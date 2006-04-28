@@ -10,6 +10,18 @@ chronological order.
 	- Eric Sunshine repaired a bunch of Texinfo problems in the new AWS2
 	  documentation.
 	- Jorrit fixed csMeshOnTexture::ScaleCamera.
+	- Jorrit moved the new csQueryRegistryOrLoad() function to
+	  iutil/plugin.h and then removed the old CS_QUERY_REGISTRY_PLUGIN.
+	- Jorrit added a version of csLoadPlugin() that accepts an
+	  object registry instead of the plugin manager.
+	- Jorrit added a new csLoadPluginCheck() function that implements
+	  the common idiom of first doing a csQueryPluginClass, optionally
+	  followed by a csLoadPlugin. There are two versions: one which
+	  accepts a plugin manager, and one which accepts an object
+	  registry.
+	- Jorrit fixed several cases in CS where the above functions
+	  are used but where in case of error there was no check (i.e.
+	  a crash would result).
 27-Apr-2006
 	- Jorrit did a few more fixes to csMeshOnTexture. It finally starts
 	  to work now.

@@ -194,16 +194,9 @@ csPtr<iBase> csHazeFactoryLoader::Parse (iDocumentNode* node,
 {
   csVector3 a;
 
-  csRef<iPluginManager> plugin_mgr (CS_QUERY_REGISTRY (object_reg,
-  	iPluginManager));
-  csRef<iMeshObjectType> type (CS_QUERY_PLUGIN_CLASS (plugin_mgr,
-  	"crystalspace.mesh.object.haze", iMeshObjectType));
-  if (!type)
-  {
-    type = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.mesh.object.haze",
-    	iMeshObjectType);
-    csPrintf ("Load TYPE plugin crystalspace.mesh.object.haze\n");
-  }
+  csRef<iMeshObjectType> type = csLoadPluginCheck<iMeshObjectType> (
+  	object_reg, "crystalspace.mesh.object.haze");
+  if (!type) return 0;
   csRef<iMeshObjectFactory> fact;
   fact = type->NewFactory ();
   csRef<iHazeFactoryState> hazefactorystate (

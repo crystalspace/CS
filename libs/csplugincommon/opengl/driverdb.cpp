@@ -500,9 +500,8 @@ void csGLDriverDatabase::Open (csGraphics2DGLCommon* ogl2d,
   csRef<iConfigManager> cfgmgr = CS_QUERY_REGISTRY (ogl2d->object_reg,
     iConfigManager);
 
-  csRef<iSyntaxService> synsrv;
-  CS_QUERY_REGISTRY_PLUGIN (synsrv, ogl2d->object_reg,
-    "crystalspace.syntax.loader.service.text", iSyntaxService);
+  csRef<iSyntaxService> synsrv = csQueryRegistryOrLoad<iSyntaxService> (
+  	ogl2d->object_reg, "crystalspace.syntax.loader.service.text");
 
   csDriverDBReader reader (this, cfgmgr, synsrv, configPriority);
 

@@ -43,27 +43,9 @@ bool csBaseRenderStepLoader::Initialize(iObjectRegistry *object_reg)
   csRef<iPluginManager> plugin_mgr = 
     CS_QUERY_REGISTRY (object_reg, iPluginManager);
 
-  synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
-  if (!synldr)
-  {
-    synldr = CS_LOAD_PLUGIN (plugin_mgr,
-    	"crystalspace.syntax.loader.service.text", iSyntaxService);
-    if (!synldr)
-    {
-      csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-	"crystalspace.renderloop.step.common",
-	"Could not load the syntax services!");
-      return false;
-    }
-    if (!object_reg->Register (synldr, "iSyntaxService"))
-    {
-      csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-	"crystalspace.renderloop.step.common",
-	"Could not register the syntax services!");
-      return false;
-    }
-  }
-
+  synldr = csQueryRegistryOrLoad<iSyntaxService> (object_reg,
+  	"crystalspace.syntax.loader.service.text");
+  if (!synldr) return false;
   return true;
 }
 

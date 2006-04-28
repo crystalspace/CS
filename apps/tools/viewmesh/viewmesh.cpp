@@ -716,19 +716,15 @@ void ViewMesh::SaveSprite (const char* path, const char* filename, bool binary)
 
     paramsdataNode->SetValue(*fname);
 
-    csRef<iBinarySaverPlugin> saver =
-      CS_QUERY_PLUGIN_CLASS(plugin_mgr, savername, iBinarySaverPlugin);
-    if (!saver)
-      saver = CS_LOAD_PLUGIN(plugin_mgr, savername, iBinarySaverPlugin);
+    csRef<iBinarySaverPlugin> saver = csLoadPluginCheck<iBinarySaverPlugin> (
+    	plugin_mgr, savername);
     if (saver)
       saver->WriteDown(meshfact, file, 0/*ssource*/);
   }
   else
   {
-    csRef<iSaverPlugin> saver = 
-      CS_QUERY_PLUGIN_CLASS(plugin_mgr, savername, iSaverPlugin);
-    if (!saver) 
-      saver = CS_LOAD_PLUGIN(plugin_mgr, savername, iSaverPlugin);
+    csRef<iSaverPlugin> saver =  csLoadPluginCheck<iSaverPlugin> (
+        plugin_mgr, savername);
     if (saver) 
       saver->WriteDown(meshfact, factNode, 0/*ssource*/);
   }

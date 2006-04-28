@@ -205,8 +205,9 @@ bool csSoftwareGraphics3DCommon::Open ()
   csRef<iPluginManager> plugin_mgr (
     csQueryRegistry<iPluginManager> (object_reg));
 
-  CS_QUERY_REGISTRY_PLUGIN(shadermgr, object_reg,
-    "crystalspace.graphics3d.shadermanager", iShaderManager);
+  shadermgr = csQueryRegistryOrLoad<iShaderManager> (object_reg,
+    "crystalspace.graphics3d.shadermanager");
+  if (!shadermgr) return false;
 
   SetupSpecifica();
 

@@ -896,25 +896,10 @@ iShader* csStencil2ShadowType::GetShadow ()
   {
     shadowLoaded = true;
 
-    csRef<iPluginManager> plugin_mgr (
-      CS_QUERY_REGISTRY (object_reg, iPluginManager));
-
     // Load the shadow vertex program 
-    csRef<iShaderManager> shmgr = CS_QUERY_REGISTRY (object_reg,
-      iShaderManager);
-
-    if (!shmgr) 
-    {
-      shmgr = CS_LOAD_PLUGIN (plugin_mgr,
-        "crystalspace.graphics3d.shadermanager",
-        iShaderManager);
-    }
-
-    if (!shmgr) 
-    {
-      Report (CS_REPORTER_SEVERITY_ERROR, "Unable to retrieve shader manager!");
-      return 0;
-    }
+    csRef<iShaderManager> shmgr = csQueryRegistryOrLoad<iShaderManager> (
+    	object_reg, "crystalspace.graphics3d.shadermanager");
+    if (!shmgr) return 0;
 
     csRef<iShaderCompiler> shcom (shmgr->GetCompiler ("XMLShader"));
 

@@ -73,16 +73,8 @@ bool csParticlesFactoryLoader::Initialize (iObjectRegistry* objreg)
 csPtr<iBase> csParticlesFactoryLoader::Parse (iDocumentNode* node,
   iStreamSource*, iLoaderContext* ldr_context, iBase* /*context*/)
 {
-  csRef<iPluginManager> plugin_mgr = CS_QUERY_REGISTRY (object_reg,
-    iPluginManager);
-
-  csRef<iMeshObjectType> type (CS_QUERY_PLUGIN_CLASS (plugin_mgr,
-  	"crystalspace.mesh.object.particles", iMeshObjectType));
-  if (!type)
-  {
-    type = CS_LOAD_PLUGIN (plugin_mgr,
-      "crystalspace.mesh.object.particles", iMeshObjectType);
-  }
+  csRef<iMeshObjectType> type = csLoadPluginCheck<iMeshObjectType> (
+  	object_reg, "crystalspace.mesh.object.particles", false);
   if (!type)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,

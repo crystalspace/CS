@@ -123,15 +123,8 @@ bool csStarFactoryLoader::Initialize (iObjectRegistry* object_reg)
 csPtr<iBase> csStarFactoryLoader::Parse (iDocumentNode* /*node*/,
 	iStreamSource*, iLoaderContext*, iBase* /* context */)
 {
-  csRef<iPluginManager> plugin_mgr (CS_QUERY_REGISTRY (object_reg,
-  	iPluginManager));
-  csRef<iMeshObjectType> type (CS_QUERY_PLUGIN_CLASS (plugin_mgr,
-  	"crystalspace.mesh.object.stars", iMeshObjectType));
-  if (!type)
-  {
-    type = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.mesh.object.stars",
-    	iMeshObjectType);
-  }
+  csRef<iMeshObjectType> type = csLoadPluginCheck<iMeshObjectType> (
+  	object_reg, "crystalspace.mesh.object.stars", false);
   if (!type)
   {
     ReportError (object_reg,

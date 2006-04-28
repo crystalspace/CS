@@ -172,8 +172,9 @@ bool csNullGraphics3D::Open ()
   SetPerspectiveAspect (G2D->GetHeight ());
   SetPerspectiveCenter (G2D->GetWidth ()/2, G2D->GetHeight ()/2);
 
-  CS_QUERY_REGISTRY_PLUGIN(shadermgr, object_reg,
-    "crystalspace.graphics3d.shadermanager", iShaderManager);
+  shadermgr = csQueryRegistryOrLoad<iShaderManager> (object_reg,
+    "crystalspace.graphics3d.shadermanager");
+  if (!shadermgr) return false;
 
   string_vertices = strings->Request ("vertices");
   string_texture_coordinates = strings->Request ("texture coordinates");

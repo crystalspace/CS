@@ -163,15 +163,8 @@ static float GetDef (iDocumentNode* node, const char* attrname, float def)
 csPtr<iBase> csInstFactoryLoader::Parse (iDocumentNode* node,
 	iStreamSource*, iLoaderContext* ldr_context, iBase* /* context */)
 {
-  csRef<iPluginManager> plugin_mgr (CS_QUERY_REGISTRY (object_reg,
-  	iPluginManager));
-  csRef<iMeshObjectType> type (CS_QUERY_PLUGIN_CLASS (plugin_mgr,
-  	"crystalspace.mesh.object.instmesh", iMeshObjectType));
-  if (!type)
-  {
-    type = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.mesh.object.instmesh",
-    	iMeshObjectType);
-  }
+  csRef<iMeshObjectType> type = csLoadPluginCheck<iMeshObjectType> (
+  	object_reg, "crystalspace.mesh.object.instmesh", false);
   if (!type)
   {
     synldr->ReportError (

@@ -138,18 +138,9 @@ bool csEmitFactoryLoader::Initialize (iObjectRegistry* object_reg)
 csPtr<iBase> csEmitFactoryLoader::Parse (iDocumentNode* /*node*/,
 	iStreamSource*, iLoaderContext*, iBase* /* context */)
 {
-  csRef<iPluginManager> plugin_mgr (CS_QUERY_REGISTRY (object_reg,
-		iPluginManager));
-  csRef<iMeshObjectType> type (CS_QUERY_PLUGIN_CLASS (plugin_mgr,
-  	"crystalspace.mesh.object.emit", iMeshObjectType));
-  if (!type)
-  {
-    type = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.mesh.object.emit",
-    	iMeshObjectType);
-    #ifdef CS_DEBUG
-      csPrintf ("Load TYPE plugin crystalspace.mesh.object.emit\n");
-    #endif  
-  }
+  csRef<iMeshObjectType> type = csLoadPluginCheck<iMeshObjectType> (
+  	object_reg, "crystalspace.mesh.object.emit");
+  if (!type) return 0;
   csRef<iMeshObjectFactory> fact (type->NewFactory ());
   return csPtr<iBase> (fact);
 }

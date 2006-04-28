@@ -484,23 +484,17 @@ csPtr<iShaderProgram> csXMLShaderTech::LoadProgram (
   // @@@ Also check if 'plugin' is a full class ID
 
   //load the plugin
-  csRef<iPluginManager> plugin_mgr = CS_QUERY_REGISTRY (
-    parent->compiler->objectreg, iPluginManager);
-
   csRef<iShaderProgramPlugin> plg;
-  plg = CS_QUERY_PLUGIN_CLASS(plugin_mgr, plugin, iShaderProgramPlugin);
+  plg = csLoadPluginCheck<iShaderProgramPlugin> (parent->compiler->objectreg,
+  	plugin, false);
   if(!plg)
   {
-    plg = CS_LOAD_PLUGIN(plugin_mgr, plugin, iShaderProgramPlugin);
-    if (!plg)
-    {
-      if (parent->compiler->do_verbose)
-        parent->compiler->Report (CS_REPORTER_SEVERITY_WARNING,
+    if (parent->compiler->do_verbose)
+      parent->compiler->Report (CS_REPORTER_SEVERITY_WARNING,
 	  "Couldn't retrieve shader plugin '%s' for <%s> in shader '%s'",
 	  plugin, node->GetValue (), parent->GetName ());
-      delete[] plugin;
-      return 0;
-    }
+    delete[] plugin;
+    return 0;
   }
 
   delete[] plugin;

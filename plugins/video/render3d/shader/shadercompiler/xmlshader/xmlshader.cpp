@@ -87,8 +87,8 @@ bool csXMLShaderCompiler::Initialize (iObjectRegistry* object_reg)
   g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
   vfs = CS_QUERY_REGISTRY (object_reg, iVFS);
   
-  CS_QUERY_REGISTRY_PLUGIN(synldr, object_reg,
-    "crystalspace.syntax.loader.service.text", iSyntaxService);
+  synldr = csQueryRegistryOrLoad<iSyntaxService> (object_reg,
+    "crystalspace.syntax.loader.service.text");
   if (!synldr)
     return false;
 

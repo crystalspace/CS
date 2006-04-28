@@ -370,19 +370,13 @@ csPtr<iMeshObject> csParticlesObject::Clone ()
 
 bool csParticlesObject::LoadPhysicsPlugin (const char *plugin_id)
 {
-  csRef<iPluginManager> plugin_mgr = CS_QUERY_REGISTRY (
-    pFactory->object_reg, iPluginManager);
-
   if(physics)
   {
     physics->RemoveParticles (&scfiParticlesObjectState);
   }
 
-  physics = CS_QUERY_PLUGIN_CLASS (plugin_mgr, plugin_id, iParticlesPhysics);
-  if (!physics)
-  {
-    physics = CS_LOAD_PLUGIN (plugin_mgr, plugin_id, iParticlesPhysics);
-  }
+  physics = csLoadPluginCheck<iParticlesPhysics> (pFactory->object_reg,
+  	plugin_id, false);
   if (!physics)
   {
     csReport (pFactory->object_reg, CS_REPORTER_SEVERITY_ERROR,

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2001 by Jorrit Tyberghein
+    Copyright (C) 2001,2006 by Jorrit Tyberghein
     Copyright (C) 1999 by Andrew Zabolotny <bit@eltech.ru>
 
     This library is free software; you can redistribute it and/or
@@ -30,60 +30,11 @@
 
 
 #include "csutil/scf.h"
+#include "iutil/objreg.h"
+#include "ivaria/reporter.h"
 
 
 struct iComponent;
-
-/**
- * Use this macro to query the object registry, loading a plugin if needed.  If
- * an object with a given interface exists in an object registry, get that
- * object from the registry. If the registry query fails, try to load a plugin
- * and get the interface from there. If that succeeds, the interface is added
- * to the registry for future use and given a tag the same name as the
- * requested interface. Example use:
- *
- * \code
- * csRef<iDynamics> dynamic_system;
- * CS_QUERY_REGISTRY_PLUGIN(dynamic_system, object_reg, 
- *   "crystalspace.dynamics.ode", iDynamics);
- * \endcode
- *
- * \param obj csRef to hold the discovered or created/loaded object.
- * \param object_reg The object registry (of type iObjectRegistry).
- * \param scf_id The requested SCF class name (ex. "crystalspace.dynamice.ode")
- * \param interface The interface to requested from class scf_id
- *   (ex. iDynamics). This argument is also stringified and used as the objects
- *   tag in the registry.
- * \todo This probably ought to be made more thread-safe by locking the object
- *   registry if possible.
- */
-#define CS_QUERY_REGISTRY_PLUGIN(obj,object_reg,scf_id,interface) \
-do { \
-  obj = CS_QUERY_REGISTRY(object_reg, interface); \
-  if (!obj.IsValid()) \
-  { \
-    csRef<iPluginManager> mgr = CS_QUERY_REGISTRY(object_reg,iPluginManager); \
-    if (!mgr.IsValid()) \
-    { \
-      csReport(object_reg, CS_REPORTER_SEVERITY_ERROR, \
-        "crystalspace.plugin.query", "Plugin manager missing from " \
-        "object-registry when attempting to query/load class: %s", scf_id); \
-    } \
-    obj = CS_LOAD_PLUGIN(mgr, scf_id, interface); \
-    if (!obj.IsValid()) \
-    { \
-      csReport(object_reg, CS_REPORTER_SEVERITY_WARNING, \
-        "crystalspace.plugin.query", "Failed to load class \"%s\" with " \
-        "interface \"" #interface "\"", scf_id); \
-    } \
-    if (!object_reg->Register(obj, #interface))	\
-    { \
-      csReport(object_reg, CS_REPORTER_SEVERITY_WARNING, \
-	"crystalspace.plugin.query", "Failed to register class \"%s\" with " \
-	"tag \"" #interface "\" in the object-registry.", scf_id); \
-    } \
-  } \
-} while (0)
 
 /**
  * An iterator to iterate over all plugins in the plugin manager.
@@ -212,6 +163,71 @@ inline csPtr<Interface> csLoadPlugin (iPluginManager *mgr,
 }
 
 /**
+ * Tell plugin manager to load a plugin.
+ * \a Interface: Desired interface type (ex. iGraphics2D, iVFS, etc.).
+ * \param object_reg object registry
+ * \param ClassID The SCF class name (ex. crystalspace.graphics3d.software).
+ */
+template<class Interface>
+inline csPtr<Interface> csLoadPlugin (iObjectRegistry* object_reg,
+                                      const char* ClassID)
+{
+  csRef<iPluginManager> mgr = csQueryRegistry<iPluginManager> (object_reg);
+  if (!mgr) return 0;
+  return csLoadPlugin<Interface> (mgr, ClassID);
+}
+
+/**
+ * Tell plugin manager to load a plugin but first check if the plugin
+ * is not already loaded.
+ * \a Interface: Desired interface type (ex. iGraphics2D, iVFS, etc.).
+ * \param mgr An object that implements iPluginManager.
+ * \param ClassID The SCF class name (ex. crystalspace.graphics3d.software).
+ */
+template<class Interface>
+inline csPtr<Interface> csLoadPluginCheck (iPluginManager *mgr,
+                                      const char* ClassID)
+{
+  csRef<Interface> i = csQueryPluginClass<Interface> (mgr, ClassID);
+  if (i) return (csPtr<Interface>) i;
+  i = csLoadPlugin<Interface> (mgr, ClassID);
+  if (!i) return 0;
+  return (csPtr<Interface>) i;
+}
+
+/**
+ * Tell plugin manager to load a plugin but first check if the plugin
+ * is not already loaded.
+ * \a Interface: Desired interface type (ex. iGraphics2D, iVFS, etc.).
+ * \param object_reg object registry
+ * \param ClassID The SCF class name (ex. crystalspace.graphics3d.software).
+ * \param report if true then we will report an error in case of error.
+ */
+template<class Interface>
+inline csPtr<Interface> csLoadPluginCheck (iObjectRegistry* object_reg,
+                                      const char* ClassID, bool report = true)
+{
+  csRef<iPluginManager> mgr = csQueryRegistry<iPluginManager> (object_reg);
+  if (!mgr)
+  {
+    if (report)
+      csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+      	"crystalspace.plugin.load", "Couldn't find plugin manager!");
+    return 0;
+  }
+  csRef<Interface> i = csLoadPluginCheck<Interface> (mgr, ClassID);
+  if (!i)
+  {
+    if (report)
+      csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+      	"crystalspace.plugin.load", "Couldn't load plugin with class '%s'!",
+		ClassID);
+    return 0;
+  }
+  return (csPtr<Interface>) i;
+}
+
+/**
  * \deprecated Compatibility macro.
  * \sa csLoadPlugin<Interface> (mgr, ClassID);
  */
@@ -235,6 +251,61 @@ inline csPtr<iBase> csLoadPluginAlways (iPluginManager *mgr,
  */
 #define CS_LOAD_PLUGIN_ALWAYS(Object,ClassID)				\
   csLoadPluginAlways (Object, ClassID)
+
+/**
+ * Use this macro to query the object registry, loading a plugin if needed.  If
+ * an object with a given interface exists in an object registry, get that
+ * object from the registry. If the registry query fails, try to load a plugin
+ * and get the interface from there. If that succeeds, the interface is added
+ * to the registry for future use and given a tag the same name as the
+ * requested interface. Example use:
+ *
+ * \code
+ * csRef<iDynamics> dynamic_system = csQueryRegistryOrLoad<iDynamics> (
+ 	object_reg, "crystalspace.dynamics.ode");
+ * \endcode
+ *
+ * \param Reg The object registry (of type iObjectRegistry).
+ * \param classID The requested SCF class name (ex. "crystalspace.dynamice.ode")
+ * \param report if true then we will report an error in case of error.
+ * \todo This probably ought to be made more thread-safe by locking the object
+ *   registry if possible.
+ * \return a reference to the requested interface if successful. Otherwise
+ *   this function returns 0.
+ */
+template<class Interface>
+inline csPtr<Interface> csQueryRegistryOrLoad (iObjectRegistry *Reg,
+	const char* classID, bool report = true)
+{
+  csRef<Interface> i = csQueryRegistry<Interface> (Reg);
+  if (i) return (csPtr<Interface>)i;
+  csRef<iPluginManager> plugmgr = csQueryRegistry<iPluginManager> (Reg);
+  if (!plugmgr)
+  {
+    if (report)
+      csReport (Reg, CS_REPORTER_SEVERITY_ERROR,
+      	"crystalspace.plugin.query", "Plugin manager missing!");
+    return 0;
+  }
+  i = csLoadPlugin<Interface> (plugmgr, classID);
+  if (!i)
+  {
+    if (report)
+      csReport (Reg, CS_REPORTER_SEVERITY_ERROR,
+      	"crystalspace.plugin.query",
+	"Couldn't load plugin with class '%s'!", classID);
+    return 0;
+  }
+  if (!Reg->Register (i, scfInterfaceTraits<Interface>::GetName ()))
+  {
+    if (report)
+      csReport (Reg, CS_REPORTER_SEVERITY_ERROR,
+      	"crystalspace.plugin.query",
+	"Couldn't register plugin with class '%s'!", classID);
+    return 0;
+  }
+  return (csPtr<Interface>)i;
+}
 
 /** @} */
 

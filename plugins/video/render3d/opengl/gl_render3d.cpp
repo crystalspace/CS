@@ -896,11 +896,12 @@ bool csGLGraphics3D::Open ()
   stencilClearWithZ = config->GetBool ("Video.OpenGL.StencilClearWithZ", true);
   if (verbose)
     Report (CS_REPORTER_SEVERITY_NOTIFY, 
-    "Clearing Z buffer when stencil clear is needed %s", 
-    stencilClearWithZ ? "enabled" : "disabled");
+      "Clearing Z buffer when stencil clear is needed %s", 
+      stencilClearWithZ ? "enabled" : "disabled");
 
-  CS_QUERY_REGISTRY_PLUGIN(shadermgr, object_reg,
-    "crystalspace.graphics3d.shadermanager", iShaderManager);
+  shadermgr = csQueryRegistryOrLoad<iShaderManager> (object_reg,
+    "crystalspace.graphics3d.shadermanager");
+  if (!shadermgr) return false;
 
   txtmgr.AttachNew (new csGLTextureManager (
     object_reg, GetDriver2D (), config, this));

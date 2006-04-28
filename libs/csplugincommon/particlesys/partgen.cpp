@@ -67,12 +67,9 @@ csParticleSystem::csParticleSystem (
   mat = 0;
   radius = 0.0f;
   color.Set (0, 0, 0);
-  csRef<iPluginManager> plugin_mgr (
-	  	CS_QUERY_REGISTRY (object_reg, iPluginManager));
-  csRef<iMeshObjectType> type (CS_QUERY_PLUGIN_CLASS (plugin_mgr,
-  	"crystalspace.mesh.object.sprite.2d", iMeshObjectType));
-  if (!type) type = CS_LOAD_PLUGIN (plugin_mgr,
-  	"crystalspace.mesh.object.sprite.2d", iMeshObjectType);
+  csRef<iMeshObjectType> type = csLoadPluginCheck<iMeshObjectType> (
+  	object_reg, "crystalspace.mesh.object.sprite.2d");
+  if (!type) return;
   spr_factory = type->NewFactory ();
   current_lod = 1;
   current_features = 0;

@@ -282,7 +282,8 @@ bool csSndSysRendererSoftware::Initialize (iObjectRegistry *obj_reg)
   // If we determined an eventrecorder plugin should be loaded, load it
   if (eventrecordername != 0)
   {
-    CS_QUERY_REGISTRY_PLUGIN(m_pEventRecorder, m_pObjectRegistry, eventrecordername, iSndSysEventRecorder);
+    m_pEventRecorder = csQueryRegistryOrLoad<iSndSysEventRecorder> (
+    	m_pObjectRegistry, eventrecordername, false);
     if (!m_pEventRecorder)
       Report (CS_REPORTER_SEVERITY_ERROR, "Event Recorder [%s] specified, but unable to load.", eventrecordername);
     // There is no need to bail out, we'll handle this ok

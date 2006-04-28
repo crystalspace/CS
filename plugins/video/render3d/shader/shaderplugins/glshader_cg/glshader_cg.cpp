@@ -229,23 +229,16 @@ bool csGLShader_CG::Open()
     dumpDir = csStrNew (config->GetStr ("Video.OpenGL.Shader.Cg.DebugDumpDir",
     "/tmp/cgdump/"));
 
-  csRef<iPluginManager> plugin_mgr = CS_QUERY_REGISTRY (object_reg,
-    iPluginManager);
   if (route)
   {
-    psplg = CS_QUERY_PLUGIN_CLASS(plugin_mgr, 
-      "crystalspace.graphics3d.shader.glps1", iShaderProgramPlugin);
+    psplg = csLoadPluginCheck<iShaderProgramPlugin> (object_reg,
+      "crystalspace.graphics3d.shader.glps1", false);
     if(!psplg)
     {
-      psplg = CS_LOAD_PLUGIN(plugin_mgr, 
-        "crystalspace.graphics3d.shader.glps1", iShaderProgramPlugin);
-      if (!psplg)
-      {
-        if (doVerbose)
-          Report (CS_REPORTER_SEVERITY_WARNING,
+      if (doVerbose)
+        Report (CS_REPORTER_SEVERITY_WARNING,
             "Could not find crystalspace.graphics3d.shader.glps1. Cg to PS "
             "routing unavailable.");
-      }
     }
   }
   // Check which FP profile to use...

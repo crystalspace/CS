@@ -85,13 +85,12 @@ namespace CS
       if (path && !vfs->ChDirAuto (path, 0, 0, filename))
 	return false;
 
-      csRef<iEngine> engine;
-      CS_QUERY_REGISTRY_PLUGIN (engine, objectReg,
-	"crystalspace.engine.3d", iEngine);
+      csRef<iEngine> engine = csQueryRegistryOrLoad<iEngine> (objectReg,
+	"crystalspace.engine.3d");
       if (!engine.IsValid()) return false;
-      csRef<iLoader> loader;
-      CS_QUERY_REGISTRY_PLUGIN (loader, objectReg,
-	"crystalspace.level.loader", iLoader);
+      csRef<iLoader> loader = csQueryRegistryOrLoad<iLoader> (objectReg,
+	"crystalspace.level.loader");
+      if (!loader.IsValid()) return false;
 
       csString regionName;
       regionName.Format ("ImportKitRegion_%s", GetTempName());

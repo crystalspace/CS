@@ -1169,24 +1169,9 @@ bool csLoader::Initialize (iObjectRegistry *object_Reg)
   // Get the virtual file system plugin.
   GET_CRITICAL_PLUGIN (VFS, iVFS, "VFS");
   // Get syntax services.
-  SyntaxService = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
-  if (!SyntaxService)
-  {
-    SyntaxService = CS_LOAD_PLUGIN (plugin_mgr,
-    	"crystalspace.syntax.loader.service.text", iSyntaxService);
-    if (!SyntaxService)
-    {
-      ReportError ("crystalspace.maploader",
-	"Could not load the syntax services!");
-      return false;
-    }
-    if (!object_reg->Register (SyntaxService, "iSyntaxService"))
-    {
-      ReportError ("crystalspace.maploader",
-	"Could not register the syntax services!");
-      return false;
-    }
-  }
+  SyntaxService = csQueryRegistryOrLoad<iSyntaxService> (object_reg,
+  	"crystalspace.syntax.loader.service.text");
+  if (!SyntaxService) return false;
 
   // Get all optional plugins.
   GET_PLUGIN (ImageLoader, iImageIO, "image loader");
@@ -1195,19 +1180,11 @@ bool csLoader::Initialize (iObjectRegistry *object_Reg)
   GET_PLUGIN (G3D, iGraphics3D, "video driver");
   GET_PLUGIN (SndSysRender, iSndSysRenderer, "sound driver (v2)");
 
-  SndSysManager = CS_QUERY_REGISTRY (object_reg, iSndSysManager);
+  SndSysManager = csQueryRegistryOrLoad<iSndSysManager> (object_reg,
+    "crystalspace.sndsys.manager", false);
   if (!SndSysManager)
   {
-    SndSysManager = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.sndsys.manager",
-    	iSndSysManager);
-    if (SndSysManager)
-    {
-      object_reg->Register (SndSysManager, "iSndSysManager");
-    }
-    else
-    {
-      if (do_verbose) ReportNotify ("Could not get sound manager!");
-    }
+    if (do_verbose) ReportNotify ("Could not get sound manager!");
   }
 
   InitTokenTable (xmltokens);
@@ -2148,14 +2125,8 @@ bool csLoader::LoadMeshObjectFactory (iLoaderContext* ldr_context,
 	      "Please don't use <params> in combination with <nullmesh>!");
 	    return false;
 	  }
-	  csRef<iPluginManager> plugin_mgr =
-	  	CS_QUERY_REGISTRY (object_reg, iPluginManager);
-	  csRef<iMeshObjectType> type = CS_QUERY_PLUGIN_CLASS (
-		plugin_mgr, "crystalspace.mesh.object.null",
-		iMeshObjectType);
-	  if (!type)
-	    type = CS_LOAD_PLUGIN (plugin_mgr,
-	    	"crystalspace.mesh.object.null", iMeshObjectType);
+	  csRef<iMeshObjectType> type = csLoadPluginCheck<iMeshObjectType> (
+		object_reg, "crystalspace.mesh.object.null", false);
 	  if (!type)
 	  {
             SyntaxService->ReportError (
@@ -3451,14 +3422,8 @@ bool csLoader::LoadMeshObject (iLoaderContext* ldr_context,
 	      "Please don't use <params> in combination with <nullmesh>!");
 	    return false;
 	  }
-	  csRef<iPluginManager> plugin_mgr =
-	  	CS_QUERY_REGISTRY (object_reg, iPluginManager);
-	  csRef<iMeshObjectType> type = CS_QUERY_PLUGIN_CLASS (
-		plugin_mgr, "crystalspace.mesh.object.null",
-		iMeshObjectType);
-	  if (!type)
-	    type = CS_LOAD_PLUGIN (plugin_mgr,
-	    	"crystalspace.mesh.object.null", iMeshObjectType);
+	  csRef<iMeshObjectType> type = csLoadPluginCheck<iMeshObjectType> (
+		object_reg, "crystalspace.mesh.object.null", false);
 	  if (!type)
 	  {
             SyntaxService->ReportError (
@@ -4165,15 +4130,9 @@ bool csLoader::LoadSettings (iDocumentNode* node)
 	          cellsize, newcellsize);
 	      cellsize = newcellsize;
 	    }
-	    csRef<iPluginManager> plugin_mgr (CS_QUERY_REGISTRY (object_reg,
-		iPluginManager));
-	    csRef<iMeshObjectType> type (CS_QUERY_PLUGIN_CLASS (plugin_mgr,
-		"crystalspace.mesh.object.thing", iMeshObjectType));
-	    if (!type)
-	    {
-	      type = CS_LOAD_PLUGIN (plugin_mgr,
-	      	"crystalspace.mesh.object.thing", iMeshObjectType);
-	    }
+	    csRef<iMeshObjectType> type = csLoadPluginCheck<iMeshObjectType> (
+	    	object_reg, "crystalspace.mesh.object.thing");
+	    if (!type) return false;
 	    csRef<iThingEnvironment> te = SCF_QUERY_INTERFACE (type,
 		iThingEnvironment);
 	    te->SetLightmapCellSize (cellsize);
@@ -5515,26 +5474,9 @@ iEngineSequenceManager* csLoader::GetEngineSequenceManager ()
 {
   if (!eseqmgr)
   {
-    eseqmgr = CS_QUERY_REGISTRY (object_reg, iEngineSequenceManager);
-    if (!eseqmgr)
-    {
-      csRef<iPluginManager> plugin_mgr (
-  	  CS_QUERY_REGISTRY (object_reg, iPluginManager));
-      eseqmgr = CS_LOAD_PLUGIN (plugin_mgr,
-    	  "crystalspace.utilities.sequence.engine", iEngineSequenceManager);
-      if (!eseqmgr)
-      {
-        ReportError ("crystalspace.maploader",
-	  "Could not load the engine sequence manager!");
-        return 0;
-      }
-      if (!object_reg->Register (eseqmgr, "iEngineSequenceManager"))
-      {
-        ReportError ("crystalspace.maploader",
-	  "Could not register the engine sequence manager!");
-        return 0;
-      }
-    }
+    eseqmgr = csQueryRegistryOrLoad<iEngineSequenceManager> (object_reg,
+    	"crystalspace.utilities.sequence.engine");
+    if (!eseqmgr) return 0;
   }
   return eseqmgr;
 }

@@ -139,16 +139,9 @@ csPtr<iBase> csLightningFactoryLoader::Parse (iDocumentNode* node,
 {
   csVector3 a;
 
-  csRef<iPluginManager> plugin_mgr (CS_QUERY_REGISTRY (object_reg,
-        iPluginManager));
-  csRef<iMeshObjectType> type (CS_QUERY_PLUGIN_CLASS (plugin_mgr,
-        "crystalspace.mesh.object.lightning", iMeshObjectType));
-  if (!type)
-  {
-    type = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.mesh.object.lightning",
-        iMeshObjectType);
-    csPrintf ("Load TYPE plugin crystalspace.mesh.object.lightning\n");
-  }
+  csRef<iMeshObjectType> type = csLoadPluginCheck<iMeshObjectType> (
+        object_reg, "crystalspace.mesh.object.lightning");
+  if (!type) return 0;
   csRef<iMeshObjectFactory> fact;
   fact = type->NewFactory ();
   csRef<iLightningFactoryState> LightningFactoryState (

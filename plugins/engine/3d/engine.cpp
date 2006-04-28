@@ -857,17 +857,9 @@ bool csEngine::HandleEvent (iEvent &Event)
       objectRegistry, "crystalspace.shared.stringset", iStringSet);
 
     maxAspectRatio = 4096;
-    shaderManager = CS_QUERY_REGISTRY(objectRegistry, iShaderManager);
-    if (!shaderManager)
-    {
-      csRef<iPluginManager> plugin_mgr = CS_QUERY_REGISTRY (
-      	objectRegistry, iPluginManager);
-      shaderManager = csPtr<iShaderManager> (
-      	CS_LOAD_PLUGIN(plugin_mgr,
-		"crystalspace.graphics3d.shadermanager",
-		iShaderManager));
-      objectRegistry->Register (shaderManager, "iShaderManager");
-    }
+    shaderManager = csQueryRegistryOrLoad<iShaderManager> (objectRegistry,
+    	"crystalspace.graphics3d.shadermanager");
+    if (!shaderManager) return false;
 
     csRef<iShaderCompiler> shcom (shaderManager->
       GetCompiler ("XMLShader"));
@@ -982,16 +974,8 @@ iMeshObjectType* csEngine::GetThingType ()
 {
   if (!thingMeshType)
   {
-    csRef<iPluginManager> plugin_mgr = CS_QUERY_REGISTRY (objectRegistry,
-  	  iPluginManager);
-    thingMeshType = CS_QUERY_PLUGIN_CLASS (
-        plugin_mgr, "crystalspace.mesh.object.thing",
-        iMeshObjectType);
-    if (!thingMeshType)
-    {
-      thingMeshType = CS_LOAD_PLUGIN (plugin_mgr,
-    	  "crystalspace.mesh.object.thing", iMeshObjectType);
-    }
+    thingMeshType = csLoadPluginCheck<iMeshObjectType> (
+        objectRegistry, "crystalspace.mesh.object.thing");
   }
 
   return (iMeshObjectType*)thingMeshType;
@@ -2999,16 +2983,11 @@ csPtr<iMeshFactoryWrapper> csEngine::CreateMeshFactory (
   // That's because that duplicate factory can still be in another
   // region. And even if this is not the case then factories with same
   // name are still allowed.
-  csRef<iPluginManager> plugin_mgr (
-  	CS_QUERY_REGISTRY (objectRegistry, iPluginManager));
-  csRef<iMeshObjectType> type (CS_QUERY_PLUGIN_CLASS (
-      plugin_mgr,
-      classId,
-      iMeshObjectType));
-  if (!type) type = CS_LOAD_PLUGIN (plugin_mgr, classId, iMeshObjectType);
+  csRef<iMeshObjectType> type = csLoadPluginCheck<iMeshObjectType> (
+      objectRegistry, classId);
   if (!type) return 0;
 
-  csRef<iMeshObjectFactory> fact (type->NewFactory ());
+  csRef<iMeshObjectFactory> fact = type->NewFactory ();
   if (!fact) return 0;
 
   // don't pass the name to avoid a second search
@@ -3190,14 +3169,8 @@ csPtr<iMeshFactoryWrapper> csEngine::LoadMeshFactory (
     return 0;
   }
 
-  csRef<iPluginManager> plugin_mgr (
-  	CS_QUERY_REGISTRY (objectRegistry, iPluginManager));
-  csRef<iLoaderPlugin> plug (CS_QUERY_PLUGIN_CLASS (
-      plugin_mgr,
-      loaderClassId,
-      iLoaderPlugin));
-  if (!plug)
-    plug = CS_LOAD_PLUGIN (plugin_mgr, loaderClassId, iLoaderPlugin);
+  csRef<iLoaderPlugin> plug = csLoadPluginCheck<iLoaderPlugin> (
+      objectRegistry, loaderClassId);
   if (!plug) return 0;
 
   csRef<iMeshFactoryWrapper> fact (CreateMeshFactory (name));
@@ -3245,14 +3218,8 @@ csPtr<iMeshWrapper> csEngine::LoadMeshWrapper (
     return 0;
   }
 
-  csRef<iPluginManager> plugin_mgr (
-  	CS_QUERY_REGISTRY (objectRegistry, iPluginManager));
-  csRef<iLoaderPlugin> plug (CS_QUERY_PLUGIN_CLASS (
-      plugin_mgr,
-      loaderClassId,
-      iLoaderPlugin));
-  if (!plug)
-    plug = CS_LOAD_PLUGIN (plugin_mgr, loaderClassId, iLoaderPlugin);
+  csRef<iLoaderPlugin> plug = csLoadPluginCheck<iLoaderPlugin> (
+      objectRegistry, loaderClassId);
   if (!plug) return 0;
 
   csMeshWrapper *meshwrap = new csMeshWrapper ();
@@ -3421,11 +3388,8 @@ csPtr<iMeshWrapper> csEngine::CreateMeshWrapper (
   iSector *sector,
   const csVector3 &pos)
 {
-  csRef<iPluginManager> plugin_mgr (
-  	CS_QUERY_REGISTRY (objectRegistry, iPluginManager));
-  csRef<iMeshObjectType> type (CS_QUERY_PLUGIN_CLASS (
-      plugin_mgr, classId, iMeshObjectType));
-  if (!type) type = CS_LOAD_PLUGIN (plugin_mgr, classId, iMeshObjectType);
+  csRef<iMeshObjectType> type = csLoadPluginCheck<iMeshObjectType> (
+      objectRegistry, classId);
   if (!type) return 0;
 
   csRef<iMeshObjectFactory> fact (type->NewFactory ());

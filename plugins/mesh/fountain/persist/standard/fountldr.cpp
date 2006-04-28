@@ -125,15 +125,9 @@ bool csFountainFactoryLoader::Initialize (iObjectRegistry* object_reg)
 csPtr<iBase> csFountainFactoryLoader::Parse (iDocumentNode* /*node*/,
 	iStreamSource*, iLoaderContext*, iBase* /* context */)
 {
-  csRef<iPluginManager> plugin_mgr (CS_QUERY_REGISTRY (object_reg,
-  	iPluginManager));
-  csRef<iMeshObjectType> type (CS_QUERY_PLUGIN_CLASS (plugin_mgr,
-  	"crystalspace.mesh.object.fountain", iMeshObjectType));
-  if (!type)
-  {
-    type = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.mesh.object.fountain",
-    	iMeshObjectType);
-  }
+  csRef<iMeshObjectType> type = csLoadPluginCheck<iMeshObjectType> (
+  	object_reg, "crystalspace.mesh.object.fountain");
+  if (!type) return 0;
   csRef<iMeshObjectFactory> fact (type->NewFactory ());
   return csPtr<iBase> (fact);
 }

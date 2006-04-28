@@ -125,15 +125,9 @@ bool csExplosionFactoryLoader::Initialize (iObjectRegistry* object_reg)
 csPtr<iBase> csExplosionFactoryLoader::Parse (iDocumentNode* /*node*/,
 	iStreamSource*, iLoaderContext*, iBase* /* context */)
 {
-  csRef<iPluginManager> plugin_mgr (CS_QUERY_REGISTRY (object_reg,
-  	iPluginManager));
-  csRef<iMeshObjectType> type (CS_QUERY_PLUGIN_CLASS (plugin_mgr,
-  	"crystalspace.mesh.object.explosion", iMeshObjectType));
-  if (!type)
-  {
-    type = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.mesh.object.explosion",
-    	iMeshObjectType);
-  }
+  csRef<iMeshObjectType> type = csLoadPluginCheck<iMeshObjectType> (
+  	object_reg, "crystalspace.mesh.object.explosion");
+  if (!type) return 0;
   csRef<iMeshObjectFactory> fact (type->NewFactory ());
   return csPtr<iBase> (fact);
 }

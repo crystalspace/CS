@@ -298,8 +298,8 @@ void LoadSectorTask::doTask()
     //osys->EnableQuickStep (1);
   }
 
-  CS_QUERY_REGISTRY_PLUGIN(sector->colsys, sector->objreg, "crystalspace.collisiondetection.opcode",
-                           iCollideSystem);
+  sector->colsys = csQueryRegistryOrLoad<iCollideSystem> (sector->objreg,
+  	"crystalspace.collisiondetection.opcode");
 
   LOG("csVosSector", 2, "Starting sector load");
 
@@ -309,8 +309,8 @@ void LoadSectorTask::doTask()
   if (meter) sp->notifyTaskStart("Sending world download request...", 1);
 
   vRef<RemoteSearch> rs = meta_cast<RemoteSearch>(sector->GetVobject()->getSite());
-  if(rs.isValid()) {
-
+  if(rs.isValid())
+  {
     {
         vRef<MessageBlock> mb(new MessageBlock(), false);
         vRef<Message> m(new Message(), false);

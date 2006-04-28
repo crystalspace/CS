@@ -114,13 +114,8 @@ csPtr<iBase> csTerrainFactoryLoader::Parse (iDocumentNode* node,
       case XMLTOKEN_PLUGIN:
       {
         const char* pluginname = child->GetContentsValue ();
-        csRef<iMeshObjectType> type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
-          pluginname, iMeshObjectType);
-        if (!type)
-        {
-          type = CS_LOAD_PLUGIN (plugin_mgr, 
-            pluginname, iMeshObjectType);
-        }
+        csRef<iMeshObjectType> type = csLoadPluginCheck<iMeshObjectType> (
+          plugin_mgr, pluginname);
         if (!type)
         {
           synldr->ReportError ("crystalspace.terrain.loader.factory",

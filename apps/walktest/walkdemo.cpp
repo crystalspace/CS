@@ -694,13 +694,10 @@ void AttachRandomLight (iLight* light)
 
 static csPtr<iMeshWrapper> CreateMeshWrapper (const char* name)
 {
-  csRef<iPluginManager> plugin_mgr = CS_QUERY_REGISTRY (Sys->object_reg,
-  	iPluginManager);
-  csRef<iMeshObjectType> ThingType = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
-  	"crystalspace.mesh.object.thing", iMeshObjectType);
+  csRef<iMeshObjectType> ThingType = csLoadPluginCheck<iMeshObjectType> (
+  	Sys->object_reg, "crystalspace.mesh.object.thing");
   if (!ThingType)
-    ThingType = CS_LOAD_PLUGIN (plugin_mgr,
-    	"crystalspace.mesh.object.thing", iMeshObjectType);
+    return 0;
 
   csRef<iMeshObjectFactory> thing_fact = ThingType->NewFactory ();
   csRef<iMeshObject> mesh_obj = thing_fact->NewInstance ();

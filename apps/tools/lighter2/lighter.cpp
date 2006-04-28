@@ -62,9 +62,9 @@ namespace lighter
       pluginManager = csQueryRegistry<iPluginManager> (objectRegistry);
       if (!pluginManager) return Report ("No iPluginManager!");
 
-      csRef<iReporter> rep;
-      CS_QUERY_REGISTRY_PLUGIN(rep, objectRegistry, 
-        "crystalspace.utilities.reporter", iReporter);
+      csRef<iReporter> rep = csQueryRegistryOrLoad<iReporter> (objectRegistry, 
+        "crystalspace.utilities.reporter");
+      if (!rep) return false;
 
       // Set ourselves up as a reporterlistener
       rep->AddReporterListener (&globalTUI);

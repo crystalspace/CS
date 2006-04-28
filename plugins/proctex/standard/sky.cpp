@@ -89,15 +89,9 @@ csPtr<iBase> csPtSkyLoader::Parse (iDocumentNode* /*node*/,
     isn't really necessary here, as we could just instantiate csPtSkyType
     with new. It's just an 'exercise'.
    */
-  csRef<iPluginManager> plugin_mgr (CS_QUERY_REGISTRY (object_reg,
-  	iPluginManager));
-  csRef<iTextureType> type (CS_QUERY_PLUGIN_CLASS (plugin_mgr,
-  	CLASSID_SKYTYPE, iTextureType));
-  if (!type)
-  {
-    type = CS_LOAD_PLUGIN (plugin_mgr, CLASSID_SKYTYPE,
-    	iTextureType);
-  }
+  csRef<iTextureType> type = csLoadPluginCheck<iTextureType> (
+  	object_reg, CLASSID_SKYTYPE);
+  if (!type) return 0;
   csRef<iSyntaxService> synldr = 
     CS_QUERY_REGISTRY (object_reg, iSyntaxService);
 

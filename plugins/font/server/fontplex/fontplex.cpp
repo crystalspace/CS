@@ -360,11 +360,7 @@ csPtr<iFontServer> csFontServerMultiplexer::ResolveFontServer (const char* name)
     csString plugName;
     plugName << "crystalspace.font.server." << name;
 
-    fs = CS_QUERY_PLUGIN_CLASS (plugin_mgr, plugName, iFontServer);
-    if (fs == 0)
-    {
-      fs = CS_LOAD_PLUGIN (plugin_mgr, plugName, iFontServer);
-    }
+    fs = csLoadPluginCheck<iFontServer> (plugin_mgr, plugName);
   }
   return csPtr<iFontServer> (fs);
 }

@@ -318,10 +318,8 @@ bool csSaver::SaveTextures(iDocumentNode *parent)
       savername.ReplaceAll (".type.", ".saver.");
 
       //Invoke the iSaverPlugin::WriteDown
-      csRef<iSaverPlugin> saver = 
-	CS_QUERY_PLUGIN_CLASS(plugin_mgr, savername, iSaverPlugin);
-      if (!saver) 
-	saver = CS_LOAD_PLUGIN(plugin_mgr, savername, iSaverPlugin);
+      csRef<iSaverPlugin> saver = csLoadPluginCheck<iSaverPlugin> (
+      	plugin_mgr, savername);
       if (saver)
 	saver->WriteDown(proctex, child, 0/**ssource*/);
 
@@ -656,10 +654,8 @@ bool csSaver::SaveMeshFactories(iMeshFactoryList* factList,
     csReplaceAll(savername, basepluginname, ".object.", ".saver.factory.", 128);
 
     //Invoke the iSaverPlugin::WriteDown
-    csRef<iSaverPlugin> saver = 
-      CS_QUERY_PLUGIN_CLASS(plugin_mgr, savername, iSaverPlugin);
-    if (!saver) 
-      saver = CS_LOAD_PLUGIN(plugin_mgr, savername, iSaverPlugin);
+    csRef<iSaverPlugin> saver = csLoadPluginCheck<iSaverPlugin> (
+    	plugin_mgr, savername);
     if (saver) 
       saver->WriteDown(meshfact, factNode, 0/**ssource*/);
 
@@ -841,12 +837,8 @@ bool csSaver::SaveSectorMeshes(iMeshList* meshList,
         csReplaceAll(savername, basepluginname, ".object.", ".saver.", 128);
 
         //Invoke the iSaverPlugin::WriteDown
-        csRef<iSaverPlugin> saver = 
-          CS_QUERY_PLUGIN_CLASS(plugin_mgr, savername, iSaverPlugin);
-          
-        if (!saver) 
-          saver = CS_LOAD_PLUGIN(plugin_mgr, savername, iSaverPlugin);
-          
+        csRef<iSaverPlugin> saver = csLoadPluginCheck<iSaverPlugin> (
+		plugin_mgr, savername);
         if (saver)
           saver->WriteDown(meshwrapper->GetMeshObject(), meshNode,
 	  	0/**ssource*/);
@@ -962,12 +954,8 @@ bool csSaver::SaveSectorMeshes(const csRefArray<iSceneNode>& meshList,
         csReplaceAll(savername, basepluginname, ".object.", ".saver.", 128);
 
         //Invoke the iSaverPlugin::WriteDown
-        csRef<iSaverPlugin> saver = 
-          CS_QUERY_PLUGIN_CLASS(plugin_mgr, savername, iSaverPlugin);
-          
-        if (!saver) 
-          saver = CS_LOAD_PLUGIN(plugin_mgr, savername, iSaverPlugin);
-          
+        csRef<iSaverPlugin> saver = csLoadPluginCheck<iSaverPlugin> (
+          plugin_mgr, savername);
         if (saver)
           saver->WriteDown(meshwrapper->GetMeshObject(), meshNode,
 	  	0/**ssource*/);
@@ -1197,13 +1185,9 @@ bool csSaver::SaveSettings (iDocumentNode* node)
   synldr->WriteBool(settingsNode,"clearscreen",engine->GetClearScreen (),
     engine->GetDefaultClearScreen ());  
 
-  csRef<iMeshObjectType> type (CS_QUERY_PLUGIN_CLASS (plugin_mgr,
-    "crystalspace.mesh.object.thing", iMeshObjectType));
-  if (!type)
-  {
-    type = CS_LOAD_PLUGIN (plugin_mgr,
-      "crystalspace.mesh.object.thing", iMeshObjectType);
-  }
+  csRef<iMeshObjectType> type = csLoadPluginCheck<iMeshObjectType> (
+  	object_reg, "crystalspace.mesh.object.thing");
+  if (!type) return false;
   csRef<iThingEnvironment> te = SCF_QUERY_INTERFACE (type,
     iThingEnvironment);
   int cellsize = te->GetLightmapCellSize ();
@@ -1412,12 +1396,8 @@ bool csSaver::SaveAddons (iDocumentNode* parent)
         csReplaceAll(savername, pluginname, ".loader", ".saver", 128);
 
         //Invoke the iSaverPlugin::WriteDown
-        csRef<iSaverPlugin> saver = 
-          CS_QUERY_PLUGIN_CLASS(plugin_mgr, savername, iSaverPlugin);
-          
-        if (!saver) 
-          saver = CS_LOAD_PLUGIN(plugin_mgr, savername, iSaverPlugin);
-          
+        csRef<iSaverPlugin> saver = csLoadPluginCheck<iSaverPlugin> (plugin_mgr,
+		savername);
         if (saver)
           saver->WriteDown(addon->GetAddonObject (), node, 0/**ssource*/);
       }

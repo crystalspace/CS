@@ -3060,15 +3060,10 @@ void csBugPlug::SaveMap ()
     return;
   }
 
-  csRef<iPluginManager> plugin_mgr = 
-    CS_QUERY_REGISTRY (object_reg, iPluginManager);
-  csRef<iSaver> saver = 
-    CS_QUERY_PLUGIN_CLASS(plugin_mgr, "crystalspace.level.saver", iSaver);
-  if (!saver) 
-    saver = CS_LOAD_PLUGIN(plugin_mgr, "crystalspace.level.saver", iSaver);
+  csRef<iSaver> saver = csLoadPluginCheck<iSaver> (object_reg,
+  	"crystalspace.level.saver");
   if (saver)
     saver->SaveMapFile(name);
-
 }
 
 //---------------------------------------------------------------------------

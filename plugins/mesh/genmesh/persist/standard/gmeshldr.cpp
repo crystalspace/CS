@@ -302,15 +302,8 @@ static float GetDef (iDocumentNode* node, const char* attrname, float def)
 csPtr<iBase> csGeneralFactoryLoader::Parse (iDocumentNode* node,
 	iStreamSource*, iLoaderContext* ldr_context, iBase* /* context */)
 {
-  csRef<iPluginManager> plugin_mgr (CS_QUERY_REGISTRY (object_reg,
-  	iPluginManager));
-  csRef<iMeshObjectType> type (CS_QUERY_PLUGIN_CLASS (plugin_mgr,
-  	"crystalspace.mesh.object.genmesh", iMeshObjectType));
-  if (!type)
-  {
-    type = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.mesh.object.genmesh",
-    	iMeshObjectType);
-  }
+  csRef<iMeshObjectType> type = csLoadPluginCheck<iMeshObjectType> (
+  	object_reg, "crystalspace.mesh.object.genmesh", false);
   if (!type)
   {
     synldr->ReportError (
@@ -639,13 +632,8 @@ csPtr<iBase> csGeneralFactoryLoader::Parse (iDocumentNode* node,
 	    return 0;
 	  }
 	  csRef<iGenMeshAnimationControlType> type =
-	  	CS_QUERY_PLUGIN_CLASS (plugin_mgr, pluginname,
-		iGenMeshAnimationControlType);
-	  if (!type)
-	  {
-	    type = CS_LOAD_PLUGIN (plugin_mgr, pluginname,
-	    	iGenMeshAnimationControlType);
-	  }
+	  	csLoadPluginCheck<iGenMeshAnimationControlType> (
+		object_reg, pluginname, false);
 	  if (!type)
 	  {
 	    synldr->ReportError (

@@ -220,16 +220,13 @@ bool csVosA3DL::Initialize (iObjectRegistry *o)
 
   clock = CS_QUERY_REGISTRY (objreg, iVirtualClock);
 
-  csRef<iCollideSystem> cdsys;
-  CS_QUERY_REGISTRY_PLUGIN (cdsys, objreg,
-                            "crystalspace.collisiondetection.opcode",
-                            iCollideSystem);
+  csRef<iCollideSystem> cdsys = csQueryRegistryOrLoad<iCollideSystem> (objreg,
+                            "crystalspace.collisiondetection.opcode");
 
 
 #if 0 // dynamics isn't ready yet
-  CS_QUERY_REGISTRY_PLUGIN(dynamics, objreg,
-                           "crystalspace.dynamics.ode",
-                           iDynamics);
+  dynamics = csQueryRegistryOrLoad<iDynamics> (objreg,
+                           "crystalspace.dynamics.ode");
 #endif
 
 

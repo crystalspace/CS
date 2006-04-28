@@ -585,16 +585,8 @@ const char *csSkeletonFactoryLoader::ParseFrame (iDocumentNode* node,
 csPtr<iBase> csSkeletonFactoryLoader::Parse (iDocumentNode* node,
   iStreamSource*, iLoaderContext* ldr_context, iBase* /* context */)
 {
-  csRef<iPluginManager> plugin_mgr (CS_QUERY_REGISTRY (object_reg,
-    iPluginManager));
-
-  csRef<iSkeletonGraveyard> graveyard (CS_QUERY_PLUGIN_CLASS (plugin_mgr,
-    "crystalspace.graveyard", iSkeletonGraveyard));
-  if (!graveyard)
-  {
-    graveyard = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.graveyard",
-      iSkeletonGraveyard);
-  }
+  csRef<iSkeletonGraveyard> graveyard = csLoadPluginCheck<iSkeletonGraveyard> (
+  	object_reg, "crystalspace.graveyard", false);
   if (!graveyard)
   {
     synldr->ReportError (

@@ -479,20 +479,15 @@ bool csWaterDemo::Initialize ()
   shader = shcom->CompileShader (shaderDoc->GetRoot ()->GetNode ("shader"));
 
   // setup the mesh 
-  csRef<iMeshObjectType> gType = CS_QUERY_PLUGIN_CLASS(plugin_mgr, 
-    "crystalspace.mesh.object.genmesh", iMeshObjectType);
+  csRef<iMeshObjectType> gType = csLoadPluginCheck<iMeshObjectType> (
+  	plugin_mgr, "crystalspace.mesh.object.genmesh");
   
   if (!gType)
   {
-    gType = CS_LOAD_PLUGIN(plugin_mgr, 
-      "crystalspace.mesh.object.genmesh", iMeshObjectType);
-    if (!gType)
-    {
-      csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
         "crystalspace.application.waterdemo",
         "Error loading genmesh baseobject!");
-      return false;
-    }
+    return false;
   }
 
   
