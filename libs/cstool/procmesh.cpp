@@ -37,6 +37,7 @@ csMeshOnTexture::csMeshOnTexture (iObjectRegistry* object_reg)
   engine = csQueryRegistry<iEngine> (object_reg);
   g3d = csQueryRegistry<iGraphics3D> (object_reg);
   view.AttachNew (new csView (engine, g3d));
+  view->SetAutoResize (false);
   cur_w = cur_h = -1;
 }
 
@@ -52,6 +53,7 @@ void csMeshOnTexture::ScaleCamera (iMeshWrapper* mesh, int txtw, int txth)
   iCamera* camera = view->GetCamera ();
   float aspect = float (camera->GetFOV ());
   float shift_x = camera->GetShiftX ();
+  float shift_y = camera->GetShiftY ();
   size_t i;
   float maxz = -100000000.0f;
   for (i = 0 ; i < 8 ; i++)
@@ -59,15 +61,17 @@ void csMeshOnTexture::ScaleCamera (iMeshWrapper* mesh, int txtw, int txth)
     csVector3 corner = mesh_box.GetCorner (i) - mesh_center;
     float z = (corner.x * aspect) / (1.0f - shift_x);
     if (z > maxz) maxz = z;
+    z = (corner.y * aspect) / (1.0f - shift_y);
+    if (z > maxz) maxz = z;
   }
 
   csVector3 cam_pos = mesh_center;
   //maxz += maxz;
-  //printf ("cam_pos=%g,%g,%g maxz=%g\n", cam_pos.x, cam_pos.y, cam_pos.z, maxz); fflush (stdout);
+  printf ("cam_pos=%g,%g,%g maxz=%g\n", cam_pos.x, cam_pos.y, cam_pos.z, maxz); fflush (stdout);
   cam_pos.z -= maxz;
 
+  camera->GetTransform ().Identity ();
   camera->GetTransform ().SetOrigin (cam_pos);
-  camera->GetTransform ().LookAt (mesh_center-cam_pos, csVector3 (0, 1, 0));
 }
 
 void csMeshOnTexture::ScaleCamera (iMeshWrapper* mesh, float distance)
@@ -88,6 +92,7 @@ void csMeshOnTexture::UpdateView (int w, int h)
   if (cur_w != w || cur_h != h)
   {
     view->SetRectangle (0, 0, w, h);
+    view->UpdateClipper ();
     view->GetCamera ()->SetPerspectiveCenter (w/2, h/2);
     view->GetCamera ()->SetFOV (h, w);
     cur_w = w;

@@ -9,6 +9,7 @@ chronological order.
 28-Apr-2006
 	- Eric Sunshine repaired a bunch of Texinfo problems in the new AWS2
 	  documentation.
+	- Jorrit fixed csMeshOnTexture::ScaleCamera.
 27-Apr-2006
 	- Jorrit did a few more fixes to csMeshOnTexture. It finally starts
 	  to work now.
