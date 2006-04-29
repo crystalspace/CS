@@ -6,6 +6,19 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+29-Apr-2006
+	- Jorrit added an example staticlod usage so that it is easier
+	  to debug problems with it.
+	- Jorrit fixed all three versions of iEngine->GetNearbyMeshes() so
+	  that they will work correctly with static lod and also return
+	  one of the lodded meshes (the correct one depending on the
+	  distance between the intersection object and the mesh).
+	  This fixed collision detection for static lod meshes and it
+	  partially fixes dynamic lighting. It only partially fixes
+	  dynamic lighting since when the camera is far away from an object
+	  but the light is close to it then the light will only affect the
+	  high detail version of the object but the camera can see the
+	  low detail version.
 28-Apr-2006
 	- Eric Sunshine repaired a bunch of Texinfo problems in the new AWS2
 	  documentation.

@@ -608,6 +608,10 @@ public:
    * Calculate the squared distance between the camera and the object.
    */
   float GetSquaredDistance (iRenderView *rview);
+  /**
+   * Calculate the squared distance between a position and the object.
+   */
+  float GetSquaredDistance (const csVector3& pos);
 
   /**
    * This routine will find out in which sectors a mesh object

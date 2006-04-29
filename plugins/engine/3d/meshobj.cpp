@@ -1013,8 +1013,13 @@ void csMeshWrapper::GetRadius (float &rad, csVector3 &cent) const
 
 float csMeshWrapper::GetSquaredDistance (iRenderView *rview)
 {
-  iCamera* camera = rview->GetCamera ();
-  // calculate distance from camera to mesh
+  csVector3 cam_origin = rview->GetCamera ()->GetTransform ().GetOrigin ();
+  return GetSquaredDistance (cam_origin);
+}
+
+float csMeshWrapper::GetSquaredDistance (const csVector3& pos)
+{
+  // calculate distance from pos to mesh
   csBox3 obox;
   GetObjectModel ()->GetObjectBoundingBox (obox);
   csVector3 obj_center = (obox.Min () + obox.Max ()) / 2;
@@ -1023,8 +1028,7 @@ float csMeshWrapper::GetSquaredDistance (iRenderView *rview)
     wor_center = obj_center;
   else
     wor_center = movable.GetFullTransform ().This2Other (obj_center);
-  csVector3 cam_origin = camera->GetTransform ().GetOrigin ();
-  float wor_sq_dist = csSquaredDist::PointPoint (cam_origin, wor_center);
+  float wor_sq_dist = csSquaredDist::PointPoint (pos, wor_center);
   return wor_sq_dist;
 }
 

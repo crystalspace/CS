@@ -17,6 +17,7 @@
 */
 #include "cssysdef.h"
 
+#include "csqsqrt.h"
 #include "csgeom/kdtree.h"
 #include "csgeom/math.h"
 #include "csgeom/polyclip.h"
@@ -2435,6 +2436,21 @@ void csEngine::GetNearbyMeshList (iSector* sector,
     if (imw)
     {
       list.Push (imw); 
+      csMeshWrapper* cmesh = (csMeshWrapper*)imw;
+      csStaticLODMesh* static_lod = cmesh->GetStaticLODMesh ();
+      if (static_lod)
+      {
+	// We also need to add the child here that is at the right LOD
+	// distance from the start of the segment.
+        float distance = csQsqrt (cmesh->GetSquaredDistance (start));
+        float lod = static_lod->GetLODValue (distance);
+        csArray<iMeshWrapper*>& meshes = static_lod->GetMeshesForLOD (lod);
+        size_t i;
+	// @@@ We assume here that there will be no portals as children.
+	// This is perhaps a bad assumption.
+        for (i = 0 ; i < meshes.Length () ; i++)
+          list.Push (meshes[i]);
+      }
       if (crossPortals && imw->GetPortalContainer ())
       {
         iPortalContainer* portals = imw->GetPortalContainer ();
@@ -2508,6 +2524,21 @@ void csEngine::GetNearbyMeshList (iSector* sector,
     if (imw)
     {
       list.Push (imw); 
+      csMeshWrapper* cmesh = (csMeshWrapper*)imw;
+      csStaticLODMesh* static_lod = cmesh->GetStaticLODMesh ();
+      if (static_lod)
+      {
+	// We also need to add the child here that is at the right LOD
+	// distance from the start of the segment.
+        float distance = csQsqrt (cmesh->GetSquaredDistance (pos));
+        float lod = static_lod->GetLODValue (distance);
+        csArray<iMeshWrapper*>& meshes = static_lod->GetMeshesForLOD (lod);
+        size_t i;
+	// @@@ We assume here that there will be no portals as children.
+	// This is perhaps a bad assumption.
+        for (i = 0 ; i < meshes.Length () ; i++)
+          list.Push (meshes[i]);
+      }
       if (crossPortals && imw->GetPortalContainer ())
       {
         iPortalContainer* portals = imw->GetPortalContainer ();
@@ -2597,6 +2628,21 @@ void csEngine::GetNearbyMeshList (iSector* sector,
     if (imw)
     {
       list.Push (imw); 
+      csMeshWrapper* cmesh = (csMeshWrapper*)imw;
+      csStaticLODMesh* static_lod = cmesh->GetStaticLODMesh ();
+      if (static_lod)
+      {
+	// We also need to add the child here that is at the right LOD
+	// distance from the start of the segment.
+        float distance = csQsqrt (cmesh->GetSquaredDistance (pos));
+        float lod = static_lod->GetLODValue (distance);
+        csArray<iMeshWrapper*>& meshes = static_lod->GetMeshesForLOD (lod);
+        size_t i;
+	// @@@ We assume here that there will be no portals as children.
+	// This is perhaps a bad assumption.
+        for (i = 0 ; i < meshes.Length () ; i++)
+          list.Push (meshes[i]);
+      }
       if (crossPortals && imw->GetPortalContainer ())
       {
         iPortalContainer* portals = imw->GetPortalContainer ();
