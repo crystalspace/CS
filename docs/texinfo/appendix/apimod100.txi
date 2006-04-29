@@ -11,7 +11,70 @@ with contributions from Adam D. Bradley @email{artdodge@@cs.bu.edu} and others.}
 This section documents the major changes between versions 0.98 and 1.00 of
 Crystal Space.
 
-@subheading New Event System
+@menu
+* Api100 New Event System:: New Event System
+* Api100 csArray Index and Size Type Change:: @code{csArray<>} Index and Size Type Change
+* Api100 Texture and Material Preparation:: Texture and Material Preparation
+* Api100 Material Registration:: Material Registration
+* Api100 Input Definitions:: Input Definitions
+* Api100 Pollution Reduction:: Pollution Reduction
+* Api100 cssysdef Changes:: @file{cssysdef.h} Changes
+* Api100 Library Consolidation:: Library Consolidation
+* Api100 Convenience Classes and Libraries:: Convenience Classes and Libraries
+* Api100 Convenience Headers:: Convenience Headers
+* Api100 Procedural Texture Relocation:: Procedural Texture Relocation
+* Api100 Mouse Corrections:: Mouse Corrections
+* Api100 Joystick Corrections:: Joystick Corrections
+* Api100 iGraphics2D Alpha Color Support:: @code{iGraphics2D} Alpha Color Support
+* Api100 garray Deprecated:: @file{csutil/garray.h} Deprecated
+* Api100 csList Iterator Normalization:: @code{csList<>::Iterator} Normalization
+* Api100 iDocument Changes:: @code{iDocument} Changes
+* Api100 Naming Normalization:: Naming Normalization
+* Api100 Default csHash Table Size:: Default @code{csHash<>} (and @code{csHashReversible<>}) Table Size
+* Api100 iTextureManager FreeImages Removal:: @code{iTextureManager::FreeImages()} Removal
+* Api100 Java Bindings:: Java Bindings
+* Api100 vfs Changes:: @sc{vfs} Changes
+* Api100 iEvent Changes:: @code{iEvent} Changes
+* Api100 Old Renderer Architecture Removal:: Old Renderer Architecture Removal
+* Api100 Query Macros:: Query Macros
+* Api100 Random Number Generator Changes:: Random Number Generator Changes
+* Api100 iImage Changes:: @samp{iImage} Changes
+* Api100 iMaterialList Change:: @samp{iMaterialList} Change
+* Api100 iObjectModel Change:: @code{iObjectModel} Change
+* Api100 iImageIO Load Parameter Change:: @code{iImageIO::Load()} Parameter Change
+* Api100 iLight Changes:: @samp{iLight} Changes
+* Api100 CS_QUERY_REGISTRY_PLUGIN Removal:: @code{CS_QUERY_REGISTRY_PLUGIN()} Removal
+* Api100 CS_DECLARE_OBJECT_ITERATOR Removal:: @code{CS_DECLARE_OBJECT_ITERATOR()} Removal
+* Api100 Reference Count Automation:: Reference Count Automation
+* Api100 Render Buffer Changes:: Render Buffer Changes
+* Api100 String Changes:: String Changes
+* Api100 rapid Collision Detection Plugin Removal:: @sc{rapid} Collision Detection Plugin Removal
+* Api100 64-Bit Portability Changes:: 64-Bit Portability Changes
+* Api100 Cg Matrix Bindings:: Cg Matrix Bindings
+* Api100 csws Removal:: @sc{csws} Removal
+* Api100 aws Changes:: @sc{aws} Changes
+* Api100 Transform Split:: Transform Split
+* Api100 chunklod Terrain Removal:: @samp{chunklod} Terrain Removal
+* Api100 csHashMap and csHashSet Removal:: @samp{csHashMap} and @samp{csHashSet} Removal
+* Api100 csObjectPool Removal:: @code{csObjectPool<>} Removal
+* Api100 csStringSetIterator and csStringHashIterator Removal:: @samp{csStringSetIterator} and @samp{csStringHashIterator} Removal
+* Api100 Miscellaneous Removals:: Miscellaneous Removals
+* Api100 csRenderMeshHolderSingle Renamed:: @code{csRenderMeshHolderSingle} Renamed
+* Api100 C++ Standard Conformance:: C++ Standard Conformance
+* Api100 parser Deprecated:: @file{imap/parser.h} Deprecated
+* Api100 csSet Relocation and Changes:: @code{csSet<>} Relocation and Changes
+* Api100 csHash Changes:: @code{csHash<>} Changes
+* Api100 iConfig Renamed:: @code{iConfig} Renamed
+* Api100 Changes for Mesh Object Writers:: Changes for Mesh Object Writers
+* Api100 csRGBVector Removed:: @code{csRGBVector} Removed
+* Api100 Changes for hierarchical objects:: Changes for hierarchical objects
+* Api100 Model Importing:: Model Importing
+* Api100 Render Priority System:: Render Priority System
+* Api100 Ball Mesh Removed:: Ball Mesh Removed
+@end menu
+
+@node Api100 New Event System, Api100 csArray Index and Size Type Change, Release Notes 100, Release Notes 100
+@subsection New Event System
 
 The event system has undergone a major rewrite, and most client applications
 will need to make changes in order to adapt to the new architecture.
@@ -327,7 +390,8 @@ Handling a keyboard event can be done like this:
 @end example
 
 
-@subheading @code{csArray<>} Index and Size Type Change
+@node Api100 csArray Index and Size Type Change, Api100 Texture and Material Preparation, Api100 New Event System, Release Notes 100
+@subsection @code{csArray<>} Index and Size Type Change
 
 @code{csArray<>} has been changed to use @samp{size_t} instead of
 @samp{int} for array sizes and indices.  Probably, the most significant
@@ -459,7 +523,8 @@ else
 @}
 @end example
 
-@subheading Texture and Material Preparation
+@node Api100 Texture and Material Preparation, Api100 Material Registration, Api100 csArray Index and Size Type Change, Release Notes 100
+@subsection Texture and Material Preparation
 
 Texture and material preparation is now fully automatic. It is no longer
 necessary to @dfn{prepare} a texture or a material before you can use it. It is
@@ -478,12 +543,14 @@ them from your applications if you used them):
 @code{iTextureManager::PrepareTextures()}
 @end itemize
 
-@subheading Material Registration
+@node Api100 Material Registration, Api100 Input Definitions, Api100 Texture and Material Preparation, Release Notes 100
+@subsection Material Registration
 
 Registering an @samp{iMaterialWrapper} with the texture manager is no longer
 necessary; any such calls can be removed.
 
-@subheading Input Definitions
+@node Api100 Input Definitions, Api100 Pollution Reduction, Api100 Material Registration, Release Notes 100
+@subsection Input Definitions
 
 The file @file{csutil/inpnames.h} has been renamed to
 @file{inputdef.h}, and the following functions have been removed:
@@ -531,7 +598,8 @@ which perform the work of instantiating the object for you:
 @code{csInputDefinition::GetOtherString()}
 @end itemize
 
-@subheading Pollution Reduction
+@node Api100 Pollution Reduction, Api100 cssysdef Changes, Api100 Input Definitions, Release Notes 100
+@subsection Pollution Reduction
 
 In order to avoid polluting the top-level system include directory, the Crystal
 Space header tree is now installed (via @samp{make install} or
@@ -719,7 +787,8 @@ global namespace.
 @code{WIN32_VOLATILE} @result{} @code{CS_WIN32_CSCONFIG}
 @end itemize
 
-@subheading @file{cssysdef.h} Changes
+@node Api100 cssysdef Changes, Api100 Library Consolidation, Api100 Pollution Reduction, Release Notes 100
+@subsection @file{cssysdef.h} Changes
 
 The @samp{CS_SYSDEF_PROVIDE_FACILITY} macros, which clients would
 @code{#define} before including @file{cssysdef.h} in order to alter the
@@ -773,7 +842,8 @@ recommended, to include @file{cssysdef.h} in header files (@file{.h}). Doing so
 helps to make header files more self-contained, thus reducing the burden of
 clients of those headers.
 
-@subheading Library Consolidation
+@node Api100 Library Consolidation, Api100 Convenience Classes and Libraries, Api100 cssysdef Changes, Release Notes 100
+@subsection Library Consolidation
 
 In order to simplify end-user documentation and client usage, the Crystal Space
 link libraries @file{csutil}, @file{csgeom}, @file{csgfx}, and @file{cstool}
@@ -792,7 +862,8 @@ directories; and (importantly) the modules themselves remain conceptually
 distinct. This will not change. The consolidation of the physical link library
 was an end-user convenience.
 
-@subheading Convenience Classes and Libraries
+@node Api100 Convenience Classes and Libraries, Api100 Convenience Headers, Api100 Library Consolidation, Release Notes 100
+@subsection Convenience Classes and Libraries
 
 Crystal Space now publishes several convenience classes and libraries which
 eliminate much of the drudgery associated with implementing @sc{scf} interfaces
@@ -828,7 +899,8 @@ Windows support.
 For a complete list of available convenience classes, consult the header files
 in the subdirectories of @file{CS/include/csplugincommon}.
 
-@subheading Convenience Headers
+@node Api100 Convenience Headers, Api100 Procedural Texture Relocation, Api100 Convenience Classes and Libraries, Release Notes 100
+@subsection Convenience Headers
 
 For convenience, several top-level @dfn{master header} files have been added to
 the project. These should simplify client usage by allowing users to choose the
@@ -929,7 +1001,8 @@ location of the wxWidgets resources will have to be added as @dfn{additional
 include directories} and @dfn{additional library directories}, in the project
 settings or globally, to ensure that @sc{msvc} will be able to find them.
 
-@subheading Procedural Texture Relocation
+@node Api100 Procedural Texture Relocation, Api100 Mouse Corrections, Api100 Convenience Headers, Release Notes 100
+@subsection Procedural Texture Relocation
  
 Implementations of the standard procedural textures (dots, fire, plasma, etc.)
 now reside directly in the @file{stdpt} plugin
@@ -955,15 +1028,9 @@ instance, via @samp{new csProcFire}).  Instead, you must now use the plugin
 system to create such textures. For example:
  
 @example
-csRef<iPluginManager> plugin_mgr(
-  scfQueryInterface<iPluginManager> (object_reg));
-csRef<iTextureType> type (csQueryPluginClass<iTextureType> (plugin_mgr,
+csRef<iTextureType> type = csLoadPluginCheck<iTextureType> (object_reg,
   "crystalspace.texture.type.fire"));
-if (!type)
-@{
-  type = csLoadPlugin<iTextureType> (plugin_mgr,
-    "crystalspace.texture.type.fire");
-@}
+if (!type) return false;	// Error
 csRef<iTextureFactory> fireFact = type->NewFactory();
 csRef<iTextureWrapper> tex = fireFact->Generate();
 csRef<iFireTexture> fire = scfQueryInterface<iFireTexture> (tex);
@@ -974,13 +1041,15 @@ interfaces beyond the normal interfaces implemented by all procedural
 textures. In the example above, the ``fire'' texture implements the specialized
 @samp{iFireTexture}.
 
-@subheading Mouse Corrections
+@node Api100 Mouse Corrections, Api100 Joystick Corrections, Api100 Procedural Texture Relocation, Release Notes 100
+@subsection Mouse Corrections
 
 Mouse buttons and axes used to be enumerated basis 1 (first mouse button was 1,
 Y axis was 2, etc).  In keeping with good C/C++/Java/etc coding style, they are now 
 basis-0 (first mouse button is 0, Y axis is 1, etc).
 
-@subheading Joystick Corrections
+@node Api100 Joystick Corrections, Api100 iGraphics2D Alpha Color Support, Api100 Mouse Corrections, Release Notes 100
+@subsection Joystick Corrections
 
 The implementation of @samp{iJoystickDriver} has been fixed to treat joystick
 numbers consistently. Previously, on account of buggy implementation, some
@@ -989,7 +1058,8 @@ considered them 1-based.  It now uniformly treats joystick numbers as
 0-based. This is consistent with button numbers for joysticks and mice, which
 are also basis-0.
 
-@subheading @code{iGraphics2D} Alpha Color Support
+@node Api100 iGraphics2D Alpha Color Support, Api100 garray Deprecated, Api100 Joystick Corrections, Release Notes 100
+@subsection @code{iGraphics2D} Alpha Color Support
 
 @samp{iGraphics2D} now supports an alpha channel. @code{iGraphics2D::FindRGB()}
 accepts an optional alpha value (0 being completely transparent, and
@@ -1001,14 +1071,16 @@ of using @samp{-1} as the color value, to obtain a color value from
 @code{FindRGB()} that has the same R, G, B components as the foreground color, 
 but an alpha component of 0.
 
-@subheading @file{csutil/garray.h} Deprecated
+@node Api100 garray Deprecated, Api100 csList Iterator Normalization, Api100 iGraphics2D Alpha Color Support, Release Notes 100
+@subsection @file{csutil/garray.h} Deprecated
 
 The @file{csutil/garray.h} file, containing the class 
 @code{csDirtyAccessArray<>}, has been deprecated in favor of the more sensible
 file name @file{csutil/dirtyaccessarray.h}. No functional changes have been
 made to the class.
 
-@subheading @code{csList<>::Iterator} Normalization
+@node Api100 csList Iterator Normalization, Api100 iDocument Changes, Api100 garray Deprecated, Release Notes 100
+@subsection @code{csList<>::Iterator} Normalization
 
 The behavior of @code{csList<>::Iterator} has been normalized so that it
 functions identically to all other iterators in Crystal Space.  In the past, a
@@ -1068,7 +1140,8 @@ interface of @code{csList<>::Iterator} internally consistent, as well as
 consistent with other iterators throughout the toolkit, in which these methods
 return references.
 
-@subheading @code{iDocument} Changes
+@node Api100 iDocument Changes, Api100 Naming Normalization, Api100 csList Iterator Normalization, Release Notes 100
+@subsection @code{iDocument} Changes
 
 The @code{iDocument::Parse()} method now accepts an optional argument
 indicating whether or not extraneous whitespace in @samp{CS_NODE_TEXT} nodes
@@ -1089,7 +1162,8 @@ Consult the following documents for more information regarding this issue.
 @uref{http://www.w3.org/TR/REC-xml/#sec-white-space}@*
 @uref{http://www.xml.com/axml/notes/AllWSAlways.html}
 
-@subheading Naming Normalization
+@node Api100 Naming Normalization, Api100 Default csHash Table Size, Api100 iDocument Changes, Release Notes 100
+@subsection Naming Normalization
 
 The following @sc{scf} class names have been normalized in order to be
 consistent with the names of all other available ``null'' and ``multiplexer''
@@ -1316,7 +1390,8 @@ The @code{csOrdering<>} template has been renamed to the more general
 @code{csComparator<>} to reflect the fact that this template can perform both
 ordering and equality comparisons.
 
-@subheading Default @code{csHash<>} (and @code{csHashReversible<>}) Table Size
+@node Api100 Default csHash Table Size, Api100 iTextureManager FreeImages Removal, Api100 Naming Normalization, Release Notes 100
+@subsection Default @code{csHash<>} (and @code{csHashReversible<>}) Table Size
 
 The default hash table size and grow rate has been reduced from 257 and 64 to
 23 and 5, respectively, to have hashes use less memory.  If a hash is expected
@@ -1324,7 +1399,8 @@ to contain a large quantity of elements, those two parameters can be tweaked
 upon construction of a @code{csHash<>} or @code{csHashReversible<>}.  Consult
 the Public @sc{api} Documentation of @code{csHash<>} for more information.
 
-@subheading @code{iTextureManager::FreeImages()} Removal
+@node Api100 iTextureManager FreeImages Removal, Api100 Java Bindings, Api100 Default csHash Table Size, Release Notes 100
+@subsection @code{iTextureManager::FreeImages()} Removal
 
 @code{iTextureManager::FreeImages()} has been removed.  It was used to release
 the @samp{iImage} objects associated with textures with the purpose of freeing
@@ -1332,7 +1408,8 @@ up memory.  This happens automatically now; the images associated with a
 texture are released by the renderer as soon as the image data is converted
 into the internal texture format (that is, uploaded to the graphics hardware).
 
-@subheading Java Bindings
+@node Api100 Java Bindings, Api100 vfs Changes, Api100 iTextureManager FreeImages Removal, Release Notes 100
+@subsection Java Bindings
 @cindex Java
 
 The Java bindings for Crystal Space have been fully integrated into the project
@@ -1345,7 +1422,8 @@ domain name ``crystalspace3d.org''. This replaces the older package name
 @samp{com.crystalspace}, which itself replaced the much older name
 @samp{net.sourceforge.crystal}.
 
-@subheading @sc{vfs} Changes
+@node Api100 vfs Changes, Api100 iEvent Changes, Api100 Java Bindings, Release Notes 100
+@subsection @sc{vfs} Changes
 @cindex @sc{vfs} Configuration File
 @cindex @file{vfs.cfg}, @sc{vfs} Configuration File
 
@@ -1362,7 +1440,8 @@ conflicting entries, then mounts and variable assignments specified in
 configuration files discovered earlier in the scan take precedence over those
 discovered later.
 
-@subheading @code{iEvent} Changes
+@node Api100 iEvent Changes, Api100 Old Renderer Architecture Removal, Api100 vfs Changes, Release Notes 100
+@subsection @code{iEvent} Changes
 
 @subsubheading Property Bags
 
@@ -1435,7 +1514,8 @@ where both devices and axes are enumerated basis 0.
 Each helper class also has @code{GetX()} and @code{GetY()} methods
 available; for joystick events, these are deprecated.
 
-@subheading Old Renderer Architecture Removal
+@node Api100 Old Renderer Architecture Removal, Api100 Query Macros, Api100 iEvent Changes, Release Notes 100
+@subsection Old Renderer Architecture Removal
 
 The old rendering architecture along with the old renderer plugins have been
 removed. Additionally, a few plugins, applications, classes, and methods have
@@ -1593,7 +1673,8 @@ for the @samp{iThingFactoryState} interface. Example:
 	->GetFactory ());
 @end example
 
-@subheading Query Macros
+@node Api100 Query Macros, Api100 Random Number Generator Changes, Api100 Old Renderer Architecture Removal, Release Notes 100
+@subsection Query Macros
 
 The macro @code{CS_QUERY_REGISTRY_PLUGIN()} has been added to
 @file{iutil/plugin.h}. This is a convenience macro which embodies the common
@@ -1603,7 +1684,8 @@ desired object if it was not found in the object-registry. It also registers
 the object with the object-registry if the plugin manager loads it
 successfully.
 
-@subheading Random Number Generator Changes
+@node Api100 Random Number Generator Changes, Api100 iImage Changes, Api100 Query Macros, Release Notes 100
+@subsection Random Number Generator Changes
 
 The global function @code{csFastRandFloat()} has been retired.  In its stead is
 the new instantiable class @samp{csRandomFloatGen}, which is modeled after the
@@ -1613,7 +1695,8 @@ controlled and seeded individually, thus making it far more flexible and
 useful.  (Note that the more general-purpose @samp{csRandomGen} class is also
 able to vend floating point numbers.)
 
-@subheading @samp{iImage} Changes
+@node Api100 iImage Changes, Api100 iMaterialList Change, Api100 Random Number Generator Changes, Release Notes 100
+@subsection @samp{iImage} Changes
 
 The @samp{iImage} interface has been reduced to a level where it merely serves
 as a container for pixel data; however, the image editing functionality was
@@ -1650,12 +1733,14 @@ by @samp{csImageMemory}.
 As a side-effect of these changes, the @samp{csImageFile} and 
 @samp{csImageMemory} were merged and the former removed.
 
-@subheading @samp{iMaterialList} Change
+@node Api100 iMaterialList Change, Api100 iObjectModel Change, Api100 iImage Changes, Release Notes 100
+@subsection @samp{iMaterialList} Change
 
 The function @code{iMaterialList::NewMaterial()} now needs an additional
 name parameter. It is not recommended to change the name later.
 
-@subheading @code{iObjectModel} Change
+@node Api100 iObjectModel Change, Api100 iImageIO Load Parameter Change, Api100 iMaterialList Change, Release Notes 100
+@subsection @code{iObjectModel} Change
 
 The function @code{iObjectModel::GetObjectBoundingBox()} only has one
 parameter now. The optional @samp{type} parameter has been removed as it
@@ -1663,13 +1748,15 @@ was not implemented anywhere. In addition to that the constants
 @code{CS_BBOX_NORMAL}, @code{CS_BBOX_ACCURATE}, and @code{CS_BBOX_MAX}
 are also removed.
 
-@subheading @code{iImageIO::Load()} Parameter Change
+@node Api100 iImageIO Load Parameter Change, Api100 iLight Changes, Api100 iObjectModel Change, Release Notes 100
+@subsection @code{iImageIO::Load()} Parameter Change
 
 @code{iImageIO::Load()} now requires the image source data in an 
 @samp{iDataBuffer} object, instead of separate @samp{buffer} and @samp{size}
 parameters.
 
-@subheading @samp{iLight} Changes
+@node Api100 iLight Changes, Api100 CS_QUERY_REGISTRY_PLUGIN Removal, Api100 iImageIO Load Parameter Change, Release Notes 100
+@subsection @samp{iLight} Changes
 
 The @samp{iLight} and its implementation (@samp{csLight}) have been extended to
 also handle spot- and directional-lights. Note that the accual computation of
@@ -1689,7 +1776,18 @@ the first attenuation constant. See comments in
 @file{CS/include/iengine/light.h} for exact details of the different
 attenuation modes.
 
-@subheading @code{CS_DECLARE_OBJECT_ITERATOR()} Removal
+@node Api100 CS_QUERY_REGISTRY_PLUGIN Removal, Api100 CS_DECLARE_OBJECT_ITERATOR Removal, Api100 iLight Changes, Release Notes 100
+@subsection @code{CS_QUERY_REGISTRY_PLUGIN()} Removal
+
+@code{CS_QUERY_REGISTRY_PLUGIN} has been removed. Instead there is now
+@code{csQueryRegistryOrLoad} which works as follows:
+@example
+csRef<iEngine> engine = csQueryRegistryOrLoad<iEngine> (object_reg,
+  "crystalspace.engine.3d");
+@end example
+
+@node Api100 CS_DECLARE_OBJECT_ITERATOR Removal, Api100 Reference Count Automation, Api100 CS_QUERY_REGISTRY_PLUGIN Removal, Release Notes 100
+@subsection @code{CS_DECLARE_OBJECT_ITERATOR()} Removal
 
 The @samp{iObject} iterator creation macro @code{CS_DECLARE_OBJECT_ITERATOR()}
 has been replaced by the templated class @code{csTypedObjectIterator<>}. Given
@@ -1725,7 +1823,8 @@ while (iter.HasNext())
 @{
 @end example
 
-@subheading Reference Count Automation
+@node Api100 Reference Count Automation, Api100 Render Buffer Changes, Api100 CS_DECLARE_OBJECT_ITERATOR Removal, Release Notes 100
+@subsection Reference Count Automation
 
 For consistency with the bulk of the Crystal Space @sc{api}, and in order to
 simplify reference-count management, the following methods have been changed
@@ -1757,7 +1856,8 @@ dispose manually via @code{DecRef()}.
 @code{iHazeHullCreation::CreateCone()}
 @end itemize
 
-@subheading Render Buffer Changes
+@node Api100 Render Buffer Changes, Api100 String Changes, Api100 Reference Count Automation, Release Notes 100
+@subsection Render Buffer Changes
 
 The @samp{iRenderBuffer} interface was made renderer-independant. Consequently,
 creation was moved out of @samp{iGraphics3D} and into @samp{csRenderBuffer} in
@@ -1828,7 +1928,8 @@ the mesh provides them). They are:
 @samp{texture coordinate 0} @result{} @samp{texture coordinate 0}
 @end itemize
 
-@subheading String Changes
+@node Api100 String Changes, Api100 rapid Collision Detection Plugin Removal, Api100 Render Buffer Changes, Release Notes 100
+@subsection String Changes
 
 The class hierarchy of @samp{csString} has changed. Most functionality is now
 provided by the new superclass @samp{csStringBase}. From this,
@@ -1863,14 +1964,16 @@ methods.
 functionality is provided by @code{SetGrowsBy(0)} and @code{GetGrowsBy()}.
 @end itemize
 
-@subheading @sc{rapid} Collision Detection Plugin Removal
+@node Api100 rapid Collision Detection Plugin Removal, Api100 64-Bit Portability Changes, Api100 String Changes, Release Notes 100
+@subsection @sc{rapid} Collision Detection Plugin Removal
 
 The @sc{rapid} collision detection plugin has been removed. In addition to
 being slower than the @sc{opcode} plugin and consuming more memory, its license
 prevented its use in commercial applications.  You should instead now use the
 @sc{opcode} plugin.
 
-@subheading 64-Bit Portability Changes
+@node Api100 64-Bit Portability Changes, Api100 Cg Matrix Bindings, Api100 rapid Collision Detection Plugin Removal, Release Notes 100
+@subsection 64-Bit Portability Changes
 
 Some changes have been made to the Crystal Space @sc{api} in order to better
 support 64-bit hardware, which is now becoming common. Additional changes to
@@ -1971,7 +2074,8 @@ methods will result in compilation errors. Alternately, defining
 supports such deprecation warnings. (Presently, only modern version of the
 @sc{gnu} compiler are so configured.)
 
-@subheading Cg Matrix Bindings
+@node Api100 Cg Matrix Bindings, Api100 csws Removal, Api100 64-Bit Portability Changes, Release Notes 100
+@subsection Cg Matrix Bindings
 
 Previously, the semantics of a Cg vertex program matrix parameter were
 determined through the variable name; e.g. a name of @samp{ModelViewProj} bound
@@ -1995,12 +2099,14 @@ Check the @file{data/shaders/} directory for further examples. For more
 detailed information, consult the Cg and @samp{ARB_vertex_program}
 documentations.
 
-@subheading @sc{csws} Removal
+@node Api100 csws Removal, Api100 aws Changes, Api100 Cg Matrix Bindings, Release Notes 100
+@subsection @sc{csws} Removal
 
 The long-deprecated Crystal Space Windowing System (@sc{csws}) was removed. 
 Instead use @sc{aws}. @xref{AWS}.
 
-@subheading @sc{aws} Changes
+@node Api100 aws Changes, Api100 Transform Split, Api100 csws Removal, Release Notes 100
+@subsection @sc{aws} Changes
 
 The trigger system in @sc{aws} has changed. The trigger callback function
 now has an additional @samp{unsigned long} parameter like this:
@@ -2012,7 +2118,8 @@ static void TriggerFunc (unsigned long, intptr_t, iAwsSource*);
 This extra parameter is the id of the given trigger name as returned by the
 standard string set (@samp{crystalspace.shared.stringset}).
 
-@subheading Transform Split
+@node Api100 Transform Split, Api100 chunklod Terrain Removal, Api100 aws Changes, Release Notes 100
+@subsection Transform Split
 
 To allow more control over how geometry is transformed when using shaders the
 @samp{csRenderMesh::object2camera} has been split into two transforms:
@@ -2021,7 +2128,8 @@ is sent via a shader variable, while @samp{world2camera} is specified via
 @code{iGraphics3D::SetWorldToCamera()} (but it is also available as a shader
 variable to shader programs).
 
-@subheading @samp{chunklod} Terrain Removal
+@node Api100 chunklod Terrain Removal, Api100 csHashMap and csHashSet Removal, Api100 Transform Split, Release Notes 100
+@subsection @samp{chunklod} Terrain Removal
 
 The @samp{chunklod} terrain plugin has been removed:
 
@@ -2034,7 +2142,8 @@ Instead use the @samp{bruteblock} terrain engine.
 @noindent
 @code{crystalspace.mesh.object.terrain.bruteblock}
 
-@subheading @samp{csHashMap} and @samp{csHashSet} Removal
+@node Api100 csHashMap and csHashSet Removal, Api100 csObjectPool Removal, Api100 chunklod Terrain Removal, Release Notes 100
+@subsection @samp{csHashMap} and @samp{csHashSet} Removal
 
 The long-deprecated @samp{csHashMap}, @samp{csHashMapReversible}, and
 @samp{csHashSet} classes have been removed. Instead, use the templated classes
@@ -2042,7 +2151,8 @@ The long-deprecated @samp{csHashMap}, @samp{csHashMapReversible}, and
 string-related @dfn{set} functionality, you may also want to consider using
 @samp{csStringHash} and @samp{csStringSet}.
 
-@subheading @code{csObjectPool<>} Removal
+@node Api100 csObjectPool Removal, Api100 csStringSetIterator and csStringHashIterator Removal, Api100 csHashMap and csHashSet Removal, Release Notes 100
+@subsection @code{csObjectPool<>} Removal
 
 The @code{csObjectPool<>} utility class has been removed since it managed
 memory poorly, and failed to invoke the destructor of contained objects at the
@@ -2057,7 +2167,8 @@ drop-in replacement for @code{csObjectPool<>} since the @sc{api} of
 @sc{api}. A global search and replace should be sufficient to account for this
 change.
 
-@subheading @samp{csStringSetIterator} and @samp{csStringHashIterator} Removal
+@node Api100 csStringSetIterator and csStringHashIterator Removal, Api100 Miscellaneous Removals, Api100 csObjectPool Removal, Release Notes 100
+@subsection @samp{csStringSetIterator} and @samp{csStringHashIterator} Removal
 
 @samp{csStringSetIterator} and @samp{csStringHashIterator} have been replaced
 with the iterator classes @samp{csStringSet::GlobalIterator} and
@@ -2091,7 +2202,8 @@ while (iter.HasNext())
 Code using @samp{csStringHashIterator} can be fixed using the same simple
 transformation.
 
-@subheading Miscellaneous Removals
+@node Api100 Miscellaneous Removals, Api100 csRenderMeshHolderSingle Renamed, Api100 csStringSetIterator and csStringHashIterator Removal, Release Notes 100
+@subsection Miscellaneous Removals
 
 The following facilities have been removed because they were unused and/or of
 questionable use.
@@ -2109,12 +2221,14 @@ questionable use.
 using @samp{csFrameDataHolder<csDirtyAccessArray<csRenderMesh*> >}.
 @end itemize
 
-@subheading @code{csRenderMeshHolderSingle} Renamed
+@node Api100 csRenderMeshHolderSingle Renamed, Api100 C++ Standard Conformance, Api100 Miscellaneous Removals, Release Notes 100
+@subsection @code{csRenderMeshHolderSingle} Renamed
 
 @samp{csRenderMeshHolderSingle} has been renamed to @samp{csRenderMeshHolder}
 as a consequence of the removal of @samp{csRenderMeshHolderMultiple}.
 
-@subheading C++ Standard Conformance
+@node Api100 C++ Standard Conformance, Api100 parser Deprecated, Api100 csRenderMeshHolderSingle Renamed, Release Notes 100
+@subsection C++ Standard Conformance
 
 Crystal Space's public header files are now C++ Language Standard
 conformant. This means that Crystal Space-based projects which choose to adhere
@@ -2122,7 +2236,8 @@ strictly to the C++ Language Standard (such as those which employ @emph{gcc}'s
 @samp{-ansi} and @samp{-pedantic} options) can now include Crystal Space
 headers safely.
 
-@subheading @file{imap/parser.h} Deprecated
+@node Api100 parser Deprecated, Api100 csSet Relocation and Changes, Api100 C++ Standard Conformance, Release Notes 100
+@subsection @file{imap/parser.h} Deprecated
 
 All functionality in the header @file{imap/parser.h} was long ago moved to
 @file{imap/loader.h}, which declares interfaces to access the Crystal Space
@@ -2131,7 +2246,8 @@ merely included @file{imap/loader.h} and did nothing more. Since
 @file{imap/parser.h} has no useful purpose, it is now officially deprecated,
 and deprecation warnings have been added. Use @file{imap/loader.h} instead.
 
-@subheading @code{csSet<>} Relocation and Changes
+@node Api100 csSet Relocation and Changes, Api100 csHash Changes, Api100 parser Deprecated, Release Notes 100
+@subsection @code{csSet<>} Relocation and Changes
 
 The declaration of @code{csSet<>} was moved out from @file{csutil/hash.h} and
 into its own header file, @file{csutil/set.h}. The method
@@ -2142,7 +2258,8 @@ However, this implementation detail still affects the use of @code{csSet<>} as
 for storage of pointers in a @code{csSet<>} the @code{csPtrKey<>} wrapper must
 be used.
 
-@subheading @code{csHash<>} Changes
+@node Api100 csHash Changes, Api100 iConfig Renamed, Api100 csSet Relocation and Changes, Release Notes 100
+@subsection @code{csHash<>} Changes
 
 The way @code{csHash<>} handles support for arbitrary key types has been
 changed. Previously, a so-called ``hash key handler'' was passed as an optional
@@ -2167,13 +2284,15 @@ and any composite types which provide these operators. Pointers (other than
 case: to use a pointer of type @samp{Foo*} as a hash key, employ 
 @samp{csPtrKey<Foo>} as the key type in the hash declaration. 
 
-@subheading @code{iConfig} Renamed
+@node Api100 iConfig Renamed, Api100 Changes for Mesh Object Writers, Api100 csHash Changes, Release Notes 100
+@subsection @code{iConfig} Renamed
 
 The @code{iConfig} interface has been renamed to the more fitting 
 @code{iPluginConfig}, and the containing header from @file{iutil/config.h} to
 @code{iutil/pluginconfig.h}. Other changes have not been made.
 
-@subheading Changes for Mesh Object Writers
+@node Api100 Changes for Mesh Object Writers, Api100 csRGBVector Removed, Api100 iConfig Renamed, Release Notes 100
+@subsection Changes for Mesh Object Writers
 
 @code{iMeshObject::SetLogicalParent()} has been renamed to
 @code{iMeshObject::SetMeshWrapper()}. Same for @code{GetLogicalParent()}.
@@ -2184,13 +2303,15 @@ of the parameter.
 Same for @code{GetLogicalParent()}. It also uses a @code{iMeshFactoryWrapper}
 instead of @code{iBase} as the type of the parameter.
 
-@subheading @code{csRGBVector} Removed
+@node Api100 csRGBVector Removed, Api100 Changes for hierarchical objects, Api100 Changes for Mesh Object Writers, Release Notes 100
+@subsection @code{csRGBVector} Removed
 
 The @code{csRGBVector} class has been removed. A @code{csComparator<>} 
 specialization has been provided, so equivalent functionality can be achieved
 by simply using @code{csArray<csRGBcolor*>}.
 
-@subheading Changes for hierarchical objects
+@node Api100 Changes for hierarchical objects, Api100 Model Importing, Api100 csRGBVector Removed, Release Notes 100
+@subsection Changes for hierarchical objects
 
 Meshes and lights can now properly be used as hierarchical objects with the
 same API. Here is how it works: meshes and lights implement the new
@@ -2226,7 +2347,8 @@ The following methods have been removed:
 @code{iMovable->SetParent()}
 @end itemize
 
-@subheading Model Importing
+@node Api100 Model Importing, Api100 Render Priority System, Api100 Changes for hierarchical objects, Release Notes 100
+@subsection Model Importing
 
 The old model importing system has been completely removed. That means
 the following interfaces and classes are gone:
@@ -2283,13 +2405,15 @@ the following interfaces and classes are gone:
 Instead it is now possible to load @sc{3ds} models as genmesh mesh
 objects and @sc{md2} models as 3D sprites. @xref{Model Loading}.
 
-@subheading Render Priority System
+@node Api100 Render Priority System, Api100 Ball Mesh Removed, Api100 Model Importing, Release Notes 100
+@subsection Render Priority System
 
 It is no longer possible to define render priorities in a map file. You can
 now only redefine render priorities from the engine @sc{api}.
 @xref{HOWTO Render Priorities}.
 
-@subheading Ball Mesh Removed
+@node Api100 Ball Mesh Removed, , Api100 Render Priority System, Release Notes 100
+@subsection Ball Mesh Removed
 
 The ball mesh has been removed. The genmesh mesh can now be used to generate
 spheres instead. Here is an example how you would have to change the map file. First

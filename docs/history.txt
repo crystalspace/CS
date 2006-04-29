@@ -33,6 +33,9 @@ chronological order.
 	  memory corruption when those attributes where used (in the case
 	  of xmlread it was pretty hard to avoid).
 	- Jorrit increased speed of mouselook in walktest.
+	- Jorrit documented the removal of CS_QUERY_REGISTRY_PLUGIN and
+	  also changed the 0.98 -> 1.00 document to use a menu (it
+	  was becoming to big).
 	- Christopher made a lot of updates in AWS2, including expanding the
 	  Native/Script interface.
 27-Apr-2006
