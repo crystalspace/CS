@@ -16300,11 +16300,11 @@ fi
   # Work around issue on intel macs, where "-fpmath=sse" is on by
 	     # default, but this breaks compilation when combined with
 	     # the "-march=i586" selected below. So the "minimum" optimization
-	     # on x86 apples is -march=i686.
+	     # on x86 Apples is -march=i686.
 
     if test "$cs_cv_prog_cxx_code_gen" = no; then
   case $host_cpu in
-	    *3-986) ac_ext=cc
+	    *[3-9]86) ac_ext=cc
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
