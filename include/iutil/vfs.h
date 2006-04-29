@@ -319,7 +319,7 @@ struct iVFS : public virtual iBase
    *   in which case, the physical locations appear as a conglomerate in the
    *   virtual filesystem.  The RealPath argument allows unmounting of just a
    *   single location represented by the given VirtualPath.  If RealPath is
-   *   the null pointer, then all pysical locations represented by VirtualPath
+   *   the null pointer, then all physical locations represented by VirtualPath
    *   are umounted.
    * \return True if the unmount succeeded, else false.
    */
