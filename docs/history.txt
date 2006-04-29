@@ -19,6 +19,10 @@ chronological order.
 	  but the light is close to it then the light will only affect the
 	  high detail version of the object but the camera can see the
 	  low detail version.
+	- res attempted to tweak the configure "code generation flags" to
+	  work on Intel Macs. The minimum "-march=i586" conflicts with a 
+	  default setting of the compiler there, so use "-march=i686" on
+	  Apples.
 28-Apr-2006
 	- Eric Sunshine repaired a bunch of Texinfo problems in the new AWS2
 	  documentation.
