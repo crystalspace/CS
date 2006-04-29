@@ -519,6 +519,40 @@
   -->
   <!-- END: For the christmas tree -->
 
+  <meshfact name="loddedFactory">
+      <nullmesh>
+          <min x="-9.72084" y="-10.2708" z="-6.56839" />
+	  <max x="9.72084" y="10.2708" z="6.56839" />
+      </nullmesh>
+      <staticlod>
+          <distance d0="2" d1="6" />
+      </staticlod>
+      <meshfact name="lod_0">
+          <lodlevel>0</lodlevel>
+          <plugin>meshFact</plugin>
+	  <params>
+              <box>
+                <min x="-0.1" y="-0.1" z="-0.1" />
+                <max x="0.1" y="0.1" z="0.1" />
+              </box>
+              <material>bricks</material>
+	      <autonormals />
+	  </params>
+      </meshfact>
+      <meshfact name="lod_1">
+          <lodlevel>1</lodlevel>
+          <plugin>meshFact</plugin>
+	  <params>
+              <box>
+                <min x="-0.1" y="-0.1" z="-0.1" />
+                <max x="0.1" y="0.1" z="0.1" />
+              </box>
+              <material>white</material>
+	      <autonormals />
+	  </params>
+      </meshfact>
+  </meshfact>
+
   <meshfact name="SkelFact">
     <plugin>meshFact</plugin>
     <params>
@@ -15825,6 +15859,15 @@
                 <v x="2.5" y="0.3" z="12" />
             </move>
         </meshobj>
+	<meshref name="loddedObject">
+	    <factory>loddedFactory</factory>
+	    <move>
+	    	<v x="-5" y="0.3" z="13" />
+	        <matrix>
+		    <rotx>0.0</rotx><roty>0.0</roty><rotz>0.0</rotz>
+		</matrix>
+	    </move>
+	</meshref>
         <meshref name="circles">
             <factory>circles</factory>
             <priority>alpha</priority>
