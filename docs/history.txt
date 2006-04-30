@@ -27,6 +27,14 @@ chronological order.
 	      generic render priority system.
 	    - Update the message about where to download demodata.zip
 	      from.
+	- Rhad made the following changes to the Windows csGetMicroTicks():
+	    - Changed the calculation logic into whole and fractional second
+	      parts to avoid overflow. This fixes a problem where time
+	      would appear to move backwards after about an hour on a 2.4
+	      ghz CPU. (shorter on faster CPUs, longer on slower CPUs)
+	    - Added an assertion when the time reported by the OS moves
+	      backwards. This can happen with some AMD X2 processors
+	      and requires OS level workarounds.
 29-Apr-2006
 	- Jorrit added an example staticlod usage so that it is easier
 	  to debug problems with it.
