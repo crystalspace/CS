@@ -35,6 +35,8 @@ chronological order.
 	    - Added an assertion when the time reported by the OS moves
 	      backwards. This can happen with some AMD X2 processors
 	      and requires OS level workarounds.
+	- Jorrit removed the broken and not very useful 'stars' mesh.
+	  Fixed demodata.zip for this removal.
 29-Apr-2006
 	- Jorrit added an example staticlod usage so that it is easier
 	  to debug problems with it.

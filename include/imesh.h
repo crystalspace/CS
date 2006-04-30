@@ -48,7 +48,6 @@
 #include "imesh/sprite2d.h"
 #include "imesh/sprite3d.h"
 #include "imesh/spritecal3d.h"
-#include "imesh/stars.h"
 #include "imesh/terrain.h"
 #include "imesh/thing.h"
 #endif /* __IMESH_H__ */
