@@ -51,7 +51,6 @@
 #include "imesh/particle.h"
 #include "imesh/sprite2d.h"
 #include "imesh/sprite3d.h"
-#include "imesh/stars.h"
 #include "imesh/thing.h"
 #include "iutil/cmdline.h"
 #include "iutil/comp.h"
