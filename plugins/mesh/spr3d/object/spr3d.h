@@ -317,6 +317,9 @@ private:
   /// The sockets.
   csPDelArray<csSpriteSocket> sockets;
 
+  /// Global bounding box over all frames.
+  csBox3 global_bbox;
+
   /// Enable tweening.
   bool do_tweening;
 
@@ -620,6 +623,7 @@ public:
   void ClearLODListeners ();
   void SetupLODListeners (iSharedVariable* varm, iSharedVariable* vara);
 
+  void SetupFactory ();
   void GetObjectBoundingBox (csBox3& bbox);
   void SetObjectBoundingBox (const csBox3& bbox);
   void GetRadius (float& rad, csVector3 &cent);

@@ -213,7 +213,7 @@ void csSprite3DMeshObjectFactory::AddTriangle (int a, int b, int c)
   texel_mesh->AddTriangle (a, b, c);
 }
 
-csPtr<iMeshObject> csSprite3DMeshObjectFactory::NewInstance ()
+void csSprite3DMeshObjectFactory::SetupFactory ()
 {
   if (!initialized)
   {
@@ -221,7 +221,11 @@ csPtr<iMeshObject> csSprite3DMeshObjectFactory::NewInstance ()
     GenerateLOD ();
     ComputeBoundingBox ();
   }
+}
 
+csPtr<iMeshObject> csSprite3DMeshObjectFactory::NewInstance ()
+{
+  SetupFactory ();
   csSprite3DMeshObject* spr = new csSprite3DMeshObject ();
   spr->SetFactory (this);
   spr->EnableTweening (do_tweening);
@@ -317,6 +321,10 @@ void csSprite3DMeshObjectFactory::ComputeBoundingBox ()
 
     ((csSpriteFrame*)GetFrame (frame))->SetBoundingBox (box);
     ((csSpriteFrame*)GetFrame (frame))->SetRadius (radius);
+    if (frame == 0)
+      global_bbox = box;
+    else
+      global_bbox += box;
   }
 }
 
@@ -648,13 +656,14 @@ void csSprite3DMeshObjectFactory::HardTransform (const csReversibleTransform& t)
 
 void csSprite3DMeshObjectFactory::GetObjectBoundingBox (csBox3& b)
 {
-  csSpriteFrame* cframe = ((csSpriteAction2*)GetAction (0))->GetCsFrame (0);
-  cframe->GetBoundingBox (b);
+  SetupFactory ();
+  b = global_bbox;
 }
 
-void csSprite3DMeshObjectFactory::SetObjectBoundingBox (const csBox3&)
+void csSprite3DMeshObjectFactory::SetObjectBoundingBox (const csBox3& b)
 {
-  // @@@ TODO
+  SetupFactory ();
+  global_bbox = b;
 }
 
 void csSprite3DMeshObjectFactory::GetRadius (float& rad, csVector3& cent)
