@@ -28,6 +28,7 @@
 #include "csutil/util.h"
 
 class Demo;
+class DemoSequenceLoader;
 class csVector3;
 class csVector2;
 struct iGraphics3D;
@@ -91,6 +92,7 @@ public:
 private:
   csRef<iSequenceManager> seqmgr;
   csRef<iSequence> main_sequence;
+  DemoSequenceLoader* loader;
   bool suspended;
   bool suspend_one_frame;
   csTicks main_start_time;

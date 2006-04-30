@@ -182,7 +182,7 @@ void ShowMeshOp::Do (csTicks /*dt*/, iBase*)
 {
   if (mesh)
   {
-    mesh->GetFlags ().Reset (CS_ENTITY_INVISIBLE);
+    mesh->SetFlagsRecursive (CS_ENTITY_INVISIBLE, 0);
   }
 }
 
@@ -202,14 +202,14 @@ void HideMeshOp::Do (csTicks /*dt*/, iBase*)
 {
   if (mesh)
   {
-    mesh->GetFlags ().Set (CS_ENTITY_INVISIBLE);
+    mesh->SetFlagsRecursive (CS_ENTITY_INVISIBLE, CS_ENTITY_INVISIBLE);
   }
 }
 
 void TestOp::Do (csTicks dt, iBase*)
 {
   csPrintf ("dt=%ld fps=%g\n", (long)dt,
-  	DemoSequenceManager::demoseq->GetFPS ()); fflush (stdout);
+  DemoSequenceManager::demoseq->GetFPS ()); fflush (stdout);
 }
 
 RecurseOp::RecurseOp (iSequence* sequence, csRef<iSequenceManager> manager)

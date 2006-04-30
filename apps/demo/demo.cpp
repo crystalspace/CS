@@ -189,6 +189,7 @@ bool Demo::LoadDemoFile (const char* demofile)
   seqmgr->Setup ("sequences");
 
   engine->Prepare ();
+  engine->PrecacheDraw ();
 
   view = csPtr<iView> (new csView (engine, myG3D));
   view->GetCamera ()->SetSector (room);
@@ -429,7 +430,7 @@ void Demo::SetupFrame ()
     GfxWrite (tx, ty, col_black, col_bg,
     	"Download 'demodata.zip' from"); ty += 10;
     GfxWrite (tx, ty, col_fgdata, col_bg,
-    	"    http://www.crystalspace3d.org/support/release/cs098/maps/demodata.zip"); ty += 10;
+    	"    http://www.crystalspace3d.org/support/release/cs099/maps/demodata.zip"); ty += 10;
 
     ty += 10;
 
@@ -439,9 +440,9 @@ void Demo::SetupFrame ()
     	"    csdemo demodata.zip"); ty += 10;
     ty += 10;
     GfxWrite (tx, ty, col_black, col_bg,
-    	"or you can run it with OpenGL and a higher resolution:"); ty += 10;
+    	"or you can run it with a higher resolution:"); ty += 10;
     GfxWrite (tx, ty, col_fgdata, col_bg,
-    	"    csdemo demodata.zip -video=opengl -mode=800x600"); ty += 10;
+    	"    csdemo demodata.zip -mode=800x600"); ty += 10;
 
     ty += 10;
 

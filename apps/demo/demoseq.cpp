@@ -53,6 +53,7 @@ DemoSequenceManager::DemoSequenceManager (Demo* demo)
 {
   DemoSequenceManager::demo = demo;
   demoseq = this;
+  loader = 0;
   iObjectRegistry* object_reg = demo->object_reg;
   csRef<iPluginManager> plugin_mgr (
   	CS_QUERY_REGISTRY (object_reg, iPluginManager));
@@ -81,11 +82,14 @@ void DemoSequenceManager::Clear ()
   seqmgr->Clear ();
   pathForMesh.DeleteAll ();
   meshRotation.DeleteAll ();
+  delete loader;
+  loader = 0;
 }
 
 void DemoSequenceManager::Setup (const char* sequenceFileName)
 {
-  DemoSequenceLoader* loader = new DemoSequenceLoader (
+  delete loader;
+  loader = new DemoSequenceLoader (
   	DemoSequenceManager::demo, this, seqmgr, sequenceFileName);
   main_sequence = loader->GetSequence ("main");
   seqmgr->RunSequence (0, main_sequence);
@@ -93,7 +97,6 @@ void DemoSequenceManager::Setup (const char* sequenceFileName)
   suspended = false;
   main_start_time = seqmgr->GetMainTime ();
   num_frames = 0;
-  delete loader;
 }
 
 void DemoSequenceManager::Suspend ()
