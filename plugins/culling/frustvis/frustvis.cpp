@@ -250,10 +250,13 @@ bool csFrustumVis::Initialize (iObjectRegistry *object_reg)
   desc->DecRef ();
 
   csRef<iGraphics2D> g2d = csQueryRegistry<iGraphics2D> (object_reg);
-  CanvasResize = csevCanvasResize(object_reg, g2d);
-  csRef<iEventQueue> q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
-  if (q)
-    q->RegisterListener (scfiEventHandler, CanvasResize);
+  if (g2d)
+  {
+    CanvasResize = csevCanvasResize(object_reg, g2d);
+    csRef<iEventQueue> q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+    if (q)
+      q->RegisterListener (scfiEventHandler, CanvasResize);
+  }
 
   return true;
 }

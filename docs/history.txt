@@ -15,6 +15,9 @@ chronological order.
 	- Jorrit reordered the nodes in the apimod100 document in a
 	  more logical fashion.
 	- Jorrit fixed simpvs so that it no longer crashes at startup.
+	- Jorrit fixed frustvis and dynavis so that they no longer
+	  crash when iGraphics2D is not present. This fixes a crash
+	  in unittest.
 30-Apr-2006
 	- Jorrit fixed spr3d object bounding box calculation. It now
 	  calculates the bounding box of all frames instead of only
