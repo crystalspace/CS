@@ -696,7 +696,7 @@ inline void operator delete[] (void* p, void*, int) { operator delete[] (p); }
  * on compilers that support it.
  */
 #if !defined(CS_DEPRECATED_METHOD_MSG) || defined(DOXYGEN_RUN)
-#  if defined(CS_COMPILER_MSVC)
+#  if defined(CS_COMPILER_MSVC) && _MSC_VER >= 1400
 #    define CS_DEPRECATED_METHOD_MSG(msg) __declspec(deprecated(msg))
 #  else
 #    define CS_DEPRECATED_METHOD_MSG(msg) CS_DEPRECATED_METHOD
