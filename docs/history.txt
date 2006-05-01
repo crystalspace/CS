@@ -14,6 +14,7 @@ chronological order.
 	- Jorrit documented the removal of the simple console.
 	- Jorrit reordered the nodes in the apimod100 document in a
 	  more logical fashion.
+	- Jorrit fixed simpvs so that it no longer crashes at startup.
 30-Apr-2006
 	- Jorrit fixed spr3d object bounding box calculation. It now
 	  calculates the bounding box of all frames instead of only

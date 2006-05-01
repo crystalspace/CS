@@ -25,6 +25,7 @@ CS_IMPLEMENT_APPLICATION
 Simple::Simple ()
 {
   SetApplicationName ("CrystalSpace.SimpVS");
+  vidprefs = 0;
 }
 
 Simple::~Simple ()
