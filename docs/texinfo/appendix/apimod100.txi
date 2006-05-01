@@ -13,41 +13,45 @@ Crystal Space.
 
 @menu
 * Api100 New Event System:: New Event System
+* Api100 iEvent Changes:: @code{iEvent} Changes
+* Api100 Input Definitions:: Input Definitions
 * Api100 csArray Index and Size Type Change:: @code{csArray<>} Index and Size Type Change
+* Api100 garray Deprecated:: @file{csutil/garray.h} Deprecated
+* Api100 csList Iterator Normalization:: @code{csList<>::Iterator} Normalization
+* Api100 csSet Relocation and Changes:: @code{csSet<>} Relocation and Changes
+* Api100 csHash Changes:: @code{csHash<>} Changes
+* Api100 csHashMap and csHashSet Removal:: @samp{csHashMap} and @samp{csHashSet} Removal
+* Api100 csObjectPool Removal:: @code{csObjectPool<>} Removal
+* Api100 csStringSetIterator and csStringHashIterator Removal:: @samp{csStringSetIterator} and @samp{csStringHashIterator} Removal
+* Api100 String Changes:: String Changes
+* Api100 Naming Normalization:: Naming Normalization
 * Api100 Texture and Material Preparation:: Texture and Material Preparation
 * Api100 Material Registration:: Material Registration
-* Api100 Input Definitions:: Input Definitions
+* Api100 Procedural Texture Relocation:: Procedural Texture Relocation
+* Api100 iImage Changes:: @samp{iImage} Changes
+* Api100 iMaterialList Change:: @samp{iMaterialList} Change
+* Api100 iImageIO Load Parameter Change:: @code{iImageIO::Load()} Parameter Change
 * Api100 Pollution Reduction:: Pollution Reduction
 * Api100 cssysdef Changes:: @file{cssysdef.h} Changes
 * Api100 Library Consolidation:: Library Consolidation
 * Api100 Convenience Classes and Libraries:: Convenience Classes and Libraries
 * Api100 Convenience Headers:: Convenience Headers
-* Api100 Procedural Texture Relocation:: Procedural Texture Relocation
 * Api100 Mouse Corrections:: Mouse Corrections
 * Api100 Joystick Corrections:: Joystick Corrections
 * Api100 iGraphics2D Alpha Color Support:: @code{iGraphics2D} Alpha Color Support
-* Api100 garray Deprecated:: @file{csutil/garray.h} Deprecated
-* Api100 csList Iterator Normalization:: @code{csList<>::Iterator} Normalization
 * Api100 iDocument Changes:: @code{iDocument} Changes
-* Api100 Naming Normalization:: Naming Normalization
 * Api100 Default csHash Table Size:: Default @code{csHash<>} (and @code{csHashReversible<>}) Table Size
 * Api100 iTextureManager FreeImages Removal:: @code{iTextureManager::FreeImages()} Removal
 * Api100 Java Bindings:: Java Bindings
 * Api100 vfs Changes:: @sc{vfs} Changes
-* Api100 iEvent Changes:: @code{iEvent} Changes
 * Api100 Old Renderer Architecture Removal:: Old Renderer Architecture Removal
-* Api100 Query Macros:: Query Macros
 * Api100 Random Number Generator Changes:: Random Number Generator Changes
-* Api100 iImage Changes:: @samp{iImage} Changes
-* Api100 iMaterialList Change:: @samp{iMaterialList} Change
 * Api100 iObjectModel Change:: @code{iObjectModel} Change
-* Api100 iImageIO Load Parameter Change:: @code{iImageIO::Load()} Parameter Change
 * Api100 iLight Changes:: @samp{iLight} Changes
-* Api100 CS_QUERY_REGISTRY_PLUGIN Removal:: @code{CS_QUERY_REGISTRY_PLUGIN()} Removal
+* Api100 new csQueryRegistryOrLoad:: New @code{csQueryRegistryOrLoad} Function
 * Api100 CS_DECLARE_OBJECT_ITERATOR Removal:: @code{CS_DECLARE_OBJECT_ITERATOR()} Removal
 * Api100 Reference Count Automation:: Reference Count Automation
 * Api100 Render Buffer Changes:: Render Buffer Changes
-* Api100 String Changes:: String Changes
 * Api100 rapid Collision Detection Plugin Removal:: @sc{rapid} Collision Detection Plugin Removal
 * Api100 64-Bit Portability Changes:: 64-Bit Portability Changes
 * Api100 Cg Matrix Bindings:: Cg Matrix Bindings
@@ -55,15 +59,10 @@ Crystal Space.
 * Api100 aws Changes:: @sc{aws} Changes
 * Api100 Transform Split:: Transform Split
 * Api100 chunklod Terrain Removal:: @samp{chunklod} Terrain Removal
-* Api100 csHashMap and csHashSet Removal:: @samp{csHashMap} and @samp{csHashSet} Removal
-* Api100 csObjectPool Removal:: @code{csObjectPool<>} Removal
-* Api100 csStringSetIterator and csStringHashIterator Removal:: @samp{csStringSetIterator} and @samp{csStringHashIterator} Removal
 * Api100 Miscellaneous Removals:: Miscellaneous Removals
 * Api100 csRenderMeshHolderSingle Renamed:: @code{csRenderMeshHolderSingle} Renamed
 * Api100 C++ Standard Conformance:: C++ Standard Conformance
 * Api100 parser Deprecated:: @file{imap/parser.h} Deprecated
-* Api100 csSet Relocation and Changes:: @code{csSet<>} Relocation and Changes
-* Api100 csHash Changes:: @code{csHash<>} Changes
 * Api100 iConfig Renamed:: @code{iConfig} Renamed
 * Api100 Changes for Mesh Object Writers:: Changes for Mesh Object Writers
 * Api100 csRGBVector Removed:: @code{csRGBVector} Removed
@@ -71,9 +70,11 @@ Crystal Space.
 * Api100 Model Importing:: Model Importing
 * Api100 Render Priority System:: Render Priority System
 * Api100 Ball Mesh Removed:: Ball Mesh Removed
+* Api100 Stars Mesh Removed:: Stars Mesh Removed
+* Api100 Simple Console Removed:: Simple Console Removed
 @end menu
 
-@node Api100 New Event System, Api100 csArray Index and Size Type Change, Release Notes 100, Release Notes 100
+@node Api100 New Event System, Api100 iEvent Changes, Release Notes 100, Release Notes 100
 @subsection New Event System
 
 The event system has undergone a major rewrite, and most client applications
@@ -390,7 +391,130 @@ Handling a keyboard event can be done like this:
 @end example
 
 
-@node Api100 csArray Index and Size Type Change, Api100 Texture and Material Preparation, Api100 New Event System, Release Notes 100
+@node Api100 iEvent Changes, Api100 Input Definitions, Api100 New Event System, Release Notes 100
+@subsection @code{iEvent} Changes
+
+@subsubheading Property Bags
+
+The @code{iEvent::Find()} method was renamed to @code{Retrieve()} and exhibits
+different return value semantics. Rather than returning a mere boolean result,
+it now returns one of the @samp{csEventError} enumeration constants.  Of
+particular note, in the case of success, @code{csEventErrNone} is returned,
+which has a value of 0. This success value could be misinterpreted as ``false''
+by the unwary when fixing code to deal with this semantic change. Conditionals
+which test if retrieval of an attribute succeeded must be changed to take this
+new semantic into account. For instance, code such as the following:
+
+@example
+iEvent* ev = @dots{};
+if (ev->Find(@dots{}))
+@{
+  @dots{}
+@}
+@end example
+
+@noindent
+must be changed to perform an explicit test on the return value of
+@code{Retrieve()}, rather than relying upon default boolean semantics:
+
+@example
+if (ev->Retrieve(@dots{}) == csEventErrNone)
+@{
+  @dots{}
+@}
+@end example
+
+@subsubheading Mouse, Joystick, and Command event properties
+
+The @samp{union} containing the @samp{Mouse}, @samp{Joystick}, and @samp{Command}
+structures has been removed; all event attributes are now stored and accessed
+using the @code{Add()} and @code{Retrieve()} mechanisms.  To ease access to
+event data, use the static methods of the @samp{csMouseEventHelper}, 
+@samp{csJoystickEventHelper}, and @samp{csCommandEventHelper} classes.  
+For example, code such as the following:
+
+@example
+iEvent* ev = @dots{};
+let X = ev->Mouse.X;
+@end example
+
+@noindent
+should be changed to:
+
+@example
+iEvent* ev = @dots{};
+let X = csMouseEventHelper::GetX(ev);
+@end example
+
+@noindent
+See the @sc{api} documentation for details.
+
+@subsubheading Multiple mice
+
+There is now support for handling input from more than one mouse.
+You can retrieve the identity (basis 0) of the mouse producing a 
+mouse event with @code{csMouseEventHelper::GetNumber()}.
+
+@subsubheading Joystick and Mouse axes
+
+Joysticks can now have up to @samp{CS_MAX_JOYSTICK_AXES} axes,
+and mice can have up to @samp{CS_MAX_MOUSE_AXES}.  Their values should
+be accessed using the @code{csJoystickEventHelper::GetAxis()}
+and @code{csMouseEventHelper::GetAxis()} functions, respectively,
+where both devices and axes are enumerated basis 0.
+Each helper class also has @code{GetX()} and @code{GetY()} methods
+available; for joystick events, these are deprecated.
+
+@node Api100 Input Definitions, Api100 csArray Index and Size Type Change, Api100 iEvent Changes, Release Notes 100
+@subsection Input Definitions
+
+The file @file{csutil/inpnames.h} has been renamed to
+@file{inputdef.h}, and the following functions have been removed:
+
+@itemize @bullet
+@item
+@code{csTypeOfInputDef()}
+@item
+@code{csParseKeyDef()}
+@item
+@code{csGetKeyDesc()}
+@item
+@code{csParseMouseDef()}
+@item
+@code{csGetMouseDesc()}
+@item
+@code{csParseJoystickDef()}
+@item
+@code{csGetJoystickDesc()}
+@end itemize
+
+These functions allowed you to convert a string such as @kbd{@key{Ctrl}+A},
+@samp{JoystickX} or @samp{Alt+Mouse1} into values describing input events
+and vice versa.
+
+The way to do this is now, however, is to use @samp{csInputDefinition}, which
+resides in @file{csutil/inputdef.h}. The preferred way to convert a string to a
+definition is to construct a @samp{csInputDefinition} from a
+@samp{char const*}; and the preferred way to convert a definition back to a
+string (perhaps constructed some other way) is via
+@code{csInputDefinition::ToString()}.
+
+There are also static helper methods in @samp{csInputDefinition} which accept
+arguments in a similar way to the old functions. These are convenience methods
+which perform the work of instantiating the object for you:
+
+@itemize @bullet
+@item
+@code{csInputDefinition::ParseKey()}
+@item
+@code{csInputDefinition::GetKeyString()}
+@item
+@code{csInputDefinition::ParseOther()}
+@item
+@code{csInputDefinition::GetOtherString()}
+@end itemize
+
+@node Api100 csArray Index and Size Type Change, Api100 garray Deprecated, Api100 Input Definitions, Release Notes 100
 @subsection @code{csArray<>} Index and Size Type Change
 
 @code{csArray<>} has been changed to use @samp{size_t} instead of
@@ -523,7 +647,438 @@ else
 @}
 @end example
 
-@node Api100 Texture and Material Preparation, Api100 Material Registration, Api100 csArray Index and Size Type Change, Release Notes 100
+@node Api100 garray Deprecated, Api100 csList Iterator Normalization, Api100 csArray Index and Size Type Change, Release Notes 100
+@subsection @file{csutil/garray.h} Deprecated
+
+The @file{csutil/garray.h} file, containing the class 
+@code{csDirtyAccessArray<>}, has been deprecated in favor of the more sensible
+file name @file{csutil/dirtyaccessarray.h}. No functional changes have been
+made to the class.
+
+@node Api100 csList Iterator Normalization, Api100 csSet Relocation and Changes, Api100 garray Deprecated, Release Notes 100
+@subsection @code{csList<>::Iterator} Normalization
+
+The behavior of @code{csList<>::Iterator} has been normalized so that it
+functions identically to all other iterators in Crystal Space.  In the past, a
+newly created @code{csList<>::Iterator} already pointed at the first element in
+the container.  This differed from all other iterator implementations, in which
+the first element, like all other elements, is accessed by an invocation of
+@code{Next()}.
+
+Old code which accessed the elements of a @code{csList<>::Iterator} required a
+non-standard idiom, such as:
+
+@example
+csList<sometype> list = @dots{};
+csList<sometype>::Iterator it(list);
+if (it.HasCurrent())
+@{
+  do_something(*it);         // First value.
+  while (it.HasNext())
+  @{
+    do_something(it.Next()); // Remaining values.
+  @}
+@}
+@end example
+
+@noindent
+Or, the slightly less complicated, though still somewhat convoluted:
+
+@example
+csList<sometype>::Iterator it(list);
+while (it.HasCurrent())
+@{
+  do_something(*it);
+  it.Next();
+@}
+@end example
+
+Following normalization, @code{csList<>::Iterator} now works like all other
+iterators throughout the toolkit.  In particular, for forward iteration, all
+elements can be accessed via the standard @code{HasNext()} / @code{Next()}
+idiom:
+
+@example
+csList<sometype>::Iterator it(list);
+while (it.HasNext())
+@{
+  do_something(it.Next());
+@}
+@end example
+
+@noindent
+Likewise, for backward iteration, the @code{HasPrevious()} / @code{Previous()}
+idiom works in the obvious and expected inverse fashion.
+
+Finally, @code{csList<>::Iterator::Next()} and @code{Previous()} now return
+references to contained elements, rather than pointers.  This makes the
+interface of @code{csList<>::Iterator} internally consistent, as well as
+consistent with other iterators throughout the toolkit, in which these methods
+return references.
+
+@node Api100 csSet Relocation and Changes, Api100 csHash Changes, Api100 csList Iterator Normalization, Release Notes 100
+@subsection @code{csSet<>} Relocation and Changes
+
+The declaration of @code{csSet<>} was moved out from @file{csutil/hash.h} and
+into its own header file, @file{csutil/set.h}. The method
+@code{csSet<>::GetHash()} has likewise been removed since it unnecessarily
+exposed an underlying implementation detail of @code{csSet<>}.
+
+However, this implementation detail still affects the use of @code{csSet<>} as
+for storage of pointers in a @code{csSet<>} the @code{csPtrKey<>} wrapper must
+be used.
+
+@node Api100 csHash Changes, Api100 csHashMap and csHashSet Removal, Api100 csSet Relocation and Changes, Release Notes 100
+@subsection @code{csHash<>} Changes
+
+The way @code{csHash<>} handles support for arbitrary key types has been
+changed. Previously, a so-called ``hash key handler'' was passed as an optional
+third template parameter that computed hash keys and was able to compare
+keys. Now, the hash computation is handled through the new
+@code{csHashComputer<>} template, and key comparison through
+@code{csComparator<>}. To provide hash computation and comparisons for specific
+types used as hash keys, specializations of the templates mentioned above are
+needed. Alternatively the default comparator uses the @samp{operator <} and
+@samp{operator >} operators, so you can also implement those operators instead
+of a @code{csComparator<>} specialization. The default @code{csHashComputer<>}
+implementation assumes that a type provides a @samp{GetHash()} method that
+computes the hash value for an object. However, this means that integral types 
+need a specialization. As a convenience, Crystal Space already provides 
+specializations of @code{csHashComputer<>} for a number of commonly used 
+intergrals. Further, @code{csComparator<>} and/or @code{csHashComputer<>} 
+specializations are provided for the commonly used types @samp{csString}, 
+@samp{const char*} and @samp{csStrKey}; and the default comparison semantics of 
+@samp{operator <} and @samp{operator >} handle the remaining fundamental types 
+and any composite types which provide these operators. Pointers (other than 
+@samp{void*} for which exists a specialization) as hash keys are a special 
+case: to use a pointer of type @samp{Foo*} as a hash key, employ 
+@samp{csPtrKey<Foo>} as the key type in the hash declaration. 
+
+@node Api100 csHashMap and csHashSet Removal, Api100 csObjectPool Removal, Api100 csHash Changes, Release Notes 100
+@subsection @samp{csHashMap} and @samp{csHashSet} Removal
+
+The long-deprecated @samp{csHashMap}, @samp{csHashMapReversible}, and
+@samp{csHashSet} classes have been removed. Instead, use the templated classes
+@code{csHash<>}, @code{csHashReversible<>}, and @code{csSet<>}.  For
+string-related @dfn{set} functionality, you may also want to consider using
+@samp{csStringHash} and @samp{csStringSet}.
+
+@node Api100 csObjectPool Removal, Api100 csStringSetIterator and csStringHashIterator Removal, Api100 csHashMap and csHashSet Removal, Release Notes 100
+@subsection @code{csObjectPool<>} Removal
+
+The @code{csObjectPool<>} utility class has been removed since it managed
+memory poorly, and failed to invoke the destructor of contained objects at the
+time they were recycled via @code{csObjectPool<>::Free()}, which meant that the
+objects might not release their own resources in a timely fashion.  (It did
+correctly destroy the freed objects when the pool itself was destroyed, but
+should have been doing so at @code{Free()}-time.)
+
+You can use @code{csBlockAllocator<>} (see @file{csutil/blockallocator.h}) as a
+drop-in replacement for @code{csObjectPool<>} since the @sc{api} of
+@code{csBlockAllocator<>} is a proper superset of the @code{csObjectPool<>}
+@sc{api}. A global search and replace should be sufficient to account for this
+change.
+
+@node Api100 csStringSetIterator and csStringHashIterator Removal, Api100 String Changes, Api100 csObjectPool Removal, Release Notes 100
+@subsection @samp{csStringSetIterator} and @samp{csStringHashIterator} Removal
+
+@samp{csStringSetIterator} and @samp{csStringHashIterator} have been replaced
+with the iterator classes @samp{csStringSet::GlobalIterator} and
+@samp{csStringHash::GlobalIterator}, respectively.  Rather than instantiating
+iterators directly, you now ask the set or hash for an iterator. This brings
+the @samp{csStringSet} and @samp{csStringHash} @sc{api}'s in line with other
+container classes which vend iterators. Given old code which is using
+@samp{csStringSetIterator}:
+
+@example
+csStringSet set;
+// ...populate set...
+csStringSetIterator iter(&set);
+while (iter.HasNext())
+@{
+  char const* s = iter.Next();
+  // ...do something with `s'...
+@}
+@end example
+
+@noindent
+Convert it like this:
+
+@example
+csStringSet::GlobalIterator iter = set.GetIterator();
+while (iter.HasNext())
+@{
+@end example
+
+@noindent
+Code using @samp{csStringHashIterator} can be fixed using the same simple
+transformation.
+
+@node Api100 String Changes, Api100 Naming Normalization, Api100 csStringSetIterator and csStringHashIterator Removal, Release Notes 100
+@subsection String Changes
+
+The class hierarchy of @samp{csString} has changed. Most functionality is now
+provided by the new superclass @samp{csStringBase}. From this,
+@code{csStringFast<>} is subclassed, and @samp{csString} descends from
+@code{csStringFast<>}. @code{csStringFast<>} is a templated class featuring an
+internal character buffer which is used instead of dynamically heap-allocated
+memory when the string length is sufficently short (as controlled by the class
+template argument). This generalization can make @samp{csStringFast<>} (and its
+subclass @samp{csString}) much faster when used as automatic (stack-allocated)
+variables, even when declared inside @samp{for@{@}}-loops, since slow
+heap-allocation often can be avoided.
+
+For simplification purposes, several methods have been removed from
+@samp{csString} and @samp{iString} (when present):
+
+@itemize @bullet
+@item
+Static @code{PadFoo()} methods. The same functionality can be achieved with
+the remaining instance @code{PadFoo()} methods.
+
+@item
+@code{AsPadFoo()} instance methods. The same functionality can be achieved with
+the remaining instance @code{PadFoo()} methods.
+
+@item
+Static integer and float @code{Format()} methods.  The same functionality can
+be achieved by utilizing the remaining @code{Replace()} or @code{Format()}
+methods.
+
+@item
+@code{SetGrowsExponentially()} and @code{GetGrowsExponentially()}. The same
+functionality is provided by @code{SetGrowsBy(0)} and @code{GetGrowsBy()}.
+@end itemize
+
+@node Api100 Naming Normalization, Api100 Texture and Material Preparation, Api100 String Changes, Release Notes 100
+@subsection Naming Normalization
+
+The following @sc{scf} class names have been normalized in order to be
+consistent with the names of all other available ``null'' and ``multiplexer''
+plugins:
+
+@itemize @bullet
+@item
+@code{crystalspace.mesh.object.nullmesh} @result{}
+@code{crystalspace.mesh.object.null}
+@item
+@code{crystalspace.graphics2d.null2d} @result{}
+@code{crystalspace.graphics2d.null}
+@item
+@code{crystalspace.documentsystem.multiplex} @result{}
+@iftex
+@*
+@end iftex
+@code{crystalspace.documentsystem.multiplexer}
+@item
+@code{crystalspace.graphic.image.io.multiplex} @result{}
+@iftex
+@*
+@end iftex
+@code{crystalspace.graphic.image.io.multiplexer}
+@end itemize
+
+For @sc{api} consistency and uniformity between container classes, the
+following methods have been renamed:
+
+@itemize @bullet
+@item
+@code{csArray<>::Length()} @result{} @code{csArray<>::GetSize()}
+@item
+@code{csArray<>::SetLength()} @result{} @code{csArray<>::SetSize()}
+@item
+@code{csHash<>::DeleteAll()} @result{} @code{csHash<>::Empty()}
+@item
+@code{csHash<>::In()} @result{} @code{csHash<>::Contains()}
+@item
+@code{csHash<>::PutFirst()} @result{} @code{csHash<>::PutUnique()}
+@item
+@code{csList<>::FetchPrev()} @result{} @code{csList<>::FetchPrevious()}
+@item
+@code{csList<>::HasPrev()} @result{} @code{csList<>::HasPrevious()}
+@item
+@code{csSet<>::DeleteAll()} @result{} @code{csSet<>::Empty()}
+@item
+@code{csSet<>::In()} @result{} @code{csSet<>::Contains()}
+@item
+@code{csString::Clear()} @result{} @code{csString::Empty()}
+@item
+@code{csString::FindReplace()} @result{} @code{csString::ReplaceAll()}
+@item
+@code{csString::FindStr()} @result{} @code{csString::Find()}
+@item
+@code{csString::Reclaim()} @result{} @code{csString::ShrinkBestFit()}
+@item
+@code{iString::FindReplace()} @result{} @code{iString::ReplaceAll()}
+@item
+@code{iString::FindStr()} @result{} @code{iString::Find()}
+@item
+@code{iStringArray::DeleteAll()} @result{} @code{iStringArray::Empty()}
+@item
+@code{iStringSet::Clear()} @result{} @code{iStringSet::Empty()}
+@end itemize
+
+@noindent
+In most cases, the old names listed above are still recognized for backward
+compatibility, but they are deprecated, so you probably ought to convert to the
+new @sc{api} at some point. The @sc{api} of most of the container classes also
+has been expanded, so you may want to study the @sc{api} reference manual to
+learn about newly available functionality.
+
+Likewise, the following global functions have been renamed:
+
+@itemize @bullet
+@item
+@code{csFindReplace()} @result{} @code{csReplaceAll()}
+@end itemize
+
+For consistency with like-named methods in other @sc{scf} interfaces, the
+following @samp{iImage} methods have been renamed:
+
+@itemize @bullet
+@item
+@code{GetKeycolor()} @result{} @code{GetKeyColor()}
+@item
+@code{HasKeycolor()} @result{} @code{HasKeyColor()}
+@end itemize
+
+Various methods in @samp{csIntersect3} have been renamed in order to improve
+consistency and clarity.  In addition, some arguments have been reversed order
+so that, for example, a method named @code{SegmentTriangle()} will receive
+first the segment argument followed by the triangle argument.
+
+@itemize @bullet
+@item
+@code{AxisPlane()} @result{} @code{SegmentAxisPlane()}
+@item
+@code{IntersectPolygon()} @result{} @code{PlanePolygon()} (plane version)
+@item
+@code{IntersectPolygon()} @result{} @code{SegmentPolygon()} (segment version)
+@item
+@code{IntersectSegment()} @result{} @code{SegmentFrustum()}
+@item
+@code{IntersectTriangle()} @result{} @code{SegmentTriangle()}
+@item
+@code{Plane()} @result{} @code{SegmentPlane()}
+@item
+@code{Planes()} @result{} @code{SegmentPlanes()} (segment version)
+@item
+@code{Planes()} @result{} @code{ThreePlanes()} (three planes version)
+@item
+@code{XFrustum()} @result{} @code{SegmentXFrustum()}
+@item
+@code{XPlane()} @result{} @code{SegmentXPlane()}
+@item
+@code{YFrustum()} @result{} @code{SegmentYFrustum()}
+@item
+@code{YPlane()} @result{} @code{SegmentYPlane()}
+@item
+@code{Z0Plane()} @result{} @code{SegmentZ0Plane()}
+@item
+@code{ZPlane()} @result{} @code{SegmentZPlane()}
+@end itemize
+
+In addition to that the function @code{csMath3::FindIntersection()} has been
+removed and is replaced with a new @code{csIntersect3::TriangleTriangle()}
+routine which is faster and more correct.
+
+@noindent
+The same improvements have been made to @code{csIntersect2}:
+
+@itemize @bullet
+@item
+@code{IntersectPolygon()} @result{} @code{PlanePolygon()} (plane version)
+@item
+@code{Lines()} @result{} @code{LineLine()} (plane version)
+@item
+@code{Plane()} @result{} @code{SegmentPlane()}
+@item
+@code{PlaneNoTest()} @result{} @code{SegmentPlaneNoTest()}
+@item
+@code{Planes()} @result{} @code{PlanePlane()}
+@item
+@code{Segments()} @result{} @code{SegmentSegment()} (plane version)
+@end itemize
+
+The following configuration control macros (most of which are emitted to
+@file{csconfig.h} by the Crystal Space @file{configure} script) have been
+renamed in order to improve internal naming consistency, and to conform more
+closely to naming scheme used by Autoconf.
+
+@itemize @bullet
+@item
+@code{CS_HAS_CAL3D} @result{} @code{CS_HAVE_CAL3D}
+@item
+@code{CS_HAS_CMATH_H} @result{} @code{CS_HAVE_CMATH_H}
+@item
+@code{CS_HAS_GLHANDLEARB_T} @result{} @code{CS_HAVE_GLHANDLEARB_T}
+@item
+@code{CS_HAS_INT64_C} @result{} @code{CS_HAVE_INT64_C}
+@item
+@code{CS_HAS_INTMAX_T} @result{} @code{CS_HAVE_INTMAX_T}
+@item
+@code{CS_HAS_INTPTR_T} @result{} @code{CS_HAVE_INTPTR_T}
+@item
+@code{CS_HAS_INTTYPES_H} @result{} @code{CS_HAVE_INTTYPES_H}
+@item
+@code{CS_HAS_MACHINE_SOUNDCARD_H} @result{} @code{CS_HAVE_MACHINE_SOUNDCARD_H}
+@item
+@code{CS_HAS_MEMORY_MAPPED_IO} @result{} @code{CS_HAVE_MEMORY_MAPPED_IO}
+@item
+@code{CS_HAS_POSIX_MMAP} @result{} @code{CS_HAVE_POSIX_MMAP}
+@item
+@code{CS_HAS_REGEX} @result{} @code{CS_HAVE_REGEX}
+@item
+@code{CS_HAS_SOUNDCARD_H} @result{} @code{CS_HAVE_SOUNDCARD_H}
+@item
+@code{CS_HAS_STDINT_H} @result{} @code{CS_HAVE_STDINT_H}
+@item
+@code{CS_HAS_SYS_PARAM_H} @result{} @code{CS_HAVE_SYS_PARAM_H}
+@item
+@code{CS_HAS_SYS_SOUNDCARD_H} @result{} @code{CS_HAVE_SYS_SOUNDCARD_H}
+@item
+@code{CS_HAS_WCHAR_H} @result{} @code{CS_HAVE_WCHAR_H}
+@item
+@code{CS_RTLD_NOW_AVAILABLE} @result{} @code{CS_HAVE_RTLD_NOW}
+@end itemize
+
+@noindent
+Likewise, the same normalization has been applied to the
+@samp{CS_USE_FAKE_feature} macros published by the @file{configure} script, and
+the boolean sense of these control macros has been reversed to account for the
+name change.
+
+@itemize @bullet
+@item
+@code{CS_USE_FAKE_EXPLICIT_KEYWORD} @result{}
+@code{CS_HAVE_CXX_KEYWORD_EXPLICIT}
+@item
+@code{CS_USE_FAKE_MATH_H_FLOAT_FUNCS} @result{}
+@code{CS_HAVE_MATH_H_FLOAT_FUNCS}
+@item
+@code{CS_USE_FAKE_SOCKLEN_TYPE} @result{} @code{CS_HAVE_SOCKLEN_T}
+@item
+@code{CS_USE_FAKE_TYPENAME_KEYWORD} @result{}
+@code{CS_HAVE_CXX_KEYWORD_TYPENAME}
+@item
+@code{CS_USE_FAKE_WCHAR_TYPE} @result{} @code{CS_HAVE_WCHAR_T}
+@item
+@code{CS_USE_FAKE_WCSLEN} @result{} @code{CS_HAVE_WCSLEN}
+@end itemize
+
+For consistency with like-named macros (such as @samp{CS_PROCESSOR_NAME} and
+@samp{CS_PROCESSOR_arch}), the following control macros have been renamed:
+
+@itemize @bullet
+@item
+@code{CS_PROCSIZE} @result{} @code{CS_PROCESSOR_SIZE}
+@end itemize
+
+The @code{csOrdering<>} template has been renamed to the more general
+@code{csComparator<>} to reflect the fact that this template can perform both
+ordering and equality comparisons.
+
+@node Api100 Texture and Material Preparation, Api100 Material Registration, Api100 Naming Normalization, Release Notes 100
 @subsection Texture and Material Preparation
 
 Texture and material preparation is now fully automatic. It is no longer
@@ -543,62 +1098,104 @@ them from your applications if you used them):
 @code{iTextureManager::PrepareTextures()}
 @end itemize
 
-@node Api100 Material Registration, Api100 Input Definitions, Api100 Texture and Material Preparation, Release Notes 100
+@node Api100 Material Registration, Api100 Procedural Texture Relocation, Api100 Texture and Material Preparation, Release Notes 100
 @subsection Material Registration
 
 Registering an @samp{iMaterialWrapper} with the texture manager is no longer
 necessary; any such calls can be removed.
 
-@node Api100 Input Definitions, Api100 Pollution Reduction, Api100 Material Registration, Release Notes 100
-@subsection Input Definitions
+@node Api100 Procedural Texture Relocation, Api100 iImage Changes, Api100 Material Registration, Release Notes 100
+@subsection Procedural Texture Relocation
+ 
+Implementations of the standard procedural textures (dots, fire, plasma, etc.)
+now reside directly in the @file{stdpt} plugin
+(@file{CS/plugins/proctex/standard}), rather than in the @file{cstool}
+module. Consequently, the following previously public headers are no longer
+available:
+ 
+@itemize @bullet
+@item
+@code{cstool/prdots.h}
+@item
+@code{cstool/prfire.h}
+@item
+@code{cstool/prplasma.h}
+@item
+@code{cstool/prsky.h}
+@item
+@code{cstool/prwater.h}
+@end itemize
+ 
+Likewise, procedural textures can no longer be allocated directly (for
+instance, via @samp{new csProcFire}).  Instead, you must now use the plugin
+system to create such textures. For example:
+ 
+@example
+csRef<iTextureType> type = csLoadPluginCheck<iTextureType> (object_reg,
+  "crystalspace.texture.type.fire"));
+if (!type) return false;	// Error
+csRef<iTextureFactory> fireFact = type->NewFactory();
+csRef<iTextureWrapper> tex = fireFact->Generate();
+csRef<iFireTexture> fire = scfQueryInterface<iFireTexture> (tex);
+@end example
+ 
+Various procedural textures may or may not implement their own custom @sc{scf}
+interfaces beyond the normal interfaces implemented by all procedural
+textures. In the example above, the ``fire'' texture implements the specialized
+@samp{iFireTexture}.
 
-The file @file{csutil/inpnames.h} has been renamed to
-@file{inputdef.h}, and the following functions have been removed:
+@node Api100 iImage Changes, Api100 iMaterialList Change, Api100 Procedural Texture Relocation, Release Notes 100
+@subsection @samp{iImage} Changes
+
+The @samp{iImage} interface has been reduced to a level where it merely serves
+as a container for pixel data; however, the image editing functionality was
+only relocated, not removed.
+
+Forbidding direct manipulation of an @samp{iImage}'s pixel data has the 
+following consequences:
 
 @itemize @bullet
 @item
-@code{csTypeOfInputDef()}
+The @code{Clone()} function was removed. The
+@samp{csImageMemory} class provides a constructor that copies the pixel data
+from another @samp{iImage} object, providing a functionality equal to 
+@code{Clone()}.
+
 @item
-@code{csParseKeyDef()}
+To edit the pixel data of an image, create a clone of an image (e.g. a
+@samp{csImageMemory} as mentioned above) and manipulate the data in the newly
+cerated instance.
+
 @item
-@code{csGetKeyDesc()}
+If the image data is needed in another
+format, as the @code{SetFormat()} call has been removed from the interface.
+
 @item
-@code{csParseMouseDef()}
+The image editing functionality found in methods such as @code{Rescale()},
+@code{Sharpen()} was moved into the @samp{csImageManipulate} class.
+
 @item
-@code{csGetMouseDesc()}
-@item
-@code{csParseJoystickDef()}
-@item
-@code{csGetJoystickDesc()}
+The @code{CopyXXX()} method that copied an image into another are now provided
+by @samp{csImageMemory}.
 @end itemize
 
-These functions allowed you to convert a string such as @kbd{@key{Ctrl}+A},
-@samp{JoystickX} or @samp{Alt+Mouse1} into values describing input events
-and vice versa.
+As a side-effect of these changes, the @samp{csImageFile} and 
+@samp{csImageMemory} were merged and the former removed.
 
-The way to do this is now, however, is to use @samp{csInputDefinition}, which
-resides in @file{csutil/inputdef.h}. The preferred way to convert a string to a
-definition is to construct a @samp{csInputDefinition} from a
-@samp{char const*}; and the preferred way to convert a definition back to a
-string (perhaps constructed some other way) is via
-@code{csInputDefinition::ToString()}.
+@node Api100 iMaterialList Change, Api100 iImageIO Load Parameter Change, Api100 iImage Changes, Release Notes 100
+@subsection @samp{iMaterialList} Change
 
-There are also static helper methods in @samp{csInputDefinition} which accept
-arguments in a similar way to the old functions. These are convenience methods
-which perform the work of instantiating the object for you:
+The function @code{iMaterialList::NewMaterial()} now needs an additional
+name parameter. It is not recommended to change the name later.
 
-@itemize @bullet
-@item
-@code{csInputDefinition::ParseKey()}
-@item
-@code{csInputDefinition::GetKeyString()}
-@item
-@code{csInputDefinition::ParseOther()}
-@item
-@code{csInputDefinition::GetOtherString()}
-@end itemize
+@node Api100 iImageIO Load Parameter Change, Api100 Pollution Reduction, Api100 iMaterialList Change, Release Notes 100
+@subsection @code{iImageIO::Load()} Parameter Change
 
-@node Api100 Pollution Reduction, Api100 cssysdef Changes, Api100 Input Definitions, Release Notes 100
+@code{iImageIO::Load()} now requires the image source data in an 
+@samp{iDataBuffer} object, instead of separate @samp{buffer} and @samp{size}
+parameters.
+
+@node Api100 Pollution Reduction, Api100 cssysdef Changes, Api100 iImageIO Load Parameter Change, Release Notes 100
 @subsection Pollution Reduction
 
 In order to avoid polluting the top-level system include directory, the Crystal
@@ -899,7 +1496,7 @@ Windows support.
 For a complete list of available convenience classes, consult the header files
 in the subdirectories of @file{CS/include/csplugincommon}.
 
-@node Api100 Convenience Headers, Api100 Procedural Texture Relocation, Api100 Convenience Classes and Libraries, Release Notes 100
+@node Api100 Convenience Headers, Api100 Mouse Corrections, Api100 Convenience Classes and Libraries, Release Notes 100
 @subsection Convenience Headers
 
 For convenience, several top-level @dfn{master header} files have been added to
@@ -1001,47 +1598,7 @@ location of the wxWidgets resources will have to be added as @dfn{additional
 include directories} and @dfn{additional library directories}, in the project
 settings or globally, to ensure that @sc{msvc} will be able to find them.
 
-@node Api100 Procedural Texture Relocation, Api100 Mouse Corrections, Api100 Convenience Headers, Release Notes 100
-@subsection Procedural Texture Relocation
- 
-Implementations of the standard procedural textures (dots, fire, plasma, etc.)
-now reside directly in the @file{stdpt} plugin
-(@file{CS/plugins/proctex/standard}), rather than in the @file{cstool}
-module. Consequently, the following previously public headers are no longer
-available:
- 
-@itemize @bullet
-@item
-@code{cstool/prdots.h}
-@item
-@code{cstool/prfire.h}
-@item
-@code{cstool/prplasma.h}
-@item
-@code{cstool/prsky.h}
-@item
-@code{cstool/prwater.h}
-@end itemize
- 
-Likewise, procedural textures can no longer be allocated directly (for
-instance, via @samp{new csProcFire}).  Instead, you must now use the plugin
-system to create such textures. For example:
- 
-@example
-csRef<iTextureType> type = csLoadPluginCheck<iTextureType> (object_reg,
-  "crystalspace.texture.type.fire"));
-if (!type) return false;	// Error
-csRef<iTextureFactory> fireFact = type->NewFactory();
-csRef<iTextureWrapper> tex = fireFact->Generate();
-csRef<iFireTexture> fire = scfQueryInterface<iFireTexture> (tex);
-@end example
- 
-Various procedural textures may or may not implement their own custom @sc{scf}
-interfaces beyond the normal interfaces implemented by all procedural
-textures. In the example above, the ``fire'' texture implements the specialized
-@samp{iFireTexture}.
-
-@node Api100 Mouse Corrections, Api100 Joystick Corrections, Api100 Procedural Texture Relocation, Release Notes 100
+@node Api100 Mouse Corrections, Api100 Joystick Corrections, Api100 Convenience Headers, Release Notes 100
 @subsection Mouse Corrections
 
 Mouse buttons and axes used to be enumerated basis 1 (first mouse button was 1,
@@ -1058,7 +1615,7 @@ considered them 1-based.  It now uniformly treats joystick numbers as
 0-based. This is consistent with button numbers for joysticks and mice, which
 are also basis-0.
 
-@node Api100 iGraphics2D Alpha Color Support, Api100 garray Deprecated, Api100 Joystick Corrections, Release Notes 100
+@node Api100 iGraphics2D Alpha Color Support, Api100 iDocument Changes, Api100 Joystick Corrections, Release Notes 100
 @subsection @code{iGraphics2D} Alpha Color Support
 
 @samp{iGraphics2D} now supports an alpha channel. @code{iGraphics2D::FindRGB()}
@@ -1071,76 +1628,7 @@ of using @samp{-1} as the color value, to obtain a color value from
 @code{FindRGB()} that has the same R, G, B components as the foreground color, 
 but an alpha component of 0.
 
-@node Api100 garray Deprecated, Api100 csList Iterator Normalization, Api100 iGraphics2D Alpha Color Support, Release Notes 100
-@subsection @file{csutil/garray.h} Deprecated
-
-The @file{csutil/garray.h} file, containing the class 
-@code{csDirtyAccessArray<>}, has been deprecated in favor of the more sensible
-file name @file{csutil/dirtyaccessarray.h}. No functional changes have been
-made to the class.
-
-@node Api100 csList Iterator Normalization, Api100 iDocument Changes, Api100 garray Deprecated, Release Notes 100
-@subsection @code{csList<>::Iterator} Normalization
-
-The behavior of @code{csList<>::Iterator} has been normalized so that it
-functions identically to all other iterators in Crystal Space.  In the past, a
-newly created @code{csList<>::Iterator} already pointed at the first element in
-the container.  This differed from all other iterator implementations, in which
-the first element, like all other elements, is accessed by an invocation of
-@code{Next()}.
-
-Old code which accessed the elements of a @code{csList<>::Iterator} required a
-non-standard idiom, such as:
-
-@example
-csList<sometype> list = @dots{};
-csList<sometype>::Iterator it(list);
-if (it.HasCurrent())
-@{
-  do_something(*it);         // First value.
-  while (it.HasNext())
-  @{
-    do_something(it.Next()); // Remaining values.
-  @}
-@}
-@end example
-
-@noindent
-Or, the slightly less complicated, though still somewhat convoluted:
-
-@example
-csList<sometype>::Iterator it(list);
-while (it.HasCurrent())
-@{
-  do_something(*it);
-  it.Next();
-@}
-@end example
-
-Following normalization, @code{csList<>::Iterator} now works like all other
-iterators throughout the toolkit.  In particular, for forward iteration, all
-elements can be accessed via the standard @code{HasNext()} / @code{Next()}
-idiom:
-
-@example
-csList<sometype>::Iterator it(list);
-while (it.HasNext())
-@{
-  do_something(it.Next());
-@}
-@end example
-
-@noindent
-Likewise, for backward iteration, the @code{HasPrevious()} / @code{Previous()}
-idiom works in the obvious and expected inverse fashion.
-
-Finally, @code{csList<>::Iterator::Next()} and @code{Previous()} now return
-references to contained elements, rather than pointers.  This makes the
-interface of @code{csList<>::Iterator} internally consistent, as well as
-consistent with other iterators throughout the toolkit, in which these methods
-return references.
-
-@node Api100 iDocument Changes, Api100 Naming Normalization, Api100 csList Iterator Normalization, Release Notes 100
+@node Api100 iDocument Changes, Api100 Default csHash Table Size, Api100 iGraphics2D Alpha Color Support, Release Notes 100
 @subsection @code{iDocument} Changes
 
 The @code{iDocument::Parse()} method now accepts an optional argument
@@ -1162,235 +1650,7 @@ Consult the following documents for more information regarding this issue.
 @uref{http://www.w3.org/TR/REC-xml/#sec-white-space}@*
 @uref{http://www.xml.com/axml/notes/AllWSAlways.html}
 
-@node Api100 Naming Normalization, Api100 Default csHash Table Size, Api100 iDocument Changes, Release Notes 100
-@subsection Naming Normalization
-
-The following @sc{scf} class names have been normalized in order to be
-consistent with the names of all other available ``null'' and ``multiplexer''
-plugins:
-
-@itemize @bullet
-@item
-@code{crystalspace.mesh.object.nullmesh} @result{}
-@code{crystalspace.mesh.object.null}
-@item
-@code{crystalspace.graphics2d.null2d} @result{}
-@code{crystalspace.graphics2d.null}
-@item
-@code{crystalspace.documentsystem.multiplex} @result{}
-@iftex
-@*
-@end iftex
-@code{crystalspace.documentsystem.multiplexer}
-@item
-@code{crystalspace.graphic.image.io.multiplex} @result{}
-@iftex
-@*
-@end iftex
-@code{crystalspace.graphic.image.io.multiplexer}
-@end itemize
-
-For @sc{api} consistency and uniformity between container classes, the
-following methods have been renamed:
-
-@itemize @bullet
-@item
-@code{csArray<>::Length()} @result{} @code{csArray<>::GetSize()}
-@item
-@code{csArray<>::SetLength()} @result{} @code{csArray<>::SetSize()}
-@item
-@code{csHash<>::DeleteAll()} @result{} @code{csHash<>::Empty()}
-@item
-@code{csHash<>::In()} @result{} @code{csHash<>::Contains()}
-@item
-@code{csHash<>::PutFirst()} @result{} @code{csHash<>::PutUnique()}
-@item
-@code{csList<>::FetchPrev()} @result{} @code{csList<>::FetchPrevious()}
-@item
-@code{csList<>::HasPrev()} @result{} @code{csList<>::HasPrevious()}
-@item
-@code{csSet<>::DeleteAll()} @result{} @code{csSet<>::Empty()}
-@item
-@code{csSet<>::In()} @result{} @code{csSet<>::Contains()}
-@item
-@code{csString::Clear()} @result{} @code{csString::Empty()}
-@item
-@code{csString::FindReplace()} @result{} @code{csString::ReplaceAll()}
-@item
-@code{csString::FindStr()} @result{} @code{csString::Find()}
-@item
-@code{csString::Reclaim()} @result{} @code{csString::ShrinkBestFit()}
-@item
-@code{iString::FindReplace()} @result{} @code{iString::ReplaceAll()}
-@item
-@code{iString::FindStr()} @result{} @code{iString::Find()}
-@item
-@code{iStringArray::DeleteAll()} @result{} @code{iStringArray::Empty()}
-@item
-@code{iStringSet::Clear()} @result{} @code{iStringSet::Empty()}
-@end itemize
-
-@noindent
-In most cases, the old names listed above are still recognized for backward
-compatibility, but they are deprecated, so you probably ought to convert to the
-new @sc{api} at some point. The @sc{api} of most of the container classes also
-has been expanded, so you may want to study the @sc{api} reference manual to
-learn about newly available functionality.
-
-Likewise, the following global functions have been renamed:
-
-@itemize @bullet
-@item
-@code{csFindReplace()} @result{} @code{csReplaceAll()}
-@end itemize
-
-For consistency with like-named methods in other @sc{scf} interfaces, the
-following @samp{iImage} methods have been renamed:
-
-@itemize @bullet
-@item
-@code{GetKeycolor()} @result{} @code{GetKeyColor()}
-@item
-@code{HasKeycolor()} @result{} @code{HasKeyColor()}
-@end itemize
-
-Various methods in @samp{csIntersect3} have been renamed in order to improve
-consistency and clarity.  In addition, some arguments have been reversed order
-so that, for example, a method named @code{SegmentTriangle()} will receive
-first the segment argument followed by the triangle argument.
-
-@itemize @bullet
-@item
-@code{AxisPlane()} @result{} @code{SegmentAxisPlane()}
-@item
-@code{IntersectPolygon()} @result{} @code{PlanePolygon()} (plane version)
-@item
-@code{IntersectPolygon()} @result{} @code{SegmentPolygon()} (segment version)
-@item
-@code{IntersectSegment()} @result{} @code{SegmentFrustum()}
-@item
-@code{IntersectTriangle()} @result{} @code{SegmentTriangle()}
-@item
-@code{Plane()} @result{} @code{SegmentPlane()}
-@item
-@code{Planes()} @result{} @code{SegmentPlanes()} (segment version)
-@item
-@code{Planes()} @result{} @code{ThreePlanes()} (three planes version)
-@item
-@code{XFrustum()} @result{} @code{SegmentXFrustum()}
-@item
-@code{XPlane()} @result{} @code{SegmentXPlane()}
-@item
-@code{YFrustum()} @result{} @code{SegmentYFrustum()}
-@item
-@code{YPlane()} @result{} @code{SegmentYPlane()}
-@item
-@code{Z0Plane()} @result{} @code{SegmentZ0Plane()}
-@item
-@code{ZPlane()} @result{} @code{SegmentZPlane()}
-@end itemize
-
-In addition to that the function @code{csMath3::FindIntersection()} has been
-removed and is replaced with a new @code{csIntersect3::TriangleTriangle()}
-routine which is faster and more correct.
-
-@noindent
-The same improvements have been made to @code{csIntersect2}:
-
-@itemize @bullet
-@item
-@code{IntersectPolygon()} @result{} @code{PlanePolygon()} (plane version)
-@item
-@code{Lines()} @result{} @code{LineLine()} (plane version)
-@item
-@code{Plane()} @result{} @code{SegmentPlane()}
-@item
-@code{PlaneNoTest()} @result{} @code{SegmentPlaneNoTest()}
-@item
-@code{Planes()} @result{} @code{PlanePlane()}
-@item
-@code{Segments()} @result{} @code{SegmentSegment()} (plane version)
-@end itemize
-
-The following configuration control macros (most of which are emitted to
-@file{csconfig.h} by the Crystal Space @file{configure} script) have been
-renamed in order to improve internal naming consistency, and to conform more
-closely to naming scheme used by Autoconf.
-
-@itemize @bullet
-@item
-@code{CS_HAS_CAL3D} @result{} @code{CS_HAVE_CAL3D}
-@item
-@code{CS_HAS_CMATH_H} @result{} @code{CS_HAVE_CMATH_H}
-@item
-@code{CS_HAS_GLHANDLEARB_T} @result{} @code{CS_HAVE_GLHANDLEARB_T}
-@item
-@code{CS_HAS_INT64_C} @result{} @code{CS_HAVE_INT64_C}
-@item
-@code{CS_HAS_INTMAX_T} @result{} @code{CS_HAVE_INTMAX_T}
-@item
-@code{CS_HAS_INTPTR_T} @result{} @code{CS_HAVE_INTPTR_T}
-@item
-@code{CS_HAS_INTTYPES_H} @result{} @code{CS_HAVE_INTTYPES_H}
-@item
-@code{CS_HAS_MACHINE_SOUNDCARD_H} @result{} @code{CS_HAVE_MACHINE_SOUNDCARD_H}
-@item
-@code{CS_HAS_MEMORY_MAPPED_IO} @result{} @code{CS_HAVE_MEMORY_MAPPED_IO}
-@item
-@code{CS_HAS_POSIX_MMAP} @result{} @code{CS_HAVE_POSIX_MMAP}
-@item
-@code{CS_HAS_REGEX} @result{} @code{CS_HAVE_REGEX}
-@item
-@code{CS_HAS_SOUNDCARD_H} @result{} @code{CS_HAVE_SOUNDCARD_H}
-@item
-@code{CS_HAS_STDINT_H} @result{} @code{CS_HAVE_STDINT_H}
-@item
-@code{CS_HAS_SYS_PARAM_H} @result{} @code{CS_HAVE_SYS_PARAM_H}
-@item
-@code{CS_HAS_SYS_SOUNDCARD_H} @result{} @code{CS_HAVE_SYS_SOUNDCARD_H}
-@item
-@code{CS_HAS_WCHAR_H} @result{} @code{CS_HAVE_WCHAR_H}
-@item
-@code{CS_RTLD_NOW_AVAILABLE} @result{} @code{CS_HAVE_RTLD_NOW}
-@end itemize
-
-@noindent
-Likewise, the same normalization has been applied to the
-@samp{CS_USE_FAKE_feature} macros published by the @file{configure} script, and
-the boolean sense of these control macros has been reversed to account for the
-name change.
-
-@itemize @bullet
-@item
-@code{CS_USE_FAKE_EXPLICIT_KEYWORD} @result{}
-@code{CS_HAVE_CXX_KEYWORD_EXPLICIT}
-@item
-@code{CS_USE_FAKE_MATH_H_FLOAT_FUNCS} @result{}
-@code{CS_HAVE_MATH_H_FLOAT_FUNCS}
-@item
-@code{CS_USE_FAKE_SOCKLEN_TYPE} @result{} @code{CS_HAVE_SOCKLEN_T}
-@item
-@code{CS_USE_FAKE_TYPENAME_KEYWORD} @result{}
-@code{CS_HAVE_CXX_KEYWORD_TYPENAME}
-@item
-@code{CS_USE_FAKE_WCHAR_TYPE} @result{} @code{CS_HAVE_WCHAR_T}
-@item
-@code{CS_USE_FAKE_WCSLEN} @result{} @code{CS_HAVE_WCSLEN}
-@end itemize
-
-For consistency with like-named macros (such as @samp{CS_PROCESSOR_NAME} and
-@samp{CS_PROCESSOR_arch}), the following control macros have been renamed:
-
-@itemize @bullet
-@item
-@code{CS_PROCSIZE} @result{} @code{CS_PROCESSOR_SIZE}
-@end itemize
-
-The @code{csOrdering<>} template has been renamed to the more general
-@code{csComparator<>} to reflect the fact that this template can perform both
-ordering and equality comparisons.
-
-@node Api100 Default csHash Table Size, Api100 iTextureManager FreeImages Removal, Api100 Naming Normalization, Release Notes 100
+@node Api100 Default csHash Table Size, Api100 iTextureManager FreeImages Removal, Api100 iDocument Changes, Release Notes 100
 @subsection Default @code{csHash<>} (and @code{csHashReversible<>}) Table Size
 
 The default hash table size and grow rate has been reduced from 257 and 64 to
@@ -1422,7 +1682,7 @@ domain name ``crystalspace3d.org''. This replaces the older package name
 @samp{com.crystalspace}, which itself replaced the much older name
 @samp{net.sourceforge.crystal}.
 
-@node Api100 vfs Changes, Api100 iEvent Changes, Api100 Java Bindings, Release Notes 100
+@node Api100 vfs Changes, Api100 Old Renderer Architecture Removal, Api100 Java Bindings, Release Notes 100
 @subsection @sc{vfs} Changes
 @cindex @sc{vfs} Configuration File
 @cindex @file{vfs.cfg}, @sc{vfs} Configuration File
@@ -1440,81 +1700,7 @@ conflicting entries, then mounts and variable assignments specified in
 configuration files discovered earlier in the scan take precedence over those
 discovered later.
 
-@node Api100 iEvent Changes, Api100 Old Renderer Architecture Removal, Api100 vfs Changes, Release Notes 100
-@subsection @code{iEvent} Changes
-
-@subsubheading Property Bags
-
-The @code{iEvent::Find()} method was renamed to @code{Retrieve()} and exhibits
-different return value semantics. Rather than returning a mere boolean result,
-it now returns one of the @samp{csEventError} enumeration constants.  Of
-particular note, in the case of success, @code{csEventErrNone} is returned,
-which has a value of 0. This success value could be misinterpreted as ``false''
-by the unwary when fixing code to deal with this semantic change. Conditionals
-which test if retrieval of an attribute succeeded must be changed to take this
-new semantic into account. For instance, code such as the following:
-
-@example
-iEvent* ev = @dots{};
-if (ev->Find(@dots{}))
-@{
-  @dots{}
-@}
-@end example
-
-@noindent
-must be changed to perform an explicit test on the return value of
-@code{Retrieve()}, rather than relying upon default boolean semantics:
-
-@example
-if (ev->Retrieve(@dots{}) == csEventErrNone)
-@{
-  @dots{}
-@}
-@end example
-
-@subsubheading Mouse, Joystick, and Command event properties
-
-The @samp{union} containing the @samp{Mouse}, @samp{Joystick}, and @samp{Command}
-structures has been removed; all event attributes are now stored and accessed
-using the @code{Add()} and @code{Retrieve()} mechanisms.  To ease access to
-event data, use the static methods of the @samp{csMouseEventHelper}, 
-@samp{csJoystickEventHelper}, and @samp{csCommandEventHelper} classes.  
-For example, code such as the following:
-
-@example
-iEvent* ev = @dots{};
-let X = ev->Mouse.X;
-@end example
-
-@noindent
-should be changed to:
-
-@example
-iEvent* ev = @dots{};
-let X = csMouseEventHelper::GetX(ev);
-@end example
-
-@noindent
-See the @sc{api} documentation for details.
-
-@subsubheading Multiple mice
-
-There is now support for handling input from more than one mouse.
-You can retrieve the identity (basis 0) of the mouse producing a 
-mouse event with @code{csMouseEventHelper::GetNumber()}.
-
-@subsubheading Joystick and Mouse axes
-
-Joysticks can now have up to @samp{CS_MAX_JOYSTICK_AXES} axes,
-and mice can have up to @samp{CS_MAX_MOUSE_AXES}.  Their values should
-be accessed using the @code{csJoystickEventHelper::GetAxis()}
-and @code{csMouseEventHelper::GetAxis()} functions, respectively,
-where both devices and axes are enumerated basis 0.
-Each helper class also has @code{GetX()} and @code{GetY()} methods
-available; for joystick events, these are deprecated.
-
-@node Api100 Old Renderer Architecture Removal, Api100 Query Macros, Api100 iEvent Changes, Release Notes 100
+@node Api100 Old Renderer Architecture Removal, Api100 Random Number Generator Changes, Api100 vfs Changes, Release Notes 100
 @subsection Old Renderer Architecture Removal
 
 The old rendering architecture along with the old renderer plugins have been
@@ -1673,18 +1859,7 @@ for the @samp{iThingFactoryState} interface. Example:
 	->GetFactory ());
 @end example
 
-@node Api100 Query Macros, Api100 Random Number Generator Changes, Api100 Old Renderer Architecture Removal, Release Notes 100
-@subsection Query Macros
-
-The macro @code{CS_QUERY_REGISTRY_PLUGIN()} has been added to
-@file{iutil/plugin.h}. This is a convenience macro which embodies the common
-idiom of first querying the object-registry for an object implementing some
-interface, and then asking the plugin manager to load a plugin supplying the
-desired object if it was not found in the object-registry. It also registers
-the object with the object-registry if the plugin manager loads it
-successfully.
-
-@node Api100 Random Number Generator Changes, Api100 iImage Changes, Api100 Query Macros, Release Notes 100
+@node Api100 Random Number Generator Changes, Api100 iObjectModel Change, Api100 Old Renderer Architecture Removal, Release Notes 100
 @subsection Random Number Generator Changes
 
 The global function @code{csFastRandFloat()} has been retired.  In its stead is
@@ -1695,51 +1870,7 @@ controlled and seeded individually, thus making it far more flexible and
 useful.  (Note that the more general-purpose @samp{csRandomGen} class is also
 able to vend floating point numbers.)
 
-@node Api100 iImage Changes, Api100 iMaterialList Change, Api100 Random Number Generator Changes, Release Notes 100
-@subsection @samp{iImage} Changes
-
-The @samp{iImage} interface has been reduced to a level where it merely serves
-as a container for pixel data; however, the image editing functionality was
-only relocated, not removed.
-
-Forbidding direct manipulation of an @samp{iImage}'s pixel data has the 
-following consequences:
-
-@itemize @bullet
-@item
-The @code{Clone()} function was removed. The
-@samp{csImageMemory} class provides a constructor that copies the pixel data
-from another @samp{iImage} object, providing a functionality equal to 
-@code{Clone()}.
-
-@item
-To edit the pixel data of an image, create a clone of an image (e.g. a
-@samp{csImageMemory} as mentioned above) and manipulate the data in the newly
-cerated instance.
-
-@item
-If the image data is needed in another
-format, as the @code{SetFormat()} call has been removed from the interface.
-
-@item
-The image editing functionality found in methods such as @code{Rescale()},
-@code{Sharpen()} was moved into the @samp{csImageManipulate} class.
-
-@item
-The @code{CopyXXX()} method that copied an image into another are now provided
-by @samp{csImageMemory}.
-@end itemize
-
-As a side-effect of these changes, the @samp{csImageFile} and 
-@samp{csImageMemory} were merged and the former removed.
-
-@node Api100 iMaterialList Change, Api100 iObjectModel Change, Api100 iImage Changes, Release Notes 100
-@subsection @samp{iMaterialList} Change
-
-The function @code{iMaterialList::NewMaterial()} now needs an additional
-name parameter. It is not recommended to change the name later.
-
-@node Api100 iObjectModel Change, Api100 iImageIO Load Parameter Change, Api100 iMaterialList Change, Release Notes 100
+@node Api100 iObjectModel Change, Api100 iLight Changes, Api100 Random Number Generator Changes, Release Notes 100
 @subsection @code{iObjectModel} Change
 
 The function @code{iObjectModel::GetObjectBoundingBox()} only has one
@@ -1748,14 +1879,7 @@ was not implemented anywhere. In addition to that the constants
 @code{CS_BBOX_NORMAL}, @code{CS_BBOX_ACCURATE}, and @code{CS_BBOX_MAX}
 are also removed.
 
-@node Api100 iImageIO Load Parameter Change, Api100 iLight Changes, Api100 iObjectModel Change, Release Notes 100
-@subsection @code{iImageIO::Load()} Parameter Change
-
-@code{iImageIO::Load()} now requires the image source data in an 
-@samp{iDataBuffer} object, instead of separate @samp{buffer} and @samp{size}
-parameters.
-
-@node Api100 iLight Changes, Api100 CS_QUERY_REGISTRY_PLUGIN Removal, Api100 iImageIO Load Parameter Change, Release Notes 100
+@node Api100 iLight Changes, Api100 new csQueryRegistryOrLoad, Api100 iObjectModel Change, Release Notes 100
 @subsection @samp{iLight} Changes
 
 The @samp{iLight} and its implementation (@samp{csLight}) have been extended to
@@ -1776,17 +1900,23 @@ the first attenuation constant. See comments in
 @file{CS/include/iengine/light.h} for exact details of the different
 attenuation modes.
 
-@node Api100 CS_QUERY_REGISTRY_PLUGIN Removal, Api100 CS_DECLARE_OBJECT_ITERATOR Removal, Api100 iLight Changes, Release Notes 100
-@subsection @code{CS_QUERY_REGISTRY_PLUGIN()} Removal
+@node Api100 new csQueryRegistryOrLoad, Api100 CS_DECLARE_OBJECT_ITERATOR Removal, Api100 iLight Changes, Release Notes 100
+@subsection New @code{csQueryRegistryOrLoad} Function
 
-@code{CS_QUERY_REGISTRY_PLUGIN} has been removed. Instead there is now
-@code{csQueryRegistryOrLoad} which works as follows:
+The function @code{csQueryRegistryOrLoad()} has been added to
+@file{iutil/plugin.h}. This is a convenience function which embodies the common
+idiom of first querying the object-registry for an object implementing some
+interface, and then asking the plugin manager to load a plugin supplying the
+desired object if it was not found in the object-registry. It also registers
+the object with the object-registry if the plugin manager loads it
+successfully:
+
 @example
 csRef<iEngine> engine = csQueryRegistryOrLoad<iEngine> (object_reg,
   "crystalspace.engine.3d");
 @end example
 
-@node Api100 CS_DECLARE_OBJECT_ITERATOR Removal, Api100 Reference Count Automation, Api100 CS_QUERY_REGISTRY_PLUGIN Removal, Release Notes 100
+@node Api100 CS_DECLARE_OBJECT_ITERATOR Removal, Api100 Reference Count Automation, Api100 new csQueryRegistryOrLoad, Release Notes 100
 @subsection @code{CS_DECLARE_OBJECT_ITERATOR()} Removal
 
 The @samp{iObject} iterator creation macro @code{CS_DECLARE_OBJECT_ITERATOR()}
@@ -1856,7 +1986,7 @@ dispose manually via @code{DecRef()}.
 @code{iHazeHullCreation::CreateCone()}
 @end itemize
 
-@node Api100 Render Buffer Changes, Api100 String Changes, Api100 Reference Count Automation, Release Notes 100
+@node Api100 Render Buffer Changes, Api100 rapid Collision Detection Plugin Removal, Api100 Reference Count Automation, Release Notes 100
 @subsection Render Buffer Changes
 
 The @samp{iRenderBuffer} interface was made renderer-independant. Consequently,
@@ -1928,43 +2058,7 @@ the mesh provides them). They are:
 @samp{texture coordinate 0} @result{} @samp{texture coordinate 0}
 @end itemize
 
-@node Api100 String Changes, Api100 rapid Collision Detection Plugin Removal, Api100 Render Buffer Changes, Release Notes 100
-@subsection String Changes
-
-The class hierarchy of @samp{csString} has changed. Most functionality is now
-provided by the new superclass @samp{csStringBase}. From this,
-@code{csStringFast<>} is subclassed, and @samp{csString} descends from
-@code{csStringFast<>}. @code{csStringFast<>} is a templated class featuring an
-internal character buffer which is used instead of dynamically heap-allocated
-memory when the string length is sufficently short (as controlled by the class
-template argument). This generalization can make @samp{csStringFast<>} (and its
-subclass @samp{csString}) much faster when used as automatic (stack-allocated)
-variables, even when declared inside @samp{for@{@}}-loops, since slow
-heap-allocation often can be avoided.
-
-For simplification purposes, several methods have been removed from
-@samp{csString} and @samp{iString} (when present):
-
-@itemize @bullet
-@item
-Static @code{PadFoo()} methods. The same functionality can be achieved with
-the remaining instance @code{PadFoo()} methods.
-
-@item
-@code{AsPadFoo()} instance methods. The same functionality can be achieved with
-the remaining instance @code{PadFoo()} methods.
-
-@item
-Static integer and float @code{Format()} methods.  The same functionality can
-be achieved by utilizing the remaining @code{Replace()} or @code{Format()}
-methods.
-
-@item
-@code{SetGrowsExponentially()} and @code{GetGrowsExponentially()}. The same
-functionality is provided by @code{SetGrowsBy(0)} and @code{GetGrowsBy()}.
-@end itemize
-
-@node Api100 rapid Collision Detection Plugin Removal, Api100 64-Bit Portability Changes, Api100 String Changes, Release Notes 100
+@node Api100 rapid Collision Detection Plugin Removal, Api100 64-Bit Portability Changes, Api100 Render Buffer Changes, Release Notes 100
 @subsection @sc{rapid} Collision Detection Plugin Removal
 
 The @sc{rapid} collision detection plugin has been removed. In addition to
@@ -2128,7 +2222,7 @@ is sent via a shader variable, while @samp{world2camera} is specified via
 @code{iGraphics3D::SetWorldToCamera()} (but it is also available as a shader
 variable to shader programs).
 
-@node Api100 chunklod Terrain Removal, Api100 csHashMap and csHashSet Removal, Api100 Transform Split, Release Notes 100
+@node Api100 chunklod Terrain Removal, Api100 Miscellaneous Removals, Api100 Transform Split, Release Notes 100
 @subsection @samp{chunklod} Terrain Removal
 
 The @samp{chunklod} terrain plugin has been removed:
@@ -2142,67 +2236,7 @@ Instead use the @samp{bruteblock} terrain engine.
 @noindent
 @code{crystalspace.mesh.object.terrain.bruteblock}
 
-@node Api100 csHashMap and csHashSet Removal, Api100 csObjectPool Removal, Api100 chunklod Terrain Removal, Release Notes 100
-@subsection @samp{csHashMap} and @samp{csHashSet} Removal
-
-The long-deprecated @samp{csHashMap}, @samp{csHashMapReversible}, and
-@samp{csHashSet} classes have been removed. Instead, use the templated classes
-@code{csHash<>}, @code{csHashReversible<>}, and @code{csSet<>}.  For
-string-related @dfn{set} functionality, you may also want to consider using
-@samp{csStringHash} and @samp{csStringSet}.
-
-@node Api100 csObjectPool Removal, Api100 csStringSetIterator and csStringHashIterator Removal, Api100 csHashMap and csHashSet Removal, Release Notes 100
-@subsection @code{csObjectPool<>} Removal
-
-The @code{csObjectPool<>} utility class has been removed since it managed
-memory poorly, and failed to invoke the destructor of contained objects at the
-time they were recycled via @code{csObjectPool<>::Free()}, which meant that the
-objects might not release their own resources in a timely fashion.  (It did
-correctly destroy the freed objects when the pool itself was destroyed, but
-should have been doing so at @code{Free()}-time.)
-
-You can use @code{csBlockAllocator<>} (see @file{csutil/blockallocator.h}) as a
-drop-in replacement for @code{csObjectPool<>} since the @sc{api} of
-@code{csBlockAllocator<>} is a proper superset of the @code{csObjectPool<>}
-@sc{api}. A global search and replace should be sufficient to account for this
-change.
-
-@node Api100 csStringSetIterator and csStringHashIterator Removal, Api100 Miscellaneous Removals, Api100 csObjectPool Removal, Release Notes 100
-@subsection @samp{csStringSetIterator} and @samp{csStringHashIterator} Removal
-
-@samp{csStringSetIterator} and @samp{csStringHashIterator} have been replaced
-with the iterator classes @samp{csStringSet::GlobalIterator} and
-@samp{csStringHash::GlobalIterator}, respectively.  Rather than instantiating
-iterators directly, you now ask the set or hash for an iterator. This brings
-the @samp{csStringSet} and @samp{csStringHash} @sc{api}'s in line with other
-container classes which vend iterators. Given old code which is using
-@samp{csStringSetIterator}:
-
-@example
-csStringSet set;
-// ...populate set...
-csStringSetIterator iter(&set);
-while (iter.HasNext())
-@{
-  char const* s = iter.Next();
-  // ...do something with `s'...
-@}
-@end example
-
-@noindent
-Convert it like this:
-
-@example
-csStringSet::GlobalIterator iter = set.GetIterator();
-while (iter.HasNext())
-@{
-@end example
-
-@noindent
-Code using @samp{csStringHashIterator} can be fixed using the same simple
-transformation.
-
-@node Api100 Miscellaneous Removals, Api100 csRenderMeshHolderSingle Renamed, Api100 csStringSetIterator and csStringHashIterator Removal, Release Notes 100
+@node Api100 Miscellaneous Removals, Api100 csRenderMeshHolderSingle Renamed, Api100 chunklod Terrain Removal, Release Notes 100
 @subsection Miscellaneous Removals
 
 The following facilities have been removed because they were unused and/or of
@@ -2236,7 +2270,7 @@ strictly to the C++ Language Standard (such as those which employ @emph{gcc}'s
 @samp{-ansi} and @samp{-pedantic} options) can now include Crystal Space
 headers safely.
 
-@node Api100 parser Deprecated, Api100 csSet Relocation and Changes, Api100 C++ Standard Conformance, Release Notes 100
+@node Api100 parser Deprecated, Api100 iConfig Renamed, Api100 C++ Standard Conformance, Release Notes 100
 @subsection @file{imap/parser.h} Deprecated
 
 All functionality in the header @file{imap/parser.h} was long ago moved to
@@ -2246,45 +2280,7 @@ merely included @file{imap/loader.h} and did nothing more. Since
 @file{imap/parser.h} has no useful purpose, it is now officially deprecated,
 and deprecation warnings have been added. Use @file{imap/loader.h} instead.
 
-@node Api100 csSet Relocation and Changes, Api100 csHash Changes, Api100 parser Deprecated, Release Notes 100
-@subsection @code{csSet<>} Relocation and Changes
-
-The declaration of @code{csSet<>} was moved out from @file{csutil/hash.h} and
-into its own header file, @file{csutil/set.h}. The method
-@code{csSet<>::GetHash()} has likewise been removed since it unnecessarily
-exposed an underlying implementation detail of @code{csSet<>}.
-
-However, this implementation detail still affects the use of @code{csSet<>} as
-for storage of pointers in a @code{csSet<>} the @code{csPtrKey<>} wrapper must
-be used.
-
-@node Api100 csHash Changes, Api100 iConfig Renamed, Api100 csSet Relocation and Changes, Release Notes 100
-@subsection @code{csHash<>} Changes
-
-The way @code{csHash<>} handles support for arbitrary key types has been
-changed. Previously, a so-called ``hash key handler'' was passed as an optional
-third template parameter that computed hash keys and was able to compare
-keys. Now, the hash computation is handled through the new
-@code{csHashComputer<>} template, and key comparison through
-@code{csComparator<>}. To provide hash computation and comparisons for specific
-types used as hash keys, specializations of the templates mentioned above are
-needed. Alternatively the default comparator uses the @samp{operator <} and
-@samp{operator >} operators, so you can also implement those operators instead
-of a @code{csComparator<>} specialization. The default @code{csHashComputer<>}
-implementation assumes that a type provides a @samp{GetHash()} method that
-computes the hash value for an object. However, this means that integral types 
-need a specialization. As a convenience, Crystal Space already provides 
-specializations of @code{csHashComputer<>} for a number of commonly used 
-intergrals. Further, @code{csComparator<>} and/or @code{csHashComputer<>} 
-specializations are provided for the commonly used types @samp{csString}, 
-@samp{const char*} and @samp{csStrKey}; and the default comparison semantics of 
-@samp{operator <} and @samp{operator >} handle the remaining fundamental types 
-and any composite types which provide these operators. Pointers (other than 
-@samp{void*} for which exists a specialization) as hash keys are a special 
-case: to use a pointer of type @samp{Foo*} as a hash key, employ 
-@samp{csPtrKey<Foo>} as the key type in the hash declaration. 
-
-@node Api100 iConfig Renamed, Api100 Changes for Mesh Object Writers, Api100 csHash Changes, Release Notes 100
+@node Api100 iConfig Renamed, Api100 Changes for Mesh Object Writers, Api100 parser Deprecated, Release Notes 100
 @subsection @code{iConfig} Renamed
 
 The @code{iConfig} interface has been renamed to the more fitting 
@@ -2412,7 +2408,7 @@ It is no longer possible to define render priorities in a map file. You can
 now only redefine render priorities from the engine @sc{api}.
 @xref{HOWTO Render Priorities}.
 
-@node Api100 Ball Mesh Removed, , Api100 Render Priority System, Release Notes 100
+@node Api100 Ball Mesh Removed, Api100 Stars Mesh Removed, Api100 Render Priority System, Release Notes 100
 @subsection Ball Mesh Removed
 
 The ball mesh has been removed. The genmesh mesh can now be used to generate
@@ -2474,4 +2470,16 @@ factory (as with all genmeshes).
 If you want to create them from code then you have to get rid of using the
 @code{iBallState} and instead use @code{iGeneralFactoryState->GenerateSphere()}
 to generate the desired sphere in a genmesh factory.
+
+@node Api100 Stars Mesh Removed, Api100 Simple Console Removed, Api100 Ball Mesh Removed, Release Notes 100
+@subsection Stars Mesh Removed
+
+Due to limited use (and it having been broken for more then a year) the
+stars mesh has been removed.
+
+@node Api100 Simple Console Removed, , Api100 Stars Mesh Removed, Release Notes 100
+@subsection Simple Console Removed
+
+The simple console (@samp{crystalspace.console.output.simple} has been
+removed. Instead use @samp{crystalspace.console.output.standard}.
 

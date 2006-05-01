@@ -91,7 +91,7 @@
       iStandardReporterListener)
 
   def CS_REQUEST_CONSOLEOUT ():
-    return CS_REQUEST_PLUGIN("crystalspace.console.output.simple",
+    return CS_REQUEST_PLUGIN("crystalspace.console.output.standard",
       iConsoleOutput)
 
 %}

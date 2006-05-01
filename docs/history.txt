@@ -6,6 +6,14 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+1-May-2006
+	- Jorrit removed the simple output console in favor of the
+	  standard output console. There is no need to keep two consoles
+	  with nearly the same functionality.
+	- Jorrit documented the removal of the stars mesh.
+	- Jorrit documented the removal of the simple console.
+	- Jorrit reordered the nodes in the apimod100 document in a
+	  more logical fashion.
 30-Apr-2006
 	- Jorrit fixed spr3d object bounding box calculation. It now
 	  calculates the bounding box of all frames instead of only

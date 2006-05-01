@@ -345,7 +345,7 @@
   void CS_REQUEST_CONSOLEOUT
     (char *& __scfid__, char *& __iface__, int & __idnum__, int & __ver__)
   {
-    __scfid__ = "crystalspace.console.output.simple";
+    __scfid__ = "crystalspace.console.output.standard";
     __iface__ = "iConsoleOutput";
     csRequestPlugin (__iface__, __idnum__, __ver__);
   }

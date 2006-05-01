@@ -107,9 +107,9 @@ struct iVerbosityManager;
 /// Request default reporter listener.
 #define CS_REQUEST_REPORTERLISTENER \
   CS_REQUEST_PLUGIN("crystalspace.utilities.stdrep", iStandardReporterListener)
-/// Request simple console output.
+/// Request standard console output.
 #define CS_REQUEST_CONSOLEOUT \
-  CS_REQUEST_PLUGIN("crystalspace.console.output.simple", iConsoleOutput)
+  CS_REQUEST_PLUGIN("crystalspace.console.output.standard", iConsoleOutput)
 /** @} */
 
 /**

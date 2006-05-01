@@ -69,7 +69,6 @@ SCF_VERSION (iConsoleOutput, 2, 1, 0);
  * interactive console.
  *
  * Main creators of instances implementing this interface:
- * - Simple output console plugin (crystalspace.console.output.simple)
  * - Standard output console plugin (crystalspace.console.output.standard)
  * - Fancy output console plugin (crystalspace.console.output.fancy)
  * 

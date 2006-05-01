@@ -22,6 +22,7 @@ WALKALL.PLUGINLIST =
   bezierldr
   bugplug
   csconin
+  csconout
   csddsimg
   csfont
   csgifimg
@@ -58,7 +59,6 @@ WALKALL.PLUGINLIST =
   reporter
   sequence
   shadermgr
-  simpcon
   simpleformer
   simpleformerldr
   bruteblock
