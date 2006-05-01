@@ -166,9 +166,8 @@ void IsoTest::SetupFrame ()
   actor_pos.y += 10.0;	// Make sure we start beam high enough.
   csVector3 end_pos, isect;
   end_pos = actor_pos; end_pos.y -= 100.0;
-  float r;
-  plane->HitBeamObject (actor_pos, end_pos, isect, &r);
-  actor_pos.y = isect.y + .8;
+  csHitBeamResult rc = plane->HitBeamObject (actor_pos, end_pos);
+  actor_pos.y = rc.isect.y + .8;
 
   actor->GetMovable ()->SetPosition (actor_pos);
   actor->GetMovable ()->UpdateMove ();

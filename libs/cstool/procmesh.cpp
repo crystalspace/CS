@@ -54,7 +54,7 @@ void csMeshOnTexture::ScaleCamera (iMeshWrapper* mesh, int txtw, int txth)
   float aspect = float (camera->GetFOV ());
   float shift_x = camera->GetShiftX ();
   float shift_y = camera->GetShiftY ();
-  size_t i;
+  int i;
   float maxz = -100000000.0f;
   for (i = 0 ; i < 8 ; i++)
   {

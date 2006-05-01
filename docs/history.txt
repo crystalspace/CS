@@ -7,6 +7,7 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 1-May-2006
+        - Arianna fixed some warning for MSVC 7.1
 	- Jorrit removed the simple output console in favor of the
 	  standard output console. There is no need to keep two consoles
 	  with nearly the same functionality.
