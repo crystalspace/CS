@@ -113,7 +113,7 @@ csPtr<iBase> csRenderLoopLoader::Parse (iDocumentNode* node,
 
   csRef<iRenderLoop> loop = loopmgr->Create ();
   csRef<iObject> obj = scfQueryInterface<iObject> (loop);
-  if (ldr_context->GetRegion ())
+  if (ldr_context && ldr_context->GetRegion ())
     ldr_context->GetRegion ()->QueryObject ()->ObjAdd (obj);
 
   char* loopName = 0;

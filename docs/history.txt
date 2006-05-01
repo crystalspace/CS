@@ -18,6 +18,9 @@ chronological order.
 	- Jorrit fixed frustvis and dynavis so that they no longer
 	  crash when iGraphics2D is not present. This fixes a crash
 	  in unittest.
+	- Jorrit fixed the renderloop loader so that it no longer
+	  crashes if the loader context is not given to the function.
+	  This fixes a crash in csbench.
 30-Apr-2006
 	- Jorrit fixed spr3d object bounding box calculation. It now
 	  calculates the bounding box of all frames instead of only
