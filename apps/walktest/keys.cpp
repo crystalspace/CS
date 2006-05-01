@@ -557,7 +557,7 @@ void WalkTest::MouseClick2Handler(iEvent &Event)
   csVector2 p (csMouseEventHelper::GetX(&Event), 
 	       FRAME_HEIGHT-csMouseEventHelper::GetY(&Event));
 
-  view->GetCamera ()->InvPerspective (p, 1, v);
+  v = view->GetCamera ()->InvPerspective (p, 1);
   csVector3 vw = view->GetCamera ()->GetTransform ().This2Other (v);
 
   iSector* sector = view->GetCamera ()->GetSector ();
@@ -720,8 +720,9 @@ iMeshWrapper *FindNextClosestMesh (iMeshWrapper *baseMesh,
   if (baseMesh)
   {
     closestMesh = baseMesh;
-    closestZLocation = baseMesh->GetScreenBoundingBox
-    	(camera, screenBoundingBox, bbox3);
+    csScreenBoxResult box = baseMesh->GetScreenBoundingBox
+    	(camera);
+    closestZLocation = box.distance; 
     // if the baseMesh isn't in front of the camera, return
     if (closestZLocation < 0)
       return 0;
@@ -740,8 +741,8 @@ iMeshWrapper *FindNextClosestMesh (iMeshWrapper *baseMesh,
 
     if (nextMesh != baseMesh)
     {
-      thisZLocation = nextMesh->GetScreenBoundingBox(camera,
-      	screenBoundingBox, bbox3);
+      csScreenBoxResult nextBox = nextMesh->GetScreenBoundingBox(camera);
+      thisZLocation = nextBox.distance;
       if ((thisZLocation > 0) && (thisZLocation < closestZLocation))
       {
         if (screenBoundingBox.In(screenCoord->x, screenCoord->y))

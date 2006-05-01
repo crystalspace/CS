@@ -1944,7 +1944,7 @@ bool csEngineSequenceManager::HandleEvent (iEvent &event)
       // Setup perspective vertex, invert mouse Y axis.
       csVector2 p (mouse_x, camera->GetShiftY() * 2 - mouse_y);
 
-      camera->InvPerspective (p, 1, v);
+      v = camera->InvPerspective (p, 1);
       csVector3 vw = camera->GetTransform ().This2Other (v);
 
       iSector* sector = camera->GetSector ();

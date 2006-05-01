@@ -515,7 +515,7 @@ void csBugPlug::MouseButton2 (iCamera* camera)
   // Setup perspective vertex, invert mouse Y axis.
   csVector2 p (mouse_x, camera->GetShiftY() * 2 - mouse_y);
 
-  camera->InvPerspective (p, 100, v);
+  v = camera->InvPerspective (p, 100);
   csVector3 end = camera->GetTransform ().This2Other (v);
 
   iSector* sector = camera->GetSector ();
@@ -549,7 +549,7 @@ void csBugPlug::MouseButton3 (iCamera* camera)
   // Setup perspective vertex, invert mouse Y axis.
   csVector2 p (mouse_x, camera->GetShiftY() * 2 - mouse_y);
 
-  camera->InvPerspective (p, 100, v);
+  v = camera->InvPerspective (p, 100);
   csVector3 end = camera->GetTransform ().This2Other (v);
 
   iSector* sector = camera->GetSector ();

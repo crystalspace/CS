@@ -996,10 +996,8 @@ void csMeshWrapper::GetRadius (float &rad, csVector3 &cent) const
       {
 	float childrad;
         csVector3 childcent;
-        spr->GetRadius (childrad, childcent);
-
-        csSphere childsphere (childcent, childrad);
-
+        csSphere childsphere = spr->GetRadius ();
+    
         // @@@ Is this the right transform?
         childsphere *= spr->GetMovable ()->GetTransform ();
         sphere += childsphere;
@@ -1225,16 +1223,16 @@ float csMeshWrapper::GetScreenBoundingBox (
   }
   else
   {
-    camera->Perspective (cbox.Max (), oneCorner);
+    oneCorner = camera->Perspective (cbox.Max ());
     sbox.StartBoundingBox (oneCorner);
 
     csVector3 v (cbox.MinX (), cbox.MinY (), cbox.MaxZ ());
-    camera->Perspective (v, oneCorner);
+    oneCorner = camera->Perspective (v);
     sbox.AddBoundingVertexSmart (oneCorner);
-    camera->Perspective (cbox.Min (), oneCorner);
+    oneCorner = camera->Perspective (cbox.Min ());
     sbox.AddBoundingVertexSmart (oneCorner);
     v.Set (cbox.MaxX (), cbox.MaxY (), cbox.MinZ ());
-    camera->Perspective (v, oneCorner);
+    oneCorner = camera->Perspective (v);
     sbox.AddBoundingVertexSmart (oneCorner);
   }
 

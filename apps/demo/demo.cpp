@@ -1298,7 +1298,7 @@ bool Demo::DemoHandleEvent (iEvent &Event)
     {
       csVector2 p (csMouseEventHelper::GetX(&Event), myG2D->GetHeight ()-csMouseEventHelper::GetY(&Event));
       csVector3 v;
-      view->GetCamera ()->InvPerspective (p, 1, v);
+      v = view->GetCamera ()->InvPerspective (p, 1);
       csVector3 vw = view->GetCamera ()->GetTransform ().This2Other (v);
       if (map_enabled == MAP_EDIT_FORWARD)
       {

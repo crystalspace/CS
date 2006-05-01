@@ -905,7 +905,7 @@ iSequenceWrapper* csLoader::LoadSequence (iLoaderContext* ldr_context,
 		  if (mw)
 		  {
 		    csBox3 box;
-		    mw->GetWorldBoundingBox (box);
+		    box = mw->GetWorldBoundingBox ();
 		    offset = (box.Min() + box.Max()) / 2.0f;
 		  }
 		  else

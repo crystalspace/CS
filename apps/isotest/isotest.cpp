@@ -188,9 +188,8 @@ void IsoTest::SetupFrame ()
     return;
 
   csVector2 lpos(0,0);
-  view->GetCamera()->Perspective(
-    view->GetCamera()->GetTransform ().Other2This(csVector3 (-4.7f, 1.0f, 5.5f)),
-    lpos);
+  lpos = view->GetCamera()->Perspective(
+    view->GetCamera()->GetTransform ().Other2This(csVector3 (-4.7f, 1.0f, 5.5f)));
   // display a helpful little text.
   int txtw=0, txth=0;
   font->GetMaxSize(txtw, txth);

@@ -1015,9 +1015,8 @@ void csSector::CalculateSectorBBox (csBox3 &bbox, bool do_meshes) const
     for (i = 0; i < meshes.GetCount (); i++)
     {
       iMeshWrapper *mesh = meshes.Get (i);
-      mesh->GetTransformedBoundingBox (
-          mesh->GetMovable ()->GetTransform (),
-          b);
+      b = mesh->GetTransformedBoundingBox (
+          mesh->GetMovable ()->GetTransform ());
       bbox += b;
     }
   }

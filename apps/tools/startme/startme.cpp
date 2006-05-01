@@ -48,7 +48,7 @@ void StartMe::ProcessFrame ()
 
   csVector3 light_v, star_v;
 
-  camera->InvPerspective (p, DEMO_MESH_Z-5, star_v);
+  star_v = camera->InvPerspective (p, DEMO_MESH_Z-5);
   star_ticks += elapsed_time;
   while (star_ticks > star_timeout)
   {
@@ -107,14 +107,14 @@ void StartMe::ProcessFrame ()
     }
   }
 
-  camera->InvPerspective (p, DEMO_MESH_Z-3, light_v);
+  light_v = camera->InvPerspective (p, DEMO_MESH_Z-3);
   pointer_light->SetCenter (light_v);
   pointer_light->Setup ();
   pointer_light->Setup ();
 
   csVector3 start_v, end_v;
-  camera->InvPerspective (p, DEMO_MESH_Z-4, start_v);
-  camera->InvPerspective (p, 100.0f, end_v);
+  start_v = camera->InvPerspective (p, DEMO_MESH_Z-4);
+  end_v = camera->InvPerspective (p, 100.0f);
   csVector3 start = camera->GetTransform ().This2Other (start_v);
   csVector3 end = camera->GetTransform ().This2Other (end_v);
 

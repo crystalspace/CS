@@ -134,7 +134,7 @@ void ViewMesh::ProcessFrame()
       csVector3 orig = c->GetTransform().GetOrigin();
 
       csBox3 box;
-      spritewrapper->GetWorldBoundingBox(box);
+      box = spritewrapper->GetWorldBoundingBox();
       csVector3 spritepos = box.GetCenter();
 
       if (kbd->GetKeyState (CSKEY_DOWN))
@@ -157,7 +157,7 @@ void ViewMesh::ProcessFrame()
       csVector3 orig = c->GetTransform().GetOrigin();
 
       csBox3 box;
-      spritewrapper->GetWorldBoundingBox(box);
+      box = spritewrapper->GetWorldBoundingBox();
       csVector3 spritepos = box.GetCenter();
 
       if (kbd->GetKeyState (CSKEY_LEFT))
@@ -637,7 +637,7 @@ void ViewMesh::LoadSprite (const char* path, const char* filename)
   if (spritewrapper)
   {
     csBox3 box;
-    spritewrapper->GetWorldBoundingBox(box);
+    box = spritewrapper->GetWorldBoundingBox();
     csVector3 sprpos = box.GetCenter();
     csVector3 campos = view->GetCamera ()->GetTransform ().GetOrigin();
     view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (campos.x, sprpos.y, campos.z));

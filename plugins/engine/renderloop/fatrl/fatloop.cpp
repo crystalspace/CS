@@ -662,7 +662,7 @@ void csFatLoopStep::BuildPortalNodes (RenderNode* node,
 
   csSphere sphere, world_sphere;
   csBox3 object_bbox;
-  meshwrapper->GetWorldBoundingBox (object_bbox);
+  object_bbox = meshwrapper->GetWorldBoundingBox ();
   float max_object_radius = csQsqrt (csSquaredDist::PointPoint (
   	object_bbox.Max (), object_bbox.Min ())) * 0.5f;
   sphere.SetCenter (object_bbox.GetCenter ());
