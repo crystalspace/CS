@@ -29,6 +29,9 @@
 
 CS_IMPLEMENT_PLUGIN
 
+CS_PLUGIN_NAMESPACE_BEGIN(VProc_std)
+{
+
 CS_LEAKGUARD_IMPLEMENT (csVProcStandardPlugin);
 
 SCF_IMPLEMENT_FACTORY (csVProc_Std)
@@ -122,3 +125,6 @@ iVertexLightCalculator* csVProc_Std::GetLightCalculator (
   return lightCalculatorMatrix[GetMatrixIndex 
     (light.type, (useAttenuation ? light.attenuationMode : CS_ATTN_NONE))];
 }
+
+}
+CS_PLUGIN_NAMESPACE_END(VProc_std)

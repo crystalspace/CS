@@ -51,7 +51,9 @@
 #include "soft_txt.h"
 #include "clip_znear.h"
 
-using namespace CS::Plugins::Soft3D;
+CS_PLUGIN_NAMESPACE_BEGIN(Soft3D)
+{
+
 using namespace CS::PluginCommon::SoftShader;
 
 ///---------------------------------------------------------------------------
@@ -1145,3 +1147,5 @@ void csSoftwareGraphics3DCommon::DrawPixmap (iTextureHandle *hTex,
   specifica->DrawPixmap (this, hTex, sx, sy, sw, sh, tx, ty, tw, th, Alpha);
 }
 
+}
+CS_PLUGIN_NAMESPACE_END(Soft3D)

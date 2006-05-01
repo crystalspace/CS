@@ -110,12 +110,12 @@ static CS_FORCEINLINE bool scfCompatibleVersion (
  */
 struct iBase
 {
-  // Jorrit: removed the code below as it causes 'pure virtual' method
-  // calls to happen upon destruction.
-  //protected:
-  //// Needed for GCC4. Otherwise emits a flood of "virtual functions but
-  //// non-virtual destructor" warnings.
-  //virtual ~iBase() {}
+protected:
+  /**
+   * Needed for GCC4. Otherwise emits a flood of "virtual functions but
+   * non-virtual destructor" warnings.
+   */
+  virtual ~iBase() {}
 public:
   SCF_INTERFACE(iBase, 1, 0, 0);
   /// Increment the number of references to this object.

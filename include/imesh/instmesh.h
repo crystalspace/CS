@@ -40,32 +40,19 @@ struct csTriangle;
 class csVector2;
 class csVector3;
 
-SCF_VERSION (iInstancingMeshCommonState, 0, 0, 3);
-
 /**
  * The common interface between instancing meshes and factories.
  * This interface is usually not used alone. Generally one
  * uses iInstancingMeshState or iInstancingFactoryState.
  */
-struct iInstancingMeshCommonState : public iBase
+struct iInstancingMeshCommonState : public virtual iBase
 {
-  /// Set material of mesh.
-  virtual void SetMaterialWrapper (iMaterialWrapper* material) = 0;
-  /// Get material of mesh.
-  virtual iMaterialWrapper* GetMaterialWrapper () const = 0;
-  /// Set mix mode.
-  virtual void SetMixMode (uint mode) = 0;
-  /// Get mix mode.
-  virtual uint GetMixMode () const = 0;
-
+  SCF_INTERFACE (iInstancingMeshCommonState, 1, 0, 0);
+  
   /// Set lighting.
   virtual void SetLighting (bool l) = 0;
   /// Is lighting enabled.
   virtual bool IsLighting () const = 0;
-  /// Set the color to use. Will be added to the lighting values.
-  virtual void SetColor (const csColor& col) = 0;
-  /// Get the color.
-  virtual const csColor& GetColor () const = 0;
   /**
    * Set manual colors. If this is set then lighting will be ignored
    * and so will the color set with SetColor(). In this case you can
@@ -94,8 +81,6 @@ struct iInstancingMeshCommonState : public iBase
   virtual bool IsShadowReceiving () const = 0;
 };
 
-SCF_VERSION (iInstancingMeshState, 0, 1, 0);
-
 /**
  * This interface describes the API for the instancing mesh object.
  * 
@@ -110,8 +95,10 @@ SCF_VERSION (iInstancingMeshState, 0, 1, 0);
  * - Instmesh Loader plugin (crystalspace.mesh.loader.instmesh)
  *   
  */
-struct iInstancingMeshState : public iInstancingMeshCommonState
+struct iInstancingMeshState : public virtual iInstancingMeshCommonState
 {
+  SCF_INTERFACE (iInstancingMeshState, 1, 0, 0);
+  
   /**
    * Add an instance. Returns an ID to identify that instance.
    */
@@ -139,8 +126,6 @@ struct iInstancingMeshState : public iInstancingMeshCommonState
   virtual const csReversibleTransform& GetInstanceTransform (size_t id) = 0;
 };
 
-SCF_VERSION (iInstancingFactoryState, 0, 3, 0);
-
 class csSphere;
 
 /**
@@ -165,8 +150,23 @@ class csSphere;
  * - Instmesh Factory Loader plugin (crystalspace.mesh.loader.factory.instmesh)
  *   
  */
-struct iInstancingFactoryState : public iInstancingMeshCommonState
+struct iInstancingFactoryState : public virtual iInstancingMeshCommonState
 {
+  SCF_INTERFACE (iInstancingFactoryState, 1, 0, 0);
+  
+  /// Set material of mesh.
+  virtual void SetMaterialWrapper (iMaterialWrapper* material) = 0;
+  /// Get material of mesh.
+  virtual iMaterialWrapper* GetMaterialWrapper () const = 0;
+  /// Set mix mode.
+  virtual void SetMixMode (uint mode) = 0;
+  /// Get mix mode.
+  virtual uint GetMixMode () const = 0;
+  /// Set the color to use. Will be added to the lighting values.
+  virtual void SetColor (const csColor& col) = 0;
+  /// Get the color.
+  virtual const csColor& GetColor () const = 0;
+
   /**
    * Add a vertex.
    */

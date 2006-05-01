@@ -65,64 +65,8 @@ CS_IMPLEMENT_PLUGIN
 
 //---------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE(csBezierMesh)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iBezierState)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iBezierFactoryState)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iLightingInfo)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iObjectModel)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iShadowCaster)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iShadowReceiver)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iMeshObject)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iMeshObjectFactory)
-  {
-    static scfInterfaceID iPolygonMesh_scfID = (scfInterfaceID)-1;		
-    if (iPolygonMesh_scfID == (scfInterfaceID)-1)				
-      iPolygonMesh_scfID = iSCF::SCF->GetInterfaceID ("iPolygonMesh");		
-    if (iInterfaceID == iPolygonMesh_scfID &&				
-      scfCompatibleVersion(iVersion, scfInterfaceTraits<iPolygonMesh>::GetVersion()))
-    {
-#ifdef CS_DEBUG
-      csPrintf ("Deprecated feature use: iPolygonMesh queried from Bezier "
-	"object; use iObjectModel->GetPolygonMeshColldet() instead.\n");
-#endif
-      iPolygonMesh* Object = scfiObjectModel.GetPolygonMeshColldet();
-      (Object)->IncRef ();						
-      return CS_STATIC_CAST(iPolygonMesh*, Object);				
-    }
-  }
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csBezierMesh::BezierState)
-  SCF_IMPLEMENTS_INTERFACE(iBezierState)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csBezierMesh::BezierFactoryState)
-  SCF_IMPLEMENTS_INTERFACE(iBezierFactoryState)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csBezierMesh::LightingInfo)
-  SCF_IMPLEMENTS_INTERFACE(iLightingInfo)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csBezierMesh::ObjectModel)
-  SCF_IMPLEMENTS_INTERFACE(iObjectModel)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csBezierMesh::ShadowCaster)
-  SCF_IMPLEMENTS_INTERFACE(iShadowCaster)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csBezierMesh::ShadowReceiver)
-  SCF_IMPLEMENTS_INTERFACE(iShadowReceiver)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csBezierMesh::MeshObject)
-  SCF_IMPLEMENTS_INTERFACE(iMeshObject)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csBezierMesh::MeshObjectFactory)
-  SCF_IMPLEMENTS_INTERFACE(iMeshObjectFactory)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
+CS_PLUGIN_NAMESPACE_BEGIN(Bezier)
+{
 
 int csBezierMesh:: last_thing_id = 0;
 
@@ -169,27 +113,19 @@ csStringID csBezierMesh::color_name = csInvalidStringID;
 csStringID csBezierMesh::index_name = csInvalidStringID;
 
 csBezierMesh::csBezierMesh (iBase *parent, csBezierMeshObjectType* thing_type) :
-  curves (4, 16)
+  scfImplementationType (this, parent), curves (4, 16)
 {
-  SCF_CONSTRUCT_IBASE (parent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiBezierState);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiBezierFactoryState);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiLightingInfo);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObjectModel);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiShadowCaster);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiShadowReceiver);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMeshObject);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMeshObjectFactory);
-
   static_data = new csBezierMeshStatic (
-  	thing_type, &scfiBezierFactoryState);
+  	thing_type, (iBezierFactoryState*)this);
 
-  scfiPolygonMesh.SetThing (this);
-  scfiPolygonMeshLOD.SetThing (this);
-  scfiObjectModel.SetPolygonMeshBase (&scfiPolygonMesh);
-  scfiObjectModel.SetPolygonMeshColldet (&scfiPolygonMesh);
-  scfiObjectModel.SetPolygonMeshViscull (&scfiPolygonMeshLOD);
-  scfiObjectModel.SetPolygonMeshShadows (&scfiPolygonMeshLOD);
+  polygonMesh.AttachNew (new BezierPolyMeshHelper ());
+  polygonMeshLOD.AttachNew (new BezierPolyMeshHelper ());
+  polygonMesh->SetThing (this);
+  polygonMeshLOD->SetThing (this);
+  SetPolygonMeshBase (polygonMesh);
+  SetPolygonMeshColldet (polygonMesh);
+  SetPolygonMeshViscull (polygonMeshLOD);
+  SetPolygonMeshShadows (polygonMeshLOD);
 
   last_thing_id++;
   thing_id = last_thing_id;
@@ -238,16 +174,6 @@ csBezierMesh::csBezierMesh (iBase *parent, csBezierMeshObjectType* thing_type) :
 csBezierMesh::~csBezierMesh ()
 {
   delete static_data;
-
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiBezierState);
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiBezierFactoryState);
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiLightingInfo);
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiObjectModel);
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiShadowCaster);
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiShadowReceiver);
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiMeshObject);
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiMeshObjectFactory);
-  SCF_DESTRUCT_IBASE ();
 }
 
 char* csBezierMesh::GenerateCacheName ()
@@ -296,7 +222,7 @@ void csBezierMesh::LightDisconnect (iLight* light)
   int dt = light->GetDynamicType ();
   for (i = 0; i < curves.Length (); i++)
   {
-    csCurve *c = GetCurve ((int)i);
+    csCurve *c = curves[i];
     if (dt == CS_LIGHT_DYNAMICTYPE_DYNAMIC)
       c->DynamicLightDisconnect (light);
     else
@@ -310,7 +236,7 @@ void csBezierMesh::DisconnectAllLights ()
   size_t i;
   for (i = 0; i < curves.Length (); i++)
   {
-    csCurve *c = GetCurve ((int)i);
+    csCurve *c = curves[i];
     c->DisconnectAllLights ();
   }
 }
@@ -344,18 +270,18 @@ void csBezierMesh::Prepare ()
 
   prepared = true;
 
-  scfiPolygonMeshLOD.Cleanup ();
-  scfiPolygonMesh.Cleanup ();
+  polygonMeshLOD->Cleanup ();
+  polygonMesh->Cleanup ();
 
   static_data_nr = static_data->static_data_nr;
 
   if (cached_movable) movablenr = cached_movable->GetUpdateNumber ()-1;
   else movablenr--;
 
-  scfiObjectModel.ShapeChanged ();
+  ShapeChanged ();
 }
 
-int csBezierMesh::AddCurveVertex (const csVector3 &v, const csVector2 &t)
+size_t csBezierMesh::AddCurveVertex (const csVector3 &v, const csVector2 &t)
 {
   if (!static_data->curve_vertices)
   {
@@ -419,14 +345,9 @@ void csBezierMesh::InvalidateThing ()
   prepared = false;
   static_data->obj_bbox_valid = false;
 
-  scfiPolygonMeshLOD.Cleanup ();
-  scfiPolygonMesh.Cleanup ();
-  scfiObjectModel.ShapeChanged ();
-}
-
-iPolygonMesh* csBezierMesh::GetWriteObject ()
-{
-  return &scfiPolygonMeshLOD;
+  polygonMeshLOD->Cleanup ();
+  polygonMesh->Cleanup ();
+  ShapeChanged ();
 }
 
 csCurve *csBezierMesh::GetCurve (char *name) const
@@ -454,12 +375,12 @@ iCurve *csBezierMesh::CreateCurve ()
   csCurve *c = new csBezierCurve (static_data->thing_type);
   c->SetParentThing (this);
   AddCurve (c);
-  return &(c->scfiCurve);
+  return c;
 }
 
 int csBezierMesh::FindCurveIndex (iCurve *curve) const
 {
-  return (int)curves.Find (curve->GetOriginalObject ());
+  return curves.Find ((csCurve*)curve);
 }
 
 void csBezierMesh::RemoveCurve (int idx)
@@ -489,7 +410,7 @@ void csBezierMesh::HardTransform (const csReversibleTransform &t)
   curves_transf_ok = false;
   for (i = 0; i < curves.Length (); i++)
   {
-    csCurve *c = GetCurve ((int)i);
+    csCurve *c = curves[i];
     c->HardTransform (t);
   }
 }
@@ -659,7 +580,7 @@ void csBezierMesh::SetBoundingBox (const csBox3& b)
 {
   static_data->obj_bbox_valid = true;
   static_data->obj_bbox = b;
-  scfiObjectModel.ShapeChanged ();
+  ShapeChanged ();
 }
 
 void csBezierMesh::GetBoundingBox (iMovable *movable, csBox3 &box)
@@ -692,22 +613,6 @@ void csBezierMesh::GetBoundingBox (iMovable *movable, csBox3 &box)
   }
 
   box = wor_bbox;
-}
-
-//-------------------------------------------------------------------------
-
-SCF_IMPLEMENT_IBASE(csBezierMesh::PolyMeshLOD)
-  SCF_IMPLEMENTS_INTERFACE(iPolygonMesh)
-SCF_IMPLEMENT_IBASE_END
-
-csBezierMesh::PolyMeshLOD::PolyMeshLOD () : BezierPolyMeshHelper ()
-{
-  SCF_CONSTRUCT_IBASE (0);
-}
-
-csBezierMesh::PolyMeshLOD::~PolyMeshLOD ()
-{
-  SCF_DESTRUCT_IBASE ();
 }
 
 //-------------------------------------------------------------------------
@@ -966,7 +871,7 @@ csRenderMesh** csBezierMesh::GetRenderMeshes (int &n, iRenderView* rview,
 
 //----------------------------------------------------------------------
 
-void csBezierMesh::CastShadows (iFrustumView *lview, iMovable *movable)
+void csBezierMesh::CastShadows (iMovable *movable, iFrustumView *lview)
 {
   Prepare ();
   //@@@ Ok?
@@ -979,7 +884,7 @@ void csBezierMesh::CastShadows (iFrustumView *lview, iMovable *movable)
   iLightingProcessInfo* lpi = (iLightingProcessInfo*)fvud;
   bool dyn = lpi->IsDynamic ();
 
-  lpi->GetLight ()->AddAffectedLightingInfo (&scfiLightingInfo);
+  lpi->GetLight ()->AddAffectedLightingInfo ((iLightingInfo*)this);
 
   for (i = 0; i < GetCurveCount (); i++)
   {
@@ -1107,8 +1012,7 @@ void csBezierMesh::MergeTemplate (
 
   //@@@ TEMPORARY
   csRef<iBezierState> ith = SCF_QUERY_INTERFACE (tpl, iBezierState);
-  ParentTemplate = ((csBezierMesh::BezierState*)(iBezierState*)ith)
-  	->GetPrivateObject ();
+  ParentTemplate = (csBezierMesh*)(iBezierState*)ith;
 
   for (i = 0; i < tpl->GetCurveVertexCount (); i++)
   {
@@ -1133,60 +1037,23 @@ void csBezierMesh::MergeTemplate (
   }
 }
 
-//---------------------------------------------------------------------------
-iCurve *csBezierMesh::BezierFactoryState::GetCurve (int idx) const
+csPtr<iMeshObject> csBezierMesh::NewInstance ()
 {
-  csCurve *c = scfParent->GetCurve (idx);
-  return &(c->scfiCurve);
-}
-
-//---------------------------------------------------------------------------
-iMeshObjectFactory *csBezierMesh::MeshObject::GetFactory () const
-{
-  if (!scfParent->ParentTemplate) return 0;
-  return &scfParent->ParentTemplate->scfiMeshObjectFactory;
-}
-
-//---------------------------------------------------------------------------
-csPtr<iMeshObject> csBezierMesh::MeshObjectFactory::NewInstance ()
-{
-  csBezierMesh *thing = new csBezierMesh (scfParent,
-  	scfParent->static_data->thing_type);
-  thing->MergeTemplate (&(scfParent->scfiBezierFactoryState), 0);
-  return csPtr<iMeshObject> (&thing->scfiMeshObject);
+  csBezierMesh *thing = new csBezierMesh (this,
+  	static_data->thing_type);
+  thing->MergeTemplate ((iBezierFactoryState*)this, 0);
+  return csPtr<iMeshObject> ((iMeshObject*)thing);
 }
 
 //---------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE(csBezierMesh::PolyMesh)
-  SCF_IMPLEMENTS_INTERFACE(iPolygonMesh)
-SCF_IMPLEMENT_IBASE_END
-
-//---------------------------------------------------------------------------
-
-SCF_IMPLEMENT_IBASE(csBezierMeshObjectType)
-  SCF_IMPLEMENTS_INTERFACE(iMeshObjectType)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iComponent)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iPluginConfig)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csBezierMeshObjectType::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE(iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csBezierMeshObjectType::eiPluginConfig)
-  SCF_IMPLEMENTS_INTERFACE(iPluginConfig)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csBezierMeshObjectType)
 
 
 csBezierMeshObjectType::csBezierMeshObjectType (
-  iBase *pParent)
+  iBase *pParent) : scfImplementationType (this, pParent)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPluginConfig);
   lightpatch_pool = 0;
   do_verbose = false;
 }
@@ -1194,10 +1061,6 @@ csBezierMeshObjectType::csBezierMeshObjectType (
 csBezierMeshObjectType::~csBezierMeshObjectType ()
 {
   delete lightpatch_pool;
-
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiPluginConfig);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csBezierMeshObjectType::Initialize (iObjectRegistry *object_reg)
@@ -1233,27 +1096,18 @@ csPtr<iMeshObjectFactory> csBezierMeshObjectType::NewFactory ()
   return csPtr<iMeshObjectFactory> (ifact);
 }
 
+void csBezierMeshObjectType::ReportV (int severity, const char *description, 
+                                      va_list args)
+{
+  csReportV (object_reg, severity, "crystalspace.mesh.object.bezier",
+    description, args);
+}
+
 void csBezierMeshObjectType::Warn (const char *description, ...)
 {
   va_list arg;
   va_start (arg, description);
-
-  csRef<iReporter> Reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
-
-  if (Reporter)
-  {
-    Reporter->ReportV (
-        CS_REPORTER_SEVERITY_WARNING,
-        "crystalspace.engine.warning",
-        description,
-        arg);
-  }
-  else
-  {
-    csPrintfV (description, arg);
-    csPrintf ("\n");
-  }
-
+  ReportV (CS_REPORTER_SEVERITY_WARNING, description, arg);
   va_end (arg);
 }
 
@@ -1261,23 +1115,7 @@ void csBezierMeshObjectType::Bug (const char *description, ...)
 {
   va_list arg;
   va_start (arg, description);
-
-  csRef<iReporter> Reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
-
-  if (Reporter)
-  {
-    Reporter->ReportV (
-        CS_REPORTER_SEVERITY_BUG,
-        "crystalspace.engine.warning",
-        description,
-        arg);
-  }
-  else
-  {
-    csPrintfV (description, arg);
-    csPrintf ("\n");
-  }
-
+  ReportV (CS_REPORTER_SEVERITY_BUG, description, arg);
   va_end (arg);
 }
 
@@ -1285,23 +1123,7 @@ void csBezierMeshObjectType::Error (const char *description, ...)
 {
   va_list arg;
   va_start (arg, description);
-
-  csRef<iReporter> Reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
-
-  if (Reporter)
-  {
-    Reporter->ReportV (
-        CS_REPORTER_SEVERITY_ERROR,
-        "crystalspace.engine.warning",
-        description,
-        arg);
-  }
-  else
-  {
-    csPrintfV (description, arg);
-    csPrintf ("\n");
-  }
-
+  ReportV (CS_REPORTER_SEVERITY_ERROR, description, arg);
   va_end (arg);
 }
 
@@ -1309,23 +1131,7 @@ void csBezierMeshObjectType::Notify (const char *description, ...)
 {
   va_list arg;
   va_start (arg, description);
-
-  csRef<iReporter> Reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
-
-  if (Reporter)
-  {
-    Reporter->ReportV (
-        CS_REPORTER_SEVERITY_NOTIFY,
-        "crystalspace.engine.warning",
-        description,
-        arg);
-  }
-  else
-  {
-    csPrintfV (description, arg);
-    csPrintf ("\n");
-  }
-
+  ReportV (CS_REPORTER_SEVERITY_NOTIFY, description, arg);
   va_end (arg);
 }
 
@@ -1342,7 +1148,7 @@ const int NUM_OPTIONS =
     sizeof (config_options[0])
   );
 
-bool csBezierMeshObjectType::eiPluginConfig::SetOption (int id, csVariant *value)
+bool csBezierMeshObjectType::SetOption (int id, csVariant *value)
 {
   switch (id)
   {
@@ -1356,7 +1162,7 @@ bool csBezierMeshObjectType::eiPluginConfig::SetOption (int id, csVariant *value
   return true;
 }
 
-bool csBezierMeshObjectType::eiPluginConfig::GetOption (int id, csVariant *value)
+bool csBezierMeshObjectType::GetOption (int id, csVariant *value)
 {
   switch (id)
   {
@@ -1367,7 +1173,7 @@ bool csBezierMeshObjectType::eiPluginConfig::GetOption (int id, csVariant *value
   return true;
 }
 
-bool csBezierMeshObjectType::eiPluginConfig::GetOptionDescription (
+bool csBezierMeshObjectType::GetOptionDescription (
   int idx,
   csOptionDescription *option)
 {
@@ -1378,3 +1184,5 @@ bool csBezierMeshObjectType::eiPluginConfig::GetOptionDescription (
 
 //---------------------------------------------------------------------------
 
+}
+CS_PLUGIN_NAMESPACE_END(Bezier)

@@ -29,11 +29,7 @@
 #include "types.h"
 #include "scan_blend.h"
 
-namespace CS
-{
-namespace Plugins
-{
-namespace Soft3D
+CS_PLUGIN_NAMESPACE_BEGIN(Soft3D)
 {
 
   using namespace CS::PluginCommon::SoftShader;
@@ -499,8 +495,7 @@ namespace Soft3D
     }
   };
   
-} // namespace Soft3D
-} // namespace Plugins
-} // namespace CS
+}
+CS_PLUGIN_NAMESPACE_END(Soft3D)
 
 #endif // __CS_SOFT3D_POLYRAST_H__

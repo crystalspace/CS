@@ -47,14 +47,18 @@
 struct iEngine;
 struct iMaterialWrapper;
 struct iObjectRegistry;
+class csSegment3;
+
+CS_PLUGIN_NAMESPACE_BEGIN(BruteBlock)
+{
+
 class csTerrainQuad;
 class csTerrainObject;
 class csTerrainFactory;
-class csSegment3;
 
 /**
-* This is one block in the terrain.
-*/
+ * This is one block in the terrain.
+ */
 class csTerrBlock : public csRefCount
 {
 public:
@@ -242,7 +246,13 @@ public:
   }
 };
 
-class csTerrainObject : public iMeshObject
+class csTerrainObject : 
+  public scfImplementationExt4<csTerrainObject,
+                               csObjectModel,
+                               iMeshObject,
+                               iShadowReceiver,
+                               iLightingInfo,
+                               iTerrainObjectState>
 {
 private:
   friend class csTerrBlock;
@@ -423,7 +433,6 @@ public:
                                     int w, int h);
   bool SetCurrentMaterialMap (const csArray<char>& data, int x, int y);
 
-  SCF_DECLARE_IBASE;
   ///--------------------- iMeshObject implementation ---------------------
 
   virtual csFlags& GetFlags () { return flags; }
@@ -489,14 +498,12 @@ public:
   void SetStaticLighting (bool enable);
 
   //------------------ iPolygonMesh interface implementation ----------------//
-  struct PolyMesh : public iPolygonMesh
+  struct PolyMesh : public scfImplementation1<PolyMesh, iPolygonMesh>
   {
   private:
     csTerrainObject* terrain;
     csFlags flags;
   public:
-    SCF_DECLARE_IBASE;
-
     void SetTerrain (csTerrainObject* t)
     {
       terrain = t;
@@ -516,194 +523,51 @@ public:
     virtual csFlags& GetFlags () { return flags;  }
     virtual uint32 GetChangeNumber() const { return 0; }
 
-    PolyMesh ()
-    { SCF_CONSTRUCT_IBASE (0); }
+    PolyMesh () : scfImplementationType (this)
+    { }
     virtual ~PolyMesh ()
-    { SCF_DESTRUCT_IBASE (); }
-  } scfiPolygonMesh;
+    { }
+  };
+  csRef<PolyMesh> polygonMesh;
   friend struct PolyMesh;
 
-  //------------------------- iObjectModel implementation ----------------
-  class eiObjectModel : public csObjectModel
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csTerrainObject);
-    virtual void GetObjectBoundingBox (csBox3& bbox)
-    {
-      scfParent->GetObjectBoundingBox (bbox);
-    }
-    virtual void SetObjectBoundingBox (const csBox3& bbox)
-    {
-      scfParent->SetObjectBoundingBox (bbox);
-    }
-    virtual void GetRadius (float& rad, csVector3& cent)
-    {
-      scfParent->GetRadius (rad, cent);
-    }
-    virtual iTerraFormer* GetTerraFormerColldet ()
-    { return scfParent->terraformer; }
-  } scfiObjectModel;
-  friend class ObjectModel;
+  /**\name iObjectModel implementation
+   * @{ */
+  virtual iTerraFormer* GetTerraFormerColldet ()
+  { return terraformer; }
+  /** @} */
 
-  virtual iObjectModel* GetObjectModel () { return &scfiObjectModel; }
+  virtual iObjectModel* GetObjectModel () { return this; }
 
-  //-------------------- iShadowReceiver interface implementation ----------
-  struct ShadowReceiver : public iShadowReceiver
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csTerrainObject);
-    virtual void CastShadows (iMovable* movable, iFrustumView* fview)
-    {
-      scfParent->CastShadows (movable, fview);
-    }
-  } scfiShadowReceiver;
-  friend struct ShadowReceiver;
-
-  //------------------------- iLightingInfo interface -------------------------
-  struct LightingInfo : public iLightingInfo
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csTerrainObject);
-    virtual void InitializeDefault (bool clear)
-    {
-      scfParent->InitializeDefault (clear);
-    }
-    virtual bool ReadFromCache (iCacheManager* cache_mgr)
-    {
-      return scfParent->ReadFromCache (cache_mgr);
-    }
-    virtual bool WriteToCache (iCacheManager* cache_mgr)
-    {
-      return scfParent->WriteToCache (cache_mgr);
-    }
-    virtual void PrepareLighting ()
-    {
-      scfParent->PrepareLighting ();
-    }
-    virtual void LightChanged (iLight* light)
-    {
-      scfParent->LightChanged (light);
-    }
-    virtual void LightDisconnect (iLight* light)
-    {
-      scfParent->LightDisconnect (light);
-    }
-    virtual void DisconnectAllLights ()
-    {
-      scfParent->DisconnectAllLights ();
-    }
-  } scfiLightingInfo;
-  friend struct LightingInfo;
-
-  //------------------ iTerrainObjectState implementation ----------------
-
+  /**\name iTerrainObjectState implementation
+   * @{ */
   bool SetMaterialPalette (const csArray<iMaterialWrapper*>& pal);
   csArray<iMaterialWrapper*> GetMaterialPalette ();
+  const csArray<iMaterialWrapper*> &GetMaterialPalette () const { return palette; }
   bool SetMaterialAlphaMaps (const csArray<csArray<char> >& data, int w, int h);
   bool SetMaterialAlphaMaps (const csArray<iImage*>& maps);
   bool SetMaterialMap (const csArray<char>& data, int x, int y);
   bool SetMaterialMap (iImage* map);
   bool SetLODValue (const char* parameter, float value);
-  float GetLODValue (const char* parameter);
+  float GetLODValue (const char* parameter) const;
   void SetMaterialMapFile (const char* file, int width, int height, bool raw);
   const char* GetMaterialMapFile (int& width, int& height, bool& raw);
-
-  class eiTerrainObjectState : public iTerrainObjectState
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csTerrainObject);
-    virtual bool SetMaterialPalette (const csArray<iMaterialWrapper*>& pal)
-    {
-      return scfParent->SetMaterialPalette (pal);
-    }
-
-    virtual const csArray<iMaterialWrapper*> &GetMaterialPalette () const
-    {
-      return scfParent->palette;
-    }
-
-    virtual bool SetMaterialMap (const csArray<char> &data, int x, int y)
-    {
-      return scfParent->SetMaterialMap (data, x, y);
-    }
-
-    virtual bool SetMaterialMap (iImage* map)
-    {
-      return scfParent->SetMaterialMap (map);
-    }
-
-    virtual bool SetMaterialAlphaMaps (const csArray<csArray<char> >& data,
-    	int w, int h)
-    {
-      return scfParent->SetMaterialAlphaMaps (data, w, h);
-    }
-
-    virtual bool SetMaterialAlphaMaps (const csArray<iImage*>& maps)
-    {
-      return scfParent->SetMaterialAlphaMaps (maps);
-    }
-
-    virtual bool SetLODValue (const char* parameter, float value)
-    {
-      return scfParent->SetLODValue (parameter, value);
-    }
-
-    virtual float GetLODValue (const char* parameter) const
-    {
-      return scfParent->GetLODValue (parameter);
-    }
-
-    virtual bool SaveState (const char* /*filename*/)
-    {
-      return true;
-    }
-
-    virtual bool RestoreState (const char* /*filename*/)
-    {
-      return true;
-    }
-
-    virtual int CollisionDetect (iMovable *m, csTransform *p)
-    {
-      return scfParent->CollisionDetect (m, p);
-    }
-
-    virtual void SetStaticLighting (bool enable)
-    {
-      scfParent->SetStaticLighting (enable);
-    }
-
-    virtual bool GetStaticLighting ()
-    {
-      return scfParent->staticlighting;
-    }
-
-    virtual void SetCastShadows (bool enable)
-    {
-      scfParent->castshadows = enable;
-    }
-
-    virtual bool GetCastShadows ()
-    {
-      return scfParent->castshadows;
-    }
-    
-    virtual void SetMaterialMapFile (const char* file, int width, int height,
-      bool raw)
-    {
-      scfParent->SetMaterialMapFile (file, width, height, raw);
-    }
-    
-    virtual const char* GetMaterialMapFile (int& width, int& height,
-      bool& raw)
-    {
-      return scfParent->GetMaterialMapFile (width, height, raw);
-    }
-
-  } scfiTerrainObjectState;
-  friend class eiTerrainObjectState;
+  bool SaveState (const char* /*filename*/) { return true; }
+  bool RestoreState (const char* /*filename*/) { return true; }
+  bool GetStaticLighting () { return staticlighting; }
+  void SetCastShadows (bool enable) { castshadows = enable; }
+  bool GetCastShadows () { return castshadows; }
+  /** @} */
 };
 
 /**
 * Factory for terrain.
 */
-class csTerrainFactory : public iMeshObjectFactory
+class csTerrainFactory : 
+  public scfImplementationExt2<csTerrainFactory,
+                               csObjectModel,
+                               iMeshObjectFactory,
+                               iTerrainFactoryState>
 {
 private:
   iMeshFactoryWrapper* logparent;
@@ -733,8 +597,6 @@ public:
   /// Destructor.
   virtual ~csTerrainFactory ();
 
-  SCF_DECLARE_IBASE;
-
   virtual csPtr<iMeshObject> NewInstance ();
   virtual csPtr<iMeshObjectFactory> Clone () { return 0; }
   virtual void HardTransform (const csReversibleTransform&) { }
@@ -745,13 +607,19 @@ public:
   { return logparent; }
   virtual iMeshObjectType* GetMeshObjectType () const { return brute_type; }
 
+  /**\name iTerrainFactoryState implementation
+   * @{ */
   void SetTerraFormer (iTerraFormer* form);
   iTerraFormer* GetTerraFormer ();
   void SetSamplerRegion (const csBox2& region);
   const csBox2& GetSamplerRegion ();
+  bool SaveState (const char* /*filename*/) { return true; }
+  bool RestoreState (const char* /*filename*/) { return true; }
+  /** @} */
 
   virtual csFlags& GetFlags () { return flags; }
 
+#if 0
   class eiTerrainFactoryState : public iTerrainFactoryState
   {
     SCF_DECLARE_EMBEDDED_IBASE (csTerrainFactory);
@@ -786,8 +654,16 @@ public:
   } scfiTerrainFactoryState;
 
   friend class eiTerrainFactoryState;
+#endif
 
-  //------------------------- iObjectModel implementation ----------------
+  /**\name iObjectModel implementation
+   * @{ */
+  iTerraFormer* GetTerraFormerColldet () { return terraformer; }
+  void GetObjectBoundingBox (csBox3& /*bbox*/) { }
+  void SetObjectBoundingBox (const csBox3& /*bbox*/) { }
+  void GetRadius (float& /*rad*/, csVector3& /*cent*/) { }
+  /** @} */
+#if 0
   class eiObjectModel : public csObjectModel
   {
     SCF_DECLARE_EMBEDDED_IBASE (csTerrainFactory);
@@ -807,8 +683,9 @@ public:
     { return scfParent->terraformer; }
   } scfiObjectModel;
   friend class eiObjectModel;
+#endif
 
-  virtual iObjectModel* GetObjectModel () { return &scfiObjectModel; }
+  virtual iObjectModel* GetObjectModel () { return this; }
 };
 
 /**
@@ -839,5 +716,8 @@ public:
   } scfiComponent;
   friend struct eiComponent;
 };
+
+}
+CS_PLUGIN_NAMESPACE_END(BruteBlock)
 
 #endif // __CS_TERRFUNC_H__

@@ -41,11 +41,7 @@ class csVector2;
 class csColor;
 class csFrustumContext;
 
-namespace CS
-{
-namespace Plugins
-{
-namespace Thing
+CS_PLUGIN_NAMESPACE_BEGIN(Thing)
 {
 
 struct csLightingPolyTexQueue;
@@ -386,9 +382,8 @@ public:
   int GetLightCellShift ();
 };
 
-} // namespace Thing
-} // namespace Plugins
-} // namespace CS
+}
+CS_PLUGIN_NAMESPACE_END(Thing)
 
 #endif // __CS_POLYTEXT_H__
 

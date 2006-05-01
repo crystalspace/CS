@@ -29,11 +29,7 @@
 #include "igraphic/image.h"
 #include "ivideo/graph2d.h"
 
-namespace CS
-{
-namespace Plugins
-{
-namespace Soft3D
+CS_PLUGIN_NAMESPACE_BEGIN(Soft3D)
 {
 
 using namespace CS::PluginCommon::SoftShader;
@@ -316,8 +312,7 @@ public:
     float& lm_u1, float& lm_v1, float &lm_u2, float& lm_v2);
 };
 
-} // namespace Soft3D
-} // namespace Plugins
-} // namespace CS
+}
+CS_PLUGIN_NAMESPACE_END(Soft3D)
 
 #endif // __CS_SOFT_TXT_H__

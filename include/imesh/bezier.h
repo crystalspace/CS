@@ -47,16 +47,16 @@ struct iObject;
  * - iBezierFactoryState::GetCurve()
  *   
  */
-struct iCurve : public iBase
+struct iCurve : public virtual iBase
 {
-  /// Get the original curve (@@@ UGLY).
-  virtual csCurve* GetOriginalObject () = 0;
+  SCF_INTERFACE (iCurve,  1, 0, 0);
+  
   /// Get the iObject for this curve.
   virtual iObject *QueryObject() = 0;
   /// Set the material wrapper.
   virtual void SetMaterial (iMaterialWrapper* mat) = 0;
   /// Get the material wrapper.
-  virtual iMaterialWrapper* GetMaterial () = 0;
+  virtual iMaterialWrapper* GetMaterial () const = 0;
   /// Set a control point.
   virtual void SetControlPoint (int idx, int control_id) = 0;
 
@@ -67,8 +67,6 @@ struct iCurve : public iBase
   /// Set a vertex.
   virtual void SetVertex (int idx, int vt) = 0;
 };
-
-SCF_VERSION (iBezierFactoryState, 0, 0, 1);
 
 /**
  * This is the state interface to access the internals of a bezier
@@ -85,8 +83,10 @@ SCF_VERSION (iBezierFactoryState, 0, 0, 1);
  * Main users of this interface:
  * - Bezier Factory Loader plugin (crystalspace.mesh.loader.factory.bezier)
  */
-struct iBezierFactoryState : public iBase
+struct iBezierFactoryState : public virtual iBase
 {
+  SCF_INTERFACE (iBezierFactoryState, 1, 0, 0);
+  
   /**
    * Get the center of the curves.
    */
@@ -106,7 +106,7 @@ struct iBezierFactoryState : public iBase
   virtual void SetCurvesScale (float scale) = 0;
 
   /// Add a curve vertex.
-  virtual void AddCurveVertex (const csVector3& v, const csVector2& uv) = 0;
+  virtual size_t AddCurveVertex (const csVector3& v, const csVector2& uv) = 0;
   /// Get the number of curves.
   virtual int GetCurveCount () const = 0;
   /// Get the curve.
@@ -154,8 +154,6 @@ struct iBezierFactoryState : public iBase
 	csVector3* shift = 0, csMatrix3* transform = 0) = 0;
 };
 
-SCF_VERSION (iBezierState, 0, 0, 1);
-
 /**
  * This is the state interface to access the internals of a bezier
  * mesh object.
@@ -170,13 +168,13 @@ SCF_VERSION (iBezierState, 0, 0, 1);
  * Main users of this interface:
  * - Bezier Loader plugin (crystalspace.mesh.loader.bezier)
  */
-struct iBezierState : public iBase
+struct iBezierState : public virtual iBase
 {
+  SCF_INTERFACE (iBezierState, 1, 0, 0);
+  
   /// Get the factory.
   virtual iBezierFactoryState* GetFactory () = 0;
 };
-
-SCF_VERSION (iCurve, 0, 1, 0);
 
 /** @} */
 

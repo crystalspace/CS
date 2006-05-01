@@ -647,33 +647,6 @@ AS_IF([test $cs_cv_prog_cxx_declare_visible_def != no && \
 
 
 #------------------------------------------------------------------------------
-# Check whether "no virtual destructor" warnings should be silenced.
-# Versions of GCC4 emit a warning "class has virtual functions but no virtual
-# destructor" for interfaces, which, due the high number of those in CS, causes
-# an annyoing flood of warnings. Test whether the compiler exhibits this
-# behaviour and if so, pass a flag to disable the warning.
-#------------------------------------------------------------------------------
-CS_CHECK_BUILD_FLAGS([for flag to disable 'lack of virtual destructor' warning],
-    [cs_cv_prog_cxx_no_non_virtual_dtor],
-    [CS_CREATE_TUPLE([-Wno-non-virtual-dtor])], [C++])
-
-AS_IF([test $cs_cv_prog_cxx_no_non_virtual_dtor != no],
-    [CS_CHECK_BUILD([whether non-virtual destructor warnings are not annoying],
-        [cs_cv_prog_cxx_silence_non_virtual_dtor],
-        [struct iBase
-        {
-          virtual void IncRef() = 0;
-        };
-        int main() { return 0; }], 
-        [], [C++], [], 
-        [CS_EMIT_BUILD_PROPERTY([COMPILER.C++FLAGS], 
-            [$cs_cv_prog_cxx_no_non_virtual_dtor], [+])], [], 
-        [$cs_cv_prog_cxx_enable_warnings $cs_cv_prog_cxx_enable_errors], 
-        [], [], [], [iBase])])
-
-
-
-#------------------------------------------------------------------------------
 # Check for compiler- and CPU-specific code generation flags.  These flags are
 # mutually exclusive.  Exclusivity is enforced by the CS_CHECK_CODE_GEN_FLAG()
 # macro.  Note that use of these flags typically means that the resulting

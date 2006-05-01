@@ -26,7 +26,6 @@
 class csPolyTexture;
 class csThing;
 class csPolygon3D;
-class csCurve;
 class csDelayedLightingInfo;
 class csObject;
 struct iLight;
@@ -34,6 +33,10 @@ struct iCacheManager;
 struct iFile;
 struct iEngine;
 
+CS_PLUGIN_NAMESPACE_BEGIN(Bezier)
+{
+
+class csCurve;
 typedef csDirtyAccessArray<csRGBpixel> csRGBMap;
 typedef csDirtyAccessArray<unsigned char> csCurveShadowMapHelper;
 
@@ -253,5 +256,8 @@ public:
   /// Get size of one lightmap
   long GetSize () const { return lm_size; }
 };
+
+}
+CS_PLUGIN_NAMESPACE_END(Bezier)
 
 #endif // __CS_BEZIER_LIGHTMAP_H__

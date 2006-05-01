@@ -47,6 +47,9 @@ struct CallStackEntry
 /// Interface for a call stack creator
 struct iCallStackCreator
 {
+protected:
+  virtual ~iCallStackCreator() {}
+public:
   /// Fill the arrays with call stack information
   virtual bool CreateCallStack (csDirtyAccessArray<CallStackEntry>& entries,
     csDirtyAccessArray<uintptr_t>& params, bool fast) = 0;
@@ -55,6 +58,9 @@ struct iCallStackCreator
 /// Call stack symbol name resolver
 struct iCallStackNameResolver
 {
+protected:
+  virtual ~iCallStackNameResolver() {}
+public:
   /**
    * Get textual description of an instruction pointer. The returned string
    * should contain address itself, symbol name, module if possible.

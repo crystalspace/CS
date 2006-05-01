@@ -62,77 +62,20 @@
 
 
 
+CS_IMPLEMENT_PLUGIN
+
+CS_PLUGIN_NAMESPACE_BEGIN(InstMesh)
+{
+
 CS_LEAKGUARD_IMPLEMENT (csInstmeshMeshObject);
 CS_LEAKGUARD_IMPLEMENT (csInstmeshMeshObjectFactory);
 
-CS_IMPLEMENT_PLUGIN
-
-SCF_IMPLEMENT_IBASE (csInstmeshMeshObject)
-  SCF_IMPLEMENTS_INTERFACE (iMeshObject)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iShadowCaster)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iShadowReceiver)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iInstancingMeshState)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iLightingInfo)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iObjectModel)
-  {
-    static scfInterfaceID iPolygonMesh_scfID = (scfInterfaceID)-1;
-    if (iPolygonMesh_scfID == (scfInterfaceID)-1)
-      iPolygonMesh_scfID = iSCF::SCF->GetInterfaceID ("iPolygonMesh");
-    if (iInterfaceID == iPolygonMesh_scfID &&
-      scfCompatibleVersion(iVersion, scfInterfaceTraits<iPolygonMesh>::GetVersion()))
-    {
-#ifdef CS_DEBUG
-      csPrintf ("Deprecated feature use: iPolygonMesh queried from Genmesh "
-    "object; use iMeshObject->GetObjectModel()->"
-    "GetPolygonMeshColldet() instead.\n");
-#endif
-      (&scfiPolygonMesh)->IncRef ();
-      return CS_STATIC_CAST(iPolygonMesh*, &scfiPolygonMesh);
-    }
-  }
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csInstmeshMeshObject::ShadowCaster)
-  SCF_IMPLEMENTS_INTERFACE (iShadowCaster)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csInstmeshMeshObject::ShadowReceiver)
-  SCF_IMPLEMENTS_INTERFACE (iShadowReceiver)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csInstmeshMeshObject::ObjectModel)
-  SCF_IMPLEMENTS_INTERFACE (iObjectModel)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csInstmeshMeshObject::PolyMesh)
-  SCF_IMPLEMENTS_INTERFACE (iPolygonMesh)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csInstmeshMeshObject::InstancingMeshState)
-  SCF_IMPLEMENTS_INTERFACE (iInstancingMeshState)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csInstmeshMeshObject::LightingInfo)
-  SCF_IMPLEMENTS_INTERFACE (iLightingInfo)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csInstmeshMeshObject::eiRenderBufferAccessor)
-  SCF_IMPLEMENTS_INTERFACE (iRenderBufferAccessor)
-SCF_IMPLEMENT_IBASE_END
-
 csInstmeshMeshObject::csInstmeshMeshObject (csInstmeshMeshObjectFactory* factory) :
+        scfImplementationType (this),
 	pseudoDynInfo (29, 32),
 	affecting_lights (29, 32)
 {
-  SCF_CONSTRUCT_IBASE (0);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObjectModel);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPolygonMesh);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiInstancingMeshState);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiShadowCaster);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiShadowReceiver);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiLightingInfo);
-
-  scfiRenderBufferAccessor = new eiRenderBufferAccessor (this);
+  renderBufferAccessor.AttachNew (new RenderBufferAccessor (this));
   csInstmeshMeshObject::factory = factory;
   vc = factory->vc;
   logparent = 0;
@@ -140,7 +83,6 @@ csInstmeshMeshObject::csInstmeshMeshObject (csInstmeshMeshObjectFactory* factory
   cur_movablenr = -1;
   material = 0;
   MixMode = 0;
-  vis_cb = 0;
   lit_fact_colors = 0;
   num_lit_fact_colors = 0;
   static_fact_colors = 0;
@@ -173,20 +115,10 @@ csInstmeshMeshObject::csInstmeshMeshObject (csInstmeshMeshObjectFactory* factory
 
 csInstmeshMeshObject::~csInstmeshMeshObject ()
 {
-  if (vis_cb) vis_cb->DecRef ();
   delete[] lit_fact_colors;
   delete[] static_fact_colors;
 
   ClearPseudoDynLights ();
-
-  scfiRenderBufferAccessor->DecRef ();
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiObjectModel);
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiPolygonMesh);
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiInstancingMeshState);
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiShadowCaster);
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiShadowReceiver);
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiLightingInfo);
-  SCF_DESTRUCT_IBASE ();
 }
 
 size_t csInstmeshMeshObject::max_instance_id = 0;
@@ -499,7 +431,7 @@ bool csInstmeshMeshObject::ReadFromCache (iCacheManager* cache_mgr)
 	if (mf.Read (lid, 16) != 16) goto stop;
 	iLight *l = factory->engine->FindLightID (lid);
 	if (!l) goto stop;
-	l->AddAffectedLightingInfo (&scfiLightingInfo);
+	l->AddAffectedLightingInfo ((iLightingInfo*)this);
 
 	csShadowArray* shadowArr = new csShadowArray();
 	float* intensities = new float[num_lit_fact_colors];
@@ -608,7 +540,7 @@ void csInstmeshMeshObject::DisconnectAllLights ()
   while (it.HasNext ())
   {
     iLight* l = (iLight*)it.Next ();
-    l->RemoveAffectedLightingInfo (&scfiLightingInfo);
+    l->RemoveAffectedLightingInfo ((iLightingInfo*)this);
   }
   affecting_lights.Empty ();
   lighting_dirty = true;
@@ -689,7 +621,7 @@ bool csInstmeshMeshObject::SetMaterialWrapper (iMaterialWrapper* mat)
 void csInstmeshMeshObject::SetupShaderVariableContext ()
 {
   uint bufferMask = (uint)CS_BUFFER_ALL_MASK;
-  bufferHolder->SetAccessor (scfiRenderBufferAccessor, bufferMask);
+  bufferHolder->SetAccessor (renderBufferAccessor, bufferMask);
 }
   
 void csInstmeshMeshObject::SetupObject ()
@@ -756,7 +688,7 @@ void csInstmeshMeshObject::CastShadows (iMovable* movable, iFrustumView* fview)
   {
     if (!do_shadow_rec || li->GetDynamicType () == CS_LIGHT_DYNAMICTYPE_PSEUDO)
     {
-      li->AddAffectedLightingInfo (&scfiLightingInfo);
+      li->AddAffectedLightingInfo ((iLightingInfo*)this);
       if (li->GetDynamicType () != CS_LIGHT_DYNAMICTYPE_PSEUDO)
         affecting_lights.Add (li);
     }
@@ -765,7 +697,7 @@ void csInstmeshMeshObject::CastShadows (iMovable* movable, iFrustumView* fview)
   {
     if (!affecting_lights.In (li))
     {
-      li->AddAffectedLightingInfo (&scfiLightingInfo);
+      li->AddAffectedLightingInfo ((iLightingInfo*)this);
       affecting_lights.Add (li);
     }
     if (do_shadow_rec) return;
@@ -799,7 +731,7 @@ void csInstmeshMeshObject::CastShadows (iMovable* movable, iFrustumView* fview)
   csColor light_color = li->GetColor () * (256. / CS_NORMAL_LIGHT_LEVEL);
 
   csColor col;
-  int i;
+  size_t i;
   for (i = 0 ; i < factory->GetVertexCount () ; i++)
   {
     const csVector3& normal = normals[i];
@@ -1033,7 +965,7 @@ void csInstmeshMeshObject::UpdateLighting (
       for (size_t l = 0 ; l < num_lights ; l++)
       {
         iLight* li = lights[l]->GetLight ();
-        li->AddAffectedLightingInfo (&scfiLightingInfo);
+        li->AddAffectedLightingInfo ((iLightingInfo*)this);
         affecting_lights.Add (li);
         UpdateLightingOne (trans, li);
       }
@@ -1218,7 +1150,7 @@ bool csInstmeshMeshObject::HitBeamObject (const csVector3& start,
 
 int csInstmeshMeshObject::PolyMesh::GetVertexCount ()
 {
-  return (int)scfParent->factory->GetVertexCount ();
+  return (int)parent->factory->GetVertexCount ();
 }
 
 csVector3* csInstmeshMeshObject::PolyMesh::GetVertices ()
@@ -1402,32 +1334,21 @@ void csInstmeshMeshObject::PreGetBuffer (csRenderBufferHolder* holder,
 
 //----------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE (csInstmeshMeshObjectFactory)
-  SCF_IMPLEMENTS_INTERFACE (iMeshObjectFactory)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iInstancingFactoryState)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csInstmeshMeshObjectFactory::InstancingFactoryState)
-  SCF_IMPLEMENTS_INTERFACE (iInstancingFactoryState)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 csInstmeshMeshObjectFactory::csInstmeshMeshObjectFactory (
-  iMeshObjectType *pParent, iObjectRegistry* object_reg)
+  iMeshObjectType *pParent, iObjectRegistry* object_reg) : 
+  scfImplementationType (this, (iBase*)pParent)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiInstancingFactoryState);
-
   csInstmeshMeshObjectFactory::object_reg = object_reg;
 
   logparent = 0;
   instmesh_type = pParent;
 
   material = 0;
-  light_mgr = CS_QUERY_REGISTRY (object_reg, iLightManager);
+  light_mgr = csQueryRegistry<iLightManager> (object_reg);
 
-  g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
-  strings = CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg,
-    "crystalspace.shared.stringset", iStringSet);
+  g3d = csQueryRegistry<iGraphics3D> (object_reg);
+  strings = csQueryRegistryTagInterface<iStringSet> (object_reg,
+    "crystalspace.shared.stringset");
 
   autonormals = false;
   autonormals_compress = true;
@@ -1439,20 +1360,18 @@ csInstmeshMeshObjectFactory::csInstmeshMeshObjectFactory (
   default_shadowcasting = true;
   default_shadowreceiving = false;
 
-  csRef<iEngine> eng = CS_QUERY_REGISTRY (object_reg, iEngine);
+  csRef<iEngine> eng = csQueryRegistry<iEngine> (object_reg);
   engine = eng; // We don't want a circular reference!
 
-  vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
+  vc = csQueryRegistry<iVirtualClock> (object_reg);
 
-  csRef<iCommandLineParser> cmdline = CS_QUERY_REGISTRY (
-  	object_reg, iCommandLineParser);
+  csRef<iCommandLineParser> cmdline = csQueryRegistry<iCommandLineParser> (
+  	object_reg);
   do_fullbright = (cmdline->GetOption ("fullbright") != 0);
 }
 
 csInstmeshMeshObjectFactory::~csInstmeshMeshObjectFactory ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiInstancingFactoryState);
-  SCF_DESTRUCT_IBASE ();
 }
 
 void csInstmeshMeshObjectFactory::CalculateBoundingVolumes ()
@@ -1578,39 +1497,26 @@ csPtr<iMeshObject> csInstmeshMeshObjectFactory::NewInstance ()
 
 //----------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE (csInstmeshMeshObjectType)
-  SCF_IMPLEMENTS_INTERFACE (iMeshObjectType)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csInstmeshMeshObjectType::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 SCF_IMPLEMENT_FACTORY (csInstmeshMeshObjectType)
 
 
-csInstmeshMeshObjectType::csInstmeshMeshObjectType (iBase* pParent)
+csInstmeshMeshObjectType::csInstmeshMeshObjectType (iBase* pParent) :
+  scfImplementationType (this, pParent)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-
   do_verbose = false;
 }
 
 csInstmeshMeshObjectType::~csInstmeshMeshObjectType ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 csPtr<iMeshObjectFactory> csInstmeshMeshObjectType::NewFactory ()
 {
-  csInstmeshMeshObjectFactory* cm = new csInstmeshMeshObjectFactory (this,
-    object_reg);
+  csRef<csInstmeshMeshObjectFactory> cm;
+  cm.AttachNew (new csInstmeshMeshObjectFactory (this,
+    object_reg));
   csRef<iMeshObjectFactory> ifact (
-    SCF_QUERY_INTERFACE (cm, iMeshObjectFactory));
-  cm->DecRef ();
+    scfQueryInterface<iMeshObjectFactory> (cm));
   return csPtr<iMeshObjectFactory> (ifact);
 }
 
@@ -1619,9 +1525,12 @@ bool csInstmeshMeshObjectType::Initialize (iObjectRegistry* object_reg)
   csInstmeshMeshObjectType::object_reg = object_reg;
 
   csRef<iVerbosityManager> verbosemgr (
-    CS_QUERY_REGISTRY (object_reg, iVerbosityManager));
+    csQueryRegistry<iVerbosityManager> (object_reg));
   if (verbosemgr) 
-    do_verbose = verbosemgr->Enabled ("genmesh");
+    do_verbose = verbosemgr->Enabled ("instmesh");
 
   return true;
 }
+
+}
+CS_PLUGIN_NAMESPACE_END(InstMesh)

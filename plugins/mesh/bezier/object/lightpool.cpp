@@ -22,6 +22,9 @@
 #include "curvebase.h"
 #include "iengine/shadows.h"
 
+CS_PLUGIN_NAMESPACE_BEGIN(Bezier)
+{
+
 csBezierLightPatch::csBezierLightPatch ()
 {
   next = prev = 0;
@@ -60,3 +63,5 @@ void csBezierLightPatch::SetShadowBlock (iShadowBlock* bl)
   shadows = bl;
 }
 
+}
+CS_PLUGIN_NAMESPACE_END(Bezier)

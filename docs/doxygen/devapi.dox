@@ -46,7 +46,7 @@ OUTPUT_LANGUAGE        = English
 # Private class members and static file members will be hidden unless 
 # the EXTRACT_PRIVATE and EXTRACT_STATIC tags are set to YES 
 
-EXTRACT_ALL            = NO
+EXTRACT_ALL            = YES
 
 # If the EXTRACT_PRIVATE tag is set to YES all private members of a class 
 # will be included in the documentation. 
@@ -678,7 +678,11 @@ PREDEFINED             = DOXYGEN_RUN \
 			 "csArrayCmpInvoke(C,R)=C(R)" \
 			 "UCTF_CONVERTER(a,b,c,d,e)=inline static size_t a \
 			   (d* dest, size_t destSize, \
-			    const b* source, size_t srcSize = (size_t)-1) {}"
+			    const b* source, size_t srcSize = (size_t)-1) {}" \
+			 "CS_PLUGIN_NAMESPACE_BEGIN(n)=namespace CS { namespace Plugin { namespace n" \
+			 "CS_PLUGIN_NAMESPACE_END(n)=} }" \
+			 "CS_PLUGIN_NAMESPACE_NAME(n)=CS::Plugin::n"
+
 
 # If the MACRO_EXPANSION and EXPAND_PREDEF_ONLY tags are set to YES then 
 # this tag can be used to specify a list of macro names that should be expanded. 
@@ -686,7 +690,11 @@ PREDEFINED             = DOXYGEN_RUN \
 # Use the PREDEFINED tag if you want to use a different macro definition. 
 
 EXPAND_AS_DEFINED      =  csAPIENTRY \
-			  CS_EVENTHANDLER_NIL_CONSTRAINTS
+			  CS_EVENTHANDLER_NIL_CONSTRAINTS \
+			  CS_PLUGIN_NAMESPACE_NAME \
+			  CS_NAMESPACE_PACKAGE_NAME \
+			  CS_DECLARE_STATIC_CLASSVAR_REF \
+			  CS_DECLARE_STATIC_CLASSVAR
 
 
 #---------------------------------------------------------------------------

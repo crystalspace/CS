@@ -51,11 +51,7 @@ struct csTriangle;
 
 #include "polyrast.h"
 
-namespace CS
-{
-namespace Plugins
-{
-namespace Soft3D
+CS_PLUGIN_NAMESPACE_BEGIN(Soft3D)
 {
 
 // Forward declaration
@@ -82,6 +78,7 @@ struct iTriangleDrawer
 
 struct iPixTypeSpecifica
 {
+  virtual ~iPixTypeSpecifica() {}
   virtual void DrawPixmap (csSoftwareGraphics3DCommon* G3D, 
     iTextureHandle *hTex, int sx, int sy, int sw, int sh, 
     int tx, int ty, int tw, int th, 
@@ -705,8 +702,7 @@ public:
   /** @} */
 };
 
-} // namespace Soft3D
-} // namespace Plugins
-} // namespace CS
+}
+CS_PLUGIN_NAMESPACE_END(Soft3D)
 
 #endif // __CS_SFTR3DCOM_H__

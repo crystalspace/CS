@@ -24,6 +24,9 @@
 #include "csplugincommon/shader/shaderprogram.h"
 #include "vproc_std.h"
 
+CS_PLUGIN_NAMESPACE_BEGIN(VProc_std)
+{
+
 class csVProcStandardProgram : public scfImplementationExt0<csVProcStandardProgram,
                                                             csShaderProgram>
 {
@@ -110,6 +113,9 @@ private:
   iRenderBuffer* GetBuffer (const BufferName& name,
     csRenderMeshModes& modes, const csShaderVarStack &stacks);
 };
+
+}
+CS_PLUGIN_NAMESPACE_END(VProc_std)
 
 #endif //__CS_VPROC_VPROC_PROGRAM_H__
 

@@ -63,6 +63,9 @@ enum CS_PEN_FLAGS
  */
 struct iPen
 {
+protected:
+  virtual ~iPen() {}
+public:
   /** 
    * Sets the given flag. 
    * @param flag The flag to set. 

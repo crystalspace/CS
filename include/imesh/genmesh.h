@@ -44,32 +44,19 @@ class csVector2;
 class csVector3;
 class csEllipsoid;
 
-SCF_VERSION (iGeneralMeshCommonState, 0, 0, 3);
-
 /**
  * The common interface between genmesh meshes and factories.
  * This interface is usually not used alone. Generally one
  * uses iGeneralMeshState or iGeneralFactoryState.
  */
-struct iGeneralMeshCommonState : public iBase
+struct iGeneralMeshCommonState : public virtual iBase
 {
-  /// Set material of mesh.
-  virtual void SetMaterialWrapper (iMaterialWrapper* material) = 0;
-  /// Get material of mesh.
-  virtual iMaterialWrapper* GetMaterialWrapper () const = 0;
-  /// Set mix mode.
-  virtual void SetMixMode (uint mode) = 0;
-  /// Get mix mode.
-  virtual uint GetMixMode () const = 0;
-
+  SCF_INTERFACE (iGeneralMeshCommonState, 1, 0, 0);
+  
   /// Set lighting.
   virtual void SetLighting (bool l) = 0;
   /// Is lighting enabled.
   virtual bool IsLighting () const = 0;
-  /// Set the color to use. Will be added to the lighting values.
-  virtual void SetColor (const csColor& col) = 0;
-  /// Get the color.
-  virtual const csColor& GetColor () const = 0;
   /**
    * Set manual colors. If this is set then lighting will be ignored
    * and so will the color set with SetColor(). In this case you can
@@ -161,8 +148,6 @@ struct iGeneralMeshCommonState : public iBase
   virtual csRef<iString> GetRenderBufferName (int index) const = 0;
 };
 
-SCF_VERSION (iGeneralMeshState, 0, 1, 0);
-
 /**
  * This interface describes the API for the general mesh object.
  * 
@@ -177,8 +162,10 @@ SCF_VERSION (iGeneralMeshState, 0, 1, 0);
  * - Genmesh Loader plugin (crystalspace.mesh.loader.genmesh)
  *   
  */
-struct iGeneralMeshState : public iGeneralMeshCommonState
+struct iGeneralMeshState : public virtual iGeneralMeshCommonState
 {
+  SCF_INTERFACE (iGeneralMeshState, 1, 0, 0);
+  
   /**
    * Set the animation control to use for this mesh object.
    * See iGenMeshAnimationControl for more information.
@@ -190,8 +177,6 @@ struct iGeneralMeshState : public iGeneralMeshCommonState
    */
   virtual iGenMeshAnimationControl* GetAnimationControl () const = 0;
 };
-
-SCF_VERSION (iGeneralFactoryState, 0, 3, 0);
 
 /**
  * This interface describes the API for the general mesh factory.
@@ -215,8 +200,23 @@ SCF_VERSION (iGeneralFactoryState, 0, 3, 0);
  * - Genmesh Factory Loader plugin (crystalspace.mesh.loader.factory.genmesh)
  *   
  */
-struct iGeneralFactoryState : public iGeneralMeshCommonState
+struct iGeneralFactoryState : public virtual iGeneralMeshCommonState
 {
+  SCF_INTERFACE (iGeneralFactoryState, 1, 0, 0);
+  
+  /// Set material of mesh.
+  virtual void SetMaterialWrapper (iMaterialWrapper* material) = 0;
+  /// Get material of mesh.
+  virtual iMaterialWrapper* GetMaterialWrapper () const = 0;
+  /// Set mix mode.
+  virtual void SetMixMode (uint mode) = 0;
+  /// Get mix mode.
+  virtual uint GetMixMode () const = 0;
+  /// Set the color to use. Will be added to the lighting values.
+  virtual void SetColor (const csColor& col) = 0;
+  /// Get the color.
+  virtual const csColor& GetColor () const = 0;
+  
   /**
    * Add a vertex. This is one way to fill the vertex and other tables.
    * The other way is to use SetVertexCount() and then fill the tables

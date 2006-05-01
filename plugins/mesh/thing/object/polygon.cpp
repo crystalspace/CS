@@ -47,7 +47,8 @@
 #include "lppool.h"
 #include "thing.h"
 
-using namespace CS::Plugins::Thing;
+CS_PLUGIN_NAMESPACE_BEGIN(Thing)
+{
 
 // This is a static vector array which is adapted to the
 // right size everytime it is used. In the beginning it means
@@ -1501,3 +1502,5 @@ bool csPolygon3D::CalculateLightingStatic (iFrustumView *lview,
     return false;
 }
 
+}
+CS_PLUGIN_NAMESPACE_END(Thing)

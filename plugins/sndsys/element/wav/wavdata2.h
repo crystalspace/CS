@@ -20,7 +20,7 @@
 #ifndef SNDSYS_DATA_WAV_H
 #define SNDSYS_DATA_WAV_H
 
-/**
+/**\file
  * iSndSysData implementation for waveform PCM audio
  */
 

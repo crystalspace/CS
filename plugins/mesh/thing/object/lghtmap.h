@@ -28,11 +28,7 @@ struct iCacheManager;
 struct iFile;
 struct iEngine;
 
-namespace CS
-{
-namespace Plugins
-{
-namespace Thing
+CS_PLUGIN_NAMESPACE_BEGIN(Thing)
 {
 
 class csPolyTexture;
@@ -208,8 +204,7 @@ public:
   int GetHeight () const { return lheight; }
 };
 
-} // namespace Thing
-} // namespace Plugins
-} // namespace CS
+}
+CS_PLUGIN_NAMESPACE_END(Thing)
 
 #endif // __CS_LIGHTMAP_H__

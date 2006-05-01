@@ -31,7 +31,8 @@
 
 CS_IMPLEMENT_PLUGIN
 
-using namespace CS::Plugins::Soft3D;
+CS_PLUGIN_NAMESPACE_BEGIN(Soft3D)
+{
 
 SCF_IMPLEMENT_FACTORY (csSoftwareGraphics3D)
 
@@ -134,3 +135,5 @@ bool csSoftwareGraphics3D::GetOptionDescription
   return true;
 }
 
+}
+CS_PLUGIN_NAMESPACE_END(Soft3D)

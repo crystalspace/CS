@@ -32,11 +32,7 @@
 
 class csShaderVariableContext;
 
-namespace CS
-{
-namespace Plugins
-{
-namespace Thing
+CS_PLUGIN_NAMESPACE_BEGIN(Thing)
 {
 
 class csThingObjectType;
@@ -278,8 +274,7 @@ public:
 
 };
 
-} // namespace Thing
-} // namespace Plugins
-} // namespace CS
+}
+CS_PLUGIN_NAMESPACE_END(Thing)
 
 #endif // __CS_POLYRENDER_H__

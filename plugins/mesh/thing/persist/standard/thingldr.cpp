@@ -59,7 +59,7 @@
 
 CS_IMPLEMENT_PLUGIN
 
-namespace cspluginThingLdr
+CS_PLUGIN_NAMESPACE_BEGIN(ThingLoader)
 {
 
 enum
@@ -1480,5 +1480,5 @@ bool csThingSaver::WriteFactory (iBase* obj, iDocumentNode* parent)
   return true;
 }
 
-} // namespace cspluginThingLdr
-
+}
+CS_PLUGIN_NAMESPACE_END(ThingLoader)

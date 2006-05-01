@@ -204,11 +204,11 @@ public:
 
 
   //-------------------- iPolygonMesh interface implementation ---------------
-  csPortalContainerPolyMeshHelper scfiPolygonMesh;
+  csRef<csPortalContainerPolyMeshHelper> polygonMesh;
   //------------------- CD iPolygonMesh implementation ---------------
-  csPortalContainerPolyMeshHelper scfiPolygonMeshCD;
+  csRef<csPortalContainerPolyMeshHelper> polygonMeshCD;
   //------------------- LOD iPolygonMesh implementation ---------------
-  csPortalContainerPolyMeshHelper scfiPolygonMeshLOD;
+  csRef<csPortalContainerPolyMeshHelper> polygonMeshLOD;
 
   //-------------------For iShadowReceiver ----------------------------//
   virtual void CastShadows (iMovable* movable, iFrustumView* fview);

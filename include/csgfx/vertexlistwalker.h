@@ -75,7 +75,9 @@ public:
   const Tcomplex& operator*() const
   {
     CS_ASSERT(currElement<elements);
-    return *((Tcomplex*)convertedComps);
+    const Tbase* x = convertedComps;
+    const Tcomplex* y = (Tcomplex*)x;
+    return *y;
   }
   //@}
 

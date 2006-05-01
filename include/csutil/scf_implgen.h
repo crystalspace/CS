@@ -66,11 +66,11 @@ class __Doxygen_Workaround__ {};
 #define SCF_IMPL_N 6
 #include "scf_impl.h"
 #undef SCF_IMPL_N
-/*
+
 #define SCF_IMPL_N 7
 #include "scf_impl.h"
 #undef SCF_IMPL_N
-
+/*
 #define SCF_IMPL_N 8
 #include "scf_impl.h"
 #undef SCF_IMPL_N
@@ -109,15 +109,15 @@ class __Doxygen_Workaround__ {};
 #define SCF_IMPL_N 5
 #include "scf_impl.h"
 #undef SCF_IMPL_N
+
 #define SCF_IMPL_N 6
 #include "scf_impl.h"
 #undef SCF_IMPL_N
 
-/*
 #define SCF_IMPL_N 7
 #include "scf_impl.h"
 #undef SCF_IMPL_N
-
+/*
 #define SCF_IMPL_N 8
 #include "scf_impl.h"
 #undef SCF_IMPL_N

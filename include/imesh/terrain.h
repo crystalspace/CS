@@ -38,20 +38,23 @@ struct iTerraFormer;
 class csBox2;
 class csTransform;
 
-SCF_VERSION (iTerrainObjectState, 0, 1, 1);
-
 /**
  * This will override the settings for material in the parent
  */
-struct iTerrainObjectState : public iBase
+struct iTerrainObjectState : public virtual iBase
 {
+  SCF_INTERFACE (iTerrainObjectState, 1, 0, 0);
+
+  //@{
   /**
    * Set/Get the material palette, this is used to specify materials on a 
    * bytemap representing the material makeup of the terrain
    */
   virtual bool SetMaterialPalette (const csArray<iMaterialWrapper*>& pal) = 0;
   virtual const csArray<iMaterialWrapper*>& GetMaterialPalette () const = 0;
+  //@}
 
+  //@{
   /**
    * In short, the materialmap paints the palette onto the terrain like
    * an indexed image format paints a color palette onto the screen
@@ -63,9 +66,13 @@ struct iTerrainObjectState : public iBase
    * \deprecated This will only work for SimpleFormers. Directories for 
    * paging terrain should be set via the respective former state.
    */
+  CS_DEPRECATED_METHOD_MSG("This will only work for SimpleFormers.")
   virtual bool SetMaterialMap (const csArray<char>& data, int x, int y) = 0;
+  CS_DEPRECATED_METHOD_MSG("This will only work for SimpleFormers.")
   virtual bool SetMaterialMap (iImage* map) = 0;
+  //@}
 
+  //@{
   /**
    * In short, the materialmap paints the palette onto the terrain like
    * an indexed image format paints a color palette onto the screen
@@ -82,9 +89,12 @@ struct iTerrainObjectState : public iBase
    * \deprecated This will only work for SimpleFormers. Directories for 
    * paging terrain should be set via the respective former state.
    */
+  CS_DEPRECATED_METHOD_MSG("This will only work for SimpleFormers.")
   virtual bool SetMaterialAlphaMaps (const csArray<csArray<char> >& data,
   	int x, int y) = 0;
+  CS_DEPRECATED_METHOD_MSG("This will only work for SimpleFormers.")
   virtual bool SetMaterialAlphaMaps (const csArray<iImage*>& maps) = 0;
+  //@}
 
   /**
    * Set a LOD parameter.
@@ -104,6 +114,7 @@ struct iTerrainObjectState : public iBase
    */
   virtual float GetLODValue (const char* parameter) const = 0;
 
+  //@{
   /**
    * Save/Restore preprocessing information, the algorithm will 
    * do some preprocessing based on the material and height information
@@ -113,6 +124,7 @@ struct iTerrainObjectState : public iBase
    */
   virtual bool SaveState (const char *filename) = 0;
   virtual bool RestoreState (const char *filename) = 0;
+  //@}
 
   /// Detects collision with a specific transform
   virtual int CollisionDetect (iMovable *m, csTransform *p) = 0;
@@ -150,16 +162,16 @@ struct iTerrainObjectState : public iBase
     bool& raw) = 0;
 };
 
-SCF_VERSION (iTerrainFactoryState, 0, 0, 1);
-
 /**
  * Allows the setting of a set of generic terrain parameters outside
  * any specific algorithm.  It is up to the algorithm to determine the
  * best use of the information provided in the interface.
  */
-struct iTerrainFactoryState : public iBase
+struct iTerrainFactoryState : public virtual iBase
 {
+  SCF_INTERFACE (iTerrainFactoryState, 1, 0, 0);
 
+  //@{
   /**
    * The terraformer defines the height, scale and other properties
    * related to the formation and structure of the terrain.
@@ -170,7 +182,9 @@ struct iTerrainFactoryState : public iBase
    */
   virtual void SetTerraFormer (iTerraFormer *form) = 0;
   virtual iTerraFormer *GetTerraFormer () = 0;
+  //@}
 
+  //@{
   /**
    * This specifies the max region the renderer will sample from.  This 
    * is more of a hint to the renderer as it may try to optimally sample
@@ -178,7 +192,9 @@ struct iTerrainFactoryState : public iBase
    */
   virtual void SetSamplerRegion (const csBox2& region) = 0;
   virtual const csBox2& GetSamplerRegion () = 0;
+  //@}
 
+  //@{
   /**
    * Save/Restore preprocessing information, the algorithm will 
    * do some preprocessing based on the material and height information
@@ -188,6 +204,7 @@ struct iTerrainFactoryState : public iBase
    */
   virtual bool SaveState (const char *filename) = 0;
   virtual bool RestoreState (const char *filename) = 0;
+  //@}
 };
 
 /** @} */

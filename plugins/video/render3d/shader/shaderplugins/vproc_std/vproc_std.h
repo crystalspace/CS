@@ -26,6 +26,9 @@
 
 struct iVertexLightCalculator;
 
+CS_PLUGIN_NAMESPACE_BEGIN(VProc_std)
+{
+
 class csVProc_Std : public scfImplementation2<csVProc_Std, 
 					      iShaderProgramPlugin,
 					      iComponent>
@@ -68,6 +71,9 @@ private:
   }
   iVertexLightCalculator *lightCalculatorMatrix[16];
 };
+
+}
+CS_PLUGIN_NAMESPACE_END(VProc_std)
 
 #endif //__CS_VPROC_VPROC_STD_H__
 

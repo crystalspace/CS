@@ -60,40 +60,14 @@
 
 /* #include "cstool/debugimagewriter.h" */
 
+CS_IMPLEMENT_PLUGIN
+
+CS_PLUGIN_NAMESPACE_BEGIN(BruteBlock)
+{
 
 CS_LEAKGUARD_IMPLEMENT (csTerrBlock);
 CS_LEAKGUARD_IMPLEMENT (csTerrainObject);
 CS_LEAKGUARD_IMPLEMENT (csTerrainFactory);
-
-CS_IMPLEMENT_PLUGIN
-
-SCF_IMPLEMENT_IBASE (csTerrainObject)
-  SCF_IMPLEMENTS_INTERFACE (iMeshObject)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iObjectModel)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iTerrainObjectState)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iShadowReceiver)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iLightingInfo)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csTerrainObject::eiObjectModel)
-  SCF_IMPLEMENTS_INTERFACE (iObjectModel)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csTerrainObject::PolyMesh)
-  SCF_IMPLEMENTS_INTERFACE (iPolygonMesh)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csTerrainObject::eiTerrainObjectState)
-  SCF_IMPLEMENTS_INTERFACE (iTerrainObjectState)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csTerrainObject::ShadowReceiver)
-  SCF_IMPLEMENTS_INTERFACE (iShadowReceiver)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csTerrainObject::LightingInfo)
-  SCF_IMPLEMENTS_INTERFACE (iLightingInfo)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csTerrBlock::csTerrBlock (csTerrainObject *terr)
 {
@@ -212,91 +186,91 @@ void csTerrBlock::LoadData ()
 
 void csTerrBlock::SetupMesh ()
 {
-
-//@@@ have a method to set this from world
-float cullsize = terr->block_maxsize;
-
-if (size < cullsize )
-{
-
-  res = terr->GetBlockResolution () + 1;
-
-  LoadData ();
-
-  bbox.Empty ();
-
-  int totres = res * res;
-  bbox.StartBoundingBox (vertex_data[0]);
-  color_data[0].Set (0.5, 0.5, 0.5);
-  for (int i = 1 ; i < totres ; i++)
-  {
-    bbox.AddBoundingVertexSmart (vertex_data[i]);
-    color_data[i].Set (0.5, 0.5, 0.5);
-  }
-  built = true;
-  last_colorVersion = (uint)~0;
-}
-else
-{
-  bbox = csBox3(center.x - size / 2.0, center.y - size / 2.0, center.z - size / 2.0, 
-                center.x + size / 2.0, center.y + size / 2.0, center.z + size / 2.0);
-
-  if (size <= cullsize * 1.5 + 0.5) //only for the smallest culled
-  {
-//printf("culled %f\n",size);
-
-      res = 512;
-//@@@
-//    res = (int)(size / (terr->block_maxsize /
-//                  terr->block_minsize)) * terr->GetBlockResolution();
   
-    csRef<iTerraSampler> mapsampler = terr->terraformer->GetSampler (
-      csBox2 (center.x - size / 2.0, center.z - size / 2.0, 
-      center.x + size / 2.0, center.z + size / 2.0), res);
-
-    csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
-      terr->object_reg, "crystalspace.shared.stringset", iStringSet);
+  //@@@ have a method to set this from world
+  float cullsize = terr->block_maxsize;
   
-    if (terr->materialAlphaMaps)
+  if (size < cullsize )
+  {
+  
+    res = terr->GetBlockResolution () + 1;
+  
+    LoadData ();
+  
+    bbox.Empty ();
+  
+    int totres = res * res;
+    bbox.StartBoundingBox (vertex_data[0]);
+    color_data[0].Set (0.5, 0.5, 0.5);
+    for (int i = 1 ; i < totres ; i++)
     {
-      csArray< csArray<char> > alphamaps = csArray< csArray<char> >();
-      for (int i = 0; i < (int)terr->palette.Length() - 1; i++)
-      {
-        csString alphaname = csString("alphamap ");
-        alphaname += i;
-
-        alphamaps.Push(csArray<char>());
-        const int* alphadata =  
-          mapsampler->SampleInteger(strings->Request(alphaname));
-        assert(alphadata != 0);
-        for (int j = 0; j < res*res; j++)
-        {
-          alphamaps[i].Push(alphadata[j]);
-        }
-      }
-      terr->SetCurrentMaterialAlphaMaps(alphamaps, res, res);
-
-    } else {
-
-      csArray<char> materialmap = csArray<char>();
-
-      const int* materialdata =  
-          mapsampler->SampleInteger(strings->Request("materialmap"));
-      assert(materialdata != 0);
-      for (int j = 0; j < res*res; j++)
-      {
-        materialmap.Push(materialdata[j]);
-      }
-      terr->SetCurrentMaterialMap(materialmap, res, res);
+      bbox.AddBoundingVertexSmart (vertex_data[i]);
+      color_data[i].Set (0.5, 0.5, 0.5);
     }
+    built = true;
+    last_colorVersion = (uint)~0;
   }
-
+  else
+  {
+    bbox = csBox3(center.x - size / 2.0, center.y - size / 2.0, center.z - size / 2.0, 
+		  center.x + size / 2.0, center.y + size / 2.0, center.z + size / 2.0);
+  
+    if (size <= cullsize * 1.5 + 0.5) //only for the smallest culled
+    {
+  //printf("culled %f\n",size);
+  
+	res = 512;
+  //@@@
+  //    res = (int)(size / (terr->block_maxsize /
+  //                  terr->block_minsize)) * terr->GetBlockResolution();
+    
+      csRef<iTerraSampler> mapsampler = terr->terraformer->GetSampler (
+	csBox2 (center.x - size / 2.0, center.z - size / 2.0, 
+	center.x + size / 2.0, center.z + size / 2.0), res);
+  
+      csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
+	terr->object_reg, "crystalspace.shared.stringset", iStringSet);
+    
+      if (terr->materialAlphaMaps)
+      {
+	csArray< csArray<char> > alphamaps = csArray< csArray<char> >();
+	for (int i = 0; i < (int)terr->palette.Length() - 1; i++)
+	{
+	  csString alphaname = csString("alphamap ");
+	  alphaname += i;
+  
+	  alphamaps.Push(csArray<char>());
+	  const int* alphadata =  
+	    mapsampler->SampleInteger(strings->Request(alphaname));
+	  assert(alphadata != 0);
+	  for (int j = 0; j < res*res; j++)
+	  {
+	    alphamaps[i].Push(alphadata[j]);
+	  }
+	}
+	terr->SetCurrentMaterialAlphaMaps(alphamaps, res, res);
+  
+      } else {
+  
+	csArray<char> materialmap = csArray<char>();
+  
+	const int* materialdata =  
+	    mapsampler->SampleInteger(strings->Request("materialmap"));
+	assert(materialdata != 0);
+	for (int j = 0; j < res*res; j++)
+	{
+	  materialmap.Push(materialdata[j]);
+	}
+	terr->SetCurrentMaterialMap(materialmap, res, res);
+      }
+    }
+  
+  }
+  
+  
 }
 
-
-}
-
-void FillEdge (bool halfres, int res, uint16* indices, int &indexcount,
+static void FillEdge (bool halfres, int res, uint16* indices, int &indexcount,
                int offs, int xadd, int zadd)
 {
   int x;
@@ -1188,22 +1162,19 @@ csTriangle* csTerrainObject::PolyMesh::GetTriangles ()
 
 
 csTerrainObject::csTerrainObject (iObjectRegistry* object_reg,
-                                    csTerrainFactory *pFactory)
+                                    csTerrainFactory *pFactory) :
+  scfImplementationType (this)
 {
-  SCF_CONSTRUCT_IBASE (0);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObjectModel);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiTerrainObjectState);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiShadowReceiver);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiLightingInfo);
   csTerrainObject::object_reg = object_reg;
   csTerrainObject::pFactory = pFactory;
-  g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+  g3d = csQueryRegistry<iGraphics3D> (object_reg);
 
-  scfiObjectModel.SetPolygonMeshBase (&scfiPolygonMesh);
-  scfiObjectModel.SetPolygonMeshColldet (&scfiPolygonMesh);
-  scfiObjectModel.SetPolygonMeshViscull (0);
-  scfiObjectModel.SetPolygonMeshShadows (0);
-  scfiPolygonMesh.SetTerrain (this);
+  polygonMesh.AttachNew (new PolyMesh);
+  SetPolygonMeshBase (polygonMesh);
+  SetPolygonMeshColldet (polygonMesh);
+  SetPolygonMeshViscull (0);
+  SetPolygonMeshShadows (0);
+  polygonMesh->SetTerrain (this);
 
   polymesh_valid = false;
   polymesh_vertices = 0;
@@ -1217,7 +1188,6 @@ csTerrainObject::csTerrainObject (iObjectRegistry* object_reg,
 
   region = ((csTerrainFactory*)pFactory)->samplerRegion;
   rootblock = 0;
-  vis_cb = 0;
     
   block_res = 32;
 
@@ -1228,8 +1198,8 @@ csTerrainObject::csTerrainObject (iObjectRegistry* object_reg,
   block_maxsize = region.MaxX () - region.MinX ();
   block_minsize = block_maxsize;
 
-  csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
-    object_reg, "crystalspace.shared.stringset", iStringSet);
+  csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet> (
+    object_reg, "crystalspace.shared.stringset");
   
   vertices_name = strings->Request ("vertices");
   normals_name = strings->Request ("normals");
@@ -1254,21 +1224,15 @@ csTerrainObject::csTerrainObject (iObjectRegistry* object_reg,
   baseContext = new csShaderVariableContext();
 
   csRef<iVerbosityManager> verbosemgr (
-    CS_QUERY_REGISTRY (object_reg, iVerbosityManager));
+    csQueryRegistry<iVerbosityManager> (object_reg));
   verbose = verbosemgr.IsValid() ? verbosemgr->Enabled ("bruteblock") : false;
 }
 
 csTerrainObject::~csTerrainObject ()
 {
   //builder->Stop ();
-  if (vis_cb) vis_cb->DecRef ();
   delete[] polymesh_vertices;
   delete[] polymesh_triangles;
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiObjectModel);
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiTerrainObjectState);
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiShadowReceiver);
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiLightingInfo);
-  SCF_DESTRUCT_IBASE ();
 }
 
 void csTerrainObject::SetStaticLighting (bool enable)
@@ -1297,7 +1261,7 @@ void csTerrainObject::FireListeners ()
 {
   size_t i;
   for (i = 0 ; i < listeners.Length () ; i++)
-    listeners[i]->ObjectModelChanged (&scfiObjectModel);
+    listeners[i]->ObjectModelChanged (this);
 }
 
 void csTerrainObject::AddListener (iObjectModelListener *listener)
@@ -1319,7 +1283,7 @@ void csTerrainObject::SetupObject ()
   {
     initialized = true;
 
-    csRef<iGraphics3D> g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+    csRef<iGraphics3D> g3d = csQueryRegistry<iGraphics3D> (object_reg);
 
     for (int t=0; t<=1; t++)
     {
@@ -1492,7 +1456,7 @@ bool csTerrainObject::ReadFromCache (iCacheManager* cache_mgr)
 	if (mf.Read (lid, 16) != 16) goto stop;
 	iLight *l = pFactory->engine->FindLightID (lid);
 	if (!l) goto stop;
-	l->AddAffectedLightingInfo (&scfiLightingInfo);
+	l->AddAffectedLightingInfo ((iLightingInfo*)this);
 
 	csShadowArray* shadowArr = new csShadowArray();
 	float* intensities = new float[staticLights.Length()];
@@ -1608,7 +1572,7 @@ void csTerrainObject::DisconnectAllLights ()
   while (it.HasNext ())
   {
     iLight* l = (iLight*)it.Next ();
-    l->RemoveAffectedLightingInfo (&scfiLightingInfo);
+    l->RemoveAffectedLightingInfo ((iLightingInfo*)this);
   }
   affecting_lights.Empty ();
   colorVersion++;
@@ -1687,7 +1651,7 @@ void csTerrainObject::CastShadows (iMovable* movable, iFrustumView* fview)
     if (!staticlighting || 
       li->GetDynamicType () == CS_LIGHT_DYNAMICTYPE_PSEUDO)
     {
-      li->AddAffectedLightingInfo (&scfiLightingInfo);
+      li->AddAffectedLightingInfo ((iLightingInfo*)this);
       if (li->GetDynamicType () != CS_LIGHT_DYNAMICTYPE_PSEUDO)
         affecting_lights.Add (li);
     }
@@ -1696,7 +1660,7 @@ void csTerrainObject::CastShadows (iMovable* movable, iFrustumView* fview)
   {
     if (!affecting_lights.In (li))
     {
-      li->AddAffectedLightingInfo (&scfiLightingInfo);
+      li->AddAffectedLightingInfo ((iLightingInfo*)this);
       affecting_lights.Add (li);
     }
     if (staticlighting) return;
@@ -2261,7 +2225,7 @@ bool csTerrainObject::SetLODValue (const char* parameter, float value)
   return false;
 }
 
-float csTerrainObject::GetLODValue (const char* parameter)
+float csTerrainObject::GetLODValue (const char* parameter) const
 {
   if (strcmp (parameter, "splatting distance") == 0)
   {
@@ -2427,7 +2391,7 @@ void csTerrainObject::GetObjectBoundingBox (csBox3& bbox)
 void csTerrainObject::SetObjectBoundingBox (const csBox3& bbox)
 {
   global_bbox = bbox;
-  scfiObjectModel.ShapeChanged ();
+  ShapeChanged ();
 }
 
 void csTerrainObject::GetRadius (float& rad, csVector3& cent)
@@ -2722,27 +2686,9 @@ bool csTerrainObject::HitBeamObject (const csVector3& start,
 
 //----------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE (csTerrainFactory)
-SCF_IMPLEMENTS_INTERFACE (iMeshObjectFactory)
-SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iTerrainFactoryState)
-SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iObjectModel)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csTerrainFactory::eiTerrainFactoryState)
-SCF_IMPLEMENTS_INTERFACE (iTerrainFactoryState)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csTerrainFactory::eiObjectModel)
-SCF_IMPLEMENTS_INTERFACE (iObjectModel)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-
 csTerrainFactory::csTerrainFactory (iObjectRegistry* object_reg,
-	iMeshObjectType* parent)
+	iMeshObjectType* parent) : scfImplementationType (this)
 {
-  SCF_CONSTRUCT_IBASE (0);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiTerrainFactoryState);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiObjectModel);
   csTerrainFactory::object_reg = object_reg;
   logparent = 0;
   brute_type = parent;
@@ -2751,15 +2697,12 @@ csTerrainFactory::csTerrainFactory (iObjectRegistry* object_reg,
     CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg, "terrain", iTerraFormer);*/
 
   scale = csVector3(1);
-  light_mgr = CS_QUERY_REGISTRY (object_reg, iLightManager);
-  engine = CS_QUERY_REGISTRY (object_reg, iEngine);
+  light_mgr = csQueryRegistry<iLightManager> (object_reg);
+  engine = csQueryRegistry<iEngine> (object_reg);
 }
 
 csTerrainFactory::~csTerrainFactory ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiTerrainFactoryState);
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiObjectModel);
-  SCF_DESTRUCT_IBASE ();
 }
 
 csPtr<iMeshObject> csTerrainFactory::NewInstance ()
@@ -2825,3 +2768,6 @@ csPtr<iMeshObjectFactory> csTerrainObjectType::NewFactory()
   csTerrainFactory *pFactory = new csTerrainFactory (object_reg, this);
   return csPtr<iMeshObjectFactory> (pFactory);
 }
+
+}
+CS_PLUGIN_NAMESPACE_END(BruteBlock)

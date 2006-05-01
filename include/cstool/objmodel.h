@@ -35,13 +35,12 @@
 #include "imesh/objmodel.h"
 #include "igeom/polymesh.h"
 
-
+struct iTerraFormer;
 
 /**
  * Helper class to make it easier to implement iObjectModel in mesh
  * objects. This class does not implement the bounding box and radius
- * functions. Note: this class is meant to be used as an embedded
- * class of a mesh object. That's why it doesn't do any of the SCF stuff.
+ * functions. 
  */
 class csObjectModel : public scfImplementation1<csObjectModel,iObjectModel>
 {
@@ -131,6 +130,10 @@ public:
   virtual void RemoveListener (iObjectModelListener* listener)
   {
     listeners.Delete (listener);
+  }
+  virtual iTerraFormer* GetTerraFormerColldet()
+  {
+    return 0;
   }
 };
 

@@ -381,6 +381,8 @@ private:
 struct iVertexLightCalculator
 {
 public:
+  virtual ~iVertexLightCalculator() {}
+  
   /**
    * Compute lighting, overwrite the destination colors.
    * \param light Properties of the light to compute.

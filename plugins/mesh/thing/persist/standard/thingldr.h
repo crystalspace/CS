@@ -36,7 +36,7 @@ struct iThingFactoryState;
 struct iMeshObject;
 struct iMeshObjectType;
 
-namespace cspluginThingLdr
+CS_PLUGIN_NAMESPACE_BEGIN(ThingLoader)
 {
 
 struct RepMaterial
@@ -212,6 +212,7 @@ public:
   };
 };
 
-} // namespace cspluginThingLdr
+}
+CS_PLUGIN_NAMESPACE_END(ThingLoader)
 
 #endif // __CS_THINGLDR_H__

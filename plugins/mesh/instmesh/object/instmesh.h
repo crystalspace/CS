@@ -52,9 +52,6 @@
 class csBSPTree;
 class csColor;
 class csColor4;
-class csInstmeshMeshObject;
-class csInstmeshMeshObjectFactory;
-class csInstmeshMeshObjectType;
 class csPolygonMesh;
 struct iCacheManager;
 struct iEngine;
@@ -62,6 +59,13 @@ struct iMaterialWrapper;
 struct iMovable;
 struct iObjectRegistry;
 struct iShadowBlockList;
+
+CS_PLUGIN_NAMESPACE_BEGIN(InstMesh)
+{
+
+class csInstmeshMeshObject;
+class csInstmeshMeshObjectFactory;
+class csInstmeshMeshObjectType;
 
 /**
  * An array giving shadow information for a pseudo-dynamic light.
@@ -90,7 +94,14 @@ struct csInstance
 /**
  * Instmesh version of mesh object.
  */
-class csInstmeshMeshObject : public iMeshObject
+class csInstmeshMeshObject : 
+  public scfImplementationExt5<csInstmeshMeshObject, 
+                               csObjectModel,
+                               iMeshObject,
+                               iLightingInfo,
+                               iShadowCaster,
+                               iShadowReceiver,
+                               iInstancingMeshState>
 {
 private:
   csRenderMeshHolder rmHolder;
@@ -133,7 +144,7 @@ private:
   csRef<iMaterialWrapper> material;
   bool material_needs_visit;
   uint MixMode;
-  iMeshObjectDrawCallback* vis_cb;
+  csRef<iMeshObjectDrawCallback> vis_cb;
   bool do_lighting;
   bool do_manual_colors;
   csColor4 base_color;
@@ -231,6 +242,8 @@ public:
   void GetRadius (float& rad, csVector3& cent);
   void SetShadowCasting (bool m) { do_shadows = m; }
   void SetShadowReceiving (bool m) { do_shadow_rec = m; }
+  bool IsShadowCasting () const { return do_shadows; }
+  bool IsShadowReceiving () const { return do_shadow_rec; }
 
   iVirtualClock* vc;
 
@@ -259,8 +272,6 @@ public:
   void DisconnectAllLights ();
 
   //----------------------- iMeshObject implementation ----------------------
-  SCF_DECLARE_IBASE;
-
   virtual iMeshObjectFactory* GetFactory () const
   {
     return (iMeshObjectFactory*)factory;
@@ -271,8 +282,6 @@ public:
     iMovable* movable, uint32 frustum_mask);
   virtual void SetVisibleCallback (iMeshObjectDrawCallback* cb)
   {
-    if (cb) cb->IncRef ();
-    if (vis_cb) vis_cb->DecRef ();
     vis_cb = cb;
   }
   virtual iMeshObjectDrawCallback* GetVisibleCallback () const
@@ -317,158 +326,23 @@ public:
   void SetObjectBoundingBox (const csBox3& bbox);
   float GetRadius ();
 
-  //------------------------- iObjectModel implementation ----------------
-  class ObjectModel : public csObjectModel
+  /**\name iObjectModel implementation
+   * @{ */
+  virtual void GetObjectBoundingBox (csBox3& bbox)
   {
-    SCF_DECLARE_EMBEDDED_IBASE (csInstmeshMeshObject);
-    virtual void GetObjectBoundingBox (csBox3& bbox)
-    {
-      bbox = scfParent->GetObjectBoundingBox ();
-    }
-    virtual void SetObjectBoundingBox (const csBox3& bbox)
-    {
-      scfParent->SetObjectBoundingBox (bbox);
-    }
-    virtual void GetRadius (float& rad, csVector3& cent)
-    {
-      rad = scfParent->GetRadius ();
-      cent = scfParent->object_bbox.GetCenter ();
-    }
-    virtual iTerraFormer* GetTerraFormerColldet () { return 0; }
-  } scfiObjectModel;
-  friend class ObjectModel;
+    bbox = GetObjectBoundingBox ();
+  }
+  /** @} */
 
-  virtual iObjectModel* GetObjectModel () { return &scfiObjectModel; }
-
-  //------------------------- iLightingInfo interface -------------------------
-  struct LightingInfo : public iLightingInfo
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csInstmeshMeshObject);
-    virtual void InitializeDefault (bool clear)
-    {
-      scfParent->InitializeDefault (clear);
-    }
-    virtual bool ReadFromCache (iCacheManager* cache_mgr)
-    {
-      return scfParent->ReadFromCache (cache_mgr);
-    }
-    virtual bool WriteToCache (iCacheManager* cache_mgr)
-    {
-      return scfParent->WriteToCache (cache_mgr);
-    }
-    virtual void PrepareLighting ()
-    {
-      scfParent->PrepareLighting ();
-    }
-    virtual void LightChanged (iLight* light)
-    {
-      scfParent->LightChanged (light);
-    }
-    virtual void LightDisconnect (iLight* light)
-    {
-      scfParent->LightDisconnect (light);
-    }
-    virtual void DisconnectAllLights ()
-    {
-      scfParent->DisconnectAllLights ();
-    }
-  } scfiLightingInfo;
-  friend struct LightingInfo;
-
-  //-------------------- iShadowCaster interface implementation ----------
-  struct ShadowCaster : public iShadowCaster
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csInstmeshMeshObject);
-    virtual void AppendShadows (iMovable* movable, iShadowBlockList* shadows,
-    	const csVector3& origin)
-    {
-      scfParent->AppendShadows (movable, shadows, origin);
-    }
-  } scfiShadowCaster;
-  friend struct ShadowCaster;
-
-  //-------------------- iShadowReceiver interface implementation ----------
-  struct ShadowReceiver : public iShadowReceiver
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csInstmeshMeshObject);
-    virtual void CastShadows (iMovable* movable, iFrustumView* fview)
-    {
-      scfParent->CastShadows (movable, fview);
-    }
-  } scfiShadowReceiver;
-  friend struct ShadowReceiver;
-
-  //------------------------- iInstancingMeshState implementation ----------------
-  class InstancingMeshState : public iInstancingMeshState
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csInstmeshMeshObject);
-    virtual void SetMaterialWrapper (iMaterialWrapper* material)
-    { scfParent->SetMaterialWrapper (material); }
-    virtual iMaterialWrapper* GetMaterialWrapper () const
-    { return scfParent->material; }
-    virtual void SetMixMode (uint mode) { scfParent->MixMode = mode; }
-    virtual uint GetMixMode () const { return scfParent->MixMode; }
-    virtual void SetLighting (bool l) { scfParent->SetLighting (l); }
-    virtual bool IsLighting () const { return scfParent->IsLighting (); }
-    virtual void SetColor (const csColor& col) { scfParent->SetColor (col); }
-    virtual const csColor& GetColor () const { return scfParent->GetColor (); }
-    virtual void SetManualColors (bool m)
-    {
-      scfParent->SetManualColors (m);
-    }
-    virtual bool IsManualColors () const
-    {
-      return scfParent->IsManualColors ();
-    }
-    virtual void SetShadowCasting (bool m)
-    {
-      scfParent->do_shadows = m;
-    }
-    virtual bool IsShadowCasting () const
-    {
-      return scfParent->do_shadows;
-    }
-    virtual void SetShadowReceiving (bool m)
-    {
-      scfParent->do_shadow_rec = m;
-    }
-    virtual bool IsShadowReceiving () const
-    {
-      return scfParent->do_shadow_rec;
-    }
-    virtual size_t AddInstance (const csReversibleTransform& trans)
-    {
-      return scfParent->AddInstance (trans);
-    }
-    virtual void RemoveInstance (size_t id)
-    {
-      scfParent->RemoveInstance (id);
-    }
-    virtual void RemoveAllInstances ()
-    {
-      scfParent->RemoveAllInstances ();
-    }
-    virtual void MoveInstance (size_t id,
-      const csReversibleTransform& trans)
-    {
-      scfParent->MoveInstance (id, trans);
-    }
-    virtual const csReversibleTransform& GetInstanceTransform (size_t id)
-    {
-      return scfParent->GetInstanceTransform (id);
-    }
-  } scfiInstancingMeshState;
-  friend class InstancingMeshState;
+  virtual iObjectModel* GetObjectModel () { return this; }
 
   //------------------ iPolygonMesh interface implementation ----------------//
-  struct PolyMesh : public iPolygonMesh
+  struct PolyMesh : public scfImplementation1<PolyMesh, iPolygonMesh>
   {
   private:
     csFlags flags;
-
+    csInstmeshMeshObject* parent;
   public:
-    SCF_DECLARE_EMBEDDED_IBASE (csInstmeshMeshObject);
-
     virtual int GetVertexCount ();
     virtual csVector3* GetVertices ();
     virtual int GetPolygonCount ();
@@ -481,35 +355,36 @@ public:
     virtual csFlags& GetFlags () { return flags;  }
     virtual uint32 GetChangeNumber() const { return 0; }
 
-    PolyMesh ()
+    PolyMesh (csInstmeshMeshObject* parent) : scfImplementationType (this),
+      parent (parent)
     {
       flags.Set (CS_POLYMESH_TRIANGLEMESH);
     }
     virtual ~PolyMesh () { }
-  } scfiPolygonMesh;
+  };
+  csRef<PolyMesh> polygonMesh;
   friend struct PolyMesh;
 
-  class eiRenderBufferAccessor : public iRenderBufferAccessor
+  class RenderBufferAccessor : 
+    public scfImplementation1<RenderBufferAccessor, iRenderBufferAccessor>
   {
   public:
     CS_LEAKGUARD_DECLARE (eiRenderBufferAccessor);
-    SCF_DECLARE_IBASE;
-    csInstmeshMeshObject* parent;
-    virtual ~eiRenderBufferAccessor ()
+    csWeakRef<csInstmeshMeshObject> parent;
+    virtual ~RenderBufferAccessor ()
     {
-      SCF_DESTRUCT_IBASE ();
     }
-    eiRenderBufferAccessor (csInstmeshMeshObject* parent)
+    RenderBufferAccessor (csInstmeshMeshObject* parent) : 
+      scfImplementationType (this), parent (parent)
     {
-      SCF_CONSTRUCT_IBASE (0);
-      eiRenderBufferAccessor::parent = parent;
     }
     virtual void PreGetBuffer (csRenderBufferHolder* holder,
     	csRenderBufferName buffer)
     {
-      parent->PreGetBuffer (holder, buffer);
+      if (parent) parent->PreGetBuffer (holder, buffer);
     }
-  } *scfiRenderBufferAccessor;
+  };
+  csRef<RenderBufferAccessor> renderBufferAccessor;
   friend class eiRenderBufferAccessor;
 
   void PreGetBuffer (csRenderBufferHolder* holder, csRenderBufferName buffer);
@@ -518,7 +393,10 @@ public:
 /**
  * Factory for general meshes.
  */
-class csInstmeshMeshObjectFactory : public iMeshObjectFactory
+class csInstmeshMeshObjectFactory : 
+  public scfImplementation2<csInstmeshMeshObjectFactory,
+                            iMeshObjectFactory,
+                            iInstancingFactoryState>
 {
 private:
   friend class csInstmeshMeshObject;	//@@@ FIXME: remove
@@ -587,7 +465,7 @@ public:
   void AddVertex (const csVector3& v,
       const csVector2& uv, const csVector3& normal,
       const csColor4& color);
-  int GetVertexCount () const { return (int)fact_vertices.Length (); }
+  size_t GetVertexCount () const { return fact_vertices.Length (); }
   const csVector3* GetVertices ()
   {
     return fact_vertices.GetArray ();
@@ -678,8 +556,6 @@ public:
   }
 
   //------------------------ iMeshObjectFactory implementation --------------
-  SCF_DECLARE_IBASE;
-
   virtual csFlags& GetFlags () { return flags; }
   virtual csPtr<iMeshObject> NewInstance ();
   virtual csPtr<iMeshObjectFactory> Clone () { return 0; }
@@ -694,137 +570,6 @@ public:
   { return logparent; }
   virtual iMeshObjectType* GetMeshObjectType () const { return instmesh_type; }
 
-  //----------------------- iInstancingFactoryState implementation -------------
-  class InstancingFactoryState : public iInstancingFactoryState
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csInstmeshMeshObjectFactory);
-
-    virtual void SetMixMode (uint mode)
-    {
-      scfParent->SetMixMode (mode);
-    }
-    virtual uint GetMixMode () const
-    {
-      return scfParent->GetMixMode ();
-    }
-    virtual void SetLighting (bool l)
-    {
-      scfParent->SetLighting (l);
-    }
-    virtual bool IsLighting () const
-    {
-      return scfParent->IsLighting ();
-    }
-    virtual void SetColor (const csColor& col)
-    {
-      scfParent->SetColor (col);
-    }
-    virtual const csColor& GetColor () const
-    {
-      return scfParent->GetColor ();
-    }
-    virtual void SetManualColors (bool m)
-    {
-      scfParent->SetManualColors (m);
-    }
-    virtual bool IsManualColors () const
-    {
-      return scfParent->IsManualColors ();
-    }
-    virtual void SetShadowCasting (bool m)
-    {
-      scfParent->SetShadowCasting (m);
-    }
-    virtual bool IsShadowCasting () const
-    {
-      return scfParent->IsShadowCasting ();
-    }
-    virtual void SetShadowReceiving (bool m)
-    {
-      scfParent->SetShadowReceiving (m);
-    }
-    virtual bool IsShadowReceiving () const
-    {
-      return scfParent->IsShadowReceiving ();
-    }
-
-    virtual void SetMaterialWrapper (iMaterialWrapper* material)
-    {
-      scfParent->SetMaterialWrapper (material);
-    }
-    virtual iMaterialWrapper* GetMaterialWrapper () const
-    {
-      return scfParent->GetMaterialWrapper ();
-    }
-    virtual void AddVertex (const csVector3& v,
-      const csVector2& uv, const csVector3& normal,
-      const csColor4& color)
-    {
-      scfParent->AddVertex (v, uv, normal, color);
-    }
-    virtual size_t GetVertexCount () const
-    {
-      return scfParent->GetVertexCount ();
-    }
-    virtual const csVector3* GetVertices ()
-    {
-      return scfParent->GetVertices ();
-    }
-    virtual const csVector2* GetTexels ()
-    {
-      return scfParent->GetTexels ();
-    }
-    virtual const csVector3* GetNormals ()
-    {
-      return scfParent->GetNormals ();
-    }
-    virtual void AddTriangle (const csTriangle& tri)
-    {
-      scfParent->AddTriangle (tri);
-    }
-    virtual size_t GetTriangleCount () const
-    {
-      return scfParent->GetTriangleCount ();
-    }
-    virtual const csTriangle* GetTriangles ()
-    {
-      return scfParent->GetTriangles ();
-    }
-    virtual const csColor4* GetColors ()
-    {
-      return scfParent->GetColors ();
-    }
-    virtual void Compress ()
-    {
-      scfParent->Compress ();
-    }
-    virtual void CalculateNormals (bool compress = true)
-    {
-      scfParent->CalculateNormals (compress);
-    }
-    virtual void GenerateBox (const csBox3& box)
-    {
-      scfParent->GenerateBox (box);
-    }
-    virtual void GenerateQuad (const csVector3& v1, const csVector3& v2, 
-      const csVector3& v3, const csVector3& v4)
-    {
-      scfParent->GenerateQuad (v1, v2, v3, v4);
-    }
-    virtual void GenerateSphere (const csEllipsoid& sphere, int rim_vertices,
-		bool cyl_mapping = false, bool toponly = false,
-		bool reversed = false)
-    {
-      scfParent->GenerateSphere (sphere, rim_vertices,
-	  cyl_mapping, toponly, reversed);
-    }
-    virtual bool IsAutoNormals () const
-    {
-      return scfParent->IsAutoNormals ();
-    }
-  } scfiInstancingFactoryState;
-  friend class InstancingFactoryState;
-
   virtual iObjectModel* GetObjectModel () { return 0; }
 };
 
@@ -832,13 +577,14 @@ public:
  * Instmesh type. This is the plugin you have to use to create instances
  * of csInstmeshMeshObjectFactory.
  */
-class csInstmeshMeshObjectType : public iMeshObjectType
+class csInstmeshMeshObjectType : 
+  public scfImplementation2<csInstmeshMeshObjectType,
+                            iMeshObjectType,
+                            iComponent>
 {
 public:
   iObjectRegistry* object_reg;
   bool do_verbose;
-
-  SCF_DECLARE_IBASE;
 
   /// Constructor.
   csInstmeshMeshObjectType (iBase*);
@@ -848,15 +594,9 @@ public:
   virtual csPtr<iMeshObjectFactory> NewFactory ();
   /// Initialize.
   bool Initialize (iObjectRegistry* object_reg);
-
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csInstmeshMeshObjectType);
-    virtual bool Initialize (iObjectRegistry* object_reg)
-    {
-      return scfParent->Initialize (object_reg);
-    }
-  } scfiComponent;
 };
+
+}
+CS_PLUGIN_NAMESPACE_END(InstMesh)
 
 #endif // __CS_INSTMESH_H__

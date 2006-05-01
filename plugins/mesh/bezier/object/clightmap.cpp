@@ -34,6 +34,8 @@
 
 #define LMMAGIC	    "LM04" // must be 4 chars!
 
+CS_PLUGIN_NAMESPACE_BEGIN(Bezier)
+{
 
 csCurveShadowMap::csCurveShadowMap ()
 {
@@ -334,7 +336,7 @@ const char* csCurveLightMap::ReadFromCache (
   }
 
   iLightingInfo* li;
-  li = &(parent->scfiLightingInfo);
+  li = (iLightingInfo*)parent;
 
   for (i = 0 ; i < lh.dyn_cnt ; i++)
   {
@@ -725,3 +727,6 @@ void csCurveLightMap::GetMeanLighting (int &r, int &g, int &b)
   g = mean_color.green; 
   b = mean_color.blue; 
 }
+
+}
+CS_PLUGIN_NAMESPACE_END(Bezier)

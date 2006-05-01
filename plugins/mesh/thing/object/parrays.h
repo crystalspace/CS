@@ -24,11 +24,7 @@
 #include "csutil/array.h"
 #include "polygon.h"
 
-namespace CS
-{
-namespace Plugins
-{
-namespace Thing
+CS_PLUGIN_NAMESPACE_BEGIN(Thing)
 {
 
 class csThingObjectType;
@@ -101,8 +97,7 @@ public:
   }
 };
 
-} // namespace Thing
-} // namespace Plugins
-} // namespace CS
+}
+CS_PLUGIN_NAMESPACE_END(Thing)
 
 #endif // __CS_PARRAYS_H__

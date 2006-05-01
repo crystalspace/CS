@@ -96,15 +96,15 @@ void csPortalContainerPolyMeshHelper::Cleanup ()
 
 csPortalContainer::csPortalContainer (iEngine* engine,
 	iObjectRegistry *object_reg) :
-	scfImplementationType (this, engine),
-	scfiPolygonMesh (0),
-	scfiPolygonMeshCD (CS_PORTAL_COLLDET),
-	scfiPolygonMeshLOD (CS_PORTAL_VISCULL)
+	scfImplementationType (this, engine)
 {
-  SetPolygonMeshBase (&scfiPolygonMesh);
-  SetPolygonMeshColldet (&scfiPolygonMeshCD);
-  SetPolygonMeshViscull (&scfiPolygonMeshLOD);
-  SetPolygonMeshShadows (&scfiPolygonMeshLOD);
+  polygonMesh.AttachNew (new csPortalContainerPolyMeshHelper (0));
+  polygonMeshCD.AttachNew (new csPortalContainerPolyMeshHelper (CS_PORTAL_COLLDET));
+  polygonMeshLOD.AttachNew (new csPortalContainerPolyMeshHelper (CS_PORTAL_VISCULL));
+  SetPolygonMeshBase (polygonMesh);
+  SetPolygonMeshColldet (polygonMeshCD);
+  SetPolygonMeshViscull (polygonMeshLOD);
+  SetPolygonMeshShadows (polygonMeshLOD);
 
   prepared = false;
   data_nr = 0;
@@ -113,9 +113,9 @@ csPortalContainer::csPortalContainer (iEngine* engine,
 
   meshwrapper = 0;
 
-  scfiPolygonMesh.SetPortalContainer (this);
-  scfiPolygonMeshCD.SetPortalContainer (this);
-  scfiPolygonMeshLOD.SetPortalContainer (this);
+  polygonMesh->SetPortalContainer (this);
+  polygonMeshCD->SetPortalContainer (this);
+  polygonMeshLOD->SetPortalContainer (this);
 
   shader_man = CS_QUERY_REGISTRY (object_reg, iShaderManager);
   fog_shader = shader_man->GetShader ("std_lighting_portal");

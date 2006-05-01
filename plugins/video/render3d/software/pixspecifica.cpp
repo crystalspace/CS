@@ -31,11 +31,7 @@
 #include "scan_pix.h"
 #include "tridraw.h"
 
-namespace CS
-{
-namespace Plugins
-{
-namespace Soft3D
+CS_PLUGIN_NAMESPACE_BEGIN(Soft3D)
 {
 
   template<typename Pix>
@@ -282,6 +278,5 @@ namespace Soft3D
     }
   }
 
-} // namespace Soft3D
-} // namespace Plugins
-} // namespace CS
+}
+CS_PLUGIN_NAMESPACE_END(Soft3D)

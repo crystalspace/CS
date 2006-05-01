@@ -75,7 +75,8 @@
 
 CS_IMPLEMENT_PLUGIN
 
-using namespace CS::Plugins::Thing;
+CS_PLUGIN_NAMESPACE_BEGIN(Thing)
+{
 
 CS_LEAKGUARD_IMPLEMENT (csThingStatic);
 CS_LEAKGUARD_IMPLEMENT (csThing);
@@ -144,21 +145,21 @@ csStringID csThingStatic::texLightmapName = csInvalidStringID;
 csThingStatic::csThingStatic (iBase* parent, csThingObjectType* thing_type) :
   scfImplementationType (this, parent),
   last_range (0, -1),
-  static_polygons (32, 64),
-  scfiPolygonMesh (0),
-  scfiPolygonMeshCD (CS_POLY_COLLDET),
-  scfiPolygonMeshLOD (CS_POLY_VISCULL)
+  static_polygons (32, 64)
 {
   csThingStatic::thing_type = thing_type;
   static_polygons.SetThingType (thing_type);
 
-  scfiPolygonMesh.SetThing (this);
-  scfiPolygonMeshCD.SetThing (this);
-  scfiPolygonMeshLOD.SetThing (this);
-  SetPolygonMeshBase (&scfiPolygonMesh);
-  SetPolygonMeshColldet (&scfiPolygonMeshCD);
-  SetPolygonMeshViscull (&scfiPolygonMeshLOD);
-  SetPolygonMeshShadows (&scfiPolygonMeshLOD);
+  polygonMesh.AttachNew (new PolyMeshHelper (0));
+  polygonMesh->SetThing (this);
+  polygonMeshCD.AttachNew (new PolyMeshHelper (CS_POLY_COLLDET));
+  polygonMeshCD->SetThing (this);
+  polygonMeshLOD.AttachNew (new PolyMeshHelper (CS_POLY_LIGHTING));
+  polygonMeshLOD->SetThing (this);
+  SetPolygonMeshBase (polygonMesh);
+  SetPolygonMeshColldet (polygonMeshCD);
+  SetPolygonMeshViscull (polygonMeshLOD);
+  SetPolygonMeshShadows (polygonMeshLOD);
 
   max_vertices = num_vertices = 0;
   obj_verts = 0;
@@ -1533,19 +1534,12 @@ void csThingStatic::LightmapTexAccessor::PreGetValue (csShaderVariable *variable
 
 csThing::csThing (iBase *parent, csThingStatic* static_data) :
   scfImplementationType (this, parent),
-  polygons(32, 64),
-  scfiPolygonMesh (0),
-  scfiPolygonMeshCD (CS_POLY_COLLDET),
-  scfiPolygonMeshLOD (CS_POLY_VISCULL)
+  polygons(32, 64)
 {
   csThing::static_data = static_data;
   polygons.SetThingType (static_data->thing_type);
   polygon_world_planes = 0;
   polygon_world_planes_num = (size_t)-1;        // -1 means not checked yet, 0 means no planes.
-
-  scfiPolygonMesh.SetThing (static_data);
-  scfiPolygonMeshCD.SetThing (static_data);
-  scfiPolygonMeshLOD.SetThing (static_data);
 
   last_thing_id++;
   thing_id = last_thing_id;
@@ -1752,9 +1746,6 @@ void csThing::HardTransform (const csReversibleTransform& t)
   csRef<csThingStatic> new_static_data = static_data->CloneStatic ();
   static_data = new_static_data;
   static_data->HardTransform (t);
-  scfiPolygonMesh.SetThing (static_data);
-  scfiPolygonMeshCD.SetThing (static_data);
-  scfiPolygonMeshLOD.SetThing (static_data);
 }
 
 void csThing::Unprepare ()
@@ -1916,11 +1907,6 @@ void csThing::InvalidateThing ()
 
   delete [] static_data->obj_normals; static_data->obj_normals = 0;
   static_data->InvalidateShape ();
-}
-
-iPolygonMesh* csThing::GetWriteObject ()
-{
-  return &scfiPolygonMeshLOD;
 }
 
 bool csThing::HitBeamOutline (const csVector3& start,
@@ -2911,3 +2897,5 @@ bool csThingObjectType::GetOptionDescription (
 
 //---------------------------------------------------------------------------
 
+}
+CS_PLUGIN_NAMESPACE_END(Thing)

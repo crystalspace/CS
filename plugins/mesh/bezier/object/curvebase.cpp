@@ -31,6 +31,8 @@
 #include "iengine/shadows.h"
 #include "iengine/camera.h"
 
+CS_PLUGIN_NAMESPACE_BEGIN(Bezier)
+{
 
 struct csCoverageMatrix
 {
@@ -137,17 +139,9 @@ void csCurveTesselated::UpdateColors (csCurveLightMap *LightMap,
 }
 
 // --- csCurve ---------------------------------------------------------------
-SCF_IMPLEMENT_IBASE_EXT(csCurve)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iCurve)
-SCF_IMPLEMENT_IBASE_EXT_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csCurve::Curve)
-  SCF_IMPLEMENTS_INTERFACE(iCurve)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 
 csCurve::csCurve (csBezierMeshObjectType* thing_type) :
-  csObject(),
+  scfImplementationType (this),
   LightPatches(0),
   O2W(0),
   uv2World(0),
@@ -156,8 +150,6 @@ csCurve::csCurve (csBezierMeshObjectType* thing_type) :
   LightMap(0),
   LightmapUpToDate(false)
 {
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiCurve);
-
   csCurve::thing_type = thing_type;
 
   // Call to make sure csBezier2 is properly initialized.
@@ -174,8 +166,6 @@ csCurve::~csCurve ()
   delete LightMap;
   delete[] uv2World;
   delete[] uv2Normal;
-
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiCurve);
 }
 
 
@@ -976,13 +966,15 @@ void csBezierCurve::SetVertex (int index, int ver_ind)
   SetControlPoint (index, ver_ind);
 }
 
-int csBezierCurve::GetVertex (int index)
+int csBezierCurve::GetVertex (int index) const
 {
   return ver_id[index];
 }
 
-int csBezierCurve::GetVertexCount ()
+int csBezierCurve::GetVertexCount () const
 {
   return 9;
 }
 
+}
+CS_PLUGIN_NAMESPACE_END(Bezier)

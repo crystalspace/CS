@@ -66,11 +66,7 @@ struct iFrustumView;
 struct iMaterialWrapper;
 struct iPolygonBuffer;
 
-namespace CS
-{
-namespace Plugins
-{
-namespace Thing
+CS_PLUGIN_NAMESPACE_BEGIN(Thing)
 {
 
 class csThing;
@@ -557,11 +553,11 @@ public:
   virtual iMeshObjectType* GetMeshObjectType () const { return thingmesh_type; }
 
   //-------------------- iPolygonMesh interface implementation ----------------
-  PolyMeshHelper scfiPolygonMesh;
+  csRef<PolyMeshHelper> polygonMesh;
   //-------------------- CD iPolygonMesh implementation -----------------------
-  PolyMeshHelper scfiPolygonMeshCD;
+  csRef<PolyMeshHelper> polygonMeshCD;
   //-------------------- Lower detail iPolygonMesh implementation -------------
-  PolyMeshHelper scfiPolygonMeshLOD;
+  csRef<PolyMeshHelper> polygonMeshLOD;
 
   //-------------------- iObjectModel implementation --------------------------
   virtual void GetObjectBoundingBox (csBox3& bbox)
@@ -870,11 +866,6 @@ public:
    */
   void GetBoundingBox (iMovable* movable, csBox3& box);
 
-  /**
-   * Get a write object for a vis culling system.
-   */
-  iPolygonMesh* GetWriteObject ();
-
   //----------------------------------------------------------------------
   // Lighting
   //----------------------------------------------------------------------
@@ -1022,11 +1013,11 @@ public:
   virtual void PositionChild (iMeshObject* /*child*/, csTicks /*current_time*/) { }
 
   //-------------------- iPolygonMesh interface implementation ----------------
-  PolyMeshHelper scfiPolygonMesh;
+  //csRef<PolyMeshHelper> polygonMesh;
   //-------------------- CD iPolygonMesh implementation -----------------------
-  PolyMeshHelper scfiPolygonMeshCD;
+  //csRef<PolyMeshHelper> polygonMeshCD;
   //-------------------- Lower detail iPolygonMesh implementation -------------
-  PolyMeshHelper scfiPolygonMeshLOD;
+  //csRef<PolyMeshHelper> polygonMeshLOD;
 };
 
 struct intar2 { int ar[2]; };
@@ -1141,8 +1132,7 @@ public:
   /** @} */
 };
 
-} // namespace Thing
-} // namespace Plugins
-} // namespace CS
+}
+CS_PLUGIN_NAMESPACE_END(Thing)
 
 #endif // __CS_THING_H__

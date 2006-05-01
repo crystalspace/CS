@@ -24,11 +24,7 @@
 
 #include "csgeom/math.h"
 
-namespace CS
-{
-namespace Plugins
-{
-namespace Soft3D
+CS_PLUGIN_NAMESPACE_BEGIN(Soft3D)
 {
 
   template<typename Pix, 
@@ -156,8 +152,7 @@ namespace Soft3D
       return p;
     }
   };
-} // namespace Soft3D
-} // namespace Plugins
-} // namespace CS
+}
+CS_PLUGIN_NAMESPACE_END(Soft3D)
 
 #endif // __CS_SOFT3D_SCAN_PIX_H__

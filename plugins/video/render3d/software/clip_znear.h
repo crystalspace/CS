@@ -22,13 +22,8 @@
 
 #include "clipper.h"
 
-namespace CS
+CS_PLUGIN_NAMESPACE_BEGIN(Soft3D)
 {
-namespace Plugins
-{
-namespace Soft3D
-{
-
 
 #define Z_NEAR	    0.1f
 
@@ -325,8 +320,7 @@ public:
   }
 };
 
-} // namespace Soft3D
-} // namespace Plugins
-} // namespace CS
+}
+CS_PLUGIN_NAMESPACE_END(Soft3D)
 
 #endif // __CS_SOFT3D_CLIP_ZNEAR_H__

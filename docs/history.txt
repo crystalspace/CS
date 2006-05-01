@@ -23,6 +23,17 @@ chronological order.
 	- Jorrit fixed the renderloop loader so that it no longer
 	  crashes if the loader context is not given to the function.
 	  This fixes a crash in csbench.
+	- res tweaked the devapi doxygen settings a bit.
+	- res removed the "no virtual destructor" warning suppression on GCC4 
+	- res re-activated the iBase virtual dtor.
+	- res changed a couple of meshes to not implement iPolygonMesh as an
+	  embedded interface but allocate it from the heap, to fix "abstract
+	  virtual method called" errors experienced after an iBase dtor was
+	  added last time.
+	- res also updated those meshes to new SCF.
+	- res changed some plugin namespaces to use the CS_PLUGIN_NAMESPACE_*
+	  macros.
+	- res fixed some more strict-aliasing warnings.
 30-Apr-2006
 	- Jorrit fixed spr3d object bounding box calculation. It now
 	  calculates the bounding box of all frames instead of only

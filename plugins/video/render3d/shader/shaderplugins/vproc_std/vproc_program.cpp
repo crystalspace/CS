@@ -29,6 +29,9 @@
 
 #include "vproc_program.h"
 
+CS_PLUGIN_NAMESPACE_BEGIN(VProc_std)
+{
+
 CS_LEAKGUARD_IMPLEMENT (csVProcStandardProgram);
 
 
@@ -430,3 +433,6 @@ iRenderBuffer* csVProcStandardProgram::GetBuffer (const BufferName& name,
   }
   return 0;
 }
+
+}
+CS_PLUGIN_NAMESPACE_END(VProc_std)

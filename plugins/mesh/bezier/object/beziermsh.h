@@ -21,13 +21,14 @@
 
 #include "csgeom/transfrm.h"
 #include "carrays.h"
-#include "csutil/csobject.h"
-#include "csutil/nobjvec.h"
-#include "csutil/util.h"
-#include "csutil/flags.h"
-#include "csutil/cscolor.h"
 #include "csutil/array.h"
+#include "csutil/cscolor.h"
+#include "csutil/csobject.h"
+#include "csutil/flags.h"
+#include "csutil/nobjvec.h"
 #include "csutil/refarr.h"
+#include "csutil/scf_implementation.h"
+#include "csutil/util.h"
 #include "csutil/weakref.h"
 #include "cstool/rendermeshholder.h"
 #include "cstool/framedataholder.h"
@@ -45,10 +46,8 @@
 #include "iutil/comp.h"
 #include "iutil/pluginconfig.h"
 #include "clightmap.h"
+#include "curvebase.h"
 
-class csBezierMesh;
-class csBezierMeshObjectType;
-class csBezierLightPatchPool;
 struct iShadowBlockList;
 struct csVisObjInfo;
 struct iGraphics3D;
@@ -57,18 +56,26 @@ struct iMovable;
 struct iFrustumView;
 struct iMaterialWrapper;
 
+CS_PLUGIN_NAMESPACE_BEGIN(Bezier)
+{
+
+class csBezierMesh;
+class csBezierMeshObjectType;
+class csBezierLightPatchPool;
+
 /**
  * A helper class for iPolygonMesh implementations used by csBezierMesh.
  */
-class BezierPolyMeshHelper : public iPolygonMesh
+class BezierPolyMeshHelper : public scfImplementation1<BezierPolyMeshHelper, 
+                                                       iPolygonMesh>
 {
 public:
   /**
    * Make a polygon mesh helper which will accept polygons which match
    * with the given flag (one of CS_POLY_COLLDET or CS_POLY_VISCULL).
    */
-  BezierPolyMeshHelper () :
-  	polygons (0), vertices (0), triangles (0) { }
+  BezierPolyMeshHelper () : scfImplementationType (this), polygons (0), 
+    vertices (0), triangles (0) { }
   virtual ~BezierPolyMeshHelper () { Cleanup (); }
   void Cleanup ();
 
@@ -232,11 +239,56 @@ public:
   void SetCurvesCenter (csVector3& v) { curves_center = v; }
 };
 
+/* The inheritance of csBezierMesh is semi-odd since it exhibits both
+ * iMeshObjectFactory and iMeshObject, but both have methods with the
+ * same name and different return values and even methods with the same
+ * name and different semantics. Isolate those conflicting interfaces into
+ * two classes and use multi-inheritance to "pull" those implementations into
+ * csBezierMesh.
+ */
+
+class csBezierMesh1 : public scfImplementationExt1<csBezierMesh1,
+                                                   csObjectModel,
+                                                   iMeshObjectFactory>
+{
+protected:
+   csFlags factory_flags;
+  /// Pointer to logical parent.
+  iMeshFactoryWrapper* logparent_factory;
+public:
+  csBezierMesh1 (iBase* parent) : scfImplementationType (this, parent) {}
+  /** \name iMeshObjectFactory interface implementation
+   * @{ */
+  virtual csFlags& GetFlags () { return factory_flags; }
+  virtual csPtr<iMeshObjectFactory> Clone () { return 0; }
+  virtual void SetMeshFactoryWrapper (iMeshFactoryWrapper* lp)
+  { logparent_factory = lp; }
+  virtual iMeshFactoryWrapper* GetMeshFactoryWrapper () const
+  { return logparent_factory; }
+  /** @} */
+};
+
+class csBezierMesh2 : public virtual iMeshObject
+{
+protected:
+  csFlags object_flags;
+public:
+  virtual csPtr<iMeshObject> Clone () { return 0; }
+  virtual csFlags& GetFlags () { return object_flags; }
+};
 
 /**
  * A bezier is a set of bezier curves.
  */
-class csBezierMesh : public iBase
+class csBezierMesh : public scfImplementationExt6<csBezierMesh,
+                                                  csBezierMesh1,
+                                                  iBezierFactoryState,
+                                                  iBezierState,
+                                                  iLightingInfo,
+                                                  iShadowCaster,
+                                                  iShadowReceiver,
+                                                  scfFakeInterface<iMeshObject> >,
+		     public csBezierMesh2
 {
   friend class BezierPolyMeshHelper;
 
@@ -317,8 +369,6 @@ private:
   csBezierMesh* ParentTemplate;
   /// Pointer to logical parent.
   iMeshWrapper* logparent;
-  /// Pointer to logical parent.
-  iMeshFactoryWrapper* logparent_factory;
   /// Pointer to meshobjecttype.
   iMeshObjectType* beziermsh_type;
 
@@ -337,9 +387,6 @@ private:
 
   float current_lod;
   uint32 current_features;
-
-  csFlags object_flags;
-  csFlags factory_flags;
 
   csFrameDataHolder<csDirtyAccessArray<csRenderMesh*> > rmListHolder;
   csRenderMeshHolder rmHolder;
@@ -401,8 +448,8 @@ public:
   { return (int)curves.Length (); }
 
   /// Get the specified curve from this set.
-  csCurve* GetCurve (int idx) const
-  { return curves.Get (idx); }
+  iCurve* GetCurve (int idx) const
+  { return (iCurve*)curves.Get (idx); }
 
   /// Create a curve from a template.
   iCurve* CreateCurve ();
@@ -429,7 +476,7 @@ public:
   void ClearCurveVertices ();
 
   /// Add a curve vertex and return the index of the vertex.
-  int AddCurveVertex (const csVector3& v, const csVector2& t);
+  size_t AddCurveVertex (const csVector3& v, const csVector2& t);
 
   //----------------------------------------------------------------------
   // Setup
@@ -560,7 +607,7 @@ public:
    * Check frustum visibility on this thing.
    * First initialize the 2D culler cube.
    */
-  void CastShadows (iFrustumView* lview, iMovable* movable);
+  void CastShadows (iMovable* movable, iFrustumView* lview);
 
   /**
    * Append a list of shadow frustums which extend from
@@ -594,263 +641,99 @@ public:
   void LightDisconnect (iLight* light);
   void DisconnectAllLights ();
 
-  SCF_DECLARE_IBASE;
+  csRef<BezierPolyMeshHelper> polygonMesh;
+  csRef<BezierPolyMeshHelper> polygonMeshLOD;
 
-  //--------------------- iBezierFactoryState interface -----------------------
-  struct BezierFactoryState : public iBezierFactoryState
+  /** \name iBezierFactoryState implementation
+   * @{ */
+  virtual const csVector3& GetCurvesCenter () const
+  { return static_data->curves_center; }
+  virtual void SetCurvesCenter (const csVector3& cen)
+  { static_data->curves_center = cen; }
+  virtual float GetCurvesScale () const
+  { return static_data->curves_scale; }
+  virtual void SetCurvesScale (float scale)
+  { static_data->curves_scale = scale; }
+  virtual int GetCurveVertexCount () const
+  { return static_data->GetCurveVertexCount (); }
+  virtual csVector3& GetCurveVertex (int i) const
+  { return static_data->GetCurveVertex (i); }
+  virtual csVector3* GetCurveVertices () const
+  { return static_data->GetCurveVertices (); }
+  virtual csVector2& GetCurveTexel (int i) const
+  { return static_data->GetCurveTexel (i); }
+  /** @} */
+  
+  /** \name iBezierState implementation
+   * @{ */
+  virtual iBezierFactoryState* GetFactory ()
+  { return (iBezierFactoryState*)this; }
+  /** @} */
+
+  /** \name iObjectModel implementation
+   * @{ */
+  void GetObjectBoundingBox (csBox3& box) { GetBoundingBox (box); }
+  void SetObjectBoundingBox (const csBox3& box) { SetBoundingBox (box); }
+  /** @} */
+
+  /** \name iMeshObject interface implementation
+   * @{ */
+  virtual iMeshObjectFactory* GetFactory () const { return (iMeshObjectFactory*)this; }
+  virtual void SetVisibleCallback (iMeshObjectDrawCallback* /*cb*/) { }
+  virtual iMeshObjectDrawCallback* GetVisibleCallback () const
+  { return 0; }
+  virtual void NextFrame (csTicks /*current_time*/,const csVector3& /*pos*/)
+  { }
+  virtual bool SupportsHardTransform () const { return true; }
+  virtual bool HitBeamOutline (const csVector3& /*start*/,
+    const csVector3& /*end*/, csVector3& /*isect*/, float* /*pr*/)
   {
-    SCF_DECLARE_EMBEDDED_IBASE (csBezierMesh);
-    virtual const csVector3& GetCurvesCenter () const
-    { return scfParent->static_data->curves_center; }
-    virtual void SetCurvesCenter (const csVector3& cen)
-    { scfParent->static_data->curves_center = cen; }
-    virtual float GetCurvesScale () const
-    { return scfParent->static_data->curves_scale; }
-    virtual void SetCurvesScale (float scale)
-    { scfParent->static_data->curves_scale = scale; }
-    virtual int GetCurveCount () const
-    { return scfParent->GetCurveCount (); }
-    virtual int GetCurveVertexCount () const
-    { return scfParent->static_data->GetCurveVertexCount (); }
-    virtual csVector3& GetCurveVertex (int i) const
-    { return scfParent->static_data->GetCurveVertex (i); }
-    virtual csVector3* GetCurveVertices () const
-    { return scfParent->static_data->GetCurveVertices (); }
-    virtual csVector2& GetCurveTexel (int i) const
-    { return scfParent->static_data->GetCurveTexel (i); }
-    virtual void SetCurveVertex (int idx, const csVector3& vt)
-    { scfParent->SetCurveVertex (idx, vt); }
-    virtual void SetCurveTexel (int idx, const csVector2& vt)
-    { scfParent->SetCurveTexel (idx, vt); }
-    virtual void ClearCurveVertices ()
-    { scfParent->ClearCurveVertices (); }
-    virtual iCurve* GetCurve (int idx) const;
-    virtual iCurve* CreateCurve ()
-    { return scfParent->CreateCurve (); }
-    virtual int FindCurveIndex (iCurve* curve) const
-    { return scfParent->FindCurveIndex (curve); }
-    virtual void RemoveCurve (int idx)
-    { scfParent->RemoveCurve (idx); }
-    virtual void RemoveCurves ()
-    { scfParent->RemoveCurves (); }
-
-    virtual void MergeTemplate (iBezierFactoryState* tpl,
-  	iMaterialWrapper* default_material = 0,
-	csVector3* shift = 0, csMatrix3* transform = 0)
-    {
-      scfParent->MergeTemplate (tpl, default_material, shift, transform);
-    }
-    virtual void AddCurveVertex (const csVector3& v, const csVector2& uv)
-    {
-      scfParent->AddCurveVertex (v, uv);
-    }
-
-    virtual float GetCosinusFactor () const
-    {
-      return scfParent->GetCosinusFactor ();
-    }
-    virtual void SetCosinusFactor (float cosfact)
-    {
-      scfParent->SetCosinusFactor (cosfact);
-    }
-  } scfiBezierFactoryState;
-  friend struct BezierFactoryState;
-
-  //------------------------- iBezierState interface -------------------------
-  struct BezierState : public iBezierState
+    return false;
+  }
+  virtual bool HitBeamObject (const csVector3& /*start*/,
+    const csVector3& /*end*/, csVector3& /*isect*/, float* /*pr*/,
+    int* /*polygon_idx*/ = 0, iMaterialWrapper** = 0)
   {
-    csBezierMesh* GetPrivateObject () { return scfParent; }
-
-    SCF_DECLARE_EMBEDDED_IBASE (csBezierMesh);
-    virtual iBezierFactoryState* GetFactory ()
-    {
-      return &(scfParent->scfiBezierFactoryState);
-    }
-
-    /// Prepare.
-    virtual void Prepare ()
-    {
-      scfParent->Prepare ();
-    }
-  } scfiBezierState;
-  friend struct BezierState;
-
-  //------------------------- iLightingInfo interface -------------------------
-  /// iLightingInfo implementation.
-  struct LightingInfo : public iLightingInfo
+    return false;
+  }
+  virtual void SetMeshWrapper (iMeshWrapper* lp)
+  { logparent = lp; }
+  virtual iMeshWrapper* GetMeshWrapper () const
+  { return logparent; }
+  virtual iObjectModel* GetObjectModel ()
   {
-    SCF_DECLARE_EMBEDDED_IBASE (csBezierMesh);
-    virtual void InitializeDefault (bool clear)
-    {
-      scfParent->InitializeDefault (clear);
-    }
-    virtual bool ReadFromCache (iCacheManager* cache_mgr)
-    {
-      return scfParent->ReadFromCache (cache_mgr);
-    }
-    virtual bool WriteToCache (iCacheManager* cache_mgr)
-    {
-      return scfParent->WriteToCache (cache_mgr);
-    }
-    virtual void PrepareLighting ()
-    {
-      scfParent->PrepareLighting ();
-    }
-    virtual void LightChanged (iLight* light)
-    { scfParent->LightChanged (light); }
-    virtual void LightDisconnect (iLight* light)
-    { scfParent->LightDisconnect (light); }
-    virtual void DisconnectAllLights ()
-    { scfParent->DisconnectAllLights (); }
-  } scfiLightingInfo;
-  friend struct LightingInfo;
+    return (iObjectModel*)this;
+  }
+  virtual bool SetColor (const csColor&) { return false; }
+  virtual bool GetColor (csColor&) const { return false; }
+  virtual bool SetMaterialWrapper (iMaterialWrapper*) { return false; }
+  virtual iMaterialWrapper* GetMaterialWrapper () const { return 0; }
+  virtual void SetMixMode (uint) { }
+  virtual uint GetMixMode () const { return CS_FX_COPY; }
+  virtual void InvalidateMaterialHandles () { }
+  /**
+    * see imesh/object.h for specification. The default implementation
+    * does nothing.
+    */
+  virtual void PositionChild (iMeshObject* /*child*/, csTicks /*current_time*/) { }
+  /** @} */
 
-  //-------------------- iPolygonMesh interface implementation ---------------
-  struct PolyMesh : public BezierPolyMeshHelper
-  {
-    SCF_DECLARE_IBASE;
-    PolyMesh () : BezierPolyMeshHelper () 
-    { SCF_CONSTRUCT_IBASE (0); }
-    virtual ~PolyMesh ()
-    { SCF_DESTRUCT_IBASE (); }
-  } scfiPolygonMesh;
-
-  //------------------- Lower detail iPolygonMesh implementation ---------------
-  struct PolyMeshLOD : public BezierPolyMeshHelper
-  {
-    PolyMeshLOD ();
-    virtual ~PolyMeshLOD ();
-    // @@@ Not embedded because we can't have two iPolygonMesh implementations
-    // in csBezierMesh.
-    SCF_DECLARE_IBASE;
-  } scfiPolygonMeshLOD;
-
-  //-------------------- iShadowCaster interface implementation ----------
-  struct ShadowCaster : public iShadowCaster
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csBezierMesh);
-    virtual void AppendShadows (iMovable* movable, iShadowBlockList* shadows, const csVector3& origin)
-    {
-      scfParent->AppendShadows (movable, shadows, origin);
-    }
-  } scfiShadowCaster;
-  friend struct ShadowCaster;
-
-  //-------------------- iShadowReceiver interface implementation ----------
-  struct ShadowReceiver : public iShadowReceiver
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csBezierMesh);
-    virtual void CastShadows (iMovable* movable, iFrustumView* fview)
-    {
-      scfParent->CastShadows (fview, movable);
-    }
-  } scfiShadowReceiver;
-  friend struct ShadowReceiver;
-
-  //------------------------- iObjectModel implementation ----------------
-  class ObjectModel : public csObjectModel
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csBezierMesh);
-    virtual void GetObjectBoundingBox (csBox3& bbox)
-    {
-      scfParent->GetBoundingBox (bbox);
-    }
-    virtual void SetObjectBoundingBox (const csBox3& bbox)
-    {
-      scfParent->SetBoundingBox (bbox);
-    }
-    virtual void GetRadius (float& rad, csVector3& cent)
-    {
-      scfParent->GetRadius (rad, cent);
-    }
-    virtual iTerraFormer* GetTerraFormerColldet () { return 0; }
-  } scfiObjectModel;
-  friend class ObjectModel;
-
-  //-------------------- iMeshObject interface implementation ----------
-  struct MeshObject : public iMeshObject
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csBezierMesh);
-    virtual iMeshObjectFactory* GetFactory () const;
-    virtual csFlags& GetFlags () { return scfParent->object_flags; }
-    virtual csPtr<iMeshObject> Clone () { return 0; }
-    virtual csRenderMesh** GetRenderMeshes (int &n, iRenderView* rview, 
-      iMovable* movable, uint32 frustum_mask) 
-    { 
-      return scfParent->GetRenderMeshes (n, rview, movable, frustum_mask);
-    }
-    virtual void SetVisibleCallback (iMeshObjectDrawCallback* /*cb*/) { }
-    virtual iMeshObjectDrawCallback* GetVisibleCallback () const
-    { return 0; }
-    virtual void NextFrame (csTicks /*current_time*/,const csVector3& /*pos*/)
-    { }
-    virtual void HardTransform (const csReversibleTransform& t)
-    {
-      scfParent->HardTransform (t);
-    }
-    virtual bool SupportsHardTransform () const { return true; }
-    virtual bool HitBeamOutline (const csVector3& /*start*/,
-      const csVector3& /*end*/, csVector3& /*isect*/, float* /*pr*/)
-    {
-      return false;
-    }
-    virtual bool HitBeamObject (const csVector3& /*start*/,
-      const csVector3& /*end*/, csVector3& /*isect*/, float* /*pr*/,
-      int* /*polygon_idx*/ = 0, iMaterialWrapper** = 0)
-    {
-      return false;
-    }
-    virtual void SetMeshWrapper (iMeshWrapper* lp)
-    { scfParent->logparent = lp; }
-    virtual iMeshWrapper* GetMeshWrapper () const
-    { return scfParent->logparent; }
-    virtual iObjectModel* GetObjectModel ()
-    {
-      return &(scfParent->scfiObjectModel);
-    }
-    virtual bool SetColor (const csColor&) { return false; }
-    virtual bool GetColor (csColor&) const { return false; }
-    virtual bool SetMaterialWrapper (iMaterialWrapper*) { return false; }
-    virtual iMaterialWrapper* GetMaterialWrapper () const { return 0; }
-    virtual void SetMixMode (uint) { }
-    virtual uint GetMixMode () const { return CS_FX_COPY; }
-    virtual void InvalidateMaterialHandles () { }
-    /**
-     * see imesh/object.h for specification. The default implementation
-     * does nothing.
-     */
-    virtual void PositionChild (iMeshObject* /*child*/, csTicks /*current_time*/) { }
-  } scfiMeshObject;
-  friend struct MeshObject;
-
-  //-------------------- iMeshObjectFactory interface implementation ---------
-  struct MeshObjectFactory : public iMeshObjectFactory
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csBezierMesh);
-    virtual csFlags& GetFlags () { return scfParent->factory_flags; }
-    virtual csPtr<iMeshObject> NewInstance ();
-    virtual csPtr<iMeshObjectFactory> Clone () { return 0; }
-    virtual void HardTransform (const csReversibleTransform& t)
-    {
-      scfParent->HardTransform (t);
-    }
-    virtual bool SupportsHardTransform () const { return true; }
-    virtual void SetMeshFactoryWrapper (iMeshFactoryWrapper* lp)
-    { scfParent->logparent_factory = lp; }
-    virtual iMeshFactoryWrapper* GetMeshFactoryWrapper () const
-    { return scfParent->logparent_factory; }
-    virtual iMeshObjectType* GetMeshObjectType () const
-    { return scfParent->beziermsh_type; }
-    virtual iObjectModel* GetObjectModel () { return 0; }
-  } scfiMeshObjectFactory;
-  friend struct MeshObjectFactory;
+  /** \name iMeshObjectFactory interface implementation
+   * @{ */
+  virtual csPtr<iMeshObject> NewInstance ();
+  virtual iMeshObjectType* GetMeshObjectType () const
+  { return beziermsh_type; }
+  /** @} */
 };
 
 /**
  * Thing type. This is the plugin you have to use to create instances
  * of csBezierMesh.
  */
-class csBezierMeshObjectType : public iMeshObjectType
+class csBezierMeshObjectType : public scfImplementation3<csBezierMeshObjectType,
+                                                         iMeshObjectType,
+                                                         iComponent,
+                                                         iPluginConfig>
 {
 public:
   iObjectRegistry* object_reg;
@@ -865,8 +748,6 @@ public:
   csBezierLightPatchPool* lightpatch_pool;
 
 public:
-  SCF_DECLARE_IBASE;
-
   /// Constructor.
   csBezierMeshObjectType (iBase*);
 
@@ -877,6 +758,7 @@ public:
   virtual bool Initialize (iObjectRegistry *object_reg);
   void Clear ();
 
+  void ReportV (int severity, const char *description, va_list args);
   void Warn (const char *description, ...);
   void Bug (const char *description, ...);
   void Notify (const char *description, ...);
@@ -885,22 +767,12 @@ public:
   /// New Factory.
   virtual csPtr<iMeshObjectFactory> NewFactory ();
 
-  /// iComponent implementation.
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csBezierMeshObjectType);
-    virtual bool Initialize (iObjectRegistry* p)
-    { return scfParent->Initialize(p); }
-  } scfiComponent;
-
-  /// iConfig implementation.
-  struct eiPluginConfig : public iPluginConfig
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csBezierMeshObjectType);
-    virtual bool GetOptionDescription (int idx, csOptionDescription *option);
-    virtual bool SetOption (int id, csVariant* value);
-    virtual bool GetOption (int id, csVariant* value);
-  } scfiPluginConfig;
+  virtual bool GetOptionDescription (int idx, csOptionDescription *option);
+  virtual bool SetOption (int id, csVariant* value);
+  virtual bool GetOption (int id, csVariant* value);
 };
+
+}
+CS_PLUGIN_NAMESPACE_END(Bezier)
 
 #endif // __CS_BEZIERMESH_H__

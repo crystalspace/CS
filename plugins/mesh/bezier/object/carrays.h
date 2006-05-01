@@ -23,8 +23,12 @@
 #include "csutil/parray.h"
 #include "curvebase.h"
 
+CS_PLUGIN_NAMESPACE_BEGIN(Bezier)
+{
 /// A dynamic array of csCurve objects
 typedef csPDelArray<csCurve> csCurvesArray;
+}
+CS_PLUGIN_NAMESPACE_END(Bezier)
 
 #endif // __CS_CARRAYS_H__
 

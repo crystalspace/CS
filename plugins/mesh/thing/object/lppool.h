@@ -23,11 +23,7 @@
 
 struct iLight;
 
-namespace CS
-{
-namespace Plugins
-{
-namespace Thing
+CS_PLUGIN_NAMESPACE_BEGIN(Thing)
 {
 
 class csLightPatchPool;
@@ -163,8 +159,7 @@ public:
   }
 };
 
-} // namespace Thing
-} // namespace Plugins
-} // namespace CS
+}
+CS_PLUGIN_NAMESPACE_END(Thing)
 
 #endif // __CS_LPPOOL_H__

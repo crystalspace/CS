@@ -42,11 +42,7 @@ struct iMaterialWrapper;
 class csFrustumView;
 class csFrustumContext;
 
-namespace CS
-{
-namespace Plugins
-{
-namespace Thing
+CS_PLUGIN_NAMESPACE_BEGIN(Thing)
 {
 
 class csPolyTxtPlane;
@@ -707,8 +703,7 @@ public:
 	csPolygon3DStatic* spoly);
 };
 
-} // namespace Thing
-} // namespace Plugins
-} // namespace CS
+}
+CS_PLUGIN_NAMESPACE_END(Thing)
 
 #endif // __CS_POLYGON_H__

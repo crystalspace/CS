@@ -20,11 +20,7 @@
 #ifndef __CS_SOFT3D_SCAN_BLEND_H__
 #define __CS_SOFT3D_SCAN_BLEND_H__
 
-namespace CS
-{
-namespace Plugins
-{
-namespace Soft3D
+CS_PLUGIN_NAMESPACE_BEGIN(Soft3D)
 {
 
   enum
@@ -103,9 +99,7 @@ namespace Soft3D
     }
   };
 
-} // namespace Soft3D
-} // namespace Plugins
-} // namespace CS
-
+}
+CS_PLUGIN_NAMESPACE_END(Soft3D)
 
 #endif // __CS_SOFT3D_SCAN_BLEND_H__

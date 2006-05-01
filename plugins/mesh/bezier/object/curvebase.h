@@ -32,13 +32,6 @@
 #include "bezier2.h"
 #include "clightmap.h"
 
-
-class csBezierMesh;
-class csBezierMeshObjectType;
-class csCurveTemplate;
-class csBezierLightPatch;
-
-struct csCoverageMatrix;
 struct csTriangle;
 
 struct iCacheManager;
@@ -46,6 +39,16 @@ struct iCamera;
 struct iFrustumView;
 struct iMaterialHandle;
 struct iMaterialWrapper;
+
+CS_PLUGIN_NAMESPACE_BEGIN(Bezier)
+{
+
+class csBezierMesh;
+class csBezierMeshObjectType;
+class csCurveTemplate;
+class csBezierLightPatch;
+
+struct csCoverageMatrix;
 
 /**
  * Tesselated curve. This is basically a list of triangles.
@@ -110,7 +113,9 @@ public:
 /**
  * This is an abstract class for all curves in Crystal Space.
  */
-class csCurve : public csObject
+class csCurve : public scfImplementationExt1<csCurve,
+					     csObject,
+					     iCurve>
 {
 private:
   csBezierMeshObjectType* thing_type;
@@ -278,37 +283,15 @@ public:
   /// Set a vertex of the template.
   virtual void SetVertex (int index, int ver_ind) = 0;
   /// Return a vertex of the template.
-  virtual int GetVertex (int index)  = 0;
+  virtual int GetVertex (int index) const = 0;
   /// Return the number of vertices in the template.
-  virtual int GetVertexCount () = 0;
+  virtual int GetVertexCount () const = 0;
 
-  SCF_DECLARE_IBASE_EXT (csObject);
-
-  //----------------------- iCurve interface implementation -----------------
-  /// iCurve implementation.
-  struct Curve : public iCurve
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csCurve);
-
-    virtual csCurve* GetOriginalObject ()
-    { return scfParent; }
-    virtual iObject *QueryObject()
-    { return scfParent; }
-    virtual void SetMaterial (iMaterialWrapper* mat)
-    { scfParent->SetMaterial (mat); }
-    virtual iMaterialWrapper* GetMaterial ()
-    { return scfParent->GetMaterial (); }
-    virtual void SetControlPoint (int idx, int control_id)
-    { scfParent->SetControlPoint (idx, control_id); }
-
-    virtual int GetVertexCount () const
-    { return scfParent->GetVertexCount (); }
-    virtual int GetVertex (int idx) const
-    { return scfParent->GetVertex (idx); }
-    virtual void SetVertex (int idx, int vt)
-    { scfParent->SetVertex (idx, vt); }
-  } scfiCurve;
-  friend struct Curve;
+  /** \name iCurve implementation.
+   * @{ */
+  virtual iObject *QueryObject()
+  { return (iObject*)this; }
+  /** @} */
 };
 
 
@@ -371,8 +354,8 @@ public:
   /// Tesselate this curve.
   virtual void SetVertex (int index, int ver_ind);
   ///
-  virtual int GetVertex (int index);
-  virtual int GetVertexCount ();
+  virtual int GetVertex (int index) const;
+  virtual int GetVertexCount () const;
 };
 
 /*
@@ -408,6 +391,9 @@ inline csBezierMesh* csCurve::GetParentThing () const
 { return ParentThing; }
 inline const csReversibleTransform *csCurve::GetObject2World () const
 { return O2W; }
+
+}
+CS_PLUGIN_NAMESPACE_END(Bezier)
 
 #endif // __CS_CURVE_H__
 

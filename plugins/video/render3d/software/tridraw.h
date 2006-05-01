@@ -23,12 +23,9 @@
 #include "csgeom/polyclip.h"
 #include "sft3dcom.h"
 
-namespace CS
+CS_PLUGIN_NAMESPACE_BEGIN(Soft3D)
 {
-namespace Plugins
-{
-namespace Soft3D
-{
+
   using namespace CS::PluginCommon::SoftShader;
 
   class TriangleDrawerCommon : public iTriangleDrawer
@@ -690,8 +687,7 @@ namespace Soft3D
       }
     }
   };
-} // namespace Soft3D
-} // namespace Plugins
-} // namespace CS
+}
+CS_PLUGIN_NAMESPACE_END(Soft3D)
 
 #endif // __CS_SOFT3D_TRIDRAW_H__

@@ -22,11 +22,15 @@
 #include "csutil/blockallocator.h"
 #include "csgeom/frustum.h"
 
-class csBezierLightPatchPool;
-class csCurve;
 class csFrustum;
 struct iLight;
 struct iShadowBlock;
+
+CS_PLUGIN_NAMESPACE_BEGIN(Bezier)
+{
+
+class csBezierLightPatchPool;
+class csCurve;
 
 /**
  * A light patch. This is a 3D polygon which fits on a world level 3D
@@ -165,5 +169,8 @@ public:
     csBlockAllocator<csBezierLightPatch>::Free (o);
   }
 };
+
+}
+CS_PLUGIN_NAMESPACE_END(Bezier)
 
 #endif // __CS_LIGHTPOOL_H__
