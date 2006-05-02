@@ -16,6 +16,8 @@ chronological order.
 	  SetColor, and SetMixMode from iGeneralMeshState.
 	- Jorrit fixed instmesh and lightning mesh for the removal of
 	  SetMeshWrapper, SetColor, and SetMixMode from iGeneralMeshState.
+	- Jorrit fixed a stray SCF_DECLARE_IBASE in genmesh. Still not
+	  working though.
 1-May-2006
         - Arianna fixed some warning for MSVC 7.1 and some deprecated 
           function.
