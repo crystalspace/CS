@@ -1359,6 +1359,11 @@ csRef<iString> csGenmeshMeshObject::GetRenderBufferName (int index) const
   return name;
 }
 
+iMeshObjectFactory* csGenmeshMeshObject::GetFactory () const
+{
+  return (iMeshObjectFactory*)factory;
+}
+
 //----------------------------------------------------------------------
 
 csGenmeshMeshObjectFactory::csGenmeshMeshObjectFactory (

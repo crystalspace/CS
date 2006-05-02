@@ -22,6 +22,8 @@ chronological order.
 	  lost.
 	- res fixed a gcc 4.1 compile fix to also work on Win32 with shared 
 	  libs.
+	- Jorrit fixed a cast error in genmesh which caused everything
+	  to crash.
 1-May-2006
         - Arianna fixed some warning for MSVC 7.1 and some deprecated 
           function.
