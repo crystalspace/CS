@@ -2599,9 +2599,9 @@ void csBugPlug::DebugSectorBox (const csBox3& box, float r, float g, float b,
   	iGeneralMeshState));
   CS_ASSERT (gms != 0);
   gms->SetLighting (false);
-  gms->SetColor (csColor (0, 0, 0));
   gms->SetManualColors (true);
-  gms->SetMixMode (mixmode);
+  mw->GetMeshObject ()->SetColor (csColor (0, 0, 0));
+  mw->GetMeshObject ()->SetMixMode (mixmode);
 
   if (mixmode == CS_FX_COPY)
   {
@@ -2661,9 +2661,9 @@ void csBugPlug::DebugSectorTriangle (const csVector3& s1, const csVector3& s2,
   	iGeneralMeshState));
   CS_ASSERT (gms != 0);
   gms->SetLighting (false);
-  gms->SetColor (csColor (0, 0, 0));
   gms->SetManualColors (true);
-  gms->SetMixMode (mixmode);
+  mw->GetMeshObject ()->SetColor (csColor (0, 0, 0));
+  mw->GetMeshObject ()->SetMixMode (mixmode);
 
   if (mixmode == CS_FX_COPY)
   {
@@ -2728,9 +2728,9 @@ void csBugPlug::DebugSectorMesh (
   	iGeneralMeshState));
   CS_ASSERT (gms != 0);
   gms->SetLighting (false);
-  gms->SetColor (csColor (0, 0, 0));
   gms->SetManualColors (true);
-  gms->SetMixMode (mixmode);
+  mw->GetMeshObject ()->SetColor (csColor (0, 0, 0));
+  mw->GetMeshObject ()->SetMixMode (mixmode);
 
   if (mixmode == CS_FX_COPY)
   {

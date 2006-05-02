@@ -12,6 +12,8 @@ chronological order.
 	  Reported by Jonathan Tarbox.
 	- Jorrit fixed genmesh loader for the removal of SetMeshWrapper,
 	  SetColor, and SetMixMode from iGeneralMeshState.
+	- Jorrit fixed bugplug for the removal of SetMeshWrapper,
+	  SetColor, and SetMixMode from iGeneralMeshState.
 1-May-2006
         - Arianna fixed some warning for MSVC 7.1 and some deprecated 
           function.
