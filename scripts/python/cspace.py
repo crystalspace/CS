@@ -5698,14 +5698,8 @@ class iGeneralMeshCommonState(iBase):
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
         return "<%s.%s; proxy of C++ iGeneralMeshCommonState instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
-    def SetMaterialWrapper(*args): return _cspace.iGeneralMeshCommonState_SetMaterialWrapper(*args)
-    def GetMaterialWrapper(*args): return _cspace.iGeneralMeshCommonState_GetMaterialWrapper(*args)
-    def SetMixMode(*args): return _cspace.iGeneralMeshCommonState_SetMixMode(*args)
-    def GetMixMode(*args): return _cspace.iGeneralMeshCommonState_GetMixMode(*args)
     def SetLighting(*args): return _cspace.iGeneralMeshCommonState_SetLighting(*args)
     def IsLighting(*args): return _cspace.iGeneralMeshCommonState_IsLighting(*args)
-    def SetColor(*args): return _cspace.iGeneralMeshCommonState_SetColor(*args)
-    def GetColor(*args): return _cspace.iGeneralMeshCommonState_GetColor(*args)
     def SetManualColors(*args): return _cspace.iGeneralMeshCommonState_SetManualColors(*args)
     def IsManualColors(*args): return _cspace.iGeneralMeshCommonState_IsManualColors(*args)
     def SetShadowCasting(*args): return _cspace.iGeneralMeshCommonState_SetShadowCasting(*args)
@@ -5771,6 +5765,12 @@ class iGeneralFactoryState(iGeneralMeshCommonState):
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
         return "<%s.%s; proxy of C++ iGeneralFactoryState instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
+    def SetMaterialWrapper(*args): return _cspace.iGeneralFactoryState_SetMaterialWrapper(*args)
+    def GetMaterialWrapper(*args): return _cspace.iGeneralFactoryState_GetMaterialWrapper(*args)
+    def SetMixMode(*args): return _cspace.iGeneralFactoryState_SetMixMode(*args)
+    def GetMixMode(*args): return _cspace.iGeneralFactoryState_GetMixMode(*args)
+    def SetColor(*args): return _cspace.iGeneralFactoryState_SetColor(*args)
+    def GetColor(*args): return _cspace.iGeneralFactoryState_GetColor(*args)
     def AddVertex(*args): return _cspace.iGeneralFactoryState_AddVertex(*args)
     def SetVertexCount(*args): return _cspace.iGeneralFactoryState_SetVertexCount(*args)
     def GetVertexCount(*args): return _cspace.iGeneralFactoryState_GetVertexCount(*args)
@@ -6857,8 +6857,6 @@ class iTerrainObjectState(iBase):
         return "<%s.%s; proxy of C++ iTerrainObjectState instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
     def SetMaterialPalette(*args): return _cspace.iTerrainObjectState_SetMaterialPalette(*args)
     def GetMaterialPalette(*args): return _cspace.iTerrainObjectState_GetMaterialPalette(*args)
-    def SetMaterialMap(*args): return _cspace.iTerrainObjectState_SetMaterialMap(*args)
-    def SetMaterialAlphaMaps(*args): return _cspace.iTerrainObjectState_SetMaterialAlphaMaps(*args)
     def SetLODValue(*args): return _cspace.iTerrainObjectState_SetLODValue(*args)
     def GetLODValue(*args): return _cspace.iTerrainObjectState_GetLODValue(*args)
     def SaveState(*args): return _cspace.iTerrainObjectState_SaveState(*args)
@@ -13482,7 +13480,7 @@ def CS_REQUEST_REPORTERLISTENER ():
     iStandardReporterListener)
 
 def CS_REQUEST_CONSOLEOUT ():
-  return CS_REQUEST_PLUGIN("crystalspace.console.output.simple",
+  return CS_REQUEST_PLUGIN("crystalspace.console.output.standard",
     iConsoleOutput)
 
 
