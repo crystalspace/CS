@@ -449,9 +449,9 @@ void csPoolEvent::DecRef()
     next = pool->EventPool;
     pool->EventPool = this;
     RemoveAll();
-    Name = 0;
-    Time = 0;
-    Broadcast = 0;
+    Name = csInvalidStringID;
+    Time = ~0;
+    Broadcast = false;
   }
   else
   {

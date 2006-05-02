@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+2-May-2006
+	- Eric Sunshine fixed csPoolEvent::DecRef() to set up recycled data
+	  members the same way as they are set up by csPoolEvent constructor.
+	  Reported by Jonathan Tarbox.
 1-May-2006
         - Arianna fixed some warning for MSVC 7.1 and some deprecated 
           function.
@@ -277,7 +281,7 @@ chronological order.
 	- caedes fixed an error at std_lighting.cscg where state.point.size
 	  was incorrectly assigned to a variable.
 	- Piotr Obrzut added quad to cs primitives and instmesh.
-	- Piotr Obrzut added feature to add positions from map in meshgenerator 
+	- Piotr Obrzut added feature to add positions from map in meshgenerator
 	  (still there are some problems with resolution probably).
 13-Apr-2006
 	- Piotr Obrzut added method for direct adding position for meshgen 
