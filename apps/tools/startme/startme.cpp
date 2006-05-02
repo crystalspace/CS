@@ -70,7 +70,7 @@ void StartMe::ProcessFrame ()
     si.star->GetMovable ()->GetTransform ().SetOrigin (star_v);
     si.star->GetMovable ()->UpdateMove ();
     si.r = 0;
-    si.stars_state->SetColor (csColor (0, 0, 0));
+    si.stars_mesh->SetColor (csColor (0, 0, 0));
     si.star->GetFlags ().Reset (CS_ENTITY_INVISIBLE);
     si.inqueue = true;
     star_queue.Push (int (cur_star));
@@ -103,7 +103,7 @@ void StartMe::ProcessFrame ()
       {
         f = 1.0f - (si.r - star_fade2) / (1.0f - star_fade2);
       }
-      si.stars_state->SetColor (csColor (f+.2, f, f));
+      si.stars_mesh->SetColor (csColor (f+.2, f, f));
     }
   }
 
@@ -448,8 +448,7 @@ void StartMe::CreateRoom ()
     stars[i].star->GetFlags ().Set (CS_ENTITY_INVISIBLE);
     stars[i].star->SetRenderPriority (engine->GetObjectRenderPriority ());
     stars[i].star->SetZBufMode (CS_ZBUF_NONE);
-    stars[i].stars_state = SCF_QUERY_INTERFACE (stars[i].star->GetMeshObject (),
-    	iGeneralMeshState);
+    stars[i].stars_mesh = stars[i].star->GetMeshObject ();
   }
   cur_star = 0;
   star_ticks = 0;

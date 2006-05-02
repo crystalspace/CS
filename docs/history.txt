@@ -28,6 +28,8 @@ chronological order.
 	  of the function-based notification mechanism.
 	- res consolidated the various 1.0 API modifications somewhat to have
 	  less "Table of Contents spam".
+	- res fixed csbench, mazing and startme for the removal of some 
+	  methods from iGeneralMeshState.
 1-May-2006
         - Arianna fixed some warning for MSVC 7.1 and some deprecated 
           function.

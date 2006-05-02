@@ -48,7 +48,7 @@ struct DemoData
 struct StarInfo
 {
   csRef<iMeshWrapper> star;
-  csRef<iGeneralMeshState> stars_state;
+  csRef<iMeshObject> stars_mesh;
   float r;	// Value between 0 and 1 indicating animation state.
   bool inqueue;	// True if in queue.
 

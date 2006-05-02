@@ -488,9 +488,8 @@ void Laser::Handle (csTicks ticks)
   {
     int flick = (lasertime / LASER_FLICKTIME) & 1;
     Check ();
-    csRef<iGeneralMeshState> state = scfQueryInterface<iGeneralMeshState> (
-    	laserbeam->GetMeshObject ());
-    state->SetColor (flick ? csColor (2.0, 2.0, 2.0) : csColor (.5, .5, .5));
+    laserbeam->GetMeshObject ()->SetColor (
+      flick ? csColor (2.0, 2.0, 2.0) : csColor (.5, .5, .5));
   }
 }
 

@@ -58,7 +58,7 @@ private:
   csRef<iDocumentSystem> docsys;
   csRef<iCommandLineParser> cmdline;
   csRef<iView> view;
-  csRef<iGeneralMeshState> gmSingle;
+  csRef<iMeshObject> meshObject;
   csRef<iStringSet> strings;
   iSector* room_single;
   iSector* room_multi;
@@ -79,7 +79,7 @@ private:
   iShaderManager* GetShaderManager ();
   void PerformShaderTest (const char* shaderPath, const char* shtype, 
     const char* shaderPath2, const char* shtype2, 
-    iGeneralMeshState* genmesh);
+    iMeshObject* mesh);
 
 public:
   CsBench ();

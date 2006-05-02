@@ -211,11 +211,9 @@ bool CsBench::CreateTestCaseSingleBigObject ()
   // Now create an instance:
   csRef<iMeshWrapper> mesh =
     engine->CreateMeshWrapper (fact, "complex", room2, csVector3 (0, 0, 10.0));
-  csRef<iGeneralMeshState> genmesh = 
-    SCF_QUERY_INTERFACE (mesh->GetMeshObject (), iGeneralMeshState);
-  genmesh->SetMaterialWrapper (material);
-  
-  gmSingle = genmesh;
+
+  meshObject = mesh->GetMeshObject ();
+  meshObject->SetMaterialWrapper (material);
 
   csRef<iLight> l;
   iLightList* ll = room2->GetLights ();
@@ -257,9 +255,7 @@ bool CsBench::CreateTestCaseMultipleObjects ()
   {
     csRef<iMeshWrapper> mesh =
       engine->CreateMeshWrapper (fact, "small", room2, p);
-    csRef<iGeneralMeshState> genmesh = 
-      SCF_QUERY_INTERFACE (mesh->GetMeshObject (), iGeneralMeshState);
-    genmesh->SetMaterialWrapper (material);
+    mesh->GetMeshObject()->SetMaterialWrapper (material);
     p.x += step;
     p.y += step;
     p.z += zstep;
@@ -451,7 +447,7 @@ iDocumentSystem* CsBench::GetDocumentSystem ()
 
 void CsBench::PerformShaderTest (const char* shaderPath, const char* shtype, 
 				 const char* shaderPath2, const char* shtype2,
-				 iGeneralMeshState* genmesh)
+				 iMeshObject* mesh)
 {
   csRef<iShaderCompiler> shcom = GetShaderManager ()->GetCompiler ("XMLShader");
   csRef<iDocument> shaderDoc = GetDocumentSystem ()->CreateDocument ();
@@ -500,7 +496,7 @@ void CsBench::PerformShaderTest (const char* shaderPath, const char* shtype,
 	matinput->SetShader (shadertype2, shader2);
       iMaterialWrapper* mat = engine->GetMaterialList ()->NewMaterial (
       	matinput, 0);
-      genmesh->SetMaterialWrapper (mat);
+      mesh->SetMaterialWrapper (mat);
       ws->ReplaceMaterial (oldmat, mat);
 
       csString name;
@@ -553,14 +549,14 @@ void CsBench::PerformTests ()
 
   view->GetCamera ()->SetSector (room_single);
   vfs->PushDir("/shader");
-  PerformShaderTest ("/shader/std_lighting.xml", "standard", 0, 0, gmSingle);
+  PerformShaderTest ("/shader/std_lighting.xml", "standard", 0, 0, meshObject);
 
   iRenderLoopManager* rlmgr = engine->GetRenderLoopManager ();
   csRef<iRenderLoop> loop = rlmgr->Load ("/shader/std_rloop_diffuse.xml");
   engine->SetCurrentDefaultRenderloop (loop);
 
   PerformShaderTest ("/shader/light_bumpmap.xml", "diffuse", 
-    "/shader/ambient.xml", "ambient", gmSingle);
+    "/shader/ambient.xml", "ambient", meshObject);
   vfs->PopDir ();
 }
 
