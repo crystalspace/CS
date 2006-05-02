@@ -82,11 +82,11 @@ csLightningMeshObject::csLightningMeshObject (csLightningMeshObjectFactory* fact
   if (GenMesh)
   {
     GenState = SCF_QUERY_INTERFACE (GenMesh, iGeneralMeshState);
-    GenState->SetMaterialWrapper (material);
     GenState->SetLighting (false);
-    GenState->SetColor (csColor (1.f, 1.f, 1.f));
     GenState->SetManualColors (true);
-    GenState->SetMixMode (MixMode);    
+    GenMesh->SetMaterialWrapper (material);
+    GenMesh->SetColor (csColor (1.f, 1.f, 1.f));
+    GenMesh->SetMixMode (MixMode);    
   }
 }
 

@@ -639,7 +639,7 @@ csPtr<iBase> csInstMeshLoader::Parse (iDocumentNode* node,
 	  csColor col;
 	  if (!synldr->ParseColor (child, col))
 	    return 0;
-	  meshstate->SetColor (col);
+	  mesh->SetColor (col);
 	}
 	break;
       case XMLTOKEN_FACTORY:
@@ -687,7 +687,7 @@ csPtr<iBase> csInstMeshLoader::Parse (iDocumentNode* node,
 		child, "Couldn't find material '%s'!", matname);
             return 0;
 	  }
-	  meshstate->SetMaterialWrapper (mat);
+	  mesh->SetMaterialWrapper (mat);
 	}
 	break;
       case XMLTOKEN_MIXMODE:
@@ -695,7 +695,7 @@ csPtr<iBase> csInstMeshLoader::Parse (iDocumentNode* node,
 	  uint mm;
 	  if (!synldr->ParseMixmode (child, mm))
 	    return 0;
-          meshstate->SetMixMode (mm);
+          mesh->SetMixMode (mm);
 	}
 	break;
       default:
@@ -773,7 +773,8 @@ bool csInstMeshSaver::WriteDown (iBase* obj, iDocumentNode* parent,
         ->SetValue("localshadows");
 
     //Writedown Color tag
-    csColor col = gmesh->GetColor();
+    csColor col;
+    mesh->GetColor(col);
     csRef<iDocumentNode> colorNode = 
       paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
     colorNode->SetValue("color");
@@ -784,7 +785,7 @@ bool csInstMeshSaver::WriteDown (iBase* obj, iDocumentNode* parent,
                       gmesh->IsManualColors(), true);
 
     //Writedown Material tag
-    iMaterialWrapper* mat = gmesh->GetMaterialWrapper();
+    iMaterialWrapper* mat = mesh->GetMaterialWrapper();
     if (mat)
     {
       const char* matname = mat->QueryObject()->GetName();
@@ -800,7 +801,7 @@ bool csInstMeshSaver::WriteDown (iBase* obj, iDocumentNode* parent,
     }    
 
     //Writedown Mixmode tag
-    int mixmode = gmesh->GetMixMode();
+    int mixmode = mesh->GetMixMode();
     csRef<iDocumentNode> mixmodeNode = 
       paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
     mixmodeNode->SetValue("mixmode");
