@@ -1940,6 +1940,8 @@ csMeshedPolygon* csGenmeshMeshObjectFactory::GetPolygons ()
 
 //----------------------------------------------------------------------
 
+SCF_IMPLEMENT_FACTORY (csGenmeshMeshObjectType)
+
 csGenmeshMeshObjectType::csGenmeshMeshObjectType (iBase* pParent) :
   scfImplementationType (this, pParent), do_verbose (false)
 {

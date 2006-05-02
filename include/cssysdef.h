@@ -39,18 +39,17 @@
 #include "csutil/csosdefs.h"
 
 // Defaults for platforms that do not define their own.
+#ifndef CS_VISIBILITY_DEFAULT
+#  define CS_VISIBILITY_DEFAULT
+#endif
 #ifndef CS_EXPORT_SYM_DLL
-#  ifdef CS_VISIBILITY_DEFAULT
-#    define CS_EXPORT_SYM_DLL CS_VISIBILITY_DEFAULT
-#  else
-#    define CS_EXPORT_SYM_DLL
-#  endif
+#  define CS_EXPORT_SYM_DLL CS_VISIBILITY_DEFAULT
 #endif
 #ifndef CS_IMPORT_SYM_DLL
 #  define CS_IMPORT_SYM_DLL extern
 #endif
 #ifndef CS_EXPORT_SYM
-#  if defined(CS_VISIBILITY_DEFAULT) && defined(CS_BUILD_SHARED_LIBS)
+#  if defined(CS_BUILD_SHARED_LIBS)
 #    define CS_EXPORT_SYM CS_VISIBILITY_DEFAULT
 #  else
 #    define CS_EXPORT_SYM

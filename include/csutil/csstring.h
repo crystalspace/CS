@@ -368,7 +368,7 @@ public:
    * \remarks See the class description for a discussion about how and when the
    *   string will represent a null-pointer.
    */
-  CS_CRYSTALSPACE_EXPORT // <- @@@ FIXME: needed for gcc 4.1.0
+  CS_VISIBILITY_DEFAULT // <- @@@ FIXME: needed for gcc 4.1.0
   virtual char const* GetData () const
   { return Data; }
 
