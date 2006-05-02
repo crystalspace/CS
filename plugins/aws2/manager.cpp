@@ -379,7 +379,7 @@ bool awsManager2::Load (const scfString &_filename)
 ***************** Scripting *****************************************
 ********************************************************************/
 
-iAws2ScriptObject *awsManager2::CreateScriptObject (const char *name, Aws2ScriptObjectFunc *_func)
+iAws2ScriptObject *awsManager2::CreateScriptObject (const char *name, iAws2ScriptEvent *_func)
 {
   iAws2ScriptObject *so =  new scriptObject (name);	
   

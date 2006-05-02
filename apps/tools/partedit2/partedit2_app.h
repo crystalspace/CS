@@ -53,6 +53,9 @@ class PartEdit2 : public csApplicationFramework, public csBaseEventHandler
 
   /// Current orientation of the camera.
   float rotX, rotY;
+  
+  /** Handles initialization of script events. */
+  void initializeScriptEvents();
 
  public:
   bool SetupModules ();
@@ -101,6 +104,7 @@ class PartEdit2 : public csApplicationFramework, public csBaseEventHandler
    * that the error message has been reported to the user.
    */
   bool OnInitialize (int argc, char* argv[]);
+   
 
   /**
    * Run the application.

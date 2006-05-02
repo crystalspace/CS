@@ -37,13 +37,32 @@
 struct iObjectRegistry;
 struct iAws2ScriptObject;
 
-typedef void Aws2ScriptObjectFunc(iAws2ScriptObject *);
+//typedef void Aws2ScriptObjectFunc(iAws2ScriptObject *);
+
+SCF_VERSION(iAws2ScriptEvent, 2, 0, 0);
+struct iAws2ScriptEvent
+{
+	/** The notification function for this object. */
+	virtual void operator()(iAws2ScriptObject *)=0;
+};
+
+/** Convenience macro for AWS2 event object. */
+#define BEGIN_AWS2_EVENT(name) \
+	struct name : public iAws2ScriptEvent \
+	{\
+		virtual void operator() (iAws2ScriptObject *info) \
+		
+			
+/** Ends the AWS2 event convenience macro. */
+#define END_AWS2_EVENT \
+	};
+			
 	
 SCF_VERSION(iAws2ScriptObject, 2, 0, 0);
 struct iAws2ScriptObject
 {			
-	/** Sets the notification function. */
-	virtual void SetNotification(Aws2ScriptObjectFunc *_func)=0;
+	/** Sets the notification object. */
+	virtual void SetNotification(iAws2ScriptEvent *_event)=0;
 	
 	/** Returns the number of arguments in the notification. */
 	virtual uint32 NumArgs()=0;
@@ -96,7 +115,7 @@ struct iAws2  : public iBase
   virtual void Redraw()=0;
   
   /// Creates a new script object with the given name. notification_func may be null, otherwise it should be the function to call.
-  virtual iAws2ScriptObject *CreateScriptObject(const char *name, Aws2ScriptObjectFunc *notification_func=0)=0;
+  virtual iAws2ScriptObject *CreateScriptObject(const char *name, iAws2ScriptEvent *notification_func=0)=0;
   
   /// Cached event names.  These should be set up in the ::Initialize method.
   csEventID PreProcess;

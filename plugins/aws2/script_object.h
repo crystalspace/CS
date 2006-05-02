@@ -22,7 +22,7 @@ class scriptObject : public iAws2ScriptObject
   JSFunction *js_fun;
 
   /// The native callback function for this object.
-  Aws2ScriptObjectFunc *func;       
+  iAws2ScriptEvent *func;       
 
   /** 
    * The activation record keeps track of all the important stuff that happens 
@@ -46,7 +46,7 @@ public:
   virtual ~scriptObject ();
 
   /// Sets the notification function.
-  virtual void SetNotification (Aws2ScriptObjectFunc *_func) { func=_func; }
+  virtual void SetNotification (iAws2ScriptEvent *_func) { func=_func; }
 
   /// Returns the number of arguments sent.
   virtual uint32 NumArgs () { return ar.argc; }
@@ -90,7 +90,7 @@ public:
     ar.argc = argc;
     ar.argv = argv;
 
-    func (this);
+    (*func) (this);
 
     // Return the value.
     *rval = ar.rval;

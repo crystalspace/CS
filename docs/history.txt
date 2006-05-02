@@ -24,6 +24,8 @@ chronological order.
 	  libs.
 	- Jorrit fixed a cast error in genmesh which caused everything
 	  to crash.
+	- Christopher changed the script event system to use a functor instead
+	  of the function-based notification mechanism.
 1-May-2006
         - Arianna fixed some warning for MSVC 7.1 and some deprecated 
           function.

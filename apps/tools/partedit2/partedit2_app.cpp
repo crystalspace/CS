@@ -260,7 +260,7 @@ bool PartEdit2::SetupModules ()
   aws->SetDrawTarget(g2d, g3d);
   
   // Initialize the scripting events.
- initializeScriptEvents(aws);
+ initializeScriptEvents();
 
  // Load a definition file
  if (aws->Load("/partedit2/skin.js")==false)
