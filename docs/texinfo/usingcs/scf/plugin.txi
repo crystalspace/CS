@@ -41,15 +41,14 @@ Here is the @sc{api} definition for our sample plugin:
 
 class csVector3;
 
-SCF_VERSION (iMyApi, 0, 0, 1);
-
 /**
  * This is the API for our plugin. It is recommended
  * that you use better comments than this one in a
  * real situation.
  */
-struct iMyApi : public iBase
+struct iMyApi : public virtual iBase
 @{
+SCF_INTERFACE (iMyApi, 1, 0, 0);
 /// Do something.
 virtual void DoSomething (int param, const csVector3&) = 0;
 /// Get something.
@@ -64,7 +63,7 @@ The above text should be put in a header file. Let's put it in
 
 First we include @file{csutil/scf.h}. This is a Crystal Space header
 for @sc{scf} which we need to get the definition of @samp{iBase} and the
-definition of the @code{SCF_VERSION()} macro.
+definition of the @code{SCF_INTERFACE()} macro.
 
 Then we declare @samp{csVector3} as a class. We do this so that we
 can later use @samp{csVector3} as a parameter in one of the @sc{api} methods.
@@ -72,8 +71,8 @@ We do not need the complete definition of @samp{csVector3} since we
 are going to define the method so that it passes the vector by
 reference.
 
-After this we use the @code{SCF_VERSION()} macro to define the version
-of this interface. This versioning can be used to query for
+In the interface declaration we use the @code{SCF_INTERFACE()} macro to
+define the version of this interface. This versioning can be used to query for
 specific versions of an interface. This can be useful later when you
 want to extend the @sc{api} without breaking existing apps. The version
 has three parts: major, minor, and micro.
@@ -82,7 +81,8 @@ Finally we define the @sc{api} by making a structure that inherits from
 @samp{iBase}.  We use @samp{struct} instead of @samp{class} simply because, for
 structures, the default visibility is @samp{public} instead of @samp{private}
 as for classes.  This is just a convenience.  There is no other difference
-between a @samp{struct} or a @samp{class} in C++.
+between a @samp{struct} or a @samp{class} in C++. Note that you have to use
+virtual inheritance for @sc{scf} to work properly.
 
 The name @samp{iMyApi} is not random.  Crystal Space uses this naming
 convention (starting a name with @samp{i}) for @sc{scf} interfaces so that it
@@ -136,28 +136,22 @@ struct iObjectRegistry;
 * This is the implementation for our API and
 * also the implementation of the plugin.
 */
-class MyPlugin : public iMyApi
+class MyPlugin : public scfImplementation2<MyPlugin,iMyApi,iComponent>
 @{
 private:
   iObjectRegistry* object_reg;
   csVector3 store_v;
 
 public:
-  SCF_DECLARE_IBASE;
-
   MyPlugin (iBase* parent);
   virtual ~MyPlugin ();
-  bool Initialize (iObjectRegistry*);
 
+  // From iComponent.
+  virtual bool Initialize (iObjectRegistry*);
+
+  // From iMyApi.
   virtual void DoSomething (int param, const csVector3&);
   virtual int GetSomething () const;
-
-  struct Component : public iComponent
-  @{
-    SCF_DECLARE_EMBEDDED_IBASE (MyPlugin);
-    virtual bool Initialize (iObjectRegistry* r)
-      @{ return scfParent->Initialize (r); @}
-  @} scfiComponent;
 @};
 
 #endif // __GAME_MYPLUG_H__
@@ -174,46 +168,18 @@ the global object registry.
 
 But, our plugin also needs to implement its own native @samp{iMyApi} interface.
 So here is a situation where the same class needs to implement two interfaces
-at the same time.  There are basically two ways to do this: multiple
-inheritance, or via use of an embedded @sc{scf} class.  We use the second
-technique here since it tends to be more portable and works better with older
-compilers which may have trouble supporting multiple inheritance.
+at the same time. By using the @samp{scfImplementation2} templated class
+we can easily declare the class @samp{MyPlugin} to implement both
+@samp{iComponent} and @samp{iMyApi}.
 
-In the example above the class @samp{MyPlugin} inherits from
-@samp{iMyApi}. The methods from @samp{iMyApi} are implemented directly in
-@samp{MyPlugin}. To do that, the method declarations from @samp{iMyApi} are
-copied to @samp{MyPlugin} except that the @samp{= 0} is removed. To indicate
-that this class represents an implementation of an @sc{scf} interface,
-we additionally need the @code{SCF_DECLARE_IBASE()} macro. This macro
-will take care of declaring the @code{DecRef()} and @code{IncRef()} functions
-which handle reference counting. In addition the macro also
-declares @code{QueryInterface()} so that it is possible to request
-other interfaces (like @samp{iComponent)} from this class. You don't need
-to worry much about this.
+In the declaration of @samp{MyPlugin} we then have to implement all
+functions from both @samp{iComponent} and @samp{iMyApi}. To do that
+the method declarations from both interfaces are repeated here but the
+@samp{= 0} is removed. This means that we'll actually give a concrete
+implementation here.
 
 Note that @samp{MyPlugin} needs a constructor that accepts an @samp{iBase*}
 parameter. Otherwise @sc{scf} will not be able to intantiate this class.
-
-To implement @samp{iComponent} we add an inner class called @samp{Component}.
-This new class will inherit directly from @samp{iComponent} which allows
-@samp{MyPlugin} to implement @samp{iComponent} indirectly.  Since this is an
-embedded interface we now need the @code{SCF_DECLARE_EMBEDDED_IBASE()} macro.
-This macro takes care of the fact that this interface actually belongs to the
-parent class (which is given as a parameter).  One thing it does is declare a
-variable of type @samp{MyPlugin} which is called @samp{scfParent}.  Through
-that variable the method implementations of the embedded interface can access
-the main class.  After declaring the class @samp{Component} we immediately
-create an instance of this called @samp{scfiComponent}.  This name is not
-chosen at random. It is composed of the token @samp{scf} followed by the name
-of the @sc{scf} interface which this embedded object implements.  The
-@code{SCF_IMPLEMENTS_EMBEDDED_INTERFACE()} macro (see below) expects the name
-to be composed in this fashion.
-
-Sometimes embedded classes are also made friend of the main
-class so that they can access the private information. In this case
-that is not needed. The only thing that @samp{Component} has is an
-@code{Initialize()} method which immediately transfers control to
-the parent's public @code{Initialize()} method.
 
 @subsubheading Creating the Plugin Implementation (source)
 
@@ -227,28 +193,16 @@ of our plugin. Let's call this @file{myplug.cpp}:
 #include <iutil/plugin.h>
 
 CS_IMPLEMENT_PLUGIN
-
-SCF_IMPLEMENT_IBASE (MyPlugin)
-  SCF_IMPLEMENTS_INTERFACE (iMyApi)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (MyPlugin::Component)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 SCF_IMPLEMENT_FACTORY (MyPlugin)
 
-MyPlugin::MyPlugin (iBase* parent) : object_reg(0)
+MyPlugin::MyPlugin (iBase* parent) :
+	scfImplementationType (this, parent),
+	object_reg(0)
 @{
-  SCF_CONSTRUCT_IBASE (parent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
 @}
 
 MyPlugin::~MyPlugin ()
 @{
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 @}
 
 bool MyPlugin::Initialize (iObjectRegistry* r)
@@ -280,18 +234,6 @@ actually makes a difference; on others it does not.  For best portability,
 you should use this macro in exactly one C++ file within each plugin
 module.
 
-The @code{SCF_IMPLEMENT_IBASE()} describes what interfaces the class
-@samp{MyPlugin} implements.  This section says that @samp{MyPlugin} implements
-@samp{iMyApi} directly and @samp{iComponent} through embedding.
-
-The @code{SCF_IMPLEMENT_EMBEDDED_IBASE()} lists the interfaces
-implemented by the class @samp{MyPlugin::Component} (the embedded class).
-In this case, @samp{MyPlugin::Component} implements only @samp{iComponent}.
-
-It is important to correctly use the above macros.  These macros ensure
-that the implementation for @code{IncRef()}, @code{DecRef()}, and
-@code{QueryInterface()} are provided by your custom class.
-
 The @code{SCF_IMPLEMENT_FACTORY()} says that C++ class @samp{MyPlugin}
 represents an @sc{scf} factory which allows @sc{scf} to instantiate objects of
 this class.  In addition to some other administrative tasks, this macro defines
@@ -300,17 +242,9 @@ that one plugin module can in fact define several distinct named @sc{scf}
 classes.  In that case you need multiple @code{SCF_IMPLEMENT_FACTORY()} lines;
 one for each exported @sc{scf} class.
 
-@code{SCF_IMPLEMENT_@dots{}_IBASE()} and @code{SCF_IMPLEMENT_FACTORY()}) are
-general purpose @sc{scf} macros. As such they are not specifically related to
-plugin modules; but rather help to define @sc{scf} classes.
-
-In the constructor of @samp{MyPlugin} you must call
-@code{SCF_CONSTRUCT_IBASE()} for the main interface and
-@code{SCF_CONSTRUCT_EMBEDDED_IBASE()} for each embedded interface.  These
-macros will ensure that the object is initialized correctly (i.e. reference
-count set to 1, and so on).  Likewise, in the destructor, you must call the
-corresponding @code{SCF_DESTRUCT_IBASE()} and
-@code{SCF_DESTRUCT_EMBEDDED_IBASE()} macros.
+In the constructor of @samp{MyPlugin} you must also call the constructor
+of the templated superclass by using @code{scfImplementationType()}. The
+first parameter to @code{scfImplementationType()} is always @samp{this}.
 
 The rest of the plugin is very straightforward. It is important
 to realize that you should do most initialization of the plugin
