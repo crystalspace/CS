@@ -194,7 +194,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
       CS_FORCEINLINE
       static void Construct (Interval* address)
       {
-        new (CS_STATIC_CAST(void*,address)) Interval();
+        new (static_cast<void*> (address)) Interval();
       }
 
       CS_FORCEINLINE

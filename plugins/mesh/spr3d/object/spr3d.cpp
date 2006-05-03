@@ -443,7 +443,7 @@ void csSprite3DMeshObjectFactory::ComputeNormals (csSpriteFrame* frame)
     csTriangleVertexCost &vt = tri_verts->GetVertex (i);
     if (vt.con_triangles.Length ())
     {
-      csVector3 &n = CS_CONST_CAST (csVector3&, GetNormal (frame_number, i));
+      csVector3 &n = const_cast<csVector3&> (GetNormal (frame_number, i));
       if (n.IsZero())
       {
         n.Set (0,0,0);
@@ -458,7 +458,7 @@ void csSprite3DMeshObjectFactory::ComputeNormals (csSpriteFrame* frame)
     {
       // If there are no connecting triangles then we just
       // initialize the normal to a default value.
-      CS_CONST_CAST (csVector3&, 
+      const_cast<csVector3&> (
 	GetNormal (frame_number, i)).Set (1, 0, 0);
     }
   }

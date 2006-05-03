@@ -977,7 +977,7 @@ void csSkeleton::Stop (const char* scriptname)
 
 void csSkeleton::Stop (iSkeletonScript *script)
 {
-  //csSkeletonRunnable *cs_skel_runnable = CS_STATIC_CAST (csSkeletonRunnable *, script);
+  //csSkeletonRunnable *cs_skel_runnable = static_cast<csSkeletonRunnable *> (script);
   //running_scripts.DeleteFast ( cs_skel_runnable );
 }
 
@@ -1304,9 +1304,10 @@ iSkeletonFactory* csSkeletonGraveyard::CreateFactory(const char *name)
 
 iSkeleton *csSkeletonGraveyard::CreateSkeleton(iSkeletonFactory *fact, const char *name)
 {
-  csSkeletonFactory *cs_skel_fact = CS_STATIC_CAST (csSkeletonFactory *, fact);
+  csSkeletonFactory *cs_skel_fact = static_cast<csSkeletonFactory*> (fact);
   cs_skel_fact->UpdateParentBones();
-  csRef<csSkeleton> skeleton = (csPtr<csSkeleton>)(new csSkeleton (cs_skel_fact));
+  csRef<csSkeleton> skeleton;
+  skeleton.AttachNew (new csSkeleton (cs_skel_fact));
   skeleton->SetName(name);
   skeletons.Push(skeleton);
   return skeleton;

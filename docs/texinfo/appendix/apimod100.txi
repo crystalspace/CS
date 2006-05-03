@@ -2448,3 +2448,8 @@ questionable use.
 @code{csRenderMeshHolderMultiple}. Equivalent functionality can be achieved by 
 using @samp{csFrameDataHolder<csDirtyAccessArray<csRenderMesh*> >}.
 @end itemize
+
+The casting macros (e.g. @code{CS_STATIC_CAST}) have been removed. Any compiler
+that does not support proper C++-style casts is likely also incapable of
+correctly supporting other advanced C++ features, e.g the use of complex
+templates in CrystalSpace.

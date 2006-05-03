@@ -6,6 +6,11 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+3-May-2006
+        - res removed the CS_*_CAST macros. It is unlikely that a compiler
+          can grok CS' use of templates but does not get the cast operators
+          right.
+	- res fixed some more "no virtual dtor" warnings.
 2-May-2006
 	- Eric Sunshine fixed csPoolEvent::DecRef() to set up recycled data
 	  members the same way as they are set up by csPoolEvent constructor.

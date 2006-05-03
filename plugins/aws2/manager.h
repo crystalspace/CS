@@ -38,9 +38,6 @@
  */
 class awsManager2 : public iAws2
 {
-  // Event ID's used
-  csEventID KeyboardDown;	
- 
   /// Store the object registry so we can get at it later.
   iObjectRegistry *object_reg;
 
@@ -71,8 +68,23 @@ class awsManager2 : public iAws2
   /// Set if the mouse is captured.
   bool mouse_captured;
     
-  
 public:
+  /// Cached event names.  These should be set up in the ::Initialize method.
+  csEventID PreProcess;
+  csEventID MouseDown;
+  csEventID MouseUp;
+  csEventID MouseClick;
+  csEventID MouseMove;
+  csEventID KeyboardDown;
+  csEventID KeyboardUp;
+
+  csEventID MouseEnter;
+  csEventID MouseExit;
+  csEventID LoseFocus;
+  csEventID GainFocus;
+  csEventID GroupOff;
+  csEventID FrameStart;
+
   /////////////////////// Accessors //////////////////////////////
 
   /// Get the iObjectRegistry interface so that components can use it.

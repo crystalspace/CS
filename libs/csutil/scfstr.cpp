@@ -49,7 +49,7 @@ char const* scfString::GetData () const
 { return s.GetData (); }
 
 char* scfString::GetData ()
-{ return CS_CONST_CAST(char*, s.GetData()); }
+{ return const_cast<char*> (s.GetData()); }
 
 size_t scfString::Length () const
 { return s.Length (); }

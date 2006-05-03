@@ -158,12 +158,12 @@ class csArrayElementHandler
 public:
   static void Construct (T* address)
   {
-    new (CS_STATIC_CAST(void*,address)) T();
+    new (static_cast<void*> (address)) T();
   }
 
   static void Construct (T* address, T const& src)
   {
-    new (CS_STATIC_CAST(void*,address)) T(src);
+    new (static_cast<void*> (address)) T(src);
   }
 
   static void Destroy (T* address)

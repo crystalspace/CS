@@ -75,47 +75,28 @@
 #undef SMALL_EPSILON_D
 #define SMALL_EPSILON_D 0.000000000001f	/* Very, very small value */
 
-// Platforms with compilers which only understand old-style C++ casting syntax
-// should define CS_USE_OLD_STYLE_CASTS.
-#if defined(CS_USE_OLD_STYLE_CASTS)
-  #define CS_CAST(C,T,V) ((T)(V))
-#else
-  #define CS_CAST(C,T,V) (C<T>(V))
-#endif
-
-#define CS_STATIC_CAST(T,V)      CS_CAST(static_cast,T,V)
-#define CS_DYNAMIC_CAST(T,V)     CS_CAST(dynamic_cast,T,V)
-#define CS_REINTERPRET_CAST(T,V) CS_CAST(reinterpret_cast,T,V)
-#define CS_CONST_CAST(T,V)       CS_CAST(const_cast,T,V)
-
-// DEPRECATED use the CS_ prefix versions instead.
-#define STATIC_CAST(T,V)      CS_STATIC_CAST(T,V)
-#define DYNAMIC_CAST(T,V)     CS_DYNAMIC_CAST(T,V)
-#define REINTERPRET_CAST(T,V) CS_REINTERPRET_CAST(T,V)
-#define CONST_CAST(T,V)       CS_CONST_CAST(T,V)
-
 // Platforms which have floating-point variations of the standard math.h
 // cos(), sin(), tan(), sqrt(), etc. functions should define
 // CS_HAVE_MATH_H_FLOAT_FUNCS. For platforms which do not provide these
 // macros or if strict-ANSI conformance is requested, we fake them up.
 #if !defined(CS_HAVE_MATH_H_FLOAT_FUNCS) || defined(__STRICT_ANSI__)
-  #define acosf(X)    CS_STATIC_CAST(float,acos(X))
-  #define asinf(X)    CS_STATIC_CAST(float,asin(X))
-  #define atan2f(X,Y) CS_STATIC_CAST(float,atan2(X,Y))
-  #define atanf(X)    CS_STATIC_CAST(float,atan(X))
-  #define cosf(X)     CS_STATIC_CAST(float,cos(X))
-  #define exp2f(X)    CS_STATIC_CAST(float,exp2(X))
-  #define expf(X)     CS_STATIC_CAST(float,exp(X))
-  #define fabsf(X)    CS_STATIC_CAST(float,fabs(X))
-  #define log10f(X)   CS_STATIC_CAST(float,log10(X))
-  #define log2f(X)    CS_STATIC_CAST(float,log2(X))
-  #define logf(X)     CS_STATIC_CAST(float,log(X))
-  #define powf(X)     CS_STATIC_CAST(float,pow(X))
-  #define sinf(X)     CS_STATIC_CAST(float,sin(X))
-  #define sqrtf(X)    CS_STATIC_CAST(float,sqrt(X))
-  #define tanf(X)     CS_STATIC_CAST(float,tan(X))
-  #define floorf(X)   CS_STATIC_CAST(float,floor(X))
-  #define ceilf(X)    CS_STATIC_CAST(float,ceil(X))
+  #define acosf(X)    static_cast<float> (acos(X))
+  #define asinf(X)    static_cast<float> (asin(X))
+  #define atan2f(X,Y) static_cast<float> (atan2(X,Y))
+  #define atanf(X)    static_cast<float> (atan(X))
+  #define cosf(X)     static_cast<float> (cos(X))
+  #define exp2f(X)    static_cast<float> (exp2(X))
+  #define expf(X)     static_cast<float> (exp(X))
+  #define fabsf(X)    static_cast<float> (fabs(X))
+  #define log10f(X)   static_cast<float> (log10(X))
+  #define log2f(X)    static_cast<float> (log2(X))
+  #define logf(X)     static_cast<float> (log(X))
+  #define powf(X)     static_cast<float> (pow(X))
+  #define sinf(X)     static_cast<float> (sin(X))
+  #define sqrtf(X)    static_cast<float> (sqrt(X))
+  #define tanf(X)     static_cast<float> (tan(X))
+  #define floorf(X)   static_cast<float> (floor(X))
+  #define ceilf(X)    static_cast<float> (ceil(X))
 #endif
 
 // Platforms which have the PRIx99 printf()-formatting directives should define

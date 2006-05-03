@@ -295,7 +295,7 @@ csPerl5::Object* csPerl5::Query (iScriptObject *obj) const
   if (priv == 0)
     reporter->Report (CS_REPORTER_SEVERITY_WARNING,
       "crystalspace.script.perl5.call", "This iScriptObject isn't from Perl!");
-  return CS_STATIC_CAST(csPerl5::Object*,(csPerl5Object*)priv);
+  return static_cast<csPerl5::Object*> ((csPerl5Object*)priv);
 }
 
 csRef<iScriptObject> csPerl5::NewObject(const char *type, const char *fmt, ...)

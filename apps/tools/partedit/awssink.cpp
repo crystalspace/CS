@@ -1321,7 +1321,7 @@ void PartEditSink::FillGraphicFileList()
     // Update the path display
     GraphicSelectionData.iawscomponent_GraphicFileList->SetProperty 
       ("Column0Caption", (intptr_t)
-      CS_CONST_CAST(char*, GraphicSelectionData.currentdirectory->GetData()));
+      const_cast<char*> (GraphicSelectionData.currentdirectory->GetData()));
 
     // Clear out list
     GraphicSelectionData.iawscomponent_GraphicFileList->Execute("ClearList");

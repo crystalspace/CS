@@ -396,7 +396,7 @@ void *Class::QueryInterface (scfInterfaceID iInterfaceID, int iVersion)	\
  * return a pointer to that interface if everything is correct.
  */
 #define SCF_IMPLEMENTS_INTERFACE(Interface)				\
-  csRefTrackerAccess::AddAlias (CS_STATIC_CAST(Interface*, this), this);\
+  csRefTrackerAccess::AddAlias (static_cast<Interface*> (this), this);\
   SCF_IMPLEMENTS_INTERFACE_COMMON (Interface, this)
 
 /**
@@ -414,7 +414,7 @@ void *Class::QueryInterface (scfInterfaceID iInterfaceID, int iVersion)	\
     scfCompatibleVersion (iVersion, scfInterfaceTraits<Interface>::GetVersion())) \
   {									\
     (Object)->IncRef ();						\
-    return CS_STATIC_CAST(Interface*, Object);				\
+    return static_cast<Interface*> (Object);				\
   }
 
 /**

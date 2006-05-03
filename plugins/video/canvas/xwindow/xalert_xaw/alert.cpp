@@ -89,7 +89,7 @@ bool csXWindow::AlertV (int /*type*/, const char* title, const char* okMsg,
 
     top = XtAppInitialize (&app_con, "Xmessage-color",
 			   0, 0, &fake_argc, 
-			   CS_CONST_CAST(char**, fake_argv), // @@@ Urgh.
+			   const_cast<char**> (fake_argv), // @@@ Urgh.
 			   fallback_resources, 0, 0);
 
     wm_delete_window = XInternAtom(XtDisplay(top), "WM_DELETE_WINDOW", False);

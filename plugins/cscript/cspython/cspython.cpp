@@ -155,9 +155,9 @@ void csPython::ShowError()
 bool csPython::RunText(const char* Text)
 {
   // Apparently, some Python installations have bad prototype, so const_cast<>.
-  bool ok = !PyRun_SimpleString(CS_CONST_CAST(char*,Text));
+  bool ok = !PyRun_SimpleString(const_cast<char*> (Text));
   if(!ok && use_debugger)
-    PyRun_SimpleString(CS_CONST_CAST(char*,"pdb.pm()"));
+    PyRun_SimpleString(const_cast<char*> ("pdb.pm()"));
   ShowError();
   return ok;
 }

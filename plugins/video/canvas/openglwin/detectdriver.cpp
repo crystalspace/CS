@@ -213,7 +213,7 @@ void csDetectDriver::DetermineDriverVersion()
     csString newName (DriverDLL);
     newName.Append (".dll");
     verInfoSize = GetFileVersionInfoSizeA (
-      CS_CONST_CAST(char*,newName.GetData()), &dummy);
+      const_cast<char*> (newName.GetData()), &dummy);
   }
   if (verInfoSize != 0)
   {

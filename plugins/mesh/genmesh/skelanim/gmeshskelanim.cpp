@@ -894,7 +894,7 @@ void csGenmeshSkelAnimationControl::TransformVerticesToBones (const csVector3* v
     // Really stuppid
     if (f_bones[i]->GetParent ())
     {
-      csSkelBone *p = CS_STATIC_CAST (csSkelBone*,f_bones[i]->GetParent ());
+      csSkelBone *p = static_cast<csSkelBone*> (f_bones[i]->GetParent ());
       size_t parent_index = f_bones.Find (p);
       csRef<csSkelBone> child = bones[i];
       bones[parent_index]->AddBone (child);

@@ -245,8 +245,8 @@ private:
       scfCompatibleVersion(version, scfInterfaceTraits<I>::GetVersion()))
     {
       scfObject->IncRef();
-      return CS_STATIC_CAST(
-        typename_qualifier scfInterfaceTraits<I>::InterfaceType*, scfObject);
+      return static_cast<
+        typename_qualifier scfInterfaceTraits<I>::InterfaceType*> (scfObject);
     }
     else
     {
@@ -258,8 +258,8 @@ private:
   CS_FORCEINLINE static void AddReftrackerAlias (Class* scfObject)
   {
     csRefTrackerAccess::AddAlias(
-      CS_STATIC_CAST(
-        typename_qualifier scfInterfaceTraits<I>::InterfaceType*, scfObject),
+      static_cast<
+        typename_qualifier scfInterfaceTraits<I>::InterfaceType*> (scfObject),
       scfObject);
   }
 
@@ -267,8 +267,8 @@ private:
   CS_FORCEINLINE static void RemoveReftrackerAlias (Class* scfObject)
   {
     csRefTrackerAccess::RemoveAlias(
-      CS_STATIC_CAST(
-        typename_qualifier scfInterfaceTraits<I>::InterfaceType*, scfObject),
+      static_cast<
+        typename_qualifier scfInterfaceTraits<I>::InterfaceType*> (scfObject),
       scfObject);
   }
  

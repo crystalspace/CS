@@ -351,7 +351,7 @@ public:
   {
     SV *sv = get_sv (name, FALSE);
     if (sv)
-      data.AttachNew(new Object (CS_CONST_CAST(csPerl5*,this), sv));
+      data.AttachNew(new Object (const_cast<csPerl5*> (this), sv));
     return sv;
   }
   bool GetTruth (const char *name, bool &data) const

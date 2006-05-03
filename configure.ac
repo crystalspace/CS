@@ -1991,30 +1991,6 @@ AS_IF([test $cs_cv_cxx_typename != no],
 
 
 #------------------------------------------------------------------------------
-# Check if C++ compiler understands new-style C++ casting syntax.
-# For example: `static_cast<int>(foo)' versus `(int)foo'
-#
-# Specifically check for all four new casting operators since some botched
-# compilers have been known to implement only a partial set.  (The OpenStep
-# Objective-C++ compiler is one such botched implementation.  It fails to
-# recognize reinterpret_cast<> even though it recognizes the others.)
-#------------------------------------------------------------------------------
-AC_CACHE_CHECK([for C++ new-style casts], [cs_cv_cxx_new_casts],
-    [CS_BUILD_IFELSE(
-	[AC_LANG_PROGRAM(
-	    [int func1() { long n = 1; return static_cast<int>(n); }
-	    char* func2() { static char const* s = "const";
-		return const_cast<char*>(s); }
-	    struct A {}; A* func3(A* a) { return dynamic_cast<A*>(a); }
-	    A* func4(void* p) { return reinterpret_cast<A*>(p); }], [])],
-	[], [C++], [cs_cv_cxx_new_casts=yes], [cs_cv_cxx_new_casts=no])])
-
-AS_IF([test $cs_cv_cxx_new_casts = no],
-    [CS_HEADER_PROPERTY([CS_USE_OLD_STYLE_CASTS])])
-
-
-
-#------------------------------------------------------------------------------
 # Check if C++ compiler understands new explicit template specialization
 # syntax `template<> class Foo<Bar>'.  Older compiler allows specializations
 # without the `template<>' prefix.

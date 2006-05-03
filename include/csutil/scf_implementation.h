@@ -249,7 +249,7 @@ protected:
       scfCompatibleVersion (iVersion, scfInterfaceTraits<iBase>::GetVersion ()))
     {
       scfObject->IncRef ();
-      return CS_STATIC_CAST(iBase*,scfObject);
+      return static_cast<iBase*> (scfObject);
     }
 
     // For embedded interfaces

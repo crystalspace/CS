@@ -263,8 +263,8 @@ bool csXWindow::Open ()
   XSetWMProtocols (dpy, wm_win, &wm_delete_window, 1);
 
   XClassHint *class_hint = XAllocClassHint();
-  class_hint->res_name = CS_CONST_CAST (char*, win_title.GetData());
-  class_hint->res_class = CS_CONST_CAST (char*, win_title.GetData());
+  class_hint->res_name = const_cast<char*> (win_title.GetData());
+  class_hint->res_class = const_cast<char*> (win_title.GetData());
   XmbSetWMProperties (dpy, wm_win,
 		      0, 0, 0, 0,
 		      0, 0, class_hint);
@@ -541,7 +541,7 @@ bool csXWindow::HandleEvent (iEvent &Event)
         XRefreshKeyboardMapping (&event.xmapping);
 	break;
       case ClientMessage:
-	if (CS_STATIC_CAST(Atom, event.xclient.data.l[0]) == wm_delete_window)
+	if (static_cast<Atom> (event.xclient.data.l[0]) == wm_delete_window)
 	{
 	  EventOutlet->Broadcast (csevCanvasClose (name_reg, Canvas), (intptr_t)this);
 	  EventOutlet->Broadcast (csevQuit (name_reg));

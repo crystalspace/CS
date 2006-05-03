@@ -998,7 +998,7 @@ void csGraphics2D::AlertV (int type, const wchar_t* title, const wchar_t* okMsg,
 
 iNativeWindow* csGraphics2D::GetNativeWindow ()
 {
-  return CS_STATIC_CAST(iNativeWindow*, this);
+  return static_cast<iNativeWindow*> (this);
 }
 
 void csGraphics2D::SetTitle (const char* title)

@@ -178,11 +178,11 @@ void csObjectRegistryTest::testGet()
   CPPUNIT_ASSERT(if2.IsValid());
 
   csRef<iString> cmp1, cmp2;
-  cmp1.AttachNew(CS_STATIC_CAST(iString*,objreg->Get(
+  cmp1.AttachNew(static_cast<iString*> (objreg->Get(
     "Test Object Registry one",
     scfInterfaceTraits<iString>::GetID(),
     scfInterfaceTraits<iString>::GetVersion())));
-  cmp2.AttachNew(CS_STATIC_CAST(iString*,objreg->Get(
+  cmp2.AttachNew(static_cast<iString*> (objreg->Get(
     "Test Object Registry two",
     scfInterfaceTraits<iString>::GetID(),
     scfInterfaceTraits<iString>::GetVersion())));

@@ -846,7 +846,7 @@ public:
   virtual iObject* QueryObject () { return this; }
 
   virtual iShaderVariableContext* GetSVContext()
-  { return CS_STATIC_CAST(iShaderVariableContext*, this); }
+  { return static_cast<iShaderVariableContext*> (this); }
 
   // Static LOD methods.
   iLODControl* CreateStaticLOD ();
