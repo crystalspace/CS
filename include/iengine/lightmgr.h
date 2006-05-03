@@ -36,6 +36,9 @@ class csFrustum;
 /**
  * A light-sector influence (LSI). Every LSI represents the influence
  * a certain light has on a sector.
+ *
+ * This interface is used and maintained by:
+ * - iLightManager
  */
 struct iLightSectorInfluence : public virtual iBase
 {
@@ -60,6 +63,15 @@ struct iLightSectorInfluence : public virtual iBase
  * <p>
  * The engine registers an implementation of this object in the object
  * registry with the "iLightManager" name.
+ *
+ * Main creators of instances implementing this interface:
+ * - 3D engine
+ * 
+ * Main ways to get pointers to this interface:
+ * - csQueryRegistry<iLightManager>
+ * 
+ * Main users of this interface:
+ * - meshes
  */
 struct iLightManager : public virtual iBase
 {

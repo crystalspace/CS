@@ -97,7 +97,7 @@ SCF_VERSION (iMaterialEngine, 0, 0, 2);
  * features.
  *
  * Main ways to get pointers to this interface:
- *   - SCF_QUERY_INTERFACE() from iMaterial
+ *   - scfQueryInterface<iMaterialEngine>() from iMaterial
  */
 struct iMaterialEngine : public iBase
 {

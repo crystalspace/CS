@@ -42,6 +42,12 @@ struct iTextureWrapper;
 /**
  * A region. A region is basically a collection of objects in the
  * 3D engine that can be treated as a unit.
+ *
+ * Main creators of instances implementing this interface:
+ * - iEngine::CreateRegion()
+ * 
+ * Main ways to get pointers to this interface:
+ * - iEngine::CreateRegion()
  */
 struct iRegion : public virtual iBase
 {
@@ -113,6 +119,9 @@ struct iRegion : public virtual iBase
 
 /**
  * A list of region objects.
+ *
+ * Main ways to get pointers to this interface:
+ * - iEngine::GetRegions()
  */
 struct iRegionList : public virtual iBase
 {

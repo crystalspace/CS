@@ -49,11 +49,21 @@ struct iMeshWrapper;
  * Render loop.
  * \remark A render loop also exhibits an iRenderStepContainer interface.
  * \todo Add more step management methods.
+ *
+ * Main creators of instances implementing this interface:
+ * - iRenderLoopManager::Create()
+ * 
+ * Main ways to get pointers to this interface:
+ * - iRenderLoopManager::Retrieve()
+ * 
+ * Main users of this interface:
+ * - iEngine
  */
 struct iRenderLoop : public iRenderStepContainer
 {
   SCF_INTERFACE(iRenderLoop, 2,0,0);
-  virtual void Draw (iRenderView *rview, iSector *s, iMeshWrapper* mesh = 0) = 0;
+  virtual void Draw (iRenderView *rview, iSector *s,
+  	iMeshWrapper* mesh = 0) = 0;
 };
 
 
@@ -62,6 +72,9 @@ struct iRenderLoop : public iRenderStepContainer
  * Use to create new loops and manage loop names.
  * \remark It's not recommended to unregister the loop with the name of
  * #CS_DEFAULT_RENDERLOOP_NAME.
+ *
+ * Main ways to get pointers to this interface:
+ * - iEngine::GetRenderLoopManager()
  */
 struct iRenderLoopManager : public virtual iBase
 {

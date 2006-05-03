@@ -124,6 +124,9 @@ enum csRenderPrioritySorting
 /**
  * A callback that will be fired whenever the engine starts drawing
  * a frame.
+ *
+ * This callback is used by:
+ * - iEngine
  */
 struct iEngineFrameCallback : public virtual iBase
 {
@@ -137,6 +140,9 @@ struct iEngineFrameCallback : public virtual iBase
 /**
  * A callback that will be fired whenever a sector is created or
  * removed from the engine.
+ *
+ * This callback is used by:
+ * - iEngine
  */
 struct iEngineSectorCallback : public virtual iBase
 {
@@ -162,7 +168,7 @@ struct iEngineSectorCallback : public virtual iBase
  * - 3D Engine plugin (crystalspace.engine.3d)
  *
  * Main ways to get pointers to this interface:
- * - CS_QUERY_REGISTRY()
+ * - csQueryRegistry<iEngine> ()
  *
  * Main users of this interface:
  * - Application.

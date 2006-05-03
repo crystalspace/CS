@@ -149,10 +149,7 @@ enum csLightType
  * The given context will be either an instance of iRenderView, iFrustumView,
  * or else 0.
  *
- * Main creators of instances implementing this interface:
- * - Application.
- * 
- * Main users of this interface:
+ * This callback is used by:
  * - iLight
  */
 struct iLightCallback : public virtual iBase

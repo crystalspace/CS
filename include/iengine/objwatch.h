@@ -65,6 +65,9 @@ struct iMeshWrapper;
 /**
  * Implement this class if you're interested in hearing about
  * object watcher events.
+ *
+ * This callback is used by:
+ * - iObjectWatcher
  */
 struct iObjectWatcherListener : public virtual iBase
 {
@@ -97,6 +100,12 @@ struct iObjectWatcherListener : public virtual iBase
  * get notified when one of the objects changes. This object will
  * not keep real references to the objects it is watching but it will
  * clean up the watcher for some object if that object is removed.
+ *
+ * Main creators of instances implementing this interface:
+ * - iEngine::CreateObjectWatcher()
+ * 
+ * Main users of this interface:
+ * - Application
  */
 struct iObjectWatcher : public virtual iBase
 {

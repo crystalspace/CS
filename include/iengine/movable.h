@@ -41,6 +41,9 @@ struct iSceneNode;
 /**
  * Implement this class if you're interested in hearing about
  * movable changes.
+ *
+ * This callback is used by:
+ * - iMovable
  */
 struct iMovableListener : public virtual iBase
 {
@@ -76,6 +79,7 @@ struct iMovableListener : public virtual iBase
  * Main ways to get pointers to this interface:
  * - iMeshWrapper::GetMovable()
  * - iLight::GetMovable()
+ * - iSceneNode::GetMovable()
  * 
  * Main users of this interface:
  * - iEngine

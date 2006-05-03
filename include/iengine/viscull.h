@@ -64,6 +64,9 @@ struct iVisibilityObjectIterator : public iBase
 /**
  * Implement this interface when you want to get notified about visible
  * objects detected by the visibility cullers.
+ *
+ * This callback is used by:
+ * - iVisibilityCuller
  */
 struct iVisibilityCullerListener : public virtual iBase
 {
@@ -92,8 +95,7 @@ SCF_VERSION (iVisibilityCuller, 0, 7, 0);
  * - Frustvis culler plugin (crystalspace.culling.frustvis)
  *
  * Main ways to get pointers to this interface:
- * - CS_QUERY_REGISTRY()
- * - CS_LOAD_PLUGIN()
+ * - csLoadPlugin()
  * - iSector::GetVisibilityCuller()
  *
  * Main users of this interface:

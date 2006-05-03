@@ -124,6 +124,9 @@ SCF_VERSION (iPortalCallback, 0, 0, 1);
  * callback has to set up the destination sector and return true.
  * The given context will be either an instance of iRenderView, iFrustumView,
  * or else 0.
+ *
+ * This callback is used by:
+ * - iPortal
  */
 struct iPortalCallback : public iBase
 {
@@ -143,6 +146,7 @@ struct iPortalCallback : public iBase
  *
  * Main creators of instances implementing this interface:
  * - iPortalContainer::CreatePortal()
+ * - iEngine::CreatePortal()
  *
  * Main ways to get pointers to this interface:
  * - iPortalContainer::GetPortal()

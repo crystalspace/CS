@@ -87,6 +87,9 @@ struct csFog
  * Set a callback which is called when this sector is traversed.
  * The given context will be either an instance of iRenderView, iFrustumView,
  * or else 0.
+ *
+ * This callback is used by:
+ * - iSector
  */
 struct iSectorCallback : public virtual iBase
 {
@@ -102,6 +105,9 @@ struct iSectorCallback : public virtual iBase
 /**
  * Set a callback which is called when a mesh is added or removed
  * from this sector.
+ *
+ * This callback is used by:
+ * - iSector
  */
 struct iSectorMeshCallback : public virtual iBase
 {
@@ -121,6 +127,9 @@ struct iSectorMeshCallback : public virtual iBase
 
 /**
  * A callback that is fired whenever a light is visible.
+ *
+ * This callback is used by:
+ * - iSector
  */
 struct iLightVisibleCallback : public virtual iBase
 {

@@ -41,6 +41,9 @@ class csFrustumContext;
 
 /**
  * User data which can be attached to iFrustumView.
+ *
+ * This is used by:
+ * - iFrustumView
  */
 struct iFrustumViewUserdata : public virtual iBase
 {

@@ -160,6 +160,9 @@ SCF_VERSION (iMeshDrawCallback, 0, 0, 1);
  * called even if the object is not visible. In general it is called
  * if there is a likely probability that the object is visible (i.e.
  * it is in the same sector as the camera for example).
+ *
+ * This callback is used by:
+ * - iMeshWrapper
  */
 struct iMeshDrawCallback : public iBase
 {

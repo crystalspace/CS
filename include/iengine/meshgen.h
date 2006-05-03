@@ -37,6 +37,15 @@ struct iTerraFormer;
 /**
  * This interface defines one piece of geometry for the mesh
  * generator.
+ *
+ * Main creators of instances implementing this interface:
+ * - iMeshGenerator::CreateGeometry()
+ * 
+ * Main ways to get pointers to this interface:
+ * - iMeshGenerator::GetGeometry()
+ * 
+ * Main users of this interface:
+ * - iMeshGenerator
  */
 struct iMeshGeneratorGeometry : public virtual iBase
 {
@@ -139,6 +148,15 @@ struct iMeshGeneratorGeometry : public virtual iBase
 
 /**
  * iMeshGenerator defines the interface for a mesh generator.
+ *
+ * Main creators of instances implementing this interface:
+ * - iSector::CreateMeshGenerator()
+ * 
+ * Main ways to get pointers to this interface:
+ * - iSector::GetMeshGenerator()
+ * 
+ * Main users of this interface:
+ * - engine
  */
 struct iMeshGenerator : public virtual iBase
 {

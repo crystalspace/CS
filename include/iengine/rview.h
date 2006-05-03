@@ -171,6 +171,12 @@ public:
 /**
  * This interface represents all information needed to render
  * some object in a current draw context.
+ *
+ * Main creators of instances implementing this interface:
+ * - iEngine
+ * 
+ * Main users of this interface:
+ * - meshes
  */
 struct iRenderView : public virtual iBase
 {

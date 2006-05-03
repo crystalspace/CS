@@ -57,6 +57,9 @@ SCF_VERSION (iCameraSectorListener, 0, 0, 1);
 /**
  * Implement this interface if you are interested in learning when
  * the camera changes sector.
+ *
+ * This callback is used by:
+ * - iCamera
  */
 struct iCameraSectorListener : public iBase
 {
@@ -87,6 +90,7 @@ struct iCameraSectorListener : public iBase
  *
  * Main creators of instances implementing this interface:
  * - iEngine::CreateCamera()
+ * - csView
  * 
  * Main ways to get pointers to this interface:
  * - iView::GetCamera()

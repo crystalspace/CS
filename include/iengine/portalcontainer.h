@@ -42,7 +42,7 @@ struct iRenderView;
  * - iEngine::CreatePortal()
  * 
  * Main ways to get pointers to this interface:
- * - scfQueryInterface() on iMeshObject from a portal container mesh.
+ * - scfQueryInterface<iMeshObject>() from a portal container mesh.
  * 
  * Main users of this interface:
  * - iEngine

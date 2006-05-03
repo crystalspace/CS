@@ -36,6 +36,9 @@ struct iTextureWrapper;
 
 /**
  * A callback for when a iTextureWrapper is used.
+ *
+ * This callback is used by:
+ * - iTextureWrapper
  */
 struct iTextureCallback : public virtual iBase
 {

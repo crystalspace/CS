@@ -39,6 +39,13 @@ class csVector3;
 /**
  * iSharedVariable implements a refcounted value which can
  * be shared across many objects and updated efficiently.
+ *
+ * Main creators of instances implementing this interface:
+ * - iSharedVariableList::New()
+ * 
+ * Main ways to get pointers to this interface:
+ * - iEngine::GetVariableList()
+ * - iSharedVariableList::Get()
  */
 struct iSharedVariable : public virtual iBase
 {
@@ -93,6 +100,9 @@ struct iSharedVariable : public virtual iBase
 /**
  * A listener so that you can get notified when a variable is
  * changed.
+ *
+ * This callback is used by:
+ * - iSharedVariable
  */
 struct iSharedVariableListener : public virtual iBase
 {
@@ -106,6 +116,9 @@ struct iSharedVariableListener : public virtual iBase
 
 /**
  * A list of shared variables.
+ *
+ * Main ways to get pointers to this interface:
+ * - iEngine::GetVariableList()
  */
 struct iSharedVariableList : public virtual iBase
 {
