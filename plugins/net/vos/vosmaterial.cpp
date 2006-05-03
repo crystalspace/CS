@@ -255,51 +255,57 @@ void csMetaMaterial::Setup(csVosA3DL* vosa3dl)
 
   this->vosa3dl = vosa3dl;
 
-  LOG("csMetaMaterial", 3, "setting up material");
+  LOG("csMetaMaterial", 3, "setting up material " << getURLstr());
   ConstructMaterialTask* cmt = new ConstructMaterialTask(
     vosa3dl->GetObjectRegistry(), this);
 
-  cmt->needListener = &needListener;
+  try {
+    cmt->needListener = &needListener;
 
-  A3DL::TextureIterator txt = getTextureLayers();
-  if(txt.hasMore())
-  {
-    vRef<csMetaTexture> base = meta_cast<csMetaTexture>(*txt);
-    if(base.isValid())
-    {
-      base->Setup(vosa3dl);
-      cmt->base = base;
-    }
+    LOG("csMetaMaterial", 4, " getting texture layers " << getURLstr());
 
-    txt++;
+    A3DL::TextureIterator txt = getTextureLayers();
     if(txt.hasMore())
     {
-      cmt->coords = (TextureLayer*)malloc(txt.remaining()
-                                          * sizeof(TextureLayer));
-      float uscale = 1, vscale = 1, ushift = 0, vshift = 0;
-      for(int i = 0; txt.hasMore(); txt++, i++)
+      vRef<csMetaTexture> base = meta_cast<csMetaTexture>(*txt);
+      if(base.isValid())
       {
-        vRef<csMetaTexture> mt = meta_cast<csMetaTexture>(*txt);
-        if(mt.isValid())
-        {
-          mt->Setup(vosa3dl);
-          mt->acquire();
-          cmt->layers.push_back(mt);
-          try
-          {
-            mt->getUVScaleAndShift(uscale, vscale, ushift, vshift);
-          }
-          catch(std::runtime_error& e)
-          {
-            uscale = 1; vscale = 1; ushift = 0; vshift = 0;
-          }
-          cmt->coords[i].uscale = uscale;
-          cmt->coords[i].vscale = vscale;
-          //cmt->coords[i].ushift = ushift;
-          //cmt->coords[i].vshift = vshift;
+        LOG("csMetaMaterial", 4, "setting up base texture " << getURLstr());
+        base->Setup(vosa3dl);
+        cmt->base = base;
+      }
 
-          switch(mt->getBlendMode())
+      LOG("csMetaMaterial", 4, "setting up layered textures " << getURLstr());
+
+      txt++;
+      if(txt.hasMore())
+      {
+        cmt->coords = (TextureLayer*)malloc(txt.remaining()
+                                            * sizeof(TextureLayer));
+        float uscale = 1, vscale = 1, ushift = 0, vshift = 0;
+        for(int i = 0; txt.hasMore(); txt++, i++)
+        {
+          vRef<csMetaTexture> mt = meta_cast<csMetaTexture>(*txt);
+          if(mt.isValid())
           {
+            mt->Setup(vosa3dl);
+            mt->acquire();
+            cmt->layers.push_back(mt);
+            try
+            {
+              mt->getUVScaleAndShift(uscale, vscale, ushift, vshift);
+            }
+            catch(std::runtime_error& e)
+            {
+              uscale = 1; vscale = 1; ushift = 0; vshift = 0;
+            }
+            cmt->coords[i].uscale = uscale;
+            cmt->coords[i].vscale = vscale;
+            //cmt->coords[i].ushift = ushift;
+            //cmt->coords[i].vshift = vshift;
+
+            switch(mt->getBlendMode())
+            {
             case A3DL::Material::BLEND_NORMAL:
               try
               {
@@ -325,29 +331,39 @@ void csMetaMaterial::Setup(csVosA3DL* vosa3dl)
             case A3DL::Material::BLEND_DOUBLE_MULTIPLY:
               cmt->coords[i].mode = CS_FX_MULTIPLY2;
               break;
+            }
+            try
+            {
+              if(!mt->getShaded())
+                cmt->coords[i].mode |= CS_FX_FLAT;
+            }
+            catch(...) { }
+            // not supported any more?  cmt->coords[i].mode |= CS_FX_TILING;   // for software renderer :P
           }
-          try
-          {
-            if(!mt->getShaded())
-              cmt->coords[i].mode |= CS_FX_FLAT;
-          }
-          catch(...) { }
-          // not supported any more?  cmt->coords[i].mode |= CS_FX_TILING;   // for software renderer :P
         }
       }
+      cmt->iscolor = false;
     }
-    cmt->iscolor = false;
-  }
-  else
-  {
-    getColor(cmt->R, cmt->G, cmt->B);
-    LOG("CSA3DL Material", 3,
-            "CS Material: material has no textures, assuming it's color. (" <<
-            cmt->R << ", " << cmt->G << ", " << cmt->B << ")");
-    cmt->iscolor = true;
-  }
+    else
+    {
+      try {
+        getColor(cmt->R, cmt->G, cmt->B);
+        LOG("csMetaMaterial", 3,
+            "Using specified color (" <<
+            cmt->R << ", " << cmt->G << ", " << cmt->B << ")"
+            << " for material " << getURLstr() << " (material does not include any textures)");
+        cmt->iscolor = true;
+      }
+      catch(...) {
+      }
+    }
 
-  vosa3dl->mainThreadTasks.push(cmt);
+    LOG("csMetaMaterial", 4, "pushing main thread task for material create " << getURLstr());
+
+    vosa3dl->mainThreadTasks.push(cmt);
+  } catch(std::runtime_error) {
+    delete cmt;
+  }
 
   return;
 }

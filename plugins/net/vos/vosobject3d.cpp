@@ -485,16 +485,17 @@ void csMetaObject3D::notifyChildInserted (VobjectEvent &event)
     try
     {
       metamaterial = VOS::meta_cast<csMetaMaterial> (getMaterial());
-      LOG("vosobject3d", 3, "getting material " << metamaterial.isValid());
+      LOG("vosobject3d", 4, getURLstr() << " getting material isValid " << metamaterial.isValid());
       metamaterial->Setup (vosa3dl);
 
       updateMaterial();
     }
     catch(std::runtime_error& e)
     {
-      LOG("vosobject3d", 2, "Got error " << e.what());
+      LOG("vosobject3d", 2, getURLstr() << " Got error " << e.what());
     }
   }
+  LOG("vosobject3d", 4, "completed notifyChildInserted " << getURLstr());
 }
 
 void csMetaObject3D::notifyChildRemoved (VobjectEvent &event)

@@ -181,7 +181,7 @@ void ConstructMozTextureTask::doTask()
   csRef<iGraphics3D> g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
   csRef<iTextureManager> txtmgr = g3d->GetTextureManager();
   csRef<iMozilla> moz = csQueryRegistryOrLoad<iMozilla> (object_reg,
-  	"crystalspace.texture.type.mozilla");
+    "crystalspace.texture.type.mozilla");
 
   if(!moz)
   {
@@ -226,7 +226,11 @@ void csMetaTexture::Setup(csVosA3DL* vosa3dl)
 
   this->vosa3dl = vosa3dl;
 
+  LOG("csMetaTexture", 3, "Setting up texture " << getURLstr());
+
   vRef<Property> imagedata = getImage();
+
+  LOG("csMetaTexture", 4, getURLstr() << " imagedata isValid " << imagedata.isValid());
 
   if(imagedata->getDataType().substr(0, 5) == "text/") {
     ConstructMozTextureTask* cmtt = new ConstructMozTextureTask(
@@ -243,6 +247,9 @@ void csMetaTexture::Setup(csVosA3DL* vosa3dl)
   else
   {
     csStringFast<256> cachefilename;
+
+    LOG("csMetaTexture", 4, getURLstr() << " imagedata isValid " << imagedata.isValid());
+
     vRef<Site> site = imagedata->getSite();
 #if 0
     cachefilename << "/csvosa3dl_cache/" << site->getURL().getHost().c_str(),
@@ -258,11 +265,16 @@ void csMetaTexture::Setup(csVosA3DL* vosa3dl)
         cachefilename[i] = '_';
     }
 
+    LOG("csMetaTexture", 4, getURLstr() << " making ConstructTextureTask");
+
     ConstructTextureTask* ctt = new ConstructTextureTask(
       vosa3dl->GetObjectRegistry(), getURLstr(),
       cachefilename.GetData(), this);
     imagedata->read(ctt->texturedata);
     ctt->needListener = &needListener;
+
+    LOG("csMetaTexture", 4, getURLstr() << " pushing main thread task");
+
     vosa3dl->mainThreadTasks.push(ctt);
   }
 }
