@@ -262,12 +262,11 @@ on this exporter at:
 @noindent
 @uref{http://cal3d.sourceforge.net/modeling/tutorial.html}
 
-@strong{A5}: Crystal Space still has the Map2CS utility
-(@ref{map2cs Tutorial}; @ref{map2cs}) which can be used to convert
-maps from Q3Radiant, Hammer, or QuarK. This tool is
-still somewhat supported but it lacks the advanced features and control of
-the tools mentioned above. We are basically still looking for a maintainer
-willing to work further on Map2CS.
+@strong{A5}: There is a tool to convert map files (from tools like
+Q3Radiant, Hammer, or Quark) to CS. You can find this tool at:
+
+@noindent
+@uref{http://www-poleia.lip6.fr/~degris/converter/}
 
 @strong{A6}: There is a Maya2Spr utility included with Crystal Space
 which can convert Maya files to 3D sprites. Not for maps, though.

@@ -57,13 +57,6 @@ The Crystal Space image manipulator.
 An application demonstrating how you can use the 3D engine to simulate
 a semi-isometric view.
 
-@cindex @file{map2cs}
-@cindex Applications, @file{map2cs}
-@item map2cs
-A map converter which converts between Quake style @file{.map} format to the
-native Crystal Space map format. It is known to work with WorldCraft
-2.1 Beta and QuArK (Quake Army Knife). @xref{map2cs}.
-
 @cindex @file{mdl2spr}
 @cindex Applications, @file{mdl2spr}
 @item mdl2spr

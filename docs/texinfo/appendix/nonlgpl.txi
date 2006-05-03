@@ -9,12 +9,6 @@ design of Crystal Space allows to simply exclude the components in question.
 
 @itemize @bullet
 @item 
-@code{map2cs}, the Quake @sc{map} to Crystal Space converter in 
-@file{apps/import/map2cs}
-
-Licensed under the @sc{gnu} General Public License. @xref{Copying}.
-
-@item 
 @code{movierecorder} plugin
 
 Licensed under the @sc{gnu} General Public License. @xref{Copying}.
