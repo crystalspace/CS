@@ -183,7 +183,7 @@ In theory it is up to your program as to how these key-value tuples
 are interpreted.  However, Crystal Space has set some standards to make life
 easier for level designers and also to make levels as portable as possible
 between different Crystal Space games. Note that key value pairs actually
-allow multiple named values for a single key. @xref{Keylist Standards}.
+allow multiple named values for a single key.
 See the section about game data for more information on this subject.
 (@pxref{Game Data}).
 
@@ -196,19 +196,4 @@ See the section about game data for more information on this subject.
 itself will not use nodes but a game can use them to represent game specific
 data. See the section about game data for more information on this subject.
 (@pxref{Game Data}).
-
-@anchor{Keylist Standards}
-@subsubheading Keylist Standards
-@cindex Keylist Standards
-
-This section describes some guidelines for key/value tuples.
-
-The most important key is the @samp{classname} key.  It tells the program the
-type of an object.  All the following guidelines are set for special object
-classes.  If you don't agree with them, you should use different classnames.
-
-The following classnames are standardized:
-
-@noindent
-@@@@@@FIXME: @emph{Write this.}
 

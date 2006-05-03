@@ -90,6 +90,7 @@ To create a genmesh box you can actually use a short-hand notation:
       <max x="0.1" y="0.1" z="0.1" />
     </box>
     <autonormals />
+    <lighting>true</lighting>
   </params>
 </meshfact>
 @end example
@@ -121,9 +122,10 @@ factstate->CalculateNormals ();
 // Now create an instance:
 csRef<iMeshWrapper> mesh =
   engine->CreateMeshWrapper (fact, "cube");
+mesh->GetMeshObject ()->SetMaterialWrapper (myMaterial);
 csRef<iGeneralMeshState> meshstate = scfQueryInterface<iGeneralMeshState> (
   mesh->GetMeshObject ());
-meshstate->SetMaterialWrapper (myMaterial);
+meshstate->SetLighting (true);
 @dots{}
 @end example
 

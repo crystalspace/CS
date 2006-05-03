@@ -40,8 +40,8 @@ if (!csInitializer::RequestPlugins (object_reg,
 csRef<iCollideSystem> cd_sys = csQueryRegistry<iCollideSystem> (object_reg);
 @end example
 
-You can also load the collision detection plugin later with the following
-code:
+Instead of using the above you can also load the collision detection
+plugin later with the following code:
 
 @example
 csRef<iPluginManager> plugmgr =

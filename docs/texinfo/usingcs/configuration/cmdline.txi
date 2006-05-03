@@ -15,10 +15,7 @@ which an application responds.
 
 The default setting for each command line option is set internally in the 
 program unless there is a corresponding line for it in the configuration file.  
-For example, normally the default for @code{-gamma} is @code{1.0} (the default 
-brightness level).  But when @code{GAMMA=2.0} is set in configuration file 
-@file{soft3d.cfg} the default will be @code{2.0} instead.  Command line 
-options always override default values.  
+Command line options always override default values.  
 
 Some interesting options to play with are:
 
