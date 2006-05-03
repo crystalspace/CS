@@ -16,6 +16,10 @@ chronological order.
 	  would cause meshes to not be assigned any material at all.
 	- Jorrit did some small improvements to the engine API ref
 	  documentation.
+	- Jorrit removed the old and unmaintained map2cs. You can still
+	  retrieve it using the PRE_MAP2CS_REMOVAL tag. To convert map files
+	  there is now a better alternative at:
+	      http://www-poleia.lip6.fr/~degris/converter/
 2-May-2006
 	- Eric Sunshine fixed csPoolEvent::DecRef() to set up recycled data
 	  members the same way as they are set up by csPoolEvent constructor.
