@@ -11,6 +11,9 @@ chronological order.
           can grok CS' use of templates but does not get the cast operators
           right.
 	- res fixed some more "no virtual dtor" warnings.
+	- Peter Amstutz added a try/catch block in material setup
+	  in the VOS plugin to handle some exceptional conditions that 
+	  would cause meshes to not be assigned any material at all.
 2-May-2006
 	- Eric Sunshine fixed csPoolEvent::DecRef() to set up recycled data
 	  members the same way as they are set up by csPoolEvent constructor.
