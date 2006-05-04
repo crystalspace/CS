@@ -37,12 +37,15 @@ protected:
   /// Render target dimensions
   int txt_w, txt_h;
 
+  int sub_texture_id;
   csDirtyAccessArray<uint8> pixelScratch;
 public:
   csGLRender2TextureFramebuf (csGLGraphics3D* G3D) 
     : csGLRender2TextureBackend (G3D) { }
 
-  virtual void SetRenderTarget (iTextureHandle* handle, bool persistent);
+  virtual void SetRenderTarget (iTextureHandle* handle, 
+	  int subtexture,
+	  bool persistent);
 
   virtual void BeginDraw (int drawflags);
   virtual void SetupProjection ();

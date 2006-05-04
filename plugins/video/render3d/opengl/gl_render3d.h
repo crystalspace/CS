@@ -595,10 +595,11 @@ public:
 
   /// Set the current render target (0 for screen).
   virtual void SetRenderTarget (iTextureHandle* handle,
+	  int subtexture = 0,
 	  bool persistent = false)
   {
     render_target = handle;
-    r2tbackend->SetRenderTarget (handle, persistent);
+    r2tbackend->SetRenderTarget (handle, subtexture, persistent);
 
     int hasRenderTarget = (handle != 0) ? 1 : 0;
     G2D->PerformExtension ("userendertarget", hasRenderTarget);

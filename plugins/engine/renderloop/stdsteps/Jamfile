@@ -6,5 +6,6 @@ Includes fullquad.h : $(SUBDIR)/fullquad.tok ;
 Includes generic.h : $(SUBDIR)/generic.tok ;
 Includes lightiter.h : $(SUBDIR)/lightiter.tok ;
 Includes target.h : $(SUBDIR)/target.tok ;
+Includes shadowmap.h : $(SUBDIR)/shadowmap.tok ;
 LinkWith rendstep_std : crystalspace ;
 CompileGroups rendstep_std : renderall ;

@@ -28,10 +28,12 @@
 #include "gl_r2t_framebuf.h"
 
 void csGLRender2TextureFramebuf::SetRenderTarget (iTextureHandle* handle, 
+						  int subtexture,
 						  bool persistent)
 {
   render_target = handle;
   rt_onscreen = !persistent;
+  sub_texture_id = subtexture;
 
   if (handle)
   {
@@ -82,11 +84,14 @@ void csGLRender2TextureFramebuf::BeginDraw (int drawflags)
     G3D->statecache->Disable_GL_BLEND ();
     G3D->SetZMode (CS_ZBUF_NONE);
 
+	csGLTextureHandle* tex_mm = (csGLTextureHandle *)(render_target->GetPrivateObject ());
+	GLenum textarget = tex_mm->GetGLTextureTarget();
+
     GLint oldMagFilt, oldMinFilt;
-    glGetTexParameteriv (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, &oldMagFilt);
-    glGetTexParameteriv (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, &oldMinFilt);
-    glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glGetTexParameteriv (textarget, GL_TEXTURE_MAG_FILTER, &oldMagFilt);
+    glGetTexParameteriv (textarget, GL_TEXTURE_MIN_FILTER, &oldMinFilt);
+    glTexParameteri (textarget, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri (textarget, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
     glBegin (GL_QUADS);
     glTexCoord2f (0, 0); glVertex2i (0, txt_h);
@@ -95,8 +100,8 @@ void csGLRender2TextureFramebuf::BeginDraw (int drawflags)
     glTexCoord2f (1, 0); glVertex2i (txt_w, txt_h);
     glEnd ();
     rt_onscreen = true;
-    glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, oldMagFilt);
-    glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, oldMinFilt);
+    glTexParameteri (textarget, GL_TEXTURE_MAG_FILTER, oldMagFilt);
+    glTexParameteri (textarget, GL_TEXTURE_MIN_FILTER, oldMinFilt);
   }
   G3D->statecache->SetCullFace (GL_BACK);
 }
@@ -139,8 +144,11 @@ void csGLRender2TextureFramebuf::FinishDraw ()
     else
     {
       GLenum textarget = tex_mm->GetGLTextureTarget();
-      if ((textarget != GL_TEXTURE_2D) && (textarget != GL_TEXTURE_RECTANGLE_ARB))
+      if ((textarget != GL_TEXTURE_2D) && (textarget != GL_TEXTURE_RECTANGLE_ARB) 
+		  && (textarget != GL_TEXTURE_CUBE_MAP))
         return;
+
+	  bool handle_subtexture = (textarget == GL_TEXTURE_CUBE_MAP);
       /* Reportedly, some drivers crash if using CopyTexImage on a texture
        * size larger than the framebuffer. Use CopyTexSubImage then. */
       bool needSubImage = (txt_w > G3D->GetWidth()) 
@@ -162,11 +170,23 @@ void csGLRender2TextureFramebuf::FinishDraw ()
 	}
       }
       if (needSubImage)
-	glCopyTexSubImage2D (textarget, 0, 0, 0, 0, 0, 
-	  G3D->GetWidth(), G3D->GetHeight());
+		{
+		  if (handle_subtexture)
+			glCopyTexSubImage2D (GL_TEXTURE_CUBE_MAP_NEGATIVE_Y_ARB + sub_texture_id, 0, 0, 0, 0, 0, 
+			  G3D->GetWidth(), G3D->GetHeight());
+		  else
+		   glCopyTexSubImage2D (textarget, 0, 0, 0, 0, 0, 
+		    G3D->GetWidth(), G3D->GetHeight());
+		}
       else
-	glCopyTexImage2D (textarget, 0, GL_RGBA, 0, 0, txt_w, txt_h, 0);
-      tex_mm->SetNeedMips (true);
+		{
+		  if (handle_subtexture)
+		    glCopyTexSubImage2D (GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + sub_texture_id, 
+			  0, 0, 0, 0, 0, txt_w, txt_h);
+		  else
+		    glCopyTexImage2D (textarget, 0, GL_RGBA, 0, 0, txt_w, txt_h, 0);
+		      tex_mm->SetNeedMips (true);
+		}
     }
   }
 }

@@ -774,6 +774,7 @@ struct iGraphics3D : public virtual iBase
    * the texture.
    */
   virtual void SetRenderTarget (iTextureHandle* handle,
+	int subtexture = 0,
   	bool persistent = false) = 0;
 
   /**

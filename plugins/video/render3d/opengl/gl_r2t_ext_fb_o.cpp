@@ -74,6 +74,7 @@ static const char* FBStatusStr (GLenum status)
 }
 
 void csGLRender2TextureEXTfbo::SetRenderTarget (iTextureHandle* handle, 
+						int subtexture,
 						bool persistent)
 {
   if (enableFBO)
@@ -142,10 +143,10 @@ void csGLRender2TextureEXTfbo::SetRenderTarget (iTextureHandle* handle,
     }
   }
   if (enableFBO)
-    csGLRender2TextureFramebuf::SetRenderTarget (handle, false);
+    csGLRender2TextureFramebuf::SetRenderTarget (handle, subtexture, false);
   else
   {
-    csGLRender2TextureFramebuf::SetRenderTarget (handle, persistent);
+    csGLRender2TextureFramebuf::SetRenderTarget (handle, subtexture, persistent);
   }
 }
 

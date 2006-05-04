@@ -205,7 +205,7 @@ csGenericRenderStep::~csGenericRenderStep ()
 }
 
 void csGenericRenderStep::RenderMeshes (iRenderView* rview, iGraphics3D* g3d,
-                                        iShader* shader, size_t ticket,
+                                        iShader* shader, iLight *light, size_t ticket,
 					meshInfo* meshContexts,
                                         csRenderMesh** meshes, 
                                         size_t num,
@@ -243,6 +243,8 @@ void csGenericRenderStep::RenderMeshes (iRenderView* rview, iGraphics3D* g3d,
       svO2W->SetValue (mesh->object2world);
 
       stacks.Empty ();
+	  if (light)
+		  light->GetSVContext()->PushVariables (stacks);
       shaderManager->PushVariables (stacks);
       shadervars.Top ().PushVariables (stacks);
       if (mesh->variablecontext)
@@ -529,7 +531,7 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
         if (shader != 0)
 	{
           g3d->SetWorldToCamera (camt.GetInverse ());
-	  RenderMeshes (rview, g3d, shader, currentTicket,
+	  RenderMeshes (rview, g3d, shader, light, currentTicket,
 	  	sameShaderMeshInfo + lastidx,
 		sameShaderMeshes+lastidx, numSSM, stacks);
           shader = 0;
@@ -593,7 +595,7 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
         if (shader != 0)
 	{
           g3d->SetWorldToCamera (camt.GetInverse ());
-          RenderMeshes (rview, g3d, shader, currentTicket,
+          RenderMeshes (rview, g3d, shader, light, currentTicket,
 	  	sameShaderMeshInfo + lastidx, 
 		sameShaderMeshes + lastidx, numSSM, stacks);
 	}
@@ -612,7 +614,7 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
     if (shader != 0)
     {
       g3d->SetWorldToCamera (camt.GetInverse ());
-      RenderMeshes (rview, g3d, shader, currentTicket,
+      RenderMeshes (rview, g3d, shader, light, currentTicket,
       	sameShaderMeshInfo + lastidx,
         sameShaderMeshes + lastidx, numSSM, stacks);
     }

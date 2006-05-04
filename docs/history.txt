@@ -6,6 +6,26 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+4-May-2006
+	- Erroroman made the follwoing:
+	    - Generic render step now handles light shader variables.
+	    - Lightiter render step shader variable for light world 
+	      inverse transform.
+	    - Added param "subtexture" to iGraphics3D->SetRenderTarget, 
+	      that is used if texture is cubemap.
+	    - Added crystalspace.renderloop.step.shadowmap interface. It
+	      renders each direction to cubemap face. This is very usefull 
+	      for point lights. In future it will provide rendering to 2D 
+	      (depth) texture for spot lights. There are problems when 
+	      rendering from light position - sometimes vis culler doesn't
+	      render some objects and their shadows are not visible/correct.
+	    - Added distance and shadowmap Cg shaders. At the moment there 
+	      is no depth texture support and depth coding/encoding is 
+	      made by fragment shaders, so fragment program support is 
+	      neccessary.
+	    - Added r3dsmtest level.
+	    - Added std_rloop_shadowmap.xml renderloop.
+
 3-May-2006
         - res removed the CS_*_CAST macros. It is unlikely that a compiler
           can grok CS' use of templates but does not get the cast operators

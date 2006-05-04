@@ -44,9 +44,25 @@
         </requires>
       </class>
       <class>
+        <name>crystalspace.renderloop.step.shadowmap</name>
+        <implementation>csShadowmapRSLoader</implementation>
+        <description>Shadowmap target render loop step</description>
+        <requires>
+          <class>crystalspace.graphics3d.</class>
+        </requires>
+      </class>
+      <class>
         <name>crystalspace.renderloop.step.rendertarget.type</name>
         <implementation>csTargetRSType</implementation>
         <description>Render target render loop step type</description>
+        <requires>
+          <class>crystalspace.graphics3d.</class>
+        </requires>
+      </class>
+      <class>
+        <name>crystalspace.renderloop.step.shadowmap.type</name>
+        <implementation>csShadowmapRSType</implementation>
+        <description>Shadowmap render loop step type</description>
         <requires>
           <class>crystalspace.graphics3d.</class>
         </requires>

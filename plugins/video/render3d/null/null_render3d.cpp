@@ -274,7 +274,7 @@ void csNullGraphics3D::Close ()
     G2D->Close ();
 }
 
-void csNullGraphics3D::SetRenderTarget (iTextureHandle*, bool)
+void csNullGraphics3D::SetRenderTarget (iTextureHandle*, int, bool)
 {
   return;
 }

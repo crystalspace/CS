@@ -186,6 +186,7 @@ void csLightIterRenderStep::Init ()
     csStringID atxname = strings->Request ("light 0 attenuationtex");
     csStringID infallname = strings->Request ("light 0 inner falloff");
     csStringID ofallname = strings->Request ("light 0 outer falloff");
+	trw_inv_name = strings->Request ("light 0 transform inverse world");
 
     shadermgr = CS_QUERY_REGISTRY (
     	object_reg, iShaderManager);
@@ -336,6 +337,10 @@ void csLightIterRenderStep::Perform (iRenderView* rview, iSector* sector,
     shvar_light_0_outer_falloff->SetValue (falloffOuter);
 
     shvar_light_0_attenuationtex->SetAccessor (GetLightAccessor (light));
+
+	csShaderVariable *sv;
+	sv = light->GetSVContext()->GetVariableAdd(trw_inv_name);
+    sv->SetValue (light->GetMovable()->GetFullTransform().GetInverse());
 
     lightList.Push (light);
     shadermgr->SetActiveLights (lightList);

@@ -152,7 +152,7 @@ public:
   virtual void RemoveDisableDefaultTriggerType (const char* type);
 
   inline void RenderMeshes (iRenderView* rview,
-  	iGraphics3D* g3d, iShader* shader,
+  	iGraphics3D* g3d, iShader* shader, iLight *light, 
 	size_t ticket, meshInfo* meshContext,
 	csRenderMesh** meshes, size_t num, csShaderVarStack &stacks);
 

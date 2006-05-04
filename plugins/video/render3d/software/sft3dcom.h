@@ -434,7 +434,7 @@ public:
 
   /// Get the vertex buffer manager.
 
-  virtual void SetRenderTarget (iTextureHandle* handle, bool persistent);
+  virtual void SetRenderTarget (iTextureHandle* handle, int subtexture, bool persistent);
   virtual iTextureHandle* GetRenderTarget () const { return render_target; }
 
   /// Get Z-buffer value at given X,Y position
