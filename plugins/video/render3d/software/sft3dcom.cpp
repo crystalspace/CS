@@ -623,7 +623,7 @@ void csSoftwareGraphics3DCommon::FinishDraw ()
         }
       }
     
-      SetRenderTarget (0, 0,false);
+      SetRenderTarget (0, false, 0);
       if (oldIlaceMode != -1) do_interlaced = oldIlaceMode;
     }
   }
@@ -751,8 +751,8 @@ float csSoftwareGraphics3DCommon::GetZBuffValue (int x, int y)
 }
 
 void csSoftwareGraphics3DCommon::SetRenderTarget (iTextureHandle* handle,
-	int subtexture, 
-	bool persistent)
+	bool persistent,
+	int subtexture)
 {
   render_target = handle;
   rt_onscreen = !persistent;

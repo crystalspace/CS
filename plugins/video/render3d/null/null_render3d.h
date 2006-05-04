@@ -81,7 +81,7 @@ public:
   void GetPerspectiveCenter (int& x, int& y) const { x = cx, y = cy; }
   void SetPerspectiveAspect (float aspect) { a = aspect; }
   float GetPerspectiveAspect () const { return a; }
-  void SetRenderTarget (iTextureHandle* handle, int subtexture = 0, bool persistent = false);
+  void SetRenderTarget (iTextureHandle* handle, bool persistent = false, int subtexture = 0);
   iTextureHandle* GetRenderTarget () const;
   bool BeginDraw (int DrawFlags);
   void FinishDraw ();

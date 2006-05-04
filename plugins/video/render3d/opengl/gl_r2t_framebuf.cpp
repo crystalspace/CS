@@ -28,8 +28,8 @@
 #include "gl_r2t_framebuf.h"
 
 void csGLRender2TextureFramebuf::SetRenderTarget (iTextureHandle* handle, 
-						  int subtexture,
-						  bool persistent)
+						  bool persistent,
+						  int subtexture)
 {
   render_target = handle;
   rt_onscreen = !persistent;

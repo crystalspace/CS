@@ -25,7 +25,10 @@ chronological order.
 	      neccessary.
 	    - Added r3dsmtest level.
 	    - Added std_rloop_shadowmap.xml renderloop.
-
+	- Jorrit fixed the new parameter in SetRenderTarget() so that it
+	  comes at the end. This is more compatible with CEL and
+	  other external projects and also fixes several cases in CS
+	  where the new parameter was not accounted for.
 3-May-2006
         - res removed the CS_*_CAST macros. It is unlikely that a compiler
           can grok CS' use of templates but does not get the cast operators

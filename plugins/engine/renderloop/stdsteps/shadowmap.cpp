@@ -280,7 +280,7 @@ void csShadowmapRenderStep::Perform (iRenderView* rview, iSector* sector,
     sv->SetValue (depth_textures[curr_depth_cubemap]);
 	for (size_t j = 0; j < 6 ; j++)
 	{
-		g3d->SetRenderTarget(depth_textures[curr_depth_cubemap], j);
+		g3d->SetRenderTarget(depth_textures[curr_depth_cubemap], false, j);
 
 		csOrthoTransform new_transform = light->GetMovable()->GetFullTransform();
 

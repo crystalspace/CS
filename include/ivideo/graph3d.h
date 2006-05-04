@@ -768,14 +768,16 @@ struct iGraphics3D : public virtual iBase
    * will overwrite the screen. So you should only do this BEFORE you
    * start rendering your frame.
    * <p>
-   * If 'persistent' is true then the current contents of the texture
+   * \param persistent If this is true then the current contents of the texture
    * will be copied on screen before drawing occurs (in the first
    * call to BeginDraw). Otherwise it is assumed that you fully render
    * the texture.
+   * \param subtexture this specifies the subtexture index if the texture
+   * is a cubemap. It is in the range 0 to 5.
    */
   virtual void SetRenderTarget (iTextureHandle* handle,
-	int subtexture = 0,
-  	bool persistent = false) = 0;
+	bool persistent = false,
+	int subtexture = 0) = 0;
 
   /**
    * Get the current render target (0 for screen).

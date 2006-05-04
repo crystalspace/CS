@@ -35,8 +35,8 @@ public:
   csGLRender2TextureBackend (csGLGraphics3D* G3D);
   virtual ~csGLRender2TextureBackend();
 
-  virtual void SetRenderTarget (iTextureHandle* handle, int subtexture, 
-	  bool persistent) = 0;
+  virtual void SetRenderTarget (iTextureHandle* handle, bool persistent,
+  	int subtexture) = 0;
   virtual void BeginDraw (int drawflags) = 0;
   virtual void SetupProjection () = 0;
   virtual void FinishDraw () = 0;

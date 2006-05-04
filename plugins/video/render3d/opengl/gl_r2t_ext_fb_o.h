@@ -35,8 +35,8 @@ public:
       depthRB(0), stencilRB(0) { }
   virtual ~csGLRender2TextureEXTfbo();
 
-  virtual void SetRenderTarget (iTextureHandle* handle, int subtexture,
-	  bool persistent);
+  virtual void SetRenderTarget (iTextureHandle* handle, bool persistent,
+  	int subtexture);
   virtual void FinishDraw ();
 };
 

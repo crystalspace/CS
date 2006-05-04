@@ -44,8 +44,8 @@ public:
     : csGLRender2TextureBackend (G3D) { }
 
   virtual void SetRenderTarget (iTextureHandle* handle, 
-	  int subtexture,
-	  bool persistent);
+	  bool persistent,
+	  int subtexture);
 
   virtual void BeginDraw (int drawflags);
   virtual void SetupProjection ();
