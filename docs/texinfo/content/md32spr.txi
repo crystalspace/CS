@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node md32spr Tutorial, mdl2spr, map2cs Tutorial, Working with Engine Content
+@node md32spr Tutorial, mdl2spr, 3DSMax, Working with Engine Content
 @section @code{md32spr} Tutorial
 @cindex Tutorial, Sprite (@code{md32spr})
 @cindex @code{md32spr} Tutorial
