@@ -935,6 +935,7 @@ AS_IF([test $cs_cv_libgl = yes],
 	    [GLhandleARB x; (void)x;])],
 	[], [],	[CS_HEADER_PROPERTY([CS_HAVE_GLHANDLEARB_T])], [], [],
 	[$cs_cv_libgl_cflags], [$cs_cv_libgl_lflags], [$cs_cv_libgl_libs])])
+CS_CHECK_GLU
 CS_CHECK_GLX
 # Check for GLX extensions.  Define CSGL_EXT_STATIC_ASSERTION if _not_
 # present.

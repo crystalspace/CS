@@ -33,6 +33,8 @@ chronological order.
 	  material on a factory in a generic way. This code only worked
 	  for 3D sprites. Now it works for all factories that support
 	  SetMaterialWrapper().
+	- res fixed configure to check for GLU again (needed by some 3rd party
+	  libs).
 4-May-2006
 	- Erroroman made the follwoing:
 	    - Generic render step now handles light shader variables.
