@@ -43,7 +43,6 @@
 #include "imap/services.h"
 #include "imap/writer.h"
 #include "imesh/object.h"
-#include "imesh/sprite3d.h"
 #include "imesh/thing.h"
 #include "itexture/ifire.h"
 #include "itexture/iproctex.h"
@@ -690,14 +689,9 @@ bool csSaver::SaveMeshFactories(iMeshFactoryList* factList,
     synldr->WriteZMode (factNode, &zmode, false);
 
     // Save sprite3d specific material...Because it's not handled in sprite3d loader?
-    csRef<iSprite3DFactoryState> sprstate =
-      SCF_QUERY_INTERFACE (meshfact, iSprite3DFactoryState);
-    if (sprstate)
-    {
-      if (sprstate->GetMaterialWrapper ())
+      if (meshfact->GetMaterialWrapper ())
         CreateNode (factNode, "material")->CreateNodeBefore (CS_NODE_TEXT)
-          ->SetValue (sprstate->GetMaterialWrapper ()->QueryObject ()->GetName ());
-    }
+          ->SetValue (meshfact->GetMaterialWrapper ()->QueryObject ()->GetName ());
 
     // TBD: Static LOD, LOD
     
