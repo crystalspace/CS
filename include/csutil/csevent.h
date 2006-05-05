@@ -69,10 +69,15 @@ private:
     attribute (const attribute &o) 
     {
       type = o.type;
-      ibaseVal = o.ibaseVal;
+      intVal = o.intVal;
       dataSize = o.dataSize;
       if ((o.type == csEventAttrEvent) || (o.type == csEventAttriBase))
         ibaseVal->IncRef();
+      if (type == csEventAttrDatabuffer) 
+      {
+        bufferVal = new char[dataSize];
+        memcpy(bufferVal, o.bufferVal,dataSize);
+      }
     }
     ~attribute () 
     { 
