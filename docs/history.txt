@@ -6,6 +6,8 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+5-May-2006
+	- Jorrit started work on more detailed mesh object documentation.
 4-May-2006
 	- Erroroman made the follwoing:
 	    - Generic render step now handles light shader variables.

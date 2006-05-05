@@ -73,7 +73,100 @@ and various other configuration parameters for a genmesh factory.
 
 @subsubheading Factory Loader
 
-@@@@@@TODO
+Here is a list of all the tags supported by a genmesh factory and their
+meaning:
+@itemize @bullet
+@item @samp{box}
+This is a shortcut for defining a box geometry. It contains two vectors
+named @samp{min} and @samp{max}:
+@samp{<box> <min x="0" y="0" z="0" /> <max x="1" y="1" z="1" /> </box>}.
+@item @samp{sphere}
+This is a short cut for defining sphere geometry:
+@samp{<sphere rimvertices="6" reversed="true" cylindrical="false">
+<radius x="10" y="10" z="1" /> </sphere>}
+@item @samp{numtri}
+Deprecated. This is the old way to specify the number of triangles this
+genmesh will use. It is no longer needed and it is most certainly not needed
+if you use @samp{box} or @samp{sphere}.
+@item @samp{numvt}
+Deprecated. This is the old way to specify the number of vertices this
+genmesh will use. It is no longer needed and it is most certainly not needed
+if you use @samp{box} or @samp{sphere}. Note that if you do not use
+@samp{numvt} that you have to specify vertices with uv in the same @samp{v}
+command but colors and normals have to be specified seperatelly. If you
+don't use @samp{numvt} then you can specify everything in one statement.
+@item @samp{v}
+Unless you use @samp{box} or @samp{sphere} you can use this to add a
+vertex. If you don't use @samp{numvt} (prefered) then you should specify
+all vertex information here: @samp{<v x="0" y="0" z="0" nx="1" ny="0" nz="0"
+red=".5" green=".g" blue=".g" u="0" v=".1" />}. Otherwise you must specify
+normal and color information seperatelly. Note that normal and color information
+is optional. Default color is black and default normal is the 0-vector (meaning
+you'll have to use @samp{autonormals} then).
+@item @samp{n}
+This is only used if you specified @samp{numvt} and it specifies the normal
+information for every vertex. You must have the same number of @samp{n}
+statements as there are vertices. Note that if you use @samp{autonormals}
+then you don't need to specify normals.
+@item @samp{color}
+This is only used if you specified @samp{numvt} and it specifies the color
+information for every vertex. You must have the same number of @samp{color}
+statements as there are vertices.
+@item @samp{submesh}
+Using submeshes you can define subsets of the factory that use different
+material and mixmode. When you don't use @samp{submesh} the entire mesh
+will use the same material and mixmode. As soon as you use submeshes you
+should make sure that every triangle is contained in some submesh. Basically
+inside the @samp{submesh} node you need to specify the triangle indices to
+use, the material, and the mixmode: @samp{<submesh> <t>0</t> <t>3</t> @dots{}
+<material>stone</material> <mixmode> <add /> </mixmode> </submesh>}.
+@item @samp{t}
+Add a triangle to the factory. You need to specify the three vertex indices
+that are used for the triangle: @samp{<t v1="3" v2="1" v3="10" />}.
+@item @samp{material}
+The name of the master material to use for this genmesh. Mesh objects
+that are created from this factory can override this material. Also note
+that if you use submeshes then multiple materials can be used for the same
+factory/object.
+@item @samp{autonormals}
+If you use this then the normals will be calculated automatically from the
+given vertices. By default the vertex table is compressed (all doubles removed)
+in a temporary table and from that table the normal data is calculated so that
+you get a smooth result. If you don't want that compression (because you want
+to ensure that there are explicit seams in the object) you need to set
+the @samp{normalnocompress} flag before this statement.
+@item @samp{normalnocompress}
+Disable compression of the vertex table before @samp{autonormals} is used.
+@item @samp{back2front}
+If you have an object that uses transparency that requires perfect sorting
+from back to front (like objects using alpha transparency) then you may need
+to set this flag. This will ensure that internally there is a @sc{bsp} tree
+to sort the polygons from back to front when rendering. Note that this slows
+down considerably so only use it if you really need it.
+@item @samp{manualcolors}
+If this flag is set then no lighting values are processed and the colors
+specified for every vertex (which are default black!) are used.
+@item @samp{lighting}
+If this flag is set (default true) then lighting information (from nearby
+lights) is added to the colors of the vertices.
+@item @samp{defaultcolor}
+This color is added to the colors of the vertices globally.
+@item @samp{localshadows}
+If this flag is set (default false) then lighting calculation is not
+dynamic but instead static and precalculated. This is faster at runtime and
+additionally shadows on the genmesh object will be supported (only shadows
+calculated per vertex).
+@item @samp{noshadows}
+If this flag is set (default false) then the object will not cast shadows
+on other objects.
+@item @samp{mixmode}
+Control the transparency of this object. @@@@@@TODO: document more!
+@item @samp{animcontrol}
+Add an animation control to the object. @@@@@@TODO: document more!
+@item @samp{renderbuffer}
+Using this statement you can add your own user renderbuffers to the object.
+These renderbuffers can be used by shaders. @@@@@@TODO: document more!
+@end itemize
 
 @subsubheading Object State Interface
 
