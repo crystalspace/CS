@@ -88,7 +88,14 @@ csEvent::csEvent (csEvent const& e) : iBase(), scfImplementationType (this),
   Name = e.Name;
   Broadcast = e.Broadcast;
   Time = e.Time;
-  attributes = e.attributes;
+  csHash<attribute*, csStringID>::GlobalIterator it = e.attributes.GetIterator();
+  csStringID key;
+  while (it.HasNext())
+  {
+    attribute *a = it.Next(key);
+    attributes.Put(key, new attribute(*a));
+    count++;
+  }
 }
 
 csEvent::~csEvent ()

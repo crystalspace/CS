@@ -66,12 +66,20 @@ private:
     csEventAttributeType type;
     size_t dataSize;
     attribute (csEventAttributeType t) { type = t; }
+    attribute (const attribute &o) 
+    {
+      type = o.type;
+      ibaseVal = o.ibaseVal;
+      dataSize = o.dataSize;
+      if ((o.type == csEventAttrEvent) || (o.type == csEventAttriBase))
+        ibaseVal->IncRef();
+    }
     ~attribute () 
     { 
       if (type == csEventAttrDatabuffer) 
-	delete[] bufferVal; 
+        delete[] bufferVal; 
       else if ((type == csEventAttrEvent) || (type == csEventAttriBase))
-	ibaseVal->DecRef();
+        ibaseVal->DecRef();
     }
   };
   csHash<attribute*, csStringID> attributes;

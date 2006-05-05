@@ -36,6 +36,7 @@ chronological order.
 	- Jorrit fixed cssaver for latest changes.
 	- res fixed configure to check for GLU again (needed by some 3rd party
 	  libs).
+	- Jtarbox fixed the copy constructor for csEvents
 4-May-2006
 	- Erroroman made the follwoing:
 	    - Generic render step now handles light shader variables.
