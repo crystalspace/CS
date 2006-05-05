@@ -166,15 +166,6 @@ SCF_VERSION (iSprite2DFactoryState, 0, 0, 1);
  */
 struct iSprite2DFactoryState : public iBase
 {
-  /// Set material of sprite.
-  virtual void SetMaterialWrapper (iMaterialWrapper* material) = 0;
-  /// Get material of sprite.
-  virtual iMaterialWrapper* GetMaterialWrapper () const = 0;
-  /// Set mix mode.
-  virtual void SetMixMode (uint mode) = 0;
-  /// Get mix mode.
-  virtual uint GetMixMode () const = 0;
-
   /**
    * Set true if this sprite needs lighting (default).
    * Otherwise the given colors are used.

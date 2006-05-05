@@ -530,15 +530,6 @@ public:
   virtual bool AddPolygonRenderBuffer (int polygon_idx, const char* name,
     iRenderBuffer* buffer);
 
-  virtual void SetMixMode (uint mode)
-  {
-    mixmode = mode;
-  }
-  virtual uint GetMixMode () const
-  {
-    return mixmode;
-  }
-
   //-------------------- iMeshObjectFactory interface implementation ----------
 
   virtual csFlags& GetFlags () { return flags; }
@@ -551,6 +542,12 @@ public:
   virtual iMeshFactoryWrapper* GetMeshFactoryWrapper () const
   { return logparent; }
   virtual iMeshObjectType* GetMeshObjectType () const { return thingmesh_type; }
+  virtual bool SetMaterialWrapper (iMaterialWrapper*) { return false; }
+  virtual iMaterialWrapper* GetMaterialWrapper () const { return 0; }
+  virtual void SetMixMode (uint mode)
+  { mixmode = mode; }
+  virtual uint GetMixMode () const
+  { return mixmode; }
 
   //-------------------- iPolygonMesh interface implementation ----------------
   csRef<PolyMeshHelper> polygonMesh;

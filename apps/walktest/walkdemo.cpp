@@ -121,7 +121,7 @@ void add_particles_rain (iSector* sector, char* matname, int num, float speed,
   csRef<iRainState> rainstate (
   	SCF_QUERY_INTERFACE (exp->GetMeshObject (), iRainState));
   exp->GetMeshObject()->SetMaterialWrapper (mat);
-  rainstate->SetMixMode (CS_FX_ADD);
+  exp->GetMeshObject()->SetMixMode (CS_FX_ADD);
   exp->GetMeshObject()->SetColor (csColor (.25,.25,.25));
   rainstate->SetParticleCount (num);
   rainstate->SetDropSize (0.3f/50.0f, 0.3f);

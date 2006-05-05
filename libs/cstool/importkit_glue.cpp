@@ -246,7 +246,8 @@ namespace CS
       newMesh.triCount = tc;
       newMesh.tris = (uint*)model->tris.GetArray();
       newMesh.material = 
-	material2texture.Get (gmfact->GetMaterialWrapper(), (size_t)-1);
+	material2texture.Get (fact->GetMeshObjectFactory ()
+		->GetMaterialWrapper(), (size_t)-1);
 
       newModel.meshes.Push (newMesh);
       newModel.glueModel = model;
@@ -288,7 +289,8 @@ namespace CS
       newMesh.triCount = tc;
       newMesh.tris = (uint*)model->tris.GetArray();
       newMesh.material = 
-	material2texture.Get (sprfact->GetMaterialWrapper(), (size_t)-1);
+	material2texture.Get (fact->GetMeshObjectFactory ()
+		->GetMaterialWrapper(), (size_t)-1);
 
       newModel.meshes.Push (newMesh);
       newModel.glueModel = model;

@@ -658,11 +658,6 @@ struct iThingFactoryState : public virtual iBase
 
   virtual bool AddPolygonRenderBuffer (int polygon_idx, const char* name,
     iRenderBuffer* buffer) = 0;
-
-  /// Set mix mode.
-  virtual void SetMixMode (uint mode) = 0;
-  /// Get mix mode.
-  virtual uint GetMixMode () const = 0;
 };
 
 /**

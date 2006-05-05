@@ -255,10 +255,6 @@ public:
   	iObjectRegistry *object_registry);
   /// Destructor.
   virtual ~csLightningMeshObjectFactory ();
-  /// Get the material for this 2D sprite.
-  iMaterialWrapper* GetMaterialWrapper () const { return material; }
-  /// Get mixmode.
-  uint GetMixMode () const { return MixMode; }
   /// Get the origin
   const csVector3& GetOrigin () const { return origin; }
   iMeshObjectFactory *GetMeshFactory () { return GenMeshFact; }
@@ -336,22 +332,23 @@ public:
       GenFactState->Invalidate ();
     }
   }
+  virtual bool SetMaterialWrapper (iMaterialWrapper* material)
+  {
+    csLightningMeshObjectFactory::material = material;
+    return true;
+  }
+  virtual iMaterialWrapper* GetMaterialWrapper () const
+  { return material; }
+  virtual void SetMixMode (uint mode) { MixMode = mode; }
+  virtual uint GetMixMode () const { return MixMode; }
 
-  //------------------------- iLightningFactoryState implementation ----------------
+  //---------------------- iLightningFactoryState implementation --------------
   class LightningFactoryState : public iLightningFactoryState
   {
     SCF_DECLARE_EMBEDDED_IBASE (csLightningMeshObjectFactory);
 
     csTicks update_counter;
 
-    virtual void SetMaterialWrapper (iMaterialWrapper* material)
-    {
-      scfParent->material = material;
-    }
-    virtual iMaterialWrapper* GetMaterialWrapper () const
-    { return scfParent->material; }
-    virtual void SetMixMode (uint mode) { scfParent->MixMode = mode; }
-    virtual uint GetMixMode () const { return scfParent->MixMode; }
     virtual void SetOrigin(const csVector3& pos) 
     {       
       scfParent->origin = pos; 

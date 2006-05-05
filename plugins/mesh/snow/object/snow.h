@@ -203,6 +203,10 @@ public:
   { return logparent; }
   virtual iMeshObjectType* GetMeshObjectType () const { return snow_type; }
   virtual iObjectModel* GetObjectModel () { return 0; }
+  virtual bool SetMaterialWrapper (iMaterialWrapper*) { return false; }
+  virtual iMaterialWrapper* GetMaterialWrapper () const { return 0; }
+  virtual void SetMixMode (uint) { }
+  virtual uint GetMixMode () const { return 0; }
 };
 
 /**

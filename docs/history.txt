@@ -16,6 +16,23 @@ chronological order.
 	  of invalid arguments.
 	- Jorrit removed iSector->RegisterPortalMesh() and
 	  UnregisterPortalMesh() from the public api.
+	- Jorrit removed a few unneeded '@@@' in the sources.
+	- Jorrit added iMeshObjectFactory->SetMaterialWrapper(),
+	  GetMaterialWrapper(), GetMixMode(), and SetMixMode().
+	- Jorrit removed SetMaterialWrapper(), SetMixMode() and related from:
+	    - iGeneralFactoryState
+	    - iHazeFactoryState 
+	    - iInstancingFactoryState
+	    - iLightningFactoryState
+	    - iSprite2DFactoryState
+	    - iSprite3DFactoryState
+	    - iThingFactoryState (only mixmode stuff)
+	  Added a note about this to the apimod document.
+	- Jorrit removed the above functions also from iRainState.
+	- Jorrit fixed the very ad-hoc code in the loader to set the
+	  material on a factory in a generic way. This code only worked
+	  for 3D sprites. Now it works for all factories that support
+	  SetMaterialWrapper().
 4-May-2006
 	- Erroroman made the follwoing:
 	    - Generic render step now handles light shader variables.

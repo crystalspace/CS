@@ -457,9 +457,10 @@ public:
   /// Do full bright.
   bool DoFullBright () const { return do_fullbright; }
 
-  void SetMaterialWrapper (iMaterialWrapper* material)
+  bool SetMaterialWrapper (iMaterialWrapper* material)
   {
     csInstmeshMeshObjectFactory::material = material;
+    return true;
   }
   iMaterialWrapper* GetMaterialWrapper () const { return material; }
   void AddVertex (const csVector3& v,

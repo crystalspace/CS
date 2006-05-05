@@ -394,9 +394,12 @@ iSpriteSocket* csSprite3DMeshObjectFactory::FindSocket (iMeshWrapper *mesh) cons
 
   return 0;
 }
-void csSprite3DMeshObjectFactory::SetMaterialWrapper (iMaterialWrapper *material)
+
+bool csSprite3DMeshObjectFactory::SetMaterialWrapper (
+	iMaterialWrapper *material)
 {
   cstxt = material;
+  return true;
 }
 
 void csSprite3DMeshObjectFactory::ComputeNormals (csSpriteFrame* frame)

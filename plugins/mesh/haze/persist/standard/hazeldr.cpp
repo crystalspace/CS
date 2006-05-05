@@ -223,7 +223,7 @@ csPtr<iBase> csHazeFactoryLoader::Parse (iDocumentNode* node,
 		child, "Could not find material '%s'!", matname);
             return 0;
 	  }
-	  hazefactorystate->SetMaterialWrapper (mat);
+	  fact->SetMaterialWrapper (mat);
 	}
 	break;
       case XMLTOKEN_MIXMODE:
@@ -231,7 +231,7 @@ csPtr<iBase> csHazeFactoryLoader::Parse (iDocumentNode* node,
 	  uint mode;
 	  if (!synldr->ParseMixmode (child, mode))
 	    return 0;
-          hazefactorystate->SetMixMode (mode);
+          fact->SetMixMode (mode);
 	}
 	break;
       case XMLTOKEN_ORIGIN:
@@ -297,7 +297,7 @@ bool csHazeFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent,
   if (mesh && haze)
   {
     //Writedown Material tag
-    iMaterialWrapper* mat = haze->GetMaterialWrapper();
+    iMaterialWrapper* mat = mesh->GetMaterialWrapper();
     if (mat)
     {
       const char* matname = mat->QueryObject()->GetName();
@@ -361,7 +361,7 @@ bool csHazeFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent,
     }
  
     //Writedown Mixmode tag
-    int mixmode = haze->GetMixMode();
+    int mixmode = mesh->GetMixMode();
     csRef<iDocumentNode> mixmodeNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
     mixmodeNode->SetValue("mixmode");
     synldr->WriteMixmode(mixmodeNode, mixmode, true);
@@ -455,7 +455,7 @@ csPtr<iBase> csHazeLoader::Parse (iDocumentNode* node,
 		child, "Could not find material '%s'!", matname);
 	    return 0;
 	  }
-	  hazestate->SetMaterialWrapper (mat);
+	  mesh->SetMaterialWrapper (mat);
 	}
 	break;
       case XMLTOKEN_MIXMODE:
@@ -463,7 +463,7 @@ csPtr<iBase> csHazeLoader::Parse (iDocumentNode* node,
 	  uint mode;
 	  if (!synldr->ParseMixmode (child, mode))
 	    return 0;
-          hazestate->SetMixMode (mode);
+          mesh->SetMixMode (mode);
 	}
 	break;
       case XMLTOKEN_ORIGIN:
@@ -543,7 +543,7 @@ bool csHazeSaver::WriteDown (iBase* obj, iDocumentNode* parent,
     }
 
     //Writedown Material tag
-    iMaterialWrapper* mat = haze->GetMaterialWrapper();
+    iMaterialWrapper* mat = mesh->GetMaterialWrapper();
     if (mat)
     {
       const char* matname = mat->QueryObject()->GetName();
@@ -607,7 +607,7 @@ bool csHazeSaver::WriteDown (iBase* obj, iDocumentNode* parent,
     }
  
     //Writedown Mixmode tag
-    int mixmode = haze->GetMixMode();
+    int mixmode = mesh->GetMixMode();
     csRef<iDocumentNode> mixmodeNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
     mixmodeNode->SetValue("mixmode");
     synldr->WriteMixmode(mixmodeNode, mixmode, true);

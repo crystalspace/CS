@@ -87,18 +87,6 @@ public:
     { scfParent->SetCollisionDetection(cd); };
     virtual bool GetCollisionDetection() const
     { return scfParent->GetCollisionDetection(); };
-    virtual void SetMaterialWrapper (iMaterialWrapper* material)
-    { scfParent->SetMaterialWrapper (material); }
-    virtual iMaterialWrapper* GetMaterialWrapper () const
-    { return scfParent->GetMaterialWrapper (); }
-    virtual void SetMixMode (uint mode)
-    { scfParent->MixMode = mode; }
-    virtual uint GetMixMode () const
-    { return scfParent->MixMode; }
-    virtual void SetColor (const csColor& color)
-    { scfParent->Color = color; }
-    virtual const csColor& GetColor () const
-    { return scfParent->Color; }
   } scfiRainState;
   friend class RainState;
 };

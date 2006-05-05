@@ -434,10 +434,6 @@ public:
   /// Destructor.
   virtual ~csHazeMeshObjectFactory ();
 
-  /// Get the material for this 2D sprite.
-  iMaterialWrapper* GetMaterialWrapper () const { return material; }
-  /// Get mixmode.
-  uint GetMixMode () const { return MixMode; }
   /// Get the layers vector
   csPDelArray<csHazeLayer>* GetLayers() {return &layers;}
   /// get the origin
@@ -459,19 +455,19 @@ public:
   { return logparent; }
   virtual iMeshObjectType* GetMeshObjectType () const { return haze_type; }
   virtual iObjectModel* GetObjectModel () { return 0; }
+  virtual bool SetMaterialWrapper (iMaterialWrapper* material)
+  {
+    csHazeMeshObjectFactory::material = material;
+    return true;
+  }
+  virtual iMaterialWrapper* GetMaterialWrapper () const { return material; }
+  virtual void SetMixMode (uint mode) { MixMode = mode; }
+  virtual uint GetMixMode () const { return MixMode; }
 
   //------------------------- iHazeFactoryState implementation ----------------
   class HazeFactoryState : public iHazeFactoryState
   {
     SCF_DECLARE_EMBEDDED_IBASE (csHazeMeshObjectFactory);
-    virtual void SetMaterialWrapper (iMaterialWrapper* material)
-    {
-      scfParent->material = material;
-    }
-    virtual iMaterialWrapper* GetMaterialWrapper () const
-    { return scfParent->material; }
-    virtual void SetMixMode (uint mode) { scfParent->MixMode = mode; }
-    virtual uint GetMixMode () const { return scfParent->MixMode; }
     virtual void SetOrigin(const csVector3& pos) { scfParent->origin = pos; }
     virtual const csVector3& GetOrigin() const {return scfParent->origin;}
     virtual void SetDirectional(const csVector3& pos)

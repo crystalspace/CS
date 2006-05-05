@@ -369,10 +369,6 @@ public:
 
   /// Has this sprite lighting?
   bool HasLighting () const { return lighting; }
-  /// Get the material for this 2D sprite.
-  iMaterialWrapper* GetMaterialWrapper () const { return material; }
-  /// Get mixmode.
-  uint GetMixMode () const { return MixMode; }
 
   int GetUVAnimationCount () const {return (int)vAnims.Length ();}
   iSprite2DUVAnimation *CreateUVAnimation ()
@@ -414,6 +410,15 @@ public:
   { return logparent; }
   virtual iMeshObjectType* GetMeshObjectType () const { return spr2d_type; }
   virtual iObjectModel* GetObjectModel () { return 0; }
+  virtual bool SetMaterialWrapper (iMaterialWrapper* material)
+  {
+    csSprite2DMeshObjectFactory::material = material;
+    return true;
+  }
+  virtual iMaterialWrapper* GetMaterialWrapper () const
+  { return material; }
+  virtual void SetMixMode (uint mode) { MixMode = mode; }
+  virtual uint GetMixMode () const { return MixMode; }
 
   //---------------------- iSprite2DFactoryState implementation ----------------
   class Sprite2DFactoryState : public iSprite2DFactoryState
@@ -421,14 +426,6 @@ public:
     SCF_DECLARE_EMBEDDED_IBASE (csSprite2DMeshObjectFactory);
     virtual void SetLighting (bool l) { scfParent->lighting = l; }
     virtual bool HasLighting () const { return scfParent->HasLighting (); }
-    virtual void SetMaterialWrapper (iMaterialWrapper* material)
-    {
-      scfParent->material = material;
-    }
-    virtual iMaterialWrapper* GetMaterialWrapper () const
-    { return scfParent->material; }
-    virtual void SetMixMode (uint mode) { scfParent->MixMode = mode; }
-    virtual uint GetMixMode () const { return scfParent->MixMode; }
 
     virtual int GetUVAnimationCount () const
     { return scfParent->GetUVAnimationCount(); }

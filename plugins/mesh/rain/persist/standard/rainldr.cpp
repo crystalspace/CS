@@ -277,7 +277,7 @@ csPtr<iBase> csRainLoader::Parse (iDocumentNode* node,
 	  uint mode;
 	  if (!synldr->ParseMixmode (child, mode))
 	    return 0;
-          rainstate->SetMixMode (mode);
+          mesh->SetMixMode (mode);
 	}
 	break;
       case XMLTOKEN_COLLDET:

@@ -2565,7 +2565,7 @@ void csBugPlug::DebugSectorBox (const csBox3& box, float r, float g, float b,
   	SCF_QUERY_INTERFACE (mf->GetMeshObjectFactory (),
   	iGeneralFactoryState));
   CS_ASSERT (gfs != 0);
-  gfs->SetMaterialWrapper (mat);
+  mf->GetMeshObjectFactory ()->SetMaterialWrapper (mat);
   gfs->GenerateBox (tbox);
   gfs->CalculateNormals ();
   gfs->GetColors ()[0].Set (1, 1, 1);
@@ -2634,7 +2634,7 @@ void csBugPlug::DebugSectorTriangle (const csVector3& s1, const csVector3& s2,
   	SCF_QUERY_INTERFACE (mf->GetMeshObjectFactory (),
   	iGeneralFactoryState));
   CS_ASSERT (gfs != 0);
-  gfs->SetMaterialWrapper (mat);
+  mf->GetMeshObjectFactory ()->SetMaterialWrapper (mat);
   gfs->SetVertexCount (3);
   gfs->GetVertices ()[0] = ss1;
   gfs->GetVertices ()[1] = ss2;
@@ -2694,7 +2694,7 @@ void csBugPlug::DebugSectorMesh (
   	SCF_QUERY_INTERFACE (mf->GetMeshObjectFactory (),
   	iGeneralFactoryState));
   CS_ASSERT (gfs != 0);
-  gfs->SetMaterialWrapper (mat);
+  mf->GetMeshObjectFactory ()->SetMaterialWrapper (mat);
   gfs->SetVertexCount (vertex_count);
   int i;
   for (i = 0 ; i < vertex_count ; i++)

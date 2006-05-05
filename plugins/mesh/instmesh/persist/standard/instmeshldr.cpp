@@ -230,7 +230,7 @@ csPtr<iBase> csInstFactoryLoader::Parse (iDocumentNode* node,
 	  uint mm;
 	  if (!synldr->ParseMixmode (child, mm))
 	    return 0;
-          state->SetMixMode (mm);
+          fact->SetMixMode (mm);
 	}
 	break;
       case XMLTOKEN_MATERIAL:
@@ -244,7 +244,7 @@ csPtr<iBase> csInstFactoryLoader::Parse (iDocumentNode* node,
 		child, "Couldn't find material '%s'!", matname);
             return 0;
 	  }
-	  state->SetMaterialWrapper (mat);
+	  fact->SetMaterialWrapper (mat);
 	}
 	break;
       case XMLTOKEN_BOX:
@@ -486,7 +486,7 @@ bool csInstFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent,
     }
 
     //Writedown Material tag
-    iMaterialWrapper* mat = gfact->GetMaterialWrapper();
+    iMaterialWrapper* mat = meshfact->GetMaterialWrapper();
     if (mat)
     {
       const char* matname = mat->QueryObject()->GetName();
@@ -502,7 +502,7 @@ bool csInstFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent,
     }    
 
     //Writedown Mixmode tag
-    int mixmode = gfact->GetMixMode();
+    int mixmode = meshfact->GetMixMode();
     csRef<iDocumentNode> mixmodeNode = 
       paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
     mixmodeNode->SetValue("mixmode");

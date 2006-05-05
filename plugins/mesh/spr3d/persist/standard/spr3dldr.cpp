@@ -169,7 +169,7 @@ csPtr<iBase> csSprite3DFactoryLoader::Parse (iDocumentNode* node,
 		  child, "Couldn't find material named '%s'", matname);
             return 0;
 	  }
-	  spr3dLook->SetMaterialWrapper (mat);
+	  fact->SetMaterialWrapper (mat);
         }
         break;
 
@@ -381,7 +381,7 @@ bool csSprite3DFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent,
     if (!meshfact) return false;
 
     //Writedown Material tag
-    iMaterialWrapper* mat = spritefact->GetMaterialWrapper();
+    iMaterialWrapper* mat = meshfact->GetMaterialWrapper();
     if (mat)
     {
       const char* matname = mat->QueryObject()->GetName();
@@ -630,7 +630,7 @@ csPtr<iBase> csSprite3DLoader::Parse (iDocumentNode* node,
 	  uint mm;
 	  if (!synldr->ParseMixmode (child, mm))
 	    return 0;
-          spr3dLook->SetMixMode (mm);
+          mesh->SetMixMode (mm);
 	}
 	break;
       case XMLTOKEN_TWEEN:

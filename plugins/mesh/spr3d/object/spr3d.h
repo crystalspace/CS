@@ -581,7 +581,7 @@ public:
   iMaterialWrapper* GetMaterialWrapper () const
   { return cstxt; }
   /// Set the material used for this sprite
-  void SetMaterialWrapper (iMaterialWrapper *material);
+  bool SetMaterialWrapper (iMaterialWrapper *material);
 
   /**
    * Compute all normals in a frame.

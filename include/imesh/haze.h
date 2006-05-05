@@ -128,15 +128,6 @@ SCF_VERSION (iHazeFactoryState, 0, 0, 1);
  */
 struct iHazeFactoryState : public iBase
 {
-  /// Set material of sprite.
-  virtual void SetMaterialWrapper (iMaterialWrapper* material) = 0;
-  /// Get material of sprite.
-  virtual iMaterialWrapper* GetMaterialWrapper () const = 0;
-  /// Set mix mode.
-  virtual void SetMixMode (uint mode) = 0;
-  /// Get mix mode.
-  virtual uint GetMixMode () const = 0;
-
   /// Set the point of origin, the center of the texture.
   virtual void SetOrigin(const csVector3& pos) = 0;
   /// Get the point of origin

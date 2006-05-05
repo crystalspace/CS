@@ -686,6 +686,10 @@ public:
 #endif
 
   virtual iObjectModel* GetObjectModel () { return this; }
+  virtual bool SetMaterialWrapper (iMaterialWrapper*) { return false; }
+  virtual iMaterialWrapper* GetMaterialWrapper () const { return 0; }
+  virtual void SetMixMode (uint) { }
+  virtual uint GetMixMode () const { return 0; }
 };
 
 /**

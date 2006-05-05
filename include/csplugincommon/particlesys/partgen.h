@@ -71,6 +71,7 @@ protected:
   /// Object space radius.
   float radius;
   /// iParticle ptrs to the particles.
+  csRefArray<iMeshObject> partmeshes;
   csRefArray<iSprite2DState> sprite2ds;
   csRefArray<iParticle> particles;
   /// Self destruct and when.
@@ -187,8 +188,10 @@ public:
   void RemoveParticles ();
 
   /// Add a new particle, increases num_particles. Do a DecRef yourself.
-  inline void AppendParticle (iParticle *part, iSprite2DState* spr2d)
+  inline void AppendParticle (iMeshObject* mesh,
+  	iParticle *part, iSprite2DState* spr2d)
   {
+    partmeshes.Push (mesh);
     sprite2ds.Push (spr2d);
     particles.Push (part);
   }

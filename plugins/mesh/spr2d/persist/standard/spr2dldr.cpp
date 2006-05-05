@@ -234,7 +234,7 @@ csPtr<iBase> csSprite2DFactoryLoader::Parse (iDocumentNode* node,
 		child, "Couldn't find material named '%s'", matname);
             return 0;
 	  }
-	  spr2dLook->SetMaterialWrapper (mat);
+	  fact->SetMaterialWrapper (mat);
 	}
 	break;
       case XMLTOKEN_LIGHTING:
@@ -250,7 +250,7 @@ csPtr<iBase> csSprite2DFactoryLoader::Parse (iDocumentNode* node,
 	  uint mm;
 	  if (!synldr->ParseMixmode (child, mm))
 	    return 0;
-          spr2dLook->SetMixMode (mm);
+          fact->SetMixMode (mm);
 	}
 	break;
       case XMLTOKEN_UVANIMATION:
@@ -303,7 +303,7 @@ bool csSprite2DFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent,
   if (!meshfact) return false;
 
   //Writedown Material tag
-  iMaterialWrapper* mat = spritefact->GetMaterialWrapper();
+  iMaterialWrapper* mat = meshfact->GetMaterialWrapper();
   if (mat)
   {
     const char* matname = mat->QueryObject()->GetName();
@@ -347,7 +347,7 @@ bool csSprite2DFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent,
   }
 
   //Writedown Mixmode tag
-  int mixmode = spritefact->GetMixMode();
+  int mixmode = meshfact->GetMixMode();
   csRef<iDocumentNode> mixmodeNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
   mixmodeNode->SetValue("mixmode");
   synldr->WriteMixmode(mixmodeNode, mixmode, true);
@@ -440,7 +440,7 @@ csPtr<iBase> csSprite2DLoader::Parse (iDocumentNode* node,
 		child, "Couldn't find material '%s'!", matname);
             return 0;
 	  }
-	  spr2dLook->SetMaterialWrapper (mat);
+	  mesh->SetMaterialWrapper (mat);
 	}
 	break;
       case XMLTOKEN_MIXMODE:
@@ -448,7 +448,7 @@ csPtr<iBase> csSprite2DLoader::Parse (iDocumentNode* node,
 	  uint mm;
 	  if (!synldr->ParseMixmode (child, mm))
 	    return 0;
-          spr2dLook->SetMixMode (mm);
+          mesh->SetMixMode (mm);
 	}
 	break;
       case XMLTOKEN_V:
@@ -603,7 +603,7 @@ bool csSprite2DSaver::WriteDown (iBase* obj, iDocumentNode* parent,
   }
 
   //Writedown Material tag
-  iMaterialWrapper* mat = sprite->GetMaterialWrapper();
+  iMaterialWrapper* mat = mesh->GetMaterialWrapper();
   if (mat)
   {
     const char* matname = mat->QueryObject()->GetName();
@@ -651,7 +651,7 @@ bool csSprite2DSaver::WriteDown (iBase* obj, iDocumentNode* parent,
   }
 
   //Writedown Mixmode tag
-  int mixmode = sprite->GetMixMode();
+  int mixmode = mesh->GetMixMode();
   csRef<iDocumentNode> mixmodeNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
   mixmodeNode->SetValue("mixmode");
   synldr->WriteMixmode(mixmodeNode, mixmode, true);

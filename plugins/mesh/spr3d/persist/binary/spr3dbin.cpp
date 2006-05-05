@@ -188,7 +188,7 @@ csPtr<iBase> csSprite3DBinFactoryLoader::Parse (iDataBuffer* data,
 	"Couldn't find material named '%s'", mat_name);
     return 0;
   }
-  spr3dLook->SetMaterialWrapper (mat);
+  fact->SetMaterialWrapper (mat);
   p += strlen(mat_name) + 1;
 
   // Read the number of frames
@@ -394,8 +394,10 @@ bool csSprite3DBinFactorySaver::WriteDown (iBase* obj, iFile* file,
 
   if (!obj) return false;
 
-  csRef<iSprite3DFactoryState> state (
-    scfQueryInterface<iSprite3DFactoryState> (obj));
+  csRef<iMeshObjectFactory> fact = scfQueryInterface<iMeshObjectFactory> (
+  	obj);
+  csRef<iSprite3DFactoryState> state =
+    scfQueryInterface<iSprite3DFactoryState> (obj);
 
   // Write a magic number so we can ID the file
   file->Write (binsprMagic, 4);
@@ -406,7 +408,7 @@ bool csSprite3DBinFactorySaver::WriteDown (iBase* obj, iFile* file,
 
   // Write out the material... This can easily expanded to multiple
   // materials later.
-  name = state->GetMaterialWrapper()->QueryObject ()->GetName();
+  name = fact->GetMaterialWrapper()->QueryObject ()->GetName();
   file->Write (name, strlen(name) + 1);
 
   // Write the number of frames

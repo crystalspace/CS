@@ -346,6 +346,10 @@ public:
   { return logparent; }
   virtual iMeshObjectType* GetMeshObjectType () const
   { return (iMeshObjectType*)sprcal3d_type; }
+  virtual bool SetMaterialWrapper (iMaterialWrapper*) { return false; }
+  virtual iMaterialWrapper* GetMaterialWrapper () const { return 0; }
+  virtual void SetMixMode (uint) { }
+  virtual uint GetMixMode () const { return 0; }
   /** @} */
 
   /**\name iObjectModel implementation

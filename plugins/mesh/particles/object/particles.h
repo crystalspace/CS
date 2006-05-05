@@ -343,12 +343,18 @@ public:
   { return transform_mode; }
   void SetPhysicsPlugin (const char *plugin)
   { physics_plugin = plugin; }
-  void SetMixMode (uint mode)
+  virtual void SetMixMode (uint mode)
   { mixmode = mode; }
-  uint GetMixMode () const
+  virtual uint GetMixMode () const
   { return mixmode; }
   void EnableZSort (bool en) { zsort_enabled = en; }
   bool IsZSortEnabled () const { return zsort_enabled; }
+  virtual bool SetMaterialWrapper (iMaterialWrapper* mat)
+  {
+    SetMaterial (mat);
+    return true;
+  }
+  virtual iMaterialWrapper* GetMaterialWrapper () const { return material; }
 
   struct eiParticlesFactoryState : public iParticlesFactoryState
   {

@@ -160,11 +160,6 @@ struct iSprite3DFactoryState : public virtual iBase
 {
   SCF_INTERFACE (iSprite3DFactoryState, 1, 0, 0);
 
-  /// Set material of sprite.
-  virtual void SetMaterialWrapper (iMaterialWrapper* material) = 0;
-  /// Get material of sprite.
-  virtual iMaterialWrapper* GetMaterialWrapper () const = 0;
-
   /**
    * Reserve space for the given number of vertices. A vertex includes
    * information about its position, normal and texel. This function will
@@ -313,11 +308,6 @@ struct iSprite3DFactoryState : public virtual iBase
    * vertices are very close in each frame
    */
   virtual void MergeNormals () = 0;
-
-  /// Set default mix mode for new sprites.
-  virtual void SetMixMode (uint mode) = 0;
-  /// Get default mix mode for new sprites.
-  virtual uint GetMixMode () const = 0;
 };
 
 /**

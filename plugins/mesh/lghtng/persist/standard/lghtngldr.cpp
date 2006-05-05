@@ -168,7 +168,7 @@ csPtr<iBase> csLightningFactoryLoader::Parse (iDocumentNode* node,
                 child, "Could not find material '%s'!", matname);
             return 0;
           }
-          LightningFactoryState->SetMaterialWrapper (mat);
+          fact->SetMaterialWrapper (mat);
         }
         break;
 
@@ -177,7 +177,7 @@ csPtr<iBase> csLightningFactoryLoader::Parse (iDocumentNode* node,
           uint mode;
           if (!synldr->ParseMixmode (child, mode))
             return 0;
-          LightningFactoryState->SetMixMode (mode);
+          fact->SetMixMode (mode);
         }
         break;
 
@@ -273,7 +273,7 @@ bool csLightningFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent,
   if (mesh && light)
   {
     //Writedown Material tag
-    iMaterialWrapper* mat = light->GetMaterialWrapper();
+    iMaterialWrapper* mat = mesh->GetMaterialWrapper();
     if (mat)
     {
       const char* matname = mat->QueryObject()->GetName();
@@ -329,7 +329,7 @@ bool csLightningFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent,
     ticksNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsInt(ticks);
 
     //Writedown Mixmode tag
-    int mixmode = light->GetMixMode();
+    int mixmode = mesh->GetMixMode();
     csRef<iDocumentNode> mixmodeNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
     mixmodeNode->SetValue("mixmode");
     synldr->WriteMixmode(mixmodeNode, mixmode, true);

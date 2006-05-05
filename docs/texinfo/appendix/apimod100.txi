@@ -1737,11 +1737,31 @@ Consult the following documents for more information regarding this issue.
 @uref{http://www.w3.org/TR/REC-xml/#sec-white-space}@*
 @uref{http://www.xml.com/axml/notes/AllWSAlways.html}
 
-@subsubheading @samp{iGeneralMeshState}, @samp{iInstancingMeshState} Changes
+@subsubheading Mesh Factory Changes
 
-From @samp{iGeneralMeshState} and @samp{iInstancingMeshState}, the following 
-methods have been removed. Use the methods with the same name from 
-@samp{iMeshObject} instead.
+The mesh factory interfaces (@samp{iGeneralFactoryState},
+@samp{iHazeFactoryState}, @samp{iInstancingFactoryState},
+@samp{iLightningFactoryState}, @samp{iSprite2DFactoryState},
+@samp{iThingFactoryState}, and @samp{iSprite3DFactoryState} no longer have a
+the following methods. Use the methods with same name from
+@samp{iMeshObjectFactory} instead:
+
+@itemize @bullet
+@item
+@code{SetMaterialWrapper()}
+@item
+@code{GetMaterialWrapper()}
+@item
+@code{SetMixMode()}
+@item
+@code{GetMixMode()}
+@end itemize
+
+@subsubheading @samp{iGeneralMeshState}, @samp{iRainState}, @samp{iInstancingMeshState} Changes
+
+From @samp{iGeneralMeshState}, @samp{iInstancingMeshState}, and
+@samp{iRainState} the following methods have been removed. Use the methods
+with the same name from @samp{iMeshObject} instead.
 
 @itemize @bullet
 @item

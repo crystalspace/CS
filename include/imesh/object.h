@@ -359,6 +359,23 @@ struct iMeshObjectFactory : public virtual iBase
    * when available as that reduces the amount of redundant memory usage.
    */
   virtual iObjectModel* GetObjectModel () = 0;
+
+  /**
+   * Set the material of the mesh. This only works for single-material
+   * factories. If not supported this function will return false.
+   */
+  virtual bool SetMaterialWrapper (iMaterialWrapper* material) = 0;
+
+  /**
+   * Get the material of the factory. If not supported this will
+   * return 0.
+   */
+  virtual iMaterialWrapper* GetMaterialWrapper () const = 0;
+
+  /// Set mix mode. Note that not all meshes may support this.
+  virtual void SetMixMode (uint mode) = 0;
+  /// Get mix mode.
+  virtual uint GetMixMode () const = 0;
 };
 
 

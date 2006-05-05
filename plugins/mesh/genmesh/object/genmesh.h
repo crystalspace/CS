@@ -359,7 +359,8 @@ public:
     CS_LEAKGUARD_DECLARE (eiRenderBufferAccessor);
     csWeakRef<csGenmeshMeshObject> parent;
     virtual ~RenderBufferAccessor () { }
-    RenderBufferAccessor (csGenmeshMeshObject* parent) : scfImplementationType (this)
+    RenderBufferAccessor (csGenmeshMeshObject* parent)
+    	: scfImplementationType (this)
     {
       this->parent = parent;
     }
@@ -381,7 +382,8 @@ public:
   public:
     csWeakRef<csGenmeshMeshObject> parent;
     virtual ~ShaderVariableAccessor () { }
-    ShaderVariableAccessor (csGenmeshMeshObject* parent) : scfImplementationType (this)
+    ShaderVariableAccessor (csGenmeshMeshObject* parent)
+    	: scfImplementationType (this)
     {
       this->parent = parent;
     }
@@ -505,9 +507,10 @@ public:
   /// Do full bright.
   bool DoFullBright () const { return do_fullbright; }
 
-  void SetMaterialWrapper (iMaterialWrapper* material)
+  bool SetMaterialWrapper (iMaterialWrapper* material)
   {
     csGenmeshMeshObjectFactory::material = material;
+    return true;
   }
   iMaterialWrapper* GetMaterialWrapper () const { return material; }
   void AddVertex (const csVector3& v,

@@ -65,18 +65,6 @@ struct iRainState : public iBase
   virtual void SetCollisionDetection (bool cd) = 0;
   /// Get CD flag.
   virtual bool GetCollisionDetection () const = 0;
-  /// Set material of particle system.
-  virtual void SetMaterialWrapper (iMaterialWrapper* material) = 0;
-  /// Get material of particle system.
-  virtual iMaterialWrapper* GetMaterialWrapper () const = 0;
-  /// Set mix mode.
-  virtual void SetMixMode (uint mode) = 0;
-  /// Get mix mode.
-  virtual uint GetMixMode () const = 0;
-  /// Set particle color.
-  virtual void SetColor (const csColor& color) = 0;
-  /// Get particle color.
-  virtual const csColor& GetColor () const = 0;
 };
 
 /** @} */

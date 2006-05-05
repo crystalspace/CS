@@ -376,7 +376,7 @@ csPtr<iBase> csGenmesh3DSFactoryLoader::Parse (iDataBuffer* buf,
   if (!rc) return 0;
 
   size_t j;
-  gmstate->SetMaterialWrapper (materials_and_tris[0].material);
+  fact->SetMaterialWrapper (materials_and_tris[0].material);
   gmstate->Compress ();
   gmstate->CalculateNormals ();
   if (materials_and_tris.Length () > 1)

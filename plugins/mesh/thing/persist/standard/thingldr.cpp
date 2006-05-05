@@ -956,10 +956,9 @@ return false; \
 #define CREATE_FACTORY_IF_NEEDED \
 if (!info.thing_fact_state) \
 { \
-  csRef<iMeshObjectFactory> fact; \
-  fact = info.type->NewFactory (); \
-  info.thing_fact_state = scfQueryInterface<iThingFactoryState> (fact); \
-  info.obj = fact->NewInstance (); \
+  info.fact = info.type->NewFactory (); \
+  info.thing_fact_state = scfQueryInterface<iThingFactoryState> (info.fact); \
+  info.obj = info.fact->NewInstance (); \
   info.thing_state = scfQueryInterface<iThingState> (info.obj); \
 }
 
@@ -1024,6 +1023,7 @@ if (!info.thing_fact_state) \
               child, "Couldn't find thing factory '%s'!", factname);
             return false;
           }
+	  info.fact = fact->GetMeshObjectFactory ();
 	  info.thing_fact_state = scfQueryInterface<iThingFactoryState> (
 	  	fact->GetMeshObjectFactory ());
 	  if (!info.thing_fact_state)
@@ -1075,6 +1075,7 @@ if (!info.thing_fact_state) \
               child, "Object '%s' is not a thing!", meshname);
             return false;
 	  }
+	  info.fact = wrap->GetMeshObject ()->GetFactory ();
 	  info.thing_fact_state = scfQueryInterface<iThingFactoryState>
 	    (wrap->GetMeshObject ()->GetFactory());
 	  info.obj = wrap->GetFactory ()->GetMeshObjectFactory ()
@@ -1175,7 +1176,7 @@ Nag to Jorrit about this feature if you want it.");
 	  if (synldr->ParseMixmode (child, mixmode))
 	  {
 	    if (info.load_factory)
-              info.thing_fact_state->SetMixMode (mixmode);
+              info.fact->SetMixMode (mixmode);
 	    else
               info.thing_state->SetMixMode (mixmode);
 	  }
@@ -1314,15 +1315,14 @@ csPtr<iBase> csThingFactoryLoader::Parse (iDocumentNode* node,
     scfQueryInterface<iThingEnvironment> (info.type);
   csRef<iEngine> engine = csQueryRegistry<iEngine> (object_reg);
 
-  csRef<iMeshObjectFactory> fact;
-  fact = info.type->NewFactory ();
-  info.thing_fact_state = scfQueryInterface<iThingFactoryState> (fact);
+  info.fact = info.type->NewFactory ();
+  info.thing_fact_state = scfQueryInterface<iThingFactoryState> (info.fact);
 
   bool baduv = false;
   if (!LoadThingPart (te, node, ldr_context, object_reg, reporter, synldr, info,
   	engine, 0, true, 0, baduv))
   {
-    fact = 0;
+    info.fact = 0;
   }
 
   if (baduv)
@@ -1332,7 +1332,7 @@ csPtr<iBase> csThingFactoryLoader::Parse (iDocumentNode* node,
 		node, "Bad UV coordinates for polygons in this thing!");
   }
 
-  return csPtr<iBase> (fact);
+  return csPtr<iBase> (info.fact);
 }
 
 //---------------------------------------------------------------------------

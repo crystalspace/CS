@@ -55,6 +55,7 @@ class ThingLoadInfo
 public:
   csRef<iMeshObjectType> type;
   csRef<iMeshObject> obj;
+  csRef<iMeshObjectFactory> fact;
   csRef<iThingState> thing_state;
   csRef<iThingFactoryState> thing_fact_state;
   iMaterialWrapper* default_material;

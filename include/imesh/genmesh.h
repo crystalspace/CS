@@ -204,14 +204,6 @@ struct iGeneralFactoryState : public virtual iGeneralMeshCommonState
 {
   SCF_INTERFACE (iGeneralFactoryState, 1, 0, 0);
   
-  /// Set material of mesh.
-  virtual void SetMaterialWrapper (iMaterialWrapper* material) = 0;
-  /// Get material of mesh.
-  virtual iMaterialWrapper* GetMaterialWrapper () const = 0;
-  /// Set mix mode.
-  virtual void SetMixMode (uint mode) = 0;
-  /// Get mix mode.
-  virtual uint GetMixMode () const = 0;
   /// Set the color to use. Will be added to the lighting values.
   virtual void SetColor (const csColor& col) = 0;
   /// Get the color.

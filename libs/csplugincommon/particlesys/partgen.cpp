@@ -134,6 +134,7 @@ void csParticleSystem::RemoveParticles ()
 
   particles.DeleteAll ();
   sprite2ds.DeleteAll ();
+  partmeshes.DeleteAll ();
   ShapeChanged ();
 }
 
@@ -156,8 +157,8 @@ void csParticleSystem::AppendRectSprite (float width, float height,
   vs[3].color.Set (0, 0, 0);
   state->SetLighting (lighted);
   part->SetColor (csColor (1.0, 1.0, 1.0));
-  state->SetMaterialWrapper (mat);
-  AppendParticle (part, state);
+  sprmesh->SetMaterialWrapper (mat);
+  AppendParticle (sprmesh, part, state);
   ShapeChanged ();
 }
 
@@ -170,11 +171,11 @@ void csParticleSystem::AppendRegularSprite (int n, float radius,
   csRef<iSprite2DState> state (SCF_QUERY_INTERFACE (sprmesh, iSprite2DState));
   state->CreateRegularVertices (n, true);
   part->ScaleBy (radius);
-  if (mat) state->SetMaterialWrapper (mat);
+  if (mat) sprmesh->SetMaterialWrapper (mat);
   state->SetLighting (lighted);
   part->SetColor (csColor (1.0, 1.0, 1.0));
 
-  AppendParticle (part, state);
+  AppendParticle (sprmesh, part, state);
   ShapeChanged ();
 }
 
@@ -289,7 +290,8 @@ csRenderMesh** csParticleSystem::GetRenderMeshes (int& n, iRenderView* rview,
 						  iMovable* movable,
 						  uint32 frustum_mask)
 {
-  if ((sprite2ds.Length() == 0) || !PreGetRenderMeshes (rview, movable, frustum_mask))
+  if ((sprite2ds.Length() == 0)
+  	|| !PreGetRenderMeshes (rview, movable, frustum_mask))
   {
     n = 0;
     return 0;
@@ -344,7 +346,7 @@ csRenderMesh** csParticleSystem::GetRenderMeshes (int& n, iRenderView* rview,
     csColoredVertices& sprvt = sprite2ds[i]->GetVertices ();
     // transform to eye coordinates
     csVector3 pos = trans.Other2This (particles[i]->GetPosition ());
-    uint mixmode = sprite2ds[i]->GetMixMode ();
+    uint mixmode = partmeshes[i]->GetMixMode ();
     float alpha = 1.0f - ((mixmode & CS_FX_MASK_ALPHA) / 255.0f);
 
     size_t j;
@@ -358,7 +360,7 @@ csRenderMesh** csParticleSystem::GetRenderMeshes (int& n, iRenderView* rview,
     }
   }
 
-  iMaterialWrapper* m = sprite2ds[0]->GetMaterialWrapper ();
+  iMaterialWrapper* m = partmeshes[0]->GetMaterialWrapper ();
   m->Visit ();
 
   //index_buffer->CopyToBuffer (triangles,
@@ -374,7 +376,7 @@ csRenderMesh** csParticleSystem::GetRenderMeshes (int& n, iRenderView* rview,
   rm->buffers = frameData.bufferHolder;
 
   // Prepare for rendering.
-  uint mixmode = sprite2ds[0]->GetMixMode ();
+  uint mixmode = partmeshes[0]->GetMixMode ();
   if ((mixmode & CS_FX_MASK_MIXMODE) == CS_FX_COPY)
     // Hack to force alpha blending...
     mixmode = CS_FX_ALPHA | (mixmode & CS_FX_MASK_ALPHA);

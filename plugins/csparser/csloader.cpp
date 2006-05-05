@@ -42,7 +42,6 @@
 #include "imap/ldrctxt.h"
 #include "imap/modelload.h"
 #include "imesh/lighting.h"
-#include "imesh/sprite3d.h"
 #include "imesh/object.h"
 #include "iengine/engine.h"
 #include "iengine/region.h"
@@ -139,9 +138,6 @@ iSector* StdLoaderContext::FindSector (const char* name)
 
 iMaterialWrapper* StdLoaderContext::FindMaterial (const char* filename)
 {
-  // @@@ in case the material is not found a replacement is taken.
-  // however, somehow the location of the errorneous material name
-  // should be reported. 
   iMaterialWrapper* mat = Engine->FindMaterial (filename,
       curRegOnly ? region : 0);
   if (mat)
@@ -163,7 +159,6 @@ iMaterialWrapper* StdLoaderContext::FindMaterial (const char* filename)
       	->NewMaterial (material, n);
     if (region) region->QueryObject ()->ObjAdd (mat->QueryObject ());
 
-    // @@@ should this be done here?
     iTextureManager *tm;
     if ((loader->G3D) && (tm = loader->G3D->GetTextureManager()))
     {
@@ -178,9 +173,6 @@ iMaterialWrapper* StdLoaderContext::FindMaterial (const char* filename)
 iMaterialWrapper* StdLoaderContext::FindNamedMaterial (const char* name, 
                                                        const char *filename)
 {
-  // @@@ in case the material is not found a replacement is taken.
-  // however, somehow the location of the errorneous material name
-  // should be reported. 
   iMaterialWrapper* mat = Engine->FindMaterial (name, curRegOnly ? region : 0);
   if (mat)
     return mat;
@@ -201,7 +193,6 @@ iMaterialWrapper* StdLoaderContext::FindNamedMaterial (const char* name,
       	->NewMaterial (material, n);
     if (region) region->QueryObject ()->ObjAdd (mat->QueryObject ());
 
-    // @@@ should this be done here?
     iTextureManager *tm;
     if ((loader->G3D) && (tm = loader->G3D->GetTextureManager()))
     {
@@ -261,9 +252,6 @@ iShader* StdLoaderContext::FindShader (const char *name)
 
 iTextureWrapper* StdLoaderContext::FindTexture (const char* name)
 {
-  // @@@ in case the texture is not found a replacement is taken.
-  // however, somehow the location of the errorneous texture name
-  // should be reported. 
   iTextureWrapper* result;
   if (region && curRegOnly)
     result = region->FindTexture (name);
@@ -285,9 +273,6 @@ iTextureWrapper* StdLoaderContext::FindTexture (const char* name)
 iTextureWrapper* StdLoaderContext::FindNamedTexture (const char* name,
                                                      const char *filename)
 {
-  // @@@ in case the texture is not found a replacement is taken.
-  // however, somehow the location of the errorneous texture name
-  // should be reported. 
   iTextureWrapper* result;
   if (region && curRegOnly)
     result = region->FindTexture (name);
@@ -335,9 +320,6 @@ iSector* ThreadedLoaderContext::FindSector (const char* name)
 
 iMaterialWrapper* ThreadedLoaderContext::FindMaterial (const char* name)
 {
-  // @@@ in case the material is not found a replacement is taken.
-  // however, somehow the location of the errorneous material name
-  // should be reported. 
   iMaterialWrapper* mat = Engine->FindMaterial (name, curRegOnly ? region : 0);
   if (mat)
     return mat;
@@ -358,7 +340,6 @@ iMaterialWrapper* ThreadedLoaderContext::FindMaterial (const char* name)
       	->NewMaterial (material, n);
     if (region) region->QueryObject ()->ObjAdd (mat->QueryObject ());
 
-    // @@@ should this be done here?
     iTextureManager *tm;
     if ((loader->G3D) && (tm = loader->G3D->GetTextureManager()))
     {
@@ -373,9 +354,6 @@ iMaterialWrapper* ThreadedLoaderContext::FindMaterial (const char* name)
 iMaterialWrapper* ThreadedLoaderContext::FindNamedMaterial (const char* name,
                                                             const char* filename)
 {
-  // @@@ in case the material is not found a replacement is taken.
-  // however, somehow the location of the errorneous material name
-  // should be reported. 
   iMaterialWrapper* mat = Engine->FindMaterial (name, curRegOnly ? region : 0);
   if (mat)
     return mat;
@@ -396,7 +374,6 @@ iMaterialWrapper* ThreadedLoaderContext::FindNamedMaterial (const char* name,
       	->NewMaterial (material, n);
     if (region) region->QueryObject ()->ObjAdd (mat->QueryObject ());
 
-    // @@@ should this be done here?
     iTextureManager *tm;
     if ((loader->G3D) && (tm = loader->G3D->GetTextureManager()))
     {
@@ -454,9 +431,6 @@ iShader* ThreadedLoaderContext::FindShader (const char *name)
 
 iTextureWrapper* ThreadedLoaderContext::FindTexture (const char* name)
 {
-  // @@@ in case the texture is not found a replacement is taken.
-  // however, somehow the location of the errorneous texture name
-  // should be reported. 
   iTextureWrapper* result;
   if (region && curRegOnly)
     result = region->FindTexture (name);
@@ -478,9 +452,6 @@ iTextureWrapper* ThreadedLoaderContext::FindTexture (const char* name)
 iTextureWrapper* ThreadedLoaderContext::FindNamedTexture (const char* name,
                                                           const char* filename)
 {
-  // @@@ in case the texture is not found a replacement is taken.
-  // however, somehow the location of the errorneous texture name
-  // should be reported. 
   iTextureWrapper* result;
   if (region && curRegOnly)
     result = region->FindTexture (name);
@@ -2324,18 +2295,13 @@ bool csLoader::LoadMeshObjectFactory (iLoaderContext* ldr_context,
           mat = ldr_context->FindMaterial (matname);
           if (mat)
 	  {
-	    csRef<iSprite3DFactoryState> state (SCF_QUERY_INTERFACE (
-	    	stemp->GetMeshObjectFactory (),
-		iSprite3DFactoryState));
-	    //@@@@@@@@@@@@@@@@@@@@ Use SetMaterial() on iMeshObjectFactory!
-	    if (!state)
+	    if (!stemp->GetMeshObjectFactory ()->SetMaterialWrapper (mat))
 	    {
               SyntaxService->ReportError (
 	        "crystalspace.maploader.parse.meshfactory",
-                child, "Only use MATERIAL keyword with 3D sprite factories!");
+                child, "This factory doesn't support setting materials this way!");
 	      return false;
 	    }
-            state->SetMaterialWrapper (mat);
 	  }
           else
           {
