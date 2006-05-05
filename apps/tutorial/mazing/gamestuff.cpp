@@ -545,7 +545,8 @@ bool Game::CreateFactories ()
     return app->ReportError ("Error loading 'misty' texture!");
   iMaterialWrapper* adversary_material = engine->GetMaterialList ()
   	->FindByName ("adversary_texture");
-  fstate->SetMaterialWrapper (adversary_material);
+  adversary_factory->GetMeshObjectFactory ()
+    ->SetMaterialWrapper (adversary_material);
 
   //---------------------------------------------------------------------
   // Beam factory.
@@ -570,7 +571,8 @@ bool Game::CreateFactories ()
     return app->ReportError ("Error loading 'blobby' texture!");
   iMaterialWrapper* laserbeam_material = engine->GetMaterialList ()
   	->FindByName ("laserbeam_texture");
-  fstate->SetMaterialWrapper (laserbeam_material);
+  laserbeam_factory->GetMeshObjectFactory ()
+    ->SetMaterialWrapper (laserbeam_material);
 
   //---------------------------------------------------------------------
   // Beam object.

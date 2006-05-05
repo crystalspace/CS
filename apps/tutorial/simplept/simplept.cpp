@@ -58,7 +58,7 @@ bool Simple::CreateGenMesh (iMaterialWrapper* mat)
     return false;
   }
 
-  factstate->SetMaterialWrapper (mat);
+  genmesh_fact->GetMeshObjectFactory ()->SetMaterialWrapper (mat);
   factstate->SetVertexCount ((genmesh_resolution+1)*(genmesh_resolution+1));
   factstate->SetTriangleCount (genmesh_resolution*genmesh_resolution*2);
 

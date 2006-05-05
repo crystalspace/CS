@@ -436,9 +436,9 @@ void StartMe::CreateRoom ()
   spark_state->GetTriangles ()[0].Set (2, 1, 0);
   spark_state->GetTriangles ()[1].Set (3, 2, 0);
   spark_state->SetLighting (false);
-  spark_state->SetMixMode (CS_FX_ADD);
+  spark_fact->GetMeshObjectFactory ()->SetMixMode (CS_FX_ADD);
   spark_state->SetColor (csColor (1, 1, 1));
-  spark_state->SetMaterialWrapper (spark_mat);
+  spark_fact->GetMeshObjectFactory ()->SetMaterialWrapper (spark_mat);
   size_t i;
   for (i = 0 ; i < star_count ; i++)
   {

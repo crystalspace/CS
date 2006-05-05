@@ -38,6 +38,7 @@ chronological order.
 	  libs).
 	- JTarbox fixed the copy constructor for csEvents
 	- JTarbox fix for the fix to the copy ctor of csEvents
+	- Jorrit fixed a few apps for the latest changes.
 4-May-2006
 	- Erroroman made the follwoing:
 	    - Generic render step now handles light shader variables.

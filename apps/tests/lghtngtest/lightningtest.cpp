@@ -297,8 +297,8 @@ bool Simple::Initialize ()
   csRef<iMeshObjectFactory> LightningObjectFactory1 = type->NewFactory();
   csRef<iLightningFactoryState> LightningFactoryState1 = SCF_QUERY_INTERFACE(LightningObjectFactory1, iLightningFactoryState);
 
-  LightningFactoryState1->SetMaterialWrapper(engine->GetMaterialList()->FindByName("energy"));
-  LightningFactoryState1->SetMixMode(CS_FX_ADD);
+  LightningObjectFactory1->SetMaterialWrapper(engine->GetMaterialList()->FindByName("energy"));
+  LightningObjectFactory1->SetMixMode(CS_FX_ADD);
   LightningFactoryState1->SetOrigin(csVector3(0, 0, 0));
   LightningFactoryState1->SetPointCount(20);
   LightningFactoryState1->SetLength(5);
@@ -315,8 +315,8 @@ bool Simple::Initialize ()
   csRef<iMeshObjectFactory> LightningObjectFactory2 = type->NewFactory();
   csRef<iLightningFactoryState> LightningFactoryState2 = SCF_QUERY_INTERFACE(LightningObjectFactory2, iLightningFactoryState);
 
-  LightningFactoryState2->SetMaterialWrapper(engine->GetMaterialList()->FindByName("energy"));
-  LightningFactoryState2->SetMixMode(CS_FX_ADD);
+  LightningObjectFactory2->SetMaterialWrapper(engine->GetMaterialList()->FindByName("energy"));
+  LightningObjectFactory2->SetMixMode(CS_FX_ADD);
   LightningFactoryState2->SetOrigin(csVector3(0, 0, 0));
   LightningFactoryState2->SetPointCount(60);
   LightningFactoryState2->SetLength(5);
@@ -333,8 +333,8 @@ bool Simple::Initialize ()
   csRef<iMeshObjectFactory> LightningObjectFactory3 = type->NewFactory();
   csRef<iLightningFactoryState> LightningFactoryState3 = SCF_QUERY_INTERFACE(LightningObjectFactory3, iLightningFactoryState);
 
-  LightningFactoryState3->SetMaterialWrapper(engine->GetMaterialList()->FindByName("energy"));
-  LightningFactoryState3->SetMixMode(CS_FX_ADD);
+  LightningObjectFactory3->SetMaterialWrapper(engine->GetMaterialList()->FindByName("energy"));
+  LightningObjectFactory3->SetMixMode(CS_FX_ADD);
   LightningFactoryState3->SetOrigin(csVector3(0, 0, 0));
   LightningFactoryState3->SetPointCount(30);
   LightningFactoryState3->SetLength(5);
