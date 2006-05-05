@@ -150,7 +150,9 @@ specified for every vertex (which are default black!) are used.
 If this flag is set (default true) then lighting information (from nearby
 lights) is added to the colors of the vertices.
 @item @samp{defaultcolor}
-This color is added to the colors of the vertices globally.
+This color is the default color as used for objects created from this
+factory. Objects can override this default with the @samp{color} statement
+in the object.
 @item @samp{localshadows}
 If this flag is set (default false) then lighting calculation is not
 dynamic but instead static and precalculated. This is faster at runtime and
@@ -177,4 +179,57 @@ object.  By using this interface you can access the material, blending mode
 
 @subsubheading Object Loader
 
-@@@@@@TODO
+Here is a list of all the tags supported by a genmesh factory and their
+meaning:
+@itemize @bullet
+@item @samp{factory}
+The name of the factory to use.
+@item @samp{material}
+For this object, override the material from the factory.
+@item @samp{mixmode}
+For this object, override the mixmode from the factory.
+@item @samp{manualcolors}
+For this object, override the manualcolors flag from the factory.
+@item @samp{lighting}
+For this object, override the lighting flag from the factory.
+@item @samp{noshadows}
+For this object, override the noshadows flag from the factory.
+@item @samp{localshadows}
+For this object, override the localshadows flag from the factory.
+@item @samp{renderbuffer}
+Add additional render buffers to this object (the ones added to the
+factory will also be valid).
+@item @samp{submesh}
+You can also define submeshes on the object level instead of the factory
+level. If you use @samp{submesh} in the mesh then the submeshes of the
+factory are ignored.
+@item @samp{color}
+Color of this mesh (overrides @samp{defaultcolor} from factory).
+@end itemize
+
+@subsubheading Lighting and Colors
+
+Lighting of genmesh objects is a bit complicated. In this section we describe
+the different possibilities:
+
+@itemize @bullet
+@item
+In all cases the color array from the factory will be added to the colors
+calculated below.
+@item
+If manualcolors is enabled then only the optional animation control still
+matters. No other lighting values are processed.
+@item
+Otherwise if lighting is disabled then the base color of the mesh will be
+added to the factory colors.
+@item
+If lighting is enabled and localshadows is disabled then lighting is calculated
+as follows: factory colors + base color + static ambient + dynamic
+ambient + lighting as calculated from nearby/relevant lights.
+@item
+If both lighting and localshadows are enabled then lighting is calculated as
+follows: factory colors + base color + static ambient + dynamic
+ambient + lighting as precalculated during static lighting +
+dynamic lights
+@end itemize
+

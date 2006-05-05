@@ -8,6 +8,7 @@ chronological order.
 
 5-May-2006
 	- Jorrit started work on more detailed mesh object documentation.
+	- Jorrit updated the genmesh documentation a bit more.
 4-May-2006
 	- Erroroman made the follwoing:
 	    - Generic render step now handles light shader variables.
