@@ -768,7 +768,7 @@ inline void operator delete[] (void* p, void*, int) { operator delete[] (p); }
  * strict alignment add your CPU to the !defined below to get slightly
  * smaller and faster code in some cases.
  *
- * @@@ In the future, this should be moved to csconfig.h and determined as
+ * \todo In the future, this should be moved to csconfig.h and determined as
  * part of the configuration process.
  */
 #if !defined (CS_PROCESSOR_X86)

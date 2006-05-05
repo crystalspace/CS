@@ -36,13 +36,13 @@ struct iSector;
 /**\addtogroup engine3d_rloop
  * @{ */
 
-/// Document me!@@@
+/// \todo Document me!
 struct iLightIterRenderStep : public virtual iBase
 {
   SCF_INTERFACE (iLightIterRenderStep, 2, 0, 0);
 };
 
-/// Document me!@@@
+/// \todo Document me!
 struct iLightRenderStep : public virtual iBase
 {
   SCF_INTERFACE (iLightRenderStep, 2, 0, 0);

@@ -171,7 +171,7 @@ struct csRenderMesh : public csCoreRenderMesh, public csRenderMeshModes
   /// Pointer to a portalcontainer, if there is any
   iPortalContainer* portal;
 
-  /// @@@ Document me.
+  /// \todo Document me!
   csRef<iShaderVariableContext> variablecontext;
 
   /// Worldspace origin of the mesh

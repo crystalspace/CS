@@ -336,7 +336,7 @@ inline void csReporterHelper::ReportV(iObjectRegistry* reg, int severity,
   else
   {
     /*
-      @@@ The csStrNCaseCmp()s are there because sometimes reported messages
+      \todo The csStrNCaseCmp()s are there because sometimes reported messages
       start with "Warning", and a "Warning: Warning" output looks rather
       crappy. The correct fix is obviously to remove "Warning" prefixes
       when the reporter is used.

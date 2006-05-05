@@ -60,7 +60,7 @@ namespace CS
     return Func;
   }
 
-  /// @@@ Document me
+  /// \todo document me!
   template <class T1, class T2>
   struct ConditionAnd
   {

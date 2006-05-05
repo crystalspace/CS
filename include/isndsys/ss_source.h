@@ -41,7 +41,7 @@ struct iSndSysStream;
 #endif
 
 /**
- * @@@ Document me.
+ * \todo Document me!
  */
 struct iSndSysSource : public virtual iBase
 {
@@ -77,7 +77,7 @@ struct iSndSysSource : public virtual iBase
 };
 
 /** 
- * @@@ Document me.
+ * \todo Document me!
  */
 struct iSndSysSourceSoftware : public virtual iSndSysSource
 {
@@ -103,7 +103,7 @@ struct iSndSysSourceSoftware : public virtual iSndSysSource
 };
 
 /**
- * @@@ Document me.
+ * \todo Document me!
  */
 struct iSndSysSourceSoftware3D : public virtual iSndSysSourceSoftware
 {

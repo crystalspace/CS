@@ -57,7 +57,7 @@ public:
  * at (-1000,0,0) and one at (1000,0,0)). Getting and setting
  * elements is not as efficient as with DenseSparse3D but it
  * consumes less memory.
- * @@@ NOTE! Current implementation is very naive. The list should
+ * \todo Current implementation is very naive. The list should
  * be sorted to make searching at least a little more efficient.
  * <p>
  * This implementation of Sparse3D is better suited when accesses

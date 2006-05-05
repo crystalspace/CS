@@ -169,7 +169,7 @@ public:
    */
   csTriangleVerticesSorted* SortVertices ();
 
-  /// Dump connectivity information@@@ TEMPORARY
+  /// Dump connectivity information.
   void Dump ();
 };
 

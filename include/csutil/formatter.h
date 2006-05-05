@@ -527,7 +527,7 @@ class csPrintfFormatter
 	  // Param delimiter
 	  else if (state.ch == '$')
 	  {
-	    // @@@ Hmm. Empty param...
+	    // \todo fix for empty param
 	    parseState = formatFlagsWidthPrecTypeConversion;
 	    break;
 	  }

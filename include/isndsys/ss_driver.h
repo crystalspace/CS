@@ -28,7 +28,7 @@
 /**\addtogroup sndsys
  * @{ */
 
-// @@@ FIXME: This should really be an interface
+// \todo This should really be an interface
 class csSndSysRendererSoftware; 
 struct csSndSysSoundFormat;
 

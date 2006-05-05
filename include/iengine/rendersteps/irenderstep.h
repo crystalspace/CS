@@ -33,7 +33,7 @@
 struct iRenderView;
 struct iSector;
 
-/// Document me!@@@
+/// \todo Document me!
 struct iRenderStep : public virtual iBase
 {
   SCF_INTERFACE (iRenderStep, 2, 0, 0);

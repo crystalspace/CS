@@ -80,7 +80,7 @@ protected:
   /// logical parent (usually the wrapper object from the engine)
   iMeshWrapper *LogParent;
 
-  /// pointer to the engine if available (@@@ temporary)
+  /// pointer to the engine if available.
   iEngine *Engine;
 
   /// Tell the engine that this object wants to be deleted
@@ -273,7 +273,7 @@ protected:
   /// Pointer to the MeshObjectType
   iMeshObjectType* mesh_type;
 
-  /// Pointer to the engine if available (@@@ temporary)
+  /// Pointer to the engine if available.
   iEngine *Engine;
 
   /// Object registry.
@@ -348,7 +348,7 @@ class CS_CRYSTALSPACE_EXPORT csMeshType :
   public scfImplementation2<csMeshType, iMeshObjectType, iComponent>
 {
 protected:
-  /// pointer to the engine if available (@@@ temporary)
+  /// pointer to the engine if available.
   iEngine *Engine;
 
   /// Object registry.

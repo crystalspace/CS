@@ -26,7 +26,7 @@
 
 SCF_VERSION (iVosApi, 0, 1, 1);
 
-/// @@@ Document me
+/// \todo Document me!
 struct iVosApi : public virtual iBase
 {
   virtual VUtil::vRef<VOS::Vobject> GetVobject() = 0;

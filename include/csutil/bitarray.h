@@ -620,7 +620,7 @@ public:
     uint ui[uintCount];
     uint hash = 0;
     csBitArrayStorageType const* p = key.GetStore();
-    // @@@ Not very good. Find a better hash function; however, it should
+    // \todo Not very good. Find a better hash function; however, it should
     // return the same hash for two bit arrays that are the same except for
     // the amount of trailing zeros. (e.g. f(10010110) == f(100101100000...))
     for (size_t i = 0; i < key.mLength; i++)

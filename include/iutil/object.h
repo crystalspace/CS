@@ -144,7 +144,7 @@ struct iObject : public virtual iBase
    */
   virtual csPtr<iObjectIterator> GetIterator () = 0;
 
-  // @@@ temporary fix
+  /// \todo Investigate a way to remove this function.
   virtual void ObjReleaseOld (iObject *obj) = 0;
 
   /**

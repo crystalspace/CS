@@ -1146,14 +1146,15 @@ public:
   /**
    * Delete a given range (inclusive).
    * \remarks Will clamp \c start and \c end to the array limits.
+   * \return false in case the inputs were invalid (csArrayItemNotFound)
+   * or if the start is greater then the number of items in the array.
    */
-  void DeleteRange (size_t start, size_t end)
+  bool DeleteRange (size_t start, size_t end)
   {
-    if (start >= count) return;
+    if (start >= count) return false;
     // Treat 'csArrayItemNotFound' as invalid indices, do nothing.
-    // @@@ Assert that?
-    if (end == csArrayItemNotFound) return;
-    if (start == csArrayItemNotFound) return;//start = 0;
+    if (end == csArrayItemNotFound) return false;
+    if (start == csArrayItemNotFound) return false;//start = 0;
     if (end >= count) end = count - 1;
     size_t i;
     for (i = start ; i <= end ; i++)
@@ -1165,6 +1166,7 @@ public:
     if (nmove > 0)
       root.MemMove (root.p, start, start + range_size, nmove);
     SetSizeUnsafe (ncount);
+    return true;
   }
 
   /**

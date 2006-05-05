@@ -141,8 +141,8 @@ public:
   virtual const csSet<csPtrKey<iMeshWrapper> >& GetPortalMeshes () const
   { return portalMeshes; }
 
-  virtual void RegisterPortalMesh (iMeshWrapper* mesh);
-  virtual void UnregisterPortalMesh (iMeshWrapper* mesh);
+  void RegisterPortalMesh (iMeshWrapper* mesh);
+  void UnregisterPortalMesh (iMeshWrapper* mesh);
 
   virtual void UnlinkObjects ();
 

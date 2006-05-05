@@ -304,8 +304,7 @@ struct iODEDynamicSystemState : public iBase
 };
 
 /**
- * TODO: Doc...
- * @@@ Document me
+ * \todo Document me!
  */
 enum ODEJointType
 {

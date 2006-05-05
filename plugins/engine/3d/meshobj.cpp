@@ -218,7 +218,7 @@ void csMeshWrapper::AddToSectorPortalLists ()
     for (i = 0; i < sectors->GetCount (); i++)
     {
       iSector *ss = sectors->Get (i);
-      if (ss) ss->RegisterPortalMesh ((iMeshWrapper*)this);
+      if (ss) ((csSector*)ss)->RegisterPortalMesh ((iMeshWrapper*)this);
     }
   }
 }
@@ -230,7 +230,7 @@ void csMeshWrapper::ClearFromSectorPortalLists (iSector* sector)
     int i;
     if (sector)
     {
-      sector->UnregisterPortalMesh ((iMeshWrapper*)this);
+      ((csSector*)sector)->UnregisterPortalMesh ((iMeshWrapper*)this);
     }
     else
     {
@@ -242,7 +242,7 @@ void csMeshWrapper::ClearFromSectorPortalLists (iSector* sector)
       for (i = 0; i < sectors->GetCount (); i++)
       {
         iSector *ss = sectors->Get (i);
-        if (ss) ss->UnregisterPortalMesh ((iMeshWrapper*)this);
+        if (ss) ((csSector*)ss)->UnregisterPortalMesh ((iMeshWrapper*)this);
       }
     }
   }
@@ -311,7 +311,8 @@ void csMeshWrapper::MoveToSector (iSector *s)
   if (!movable.GetParent ()) s->GetMeshes ()->Add ((iMeshWrapper*)this);
   // If we are a portal container then we have to register ourselves
   // to the sector.
-  if (portal_container) s->RegisterPortalMesh ((iMeshWrapper*)this);
+  if (portal_container)
+    ((csSector*)s)->RegisterPortalMesh ((iMeshWrapper*)this);
 
   // Fire the new mesh callbacks in the sector.
   ((csSector*)s)->FireNewMesh ((iMeshWrapper*)this);

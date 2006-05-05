@@ -95,7 +95,7 @@ struct iMeshGeneratorGeometry : public virtual iBase
   /**
    * Set the density. The density is defined as the number of objects
    * in every 1x1 square. Default density is 1.
-   * @@@ TODO: add density map support.
+   * \todo add density map support.
    */
   virtual void SetDensity (float density) = 0;
 
@@ -196,8 +196,8 @@ struct iMeshGenerator : public virtual iBase
   /**
    * Get the box where where we will sample. We will sample starting
    * at the highest y value of the box and pointing down to the lowest
-   * y value of the box. (@@@ TODO: in future support other directions
-   * for the mapping beam).
+   * y value of the box.
+   * \todo In future support other directions for the mapping beam.
    */
   virtual void SetSampleBox (const csBox3& box) = 0;
 

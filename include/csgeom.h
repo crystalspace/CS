@@ -45,7 +45,6 @@
 #include "csgeom/poly3d.h"
 #include "csgeom/polyaa.h"
 #include "csgeom/polyclip.h"
-#include "csgeom/polyedge.h"
 #include "csgeom/polyidx.h"
 #include "csgeom/polymesh.h"
 #include "csgeom/polypool.h"

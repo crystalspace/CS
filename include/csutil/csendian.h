@@ -166,7 +166,7 @@ public:
  */
 struct csIEEEfloat
 {
-  /* @@@ FIXME It would be even better if we also check for sizeof (float)
+  /* \todo It would be even better if we also check for sizeof (float)
    * in configure or so. */
 #ifdef CS_IEEE_DOUBLE_FORMAT
   /// Convert native to IEEE

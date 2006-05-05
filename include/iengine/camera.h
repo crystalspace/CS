@@ -109,9 +109,9 @@ struct iCamera : public virtual iBase
   virtual iCamera *Clone () const = 0;
 
   /**
-   * Get the scene node that this object represents. @@@ Note. iCamera
-   * doesn't yet support iMovable so scene nodes are not properly working
-   * yet.
+   * Get the scene node that this object represents.
+   * \todo iCamera doesn't yet support iMovable so scene nodes are not
+   * properly working yet.
    */
   virtual iSceneNode* QuerySceneNode () = 0;
 

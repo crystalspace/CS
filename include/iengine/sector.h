@@ -188,14 +188,6 @@ struct iSector : public virtual iBase
    * actually located in this sector.
    */
   virtual const csSet<csPtrKey<iMeshWrapper> >& GetPortalMeshes () const = 0;
-  /**
-   * Register a mesh with a portal. @@@ TO BE REMOVED...
-   */
-  virtual void RegisterPortalMesh (iMeshWrapper* mesh) = 0;
-  /**
-   * Unregister a mesh with a portal. @@@ TO BE REMOVED...
-   */
-  virtual void UnregisterPortalMesh (iMeshWrapper* mesh) = 0;
 
   /**
    * Unlink all mesh objects from this sector. This will not remove

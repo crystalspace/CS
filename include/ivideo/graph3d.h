@@ -137,7 +137,7 @@ enum csZBufMode
 };
 
 // @@@ Keep in sync with values below
-// @@@ Document me better!
+// \todo Document me!
 #define CS_VATTRIB_SPECIFIC_FIRST    0
 #define CS_VATTRIB_SPECIFIC_LAST    15
 #define CS_VATTRIB_GENERIC_FIRST   100

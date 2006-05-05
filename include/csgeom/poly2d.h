@@ -211,7 +211,7 @@ public:
   /**
    * Generate a random convex polygon with the specified number
    * of vertices. The polygon will be inside the given bounding box.
-   * @@@ Currently only triangles are supported.
+   * \todo Extend the Random() function to support more then only triangles.
    */
   void Random (size_t num, const csBox2& max_bbox);
 };

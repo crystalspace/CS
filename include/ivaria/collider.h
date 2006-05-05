@@ -114,8 +114,10 @@ struct iCollideSystem : public iBase
    */
   virtual csPtr<iCollider> CreateCollider (iPolygonMesh* mesh) = 0;
 
-  /** Create a Collider from a terrain.
-   * @@@ write something more suitable
+  /**
+   * Create a Collider from a terrain. This should be used instead
+   * of the iPolygonMesh version in case you have a landscape because
+   * this is a more optimal way to do.
    */
   virtual csPtr<iCollider> CreateCollider (iTerraFormer* mesh) = 0;
   

@@ -153,7 +153,7 @@ struct iGenMeshSkeletonControlState : public iBase
 SCF_VERSION  (iGenMeshSkeletonControlFactory, 0, 0, 1);
 
 /**
- * @@@ Document me
+ * \todo Document me!
  */
 struct iGenMeshSkeletonControlFactory: public iGenMeshAnimationControlFactory 
 {
@@ -268,7 +268,7 @@ struct iGenMeshSkeletonBone : public iBase
 SCF_VERSION  (iGenMeshSkeletonBoneUpdateCallback, 0, 0, 1);
 
 /**
- * @@@ Document me
+ * \todo Document me!
  */
 struct iGenMeshSkeletonBoneUpdateCallback : public iBase
 {
@@ -279,7 +279,7 @@ struct iGenMeshSkeletonBoneUpdateCallback : public iBase
 SCF_VERSION  (iGenMeshSkeletonScript, 0, 0, 1);
 
 /**
- * @@@ Document me
+ * \todo Document me!
  */
 struct iGenMeshSkeletonScript : public iBase
 {

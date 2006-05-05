@@ -213,7 +213,7 @@ struct iLoader : public iBase
    * This function returns immediatelly. You can check the iLoaderStatus
    * instance that is returned to see if the map has finished loading or
    * if there was an error.
-   * @@@ NOT IMPLEMENTED YET @@@
+   * \todo This is not implemented! Implement me or remove me!
    */
   virtual csPtr<iLoaderStatus> ThreadedLoadMapFile (const char* filename,
 	iRegion* region = 0, bool curRegOnly = true,

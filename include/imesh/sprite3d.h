@@ -84,9 +84,6 @@ enum
  */
 #define CS_SPR_LOD_LOCAL 2
 
-// @@@ CONFIG TODO: global_lighting_quality
-// @@@ CONFIG TODO: global_lod_level
-
 /**
  * A frame for 3D sprite animation.
  */
@@ -156,6 +153,8 @@ struct iSpriteSocket : public virtual iBase
 
 /**
  * This interface describes the API for the 3D sprite factory mesh object.
+ * \todo global_lighting_quality should be a config option.
+ * \todo global_lod_level should be a config option.
  */
 struct iSprite3DFactoryState : public virtual iBase
 {
@@ -323,6 +322,7 @@ struct iSprite3DFactoryState : public virtual iBase
 
 /**
  * This interface describes the API for the 3D sprite mesh object.
+ * \todo What about convenience functions to set colors for verts?
  */
 struct iSprite3DState : public virtual iBase
 {
@@ -336,8 +336,6 @@ struct iSprite3DState : public virtual iBase
   virtual void SetLighting (bool l) = 0;
   /// Get lighting.
   virtual bool IsLighting () const = 0;
-
-  // @@@ TODO: what about convenience functions to set colors for verts?
 
   /// Go to a specified frame.
   virtual void SetFrame (int f) = 0;

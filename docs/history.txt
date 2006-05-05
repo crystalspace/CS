@@ -9,6 +9,13 @@ chronological order.
 5-May-2006
 	- Jorrit started work on more detailed mesh object documentation.
 	- Jorrit updated the genmesh documentation a bit more.
+	- Jorrit replaced several @@@ tags in the public headers with
+	  proper \todo tags.
+	- Jorrit removed the unused csPoly2DEdges class.
+	- Jorrit changed csArray::DeleteRange() to return false in case
+	  of invalid arguments.
+	- Jorrit removed iSector->RegisterPortalMesh() and
+	  UnregisterPortalMesh() from the public api.
 4-May-2006
 	- Erroroman made the follwoing:
 	    - Generic render step now handles light shader variables.

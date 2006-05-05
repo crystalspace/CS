@@ -34,7 +34,7 @@ class csVector3;
 
 SCF_VERSION (iLightningFactoryState, 0, 0, 1);
 
-/// Document me! @@@
+/// \todo Document me!
 struct iLightningFactoryState : public iBase
 {
   /// Set material of sprite.
