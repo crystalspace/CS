@@ -60,24 +60,27 @@ public:
   /** Returns the argument in position arg as a string. */
   virtual scfString GetStringArg(uint arg);	
   
-  /** Returns the named property as an integer, or zero if it doesn't exist. */
-  virtual int32 GetIntProp(const scfString &name);		
+  /** Gets the named property as an integer, or zero if it doesn't exist. Returns true if it existed, false if it didn't. */
+  virtual bool GetProp(const scfString &name, int32 &val);		
 	
- /** Returns the named property as a double, or zero if it doesn't exist. */
-  virtual double GetDoubleProp(const scfString &name);		
+ /** Gets the named property as a double, or zero if it doesn't exist.  Returns true if it existed, false if it didn't. */
+  virtual bool GetProp(const scfString &name, double &val);		
 	
-  /** Returns the named property as a string, or an empty string if it doesn't exist. */
-  virtual scfString GetStringProp(const scfString &name);	
+  /** Gets the named property as a string, or an empty string if it doesn't exist.  Returns true if it existed, false if it didn't. */
+  virtual bool GetProp(const scfString &name, scfString &val);	
   
   /** Sets the named property to the integer val. */
-  virtual void SetIntProp(const scfString &name, int32 val);		
+  virtual void SetProp(const scfString &name, int32 val);		
 	
   /** Sets the named property to the double val. */
-  virtual void SetDoubleProp(const scfString &name, double val);		
+  virtual void SetProp(const scfString &name, double val);		
 	
   /** Sets the named property to the string val. */
-  virtual void SetStringProp(const scfString &name, const scfString val);		
-
+  virtual void SetProp(const scfString &name, const scfString &val);
+    
+  /** Executes the given code. */
+  virtual void Exec(const scfString &code);					
+  
   /** 
    * Sets up the activation record for the notification, and then
    * notifies the requestor that an event has occured. 

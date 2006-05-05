@@ -18,6 +18,52 @@
 
 #include "picview.h"
 
+/** Event codes for the control bar's widgets. */
+enum PICVIEW_EVENTS { PVE_FIRST, PVE_PREV, PVE_NEXT, PVE_QUIT, PVE_SCALE };
+
+/** Callback for picture viewer events. */
+struct onPicViewEvent : public iAws2ScriptEvent 
+{	
+private:
+	/** Holds the instance of the picture viewer that we're responding to. */
+	PicView *picview;
+	
+public:
+	onPicViewEvent(PicView *_pv):picview(_pv) {}
+	virtual ~onPicViewEvent() {};
+	
+	virtual void operator() (iAws2ScriptObject *info) 
+	{
+		switch(info->GetIntArg(0))
+		{
+			case PVE_FIRST:
+				picview->LoadNextImage (1, -1);
+			break;
+			
+			case PVE_PREV:
+				picview->LoadNextImage (0, -1);
+			break;
+			
+			case PVE_NEXT:
+				picview->LoadNextImage (0, 1);
+			break;
+			
+			case PVE_QUIT:
+				picview->Quit();
+			break;
+			
+			case PVE_SCALE:
+				picview->FlipScale();
+			break;							
+		}	
+	}	
+
+};	
+
+
+
+//---------------------------------------------------------------------------
+
 CS_IMPLEMENT_APPLICATION
 
 //---------------------------------------------------------------------------
@@ -26,7 +72,6 @@ PicView::PicView ()
 {
   SetApplicationName ("PicView");
   pic = 0;
-  gui = 0;
   scale = false;
 }
 
@@ -38,19 +83,10 @@ void PicView::ProcessFrame ()
 {
   iGraphics2D* g2d = g3d->GetDriver2D ();
 
-  if (g2d->GetHeight() != y || g2d->GetWidth() != x)
-  {
-    x = g2d->GetWidth();
-    y = g2d->GetHeight();
-    // TODO : why call GetDriver2D here instead of using g2d?
-    aws->SetupCanvas(0, g3d->GetDriver2D (), g3d);
-    if (gui)
-      gui->MoveTo(g2d->GetWidth ()/2-100, 0);
-  }
-  
   if (!g3d->BeginDraw (CSDRAW_2DGRAPHICS)) return;
 
   g2d->Clear(0);
+
   if (pic)
   {
     if (scale)
@@ -60,7 +96,6 @@ void PicView::ProcessFrame ()
   }
 
   aws->Redraw ();
-  aws->Print (g3d, 64);
 }
 
 void PicView::FinishFrame ()
@@ -77,23 +112,23 @@ bool PicView::OnKeyboard(iEvent& ev)
     utf32_char code = csKeyEventHelper::GetCookedCode(&ev);
     if (code == CSKEY_ESC || code == 'q')
     {
-      ButtonQuit(0, (intptr_t)this, 0);
+      picview_events->Exec("picview.Quit()");
     }
     else if (code == 'f')
     {
-      ButtonFirst(0, (intptr_t)this, 0);
+      picview_events->Exec("picview.First()");
     }
     else if (code == 'p')
     {
-      ButtonPrev(0, (intptr_t)this, 0);
+      picview_events->Exec("picview.Prev()");
     }
     else if (code == 'n')
     {
-      ButtonNext(0, (intptr_t)this, 0);
+      picview_events->Exec("picview.Next()");
     }
     else if (code == 's')
     {
-      ButtonScale(0, (intptr_t)this, 0);
+      picview_events->Exec("picview.Scale()");
     }
   }
   return false;
@@ -152,8 +187,8 @@ bool PicView::Application()
   imgloader = CS_QUERY_REGISTRY(GetObjectRegistry(), iImageIO);
   if (!imgloader) return ReportError("Failed to locate Image Loader!");
 
-  aws = CS_QUERY_REGISTRY(GetObjectRegistry(), iAws);
-  if (!aws) return ReportError("Failed to locate Alternative WindowingSystem!");
+  aws = CS_QUERY_REGISTRY(GetObjectRegistry(), iAws2);
+  if (!aws) return ReportError("Failed to locate Alternative Windowing System 2!");
 
   vfs->ChDir ("/tmp");
   files = vfs->FindFiles ("/this/*");
@@ -170,30 +205,19 @@ bool PicView::Application()
 }
 
 void PicView::CreateGui ()
-{
-  aws->SetupCanvas(0, g3d->GetDriver2D (), g3d);
+{  
+  aws->SetDrawTarget(g3d->GetDriver2D (), g3d);
 
-  iAwsSink* sink = aws->GetSinkMgr ()->CreateSink ((intptr_t)this);
-  sink->RegisterTrigger ("First", &ButtonFirst);
-  sink->RegisterTrigger ("Prev" , &ButtonPrev );
-  sink->RegisterTrigger ("Next" , &ButtonNext );
-  sink->RegisterTrigger ("Quit" , &ButtonQuit );
-  sink->RegisterTrigger ("Scale", &ButtonScale);
-  aws->GetSinkMgr ()->RegisterSink ("PicView", sink);
+  picview_events = aws->CreateScriptObject("picView", new onPicViewEvent(this));
+  
+  picview_events->SetProp("cmdFirst", PVE_FIRST);
+  picview_events->SetProp("cmdPrev", PVE_PREV);
+  picview_events->SetProp("cmdNext", PVE_NEXT);
+  picview_events->SetProp("cmdQuit", PVE_QUIT);
+  picview_events->SetProp("cmdScale", PVE_SCALE);  
 
-  if (!aws->GetPrefMgr()->Load ("/aws/windows_skin.def"))
-    ReportError("couldn't load skin definition file!");
-  if (!aws->GetPrefMgr()->Load ("/varia/picview.def"))
-    ReportError("couldn't load definition file!");
-
-  aws->GetPrefMgr ()->SelectDefaultSkin ("Windows");
-
-  gui = aws->CreateWindowFrom ("PicView");
-  if (gui)
-  {
-    gui->MoveTo(g3d->GetDriver2D ()->GetWidth ()/2-100, 0);
-    gui->Show ();
-  }
+  if (aws->Load ("/varia/picview.skin.js")==false)
+    ReportError("Couldn't load skin definition file: '/varia/picview.skin.js'!");
 }
 
 void PicView::LoadNextImage (size_t idx, int step)
@@ -226,35 +250,35 @@ void PicView::LoadNextImage (size_t idx, int step)
 
 //---------------------------------------------------------------------------
 
-void PicView::ButtonFirst (unsigned long, intptr_t app, iAwsSource* /*source*/)
-{
-  PicView* picview = (PicView*)app;
-  picview->LoadNextImage (1, -1);
-}
+// void PicView::ButtonFirst (unsigned long, intptr_t app, iAwsSource* /*source*/)
+// {
+//   PicView* picview = (PicView*)app;
+//   picview->LoadNextImage (1, -1);
+// }
 
-void PicView::ButtonPrev (unsigned long, intptr_t app, iAwsSource* /*source*/)
-{
-  PicView* picview = (PicView*)app;
-  picview->LoadNextImage (0, -1);
-}
+// void PicView::ButtonPrev (unsigned long, intptr_t app, iAwsSource* /*source*/)
+// {
+//   PicView* picview = (PicView*)app;
+//   picview->LoadNextImage (0, -1);
+// }
 
-void PicView::ButtonNext (unsigned long, intptr_t app, iAwsSource* /*source*/)
-{
-  PicView* picview = (PicView*)app;
-  picview->LoadNextImage (0, 1);
-}
+// void PicView::ButtonNext (unsigned long, intptr_t app, iAwsSource* /*source*/)
+// {
+//   PicView* picview = (PicView*)app;
+//   picview->LoadNextImage (0, 1);
+// }
 
-void PicView::ButtonQuit (unsigned long, intptr_t /*app*/, iAwsSource* /*source*/)
-{
-  csRef<iEventQueue> q = CS_QUERY_REGISTRY(GetObjectRegistry(), iEventQueue);
-  if (q.IsValid()) q->GetEventOutlet()->Broadcast(csevQuit(GetObjectRegistry()));
-}
+// void PicView::ButtonQuit (unsigned long, intptr_t /*app*/, iAwsSource* /*source*/)
+// {
+//   csRef<iEventQueue> q = CS_QUERY_REGISTRY(GetObjectRegistry(), iEventQueue);
+//   if (q.IsValid()) q->GetEventOutlet()->Broadcast(csevQuit(GetObjectRegistry()));
+// }
 
-void PicView::ButtonScale (unsigned long, intptr_t app, iAwsSource* /*source*/)
-{
-  PicView* picview = (PicView*)app;
-  picview->scale ^= true;
-}
+// void PicView::ButtonScale (unsigned long, intptr_t app, iAwsSource* /*source*/)
+// {
+//   PicView* picview = (PicView*)app;
+//   picview->scale ^= true;
+// }
 
 /*-------------------------------------------------------------------------*
  * Main function

@@ -39,6 +39,9 @@ chronological order.
 	- JTarbox fixed the copy constructor for csEvents
 	- JTarbox fix for the fix to the copy ctor of csEvents
 	- Jorrit fixed a few apps for the latest changes.
+	- Christopher changed the API of iAwsScriptObject to be a little easier 
+	  to use (I hope), and added an Exec() call.  He also moved picview over
+	  to AWS2.
 4-May-2006
 	- Erroroman made the follwoing:
 	    - Generic render step now handles light shader variables.

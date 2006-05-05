@@ -30,12 +30,12 @@ class PicView : public csApplicationFramework, public csBaseEventHandler
   csRef<iKeyboardDriver> kbd;
   csRef<iVFS> vfs;
   csRef<iImageIO> imgloader;
-  csRef<iAws> aws;
+  csRef<iAws2> aws;
 
   csRef<iStringArray> files;
   csRef<iTextureHandle> txt;
   csSimplePixmap* pic;
-  iAwsWindow *gui;
+  
   size_t cur_idx;
   bool scale;
   float x,y;
@@ -47,18 +47,27 @@ class PicView : public csApplicationFramework, public csBaseEventHandler
   void FinishFrame ();
 
   void CreateGui ();
-  void LoadNextImage (size_t idx, int step);
 
-  static void ButtonFirst(unsigned long, intptr_t app, iAwsSource *source);
-  static void ButtonPrev (unsigned long, intptr_t app, iAwsSource *source);
-  static void ButtonNext (unsigned long, intptr_t app, iAwsSource *source);
-  static void ButtonQuit (unsigned long, intptr_t app, iAwsSource *source);
-  static void ButtonScale(unsigned long, intptr_t app, iAwsSource *source);
+
+  iAws2ScriptObject *picview_events;
 
  public:
 
   PicView ();
   ~PicView ();
+
+  /** Allows us to load the next image in progression. */
+  void LoadNextImage (size_t idx, int step);
+  
+  /** Turns scaling on and off. */
+  void FlipScale() { scale^=true; }
+  
+  /** Posts a quit message. */
+  void Quit()
+  {
+	csRef<iEventQueue> q = CS_QUERY_REGISTRY(GetObjectRegistry(), iEventQueue);
+  	if (q.IsValid()) q->GetEventOutlet()->Broadcast(csevQuit(GetObjectRegistry()));	  
+  }
 
   void OnExit ();
   bool OnInitialize (int argc, char* argv[]);
