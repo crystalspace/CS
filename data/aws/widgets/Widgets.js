@@ -16,4 +16,5 @@ Sys.Load("/aws/widgets/Gauge.js");
 Sys.Load("/aws/widgets/Slider.js");
 Sys.Load("/aws/widgets/Label.js");
 Sys.Load("/aws/widgets/Image.js");
+Sys.Load("/aws/widgets/Panel.js");
 Sys.Load("/aws/widgets/Window.js");

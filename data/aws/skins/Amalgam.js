@@ -123,6 +123,20 @@ skin_Amalgam =
   		Thickness : 15,
   		TickThickness : 5,
   	},
+  	
+  	RoundedPanel : 
+  	{   		
+  		Base	: new Color(0.85, 0.85, 0.85, 1.0), 
+  		Border	: new Color(0,    0,    0,    1.0),  		
+  		Roundness   : 10,
+  	},
+  	
+  	MiteredPanel : 
+  	{   		
+  		Base	: new Color(0.85, 0.85, 0.85, 1.0), 
+  		Border	: new Color(0,    0,    0,    1.0),  		
+  		Miter   : 10,
+  	},
         
 	
 };

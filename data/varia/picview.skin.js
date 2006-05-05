@@ -91,6 +91,8 @@ is an image that this program understands.</text>
 function LoadingPic()
 {
 	var loading_info= 	 
+	  <widget type="Panel" id="loading_panel">
+	    <setup>widget.onDraw=Skin.current.Style.RoundedPanel</setup>
 		<layout type="Horizontal" id="loading_thing">		  
 		 	<padding>2</padding>	  	 
 		 	<widget type="Image">
@@ -99,13 +101,16 @@ function LoadingPic()
 		 	<widget type="Label">
 		 		<text>Loading image, please wait...</text>
 		 	</widget>		 	
-		 </layout>;
+		 </layout>
+		</widget>;
 	
 	return ParseXMLInterface(loading_info, null);
 }
 
 // Create and center loading widget.
 lw = LoadingPic();
+lw.ResizeTo(loading_thing.width+20, loading_thing.height+20);
+loading_thing.Move(10,10);
 lw.MoveTo((Sys.GetWidth()/2) - (lw.width/2), (Sys.GetHeight()/2) - (lw.height/2));
 
 // Create a new controls widget

@@ -645,6 +645,48 @@ Style3D =
 		}		
 	},
 	
+	RoundedPanel : function(pen)
+	{
+		var w  = this.width, h = this.height;
+						
+		var prefs = Skin.current;
+		var rp = prefs.RoundedPanel;
+				
+		pen.Clear();				
+		
+		pen.SetFlag(Pen.FLAG_FILL);
+		pen.SetColor(rp.Base);		
+		pen.DrawRoundedRect(0,0,w,h,rp.Roundness);
+		pen.ClearFlag(Pen.FLAG_FILL);
+				
+		if (this.border==true)
+		{
+			pen.SetColor(rp.Border);
+			pen.DrawRoundedRect(0,0,w,h,rp.Roundess);		
+		}		
+	},
+	
+	MiteredPanel : function(pen)
+	{
+		var w  = this.width, h = this.height;
+						
+		var prefs = Skin.current;
+		var mp = prefs.MiteredPanel;
+				
+		pen.Clear();				
+		
+		pen.SetFlag(Pen.FLAG_FILL);
+		pen.SetColor(mp.Base);		
+		pen.DrawMiteredRect(0,0,w,h,mp.Miter);
+		pen.ClearFlag(Pen.FLAG_FILL);
+				
+		if (this.border==true)
+		{
+			pen.SetColor(mp.Border);
+			pen.DrawMiteredRect(0,0,w,h,mp.Miter);		
+		}		
+	},
+	
 	EmptyLayout : function(pen)
 	{
 		// empty
