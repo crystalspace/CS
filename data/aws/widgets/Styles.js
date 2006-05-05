@@ -621,6 +621,30 @@ Style3D =
 		
 	},
 	
+	Image : function(pen)
+	{
+		var w  = this.width, h = this.height;
+						
+		var prefs = Skin.current;
+				
+		pen.Clear();				
+		
+		if (this.image!=null && this.image!=undefined)
+		{
+			pen.SetFlag(Pen.FLAG_TEXTURE);
+			pen.SetColor(0.5,0.5,0.5,1);
+			pen.SetTexture(this.image);
+			pen.DrawRect(0,0,w,h);
+			pen.ClearFlag(Pen.FLAG_TEXTURE);
+		}
+		
+		if (this.border==true)
+		{
+			pen.SetColor(prefs.TextForeColor);
+			pen.DrawRect(0,0,w,h);		
+		}		
+	},
+	
 	EmptyLayout : function(pen)
 	{
 		// empty

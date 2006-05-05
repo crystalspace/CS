@@ -42,6 +42,10 @@ chronological order.
 	- Christopher changed the API of iAwsScriptObject to be a little easier 
 	  to use (I hope), and added an Exec() call.  He also moved picview over
 	  to AWS2.
+	- Christopher enhanced picview by having it actually tell you what it's
+	  doing.  While some may feel that this is a radical paradigm shift, he
+	  felt that taking the plunge was really worthwhile, and that everyone
+	  will be better off for it eventually.	
 4-May-2006
 	- Erroroman made the follwoing:
 	    - Generic render step now handles light shader variables.
