@@ -315,8 +315,8 @@ void awsManager2::Redraw ()
 
   ++frames;
 
-  g2d->Write (default_font, 90, 90, g2d->FindRGB (128,128,128,128), -1, 
-    "AWS Redrawing");
+//   g2d->Write (default_font, 90, 90, g2d->FindRGB (128,128,128,128), -1, 
+//     "AWS Redrawing");
   ScriptCon ()->Redraw (g2d);
 
   //   float angle;
@@ -360,9 +360,12 @@ void awsManager2::Redraw ()
     start=end;
   }	  
 
-  msg.Format ("%d fps", fps);
-  g2d->Write (default_font, 150, 5, g2d->FindRGB (128,128,128,255), -1, 
-    msg.GetDataSafe ());  
+  if (ScriptCon()->Visible())
+  {
+	  msg.Format ("%d fps", fps);
+	  g2d->Write (default_font, 150, 5, g2d->FindRGB (128,128,128,255), -1, 
+	    msg.GetDataSafe ());  
+  }
 }
 
 /*********************************************************************

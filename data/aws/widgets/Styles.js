@@ -527,9 +527,9 @@ Style3D =
 		pen.Clear();
 		
 		var start_y, arrow_x=this.fx;
-		
+				
 		// If we are below the item we are highlighting...
-		if (!this.over)
+		if (!this.over_focus_point)
 		{		
 			start_y=10;
 			
@@ -540,12 +540,13 @@ Style3D =
 			pen.DrawTriangle(arrow_x, 0, arrow_x+10, start_y, arrow_x-10, start_y);
 			
 			// Decoration
-			pen.SetColor(prefs.ActiveTitleBarColor1);
+			if (this.over) pen.SetColor(prefs.TitleBar.Active);
+			else 		   pen.SetColor(prefs.TitleBar.Inactive);
 			pen.DrawRect(3,start_y+3, 8, h-3);
 					
 			// Border
 			pen.SetWidth(1.5);
-			pen.SetColor(prefs.TextForeColor);		
+			//pen.SetColor(prefs.TextForeColor);		
 			pen.DrawLine(0,start_y, arrow_x-10, start_y);
 			pen.DrawLine(arrow_x-10, start_y, arrow_x, 0);
 			pen.DrawLine(arrow_x, 0, arrow_x+10, start_y);
@@ -565,12 +566,13 @@ Style3D =
 			pen.DrawTriangle(arrow_x, h, arrow_x-10, start_y, arrow_x+10, start_y);
 			
 			// Decoration
-			pen.SetColor(prefs.ActiveTitleBarColor1);
+			if (this.over) pen.SetColor(prefs.TitleBar.Active);
+			else 		   pen.SetColor(prefs.TitleBar.Inactive);
 			pen.DrawRect(3, 3, 8, start_y-3);
 					
 			// Border
 			pen.SetWidth(1.5);
-			pen.SetColor(prefs.TextForeColor);		
+			//pen.SetColor(prefs.TextForeColor);		
 			pen.DrawLine(0,0, w, 0);
 			pen.DrawLine(w, 0, w, start_y);
 			pen.DrawLine(w, start_y, arrow_x+10, start_y);
@@ -582,6 +584,7 @@ Style3D =
 			start_y=0;
 		}
 					
+		pen.SetColor(prefs.TextForeColor);		
 		pen.Write(prefs.TitleFont, 10, start_y+5, this.title);
 		
 		// Setup for the information.

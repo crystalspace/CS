@@ -54,6 +54,7 @@ public:
 			
 			case PVE_SCALE:
 				picview->FlipScale();
+				picview->LoadNextImage (0, 0);
 			break;							
 		}	
 	}	
@@ -112,23 +113,23 @@ bool PicView::OnKeyboard(iEvent& ev)
     utf32_char code = csKeyEventHelper::GetCookedCode(&ev);
     if (code == CSKEY_ESC || code == 'q')
     {
-      picview_events->Exec("picview.Quit()");
+      picview_events->Exec("picView.Quit()");
     }
     else if (code == 'f')
     {
-      picview_events->Exec("picview.First()");
+      picview_events->Exec("picView.First()");
     }
     else if (code == 'p')
     {
-      picview_events->Exec("picview.Prev()");
+      picview_events->Exec("picView.Prev()");
     }
     else if (code == 'n')
     {
-      picview_events->Exec("picview.Next()");
+      picview_events->Exec("picView.Next()");
     }
     else if (code == 's')
     {
-      picview_events->Exec("picview.Scale()");
+      picview_events->Exec("picView.Scale()");
     }
   }
   return false;
@@ -143,6 +144,8 @@ bool PicView::HandleEvent (iEvent &ev)
 
 bool PicView::OnInitialize(int /*argc*/, char* /*argv*/ [])
 {
+  SetupConfigManager(GetObjectRegistry(), "/config/picview.cfg");	
+	
   if (!csInitializer::RequestPlugins(GetObjectRegistry(),
     CS_REQUEST_VFS,
     CS_REQUEST_OPENGL3D,
@@ -151,11 +154,12 @@ bool PicView::OnInitialize(int /*argc*/, char* /*argv*/ [])
     CS_REQUEST_IMAGELOADER,
     CS_REQUEST_REPORTER,
     CS_REQUEST_REPORTERLISTENER,
-    CS_REQUEST_PLUGIN("crystalspace.window.alternatemanager", iAws),
+    CS_REQUEST_PLUGIN("crystalspace.window.alternatemanager2", iAws2),
     CS_REQUEST_END))
     return ReportError("Failed to initialize plugins!");
 
-  csBaseEventHandler::Initialize(GetObjectRegistry());
+  csBaseEventHandler::Initialize(GetObjectRegistry());  
+  
 
   if (!RegisterQueue(GetObjectRegistry(), csevAllEvents(GetObjectRegistry())))
     return ReportError("Failed to set up event handler!");
@@ -216,8 +220,21 @@ void PicView::CreateGui ()
   picview_events->SetProp("cmdQuit", PVE_QUIT);
   picview_events->SetProp("cmdScale", PVE_SCALE);  
 
+  // Load the normal skin.
   if (aws->Load ("/varia/picview.skin.js")==false)
     ReportError("Couldn't load skin definition file: '/varia/picview.skin.js'!");
+   
+  // Load the no files we recognize tooltip. 
+  if (files->IsEmpty())
+  {
+	  if (aws->Load ("/varia/picview.nopics.js")==false)
+    	ReportError("Couldn't load skin definition file: '/varia/picview.nopics.js'!");	  	  
+  }
+  // Otherwise, queue up the first picture.
+  else
+  {
+	 picview_events->Exec("picView.First()");	  
+  }
 }
 
 void PicView::LoadNextImage (size_t idx, int step)
@@ -241,7 +258,11 @@ void PicView::LoadNextImage (size_t idx, int step)
     ifile = imgloader->Load (buf, txtmgr->GetTextureFormat ());
   }
   while (!ifile.IsValid() && (cur_idx != startIdx));
-  if (!ifile) return;
+  if (!ifile) 
+  {
+	  picview_events->Exec("nmp.Show()");
+	  return;
+  }
 
   delete pic;
   txt = txtmgr->RegisterTexture (ifile, CS_TEXTURE_2D);

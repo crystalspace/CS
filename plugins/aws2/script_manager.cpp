@@ -125,7 +125,7 @@ static JSBool GarbageCollectSmart (JSContext *cx, JSObject *obj, uintN argc,
   return JS_TRUE;
 } 
 
-/// Calls the garbage collector, but only collects garbage if memory is at 75% of the threshold.
+/// Print all the arguments to the console.
 static JSBool Print (JSContext *cx, JSObject *obj, uintN argc, jsval *argv, 
                      jsval *rval)	
 {
@@ -176,6 +176,19 @@ static JSBool GetHeight (JSContext *cx, JSObject *obj, uintN argc, jsval *argv,
   return JS_TRUE;
 }
 
+/// Makes the console visible or invisible
+static JSBool SetConsoleVisible (JSContext *cx, JSObject *obj, uintN argc, jsval *argv, 
+                     jsval *rval)	
+{  
+  JSBool visible=true;
+    
+  JS_ValueToBoolean(cx, argv[0], &visible);  
+  
+  ScriptCon()->SetConsoleVisible(visible);
+
+  return JS_TRUE;
+} 
+
 JSClass autom_class = {
   "Sys", 
   0,
@@ -200,6 +213,7 @@ static JSFunctionSpec autom_static_methods[] = {
   {"CreateTimer",         CreateTimer,        2, 0, 0},
   {"GetWidth",            GetWidth,           0, 0, 0},
   {"GetHeight",           GetHeight,          0, 0, 0},    
+  {"SetConsoleVisible",   SetConsoleVisible,  1, 0, 0},      
   {0,0,0,0,0}
 };
 

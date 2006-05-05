@@ -49,10 +49,13 @@ class scriptConsole
    * It will accept keystrokes when active, and it's appearance is different.
    */
   bool active;
+  
+  /** Set to true if the console is visible. */
+  bool visible;
 
 public:
   scriptConsole ()
-    : history_size (500), cmd_ptr (0), cursor_pos (0), active (false) 
+    : history_size (500), cmd_ptr (0), cursor_pos (0), active (false), visible(true) 
   {}
 
   ~scriptConsole() 
@@ -61,9 +64,22 @@ public:
   void Initialize (iObjectRegistry *obj_reg);
 
   void OnKeypress (csKeyEventData &data);
-
+  
+  /// Shows or hides the console.
+  void SetConsoleVisible(bool setting)
+  {
+	visible=setting;
+	if (!visible) active=false;	  
+  }
+  
+  /// Returns true if the console is visible.
+  bool Visible()
+  {
+	return visible;	  
+  }
+  
   /// Returns true if the console is active.
-  bool Active () { return active; }
+  bool Active () { if (visible==false) return false; else return active; }
 
   /// Flips the active state of the console (turns it on or off.)
   void FlipActiveState () 

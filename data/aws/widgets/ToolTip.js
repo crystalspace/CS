@@ -12,6 +12,9 @@ function ToolTip(settings)
 	_widget.__defineGetter__("text", function() { return this._text; });			
 	
 	// Whether we are over the focus point, or under it.
+	_widget.over_focus_point=false;
+	
+	// If mouse is over.
 	_widget.over=false;
 	
 	// The place to point to.
@@ -24,6 +27,20 @@ function ToolTip(settings)
 	// Set the default size.
 	_widget.ResizeTo(prefs.ScrollBarWidth, prefs.ScrollBarHeight);
 	
+	// Catch mouse enter event
+	_widget.onMouseEnter = function()
+	{
+		this.over=true;
+		this.Invalidate();	
+	}
+	
+	// Catch mouse exit event
+	_widget.onMouseExit = function()
+	{
+		this.over=false;
+		this.Invalidate();	
+	}
+	
 	//  Set's the widget's focus point so that the widget will know where
 	// to place itself.
 	_widget.SetFocusPoint = function(x,y)
@@ -35,7 +52,7 @@ function ToolTip(settings)
 		// which they will so long as we aren't a child of anyone.
 		
 		this.MoveTo(x-30, y);
-		this.over=false;
+		this.over_focus_point=false;
 		
 		// First make sure we're not off screen already.
 		
@@ -50,7 +67,7 @@ function ToolTip(settings)
 			
 		if (this.ymax > Sys.GetHeight())
 		{
-			this.over=true;
+			this.over_focus_point=true;
 			this.MoveTo(this.xmin, y-this.height);	
 		}		
 		

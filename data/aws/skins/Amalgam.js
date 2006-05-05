@@ -107,7 +107,8 @@ skin_Amalgam =
   	},
   	
   	Button : 
-  	{   		
+  	{   	
+	  	w:40, h:20,	
   		Base  : new Color(0.56, 0.86, 0.94, 1.0),  
   		Border	: new Color(0,    0,    0,    1.0),
   		Over	: new Color(0.56, 0.86, 0.94, 0.5), 

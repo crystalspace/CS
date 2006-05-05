@@ -210,6 +210,8 @@ void scriptConsole::OnKeypress (csKeyEventData &eventData)
 
 void scriptConsole::Redraw (iGraphics2D * g2d)
 {
+  if (visible==false) return;
+	
   int thd = font->GetTextHeight ();
   int y=g2d->GetHeight ()-thd;
   int tw=0,th=thd;

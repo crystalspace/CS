@@ -1,5 +1,5 @@
 /** Button factory. */
-function Button()
+function Button(settings)
 {
 	var _widget = new Widget;
 	var prefs = Skin.current;
@@ -16,7 +16,8 @@ function Button()
 	_widget.__defineSetter__("state", function(v) { this._state = v; this.Invalidate(); if (this.onChange) this.onChange(this); });	
 	_widget.__defineGetter__("state", function() { return this._state; });	
 	
-	_widget.Resize(40, 20);	
+	// Set the initial width and height
+	_widget.Resize(prefs.Button.w, prefs.Button.h);	
 			
 	// Set the drawing function to be whatever the current style dictates.
 	_widget.onDraw = Skin.current.Style.Button;
@@ -42,26 +43,40 @@ function Button()
 	
 	_widget.onMouseEnter = function()
 	{
-		_widget.over=true;
+		this.over=true;
 		this.Invalidate();	
 	}
 	
 	_widget.onMouseExit = function()
 	{
-		_widget.over=false;
+		this.over=false;
 		this.Invalidate();	
 	}
 		
 	return _widget;
 }
 
-function buttonDrawText(text_item)
-{	
-	function doDraw(pen) 
+function ButtonWithText(settings)
+{
+	var _widget = Button(settings);
+	var dim;
+	
+	_widget.text = settings.text;	
+	
+	if (settings.padding!=undefined) _widget.padding=Number(settings.padding); 
+	else _widget.padding=1;
+		
+	// Resize the button appropriately.
+	dim = Skin.current.Font.GetDimensions(settings.text);
+	
+	_widget.ResizeTo(dim.width+_widget.padding, dim.height+_widget.padding);
+	
+	_widget.onDrawContent = function(pen) 
 	{ 
 		pen.SetColor(1,1,1,1); 
-		pen.WriteBoxed(Skin.current.Font, 0,0,this.width, this.height, Pen.ALIGN_CENTER, Pen.ALIGN_CENTER, text_item); 		
-	}				 			
-				
-	return doDraw;
+		pen.WriteBoxed(Skin.current.Font, 0,0,this.width, this.height, Pen.ALIGN_CENTER, Pen.ALIGN_CENTER, this.text); 		
+	}
+	
+	return _widget;
 }
+
