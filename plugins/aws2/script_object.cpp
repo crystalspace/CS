@@ -67,18 +67,18 @@ double scriptObject::GetDoubleArg(uint arg)
   return (double)val;
 }
 	 
-scfString scriptObject::GetStringArg(uint arg)
+csRef<iString> scriptObject::GetStringArg(uint arg)
 {
 	JSString *val = JS_ValueToString (ar.cx, ar.argv[arg]);
 
-    return scfString(JS_GetStringBytes (val));	
+    return new scfString(JS_GetStringBytes (val));	
 }
 
-bool scriptObject::GetProp(const scfString &name, int32 &return_val)
+bool scriptObject::GetProp(const char *name, int32 &return_val)
 {	
 	jsval sval;
-	
-	if (JS_GetProperty (cx, so, name.GetData(), &sval)==JS_TRUE && sval!=JSVAL_VOID)
+		
+	if (JS_GetProperty (cx, so, name, &sval)==JS_TRUE && sval!=JSVAL_VOID)
 	{
 		int32 val;
 	
@@ -92,11 +92,11 @@ bool scriptObject::GetProp(const scfString &name, int32 &return_val)
 	return false;
 }	
 
-bool scriptObject::GetProp(const scfString &name, double &return_val)		
+bool scriptObject::GetProp(const char *name, double &return_val)		
 {	
 	jsval sval;
-	
-	if (JS_GetProperty (cx, so, name.GetData(), &sval)==JS_TRUE && sval!=JSVAL_VOID)
+		
+	if (JS_GetProperty (cx, so, name, &sval)==JS_TRUE && sval!=JSVAL_VOID)
 	{
 		 jsdouble val=0.0;
 
@@ -109,15 +109,15 @@ bool scriptObject::GetProp(const scfString &name, double &return_val)
 	return false;
 }	
 
-bool scriptObject::GetProp(const scfString &name, scfString &return_val)
+bool scriptObject::GetProp(const char *name, iString *return_val)
 {	
 	jsval sval;
-	
-	if (JS_GetProperty (cx, so, name.GetData(), &sval)==JS_TRUE && sval!=JSVAL_VOID)
+		
+	if (JS_GetProperty (cx, so, name, &sval)==JS_TRUE && sval!=JSVAL_VOID)
 	{
 		JSString *val = JS_ValueToString (cx, sval);
 		
-    	return_val = scfString(JS_GetStringBytes (val));	
+    	(*return_val) = scfString(JS_GetStringBytes (val));	
     	
     	return true;
 	}	
@@ -126,32 +126,35 @@ bool scriptObject::GetProp(const scfString &name, scfString &return_val)
 }
 
 
-void scriptObject::SetProp(const scfString &name, int32 val)
+void scriptObject::SetProp(const char *name, int32 val)
 {
 	jsval sval = INT_TO_JSVAL(val);
-	
-	JS_SetProperty (cx, so, name.GetData(), &sval);
+		
+	JS_SetProperty (cx, so, name, &sval);
 }	
 
-void scriptObject::SetProp(const scfString &name, double val)
+void scriptObject::SetProp(const char *name, double val)
 {
 	jsdouble tmp=(jsdouble)val;
 	jsval sval = DOUBLE_TO_JSVAL(tmp);
-	
-	JS_SetProperty (cx, so, name.GetData(), &sval);	
+		
+	JS_SetProperty (cx, so, name, &sval);	
 }	
 
-void scriptObject::SetProp(const scfString &name, const scfString &val)
-{
-	JSString *str = JS_NewString(cx, (char *)name.GetData(), name.Length());
+void scriptObject::SetProp(const char *name, const char *_val)
+{	
+	csString val(_val);
+	
+	JSString *str = JS_NewString(cx, (char *)val.GetData(), val.Length());
 	jsval sval = STRING_TO_JSVAL(str);
 			
-	JS_SetProperty (cx, so, name.GetData(), &sval);	
+	JS_SetProperty (cx, so, name, &sval);	
 }
 
-void scriptObject::Exec(const scfString &code)
+void scriptObject::Exec(const char *_code)
 {
 	jsval rv;
+	csString code(_code);
 	
 	JS_EvaluateScript(cx, so, code.GetData(), code.Length(), "nofile", 1, &rv);
 }
