@@ -23,11 +23,21 @@ function Image(settings)
 		var dim = this._image.GetDimensions();
 									
 		this.ResizeTo(dim.width, dim.height);		
-	}
-	
+	}	
 	
 	// Setup needed info	
-	if (settings.image!=undefined && settings.image!=null) _widget.text=settings.image;
+	if (settings.image!=undefined && settings.image!=null)
+	{
+		if (typeof(settings.image)=="object")
+		{
+			_widget.image=settings.image;
+		}
+		else
+		{
+			_widget.image = new Texture(String(settings.image));	
+		}
+	}
+	 
 	_widget.border=settings.border;
 		
 	return _widget;

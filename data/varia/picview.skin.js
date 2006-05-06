@@ -92,11 +92,12 @@ function LoadingPic()
 {
 	var loading_info= 	 
 	  <widget type="Panel" id="loading_panel">
+	    <border>{true}</border>
 	    <setup>widget.onDraw=Skin.current.Style.RoundedPanel</setup>
 		<layout type="Horizontal" id="loading_thing">		  
 		 	<padding>2</padding>	  	 
 		 	<widget type="Image">
-		 		<setup>widget.image=new Texture("/varia/loading-icon.png");</setup> 		 				 		
+		 		<image>/varia/loading-icon.png</image>
 		 	</widget>
 		 	<widget type="Label">
 		 		<text>Loading image, please wait...</text>

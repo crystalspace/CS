@@ -11,6 +11,9 @@ function Panel(settings)
 	_widget.SetPen(new Pen);
 		
 	_widget.onDraw = settings.style;	
+	
+	if (settings.border!=undefined) _widget.border=Boolean(settings.border);
+	else _widget.border=false;
 		
 	return _widget;
 }
