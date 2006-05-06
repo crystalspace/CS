@@ -1035,6 +1035,14 @@ bool csGeneralMeshLoader::ParseSubMesh(iDocumentNode *node,
   return true;
 }
 
+#define CHECK_MESH(m) \
+  if (!m) { \
+    synldr->ReportError ( \
+	"crystalspace.genmeshloader.parse.unknownfactory", \
+	child, "Specify the factory first!"); \
+    return 0; \
+  }
+
 csPtr<iBase> csGeneralMeshLoader::Parse (iDocumentNode* node,
 	iStreamSource*, iLoaderContext* ldr_context, iBase*)
 {
@@ -1056,16 +1064,19 @@ csPtr<iBase> csGeneralMeshLoader::Parse (iDocumentNode* node,
 	  bool r;
 	  if (!synldr->ParseBool (child, r, true))
 	    return 0;
+	  CHECK_MESH(meshstate);
 	  meshstate->SetManualColors (r);
 	}
 	break;
       case XMLTOKEN_NOSHADOWS:
 	{
+	  CHECK_MESH(meshstate);
 	  meshstate->SetShadowCasting (false);
 	}
 	break;
       case XMLTOKEN_LOCALSHADOWS:
 	{
+	  CHECK_MESH(meshstate);
 	  meshstate->SetShadowReceiving (true);
 	}
 	break;
@@ -1074,6 +1085,7 @@ csPtr<iBase> csGeneralMeshLoader::Parse (iDocumentNode* node,
 	  bool r;
 	  if (!synldr->ParseBool (child, r, true))
 	    return 0;
+	  CHECK_MESH(meshstate);
 	  meshstate->SetLighting (r);
 	}
 	break;
@@ -1082,6 +1094,7 @@ csPtr<iBase> csGeneralMeshLoader::Parse (iDocumentNode* node,
 	  csColor col;
 	  if (!synldr->ParseColor (child, col))
 	    return 0;
+	  CHECK_MESH(meshstate);
 	  mesh->SetColor (col);
 	}
 	break;
@@ -1130,6 +1143,7 @@ csPtr<iBase> csGeneralMeshLoader::Parse (iDocumentNode* node,
 		child, "Couldn't find material '%s'!", matname);
             return 0;
 	  }
+	  CHECK_MESH(meshstate);
 	  mesh->SetMaterialWrapper (mat);
 	}
 	break;
@@ -1138,13 +1152,16 @@ csPtr<iBase> csGeneralMeshLoader::Parse (iDocumentNode* node,
 	  uint mm;
 	  if (!synldr->ParseMixmode (child, mm))
 	    return 0;
+	  CHECK_MESH(meshstate);
           mesh->SetMixMode (mm);
 	}
 	break;
       case XMLTOKEN_RENDERBUFFER:
+	CHECK_MESH(meshstate);
         ParseRenderBuffer (child, meshstate, factstate);
         break;
       case XMLTOKEN_SUBMESH:
+	CHECK_MESH(meshstate);
         ParseSubMesh (child, (iGeneralMeshCommonState*)meshstate,
 		factstate, ldr_context);
         break;

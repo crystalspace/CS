@@ -383,6 +383,14 @@ bool csNullMeshLoader::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
+#define CHECK_MESH(m) \
+  if (!m) { \
+    synldr->ReportError ( \
+	"crystalspace.nullmeshloader.parse.unknownfactory", \
+	child, "Specify the factory first!"); \
+    return 0; \
+  }
+
 csPtr<iBase> csNullMeshLoader::Parse (iDocumentNode* node,
 	iStreamSource*, iLoaderContext* ldr_context, iBase*)
 {
@@ -403,10 +411,12 @@ csPtr<iBase> csNullMeshLoader::Parse (iDocumentNode* node,
 	  csBox3 box;
 	  if (!synldr->ParseBox (child, box))
 	    return 0;
+	  CHECK_MESH (state);
 	  state->SetBoundingBox (box);
 	}
         break;
       case XMLTOKEN_RADIUS:
+	CHECK_MESH (state);
         state->SetRadius (child->GetContentsValueAsFloat ());
 	break;
       case XMLTOKEN_FACTORY:

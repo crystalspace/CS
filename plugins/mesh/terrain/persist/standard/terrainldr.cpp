@@ -293,6 +293,14 @@ bool csTerrainObjectLoader::Initialize (iObjectRegistry* objreg)
   return true;
 }
 
+#define CHECK_MESH(m) \
+  if (!m) { \
+    synldr->ReportError ( \
+	"crystalspace.sprite3dloader.parse.unknownfactory", \
+	child, "Specify the factory first!"); \
+    return 0; \
+  }
+
 csPtr<iBase> csTerrainObjectLoader::Parse (iDocumentNode* node, 
   iStreamSource*, iLoaderContext* ldr_context, iBase* /*context*/)
 {
@@ -342,6 +350,7 @@ csPtr<iBase> csTerrainObjectLoader::Parse (iDocumentNode* node,
             child, "Error reading color value!");
           return 0;
         }
+	CHECK_MESH (mesh);
         mesh->SetColor (c);
         break;
       }
@@ -355,6 +364,7 @@ csPtr<iBase> csTerrainObjectLoader::Parse (iDocumentNode* node,
             child, "Couldn't find material '%s'!", matname);
           return 0;
         }
+	CHECK_MESH (mesh);
         mesh->SetMaterialWrapper (mat);
         break;
       }
@@ -367,6 +377,7 @@ csPtr<iBase> csTerrainObjectLoader::Parse (iDocumentNode* node,
             child, "Error parsing material palette!");
           return 0;
         }
+	CHECK_MESH (state);
         state->SetMaterialPalette (pal);
 	palette_set = true;
         break;
@@ -402,6 +413,7 @@ csPtr<iBase> csTerrainObjectLoader::Parse (iDocumentNode* node,
           return 0;
 	}
         float val = child->GetContentsValueAsFloat ();
+	CHECK_MESH (state);
 	state->SetLODValue (name, val);
 	break;
       }
@@ -410,6 +422,7 @@ csPtr<iBase> csTerrainObjectLoader::Parse (iDocumentNode* node,
 	  bool staticLighting;
 	  if (!synldr->ParseBool (child, staticLighting, true))
 	    return 0;
+	  CHECK_MESH (state);
 	  state->SetStaticLighting (staticLighting);
 	}
 	break;
@@ -418,6 +431,7 @@ csPtr<iBase> csTerrainObjectLoader::Parse (iDocumentNode* node,
 	  bool castShadows;
 	  if (!synldr->ParseBool (child, castShadows, true))
 	    return 0;
+	  CHECK_MESH (state);
 	  state->SetCastShadows (castShadows);
 	}
 	break;

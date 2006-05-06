@@ -570,6 +570,14 @@ bool csInstMeshLoader::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
+#define CHECK_MESH(m) \
+  if (!m) { \
+    synldr->ReportError ( \
+	"crystalspace.instmeshloader.parse.unknownfactory", \
+	child, "Specify the factory first!"); \
+    return 0; \
+  }
+
 csPtr<iBase> csInstMeshLoader::Parse (iDocumentNode* node,
 	iStreamSource*, iLoaderContext* ldr_context, iBase*)
 {
@@ -605,6 +613,7 @@ csPtr<iBase> csInstMeshLoader::Parse (iDocumentNode* node,
 	      return false;
             trans.SetO2TTranslation (v);
 	  }
+	  CHECK_MESH (meshstate);
 	  meshstate->AddInstance (trans);
 	}
 	break;
@@ -613,16 +622,19 @@ csPtr<iBase> csInstMeshLoader::Parse (iDocumentNode* node,
 	  bool r;
 	  if (!synldr->ParseBool (child, r, true))
 	    return 0;
+	  CHECK_MESH (meshstate);
 	  meshstate->SetManualColors (r);
 	}
 	break;
       case XMLTOKEN_NOSHADOWS:
 	{
+	  CHECK_MESH (meshstate);
 	  meshstate->SetShadowCasting (false);
 	}
 	break;
       case XMLTOKEN_LOCALSHADOWS:
 	{
+	  CHECK_MESH (meshstate);
 	  meshstate->SetShadowReceiving (true);
 	}
 	break;
@@ -631,6 +643,7 @@ csPtr<iBase> csInstMeshLoader::Parse (iDocumentNode* node,
 	  bool r;
 	  if (!synldr->ParseBool (child, r, true))
 	    return 0;
+	  CHECK_MESH (meshstate);
 	  meshstate->SetLighting (r);
 	}
 	break;
@@ -639,6 +652,7 @@ csPtr<iBase> csInstMeshLoader::Parse (iDocumentNode* node,
 	  csColor col;
 	  if (!synldr->ParseColor (child, col))
 	    return 0;
+	  CHECK_MESH (mesh);
 	  mesh->SetColor (col);
 	}
 	break;
@@ -687,6 +701,7 @@ csPtr<iBase> csInstMeshLoader::Parse (iDocumentNode* node,
 		child, "Couldn't find material '%s'!", matname);
             return 0;
 	  }
+	  CHECK_MESH (mesh);
 	  mesh->SetMaterialWrapper (mat);
 	}
 	break;
@@ -695,6 +710,7 @@ csPtr<iBase> csInstMeshLoader::Parse (iDocumentNode* node,
 	  uint mm;
 	  if (!synldr->ParseMixmode (child, mm))
 	    return 0;
+	  CHECK_MESH (mesh);
           mesh->SetMixMode (mm);
 	}
 	break;

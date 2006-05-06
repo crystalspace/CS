@@ -385,6 +385,15 @@ bool csSprite2DLoader::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
+#define CHECK_MESH(m) \
+  if (!m) { \
+    synldr->ReportError ( \
+	"crystalspace.sprite2dloader.parse.unknownfactory", \
+	child, "Specify the factory first!"); \
+    return 0; \
+  }
+
+
 csPtr<iBase> csSprite2DLoader::Parse (iDocumentNode* node,
 				iStreamSource*, iLoaderContext* ldr_context,
 				iBase*)
@@ -440,6 +449,7 @@ csPtr<iBase> csSprite2DLoader::Parse (iDocumentNode* node,
 		child, "Couldn't find material '%s'!", matname);
             return 0;
 	  }
+	  CHECK_MESH (mesh);
 	  mesh->SetMaterialWrapper (mat);
 	}
 	break;
@@ -448,6 +458,7 @@ csPtr<iBase> csSprite2DLoader::Parse (iDocumentNode* node,
 	  uint mm;
 	  if (!synldr->ParseMixmode (child, mm))
 	    return 0;
+	  CHECK_MESH (mesh);
           mesh->SetMixMode (mm);
 	}
 	break;
@@ -493,11 +504,13 @@ csPtr<iBase> csSprite2DLoader::Parse (iDocumentNode* node,
           bool do_lighting;
 	  if (!synldr->ParseBool (child, do_lighting, true))
 	    return 0;
+	  CHECK_MESH (spr2dLook);
           spr2dLook->SetLighting (do_lighting);
         }
         break;
       case XMLTOKEN_ANIMATE:
         {
+	  CHECK_MESH (spr2dLook);
           bool loop = false;
 	  int timing = 0;
 	  const char* animname = child->GetAttributeValue ("name");

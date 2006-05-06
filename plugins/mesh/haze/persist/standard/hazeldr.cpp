@@ -401,6 +401,14 @@ bool csHazeLoader::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
+#define CHECK_MESH(m) \
+  if (!m) { \
+    synldr->ReportError ( \
+	"crystalspace.hazeloader.parse.unknownfactory", \
+	child, "Specify the factory first!"); \
+    return 0; \
+  }
+
 csPtr<iBase> csHazeLoader::Parse (iDocumentNode* node,
 			    iStreamSource*, iLoaderContext* ldr_context,
 			    iBase*)
@@ -455,6 +463,7 @@ csPtr<iBase> csHazeLoader::Parse (iDocumentNode* node,
 		child, "Could not find material '%s'!", matname);
 	    return 0;
 	  }
+	  CHECK_MESH (mesh);
 	  mesh->SetMaterialWrapper (mat);
 	}
 	break;
@@ -463,17 +472,20 @@ csPtr<iBase> csHazeLoader::Parse (iDocumentNode* node,
 	  uint mode;
 	  if (!synldr->ParseMixmode (child, mode))
 	    return 0;
+	  CHECK_MESH (mesh);
           mesh->SetMixMode (mode);
 	}
 	break;
       case XMLTOKEN_ORIGIN:
         if (!synldr->ParseVector (child, a))
 	  return 0;
+	CHECK_MESH (hazestate);
         hazestate->SetOrigin (a);
 	break;
       case XMLTOKEN_DIRECTIONAL:
         if (!synldr->ParseVector (child, a))
 	  return 0;
+	CHECK_MESH (hazestate);
         hazestate->SetDirectional (a);
 	break;
       case XMLTOKEN_LAYER:
@@ -481,6 +493,7 @@ csPtr<iBase> csHazeLoader::Parse (iDocumentNode* node,
 	  float layerscale = 1.0;
 	  iHazeHull *hull = ParseHull (xmltokens, reporter, synldr,
 	  	child, hazefactorystate, layerscale);
+	  CHECK_MESH (hazestate);
           hazestate->AddLayer (hull, layerscale);
 	}
 	break;

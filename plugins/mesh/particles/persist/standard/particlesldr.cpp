@@ -934,6 +934,15 @@ bool csParticlesObjectLoader::Initialize (iObjectRegistry* objreg)
   return true;
 }
 
+#define CHECK_MESH(m) \
+  if (!m) { \
+    synldr->ReportError ( \
+	"crystalspace.particlesloader.parse.unknownfactory", \
+	child, "Specify the factory first!"); \
+    return 0; \
+  }
+
+
 csPtr<iBase> csParticlesObjectLoader::Parse (iDocumentNode* node,
   iStreamSource*, iLoaderContext* ldr_context, iBase* /*context*/)
 {
@@ -975,6 +984,7 @@ csPtr<iBase> csParticlesObjectLoader::Parse (iDocumentNode* node,
       {
         csColor color;
         synldr->ParseColor (child, color);
+	CHECK_MESH (mesh);
         mesh->SetColor (color);
         break;
       }
@@ -988,45 +998,57 @@ csPtr<iBase> csParticlesObjectLoader::Parse (iDocumentNode* node,
 	    child, "Couldn't find material '%s'!", matname);
           return 0;
         }
+	CHECK_MESH (mesh);
         mesh->SetMaterialWrapper (mat);
         break;
       }
       case XMLTOKEN_EMITTER:
+	CHECK_MESH (state);
         ParseEmitter (child, state);
         break;
       case XMLTOKEN_DIFFUSION:
+	CHECK_MESH (state);
         state->SetDiffusion (child->GetContentsValueAsFloat ());
         break;
       case XMLTOKEN_GRAVITY:
       {
         csVector3 gravity;
         synldr->ParseVector (child, gravity);
+	CHECK_MESH (state);
         state->SetGravity (gravity);
         break;
       }
       case XMLTOKEN_TTL:
+	CHECK_MESH (state);
         state->SetTimeToLive (child->GetContentsValueAsFloat ());
         break;
       case XMLTOKEN_TIMEVARIATION:
+	CHECK_MESH (state);
         state->SetTimeVariation (child->GetContentsValueAsFloat ());
         break;
       case XMLTOKEN_INITIAL:
+	CHECK_MESH (state);
         state->SetInitialParticleCount (child->GetContentsValueAsInt ());
         break;
       case XMLTOKEN_PPS:
+	CHECK_MESH (state);
         state->SetParticlesPerSecond (child->GetContentsValueAsInt ());
         break;
       case XMLTOKEN_RADIUS:
+	CHECK_MESH (state);
         state->SetParticleRadius (child->GetContentsValueAsFloat ());
         break;
       case XMLTOKEN_MASS:
+	CHECK_MESH (state);
         state->SetMass (child->GetContentsValueAsFloat ());
         break;
       case XMLTOKEN_MASSVARIATION:
+	CHECK_MESH (state);
         state->SetMassVariation (child->GetContentsValueAsFloat ());
         break;
       case XMLTOKEN_TRANSFORMMODE:
       {
+	CHECK_MESH (state);
         const char *mode = child->GetContentsValue ();
         if(!strcmp(mode, "no")) state->SetTransformMode (false);
         else if(!strcmp(mode, "yes")) state->SetTransformMode (true);
@@ -1039,13 +1061,16 @@ csPtr<iBase> csParticlesObjectLoader::Parse (iDocumentNode* node,
         break;
       }
       case XMLTOKEN_PHYSICSPLUGIN:
+	CHECK_MESH (state);
         state->ChangePhysicsPlugin (child->GetContentsValue ());
         break;
       case XMLTOKEN_DAMPENER:
+	CHECK_MESH (state);
         state->SetDampener (child->GetContentsValueAsFloat ());
         break;
       case XMLTOKEN_COLORMETHOD:
       {
+	CHECK_MESH (state);
         const char *str = child->GetAttributeValue ("type");
         if (!str)
         {
@@ -1087,6 +1112,7 @@ csPtr<iBase> csParticlesObjectLoader::Parse (iDocumentNode* node,
 	{
 	  uint mixmode;
 	  if (!synldr->ParseMixmode (child, mixmode)) return 0;
+	  CHECK_MESH (state);
 	  state->SetMixMode (mixmode);
 	}
 	break;
@@ -1094,6 +1120,7 @@ csPtr<iBase> csParticlesObjectLoader::Parse (iDocumentNode* node,
 	{
 	  bool zsort;
 	  if (!synldr->ParseBool (child, zsort, true)) return 0;
+	  CHECK_MESH (state);
 	  state->EnableZSort (zsort);
 	}
 	break;

@@ -271,6 +271,15 @@ bool csProtoMeshLoader::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
+#define CHECK_MESH(m) \
+  if (!m) { \
+    synldr->ReportError ( \
+	"crystalspace.protomeshloader.parse.unknownfactory", \
+	child, "Specify the factory first!"); \
+    return 0; \
+  }
+
+
 csPtr<iBase> csProtoMeshLoader::Parse (iDocumentNode* node,
 	iStreamSource*, iLoaderContext* ldr_context, iBase*)
 {
@@ -291,6 +300,7 @@ csPtr<iBase> csProtoMeshLoader::Parse (iDocumentNode* node,
 	  csColor col;
 	  if (!synldr->ParseColor (child, col))
 	    return 0;
+	  CHECK_MESH (mesh);
 	  mesh->SetColor (col);
 	}
 	break;
@@ -329,6 +339,7 @@ csPtr<iBase> csProtoMeshLoader::Parse (iDocumentNode* node,
 		child, "Couldn't find material '%s'!", matname);
             return 0;
 	  }
+	  CHECK_MESH (mesh);
 	  mesh->SetMaterialWrapper (mat);
 	}
 	break;
@@ -337,6 +348,7 @@ csPtr<iBase> csProtoMeshLoader::Parse (iDocumentNode* node,
 	  uint mm;
 	  if (!synldr->ParseMixmode (child, mm))
 	    return 0;
+	  CHECK_MESH (mesh);
           mesh->SetMixMode (mm);
 	}
 	break;
