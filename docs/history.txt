@@ -7,6 +7,13 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 6-May-2006
+	- Errroman fixed a small bug in render to cubemap face.
+	- Erroroman added another rendering tehnique in shadowmap.xml.
+	- Erroroman added abillity light shadervars to override shader manager
+	  shadervars in generic render step.
+	- Erroroman fixed light_spec_bumpamp shader and added attenuation 
+	  support in it.
+	- Erroroman added r3dsmtest in vfs.cfg.template.
 	- Eric Sunshine fixed several problems and issues with jobber-svn.pl
 	  and jobber-svn.cfg; and also re-generalized them a bit
 	- Eric Sunshine fixed resource leak in AWS2.
@@ -54,7 +61,7 @@ chronological order.
 	  felt that taking the plunge was really worthwhile, and that everyone
 	  will be better off for it eventually.	
 4-May-2006
-	- Erroroman made the follwoing:
+	- Erroroman made the following:
 	    - Generic render step now handles light shader variables.
 	    - Lightiter render step shader variable for light world 
 	      inverse transform.

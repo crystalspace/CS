@@ -1,6 +1,7 @@
 <cgvp>
 <profile>arbvp1</profile>
 <variablemap variable="light 0 position" destination="LightPos" />
+<variablemap variable="light 0 attenuation" destination="Attenuation" />
 <program>
 <![CDATA[
 
@@ -17,6 +18,7 @@ struct vertex2fragment {
 	float3 TexCoord : TEXCOORD0;
 	float3 oLightDir : TEXCOORD1;
 	float3 oEyeVec : TEXCOORD2;
+	float4 Attenuation : TEXCOORD2;
 };
 
 vertex2fragment main (app2vertex IN,
@@ -24,7 +26,8 @@ vertex2fragment main (app2vertex IN,
 	uniform float4x4 ModelViewI : state.matrix.modelview.inverse,
 	uniform float4x4 ModelViewIT : state.matrix.modelview.invtrans,
 	uniform float4x4 ModelViewProj : state.matrix.mvp,
-	uniform float4 LightPos
+	uniform float4 LightPos,
+	uniform float4 Attenuation
 	)
 {
 	vertex2fragment OUT;
@@ -45,6 +48,9 @@ vertex2fragment main (app2vertex IN,
 	OUT.TexCoord = IN.TexCoord;
 	OUT.oLightDir = tangLight;
 	OUT.oEyeVec = tangEyeVec;
+
+	OUT.Attenuation = -objLight*Attenuation.y*0.8 + 0.5;
+	OUT.Attenuation.w = 0.5;
 
 	return OUT;
 }

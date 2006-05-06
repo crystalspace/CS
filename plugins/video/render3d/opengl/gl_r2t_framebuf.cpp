@@ -172,7 +172,7 @@ void csGLRender2TextureFramebuf::FinishDraw ()
       if (needSubImage)
 		{
 		  if (handle_subtexture)
-			glCopyTexSubImage2D (GL_TEXTURE_CUBE_MAP_NEGATIVE_Y_ARB + sub_texture_id, 0, 0, 0, 0, 0, 
+			glCopyTexSubImage2D (GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + sub_texture_id, 0, 0, 0, 0, 0, 
 			  G3D->GetWidth(), G3D->GetHeight());
 		  else
 		   glCopyTexSubImage2D (textarget, 0, 0, 0, 0, 0, 

@@ -1,37 +1,17 @@
 <shader compiler="xmlshader" name="light_spec_bumpmap">
-  <technique priority="300" lights="1">
+  <technique priority="250" lights="1">
     <pass>
-      <writemask r="false" g="false" b="false" a="true" />
       <mixmode>
-        <copy />
+        <srcalphaadd />
       </mixmode>
-      <vp plugin="glarb" file="/shader/flat_ppl_attenuation.avp" />
-      <texture destination="unit 0" name="light 0 attenuationtex" />
-      <texture destination="unit 1" name="light 0 attenuationtex" />
-      <fp plugin="glfixed">
-        <fixedfp>
-          <layer>
-            <alphasource num="0" source="texture" modifier="alpha" />
-            <alphaoperation operation="replace" />
-          </layer>
-          <layer>
-            <alphasource num="0" source="texture" modifier="alpha" />
-            <alphasource num="1" source="previous layer" modifier="alpha" />
-            <alphaoperation operation="modulate" scale="2" />
-          </layer>
-        </fixedfp>
-      </fp>
-    </pass>
-	<pass>
-      <mixmode>
-        <destalphaadd />
-      </mixmode>
+		<buffer source="texture coordinate 0" destination="texture coordinate 0" />
       <buffer source="normal" destination="normal" />
       <buffer source="tangent" destination="texture coordinate 1" />
       <buffer source="binormal" destination="texture coordinate 2" />
-      <vp plugin="glcg" file="/shader/specular/bump.cgvp" />
+      <vp plugin="glcg" file="/shader/specular/bump_attn.cgvp" />
       <texture destination="TexNormal" name="tex normal" />
       <texture destination="TexDiffuse" name="tex diffuse" />
+      <texture destination="TexAttn" name="light 0 attenuationtex" />
       <fp plugin="glcg" file="/shader/specular/specular.cgfp" />
     </pass>
   </technique>

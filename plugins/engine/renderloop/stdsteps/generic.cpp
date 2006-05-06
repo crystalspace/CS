@@ -243,9 +243,9 @@ void csGenericRenderStep::RenderMeshes (iRenderView* rview, iGraphics3D* g3d,
       svO2W->SetValue (mesh->object2world);
 
       stacks.Empty ();
+      shaderManager->PushVariables (stacks);
 	  if (light)
 		  light->GetSVContext()->PushVariables (stacks);
-      shaderManager->PushVariables (stacks);
       shadervars.Top ().PushVariables (stacks);
       if (mesh->variablecontext)
         mesh->variablecontext->PushVariables (stacks);
