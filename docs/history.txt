@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+6-May-2006
+	- Eric Sunshine fixed several problems and issues with jobber-svn.pl
+	  and jobber-svn.cfg; and also re-generalized them a bit
+	- Eric Sunshine fixed resource leak in AWS2.
 5-May-2006
 	- Jorrit started work on more detailed mesh object documentation.
 	- Jorrit updated the genmesh documentation a bit more.
@@ -39,9 +43,9 @@ chronological order.
 	- JTarbox fixed the copy constructor for csEvents
 	- JTarbox fix for the fix to the copy ctor of csEvents
 	- Jorrit fixed a few apps for the latest changes.
-	- Christopher changed the API of iAwsScriptObject to be a little easier 
-	  to use (I hope), and added an Exec() call.  He also moved picview over
-	  to AWS2.
+	- Christopher changed the API of iAwsScriptObject to be a little easier
+	  to use (I hope), and added an Exec() call.  He also moved picview
+	  over to AWS2.
 	- Christopher enhanced picview by having it actually tell you what it's
 	  doing.  While some may feel that this is a radical paradigm shift, he
 	  felt that taking the plunge was really worthwhile, and that everyone

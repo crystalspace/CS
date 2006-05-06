@@ -69,9 +69,10 @@ double scriptObject::GetDoubleArg(uint arg)
 	 
 csRef<iString> scriptObject::GetStringArg(uint arg)
 {
-	JSString *val = JS_ValueToString (ar.cx, ar.argv[arg]);
-
-    return new scfString(JS_GetStringBytes (val));	
+    JSString *val = JS_ValueToString (ar.cx, ar.argv[arg]);
+    csRef<iString> x;
+    x.AttachNew(new scfString(JS_GetStringBytes (val)));
+    return x;
 }
 
 bool scriptObject::GetProp(const char *name, int32 &return_val)
