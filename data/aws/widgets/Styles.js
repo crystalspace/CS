@@ -632,7 +632,7 @@ Style3D =
 		if (this.image!=null && this.image!=undefined)
 		{
 			pen.SetFlag(Pen.FLAG_TEXTURE);
-			pen.SetColor(0.5,0.5,0.5,1);
+			pen.SetColor(1,1,1,1);
 			pen.SetTexture(this.image);
 			pen.DrawRect(0,0,w,h);
 			pen.ClearFlag(Pen.FLAG_TEXTURE);

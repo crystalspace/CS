@@ -38,7 +38,10 @@ function Image(settings)
 		}
 	}
 	 
-	_widget.border=settings.border;
+	if (settings.border!=undefined)
+		_widget.border=Boolean(settings.border);
+	else
+		_widget.border=false;
 		
 	return _widget;
 }

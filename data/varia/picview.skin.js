@@ -92,7 +92,6 @@ function LoadingPic()
 {
 	var loading_info= 	 
 	  <widget type="Panel" id="loading_panel">
-	    <border>{true}</border>
 	    <setup>widget.onDraw=Skin.current.Style.RoundedPanel</setup>
 		<layout type="Horizontal" id="loading_thing">		  
 		 	<padding>2</padding>	  	 
