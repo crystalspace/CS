@@ -4290,8 +4290,6 @@ class iSector(iBase):
     def GetMeshes(*args): return _cspace.iSector_GetMeshes(*args)
     def GetVisibleMeshes(*args): return _cspace.iSector_GetVisibleMeshes(*args)
     def GetPortalMeshes(*args): return _cspace.iSector_GetPortalMeshes(*args)
-    def RegisterPortalMesh(*args): return _cspace.iSector_RegisterPortalMesh(*args)
-    def UnregisterPortalMesh(*args): return _cspace.iSector_UnregisterPortalMesh(*args)
     def UnlinkObjects(*args): return _cspace.iSector_UnlinkObjects(*args)
     def AddSectorMeshCallback(*args): return _cspace.iSector_AddSectorMeshCallback(*args)
     def RemoveSectorMeshCallback(*args): return _cspace.iSector_RemoveSectorMeshCallback(*args)
@@ -5765,10 +5763,6 @@ class iGeneralFactoryState(iGeneralMeshCommonState):
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
         return "<%s.%s; proxy of C++ iGeneralFactoryState instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
-    def SetMaterialWrapper(*args): return _cspace.iGeneralFactoryState_SetMaterialWrapper(*args)
-    def GetMaterialWrapper(*args): return _cspace.iGeneralFactoryState_GetMaterialWrapper(*args)
-    def SetMixMode(*args): return _cspace.iGeneralFactoryState_SetMixMode(*args)
-    def GetMixMode(*args): return _cspace.iGeneralFactoryState_GetMixMode(*args)
     def SetColor(*args): return _cspace.iGeneralFactoryState_SetColor(*args)
     def GetColor(*args): return _cspace.iGeneralFactoryState_GetColor(*args)
     def AddVertex(*args): return _cspace.iGeneralFactoryState_AddVertex(*args)
@@ -6021,10 +6015,6 @@ class iSprite2DFactoryState(iBase):
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
         return "<%s.%s; proxy of C++ iSprite2DFactoryState instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
-    def SetMaterialWrapper(*args): return _cspace.iSprite2DFactoryState_SetMaterialWrapper(*args)
-    def GetMaterialWrapper(*args): return _cspace.iSprite2DFactoryState_GetMaterialWrapper(*args)
-    def SetMixMode(*args): return _cspace.iSprite2DFactoryState_SetMixMode(*args)
-    def GetMixMode(*args): return _cspace.iSprite2DFactoryState_GetMixMode(*args)
     def SetLighting(*args): return _cspace.iSprite2DFactoryState_SetLighting(*args)
     def HasLighting(*args): return _cspace.iSprite2DFactoryState_HasLighting(*args)
     def GetUVAnimationCount(*args): return _cspace.iSprite2DFactoryState_GetUVAnimationCount(*args)
@@ -6185,8 +6175,6 @@ class iSprite3DFactoryState(iBase):
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
         return "<%s.%s; proxy of C++ iSprite3DFactoryState instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
-    def SetMaterialWrapper(*args): return _cspace.iSprite3DFactoryState_SetMaterialWrapper(*args)
-    def GetMaterialWrapper(*args): return _cspace.iSprite3DFactoryState_GetMaterialWrapper(*args)
     def AddVertices(*args): return _cspace.iSprite3DFactoryState_AddVertices(*args)
     def GetVertexCount(*args): return _cspace.iSprite3DFactoryState_GetVertexCount(*args)
     def GetVertex(*args): return _cspace.iSprite3DFactoryState_GetVertex(*args)
@@ -6229,8 +6217,6 @@ class iSprite3DFactoryState(iBase):
     def SetLodLevelConfig(*args): return _cspace.iSprite3DFactoryState_SetLodLevelConfig(*args)
     def GetLodLevelConfig(*args): return _cspace.iSprite3DFactoryState_GetLodLevelConfig(*args)
     def MergeNormals(*args): return _cspace.iSprite3DFactoryState_MergeNormals(*args)
-    def SetMixMode(*args): return _cspace.iSprite3DFactoryState_SetMixMode(*args)
-    def GetMixMode(*args): return _cspace.iSprite3DFactoryState_GetMixMode(*args)
     def __del__(self, destroy=_cspace.delete_iSprite3DFactoryState):
         try:
             if self.thisown: destroy(self)
@@ -6596,6 +6582,10 @@ class iMeshObjectFactory(iBase):
     def GetMeshFactoryWrapper(*args): return _cspace.iMeshObjectFactory_GetMeshFactoryWrapper(*args)
     def GetMeshObjectType(*args): return _cspace.iMeshObjectFactory_GetMeshObjectType(*args)
     def GetObjectModel(*args): return _cspace.iMeshObjectFactory_GetObjectModel(*args)
+    def SetMaterialWrapper(*args): return _cspace.iMeshObjectFactory_SetMaterialWrapper(*args)
+    def GetMaterialWrapper(*args): return _cspace.iMeshObjectFactory_GetMaterialWrapper(*args)
+    def SetMixMode(*args): return _cspace.iMeshObjectFactory_SetMixMode(*args)
+    def GetMixMode(*args): return _cspace.iMeshObjectFactory_GetMixMode(*args)
     def __del__(self, destroy=_cspace.delete_iMeshObjectFactory):
         try:
             if self.thisown: destroy(self)
@@ -6760,8 +6750,6 @@ class iThingFactoryState(iBase):
     def GetCosinusFactor(*args): return _cspace.iThingFactoryState_GetCosinusFactor(*args)
     def SetCosinusFactor(*args): return _cspace.iThingFactoryState_SetCosinusFactor(*args)
     def AddPolygonRenderBuffer(*args): return _cspace.iThingFactoryState_AddPolygonRenderBuffer(*args)
-    def SetMixMode(*args): return _cspace.iThingFactoryState_SetMixMode(*args)
-    def GetMixMode(*args): return _cspace.iThingFactoryState_GetMixMode(*args)
     def __del__(self, destroy=_cspace.delete_iThingFactoryState):
         try:
             if self.thisown: destroy(self)
