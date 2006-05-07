@@ -7,6 +7,8 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 7-May-2006
+    - Reed updated csvosa3dl for CS API changes, tweaked some log messages,
+      added some useful accessors.
 	- Jorrit added a missing %ignore for iGraphics3D::PerformExtensionV()
 	  so that the python plugin builds properly on 64-bit machines.
 	- Eric Sunshine applied more fixes to the new jobber-svn.pl and
