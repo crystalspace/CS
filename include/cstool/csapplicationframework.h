@@ -34,7 +34,6 @@
 
 /**
  * Application framework class.
- * \remarks
  * This class provides a handy object-oriented wrapper around the Crystal Space
  * initialization and start-up functions. It encapsulates a callback paradigm
  * which provides methods such as OnInitialize() and OnExit() which you can
@@ -42,7 +41,7 @@
  * using csBaseEventHandler (csutil/csbaseeventh.h), which provides the same
  * sort of object-oriented wrapper for the Crystal Space event mechanism;
  * providing methods such as OnMouseClick(), OnKeyboard(), OnBroadcast(), etc.
- * \par
+ * 
  * In order to properly use this class, you must derive your own class from it,
  * providing a constructor and implementation for the OnInitialize() and
  * Application() methods. You may only have one csApplicationFramework derived
@@ -97,7 +96,7 @@
  *   return csApplicationRunner<MyApp>::Run (argc, argv);
  * }
  * \endcode
- * \par
+ * 
  * csApplicationFramework itself is derived from csInitializer for convenience,
  * allowing overridden members to call csInitializer methods without qualifying
  * them with <tt>csInitializer::</tt>.
