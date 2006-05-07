@@ -68,20 +68,15 @@ void ConstructConeTask::doTask()
 
   csRef<iEngine> engine = CS_QUERY_REGISTRY (object_reg, iEngine);
 
-  // should store a single cone factory for everything?  or do we always get
-  // the same one back?
-  //if (!cone_factory)
-  //{
-
-  csRef<iMeshFactoryWrapper> cone_factory = engine->CreateMeshFactory (
+  csRef<iMeshFactoryWrapper> cone_factory_wrap = engine->CreateMeshFactory (
                           "crystalspace.mesh.object.genmesh", "cone_factory");
-  //}
+  cone_factory_wrap->GetMeshObjectFactory()->SetMaterialWrapper(metamat->GetMaterialWrapper());
 
   csRef<iGeneralFactoryState> coneLook = SCF_QUERY_INTERFACE(
-                   cone_factory->GetMeshObjectFactory(), iGeneralFactoryState);
+                   cone_factory_wrap->GetMeshObjectFactory(), iGeneralFactoryState);
+  
   if(coneLook)
   {
-    coneLook->SetMaterialWrapper(metamat->GetMaterialWrapper());
 
     int hubVertices = 24;
 
@@ -133,7 +128,7 @@ void ConstructConeTask::doTask()
     coneLook->Invalidate ();
     coneLook->CalculateNormals ();
 
-    csRef<iMeshWrapper> meshwrapper = engine->CreateMeshWrapper (cone_factory,
+    csRef<iMeshWrapper> meshwrapper = engine->CreateMeshWrapper (cone_factory_wrap,
                                      name.c_str(), sector, csVector3(0, 0, 0));
     cone->GetCSinterface()->SetMeshWrapper(meshwrapper);
   }

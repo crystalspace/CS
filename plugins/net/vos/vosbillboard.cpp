@@ -76,17 +76,22 @@ void ConstructBillboardTask::doTask()
   csRef<iEngine> engine = CS_QUERY_REGISTRY (object_reg, iEngine);
 
   // Create factory and give it the material
-  csRef<iMeshFactoryWrapper> billboard_factory = engine->CreateMeshFactory (
+  csRef<iMeshFactoryWrapper> billboard_factory_wrap = engine->CreateMeshFactory (
                      "crystalspace.mesh.object.sprite.2d", "billboard_factory");
 
-  csRef<iSprite2DFactoryState> fact = SCF_QUERY_INTERFACE (
-          billboard_factory->GetMeshObjectFactory(), iSprite2DFactoryState);
-  if (!fact) return;
-  fact->SetMaterialWrapper (metamat->GetMaterialWrapper());
+  // I don't think we need to use this "FactoryState" object anymore?
+  // SetMaterialWrapper has moved to the actual factory according to change logs
+  // -rh
+  //
+  //csRef<iSprite2DFactoryState> fact_state = SCF_QUERY_INTERFACE (
+  //        billboard_factory->GetMeshObjectFactory(), iSprite2DFactoryState);
+  //if (!fact) return;
+  // fact->SetMaterialWrapper (metamat->GetMaterialWrapper());
+  
+  billboard_factory_wrap->GetMeshObjectFactory()->SetMaterialWrapper (metamat->GetMaterialWrapper());
 
   // Create the mesh object and query the state
-  csRef<iMeshObject> mesh = billboard_factory->GetMeshObjectFactory ()
-    ->NewInstance();
+  csRef<iMeshObject> mesh = billboard_factory_wrap->GetMeshObjectFactory()->NewInstance();
   csRef<iSprite2DState> state = SCF_QUERY_INTERFACE (mesh, iSprite2DState);
   if (!state) return;
 
@@ -115,7 +120,7 @@ void ConstructBillboardTask::doTask()
                              mesh, name.c_str(), sector, csVector3(0, 0, 0));
 
   // For some reason this doesn't get set in the CreateMeshWrapper
-  meshwrapper->SetFactory (billboard_factory);
+  meshwrapper->SetFactory (billboard_factory_wrap);
 
   meshwrapper->SetRenderPriority (engine->GetRenderPriority("alpha"));
   meshwrapper->SetZBufMode (CS_ZBUF_TEST);

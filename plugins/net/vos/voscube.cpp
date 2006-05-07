@@ -67,19 +67,15 @@ void ConstructCubeTask::doTask()
 
   csRef<iEngine> engine = CS_QUERY_REGISTRY (object_reg, iEngine);
 
-  // should store a single cube factory for everything?  or do we always get
-  // the same one back?
-  //if(! cube_factory)
-  //{
   csRef<iMeshFactoryWrapper> cube_factory = engine->CreateMeshFactory (
                          "crystalspace.mesh.object.genmesh", "cube_factory");
-  //}
+  assert(cube_factory);
+  cube_factory->GetMeshObjectFactory()->SetMaterialWrapper(metamat->GetMaterialWrapper());
 
   csRef<iGeneralFactoryState> cubeLook = SCF_QUERY_INTERFACE(
                    cube_factory->GetMeshObjectFactory(), iGeneralFactoryState);
   if(cubeLook)
   {
-    cubeLook->SetMaterialWrapper(metamat->GetMaterialWrapper());
     cubeLook->GenerateBox(csBox3(-.5, -.5, -.5, .5, .5, .5));
 
     csRef<iMeshWrapper> meshwrapper = engine->CreateMeshWrapper (

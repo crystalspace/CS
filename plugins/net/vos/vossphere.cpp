@@ -68,18 +68,13 @@ void ConstructSphereTask::doTask()
 {
   csRef<iEngine> engine = CS_QUERY_REGISTRY (object_reg, iEngine);
 
-  // should store a single sphere factory for everything?  or do we always get
-  // the same one back?
-  //if(! sphere_factor)
-  //{
   csRef<iMeshFactoryWrapper> ball_factory = engine->CreateMeshFactory (
                          "crystalspace.mesh.object.genmesh", "ball_factory");
-  //}
+  ball_factory->GetMeshObjectFactory()->SetMaterialWrapper(metamat->GetMaterialWrapper());
 
   csRef<iGeneralFactoryState> ballLook = SCF_QUERY_INTERFACE(
                    ball_factory->GetMeshObjectFactory(), iGeneralFactoryState);
   if(ballLook) {
-    ballLook->SetMaterialWrapper(metamat->GetMaterialWrapper());
     ballLook->GenerateSphere(csEllipsoid(csVector3(0, 0, 0), csVector3(.5, .5, .5)), 12);
 
     csRef<iMeshWrapper> meshwrapper = engine->CreateMeshWrapper

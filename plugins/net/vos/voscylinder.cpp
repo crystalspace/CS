@@ -70,20 +70,16 @@ void ConstructCylinderTask::doTask()
 
   csRef<iEngine> engine = CS_QUERY_REGISTRY (object_reg, iEngine);
 
-  // should store a single sphere factory for everything?  or do we always get
-  // the same one back?
-  //if(! sphere_factor)
-  //{
   csRef<iMeshFactoryWrapper> cylinder_factory = engine->CreateMeshFactory (
                         "crystalspace.mesh.object.genmesh","cylinder_factory");
-  //}
+  cylinder_factory->GetMeshObjectFactory()->SetMaterialWrapper(metamat->GetMaterialWrapper());
+
 
   csRef<iGeneralFactoryState> cylinderLook = SCF_QUERY_INTERFACE (
                cylinder_factory->GetMeshObjectFactory(), iGeneralFactoryState);
 
   if (cylinderLook)
   {
-    cylinderLook->SetMaterialWrapper(metamat->GetMaterialWrapper());
     cylinderLook->SetVertexCount (2 + (hub_vertices+1) * 4);
     cylinderLook->SetTriangleCount (hub_vertices * 4);
 

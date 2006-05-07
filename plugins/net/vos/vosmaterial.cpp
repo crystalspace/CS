@@ -111,7 +111,7 @@ ConstructMaterialTask::~ConstructMaterialTask()
 
 void ConstructMaterialTask::doTask()
 {
-  LOG("vosmaterial", 3, "Constructing material");
+  LOG("csMetaMaterial", 3, "Constructing material");
 
   csRef<iEngine> engine = CS_QUERY_REGISTRY (object_reg, iEngine);
   csRef<iGraphics3D> g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
@@ -194,6 +194,8 @@ void ConstructMaterialTask::doTask()
 
   if(imat.IsValid())
   {
+    assert(engine);
+    assert(engine->GetMaterialList());
     csRef<iMaterialWrapper> material = engine->GetMaterialList()->NewMaterial(
       imat, 0);
     if(!material) return;
@@ -357,11 +359,11 @@ void csMetaMaterial::Setup(csVosA3DL* vosa3dl)
       catch(...) {
       }
     }
-
     LOG("csMetaMaterial", 4, "pushing main thread task for material create " << getURLstr());
 
     vosa3dl->mainThreadTasks.push(cmt);
-  } catch(std::runtime_error) {
+  } catch(std::runtime_error& e) {
+    LOG("csMetaMaterial", 1, "Internal Warning: Exception creating material layers: " << e.what());
     delete cmt;
   }
 
@@ -370,7 +372,7 @@ void csMetaMaterial::Setup(csVosA3DL* vosa3dl)
 
 void csMetaMaterial::notifyPropertyChange(const PropertyEvent& event)
 {
-  LOG("vosmaterial", 4, "property change!");
+  LOG("csMetaMaterial", 4, "property change!");
   try
   {
     vRef<ParentChildRelation> pcr = event.getProperty()->findParent(this);
@@ -394,7 +396,7 @@ csRef<iMaterialWrapper> csMetaMaterial::GetMaterialWrapper()
 
 void csMetaMaterial::notifyChildInserted(VobjectEvent& event)
 {
-  LOG("vosmaterial", 4, "child inserted!");
+  LOG("csMetaMaterial", 4, "child inserted!");
 
   if(event.getContextualName() == "a3dl:texture")
   {
