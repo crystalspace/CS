@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+7-May-2006
+	- Jorrit added a missing %ignore for iGraphics3D::PerformExtensionV()
+	  so that the python plugin builds properly on 64-bit machines.
 6-May-2006
 	- Errroman fixed a small bug in render to cubemap face.
 	- Erroroman added another rendering tehnique in shadowmap.xml.

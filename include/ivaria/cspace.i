@@ -1067,6 +1067,7 @@ TYPEMAP_OUT_csWrapPtr
 
 #ifndef CS_MICRO_SWIG
 %ignore iGraphics2D::PerformExtensionV;
+%ignore iGraphics3D::PerformExtensionV;
 %rename(GetRGBA) iGraphics2D::GetRGB(int, int&, int&, int&, int&);
 %include "ivideo/graph2d.h"
 %include "ivideo/graph3d.h"
