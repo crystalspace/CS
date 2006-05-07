@@ -103,6 +103,7 @@ public:
   virtual VUtil::vRef<VOS::Vobject> GetVobject();
 
   void setProgressMeter(iProgressMeter* meter);
+  iProgressMeter* getProgressMeter();
 
   void incrementRelightCounter();
   void decrementRelightCounter();

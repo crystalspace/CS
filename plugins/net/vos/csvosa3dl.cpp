@@ -315,6 +315,11 @@ void csVosA3DL::setProgressMeter(iProgressMeter* pm)
   progress = pm;
 }
 
+iProgressMeter* csVosA3DL::getProgressMeter()
+{
+  return progress;
+}
+
 void csVosA3DL::incrementRelightCounter()
 {
   boost::mutex::scoped_lock lk (relightCounterMutex);

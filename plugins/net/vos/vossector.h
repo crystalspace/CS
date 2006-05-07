@@ -28,6 +28,7 @@
 #include "iengine/engine.h"
 #include "iengine/sector.h"
 #include "ivaria/collider.h"
+#include "ivaria/pmeter.h"
 
 #include <vos/metaobjects/a3dl/a3dl.hh>
 
@@ -108,6 +109,40 @@ public:
 
   csRef<csVosSector> GetCsVosSector() { return csvossector; }
   void SetCsVosSector(csRef<csVosSector> s) { csvossector = s; }
+};
+
+
+class csVosProgressTask : public VUtil::Task
+{
+private:
+  csRef<iProgressMeter> meter;
+  std::string action;
+  unsigned int step;
+  unsigned int total;
+
+public:
+  csVosProgressTask(iProgressMeter* m, const std::string& a, unsigned int t)
+    : meter(m), action(a), total(t)
+    {
+    }
+
+  csVosProgressTask(iProgressMeter* m, unsigned int s)
+    : meter(m), step(s)
+    {
+    }
+
+  virtual void doTask()
+    {
+      if (action != "") {
+        meter->SetProgressDescription("crystalspace.network.vos.a3dl.progress", action.c_str());
+        meter->SetTotal(total);
+        meter->SetGranularity(1);
+      }
+      else
+      {
+        meter->Step(step);
+      }
+    }
 };
 
 

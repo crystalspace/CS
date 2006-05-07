@@ -44,6 +44,7 @@ protected:
 public:
   csMetaLight(VOS::VobjectBase* superobject);
   virtual ~csMetaLight();
+  virtual csRef<iLight> GetCSLight() { return light; }
 
   virtual void Setup(csVosA3DL* vosa3dl, csVosSector* sect);
 
