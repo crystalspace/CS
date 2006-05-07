@@ -524,6 +524,7 @@ csPtr<iBase> csCubemapTextureLoader::Parse (iDocumentNode* node,
     csStringID id = xmltokens.Request (value);
     switch (id)
     {
+      case XMLTOKEN_POSZ:
       case XMLTOKEN_NORTH:
         fname = child->GetContentsValue ();
 	if (!fname)
@@ -537,6 +538,7 @@ csPtr<iBase> csCubemapTextureLoader::Parse (iDocumentNode* node,
 	cube->SetSubImage (4, csRef<iImage>(loader->LoadImage (fname, Format)));
         break;
     
+      case XMLTOKEN_NEGZ:
       case XMLTOKEN_SOUTH:
         fname = child->GetContentsValue ();
 	if (!fname)
@@ -550,6 +552,7 @@ csPtr<iBase> csCubemapTextureLoader::Parse (iDocumentNode* node,
 	cube->SetSubImage (5, csRef<iImage>(loader->LoadImage (fname, Format)));
         break;
     
+      case XMLTOKEN_POSX:
       case XMLTOKEN_EAST:
         fname = child->GetContentsValue ();
 	if (!fname)
@@ -563,6 +566,7 @@ csPtr<iBase> csCubemapTextureLoader::Parse (iDocumentNode* node,
 	cube->SetSubImage (0, csRef<iImage>(loader->LoadImage (fname, Format)));
         break;
     
+      case XMLTOKEN_NEGX:
       case XMLTOKEN_WEST:
         fname = child->GetContentsValue ();
 	if (!fname)
@@ -576,6 +580,7 @@ csPtr<iBase> csCubemapTextureLoader::Parse (iDocumentNode* node,
 	cube->SetSubImage (1, csRef<iImage>(loader->LoadImage (fname, Format)));
         break;
     
+      case XMLTOKEN_POSY:
       case XMLTOKEN_TOP:
         fname = child->GetContentsValue ();
 	if (!fname)
@@ -589,6 +594,7 @@ csPtr<iBase> csCubemapTextureLoader::Parse (iDocumentNode* node,
 	cube->SetSubImage (2, csRef<iImage>(loader->LoadImage (fname, Format)));
         break;
     
+      case XMLTOKEN_NEGY:
       case XMLTOKEN_BOTTOM:
         fname = child->GetContentsValue ();
 	if (!fname)
