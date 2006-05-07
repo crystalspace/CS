@@ -110,7 +110,7 @@ undesireable (e.g. for normal maps - see
 @uref{http://developer.nvidia.com/object/bump_map_compression.html} for an 
 illustration of the problems). 
 
-CrystalSpace allows quality control here on a per-texture base thorugh 
+CrystalSpace allows quality control here on a per-texture base through 
 @dfn{texture classes}. Basically, a texture class is a collection of certain 
 settings that control how a texture is uploaded to the graphics hardware. 
 E.g. the @samp{lookup}, @samp{normalmap} and @samp{nocompress} cause textures 
