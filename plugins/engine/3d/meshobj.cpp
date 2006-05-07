@@ -995,8 +995,6 @@ void csMeshWrapper::GetRadius (float &rad, csVector3 &cent) const
       iMeshWrapper *spr = children[i]->QueryMesh ();
       if (spr)
       {
-	float childrad;
-        csVector3 childcent;
         csSphere childsphere = spr->GetRadius ();
     
         // @@@ Is this the right transform?

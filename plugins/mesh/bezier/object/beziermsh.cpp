@@ -380,7 +380,7 @@ iCurve *csBezierMesh::CreateCurve ()
 
 int csBezierMesh::FindCurveIndex (iCurve *curve) const
 {
-  return curves.Find ((csCurve*)curve);
+  return (int)curves.Find (static_cast<csCurve*> (curve));
 }
 
 void csBezierMesh::RemoveCurve (int idx)

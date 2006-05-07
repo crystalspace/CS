@@ -246,6 +246,8 @@ public:
   }
 };
 
+#include "csutil/win32/msvc_deprecated_warn_off.h"
+
 class csTerrainObject : 
   public scfImplementationExt4<csTerrainObject,
                                csObjectModel,
@@ -559,6 +561,8 @@ public:
   bool GetCastShadows () { return castshadows; }
   /** @} */
 };
+
+#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 /**
 * Factory for terrain.
