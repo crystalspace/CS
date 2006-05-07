@@ -11,6 +11,7 @@ chronological order.
 	  so that the python plugin builds properly on 64-bit machines.
 	- Eric Sunshine applied more fixes to the new jobber-svn.pl and
 	  jobber-svn.cfg.
+	- res made updates for the new cs-win32libs.
 6-May-2006
 	- Eric Sunshine fixed several problems and issues with jobber-svn.pl
 	  and jobber-svn.cfg; and also re-generalized them a bit

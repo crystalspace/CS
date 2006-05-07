@@ -319,7 +319,7 @@ void csBulletRigidBody::ResetShape ()
   if (pc->GetCollisionShape ()->GetShapeType () != EMPTY_SHAPE_PROXYTYPE)
   {
     BroadphaseProxy* bpproxy = (BroadphaseProxy*)pc->GetRigidBody ()->m_broadphaseHandle;
-    bpproxy->SetClientObjectType(pc->GetRigidBody()->GetCollisionShape()->GetShapeType());
+    //bpproxy->SetClientObjectType(pc->GetRigidBody()->GetCollisionShape()->GetShapeType());
     ds->GetBulletSys ()->GetBroadphase()->CleanProxyFromPairs(bpproxy);
 
     SimdVector3 newinertia;
@@ -678,7 +678,7 @@ void csBulletCollider::ResetShape ()
 {
 
   BroadphaseProxy* bpproxy = (BroadphaseProxy*)pc->GetRigidBody ()->m_broadphaseHandle;
-  bpproxy->SetClientObjectType(pc->GetRigidBody()->GetCollisionShape()->GetShapeType());
+  //bpproxy->SetClientObjectType(pc->GetRigidBody()->GetCollisionShape()->GetShapeType());
   ds->GetBulletSys ()->GetBroadphase()->CleanProxyFromPairs(bpproxy);
 
   SimdVector3 newinertia;
