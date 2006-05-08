@@ -14,6 +14,9 @@ chronological order.
 	  the foliage density when the camera moves on x/z plane.
 	- caedes uploaded correct bump.cgvp for light_spec_bumpamp from 
 	  Erroroman.
+	- Jorrit added a forest to terrainf.
+	- Jorrit fixed the mesh generator so that it correctly fades
+	  hierarchical meshes.
 7-May-2006
         - Reed updated csvosa3dl for CS API changes, tweaked some log messages,
           added some useful accessors.

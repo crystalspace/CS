@@ -20,10 +20,14 @@
     -->
   </plugins>
 
-  <library>grass.lib</library>
-  <library>rock.lib</library>
-
   <textures>
+    <texture name='branch.png'>
+      <file>branch.png</file> <alpha> <binary/> </alpha>
+    </texture>
+    <texture name='bark.png'>
+      <file>bark.png</file>
+    </texture>
+
     <texture name="andrew_marble4.jpg">
       <file>/lib/stdtex/andrew_marble4.jpg</file>
     </texture>
@@ -65,6 +69,12 @@
   </shaders>
 
   <materials>
+    <material name='materialbark'>
+      <texture>bark.png</texture>
+    </material>
+    <material name='branch'>
+      <texture>branch.png</texture>
+    </material>
     <material name="ScatterSky">
       <color red="0" green="0" blue="0" /> 
     </material>
@@ -115,6 +125,12 @@
             <texture>sky_back</texture>
         </material>
   </materials>
+
+  <library>grass.lib</library>
+  <library>rock.lib</library>
+  <library>tree.lib</library>
+  <library>tree_skimp.lib</library>
+  <library>treebark_bare.lib</library>
 
   <addon>
     <plugin>crystalspace.renderloop.loop.loader</plugin>
@@ -320,44 +336,65 @@
 
      <meshgen name="grass">
         <geometry>
-	    <factory maxdist="10" name="Grass" />
-	    <factory maxdist="20" name="GrassLow" />
+	    <factory maxdist="30" name="treebark_bare" />
 	    <radius>1</radius>
-	    <density>1.1</density>
+	    <density>0.02</density>
+	    <materialfactor material="Grass" factor=".4" />
+	    <defaultmaterialfactor>.7</defaultmaterialfactor>
+        </geometry>
+        <geometry>
+	    <factory maxdist="30" name="tree" />
+	    <radius>1</radius>
+	    <density>0.02</density>
+	    <materialfactor material="Grass" factor="1" />
+	    <defaultmaterialfactor>.1</defaultmaterialfactor>
+        </geometry>
+        <geometry>
+	    <factory maxdist="30" name="tree_skimp" />
+	    <radius>1</radius>
+	    <density>0.01</density>
+	    <materialfactor material="Grass" factor="1" />
+	    <defaultmaterialfactor>.1</defaultmaterialfactor>
+        </geometry>
+        <geometry>
+	    <factory maxdist="10" name="Grass" />
+	    <factory maxdist="30" name="GrassLow" />
+	    <radius>1</radius>
+	    <density>0.4</density>
 	    <materialfactor material="Grass" factor="1" />
         </geometry>
         <geometry>
 	    <factory maxdist="10" name="TallGrass" />
-	    <factory maxdist="20" name="TallGrassLow" />
+	    <factory maxdist="30" name="TallGrassLow" />
 	    <radius>1</radius>
-	    <density>.15</density>
+	    <density>.08</density>
 	    <materialfactor material="Grass" factor="1" />
         </geometry>
         <geometry>
-	    <factory maxdist="20" name="Rock" />
+	    <factory maxdist="30" name="Rock" />
 	    <radius>1</radius>
-	    <density>.015</density>
+	    <density>.010</density>
 	    <materialfactor material="Marble" factor="1" />
 	    <materialfactor material="Stone" factor="0" />
 	    <defaultmaterialfactor>.3</defaultmaterialfactor>
         </geometry>
         <geometry>
-	    <factory maxdist="20" name="RockSmall" />
+	    <factory maxdist="30" name="RockSmall" />
 	    <radius>1</radius>
-	    <density>.15</density>
+	    <density>.10</density>
 	    <materialfactor material="Marble" factor="1" />
 	    <materialfactor material="Stone" factor="0" />
 	    <defaultmaterialfactor>.3</defaultmaterialfactor>
         </geometry>
 	<!--
         <geometry>
-	    <factory maxdist="20" name="squareInst" />
+	    <factory maxdist="30" name="squareInst" />
 	    <radius>1</radius>
 	    <density>.3</density>
         </geometry>
 	-->
-	<densityscale mindist="16" maxdist="20" maxfactor="0" />
-	<alphascale mindist="12" maxdist="20" />
+	<!--<densityscale mindist="26" maxdist="30" maxfactor="0" />-->
+	<alphascale mindist="22" maxdist="30" />
 	<samplebox>
 	    <min x="-256" y="-200" z="-256" />
 	    <max x="256" y="200" z="256" />

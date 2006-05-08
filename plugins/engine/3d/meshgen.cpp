@@ -744,6 +744,17 @@ void csMeshGenerator::AllocateBlock (int cidx, csMGCell& cell)
   }
 }
 
+void csMeshGenerator::SetFade (iMeshWrapper* mesh, uint mode)
+{
+  if (!mesh) return;
+  mesh->GetMeshObject ()->SetMixMode (mode);
+  iSceneNode* sn = mesh->QuerySceneNode ();
+  const csRefArray<iSceneNode>& children = sn->GetChildren ();
+  size_t i;
+  for (i = 0 ; i < children.Length () ; i++)
+    SetFade (children[i]->QueryMesh (), mode);
+}
+
 void csMeshGenerator::SetFade (csMGPosition& p, float factor)
 {
   if (factor < .01)
@@ -751,26 +762,26 @@ void csMeshGenerator::SetFade (csMGPosition& p, float factor)
     if (p.last_mixmode == CS_FX_TRANSPARENT)
       return;
     p.last_mixmode = CS_FX_TRANSPARENT;
-    p.mesh->GetMeshObject ()->SetMixMode (CS_FX_TRANSPARENT);
+    SetFade (p.mesh, CS_FX_TRANSPARENT);
   }
   else if (factor < .99)
   {
     if (p.mesh->GetRenderPriority () != alpha_priority)
     {
-      p.mesh->SetRenderPriority (alpha_priority);
-      p.mesh->SetZBufMode (CS_ZBUF_TEST);
+      p.mesh->SetRenderPriorityRecursive (alpha_priority);
+      p.mesh->SetZBufModeRecursive (CS_ZBUF_TEST);
     }
     p.last_mixmode = CS_FX_SETALPHA (1.0f-factor);
-    p.mesh->GetMeshObject ()->SetMixMode (p.last_mixmode);
+    SetFade (p.mesh, p.last_mixmode);
   }
   else
   {
     if (p.last_mixmode == CS_FX_COPY)
       return;
     p.last_mixmode = CS_FX_COPY;
-    p.mesh->GetMeshObject ()->SetMixMode (CS_FX_COPY);
-    p.mesh->SetRenderPriority (object_priority);
-    p.mesh->SetZBufMode (CS_ZBUF_USE);
+    SetFade (p.mesh, CS_FX_COPY);
+    p.mesh->SetRenderPriorityRecursive (object_priority);
+    p.mesh->SetZBufModeRecursive (CS_ZBUF_USE);
   }
 }
 

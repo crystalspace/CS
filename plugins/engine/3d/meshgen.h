@@ -421,6 +421,7 @@ private:
 
   /// Set the fade for a mesh.
   void SetFade (csMGPosition& p, float factor);
+  void SetFade (iMeshWrapper* mesh, uint mode);
 
   /// Statistics.
   size_t CountPositions (int cidx, csMGCell& cell);
