@@ -56,8 +56,10 @@ void csMeshGeneratorGeometry::SetDensityMap (iTerraFormer* map, float factor,
   density_map_factor = factor;
   density_map_type = type;
 }
-void csMeshGeneratorGeometry::AddPositionsFromMap (iTerraFormer* map, const csBox2 &region,
-    uint resx, uint resy, float value, const csStringID & type)
+
+void csMeshGeneratorGeometry::AddPositionsFromMap (iTerraFormer* map,
+	const csBox2 &region, uint resx, uint resy, float value,
+	const csStringID & type)
 {
   csRef<iTerraSampler> sampler = map->GetSampler (region, resx, resy);
   float stepx = (region.MaxX () - region.MinX ())/resx;
@@ -79,6 +81,7 @@ void csMeshGeneratorGeometry::AddPositionsFromMap (iTerraFormer* map, const csBo
     cury += stepy;
   }
 }
+
 void csMeshGeneratorGeometry::ResetManualPositions (int new_celldim)
 {
   if (celldim == new_celldim)
@@ -103,11 +106,13 @@ void csMeshGeneratorGeometry::ResetManualPositions (int new_celldim)
     AddPosition (tmp_pos[i]);
   }
 }
+
 void csMeshGeneratorGeometry::AddPosition (const csVector2 &pos)
 {
   ResetManualPositions (generator->GetCellCount ());
   positions[generator->GetCellId (pos)].Push (pos);
 }
+
 void csMeshGeneratorGeometry::AddDensityMaterialFactor (
   iMaterialWrapper* material, float factor)
 {
@@ -858,7 +863,7 @@ void csMeshGenerator::AllocateMeshes (int cidx, csMGCell& cell,
           factor = (alpha_maxdist-correct_dist - dist) * alpha_scale;
         }
         //printf (" -> factor=%g\n", factor); fflush (stdout);
-        //SetFade (p, factor);
+        SetFade (p, factor);
       }
     }
     else
@@ -875,9 +880,9 @@ void csMeshGenerator::AllocateMeshes (int cidx, csMGCell& cell,
 
 void csMeshGenerator::AllocateBlocks (const csVector3& pos)
 {
-  if (setup_cells)
-    if (pos.x == last_pos.x && pos.z == last_pos.y)
-      return;
+  //if (setup_cells)
+    //if (pos.x == last_pos.x && pos.z == last_pos.y)
+      //return;
   last_pos.x = pos.x;
   last_pos.y = pos.z;
   SetupSampleBox ();

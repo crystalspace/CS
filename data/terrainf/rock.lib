@@ -2,7 +2,12 @@
 <!-- http://projects.blender.org/projects/blend2cs -->
 <library>
   <plugins>
-    <plugin name="instFact">crystalspace.mesh.loader.factory.instmesh</plugin>
+    <plugin name="genmeshfact">
+      <id>crystalspace.mesh.loader.factory.genmesh</id>
+      <defaults>
+        <staticshape/>
+      </defaults>
+    </plugin>
   </plugins>
   <textures>
     <texture name="rocky_surface.jpg">
@@ -15,9 +20,10 @@
     </material>
   </materials>
   <meshfact name="Rock">
-    <plugin>instFact</plugin>
+    <plugin>genmeshfact</plugin>
     <params>
       <material>rocky_surface.jpg</material>
+      <numvt>155</numvt>
       <v x="-0.217702" y="-0.431391" z="-0.517025" u="0.391149" v="0.758513"/>
       <v x="-0.253106" y="-0.508519" z="-0.258233" u="0.373447" v="0.629117"/>
       <v x="-0.503973" y="-0.485779" z="-0.24851" u="0.248014" v="0.624255"/>
@@ -173,6 +179,7 @@
       <v x="-0.577154" y="-0.00598819" z="0.576154" u="0.211423" v="0.502993"/>
       <v x="-0.673052" y="-0.240619" z="-0.288858" u="0.163474" v="0.620308"/>
       <v x="-0.859314" y="4.92391e-008" z="-0.339832" u="0.0703428" v="0.499999"/>
+      <numtri>192</numtri>
       <t v1="0" v2="1" v3="2"/>
       <t v1="2" v2="3" v3="0"/>
       <t v1="4" v2="5" v3="6"/>
@@ -370,9 +377,10 @@
     </params>
   </meshfact>
   <meshfact name="RockSmall">
-    <plugin>instFact</plugin>
+    <plugin>genmeshfact</plugin>
     <params>
       <material>rocky_surface.jpg</material>
+      <numvt>53</numvt>
       <v x="-0.0123379" y="-0.167073" z="-0.2628" u="0.493831" v="0.6314"/>
       <v x="-0.0123378" y="-0.167073" z="-0.0047908" u="0.493831" v="0.502395"/>
       <v x="-0.2123" y="-0.136281" z="-0.00881117" u="0.39385" v="0.504406"/>
@@ -426,6 +434,7 @@
       <v x="0.19725" y="-0.119374" z="-0.00568695" u="0.598625" v="0.502843"/>
       <v x="0.181153" y="-0.106468" z="0.189807" u="0.590576" v="0.405096"/>
       <v x="0.19725" y="-0.119374" z="-0.263697" u="0.598625" v="0.631848"/>
+      <numtri>48</numtri>
       <t v1="0" v2="1" v3="2"/>
       <t v1="2" v2="3" v3="0"/>
       <t v1="4" v2="5" v3="6"/>
