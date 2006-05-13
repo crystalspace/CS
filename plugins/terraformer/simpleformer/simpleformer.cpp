@@ -591,8 +591,10 @@ void csSimpleSampler::CachePositions ()
   maxCorner = csVector3 (region.MaxX (), 0, region.MaxY ());
 
   // Compute distance between sample points
-  sampleDistanceReal = (maxCorner.x-minCorner.x)/(float)(resx-1);
-  sampleDistanceReal = (maxCorner.z-minCorner.z)/(float)(resz-1);
+  sampleDistanceReal = (resx == 1) ? 0 :
+    (maxCorner.x-minCorner.x)/(float)(resx-1);
+  sampleDistanceReal = (resz == 1) ? 0 :
+    (maxCorner.z-minCorner.z)/(float)(resz-1);
 
   // We wanna compute our region in heightmap space
   // Heightmap -> real space is computed by:
@@ -625,8 +627,10 @@ void csSimpleSampler::CachePositions ()
   maxCorner.z *= (float)terraFormer->height/2;
 
   // Compute distance between sample points in heightmap space
-  sampleDistanceHeight.x = (maxCorner.x-minCorner.x)/(float)(resx-1);
-  sampleDistanceHeight.z = (maxCorner.z-minCorner.z)/(float)(resz-1);
+  sampleDistanceHeight.x = (resx == 1) ? 0 :
+    (maxCorner.x-minCorner.x)/(float)(resx-1);
+  sampleDistanceHeight.z = (resz == 1) ? 0 :
+    (maxCorner.z-minCorner.z)/(float)(resz-1);
 
   // Keep index counters to avoid uneccessary x+y*w calculations
   int posIdx = 0, edgeIdx = 0;

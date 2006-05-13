@@ -109,9 +109,10 @@ csPtr<iBase> csPagingFormerLoader::Parse (iDocumentNode* node,
       }
       case XMLTOKEN_HEIGHTMAPDIR:
       {
-        const char* typestring = child->GetAttributeValue ("type");
+        const char* formatstring = child->GetAttributeValue ("format");
         const char *dir = child->GetContentsValue ();
-        state->SetHeightmapDir (dir, typestring);
+        state->SetHeightmapDir (dir, 
+          (formatstring == 0) ? "image" : formatstring);
         break;
       }
       case XMLTOKEN_INTMAPDIR:
