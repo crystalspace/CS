@@ -19,13 +19,13 @@
 #ifndef __CS_CSUTIL_COWWRAPPER_H__
 #define __CS_CSUTIL_COWWRAPPER_H__
 
-#include "refcount.h"
-
 // Hack: Work around problems caused by #defining 'new'.
 #if defined(CS_EXTENSIVE_MEMDEBUG) || defined(CS_MEMORY_TRACKER)
 # undef new
 #endif
 #include <new>
+
+#include "allocator.h"
 
 /**\file
  */
@@ -33,20 +33,7 @@
 namespace CS
 {
 
-  class CowMemoryAllocatorMalloc
-  {
-  public:
-    static void* Alloc (const size_t n)
-    {
-      return malloc (n);
-    }
-    static void Free (void* p)
-    {
-      free (p);
-    }
-  };
-
-  template<typename T, class MemoryAllocator = CowMemoryAllocatorMalloc>
+  template<typename T, class MemoryAllocator = Memory::AllocatorMalloc>
   class CowWrapper
   {
     struct WrappedData

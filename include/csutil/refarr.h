@@ -60,7 +60,7 @@
 #endif
 
 template <class T>
-class csRefArrayElementHandler
+class csRefArrayElementHandler : public csArrayElementHandler<T>
 {
 public:
   static void Construct (T* address, T const& src)

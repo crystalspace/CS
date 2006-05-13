@@ -1621,6 +1621,21 @@ CS_CHECK_BUILD([for setenv], [cs_cv_setenv],
 
 
 #------------------------------------------------------------------------------
+# Check for a couple of memory-related functions.
+#------------------------------------------------------------------------------
+CS_CHECK_BUILD([for _aligned_malloc], [cs_cv__aligned_malloc],
+    [AC_LANG_PROGRAM(
+	[[#ifdef HAVE_SYS_TYPES_H
+	#include <sys/types.h>
+	#endif
+	#include <malloc.h>]],
+	[_aligned_malloc(0, 0);])],
+    [], [],
+    [CS_HEADER_PROPERTY([CS_HAVE__ALIGNED_MALLOC])])
+
+
+
+#------------------------------------------------------------------------------
 # Check if cxxabi.h is available and if the abi::__cxa_demangle() function is 
 # available.
 #------------------------------------------------------------------------------

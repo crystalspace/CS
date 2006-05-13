@@ -31,6 +31,7 @@
  */
 
 #include "csextern.h"
+#include "allocator.h"
 #include "comparator.h"
 #include "hash.h"
 
@@ -45,33 +46,6 @@ typedef unsigned long csBitArrayStorageType;
 #endif
 const size_t csBitArrayDefaultInlineBits = 
   sizeof (csBitArrayStorageType) * 8;
-
-class csBitArrayAllocatorHeap
-{
-public:
-  static void* Alloc (const size_t n)
-  {
-#ifdef CS_MEMORY_TRACKER
-    static const char mtiInfo[] = "csBitArrayAllocatorHeap";
-    uintptr_t* ptr = (uintptr_t*)malloc (n + sizeof (uintptr_t)*2);
-    *ptr++ = (uintptr_t)mtiRegisterAlloc (n, (void*)&mtiInfo);
-    *ptr++ = n;
-    return ptr;
-#else
-    return malloc (n);
-#endif
-  }
-  static void Free (void* p)
-  {
-#ifdef CS_MEMORY_TRACKER
-    uintptr_t* ptr = ((uintptr_t*)p)-2;
-    mtiRegisterFree ((csMemTrackerInfo*)*ptr, (size_t)ptr[1]);
-    free (ptr);
-#else
-    free (p);
-#endif
-  }
-};
 
 /**
  * A one-dimensional array of bits, similar to STL bitset.
@@ -93,7 +67,7 @@ public:
  * to allocate bits from the heap.
  */
 template<int InlinedBits = csBitArrayDefaultInlineBits,
-  typename Allocator = csBitArrayAllocatorHeap>
+  typename Allocator = CS::Memory::AllocatorMalloc>
 class csBitArrayTweakable
 {
 private:

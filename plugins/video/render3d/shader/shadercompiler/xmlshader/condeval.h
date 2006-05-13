@@ -335,7 +335,7 @@ protected:
       inline operator csStringID() const { return n; }
     };
     typedef csArray<Entry, csArrayElementHandler<Entry>,
-      csArrayMemoryAllocator<Entry>,
+      CS::Memory::AllocatorMalloc,
       csArrayCapacityLinear<csArrayThresholdFixed<4> > > ArrayType;
 
     ArrayType _array;

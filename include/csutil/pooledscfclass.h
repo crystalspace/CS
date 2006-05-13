@@ -126,7 +126,7 @@ public:
       if (p.mti == 0)
       {
         p.mti = mtiRegisterAlloc (sizeof (PoolEntry) + n, 
-          (void*)typeid (Pool).name());
+          typeid (Pool).name());
       }
       else
         mtiUpdateAmount (p.mti, 1, int (sizeof (PoolEntry) + n));

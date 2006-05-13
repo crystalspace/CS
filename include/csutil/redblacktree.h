@@ -23,6 +23,12 @@
 #include "csutil/blockallocator.h"
 #include "csutil/comparator.h"
 
+// hack: work around problems caused by #defining 'new'
+#if defined(CS_EXTENSIVE_MEMDEBUG) || defined(CS_MEMORY_TRACKER)
+# undef new
+#endif
+#include <new>
+
 /**\file
  * Implementation of a red-black-tree.
  */
@@ -68,7 +74,7 @@ protected:
     void SetColor (NodeColor color)
     { parent = (Node*)(((uintptr_t)parent & (uintptr_t)~1) | (uint)color); }
   };
-  csBlockAllocator<Node, csBlockAllocatorAlignPolicy<2> > nodeAlloc;
+  csBlockAllocator<Node, CS::Memory::AllocatorAlign<2> > nodeAlloc;
   
   Node* root;
   
@@ -640,5 +646,9 @@ public:
 };
 
 /** @} */
+
+#if defined(CS_EXTENSIVE_MEMDEBUG) || defined(CS_MEMORY_TRACKER)
+# define new CS_EXTENSIVE_MEMDEBUG_NEW
+#endif
 
 #endif // __CS_UTIL_REDBLACKTREE_H__

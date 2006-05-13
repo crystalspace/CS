@@ -115,4 +115,9 @@
 #  define _SECURE_SCL 0
 #endif
 
+// Check for support of native aligned allocation
+#if defined(CS_COMPILER_MSVC) && defined(_MSC_VER) && (_MSC_VER >= 1300)
+  #define CS_HAVE__ALIGNED_MALLOC
+#endif
+
 #endif // __CS_WIN32_CSCONFIG_H__

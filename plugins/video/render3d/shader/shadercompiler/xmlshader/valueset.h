@@ -188,7 +188,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
     };
   protected:
     static const size_t arrayGrow = 2;
-    class IntervalElementHandler
+    class IntervalElementHandler : public csArrayElementHandler<Interval>
     {
     public:
       CS_FORCEINLINE
@@ -215,7 +215,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
       }
     };
     typedef csArray<Interval, IntervalElementHandler,
-      csArrayLocalBufferAllocator<Interval, arrayGrow>,
+      CS::Memory::LocalBufferAllocator<Interval, arrayGrow>,
       csArrayCapacityLinear<csArrayThresholdFixed<arrayGrow> > > IntervalArray;
     IntervalArray intervals;
   public:

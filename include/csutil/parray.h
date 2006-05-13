@@ -34,7 +34,7 @@
 #include "csutil/array.h"
 
 template <class T>
-class csPDelArrayElementHandler
+class csPDelArrayElementHandler : public csArrayElementHandler<T>
 {
 public:
   static void Construct (T* address, T const& src)

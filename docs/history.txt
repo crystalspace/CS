@@ -11,6 +11,11 @@ chronological order.
 	- Fossi added new paging terrain version and 'terrainp' testlevel.
 	- res fixed a cut'n'paste error in the GLU check.
 	- res fixed some missing symbol issues with Win32 shared lib builds.
+	- res unified the allocators for classes that support custom memory
+	  allocation (csArray, csBitArray, csBlockAllocator, csCowWrapper).
+	  As a collateral, moved some functionality from the array memory
+	  handler to the array element handler which more correctly belong
+	  to the latter.
 12-May-2006
 	- Adam implemented an (incomplete) unit test for csPartialOrder.
 9-May-2006

@@ -31,7 +31,7 @@
  * a single array.
  */
 template <class T, class ElementHandler = csArrayElementHandler<T>,
-	   class MemoryAllocator = csArrayMemoryAllocator<T> >
+  class MemoryAllocator = CS::Memory::AllocatorMalloc>
 class csFIFO
 {
   csArray<T, ElementHandler, MemoryAllocator> a1, a2;

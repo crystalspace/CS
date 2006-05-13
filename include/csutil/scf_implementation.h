@@ -223,7 +223,7 @@ protected:
   iBase *scfParent;
   typedef csArray<void**,
     csArrayElementHandler<void**>,
-    csArrayMemoryAllocator<void**>,
+    CS::Memory::AllocatorMalloc,
     csArrayCapacityLinear<csArrayThresholdFixed<4> > > WeakRefOwnerArray;
   WeakRefOwnerArray* scfWeakRefOwners;
 

@@ -694,7 +694,7 @@ public:
     mti_table_count = 0;
   }
 
-  void InsertBefore (int idx, char* filename)
+  void InsertBefore (int idx, const char* filename)
   {
     int tomove = mti_table_count - idx;
     if (tomove > 0)
@@ -706,7 +706,7 @@ public:
   }
 
   csMemTrackerInfo* FindInsertMtiTableEntry (
-        char* filename, int start, int end)
+        const char* filename, int start, int end)
   {
     // Binary search.
     if (mti_table_count <= 0)
@@ -762,7 +762,7 @@ public:
     }
   }
 
-  csMemTrackerInfo* FindInsertMtiTableEntry (char* filename)
+  csMemTrackerInfo* FindInsertMtiTableEntry (const char* filename)
   {
     return FindInsertMtiTableEntry (filename, 0, mti_table_count-1);
   }
@@ -822,6 +822,60 @@ public:
 
   virtual void Dump (bool summary_only)
   {
+#if defined(CS_PLATFORM_WIN32)
+    /* Yes, that's horribly platform-dependent, and this may not be the right
+     * place. However, the heap statistics are somewhat useful, since they
+     * can e.g. indicate fragmentation. */
+    DWORD heapNum = GetProcessHeaps (0, 0);
+    CS_ALLOC_STACK_ARRAY(HANDLE, heaps, heapNum);
+    GetProcessHeaps (heapNum, heaps);
+
+    for (DWORD i = 0; i < heapNum; i++)
+    {
+      const HANDLE heap = heaps[i];
+
+      struct RegionInfo
+      {
+        size_t committedSize;
+        size_t uncommittedSize;
+        size_t busySize;
+        size_t blocks;
+
+        RegionInfo() : committedSize (0), uncommittedSize (0),
+          busySize (0), blocks (0) {}
+      };
+      RegionInfo regions[256];
+
+      PROCESS_HEAP_ENTRY entry;
+      entry.lpData = 0;
+      bool hasEntry = HeapWalk (heap, &entry) != FALSE;
+      while (hasEntry)
+      {
+        RegionInfo& region = regions[entry.iRegionIndex];
+        if (entry.wFlags & PROCESS_HEAP_REGION)
+        {
+          region.committedSize = entry.Region.dwCommittedSize;
+          region.uncommittedSize = entry.Region.dwUnCommittedSize;
+        }
+        else if (entry.wFlags & PROCESS_HEAP_ENTRY_BUSY)
+        {
+          region.busySize += entry.cbData;
+        }
+        if (!(entry.wFlags & (PROCESS_HEAP_REGION | PROCESS_HEAP_UNCOMMITTED_RANGE)))
+          region.blocks++;
+        hasEntry = HeapWalk (heap, &entry) != FALSE;
+      }
+      for (int i = 0; i < 256; i++)
+      {
+        const RegionInfo& region = regions[i];
+        if ((region.committedSize + region.uncommittedSize) == 0) continue;
+        csPrintf ("heap %p region %d: %9zu/%9zu/%9zu bytes in %6zu blocks\n", (void*)heap, i,
+          region.committedSize, region.uncommittedSize, region.busySize, region.blocks);
+      }
+    }
+    fflush (stdout);
+#endif
+
     int i;
     for (i = 0 ; i < num_modules ; i++)
     {
@@ -862,19 +916,26 @@ void mtiRegisterModule (char* Class)
   }
 }
 
-csMemTrackerInfo* mtiRegisterAlloc (size_t s, void* filename)
+csMemTrackerInfo* mtiRegisterAlloc (size_t s, const char* filename)
 {
   if (mti_this_module == 0)
     return 0;   // Don't track this alloc yet.
 
   csMemTrackerInfo* mti = mti_this_module->FindInsertMtiTableEntry (
-        (char*)filename);
+        filename);
   mti->current_count++;
   mti->current_alloc += s;
   if (mti->current_count > mti->max_count)
     mti->max_count = mti->current_count;
   if (mti->current_alloc > mti->max_alloc)
     mti->max_alloc = mti->current_alloc;
+  return mti;
+}
+
+csMemTrackerInfo* mtiRegister (const char* info)
+{
+  csMemTrackerInfo* mti = mti_this_module->FindInsertMtiTableEntry (
+        info);
   return mti;
 }
 
@@ -907,7 +968,7 @@ void* operator new (size_t s, void* filename, int /*line*/)
   memset (rc, 0xfe, s+4*sizeof(uintptr_t));
   *rc++ = s;
   *rc++ = 0xbeebbeeb;
-  *rc++ = (uintptr_t)mtiRegisterAlloc (s, filename);
+  *rc++ = (uintptr_t)mtiRegisterAlloc (s, (const char*)filename);
   *rc++ = 0xdeadbeef;
   return (void*)rc;
 }
@@ -918,7 +979,7 @@ void* operator new[] (size_t s, void* filename, int /*line*/)
   memset (rc, 0xfe, s+4*sizeof(uintptr_t));
   *rc++ = s;
   *rc++ = 0xfeedbeef;
-  *rc++ = (uintptr_t)mtiRegisterAlloc (s, filename);
+  *rc++ = (uintptr_t)mtiRegisterAlloc (s, (const char*)filename);
   *rc++ = 0xdeadbeef;
   return (void*)rc;
 }

@@ -38,7 +38,7 @@ struct CS_CRYSTALSPACE_EXPORT csMemTrackerInfo
   size_t current_alloc;
   int max_count;
   int current_count;
-  void Init (char* filename)
+  void Init (const char* filename)
   {
     file = (char*)malloc (strlen (filename)+1);
     strcpy (file, filename);
@@ -50,7 +50,9 @@ struct CS_CRYSTALSPACE_EXPORT csMemTrackerInfo
 };
 
 /// 'info' can be filename or some other information to recognize allocation.
-CS_CRYSTALSPACE_EXPORT csMemTrackerInfo* mtiRegisterAlloc(size_t, void* info);
+CS_CRYSTALSPACE_EXPORT csMemTrackerInfo* mtiRegisterAlloc(size_t, 
+  const char* info);
+CS_CRYSTALSPACE_EXPORT csMemTrackerInfo* mtiRegister (const char* info);
 CS_CRYSTALSPACE_EXPORT void mtiRegisterModule (char*);
 CS_CRYSTALSPACE_EXPORT void mtiRegisterFree(csMemTrackerInfo* mti, size_t s);
 CS_CRYSTALSPACE_EXPORT void mtiUpdateAmount(csMemTrackerInfo* mti, int dcount,

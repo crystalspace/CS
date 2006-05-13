@@ -29,7 +29,7 @@
 #include "csutil/array.h"
 #include "csutil/util.h"
 
-class csStringArrayElementHandler
+class csStringArrayElementHandler : public csArrayElementHandler<const char*>
 {
 public:
   static void Construct (const char** address, const char* const& src)

@@ -34,100 +34,6 @@
 #endif
 #include <new>
 
-#ifdef CS_MEMORY_TRACKER
-#include "csutil/memdebug.h"
-#include <typeinfo>
-#include "csstring.h"
-#endif
-
-/**
- * This class implements the normal per block allocating policy.
- * It has no per-block overhead.
- */
-class csBlockAllocatorNormalBlockPolicy
-{
-public:
-  /**
-   * Allocate a raw block of given size. 
-   */
-  static inline uint8* AllocBlock (size_t blocksize) 
-  {
-    return (uint8*)malloc(blocksize);
-  }
-
-  /**
-   * Free a block.
-   * \remarks Does not check that the block pointer is valid.
-   */
-  static inline void FreeBlock(uint8* p)
-  {
-    free (p);
-  }
-};
-
-/**
- * This class implements a per-block allocating policy which aligns the first
- * element on given byte boundary.  It has a per-block overhead of
- * `sizeof(void*)+alignment' bytes.
- */
-template <size_t A = 1>
-class csBlockAllocatorAlignPolicy
-{
-public:
-  /**
-   * Allocate a raw block of given size. 
-   */
-  static inline uint8* AllocBlock(size_t blocksize) 
-  {
-    return (uint8*)csAlignedMalloc (blocksize, A);
-  }
-
-  /**
-   * Free a block.
-   * \remarks Does not check that the block pointer is valid.
-   */
-  static inline void FreeBlock(uint8* p)
-  {
-    csAlignedFree (p);
-  }
-};
-
-#ifdef CS_MEMORY_TRACKER
-/**
- * This class implements block allocating policy for memory-tracking builds
- * (when CS_MEMORY_TRACKER is defined).  It has a per-block overhead of 
- * 2*sizeof(uintptr_t) bytes.
- */
-template <class T>
-class csBlockAllocatorMTBlockPolicy
-{
-public:
-  /**
-   * Allocate a raw block of given size. 
-   */
-  static inline uint8* AllocBlock (size_t blocksize)
-  {
-    csString buf;
-    buf.AppendFmt ("csBlockAllocator<%s >", typeid (T).name());
-    uintptr_t* ptr = (uintptr_t*)malloc (blocksize + sizeof (uintptr_t)*2);
-    *ptr++ = (uintptr_t)mtiRegisterAlloc (blocksize, (void*)buf.GetData());
-    *ptr++ = blocksize;
-    return (uint8*)ptr;
-  }
-
-  /**
-   * Free a block.
-   * \remarks Does not check that the block pointer is valid.
-   */
-  static inline void FreeBlock(uint8* p)
-  {
-    uintptr_t* ptr = ((uintptr_t*)p)-2;
-    mtiRegisterFree ((csMemTrackerInfo*)*ptr, (size_t)ptr[1]);
-    free (ptr);
-  }
-};
-#endif
-
 /**
  * This class implements a memory allocator which can efficiently allocate
  * objects that all have the same size. It has no memory overhead per
@@ -148,11 +54,7 @@ public:
  * \sa csArray
  * \sa csMemoryPool
  */
-#ifdef CS_MEMORY_TRACKER
-template <class T, class BlockPolicy = csBlockAllocatorMTBlockPolicy<T> >
-#else
-template <class T, class BlockPolicy = csBlockAllocatorNormalBlockPolicy>
-#endif
+template <class T, class Allocator = CS::Memory::AllocatorMalloc>
 class csBlockAllocator
 {
 protected: // 'protected' allows access by test-suite.
@@ -168,8 +70,12 @@ protected: // 'protected' allows access by test-suite.
     BlockKey(uint8 const* p, size_t n) : addr(p), blocksize(n) {}
   };
 
+  struct BlocksWrapper : public Allocator
+  {
+    csArray<uint8*> b;
+  };
   /// List of allocated blocks; sorted by address.
-  csArray<uint8*> blocks;
+  BlocksWrapper blocks;
   /// Number of elements per block.
   size_t size;
   /// Element size; >= sizeof(void*).
@@ -203,7 +109,7 @@ protected: // 'protected' allows access by test-suite.
    */
   size_t FindBlock(void const* m) const
   {
-    return blocks.FindSortedKey(
+    return blocks.b.FindSortedKey(
       csArrayCmp<uint8*,BlockKey>(BlockKey((uint8*)m, blocksize), FuzzyCmp));
   }
 
@@ -212,9 +118,9 @@ protected: // 'protected' allows access by test-suite.
    * \return The returned address is both the reference to the overall block,
    *   and the address of the first free node in the chain.
    */
-  uint8* AllocBlock() const
+  uint8* AllocBlock()
   {
-    uint8* block = BlockPolicy::AllocBlock(blocksize);
+    uint8* block = (uint8*)blocks.Alloc (blocksize);
 
     // Build the free-node chain (all nodes are free in the new block).
     FreeNode* nextfree = 0;
@@ -232,9 +138,9 @@ protected: // 'protected' allows access by test-suite.
   /**
    * Dispose of a block.
    */
-  void FreeBlock(uint8* p) const
+  void FreeBlock(uint8* p)
   {
-    BlockPolicy::FreeBlock(p);
+    blocks.Free (p);
   }
 
   /**
@@ -261,13 +167,13 @@ protected: // 'protected' allows access by test-suite.
    */
   csBitArray GetAllocationMap() const
   {
-    csBitArray mask(size * blocks.GetSize());
+    csBitArray mask(size * blocks.b.GetSize());
     mask.FlipAllBits();
     for (FreeNode* p = freenode; p != 0; p = p->next)
     {
       size_t const n = FindBlock(p);
       CS_ASSERT(n != csArrayItemNotFound);
-      size_t const slot = ((uint8*)p - blocks[n]) / elsize; // Slot in block.
+      size_t const slot = ((uint8*)p - blocks.b[n]) / elsize; // Slot in block.
       mask.ClearBit(n * size + slot);
     }
     return mask;
@@ -283,14 +189,14 @@ protected: // 'protected' allows access by test-suite.
     insideDisposeAll = true;
     csBitArray const mask(GetAllocationMap());
     size_t node = 0;
-    for (size_t b = 0, bN = blocks.GetSize(); b < bN; b++)
+    for (size_t b = 0, bN = blocks.b.GetSize(); b < bN; b++)
     {
-      for (uint8 *p = blocks[b], *pN = p + blocksize; p < pN; p += elsize)
+      for (uint8 *p = blocks.b[b], *pN = p + blocksize; p < pN; p += elsize)
           if (mask.IsBitSet(node++))
             DestroyObject((T*)p, warn_unfreed);
-      FreeBlock(blocks[b]);
+      FreeBlock(blocks.b[b]);
     }
-    blocks.DeleteAll();
+    blocks.b.DeleteAll();
     freenode = 0;
     insideDisposeAll = false;
   }
@@ -308,7 +214,7 @@ protected: // 'protected' allows access by test-suite.
     if (freenode == 0)
     {
       uint8* p = AllocBlock();
-      blocks.InsertSorted(p);
+      blocks.b.InsertSorted(p);
       freenode = (FreeNode*)p;
     }
     void* const node = freenode;
@@ -341,6 +247,9 @@ public:
     size(nelem), elsize(sizeof(T)), freenode(0), pedantic(warn_unfreed),
     insideDisposeAll(false)
   {
+#ifdef CS_MEMORY_TRACKER
+    blocks.SetMemTrackerInfo (typeid(*this).name());
+#endif
     if (elsize < sizeof (FreeNode))
       elsize = sizeof (FreeNode);
     blocksize = elsize * size;
@@ -374,13 +283,13 @@ public:
 
     bool compacted = false;
     csBitArray mask(GetAllocationMap());
-    for (size_t b = blocks.GetSize(); b-- > 0; )
+    for (size_t b = blocks.b.GetSize(); b-- > 0; )
     {
       size_t const node = b * size;
       if (!mask.AreSomeBitsSet(node, size))
       {
-        FreeBlock(blocks[b]);
-        blocks.DeleteIndex(b);
+        FreeBlock(blocks.b[b]);
+        blocks.b.DeleteIndex(b);
         mask.Delete(node, size);
         compacted = true;
       }
@@ -390,11 +299,11 @@ public:
     if (compacted)
     {
       FreeNode* nextfree = 0;
-      size_t const bN = blocks.GetSize();
+      size_t const bN = blocks.b.GetSize();
       size_t node = bN * size;
       for (size_t b = bN; b-- > 0; )
       {
-        uint8* const p0 = blocks[b];
+        uint8* const p0 = blocks.b[b];
         for (uint8* p = p0 + (size - 1) * elsize; p >= p0; p -= elsize)
         {
           if (!mask.IsBitSet(--node))
@@ -443,7 +352,7 @@ public:
     if (p != 0 && !insideDisposeAll)
     {
       CS_ASSERT(FindBlock(p) != csArrayItemNotFound);
-      DestroyObject(p, false, invokeDtor);
+      DestroyObject (p, false, invokeDtor);
       FreeNode* f = (FreeNode*)p;
       f->next = freenode;
       freenode = f;

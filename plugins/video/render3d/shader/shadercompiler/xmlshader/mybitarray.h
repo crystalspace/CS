@@ -45,7 +45,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
 #ifdef CS_MEMORY_TRACKER
         static const char mtiInfo[] = "MyBitArrayAllocator";
         uintptr_t* ptr = (uintptr_t*)malloc (n + sizeof (uintptr_t)*2);
-        *ptr++ = (uintptr_t)mtiRegisterAlloc (n, (void*)&mtiInfo);
+        *ptr++ = (uintptr_t)mtiRegisterAlloc (n, mtiInfo);
         *ptr++ = n;
         return ptr;
 #else

@@ -25,6 +25,7 @@
  * Generic Array Template
  */
 
+#include "allocator.h"
 #include "comparator.h"
 
 // Hack: Work around problems caused by #defining 'new'.
@@ -156,6 +157,59 @@ template <class T>
 class csArrayElementHandler
 {
 public:
+  /// Construct an element
+  static void Construct (T* address)
+  {
+    new (static_cast<void*> (address)) T();
+  }
+
+  /// Copy-construct an element
+  static void Construct (T* address, T const& src)
+  {
+    new (static_cast<void*> (address)) T(src);
+  }
+
+  /// Destroy an element
+  static void Destroy (T* address)
+  {
+    address->~T();
+  }
+
+  /// Construct a number of elements
+  static void InitRegion (T* address, size_t count)
+  {
+    for (size_t i = 0 ; i < count ; i++)
+      Construct (address + i);
+  }
+  
+  /// Reallocates a region allocated by \p Allocator.
+  template<typename Allocator>
+  static T* ResizeRegion (Allocator& alloc, T* mem, size_t relevantcount, 
+    size_t oldcount, size_t newcount)
+  {
+    (void)relevantcount; (void)oldcount;
+    return (T*)alloc.Realloc (mem, newcount * sizeof(T));
+  }
+
+  /// Move elements inside a region.
+  static void MoveElements (T* mem, size_t dest, size_t src, size_t count)
+  {
+    memmove (mem + dest, mem + src, count * sizeof(T));
+  }
+};
+
+/**
+ * Special element handler for csArray that makes sure that when
+ * the array is reallocated that the objects are properly constructed
+ * and destructed at their new position. This is needed for objects
+ * that can not be safely moved around in memory (like weak references).
+ * This is of course slower and that is the reason that this is not
+ * done by default.
+ */
+template <class T>
+class csArraySafeCopyElementHandler
+{
+public:
   static void Construct (T* address)
   {
     new (static_cast<void*> (address)) T();
@@ -176,163 +230,49 @@ public:
     for (size_t i = 0 ; i < count ; i++)
       Construct (address + i);
   }
-};
-
-/**
- * The default allocator for csArray. Uses malloc/free/realloc.
- */
-template <class T>
-class csArrayMemoryAllocator
-{
-public:
-  static T* Alloc (size_t count)
-  {
-    return (T*)malloc (count * sizeof(T));
-  }
-
-  static void Free (T* mem)
-  {
-    free (mem);
-  }
-
-  // The 'relevantcount' parameter should be the number of items
-  // in the old array that are initialized.
-  static T* Realloc (T* mem, size_t relevantcount, size_t oldcount,
-    size_t newcount)
-  {
-    (void)relevantcount; (void)oldcount;
-    return (T*)realloc (mem, newcount * sizeof(T));
-  }
-
-  // Move memory.
-  static void MemMove (T* mem, size_t dest, size_t src, size_t count)
-  {
-    memmove (mem + dest, mem + src, count * sizeof(T));
-  }
-};
-
-/**
- * A csArray allocator with a small local buffer.
- * If the array data fits into the local buffer (which is set up to holds 
- * \c N elements of type \c T), a memory allocation from the heap is saved.
- * Thus, if you have lots of arrays with a relatively small, well known size
- * you can gain some performance by using this allocator.
- * \remarks If you nest an array with that allocator into another array,
- *  you MUST use csSafeCopyArrayMemoryAllocator for the nesting array!
- */
-template<typename T, int N>
-class csArrayLocalBufferAllocator
-{
-  static const size_t localSize = N * sizeof (T);
-  uint8 localBuf[localSize];
-public:
-  T* Alloc (size_t count)
-  {
-    const size_t allocSize = count * sizeof (T);
-    if (allocSize <= localSize)
-      return (T*)localBuf;
-    else
-      return (T*)malloc (allocSize);
-  }
-
-  void Free (T* mem)
-  {
-    if (mem != (T*)localBuf) free (mem);
-  }
-
-  // The 'relevantcount' parameter should be the number of items
-  // in the old array that are initialized.
-  T* Realloc (T* mem, size_t relevantcount, size_t oldcount,
-    size_t newcount)
-  {
-    const size_t oldAllocSize = oldcount * sizeof (T);
-    const size_t newAllocSize = newcount * sizeof (T);
-    if ((oldAllocSize <= localSize)
-      && (newAllocSize <= localSize))
-    {
-      CS_ASSERT (mem == (T*)localBuf);
-      return mem;
-    }
-    if (newAllocSize <= localSize)
-    {
-      const size_t relevantSize = relevantcount * sizeof (T);
-      memcpy (localBuf, mem, relevantSize);
-      free (mem);
-      return (T*)localBuf;
-    }
-    else if (oldAllocSize <= localSize)
-    {
-      const size_t relevantSize = relevantcount * sizeof (T);
-      mem = (T*)malloc (newAllocSize);
-      memcpy (mem, localBuf, relevantSize);
-      return mem;
-    }
-    else
-    {
-      return (T*)realloc (mem, newAllocSize);
-    }
-  }
-
-  // Move memory.
-  void MemMove (T* mem, size_t dest, size_t src, size_t count)
-  {
-    memmove (mem + dest, mem + src, count * sizeof(T));
-  }
-};
-
-/**
- * Special allocator for csArray that makes sure that when
- * the array is reallocated that the objects are properly constructed
- * and destructed at their new position. This is needed for objects
- * that can not be safely moved around in memory (like weak references).
- * This is of course slower and that is the reason that this is not
- * done by default.
- */
-template <class T, class ElementHandler = csArrayElementHandler<T> >
-class csSafeCopyArrayMemoryAllocator
-{
-public:
-  static T* Alloc (size_t count)
-  {
-    return (T*)malloc (count * sizeof(T));
-  }
-
-  static void Free (T* mem)
-  {
-    free (mem);
-  }
-
-  static T* Realloc (T* mem, size_t relevantcount, size_t oldcount,
-    size_t newcount)
+  
+  /**
+   * Reallocates a region allocated by \p Allocator. Ensure that all elements
+   * are properly moved, ie they are copy-constructed at the new position 
+   * in memory, the old instance is then destroyed.
+   */
+  template<typename Allocator>
+  static T* ResizeRegion (Allocator& alloc, T* mem, size_t relevantcount, 
+    size_t oldcount, size_t newcount)
   {
     if (newcount <= oldcount)
     {
       // Realloc is safe.
-      T* newmem = (T*)realloc (mem, newcount * sizeof (T));
+      T* newmem = (T*)alloc.Realloc (mem, newcount * sizeof (T));
       CS_ASSERT (newmem == mem);
       return newmem;
     }
 
-    T* newmem = Alloc (newcount);
+    T* newmem = (T*)alloc.Alloc (newcount * sizeof (T));
     size_t i;
     for (i = 0 ; i < relevantcount ; i++)
     {
-      ElementHandler::Construct (newmem + i, mem[i]);
-      ElementHandler::Destroy (mem + i);
+      Construct (newmem + i, mem[i]);
+      Destroy (mem + i);
     }
-    Free (mem);
+    alloc.Free (mem);
     return newmem;
   }
 
-  static void MemMove (T* mem, size_t dest, size_t src, size_t count)
+  /**
+   * Move elements inside a region. Ensure that all elements
+   * are properly moved, ie they are copy-constructed at the new position 
+   * in memory, the old instance is then destroyed.
+   */
+  static void MoveElements (T* mem, size_t dest, size_t src, size_t count)
   {
     size_t i;
     if (dest < src)
     {
       for (i = 0 ; i < count ; i++)
       {
-        ElementHandler::Construct (mem + dest + i, mem[src + i]);
-	ElementHandler::Destroy (mem + src + i);
+        Construct (mem + dest + i, mem[src + i]);
+	Destroy (mem + src + i);
       }
     }
     else
@@ -341,12 +281,13 @@ public:
       while (i > 0)
       {
 	i--;
-        ElementHandler::Construct (mem + dest + i, mem[src + i]);
-	ElementHandler::Destroy (mem + src + i);
+        Construct (mem + dest + i, mem[src + i]);
+	Destroy (mem + src + i);
       }
     }
   }
 };
+
 
 /**
  * csArray variable threshold for capacity handlers.
@@ -442,7 +383,7 @@ const size_t csArrayItemNotFound = (size_t)-1;
  */
 template <class T,
 	class ElementHandler = csArrayElementHandler<T>,
-	class MemoryAllocator = csArrayMemoryAllocator<T>,
+        class MemoryAllocator = CS::Memory::AllocatorMalloc,
         class CapacityHandler = csArrayCapacityLinear<csArrayThresholdVariable> >
 class csArray
 {
@@ -466,34 +407,7 @@ private:
     }
   };
   ArrayCapacity capacity;
-  /**
-   * Class to eliminate overhead from possibly empty MemoryAllocator.
-   * See http://www.cantrip.org/emptyopt.html for details.
-   */
-  struct RootWrapper : public MemoryAllocator
-  {
-    T* p;
-    RootWrapper () {}
-    RootWrapper (T* const p) : p(p) {}
-  };
-  RootWrapper root;
-#ifdef CS_MEMORY_TRACKER
-  csMemTrackerInfo* mti;
-  void UpdateMti (int dn, int curcapacity)
-  {
-    if (!mti)
-    {
-      if (!curcapacity) return;
-      mti = mtiRegisterAlloc (1 * sizeof (T), (void*)typeid (*this).name());
-      if (!mti) return;
-      curcapacity--;
-      if (curcapacity)
-        mtiUpdateAmount (mti, curcapacity, curcapacity * sizeof (T));
-      return;
-    }
-    mtiUpdateAmount (mti, dn, dn * sizeof (T));
-  }
-#endif
+  CS::Memory::AllocatorPointerWrapper<T, MemoryAllocator> root;
 
 protected:
   /**
@@ -520,17 +434,11 @@ private:
   {
     if (root.p == 0)
     {
-      root.p = root.Alloc (n);
-#ifdef CS_MEMORY_TRACKER
-      UpdateMti (int (n), int (n));
-#endif
+      root.p = (T*)root.Alloc (n * sizeof (T));
     }
     else
     {
-      root.p = root.Realloc (root.p, count, capacity.c, n);
-#ifdef CS_MEMORY_TRACKER
-      UpdateMti (int (n-capacity.c), int (n));
-#endif
+      root.p = ElementHandler::ResizeRegion (root, root.p, count, capacity.c, n);
     }
     capacity.c = n;
   }
@@ -587,14 +495,11 @@ public:
     capacity (in_capacity, ch)
   {
 #ifdef CS_MEMORY_TRACKER
-    mti = 0;
+    root.SetMemTrackerInfo (typeid(*this).name());
 #endif
     if (capacity.c != 0)
     {
-      root.p = root.Alloc (capacity.c);
-#ifdef CS_MEMORY_TRACKER
-      UpdateMti (int (capacity.c), int (capacity.c));
-#endif
+      root.p = (T*)root.Alloc (capacity.c * sizeof (T));
     }
     else
     {
@@ -612,7 +517,7 @@ public:
   csArray (const csArray& source) : count (0), capacity (0), root (0)
   {
 #ifdef CS_MEMORY_TRACKER
-    mti = 0;
+    root.SetMemTrackerInfo (typeid(*this).name());
 #endif
     CopyFrom (source);
   }
@@ -656,19 +561,16 @@ public:
    * other array will have all items that originally were in this array.
    * This operation is very efficient.
    */
+  // @@@ FIXME: What about custom allocators?
   void TransferTo (csArray& destination)
   {
     if (&destination != this)
     {
       destination.DeleteAll ();
-      destination.root = root;
+      destination.root.p = root.p;
       destination.count = count;
       destination.capacity = capacity;
-#ifdef CS_MEMORY_TRACKER
-      destination.mti = mti;
-      mti = 0;
-#endif
-      root = 0;
+      root.p = 0;
       capacity.c = count = 0;
     }
   }
@@ -859,7 +761,7 @@ public:
       SetSizeUnsafe (count + 1); // Increments 'count' as a side-effect.
       size_t const nmove = (count - n - 1);
       if (nmove > 0)
-	root.MemMove (root.p, n+1, n, nmove);
+        ElementHandler::MoveElements (root.p, n+1, n, nmove);
       ElementHandler::Construct (root.p + n, item);
       return true;
     }
@@ -997,9 +899,6 @@ public:
       for (i = 0 ; i < count ; i++)
         ElementHandler::Destroy (root.p + i);
       root.Free (root.p);
-#     ifdef CS_MEMORY_TRACKER
-      UpdateMti (-int (capacity.c), 0);
-#     endif
       root.p = 0;
       capacity.c = count = 0;
     }
@@ -1086,10 +985,7 @@ public:
     }
     else if (count != capacity.c)
     {
-      root.p = root.Realloc (root.p, count, capacity.c, count);
-#ifdef CS_MEMORY_TRACKER
-      UpdateMti (int (count-capacity.c), int (count));
-#endif
+      root.p = ElementHandler::ResizeRegion (root, root.p, count, capacity.c, count);
       capacity.c = count;
     }
   }
@@ -1110,7 +1006,7 @@ public:
       size_t const nmove = ncount - n;
       ElementHandler::Destroy (root.p + n);
       if (nmove > 0)
-	root.MemMove (root.p, n, n+1, nmove);
+        ElementHandler::MoveElements (root.p, n, n+1, nmove);
       SetSizeUnsafe (ncount);
       return true;
     }
@@ -1135,7 +1031,7 @@ public:
       size_t const nmove = ncount - n;
       ElementHandler::Destroy (root.p + n);
       if (nmove > 0)
-        root.MemMove (root.p, n, ncount, 1);
+        ElementHandler::MoveElements (root.p, n, ncount, 1);
       SetSizeUnsafe (ncount);
       return true;
     }
@@ -1164,7 +1060,7 @@ public:
     size_t const ncount = count - range_size;
     size_t const nmove = count - end - 1;
     if (nmove > 0)
-      root.MemMove (root.p, start, start + range_size, nmove);
+      ElementHandler::MoveElements (root.p, start, start + range_size, nmove);
     SetSizeUnsafe (ncount);
     return true;
   }
@@ -1297,8 +1193,7 @@ public:
 template <class T>
 class csSafeCopyArray
 	: public csArray<T,
-		csArrayElementHandler<T>,
-		csSafeCopyArrayMemoryAllocator<T> >
+		csArraySafeCopyElementHandler<T> >
 {
 public:
   /**
@@ -1306,8 +1201,7 @@ public:
    * storage by \c threshold each time the upper bound is exceeded.
    */
   csSafeCopyArray (size_t limit = 0, size_t threshold = 0)
-  	: csArray<T, csArrayElementHandler<T>,
-		     csSafeCopyArrayMemoryAllocator<T> > (limit, threshold)
+  	: csArray<T, csArraySafeCopyElementHandler<T> > (limit, threshold)
   {
   }
 };
