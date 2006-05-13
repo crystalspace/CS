@@ -6,6 +6,8 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+12-May-2006
+	- Adam implemented an (incomplete) unit test for csPartialOrder.
 8-May-2006
 	- Jorrit restored the genmesh version of terrainf since that one
 	  works better.
