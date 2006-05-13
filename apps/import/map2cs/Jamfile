@@ -1,9 +1,0 @@
-SubDir TOP apps import map2cs ;
-
-Description map2cs : "Quake map conversion tool" ;
-
-Application map2cs
-	: [ Wildcard *.cpp *.h ]
-	: console
-;
-LinkWith map2cs : crystalspace ;
