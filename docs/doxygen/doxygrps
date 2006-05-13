@@ -170,6 +170,10 @@
 	 * \defgroup util_containers Containers
 	 */
 	 
+	/**
+	 * \defgroup util_memory Memory Management
+	 */
+	 
 /** @} */ 
  
 /**
