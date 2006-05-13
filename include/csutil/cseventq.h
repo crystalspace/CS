@@ -71,6 +71,7 @@ class CS_CRYSTALSPACE_EXPORT csEventQueue :
   friend class csEventOutlet;
   friend class csPoolEvent;
   friend class csEventTree;
+  friend class csEventQueueTest;
 
 private:
   // Shared-object registry
