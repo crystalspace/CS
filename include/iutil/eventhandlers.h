@@ -57,7 +57,7 @@ struct iEventHandler;
  */
 struct iEventHandlerRegistry : public virtual iBase
 {
-  SCF_INTERFACE(iEventHandlerRegistry, 1, 1, 0);
+  SCF_INTERFACE(iEventHandlerRegistry, 1, 1, 1);
 
   /**
    * Get a csHandlerID based upon some string.
@@ -72,6 +72,13 @@ struct iEventHandlerRegistry : public virtual iBase
    * its own name via the iEventHandler::GetInstanceName() method.
    */
   virtual csHandlerID GetID (iEventHandler *) = 0;
+  /**
+   * Get the csHandlerID for an arbitrary handler name.  Does not set
+   * up any mappings, implicit names, or anything else that you need;
+   * should only be used internally by other CS libraries when you KNOW 
+   * these aren't needed.
+   */
+  virtual csHandlerID GetID (csString &) = 0;
   /**
    * Used when an iEventHandler is desroyed to remove our reference.
    */

@@ -97,6 +97,11 @@ csHandlerID csEventHandlerRegistry::GetID (iEventHandler *handler)
   return res;
 }
 
+csHandlerID csEventHandlerRegistry::GetID (csString &name)
+{
+  return names.Request (name);
+}
+
 void csEventHandlerRegistry::ReleaseID (csHandlerID id)
 {
   CS_ASSERT (IsInstance (id));

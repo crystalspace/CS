@@ -16,6 +16,9 @@ chronological order.
 	  As a collateral, moved some functionality from the array memory
 	  handler to the array element handler which more correctly belong
 	  to the latter.
+	- Adam updated the signpost event handlers to force full order even
+	  when they are only partially instantiated.  Also added by-name 
+          GetID interface to iEventHandlerRegistry.
 12-May-2006
 	- Adam implemented an (incomplete) unit test for csPartialOrder.
 9-May-2006
