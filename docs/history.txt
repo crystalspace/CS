@@ -22,6 +22,7 @@ chronological order.
 	- Adam added a method to csPartialOrder to query an edge's presence.
 	- Adam added code to enforce ":pre"-then-":post" metahandler ordering
 	  and cleaned up some debug output blocks.
+	- Adam implemented an (incomplete) unit test for csEventQueue.
 12-May-2006
 	- Adam implemented an (incomplete) unit test for csPartialOrder.
 9-May-2006
