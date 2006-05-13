@@ -911,7 +911,7 @@
 <zuse/>
 <params>
 <material>branch</material>
-<numvt>32</numvt>
+<numvt>16</numvt>
 <numtri>16</numtri>
 <v x="-2.132992" y="2.514157" z="0.350635" u="1.000000" v="-1.000000"/>
 <n x="0.599738" y="0.580474" z="0.550786"/>

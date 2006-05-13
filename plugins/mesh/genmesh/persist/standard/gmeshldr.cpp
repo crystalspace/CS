@@ -400,6 +400,8 @@ csPtr<iBase> csGeneralFactoryLoader::Parse (iDocumentNode* node,
 	  if (!synldr->ParseBox (child, box))
 	    return 0;
 	  state->GenerateBox (box);
+	  num_vt = state->GetVertexCount ();
+	  num_tri = state->GetTriangleCount ();
 	}
         break;
       case XMLTOKEN_SPHERE:
@@ -442,6 +444,8 @@ csPtr<iBase> csGeneralFactoryLoader::Parse (iDocumentNode* node,
   	    return 0;
 	  state->GenerateSphere (ellips, rim_vertices,
 	      cylmapping, toponly, reversed);
+	  num_vt = state->GetVertexCount ();
+	  num_tri = state->GetTriangleCount ();
 	}
         break;
       case XMLTOKEN_AUTONORMALS:
@@ -665,6 +669,25 @@ csPtr<iBase> csGeneralFactoryLoader::Parse (iDocumentNode* node,
 	return 0;
     }
   }
+
+  if (num_vt_given)
+    if (num_vt != state->GetVertexCount ())
+    {
+      synldr->ReportError (
+		"crystalspace.genmeshfactoryloader.parse", node,
+		"Number of vertices (%d) doesn't match real number (%d)!",
+		num_vt, state->GetVertexCount ());
+      return 0;
+    }
+  if (num_tri_given)
+    if (num_tri != state->GetTriangleCount ())
+    {
+      synldr->ReportError (
+		"crystalspace.genmeshfactoryloader.parse", node,
+		"Number of triangles (%d) doesn't match real number (%d)!",
+		num_tri, state->GetTriangleCount ());
+      return 0;
+    }
 
   if (compress)
     state->Compress ();

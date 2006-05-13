@@ -358,8 +358,12 @@ public:
   virtual iObjectModel* GetObjectModel () { return &scfiObjectModel; }
   virtual bool SetColor (const csColor&) { return false; }
   virtual bool GetColor (csColor&) const { return false; }
-  virtual bool SetMaterialWrapper (iMaterialWrapper*) { return false; }
-  virtual iMaterialWrapper* GetMaterialWrapper () const { return 0; }
+  virtual bool SetMaterialWrapper (iMaterialWrapper* mat)
+  {
+    material = mat;
+    return true;
+  }
+  virtual iMaterialWrapper* GetMaterialWrapper () const { return material; }
   virtual void SetMixMode (uint mode) { MixMode = mode; }
   virtual uint GetMixMode () const { return MixMode; }
   virtual void InvalidateMaterialHandles () { }

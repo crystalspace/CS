@@ -8,6 +8,24 @@ chronological order.
 
 12-May-2006
 	- Adam implemented an (incomplete) unit test for csPartialOrder.
+9-May-2006
+	- Jorrit fixed a bug in walktest with the 'doSave' variable.
+	  First the 'doSave' variable was not initialized. Secondly
+	  in the function that reads the config and commandline a local
+	  'doSave' variable was used so that the real 'doSave' was
+	  never set.
+	- Jorrit changed the genmesh loader so that it now tests if
+	  the number of vertices and triangles given matches the actual
+	  number of vertices and triangles. This test shows that
+	  blender2crystal occasionally doubles the number of vertices
+	  in <numvt> without actually giving that many vertices.
+	- Jorrit fixed the genmeshes in terrainf so that the number
+	  of vertices is correct.
+	- Jorrit fixed the haze mesh so that the
+	  iMeshObject->SetMaterialWrapper() now works correctly. This
+	  fixes a problem in partsys level.
+	- Jorrit fixed instmesh in a similar way as a recent genmesh
+	  fix with relation to GetFactory() from the mesh object.
 8-May-2006
 	- Jorrit restored the genmesh version of terrainf since that one
 	  works better.

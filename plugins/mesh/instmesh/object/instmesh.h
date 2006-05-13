@@ -272,10 +272,7 @@ public:
   void DisconnectAllLights ();
 
   //----------------------- iMeshObject implementation ----------------------
-  virtual iMeshObjectFactory* GetFactory () const
-  {
-    return (iMeshObjectFactory*)factory;
-  }
+  virtual iMeshObjectFactory* GetFactory () const;
   virtual csFlags& GetFlags () { return flags; }
   virtual csPtr<iMeshObject> Clone () { return 0; }
   virtual csRenderMesh** GetRenderMeshes (int &n, iRenderView* rview, 

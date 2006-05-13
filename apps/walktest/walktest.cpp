@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998-2005 by Jorrit Tyberghein
+    Copyright (C) 1998-2006 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -119,6 +119,7 @@ WalkTest::WalkTest () :
   first_map = last_map = 0;
   num_maps = 0;
   cache_map = 0;
+  doSave = false;
 }
 
 WalkTest::~WalkTest ()
@@ -230,8 +231,7 @@ void WalkTest::SetDefaults ()
     Report (CS_REPORTER_SEVERITY_NOTIFY, "Logo disabled.");
   }
 
-  bool doSave = Config->GetBool ("Walktest.Settings.EnableEngineSaving", 
-    false);
+  doSave = Config->GetBool ("Walktest.Settings.EnableEngineSaving", doSave);
   doSave = cmdline->GetBoolOption ("saveable", doSave);
   Report (CS_REPORTER_SEVERITY_NOTIFY, "World saving %s.", 
     doSave ? "enabled" : "disabled");

@@ -84,17 +84,17 @@
     </material>
     <material name="Marble">
       <texture>andrew_marble4.jpg</texture>
-      <shadervar name="texture scale" type="vector2">16,16</shadervar>
+      <shadervar name="texture scale" type="vector2">32,32</shadervar>
       <shader type="terrain splat">terrain_fixed_splatting</shader>
     </material>
     <material name="Stone">
       <texture>stone4.gif</texture>
-      <shadervar name="texture scale" type="vector2">16,16</shadervar>
+      <shadervar name="texture scale" type="vector2">128,128</shadervar>
       <shader type="terrain splat">terrain_fixed_splatting</shader>
     </material>
     <material name="Grass">
       <texture>grass.png</texture>
-      <shadervar name="texture scale" type="vector2">16,16</shadervar>
+      <shadervar name="texture scale" type="vector2">256,256</shadervar>
       <shader type="terrain splat">terrain_fixed_splatting</shader>
     </material>
     <material name="box1">

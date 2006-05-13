@@ -187,6 +187,11 @@ void csInstmeshMeshObject::CalculateInstanceArrays ()
   }
 }
 
+iMeshObjectFactory* csInstmeshMeshObject::GetFactory () const
+{
+  return (iMeshObjectFactory*)factory;
+}
+
 size_t csInstmeshMeshObject::AddInstance (const csReversibleTransform& trans)
 {
   csInstance inst;
