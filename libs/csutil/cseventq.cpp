@@ -34,6 +34,9 @@
 #include "csutil/eventnames.h"
 #include "csutil/eventhandlers.h"
 
+#ifdef ADB_DEBUG
+#include <iostream>
+#endif
 
 csEventQueue::csEventQueue (iObjectRegistry* r, size_t iLength) : 
   scfImplementationType (this),

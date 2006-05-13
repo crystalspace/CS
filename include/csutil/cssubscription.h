@@ -119,9 +119,6 @@ private:
   ~csEventTree ();
   
   csEventID self;
-#ifdef CS_DEBUG
-  csString *self_name;
-#endif
   csEventQueue *queue;
   
   bool SubscribeInternal (csHandlerID, csEventID);
@@ -349,6 +346,7 @@ private:
     
   private:
     friend class csEventTree;
+    friend class csEventQueueTest;
 
     csRef<iEventHandlerRegistry> handler_reg;
     FatRecordObject *record;
@@ -363,7 +361,8 @@ private:
     csList<iEventHandler *>::Iterator qit;
   };
   friend class SubscriberIterator;
-  
+  friend class csEventQueueTest;
+
   /**
    * Return a csEventTree::SubscriberIterator for all subscribers
    * to this event name (and to its parents).

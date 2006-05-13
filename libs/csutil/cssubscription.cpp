@@ -26,10 +26,9 @@
 #include "csutil/partialorder.h"
 #include "ivaria/reporter.h"
 
-#ifdef ADB_DEBUG /* debugging output... */
+#ifdef ADB_DEBUG
 #include <iostream>
 #endif
-
 
 csEventTree::csEventTree (csRef<iEventHandlerRegistry> &h_reg,
 			  csRef<iEventNameRegistry> &n_reg, 
@@ -39,9 +38,6 @@ csEventTree::csEventTree (csRef<iEventHandlerRegistry> &h_reg,
   self (name), queue (q)
 {
   CS_ASSERT(name != CS_EVENT_INVALID);
-#ifdef CS_DEBUG
-  self_name = new csString(n_reg->GetString(name));
-#endif
   if (parent) 
   {
     fatRecord = ((csEventTree *)parent)->fatRecord; // I wish csEventTree was polymorphic.
@@ -62,9 +58,6 @@ csEventTree::~csEventTree()
 {
   queue->EventHash.DeleteAll(self);
   if (fatNode) delete fatRecord;
-#ifdef CS_DEBUG
-  delete self_name;
-#endif
 }
 
 /**
@@ -277,24 +270,49 @@ csPartialOrder<csHandlerID> *csEventTree::FatRecordObject::SubscribeInternal(
 		* is already ruled out by conflicting generic constraints. */
 
 #ifdef ADB_DEBUG
-  NewSubscriberGraph->Dump ();
+  std::cerr << "About to add to graph:" << std::endl;
 #endif
-  
+
   CS_ASSERT (postBound != CS_HANDLER_INVALID);
   NewSubscriberGraph->Add (postBound);
   if (!NewSubscriberGraph->AddOrder (id, postBound))
     goto fail; /* Ditto */
 
-#ifdef ADB_DEBUG  
-  NewSubscriberGraph->Dump ();
-#endif
+  // Make sure every ":pre" or ":post" that was implicitly created has a 
+  // "pre -> post" rule as well.
+  for (size_t i=0 ; i<NewSubscriberGraph->Size() ; i++)
+  {
+    csHandlerID Idx = NewSubscriberGraph->GetByIndex (i);
+    csString HandlerName = handler_reg->GetString(Idx);
+    if (HandlerName.Find(":pre") != (size_t)-1)
+    {
+      HandlerName.ReplaceAll (":pre", ":post");
+      csHandlerID PostIdx = handler_reg->GetID(HandlerName);
+      NewSubscriberGraph->Add (PostIdx); // Makes sure it's present
+      if (!NewSubscriberGraph->Contains (Idx, PostIdx)) {
+	NewSubscriberGraph->AddOrder (Idx, PostIdx);
+      }
+    }
+    else if (HandlerName.Find(":post") != (size_t)-1)
+    {
+      HandlerName.ReplaceAll (":post", ":pre");
+      csHandlerID PreIdx = handler_reg->GetID(HandlerName);
+      NewSubscriberGraph->Add (PreIdx); // Makes sure it's present
+      if (!NewSubscriberGraph->Contains (PreIdx, Idx)) {
+	NewSubscriberGraph->AddOrder (PreIdx, Idx);
+      }
+    }
+  }
+
+  if (!NewSubscriberGraph->AddOrder(preBound, postBound))
+    goto fail;
 
   /* If this is an in-delivery event name, then if the event is
-     still eligible to execute (subject to all constraints) then
+     still eligible to execute (subject to all constraints) 
      we will let it, otherwise we mark it, so it will not get 
      executed until a new instance of the event gets dispatched. 
      Note that this is not deterministic unless your order is
-     specifically with request to the currentl in-service handler,
+     specifically with request to the currently in-service handler,
      since PO solutions are not fully deterministic. */
   if ((iterator) && (NewSubscriberGraph->IsMarked (postBound)))
     NewSubscriberGraph->Mark (id);
@@ -317,13 +335,10 @@ csPartialOrder<csHandlerID> *csEventTree::FatRecordObject::SubscribeInternal(
 	{
 	  prec = handler_reg->GetGenericPostBoundID (prec);
 	}
+
 	NewSubscriberGraph->Add (prec);
 	if (!NewSubscriberGraph->AddOrder (prec, id))
 	  goto fail; /* This edge introduced a cycle */
-	
-#ifdef ADB_DEBUG      
-	NewSubscriberGraph->Dump ();
-#endif
       }
     }
   } while (0);
@@ -349,19 +364,22 @@ csPartialOrder<csHandlerID> *csEventTree::FatRecordObject::SubscribeInternal(
 	}
 	if (!NewSubscriberGraph->AddOrder (id, succ))
 	  goto fail; /* This edge introduced a cycle */
-	
-#ifdef ADB_DEBUG
-	NewSubscriberGraph->Dump ();
-#endif      
       }
     }
   } while (0);
   
+#ifdef ADB_DEBUG
+  std::cerr << "Done adding." << std::endl << std::endl << std::endl;
+#endif
+
   return NewSubscriberGraph;
   
  fail:
   if (NewSubscriberGraph)
     delete NewSubscriberGraph;
+#ifdef ADB_DEBUG
+  std::cerr << "Failing." << std::endl << std::endl << std::endl;
+#endif
   return 0;
 }
 
@@ -390,10 +408,6 @@ bool csEventTree::SubscribeInternal (csHandlerID id, csEventID baseevent)
     // Install new partial order
     *fatRecord->SubscriberGraph = *NewSubscriberGraph;
     delete NewSubscriberGraph;
-
-#ifdef ADB_DEBUG
-    fatRecord->SubscriberGraph->Dump();
-#endif
 
     fatRecord->StaleSubscriberQueue = true;
 
@@ -606,9 +620,8 @@ void csEventTree::SubscriberIterator::GraphMode()
 
 
 
-
-
 #ifdef ADB_DEBUG
+
 void Indent (int n)
 {
   for (int i=0 ; i<n ; i++)
@@ -657,5 +670,5 @@ void csEventTree::Dump (int depth)
     ((csEventTree *) children[i])->Dump(depth+1);
   }
 }
-#endif
 
+#endif
