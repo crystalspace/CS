@@ -45,8 +45,8 @@
  * The handler returns false, so it will not prevent any subsequent
  * csevFrame handlers being called.
  */
-class FrameBegin3DDraw
-: public scfImplementation1<FrameBegin3DDraw, iEventHandler>
+class CS_CRYSTALSPACE_EXPORT FrameBegin3DDraw :
+  public scfImplementation1<FrameBegin3DDraw, iEventHandler>
 {
  protected:
   iObjectRegistry *object_reg;
@@ -68,8 +68,8 @@ class FrameBegin3DDraw
  * when the constructor is called.  The constructor also subscribes the new 
  * instance to the event queue automatically.
  */
-class FramePrinter
-: public scfImplementation1<FramePrinter, iEventHandler>
+class CS_CRYSTALSPACE_EXPORT FramePrinter : 
+  public scfImplementation1<FramePrinter, iEventHandler>
 {
  protected:
   csRef<iGraphics3D> g3d;
@@ -80,5 +80,6 @@ class FramePrinter
   CS_EVENTHANDLER_PHASE_FRAME ("crystalspace.frame.printer")
 };
 
+/** @} */
 
-#endif
+#endif // __CSUTIL_COMMON_HANDLERS_H__

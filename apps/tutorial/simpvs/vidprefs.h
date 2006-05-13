@@ -47,7 +47,7 @@ struct iImageIO;
  * selection is made the renderer can be queried. To apply the new
  * setting, a restart of CS is required, though.
  */
-class CS_CRYSTALSPACE_EXPORT csVideoPreferences
+class csVideoPreferences
 {
 private:
   iObjectRegistry* object_reg;
