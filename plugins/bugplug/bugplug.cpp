@@ -200,9 +200,7 @@ bool csBugPlug::Initialize (iObjectRegistry *object_reg)
   if (q != 0)
   {
     csEventID esub[] = { 
-      PreProcess,   // this goes away...
-      PostProcess,  // this goes away...
-      FinalProcess, // this goes away...
+      PreProcess,   // TODO: this goes away (needs 2nd handler)
       Frame,        // this replaces the above!
       KeyboardEvent,
       MouseEvent,
@@ -1545,7 +1543,7 @@ static inline void BugplugBox (iGraphics2D* G2D,
   G2D->DrawLine (x, y+h, x, y, bordercolor);
 }
 
-bool csBugPlug::HandleEndFrame (iEvent& /*event*/)
+bool csBugPlug::HandleFrame (iEvent& /*event*/)
 {
   SetupPlugin ();
   if (!G3D) return false;
@@ -2407,8 +2405,8 @@ bool csBugPlug::HandleEvent (iEvent& event)
     return EatMouse (event);
   else if (event.Name == PreProcess)
     return HandleStartFrame (event);
-  else if (event.Name == PostProcess)
-    return HandleEndFrame (event);
+  else if (event.Name == Frame)
+    return HandleFrame (event);
   else if (event.Name == SystemOpen)
     return HandleSystemOpen (&event);
   else if (event.Name == SystemClose)
@@ -2418,19 +2416,18 @@ bool csBugPlug::HandleEvent (iEvent& event)
 }
 
 
-/* We want to handle frame events after these,
-   and input (key/mouse) events before them. */
+/* We want to handle frame event in the DEBUG phase,
+   and input (key/mouse) events before the renderer or printer */
 
 const csHandlerID * csBugPlug::EventHandler::GenericPrec(
 	csRef<iEventHandlerRegistry> &handler_reg,
 	csRef<iEventNameRegistry> &name_reg,
 	csEventID e) const
 {
-  static csHandlerID Constraints[3]; // TODO : this is not thread-safe/reentrant
+  static csHandlerID Constraints[2]; // TODO : this is not thread-safe/reentrant
 
-  Constraints[0] = handler_reg->GetGenericID("crystalspace.graphics3d");
-  Constraints[1] = handler_reg->GetGenericID("crystalspace.window");
-  Constraints[2] = CS_HANDLERLIST_END;
+  Constraints[0] = FrameSignpost_ConsoleDebug::StaticID (handler_reg);
+  Constraints[1] = CS_HANDLERLIST_END;
   
   if (name_reg->IsKindOf(e, csevFrame (name_reg)))
   {
@@ -2447,16 +2444,22 @@ const csHandlerID * csBugPlug::EventHandler::GenericSucc(
 	csRef<iEventNameRegistry> &name_reg,
 	csEventID e) const
 {
-  static csHandlerID Constraints[3]; // TODO : this is not thread-safe/reentrant
+  static csHandlerID Constraints[2][3]; // TODO : this is not thread-safe/reentrant
+  Constraints[0][0] = handler_reg->GetGenericID("crystalspace.graphics3d");
+  Constraints[0][1] = handler_reg->GetGenericID("crystalspace.window");
+  Constraints[0][2] = CS_HANDLERLIST_END;
 
-  Constraints[0] = handler_reg->GetGenericID("crystalspace.graphics3d");
-  Constraints[1] = handler_reg->GetGenericID("crystalspace.window");
-  Constraints[2] = CS_HANDLERLIST_END;
+  Constraints[1][0] = FrameSignpost_DebugFrame::StaticID (handler_reg);
+  Constraints[1][1] = CS_HANDLERLIST_END;
   
   if (name_reg->IsKindOf(e, csevKeyboardEvent (name_reg)) || 
       name_reg->IsKindOf(e, csevMouseEvent (name_reg)))
   {
-    return Constraints;
+    return Constraints[0];
+  }
+  else if (name_reg->IsKindOf(e, csevFrame (name_reg)))
+  {
+    return Constraints[1];
   }
   else
   {

@@ -378,7 +378,7 @@ private:
   /// Start of frame.
   bool HandleStartFrame (iEvent& event);
   /// End of frame.
-  bool HandleEndFrame (iEvent& event);
+  bool HandleFrame (iEvent& event);
   /// Open system.
   bool HandleSystemOpen (iEvent* event);
   /// Close system.
