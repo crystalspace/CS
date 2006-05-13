@@ -32,6 +32,7 @@
 #include "csutil/util.h"
 
 #ifdef ADB_DEBUG
+#include "csutil/eventhandlers.h"
 #include <iostream>
 #endif /* ADB_DEBUG */
 
@@ -87,6 +88,38 @@ public:
     return;
   }
 
+#ifdef ADB_DEBUG
+  // This code is particular to the csHandlerID scheduler.
+  void Dump (iObjectRegistry *objreg)
+  {
+    std::cerr << "Dumping PO Graph..." << std::endl;
+    for (size_t i=0 ; i<Nodes.Length() ; i++)
+    {
+      std::cerr << "  NODE: " << csEventHandlerRegistry::GetRegistry(objreg)->GetString(Nodes[i].self) << std::endl;
+      std::cerr << "    pre: ";
+      for (size_t j=0 ; j<Nodes[i].pre.Length() ; j++) 
+      {
+	std::cerr << csEventHandlerRegistry::GetRegistry(objreg)->GetString(Nodes[Nodes[i].pre[j]].self) << " ";
+      }
+      std::cerr << std::endl << "    post: ";
+      for (size_t j=0 ; j<Nodes[i].post.Length() ; j++)
+      {
+	std::cerr << csEventHandlerRegistry::GetRegistry(objreg)->GetString(Nodes[Nodes[i].post[j]].self) << " ";
+      }
+      std::cerr << std::endl;
+    }
+    std::cerr << "End PO Graph, printing a solution..." << std::endl;
+    csList<const T> Solution;
+    Solve (Solution);
+    while (!Solution.IsEmpty ())
+    {
+      std::cerr << csEventHandlerRegistry::GetRegistry(objreg)->GetString(Solution.Front()) << " ";
+      Solution.PopFront();
+    }
+    std::cerr << std::endl << "Done." << std::endl << std::endl;
+  }
+#endif /* ADB_DEBUG */
+
   /// Copy constructor
   csPartialOrder(const csPartialOrder *other)
     : Nodes (other->Nodes), NodeMap (other->NodeMap)
@@ -109,6 +142,23 @@ public:
   bool Contains (const T& node)
   {
     return (NodeMap.Get(node, csArrayItemNotFound) != csArrayItemNotFound);
+  }
+
+  /// Query an edge's presence.  Does not check for transitive connectivity.
+  bool Contains (const T& pre, const T& post)
+  {
+    if (!Contains (pre) || !Contains (post))
+      return false;
+    size_t PreIdx = NodeMap.Get (pre, csArrayItemNotFound);
+    size_t PostIdx = NodeMap.Get (post, csArrayItemNotFound);
+    for (size_t i=0 ; i<Nodes[PreIdx].post.Length() ; i++)
+    {
+      if (Nodes[PreIdx].post[i] == PostIdx)
+      {
+	return true;
+      }
+    }
+    return false;
   }
   
   /// Delete a node and all edges connected to it.
