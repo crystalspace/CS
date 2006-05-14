@@ -62,6 +62,9 @@
 #include "gl_txtmgr.h"
 #include "gl_r2t_ext_fb_o.h"
 
+#include "csplugincommon/opengl/glextmanager.h"
+
+
 
 #define BYTE_TO_FLOAT(x) ((x) * (1.0 / 255.0))
 
@@ -1552,7 +1555,111 @@ void csGLGraphics3D::SetWorldToCamera (const csReversibleTransform& w2c)
   statecache->SetMatrixMode (GL_MODELVIEW);
   glLoadMatrixf (m);
 }
+void csGLGraphics3D::DrawInstancesUseShader (
+  const csCoreRenderMesh* mymesh, const csRenderMeshModes& modes,
+  GLenum primitivetype, iRenderBuffer* iIndexbuf, void* bufData, 
+  GLenum compType, size_t indexCompsBytes)
+{
 
+  if (ext->glMultiTexCoord4fvARB)
+  {
+    size_t values_cnt = modes.instances_binds.GetSize ();
+    //loop through all instances
+    csHash<csInstance*>::GlobalIterator it = modes.instances.GetIterator ();
+    
+    while (it.HasNext ())
+    {
+      //loop through all parameters
+      csInstance* instance = it.Next ();
+      for (size_t i = 0; i < values_cnt; i++)
+      {
+        GLfloat glvector [4];
+        glvector[0] = instance->values[i].x;
+        glvector[1] = instance->values[i].y;
+        glvector[2] = instance->values[i].z;
+        glvector[3] = instance->values[i].w;
+        switch (modes.instances_binds[i])
+        {
+        case csVertexAttrib::CS_VATTRIB_TEXCOORD0:
+          ext->glMultiTexCoord4fvARB (GL_TEXTURE0, glvector);
+          break;
+        case csVertexAttrib::CS_VATTRIB_TEXCOORD1:
+          ext->glMultiTexCoord4fvARB (GL_TEXTURE1, glvector);
+          break;
+        case csVertexAttrib::CS_VATTRIB_TEXCOORD2:
+          ext->glMultiTexCoord4fvARB (GL_TEXTURE2, glvector);
+          break;
+        case csVertexAttrib::CS_VATTRIB_TEXCOORD3:
+          ext->glMultiTexCoord4fvARB (GL_TEXTURE3, glvector);
+          break;
+        case csVertexAttrib::CS_VATTRIB_TEXCOORD4:
+          ext->glMultiTexCoord4fvARB (GL_TEXTURE4, glvector);
+          break;
+        default:
+          break;
+        }
+      }
+
+      glDrawRangeElements (primitivetype, (GLuint)iIndexbuf->GetRangeStart(), 
+        (GLuint)iIndexbuf->GetRangeEnd(), mymesh->indexend - mymesh->indexstart,
+        compType, 
+        ((uint8*)bufData) + (indexCompsBytes * mymesh->indexstart));
+    }
+  }
+}
+void csGLGraphics3D::DrawInstancesNoShader (
+  const csCoreRenderMesh* mymesh, const csRenderMeshModes& modes,
+  GLenum primitivetype, iRenderBuffer* iIndexbuf, void* bufData, 
+  GLenum compType, size_t indexCompsBytes)
+{
+  bool using_transform = false;
+
+  //FIXME: it works only for for very specyfic setup
+  //loop through all instances
+  csHash<csInstance*>::GlobalIterator it = modes.instances.GetIterator ();
+  while (it.HasNext ())
+  {
+    //loop through all parameters
+    csInstance* instance = it.Next ();
+    if (instance->values.GetSize () != 4) continue;
+    for (size_t j = 0; j < instance->values.GetSize (); j++)
+    {
+      float matrix[16];
+      matrix[0] = instance->values[0].x;
+      matrix[1] = instance->values[0].y;
+      matrix[2] = instance->values[0].z;
+      matrix[3] = instance->values[0].w;
+
+      matrix[4] = instance->values[1].x;
+      matrix[5] = instance->values[1].y;
+      matrix[6] = instance->values[1].z;
+      matrix[7] = instance->values[1].w;
+
+      matrix[8] = instance->values[2].x;
+      matrix[9] = instance->values[2].y;
+      matrix[10] = instance->values[2].z;
+      matrix[11] = instance->values[2].w;
+
+      matrix[12] = instance->values[3].x;
+      matrix[13] = instance->values[3].y;
+      matrix[14] = instance->values[3].z;
+      matrix[15] = instance->values[3].w;
+
+      statecache->SetMatrixMode (GL_MODELVIEW);
+      glPushMatrix ();
+      glMultMatrixf (matrix);
+      using_transform  = true;
+    }
+
+    glDrawRangeElements (primitivetype, (GLuint)iIndexbuf->GetRangeStart(), 
+      (GLuint)iIndexbuf->GetRangeEnd(), mymesh->indexend - mymesh->indexstart,
+      compType, 
+      ((uint8*)bufData) + (indexCompsBytes * mymesh->indexstart));
+
+    if (using_transform)
+      glPopMatrix ();
+  }
+}
 void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
     const csRenderMeshModes& modes,
     const csArray<csShaderVariable*> &stacks)
@@ -1781,11 +1888,25 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
     if (mixmode & CS_FX_MASK_ALPHA)
       alpha = 1.0f - (float)(mixmode & CS_FX_MASK_ALPHA) / 255.0f;
     glColor4f (1.0f, 1.0f, 1.0f, alpha);
-    glDrawRangeElements (primitivetype, (GLuint)iIndexbuf->GetRangeStart(), 
-      (GLuint)iIndexbuf->GetRangeEnd(), mymesh->indexend - mymesh->indexstart,
-      compType, 
-      ((uint8*)bufData) + (indexCompsBytes * mymesh->indexstart));
-    //indexbuf->Release();
+
+    if (modes.instances.GetSize () > 0)
+    {
+      if (!modes.supports_pseudoinstancing)
+        DrawInstancesNoShader (mymesh, modes, primitivetype, iIndexbuf, bufData,
+        compType, indexCompsBytes);
+      else 
+        DrawInstancesUseShader (mymesh, modes, primitivetype, iIndexbuf, bufData,
+        compType, indexCompsBytes);
+
+      
+    }else
+    {
+      glDrawRangeElements (primitivetype, (GLuint)iIndexbuf->GetRangeStart(), 
+        (GLuint)iIndexbuf->GetRangeEnd(), mymesh->indexend - mymesh->indexstart,
+        compType, 
+        ((uint8*)bufData) + (indexCompsBytes * mymesh->indexstart));
+      //indexbuf->Release();
+    }
   }
 
   if (mymesh->meshtype == CS_MESHTYPE_POINT_SPRITES) 

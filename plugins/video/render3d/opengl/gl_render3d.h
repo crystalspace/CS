@@ -623,6 +623,17 @@ public:
   /// Do backbuffer printing
   void Print (csRect const* area);
 
+  /// Draws instances, not using shader.
+  void DrawInstancesNoShader (const csCoreRenderMesh* mymesh, 
+  const csRenderMeshModes& modes,
+  GLenum primitivetype, iRenderBuffer* iIndexbuf, void* bufData, 
+  GLenum compType, size_t indexCompsBytes);
+
+  void DrawInstancesUseShader (
+  const csCoreRenderMesh* mymesh, const csRenderMeshModes& modes,
+  GLenum primitivetype, iRenderBuffer* iIndexbuf, void* bufData, 
+  GLenum compType, size_t indexCompsBytes);
+
   /// Drawroutine. Only way to draw stuff
   void DrawMesh (const csCoreRenderMesh* mymesh,
     const csRenderMeshModes& modes,

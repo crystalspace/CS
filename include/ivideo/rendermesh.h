@@ -37,6 +37,12 @@
 struct iMaterialWrapper;
 struct iPortalContainer;
 
+struct csInstance
+{
+  size_t id;
+  csArray< csVector4 > values;
+};
+
 /**
  * Mesh render mode information. Contains the Z, mix and alpha modes to use
  * for rendering a mesh. 
@@ -69,6 +75,12 @@ struct csRenderMeshModes
 
   /// Holder of default render buffers
   csRef<csRenderBufferHolder> buffers;
+
+  bool supports_pseudoinstancing;
+
+  csHash< csInstance* > instances;
+
+  csArray<csVertexAttrib> instances_binds;
 };
 
 /**

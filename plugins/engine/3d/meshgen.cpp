@@ -34,6 +34,9 @@ csMeshGeneratorGeometry::csMeshGeneratorGeometry (
   default_material_factor = 0.0f;
   celldim = 0;
   positions = 0;
+  csRef<iStringSet> strings; /*= csQueryRegistryTagInterface<iStringSet> (object_reg,
+    "crystalspace.shared.stringset");*/
+  var_name = strings->Request ("transform");
 }
 csMeshGeneratorGeometry::~csMeshGeneratorGeometry ()
 {
@@ -146,6 +149,12 @@ void csMeshGeneratorGeometry::AddFactory (iMeshFactoryWrapper* factory,
   {
     int cell_dim = generator->GetCellCount ();
     factories[idx].instmeshes.SetLength (cell_dim * cell_dim);
+    for (size_t i = 0; i < cell_dim * cell_dim; i++)
+    {
+      csShaderVariable var (var_name);
+      var.SetValue (csReversibleTransform ());
+      factories[idx].instmeshes[i].instmesh_state->AddInstancesVariable (var);
+    }
   }
 
   if (maxdist > total_max_dist) total_max_dist = maxdist;
@@ -196,8 +205,7 @@ csPtr<iMeshWrapper> csMeshGeneratorGeometry::AllocMesh (
     if (geominst.inst_setaside.Length () > 0)
       instance_id = geominst.inst_setaside.Pop ();
     else
-      instance_id = geominst.instmesh_state->AddInstance (
-      csReversibleTransform ());
+      instance_id = geominst.instmesh_state->AddInstance ();
     geominst.instmesh->IncRef ();
     return (iMeshWrapper*)geominst.instmesh;
   }
@@ -237,7 +245,9 @@ void csMeshGeneratorGeometry::MoveMesh (int cidx, iMeshWrapper* mesh,
     csVector3 pos = position - meshpos;
     ////printf ("position=%g,%g,%g    meshpos=%g,%g,%g  ->  pos=%g,%g,%g\n", position.x, position.y, position.z, meshpos.x, meshpos.y, meshpos.z, pos.x, pos.y, pos.z); fflush (stdout);
     csReversibleTransform tr (matrix, pos);
-    geominst.instmesh_state->MoveInstance (instance_id, tr);
+    csShaderVariable var (var_name);
+    var.SetValue (tr);
+    geominst.instmesh_state->SetInstanceVariable (instance_id, var);
   }
 }
 

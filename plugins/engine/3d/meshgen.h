@@ -101,6 +101,7 @@ private:
   float radius;
   float density;
   float total_max_dist;
+  csStringID var_name;
 
   //density map
   csRef<iTerraFormer> density_map;

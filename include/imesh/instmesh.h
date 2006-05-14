@@ -102,7 +102,27 @@ struct iInstancingMeshState : public virtual iInstancingMeshCommonState
   /**
    * Add an instance. Returns an ID to identify that instance.
    */
-  virtual size_t AddInstance (const csReversibleTransform& trans) = 0;
+  virtual size_t AddInstance () = 0;
+
+  virtual size_t GetInstancesCount () = 0;
+
+  /**
+   * Add an instance parameter. Returns an ID to identify that parameter.
+   */
+  virtual size_t AddInstancesVariable (const csShaderVariable& parameter) = 0;
+
+  virtual const csShaderVariable& GetInstanceVariable (size_t instance_id, size_t variable_id) = 0;
+
+  virtual void SetInstanceVariable (size_t instance_id, csShaderVariable variable) = 0;
+
+  virtual void SetInstanceVariable (size_t instance_id, size_t variable_id, 
+    const csVector3 &variable) = 0;
+
+  virtual void SetAutomaticBoundingBoxCreation (bool flag) = 0;
+
+  virtual void SetBoundingBox (const csBox3& box) = 0;
+
+  virtual void SetupObject () = 0;
 
   /**
    * Remove an instance.
@@ -114,16 +134,6 @@ struct iInstancingMeshState : public virtual iInstancingMeshCommonState
    */
   virtual void RemoveAllInstances () = 0;
 
-  /**
-   * Move an instance.
-   */
-  virtual void MoveInstance (size_t id,
-      const csReversibleTransform& trans) = 0;
-
-  /**
-   * Get instance transform.
-   */
-  virtual const csReversibleTransform& GetInstanceTransform (size_t id) = 0;
 };
 
 class csSphere;
@@ -154,6 +164,14 @@ struct iInstancingFactoryState : public virtual iInstancingMeshCommonState
 {
   SCF_INTERFACE (iInstancingFactoryState, 1, 0, 0);
   
+  /// Set material of mesh.
+  virtual bool SetMaterialWrapper (iMaterialWrapper* material) = 0;
+  /// Get material of mesh.
+  virtual iMaterialWrapper* GetMaterialWrapper () const = 0;
+  /// Set mix mode.
+  virtual void SetMixMode (uint mode) = 0;
+  /// Get mix mode.
+  virtual uint GetMixMode () const = 0;
   /// Set the color to use. Will be added to the lighting values.
   virtual void SetColor (const csColor& col) = 0;
   /// Get the color.

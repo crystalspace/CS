@@ -71,10 +71,113 @@ static inline bool IsDestalphaMixmode (uint mode)
   return (mode == CS_FX_DESTALPHAADD);
 }
 
+bool csXMLShaderTech::ParseInstanceBinds (iDocumentNode *node, shaderPass *pass)
+{
+  if (!node) return true;
+
+  csRef<iDocumentNodeIterator> it = node->GetNodes (
+    xmltokens.Request (csXMLShaderCompiler::XMLTOKEN_INSTANCEPARAMETER));
+
+  iStringSet* strings = parent->compiler->strings;
+  csRef<csShaderVariable> instance_template = parent->GetVariable (
+    strings->Request ("instance_template"));
+  if (!instance_template) 
+  {
+    if (do_verbose)
+        SetFailReason ("can't find instances template");
+    return false;
+  }
+
+  pass->pseudo_instancing = true;
+
+  while (it->HasNext ())
+  {
+    csRef<iDocumentNode> ch_node = it->Next ();
+    csRef<iDocumentNode> src_node = ch_node->GetNode (xmltokens.Request (
+      csXMLShaderCompiler::XMLTOKEN_SOURCE));
+    
+    csStringID source_id = strings->Request (src_node->GetContentsValue ());
+    csRef<csShaderVariable> source_variable;
+    //check if we have such source
+    for (size_t i = 0; i < instance_template->GetArraySize (); i++)
+    {
+      if (instance_template->GetArrayElement (i)->GetName () == source_id)
+      {
+        source_variable = instance_template->GetArrayElement (i);
+        break;
+      }
+    }
+    if (!source_variable) continue;
+
+    size_t binds_cnt = 0;
+    switch (source_variable->GetType ())
+    {
+    case csShaderVariable::COLOR:
+    case csShaderVariable::VECTOR2:
+    case csShaderVariable::VECTOR3:
+    case csShaderVariable::VECTOR4:
+      binds_cnt = 1;
+      break;
+    case csShaderVariable::MATRIX:
+      binds_cnt = 3;
+      break;
+    case csShaderVariable::TRANSFORM:
+      binds_cnt = 4;
+      break;
+    default:
+      break;
+    }
+
+    csRef<iDocumentNodeIterator> dest_it = ch_node->GetNodes (
+      xmltokens.Request (csXMLShaderCompiler::XMLTOKEN_DESTINATION));
+
+    size_t first_id = pass->instances_binds.GetSize ();
+    for (size_t i = 0; i < binds_cnt; i++)
+      pass->instances_binds.Push (csVertexAttrib::CS_VATTRIB_TEXCOORD0);
+
+    size_t bind = 0;
+    while (dest_it->HasNext ())
+    {
+      if (bind >= binds_cnt) break;
+      size_t index = first_id + bind%binds_cnt;
+      bind++;
+      csRef<iDocumentNode> dest_nodes = dest_it->Next ();
+      switch (xmltokens.Request (dest_nodes->GetContentsValue ()))
+      {
+      case csXMLShaderCompiler::XMLTOKEN_TEXCOORD0:
+        pass->instances_binds[index] = csVertexAttrib::CS_VATTRIB_TEXCOORD0;
+        break;
+      case csXMLShaderCompiler::XMLTOKEN_TEXCOORD1:
+        pass->instances_binds[index] = csVertexAttrib::CS_VATTRIB_TEXCOORD1;
+        break;
+      case csXMLShaderCompiler::XMLTOKEN_TEXCOORD2:
+        pass->instances_binds[index] = csVertexAttrib::CS_VATTRIB_TEXCOORD2;
+        break;
+      case csXMLShaderCompiler::XMLTOKEN_TEXCOORD3:
+        pass->instances_binds[index] = csVertexAttrib::CS_VATTRIB_TEXCOORD3;
+        break;
+      case csXMLShaderCompiler::XMLTOKEN_TEXCOORD4:
+        pass->instances_binds[index] = csVertexAttrib::CS_VATTRIB_TEXCOORD4;
+        break;
+      default:
+        break;
+      }
+    }
+  }
+  return true;
+}
+
 bool csXMLShaderTech::LoadPass (iDocumentNode *node, shaderPass *pass)
 {
   iSyntaxService* synldr = parent->compiler->synldr;
   iStringSet* strings = parent->compiler->strings;
+
+  pass->pseudo_instancing = false;
+  //Load pseudo-instancing binds
+  csRef<iDocumentNode> pi_node = node->GetNode (
+    xmltokens.Request (csXMLShaderCompiler::XMLTOKEN_PSEUDOINSTANCING));
+  if (!ParseInstanceBinds (pi_node, pass))
+    return false;
 
   //Load shadervar block
   csRef<iDocumentNode> varNode = node->GetNode(
@@ -793,7 +896,16 @@ bool csXMLShaderTech::SetupPass (const csRenderMesh *mesh,
   if(thispass->vp) thispass->vp->SetupState (mesh, modes, stacks);
   if(thispass->fp) thispass->fp->SetupState (mesh, modes, stacks);
 
+  //pseudo instancing setup
+  SetupInstances (modes, thispass);
+
   return true;
+}
+
+void csXMLShaderTech::SetupInstances (csRenderMeshModes& modes, shaderPass *thispass)
+{
+  modes.supports_pseudoinstancing = thispass->pseudo_instancing;
+  modes.instances_binds = thispass->instances_binds;
 }
 
 bool csXMLShaderTech::TeardownPass ()

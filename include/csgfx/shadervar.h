@@ -397,6 +397,16 @@ public:
     return true;
   }
 
+  void AddVariableToArray (csShaderVariable *variable)
+  {
+    if (array) array->Push (variable);
+  }
+
+  void RemoveFromArray (size_t element)
+  {
+    if (array) array->DeleteIndex (element);
+  }
+
   /// Set the number of elements in an array variable
   void SetArraySize (size_t size)
   {
