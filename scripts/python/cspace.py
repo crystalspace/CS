@@ -2469,6 +2469,8 @@ class csShaderVariable(csRefCount):
     def GetName(*args): return _cspace.csShaderVariable_GetName(*args)
     def GetValue(*args): return _cspace.csShaderVariable_GetValue(*args)
     def SetValue(*args): return _cspace.csShaderVariable_SetValue(*args)
+    def AddVariableToArray(*args): return _cspace.csShaderVariable_AddVariableToArray(*args)
+    def RemoveFromArray(*args): return _cspace.csShaderVariable_RemoveFromArray(*args)
     def SetArraySize(*args): return _cspace.csShaderVariable_SetArraySize(*args)
     def GetArraySize(*args): return _cspace.csShaderVariable_GetArraySize(*args)
     def GetArrayElement(*args): return _cspace.csShaderVariable_GetArrayElement(*args)
