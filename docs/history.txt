@@ -7,6 +7,8 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 14-May-2006
+  - Philip Wyett added entries for Cal3D and lib3ds to external
+    libraries section of manual.
 	- Piotr Obrzut added support for pseudo instancing.
 	- Piotr Obrzut fixes compile warning/errors related to 
           pseudo-instancing.

@@ -135,13 +135,33 @@ you have to directly download this from
 @cindex Physics library
 
 Crystal Space contains a plugin providing physics through @sc{ode}. You can get
-the required latest @sc{cvs} code at:
+the required latest @sc{svn} code at:
 
 @noindent
 @uref{http://www.ode.org/}
 
 @emph{Note:} You @emph{must} compile @sc{ode} with @sc{opcode} support enabled
 in order to use the library with Crystal Space.
+
+@subheading Cal3D
+@cindex Cal3D
+@cindex Libraries, Cal3D
+
+Crystal Space supports skeletal animation using the Cal3D library. You
+can btain the required the @sc{cvs} code at:
+
+@noindent
+@uref{http://cal3d.sourceforge.net/}
+
+@subheading lib3ds
+@cindex lib3ds
+@cindex Libraries, lib3ds
+
+Crystal Space has support for the popular 3ds model format using the lib3ds
+library. It is recommended that you use the 1.2.0 release.
+
+@noindent
+@uref{http://lib3ds.sourceforge.net/}
 
 @subheading Ogg/Vorbis libraries
 @cindex Ogg/Vorbis
