@@ -117,7 +117,7 @@ public:
   /**
    * Construct a sector. This sector will be completely empty.
    */
-  csSector (csEngine*);
+  csSector (csEngine*, iObjectRegistry* object_reg);
 
   /**
    * Set single mesh. This is used to render only a single mesh out
@@ -426,6 +426,8 @@ private:
 
   /// Engine handle.
   csEngine* engine;
+
+  iObjectRegistry* object_reg;
 
   /// Optional renderloop.
   iRenderLoop* renderloop;

@@ -1580,19 +1580,19 @@ void csGLGraphics3D::DrawInstancesUseShader (
         glvector[3] = instance->values[i].w;
         switch (modes.instances_binds[i])
         {
-        case csVertexAttrib::CS_VATTRIB_TEXCOORD0:
+        case CS_VATTRIB_TEXCOORD0:
           ext->glMultiTexCoord4fvARB (GL_TEXTURE0, glvector);
           break;
-        case csVertexAttrib::CS_VATTRIB_TEXCOORD1:
+        case CS_VATTRIB_TEXCOORD1:
           ext->glMultiTexCoord4fvARB (GL_TEXTURE1, glvector);
           break;
-        case csVertexAttrib::CS_VATTRIB_TEXCOORD2:
+        case CS_VATTRIB_TEXCOORD2:
           ext->glMultiTexCoord4fvARB (GL_TEXTURE2, glvector);
           break;
-        case csVertexAttrib::CS_VATTRIB_TEXCOORD3:
+        case CS_VATTRIB_TEXCOORD3:
           ext->glMultiTexCoord4fvARB (GL_TEXTURE3, glvector);
           break;
-        case csVertexAttrib::CS_VATTRIB_TEXCOORD4:
+        case CS_VATTRIB_TEXCOORD4:
           ext->glMultiTexCoord4fvARB (GL_TEXTURE4, glvector);
           break;
         default:

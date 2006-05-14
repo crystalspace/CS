@@ -25,6 +25,7 @@
 #include "ivaria/reporter.h"
 #include "ivideo/rendermesh.h"
 #include "ivideo/material.h"
+#include "ivideo/graph3d.h"
 
 #include "csgfx/renderbuffer.h"
 
@@ -133,7 +134,7 @@ bool csXMLShaderTech::ParseInstanceBinds (iDocumentNode *node, shaderPass *pass)
 
     size_t first_id = pass->instances_binds.GetSize ();
     for (size_t i = 0; i < binds_cnt; i++)
-      pass->instances_binds.Push (csVertexAttrib::CS_VATTRIB_TEXCOORD0);
+      pass->instances_binds.Push (CS_VATTRIB_TEXCOORD0);
 
     size_t bind = 0;
     while (dest_it->HasNext ())
@@ -145,19 +146,19 @@ bool csXMLShaderTech::ParseInstanceBinds (iDocumentNode *node, shaderPass *pass)
       switch (xmltokens.Request (dest_nodes->GetContentsValue ()))
       {
       case csXMLShaderCompiler::XMLTOKEN_TEXCOORD0:
-        pass->instances_binds[index] = csVertexAttrib::CS_VATTRIB_TEXCOORD0;
+        pass->instances_binds[index] = CS_VATTRIB_TEXCOORD0;
         break;
       case csXMLShaderCompiler::XMLTOKEN_TEXCOORD1:
-        pass->instances_binds[index] = csVertexAttrib::CS_VATTRIB_TEXCOORD1;
+        pass->instances_binds[index] = CS_VATTRIB_TEXCOORD1;
         break;
       case csXMLShaderCompiler::XMLTOKEN_TEXCOORD2:
-        pass->instances_binds[index] = csVertexAttrib::CS_VATTRIB_TEXCOORD2;
+        pass->instances_binds[index] = CS_VATTRIB_TEXCOORD2;
         break;
       case csXMLShaderCompiler::XMLTOKEN_TEXCOORD3:
-        pass->instances_binds[index] = csVertexAttrib::CS_VATTRIB_TEXCOORD3;
+        pass->instances_binds[index] = CS_VATTRIB_TEXCOORD3;
         break;
       case csXMLShaderCompiler::XMLTOKEN_TEXCOORD4:
-        pass->instances_binds[index] = csVertexAttrib::CS_VATTRIB_TEXCOORD4;
+        pass->instances_binds[index] = CS_VATTRIB_TEXCOORD4;
         break;
       default:
         break;

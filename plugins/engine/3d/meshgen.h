@@ -351,6 +351,8 @@ private:
   float alpha_mindist, sq_alpha_mindist, alpha_maxdist;
   float alpha_scale;
 
+  iObjectRegistry* object_reg;
+
   csVector2 last_pos;
 
   /**
@@ -428,8 +430,11 @@ private:
   size_t CountPositions (int cidx, csMGCell& cell);
   size_t CountAllPositions ();
 
+  friend class csMeshGeneratorGeometry;
+
 public:
-  csMeshGenerator ();
+
+  csMeshGenerator (iObjectRegistry* object_reg);
   virtual ~csMeshGenerator ();
 
   void SetSector (iSector* sector) { csMeshGenerator::sector = sector; }

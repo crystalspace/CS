@@ -28,6 +28,8 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "csgeom/math3d.h"
 #include "csgeom/sphere.h"
 #include "csgeom/trimesh.h"
+#include "csgeom/vector3.h"
+#include "csgeom/vector4.h"
 #include "csgfx/normalmaptools.h"
 #include "csgfx/renderbuffer.h"
 #include "csutil/csendian.h"
@@ -59,6 +61,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "cstool/normalcalc.h"
 #include "cstool/primitives.h"
 #include "ivideo/rendermesh.h"
+
 #include "instmesh.h"
 
 
@@ -201,7 +204,7 @@ void csInstmeshMeshObject::SetInstanceVariable (size_t instance_id, csShaderVari
   {
     csArray<csInstance*> inst =
       instances.GetAll<csArrayElementHandler<csInstance*>,
-      csArrayMemoryAllocator<csInstance*>> (instance_id);
+      CS::Memory::AllocatorMalloc > (instance_id);
 
     for (size_t i = 0; i < inst.GetSize (); i++)
       if (inst[i]->id == instance_id) 
@@ -218,7 +221,7 @@ void csInstmeshMeshObject::SetInstanceVariable (size_t instance_id, size_t varia
 {
   csArray<csInstance*> inst =
     instances.GetAll<csArrayElementHandler<csInstance*>,
-    csArrayMemoryAllocator<csInstance*>> (instance_id);
+    CS::Memory::AllocatorMalloc> (instance_id);
 
   for (size_t i = 0; i < inst.GetSize (); i++)
     if (inst[i]->id == instance_id) 
@@ -231,7 +234,7 @@ const csShaderVariable& csInstmeshMeshObject::GetInstanceVariable (
 {
   csArray<csInstance*> inst =
     instances.GetAll<csArrayElementHandler<csInstance*>,
-    csArrayMemoryAllocator<csInstance*>> (instance_id);
+    CS::Memory::AllocatorMalloc > (instance_id);
 
   for (size_t i = 0; i < inst.GetSize (); i++)
     if (inst[i]->id == instance_id) 
@@ -241,17 +244,17 @@ const csShaderVariable& csInstmeshMeshObject::GetInstanceVariable (
       csShaderVariable* variable = instance_template->GetArrayElement (variable_id);
       switch (variable->GetType ())
       {
-    case csShaderVariable::COLOR:
-    case csShaderVariable::VECTOR2:
-    case csShaderVariable::VECTOR3:
-      dummy_variable.SetValue (csVector3 (variables[0].x, variables[0].y, variables[0].z));
-      break;
-    case csShaderVariable::VECTOR4:
-    case csShaderVariable::MATRIX:
-    case csShaderVariable::TRANSFORM:
-      break;
-    default:
-      break;
+      case csShaderVariable::COLOR:
+      case csShaderVariable::VECTOR2:
+      case csShaderVariable::VECTOR3:
+        dummy_variable.SetValue (csVector3 (variables[0].x, variables[0].y, variables[0].z));
+        break;
+      case csShaderVariable::VECTOR4:
+      case csShaderVariable::MATRIX:
+      case csShaderVariable::TRANSFORM:
+        break;
+      default:
+        break;
       }
       
       return dummy_variable;
@@ -278,7 +281,7 @@ void csInstmeshMeshObject::RemoveInstance (size_t id)
 {
   csArray<csInstance*> values =
     instances.GetAll<csArrayElementHandler<csInstance*>,
-    csArrayMemoryAllocator<csInstance*>> (id);
+    CS::Memory::AllocatorMalloc> (id);
   for (size_t i = 0; i < values.GetSize (); i++)
     if (values[i]->id == id) 
     {

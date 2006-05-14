@@ -117,7 +117,7 @@ void csSectorMeshList::FreeMesh (iMeshWrapper* item)
 
 //---------------------------------------------------------------------------
 
-csSector::csSector (csEngine *engine) :
+csSector::csSector (csEngine *engine, iObjectRegistry* object_reg) :
   scfImplementationType (this)
 {
   DG_TYPE (this, "csSector");
@@ -133,6 +133,7 @@ csSector::csSector (csEngine *engine) :
   renderloop = 0;
   use_lightculling = false;
   single_mesh = 0;
+  csSector::object_reg = object_reg;
 }
 
 csSector::~csSector ()
@@ -1047,7 +1048,7 @@ void csSector::RemoveLSI (csLightSectorInfluence* inf)
 
 iMeshGenerator* csSector::CreateMeshGenerator (const char* name)
 {
-  csMeshGenerator* meshgen = new csMeshGenerator ();
+  csMeshGenerator* meshgen = new csMeshGenerator (object_reg);
   meshgen->SetSector (this);
   meshgen->QueryObject ()->SetName (name);
   meshGenerators.Push (meshgen);

@@ -2906,7 +2906,7 @@ csPtr<iMeshWrapper> csEngine::CreateSectorWallsMesh (
 
 iSector *csEngine::CreateSector (const char *name)
 {
-  iSector *sector = (iSector*)(new csSector (this));
+  iSector *sector = (iSector*)(new csSector (this, objectRegistry));
   sector->QueryObject ()->SetName (name);
   sectors.Add (sector);
   sector->DecRef ();

@@ -34,8 +34,8 @@ csMeshGeneratorGeometry::csMeshGeneratorGeometry (
   default_material_factor = 0.0f;
   celldim = 0;
   positions = 0;
-  csRef<iStringSet> strings; /*= csQueryRegistryTagInterface<iStringSet> (object_reg,
-    "crystalspace.shared.stringset");*/
+  csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet> (generator->object_reg,
+    "crystalspace.shared.stringset");
   var_name = strings->Request ("transform");
 }
 csMeshGeneratorGeometry::~csMeshGeneratorGeometry ()
@@ -322,7 +322,7 @@ bool csMeshGeneratorGeometry::IsRightLOD (float sqdist, size_t current_lod)
 
 //--------------------------------------------------------------------------
 
-csMeshGenerator::csMeshGenerator() : scfImplementationType (this)
+csMeshGenerator::csMeshGenerator(iObjectRegistry* object_reg) : scfImplementationType (this)
 {
   max_blocks = 100;
   cell_dim = 50;
@@ -330,6 +330,8 @@ csMeshGenerator::csMeshGenerator() : scfImplementationType (this)
   use_alpha_scaling = false;
 
   last_pos = csVector2 (0,0);
+
+  csMeshGenerator::object_reg = object_reg;
 
   sector = 0;
 
