@@ -276,6 +276,14 @@ rule LibraryShared
   LFlags $(<) : $(LINKLIBS) ;
     
   SystemLinkSharedLibrary $(target) : $(objects) $(deplibs) : $(linklib) ;
+  
+  local debugfile = [ SplitDebugInfo $(target) ] ;
+  Clean $(<)clean : $(debugfile) ;
+  if ! [ IsElem noinstall : $(options) ]
+  {
+    NoCare $(debugfile) ;
+    Depends install_lib : [ DoInstall $(debugfile) : $(libdir) : $(INSTALL_DATA) ] ;
+  }
 }
 
 rule ConstructLibraryTarget

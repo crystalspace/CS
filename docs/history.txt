@@ -23,6 +23,11 @@ chronological order.
 	  constructing.
 	- res added a proper copy ctor for csSubRectangles.
 	- res removed some static variables from csEngine.
+	- res fixed shared lib linking on unix.
+	- res added stripping of debug info to separate files when building
+	  with a GNU toolchain.
+	- res enabled debug info for optimized builds when building with a
+	  GNU toolchain.
 13-May-2006
 	- Fossi added new compile output to .cvsignore.
 	- Fossi added new paging terrain version and 'terrainp' testlevel.

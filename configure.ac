@@ -781,12 +781,18 @@ CS_CHECK_OPTIMIZE_FLAGS
 #------------------------------------------------------------------------------
 # Check for compiler debug flags.
 #------------------------------------------------------------------------------
-CS_EMIT_BUILD_FLAGS([how to enable compiler debug output],
-    [cs_cv_prog_cxx_debug],
+CS_EMIT_BUILD_FLAGS([how to enable extra debugging symbols],
+    [cs_cv_prog_cxx_debug_symbols_extra],
     [CS_CREATE_TUPLE([-g3]) CS_CREATE_TUPLE([-g2]) CS_CREATE_TUPLE([-g])],
     [C++], [COMPILER.CFLAGS.debug], [+],
     [CS_EMIT_BUILD_PROPERTY([COMPILER.LFLAGS.debug],
-	[$cs_cv_prog_cxx_debug], [+])])
+	[$cs_cv_prog_cxx_debug_symbols_extra], [+])])
+CS_EMIT_BUILD_FLAGS([how to enable normal debugging symbols],
+    [cs_cv_prog_cxx_debug_symbols_normal],
+    [CS_CREATE_TUPLE([-g2]) CS_CREATE_TUPLE([-g])],
+    [C++], [COMPILER.CFLAGS.optimize], [+],
+    [CS_EMIT_BUILD_PROPERTY([COMPILER.LFLAGS.optimize],
+	[$cs_cv_prog_cxx_debug_symbols_normal], [+])])
 
 
 
