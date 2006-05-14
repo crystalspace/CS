@@ -2881,6 +2881,8 @@ sub DESTROY {
 *GetName = *cspacec::csShaderVariable_GetName;
 *GetValue = *cspacec::csShaderVariable_GetValue;
 *SetValue = *cspacec::csShaderVariable_SetValue;
+*AddVariableToArray = *cspacec::csShaderVariable_AddVariableToArray;
+*RemoveFromArray = *cspacec::csShaderVariable_RemoveFromArray;
 *SetArraySize = *cspacec::csShaderVariable_SetArraySize;
 *GetArraySize = *cspacec::csShaderVariable_GetArraySize;
 *GetArrayElement = *cspacec::csShaderVariable_GetArrayElement;
