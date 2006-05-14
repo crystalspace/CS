@@ -339,8 +339,10 @@ bool csReporterListener::HandleEvent (iEvent& event)
     {
       size_t i;
       csRef<iGraphics3D> g3d = csQueryRegistry<iGraphics3D> (object_reg);
+      if(!g3d) return false;
 
       csRef<iGraphics2D> g2d = g3d->GetDriver2D ();
+      if(!g2d) return false;
       if (!fnt)
       {
         iFontServer* fntsvr = g2d->GetFontServer ();

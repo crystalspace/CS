@@ -10,6 +10,11 @@ chronological order.
 	- Piotr Obrzut added support for pseudo instancing.
 	- Piotr Obrzut fixes compile warning/errors related to 
           pseudo-instancing.
+	- Piotr Obrzut aplies patch from Lak_Moore: added check for 
+          valid references to 3D and 2D graphics plugins to 
+          csReporterListener::HandleEvent before trying to use them.  
+          Useful for console applications using the Standard Reporter 
+          plugin. 
 13-May-2006
 	- Fossi added new compile output to .cvsignore.
 	- Fossi added new paging terrain version and 'terrainp' testlevel.
