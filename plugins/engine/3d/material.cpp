@@ -296,8 +296,9 @@ bool csMaterial::IsVisitRequired () const
 }
 
 //---------------------------------------------------------------------------
-csMaterialWrapper::csMaterialWrapper (iMaterial *m) :
-  scfImplementationType (this)
+csMaterialWrapper::csMaterialWrapper (iMaterialList* materials, 
+                                      iMaterial *m) :
+  scfImplementationType (this), materials (materials)
 {
   material = m;
   matEngine = SCF_QUERY_INTERFACE (material, iMaterialEngine);
@@ -309,8 +310,7 @@ csMaterialWrapper::~csMaterialWrapper ()
 
 void csMaterialWrapper::SelfDestruct ()
 {
-  csEngine::currentEngine->GetMaterialList ()->Remove (
-  	(iMaterialWrapper*)this);
+  materials->Remove (static_cast<iMaterialWrapper*> (this));
 }
 
 void csMaterialWrapper::SetMaterial (iMaterial *m)
@@ -337,25 +337,19 @@ bool csMaterialWrapper::IsVisitRequired () const
 }
 
 //------------------------------------------------------ csMaterialList -----//
-SCF_IMPLEMENT_IBASE(csMaterialList)
-  SCF_IMPLEMENTS_INTERFACE(iMaterialList)
-SCF_IMPLEMENT_IBASE_END
-
-csMaterialList::csMaterialList ()
+csMaterialList::csMaterialList () : scfImplementationType (this)
 {
-  SCF_CONSTRUCT_IBASE (0);
   listener.AttachNew (new NameChangeListener (this));
 }
 
 csMaterialList::~csMaterialList()
 {
-  SCF_DESTRUCT_IBASE ();
 }
 
 void csMaterialList::NameChanged (iObject* object, const char* oldname,
   	const char* newname)
 {
-  csRef<iMaterialWrapper> mat = SCF_QUERY_INTERFACE (object, iMaterialWrapper);
+  csRef<iMaterialWrapper> mat = scfQueryInterface<iMaterialWrapper> (object);
   CS_ASSERT (mat != 0);
   if (oldname) mat_hash.Delete (oldname, mat);
   if (newname) mat_hash.Put (newname, mat);
@@ -364,13 +358,13 @@ void csMaterialList::NameChanged (iObject* object, const char* oldname,
 iMaterialWrapper *csMaterialList::NewMaterial (iMaterial *material,
 	const char* name)
 {
-  iMaterialWrapper *tm = (iMaterialWrapper*)(new csMaterialWrapper (material));
+  csRef<iMaterialWrapper> tm;
+  tm.AttachNew (new csMaterialWrapper (this, material));
   tm->QueryObject ()->SetName (name);
   if (name)
     mat_hash.Put (name, tm);
   list.Push (tm);
   tm->QueryObject ()->AddNameChangeListener (listener);
-  tm->DecRef ();
   return tm;
 }
 

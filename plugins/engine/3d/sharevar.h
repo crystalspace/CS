@@ -30,7 +30,7 @@
 #include "iutil/selfdestruct.h"
 #include "iengine/sharevar.h"
 
-
+class csSharedVariableList;
 
 /**
  * A SharedVariable is a refcounted floating point value.
@@ -46,6 +46,7 @@ private:
   csColor color;
   csVector3 vec;
   csRefArray<iSharedVariableListener> listeners;
+  csSharedVariableList* variables;
 
   void FireListeners ();
 
@@ -57,10 +58,10 @@ public:
    * Construct a SharedVariable. This SharedVariable will be initialized to
    * zero and unnamed.
    */
-  csSharedVariable () : scfImplementationType (this)
+  csSharedVariable (csSharedVariableList* variables) : 
+    scfImplementationType (this), type (iSharedVariable::SV_UNKNOWN), 
+      value (0), variables (variables)
   { 
-    value = 0;
-    type = iSharedVariable::SV_UNKNOWN;
   }
 
   virtual ~csSharedVariable()
@@ -145,7 +146,7 @@ public:
   virtual ~csSharedVariableList ();
 
   /// iSharedVariable Factory method. This does not add the new var to the list.
-  csPtr<iSharedVariable> New() const;
+  csPtr<iSharedVariable> New();
 
   virtual int GetCount () const;
   virtual iSharedVariable *Get (int n) const;

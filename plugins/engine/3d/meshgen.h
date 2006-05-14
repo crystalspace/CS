@@ -101,7 +101,6 @@ private:
   float radius;
   float density;
   float total_max_dist;
-  csStringID var_name;
 
   //density map
   csRef<iTerraFormer> density_map;
@@ -351,7 +350,9 @@ private:
   float alpha_mindist, sq_alpha_mindist, alpha_maxdist;
   float alpha_scale;
 
-  iObjectRegistry* object_reg;
+  csEngine* engine;
+  csStringID varTransform;
+ 
 
   csVector2 last_pos;
 
@@ -434,7 +435,7 @@ private:
 
 public:
 
-  csMeshGenerator (iObjectRegistry* object_reg);
+  csMeshGenerator (csEngine* engine);
   virtual ~csMeshGenerator ();
 
   void SetSector (iSector* sector) { csMeshGenerator::sector = sector; }

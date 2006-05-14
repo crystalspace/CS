@@ -26,10 +26,11 @@
 #include "csutil/scf_implementation.h"
 #include "iutil/selfdestruct.h"
 #include "iengine/campos.h"
-#include "plugins/engine/3d/camera.h"
 
-struct iEngine;
+#include "camera.h"
+
 struct iCamera;
+class csCameraPositionList;
 class csPlane3;
 
 /**
@@ -43,8 +44,8 @@ class csCameraPosition : public scfImplementationExt2<csCameraPosition,
 {
 public:
   /// Initialize the camera position object
-  csCameraPosition (const char *name, const char *sector,
-    const csVector3 &position,
+  csCameraPosition (csCameraPositionList* positions,
+    const char *name, const char *sector, const csVector3 &position,
     const csVector3 &forward, const csVector3 &upward);
 
   csCameraPosition (const csCameraPosition& other);
@@ -91,6 +92,8 @@ private:
   * act). If this is 0 there is no far plane.
   */
   csPlane3* far_plane;
+
+  csCameraPositionList* positions;
 };
 
 #endif // __CS_CAMPOS_H__

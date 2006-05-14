@@ -178,7 +178,9 @@ public:
 /**
  * The loader for Crystal Space maps.
  */
-class csLoader : public iLoader
+class csLoader : public scfImplementation2<csLoader,
+                                           iLoader,
+                                           iComponent>
 {
   friend class StdLoaderContext;
   friend class ThreadedLoaderContext;
@@ -414,7 +416,7 @@ private:
    * This version will parse FACTORY statement to directly create
    * a mesh from a factory.
    */
-  iMeshWrapper* LoadMeshObjectFromFactory (iLoaderContext* ldr_context,
+  csRef<iMeshWrapper> LoadMeshObjectFromFactory (iLoaderContext* ldr_context,
   	iDocumentNode* node, iStreamSource* ssource);
 
   /**
@@ -536,8 +538,6 @@ private:
 
 public:
   /********** iLoader implementation **********/
-  SCF_DECLARE_IBASE;
-
   static bool do_verbose;
 
   // system driver
@@ -637,14 +637,6 @@ public:
   	iStreamSource* ssource);
   virtual csPtr<iMeshWrapper> LoadMeshObject (const char* fname,
   	iStreamSource* ssource);
-
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csLoader);
-    virtual bool Initialize (iObjectRegistry* p)
-    { return scfParent->Initialize(p); }
-    eiComponent();
-  } scfiComponent;
 };
 
 #endif // __CS_CSLOADER_H__

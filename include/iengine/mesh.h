@@ -774,7 +774,7 @@ struct iMeshFactoryWrapper : public virtual iBase
    * Create mesh objects from this factory. If the factory has a hierarchy
    * then a hierarchical mesh object will be created.
    */
-  virtual iMeshWrapper* CreateMeshWrapper () = 0;
+  virtual csPtr<iMeshWrapper> CreateMeshWrapper () = 0;
 
   /**
    * Get default flags for all meshes created from this factory.

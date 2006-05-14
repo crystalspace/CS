@@ -30,6 +30,7 @@
 #include "iengine/texture.h"
 #include "igraphic/image.h"
 
+class csEngine;
 class csTextureWrapper;
 struct iTextureManager;
 struct iTextureHandle;
@@ -45,6 +46,7 @@ class csTextureWrapper : public scfImplementationExt2<csTextureWrapper,
 						      iSelfDestruct>
 {
 private:
+  csEngine* engine;
   /// The corresponding iImage.
   csRef<iImage> image;
   /**
@@ -91,9 +93,9 @@ public:
   CS_LEAKGUARD_DECLARE (csTextureWrapper);
 
   /// Construct a texture handle given a image file
-  csTextureWrapper (iImage* Image);
+  csTextureWrapper (csEngine* engine, iImage* Image);
   /// Construct a csTextureWrapper from a pre-registered texture
-  csTextureWrapper (iTextureHandle *ith);
+  csTextureWrapper (csEngine* engine, iTextureHandle *ith);
   /// Copy constructor
   csTextureWrapper (const csTextureWrapper &c);
 
@@ -190,11 +192,15 @@ public:
 /**
  * This class is used to hold a list of textures.
  */
-class csTextureList : public csRefArrayObject<iTextureWrapper>
+class csTextureList : 
+  public scfImplementation1<csTextureList,
+                            iTextureList>,
+  public csRefArrayObject<iTextureWrapper>
 {
+  csEngine* engine;
 public:
   /// Initialize the array
-  csTextureList ();
+  csTextureList (csEngine* engine);
   virtual ~csTextureList ();
 
   /// Create a new texture.
@@ -204,27 +210,15 @@ public:
    * Create a engine wrapper for a pre-prepared iTextureHandle
    * The handle will be IncRefed
    */
-  iTextureWrapper *NewTexture (iTextureHandle *ith);
-
-  SCF_DECLARE_IBASE;
-
-  //-------------------- iTextureList implementation -------------------------
-  class TextureList : public iTextureList
-  {
-  public:
-    SCF_DECLARE_EMBEDDED_IBASE (csTextureList);
-
-    virtual iTextureWrapper *NewTexture (iImage *image);
-    virtual iTextureWrapper *NewTexture (iTextureHandle *ith);
-    virtual int GetCount () const;
-    virtual iTextureWrapper *Get (int n) const;
-    virtual int Add (iTextureWrapper *obj);
-    virtual bool Remove (iTextureWrapper *obj);
-    virtual bool Remove (int n);
-    virtual void RemoveAll ();
-    virtual int Find (iTextureWrapper *obj) const;
-    virtual iTextureWrapper *FindByName (const char *Name) const;
-  } scfiTextureList;
+  virtual iTextureWrapper *NewTexture (iTextureHandle *ith);
+  virtual int GetCount () const;
+  virtual iTextureWrapper *Get (int n) const;
+  virtual int Add (iTextureWrapper *obj);
+  virtual bool Remove (iTextureWrapper *obj);
+  virtual bool Remove (int n);
+  virtual void RemoveAll ();
+  virtual int Find (iTextureWrapper *obj) const;
+  virtual iTextureWrapper *FindByName (const char *Name) const;
 };
 
 #endif // __CS_TEXTURE_H__

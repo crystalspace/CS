@@ -25,16 +25,13 @@
 #include "csutil/csmd5.h"
 #include "csutil/debug.h"
 #include "csutil/memfile.h"
-#include "plugins/engine/3d/engine.h"
-#include "plugins/engine/3d/halo.h"
-#include "plugins/engine/3d/light.h"
-#include "plugins/engine/3d/meshobj.h"
-#include "plugins/engine/3d/sector.h"
-#include "plugins/engine/3d/portal.h"
 
-int csLight::ambient_red = CS_DEFAULT_LIGHT_LEVEL;
-int csLight::ambient_green = CS_DEFAULT_LIGHT_LEVEL;
-int csLight::ambient_blue = CS_DEFAULT_LIGHT_LEVEL;
+#include "engine.h"
+#include "halo.h"
+#include "light.h"
+#include "meshobj.h"
+#include "sector.h"
+#include "portal.h"
 
 //float csLight::influenceIntensityFraction = 256;
 #define HUGE_RADIUS 100000000
@@ -74,7 +71,7 @@ void csLight::UpdateViscullMesh ()
   object_model->ShapeChanged ();
 }
 
-csLight::csLight (
+csLight::csLight (csEngine* engine,
   float x, float y, float z,
   float d,
   float red, float green, float blue,
@@ -84,7 +81,7 @@ csLight::csLight (
     halo (0), dynamicType (dyntype), type (CS_LIGHT_POINTLIGHT), 
     attenuation (CS_ATTN_LINEAR), cutoffDistance (d),
     directionalCutoffRadius (d), spotlightFalloffInner (0),
-    spotlightFalloffOuter (1), lightnr (0)
+    spotlightFalloffOuter (1), lightnr (0), engine (engine)
 {
   //movable.scfParent = (iBase*)(csObject*)this; //@@MS: Look at this?
   movable.SetLight (this);
@@ -119,7 +116,7 @@ csLight::~csLight ()
   }
 
   if (flags.Check (CS_LIGHT_ACTIVEHALO))
-    csEngine::currentEngine->RemoveHalo (this);
+    engine->RemoveHalo (this);
   delete halo;
   delete[] light_id;
 
@@ -600,9 +597,8 @@ void csLight::CalculateLighting ()
 
   if (dynamicType == CS_LIGHT_DYNAMICTYPE_DYNAMIC)
   {
-    csRef<iMeshWrapperIterator> it = csEngine::currentEngine
-    	->GetNearbyMeshes (GetSector (), GetFullCenter (),
-	  GetCutoffDistance ());
+    csRef<iMeshWrapperIterator> it = engine->GetNearbyMeshes (
+      GetSector (), GetFullCenter (), GetCutoffDistance ());
     while (it->HasNext ())
     {
       iMeshWrapper* m = it->Next ();

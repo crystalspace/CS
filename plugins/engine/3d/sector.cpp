@@ -117,11 +117,10 @@ void csSectorMeshList::FreeMesh (iMeshWrapper* item)
 
 //---------------------------------------------------------------------------
 
-csSector::csSector (csEngine *engine, iObjectRegistry* object_reg) :
-  scfImplementationType (this)
+csSector::csSector (csEngine *engine) :
+  scfImplementationType (this), engine (engine)
 {
   DG_TYPE (this, "csSector");
-  csSector::engine = engine;
   fog.enabled = false;
   drawBusy = 0;
   dynamicAmbientLightColor.Set (0,0,0);
@@ -133,7 +132,6 @@ csSector::csSector (csEngine *engine, iObjectRegistry* object_reg) :
   renderloop = 0;
   use_lightculling = false;
   single_mesh = 0;
-  csSector::object_reg = object_reg;
 }
 
 csSector::~csSector ()
@@ -144,7 +142,7 @@ csSector::~csSector ()
 
 void csSector::SelfDestruct ()
 {
-  csEngine::currentEngine->GetSectors ()->Remove ((iSector*)this);
+  engine->GetSectors ()->Remove ((iSector*)this);
 }
 
 void csSector::RegisterLightToCuller (csLight* light)
@@ -332,7 +330,7 @@ bool csSector::SetVisibilityCullerPlugin (const char *plugname,
   culler = 0;
 
   // Load the culler plugin.
-  csRef<iPluginManager> plugmgr = CS_QUERY_REGISTRY (csEngine::objectRegistry,
+  csRef<iPluginManager> plugmgr = CS_QUERY_REGISTRY (engine->objectRegistry,
   	iPluginManager);
   culler = CS_LOAD_PLUGIN (plugmgr, plugname, iVisibilityCuller);
 
@@ -344,7 +342,7 @@ bool csSector::SetVisibilityCullerPlugin (const char *plugname,
   const char* err = culler->ParseCullerParameters (culler_params);
   if (err)
   {
-    csEngine::currentEngine->Error ("Error loading visibility culler: %s!",
+    engine->Error ("Error loading visibility culler: %s!",
     	err);
     return false;
   }
@@ -748,8 +746,8 @@ iSector *csSector::FollowSegment (
 
 void csSector::PrepareDraw (iRenderView *rview)
 {
-  if (csEngine::currentEngine->bugplug)
-    csEngine::currentEngine->bugplug->AddCounter ("Sector Count", 1);
+  if (engine->bugplug)
+    engine->bugplug->AddCounter ("Sector Count", 1);
 
   // Make sure the visibility culler is loaded.
   GetVisibilityCuller ();
@@ -1048,11 +1046,11 @@ void csSector::RemoveLSI (csLightSectorInfluence* inf)
 
 iMeshGenerator* csSector::CreateMeshGenerator (const char* name)
 {
-  csMeshGenerator* meshgen = new csMeshGenerator (object_reg);
+  csRef<csMeshGenerator> meshgen;
+  meshgen.AttachNew (new csMeshGenerator (engine));
   meshgen->SetSector (this);
   meshgen->QueryObject ()->SetName (name);
   meshGenerators.Push (meshgen);
-  meshgen->DecRef ();
   return (iMeshGenerator*)meshgen;
 }
 
@@ -1086,8 +1084,8 @@ void csSector::UnregisterPortalMesh (iMeshWrapper* mesh)
 //---------------------------------------------------------------------------
 
 
-csSectorList::csSectorList ()
-  : scfImplementationType (this)
+csSectorList::csSectorList (csEngine* engine)
+  : scfImplementationType (this), engine (engine)
 {
   listener.AttachNew (new NameChangeListener (this));
 }
@@ -1124,7 +1122,7 @@ int csSectorList::Add (iSector *obj)
 
 bool csSectorList::Remove (iSector *obj)
 {
-  csEngine::currentEngine->FireRemoveSector (obj);
+  engine->FireRemoveSector (obj);
   FreeSector (obj);
   const char* name = obj->QueryObject ()->GetName ();
   if (name)

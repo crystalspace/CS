@@ -216,6 +216,7 @@ private:
   /// The corresponding iMaterialEngine.
   csRef<iMaterialEngine> matEngine;
 
+  iMaterialList* materials;
 private:
   /// Release material handle
   virtual ~csMaterialWrapper ();
@@ -224,7 +225,7 @@ public:
   CS_LEAKGUARD_DECLARE (csMaterialWrapper);
 
   /// Construct a material handle given a material.
-  csMaterialWrapper (iMaterial* Image);
+  csMaterialWrapper (iMaterialList* materials, iMaterial* Image);
 
   /**
    * Change the base material. Note: The changes will not be visible until
@@ -254,7 +255,8 @@ public:
 /**
  * This class is used to hold a list of materials.
  */
-class csMaterialList : public iMaterialList
+class csMaterialList : public scfImplementation1<csMaterialList,
+                                                 iMaterialList>
 {
 private:
   csRefArrayObject<iMaterialWrapper> list;
@@ -286,8 +288,6 @@ public:
   /// Initialize the array
   csMaterialList ();
   virtual ~csMaterialList ();
-
-  SCF_DECLARE_IBASE;
 
   void NameChanged (iObject* object, const char* oldname,
   	const char* newname);

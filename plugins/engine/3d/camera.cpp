@@ -29,16 +29,16 @@ float csCamera:: default_inv_aspect = 0;
 float csCamera:: default_fov_angle = 90;
 long csCamera:: cur_cameranr = 0;
 
-csCamera::csCamera () :
-  csOrthoTransform(), scfImplementationType (this), fp (0)
+csCamera::csCamera (int frameWidth, int frameHeight) :
+  scfImplementationType (this), fp (0)
 {
   mirror = false;
   sector = 0;
   aspect = default_aspect;
   inv_aspect = default_inv_aspect;
   fov_angle = default_fov_angle;
-  shift_x = csEngine::frameWidth / 2;
-  shift_y = csEngine::frameHeight / 2;
+  shift_x = frameWidth / 2;
+  shift_y = frameHeight / 2;
   cameranr = cur_cameranr++;
   only_portals = true;
 }

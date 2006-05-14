@@ -159,16 +159,16 @@ struct iTextureWrapper : public virtual iBase
 };
 
 
-SCF_VERSION (iTextureList, 0, 0, 1);
-
 /**
  * This class represents a list of texture wrappers.
  *
  * Main ways to get pointers to this interface:
  *   - iEngine::GetTextureList()
  */
-struct iTextureList : public iBase
+struct iTextureList : public virtual iBase
 {
+  SCF_INTERFACE (iTextureList, 1, 0, 0);
+
   /// Create a new texture.
   virtual iTextureWrapper *NewTexture (iImage *image) = 0;
 

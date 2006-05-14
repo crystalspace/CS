@@ -261,7 +261,7 @@ public:
   virtual bool Process (csTicks ElapsedTime, iCamera* camera, 
     csEngine* engine);
   /// process a flare component (clip and draw it).
-  void ProcessFlareComponent(csEngine const& engine, csFlareComponent *comp,
+  void ProcessFlareComponent(csEngine* engine, csFlareComponent *comp,
     csVector2 const& start, csVector2 const& deltapos);
 };
 

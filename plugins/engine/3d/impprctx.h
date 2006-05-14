@@ -19,39 +19,26 @@
 #ifndef __CS_IMPPRCTX_H__
 #define __CS_IMPPRCTX_H__
 
-#include <stdarg.h>
 #include "csutil/ref.h"
 #include "cstool/proctex.h"
 #include "csgeom/vector3.h"
 #include "iengine/engine.h"
 #include "iengine/rview.h"
 
-struct iLoader;
-struct iGraphics3D;
-struct iKeyboardDriver;
-struct iSector;
-struct iVFS;
-struct iEvent;
-struct iTextureHandle;
-struct iObjectRegistry;
-struct iVirtualClock;
-struct iThingState;
-struct iMaterialWrapper;
-struct iMeshWrapper;
-struct iGeneralFactoryState;
+class csEngine;
 class csEngineProcTex;
 class csImposterMesh;
 
 class csImposterProcTex : public csProcTexture
 {
 private:
-  iEngine* Engine;
+  csEngine* engine;
   iRenderView* View;
   csImposterMesh *mesh;
   bool imposter_ready;
 
 public:
-  csImposterProcTex (csImposterMesh *parent);
+  csImposterProcTex (csEngine* engine, csImposterMesh *parent);
   ~csImposterProcTex ();
 
   bool GetImposterReady () { return imposter_ready; }

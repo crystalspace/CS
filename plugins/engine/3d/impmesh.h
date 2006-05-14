@@ -22,8 +22,9 @@
 #include "iengine/movable.h"
 #include "iengine/sector.h"
 #include "csgeom/poly3d.h"
-#include "plugins/engine/3d/impprctx.h"
 #include "csgeom/box.h"
+
+#include "impprctx.h"
 
 class csVector3;
 class csMatrix3;
@@ -44,7 +45,7 @@ private:
   csBox3   camera_box;       // Bounding box of object being impostered
 
 public:
-  csImposterMesh (csMeshWrapper *parent);
+  csImposterMesh (csEngine* engine, csMeshWrapper *parent);
 
   float CalcIncidenceAngleDist (iRenderView *rview);
   bool CheckIncidenceAngle (iRenderView *rview,float tolerance);

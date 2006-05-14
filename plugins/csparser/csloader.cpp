@@ -1076,27 +1076,12 @@ csPtr<iMeshWrapper> csLoader::LoadMeshObject (const char* fname,
 
 //--- Plugin stuff -----------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE(csLoader);
-  SCF_IMPLEMENTS_INTERFACE(iLoader);
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iComponent);
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csLoader::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-csLoader::eiComponent::eiComponent()
-{
-}
-
 SCF_IMPLEMENT_FACTORY(csLoader)
 
 CS_IMPLEMENT_PLUGIN
 
-csLoader::csLoader (iBase *p)
+csLoader::csLoader (iBase *p) : scfImplementationType (this, p)
 {
-  SCF_CONSTRUCT_IBASE(p);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
   object_reg = 0;
   do_verbose = false;
   autoRegions = false;
@@ -1105,8 +1090,6 @@ csLoader::csLoader (iBase *p)
 csLoader::~csLoader()
 {
   loaded_plugins.DeleteAll ();
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE();
 }
 
 #define GET_PLUGIN(var, intf, msgname)				\
@@ -1471,7 +1454,7 @@ bool csLoader::LoadLibrary (iLoaderContext* ldr_context, iDocumentNode* libnode,
         break;
       case XMLTOKEN_MESHREF:
         {
-          iMeshWrapper* mesh = LoadMeshObjectFromFactory (ldr_context, child,
+          csRef<iMeshWrapper> mesh = LoadMeshObjectFromFactory (ldr_context, child,
 	  	ssource);
           if (!mesh)
 	  {
@@ -3042,14 +3025,14 @@ bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
 #undef TEST_MISSING_MESH
 }
 
-iMeshWrapper* csLoader::LoadMeshObjectFromFactory (iLoaderContext* ldr_context,
+csRef<iMeshWrapper> csLoader::LoadMeshObjectFromFactory (iLoaderContext* ldr_context,
 	iDocumentNode* node, iStreamSource* ssource)
 {
   if (!Engine) return 0;
 
   csString priority;
 
-  iMeshWrapper* mesh = 0;
+  csRef<iMeshWrapper> mesh;
   bool staticpos = false;
   bool staticshape = false;
   bool zbufSet = false;
@@ -3331,7 +3314,7 @@ bool csLoader::LoadMeshObject (iLoaderContext* ldr_context,
         break;
       case XMLTOKEN_MESHREF:
         {
-          iMeshWrapper* sp = LoadMeshObjectFromFactory (ldr_context, child,
+          csRef<iMeshWrapper> sp = LoadMeshObjectFromFactory (ldr_context, child,
 	  	ssource);
           if (!sp)
 	  {
@@ -3340,7 +3323,6 @@ bool csLoader::LoadMeshObject (iLoaderContext* ldr_context,
 	  }
 	  sp->QueryObject ()->SetName (child->GetAttributeValue ("name"));
 	  sp->QuerySceneNode ()->SetParent (mesh->QuerySceneNode ());
-	  sp->DecRef ();
         }
         break;
       case XMLTOKEN_MESHOBJ:
@@ -5248,7 +5230,7 @@ iSector* csLoader::ParseSector (iLoaderContext* ldr_context,
 		secname ? secname : "<noname>");
 	    return 0;
 	  }
-          iMeshWrapper* mesh = LoadMeshObjectFromFactory (ldr_context, child,
+          csRef<iMeshWrapper> mesh = LoadMeshObjectFromFactory (ldr_context, child,
 	  	ssource);
           if (!mesh)
 	  {
@@ -5259,7 +5241,6 @@ iSector* csLoader::ParseSector (iLoaderContext* ldr_context,
           mesh->GetMovable ()->SetSector (sector);
 	  mesh->GetMovable ()->UpdateMove ();
 	  Engine->AddMeshAndChildren (mesh);
-	  mesh->DecRef ();
         }
         break;
       case XMLTOKEN_POLYMESH:

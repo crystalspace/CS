@@ -200,23 +200,10 @@ protected:
 
   csShaderVariableContext svcontext;
 
+  csEngine* engine;
 public:
   /// Set of flags
   csFlags flags;
-
-public:
-  /** 
-   * Config value: ambient red value.
-   */
-  static int ambient_red;
-  /**
-   * Config value: ambient green value.
-   */
-  static int ambient_green;
-  /** 
-   * Config value: ambient blue value.
-   */
-  static int ambient_blue;
 
 public:
   /**
@@ -224,7 +211,7 @@ public:
    * a given radius, a given color, a given name and
    * type. The light will not have a halo by default.
    */
-  csLight (float x, float y, float z, float dist,
+  csLight (csEngine* engine, float x, float y, float z, float dist,
      float red, float green, float blue, csLightDynamicType dyntype);
 
   /**

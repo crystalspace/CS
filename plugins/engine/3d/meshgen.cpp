@@ -34,13 +34,12 @@ csMeshGeneratorGeometry::csMeshGeneratorGeometry (
   default_material_factor = 0.0f;
   celldim = 0;
   positions = 0;
-  csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet> (generator->object_reg,
-    "crystalspace.shared.stringset");
-  var_name = strings->Request ("transform");
 }
+
 csMeshGeneratorGeometry::~csMeshGeneratorGeometry ()
 {
 }
+
 void csMeshGeneratorGeometry::GetDensityMapFactor (float x, float z,
                                                    float &data)
 {
@@ -149,9 +148,9 @@ void csMeshGeneratorGeometry::AddFactory (iMeshFactoryWrapper* factory,
   {
     int cell_dim = generator->GetCellCount ();
     factories[idx].instmeshes.SetLength (cell_dim * cell_dim);
-    for (size_t i = 0; i < cell_dim * cell_dim; i++)
+    for (int i = 0; i < cell_dim * cell_dim; i++)
     {
-      csShaderVariable var (var_name);
+      csShaderVariable var (generator->varTransform);
       var.SetValue (csReversibleTransform ());
       factories[idx].instmeshes[i].instmesh_state->AddInstancesVariable (var);
     }
@@ -190,7 +189,7 @@ csPtr<iMeshWrapper> csMeshGeneratorGeometry::AllocMesh (
     csMGGeomInstMesh& geominst = geom.instmeshes[cidx];
     if (!geominst.instmesh)
     {
-      geominst.instmesh = csEngine::currentEngine->CreateMeshWrapper (
+      geominst.instmesh = generator->engine->CreateMeshWrapper (
         geom.factory, 0);
       csVector3 cell_center (
         (cell.box.MinX ()+cell.box.MaxX ())/2.0f,
@@ -223,7 +222,7 @@ csPtr<iMeshWrapper> csMeshGeneratorGeometry::AllocMesh (
   else
   {
     instance_id = csArrayItemNotFound;
-    return csEngine::currentEngine->CreateMeshWrapper (geom.factory, 0);
+    return generator->engine->CreateMeshWrapper (geom.factory, 0);
   }
 }
 
@@ -245,7 +244,7 @@ void csMeshGeneratorGeometry::MoveMesh (int cidx, iMeshWrapper* mesh,
     csVector3 pos = position - meshpos;
     ////printf ("position=%g,%g,%g    meshpos=%g,%g,%g  ->  pos=%g,%g,%g\n", position.x, position.y, position.z, meshpos.x, meshpos.y, meshpos.z, pos.x, pos.y, pos.z); fflush (stdout);
     csReversibleTransform tr (matrix, pos);
-    csShaderVariable var (var_name);
+    csShaderVariable var (generator->varTransform);
     var.SetValue (tr);
     geominst.instmesh_state->SetInstanceVariable (instance_id, var);
   }
@@ -322,40 +321,32 @@ bool csMeshGeneratorGeometry::IsRightLOD (float sqdist, size_t current_lod)
 
 //--------------------------------------------------------------------------
 
-csMeshGenerator::csMeshGenerator(iObjectRegistry* object_reg) : scfImplementationType (this)
+csMeshGenerator::csMeshGenerator (csEngine* engine) : 
+  scfImplementationType (this), total_max_dist (-1.0f), 
+  use_density_scaling (false), use_alpha_scaling (false),
+  engine (engine), 
+  last_pos (0, 0), setup_cells (false), cell_dim (50), 
+  inuse_blocks (0), inuse_blocks_last (0), max_blocks (100)
 {
-  max_blocks = 100;
-  cell_dim = 50;
-  use_density_scaling = false;
-  use_alpha_scaling = false;
-
-  last_pos = csVector2 (0,0);
-
-  csMeshGenerator::object_reg = object_reg;
-
-  sector = 0;
-
-  total_max_dist = -1.0f;
-
   cells = new csMGCell [cell_dim * cell_dim];
-  size_t i;
-  for (i = 0 ; i < size_t (max_blocks) ; i++)
+
+  for (size_t i = 0 ; i < size_t (max_blocks) ; i++)
     cache_blocks.Push (new csMGPositionBlock ());
-  inuse_blocks = 0;
-  inuse_blocks_last = 0;
 
   prev_cells.MakeEmpty ();
 
-  setup_cells = false;
-
-  for (i = 0 ; i < CS_GEOM_MAX_ROTATIONS ; i++)
+  for (size_t i = 0 ; i < CS_GEOM_MAX_ROTATIONS ; i++)
   {
     rotation_matrices[i] = csYRotMatrix3 (2.0f*PI * float (i)
       / float (CS_GEOM_MAX_ROTATIONS));
   }
 
-  alpha_priority = csEngine::currentEngine->GetAlphaRenderPriority ();
-  object_priority = csEngine::currentEngine->GetObjectRenderPriority ();
+  alpha_priority = engine->GetAlphaRenderPriority ();
+  object_priority = engine->GetObjectRenderPriority ();
+  
+  csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet> (
+    engine->objectRegistry, "crystalspace.shared.stringset");
+  varTransform = strings->Request ("transform");
 }
 
 csMeshGenerator::~csMeshGenerator ()
@@ -969,8 +960,8 @@ void csMeshGenerator::AllocateBlocks (const csVector3& pos)
         total_needed++;
         if (total_needed >= max_blocks)
         {
-          csEngine::currentEngine->Error (
-            "The mesh generator need more blocks then %d!", max_blocks);
+          engine->Error (
+            "The mesh generator needs more blocks than %d!", max_blocks);
           return;	// @@@ What to do here???
         }
         AllocateBlock (cidx, cell);

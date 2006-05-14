@@ -20,27 +20,29 @@
 #include "csgeom/matrix3.h"
 #include "csgeom/plane3.h"
 #include "csutil/util.h"
-#include "plugins/engine/3d/campos.h"
-#include "plugins/engine/3d/engine.h"
+
+#include "campos.h"
+#include "engine.h"
 
 
-csCameraPosition::csCameraPosition (
-  const char *name,
-  const char *sector,
-  const csVector3 &position,
-  const csVector3 &forward,
-  const csVector3 &upward)
+csCameraPosition::csCameraPosition (csCameraPositionList* positions,
+                                    const char *name,
+                                    const char *sector,
+                                    const csVector3 &position,
+                                    const csVector3 &forward,
+                                    const csVector3 &upward)
   : scfImplementationType (this),
   sector (csStrNew (sector)), position (position), forward (forward),
-  upward (upward), far_plane (0)
+  upward (upward), far_plane (0), positions (positions)
 {
   SetName (name);
 }
 
 csCameraPosition::csCameraPosition (const csCameraPosition& other)
-  : iBase(), scfImplementationType (this),
+  : scfImplementationType (this),
   sector (csStrNew (other.sector)), position (other.position),
-  forward (other.forward), upward (other.upward), far_plane (0)
+  forward (other.forward), upward (other.upward), far_plane (0), 
+  positions (other.positions)
 {
   SetName (other.GetName ());
 }
@@ -53,8 +55,7 @@ csCameraPosition::~csCameraPosition ()
 
 void csCameraPosition::SelfDestruct ()
 {
-  csEngine::currentEngine->GetCameraPositions ()->Remove (
-  	(iCameraPosition*)this);
+  positions->Remove (static_cast<iCameraPosition*> (this));
 }
 
 void csCameraPosition::Set (
@@ -76,7 +77,7 @@ bool csCameraPosition::Load (iCamera *camera, iEngine *e)
   csRef<iRegion> this_region;
   if (GetObjectParent () != 0)
   {
-    this_region = SCF_QUERY_INTERFACE (GetObjectParent (), iRegion);
+    this_region = scfQueryInterface<iRegion> (GetObjectParent ());
   }
 
   iSector *room = e->FindSector (sector, this_region);

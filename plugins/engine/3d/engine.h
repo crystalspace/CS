@@ -776,12 +776,8 @@ public:
   /// For debugging purposes.
   csRef<iBugPlug> bugplug;
 
-  /// The shared engine instance.
-  static csEngine* currentEngine;
-  /// The shared engine instance.
-  static iEngine* currentiEngine;
   /// Remember iObjectRegistry.
-  static iObjectRegistry* objectRegistry;
+  iObjectRegistry* objectRegistry;
   /// The global material/shader string set
   csRef<iStringSet> globalStringSet;
   /// The 3D driver
@@ -799,7 +795,20 @@ public:
   csRef<iVFS> VFS;
 
   /// Remember dimensions of display.
-  static int frameWidth, frameHeight;
+  int frameWidth, frameHeight;
+
+  /** 
+   * Config value: light ambient red value.
+   */
+  int lightAmbientRed;
+  /**
+   * Config value: light ambient green value.
+   */
+  int lightAmbientGreen;
+  /** 
+   * Config value: light ambient blue value.
+   */
+  int lightAmbientBlue;
 
 private:
 
@@ -957,10 +966,10 @@ private:
   uint currentFrameNumber;
 
     /// Option variable: force lightmap recalculation?
-  static int lightmapCacheMode;
+  int lightmapCacheMode;
   /// Maximum lightmap dimensions
-  static int maxLightmapWidth;
-  static int maxLightmapHeight;
+  int maxLightmapWidth;
+  int maxLightmapHeight;
 
   /// Clear the Z-buffer every frame.
   bool clearZBuf;

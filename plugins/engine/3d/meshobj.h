@@ -31,11 +31,6 @@
 #include "csutil/hash.h"
 #include "iutil/selfdestruct.h"
 #include "csgfx/shadervarcontext.h"
-#include "plugins/engine/3d/movable.h"
-#include "plugins/engine/3d/impmesh.h"
-#include "plugins/engine/3d/meshlod.h"
-#include "plugins/engine/3d/scenenode.h"
-#include "plugins/engine/3d/light.h"
 #include "imesh/object.h"
 #include "imesh/lighting.h"
 #include "iengine/mesh.h"
@@ -45,13 +40,20 @@
 #include "ivideo/graph3d.h"
 #include "ivideo/shader/shader.h"
 
+#include "movable.h"
+#include "impmesh.h"
+#include "meshlod.h"
+#include "scenenode.h"
+#include "light.h"
+
 struct iMeshWrapper;
-struct iRenderView;
 struct iMovable;
+struct iRenderView;
 struct iSharedVariable;
-class csMeshWrapper;
-class csMeshFactoryWrapper;
+class csEngine;
 class csLight;
+class csMeshFactoryWrapper;
+class csMeshWrapper;
 
 /**
  * General list of meshes.
@@ -265,6 +267,7 @@ protected:
   csShaderVariableContext svcontext;
   csRef<iShaderVariableContext> factorySVC;
 
+  csEngine* engine;
 private:
   /// Mesh object corresponding with this csMeshWrapper.
   csRef<iMeshObject> meshobj;
@@ -385,7 +388,7 @@ protected:
 
 public:
   /// Constructor.
-  csMeshWrapper (iMeshObject* meshobj = 0);
+  csMeshWrapper (csEngine* engine, iMeshObject* meshobj = 0);
 
   /// Set the mesh factory.
   virtual void SetFactory (iMeshFactoryWrapper* factory)
@@ -784,11 +787,12 @@ private:
 
   csFlags flags;
 
+  csEngine* engine;
 public:
   /// Constructor.
-  csMeshFactoryWrapper (iMeshObjectFactory* meshFact);
+  csMeshFactoryWrapper (csEngine* engine, iMeshObjectFactory* meshFact);
   /// Constructor.
-  csMeshFactoryWrapper ();
+  csMeshFactoryWrapper (csEngine* engine);
   /// Destructor.
   virtual ~csMeshFactoryWrapper ();
 
@@ -811,7 +815,7 @@ public:
   /**
    * Create a new mesh object for this template.
    */
-  iMeshWrapper* CreateMeshWrapper ();
+  csPtr<iMeshWrapper> CreateMeshWrapper ();
 
   /**
    * Do a hard transform of this factory.

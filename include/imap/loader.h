@@ -58,13 +58,13 @@ struct iLoaderStatus : public iBase
   virtual bool IsError () = 0;
 };
 
-SCF_VERSION (iLoader, 0, 0, 9);
-
 /**
  * This interface represents the map loader.
  */
-struct iLoader : public iBase
+struct iLoader : public virtual iBase
 {
+  SCF_INTERFACE (iLoader, 1, 0, 0);
+
   /**
    * Load an image file. The image will be loaded in the format requested by
    * the engine. If no engine exists, the format is taken from the video

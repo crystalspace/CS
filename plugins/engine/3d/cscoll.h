@@ -26,9 +26,9 @@
 #include "iutil/selfdestruct.h"
 #include "iengine/collectn.h"
 
-class csSector;
+class csCollectionList;
 class csEngine;
-
+class csSector;
 
 /**
  * A collection object is for convenience of the script language.
@@ -43,7 +43,7 @@ public:
   /**
    * Create a new csCollection with the given name.
    */
-  csCollection ();
+  csCollection (csCollectionList* collections);
   /**
    * Destroy the collection.
    */
@@ -81,6 +81,8 @@ public:
 private:
   /// The list of objects contained in this csCollection.
   csRefArray<iObject> objects;
+
+  csCollectionList* collections;
 };
 
 #endif // __CS_CSCOLL_H__

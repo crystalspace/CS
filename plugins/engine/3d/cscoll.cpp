@@ -16,12 +16,13 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 #include "cssysdef.h"
-#include "plugins/engine/3d/cscoll.h"
-#include "plugins/engine/3d/engine.h"
+
+#include "cscoll.h"
+#include "engine.h"
 
 
-csCollection::csCollection ()
-  : scfImplementationType (this), objects (8, 8)
+csCollection::csCollection (csCollectionList* collections)
+  : scfImplementationType (this), objects (8, 8), collections (collections)
 {
 }
 
@@ -31,8 +32,7 @@ csCollection::~csCollection ()
 
 void csCollection::SelfDestruct ()
 {
-  csEngine::currentEngine->GetCollections ()->Remove (
-  	(iCollection*)this);
+  collections->Remove (static_cast<iCollection*> (this));
 }
 
 iObject *csCollection::FindObject (char *name) const

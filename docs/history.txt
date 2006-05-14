@@ -22,6 +22,7 @@ chronological order.
 	- res changed csBlockAllocator to disallow assignments and copy-
 	  constructing.
 	- res added a proper copy ctor for csSubRectangles.
+	- res removed some static variables from csEngine.
 13-May-2006
 	- Fossi added new compile output to .cvsignore.
 	- Fossi added new paging terrain version and 'terrainp' testlevel.

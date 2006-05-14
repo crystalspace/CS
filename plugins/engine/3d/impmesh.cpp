@@ -18,20 +18,21 @@
 
 #include "cssysdef.h"
 #include "csqsqrt.h"
-#include "plugins/engine/3d/impmesh.h"
-#include "plugins/engine/3d/sector.h"
-#include "plugins/engine/3d/meshobj.h"
-#include "plugins/engine/3d/light.h"
-#include "plugins/engine/3d/engine.h"
 #include "iengine/portal.h"
 #include "csutil/debug.h"
 #include "iengine/rview.h"
 #include "ivideo/graph3d.h"
 
-csImposterMesh::csImposterMesh (csMeshWrapper *parent)
+#include "impmesh.h"
+#include "sector.h"
+#include "meshobj.h"
+#include "light.h"
+#include "engine.h"
+
+csImposterMesh::csImposterMesh (csEngine* engine, csMeshWrapper *parent)
 {
   parent_mesh = parent;
-  tex = new csImposterProcTex (this);
+  tex = new csImposterProcTex (engine, this);
   ready	= false;
   incidence_dist = 0;
 }

@@ -122,8 +122,6 @@ struct iMaterialEngine : public iBase
   virtual bool IsVisitRequired () const = 0;
 };
 
-SCF_VERSION (iMaterialList, 0, 0, 1);
-
 /**
  * This class represents a list of materials.
  *
@@ -133,8 +131,10 @@ SCF_VERSION (iMaterialList, 0, 0, 1);
  * Main users of this interface:
  *   - iEngine
  */
-struct iMaterialList : public iBase
+struct iMaterialList : public virtual iBase
 {
+  SCF_INTERFACE (iMaterialList, 1, 0, 0);
+
   /// Create a new material.
   virtual iMaterialWrapper* NewMaterial (iMaterial* material,
   	const char* name) = 0;

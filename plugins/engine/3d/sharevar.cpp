@@ -33,8 +33,7 @@ void csSharedVariable::FireListeners ()
 
 void csSharedVariable::SelfDestruct ()
 {
-  csEngine::currentEngine->GetVariableList ()->Remove (
-  	(iSharedVariable*)this);
+  variables->Remove (static_cast<iSharedVariable*> (this));
 }
 
 //-----------------------------------------------------------------------------
@@ -91,9 +90,9 @@ iSharedVariable *csSharedVariableList::FindByName (
   return list.FindByName (Name);
 }
 
-csPtr<iSharedVariable> csSharedVariableList::New() const
+csPtr<iSharedVariable> csSharedVariableList::New()
 {
-  csSharedVariable *New = new csSharedVariable;
+  csSharedVariable *New = new csSharedVariable (this);
   return csPtr<iSharedVariable> (New);
 }
 

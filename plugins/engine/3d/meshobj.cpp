@@ -117,8 +117,8 @@ public:
 // csMeshWrapper
 // ---------------------------------------------------------------------------
 
-csMeshWrapper::csMeshWrapper (iMeshObject *meshobj) 
-  : scfImplementationType (this)
+csMeshWrapper::csMeshWrapper (csEngine* engine, iMeshObject *meshobj) 
+  : scfImplementationType (this), engine (engine)
 {
   DG_TYPE (this, "csMeshWrapper");
 
@@ -126,7 +126,7 @@ csMeshWrapper::csMeshWrapper (iMeshObject *meshobj)
   wor_bbox_movablenr = -1;
   movable.SetMeshWrapper (this);
 
-  render_priority = csEngine::currentEngine->GetObjectRenderPriority ();
+  render_priority = engine->GetObjectRenderPriority ();
 
   last_anim_time = 0;
 
@@ -135,8 +135,8 @@ csMeshWrapper::csMeshWrapper (iMeshObject *meshobj)
   csMeshWrapper::meshobj = meshobj;
   if (meshobj)
   {
-    light_info = SCF_QUERY_INTERFACE (meshobj, iLightingInfo);
-    portal_container = SCF_QUERY_INTERFACE (meshobj, iPortalContainer);
+    light_info = scfQueryInterface<iLightingInfo> (meshobj);
+    portal_container = scfQueryInterface<iPortalContainer> (meshobj);
     // Only if we have a parent can it possibly be useful to call
     // AddToSectorPortalLists. Because if we don't have a parent yet then
     // we cannot have a sector either. If we have a parent then the parent
@@ -165,7 +165,7 @@ csMeshWrapper::csMeshWrapper (iMeshObject *meshobj)
 
 void csMeshWrapper::SelfDestruct ()
 {
-  csEngine::currentEngine->GetMeshes ()->Remove ((iMeshWrapper*)this);
+  engine->GetMeshes ()->Remove (static_cast<iMeshWrapper*> (this));
 }
 
 iShadowReceiver* csMeshWrapper::GetShadowReceiver ()
@@ -182,7 +182,7 @@ iShadowReceiver* csMeshWrapper::GetShadowReceiver ()
 
     if (!meshobj) return 0;
     shadow_receiver_valid = true;
-    shadow_receiver = SCF_QUERY_INTERFACE (meshobj, iShadowReceiver);
+    shadow_receiver = scfQueryInterface<iShadowReceiver> (meshobj);
   }
   return shadow_receiver;
 }
@@ -627,7 +627,7 @@ csRenderMesh** csMeshWrapper::GetRenderMeshes (int& n, iRenderView* rview,
     csrview->SetCsRenderContext (ctxt);
   }
 
-  csTicks lt = csEngine::currentEngine->GetLastAnimationTime ();
+  csTicks lt = engine->GetLastAnimationTime ();
   meshobj->NextFrame (lt, movable.GetPosition ());
     
   csMeshWrapper *meshwrap = this;
@@ -867,7 +867,7 @@ void csMeshWrapper::SetImposterActive (bool flag)
   imposter_active = flag;
   if (flag)
   {
-    imposter_mesh = new csImposterMesh (this);
+    imposter_mesh = new csImposterMesh (engine, this);
     imposter_mesh->SetImposterReady (false);
   }
 }
@@ -1071,8 +1071,8 @@ void csMeshWrapper::PlaceMesh ()
   radius = sphere.GetRadius ();
   float max_sq_radius = radius * radius;
 
-  csRef<iMeshWrapperIterator> it = csEngine::currentEngine
-  	->GetNearbyMeshes (sector, sphere.GetCenter (), radius, true);
+  csRef<iMeshWrapperIterator> it = 
+    engine->GetNearbyMeshes (sector, sphere.GetCenter (), radius, true);
 
   int j;
   while (it->HasNext ())
@@ -1275,21 +1275,23 @@ iMeshWrapper* csMeshWrapper::FindChildByName (const char* name)
 // ---------------------------------------------------------------------------
 
 
-csMeshFactoryWrapper::csMeshFactoryWrapper (iMeshObjectFactory *meshFact)
+csMeshFactoryWrapper::csMeshFactoryWrapper (csEngine* engine,
+                                            iMeshObjectFactory *meshFact)
   : scfImplementationType (this), meshFact (meshFact), parent (0),
-  zbufMode (CS_ZBUF_USE)
+  zbufMode (CS_ZBUF_USE), engine (engine)
 {
   children.SetMeshFactory (this);
 
-  render_priority = csEngine::currentEngine->GetObjectRenderPriority ();
+  render_priority = engine->GetObjectRenderPriority ();
 }
 
-csMeshFactoryWrapper::csMeshFactoryWrapper ()
-  : scfImplementationType (this), parent (0), zbufMode (CS_ZBUF_USE)
+csMeshFactoryWrapper::csMeshFactoryWrapper (csEngine* engine)
+  : scfImplementationType (this), parent (0), zbufMode (CS_ZBUF_USE), 
+  engine (engine)
 {
   children.SetMeshFactory (this);
 
-  render_priority = csEngine::currentEngine->GetObjectRenderPriority ();
+  render_priority = engine->GetObjectRenderPriority ();
 }
 
 csMeshFactoryWrapper::~csMeshFactoryWrapper ()
@@ -1301,8 +1303,8 @@ csMeshFactoryWrapper::~csMeshFactoryWrapper ()
 
 void csMeshFactoryWrapper::SelfDestruct ()
 {
-  csEngine::currentEngine->GetMeshFactories ()->Remove (
-  	(iMeshFactoryWrapper*)this);
+  engine->GetMeshFactories ()->Remove (
+    static_cast<iMeshFactoryWrapper*> (this));
 }
 
 void csMeshFactoryWrapper::SetZBufModeRecursive (csZBufMode mode)
@@ -1335,10 +1337,11 @@ void csMeshFactoryWrapper::SetMeshObjectFactory (iMeshObjectFactory *meshFact)
   csMeshFactoryWrapper::meshFact = meshFact;
 }
 
-iMeshWrapper *csMeshFactoryWrapper::CreateMeshWrapper ()
+csPtr<iMeshWrapper> csMeshFactoryWrapper::CreateMeshWrapper ()
 {
   csRef<iMeshObject> basemesh = meshFact->NewInstance ();
-  iMeshWrapper *mesh = (iMeshWrapper*)(new csMeshWrapper (basemesh));
+  iMeshWrapper* mesh = 
+    static_cast<iMeshWrapper*> (new csMeshWrapper (engine, basemesh));
   basemesh->SetMeshWrapper (mesh);
 
   if (GetName ()) mesh->QueryObject ()->SetName (GetName ());
@@ -1368,7 +1371,7 @@ iMeshWrapper *csMeshFactoryWrapper::CreateMeshWrapper ()
   for (i = 0; i < children.GetCount (); i++)
   {
     iMeshFactoryWrapper *childfact = children.Get (i);
-    iMeshWrapper *child = childfact->CreateMeshWrapper ();
+    csRef<iMeshWrapper> child = childfact->CreateMeshWrapper ();
     child->QuerySceneNode ()->SetParent (mesh->QuerySceneNode ());
     child->GetMovable ()->SetTransform (childfact->GetTransform ());
     child->GetMovable ()->UpdateMove ();
@@ -1390,11 +1393,9 @@ iMeshWrapper *csMeshFactoryWrapper::CreateMeshWrapper ()
 	}
       }
     }
-
-    child->DecRef ();
   }
 
-  return mesh;
+  return csPtr<iMeshWrapper> (mesh);
 }
 
 void csMeshFactoryWrapper::HardTransform (const csReversibleTransform &t)

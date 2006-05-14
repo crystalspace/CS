@@ -78,7 +78,7 @@ void csRegion::DeleteAll ()
     rc[i].weakb = b;
     rc[i].n = copy[i]->GetName ();
 #endif
-    if (csEngine::currentEngine->RemoveObject (b))
+    if (engine->RemoveObject (b))
     {
       copy[i] = 0;
       total--;
@@ -105,11 +105,8 @@ void csRegion::DeleteAll ()
       if (copy[i])
       {
         iObject *o = copy[i];
-        csEngine::currentEngine->ReportBug (
-          "\
-There is still an object in the array after deleting region contents!\n\
-Object name is '%s'",
-          o->GetName () ? o->GetName () : "<NoName>");
+        engine->ReportBug ("There is still an object in the array after "
+          "deleting region contents!\nObject name is '%s'", o->GetName ());
       }
     CS_ASSERT (false);
   }
@@ -118,7 +115,7 @@ Object name is '%s'",
 bool csRegion::PrepareTextures ()
 {
   csRef<iObjectIterator> iter;
-  iTextureManager *txtmgr = csEngine::currentEngine->G3D->GetTextureManager ();
+  iTextureManager *txtmgr = engine->G3D->GetTextureManager ();
 
   // First register all textures to the texture manager.
   iter = GetIterator ();

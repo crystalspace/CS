@@ -38,7 +38,9 @@
 
 //#include "iutil/vfs.h"
 
-csImposterProcTex::csImposterProcTex (csImposterMesh *parent) : csProcTexture ()
+csImposterProcTex::csImposterProcTex (csEngine* engine, 
+                                      csImposterMesh *parent) : 
+  csProcTexture (), engine (engine)
 {
   mesh = parent;
 
@@ -47,7 +49,7 @@ csImposterProcTex::csImposterProcTex (csImposterMesh *parent) : csProcTexture ()
 
   texFlags = CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS;
 
-  csProcTexture::Initialize (csEngine::objectRegistry);
+  csProcTexture::Initialize (engine->objectRegistry);
 }
 
 csImposterProcTex::~csImposterProcTex ()
@@ -75,11 +77,11 @@ void csImposterProcTex::Animate (csTicks CurrentTime)
   g3d->SetRenderTarget (tex->GetTextureHandle ());
 
   // Switch to the context of the procedural texture.
-  iTextureHandle *oldContext = Engine->GetContext ();
-  Engine->SetContext (tex->GetTextureHandle ());
+  iTextureHandle *oldContext = engine->GetContext ();
+  engine->SetContext (tex->GetTextureHandle ());
 
   // Draw the engine view.
-  g3d->BeginDraw (CSDRAW_3DGRAPHICS | Engine->GetBeginDrawFlags ());
+  g3d->BeginDraw (CSDRAW_3DGRAPHICS | engine->GetBeginDrawFlags ());
 
   // Determine and save the actual polygon on which the texture will be rendered
   mesh->FindImposterRectangle (View->GetCamera () );
@@ -93,6 +95,6 @@ void csImposterProcTex::Animate (csTicks CurrentTime)
   g3d->FinishDraw ();
 
   // switch back to the old context
-  Engine->SetContext (oldContext);
+  engine->SetContext (oldContext);
 }
 

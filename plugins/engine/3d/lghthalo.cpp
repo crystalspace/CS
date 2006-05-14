@@ -310,7 +310,7 @@ bool csLightFlareHalo::Process (csTicks elapsed_time, iCamera* camera,
   csFlareComponent *p = flare->GetComponents ();
   while (p)
   {
-    ProcessFlareComponent (*engine, p, start, deltapos);
+    ProcessFlareComponent (engine, p, start, deltapos);
     p = p->next;
   }
 
@@ -318,7 +318,7 @@ bool csLightFlareHalo::Process (csTicks elapsed_time, iCamera* camera,
 }
 
 void csLightFlareHalo::ProcessFlareComponent (
-  csEngine const &engine,
+  csEngine* engine,
   csFlareComponent *comp,
   csVector2 const &start,
   csVector2 const &deltapos)
@@ -340,13 +340,13 @@ void csLightFlareHalo::ProcessFlareComponent (
 
   if (!comp->image)
   {
-    csEngine::currentEngine->Warn ("INTERNAL ERROR: flare used without material.");
+    engine->Warn ("INTERNAL ERROR: flare used without material.");
     return ;
   }
   iMaterial* mat = comp->image->GetMaterial ();
   if (!mat)
   {
-    csEngine::currentEngine->Warn ("INTERNAL ERROR: flare used without valid material.");
+    engine->Warn ("INTERNAL ERROR: flare used without valid material.");
     return ;
   }
 
@@ -366,7 +366,7 @@ void csLightFlareHalo::ProcessFlareComponent (
   csVector4 colors[4] = {csVector4 (intensity), csVector4 (intensity), 
     csVector4 (intensity), csVector4 (intensity)};
 
-  pos.y = ((float)engine.G3D->GetHeight()) - pos.y;
+  pos.y = ((float)engine->G3D->GetHeight()) - pos.y;
 
   // Create a rectangle containing the halo and clip it against screen
   csVector3 HaloPoly[4] =
@@ -387,5 +387,5 @@ void csLightFlareHalo::ProcessFlareComponent (
   mesh.texture = mat->GetTexture();
   mesh.mixmode = ((mode & CS_FX_MASK_MIXMODE) != CS_FX_ALPHA) ? mode : CS_FX_COPY;
 
-  engine.G3D->DrawSimpleMesh (mesh, csSimpleMeshScreenspace);
+  engine->G3D->DrawSimpleMesh (mesh, csSimpleMeshScreenspace);
 }

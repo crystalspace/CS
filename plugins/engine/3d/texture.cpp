@@ -18,17 +18,18 @@
 
 #include "cssysdef.h"
 #include <math.h>
-#include "plugins/engine/3d/texture.h"
-#include "plugins/engine/3d/engine.h"
 #include "igraphic/image.h"
 #include "ivideo/txtmgr.h"
+
+#include "texture.h"
+#include "engine.h"
 
 CS_LEAKGUARD_IMPLEMENT (csTextureWrapper);
 
 //---------------------------------------------------------------------------
 
-csTextureWrapper::csTextureWrapper (iImage *Image)
-  : scfImplementationType (this),
+csTextureWrapper::csTextureWrapper (csEngine* engine, iImage *Image)
+  : scfImplementationType (this), engine (engine),
   flags(CS_TEXTURE_3D)
 {
   image = Image;
@@ -37,8 +38,8 @@ csTextureWrapper::csTextureWrapper (iImage *Image)
   UpdateKeyColorFromImage ();
 }
 
-csTextureWrapper::csTextureWrapper (iTextureHandle *ith) 
-  : scfImplementationType (this)
+csTextureWrapper::csTextureWrapper (csEngine* engine, iTextureHandle *ith) 
+  : scfImplementationType (this), engine (engine)
 {
   keep_image = false;
   texClass = 0;
@@ -58,12 +59,11 @@ csTextureWrapper::csTextureWrapper (iTextureHandle *ith)
 
 void csTextureWrapper::SelfDestruct ()
 {
-  csEngine::currentEngine->GetTextureList ()->Remove (
-  	(iTextureWrapper*)this);
+  engine->GetTextureList ()->Remove (static_cast<iTextureWrapper*>(this));
 }
 
 csTextureWrapper::csTextureWrapper (const csTextureWrapper &t) :
-  iBase(), scfImplementationType (this),
+  scfImplementationType (this), engine (t.engine),
   flags(CS_TEXTURE_3D)
 {
   handle = t.handle;
@@ -131,11 +131,9 @@ void csTextureWrapper::Register (iTextureManager *txtmgr)
 
     if (!csIsPowerOf2 (Width) || !csIsPowerOf2 (Height))
     {
-      csEngine::currentEngine->Warn (
-          "Inefficient texture image '%s' dimensions!\nThe width (%d) and height (%d) should be a power of two.\n",
-          GetName (),
-          Width,
-          Height);
+      engine->Warn ("Inefficient texture image '%s' dimensions!\n"
+        "The width (%d) and height (%d) should be a power of two.",
+        GetName (), Width, Height);
     }
   }
 
@@ -171,90 +169,68 @@ const char* csTextureWrapper::GetTextureClass ()
 }
 
 //------------------------------------------------------- csTextureList -----//
-SCF_IMPLEMENT_IBASE(csTextureList)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iTextureList)
-SCF_IMPLEMENT_IBASE_END
 
-SCF_IMPLEMENT_EMBEDDED_IBASE (csTextureList::TextureList)
-  SCF_IMPLEMENTS_INTERFACE(iTextureList)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-csTextureList::csTextureList () :
-  csRefArrayObject<iTextureWrapper> (16, 16)
+csTextureList::csTextureList (csEngine* engine) : scfImplementationType (this),
+  csRefArrayObject<iTextureWrapper> (16, 16), engine (engine)
 {
-  SCF_CONSTRUCT_IBASE (0);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiTextureList);
 }
 
 csTextureList::~csTextureList()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiTextureList);
-  SCF_DESTRUCT_IBASE ();
 }
 
 iTextureWrapper *csTextureList::NewTexture (iImage *image)
 {
-  iTextureWrapper *tm = new csTextureWrapper (image);
+  csRef<iTextureWrapper> tm;
+  tm.AttachNew (new csTextureWrapper (engine, image));
   Push (tm);
-  tm->DecRef ();
   return tm;
 }
 
 iTextureWrapper *csTextureList::NewTexture (iTextureHandle *ith)
 {
-  iTextureWrapper *tm = new csTextureWrapper (ith);
+  csRef<iTextureWrapper> tm;
+  tm.AttachNew (new csTextureWrapper (engine, ith));
   Push (tm);
-  tm->DecRef ();
   return tm;
 }
 
-iTextureWrapper *csTextureList::TextureList::NewTexture (iImage *image)
+int csTextureList::GetCount () const
 {
-  return scfParent->NewTexture (image);
+  return (int)this->Length ();
 }
 
-iTextureWrapper *csTextureList::TextureList::NewTexture (iTextureHandle *ith)
+iTextureWrapper *csTextureList::Get (int n) const
 {
-  return scfParent->NewTexture (ith);
+  return csRefArrayObject<iTextureWrapper>::Get (n);
 }
 
-int csTextureList::TextureList::GetCount () const
+int csTextureList::Add (iTextureWrapper *obj)
 {
-  return (int)scfParent->Length ();
+  return (int)this->Push (obj);
 }
 
-iTextureWrapper *csTextureList::TextureList::Get (int n) const
+bool csTextureList::Remove (iTextureWrapper *obj)
 {
-  return scfParent->Get (n);
+  return this->Delete (obj);
 }
 
-int csTextureList::TextureList::Add (iTextureWrapper *obj)
+bool csTextureList::Remove (int n)
 {
-  return (int)scfParent->Push (obj);
+  return this->DeleteIndex (n);
 }
 
-bool csTextureList::TextureList::Remove (iTextureWrapper *obj)
+void csTextureList::RemoveAll ()
 {
-  return scfParent->Delete (obj);
+  this->DeleteAll ();
 }
 
-bool csTextureList::TextureList::Remove (int n)
+int csTextureList::Find (iTextureWrapper *obj) const
 {
-  return scfParent->DeleteIndex (n);
+  return (int)csRefArrayObject<iTextureWrapper>::Find (obj);
 }
 
-void csTextureList::TextureList::RemoveAll ()
+iTextureWrapper *csTextureList::FindByName (const char *Name) const
 {
-  scfParent->DeleteAll ();
-}
-
-int csTextureList::TextureList::Find (iTextureWrapper *obj) const
-{
-  return (int)scfParent->Find (obj);
-}
-
-iTextureWrapper *csTextureList::TextureList::FindByName (
-  const char *Name) const
-{
-  return scfParent->FindByName (Name);
+  return csRefArrayObject<iTextureWrapper>::FindByName (Name);
 }

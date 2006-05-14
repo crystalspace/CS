@@ -195,9 +195,9 @@ csCameraPositionList::~csCameraPositionList ()
 iCameraPosition *csCameraPositionList::NewCameraPosition (const char *name)
 {
   csVector3 v (0);
-  csCameraPosition *cp = new csCameraPosition (name, "", v, v, v);
+  csRef<csCameraPosition> cp;
+  cp.AttachNew (new csCameraPosition (this, name, "", v, v, v));
   positions.Push (cp);
-  cp->DecRef ();
   return cp;
 }
 
@@ -255,10 +255,10 @@ csCollectionList::~csCollectionList ()
 
 iCollection *csCollectionList::NewCollection (const char *name)
 {
-  csCollection *c = new csCollection ();
+  csRef<csCollection> c;
+  c.AttachNew (new csCollection (this));
   c->SetName (name);
   collections.Push (c);
-  c->DecRef ();
   return c;
 }
 
@@ -713,36 +713,30 @@ bool csMeshListIt::HasNext () const
 }
 
 //---------------------------------------------------------------------------
-int csEngine::frameWidth;
-int csEngine::frameHeight;
-iObjectRegistry *csEngine::objectRegistry = 0;
-csEngine *csEngine::currentEngine = 0;
-iEngine *csEngine::currentiEngine = 0;
-int csEngine::lightmapCacheMode = CS_ENGINE_CACHE_READ | CS_ENGINE_CACHE_NOUPDATE;
-int csEngine::maxLightmapWidth = 0;
-int csEngine::maxLightmapHeight = 0;
-
 SCF_IMPLEMENT_FACTORY (csEngine)
 
 csEngine::csEngine (iBase *iParent) :
-  scfImplementationType (this, iParent),
-  textures (new csTextureList), materials (new csMaterialList),
-  sharedVariables (new csSharedVariableList),
+  scfImplementationType (this, iParent), objectRegistry (0),
+  frameWidth (0), frameHeight (0), 
+  lightAmbientRed (CS_DEFAULT_LIGHT_LEVEL),
+  lightAmbientGreen (CS_DEFAULT_LIGHT_LEVEL),
+  lightAmbientBlue (CS_DEFAULT_LIGHT_LEVEL),
+  sectors (this), textures (new csTextureList (this)), 
+  materials (new csMaterialList), sharedVariables (new csSharedVariableList),
   sectorItPool (0),
   renderLoopManager (0), topLevelClipper (0), resize (false),
   worldSaveable (false), maxAspectRatio (0), nextframePending (0),
-  currentFrameNumber (0), clearZBuf (false), defaultClearZBuf (false),
-  clearScreen (false), defaultClearScreen (false), 
+  currentFrameNumber (0), 
+  lightmapCacheMode (CS_ENGINE_CACHE_READ | CS_ENGINE_CACHE_NOUPDATE),
+  maxLightmapWidth (0), maxLightmapHeight (0),
+  clearZBuf (false), defaultClearZBuf (false), 
+  clearScreen (false),  defaultClearScreen (false), 
   defaultMaxLightmapWidth (256), defaultMaxLightmapHeight (256),
   currentRenderContext (0)
 {
   DG_TYPE (this, "csEngine");
 
   scfiEventHandler = new eiEventHandler (this);
-
-  currentEngine = this;
-  currentiEngine = (iEngine*)this;
-  objectRegistry = 0;
 
   ClearRenderPriorities ();
 }
@@ -1001,7 +995,7 @@ void csEngine::DeleteAll ()
   delete materials;
   materials = new csMaterialList ();
   delete textures;
-  textures = new csTextureList ();
+  textures = new csTextureList (this);
   delete sharedVariables;
   sharedVariables = new csSharedVariableList();
 
@@ -1154,7 +1148,7 @@ void csEngine::PrepareTextures ()
   // First register all textures to the texture manager.
   for (i = 0; i < textures->Length (); i++)
   {
-    iTextureWrapper *csth = textures->Get (i);
+    iTextureWrapper *csth = textures->Get ((int)i);
     if (!csth->GetTextureHandle ()) csth->Register (txtmgr);
     if (!csth->KeepImage ()) csth->SetImageFile (0);
   }
@@ -1332,9 +1326,9 @@ void csEngine::ShineLights (iRegion *region, iProgressMeter *meter)
   memset (&current, 0, sizeof (current));
   current.lm_version = 3;
   current.normal_light_level = CS_NORMAL_LIGHT_LEVEL;
-  current.ambient_red = csLight::ambient_red;
-  current.ambient_green = csLight::ambient_green;
-  current.ambient_blue = csLight::ambient_blue;
+  current.ambient_red = lightAmbientRed;
+  current.ambient_green = lightAmbientGreen;
+  current.ambient_blue = lightAmbientBlue;
   current.cosinus_factor = 0;	//@@@
   current.lightmap_size = 0;	//@@@
 
@@ -1631,7 +1625,7 @@ void csEngine::PrecacheDraw (iRegion* region)
   size_t i;
   for (i = 0 ; i < textures->Length () ; i++)
   {
-    iTextureWrapper* txt = textures->Get (i);
+    iTextureWrapper* txt = textures->Get ((int)i);
     if (txt->GetTextureHandle ())
       if (!region || region->IsInRegion (txt->QueryObject ()))
       {
@@ -2025,9 +2019,9 @@ void csEngine::ReadConfig (iConfigFile *Config)
       "Engine.Lighting.Ambient.Blue",
       CS_DEFAULT_LIGHT_LEVEL);
 
-  csLight::ambient_red = defaultAmbientRed;
-  csLight::ambient_green = defaultAmbientGreen;
-  csLight::ambient_blue = defaultAmbientBlue;
+  lightAmbientRed = defaultAmbientRed;
+  lightAmbientGreen = defaultAmbientGreen;
+  lightAmbientBlue = defaultAmbientBlue;
 
   defaultClearZBuf = 
     Config->GetBool ("Engine.ClearZBuffer", defaultClearZBuf);
@@ -2214,7 +2208,7 @@ int csEngine::GetNearbyLights (
   if (!light_array)
   {
     light_array = new csLightArray ();
-    csEngine::currentEngine->cleanupList.Push (light_array);
+    cleanupList.Push (light_array);
     light_array->DecRef ();
   }
 
@@ -2259,7 +2253,7 @@ int csEngine::GetNearbyLights (
   if (!light_array)
   {
     light_array = new csLightArray ();
-    csEngine::currentEngine->cleanupList.Push (light_array);
+    cleanupList.Push (light_array);
     light_array->DecRef ();
   }
 
@@ -2906,10 +2900,10 @@ csPtr<iMeshWrapper> csEngine::CreateSectorWallsMesh (
 
 iSector *csEngine::CreateSector (const char *name)
 {
-  iSector *sector = (iSector*)(new csSector (this, objectRegistry));
+  csRef<iSector> sector;
+  sector.AttachNew (new csSector (this));
   sector->QueryObject ()->SetName (name);
   sectors.Add (sector);
-  sector->DecRef ();
 
   FireNewSector (sector);
 
@@ -2978,7 +2972,7 @@ csPtr<iMaterial> csEngine::CreateBaseMaterial (iTextureWrapper *txt)
 
 iTextureList *csEngine::GetTextureList () const
 {
-  return &(GetTextures ()->scfiTextureList);
+  return GetTextures ();
 }
 
 iMaterialList *csEngine::GetMaterialList () const
@@ -2999,7 +2993,7 @@ iRegionList *csEngine::GetRegions ()
 
 csPtr<iCamera> csEngine::CreateCamera ()
 {
-  return csPtr<iCamera> ((iCamera*)(new csCamera ()));
+  return csPtr<iCamera> (new csCamera (frameWidth, frameHeight));
 }
 
 csPtr<iLight> csEngine::CreateLight (
@@ -3009,7 +3003,7 @@ csPtr<iLight> csEngine::CreateLight (
   const csColor &color,
   csLightDynamicType dyntype)
 {
-  csLight *light = new csLight (
+  csLight *light = new csLight (this,
       pos.x, pos.y, pos.z,
       radius,
       color.red, color.green, color.blue,
@@ -3051,7 +3045,7 @@ csPtr<iMeshFactoryWrapper> csEngine::CreateMeshFactory (
   // That's because that duplicate factory can still be in another
   // region. And even if this is not the case then factories with same
   // name are still allowed.
-  csMeshFactoryWrapper *mfactwrap = new csMeshFactoryWrapper (fact);
+  csMeshFactoryWrapper *mfactwrap = new csMeshFactoryWrapper (this, fact);
   if (name) mfactwrap->SetName (name);
   GetMeshFactories ()->Add (mfactwrap);
   fact->SetMeshFactoryWrapper ((iMeshFactoryWrapper*)mfactwrap);
@@ -3066,7 +3060,7 @@ csPtr<iMeshFactoryWrapper> csEngine::CreateMeshFactory (const char *name)
   // That's because that duplicate factory can still be in another
   // region. And even if this is not the case then factories with same
   // name are still allowed.
-  csMeshFactoryWrapper *mfactwrap = new csMeshFactoryWrapper ();
+  csMeshFactoryWrapper *mfactwrap = new csMeshFactoryWrapper (this);
   if (name) mfactwrap->SetName (name);
   GetMeshFactories ()->Add (mfactwrap);
   return csPtr<iMeshFactoryWrapper> (mfactwrap);
@@ -3081,12 +3075,12 @@ class EngineLoaderContext : public scfImplementation1<EngineLoaderContext,
                                                      iLoaderContext>
 {
 private:
-  iEngine* Engine;
+  csEngine* Engine;
   iRegion* region;
   bool curRegOnly;
 
 public:
-  EngineLoaderContext (iEngine* Engine, iRegion* region, bool curRegOnly);
+  EngineLoaderContext (csEngine* Engine, iRegion* region, bool curRegOnly);
   virtual ~EngineLoaderContext ();
 
   virtual iSector* FindSector (const char* name);
@@ -3106,7 +3100,7 @@ public:
 };
 
 
-EngineLoaderContext::EngineLoaderContext (iEngine* Engine,
+EngineLoaderContext::EngineLoaderContext (csEngine* Engine,
 	iRegion* region, bool curRegOnly)
   : scfImplementationType (this), Engine (Engine), region (region),
   curRegOnly (curRegOnly)
@@ -3157,10 +3151,10 @@ iTextureWrapper* EngineLoaderContext::FindNamedTexture (const char* name,
 iShader* EngineLoaderContext::FindShader (const char* name)
 {
   if (!curRegOnly || !region)
-    return csEngine::currentEngine->shaderManager->GetShader (name);
+    return Engine->shaderManager->GetShader (name);
 
-  const csRefArray<iShader>& shaders = csEngine::currentEngine->shaderManager
-  	->GetShaders ();
+  const csRefArray<iShader>& shaders = 
+    Engine->shaderManager->GetShaders ();
   size_t i;
   for (i = 0 ; i < shaders.Length () ; i++)
   {
@@ -3268,10 +3262,10 @@ csPtr<iMeshWrapper> csEngine::LoadMeshWrapper (
       objectRegistry, loaderClassId);
   if (!plug) return 0;
 
-  csMeshWrapper *meshwrap = new csMeshWrapper ();
+  csMeshWrapper *meshwrap = new csMeshWrapper (this);
   if (name) meshwrap->SetName (name);
 
-  iMeshWrapper *imw = (iMeshWrapper*)meshwrap;
+  iMeshWrapper *imw = static_cast<iMeshWrapper*> (meshwrap);
   GetMeshes ()->Add (imw);
   imw->DecRef (); // the ref is now stored in the MeshList
   if (sector)
@@ -3289,7 +3283,7 @@ csPtr<iMeshWrapper> csEngine::LoadMeshWrapper (
     return 0;
   }
 
-  csRef<iMeshObject> mof2 (SCF_QUERY_INTERFACE (mof, iMeshObject));
+  csRef<iMeshObject> mof2 (scfQueryInterface<iMeshObject> (mof));
   meshwrap->SetMeshObject (mof2);
   return csPtr<iMeshWrapper> (imw);
 }
@@ -3386,7 +3380,7 @@ csPtr<iMeshWrapper> csEngine::CreateMeshWrapper (
   iSector *sector,
   const csVector3 &pos)
 {
-  iMeshWrapper *mesh = factory->CreateMeshWrapper ();
+  csRef<iMeshWrapper> mesh = factory->CreateMeshWrapper ();
   if (name) mesh->QueryObject ()->SetName (name);
   GetMeshes ()->Add (mesh);
   if (sector)
@@ -3406,7 +3400,7 @@ csPtr<iMeshWrapper> csEngine::CreateMeshWrapper (
   iSector *sector,
   const csVector3 &pos)
 {
-  csMeshWrapper *meshwrap = new csMeshWrapper (mesh);
+  csMeshWrapper *meshwrap = new csMeshWrapper (this, mesh);
   if (name) meshwrap->SetName (name);
   GetMeshes ()->Add ((iMeshWrapper*)meshwrap);
   if (sector)
@@ -3422,7 +3416,7 @@ csPtr<iMeshWrapper> csEngine::CreateMeshWrapper (
 
 csPtr<iMeshWrapper> csEngine::CreateMeshWrapper (const char *name)
 {
-  csMeshWrapper *meshwrap = new csMeshWrapper ();
+  csMeshWrapper *meshwrap = new csMeshWrapper (this);
   if (name) meshwrap->SetName (name);
   GetMeshes ()->Add ((iMeshWrapper*)meshwrap);
   return csPtr<iMeshWrapper> ((iMeshWrapper*)meshwrap);
@@ -3501,23 +3495,23 @@ iTextureHandle *csEngine::GetContext () const
 
 void csEngine::SetAmbientLight (const csColor &c)
 {
-  csLight::ambient_red = int (c.red * 255.0f);
-  csLight::ambient_green = int (c.green * 255.0f);
-  csLight::ambient_blue = int (c.blue * 255.0f);
+  lightAmbientRed = int (c.red * 255.0f);
+  lightAmbientGreen = int (c.green * 255.0f);
+  lightAmbientBlue = int (c.blue * 255.0f);
 }
 
 void csEngine::GetAmbientLight (csColor &c) const
 {
-  c.red = csLight::ambient_red / 255.0f;
-  c.green = csLight::ambient_green / 255.0f;
-  c.blue = csLight::ambient_blue / 255.0f;
+  c.red = lightAmbientRed / 255.0f;
+  c.green = lightAmbientGreen / 255.0f;
+  c.blue = lightAmbientBlue / 255.0f;
 }
 
 void csEngine::GetDefaultAmbientLight (csColor &c) const
 {   
-  c.red = defaultAmbientRed / 255.0f;
-  c.green = defaultAmbientGreen / 255.0f;
-  c.blue = defaultAmbientBlue / 255.0f;
+  c.red = lightAmbientRed / 255.0f;
+  c.green = lightAmbientGreen / 255.0f;
+  c.blue = lightAmbientBlue / 255.0f;
 }
 
 csPtr<iFrustumView> csEngine::CreateFrustumView ()

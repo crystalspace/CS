@@ -117,7 +117,7 @@ public:
   /**
    * Construct a sector. This sector will be completely empty.
    */
-  csSector (csEngine*, iObjectRegistry* object_reg);
+  csSector (csEngine*);
 
   /**
    * Set single mesh. This is used to render only a single mesh out
@@ -427,8 +427,6 @@ private:
   /// Engine handle.
   csEngine* engine;
 
-  iObjectRegistry* object_reg;
-
   /// Optional renderloop.
   iRenderLoop* renderloop;
 
@@ -515,13 +513,13 @@ private:
   };
   csRef<NameChangeListener> listener;
 
-
+  csEngine* engine;
 public:
   void NameChanged (iObject* object, const char* oldname,
   	const char* newname);
 
   /// constructor
-  csSectorList ();
+  csSectorList (csEngine* engine);
   /// destructor
   virtual ~csSectorList ();
 

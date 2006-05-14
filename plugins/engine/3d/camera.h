@@ -25,8 +25,8 @@
 #include "iengine/camera.h"
 #include "iengine/scenenode.h"
 
-#include "plugins/engine/3d/sector.h"
-#include "plugins/engine/3d/movable.h"
+#include "sector.h"
+#include "movable.h"
 
 class csEngine;
 
@@ -94,7 +94,7 @@ private:
 
 public:
   ///
-  csCamera ();
+  csCamera (int frameWidth, int frameHeight);
   /// Copy constructor.
   csCamera (csCamera* c);
   /// Copy constructor.

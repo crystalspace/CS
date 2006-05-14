@@ -148,7 +148,7 @@ struct iSharedVariableList : public virtual iBase
   virtual iSharedVariable *FindByName (const char *Name) const = 0;
 
   /// iSharedVariable Factory method. This does not add the new var to the list.
-  virtual csPtr<iSharedVariable> New() const = 0;
+  virtual csPtr<iSharedVariable> New() = 0;
 };
 
 /** @} */
