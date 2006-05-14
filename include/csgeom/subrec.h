@@ -87,6 +87,7 @@ public:
     SubRect* children[2];
 
     SubRect ();
+    SubRect& operator= (const SubRect& other);
 
     /// searches for the "ideal" position of a rectangle
     void TestAlloc (int w, int h, AllocInfo& ai);
@@ -103,7 +104,6 @@ public:
       SubRect::SplitType& splitType);
   };
   friend class SubRect; // Give MSVC6 access to enclosing protected scope.
-
 protected:
   /// Dimensions of this region.
   csRect region;
@@ -132,6 +132,7 @@ protected:
 public:
   /// Allocate a new empty region with the given size.
   csSubRectangles (const csRect& region);
+  csSubRectangles (const csSubRectangles& other);
 
   /// Remove this region and sub-regions.
   ~csSubRectangles ();

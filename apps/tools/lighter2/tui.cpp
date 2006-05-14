@@ -194,7 +194,7 @@ namespace lighter
   void TUI::DrawProgress () const
   {
     csPrintf (CS_ANSI_CURSOR(70, 1));
-    csPrintf ("%03d%%", (uint)globalStats.progress.overallProgress);
+    csPrintf ("%3d%%", (uint)globalStats.progress.overallProgress);
     
     csPrintf (CS_ANSI_CURSOR(2, 2));
     csPrintf ("%s", GetProgressBar ((uint)globalStats.progress.overallProgress).GetDataSafe ());
@@ -203,7 +203,7 @@ namespace lighter
     csPrintf ("%s", globalStats.progress.taskName.Slice (0, 40).GetDataSafe ());
 
     csPrintf (CS_ANSI_CURSOR(70, 3));
-    csPrintf ("%03d%%", (uint)globalStats.progress.taskProgress);
+    csPrintf ("%3d%%", (uint)globalStats.progress.taskProgress);
 
     csPrintf (CS_ANSI_CURSOR(2, 4));
     csPrintf ("%s", GetProgressBar ((uint)globalStats.progress.taskProgress).GetDataSafe ());

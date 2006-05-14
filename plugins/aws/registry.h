@@ -1,7 +1,18 @@
 #ifndef __AWS_REGISTRY_H__
 #define __AWS_REGISTRY_H__
 
+// hack: work around problems caused by #defining 'new'
+#if defined(CS_EXTENSIVE_MEMDEBUG) || defined(CS_MEMORY_TRACKER)
+# undef new
+#endif
+#include <new>
+
 #include <map>
+
+#if defined(CS_EXTENSIVE_MEMDEBUG) || defined(CS_MEMORY_TRACKER)
+# define new CS_EXTENSIVE_MEMDEBUG_NEW
+#endif
+
 #include "object.h"
 
 /** Namespace which includes aws specific code. */

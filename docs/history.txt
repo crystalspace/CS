@@ -7,8 +7,6 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 14-May-2006
-  - Philip Wyett added entries for Cal3D and lib3ds to external
-    libraries section of manual.
 	- Piotr Obrzut added support for pseudo instancing.
 	- Piotr Obrzut fixes compile warning/errors related to 
           pseudo-instancing.
@@ -17,6 +15,13 @@ chronological order.
           csReporterListener::HandleEvent before trying to use them.  
           Useful for console applications using the Standard Reporter 
           plugin. 
+	- Philip Wyett added entries for Cal3D and lib3ds to external
+	  libraries section of manual.
+	- res fixed building of aws and the CEGUI stuff with memtracker 
+	  enabled.
+	- res changed csBlockAllocator to disallow assignments and copy-
+	  constructing.
+	- res added a proper copy ctor for csSubRectangles.
 13-May-2006
 	- Fossi added new compile output to .cvsignore.
 	- Fossi added new paging terrain version and 'terrainp' testlevel.

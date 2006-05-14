@@ -25,10 +25,19 @@
 * \addtogroup CEGUI
 * @{ */
 
+// hack: work around problems caused by #defining 'new'
+#if defined(CS_EXTENSIVE_MEMDEBUG) || defined(CS_MEMORY_TRACKER)
+# undef new
+#endif
+#include <new>
+#include <CEGUI.h>
+#if defined(CS_EXTENSIVE_MEMDEBUG) || defined(CS_MEMORY_TRACKER)
+# define new CS_EXTENSIVE_MEMDEBUG_NEW
+#endif
+
 #include "csutil/ref.h"
 #include "ivideo/texture.h"
 
-#include "CEGUI.h"
 #include "ceguirenderer.h"
 
 struct iObjectRegistry;

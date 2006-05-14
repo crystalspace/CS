@@ -20,6 +20,7 @@
 #define __CS_CSUTIL_ALLOCATOR_H__
 
 /**\file
+ * Basic allocator classes.
  */
 
 #include "alignedalloc.h"
@@ -71,7 +72,7 @@ namespace CS
 	free (p);
       #endif
       }
-      /// Resize the allocated block \p p to size \p newSize;
+      /// Resize the allocated block \p p to size \p newSize.
       void* Realloc (void* p, size_t newSize)
       {
       #ifdef CS_MEMORY_TRACKER

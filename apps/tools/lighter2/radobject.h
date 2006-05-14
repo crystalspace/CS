@@ -153,6 +153,7 @@ namespace lighter
   */
   class RadObject : public csRefCount
   {
+    RadObject (const RadObject&); // Illegal
   public:
     // Construct a new RadObject from a RadObjectFactory and transform
     RadObject (RadObjectFactory* object);

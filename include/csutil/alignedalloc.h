@@ -21,6 +21,7 @@
 #define __CS_CSUTIL_ALIGNED_ALLOC_H__
 
 /**\file
+ * Aligned memory allocations.
  */
 
 /**\addtogroup util_memory
@@ -30,6 +31,11 @@ namespace CS
 {
   namespace Memory
   {
+    /**
+     * Allocate a block of memory, with the start address being aligned
+     * to a multiple of \p align bytes.
+     * \remarks The returned block of memory must be freed with AlignedFree.
+     */
     static inline void* AlignedMalloc (size_t size, size_t align)
     {
     #ifdef CS_HAVE__ALIGNED_MALLOC
@@ -45,6 +51,7 @@ namespace CS
     #endif
     }
     
+    /// Free a block of memory allocated with AlignedMalloc.
     static inline void AlignedFree (void* ptr)
     {
     #ifdef CS_HAVE__ALIGNED_MALLOC
@@ -54,6 +61,13 @@ namespace CS
     #endif
     }
     
+    /**
+     * Reallocate a block of memory with a new size, with the start address 
+     * being aligned to a multiple of \p align bytes.
+     * \remarks The returned block of memory must be freed with AlignedFree.
+     * \warning The alignment must be the same as initially passed to 
+     *   AlignedMalloc.
+     */
     static inline void* AlignedRealloc (void* ptr, size_t size, 
       size_t align)
     {

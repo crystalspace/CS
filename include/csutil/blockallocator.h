@@ -34,6 +34,9 @@
 #endif
 #include <new>
 
+/**\addtogroup util_memory
+ * @{ */
+
 /**
  * This class implements a memory allocator which can efficiently allocate
  * objects that all have the same size. It has no memory overhead per
@@ -221,6 +224,8 @@ protected: // 'protected' allows access by test-suite.
     freenode = freenode->next;
     return node;
   }
+  csBlockAllocator (csBlockAllocator const&);  // Illegal; unimplemented.
+  void operator= (csBlockAllocator const&); 	// Illegal; unimplemented.
 public:
   /**
    * Construct a new block allocator.
@@ -378,6 +383,8 @@ public:
   /// Query number of elements per block.
   size_t GetBlockElements() const { return size; }
 };
+
+/** @} */
 
 #if defined(CS_EXTENSIVE_MEMDEBUG) || defined(CS_MEMORY_TRACKER)
 # define new CS_EXTENSIVE_MEMDEBUG_NEW

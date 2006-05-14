@@ -72,6 +72,41 @@ csSubRectangles::SubRect::SubRect ()
   parent = 0;
 }
 
+csSubRectangles::SubRect& csSubRectangles::SubRect::operator= (
+  const csSubRectangles::SubRect& other)
+{
+  rect = other.rect;
+  allocedRect = other.allocedRect;
+  splitType = other.splitType;
+  splitPos = other.splitPos;
+
+  if (children[0] != 0)
+  {
+    superrect->FreeSubrect (children[0]);
+    children[0] = 0;
+  }
+  if (other.children[0] != 0)
+  {
+    children[0] = superrect->AllocSubrect ();
+    children[0]->parent = this;
+    children[0]->superrect = superrect;
+    *(children[0]) = *(other.children[0]);
+  }
+  if (children[1] != 0)
+  {
+    superrect->FreeSubrect (children[1]);
+    children[1] = 0;
+  }
+  if (other.children[1] != 0)
+  {
+    children[1] = superrect->AllocSubrect ();
+    children[1]->parent = this;
+    children[1]->superrect = superrect;
+    *(children[1]) = *(other.children[1]);
+  }
+  return *this;
+}
+
 void csSubRectangles::SubRect::TestAlloc (int w, int h, AllocInfo& ai)
 {
   int rW = rect.Width ();
@@ -389,11 +424,16 @@ void csSubRectangles::SubRect::TestCollapse ()
 // --------------------------------------------------------------------------
 
 csSubRectangles::csSubRectangles (const csRect &region) : 
-  alloc (4096 / sizeof(SubRect))
+  region(region), root (0), alloc (4096 / sizeof(SubRect))
 {
-  csSubRectangles::region = region;
-  root = 0;
   Clear ();
+}
+
+csSubRectangles::csSubRectangles (const csSubRectangles& other) : 
+  region(region), root (0), alloc (4096 / sizeof(SubRect))
+{
+  Clear();
+  *root = *(other.root);
 }
 
 csSubRectangles::~csSubRectangles ()
