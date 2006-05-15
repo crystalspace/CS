@@ -21,13 +21,6 @@
   </plugins>
 
   <textures>
-    <texture name='branch.png'>
-      <file>branch.png</file> <alpha> <binary/> </alpha>
-    </texture>
-    <texture name='bark.png'>
-      <file>bark.png</file>
-    </texture>
-
     <texture name="andrew_marble4.jpg">
       <file>/lib/stdtex/andrew_marble4.jpg</file>
     </texture>
@@ -69,12 +62,6 @@
   </shaders>
 
   <materials>
-    <material name='materialbark'>
-      <texture>bark.png</texture>
-    </material>
-    <material name='branch'>
-      <texture>branch.png</texture>
-    </material>
     <material name="ScatterSky">
       <color red="0" green="0" blue="0" /> 
     </material>
@@ -131,6 +118,7 @@
   <library>tree.lib</library>
   <library>tree_skimp.lib</library>
   <library>treebark_bare.lib</library>
+  <library>bush2.lib</library>
 
   <addon>
     <plugin>crystalspace.renderloop.loop.loader</plugin>
@@ -362,6 +350,14 @@
 	    <radius>1</radius>
 	    <density>0.4</density>
 	    <materialfactor material="Grass" factor="1" />
+        </geometry>
+        <geometry>
+	    <factory maxdist="30" name="bush2" />
+	    <radius>1</radius>
+	    <density>0.04</density>
+	    <materialfactor material="Marble" factor="1" />
+	    <materialfactor material="Stone" factor="1" />
+	    <defaultmaterialfactor>.1</defaultmaterialfactor>
         </geometry>
         <geometry>
 	    <factory maxdist="10" name="TallGrass" />

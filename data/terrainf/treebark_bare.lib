@@ -1,4 +1,20 @@
+<?xml version="1.0" encoding="utf-8" ?> 
 <library>
+  <plugins>
+    <plugin name="genmeshFactory">crystalspace.mesh.loader.factory.genmesh</plugin>
+  </plugins>
+  <textures>
+    <texture name='bark.png'>
+      <file>bark.png</file>
+    </texture>
+  </textures>
+  <materials>
+    <material name='materialbark'>
+      <texture>bark.png</texture>
+    </material>
+  </materials>
+
+
 <meshfact name='treebark_bare'>
 <plugin>genmeshFactory</plugin>
 <zuse/>

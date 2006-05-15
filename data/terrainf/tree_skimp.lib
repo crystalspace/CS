@@ -1,6 +1,26 @@
+<?xml version="1.0" encoding="utf-8" ?> 
 <library>
-<meshfact name='tree_skimp'>
+  <plugins>
+    <plugin name="genmeshFactory">crystalspace.mesh.loader.factory.genmesh</plugin>
+  </plugins>
+  <textures>
+    <texture name='branch.png'>
+      <file>branch.png</file> <alpha> <binary/> </alpha>
+    </texture>
+    <texture name='bark.png'>
+      <file>bark.png</file>
+    </texture>
+  </textures>
+  <materials>
+    <material name='materialbark'>
+      <texture>bark.png</texture>
+    </material>
+    <material name='branch'>
+      <texture>branch.png</texture>
+    </material>
+  </materials>
 
+  <meshfact name='tree_skimp'>
     <nullmesh>
         <min x="-2" y="0" z="-2" />
         <max x="2" y="4" z="2" />
