@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+15-May-2006
+	- Jorrit got a new bush from Jason Bonham and added it to
+	  terrainf. Also made the lib files more standalone.
 14-May-2006
 	- Piotr Obrzut added support for pseudo instancing.
 	- Piotr Obrzut fixes compile warning/errors related to 
