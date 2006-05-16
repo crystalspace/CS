@@ -339,6 +339,7 @@ class csSkeletonScriptKeyFrame: public iSkeletonScriptKeyFrame
     csTicks duration;
     struct bone_key_frame
     {
+      bool relative;
       csReversibleTransform transform;
       iSkeletonBoneFactory *bone;
     };
@@ -359,11 +360,12 @@ class csSkeletonScriptKeyFrame: public iSkeletonScriptKeyFrame
       { return bones_frame_transforms.Length(); }
 
     virtual void AddTransform(iSkeletonBoneFactory *bone, 
-      csReversibleTransform &transform)
+      csReversibleTransform &transform, bool relative)
     {
       bone_key_frame bf;
       bf.transform = transform;
       bf.bone = bone;
+	  bf.relative = relative;
       bones_frame_transforms.Push(bf);
     }
 
@@ -391,10 +393,14 @@ class csSkeletonScriptKeyFrame: public iSkeletonScriptKeyFrame
       }
     }
 
-    virtual csReversibleTransform & GetTransform(size_t i)
-    { return bones_frame_transforms[i].transform; }
-    virtual iSkeletonBoneFactory *GetBone(size_t i)
-    { return bones_frame_transforms[i].bone; }
+  virtual void GetKeyFrameData(size_t i, iSkeletonBoneFactory *& bone_fact, 
+    csReversibleTransform & transform, bool & relative)
+    {
+	  const bone_key_frame & bkf = bones_frame_transforms[i];
+	  transform = bkf.transform;
+	  bone_fact = bkf.bone;
+	  relative = bkf.relative;
+    }
 };
 
 class csSkeletonScript : public iSkeletonScript
@@ -705,7 +711,7 @@ public:
   bool Initialize (iObjectRegistry* object_reg);
   bool HandleEvent (iEvent& ev);
 
-  virtual int GetFactoriesCount() { return 0; }
+  virtual int GetFactoriesCount() { return factories.Length(); }
   virtual iSkeletonFactory *CreateFactory(const char *name);
   virtual iSkeletonFactory *LoadFactory(const char *file_name) { return 0; }
   virtual iSkeletonFactory *FindFactory(const char *name) { return 0; }

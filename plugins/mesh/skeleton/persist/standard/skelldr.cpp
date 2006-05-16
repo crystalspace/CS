@@ -76,7 +76,8 @@ enum
   XMLTOKEN_JOINT,
   XMLTOKEN_ATTACHTOPARENT,
   XMLTOKEN_DISABLED,
-  XMLTOKEN_LOOP
+  XMLTOKEN_LOOP,
+  XMLTOKEN_RELATIVE
 };
 
 SCF_IMPLEMENT_IBASE (csSkeletonFactoryLoader)
@@ -135,6 +136,7 @@ bool csSkeletonFactoryLoader::Initialize (iObjectRegistry* object_reg)
   xmltokens.Register ("joint", XMLTOKEN_JOINT);
   xmltokens.Register ("attachtoparent", XMLTOKEN_ATTACHTOPARENT);
   xmltokens.Register ("disabled", XMLTOKEN_DISABLED);
+  xmltokens.Register ("relative", XMLTOKEN_RELATIVE);
 
   return true;
 }
@@ -150,7 +152,6 @@ const char *csSkeletonFactoryLoader::ParseBone (iDocumentNode* node,
 
   iSkeletonBoneFactory *bone = skel_fact->CreateBone(bonename);
   bone->SetParent(parent_bone);
-  //printf("added bone %s\n", bone->GetName());
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
@@ -392,7 +393,6 @@ const char *csSkeletonFactoryLoader::ParseBone (iDocumentNode* node,
               {
                 case XMLTOKEN_ROTCONSTRAINTS:
                 {
-                  printf("%s\n", name);
                   csRef<iDocumentNodeIterator> it = child->GetNodes ();
                   while (it->HasNext ())
                   {
@@ -407,7 +407,6 @@ const char *csSkeletonFactoryLoader::ParseBone (iDocumentNode* node,
                         csVector3 constraints = csVector3(child->GetAttributeValueAsFloat("x"),
                                         child->GetAttributeValueAsFloat("y"),
                                         child->GetAttributeValueAsFloat("z"));
-                        //printf("Min Rot Contraints: %.3f %.3f %.3f\n", constraints.x, constraints.y, constraints.z);
                         bone->GetRagdollInfo()->SetJointMinRotContraints(constraints);
                       }
                       break;
@@ -416,7 +415,6 @@ const char *csSkeletonFactoryLoader::ParseBone (iDocumentNode* node,
                         csVector3 constraints = csVector3(child->GetAttributeValueAsFloat("x"),
                                         child->GetAttributeValueAsFloat("y"),
                                         child->GetAttributeValueAsFloat("z"));
-                        //printf("Max Rot Contraints: %.3f %.3f %.3f\n", constraints.x, constraints.y, constraints.z);
                         bone->GetRagdollInfo()->SetJointMaxRotContraints(constraints);
                       }
                       break;
@@ -512,12 +510,12 @@ const char *csSkeletonFactoryLoader::ParseScript (iDocumentNode* node,
 const char *csSkeletonFactoryLoader::ParseFrame (iDocumentNode* node, 
   iSkeletonFactory *skel_fact, iSkeletonScript *script)
 {
-
-  const char* frame_name = "test"; //node->GetAttributeValue ("name");
-  int duration = node->GetAttributeValueAsInt ("duration");
-
+  const char* frame_name = node->GetAttributeValue ("name");
   if (!frame_name)
-    return "Name of the script is missing!";
+  {
+    frame_name = "";
+  }
+  int duration = node->GetAttributeValueAsInt ("duration");
 
   iSkeletonScriptKeyFrame *frame = script->CreateFrame(frame_name);
   frame->SetDuration(duration);
@@ -534,6 +532,8 @@ const char *csSkeletonFactoryLoader::ParseFrame (iDocumentNode* node,
       case XMLTOKEN_BONE:
         {
       const char *bone_name = child->GetAttributeValue ("name");
+      csReversibleTransform key_transform;
+	  bool relative = false;
 
       iSkeletonBoneFactory *bone_fact = skel_fact->FindBone(bone_name);
       if (!bone_fact)
@@ -549,9 +549,13 @@ const char *csSkeletonFactoryLoader::ParseFrame (iDocumentNode* node,
       csStringID id = xmltokens.Request (value);
       switch (id)
       {
+        case XMLTOKEN_RELATIVE:
+        {
+          relative = true;
+        }
+        break;
         case XMLTOKEN_MOVE:
         {
-          csReversibleTransform key_transform;
           csRef<iSyntaxService> SyntaxService = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
           csRef<iDocumentNode> vector_node = child->GetNode ("v");
           if (vector_node)
@@ -570,14 +574,14 @@ const char *csSkeletonFactoryLoader::ParseFrame (iDocumentNode* node,
             return false;
           key_transform.SetO2T (m);
           }
-          frame->AddTransform(bone_fact, key_transform);
         }
         break;
       }
       }
+        frame->AddTransform(bone_fact, key_transform, relative);
         }
         break;
-  }
+    }
   }
   return 0;
 }
@@ -598,7 +602,6 @@ csPtr<iBase> csSkeletonFactoryLoader::Parse (iDocumentNode* node,
   csRef<iDocumentNode> skelfact_node = node->GetNode("skelfact");
 
   const char* fact_name = skelfact_node->GetAttributeValue ("name");
-  //printf("node value %s\n", skelfact_node->GetValue ());
   iSkeletonFactory *skel_fact = graveyard->CreateFactory (fact_name);
 
   csRef<iDocumentNodeIterator> it = skelfact_node->GetNodes ();
@@ -623,6 +626,5 @@ csPtr<iBase> csSkeletonFactoryLoader::Parse (iDocumentNode* node,
   }
   }
 
-  //printf("skel_fact %s\n", skel_fact->GetName());
   return csPtr<iBase> (skel_fact);
 }

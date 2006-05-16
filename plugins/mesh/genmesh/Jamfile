@@ -4,3 +4,4 @@ SubInclude TOP plugins mesh genmesh object ;
 SubInclude TOP plugins mesh genmesh persist ;
 SubInclude TOP plugins mesh genmesh anim ;
 SubInclude TOP plugins mesh genmesh skelanim ;
+SubInclude TOP plugins mesh genmesh skelanim2 ;

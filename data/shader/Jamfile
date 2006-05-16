@@ -8,3 +8,4 @@ SubInclude TOP data shader parallax ;
 SubInclude TOP data shader specular ;
 SubInclude TOP data shader snippets ;
 SubInclude TOP data shader surface ;
+SubInclude TOP data shader character ;

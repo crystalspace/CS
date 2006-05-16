@@ -98,13 +98,12 @@ struct iSkeletonScriptKeyFrame : public virtual iBase
   virtual void SetDuration (csTicks time) = 0;
   virtual size_t GetTransformsCount() = 0;
   virtual void AddTransform(iSkeletonBoneFactory *bone, 
-	  csReversibleTransform &transform) = 0;
+	  csReversibleTransform &transform, bool relative = false) = 0;
   virtual csReversibleTransform & GetTransform(iSkeletonBoneFactory *bone) = 0;
   virtual void SetTransform(iSkeletonBoneFactory *bone, 
 	  csReversibleTransform &transform) = 0;
-
-  virtual csReversibleTransform & GetTransform(size_t i) = 0;
-  virtual iSkeletonBoneFactory *GetBone(size_t i) = 0;
+  virtual void GetKeyFrameData(size_t i, iSkeletonBoneFactory *& bone_fact, 
+	  csReversibleTransform & transform, bool & relative) = 0;
 };
 
 struct iSkeletonScript : public virtual iBase
