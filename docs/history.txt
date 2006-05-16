@@ -14,9 +14,11 @@ chronological order.
 	  finalizers for all native objects, clipping for child objects,
 	  fixed the two layout mechanisms currently extant, fixed all
 	  widgets to compile properly when created directly or through XML,
-	  added a ListBox, a FileChooser widget, and is working on a ComboBox widget.
+	  added a ListBox, a FileChooser widget, and is working on a ComboBox
+	  widget.
 	  He also added several icons to the AWS data file to help make the 
 	  FileChooser pretty.
+	- Fossi also added terrainp to the vfs template as pointed out by eric
 15-May-2006
 	- Jorrit got a new bush from Jason Bonham and added it to
 	  terrainf. Also made the lib files more standalone.
