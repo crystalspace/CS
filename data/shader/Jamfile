@@ -9,3 +9,4 @@ SubInclude TOP data shader specular ;
 SubInclude TOP data shader snippets ;
 SubInclude TOP data shader surface ;
 SubInclude TOP data shader character ;
+SubInclude TOP data shader shadowmap ;

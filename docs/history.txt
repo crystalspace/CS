@@ -9,6 +9,7 @@ chronological order.
 16-May-2006
 	- caedes added gmeshskelanim2 plugin and related shaders from
 	  Erroroman. Also goes with some updates for skeleton code.
+	- caedes added Jam files for the shadowmap shader folder.
 15-May-2006
 	- Jorrit got a new bush from Jason Bonham and added it to
 	  terrainf. Also made the lib files more standalone.
