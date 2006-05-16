@@ -300,6 +300,13 @@ static JSBool gradient_get_staticProperty (JSContext *cx, JSObject *obj,
   return JS_FALSE;
 }
 
+static void FinalizeGradient(JSContext *cx, JSObject *obj)
+{
+    csGradient *go = (csGradient *)JS_GetPrivate (cx, obj);
+        
+    delete go; 	
+}
+
 
 JSClass gradient_object_class = {
   "Gradient", 
@@ -311,7 +318,7 @@ JSClass gradient_object_class = {
   JS_EnumerateStub,
   JS_ResolveStub,
   JS_ConvertStub,
-  JS_FinalizeStub,
+  FinalizeGradient,
   JSCLASS_NO_OPTIONAL_MEMBERS 
 };
 

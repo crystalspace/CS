@@ -22,12 +22,11 @@ function Horizontal(settings)
 		if (new_h > this._current_height) 
 		{	
 			this._current_height = new_h;
-			var adjusted_h = child.height;
-			
+						
 			// Resize the height of all children.
 			for(var kid in this.kids)
 			{				
-				kid.ResizeTo(kid.width,adjusted_h);									
+				kid.ResizeTo(kid.width,new_h);									
 			}
 		}
 		else

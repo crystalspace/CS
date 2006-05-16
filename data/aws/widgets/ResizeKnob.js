@@ -1,8 +1,10 @@
 /** ResizeKnob factory. */
-function ResizeKnob()
+function ResizeKnob(settings)
 {
 	var _widget = new Widget;
 	var prefs = Skin.current;
+	
+	if (settings==null) settings={};
 	
 	// Give it a pen
 	_widget.SetPen(new Pen);	

@@ -4,6 +4,8 @@ function RadioButton(settings)
 	var _widget = new Widget;
 	var prefs = Skin.current;
 	
+	if (settings==null) settings={};
+	
 	// Give it a pen
 	_widget.SetPen(new Pen);
 			
@@ -20,11 +22,11 @@ function RadioButton(settings)
 	_widget.__defineSetter__("text", function(v) { this._text = v; this.Invalidate();} );	
 	_widget.__defineGetter__("text", function() { return this._text; });	
 	
-	_widget.text = settings.text;
-	_widget.align = settings.align;
+	_widget.text = SafeDefault(settings.text, String(settings.text), "");	
+	_widget.align = SafeDefault(settings.align, Number(settings.align), Pen.ALIGN_LEFT);
 	
 	// Set the size	
-	var dim = prefs.Font.GetDimensions(text);
+	var dim = prefs.Font.GetDimensions(_widget.text);
     _widget.Resize(prefs.RadioButton.w + 5 + dim.width, dim.height);
 			
 	// Set the drawing function to be whatever the current style dictates.

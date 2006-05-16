@@ -124,14 +124,14 @@ w.AddChild(sb2);
 
 tb.Show();
 
-
 test_clock = Clock();
 test_clock.MoveTo(580,20);
 test_clock.Show();
 
 // Test the Window
 win = Window({title:"Test Window"});
-win.ResizeTo(300,300);
+win.ResizeTo(400,350);
+win.MoveTo(100,100);
 win.StatusBar.text = "Test complete.";
 win.Show();
 
@@ -139,6 +139,14 @@ win.Show();
 tt = ToolTip({title:"ToolTip", text:"A tooltip is designed to show\nshort, useful information."});
 tt.SetFocusPoint(test_clock.xmin + (test_clock.width>>1), test_clock.ymax);
 tt.Show();
+
+// Test a file chooser (also tests the list box)
+fc = FileChooser();
+win.AddChild(fc);
+fc.MoveTo(175,5);
+fc.Resize(0,200);
+fc.SetFrameAnchor(Widget.STICK_EAST);
+fc.SetMargin(5, Widget.MARGIN_EAST);
 
 // Test a checkbox
 chk = CheckBox({text:"Enable some setting", align:Pen.ALIGN_LEFT});

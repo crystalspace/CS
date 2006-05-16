@@ -121,6 +121,15 @@ static JSBool widget_setProperty (JSContext *cx, JSObject *obj, jsval id,
   return JS_TRUE;
 }
 
+static void FinalizeWidget(JSContext *cx, JSObject *obj)
+{
+  aws::widget *wo = (aws::widget *)JS_GetPrivate (cx, obj);
+  
+  wo->Unlink();
+  
+  delete wo;	
+}
+
 ///// Widget JS Class //////////////////////////////////////////////////
 JSClass widget_object_class = {
   "Widget", 
@@ -275,10 +284,19 @@ static JSBool AddChild (JSContext *cx, JSObject *obj, uintN argc, jsval *argv,
 
   JSObject *child_object = JSVAL_TO_OBJECT(argv[0]);
 
+  if (!(JSVAL_IS_OBJECT(argv[0])))
+  {
+	JS_ReportError (cx, 
+      "You must specify a widget to add as a child.");
+
+	return JS_FALSE;	
+  }
+
   if (JS_InstanceOf (cx, child_object, &widget_object_class, NULL) == JS_FALSE)
   {
     JS_ReportError (cx, 
       "Trying to add an object that is not a Widget as a child is prohibited.");
+
     return JS_FALSE;	
   } 
 
@@ -434,7 +452,10 @@ static JSBool Show (JSContext *cx, JSObject *obj, uintN argc, jsval *argv,
 {		
   aws::widget *wo = (aws::widget *)JS_GetPrivate (cx, obj);
 
-  AwsMgr ()->AddWidget (wo);
+  if (wo->IsChild())
+  	wo->Show();
+  else
+  	AwsMgr ()->AddWidget (wo);
 
   return JS_TRUE;
 }
@@ -445,7 +466,10 @@ static JSBool Hide (JSContext *cx, JSObject *obj, uintN argc, jsval *argv,
 {		
   aws::widget *wo = (aws::widget *)JS_GetPrivate (cx, obj);
 
-  AwsMgr ()->RemoveWidget (wo);
+  if (wo->IsChild())
+  	wo->Hide();
+  else
+  	AwsMgr ()->RemoveWidget (wo);
 
   return JS_TRUE;
 }
@@ -659,15 +683,15 @@ namespace aws
         // Clear the dirty flag
         dirty = JS_FALSE;
       }		
-
-
+	  
       wpen->Draw (output_pen);	
     }
 
 	// Draw all children.
 	for(size_t i=0; i<children.Length (); ++i)
 	{
-	children[i]->Draw (output_pen);						
+		if (children[i]->visible)
+			children[i]->Draw (output_pen);						
 	}		
 	
 	// Finish the drawing

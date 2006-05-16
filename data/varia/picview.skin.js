@@ -38,7 +38,9 @@ picView.Scale = function() { lw.Show(); delayedCmd(picView.cmdScale); }
 // Create a new widget with the picview controls in it.
 function PicViewControls()
 {
-	var button_bar = 	 	  	 
+	var button_bar = 	
+	   <widget type="Panel"> 	  	 
+	    <setup>widget.onDraw=Skin.current.Style.RoundedPanel</setup>
 		 <layout type="Horizontal" id="button_bar">		  
 		 	<padding>2</padding>
 		 
@@ -67,7 +69,8 @@ function PicViewControls()
 		 		<text>Scale</text>
 		 		<event name="onMouseClick" action="picView.Scale" />		 				 		
 		 	</widget>		 	
-		 </layout>;	
+		 </layout>
+		</widget>;	
 	
 	return ParseXMLInterface(button_bar, null);
 }
@@ -115,6 +118,8 @@ lw.MoveTo((Sys.GetWidth()/2) - (lw.width/2), (Sys.GetHeight()/2) - (lw.height/2)
 
 // Create a new controls widget
 controls = PicViewControls();
+button_bar.MoveTo(4,4);
+controls.ResizeTo(button_bar.width+8, button_bar.height+8);
 
 // Center the controls on the top of the screen
 controls.MoveTo((Sys.GetWidth()/2) - (controls.width/2), 0);

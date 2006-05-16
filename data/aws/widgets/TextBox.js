@@ -1,66 +1,64 @@
 /** TextBox constructor. */
-function TextBox(inittext)
+function TextBox(settings)
 {
-	// Initialize the text property.
-	this.text = new String(inittext);
+	var _widget = new Widget;
+	var prefs = Skin.current;
+	var sb = prefs.TextBox;
 	
+	if (settings==null) settings={};
+	
+	// Give it a pen
+	_widget.SetPen(new Pen);
+	
+	// The text of the titlebar.		
+	_widget._text = SafeDefault(settings.text, String(settings.text), "");
+	_widget.border = SafeDefault(settings.border, Boolean(settings.border), true);
+	_widget.cursor_pos = 0;
+	
+	// Some widget-specific settings.
+	_widget.draw_init=false;
+		
 	// Initialize the cursor position property.
-	this.cursor_pos = 0;
+	_widget.cursor_pos = 0;
+	
+	// Resize the textbox to a basic size.
+	_widget.ResizeTo(100,prefs.Font.GetTextHeight()+5);
 	
 	// Initialize the alignment
-	this.hAlign = Pen.ALIGN_LEFT;
-	this.vAlign = Pen.ALIGN_CENTER;
+	_widget.halign = SafeDefault(settings.halign, Number(settings.halign), Pen.ALIGN_LEFT);
+	_widget.valign = SafeDefault(settings.valign, Number(settings.valign), Pen.ALIGN_CENTER);
 	
 	// Invalidate and fire onChange when the text property is set.
-	this.__defineSetter__("text", function(t) { this.text = t; this.Invalidate(); if (this.onChange) this.onChange(this); });		
+	_widget.__defineSetter__("text", function(t) { this._text = t; this.Invalidate(); if (this.onChange) this.onChange(this); });		
+	_widget.__defineGetter__("text", function()  { return this._text; });	
 	
 	// When text changes, this is fired if it's set.
-	this.onChange = null;			
-}
-
-// Inherit from widget.
-TextBox.prototype = new Widget;
-
-// Set the default border method.
-TextBox.prototype.DrawFrame = Frames.Rect;
-
-// Setup the onDraw function for all textboxes.
-TextBox.prototype.onDraw = function(pen, prefs)
-{
-	var tw, th;
+	_widget.onChange = null;			
 	
-	// Draw the frame.
-	this.DrawFrame(pen, prefs);
+	// Set the drawing function to be whatever the current style dictates.
+	_widget.onDraw = Skin.current.Style.TextBox;	
 	
-	// Draw the text.
-	pen.SetColor(prefs["TextColor"]);
-	pen.WriteBoxed(x, y, x+width, y+height, hAlign, vAlign, text);
-	
-	// Get the width of the text where the cursor is.
-	pen.GetTextSize(text.slice(0, cursor_pos), tw, th);
-	
-	// Draw the cursor position.
-	pen.DrawLine(x+tw, y+1, x+tw+1, y+th-2);
-}
-
-TextBox.prototype.onKeypress = function(key, modifiers)
-{
-	switch(key)
+	// Handle keypresses
+	_widget.onKeypress = function(key, modifiers)
 	{
-		case Keys.Backspace: text = text.slice(0, -1); break;
-		
-		case Keys.Left:  --cursor_pos; 
-						 if (cursor_pos<0) cursor_pos=0;
-			break;
+		switch(key)
+		{
+			case Keys.Backspace: this.text = this.text.slice(0, -1); break;
 			
-		case Keys.Right: ++cursor_pos; 
-						 if (cursor_pos>text.length) cursor_pos=text.length;
-			break;
-			
-		default:
-			text+=key;
-			++cursor_pos;
-			break;
-	}	
+			case Keys.Left:  --this.cursor_pos; 
+							 if (this.cursor_pos<0) this.cursor_pos=0;
+				break;
+				
+			case Keys.Right: ++this.cursor_pos; 
+							 if (this.cursor_pos>text.length) this.cursor_pos=this.text.length;
+				break;
+				
+			default:
+				this.text+=key;
+				++this.cursor_pos;
+				break;
+		}	
+	}
+	
+    return _widget;
 }
-

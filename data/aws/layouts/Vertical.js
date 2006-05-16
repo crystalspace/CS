@@ -13,7 +13,7 @@ function Vertical(settings)
 	// When a child is added, grow the box.
 	l.onAddChild = function(child)
 	{
-		var new_w = child.height + (this.padding*2);
+		var new_w = child.width + (this.padding*2);
 		
 		child.MoveTo(this.padding, this._current_height + this.padding);
 						
@@ -22,12 +22,11 @@ function Vertical(settings)
 		if (new_w > this._current_width) 
 		{	
 			this._current_width = new_w;
-			var adjusted_w = child.width;
-			
-			// Resize the height of all children.
+						
+			// Resize the width of all children.
 			for(var kid in this.kids)
 			{				
-				kid.ResizeTo(adjusted_w, child.height);									
+				kid.ResizeTo(new_w, kid.height);									
 			}
 		}
 		else

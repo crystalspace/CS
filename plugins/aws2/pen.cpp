@@ -718,6 +718,14 @@ static JSBool pen_get_staticMixProperty (JSContext *cx, JSObject *obj,
   return JS_FALSE;
 }
 
+static void FinalizePen(JSContext *cx, JSObject *obj)
+{
+    aws::pen *po = (aws::pen *)JS_GetPrivate (cx, obj);
+                
+    delete po; 	
+}
+
+
 JSClass pen_object_class = {
   "Pen", 
   JSCLASS_HAS_PRIVATE,
@@ -728,7 +736,7 @@ JSClass pen_object_class = {
   JS_EnumerateStub,
   JS_ResolveStub,
   JS_ConvertStub,
-  JS_FinalizeStub 
+  FinalizePen 
 };
 
 // enum { WIDGET_XMIN, WIDGET_YMIN, WIDGET_XMAX, WIDGET_YMAX, WIDGET_WIDTH, WIDGET_HEIGHT, WIDGET_DIRTY };

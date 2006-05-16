@@ -49,6 +49,12 @@ namespace aws
       return bounds; 
     }
     
+    /// Set the parent for this frame.
+    void SetParent(frame *p)
+    {
+		parent = p;
+    }
+    
     /**
      * Gets the screen absolute x and y coordinates of this frame. The 'x'
      * and 'y' variables should be initialized to zero before the call.
@@ -75,12 +81,7 @@ namespace aws
      * and sets it to the transform you specify here.
      */
     void Transform (iPen *pen, float angle, float x, float y);
-
-    /**
-     * Override this function in the widget in order to draw it.  The drawing
-     * space is 0,0 to bounds.width, bounds.height.
-     */
-    virtual void OnDraw (iPen* /*pen*/) {}
+    
   };
 
   /** This manages frames.  It can find frames within a geometric area. */

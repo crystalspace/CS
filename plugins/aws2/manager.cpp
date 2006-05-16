@@ -27,6 +27,7 @@
 #include "gradient.h"
 #include "font.h"
 #include "texture.h"
+#include "vfs.h"
 #include "skin.h"
 
 
@@ -134,6 +135,7 @@ bool awsManager2::Initialize (iObjectRegistry *_object_reg)
   ScriptCon ()->Initialize (object_reg);
   ScriptMgr ()->Initialize (object_reg);
   
+  Vfs_SetupAutomation ();
   Color_SetupAutomation ();
   Gradient_SetupAutomation ();
   Skin_SetupAutomation ();
@@ -314,6 +316,8 @@ void awsManager2::Redraw ()
   static time_t start = time(NULL);
 
   ++frames;
+  
+  AwsMgr()->G2D()->SetClipRect(0,0, g2d->GetWidth(), g2d->GetHeight());
 
 //   g2d->Write (default_font, 90, 90, g2d->FindRGB (128,128,128,128), -1, 
 //     "AWS Redrawing");
@@ -359,6 +363,8 @@ void awsManager2::Redraw ()
     frames = 0;
     start=end;
   }	  
+  
+  AwsMgr()->G2D()->SetClipRect(0,0, g2d->GetWidth(), g2d->GetHeight());
 
   if (ScriptCon()->Visible())
   {

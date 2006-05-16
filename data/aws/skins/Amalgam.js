@@ -48,10 +48,17 @@ skin_Amalgam =
     Font 	  : new Font("VeraSans", 10),
     GaugeFont : new Font("VeraSans", 6),
     ClockFont : new Font("VeraSerif", 10),    
-    
-	Texture   : new Texture("/aws/texture.png"),
+    	
 	OverlayGradient : skin_AmalgamRes._createGlassGradient(),
 	DropShadowGradient : skin_AmalgamRes._createDropShadowGradient(),
+	
+	Arrows :
+	{
+		Left  : new Texture("/aws/arrow_lt.png"),
+		Right : new Texture("/aws/arrow_rt.png"),
+		Up    : new Texture("/aws/arrow_up.png"),
+		Down  : new Texture("/aws/arrow_dn.png"),
+	},
 	
     HighlightColor    : new Color(0.76, 0.96, 1, 1.0),
     ShadowColor	      : new Color(0.26, 0.56, 0.64, 1.0),
@@ -137,7 +144,42 @@ skin_Amalgam =
   		Border	: new Color(0,    0,    0,    1.0),  		
   		Miter   : 10,
   	},
-        
+  	
+  	ListBox : 
+  	{   	
+	  	w:100, h:50,	
+  		Base  	: new Color(0.56, 0.86, 0.94, 1.0),  
+  		Border	: new Color(0,    0,    0,    1.0),
+  		Color1  : new Color(0.75, 0.75, 0.75, 1.0),
+  		Color2  : new Color(0.70, 0.7,  0.7,  1.0),
+  		Selected: new Color(0.0,  0.0,  1.0,  0.5),
+  	},  
+  	  	
+  	
+  	FileChooser :
+  	{
+		w:200, h:100,
+						
+		DocIcon: new Texture("/aws/regular-doc.png"),
+		CompressedDocIcon: new Texture("/aws/compressed-doc.png"),
+		AudioDocIcon: new Texture("/aws/audio-doc.png"),
+		VideoDocIcon: new Texture("/aws/video-doc.png"),
+		ImageDocIcon: new Texture("/aws/image-doc.png"),
+		MeshDocIcon: new Texture("/aws/mesh-doc.png"),
+		
+		FolderNavUpIcon: new Texture("/aws/folder-nav-up.png"),
+		ActiveFolderIcon: new Texture("/aws/active-folder.png"),
+		VisitedFolderIcon: new Texture("/aws/visited-folder.png"),
+		FolderIcon: new Texture("/aws/folder.png"),
+		
+		
+		CompressedDocTypes: [".zip", ".gz", ".bz2", ".tgz"],
+		AudioDocTypes: [".mp3", ".wav", ".ogg", ".wma", ".au"],
+		VideoDocTypes: [".wmv", ".avi", ".rv"],
+		ImageDocTypes: [".jpg", ".png", ".bmp", ".gif"],
+		MeshDocTypes: [".blend", ".max", ".3ds"],		
+				 	
+  	}      
 	
 };
   

@@ -78,8 +78,9 @@ static JSBool Texture (JSContext *cx, JSObject *obj, uintN argc, jsval *argv,
     csRef<iTextureHandle> *to = 
       new csRef<iTextureHandle>(AwsMgr ()->G3D ()->GetTextureManager ()->
         RegisterTexture (img, CS_TEXTURE_2D | CS_TEXTURE_3D));
+        
     /* Disable compression on the texture.
-     * @@@ FIXME Really added so gradients look nice, but is this the right
+     * \todo FIXME Really added so gradients look nice, but is this the right
      *   place?
      */
     (*to)->SetTextureClass ("nocompress");
@@ -230,6 +231,13 @@ static JSBool Create (JSContext *cx, JSObject *obj, uintN argc, jsval *argv,
   return Texture (cx, obj, argc, argv, rval);
 }
 
+static void FinalizeTexture(JSContext *cx, JSObject *obj)
+{
+  csRef<iTextureHandle> *to = (csRef<iTextureHandle> *)JS_GetPrivate (cx, obj);		
+  
+  delete to;
+}
+
 
 JSClass texture_object_class = {
   "Texture", 
@@ -241,7 +249,7 @@ JSClass texture_object_class = {
   JS_EnumerateStub,
   JS_ResolveStub,
   JS_ConvertStub,
-  JS_FinalizeStub,
+  FinalizeTexture,
   JSCLASS_NO_OPTIONAL_MEMBERS 
 };
 

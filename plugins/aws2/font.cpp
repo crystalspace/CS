@@ -174,6 +174,12 @@ static JSBool Load (JSContext *cx, JSObject *obj, uintN argc, jsval *argv,
   return Font (cx, obj, argc, argv, rval);
 }
 
+static void FinalizeFont(JSContext *cx, JSObject *obj)
+{
+    csRef<iFont> *fo = (csRef<iFont> *)JS_GetPrivate (cx, obj);		
+            
+    delete fo; 	
+}
 
 JSClass font_object_class = 
 {
@@ -186,7 +192,7 @@ JSClass font_object_class =
   JS_EnumerateStub,
   JS_ResolveStub,
   JS_ConvertStub,
-  JS_FinalizeStub,
+  FinalizeFont,
   JSCLASS_NO_OPTIONAL_MEMBERS 
 };
 

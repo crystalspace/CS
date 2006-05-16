@@ -126,6 +126,10 @@ namespace aws
 
     /// The widget below this one.
     widget *below;
+    
+    /** True if this should be drawn.  Note that this flag is only
+     * checked for children.  It is ignored for top-level widgets. */    
+    bool visible;
 
   public:
     /// Updates the skin preferences.
@@ -142,7 +146,7 @@ namespace aws
 
     widget ()
       : wpen (0), parent (0), sticky_frame_flags (0), dirty (JS_TRUE), 
-        above (0), below (0)
+        above (0), below (0), visible(true)
     {
       memset (docked, 0, sizeof(docked)); 
       memset (docked_to, 0, sizeof(docked_to)); 
@@ -207,6 +211,26 @@ namespace aws
 
     /// Adds all docked widgets into the view/input chain.
     void LinkDocked (widget *w);  	 
+    
+    /// Returns true if this is a child widget, false otherwise.
+    bool IsChild()
+    {
+	 	return parent!=0;   
+    }
+    
+    /// Shows this widget if it's a child widget.
+    void Show()
+    {
+	 	visible=true;   
+	 	Invalidate();
+    }
+    
+    /// Hides this widget if it's a child widget.
+    void Hide()
+    {
+	 	visible=false;   
+	 	Invalidate();
+    }
 
     /// Returns true if the widget is a child of this widget.
     bool HasChild (widget *w)
@@ -251,13 +275,18 @@ namespace aws
     void AddChild (widget *w)
     {
       w->parent = this;
-      children.Push (w);	 
+      w->fr.SetParent(&fr);      
+      children.Push (w);
+      
+      w->AdjustForStickiness();	 
+      w->AdjustChildrenForStickiness();	 
     }
 
     /// Removes a child widget from this widget.
     void RemoveChild (widget *w)
     {
       w->parent = 0;
+      w->fr.SetParent(0);
       children.Delete (w);	 
     }
 
@@ -404,6 +433,8 @@ namespace aws
         children[i]->AdjustForStickiness ();	 
         children[i]->AdjustDocked ();
         children[i]->Invalidate ();
+        
+        children[i]->AdjustChildrenForStickiness();
       }	  	 
     }
 
@@ -499,7 +530,11 @@ namespace aws
     /// Sets a stick frame bit.
     void SetFrameAnchor (int32 flags)
     {
-      sticky_frame_flags |= flags;	 
+      sticky_frame_flags |= flags;
+      
+      AdjustForStickiness();	 
+      AdjustChildrenForStickiness();		 
+      Invalidate();
     }
 
     /// Clears a sticky frame bit.
@@ -511,7 +546,11 @@ namespace aws
     /// Sets the margin for the given side.
     void SetMargin (int32 size, int32 margin)
     {
-      margins[margin] = size;	 
+      margins[margin] = size;
+      
+      AdjustForStickiness();	 
+      AdjustChildrenForStickiness();		 
+      Invalidate();
     }
 
     /// Drawing ////

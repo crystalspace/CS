@@ -1181,5 +1181,70 @@ Style3D =
 	},
 	
 	
+	ListBox : function(pen)
+	{
+		var w = this.width, h = this.height;
+		var prefs = Skin.current;
+		var b = prefs.ListBox;
+		
+		pen.Clear();
+		
+		pen.SetColor(b.Border);
+		pen.DrawRect(0,0,w,h);
+		
+		var y=1, count=0;
+		
+		for (var i=this.start_index; i<this.items.length; ++i)
+		{
+			var item = this.items[i];
+			var ih = item.GetHeight();
+			
+			if (count&1) pen.SetColor(b.Color1);
+			else pen.SetColor(b.Color2);
+								
+			pen.SetFlag(Pen.FLAG_FILL);
+			pen.DrawRect(1,y,w-1,y+ih);			
+			pen.ClearFlag(Pen.FLAG_FILL);
+			
+			item.onDrawItem(pen, this, 1,y,w-1,y+ih);
+			
+			if (i==this.selected)
+			{
+				pen.SetFlag(Pen.FLAG_FILL);
+				pen.SetColor(b.Selected);
+				pen.DrawRect(1,y,w-1,y+ih);
+				pen.ClearFlag(Pen.FLAG_FILL);
+			}
+			
+			count+=1;
+			y+=ih;
+				
+			if (y>h) break;				
+		}
+		
+	},
+	
+	TextBox : function(pen)
+	{
+		var w  = this.width, h = this.height;
+						
+		var prefs = Skin.current;
+				
+		pen.Clear();		
+		
+		// Draw the background.
+		pen.SetColor(prefs.TextBackColor);
+		pen.SetFlag(Pen.FLAG_FILL);
+		pen.DrawRect(0,0,w,h);
+		pen.ClearFlag(Pen.FLAG_FILL);
+		
+		pen.SetColor(prefs.TextForeColor);
+		if (this.border==true) pen.DrawRect(0,0,w,h);
+										
+		pen.WriteBoxed(prefs.Font, 0, 0, w, h, this.halign, this.valign, this.text);			
+		
+	},
+	
+	
 	
 }; // end Style3D

@@ -155,6 +155,13 @@ static JSBool color_setProperty(JSContext *cx, JSObject *obj, jsval id,
   return JS_FALSE;
 }
 
+static void FinalizeColor(JSContext *cx, JSObject *obj)
+{
+    csColor4 *co = (csColor4 *)JS_GetPrivate (cx, obj);    
+        
+    delete co; 	
+}
+
 JSClass color_object_class = 
 {
   "Color", 
@@ -166,7 +173,7 @@ JSClass color_object_class =
   JS_EnumerateStub,
   JS_ResolveStub,
   JS_ConvertStub,
-  JS_FinalizeStub,
+  FinalizeColor,
   JSCLASS_NO_OPTIONAL_MEMBERS 
 };
 

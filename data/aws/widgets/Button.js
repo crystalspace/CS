@@ -4,6 +4,8 @@ function Button(settings)
 	var _widget = new Widget;
 	var prefs = Skin.current;
 	
+	if (settings==null) settings={};
+	
 	// Give it a pen
 	_widget.SetPen(new Pen);
 			
@@ -63,8 +65,7 @@ function ButtonWithText(settings)
 	
 	_widget.text = settings.text;	
 	
-	if (settings.padding!=undefined) _widget.padding=Number(settings.padding); 
-	else _widget.padding=1;
+	_widget.padding = SafeDefault(settings.padding, Number(settings.padding), 1);
 		
 	// Resize the button appropriately.
 	dim = Skin.current.Font.GetDimensions(settings.text);
@@ -80,3 +81,29 @@ function ButtonWithText(settings)
 	return _widget;
 }
 
+
+function ButtonWithIcon(settings)
+{
+	var _widget = Button(settings);
+	var dim;
+	
+	_widget.icon = settings.icon;	
+	
+	_widget.padding = SafeDefault(settings.padding, Number(settings.padding), 1);
+		
+	// Resize the button appropriately.
+	
+	_widget.onDrawContent = function(pen) 
+	{ 
+		pen.SetColor(1,1,1,1); 
+		pen.SetFlag(Pen.FLAG_TEXTURE);
+		pen.SetTexture(this.icon);
+		pen.PushTransform();
+		pen.Translate(_widget.padding, _widget.padding,0);
+		pen.DrawRect(0,0, _widget.width-(_widget.padding*2), _widget.height-(_widget.padding*2));
+		pen.PopTransform();
+		pen.ClearFlag(Pen.FLAG_TEXTURE);			
+	}
+	
+	return _widget;
+}

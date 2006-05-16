@@ -18,6 +18,7 @@
 
 #include "cssysdef.h"
 #include "frame.h"
+#include "manager.h"
 
 namespace aws
 {
@@ -54,10 +55,19 @@ namespace aws
 
     GetScreenPos (tx,ty);
 
+    // Adjust the pen so that children are translated correctly.
     pen->PushTransform ();
-    pen->Translate (csVector3 (tx, ty, 0));
+    pen->Translate (csVector3 (bounds.xmin, bounds.ymin, 0));
 
-    //OnDraw(pen);
+	// For debugging: draw the bounding box.	
+//     int color = AwsMgr()->G2D()->FindRGB(255,0,0,255);
+//     AwsMgr()->G2D()->DrawLine((int)tx,(int)ty, (int)tx+bounds.Width()+1, (int)ty,color);
+//     AwsMgr()->G2D()->DrawLine((int)tx,(int)ty, (int)tx, (int)ty + bounds.Height()+1,color);
+//     AwsMgr()->G2D()->DrawLine((int)tx+bounds.Width()+1,(int)ty, (int)tx+bounds.Width()+1, (int)ty + bounds.Height()+1,color);
+//     AwsMgr()->G2D()->DrawLine((int)tx,(int)ty + bounds.Height()+1, (int)tx+bounds.Width()+1, (int)ty + bounds.Height()+1,color);
+    
+    // Clip all the widgets to the bounding box they occupy.
+    AwsMgr()->G2D()->SetClipRect((int)tx-1,(int)ty-1, (int)tx+bounds.Width()+1, (int)ty + bounds.Height()+1);
   }
   
   void frame::Finish (iPen *pen)

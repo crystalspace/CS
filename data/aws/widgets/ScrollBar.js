@@ -1,14 +1,19 @@
 /** ScrollBar factory. */
-function ScrollBar(orientation_vertical)
+function ScrollBar(settings)
 {
 	var _widget = new Widget;
 	var prefs = Skin.current;
+	
+	if (settings==null) settings={};
 	
 	// Give it a pen
 	_widget.SetPen(new Pen);
 		
 	// Set the orientation of the ScrollBar
-	_widget.orientation_vertical = orientation_vertical;
+	if (settings.orientation_vertical!=undefined)
+		_widget.orientation_vertical = Boolean(settings.orientation_vertical);
+	else
+		_widget.orientation_vertical = false;
 	
 	// Setup the scroll bar
 	_widget._value=0;
@@ -24,7 +29,7 @@ function ScrollBar(orientation_vertical)
 	_widget.__defineGetter__("value", function() { return this._value; });	
 		
 	//  Set initial size
-	if (orientation_vertical)
+	if (_widget.orientation_vertical)
 	{	// vertical		
 		_widget.Resize(prefs.ScrollBarWidth, 20);
 		_widget.SetFrameAnchor(Widget.STICK_NORTH | Widget.STICK_SOUTH | Widget.TRACK_EAST);

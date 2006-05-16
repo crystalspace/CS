@@ -1,9 +1,11 @@
 /** StatusBar factory. */
-function StatusBar()
+function StatusBar(settings)
 {
 	var _widget = new Widget;
 	var prefs = Skin.current;
 	var sb = prefs.StatusBar;
+	
+	if (settings==null) settings={};
 	
 	// Give it a pen
 	_widget.SetPen(new Pen);

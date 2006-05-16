@@ -47,3 +47,18 @@ Function.method('assimilate', function (parent) {
     return this;
 });
 
+/// Tests the value test.  If it's undefined, it returns the default, other wise it returns value.
+function SafeDefault(testv, value, the_default)
+{
+	if (testv==undefined) return the_default;
+	
+	return value;
+}
+
+/// Tests the value test.  If it's undefined, it returns the default, otherwise it evaluates value and returns it.
+function SafeDefaultEval(testv, value, the_default)
+{
+	if (testv==undefined) return the_default;
+	
+	return eval(value);
+}
