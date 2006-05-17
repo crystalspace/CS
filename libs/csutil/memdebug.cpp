@@ -772,7 +772,7 @@ public:
     int i;
     csPrintf ("-----------------------------------------------------\n");
     csPrintf ("Module: %s\n", Class);
-    csPrintf ("     current      max current#     max# file\n");
+    csPrintf ("       bytes   ...max   blocks   ...max #alloc #free  file\n");
     size_t total_current_alloc = 0;
     int total_current_count = 0;
     for (i = 0 ; i < mti_table_count ; i++)
@@ -780,15 +780,17 @@ public:
       csMemTrackerInfo* mti = mti_table[i];
       if (!summary_only)
       {
-        csPrintf ("    %8zu %8zu %8d %8d %s\n", mti->current_alloc,
+        csPrintf ("    %8zu %8zu %8d %8d %6zu %6zu %s\n", mti->current_alloc,
             mti->max_alloc, mti->current_count, mti->max_count,
-            mti->file);
+            mti->totalAllocCount, mti->totalDeallocCount, mti->file);
       }
       total_current_alloc += mti->current_alloc;
       total_current_count += mti->current_count;
     }
-    csPrintf ("total_alloc=%zu total_count=%d Module=%s\n",
+  #define Sigma "\xE2\x88\x91"
+    csPrintf (Sigma "bytes=%zu " Sigma "blocks=%d Module=%s\n",
         total_current_alloc, total_current_count, Class);
+  #undef Sigma
     fflush (stdout);
   }
 };
@@ -902,12 +904,12 @@ void mtiRegisterModule (char* Class)
         iMemoryTracker);
     if (!mtiTR)
     {
-      mtiTR = csPtr<iMemoryTracker>((iMemoryTracker*)new csMemTrackerRegistry);
+      mtiTR.AttachNew (new csMemTrackerRegistry);
       iSCF::SCF->object_reg->Register (mtiTR,
         "crystalspace.utilities.memorytracker");
     }
-    mti_this_module = ((csMemTrackerRegistry*)(iMemoryTracker*)mtiTR)
-        ->NewMemTrackerModule (Class);
+    mti_this_module = (static_cast<csMemTrackerRegistry*> (
+      (iMemoryTracker*)mtiTR))->NewMemTrackerModule (Class);
   }
   else
   {
@@ -929,11 +931,13 @@ csMemTrackerInfo* mtiRegisterAlloc (size_t s, const char* filename)
     mti->max_count = mti->current_count;
   if (mti->current_alloc > mti->max_alloc)
     mti->max_alloc = mti->current_alloc;
+  mti->totalAllocCount++;
   return mti;
 }
 
 csMemTrackerInfo* mtiRegister (const char* info)
 {
+  if (!mti_this_module) return 0;
   csMemTrackerInfo* mti = mti_this_module->FindInsertMtiTableEntry (
         info);
   return mti;
@@ -945,6 +949,7 @@ void mtiRegisterFree (csMemTrackerInfo* mti, size_t s)
   {
     mti->current_count--;
     mti->current_alloc -= s;
+    mti->totalDeallocCount++;
   }
 }
 
@@ -958,6 +963,10 @@ void mtiUpdateAmount (csMemTrackerInfo* mti, int dcount, int dsize)
       mti->max_count = mti->current_count;
     if (mti->current_alloc > mti->max_alloc)
       mti->max_alloc = mti->current_alloc;
+    if (dcount > 0)
+      mti->totalAllocCount++;
+    else if (dcount < 0)
+      mti->totalDeallocCount++;
   }
 }
 
