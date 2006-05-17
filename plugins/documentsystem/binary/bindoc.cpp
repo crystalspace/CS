@@ -151,8 +151,7 @@ const char* csBdAttr::GetValueStr (csBinaryDocument* doc) const
     }
     else
     {
-      return doc->GetInIDString (
-	csLittleEndian::UInt32 (value));
+      return doc->GetInIDString (csLittleEndian::UInt32 (value));
     }
   }
 }
@@ -647,7 +646,7 @@ const char* csBdNode::GetValueStr (csBinaryDocument* doc) const
     }
     else
     {
-      return doc->GetInIDString (value);
+      return doc->GetInIDString (csLittleEndian::UInt32 (value));
     }
   }
 }
@@ -660,9 +659,10 @@ csBdAttr* csBdNode::atGetItem(int pos)
   }
   else
   {
-    void* at =  (void*)GetAttrTab();
-    return (csBdAttr*)((uint8*)at +
-      csLittleEndian::UInt32 (*((uint32*)at + pos + 1)));
+    bdNodeAttrTab* atab = GetAttrTab();
+    const uint32 attrOffsLE = 
+      *(((uint32*)((uint8*)atab + sizeof (bdNodeAttrTab))) + pos);
+    return (csBdAttr*)((uint8*)atab + csLittleEndian::UInt32 (attrOffsLE));
   }
 }
 
@@ -717,7 +717,7 @@ uint csBdNode::atNum ()
   }
   else
   {
-    return GetAttrTab()->num; 
+    return csLittleEndian::UInt32 (GetAttrTab()->num); 
   }
 }
 
@@ -729,9 +729,10 @@ csBdNode* csBdNode::ctGetItem(int pos)
   }
   else
   {
-    void* ct = (void*)GetChildTab();
-    return (csBdNode*)((uint8*)ct +
-      csLittleEndian::UInt32 (*((uint32*)ct + pos + 1)));
+    bdNodeChildTab* ctab = GetChildTab();
+    const uint32 childOffsLE = 
+      *(((uint32*)((uint8*)ctab + sizeof (bdNodeChildTab))) + pos);
+    return (csBdNode*)((uint8*)ctab + csLittleEndian::UInt32 (childOffsLE));
   }
 }
 
@@ -786,7 +787,7 @@ uint csBdNode::ctNum ()
   }
   else
   {
-    return GetChildTab()->num; 
+    return csLittleEndian::UInt32 (GetChildTab()->num); 
   }
 }
 
@@ -1774,7 +1775,7 @@ const char* csBinaryDocument::Parse (iDataBuffer* buf, bool /* collapse */)
   {
     return "Not a binary CS document";
   }
-  if (head->size != buf->GetSize())
+  if (csLittleEndian::UInt32 (head->size) != buf->GetSize())
   {
     return "Size mismatch";
   }
@@ -1789,9 +1790,10 @@ const char* csBinaryDocument::Parse (iDataBuffer* buf, bool /* collapse */)
   data = buf;
   dataStart = data->GetUint8();
 
-  inStrTabOfs =  sizeof(bdHeader) + bdDoc->ofsStr;
+  inStrTabOfs =  sizeof(bdHeader) + csLittleEndian::UInt32 (bdDoc->ofsStr);
 
-  root = (csBdNode*)((uint8*)bdDoc + bdDoc->ofsRoot);
+  root = (csBdNode*)((uint8*)bdDoc + 
+    csLittleEndian::UInt32 (bdDoc->ofsRoot));
 
   return 0;
 }
@@ -1871,7 +1873,7 @@ const char* csBinaryDocument::Write (iFile* out)
   out->Write (outNodes->GetData(), outNodes->GetSize());
   delete outNodes;
 
-  head.size = (uint32)out->GetSize();
+  head.size = csLittleEndian::UInt32 ((uint32)out->GetSize());
   out->SetPos (0);
   out->Write ((char*)&head, sizeof (head));
   out->Write ((char*)&doc, sizeof (doc));

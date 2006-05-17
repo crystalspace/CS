@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+17-May-2006
+	- res fixed a couple of bindoc endianness bloopers, with the help of
+	  dfryer, who acted as the remote debugger.
 16-May-2006
 	- caedes added gmeshskelanim2 plugin and related shaders from
 	  Erroroman. Also goes with some updates for skeleton code.
