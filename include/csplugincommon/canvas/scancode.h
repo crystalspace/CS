@@ -30,7 +30,7 @@
  * @{ */
 
 /// This array can be used to translate scancodes into Crystal Space codes
-extern CS_CRYSTALSPACE_EXPORT unsigned short ScanCodeToChar [128];
+extern CS_CRYSTALSPACE_EXPORT const unsigned short ScanCodeToChar [128];
 
 /** @} */
 

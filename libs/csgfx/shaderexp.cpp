@@ -194,7 +194,7 @@ Currently supported patterns:
 x, y  - This will not do anything to atomic arguments. x <= y. Most of these will
 require special handling during the compile stage.
 */
-static op_args_info optimize_arg_table[] = 
+static const op_args_info optimize_arg_table[] = 
 {
   { 0, 0, false }, //  OP_INVALID
 

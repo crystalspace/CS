@@ -37,7 +37,7 @@
 #undef NOP
 #define NOP ((char)-1)
 // This array defines first 32..128 character codes with SHIFT key applied
-static char ShiftedKey [128-32] =
+static const char ShiftedKey [128-32] =
 {
 ' ', '!', '"', '#', '$', '%', '&', '"', '(', ')', '*', '+', '<', '_', '>', '?',
 ')', '!', '@', '#', '$', '%', '^', '&', '*', '(', ':', ':', '<', '+', '>', '?',
@@ -139,7 +139,7 @@ csKeyComposer::~csKeyComposer ()
   List of supported diacritical marks.
   Should be sorted ascending.
  */
-const utf32_char marks[] = {
+static const utf32_char marks[] = {
   0x005e, // accent circumflex
   0x0060, // accent grave
   0x007e, // tilde
@@ -148,19 +148,19 @@ const utf32_char marks[] = {
   0x02da  // ring
 };
 
-const int numMarks = sizeof (marks) / sizeof (utf32_char);
+static const int numMarks = sizeof (marks) / sizeof (utf32_char);
 
 /*
   List of supported latin letters.
   Should be sorted ascending.
  */
-const utf32_char latinLetters[] = {
+static const utf32_char latinLetters[] = {
   ' ',
   'A', 'E', 'I', 'O', 'U', 'Y',
   'a', 'e', 'i', 'o', 'u', 'y'
 };
 
-const int numLetters = sizeof (latinLetters) / sizeof (utf32_char);
+static const int numLetters = sizeof (latinLetters) / sizeof (utf32_char);
 
 /// A combination is not available.
 #undef NOPE
@@ -169,7 +169,7 @@ const int numLetters = sizeof (latinLetters) / sizeof (utf32_char);
 /*
   All combinations of marks and letters we support.
  */
-const utf32_char combinedChars[numMarks][numLetters] = {
+static const utf32_char combinedChars[numMarks][numLetters] = {
   {0x005e,
    0x00c2, 0x00ca, 0x00ce, 0x00d4, 0x00db, 0x0176,
    0x00e2, 0x00ea, 0x00ee, 0x00f4, 0x00fb, 0x0177},

@@ -36,11 +36,7 @@
 struct iObjectRegistry;
 struct iPluginManager;
 
-namespace CS
-{
-namespace Plugins
-{
-namespace CSFont
+CS_PLUGIN_NAMESPACE_BEGIN(csFont)
 {
 
 class csDefaultFontServer;
@@ -95,7 +91,7 @@ public:
 
   /// Create the font object
   csDefaultFont (csDefaultFontServer *parent, const char *name, 
-    CharRange* glyphs, int height, int ascent, int descent,
+    const CharRange* glyphs, int height, int ascent, int descent,
     int text_height, int underline_position, int underline_thickness,
     csGlyphMetrics* gMetrics,
     iDataBuffer* bitmap, csBitmapMetrics* bMetrics,
@@ -254,8 +250,7 @@ public:
   { return emitErrors; }
 };
 
-} // namespace CSFont
-} // namespace Plugins
-} // namespace CS
+}
+CS_PLUGIN_NAMESPACE_END(csFont)
 
 #endif // __CS_CSFONT_H__

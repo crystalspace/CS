@@ -106,7 +106,7 @@ private:
   };
   // Index by edge number. Edge e and e+1 with e even are opposite edges.
   // (CS_BOX_EDGE_...)
-  static bEdge edges[8];
+  static const bEdge edges[8];
 
 protected:
   /// The top-left coordinate of the bounding box.
@@ -612,9 +612,19 @@ protected:
    * Index by edge number. Edge e and e+1 with e even are opposite edges.
    * (CS_BOX_EDGE_...) 
    */
-  static bEdge edges[24];
+  static const bEdge edges[24];
   /// Index by CS_BOX_SIDE_? number.
-  static bFace faces[6];
+  static const bFace faces[6];
+  /// This table also contains an array of sides visible from that region.
+  struct Outline
+  {
+    int num;
+    int vertices[8];
+    int num_sides;
+    int sides[3];
+  };
+  /// Outline lookup table.
+  static const Outline outlines[27];
 public:
   /// Get the minimum X value of the box
   inline float MinX () const { return minbox.x; }
@@ -678,7 +688,7 @@ public:
    * Given a face index (#CS_BOX_SIDE_x etc.) return the four edges oriented
    * clockwise around this face (#CS_BOX_EDGE_Xyz_xyz etc.).
    */
-  inline uint8* GetFaceEdges (int face) const
+  inline const uint8* GetFaceEdges (int face) const
   {
     return faces[face];
   }

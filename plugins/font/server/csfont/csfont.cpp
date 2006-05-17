@@ -31,21 +31,14 @@
 
 CS_IMPLEMENT_PLUGIN
 
-namespace CS
+CS_PLUGIN_NAMESPACE_BEGIN(csFont)
 {
-namespace Plugins
-{
-namespace CSFont
-{
+
 #include "font_police.h"
 #include "font_courier.h"	// font (C) Andrew Zabolotny
 #include "font_tiny.h"		// font (C) Andrew Zabolotny
 #include "font_italic.h"	// font (C) Andrew Zabolotny
-}
-}
-}
 
-using namespace CS::Plugins::CSFont;
 //---------------------------------------------------------------------------
 
 struct csFontDef
@@ -53,10 +46,10 @@ struct csFontDef
   const char* Name;
   int Height;
   int Baseline;
-  uint8 *FontBitmap;
+  const uint8 *FontBitmap;
   size_t bitmapSize;
-  uint8 *IndividualWidth;
-  csDefaultFont::CharRange* ranges;
+  const uint8 *IndividualWidth;
+  const csDefaultFont::CharRange* ranges;
   int underline_position;
   int underline_thickness;
   int text_height;
@@ -539,7 +532,7 @@ error:
 //--//--//--//--//--//--//--//--//--//--//--//--//--//- The font object -//--//
 
 csDefaultFont::csDefaultFont (csDefaultFontServer *parent, const char *name, 
-			      CharRange* glyphRanges, int height, 
+			      const CharRange* glyphRanges, int height, 
 			      int ascent, int descent,
 			      int text_height, int underline_position,
 			      int underline_thickness,
@@ -831,3 +824,5 @@ int csDefaultFont::GetUnderlineThickness ()
   return UnderlineThickness;
 }
 
+}
+CS_PLUGIN_NAMESPACE_END(csFont)

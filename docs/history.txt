@@ -11,6 +11,8 @@ chronological order.
 	  dfryer, who acted as the remote debugger.
 	- res augmented the memory tracker to also count the number of
 	  allocation/deallocation calls.
+	- res made a couple of look-up tables and generally read-only values
+	  'const'.
 16-May-2006
 	- caedes added gmeshskelanim2 plugin and related shaders from
 	  Erroroman. Also goes with some updates for skeleton code.

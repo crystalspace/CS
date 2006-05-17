@@ -1,6 +1,6 @@
 // Tiny proportional ~4x6 font
 
-uint8 font_Tiny [193 * 8] =
+static const uint8 font_Tiny [193 * 8] =
 {
   0x00, 0x70, 0x50, 0x50, 0x70, 0x00,
   0x7E, 0x81, 0xA5, 0x81, 0x99, 0x7E,
@@ -198,7 +198,7 @@ uint8 font_Tiny [193 * 8] =
   0x30, 0x48, 0x74, 0xc4, 0x58, 0x30
 };
 
-unsigned char width_Tiny[193] =
+static const unsigned char width_Tiny[193] =
 {
   5,4,2,3,6,6,6,6,6,6,6,6,4,4,4,4,		// 00-0F
   4,4,4,4,4,4,4,4,4,4,6,6,4,4,4,4,		// 10-1F
@@ -215,7 +215,7 @@ unsigned char width_Tiny[193] =
   6
 };
 
-csDefaultFont::CharRange ranges_Tiny[] =
+static const csDefaultFont::CharRange ranges_Tiny[] =
 {
   // 00 - 0f - Var. symbols
   {CS_FONT_DEFAULT_GLYPH,  1},
@@ -316,9 +316,9 @@ csDefaultFont::CharRange ranges_Tiny[] =
   {0, 0}
 };
 
-int underline_position_Tiny = 1;
+static const int underline_position_Tiny = 1;
 
-int underline_thickness_Tiny = 1;
+static const int underline_thickness_Tiny = 1;
 
-int text_height_Tiny = 10;
+static const int text_height_Tiny = 10;
 

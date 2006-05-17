@@ -35,7 +35,7 @@ void csLightShaderVarCache::SetStrings (iStringSet* strings)
   
 csStringID csLightShaderVarCache::GetLightSVId (size_t num, LightProperty prop)
 {
-  static const char* svSuffixes[_lightCount] = {
+  static const char* const svSuffixes[_lightCount] = {
     "diffuse",
     "specular",
     "position object",
@@ -77,7 +77,7 @@ csStringID csLightShaderVarCache::GetLightSVId (size_t num, LightProperty prop)
 
 csStringID csLightShaderVarCache::GetDefaultSVId (DefaultSV var)
 {
-  static const char* svNames[_varCount] = {
+  static const char* const svNames[_varCount] = {
     "light ambient",
     "light count"
   };

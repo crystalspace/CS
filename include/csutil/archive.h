@@ -54,10 +54,10 @@ struct csFileTime;
 class CS_CRYSTALSPACE_EXPORT csArchive
 {
 public:
-  static char hdr_central[4];
-  static char hdr_local[4];
-  static char hdr_endcentral[4];
-  static char hdr_extlocal[4];
+  static const char hdr_central[4];
+  static const char hdr_local[4];
+  static const char hdr_endcentral[4];
+  static const char hdr_extlocal[4];
 
 private:
   /// csArchive entry class

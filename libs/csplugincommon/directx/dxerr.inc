@@ -29,11 +29,11 @@
 
 typedef struct {
 	unsigned long Value;
-	TCHAR *Name;
-	TCHAR *Description;
+	const TCHAR *Name;
+	const TCHAR *Description;
 } Error;
 
-static Error Errors[] = {
+static const Error Errors[] = {
 	DXERROR(0, "S_OK", "The function completed successfully")
 	DXERROR(0x1, "S_FALSE", "Call successful, but returned FALSE")
 	DXERROR(0x2, "DXERROR_FILE_NOT_FOUND", "The system cannot find the file specified.")
@@ -679,13 +679,13 @@ static Error Errors[] = {
 };
 
 //static Error UnknownError = DXERRORLAST(0xffffffff, "Unknown", "n/a");
-static Error UnknownError = DXERRORLAST(0xffffffff, 0, 0);
+static const Error UnknownError = DXERRORLAST(0xffffffff, 0, 0);
 
-static Error *FindError(unsigned long hr)
+static const Error *FindError(unsigned long hr)
 {
-	register Error *Base = &Errors[0];
+	register const Error *Base = &Errors[0];
 	register int Limit;
-	register Error *Ptr;
+	register const Error *Ptr;
 
 	for (Limit = sizeof(Errors) / sizeof(Error); Limit != 0; Limit >>= 1)
 	{

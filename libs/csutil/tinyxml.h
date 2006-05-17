@@ -177,7 +177,7 @@ protected:
   static bool StringEqual(const char* p, const char* endTag);
   static bool StringEqualIgnoreCase(const char* p, const char* endTag);
 
-  static const char* errorString[ TIXML_ERROR_STRING_COUNT ];
+  static const char* const errorString[ TIXML_ERROR_STRING_COUNT ];
 
 private:
   struct Entity
@@ -191,7 +191,7 @@ private:
     NUM_ENTITY = 5,
     MAX_ENTITY_LENGTH = 6
   };
-  static Entity entity[ NUM_ENTITY ];
+  static const Entity entity[ NUM_ENTITY ];
   static bool condenseWhiteSpace;
 };
 

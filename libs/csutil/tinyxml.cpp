@@ -27,7 +27,7 @@ distribution.
 #include "tinyxml.h"
 #include "csutil/scfstr.h"
 
-const char* TiXmlBase::errorString[ TIXML_ERROR_STRING_COUNT ] =
+const char* const TiXmlBase::errorString[ TIXML_ERROR_STRING_COUNT ] =
 {
   "No error",
   "Error",
@@ -178,8 +178,8 @@ TiDocumentNode* TiDocumentNodeChildren::Identify( TiDocument* document,
   // - Everthing else is unknown to tinyxml.
   //
 
-  const char* xmlHeader = { "<?xml" };
-  const char* commentHeader = { "<!--" };
+  const char* xmlHeader = "<?xml";
+  const char* commentHeader = "<!--";
 
   if ( StringEqual( p, xmlHeader) )
   {

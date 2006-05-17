@@ -1,6 +1,6 @@
 // Proportional thick ~8x8 font
 
-uint8 font_Police [257 * 8] =
+static const uint8 font_Police [257 * 8] =
 {
   0x00, 0x7e, 0x42, 0x42, 0x42, 0x42, 0x7e, 0x00,
   0x7E, 0x81, 0xA5, 0x81, 0xBD, 0x99, 0x81, 0x7E,
@@ -261,7 +261,7 @@ uint8 font_Police [257 * 8] =
   0x18, 0x3c, 0x46, 0xfb, 0xe7, 0x7e, 0x2c, 0x18
 };
 
-unsigned char width_Police [257] =
+static const unsigned char width_Police [257] =
 {
   8,8,8,8,8,8,8,7,8,8,8,8,8,8,8,8,		// 00-0f
   8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,		// 10-1f
@@ -282,7 +282,7 @@ unsigned char width_Police [257] =
   8
 };
 
-csDefaultFont::CharRange ranges_Police[] =
+static const csDefaultFont::CharRange ranges_Police[] =
 {
   // 00 - 0f - Var. symbols
   {CS_FONT_DEFAULT_GLYPH,  1},
@@ -387,8 +387,8 @@ csDefaultFont::CharRange ranges_Police[] =
   {0, 0}
 };
 
-int underline_position_Police = 1;
+static const int underline_position_Police = 1;
 
-int underline_thickness_Police = 1;
+static const int underline_thickness_Police = 1;
 
-int text_height_Police = 13;
+static const int text_height_Police = 13;

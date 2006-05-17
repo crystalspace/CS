@@ -106,7 +106,7 @@ public:
    * Construct from a list of single paths. The list must be terminated by a
    * 0 entry.
    */
-  csPathsList (const char* pathList[]);
+  csPathsList (const char* const pathList[]);
   /// Destructor.
   ~csPathsList() {}
   /// Assignment operator.

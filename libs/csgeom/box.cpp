@@ -25,7 +25,7 @@
 #include "csgeom/transfrm.h"
 
 //---------------------------------------------------------------------------
-csBox2::bEdge csBox2::edges[8] =
+const csBox2::bEdge csBox2::edges[8] =
 {
   { CS_BOX_CORNER_xy, CS_BOX_CORNER_Xy },
   { CS_BOX_CORNER_Xy, CS_BOX_CORNER_xy },
@@ -350,17 +350,8 @@ float csBox2::SquaredPosMaxDist (const csVector2& pos) const
  * but not part of the outline (i.e. the center point).
  */
 
-// This table also contains an array of sides visible from that region.
-struct Outline
-{
-  int num;
-  int vertices[8];
-  int num_sides;
-  int sides[3];
-};
-
 /// Outline lookup table.
-static Outline outlines[27] =
+const csBox3::Outline csBox3::outlines[27] =
 {
   { 7, { 3, 2, 6, 4, 5, 1, 0, /**/ 7 },
     3, { CS_BOX_SIDE_x, CS_BOX_SIDE_y, CS_BOX_SIDE_z } }, //000
@@ -418,7 +409,7 @@ static Outline outlines[27] =
     3, { CS_BOX_SIDE_X, CS_BOX_SIDE_Y, CS_BOX_SIDE_Z } } //222
 };
 
-csBox3::bEdge csBox3:: edges[24] =
+const csBox3::bEdge csBox3:: edges[24] =
 {
   { CS_BOX_CORNER_Xyz, CS_BOX_CORNER_xyz, CS_BOX_SIDE_y, CS_BOX_SIDE_z },
   { CS_BOX_CORNER_xyz, CS_BOX_CORNER_Xyz, CS_BOX_SIDE_z, CS_BOX_SIDE_y },
@@ -447,7 +438,7 @@ csBox3::bEdge csBox3:: edges[24] =
 };
 
 // Index by CS_BOX_SIDE_? number.
-csBox3::bFace csBox3:: faces[6] =
+const csBox3::bFace csBox3:: faces[6] =
 {
   { CS_BOX_EDGE_xyz_xyZ, CS_BOX_EDGE_xyZ_xYZ, CS_BOX_EDGE_xYZ_xYz,
       CS_BOX_EDGE_xYz_xyz },

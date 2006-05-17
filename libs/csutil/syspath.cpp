@@ -50,7 +50,7 @@ csPathsList::csPathsList (const char* pathList)
   }
 }
 
-csPathsList::csPathsList (const char* pathList[])
+csPathsList::csPathsList (const char* const pathList[])
 {
   const char* const* pp = pathList;
 
@@ -203,7 +203,7 @@ csPathsList csPathsUtilities::ExpandAll (const csPathsList& paths)
 
 csPathsList* csInstallationPathsHelper::GetPluginPaths (const char* argv0)
 {
-  static const char* pluginSubdirs[] = {
+  static const char* const pluginSubdirs[] = {
     "lib", 
     "lib/" CS_PACKAGE_NAME, 
     CS_PACKAGE_NAME "/lib", 

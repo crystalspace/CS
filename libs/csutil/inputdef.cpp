@@ -31,12 +31,13 @@
 #include <ctype.h>
 #include <string.h>
 
-static struct csKeyModDef
+struct csKeyModDef
 {
   const char *key;
   int type;
   int num;
-} KeyModifiers [] =
+};
+static const csKeyModDef KeyModifiers [] =
 {
   { "LCtrl",	csKeyModifierTypeCtrl,		csKeyModifierNumLeft },
   { "RCtrl",	csKeyModifierTypeCtrl,		csKeyModifierNumRight },
@@ -53,12 +54,13 @@ static struct csKeyModDef
   { 0, 0, 0 }
 };
 
-static struct csKeyCodeDef
+struct csKeyCodeDef
 {
   const char *key;
   utf32_char codeRaw;
   utf32_char codeCooked;
-} KeyDefs [] =
+};
+static const csKeyCodeDef KeyDefs [] =
 {
   { "Esc",	CSKEY_ESC,	   CSKEY_ESC },
   { "Enter",	CSKEY_ENTER,	   CSKEY_ENTER },
@@ -134,7 +136,7 @@ static struct csKeyCodeDef
 
 static const char* ModToName (csKeyModifierType type, csKeyModifierNumType num)
 {
-  for (csKeyModDef *c = KeyModifiers; c->key; c++)
+  for (const csKeyModDef *c = KeyModifiers; c->key; c++)
     if (c->type == (int) type && c->num == (int) num) return c->key;
   return 0;
 }
@@ -142,7 +144,7 @@ static const char* ModToName (csKeyModifierType type, csKeyModifierNumType num)
 static bool NameToMod (const char *name,
 		       csKeyModifierType &type, csKeyModifierNumType &num)
 {
-  for (csKeyModDef *c = KeyModifiers; c->key; c++)
+  for (const csKeyModDef *c = KeyModifiers; c->key; c++)
     if (strcasecmp (name, c->key) == 0)
     {
       type = (csKeyModifierType) c->type;
@@ -154,28 +156,28 @@ static bool NameToMod (const char *name,
 
 static const char* RawToName (utf32_char raw)
 {
-  for (csKeyCodeDef *c = KeyDefs; c->key; c++)
+  for (const csKeyCodeDef *c = KeyDefs; c->key; c++)
     if (c->codeRaw == raw) return c->key;
   return 0;
 }
 
 static utf32_char NameToRaw (const char *name)
 {
-  for (csKeyCodeDef *c = KeyDefs; c->key; c++)
+  for (const csKeyCodeDef *c = KeyDefs; c->key; c++)
     if (strcasecmp (name, c->key) == 0) return c->codeRaw;
   return 0;
 }
 
 static utf32_char NameToCooked (const char *name)
 {
-  for (csKeyCodeDef *c = KeyDefs; c->key; c++)
+  for (const csKeyCodeDef *c = KeyDefs; c->key; c++)
     if (strcasecmp (name, c->key) == 0) return c->codeCooked;
   return 0;
 }
 
 static utf32_char RawToCooked (utf32_char raw)
 {
-  for (csKeyCodeDef *c = KeyDefs; c->key; c++)
+  for (const csKeyCodeDef *c = KeyDefs; c->key; c++)
     if (c->codeRaw == raw) return c->codeCooked;
   return 0;
 }

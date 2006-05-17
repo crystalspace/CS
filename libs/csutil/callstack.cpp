@@ -48,7 +48,7 @@ namespace CS
 namespace Debug
 {
 
-static const void* callStackCreators[] =
+static const void* const callStackCreators[] =
 {
 #ifdef CS_PLATFORM_WIN32
   (void*)&cscDbgHelp,
@@ -59,7 +59,7 @@ static const void* callStackCreators[] =
   0
 };
 
-static const void* callStackNameResolvers[] =
+static const void* const callStackNameResolvers[] =
 {
 #ifdef CS_PLATFORM_WIN32
   #ifdef CS_HAVE_LIBBFD
@@ -85,7 +85,7 @@ typedef iCallStackNameResolver* (*NameResolveGetter)();
 bool CallStackImpl::GetFunctionName (size_t num, csString& str)
 {
   csString sym, mod;
-  const void** resGetter = callStackNameResolvers;
+  const void* const* resGetter = callStackNameResolvers;
   while (*resGetter != 0)
   {
     iCallStackNameResolver* res = ((NameResolveGetter)*resGetter)();
@@ -103,7 +103,7 @@ bool CallStackImpl::GetFunctionName (size_t num, csString& str)
 
 bool CallStackImpl::GetLineNumber (size_t num, csString& str)
 {
-  const void** resGetter = callStackNameResolvers;
+  const void* const* resGetter = callStackNameResolvers;
   while (*resGetter != 0)
   {
     iCallStackNameResolver* res = ((NameResolveGetter)*resGetter)();
@@ -117,7 +117,7 @@ bool CallStackImpl::GetLineNumber (size_t num, csString& str)
 bool CallStackImpl::GetParameters (size_t num, csString& str)
 {
   if (entries[num].paramNum == csParamUnknown) return false;
-  const void** resGetter = callStackNameResolvers;
+  const void* const* resGetter = callStackNameResolvers;
   while (*resGetter != 0)
   {
     void* h;
@@ -156,7 +156,7 @@ csCallStack* csCallStackHelper::CreateCallStack (int skip, bool fast)
 {
   skip += 1; /* Adjust for this function */
   CallStackImpl* stack = new CallStackImpl();
-  const void** cscGetter = callStackCreators;
+  const void* const* cscGetter = callStackCreators;
   while (*cscGetter != 0)
   {
     iCallStackCreator* csc = ((CreatorGetter)*cscGetter)();

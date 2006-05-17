@@ -52,10 +52,10 @@
 
 //---------------------------------------------------------------------------
 
-char csArchive::hdr_central[4] = {'P', 'K', CENTRAL_HDR_SIG};
-char csArchive::hdr_local[4] = {'P', 'K', LOCAL_HDR_SIG};
-char csArchive::hdr_endcentral[4] = {'P', 'K', END_CENTRAL_SIG};
-char csArchive::hdr_extlocal[4] = {'P', 'K', EXTD_LOCAL_SIG};
+const char csArchive::hdr_central[4] = {'P', 'K', CENTRAL_HDR_SIG};
+const char csArchive::hdr_local[4] = {'P', 'K', LOCAL_HDR_SIG};
+const char csArchive::hdr_endcentral[4] = {'P', 'K', END_CENTRAL_SIG};
+const char csArchive::hdr_extlocal[4] = {'P', 'K', EXTD_LOCAL_SIG};
 
 //-- Endianess handling -----------------------------------------------------
 

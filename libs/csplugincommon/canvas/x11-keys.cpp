@@ -20,7 +20,7 @@
 #include "cssysdef.h"
 #include "csplugincommon/canvas/scancode.h"
 
-unsigned short ScanCodeToChar [128] =
+const unsigned short ScanCodeToChar [128] =
 {
   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
