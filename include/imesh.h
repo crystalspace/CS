@@ -30,7 +30,6 @@
 #include "imesh/genmesh.h"
 #include "imesh/gmeshanim.h"
 #include "imesh/gmeshskel.h"
-#include "imesh/gmeshskel2.h"
 #include "imesh/haze.h"
 #include "imesh/instmesh.h"
 #include "imesh/lghtng.h"
