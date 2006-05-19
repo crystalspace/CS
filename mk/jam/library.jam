@@ -277,12 +277,15 @@ rule LibraryShared
     
   SystemLinkSharedLibrary $(target) : $(objects) $(deplibs) : $(linklib) ;
   
-  local debugfile = [ SplitDebugInfo $(target) ] ;
-  Clean $(<)clean : $(debugfile) ;
-  if ! [ IsElem noinstall : $(options) ]
+  if $(LINK.DEBUG.INFO.SEPARATE) = "yes"
   {
-    NoCare $(debugfile) ;
-    Depends install_lib : [ DoInstall $(debugfile) : $(libdir) : $(INSTALL_DATA) ] ;
+    local debugfile = [ SplitDebugInfo $(target) ] ;
+    Clean $(<)clean : $(debugfile) ;
+    if ! [ IsElem noinstall : $(options) ]
+    {
+      NoCare $(debugfile) ;
+      Depends install_lib : [ DoInstall $(debugfile) : $(libdir) : $(INSTALL_DATA) ] ;
+    }
   }
 }
 

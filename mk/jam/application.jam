@@ -88,12 +88,15 @@ rule Application
   MakeLocate $(target) : $(LOCATE.TARGETS) ;
   SystemLinkApplication $(<) : $(objects) : $(3) ;
 
-  local debugfile = [ SplitDebugInfo $(target) ] ;
-  Clean $(<)clean : $(debugfile) ;
-  if ! [ IsElem noinstall : $(3) ]
+  if $(LINK.DEBUG.INFO.SEPARATE) = "yes"
   {
-    NoCare $(debugfile) ;
-    Depends install_bin : [ DoInstall $(debugfile) : $(bindir) : $(INSTALL_DATA) ] ;
+    local debugfile = [ SplitDebugInfo $(target) ] ;
+    Clean $(<)clean : $(debugfile) ;
+    if ! [ IsElem noinstall : $(3) ]
+    {
+      NoCare $(debugfile) ;
+      Depends install_bin : [ DoInstall $(debugfile) : $(bindir) : $(INSTALL_DATA) ] ;
+    }
   }
 
   CFlags $(<) : $(APPLICATION.CFLAGS) ;

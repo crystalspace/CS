@@ -116,12 +116,15 @@ rule Plugin
   MakeLocate $(target) : $(LOCATE.TARGETS) ;
   SystemLinkPlugin $(<) : $(objects) : $(3) ;
   
-  local debugfile = [ SplitDebugInfo $(target) ] ;
-  Clean $(<)clean : $(debugfile) ;
-  if ! [ IsElem noinstall : $(3) ]
+  if $(LINK.DEBUG.INFO.SEPARATE) = "yes"
   {
-    NoCare $(debugfile) ;
-    Depends install_plugin : [ DoInstall $(debugfile) : $(plugindir) : $(INSTALL_DATA) ] ;
+    local debugfile = [ SplitDebugInfo $(target) ] ;
+    Clean $(<)clean : $(debugfile) ;
+    if ! [ IsElem noinstall : $(3) ]
+    {
+      NoCare $(debugfile) ;
+      Depends install_plugin : [ DoInstall $(debugfile) : $(plugindir) : $(INSTALL_DATA) ] ;
+    }
   }
 
   CFlags $(<) : $(PLUGIN.CFLAGS) : nostatic ;

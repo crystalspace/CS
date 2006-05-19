@@ -919,6 +919,14 @@ Optional Packages:
   --with-perl             use Perl5 scripting interface (default NO)
   --without-python        do not use Python scripting interface
   --with-java             use Java scripting interface (default YES)
+  --with-separate-debug-info
+                          split debug information into separate files.
+                          (default YES if binutils >= 2.16 detected, otherwise
+                          default NO)
+  --with-optimize-debug-info
+                          whether to enable debug information even in optimize
+                          builds. (default YES if separate debug information
+                          is enabled, otherwise default NO)
   --with-x                use the X Window System
   --with-Xxf86vm=dir      specify location of libXxf86vm if not detected
                           automatically; searches dir/include, dir/lib, and
@@ -13740,6 +13748,178 @@ fi
 
 
 #------------------------------------------------------------------------------
+# Check if linker recognizes "-z defs" which is useful on some platforms that
+# allow undefined symbols at link time. This can detect possible build issues
+# (e.g. not linking against some library, a missing function) that could cause
+# problems on stricter platforms.
+#------------------------------------------------------------------------------
+echo "$as_me:$LINENO: checking if warning for missing symbols is supported" >&5
+echo $ECHO_N "checking if warning for missing symbols is supported... $ECHO_C" >&6
+if test "${cs_cv_prog_link_z_defs_ok+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_ext=cc
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+    cs_cflags_save="$CXXFLAGS"
+    cs_lflags_save="$LDFLAGS"
+    cs_libs_save="$LIBS"
+    cs_build_ok=no
+
+
+    for cs_build_item in `echo @@-Wl,-z,defs@ | sed 'y% %#%'`
+    do
+
+    set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
+	{ for (i=1; i <= NF; ++i)
+	    { if ($i == "") print "filler"; else print $i } }'`
+    shift
+    if test $# -eq 0; then
+  cs_dummy=''
+else
+  if test "$1" = filler; then
+  cs_dummy=''
+else
+  cs_dummy=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_cflags_test=''
+else
+  if test "$1" = filler; then
+  cs_cflags_test=''
+else
+  cs_cflags_test=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_lflags_test=''
+else
+  if test "$1" = filler; then
+  cs_lflags_test=''
+else
+  cs_lflags_test=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_libs_test=''
+else
+  if test "$1" = filler; then
+  cs_libs_test=''
+else
+  cs_libs_test=$1
+fi
+
+	shift
+fi
+
+    cs_cflags_test=`echo $cs_cflags_test | sed 'y%#% %'`
+    cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
+    cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
+
+	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
+	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
+	LIBS="$cs_libs_test  $cs_libs_save"
+	cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+int
+main ()
+{
+
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+	 { ac_try='test -z "$ac_cxx_werror_flag"
+			 || test ! -s conftest.err'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; } &&
+	 { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  cs_build_ok=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+fi
+rm -f conftest.err conftest.$ac_objext \
+      conftest$ac_exeext conftest.$ac_ext
+	if test $cs_build_ok = yes; then
+  break
+fi
+
+    done
+
+
+    CXXFLAGS=$cs_cflags_save
+    LDFLAGS=$cs_lflags_save
+    LIBS=$cs_libs_save
+    ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
+    if test $cs_build_ok = yes; then
+  cs_build_cflags=`echo x$cs_cflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_cv_prog_link_z_defs=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	    cs_cv_prog_link_z_defs_ok="$cs_cv_prog_link_z_defs"
+else
+  cs_cv_prog_link_z_defs=''
+	    cs_cv_prog_link_z_defs_ok=no
+fi
+
+fi
+echo "$as_me:$LINENO: result: $cs_cv_prog_link_z_defs_ok" >&5
+echo "${ECHO_T}$cs_cv_prog_link_z_defs_ok" >&6
+    if test "$cs_cv_prog_link_z_defs_ok" != no; then
+  cs_build_prop_val="$cs_cv_prog_link_z_defs"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.LFLAGS += \"$cs_build_prop_val\" ;
+"
+fi
+
+
+fi
+
+
+
+
+#------------------------------------------------------------------------------
 # Check if C++ function inlining can be enabled and disabled. Apparently, with
 # some versions of GNU build tools on Windows, the Crystal Space Python plugin
 # fails to link and emits the error message "Error: 0-bit reloc in dll". In
@@ -18591,8 +18771,106 @@ fi
 #------------------------------------------------------------------------------
 # Check for compiler debug flags.
 #------------------------------------------------------------------------------
-echo "$as_me:$LINENO: checking how to enable extra debugging symbols" >&5
-echo $ECHO_N "checking how to enable extra debugging symbols... $ECHO_C" >&6
+binutils_recent=no
+if test -n "$OBJCOPY"; then
+  echo "$as_me:$LINENO: checking if binutils version >= 2.16" >&5
+echo $ECHO_N "checking if binutils version >= 2.16... $ECHO_C" >&6
+if test "${cs_cv_prog_binutils_version_ok_annotated+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  cs_prog_binutils_is_version=
+cs_prog_binutils_min_version=
+cs_prog_binutils_is_suffix=
+cs_prog_binutils_min_suffix=
+cs_prog_binutils_is_suffix_done=
+cs_prog_binutils_min_suffix_done=
+
+
+
+
+test -z $cs_prog_binutils_is_version && cs_prog_binutils_is_version=`$OBJCOPY -V | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
+test -n "$cs_prog_binutils_is_version" && test -z $cs_prog_binutils_is_suffix_done  && { cs_prog_binutils_is_suffix_done=yes ; cs_prog_binutils_is_suffix= ; }
+
+test -z $cs_prog_binutils_is_version && cs_prog_binutils_is_version=`$OBJCOPY -V | sed '/[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
+test -n "$cs_prog_binutils_is_version" && test -z $cs_prog_binutils_is_suffix_done  && { cs_prog_binutils_is_suffix_done=yes ; cs_prog_binutils_is_suffix=.0.0.0 ; }
+
+
+
+
+
+
+test -z $cs_prog_binutils_min_version && cs_prog_binutils_min_version=`echo 2.16 | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
+test -n "$cs_prog_binutils_min_version" && test -z $cs_prog_binutils_min_suffix_done  && { cs_prog_binutils_min_suffix_done=yes ; cs_prog_binutils_min_suffix= ; }
+
+test -z $cs_prog_binutils_min_version && cs_prog_binutils_min_version=`echo 2.16 | sed '/[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
+test -n "$cs_prog_binutils_min_version" && test -z $cs_prog_binutils_min_suffix_done  && { cs_prog_binutils_min_suffix_done=yes ; cs_prog_binutils_min_suffix=.0.0.0 ; }
+
+
+cs_prog_binutils_is_ver_1=`echo ${cs_prog_binutils_is_version}${cs_prog_binutils_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\1/'`
+cs_prog_binutils_is_ver_2=`echo ${cs_prog_binutils_is_version}${cs_prog_binutils_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\2/'`
+cs_prog_binutils_is_ver_3=`echo ${cs_prog_binutils_is_version}${cs_prog_binutils_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\3/'`
+cs_prog_binutils_is_ver_4=`echo ${cs_prog_binutils_is_version}${cs_prog_binutils_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\4/'`
+cs_prog_binutils_is_ver_5=`echo ${cs_prog_binutils_is_version}${cs_prog_binutils_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\5/'`
+
+cs_prog_binutils_min_ver_1=`echo $cs_prog_binutils_min_version${cs_prog_binutils_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\1/'`
+cs_prog_binutils_min_ver_2=`echo $cs_prog_binutils_min_version${cs_prog_binutils_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\2/'`
+cs_prog_binutils_min_ver_3=`echo $cs_prog_binutils_min_version${cs_prog_binutils_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\3/'`
+cs_prog_binutils_min_ver_4=`echo $cs_prog_binutils_min_version${cs_prog_binutils_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\4/'`
+cs_prog_binutils_min_ver_5=`echo $cs_prog_binutils_min_version${cs_prog_binutils_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\5/'`
+
+cs_cv_prog_binutils_version_ok=''
+test -z "$cs_cv_prog_binutils_version_ok" && { expr "$cs_prog_binutils_is_ver_1" ">=" "$cs_prog_binutils_min_ver_1" >/dev/null || cs_cv_prog_binutils_version_ok=no ; }
+test -z "$cs_cv_prog_binutils_version_ok" && { expr "$cs_prog_binutils_min_ver_1" ">=" "$cs_prog_binutils_is_ver_1" >/dev/null || cs_cv_prog_binutils_version_ok=yes ; }
+test -z "$cs_cv_prog_binutils_version_ok" && { expr "$cs_prog_binutils_is_ver_2" ">=" "$cs_prog_binutils_min_ver_2" >/dev/null || cs_cv_prog_binutils_version_ok=no ; }
+test -z "$cs_cv_prog_binutils_version_ok" && { expr "$cs_prog_binutils_min_ver_2" ">=" "$cs_prog_binutils_is_ver_2" >/dev/null || cs_cv_prog_binutils_version_ok=yes ; }
+test -z "$cs_cv_prog_binutils_version_ok" && { expr "$cs_prog_binutils_is_ver_3" ">=" "$cs_prog_binutils_min_ver_3" >/dev/null || cs_cv_prog_binutils_version_ok=no ; }
+test -z "$cs_cv_prog_binutils_version_ok" && { expr "$cs_prog_binutils_min_ver_3" ">=" "$cs_prog_binutils_is_ver_3" >/dev/null || cs_cv_prog_binutils_version_ok=yes ; }
+test -z "$cs_cv_prog_binutils_version_ok" && { expr "$cs_prog_binutils_is_ver_4" ">=" "$cs_prog_binutils_min_ver_4" >/dev/null || cs_cv_prog_binutils_version_ok=no ; }
+test -z "$cs_cv_prog_binutils_version_ok" && { expr "$cs_prog_binutils_min_ver_4" ">=" "$cs_prog_binutils_is_ver_4" >/dev/null || cs_cv_prog_binutils_version_ok=yes ; }
+test -z "$cs_cv_prog_binutils_version_ok" && { expr "$cs_prog_binutils_is_ver_5" ">=" "$cs_prog_binutils_min_ver_5" >/dev/null || cs_cv_prog_binutils_version_ok=no ; }
+test -z "$cs_cv_prog_binutils_version_ok" && { expr "$cs_prog_binutils_min_ver_5" ">=" "$cs_prog_binutils_is_ver_5" >/dev/null || cs_cv_prog_binutils_version_ok=yes ; }
+
+if test -z "$cs_cv_prog_binutils_version_ok"; then
+  cs_cv_prog_binutils_version_ok=yes
+fi
+
+cs_cv_prog_binutils_version_ok_annotated="$cs_cv_prog_binutils_version_ok"
+if test -n "$cs_prog_binutils_is_version"; then
+  cs_cv_prog_binutils_version_ok_annotated="$cs_cv_prog_binutils_version_ok_annotated (version $cs_prog_binutils_is_version)"
+fi
+
+
+fi
+echo "$as_me:$LINENO: result: $cs_cv_prog_binutils_version_ok_annotated" >&5
+echo "${ECHO_T}$cs_cv_prog_binutils_version_ok_annotated" >&6
+if test "$cs_cv_prog_binutils_version_ok" = yes; then
+  binutils_recent=yes
+fi
+
+fi
+
+
+
+# Check whether --with-separate-debug-info or --without-separate-debug-info was given.
+if test "${with_separate_debug_info+set}" = set; then
+  withval="$with_separate_debug_info"
+
+fi;
+if test -z "$with_separate_debug_info"; then
+  with_separate_debug_info=$binutils_recent
+fi
+
+
+cs_build_prop_val="$with_separate_debug_info"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}LINK.DEBUG.INFO.SEPARATE ?= \"$cs_build_prop_val\" ;
+"
+fi
+
+
+echo "$as_me:$LINENO: checking how to enable debug mode debugging symbols" >&5
+echo $ECHO_N "checking how to enable debug mode debugging symbols... $ECHO_C" >&6
 if test "${cs_cv_prog_cxx_debug_symbols_extra_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
@@ -18760,8 +19038,20 @@ fi
 
 fi
 
-echo "$as_me:$LINENO: checking how to enable normal debugging symbols" >&5
-echo $ECHO_N "checking how to enable normal debugging symbols... $ECHO_C" >&6
+
+
+# Check whether --with-optimize-debug-info or --without-optimize-debug-info was given.
+if test "${with_optimize_debug_info+set}" = set; then
+  withval="$with_optimize_debug_info"
+
+fi;
+if test -z "$with_optimize_debug_info"; then
+  with_optimize_debug_info=$with_separate_debug_info
+fi
+
+if test "$with_optimize_debug_info" != no; then
+  echo "$as_me:$LINENO: checking how to enable optimize mode debugging symbols" >&5
+echo $ECHO_N "checking how to enable optimize mode debugging symbols... $ECHO_C" >&6
 if test "${cs_cv_prog_cxx_debug_symbols_normal_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
@@ -18925,6 +19215,8 @@ fi
     if test -n "$cs_build_prop_val"; then
   cs_jamconfig_text="${cs_jamconfig_text}COMPILER.LFLAGS.optimize += \"$cs_build_prop_val\" ;
 "
+fi
+
 fi
 
 fi

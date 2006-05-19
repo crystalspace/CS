@@ -6,6 +6,14 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+19-May-2006
+        - res made the separate debug info and optimize mode debug info 
+          features toggleable via configure switches.
+	- res changed separate debug info only to be enabled by default 
+	  when binutils >= 2.16 are present.
+	- res changed the optimize mode debug info to only be enabled by
+	  default when separate debug info is enabled (since otherwise
+	  optimize mode binaries would get undesireably large).
 17-May-2006
 	- res fixed a couple of bindoc endianness bloopers, with the help of
 	  dfryer, who acted as the remote debugger.

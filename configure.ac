@@ -559,6 +559,18 @@ CS_CHECK_BUILD([if --kill-at is accepted], [cs_cv_prog_link_kill_at], [],
 
 
 #------------------------------------------------------------------------------
+# Check if linker recognizes "-z defs" which is useful on some platforms that
+# allow undefined symbols at link time. This can detect possible build issues
+# (e.g. not linking against some library, a missing function) that could cause
+# problems on stricter platforms.
+#------------------------------------------------------------------------------
+CS_EMIT_BUILD_FLAGS([if warning for missing symbols is supported], 
+    [cs_cv_prog_link_z_defs], [CS_CREATE_TUPLE([],[-Wl,-z,defs])], 
+    [C++], [COMPILER.LFLAGS], [+])
+
+
+
+#------------------------------------------------------------------------------
 # Check if C++ function inlining can be enabled and disabled. Apparently, with
 # some versions of GNU build tools on Windows, the Crystal Space Python plugin
 # fails to link and emits the error message "Error: 0-bit reloc in dll". In
@@ -781,18 +793,39 @@ CS_CHECK_OPTIMIZE_FLAGS
 #------------------------------------------------------------------------------
 # Check for compiler debug flags.
 #------------------------------------------------------------------------------
-CS_EMIT_BUILD_FLAGS([how to enable extra debugging symbols],
+binutils_recent=no
+AS_IF([test -n "$OBJCOPY"],
+    [CS_CHECK_PROG_VERSION([binutils], [$OBJCOPY -V], [2.16], [9.9|.9.9.9],
+	[binutils_recent=yes])])
+
+AC_ARG_WITH([separate-debug-info], [AC_HELP_STRING([--with-separate-debug-info],
+    [split debug information into separate files. (default YES if 
+    binutils >= 2.16 detected, otherwise default NO)])])
+AS_IF([test -z "$with_separate_debug_info"], 
+    [with_separate_debug_info=$binutils_recent])
+
+CS_EMIT_BUILD_PROPERTY([LINK.DEBUG.INFO.SEPARATE], [$with_separate_debug_info])
+
+CS_EMIT_BUILD_FLAGS([how to enable debug mode debugging symbols],
     [cs_cv_prog_cxx_debug_symbols_extra],
     [CS_CREATE_TUPLE([-g3]) CS_CREATE_TUPLE([-g2]) CS_CREATE_TUPLE([-g])],
     [C++], [COMPILER.CFLAGS.debug], [+],
     [CS_EMIT_BUILD_PROPERTY([COMPILER.LFLAGS.debug],
 	[$cs_cv_prog_cxx_debug_symbols_extra], [+])])
-CS_EMIT_BUILD_FLAGS([how to enable normal debugging symbols],
-    [cs_cv_prog_cxx_debug_symbols_normal],
-    [CS_CREATE_TUPLE([-g2]) CS_CREATE_TUPLE([-g])],
-    [C++], [COMPILER.CFLAGS.optimize], [+],
-    [CS_EMIT_BUILD_PROPERTY([COMPILER.LFLAGS.optimize],
-	[$cs_cv_prog_cxx_debug_symbols_normal], [+])])
+	
+AC_ARG_WITH([optimize-debug-info], [AC_HELP_STRING([--with-optimize-debug-info],
+    [whether to enable debug information even in optimize builds. 
+    (default YES if separate debug information is enabled, 
+    otherwise default NO)])])
+AS_IF([test -z "$with_optimize_debug_info"], 
+    [with_optimize_debug_info=$with_separate_debug_info])
+AS_IF([test "$with_optimize_debug_info" != no],
+    [CS_EMIT_BUILD_FLAGS([how to enable optimize mode debugging symbols],
+	[cs_cv_prog_cxx_debug_symbols_normal],
+	[CS_CREATE_TUPLE([-g2]) CS_CREATE_TUPLE([-g])],
+	[C++], [COMPILER.CFLAGS.optimize], [+],
+	[CS_EMIT_BUILD_PROPERTY([COMPILER.LFLAGS.optimize],
+	    [$cs_cv_prog_cxx_debug_symbols_normal], [+])])])
 
 
 

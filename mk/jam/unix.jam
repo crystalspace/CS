@@ -120,9 +120,12 @@ rule SystemLinkSharedLibrary
   local response = $(<).resp ;
   MakeLocate $(response) : $(LOCATE.OBJECTS)/libs ;
   ResponseFile $(response) : $(>) ;
-  Depends $(response) : $(>) ;
-  Depends $(<) : $(response) ;
-  LinkSharedLibrary $(<) : $(response) ;
+  # @@@ FIXME: response files are only supported on newer binutils
+  # But quite useful to avoid blowing jam's 10240 max action length.
+  #Depends $(response) : $(>) ;
+  #Depends $(<) : $(response) ;
+  #LinkSharedLibrary $(<) : $(response) ;
+  LinkSharedLibrary $(<) : $(>) ;
 
   Clean clean : $(<) ;
   Clean $(<)clean : $(<) ;
@@ -151,6 +154,6 @@ else
 
 actions LinkSharedLibrary bind NEEDLIBS bind EXTRAOBJECTS
 {
-  $(CMD.LINK) -shared -o $(<) -Wl,@$(>) $(EXTRAOBJECTS) $(NEEDLIBS) $(LINKLIBS) \
+  $(CMD.LINK) -shared -o $(<) $(>) $(EXTRAOBJECTS) $(NEEDLIBS) $(LINKLIBS) \
     -Wl,-soname,$(<:BS)
 }
