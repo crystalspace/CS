@@ -116,37 +116,62 @@ namespace CS
      *  nest that into another array, you MUST use 
      *  csSafeCopyArrayElementHandler for  the nesting array!
      */
-    template<typename T, size_t N>
-    class LocalBufferAllocator : AllocatorMalloc
+    template<typename T, size_t N, class ExcessAllocator = AllocatorMalloc>
+    class LocalBufferAllocator : public ExcessAllocator
     {
       static const size_t localSize = N * sizeof (T);
       uint8 localBuf[localSize];
+    #ifdef CS_DEBUG
+      bool allocation;
+    #endif
     public:
-      T* Alloc (size_t count)
+    #ifdef CS_DEBUG
+      LocalBufferAllocator () : allocation (false) {}
+      LocalBufferAllocator (const ExcessAllocator& xalloc) : 
+        ExcessAllocator (xalloc), allocation (false) {}
+    #else
+      LocalBufferAllocator () {}
+      LocalBufferAllocator (const ExcessAllocator& xalloc) : 
+        ExcessAllocator (xalloc) {}
+    #endif
+      T* Alloc (size_t allocSize)
       {
-	const size_t allocSize = count * sizeof (T);
+      #ifdef CS_DEBUG
+        CS_ASSERT_MSG("LocalBufferAllocator only allows one allocation a time!",
+          !allocation);
+        allocation = true;
+      #endif
 	if (allocSize <= localSize)
 	  return (T*)localBuf;
 	else
-	  return (T*)AllocatorMalloc::Alloc (allocSize);
+	  return (T*)ExcessAllocator::Alloc (allocSize);
       }
     
       void Free (T* mem)
       {
-	if (mem != (T*)localBuf) AllocatorMalloc::Free (mem);
+      #ifdef CS_DEBUG
+        CS_ASSERT_MSG("Free() without prior allocation",
+          allocation);
+        allocation = false;
+      #endif
+	if (mem != (T*)localBuf) ExcessAllocator::Free (mem);
       }
     
       // The 'relevantcount' parameter should be the number of items
       // in the old array that are initialized.
       void* Realloc (void* p, size_t newSize)
       {
+      #ifdef CS_DEBUG
+        CS_ASSERT_MSG("Realloc() without prior allocation",
+          allocation);
+      #endif
         if (p == localBuf)
         {
           if (newSize <= localSize)
             return p;
           else
           {
-	    p = AllocatorMalloc::Alloc (newSize);
+	    p = ExcessAllocator::Alloc (newSize);
 	    memcpy (p, localBuf, localSize);
 	    return p;
           }
@@ -156,14 +181,14 @@ namespace CS
           if (newSize <= localSize)
 	  {
 	    memcpy (localBuf, p, newSize);
-	    AllocatorMalloc::Free (p);
+	    ExcessAllocator::Free (p);
 	    return localBuf;
 	  }
 	  else
-	    return AllocatorMalloc::Realloc (p, newSize);
+	    return ExcessAllocator::Realloc (p, newSize);
         }
       }
-      using AllocatorMalloc::SetMemTrackerInfo;
+      using ExcessAllocator::SetMemTrackerInfo;
     };
     
     /**
@@ -215,7 +240,11 @@ namespace CS
       T* p;
 
       AllocatorPointerWrapper () {}
+      AllocatorPointerWrapper (const Allocator& alloc) : 
+        Allocator (alloc) {}
       AllocatorPointerWrapper (T* p) : p (p) {}
+      AllocatorPointerWrapper (const Allocator& alloc, T* p) : 
+        Allocator (alloc), p (p) {}
     };
   } // namespace Memory
 } // namespace CS

@@ -88,8 +88,8 @@ public:
  *   counting and cause unexpected problems. Use Put() to manipulate elements
  *   of the array.
  */
-template <class T>
-class csRefArray : public csArray<T*, csRefArrayElementHandler<T*> >
+template <class T, class Allocator = CS::Memory::AllocatorMalloc>
+class csRefArray : public csArray<T*, csRefArrayElementHandler<T*>, Allocator>
 {
 public:
   /**
@@ -97,7 +97,7 @@ public:
    * storage by 'ithreshold' each time the upper bound is exceeded.
    */
   csRefArray (int ilimit = 0, int ithreshold = 0)
-  	: csArray<T*, csRefArrayElementHandler<T*> > (ilimit, ithreshold)
+    : csArray<T*, csRefArrayElementHandler<T*>, Allocator> (ilimit, ithreshold)
   {
   }
 

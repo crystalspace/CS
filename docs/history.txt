@@ -15,6 +15,11 @@ chronological order.
 	  walktest.
 	- res renamed csMeasureTime to CS::MeasureTime and changed it to use 
 	  csGetMicroTicks().
+	- res augmented csHash to allow specification of an allocator.
+	- res changed Memory::LocalBufferAllocator to have a templated 
+	  fallback allocator. Also improved detection of errorneous usage.
+	- res added a csArray constructor that allows custom initialization of 
+	  the allocator.
 19-May-2006
         - res made the separate debug info and optimize mode debug info 
           features toggleable via configure switches.

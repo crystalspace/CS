@@ -245,7 +245,8 @@ class csComparator<csStrKey, csStrKey> : public csComparatorString<csStrKey> {};
  * (other than const char*, csStrKey and csString for which appropriate 
  * specializations are already provided) or special hash algorithms. 
  */
-template <class T, class K = unsigned int> 
+template <class T, class K = unsigned int, 
+  class ArrayMemoryAlloc = CS::Memory::AllocatorMalloc> 
 class csHash
 {
 protected:
@@ -257,8 +258,10 @@ protected:
     Element (const K& key0, const T &value0) : key (key0), value (value0) {}
     Element (const Element &other) : key (other.key), value (other.value) {}
   };
-  typedef csArray<Element> ElementArray;
-  csArray<ElementArray> Elements;
+  typedef csArray<Element, csArrayElementHandler<Element>,
+    ArrayMemoryAlloc> ElementArray;
+  csArray<ElementArray, csArrayElementHandler<ElementArray>,
+    ArrayMemoryAlloc> Elements;
 
   size_t Modulo;
 

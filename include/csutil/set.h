@@ -33,11 +33,11 @@
  * You can basically use this to test for the occurrence
  * of some object quickly.
  */
-template <class T> 
+template <class T, class Allocator = CS::Memory::AllocatorMalloc> 
 class csSet
 {
 public:
-  typedef csHash<bool, T> HashType;
+  typedef csHash<bool, T, Allocator> HashType;
 
 private:
   typedef typename_qualifier HashType::GlobalIterator ParentIter;

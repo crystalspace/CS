@@ -469,6 +469,10 @@ private:
   }
 
 public:
+  typedef typename_qualifier ElementHandler ElementHandlerType;
+  typedef typename_qualifier MemoryAllocator MemoryAllocatorType;
+  typedef typename_qualifier CapacityHandler CapacityHandlerType;
+
   /**
    * Compare two objects of the same type.
    * \param r1 Reference to first object.
@@ -486,13 +490,35 @@ public:
   }
 
   /**
-   * Initialize object to have initial capacity of \c in_capacity elements, and
-   * to increase storage by \c in_threshold each time the upper bound is
-   * exceeded.
+   * Initialize object to have initial capacity of \c in_capacity elements.
+   * The storage increase depends on the specified capacity handler. The
+   * default capacity handler accepts a threshold parameter by which the 
+   * storage is increased each time the upper bound is exceeded.
    */
-  csArray (size_t in_capacity = 0, 
+  csArray (size_t in_capacity = 0,
     const CapacityHandler& ch = CapacityHandler()) : count (0), 
     capacity (in_capacity, ch)
+  {
+#ifdef CS_MEMORY_TRACKER
+    root.SetMemTrackerInfo (typeid(*this).name());
+#endif
+    if (capacity.c != 0)
+    {
+      root.p = (T*)root.Alloc (capacity.c * sizeof (T));
+    }
+    else
+    {
+      root.p = 0;
+    }
+  }
+  /**
+   * Initialize object to have initial capacity of \c in_capacity elements
+   * and with specific memory allocator and capacity handler initializations.
+   */
+  csArray (size_t in_capacity, 
+    const MemoryAllocator& alloc,
+    const CapacityHandler& ch) : count (0), 
+    capacity (in_capacity, ch), root (alloc)
   {
 #ifdef CS_MEMORY_TRACKER
     root.SetMemTrackerInfo (typeid(*this).name());
@@ -1182,6 +1208,12 @@ public:
     for (size_t i = 0; i < GetSize(); i++)
       if (Get (i) != other[i]) return false;
     return true;
+  }
+
+  /// Return a reference to the allocator of this array.
+  const MemoryAllocator& GetAllocator() const
+  {
+    return root;
   }
 };
 

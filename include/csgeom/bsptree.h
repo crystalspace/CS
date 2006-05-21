@@ -25,6 +25,7 @@
 #include "csutil/array.h"
 #include "csutil/blockallocator.h"
 #include "csutil/dirtyaccessarray.h"
+#include "csutil/set.h"
 
 /**\file
  * BSP tree implementation.
@@ -34,8 +35,6 @@
 
 struct iGraphics3D;
 
-template<class T>
-class csSet;
 struct csTriangle;
 
 /**
