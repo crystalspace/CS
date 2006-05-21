@@ -9,6 +9,7 @@ chronological order.
 21-May-2006
         - res changed the unresolved symbol reporting to (just) warnings.
         - res fixed the xwin linking issues.
+	- res updated bindoc to use new SCF.
 19-May-2006
         - res made the separate debug info and optimize mode debug info 
           features toggleable via configure switches.

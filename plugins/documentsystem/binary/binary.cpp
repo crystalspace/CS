@@ -27,19 +27,18 @@
 #include "binary.h"
 #include "bindoc.h"
 
-SCF_IMPLEMENT_IBASE(csBinaryDocumentSystem)
-  SCF_IMPLEMENTS_INTERFACE(iDocumentSystem)
-  SCF_IMPLEMENTS_INTERFACE(iComponent)
-SCF_IMPLEMENT_IBASE_END
+CS_IMPLEMENT_PLUGIN
 
-csBinaryDocumentSystem::csBinaryDocumentSystem(iBase* parent)
+CS_PLUGIN_NAMESPACE_BEGIN(BinDoc)
 {
-  SCF_CONSTRUCT_IBASE(parent);
+
+csBinaryDocumentSystem::csBinaryDocumentSystem (iBase* parent) :
+  scfImplementationType (this, parent)
+{
 }
 
 csBinaryDocumentSystem::~csBinaryDocumentSystem ()
 {
-  SCF_DESTRUCT_IBASE();
 }
 
 csRef<iDocument> csBinaryDocumentSystem::CreateDocument ()
@@ -52,8 +51,7 @@ bool csBinaryDocumentSystem::Initialize (iObjectRegistry* /*objreg*/)
   return true;
 }
 
-CS_IMPLEMENT_PLUGIN
-
 SCF_IMPLEMENT_FACTORY (csBinaryDocumentSystem)
 
-
+}
+CS_PLUGIN_NAMESPACE_END(BinDoc)

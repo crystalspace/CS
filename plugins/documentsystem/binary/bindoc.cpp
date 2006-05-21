@@ -34,17 +34,16 @@
 
 #include "bindoc.h"
 
+CS_PLUGIN_NAMESPACE_BEGIN(BinDoc)
+{
+
 // =================================================
 //  csBinaryDocAttributeIterator
 // =================================================
 
-SCF_IMPLEMENT_IBASE(csBinaryDocAttributeIterator)
-  SCF_IMPLEMENTS_INTERFACE(iDocumentAttributeIterator)
-SCF_IMPLEMENT_IBASE_END
-
-csBinaryDocAttributeIterator::csBinaryDocAttributeIterator ()
+csBinaryDocAttributeIterator::csBinaryDocAttributeIterator () :
+  scfImplementationType (this)
 {
-  SCF_CONSTRUCT_IBASE (0);
 }
 
 void csBinaryDocAttributeIterator::SetTo (csBdNode* node,
@@ -64,7 +63,6 @@ void csBinaryDocAttributeIterator::SetTo (csBdNode* node,
 
 csBinaryDocAttributeIterator::~csBinaryDocAttributeIterator()
 {
-  SCF_DESTRUCT_IBASE();
 }
 
 bool csBinaryDocAttributeIterator::HasNext ()
@@ -160,32 +158,23 @@ const char* csBdAttr::GetValueStr (csBinaryDocument* doc) const
 //  csBinaryDocAttribute
 // =================================================
 
-void csBinaryDocAttribute::IncRef ()
-{
-  scfRefCount++;
-}
-
 void csBinaryDocAttribute::DecRef ()
 {
+  csRefTrackerAccess::TrackDecRef (scfObject, scfRefCount);
   if (scfRefCount == 1)
   {
+    // Not needed atm
+    //scfRemoveRefOwners ();
+    //if (scfParent) scfParent->DecRef();
     node->doc->RecyclePoolAttr (this);
     return;
   }
   scfRefCount--;
 }
 
-SCF_IMPLEMENT_IBASE_GETREFCOUNT(csBinaryDocAttribute)
-SCF_IMPLEMENT_IBASE_REFOWNER(csBinaryDocAttribute)
-SCF_IMPLEMENT_IBASE_REMOVE_REF_OWNERS(csBinaryDocAttribute)
-SCF_IMPLEMENT_IBASE_QUERY(csBinaryDocAttribute)
-  SCF_IMPLEMENTS_INTERFACE(iDocumentAttribute)
-SCF_IMPLEMENT_IBASE_END
-
-csBinaryDocAttribute::csBinaryDocAttribute ()
+csBinaryDocAttribute::csBinaryDocAttribute () :
+  scfImplementationType (this)
 {
-  SCF_CONSTRUCT_IBASE (0);
-
   vstr = 0;
   vsptr = 0;
 }
@@ -194,7 +183,6 @@ csBinaryDocAttribute::~csBinaryDocAttribute ()
 {
   CleanData ();
   delete vstr; 
-  SCF_DESTRUCT_IBASE();
 }
 
 void csBinaryDocAttribute::CleanData ()
@@ -483,13 +471,9 @@ void csBinaryDocAttribute::Store (csMemFile* nodesFile)
 //  csBinaryDocNodeIterator
 // =================================================
 
-SCF_IMPLEMENT_IBASE(csBinaryDocNodeIterator)
-  SCF_IMPLEMENTS_INTERFACE(iDocumentNodeIterator)
-SCF_IMPLEMENT_IBASE_END
-
-csBinaryDocNodeIterator::csBinaryDocNodeIterator ()
+csBinaryDocNodeIterator::csBinaryDocNodeIterator () :
+  scfImplementationType (this)
 {
-  SCF_CONSTRUCT_IBASE (0);
   value = 0;
 }
 
@@ -522,7 +506,6 @@ void csBinaryDocNodeIterator::SetTo (csBdNode* node,
 csBinaryDocNodeIterator::~csBinaryDocNodeIterator ()
 {
   delete[] value;
-  SCF_DESTRUCT_IBASE();
 }
 
 void csBinaryDocNodeIterator::FastForward()
@@ -795,31 +778,22 @@ uint csBdNode::ctNum ()
 //  csBinaryDocNode
 // =================================================
 
-void csBinaryDocNode::IncRef ()
-{
-  scfRefCount++;
-}
-
 void csBinaryDocNode::DecRef ()
 {
+  csRefTrackerAccess::TrackDecRef (scfObject, scfRefCount);
   if (scfRefCount == 1)
   {
+    // Not needed atm
+    //scfRemoveRefOwners ();
+    //if (scfParent) scfParent->DecRef();
     doc->RecyclePoolNode (this);
     return;
   }
   scfRefCount--;
 }
 
-SCF_IMPLEMENT_IBASE_GETREFCOUNT(csBinaryDocNode)
-SCF_IMPLEMENT_IBASE_REFOWNER(csBinaryDocNode)
-SCF_IMPLEMENT_IBASE_REMOVE_REF_OWNERS(csBinaryDocNode)
-SCF_IMPLEMENT_IBASE_QUERY(csBinaryDocNode)
-  SCF_IMPLEMENTS_INTERFACE(iDocumentNode)
-SCF_IMPLEMENT_IBASE_END
-
-csBinaryDocNode::csBinaryDocNode ()
+csBinaryDocNode::csBinaryDocNode () : scfImplementationType (this)
 {
-  SCF_CONSTRUCT_IBASE (0);
   vstr = 0;
   vsptr = 0;
 }
@@ -828,7 +802,6 @@ csBinaryDocNode::~csBinaryDocNode ()
 {
   CleanData();
   delete vstr;
-  SCF_DESTRUCT_IBASE();
 }
 
 void csBinaryDocNode::SetTo (csBdNode* ptr,
@@ -1572,19 +1545,10 @@ void csBinaryDocNode::Store (csMemFile* nodesFile)
 //  csBinaryDocument
 // =================================================
 
-SCF_IMPLEMENT_IBASE(csBinaryDocument)
-  SCF_IMPLEMENTS_INTERFACE(iDocument)
-SCF_IMPLEMENT_IBASE_END
-
-csBinaryDocument::csBinaryDocument ()
+csBinaryDocument::csBinaryDocument () : scfImplementationType (this),
+  nodePool (0), attrPool (0), root (0), outStrHash (0), attrAlloc (0),
+  nodeAlloc (0)
 {
-  SCF_CONSTRUCT_IBASE (0);
-  nodePool = 0;
-  attrPool = 0;
-  root = 0;
-  outStrHash = 0;
-  attrAlloc = 0;
-  nodeAlloc = 0;
 }
 
 csBinaryDocument::~csBinaryDocument ()
@@ -1605,7 +1569,6 @@ csBinaryDocument::~csBinaryDocument ()
   }
   delete attrAlloc;
   delete nodeAlloc;
-  SCF_DESTRUCT_IBASE();
 }
 
 csBdAttr* csBinaryDocument::AllocBdAttr ()
@@ -1834,7 +1797,7 @@ const char* csBinaryDocument::Write (iFile* out)
     if (pad != 0)
     {
       // align to 4 byte boundary, to avoid problems
-      char null[4] = {0, 0, 0, 0};
+      static const char null[4] = {0, 0, 0, 0};
       out->Write (null, pad);
       doc.ofsStr += pad;
     }
@@ -1863,7 +1826,7 @@ const char* csBinaryDocument::Write (iFile* out)
     if (pad != 0)
     {
       // align to 4 byte boundary, to avoid problems
-      char null[4] = {0, 0, 0, 0};
+      static const char null[4] = {0, 0, 0, 0};
       out->Write (null, pad);
       doc.ofsRoot += pad;
     }
@@ -1913,3 +1876,6 @@ int csBinaryDocument::Changeable ()
     return CS_CHANGEABLE_NEWROOT;
   }
 }
+
+}
+CS_PLUGIN_NAMESPACE_END(BinDoc)

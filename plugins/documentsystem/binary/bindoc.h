@@ -17,6 +17,9 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#ifndef __CS_BINDOC_BINDOC_H__
+#define __CS_BINDOC_BINDOC_H__
+
 #include "iutil/document.h"
 #include "csutil/csendian.h"
 #include "csutil/parray.h"
@@ -25,6 +28,9 @@
 
 struct iDataBuffer;
 class csMemFile;
+
+CS_PLUGIN_NAMESPACE_BEGIN(BinDoc)
+{
 
 /*
    Designed to be loadable with minimal processing.
@@ -231,7 +237,9 @@ struct csBinaryDocNode;
 struct csBdNode;
 struct csBdAttr;
 
-struct csBinaryDocAttributeIterator : public iDocumentAttributeIterator
+struct csBinaryDocAttributeIterator : 
+  public scfImplementation1<csBinaryDocAttributeIterator, 
+                            iDocumentAttributeIterator>
 {
 private:
   friend struct csBinaryDocument;
@@ -246,8 +254,6 @@ private:
   csBinaryDocNode* parentNode;
 
 public:
-  SCF_DECLARE_IBASE;
-
   csBinaryDocAttributeIterator ();
   virtual ~csBinaryDocAttributeIterator();
   void SetTo (csBdNode* node,
@@ -290,7 +296,9 @@ public:
   const char* GetNameStr (csBinaryDocument* doc) const;
 };
 
-struct csBinaryDocAttribute : public iDocumentAttribute
+struct csBinaryDocAttribute : 
+  public scfImplementation1<csBinaryDocAttribute, 
+                            iDocumentAttribute>
 {
 private:
   friend struct csBinaryDocument;
@@ -313,10 +321,9 @@ private:
 
   void CleanData ();
 public:
-  SCF_DECLARE_IBASE;
-
   csBinaryDocAttribute ();
   virtual ~csBinaryDocAttribute ();
+  void DecRef ();
 
   void SetTo (csBdAttr* ptr,
 	      csBinaryDocNode* owner);
@@ -332,7 +339,9 @@ public:
   virtual void SetValueAsFloat (float f);
 };
 
-struct csBinaryDocNodeIterator : iDocumentNodeIterator
+struct csBinaryDocNodeIterator : 
+  public scfImplementation1<csBinaryDocNodeIterator,
+                            iDocumentNodeIterator>
 {
 private:
   friend struct csBinaryDocument;
@@ -348,15 +357,9 @@ private:
   /// Node whose childen we're iterating.
   csBdNode* iteratedNode;
 
-  // fill up struct size to 32(64)
-  // may sound like voodoo - but seems to help performance
-  int pad[1];
-
   /// Skip to next node with value 'value'.
   void FastForward();
 public:
-  SCF_DECLARE_IBASE;
-
   csBinaryDocNodeIterator ();
   virtual ~csBinaryDocNodeIterator ();
   void SetTo (csBdNode* node,
@@ -421,7 +424,9 @@ public:
   uint ctNum ();
 };
 
-struct csBinaryDocNode: public iDocumentNode
+struct csBinaryDocNode : 
+  public scfImplementation1<csBinaryDocNode,
+                            iDocumentNode>
 {
 private:
   friend struct csBinaryDocument;
@@ -454,10 +459,9 @@ private:
   inline int nodeValueInt (csBdNode* nodeData);
   inline float nodeValueFloat (csBdNode* nodeData);
 public:
-  SCF_DECLARE_IBASE;
-
   csBinaryDocNode ();
   virtual ~csBinaryDocNode ();
+  void DecRef ();
 
   void SetTo (csBdNode* ptr,
 	      csBinaryDocNode* parent);
@@ -496,7 +500,9 @@ public:
   virtual void SetAttributeAsFloat (const char* name, float value);
 };
 
-struct csBinaryDocument : public iDocument
+struct csBinaryDocument : 
+  public scfImplementation1<csBinaryDocument, 
+                            iDocument>
 {
 private:
   friend struct csBinaryDocNode;
@@ -525,8 +531,6 @@ private:
 
   csBinaryDocNode* GetRootNode ();
 public:
-  SCF_DECLARE_IBASE;
-
   csBinaryDocument ();
   virtual ~csBinaryDocument ();
 
@@ -556,3 +560,8 @@ public:
 
   virtual int Changeable ();
 };
+
+}
+CS_PLUGIN_NAMESPACE_END(BinDoc)
+
+#endif // __CS_BINDOC_BINDOC_H__

@@ -17,17 +17,24 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "csutil/scf.h"
+#ifndef __CS_BINDOC_BINARY_H__
+#define __CS_BINDOC_BINARY_H__
+
 #include "iutil/comp.h"
 #include "iutil/document.h"
+#include "csutil/scf_implementation.h"
 
 struct iObjectRegistry;
 
-class csBinaryDocumentSystem : public iDocumentSystem, public iComponent
+CS_PLUGIN_NAMESPACE_BEGIN(BinDoc)
+{
+
+class csBinaryDocumentSystem : 
+  public scfImplementation2<csBinaryDocumentSystem, 
+                            iDocumentSystem, 
+                            iComponent>
 {
 public:
-  SCF_DECLARE_IBASE;
-  
   csBinaryDocumentSystem (iBase* parent = 0);
   virtual ~csBinaryDocumentSystem ();
 	
@@ -35,3 +42,8 @@ public:
 
   csRef<iDocument> CreateDocument ();
 };
+
+}
+CS_PLUGIN_NAMESPACE_END(BinDoc)
+
+#endif // __CS_BINDOC_BINARY_H__
