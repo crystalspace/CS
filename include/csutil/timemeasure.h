@@ -26,70 +26,75 @@
 
 #include "csutil/util.h"
 #include "csutil/sysfunc.h"
- 
-/**
- * \addtogroup util
- * @{ */
 
-/**
- * Simple helper class to measure execution time of a block.
- * When destructed, printf()s the time that has passed between
- * construction and destruction in ms.
- * \par
- * Use like:
- * \code
- * void Foo (int x)
- * {
- *   csMeasureTime measureFoo ("Foo (%d) time", x);
- *   
- *   // ...
- * }
- * \endcode
- * This will print the total execution time of Foo().
- */ 
-class csMeasureTime
+namespace CS
 {
-protected:
-  csTicks offsetTime;
-  csString text;
-public:
+
   /**
-   * Construct with a formatted description string.
-   */
-  csMeasureTime (const char* format, ...)
-  {
-    va_list args;
-    va_start (args, format);
-    text.FormatV (format, args);
-    va_end (args);
+   * \addtogroup util
+   * @{ */
 
-    offsetTime = csGetTicks ();
-  }
-  
-  ~csMeasureTime ()
+  /**
+   * Simple helper class to measure execution time of a block.
+   * When destructed, csPrintf()s the time that has passed between
+   * construction and destruction in &micro;s.
+   * 
+   * Use like:
+   * \code
+   * void Foo (int x)
+   * {
+   *   csMeasureTime measureFoo ("Foo (%d) time", x);
+   *   
+   *   // ...
+   * }
+   * \endcode
+   * This will print the total execution time of Foo().
+   */ 
+  class MeasureTime
   {
-    csTicks endTime = csGetTicks ();
-    csPrintf ("%s: %u ms\n", text.GetData(), endTime - offsetTime);
-  }
-  
-  /// Print an intermediate measurement.
-  void PrintIntermediate (const char* descr, ...)
-  {
-    csTicks currentTime = csGetTicks ();
+  protected:
+    int64 offsetTime;
+    csString text;
+  public:
+    /**
+     * Construct with a formatted description string.
+     */
+    MeasureTime (const char* format, ...)
+    {
+      va_list args;
+      va_start (args, format);
+      text.FormatV (format, args);
+      va_end (args);
 
-    csPrintf ("(%s)", text.GetData());
-    va_list args;
-    va_start (args, descr);
-    csPrintfV (descr, args);
-    va_end (args);
-    csPrintf (": %u ms\n", currentTime - offsetTime);
+      offsetTime = csGetMicroTicks ();
+    }
     
-    csTicks currentTime2 = csGetTicks ();
-    // Correct difference from printing
-    offsetTime += currentTime2 - currentTime;
-  }
-};
+    ~MeasureTime ()
+    {
+      csTicks endTime = csGetMicroTicks ();
+      csPrintf ("%s: %" PRId64 " \xC2\xB5s\n", text.GetData(), endTime - offsetTime);
+    }
+    
+    /// Print an intermediate measurement.
+    void PrintIntermediate (const char* descr, ...)
+    {
+      int64 currentTime = csGetMicroTicks ();
+
+      csPrintf ("(%s)", text.GetData());
+      va_list args;
+      va_start (args, descr);
+      csPrintfV (descr, args);
+      va_end (args);
+      csPrintf (": %" PRId64 " \xC2\xB5s\n", currentTime - offsetTime);
+      
+      int64 currentTime2 = csGetMicroTicks ();
+      // Correct difference from printing
+      offsetTime += currentTime2 - currentTime;
+    }
+  };
  
 /** @} */
- 
+
+} // namespace CS
+
 #endif

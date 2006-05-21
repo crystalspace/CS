@@ -13,6 +13,8 @@ chronological order.
 	- res augmented bugplug to allow programmatic command execution (and
 	  not just via user input). Added new "bugplugcmd" command to 
 	  walktest.
+	- res renamed csMeasureTime to CS::MeasureTime and changed it to use 
+	  csGetMicroTicks().
 19-May-2006
         - res made the separate debug info and optimize mode debug info 
           features toggleable via configure switches.
