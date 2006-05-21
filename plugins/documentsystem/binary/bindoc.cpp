@@ -1546,8 +1546,8 @@ void csBinaryDocNode::Store (csMemFile* nodesFile)
 // =================================================
 
 csBinaryDocument::csBinaryDocument () : scfImplementationType (this),
-  nodePool (0), attrPool (0), root (0), outStrHash (0), attrAlloc (0),
-  nodeAlloc (0)
+  root (0), nodePool (0), attrPool (0), attrAlloc (0), nodeAlloc (0),
+  outStrHash (0)
 {
 }
 

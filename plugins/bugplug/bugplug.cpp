@@ -681,12 +681,12 @@ bool csBugPlug::ExecCommand (int cmd, const csString& args)
 	    if (dbghelp->DebugCommand (args))
 	    {
             Report (CS_REPORTER_SEVERITY_NOTIFY,
-	        "Engine command '%s' performed.", args);
+	        "Engine command '%s' performed.", args.GetData());
 	    }
 	    else
 	    {
             Report (CS_REPORTER_SEVERITY_NOTIFY,
-	        "Engine command '%s' not supported!", args);
+	        "Engine command '%s' not supported!", args.GetData());
 	    }
 	  }
 	}
@@ -1308,7 +1308,7 @@ void csBugPlug::CaptureScreen ()
       captureOptions));
     if (db)
     {
-      Report (CS_REPORTER_SEVERITY_NOTIFY, "Screenshot: %s", name);
+      Report (CS_REPORTER_SEVERITY_NOTIFY, "Screenshot: %s", name.GetData());
       if (!VFS->WriteFile (name, (const char*)db->GetData (),
       		db->GetSize ()))
       {
