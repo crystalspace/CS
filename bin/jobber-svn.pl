@@ -2,8 +2,8 @@
 #==============================================================================
 #
 #    Automated Task Processing, Publishing, and SVN Update Script
-#    Copyright (C) 2000-2006 by Eric Sunshine <sunshine@sunshineco.com>
-#    Converted from CVS to SVN by Marten Svanfeldt <developer@svanfeldt.com>
+#    Copyright (C) 2000-2005 by Eric Sunshine <sunshine@sunshineco.com>
+#                       2006 by Marten Svanfeldt <developer@svanfeldt.com>
 #
 #    This program is free software; you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -55,13 +55,14 @@
 #
 # The script makes no attempt to perform any sort of SVN authentication.  It is
 # the client's responsibility to authenticate with the SVN server if necessary.
-# For general access the easiest way to do so is to login to the SVN server one
-# time manually using the appropriate identity.  Once logged in successfully,
+# For access the easiest way to do so is to login to the CVS server  one time 
+# manually using the appropriate identity.  Once logged in successfully, 
 # the authentication information is stored in $(HOME)/.subversion/ directory
 # and remains there.  From that point onward, SVN considers the account as
-# having been authenticated.  The identity used for SVN access must have
-# "write" access to the repository if files changed by the performed tasks are
-# to be committed back to the repository.
+# having been authenticated.
+# The identity used for SVN access must have "write" access to the repository 
+# if files changed by the performed tasks are to be committed back to the 
+# repository.
 #
 #------------------------------------------------------------------------------
 #
@@ -88,7 +89,7 @@
 #
 # $jobber_svn_base_url [required]
 #     The URL used as base url when invoking SVN commands. The specified value
-#     must allow "write" access to the repository if files are to be committed
+#     must allow "write" access to the repository if files are to be commited
 #     back to the repository. No default.
 #
 # $jobber_svn_user [required]
@@ -96,11 +97,8 @@
 #     repository. Notice that the password/certificate must be configured 
 #     as noted above.
 #
-# $jobber_svn_command [optional]
-#     The command to invoke the SVN client tool. Default is 'svn'.
-#
 # $jobber_svn_flags [optional]
-#     Additional flags to pass to each of the `svn' command invocations.  An
+#     Additional flags to pass to each of the `cvs' command invocations.  An
 #     obvious example would be to set this variable to "-z9" to enable
 #     compression. No default.
 #
@@ -132,11 +130,23 @@
 #     occur.  The script cleans up after itself, so nothing will be left in
 #     this directory after the script terminates. Default: "/tmp"
 #
+# @jobber_binary_override [optional] @@ NOT NEEDED
+#     Normally, jobber-svn.pl determines automatically whether files which it adds
+#     to the repository are binary or text (CVS needs to know this
+#     information).  There may be special cases, however, when text files need
+#     to be treated as binary files. This setting is a list of regular
+#     expressions which are matched against the names of files being added to
+#     the CVS repository.  If a filename matches one of these expressions, then
+#     it is considered binary (thus, the CVS "-kb" option is used).  An example
+#     of when this comes in handy is when dealing with Visual-C++ DSW and DSP
+#     project files in which the CRLF line-terminator must be preserved.
+#     Default: .dsw and .dsp files
+#
 # @jobber_tasks [required]
 #     A list of tasks to perform on the checked-out source tree.  Typical tasks
 #     are those which repair outdated files, and those which generate
 #     human-consumable documentation from various sources.  Files generated or
-#     repaired by the tasks can then optionally be committed back to the SVN
+#     repaired by the tasks can then optionally be committed back to the CVS
 #     repository and/or published for browsing or download. Each task's
 #     "command" is invoked in the top-level directory of the project tree
 #     ($jobber_project_root).
@@ -243,11 +253,9 @@
 #
 # To-Do List
 #
-# * Merge this with the jobber.pl script so that one script can handle both
-#   CVS and SVN, thus reducing maintenance consts considerably.
 # * Generalize into a "job" processing mechanism.  Each job could reside within
-#   its own source file.  Jobs such as checking out files from SVN, committing
-#   changes to SVN, and publishing browseable and downloadable documentation
+#   its own source file.  Jobs such as checking out files from CVS, committing
+#   changes to CVS, and publishing browseable and downloadable documentation
 #   can perhaps just be additional tasks in the @jobber_tasks array.
 # * The mechanism for publishing packages for download and online browsing
 #   needs to be generalized further.  It is still somewhat geared toward the
@@ -265,6 +273,7 @@ use File::Find;
 use File::Path;
 use FileHandle;
 use Getopt::Long;
+use Cwd;
 use strict;
 use warnings;
 $Getopt::Long::ignorecase = 0;
@@ -273,8 +282,7 @@ my $PROG_NAME = 'jobber-svn.pl';
 my $PROG_VERSION = '35';
 my $AUTHOR_NAME = 'Eric Sunshine';
 my $AUTHOR_EMAIL = 'sunshine@sunshineco.com';
-my $COPYRIGHT = "Copyright (C) 2000-2005 by $AUTHOR_NAME <$AUTHOR_EMAIL>\n" .
-    "Converted for SVN support by Marten Svanfeldt\n";
+my $COPYRIGHT = "Copyright (C) 2000-2005 by $AUTHOR_NAME <$AUTHOR_EMAIL>\nConverted for SVN support by Marten Svanfeldt";
 
 my $ARCHIVER_BZIP2 = {
     'name'      => 'bzip2',
@@ -291,7 +299,6 @@ my $ARCHIVER_ZIP = {
 
 my $jobber_project_root = undef;
 my $jobber_svn_base_url = undef;
-my $jobber_svn_command = 'svn';
 my $jobber_svn_flags = '';
 my $jobber_svn_user = '';
 my $jobber_browseable_dir = undef;
@@ -299,9 +306,13 @@ my $jobber_package_dir = undef;
 my $jobber_public_group = undef;
 my $jobber_public_mode = undef;
 my $jobber_temp_dir = '/tmp';
+my @jobber_binary_override = ('(?i)\.(dsw|dsp)$');
 my @jobber_tasks = ();
 my @jobber_archivers = ($ARCHIVER_BZIP2, $ARCHIVER_GZIP, $ARCHIVER_ZIP);
 my %jobber_properties = ();
+
+# SVN binary name
+my $jobber_svn_command = './svnwrapper';
 
 my $CONFIG_FILE = undef;
 my $TESTING = undef;
@@ -547,6 +558,7 @@ sub svn_queue_add {
 	push(@NEW_DIRECTORIES, $dst);
     }
     else {
+	# my $isbin = is_binary($src);
 	print "Adding file: $file\n";
 	push(@NEW_FILES, $dst);
 	copy_file($src, $dst);
@@ -583,7 +595,7 @@ sub svn_update {
     my $line = '-' x length($message);
     my $dirs = '';
     foreach my $task (@jobber_tasks) {
-	$dirs .= " @{$task->{'olddirs'}}" if exists $task->{'olddirs'};
+	$dirs .= " @{$task->{'olddirs'}}" if exists $task->{'olddeirs'};
     }
     if ($dirs) {
         print "$line\n$message\n";
@@ -605,7 +617,7 @@ sub svn_commit_dirs {
     print RESPFILE $message;
     close(RESPFILE);
 
-    run_command("$jobber_svn_command $jobber_svn_flags --username=$jobber_svn_user commit -F $respFileName $dirsAsText")
+    run_command("$jobber_svn_command $jobber_svn_flags --username $jobber_svn_user commit -F $respFileName $dirsAsText")
 	unless $TESTING;
     unlink($respFileName);
 }
@@ -833,10 +845,11 @@ sub time_now {
 }
 
 #------------------------------------------------------------------------------
-# Perform the complete process of running tasks, committing to SVN, and
+# Perform the complete process of running tasks, committing to CVS, and
 # publishing packages.
 #------------------------------------------------------------------------------
 sub run {
+    $jobber_svn_command = getcwd . "/$jobber_svn_command";
     print 'BEGIN: ', time_now(), "\n";
     my $convdir = conversion_dir();
     create_transient($convdir);
@@ -883,6 +896,8 @@ sub validate_config {
 	    last;
 	}
     }
+
+    # $jobber_cvs_sources = $jobber_project_root unless $jobber_svna_sources;
 }
 
 #------------------------------------------------------------------------------
