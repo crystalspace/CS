@@ -564,9 +564,23 @@ CS_CHECK_BUILD([if --kill-at is accepted], [cs_cv_prog_link_kill_at], [],
 # (e.g. not linking against some library, a missing function) that could cause
 # problems on stricter platforms.
 #------------------------------------------------------------------------------
-CS_EMIT_BUILD_FLAGS([if warning for missing symbols is supported], 
+CS_EMIT_BUILD_FLAGS([if reporting missing symbols is supported], 
     [cs_cv_prog_link_z_defs], [CS_CREATE_TUPLE([],[-Wl,-z,defs])], 
     [C++], [COMPILER.LFLAGS], [+])
+CS_EMIT_BUILD_FLAGS([if missing symbols can be reported as warnings], 
+    [cs_cv_prog_link_warn_unresolved_symbols], 
+    [CS_CREATE_TUPLE([],[-Wl,--warn-unresolved-symbols])], 
+    [C++], [COMPILER.LFLAGS], [+])
+
+
+
+#------------------------------------------------------------------------------
+# Check if linker recognizes "--as-needed" which only links dynamic libs that
+# are really honestly needed.
+#------------------------------------------------------------------------------
+#CS_EMIT_BUILD_FLAGS([if --as-needed is supported], 
+#    [cs_cv_prog_link_as_needed], [CS_CREATE_TUPLE([],[-Wl,--as-needed])], 
+#    [C++], [COMPILER.LFLAGS], [+])
 
 
 
@@ -795,7 +809,7 @@ CS_CHECK_OPTIMIZE_FLAGS
 #------------------------------------------------------------------------------
 binutils_recent=no
 AS_IF([test -n "$OBJCOPY"],
-    [CS_CHECK_PROG_VERSION([binutils], [$OBJCOPY -V], [2.16], [9.9|.9.9.9],
+    [CS_CHECK_PROG_VERSION([binutils], [$OBJCOPY -V], [2.16.0], [9.9.9|.9.9],
 	[binutils_recent=yes])])
 
 AC_ARG_WITH([separate-debug-info], [AC_HELP_STRING([--with-separate-debug-info],
@@ -949,7 +963,7 @@ AS_IF([test "$no_x" != yes],
 	    #include <X11/Xaw/Form.h>]],
 	    [XtVaGetValues(0,0,0,0)])],
 	[], [],	[CS_EMIT_BUILD_RESULT([cs_cv_libXaw], [XAW])], [],
-	[$X_CFLAGS], [], [$X_PRE_LIBS $X_LIBS -lX11 $X_EXTRA_LIBS])])
+	[$X_CFLAGS], [], [$X_PRE_LIBS $X_LIBS -lXt -lX11 $X_EXTRA_LIBS])])
 
 
 
