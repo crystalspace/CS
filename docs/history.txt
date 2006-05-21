@@ -22,6 +22,7 @@ chronological order.
 	  the allocator.
 	- res fixed gcc 3.4 compile errors after the array.h change.
 	- res fixed some gcc compile warnings.
+	- res moved AWS and AWS2 to plugins/gui/.
 19-May-2006
         - res made the separate debug info and optimize mode debug info 
           features toggleable via configure switches.

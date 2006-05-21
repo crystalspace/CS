@@ -1,0 +1,84 @@
+SubDir TOP plugins aws ;
+
+if $(STL.AVAILABLE) = yes
+{
+
+FILES = [ Wildcard *.cpp *.h *.hpp ] ;
+
+if ! [ Property build : projgen ]
+{
+  if $(CMD.BISON) && $(CMD.FLEX)
+  {
+    FILES = [ Filter $(FILES) : skinlex.cpp skinpars.cpp skinpars.hpp ] 
+	skinlex.ll skinpars.yy ;
+    BisonFlags skinpars.yy : "-p aws" ;
+    
+    # skinlex.cpp includes the generated skinpars.hpp, so we must ensure that
+    # skinpars.hpp is generated before skinlex.cpp, since we do not want
+    # skinlex.cpp accidentally including the factory-supplied skinpars.hpp from
+    # the source directory.
+    local lex = [ DoObjectGrist skinlex.cpp ] ;
+    local parse = [ DoObjectGrist skinpars.cpp ] ;
+    local parseh = [ DoObjectGrist skinpars.hpp ] ;
+    Depends $(lex) : $(parse) ;
+    Includes $(parse) : $(parseh) ;
+
+    # @@@ Have the build order above respected for static builds.
+    {
+      SubVariant static ;
+      local lex = [ DoObjectGrist skinlex.cpp ] ;
+      local parse = [ DoObjectGrist skinpars.cpp ] ;
+      local parseh = [ DoObjectGrist skinpars.hpp ] ;
+      Depends $(lex) : $(parse) ;
+      Includes $(parse) : $(parseh) ;
+      SubVariant ;
+    }
+
+    # Construct a rule for copying the generated sources from Bison and Flex
+    # into the source directories.
+    local freezefiles = $(lex) $(parse) $(parseh) ;
+    for i in $(freezefiles)
+    {
+      local targetfile = $(i:D=$(SUBDIR):G=awsfreeze) ;
+      Copy $(targetfile) : $(i) ;
+      Depends $(targetfile) : $(i) ;
+      Depends awsfreeze : $(targetfile) ;
+    }
+
+    NotFile awsfreeze ;
+    Help awsfreeze :
+      "Copy generated Bison/Flex files to source directory" ;
+
+    # When Bison and Flex are installed, then skinpars.cpp and skinlex.cpp
+    # reside in $(LOCATE_TARGET) rather than CS/plugins/aws, so we need to tell
+    # those files that some headers they require reside in CS/plugins/aws.
+    # Also, we ensure that skinlex.cpp searches $(LOCATE_TARGET) first because
+    # it needs to locate the generated skinpars.hpp rather than the
+    # factory-supplied one in CS/plugins/aws.  (In reality, LOCATE_TARGET
+    # should be searched automatically since #include "skinpars.hpp" is used,
+    # and LOCATE_TARGET is the "current directory" in this case, but we do this
+    # for that extra measure of insurance.)
+    C++FLAGS on [ DoObjectGrist skinpars$(SUFOBJ) skinlex$(SUFOBJ) ] +=
+      [ FIncludes $(LOCATE_TARGET) $(SEARCH_SOURCE) ] ;
+  }
+}
+
+Description aws : "Alternate Windowing System plugin" ;
+Plugin aws : $(FILES) ;
+LinkWith aws : crystalspace ;
+ExternalLibs aws : STL ;
+# Be lazy: AWS is to be removed, so don't care to fix strict aliasing issues
+CFlags aws : $(COMPILER.C++FLAGS.STRICTALIASING.DISABLE) ;
+
+if "$(COMPILER.C++FLAGS.WARNING.NO_UNUSED)"
+{
+  # We can't avoid unused variables in auto-generated code, so disable warning.
+  C++FLAGS on [ DoObjectGrist skinlex$(SUFOBJ) skinpars$(SUFOBJ) ] +=
+    $(COMPILER.C++FLAGS.WARNING.NO_UNUSED) ;
+}
+C++FLAGS on [ DoObjectGrist skinlex$(SUFOBJ) skinpars$(SUFOBJ) ] += 
+  [ FDefines YY_NEVER_INTERACTIVE ] ;
+
+MsvcDefine aws : YY_NEVER_INTERACTIVE ;
+
+}
