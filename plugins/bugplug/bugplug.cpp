@@ -89,6 +89,9 @@
 
 CS_IMPLEMENT_PLUGIN
 
+CS_PLUGIN_NAMESPACE_BEGIN(BugPlug)
+{
+
 SCF_IMPLEMENT_FACTORY (csBugPlug)
 
 void csBugPlug::Report (int severity, const char* msg, ...)
@@ -299,7 +302,7 @@ void csBugPlug::SetupPlugin ()
   // and create an appropriate format string
   {
     captureFormatNumberMax = 1;
-    int captureFormatNumberDigits = 0;
+    uint captureFormatNumberDigits = 0;
 
     char* end = strrchr (captureFormat, 0);
     if (end != captureFormat)
@@ -320,7 +323,7 @@ void csBugPlug::SetupPlugin ()
 	while ((end >= captureFormat) && (isdigit (*end)));
 	
 	csString nameForm;
-	nameForm.Format ("%%0%dd", captureFormatNumberDigits);
+	nameForm.Format ("%%0%uu", captureFormatNumberDigits);
 
         csString newCapForm;
         newCapForm.Append (captureFormat, end-captureFormat+1);
@@ -503,11 +506,7 @@ void csBugPlug::ToggleG3DState (G3D_RENDERSTATEOPTION op, const char* name)
   }
 }
 
-void csBugPlug::MouseButton1 (iCamera*)
-{
-}
-
-void csBugPlug::MouseButton2 (iCamera* camera)
+void csBugPlug::MouseButtonRight (iCamera* camera)
 {
   csVector3 v;
   // Setup perspective vertex, invert mouse Y axis.
@@ -541,7 +540,7 @@ void csBugPlug::MouseButton2 (iCamera* camera)
   }
 }
 
-void csBugPlug::MouseButton3 (iCamera* camera)
+void csBugPlug::MouseButtonLeft (iCamera* camera)
 {
   csVector3 v;
   // Setup perspective vertex, invert mouse Y axis.
@@ -634,9 +633,8 @@ bool csBugPlug::EatMouse (iEvent& event)
       {
         switch (button)
 	{
-	  case 1: MouseButton3 (catcher->camera); break;
-	  case 2: MouseButton2 (catcher->camera); break;
-	  case 3: MouseButton3 (catcher->camera); break;
+	  case csmbLeft: MouseButtonLeft (catcher->camera); break;
+	  case csmbRight: MouseButtonRight (catcher->camera); break;
 	}
       }
       process_next_mouse = false;
@@ -657,15 +655,634 @@ bool csBugPlug::EatMouse (iEvent& event)
   return true;
 }
 
+bool csBugPlug::ExecCommand (int cmd, const csString& args)
+{
+  switch (cmd)
+  {
+    case DEBUGCMD_UNKNOWN:
+      return true;
+    case DEBUGCMD_QUIT:
+      Report (CS_REPORTER_SEVERITY_NOTIFY, "Nah nah! I will NOT quit!");
+      break;
+    case DEBUGCMD_STATUS:
+      Report (CS_REPORTER_SEVERITY_NOTIFY,
+		"I'm running smoothly, thank you...");
+      break;
+    case DEBUGCMD_DEBUGGRAPH:
+      Report (CS_REPORTER_SEVERITY_NOTIFY, "Debug graph dumped!");
+	csDebuggingGraph::Dump (object_reg);
+      break;
+    case DEBUGCMD_ENGINECMD:
+	{
+	  csRef<iDebugHelper> dbghelp (
+	  	SCF_QUERY_INTERFACE (Engine, iDebugHelper));
+	  if (dbghelp)
+	  {
+	    if (dbghelp->DebugCommand (args))
+	    {
+            Report (CS_REPORTER_SEVERITY_NOTIFY,
+	        "Engine command '%s' performed.", args);
+	    }
+	    else
+	    {
+            Report (CS_REPORTER_SEVERITY_NOTIFY,
+	        "Engine command '%s' not supported!", args);
+	    }
+	  }
+	}
+      break;
+    case DEBUGCMD_VISCULCMD:
+      VisculCmd (args);
+      break;
+    case DEBUGCMD_DEBUGCMD:
+	{
+	  DebugCmd (args);
+	  break;
+	}
+    case DEBUGCMD_ENGINESTATE:
+	{
+	  csRef<iDebugHelper> dbghelp (
+	  	SCF_QUERY_INTERFACE (Engine, iDebugHelper));
+	  if (dbghelp)
+	  {
+	    if (dbghelp->GetSupportedTests () & CS_DBGHELP_STATETEST)
+	    {
+	      csRef<iString> rc (dbghelp->StateTest ());
+	      if (rc)
+	      {
+              Report (CS_REPORTER_SEVERITY_NOTIFY,
+	          "Engine StateTest() failed:");
+              Report (CS_REPORTER_SEVERITY_DEBUG,
+	          "Engine StateTest() failed:");
+              Report (CS_REPORTER_SEVERITY_DEBUG,
+		  rc->GetData ());
+	      }
+	      else
+	      {
+              Report (CS_REPORTER_SEVERITY_NOTIFY,
+	          "Engine StateTest() succeeded!");
+	      }
+	    }
+	    else
+	    {
+            Report (CS_REPORTER_SEVERITY_NOTIFY,
+	        "Engine doesn't support StateTest()!");
+	    }
+	  }
+	}
+      break;
+    case DEBUGCMD_HELP:
+      Report (CS_REPORTER_SEVERITY_NOTIFY, "Sorry, cannot help you yet.");
+      break;
+    case DEBUGCMD_DUMPENG:
+      if (Engine)
+	{
+        Report (CS_REPORTER_SEVERITY_NOTIFY,
+		"Dumping entire engine contents to debug.txt.");
+	  Dump (Engine);
+	  Report (CS_REPORTER_SEVERITY_DEBUG, "");
+	}
+      break;
+    case DEBUGCMD_DUMPSEC:
+      Report (CS_REPORTER_SEVERITY_NOTIFY, "Not implemented yet.");
+      break;
+    case DEBUGCMD_CLEAR:
+      do_clear = !do_clear;
+      Report (CS_REPORTER_SEVERITY_NOTIFY, "BugPlug %s screen clearing.",
+	  	do_clear ? "enabled" : "disabled");
+      break;
+    case DEBUGCMD_EDGES:
+      ToggleG3DState (G3DRENDERSTATE_EDGES, "edge drawing");
+	{
+	  if (Engine && (Engine->GetBeginDrawFlags () & CSDRAW_CLEARSCREEN))
+	    break;
+	  bool v;
+	  v = (G3D->GetRenderState (G3DRENDERSTATE_EDGES) != 0);
+	  if (v && !do_clear) do_clear = true;
+	}
+      break;
+    case DEBUGCMD_TEXTURE:
+      ToggleG3DState (G3DRENDERSTATE_TEXTUREMAPPINGENABLE, "texture mapping");
+      break;
+    case DEBUGCMD_BILINEAR:
+      ToggleG3DState (G3DRENDERSTATE_BILINEARMAPPINGENABLE,
+		"bi-linear filtering");
+	break;
+    case DEBUGCMD_TRILINEAR:
+      ToggleG3DState (G3DRENDERSTATE_TRILINEARMAPPINGENABLE,
+		"tri-linear filtering");
+	break;
+    case DEBUGCMD_LIGHTING:
+      ToggleG3DState (G3DRENDERSTATE_LIGHTINGENABLE, "lighting");
+	break;
+    case DEBUGCMD_GOURAUD:
+      ToggleG3DState (G3DRENDERSTATE_GOURAUDENABLE, "gouraud shading");
+	break;
+    case DEBUGCMD_ILACE:
+      ToggleG3DState (G3DRENDERSTATE_INTERLACINGENABLE, "interlaced mode");
+	break;
+    case DEBUGCMD_MMX:
+      ToggleG3DState (G3DRENDERSTATE_MMXENABLE, "mmx mode");
+	break;
+    case DEBUGCMD_TRANSP:
+      ToggleG3DState (G3DRENDERSTATE_TRANSPARENCYENABLE, "transp mode");
+      break;
+    case DEBUGCMD_CACHECLEAR:
+      /*if (G3D)
+	{
+	  G3D->ClearCache ();
+        Report (CS_REPORTER_SEVERITY_NOTIFY,
+	    "BugPlug cleared the texture cache.");
+	}*/
+      break;
+    case DEBUGCMD_CACHEDUMP:
+      //if (G3D) G3D->DumpCache ();
+      break;
+    case DEBUGCMD_MIPMAP:
+      {
+	  if (!G3D) break;
+	  char* choices[6] = { "on", "off", "1", "2", "3", 0 };
+	  long v = G3D->GetRenderState (G3DRENDERSTATE_MIPMAPENABLE);
+	  v = (v+1)%5;
+	  G3D->SetRenderState (G3DRENDERSTATE_MIPMAPENABLE, v);
+	  Report (CS_REPORTER_SEVERITY_NOTIFY, "BugPlug set mipmap to '%s'",
+	  	choices[v]);
+	}
+	break;
+    case DEBUGCMD_INTER:
+	{
+	  if (!G3D) break;
+	  char* choices[5] = { "smart", "step32", "step16", "step8", 0 };
+	  long v = G3D->GetRenderState (G3DRENDERSTATE_INTERPOLATIONSTEP);
+	  v = (v+1)%4;
+	  G3D->SetRenderState (G3DRENDERSTATE_INTERPOLATIONSTEP, v);
+	  Report (CS_REPORTER_SEVERITY_NOTIFY, "BugPlug set interpolation to '%s'",
+	  	choices[v]);
+	}
+	break;
+    case DEBUGCMD_GAMMA:
+      {
+	  if (!G3D) break;
+	  float val = G2D->GetGamma ();
+        csString buf;
+	  buf.Format ("%g", val);
+        EnterEditMode (cmd, "Enter new gamma:", buf);
+	}
+      break;
+    case DEBUGCMD_SELECTMESH:
+      EnterEditMode (cmd, "Enter mesh name regexp pattern:", "");
+      break;
+    case DEBUGCMD_DBLBUFF:
+      {
+	  bool state = G2D->GetDoubleBufferState ();
+	  state = !state;
+	  if (!G2D->DoubleBuffer (state))
+	  {
+	    Report (CS_REPORTER_SEVERITY_NOTIFY,
+	    	"Double buffer not supported in current video mode!");
+	  }
+	  else
+	  {
+	    Report (CS_REPORTER_SEVERITY_NOTIFY,
+	    	"BugPlug %s double buffering.",
+		state ? "enabled" : "disabled");
+	  }
+	}
+      break;
+    case DEBUGCMD_TERRVIS:
+	{
+	  Report (CS_REPORTER_SEVERITY_NOTIFY,
+	    	"BugPlug Terrain Visualization not implemented!");
+	}
+      break;
+    case DEBUGCMD_MESHBASEMESH:
+	{
+	  if (show_polymesh == BUGPLUG_POLYMESH_BASE)
+	  {
+	    show_polymesh = BUGPLUG_POLYMESH_NO;
+	    Report (CS_REPORTER_SEVERITY_NOTIFY,
+	    	"BugPlug disabled showing BASE polygonmesh.");
+	  }
+	  else
+	  {
+	    show_polymesh = BUGPLUG_POLYMESH_BASE;
+	    Report (CS_REPORTER_SEVERITY_NOTIFY,
+	    	"BugPlug is showing BASE polygonmesh.");
+	  }
+	}
+      break;
+    case DEBUGCMD_MESHSHADMESH:
+	{
+	  if (show_polymesh == BUGPLUG_POLYMESH_SHAD)
+	  {
+	    show_polymesh = BUGPLUG_POLYMESH_NO;
+	    Report (CS_REPORTER_SEVERITY_NOTIFY,
+	    	"BugPlug disabled showing SHAD polygonmesh.");
+	  }
+	  else
+	  {
+	    show_polymesh = BUGPLUG_POLYMESH_SHAD;
+	    Report (CS_REPORTER_SEVERITY_NOTIFY,
+	    	"BugPlug is showing SHAD polygonmesh.");
+	  }
+	}
+      break;
+    case DEBUGCMD_MESHVISMESH:
+	{
+	  if (show_polymesh == BUGPLUG_POLYMESH_VIS)
+	  {
+	    show_polymesh = BUGPLUG_POLYMESH_NO;
+	    Report (CS_REPORTER_SEVERITY_NOTIFY,
+	    	"BugPlug disabled showing VIS polygonmesh.");
+	  }
+	  else
+	  {
+	    show_polymesh = BUGPLUG_POLYMESH_VIS;
+	    Report (CS_REPORTER_SEVERITY_NOTIFY,
+	    	"BugPlug is showing VIS polygonmesh.");
+	  }
+	}
+      break;
+    case DEBUGCMD_MESHCDMESH:
+	{
+	  if (show_polymesh == BUGPLUG_POLYMESH_CD)
+	  {
+	    show_polymesh = BUGPLUG_POLYMESH_NO;
+	    Report (CS_REPORTER_SEVERITY_NOTIFY,
+	    	"BugPlug disabled showing CD polygonmesh.");
+	  }
+	  else
+	  {
+	    show_polymesh = BUGPLUG_POLYMESH_CD;
+	    Report (CS_REPORTER_SEVERITY_NOTIFY,
+	    	"BugPlug is showing CD polygonmesh.");
+	  }
+	}
+      break;
+    case DEBUGCMD_MESHBBOX:
+	{
+	  bool bbox, rad;
+	  shadow->GetShowOptions (bbox, rad);
+        bbox = !bbox;
+	  Report (CS_REPORTER_SEVERITY_NOTIFY,
+	    	"BugPlug %s bounding box display.",
+		bbox ? "enabled" : "disabled");
+	  shadow->SetShowOptions (bbox, rad);
+	  if ((bbox || rad || show_polymesh != BUGPLUG_POLYMESH_NO)
+			  && HasSelectedMeshes ())
+	    shadow->AddToEngine (Engine);
+	  else
+	    shadow->RemoveFromEngine (Engine);
+	}
+      break;
+    case DEBUGCMD_MESHRAD:
+      {
+	  bool bbox, rad;
+	  shadow->GetShowOptions (bbox, rad);
+        rad = !rad;
+	  Report (CS_REPORTER_SEVERITY_NOTIFY,
+	    	"BugPlug %s bounding sphere display.",
+		rad ? "enabled" : "disabled");
+	  shadow->SetShowOptions (bbox, rad);
+	  if ((bbox || rad || show_polymesh != BUGPLUG_POLYMESH_NO)
+			  && HasSelectedMeshes ())
+	    shadow->AddToEngine (Engine);
+	  else
+	    shadow->RemoveFromEngine (Engine);
+	}
+      break;
+    case DEBUGCMD_DEBUGVIEW:
+	SwitchDebugView ();
+      break;
+    case DEBUGCMD_SWITCHCULLER:
+	if (catcher->camera)
+        SwitchCuller (catcher->camera->GetSector (), args);
+      break;
+    case DEBUGCMD_ONESECTOR:
+	if (catcher->camera)
+        OneSector (catcher->camera);
+	break;
+    case DEBUGCMD_VISCULVIEW:
+      if (catcher->camera)
+        VisculView (catcher->camera);
+      break;
+    case DEBUGCMD_DUMPCAM:
+      if (catcher->camera) Dump (catcher->camera);
+	break;
+    case DEBUGCMD_FOV:
+      if (catcher->camera)
+	{
+	  csString buf;
+        int fov = catcher->camera->GetFOV ();
+	  buf.Format ("%d", fov);
+	  EnterEditMode (cmd, "Enter new fov value:", buf);
+	}
+	break;
+    case DEBUGCMD_FOVANGLE:
+      if (catcher->camera)
+	{
+	  csString buf;
+        float fov = catcher->camera->GetFOVAngle ();
+	  buf.Format ("%g", fov);
+	  EnterEditMode (cmd, "Enter new fov angle:", buf);
+	}
+	break;
+    case DEBUGCMD_DEBUGSECTOR:
+	if (catcher->camera)
+	  SwitchDebugSector (catcher->camera->GetTransform ());
+      break;
+    case DEBUGCMD_SAVEMAP:
+      delay_command = DEBUGCMD_SAVEMAP;
+	break;
+    case DEBUGCMD_SCRSHOT:
+      delay_command = DEBUGCMD_SCRSHOT;
+      break;
+    case DEBUGCMD_DS_LEFT:
+      if (debug_sector.show && debug_sector.clear)
+	{
+	  debug_sector.view->GetCamera ()->Move (csVector3 (-1, 0, 0), false);
+	}
+	else
+	{
+	  Report (CS_REPORTER_SEVERITY_NOTIFY,
+	    	"Debug sector is not active now!");
+	}
+      break;
+    case DEBUGCMD_DS_RIGHT:
+      if (debug_sector.show && debug_sector.clear)
+	{
+	  debug_sector.view->GetCamera ()->Move (csVector3 (1, 0, 0), false);
+	}
+	else
+	{
+	  Report (CS_REPORTER_SEVERITY_NOTIFY,
+	    	"Debug sector is not active now!");
+	}
+      break;
+    case DEBUGCMD_DS_FORWARD:
+      if (debug_sector.show && debug_sector.clear)
+	{
+	  debug_sector.view->GetCamera ()->Move (csVector3 (0, 0, 1), false);
+	}
+	else
+	{
+	  Report (CS_REPORTER_SEVERITY_NOTIFY,
+	    	"Debug sector is not active now!");
+	}
+      break;
+    case DEBUGCMD_DS_BACKWARD:
+      if (debug_sector.show && debug_sector.clear)
+	{
+	  debug_sector.view->GetCamera ()->Move (csVector3 (0, 0, -1), false);
+	}
+	else
+	{
+	  Report (CS_REPORTER_SEVERITY_NOTIFY,
+	    	"Debug sector is not active now!");
+	}
+      break;
+    case DEBUGCMD_DS_UP:
+      if (debug_sector.show && debug_sector.clear)
+	{
+	  debug_sector.view->GetCamera ()->Move (csVector3 (0, 1, 0), false);
+	}
+	else
+	{
+	  Report (CS_REPORTER_SEVERITY_NOTIFY,
+	    	"Debug sector is not active now!");
+	}
+      break;
+    case DEBUGCMD_DS_DOWN:
+      if (debug_sector.show && debug_sector.clear)
+	{
+	  debug_sector.view->GetCamera ()->Move (csVector3 (0, -1, 0), false);
+	}
+	else
+	{
+	  Report (CS_REPORTER_SEVERITY_NOTIFY,
+	    	"Debug sector is not active now!");
+	}
+      break;
+    case DEBUGCMD_DS_TURNLEFT:
+      if (debug_sector.show && debug_sector.clear)
+	{
+	  debug_sector.view->GetCamera ()->GetTransform ().
+	  	RotateThis (CS_VEC_ROT_LEFT, 0.2f);
+	}
+	else
+	{
+	  Report (CS_REPORTER_SEVERITY_NOTIFY,
+	    	"Debug sector is not active now!");
+	}
+      break;
+    case DEBUGCMD_DS_TURNRIGHT:
+      if (debug_sector.show && debug_sector.clear)
+	{
+	  debug_sector.view->GetCamera ()->GetTransform ().
+	  	RotateThis (CS_VEC_ROT_RIGHT, 0.2f);
+	}
+	else
+	{
+	  Report (CS_REPORTER_SEVERITY_NOTIFY,
+	    	"Debug sector is not active now!");
+	}
+      break;
+    case DEBUGCMD_FPS:
+      do_fps = !do_fps;
+	Report (CS_REPORTER_SEVERITY_NOTIFY,
+	    	"BugPlug %s fps display.",
+		do_fps ? "enabled" : "disabled");
+	fps_frame_count = 0;
+	fps_tottime = 0;
+	fps_cur = -1;
+      break;
+    case DEBUGCMD_MESH_XMIN:
+      MoveSelectedMeshes (csVector3 (-1, 0, 0));
+      break;
+    case DEBUGCMD_MESH_XPLUS:
+      MoveSelectedMeshes (csVector3 (1, 0, 0));
+      break;
+    case DEBUGCMD_MESH_YMIN:
+      MoveSelectedMeshes (csVector3 (0, -1, 0));
+      break;
+    case DEBUGCMD_MESH_YPLUS:
+      MoveSelectedMeshes (csVector3 (0, 1, 0));
+      break;
+    case DEBUGCMD_MESH_ZMIN:
+      MoveSelectedMeshes (csVector3 (0, 0, -1));
+      break;
+    case DEBUGCMD_MESH_ZPLUS:
+      MoveSelectedMeshes (csVector3 (0, 0, 1));
+      break;
+    case DEBUGCMD_HIDESELECTED:
+      if (HasSelectedMeshes ())
+	{
+	  size_t j;
+	  for (j = 0 ; j < selected_meshes.Length () ; j++)
+	  {
+	    if (selected_meshes[j])
+	      selected_meshes[j]->GetFlags ().Set (CS_ENTITY_INVISIBLE);
+	  }
+	}
+	else
+	{
+	  Report (CS_REPORTER_SEVERITY_NOTIFY,
+	    	"There are no selected meshes to hide!");
+	}
+      break;
+    case DEBUGCMD_UNDOHIDE:
+      if (HasSelectedMeshes ())
+	{
+	  size_t j;
+	  for (j = 0 ; j < selected_meshes.Length () ; j++)
+	  {
+	    if (selected_meshes[j])
+	      selected_meshes[j]->GetFlags ().Reset (CS_ENTITY_INVISIBLE);
+	  }
+	}
+      break;
+    case DEBUGCMD_COUNTERRESET:
+      FullResetCounters ();
+	break;
+    case DEBUGCMD_COUNTERREMOVE:
+      counters.DeleteAll ();
+	break;
+    case DEBUGCMD_COUNTERFREEZE:
+      counter_freeze = !counter_freeze;
+	Report (CS_REPORTER_SEVERITY_NOTIFY,
+	    	"BugPlug %s counting.",
+		counter_freeze ? "disabled" : "enabled");
+	break;
+    case DEBUGCMD_MEMORYDUMP:
+	  {
+	    csRef<iMemoryTracker> mtr = CS_QUERY_REGISTRY_TAG_INTERFACE (
+	    	object_reg, "crystalspace.utilities.memorytracker",
+		iMemoryTracker);
+	    if (!mtr)
+	    {
+	      Report (CS_REPORTER_SEVERITY_NOTIFY,
+	    	"Memory tracker interface is missing!");
+	    }
+	    else
+	    {
+	      mtr->Dump (false);
+	      Report (CS_REPORTER_SEVERITY_NOTIFY,
+	    	"Memory dump sent to stdout!");
+	    }
+	  }
+      break;
+    case DEBUGCMD_UNPREPARE:
+	Report (CS_REPORTER_SEVERITY_NOTIFY,
+	    	"Unprepare all things...");
+	{
+	  int i;
+	  iMeshList* ml = Engine->GetMeshes ();
+	  for (i = 0 ; i < ml->GetCount () ; i++)
+	  {
+	    iMeshWrapper* m = ml->Get (i);
+	    csRef<iThingState> th = SCF_QUERY_INTERFACE (m->GetMeshObject (),
+	    	iThingState);
+	    if (th)
+	    {
+	      th->Unprepare ();
+	    }
+	  }
+	}
+      break;
+    case DEBUGCMD_COLORSECTORS:
+	Report (CS_REPORTER_SEVERITY_NOTIFY,
+	    	"Color all sectors...");
+	{
+	  csColor color_table[14];
+	  color_table[0].Set (255, 0, 0);
+	  color_table[1].Set (0, 255, 0);
+	  color_table[2].Set (0, 0, 255);
+	  color_table[3].Set (255, 255, 0);
+	  color_table[4].Set (255, 0, 255);
+	  color_table[5].Set (0, 255, 255);
+	  color_table[6].Set (255, 255, 255);
+	  color_table[7].Set (128, 0, 0);
+	  color_table[8].Set (0, 128, 0);
+	  color_table[9].Set (0, 0, 128);
+	  color_table[10].Set (128, 128, 0);
+	  color_table[11].Set (128, 0, 128);
+	  color_table[12].Set (0, 128, 128);
+	  color_table[13].Set (128, 128, 128);
+	  int i;
+	  iSectorList* sl = Engine->GetSectors ();
+	  for (i = 0 ; i < sl->GetCount () ; i++)
+	  {
+	    iSector* s = sl->Get (i);
+	    s->SetDynamicAmbientLight (color_table[i%14]);
+	  }
+	}
+      break;
+    case DEBUGCMD_PROFDUMP:
+      CS_PROFDUMP(object_reg);
+      break;
+    case DEBUGCMD_PROFRESET:
+      CS_PROFRESET(object_reg);
+      break;
+    case DEBUGCMD_SHADOWDEBUG:
+	// swap the default shadow volume material shader to/from a version
+	// better visualizing the volume.
+	/*csRef<iMaterialWrapper> shadowmat = 
+	  Engine->FindMaterial ("shadow extruder");
+	if (!standardShadowShader)
+	  standardShadowShader = shadowmat->GetMaterial()->GetShader();
+	if (!debugShadowShader)
+	{
+	  csRef<iShaderManager> shmgr ( CS_QUERY_REGISTRY(object_reg, iShaderManager));
+	  if(shmgr)
+	  {
+	    debugShadowShader = shmgr->CreateShader();
+	    if(debugShadowShader)
+	    {
+	      debugShadowShader->Load (csRef<iDataBuffer> 
+		(VFS->ReadFile("/shader/shadowdebug.xml")));
+	      if(!debugShadowShader->Prepare())
+	      {
+		debugShadowShader = 0;
+		return true;
+	      }
+	    }
+	    else
+	      return true;
+	  }
+	  else
+	    return true;
+	}
+	do_shadow_debug = !do_shadow_debug;
+	if (do_shadow_debug)
+	{
+	  shadowmat->GetMaterial ()->SetShader(debugShadowShader);
+	}
+	else
+	{
+	  shadowmat->GetMaterial ()->SetShader(standardShadowShader);
+	}
+	Report (CS_REPORTER_SEVERITY_NOTIFY,
+	    "BugPlug %s shadow debugging.",
+	    do_shadow_debug ? "enabled" : "disabled");*/
+      break;
+    case DEBUGCMD_LISTPLUGINS:
+	ListLoadedPlugins();
+	break;
+    default:
+        return false;
+  }
+  return true;
+}
+
 void csBugPlug::CaptureScreen ()
 {
-  int i = 0;
-  char name[CS_MAXPATHLEN];
+  uint i = 0;
+  csString name;
 
   bool exists = false;
   do
   {
-    cs_snprintf (name, CS_MAXPATHLEN, captureFormat, i);
+    name.Format (captureFormat, i);
     if (exists = VFS->Exists (name)) i++;
   }
   while ((i < captureFormatNumberMax) && (exists));
@@ -838,7 +1455,7 @@ bool csBugPlug::EatKey (iEvent& event)
   }
 
   // Get command.
-  char* args;
+  csString args;
   int cmd = GetCommandCode (key, shift, alt, ctrl, args);
   if (down)
   {
@@ -879,623 +1496,7 @@ bool csBugPlug::EatKey (iEvent& event)
 
   if (down)
   {
-    switch (cmd)
-    {
-      case DEBUGCMD_UNKNOWN:
-        return true;
-      case DEBUGCMD_QUIT:
-        Report (CS_REPORTER_SEVERITY_NOTIFY, "Nah nah! I will NOT quit!");
-        break;
-      case DEBUGCMD_STATUS:
-        Report (CS_REPORTER_SEVERITY_NOTIFY,
-		"I'm running smoothly, thank you...");
-        break;
-      case DEBUGCMD_DEBUGGRAPH:
-        Report (CS_REPORTER_SEVERITY_NOTIFY, "Debug graph dumped!");
-	csDebuggingGraph::Dump (object_reg);
-        break;
-      case DEBUGCMD_ENGINECMD:
-	{
-	  csRef<iDebugHelper> dbghelp (
-	  	SCF_QUERY_INTERFACE (Engine, iDebugHelper));
-	  if (dbghelp)
-	  {
-	    if (dbghelp->DebugCommand (args))
-	    {
-              Report (CS_REPORTER_SEVERITY_NOTIFY,
-	        "Engine command '%s' performed.", args);
-	    }
-	    else
-	    {
-              Report (CS_REPORTER_SEVERITY_NOTIFY,
-	        "Engine command '%s' not supported!", args);
-	    }
-	  }
-	}
-        break;
-      case DEBUGCMD_VISCULCMD:
-        VisculCmd (args);
-        break;
-      case DEBUGCMD_DEBUGCMD:
-	{
-	  DebugCmd (args);
-	  break;
-	}
-      case DEBUGCMD_ENGINESTATE:
-	{
-	  csRef<iDebugHelper> dbghelp (
-	  	SCF_QUERY_INTERFACE (Engine, iDebugHelper));
-	  if (dbghelp)
-	  {
-	    if (dbghelp->GetSupportedTests () & CS_DBGHELP_STATETEST)
-	    {
-	      csRef<iString> rc (dbghelp->StateTest ());
-	      if (rc)
-	      {
-                Report (CS_REPORTER_SEVERITY_NOTIFY,
-	          "Engine StateTest() failed:");
-                Report (CS_REPORTER_SEVERITY_DEBUG,
-	          "Engine StateTest() failed:");
-                Report (CS_REPORTER_SEVERITY_DEBUG,
-		  rc->GetData ());
-	      }
-	      else
-	      {
-                Report (CS_REPORTER_SEVERITY_NOTIFY,
-	          "Engine StateTest() succeeded!");
-	      }
-	    }
-	    else
-	    {
-              Report (CS_REPORTER_SEVERITY_NOTIFY,
-	        "Engine doesn't support StateTest()!");
-	    }
-	  }
-	}
-        break;
-      case DEBUGCMD_HELP:
-        Report (CS_REPORTER_SEVERITY_NOTIFY, "Sorry, cannot help you yet.");
-        break;
-      case DEBUGCMD_DUMPENG:
-        if (Engine)
-	{
-          Report (CS_REPORTER_SEVERITY_NOTIFY,
-		"Dumping entire engine contents to debug.txt.");
-	  Dump (Engine);
-	  Report (CS_REPORTER_SEVERITY_DEBUG, "");
-	}
-        break;
-      case DEBUGCMD_DUMPSEC:
-        Report (CS_REPORTER_SEVERITY_NOTIFY, "Not implemented yet.");
-        break;
-      case DEBUGCMD_CLEAR:
-        do_clear = !do_clear;
-        Report (CS_REPORTER_SEVERITY_NOTIFY, "BugPlug %s screen clearing.",
-	  	do_clear ? "enabled" : "disabled");
-        break;
-      case DEBUGCMD_EDGES:
-        ToggleG3DState (G3DRENDERSTATE_EDGES, "edge drawing");
-	{
-	  if (Engine && (Engine->GetBeginDrawFlags () & CSDRAW_CLEARSCREEN))
-	    break;
-	  bool v;
-	  v = (G3D->GetRenderState (G3DRENDERSTATE_EDGES) != 0);
-	  if (v && !do_clear) do_clear = true;
-	}
-        break;
-      case DEBUGCMD_TEXTURE:
-        ToggleG3DState (G3DRENDERSTATE_TEXTUREMAPPINGENABLE, "texture mapping");
-        break;
-      case DEBUGCMD_BILINEAR:
-        ToggleG3DState (G3DRENDERSTATE_BILINEARMAPPINGENABLE,
-		"bi-linear filtering");
-	break;
-      case DEBUGCMD_TRILINEAR:
-        ToggleG3DState (G3DRENDERSTATE_TRILINEARMAPPINGENABLE,
-		"tri-linear filtering");
-	break;
-      case DEBUGCMD_LIGHTING:
-        ToggleG3DState (G3DRENDERSTATE_LIGHTINGENABLE, "lighting");
-	break;
-      case DEBUGCMD_GOURAUD:
-        ToggleG3DState (G3DRENDERSTATE_GOURAUDENABLE, "gouraud shading");
-	break;
-      case DEBUGCMD_ILACE:
-        ToggleG3DState (G3DRENDERSTATE_INTERLACINGENABLE, "interlaced mode");
-	break;
-      case DEBUGCMD_MMX:
-        ToggleG3DState (G3DRENDERSTATE_MMXENABLE, "mmx mode");
-	break;
-      case DEBUGCMD_TRANSP:
-        ToggleG3DState (G3DRENDERSTATE_TRANSPARENCYENABLE, "transp mode");
-        break;
-      case DEBUGCMD_CACHECLEAR:
-        /*if (G3D)
-	{
-	  G3D->ClearCache ();
-          Report (CS_REPORTER_SEVERITY_NOTIFY,
-	    "BugPlug cleared the texture cache.");
-	}*/
-        break;
-      case DEBUGCMD_CACHEDUMP:
-        //if (G3D) G3D->DumpCache ();
-        break;
-      case DEBUGCMD_MIPMAP:
-        {
-	  if (!G3D) break;
-	  char* choices[6] = { "on", "off", "1", "2", "3", 0 };
-	  long v = G3D->GetRenderState (G3DRENDERSTATE_MIPMAPENABLE);
-	  v = (v+1)%5;
-	  G3D->SetRenderState (G3DRENDERSTATE_MIPMAPENABLE, v);
-	  Report (CS_REPORTER_SEVERITY_NOTIFY, "BugPlug set mipmap to '%s'",
-	  	choices[v]);
-  	}
-	break;
-      case DEBUGCMD_INTER:
-	{
-	  if (!G3D) break;
-	  char* choices[5] = { "smart", "step32", "step16", "step8", 0 };
-	  long v = G3D->GetRenderState (G3DRENDERSTATE_INTERPOLATIONSTEP);
-	  v = (v+1)%4;
-	  G3D->SetRenderState (G3DRENDERSTATE_INTERPOLATIONSTEP, v);
-	  Report (CS_REPORTER_SEVERITY_NOTIFY, "BugPlug set interpolation to '%s'",
-	  	choices[v]);
-	}
-	break;
-      case DEBUGCMD_GAMMA:
-        {
-	  if (!G3D) break;
-	  float val = G2D->GetGamma ();
-          csString buf;
-	  buf.Format ("%g", val);
-          EnterEditMode (cmd, "Enter new gamma:", buf);
-	}
-        break;
-      case DEBUGCMD_SELECTMESH:
-        EnterEditMode (cmd, "Enter mesh name regexp pattern:", "");
-        break;
-      case DEBUGCMD_DBLBUFF:
-        {
-	  bool state = G2D->GetDoubleBufferState ();
-	  state = !state;
-	  if (!G2D->DoubleBuffer (state))
-	  {
-	    Report (CS_REPORTER_SEVERITY_NOTIFY,
-	    	"Double buffer not supported in current video mode!");
-	  }
-	  else
-	  {
-	    Report (CS_REPORTER_SEVERITY_NOTIFY,
-	    	"BugPlug %s double buffering.",
-		state ? "enabled" : "disabled");
-	  }
-	}
-        break;
-      case DEBUGCMD_TERRVIS:
-	{
-	  Report (CS_REPORTER_SEVERITY_NOTIFY,
-	    	"BugPlug Terrain Visualization not implemented!");
-	}
-        break;
-      case DEBUGCMD_MESHBASEMESH:
-	{
-	  if (show_polymesh == BUGPLUG_POLYMESH_BASE)
-	  {
-	    show_polymesh = BUGPLUG_POLYMESH_NO;
-	    Report (CS_REPORTER_SEVERITY_NOTIFY,
-	    	"BugPlug disabled showing BASE polygonmesh.");
-	  }
-	  else
-	  {
-	    show_polymesh = BUGPLUG_POLYMESH_BASE;
-	    Report (CS_REPORTER_SEVERITY_NOTIFY,
-	    	"BugPlug is showing BASE polygonmesh.");
-	  }
-	}
-        break;
-      case DEBUGCMD_MESHSHADMESH:
-	{
-	  if (show_polymesh == BUGPLUG_POLYMESH_SHAD)
-	  {
-	    show_polymesh = BUGPLUG_POLYMESH_NO;
-	    Report (CS_REPORTER_SEVERITY_NOTIFY,
-	    	"BugPlug disabled showing SHAD polygonmesh.");
-	  }
-	  else
-	  {
-	    show_polymesh = BUGPLUG_POLYMESH_SHAD;
-	    Report (CS_REPORTER_SEVERITY_NOTIFY,
-	    	"BugPlug is showing SHAD polygonmesh.");
-	  }
-	}
-        break;
-      case DEBUGCMD_MESHVISMESH:
-	{
-	  if (show_polymesh == BUGPLUG_POLYMESH_VIS)
-	  {
-	    show_polymesh = BUGPLUG_POLYMESH_NO;
-	    Report (CS_REPORTER_SEVERITY_NOTIFY,
-	    	"BugPlug disabled showing VIS polygonmesh.");
-	  }
-	  else
-	  {
-	    show_polymesh = BUGPLUG_POLYMESH_VIS;
-	    Report (CS_REPORTER_SEVERITY_NOTIFY,
-	    	"BugPlug is showing VIS polygonmesh.");
-	  }
-	}
-        break;
-      case DEBUGCMD_MESHCDMESH:
-	{
-	  if (show_polymesh == BUGPLUG_POLYMESH_CD)
-	  {
-	    show_polymesh = BUGPLUG_POLYMESH_NO;
-	    Report (CS_REPORTER_SEVERITY_NOTIFY,
-	    	"BugPlug disabled showing CD polygonmesh.");
-	  }
-	  else
-	  {
-	    show_polymesh = BUGPLUG_POLYMESH_CD;
-	    Report (CS_REPORTER_SEVERITY_NOTIFY,
-	    	"BugPlug is showing CD polygonmesh.");
-	  }
-	}
-        break;
-      case DEBUGCMD_MESHBBOX:
-	{
-	  bool bbox, rad;
-	  shadow->GetShowOptions (bbox, rad);
-          bbox = !bbox;
-	  Report (CS_REPORTER_SEVERITY_NOTIFY,
-	    	"BugPlug %s bounding box display.",
-		bbox ? "enabled" : "disabled");
-	  shadow->SetShowOptions (bbox, rad);
-	  if ((bbox || rad || show_polymesh != BUGPLUG_POLYMESH_NO)
-			  && HasSelectedMeshes ())
-	    shadow->AddToEngine (Engine);
-	  else
-	    shadow->RemoveFromEngine (Engine);
-	}
-        break;
-      case DEBUGCMD_MESHRAD:
-        {
-	  bool bbox, rad;
-	  shadow->GetShowOptions (bbox, rad);
-          rad = !rad;
-	  Report (CS_REPORTER_SEVERITY_NOTIFY,
-	    	"BugPlug %s bounding sphere display.",
-		rad ? "enabled" : "disabled");
-	  shadow->SetShowOptions (bbox, rad);
-	  if ((bbox || rad || show_polymesh != BUGPLUG_POLYMESH_NO)
-			  && HasSelectedMeshes ())
-	    shadow->AddToEngine (Engine);
-	  else
-	    shadow->RemoveFromEngine (Engine);
-	}
-        break;
-      case DEBUGCMD_DEBUGVIEW:
-	SwitchDebugView ();
-        break;
-      case DEBUGCMD_SWITCHCULLER:
-	if (catcher->camera)
-          SwitchCuller (catcher->camera->GetSector (), args);
-        break;
-      case DEBUGCMD_ONESECTOR:
-	if (catcher->camera)
-          OneSector (catcher->camera);
-	break;
-      case DEBUGCMD_VISCULVIEW:
-        if (catcher->camera)
-          VisculView (catcher->camera);
-        break;
-      case DEBUGCMD_DUMPCAM:
-        if (catcher->camera) Dump (catcher->camera);
-	break;
-      case DEBUGCMD_FOV:
-        if (catcher->camera)
-	{
-	  csString buf;
-          int fov = catcher->camera->GetFOV ();
-	  buf.Format ("%d", fov);
-	  EnterEditMode (cmd, "Enter new fov value:", buf);
-	}
-	break;
-      case DEBUGCMD_FOVANGLE:
-        if (catcher->camera)
-	{
-	  csString buf;
-          float fov = catcher->camera->GetFOVAngle ();
-	  buf.Format ("%g", fov);
-	  EnterEditMode (cmd, "Enter new fov angle:", buf);
-	}
-	break;
-      case DEBUGCMD_DEBUGSECTOR:
-	if (catcher->camera)
-	  SwitchDebugSector (catcher->camera->GetTransform ());
-        break;
-      case DEBUGCMD_SAVEMAP:
-        delay_command = DEBUGCMD_SAVEMAP;
-	break;
-      case DEBUGCMD_SCRSHOT:
-        delay_command = DEBUGCMD_SCRSHOT;
-        break;
-      case DEBUGCMD_DS_LEFT:
-        if (debug_sector.show && debug_sector.clear)
-	{
-	  debug_sector.view->GetCamera ()->Move (csVector3 (-1, 0, 0), false);
-	}
-	else
-	{
-	  Report (CS_REPORTER_SEVERITY_NOTIFY,
-	    	"Debug sector is not active now!");
-	}
-        break;
-      case DEBUGCMD_DS_RIGHT:
-        if (debug_sector.show && debug_sector.clear)
-	{
-	  debug_sector.view->GetCamera ()->Move (csVector3 (1, 0, 0), false);
-	}
-	else
-	{
-	  Report (CS_REPORTER_SEVERITY_NOTIFY,
-	    	"Debug sector is not active now!");
-	}
-        break;
-      case DEBUGCMD_DS_FORWARD:
-        if (debug_sector.show && debug_sector.clear)
-	{
-	  debug_sector.view->GetCamera ()->Move (csVector3 (0, 0, 1), false);
-	}
-	else
-	{
-	  Report (CS_REPORTER_SEVERITY_NOTIFY,
-	    	"Debug sector is not active now!");
-	}
-        break;
-      case DEBUGCMD_DS_BACKWARD:
-        if (debug_sector.show && debug_sector.clear)
-	{
-	  debug_sector.view->GetCamera ()->Move (csVector3 (0, 0, -1), false);
-	}
-	else
-	{
-	  Report (CS_REPORTER_SEVERITY_NOTIFY,
-	    	"Debug sector is not active now!");
-	}
-        break;
-      case DEBUGCMD_DS_UP:
-        if (debug_sector.show && debug_sector.clear)
-	{
-	  debug_sector.view->GetCamera ()->Move (csVector3 (0, 1, 0), false);
-	}
-	else
-	{
-	  Report (CS_REPORTER_SEVERITY_NOTIFY,
-	    	"Debug sector is not active now!");
-	}
-        break;
-      case DEBUGCMD_DS_DOWN:
-        if (debug_sector.show && debug_sector.clear)
-	{
-	  debug_sector.view->GetCamera ()->Move (csVector3 (0, -1, 0), false);
-	}
-	else
-	{
-	  Report (CS_REPORTER_SEVERITY_NOTIFY,
-	    	"Debug sector is not active now!");
-	}
-        break;
-      case DEBUGCMD_DS_TURNLEFT:
-        if (debug_sector.show && debug_sector.clear)
-	{
-	  debug_sector.view->GetCamera ()->GetTransform ().
-	  	RotateThis (CS_VEC_ROT_LEFT, 0.2f);
-	}
-	else
-	{
-	  Report (CS_REPORTER_SEVERITY_NOTIFY,
-	    	"Debug sector is not active now!");
-	}
-        break;
-      case DEBUGCMD_DS_TURNRIGHT:
-        if (debug_sector.show && debug_sector.clear)
-	{
-	  debug_sector.view->GetCamera ()->GetTransform ().
-	  	RotateThis (CS_VEC_ROT_RIGHT, 0.2f);
-	}
-	else
-	{
-	  Report (CS_REPORTER_SEVERITY_NOTIFY,
-	    	"Debug sector is not active now!");
-	}
-        break;
-      case DEBUGCMD_FPS:
-        do_fps = !do_fps;
-	Report (CS_REPORTER_SEVERITY_NOTIFY,
-	    	"BugPlug %s fps display.",
-		do_fps ? "enabled" : "disabled");
-	fps_frame_count = 0;
-	fps_tottime = 0;
-	fps_cur = -1;
-        break;
-      case DEBUGCMD_MESH_XMIN:
-        MoveSelectedMeshes (csVector3 (-1, 0, 0));
-        break;
-      case DEBUGCMD_MESH_XPLUS:
-        MoveSelectedMeshes (csVector3 (1, 0, 0));
-        break;
-      case DEBUGCMD_MESH_YMIN:
-        MoveSelectedMeshes (csVector3 (0, -1, 0));
-        break;
-      case DEBUGCMD_MESH_YPLUS:
-        MoveSelectedMeshes (csVector3 (0, 1, 0));
-        break;
-      case DEBUGCMD_MESH_ZMIN:
-        MoveSelectedMeshes (csVector3 (0, 0, -1));
-        break;
-      case DEBUGCMD_MESH_ZPLUS:
-        MoveSelectedMeshes (csVector3 (0, 0, 1));
-        break;
-      case DEBUGCMD_HIDESELECTED:
-        if (HasSelectedMeshes ())
-	{
-	  size_t j;
-	  for (j = 0 ; j < selected_meshes.Length () ; j++)
-	  {
-	    if (selected_meshes[j])
-	      selected_meshes[j]->GetFlags ().Set (CS_ENTITY_INVISIBLE);
-	  }
-	}
-	else
-	{
-	  Report (CS_REPORTER_SEVERITY_NOTIFY,
-	    	"There are no selected meshes to hide!");
-	}
-        break;
-      case DEBUGCMD_UNDOHIDE:
-        if (HasSelectedMeshes ())
-	{
-	  size_t j;
-	  for (j = 0 ; j < selected_meshes.Length () ; j++)
-	  {
-	    if (selected_meshes[j])
-	      selected_meshes[j]->GetFlags ().Reset (CS_ENTITY_INVISIBLE);
-	  }
-	}
-        break;
-      case DEBUGCMD_COUNTERRESET:
-        FullResetCounters ();
-	break;
-      case DEBUGCMD_COUNTERREMOVE:
-        counters.DeleteAll ();
-	break;
-      case DEBUGCMD_COUNTERFREEZE:
-        counter_freeze = !counter_freeze;
-	Report (CS_REPORTER_SEVERITY_NOTIFY,
-	    	"BugPlug %s counting.",
-		counter_freeze ? "disabled" : "enabled");
-	break;
-      case DEBUGCMD_MEMORYDUMP:
-#       ifdef CS_MEMORY_TRACKER
-	  {
-	    csRef<iMemoryTracker> mtr = CS_QUERY_REGISTRY_TAG_INTERFACE (
-	    	object_reg, "crystalspace.utilities.memorytracker",
-		iMemoryTracker);
-	    if (!mtr)
-	    {
-	      Report (CS_REPORTER_SEVERITY_NOTIFY,
-	    	"Memory tracker interface is missing!");
-	    }
-	    else
-	    {
-	      mtr->Dump (false);
-	      Report (CS_REPORTER_SEVERITY_NOTIFY,
-	    	"Memory dump sent to stdout!");
-	    }
-	  }
-#       else
-	  Report (CS_REPORTER_SEVERITY_NOTIFY,
-	    	"Memory tracker not enabled at compile time!...");
-#       endif
-        break;
-      case DEBUGCMD_UNPREPARE:
-	Report (CS_REPORTER_SEVERITY_NOTIFY,
-	    	"Unprepare all things...");
-	{
-	  int i;
-	  iMeshList* ml = Engine->GetMeshes ();
-	  for (i = 0 ; i < ml->GetCount () ; i++)
-	  {
-	    iMeshWrapper* m = ml->Get (i);
-	    csRef<iThingState> th = SCF_QUERY_INTERFACE (m->GetMeshObject (),
-	    	iThingState);
-	    if (th)
-	    {
-	      th->Unprepare ();
-	    }
-	  }
-	}
-        break;
-      case DEBUGCMD_COLORSECTORS:
-	Report (CS_REPORTER_SEVERITY_NOTIFY,
-	    	"Color all sectors...");
-	{
-	  csColor color_table[14];
-	  color_table[0].Set (255, 0, 0);
-	  color_table[1].Set (0, 255, 0);
-	  color_table[2].Set (0, 0, 255);
-	  color_table[3].Set (255, 255, 0);
-	  color_table[4].Set (255, 0, 255);
-	  color_table[5].Set (0, 255, 255);
-	  color_table[6].Set (255, 255, 255);
-	  color_table[7].Set (128, 0, 0);
-	  color_table[8].Set (0, 128, 0);
-	  color_table[9].Set (0, 0, 128);
-	  color_table[10].Set (128, 128, 0);
-	  color_table[11].Set (128, 0, 128);
-	  color_table[12].Set (0, 128, 128);
-	  color_table[13].Set (128, 128, 128);
-	  int i;
-	  iSectorList* sl = Engine->GetSectors ();
-	  for (i = 0 ; i < sl->GetCount () ; i++)
-	  {
-	    iSector* s = sl->Get (i);
-	    s->SetDynamicAmbientLight (color_table[i%14]);
-	  }
-	}
-        break;
-      case DEBUGCMD_PROFDUMP:
-        CS_PROFDUMP(object_reg);
-        break;
-      case DEBUGCMD_PROFRESET:
-        CS_PROFRESET(object_reg);
-        break;
-      case DEBUGCMD_SHADOWDEBUG:
-	// swap the default shadow volume material shader to/from a version
-	// better visualizing the volume.
-	/*csRef<iMaterialWrapper> shadowmat = 
-	  Engine->FindMaterial ("shadow extruder");
-	if (!standardShadowShader)
-	  standardShadowShader = shadowmat->GetMaterial()->GetShader();
-	if (!debugShadowShader)
-	{
-	  csRef<iShaderManager> shmgr ( CS_QUERY_REGISTRY(object_reg, iShaderManager));
-	  if(shmgr)
-	  {
-	    debugShadowShader = shmgr->CreateShader();
-	    if(debugShadowShader)
-	    {
-	      debugShadowShader->Load (csRef<iDataBuffer> 
-		(VFS->ReadFile("/shader/shadowdebug.xml")));
-	      if(!debugShadowShader->Prepare())
-	      {
-		debugShadowShader = 0;
-  		return true;
-	      }
-	    }
-	    else
-	      return true;
-	  }
-	  else
-	    return true;
-	}
-	do_shadow_debug = !do_shadow_debug;
-	if (do_shadow_debug)
-	{
-	  shadowmat->GetMaterial ()->SetShader(debugShadowShader);
-	}
-	else
-	{
-	  shadowmat->GetMaterial ()->SetShader(standardShadowShader);
-	}
-	Report (CS_REPORTER_SEVERITY_NOTIFY,
-	    "BugPlug %s shadow debugging.",
-	    do_shadow_debug ? "enabled" : "disabled");*/
-        break;
-      case DEBUGCMD_LISTPLUGINS:
-	ListLoadedPlugins();
-	break;
-    }
+    ExecCommand (cmd, args);
     process_next_key = false;
   }
   return true;
@@ -1518,7 +1519,7 @@ bool csBugPlug::HandleStartFrame (iEvent& /*event*/)
   return false;
 }
 
-void GfxWrite (iGraphics2D* g2d, iFont* font,
+static void GfxWrite (iGraphics2D* g2d, iFont* font,
 	int x, int y, int fg, int bg, char *str, ...)
 {
   va_list arg;
@@ -1983,19 +1984,19 @@ int csBugPlug::GetKeyCode (const char* keystring, bool& shift, bool& alt,
   return keycode;
 }
 
-int csBugPlug::GetCommandCode (const char* cmdstr, char* args)
+int csBugPlug::GetCommandCode (const char* cmdstr, csString& args)
 {
   csString cmd;
   char const* spc = strchr (cmdstr, ' ');
   if (spc)
   {
     cmd.Append (cmdstr, spc - cmdstr);
-    strcpy (args, spc + 1);
+    args.Replace (spc + 1);
   }
   else
   {
     cmd = cmdstr;
-    args[0] = 0;
+    args.Clear();
   }
 
   if (!strcmp (cmd, "debugenter"))	return DEBUGCMD_DEBUGENTER;
@@ -2077,7 +2078,7 @@ int csBugPlug::GetCommandCode (const char* cmdstr, char* args)
 }
 
 int csBugPlug::GetCommandCode (int key, bool shift, bool alt, bool ctrl,
-	char*& args)
+	csString& args)
 {
   csKeyMap* m = mappings;
   while (m)
@@ -2100,13 +2101,13 @@ void csBugPlug::AddCommand (const char* keystring, const char* cmdstring)
   // Check if valid key name.
   if (keycode == -1) return;
 
-  char args[512];
+  csString args;
   int cmdcode = GetCommandCode (cmdstring, args);
   // Check if valid command name.
   if (cmdcode == DEBUGCMD_UNKNOWN) return;
 
   // Check if key isn't already defined.
-  char* args2;
+  csString args2;
   if (GetCommandCode (keycode, shift, alt, ctrl, args2) != DEBUGCMD_UNKNOWN)
     return;
 
@@ -2120,7 +2121,7 @@ void csBugPlug::AddCommand (const char* keystring, const char* cmdstring)
   map->next = mappings;
   if (mappings) mappings->prev = map;
   map->prev = 0;
-  if (args[0])
+  if (!args.IsEmpty())
     map->args = csStrNew (args);
   else
     map->args = 0;
@@ -3043,23 +3044,31 @@ void csBugPlug::RemoveCounter (const char* countername)
     counters.DeleteIndex (i);
 }
 
+bool csBugPlug::ExecCommand (const char* command)
+{
+  csString args;
+  int cmd = GetCommandCode (command, args);
+  if (cmd == DEBUGCMD_UNKNOWN) return false;
+  return ExecCommand (cmd, args);
+}
+
 void csBugPlug::SaveMap ()
 {
-  int i = 0;
-  char name[CS_MAXPATHLEN];
+  uint i = 0;
+  csString name;
 
   bool exists = false;
   do
   {
-    cs_snprintf (name, CS_MAXPATHLEN, "/this/world%d.xml", i);
+    name.Format ("/this/world%u.xml", i);
     if (exists = VFS->Exists (name)) i++;
   }
-  while ((i < captureFormatNumberMax) && (exists));
+  while ((i > 0) && (exists));
 
-  if (i >= captureFormatNumberMax)
+  if ((i == 0) && (exists))
   {
     Report (CS_REPORTER_SEVERITY_NOTIFY,
-    	"Too many screenshot files in current directory");
+    	"Too many world files in current directory");
     return;
   }
 
@@ -3071,3 +3080,5 @@ void csBugPlug::SaveMap ()
 
 //---------------------------------------------------------------------------
 
+}
+CS_PLUGIN_NAMESPACE_END(BugPlug)

@@ -52,6 +52,7 @@
 #include "iutil/databuff.h"
 #include "iutil/pluginconfig.h"
 #include "iutil/vfs.h"
+#include "ivaria/bugplug.h"
 #include "ivaria/mapnode.h"
 #include "ivaria/pmeter.h" 
 #include "ivaria/reporter.h"
@@ -2400,6 +2401,29 @@ bool CommandHandler (const char *cmd, const char *arg)
 	  "%s", stack->GetEntryAll (i).GetData());
       }
       stack->Free();
+    }
+  }
+  else if (!csStrCaseCmp (cmd, "bugplugcmd"))
+  {
+    csRef<iBugPlug> bugplug = csQueryRegistry<iBugPlug> (Sys->object_reg);
+    if (!bugplug.IsValid())
+    {
+      csRef<iPluginManager> plugmgr = 
+        csQueryRegistry<iPluginManager> (Sys->object_reg);
+      bugplug = csQueryPluginClass<iBugPlug> (plugmgr, 
+        "crystalspace.utilities.bugplug");
+    }
+    if (!bugplug.IsValid())
+    {
+      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, 
+        "Could not get bugplug interface");
+    }
+    else
+    {
+      bool success = bugplug->ExecCommand (arg);
+      if (!success)
+        Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, 
+        "bugplug failed to execute '%s'", arg);
     }
   }
   else

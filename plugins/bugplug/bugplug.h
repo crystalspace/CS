@@ -68,6 +68,9 @@ struct csTriangle;
 
 class csShadow;
 
+CS_PLUGIN_NAMESPACE_BEGIN(BugPlug)
+{
+
 //--------------------------------------------------------------------------
 // Command codes.
 //--------------------------------------------------------------------------
@@ -301,7 +304,7 @@ private:
   const char* captureOptions;
   /// format of the screenshot filename (e.g. "/tmp/cryst%03d.png")
   char* captureFormat;
-  int captureFormatNumberMax;
+  uint captureFormatNumberMax;
   /**
    * Make a screenshot.
    */
@@ -384,25 +387,26 @@ private:
   /// Close system.
   bool HandleSystemClose (iEvent* event);
 
-  /// Execute mouse button one.
-  void MouseButton1 (iCamera* camera);
-  /// Execute mouse button two.
-  void MouseButton2 (iCamera* camera);
-  /// Execute mouse button three.
-  void MouseButton3 (iCamera* camera);
+  /// Execute right mouse button.
+  void MouseButtonRight (iCamera* camera);
+  /// Execute left mouse button.
+  void MouseButtonLeft (iCamera* camera);
+
+  /// Execute a debug command.
+  bool ExecCommand (int cmd, const csString& args);
 
   /**
    * Given a command string, return a command code.
    * Optionally fill 'args' with arguments after the command.
    */
-  int GetCommandCode (const char* cmd, char* args);
+  int GetCommandCode (const char* cmd, csString& args);
   /// Given a keyname, parse it and return key code + modifier status.
   int GetKeyCode (const char* keystring, bool& shift, bool& alt,
 	bool& ctrl);
 
   /// Given a keycode, and shift/alt/ctrl status return a command code.
   int GetCommandCode (int key, bool shift, bool alt, bool ctrl,
-  	char*& args);
+  	csString& args);
   /// Add a new key binding for a command.
   void AddCommand (const char* keystring, const char* cmdstring);
 
@@ -486,6 +490,8 @@ public:
   void ResetCounter (const char* countername, int value = 0);
   void RemoveCounter (const char* countername);
 
+  bool ExecCommand (const char* command);
+
   // This is not an embedded interface in order to avoid
   // a circular reference between this registered event handler
   // and the parent object.
@@ -520,5 +526,8 @@ public:
 
   CS_DECLARE_EVENT_SHORTCUTS;
 };
+
+}
+CS_PLUGIN_NAMESPACE_END(BugPlug)
 
 #endif // __CS_BUGPLUG_H__

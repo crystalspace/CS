@@ -10,6 +10,9 @@ chronological order.
         - res changed the unresolved symbol reporting to (just) warnings.
         - res fixed the xwin linking issues.
 	- res updated bindoc to use new SCF.
+	- res augmented bugplug to allow programmatic command execution (and
+	  not just via user input). Added new "bugplugcmd" command to 
+	  walktest.
 19-May-2006
         - res made the separate debug info and optimize mode debug info 
           features toggleable via configure switches.

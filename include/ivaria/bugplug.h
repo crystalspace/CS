@@ -53,7 +53,7 @@ struct iBugPlugRenderObject : public virtual iBase
  */
 struct iBugPlug : public virtual iBase
 {
-  SCF_INTERFACE(iBugPlug,2,0,0);
+  SCF_INTERFACE(iBugPlug,2,0,1);
   //=========================================================================
 
   /**
@@ -211,6 +211,14 @@ struct iBugPlug : public virtual iBase
   virtual void RemoveCounter (const char* countername) = 0;
 
   //=========================================================================
+  
+  /**
+   * Execute a bugplug command. The commands are the same ones you can specify
+   * in the <tt>bugplug.key</tt> file.
+   * \param command Command to execute.
+   * \return Whether the command was executed successfully.
+   */
+  virtual bool ExecCommand (const char* command) = 0;
 };
 
 #endif // __CS_IVARIA_BUGPLUG_H__
