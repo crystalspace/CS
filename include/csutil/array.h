@@ -469,9 +469,9 @@ private:
   }
 
 public:
-  typedef typename_qualifier ElementHandler ElementHandlerType;
-  typedef typename_qualifier MemoryAllocator MemoryAllocatorType;
-  typedef typename_qualifier CapacityHandler CapacityHandlerType;
+  typedef ElementHandler ElementHandlerType;
+  typedef MemoryAllocator MemoryAllocatorType;
+  typedef CapacityHandler CapacityHandlerType;
 
   /**
    * Compare two objects of the same type.
