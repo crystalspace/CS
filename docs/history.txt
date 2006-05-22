@@ -9,6 +9,11 @@ chronological order.
 22-May-2006
 	- res fixed SubDir rules in the aws & aws2 Jamfiles after their move
 	  to plugins/gui/.
+	- Jorrit added a new iMissingLoaderData interface. Applications can
+	  implement this and give it to the loader. The loader will then
+	  call functions in case it can't find some sector, light, texture,
+	  shader, material, sector, mesh, or factory. This can be used for
+	  loader managing purposes.
 21-May-2006
         - res changed the unresolved symbol reporting to (just) warnings.
         - res fixed the xwin linking issues.

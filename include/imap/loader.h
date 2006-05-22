@@ -33,11 +33,13 @@
 
 struct iDocumentNode;
 struct iImage;
+struct iLight;
 struct iMaterialWrapper;
 struct iMeshWrapper;
 struct iMeshFactoryWrapper;
 struct iRegion;
 struct iSector;
+struct iShader;
 struct iTextureHandle;
 struct iTextureManager;
 struct iTextureWrapper;
@@ -56,6 +58,74 @@ struct iLoaderStatus : public iBase
   virtual bool IsReady () = 0;
   /// Check if there was an error during loading.
   virtual bool IsError () = 0;
+};
+
+/**
+ * This callback is called when the loader can't find some material,
+ * texture, factory, mesh, light, shader, or sector. This gives the
+ * application a chance to manually load it first.
+ */
+struct iMissingLoaderData : public virtual iBase
+{
+  SCF_INTERFACE (iMissingLoaderData, 1, 0, 0);
+
+  /**
+   * Called when a material is missing. This implementation should
+   * either attempt to find or load the material or else return 0.
+   * In the last case the loader will proceed as usual when a material
+   * is not found.
+   */
+  virtual iMaterialWrapper* MissingMaterial (const char* name,
+      	const char* filename) = 0;
+
+  /**
+   * Called when a texture is missing. This implementation should
+   * either attempt to find or load the texture or else return 0.
+   * In the last case the loader will proceed as usual when a texture
+   * is not found.
+   */
+  virtual iTextureWrapper* MissingTexture (const char* name,
+      const char* filename) = 0;
+
+  /**
+   * Called when a shader is missing. This implementation should
+   * either attempt to find or load the shader or else return 0.
+   * In the last case the loader will proceed as usual when a shader
+   * is not found.
+   */
+  virtual iShader* MissingShader (const char* name) = 0;
+
+  /**
+   * Called when a mesh factory is missing. This implementation should
+   * either attempt to find or load the mesh factory or else return 0.
+   * In the last case the loader will proceed as usual when a mesh factory
+   * is not found.
+   */
+  virtual iMeshFactoryWrapper* MissingFactory (const char* name) = 0;
+
+  /**
+   * Called when a mesh is missing. This implementation should
+   * either attempt to find or load the mesh or else return 0.
+   * In the last case the loader will proceed as usual when a mesh
+   * is not found.
+   */
+  virtual iMeshWrapper* MissingMesh (const char* name) = 0;
+
+  /**
+   * Called when a sector is missing. This implementation should
+   * either attempt to find or load the sector or else return 0.
+   * In the last case the loader will proceed as usual when a sector
+   * is not found.
+   */
+  virtual iSector* MissingSector (const char* name) = 0;
+
+  /**
+   * Called when a light is missing. This implementation should
+   * either attempt to find or load the light or else return 0.
+   * In the last case the loader will proceed as usual when a light
+   * is not found.
+   */
+  virtual iLight* MissingLight (const char* name) = 0;
 };
 
 /**
@@ -244,10 +314,13 @@ struct iLoader : public virtual iBase
    * with the same name. Only use checkDupes == true if you know that your
    * objects have unique names accross all world files.
    * \param ssource is an optional stream source for faster loading.
+   * \param missingdata is an optional callback in case data is missing.
+   * The application can then provide that missing data in some other way.
    */
   virtual bool LoadMapFile (const char* filename, bool clearEngine = true,
 	iRegion* region = 0, bool curRegOnly = true,
-	bool checkDupes = false, iStreamSource* ssource = 0) = 0;
+	bool checkDupes = false, iStreamSource* ssource = 0,
+	iMissingLoaderData* missingdata = 0) = 0;
 
   /**
    * Load a map from the given 'world' node. If 'clearEngine' is true then
@@ -274,10 +347,13 @@ struct iLoader : public virtual iBase
    * with the same name. Only use checkDupes == true if you know that your
    * objects have unique names accross all world files.
    * \param ssource is an optional stream source for faster loading.
+   * \param missingdata is an optional callback in case data is missing.
+   * The application can then provide that missing data in some other way.
    */
   virtual bool LoadMap (iDocumentNode* world_node, bool clearEngine = true,
 	iRegion* region = 0, bool curRegOnly = true,
-	bool checkDupes = false, iStreamSource* ssource = 0) = 0;
+	bool checkDupes = false, iStreamSource* ssource = 0,
+	iMissingLoaderData* missingdata = 0) = 0;
 
   /**
    * Load library from a VFS file
@@ -294,10 +370,13 @@ struct iLoader : public virtual iBase
    * with the same name. Only use checkDupes == true if you know that your
    * objects have unique names accross all world files.
    * \param ssource is an optional stream source for faster loading.
+   * \param missingdata is an optional callback in case data is missing.
+   * The application can then provide that missing data in some other way.
    */
   virtual bool LoadLibraryFile (const char* filename, iRegion* region = 0,
   	bool curRegOnly = true, bool checkDupes = false,
-	iStreamSource* ssource = 0) = 0;
+	iStreamSource* ssource = 0,
+	iMissingLoaderData* missingdata = 0) = 0;
 
   /**
    * Load library from a 'library' node.
@@ -314,10 +393,13 @@ struct iLoader : public virtual iBase
    * with the same name. Only use checkDupes == true if you know that your
    * objects have unique names accross all world files.
    * \param ssource is an optional stream source for faster loading.
+   * \param missingdata is an optional callback in case data is missing.
+   * The application can then provide that missing data in some other way.
    */
   virtual bool LoadLibrary (iDocumentNode* lib_node, iRegion* region = 0,
   	bool curRegOnly = true, bool checkDupes = false,
-	iStreamSource* ssource = 0) = 0;
+	iStreamSource* ssource = 0,
+	iMissingLoaderData* missingdata = 0) = 0;
 
   /**
    * Load a Mesh Object Factory from a file.
@@ -373,10 +455,13 @@ struct iLoader : public virtual iBase
    * \param override_name if this is given the the name of the loaded object
    * will be set to that. This only works in case of meshfact, meshobj, and
    * 3ds or md2 model.
+   * \param missingdata is an optional callback in case data is missing.
+   * The application can then provide that missing data in some other way.
    */
   virtual bool Load (const char* fname, iBase*& result, iRegion* region = 0,
   	bool curRegOnly = true, bool checkDupes = false,
-	iStreamSource* ssource = 0, const char* override_name = 0) = 0;
+	iStreamSource* ssource = 0, const char* override_name = 0,
+	iMissingLoaderData* missingdata = 0) = 0;
 
   /**
    * Load a file. This is a smart function that will try to recognize
@@ -416,10 +501,13 @@ struct iLoader : public virtual iBase
    * \param override_name if this is given the the name of the loaded object
    * will be set to that. This only works in case of meshfact, meshobj, and
    * 3ds or md2 model.
+   * \param missingdata is an optional callback in case data is missing.
+   * The application can then provide that missing data in some other way.
    */
   virtual bool Load (iDataBuffer* buffer, iBase*& result, iRegion* region = 0,
   	bool curRegOnly = true, bool checkDupes = false,
-	iStreamSource* ssource = 0, const char* override_name = 0) = 0;
+	iStreamSource* ssource = 0, const char* override_name = 0,
+	iMissingLoaderData* missingdata = 0) = 0;
 
   /**
    * Load a node. This is a smart function that will try to recognize
@@ -458,10 +546,13 @@ struct iLoader : public virtual iBase
    * \param override_name if this is given the the name of the loaded object
    * will be set to that. This only works in case of meshfact, meshobj, and
    * 3ds or md2 model.
+   * \param missingdata is an optional callback in case data is missing.
+   * The application can then provide that missing data in some other way.
    */
   virtual bool Load (iDocumentNode* node, iBase*& result, iRegion* region = 0,
   	bool curRegOnly = true, bool checkDupes = false,
-	iStreamSource* ssource = 0, const char* override_name = 0) = 0;
+	iStreamSource* ssource = 0, const char* override_name = 0,
+	iMissingLoaderData* missingdata = 0) = 0;
 
   /**
    * Load a shader from a file.

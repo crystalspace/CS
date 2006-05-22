@@ -88,28 +88,31 @@ struct csLoaderPluginRec;
 /*
  * Context class for the standard loader.
  */
-class StdLoaderContext : public iLoaderContext
+class StdLoaderContext : public scfImplementation1<StdLoaderContext,
+			 iLoaderContext>
 {
 private:
   iEngine* Engine;
   iRegion* region;
   csLoader* loader;
+  csRef<iMissingLoaderData> missingdata;
   bool checkDupes;
   bool curRegOnly;
+
 public:
   StdLoaderContext (iEngine* Engine, iRegion* region, bool curRegOnly,
-    csLoader* loader, bool checkDupes);
+    csLoader* loader, bool checkDupes, iMissingLoaderData* missingdata);
   virtual ~StdLoaderContext ();
-
-  SCF_DECLARE_IBASE;
 
   virtual iSector* FindSector (const char* name);
   virtual iMaterialWrapper* FindMaterial (const char* name);
-  virtual iMaterialWrapper* FindNamedMaterial (const char* name, const char *filename);
+  virtual iMaterialWrapper* FindNamedMaterial (const char* name,
+      const char *filename);
   virtual iMeshFactoryWrapper* FindMeshFactory (const char* name);
   virtual iMeshWrapper* FindMeshObject (const char* name);
   virtual iTextureWrapper* FindTexture (const char* name);
-  virtual iTextureWrapper* FindNamedTexture (const char* name, const char *filename);
+  virtual iTextureWrapper* FindNamedTexture (const char* name,
+      const char *filename);
   virtual iLight* FindLight (const char *name);
   virtual iShader* FindShader (const char *name);
   virtual bool CheckDupes () const { return checkDupes; }
@@ -461,11 +464,11 @@ private:
    * thing templates, sounds and textures.
    */
   bool LoadLibrary (iLoaderContext* ldr_context, iDocumentNode* node,
-  	iStreamSource* ssource);
+  	iStreamSource* ssource, iMissingLoaderData* missingdata);
 
   /// Load map from a memory buffer
   bool LoadMap (iLoaderContext* ldr_context, iDocumentNode* world_node,
-  	iStreamSource* ssource);
+  	iStreamSource* ssource, iMissingLoaderData* missingdata);
 
   /// Get the engine sequence manager (load it if not already present).
   iEngineSequenceManager* GetEngineSequenceManager ();
@@ -596,32 +599,33 @@ public:
 	iRegion* region, bool curRegOnly, bool checkDupes);
   virtual bool LoadMapFile (const char* filename, bool clearEngine,
 	iRegion* region, bool curRegOnly, bool checkDupes,
-	iStreamSource* ssource);
+	iStreamSource* ssource, iMissingLoaderData* missingdata);
   virtual bool LoadMap (iDocumentNode* world_node, bool clearEngine,
 	iRegion* region, bool curRegOnly, bool checkDupes,
-	iStreamSource* ssource);
+	iStreamSource* ssource, iMissingLoaderData* missingdata);
   virtual bool LoadLibraryFile (const char* filename, iRegion* region,
   	bool curRegOnly, bool checkDupes,
-	iStreamSource* ssource);
+	iStreamSource* ssource, iMissingLoaderData* missingdata);
   virtual bool LoadLibrary (iDocumentNode* lib_node, iRegion* region,
   	bool curRegOnly, bool checkDupes,
-	iStreamSource* ssource);
+	iStreamSource* ssource, iMissingLoaderData* missingdata);
   bool LoadLibraryFromNode (iLoaderContext* ldr_context,
 	iDocumentNode* child,
-	iStreamSource* ssource);
+	iStreamSource* ssource, iMissingLoaderData* missingdata);
 
   bool Load (iDataBuffer* buffer, const char* fname, iBase*& result,
   	iRegion* region, bool curRegOnly, bool checkDupes,
-	iStreamSource* ssource, const char* override_name);
+	iStreamSource* ssource, const char* override_name,
+	iMissingLoaderData* missingdata);
   virtual bool Load (const char* fname, iBase*& result, iRegion* region,
   	bool curRegOnly, bool checkDupes, iStreamSource* ssource,
-	const char* override_name);
+	const char* override_name, iMissingLoaderData* missingdata);
   virtual bool Load (iDataBuffer* buffer, iBase*& result, iRegion* region,
   	bool curRegOnly, bool checkDupes, iStreamSource* ssource,
-	const char* override_name);
+	const char* override_name, iMissingLoaderData* missingdata);
   virtual bool Load (iDocumentNode* node, iBase*& result, iRegion* region,
   	bool curRegOnly, bool checkDupes, iStreamSource* ssource,
-	const char* override_name);
+	const char* override_name, iMissingLoaderData* missingdata);
 
   virtual void SetAutoRegions (bool autoRegions)
   {
