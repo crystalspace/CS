@@ -1,4 +1,4 @@
-SubDir TOP plugins aws2 ;
+SubDir TOP plugins gui aws2 ;
 
 if $(STL.AVAILABLE) = yes && $(JS.AVAILABLE) = yes
 {

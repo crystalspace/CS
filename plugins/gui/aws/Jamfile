@@ -1,4 +1,4 @@
-SubDir TOP plugins aws ;
+SubDir TOP plugins gui aws ;
 
 if $(STL.AVAILABLE) = yes
 {
