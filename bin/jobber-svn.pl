@@ -55,7 +55,7 @@
 #
 # The script makes no attempt to perform any sort of SVN authentication.  It is
 # the client's responsibility to authenticate with the SVN server if necessary.
-# For access the easiest way to do so is to login to the CVS server  one time 
+# For access the easiest way to do so is to login to the SVN server  one time 
 # manually using the appropriate identity.  Once logged in successfully, 
 # the authentication information is stored in $(HOME)/.subversion/ directory
 # and remains there.  From that point onward, SVN considers the account as
@@ -132,12 +132,12 @@
 #
 # @jobber_binary_override [optional] @@ NOT NEEDED
 #     Normally, jobber-svn.pl determines automatically whether files which it adds
-#     to the repository are binary or text (CVS needs to know this
+#     to the repository are binary or text (SVN needs to know this
 #     information).  There may be special cases, however, when text files need
 #     to be treated as binary files. This setting is a list of regular
 #     expressions which are matched against the names of files being added to
-#     the CVS repository.  If a filename matches one of these expressions, then
-#     it is considered binary (thus, the CVS "-kb" option is used).  An example
+#     the SVN repository.  If a filename matches one of these expressions, then
+#     it is considered binary (thus, the SVN "-kb" option is used).  An example
 #     of when this comes in handy is when dealing with Visual-C++ DSW and DSP
 #     project files in which the CRLF line-terminator must be preserved.
 #     Default: .dsw and .dsp files
@@ -146,7 +146,7 @@
 #     A list of tasks to perform on the checked-out source tree.  Typical tasks
 #     are those which repair outdated files, and those which generate
 #     human-consumable documentation from various sources.  Files generated or
-#     repaired by the tasks can then optionally be committed back to the CVS
+#     repaired by the tasks can then optionally be committed back to the SVN
 #     repository and/or published for browsing or download. Each task's
 #     "command" is invoked in the top-level directory of the project tree
 #     ($jobber_project_root).
@@ -254,8 +254,8 @@
 # To-Do List
 #
 # * Generalize into a "job" processing mechanism.  Each job could reside within
-#   its own source file.  Jobs such as checking out files from CVS, committing
-#   changes to CVS, and publishing browseable and downloadable documentation
+#   its own source file.  Jobs such as checking out files from SVN, committing
+#   changes to SVN, and publishing browseable and downloadable documentation
 #   can perhaps just be additional tasks in the @jobber_tasks array.
 # * The mechanism for publishing packages for download and online browsing
 #   needs to be generalized further.  It is still somewhat geared toward the
@@ -845,7 +845,7 @@ sub time_now {
 }
 
 #------------------------------------------------------------------------------
-# Perform the complete process of running tasks, committing to CVS, and
+# Perform the complete process of running tasks, committing to SVN, and
 # publishing packages.
 #------------------------------------------------------------------------------
 sub run {
