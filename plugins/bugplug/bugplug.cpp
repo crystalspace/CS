@@ -659,8 +659,6 @@ bool csBugPlug::ExecCommand (int cmd, const csString& args)
 {
   switch (cmd)
   {
-    case DEBUGCMD_UNKNOWN:
-      return true;
     case DEBUGCMD_QUIT:
       Report (CS_REPORTER_SEVERITY_NOTIFY, "Nah nah! I will NOT quit!");
       break;
@@ -1496,8 +1494,8 @@ bool csBugPlug::EatKey (iEvent& event)
 
   if (down)
   {
-    ExecCommand (cmd, args);
-    process_next_key = false;
+    if (ExecCommand (cmd, args))
+      process_next_key = false;
   }
   return true;
 }
