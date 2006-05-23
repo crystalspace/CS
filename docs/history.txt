@@ -8,6 +8,7 @@ chronological order.
 
 23-May-2006
 	- res fixed bugplug to properly accept commands via keys again.
+        - acraig made iGenMeshAnimationControl virtually inherrit from iBase.
 22-May-2006
 	- res fixed SubDir rules in the aws & aws2 Jamfiles after their move
 	  to plugins/gui/.

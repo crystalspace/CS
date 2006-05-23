@@ -379,7 +379,7 @@ SCF_VERSION (iGenMeshAnimationControl, 0, 0, 1);
  * - Genmesh plugin (crystalspace.mesh.object.genmesh)
  *   
  */
-struct iGenMeshAnimationControl : public iBase
+struct iGenMeshAnimationControl : public virtual iBase
 {
   /// Returns true if this control animates vertices.
   virtual bool AnimatesVertices () const = 0;
