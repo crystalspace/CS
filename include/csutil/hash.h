@@ -325,10 +325,9 @@ public:
    * For a bigger list go to http://www.utm.edu/research/primes/
    */
   csHash (size_t size = 23, size_t grow_rate = 5, size_t max_size = 20000)
-    : Elements (size), Modulo (size), InitModulo (size),
+    : Modulo (size), InitModulo (size),
       GrowRate (MIN (grow_rate, size)), MaxSize (max_size), Size (0)
   {
-    Elements.SetLength (size, ElementArray (0, MIN (size / GrowRate, 4)));
   }
 
   /// Copy constructor.
@@ -345,6 +344,7 @@ public:
    */
   void Put (const K& key, const T &value)
   {
+    if (Elements.GetSize() == 0) Elements.SetLength (Modulo);
     ElementArray& values = 
       Elements[csHashComputer<K>::ComputeHash (key) % Modulo];
     values.Push (Element (key, value));
@@ -354,9 +354,9 @@ public:
   }
 
   /// Get all the elements with the given key, or empty if there are none.
-  template<typename H, typename M>
-  csArray<T, H, M> GetAll (const K& key) const
+  csArray<T> GetAll (const K& key) const
   {
+    if (Elements.GetSize() == 0) return csArray<T> ();
     const ElementArray& values = 
       Elements[csHashComputer<K>::ComputeHash (key) % Modulo];
     csArray<T, H, M> ret (values.Length () / 2);
@@ -373,6 +373,7 @@ public:
   /// Add an element to the hash table, overwriting if the key already exists.
   void PutUnique (const K& key, const T &value)
   {
+    if (Elements.GetSize() == 0) Elements.SetLength (Modulo);
     ElementArray& values = 
       Elements[csHashComputer<K>::ComputeHash (key) % Modulo];
     const size_t len = values.Length ();
@@ -404,6 +405,7 @@ public:
   /// Returns whether at least one element matches the given key.
   bool Contains (const K& key) const
   {
+    if (Elements.GetSize() == 0) return false;
     const ElementArray& values = 
       Elements[csHashComputer<K>::ComputeHash (key) % Modulo];
     const size_t len = values.Length ();
@@ -427,6 +429,7 @@ public:
    */
   const T* GetElementPointer (const K& key) const
   {
+    if (Elements.GetSize() == 0) return 0;
     const ElementArray& values = 
       Elements[csHashComputer<K>::ComputeHash (key) % Modulo];
     const size_t len = values.Length ();
@@ -446,6 +449,7 @@ public:
    */
   T* GetElementPointer (const K& key)
   {
+    if (Elements.GetSize() == 0) return 0;
     ElementArray& values = 
       Elements[csHashComputer<K>::ComputeHash (key) % Modulo];
     const size_t len = values.Length ();
@@ -465,6 +469,7 @@ public:
    */
   const T& Get (const K& key, const T& fallback) const
   {
+    if (Elements.GetSize() == 0) return fallback;
     const ElementArray& values = 
       Elements[csHashComputer<K>::ComputeHash (key) % Modulo];
     const size_t len = values.Length ();
@@ -484,6 +489,7 @@ public:
    */
   T& Get (const K& key, T& fallback)
   {
+    if (Elements.GetSize() == 0) return fallback;
     ElementArray& values = 
       Elements[csHashComputer<K>::ComputeHash (key) % Modulo];
     const size_t len = values.Length ();
@@ -500,10 +506,8 @@ public:
   /// Delete all the elements.
   void DeleteAll ()
   {
-    Elements.SetLength (Modulo = InitModulo);
-    size_t elen = Elements.Length ();
-    for (size_t i = 0; i < elen; i++)
-      Elements[i].Empty ();
+    Elements.DeleteAll();
+    Modulo = InitModulo;
     Size = 0;
   }
 
@@ -514,6 +518,7 @@ public:
   bool DeleteAll (const K& key)
   {
     bool ret = false;
+    if (Elements.GetSize() == 0) return ret;
     ElementArray& values = 
       Elements[csHashComputer<K>::ComputeHash (key) % Modulo];
     for (size_t i = values.Length (); i > 0; i--)
@@ -533,6 +538,7 @@ public:
   bool Delete (const K& key, const T &value)
   {
     bool ret = false;
+    if (Elements.GetSize() == 0) return ret;
     ElementArray& values = 
       Elements[csHashComputer<K>::ComputeHash (key) % Modulo];
     for (size_t i = values.Length (); i > 0; i--)
@@ -586,7 +592,7 @@ public:
       hash(hash0),
       key(key0), 
       bucket(csHashComputer<K>::ComputeHash (key) % hash->Modulo),
-      size(hash->Elements[bucket].Length ())
+      size((hash->Elements.GetSize() > 0) ? hash->Elements[bucket].Length () : 0)
       { Reset (); }
 
     friend class csHash<T, K>;
@@ -638,7 +644,11 @@ public:
     size_t bucket, size, element;
 
     void Zero () { bucket = element = 0; }
-    void Init () { size = hash->Elements[bucket].Length (); }
+    void Init () 
+    { 
+      size = 
+        (hash->Elements.GetSize() > 0) ? hash->Elements[bucket].Length () : 0;
+    }
 
     void FindItem ()
     {
