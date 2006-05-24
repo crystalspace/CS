@@ -44,6 +44,13 @@ chronological order.
 	- Jorrit fixed particles so that it compiles again after the
 	  changes of Marten.
 	- res fixed xmlshader to compile on gcc again.
+	- res fixed the xmlshader bug where programs in auxiliary files (ie
+	  included via a file attribute) did not work properly in some cases.
+	  The problem was that conditions in that file did not contribute to
+	  the main condition tree, ie a appeared that condition in an 
+	  auxiliary file but not the main shader file would not lead to more
+	  variants. Fixed by also parsing auxiliary files for conditions and
+	  adding those to the main condition tree.
 23-May-2006
 	- res fixed bugplug to properly accept commands via keys again.
         - acraig made iGenMeshAnimationControl virtually inherrit from iBase.
