@@ -21,20 +21,24 @@ correct number of shooting sounds.
 
 if (!csInitializer::RequestPlugins(object_reg,
 @dots{}
-CS_REQUEST_PLUGIN("crystalspace.sndsys.renderer.software", iSndSysRenderer),
-CS_REQUEST_PLUGIN("crystalspace.sndsys.element.loader", iSndSysLoader),
-CS_REQUEST_END))
+  CS_REQUEST_PLUGIN("crystalspace.sndsys.renderer.software",
+    iSndSysRenderer),
+  CS_REQUEST_PLUGIN("crystalspace.sndsys.element.loader",
+    iSndSysLoader),
+  CS_REQUEST_END))
 @dots{}
 
 csRef<iLoader> loader = csQueryRegistry<iLoader> (object_reg);
-csRef<iSndSysRenderer> sndrdr = csQueryRegistry<iSndSysRenderer> (object_reg);
+csRef<iSndSysRenderer> sndrdr =
+  csQueryRegistry<iSndSysRenderer> (object_reg);
 if (sndrdr)
 @{
-  iSndSysWrapper* w_boom = loader->LoadSoundWrapper (<sound name>,
-  	<sound file>, CS_SND3D_DISABLE);
+  iSndSysWrapper* w_boom = loader->LoadSoundWrapper (
+    <sound name>, <sound file>, CS_SND3D_DISABLE);
   if (w_boom)
   @{
-    csRef<iSoundSource> sndsrc = w_boom->GetSound()->CreateSource(w_boom->GetStream());
+    csRef<iSoundSource> sndsrc =
+      w_boom->GetSound()->CreateSource(w_boom->GetStream());
     w_boom->GetStream ()->SetLoopState (CS_SNDSYS_STREAM_DONTLOOP);
     w_boom->GetStream ()->Unpause();
   @}
@@ -46,16 +50,16 @@ if (sndrdr)
 Here is how you can play a looping sound:
 
 @example
-csRef<iSndSysRenderer> sndrdr = csQueryRegistry<iSndSysRenderer> (object_reg);
+csRef<iSndSysRenderer> sndrdr =
+  csQueryRegistry<iSndSysRenderer> (object_reg);
 if (sndrdr)
 @{
-  iSndSysWrapper* w_music = loader->LoadSoundWrapper (<sound name>,
-  	<sound file>, CS_SND3D_DISABLE);
+  iSndSysWrapper* w_music = loader->LoadSoundWrapper (
+    <sound name>, <sound file>, CS_SND3D_DISABLE);
   if (w_music)
   @{
-    w_boom->GetStream ()->SetLoopState (CS_SNDSYS_STREAM_LOOP);
-    w_boom->GetStream ()->Unpause();
+    w_music->GetStream ()->SetLoopState (CS_SNDSYS_STREAM_LOOP);
+    w_music->GetStream ()->Unpause();
   @}
 @}
 @end example
-
