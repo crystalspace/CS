@@ -364,6 +364,17 @@ public:
     }
   }
   /**
+   * Deallocate an object. It is safe to provide a null pointer.
+   * \param p Pointer to deallocate.
+   * \remarks Intended as a counterpart to AllocUninit().
+   * \remarks Does not invoke the destructor for p, so before freeing an 
+   *  object, make sure it is properly destructed.
+   */
+  void FreeUninit (void* p)
+  {
+    Free ((T*)p, false);
+  }
+  /**
    * Try to delete an object. Usage is the same as Free(), the difference
    * being that \c false is returned if the deallocation failed (the reason
    * is most likely that the memory was not allocated by the allocator).
