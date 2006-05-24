@@ -834,20 +834,23 @@ void csGenmeshMeshObject::UpdateLighting (
     iMovable* movable)
 {
   int i;
+  if (factory->DoFullBright ())
+  {
+    if (lighting_dirty)
+    {
+      lighting_dirty = false;
+      for (i = 0 ; i < factory->GetVertexCount () ; i++)
+      {
+        lit_mesh_colors[i].Set (1, 1, 1);
+      }
+    }
+    return;
+  }
+
   if (cur_movablenr != movable->GetUpdateNumber ())
   {
     lighting_dirty = true;
     cur_movablenr = movable->GetUpdateNumber ();
-  }
-
-  if (factory->DoFullBright ())
-  {
-    lighting_dirty = false;
-    for (i = 0 ; i < factory->GetVertexCount () ; i++)
-    {
-      lit_mesh_colors[i].Set (1, 1, 1);
-    }
-    return;
   }
 
   if (do_manual_colors) return;
