@@ -23,33 +23,14 @@
 
 CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
 {
-#define IMPLEMENT_STATIC_CLASSVAR_REF_T(Class,var,getterFunc,Type,\
-  initParam) \
-CS_SPECIALIZE_TEMPLATE Type *Class::var = 0;                   \
-CS_SPECIALIZE_TEMPLATE                                         \
-void Class::getterFunc ## _kill ()                             \
-{                                                              \
-  delete &getterFunc ();                                       \
-}                                                              \
-CS_SPECIALIZE_TEMPLATE                                         \
-Type &Class::getterFunc ()                                     \
-{                                                              \
-  if (!var)                                                    \
-  {                                                            \
-    var = new Type initParam;                                  \
-    csStaticVarCleanup (getterFunc ## _kill);                  \
-  }                                                            \
-  return *var;                                                 \
-}
-
-  IMPLEMENT_STATIC_CLASSVAR_REF_T(MyBitArrayAllocatorMalloc, bitsAlloc2,
+  CS_IMPLEMENT_STATIC_CLASSVAR_REF(MyBitArrayAllocatorMalloc, bitsAlloc2,
     BitsAlloc2, MyBitArrayAllocatorMalloc::BitsAlloc2Type, (1024));
-  IMPLEMENT_STATIC_CLASSVAR_REF_T(MyBitArrayAllocatorMalloc, bitsAlloc4,
+  CS_IMPLEMENT_STATIC_CLASSVAR_REF(MyBitArrayAllocatorMalloc, bitsAlloc4,
     BitsAlloc4, MyBitArrayAllocatorMalloc::BitsAlloc4Type, (1024));
 
-  IMPLEMENT_STATIC_CLASSVAR_REF_T(MyBitArrayAllocatorTemp, bitsAlloc2,
+  CS_IMPLEMENT_STATIC_CLASSVAR_REF(MyBitArrayAllocatorTemp, bitsAlloc2,
     BitsAlloc2, MyBitArrayAllocatorTemp::BitsAlloc2Type, (1024));
-  IMPLEMENT_STATIC_CLASSVAR_REF_T(MyBitArrayAllocatorTemp, bitsAlloc4,
+  CS_IMPLEMENT_STATIC_CLASSVAR_REF(MyBitArrayAllocatorTemp, bitsAlloc4,
     BitsAlloc4, MyBitArrayAllocatorTemp::BitsAlloc4Type, (1024));
 }
 CS_PLUGIN_NAMESPACE_END(XMLShader)

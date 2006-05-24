@@ -27,13 +27,53 @@
 
 CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
 {
-  template<typename Allocator>
-  class MyBitArrayAllocator : Allocator
+  class MyBitArrayAllocatorMalloc : CS::Memory::AllocatorMalloc
   {
+    typedef CS::Memory::AllocatorMalloc Allocator;
+    
     typedef csBitArrayStorageType Bits2[2];
     typedef csBlockAllocator<Bits2, Allocator> BitsAlloc2Type;
     CS_DECLARE_STATIC_CLASSVAR_REF (bitsAlloc2,
       BitsAlloc2, BitsAlloc2Type);
+    
+    typedef csBitArrayStorageType Bits4[4];
+    typedef csBlockAllocator<Bits4, Allocator> BitsAlloc4Type;
+    CS_DECLARE_STATIC_CLASSVAR_REF (bitsAlloc4,
+      BitsAlloc4, BitsAlloc4Type);
+  public:
+    void* Alloc (const size_t n)
+    {
+      if (n <= sizeof (Bits2))
+        return BitsAlloc2().AllocUninit();
+      else if (n <= sizeof (Bits4))
+        return BitsAlloc4().AllocUninit();
+      else
+      {
+        return Allocator::Alloc (n);
+      }
+    }
+    void Free (void* p)
+    {
+      if (BitsAlloc4().TryFree ((Bits4*)p)) return;
+      if (BitsAlloc2().TryFree ((Bits2*)p)) return;
+      Allocator::Free (p);
+    }
+
+    static void CompactAllocators()
+    {
+      BitsAlloc2().Compact();
+      BitsAlloc4().Compact();
+    }
+  };
+  class MyBitArrayAllocatorTemp : TempHeapAlloc
+  {
+    typedef TempHeapAlloc Allocator;
+    
+    typedef csBitArrayStorageType Bits2[2];
+    typedef csBlockAllocator<Bits2, Allocator> BitsAlloc2Type;
+    CS_DECLARE_STATIC_CLASSVAR_REF (bitsAlloc2,
+      BitsAlloc2, BitsAlloc2Type);
+    
     typedef csBitArrayStorageType Bits4[4];
     typedef csBlockAllocator<Bits4, Allocator> BitsAlloc4Type;
     CS_DECLARE_STATIC_CLASSVAR_REF (bitsAlloc4,
@@ -69,10 +109,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
    * Specialized bit array that uses block allocation for smaller
    * sizes.
    */
-  typedef MyBitArrayAllocator<CS::Memory::AllocatorMalloc>
-    MyBitArrayAllocatorMalloc;
   typedef csBitArrayTweakable<64, MyBitArrayAllocatorMalloc> MyBitArrayMalloc;
-  typedef MyBitArrayAllocator<TempHeapAlloc> MyBitArrayAllocatorTemp;
   typedef csBitArrayTweakable<64, MyBitArrayAllocatorTemp> MyBitArrayTemp;
   //@}
 }
