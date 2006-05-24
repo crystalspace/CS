@@ -43,13 +43,7 @@ namespace CS
     }
     Heap::~Heap()
     {
-      size_t n = destroy_mspace (mspace);
-    #ifdef CS_DEBUG
-      if (n > 0)
-	csPrintf ("WARNING: Heap %p: %zu unfreed bytes\n", this, n);
-    #else
-      (void)n;
-    #endif
+      destroy_mspace (mspace);
     }
     
     void* Heap::Alloc (const size_t n)
