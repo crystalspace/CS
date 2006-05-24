@@ -150,7 +150,7 @@ public:
   {
     return vis_cb;
   }
-  virtual void NextFrame (csTicks, const csVector3&)
+  virtual void NextFrame (csTicks, const csVector3&, uint)
   {
     // We don't support animation.
   }

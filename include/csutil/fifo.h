@@ -34,6 +34,13 @@ template <class T, class ElementHandler = csArrayElementHandler<T>,
   class MemoryAllocator = CS::Memory::AllocatorMalloc>
 class csFIFO
 {
+public:
+  typedef csFIFO<T, ElementHandler, MemoryAllocator> ThisType;
+  typedef T ValueType;
+  typedef ElementHandler ElementHandlerType;
+  typedef MemoryAllocator AllocatorType;
+
+private:
   csArray<T, ElementHandler, MemoryAllocator> a1, a2;
 public:
   /**

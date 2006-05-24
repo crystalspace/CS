@@ -59,6 +59,50 @@ namespace lighter
           p.vertices[1] = vdata.vertexArray[ia[j+1]].position;
           p.vertices[2] = vdata.vertexArray[ia[j+2]].position;
           p.normal = prim.GetPlane ().norm;
+
+          // Setup optimized
+          int k = 0;
+          // Find max normal direction
+          if (fabsf (p.normal.x) > fabsf (p.normal.y))
+          {
+            if (fabsf (p.normal.x) > fabsf (p.normal.z)) k = 0;
+            else k = 2;
+          }
+          else
+          {
+            if (fabsf (p.normal.y) > fabsf (p.normal.z)) k = 1;
+            else k = 2;
+          }
+
+          p.k = k;
+
+          uint u = (k+1)%3;
+          uint v = (k+2)%3;
+
+          const csVector3& A = p.vertices[0];
+
+          // precalc normal
+          float nkinv = 1.0f/p.normal[k];
+          p.n_u = p.normal[u] * nkinv;
+          p.n_v = p.normal[v] * nkinv;
+          p.n_d = (p.normal * A) * nkinv;
+
+
+          csVector3 b = p.vertices[2] - p.vertices[0];
+          csVector3 c = p.vertices[1] - p.vertices[0];
+
+          float tmp = 1.0f/(b[u] * c[v] - b[v] * c[u]);
+
+          // edge 1
+          p.b_nu = -b[v] * tmp;
+          p.b_nv = b[u] * tmp;
+          p.b_d = (b[v] * A[u] - b[u] * A[v]) * tmp;
+
+          // edge 2
+          p.c_nu = c[v] * tmp;
+          p.c_nv = -c[u] * tmp;
+          p.c_d = (c[u] * A[v] - c[v] * A[u]) * tmp;
+
           tree->allTriangles.Push (p);
         }
         for (; j < ia.GetSize (); j++)
@@ -252,7 +296,7 @@ namespace lighter
     }
   
     // check if any split is good enough
-    if (bestCost > node->triangleIndices.GetSize ())
+    if (bestCost > node->triangleIndices.GetSize ()*2.0f)
     {
       return;
     }
@@ -275,11 +319,11 @@ namespace lighter
     // And remove from ourselves
     node->triangleIndices.DeleteAll ();
 
-    if (node->leftChild->triangleIndices.GetSize () > 4)
+    if (node->leftChild->triangleIndices.GetSize () > 1)
       Subdivide (tree, node->leftChild, leftBox, depth, node->splitDimension,
       node->splitLocation);
 
-    if (node->rightChild->triangleIndices.GetSize () > 4)
+    if (node->rightChild->triangleIndices.GetSize () > 1)
       Subdivide (tree, node->rightChild, rightBox, depth, node->splitDimension,
       node->splitLocation);
   }

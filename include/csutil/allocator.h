@@ -23,8 +23,8 @@
  * Basic allocator classes.
  */
 
-#include "alignedalloc.h"
-#include "memdebug.h"
+#include "csutil/alignedalloc.h"
+#include "csutil/memdebug.h"
 
 /**\addtogroup util_memory
  * @{ */

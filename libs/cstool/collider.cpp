@@ -639,8 +639,8 @@ void csColliderActor::SetCamera (iCamera* camera, bool adjustRotation)
   this->camera = camera; 
   if (adjustRotation)
   {
-    csQuaternion quat (camera->GetTransform().GetT2O());
-    quat.GetEulerAngles (rotation, true);
+    csQuaternion quat; quat.SetMatrix (camera->GetTransform().GetT2O());
+    rotation = quat.GetEulerAngles ();
     // Angle fixups.
     /* @@@ FIXME: Are those right in the math sense or do they indicate
      * csQuaternion bugs? */

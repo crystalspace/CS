@@ -182,27 +182,7 @@ float csMatrix3::Determinant () const
 
 void csMatrix3::Set (const csQuaternion &quat)
 {
-  float rx, ry, rz, xx, yy, yz, xy, xz, zz, x2, y2, z2;
-
-  // calculate coefficients
-  x2 = quat.x + quat.x;
-  y2 = quat.y + quat.y;
-  z2 = quat.z + quat.z;
-  xx = quat.x * x2;   xy = quat.x * y2;   xz = quat.x * z2;
-  yy = quat.y * y2;   yz = quat.y * z2;   zz = quat.z * z2;
-  rx = quat.r * x2;   ry = quat.r * y2;   rz = quat.r * z2;
-
-  m11 = 1.0 - (yy + zz);
-  m12 = xy - rz;
-  m13 = xz + ry;
-
-  m21 = xy + rz;
-  m22 = 1.0 - (xx + zz);
-  m23 = yz - rx;
-
-  m31 = xz - ry;
-  m32 = yz + rx;
-  m33 = 1.0 - (xx + yy);
+  *this = quat.GetMatrix ();
 }
 
 csMatrix3 operator+ (const csMatrix3 &m1, const csMatrix3 &m2)

@@ -237,51 +237,97 @@ namespace lighter
     return false;*/
   }
 
+  static const uint mod5[] = {0,1,2,0,1};
+
   bool IntersectPrimitiveRay (const KDTreePrimitive &primitive, const Ray &ray,
     HitPoint &hit)
   {
-    float nom = - (primitive.normal * (ray.origin - primitive.vertices[0]));
-    float den = primitive.normal * ray.direction;
+    /*
+    {
+      
+      float nom = - (primitive.normal * (ray.origin - primitive.vertices[0]));
+      float den = primitive.normal * ray.direction;
 
-    if(den < 0) 
-      return false; //backface culling
+      if(den < 0) 
+        return false; //backface culling
 
 
-    float dist = nom / den;
-    if(dist < ray.minLength || dist > ray.maxLength)
-      return false;
+      float dist = nom / den;
+      if(dist < ray.minLength || dist > ray.maxLength)
+        return false;
 
-    csVector3 I = ray.origin + ray.direction * dist;
+      csVector3 I = ray.origin + ray.direction * dist;
 
-    // Is inside?
-    csVector3 u, v, w;
-    float uu, uv, vv, wu, wv, D;
+      // Is inside?
+      csVector3 u, v, w;
+      float uu, uv, vv, wu, wv, D;
 
-    u = primitive.vertices[2] - primitive.vertices[0];
-    v = primitive.vertices[1] - primitive.vertices[0];
+      u = primitive.vertices[2] - primitive.vertices[0];
+      v = primitive.vertices[1] - primitive.vertices[0];
 
-    uu = u*u;
-    uv = u*v;
-    vv = v*v;
-    w = I - primitive.vertices[0];
-    wu = w*u;
-    wv = w*v;
-    D = uv*uv - uu*vv;
+      uu = u*u;
+      uv = u*v;
+      vv = v*v;
+      w = I - primitive.vertices[0];
+      wu = w*u;
+      wv = w*v;
+      D = uv*uv - uu*vv;
 
-    // Test barycentric
-    float s, t;
-    s = (uv*wv - vv*wu) / D;
-    if (s < 0.0f || s > 1.0f)
-      return false;
+      // Test barycentric
+      float s, t;
+      s = (uv*wv - vv*wu) / D;
+      if (s < 0.0f || s > 1.0f)
+        return false;
 
-    t = (uv*wu - uu*wv) / D;
-    if (t < 0.0f || (t+s) > 1.0f)
-      return false;
+      t = (uv*wu - uu*wv) / D;
+      if (t < 0.0f || (t+s) > 1.0f)
+        return false;
 
-    hit.hitPoint = I;
-    hit.distance = dist;
-    hit.primitive = primitive.primPointer;
+      hit.hitPoint = I;
+      hit.distance = dist;
+      hit.primitive = primitive.primPointer;
+    }*/
  
+
+    {
+      const uint k = primitive.k;
+      const uint ku = mod5[primitive.k+1];
+      const uint kv = mod5[primitive.k+2];
+
+      // prefetch?
+
+      const float nd = 1.0f / (ray.direction[k] + 
+        primitive.n_u * ray.direction[ku] + primitive.n_v * ray.direction[kv]);
+
+      const float f = (primitive.n_d - ray.origin[k] - 
+        primitive.n_u * ray.origin[ku] - primitive.n_v * ray.origin[kv]) * nd;
+
+      // Check for distance..
+      if (!(ray.maxLength > f && f > ray.minLength)) return false;
+
+      // Compute hitpoint on plane
+      const float hu = (ray.origin[ku] + f * ray.direction[ku]);
+      const float hv = (ray.origin[kv] + f * ray.direction[kv]);
+
+      // First barycentric coordinate
+      const float lambda = (hu * primitive.b_nu + hv * primitive.b_nv + primitive.b_d);
+      if (lambda < 0.0f) 
+        return false;
+
+      // Second barycentric coordinate
+      const float mu = (hu * primitive.c_nu + hv * primitive.c_nv + primitive.c_d);
+      if (mu < 0.0f) 
+        return false;
+
+      // Third barycentric coordinate
+      if (lambda + mu > 1.0f) 
+        return false;
+
+      // Ok, is a hit, store it
+      hit.hitPoint = ray.origin + ray.direction * f;
+      hit.distance = f;
+      hit.primitive = primitive.primPointer;
+    }
 
 
     return true;

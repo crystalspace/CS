@@ -36,7 +36,7 @@
 /**
  * This routine computes sqrt(x) very quickly on Intel and PowerPC platforms.
  */
-static inline float csQsqrt (float x);
+static CS_FORCEINLINE float csQsqrt (float x);
 
 /**
  * This routine is basically equivalent to csQsqrt() except that it returns
@@ -45,7 +45,7 @@ static inline float csQsqrt (float x);
  * because the routine is a little faster than csQsqrt() and also you avoid
  * a division.
  */
-static inline float csQisqrt (float x);
+static CS_FORCEINLINE float csQisqrt (float x);
 
 /** @} */
 
@@ -59,7 +59,7 @@ static inline float csQisqrt (float x);
  * to get a more accurate result.  Zero is treated as a special case, otherwise
  * we end up returning NaN (Not a Number).
  */
-static inline float csQsqrt(float x)
+static CS_FORCEINLINE float csQsqrt(float x)
 {
   float y0 = 0.0;
 
@@ -94,8 +94,8 @@ static inline float csQisqrt(float x)
 
 #else
 
-static inline float csQsqrt (float x) { return sqrtf(x); }
-static inline float csQisqrt(float x) { return 1.0f / sqrtf(x); }
+static CS_FORCEINLINE float csQsqrt (float x) { return sqrtf(x); }
+static CS_FORCEINLINE float csQisqrt(float x) { return 1.0f / sqrtf(x); }
 
 #endif
 

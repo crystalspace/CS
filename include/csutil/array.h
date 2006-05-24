@@ -25,8 +25,8 @@
  * Generic Array Template
  */
 
-#include "allocator.h"
-#include "comparator.h"
+#include "csutil/allocator.h"
+#include "csutil/comparator.h"
 
 // Hack: Work around problems caused by #defining 'new'.
 #if defined(CS_EXTENSIVE_MEMDEBUG) || defined(CS_MEMORY_TRACKER)
@@ -387,6 +387,13 @@ template <class T,
         class CapacityHandler = csArrayCapacityLinear<csArrayThresholdVariable> >
 class csArray
 {
+public:
+  typedef csArray<T, ElementHandler, MemoryAllocator, CapacityHandler> ThisType;
+  typedef T ValueType;
+  typedef ElementHandler ElementHandlerType;
+  typedef MemoryAllocator AllocatorType;
+  typedef CapacityHandler CapacityHandlerType;
+
 private:
   size_t count;
   /**

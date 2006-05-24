@@ -145,7 +145,8 @@ public:
    * See imesh/object.h for specification. The default implementation
    * does nothing.
    */
-  virtual void NextFrame (csTicks current_time,const csVector3& pos);
+  virtual void NextFrame (csTicks current_time,const csVector3& pos,
+    uint currentFrame);
 
   /**
    * See imesh/object.h for specification. The default implementation

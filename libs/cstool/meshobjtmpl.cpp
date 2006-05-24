@@ -59,7 +59,8 @@ iMeshObjectDrawCallback* csMeshObject::GetVisibleCallback () const
   return VisCallback;
 }
 
-void csMeshObject::NextFrame (csTicks /*current_time*/,const csVector3& /*pos*/)
+void csMeshObject::NextFrame (csTicks /*current_time*/,const csVector3& /*pos*/,
+                              uint /*currentFrame*/)
 {
 }
 

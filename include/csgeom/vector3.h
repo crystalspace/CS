@@ -294,8 +294,23 @@ public:
 
   /// Query if the vector is zero
   inline bool IsZero (float precision = SMALL_EPSILON) const
-  { return (ABS(x) < precision) && (ABS(y) < precision)
-            && (ABS(z) < precision);
+  { 
+    return (fabsf(x) < precision) && (fabsf(y) < precision)
+            && (fabsf(z) < precision);
+  }
+
+  /// Return a version of the vector clamped to closest unit vector (+-xyz)
+  inline csVector3 UnitAxisClamped () const
+  {
+    if (IsZero ())
+      return csVector3 (0, 0, 0);
+
+    if (fabsf (x) > fabsf (y) && fabsf (x) > fabsf (z))
+      return csVector3 (x / fabsf (x), 0, 0); //X biggest
+    else if (fabsf (y) > fabsf (z))
+      return csVector3 (0, y / fabsf (y), 0); //Y biggest
+    else
+      return csVector3 (0, 0, z / fabsf (z)); //Z biggest
   }
 };
 

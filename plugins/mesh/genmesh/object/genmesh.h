@@ -319,7 +319,7 @@ public:
     return vis_cb;
   }
   virtual void NextFrame (csTicks /*current_time*/,
-  	const csVector3& /*pos*/) { }
+  	const csVector3& /*pos*/, uint /*currentFrame*/) { }
   virtual void HardTransform (const csReversibleTransform&) { }
   virtual bool SupportsHardTransform () const { return false; }
   virtual bool HitBeamOutline (const csVector3& start, const csVector3& end,

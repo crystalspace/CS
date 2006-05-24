@@ -145,7 +145,7 @@ void csLightningMeshObject::HardTransform (const csReversibleTransform& t)
 }
 
 void csLightningMeshObject::NextFrame (csTicks current_time,
-	const csVector3& /*pos*/)
+	const csVector3& /*pos*/, uint /*currentFrame*/)
 {
   factory->NextFrame(current_time);
 }

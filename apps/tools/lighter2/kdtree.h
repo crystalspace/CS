@@ -25,21 +25,25 @@ namespace lighter
 {
   class RadPrimitive;
 
-
   /// Single primitive in KD-tree. A single triangle
   struct KDTreePrimitive
   {
     /// The three vertices
     csVector3 vertices[3];
 
-    /// Normal
     csVector3 normal;
 
     /// The RadPrimitive we belong to
     RadPrimitive *primPointer;
+
+    float n_u, n_v, n_d;
+
+    float b_nu, b_nv, b_d;
+    uint32 k;
+    float c_nu, c_nv, c_d;
   };
 
-  
+
   /// Node in non-optimized KD-tree
   struct KDTreeNode
   {

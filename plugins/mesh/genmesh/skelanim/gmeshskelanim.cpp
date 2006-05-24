@@ -159,12 +159,12 @@ void csSkelBone::UpdateRotation ()
           if (script->GetFactor () >= min)
           {
             max = script->GetFactor ();
-            q = q.Slerp (b_rot->quat, max_over_factor);
+            q = q.SLerp (b_rot->quat, max_over_factor);
           }
           else
           {
             min = script->GetFactor ();
-            q = b_rot->quat.Slerp (q, max_over_factor);
+            q = b_rot->quat.SLerp (q, max_over_factor);
           }
           script_factors_total = min + max_over_factor;
         }
@@ -355,7 +355,7 @@ csSkelAnimControlRunnable::csSkelAnimControlRunnable (csSkelAnimControlScript* s
   current_ticks = 0;
   parse_key_frame = true;
 
-  zero_quat.SetWithEuler (csVector3 (0));
+  zero_quat.SetIdentity ();
 
   if (script->GetLoop ())
   {
@@ -503,7 +503,7 @@ bool csSkelAnimControlRunnable::Do (csTicks elapsed, bool& stop, csTicks & left)
     {
       float slerp = 
         (float)delay.current/ (float)delay.final;
-      m.bone_rotation->quat = m.curr_quat.Slerp (m.quat, slerp);
+      m.bone_rotation->quat = m.curr_quat.SLerp (m.quat, slerp);
     }
     else
     {
@@ -522,7 +522,7 @@ bool csSkelAnimControlRunnable::Do (csTicks elapsed, bool& stop, csTicks & left)
     {
       float slerp = 
         ( (float) (delay.current - m.elapsed_ticks)/ (float)delay.final);
-      m.quat = zero_quat.Slerp (m.curr_quat, slerp);
+      m.quat = zero_quat.SLerp (m.curr_quat, slerp);
       m.bone_rotation->quat = m.quat*m.bone_rotation->quat;
       m.elapsed_ticks = delay.current;
     }
@@ -530,7 +530,7 @@ bool csSkelAnimControlRunnable::Do (csTicks elapsed, bool& stop, csTicks & left)
     {
       float slerp = 
         ( (float) (delay.final - m.elapsed_ticks)/ (float)delay.final);
-      m.quat = zero_quat.Slerp (m.curr_quat, slerp);
+      m.quat = zero_quat.SLerp (m.curr_quat, slerp);
       m.bone_rotation->quat = m.quat*m.bone_rotation->quat;
       relative_rotates.DeleteIndexFast (i);
     }
@@ -1505,33 +1505,33 @@ const char* csGenmeshSkelAnimationControlFactory::ParseScript (iDocumentNode* no
               float x_val = child->GetAttributeValueAsFloat ("x");
               if (x_val)
               {
-                v.x = (x_val*180)/PI;
+                v.x = x_val;
               }
 
               float y_val = child->GetAttributeValueAsFloat ("y");
               if (y_val)
               {
-                v.y = (y_val*180)/PI;
+                v.y = y_val;
               }
 
               float z_val = child->GetAttributeValueAsFloat ("z");
               if (z_val)
               {
-                v.z = (z_val*180)/PI;
+                v.z = z_val;
               }
               
 
               csQuaternion q;
               
-              q.SetWithEuler (v);
+              q.SetEulerAngles (v);
 
-              instr.rotate.quat_x = q.x;
+              instr.rotate.quat_x = q.v.x;
 
               //Why?
-              instr.rotate.quat_y = -q.y;
+              instr.rotate.quat_y = -q.v.y;
 
-              instr.rotate.quat_z = q.z;
-              instr.rotate.quat_r = q.r;
+              instr.rotate.quat_z = q.v.z;
+              instr.rotate.quat_r = q.w;
               
               /// The code below is correct ,but generated quaternion
               /// is incorrect in certain cases and animation bumps ugly sometimes

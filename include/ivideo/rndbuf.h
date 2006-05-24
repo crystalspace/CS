@@ -237,9 +237,9 @@ enum csRenderBufferNameMask
   CS_BUFFER_POSITION_MASK = 1 << CS_BUFFER_POSITION,
   /// Normals
   CS_BUFFER_NORMAL_MASK = 1 << CS_BUFFER_NORMAL,
-  /// Primary color multiplied with lighting
-  CS_BUFFER_COLOR_MASK = 1 << CS_BUFFER_COLOR,
   /// Primary color 
+  CS_BUFFER_COLOR_MASK = 1 << CS_BUFFER_COLOR,
+  /// Primary color multiplied with lighting
   CS_BUFFER_COLOR_LIGHTING_MASK = 1 << CS_BUFFER_COLOR_UNLIT,
   /// Texture coordinate 0
   CS_BUFFER_TEXCOORD0_MASK = 1 << CS_BUFFER_TEXCOORD0,
@@ -302,6 +302,17 @@ public:
         accessorMask & CS_BUFFER_MAKE_MASKABLE(bufferName))
       accessor->PreGetBuffer (this, bufferName);
 
+    return buffers[bufferName];
+  }
+
+  /**
+   * Get buffer by name.
+   * This version won't call accessor
+   */
+  iRenderBuffer* GetRenderBufferNoAccessor (csRenderBufferName bufferName)
+  {
+    if (bufferName < CS_BUFFER_INDEX) return 0;
+    
     return buffers[bufferName];
   }
 

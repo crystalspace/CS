@@ -585,12 +585,8 @@ namespace lighter
       }
     }
 
-    //check
-    float totalElementArea = GetArea ();
-    for (uint i = 0; i < elementAreas.GetSize (); i++)
-    {
-      totalElementArea -= elementAreas[i];
-    }
+    patches.ShrinkBestFit ();
+    elementAreas.ShrinkBestFit ();
   }
 
   void RadPrimitive::PrepareNoPatches ()
@@ -673,6 +669,8 @@ namespace lighter
         elementAreas.Push (elArea);
       }
     }
+
+    elementAreas.ShrinkBestFit ();
   }
 
   csPoly3D RadPrimitive::BuildPoly3D () const

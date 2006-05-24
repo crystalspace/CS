@@ -1897,9 +1897,8 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
       else 
         DrawInstancesUseShader (mymesh, modes, primitivetype, iIndexbuf, bufData,
         compType, indexCompsBytes);
-
-      
-    }else
+    }
+    else
     {
       glDrawRangeElements (primitivetype, (GLuint)iIndexbuf->GetRangeStart(), 
         (GLuint)iIndexbuf->GetRangeEnd(), mymesh->indexend - mymesh->indexstart,

@@ -644,7 +644,8 @@ public:
   }
   virtual bool Advance (csTicks current_time);
 
-  virtual void NextFrame (csTicks current_time, const csVector3& /*new_pos*/)
+  virtual void NextFrame (csTicks current_time, const csVector3& /*new_pos*/,
+    uint /*currentFrame*/)
   {
     Advance (current_time);
   }

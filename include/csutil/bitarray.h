@@ -70,6 +70,10 @@ template<int InlinedBits = csBitArrayDefaultInlineBits,
   typename Allocator = CS::Memory::AllocatorMalloc>
 class csBitArrayTweakable
 {
+public:
+  typedef csBitArrayTweakable<InlinedBits, Allocator> ThisType;
+  typedef Allocator AllocatorType;
+
 private:
   template<typename BitArray> friend class csComparatorBitArray;
   template<typename BitArray> friend class csHashComputerBitArray;

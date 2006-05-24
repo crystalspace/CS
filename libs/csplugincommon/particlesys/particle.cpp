@@ -410,7 +410,8 @@ csRenderMesh **csNewParticleSystem::GetRenderMeshes (int &num,
   return &rm;
 }
 
-void csNewParticleSystem::NextFrame (csTicks current, const csVector3&)
+void csNewParticleSystem::NextFrame (csTicks current, const csVector3&,
+                                     uint /*currentFrame*/)
 {
   if (PrevTime != 0)
   {

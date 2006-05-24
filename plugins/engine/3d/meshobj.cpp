@@ -628,8 +628,9 @@ csRenderMesh** csMeshWrapper::GetRenderMeshes (int& n, iRenderView* rview,
   }
 
   csTicks lt = engine->GetLastAnimationTime ();
-  meshobj->NextFrame (lt, movable.GetPosition ());
-    
+  meshobj->NextFrame (lt, movable.GetPosition (), 
+    rview->GetCurrentFrameNumber ());
+
   csMeshWrapper *meshwrap = this;
   last_anim_time = lt;
   csMeshWrapper* lastparent = meshwrap;

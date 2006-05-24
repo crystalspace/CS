@@ -26,6 +26,8 @@
 
 #include "csextern.h"
 
+#include "csgeom/vector3.h"
+
 /**
  * Fast simple random number generator for floating point values.
  */
@@ -81,6 +83,79 @@ public:
   {
     return TWO_PI * Get();
   }
+};
+
+/**
+ * Random number generator that generates random vector with spherical distribution
+ */
+class CS_CRYSTALSPACE_EXPORT csRandomVectorGen
+{
+public:
+public:
+  /// Initialize the random number generator using current time().
+  csRandomVectorGen ()
+    : floatGen ()
+  {}
+  /// Initialize the random number generator using given seed.
+  csRandomVectorGen (unsigned int seed)
+    : floatGen (seed)
+  {}
+
+  /// Initialize the RNG using current time() as the seed value.
+  void Initialize()
+  {
+    floatGen.Initialize ();
+  }
+  /// Initialize the RNG using the supplied seed value.
+  void Initialize(unsigned int new_seed)
+  { 
+    floatGen.Initialize (new_seed);
+  }
+
+  /// Get a random vector within unit sphere
+  inline csVector3 Get ()
+  {
+    /* 
+    This is a variant of the algorithm for computing a random point
+    on the unit sphere; the algorithm is suggested in Knuth, v2,
+    3rd ed, p136; and attributed to Robert E Knop, CACM, 13 (1970),
+    326. 
+    */
+    csVector3 ret (0.0f);
+    float s, a;
+
+    do 
+    {
+      ret.x = 2.0f * floatGen.Get () - 1.0f;
+      ret.y = 2.0f * floatGen.Get () - 1.0f;
+      s = ret.SquaredNorm ();
+    } while(s > 1.0f);
+
+    ret.z = 2.0f * s - 1.0f;
+
+    a = 2.0f * sqrtf (1.0f - s);
+    ret.x *= a;
+    ret.y *= a;
+
+//    float x1, x2, x1sq, x2sq;
+//    while (!haveNrs)
+//    {
+//      x1 = floatGen.Get (-1, 1);
+//      x2 = floatGen.Get (-1, 1);
+//      x1sq = x1*x1;
+//      x2sq = x2*x2;
+//      if ( (x1sq)+(x2sq) < 1) haveNrs = true;
+//    }
+//    csVector3 ret;
+//    ret.x = 2*x1*sqrtf(1-x1sq-x2sq);
+//    ret.y = 2*x2*sqrtf(1-x1sq-x2sq);
+//    ret.z = 1-2*(x1sq+x2sq);
+
+    return ret;
+  }
+
+private:
+  csRandomFloatGen floatGen;
 };
 
 #endif // __CS_CSUTIL_FLOATRAND_H__

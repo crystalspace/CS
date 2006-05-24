@@ -60,6 +60,11 @@
 template <class T, class Allocator = CS::Memory::AllocatorMalloc>
 class csBlockAllocator
 {
+public:
+  typedef csBlockAllocator<T, Allocator> ThisType;
+  typedef T ValueType;
+  typedef Allocator AllocatorType;
+
 protected: // 'protected' allows access by test-suite.
   struct FreeNode
   {

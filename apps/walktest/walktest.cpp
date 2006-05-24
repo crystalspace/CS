@@ -996,6 +996,13 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
     return false;
   }
 
+  //Must have before help is called
+  name_reg = csEventNameRegistry::GetRegistry (object_reg);
+  Process = csevProcess (name_reg);
+  FinalProcess = csevFinalProcess (name_reg);
+  CommandLineHelp = csevCommandLineHelp (name_reg);
+  
+
   // Check for commandline help.
   if (csCommandLineHelper::CheckHelp (object_reg))
   {
@@ -1035,10 +1042,6 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
     return false;
   }
 
-  name_reg = csEventNameRegistry::GetRegistry (object_reg);
-  Process = csevProcess (name_reg);
-  FinalProcess = csevFinalProcess (name_reg);
-  CommandLineHelp = csevCommandLineHelp (name_reg);
   CanvasHidden = csevCanvasHidden (name_reg, myG2D);
   CanvasExposed = csevCanvasExposed (name_reg, myG2D);
   CanvasResize = csevCanvasResize (name_reg, myG2D);

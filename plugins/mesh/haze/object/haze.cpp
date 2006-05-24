@@ -899,7 +899,7 @@ void csHazeMeshObject::HardTransform (const csReversibleTransform& t)
 }
 
 void csHazeMeshObject::NextFrame (csTicks /*current_time*/,
-	const csVector3& /*pos*/)
+	const csVector3& /*pos*/, uint /*currentFrame*/)
 {
   // nothing
 }

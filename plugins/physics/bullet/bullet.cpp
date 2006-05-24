@@ -412,14 +412,14 @@ const csVector3 csBulletRigidBody::GetPosition () const
 
 void csBulletRigidBody::SetOrientation (const csMatrix3& rot)
 {
-  csQuaternion q (rot);
-  pc->setOrientation (q.x, q.y, q.z, q.r);
+  csQuaternion q; q.SetMatrix (rot);
+  pc->setOrientation (q.v.x, q.v.y, q.v.z, q.w);
 }
 
 const csMatrix3 csBulletRigidBody::GetOrientation () const
 {
   csQuaternion q;
-  ms->getWorldOrientation(q.x,q.y,q.z,q.r);
+  ms->getWorldOrientation(q.v.x,q.v.y,q.v.z,q.w);
   return csMatrix3 (q).GetTranspose ();
 }
 
@@ -777,7 +777,7 @@ void csBulletCollider::FillWithColliderGeometry (csRef<iGeneralFactoryState> gen
 csOrthoTransform csBulletCollider::GetTransform ()
 {
   csQuaternion q;
-  ms->getWorldOrientation(q.x,q.y,q.z,q.r);
+  ms->getWorldOrientation(q.v.x,q.v.y,q.v.z,q.w);
   csMatrix3 rot (q);
 
   csVector3 v;
@@ -791,9 +791,9 @@ csOrthoTransform csBulletCollider::GetLocalTransform ()
 }
 void csBulletCollider::SetTransform (const csOrthoTransform& trans)
 {
-  csQuaternion q (trans.GetO2T ());
-  pc->setOrientation (q.x, q.y, q.z, q.r);
-  ms->setWorldOrientation (q.x, q.y, q.z, q.r);
+  csQuaternion q; q.SetMatrix (trans.GetO2T ());
+  pc->setOrientation (q.v.x, q.v.y, q.v.z, q.w);
+  ms->setWorldOrientation (q.v.x, q.v.y, q.v.z, q.w);
   csVector3 pos = trans.GetOrigin ();
   pc->setPosition (pos.x, pos.y, pos.z);
   ms->setWorldPosition (pos.x, pos.y, pos.z);

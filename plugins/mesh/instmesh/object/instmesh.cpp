@@ -202,9 +202,7 @@ void csInstmeshMeshObject::SetInstanceVariable (size_t instance_id, csShaderVari
   }
   if (var_id != -1)
   {
-    csArray<csInstance*> inst =
-      instances.GetAll<csArrayElementHandler<csInstance*>,
-      CS::Memory::AllocatorMalloc > (instance_id);
+    csArray<csInstance*> inst = instances.GetAll (instance_id);
 
     for (size_t i = 0; i < inst.GetSize (); i++)
       if (inst[i]->id == instance_id) 

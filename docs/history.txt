@@ -24,7 +24,23 @@ chronological order.
 	  different variants.
 	- Jorrit fixed csHash so it compiles again.
 	- Jorrit did an optimization in genmesh lighting in case
-	  --fullbright is selected.
+	  --fullbright is selected.	
+	- Marten made a whole bunch of changes:
+	    - Added methods to csOBB to access the base matrix.
+	    - Rewrote csQuaternion a bit to make it more efficient and easier to 
+	      use.
+	    - Added a "UnitAxisClamped" which returns an unit-length axis-clamped
+	      version of a vector.
+	    - Added currentFrame number to iMeshObject::NextFrame and updated
+	      all mesh objects for the change.
+	    - Force csQsqrt/csQisqrt to be inlined.
+	    - Added one more version of CS::ForEach to work on normal arrays 
+	      instead of iterators.
+	    - Added a number of public typedefs to the standard containers to allow
+	      easier access of template parameters.
+	    - Added a csRandomVectorGen which generates a spherically uniform
+	      unit-length random vector.
+	    - Small bugfix in GL-renderer buffer handling.
 23-May-2006
 	- res fixed bugplug to properly accept commands via keys again.
         - acraig made iGenMeshAnimationControl virtually inherrit from iBase.

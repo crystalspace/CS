@@ -356,6 +356,13 @@ public:
   /// Get all the elements with the given key, or empty if there are none.
   csArray<T> GetAll (const K& key) const
   {
+    return GetAll<csArray<T>::ElementHandlerType, csArray<T>::AllocatorType> (key);
+  }
+
+  /// Get all the elements with the given key, or empty if there are none.
+  template<typename H, typename M>
+  csArray<T, H, M> GetAll (const K& key) const
+  {
     if (Elements.GetSize() == 0) return csArray<T> ();
     const ElementArray& values = 
       Elements[csHashComputer<K>::ComputeHash (key) % Modulo];

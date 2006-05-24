@@ -58,10 +58,8 @@ public:
    * SetPolygonMesh<xxx>()!
    */
   csObjectModel (iBase* parent = 0)
-    : scfImplementationType (this, parent)
+    : scfImplementationType (this, parent), shapenr (-1), polymesh_base (0)
   {
-    shapenr = -1;
-    polymesh_base = 0;
   }
 
   virtual ~csObjectModel () {}

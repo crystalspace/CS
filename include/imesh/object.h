@@ -154,7 +154,8 @@ struct iMeshObject : public virtual iBase
   /**
    * Control animation of this object.
    */
-  virtual void NextFrame (csTicks current_time,const csVector3& pos) = 0;
+  virtual void NextFrame (csTicks current_time,const csVector3& pos,
+    uint currentFrame) = 0;
 
   /**
    * Do a hard transform of this object.

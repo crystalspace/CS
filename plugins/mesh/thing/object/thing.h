@@ -995,7 +995,8 @@ public:
   virtual void SetVisibleCallback (iMeshObjectDrawCallback* /*cb*/) { }
   virtual iMeshObjectDrawCallback* GetVisibleCallback () const
   { return 0; }
-  virtual void NextFrame (csTicks /*current_time*/,const csVector3& /*pos*/)
+  virtual void NextFrame (csTicks /*current_time*/,const csVector3& /*pos*/,
+    uint /*currentFrame*/)
   { }
   virtual void SetMeshWrapper (iMeshWrapper* lp) { logparent = lp; }
   virtual iMeshWrapper* GetMeshWrapper () const { return logparent; }

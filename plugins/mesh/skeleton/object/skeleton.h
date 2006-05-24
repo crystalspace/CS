@@ -94,7 +94,7 @@ public:
   virtual void SetTransform (const csReversibleTransform &transform) 
   {
     csSkeletonBone::transform = transform;
-    rot_quat = csQuaternion(transform.GetT2O());
+    rot_quat.SetMatrix (transform.GetT2O());
   }
   virtual csReversibleTransform &GetFullTransform () 
     { return full_transform; }

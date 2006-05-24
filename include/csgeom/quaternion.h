@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2000 by Norman Kramer
+                  2006 by Marten Svanfeldt 
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -35,165 +36,229 @@ class csMatrix3;
 
 /**
  * Class for a quaternion.
+ * A SE3 rotation represented as a normalized quaternion
  */
 class CS_CRYSTALSPACE_EXPORT csQuaternion
 {
 public:
-  /// Initialize a quaternion with specific values.
-  inline void Init (float theR, float theX, float theY, float theZ)
-  { r = theR; x = theX; y = theY; z = theZ; }
+  // Constructors
 
-  /// Construct a 0,0,0,0 quaternion.
-  csQuaternion () { Init(0, 0, 0, 0 ); }
-  /// Construct a quaternion with the given parameters.
-  csQuaternion (float theR, float theX=0.0, float theY=0.0, float theZ=0.0)
-  { Init (theR, theX, theY, theZ ); }
-  /// Copy constructor.
-  csQuaternion (const csQuaternion& q) { Init (q.r, q.x, q.y, q.z); }
-  /// Construct quaternion from a vector.
-  csQuaternion (const csVector3& q) { Init (0, q.x, q.y, q.z); }
+  /// Initialize with identity
+  csQuaternion ()
+    : v (0.0f), w (1.0f)
+  {}
 
-  /// Construct quaternion from a matrix
-  csQuaternion (const csMatrix3& smat);
+  /// Initialize with given values. Does not normalize
+  csQuaternion (float x, float y, float z, float w)
+    : v (x, y, z), w (w)
+  {}
 
-  /// Add two quaternions.
-  inline friend csQuaternion operator+ (const csQuaternion& q1,
-  	const csQuaternion& q2)
+  /// Construct from a vector and given w value
+  csQuaternion (const csVector3& v, float w)
+    : v (v), w (w)
+  {}
+
+  /// Copy-constructor
+  csQuaternion (const csQuaternion& q)
+    : v (q.v), w (q.w)
+  {}
+  
+  /// Set quaternion to identity rotation
+  inline void SetIdentity () 
   {
-    return csQuaternion (q1.r + q2.r, q1.x + q2.x, q1.y + q2.y, q1.z + q2.z );
+    v.Set (0.0f); w = 1.0f;
   }
 
-  /// Subtract two quaternions.
-  inline friend csQuaternion operator- (const csQuaternion& q1,
-  	const csQuaternion& q2)
+  /// Add two quaternions
+  inline friend csQuaternion operator+ (const csQuaternion& q1, 
+    const csQuaternion& q2)
   {
-    return csQuaternion (q1.r - q2.r, q1.x - q2.x, q1.y - q2.y, q1.z - q2.z );
+    return csQuaternion (q1.v+q2.v, q1.w+q2.w);
   }
 
-  /// Multiply two quaternions.
-  inline friend csQuaternion operator* (const csQuaternion& q1,
-  	const csQuaternion& q2)
+  /// Add quaternion to this one
+  inline csQuaternion& operator+= (const csQuaternion& q)
   {
-    return csQuaternion (q1.r*q2.r -  q1.x*q2.x - q1.y*q2.y - q1.z*q2.z,
-             q1.y*q2.z -  q1.z*q2.y + q1.r*q2.x + q1.x*q2.r,
-             q1.z*q2.x -  q1.x*q2.z + q1.r*q2.y + q1.y*q2.r,
-             q1.x*q2.y -  q1.y*q2.x + q1.r*q2.z + q1.z*q2.r);
-  }
-
-  /// Multiply two quaternions.
-  csQuaternion& operator*= (const csQuaternion& q2)
-  {
-    Init (r*q2.r -  x*q2.x - y*q2.y - z*q2.z,
-      y*q2.z -  z*q2.y + r*q2.x + x*q2.r,
-      z*q2.x -  x*q2.z + r*q2.y + y*q2.r,
-      x*q2.y -  y*q2.x + r*q2.z + z*q2.r);
+    v += q.v; w += q.w;
     return *this;
   }
 
-  ///
-  void Conjugate () { Init (r, -x, -y, -z); }
-
-  /// Negate all parameters of the quaternion.
-  void Negate () { Init(-r, -x, -y, -z); }
-
-  /// Invert the orientation of this quaternion.
-  void Invert();
-
-  /**
-   * Get an axis-angle representation of this orientation.
-   * @param axis this vector specifies the axis on which to make a rotation
-   * @param phi the angle (in radians) about this axis
-   */
-  void GetAxisAngle(csVector3& axis, float& phi) const;
-
-  /**
-   * Set the quaternion using an axis-angle representation.
-   * @param axis this vector specifies the axis on which to make a rotation
-   * @param phi the angle (in radians) about this axis
-   */
-  void SetWithAxisAngle(csVector3 axis, float phi);
-
-  /**
-   * Prepare a rotation quaternion, we do a rotation around vec by
-   * an angle of "angle". Note that vec needs to be a normalized
-   * vector (we don't check this).
-   */
-  void PrepRotation (float angle, csVector3 vec)
+  /// Subtract two quaternions
+  inline friend csQuaternion operator- (const csQuaternion& q1, 
+    const csQuaternion& q2)
   {
-    double theSin = sin (angle / 2.0f);
-    Init ((float) cos (angle / 2.0f), vec.x * theSin, vec.y * theSin,
-    	vec.z * theSin);
+    return csQuaternion (q1.v-q2.v, q1.w-q2.w);
   }
 
-  /// rotated = q * vec * qConj.
-  csVector3 Rotate (csVector3 vec)
+  /// Subtract quaternion from this one
+  inline csQuaternion& operator-= (const csQuaternion& q)
   {
-    csQuaternion p (vec);
-    csQuaternion qConj (r, -x, -y, -z);
-
-    p = *this * p;
-    p *= qConj;
-    return csVector3 (p.x, p.y, p.z);
+    v -= q.v; w -= q.w;
+    return *this;
+  }
+  
+  /// Get the negative quaternion (unary minus)
+  inline csQuaternion friend operator- (const csQuaternion& q)
+  {
+    return csQuaternion (-q.v, -q.w);
   }
 
-  /// Normalize this quaternion.
-  void Normalize ()
+  /// Multiply two quaternions, Grassmann product
+  inline friend csQuaternion operator* (const csQuaternion& q1,
+    const csQuaternion& q2)
   {
-    float dist, square;
-    square = x * x + y * y + z * z + r * r;
+    return csQuaternion (q1.v*q2.w + q1.w*q2.v + q1.v%q2.v, 
+      q1.w*q2.w - q1.v*q2.v);
+  }
 
-    if (square > 0.0) dist = (float)csQisqrt(square);
-    else dist = 1;
+  /// Multiply this quaternion by another
+  inline csQuaternion& operator*= (const csQuaternion& q)
+  {
+    csVector3 newV = v*q.w + w*q.v + v%q.v;
+    w = w*q.w - v*q.v;
+    v = newV;
+    return *this;
+  }
 
-    x *= dist;
-    y *= dist;
-    z *= dist;
-    r *= dist;
+  /// Multiply by scalar
+  inline friend csQuaternion operator* (const csQuaternion q, float f)
+  {
+    return csQuaternion (q.v*f, q.w*f);
+  }
 
-    /*if(x*x + y*y + z*z > .999)
-    {
-      // Severe problems...
-      float inverselen = 1.0f / (x*x + y*y + z*z);
-      x *= inverselen;
-      y *= inverselen;
-      z *= inverselen;
-      if(r > 0) r = -1 + r;
-      else r = 1 + r;
-    }
+  /// Multiply by scalar
+  inline friend csQuaternion operator* (float f, const csQuaternion q)
+  {
+    return csQuaternion (q.v*f, q.w*f);
+  }
+
+  /// Divide by scalar
+  inline friend csQuaternion operator/ (const csQuaternion q, float f)
+  {
+    float invF = 1.0f/f;
+    return csQuaternion (q.v*invF, q.w*invF);
+  }
+
+  /// Divide by scalar
+  inline friend csQuaternion operator/ (float f, const csQuaternion q)
+  {
+    float invF = 1.0f/f;
+    return csQuaternion (q.v*invF, q.w*invF);
+  }
+
+  /// Get the conjugate quaternion
+  inline csQuaternion GetConjugate () const
+  {
+    return csQuaternion (-v, w);
+  }
+
+  /// Set this quaternion to its own conjugate
+  inline void Conjugate () 
+  {
+    v = -v;
+  }
+
+  /// Return euclidian inner-product (dot)
+  inline float Dot (const csQuaternion& q) const
+  {
+    return v*q.v + w*q.w;
+  }
+
+  /// Get the squared norm of this quaternion (equals dot with itself)
+  inline float SquaredNorm () const
+  {
+    return Dot (*this);
+  }
+
+  /// Get the norm of this quaternion
+  inline float Norm () const
+  {
+    return csQsqrt (SquaredNorm ());
+  }
+
+  /**
+   * Return a unit-lenght version of this quaternion (also called sgn)
+   * Attempting to normalize a zero-length quaternion will result in a divide by
+   * zero error.  This is as it should be... fix the calling code.
+   */
+  inline csQuaternion Unit () const
+  {
+    return (*this) / Norm ();
+  }
+
+  /**
+   * Rotate vector by quaternion.
+   */
+  inline csVector3 Rotate (const csVector3& src) const
+  {
+    return 2.0f * (src * (w*w - 0.5f) + w*(v%src) + v*(v*src));
+  }
+
+  /**
+   * Set a quaternion using axis-angle representation
+   * \param axis
+   * Rotation axis. Should be normalized before calling this function.
+   * \param angle
+   * Angle to rotate about axis (in radians)
+   */
+  inline void SetAxisAngle (const csVector3& axis, float angle)
+  {
+    v = axis * sinf (angle / 2.0f);
+    w = cosf (angle / 2.0f);
+  }
+
+  /**
+   * Get a quaternion as axis-angle representation
+   * \param axis
+   * Rotation axis.
+   * \param angle
+   * Angle to rotate about axis (in radians)
+   */
+  inline void GetAxisAngle (csVector3& axis, float& angle) const
+  {
+    angle = 2.0f * acosf (w);
+    if (v.SquaredNorm () != 0)
+      axis = v.Unit ();
     else
-    {
-      r = csQsqrt(1.0f - x*x - y*y - z*z);
-      }*/
+      axis.Set (1.0f, 0.0f, 0.0f);
   }
 
   /**
-   * Convert a set of Euler angles to a Quaternion.
-   * Takes a (X,Y,Z) rather than Yaw-Pitch-Roll (Y,X,Z)
-   * The output is NOT Normalized, if you wish to do so, normalize it yourself.
+   * Set quaternion using Euler angles X, Y, Z, expressed in radians
    */
-  void SetWithEuler (const csVector3 &rot);
+  void SetEulerAngles (const csVector3& angles);
 
   /**
-   * Convert a Quaternion to a set of Euler angles.
-   * Returns a (X,Y,Z) rather than Yaw-Pitch-Roll (Y,X,Z).
+   * Get quaternion as three Euler angles X, Y, Z, expressed in radians
    */
-  void GetEulerAngles (csVector3& angles, bool radians = false);
+  csVector3 GetEulerAngles () const; 
 
   /**
-   * Return an Axis Angle representation of this Quaternion.
+   * Set quaternion using 3x3 rotation matrix
    */
-  csQuaternion ToAxisAngle () const;
+  void SetMatrix (const csMatrix3& matrix);
 
   /**
-   * Spherical Linear Interpolation between two quaternions
-   * Calculated between this class & the second quaternion by the slerp
-   * factor and returned as a new quaternion
+   * Get quaternion as a 3x3 rotation matrix
    */
-  csQuaternion Slerp (const csQuaternion &quat2, float slerp) const;
+  csMatrix3 GetMatrix () const;
 
-  //csQuaternion Lerp(const csQuaternion& quat2, float ratio) const;
+  /**
+   * Interpolate this quaternion with another using normalized linear 
+   * interpolation (nlerp) using given interpolation factor.
+   */
+  csQuaternion NLerp (const csQuaternion& q2, float t) const;
 
-  float r,x,y,z;
+  /**
+   * Interpolate this quaternion with another using spherical linear
+   * interpolation (slerp) using given interpolation factor.
+   */
+  csQuaternion SLerp (const csQuaternion& q2, float t) const;
+
+
+  // Data
+  csVector3 v;
+  float w;
 };
 
 /** @} */

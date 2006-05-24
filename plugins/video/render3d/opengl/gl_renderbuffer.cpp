@@ -124,6 +124,9 @@ bool csGLVBOBufferManager::ActivateBuffer (iRenderBuffer *buffer)
   }
   else
   {
+    if (buffer->GetSize () == 0)
+      return false;
+
     //need a new slot
     slot = FindEmptySlot (buffer->GetSize(), buffer->IsIndexBuffer());
     AttachBuffer (slot, buffer);

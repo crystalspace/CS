@@ -1418,7 +1418,8 @@ public:
   {
     return vis_cb;
   }
-  virtual void NextFrame (csTicks current_time,const csVector3& new_pos)
+  virtual void NextFrame (csTicks current_time,const csVector3& new_pos, 
+    uint /*currentFrame*/)
   {   
     OldNextFrame (current_time, new_pos, single_step, !loopaction);
   }

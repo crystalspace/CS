@@ -37,7 +37,7 @@ namespace CS
    * \endcode
    */
   template <class T, class Fn>
-  inline Fn& ForEach (T it, Fn& Func)
+  CS_FORCEINLINE Fn& ForEach (T it, Fn& Func)
   {
     while (it.HasNext ())
     {
@@ -47,11 +47,26 @@ namespace CS
   }
 
   /**
+   * Iterate over all elements in the list and perform operation
+   * given by Func.
+   */
+  template <class T, class Fn>
+  CS_FORCEINLINE Fn& ForEach (T* start, T* end, Fn& Func)
+  {
+    while (start != end)
+    {
+      Func (*start);
+      start++;
+    }
+    return Func;
+  }
+
+  /**
    * Iterate over all elements in the iterator and perform operation
    * given by Func.
    */
   template <class T, class Fn, class P>
-  inline Fn& ForEach (T it, Fn& Func, P& p)
+  CS_FORCEINLINE Fn& ForEach (T it, Fn& Func, P& p)
   {
     while (it.HasNext ())
     {
@@ -68,7 +83,7 @@ namespace CS
     { }
 
     template<class T>
-    bool operator () (T obj)
+    CS_FORCEINLINE bool operator () (T obj)
     {
       return (op1 (obj) && op2 (obj));
     }

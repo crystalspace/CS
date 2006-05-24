@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2000 by Norman Kramer
+                  2006 by Marten Svanfeldt
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -19,231 +20,164 @@
 
 #include "csgeom/matrix3.h"
 #include "csgeom/quaternion.h"
+#include "csgeom/math.h"
 
-#define EULERTOQUATCONST      0.0174532925199 // PI*1/(360/2)
-#define QUATTOAXISANGLECONST  114.591559026 \
- \
-  // (360/2)*(1/PI)*2
-void csQuaternion::SetWithEuler (const csVector3 &rot)
+
+void csQuaternion::SetEulerAngles (const csVector3& angles)
 {
-  float rx, ry, rz, tx, ty, tz, cx, cy, cz, sx, sy, sz, cc, cs, sc, ss;
+  csVector3 halfAngles = angles / 2.0f;
+  const float c1 = cosf (halfAngles.y);
+  const float s1 = sinf (halfAngles.y);
+  const float c2 = cosf (halfAngles.x);
+  const float s2 = sinf (halfAngles.x);
+  const float c3 = cosf (halfAngles.z);
+  const float s3 = sinf (halfAngles.z);
 
-  // FIRST STEP, CONVERT ANGLES TO RADIANS
-  rx = rot.x * (float)EULERTOQUATCONST;
-  ry = rot.y * (float)EULERTOQUATCONST;
-  rz = rot.z * (float)EULERTOQUATCONST;
+  const float c1c2 = c1*c2;
+  const float s1s2 = s1*s2;
 
-  // GET THE HALF ANGLES
-  tx = rx * (float)0.5;
-  ty = ry * (float)0.5;
-  tz = rz * (float)0.5;
-  cx = (float)cos (tx);
-  cy = (float)cos (ty);
-  cz = (float)cos (tz);
-  sx = (float)sin (tx);
-  sy = (float)sin (ty);
-  sz = (float)sin (tz);
-
-  cc = cx * cz;
-  cs = cx * sz;
-  sc = sx * cz;
-  ss = sx * sz;
-
-  x = (cy * sc) - (sy * cs);
-  y = (cy * ss) + (sy * cc);
-  z = (cy * cs) - (sy * sc);
-  r = (cy * cc) + (sy * ss);
+  w = c1c2*c3 - s1s2*s3;
+  v.x = c1c2*s3 + s1s2*c3;
+  v.y = s1*c2*c3 + c1*s2*s3;
+  v.z = c1*s2*c3 - s1*c2*s3;
 }
 
-csQuaternion csQuaternion::ToAxisAngle () const
+
+csVector3 csQuaternion::GetEulerAngles () const
 {
-  float invscale, tr;
+  csVector3 ret;
 
-  tr = (float)acos (r);
-  invscale = 1.0f / ((float)sin (tr));
-  return csQuaternion (
-      tr * (float)QUATTOAXISANGLECONST,
-      x * invscale,
-      y * invscale,
-      z * invscale);
-}
-
-#define SLERPDELTA  0.0001f \
- \
-  // Difference at which to lerp instead of slerp
-csQuaternion csQuaternion::Slerp (
-  const csQuaternion &quat2,
-  float slerp) const
-{
-  double omega, cosom, invsinom, scale0, scale1;
-
-  csQuaternion quato(quat2);
-
-  // decide if one of the quaternions is backwards
-  double a = (x-quat2.x)*(x-quat2.x) + (y-quat2.y)*(y-quat2.y) + (z-quat2.z)*(z-quat2.z) + (r-quat2.r)*(r-quat2.r);
-  double b = (x+quat2.x)*(x+quat2.x) + (y+quat2.y)*(y+quat2.y) + (z+quat2.z)*(z+quat2.z) + (r+quat2.r)*(r+quat2.r);
-  if (a > b)
+  const float test = v.x*v.y + v.z*w;
+  
+  if (test > 0.499f) //"north pole" singularitv.y
   {
-      quato.Negate();
+    return csVector3 (PI/2.0f, 2.0f * atan2f (v.x, w), 0);
+  }
+  else if (test < -0.499f) //"south pole" singularitv.y
+  {
+    return csVector3 (-PI/2.0f, -2.0f * atan2f (v.x,w), 0);
   }
 
-  // Calculate dot between quats
-  cosom = x * quato.x + y * quato.y + z * quato.z + r * quato.r;
+  const float sqx2 = 2.0f*v.x*v.x;
+  const float sqy2 = 2.0f*v.y*v.y;
+  const float sqz2 = 2.0f*v.z*v.z;
 
-  // Make sure the two quaternions are not exactly opposite? (within a little
-  // slop).
-  if ((1.0f + cosom) > SLERPDELTA)
+  return csVector3 (
+    asinf (2.0f*test), 
+    atan2f (2.0f*(v.y*w - v.x*v.z), 1.0f - sqy2 - sqz2),
+    atan2f (2.0f*(v.x*w - v.y*v.z), 1.0f - sqx2 - sqz2));
+}
+
+void csQuaternion::SetMatrix (const csMatrix3& matrix)
+{
+  // Ken Shoemake's article in 1987 SIGGRAPH course notes
+  const float trace = matrix.m11 + matrix.m22 + matrix.m33;
+
+  if (trace > 0.0f)
   {
-    // Are they more than a little bit different?  Avoid a divided by zero
-    // and lerp if not.
-    if ((1.0f - cosom) > SLERPDELTA)
+    // Quick-route
+    float s = 1.0f / sqrtf (trace + 1.0f);
+    w = 0.25f / s;
+    v.x = (matrix.m23 - matrix.m32) * s;
+    v.y = (matrix.m31 - matrix.m13) * s;
+    v.z = (matrix.m12 - matrix.m21) * s;
+  }
+  else
+  {
+    //Check biggest diagonal elmenet
+    if (matrix.m11 > matrix.m22 && matrix.m11 > matrix.m33)
     {
-      // Yes, do a slerp
-      omega = acos (cosom);
-      invsinom = 1.0f / sin (omega);
-      scale0 = sin ((1.0f - slerp) * omega) * invsinom;
-      scale1 = sin (slerp * omega) * invsinom;
+      //X biggest
+      float s = 1.0f / (2.0f * sqrtf (1.0f + matrix.m11 - matrix.m22 - matrix.m33));
+      w = (matrix.m32 - matrix.m23) * s;
+      v.x = 0.25f / s;
+      v.y = (matrix.m21 + matrix.m12) * s;
+      v.z = (matrix.m31 + matrix.m13) * s;
+    }
+    else if (matrix.m22 > matrix.m33)
+    {
+      //Y biggest
+      float s = 1.0f / (2.0f * sqrtf (1.0f + matrix.m22 - matrix.m11 - matrix.m33));
+      w = (matrix.m31 - matrix.m13) * s;
+      v.x = (matrix.m21 + matrix.m12) * s;
+      v.y = 0.25f / s;
+      v.z = (matrix.m32 + matrix.m23) * s;
     }
     else
     {
-      // Not a very big difference, do a lerp
-      scale0 = 1.0f - slerp;
-      scale1 = slerp;
+      //Z biggest
+      float s = 1.0f / (2.0f * sqrtf (1.0f + matrix.m33 - matrix.m11 - matrix.m22));
+      w = (matrix.m21 - matrix.m12) * s;
+      v.x = (matrix.m31 + matrix.m13) * s;
+      v.y = (matrix.m32 + matrix.m23) * s;
+      v.z = 0.25f / s;
     }
+  }
+}
+
+csMatrix3 csQuaternion::GetMatrix () const
+{
+  const float x2 = v.x*2.0f;
+  const float y2 = v.y*2.0f;
+  const float z2 = v.z*2.0f;
+
+  const float xx2 = v.x*x2;
+  const float xy2 = v.y*x2;
+  const float xz2 = v.z*x2;
+  const float xw2 = w*x2;
+
+  const float yy2 = v.y*y2;
+  const float yz2 = v.z*y2;
+  const float yw2 = w*y2;
+
+  const float zz2 = v.z*z2;
+  const float zw2 = w*z2;
+
+  
+  return csMatrix3 (
+    1.0f - (yy2+zz2), xy2 - zw2,        xz2 + yw2,
+    xy2 + zw2,        1.0f - (xx2+zz2), yz2 - xw2,
+    xz2 - yw2,        yz2 + xw2,        1.0f - (xx2+yy2));
+}
+
+csQuaternion csQuaternion::NLerp (const csQuaternion& q2, float t) const
+{
+  return (*this + t * (q2 - (*this))).Unit ();
+}
+
+csQuaternion csQuaternion::SLerp (const csQuaternion& q2, float t) const
+{
+  //compute cos between them and clamp to -1, 1
+  const float dA = csClamp (Dot (q2), 1.0f, -1.0f); 
+
+  if (dA > 0.998f) //really small, NLerp instead of slerp
+  {
+    return NLerp (q2, t);
+  }
+  else if (dA < -0.998f) //almost opposite, special treatment too
+  {
+    const float s0 = sinf ((1.0f - t)*PI);
+    const float s1 = sinf (t*PI);
 
     return csQuaternion (
-        scale0 * r + scale1 * quato.r,
-        scale0 * x + scale1 * quato.x,
-        scale0 * y + scale1 * quato.y,
-        scale0 * z + scale1 * quato.z);
+      s0*v.x - s1*q2.v.y,
+      s0*v.y + s1*q2.v.x,
+      s0*v.z - s1*q2.w,
+      s0*w + s1*q2.v.z);
   }
 
-  // The quaternions are nearly opposite so to avoid a divided by zero error
-  // Calculate a perpendicular quaternion and slerp that direction
-  scale0 = sin ((1.0f - slerp) * PI);
-  scale1 = sin (slerp * PI);
-  return csQuaternion (
-      scale0 * r + scale1 * quato.z,
-      scale0 * x + scale1 * -quato.y,
-      scale0 * y + scale1 * quato.x,
-      scale0 * z + scale1 * -quato.r);
-}
+  const float angle = acosf (dA);
 
-csQuaternion::csQuaternion(const csMatrix3& matrix)
-{
-      float mat[3][3] = { { matrix.m11, matrix.m21, matrix.m31 },
-                          { matrix.m12, matrix.m22, matrix.m32 },
-                          { matrix.m13, matrix.m23, matrix.m33 } };
-      float qx, qy, qz, qw;
-      // Algorithm in Ken Shoemake's article in 1987 SIGGRAPH course notes
-      // article "Quaternion Calculus and Fast Animation".
+  // Do a normal slerp
+  const float invSinA = 1.0/sinf (angle);
+  const float s0 = sinf ((1.0f - t)*angle) * invSinA;
+  const float s1 = sinf (t*angle) * invSinA;
 
-      float fTrace = mat[0][0] + mat[1][1] + mat[2][2];
-      float fRoot;
-
-      if( fTrace > 0.0 )
-      {
-        fRoot = sqrtf( fTrace + 1.0f );
-
-        qw = 0.5f * fRoot;
-
-        fRoot = 0.5f / fRoot;
-
-        qx = ( mat[2][1] - mat[1][2] ) * fRoot;
-        qy = ( mat[0][2] - mat[2][0] ) * fRoot;
-        qz = ( mat[1][0] - mat[0][1] ) * fRoot;
-      }
-      else
-      {
-        int iNext[3] = { 1, 2, 0 };
-
-        int i = 0;
-        if( mat[1][1] > mat[0][0] )
-          i = 1;
-
-        if( mat[2][2] > mat[i][i] )
-          i = 2;
-
-        int j = iNext[i];
-        int k = iNext[j];
-
-        fRoot = sqrtf( mat[i][i] - mat[j][j] - mat[k][k] + 1.0f );
-
-        float *apfQuat[3] = { &qx, &qy, &qz };
-
-        *(apfQuat[i]) = 0.5f * fRoot;
-
-        fRoot = 0.5f / fRoot;
-
-        qw = ( mat[k][j] - mat[j][k] ) * fRoot;
-
-        *(apfQuat[j]) = ( mat[j][i] + mat[i][j] ) * fRoot;
-        *(apfQuat[k]) = ( mat[k][i] + mat[i][k] ) * fRoot;
-      }
-
-	  x = qx;
-	  y = qy;
-	  z = qz;
-	  r = qw;
-      Normalize();
-}
-
-void csQuaternion::Invert()
-{
-    float norm, invNorm;
-
-    norm = x * x + y * y + z * z + r * r;
-
-    invNorm = (float) (1.0 / norm);
-
-    x = -x * invNorm;
-    y = -y * invNorm;
-    z = -z * invNorm;
-    r =  r * invNorm;
-}
-
-void csQuaternion::GetAxisAngle(csVector3& axis, float& phi) const
-{
-    phi = 2.0 * acos(r);
-    float ss = sin(phi/2.0);
-    if (ss != 0) {
-        axis.x = x / ss;
-        axis.y = y / ss;
-        axis.z = z / ss;
-    }
-    else
-    {
-        axis.x = 0;
-        axis.y = 0;
-        axis.z = 1;
-    }
-}
-
-void csQuaternion::SetWithAxisAngle(csVector3 axis, float phi)
-{
-    axis.Normalize();
-    float ss = sin(phi/2.0);
-    r = cos(phi/2.0);
-    x = axis.x * ss;
-    y = axis.y * ss;
-    z = axis.z * ss;
-}
-
-void csQuaternion::GetEulerAngles (csVector3& angles, bool radians)
-{
-  const float rad2deg = radians ? 1.0f : 180.0f / PI;
-  const float case1 = PI / 2.0f * 180.0f / rad2deg;
-  const float case2 = -PI / 2.0f * rad2deg;
-
-  angles.z = atan2 (2.0f * (x*y + r*z), (r*r + x*x - y*y - z*z)) * rad2deg;
-  float sine = -2.0f * (x*z - r*y);
-
-  if(sine >= 1)     //cases where value is 1 or -1 cause NAN
-    angles.y = case1; //PI / 2 * 180.0f / rad2deg;
-  else if ( sine <= -1 )
-    angles.y = case2;//-PI / 2 * rad2deg;
-  else
-    angles.y = asin (sine) * rad2deg;
-
-  angles.x = atan2 (2.0f * (r*x + y*z), (r*r - x*x - y*y + z*z)) * rad2deg;
+  if (angle < 0.0f)
+  {
+    //need to invert
+    return (s0*(*this) + -s1*q2).Unit ();
+  }
+  
+  return s0*(*this) + s1*q2;
 }

@@ -638,8 +638,9 @@ bool csSpriteCal3DMeshObjectFactory::RemoveAnimCallback(
 void csSpriteCal3DMeshObjectFactory::HardTransform (
     const csReversibleTransform& t)
 {
-  csQuaternion quat (t.GetO2T ());
-  CalQuaternion quatrot(quat.x,quat.y,quat.z,quat.r);
+  csQuaternion quat;
+  quat.SetMatrix (t.GetO2T ());
+  CalQuaternion quatrot(quat.v.x,quat.v.y,quat.v.z,quat.w);
   csVector3 trans (t.GetOrigin () );
   CalVector translation (trans.x,trans.y,trans.z);
 

@@ -98,7 +98,8 @@ public:
   {
     return vis_cb;
   }
-  virtual void NextFrame (csTicks current_time, const csVector3& /*pos*/);
+  virtual void NextFrame (csTicks current_time, const csVector3& /*pos*/,
+    uint /*currentFrame*/);
   virtual bool WantToDie () const { return false; }
   virtual void HardTransform (const csReversibleTransform& t);
   virtual bool SupportsHardTransform () const { return false; }

@@ -193,12 +193,12 @@ void csSkeletonBone::UpdateTransform ()
           if (script.GetFactor () >= min)
           {
             max = script.GetFactor ();
-            q = q.Slerp (b_tr->quat, max_over_factor);
+            q = q.SLerp (b_tr->quat, max_over_factor);
           }
           else
           {
             min = script.GetFactor ();
-            q = b_tr->quat.Slerp (q, max_over_factor);
+            q = b_tr->quat.SLerp (q, max_over_factor);
           }
           script_factors_total = min + max_over_factor;
         }
@@ -539,7 +539,9 @@ void csSkeletonRunnable::ParseFrame(csSkeletonScriptKeyFrame *frame)
       m.elapsed_ticks = 0;
       m.curr_quat = m.bone_transform->quat;
       m.position = bone_transform->pos;
-      m.quat = csQuaternion (transform.GetT2O());
+      m.type = 1;
+      //m.quat = csQuaternion (transform.GetT2O());
+      m.quat.SetMatrix (transform.GetT2O());
       m.final_position = transform.GetOrigin();
 
       csVector3 delta;
@@ -644,7 +646,7 @@ bool csSkeletonRunnable::Do (csTicks elapsed, bool& stop, csTicks & left)
 
         float slerp = 
           (float)delay.current/ (float)delay.final;
-        m.bone_transform->quat = m.curr_quat.Slerp (m.quat, slerp);
+        m.bone_transform->quat = m.curr_quat.SLerp (m.quat, slerp);
       }
       else
       {
@@ -665,10 +667,10 @@ bool csSkeletonRunnable::Do (csTicks elapsed, bool& stop, csTicks & left)
         float slerp = 
           ( (float) (delay.current - m.elapsed_ticks)/ (float)delay.final);
         csQuaternion zero_quat;
-        zero_quat.SetWithEuler(csVector3(0));
+        
 
         //m.bone_transform->quat = zero_quat.Slerp (m.quat, slerp);
-        m.curr_quat = zero_quat.Slerp (m.quat, slerp);
+        m.curr_quat = zero_quat.SLerp (m.quat, slerp);
         m.bone_transform->quat = m.curr_quat*m.bone_transform->quat;
         m.elapsed_ticks = delay.current;
         //printf("m.curr_quat %.3f %.3f %.3f %.3f\n", m.curr_quat.x, m.curr_quat.y, m.curr_quat.z, m.curr_quat.r);
@@ -684,10 +686,9 @@ bool csSkeletonRunnable::Do (csTicks elapsed, bool& stop, csTicks & left)
         float slerp = 
           ( (float) (delay.final - m.elapsed_ticks)/ (float)delay.final);
         csQuaternion zero_quat;
-        zero_quat.SetWithEuler(csVector3(0));
 
         //m.bone_transform->quat = zero_quat.Slerp (m.quat, slerp);
-        m.curr_quat = zero_quat.Slerp (m.quat, slerp);
+        m.curr_quat = zero_quat.SLerp (m.quat, slerp);
         m.bone_transform->quat = m.curr_quat*m.bone_transform->quat;
 
         //printf("m.quat %.3f %.3f %.3f %.3f\n", m.quat.x, m.quat.y, m.quat.z, m.quat.r);

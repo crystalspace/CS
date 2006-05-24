@@ -682,7 +682,8 @@ public:
   virtual void SetVisibleCallback (iMeshObjectDrawCallback* /*cb*/) { }
   virtual iMeshObjectDrawCallback* GetVisibleCallback () const
   { return 0; }
-  virtual void NextFrame (csTicks /*current_time*/,const csVector3& /*pos*/)
+  virtual void NextFrame (csTicks /*current_time*/,const csVector3& /*pos*/,
+    uint /*currentFrame*/)
   { }
   virtual bool SupportsHardTransform () const { return true; }
   virtual bool HitBeamOutline (const csVector3& /*start*/,

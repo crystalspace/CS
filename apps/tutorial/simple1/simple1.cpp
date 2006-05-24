@@ -261,7 +261,47 @@ void Simple::CreateRoom ()
 
   light = engine->CreateLight(0, csVector3(0, 5, -3), 10, csColor(0, 1, 0));
   ll->Add (light);
+
+  // Create particle system
+  csRef<iPluginManager> plugin_mgr (
+    CS_QUERY_REGISTRY (object_registry, iPluginManager));
+
+  csRef<iMeshFactoryWrapper> factory (engine->CreateMeshFactory (
+    "crystalspace.mesh.object.particles", "partFact"));
+
+  csRef<iMeshWrapper> mesh = engine->CreateMeshWrapper (factory, "part", room,
+    csVector3(0,2,0));
+  mesh->GetMeshObject ()->SetMaterialWrapper (tm);
+
+  csRef<iMeshObject> particleMesh = mesh->GetMeshObject ();
+  
+  {
+    csRef<iParticleSystem> partSys = scfQueryInterface<iParticleSystem> (particleMesh);
+
+    partSys->SetParticleRenderOrientation (CS_PARTICLE_CAMERAFACE_APPROX);
+    partSys->SetParticleSize (csVector2 (0.08f));    
+    partSys->SetCommonDirection (csVector3(0,1,0));
+    
+    // Get an emitter 
+    csRef<iParticleBuiltinEmitterFactory> emitFact = 
+      CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.mesh.object.particles.emitter",
+      iParticleBuiltinEmitterFactory);
+
+    csRef<iParticleBuiltinEmitterCylinder> cylEmit = emitFact->CreateCylinder ();
+
+    cylEmit->SetEmissionRate (100.0f);
+    cylEmit->SetInitialTTL (5, 5);
+    cylEmit->SetInitialVelocity (csVector3 (0.1f, 0.0f, 0.0f), csVector3 (0.0f));
+    cylEmit->SetEnabled (true);
+    cylEmit->SetParticlePlacement (CS_PARTICLE_BUILTIN_SURFACE);
+    cylEmit->SetExtent (csVector3 (3, 0, 0));
+    cylEmit->SetRadius (2);
+    
+
+    partSys->AddEmitter (cylEmit);
+  }
 }
+
 
 /*-------------------------------------------------------------------------*
  * Main function

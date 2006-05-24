@@ -201,7 +201,8 @@ public:
   void UpdateLighting (const csArray<iLightSectorInfluence*>&, iMovable*);
 
   /// calls Update() with the amount of time passed since the previous call
-  virtual void NextFrame (csTicks current_time, const csVector3& pos);
+  virtual void NextFrame (csTicks current_time, const csVector3& pos,
+    uint currentFrame);
 
   /// Set the base color
   virtual bool SetColor (const csColor& color);

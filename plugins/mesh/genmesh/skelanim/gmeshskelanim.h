@@ -126,7 +126,7 @@ public:
   virtual void SetTransform (const csReversibleTransform &transform) 
   {
     csSkelBone::transform = transform;
-    rot_quat = csQuaternion(transform.GetO2T());
+    rot_quat.SetMatrix (transform.GetO2T());
   }
   virtual csReversibleTransform &GetFullTransform () { return full_transform; }
   virtual iGenMeshSkeletonBone* GetParent () { return parent; }

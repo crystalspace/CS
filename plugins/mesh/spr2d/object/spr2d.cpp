@@ -422,7 +422,7 @@ void csSprite2DMeshObject::CreateRegularVertices (int n, bool setuv)
 }
 
 void csSprite2DMeshObject::NextFrame (csTicks current_time,
-	const csVector3& /*pos*/)
+	const csVector3& /*pos*/, uint /*currentFrame*/)
 {
   if (uvani && !uvani->halted)
   {

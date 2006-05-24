@@ -72,7 +72,19 @@ public:
 
   void AddBoundingVertex (const csVector3 &v);
   csVector3 GetCorner (int corner) const; 
-  inline const csMatrix3 &GetMatrix () const { return mMat; }
+
+  /**
+   * Get the rotation matrix for the OBB
+   */
+  inline const csMatrix3 &GetMatrix () const 
+  { return mMat; }
+
+  /**
+   * Get the rotation matrix for the OBB
+   */
+  inline csMatrix3 &GetMatrix () 
+  { return mMat; }
+
 
   /**
    * Get the diameter of this OBB.
