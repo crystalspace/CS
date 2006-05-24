@@ -356,7 +356,7 @@ public:
   /// Get all the elements with the given key, or empty if there are none.
   csArray<T> GetAll (const K& key) const
   {
-    return GetAll<csArray<T>::ElementHandlerType, csArray<T>::AllocatorType> (key);
+    return GetAll<typename csArray<T>::ElementHandlerType, typename csArray<T>::AllocatorType> (key);
   }
 
   /// Get all the elements with the given key, or empty if there are none.
