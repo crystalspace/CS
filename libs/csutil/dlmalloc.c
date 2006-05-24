@@ -3408,7 +3408,7 @@ static void* sys_alloc(mstate m, size_t nb) {
             if (end != CMFAIL)
               asize += esize;
             else {            /* Can't use; try to release */
-              CALL_MORECORE(-asize);
+              void* p = CALL_MORECORE(-asize); (void)p;
               br = CMFAIL;
             }
           }
