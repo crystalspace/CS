@@ -561,6 +561,18 @@ Type &Class::getterFunc ()                                     \
     _kill_array)
 #endif
 
+/**\def CS_FUNCTION_NAME
+ * Macro that resolves to a compiler-specific variable or string that contains 
+ * the name of the current function.
+ */
+#if defined(CS_COMPILER_GCC)
+#  define CS_FUNCTION_NAME		__PRETTY_FUNCTION__
+#elif defined(__FUNCTION__)
+#  define CS_FUNCTION_NAME		__FUNCTION__
+#else
+#  define CS_FUNCTION_NAME		"<?\?\?>"
+#endif
+
 // The following define should only be enabled if you have defined
 // a special version of overloaded new that accepts two additional
 // parameters: a (void*) pointing to the filename and an int with the
@@ -590,7 +602,7 @@ inline void operator delete (void* p, void*, int) { operator delete (p); }
 extern void* CS_CRYSTALSPACE_EXPORT operator new[] (size_t s, 
   void* filename, int line);
 inline void operator delete[] (void* p, void*, int) { operator delete[] (p); }
-#define CS_EXTENSIVE_MEMDEBUG_NEW new ((void*)__FILE__, __LINE__)
+#define CS_EXTENSIVE_MEMDEBUG_NEW new ((void*)CS_FUNCTION_NAME, __LINE__)
 #define new CS_EXTENSIVE_MEMDEBUG_NEW
 #endif
 
@@ -884,18 +896,6 @@ inline void operator delete[] (void* p, void*, int) { operator delete[] (p); }
 #  else
 #    define CS_VA_COPY(dest, src)	dest = src;
 #  endif
-#endif
-
-/**\def CS_FUNCTION_NAME
- * Macro that resolves to a compiler-specific variable or string that contains 
- * the name of the current function.
- */
-#if defined(CS_COMPILER_GCC)
-#  define CS_FUNCTION_NAME		__PRETTY_FUNCTION__
-#elif defined(__FUNCTION__)
-#  define CS_FUNCTION_NAME		__FUNCTION__
-#else
-#  define CS_FUNCTION_NAME		"<?\?\?>"
 #endif
 
 #define CS_STRING_TO_WIDE_(x)   L ## x

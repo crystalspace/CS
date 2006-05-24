@@ -686,7 +686,8 @@ class csMemTrackerModule
 {
 public:
   char* Class;          // Name of class or 0 for application level.
-  csMemTrackerInfo* mti_table[10000];
+  static const int mti_table_max = 10000;
+  csMemTrackerInfo* mti_table[mti_table_max];
   int mti_table_count;
 
   csMemTrackerModule ()
@@ -701,6 +702,7 @@ public:
       memmove (mti_table+idx+1, mti_table+idx,
           sizeof (csMemTrackerInfo*) * tomove);
     mti_table_count++;
+    CS_ASSERT(mti_table_count <= mti_table_max);
     mti_table[idx] = (csMemTrackerInfo*)malloc (sizeof (csMemTrackerInfo));
     mti_table[idx]->Init (filename);
   }
@@ -802,7 +804,8 @@ class csMemTrackerRegistry : public scfImplementation1<csMemTrackerRegistry,
                                                        iMemoryTracker>
 {
 public:
-  csMemTrackerModule* modules[500];     // @@@ Hardcoded!
+  static const int max_modules = 500;
+  csMemTrackerModule* modules[max_modules];     // @@@ Hardcoded!
   int num_modules;
 
   csMemTrackerRegistry ()
@@ -819,6 +822,7 @@ public:
     csMemTrackerModule* mod = new csMemTrackerModule ();
     mod->Class = Class;
     modules[num_modules++] = mod;
+    CS_ASSERT(num_modules <= max_modules);
     return mod;
   }
 
