@@ -359,7 +359,7 @@ public:
     if (Elements.GetSize() == 0) return csArray<T> ();
     const ElementArray& values = 
       Elements[csHashComputer<K>::ComputeHash (key) % Modulo];
-    csArray<T, H, M> ret (values.Length () / 2);
+    csArray<T> ret (values.Length () / 2);
     const size_t len = values.Length ();
     for (size_t i = 0; i < len; ++i)
     {
