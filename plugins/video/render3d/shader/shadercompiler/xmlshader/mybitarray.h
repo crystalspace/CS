@@ -23,18 +23,23 @@
 #include "csutil/bitarray.h"
 #include "csutil/blockallocator.h"
 
+#include "tempheap.h"
+
 CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
 {
-  class MyBitArrayAllocator
+  template<typename Allocator>
+  class MyBitArrayAllocator : Allocator
   {
     typedef csBitArrayStorageType Bits2[2];
+    typedef csBlockAllocator<Bits2, Allocator> BitsAlloc2Type;
     CS_DECLARE_STATIC_CLASSVAR_REF (bitsAlloc2,
-      BitsAlloc2, csBlockAllocator<Bits2>);
+      BitsAlloc2, BitsAlloc2Type);
     typedef csBitArrayStorageType Bits4[4];
+    typedef csBlockAllocator<Bits4, Allocator> BitsAlloc4Type;
     CS_DECLARE_STATIC_CLASSVAR_REF (bitsAlloc4,
-      BitsAlloc4, csBlockAllocator<Bits4>);
+      BitsAlloc4, BitsAlloc4Type);
   public:
-    static void* Alloc (const size_t n)
+    void* Alloc (const size_t n)
     {
       if (n <= sizeof (Bits2))
         return BitsAlloc2().AllocUninit();
@@ -42,28 +47,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
         return BitsAlloc4().AllocUninit();
       else
       {
-#ifdef CS_MEMORY_TRACKER
-        static const char mtiInfo[] = "MyBitArrayAllocator";
-        uintptr_t* ptr = (uintptr_t*)malloc (n + sizeof (uintptr_t)*2);
-        *ptr++ = (uintptr_t)mtiRegisterAlloc (n, mtiInfo);
-        *ptr++ = n;
-        return ptr;
-#else
-        return malloc (n);
-#endif
+        return Allocator::Alloc (n);
       }
     }
-    static void Free (void* p)
+    void Free (void* p)
     {
       if (BitsAlloc4().TryFree ((Bits4*)p)) return;
       if (BitsAlloc2().TryFree ((Bits2*)p)) return;
-#ifdef CS_MEMORY_TRACKER
-      uintptr_t* ptr = ((uintptr_t*)p)-2;
-      mtiRegisterFree ((csMemTrackerInfo*)*ptr, (size_t)ptr[1]);
-      free (ptr);
-#else
-      free (p);
-#endif
+      Allocator::Free (p);
     }
 
     static void CompactAllocators()
@@ -73,19 +64,37 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
     }
   };
 
-  typedef csBitArrayTweakable<64, MyBitArrayAllocator> MyBitArray;
+  //@{
+  /**
+   * Specialized bit array that uses block allocation for smaller
+   * sizes.
+   */
+  typedef MyBitArrayAllocator<CS::Memory::AllocatorMalloc>
+    MyBitArrayAllocatorMalloc;
+  typedef csBitArrayTweakable<64, MyBitArrayAllocatorMalloc> MyBitArrayMalloc;
+  typedef MyBitArrayAllocator<TempHeapAlloc> MyBitArrayAllocatorTemp;
+  typedef csBitArrayTweakable<64, MyBitArrayAllocatorTemp> MyBitArrayTemp;
+  //@}
 }
 CS_PLUGIN_NAMESPACE_END(XMLShader)
 
 #define XMLSNS CS_PLUGIN_NAMESPACE_NAME(XMLShader)
 
 CS_SPECIALIZE_TEMPLATE
-class csComparator<XMLSNS::MyBitArray, XMLSNS::MyBitArray> : 
-  public csComparatorBitArray<XMLSNS::MyBitArray> { };
+class csComparator<XMLSNS::MyBitArrayMalloc, XMLSNS::MyBitArrayMalloc> : 
+  public csComparatorBitArray<XMLSNS::MyBitArrayMalloc> { };
 
 CS_SPECIALIZE_TEMPLATE
-class csHashComputer<XMLSNS::MyBitArray> : 
-  public csBitArrayHashComputer<XMLSNS::MyBitArray> { };
+class csHashComputer<XMLSNS::MyBitArrayMalloc> : 
+  public csHashComputerBitArray<XMLSNS::MyBitArrayMalloc> { };
+
+CS_SPECIALIZE_TEMPLATE
+class csComparator<XMLSNS::MyBitArrayTemp, XMLSNS::MyBitArrayTemp> : 
+  public csComparatorBitArray<XMLSNS::MyBitArrayTemp> { };
+
+CS_SPECIALIZE_TEMPLATE
+class csHashComputer<XMLSNS::MyBitArrayTemp> : 
+  public csHashComputerBitArray<XMLSNS::MyBitArrayTemp> { };
 
 #undef XMLSNS
 

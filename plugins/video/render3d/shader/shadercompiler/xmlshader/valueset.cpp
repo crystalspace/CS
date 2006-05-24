@@ -86,9 +86,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
 
   ValueSet ValueSet::operator!() const
   {
-    if (intervals.Length() == 0) return ValueSet();
+    if (intervals.Length() == 0) return ValueSet ();
 
-    csArray<Interval::Side> borders;
+    csArray<Interval::Side,
+      csArrayElementHandler<Interval::Side>,
+      TempHeapAlloc> borders;
     int currentSide = 0;
 
     borders.Push (Interval::Side (true, false));
@@ -132,6 +134,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
 
     while ((i < intervals.GetSize()) && (j < otherIntervals.GetSize()))
     {
+      //if (intervals.GetSize() >= 3) CS_DEBUG_BREAK;
       Interval& intv = intervals[i];
       while (((i+1) < intervals.GetSize())
         && intv.Overlaps (intervals[i+1]))
@@ -156,29 +159,61 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
         intv = Interval (
           CompareLeftLeft (l1, l2) <= 0 ? l1 : l2,
           CompareRightRight (r1, r2) >= 0 ? r1 : r2);
+        while ((i > 0)
+          && (intervals[i-1].right.GetValue() == intv.left.GetValue())
+          && (intervals[i-1].right.GetInclusive() != intv.left.GetInclusive()))
+        {
+          intv.left = intervals[i-1].left;
+          intervals.DeleteIndex (i-1);
+          i--;
+        }
+        while (((i+1) < intervals.GetSize())
+          && (intv.right.GetValue() == intervals[i+1].left.GetValue())
+          && (intv.right.GetInclusive() != intervals[i+1].left.GetInclusive()))
+        {
+          intv.right = intervals[i+1].right;
+          intervals.DeleteIndex (i+1);
+        }
         j++;
       }
       else
       {
-        const Interval::Side& il = intv.right;
+        const Interval::Side& ir = intv.right;
         const Interval::Side& ol = intvOther.left;
-        if (il >= ol)
+        if (ir >= ol)
         {
-          intervals.Insert (i, intvOther);
+          if ((intvOther.right.GetValue() == intv.left.GetValue())
+            && (intvOther.right.GetInclusive() != intv.left.GetInclusive()))
+          {
+            intv.left = intvOther.left;
+          }
+          else
+            intervals.Insert (i, intvOther);
           j++;
         }
         else
           i++;
       }
     }
-    while (j < otherIntervals.GetSize())
     {
-      intervals.Push (otherIntervals[j]);
-      j++;
+      Interval::Side& intvRight = intervals[intervals.GetSize()-1].right;
+      while (j < otherIntervals.GetSize())
+      {
+        const Interval::Side& intvNextLeft = otherIntervals[j].left;
+        if ((intvRight.GetValue() == intvNextLeft.GetValue())
+          && (intvRight.GetInclusive() != intvNextLeft.GetInclusive()))
+        {
+          intvRight = otherIntervals[j].right;
+        }
+        else
+          intervals.Push (otherIntervals[j]);
+        j++;
+      }
     }
+    //if (intervals.GetSize() >= 3) CS_DEBUG_BREAK;
 
     // Merge directly adjacent intervals
-    i = 0;
+    /*i = 0;
     while (i+1 < intervals.GetSize())
     {
       Interval::Side& intvRight = intervals[i].right;
@@ -191,7 +226,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
       }
       else
         i++;
-    }
+    }*/
 
     return *this;
   }
@@ -223,7 +258,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
           newInterval.left.FlipInclusive();
           newInterval.right = intervals[i].right;
           intervals[i].right = otherIntervals[j].right;
-          intervals.Insert (i+1, newInterval);
+          if (!newInterval.IsEmpty()
+            && (j+1 < otherIntervals.GetSize()))
+          {
+            intervals.Insert (i+1, newInterval);
+          }
         }
         i++;
       }

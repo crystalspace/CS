@@ -61,7 +61,7 @@ struct csConditionNode
     delete trueNode;
     delete falseNode;
   }
-  void FillConditionArray (MyBitArray& array)
+  void FillConditionArray (MyBitArrayTemp& array)
   {
     if (!parent) return;
     const csConditionID cond = parent->condition;
@@ -81,7 +81,7 @@ class csShaderConditionResolver : public iConditionResolver
   
   csConditionNode* rootNode;
   size_t nextVariant;
-  csHash<size_t, MyBitArray> variantIDs;
+  csHash<size_t, MyBitArrayTemp, TempHeapAlloc> variantIDs;
 
   const csRenderMeshModes* modes;
   const csShaderVarStack* stacks;

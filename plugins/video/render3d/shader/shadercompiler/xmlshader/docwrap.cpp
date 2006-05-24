@@ -61,7 +61,7 @@ class ConditionTree
     csConditionID condition;
     Node* branches[2];
     Variables values;
-    MyBitArray conditionAffectedSVs;
+    MyBitArrayTemp conditionAffectedSVs;
 
     Node (Node* p, ConditionTree* owner) : parent (p), owner (owner),
       condition (csCondUnknown)
@@ -76,19 +76,22 @@ class ConditionTree
     }
   };
 
-  csBlockAllocator<Node> nodeAlloc;
+  csBlockAllocator<Node, TempHeapAlloc> nodeAlloc;
   Node* root;
   int currentBranch;
+  typedef csArray<Node*, csArrayElementHandler<Node*>, TempHeapAlloc> 
+    NodeArray;
   struct NodeStackEntry
   {
-    csArray<Node*> branches[2];
+    NodeArray branches[2];
   };
 
-  csArray<NodeStackEntry> nodeStack;
-  csArray<int> branchStack;
+  csArray<NodeStackEntry, csArrayElementHandler<NodeStackEntry>, 
+    TempHeapAlloc> nodeStack;
+  csArray<int, csArrayElementHandler<int>, TempHeapAlloc> branchStack;
 
   void RecursiveAdd (csConditionID condition, Node* node, 
-    NodeStackEntry& newCurrent, MyBitArray& affectedSVs);
+    NodeStackEntry& newCurrent, MyBitArrayTemp& affectedSVs);
   void ToResolver (iConditionResolver* resolver, Node* node,
     csConditionNode* parent);
 
@@ -120,9 +123,10 @@ public:
   void ToResolver (iConditionResolver* resolver);
 };
 
+
 void ConditionTree::RecursiveAdd (csConditionID condition, Node* node, 
                                   NodeStackEntry& newCurrent, 
-                                  MyBitArray& affectedSVs)
+                                  MyBitArrayTemp& affectedSVs)
 {
   /* Shortcut */
   if (node->condition == condition)
@@ -154,7 +158,7 @@ void ConditionTree::RecursiveAdd (csConditionID condition, Node* node,
        * Though, if the node is a leaf, always check since the
        * "true values" and "false values" are required.
        */
-      MyBitArray& nodeAffectedSVs = node->parent->conditionAffectedSVs;
+      MyBitArrayTemp& nodeAffectedSVs = node->parent->conditionAffectedSVs;
       if (affectedSVs.GetSize() != nodeAffectedSVs.GetSize())
       {
         size_t newSize = csMax (affectedSVs.GetSize(),
@@ -194,8 +198,8 @@ void ConditionTree::RecursiveAdd (csConditionID condition, Node* node,
         node->conditionAffectedSVs = affectedSVs;
         if (node->parent)
         {
-          MyBitArray& nodeAffectedSVs = node->conditionAffectedSVs;
-          MyBitArray& parentAffectedSVs = node->parent->conditionAffectedSVs;
+          MyBitArrayTemp& nodeAffectedSVs = node->conditionAffectedSVs;
+          MyBitArrayTemp& parentAffectedSVs = node->parent->conditionAffectedSVs;
           if (nodeAffectedSVs.GetSize() != parentAffectedSVs.GetSize())
           {
             size_t newSize = csMax (nodeAffectedSVs.GetSize(),
@@ -262,9 +266,9 @@ Logic3 ConditionTree::Descend (csConditionID condition)
 
   NodeStackEntry newCurrent;
 
-  MyBitArray affectedSVs;
+  MyBitArrayTemp affectedSVs;
   evaluator.GetUsedSVs (condition, affectedSVs);
-  const csArray<Node*>& currentNodes = current.branches[currentBranch];
+  const NodeArray& currentNodes = current.branches[currentBranch];
   for (size_t i = 0; i < currentNodes.GetSize(); i++)
   {
     RecursiveAdd (condition, currentNodes[i], newCurrent, affectedSVs);
@@ -341,6 +345,10 @@ bool ConditionTree::HasContainingCondition (Node* node,
 //---------------------------------------------------------------------------
 
 CS_LEAKGUARD_IMPLEMENT(csWrappedDocumentNode);
+
+CS_IMPLEMENT_STATIC_CLASSVAR_REF(csWrappedDocumentNode::WrappedChild, 
+  childAlloc, ChildAlloc, 
+  csWrappedDocumentNode::WrappedChild::WrappedChildAlloc, (256));
 
 template<typename ConditionEval>
 csWrappedDocumentNode::csWrappedDocumentNode (ConditionEval& eval,
@@ -515,7 +523,7 @@ void csWrappedDocumentNode::ProcessTemplate (ConditionEval& eval,
                                              iDocumentNode* templNode, 
 					     NodeProcessingState* state)
 {
-  csRefArray<iDocumentNode>& templNodes = state->templ.nodes;
+  Template::Nodes& templNodes = state->templ.nodes;
   csRef<iDocumentNode> node = templNode;
   if (node->GetType() == CS_NODE_UNKNOWN)
   {
@@ -585,7 +593,7 @@ void csWrappedDocumentNode::ProcessTemplate (ConditionEval& eval,
                 && (state->templNestCount == 1)
 		&& (templ = globalState->templates.GetElementPointer (tokenStr)))
 	      {
-		csArray<csString> templArgs;
+		Template::Params templArgs;
 		csString pStr (valStart + cmdLen, valLen - cmdLen);
 		pStr.Trim();
 		ParseTemplateArguments (pStr, templArgs);
@@ -644,8 +652,8 @@ void csWrappedDocumentNode::ProcessTemplate (ConditionEval& eval,
             if (v < end) break;
           }
 
-          csRefArray<iDocumentNode> templatedNodes;
-          csArray<csString> params;
+          Template::Nodes templatedNodes;
+          Template::Params params;
           csString s; s << v;
           params.Push (s);
           InvokeTemplate (&generateTempl, params, templatedNodes);
@@ -671,8 +679,8 @@ void csWrappedDocumentNode::ProcessTemplate (ConditionEval& eval,
 }
 
 bool csWrappedDocumentNode::InvokeTemplate (Template* templ,
-					    const csArray<csString>& params,
-					    csRefArray<iDocumentNode>& templatedNodes)
+					    const Template::Params& params,
+					    Template::Nodes& templatedNodes)
 {
   if (!templ) return false;
 
@@ -701,12 +709,12 @@ bool csWrappedDocumentNode::InvokeTemplate (ConditionEval& eval,
                                             const char* name, 
                                             iDocumentNode* node,
 					    NodeProcessingState* state, 
-					    const csArray<csString>& params)
+					    const Template::Params& params)
 {
   Template* templNodes = 
     globalState->templates.GetElementPointer (name);
 
-  csRefArray<iDocumentNode> nodes;
+  Template::Nodes nodes;
 
   if (!InvokeTemplate (templNodes, params, nodes))
     return false;
@@ -742,7 +750,7 @@ void csWrappedDocumentNode::ValidateGenerateEnd (iDocumentNode* node,
 }
 
 void csWrappedDocumentNode::ParseTemplateArguments (const char* str, 
-						    csArray<csString>& strings)
+						    Template::Params& strings)
 {
   if (!str) return;
 
@@ -1016,11 +1024,11 @@ void csWrappedDocumentNode::ProcessSingleWrappedNode (
 	      if (okay && (templateEnd != (size_t)-1))
 	      {
 		// Parse template parameter names
-		csArray<csString> paramNames;
+		Template::Params paramNames;
 		ParseTemplateArguments (
 		  templateName.GetData() + templateEnd + 1, paramNames);
 
-		csSet<csString> dupeCheck;
+		csSet<TempString<>, TempHeapAlloc> dupeCheck;
 		for (size_t i = 0; i < paramNames.Length(); i++)
 		{
 		  if (dupeCheck.Contains (paramNames[i]))
@@ -1074,7 +1082,7 @@ void csWrappedDocumentNode::ProcessSingleWrappedNode (
           case csWrappedDocumentNodeFactory::PITOKEN_GENERATE:
             {
 	      bool okay = true;
-              csArray<csString> args;
+              Template::Params args;
 	      if (space != 0)
 	      {
 		csString pStr (space + 1, valLen - cmdLen - 1);
@@ -1151,7 +1159,7 @@ void csWrappedDocumentNode::ProcessSingleWrappedNode (
 	    break;
 	  default:
 	    {
-	      csArray<csString> params;
+	      Template::Params params;
 	      if (space != 0)
 	      {
 		csString pStr (space + 1, valLen - cmdLen - 1);
@@ -1440,11 +1448,6 @@ csTextNodeWrapper::~csTextNodeWrapper ()
 
 //---------------------------------------------------------------------------
 
-// hack: work around problems caused by #defining 'new'
-#if defined(CS_EXTENSIVE_MEMDEBUG) || defined(CS_MEMORY_TRACKER)
-# undef new
-#endif
-
 CS_LEAKGUARD_IMPLEMENT(csWrappedDocumentNodeIterator);
 
 csWrappedDocumentNodeIterator::csWrappedDocumentNodeIterator (
@@ -1459,6 +1462,12 @@ csWrappedDocumentNodeIterator::csWrappedDocumentNodeIterator (
 csWrappedDocumentNodeIterator::~csWrappedDocumentNodeIterator ()
 {
 }
+
+// Hack: Work around problems caused by #defining 'new'.
+#if defined(CS_EXTENSIVE_MEMDEBUG) || defined(CS_MEMORY_TRACKER)
+# undef new
+#endif
+#include <new>
 
 void csWrappedDocumentNodeIterator::SeekNext()
 {
@@ -1483,6 +1492,10 @@ void csWrappedDocumentNodeIterator::SeekNext()
     next.AttachNew (textNode);
   }
 }
+
+#if defined(CS_EXTENSIVE_MEMDEBUG) || defined(CS_MEMORY_TRACKER)
+# define new CS_EXTENSIVE_MEMDEBUG_NEW
+#endif
 
 bool csWrappedDocumentNodeIterator::HasNext ()
 {
@@ -1539,13 +1552,18 @@ csWrappedDocumentNode* csWrappedDocumentNodeFactory::CreateWrapper (
 {
   currentOut = dumpOut;
 
-  csRef<csWrappedDocumentNode::GlobalProcessingState> globalState;
-  globalState.AttachNew (new csWrappedDocumentNode::GlobalProcessingState ());
-  EvalCondTree eval (evaluator);
-  csWrappedDocumentNode* node = new csWrappedDocumentNode (eval, wrappedNode, 
-    resolver, this, globalState);
-  eval.condTree.ToResolver (resolver);
+  csWrappedDocumentNode* node;
+  {
+    csRef<csWrappedDocumentNode::GlobalProcessingState> globalState;
+    globalState.AttachNew (csWrappedDocumentNode::GlobalProcessingState::Create ());
+    EvalCondTree eval (evaluator);
+    node = new csWrappedDocumentNode (eval, wrappedNode, resolver, this, 
+      globalState);
+    eval.condTree.ToResolver (resolver);
+    CS_ASSERT(globalState->GetRefCount() == 1);
+  }
   evaluator.CompactMemory();
+  TempHeap::Trim();
   return node;
 }
 
@@ -1553,7 +1571,7 @@ struct EvalStatic
 {
   iConditionResolver* resolver;
   int currentBranch;
-  csArray<int> branchStack;
+  csArray<int, csArrayElementHandler<int>, TempHeapAlloc> branchStack;
 
   EvalStatic (iConditionResolver* resolver) : resolver (resolver),
     currentBranch(0) {}
@@ -1581,11 +1599,16 @@ csWrappedDocumentNode* csWrappedDocumentNodeFactory::CreateWrapperStatic (
 {
   currentOut = dumpOut;
 
-  csRef<csWrappedDocumentNode::GlobalProcessingState> globalState;
-  globalState.AttachNew (new csWrappedDocumentNode::GlobalProcessingState ());
-  EvalStatic eval (resolver);
-  return new csWrappedDocumentNode (eval, wrappedNode, resolver, this, 
-    globalState);
+  csWrappedDocumentNode* node;
+  {
+    csRef<csWrappedDocumentNode::GlobalProcessingState> globalState;
+    globalState.AttachNew (csWrappedDocumentNode::GlobalProcessingState::Create ());
+    EvalStatic eval (resolver);
+    node = new csWrappedDocumentNode (eval, wrappedNode, resolver, this, 
+      globalState);
+    CS_ASSERT(globalState->GetRefCount() == 1);
+  }
+  return node;
 }
 
 }

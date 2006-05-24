@@ -22,9 +22,11 @@
 
 #include <limits>
 #include "csutil/array.h"
+#include "csutil/memheap.h"
 #include "csgeom/math.h"
 
 #include "logic3.h"
+#include "tempheap.h"
 
 // Hack: Work around problems caused by #defining 'new'.
 #if defined(CS_EXTENSIVE_MEMDEBUG) || defined(CS_MEMORY_TRACKER)
@@ -187,7 +189,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
       }
     };
   protected:
-    static const size_t arrayGrow = 2;
+    static const size_t arrayGrow = 3;
     class IntervalElementHandler : public csArrayElementHandler<Interval>
     {
     public:
@@ -215,7 +217,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
       }
     };
     typedef csArray<Interval, IntervalElementHandler,
-      CS::Memory::LocalBufferAllocator<Interval, arrayGrow>,
+      CS::Memory::LocalBufferAllocator<Interval, arrayGrow, TempHeapAlloc>,
       csArrayCapacityLinear<csArrayThresholdFixed<arrayGrow> > > IntervalArray;
     IntervalArray intervals;
   public:
@@ -224,11 +226,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
     {
       if (!empty) intervals.SetSize (1);
     }
-    ValueSet (const float f) : intervals (1, arrayGrow)
+    ValueSet (const float f) : 
+      intervals (1, arrayGrow)
     {
       intervals.Push (Interval (f));
     }
-    ValueSet (const Interval& i) : intervals (1, arrayGrow)
+    ValueSet (const Interval& i) : 
+      intervals (1, arrayGrow)
     {
       intervals.Push (i);
     }

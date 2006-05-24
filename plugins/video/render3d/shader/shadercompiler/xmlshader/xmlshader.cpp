@@ -144,27 +144,21 @@ csPtr<iShader> csXMLShaderCompiler::CompileShader (iDocumentNode *templ,
   return csPtr<iShader> (ishader);
 }
 
-class csShaderPriorityList : public iShaderPriorityList
+class csShaderPriorityList : public scfImplementation1<csShaderPriorityList, 
+                                                       iShaderPriorityList>
 {
 public:
   csArray<int> priorities;
-  csShaderPriorityList ()
+  csShaderPriorityList () : scfImplementationType (this)
   {
-    SCF_CONSTRUCT_IBASE (0);
   }
   virtual ~csShaderPriorityList ()
   {
-    SCF_DESTRUCT_IBASE ();
   }
 
-  SCF_DECLARE_IBASE;
   virtual size_t GetCount () const { return priorities.Length (); }
   virtual int GetPriority (size_t idx) const { return priorities[idx]; }
 };
-
-SCF_IMPLEMENT_IBASE (csShaderPriorityList)
-  SCF_IMPLEMENTS_INTERFACE (iShaderPriorityList)
-SCF_IMPLEMENT_IBASE_END
 
 csPtr<iShaderPriorityList> csXMLShaderCompiler::GetPriorities (
 	iDocumentNode* templ)

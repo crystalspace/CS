@@ -117,7 +117,7 @@ csConditionNode* csShaderConditionResolver::GetRoot ()
 
 size_t csShaderConditionResolver::GetVariant (csConditionNode* node)
 {
-  MyBitArray bits (evaluator.GetNumConditions ());
+  MyBitArrayTemp bits (evaluator.GetNumConditions ());
   node->FillConditionArray (bits);
   size_t* var = variantIDs.GetElementPointer (bits);
   if (var)
@@ -157,7 +157,7 @@ void csShaderConditionResolver::AddNode (csConditionNode* parent,
     parent->falseNode = falseNode = NewNode (parent);
 
     CS_ASSERT(parent->variant != csArrayItemNotFound);
-    MyBitArray bits (evaluator.GetNumConditions ());
+    MyBitArrayTemp bits (evaluator.GetNumConditions ());
     parent->condition = condition;
 
     trueNode->variant = GetVariant (trueNode);

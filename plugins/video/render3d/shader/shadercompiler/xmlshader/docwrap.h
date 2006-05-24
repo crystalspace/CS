@@ -38,6 +38,12 @@
 #include "condeval.h"
 #include "docwrap_replacer.h"
 
+// Hack: Work around problems caused by #defining 'new'.
+#if defined(CS_EXTENSIVE_MEMDEBUG) || defined(CS_MEMORY_TRACKER)
+# undef new
+#endif
+#include <new>
+
 CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
 {
 
@@ -99,6 +105,7 @@ class csWrappedDocumentNode :
   csString contents;
   csWrappedDocumentNodeFactory* shared;
 
+public:
   /**
    * Contains all the consecutive children that are dependant on the same
    * condition.
@@ -116,7 +123,28 @@ class csWrappedDocumentNode :
       condition = csCondAlwaysTrue;
       conditionValue = true;
     }
+
+    typedef csBlockAllocator<WrappedChild> WrappedChildAlloc;
+    CS_DECLARE_STATIC_CLASSVAR_REF (childAlloc,
+      ChildAlloc, WrappedChildAlloc);
+
+    inline void* operator new (size_t n)
+    {
+      CS_ASSERT(n == sizeof (WrappedChild));
+      return ChildAlloc().AllocUninit();
+    }
+    inline void operator delete (void* p)
+    {
+      ChildAlloc().FreeUninit (p);
+    }
+#if defined(CS_EXTENSIVE_MEMDEBUG) || defined(CS_MEMORY_TRACKER)
+    inline void* operator new (size_t n, void*, int)
+    { return WrappedChild::operator new (n); }
+    inline void operator delete (void* p, void*, int)
+    { WrappedChild::operator delete (p); }
+#endif
   };
+protected:
   csPDelArray<WrappedChild> wrappedChildren;
 
   /**
@@ -152,13 +180,29 @@ class csWrappedDocumentNode :
 
   struct Template
   {
-    csRefArray<iDocumentNode> nodes;
-    csArray<csString> paramMap;
+    typedef csRefArray<iDocumentNode, TempHeapAlloc> Nodes;
+    typedef csArray<TempString<>, csArrayElementHandler<TempString<> >, 
+      TempHeapAlloc> Params;
+    Nodes nodes;
+    Params paramMap;
   };
-  struct GlobalProcessingState : public csRefCount
+  struct GlobalProcessingState : public csRefCount, protected TempHeap
   {
-    csHash<Template, csString> templates;
-    csArray<int> ascendStack;
+    static GlobalProcessingState* Create()
+    {
+      GlobalProcessingState* gps;
+      gps = (GlobalProcessingState*)TempHeap::Alloc (sizeof (GlobalProcessingState));
+      new (gps) GlobalProcessingState;
+      return gps;
+    }
+    virtual void Delete ()
+    {
+      this->~GlobalProcessingState();
+      TempHeap::Free (this);
+    }
+
+    csHash<Template, TempString<>, TempHeapAlloc> templates;
+    csArray<int, csArrayElementHandler<int>, TempHeapAlloc> ascendStack;
   };
   csRef<GlobalProcessingState> globalState;
 
@@ -173,18 +217,18 @@ class csWrappedDocumentNode :
   template<typename ConditionEval>
   void ProcessTemplate (ConditionEval& eval, iDocumentNode* templNode, 
     NodeProcessingState* state);
-  bool InvokeTemplate (Template* templ, const csArray<csString>& params,
-    csRefArray<iDocumentNode>& templatedNodes);
+  bool InvokeTemplate (Template* templ, const Template::Params& params,
+    Template::Nodes& templatedNodes);
   template<typename ConditionEval>
   bool InvokeTemplate (ConditionEval& eval, const char* name, 
     iDocumentNode* node, NodeProcessingState* state, 
-    const csArray<csString>& params);
+    const Template::Params& params);
   void ValidateTemplateEnd (iDocumentNode* node, 
     NodeProcessingState* state);
   void ValidateGenerateEnd (iDocumentNode* node, 
     NodeProcessingState* state);
   void ParseTemplateArguments (const char* str, 
-    csArray<csString>& strings);
+    Template::Params& strings);
 
   template<typename ConditionEval>
   void ProcessSingleWrappedNode (ConditionEval& eval, 
@@ -317,5 +361,9 @@ public:
 
 }
 CS_PLUGIN_NAMESPACE_END(XMLShader)
+
+#if defined(CS_EXTENSIVE_MEMDEBUG) || defined(CS_MEMORY_TRACKER)
+# define new CS_EXTENSIVE_MEMDEBUG_NEW
+#endif
 
 #endif // __CS_DOCWRAP_H__

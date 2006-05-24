@@ -1,6 +1,6 @@
 /*
-  Copyright (C) 2004 by Frank Richter
-	    (C) 2004 by Jorrit Tyberghein
+  Copyright (C) 2004-2006 by Frank Richter
+	    (C) 2004-2006 by Jorrit Tyberghein
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -91,21 +91,22 @@ const ValueSet& Variables::Values::GetValue (int type) const
 
 //---------------------------------------------------------------------------
 
-struct BlockAllocatorSlicePolicy
+struct SliceAllocator
 {
   static const size_t valueSetsPerSlice = 32;
   static const size_t sliceSize = valueSetsPerSlice * sizeof (ValueSet);
   typedef uint8 SliceType[sliceSize];
 
+  typedef csBlockAllocator<SliceType, TempHeapAlloc> BlockAlloc;
   CS_DECLARE_STATIC_CLASSVAR_REF (sliceAlloc, SliceAlloc, 
-    csBlockAllocator<SliceType>);
+    BlockAlloc);
 
-  static inline uint8* AllocBlock(size_t blocksize) 
+  static inline uint8* Alloc (size_t blocksize) 
   {
     CS_ASSERT(blocksize == sliceSize);
     return (uint8*)SliceAlloc().AllocUninit();
   }
-  static inline void FreeBlock(uint8* p)
+  static inline void Free (uint8* p)
   {
     SliceAlloc().Free ((SliceType*)p);
   }
@@ -113,12 +114,13 @@ struct BlockAllocatorSlicePolicy
   {
     SliceAlloc().Compact();
   }
+  static void SetMemTrackerInfo (const char*) {}
 };
-CS_IMPLEMENT_STATIC_CLASSVAR_REF(BlockAllocatorSlicePolicy, sliceAlloc,
-  SliceAlloc, csBlockAllocator<BlockAllocatorSlicePolicy::SliceType>, (32));
+CS_IMPLEMENT_STATIC_CLASSVAR_REF(SliceAllocator, sliceAlloc,
+  SliceAlloc, SliceAllocator::BlockAlloc, (32));
 
 CS_IMPLEMENT_STATIC_CLASSVAR_REF(Variables, valAlloc,
-  ValAlloc, csBlockAllocator<Variables::Values>, (1024));
+  ValAlloc, Variables::ValBlockAlloc, (1024));
 size_t Variables::Values::deallocCount = 0;
 CS_IMPLEMENT_STATIC_CLASSVAR(Variables, def,
   Def, Variables::Values, ());
@@ -1358,7 +1360,7 @@ bool csConditionEvaluator::EvaluateOperandFConst (const CondOperand& operand,
 }
 
 void csConditionEvaluator::GetUsedSVs2 (csConditionID condition, 
-                                        MyBitArray& affectedSVs)
+                                        MyBitArrayTemp& affectedSVs)
 {
   const CondOperation* op = conditions.GetKeyPointer (condition);
   CS_ASSERT (op != 0);
@@ -1383,7 +1385,7 @@ void csConditionEvaluator::GetUsedSVs2 (csConditionID condition,
 }
 
 void csConditionEvaluator::GetUsedSVs (csConditionID condition, 
-                                       MyBitArray& affectedSVs)
+                                       MyBitArrayTemp& affectedSVs)
 {
   affectedSVs.Clear();
   if ((condition == csCondAlwaysFalse) || (condition == csCondAlwaysTrue))
@@ -1394,8 +1396,8 @@ void csConditionEvaluator::GetUsedSVs (csConditionID condition,
 void csConditionEvaluator::CompactMemory ()
 {
   Variables::Values::CompactAllocator();
-  BlockAllocatorSlicePolicy::CompactAllocator();
-  MyBitArrayAllocator::CompactAllocators();
+  SliceAllocator::CompactAllocator();
+  MyBitArrayAllocatorTemp::CompactAllocators();
 }
 
 struct ValueSetWrapper
@@ -1512,7 +1514,7 @@ struct EvaluatorShadervarValuesSimple
   EvaluatorShadervarValuesSimple (csConditionEvaluator& evaluator, 
     const Variables& vars) : evaluator (evaluator), vars (vars), 
     boolMask (ValueSet (0.0f) | ValueSet (1.0f)),
-    createdValues (BlockAllocatorSlicePolicy::valueSetsPerSlice) {}
+    createdValues (SliceAllocator::valueSetsPerSlice) {}
 
   BoolType Boolean (const CondOperand& operand);
   IntType Int (const CondOperand& operand)
@@ -1522,7 +1524,7 @@ struct EvaluatorShadervarValuesSimple
   EvalResult LogicAnd (const CondOperand& a, const CondOperand& b);
   EvalResult LogicOr (const CondOperand& a, const CondOperand& b);
 
-  csBlockAllocator<ValueSet/*, BlockAllocatorSlicePolicy*/> createdValues;
+  csBlockAllocator<ValueSet, SliceAllocator> createdValues;
 protected:
   ValueSet& CreateValue ()
   {
@@ -1854,7 +1856,7 @@ struct EvaluatorShadervarValues
     Variables& trueVars, Variables& falseVars) : evaluator (evaluator), 
     vars (vars), trueVars (trueVars), falseVars (falseVars),
     boolMask (ValueSet (0.0f) | ValueSet (1.0f)),
-    createdValues (BlockAllocatorSlicePolicy::valueSetsPerSlice) {}
+    createdValues (SliceAllocator::valueSetsPerSlice) {}
 
   BoolType Boolean (const CondOperand& operand);
   IntType Int (const CondOperand& operand)

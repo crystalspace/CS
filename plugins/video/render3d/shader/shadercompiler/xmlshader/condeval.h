@@ -25,6 +25,7 @@
 #include "csutil/blockallocator.h"
 #include "csutil/cowwrapper.h"
 #include "csutil/hashr.h"
+#include "csutil/memheap.h"
 #include "csutil/ptrwrap.h"
 #include "csgeom/math.h"
 #include "iutil/strset.h"
@@ -96,12 +97,12 @@ public:
       if (refcount == 0) 
       {
         Variables::ValAlloc().Free (this);
-        deallocCount++;
+        /*deallocCount++;
         if (deallocCount > 65536)
         {
           Variables::ValAlloc().Compact();
           deallocCount = 0;
-        }
+        }*/
       }
     }
     int GetRefCount () const { return refcount; }
@@ -155,7 +156,7 @@ public:
       ValueSet vs;
       ValueSetChain* nextPlease;
 
-      ValueSetChain() : nextPlease (0) {}
+      ValueSetChain () : nextPlease (0) {}
       ValueSetChain (const ValueSetChain& other) : vs (other.vs), 
         nextPlease (0) {}
       ~ValueSetChain() { delete nextPlease; }
@@ -299,8 +300,9 @@ public:
     }
   };
 protected:
+  typedef csBlockAllocator<Values, TempHeapAlloc> ValBlockAlloc;
   CS_DECLARE_STATIC_CLASSVAR_REF (valAlloc,
-    ValAlloc, csBlockAllocator<Values>);
+    ValAlloc, ValBlockAlloc);
   static size_t valDeAllocCount;
   CS_DECLARE_STATIC_CLASSVAR (def,
     Def, Values);
@@ -335,7 +337,7 @@ protected:
       inline operator csStringID() const { return n; }
     };
     typedef csArray<Entry, csArrayElementHandler<Entry>,
-      CS::Memory::AllocatorMalloc,
+      TempHeapAlloc,
       csArrayCapacityLinear<csArrayThresholdFixed<4> > > ArrayType;
 
     ArrayType _array;
@@ -379,7 +381,8 @@ protected:
   class CowBlockAllocator
   {
   public:
-    typedef csBlockAllocator<uint8[ValuesArrayWrapper::allocSize]> BlockAlloc;
+    typedef csBlockAllocator<uint8[ValuesArrayWrapper::allocSize], 
+      TempHeapAlloc> BlockAlloc;
   private:
     CS_DECLARE_STATIC_CLASSVAR_REF (allocator,
       Allocator, BlockAlloc);
@@ -463,8 +466,8 @@ class csConditionEvaluator
   csHashReversible<csConditionID, CondOperation> conditions;
 
   // Evaluation cache
-  MyBitArray condChecked;
-  MyBitArray condResult;
+  MyBitArrayMalloc condChecked;
+  MyBitArrayMalloc condResult;
 
   // Constants
   const csConditionConstants& constants;
@@ -493,7 +496,7 @@ class csConditionEvaluator
   bool EvaluateOperandIConst (const CondOperand& operand, int& result);
   bool EvaluateOperandFConst (const CondOperand& operand, float& result);
 
-  void GetUsedSVs2 (csConditionID condition, MyBitArray& affectedSVs);
+  void GetUsedSVs2 (csConditionID condition, MyBitArrayTemp& affectedSVs);
 
   struct EvaluatorShadervar
   {
@@ -582,7 +585,7 @@ public:
     csConditionID containerCondition);
 
   /// Determine which SVs are used in some condition.
-  void GetUsedSVs (csConditionID condition, MyBitArray& affectedSVs);
+  void GetUsedSVs (csConditionID condition, MyBitArrayTemp& affectedSVs);
 
   /// Try to release unused temporary memory
   static void CompactMemory ();
