@@ -637,7 +637,7 @@ public:
   iMeshObjectDrawCallback* GetVisibleCallback () const { return vis_cb; }
 
   /// For creating the quads when necessary
-  void NextFrame (csTicks ticks, const csVector3&);
+  void NextFrame (csTicks ticks, const csVector3&, uint);
 
   /// Unsupported
   void HardTransform (const csReversibleTransform&) {}

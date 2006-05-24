@@ -699,6 +699,6 @@ void csParticlesObject::Stop ()
   physics->Stop (&scfiParticlesObjectState);
 }
 
-void csParticlesObject::NextFrame (csTicks, const csVector3 &)
+void csParticlesObject::NextFrame (csTicks, const csVector3 &, uint)
 {
 }
