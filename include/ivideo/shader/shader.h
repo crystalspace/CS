@@ -122,8 +122,6 @@ struct iShaderVariableContext : public virtual iBase
   virtual void Clear() = 0;
 };
 
-SCF_VERSION (iShaderManager, 0, 1, 0);
-
 /**
  * Possible settings regarding a techique tag's presence.
  */
@@ -149,8 +147,9 @@ enum csShaderTagPresence
 /**
  * A manager for all shaders. Will only be one at a given time
  */
-struct iShaderManager : public iShaderVariableContext
+struct iShaderManager : public virtual iShaderVariableContext
 {
+  SCF_INTERFACE (iShaderManager, 1, 0, 0);
   /**
    * Register a shader to the shadermanager.
    * Compiler should register all shaders
@@ -235,9 +234,9 @@ struct csShaderMetadata
  * Specific shader. Can/will be either render-specific or general
  * The shader in this form is "compiled" and cannot be modified.
  */
-struct iShader : public iShaderVariableContext
+struct iShader : public virtual iShaderVariableContext
 {
-  SCF_INTERFACE(iShader, 2, 0, 0);
+  SCF_INTERFACE(iShader, 3, 0, 0);
 
   /// Query the object.
   virtual iObject* QueryObject () = 0;
@@ -286,19 +285,18 @@ struct iShader : public iShaderVariableContext
 };
 
 
-SCF_VERSION (iShaderPriorityList, 0,0,1);
 /**
  * A list of priorities as returned by iShaderCompiler->GetPriorities()
  */
-struct iShaderPriorityList : public iBase
+struct iShaderPriorityList : public virtual iBase
 {
+  SCF_INTERFACE (iShaderPriorityList, 1,0,0);
   /// Get number of priorities.
   virtual size_t GetCount () const = 0;
   /// Get priority.
   virtual int GetPriority (size_t idx) const = 0;
 };
 
-SCF_VERSION (iShaderCompiler, 0,0,1);
 /**
  * Compiler of shaders. Compile from a description of the shader to a 
  * compiled shader. The exact schema for input is specific to each shader-
@@ -306,6 +304,7 @@ SCF_VERSION (iShaderCompiler, 0,0,1);
  */
 struct iShaderCompiler : public virtual iBase
 {
+  SCF_INTERFACE (iShaderCompiler, 0,0,1);
   /// Get a name identifying this compiler
   virtual const char* GetName() = 0;
 
