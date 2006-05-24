@@ -72,7 +72,7 @@ class csBitArrayTweakable
 {
 private:
   template<typename BitArray> friend class csComparatorBitArray;
-  template<typename BitArray> friend class csBitArrayHashComputer;
+  template<typename BitArray> friend class csHashComputerBitArray;
 
   enum
   {
@@ -585,7 +585,7 @@ class csComparator<csBitArray, csBitArray> :
 
 /// Base hash computer for bit arrays
 template<typename BitArray>
-class csBitArrayHashComputer
+class csHashComputerBitArray
 {
 public:
   static uint ComputeHash (BitArray const& key)
@@ -613,7 +613,7 @@ public:
  */
 CS_SPECIALIZE_TEMPLATE
 class csHashComputer<csBitArray> : 
-  public csBitArrayHashComputer<csBitArray> { };
+  public csHashComputerBitArray<csBitArray> { };
 
 
 #endif // __CS_BITARRAY_H__

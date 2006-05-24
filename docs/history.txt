@@ -13,6 +13,7 @@ chronological order.
 	  empty.
 	- res changed a couple of interfaces in shader.h to use virtual
 	  inheritance.
+	- res renamed csBitArrayHashComputer<> to csHashComputerBitArray<>
 23-May-2006
 	- res fixed bugplug to properly accept commands via keys again.
         - acraig made iGenMeshAnimationControl virtually inherrit from iBase.
