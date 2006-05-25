@@ -11,19 +11,20 @@ If you would like to contribute documentation, please read
 @ref{Writing Documentation}.
 
 If you wish to contribute code, you should first read @ref{Coding Style}.  If
-you are a registered Crystal Space developer with write-access to the @sc{cvs}
+you are a registered Crystal Space developer with write-access to the @sc{svn}
 repository, then before you commit changes, you should also read
-@ref{CVS Guide}.
+@ref{SVN Guide}.
 
 If you are not a registered developer, but still have code or bug fixes to
-submit, you can send your code to any developer with write access to the CVS
-repository.  To see which developers have write-access, look at the Crystal
-Space web page on SourceForge (@uref{http://www.sourceforge.net/}).  It is also
-acceptable to send small changes or patches to the Crystal Space mailing list.
-If all else fails, you can always send your code to the project administrators
-Jorrit Tyberghein (@email{jorrit.tyberghein@@gmail.com}), Eric Sunshine
-(@email{sunshine@@sunshineco.com}), or Frank Richter 
-(@email{res@@crystalspace3d.org}) for inclusion in the project.
+submit, you can send your code to any developer with write access to the 
+@sc{svn} repository.  To see which developers have write-access, look at the 
+Crystal Space web page on SourceForge (@uref{http://www.sourceforge.net/}).  
+It is also acceptable to send small changes or patches to the Crystal Space 
+mailing list. If all else fails, you can always send your code to the project 
+administrators Jorrit Tyberghein (@email{jorrit.tyberghein@@gmail.com}), 
+Eric Sunshine (@email{sunshine@@sunshineco.com}), Frank Richter 
+(@email{res@@crystalspace3d.org}) or M@aa{}rten Svanfeldt 
+(@email{developer@@svanfeldt.com]) for inclusion in the project.
 
 If you would like to contribute to the project in general by working on
 features which are missing or lacking, you might want to see the To-Do

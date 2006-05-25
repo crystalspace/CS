@@ -40,8 +40,8 @@ Click @emph{Next} and you will next be confronted with another dialog box.
 
 @subsubheading KDevelop External Step 3
 
-If you want @emph{Version Control Support} you can select @emph{@sc{cvs}} now
-and fill the required fields according to your @sc{cvs} environment, otherwise
+If you want @emph{Version Control Support} you can select @emph{@sc{svn}} now
+and fill the required fields according to your @sc{svn} environment, otherwise
 leave it set to @emph{@sc{none}}.
 
 The @emph{Next} two pages are header templates for header @file{.h} and source

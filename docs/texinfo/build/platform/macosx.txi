@@ -142,7 +142,7 @@ transporting the code from Windows to MacOS/X.  Although many MacOS/X tools
 deal gracefully with Windows line-terminators (a carriage-return follwed by a
 linefeed), not all tools do so, and may emit apparently inexplicable error
 messages when encountering files with Windows line-terminators.  The official
-distributions of Crystal Space, including the stable releases and the @sc{cvs}
+distributions of Crystal Space, including the stable releases and the @sc{svn}
 snapshots, are packaged with Unix line-terminators, which are acceptable on all
 supported platforms.  These virgin packages themselves can be transported
 between Windows and MacOS/X safely

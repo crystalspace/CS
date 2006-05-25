@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+25-May-2006
+	- res removed the now-useless WinCVS tutorial from the manual.
+	- res changed some references to CVS in the manual to SVN and also
+	  updated some CVS-specific parts.
 24-May-2006
 	- res changed the memory tracking to record function names, not
 	  file names.
