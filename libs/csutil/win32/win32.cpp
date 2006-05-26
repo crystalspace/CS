@@ -335,6 +335,19 @@ BOOL WINAPI Win32Assistant::ConsoleHandlerRoutine (DWORD dwCtrlType)
   return result;
 }
 
+#if defined(__CYGWIN__) || defined(CS_COMPILER_BCC)
+#define _fileno(x) fileno(x)
+#define _isatty(x) isatty(x)
+#endif
+
+/// Determine whether a standard handle was redirected to a file
+static bool IsStdHandleRedirected (DWORD nHandle)
+{
+  HANDLE file = GetStdHandle (nHandle);
+  return (file != INVALID_HANDLE_VALUE) && (file != NULL) 
+    && (GetFileType (file) != FILE_TYPE_CHAR);
+}
+
 Win32Assistant::Win32Assistant (iObjectRegistry* r) 
   : scfImplementationType (this),
   ApplicationActive (true),
@@ -388,9 +401,14 @@ Win32Assistant::Win32Assistant (iObjectRegistry* r)
     if (console_window || cmdline_help_wanted)
     {
       AllocConsole ();
-      freopen("CONOUT$", "a", stderr);
-      freopen("CONOUT$", "a", stdout);
-      freopen("CONIN$", "a", stdin);
+      /* "Redirect" C runtime standard files to console, if not redirected 
+       * by the user. */
+      if (!IsStdHandleRedirected (STD_ERROR_HANDLE)) 
+        freopen("CONOUT$", "a", stderr);
+      if (!IsStdHandleRedirected (STD_OUTPUT_HANDLE)) 
+        freopen("CONOUT$", "a", stdout);
+      if (!IsStdHandleRedirected (STD_INPUT_HANDLE)) 
+        freopen("CONIN$", "a", stdin);
     }
   }
 
@@ -969,27 +987,56 @@ bool Win32Assistant::SetCursor (int cursor)
 
 void Win32Assistant::DisableConsole ()
 {
-  if (console_window)
+  if (!console_window) return;
+  console_window = false;
+
+  DWORD lasterr;
+  csString outName;
   {
-    console_window = false;
+    char apppath[MAX_PATH];
+    GetModuleFileName (0, apppath, sizeof(apppath));
+    lasterr = GetLastError ();
+    if (lasterr != ERROR_INSUFFICIENT_BUFFER)
+      outName = apppath;
+  }
+  if (lasterr == ERROR_INSUFFICIENT_BUFFER)
+  {
+    DWORD bufSize = 2*MAX_PATH;
+    char* buf = 0;
+    while (lasterr == ERROR_INSUFFICIENT_BUFFER)
+    {
+      buf = (char*)realloc (buf, bufSize);
+      GetModuleFileName (0, buf, bufSize);
+      bufSize += MAX_PATH;
+      lasterr = GetLastError ();
+    }
+    outName = buf;
+    free (buf);
   }
 
-  char apppath[MAX_PATH];
-
-  GetModuleFileName (0, apppath, sizeof(apppath));
-
-  char *dot = strrchr (apppath, '.');
-  if (dot) 
   {
-    strcpy (dot, ".txt");
+    size_t basePos = outName.FindLast ('\\');
+    if (basePos != (size_t)-1) outName.DeleteAt (0, basePos+1);
   }
-  else
   {
-    strcat (apppath, ".txt");
+    size_t dot = outName.FindLast ('.');
+    if (dot != (size_t)-1)
+      outName.Overwrite (dot, ".txt");
+    else
+      outName.Append (".txt");
+  }
+  {
+    char tmp[MAX_PATH];
+    if (GetTempPath (sizeof (tmp), tmp) != 0)
+      outName.Insert (0, tmp);
   }
 
-  freopen(apppath, "w", stderr);
-  freopen(apppath, "w", stdout);
+  /* Redirect only those handles that were not initially redirected by
+   * the user */
+  if (!IsStdHandleRedirected (STD_ERROR_HANDLE)) 
+    freopen (outName, "w", stderr);
+  if (!IsStdHandleRedirected (STD_OUTPUT_HANDLE)) 
+    freopen (outName, "w", stdout);
   FreeConsole();
 
   struct tm *now;

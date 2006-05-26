@@ -12,6 +12,8 @@ chronological order.
 	  updated some CVS-specific parts.
 	- res changed the jobber config to pass the 'quiet' flags to svn 
 	  invocations.
+	- res changed the Win32 -[no]console stuff to respect user-specified
+	  redirects of the standard handles.
 24-May-2006
 	- res changed the memory tracking to record function names, not
 	  file names.
