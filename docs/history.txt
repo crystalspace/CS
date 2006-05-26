@@ -10,6 +10,8 @@ chronological order.
 	- res removed the now-useless WinCVS tutorial from the manual.
 	- res changed some references to CVS in the manual to SVN and also
 	  updated some CVS-specific parts.
+	- res changed the jobber config to pass the 'quiet' flags to svn 
+	  invocations.
 24-May-2006
 	- res changed the memory tracking to record function names, not
 	  file names.
