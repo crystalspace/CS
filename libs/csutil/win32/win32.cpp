@@ -335,11 +335,6 @@ BOOL WINAPI Win32Assistant::ConsoleHandlerRoutine (DWORD dwCtrlType)
   return result;
 }
 
-#if defined(__CYGWIN__) || defined(CS_COMPILER_BCC)
-#define _fileno(x) fileno(x)
-#define _isatty(x) isatty(x)
-#endif
-
 /// Determine whether a standard handle was redirected to a file
 static bool IsStdHandleRedirected (DWORD nHandle)
 {
