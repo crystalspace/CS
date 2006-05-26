@@ -24,7 +24,7 @@ mailing list. If all else fails, you can always send your code to the project
 administrators Jorrit Tyberghein (@email{jorrit.tyberghein@@gmail.com}), 
 Eric Sunshine (@email{sunshine@@sunshineco.com}), Frank Richter 
 (@email{res@@crystalspace3d.org}) or M@aa{}rten Svanfeldt 
-(@email{developer@@svanfeldt.com]) for inclusion in the project.
+(@email{developer@@svanfeldt.com}) for inclusion in the project.
 
 If you would like to contribute to the project in general by working on
 features which are missing or lacking, you might want to see the To-Do
