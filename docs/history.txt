@@ -12,6 +12,9 @@ chronological order.
 	- res changed dsplex to new SCF.
 	- res changed dsplex to try each document system only once when
 	  parsing a document. This fixes the redundancy in error messages.
+	- res changed stdrep to show alert windows before splitting a message
+	  into multiple lines (so only one alert is visible per message and 
+	  not one per line of the message).
 26-May-2006
         - dfryer rearranged bitarray.h to avoid an ICE in Apple's gcc 3.3 
           build
