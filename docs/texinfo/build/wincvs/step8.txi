@@ -1,3 +1,0 @@
-@c -*-texinfo-*-
-@node WinCVS Tutorial Step 8, , WinCVS Tutorial Step 7, WinCVS Tutorial
-@subsubsection Step 8: Updating Crystal Space

@@ -352,9 +352,18 @@ class csWrappedDocumentNodeFactory
 public:
   csWrappedDocumentNodeFactory (csXMLShaderCompiler* plugin);
 
+  /**
+   * Create a wrapper for a document node for conditional shaders.
+   * \param wrappedNode The document node to wrap in its entirety.
+   * \param resolver Condition resolver to which to add condition nodes.
+   * \param evaluator Condition evaluator to register conditions with.
+   * \param extraNodes Extra document nodes whose conditions are added to the
+   *  tree.
+   * \param dumpOut Optional destination for condition tree dump.
+   */
   csWrappedDocumentNode* CreateWrapper (iDocumentNode* wrappedNode,
     iConditionResolver* resolver, csConditionEvaluator& evaluator, 
-    csString* dumpOut);
+    const csRefArray<iDocumentNode>& extraNodes, csString* dumpOut);
   csWrappedDocumentNode* CreateWrapperStatic (iDocumentNode* wrappedNode,
     iConditionResolver* resolver, csString* dumpOut);
 };
