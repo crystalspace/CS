@@ -15,6 +15,8 @@ chronological order.
 	- res changed stdrep to show alert windows before splitting a message
 	  into multiple lines (so only one alert is visible per message and 
 	  not one per line of the message).
+	- res changed csVariant to store strings in iString*s rather than
+	  char*s, as outlined in bug #1388079.
 26-May-2006
         - dfryer rearranged bitarray.h to avoid an ICE in Apple's gcc 3.3 
           build
