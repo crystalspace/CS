@@ -136,12 +136,12 @@ private:
   void SetupInstances (csRenderMeshModes& modes, shaderPass *thispass);
 
   // load one pass, return false if it fails
-  bool LoadPass (iDocumentNode *node, shaderPass *pass);
+  bool LoadPass (iDocumentNode *node, shaderPass *pass, size_t variant);
   // load a shaderdefinition block
   //bool LoadSVBlock (iDocumentNode *node, iShaderVariableContext *context);
   // load a shaderprogram
   csPtr<iShaderProgram> LoadProgram (iShaderDestinationResolver* resolve,
-  	iDocumentNode *node, shaderPass *pass);
+  	iDocumentNode *node, shaderPass *pass, size_t variant);
   // Set reason for failure.
   void SetFailReason (const char* reason, ...) CS_GNUC_PRINTF (2, 3);
 
@@ -161,7 +161,7 @@ public:
   bool TeardownPass();
   bool DeactivatePass();
 
-  bool Load (iDocumentNode* node, iDocumentNode* parentSV);
+  bool Load (iDocumentNode* node, iDocumentNode* parentSV, size_t variant);
 
   const char* GetFailReason()
   { return fail_reason.GetData(); }

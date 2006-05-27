@@ -241,7 +241,7 @@ public:
             newString = lastDelim == -1;
             break;
           case delimIgnoreDifferent:
-            newString = lastDelim == *p;
+            newString = (lastDelim == -1) || (lastDelim == *p);
             break;
         }
         if (newString)

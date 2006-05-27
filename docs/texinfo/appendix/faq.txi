@@ -333,16 +333,6 @@ The following section lists some more technical questions.
 
 @itemize @bullet
 @item
-@strong{Q}: I updated Crystal Space from @sc{cvs} (with either @samp{WinCVS} or
-command-line) but it seems some files are missing.
-
-@strong{A}: When doing an update from @sc{cvs} it is important not to
-forget the @samp{-d} and @samp{-P} command-line options. Otherwise you
-will not get new directories and old empty directories will be
-everywhere. Using @samp{WinCVS} it is also possible to set these
-options.  @xref{WinCVS Tutorial}.
-
-@item
 @strong{Q}: I have some objects but collision detection is not working on
 them. What is wrong?
 

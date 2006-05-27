@@ -119,7 +119,7 @@ make -k all
 The @samp{-k} option used in @samp{make -k all} instructs the @file{make}
 utility to ignore errors and continue building the project.  This may be
 necessary if you are using the bleeding-edge version of Crystal Space from the
-@sc{cvs} repository and some module fails to build correctly.
+@sc{svn} repository and some module fails to build correctly.
 
 If you prefer to build a @dfn{debug} version of Crystal Space, substitute
 the following commands for those shown above:
@@ -162,7 +162,7 @@ make -k all
 
 Once in a while it is even a good idea to completely clean and re-configure the
 project.  This may be required if you are using the bleeding-edge version of
-Crystal Space from the @sc{cvs} repository after some radical change.
+Crystal Space from the @sc{svn} repository after some radical change.
 
 @example
 make distclean
