@@ -476,10 +476,6 @@ private:
   }
 
 public:
-  typedef ElementHandler ElementHandlerType;
-  typedef MemoryAllocator MemoryAllocatorType;
-  typedef CapacityHandler CapacityHandlerType;
-
   /**
    * Compare two objects of the same type.
    * \param r1 Reference to first object.
