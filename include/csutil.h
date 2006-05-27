@@ -82,6 +82,7 @@
 #include "csutil/list.h"
 #include "csutil/memdebug.h"
 #include "csutil/memfile.h"
+#include "csutil/memheap.h"
 #include "csutil/mempool.h"
 #include "csutil/mmapio.h"
 #include "csutil/nobjvec.h"

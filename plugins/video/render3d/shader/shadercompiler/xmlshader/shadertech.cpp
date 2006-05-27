@@ -168,7 +168,8 @@ bool csXMLShaderTech::ParseInstanceBinds (iDocumentNode *node, shaderPass *pass)
   return true;
 }
 
-bool csXMLShaderTech::LoadPass (iDocumentNode *node, shaderPass *pass)
+bool csXMLShaderTech::LoadPass (iDocumentNode *node, shaderPass *pass, 
+                                size_t variant)
 {
   iSyntaxService* synldr = parent->compiler->synldr;
   iStringSet* strings = parent->compiler->strings;
@@ -197,7 +198,7 @@ bool csXMLShaderTech::LoadPass (iDocumentNode *node, shaderPass *pass)
 
   if (programNode)
   {
-    program = LoadProgram (0, programNode, pass);
+    program = LoadProgram (0, programNode, pass, variant);
     if (program)
       pass->fp = program;
     else
@@ -218,7 +219,7 @@ bool csXMLShaderTech::LoadPass (iDocumentNode *node, shaderPass *pass)
 
   if (programNode)
   {
-    program = LoadProgram (resolveFP, programNode, pass);
+    program = LoadProgram (resolveFP, programNode, pass, variant);
     if (program)
     {
       pass->vp = program;
@@ -241,7 +242,7 @@ bool csXMLShaderTech::LoadPass (iDocumentNode *node, shaderPass *pass)
 
   if (programNode)
   {
-    program = LoadProgram (resolveFP, programNode, pass);
+    program = LoadProgram (resolveFP, programNode, pass, variant);
     if (program)
     {
       pass->vproc = program;
@@ -568,7 +569,8 @@ bool csXMLShaderCompiler::LoadSVBlock (iDocumentNode *node,
 }
 
 csPtr<iShaderProgram> csXMLShaderTech::LoadProgram (
-  iShaderDestinationResolver* resolve, iDocumentNode* node, shaderPass* /*pass*/)
+  iShaderDestinationResolver* resolve, iDocumentNode* node, shaderPass* /*pass*/,
+  size_t variant)
 {
   if (node->GetAttributeValue("plugin") == 0)
   {
@@ -610,7 +612,8 @@ csPtr<iShaderProgram> csXMLShaderTech::LoadProgram (
     return 0;
   csRef<iDocumentNode> programNode;
   if (node->GetAttributeValue ("file") != 0)
-    programNode = parent->LoadProgramFile (node->GetAttributeValue ("file"));
+    programNode = parent->LoadProgramFile (node->GetAttributeValue ("file"), 
+      variant);
   else
     programNode = node;
   if (!program->Load (resolve, programNode))
@@ -622,7 +625,8 @@ csPtr<iShaderProgram> csXMLShaderTech::LoadProgram (
   return csPtr<iShaderProgram> (program);
 }
 
-bool csXMLShaderTech::Load (iDocumentNode* node, iDocumentNode* parentSV)
+bool csXMLShaderTech::Load (iDocumentNode* node, iDocumentNode* parentSV, 
+                            size_t variant)
 {
   if ((node->GetType() != CS_NODE_ELEMENT) || 
     (xmltokens.Request (node->GetValue()) 
@@ -718,7 +722,7 @@ bool csXMLShaderTech::Load (iDocumentNode* node, iDocumentNode* parentSV)
   {
     csRef<iDocumentNode> passNode = it->Next ();
     passes[currentPassNr].owner = this;
-    if (!LoadPass (passNode, &passes[currentPassNr++]))
+    if (!LoadPass (passNode, &passes[currentPassNr++], variant))
     {
       return false;
     }

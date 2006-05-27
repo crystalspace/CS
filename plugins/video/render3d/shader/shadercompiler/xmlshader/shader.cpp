@@ -275,6 +275,36 @@ csXMLShader::csXMLShader (csXMLShaderCompiler* compiler,
   shadermgr = CS_QUERY_REGISTRY (compiler->objectreg, iShaderManager);
   CS_ASSERT (shadermgr); // Should be present - loads us, after all
 
+  csRefArray<iDocumentNode> extraNodes;
+  {
+    static const char* const extraNodeNames[] = { "vp", "fp", "vproc", 0 };
+    csRef<iDocumentNodeIterator> techNodes = source->GetNodes ("technique");
+    while (techNodes->HasNext())
+    {
+      csRef<iDocumentNode> techNode = techNodes->Next();
+      csRef<iDocumentNodeIterator> passNodes = techNode->GetNodes ("pass");
+      while (passNodes->HasNext())
+      {
+        csRef<iDocumentNode> passNode = passNodes->Next();
+        const char* const* extraName = extraNodeNames;
+        while (*extraName)
+        {
+          csRef<iDocumentNode> node = passNode->GetNode (*extraName);
+          if (node.IsValid())
+          {
+            const char* filename = node->GetAttributeValue ("file");
+            if (filename != 0)
+            {
+              csRef<iDocumentNode> extraNode = OpenDocFile (filename);
+              if (extraNode.IsValid()) extraNodes.Push (extraNode);
+            }
+          }
+          extraName++;
+        }
+      }
+    }
+  }
+
   resolver = new csShaderConditionResolver (compiler);
   csRef<iDocumentNode> wrappedNode;
   if (compiler->doDumpConds)
@@ -282,7 +312,7 @@ csXMLShader::csXMLShader (csXMLShaderCompiler* compiler,
     csString tree;
     tree.SetGrowsBy (0);
     wrappedNode.AttachNew (compiler->wrapperFact->CreateWrapper (source, 
-      resolver, resolver->evaluator, &tree));
+      resolver, resolver->evaluator, extraNodes, &tree));
     resolver->DumpConditionTree (tree);
     csString filename;
     filename.Format ("/tmp/shader/cond_%s.txt", source->GetAttributeValue ("name"));
@@ -290,7 +320,7 @@ csXMLShader::csXMLShader (csXMLShaderCompiler* compiler,
   }
   else
     wrappedNode.AttachNew (compiler->wrapperFact->CreateWrapper (source, 
-    resolver, resolver->evaluator, 0));
+    resolver, resolver->evaluator, extraNodes, 0));
   shaderSource = wrappedNode;
   vfsStartDir = csStrNew (compiler->vfs->GetCwd ());
 
@@ -472,7 +502,7 @@ size_t csXMLShader::GetTicket (const csRenderMeshModes& modes,
       {
 	TechniqueKeeper tk = techIt.Next();
 	csXMLShaderTech* tech = new csXMLShaderTech (this);
-	if (tech->Load (tk.node, shaderSource))
+	if (tech->Load (tk.node, shaderSource, vi))
 	{
 	  if (compiler->do_verbose)
 	    compiler->Report (CS_REPORTER_SEVERITY_NOTIFY,
@@ -562,12 +592,12 @@ void csXMLShader::DumpStats (csString& str)
     str.Format ("%zu variations", resolver->GetVariantCount ());
 }
 
-csRef<iDocumentNode> csXMLShader::LoadProgramFile (const char* filename)
+csRef<iDocumentNode> csXMLShader::OpenDocFile (const char* filename)
 {
   csRef<iVFS> VFS = CS_QUERY_REGISTRY (compiler->objectreg, 
     iVFS);
-  csRef<iFile> programFile = VFS->Open (filename, VFS_FILE_READ);
-  if (!programFile)
+  csRef<iFile> file = VFS->Open (filename, VFS_FILE_READ);
+  if (!file)
   {
     compiler->Report (CS_REPORTER_SEVERITY_ERROR,
       "Unable to open shader program file '%s'", filename);
@@ -578,14 +608,23 @@ csRef<iDocumentNode> csXMLShader::LoadProgramFile (const char* filename)
   if (docsys == 0)
     docsys.AttachNew (new csTinyDocumentSystem ());
 
-  csRef<iDocument> programDoc = docsys->CreateDocument ();
-  const char* err = programDoc->Parse (programFile, true);
+  csRef<iDocument> doc = docsys->CreateDocument ();
+  const char* err = doc->Parse (file, true);
   if (err != 0)
   {
     compiler->Report (CS_REPORTER_SEVERITY_ERROR,
       "Unable to parse shader program file '%s': %s", filename, err);
     return 0;
   }
+
+  return doc->GetRoot ();
+}
+
+csRef<iDocumentNode> csXMLShader::LoadProgramFile (const char* filename, 
+                                                   size_t variant)
+{
+  csRef<iDocumentNode> programRoot = OpenDocFile (filename);
+  if (!programRoot.IsValid()) return 0;
 
   csString dumpFN;
   if (compiler->doDumpConds || compiler->doDumpXML)
@@ -604,14 +643,14 @@ csRef<iDocumentNode> csXMLShader::LoadProgramFile (const char* filename)
   {
     csString tree;
     programNode.AttachNew (compiler->wrapperFact->CreateWrapperStatic (
-      programDoc->GetRoot (), resolver, &tree));
+      programRoot, resolver, &tree));
     resolver->DumpConditionTree (tree);
-    compiler->vfs->WriteFile (csString().Format ("/tmp/shader/%s.txt",
-      dumpFN.GetData()), tree.GetData(), tree.Length());
+    compiler->vfs->WriteFile (csString().Format ("/tmp/shader/%s_%zu.txt",
+      dumpFN.GetData(), variant), tree.GetData(), tree.Length());
   }
   else
     programNode.AttachNew (compiler->wrapperFact->CreateWrapperStatic (
-      programDoc->GetRoot (), resolver, 0));
+      programRoot, resolver, 0));
 
   if (compiler->doDumpXML)
   {
@@ -619,8 +658,8 @@ csRef<iDocumentNode> csXMLShader::LoadProgramFile (const char* filename)
     docsys.AttachNew (new csTinyDocumentSystem);
     csRef<iDocument> newdoc = docsys->CreateDocument();
     CloneNode (programNode, newdoc->CreateRoot());
-    newdoc->Write (compiler->vfs, csString().Format ("/tmp/shader/%s.xml",
-      dumpFN.GetData()));
+    newdoc->Write (compiler->vfs, csString().Format ("/tmp/shader/%s_%zu.xml",
+      dumpFN.GetData(), variant));
   }
   return programNode;
 }

@@ -341,7 +341,7 @@ make -k all
 
 Once in a while it is even a good idea to completely clean and re-configure the
 project.  This may be required if you are using the bleeding-edge version of
-Crystal Space from the @sc{cvs} repository after some radical change.
+Crystal Space from the @sc{svn} repository after some radical change.
 
 @example
 make distclean

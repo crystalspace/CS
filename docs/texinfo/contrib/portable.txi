@@ -236,22 +236,20 @@ case-insensitive file system such as @sc{dos}, Windows, or Macintosh (HFS).  In
 general, it is preferable to use entirely lower-case filenames for files which
 are shared between ports.
 
-@strong{Warning}: @file{WinCVS} has been reported to botch capitalization of
-files.  Please be aware of this potential problem.
-
 @item
-@emph{Makefiles and Project Files}
+@emph{@file{Jamfile}s and Project Files}
 
 Some platforms use custom project files, whereas other platforms use the
-Crystal Space makefile system.  If you change a makefile and then change the
-code so that it depends on this change, ports for other platforms will
-probably break.  This may be unavoidable to some extent, but try to minimize
-the breakage.  For example, wrap the dependent code in an @code{#ifdef} and
-check for operating systems that @emph{do} support the change.  This will
-allow other systems to continue to work without your change.  After committing
-your change to the @sc{cvs} repository, be sure to inform port maintainers
-that their projects may need to be updated in order to support your
-modifications.
+Crystal Space Jam-based build system.  If you change a @file{Jamfile} and then 
+change the code so that it depends on this change, ports for other platforms 
+will probably break.  This may be unavoidable to some extent, but try to 
+minimize the breakage.  For example, devise a @file{configure} check for the
+feature andwrap the dependent code in an @code{#ifdef} for a definition emitted
+when the feature was detected, or at least for operating systems that 
+@emph{do} support the change.   This will allow other systems to continue to 
+work without your change.  After committing your change to the @sc{svn} 
+repository, be sure to  inform port maintainers that their projects may need 
+to be updated in order to support your modifications.
 
 @item
 @emph{Ensuring Rendering}

@@ -17,14 +17,24 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "csutil/scf.h"
+#ifndef __CS_DSPLEX_H__
+#define __CS_DSPLEX_H__
+
 #include "csutil/refarr.h"
+#include "csutil/stringarray.h"
+#include "csutil/scf.h"
 #include "iutil/comp.h"
 #include "iutil/document.h"
 
 struct iObjectRegistry;
 
-class csDocumentSystemMultiplexer : public iDocumentSystem, public iComponent
+CS_PLUGIN_NAMESPACE_BEGIN(DSPlex)
+{
+
+class csDocumentSystemMultiplexer : 
+  public scfImplementation2<csDocumentSystemMultiplexer,
+                            iDocumentSystem, 
+                            iComponent>
 {
 private:
   friend struct csPlexDocument;
@@ -32,14 +42,12 @@ private:
   csRef<iDocumentSystem> defaultDocSys;
   csRefArray<iDocumentSystem> orderedlist;
   csRefArray<iDocumentSystem> autolist;
-  csRef<iStringArray> classlist;
+  csStringArray classlist;
   csRef<iPluginManager> plugin_mgr;
 
   csRef<iDocumentSystem> LoadNextPlugin (size_t num);
   void RewardPlugin (size_t num);
 public:
-  SCF_DECLARE_IBASE;
-  
   csDocumentSystemMultiplexer (iBase* parent = 0);
   virtual ~csDocumentSystemMultiplexer ();
 	
@@ -48,7 +56,9 @@ public:
   csRef<iDocument> CreateDocument ();
 };
 
-struct csPlexDocument : public iDocument
+struct csPlexDocument : 
+  public scfImplementation1<csPlexDocument,
+                            iDocument>
 {
 private:
   friend class csDocumentSystemMultiplexer;
@@ -58,8 +68,6 @@ private:
   csRef<iDocument> wrappedDoc;
   csString lasterr;
 public:
-  SCF_DECLARE_IBASE;
-
   csPlexDocument (csRef<csDocumentSystemMultiplexer> aPlexer);
   virtual ~csPlexDocument ();
 
@@ -77,3 +85,7 @@ public:
   virtual int Changeable ();
 };
 
+}
+CS_PLUGIN_NAMESPACE_END(DSPlex)
+
+#endif // __CS_DSPLEX_H__

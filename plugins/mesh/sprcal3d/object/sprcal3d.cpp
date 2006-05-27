@@ -758,7 +758,7 @@ csSpriteCal3DMeshObject::csSpriteCal3DMeshObject (iBase *pParent,
   updateanim_skip3 = 1000;  // Animate very rarely.
 
   anim_time_handler.AttachNew (new DefaultAnimTimeUpdateHandler());
-  //calModel.getPhysique()->setAxisFactorX(-1.0f);
+  calModel.getPhysique()->setAxisFactorX(-1.0f);
 }
 
 csSpriteCal3DMeshObject::~csSpriteCal3DMeshObject ()

@@ -25,6 +25,7 @@
 /**\addtogroup util
  * @{ */
 #include "csutil/scf.h"
+#include "csutil/scfstr.h"
 
 /// Types that can be contained within a variant.
 enum csVariantType
@@ -55,50 +56,50 @@ private:
     long l;
     bool b;
     float f;
-    char* s;
+    iString* s;
   } v;
-
+  void Clear()
+  {
+    if ((type == CSVAR_STRING) && (v.s != 0)) v.s->DecRef();
+  }
 public:
-  csVariant () { type = CSVAR_LONG; v.s = 0; }
-  ~csVariant () { if (type == CSVAR_STRING) delete[] v.s; }
+  csVariant () { type = CSVAR_LONG; memset (&v, 0, sizeof (v)); }
+  ~csVariant () { Clear(); }
   /// Assign a long
   void SetLong (long l)
   {
-    if (type == CSVAR_STRING) delete[] v.s;
+    Clear();
     type = CSVAR_LONG;
     v.l = l;
   }
   /// Assign a bool
   void SetBool (bool b)
   {
-    if (type == CSVAR_STRING) delete[] v.s;
+    Clear();
     type = CSVAR_BOOL;
     v.b = b;
   }
   /// Assign a float
   void SetFloat (float f)
   {
-    if (type == CSVAR_STRING) delete[] v.s;
+    Clear();
     type = CSVAR_FLOAT;
     v.f = f;
   }
   /// Assign a string
   void SetString (const char* s)
   {
-    if (s != v.s)
-    {
-      if (type == CSVAR_STRING) delete[] v.s;
-      type = CSVAR_STRING;
-      if (s)
-	v.s = csStrNew (s);
-      else
-	v.s = 0;
-    }
+    Clear();
+    type = CSVAR_STRING;
+    if (s)
+      v.s = new scfString (s);
+    else
+      v.s = 0;
   }
   /// Assign a command
   void SetCommand ()
   {
-    if (type == CSVAR_STRING) delete[] v.s;
+    Clear();
     type = CSVAR_CMD;
   }
 
@@ -124,7 +125,7 @@ public:
   const char* GetString () const
   {
     CS_ASSERT (type == CSVAR_STRING);
-    return v.s;
+    return v.s->GetData();
   }
   csVariantType GetType () const { return type; }
 };
@@ -159,7 +160,7 @@ struct csOptionDescription
  */
 struct iPluginConfig : public virtual iBase
 {
-  SCF_INTERFACE(iPluginConfig,2,0,0);
+  SCF_INTERFACE(iPluginConfig,2,1,0);
   /// Get option description; return FALSE if there is no such option
   virtual bool GetOptionDescription (int idx, csOptionDescription *option) = 0;
   /// Set option

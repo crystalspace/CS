@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Porting, , CVS Guide, Contributing
+@node Porting, , SVN Guide, Contributing
 @section Porting to a New Platform
 @cindex Porting
 

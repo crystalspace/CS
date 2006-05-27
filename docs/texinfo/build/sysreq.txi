@@ -15,7 +15,7 @@ System.  Currently Crystal Space supports: Windows (32 bit), Unix
 (@sc{gnu}/Linux, FreeBSD, etc.), and MacOS/X.
 
 @strong{Development Environment}: You may build Crystal Space yourself, or you
-may download a pre-built @sc{sdk} package.  If you are using the @sc{cvs}
+may download a pre-built @sc{sdk} package.  If you are using the @sc{svn}
 version of Crystal Space, then you will need to build it yourself.  To do so
 you will need a supported C++ compiler such as the @sc{gnu} Compiler Collection
 (@sc{gcc}) or Microsoft Visual C++.  If you plan to use the scripting
@@ -30,17 +30,17 @@ downloaded from:
 
 The release includes all of the source code, some pre-generated documentation,
 and a few example data files.  Alternately, you can download the latest
-@sc{cvs} snapshot, which is often a great improvement over the latest release,
+@sc{svn} snapshot, which is often a great improvement over the latest release,
 and often as, or more, stable.
 
 @noindent
 @uref{http://www.crystalspace3d.org/cvs-snapshots/}
 
-You can also checkout the source directly from the @sc{cvs} repository.
+You can also checkout the source directly from the @sc{svn} repository.
 Directions for doing this can be found here:
 
 @noindent
-@uref{http://sourceforge.net/cvs/?group_id=649}
+@uref{http://sourceforge.net/svn/?group_id=649}
 
 @strong{External Dependencies}: Crystal Space can use a number of optional
 libraries and tools to provide a more robust set of features.  A brief list of

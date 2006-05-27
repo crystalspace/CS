@@ -8,9 +8,6 @@ This chapter describes how to configure, build, and install Crystal Space.
 It begins by describing the resources you need to utilize Crystal Space
 and ends with detailed instructions for each supported platform.
 
-If you wish to learn how you can use WinCVS to obtain the bleeding edge 
-(or ``@sc{cvs}'') version of Crystal Space, @pxref{WinCVS Tutorial}.
-
 If you are eager to try out the package after building it successfully, then
 read the Quick Start section.  @xref{Quick Start}.
 

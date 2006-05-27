@@ -19,10 +19,11 @@
 
 #include "cssysdef.h"
 
-#include "csutil/util.h"
-#include "csutil/scf.h"
 #include "csutil/csstring.h"
 #include "csutil/databuf.h"
+#include "csutil/scf.h"
+#include "csutil/set.h"
+#include "csutil/util.h"
 #include "iutil/document.h"
 #include "iutil/databuff.h"
 #include "iutil/plugin.h"
@@ -32,22 +33,20 @@
 
 #include "dsplex.h"
 
+CS_IMPLEMENT_PLUGIN
+
+CS_PLUGIN_NAMESPACE_BEGIN(DSPlex)
+{
 #define DSCLASSPREFIX "crystalspace.documentsystem."
 #define DOCPLEX_CLASSNAME DSCLASSPREFIX "multiplexer"
 
-SCF_IMPLEMENT_IBASE (csPlexDocument)
-  SCF_IMPLEMENTS_INTERFACE (iDocument)
-SCF_IMPLEMENT_IBASE_END
-
-csPlexDocument::csPlexDocument (csRef<csDocumentSystemMultiplexer> aPlexer)
+csPlexDocument::csPlexDocument (csRef<csDocumentSystemMultiplexer> aPlexer) :
+  scfImplementationType (this), plexer (aPlexer)
 {
-  SCF_CONSTRUCT_IBASE (0);
-  plexer = aPlexer;
 }
 
 csPlexDocument::~csPlexDocument ()
 {
-  SCF_DESTRUCT_IBASE();
 }
 
 void csPlexDocument::Clear ()
@@ -246,19 +245,13 @@ int csPlexDocument::Changeable ()
   }
 }
 
-SCF_IMPLEMENT_IBASE(csDocumentSystemMultiplexer)
-  SCF_IMPLEMENTS_INTERFACE(iDocumentSystem)
-  SCF_IMPLEMENTS_INTERFACE(iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-csDocumentSystemMultiplexer::csDocumentSystemMultiplexer(iBase* parent) : autolist (0, 1)
+csDocumentSystemMultiplexer::csDocumentSystemMultiplexer(iBase* parent) : 
+  scfImplementationType (this, parent), autolist (0, 1)
 {
-  SCF_CONSTRUCT_IBASE(parent);
 }
 
 csDocumentSystemMultiplexer::~csDocumentSystemMultiplexer ()
 {
-  SCF_DESTRUCT_IBASE();
 }
 
 csRef<iDocument> csDocumentSystemMultiplexer::CreateDocument ()
@@ -270,13 +263,14 @@ bool csDocumentSystemMultiplexer::Initialize (iObjectRegistry* object_reg)
 {
   if (object_reg)
   {
-    plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+    plugin_mgr = csQueryRegistry<iPluginManager> (object_reg);
 
+    csSet<csString> usedPlugins;
     int idx;
     int errorcount = 0;
     for (idx = 1; ; idx++)
     {
-      csRef<iBase> b (CS_QUERY_REGISTRY_TAG (object_reg, 
+      csRef<iBase> b (csQueryRegistryTag (object_reg, 
 	csString().Format ("iDocumentSystem.%d", idx)));
       if (!b) 
       {
@@ -288,20 +282,37 @@ bool csDocumentSystemMultiplexer::Initialize (iObjectRegistry* object_reg)
       else
       {
 	errorcount = 0;	
-	csRef<iDocumentSystem> ds (SCF_QUERY_INTERFACE (b, iDocumentSystem));
-	orderedlist.Push (ds);
+	csRef<iDocumentSystem> ds (scfQueryInterface<iDocumentSystem> (b));
+        if (ds.IsValid()) 
+        {
+          orderedlist.Push (ds);
+          csRef<iFactory> fact = scfQueryInterface<iFactory> (b);
+          usedPlugins.Add (fact->QueryClassID ());
+        }
       }
     }
     orderedlist.ShrinkBestFit();
 
-    csRef<iBase> b (CS_QUERY_REGISTRY_TAG (object_reg, 
+    csRef<iBase> b (csQueryRegistryTag (object_reg, 
       "iDocumentSystem.Default"));
     if (b)
     {
-      defaultDocSys = SCF_QUERY_INTERFACE (b, iDocumentSystem);
+      defaultDocSys = scfQueryInterface<iDocumentSystem> (b);
+      csRef<iFactory> fact = scfQueryInterface<iFactory> (b);
+      usedPlugins.Add (fact->QueryClassID ());
     }
 
-    classlist = iSCF::SCF->QueryClassList (DSCLASSPREFIX);
+    csRef<iStringArray> scfClassList = 
+      iSCF::SCF->QueryClassList (DSCLASSPREFIX);
+    for (size_t i = 0; i < scfClassList->GetSize(); i++)
+    {
+      const char* scfClass = scfClassList->Get (i);
+      if ((strcasecmp (scfClass, DOCPLEX_CLASSNAME) != 0)
+        && !usedPlugins.Contains (scfClass))
+      {
+        classlist.Push (scfClass);
+      }
+    }
     return true;
   }
   return false;
@@ -323,31 +334,16 @@ csRef<iDocumentSystem> csDocumentSystemMultiplexer::LoadNextPlugin (size_t num)
     }
     else
     {
-      if (classlist.IsValid())
+      while ((classlist.GetSize() > 0) && !res.IsValid())
       {
-	while (classlist.IsValid() && !res.IsValid())
+        char const* classname = classlist.Get (0);
+	res = csLoadPlugin<iDocumentSystem> (plugin_mgr, classname);
+	if (res.IsValid())
 	{
-	  char const* classname = 0;
-	  do
-	  {
-	    if (classname) classlist->DeleteIndex (0);
-	    if (classlist->Length() == 0)
-	    {
-	      classlist = 0;
-	      plugin_mgr = 0;
-	      return 0;
-	    }
-	    classname = classlist->Get(0);
-	  } while (!strcasecmp (classname, DOCPLEX_CLASSNAME));
-          
-	  res = CS_LOAD_PLUGIN (plugin_mgr, classname, iDocumentSystem);
-	  if (res.IsValid())
-	  {
-	    // remember the plugin
-	    autolist.Push (res);
-	  }
-	  classlist->DeleteIndex (0);
+	  // remember the plugin
+	  autolist.Push (res);
 	}
+	classlist.DeleteIndex (0);
       }
     }
   }
@@ -366,6 +362,7 @@ void csDocumentSystemMultiplexer::RewardPlugin (size_t num)
   }
 }
 
-CS_IMPLEMENT_PLUGIN
-
 SCF_IMPLEMENT_FACTORY (csDocumentSystemMultiplexer)
+
+}
+CS_PLUGIN_NAMESPACE_END(DSPlex)
