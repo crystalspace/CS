@@ -19,6 +19,7 @@ chronological order.
 	- res added material emission support to glshader_fixed. Closes bug
 	  (should've really been an RFE) #1396182.
 	- res reworded, reordered and somewhat compacted the feature list.
+	- Jorrit completed the portal container documentation.
 27-May-2006
 	- res fixed the delimIgnoreDifferent mode for 
 	  csStringArray::SplitString() to work as it should.
