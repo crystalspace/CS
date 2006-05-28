@@ -42,9 +42,10 @@ matrices, transforms, quaternions, kdtree, axis aligned and oriented bounding
 box routines, rectangle subdivision, etc. @xref{csGeom}.
 
 @item
-General utility library with stuff like templated arrays, smart pointer,
-hash map, object registry, plugin manager, radix sort, bit array, optimized
-allocators, strings, etc. @xref{csUtil}.
+General utility library with stuff like templated arrays, smart pointers,
+hash maps, object registry, plugin manager, radix sort, bit array, optimized
+allocators, strings, command-line parsing, configuration files, and more. 
+@xref{csUtil}. @xref{The Basics}. @xref{Configuration File}.
 
 @item
 Higher level tool library containing things like some example procedural
@@ -52,37 +53,19 @@ textures (plasma, fire, and water), full screen effects, collider support,
 texture generation tools, etc.
 
 @item
-Graphics library with simple utilities to do mipmapping, color quantization,
-calculation of color gradients, simple bumpmapping, etc.
+Graphics utility library with simple tools to compute mipmaps, color 
+quantization, calculation of color gradients, and more.
 
 @item
 Shared Class Facility @sc{scf} allowing for proper decoupling of interface
-and implementation and also allows for dynamically loadable modules (see
-plugins below).  @xref{SCF}. @xref{The Basics}.
-
-@item
-Smart Pointers, making it easier to keep track of reference counted
-objects. @xref{Smart Pointers}.
-
-@item
-Flexible plug-in system which is used extensively by Crystal Space and
-also allows third-party creation of plugins. @xref{SCF}.
-@xref{HOWTO Create Your Own Plugin}.
+and implementation and also allows for dynamically loadable modules 
+It provides a flexible plug-in system which is used extensively by Crystal 
+Space itself but also allows third-party creation of plugins. @xref{SCF}.
+@xref{SCF}. @xref{The Basics}. @xref{HOWTO Create Your Own Plugin}.
 
 @item
 Virtual file system and transparent support for @sc{zip} files. This
 allows cross-platform access to game data files. @xref{VFS}.
-
-@item
-Configuration files for all Crystal Space modules and also for your
-own application. @xref{Configuration File}.
-
-@item
-Command-line parsing. @xref{The Basics}. @xref{Configuration File}.
-
-@item
-Pull-down console that you can integrate in your own games.
-@xref{Config Console}.
 
 @item
 Flexible and extensible event system.
@@ -94,8 +77,24 @@ Full screen effects (fading, whiteout, etc).
 Level of Detail. @xref{Level of Detail}.
 
 @item
+Various types of mesh objects: bezier curves, polygonal lightmapped
+objects, triangle meshes, haze mesh (bit like volumetric light),
+@dots{}.
+@xref{MeshObject}. @xref{MeshObject Thing},
+@xref{HOWTO Create Thing}. @xref{MeshObject Genmesh}.
+@xref{HOWTO Create Genmesh}.
+
+@item
 Animated 3D models (3D sprites) using frame based animation. @xref{Animation}.
 @xref{MeshObject Spr3D}.
+
+@item
+Animated 3D models using a skeletal animation system with good support
+for hardware skinning.
+
+@item
+Animated Cal3D models using skeletal based animation using the 
+@file{sprcal3d} plugin. @xref{MeshObject SprCal3D}.
 
 @item
 2D animations.
@@ -106,23 +105,16 @@ Quake @sc{md3} and @sc{mdl} to Crystal Space convertor.
 and @sc{3ds} models directly.
 
 @item
-The @file{sprcal3d} plugin is able to load Cal3D models. These models
-can do skeletal based animation. @xref{MeshObject SprCal3D}.
-
-@item
-Powerful alternative skeletal animation system with good support
-for hardware skinning and dynamic soft shadows.
-
-@item
 Crystal Space native windowing system(s). @xref{AWS}. 
 
 @item
-3D renderers (OpenGL, software, null) and support for several
-2D canvases. @xref{3D Renderer}.
+Cross-platform support for hardware rendering via OpenGL and software 
+rendering as well as a special "null" renderer for applications like game 
+servers. @xref{3D Renderer}.
 
 @item
-Various image loaders (@sc{bmp}, @sc{gif}, @sc{jpg}, @sc{png}, @sc{sgi},
-@sc{tga}, @sc{wal}).
+Supports various common image formats (@sc{bmp}, @sc{dds}, @sc{gif}, @sc{jpg}, 
+@sc{mng}, @sc{png}, @sc{tga}).
 
 @item
 Portals and sectors which allow for flexible world creation.
@@ -140,30 +132,20 @@ Lighting: static, pseudo-dynamic, dynamic, halos, shadows, stencil shadows.
 Multiple cameras. @xref{HOWTO Camera Movement}.
 
 @item
-Textures, materials, and shaders. Shaders support @sc{cg}, @sc{arb}, and
+Powerful material support. Shaders and textures can be assigned arbitrarily 
+to materials allowing great flexibility. Shaders support @sc{cg}, @sc{arb}, and
 @samp{fixed function} language. @xref{Texture Mapping}.
 
 @item
 Procedural textures. @xref{ProcTextures}. @xref{Texture Mapping}.
 
 @item
-Sound drivers (CoreAudio, @sc{oss}, and WaveOut) and
-renderers (software only at the moment). @xref{Sound Drivers}.
+Cross-platform support for sound rendering. Supports @sc{wav} and @sc{ogg}
+sounds. @xref{Sound Drivers}.
 
 @item
-Sound loaders (@sc{wav} and @sc{ogg}). @xref{Sound Drivers}.
-
-@item
-Various types of mesh objects: bezier curves, polygonal lightmapped
-objects, triangle meshes, haze mesh (bit like volumetric light),
-@dots{}.
-@xref{MeshObject}. @xref{MeshObject Thing},
-@xref{HOWTO Create Thing}. @xref{MeshObject Genmesh}.
-@xref{HOWTO Create Genmesh}.
-
-@item
-Terrain engine with support for texture splatting (dynamically merging
-multiple textures on a terrain and @sc{lod}). @xref{MeshObject TerrFunc}.
+Terrain engine with support for texture splatting (blending multiple materials 
+on a terrain) and @sc{lod}. @xref{MeshObject TerrFunc}.
 
 @item
 Particle system to make fire, explosions, rain, snow, fountains, and much
@@ -179,21 +161,25 @@ Powerful sequence manager to control movement, animation and other
 features in a world. @xref{Sequence Manager}.
 
 @item
-Bitmapped and vector fonts (FreeFont). @xref{HOWTO Use custom font}.
+Built-in support for TrueType fonts. @xref{HOWTO Use custom font}.
 
 @item
-@sc{xml} map file loader and converters. @xref{XML File Format},
+Unicode text output.
+
+@item
+@sc{xml}-based map format. @xref{XML File Format},
 @xref{Tutorial Simple Map}. @xref{Old Map File Format}.
 
 @item
 Scripting bindings (Python, Perl, Java). @xref{Scripting Languages}.
 
 @item
-Object movement. @xref{HOWTO Mesh Movement}.
+Plugin for integrated movie recording. @xref{HOWTO Recording Movies}.
 
 @item
-Movie recording plugin. @xref{HOWTO Recording Movies}.
+Pull-down console that you can integrate in your own games.
+@xref{Config Console}.
 
 @item
-Debugging system.
+Debugging systems.
 @end itemize
