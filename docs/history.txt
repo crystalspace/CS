@@ -20,6 +20,7 @@ chronological order.
 	  (should've really been an RFE) #1396182.
 	- res reworded, reordered and somewhat compacted the feature list.
 	- Jorrit completed the portal container documentation.
+	- Marten added the new particle system and loader.
 27-May-2006
 	- res fixed the delimIgnoreDifferent mode for 
 	  csStringArray::SplitString() to work as it should.

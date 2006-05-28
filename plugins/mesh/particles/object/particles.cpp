@@ -1,704 +1,689 @@
 /*
-    Copyright (C) 2003 by Jorrit Tyberghein, John Harger, Daniel Duhprey
+  Copyright (C) 2006 by Marten Svanfeldt
 
-    This library is free software; you can redistribute it and/or
-    modify it under the terms of the GNU Library General Public
-    License as published by the Free Software Foundation; either
-    version 2 of the License, or (at your option) any later version.
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Library General Public
+  License as published by the Free Software Foundation; either
+  version 2 of the License, or (at your option) any later version.
 
-    This library is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    Library General Public License for more details.
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  Library General Public License for more details.
 
-    You should have received a copy of the GNU Library General Public
-    License along with this library; if not, write to the Free
-    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+  You should have received a copy of the GNU Library General Public
+  License along with this library; if not, write to the Free
+  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #include "cssysdef.h"
 
-#include "csqint.h"
-#include "csqsqrt.h"
-
-#include "csgeom/box.h"
+#include "csgeom/math.h"
+#include "csgeom/transfrm.h"
+#include "csgeom/tri.h"
 #include "csgfx/renderbuffer.h"
-#include "csutil/cscolor.h"
-#include "csutil/randomgen.h"
-#include "csutil/util.h"
-#include "iengine/camera.h"
-#include "iengine/movable.h"
-#include "iengine/rview.h"
-#include "imesh/particles.h"
-#include "iutil/objreg.h"
-#include "iutil/plugin.h"
-#include "ivaria/reporter.h"
-#include "ivideo/material.h"
-#include "ivideo/rndbuf.h"
-#include "ivideo/texture.h"
-#include "ivideo/txtmgr.h"
+#include "cstool/rbuflock.h"
+#include "csutil/algorithms.h"
+#include "csutil/sysfunc.h"
+#include "csutil/radixsort.h"
 
+#include "imesh/particles.h"
+#include "iengine/material.h"
+#include "iengine/camera.h"
+#include "iengine/rview.h"
+#include "iengine/movable.h"
+#include "ivideo/graph3d.h"
+#include "ivideo/rendermesh.h"
 
 #include "particles.h"
-#include <limits.h>
-
-CS_LEAKGUARD_IMPLEMENT (csParticlesFactory);
-CS_LEAKGUARD_IMPLEMENT (csParticlesObject);
-CS_LEAKGUARD_IMPLEMENT (csParticlesObject::eiRenderBufferAccessor);
+#include "vertexsetup.h"
 
 CS_IMPLEMENT_PLUGIN
 
-SCF_IMPLEMENT_IBASE (csParticlesType)
-  SCF_IMPLEMENTS_INTERFACE (iMeshObjectType)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csParticlesType::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_FACTORY (csParticlesType)
-
-csParticlesType::csParticlesType (iBase* p) : parent(p)
+CS_PLUGIN_NAMESPACE_BEGIN(Particles)
 {
-  SCF_CONSTRUCT_IBASE (parent)
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent)
-}
 
-csParticlesType::~csParticlesType ()
-{
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
-  SCF_DESTRUCT_IBASE ();
-}
+  SCF_IMPLEMENT_FACTORY(ParticlesMeshObjectType)
 
-csPtr<iMeshObjectFactory> csParticlesType::NewFactory ()
-{
-  return csPtr<iMeshObjectFactory>
-	(new csParticlesFactory (this, object_reg));
-}
-
-SCF_IMPLEMENT_IBASE (csParticlesFactory)
-  SCF_IMPLEMENTS_INTERFACE (iMeshObjectFactory)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iParticlesFactoryState)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csParticlesFactory::eiParticlesFactoryState)
-  SCF_IMPLEMENTS_INTERFACE (iParticlesFactoryState)
-  SCF_IMPLEMENTS_INTERFACE (iParticlesStateBase)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-csParticlesFactory::csParticlesFactory (csParticlesType* p,
-  iObjectRegistry* objreg) : particles_type(p), object_reg (objreg)
-{
-  SCF_CONSTRUCT_IBASE (p)
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiParticlesFactoryState)
-
-  g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
-  shmgr = CS_QUERY_REGISTRY (object_reg, iShaderManager);
-
-  emit_type = CS_PART_EMIT_SPHERE;
-  emit_size_1 = 0.0015f;
-  emit_size_2 = 0.001f;
-  emit_size_3 = 0.0f;
-
-  force_type = CS_PART_FORCE_RADIAL;
-
-  force_direction = csVector3(0.0f, 0.0f, 0.0f);
-  force_direction_variation = csVector3(0.0f, 0.0f, 0.0f);
-  force_range = 1.0f;
-  force_falloff = CS_PART_FALLOFF_LINEAR;
-  force_cone_radius = 0.0f;
-  force_cone_radius_falloff = CS_PART_FALLOFF_CONSTANT;
-
-  force_amount = 1.0f;
-
-  particles_per_second = 100;
-  initial_particles = 100;
-
-  gravity = csVector3(0.0f, 0.0f, 0.0f);
-
-  emit_time = 1.0f;
-  time_to_live = 1.0f;
-  time_variation = 0.0f;
-
-  diffusion = 0.0f;
-
-  particle_radius = 0.05f;
-  particle_mass = 1.0f;
-  mass_variation = 0.0f;
-  dampener = 0.01f;
-
-  autostart = true;
-
-  transform_mode = false;
-
-  physics_plugin = "crystalspace.particles.physics.simple";
-  physics_zsort = false;
-
-  color_method = CS_PART_COLOR_CONSTANT;
-  constant_color = csColor4 (1.0f, 1.0f, 1.0f, 1.0f);
-
-  mixmode = CS_FX_COPY;
-  zsort_enabled = false;
-}
-
-csParticlesFactory::~csParticlesFactory ()
-{
-}
-
-csPtr<iMeshObject> csParticlesFactory::NewInstance ()
-{
-  return csPtr<iMeshObject>(new csParticlesObject (this));
-}
-
-SCF_IMPLEMENT_IBASE (csParticlesObject)
-  SCF_IMPLEMENTS_INTERFACE (iMeshObject)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iParticlesObjectState)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iObjectModel)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csParticlesObject::eiParticlesObjectState)
-  SCF_IMPLEMENTS_INTERFACE (iParticlesObjectState)
-  SCF_IMPLEMENTS_INTERFACE (iParticlesStateBase)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csParticlesObject::eiObjectModel)
-  SCF_IMPLEMENTS_INTERFACE (iObjectModel)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csParticlesObject::eiRenderBufferAccessor)
-  SCF_IMPLEMENTS_INTERFACE (iRenderBufferAccessor)
-SCF_IMPLEMENT_IBASE_END
-
-csParticlesObject::csParticlesObject (csParticlesFactory* p)
-  : logparent (0), pFactory (p)
-{
-  SCF_CONSTRUCT_IBASE (p)
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiParticlesObjectState)
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObjectModel)
-
-  mesh = 0;
-  meshpp = 0;
-  meshppsize = 0;
-
-  csRef<iStringSet> strings =
-    CS_QUERY_REGISTRY_TAG_INTERFACE (p->object_reg,
-	  "crystalspace.shared.stringset", iStringSet);
-
-  radius_name = strings->Request ("point radius");
-  scale_name = strings->Request ("point scale");
-
-  matwrap = p->material;
-
-  camera_fov = -1;
-
-  emit_type = p->emit_type;
-  emit_size_1 = p->emit_size_1;
-  emit_size_2 = p->emit_size_2;
-  emit_size_3 = p->emit_size_3;
-
-  force_type = p->force_type;
-
-  force_direction = p->force_direction;
-  force_direction_variation = p->force_direction_variation;
-  force_range = p->force_range;
-  force_falloff = p->force_falloff;
-  force_cone_radius = p->force_cone_radius;
-  force_cone_radius_falloff = p->force_cone_radius_falloff;
-
-  force_amount = p->force_amount;
-  particle_mass = p->particle_mass;
-  mass_variation = p->mass_variation;
-  dampener = p->dampener;
-
-  particles_per_second = p->particles_per_second;
-  initial_particles = p->initial_particles;
-
-  gravity = p->gravity;
-
-  emit_time = p->emit_time;
-  time_to_live = p->time_to_live;
-  time_variation = p->time_variation;
-
-  diffusion = p->diffusion;
-
-  autostart = p->autostart;
-
-  particle_radius = p->particle_radius;
-  radius_changed=false;
-
-  gradient_colors = p->gradient_colors;
-
-  color_method = p->color_method;
-  constant_color = p->constant_color;
-  base_heat = p->base_heat;
-  loop_time = p->loop_time;
-  color_callback = p->color_callback;
-
-  transform_mode = p->transform_mode;
-
-  point_data = 0; // This gets created by the physics plugin
-
-  emitter = csVector3(0.0f, 0.0f, 0.0f);
-  radius = 1.0f;
-  //dead_particles = 0;
-  point_sprites = p->g3d->GetCaps ()->SupportsPointSprites;
-
-  running = false;
-
-  svcontext.AttachNew (new csShaderVariableContext);
-  bufferHolder.AttachNew (new csRenderBufferHolder);
-
-  scfiRenderBufferAccessor.AttachNew (new eiRenderBufferAccessor (this));
-
-  bufferHolder->SetAccessor (scfiRenderBufferAccessor, (uint32)~0);
-
-  csShaderVariable* sv;
-  sv = svcontext->GetVariableAdd (radius_name);
-  sv->SetValue (particle_radius);
-  sv = svcontext->GetVariableAdd (scale_name);
-  sv->SetValue (1.0f);
-
-  mixmode = p->mixmode;
-  zsort_enabled = p->zsort_enabled;
-
-  LoadPhysicsPlugin (p->physics_plugin);
-
-  if(autostart) Start();
-}
-
-csParticlesObject::~csParticlesObject ()
-{
-  if (physics)
-    physics->RemoveParticles (&scfiParticlesObjectState);
-
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiObjectModel)
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiParticlesObjectState)
-  SCF_DESTRUCT_IBASE ()
-  
-  delete [] meshpp;
-  delete mesh;
-}
-
-csPtr<iMeshObject> csParticlesObject::Clone ()
-{
-  csParticlesObject* new_obj = new csParticlesObject(pFactory);
-
-  new_obj->vis_cb = vis_cb;
-  
-  new_obj->matwrap = matwrap;
-  new_obj->meshppsize = meshppsize;
-  
-  new_obj->vis_cb = vis_cb;
-
-  new_obj->tr_o2c = tr_o2c;
-  new_obj->rotation_matrix = rotation_matrix;
-  new_obj->tricount = tricount;
-
-  new_obj->vertex_name = vertex_name;
-  new_obj->color_name = color_name;
-  new_obj->texcoord_name = texcoord_name;
-  new_obj->index_name = index_name;
-  new_obj->radius_name = radius_name;
-  new_obj->scale_name = scale_name;
-
-  new_obj->camera_fov = camera_fov;
-  new_obj->camera_pixels = camera_pixels;
-
-  new_obj->basecolor = basecolor;
-
-  new_obj->emit_type = emit_type;
-  new_obj->emit_size_1 = emit_size_1;
-  new_obj->emit_size_2 = emit_size_2;
-  new_obj->emit_size_3 = emit_size_3;
-
-  new_obj->force_type = force_type;
-
-  new_obj->force_direction = force_direction;
-  new_obj->force_direction_variation = force_direction_variation;
-  new_obj->force_range = force_range;
-  new_obj->force_falloff = force_falloff;
-  new_obj->force_cone_radius = force_cone_radius;
-  new_obj->force_cone_radius_falloff = force_cone_radius_falloff;
-
-  new_obj->force_amount = force_amount;
-
-  new_obj->particles_per_second = particles_per_second;
-  new_obj->initial_particles = initial_particles;
-
-  new_obj->gravity = gravity;
-
-  new_obj->emit_time = emit_time;
-  new_obj->time_to_live = time_to_live;
-  new_obj->time_variation = time_variation;
-  
-  new_obj->particle_mass = particle_mass;
-  new_obj->mass_variation = mass_variation;
-  new_obj->dampener = dampener;
-
-  new_obj->autostart = autostart;
-  new_obj->running = running;
-  new_obj->transform_mode = transform_mode;
-
-  new_obj->diffusion = diffusion;
-
-  new_obj->particle_radius = particle_radius;
-
-  new_obj->gradient_colors = gradient_colors;
-  new_obj->loop_time = loop_time;
-  new_obj->base_heat = base_heat;
-  new_obj->constant_color = constant_color;
-  new_obj->color_method = color_method;
-
-  new_obj->buffer_length = buffer_length;
-
-  new_obj->point_sprites = point_sprites;
-  new_obj->corners[0] = corners[0];
-  new_obj->corners[1] = corners[1];
-  new_obj->corners[2] = corners[2];
-  new_obj->corners[3] = corners[3];
-
-  new_obj->emitter = emitter;
-  new_obj->radius = radius;
-
-  new_obj->flags = flags;
-  new_obj->mixmode = mixmode;
-  new_obj->zsort_enabled = zsort_enabled;
-  
-  return csPtr<iMeshObject> (new_obj);
-}
-
-bool csParticlesObject::LoadPhysicsPlugin (const char *plugin_id)
-{
-  if(physics)
+  //-- Object type
+  ParticlesMeshObjectType::ParticlesMeshObjectType (iBase* parent)
+    : scfImplementationType (this, parent)
   {
-    physics->RemoveParticles (&scfiParticlesObjectState);
   }
 
-  physics = csLoadPluginCheck<iParticlesPhysics> (pFactory->object_reg,
-  	plugin_id, false);
-  if (!physics)
+  ParticlesMeshObjectType::~ParticlesMeshObjectType ()
   {
-    csReport (pFactory->object_reg, CS_REPORTER_SEVERITY_ERROR,
-      "crystalspace.mesh.object.particles",
-      "Could not load the particles physics plugin '%s'!", plugin_id);
-    return false;
   }
-  point_data = physics->RegisterParticles (&scfiParticlesObjectState);
-  return true;
-}
 
-void csParticlesObject::EnableZSort (bool en)
-{
-  if (zsort_enabled == en) return;
-  zsort_enabled = en;
-  if (physics)
+  bool ParticlesMeshObjectType::Initialize (iObjectRegistry* object_reg)
   {
-    physics->RemoveParticles (&scfiParticlesObjectState);
-    physics->RegisterParticles (&scfiParticlesObjectState);
+    return true;
   }
-}
 
-void csParticlesObject::SetParticleRadius (float rad)
-{
-  particle_radius = rad;
-  if (svcontext)
+  csPtr<iMeshObjectFactory> ParticlesMeshObjectType::NewFactory ()
   {
-    csShaderVariable* sv = svcontext->GetVariableAdd (radius_name);
-    if (sv) sv->SetValue (particle_radius);
-    radius_changed=true;
+    return new ParticlesMeshFactory (this);
   }
-}
 
-void csParticlesObject::PreGetBuffer (csRenderBufferHolder* holder, csRenderBufferName buffer)
-{
-  if (!holder) return;
-  holder->SetRenderBuffer (buffer, GetRenderBuffer(buffer));
-}
-
-iRenderBuffer *csParticlesObject::GetRenderBuffer (csRenderBufferName name)
-{
-  if (!vertex_buffer || buffer_length != point_data->Length ())
+  //-- Object factory
+  ParticlesMeshFactory::ParticlesMeshFactory (ParticlesMeshObjectType* objectType)
+    : scfImplementationType (this), objectType (objectType), factoryWrapper (0),
+    materialWrapper (0), mixMode (0),
+    deepCreation (false), particleOrientation (CS_PARTICLE_CAMERAFACE_APPROX), 
+    rotationMode (CS_PARTICLE_ROTATE_NONE), sortMode (CS_PARTICLE_SORT_NONE),
+    integrationMode (CS_PARTICLE_INTEGRATE_LINEAR),
+    commonDirection (1.0f,0,0),
+    localMode (true), individualSize (false), particleSize (1.0f)
   {
-    buffer_length = point_data->Length ();
-    static const csInterleavedSubBufferOptions interleavedElements[2] =
-      {{CS_BUFCOMP_FLOAT, 3}, {CS_BUFCOMP_FLOAT, 4}};
-    csRef<iRenderBuffer> buffers[2];
-    int bufsize = (int)(point_sprites ? buffer_length : buffer_length * 4);
-    masterBuffer = csRenderBuffer::CreateInterleavedRenderBuffers (bufsize, 
-      CS_BUF_DYNAMIC, 2, interleavedElements, buffers);
-    vertex_buffer = buffers[0];
-    color_buffer = buffers[1];
+  }
 
-    texcoord_buffer = csRenderBuffer::CreateRenderBuffer (
-      bufsize, CS_BUF_DYNAMIC,
-      CS_BUFCOMP_FLOAT, 2);
-    csVector2 *texcoords = new csVector2 [bufsize];
-    unsigned int *indices;
-    size_t indices_size;
-    if (point_sprites)
+  ParticlesMeshFactory::~ParticlesMeshFactory()
+  {
+  }
+
+  csPtr<iMeshObject> ParticlesMeshFactory::NewInstance ()
+  {
+    ParticlesMeshObject* mesh = new ParticlesMeshObject (this);
+
+    // Copy default properties
+    mesh->materialWrapper = materialWrapper;
+    mesh->mixMode = mixMode;
+
+    mesh->particleOrientation = particleOrientation;
+    mesh->rotationMode = rotationMode;
+    mesh->sortMode = sortMode;
+    mesh->integrationMode = integrationMode;
+    mesh->commonDirection = commonDirection;
+    mesh->localMode = localMode;
+    mesh->individualSize = individualSize;
+    mesh->particleSize = particleSize;
+
+    if (deepCreation)
     {
-      indices_size = buffer_length;
-      indices = new unsigned int[indices_size];
-      for (size_t i = 0; i < buffer_length; i++)
-        indices[i] = (uint)i;
-    }
-    else
-    {
-      indices_size = buffer_length * 6;
-      int i;
-      for (i = 0; i < bufsize - 4; i += 4)
+      for (size_t i = 0; i < emitters.GetSize (); ++i)
       {
-        texcoords[i].x = 0; texcoords[i].y = 0;
-        texcoords[i+1].x = 0; texcoords[i+1].y = 1;
-        texcoords[i+2].x = 1; texcoords[i+2].y = 1;
-        texcoords[i+3].x = 1; texcoords[i+3].y = 0;
+        csRef<iParticleEmitter> copy = emitters[i]->Clone ();
+        mesh->emitters.Push (copy);
       }
-      indices = new unsigned int[indices_size];
-      int j;
-      for (i = 0, j = 0; i < bufsize-4; i += 4, j += 6)
-      {
-        // First triangle
-        indices[j] = i;
-        indices[j+1] = i + 1;
-        indices[j+2] = i + 2;
-        // Second triangle
-        indices[j+3] = i;
-        indices[j+4] = i + 2;
-        indices[j+5] = i + 3;
-      }
-    }
-    index_buffer = csRenderBuffer::CreateIndexRenderBuffer (
-        indices_size, CS_BUF_STATIC,
-        CS_BUFCOMP_UNSIGNED_INT, 0, bufsize - 1);
-    index_buffer->CopyInto (indices, indices_size);
-    delete [] indices;
 
-    texcoord_buffer->CopyInto (texcoords, bufsize);
-    delete [] texcoords;
-  }
-  if (name == CS_BUFFER_POSITION)
-  {
-    if (point_sprites)
-    {
-      int len = (int)point_data->Length ();
-      vertex_data.SetLength (len);
-      for (int i = 0; i < len - 1; i++)
+      for (size_t i = 0; i < effectors.GetSize (); ++i)
       {
-        const csParticlesData &point = point_data->Get(i);
-        i_vertex vertex;
-        vertex.position = point.position - emitter;
-        vertex.color = point.color;
-        vertex_data.Put (i, vertex);
+        csRef<iParticleEffector> copy = effectors[i]->Clone ();
+        mesh->effectors.Push (copy);
       }
     }
     else
     {
-      int len = (int)point_data->Length ();
-      vertex_data.SetLength (len * 4);
-      int i,j;
-      for (i = 0, j = 0; i < len - 1; i++, j += 4)
+      mesh->emitters = emitters;
+      mesh->effectors = effectors;
+    }
+
+    return mesh;
+  }
+
+  csPtr<iMeshObjectFactory> ParticlesMeshFactory::Clone ()
+  {
+    ParticlesMeshFactory* newFact = new ParticlesMeshFactory (objectType);
+
+    newFact->materialWrapper = materialWrapper;
+    newFact->mixMode = mixMode;
+    newFact->flags = flags;
+    newFact->deepCreation = deepCreation;
+    newFact->particleOrientation = particleOrientation;
+    newFact->rotationMode = rotationMode;
+    newFact->sortMode = sortMode;
+    newFact->integrationMode = integrationMode;
+    newFact->commonDirection = commonDirection;
+    newFact->localMode = localMode;
+    newFact->individualSize = individualSize;
+    newFact->particleSize = particleSize;
+
+    if (deepCreation)
+    {
+      for (size_t i = 0; i < emitters.GetSize (); ++i)
       {
-        const csParticlesData &point = point_data->Get(i);
-        i_vertex vertex;
-        vertex.position = (point.position - emitter) + corners[0];
-        vertex.color = point.color;
-        vertex_data.Put (j, vertex);
-        vertex.position = (point.position - emitter) + corners[1];
-        vertex.color = point.color;
-        vertex_data.Put (j+1, vertex);
-        vertex.position = (point.position - emitter) + corners[2];
-        vertex.color = point.color;
-        vertex_data.Put (j+2, vertex);
-        vertex.position = (point.position - emitter) + corners[3];
-        vertex.color = point.color;
-        vertex_data.Put (j+3, vertex);
+        csRef<iParticleEmitter> copy = emitters[i]->Clone ();
+        newFact->emitters.Push (copy);
+      }
+
+      for (size_t i = 0; i < effectors.GetSize (); ++i)
+      {
+        csRef<iParticleEffector> copy = effectors[i]->Clone ();
+        newFact->effectors.Push (copy);
       }
     }
-    // Vertex buffer is an interleaved buffer, so copy all the data into it
-    masterBuffer->CopyInto (vertex_data.GetArray (), vertex_data.Length ());
-    return vertex_buffer;
-  }
-  else if (name == CS_BUFFER_COLOR)
-  {
-    return color_buffer;
-  }
-  else if (name == CS_BUFFER_TEXCOORD0)
-  {
-    return texcoord_buffer;
-  }
-  else if (name == CS_BUFFER_INDEX)
-  {
-    return index_buffer;
-  }
-  return 0;
-}
-
-csRenderMesh** csParticlesObject::GetRenderMeshes (int& n, iRenderView* rview, 
-  iMovable* movable, uint32 frustum_mask)
-{
-  iCamera* cam = rview->GetCamera ();
-
-  csReversibleTransform o2wt;
-
-  if (!transform_mode)
-  {
-    emitter = movable->GetFullPosition();
-    // @@@ The code below is not very efficient!
-    o2wt.Identity();
-    o2wt.SetOrigin (emitter);
-  }
-  else
-  {
-    o2wt = movable->GetFullTransform ();
-  }
-  // @@@ GetTransform??? Shouldn't this be GetFullTransform?
-  rotation_matrix = movable->GetFullTransform ().GetT2O ();
-
-  int vertnum = 0;
-  float new_radius = 0.0f;
-
-  size_t i;
-  for (i=0 ; i<point_data->Length () ; i++)
-  {
-    const csParticlesData &point = point_data->Get(i);
-    if (point.time_to_live < 0.0f) break;
-
-    vertnum ++;
-
-    // For calculating radius
-    csVector3 dist_vect = point.position - emitter;
-    if (dist_vect.SquaredNorm() > new_radius)
+    else
     {
-      new_radius = dist_vect.SquaredNorm();
+      newFact->emitters = emitters;
+      newFact->effectors = effectors;
     }
-  }
-  //dead_particles = point_data->Length () - vertnum;
 
-  if (vertnum>0) 
+    return newFact;
+  }
+
+  //-- Object
+  ParticlesMeshObject::ParticlesMeshObject (ParticlesMeshFactory* factory)
+    : scfImplementationType (this), 
+    factory (factory), vertexSetup (0),
+    meshWrapper (0), mixMode (CS_FX_COPY), lastUpdateTime (0),
+    currentDt (0), lastFrameNumber (0), totalParticleTime (0.0f),
+    radius (1.0f), minRadius (1.0f), rawBuffer (0), particleAllocatedSize (0),
+    particleOrientation (CS_PARTICLE_CAMERAFACE_APPROX), rotationMode (CS_PARTICLE_ROTATE_NONE), 
+    integrationMode (CS_PARTICLE_INTEGRATE_LINEAR), 
+    sortMode (CS_PARTICLE_SORT_NONE), commonDirection (1.0f,0,0), localMode (true), 
+    individualSize (false), particleSize (1.0f)
   {
-    new_radius = csQsqrt (new_radius);
-    if (new_radius>radius)
+    particleBuffer.particleCount = 0;
+  }
+
+  ParticlesMeshObject::~ParticlesMeshObject ()
+  {
+    // Delete all particles
+    delete [] rawBuffer;
+    delete vertexSetup;
+  }
+
+  void ParticlesMeshObject::ReserveNewParticles (size_t numNew)
+  {
+    if (particleBuffer.particleCount + numNew > particleAllocatedSize)
     {
-      radius = new_radius;
-      scfiObjectModel.ShapeChanged ();
-    }
-    running = true;
-  }
-  else
-  {
-    radius = 0.0f;
-    running = false;
-  }
+      //Allocate some more
+      size_t newSize = particleBuffer.particleCount + numNew;
+      size_t byteSize = newSize * (sizeof (csParticle) + sizeof (csParticleAux));
 
-  int clip_portal, clip_plane, clip_z_plane;
-  rview->CalculateClipSettings (frustum_mask, clip_portal, clip_plane,
-  	clip_z_plane);
+      uint8* newBuf = new uint8[byteSize];
 
-  tr_o2c = cam->GetTransform () / o2wt;
+      csParticleBuffer setupBuffer;
+      setupBuffer.particleCount = particleBuffer.particleCount;
+      setupBuffer.particleData = reinterpret_cast<csParticle*> (newBuf);
+      setupBuffer.particleAuxData = reinterpret_cast<csParticleAux*> (
+        newBuf + newSize*sizeof (csParticle));
 
-  if (!point_sprites)
-  {
-    vertnum *= 6;
-    csMatrix3 m = tr_o2c.GetT2O();
-    corners[0] = m * csVector3(-particle_radius, particle_radius, 0.0f);
-    corners[1] = m * csVector3(particle_radius, particle_radius, 0.0f);
-    corners[2] = m * csVector3(particle_radius, -particle_radius, 0.0f);
-    corners[3] = m * csVector3(-particle_radius, -particle_radius, 0.0f);
-  }
-  else
-  {
-    int fov = csQint (cam->GetFOVAngle ());
-    int fov_pixels = cam->GetFOV ();
-    if (radius_changed || camera_fov != fov || camera_pixels != fov_pixels)
-    {
-      camera_fov = fov;
-      camera_pixels = fov_pixels;
-      float lambda = (float)(fov_pixels / (2.0 * tan (fov / 360.0 * PI)));
-      csShaderVariable* sv = svcontext->GetVariable (scale_name);
-      sv->SetValue (1.0f / (lambda * particle_radius * 3));
-      radius_changed=false;
+      memcpy(setupBuffer.particleData, particleBuffer.particleData, 
+        particleBuffer.particleCount * sizeof (csParticle));
+      memcpy(setupBuffer.particleAuxData, particleBuffer.particleAuxData, 
+        particleBuffer.particleCount * sizeof (csParticleAux));
+
+      delete [] rawBuffer;
+
+      particleBuffer = setupBuffer;
+      rawBuffer = newBuf;
+
+      particleAllocatedSize = newSize;
     }
   }
 
-  if (!mesh)
-    mesh = new csRenderMesh;
-
-  mesh->mixmode = mixmode;
-  mesh->clip_plane = clip_plane;
-  mesh->clip_portal = clip_portal;
-  mesh->clip_z_plane = clip_z_plane;
-  mesh->do_mirror = rview->GetCamera()->IsMirrored();
-  matwrap->Visit ();
-  mesh->material = matwrap;
-  mesh->worldspace_origin = o2wt.GetOrigin ();
-  mesh->indexstart = 0;
-  mesh->indexend = vertnum;
-  mesh->variablecontext = svcontext;
-  mesh->object2world = o2wt;
-  mesh->buffers = bufferHolder;
-  if (point_sprites)
-    mesh->meshtype = CS_MESHTYPE_POINT_SPRITES;
-  else
-    mesh->meshtype = CS_MESHTYPE_TRIANGLES;
-
-  n = 1;
-  if (!meshpp)
+  void ParticlesMeshObject::SetupIndexBuffer (csRenderBufferHolder* bufferHolder, 
+    const csReversibleTransform& o2c)
   {
-    meshpp = new csRenderMesh*[1];
-    meshppsize = 1;
+    if (particleBuffer.particleCount == 0)
+      return;
+
+    if (sortMode == CS_PARTICLE_SORT_NONE)
+    {
+      //Make sure buffer is big enough
+      if (!unsortedIndexBuffer || 
+          particleBuffer.particleCount*6 > unsortedIndexBuffer->GetElementCount ())
+      {
+        unsortedIndexBuffer = csRenderBuffer::CreateIndexRenderBuffer (
+          particleBuffer.particleCount*6, CS_BUF_STATIC, CS_BUFCOMP_UNSIGNED_INT, 
+          0, particleBuffer.particleCount*4);
+
+        csRenderBufferLock<csTriangle> bufferLock (unsortedIndexBuffer);
+        csTriangle* trigs = bufferLock.Lock ();
+
+        for (unsigned int i = 0; i < particleBuffer.particleCount; ++i)
+        {
+          const unsigned int trigId = i*2;
+          const unsigned int index = i*4;
+          trigs[trigId+0].a = index+0;
+          trigs[trigId+0].b = index+1;
+          trigs[trigId+0].c = index+2;
+
+          trigs[trigId+1].a = index+2;
+          trigs[trigId+1].b = index+3;
+          trigs[trigId+1].c = index+0;
+        }
+      }
+
+      bufferHolder->SetRenderBuffer (CS_BUFFER_INDEX, unsortedIndexBuffer);
+    }
+    else
+    {
+      csRef<iRenderBuffer> indexBuffer = bufferHolder->
+        GetRenderBufferNoAccessor (CS_BUFFER_INDEX);
+
+      if (!indexBuffer || 
+        particleBuffer.particleCount*6 > indexBuffer->GetElementCount ())
+      {
+        indexBuffer = csRenderBuffer::CreateIndexRenderBuffer (
+          particleBuffer.particleCount*6, CS_BUF_STREAM, CS_BUFCOMP_UNSIGNED_INT,
+          0, particleBuffer.particleCount*4);
+      }
+
+      CS_ALLOC_STACK_ARRAY(float, sortValues, particleBuffer.particleCount);
+      
+      if (sortMode == CS_PARTICLE_SORT_DISTANCE)
+      {
+        const csVector3& camPos = o2c.GetOrigin ();
+
+        for (unsigned int i = 0; i < particleBuffer.particleCount; ++i)
+        {
+          const csParticle& particle = particleBuffer.particleData[i];
+          sortValues[i] = -(particle.position - camPos).SquaredNorm ();
+        }
+      }
+      else if (sortMode == CS_PARTICLE_SORT_DOT)
+      {
+        const csVector3& camFwd = o2c.GetFront ();
+
+        for (unsigned int i = 0; i < particleBuffer.particleCount; ++i)
+        {
+          const csParticle& particle = particleBuffer.particleData[i];
+          sortValues[i] = -(particle.position * camFwd);
+        }
+      }
+
+      indexSorter.Sort (sortValues, particleBuffer.particleCount);
+      unsigned int* ranks = (unsigned int*)indexSorter.GetRanks (); 
+
+      csRenderBufferLock<csTriangle> bufferLock (indexBuffer);
+      csTriangle* trigs = bufferLock.Lock ();
+
+      for (unsigned int i = 0; i < particleBuffer.particleCount; ++i)
+      {
+        const unsigned int trigId = i*2;
+        const unsigned int index = ranks[i]*4;
+        trigs[trigId+0].a = index+0;
+        trigs[trigId+0].b = index+1;
+        trigs[trigId+0].c = index+2;
+
+        trigs[trigId+1].a = index+2;
+        trigs[trigId+1].b = index+3;
+        trigs[trigId+1].c = index+0;
+      }
+
+      bufferHolder->SetRenderBuffer (CS_BUFFER_INDEX, indexBuffer);
+    }
   }
 
-  meshpp[0] = mesh;
+  void ParticlesMeshObject::SetupVertexBuffer (csRenderBufferHolder* bufferHolder, 
+    const csReversibleTransform& o2c)
+  {
+    if (particleBuffer.particleCount == 0)
+      return;
 
-  return meshpp;
-}
+    csRef<iRenderBuffer> buffer = bufferHolder->GetRenderBuffer (CS_BUFFER_POSITION);
+    if (!buffer ||
+      particleBuffer.particleCount*4 > buffer->GetElementCount ())
+    {
+      //Create a new one
+      buffer = csRenderBuffer::CreateRenderBuffer (particleBuffer.particleCount*4,
+        CS_BUF_STREAM, CS_BUFCOMP_FLOAT, 3);
 
-bool csParticlesObject::HitBeamOutline (const csVector3& /*start*/,
-	const csVector3& /*end*/, csVector3& /*isect*/, float* /*pr*/)
-{
-  return false;
-}
+      bufferHolder->SetRenderBuffer (CS_BUFFER_POSITION, buffer);
+    }
 
-bool csParticlesObject::HitBeamObject (const csVector3& /*start*/,
-	const csVector3& /*end*/, csVector3& /*isect*/, float* /*pr*/,
-	int* polygon_idx, iMaterialWrapper**)
-{
-  if (polygon_idx) *polygon_idx = -1;
-  return false;
-}
+    csRenderBufferLock<csVector3> bufferLock (buffer);
+    csVector3* vertices = bufferLock.Lock ();
 
-void csParticlesObject::GetObjectBoundingBox (csBox3& bbox)
-{
-  bbox.Set (csVector3 (-radius, -radius, -radius),
-  	csVector3 (radius, radius, radius));
-}
+    if (!vertexSetup)
+    {
+      vertexSetup = GetVertexSetupFunc (rotationMode, particleOrientation,
+        individualSize);
+    }
 
-void csParticlesObject::SetObjectBoundingBox (const csBox3&)
-{
-  // @@@ TODO
-}
+    vertexSetup->Init (o2c, commonDirection, particleSize);
 
-void csParticlesObject::GetRadius(float &rad, csVector3 &c)
-{
-  rad = radius;
-  c = emitter;
-}
-
-void csParticlesObject::Start ()
-{
-  if(point_data->Length () < 1) {
-    buffer_length = 0;
+    vertexSetup->SetupVertices (particleBuffer, vertices);
   }
-  physics->Start (&scfiParticlesObjectState);
-  running = true;
-}
 
-void csParticlesObject::Stop ()
-{
-  physics->Stop (&scfiParticlesObjectState);
-}
+  void ParticlesMeshObject::UpdateTexCoordBuffer ()
+  {
+    if (rotationMode == CS_PARTICLE_ROTATE_TEXCOORD)
+    {
+      if (!tcBuffer ||
+        particleBuffer.particleCount*4 > tcBuffer->GetElementCount ())
+      {
+        tcBuffer = csRenderBuffer::CreateRenderBuffer (
+          particleBuffer.particleCount*4,
+          CS_BUF_DYNAMIC, CS_BUFCOMP_FLOAT, 2);
+      }
 
-void csParticlesObject::NextFrame (csTicks, const csVector3 &, uint)
-{
+      csRenderBufferLock<csVector2> bufferLock (tcBuffer);
+      csVector2 *tcs = bufferLock.Lock ();
+
+      for (unsigned int idx = 0; idx < particleBuffer.particleCount; ++idx)
+      {
+        const unsigned int tcIdx = idx*4;
+
+        const csParticle& particle = particleBuffer.particleData[idx];
+
+        csVector3 tmpV;
+        float rot;
+        particle.orientation.GetAxisAngle (tmpV, rot);
+        const float r = rot + PI/4;
+        const float s = sinf(r);
+        const float c = cosf(r);
+
+        float pX = 0.5f*(c-s);
+        float pY = 0.5f*(s+c);
+
+        tcs[tcIdx+0].x = -pX; tcs[tcIdx+0].y = +pY;
+        tcs[tcIdx+1].x =  pY; tcs[tcIdx+1].y =  pX;
+        tcs[tcIdx+2].x =  pX; tcs[tcIdx+2].y = -pY;          
+        tcs[tcIdx+3].x = -pY; tcs[tcIdx+3].y = -pX;
+
+      }        
+    
+    }
+    else
+    {
+      // Just setup 00 10 11 01
+      if (!tcBuffer ||
+          particleBuffer.particleCount*4 > tcBuffer->GetElementCount ())
+      {
+        tcBuffer = csRenderBuffer::CreateRenderBuffer (
+          particleBuffer.particleCount*4,
+          CS_BUF_DYNAMIC, CS_BUFCOMP_FLOAT, 2);
+
+        csRenderBufferLock<csVector2> bufferLock (tcBuffer);
+        csVector2 *tcs = bufferLock.Lock ();
+
+        for (unsigned int idx = 0; idx < particleBuffer.particleCount; ++idx)
+        {
+          const unsigned int tcIdx = idx*4;
+
+          tcs[tcIdx+0].x = -0.5f; tcs[tcIdx+0].y = -0.5f;
+          tcs[tcIdx+1].x =  0.5f; tcs[tcIdx+1].y = -0.5f;
+          tcs[tcIdx+2].x =  0.5f; tcs[tcIdx+2].y =  0.5f;
+          tcs[tcIdx+3].x = -0.5f; tcs[tcIdx+3].y =  0.5f;
+        }        
+      }
+    }
+    
+  }
+
+  void ParticlesMeshObject::UpdateColorBuffer ()
+  {
+    if (!colorBuffer ||
+        particleBuffer.particleCount*4 > colorBuffer->GetElementCount ())
+    {
+      colorBuffer = csRenderBuffer::CreateRenderBuffer (particleBuffer.particleCount*4,
+        CS_BUF_STREAM, CS_BUFCOMP_FLOAT, 4);
+    }
+
+    csRenderBufferLock<csColor4> bufferLock (colorBuffer);
+    csColor4 *color = bufferLock.Lock ();
+
+    for (unsigned int idx = 0; idx < particleBuffer.particleCount; ++idx)
+    {
+      const unsigned int cIdx = idx*4;
+
+      const csParticleAux& aux = particleBuffer.particleAuxData[idx];
+
+      color[cIdx+0] = aux.color;
+      color[cIdx+1] = aux.color;
+      color[cIdx+2] = aux.color;
+      color[cIdx+3] = aux.color;
+    }          
+  }
+
+  void ParticlesMeshObject::InvalidateVertexSetup ()
+  {
+    delete vertexSetup;
+    vertexSetup = 0;
+  }
+
+  csPtr<iMeshObject> ParticlesMeshObject::Clone ()
+  {
+    ParticlesMeshObject* newMesh = new ParticlesMeshObject (factory);
+
+    newMesh->flags = flags;
+    newMesh->mixMode = mixMode;
+
+    newMesh->minRadius = minRadius;
+
+    newMesh->particleOrientation = particleOrientation;
+    newMesh->rotationMode = rotationMode;
+    newMesh->sortMode = sortMode;
+    newMesh->integrationMode = integrationMode;
+    newMesh->commonDirection = commonDirection;
+    newMesh->localMode = localMode;
+    newMesh->individualSize = individualSize;
+    newMesh->particleSize = particleSize;
+
+    newMesh->emitters = emitters;
+    newMesh->effectors = effectors;
+
+    return newMesh;
+  }
+
+  csRenderMesh** ParticlesMeshObject::GetRenderMeshes (int& num, iRenderView* rview, 
+    iMovable* movable, uint32 frustum_mask)
+  {
+    num = 0;
+
+    if (particleBuffer.particleCount == 0)
+      return 0;
+
+    iMaterialWrapper* mater = materialWrapper;
+    if (!mater)
+    {
+      csPrintf ("INTERNAL ERROR: mesh used without material!\n");
+      return 0;
+    }
+
+    if (mater->IsVisitRequired ()) 
+      mater->Visit ();
+    
+    iCamera* camera = rview->GetCamera ();
+    csReversibleTransform obj2world;
+
+    if(localMode)
+      obj2world = movable->GetFullTransform ();
+
+    csReversibleTransform obj2cam = camera->GetTransform () / obj2world;
+
+    bool rmCreated;
+    csRenderMesh*& mesh = rmHolder.GetUnusedMesh (rmCreated, 
+      rview->GetCurrentFrameNumber ());
+
+    int clip_portal, clip_plane, clip_z_plane;
+    rview->CalculateClipSettings (frustum_mask, clip_portal, clip_plane,
+      clip_z_plane);
+
+
+    if (rmCreated)
+    {
+      mesh->buffers.AttachNew (new csRenderBufferHolder);
+      mesh->meshtype = CS_MESHTYPE_TRIANGLES;
+      mesh->buffers->SetAccessor (this, 
+        CS_BUFFER_COLOR_MASK | CS_BUFFER_TEXCOORD0_MASK);
+    }
+
+    mesh->mixmode = mixMode;
+    mesh->clip_plane = clip_plane;
+    mesh->clip_portal = clip_portal;
+    mesh->clip_z_plane = clip_z_plane;
+    mesh->do_mirror = camera->IsMirrored ();
+    mesh->indexstart = 0;
+    mesh->indexend = (unsigned int)(particleBuffer.particleCount * 6);
+    mesh->material = materialWrapper;
+    mesh->worldspace_origin = obj2world.GetOrigin (); //@@TODO: use real center
+    mesh->geometryInstance = (void*)this;
+    mesh->object2world = obj2world;
+
+    SetupIndexBuffer (mesh->buffers, obj2cam);
+    SetupVertexBuffer (mesh->buffers, obj2cam);
+
+    num = 1;
+    return &mesh;
+  }
+
+  void ParticlesMeshObject::NextFrame (csTicks current_time, const csVector3& pos,
+    uint currentFrame)
+  {
+    // Update the particle buffers etc
+    if (lastFrameNumber == currentFrame)
+      return;
+
+    if (lastFrameNumber == 0 ||
+        lastFrameNumber + 1 < currentFrame)
+    {
+      lastFrameNumber = currentFrame;
+      lastUpdateTime = current_time;
+      return; //first update, or been invisible for a while
+    }
+
+    lastFrameNumber = currentFrame;
+    currentDt = current_time - lastUpdateTime;
+    lastUpdateTime = current_time;
+
+    float dt = currentDt/1000.0f;
+    totalParticleTime += dt;
+
+    float newRadiusSq = 0;
+
+    // Retire old particles, at same time recompute new radius
+    size_t currentParticleIdx = 0;
+    while (currentParticleIdx < particleBuffer.particleCount)
+    {
+      csParticle &currentParticle = particleBuffer.particleData[currentParticleIdx];
+
+      currentParticle.timeToLive -= dt;
+      if (currentParticle.timeToLive < 0)
+      {
+        //retire particle
+        particleBuffer.particleAuxData[currentParticleIdx] = 
+          particleBuffer.particleAuxData[particleBuffer.particleCount];
+
+        currentParticle = 
+          particleBuffer.particleData[--particleBuffer.particleCount];
+        continue;
+      }
+
+      currentParticleIdx++;
+    }
+
+    // Apply emitters
+    for (size_t idx = 0; idx < emitters.GetSize (); ++idx)
+    {
+      iParticleEmitter* emitter = emitters[idx];
+      size_t numParticles = emitter->ParticlesToEmit (this, dt, totalParticleTime);
+      if (numParticles == 0)
+        continue;
+
+      ReserveNewParticles (numParticles);
+
+      csParticleBuffer tmpBuf;
+      tmpBuf.particleCount = numParticles;
+      tmpBuf.particleData = particleBuffer.particleData + particleBuffer.particleCount;
+      tmpBuf.particleAuxData = particleBuffer.particleAuxData + particleBuffer.particleCount;
+      
+      emitter->EmitParticles (this, tmpBuf, dt, totalParticleTime);
+
+      particleBuffer.particleCount += numParticles;
+    }
+
+    // Apply effectors
+    for (size_t idx = 0; idx < effectors.GetSize (); ++idx)
+    {
+      iParticleEffector* effector = effectors[idx];
+      
+      effector->EffectParticles (this, particleBuffer, dt, totalParticleTime);
+    }
+    
+    // Integrate positions
+    if (integrationMode == CS_PARTICLE_INTEGRATE_LINEAR)
+    {
+      for (currentParticleIdx = 0; 
+        currentParticleIdx < particleBuffer.particleCount; ++currentParticleIdx)
+      {
+        csParticle &currentParticle = 
+          particleBuffer.particleData[currentParticleIdx];
+        currentParticle.position += currentParticle.linearVelocity * dt;
+
+        float currDistSq = currentParticle.position.SquaredNorm ();
+        if (currDistSq > newRadiusSq)
+          newRadiusSq = currDistSq;
+      }
+    }
+    else if (integrationMode == CS_PARTICLE_INTEGRATE_BOTH)
+    {
+      for (currentParticleIdx = 0; 
+        currentParticleIdx < particleBuffer.particleCount; ++currentParticleIdx)
+      {
+        csParticle &currentParticle = 
+          particleBuffer.particleData[currentParticleIdx];
+        currentParticle.position += currentParticle.linearVelocity * dt;
+
+        // Use closed-form quaternion integrator
+        float w = currentParticle.angularVelocity.SquaredNorm ();
+        if (w != 0)
+        {
+          w = sqrtf (w);
+          float v = dt * 0.5f * w;
+          float q = cosf (v);
+          float s = sinf (v) / w;
+
+          csVector3 pqr = currentParticle.angularVelocity * s;
+          csQuaternion qVel (pqr, 0);
+          csQuaternion res = qVel * currentParticle.orientation;
+          currentParticle.orientation = res + currentParticle.orientation * q;
+        }
+
+        float currDistSq = currentParticle.position.SquaredNorm ();
+        if (currDistSq > newRadiusSq)
+          newRadiusSq = currDistSq;
+      }
+    }
+
+    newRadiusSq = csMax(sqrtf(newRadiusSq), minRadius);
+
+    if (newRadiusSq > radius)
+    {
+      ShapeChanged ();
+      radius = newRadiusSq;
+    }
+  }
+
+  void ParticlesMeshObject::GetObjectBoundingBox (csBox3& bbox)
+  {
+    bbox.SetCenter (csVector3 (0.0f));
+    bbox.SetSize (csVector3 (radius*2));
+  }
+
+  void ParticlesMeshObject::SetObjectBoundingBox (const csBox3& bbox)
+  {
+    minRadius = bbox.GetSize ().Norm () * 0.5f;
+  }
+
+  void ParticlesMeshObject::GetRadius (float& radius, csVector3& center)
+  {
+    radius = this->radius;
+    center.Set (0.0f);
+  }
+
+  void ParticlesMeshObject::PreGetBuffer (csRenderBufferHolder* holder, 
+    csRenderBufferName buffer)
+  {
+    switch (buffer)
+    {
+    case CS_BUFFER_COLOR:
+      {
+        holder->SetRenderBuffer (CS_BUFFER_COLOR, colorBuffer);
+      }
+      break;
+    case CS_BUFFER_TEXCOORD0:
+      {
+        UpdateTexCoordBuffer ();
+        holder->SetRenderBuffer (CS_BUFFER_TEXCOORD0, tcBuffer);
+      }
+      break;
+    }
+  }
 }
+CS_PLUGIN_NAMESPACE_END(Particles)
+
+

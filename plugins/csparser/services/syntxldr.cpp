@@ -24,6 +24,7 @@
 #include "csgeom/box.h"
 #include "csgeom/math.h"
 #include "csgeom/matrix3.h"
+#include "csgeom/obb.h"
 #include "csgeom/plane3.h"
 #include "csgeom/transfrm.h"
 #include "csgeom/vector2.h"
@@ -404,6 +405,48 @@ bool csTextSyntaxService::WriteBox (iDocumentNode* node, csBox3* v)
   maxNode->SetAttributeAsFloat("z", v->MaxZ());
 
   return true;
+}
+
+bool csTextSyntaxService::ParseBox (iDocumentNode* node, csOBB &b)
+{
+  csRef<iDocumentNode> boxNode = node->GetNode ("box");
+  
+  if (!boxNode)
+  {
+    ReportError ("crystalspace.syntax.box", node, "Expected 'box' node!");
+    return false;
+  }
+
+  csRef<iDocumentNode> matrixNode = node->GetNode ("matrix");
+
+  if (!matrixNode)
+  {
+    ReportError ("crystalspace.syntax.box", node, "Expected 'box' node!");
+    return false;
+  }
+
+  if (!ParseBox (boxNode, (csBox3&)b))
+    return false;
+  
+  if (!ParseMatrix (matrixNode, b.GetMatrix ()))
+    return false;
+
+  return true;
+}
+
+bool csTextSyntaxService::WriteBox (iDocumentNode* node, csOBB* b)
+{
+  csRef<iDocumentNode> boxNode = node->CreateNodeBefore (CS_NODE_ELEMENT, 0);
+  boxNode->SetValue ("box");
+  
+  if (!WriteBox (boxNode, (csBox3*)b))
+    return false;
+
+  csRef<iDocumentNode> matrixNode = node->CreateNodeBefore (CS_NODE_ELEMENT, 0);
+  matrixNode->SetValue ("matrix");
+
+  if (!WriteMatrix (matrixNode, &b->GetMatrix ()))
+    return false;
 }
 
 bool csTextSyntaxService::ParseVector (iDocumentNode* node, csVector3 &v)

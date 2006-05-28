@@ -1,1800 +1,549 @@
 /*
-    Copyright (C) 2003 by Jorrit Tyberghein, John Harger
+  Copyright (C) 2006 by Marten Svanfeldt
 
-    This library is free software; you can redistribute it and/or
-    modify it under the terms of the GNU Library General Public
-    License as published by the Free Software Foundation; either
-    version 2 of the License, or (at your option) any later version.
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Library General Public
+  License as published by the Free Software Foundation; either
+  version 2 of the License, or (at your option) any later version.
 
-    This library is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    Library General Public License for more details.
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  Library General Public License for more details.
 
-    You should have received a copy of the GNU Library General Public
-    License along with this library; if not, write to the Free
-    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+  You should have received a copy of the GNU Library General Public
+  License along with this library; if not, write to the Free
+  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+
 #include "cssysdef.h"
-#include "csutil/sysfunc.h"
-
-#include "imap/ldrctxt.h"
-
-#include "iutil/comp.h"
-#include "iutil/document.h"
-#include "iutil/objreg.h"
-#include "iutil/plugin.h"
-
-#include "iengine/material.h"
-#include "iengine/mesh.h"
-
-#include "imesh/object.h"
-#include "imesh/particles.h"
-#include "iutil/object.h"
-#include "ivaria/reporter.h"
 
 #include "particlesldr.h"
 
+#include "iengine/mesh.h"
+#include "imap/ldrctxt.h"
+#include "imesh/object.h"
+#include "imesh/particles.h"
+#include "iutil/document.h"
+#include "iutil/plugin.h"
+
 CS_IMPLEMENT_PLUGIN
 
-SCF_IMPLEMENT_IBASE (csParticlesFactoryLoader)
-  SCF_IMPLEMENTS_INTERFACE (iLoaderPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csParticlesFactoryLoader::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_FACTORY (csParticlesFactoryLoader)
-
-csParticlesFactoryLoader::csParticlesFactoryLoader (iBase* parent)
+CS_PLUGIN_NAMESPACE_BEGIN(ParticlesLoader)
 {
-  SCF_CONSTRUCT_IBASE (parent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
+  SCF_IMPLEMENT_FACTORY(ParticlesFactoryLoader);
+  SCF_IMPLEMENT_FACTORY(ParticlesObjectLoader);
 
-  InitTokenTable (xmltokens);
-}
-
-csParticlesFactoryLoader::~csParticlesFactoryLoader ()
-{
-}
-
-bool csParticlesFactoryLoader::Initialize (iObjectRegistry* objreg)
-{
-  object_reg = objreg;
-  synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
-  vfs = CS_QUERY_REGISTRY (object_reg, iVFS);
-
-  return true;
-}
-
-csPtr<iBase> csParticlesFactoryLoader::Parse (iDocumentNode* node,
-  iStreamSource*, iLoaderContext* ldr_context, iBase* /*context*/)
-{
-  csRef<iMeshObjectType> type = csLoadPluginCheck<iMeshObjectType> (
-  	object_reg, "crystalspace.mesh.object.particles", false);
-  if (!type)
+  ParticlesBaseLoader::ParticlesBaseLoader (iBase* parent)
+    : scfImplementationType (this, parent), objectRegistry (0)
   {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-      "crystalspace.particles.loader.factory",
-		  "Could not load the particles mesh object plugin!");
-    return 0;
-  }
-  csRef<iMeshObjectFactory> fact = type->NewFactory ();
-  if (!fact)
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-      "crystalspace.particles.loader.factory",
-		  "Could not create the particles factory!");
-    return 0;
+    InitTokenTable (xmltokens);
   }
 
-  csRef<iParticlesFactoryState> state =
-    SCF_QUERY_INTERFACE(fact, iParticlesFactoryState);
-  if (!state)
+  bool ParticlesBaseLoader::Initialize (iObjectRegistry* objreg)
   {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-      "crystalspace.particles.loader.factory",
-      "Could not query iParticlesFactoryState from factory object!");
-    return 0;
+    objectRegistry = objreg;
+    synldr = csQueryRegistry<iSyntaxService> (objectRegistry);
+    return true;
   }
 
-  csRef<iDocumentNodeIterator> it = node->GetNodes ();
-  while (it->HasNext())
+  bool ParticlesBaseLoader::ParseBaseNode (iParticleSystemBase* baseObject, 
+    iDocumentNode *node, iLoaderContext* ldr_context, iBase* context)
   {
-    csRef<iDocumentNode> child = it->Next ();
-    if (child->GetType () != CS_NODE_ELEMENT) continue;
-    const char* value = child->GetValue ();
-    csStringID id = xmltokens.Request (value);
-    switch (id)
-    {
-      case XMLTOKEN_MATERIAL:
-      {
-        const char* matname = child->GetContentsValue ();
-        iMaterialWrapper* mat = ldr_context->FindMaterial (matname);
-        if (!mat)
-        {
-          synldr->ReportError ("crystalspace.particles.factory.loader",
-	    child, "Couldn't find material '%s'!", matname);
-          return 0;
-        }
-        state->SetMaterial (mat);
-        break;
-      }
-      case XMLTOKEN_EMITTER:
-        ParseEmitter (child, state);
-        break;
-      case XMLTOKEN_DIFFUSION:
-        state->SetDiffusion (child->GetContentsValueAsFloat ());
-        break;
-      case XMLTOKEN_GRAVITY:
-      {
-        csVector3 gravity;
-        synldr->ParseVector (child, gravity);
-        state->SetGravity (gravity);
-        break;
-      }
-      case XMLTOKEN_TTL:
-        state->SetTimeToLive (child->GetContentsValueAsFloat ());
-        break;
-      case XMLTOKEN_TIMEVARIATION:
-        state->SetTimeVariation (child->GetContentsValueAsFloat ());
-        break;
-      case XMLTOKEN_INITIAL:
-        state->SetInitialParticleCount (child->GetContentsValueAsInt ());
-        break;
-      case XMLTOKEN_PPS:
-        state->SetParticlesPerSecond (child->GetContentsValueAsInt ());
-        break;
-      case XMLTOKEN_RADIUS:
-        state->SetParticleRadius (child->GetContentsValueAsFloat ());
-        break;
-      case XMLTOKEN_MASS:
-        state->SetMass (child->GetContentsValueAsFloat ());
-        break;
-      case XMLTOKEN_MASSVARIATION:
-        state->SetMassVariation (child->GetContentsValueAsFloat ());
-        break;
-      case XMLTOKEN_AUTOSTART:
-      {
-        const char *autostart = child->GetContentsValue ();
-        if(!strcmp(autostart, "no")) state->SetAutoStart (false);
-        else if(!strcmp(autostart, "yes")) state->SetAutoStart (true);
-        else 
-        {
-          synldr->ReportError ("crystalspace.particles.factory.loader",
-            child, "Unknown autostart parameter '%s'!", autostart);
-	  return 0;
-        }
-        break;
-      }
-      case XMLTOKEN_TRANSFORMMODE:
-      {
-        const char *mode = child->GetContentsValue ();
-        if(!strcmp(mode, "no")) state->SetTransformMode (false);
-        else if(!strcmp(mode, "yes")) state->SetTransformMode (true);
-        else 
-        {
-          synldr->ReportError ("crystalspace.particles.factory.loader",
-            child, "Unknown transform mode parameter '%s'!", mode);
-	  return 0;
-        }
-        break;
-      }
-      case XMLTOKEN_PHYSICSPLUGIN:
-        state->SetPhysicsPlugin (child->GetContentsValue ());
-        break;
-      case XMLTOKEN_DAMPENER:
-        state->SetDampener (child->GetContentsValueAsFloat ());
-        break;
-      case XMLTOKEN_COLORMETHOD:
-      {
-        const char *str = child->GetAttributeValue ("type");
-        if (!str)
-        {
-          synldr->ReportError ("crystalspace.particles.factory.loader",
-            child, "No color method type specified!");
-          return 0;
-        }
-        if (!strcmp (str, "constant"))
-        {
-          ParseColorConstant (child, state);
-        }
-        else if (!strcmp (str, "linear"))
-        {
-          ParseColorLinear (child, state);
-        }
-        else if (!strcmp (str, "looping"))
-        {
-          ParseColorLooping (child, state);
-        }
-        else if (!strcmp (str, "heat"))
-        {
-          ParseColorHeat (child, state);
-        }
-        else if (!strcmp (str, "callback"))
-        {
-          synldr->ReportError ("crystalspace.particles.factory.loader",
-            child, "You cannot specify callback color method in loader!");
-	  return 0;
-        }
-        else
-        {
-          synldr->ReportError ("crystalspace.particles.factory.loader",
-            child, "Unknown color method '%s'!", str);
-	  return 0;
-        }
-        break;
-      }
-      case XMLTOKEN_MIXMODE:
-	{
-	  uint mixmode;
-	  if (!synldr->ParseMixmode (child, mixmode)) return 0;
-	  state->SetMixMode (mixmode);
-	}
-	break;
-      case XMLTOKEN_ZSORT:
-	{
-	  bool zsort;
-	  if (!synldr->ParseBool (child, zsort, true)) return 0;
-	  state->EnableZSort (zsort);
-	}
-	break;
-      default:
-        synldr->ReportError ("crystalspace.particles.factory.loader",
-          child, "Unknown token '%s'!", value);
-        return 0;
-    }
-  }
-
-  return csPtr<iBase> (fact);
-}
-
-bool csParticlesFactoryLoader::ParseEmitter (iDocumentNode *node,
-  iParticlesFactoryState *state)
-{
-  const char *type = node->GetAttributeValue ("type");
-  if (!type)
-  {
-    synldr->ReportError ("crystalspace.particles.factory.loader",
-      node, "No type specified for emitter!");
-    return false;
-  }
-
-  float x_size = 0.0f, y_size = 0.0f, z_size = 0.0f;
-
-  csRef<iDocumentNodeIterator> it = node->GetNodes ();
-  while (it->HasNext())
-  {
-    csRef<iDocumentNode> child = it->Next ();
-    if (child->GetType () != CS_NODE_ELEMENT) continue;
-    const char* value = child->GetValue ();
-    csStringID id = xmltokens.Request (value);
-    switch (id)
-    {
-      case XMLTOKEN_OUTERRADIUS:
-        x_size = child->GetContentsValueAsFloat ();
-        break;
-      case XMLTOKEN_INNERRADIUS:
-        y_size = child->GetContentsValueAsFloat ();
-        break;
-      case XMLTOKEN_SIZE:
-        x_size = child->GetAttributeValueAsFloat ("x");
-        y_size = child->GetAttributeValueAsFloat ("y");
-        z_size = child->GetAttributeValueAsFloat ("z");
-        break;
-      case XMLTOKEN_TIME:
-        state->SetEmitTime (child->GetContentsValueAsFloat ());
-        break;
-      case XMLTOKEN_FORCE:
-        ParseForce (child, state);
-        break;
-      default:
-        synldr->ReportError ("crystalspace.particles.factory.loader",
-          child, "Unknown token '%s'!", value);
-        return false;
-    }
-  }
-
-  if (!strcmp (type, "point"))
-  {
-    state->SetPointEmitType ();
-  }
-  else if (!strcmp (type, "sphere"))
-  {
-    state->SetSphereEmitType (x_size, y_size);;
-  }
-  else if (!strcmp (type, "plane"))
-  {
-    state->SetPlaneEmitType (x_size, y_size);
-  }
-  else if (!strcmp (type, "box"))
-  {
-    state->SetBoxEmitType (x_size, y_size, z_size);
-  }
-  else if (!strcmp (type, "cylinder"))
-  {
-    state->SetCylinderEmitType (x_size, y_size);
-  }
-  else
-  {
-    synldr->ReportError ("crystalspace.particles.factory.loader",
-      node, "Unknown emitter type '%s'!", type);
-    return false;
-  }
-  return true;
-}
-
-bool csParticlesFactoryLoader::ParseForce (iDocumentNode *node,
-  iParticlesFactoryState *state)
-{
-  const char *type = node->GetAttributeValue ("type");
-  if (!type)
-  {
-    synldr->ReportError ("crystalspace.particles.factory.loader",
-      node, "No type specified for force!");
-    return false;
-  }
-
-  csVector3 direction (0.0f, 0.0f, 0.0f);
-  csVector3 direction_variation (0.0f, 0.0f, 0.0f);
-  float range = 0.0f, radius = 0.0f;
-  csParticleFalloffType falloff = CS_PART_FALLOFF_LINEAR,
-    radius_falloff = CS_PART_FALLOFF_LINEAR;
-
-  csRef<iDocumentNodeIterator> it = node->GetNodes ();
-  while (it->HasNext())
-  {
-    csRef<iDocumentNode> child = it->Next ();
-    if (child->GetType () != CS_NODE_ELEMENT) continue;
-    const char* value = child->GetValue ();
-    csStringID id = xmltokens.Request (value);
-    switch (id)
-    {
-      case XMLTOKEN_RANGE:
-        range = child->GetContentsValueAsFloat ();
-        break;
-      case XMLTOKEN_FALLOFF:
-      {
-        const char *str = child->GetContentsValue ();
-        if (!str)
-        {
-          synldr->ReportError ("crystalspace.particles.factory.loader",
-            child, "No falloff type specified!");
-          return false;
-        }
-        if (!strcmp (str, "constant"))
-	        falloff = CS_PART_FALLOFF_CONSTANT;
-        else if (!strcmp (str, "linear"))
-	        falloff = CS_PART_FALLOFF_LINEAR;
-        else if (!strcmp (str, "parabolic"))
-	        falloff = CS_PART_FALLOFF_PARABOLIC;
-        else
-        {
-          synldr->ReportError ("crystalspace.particles.factory.loader",
-            child, "Unknown falloff type '%s'!", str);
-	  return false;
-        }
-        break;
-      }
-      case XMLTOKEN_DIRECTION:
-        synldr->ParseVector (child, direction);
-        direction.Normalize ();
-        break;
-      case XMLTOKEN_DIRECTIONVARIATION:
-        synldr->ParseVector (child, direction_variation);
-        break;
-      case XMLTOKEN_CONERADIUS:
-        radius = child->GetContentsValueAsFloat ();
-        break;
-      case XMLTOKEN_CONEFALLOFF:
-      {
-        const char *str = child->GetContentsValue ();
-        if (!str)
-        {
-          synldr->ReportError ("crystalspace.particles.factory.loader",
-            child, "No cone falloff type specified!");
-          return false;
-        }
-        if (!strcmp (str, "constant"))
-	        radius_falloff = CS_PART_FALLOFF_CONSTANT;
-        else if (!strcmp (str, "linear"))
-	        radius_falloff = CS_PART_FALLOFF_LINEAR;
-        else if (!strcmp (str, "parabolic"))
-	        radius_falloff = CS_PART_FALLOFF_PARABOLIC;
-        else
-        {
-          synldr->ReportError ("crystalspace.particles.factory.loader",
-            child, "Unknown cone falloff type '%s'!", str);
-	  return false;
-        }
-        break;
-      }
-      case XMLTOKEN_AMOUNT:
-        state->SetForce (child->GetContentsValueAsFloat ());
-        break;
-      default:
-        synldr->ReportError ("crystalspace.particles.factory.loader",
-          child, "Unknown token '%s'!", value);
-        return false;
-    }
-  }
-
-  if (!strcmp(type, "radial"))
-  {
-    state->SetRadialForceType (range, falloff);
-  }
-  else if (!strcmp(type, "linear"))
-  {
-    state->SetLinearForceType (direction, direction_variation, range, falloff);
-  }
-  else if (!strcmp(type, "cone"))
-  {
-    state->SetConeForceType(direction, direction_variation, range, falloff,
-    	radius, radius_falloff);
-  }
-  else
-  {
-    synldr->ReportError ("crystalspace.particles.factory.loader",
-      node, "Unknown force type '%s'!", type);
-    return false;
-  }
-  return true;
-}
-
-bool csParticlesFactoryLoader::ParseColorConstant (iDocumentNode *node,
-  iParticlesFactoryState *state)
-{
-  csRef<iDocumentNodeIterator> it = node->GetNodes ();
-  bool method_set = false;
-  while (it->HasNext())
-  {
-    csRef<iDocumentNode> child = it->Next ();
-    if (child->GetType () != CS_NODE_ELEMENT) continue;
-    const char* value = child->GetValue ();
-    csStringID id = xmltokens.Request (value);
-    switch (id)
-    {
-      case XMLTOKEN_COLOR:
-      {
-        csColor4 color;
-        synldr->ParseColor (child, color);
-        state->SetConstantColorMethod (color);
-        method_set = true;
-        break;
-      }
-      default:
-        synldr->ReportError ("crystalspace.particles.factory.loader",
-          child, "Unknown token '%s'!", value);
-        return false;
-    }
-  }
-  if(!method_set)
-  {
-    synldr->ReportError ("crystalspace.particles.factory.loader",
-          node, "No constant color specified!");
-    return false;
-  }
-  return true;
-}
-
-bool csParticlesFactoryLoader::ParseColorLinear (iDocumentNode *node,
-  iParticlesFactoryState *state)
-{
-  csRef<iDocumentNodeIterator> it = node->GetNodes ();
-  bool method_set = false;
-  while (it->HasNext())
-  {
-    csRef<iDocumentNode> child = it->Next ();
-    if (child->GetType () != CS_NODE_ELEMENT) continue;
-    const char* value = child->GetValue ();
-    csStringID id = xmltokens.Request (value);
-    switch (id)
-    {
-      case XMLTOKEN_GRADIENT:
-      {
-        ParseGradient (child, state);
-        state->SetLinearColorMethod ();
-        method_set = true;
-        break;
-      }
-      default:
-        synldr->ReportError ("crystalspace.particles.factory.loader",
-          child, "Unknown token '%s'!", value);
-        return false;
-    }
-  }
-  if(!method_set)
-  {
-    synldr->ReportError ("crystalspace.particles.factory.loader",
-          node, "No gradient specified!");
-    return false;
-  }
-  return true;
-}
-
-bool csParticlesFactoryLoader::ParseColorLooping (iDocumentNode *node,
-  iParticlesFactoryState *state)
-{
-  csRef<iDocumentNodeIterator> it = node->GetNodes ();
-  int actions = 0;
-  while (it->HasNext())
-  {
-    csRef<iDocumentNode> child = it->Next ();
-    if (child->GetType () != CS_NODE_ELEMENT) continue;
-    const char* value = child->GetValue ();
-    csStringID id = xmltokens.Request (value);
-    switch (id)
-    {
-      case XMLTOKEN_GRADIENT:
-      {
-        ParseGradient(child, state);
-        actions |= 1;
-        break;
-      }
-      case XMLTOKEN_TIME:
-      {
-        float time = child->GetContentsValueAsFloat ();
-        state->SetLoopingColorMethod (time);
-        actions |= 2;
-        break;
-      }
-      default:
-        synldr->ReportError ("crystalspace.particles.factory.loader",
-          child, "Unknown token '%s'!", value);
-        return false;
-    }
-  }
-  if(actions != 3)
-  {
-    synldr->ReportError ("crystalspace.particles.factory.loader",
-          node, "You must specify a gradient and loop time!");
-    return false;
-  }
-  return true;
-}
-
-bool csParticlesFactoryLoader::ParseColorHeat (iDocumentNode *node,
-  iParticlesFactoryState *state)
-{
-  csRef<iDocumentNodeIterator> it = node->GetNodes ();
-  bool method_set = false;
-  while (it->HasNext())
-  {
-    csRef<iDocumentNode> child = it->Next ();
-    if (child->GetType () != CS_NODE_ELEMENT) continue;
-    const char* value = child->GetValue ();
-    csStringID id = xmltokens.Request (value);
-    switch (id)
-    {
-      case XMLTOKEN_TEMP:
-      {
-        float base_heat = child->GetContentsValueAsFloat ();
-        state->SetHeatColorMethod ((int)base_heat);
-        method_set = true;
-        break;
-      }
-      default:
-        synldr->ReportError ("crystalspace.particles.factory.loader",
-          child, "Unknown token '%s'!", value);
-        return false;
-    }
-  }
-  if(!method_set)
-  {
-    synldr->ReportError ("crystalspace.particles.factory.loader",
-          node, "You must specify a base heat (temp)!");
-    return false;
-  }
-  return true;
-}
-
-bool csParticlesFactoryLoader::ParseGradient (iDocumentNode *node,
-  iParticlesFactoryState *state)
-{
-  state->ClearColors ();
-
-  csRef<iDocumentNodeIterator> it = node->GetNodes ();
-  while (it->HasNext())
-  {
-    csRef<iDocumentNode> child = it->Next ();
-    if (child->GetType () != CS_NODE_ELEMENT) continue;
-    const char* value = child->GetValue ();
-    csStringID id = xmltokens.Request (value);
-    switch (id)
-    {
-      case XMLTOKEN_COLOR:
-      {
-        csColor4 color;
-        synldr->ParseColor (child, color);
-        state->AddColor (color);
-        break;
-      }
-      default:
-        synldr->ReportError ("crystalspace.particles.factory.loader",
-          child, "Unknown token '%s'!", value);
-        return false;
-    }
-  }
-  return true;
-}
-
-SCF_IMPLEMENT_IBASE (csParticlesFactorySaver)
-  SCF_IMPLEMENTS_INTERFACE (iSaverPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csParticlesFactorySaver::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_FACTORY (csParticlesFactorySaver)
-
-csParticlesFactorySaver::csParticlesFactorySaver (iBase* parent)
-{
-  SCF_CONSTRUCT_IBASE (parent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
-}
-
-csParticlesFactorySaver::~csParticlesFactorySaver ()
-{
-}
-
-bool csParticlesFactorySaver::Initialize (iObjectRegistry* objreg)
-{
-  object_reg = objreg;
-  synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
-  return true;
-}
-
-bool csParticlesFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent,
-	iStreamSource*)
-{
-  if (!parent) return false; //you never know...
-  if (!obj)    return false; //you never know...
-
-  csRef<iMeshObjectFactory> fact = 
-    SCF_QUERY_INTERFACE(obj, iMeshObjectFactory);
-  csRef<iParticlesFactoryState> state =
-    SCF_QUERY_INTERFACE(obj, iParticlesFactoryState);
-
-  if (fact && state)
-  {
-    csRef<iDocumentNode> paramsNode = 
-      parent->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-    paramsNode->SetValue("params");
-
-    //TBD
-    //Writedown Material tag
-    iMaterialWrapper* mat = 0; //state->GetMaterialWrapper();
-    if (mat)
-    {
-      const char* matname = mat->QueryObject()->GetName();
-      if (matname && *matname)
-      {
-        csRef<iDocumentNode> matNode = 
-          paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-        matNode->SetValue("material");
-        csRef<iDocumentNode> matnameNode = 
-          matNode->CreateNodeBefore(CS_NODE_TEXT, 0);
-        matnameNode->SetValue(matname);
-      }    
-    }    
-
-    //Writedown emitter tag
-    WriteEmitter(state, paramsNode);
-
-    //Writedown dampener tag:
-    float damp = state->GetDampener ();
-    csRef<iDocumentNode> dampNode = 
-      paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-    dampNode->SetValue("dampener");
-    dampNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(damp);
-
-    //Writedown mass tag
-    float mass = state->GetMass ();
-    csRef<iDocumentNode> massNode = 
-      paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-    massNode->SetValue("mass");
-    massNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(mass);
-
-    //Writedown massvar tag
-    float massvar = state->GetMassVariation ();
-    csRef<iDocumentNode> massvarNode = 
-      paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-    massvarNode->SetValue("massvariation");
-    massvarNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(massvar);
-
-    //Writedown partpersec tag
-    int pps = state->GetParticlesPerSecond ();
-    csRef<iDocumentNode> ppsNode = 
-      paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-    ppsNode->SetValue("pps");
-    ppsNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsInt(pps);
-
-    //Writedown initial tag
-    int initial = state->GetInitialParticleCount ();
-    csRef<iDocumentNode> initialNode = 
-      paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-    initialNode->SetValue("initial");
-    initialNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsInt(initial);
-
-    //Writedown gravity tag
-    csVector3 gravity;
-    state->GetGravity(gravity);
-    csRef<iDocumentNode> gravityNode = 
-      paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-    gravityNode->SetValue("gravity");
-    synldr->WriteVector(gravityNode, &gravity);
-
-    //Writedown diffusion tag
-    float diffuse = state->GetDiffusion ();
-    csRef<iDocumentNode> diffuseNode = 
-      paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-    diffuseNode->SetValue("diffusion");
-    diffuseNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(diffuse);
-
-    //Writedown radius tag
-    float radius = state->GetParticleRadius ();
-    csRef<iDocumentNode> radiusNode = 
-      paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-    radiusNode->SetValue("radius");
-    radiusNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(radius);
-
-    //Writedown timetolive tag (ttl)
-    float ttl = state->GetTimeToLive ();
-    csRef<iDocumentNode> ttlNode = 
-      paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-    ttlNode->SetValue("ttl");
-    ttlNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(ttl);
-
-    //Writedown timevariation tag
-    float tv = state->GetTimeVariation ();
-    csRef<iDocumentNode> tvNode = 
-      paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-    tvNode->SetValue("timevariation");
-    tvNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(tv);
-
-    //TBD
-    //case XMLTOKEN_AUTOSTART:
-    //state->GetAutoStart ();
-
-    //case XMLTOKEN_TRANSFORM_MODE:
-    synldr->WriteBool(paramsNode, "transformnode", 
-                      state->GetTransformMode(), false);
-
-    //TBD
-    //case XMLTOKEN_PHYSICS_PLUGIN:
-    //const char* pysplug = state->GetPhysicsPlugin ();
-
-    //Write colormethod tags
-    WriteColorMethode(state, paramsNode);
-  }
-  return true;
-}
-
-//TBD
-bool csParticlesFactorySaver::WriteEmitter (iParticlesFactoryState* state,
-                                            iDocumentNode* parent)
-{
-  csRef<iDocumentNode> emitterNode =
-    parent->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-  emitterNode->SetValue("emitter");
-  
-  //Write time tags
-  float emittime = state->GetEmitTime();
-  csRef<iDocumentNode> emittimeNode =
-    emitterNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-  emittimeNode->SetValue("time");
-  emittimeNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(emittime);
-
-  switch (state->GetEmitType())
-  {
-    case CS_PART_EMIT_BOX:
-    {
-      //float x = state->GetEmitXSize();
-      //float y = state->GetEmitYSize();
-      //float z = state->GetEmitZSize();
-      break;
-    }
-
-    case CS_PART_EMIT_CYLINDER:
-    {
-      break;
-    }
-
-    case CS_PART_EMIT_PLANE:
-    {
-      break;
-    }
-
-    case CS_PART_EMIT_SPHERE:
-    {
-      emitterNode->SetAttribute("type", "sphere");
-
-      float innerradius = state->GetEmitXSize();
-      csRef<iDocumentNode> innerradiusNode =
-        emitterNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-      innerradiusNode->SetValue("innerradius");
-      innerradiusNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(innerradius);
-      
-      float outerradius = state->GetEmitYSize();
-      csRef<iDocumentNode> outerradiusNode =
-        emitterNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-      outerradiusNode->SetValue("outerradius");
-      outerradiusNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(outerradius);
-
-      break;
-    }
-  }
-
-  //paramsNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValue(matname);
-
-  //Write force tags
-  csRef<iDocumentNode> forceNode =
-    emitterNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-  forceNode->SetValue("force");
-
-  switch (state->GetForceType())
-  {
-    case CS_PART_FORCE_RADIAL:
-    {
-      break;
-    }
-
-    case CS_PART_FORCE_LINEAR:
-    {
-      forceNode->SetAttribute("type", "linear");
-
-      csVector3 direction;
-      state->GetForceDirection(direction);
-      csRef<iDocumentNode> directionNode =
-        forceNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-      directionNode->SetValue("direction");
-      synldr->WriteVector(directionNode, &direction);
-
-      csVector3 direction_variation;
-      state->GetForceDirectionVariation(direction_variation);
-      csRef<iDocumentNode> directionVariationNode =
-        forceNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-      directionVariationNode->SetValue("directionvariation");
-      synldr->WriteVector(directionVariationNode, &direction_variation);
-
-      float amount = state->GetForce();
-      csRef<iDocumentNode> amountNode =
-        forceNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-      amountNode->SetValue("amount");
-      amountNode->CreateNodeBefore(CS_NODE_TEXT,0)->SetValueAsFloat(amount);
-
-      float range = state->GetForceRange();
-      csRef<iDocumentNode> rangeNode =
-        forceNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-      rangeNode->SetValue("range");
-      rangeNode->CreateNodeBefore(CS_NODE_TEXT,0)->SetValueAsFloat(range);
-
-      break;
-    }
-
-    case CS_PART_FORCE_CONE:
-    {
-      float radius = state->GetForceConeRadius();
-      csRef<iDocumentNode> radiusNode =
-        forceNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-      radiusNode->SetValue("radius");
-      radiusNode->CreateNodeBefore(CS_NODE_TEXT,0)->SetValueAsFloat(radius);
-
-      break;
-    }
-  }
-
-
-  return true;
-}
-
-//TBD
-bool csParticlesFactorySaver::WriteColorMethode (iParticlesFactoryState* /*state*/,
-                                                 iDocumentNode* /*parent*/)
-{
-  //state->GetConstantColor();
-
-  return true;
-}
-
-SCF_IMPLEMENT_IBASE (csParticlesObjectLoader)
-  SCF_IMPLEMENTS_INTERFACE (iLoaderPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csParticlesObjectLoader::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_FACTORY (csParticlesObjectLoader)
-
-csParticlesObjectLoader::csParticlesObjectLoader (iBase* parent)
-{
-  SCF_CONSTRUCT_IBASE (parent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
-
-  InitTokenTable (xmltokens);
-}
-
-csParticlesObjectLoader::~csParticlesObjectLoader ()
-{
-}
-
-bool csParticlesObjectLoader::Initialize (iObjectRegistry* objreg)
-{
-  object_reg = objreg;
-  synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
-  vfs = CS_QUERY_REGISTRY (object_reg, iVFS);
-
-  return true;
-}
-
-#define CHECK_MESH(m) \
-  if (!m) { \
-    synldr->ReportError ( \
-	"crystalspace.particlesloader.parse.unknownfactory", \
-	child, "Specify the factory first!"); \
-    return 0; \
-  }
-
-
-csPtr<iBase> csParticlesObjectLoader::Parse (iDocumentNode* node,
-  iStreamSource*, iLoaderContext* ldr_context, iBase* /*context*/)
-{
-  csRef<iMeshObject> mesh;
-  csRef<iParticlesObjectState> state;
-
-  csRef<iDocumentNodeIterator> it = node->GetNodes ();
-  while (it->HasNext())
-  {
-    csRef<iDocumentNode> child = it->Next ();
-    if (child->GetType () != CS_NODE_ELEMENT) continue;
-    const char* value = child->GetValue ();
-    csStringID id = xmltokens.Request (value);
-    switch (id)
-    {
-      case XMLTOKEN_FACTORY:
-      {
-        const char* factname = child->GetContentsValue ();
-        iMeshFactoryWrapper* fact = ldr_context->FindMeshFactory (factname);
-        if (!fact)
-        {
-      	  synldr->ReportError ("crystalspace.particles.object.loader",
-            child, "Couldn't find factory '%s'!", factname);
-          return 0;
-        }
-        mesh = fact->GetMeshObjectFactory ()->NewInstance ();
-        state = SCF_QUERY_INTERFACE(mesh, iParticlesObjectState);
-	if (!state)
-	{
-      	  synldr->ReportError (
-		"crystalspace.particles.parse.badfactory", child,
-                "Factory '%s' doesn't appear to be a particles factory!",
-		factname);
-	  return 0;
-	}
-        break;
-      }
-      case XMLTOKEN_COLOR:
-      {
-        csColor color;
-        synldr->ParseColor (child, color);
-	CHECK_MESH (mesh);
-        mesh->SetColor (color);
-        break;
-      }
-      case XMLTOKEN_MATERIAL:
-      {
-        const char* matname = child->GetContentsValue ();
-        iMaterialWrapper* mat = ldr_context->FindMaterial (matname);
-        if (!mat)
-        {
-          synldr->ReportError("crystalspace.ballloader.parse.unknownmaterial",
-	    child, "Couldn't find material '%s'!", matname);
-          return 0;
-        }
-	CHECK_MESH (mesh);
-        mesh->SetMaterialWrapper (mat);
-        break;
-      }
-      case XMLTOKEN_EMITTER:
-	CHECK_MESH (state);
-        ParseEmitter (child, state);
-        break;
-      case XMLTOKEN_DIFFUSION:
-	CHECK_MESH (state);
-        state->SetDiffusion (child->GetContentsValueAsFloat ());
-        break;
-      case XMLTOKEN_GRAVITY:
-      {
-        csVector3 gravity;
-        synldr->ParseVector (child, gravity);
-	CHECK_MESH (state);
-        state->SetGravity (gravity);
-        break;
-      }
-      case XMLTOKEN_TTL:
-	CHECK_MESH (state);
-        state->SetTimeToLive (child->GetContentsValueAsFloat ());
-        break;
-      case XMLTOKEN_TIMEVARIATION:
-	CHECK_MESH (state);
-        state->SetTimeVariation (child->GetContentsValueAsFloat ());
-        break;
-      case XMLTOKEN_INITIAL:
-	CHECK_MESH (state);
-        state->SetInitialParticleCount (child->GetContentsValueAsInt ());
-        break;
-      case XMLTOKEN_PPS:
-	CHECK_MESH (state);
-        state->SetParticlesPerSecond (child->GetContentsValueAsInt ());
-        break;
-      case XMLTOKEN_RADIUS:
-	CHECK_MESH (state);
-        state->SetParticleRadius (child->GetContentsValueAsFloat ());
-        break;
-      case XMLTOKEN_MASS:
-	CHECK_MESH (state);
-        state->SetMass (child->GetContentsValueAsFloat ());
-        break;
-      case XMLTOKEN_MASSVARIATION:
-	CHECK_MESH (state);
-        state->SetMassVariation (child->GetContentsValueAsFloat ());
-        break;
-      case XMLTOKEN_TRANSFORMMODE:
-      {
-	CHECK_MESH (state);
-        const char *mode = child->GetContentsValue ();
-        if(!strcmp(mode, "no")) state->SetTransformMode (false);
-        else if(!strcmp(mode, "yes")) state->SetTransformMode (true);
-        else 
-        {
-          synldr->ReportError ("crystalspace.particles.factory.loader",
-            child, "Unknown transform mode parameter '%s'!", mode);
-	  return 0;
-        }
-        break;
-      }
-      case XMLTOKEN_PHYSICSPLUGIN:
-	CHECK_MESH (state);
-        state->ChangePhysicsPlugin (child->GetContentsValue ());
-        break;
-      case XMLTOKEN_DAMPENER:
-	CHECK_MESH (state);
-        state->SetDampener (child->GetContentsValueAsFloat ());
-        break;
-      case XMLTOKEN_COLORMETHOD:
-      {
-	CHECK_MESH (state);
-        const char *str = child->GetAttributeValue ("type");
-        if (!str)
-        {
-          synldr->ReportError ("crystalspace.particles.factory.loader",
-            child, "No color method type specified!");
-          return 0;
-        }
-        if (!strcmp (str, "constant"))
-        {
-          ParseColorConstant (child, state);
-        }
-        else if (!strcmp (str, "linear"))
-        {
-          ParseColorLinear (child, state);
-        }
-        else if (!strcmp (str, "looping"))
-        {
-          ParseColorLooping (child, state);
-        }
-        else if (!strcmp (str, "heat"))
-        {
-          ParseColorHeat (child, state);
-        }
-        else if (!strcmp (str, "callback"))
-        {
-          synldr->ReportError ("crystalspace.particles.factory.loader",
-            child, "You cannot specify callback color method in loader!");
-	  return 0;
-        }
-        else
-        {
-          synldr->ReportError ("crystalspace.particles.factory.loader",
-            child, "Unknown color method '%s'!", str);
-	  return 0;
-        }
-        break;
-      }
-      case XMLTOKEN_MIXMODE:
-	{
-	  uint mixmode;
-	  if (!synldr->ParseMixmode (child, mixmode)) return 0;
-	  CHECK_MESH (state);
-	  state->SetMixMode (mixmode);
-	}
-	break;
-      case XMLTOKEN_ZSORT:
-	{
-	  bool zsort;
-	  if (!synldr->ParseBool (child, zsort, true)) return 0;
-	  CHECK_MESH (state);
-	  state->EnableZSort (zsort);
-	}
-	break;
-      default:
-        synldr->ReportError ("crystalspace.particles.object.loader",
-          child, "Unknown token '%s'!", value);
-        return 0;
-    }
-  }
-
-  return csPtr<iBase>(mesh);
-}
-
-bool csParticlesObjectLoader::ParseEmitter (iDocumentNode *node,
-  iParticlesObjectState *state)
-{
-  const char *type = node->GetAttributeValue ("type");
-  if (!type)
-  {
-    synldr->ReportError ("crystalspace.particles.object.loader",
-      node, "No type specified for emitter!");
-    return false;
-  }
-
-  float x_size = 0.0f, y_size = 0.0f, z_size = 0.0f;
-
-  csRef<iDocumentNodeIterator> it = node->GetNodes ();
-  while (it->HasNext())
-  {
-    csRef<iDocumentNode> child = it->Next ();
-    if (child->GetType () != CS_NODE_ELEMENT) continue;
-    const char* value = child->GetValue ();
-    csStringID id = xmltokens.Request (value);
-    switch (id)
-    {
-      case XMLTOKEN_OUTERRADIUS:
-        x_size = child->GetContentsValueAsFloat ();
-        break;
-      case XMLTOKEN_INNERRADIUS:
-        y_size = child->GetContentsValueAsFloat ();
-        break;
-      case XMLTOKEN_SIZE:
-        x_size = child->GetAttributeValueAsFloat ("x");
-        y_size = child->GetAttributeValueAsFloat ("y");
-        z_size = child->GetAttributeValueAsFloat ("z");
-        break;
-      case XMLTOKEN_TIME:
-        state->SetEmitTime (child->GetContentsValueAsFloat ());
-        break;
-      case XMLTOKEN_FORCE:
-        ParseForce (child, state);
-        break;
-      default:
-        synldr->ReportError ("crystalspace.particles.factory.loader",
-          child, "Unknown token '%s'!", value);
-        return false;
-    }
-  }
-
-  if (!strcmp (type, "point"))
-  {
-    state->SetPointEmitType ();
-  }
-  else if (!strcmp (type, "sphere"))
-  {
-    state->SetSphereEmitType (x_size, y_size);;
-  }
-  else if (!strcmp (type, "plane"))
-  {
-    state->SetPlaneEmitType (x_size, y_size);
-  }
-  else if (!strcmp (type, "box"))
-  {
-    state->SetBoxEmitType (x_size, y_size, z_size);
-  }
-  else if (!strcmp (type, "cylinder"))
-  {
-    state->SetCylinderEmitType (x_size, y_size);
-  }
-  else
-  {
-    synldr->ReportError ("crystalspace.particles.object.loader",
-      node, "Unknown emitter type '%s'!", type);
-    return false;
-  }
-  return true;
-}
-
-bool csParticlesObjectLoader::ParseForce (iDocumentNode *node,
-  iParticlesObjectState *state)
-{
-  const char *type = node->GetAttributeValue ("type");
-  if (!type)
-  {
-    synldr->ReportError ("crystalspace.particles.object.loader",
-      node, "No type specified for force!");
-    return false;
-  }
-
-  csVector3 direction (0.0f, 0.0f, 0.0f);
-  csVector3 direction_variation (0.0f, 0.0f, 0.0f);
-  float range = 0.0f, radius = 0.0f;
-  csParticleFalloffType falloff = CS_PART_FALLOFF_LINEAR,
-    radius_falloff = CS_PART_FALLOFF_LINEAR;
-
-  csRef<iDocumentNodeIterator> it = node->GetNodes ();
-  while (it->HasNext())
-  {
-    csRef<iDocumentNode> child = it->Next ();
-    if (child->GetType () != CS_NODE_ELEMENT) continue;
-    const char* value = child->GetValue ();
-    csStringID id = xmltokens.Request (value);
-    switch (id)
-    {
-      case XMLTOKEN_RANGE:
-        range = child->GetContentsValueAsFloat ();
-        break;
-      case XMLTOKEN_FALLOFF:
-      {
-        const char *str = child->GetContentsValue ();
-        if (!str)
-        {
-          synldr->ReportError ("crystalspace.particles.object.loader",
-            child, "No falloff type specified!");
-          return false;
-        }
-        if (!strcmp (str, "constant"))
-      	  falloff = CS_PART_FALLOFF_CONSTANT;
-        else if (!strcmp (str, "linear"))
-	        falloff = CS_PART_FALLOFF_LINEAR;
-        else if (!strcmp (str, "parabolic"))
-	        falloff = CS_PART_FALLOFF_PARABOLIC;
-        else
-        {
-          synldr->ReportError ("crystalspace.particles.object.loader",
-            child, "Unknown falloff type '%s'!", str);
-	  return false;
-        }
-        break;
-      }
-      case XMLTOKEN_DIRECTION:
-        synldr->ParseVector (child, direction);
-        direction.Normalize ();
-        break;
-      case XMLTOKEN_DIRECTIONVARIATION:
-        synldr->ParseVector (child, direction_variation);
-        break;
-      case XMLTOKEN_CONERADIUS:
-        radius = child->GetContentsValueAsFloat ();
-        break;
-      case XMLTOKEN_CONEFALLOFF:
-      {
-        const char *str = child->GetContentsValue ();
-        if (!str)
-        {
-          synldr->ReportError ("crystalspace.particles.object.loader",
-            child, "No cone falloff type specified!");
-          return false;
-        }
-        if (!strcmp (str, "constant"))
-      	  radius_falloff = CS_PART_FALLOFF_CONSTANT;
-        else if (!strcmp (str, "linear"))
-	        radius_falloff = CS_PART_FALLOFF_LINEAR;
-        else if (!strcmp (str, "parabolic"))
-	        radius_falloff = CS_PART_FALLOFF_PARABOLIC;
-        else
-        {
-          synldr->ReportError ("crystalspace.particles.object.loader",
-            child, "Unknown cone falloff type '%s'!", str);
-	  return false;
-        }
-        break;
-      }
-      case XMLTOKEN_AMOUNT:
-        state->SetForce (child->GetContentsValueAsFloat ());
-        break;
-      default:
-        synldr->ReportError ("crystalspace.particles.object.loader",
-          child, "Unknown token '%s'!", value);
-	return false;
-    }
-  }
-
-  if (!strcmp(type, "radial"))
-  {
-    state->SetRadialForceType (range, falloff);
-  }
-  else if (!strcmp(type, "linear"))
-  {
-    state->SetLinearForceType (direction, direction_variation, range, falloff);
-  }
-  else if (!strcmp(type, "cone"))
-  {
-    state->SetConeForceType(direction, direction_variation, range, falloff, radius,
-      radius_falloff);
-  }
-  else
-  {
-    synldr->ReportError ("crystalspace.particles.object.loader",
-      node, "Unknown force type '%s'!", type);
-    return false;
-  }
-  return true;
-}
-
-bool csParticlesObjectLoader::ParseColorConstant (iDocumentNode *node,
-  iParticlesObjectState *state)
-{
-  csRef<iDocumentNodeIterator> it = node->GetNodes ();
-  bool method_set = false;
-  while (it->HasNext())
-  {
-    csRef<iDocumentNode> child = it->Next ();
-    if (child->GetType () != CS_NODE_ELEMENT) continue;
-    const char* value = child->GetValue ();
-    csStringID id = xmltokens.Request (value);
-    switch (id)
-    {
-      case XMLTOKEN_COLOR:
-      {
-        csColor4 color;
-        synldr->ParseColor (child, color);
-        state->SetConstantColorMethod (color);
-        method_set = true;
-        break;
-      }
-      default:
-        synldr->ReportError ("crystalspace.particles.object.loader",
-          child, "Unknown token '%s'!", value);
-        return false;
-    }
-  }
-  if(!method_set)
-  {
-    synldr->ReportError ("crystalspace.particles.object.loader",
-          node, "No constant color specified!");
-    return false;
-  }
-  return true;
-}
-
-bool csParticlesObjectLoader::ParseColorLinear (iDocumentNode *node,
-  iParticlesObjectState *state)
-{
-  csRef<iDocumentNodeIterator> it = node->GetNodes ();
-  bool method_set = false;
-  while (it->HasNext())
-  {
-    csRef<iDocumentNode> child = it->Next ();
-    if (child->GetType () != CS_NODE_ELEMENT) continue;
-    const char* value = child->GetValue ();
-    csStringID id = xmltokens.Request (value);
-    switch (id)
-    {
-      case XMLTOKEN_GRADIENT:
-      {
-        ParseGradient (child, state);
-        state->SetLinearColorMethod ();
-        method_set = true;
-        break;
-      }
-      default:
-        synldr->ReportError ("crystalspace.particles.object.loader",
-          child, "Unknown token '%s'!", value);
-        return false;
-    }
-  }
-  if(!method_set)
-  {
-    synldr->ReportError ("crystalspace.particles.object.loader",
-          node, "No gradient specified!");
-    return false;
-  }
-  return true;
-}
-
-bool csParticlesObjectLoader::ParseColorLooping (iDocumentNode *node,
-  iParticlesObjectState *state)
-{
-  csRef<iDocumentNodeIterator> it = node->GetNodes ();
-  int actions = 0;
-  while (it->HasNext())
-  {
-    csRef<iDocumentNode> child = it->Next ();
-    if (child->GetType () != CS_NODE_ELEMENT) continue;
-    const char* value = child->GetValue ();
-    csStringID id = xmltokens.Request (value);
-    switch (id)
-    {
-      case XMLTOKEN_GRADIENT:
-      {
-        ParseGradient(child, state);
-        actions |= 1;
-        break;
-      }
-      case XMLTOKEN_TIME:
-      {
-        float time = child->GetContentsValueAsFloat ();
-        state->SetLoopingColorMethod (time);
-        actions |= 2;
-        break;
-      }
-      default:
-        synldr->ReportError ("crystalspace.particles.object.loader",
-          child, "Unknown token '%s'!", value);
-        return false;
-    }
-  }
-  if(actions != 3)
-  {
-     synldr->ReportError ("crystalspace.particles.object.loader",
-          node, "You must specify a gradient and loop time!");
+    if (!node || !baseObject)
       return false;
-  }
-  return true;
-}
 
-bool csParticlesObjectLoader::ParseColorHeat (iDocumentNode *node,
-  iParticlesObjectState *state)
-{
-  csRef<iDocumentNodeIterator> it = node->GetNodes ();
-  bool method_set = false;
-  while (it->HasNext())
-  {
-    csRef<iDocumentNode> child = it->Next ();
-    if (child->GetType () != CS_NODE_ELEMENT) continue;
-    const char* value = child->GetValue ();
+    if (node->GetType () != CS_NODE_ELEMENT)
+      return false;
+
+    const char* value = node->GetValue ();
     csStringID id = xmltokens.Request (value);
     switch (id)
     {
-      case XMLTOKEN_TEMP:
+    case XMLTOKEN_RENDERORIENTATION:
       {
-        float base_heat = child->GetContentsValueAsFloat ();
-        state->SetHeatColorMethod ((int)base_heat);
-        method_set = true;
-        break;
+        const char* orient = node->GetContentsValue ();
+        
+        csParticleRenderOrientation r = CS_PARTICLE_CAMERAFACE_APPROX;
+        if (!strcasecmp (orient, "camface"))
+          r = CS_PARTICLE_CAMERAFACE;
+        else if (!strcasecmp (orient, "camface approx"))
+          r = CS_PARTICLE_CAMERAFACE_APPROX;
+        else if (!strcasecmp (orient, "common"))
+          r = CS_PARTICLE_ORIENT_COMMON;
+        else if (!strcasecmp (orient, "common approx"))
+          r = CS_PARTICLE_ORIENT_COMMON_APPROX;
+        else if (!strcasecmp (orient, "velocity"))
+          r = CS_PARTICLE_ORIENT_VELOCITY;
+        else if (!strcasecmp (orient, "self"))
+          r = CS_PARTICLE_ORIENT_SELF;
+        else if (!strcasecmp (orient, "self forward"))
+          r = CS_PARTICLE_ORIENT_SELF_FORWARD;
+        else
+        {
+          synldr->ReportError ("crystalspace.particleloader.parsebase", node,
+            "Unknown orientation mode (%s)!", orient);
+          return false;
+        }
+
+        baseObject->SetParticleRenderOrientation (r);
       }
-      default:
-        synldr->ReportError ("crystalspace.particles.object.loader",
-          child, "Unknown token '%s'!", value);
-        return false;
-    }
-  }
-  if(!method_set)
-  {
-    synldr->ReportError ("crystalspace.particles.object.loader",
-          node, "You must specify a base heat (temp)!");
-    return false;
-  }
-  return true;
-}
-
-bool csParticlesObjectLoader::ParseGradient (iDocumentNode *node,
-  iParticlesObjectState *state)
-{
-  state->ClearColors ();
-
-  csRef<iDocumentNodeIterator> it = node->GetNodes ();
-  while (it->HasNext())
-  {
-    csRef<iDocumentNode> child = it->Next ();
-    if (child->GetType () != CS_NODE_ELEMENT) continue;
-    const char* value = child->GetValue ();
-    csStringID id = xmltokens.Request (value);
-    switch (id)
-    {
-      case XMLTOKEN_COLOR:
+      break;
+    case XMLTOKEN_ROTATIONMODE:
       {
-        csColor4 color;
-        synldr->ParseColor (child, color);
-        state->AddColor (color);
-        break;
+        const char* rotation = node->GetContentsValue ();
+        csParticleRotationMode m = CS_PARTICLE_ROTATE_NONE;
+
+        if (!strcasecmp (rotation, "none"))
+          m = CS_PARTICLE_ROTATE_NONE;
+        else if (!strcasecmp (rotation, "texcoord"))
+          m = CS_PARTICLE_ROTATE_TEXCOORD;
+        else if (!strcasecmp (rotation, "vertex"))
+          m = CS_PARTICLE_ROTATE_VERTICES;
+        else
+        {
+          synldr->ReportError ("crystalspace.particleloader.parsebase", node,
+            "Unknown rotation mode (%s)!", rotation);
+          return false;
+        }
+
+        baseObject->SetRotationMode (m);
       }
-      default:
-        synldr->ReportError ("crystalspace.particles.object.loader",
-          child, "Unknown token '%s'!", value);
-        return false;
-    }
-  }
-  return true;
-}
-
-SCF_IMPLEMENT_IBASE (csParticlesObjectSaver)
-  SCF_IMPLEMENTS_INTERFACE (iSaverPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csParticlesObjectSaver::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_FACTORY (csParticlesObjectSaver)
-
-csParticlesObjectSaver::csParticlesObjectSaver (iBase* parent)
-{
-  SCF_CONSTRUCT_IBASE (parent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
-}
-
-csParticlesObjectSaver::~csParticlesObjectSaver ()
-{
-}
-
-bool csParticlesObjectSaver::Initialize (iObjectRegistry *objreg)
-{
-  object_reg = objreg;
-  synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
-  return true;
-}
-
-
-bool csParticlesObjectSaver::WriteDown (iBase* obj, iDocumentNode* parent,
-	iStreamSource*)
-{
-  if (!parent) return false; //you never know...
-  if (!obj)    return false; //you never know...
-
-  csRef<iMeshObject> mesh = 
-    SCF_QUERY_INTERFACE(obj, iMeshObject);
-  csRef<iParticlesObjectState> object =
-    SCF_QUERY_INTERFACE(obj, iParticlesObjectState);
-
-  if (mesh && object)
-  {
-    csRef<iDocumentNode> paramsNode = 
-      parent->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-    paramsNode->SetValue("params");
-
-    //Writedown factory tag
-    iMeshWrapper* meshwrap = mesh->GetMeshWrapper ();
-    iMeshFactoryWrapper* factwrap = meshwrap->GetFactory();
-    if (factwrap)
-    {
-      const char* factname = factwrap->QueryObject()->GetName();
-      if (factname && *factname)
+      break;
+    case XMLTOKEN_SORTMODE:
       {
-        csRef<iDocumentNode> factNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-        factNode->SetValue("factory");
-        factNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValue(factname);
-      }    
-    }
+        const char* sortmode = node->GetContentsValue ();
+        csParticleSortMode m = CS_PARTICLE_SORT_NONE;
+        
+        if (!strcasecmp (sortmode, "none"))
+          m = CS_PARTICLE_SORT_NONE;
+        else if (!strcasecmp (sortmode, "distance"))
+          m = CS_PARTICLE_SORT_DISTANCE;
+        else if (!strcasecmp (sortmode, "dot"))
+          m = CS_PARTICLE_SORT_DOT;
+        else
+        {
+          synldr->ReportError ("crystalspace.particleloader.parsebase", node,
+            "Unknown sorting mode (%s)!", sortmode);
+          return false;
+        }
 
-    //TBD
-    //Writedown Material tag
-    iMaterialWrapper* mat = 0; //object->GetMaterialWrapper();
-    if (mat)
-    {
-      const char* matname = mat->QueryObject()->GetName();
-      if (matname && *matname)
+        baseObject->SetSortMode (m);
+      }
+      break;
+    case XMLTOKEN_INTEGRATIONMODE:
       {
-        csRef<iDocumentNode> matNode = 
-          paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-        matNode->SetValue("material");
-        csRef<iDocumentNode> matnameNode = 
-          matNode->CreateNodeBefore(CS_NODE_TEXT, 0);
-        matnameNode->SetValue(matname);
-      }    
-    }    
+        const char* integ = node->GetContentsValue ();
+        csParticleIntegrationMode m = CS_PARTICLE_INTEGRATE_LINEAR;
 
-    //Writedown emitter tag
-    WriteEmitter(object, paramsNode);
+        if (!strcasecmp (integ, "none"))
+          m = CS_PARTICLE_INTEGRATE_NONE;
+        else if (!strcasecmp (integ, "linear"))
+          m = CS_PARTICLE_INTEGRATE_LINEAR;
+        else if (!strcasecmp (integ, "both"))
+          m = CS_PARTICLE_INTEGRATE_BOTH;
+        else
+        {
+          synldr->ReportError ("crystalspace.particleloader.parsebase", node,
+            "Unknown integration mode (%s)!", integ);
+          return false;
+        }
 
-    //Writedown dampener tag:
-    float damp = object->GetDampener ();
-    csRef<iDocumentNode> dampNode = 
-      paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-    dampNode->SetValue("dampener");
-    dampNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(damp);
+        baseObject->SetIntegrationMode (m);
+      }
+      break;
+    case XMLTOKEN_COMMONDIRECTION:
+      {
+        csVector3 dir;
+        if (!synldr->ParseVector (node, dir))
+        {
+          return false;
+        }
+        baseObject->SetCommonDirection (dir);
+      }
+      break;
+    case XMLTOKEN_LOCALMODE:
+      {
+        bool local;
+        if (!synldr->ParseBool (node, local, true))
+        {
+          return false;
+        }
+        baseObject->SetLocalMode (local);
+      }
+      break;
+    case XMLTOKEN_INDIVIDUALSIZE:
+      {
+        bool ind;
+        if (!synldr->ParseBool (node, ind, true))
+        {
+          return false;
+        }
+        baseObject->SetUseIndividualSize (ind);
+      }
+      break;
+    case XMLTOKEN_PARTICLESIZE:
+      {
+        csVector2 size (1.0f);
+        if (!synldr->ParseVector (node, size))
+        {
+          return false;
+        }
+        baseObject->SetParticleSize (size);
+      }
+      break;
+    case XMLTOKEN_EMITTER:
+      {
+        csRef<iParticleEmitter> emitter;
 
-    //Writedown mass tag
-    float mass = object->GetMass ();
-    csRef<iDocumentNode> massNode = 
-      paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-    massNode->SetValue("mass");
-    massNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(mass);
+        if (!emitter)
+        {
+          synldr->ReportError ("crystalspace.particleloader.parsebase", node,
+            "Error loading emitter!");
+          return false;
+        }
+        baseObject->AddEmitter (emitter);
+      }
+      break;
+    case XMLTOKEN_EFFECTOR:
+      {
+        csRef<iParticleEffector> effector;
 
-    //Writedown massvar tag
-    float massvar = object->GetMassVariation ();
-    csRef<iDocumentNode> massvarNode = 
-      paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-    massvarNode->SetValue("massvariation");
-    massvarNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(massvar);
+        if (!effector)
+        {
+          synldr->ReportError ("crystalspace.particleloader.parsebase", node,
+            "Error loading effector!");
+          return false;
+        }
+        baseObject->AddEffector (effector);
+      }
+      break;
+    default:
+      synldr->ReportBadToken (node);
+    }
 
-    //Writedown partpersec tag
-    //int pps = object->GetParticlesPerSecond ();
-    //csRef<iDocumentNode> ppsNode = 
-    //  paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-    //ppsNode->SetValue("pps");
-    //ppsNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsInt(pps);
-
-    //Writedown initial tag
-    //int initial = object->GetInitialParticleCount ();
-    //csRef<iDocumentNode> initialNode = 
-    //  paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-    //initialNode->SetValue("initial");
-    //initialNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsInt(initial);
-
-    //Writedown gravity tag
-    csVector3 gravity;
-    object->GetGravity(gravity);
-    csRef<iDocumentNode> gravityNode = 
-      paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-    gravityNode->SetValue("gravity");
-    synldr->WriteVector(gravityNode, &gravity);
-
-    //Writedown diffusion tag
-    float diffuse = object->GetDiffusion ();
-    csRef<iDocumentNode> diffuseNode = 
-      paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-    diffuseNode->SetValue("diffusion");
-    diffuseNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(diffuse);
-
-    //Writedown radius tag
-    float radius = object->GetParticleRadius ();
-    csRef<iDocumentNode> radiusNode = 
-      paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-    radiusNode->SetValue("radius");
-    radiusNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(radius);
-
-    //Writedown timetolive tag (ttl)
-    float ttl = object->GetTimeToLive ();
-    csRef<iDocumentNode> ttlNode = 
-      paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-    ttlNode->SetValue("ttl");
-    ttlNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(ttl);
-
-    //Writedown timevariation tag
-    float tv = object->GetTimeVariation ();
-    csRef<iDocumentNode> tvNode = 
-      paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-    tvNode->SetValue("timevariation");
-    tvNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(tv);
-
-    //TBD
-    //case XMLTOKEN_AUTOSTART:
-    //object->GetAutoStart ();
-
-    //case XMLTOKEN_TRANSFORM_MODE:
-    synldr->WriteBool(paramsNode, "transformnode", 
-                      object->GetTransformMode(), false);
-
-    //TBD
-    //case XMLTOKEN_PHYSICS_PLUGIN:
-    //const char* pysplug = object->GetPhysicsPlugin ();
-
-    //Write colormethod tags
-    WriteColorMethode(object, paramsNode);
+    return true;
   }
-  return true;
-}
 
-//TBD
-bool csParticlesObjectSaver::WriteEmitter (iParticlesObjectState* object,
-                                            iDocumentNode* parent)
-{
-  csRef<iDocumentNode> emitterNode =
-    parent->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-  emitterNode->SetValue("emitter");
-  
-  //Write time tags
-  float emittime = object->GetEmitTime();
-  csRef<iDocumentNode> emittimeNode =
-    emitterNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-  emittimeNode->SetValue("time");
-  emittimeNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(emittime);
 
-  switch (object->GetEmitType())
+  bool ParticlesBaseLoader::ParseEmitter (csRef<iParticleEmitter>& newEmitter,
+    iDocumentNode* node)
   {
-    case CS_PART_EMIT_BOX:
+    const char* emitterType = node->GetAttributeValue ("type");
+    
+    if (!emitterType)
     {
-      //float x = object->GetEmitXSize();
-      //float y = object->GetEmitYSize();
-      //float z = object->GetEmitZSize();
-      break;
+      synldr->ReportError ("crystalspace.particleloader.parseemitter", node,
+        "No emitter type specified!");
+      return false;
     }
 
-    case CS_PART_EMIT_CYLINDER:
+    csRef<iParticleBuiltinEmitterFactory> factory = 
+      csLoadPluginCheck<iParticleBuiltinEmitterFactory> (
+        objectRegistry, "crystalspace.mesh.object.particles.emitter", false);
+    
+    if (!factory)
     {
-      break;
+      synldr->ReportError ("crystalspace.particleloader.parseemitter", node,
+        "Could not load particle emitter factory!");
+      return false;
     }
 
-    case CS_PART_EMIT_PLANE:
-    {
-      break;
-    }
+    //properties
+    float radius = 1.0f, coneAngle = PI/4;
+    csVector3 position (0.0f), extent (0.0f), initialVelocity (0.0f);
+    bool enabled = true;
+    float startTime = -1.0f, duration = FLT_MAX, emissionRate = 0.0f, 
+      minTTL = FLT_MAX, maxTTL = FLT_MAX, minMass = 1.0f, maxMass = 1.0f;
+    csOBB box;
+    csParticleBuiltinEmitterPlacement placement = CS_PARTICLE_BUILTIN_CENTER;
+    bool unifromVelocity = false;
 
-    case CS_PART_EMIT_SPHERE:
+    csRef<iDocumentNodeIterator> it = node->GetNodes ();
+    while (it->HasNext ())
     {
-      emitterNode->SetAttribute("type", "sphere");
-
-      float innerradius = object->GetEmitXSize();
-      csRef<iDocumentNode> innerradiusNode =
-        emitterNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-      innerradiusNode->SetValue("innerradius");
-      innerradiusNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(innerradius);
+      csRef<iDocumentNode> child = it->Next ();
       
-      float outerradius = object->GetEmitYSize();
-      csRef<iDocumentNode> outerradiusNode =
-        emitterNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-      outerradiusNode->SetValue("outerradius");
-      outerradiusNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(outerradius);
+      if (child->GetType () != CS_NODE_ELEMENT) 
+        continue;
 
-      break;
+      const char* value = child->GetValue ();
+      csStringID id = xmltokens.Request (value);
+      switch(id)
+      {
+      case XMLTOKEN_ENABLED:
+        {
+          if(!synldr->ParseBool (child, enabled, true))
+          {
+            return false;
+          }
+        }
+        break;
+      case XMLTOKEN_STARTTIME:
+        startTime = child->GetContentsValueAsFloat ();
+        break;
+      case XMLTOKEN_DURATION:
+        duration = child->GetContentsValueAsFloat ();
+        break;
+      case XMLTOKEN_EMISSIONRATE:
+        emissionRate = child->GetContentsValueAsFloat ();
+        break;
+      case XMLTOKEN_INITIALTTL:
+        {
+          minTTL = child->GetAttributeValueAsFloat ("min");
+          maxTTL = child->GetAttributeValueAsFloat ("max");
+        }
+        break;
+      case XMLTOKEN_MASS:
+        {
+          minMass = child->GetAttributeValueAsFloat ("min");
+          maxMass = child->GetAttributeValueAsFloat ("max");
+        }
+        break;
+      case XMLTOKEN_POSITION:
+        {
+          if (!synldr->ParseVector (child, position))
+          {
+            synldr->ReportError ("crystalspace.particleloader.parsebase", child,
+              "Error parsing position!");
+          }
+        }
+        break;
+      case XMLTOKEN_PLACEMENT:
+        {
+          const char* p = child->GetContentsValue ();
+          if (!strcasecmp (p, "center"))
+            placement = CS_PARTICLE_BUILTIN_CENTER;
+          else if (!strcasecmp (p, "volume"))
+            placement = CS_PARTICLE_BUILTIN_VOLUME;
+          else if (!strcasecmp (p, "surface"))
+            placement = CS_PARTICLE_BUILTIN_SURFACE;
+          else
+          {
+            synldr->ReportError ("crystalspace.particleloader.parsebase", child,
+              "Unknown particle placement mode (%s)!", p);
+            return false;
+          }
+        }
+        break;
+      case XMLTOKEN_UNIFORMVELOCITY:
+        if (!synldr->ParseBool (child, unifromVelocity, true))
+        {
+          return false;
+        }       
+        break;
+      case XMLTOKEN_INITIALVELOCITY:
+        if (!synldr->ParseVector (child, initialVelocity))
+        {
+          return false;
+        }
+        break;
+      case XMLTOKEN_RADIUS:
+        radius = child->GetContentsValueAsFloat ();
+        break;
+      case XMLTOKEN_EXTENT:
+        if (!synldr->ParseVector (child, extent))
+        {
+          return false;
+        }
+        break;
+      case XMLTOKEN_CONEANGLE:
+        coneAngle = child->GetContentsValueAsFloat ();
+        break;
+      case XMLTOKEN_BOX:
+        if (!synldr->ParseBox (child, box))
+        {
+          return false;
+        }
+        break;
+      default:
+        synldr->ReportBadToken (child);
+        return false;
+      }
     }
+
+    csRef<iParticleBuiltinEmitterBase> baseEmitter;
+
+    // Create it..
+    if (!strcasecmp (emitterType, "sphere")) 
+    {
+      csRef<iParticleBuiltinEmitterSphere> sphereEmitter = factory->CreateSphere ();
+      baseEmitter = sphereEmitter;
+      // Set individual properties
+      sphereEmitter->SetRadius (radius);
+    }
+    else if (!strcasecmp (emitterType, "box"))
+    {
+      csRef<iParticleBuiltinEmitterBox> boxEmitter = factory->CreateBox ();
+      baseEmitter = boxEmitter;
+      // Set individual properties
+      boxEmitter->SetBox (box);
+    }
+    else if (!strcasecmp (emitterType, "cylinder"))
+    {
+      csRef<iParticleBuiltinEmitterCylinder> cylinderEmitter = factory->CreateCylinder ();
+      baseEmitter = cylinderEmitter;
+      // Set individual properties
+      cylinderEmitter->SetRadius (radius);
+      cylinderEmitter->SetExtent (extent);
+    }
+    else if (!strcasecmp (emitterType, "cone"))
+    {
+      csRef<iParticleBuiltinEmitterCone> coneEmitter = factory->CreateCone ();
+      baseEmitter = coneEmitter;
+      // Set individual properties
+      coneEmitter->SetExtent (extent);
+      coneEmitter->SetConeAngle (coneAngle);
+    }
+    else
+    {
+      synldr->ReportError ("crystalspace.particleloader.parsebase", node,
+              "Unknown emitter type (%s)!", emitterType);
+      return false;
+    }
+
+    if (!baseEmitter)
+    {
+      return false;
+    }
+
+    // Set base properties
+    baseEmitter->SetPosition (position);
+    baseEmitter->SetInitialVelocity (initialVelocity, csVector3 (0.0f));
+    baseEmitter->SetUniformVelocity (unifromVelocity);
+    baseEmitter->SetParticlePlacement (placement);
+    
+    // Set common properties
+    newEmitter = baseEmitter;
+    newEmitter->SetEnabled (enabled);
+    newEmitter->SetStartTime (startTime);
+    newEmitter->SetDuration (duration);
+    newEmitter->SetEmissionRate (emissionRate);
+    newEmitter->SetInitialTTL (minTTL, maxTTL);
+    newEmitter->SetInitialMass (minMass, maxMass);
+
+    return true;
   }
 
-  //paramsNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValue(matname);
 
-  //Write force tags
-  csRef<iDocumentNode> forceNode =
-    emitterNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-  forceNode->SetValue("force");
-
-  switch (object->GetForceType())
+  csPtr<iBase> ParticlesFactoryLoader::Parse (iDocumentNode* node,
+    iStreamSource* ssource, iLoaderContext* ldr_context, iBase* context)
   {
-    case CS_PART_FORCE_RADIAL:
+    csRef<iMeshObjectType> type = csLoadPluginCheck<iMeshObjectType> (
+  	objectRegistry, "crystalspace.mesh.loader.factory.particles", false);
+    if (!type)
     {
-      break;
+      synldr->ReportError (
+		  "crystalspace.particleloader.parsefactory",
+		  node, "Could not load the general mesh object plugin!");
+      return 0;
     }
 
-    case CS_PART_FORCE_LINEAR:
+    csRef<iMeshObjectFactory> factoryObj = type->NewFactory ();
+    csRef<iParticleSystemFactory> particleFact = 
+      scfQueryInterfaceSafe<iParticleSystemFactory> (factoryObj);
+
+    csRef<iDocumentNodeIterator> it = node->GetNodes ();
+    while (it->HasNext ())
     {
-      forceNode->SetAttribute("type", "linear");
-
-      csVector3 direction;
-      object->GetForceDirection(direction);
-      csRef<iDocumentNode> directionNode =
-        forceNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-      directionNode->SetValue("direction");
-      synldr->WriteVector(directionNode, &direction);
-
-      csVector3 direction_variation;
-      object->GetForceDirectionVariation(direction_variation);
-      csRef<iDocumentNode> directionVariationNode =
-        forceNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-      directionVariationNode->SetValue("directionvariation");
-      synldr->WriteVector(directionVariationNode, &direction_variation);
-
-      float amount = object->GetForce();
-      csRef<iDocumentNode> amountNode =
-        forceNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-      amountNode->SetValue("amount");
-      amountNode->CreateNodeBefore(CS_NODE_TEXT,0)->SetValueAsFloat(amount);
-
-      float range = object->GetForceRange();
-      csRef<iDocumentNode> rangeNode =
-        forceNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-      rangeNode->SetValue("range");
-      rangeNode->CreateNodeBefore(CS_NODE_TEXT,0)->SetValueAsFloat(range);
-
-      break;
+      csRef<iDocumentNode> child = it->Next ();
+      if (child->GetType () != CS_NODE_ELEMENT) continue;
+      const char* value = child->GetValue ();
+      csStringID id = xmltokens.Request (value);
+      switch(id)
+      {
+      case XMLTOKEN_DEEPCREATION:
+        {
+          bool deep = false;
+          if (!synldr->ParseBool (child, deep, true))
+          {
+            synldr->ReportError ("crystalspace.particleloader.parsefactory",
+              node, "Could not parse factory!");
+            return 0;
+          }
+        }
+        break;
+      default:
+        {
+          if (!ParseBaseNode (particleFact, child, ldr_context, context))
+          {
+            synldr->ReportError ("crystalspace.particleloader.parsefactory",
+              node, "Could not parse factory!");
+            return 0;
+          }
+        }
+      }
     }
 
-    case CS_PART_FORCE_CONE:
-    {
-      float radius = object->GetForceConeRadius();
-      csRef<iDocumentNode> radiusNode =
-        forceNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-      radiusNode->SetValue("radius");
-      radiusNode->CreateNodeBefore(CS_NODE_TEXT,0)->SetValueAsFloat(radius);
-
-      break;
-    }
+    return csPtr<iBase> (factoryObj);
   }
 
+  csPtr<iBase> ParticlesObjectLoader::Parse (iDocumentNode* node,
+    iStreamSource* ssource, iLoaderContext* ldr_context, iBase* context)
+  {
+    
+    csRef<iMeshObject> meshObj;
+    csRef<iParticleSystem> particleSystem;
 
-  return true;
+    csRef<iDocumentNodeIterator> it = node->GetNodes ();
+    while (it->HasNext ())
+    {
+      csRef<iDocumentNode> child = it->Next ();
+      if (child->GetType () != CS_NODE_ELEMENT) continue;
+      const char* value = child->GetValue ();
+      csStringID id = xmltokens.Request (value);
+      switch(id)
+      {
+      case XMLTOKEN_FACTORY:
+        {
+          const char* factname = child->GetContentsValue ();
+	  iMeshFactoryWrapper* fact = ldr_context->FindMeshFactory (factname);
+
+          if (!fact)
+          {
+            synldr->ReportError ("crystalspace.particleloader.parsesystem",
+              child, "Could not find factory '%s'!", factname);
+
+            return 0;
+          }
+
+          meshObj = fact->GetMeshObjectFactory ()->NewInstance ();
+          particleSystem = scfQueryInterface<iParticleSystem> (meshObj);
+
+          if (!particleSystem)
+          {
+            synldr->ReportError ("crystalspace.particleloader.parsesystem",
+              child, "Factory '%s' does not seem to be a particle system factory!", 
+              factname);
+
+            return 0;
+          }
+        }
+        break;
+      default:
+        {
+          if (!particleSystem)
+          {
+            synldr->ReportError ("crystalspace.particleloader.parsesystem",
+              child, "Specify factory first!");
+
+            return 0;
+          }
+
+          if (!ParseBaseNode (particleSystem, child, ldr_context, context))
+          {
+            synldr->ReportError ("crystalspace.particleloader.parsesystem",
+              node, "Could not parse particle system!");
+            return 0;
+          }
+        }
+      }
+    }
+
+    return csPtr<iBase> (meshObj);
+  }
+
 }
 
-//TBD
-bool csParticlesObjectSaver::WriteColorMethode (iParticlesObjectState* /*object*/,
-                                                 iDocumentNode* /*parent*/)
-{
-  //state->GetConstantColor();
-
-  return true;
-}
+CS_PLUGIN_NAMESPACE_END(ParticlesLoader)
