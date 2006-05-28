@@ -16,6 +16,8 @@ chronological order.
 	- Jorrit fixed bugplug so that it no longer outputs a useless
 	  empty string.
 	- Jorrit updated the features section in the manual a bit.
+	- res added material emission support to glshader_fixed. Closes bug
+	  (should've really been an RFE) #1396182.
 27-May-2006
 	- res fixed the delimIgnoreDifferent mode for 
 	  csStringArray::SplitString() to work as it should.
