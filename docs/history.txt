@@ -15,6 +15,8 @@ chronological order.
 	  terrain since that is now initialization colliders constantly.
 	  Performance when moving on one particular spot in a test
 	  level I got went up from 0.2 to 23 fps.
+	- res fixed the software canvases to not strip the alpha component
+	  off colors before before doing alpha-blended 2D ops.
 28-May-2006
 	- Jorrit copied some documentation out of the wiki into CS.
 	  Documentation contributed by 'adu'. He added the 'sounds'

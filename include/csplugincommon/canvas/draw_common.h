@@ -34,7 +34,7 @@
 template<class Tpixel>
 static void SplitAlpha (const int color, Tpixel& colorPart, uint8& alphaPart)
 {
-  colorPart = color & 0x00ffffff;
+  colorPart = color;
   alphaPart = 255 - (color >> 24);
 }
 
