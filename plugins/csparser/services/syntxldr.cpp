@@ -68,40 +68,24 @@
 
 CS_IMPLEMENT_PLUGIN
 
-SCF_IMPLEMENT_IBASE (csTextSyntaxService)
-  SCF_IMPLEMENTS_INTERFACE (iSyntaxService)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iDebugHelper)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csTextSyntaxService::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csTextSyntaxService::DebugHelper)
-  SCF_IMPLEMENTS_INTERFACE (iDebugHelper)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
+CS_PLUGIN_NAMESPACE_BEGIN(SyntaxService)
+{
 
 SCF_IMPLEMENT_FACTORY (csTextSyntaxService)
 
-csTextSyntaxService::csTextSyntaxService (iBase *parent)
+csTextSyntaxService::csTextSyntaxService (iBase *parent) : 
+  scfImplementationType (this, parent)
 {
-  SCF_CONSTRUCT_IBASE (parent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiDebugHelper);
 }
 
 csTextSyntaxService::~csTextSyntaxService ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiDebugHelper);
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csTextSyntaxService::Initialize (iObjectRegistry* object_reg)
 {
   csTextSyntaxService::object_reg = object_reg;
-  reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
+  reporter = csQueryRegistry<iReporter> (object_reg);
 
   InitTokenTable (xmltokens);
 
@@ -217,7 +201,7 @@ bool csTextSyntaxService::ParsePlane (iDocumentNode* node, csPlane3 &p)
   return true;
 }
 
-bool csTextSyntaxService::WritePlane (iDocumentNode* node, csPlane3 &p)
+bool csTextSyntaxService::WritePlane (iDocumentNode* node, const csPlane3 &p)
 {
   csRef<iDocumentNode> ANode = node->CreateNodeBefore(CS_NODE_ELEMENT, 0);
   ANode->SetValue("A");
@@ -322,43 +306,43 @@ bool csTextSyntaxService::ParseMatrix (iDocumentNode* node, csMatrix3 &m)
   return true;
 }
 
-bool csTextSyntaxService::WriteMatrix (iDocumentNode* node, csMatrix3* m)
+bool csTextSyntaxService::WriteMatrix (iDocumentNode* node, const csMatrix3& m)
 {
   csRef<iDocumentNode> m11Node = node->CreateNodeBefore(CS_NODE_ELEMENT, 0);
   m11Node->SetValue("m11");
-  m11Node->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(m->m11);
+  m11Node->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(m.m11);
 
   csRef<iDocumentNode> m12Node = node->CreateNodeBefore(CS_NODE_ELEMENT, 0);
   m12Node->SetValue("m12");
-  m12Node->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(m->m12);
+  m12Node->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(m.m12);
 
   csRef<iDocumentNode> m13Node = node->CreateNodeBefore(CS_NODE_ELEMENT, 0);
   m13Node->SetValue("m13");
-  m13Node->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(m->m13);
+  m13Node->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(m.m13);
 
   csRef<iDocumentNode> m21Node = node->CreateNodeBefore(CS_NODE_ELEMENT, 0);
   m21Node->SetValue("m21");
-  m21Node->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(m->m21);
+  m21Node->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(m.m21);
 
   csRef<iDocumentNode> m22Node = node->CreateNodeBefore(CS_NODE_ELEMENT, 0);
   m22Node->SetValue("m22");
-  m22Node->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(m->m22);
+  m22Node->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(m.m22);
 
   csRef<iDocumentNode> m23Node = node->CreateNodeBefore(CS_NODE_ELEMENT, 0);
   m23Node->SetValue("m23");
-  m23Node->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(m->m23);
+  m23Node->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(m.m23);
 
   csRef<iDocumentNode> m31Node = node->CreateNodeBefore(CS_NODE_ELEMENT, 0);
   m31Node->SetValue("m31");
-  m31Node->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(m->m31);
+  m31Node->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(m.m31);
 
   csRef<iDocumentNode> m32Node = node->CreateNodeBefore(CS_NODE_ELEMENT, 0);
   m32Node->SetValue("m32");
-  m32Node->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(m->m32);
+  m32Node->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(m.m32);
 
   csRef<iDocumentNode> m33Node = node->CreateNodeBefore(CS_NODE_ELEMENT, 0);
   m33Node->SetValue("m33");
-  m33Node->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(m->m33);
+  m33Node->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(m.m33);
 
   return true;
 }
@@ -390,18 +374,18 @@ bool csTextSyntaxService::ParseBox (iDocumentNode* node, csBox3 &v)
   return true;
 }
 
-bool csTextSyntaxService::WriteBox (iDocumentNode* node, csBox3* v)
+bool csTextSyntaxService::WriteBox (iDocumentNode* node, const csBox3& v)
 {
   csRef<iDocumentNode> minNode = node->CreateNodeBefore(CS_NODE_ELEMENT, 0);
   minNode->SetValue("min");
-  minNode->SetAttributeAsFloat("x", v->MinX());
-  minNode->SetAttributeAsFloat("y", v->MinY());
-  minNode->SetAttributeAsFloat("z", v->MinZ());
+  minNode->SetAttributeAsFloat("x", v.MinX());
+  minNode->SetAttributeAsFloat("y", v.MinY());
+  minNode->SetAttributeAsFloat("z", v.MinZ());
   csRef<iDocumentNode> maxNode = node->CreateNodeBefore(CS_NODE_ELEMENT, 0);
   maxNode->SetValue("max");
-  maxNode->SetAttributeAsFloat("x", v->MaxX());
-  maxNode->SetAttributeAsFloat("y", v->MaxY());
-  maxNode->SetAttributeAsFloat("z", v->MaxZ());
+  maxNode->SetAttributeAsFloat("x", v.MaxX());
+  maxNode->SetAttributeAsFloat("y", v.MaxY());
+  maxNode->SetAttributeAsFloat("z", v.MaxZ());
 
   return true;
 }
@@ -414,11 +398,11 @@ bool csTextSyntaxService::ParseVector (iDocumentNode* node, csVector3 &v)
   return true;
 }
 
-bool csTextSyntaxService::WriteVector (iDocumentNode* node, csVector3* v)
+bool csTextSyntaxService::WriteVector (iDocumentNode* node, const csVector3& v)
 {
-  node->SetAttributeAsFloat("x", v->x);
-  node->SetAttributeAsFloat("y", v->y);
-  node->SetAttributeAsFloat("z", v->z);
+  node->SetAttributeAsFloat("x", v.x);
+  node->SetAttributeAsFloat("y", v.y);
+  node->SetAttributeAsFloat("z", v.z);
   return true;
 }
 
@@ -430,10 +414,10 @@ bool csTextSyntaxService::ParseVector (iDocumentNode* node, csVector2 &v)
   return true;
 }
 
-bool csTextSyntaxService::WriteVector (iDocumentNode* node, csVector2* v)
+bool csTextSyntaxService::WriteVector (iDocumentNode* node, const csVector2& v)
 {
-  node->SetAttributeAsFloat("x", v->x);
-  node->SetAttributeAsFloat("y", v->y);
+  node->SetAttributeAsFloat("x", v.x);
+  node->SetAttributeAsFloat("y", v.y);
   return true;
 }
 
@@ -445,11 +429,11 @@ bool csTextSyntaxService::ParseColor (iDocumentNode* node, csColor &c)
   return true;
 }
 
-bool csTextSyntaxService::WriteColor (iDocumentNode* node, csColor* col)
+bool csTextSyntaxService::WriteColor (iDocumentNode* node, const csColor& col)
 {				      
-  node->SetAttributeAsFloat("red", col->red);
-  node->SetAttributeAsFloat("green", col->green);
-  node->SetAttributeAsFloat("blue", col->blue);
+  node->SetAttributeAsFloat("red", col.red);
+  node->SetAttributeAsFloat("green", col.green);
+  node->SetAttributeAsFloat("blue", col.blue);
   return true;
 }
 
@@ -466,12 +450,12 @@ bool csTextSyntaxService::ParseColor (iDocumentNode* node, csColor4 &c)
   return true;
 }
 
-bool csTextSyntaxService::WriteColor (iDocumentNode* node, csColor4* col)
+bool csTextSyntaxService::WriteColor (iDocumentNode* node, const csColor4& col)
 {				      
-  node->SetAttributeAsFloat("red", col->red);
-  node->SetAttributeAsFloat("green", col->green);
-  node->SetAttributeAsFloat("blue", col->blue);
-  node->SetAttributeAsFloat("alpha", col->alpha);
+  node->SetAttributeAsFloat("red", col.red);
+  node->SetAttributeAsFloat("green", col.green);
+  node->SetAttributeAsFloat("blue", col.blue);
+  node->SetAttributeAsFloat("alpha", col.alpha);
   return true;
 }
 
@@ -928,26 +912,26 @@ bool csTextSyntaxService::ParseGradientShade (iDocumentNode* node,
 }
 
 bool csTextSyntaxService::WriteGradientShade (iDocumentNode* node, 
-					      csGradientShade* shade)
+					      const csGradientShade& shade)
 {
-  if (shade->left == shade->right)
+  if (shade.left == shade.right)
   {
     csRef<iDocumentNode> color = node->CreateNodeBefore (CS_NODE_ELEMENT, 0);
     color->SetValue ("color");
-    WriteColor (color, &shade->left);
+    WriteColor (color, shade.left);
   }
   else
   {
     csRef<iDocumentNode> left = node->CreateNodeBefore (CS_NODE_ELEMENT, 0);
     left->SetValue ("left");
-    WriteColor (left, &shade->left);
+    WriteColor (left, shade.left);
     csRef<iDocumentNode> right = node->CreateNodeBefore (CS_NODE_ELEMENT, 0);
     right->SetValue ("right");
-    WriteColor (right, &shade->right);
+    WriteColor (right, shade.right);
   }
   csRef<iDocumentNode> pos = node->CreateNodeBefore (CS_NODE_ELEMENT, 0);
   pos->SetValue ("pos");
-  pos->CreateNodeBefore (CS_NODE_TEXT, 0)->SetValueAsFloat (shade->position);
+  pos->CreateNodeBefore (CS_NODE_TEXT, 0)->SetValueAsFloat (shade.position);
 
   return true;
 }
@@ -986,16 +970,16 @@ bool csTextSyntaxService::ParseGradient (iDocumentNode* node,
 }
 
 bool csTextSyntaxService::WriteGradient (iDocumentNode* node,
-					 csGradient* gradient)
+					 const csGradient& gradient)
 {
-  csArray<csGradientShade> shades = gradient->GetShades ();
-  csArray<csGradientShade>::Iterator it = shades.GetIterator ();
+  const csArray<csGradientShade>& shades = gradient.GetShades ();
+  csArray<csGradientShade>::ConstIterator it = shades.GetIterator ();
   while (it.HasNext ())
   {
-    csGradientShade shade = it.Next ();
+    const csGradientShade& shade = it.Next ();
     csRef<iDocumentNode> child = node->CreateNodeBefore (CS_NODE_ELEMENT, 0);
     child->SetValue ("shade");
-    WriteGradientShade (child, &shade);
+    WriteGradientShade (child, shade);
   }
 
   return true;
@@ -1164,18 +1148,18 @@ csRef<iShaderVariableAccessor> csTextSyntaxService::ParseShaderVarExpr (
 }
 
 bool csTextSyntaxService::WriteShaderVar (iDocumentNode* node,
-					  csShaderVariable* var)
+					  csShaderVariable& var)
 {
   csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
     object_reg, "crystalspace.shared.stringset", iStringSet);
-  node->SetAttribute ("name", strings->Request (var->GetName ()));
-  switch (var->GetType ())
+  node->SetAttribute ("name", strings->Request (var.GetName ()));
+  switch (var.GetType ())
   {
     case csShaderVariable::INT:
       {
         node->SetAttribute ("type", "integer");
         int val;
-        var->GetValue (val);
+        var.GetValue (val);
         node->CreateNodeBefore (CS_NODE_TEXT, 0)->SetValueAsInt (val);
       }
       break;
@@ -1183,7 +1167,7 @@ bool csTextSyntaxService::WriteShaderVar (iDocumentNode* node,
       {
         node->SetAttribute ("type", "float");
         float val;
-        var->GetValue (val);
+        var.GetValue (val);
         node->CreateNodeBefore (CS_NODE_TEXT, 0)->SetValueAsFloat (val);
       }
       break;
@@ -1192,7 +1176,7 @@ bool csTextSyntaxService::WriteShaderVar (iDocumentNode* node,
         node->SetAttribute ("type", "vector2");
         csString val;
         csVector2 vec;
-        var->GetValue (vec);
+        var.GetValue (vec);
         val.Format ("%f,%f", vec.x, vec.y);
         node->CreateNodeBefore (CS_NODE_TEXT, 0)->SetValue (val);
       }
@@ -1202,7 +1186,7 @@ bool csTextSyntaxService::WriteShaderVar (iDocumentNode* node,
         node->SetAttribute ("type", "vector3");
         csString val;
         csVector3 vec;
-        var->GetValue (vec);
+        var.GetValue (vec);
         val.Format ("%f,%f,%f", vec.x, vec.y, vec.z);
         node->CreateNodeBefore (CS_NODE_TEXT, 0)->SetValue (val);
       }
@@ -1212,7 +1196,7 @@ bool csTextSyntaxService::WriteShaderVar (iDocumentNode* node,
         node->SetAttribute ("type", "vector4");
         csString val;
         csVector4 vec;
-        var->GetValue (vec);
+        var.GetValue (vec);
         val.Format ("%f,%f,%f,%f", vec.x, vec.y, vec.z, vec.w);
         node->CreateNodeBefore (CS_NODE_TEXT, 0)->SetValue (val);
       }
@@ -1221,7 +1205,7 @@ bool csTextSyntaxService::WriteShaderVar (iDocumentNode* node,
       {
         node->SetAttribute ("type", "texture");
         iTextureWrapper* val;
-        var->GetValue (val);
+        var.GetValue (val);
         if (val)
           node->CreateNodeBefore (CS_NODE_TEXT, 0)->SetValue (val->QueryObject ()->GetName ());
       }
@@ -1330,18 +1314,18 @@ bool csTextSyntaxService::ParseAlphaMode (iDocumentNode* node,
 
 bool csTextSyntaxService::WriteAlphaMode (iDocumentNode* node, 
 					  iStringSet* strings,
-					  csAlphaMode* alphaMode)
+					  const csAlphaMode& alphaMode)
 {
-  if (alphaMode->autoAlphaMode)
+  if (alphaMode.autoAlphaMode)
   {
     csRef<iDocumentNode> automode = node->CreateNodeBefore (CS_NODE_ELEMENT, 0);
     automode->SetValue ("auto");
-    if (alphaMode->autoModeTexture != strings->Request (CS_MATERIAL_TEXTURE_DIFFUSE))
-      automode->SetAttribute ("texture", strings->Request (alphaMode->autoModeTexture));
+    if (alphaMode.autoModeTexture != strings->Request (CS_MATERIAL_TEXTURE_DIFFUSE))
+      automode->SetAttribute ("texture", strings->Request (alphaMode.autoModeTexture));
   }
-  else if (alphaMode->alphaType == csAlphaMode::alphaSmooth)
+  else if (alphaMode.alphaType == csAlphaMode::alphaSmooth)
     node->CreateNodeBefore (CS_NODE_ELEMENT, 0)->SetValue ("smooth");
-  else if (alphaMode->alphaType == csAlphaMode::alphaBinary)
+  else if (alphaMode.alphaType == csAlphaMode::alphaBinary)
     node->CreateNodeBefore (CS_NODE_ELEMENT, 0)->SetValue ("binary");
   else
     node->CreateNodeBefore (CS_NODE_ELEMENT, 0)->SetValue ("none");
@@ -1389,10 +1373,10 @@ bool csTextSyntaxService::ParseZMode (iDocumentNode* node,
 }
 
 bool csTextSyntaxService::WriteZMode (iDocumentNode* node, 
-				      csZBufMode* zmode,    
+				      csZBufMode zmode,    
 				      bool allowZmesh)
 {
-  switch (*zmode)
+  switch (zmode)
   {
   case CS_ZBUF_NONE:
     node->CreateNodeBefore (CS_NODE_ELEMENT, 0)->SetValue ("znone");
@@ -1996,7 +1980,7 @@ void csTextSyntaxService::ReportBadToken (iDocumentNode* badtokennode)
     return csPtr<iString> (rc); \
   }
 
-csPtr<iString> csTextSyntaxService::Debug_UnitTest ()
+csPtr<iString> csTextSyntaxService::UnitTest ()
 {
   csRef<scfString> rc (csPtr<scfString> (new scfString ()));
   csString& str = rc->GetCsString ();
@@ -2055,3 +2039,6 @@ csPtr<iString> csTextSyntaxService::Debug_UnitTest ()
 
   return 0;
 }
+
+}
+CS_PLUGIN_NAMESPACE_END(SyntaxService)

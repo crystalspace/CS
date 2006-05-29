@@ -65,14 +65,37 @@ struct iThingFactoryState;
 #define CSTEX_UV_SHIFT 8 
 /** @} */
 
-SCF_VERSION (iSyntaxService, 1, 7, 1);
-
 /**
  * This component provides services for other loaders to easily parse
  * properties of standard CS world syntax.
  */
-struct iSyntaxService : public iBase
+struct iSyntaxService : public virtual iBase
 {
+  SCF_INTERFACE (iSyntaxService, 2, 0, 0);
+  
+  /**\name Parse reporting helpers
+   * @{ */
+  /**
+   * Report an error and also gives a path in the XML tree.
+   * \sa \ref FormatterNotes
+   */
+  virtual void ReportError (const char* msgid, iDocumentNode* errornode,
+	const char* msg, ...) CS_GNUC_PRINTF(4,5) = 0;
+
+  /**
+   * Report a bad token. This is a convenience function which will
+   * eventually call ReportError().
+   */
+  virtual void ReportBadToken (iDocumentNode* badtokennode) = 0;
+
+  /**
+   * Report something, also gives a path in the XML tree.
+   * \sa \ref FormatterNotes
+   */
+  virtual void Report (const char* msgid, int severity, 
+    iDocumentNode* errornode, const char* msg, ...) CS_GNUC_PRINTF(5,6) = 0;
+  /** @} */
+  
   /**
    * Parse the value of this node and return a boolean depending
    * on this value. The following mapping happens (case insensitive):
@@ -142,7 +165,7 @@ struct iSyntaxService : public iBase
   /**
    * Write a plane description. Returns true if successful.
    */
-  virtual bool WritePlane (iDocumentNode* node, csPlane3 &p) = 0;
+  virtual bool WritePlane (iDocumentNode* node, const csPlane3& p) = 0;
   
   /**
    * Parse a matrix description. Returns true if successful.
@@ -152,7 +175,7 @@ struct iSyntaxService : public iBase
   /**
    * Write a matrix description. Returns true if successful.
    */
-  virtual bool WriteMatrix (iDocumentNode* node, csMatrix3* m) = 0;
+  virtual bool WriteMatrix (iDocumentNode* node, const csMatrix3& m) = 0;
 
   /**
    * Parse a vector description. Returns true if successful.
@@ -162,7 +185,7 @@ struct iSyntaxService : public iBase
   /**
    * Write a vector description. Returns true if successful.
    */
-  virtual bool WriteVector (iDocumentNode* node, csVector3* v) = 0;
+  virtual bool WriteVector (iDocumentNode* node, const csVector3& v) = 0;
 
   /**
    * Parse a vector description. Returns true if successful.
@@ -172,7 +195,7 @@ struct iSyntaxService : public iBase
   /**
    * Write a vector description. Returns true if successful.
    */
-  virtual bool WriteVector (iDocumentNode* node, csVector2* v) = 0;
+  virtual bool WriteVector (iDocumentNode* node, const csVector2& v) = 0;
 
   /**
    * Parse a box description. Returns true if successful.
@@ -182,7 +205,7 @@ struct iSyntaxService : public iBase
   /**
    * Write a box description. Returns true if successful.
    */
-  virtual bool WriteBox (iDocumentNode* node, csBox3* v) = 0;
+  virtual bool WriteBox (iDocumentNode* node, const csBox3& v) = 0;
 
   /**
    * Parse a color description. Returns true if successful.
@@ -192,7 +215,7 @@ struct iSyntaxService : public iBase
   /**
    * Write a color description. Returns true if successful.
    */
-  virtual bool WriteColor (iDocumentNode* node, csColor* c) = 0;
+  virtual bool WriteColor (iDocumentNode* node, const csColor& c) = 0;
 
   /**
    * Parse a color description. Returns true if successful.
@@ -202,7 +225,7 @@ struct iSyntaxService : public iBase
   /**
    * Write a color description. Returns true if successful.
    */
-  virtual bool WriteColor (iDocumentNode* node, csColor4* c) = 0;
+  virtual bool WriteColor (iDocumentNode* node, const csColor4& c) = 0;
 
   /**
    * Parse a mixmode description. Returns true if successful.
@@ -238,7 +261,7 @@ struct iSyntaxService : public iBase
    * Write a color gradient.
    */
   virtual bool WriteGradient (iDocumentNode* node,
-			      csGradient* gradient) = 0;
+			      const csGradient& gradient) = 0;
 
   /**
    * Parse a shader variable declaration
@@ -256,28 +279,8 @@ struct iSyntaxService : public iBase
    * Write a shader variable declaration
    */
   virtual bool WriteShaderVar (iDocumentNode* node, 
-    csShaderVariable* var) = 0;
+    csShaderVariable& var) = 0;
 			    
-  /**
-   * Report an error and also gives a path in the XML tree.
-   * \sa \ref FormatterNotes
-   */
-  virtual void ReportError (const char* msgid, iDocumentNode* errornode,
-	const char* msg, ...) CS_GNUC_PRINTF(4,5) = 0;
-
-  /**
-   * Report a bad token. This is a convenience function which will
-   * eventually call ReportError().
-   */
-  virtual void ReportBadToken (iDocumentNode* badtokennode) = 0;
-
-  /**
-   * Report something, also gives a path in the XML tree.
-   * \sa \ref FormatterNotes
-   */
-  virtual void Report (const char* msgid, int severity, 
-    iDocumentNode* errornode, const char* msg, ...) CS_GNUC_PRINTF(5,6) = 0;
-  
   /**
    * Parse an alphamode description. Returns true if successful.
    */
@@ -288,7 +291,7 @@ struct iSyntaxService : public iBase
    * Write an alphamode description. Returns true if successful.
    */
   virtual bool WriteAlphaMode (iDocumentNode* node, iStringSet* strings,
-    csAlphaMode* alphaMode) = 0;
+    const csAlphaMode& alphaMode) = 0;
     
   /**
    * Attempt to parse a zmode from \a node.
@@ -305,7 +308,7 @@ struct iSyntaxService : public iBase
   /**
    * Write a ZMode description. Returns true if successful.
    */
-  virtual bool WriteZMode (iDocumentNode* node, csZBufMode* zmode,
+  virtual bool WriteZMode (iDocumentNode* node, csZBufMode zmode,
     bool allowZmesh) = 0;
 
   /**
@@ -313,7 +316,7 @@ struct iSyntaxService : public iBase
    * return in "keyvalue", with refcount 1
    * Returns true if successful.
    */
-  virtual bool ParseKey (iDocumentNode* node, iKeyValuePair* &keyvalue) = 0;
+  virtual bool ParseKey (iDocumentNode* node, iKeyValuePair*& keyvalue) = 0;
 
   /**
    * Write a key definition and add the key to the given object, 
