@@ -20,6 +20,10 @@ chronological order.
 	- res changed the Win32 custom cursor code to only create cursors with
 	  an alpha channel when the color depth is at least 24bpp.
 	- res tweaked dsplex to not recursively use itself in all cases.
+	- res tweaked the TGA loader to reject unusually large images. (TGAs
+	  don't have a "magic" file identifier, so it can happen that some
+	  random file is interpreted as a TGA image. So some heuristics to
+	  reject bogus "images" are needed.)
 28-May-2006
 	- Jorrit copied some documentation out of the wiki into CS.
 	  Documentation contributed by 'adu'. He added the 'sounds'
