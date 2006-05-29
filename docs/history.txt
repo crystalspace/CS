@@ -24,6 +24,8 @@ chronological order.
 	  don't have a "magic" file identifier, so it can happen that some
 	  random file is interpreted as a TGA image. So some heuristics to
 	  reject bogus "images" are needed.)
+	- res fixed a crash in the ddraw2d plugin when switching the double
+	  buffer mode while in a BeginDraw()/EndDraw().
 28-May-2006
 	- Jorrit copied some documentation out of the wiki into CS.
 	  Documentation contributed by 'adu'. He added the 'sounds'
