@@ -9,6 +9,12 @@ chronological order.
 29-May-2006
 	- Jorrit mentioned the new location of Cal3d (gna.org) in the
 	  manual.
+	- Jorrit fixed a big performance problem in the opcode plugin.
+	  In some cases (i.e. flat surfaces) it would fall into a very
+	  bad loop when initialization colliders. This badly affected
+	  terrain since that is now initialization colliders constantly.
+	  Performance when moving on one particular spot in a test
+	  level I got went up from 0.2 to 23 fps.
 28-May-2006
 	- Jorrit copied some documentation out of the wiki into CS.
 	  Documentation contributed by 'adu'. He added the 'sounds'
