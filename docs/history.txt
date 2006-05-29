@@ -26,6 +26,9 @@ chronological order.
 	  reject bogus "images" are needed.)
 	- res fixed a crash in the ddraw2d plugin when switching the double
 	  buffer mode while in a BeginDraw()/EndDraw().
+	- res changed fontplex to also use any available font server 
+	  automatically and not just those explicitly specified by the user.
+	  This behaviour is more like the other multiplexers.
 28-May-2006
 	- Jorrit copied some documentation out of the wiki into CS.
 	  Documentation contributed by 'adu'. He added the 'sounds'

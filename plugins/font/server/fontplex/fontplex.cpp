@@ -23,17 +23,20 @@
 #include "csqint.h"
 #include "csutil/csuctransform.h"
 #include "csutil/util.h"
-#include "iutil/plugin.h"
-#include "iutil/eventh.h"
-#include "iutil/comp.h"
-#include "iutil/objreg.h"
+#include "csutil/set.h"
 #include "iutil/databuff.h"
+#include "iutil/eventh.h"
+#include "iutil/objreg.h"
+#include "iutil/plugin.h"
+#include "iutil/stringarray.h"
 #include "ivaria/reporter.h"
+
 #include "fontplex.h"
 
 CS_IMPLEMENT_PLUGIN
 
-using namespace CS::Plugins::FontPlex;
+CS_PLUGIN_NAMESPACE_BEGIN(FontPlex)
+{
 
 //---------------------------------------------------------------------------
 
@@ -123,12 +126,13 @@ csFontServerMultiplexer::~csFontServerMultiplexer ()
 {
 }
 
+#define FSCLASSPREFIX "crystalspace.font.server."
+#define FONTPLEX_CLASSNAME FSCLASSPREFIX "multiplexer"
+#define CSFONT_CLASSNAME FSCLASSPREFIX "default"
+
 bool csFontServerMultiplexer::Initialize (iObjectRegistry *object_reg)
 {
   csFontServerMultiplexer::object_reg = object_reg;
-
-  csRef<iPluginManager> plugin_mgr = CS_QUERY_REGISTRY (object_reg,
-    iPluginManager);
 
   config.AddConfig(object_reg, "config/fontplex.cfg");
   fontset = config->GetStr ("Fontplex.Settings.FontSet", 0);
@@ -140,8 +144,8 @@ bool csFontServerMultiplexer::Initialize (iObjectRegistry *object_reg)
   while (mapEnum->Next ())
   {
     const char* pluginName = mapEnum->GetStr ();
-    csRef<iFontServer> fs = CS_QUERY_PLUGIN_CLASS (plugin_mgr, pluginName, 
-      iFontServer);
+    csRef<iFontServer> fs = csLoadPluginCheck<iFontServer> (object_reg, 
+      pluginName);
 
     if (fs)
     {
@@ -154,13 +158,15 @@ bool csFontServerMultiplexer::Initialize (iObjectRegistry *object_reg)
   }
 
   // Query the auxiliary font servers in turn
+  csSet<csString> usedPlugins;
+  usedPlugins.Add (FONTPLEX_CLASSNAME);
   csString tag;
   int idx;
   int errorcount = 0;
   for (idx = 1; ; idx++)
   {
     tag.Format ("iFontServer.%d", idx);
-    csRef<iBase> b (CS_QUERY_REGISTRY_TAG (object_reg, tag));
+    csRef<iBase> b (csQueryRegistryTag (object_reg, tag));
     if (!b) 
     {
       // in cases where just one entry in the server list doesn't work
@@ -171,11 +177,36 @@ bool csFontServerMultiplexer::Initialize (iObjectRegistry *object_reg)
     else
     {
       errorcount = 0;	
-      csRef<iFontServer> fs (SCF_QUERY_INTERFACE (b, iFontServer));
+      csRef<iFactory> fact = scfQueryInterface<iFactory> (b);
+      const char* classId = fact->QueryClassID ();
+      if (usedPlugins.Contains (classId)) continue;
+      csRef<iFontServer> fs (scfQueryInterface<iFontServer> (b));
+      if (!fs.IsValid()) continue;
       fs->SetWarnOnError (false);
       fontservers.Push (fs);
     }
   }
+
+  // Small hack: forcibly add csfont as the last server
+  usedPlugins.Add (CSFONT_CLASSNAME);
+  csRef<iStringArray> scfClassList = 
+    iSCF::SCF->QueryClassList (FSCLASSPREFIX);
+  for (size_t i = 0; i < scfClassList->GetSize(); i++)
+  {
+    const char* scfClass = scfClassList->Get (i);
+    if (!usedPlugins.Contains (scfClass))
+    {
+      csRef<iFontServer> fs = csLoadPluginCheck<iFontServer> (object_reg, 
+        scfClass);
+      if (fs.IsValid()) fontservers.Push (fs);
+    }
+  }
+  {
+    csRef<iFontServer> fs = csLoadPluginCheck<iFontServer> (object_reg, 
+      CSFONT_CLASSNAME);
+    if (fs.IsValid()) fontservers.Push (fs);
+  }
+
   if (!fontservers.Length ())
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_WARNING,
@@ -612,3 +643,5 @@ int csFontPlexer::GetUnderlineThickness ()
   return primaryFont->GetUnderlineThickness();
 }
 
+} 
+CS_PLUGIN_NAMESPACE_END(FontPlex)
