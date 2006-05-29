@@ -148,10 +148,10 @@ in order to use the library with Crystal Space.
 @cindex Libraries, Cal3D
 
 Crystal Space supports skeletal animation using the Cal3D library. You
-can obtain the required the @sc{cvs} code at:
+can obtain the required the @sc{svn} code at:
 
 @noindent
-@uref{http://cal3d.sourceforge.net/}
+@uref{https://gna.org/projects/cal3d/}
 
 @subheading lib3ds
 @cindex lib3ds

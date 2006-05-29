@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+29-May-2006
+	- Jorrit mentioned the new location of Cal3d (gna.org) in the
+	  manual.
 28-May-2006
 	- Jorrit copied some documentation out of the wiki into CS.
 	  Documentation contributed by 'adu'. He added the 'sounds'
