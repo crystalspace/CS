@@ -33,6 +33,7 @@ chronological order.
 	  and also skips over directories properly when seeking the next/prev
 	  image.
 	- res added a picview.cfg.
+	- res removed support for per-pass SVs from xmlshader.
 28-May-2006
 	- Jorrit copied some documentation out of the wiki into CS.
 	  Documentation contributed by 'adu'. He added the 'sounds'
