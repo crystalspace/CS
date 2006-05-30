@@ -128,6 +128,8 @@ void csGLShader_PS1::Open()
   if (doVerbose)
     Report(CS_REPORTER_SEVERITY_NOTIFY,
       "Display list usage %s", useLists ? "enabled" : "disabled");
+  dumpTo14ConverterOutput = config->GetBool (
+    "Video.OpenGL.Shader.PS1.Dump14ConverterOutput", false);
 
   isOpen = true;
 }

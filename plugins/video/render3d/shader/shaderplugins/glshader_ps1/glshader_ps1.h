@@ -41,6 +41,7 @@ public:
   iObjectRegistry* object_reg;
   bool useLists;
   bool doVerbose;
+  bool dumpTo14ConverterOutput;
 
   csGLShader_PS1 (iBase *parent);
   virtual ~csGLShader_PS1 ();

@@ -30,7 +30,11 @@ class csShaderGLPS1_ATI : public csShaderGLPS1_Common
 private:
   GLuint program_num;
 
-  bool GetATIShaderCommand (const csPSProgramInstruction &instruction);
+  bool CheckShaderCommand (const char* glCall,
+    const csPixelShaderParser& parser,
+    const csPSProgramInstruction &instruction);
+  bool GetATIShaderCommand (const csPixelShaderParser& parser,
+    const csPSProgramInstruction &instruction);
 public:
   csShaderGLPS1_ATI (csGLShader_PS1* shaderPlug)
     : csShaderGLPS1_Common(shaderPlug)
