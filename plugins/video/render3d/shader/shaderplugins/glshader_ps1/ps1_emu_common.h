@@ -27,6 +27,9 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "iutil/strset.h"
 #include "glshader_ps1.h"
 
+CS_PLUGIN_NAMESPACE_BEGIN(GLShaderPS1)
+{
+
 class csShaderGLPS1_Common : public csShaderProgram
 {
 protected:
@@ -75,5 +78,7 @@ public:
   virtual bool Compile();
 };
 
-#endif //__GLSHADER_PS1_COMMON_H__
+}
+CS_PLUGIN_NAMESPACE_END(GLShaderPS1)
 
+#endif //__GLSHADER_PS1_COMMON_H__

@@ -30,6 +30,9 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "glshader_ps1.h"
 #include "ps1_emu_common.h"
 
+CS_PLUGIN_NAMESPACE_BEGIN(GLShaderPS1)
+{
+
 void csShaderGLPS1_Common::Report (int severity, const char* msg, ...)
 {
   va_list args;
@@ -107,3 +110,6 @@ bool csShaderGLPS1_Common::Compile ()
 
   return LoadProgramStringToGL();
 }
+
+}
+CS_PLUGIN_NAMESPACE_END(GLShaderPS1)

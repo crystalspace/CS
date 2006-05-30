@@ -25,6 +25,9 @@
 #include "ps1_emu_common.h"
 #include "ps1_parser.h"
 
+CS_PLUGIN_NAMESPACE_BEGIN(GLShaderPS1)
+{
+
 class csShaderGLPS1_ATI : public csShaderGLPS1_Common
 {
 private:
@@ -65,6 +68,7 @@ public:
   virtual void ResetState ();
 };
 
+}
+CS_PLUGIN_NAMESPACE_END(GLShaderPS1)
 
 #endif //__GLSHADER_PS1_ATI_H__
-

@@ -28,6 +28,9 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "ps1_instr.h"
 
+CS_PLUGIN_NAMESPACE_BEGIN(GLShaderPS1)
+{
+
 struct csPSProgramInstruction
 {
   csPixelShaderInstruction instruction;
@@ -98,6 +101,7 @@ public:
   csPixelShaderVersion GetVersion () const { return version; };
 };
 
+}
+CS_PLUGIN_NAMESPACE_END(GLShaderPS1)
 
 #endif //__GLSHADER_PS1_PARSER_H__
-

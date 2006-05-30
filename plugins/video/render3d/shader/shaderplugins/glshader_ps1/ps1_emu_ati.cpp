@@ -37,6 +37,9 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "ps1_1xto14.h"
 #include "stringlists.h"
 
+CS_PLUGIN_NAMESPACE_BEGIN(GLShaderPS1)
+{
+
 void csShaderGLPS1_ATI::Activate ()
 {
   //enable it
@@ -341,3 +344,6 @@ bool csShaderGLPS1_ATI::LoadProgramStringToGL ()
 
   return true;
 }
+
+}
+CS_PLUGIN_NAMESPACE_END(GLShaderPS1)

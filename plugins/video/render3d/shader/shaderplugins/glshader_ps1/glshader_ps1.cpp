@@ -34,6 +34,9 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 CS_IMPLEMENT_PLUGIN
 
+CS_PLUGIN_NAMESPACE_BEGIN(GLShaderPS1)
+{
+
 SCF_IMPLEMENT_FACTORY (csGLShader_PS1)
 
 csGLShader_PS1::csGLShader_PS1(iBase* parent) : 
@@ -164,3 +167,5 @@ bool csGLShader_PS1::Initialize(iObjectRegistry* reg)
   return true;
 }
 
+}
+CS_PLUGIN_NAMESPACE_END(GLShaderPS1)

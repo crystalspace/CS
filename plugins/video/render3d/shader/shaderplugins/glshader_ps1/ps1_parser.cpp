@@ -32,6 +32,9 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "glshader_ps1.h"
 #include "ps1_parser.h"
 
+CS_PLUGIN_NAMESPACE_BEGIN(GLShaderPS1)
+{
+
 void csPixelShaderParser::RegisterInstructions ()
 {
   PS_Instructions[CS_PS_INS_INVALID].arguments = 0;
@@ -554,3 +557,6 @@ void csPixelShaderParser::WriteProgram (
     str << '\n';
   }
 }
+
+}
+CS_PLUGIN_NAMESPACE_END(GLShaderPS1)
