@@ -82,12 +82,33 @@ struct csRGBcolor
   /// Compare with an csRGBcolor
   bool operator != (const csRGBcolor& c) const
   { return !operator == (c); }
-  /// add two csRGBcolors
+  /// Add two csRGBcolors (may overflow!)
   csRGBcolor operator + (const csRGBcolor& c) const
   { return csRGBcolor (
     (unsigned char)(c.red + red),
     (unsigned char)(c.green + green),
     (unsigned char)(c.blue + blue)); }
+  /**
+   * Use this only if you know there is no overflow.
+   */
+  void UnsafeAdd (const csRGBcolor& c)
+  {
+    red   = (unsigned char)(red   + c.red  );
+    green = (unsigned char)(green + c.green);
+    blue  = (unsigned char)(blue  + c.blue );
+  }
+  /**
+   * Use this in the general case. This version test for overflow.
+   */
+  void SafeAdd (const csRGBcolor& c)
+  {
+    int color = red + c.red;
+    red   = (unsigned char)(color > 255 ? 255 : color);
+    color = green + c.green;
+    green = (unsigned char)(color > 255 ? 255 : color);
+    color = blue + c.blue;
+    blue  = (unsigned char)(color > 255 ? 255 : color);
+  }
 } CS_STRUCT_ALIGN_4BYTE_END;
 
 
@@ -186,7 +207,7 @@ struct csRGBpixel
   /// Assign another csRGBpixel
   void Set (const csRGBpixel& p)
   { red = p.red; green = p.green; blue = p.blue; alpha = p.alpha; }
-  /// Add a csRGBcolor
+  /// Add a csRGBcolor (may overflow!)
   void operator += (const csRGBcolor& c)
   {
       red   = (unsigned char)(red   + c.red  );

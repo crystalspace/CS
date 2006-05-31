@@ -755,7 +755,7 @@ bool csEmitSaver::WriteDown (iBase* obj, iDocumentNode* parent,
       csRef<iDocumentNode> colorNode =
 	agingNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
       colorNode->SetValue("color");
-      synldr->WriteColor(colorNode, &color);
+      synldr->WriteColor(colorNode, color);
 
       //Writedown Aging's Time tag
       csRef<iDocumentNode> timeNode =
@@ -797,7 +797,7 @@ bool csEmitSaver::WriteDown (iBase* obj, iDocumentNode* parent,
 	paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
       containerboxNode->SetValue("containerbox");
       csBox3 box(minBox, maxBox);
-      synldr->WriteBox(containerboxNode, &box);
+      synldr->WriteBox(containerboxNode, box);
     }
 
     //Writedown RectParticles tag
@@ -852,7 +852,7 @@ bool csEmitSaver::WriteEmit (iEmitGen3D* emit, iDocumentNode* parent)
     efixed->GetValue(a, b); // b is ignored
     csRef<iDocumentNode> node = parent->CreateNodeBefore(CS_NODE_ELEMENT, 0);
     node->SetValue("emitfixed");
-    synldr->WriteVector(node, &a);
+    synldr->WriteVector(node, a);
     return true;
   }
   csRef<iEmitSphere> esphere (SCF_QUERY_INTERFACE(emit, iEmitSphere));
@@ -861,7 +861,7 @@ bool csEmitSaver::WriteEmit (iEmitGen3D* emit, iDocumentNode* parent)
     esphere->GetContent(a, p, q);
     csRef<iDocumentNode> node = parent->CreateNodeBefore(CS_NODE_ELEMENT, 0);
     node->SetValue("emitsphere");
-    synldr->WriteVector(node, &a);
+    synldr->WriteVector(node, a);
     node->SetAttributeAsFloat("p",p);
     node->SetAttributeAsFloat("q",q);
     return true;
@@ -873,7 +873,7 @@ bool csEmitSaver::WriteEmit (iEmitGen3D* emit, iDocumentNode* parent)
     ebox->GetContent(a, b);
     csRef<iDocumentNode> node = parent->CreateNodeBefore(CS_NODE_ELEMENT, 0);
     node->SetValue("emitbox");
-    synldr->WriteBox(node, &x);
+    synldr->WriteBox(node, x);
     return true;
   }
   csRef<iEmitCone> econe (SCF_QUERY_INTERFACE(emit, iEmitCone));
@@ -882,7 +882,7 @@ bool csEmitSaver::WriteEmit (iEmitGen3D* emit, iDocumentNode* parent)
     econe->GetContent(a, p, q, r, s, t);
     csRef<iDocumentNode> node = parent->CreateNodeBefore(CS_NODE_ELEMENT, 0);
     node->SetValue("emitcone");
-    synldr->WriteVector(node, &a);
+    synldr->WriteVector(node, a);
     node->SetAttributeAsFloat("p",p);
     node->SetAttributeAsFloat("q",q);
     node->SetAttributeAsFloat("r",r);
@@ -913,7 +913,7 @@ bool csEmitSaver::WriteEmit (iEmitGen3D* emit, iDocumentNode* parent)
     eline->GetContent(a, b);
     csRef<iDocumentNode> node = parent->CreateNodeBefore(CS_NODE_ELEMENT, 0);
     node->SetValue("emitline");
-    synldr->WriteBox(node, &x);
+    synldr->WriteBox(node, x);
     return true;
   }
   csRef<iEmitCylinder> ecyl (SCF_QUERY_INTERFACE(emit, iEmitCylinder));
@@ -923,7 +923,7 @@ bool csEmitSaver::WriteEmit (iEmitGen3D* emit, iDocumentNode* parent)
     ecyl->GetContent(a, b, p, q);
     csRef<iDocumentNode> node = parent->CreateNodeBefore(CS_NODE_ELEMENT, 0);
     node->SetValue("emitcylinder");
-    synldr->WriteBox(node, &x);
+    synldr->WriteBox(node, x);
     node->SetAttributeAsFloat("p",p);
     node->SetAttributeAsFloat("q",q);
     return true;
@@ -936,7 +936,7 @@ bool csEmitSaver::WriteEmit (iEmitGen3D* emit, iDocumentNode* parent)
     ecyltan->GetContent(a, b, p, q);
     csRef<iDocumentNode> node = parent->CreateNodeBefore(CS_NODE_ELEMENT, 0);
     node->SetValue("emitcylindertangent");
-    synldr->WriteBox(node, &x);
+    synldr->WriteBox(node, x);
     node->SetAttributeAsFloat("p",p);
     node->SetAttributeAsFloat("q",q);
     return true;
@@ -948,7 +948,7 @@ bool csEmitSaver::WriteEmit (iEmitGen3D* emit, iDocumentNode* parent)
     espheretan->GetContent(a, p, q);
     csRef<iDocumentNode> node = parent->CreateNodeBefore(CS_NODE_ELEMENT, 0);
     node->SetValue("emitspheretangent");
-    synldr->WriteVector(node, &a);
+    synldr->WriteVector(node, a);
     node->SetAttributeAsFloat("p",p);
     node->SetAttributeAsFloat("q",q);
     return true;

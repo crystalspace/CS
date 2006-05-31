@@ -176,7 +176,7 @@ public:
    * - lightcolor can also be different from the color of the light because
    *   it could in principle be modified by portals.
    */
-  void UpdateLightMap (csRGBpixel* lightmap,
+  void UpdateLightMap (csRGBcolor* lightmap,
 	int lightcell_shift,
 	float shf_u, float shf_v,
 	float mul_u, float mul_v,
@@ -330,14 +330,14 @@ public:
 	csLightingScratchBuffer& finalLM);
   // Assuming cosfact == 0 this will do one scanline of a lightmap.
   void ShineDynLightMapHoriz (
-	int du, csRGBpixel* map_uv,
+	int du, csRGBcolor* map_uv,
 	csVector3& v2,
 	float dv2x_x, float dv2x_y, float dv2x_z,
 	iLight* light, const csColor& color, float infradius_sq,
 	const csPlane3& polygon_world_plane);
   // Same but using cosfact now.
   void ShineDynLightMapHorizCosfact (
-	int du, csRGBpixel* map_uv,
+	int du, csRGBcolor* map_uv,
 	csVector3& v2,
 	float dv2x_x, float dv2x_y, float dv2x_z,
 	iLight* light, const csColor& color, float infradius_sq,

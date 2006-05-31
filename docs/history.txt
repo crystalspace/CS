@@ -6,6 +6,81 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+30-May-2006
+	- res improved the debug facilities for the ATI_fragment_shader 
+	  support in glshader_ps1.
+	- res changed glshader_ps1 to use a plugin namespace.
+	- res fixed the software canvases to properly flip alpha component
+	  of colors again before before doing alpha-blended 2D ops.
+	- res changed the Thing lightmap loading to do somewhat less memory
+	  allocations.
+29-May-2006
+	- Jorrit mentioned the new location of Cal3d (gna.org) in the
+	  manual.
+	- Jorrit fixed a big performance problem in the opcode plugin.
+	  In some cases (i.e. flat surfaces) it would fall into a very
+	  bad loop when initialization colliders. This badly affected
+	  terrain since that is now initialization colliders constantly.
+	  Performance when moving on one particular spot in a test
+	  level I got went up from 0.2 to 23 fps.
+	- res fixed the software canvases to not strip the alpha component
+	  off colors before before doing alpha-blended 2D ops.
+	- res changed the Win32 custom cursor code to only create cursors with
+	  an alpha channel when the color depth is at least 24bpp.
+	- res tweaked dsplex to not recursively use itself in all cases.
+	- res tweaked the TGA loader to reject unusually large images. (TGAs
+	  don't have a "magic" file identifier, so it can happen that some
+	  random file is interpreted as a TGA image. So some heuristics to
+	  reject bogus "images" are needed.)
+	- res fixed a crash in the ddraw2d plugin when switching the double
+	  buffer mode while in a BeginDraw()/EndDraw().
+	- res changed fontplex to also use any available font server 
+	  automatically and not just those explicitly specified by the user.
+	  This behaviour is more like the other multiplexers.
+	- res changed picview so it really starts on the first file on startup
+	  and also skips over directories properly when seeking the next/prev
+	  image.
+	- res added a picview.cfg.
+	- res removed support for per-pass SVs from xmlshader.
+28-May-2006
+	- Jorrit copied some documentation out of the wiki into CS.
+	  Documentation contributed by 'adu'. He added the 'sounds'
+	  and 'variables' section to the XML map format documentation.
+	- Jorrit made stdrep more robust so it no longer crashes
+	  with empty lines. Apparently a SplitString() can return 0
+	  strings.
+	- Jorrit fixed bugplug so that it no longer outputs a useless
+	  empty string.
+	- Jorrit updated the features section in the manual a bit.
+	- res added material emission support to glshader_fixed. Closes bug
+	  (should've really been an RFE) #1396182.
+	- res reworded, reordered and somewhat compacted the feature list.
+	- Jorrit completed the portal container documentation.
+	- res changed iSyntaxService to let the various Write*() methods take
+	  const refs instead of pointers of the values to write.
+	- res moved cssynldr to new SCF.
+27-May-2006
+	- res fixed the delimIgnoreDifferent mode for 
+	  csStringArray::SplitString() to work as it should.
+	- res changed dsplex to new SCF.
+	- res changed dsplex to try each document system only once when
+	  parsing a document. This fixes the redundancy in error messages.
+	- res changed stdrep to show alert windows before splitting a message
+	  into multiple lines (so only one alert is visible per message and 
+	  not one per line of the message).
+	- res changed csVariant to store strings in iString*s rather than
+	  char*s, as outlined in bug #1388079.
+26-May-2006
+        - dfryer rearranged bitarray.h to avoid an ICE in Apple's gcc 3.3 
+          build
+25-May-2006
+	- res removed the now-useless WinCVS tutorial from the manual.
+	- res changed some references to CVS in the manual to SVN and also
+	  updated some CVS-specific parts.
+	- res changed the jobber config to pass the 'quiet' flags to svn 
+	  invocations.
+	- res changed the Win32 -[no]console stuff to respect user-specified
+	  redirects of the standard handles.
 24-May-2006
 	- res changed the memory tracking to record function names, not
 	  file names.

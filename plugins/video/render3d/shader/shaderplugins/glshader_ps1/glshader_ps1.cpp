@@ -34,6 +34,9 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 CS_IMPLEMENT_PLUGIN
 
+CS_PLUGIN_NAMESPACE_BEGIN(GLShaderPS1)
+{
+
 SCF_IMPLEMENT_FACTORY (csGLShader_PS1)
 
 csGLShader_PS1::csGLShader_PS1(iBase* parent) : 
@@ -128,6 +131,8 @@ void csGLShader_PS1::Open()
   if (doVerbose)
     Report(CS_REPORTER_SEVERITY_NOTIFY,
       "Display list usage %s", useLists ? "enabled" : "disabled");
+  dumpTo14ConverterOutput = config->GetBool (
+    "Video.OpenGL.Shader.PS1.Dump14ConverterOutput", false);
 
   isOpen = true;
 }
@@ -162,3 +167,5 @@ bool csGLShader_PS1::Initialize(iObjectRegistry* reg)
   return true;
 }
 
+}
+CS_PLUGIN_NAMESPACE_END(GLShaderPS1)

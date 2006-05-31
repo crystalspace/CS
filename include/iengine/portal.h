@@ -65,7 +65,7 @@ struct iTextureHandle;
  * If this flag is set then this portal will do a Z-fill after
  * rendering the contents. This is mainly useful for floating portals
  * where it is possible that there is geometry in the same sector
- * that will be rendered behind the portal (and does could accidently
+ * that will be rendered behind the portal (and thus could accidently
  * get written in the portal sector because the Z-buffer cannot
  * be trusted).
  */

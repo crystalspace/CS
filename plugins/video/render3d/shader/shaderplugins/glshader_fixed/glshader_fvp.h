@@ -41,7 +41,7 @@ public:
     TEXGEN_REFLECT_SPHERE,
     TEXGEN_REFLECT_CUBE,
     TEXGEN_FOG,
-	TEXGEN_TEXTURE3D,
+    TEXGEN_TEXTURE3D,
     TEXGEN_PROJECTION
   };
   enum TexMatrixOpType
@@ -104,6 +104,7 @@ private:
   GLenum colorMaterial;
   ProgramParam matAmbient;
   ProgramParam matDiffuse;
+  ProgramParam matEmission;
   ProgramParam matSpecular;
   ProgramParam matSpecularExp;
   bool separateSpecular;

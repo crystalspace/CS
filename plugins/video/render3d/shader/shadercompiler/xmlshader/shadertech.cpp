@@ -184,9 +184,6 @@ bool csXMLShaderTech::LoadPass (iDocumentNode *node, shaderPass *pass)
   csRef<iDocumentNode> varNode = node->GetNode(
     xmltokens.Request (csXMLShaderCompiler::XMLTOKEN_SHADERVARS));
  
-  if (varNode)
-    parent->compiler->LoadSVBlock (varNode, &pass->svcontext);
-
   csRef<iDocumentNode> programNode;
   csRef<iShaderProgram> program;
   // load fp
@@ -329,19 +326,6 @@ bool csXMLShaderTech::LoadPass (iDocumentNode *node, shaderPass *pass)
 	pass->wmAlpha = !strcasecmp (nodeWM->GetAttributeValue ("a"), "true");
     }
   }
-  if (pass->alphaMode.autoAlphaMode)
-  {
-    if (pass->alphaMode.autoModeTexture != csInvalidStringID)
-    {
-      csShaderVariable *var;
-      var = pass->svcontext.GetVariable (pass->alphaMode.autoModeTexture);
-
-      if(!var)
-	var = svcontext.GetVariable (pass->alphaMode.autoModeTexture);
-      if (var)
-	pass->autoAlphaTexRef = var;
-    }
-  }
 
   //if we got this far, load buffermappings
   csRef<iDocumentNodeIterator> it;
@@ -460,13 +444,6 @@ bool csXMLShaderTech::LoadPass (iDocumentNode *node, shaderPass *pass)
         pass->custommapping_id.Push (varID);
         //pass->bufferGeneric[pass->bufferCount] = CS_VATTRIB_IS_GENERIC (attrib);
 
-        csShaderVariable *varRef=0;
-        varRef = pass->svcontext.GetVariable(varID);
-
-        if(!varRef)
-          varRef = svcontext.GetVariable (varID);
-
-        pass->custommapping_variables.Push (varRef);
         pass->custommapping_attrib.Push (attrib);
 	pass->custommapping_buffer.Push (CS_BUFFER_NONE);
       }
@@ -485,7 +462,6 @@ bool csXMLShaderTech::LoadPass (iDocumentNode *node, shaderPass *pass)
 	  pass->defaultMappings[attrib] = sourceName;
 	else
 	{
-	  pass->custommapping_variables.Push (0);
 	  pass->custommapping_attrib.Push (attrib);
 	  pass->custommapping_buffer.Push (sourceName);
 	  /* Those buffers are mapped by default to some specific vattribs; 
@@ -531,15 +507,6 @@ bool csXMLShaderTech::LoadPass (iDocumentNode *node, shaderPass *pass)
       if (texUnit < 0) continue;
       csStringID varID = strings->Request (mapping->GetAttributeValue("name"));
       pass->textureID[texUnit] = varID;
-
-      csShaderVariable *varRef=0;
-      varRef = pass->svcontext.GetVariable (varID);
-
-      if(!varRef)
-        varRef = svcontext.GetVariable (varID);
-
-      if (varRef)
-	pass->textureRef[texUnit] = varRef;
 
       pass->textureCount = MAX(pass->textureCount, texUnit + 1);
     }
@@ -805,9 +772,6 @@ bool csXMLShaderTech::SetupPass (const csRenderMesh *mesh,
       last_buffers[i] = modes.buffers->GetRenderBuffer (
 	thispass->custommapping_buffer[i]);
     }
-    else if ((thispass->custommapping_variables.Length () >= i) 
-      && (thispass->custommapping_variables[i] != 0))
-      thispass->custommapping_variables[i]->GetValue(last_buffers[i]);
     else if (thispass->custommapping_id[i] < (csStringID)stacks.Length ())
     {
       csShaderVariable* var = 0;
@@ -829,19 +793,7 @@ bool csXMLShaderTech::SetupPass (const csRenderMesh *mesh,
   int j;
   for (j = 0; j < thispass->textureCount; j++)
   {
-    if (thispass->textureRef[j] != 0)
-    {
-      iTextureWrapper* wrap;
-      thispass->textureRef[j]->GetValue(wrap);
-      if (wrap)
-      {
-        wrap->Visit ();
-        last_textures[j] = wrap->GetTextureHandle ();
-      }
-      else
-        last_textures[j] = 0;
-    }
-    else if (thispass->textureID[j] < (csStringID)stacks.Length ())
+    if (thispass->textureID[j] < (csStringID)stacks.Length ())
     {
       csShaderVariable* var = 0;
       var = csGetShaderVariableFromStack (stacks, thispass->textureID[j]);
@@ -869,9 +821,7 @@ bool csXMLShaderTech::SetupPass (const csRenderMesh *mesh,
   if (thispass->alphaMode.autoAlphaMode)
   {
     iTextureHandle* tex = 0;
-    if (thispass->autoAlphaTexRef != 0)
-      thispass->autoAlphaTexRef->GetValue (tex);
-    else if (thispass->alphaMode.autoModeTexture != csInvalidStringID)
+    if (thispass->alphaMode.autoModeTexture != csInvalidStringID)
     {
       if (thispass->alphaMode.autoModeTexture < (csStringID)stacks.Length ())
       {

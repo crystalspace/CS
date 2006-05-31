@@ -385,7 +385,7 @@ bool csFountainSaver::WriteDown (iBase* obj, iDocumentNode* parent,
     mesh->GetColor(col);
     csRef<iDocumentNode> colorNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
     colorNode->SetValue("color");
-    synldr->WriteColor(colorNode, &col);
+    synldr->WriteColor(colorNode, col);
 
     //Writedown DropSize tag
     float dw, dh;
@@ -399,13 +399,13 @@ bool csFountainSaver::WriteDown (iBase* obj, iDocumentNode* parent,
     csRef<iDocumentNode> originboxNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
     originboxNode->SetValue("origin");
     csBox3 originbox = fountainstate->GetOrigin();
-    synldr->WriteBox(originboxNode, &originbox);
+    synldr->WriteBox(originboxNode, originbox);
 
     //Writedown Accel tag
     csVector3 accel = fountainstate->GetAcceleration();
     csRef<iDocumentNode> accelNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
     accelNode->SetValue("accel");
-    synldr->WriteVector(accelNode, &accel);
+    synldr->WriteVector(accelNode, accel);
 
     //Writedown Speed tag
     float speed = fountainstate->GetSpeed();

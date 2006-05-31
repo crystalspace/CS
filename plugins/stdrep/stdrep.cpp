@@ -323,9 +323,10 @@ bool csReporterListener::Report (iReporter*, int severity,
   const char* msgID, const char* description)
 {
   csStringArray lines;
-  size_t n = lines.SplitString (description, "\r\n", csStringArray::delimIgnoreDifferent);
+  size_t n = lines.SplitString (description, "\r\n",
+      csStringArray::delimIgnoreDifferent);
   for (size_t i = 0; i < n; i++)
-    WriteLine (severity, msgID, lines[i]);
+    WriteLine (severity, msgID, lines[i] ? lines[i] : "");
   return msg_remove[severity];
 }
 

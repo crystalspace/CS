@@ -172,14 +172,14 @@ These renderbuffers can be used by shaders. @@@@@@TODO: document more!
 
 @subsubheading Object State Interface
 
-@samp{iGeneralMeshState} (residing in @file{CS/include/imesh/genmesh.h}) is the
-@sc{scf} interface that you can use to manipulate settings for a genmesh
+@samp{iGeneralMeshState} (residing in @file{CS/include/imesh/genmesh.h}) is
+the @sc{scf} interface that you can use to manipulate settings for a genmesh
 object.  By using this interface you can access the material, blending mode
 (mixmode), and various other configuration parameters for a genmesh object.
 
 @subsubheading Object Loader
 
-Here is a list of all the tags supported by a genmesh factory and their
+Here is a list of all the tags supported by a genmesh object and their
 meaning:
 @itemize @bullet
 @item @samp{factory}
