@@ -91,9 +91,6 @@ private:
    */
   void SetSize (int w, int h);
 
-  typedef csParasiticDataBufferPooled::Pool ParasiticDataBufferPool;
-  CS_DECLARE_STATIC_CLASSVAR_REF(bufferPool, BufferPool, 
-    ParasiticDataBufferPool);
   typedef csBlockAllocator<csShadowMap> ShadowMapAllocator;
   CS_DECLARE_STATIC_CLASSVAR_REF(shadowMapAlloc, ShadowMapAlloc, 
     ShadowMapAllocator);

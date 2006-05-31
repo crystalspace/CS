@@ -63,12 +63,53 @@ void csShadowMap::CalcMaxShadow (long lmsize)
 }
 
 //---------------------------------------------------------------------------
+
+// Hack: Work around problems caused by #defining 'new'.
+#if defined(CS_EXTENSIVE_MEMDEBUG) || defined(CS_MEMORY_TRACKER)
+# undef new
+#endif
+#include <new>
+
+class ParasiticDataBufferBlockAllocated : public csParasiticDataBufferBase
+{
+  typedef csBlockAllocator<ParasiticDataBufferBlockAllocated> Allocator;
+  CS_DECLARE_STATIC_CLASSVAR_REF(bufAlloc, BufAlloc, 
+    Allocator);
+public:
+  void DecRef()
+  {
+    CS_ASSERT_MSG("Refcount decremented for destroyed object", 
+      scfRefCount != 0);
+    csRefTrackerAccess::TrackDecRef (scfObject, scfRefCount);
+    scfRefCount--;
+    if (scfRefCount == 0)
+    {
+      //scfRemoveRefOwners ();
+      //if (scfParent) scfParent->DecRef();
+      BufAlloc().Free (this);
+    }
+  }
+  static ParasiticDataBufferBlockAllocated* Alloc (iDataBuffer* parent, 
+    size_t offs, size_t size = (size_t)~0)
+  {
+    ParasiticDataBufferBlockAllocated* p = BufAlloc().Alloc();
+    p->SetContents (parent, offs, size);
+    return p;
+  }
+};
+
+CS_IMPLEMENT_STATIC_CLASSVAR_REF(ParasiticDataBufferBlockAllocated, bufAlloc, 
+  BufAlloc, ParasiticDataBufferBlockAllocated::Allocator, (1024));
+
+#if defined(CS_EXTENSIVE_MEMDEBUG) || defined(CS_MEMORY_TRACKER)
+# define new CS_EXTENSIVE_MEMDEBUG_NEW
+#endif
+
+//---------------------------------------------------------------------------
 int csLightMap::lightcell_size = 16;
 int csLightMap::lightcell_shift = 4;
 int csLightMap::default_lightmap_cell_size = 16;
 
-CS_IMPLEMENT_STATIC_CLASSVAR_REF(csLightMap, bufferPool, BufferPool,
-  csLightMap::ParasiticDataBufferPool, ());
 CS_IMPLEMENT_STATIC_CLASSVAR_REF(csLightMap, shadowMapAlloc, ShadowMapAlloc, 
   csLightMap::ShadowMapAllocator, (1024));
 
@@ -188,12 +229,6 @@ struct LightHeader
   int32 dyn_cnt;             // Number of dynamic maps
 };
 
-// Hack: Work around problems caused by #defining 'new'.
-#if defined(CS_EXTENSIVE_MEMDEBUG) || defined(CS_MEMORY_TRACKER)
-# undef new
-#endif
-#include <new>
-
 // This really should be inside csLightMap::ReadFromCache, but Cygwin
 // crashes on exit if functions have local static variables with complex types
 static csString error_buf;
@@ -310,9 +345,8 @@ const char* csLightMap::ReadFromCache (
   {
     csRef<iDataBuffer> lmDataBuffer = file->GetAllData();
     const size_t bufSize = lm_size * 3;
-    lmDataBuffer.AttachNew (new (BufferPool()) 
-      csParasiticDataBufferPooled (lmDataBuffer,
-        file->GetPos(), bufSize));
+    lmDataBuffer.AttachNew (ParasiticDataBufferBlockAllocated::Alloc (
+      lmDataBuffer, file->GetPos(), bufSize));
     if ((lmDataBuffer->GetSize() != bufSize)
       || (!file->SetPos (file->GetPos() + bufSize)))
       return "File too short while reading static lightmap data!";
@@ -382,9 +416,8 @@ const char* csLightMap::ReadFromCache (
       light->AddAffectedLightingInfo (li);
 
       csRef<iDataBuffer> smDataBuffer = file->GetAllData();
-      smDataBuffer.AttachNew (new (BufferPool()) 
-        csParasiticDataBufferPooled (smDataBuffer,
-          file->GetPos(), lm_size));
+      smDataBuffer.AttachNew (ParasiticDataBufferBlockAllocated::Alloc (
+        smDataBuffer, file->GetPos(), lm_size));
       if ((smDataBuffer->GetSize() != lm_size)
         || (!file->SetPos (file->GetPos() + lm_size)))
         return "File too short while reading pseudo-dynamic lightmap data!";
@@ -404,10 +437,6 @@ const char* csLightMap::ReadFromCache (
 stop:
   return 0;
 }
-
-#if defined(CS_EXTENSIVE_MEMDEBUG) || defined(CS_MEMORY_TRACKER)
-# define new CS_EXTENSIVE_MEMDEBUG_NEW
-#endif
 
 void csLightMap::Cache (
   iFile* file,
