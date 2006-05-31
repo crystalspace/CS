@@ -19,9 +19,11 @@
 #ifndef __CS_LIGHTMAP_H__
 #define __CS_LIGHTMAP_H__
 
+#include "csutil/blockallocator.h"
 #include "csutil/dirtyaccessarray.h"
 #include "csutil/scf.h"
 #include "csgfx/rgbpixel.h"
+#include "csutil/parasiticdatabuffer.h"
 
 struct iLight;
 struct iCacheManager;
@@ -38,7 +40,7 @@ class csPolygon3DStatic;
 class csDelayedLightingInfo;
 class csObject;
 
-typedef csDirtyAccessArray<csRGBpixel> csLightingScratchBuffer;
+typedef csDirtyAccessArray<csRGBcolor> csLightingScratchBuffer;
 
 class csShadowMap
 {
@@ -46,11 +48,11 @@ public:
   iLight *Light;
   csShadowMap *next;
   unsigned char max_shadow;
-  unsigned char* array;
+  csRef<iDataBuffer> map;
 
   csShadowMap ();
   ~csShadowMap ();
-  void Alloc (iLight *l, int w, int h);
+  void Alloc (iLight *l);
   void CalcMaxShadow (long lm_size);
 };
 
@@ -67,13 +69,13 @@ private:
    * A color lightmap containing all static lighting information
    * for the static lights (no pseudo-dynamic lights are here).
    */
-  csRGBpixel* static_lm;
+  csRef<iDataBuffer> staticLmBuffer;
 
   /**
    * Stores the maximum r, g, b values for the static_lm array above.
    * This is used in lightmap merge optimizations.
    */
-  csRGBpixel max_static_color_values;
+  csRGBcolor max_static_color_values;
 
   /**
    * Linked list of shadow-maps (for the pseudo-dynamic lights).
@@ -89,6 +91,12 @@ private:
    */
   void SetSize (int w, int h);
 
+  typedef csParasiticDataBufferPooled::Pool ParasiticDataBufferPool;
+  CS_DECLARE_STATIC_CLASSVAR_REF(bufferPool, BufferPool, 
+    ParasiticDataBufferPool);
+  typedef csBlockAllocator<csShadowMap> ShadowMapAllocator;
+  CS_DECLARE_STATIC_CLASSVAR_REF(shadowMapAlloc, ShadowMapAlloc, 
+    ShadowMapAllocator);
 public:
   /// Option variable: shadow cell size
   static int lightcell_size;
@@ -130,20 +138,14 @@ public:
    * is possible that this returns 0. In that case you can find
    * the uniform lighting value in max_static_color_values.
    */
-  csRGBpixel* GetStaticMap () { return static_lm; }
+  csRGBcolor* GetStaticMap () 
+  { return staticLmBuffer ? (csRGBcolor*)staticLmBuffer->GetData() : 0; }
 
   /**
    * Allocate the lightmap. 'w' and 'h' are the size of the
    * bounding box in lightmap space.
    */
   void Alloc (int w, int h);
-
-  /**
-   * In case the lightmap has become zero (due to an optimization
-   * in a previous lighting step we can allocate it again here by
-   * calling ReAlloc()).
-   */
-  void ReAlloc ();
 
   /**
    * Initialize the lightmap to the given color.
@@ -164,7 +166,7 @@ public:
   /**
    * Create a ShadowMap for this LightMap.
    */
-  csShadowMap* NewShadowMap (iLight* light, int w, int h);
+  csShadowMap* NewShadowMap (iLight* light);
 
   /**
    * Find a ShadowMap for a specific pseudo-dynamic light.

@@ -12,6 +12,8 @@ chronological order.
 	- res changed glshader_ps1 to use a plugin namespace.
 	- res fixed the software canvases to properly flip alpha component
 	  of colors again before before doing alpha-blended 2D ops.
+	- res changed the Thing lightmap loading to do somewhat less memory
+	  allocations.
 29-May-2006
 	- Jorrit mentioned the new location of Cal3d (gna.org) in the
 	  manual.
