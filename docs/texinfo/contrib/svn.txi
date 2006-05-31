@@ -3,7 +3,7 @@
 @section @sc{svn} Etiquette Guidelines
 @cindex @sc{svn} Guide
 @cindex @sc{svn} Etiquette
-@cindex Etiquette, @sc{cvs}
+@cindex Etiquette, @sc{svn}
 
 Since Crystal Space has enough developers to warrant the use of @sc{svn} to
 manage its code base, there are some rules you need to keep in mind if you

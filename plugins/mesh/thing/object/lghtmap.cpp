@@ -18,6 +18,7 @@
 #include "cssysdef.h"
 #include "csqint.h"
 
+#include "csgfx/packrgb.h"
 #include "csutil/csendian.h"
 #include "csutil/debug.h"
 #include "csutil/memfile.h"
@@ -41,27 +42,22 @@ csShadowMap::csShadowMap ()
 {
   Light = 0;
   max_shadow = 255;  // use worst case until calc'd
-  array = 0;
 }
 
 csShadowMap::~csShadowMap ()
 {
-  delete[] array;
 }
 
-void csShadowMap::Alloc (iLight *l, int w, int h)
+void csShadowMap::Alloc (iLight *l)
 {
   Light = l;
-
-  int lw = csLightMap::CalcLightMapWidth (w);
-  int lh = csLightMap::CalcLightMapHeight (h);
-  array = new unsigned char[lw * lh];
-  memset (array, 0, lw*lh);
 }
 
 void csShadowMap::CalcMaxShadow (long lmsize)
 {
   max_shadow=0;
+  if (!map.IsValid()) return;
+  const uint8* array = map->GetUint8();
   for (int i=0; i<lmsize; i++)
     if (array[i] > max_shadow) max_shadow = array[i];
 }
@@ -71,12 +67,16 @@ int csLightMap::lightcell_size = 16;
 int csLightMap::lightcell_shift = 4;
 int csLightMap::default_lightmap_cell_size = 16;
 
+CS_IMPLEMENT_STATIC_CLASSVAR_REF(csLightMap, bufferPool, BufferPool,
+  csLightMap::ParasiticDataBufferPool, ());
+CS_IMPLEMENT_STATIC_CLASSVAR_REF(csLightMap, shadowMapAlloc, ShadowMapAlloc, 
+  csLightMap::ShadowMapAllocator, (1024));
+
 csLightMap::csLightMap ()
 {
   first_smap = 0;
   // Use slowest safest method by default.
   max_static_color_values.Set (255,255,255);
-  static_lm = 0;
 }
 
 csLightMap::~csLightMap ()
@@ -84,11 +84,9 @@ csLightMap::~csLightMap ()
   while (first_smap)
   {
     csShadowMap *smap = first_smap->next;
-    delete first_smap;
+    ShadowMapAlloc().Free (first_smap);
     first_smap = smap;
   }
-
-  delete[] static_lm;
 }
 
 void csLightMap::SetLightCellSize (int size)
@@ -115,17 +113,17 @@ void csLightMap::DelShadowMap (csShadowMap *smap)
       map->next = smap->next;
     }
   }
-  delete smap;
+  ShadowMapAlloc().Free (smap);
 }
 
-csShadowMap *csLightMap::NewShadowMap (iLight *light, int w, int h)
+csShadowMap *csLightMap::NewShadowMap (iLight *light)
 {
-  csShadowMap *smap = new csShadowMap ();
+  csShadowMap *smap = ShadowMapAlloc().Alloc();
   smap->Light = light;
   smap->next = first_smap;
   first_smap = smap;
 
-  smap->Alloc (light, w, h);
+  smap->Alloc (light);
 
   return smap;
 }
@@ -151,27 +149,23 @@ void csLightMap::SetSize (int w, int h)
 void csLightMap::InitColor (int r, int g, int b)
 {
   long lm_size = lwidth * lheight;
-  csRGBpixel def (r, g, b);
-  // don't know why, but the previous implementation did this:
-  def.alpha = 128;
-  int i;
-  for (i = 0; i < lm_size; i++) static_lm[i] = def;
+  csRGBcolor def (r, g, b);
+  if (!staticLmBuffer.IsValid())
+  {
+    staticLmBuffer.AttachNew (
+      new csDataBuffer (lm_size * sizeof (csRGBcolor)));
+  }
+  /* @@@ FIXME: if staticLmBuffer != 0, it may come from a file. We don't want
+   * to write the colors to it then ... */
+  csRGBcolor* static_lm = (csRGBcolor*)staticLmBuffer->GetData();
+  for (int i = 0; i < lm_size; i++) static_lm[i] = def;
 }
 
 void csLightMap::Alloc (int w, int h)
 {
   SetSize (w, h);
-  delete[] static_lm;
-
-  long lm_size = lwidth * lheight;
-  static_lm = new csRGBpixel [lm_size];
-}
-
-void csLightMap::ReAlloc ()
-{
-  if (static_lm) return;
-  long lm_size = lwidth * lheight;
-  static_lm = new csRGBpixel [lm_size];
+  staticLmBuffer = 0;
+  max_static_color_values.Set (0, 0, 0);
 }
 
 struct PolySave
@@ -193,6 +187,12 @@ struct LightHeader
   char header[4];
   int32 dyn_cnt;             // Number of dynamic maps
 };
+
+// Hack: Work around problems caused by #defining 'new'.
+#if defined(CS_EXTENSIVE_MEMDEBUG) || defined(CS_MEMORY_TRACKER)
+# undef new
+#endif
+#include <new>
 
 // This really should be inside csLightMap::ReadFromCache, but Cygwin
 // crashes on exit if functions have local static variables with complex types
@@ -281,10 +281,8 @@ const char* csLightMap::ReadFromCache (
   {
     // Invalid.
     // First try to skip the cached lightmap.
-    char* data = new char [ps.lm_size*3];
-    if (file->Read (data, ps.lm_size*3) != (size_t)ps.lm_size*3)
+    if (!file->SetPos (file->GetPos() + ps.lm_size*3))
       return error_buf;
-    delete[] data;
 
     uint8 have_dyn;
     if (file->Read ((char*)&have_dyn, sizeof (have_dyn)) != sizeof (have_dyn))
@@ -300,9 +298,7 @@ const char* csLightMap::ReadFromCache (
       if (file->Read ((char*)&size, sizeof (size)) != sizeof (size))
         return error_buf;
       size = csLittleEndian::Convert (size);
-      data = new char[size];
-      file->Read (data, size);
-      delete[] data;
+      file->SetPos (file->GetPos() + size);
     }
 
     return error_buf;
@@ -311,17 +307,24 @@ const char* csLightMap::ReadFromCache (
   //-------------------------------
   // The cached item is valid.
   //-------------------------------
-  delete[] static_lm;
-  static_lm = new csRGBpixel[lm_size];
-
-  int n = lm_size;
-  char *lm_ptr = (char*)static_lm;
-  while (--n >= 0) 
   {
-    if (file->Read ((char*)lm_ptr, 3) != 3)
+    csRef<iDataBuffer> lmDataBuffer = file->GetAllData();
+    const size_t bufSize = lm_size * 3;
+    lmDataBuffer.AttachNew (new (BufferPool()) 
+      csParasiticDataBufferPooled (lmDataBuffer,
+        file->GetPos(), bufSize));
+    if ((lmDataBuffer->GetSize() != bufSize)
+      || (!file->SetPos (file->GetPos() + bufSize)))
       return "File too short while reading static lightmap data!";
-    lm_ptr += 3;
-    *(lm_ptr++) = (char)-127;
+    if (csPackRGB::IsRGBcolorSane())
+      staticLmBuffer = lmDataBuffer;
+    else
+    {
+      staticLmBuffer.AttachNew (
+        new csDataBuffer (lm_size * sizeof (csRGBcolor)));
+      csPackRGB::UnpackRGBtoRGBcolor ((csRGBcolor*)staticLmBuffer->GetData(),
+        lmDataBuffer->GetUint8(), lm_size);
+    }
   }
 
   //-------------------------------
@@ -357,9 +360,7 @@ const char* csLightMap::ReadFromCache (
   {
     // Skip the data in the cache so we can potentially proceed
     // to the next lightmap.
-    char* data = new char[size];
-    file->Read (data, size);
-    delete[] data;
+    file->SetPos (file->GetPos() + size);
     return "Mismatch with expected number of pseudo-dynamic lightmaps!";
   }
 
@@ -376,22 +377,26 @@ const char* csLightMap::ReadFromCache (
     iLight *light = engine->FindLightID (ls.light_id);
     if (light)
     {
-      csShadowMap *smap = NewShadowMap (light, w, h);
+      csShadowMap *smap = NewShadowMap (light);
 
       light->AddAffectedLightingInfo (li);
 
-      if ((long) file->Read ((char*)(smap->array), lm_size) != lm_size)
+      csRef<iDataBuffer> smDataBuffer = file->GetAllData();
+      smDataBuffer.AttachNew (new (BufferPool()) 
+        csParasiticDataBufferPooled (smDataBuffer,
+          file->GetPos(), lm_size));
+      if ((smDataBuffer->GetSize() != lm_size)
+        || (!file->SetPos (file->GetPos() + lm_size)))
         return "File too short while reading pseudo-dynamic lightmap data!";
       size -= lm_size;
+      smap->map = smDataBuffer;
       smap->CalcMaxShadow (lm_size);
     }
     else
     {
       // Skip the data in the cache so we can potentially proceed to the
       // next lightmap.
-      char* data = new char[size];
-      file->Read (data, size);
-      delete[] data;
+      file->SetPos (file->GetPos() + size);
       return "Couldn't find the pseudo-dynamic light for this lightmap!";
     }
   }
@@ -399,6 +404,10 @@ const char* csLightMap::ReadFromCache (
 stop:
   return 0;
 }
+
+#if defined(CS_EXTENSIVE_MEMDEBUG) || defined(CS_MEMORY_TRACKER)
+# define new CS_EXTENSIVE_MEMDEBUG_NEW
+#endif
 
 void csLightMap::Cache (
   iFile* file,
@@ -434,12 +443,14 @@ void csLightMap::Cache (
   //-------------------------------
   file->Write ((char*)&ps, sizeof (ps));
 
-  int n = lm_size;
-  char* lm_ptr = (char*)static_lm;
-  while (--n >= 0) 
+  if (csPackRGB::IsRGBcolorSane())
+    file->Write (staticLmBuffer->GetData(), staticLmBuffer->GetSize());
+  else
   {
-    file->Write (lm_ptr, 3);
-    lm_ptr += 4;
+    const uint8* rgbData = csPackRGB::PackRGBcolorToRGB (
+      (csRGBcolor*)staticLmBuffer->GetData(), lm_size);
+    file->Write ((char*)rgbData, lm_size * 3);
+    csPackRGB::DiscardPackedRGB (rgbData);
   }
 
   //-------------------------------
@@ -475,12 +486,12 @@ void csLightMap::Cache (
     while (smap)
     {
       iLight *light = smap->Light;
-      if (smap->array)
+      if (smap->map.IsValid())
       {
         LightSave ls;
 	memcpy (ls.light_id, light->GetLightID (), sizeof (LightSave));
         file->Write ((char *) &ls.light_id, sizeof (LightSave));
-        file->Write ((char *)(smap->array), lm_size);
+        file->Write (smap->map->GetData(), smap->map->GetSize());
       }
 
       smap = smap->next;
@@ -501,7 +512,8 @@ bool csLightMap::UpdateRealLightMap (float dyn_ambient_r,
 {
   if (!dyn_dirty) return false;
 
-  csRGBpixel temp_max_color_values = max_static_color_values;
+  csRGBcolor temp_max_color_values = max_static_color_values;
+  csRGBcolor* static_lm = GetStaticMap();
 
   long lm_size = lwidth * lheight;
   finalLM.SetLength (lm_size);
@@ -513,15 +525,14 @@ bool csLightMap::UpdateRealLightMap (float dyn_ambient_r,
   //---
   if (dyn_ambient_r || dyn_ambient_g || dyn_ambient_b)
   {
-    csRGBpixel ambient;
+    csRGBcolor ambient;
     int dr = csQint (dyn_ambient_r * 128);
     int dg = csQint (dyn_ambient_g * 128);
     int db = csQint (dyn_ambient_b * 128);
     if (dr > 255) dr = 255;
     if (dg > 255) dg = 255;
     if (db > 255) db = 255;
-    ambient.Set ((unsigned char)dr, (unsigned char)dg, (unsigned char)db,
-		 0);	// Use alpha 0 so we can use this for UnsafeAdd.
+    ambient.Set ((unsigned char)dr, (unsigned char)dg, (unsigned char)db);
 
     if (max_static_color_values.red   + ambient.red   <= 255  &&
         max_static_color_values.green + ambient.green <= 255  &&
@@ -538,7 +549,7 @@ bool csLightMap::UpdateRealLightMap (float dyn_ambient_r,
       }
       else
       {
-        csRGBpixel t = max_static_color_values;
+        csRGBcolor t = max_static_color_values;
 	t.UnsafeAdd (ambient);
         for (int i=0; i<lm_size; i++) finalLM[i] = t;
       }
@@ -557,7 +568,7 @@ bool csLightMap::UpdateRealLightMap (float dyn_ambient_r,
       }
       else
       {
-        csRGBpixel t = max_static_color_values;
+        csRGBcolor t = max_static_color_values;
 	t.SafeAdd (ambient);
         for (int i=0; i<lm_size; i++) finalLM[i] = t;
       }
@@ -567,7 +578,7 @@ bool csLightMap::UpdateRealLightMap (float dyn_ambient_r,
   else
   {
     if (static_lm)
-      memcpy (finalLM.GetArray(), static_lm, 4 * lm_size);
+      memcpy (finalLM.GetArray(), static_lm, lm_size * sizeof (csRGBcolor));
     else
       for (int i=0; i<lm_size; i++)
         finalLM[i] = max_static_color_values;
@@ -577,7 +588,7 @@ bool csLightMap::UpdateRealLightMap (float dyn_ambient_r,
   // Then add all pseudo-dynamic lights.
   //---
   iLight *light;
-  csRGBpixel *map;
+  csRGBcolor* map;
   float red, green, blue;
   unsigned char *p, *last_p;
   int l, s;
@@ -594,7 +605,7 @@ bool csLightMap::UpdateRealLightMap (float dyn_ambient_r,
       red = light->GetColor ().red;
       green = light->GetColor ().green;
       blue = light->GetColor ().blue;
-      p = smap->array;
+      p = smap->map->GetUint8();
       last_p = p + lm_size;
 
       int tm_r = temp_max_color_values.red   + csQint (smap->max_shadow * red);
@@ -649,28 +660,71 @@ bool csLightMap::UpdateRealLightMap (float dyn_ambient_r,
 
 void csLightMap::CalcMaxStatic (int r, int g, int b)
 {
-  csRGBpixel min_static_color_values (255,255,255);
   max_static_color_values.Set (0,0,0);
 
-  csRGBpixel *map = static_lm;
+  csRGBcolor *map = GetStaticMap();
+  if (!map) return;
   long lm_size = lwidth * lheight;
-  for (int i = 0; i < lm_size; i++)
+  csRGBcolor min_static_color_values;
+  if (lm_size & 1)
   {
-    if (max_static_color_values.red < map->red)
-        max_static_color_values.red = map->red;
-    if (max_static_color_values.green < map->green)
-        max_static_color_values.green = map->green;
-    if (max_static_color_values.blue < map->blue)
-        max_static_color_values.blue = map->blue;
+    min_static_color_values = *map;
+    max_static_color_values = *map;
+    lm_size--;
+  }
+  else
+    min_static_color_values.Set (255,255,255);
+  for (int i = 0; i < lm_size; i+=2)
+  {
+    const csRGBcolor& a = map[0];
+    const csRGBcolor& b = map[1];
 
-    if (min_static_color_values.red > map->red)
-        min_static_color_values.red = map->red;
-    if (min_static_color_values.green > map->green)
-        min_static_color_values.green = map->green;
-    if (min_static_color_values.blue > map->blue)
-        min_static_color_values.blue = map->blue;
+    if (a.red < b.red)
+    {
+      if (a.red < min_static_color_values.red)
+        min_static_color_values.red = a.red;
+      if (b.red > max_static_color_values.red)
+        max_static_color_values.red = b.red;
+    }
+    else
+    {
+      if (a.red > max_static_color_values.red)
+        max_static_color_values.red = a.red;
+      if (b.red < min_static_color_values.red)
+        min_static_color_values.red = b.red;
+    }
 
-    map++;
+    if (a.green < b.green)
+    {
+      if (a.green < min_static_color_values.green)
+        min_static_color_values.green = a.green;
+      if (b.green > max_static_color_values.green)
+        max_static_color_values.green = b.green;
+    }
+    else
+    {
+      if (a.green > max_static_color_values.green)
+        max_static_color_values.green = a.green;
+      if (b.green < min_static_color_values.green)
+        min_static_color_values.green = b.green;
+    }
+
+    if (a.blue < b.blue)
+    {
+      if (a.blue < min_static_color_values.blue)
+        min_static_color_values.blue = a.blue;
+      if (b.blue > max_static_color_values.blue)
+        max_static_color_values.blue = b.blue;
+    }
+    else
+    {
+      if (a.blue > max_static_color_values.blue)
+        max_static_color_values.blue = a.blue;
+      if (b.blue < min_static_color_values.blue)
+        min_static_color_values.blue = b.blue;
+    }
+
+    map+=2;
   }
   if (min_static_color_values.red < r) min_static_color_values.red = r;
   if (min_static_color_values.green < g) min_static_color_values.green = g;
@@ -681,9 +735,7 @@ void csLightMap::CalcMaxStatic (int r, int g, int b)
       max_static_color_values.green - min_static_color_values.green <= THRESHOLD &&
       max_static_color_values.blue - min_static_color_values.blue <= THRESHOLD)
   {
-    // Optimize!
-    delete[] static_lm;
-    static_lm = 0;
+    staticLmBuffer = 0;
   }
 }
 

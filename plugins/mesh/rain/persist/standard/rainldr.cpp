@@ -363,7 +363,7 @@ bool csRainSaver::WriteDown (iBase* obj, iDocumentNode* parent,
     mesh->GetColor(col);
     csRef<iDocumentNode> colorNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
     colorNode->SetValue("color");
-    synldr->WriteColor(colorNode, &col);
+    synldr->WriteColor(colorNode, col);
 
     //Writedown DropSize tag
     float dw, dh;
@@ -379,13 +379,13 @@ bool csRainSaver::WriteDown (iBase* obj, iDocumentNode* parent,
     csBox3 box(minBox, maxBox);
     csRef<iDocumentNode> boxNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
     boxNode->SetValue("box");
-    synldr->WriteBox(boxNode, &box);
+    synldr->WriteBox(boxNode, box);
 
     //Writedown FallSpeed tag
     csVector3 fallspeed = rainstate->GetFallSpeed();
     csRef<iDocumentNode> fallspeedNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
     fallspeedNode->SetValue("fallspeed");
-    synldr->WriteVector(fallspeedNode, &fallspeed);
+    synldr->WriteVector(fallspeedNode, fallspeed);
 
     //Writedown CollDet tag
     synldr->WriteBool(paramsNode,"colldet", rainstate->GetCollisionDetection(), true);

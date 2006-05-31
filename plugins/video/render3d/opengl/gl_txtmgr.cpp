@@ -1415,9 +1415,9 @@ csGLRendererLightmap::~csGLRendererLightmap ()
 #ifdef CS_DEBUG
   if (slm->texHandle != (GLuint)~0)
   {
-    csRGBpixel* pat = new csRGBpixel[rect.Width () * rect.Height ()];
+    csRGBcolor* pat = new csRGBcolor[rect.Width () * rect.Height ()];
     int x, y;
-    csRGBpixel* p = pat;
+    csRGBcolor* p = pat;
     for (y = 0; y < rect.Height (); y++)
     {
       for (x = 0; x < rect.Width (); x++)
@@ -1432,7 +1432,7 @@ csGLRendererLightmap::~csGLRendererLightmap ()
 
     glTexSubImage2D (GL_TEXTURE_2D, 0, rect.xmin, rect.ymin, 
       rect.Width (), rect.Height (),
-      GL_RGBA, GL_UNSIGNED_BYTE, pat);
+      GL_RGB, GL_UNSIGNED_BYTE, pat);
 
     delete[] pat;
   }
@@ -1446,7 +1446,7 @@ void csGLRendererLightmap::GetSLMCoords (int& left, int& top,
   width = rect.Width (); height = rect.Height ();
 }
     
-void csGLRendererLightmap::SetData (csRGBpixel* data)
+void csGLRendererLightmap::SetData (csRGBcolor* data)
 {
   slm->CreateTexture ();
 
@@ -1455,7 +1455,7 @@ void csGLRendererLightmap::SetData (csRGBpixel* data)
 
   glTexSubImage2D (GL_TEXTURE_2D, 0, rect.xmin, rect.ymin, 
     rect.Width (), rect.Height (),
-    GL_RGBA, GL_UNSIGNED_BYTE, data);
+    GL_RGB, GL_UNSIGNED_BYTE, data);
 }
 
 void csGLRendererLightmap::SetLightCellSize (int size)
@@ -1506,7 +1506,7 @@ void csGLSuperLightmap::CreateTexture ()
     glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 
-    csRGBpixel* data = new csRGBpixel [w * h];
+    csRGBcolor* data = new csRGBcolor [w * h];
 #ifdef CS_DEBUG
     // Fill the background for debugging purposes (to quickly see what's
     // a lightmap and what's not; esp. useful when LMs are rather dark -
@@ -1516,7 +1516,7 @@ void csGLSuperLightmap::CreateTexture ()
       {0x0000, 0x3222, 0x4a36, 0x422a, 0x3222, 0x0a22, 0x4a22, 0x33a2, 
        0x0000, 0x2232, 0x364a, 0x2a42, 0x2232, 0x220a, 0x224a, 0xa233};
 
-    csRGBpixel* p = data;
+    csRGBcolor* p = data;
     int y, x;
     for (y = 0; y < h; y++)
     {
@@ -1534,13 +1534,12 @@ void csGLSuperLightmap::CreateTexture ()
 	  px >>= b - bitNum;
 	}
 	p->blue = ~(1 << bitNum) + px;
-	p->alpha = ~((px >> 6) * 0xff);
 	p++;
       }
     }
 #endif
-    glTexImage2D (GL_TEXTURE_2D, 0, GL_RGBA8, w, h, 0, 
-      GL_RGBA, GL_UNSIGNED_BYTE, data);
+    glTexImage2D (GL_TEXTURE_2D, 0, GL_RGB8, w, h, 0, 
+      GL_RGB, GL_UNSIGNED_BYTE, data);
     delete[] data;
   }
 }

@@ -76,13 +76,10 @@ private:
     csRenderBufferName defaultMappings[STREAMMAX];
     csArray<csStringID> custommapping_id;
     csDirtyAccessArray<csVertexAttrib> custommapping_attrib;
-    csDirtyAccessArray<csRef<csShaderVariable> > custommapping_variables;
     csArray<csRenderBufferName> custommapping_buffer;
 
     // texture mappings
     csStringID textureID[TEXTUREMAX];
-    csRef<csShaderVariable> textureRef[TEXTUREMAX];
-    csRef<csShaderVariable> autoAlphaTexRef;
     int textureCount;
 
     // programs
@@ -92,9 +89,6 @@ private:
 
     // writemasks
     bool wmRed, wmGreen, wmBlue, wmAlpha;
-
-    // variable context
-    csShaderVariableContext svcontext;
 
     csXMLShaderTech* owner;
   };
