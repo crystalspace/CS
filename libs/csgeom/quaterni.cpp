@@ -26,46 +26,44 @@
 void csQuaternion::SetEulerAngles (const csVector3& angles)
 {
   csVector3 halfAngles = angles / 2.0f;
-  const float c1 = cosf (halfAngles.y);
-  const float s1 = sinf (halfAngles.y);
-  const float c2 = cosf (halfAngles.x);
-  const float s2 = sinf (halfAngles.x);
-  const float c3 = cosf (halfAngles.z);
-  const float s3 = sinf (halfAngles.z);
+  const float cx = cosf (halfAngles.x);
+  const float sx = sinf (halfAngles.x);
+  const float cy = cosf (halfAngles.y);
+  const float sy = sinf (halfAngles.y);
+  const float cz = cosf (halfAngles.z);
+  const float sz = sinf (halfAngles.z);
 
-  const float c1c2 = c1*c2;
-  const float s1s2 = s1*s2;
-
-  w = c1c2*c3 - s1s2*s3;
-  v.x = c1c2*s3 + s1s2*c3;
-  v.y = s1*c2*c3 + c1*s2*s3;
-  v.z = c1*s2*c3 - s1*c2*s3;
+  const float cxcz = cx*cz;
+  const float cxsz = cx*sz;
+  const float sxcz = sx*cz;
+  const float sxsz = sx*sz;
+  
+  v.x = (cy * sxcz) - (sy * cxsz);
+  v.y = (cy * sxsz) + (sy * cxcz);
+  v.z = (cy * cxsz) - (sy * sxcz);
+  w   = (cy * cxcz) + (sy * sxsz);
 }
 
 
 csVector3 csQuaternion::GetEulerAngles () const
 {
-  csVector3 ret;
+  csVector3 angles;
+  const float case1 = PI / 2.0f;
+  const float case2 = -PI / 2.0f;
 
-  const float test = v.x*v.y + v.z*w;
-  
-  if (test > 0.499f) //"north pole" singularitv.y
-  {
-    return csVector3 (PI/2.0f, 2.0f * atan2f (v.x, w), 0);
-  }
-  else if (test < -0.499f) //"south pole" singularitv.y
-  {
-    return csVector3 (-PI/2.0f, -2.0f * atan2f (v.x,w), 0);
-  }
+  angles.z = atan2f (2.0f * (v.x*v.y + w*v.z), (w*w + v.x*v.x - v.y*v.y - v.z*v.z));
+  float sine = -2.0f * (v.x*v.z - w*v.y);
 
-  const float sqx2 = 2.0f*v.x*v.x;
-  const float sqy2 = 2.0f*v.y*v.y;
-  const float sqz2 = 2.0f*v.z*v.z;
+  if(sine >= 1)     //cases whewe value is 1 ow -1 cause NAN
+    angles.y = case1;
+  else if ( sine <= -1 )
+    angles.y = case2;
+  else
+    angles.y = asinf (sine);
 
-  return csVector3 (
-    asinf (2.0f*test), 
-    atan2f (2.0f*(v.y*w - v.x*v.z), 1.0f - sqy2 - sqz2),
-    atan2f (2.0f*(v.x*w - v.y*v.z), 1.0f - sqx2 - sqz2));
+  angles.x = atan2f (2.0f * (w*v.x + v.y*v.z), (w*w - v.x*v.x - v.y*v.y + v.z*v.z)) ;
+
+  return angles;
 }
 
 void csQuaternion::SetMatrix (const csMatrix3& matrix)
@@ -76,7 +74,7 @@ void csQuaternion::SetMatrix (const csMatrix3& matrix)
   if (trace > 0.0f)
   {
     // Quick-route
-    float s = 1.0f / sqrtf (trace + 1.0f);
+    float s = 0.5f / sqrtf (trace + 1.0f);
     w = 0.25f / s;
     v.x = (matrix.m23 - matrix.m32) * s;
     v.y = (matrix.m31 - matrix.m13) * s;
@@ -147,37 +145,56 @@ csQuaternion csQuaternion::NLerp (const csQuaternion& q2, float t) const
 
 csQuaternion csQuaternion::SLerp (const csQuaternion& q2, float t) const
 {
-  //compute cos between them and clamp to -1, 1
-  const float dA = csClamp (Dot (q2), 1.0f, -1.0f); 
+  float omega, cosom, invsinom, scale0, scale1;
 
-  if (dA > 0.998f) //really small, NLerp instead of slerp
+  csQuaternion quato(q2);
+
+  // decide if one of the quaternions is backwards  
+  float a = (*this-q2).SquaredNorm ();
+  float b = (*this+q2).SquaredNorm ();
+  if (a > b)
   {
-    return NLerp (q2, t);
+    quato = -q2;
   }
-  else if (dA < -0.998f) //almost opposite, special treatment too
+
+  // Calculate dot between quats
+  cosom = Dot (quato);
+
+  // Make sure the two quaternions are not exactly opposite? (within a little
+  // slop).
+  if (cosom > -0.9998f)
   {
-    const float s0 = sinf ((1.0f - t)*PI);
-    const float s1 = sinf (t*PI);
+    // Are they more than a little bit different?  Avoid a divided by zero
+    // and lerp if not.
+    if (cosom < 0.9998f)
+    {
+      // Yes, do a slerp
+      omega = acos (cosom);
+      invsinom = 1.0f / sin (omega);
+      scale0 = sin ((1.0f - t) * omega) * invsinom;
+      scale1 = sin (t * omega) * invsinom;
+    }
+    else
+    {
+      // Not a very big difference, do a lerp
+      scale0 = 1.0f - t;
+      scale1 = t;
+    }
 
     return csQuaternion (
-      s0*v.x - s1*q2.v.y,
-      s0*v.y + s1*q2.v.x,
-      s0*v.z - s1*q2.w,
-      s0*w + s1*q2.v.z);
+      scale0 * v.x + scale1 * quato.v.x,
+      scale0 * v.y + scale1 * quato.v.y,
+      scale0 * v.z + scale1 * quato.v.z,
+      scale0 * w + scale1 * quato.w);
   }
 
-  const float angle = acosf (dA);
-
-  // Do a normal slerp
-  const float invSinA = 1.0/sinf (angle);
-  const float s0 = sinf ((1.0f - t)*angle) * invSinA;
-  const float s1 = sinf (t*angle) * invSinA;
-
-  if (angle < 0.0f)
-  {
-    //need to invert
-    return (s0*(*this) + -s1*q2).Unit ();
-  }
-  
-  return s0*(*this) + s1*q2;
+  // The quaternions are nearly opposite so to avoid a divided by zero error
+  // Calculate a perpendicular quaternion and slerp that direction
+  scale0 = sin ((1.0f - t) * PI);
+  scale1 = sin (t * PI);
+  return csQuaternion (
+    scale0 * v.x + scale1 * -quato.v.y,
+    scale0 * v.y + scale1 * quato.v.x,
+    scale0 * v.z + scale1 * -quato.w,
+    scale0 * w + scale1 * quato.v.z);
 }

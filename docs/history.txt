@@ -9,6 +9,8 @@ chronological order.
 31-May-2006
 	- res tweaked the Thing lightmap loader to use a block allocator
 	  instead of a pool for the lightmap buffers.
+	- Marten fixed the quaternion class. The woman in flarge now looks
+	  normal, or at least as normal as before.
 30-May-2006
 	- res improved the debug facilities for the ATI_fragment_shader 
 	  support in glshader_ps1.
