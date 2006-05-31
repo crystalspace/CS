@@ -10,6 +10,8 @@ chronological order.
 	- res improved the debug facilities for the ATI_fragment_shader 
 	  support in glshader_ps1.
 	- res changed glshader_ps1 to use a plugin namespace.
+	- res fixed the software canvases to properly flip alpha component
+	  of colors again before before doing alpha-blended 2D ops.
 29-May-2006
 	- Jorrit mentioned the new location of Cal3d (gna.org) in the
 	  manual.
