@@ -261,10 +261,6 @@ void csReporterListener::WriteLine (int severity, const char* msgID,
   if (dest_console[severity] && console)
     console->PutText ("%s", msg.GetData());
 
-  if (dest_alert[severity] && nativewm)
-    nativewm->Alert (CS_ALERT_ERROR, "Fatal Error!", "Ok", "%s",
-    msg.GetData());
-
   if (dest_debug[severity] && !debug_filename.IsEmpty())
   {
     if (!debug_file.IsValid())
@@ -322,10 +318,22 @@ void csReporterListener::WriteLine (int severity, const char* msgID,
 bool csReporterListener::Report (iReporter*, int severity,
   const char* msgID, const char* description)
 {
+  if (dest_alert[severity] && nativewm)
+  {
+    csString msg;
+    if (show_msgid[severity])
+      msg.Format("%s:  %s\n", msgID, description);
+    else
+      msg.Format("%s\n", description);
+    nativewm->Alert (CS_ALERT_ERROR, "Fatal Error!", "Ok", "%s",
+      msg.GetData());
+  }
+
   csStringArray lines;
-  size_t n = lines.SplitString (description, "\r\n", csStringArray::delimIgnoreDifferent);
+  size_t n = lines.SplitString (description, "\r\n",
+      csStringArray::delimIgnoreDifferent);
   for (size_t i = 0; i < n; i++)
-    WriteLine (severity, msgID, lines[i]);
+    WriteLine (severity, msgID, lines[i] ? lines[i] : "");
   return msg_remove[severity];
 }
 

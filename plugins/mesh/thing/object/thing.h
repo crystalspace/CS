@@ -751,7 +751,7 @@ private:
   	csZBufMode zMode);
 
   /// Generate a cachename based on geometry.
-  char* GenerateCacheName ();
+  csString GenerateCacheName ();
 
 public:
   CS_LEAKGUARD_DECLARE (csThing);

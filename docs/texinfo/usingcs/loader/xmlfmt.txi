@@ -278,12 +278,125 @@ Most of the times you simply refer to shaders from a file.
 @subsubheading Sounds Section
 @cindex sounds (Map File)
 
-@@@@@@Todo.
+The @samp{sounds} Section of the map file format allows you to encode
+information about the sound effects, background music, or pre-recorded
+dialogues that you want to include in the map. Here is an example of
+a 'sounds' section of a map file:
+
+@example
+<sounds>
+  <sound name="ear-joy.mp3" mode3d="relative" />
+  <sound name="waterfall.mp3"
+    file="waterfall_179384.mp3"
+    mode3d="absolute" />
+</sounds>
+@end example
+
+As you can see, you can include multiple @samp{sound} nodes within a
+@samp{sounds} node, and there are three attributes that determine the
+behavior of each @samp{sound} node. Here is an overview of what each of
+the attributes do:
+
+@itemize
+@item @samp{name}
+@samp{String}. The @samp{name} attribute is the internal Crystal
+Space @sc{vfs} identifier for the sound object. This is usually identical to
+the filename for the object.
+@item @samp{file}
+@samp{String}. The @samp{file} attribute is the external filename for the
+sound object, which may be different than the sound object's Crystal Space
+name. Most of the time, though, the @samp{file} attribute will be left
+blank, and its default value will be the value of the @samp{name} attribute.
+@item @samp{mode3d}
+@samp{Enum}.  The @samp{mode3d} attribute can be one of: @samp{absolute},
+@samp{disable}, or @samp{relative}. If @samp{mode3d} is not one of these
+three values or empty, then the @samp{crystalspace.maploader.parse.sound}
+error is reported.
+@end itemize
+
+As mentioned above, it is possible to omit, the @samp{file} attribute and
+let it default to @samp{name}, because @samp{name} is required. However,
+if you want the Crystal Space name to be different than the filename,
+use the @samp{file} attribute as well. An alternative to using @samp{file}
+attribute (for example: @samp{file="mysound.wav"} to indicate the filename
+of a sound object, you may instead use a @samp{file} element (for example
+@samp{<file>mysong.wav</file>}) within a @samp{sound} node to load a
+sound from a filename. Here is an example of how it would look:
+
+@example
+<sounds>
+  <sound name="mysong.wav" mode3d="disable">
+    <file>mysong.wav</file>
+  </sound>
+</sounds>
+@end example
+
+As mentioned earlier, The @samp{mode3d} enumeration is one of:
+@samp{absolute}, @samp{disable}, or @samp{relative}. The following is a
+breakdown of what each of these options implies:
+
+@itemize
+@item @samp{disabled}
+When @samp{mode3d} is @samp{disabled} then no signal processing is done
+to the sound object. This mode allows stereo audio to be stored in a
+sound object. Both other modes only allow one channel.
+@item @samp{relative}
+When @samp{mode3d} is @samp{relative} then some level of signal processing
+is done to ensure that the sound being played will have different volumes
+depending on the @samp{position} parameter of the sound object. Note that
+only on-channel sound objects are allowed.
+@item @samp{absolute}
+When @samp{mode3d} is @samp{absolute} then the highest level of signal
+processing is performed. Like @samp{relative} this mode only works with
+one-channel sound objects. Unlike @samp{relative}, this mode translates
+absolute coordinates into relative listener coordinates, allowing the
+calculation of the sound output by finding the difference between the
+user and the sound object, so the volume of the sound object will seem
+to vary as you move about.
+@end itemize
 
 @subsubheading Variable Section
 @cindex variables (Map File)
 
-@@@@@@Todo.
+The @code{variables} section of a map file format allows you to define
+variables, and make shortcuts for common strings, colors, and vectors.
+Here is an example of a @code{variables} section of a map file:
+
+@example
+<variables>
+  <variable name="avatar_age" value="21.0" />
+  <variable name="sky_color">
+    <color red="0.0" green="0.0" blue="1.0" alpha="1.0" />
+  </variable>
+  <variable name="that_way">
+    <v x="-0.5" y="3.5" z="0.5" />
+  </variable>
+</variables>
+@end example
+
+As you can see, the @code{variables} section can contain multiple
+@code{variable} elements, each of them defining a variable definition.
+Within each variable definition, depending on the type, you can specify
+different attributes. Here is an overview of the attributes and
+elements that can be found within a @code{variable} element:
+
+@itemize
+@item @samp{name} @samp{String} attribute,
+The name of the variable.
+@item @samp{value} @samp{String} attribute
+A string value associated with the variable name.
+@item @samp{oolor} element
+A color value associated with the variable name. A @samp{color} element
+can have @samp{red}, @samp{green}, @samp{blue}, and optionally
+@samp{alpha} attributes, where each attribute can be assigned a value
+between 0 and 1. If the @samp{alpha} attribute is omitted, then it is
+assumed to have a value of 1.
+@item @samp{v} element
+A vector value associated with the variable name. A @samp{vector} element
+can have @samp{x}, @samp{y}, and optionally @samp{z} attributes, where
+each attribute is any floating point number. If the @samp{z} attribute
+is omitted, then it is assumed to have a value of 0.
+@end itemize
 
 @subsubheading Plugin Section
 @cindex plugin section (Map File)

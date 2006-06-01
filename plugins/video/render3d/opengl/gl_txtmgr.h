@@ -326,7 +326,7 @@ public:
     int& width, int& height);
 
   /// Set the light data.
-  virtual void SetData (csRGBpixel* data);
+  virtual void SetData (csRGBcolor* data);
 
   /// Set the size of a light cell.
   virtual void SetLightCellSize (int size);

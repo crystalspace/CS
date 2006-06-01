@@ -25,14 +25,20 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "iutil/document.h"
 #include "iutil/string.h"
 #include "iutil/strset.h"
+#include "iutil/vfs.h"
 #include "ivaria/reporter.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/shader/shader.h"
+
 #include "glshader_ps1.h"
 #include "ps1_emu_ati.h"
 #include "ps1_emu_common.h"
 #include "ps1_parser.h"
 #include "ps1_1xto14.h"
+#include "stringlists.h"
+
+CS_PLUGIN_NAMESPACE_BEGIN(GLShaderPS1)
+{
 
 void csShaderGLPS1_ATI::Activate ()
 {
@@ -76,9 +82,35 @@ void csShaderGLPS1_ATI::ResetState ()
 {
 }
 
-bool csShaderGLPS1_ATI::GetATIShaderCommand
-  (const csPSProgramInstruction &instr)
+bool csShaderGLPS1_ATI::CheckShaderCommand (const char* glCall,
+                                            const csPixelShaderParser& parser,
+                                            const csPSProgramInstruction &instruction)
 {
+  GLenum error;
+  if((error = glGetError())) 
+  {
+    if (shaderPlug->doVerbose)
+    {
+      csString instrLine;
+      parser.GetInstructionLine (instruction, instrLine);
+      Report (CS_REPORTER_SEVERITY_WARNING, "%s: ATI_fragment_shader error %s "
+        "translating %s", glCall, GLIdent.StringForIdent (error), 
+        instrLine.GetData());
+    }
+    return false;
+  }
+  return true;
+}
+
+bool csShaderGLPS1_ATI::GetATIShaderCommand (const csPixelShaderParser& parser,
+                                             const csPSProgramInstruction &instr)
+{
+#define CHECKED_CALL(FUNC, PARAMS)                                    \
+  do {                                                                \
+    ext->FUNC PARAMS;                                                 \
+    if (!CheckShaderCommand (#FUNC, parser, instr)) return false;     \
+  } while(false)
+
   if ((instr.instruction == CS_PS_INS_NOP) ||
     (instr.instruction == CS_PS_INS_PHASE))
     return true;
@@ -103,9 +135,9 @@ bool csShaderGLPS1_ATI::GetATIShaderCommand
     else if(instr.src_reg_mods[0] & CS_PS_RMOD_DW)
       swizzle = GL_SWIZZLE_STQ_DQ_ATI;
     if(instr.instruction == CS_PS_INS_TEXLD)
-      ext->glSampleMapATI (dest, interp, swizzle);
+      CHECKED_CALL (glSampleMapATI, (dest, interp, swizzle));
     else 
-      ext->glPassTexCoordATI (dest, interp, swizzle);
+      CHECKED_CALL (glPassTexCoordATI, (dest, interp, swizzle));
     return true;
   }
 
@@ -198,39 +230,35 @@ bool csShaderGLPS1_ATI::GetATIShaderCommand
     default:
       return false;
     case 1:
-      if(color) ext->glColorFragmentOp1ATI (op, dst, dstMask, dstMod,
-	arg[0], argrep[0], argmod[0]);
-      if(alpha) ext->glAlphaFragmentOp1ATI (op, dst, dstMod, arg[0],
-	argrep[0], argmod[0]);
+      if(color) 
+        CHECKED_CALL (glColorFragmentOp1ATI, (op, dst, dstMask, dstMod, 
+          arg[0], argrep[0], argmod[0]));
+      if(alpha) 
+        CHECKED_CALL (glAlphaFragmentOp1ATI, (op, dst, dstMod, arg[0],
+	  argrep[0], argmod[0]));
       break;
     case 2:
-      if(color) ext->glColorFragmentOp2ATI (op, dst, dstMask, dstMod,
-	arg[0], argrep[0], argmod[0], arg[1], argrep[1], argmod[1]);
-      if(alpha) ext->glAlphaFragmentOp2ATI (op, dst, dstMod, arg[0],
-	argrep[0], argmod[0], arg[1], argrep[1], argmod[1]);
+      if(color) 
+        CHECKED_CALL (glColorFragmentOp2ATI, (op, dst, dstMask, dstMod,
+	  arg[0], argrep[0], argmod[0], arg[1], argrep[1], argmod[1]));
+      if(alpha) 
+        CHECKED_CALL (glAlphaFragmentOp2ATI, (op, dst, dstMod, arg[0],
+	  argrep[0], argmod[0], arg[1], argrep[1], argmod[1]));
       break;
     case 3:
-      if(color) ext->glColorFragmentOp3ATI (op, dst, dstMask, dstMod,
-	arg[0], argrep[0], argmod[0], arg[1], argrep[1], argmod[1],
-	arg[2], argrep[2], argmod[2]);
-      if(alpha) ext->glAlphaFragmentOp3ATI (op, dst, dstMod, arg[0],
-	argrep[0], argmod[0], arg[1], argrep[1], argmod[1], arg[2],
-	argrep[2], argmod[2]);
+      if(color) 
+        CHECKED_CALL (glColorFragmentOp3ATI, (op, dst, dstMask, dstMod,
+	  arg[0], argrep[0], argmod[0], arg[1], argrep[1], argmod[1],
+	  arg[2], argrep[2], argmod[2]));
+      if(alpha) 
+        CHECKED_CALL (glAlphaFragmentOp3ATI, (op, dst, dstMod, arg[0],
+	  argrep[0], argmod[0], arg[1], argrep[1], argmod[1], arg[2],
+	  argrep[2], argmod[2]));
       break;
   }
-  GLenum error;
-  if((error = glGetError())) 
-  {
-    Report (CS_REPORTER_SEVERITY_ERROR, "ATI_fragment_shader error %d!", error);
-    return false;
-  }
   return true;
+#undef CHECKED_CALL
 }
-
-
-#ifdef CS_DEBUG
-//#define DUMP_CONVERTER_OUTPUT
-#endif
 
 bool csShaderGLPS1_ATI::LoadProgramStringToGL ()
 {
@@ -256,8 +284,9 @@ bool csShaderGLPS1_ATI::LoadProgramStringToGL ()
     constantRegs[constant.reg].valid = true;
   }
 
-  const csArray<csPSProgramInstruction>* instrs =
+  const csArray<csPSProgramInstruction>* orgInstrs =
     &parser.GetParsedInstructionList ();
+  const csArray<csPSProgramInstruction>* instrs = orgInstrs;
 
   csPS1xTo14Converter conv;
   if(parser.GetVersion () != CS_PS_1_4)
@@ -270,12 +299,27 @@ bool csShaderGLPS1_ATI::LoadProgramStringToGL ()
 	err);
       return false;
     }
-#ifdef DUMP_CONVERTER_OUTPUT
-    csString prog;
-    parser.WriteProgram (*instrs, prog);
+    if (shaderPlug->dumpTo14ConverterOutput)
+    {
+      csString dump;
+      dump << "Original program:\n";
+      parser.WriteProgram (*orgInstrs, dump);
+      dump << "\nConverted program:\n";
+      parser.WriteProgram (*instrs, dump);
 
-    csPrintf (prog);
-#endif
+      csRef<iVFS> vfs = csQueryRegistry<iVFS> (shaderPlug->object_reg);
+      static uint programNum = 0;
+      csString filename;
+      filename.Format ("/tmp/shader/ps14conv%u.txt", programNum++);
+      if (vfs->WriteFile (filename, dump, dump.Length()))
+        Report (CS_REPORTER_SEVERITY_NOTIFY, 
+	  "Written conversion output to %s",
+          filename.GetData());
+      else
+        Report (CS_REPORTER_SEVERITY_WARNING, 
+	  "Error writing conversion output to %s",
+          filename.GetData());
+    }
   }
 
   csGLExtensionManager *ext = shaderPlug->ext;
@@ -288,7 +332,7 @@ bool csShaderGLPS1_ATI::LoadProgramStringToGL ()
 
   for(i = 0; i < instrs->Length (); i++)
   {
-    if(!GetATIShaderCommand (instrs->Get (i)))
+    if(!GetATIShaderCommand (parser, instrs->Get (i)))
     {
       ext->glEndFragmentShaderATI ();
       ext->glDeleteFragmentShaderATI (program_num);
@@ -300,3 +344,6 @@ bool csShaderGLPS1_ATI::LoadProgramStringToGL ()
 
   return true;
 }
+
+}
+CS_PLUGIN_NAMESPACE_END(GLShaderPS1)

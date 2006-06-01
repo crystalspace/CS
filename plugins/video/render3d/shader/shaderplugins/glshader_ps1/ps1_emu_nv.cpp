@@ -38,6 +38,9 @@
 #include "ps1_parser.h"
 #include "glshader_ps1.h"
 
+CS_PLUGIN_NAMESPACE_BEGIN(GLShaderPS1)
+{
+
 void csShaderGLPS1_NV::Activate ()
 {
   // enable it
@@ -777,3 +780,6 @@ bool csShaderGLPS1_NV::LoadProgramStringToGL ()
 
   return ret;
 }
+
+}
+CS_PLUGIN_NAMESPACE_END(GLShaderPS1)

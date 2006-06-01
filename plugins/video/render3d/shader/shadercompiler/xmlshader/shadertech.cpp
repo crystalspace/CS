@@ -168,7 +168,8 @@ bool csXMLShaderTech::ParseInstanceBinds (iDocumentNode *node, shaderPass *pass)
   return true;
 }
 
-bool csXMLShaderTech::LoadPass (iDocumentNode *node, shaderPass *pass)
+bool csXMLShaderTech::LoadPass (iDocumentNode *node, shaderPass *pass, 
+                                size_t variant)
 {
   iSyntaxService* synldr = parent->compiler->synldr;
   iStringSet* strings = parent->compiler->strings;
@@ -184,9 +185,6 @@ bool csXMLShaderTech::LoadPass (iDocumentNode *node, shaderPass *pass)
   csRef<iDocumentNode> varNode = node->GetNode(
     xmltokens.Request (csXMLShaderCompiler::XMLTOKEN_SHADERVARS));
  
-  if (varNode)
-    parent->compiler->LoadSVBlock (varNode, &pass->svcontext);
-
   csRef<iDocumentNode> programNode;
   csRef<iShaderProgram> program;
   // load fp
@@ -197,7 +195,7 @@ bool csXMLShaderTech::LoadPass (iDocumentNode *node, shaderPass *pass)
 
   if (programNode)
   {
-    program = LoadProgram (0, programNode, pass);
+    program = LoadProgram (0, programNode, pass, variant);
     if (program)
       pass->fp = program;
     else
@@ -218,7 +216,7 @@ bool csXMLShaderTech::LoadPass (iDocumentNode *node, shaderPass *pass)
 
   if (programNode)
   {
-    program = LoadProgram (resolveFP, programNode, pass);
+    program = LoadProgram (resolveFP, programNode, pass, variant);
     if (program)
     {
       pass->vp = program;
@@ -241,7 +239,7 @@ bool csXMLShaderTech::LoadPass (iDocumentNode *node, shaderPass *pass)
 
   if (programNode)
   {
-    program = LoadProgram (resolveFP, programNode, pass);
+    program = LoadProgram (resolveFP, programNode, pass, variant);
     if (program)
     {
       pass->vproc = program;
@@ -327,19 +325,6 @@ bool csXMLShaderTech::LoadPass (iDocumentNode *node, shaderPass *pass)
 	pass->wmBlue = !strcasecmp (nodeWM->GetAttributeValue ("b"), "true");
       if (nodeWM->GetAttributeValue ("a") != 0)
 	pass->wmAlpha = !strcasecmp (nodeWM->GetAttributeValue ("a"), "true");
-    }
-  }
-  if (pass->alphaMode.autoAlphaMode)
-  {
-    if (pass->alphaMode.autoModeTexture != csInvalidStringID)
-    {
-      csShaderVariable *var;
-      var = pass->svcontext.GetVariable (pass->alphaMode.autoModeTexture);
-
-      if(!var)
-	var = svcontext.GetVariable (pass->alphaMode.autoModeTexture);
-      if (var)
-	pass->autoAlphaTexRef = var;
     }
   }
 
@@ -460,13 +445,6 @@ bool csXMLShaderTech::LoadPass (iDocumentNode *node, shaderPass *pass)
         pass->custommapping_id.Push (varID);
         //pass->bufferGeneric[pass->bufferCount] = CS_VATTRIB_IS_GENERIC (attrib);
 
-        csShaderVariable *varRef=0;
-        varRef = pass->svcontext.GetVariable(varID);
-
-        if(!varRef)
-          varRef = svcontext.GetVariable (varID);
-
-        pass->custommapping_variables.Push (varRef);
         pass->custommapping_attrib.Push (attrib);
 	pass->custommapping_buffer.Push (CS_BUFFER_NONE);
       }
@@ -485,7 +463,6 @@ bool csXMLShaderTech::LoadPass (iDocumentNode *node, shaderPass *pass)
 	  pass->defaultMappings[attrib] = sourceName;
 	else
 	{
-	  pass->custommapping_variables.Push (0);
 	  pass->custommapping_attrib.Push (attrib);
 	  pass->custommapping_buffer.Push (sourceName);
 	  /* Those buffers are mapped by default to some specific vattribs; 
@@ -532,15 +509,6 @@ bool csXMLShaderTech::LoadPass (iDocumentNode *node, shaderPass *pass)
       csStringID varID = strings->Request (mapping->GetAttributeValue("name"));
       pass->textureID[texUnit] = varID;
 
-      csShaderVariable *varRef=0;
-      varRef = pass->svcontext.GetVariable (varID);
-
-      if(!varRef)
-        varRef = svcontext.GetVariable (varID);
-
-      if (varRef)
-	pass->textureRef[texUnit] = varRef;
-
       pass->textureCount = MAX(pass->textureCount, texUnit + 1);
     }
   }
@@ -568,7 +536,8 @@ bool csXMLShaderCompiler::LoadSVBlock (iDocumentNode *node,
 }
 
 csPtr<iShaderProgram> csXMLShaderTech::LoadProgram (
-  iShaderDestinationResolver* resolve, iDocumentNode* node, shaderPass* /*pass*/)
+  iShaderDestinationResolver* resolve, iDocumentNode* node, shaderPass* /*pass*/,
+  size_t variant)
 {
   if (node->GetAttributeValue("plugin") == 0)
   {
@@ -610,7 +579,8 @@ csPtr<iShaderProgram> csXMLShaderTech::LoadProgram (
     return 0;
   csRef<iDocumentNode> programNode;
   if (node->GetAttributeValue ("file") != 0)
-    programNode = parent->LoadProgramFile (node->GetAttributeValue ("file"));
+    programNode = parent->LoadProgramFile (node->GetAttributeValue ("file"), 
+      variant);
   else
     programNode = node;
   if (!program->Load (resolve, programNode))
@@ -622,7 +592,8 @@ csPtr<iShaderProgram> csXMLShaderTech::LoadProgram (
   return csPtr<iShaderProgram> (program);
 }
 
-bool csXMLShaderTech::Load (iDocumentNode* node, iDocumentNode* parentSV)
+bool csXMLShaderTech::Load (iDocumentNode* node, iDocumentNode* parentSV, 
+                            size_t variant)
 {
   if ((node->GetType() != CS_NODE_ELEMENT) || 
     (xmltokens.Request (node->GetValue()) 
@@ -718,7 +689,7 @@ bool csXMLShaderTech::Load (iDocumentNode* node, iDocumentNode* parentSV)
   {
     csRef<iDocumentNode> passNode = it->Next ();
     passes[currentPassNr].owner = this;
-    if (!LoadPass (passNode, &passes[currentPassNr++]))
+    if (!LoadPass (passNode, &passes[currentPassNr++], variant))
     {
       return false;
     }
@@ -805,9 +776,6 @@ bool csXMLShaderTech::SetupPass (const csRenderMesh *mesh,
       last_buffers[i] = modes.buffers->GetRenderBuffer (
 	thispass->custommapping_buffer[i]);
     }
-    else if ((thispass->custommapping_variables.Length () >= i) 
-      && (thispass->custommapping_variables[i] != 0))
-      thispass->custommapping_variables[i]->GetValue(last_buffers[i]);
     else if (thispass->custommapping_id[i] < (csStringID)stacks.Length ())
     {
       csShaderVariable* var = 0;
@@ -829,19 +797,7 @@ bool csXMLShaderTech::SetupPass (const csRenderMesh *mesh,
   int j;
   for (j = 0; j < thispass->textureCount; j++)
   {
-    if (thispass->textureRef[j] != 0)
-    {
-      iTextureWrapper* wrap;
-      thispass->textureRef[j]->GetValue(wrap);
-      if (wrap)
-      {
-        wrap->Visit ();
-        last_textures[j] = wrap->GetTextureHandle ();
-      }
-      else
-        last_textures[j] = 0;
-    }
-    else if (thispass->textureID[j] < (csStringID)stacks.Length ())
+    if (thispass->textureID[j] < (csStringID)stacks.Length ())
     {
       csShaderVariable* var = 0;
       var = csGetShaderVariableFromStack (stacks, thispass->textureID[j]);
@@ -869,9 +825,7 @@ bool csXMLShaderTech::SetupPass (const csRenderMesh *mesh,
   if (thispass->alphaMode.autoAlphaMode)
   {
     iTextureHandle* tex = 0;
-    if (thispass->autoAlphaTexRef != 0)
-      thispass->autoAlphaTexRef->GetValue (tex);
-    else if (thispass->alphaMode.autoModeTexture != csInvalidStringID)
+    if (thispass->alphaMode.autoModeTexture != csInvalidStringID)
     {
       if (thispass->alphaMode.autoModeTexture < (csStringID)stacks.Length ())
       {

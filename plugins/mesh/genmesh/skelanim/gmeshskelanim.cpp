@@ -560,12 +560,14 @@ void csSkelAnimControlRunnable::ParseFrame (const sac_frame & frame)
             switch (inst.tr_mode)
             {
               case AC_TRANSFORM_ABSOLUTE:
-                bone_rot->quat = csQuaternion (inst.rotate.quat_r, 
-                  inst.rotate.quat_x, inst.rotate.quat_y, inst.rotate.quat_z);
+                bone_rot->quat = csQuaternion (
+                  inst.rotate.quat_x, inst.rotate.quat_y, inst.rotate.quat_z,
+                  inst.rotate.quat_r);
               break;
               case AC_TRANSFORM_RELATIVE:
-                csQuaternion q = csQuaternion (inst.rotate.quat_r,
-                  inst.rotate.quat_x, inst.rotate.quat_y, inst.rotate.quat_z);
+                csQuaternion q = csQuaternion (
+                  inst.rotate.quat_x, inst.rotate.quat_y, inst.rotate.quat_z,
+                  inst.rotate.quat_r);
                 bone_rot->quat = q*bone_rot->quat;
               break;
             }
@@ -581,15 +583,17 @@ void csSkelAnimControlRunnable::ParseFrame (const sac_frame & frame)
             {
               case AC_TRANSFORM_ABSOLUTE:
                 m.curr_quat = m.bone_rotation->quat;
-                m.quat = csQuaternion (inst.rotate.quat_r, 
-                  inst.rotate.quat_x, inst.rotate.quat_y, inst.rotate.quat_z);
+                m.quat = csQuaternion ( 
+                  inst.rotate.quat_x, inst.rotate.quat_y, inst.rotate.quat_z,
+                  inst.rotate.quat_r);
                 absolute_rotates.Push (m);
               break;
               case AC_TRANSFORM_RELATIVE:
               {
                 m.quat = m.bone_rotation->quat;
-                m.curr_quat = csQuaternion (inst.rotate.quat_r, 
-                  inst.rotate.quat_x, inst.rotate.quat_y, inst.rotate.quat_z);
+                m.curr_quat = csQuaternion ( 
+                  inst.rotate.quat_x, inst.rotate.quat_y, inst.rotate.quat_z,
+                  inst.rotate.quat_r);
                 relative_rotates.Push (m);
               }
               break;

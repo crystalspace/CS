@@ -3355,8 +3355,8 @@ bool csLoader::LoadMeshObject (iLoaderContext* ldr_context,
         break;
       case XMLTOKEN_MESHREF:
         {
-          csRef<iMeshWrapper> sp = LoadMeshObjectFromFactory (ldr_context, child,
-	  	ssource);
+          csRef<iMeshWrapper> sp = LoadMeshObjectFromFactory (ldr_context,
+	      	child, ssource);
           if (!sp)
 	  {
 	    // Error is already reported.
@@ -5195,13 +5195,13 @@ iSector* csLoader::ParseSector (iLoaderContext* ldr_context,
 	}
 	break;
       case XMLTOKEN_AMBIENT:
-  {
-    csColor c;
-    if (!SyntaxService->ParseColor (child, c))
-      return false;
-    sector->SetDynamicAmbientLight (c);
-  }
-  break;
+	{
+	  csColor c;
+	  if (!SyntaxService->ParseColor (child, c))
+	    return false;
+	  sector->SetDynamicAmbientLight (c);
+	}
+	break;
       case XMLTOKEN_MESHGEN:
 	if (!LoadMeshGen (ldr_context, child, sector))
 	  return 0;
@@ -5271,8 +5271,8 @@ iSector* csLoader::ParseSector (iLoaderContext* ldr_context,
 		secname ? secname : "<noname>");
 	    return 0;
 	  }
-          csRef<iMeshWrapper> mesh = LoadMeshObjectFromFactory (ldr_context, child,
-	  	ssource);
+          csRef<iMeshWrapper> mesh = LoadMeshObjectFromFactory (ldr_context,
+	      child, ssource);
           if (!mesh)
 	  {
 	    // Error is already reported.
@@ -5684,7 +5684,8 @@ bool csLoader::ParseShader (iLoaderContext* ldr_context,
     if (!shaderNode)
     {
       SyntaxService->ReportError ("crystalspace.maploader", node,
-        "Shader file '%s' is not a valid shader XML file!", filename.GetData ());
+        "Shader file '%s' is not a valid shader XML file!",
+	filename.GetData ());
       return false;
     }
 

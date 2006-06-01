@@ -377,19 +377,19 @@ bool csExplosionSaver::WriteDown (iBase* obj, iDocumentNode* parent,
     mesh->GetColor(col);
     csRef<iDocumentNode> colorNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
     colorNode->SetValue("color");
-    synldr->WriteColor(colorNode, &col);
+    synldr->WriteColor(colorNode, col);
 
     //Writedown Center tag
     csVector3 center = explosionstate->GetCenter();
     csRef<iDocumentNode> centerNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
     centerNode->SetValue("center");
-    synldr->WriteVector(centerNode, &center);
+    synldr->WriteVector(centerNode, center);
 
     //Writedown Push tag
     csVector3 push = explosionstate->GetPush();
     csRef<iDocumentNode> pushNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
     pushNode->SetValue("push");
-    synldr->WriteVector(pushNode, &push);
+    synldr->WriteVector(pushNode, push);
 
     //Writedown PartRadius tag
     float partradius = explosionstate->GetPartRadius();

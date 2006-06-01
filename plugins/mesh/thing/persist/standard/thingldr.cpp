@@ -1413,7 +1413,7 @@ bool csThingSaver::WriteFactory (iBase* obj, iDocumentNode* parent)
       csRef<iDocumentNode> vertNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
       vertNode->SetValue("v");
       csVector3 vertex = thingfact->GetVertex(vertidx);
-      synldr->WriteVector(vertNode, &vertex);
+      synldr->WriteVector(vertNode, vertex);
     }  
     iMaterialWrapper* material = 0;
     for (int polyidx = 0; polyidx < thingfact->GetPolygonCount(); polyidx++)
@@ -1451,10 +1451,10 @@ bool csThingSaver::WriteFactory (iBase* obj, iDocumentNode* parent)
         thingfact->GetPolygonTextureMapping(polyidx, m, v);
         csRef<iDocumentNode> matrixNode = texmapNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
         matrixNode->SetValue("matrix");
-        synldr->WriteMatrix(matrixNode, &m);
+        synldr->WriteMatrix(matrixNode, m);
         csRef<iDocumentNode> vectorNode = texmapNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
         vectorNode->SetValue("v");
-        synldr->WriteVector(vectorNode, &v);
+        synldr->WriteVector(vectorNode, v);
       }
       //Writedown Colldet tag
       bool colldet = thingfact->GetPolygonFlags(polyidx).Check(CS_POLY_COLLDET);

@@ -352,7 +352,8 @@ public:
 
   /// Return some info on this shader
   void DumpStats (csString& str);
-  csRef<iDocumentNode> LoadProgramFile (const char* filename);
+  csRef<iDocumentNode> OpenDocFile (const char* filename);
+  csRef<iDocumentNode> LoadProgramFile (const char* filename, size_t variant);
 public:
   //Holders
   csXMLShaderCompiler* compiler;

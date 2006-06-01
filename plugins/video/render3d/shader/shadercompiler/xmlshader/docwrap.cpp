@@ -1548,15 +1548,23 @@ struct EvalCondTree
 
 csWrappedDocumentNode* csWrappedDocumentNodeFactory::CreateWrapper (
   iDocumentNode* wrappedNode, iConditionResolver* resolver,
-  csConditionEvaluator& evaluator, csString* dumpOut)
+  csConditionEvaluator& evaluator, const csRefArray<iDocumentNode>& extraNodes,
+  csString* dumpOut)
 {
   currentOut = dumpOut;
 
   csWrappedDocumentNode* node;
   {
+    EvalCondTree eval (evaluator);
+    for (size_t i = 0; i < extraNodes.GetSize(); i++)
+    {
+      csRef<csWrappedDocumentNode::GlobalProcessingState> globalState;
+      globalState.AttachNew (csWrappedDocumentNode::GlobalProcessingState::Create ());
+      delete new csWrappedDocumentNode (eval, extraNodes[i], resolver, this, 
+        globalState);
+    }
     csRef<csWrappedDocumentNode::GlobalProcessingState> globalState;
     globalState.AttachNew (csWrappedDocumentNode::GlobalProcessingState::Create ());
-    EvalCondTree eval (evaluator);
     node = new csWrappedDocumentNode (eval, wrappedNode, resolver, this, 
       globalState);
     eval.condTree.ToResolver (resolver);

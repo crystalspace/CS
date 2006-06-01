@@ -37,15 +37,15 @@ public:
 		switch(info->GetIntArg(0))
 		{
 			case PVE_FIRST:
-				picview->LoadNextImage (1, -1);
+				picview->LoadNextImage (true, 1);
 			break;
 			
 			case PVE_PREV:
-				picview->LoadNextImage (0, -1);
+				picview->LoadNextImage (false, -1);
 			break;
 			
 			case PVE_NEXT:
-				picview->LoadNextImage (0, 1);
+				picview->LoadNextImage (false, 1);
 			break;
 			
 			case PVE_QUIT:
@@ -54,7 +54,7 @@ public:
 			
 			case PVE_SCALE:
 				picview->FlipScale();
-				picview->LoadNextImage (0, 0);
+				picview->LoadNextImage (false, 0);
 			break;							
 		}	
 	}	
@@ -71,7 +71,7 @@ CS_IMPLEMENT_APPLICATION
 
 PicView::PicView ()
 {
-  SetApplicationName ("PicView");
+  SetApplicationName ("CrystalSpace.PicView");
   pic = 0;
   scale = false;
 }
@@ -237,13 +237,13 @@ void PicView::CreateGui ()
   }
 }
 
-void PicView::LoadNextImage (size_t idx, int step)
+void PicView::LoadNextImage (bool rewind, int step)
 {
+  if (rewind) cur_idx = files->Length ();
   size_t startIdx = cur_idx;
   csRef<iImage> ifile;
   iTextureManager* txtmgr = g3d->GetTextureManager();
 
-  if (idx) cur_idx = idx;
   do
   {
     if ((step < 0) && ((size_t)-step > cur_idx))
@@ -253,7 +253,7 @@ void PicView::LoadNextImage (size_t idx, int step)
     if ((size_t)cur_idx >= files->Length ()) cur_idx = 0;
 
     csRef<iDataBuffer> buf (vfs->ReadFile (files->Get (cur_idx), false));
-    if (!buf) return;
+    if (!buf) continue;
   		
     ifile = imgloader->Load (buf, txtmgr->GetTextureFormat ());
   }

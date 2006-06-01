@@ -170,8 +170,10 @@ csPtr<iBase> csSpriteCal3DFactoryLoader::Parse (iDocumentNode* node,
       {
           bool rotate = child->GetAttributeValueAsBool("rotate_x_axis");
           bool invert = child->GetAttributeValueAsBool("flip_textures");
-          newspr->SetLoadFlags( rotate?LOADER_ROTATE_X_AXIS:0
-	      | invert?LOADER_INVERT_V_COORD:0 );
+          //newspr->SetLoadFlags( rotate?LOADER_ROTATE_X_AXIS:0
+          //| invert?LOADER_INVERT_V_COORD:0 );          
+          newspr->SetLoadFlags( (rotate?LOADER_ROTATE_X_AXIS:0) 
+          | (invert?LOADER_INVERT_V_COORD:0) | LOADER_FLIP_WINDING );          
           break;
       }
     case XMLTOKEN_PATH:

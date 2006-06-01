@@ -606,6 +606,7 @@ class csVector3(_object):
     def Unit(*args): return _cspace.csVector3_Unit(*args)
     def Normalize(*args): return _cspace.csVector3_Normalize(*args)
     def IsZero(*args): return _cspace.csVector3_IsZero(*args)
+    def UnitAxisClamped(*args): return _cspace.csVector3_UnitAxisClamped(*args)
     def __add__(*args): return _cspace.csVector3___add__(*args)
     def __sub__(*args): return _cspace.csVector3___sub__(*args)
     def __mul__(*args): return _cspace.csVector3___mul__(*args)
@@ -1901,35 +1902,33 @@ class csQuaternion(_object):
     __getattr__ = lambda self, name: _swig_getattr(self, csQuaternion, name)
     def __repr__(self):
         return "<%s.%s; proxy of C++ csQuaternion instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
-    def Init(*args): return _cspace.csQuaternion_Init(*args)
     def __init__(self, *args):
         _swig_setattr(self, csQuaternion, 'this', _cspace.new_csQuaternion(*args))
         _swig_setattr(self, csQuaternion, 'thisown', 1)
-    def __imul__(*args): return _cspace.csQuaternion___imul__(*args)
+    def SetIdentity(*args): return _cspace.csQuaternion_SetIdentity(*args)
+    def __iadd__(*args): return _cspace.csQuaternion___iadd__(*args)
+    def __isub__(*args): return _cspace.csQuaternion___isub__(*args)
+    def GetConjugate(*args): return _cspace.csQuaternion_GetConjugate(*args)
     def Conjugate(*args): return _cspace.csQuaternion_Conjugate(*args)
-    def Negate(*args): return _cspace.csQuaternion_Negate(*args)
-    def Invert(*args): return _cspace.csQuaternion_Invert(*args)
-    def GetAxisAngle(*args): return _cspace.csQuaternion_GetAxisAngle(*args)
-    def SetWithAxisAngle(*args): return _cspace.csQuaternion_SetWithAxisAngle(*args)
-    def PrepRotation(*args): return _cspace.csQuaternion_PrepRotation(*args)
+    def Dot(*args): return _cspace.csQuaternion_Dot(*args)
+    def SquaredNorm(*args): return _cspace.csQuaternion_SquaredNorm(*args)
+    def Norm(*args): return _cspace.csQuaternion_Norm(*args)
+    def Unit(*args): return _cspace.csQuaternion_Unit(*args)
     def Rotate(*args): return _cspace.csQuaternion_Rotate(*args)
-    def Normalize(*args): return _cspace.csQuaternion_Normalize(*args)
-    def SetWithEuler(*args): return _cspace.csQuaternion_SetWithEuler(*args)
+    def SetAxisAngle(*args): return _cspace.csQuaternion_SetAxisAngle(*args)
+    def GetAxisAngle(*args): return _cspace.csQuaternion_GetAxisAngle(*args)
+    def SetEulerAngles(*args): return _cspace.csQuaternion_SetEulerAngles(*args)
     def GetEulerAngles(*args): return _cspace.csQuaternion_GetEulerAngles(*args)
-    def ToAxisAngle(*args): return _cspace.csQuaternion_ToAxisAngle(*args)
-    def Slerp(*args): return _cspace.csQuaternion_Slerp(*args)
-    __swig_setmethods__["r"] = _cspace.csQuaternion_r_set
-    __swig_getmethods__["r"] = _cspace.csQuaternion_r_get
-    if _newclass:r = property(_cspace.csQuaternion_r_get, _cspace.csQuaternion_r_set)
-    __swig_setmethods__["x"] = _cspace.csQuaternion_x_set
-    __swig_getmethods__["x"] = _cspace.csQuaternion_x_get
-    if _newclass:x = property(_cspace.csQuaternion_x_get, _cspace.csQuaternion_x_set)
-    __swig_setmethods__["y"] = _cspace.csQuaternion_y_set
-    __swig_getmethods__["y"] = _cspace.csQuaternion_y_get
-    if _newclass:y = property(_cspace.csQuaternion_y_get, _cspace.csQuaternion_y_set)
-    __swig_setmethods__["z"] = _cspace.csQuaternion_z_set
-    __swig_getmethods__["z"] = _cspace.csQuaternion_z_get
-    if _newclass:z = property(_cspace.csQuaternion_z_get, _cspace.csQuaternion_z_set)
+    def SetMatrix(*args): return _cspace.csQuaternion_SetMatrix(*args)
+    def GetMatrix(*args): return _cspace.csQuaternion_GetMatrix(*args)
+    def NLerp(*args): return _cspace.csQuaternion_NLerp(*args)
+    def SLerp(*args): return _cspace.csQuaternion_SLerp(*args)
+    __swig_setmethods__["v"] = _cspace.csQuaternion_v_set
+    __swig_getmethods__["v"] = _cspace.csQuaternion_v_get
+    if _newclass:v = property(_cspace.csQuaternion_v_get, _cspace.csQuaternion_v_set)
+    __swig_setmethods__["w"] = _cspace.csQuaternion_w_set
+    __swig_getmethods__["w"] = _cspace.csQuaternion_w_get
+    if _newclass:w = property(_cspace.csQuaternion_w_get, _cspace.csQuaternion_w_set)
     def __add__(*args): return _cspace.csQuaternion___add__(*args)
     def __sub__(*args): return _cspace.csQuaternion___sub__(*args)
     def __mul__(*args): return _cspace.csQuaternion___mul__(*args)

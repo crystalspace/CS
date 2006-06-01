@@ -727,7 +727,7 @@ bool csParticlesFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent,
     csRef<iDocumentNode> gravityNode = 
       paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
     gravityNode->SetValue("gravity");
-    synldr->WriteVector(gravityNode, &gravity);
+    synldr->WriteVector(gravityNode, gravity);
 
     //Writedown diffusion tag
     float diffuse = state->GetDiffusion ();
@@ -853,14 +853,14 @@ bool csParticlesFactorySaver::WriteEmitter (iParticlesFactoryState* state,
       csRef<iDocumentNode> directionNode =
         forceNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
       directionNode->SetValue("direction");
-      synldr->WriteVector(directionNode, &direction);
+      synldr->WriteVector(directionNode, direction);
 
       csVector3 direction_variation;
       state->GetForceDirectionVariation(direction_variation);
       csRef<iDocumentNode> directionVariationNode =
         forceNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
       directionVariationNode->SetValue("directionvariation");
-      synldr->WriteVector(directionVariationNode, &direction_variation);
+      synldr->WriteVector(directionVariationNode, direction_variation);
 
       float amount = state->GetForce();
       csRef<iDocumentNode> amountNode =
@@ -1624,7 +1624,7 @@ bool csParticlesObjectSaver::WriteDown (iBase* obj, iDocumentNode* parent,
     csRef<iDocumentNode> gravityNode = 
       paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
     gravityNode->SetValue("gravity");
-    synldr->WriteVector(gravityNode, &gravity);
+    synldr->WriteVector(gravityNode, gravity);
 
     //Writedown diffusion tag
     float diffuse = object->GetDiffusion ();
@@ -1750,14 +1750,14 @@ bool csParticlesObjectSaver::WriteEmitter (iParticlesObjectState* object,
       csRef<iDocumentNode> directionNode =
         forceNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
       directionNode->SetValue("direction");
-      synldr->WriteVector(directionNode, &direction);
+      synldr->WriteVector(directionNode, direction);
 
       csVector3 direction_variation;
       object->GetForceDirectionVariation(direction_variation);
       csRef<iDocumentNode> directionVariationNode =
         forceNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
       directionVariationNode->SetValue("directionvariation");
-      synldr->WriteVector(directionVariationNode, &direction_variation);
+      synldr->WriteVector(directionVariationNode, direction_variation);
 
       float amount = object->GetForce();
       csRef<iDocumentNode> amountNode =

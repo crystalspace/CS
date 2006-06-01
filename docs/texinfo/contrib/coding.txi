@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Coding Style, CVS Guide, Portability, Contributing
+@node Coding Style, SVN Guide, Portability, Contributing
 @section Coding Style
 
 For consistency and ease of future maintenance, when working on Crystal Space
