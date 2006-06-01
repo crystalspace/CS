@@ -38,6 +38,7 @@ Here is the @sc{api} definition for our sample plugin:
 #define __GAME_MYAPI_H__
 
 #include <csutil/scf.h>
+#include <csutil/scf_implementation.h>
 
 class csVector3;
 

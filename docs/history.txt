@@ -6,6 +6,12 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+1-Jun-2006
+	- Jorrit fixed a bug in csMeshOnTexture where it would add
+	  the begindraw flags from the engine and this would prevent
+	  the persistent flag from working.
+	- res fixed building with gcc 4.1.1 on AMD64 by adding utilizing
+	  the -fPIC flag when testing for -shared.
 31-May-2006
 	- res tweaked the Thing lightmap loader to use a block allocator
 	  instead of a pool for the lightmap buffers.
