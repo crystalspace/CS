@@ -9,9 +9,9 @@ chronological order.
 2-Jun-2006
 	- res fixed compilation of glshader_ps1 on gcc 3.3.
 1-Jun-2006
-	- Jorrit fixed a bug in csMeshOnTexture where it would add
-	  the begindraw flags from the engine and this would prevent
-	  the persistent flag from working.
+	- Jorrit fixed a bug in csMeshOnTexture where it would add the
+	  begindraw flags from the engine and this would prevent the
+	  persistent flag from working.
 	- res fixed building with gcc 4.1.1 on AMD64 by adding utilizing
 	  the -fPIC flag when testing for -shared.
 	- AndyDude fixed spelling mistakes in my additions (xmlfmt.txi).
