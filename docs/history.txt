@@ -8,6 +8,8 @@ chronological order.
 
 2-Jun-2006
 	- res fixed compilation of glshader_ps1 on gcc 3.3.
+	- Jorrit fixed two errors in the documentation as reported
+	  by schorsch_76 on the forums.
 1-Jun-2006
 	- Jorrit fixed a bug in csMeshOnTexture where it would add the
 	  begindraw flags from the engine and this would prevent the
