@@ -671,11 +671,14 @@
                     <Dim type="Width" ><UnifiedDim scale="1" type="Width" /></Dim>
                     <Dim type="BottomEdge" ><UnifiedDim scale="1" type="BottomEdge" /></Dim>
                 </Area>
+                <Image type="TopLeftCorner" imageset="ice" image="WindowTopLeft" />
+                <Image type="TopRightCorner" imageset="ice" image="WindowTopRight" />
                 <Image type="BottomLeftCorner" imageset="ice" image="WindowBottomLeft" />
                 <Image type="BottomRightCorner" imageset="ice" image="WindowBottomRight" />
                 <Image type="LeftEdge" imageset="ice" image="WindowLeftEdge" />
                 <Image type="RightEdge" imageset="ice" image="WindowRightEdge" />
                 <Image type="BottomEdge" imageset="ice" image="WindowBottomEdge" />
+                <Image type="TopEdge" imageset="ice" image="WindowTopEdge" />
                 <Image type="Background" imageset="ice" image="ClientBrush" />
                 <VertFormat type="Tiled" />
                 <HorzFormat type="Tiled" />
@@ -2092,6 +2095,7 @@
     <WidgetLook name="ice/StaticText">
         <Property name="FrameEnabled" value="True" />
         <Property name="BackgroundEnabled" value="True" />
+        <Property name="TextColours" value="tl:FF000000 tr:FF000000 bl:FF000000 br:FF000000" />
         <NamedArea name="TextRenderArea">
             <Area>
                 <Dim type="LeftEdge" ><ImageDim imageset="ice" image="StaticLeft" dimension="Width" /></Dim>
