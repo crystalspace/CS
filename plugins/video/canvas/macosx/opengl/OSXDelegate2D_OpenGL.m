@@ -35,7 +35,8 @@
 
 // Create an OpenGL Context
 - (CGLContextObj) createOpenGLContext:(int) depth display:(CGDirectDisplayID) display;
-
+// Get the PixelFormat object for BitDepth info
+- (CGLPixelFormatObj) getOpenGLPixelFormat;
 // Update OpenGL context (bind to current window, etc)
 - (void) updateOpenGLContext;
 
@@ -43,6 +44,8 @@
 
 
 @implementation OSXDelegate2D (OpenGL)
+
+CGLPixelFormatObj pixelFormatSave;
 
 NSOpenGLContext *context;
 
@@ -68,6 +71,8 @@ NSOpenGLContext *context;
     if (pixelFormat == nil)
         return 0;
 
+    pixelFormatSave = (CGLPixelFormatObj)[pixelFormat CGLPixelFormatObj];
+    
     // Create a GL context
     context = [[NSOpenGLContext alloc] initWithFormat:pixelFormat shareContext:nil];
     [pixelFormat release];
@@ -91,6 +96,13 @@ NSOpenGLContext *context;
     return [context getCGLContext];
 }
 
+// getOpenGLPixelFormat
+// Get the PixelFormat object for BitDepth info
+- (CGLPixelFormatObj) getOpenGLPixelFormat
+{
+    // Must call createOpenGLContext first for this to work!
+    return pixelFormatSave;
+}
 
 // updateOpenGLContext
 // Update OpenGL context (bind to current window, etc)
@@ -131,6 +143,11 @@ DEL2D_FUNC(CGLContextObj, createOpenGLContext)(OSXDelegate2DHandle delegate, int
                                                 CGDirectDisplayID display)
 {
     return [(OSXDelegate2D *) delegate createOpenGLContext:depth display:display];
+}
+
+DEL2D_FUNC(CGLPixelFormatObj, getOpenGLPixelFormat)(OSXDelegate2DHandle delegate)
+{
+    return [(OSXDelegate2D *) delegate getOpenGLPixelFormat];
 }
 
 DEL2D_FUNC(void, updateOpenGLContext)(OSXDelegate2DHandle delegate)
