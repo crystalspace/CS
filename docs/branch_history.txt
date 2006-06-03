@@ -1,0 +1,12 @@
+Crystal Space Streaming Loader branch change log.
+http://www.crystalspace3d.org/tikiwiki/tiki-index.php?page=Streaming+Loader
+
+The overall history is in reverse (descending) chronological order, so that
+each new day's entries apears before the previous day's entries.  The
+individual changes for each given day, however, are in normal (ascending)
+chronological order.
+
+3-June-2006
+	- David H. Bronke added a forward declaration of iDataBuffer to
+	  imap/streamsource.h, and added a stubbed-out implementation of
+	  iStreamSource. Also, branch_history.txt was created.

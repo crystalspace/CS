@@ -1,0 +1,3 @@
+SubDir TOP plugins streamloader ;
+
+SubInclude TOP plugins streamloader foreground ;

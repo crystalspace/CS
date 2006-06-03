@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<!-- streamloader_fg.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.streamloader.foreground</name>
+        <implementation>csForegroundStreamingLoader</implementation>
+        <description>Foreground Streaming Loader Plugin</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>
+

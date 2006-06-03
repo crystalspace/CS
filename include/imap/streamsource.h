@@ -22,6 +22,8 @@
 #include "csutil/scf.h"
 #include "csutil/scf_implementation.h"
 
+struct iDataBuffer;
+
 /**\file
  * Streaming data source
  */

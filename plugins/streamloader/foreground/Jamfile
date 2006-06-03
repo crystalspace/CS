@@ -1,0 +1,9 @@
+SubDir TOP plugins streamloader foreground ;
+
+Description streamloader_fg : "Foreground Streaming Loader Plugin" ;
+
+Plugin streamloader_fg
+        : [ Wildcard *.cpp *.h ]
+;
+LinkWith streamloader_fg : crystalspace ;
+

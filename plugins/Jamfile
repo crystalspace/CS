@@ -23,6 +23,7 @@ SubInclude TOP plugins reporter ;
 SubInclude TOP plugins sequence ;
 SubInclude TOP plugins sndsys ;
 SubInclude TOP plugins stdrep ;
+SubInclude TOP plugins streamloader ;
 SubInclude TOP plugins terraformer ;
 SubInclude TOP plugins video ;
 
