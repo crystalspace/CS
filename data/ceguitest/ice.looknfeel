@@ -101,6 +101,10 @@
     ***************************************************
     -->
     <WidgetLook name="ice/RadioButton">
+        <Property name="NormalTextColour" value="FF000000" />
+        <Property name="HoverTextColour" value="FF000000" />
+        <Property name="PushedTextColour" value="FF000000" />
+        <Property name="DisabledTextColour" value="FF888888" />
         <ImagerySection name="label">
             <TextComponent>
                 <Area>
@@ -223,6 +227,10 @@
     ***************************************************
     -->
     <WidgetLook name="ice/Checkbox">
+        <Property name="NormalTextColour" value="FF000000" />
+        <Property name="HoverTextColour" value="FF000000" />
+        <Property name="PushedTextColour" value="FF000000" />
+        <Property name="DisabledTextColour" value="FF888888" />
         <ImagerySection name="label">
             <TextComponent>
                 <Area>
@@ -346,6 +354,12 @@
     -->
     <WidgetLook name="ice/Editbox">
         <Property name="MouseCursorImage" value="set:ice image:MouseTextBar" />
+        <Property name="ActiveSelectionColour" value="FFFFFFFF" />
+        <Property name="InactiveSelectionColour" value="FF999999" />
+        <Property name="NormalTextColour" value="FF000000" />
+        <Property name="HoverTextColour" value="FF000000" />
+        <Property name="PushedTextColour" value="FF000000" />
+        <Property name="DisabledTextColour" value="FF888888" />
         <NamedArea name="TextArea">
             <Area>
                 <Dim type="LeftEdge" ><AbsoluteDim value="5" /></Dim>
@@ -2573,6 +2587,10 @@
     <WidgetLook name="ice/MultiLineEditbox">
         <Property name="MouseCursorImage" value="set:ice image:MouseTextBar" />
         <Property name="SelectionBrushImage" value="set:ice image:MultiLineEditboxSelectionBrush" />
+        <Property name="NormalTextColour" value="FF000000" />
+        <Property name="HoverTextColour" value="FF000000" />
+        <Property name="PushedTextColour" value="FF000000" />
+        <Property name="DisabledTextColour" value="FF888888" />
         <NamedArea name="TextArea">
             <Area>
                 <Dim type="LeftEdge" ><ImageDim imageset="ice" image="MultiLineEditboxLeft" dimension="Width" /></Dim>
