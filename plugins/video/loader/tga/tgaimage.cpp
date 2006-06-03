@@ -405,6 +405,8 @@ bool ImageTgaFile::TgaLoader::InitOk()
 
   Height = tga_head.Height;
   Width = tga_head.Width;
+  if ((Width > 0x8000) || (Height > 0x8000)
+    || ((Width * Height) > (128*1024*1024))) return false;
   colorMapSize = tga_head.Length;
 
   if (tga_head.ImgType == TGA_Map ||

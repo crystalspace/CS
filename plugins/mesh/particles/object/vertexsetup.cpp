@@ -374,7 +374,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
   public:
     CS_FORCEINLINE
     UnrotatedVertexSetup (const ParticleDirT& pd, const ParticleSizeT& ps)
-      : Base (pd, ps)
+      : BaseVertexSetup<ParticleDirT, ParticleSizeT> (pd, ps)
     {}
 
     CS_FORCEINLINE
@@ -386,10 +386,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
         const csParticle& particle = particleBuffer.particleData[pidx];
         const csParticleAux& aux = particleBuffer.particleAuxData[pidx];
 
-        Update (particle, aux);
+        this->Update (particle, aux);
         
-        const csVector3 partX = partDir.GetX () * partSize.GetX ();
-        const csVector3 partY = partDir.GetY () * partSize.GetY ();
+        const csVector3 partX = this->partDir.GetX () * this->partSize.GetX ();
+        const csVector3 partY = this->partDir.GetY () * this->partSize.GetY ();
 
         const csVector3& particleCenter = particle.position;
 
@@ -410,7 +410,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
   public:
     CS_FORCEINLINE
     RotatedVertexSetup (const ParticleDirT& pd, const ParticleSizeT& ps)
-      : Base (pd, ps)
+      : BaseVertexSetup<ParticleDirT, ParticleSizeT> (pd, ps)
     {}
 
     CS_FORCEINLINE
@@ -422,7 +422,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
         const csParticle& particle = particleBuffer.particleData[pidx];
         const csParticleAux& aux = particleBuffer.particleAuxData[pidx];
 
-        Update (particle, aux);
+        this->Update (particle, aux);
 
         csVector3 tmpV;
         float rot;
@@ -431,19 +431,19 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
         const float s = sinf(r);
         const float c = cosf(r);
 
-        const float pX = partSize.GetX ();
-        const float pY = partSize.GetX ();
+        const float pX = this->partSize.GetX ();
+        const float pY = this->partSize.GetX ();
 
-        csVector3 partX = partDir.GetX () * (pX*c - pY*s);
-        csVector3 partY = partDir.GetY () * (pX*s + pY*c);
+        csVector3 partX = this->partDir.GetX () * (pX*c - pY*s);
+        csVector3 partY = this->partDir.GetY () * (pX*s + pY*c);
 
         const csVector3& particleCenter = particle.position;
 
         vertexBuffer[0] = particleCenter - partX + partY;
         vertexBuffer[2] = particleCenter + partX - partY;
 
-        partX = partDir.GetX () * (-pX*c - pY*s);
-        partY = partDir.GetY () * (-pX*s + pY*c);
+        partX = this->partDir.GetX () * (-pX*c - pY*s);
+        partY = this->partDir.GetY () * (-pX*s + pY*c);
 
         vertexBuffer[1] = particleCenter - partX + partY;
         vertexBuffer[3] = particleCenter + partX - partY;

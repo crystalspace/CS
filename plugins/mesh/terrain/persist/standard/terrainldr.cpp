@@ -246,7 +246,7 @@ bool csTerrainFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent,
     
     csBox2 box = tfact->GetSamplerRegion ();
     csBox3 box3 (box.MinX(), box.MinY(), 0, box.MaxX(), box.MaxY(), 0);
-    synldr->WriteBox (sampleRegionNode, &box3);
+    synldr->WriteBox (sampleRegionNode, box3);
   }
   
   return true;
@@ -555,7 +555,7 @@ bool csTerrainObjectSaver::WriteDown (iBase* obj, iDocumentNode* parent,
       csRef<iDocumentNode> colorNode = 
         paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
       colorNode->SetValue("color");
-      synldr->WriteColor(colorNode, &col);
+      synldr->WriteColor(colorNode, col);
     }
 
     //Writedown Material tag

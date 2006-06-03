@@ -128,7 +128,7 @@ Here are some general formatting conventions.
 @item
 When creating @code{@@itemize} lists, one blank line should separate each
 @code{@@item} except for short lists of items with short descriptions.  Also
-remember to use the @code{@@bullet} directive after the @code{@@itemze}
+remember to use the @code{@@bullet} directive after the @code{@@itemize}
 directive, as in @code{@@itemize @@bullet}.
 
 @item

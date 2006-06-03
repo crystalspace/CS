@@ -89,8 +89,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
                                                           scfFakeInterface<iParticleEmitter> >
   {
   public:
+    typedef scfImplementation3<ParticleEmitterHelper<T>,
+                               T,
+                               scfFakeInterface<iParticleBuiltinEmitterBase>,
+                               scfFakeInterface<iParticleEmitter> > base;
+
     ParticleEmitterHelper ()
-      : scfImplementationType (this),
+      : base (this),
       isEnabled (true), startTime (-1), duration (FLT_MAX),
       initialTTLMin(1.0f), initialTTLMax (1.0f), initialMassMin (1.0f), 
       initialMassMax (1.0f),

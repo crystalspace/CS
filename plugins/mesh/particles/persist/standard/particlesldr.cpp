@@ -195,7 +195,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ParticlesLoader)
       break;
     case XMLTOKEN_EMITTER:
       {
-        csRef<iParticleEmitter> emitter;
+        csRef<iParticleEmitter> emitter = ParseEmitter (node);
 
         if (!emitter)
         {
@@ -226,9 +226,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(ParticlesLoader)
     return true;
   }
 
-
-  bool ParticlesBaseLoader::ParseEmitter (csRef<iParticleEmitter>& newEmitter,
-    iDocumentNode* node)
+  
+  csPtr<iParticleEmitter> ParticlesBaseLoader::ParseEmitter (iDocumentNode* node)
   {
     const char* emitterType = node->GetAttributeValue ("type");
     
@@ -236,7 +235,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ParticlesLoader)
     {
       synldr->ReportError ("crystalspace.particleloader.parseemitter", node,
         "No emitter type specified!");
-      return false;
+      return 0;
     }
 
     csRef<iParticleBuiltinEmitterFactory> factory = 
@@ -247,7 +246,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ParticlesLoader)
     {
       synldr->ReportError ("crystalspace.particleloader.parseemitter", node,
         "Could not load particle emitter factory!");
-      return false;
+      return 0;
     }
 
     //properties
@@ -276,7 +275,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ParticlesLoader)
         {
           if(!synldr->ParseBool (child, enabled, true))
           {
-            return false;
+            return 0;
           }
         }
         break;
@@ -305,8 +304,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(ParticlesLoader)
         {
           if (!synldr->ParseVector (child, position))
           {
-            synldr->ReportError ("crystalspace.particleloader.parsebase", child,
-              "Error parsing position!");
+            synldr->ReportError ("crystalspace.particleloader.parseemitter", 
+              child, "Error parsing position!");
           }
         }
         break;
@@ -321,22 +320,22 @@ CS_PLUGIN_NAMESPACE_BEGIN(ParticlesLoader)
             placement = CS_PARTICLE_BUILTIN_SURFACE;
           else
           {
-            synldr->ReportError ("crystalspace.particleloader.parsebase", child,
-              "Unknown particle placement mode (%s)!", p);
-            return false;
+            synldr->ReportError ("crystalspace.particleloader.parseemitter", 
+              child, "Unknown particle placement mode (%s)!", p);
+            return 0;
           }
         }
         break;
       case XMLTOKEN_UNIFORMVELOCITY:
         if (!synldr->ParseBool (child, unifromVelocity, true))
         {
-          return false;
+          return 0;
         }       
         break;
       case XMLTOKEN_INITIALVELOCITY:
         if (!synldr->ParseVector (child, initialVelocity))
         {
-          return false;
+          return 0;
         }
         break;
       case XMLTOKEN_RADIUS:
@@ -354,12 +353,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(ParticlesLoader)
       case XMLTOKEN_BOX:
         if (!synldr->ParseBox (child, box))
         {
-          return false;
+          return 0;
         }
         break;
       default:
         synldr->ReportBadToken (child);
-        return false;
+        return 0;
       }
     }
 
@@ -398,14 +397,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(ParticlesLoader)
     }
     else
     {
-      synldr->ReportError ("crystalspace.particleloader.parsebase", node,
+      synldr->ReportError ("crystalspace.particleloader.parseemitter", node,
               "Unknown emitter type (%s)!", emitterType);
-      return false;
+      return 0;
     }
 
     if (!baseEmitter)
     {
-      return false;
+      return 0;
     }
 
     // Set base properties
@@ -415,16 +414,103 @@ CS_PLUGIN_NAMESPACE_BEGIN(ParticlesLoader)
     baseEmitter->SetParticlePlacement (placement);
     
     // Set common properties
-    newEmitter = baseEmitter;
-    newEmitter->SetEnabled (enabled);
-    newEmitter->SetStartTime (startTime);
-    newEmitter->SetDuration (duration);
-    newEmitter->SetEmissionRate (emissionRate);
-    newEmitter->SetInitialTTL (minTTL, maxTTL);
-    newEmitter->SetInitialMass (minMass, maxMass);
+    baseEmitter->SetEnabled (enabled);
+    baseEmitter->SetStartTime (startTime);
+    baseEmitter->SetDuration (duration);
+    baseEmitter->SetEmissionRate (emissionRate);
+    baseEmitter->SetInitialTTL (minTTL, maxTTL);
+    baseEmitter->SetInitialMass (minMass, maxMass);
 
-    return true;
+    return csPtr<iParticleEmitter> (baseEmitter);
   }
+
+
+  csPtr<iParticleEffector> ParticlesBaseLoader::ParseEffector (
+    iDocumentNode* node)
+  {
+    const char* effectorType = node->GetAttributeValue ("type");
+
+    if (!effectorType)
+    {
+      synldr->ReportError ("crystalspace.particleloader.parseeffector", node,
+        "No effector type specified!");
+      return 0;
+    }
+
+    csRef<iParticleBuiltinEffectorFactory> factory = 
+      csLoadPluginCheck<iParticleBuiltinEffectorFactory> (
+      objectRegistry, "crystalspace.mesh.object.particles.effector", false);
+
+    if (!factory)
+    {
+      synldr->ReportError ("crystalspace.particleloader.parseeffector", node,
+        "Could not load particle effector factory!");
+      return 0;
+    }
+
+    csRef<iParticleEffector> effector;
+    csVector3 force (0.0f), acceleration (0.0f);
+
+    csRef<iDocumentNodeIterator> it = node->GetNodes ();
+    while (it->HasNext ())
+    {
+      csRef<iDocumentNode> child = it->Next ();
+
+      if (child->GetType () != CS_NODE_ELEMENT) 
+        continue;
+
+      const char* value = child->GetValue ();
+      csStringID id = xmltokens.Request (value);
+      switch(id)
+      {
+      case XMLTOKEN_ACCELERATION:
+        {
+          if (!synldr->ParseVector (child, acceleration))
+          {
+            synldr->ReportError ("crystalspace.particleloader.parseeffector", child,
+              "Error parsing acceleration!");
+          }
+        }
+        break;
+      case XMLTOKEN_FORCE:
+        {
+          if (!synldr->ParseVector (child, force))
+          {
+            synldr->ReportError ("crystalspace.particleloader.parseeffector", child,
+              "Error parsing force!");
+          }
+        }
+        break;
+      default:
+        synldr->ReportBadToken (child);
+        return 0;
+      }
+    }
+
+
+    if (!strcasecmp (effectorType, "force"))
+    {
+      csRef<iParticleBuiltinEffectorForce> forceEffector = factory->CreateForce ();
+      effector = forceEffector;
+      forceEffector->SetAcceleration (acceleration);
+      forceEffector->SetForce (force);
+    }
+    else
+    {
+      synldr->ReportError ("crystalspace.particleloader.parseeffector", node,
+        "Unknown effector type (%s)!", effectorType);
+      return 0;
+    }
+
+    if (!effector)
+    {
+      return 0;
+    }
+
+
+    return csPtr<iParticleEffector> (effector);
+  }
+
 
 
   csPtr<iBase> ParticlesFactoryLoader::Parse (iDocumentNode* node,

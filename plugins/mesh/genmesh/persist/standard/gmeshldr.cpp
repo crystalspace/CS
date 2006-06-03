@@ -760,7 +760,7 @@ bool csGeneralFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent,
       triaNode->SetValue("v");
       csVector3 vertex = gfact->GetVertices()[i];
       csVector2 texel = gfact->GetTexels()[i];
-      synldr->WriteVector(triaNode, &vertex);
+      synldr->WriteVector(triaNode, vertex);
       triaNode->SetAttributeAsFloat("u", texel.x);
       triaNode->SetAttributeAsFloat("v", texel.y);
     }
@@ -774,7 +774,7 @@ bool csGeneralFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent,
           paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
         colorNode->SetValue("color");
         csColor4 color = gfact->GetColors()[i];
-        synldr->WriteColor(colorNode, &color);
+        synldr->WriteColor(colorNode, color);
       }
     }
 
@@ -797,7 +797,7 @@ bool csGeneralFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent,
       csRef<iDocumentNode> colorNode = 
         paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
       colorNode->SetValue("defaultcolor");
-      synldr->WriteColor(colorNode, &col);
+      synldr->WriteColor(colorNode, col);
     }
 
     //Writedown Material tag
@@ -874,7 +874,7 @@ bool csGeneralFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent,
           paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
         normalNode->SetValue("n");
         csVector3 normal = gfact->GetNormals()[i];
-        synldr->WriteVector(normalNode, &normal);
+        synldr->WriteVector(normalNode, normal);
       }
     }
 
@@ -1268,7 +1268,7 @@ bool csGeneralMeshSaver::WriteDown (iBase* obj, iDocumentNode* parent,
     csRef<iDocumentNode> colorNode = 
       paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
     colorNode->SetValue("color");
-    synldr->WriteColor(colorNode, &col);
+    synldr->WriteColor(colorNode, col);
 
     //Writedown ManualColor tag
     synldr->WriteBool(paramsNode, "manualcolors",

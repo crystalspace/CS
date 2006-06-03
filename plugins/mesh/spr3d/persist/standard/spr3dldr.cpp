@@ -414,7 +414,7 @@ bool csSprite3DFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent,
         csVector3 vertex = spritefact->GetVertex(i,j);
         csVector2 texel = spritefact->GetTexel(i,j);
         //vertexNode->SetAttribute("name", sprite_frame->GetName());
-        synldr->WriteVector(vertexNode, &vertex);
+        synldr->WriteVector(vertexNode, vertex);
         vertexNode->SetAttributeAsFloat("u", texel.x);
         vertexNode->SetAttributeAsFloat("v", texel.y);
       }
@@ -719,7 +719,7 @@ bool csSprite3DSaver::WriteDown (iBase* obj, iDocumentNode* parent,
     csRef<iDocumentNode> colorNode = 
       paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
     colorNode->SetValue("basecolor");
-    synldr->WriteColor(colorNode, &col);
+    synldr->WriteColor(colorNode, col);
 
     //Writedown Action tag
     const char* actionname = sprite->GetCurAction()->GetName();

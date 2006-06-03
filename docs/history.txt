@@ -6,6 +6,47 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+31-May-2006
+	- res tweaked the Thing lightmap loader to use a block allocator
+	  instead of a pool for the lightmap buffers.
+	- Marten fixed the quaternion class. The woman in flarge now looks
+	  normal, or at least as normal as before.
+30-May-2006
+	- res improved the debug facilities for the ATI_fragment_shader 
+	  support in glshader_ps1.
+	- res changed glshader_ps1 to use a plugin namespace.
+	- res fixed the software canvases to properly flip alpha component
+	  of colors again before before doing alpha-blended 2D ops.
+	- res changed the Thing lightmap loading to do somewhat less memory
+	  allocations.
+29-May-2006
+	- Jorrit mentioned the new location of Cal3d (gna.org) in the
+	  manual.
+	- Jorrit fixed a big performance problem in the opcode plugin.
+	  In some cases (i.e. flat surfaces) it would fall into a very
+	  bad loop when initialization colliders. This badly affected
+	  terrain since that is now initialization colliders constantly.
+	  Performance when moving on one particular spot in a test
+	  level I got went up from 0.2 to 23 fps.
+	- res fixed the software canvases to not strip the alpha component
+	  off colors before before doing alpha-blended 2D ops.
+	- res changed the Win32 custom cursor code to only create cursors with
+	  an alpha channel when the color depth is at least 24bpp.
+	- res tweaked dsplex to not recursively use itself in all cases.
+	- res tweaked the TGA loader to reject unusually large images. (TGAs
+	  don't have a "magic" file identifier, so it can happen that some
+	  random file is interpreted as a TGA image. So some heuristics to
+	  reject bogus "images" are needed.)
+	- res fixed a crash in the ddraw2d plugin when switching the double
+	  buffer mode while in a BeginDraw()/EndDraw().
+	- res changed fontplex to also use any available font server 
+	  automatically and not just those explicitly specified by the user.
+	  This behaviour is more like the other multiplexers.
+	- res changed picview so it really starts on the first file on startup
+	  and also skips over directories properly when seeking the next/prev
+	  image.
+	- res added a picview.cfg.
+	- res removed support for per-pass SVs from xmlshader.
 28-May-2006
 	- Jorrit copied some documentation out of the wiki into CS.
 	  Documentation contributed by 'adu'. He added the 'sounds'
@@ -21,6 +62,9 @@ chronological order.
 	- res reworded, reordered and somewhat compacted the feature list.
 	- Jorrit completed the portal container documentation.
 	- Marten added the new particle system and loader.
+	- res changed iSyntaxService to let the various Write*() methods take
+	  const refs instead of pointers of the values to write.
+	- res moved cssynldr to new SCF.
 27-May-2006
 	- res fixed the delimIgnoreDifferent mode for 
 	  csStringArray::SplitString() to work as it should.

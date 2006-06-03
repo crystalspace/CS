@@ -355,13 +355,13 @@ bool csSpiralSaver::WriteDown (iBase* obj, iDocumentNode* parent,
     mesh->GetColor(col);
     csRef<iDocumentNode> colorNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
     colorNode->SetValue("color");
-    synldr->WriteColor(colorNode, &col);
+    synldr->WriteColor(colorNode, col);
 
     //Writedown Source tag
     csVector3 source = spiralstate->GetSource();
     csRef<iDocumentNode> sourceNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
     sourceNode->SetValue("source");
-    synldr->WriteVector(sourceNode, &source);
+    synldr->WriteVector(sourceNode, source);
 
     //Writedown ParticleSize tag
     float dw, dh;

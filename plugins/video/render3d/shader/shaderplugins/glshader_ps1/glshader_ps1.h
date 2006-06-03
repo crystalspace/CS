@@ -26,6 +26,9 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 struct csGLExtensionManager;
 class csGLStateCache;
 
+CS_PLUGIN_NAMESPACE_BEGIN(GLShaderPS1)
+{
+
 class csGLShader_PS1 : public scfImplementation2<csGLShader_PS1, 
 					         iShaderProgramPlugin,
 					         iComponent>
@@ -41,6 +44,7 @@ public:
   iObjectRegistry* object_reg;
   bool useLists;
   bool doVerbose;
+  bool dumpTo14ConverterOutput;
 
   csGLShader_PS1 (iBase *parent);
   virtual ~csGLShader_PS1 ();
@@ -60,6 +64,9 @@ public:
   bool Initialize (iObjectRegistry* reg);
   /** @} */
 };
+
+}
+CS_PLUGIN_NAMESPACE_END(GLShaderPS1)
 
 #endif //__GLSHADER_PS1_H__
 

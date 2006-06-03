@@ -1591,7 +1591,7 @@ csThing::~csThing ()
   delete[] polygon_world_planes;
 }
 
-char* csThing::GenerateCacheName ()
+csString csThing::GenerateCacheName ()
 {
   csBox3 b;
   static_data->GetBoundingBox (b);
@@ -1615,8 +1615,7 @@ char* csThing::GenerateCacheName ()
   }
 
   csMD5::Digest digest = csMD5::Encode (mf.GetData (), mf.GetSize ());
-  csString hex(digest.HexString());
-  return hex.Detach();
+  return digest.HexString();
 }
 
 void csThing::MarkLightmapsDirty ()
@@ -2268,9 +2267,10 @@ void csThing::InitializeDefault (bool clear)
 bool csThing::ReadFromCache (iCacheManager* cache_mgr)
 {
   PrepareSomethingOrOther ();
-  char* cachename = GenerateCacheName ();
-  cache_mgr->SetCurrentScope (cachename);
-  delete[] cachename;
+  {
+    csString cachename = GenerateCacheName ();
+    cache_mgr->SetCurrentScope (cachename);
+  }
 
   // For error reporting.
   const char* thing_name = 0;
@@ -2283,7 +2283,7 @@ bool csThing::ReadFromCache (iCacheManager* cache_mgr)
   csRef<iDataBuffer> db = cache_mgr->ReadCache ("thing_lm", 0, (uint32) ~0);
   if (db)
   {
-    csMemFile mf ((const char*)(db->GetData ()), db->GetSize ());
+    csMemFile mf (db, true);
     size_t i;
     for (i = 0; i < polygons.Length (); i++)
     {
@@ -2319,9 +2319,8 @@ bool csThing::ReadFromCache (iCacheManager* cache_mgr)
 
 bool csThing::WriteToCache (iCacheManager* cache_mgr)
 {
-  char* cachename = GenerateCacheName ();
+  csString cachename = GenerateCacheName ();
   cache_mgr->SetCurrentScope (cachename);
-  delete[] cachename;
 
   size_t i;
   bool rc = false;
