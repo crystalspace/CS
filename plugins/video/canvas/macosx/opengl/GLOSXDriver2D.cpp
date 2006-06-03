@@ -76,9 +76,7 @@ bool GLOSXDriver2D::Initialize(iObjectRegistry *reg)
 // Open the window/switch to fullscreen as necessary
 bool GLOSXDriver2D::Open()
 {
-  CGLPixelFormatObj format;
-  long return_val;
-  long screen;
+  long * values;
 
   // Check if already open has already been called
   if (is_open)
@@ -95,29 +93,18 @@ bool GLOSXDriver2D::Open()
 
   // Initialize function pointers
   SetupDrawingFunctions();
-  
-  format = OSXDelegate2D_getOpenGLPixelFormat(delegate);
-  
-  CGLGetVirtualScreen(context, &screen);
-  
-  CGLDescribePixelFormat(format, screen, kCGLPFAColorSize, &return_val);
-  currentFormat[glpfvColorBits] = return_val;
 
-  CGLDescribePixelFormat(format, screen, kCGLPFAAlphaSize, &return_val);
-  currentFormat[glpfvAlphaBits] = 0;
+  // Initialize currentFormat with bit-depth & other info
+  values = OSXDelegate2D_getOpenGLPixelFormatValues(delegate);
 
-  CGLDescribePixelFormat(format, screen, kCGLPFADepthSize, &return_val);
-  currentFormat[glpfvDepthBits] = return_val;
-
-  CGLDescribePixelFormat(format, screen, kCGLPFAStencilSize, &return_val);
-  currentFormat[glpfvStencilBits] = return_val;
-
-  CGLDescribePixelFormat(format, screen, kCGLPFAAccumSize, &return_val);
-  currentFormat[glpfvAccumColorBits] = return_val;
-
+  currentFormat[glpfvColorBits] = values[0];
+  currentFormat[glpfvAlphaBits] = values[1];
+  currentFormat[glpfvDepthBits] = values[2];
+  currentFormat[glpfvStencilBits] = values[3];
+  currentFormat[glpfvAccumColorBits] = values[4];
   currentFormat[glpfvAccumAlphaBits] = 0; // No equivalent
-  
-  CGLDestroyPixelFormat(format);
+
+  free(values); // malloc'd in OSXDelegate2D_OpenGL.m
 
   // Context was created in initialize, window was created in
   // OSXDriver2D::Open() - bind them

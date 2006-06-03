@@ -20,7 +20,8 @@
 
 DEL2D_FUNC(CGLContextObj, createOpenGLContext)(OSXDelegate2D delegate, int depth,
                                                 CGDirectDisplayID display);
-DEL2D_FUNC(CGLPixelFormatObj, getOpenGLPixelFormat)(OSXDelegate2D delegate);
+DEL2D_FUNC(long *, getOpenGLPixelFormatValues)
+    (OSXDelegate2D delegate);
 DEL2D_FUNC(void, updateOpenGLContext)(OSXDelegate2D delegate);
 
 #undef DEL2D_FUNC
