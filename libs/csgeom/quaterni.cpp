@@ -71,14 +71,15 @@ void csQuaternion::SetMatrix (const csMatrix3& matrix)
   // Ken Shoemake's article in 1987 SIGGRAPH course notes
   const float trace = matrix.m11 + matrix.m22 + matrix.m33;
 
-  if (trace > 0.0f)
+  if (trace >= 0.0f)
   {
     // Quick-route
-    float s = 0.5f / sqrtf (trace + 1.0f);
-    w = 0.25f / s;
-    v.x = (matrix.m23 - matrix.m32) * s;
-    v.y = (matrix.m31 - matrix.m13) * s;
-    v.z = (matrix.m12 - matrix.m21) * s;
+    float s = sqrtf (trace + 1.0f);
+    w = 0.5f * s;
+    s = 0.5f / s;
+    v.x = (matrix.m32 - matrix.m23) * s;
+    v.y = (matrix.m13 - matrix.m31) * s;
+    v.z = (matrix.m21 - matrix.m12) * s;
   }
   else
   {
@@ -86,29 +87,32 @@ void csQuaternion::SetMatrix (const csMatrix3& matrix)
     if (matrix.m11 > matrix.m22 && matrix.m11 > matrix.m33)
     {
       //X biggest
-      float s = 1.0f / (2.0f * sqrtf (1.0f + matrix.m11 - matrix.m22 - matrix.m33));
+      float s = sqrtf (1.0f + matrix.m11 - matrix.m22 - matrix.m33);
+      v.x = 0.5f * s;
+      s = 0.5f / s;
       w = (matrix.m32 - matrix.m23) * s;
-      v.x = 0.25f / s;
-      v.y = (matrix.m21 + matrix.m12) * s;
+      v.y = (matrix.m12 + matrix.m32) * s;
       v.z = (matrix.m31 + matrix.m13) * s;
     }
     else if (matrix.m22 > matrix.m33)
     {
       //Y biggest
-      float s = 1.0f / (2.0f * sqrtf (1.0f + matrix.m22 - matrix.m11 - matrix.m33));
-      w = (matrix.m31 - matrix.m13) * s;
-      v.x = (matrix.m21 + matrix.m12) * s;
-      v.y = 0.25f / s;
-      v.z = (matrix.m32 + matrix.m23) * s;
+      float s = sqrtf (1.0f + matrix.m22 - matrix.m11 - matrix.m33);
+      v.y = 0.5f * s;
+      s = 0.5f / s;
+      w = (matrix.m13 - matrix.m31) * s;
+      v.x = (matrix.m12 + matrix.m21) * s;
+      v.z = (matrix.m23 + matrix.m32) * s;
     }
     else
     {
       //Z biggest
-      float s = 1.0f / (2.0f * sqrtf (1.0f + matrix.m33 - matrix.m11 - matrix.m22));
+      float s = sqrtf (1.0f + matrix.m33 - matrix.m11 - matrix.m22);
+      v.z = 0.5f * s;
+      s = 0.5f / s;
       w = (matrix.m21 - matrix.m12) * s;
       v.x = (matrix.m31 + matrix.m13) * s;
-      v.y = (matrix.m32 + matrix.m23) * s;
-      v.z = 0.25f / s;
+      v.y = (matrix.m23 + matrix.m32) * s;
     }
   }
 }

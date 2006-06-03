@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+4-Jun-2006
+	- Marten made another fix to the quaternion class. Matrix->Quat->
+	  Matrix seems to yield the original matrix (within tolerable
+	  errors) for all tested matrices now.
 3-Jun-2006
 	- iceeey made some more changes to 'ice' CEGUI skin.
 	- Rhad updated the windows software sound driver (directsound)
