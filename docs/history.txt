@@ -8,6 +8,9 @@ chronological order.
 
 3-Jun-2006
 	- iceeey made some more changes to 'ice' CEGUI skin.
+	- Rhad updated the windows software sound driver (directsound)
+	  so that it should better detect and respond to underbuffer
+	  conditions.
 2-Jun-2006
 	- res fixed compilation of glshader_ps1 on gcc 3.3.
 	- Jorrit fixed two errors in the documentation as reported
