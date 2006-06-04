@@ -14,6 +14,8 @@ chronological order.
 	  to 0 when converting from a bit mask, to prevent undefined mods.
 	- iceeey worked more on the 'ice' CEGUI skin. It should be fairly
 	  complete now.
+	- Rhad changed csLoader::LoadSoundSysData() so that it creates the
+	  iSndSysData object with the filename as the description.
 3-Jun-2006
 	- iceeey made some more changes to 'ice' CEGUI skin.
 	- Rhad updated the windows software sound driver (directsound)

@@ -47,7 +47,7 @@ csPtr<iSndSysData> csLoader::LoadSoundSysData (const char* filename)
   }
 
   // load the sound
-  csRef<iSndSysData> Sound = SndSysLoader->LoadSound (buf);
+  csRef<iSndSysData> Sound = SndSysLoader->LoadSound (buf, filename);
 
   // check for valid sound data
   if (!Sound)
