@@ -10,6 +10,8 @@ chronological order.
 	- Marten made another fix to the quaternion class. Matrix->Quat->
 	  Matrix seems to yield the original matrix (within tolerable
 	  errors) for all tested matrices now.
+	- DaveG fixed csKeyEventHelper to initialize passed csKeyModifiers&
+	  to 0 when converting from a bit mask, to prevent undefined mods.
 3-Jun-2006
 	- iceeey made some more changes to 'ice' CEGUI skin.
 	- Rhad updated the windows software sound driver (directsound)
