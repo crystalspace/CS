@@ -88,7 +88,7 @@
             <Property Name="Position" Value="x:0.4 y:0.1" />
             <Property Name="Size" Value="w:0.5 h:0.5" />
             <Property Name="Text" Value="Demo 7 - Window 2" />
-            <Property Name="CloseButtonEnabled" Value="False" />
+            <Property Name="CloseButtonEnabled" Value="True" />
 
             <Window Type="ice/ProgressBar" Name="Demo7/Window2/Progbar1">
                 <Property Name="RelativeMaxSize" Value="w:1.0 h:1.0" />
