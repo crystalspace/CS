@@ -243,7 +243,6 @@ cp -p  "$SUPPORTDIR/msvcgen/custom.cslib" "$PROJECTNAME/mk/msvcgen"
 if $EXTRAM4
 then
     cp -p "$TEMPLATEDIR/cel.m4" "$PROJECTNAME/mk/autoconf"
-    cp -p "$TEMPLATEDIR/cs_check_host.m4" "$PROJECTNAME/mk/autoconf"
 fi
 
 # instantiate template files
