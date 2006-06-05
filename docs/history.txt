@@ -13,6 +13,8 @@ chronological order.
 	- res changed the "separate debug info" and "optimize mode debug info"
 	  configure options to more appropriately use --enable-... instead of
 	  --with-...
+	- Marten fixed the interface and scfImplementation lines for sound
+	  sources.
 4-Jun-2006
 	- Marten made another fix to the quaternion class. Matrix->Quat->
 	  Matrix seems to yield the original matrix (within tolerable
