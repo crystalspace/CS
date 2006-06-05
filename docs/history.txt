@@ -10,6 +10,9 @@ chronological order.
         - res fixed createproject.sh to not copy cs_check_host.m4 any more
           (since it has moved).
 	- res fixed the Jam project template to utilize include custom.cslib.
+	- res changed the "separate debug info" and "optimize mode debug info"
+	  configure options to more appropriately use --enable-... instead of
+	  --with-...
 4-Jun-2006
 	- Marten made another fix to the quaternion class. Matrix->Quat->
 	  Matrix seems to yield the original matrix (within tolerable
