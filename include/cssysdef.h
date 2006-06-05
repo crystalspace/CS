@@ -573,6 +573,33 @@ Type &Class::getterFunc ()                                     \
 #  define CS_FUNCTION_NAME		"<?\?\?>"
 #endif
 
+#ifndef CS_NO_PTMALLOC
+namespace CS
+{
+  namespace Memory
+  {
+    extern void* CS_CRYSTALSPACE_EXPORT ptmalloc (size_t n);
+    extern void CS_CRYSTALSPACE_EXPORT ptfree (void* p);
+    extern void* CS_CRYSTALSPACE_EXPORT ptrealloc (void* p, size_t n);
+    extern void* CS_CRYSTALSPACE_EXPORT ptmemalign (size_t a, size_t n);
+    extern void* CS_CRYSTALSPACE_EXPORT ptcalloc (size_t n, size_t s);
+  };
+};
+#define malloc 		CS::Memory::ptmalloc
+#define free 	CS::	Memory::ptfree
+#define realloc 	CS::Memory::ptrealloc
+#define memalign	CS::Memory::ptmemalign
+#define calloc 		CS::Memory::ptcalloc
+inline void* operator new (size_t s)
+{ return CS::Memory::ptmalloc (s); }
+inline void* operator new[] (size_t s)
+{ return CS::Memory::ptmalloc (s); }
+inline void operator delete (void* p) 
+{ CS::Memory::ptfree (p); }
+inline void operator delete[] (void* p) 
+{ CS::Memory::ptfree (p); }
+#endif
+
 // The following define should only be enabled if you have defined
 // a special version of overloaded new that accepts two additional
 // parameters: a (void*) pointing to the filename and an int with the

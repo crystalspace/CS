@@ -442,7 +442,7 @@ DEFAULT_MMAP_THRESHOLD       default: 256K
 
 #define MSPACES 1
 #define ONLY_MSPACES 1
-#define USE_LOCKS 1
+#define USE_LOCKS 0
 
 #ifdef _MSC_VER
 /* silence "conversion from 'size_t' to 'bindex_t', possible loss of data" */

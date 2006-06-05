@@ -1,0 +1,14 @@
+Crystal Space detailed change log.
+http://www.crystalspace3d.org/ 
+
+The overall history is in reverse (descending) chronological order, so that
+each new day's entries apears before the previous day's entries.  The
+individual changes for each given day, however, are in normal (ascending)
+chronological order.
+
+5-Jun-2006
+	- res added CS::SpinLock.
+	- res added csScopedLock<> (which also works on non-mutexes).
+	- res changed CS::Memory::Heap to use CS::SpinLock instead of just
+	  relying on dlmalloc's internal spinlock.
+	- res integrated a Win32-enabled version of ptmalloc.
