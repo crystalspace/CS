@@ -16,6 +16,7 @@ chronological order.
 	  complete now.
 	- Rhad changed csLoader::LoadSoundSysData() so that it creates the
 	  iSndSysData object with the filename as the description.
+	- mdmkolbe fixed Java detection under Cygwin.
 3-Jun-2006
 	- iceeey made some more changes to 'ice' CEGUI skin.
 	- Rhad updated the windows software sound driver (directsound)

@@ -351,7 +351,20 @@ AS_IF([test "$with_java" != no && test -n "$JAVAC" && test -n "$JAVA"],
     [CS_JAVA_FLAGS([cs_java], [$JAVAC])
     CS_CHECK_BUILD([if Java2 SDK is usable], [cs_cv_java],
 	[AC_LANG_PROGRAM(
-	    [[#include <jni.h>
+	    [[
+	    #if defined(__GNUC__)
+	        typedef long long __int64; /*For gcc on Windows */
+	    #endif
+
+	    /* fix for 'jlong' on x86_64 */
+	    #if defined(__x86_64)
+	    #ifdef _LP64 /* 64-bit Solaris */
+	    #undef _LP64
+	    #endif
+	    #endif
+
+	    #include <jni.h>
+
 	    JNIEXPORT void JNICALL f(JNIEnv *env, jobject obj);]])],
 	[CS_CREATE_TUPLE() \
         CS_CREATE_TUPLE([$cs_java_cflags],[$cs_java_lflags],[$cs_java_libs])],
