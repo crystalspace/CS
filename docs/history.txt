@@ -7,14 +7,15 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 5-Jun-2006
-        - res fixed createproject.sh to not copy cs_check_host.m4 any more
-          (since it has moved).
+	- res fixed createproject.sh to not copy cs_check_host.m4 any more
+	  (since it has moved).
 	- res fixed the Jam project template to utilize include custom.cslib.
 	- res changed the "separate debug info" and "optimize mode debug info"
 	  configure options to more appropriately use --enable-... instead of
 	  --with-...
 	- Marten fixed the interface and scfImplementation lines for sound
 	  sources.
+	- AndyDude fixed further spelling mistakes in (xmlfmt.txi).
 4-Jun-2006
 	- Marten made another fix to the quaternion class. Matrix->Quat->
 	  Matrix seems to yield the original matrix (within tolerable

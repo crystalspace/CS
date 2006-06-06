@@ -325,7 +325,7 @@ sound from a filename. Here is an example of how it would look:
 
 @example
 <sounds>
-  <sound name="mysong.wav" mode3d="disabled">
+  <sound name="mysong.wav" mode3d="disable">
     <file>mysong.wav</file>
   </sound>
 </sounds>
@@ -336,8 +336,8 @@ As mentioned earlier, The @samp{mode3d} enumeration is one of:
 breakdown of what each of these options implies:
 
 @itemize
-@item @samp{disabled}
-When @samp{mode3d} is @samp{disabled} then no signal processing is done
+@item @samp{disable}
+When @samp{mode3d} is @samp{disable} then no signal processing is done
 to the sound object. This mode allows stereo audio to be stored in a
 sound object. Both other modes only allow one channel.
 @item @samp{relative}
