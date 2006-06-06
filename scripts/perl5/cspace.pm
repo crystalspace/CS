@@ -2731,6 +2731,8 @@ sub new {
 *__eq__ = *cspacec::csRGBcolor___eq__;
 *__ne__ = *cspacec::csRGBcolor___ne__;
 *__add__ = *cspacec::csRGBcolor___add__;
+*UnsafeAdd = *cspacec::csRGBcolor_UnsafeAdd;
+*SafeAdd = *cspacec::csRGBcolor_SafeAdd;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});

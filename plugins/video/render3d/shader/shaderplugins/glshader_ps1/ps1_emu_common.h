@@ -19,12 +19,15 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #ifndef __GLSHADER_PS1_COMMON_H__
 #define __GLSHADER_PS1_COMMON_H__
 
+#include "csgfx/shadervarcontext.h"
+#include "csutil/strhash.h"
+#include "iutil/databuff.h"
+#include "iutil/strset.h"
+#include "ivideo/shader/shader.h"
+
 #include "csplugincommon/shader/shaderplugin.h"
 #include "csplugincommon/shader/shaderprogram.h"
-#include "csgfx/shadervarcontext.h"
-#include "ivideo/shader/shader.h"
-#include "csutil/strhash.h"
-#include "iutil/strset.h"
+
 #include "glshader_ps1.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(GLShaderPS1)

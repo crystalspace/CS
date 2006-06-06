@@ -92,7 +92,9 @@ public:
 
 
 class SndSysSourceSoftwareBasic :
-  public scfImplementation1<SndSysSourceSoftwareBasic, iSndSysSourceSoftware>
+  public scfImplementation2<SndSysSourceSoftwareBasic, 
+                            iSndSysSourceSoftware,
+                            scfFakeInterface<iSndSysSource> >
 {
 public:
   SndSysSourceSoftwareBasic(csRef<iSndSysStream> stream, 
@@ -159,7 +161,9 @@ protected:
 };
 
 class SndSysSourceSoftware3D :
-  public scfImplementation1<SndSysSourceSoftware3D, iSndSysSourceSoftware3D>
+  public scfImplementation2<SndSysSourceSoftware3D, 
+                            iSndSysSourceSoftware3D,
+                            scfFakeInterface<iSndSysSource> >
 {
 public:
 

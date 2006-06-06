@@ -8,6 +8,10 @@
     <WidgetLook name="ice/Button">
         <PropertyDefinition name="VertLabelFormatting" initialValue="CentreAligned" />
         <PropertyDefinition name="HorzLabelFormatting" initialValue="CentreAligned" />
+        <Property name="NormalTextColour" value="FF000000" />
+        <Property name="HoverTextColour" value="FF000000" />
+        <Property name="PushedTextColour" value="FFFFFFFF" />
+        <Property name="DisabledTextColour" value="FF888888" />
         <ImagerySection name="label">
             <TextComponent>
                 <Area>
@@ -101,6 +105,10 @@
     ***************************************************
     -->
     <WidgetLook name="ice/RadioButton">
+        <Property name="NormalTextColour" value="FF000000" />
+        <Property name="HoverTextColour" value="FF000000" />
+        <Property name="PushedTextColour" value="FF000000" />
+        <Property name="DisabledTextColour" value="FF888888" />
         <ImagerySection name="label">
             <TextComponent>
                 <Area>
@@ -223,6 +231,10 @@
     ***************************************************
     -->
     <WidgetLook name="ice/Checkbox">
+        <Property name="NormalTextColour" value="FF000000" />
+        <Property name="HoverTextColour" value="FF000000" />
+        <Property name="PushedTextColour" value="FF000000" />
+        <Property name="DisabledTextColour" value="FF888888" />
         <ImagerySection name="label">
             <TextComponent>
                 <Area>
@@ -346,6 +358,12 @@
     -->
     <WidgetLook name="ice/Editbox">
         <Property name="MouseCursorImage" value="set:ice image:MouseTextBar" />
+        <Property name="ActiveSelectionColour" value="FFFFFFFF" />
+        <Property name="InactiveSelectionColour" value="FF999999" />
+        <Property name="NormalTextColour" value="FF000000" />
+        <Property name="HoverTextColour" value="FF000000" />
+        <Property name="PushedTextColour" value="FF000000" />
+        <Property name="DisabledTextColour" value="FF888888" />
         <NamedArea name="TextArea">
             <Area>
                 <Dim type="LeftEdge" ><AbsoluteDim value="5" /></Dim>
@@ -671,11 +689,14 @@
                     <Dim type="Width" ><UnifiedDim scale="1" type="Width" /></Dim>
                     <Dim type="BottomEdge" ><UnifiedDim scale="1" type="BottomEdge" /></Dim>
                 </Area>
+                <Image type="TopLeftCorner" imageset="ice" image="WindowTopLeft" />
+                <Image type="TopRightCorner" imageset="ice" image="WindowTopRight" />
                 <Image type="BottomLeftCorner" imageset="ice" image="WindowBottomLeft" />
                 <Image type="BottomRightCorner" imageset="ice" image="WindowBottomRight" />
                 <Image type="LeftEdge" imageset="ice" image="WindowLeftEdge" />
                 <Image type="RightEdge" imageset="ice" image="WindowRightEdge" />
                 <Image type="BottomEdge" imageset="ice" image="WindowBottomEdge" />
+                <Image type="TopEdge" imageset="ice" image="WindowTopEdge" />
                 <Image type="Background" imageset="ice" image="ClientBrush" />
                 <VertFormat type="Tiled" />
                 <HorzFormat type="Tiled" />
@@ -1788,6 +1809,12 @@
     -->
     <WidgetLook name="ice/ComboEditbox">
         <Property name="MouseCursorImage" value="set:ice image:MouseTextBar" />
+        <Property name="ActiveSelectionColour" value="FFFFFFFF" />
+        <Property name="InactiveSelectionColour" value="FF999999" />
+        <Property name="NormalTextColour" value="FF000000" />
+        <Property name="HoverTextColour" value="FF000000" />
+        <Property name="PushedTextColour" value="FF000000" />
+        <Property name="DisabledTextColour" value="FF888888" />
         <NamedArea name="TextArea">
             <Area>
                 <Dim type="LeftEdge" ><AbsoluteDim value="5" /></Dim>
@@ -2092,6 +2119,7 @@
     <WidgetLook name="ice/StaticText">
         <Property name="FrameEnabled" value="True" />
         <Property name="BackgroundEnabled" value="True" />
+        <Property name="TextColours" value="tl:FF000000 tr:FF000000 bl:FF000000 br:FF000000" />
         <NamedArea name="TextRenderArea">
             <Area>
                 <Dim type="LeftEdge" ><ImageDim imageset="ice" image="StaticLeft" dimension="Width" /></Dim>
@@ -2569,6 +2597,12 @@
     <WidgetLook name="ice/MultiLineEditbox">
         <Property name="MouseCursorImage" value="set:ice image:MouseTextBar" />
         <Property name="SelectionBrushImage" value="set:ice image:MultiLineEditboxSelectionBrush" />
+        <Property name="ActiveSelectionColour" value="FFFFFFFF" />
+        <Property name="InactiveSelectionColour" value="FF999999" />
+        <Property name="NormalTextColour" value="FF000000" />
+        <Property name="HoverTextColour" value="FF000000" />
+        <Property name="PushedTextColour" value="FF000000" />
+        <Property name="DisabledTextColour" value="FF888888" />
         <NamedArea name="TextArea">
             <Area>
                 <Dim type="LeftEdge" ><ImageDim imageset="ice" image="MultiLineEditboxLeft" dimension="Width" /></Dim>

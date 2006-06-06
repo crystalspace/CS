@@ -3,5 +3,7 @@ Crystal Space detailed change log for newparticles branch.
 
 6-Jun-2006
 	- Marten wrote the particle system saver components.
+	- Marten integrated trunk revisions 24417:24471 to
+	  newparticles branch.
 28-May-2006
 	- Marten added the new particle system and loader.

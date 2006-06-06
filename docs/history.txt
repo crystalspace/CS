@@ -6,6 +6,49 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+6-Jun-2006
+	- Vincent fixed leak-guard enabled build.
+5-Jun-2006
+	- res fixed createproject.sh to not copy cs_check_host.m4 any more
+	  (since it has moved).
+	- res fixed the Jam project template to utilize include custom.cslib.
+	- res changed the "separate debug info" and "optimize mode debug info"
+	  configure options to more appropriately use --enable-... instead of
+	  --with-...
+	- Marten fixed the interface and scfImplementation lines for sound
+	  sources.
+	- AndyDude fixed further spelling mistakes in (xmlfmt.txi).
+4-Jun-2006
+	- Marten made another fix to the quaternion class. Matrix->Quat->
+	  Matrix seems to yield the original matrix (within tolerable
+	  errors) for all tested matrices now.
+	- DaveG fixed csKeyEventHelper to initialize passed csKeyModifiers&
+	  to 0 when converting from a bit mask, to prevent undefined mods.
+	- iceeey worked more on the 'ice' CEGUI skin. It should be fairly
+	  complete now.
+	- Rhad changed csLoader::LoadSoundSysData() so that it creates the
+	  iSndSysData object with the filename as the description.
+	- mdmkolbe fixed Java detection under Cygwin.
+3-Jun-2006
+	- iceeey made some more changes to 'ice' CEGUI skin.
+	- Rhad updated the windows software sound driver (directsound)
+	  so that it should better detect and respond to underbuffer
+	  conditions.
+2-Jun-2006
+	- res fixed compilation of glshader_ps1 on gcc 3.3.
+	- Jorrit fixed two errors in the documentation as reported
+	  by schorsch_76 on the forums.
+	- iceeey added example of handling a CEGUI event to ceguitest.
+	- iceeey made various changes to the 'ice' CEGUI skin -- work
+	  in progress.
+	- AndyDude fixed the 'glosx2d' plugin to get proper bit-depth info.
+1-Jun-2006
+	- Jorrit fixed a bug in csMeshOnTexture where it would add the
+	  begindraw flags from the engine and this would prevent the
+	  persistent flag from working.
+	- res fixed building with gcc 4.1.1 on AMD64 by adding utilizing
+	  the -fPIC flag when testing for -shared.
+	- AndyDude fixed spelling mistakes in my additions (xmlfmt.txi).
 31-May-2006
 	- res tweaked the Thing lightmap loader to use a block allocator
 	  instead of a pool for the lightmap buffers.

@@ -60,6 +60,9 @@ public:
   CEGUITest();
   ~CEGUITest();
 
+  // Handle exit button clicked event
+  bool OnExitButtonClicked (const CEGUI::EventArgs& e);
+
   void OnExit();
   bool OnInitialize(int argc, char* argv[]);
 

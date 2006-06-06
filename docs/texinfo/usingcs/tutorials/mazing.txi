@@ -1038,7 +1038,7 @@ void Laser::Check ()
     if (adv)
     @{
       // Hit!
-      app->ExplodeAdversary (adv);
+      app->GetGame ().ExplodeAdversary (adv);
     @}
   @}
 @}
