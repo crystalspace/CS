@@ -8,6 +8,7 @@ chronological order.
 
 6-Jun-2006
 	- Vincent fixed leak-guard enabled build.
+	- Eric Sunshine added missing #include <new> to csutil/radixsort.h.
 5-Jun-2006
 	- res fixed createproject.sh to not copy cs_check_host.m4 any more
 	  (since it has moved).

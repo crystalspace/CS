@@ -25,6 +25,7 @@
  */
 
 #include "csextern.h"
+#include <new>
 
 /**
  * A radix-sorter for signed and unsigned integers as well as floats.
