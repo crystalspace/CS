@@ -44,8 +44,9 @@ MsvcGenTemplateDir TOP mk msvcgen ;
 MsvcGenWorkspace #PROJECTNAME# ;
 
 # Customize the build configurations to contain some defines required by
-# CrystalSpace.
-MsvcGenVariable customize : mk/msvcgen/custom.cslib ;
+# CrystalSpace.  NOTE: The file with the customization options is assumed
+# to reside in mk/msvcgen/.
+MsvcGenVariable customize : custom.cslib ;
 
 local hash = "\$" ;
 MsvcGenConfig CRYSTAL.AVAILABLE : yes ;
