@@ -152,7 +152,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
       particleOrientation = o;
     }
 
-    virtual csParticleRenderOrientation SetParticleRenderOrientation () const
+    virtual csParticleRenderOrientation GetParticleRenderOrientation () const
     {
       return particleOrientation;
     }
@@ -463,7 +463,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
       particleOrientation = o;
     }
 
-    virtual csParticleRenderOrientation SetParticleRenderOrientation () const
+    virtual csParticleRenderOrientation GetParticleRenderOrientation () const
     {
       return particleOrientation;
     }

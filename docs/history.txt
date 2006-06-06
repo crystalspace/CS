@@ -61,7 +61,6 @@ chronological order.
 	  (should've really been an RFE) #1396182.
 	- res reworded, reordered and somewhat compacted the feature list.
 	- Jorrit completed the portal container documentation.
-	- Marten added the new particle system and loader.
 	- res changed iSyntaxService to let the various Write*() methods take
 	  const refs instead of pointers of the values to write.
 	- res moved cssynldr to new SCF.

@@ -350,7 +350,7 @@ struct iParticleSystemBase : public virtual iBase
   virtual void SetParticleRenderOrientation (csParticleRenderOrientation o) = 0;
 
   /// Get particle type
-  virtual csParticleRenderOrientation SetParticleRenderOrientation () const = 0;
+  virtual csParticleRenderOrientation GetParticleRenderOrientation () const = 0;
 
   /// Set particle rotation mode
   virtual void SetRotationMode (csParticleRotationMode mode) = 0;

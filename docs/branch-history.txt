@@ -1,0 +1,7 @@
+Crystal Space detailed change log for newparticles branch.
+
+
+6-Jun-2006
+	- Marten wrote the particle system saver components.
+28-May-2006
+	- Marten added the new particle system and loader.

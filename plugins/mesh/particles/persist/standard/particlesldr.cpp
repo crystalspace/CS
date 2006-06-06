@@ -21,14 +21,22 @@
 
 #include "particlesldr.h"
 
+#include "csutil/set.h"
+
 #include "iengine/mesh.h"
 #include "imap/ldrctxt.h"
 #include "imesh/object.h"
 #include "imesh/particles.h"
 #include "iutil/document.h"
 #include "iutil/plugin.h"
+#include "iutil/object.h"
 
 CS_IMPLEMENT_PLUGIN
+
+CS_SPECIALIZE_TEMPLATE
+class csHashComputer<iParticleEmitter*> : public csHashComputerIntegral<iParticleEmitter*> {};
+CS_SPECIALIZE_TEMPLATE
+class csHashComputer<iParticleEffector*> : public csHashComputerIntegral<iParticleEffector*> {};
 
 CS_PLUGIN_NAMESPACE_BEGIN(ParticlesLoader)
 {
@@ -629,6 +637,540 @@ CS_PLUGIN_NAMESPACE_BEGIN(ParticlesLoader)
 
     return csPtr<iBase> (meshObj);
   }
+
+
+  ParticlesBaseSaver::ParticlesBaseSaver (iBase* p)
+    : scfImplementationType (this, p), objectRegistry (0)
+  {
+  }
+
+  bool ParticlesBaseSaver::Initialize (iObjectRegistry* objreg)
+  {
+    objectRegistry = objreg;
+    synldr = csQueryRegistry<iSyntaxService> (objectRegistry);
+    return true;
+  }
+
+  bool ParticlesBaseSaver::WriteOrientation(iDocumentNode *paramsNode, 
+    csParticleRenderOrientation orientation)
+  {
+    csRef<iDocumentNode> orientationNode = paramsNode->CreateNodeBefore (
+      CS_NODE_ELEMENT, 0);
+    orientationNode->SetValue ("renderorientation");
+    csRef<iDocumentNode> valueNode = orientationNode->CreateNodeBefore (CS_NODE_TEXT, 0);
+
+    switch (orientation)
+    {
+    case CS_PARTICLE_CAMERAFACE:
+      valueNode->SetValue ("camface");
+      break;
+    case CS_PARTICLE_CAMERAFACE_APPROX:
+      valueNode->SetValue ("camface approx");
+      break;
+    case CS_PARTICLE_ORIENT_COMMON:
+      valueNode->SetValue ("common");
+      break;
+    case CS_PARTICLE_ORIENT_COMMON_APPROX:
+      valueNode->SetValue ("common approx");
+      break;
+    case CS_PARTICLE_ORIENT_VELOCITY:
+      valueNode->SetValue ("velocity");
+      break;
+    case CS_PARTICLE_ORIENT_SELF:
+      valueNode->SetValue ("self");
+      break;
+    case CS_PARTICLE_ORIENT_SELF_FORWARD:
+      valueNode->SetValue ("self forward");
+      break;
+    default:
+      valueNode->SetValue ("camface");
+    }
+
+    return true;
+  }
+
+  bool ParticlesBaseSaver::WriteRotation (iDocumentNode* paramsNode,
+    csParticleRotationMode rot)
+  {
+    csRef<iDocumentNode> rotationNode = paramsNode->CreateNodeBefore (
+      CS_NODE_ELEMENT, 0);
+    rotationNode->SetValue ("rotationmode");
+    csRef<iDocumentNode> valueNode = rotationNode->CreateNodeBefore (CS_NODE_TEXT, 0);
+    
+    switch (rot)
+    {
+    case CS_PARTICLE_ROTATE_NONE:
+      valueNode->SetValue ("none");
+      break;
+    case CS_PARTICLE_ROTATE_TEXCOORD:
+      valueNode->SetValue ("texcoord");
+      break;
+    case CS_PARTICLE_ROTATE_VERTICES:
+      valueNode->SetValue ("vertex");
+      break;
+    default:
+      valueNode->SetValue ("none");
+    }
+
+    return true;
+  }
+  
+  bool ParticlesBaseSaver::WriteSort(iDocumentNode *paramsNode, csParticleSortMode sort)
+  {
+    csRef<iDocumentNode> sortNode = paramsNode->CreateNodeBefore (
+      CS_NODE_ELEMENT, 0);
+    sortNode->SetValue ("sortmode");
+    csRef<iDocumentNode> valueNode = sortNode->CreateNodeBefore (CS_NODE_TEXT, 0);
+    
+    switch (sort)
+    {
+    case CS_PARTICLE_SORT_NONE:
+      valueNode->SetValue ("none");
+      break;
+    case CS_PARTICLE_SORT_DISTANCE:
+      valueNode->SetValue ("distance");
+      break;
+    case CS_PARTICLE_SORT_DOT:
+      valueNode->SetValue ("dot");
+      break;
+    default:
+      valueNode->SetValue ("none");
+    }    
+
+    return true;
+  }
+
+  bool ParticlesBaseSaver::WriteIntegration(iDocumentNode *paramsNode, 
+    csParticleIntegrationMode integ)
+  {
+    csRef<iDocumentNode> integNode = paramsNode->CreateNodeBefore (
+      CS_NODE_ELEMENT, 0);
+    integNode->SetValue ("integrationmode");
+    csRef<iDocumentNode> valueNode = integNode->CreateNodeBefore (CS_NODE_TEXT, 0);
+    
+    switch (integ)
+    {
+    case CS_PARTICLE_INTEGRATE_NONE:
+      valueNode->SetValue ("none");
+      break;
+    case CS_PARTICLE_INTEGRATE_LINEAR:
+      valueNode->SetValue ("linear");
+      break;
+    case CS_PARTICLE_INTEGRATE_BOTH:
+      valueNode->SetValue ("both");
+      break;
+    default:
+      valueNode->SetValue ("linear");
+    }
+
+    return true;
+  }
+
+  bool ParticlesBaseSaver::WriteEmitter(iDocumentNode *paramsNode, 
+    iParticleEmitter *emitter)
+  {
+    //Try to determine emitter type
+    csRef<iParticleBuiltinEmitterBase> emitterBase = 
+      scfQueryInterfaceSafe<iParticleBuiltinEmitterBase> (emitter);
+
+    if (!emitterBase)
+      return false;
+
+    csRef<iDocumentNode> valueNode;
+
+    //Write base properties
+    csRef<iDocumentNode> emitterNode = paramsNode->CreateNodeBefore (
+      CS_NODE_ELEMENT, 0);
+    emitterNode->SetValue ("emitter");
+
+    //Enabled
+    synldr->WriteBool (emitterNode, "enabled", emitterBase->GetEnabled ());
+
+    //Start time
+    csRef<iDocumentNode> startNode = emitterNode->CreateNodeBefore (
+      CS_NODE_ELEMENT, 0);
+    startNode->SetValue ("starttime");
+    valueNode = startNode->CreateNodeBefore (CS_NODE_TEXT, 0);
+    valueNode->SetValueAsFloat (emitterBase->GetStartTime ());
+
+    //Duration
+    csRef<iDocumentNode> durationNode = emitterNode->CreateNodeBefore (
+      CS_NODE_ELEMENT, 0);
+    durationNode->SetValue ("duration");
+    valueNode = durationNode->CreateNodeBefore (CS_NODE_TEXT, 0);
+    valueNode->SetValueAsFloat (emitterBase->GetDuration ());
+
+    //Emission rate
+    csRef<iDocumentNode> rateNode = emitterNode->CreateNodeBefore (
+      CS_NODE_ELEMENT, 0);
+    rateNode->SetValue ("emissionrate");
+    valueNode = rateNode->CreateNodeBefore (CS_NODE_TEXT, 0);
+    valueNode->SetValueAsFloat (emitterBase->GetEmissionRate ());
+
+    float tmp0, tmp1;
+
+    //TTL
+    emitterBase->GetInitialTTL (tmp0, tmp1);
+    csRef<iDocumentNode> ttlNode = emitterNode->CreateNodeBefore (
+      CS_NODE_ELEMENT, 0);
+    ttlNode->SetValue ("initialttl");
+    ttlNode->SetAttributeAsFloat ("min", tmp0);
+    ttlNode->SetAttributeAsFloat ("max", tmp1);
+
+    //Mass
+    emitterBase->GetInitialMass (tmp0, tmp1);
+    csRef<iDocumentNode> massNode = emitterNode->CreateNodeBefore (
+      CS_NODE_ELEMENT, 0);
+    massNode->SetValue ("mass");
+    massNode->SetAttributeAsFloat ("min", tmp0);
+    massNode->SetAttributeAsFloat ("max", tmp1);
+
+
+    //Position
+    csRef<iDocumentNode> posNode = emitterNode->CreateNodeBefore (
+      CS_NODE_ELEMENT, 0);
+    posNode->SetValue ("position");
+    synldr->WriteVector (posNode, emitterBase->GetPosition ());
+
+    //Placement
+    csParticleBuiltinEmitterPlacement place = emitterBase->GetParticlePlacement ();
+    csRef<iDocumentNode> placeNode = emitterNode->CreateNodeBefore (
+      CS_NODE_ELEMENT, 0);
+    placeNode->SetValue ("placement");
+    valueNode = placeNode->CreateNodeBefore (CS_NODE_TEXT, 0);
+    switch (place)
+    {
+    case CS_PARTICLE_BUILTIN_CENTER:
+      valueNode->SetValue ("center");
+      break;
+    case CS_PARTICLE_BUILTIN_VOLUME:
+      valueNode->SetValue ("volume");
+      break;
+    case CS_PARTICLE_BUILTIN_SURFACE:
+      valueNode->SetValue ("surface");
+      break;
+    default:
+      valueNode->SetValue ("volume");
+    }
+
+    //Uniform velocity
+    synldr->WriteBool (emitterNode, "uniformvelocity", 
+      emitterBase->GetUniformVelocity ());
+
+    //Initial velocity
+    csRef<iDocumentNode> velNode = emitterNode->CreateNodeBefore (
+      CS_NODE_ELEMENT, 0);
+    velNode->SetValue ("initialvelocity");
+    csVector3 lin, ang;
+    emitterBase->GetInitialVelocity (lin, ang);
+    synldr->WriteVector (velNode, lin);
+
+    //Write specific properties
+    csRef<iParticleBuiltinEmitterSphere> sphereEmit = 
+      scfQueryInterface<iParticleBuiltinEmitterSphere> (emitterBase);
+
+    if (sphereEmit)
+    {
+      emitterNode->SetAttribute ("type", "sphere");
+
+      csRef<iDocumentNode> radiusNode = emitterNode->CreateNodeBefore (
+        CS_NODE_ELEMENT, 0);
+      radiusNode->SetValue ("radius");
+      valueNode = radiusNode->CreateNodeBefore (CS_NODE_TEXT, 0);
+      valueNode->SetValueAsFloat (sphereEmit->GetRadius ());
+
+      return true;
+    }
+
+    csRef<iParticleBuiltinEmitterCone> coneEmit = 
+      scfQueryInterface<iParticleBuiltinEmitterCone> (emitterBase);
+
+    if (coneEmit)
+    {
+      emitterNode->SetAttribute ("type", "cone");
+
+      csRef<iDocumentNode> coneAngNode = emitterNode->CreateNodeBefore (
+        CS_NODE_ELEMENT, 0);
+      coneAngNode->SetValue ("coneangle");
+      valueNode = coneAngNode->CreateNodeBefore (CS_NODE_TEXT, 0);
+      valueNode->SetValueAsFloat (coneEmit->GetConeAngle ());
+
+      csRef<iDocumentNode> extentNode = emitterNode->CreateNodeBefore (
+        CS_NODE_ELEMENT, 0);
+      extentNode->SetValue ("extent");
+      synldr->WriteVector (extentNode, coneEmit->GetExtent ());
+
+      return true;
+    }
+
+    csRef<iParticleBuiltinEmitterBox> boxEmit = 
+      scfQueryInterface<iParticleBuiltinEmitterBox> (emitterBase);
+
+    if (boxEmit)
+    {
+      emitterNode->SetAttribute ("type", "box");
+
+      csRef<iDocumentNode> boxNode = emitterNode->CreateNodeBefore (
+        CS_NODE_ELEMENT, 0);
+      boxNode->SetValue ("box");
+      synldr->WriteBox (boxNode, boxEmit->GetBox ());
+
+      return true;
+    }
+
+    csRef<iParticleBuiltinEmitterCylinder> cylEmit = 
+      scfQueryInterface<iParticleBuiltinEmitterCylinder> (emitterBase);
+
+    if (cylEmit)
+    {
+      emitterNode->SetAttribute ("type", "sphere");
+
+      csRef<iDocumentNode> radiusNode = emitterNode->CreateNodeBefore (
+        CS_NODE_ELEMENT, 0);
+      radiusNode->SetValue ("radius");
+      valueNode = radiusNode->CreateNodeBefore (CS_NODE_TEXT, 0);
+      valueNode->SetValueAsFloat (cylEmit->GetRadius ());
+
+      csRef<iDocumentNode> extentNode = emitterNode->CreateNodeBefore (
+        CS_NODE_ELEMENT, 0);
+      extentNode->SetValue ("extent");
+      synldr->WriteVector (extentNode, cylEmit->GetExtent ());
+  
+      return true;
+    }
+
+    return true;
+  }
+
+  bool ParticlesBaseSaver::WriteEffector (iDocumentNode* paramsNode, 
+    iParticleEffector* effector)
+  {
+    if (!effector)
+      return false;
+
+    csRef<iDocumentNode> valueNode;
+
+    //Write base properties
+    csRef<iDocumentNode> effectorNode = paramsNode->CreateNodeBefore (
+      CS_NODE_ELEMENT, 0);
+    effectorNode->SetValue ("effector");
+
+    csRef<iParticleBuiltinEffectorForce> forceEffector = 
+      scfQueryInterface<iParticleBuiltinEffectorForce> (effector);
+
+    if (forceEffector)
+    {
+      effectorNode->SetAttribute ("type", "force");
+
+      csRef<iDocumentNode> accNode = effectorNode->CreateNodeBefore (
+        CS_NODE_ELEMENT, 0);
+      accNode->SetValue ("acceleration");
+      synldr->WriteVector (accNode, forceEffector->GetAcceleration ());
+
+      csRef<iDocumentNode> forceNode = effectorNode->CreateNodeBefore (
+        CS_NODE_ELEMENT, 0);
+      forceNode->SetValue ("force");
+      synldr->WriteVector (forceNode, forceEffector->GetForce ());
+
+      return true;
+    }
+
+    return true;
+  }
+
+
+
+  bool ParticlesFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent, 
+    iStreamSource* ssource)
+  {
+    if (!parent)
+      return false;
+
+    csRef<iDocumentNode> paramsNode = 
+      parent->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    paramsNode->SetValue("params");
+
+    if (obj)
+    {
+      csRef<iParticleSystemFactory> partFact = 
+        scfQueryInterface<iParticleSystemFactory> (obj);
+      csRef<iMeshObjectFactory> meshFact =
+        scfQueryInterface<iMeshObjectFactory> (obj);
+      if (!partFact || !meshFact)
+        return false;
+
+      // Deep creation mode flag
+      synldr->WriteBool (paramsNode, "deepcreation", 
+        partFact->GetDeepCreation ());
+
+      //Write orientation
+      WriteOrientation (paramsNode, partFact->GetParticleRenderOrientation ());
+      
+      //Rotation mode
+      WriteRotation (paramsNode, partFact->GetRotationMode ());
+      
+      //Sorting mode
+      WriteSort (paramsNode, partFact->GetSortMode ());
+
+      //Integration mode
+      WriteIntegration (paramsNode, partFact->GetIntegrationMode ());
+
+
+      //Common direction
+      csRef<iDocumentNode> comdirNode = paramsNode->CreateNodeBefore (
+        CS_NODE_ELEMENT, 0);
+      comdirNode->SetValue ("commondirection");
+      synldr->WriteVector (comdirNode, partFact->GetCommonDirection ());
+
+      //Local mode
+      synldr->WriteBool (paramsNode, "localmode", partFact->GetLocalMode ());
+
+      //Individual size
+      synldr->WriteBool (paramsNode, "individualsize", 
+        partFact->GetUseIndividualSize ());
+
+      //Particle size
+      csRef<iDocumentNode> sizeNode = paramsNode->CreateNodeBefore (
+        CS_NODE_ELEMENT, 0);
+      sizeNode->SetValue ("particlesize");
+      synldr->WriteVector (sizeNode, partFact->GetParticleSize ());
+
+      // Write emitters
+      for (size_t i = 0; i < partFact->GetEmitterCount (); i++)
+      {
+        WriteEmitter (paramsNode, partFact->GetEmitter (i));
+      }
+
+      // Write effectors
+      for (size_t i = 0; i < partFact->GetEffectorCount (); i++)
+      {
+        WriteEffector (paramsNode, partFact->GetEffector (i));
+      }
+
+    }
+
+    return true;
+  }
+
+
+  bool ParticlesObjectSaver::WriteDown (iBase* obj, iDocumentNode* parent, 
+    iStreamSource* ssource)
+  {
+    if (!parent)
+      return false;
+
+    csRef<iDocumentNode> paramsNode = 
+      parent->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    paramsNode->SetValue("params");
+
+    if (obj)
+    {
+      csRef<iParticleSystem> partObj = 
+        scfQueryInterface<iParticleSystem> (obj);
+      csRef<iMeshObject> meshObj =
+        scfQueryInterface<iMeshObject> (obj);
+      if (!partObj || !meshObj)
+        return false;
+
+      //Factory name
+      iMeshFactoryWrapper* factWrap = meshObj->GetFactory ()->GetMeshFactoryWrapper ();
+      if (factWrap)
+      {
+        const char* factName = factWrap->QueryObject ()->GetName ();
+        if (factName && *factName)
+        {
+          csRef<iDocumentNode> factNode = 
+            paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+          factNode->SetValue("factory");
+          factNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValue(factName);
+        }
+      }
+
+      csRef<iParticleSystemFactory> factObj = 
+        scfQueryInterface<iParticleSystemFactory> (factWrap->GetMeshObjectFactory ());
+
+      
+      //Write orientation
+      if (factObj->GetParticleRenderOrientation () != 
+        partObj->GetParticleRenderOrientation ())
+        WriteOrientation (paramsNode, partObj->GetParticleRenderOrientation ());
+
+      //Rotation mode
+      if (factObj->GetRotationMode () != 
+        partObj->GetRotationMode ())
+        WriteRotation (paramsNode, partObj->GetRotationMode ());
+
+      //Sorting mode
+      if (factObj->GetSortMode () != partObj->GetSortMode ())
+        WriteSort (paramsNode, partObj->GetSortMode ());
+
+      //Integration mode
+      if (factObj->GetIntegrationMode () != partObj->GetIntegrationMode ())
+        WriteIntegration (paramsNode, partObj->GetIntegrationMode ());
+
+
+      //Common direction
+      csVector3 commonDir = partObj->GetCommonDirection ();
+
+      if (commonDir != factObj->GetCommonDirection ())
+      {
+        csRef<iDocumentNode> comdirNode = paramsNode->CreateNodeBefore (
+          CS_NODE_ELEMENT, 0);
+        comdirNode->SetValue ("commondirection");
+        synldr->WriteVector (comdirNode, commonDir);
+      }
+
+      //Local mode
+      if (factObj->GetLocalMode () != partObj->GetLocalMode ())
+        synldr->WriteBool (paramsNode, "localmode", partObj->GetLocalMode ());
+
+      //Individual size
+      if (factObj->GetUseIndividualSize () != partObj->GetUseIndividualSize ())
+        synldr->WriteBool (paramsNode, "individualsize", 
+          partObj->GetUseIndividualSize ());
+
+      //Particle size
+      if (factObj->GetParticleSize () != partObj->GetParticleSize ())
+      {
+        csRef<iDocumentNode> sizeNode = paramsNode->CreateNodeBefore (
+          CS_NODE_ELEMENT, 0);
+        sizeNode->SetValue ("particlesize");
+        synldr->WriteVector (sizeNode, partObj->GetParticleSize ());
+      }
+
+      // Write emitters
+      csSet<iParticleEmitter*> factEmitters;
+      for (size_t i = 0; i < factObj->GetEmitterCount (); i++)
+      {
+        factEmitters.Add (factObj->GetEmitter (i)); 
+      }
+
+      for (size_t i = 0; i < partObj->GetEmitterCount (); i++)
+      {
+        iParticleEmitter* emitter = partObj->GetEmitter (i);
+        if (!factEmitters.Contains (emitter))
+          WriteEmitter (paramsNode, emitter);
+      }
+
+      csSet<iParticleEffector*> factEffectors;
+
+      for (size_t i = 0; i < factObj->GetEffectorCount (); i++)
+      {
+        factEffectors.Add (factObj->GetEffector (i)); 
+      }
+
+      for (size_t i = 0; i < partObj->GetEffectorCount (); i++)
+      {
+        iParticleEffector* effector = partObj->GetEffector (i);
+        if (!factEffectors.Contains (effector))
+          WriteEffector (paramsNode, effector);
+      }
+    }
+
+    return true;
+  }
+
+
 
 }
 

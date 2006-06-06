@@ -22,17 +22,19 @@
 #include "csutil/scf_implementation.h"
 #include "csutil/strhash.h"
 
-#include "imesh/particles.h"
-#include "iutil/comp.h"
 #include "imap/reader.h"
 #include "imap/services.h"
+#include "imap/writer.h"
+#include "imesh/particles.h"
+#include "iutil/comp.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(ParticlesLoader)
 {
-  class ParticlesBaseLoader : public 
-   scfImplementation2<ParticlesBaseLoader,
-                      iLoaderPlugin,
-                      iComponent>
+
+  // Loaders
+  class ParticlesBaseLoader : public scfImplementation2<ParticlesBaseLoader,
+                                                        iLoaderPlugin,
+                                                        iComponent>
   {
   public:
     ParticlesBaseLoader (iBase* p);
@@ -84,6 +86,64 @@ CS_PLUGIN_NAMESPACE_BEGIN(ParticlesLoader)
     virtual csPtr<iBase> Parse (iDocumentNode* node,
   	iStreamSource* ssource, iLoaderContext* ldr_context,
   	iBase* context);
+  };
+
+
+  // Savers
+  class ParticlesBaseSaver : public scfImplementation2<ParticlesBaseSaver,
+                                                       iSaverPlugin,
+                                                       iComponent>
+  {
+  public:
+    ParticlesBaseSaver (iBase* p);
+
+    //-- iComponent
+    bool Initialize (iObjectRegistry* objreg);
+
+  protected:
+    iObjectRegistry* objectRegistry;
+    csRef<iSyntaxService> synldr;
+
+    //-- iSaverPlugin helpers for derived classes
+    bool WriteOrientation (iDocumentNode* paramsNode, 
+      csParticleRenderOrientation orientation);
+
+    bool WriteRotation (iDocumentNode* paramsNode, 
+      csParticleRotationMode rot);
+
+    bool WriteSort (iDocumentNode* paramsNode, 
+      csParticleSortMode sort);
+
+    bool WriteIntegration (iDocumentNode* paramsNode, 
+      csParticleIntegrationMode integ);
+
+    bool WriteEmitter (iDocumentNode* paramsNode,
+      iParticleEmitter* emitter);
+
+    bool WriteEffector (iDocumentNode* paramsNode,
+      iParticleEffector* effector);
+  };
+
+  class ParticlesFactorySaver : public ParticlesBaseSaver
+  {
+  public:
+    ParticlesFactorySaver (iBase* parent) 
+      : ParticlesBaseSaver (parent)
+    {}
+
+    virtual bool WriteDown (iBase*obj, iDocumentNode* parent,
+      iStreamSource* ssource);
+  };
+
+  class ParticlesObjectSaver : public ParticlesBaseSaver
+  {
+  public:
+    ParticlesObjectSaver (iBase* parent) 
+      : ParticlesBaseSaver (parent)
+    {}
+
+    virtual bool WriteDown (iBase*obj, iDocumentNode* parent,
+      iStreamSource* ssource);
   };
 }
 CS_PLUGIN_NAMESPACE_END(ParticlesLoader)
