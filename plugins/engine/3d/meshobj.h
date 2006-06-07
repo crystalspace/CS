@@ -640,8 +640,8 @@ public:
   virtual csScreenBoxResult GetScreenBoundingBox (iCamera *camera);
 
   //--------------------- SCF stuff follows ------------------------------//
-  //=================== iShaderVariableContext ================//
-
+  /**\name iShaderVariableContext implementation
+   * @{ */
   /// Add a variable to this context
   void AddVariable (csShaderVariable *variable)
   { svcontext.AddVariable (variable); }
@@ -666,7 +666,7 @@ public:
    * Push the variables of this context onto the variable stacks
    * supplied in the "stacks" argument
    */
-  void PushVariables (csShaderVarStack &stacks) const
+  void PushVariables (iShaderVarStack* stacks) const
   { 
     if (factorySVC.IsValid()) factorySVC->PushVariables (stacks);
     svcontext.PushVariables (stacks); 
@@ -681,6 +681,7 @@ public:
   void ReplaceVariable (csShaderVariable *variable)
   { svcontext.ReplaceVariable (variable); }
   void Clear () { svcontext.Clear(); }
+  /** @} */
 
   //--------------------- iSelfDestruct implementation -------------------//
 
@@ -876,8 +877,8 @@ public:
 
   virtual void SelfDestruct ();
 
-  //=================== iShaderVariableContext ================//
-
+  /**\name iShaderVariableContext implementation
+   * @{ */
   /// Add a variable to this context
   void AddVariable (csShaderVariable *variable)
   { svcontext.AddVariable (variable); }
@@ -894,7 +895,7 @@ public:
    * Push the variables of this context onto the variable stacks
    * supplied in the "stacks" argument
    */
-  void PushVariables (csShaderVarStack &stacks) const
+  void PushVariables (iShaderVarStack* stacks) const
   { svcontext.PushVariables (stacks); }
 
   bool IsEmpty () const 
@@ -903,7 +904,7 @@ public:
   void ReplaceVariable (csShaderVariable *variable)
   { svcontext.ReplaceVariable (variable); }
   void Clear () { svcontext.Clear(); }
-
+  /** @} */
 };
 
 #endif // __CS_MESHOBJ_H__

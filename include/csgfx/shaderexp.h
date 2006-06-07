@@ -78,7 +78,7 @@ public:
 private:
   iObjectRegistry * obj_reg;
   /// Variables used for evaluation
-  csShaderVarStack* stacks;
+  csRef<iShaderVarStack> stacks;
   /// String set for producing String IDs
   csRef<iStringSet> strset;
   /// Compiled array of opcodes for evaluation
@@ -220,11 +220,14 @@ public:
 
   /// Parse in the XML in the context of a symbol table.
   bool Parse(iDocumentNode *);
+  //@{
   /**
    * Evaluate this expression into a variable.
    * It will use the symbol table it was initialized with.
    */
   bool Evaluate(csShaderVariable *, csShaderVarStack& stacks);
+  bool Evaluate(csShaderVariable *, iShaderVarStack* stacks);
+  //@}
 
   /// Retrieve the error message if the evaluation or parsing failed.
   const char* GetError() const { return errorMsg; }

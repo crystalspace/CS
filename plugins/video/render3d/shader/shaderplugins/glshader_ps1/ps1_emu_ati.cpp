@@ -54,7 +54,7 @@ void csShaderGLPS1_ATI::Deactivate()
 
 void csShaderGLPS1_ATI::SetupState (const csRenderMesh* /*mesh*/, 
                                     csRenderMeshModes& /*modes*/,
-	                            const csShaderVarStack& stacks)
+	                            const iShaderVarStack* stacks)
 {
   csGLExtensionManager *ext = shaderPlug->ext;
   // set variables

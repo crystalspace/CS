@@ -44,6 +44,7 @@ struct iRenderBuffer;
 struct iRendererLightmap;
 struct iShader;
 struct iShaderVariableContext;
+struct iShaderVarStack;
 struct iTextureHandle;
 struct iTextureManager;
 
@@ -699,7 +700,7 @@ struct csSimpleRenderMesh
  */
 struct iGraphics3D : public virtual iBase
 {
-  SCF_INTERFACE(iGraphics3D, 2, 0, 2);
+  SCF_INTERFACE(iGraphics3D, 2, 1, 0);
   
   /// Open the 3D graphics display.
   virtual bool Open () = 0;
@@ -800,7 +801,7 @@ struct iGraphics3D : public virtual iBase
   /// Drawroutine. Only way to draw stuff
   virtual void DrawMesh (const csCoreRenderMesh* mymesh,
                          const csRenderMeshModes& modes,
-                         const csArray<csShaderVariable*> &stacks) = 0;
+                         const iShaderVarStack* stacks) = 0;
   /**
   * Draw a csSimpleRenderMesh on the screen.
   * Simple render meshes are intended for cases where setting up

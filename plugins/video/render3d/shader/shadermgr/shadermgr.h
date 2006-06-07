@@ -27,6 +27,7 @@
 #include "csutil/ref.h"
 #include "csutil/refarr.h"
 #include "csutil/scf.h"
+#include "csutil/scfarray.h"
 #include "csutil/util.h"
 #include "csutil/weakref.h"
 
@@ -45,6 +46,8 @@
 #include "csgfx/shadervar.h"
 #include "csgfx/shadervarcontext.h"
 
+CS_PLUGIN_NAMESPACE_BEGIN(ShaderManager)
+{
 
 class csShaderManager : public scfImplementation3<csShaderManager,
 						  iShaderManager,
@@ -72,7 +75,7 @@ private:
   void UpdateStandardVariables();
 
   csShaderVariableContext svcontext;
-  csShaderVarStack shaderVarStack;
+  csRef<iShaderVarStack> shaderVarStack;
 
   csSet<csStringID> neutralTags;
   csSet<csStringID> forbiddenTags;
@@ -122,7 +125,7 @@ public:
   void Report (int severity, const char* msg, ...);
 
   /// Get the shadervariablestack used to handle shadervariables on rendering
-  virtual csShaderVarStack& GetShaderVariableStack ()
+  virtual iShaderVarStack* GetShaderVariableStack ()
   {
     return shaderVarStack;
   }
@@ -168,7 +171,7 @@ public:
   * Push the variables of this context onto the variable stacks
   * supplied in the "stacks" argument
   */
-  void PushVariables (csShaderVarStack &stacks) const
+  void PushVariables (iShaderVarStack* stacks) const
     { svcontext.PushVariables (stacks); }
 
   bool IsEmpty () const 
@@ -206,5 +209,8 @@ public:
   CS_EVENTHANDLER_DEFAULT_INSTANCE_CONSTRAINTS
   /** @} */
 };
+
+}
+CS_PLUGIN_NAMESPACE_END(ShaderManager)
 
 #endif //__SHADERMGR_H__

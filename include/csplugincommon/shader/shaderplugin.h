@@ -65,7 +65,7 @@ struct iShaderDestinationResolver : public virtual iBase
  */
 struct iShaderProgram : public virtual iBase
 {
-  SCF_INTERFACE(iShaderProgram, 2,0,0);
+  SCF_INTERFACE(iShaderProgram, 2, 1, 0);
   /// Sets this program to be the one used when rendering
   virtual void Activate() = 0;
 
@@ -75,7 +75,7 @@ struct iShaderProgram : public virtual iBase
   /// Setup states needed for proper operation of the shaderprogram
   virtual void SetupState (const csRenderMesh* mesh, 
                            csRenderMeshModes& modes,
-                           const csShaderVarStack &stacks) = 0;
+                           const iShaderVarStack* stacks) = 0;
 
   /// Reset states to original
   virtual void ResetState () = 0;
