@@ -6,6 +6,11 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+7-Jun-2006
+	- mdmkolbe made "separate debug info" default to disabled by default
+	  on Cygwin.  All released binutils to date have a bug in them which
+	  corrupts the output files when using separate debug info on Cygwin.
+	  See <http://www.mail-archive.com/bug-binutils@gnu.org/msg00687.html>.
 6-Jun-2006
 	- Vincent fixed leak-guard enabled build.
 	- Eric Sunshine added missing #include <new> to csutil/radixsort.h.
