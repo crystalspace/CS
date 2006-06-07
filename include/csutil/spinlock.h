@@ -22,6 +22,11 @@
 /**\file
  */
 
+#ifndef CS_PLATFORM_WIN32
+#include <pthread.h>
+#include <sched.h>
+#endif
+
 /**\addtogroup util
  * @{ */
 

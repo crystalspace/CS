@@ -98,7 +98,7 @@ namespace CS
       memset (p, 0xcf, n + sizeof (size_t) + 2*sizeof (CookieType));
       ::ptfree (p); 
     #else
-      ::ptfree (p); 
+      ::ptfree (P); 
     #endif
     }
     void* ptrealloc (void* P, size_t n)
@@ -132,7 +132,7 @@ namespace CS
         memset (np + nOld, 0xca, n-nOld);
       return np;
     #else
-      return ::ptrealloc (p, n); 
+      return ::ptrealloc (P, n); 
     #endif
     }
     void* ptmemalign (size_t a, size_t n)

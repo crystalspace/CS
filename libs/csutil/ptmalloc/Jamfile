@@ -1,5 +1,6 @@
 SubDir TOP libs csutil ptmalloc ;
 
+CSLIB.CFLAGS += [ FIncludes [ ConcatDirs $(SUBDIR) ] ] ;
 if $(TARGET.OS) != "WIN32"
 {
   CSLIB.CFLAGS += [ FIncludes [ ConcatDirs $(SUBDIR) sysdeps pthread ] ] ;

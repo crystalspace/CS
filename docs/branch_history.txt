@@ -15,6 +15,7 @@ chronological order.
 	- res changed csShaderVarStack& to iShaderVarStack* in interfaces.
 	- res made a couple of gcc compile fixes.
 	- res made the Jamfiles pick up ptmalloc.
+	- res made some Linux compile fixes.
 5-Jun-2006
 	- res added CS::SpinLock.
 	- res added csScopedLock<> (which also works on non-mutexes).
