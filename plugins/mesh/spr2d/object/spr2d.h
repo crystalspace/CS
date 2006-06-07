@@ -45,13 +45,22 @@
 
 struct iMaterialWrapper;
 struct iSprite2DUVAnimation;
-class csSprite2DMeshObjectFactory;
 class csBox2;
+
+CS_PLUGIN_NAMESPACE_BEGIN(Spr2D)
+{
+
+class csSprite2DMeshObjectFactory;
 
 /**
  * Sprite 2D version of mesh object.
  */
-class csSprite2DMeshObject : public iMeshObject
+class csSprite2DMeshObject : 
+  public scfImplementationExt3<csSprite2DMeshObject, 
+                               csObjectModel, 
+                               iMeshObject,
+                               iSprite2DState,
+                               iParticle>
 {
 protected:
   class uvAnimationControl
@@ -68,22 +77,21 @@ protected:
 
   uvAnimationControl* uvani;
 
-  class eiRenderBufferAccessor : public iRenderBufferAccessor
+  class RenderBufferAccessor : 
+    public scfImplementation1<RenderBufferAccessor, 
+                              iRenderBufferAccessor>
   {
   private:
     csWeakRef<csSprite2DMeshObject> parent;
   public:
-    CS_LEAKGUARD_DECLARE (eiRenderBufferAccessor);
-    SCF_DECLARE_IBASE;
+    CS_LEAKGUARD_DECLARE (RenderBufferAccessor);
 
-    eiRenderBufferAccessor (csSprite2DMeshObject* parent)
+    RenderBufferAccessor (csSprite2DMeshObject* parent) :
+      scfImplementationType (this), parent (parent)
     {
-      SCF_CONSTRUCT_IBASE(0);
-      eiRenderBufferAccessor::parent = parent;
     }
-    virtual ~eiRenderBufferAccessor() 
+    virtual ~RenderBufferAccessor() 
     {
-      SCF_DESTRUCT_IBASE();
     }
 
     void PreGetBuffer (csRenderBufferHolder* holder, csRenderBufferName buffer)
@@ -91,7 +99,7 @@ protected:
       if (parent) parent->PreGetBuffer (holder, buffer);
     }
   };
-  friend class eiRenderBufferAccessor;
+  friend class RenderBufferAccessor;
 
   void PreGetBuffer (csRenderBufferHolder* holder, csRenderBufferName buffer);
 
@@ -115,7 +123,7 @@ private:
   csRef<iMaterialWrapper> material;
   uint MixMode;
   bool initialized;
-  iMeshObjectDrawCallback* vis_cb;
+  csRef<iMeshObjectDrawCallback> vis_cb;
   float radius;
   float current_lod;
   uint32 current_features;
@@ -166,14 +174,16 @@ public:
    */
   void CreateRegularVertices (int n, bool setuv);
 
+  /**\name iObjectModel implementation
+   * @{ */
   void GetObjectBoundingBox (csBox3& bbox);
   void SetObjectBoundingBox (const csBox3& bbox);
   void GetRadius (float& rad, csVector3& cent)
   { rad = radius; cent.Set (0,0,0); }
+  /** @} */
 
-  ///---------------------- iMeshObject implementation ------------------------
-  SCF_DECLARE_IBASE;
-
+  /**\name iMeshObject implementation
+   * @{ */
   virtual iMeshObjectFactory* GetFactory () const { return ifactory; }
   virtual csFlags& GetFlags () { return flags; }
   virtual csPtr<iMeshObject> Clone () { return 0; }
@@ -186,8 +196,6 @@ public:
   }
   virtual void SetVisibleCallback (iMeshObjectDrawCallback* cb)
   {
-    if (cb) cb->IncRef ();
-    if (vis_cb) vis_cb->DecRef ();
     vis_cb = cb;
   }
   virtual iMeshObjectDrawCallback* GetVisibleCallback () const
@@ -211,28 +219,9 @@ public:
   }
   virtual void SetMeshWrapper (iMeshWrapper* lp) { logparent = lp; }
   virtual iMeshWrapper* GetMeshWrapper () const { return logparent; }
+  /** @} */
 
-  //------------------------- iObjectModel implementation ----------------
-  class ObjectModel : public csObjectModel
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csSprite2DMeshObject);
-    virtual void GetObjectBoundingBox (csBox3& bbox)
-    {
-      scfParent->GetObjectBoundingBox (bbox);
-    }
-    virtual void SetObjectBoundingBox (const csBox3& bbox)
-    {
-      scfParent->SetObjectBoundingBox (bbox);
-    }
-    virtual void GetRadius (float& rad, csVector3& cent)
-    {
-      scfParent->GetRadius (rad, cent);
-    }
-    virtual iTerraFormer* GetTerraFormerColldet () { return 0; }
-  } scfiObjectModel;
-  friend class ObjectModel;
-
-  virtual iObjectModel* GetObjectModel () { return &scfiObjectModel; }
+  virtual iObjectModel* GetObjectModel () { return static_cast<iObjectModel*> (this); }
   virtual bool SetColor (const csColor&) { return false; }
   virtual bool GetColor (csColor&) const { return false; }
   virtual bool SetMaterialWrapper (iMaterialWrapper* mat)
@@ -250,79 +239,49 @@ public:
    */
   virtual void PositionChild (iMeshObject* /*child*/, csTicks /*current_time*/) { }
 
-  //------------------------- iSprite2DState implementation ----------------
-  class Sprite2DState : public iSprite2DState
+  /**\name iSprite2DState implementation
+   * @{ */
+  virtual void SetLighting (bool l)
   {
-    SCF_DECLARE_EMBEDDED_IBASE (csSprite2DMeshObject);
-    virtual void SetLighting (bool l)
-    {
-      scfParent->initialized = false;
-      scfParent->lighting = l;
-    }
-    virtual bool HasLighting () const { return scfParent->lighting; }
-    virtual void SetMaterialWrapper (iMaterialWrapper* material)
-    {
-      scfParent->material = material;
-    }
-    virtual iMaterialWrapper* GetMaterialWrapper () const
-    { return scfParent->material; }
-    virtual void SetMixMode (uint mode) { scfParent->MixMode = mode; }
-    virtual uint GetMixMode () const { return scfParent->MixMode; }
-    virtual csColoredVertices& GetVertices ()
-    {
-      return scfParent->GetVertices ();
-    }
-    virtual void CreateRegularVertices (int n, bool setuv)
-    {
-      scfParent->CreateRegularVertices (n, setuv);
-    }
+    initialized = false;
+    lighting = l;
+  }
+  virtual bool HasLighting () const { return lighting; }
+  virtual void SetUVAnimation (const char *name, int style, bool loop);
+  virtual void StopUVAnimation (int idx);
+  virtual void PlayUVAnimation (int idx, int style, bool loop);
 
-    virtual void SetUVAnimation (const char *name, int style, bool loop);
-    virtual void StopUVAnimation (int idx);
-    virtual void PlayUVAnimation (int idx, int style, bool loop);
+  virtual int GetUVAnimationCount () const;
+  virtual iSprite2DUVAnimation *CreateUVAnimation ();
+  virtual void RemoveUVAnimation (iSprite2DUVAnimation *anim);
+  virtual iSprite2DUVAnimation *GetUVAnimation (const char *name) const;
+  virtual iSprite2DUVAnimation *GetUVAnimation (int idx) const;
+  virtual iSprite2DUVAnimation *GetUVAnimation (int idx, int &style,
+  	bool &loop) const;
+  /** @} */
 
-    virtual int GetUVAnimationCount () const;
-    virtual iSprite2DUVAnimation *CreateUVAnimation ();
-    virtual void RemoveUVAnimation (iSprite2DUVAnimation *anim);
-    virtual iSprite2DUVAnimation *GetUVAnimation (const char *name) const;
-    virtual iSprite2DUVAnimation *GetUVAnimation (int idx) const;
-    virtual iSprite2DUVAnimation *GetUVAnimation (int idx, int &style,
-    	bool &loop) const;
+  /**\name iParticle implementation
+   * @{ */
+  csVector3 part_pos;
 
-  } scfiSprite2DState;
-  friend class Sprite2DState;
-
-  //------------------------- iParticle implementation ----------------
-  class Particle : public iParticle
-  {
-  private:
-    csVector3 part_pos;
-
-  public:
-    SCF_DECLARE_EMBEDDED_IBASE (csSprite2DMeshObject);
-    virtual void SetPosition (const csVector3& pos) { part_pos = pos; }
-    virtual const csVector3& GetPosition () const { return part_pos; }
-    virtual void MovePosition (const csVector3& move) { part_pos += move; }
-    virtual void SetColor (const csColor& col);
-    virtual void AddColor (const csColor& col);
-    virtual void ScaleBy (float factor);
-    virtual void SetMixMode (uint mode)
-    {
-      scfParent->MixMode = mode;
-    }
-    virtual void Rotate (float angle);
-    virtual csRenderMesh** GetRenderMeshes (int& n, iRenderView* rview, 
-      iMovable* movable, uint32 frustum_mask);
-    virtual void UpdateLighting (const csArray<iLightSectorInfluence*>& lights,
+  virtual void SetPosition (const csVector3& pos) { part_pos = pos; }
+  virtual const csVector3& GetPosition () const { return part_pos; }
+  virtual void MovePosition (const csVector3& move) { part_pos += move; }
+  virtual void AddColor (const csColor& col);
+  virtual void ScaleBy (float factor);
+  virtual void Rotate (float angle);
+  virtual void UpdateLighting (const csArray<iLightSectorInfluence*>& lights,
 	const csReversibleTransform& transform);
-  } scfiParticle;
-  friend class Particle;
+  /** @} */
 };
 
 /**
  * Factory for 2D sprites. This factory also implements iSprite2DFactoryState.
  */
-class csSprite2DMeshObjectFactory : public iMeshObjectFactory
+class csSprite2DMeshObjectFactory : 
+  public scfImplementation2<csSprite2DMeshObjectFactory, 
+                            iMeshObjectFactory,
+                            iSprite2DFactoryState>
 {
 protected:
   class animVector : public csArray<csSprite2DUVAnimation*>
@@ -334,7 +293,7 @@ protected:
     {
       return strcmp (item->GetName (), key);
     }
-    csArrayCmp<csSprite2DUVAnimation*,char const*>KeyCmp(char const* key)
+    csArrayCmp<csSprite2DUVAnimation*,char const*> KeyCmp (char const* key) const
     {
       return csArrayCmp<csSprite2DUVAnimation*,char const*>(key, CompareKey);
     }
@@ -387,19 +346,21 @@ public:
       vAnims.DeleteIndex (idx);
     }
   }
-  iSprite2DUVAnimation *GetUVAnimation (const char *name)
+  iSprite2DUVAnimation *GetUVAnimation (const char *name) const 
   {
-    int idx = (int)vAnims.FindKey (vAnims.KeyCmp(name));
-    return (iSprite2DUVAnimation *)(idx != -1 ? vAnims.Get (idx) : 0);
+    size_t idx = vAnims.FindKey (vAnims.KeyCmp (name));
+    if (idx != csArrayItemNotFound)
+      return static_cast<iSprite2DUVAnimation *> (vAnims.Get (idx));
+    else
+      return 0;
   }
-  iSprite2DUVAnimation *GetUVAnimation (int idx)
+  iSprite2DUVAnimation *GetUVAnimation (int idx) const 
   {
-    return (iSprite2DUVAnimation *)vAnims.Get (idx);
+    return static_cast<iSprite2DUVAnimation *> (vAnims.Get (idx));
   }
 
-  //------------------------ iMeshObjectFactory implementation --------------
-  SCF_DECLARE_IBASE;
-
+  /**\name iMeshObjectFactory implementation
+   * @{ */
   virtual csFlags& GetFlags () { return flags; }
   virtual csPtr<iMeshObject> NewInstance ();
   virtual csPtr<iMeshObjectFactory> Clone () { return 0; }
@@ -420,39 +381,26 @@ public:
   { return material; }
   virtual void SetMixMode (uint mode) { MixMode = mode; }
   virtual uint GetMixMode () const { return MixMode; }
+  /** @} */
 
-  //---------------------- iSprite2DFactoryState implementation ----------------
-  class Sprite2DFactoryState : public iSprite2DFactoryState
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csSprite2DMeshObjectFactory);
-    virtual void SetLighting (bool l) { scfParent->lighting = l; }
-    virtual bool HasLighting () const { return scfParent->HasLighting (); }
-
-    virtual int GetUVAnimationCount () const
-    { return scfParent->GetUVAnimationCount(); }
-    virtual iSprite2DUVAnimation *CreateUVAnimation ()
-    { return scfParent->CreateUVAnimation (); }
-    virtual void RemoveUVAnimation (iSprite2DUVAnimation *anim)
-    { scfParent->RemoveUVAnimation(anim); }
-    virtual iSprite2DUVAnimation *GetUVAnimation (const char *name) const
-    { return scfParent->GetUVAnimation (name); }
-    virtual iSprite2DUVAnimation *GetUVAnimation (int idx) const
-    { return scfParent->GetUVAnimation (idx); }
-  } scfiSprite2DFactoryState;
-  friend class Sprite2DFactoryState;
+  /**\name iSprite2DFactoryState implementation
+   * @{ */
+  virtual void SetLighting (bool l) { lighting = l; }
+  /** @} */
 };
 
 /**
  * Sprite 2D type. This is the plugin you have to use to create instances
  * of csSprite2DMeshObjectFactory.
  */
-class csSprite2DMeshObjectType : public iMeshObjectType
+class csSprite2DMeshObjectType : 
+  public scfImplementation2<csSprite2DMeshObjectType, 
+                            iMeshObjectType,
+                            iComponent>
 {
 public:
   iObjectRegistry* object_reg;
 public:
-  SCF_DECLARE_IBASE;
-
   /// Constructor.
   csSprite2DMeshObjectType (iBase*);
   /// Destructor.
@@ -461,15 +409,9 @@ public:
   virtual csPtr<iMeshObjectFactory> NewFactory ();
 
   bool Initialize (iObjectRegistry* object_reg);
-
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csSprite2DMeshObjectType);
-    virtual bool Initialize (iObjectRegistry* object_reg)
-    {
-      return scfParent->Initialize (object_reg);
-    }
-  } scfiComponent;
 };
+
+}
+CS_PLUGIN_NAMESPACE_END(Spr2D)
 
 #endif // __CS_SPR2D_H__

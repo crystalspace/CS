@@ -23,6 +23,7 @@ chronological order.
 	  debug-break on first nested assert.
 	- res fixed an apparent name collision of some ptmalloc variables.
 	- res fixed the freetype2 plugin to compile again.
+	- res updated spr2d to use new SCF.
 5-Jun-2006
 	- res added CS::SpinLock.
 	- res added csScopedLock<> (which also works on non-mutexes).
