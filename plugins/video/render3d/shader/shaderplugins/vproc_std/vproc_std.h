@@ -34,7 +34,7 @@ class csVProc_Std : public scfImplementation2<csVProc_Std,
 					      iComponent>
 {
 public:
-  CS_LEAKGUARD_DECLARE (csVProcStandardPlugin);
+  CS_LEAKGUARD_DECLARE (csVProc_Std);
 
   csVProc_Std (iBase *parent);
   virtual ~csVProc_Std ();

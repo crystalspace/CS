@@ -877,6 +877,14 @@ Optional Features:
                           processor will not work with earlier processors (for
                           example, Intel 686-specific code will not work with
                           a 586)
+  --enable-separate-debug-info
+                          split debug information into separate files.
+                          (default YES if binutils >= 2.16 detected, otherwise
+                          default NO)
+  --enable-optimize-mode-debug-info
+                          whether to enable debug information even in optimize
+                          builds. (default YES if separate debug information
+                          is enabled, otherwise default NO)
   --enable-meta-info-embedding
                           store plugin meta-information directly inside plugin
                           modules if supported by platform; if disabled,
@@ -919,14 +927,6 @@ Optional Packages:
   --with-perl             use Perl5 scripting interface (default NO)
   --without-python        do not use Python scripting interface
   --with-java             use Java scripting interface (default YES)
-  --with-separate-debug-info
-                          split debug information into separate files.
-                          (default YES if binutils >= 2.16 detected, otherwise
-                          default NO)
-  --with-optimize-debug-info
-                          whether to enable debug information even in optimize
-                          builds. (default YES if separate debug information
-                          is enabled, otherwise default NO)
   --with-x                use the X Window System
   --with-Xxf86vm=dir      specify location of libXxf86vm if not detected
                           automatically; searches dir/include, dir/lib, and
@@ -10205,7 +10205,20 @@ _ACEOF
 cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
-#include <jni.h>
+
+	    #if defined(__GNUC__)
+	        typedef long long __int64; /*For gcc on Windows */
+	    #endif
+
+	    /* fix for 'jlong' on x86_64 */
+	    #if defined(__x86_64)
+	    #ifdef _LP64 /* 64-bit Solaris */
+	    #undef _LP64
+	    #endif
+	    #endif
+
+	    #include <jni.h>
+
 	    JNIEXPORT void JNICALL f(JNIEnv *env, jobject obj);
 int
 main ()
@@ -10358,7 +10371,20 @@ _ACEOF
 cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
-#include <jni.h>
+
+	    #if defined(__GNUC__)
+	        typedef long long __int64; /*For gcc on Windows */
+	    #endif
+
+	    /* fix for 'jlong' on x86_64 */
+	    #if defined(__x86_64)
+	    #ifdef _LP64 /* 64-bit Solaris */
+	    #undef _LP64
+	    #endif
+	    #endif
+
+	    #include <jni.h>
+
 	    JNIEXPORT void JNICALL f(JNIEnv *env, jobject obj);
 int
 main ()
@@ -19024,18 +19050,21 @@ fi
 fi
 
 
-
-# Check whether --with-separate-debug-info or --without-separate-debug-info was given.
-if test "${with_separate_debug_info+set}" = set; then
-  withval="$with_separate_debug_info"
+echo "$as_me:$LINENO: checking whether to split debug information" >&5
+echo $ECHO_N "checking whether to split debug information... $ECHO_C" >&6
+# Check whether --enable-separate-debug-info or --disable-separate-debug-info was given.
+if test "${enable_separate_debug_info+set}" = set; then
+  enableval="$enable_separate_debug_info"
 
 fi;
-if test -z "$with_separate_debug_info"; then
-  with_separate_debug_info=$binutils_recent
+if test -z "$enable_separate_debug_info"; then
+  enable_separate_debug_info=$binutils_recent
 fi
 
+echo "$as_me:$LINENO: result: $enable_separate_debug_info" >&5
+echo "${ECHO_T}$enable_separate_debug_info" >&6
 
-cs_build_prop_val="$with_separate_debug_info"
+cs_build_prop_val="$enable_separate_debug_info"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     if test -n "$cs_build_prop_val"; then
   cs_jamconfig_text="${cs_jamconfig_text}LINK.DEBUG.INFO.SEPARATE ?= \"$cs_build_prop_val\" ;
@@ -19213,17 +19242,20 @@ fi
 fi
 
 
-
-# Check whether --with-optimize-debug-info or --without-optimize-debug-info was given.
-if test "${with_optimize_debug_info+set}" = set; then
-  withval="$with_optimize_debug_info"
-
+echo "$as_me:$LINENO: checking whether to enable debug information in optimize mode" >&5
+echo $ECHO_N "checking whether to enable debug information in optimize mode... $ECHO_C" >&6
+# Check whether --enable-optimize-mode-debug-info or --disable-optimize-mode-debug-info was given.
+if test "${enable_optimize_mode_debug_info+set}" = set; then
+  enableval="$enable_optimize_mode_debug_info"
+  enable_optimize_mode_debug_info=$enableval
 fi;
-if test -z "$with_optimize_debug_info"; then
-  with_optimize_debug_info=$with_separate_debug_info
+if test -z "$enable_optimize_mode_debug_info"; then
+  enable_optimize_mode_debug_info=$enable_separate_debug_info
 fi
 
-if test "$with_optimize_debug_info" != no; then
+echo "$as_me:$LINENO: result: $enable_optimize_mode_debug_info" >&5
+echo "${ECHO_T}$enable_optimize_mode_debug_info" >&6
+if test "$enable_optimize_mode_debug_info" != "no"; then
   echo "$as_me:$LINENO: checking how to enable optimize mode debugging symbols" >&5
 echo $ECHO_N "checking how to enable optimize mode debugging symbols... $ECHO_C" >&6
 if test "${cs_cv_prog_cxx_debug_symbols_normal_ok+set}" = set; then

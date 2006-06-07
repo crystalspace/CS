@@ -6,6 +6,19 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+6-Jun-2006
+	- Vincent fixed leak-guard enabled build.
+	- Eric Sunshine added missing #include <new> to csutil/radixsort.h.
+5-Jun-2006
+	- res fixed createproject.sh to not copy cs_check_host.m4 any more
+	  (since it has moved).
+	- res fixed the Jam project template to utilize include custom.cslib.
+	- res changed the "separate debug info" and "optimize mode debug info"
+	  configure options to more appropriately use --enable-... instead of
+	  --with-...
+	- Marten fixed the interface and scfImplementation lines for sound
+	  sources.
+	- AndyDude fixed further spelling mistakes in (xmlfmt.txi).
 4-Jun-2006
 	- Marten made another fix to the quaternion class. Matrix->Quat->
 	  Matrix seems to yield the original matrix (within tolerable
@@ -16,6 +29,7 @@ chronological order.
 	  complete now.
 	- Rhad changed csLoader::LoadSoundSysData() so that it creates the
 	  iSndSysData object with the filename as the description.
+	- mdmkolbe fixed Java detection under Cygwin.
 3-Jun-2006
 	- iceeey made some more changes to 'ice' CEGUI skin.
 	- Rhad updated the windows software sound driver (directsound)

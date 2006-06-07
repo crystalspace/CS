@@ -7,8 +7,8 @@
 function EmptyPicDir()
 {
 	label_thing = 	 	  	 
-		 <widget type="Tooltip">
-		 	<setup>this.SetFocusPoint(controls.xmin + (controls.width>>1), controls.ymax);</setup>
+		 <widget type="ToolTip">
+		 	<setup>widget.SetFocusPoint(controls.xmin + (controls.width>>1), controls.ymax);</setup>
 		 	<title>No Pictures</title>
 		 	<text>The directory that you started picview from does
 not contain any pictures that this app

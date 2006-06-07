@@ -74,6 +74,7 @@ PicView::PicView ()
   SetApplicationName ("CrystalSpace.PicView");
   pic = 0;
   scale = false;
+  cur_idx=0;
 }
 
 PicView::~PicView ()
@@ -239,7 +240,7 @@ void PicView::CreateGui ()
 
 void PicView::LoadNextImage (bool rewind, int step)
 {
-  if (rewind) cur_idx = files->Length ();
+  if (rewind) cur_idx = 0; //files->Length ();
   size_t startIdx = cur_idx;
   csRef<iImage> ifile;
   iTextureManager* txtmgr = g3d->GetTextureManager();
@@ -250,14 +251,15 @@ void PicView::LoadNextImage (bool rewind, int step)
       cur_idx = files->Length ()-1;
     else
       cur_idx += step;
+      
     if ((size_t)cur_idx >= files->Length ()) cur_idx = 0;
 
     csRef<iDataBuffer> buf (vfs->ReadFile (files->Get (cur_idx), false));
     if (!buf) continue;
   		
     ifile = imgloader->Load (buf, txtmgr->GetTextureFormat ());
-  }
-  while (!ifile.IsValid() && (cur_idx != startIdx));
+  }  while (!ifile.IsValid() && (cur_idx != startIdx));
+  
   if (!ifile) 
   {
 	  picview_events->Exec("nmp.Show()");
