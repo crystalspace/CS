@@ -10,6 +10,10 @@
 #ifndef MALLOC_PRIVATE_H
 #define MALLOC_PRIVATE_H
 
+/***** CS SPECIFIC SETTINGS BEGIN HERE *****/
+#include "../dlmalloc-settings.h"
+/*****  CS SPECIFIC SETTINGS END HERE  *****/
+
 #ifndef MALLOC_ALIGNMENT
 # define MALLOC_ALIGNMENT  ((size_t)8U)
 #endif
@@ -140,7 +144,11 @@ struct malloc_state {
 
 #define MCHUNK_SIZE         (sizeof(mchunk))
 
+#if FOOTERS
+#define CHUNK_OVERHEAD      (TWO_SIZE_T_SIZES)
+#else /* FOOTERS */
 #define CHUNK_OVERHEAD      (SIZE_T_SIZE)
+#endif /* FOOTERS */
 
 /* MMapped chunks need a second word of overhead ... */
 #define MMAP_CHUNK_OVERHEAD (TWO_SIZE_T_SIZES)
