@@ -12,6 +12,23 @@
 
 /***** CS SPECIFIC SETTINGS BEGIN HERE *****/
 #include "../dlmalloc-settings.h"
+
+#ifndef FORCEINLINE
+  #if defined(__GNUC__)
+    #define FORCEINLINE __inline __attribute__ ((always_inline))
+  #elif defined(_MSC_VER)
+    #define FORCEINLINE __forceinline
+  #endif
+#endif
+#ifndef NOINLINE
+  #if defined(__GNUC__)
+    #define NOINLINE __attribute__ ((noinline))
+  #elif defined(_MSC_VER)
+    #define NOINLINE __declspec(noinline)
+  #else
+    #define NOINLINE
+  #endif
+#endif
 /*****  CS SPECIFIC SETTINGS END HERE  *****/
 
 #ifndef MALLOC_ALIGNMENT

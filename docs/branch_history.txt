@@ -13,6 +13,8 @@ chronological order.
 	  debug mode.
 	- res added SCF interfaces for arrays.
 	- res changed csShaderVarStack& to iShaderVarStack* in interfaces.
+	- res made a couple of gcc compile fixes.
+	- res made the Jamfiles pick up ptmalloc.
 5-Jun-2006
 	- res added CS::SpinLock.
 	- res added csScopedLock<> (which also works on non-mutexes).

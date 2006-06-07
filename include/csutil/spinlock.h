@@ -69,7 +69,7 @@ namespace CS
 	int spins = 0;
 	for (;;) {
 	  int ret;
-	  __asm__ __volatile__ ("lock cmpxchgl %2,(%1)" : "=a" (ret) : "r" (&sl->l), "r" (1), "a" (0));
+	  __asm__ __volatile__ ("lock cmpxchgl %2,(%1)" : "=a" (ret) : "r" (&l), "r" (1), "a" (0));
 	  if(!ret) 
 	  {
 	    CS_ASSERT(!threadid);
@@ -87,12 +87,15 @@ namespace CS
     #else  /* no-op yield on unknown systems */
 	    ;
     #endif /* solaris, linux, CS_PLATFORM_WIN32 */
+	  }
+	}
       }
+      return true;
     }
     CS_FORCEINLINE bool DoLockTry()
     {
       int ret;
-      __asm__ __volatile__ ("lock cmpxchgl %2,(%1)" : "=a" (ret) : "r" (&sl->l), "r" (1), "a" (0));
+      __asm__ __volatile__ ("lock cmpxchgl %2,(%1)" : "=a" (ret) : "r" (&l), "r" (1), "a" (0));
       if(!ret){
 	CS_ASSERT(!threadid);
 	threadid = CurrentThreadID();
@@ -107,11 +110,11 @@ namespace CS
       CS_ASSERT(CurrentThreadID() == threadid);
       if (!--c) {
 	threadid=0;
-	__asm__ __volatile__ ("xchgl %2,(%1)" : "=r" (ret) : "r" (&sl->l), "0" (0));
+	__asm__ __volatile__ ("xchgl %2,(%1)" : "=r" (ret) : "r" (&l), "0" (0));
       }
     }
     CS_FORCEINLINE void Init() { threadid = 0; c = 0; l = 0; }
-    void Destroy() {}
+    CS_FORCEINLINE void Destroy() {}
     //------------------------------------------------------------------------
   #elif defined(CS_PLATFORM_WIN32)
     CS_FORCEINLINE bool DoLockWait()
@@ -153,7 +156,7 @@ namespace CS
       }
     }
     CS_FORCEINLINE void Init() { threadid = 0; c = 0; l = 0; }
-    void Destroy() {}
+    CS_FORCEINLINE void Destroy() {}
     //------------------------------------------------------------------------
   #else
     CS_FORCEINLINE bool DoLockWait()
@@ -186,7 +189,7 @@ namespace CS
       if(pthread_mutex_init (&l, &attr)) return;
       pthread_mutexattr_destroy (&attr);
     }
-    void Destroy() {}
+    CS_FORCEINLINE void Destroy() {}
 #endif
   public:
     SpinLock()

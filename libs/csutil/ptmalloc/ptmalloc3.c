@@ -444,7 +444,7 @@ static
 void ptmalloc_init(void);
 
 void* public_mALLOc(size_t sz);
-void* public_rEALLOc(const void* p, size_t sz);
+void* public_rEALLOc(void* p, size_t sz);
 void* public_mEMALIGn(size_t alignment, size_t sz);
 int public_mALLOPt(int p, int v);
 

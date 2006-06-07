@@ -34,8 +34,10 @@ PERFORMANCE OF THIS SOFTWARE.
 #if (defined __i386__ || defined __x86_64__) && defined __GNUC__ && \
     !defined USE_NO_SPINLOCKS
 
+#ifndef WIN32
 #include <time.h>
 #include <sched.h>
+#endif
 
 typedef struct {
   volatile unsigned int lock;
@@ -46,7 +48,9 @@ typedef struct {
 #define mutex_init(m)              ((m)->lock = 0)
 static inline int mutex_lock(mutex_t *m) {
   int cnt = 0, r;
+#ifndef WIN32
   struct timespec tm;
+#endif
 
   for(;;) {
     __asm__ __volatile__

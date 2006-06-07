@@ -28,6 +28,7 @@ template<typename IF, typename T, typename Backend = csArray<T> >
 class scfArray : 
   public scfImplementation1<scfArray<IF, T, Backend>, IF>
 {
+  typedef scfImplementation1<scfArray<IF, T, Backend>, IF> scfImplementationType;
 public:
   Backend storage;
 
@@ -103,6 +104,8 @@ template<typename IF, typename T, typename Backend = csArray<T> >
 class scfArrayWrap : 
   public scfImplementation1<scfArrayWrap<IF, T, Backend>, IF>
 {
+  typedef scfImplementation1<scfArrayWrap<IF, T, Backend>, IF> 
+    scfImplementationType;
 public:
   Backend& storage;
 
@@ -177,6 +180,8 @@ template<typename IF, typename T, typename Backend = csArray<T> >
 class scfArrayWrapConst : 
   public scfImplementation1<scfArrayWrapConst<IF, T, Backend>, IF>
 {
+  typedef scfImplementation1<scfArrayWrapConst<IF, T, Backend>, IF> 
+    scfImplementationType;
 public:
   const Backend& storage;
 

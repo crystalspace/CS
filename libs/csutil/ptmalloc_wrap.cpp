@@ -40,6 +40,13 @@ namespace CS
      * modules. */
     typedef time_t CookieType;
     static CookieType cookie;
+    inline static CookieType CookieSwap (CookieType x)
+    {
+      if (sizeof (CookieType) >= 8)
+        return csSwapBytes::UInt64 (x);
+      else
+        return csSwapBytes::UInt32 (x);
+    }
     static CookieType GetCookie (void* p)
     {
       while (cookie == 0)
@@ -49,7 +56,7 @@ namespace CS
         // Make somewhat unique
         cookie = cookie ^ (CookieType)&cookie;
       }
-      return csSwapBytes::Swap (cookie) ^ CookieType (p);
+      return CookieSwap (cookie) ^ CookieType (p);
     }
   #endif
 
@@ -59,7 +66,7 @@ namespace CS
       uint8* p = 
         (uint8*)::ptmalloc (n + sizeof (size_t) + 2*sizeof (CookieType)); 
       const CookieType startCookie = GetCookie (p);
-      const CookieType endCookie = csSwapBytes::Swap (startCookie);
+      const CookieType endCookie = CookieSwap (startCookie);
       // Write allocated size(needed for checks in free()) and cookies.
       *((size_t*)p) = n;
       p += sizeof (size_t);
@@ -81,7 +88,7 @@ namespace CS
       uint8* p = (uint8*)P;
       p -= sizeof(CookieType);
       const CookieType startCookie = GetCookie (p - sizeof(size_t));
-      const CookieType endCookie = csSwapBytes::Swap (startCookie);
+      const CookieType endCookie = CookieSwap (startCookie);
       // Verify cookies
       CS_ASSERT(*(CookieType*)p == startCookie);
       p -= sizeof(size_t);
@@ -103,7 +110,7 @@ namespace CS
       p -= sizeof(CookieType);
       // Verify cookies
       const CookieType startCookie = GetCookie (p - sizeof(size_t));
-      const CookieType endCookie = csSwapBytes::Swap (startCookie);
+      const CookieType endCookie = CookieSwap (startCookie);
       CS_ASSERT(*(CookieType*)p == startCookie);
       p -= sizeof(size_t);
       size_t nOld = *((size_t*)p);
@@ -114,7 +121,7 @@ namespace CS
       // Cookie may have changed since the memory address may have changed,
       // update
       const CookieType newStartCookie = GetCookie (np);
-      const CookieType newEndCookie = csSwapBytes::Swap (newStartCookie);
+      const CookieType newEndCookie = CookieSwap (newStartCookie);
       *((size_t*)np) = n;
       np += sizeof (size_t);
       *((CookieType*)np) = newStartCookie;
