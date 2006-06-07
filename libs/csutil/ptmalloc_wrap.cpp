@@ -122,7 +122,7 @@ namespace CS
       size_t nOld = *((size_t*)p);
       CS_ASSERT_MSG("Memory block has wrong cookie "
 	"(probably corrupted by an overflow)",
-	*(CookieType*)((uint8*)P + n) == endCookie);
+	*(CookieType*)((uint8*)P + nOld) == endCookie);
 
       uint8* np = 
         (uint8*)::ptrealloc (p, n + sizeof (size_t) + 2*sizeof (CookieType)); 
