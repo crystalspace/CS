@@ -90,10 +90,14 @@ namespace CS
       const CookieType startCookie = GetCookie (p - sizeof(size_t));
       const CookieType endCookie = CookieSwap (startCookie);
       // Verify cookies
-      CS_ASSERT(*(CookieType*)p == startCookie);
+      CS_ASSERT_MSG("Memory block has wrong cookie "
+	"(was probably allocated in another module)",
+	*(CookieType*)p == startCookie);
       p -= sizeof(size_t);
       size_t n = *((size_t*)p);
-      CS_ASSERT(*(CookieType*)((uint8*)P + n) == endCookie);
+      CS_ASSERT_MSG("Memory block has wrong cookie "
+	"(probably corrupted by an overflow)",
+	*(CookieType*)((uint8*)P + n) == endCookie);
       // Salt.
       memset (p, 0xcf, n + sizeof (size_t) + 2*sizeof (CookieType));
       ::ptfree (p); 
@@ -111,10 +115,14 @@ namespace CS
       // Verify cookies
       const CookieType startCookie = GetCookie (p - sizeof(size_t));
       const CookieType endCookie = CookieSwap (startCookie);
-      CS_ASSERT(*(CookieType*)p == startCookie);
+      CS_ASSERT_MSG("Memory block has wrong cookie "
+	"(was probably allocated in another module)",
+	*(CookieType*)p == startCookie);
       p -= sizeof(size_t);
       size_t nOld = *((size_t*)p);
-      CS_ASSERT(*(CookieType*)((uint8*)P + nOld) == endCookie);
+      CS_ASSERT_MSG("Memory block has wrong cookie "
+	"(probably corrupted by an overflow)",
+	*(CookieType*)((uint8*)P + n) == endCookie);
 
       uint8* np = 
         (uint8*)::ptrealloc (p, n + sizeof (size_t) + 2*sizeof (CookieType)); 

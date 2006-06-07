@@ -16,6 +16,8 @@ chronological order.
 	- res made a couple of gcc compile fixes.
 	- res made the Jamfiles pick up ptmalloc.
 	- res made some Linux compile fixes.
+	- res made the ptmalloc wrapper asserts a bit more useful.
+	- res fixed compilation in -pedantic.
 5-Jun-2006
 	- res added CS::SpinLock.
 	- res added csScopedLock<> (which also works on non-mutexes).

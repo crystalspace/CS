@@ -583,8 +583,8 @@ namespace CS
     extern void* CS_CRYSTALSPACE_EXPORT ptrealloc (void* p, size_t n);
     extern void* CS_CRYSTALSPACE_EXPORT ptmemalign (size_t a, size_t n);
     extern void* CS_CRYSTALSPACE_EXPORT ptcalloc (size_t n, size_t s);
-  };
-};
+  }
+}
 #define malloc 		CS::Memory::ptmalloc
 #define free 	CS::	Memory::ptfree
 #define realloc 	CS::Memory::ptrealloc
