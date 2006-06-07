@@ -1,0 +1,12 @@
+SubDir TOP libs csutil ptmalloc ;
+
+if $(TARGET.OS) != "WIN32"
+{
+  CSLIB.CFLAGS += [ FIncludes [ ConcatDirs $(SUBDIR) sysdeps pthread ] ] ;
+}
+else
+{
+  CSLIB.CFLAGS += [ FIncludes [ ConcatDirs $(SUBDIR) sysdeps win32 ] ] ;
+}
+
+CsLibAddWild *.c : csutil ptmalloc ;
