@@ -93,7 +93,7 @@ PERFORMANCE OF THIS SOFTWARE.
 #define my_powerof2(x) ((((x)-1)&(x))==0)
 
 /* Already initialized? */
-int __malloc_initialized = -1;
+static int __malloc_initialized = -1;
 
 #ifndef RETURN_ADDRESS
 # define RETURN_ADDRESS(X_) (NULL)
@@ -158,6 +158,12 @@ void *(*__morecore)(ptrdiff_t) = __default_morecore;
 #define public_iCOMALLOc ptindependent_comalloc
 #define public_gET_STATe ptmalloc_get_state
 #define public_sET_STATe ptmalloc_set_state
+
+#define __malloc_initialize_hook        __ptmalloc_initialize_hook
+#define __free_hook                     __ptfree_hook
+#define __malloc_hook                   __ptmalloc_hook
+#define __realloc_hook                  __ptrealloc_hook
+#define __memalign_hook                 __ptmemalign_hook
 
 #else /* !_LIBC */
 

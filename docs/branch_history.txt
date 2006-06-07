@@ -21,6 +21,7 @@ chronological order.
 	- res changed the assert-in-assert handling to print the assert using
 	  the runtime functions as opposed to CS functions again. Also
 	  debug-break on first nested assert.
+	- res fixed an apparent name collision of some ptmalloc variables.
 5-Jun-2006
 	- res added CS::SpinLock.
 	- res added csScopedLock<> (which also works on non-mutexes).
