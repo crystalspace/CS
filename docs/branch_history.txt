@@ -9,6 +9,8 @@ chronological order.
 7-Jun-2006
 	- res updated ptmalloc to the version of May 30. Also updated
 	  dlmalloc to 2.8.4.
+	- res augmented the ptmalloc wrapper to do some error detection in
+	  debug mode.
 5-Jun-2006
 	- res added CS::SpinLock.
 	- res added csScopedLock<> (which also works on non-mutexes).
