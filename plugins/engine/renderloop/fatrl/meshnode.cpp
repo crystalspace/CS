@@ -45,7 +45,7 @@ csMeshRenderNode::csMeshRenderNode (csMeshRenderNodeFactory* factory,
 void csMeshRenderNode::RenderMeshes (iGraphics3D* g3d,
                                      iShader* shader, size_t ticket,
                                      csRenderMesh** meshes, size_t num,
-                                     const csShaderVarStack* Stacks)
+                                     csRef<iShaderVarStack>* Stacks)
 {
   if (num == 0) return;
   csRef<csShaderVariable> svO2W = 
@@ -63,8 +63,14 @@ void csMeshRenderNode::RenderMeshes (iGraphics3D* g3d,
       csRenderMesh* mesh = meshes[j];
       svO2W->SetValue (mesh->object2world);
 
-      const csShaderVarStack& stacks = Stacks[j];
-      shmgr->GetShaderVariableStack() = stacks;
+      iShaderVarStack* stacks = Stacks[j];
+      {
+        csRef<iShaderVarStack> smStacks;
+        smStacks = shmgr->GetShaderVariableStack();
+        smStacks->Empty();
+        for (size_t i = 0; i < stacks->GetSize(); i++)
+          smStacks->Push (stacks->Get (i));
+      }
       csRenderMeshModes modes (*mesh);
       shader->SetupPass (ticket, mesh, modes, stacks);
       g3d->DrawMesh (mesh, modes, stacks);
@@ -75,7 +81,7 @@ void csMeshRenderNode::RenderMeshes (iGraphics3D* g3d,
 }
 
 void csMeshRenderNode::AddMesh (csRenderMesh* rm, iShader* shader, 
-				const csShaderVarStack& stacks, 
+				iShaderVarStack* stacks, 
                                 long prio, bool keepOrder,
 				size_t ticket)
 {
