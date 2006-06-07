@@ -11,6 +11,7 @@ chronological order.
 	  dlmalloc to 2.8.4.
 	- res augmented the ptmalloc wrapper to do some error detection in
 	  debug mode.
+	- res added SCF interfaces for arrays.
 5-Jun-2006
 	- res added CS::SpinLock.
 	- res added csScopedLock<> (which also works on non-mutexes).
