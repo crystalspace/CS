@@ -18,6 +18,9 @@ chronological order.
 	- res made some Linux compile fixes.
 	- res made the ptmalloc wrapper asserts a bit more useful.
 	- res fixed compilation in -pedantic.
+	- res changed the assert-in-assert handling to print the assert using
+	  the runtime functions as opposed to CS functions again. Also
+	  debug-break on first nested assert.
 5-Jun-2006
 	- res added CS::SpinLock.
 	- res added csScopedLock<> (which also works on non-mutexes).
