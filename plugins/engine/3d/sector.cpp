@@ -563,7 +563,7 @@ csSectorHitBeamResult csSector::HitBeamPortals (
 {
   csSectorHitBeamResult rc;
   rc.mesh = 0;
-  rc.final_sector = 0;
+  rc.final_sector = static_cast<iSector*> (this);
   int p = IntersectSegment (start, end, rc.isect, 0, false,
 		  &rc.mesh);
   if (p != -1)

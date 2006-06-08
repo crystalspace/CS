@@ -13,6 +13,8 @@ chronological order.
 	  That is more friendly for python, java, perl, ...
 	- Jorrit extended iSector->HitBeamPortals() so that it also returns
 	  the last sector we entered.
+	- Jorrit fixed a bug in the new iSector->HitBeamPortals() with
+	  regards to the final_sector.
 7-Jun-2006
 	- mdmkolbe made "separate debug info" default to disabled by default
 	  on Cygwin.  All released binutils to date have a bug in them which
