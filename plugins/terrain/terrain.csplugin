@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<!-- terrain.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.terrain.simplerenderer</name>
+        <implementation>csTerrainSimpleRenderer</implementation>
+        <description>Simple terrain renderer</description>
+      </class>
+      <class>
+        <name>crystalspace.terrain.simplecollider</name>
+        <implementation>csTerrainSimpleCollider</implementation>
+        <description>Simple terrain collider</description>
+      </class>
+      <class>
+        <name>crystalspace.terrain.terrainsystem</name>
+        <implementation>csTerrainSystem</implementation>
+        <description>Terrain system</description>
+      </class>
+      <class>
+        <name>crystalspace.terrain.simpledatafeeder</name>
+        <implementation>csTerrainSimpleDataFeeder</implementation>
+        <description>Terrain simple data feeder</description>
+      </class>
+      <class>
+        <name>crystalspace.terrain.builder</name>
+        <implementation>csTerrainBuilder</implementation>
+        <description>Terrain builder</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>
