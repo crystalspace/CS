@@ -6,6 +6,13 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+8-Jun-2006
+	- Jorrit added new versions of iSector->HitBeamPortals() and
+	  iSector->HitBeam() which return their results in a
+	  csSectorHitBeamResult class instead of through their parameters.
+	  That is more friendly for python, java, perl, ...
+	- Jorrit extended iSector->HitBeamPortals() so that it also returns
+	  the last sector we entered.
 7-Jun-2006
 	- mdmkolbe made "separate debug info" default to disabled by default
 	  on Cygwin.  All released binutils to date have a bug in them which
