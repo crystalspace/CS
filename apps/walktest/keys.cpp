@@ -562,12 +562,12 @@ void WalkTest::MouseClick2Handler(iEvent &Event)
 
   iSector* sector = view->GetCamera ()->GetSector ();
   csVector3 origin = view->GetCamera ()->GetTransform ().GetO2TTranslation ();
-  csVector3 isect;
-  int sel;
-  iMeshWrapper* mesh = sector->HitBeamPortals (origin,
-  	origin + (vw-origin) * 20, isect, &sel);
+  csSectorHitBeamResult rc = sector->HitBeamPortals (origin,
+  	origin + (vw-origin) * 20);
+  iMeshWrapper* mesh = rc.mesh;
+  int sel = rc.polygon_idx;
 
-  vw = isect;
+  vw = rc.isect;
   v = view->GetCamera ()->GetTransform ().Other2This (vw);
   Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
   	"RMB down : cam:(%f,%f,%f) world:(%f,%f,%f)",

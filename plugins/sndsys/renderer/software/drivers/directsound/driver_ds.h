@@ -40,26 +40,40 @@ class SndSysDriverDirectSound;
 class SndSysDriverRunnable : public csRunnable
 {
 private:
-  SndSysDriverDirectSound* parent;
-  int ref_count;
+  SndSysDriverDirectSound* m_pParent;
+  int m_RefCount;
 
 public:
-  SndSysDriverRunnable (SndSysDriverDirectSound* parent) :
-  	parent (parent), ref_count (1) { }
-  virtual ~SndSysDriverRunnable () { }
+  SndSysDriverRunnable(SndSysDriverDirectSound* pParent) :
+  	m_pParent(pParent), m_RefCount (1) 
+  {
+  }
 
-  virtual void Run ();
-  virtual void IncRef() { ++ref_count; }
+  virtual ~SndSysDriverRunnable() 
+  {
+  }
+
+  /// \brief The main running function of this thread
+  virtual void Run();
+
+  virtual void IncRef() 
+  { 
+    ++m_RefCount; 
+  }
+
   /// Decrement reference count.
   virtual void DecRef()
   {
-    --ref_count;
-    if (ref_count <= 0)
+    --m_RefCount;
+    if (m_RefCount <= 0)
       delete this;
   }
 
   /// Get reference count.
-  virtual int GetRefCount() { return ref_count; }
+  virtual int GetRefCount() 
+  {
+    return m_RefCount; 
+  }
 };
 
 struct iConfigFile;
@@ -82,15 +96,15 @@ public:
   //------------------------
 public:
   // iComponent
-  virtual bool Initialize (iObjectRegistry *obj_reg);
+  virtual bool Initialize (iObjectRegistry *pObjectRegistry);
 
   //------------------------
   // iSndSysSoftwareDriver
   //------------------------
 public:
   /// Called to initialize the driver
-  bool Open (csSndSysRendererSoftware *renderer, 
-    csSndSysSoundFormat *requested_format);
+  bool Open (csSndSysRendererSoftware *pRenderer, 
+    csSndSysSoundFormat *pRequestedFormat);
 
   /// Called to shutdown the driver
   void Close ();
@@ -121,6 +135,31 @@ protected:
   /// Send a message to the sound system event recorder as the driver
   void RecordEvent(SndSysEventLevel Severity, const char* msg, ...);
 
+  /// \brief Called to determine whether we have underbuffered based on cursor positions
+  ///
+  /// \note This test cannot detect conditions where we're underbuffered so far that the play cursor
+  ///       has lapped the buffer.
+  ///
+  /// \return true : An underbuffer condition has occurred   false : No underbuffer condition has occurred 
+  bool HasUnderbuffered(int DSWriteCursor, int DSPlayCursor, int RealWriteCursor);
+
+  /// \brief Called to determine whether we have underbuffered based on last buffer fill time
+  ///
+  /// \note This test detects only conditions where we've underbuffered so far that the play cursor
+  ///       has lapped the buffer
+  ///
+  /// \return true : An underbuffer condition has occurred   false : No underbuffer condition has occurred 
+  bool HasUnderbuffered(csTicks CurrentTime, csTicks LastBufferFillTime);
+
+  /// \brief Called on an underbuffer condition to determine whether corrective action should be taken
+  ///
+  /// \return true : Corrective action should be taken.    false : Corrective action should not be taken.
+  bool NeedUnderbufferCorrection();
+
+  /// \brief Expands the underlying directsound buffer, clears the buffer, and restarts playback at the begining.
+  ///
+  /// \return true : OK   false : Expansion failed, cannot continue playback.
+  bool CorrectUnderbuffer();
 
   ////
   // Member Variables
@@ -153,14 +192,17 @@ protected:
   /// The length of the DirectSound allocated buffer, in milliseconds
   csTicks m_BufferLengthms;
 
-  /** The minimum number of empty frames that need to be available
-   *    before a write is considered worthwhile.
-   */
-  DWORD m_DirectSoundBufferMinimumFillFrames;
+  /// \brief The byte offset into the directsound buffer where data should
+  ///        next be written.
+  int m_RealWriteCursor;
 
   /// The number of underbuffer conditions that must occur before
   //   we take major corrective action
   int m_UnderBuffersAllowed;
+
+  /// \brief The number of underbuffer conditions that have occurred
+  ///        since the last corrective action.
+  int m_UnderBufferCount;
 
   /// A flag used to shut down the running background thread.
   // We don't really need to synchronize access to this since a delay in
@@ -171,7 +213,11 @@ protected:
   csRef<csThread> m_pBackgroundThread;
 
   /// The event recorder interface, if active
-  csRef<iSndSysEventRecorder> m_EventRecorder;
+  csRef<iSndSysEventRecorder> m_pEventRecorder;
+
+  /// \brief The windows Event object that will be signaled at pre-defined playback positions
+  ///        to request buffer fills.
+  HANDLE m_BufferFillNeededEvent;
 };
 
 }

@@ -26,6 +26,12 @@
 
 #include "csextern.h"
 
+// Hack: Work around problems caused by #defining 'new'.
+#if defined(CS_EXTENSIVE_MEMDEBUG) || defined(CS_MEMORY_TRACKER)
+# undef new
+#endif
+#include <new>
+
 /**
  * A radix-sorter for signed and unsigned integers as well as floats.
  * Creates an index-table instead of reordering elements.
@@ -144,5 +150,9 @@ private:
 
   bool ranksValid;
 };
+
+#if defined(CS_EXTENSIVE_MEMDEBUG) || defined(CS_MEMORY_TRACKER)
+# define new CS_EXTENSIVE_MEMDEBUG_NEW
+#endif
 
 #endif

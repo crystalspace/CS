@@ -358,7 +358,7 @@ struct iPortal : public virtual iBase
    */
   virtual iMeshWrapper* HitBeamPortals (const csReversibleTransform& t,
 	const csVector3& start, const csVector3& end,
-  	csVector3& isect, int* polygon_idx) = 0;
+  	csVector3& isect, int* polygon_idx, iSector** final_sector = 0) = 0;
 
   /**
    * Get number of vertices in the array returned by GetVertices().

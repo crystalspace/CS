@@ -1028,17 +1028,16 @@ happens with the @code{Check()} function below:
 void Laser::Check ()
 @{
   // Do a beam to check if we hit an adversary.
-  csVector3 isect;
-  iMeshWrapper* mesh = lasersector->HitBeamPortals (laserstart,
-  	laserend, isect, 0);
-  if (mesh)
+  csSectorHitBeamResult rc = lasersector->HitBeamPortals (
+  	laserstart, laserend);
+  if (rc.mesh)
   @{
     csRef<Adversary> adv = CS_GET_CHILD_OBJECT (
-    	mesh->QueryObject (), Adversary);
+    	rc.mesh->QueryObject (), Adversary);
     if (adv)
     @{
       // Hit!
-      app->ExplodeAdversary (adv);
+      app->GetGame ().ExplodeAdversary (adv);
     @}
   @}
 @}

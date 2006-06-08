@@ -351,7 +351,20 @@ AS_IF([test "$with_java" != no && test -n "$JAVAC" && test -n "$JAVA"],
     [CS_JAVA_FLAGS([cs_java], [$JAVAC])
     CS_CHECK_BUILD([if Java2 SDK is usable], [cs_cv_java],
 	[AC_LANG_PROGRAM(
-	    [[#include <jni.h>
+	    [[
+	    #if defined(__GNUC__)
+	        typedef long long __int64; /*For gcc on Windows */
+	    #endif
+
+	    /* fix for 'jlong' on x86_64 */
+	    #if defined(__x86_64)
+	    #ifdef _LP64 /* 64-bit Solaris */
+	    #undef _LP64
+	    #endif
+	    #endif
+
+	    #include <jni.h>
+
 	    JNIEXPORT void JNICALL f(JNIEnv *env, jobject obj);]])],
 	[CS_CREATE_TUPLE() \
         CS_CREATE_TUPLE([$cs_java_cflags],[$cs_java_lflags],[$cs_java_libs])],
@@ -810,15 +823,20 @@ CS_CHECK_OPTIMIZE_FLAGS
 binutils_recent=no
 AS_IF([test -n "$OBJCOPY"],
     [CS_CHECK_PROG_VERSION([binutils], [$OBJCOPY -V], [2.16.0], [9.9.9|.9.9],
-	[binutils_recent=yes])])
+        [binutils_recent=yes])])
 
-AC_ARG_WITH([separate-debug-info], [AC_HELP_STRING([--with-separate-debug-info],
-    [split debug information into separate files. (default YES if 
-    binutils >= 2.16 detected, otherwise default NO)])])
-AS_IF([test -z "$with_separate_debug_info"], 
-    [with_separate_debug_info=$binutils_recent])
+AC_MSG_CHECKING([whether to split debug information])
+AC_ARG_ENABLE([separate-debug-info], 
+    [AC_HELP_STRING([--enable-separate-debug-info],
+        [split debug information into separate files. (default YES if 
+        binutils >= 2.16 detected and not on Cygwin, otherwise default NO)])])
+AS_IF([test -z "$enable_separate_debug_info"], 
+    AS_IF([test -z `uname | grep -i CYGWIN`],
+        [enable_separate_debug_info=$binutils_recent],
+        [enable_separate_debug_info=no]))
+AC_MSG_RESULT([$enable_separate_debug_info])
 
-CS_EMIT_BUILD_PROPERTY([LINK.DEBUG.INFO.SEPARATE], [$with_separate_debug_info])
+CS_EMIT_BUILD_PROPERTY([LINK.DEBUG.INFO.SEPARATE], [$enable_separate_debug_info])
 
 CS_EMIT_BUILD_FLAGS([how to enable debug mode debugging symbols],
     [cs_cv_prog_cxx_debug_symbols_extra],
@@ -827,13 +845,17 @@ CS_EMIT_BUILD_FLAGS([how to enable debug mode debugging symbols],
     [CS_EMIT_BUILD_PROPERTY([COMPILER.LFLAGS.debug],
 	[$cs_cv_prog_cxx_debug_symbols_extra], [+])])
 	
-AC_ARG_WITH([optimize-debug-info], [AC_HELP_STRING([--with-optimize-debug-info],
-    [whether to enable debug information even in optimize builds. 
-    (default YES if separate debug information is enabled, 
-    otherwise default NO)])])
-AS_IF([test -z "$with_optimize_debug_info"], 
-    [with_optimize_debug_info=$with_separate_debug_info])
-AS_IF([test "$with_optimize_debug_info" != no],
+AC_MSG_CHECKING([whether to enable debug information in optimize mode])
+AC_ARG_ENABLE([optimize-mode-debug-info], 
+    [AC_HELP_STRING([--enable-optimize-mode-debug-info],
+        [whether to enable debug information even in optimize builds. 
+        (default YES if separate debug information is enabled, 
+        otherwise default NO)])],
+    [enable_optimize_mode_debug_info=$enableval])
+AS_IF([test -z "$enable_optimize_mode_debug_info"], 
+    [enable_optimize_mode_debug_info=$enable_separate_debug_info])
+AC_MSG_RESULT([$enable_optimize_mode_debug_info])
+AS_IF([test "$enable_optimize_mode_debug_info" != "no"],
     [CS_EMIT_BUILD_FLAGS([how to enable optimize mode debugging symbols],
 	[cs_cv_prog_cxx_debug_symbols_normal],
 	[CS_CREATE_TUPLE([-g2]) CS_CREATE_TUPLE([-g])],

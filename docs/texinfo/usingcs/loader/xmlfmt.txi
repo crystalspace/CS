@@ -336,15 +336,15 @@ As mentioned earlier, The @samp{mode3d} enumeration is one of:
 breakdown of what each of these options implies:
 
 @itemize
-@item @samp{disabled}
-When @samp{mode3d} is @samp{disabled} then no signal processing is done
+@item @samp{disable}
+When @samp{mode3d} is @samp{disable} then no signal processing is done
 to the sound object. This mode allows stereo audio to be stored in a
 sound object. Both other modes only allow one channel.
 @item @samp{relative}
 When @samp{mode3d} is @samp{relative} then some level of signal processing
 is done to ensure that the sound being played will have different volumes
 depending on the @samp{position} parameter of the sound object. Note that
-only on-channel sound objects are allowed.
+only one-channel sound objects are allowed.
 @item @samp{absolute}
 When @samp{mode3d} is @samp{absolute} then the highest level of signal
 processing is performed. Like @samp{relative} this mode only works with
@@ -385,7 +385,7 @@ elements that can be found within a @code{variable} element:
 The name of the variable.
 @item @samp{value} @samp{String} attribute
 A string value associated with the variable name.
-@item @samp{oolor} element
+@item @samp{color} element
 A color value associated with the variable name. A @samp{color} element
 can have @samp{red}, @samp{green}, @samp{blue}, and optionally
 @samp{alpha} attributes, where each attribute can be assigned a value

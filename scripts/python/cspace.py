@@ -2344,6 +2344,8 @@ class csRGBcolor(_object):
     def __eq__(*args): return _cspace.csRGBcolor___eq__(*args)
     def __ne__(*args): return _cspace.csRGBcolor___ne__(*args)
     def __add__(*args): return _cspace.csRGBcolor___add__(*args)
+    def UnsafeAdd(*args): return _cspace.csRGBcolor_UnsafeAdd(*args)
+    def SafeAdd(*args): return _cspace.csRGBcolor_SafeAdd(*args)
     def __del__(self, destroy=_cspace.delete_csRGBcolor):
         try:
             if self.thisown: destroy(self)
