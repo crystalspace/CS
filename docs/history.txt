@@ -15,6 +15,9 @@ chronological order.
 	  the last sector we entered.
 	- Jorrit fixed a bug in the new iSector->HitBeamPortals() with
 	  regards to the final_sector.
+	- Jorrit added updated ambient shader from Erroroman/caedes which
+	  adds support for glow.
+	- Jorrit added new parallaxAtt shader from Erroroman.
 7-Jun-2006
 	- mdmkolbe made "separate debug info" default to disabled by default
 	  on Cygwin.  All released binutils to date have a bug in them which
