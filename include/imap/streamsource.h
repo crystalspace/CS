@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2005 by Jorrit Tyberghein
+    Copyright (C) 2006 by David H. Bronke
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -31,16 +32,33 @@ struct iDataBuffer;
  * @{ */
 
 /**
- * This callback will be fired when the data is ready.
+ * Callback functions for when a streaming operation has finished or when an
+ * error has occurred.
  */
 struct iStreamDataCallback : public virtual iBase
 {
-  SCF_INTERFACE (iStreamDataCallback, 0, 0, 1);
+  SCF_INTERFACE (iStreamDataCallback, 1, 0, 0);
 
   /**
-   * The buffer is ready. The buffer will be endian correct for this system.
+   * The type of streaming operation being referenced.
    */
-  virtual void DataReady (iDataBuffer* data) = 0;
+  enum RequestType
+  {
+    RT_SAVE,
+    RT_LOAD
+  };
+
+  /**
+   * The given streaming operation is finished. In the case of a load, the
+   * buffer will be endian correct for this system.
+   */
+  virtual void StreamingFinished (const char* id, iDataBuffer* data, RequestType type = RT_LOAD) = 0;
+
+  /**
+   * An error has occurred during the given streaming operation. The error
+   * should already be reported.
+   */
+  virtual void StreamingError (const char* id, RequestType type = RT_LOAD) = 0;
 };
 
 /**
@@ -52,24 +70,31 @@ struct iStreamDataCallback : public virtual iBase
  */
 struct iStreamSource : public virtual iBase
 {
-  SCF_INTERFACE (iStreamSource, 0, 0, 1);
+  SCF_INTERFACE (iStreamSource, 1, 0, 0);
+
+  /**
+   * Available priority levels for load/save requests.
+   */
+  enum RequestPriority
+  {
+    RP_LOW           = 0,
+    RP_NORMAL        = 10,
+    RP_HIGH          = 100,
+    RP_TIME_CRITICAL = 1000
+  };
 
   /**
    * Load a buffer given an id. This will fire the callback as soon as
    * the buffer is ready. Note that some implementations that don't support
-   * asynchronious loading may call the callback immediatelly from within
+   * asynchronous loading may call the callback immediatelly from within
    * this function.
-   * \return false if we can't find the buffer (early error). The error
-   * should be placed on the reporter.
    */
-  virtual bool QueryBuffer (const char* id, iStreamDataCallback* callback) = 0;
+  virtual void QueryBuffer (const char* id, iStreamDataCallback* callback, RequestPriority priority = RP_NORMAL, iProgressMeter* indicator = 0) = 0;
 
   /**
-   * Save a buffer with some id. Returns false if the buffer couldn't be
-   * saved for some reason. The error should be reported on the reporter
-   * by this function.
+   * Save a buffer with some id.
    */
-  virtual bool SaveBuffer (const char* id, iDataBuffer* buffer) = 0;
+  virtual void SaveBuffer (const char* id, iDataBuffer* buffer, iStreamDataCallback* callback, RequestPriority priority = RP_NORMAL, iProgressMeter* indicator = 0) = 0;
 };
 
 /** @} */

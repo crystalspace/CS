@@ -6,6 +6,22 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+8-June-2006
+	- David H. Bronke audited imap/streamsource.h and made the following
+	  changes:
+	  - The stream callback now contains a StreamingError() function as well
+	    as StreamingFinished() (renamed from DataReady) to allow errors to be
+	    caught after streaming has started. An iStreamCallback* parameter has
+	    been added to SaveBuffer() as well, allowing both loading and saving
+	    to report back on errors and completion of the streaming operation.
+	  - Priorities have also been added to QueryBuffer() and SaveBuffer().
+	    There are currently four priority levels: low, normal, high, and
+	    time-critical. The plan is for buffers to start at the given priority,
+	    and then have their priority increase every so often so that buffers
+	    that were requested earlier have priority over newly-requested buffers
+	    of the same starting priority.
+	  - An iProgressMeter* parameter has been added to QueryBuffer() and
+	    SaveBuffer() to allow for progress indication later on.
 3-June-2006
 	- David H. Bronke added a forward declaration of iDataBuffer to
 	  imap/streamsource.h, and added a stubbed-out implementation of
