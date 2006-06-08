@@ -764,7 +764,7 @@ inline void operator delete[] (void* p, void*, int) { operator delete[] (p); }
  * \todo In the future, this should be moved to csconfig.h and determined as
  * part of the configuration process.
  */
-#if !defined (CS_PROCESSOR_X86)
+#if defined (CS_PROCESSOR_SPARC)
 #  define CS_STRICT_ALIGNMENT
 #endif
 

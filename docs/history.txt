@@ -20,6 +20,11 @@ chronological order.
 	- Jorrit added updated ambient shader from Erroroman/caedes which
 	  adds support for glow.
 	- Jorrit added new parallaxAtt shader from Erroroman.
+	- res changed "CS_STRICT_ALIGNMENT" from being defined on all but x86
+	  processors to be only defined on Sparc (where it was originally 
+	  needed).
+	- res fixed the GL renderer to repack csRGBcolor to an RGB bytestream
+	  on platforms that need it.
 7-Jun-2006
 	- mdmkolbe made "separate debug info" default to disabled by default
 	  on Cygwin.  All released binutils to date have a bug in them which
