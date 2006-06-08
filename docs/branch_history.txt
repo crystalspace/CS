@@ -6,6 +6,8 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+8-Jun-2006
+	- res changed the spr2d to use an iArray instead of a csArray.
 7-Jun-2006
 	- res updated ptmalloc to the version of May 30. Also updated
 	  dlmalloc to 2.8.4.

@@ -23,6 +23,7 @@
  * 2D sprite (billboard) mesh object
  */ 
 
+#include "iutil/array.h"
 #include "csutil/scf.h"
 #include "csutil/dirtyaccessarray.h"
 #include "csutil/cscolor.h"
@@ -40,9 +41,17 @@ struct csSprite2DVertex
   csColor color_init;
   csColor color;
   float u, v;
+  bool operator== (const csSprite2DVertex& other)
+  { 
+    return (pos == other.pos) && (color_init == other.color_init)
+      && (color == other.color) && (u == other.u) && (v == other.v);
+  }
 };
 
-typedef csDirtyAccessArray<csSprite2DVertex> csColoredVertices;
+struct iColoredVertices : public iArrayChangeAll<csSprite2DVertex>
+{
+  SCF_IARRAYCHANGEALL_INTERFACE(iColoredVertices);
+};
 
 /**
  * This is a single frame in a UV animation. So its not much more than a set of
@@ -210,10 +219,10 @@ struct iSprite2DFactoryState : public virtual iBase
  */
 struct iSprite2DState : public iSprite2DFactoryState
 {
-  SCF_INTERFACE (iSprite2DState, 1, 0, 0);
+  SCF_INTERFACE (iSprite2DState, 1, 1, 0);
 
   /// Get the vertex array.
-  virtual csColoredVertices& GetVertices () = 0;
+  virtual iColoredVertices* GetVertices () = 0;
   /**
    * Set vertices to form a regular n-polygon around (0,0),
    * optionally also set u,v to corresponding coordinates in a texture.
