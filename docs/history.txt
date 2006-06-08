@@ -7,6 +7,8 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 8-Jun-2006
+	- Andres added a stupid filter to the annotation facility to filter
+	  obvious spam.
 	- Jorrit added new versions of iSector->HitBeamPortals() and
 	  iSector->HitBeam() which return their results in a
 	  csSectorHitBeamResult class instead of through their parameters.
