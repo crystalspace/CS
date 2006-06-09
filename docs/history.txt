@@ -12,6 +12,7 @@ chronological order.
 	  - the CS_DEPRECATED_METHOD tag on iString::Clear()
 	  - CS_PRId64 vs PRId64 in include/csutil/timemeasure.h
 	    (Use the first for csPrintf and the second for printf.)
+	- mdmkolbe fixed a suspected variable name typo.
 8-Jun-2006
 	- Andres added a stupid filter to the annotation facility to filter
 	  obvious spam.
