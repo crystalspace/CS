@@ -29,6 +29,7 @@ chronological order.
 	  that it actually works. Previously it would set a default
 	  renderloop and later on it would be overwritten again by
 	  the usual default renderloop.
+	- mdmkolbe fixed overload ambiguity error in picView.
 8-Jun-2006
 	- Andres added a stupid filter to the annotation facility to filter
 	  obvious spam.
