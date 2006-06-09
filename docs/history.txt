@@ -25,6 +25,10 @@ chronological order.
 	  needed).
 	- res fixed the GL renderer to repack csRGBcolor to an RGB bytestream
 	  on platforms that need it.
+	- Rhad added more robust error handling to the ALSA sound driver.
+	  This should correct some cases where the sound device was entering
+	  a bad state and never coming out when an underbuffer condition
+	  occurred.
 7-Jun-2006
 	- mdmkolbe made "separate debug info" default to disabled by default
 	  on Cygwin.  All released binutils to date have a bug in them which
