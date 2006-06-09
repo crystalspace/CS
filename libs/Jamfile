@@ -87,7 +87,7 @@ SubInclude TOP libs csplugincommon ;
 
 SubDir TOP libs ;
 
-if if [ Property build : projgen ] = msvc
+if [ Property build : projgen ] = msvc
 {
   IncludeDir  $(CSLIB.ROOT) csutil ptmalloc sysdeps win32 : crystalspace ;
 }
