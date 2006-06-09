@@ -62,6 +62,7 @@ chronological order.
 	  This should correct some cases where the sound device was entering
 	  a bad state and never coming out when an underbuffer condition
 	  occurred.
+	- AndyDude fixed the url to demodata.zip to be the recent one.
 7-Jun-2006
 	- mdmkolbe made "separate debug info" default to disabled by default
 	  on Cygwin.  All released binutils to date have a bug in them which
