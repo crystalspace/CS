@@ -6,6 +6,12 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+9-Jun-2006
+	- mdmkolbe fixed the following:
+	  - several unused parameter warnings
+	  - the CS_DEPRECATED_METHOD tag on iString::Clear()
+	  - CS_PRId64 vs PRId64 in include/csutil/timemeasure.h
+	    (Use the first for csPrintf and the second for printf.)
 8-Jun-2006
 	- Andres added a stupid filter to the annotation facility to filter
 	  obvious spam.

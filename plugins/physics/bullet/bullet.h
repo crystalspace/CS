@@ -140,8 +140,8 @@ public:
 
   void Execute (iMeshWrapper* mesh, csOrthoTransform& t);
   void Execute (csOrthoTransform& t);
-  void Execute (iLight* light, csOrthoTransform& t){;}
-  void Execute (iCamera* camera, csOrthoTransform& t) {;}
+  void Execute (iLight*, csOrthoTransform&) {}
+  void Execute (iCamera*, csOrthoTransform&) {}
 };
 
 class	MyMotionState : public PHY_IMotionState

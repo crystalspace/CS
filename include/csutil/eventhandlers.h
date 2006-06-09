@@ -310,7 +310,7 @@ class FrameSignpost_DebugFrame
 CS_EVENTHANDLER_NAMES(x)						\
 CS_EVENTHANDLER_DEFAULT_INSTANCE_CONSTRAINTS				\
 CS_CONST_METHOD virtual const csHandlerID * GenericPrec			\
-(csRef<iEventHandlerRegistry> &r1, csRef<iEventNameRegistry> &r2,	\
+(csRef<iEventHandlerRegistry> &, csRef<iEventNameRegistry> &,		\
  csEventID) const {							\
   return 0;								\
 }									\
@@ -485,8 +485,8 @@ CS_CONST_METHOD virtual const csHandlerID * GenericPrec			\
   return precConstraint;						\
 }									\
 CS_CONST_METHOD virtual const csHandlerID * GenericSucc			\
-(csRef<iEventHandlerRegistry> &r1, csRef<iEventNameRegistry> &r2,	\
- csEventID event) const {						\
+(csRef<iEventHandlerRegistry> &, csRef<iEventNameRegistry> &,		\
+ csEventID) const {							\
   return 0;								\
 }
 
