@@ -37,6 +37,8 @@ chronological order.
 	  - include/csutil/sysfunc.h
 	  Files that assumed these headers included things such as csstring.h
 	  and util.h were corrected.
+	- Jorrit fixed a compile error in tinypars.cpp after the removal
+	  of several includes.
 8-Jun-2006
 	- Andres added a stupid filter to the annotation facility to filter
 	  obvious spam.
