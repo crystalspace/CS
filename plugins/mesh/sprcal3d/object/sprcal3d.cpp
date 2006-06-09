@@ -16,6 +16,13 @@ License along with this library; if not, write to the Free
 Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+/* We need to pass some new-ed objects into Cal3d itself (which does
+ * obviously not use CS' ptmalloc), so we can't use ptmalloc here 
+ */
+#ifndef CS_NO_PTMALLOC
+#define CS_NO_PTMALLOC
+#endif
+
 #include "cssysdef.h"
 #include "csqsqrt.h"
 
