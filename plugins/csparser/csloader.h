@@ -64,6 +64,7 @@ struct iPolygonMesh;
 struct iShaderManager;
 struct iMeshGenerator;
 struct iSceneNode;
+struct iRenderLoop;
 
 struct iObject;
 struct iThingState;
@@ -147,11 +148,13 @@ public:
 
   virtual iSector* FindSector (const char* name);
   virtual iMaterialWrapper* FindMaterial (const char* name);
-  virtual iMaterialWrapper* FindNamedMaterial (const char* name, const char *filename);
+  virtual iMaterialWrapper* FindNamedMaterial (const char* name,
+  	const char *filename);
   virtual iMeshFactoryWrapper* FindMeshFactory (const char* name);
   virtual iMeshWrapper* FindMeshObject (const char* name);
   virtual iTextureWrapper* FindTexture (const char* name);
-  virtual iTextureWrapper* FindNamedTexture (const char* name, const char *filename);
+  virtual iTextureWrapper* FindNamedTexture (const char* name,
+  	const char *filename);
   virtual iLight* FindLight (const char *name);
   virtual iShader* FindShader (const char *name);
   virtual bool CheckDupes () const { return checkDupes; }
@@ -325,6 +328,8 @@ private:
   /// Parse a material definition and add the material to the engine
   iMaterialWrapper* ParseMaterial (iLoaderContext* ldr_context,
   	iDocumentNode* node, const char* prefix = 0);
+  /// Parse a renderloop.
+  iRenderLoop* ParseRenderLoop (iDocumentNode* node, bool& set);
   /// Parse a collection definition and add the collection to the engine
   iCollection* ParseCollection (iLoaderContext* ldr_context,
   	iDocumentNode* node);

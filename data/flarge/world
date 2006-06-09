@@ -344,6 +344,17 @@
     </start>
     <library>/lib/teapot/teapot.lib</library>
 
+  <addon>
+    <plugin>crystalspace.renderloop.loop.loader</plugin>
+    <paramsfile>/shader/std_rloop_diffuse.xml</paramsfile>
+  </addon>
+
+  <settings>
+    <renderloop variable="renderloop">
+        <condition value="diffuse">std_rloop_diffuse</condition>
+    </renderloop>
+  </settings>
+
   <!-- START: For the christmas tree -->
   <meshfact name="Plane.056">
     <plugin>spr2dFact</plugin>

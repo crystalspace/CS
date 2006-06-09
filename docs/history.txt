@@ -13,6 +13,22 @@ chronological order.
 	  - CS_PRId64 vs PRId64 in include/csutil/timemeasure.h
 	    (Use the first for csPrintf and the second for printf.)
 	- mdmkolbe fixed a suspected variable name typo.
+	- Jorrit added support for strings to iSharedVariable.
+	- Jorrit added std_rloop_standard.xml which corresponds to the
+	  standard default renderloop as created internally by the engine.
+	- Jorrit added support for conditional renderloops in a map file.
+	  You can now say something like this:
+		<renderloop variable="quality">
+		    <condition value="low">std_rloop_standard</condition>
+		    <condition value="high">std_rloop_shadowmap</condition>
+		    <default>std_rloop_diffuse</default>
+		</renderloop>
+	  It will use the shared variable 'quality' to determine which
+	  renderloop to select.
+	- Jorrit fixed the engine renderloop commandline option so
+	  that it actually works. Previously it would set a default
+	  renderloop and later on it would be overwritten again by
+	  the usual default renderloop.
 8-Jun-2006
 	- Andres added a stupid filter to the annotation facility to filter
 	  obvious spam.
