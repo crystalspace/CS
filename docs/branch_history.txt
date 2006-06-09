@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+9-Jun-2006
+	- res changed the way how malloc etc. are overridden to make things
+	  more friendly in case identifiers like "free" are used in code.
 8-Jun-2006
 	- res changed the spr2d to use an iArray instead of a csArray.
 7-Jun-2006

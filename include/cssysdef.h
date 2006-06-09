@@ -574,30 +574,36 @@ Type &Class::getterFunc ()                                     \
 #endif
 
 #ifndef CS_NO_PTMALLOC
-namespace CS
-{
-  namespace Memory
-  {
-    extern void* CS_CRYSTALSPACE_EXPORT ptmalloc (size_t n);
-    extern void CS_CRYSTALSPACE_EXPORT ptfree (void* p);
-    extern void* CS_CRYSTALSPACE_EXPORT ptrealloc (void* p, size_t n);
-    extern void* CS_CRYSTALSPACE_EXPORT ptmemalign (size_t a, size_t n);
-    extern void* CS_CRYSTALSPACE_EXPORT ptcalloc (size_t n, size_t s);
-  }
-}
-#define malloc 		CS::Memory::ptmalloc
-#define free 	CS::	Memory::ptfree
-#define realloc 	CS::Memory::ptrealloc
-#define memalign	CS::Memory::ptmemalign
-#define calloc 		CS::Memory::ptcalloc
+extern void* CS_CRYSTALSPACE_EXPORT ptmalloc (size_t n);
+extern void CS_CRYSTALSPACE_EXPORT ptfree (void* p);
+extern void* CS_CRYSTALSPACE_EXPORT ptrealloc (void* p, size_t n);
+extern void* CS_CRYSTALSPACE_EXPORT ptmemalign (size_t a, size_t n);
+extern void* CS_CRYSTALSPACE_EXPORT ptcalloc (size_t n, size_t s);
+
+inline void* platform_malloc (size_t n)
+{ return malloc (n); }
+inline void platform_free (void* p)
+{ return free (p); }
+inline void* platform_realloc (void* p, size_t n)
+{ return realloc (p, n); }
+
+#define malloc 		ptmalloc
+#define free 	        ptfree
+#define realloc 	ptrealloc
+#define memalign	ptmemalign
+#define calloc 		ptcalloc
 inline void* operator new (size_t s)
-{ return CS::Memory::ptmalloc (s); }
+{ return ptmalloc (s); }
 inline void* operator new[] (size_t s)
-{ return CS::Memory::ptmalloc (s); }
+{ return ptmalloc (s); }
 inline void operator delete (void* p) 
-{ CS::Memory::ptfree (p); }
+{ ptfree (p); }
 inline void operator delete[] (void* p) 
-{ CS::Memory::ptfree (p); }
+{ ptfree (p); }
+#else
+#define platform_malloc   malloc
+#define platform_free     free
+#define platform_realloc  realloc
 #endif
 
 // The following define should only be enabled if you have defined

@@ -29,25 +29,11 @@
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 
-#ifdef free
-#define OLDFREE free
-#undef free
-#endif
-#ifdef realloc
-#define OLDREALLOC realloc
-#undef realloc
-#endif
 #include <ft2build.h>
 #include FT_INTERNAL_OBJECTS_H
 #include FT_FREETYPE_H
 #include FT_GLYPH_H
 #include FT_MODULE_H
-#ifdef OLDFREE
-#define free OLDFREE
-#endif
-#ifdef OLDREALLOC
-#define realloc OLDREALLOC
-#endif
 
 #include "freefnt2.h"
 
