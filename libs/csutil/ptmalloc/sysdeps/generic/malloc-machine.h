@@ -63,7 +63,13 @@ typedef void *tsd_key_t;
 
 #elif defined(_MSC_VER)
 
-#include <intrin.h>
+#if _MSC_VER >= 1400
+  #include <intrin.h>
+#else
+  void _ReadWriteBarrier (void);
+  void _ReadBarrier (void);
+  void _WriteBarrier (void);
+#endif
 
 #ifndef atomic_full_barrier
 # define atomic_full_barrier() _ReadWriteBarrier()
@@ -78,7 +84,9 @@ typedef void *tsd_key_t;
 #endif
 
 #pragma intrinsic(_ReadWriteBarrier)
-#pragma intrinsic(_ReadBarrier)
+#if _MSC_VER >= 1400
+  #pragma intrinsic(_ReadBarrier)
+#endif
 #pragma intrinsic(_WriteBarrier)
 
 #else

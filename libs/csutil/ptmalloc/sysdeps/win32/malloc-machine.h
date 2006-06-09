@@ -101,6 +101,13 @@ typedef struct {
   int pad0_;
 } mutex_t;
 
+#if _MSC_VER >= 1400
+  #include <intrin.h>
+#else
+  long _InterlockedExchange (long volatile *, long);
+#endif
+#pragma intrinsic (_InterlockedExchange)
+
 #define MUTEX_INITIALIZER          { 0 }
 #define mutex_init(m)              ((m)->lock = 0)
 static __inline int mutex_lock(mutex_t *m) {

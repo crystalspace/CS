@@ -81,7 +81,11 @@
   #pragma intrinsic (abs, fabs)
   #pragma intrinsic (_byteswap_ushort, _byteswap_ulong, _byteswap_uint64)
   
-  #include <intrin.h>
+  #if _MSC_VER >= 1400
+    #include <intrin.h>
+  #else
+    extern "C" long _InterlockedExchange (long volatile *, long);
+  #endif
   #pragma intrinsic (_InterlockedExchange)
 
   #if defined(__CRYSTAL_SPACE__) && !defined(CS_DEBUG)
