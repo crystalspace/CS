@@ -24,6 +24,8 @@
 #include "csgeom/poly2d.h"
 #include "csgeom/transfrm.h"
 
+#include "csutil/csstring.h"
+
 //---------------------------------------------------------------------------
 const csBox2::bEdge csBox2::edges[8] =
 {

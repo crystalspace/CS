@@ -26,6 +26,7 @@
 #include "csextern.h"
 #include "csutil/array.h"
 #include "csutil/comparator.h"
+#include "csutil/util.h"
 
 
 /**\addtogroup util_containers

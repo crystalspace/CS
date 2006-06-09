@@ -25,6 +25,7 @@
 #include "imap/loader.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
+#include "csutil/csstring.h"
 #include "csutil/util.h"
 #include "csutil/strhash.h"
 #include "csutil/hash.h"

@@ -30,6 +30,13 @@ chronological order.
 	  renderloop and later on it would be overwritten again by
 	  the usual default renderloop.
 	- mdmkolbe fixed overload ambiguity error in picView.
+	- mdmkolbe removed unneeded includes from:
+	  - include/csgeom/math3d.h
+	  - include/iutil/event.h
+	  - include/csutil/comparator.h
+	  - include/csutil/sysfunc.h
+	  Files that assumed these headers included things such as csstring.h
+	  and util.h were corrected.
 8-Jun-2006
 	- Andres added a stupid filter to the annotation facility to filter
 	  obvious spam.

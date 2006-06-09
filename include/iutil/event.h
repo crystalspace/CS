@@ -22,7 +22,7 @@
 
 #include "cssysdef.h"
 
-#include "csutil/scf.h"
+#include "csutil/scf_interface.h"
 #include "csutil/csunicode.h"
 #include "csutil/strset.h"
 #include "csutil/eventnames.h"

@@ -19,6 +19,7 @@
 #include "cssysdef.h"
 
 #include "cstool/collider.h"
+#include "csutil/csstring.h"
 #include "csutil/flags.h"
 #include "csutil/sparse3d.h"
 #include "iengine/light.h"
