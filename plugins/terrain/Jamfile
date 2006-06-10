@@ -5,4 +5,6 @@ Description terrain : "Improved Terrain plugin" ;
 Plugin terrain
         : [ Wildcard *.cpp *.h ]
 ;
+
 LinkWith terrain : crystalspace ;
+
