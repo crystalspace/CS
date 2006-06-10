@@ -55,7 +55,7 @@ void csTerrainBuilder::AddCell(const char* name, int grid_width, int grid_height
   csRef<iTerrainCellCollisionProperties> collision_properties = terrain->GetCollider()->CreateProperties();
   
   csRef<csTerrainCell> cell;
-  cell.AttachNew(new csTerrainCell(NULL, name, grid_width, grid_height, material_width, material_height, position, size, feeder, render_properties, collision_properties));
+  cell.AttachNew(new csTerrainCell(NULL, name, grid_width, grid_height, material_width, material_height, position, size, feeder, render_properties, collision_properties, terrain->GetRenderer()));
                                      
   terrain->AddCell(cell);
 }

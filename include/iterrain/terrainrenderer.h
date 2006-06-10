@@ -27,6 +27,7 @@ struct iTerrainCellRenderProperties;
 struct iMovable;
 struct iTerrainCell;
 
+class csRect;
 struct csRenderMesh;
 
 struct iTerrainRenderer : public virtual iBase
@@ -35,6 +36,8 @@ struct iTerrainRenderer : public virtual iBase
 
   virtual csPtr<iTerrainCellRenderProperties> CreateProperties() = 0;
   virtual csRenderMesh** GetRenderMeshes(int& n, iRenderView* rview, iMovable* movable, uint32 frustum_mask, iTerrainCell** cells, int cell_count) = 0;
+
+  virtual void OnHeightUpdate(iTerrainCell* cell, const csRect& rectangle, float* data, unsigned int pitch) = 0;
 };
 
 #endif // __CS_ITERRAIN_TERRAINRENDERER_H__

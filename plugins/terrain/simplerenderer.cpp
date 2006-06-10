@@ -25,12 +25,25 @@
 
 #include "iengine.h"
 
+#include "iterrain/terraincell.h"
+
 #include "csutil/objreg.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(ImprovedTerrain)
 {
 
 SCF_IMPLEMENT_FACTORY (csTerrainSimpleRenderer)
+
+struct csSimpleTerrainRenderData: public csRefCount
+{
+  csRef<csRenderBuffer> vb_pos;
+  csRef<csRenderBuffer> vb_texcoord;
+  csRef<csRenderBuffer> ib;
+
+  csRef<iMaterialWrapper> material;
+
+  unsigned int primitive_count;
+};
 
 csTerrainSimpleCellRenderProperties::csTerrainSimpleCellRenderProperties (iBase* parent)
   : scfImplementationType (this, parent)
@@ -69,40 +82,30 @@ csPtr<iTerrainCellRenderProperties> csTerrainSimpleRenderer::CreateProperties()
 
 csRenderMesh** csTerrainSimpleRenderer::GetRenderMeshes(int& n, iRenderView* rview, iMovable* movable, uint32 frustum_mask, iTerrainCell** cells, int cell_count)
 {
-  if (meshes.IsEmpty())
+  meshes.Empty();
+  
+  for (int i = 0; i < cell_count; ++i)
   {
-    csRenderMesh* mesh = new csRenderMesh();
-    
-    mesh->db_mesh_name = "terrain mesh";
-    
-    csRef<iEngine> engine = csQueryRegistry<iEngine> (iSCF::SCF->object_reg);
+    csSimpleTerrainRenderData* rdata = (csSimpleTerrainRenderData*)cells[i]->GetRenderData();
 
-    mesh->material = engine->GetMaterialList ()->FindByName ("Stone");
+    if (!rdata) continue;
 
+    bool created;
+    
+    csRenderMesh*& mesh = rm_holder.GetUnusedMesh(created, rview->GetCurrentFrameNumber());
+    
     mesh->meshtype = CS_MESHTYPE_TRIANGLES;
     
+    mesh->material = rdata->material;
+    
     mesh->indexstart = 0;
-    mesh->indexend = 3;
+    mesh->indexend = rdata->primitive_count * 3;
     
     mesh->buffers.AttachNew(new csRenderBufferHolder);
     
-    csRef<csRenderBuffer> vertices = csRenderBuffer::CreateRenderBuffer(3, CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 3);
-    csRef<csRenderBuffer> indices = csRenderBuffer::CreateIndexRenderBuffer(3, CS_BUF_STATIC, CS_BUFCOMP_UNSIGNED_SHORT, 0, 3);
-    
-    csVector3* vptr = (csVector3*)vertices->Lock(CS_BUF_LOCK_NORMAL);
-    vptr[0] = csVector3(0, 0, 0);
-    vptr[1] = csVector3(10000, 0, 0);
-    vptr[2] = csVector3(0, 0, 10000);
-    vertices->Release();
-    
-    unsigned short* iptr = (unsigned short*)indices->Lock(CS_BUF_LOCK_NORMAL);
-    iptr[0] = 0;
-    iptr[1] = 2;
-    iptr[2] = 1;
-    indices->Release();
-    
-    mesh->buffers->SetRenderBuffer(CS_BUFFER_POSITION, vertices);
-    mesh->buffers->SetRenderBuffer(CS_BUFFER_INDEX, indices);
+    mesh->buffers->SetRenderBuffer(CS_BUFFER_POSITION, rdata->vb_pos);
+    mesh->buffers->SetRenderBuffer(CS_BUFFER_TEXCOORD0, rdata->vb_texcoord);
+    mesh->buffers->SetRenderBuffer(CS_BUFFER_INDEX, rdata->ib);
     
     meshes.Push(mesh);
   }
@@ -110,6 +113,90 @@ csRenderMesh** csTerrainSimpleRenderer::GetRenderMeshes(int& n, iRenderView* rvi
   n = (int)meshes.GetSize();
   
   return meshes.GetArray();
+}
+
+void csTerrainSimpleRenderer::OnHeightUpdate(iTerrainCell* cell, const csRect& rectangle, float* data, unsigned int pitch)
+{
+  csRef<csSimpleTerrainRenderData> rdata = (csSimpleTerrainRenderData*)cell->GetRenderData();
+
+  int grid_width = cell->GetGridWidth();
+  int grid_height = cell->GetGridHeight();
+
+  if (!rdata)
+  {
+    rdata.AttachNew(new csSimpleTerrainRenderData());
+
+    cell->SetRenderData(rdata);
+
+    rdata->primitive_count = (grid_width-1)*(grid_height-1)*2;
+
+    rdata->vb_pos = csRenderBuffer::CreateRenderBuffer(grid_width * grid_height, CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 3);
+    rdata->vb_texcoord = csRenderBuffer::CreateRenderBuffer(grid_width * grid_height, CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 2);
+    rdata->ib = csRenderBuffer::CreateIndexRenderBuffer(rdata->primitive_count*3, CS_BUF_STATIC, CS_BUFCOMP_UNSIGNED_SHORT, 0, grid_width * grid_height);
+
+    csRef<iEngine> engine = csQueryRegistry<iEngine> (iSCF::SCF->object_reg);
+
+    rdata->material = engine->GetMaterialList ()->FindByName ("Stone");
+
+    // fill ib
+    unsigned short* iptr = (unsigned short*)rdata->ib->Lock(CS_BUF_LOCK_NORMAL);
+
+    for (int y = 0; y < grid_height - 1; ++y)
+      for (int x = 0; x < grid_width - 1; ++x)
+      {
+        // tl - tr
+        //  | / |
+        // bl - br
+
+        int tl = y * grid_width + x;
+        int tr = y * grid_width + x + 1;
+        int bl = (y + 1) * grid_width + x;
+        int br = (y + 1) * grid_width + x + 1;
+
+        *iptr++ = tl;
+        *iptr++ = bl;
+        *iptr++ = tr;
+
+        *iptr++ = tr;
+        *iptr++ = bl;
+        *iptr++ = br;
+      }
+
+    rdata->ib->Release();
+
+    // fill tex coords
+    float* vptr = (float*)rdata->vb_texcoord->Lock(CS_BUF_LOCK_NORMAL);
+
+    float u_offset = 1.0f / (grid_width - 1);
+    float v_offset = 1.0f / (grid_height - 1);
+    
+    for (int y = 0; y < grid_height; ++y)
+      for (int x = 0; x < grid_width; ++x)
+      {
+        *vptr++ = x * u_offset;
+        *vptr++ = y * v_offset;
+      }
+
+    rdata->vb_texcoord->Release();
+  }
+
+  float* vptr = (float*)rdata->vb_pos->Lock(CS_BUF_LOCK_NORMAL);
+
+  float offset_x = cell->GetPosition().x;
+  float offset_y = cell->GetPosition().y;
+
+  float scale_x = cell->GetSize().x / (grid_width - 1);
+  float scale_y = cell->GetSize().y / (grid_height - 1);
+
+   for (int y = rectangle.ymin; y < rectangle.ymax; ++y)
+     for (int x = rectangle.xmin; x < rectangle.xmax; ++x)
+     {
+       *vptr++ = x * scale_x + offset_x;
+       *vptr++ = data[y * pitch + x];
+       *vptr++ = y * scale_y + offset_y;
+     }
+
+  rdata->vb_pos->Release();
 }
 
 }

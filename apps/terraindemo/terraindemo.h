@@ -75,6 +75,8 @@ private:
   /// Here goes the terrain stuff
   csRef<iTerrainSystem> terrain;
 
+  float rotX, rotY;
+
   /**
    * Handle keyboard events - ie key presses and releases.
    * This routine is called from the event handler in response to a 

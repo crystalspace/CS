@@ -24,6 +24,8 @@
 #include "iterrain/terrainrenderer.h"
 #include "iterrain/terraincellrenderproperties.h"
 
+#include "cstool/rendermeshholder.h"
+
 #include "csutil/dirtyaccessarray.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(ImprovedTerrain)
@@ -51,6 +53,7 @@ class csTerrainSimpleRenderer :
 {
   csDirtyAccessArray<csRenderMesh*> meshes;
   
+  csRenderMeshHolder rm_holder;
 public:
   csTerrainSimpleRenderer (iBase* parent);
 
@@ -61,6 +64,8 @@ public:
   virtual csPtr<iTerrainCellRenderProperties> CreateProperties();
 
   virtual csRenderMesh** GetRenderMeshes(int& n, iRenderView* rview, iMovable* movable, uint32 frustum_mask, iTerrainCell** cells, int cell_count);
+  
+  virtual void OnHeightUpdate(iTerrainCell* cell, const csRect& rectangle, float* data, unsigned int pitch);
 };
 
 }

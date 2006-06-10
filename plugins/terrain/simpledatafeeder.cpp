@@ -58,7 +58,7 @@ void csTerrainSimpleDataFeeder::Load(iTerrainCell* cell)
       float xd = float(x - width/2) / width;
       float yd = float(y - height/2) / height;
 
-      data.data[y * data.pitch + x] = sqrtf(2 - xd*xd - yd*yd);
+      data.data[y * data.pitch + x] = sqrtf(1 - xd*xd - yd*yd) * width;
     }
 
   cell->UnlockHeightData();

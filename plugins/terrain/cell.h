@@ -20,6 +20,7 @@
 #define __CS_TERRAIN_CELL_H__
 
 #include "csutil/scf_implementation.h"
+#include "csutil/refcount.h"
 
 #include "iterrain/terraincell.h"
 #include "iterrain/terraindatafeeder.h"
@@ -31,6 +32,8 @@
 
 #include "csutil/csstring.h"
 #include "csutil/dirtyaccessarray.h"
+
+struct iTerrainRenderer;
 
 CS_PLUGIN_NAMESPACE_BEGIN(ImprovedTerrain)
 {
@@ -55,11 +58,20 @@ private:
 
   LoadState state;
 
+  csLockedHeightData locked_height_data;
+  csRect locked_height_rect;
+
+  csRef<iTerrainRenderer> renderer;
+
+  csRef<csRefCount> render_data;
+
+  float min_height, max_height;
+
+  void LerpHelper(const csVector2& pos, int& x1, int& x2, float& xfrac, int& y1, int& y2, float& yfrac);
+
 public:
 
-  csTerrainCell (iBase* parent);
-
-  csTerrainCell (iBase* parent, const char* name, int grid_width, int grid_height, int material_width, int material_height, const csVector2& position, const csVector2& size, iTerrainDataFeeder* feeder, iTerrainCellRenderProperties* render_properties, iTerrainCellCollisionProperties* collision_properties);
+  csTerrainCell (iBase* parent, const char* name, int grid_width, int grid_height, int material_width, int material_height, const csVector2& position, const csVector2& size, iTerrainDataFeeder* feeder, iTerrainCellRenderProperties* render_properties, iTerrainCellCollisionProperties* collision_properties, iTerrainRenderer* renderer);
 
   virtual ~csTerrainCell ();
 
@@ -78,6 +90,9 @@ public:
   virtual const char* GetName();
   virtual iTerrainCellRenderProperties* GetRenderProperties();
   virtual iTerrainCellCollisionProperties* GetCollisionProperties();
+
+  virtual csRefCount* GetRenderData();
+  virtual void SetRenderData(csRefCount* data);
 
   virtual int GetGridWidth();
   virtual int GetGridHeight();
@@ -102,9 +117,16 @@ public:
   virtual bool CollideRay(const csVector3& start, const csVector3& end, bool oneHit, csArray<csVector3>& points);
   virtual bool CollideSegment(const csVector3& start, const csVector3& end, bool oneHit, csArray<csVector3>& points);
 
+  virtual float GetHeight(int x, int y);
   virtual float GetHeight(const csVector2& pos);
+  
+  virtual csVector3 GetTangent(int x, int y);
   virtual csVector3 GetTangent(const csVector2& pos);
+
+  virtual csVector3 GetBinormal(int x, int y);
   virtual csVector3 GetBinormal(const csVector2& pos);
+
+  virtual csVector3 GetNormal(int x, int y);
   virtual csVector3 GetNormal(const csVector2& pos);
 };
 

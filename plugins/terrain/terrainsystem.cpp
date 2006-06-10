@@ -40,7 +40,7 @@ SCF_IMPLEMENT_FACTORY (csTerrainSystem)
 csTerrainSystem::csTerrainSystem (iBase* parent)
   : scfImplementationType (this, parent)
 {
-  vview_distance = 100;
+  vview_distance = 2;
   auto_preload = true;
 
   bbox.Set(-1000, -1000, -1000, 1000, 1000, 1000);

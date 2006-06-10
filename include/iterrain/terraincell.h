@@ -31,6 +31,7 @@ struct iImage;
 class csVector2;
 class csVector3;
 class csRect;
+class csRefCount;
 
 struct csLockedHeightData
 {
@@ -53,6 +54,9 @@ struct iTerrainCell : public virtual iBase
   virtual iTerrainCellRenderProperties* GetRenderProperties() = 0;
   virtual iTerrainCellCollisionProperties* GetCollisionProperties() = 0;
 
+  virtual csRefCount* GetRenderData() = 0;
+  virtual void SetRenderData(csRefCount* data) = 0;
+
   virtual int GetGridWidth() = 0;
   virtual int GetGridHeight() = 0;
 
@@ -70,15 +74,22 @@ struct iTerrainCell : public virtual iBase
   virtual csLockedMaterialMap LockMaterialMap(const csRect& rectangle) = 0;
   virtual void UnlockMaterialMap() = 0;
 
-  virtual void SetMaterialMask(int material, iImage* image) =0;
-  virtual void SetMaterialMask(int material, const csArray<char>& data, int width, int height) =0;
+  virtual void SetMaterialMask(int material, iImage* image) = 0;
+  virtual void SetMaterialMask(int material, const csArray<char>& data, int width, int height) = 0;
 
-  virtual bool CollideRay(const csVector3& start, const csVector3& end, bool oneHit, csArray<csVector3>& points) =0;
-  virtual bool CollideSegment(const csVector3& start, const csVector3& end, bool oneHit, csArray<csVector3>& points) =0;
+  virtual bool CollideRay(const csVector3& start, const csVector3& end, bool oneHit, csArray<csVector3>& points) = 0;
+  virtual bool CollideSegment(const csVector3& start, const csVector3& end, bool oneHit, csArray<csVector3>& points) = 0;
 
+  virtual float GetHeight(int x, int y) = 0;
   virtual float GetHeight(const csVector2& pos) = 0;
+  
+  virtual csVector3 GetTangent(int x, int y) = 0;
   virtual csVector3 GetTangent(const csVector2& pos) = 0;
+
+  virtual csVector3 GetBinormal(int x, int y) = 0;
   virtual csVector3 GetBinormal(const csVector2& pos) = 0;
+
+  virtual csVector3 GetNormal(int x, int y) = 0;
   virtual csVector3 GetNormal(const csVector2& pos) = 0;
 };
 
