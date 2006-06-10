@@ -24,7 +24,8 @@
 #include "csutil/array.h"
 #include "csutil/scf_implementation.h"
 
-template<typename IF, typename Backend = csArray<IF::ContainedType> >
+template<typename IF, 
+  typename Backend = csArray<typename IF::ContainedType> >
 class scfArray : 
   public scfImplementation1<scfArray<IF, Backend>, IF>
 {
@@ -101,7 +102,8 @@ public:
   /** @} */
 };
 
-template<typename IF, typename Backend = csArray<IF::ContainedType> >
+template<typename IF, 
+  typename Backend = csArray<typename IF::ContainedType> >
 class scfArrayWrap : 
   public scfImplementation1<scfArrayWrap<IF, Backend>, IF>
 {
@@ -178,7 +180,8 @@ public:
   /** @} */
 };
 
-template<typename IF, typename Backend = csArray<IF::ContainedType> >
+template<typename IF, 
+  typename Backend = csArray<typename IF::ContainedType> >
 class scfArrayWrapConst : 
   public scfImplementation1<scfArrayWrapConst<IF, Backend>, IF>
 {
