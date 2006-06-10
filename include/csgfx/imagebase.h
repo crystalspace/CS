@@ -30,6 +30,7 @@
 
 #include "csextern.h"
 
+#include "csutil/util.h"
 #include "csutil/databuf.h"
 #include "csutil/scf_implementation.h"
 

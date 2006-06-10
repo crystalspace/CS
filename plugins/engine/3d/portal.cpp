@@ -495,7 +495,8 @@ iMeshWrapper* csPortal::HitBeamPortals (
   const csVector3 &start,
   const csVector3 &end,
   csVector3 &isect,
-  int* polygon_idx)
+  int* polygon_idx,
+  iSector** final_sector)
 {
   if (!CompleteSector (0)) return 0;
   if (sector->GetRecLevel () >= max_sector_visit)
@@ -512,7 +513,7 @@ iMeshWrapper* csPortal::HitBeamPortals (
     csVector3 new_isect;
     int pidx;
     iMeshWrapper* mesh = sector->HitBeamPortals (new_start,
-    	new_end, new_isect, &pidx);
+    	new_end, new_isect, &pidx, final_sector);
     if (mesh && pidx != -1) isect = warp_wor.This2Other (new_isect);
     if (mesh && polygon_idx) *polygon_idx = pidx;
     return mesh;
@@ -520,7 +521,8 @@ iMeshWrapper* csPortal::HitBeamPortals (
   else
   {
     int pidx;
-    iMeshWrapper* mesh = sector->HitBeamPortals (start, end, isect, &pidx);
+    iMeshWrapper* mesh = sector->HitBeamPortals (start, end, isect, &pidx,
+    	final_sector);
     if (mesh && polygon_idx) *polygon_idx = pidx;
     return mesh;
   }

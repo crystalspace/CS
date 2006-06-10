@@ -1,11 +1,67 @@
 <?xml version="1.0" encoding="utf-8" ?> 
 <shader compiler="xmlshader" name="ambient">
+    <?if vars."tex glow".texture ?>
+    <?if vars."glow pulse speed" ?>
+    <shadervars>
+     <shadervar name="glow alpha" type="expression">
+       <sin>
+         <mul>
+	   <atom type="var">standard time</atom>
+	   <atom type="var">glow pulse speed</atom>
+	 </mul>
+       </sin>
+     </shadervar>
+     </shadervars>
+    <?endif?>
+    <?endif?>
     <technique priority="50">
 	<pass>
 	    <mixmode><copy/></mixmode>
 	    <buffer source="texture coordinate 0" destination="texture coordinate 0" />
-	    <vp plugin="glfixed" file="/shader/ambient.fvp"/>
+	    <?if vars."tex glow".texture ?>
+	    <buffer source="texture coordinate 0" destination="texture coordinate 1" />
+	    <?endif?>
+	    <vp plugin="glfixed">
+<fixedvp>
+  <description>Simple Ambient Lighting (Fixed Function)</description>
+  <ambient />
+  <?if vars."tex glow".texture ?>
+  <?if vars."glow pulse speed" ?>
+  <constantcolor layer="1" type="shadervar">glow alpha</constantcolor>
+  <?endif ?>
+  <?if vars."glow slide speed x" || vars."glow slide speed y" ?>
+  <texmatrix layer="1">
+  <translate type="expression">
+    <make-vector>
+      <?if vars."glow slide speed x" ?>
+       <mul>
+        <atom type="var">standard time</atom>
+	<atom type="var">glow slide speed x</atom>
+        </mul>
+      <?endif ?>
+      <?if !vars."glow slide speed x" ?>
+        <atom type="num">0.0</atom>
+      <?endif ?>
+      <?if vars."glow slide speed y" ?>
+       <mul>
+        <atom type="var">standard time</atom>
+	<atom type="var">glow slide speed y</atom>
+        </mul>
+      <?endif ?>
+      <?if !vars."glow slide speed y" ?>
+        <atom type="num">0.0</atom>
+      <?endif ?>
+    </make-vector>
+  </translate>
+  </texmatrix>
+  <?endif ?>
+  <?endif ?>
+</fixedvp>
+</vp>
 	    <texture name="tex diffuse" destination="unit 0" />
+	    <?if vars."tex glow".texture ?>
+	    <texture name="tex glow" destination="unit 1" />
+	    <?endif?>
 	    <fp plugin="glfixed">
 		<fixedfp>
 		    <layer>
@@ -13,6 +69,23 @@
 			<colorsource num="1" source="texture" modifier="color"/>
 			<coloroperation operation="modulate"/>
 		    </layer>
+		    <?if vars."tex glow".texture ?>
+		    <?if vars."glow pulse speed" ?>
+		    <layer>
+			<colorsource num="0" source="previous layer" modifier="color"/>
+			<colorsource num="1" source="texture" modifier="color"/>
+			<colorsource num="2" source="constant color" modifier="one minus alpha"/>
+			<coloroperation operation="interpolate"/>
+		    </layer>
+		    <?endif?>
+		    <?if !vars."glow pulse speed" ?>
+		    <layer>
+			<colorsource num="0" source="previous layer" modifier="color"/>
+			<colorsource num="1" source="texture" modifier="color"/>
+			<coloroperation operation="add"/>
+		    </layer>
+		    <?endif?>
+		    <?endif?>
 		</fixedfp>
 	    </fp>
 	</pass>

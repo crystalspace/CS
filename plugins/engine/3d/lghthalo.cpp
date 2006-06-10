@@ -157,7 +157,8 @@ bool csLightHalo::IsVisible (iCamera* camera, csEngine* Engine, csVector3 &v)
     v.x = v.x * iz + camera->GetShiftX ();
     v.y = Engine->frameHeight - 1 - (v.y * iz + camera->GetShiftY ());
 
-    if (Engine->GetTopLevelClipper ()->GetClipper ()->IsInside (csVector2 (v.x, v.y)))
+    if (Engine->GetTopLevelClipper ()->GetClipper ()->IsInside (
+    	csVector2 (v.x, v.y)))
     {
       csVector3 isect;
       int polyidx = 0;

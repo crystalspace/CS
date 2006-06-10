@@ -161,6 +161,9 @@
         <texture name="oldbrick_h.png">
             <file>oldbrick_h.png</file>
         </texture>
+        <texture name="mosaic_h.png">
+            <file>mosaic_h.png</file>
+        </texture>
     </textures>
     <variables>
         <variable name="Std Thing Angle" value="0.54321" />
@@ -190,7 +193,9 @@
             <texture>mosholes.gif</texture>
 	    <shader type="standard">std_lighting_detail</shader>
 	    <shadervar name="tex detail" type="texture">mosaic-detail</shadervar>
-	    <shadervar name="detail texture scale" type="vector2">10,10</shadervar>
+	    <shadervar name="tex detail scale" type="vector2">10,10</shadervar>
+	    <shadervar name="tex height" type="texture">mosaic-detail</shadervar>
+	    <shadervar name="tex height scale" type="vector2">10,10</shadervar>
         </material>
         <material name="robot">
             <texture>oldmetal.gif</texture>
@@ -199,7 +204,7 @@
             <texture>oldmetal.gif</texture>
 	    <shader type="standard">std_lighting_detail_add</shader>
 	    <shadervar name="tex detail" type="texture">spark</shadervar>
-	    <shadervar name="detail texture scale" type="vector2">20,20</shadervar>
+	    <shadervar name="tex detail scale" type="vector2">20,20</shadervar>
         </material>
         <material name="raindrop">
             <texture>raindrop</texture>
@@ -211,14 +216,14 @@
             <texture>bricks.gif</texture>
 	    <shader type="standard">std_lighting_detail_alpha_scroll</shader>
 	    <shadervar name="tex detail" type="texture">spark</shadervar>
-	    <shadervar name="detail texture scale" type="vector2">10,10</shadervar>
+	    <shadervar name="tex detail scale" type="vector2">10,10</shadervar>
 	    <shadervar name="detail texture color" type="vector4">1,1,1,0.25</shadervar>
         </material>
         <material name="bricks2">
             <texture>bricks.gif</texture>
 	    <shader type="standard">std_lighting_detail_alpha</shader>
 	    <shadervar name="tex detail" type="texture">spark</shadervar>
-	    <shadervar name="detail texture scale" type="expression">
+	    <shadervar name="tex detail scale" type="expression">
 		<make-vector>
 		    <add>
 			<atom type="num">6</atom>
@@ -236,7 +241,9 @@
             <texture>mosaic.gif</texture>
 	    <shader type="standard">std_lighting_detail</shader>
 	    <shadervar name="tex detail" type="texture">mosaic-detail</shadervar>
-	    <shadervar name="detail texture scale" type="vector2">10,10</shadervar>
+	    <shadervar name="tex detail scale" type="vector2">10,10</shadervar>
+	    <shadervar name="tex height" type="texture">mosaic-detail</shadervar>
+	    <shadervar name="tex height scale" type="vector2">10,10</shadervar>
         </material>
         <material name="oldmetal">
             <texture>oldmetal.gif</texture>
@@ -284,6 +291,7 @@
         </material>
         <material name="green_color">
             <color red="0" green="1" blue="0" />
+	    <shadervar name="tex glow" type="texture">spark</shadervar>
         </material>
         <material name="seagull">
             <texture>seagull</texture>
@@ -343,6 +351,17 @@
 	<!-- <farplane a="0" b="0" c="1" d="10" /> -->
     </start>
     <library>/lib/teapot/teapot.lib</library>
+
+  <addon>
+    <plugin>crystalspace.renderloop.loop.loader</plugin>
+    <paramsfile>/shader/std_rloop_diffuse.xml</paramsfile>
+  </addon>
+
+  <settings>
+    <renderloop variable="renderloop">
+        <condition value="diffuse">std_rloop_diffuse</condition>
+    </renderloop>
+  </settings>
 
   <!-- START: For the christmas tree -->
   <meshfact name="Plane.056">

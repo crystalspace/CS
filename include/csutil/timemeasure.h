@@ -72,7 +72,8 @@ namespace CS
     ~MeasureTime ()
     {
       csTicks endTime = csGetMicroTicks ();
-      csPrintf ("%s: %" PRId64 " \xC2\xB5s\n", text.GetData(), endTime - offsetTime);
+      csPrintf ("%s: %" CS_PRId64 " \xC2\xB5s\n",
+        text.GetData(), endTime - offsetTime);
     }
     
     /// Print an intermediate measurement.
@@ -85,7 +86,7 @@ namespace CS
       va_start (args, descr);
       csPrintfV (descr, args);
       va_end (args);
-      csPrintf (": %" PRId64 " \xC2\xB5s\n", currentTime - offsetTime);
+      csPrintf (": %" CS_PRId64 " \xC2\xB5s\n", currentTime - offsetTime);
       
       int64 currentTime2 = csGetMicroTicks ();
       // Correct difference from printing

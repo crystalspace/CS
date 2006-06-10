@@ -23,6 +23,7 @@
 #include "csgeom/poly3d.h"
 #include "cstool/collider.h"
 #include "cstool/cspixmap.h"
+#include "csutil/csstring.h"
 #include "csutil/flags.h"
 #include "csutil/scanstr.h"
 #include "iengine/camera.h"

@@ -38,8 +38,8 @@
 #include "csutil/scf_implementation.h"
 
 #include "iutil/dbghelp.h"
-#include "iutil/string.h"
 
+struct iString;
 class csPlane2;
 class csPoly3D;
 

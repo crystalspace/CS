@@ -6,6 +6,70 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+10-Jun-2006
+	- res added SCF interfaces for arrays.
+9-Jun-2006
+	- mdmkolbe fixed the following:
+	  - several unused parameter warnings
+	  - the CS_DEPRECATED_METHOD tag on iString::Clear()
+	  - CS_PRId64 vs PRId64 in include/csutil/timemeasure.h
+	    (Use the first for csPrintf and the second for printf.)
+	- mdmkolbe fixed a suspected variable name typo.
+	- Jorrit added support for strings to iSharedVariable.
+	- Jorrit added std_rloop_standard.xml which corresponds to the
+	  standard default renderloop as created internally by the engine.
+	- Jorrit added support for conditional renderloops in a map file.
+	  You can now say something like this:
+		<renderloop variable="quality">
+		    <condition value="low">std_rloop_standard</condition>
+		    <condition value="high">std_rloop_shadowmap</condition>
+		    <default>std_rloop_diffuse</default>
+		</renderloop>
+	  It will use the shared variable 'quality' to determine which
+	  renderloop to select.
+	- Jorrit fixed the engine renderloop commandline option so
+	  that it actually works. Previously it would set a default
+	  renderloop and later on it would be overwritten again by
+	  the usual default renderloop.
+	- mdmkolbe fixed overload ambiguity error in picView.
+	- mdmkolbe removed unneeded includes from:
+	  - include/csgeom/math3d.h
+	  - include/iutil/event.h
+	  - include/csutil/comparator.h
+	  - include/csutil/sysfunc.h
+	  Files that assumed these headers included things such as csstring.h
+	  and util.h were corrected.
+	- Jorrit fixed a compile error in tinypars.cpp after the removal
+	  of several includes.
+8-Jun-2006
+	- Andres added a stupid filter to the annotation facility to filter
+	  obvious spam.
+	- Jorrit added new versions of iSector->HitBeamPortals() and
+	  iSector->HitBeam() which return their results in a
+	  csSectorHitBeamResult class instead of through their parameters.
+	  That is more friendly for python, java, perl, ...
+	- Jorrit extended iSector->HitBeamPortals() so that it also returns
+	  the last sector we entered.
+	- Jorrit fixed a bug in the new iSector->HitBeamPortals() with
+	  regards to the final_sector.
+	- Jorrit added updated ambient shader from Erroroman/caedes which
+	  adds support for glow.
+	- Jorrit added new parallaxAtt shader from Erroroman.
+	- res changed "CS_STRICT_ALIGNMENT" from being defined on all but x86
+	  processors to be only defined on Sparc (where it was originally 
+	  needed).
+	- res fixed the GL renderer to repack csRGBcolor to an RGB bytestream
+	  on platforms that need it.
+	- Rhad added more robust error handling to the ALSA sound driver.
+	  This should correct some cases where the sound device was entering
+	  a bad state and never coming out when an underbuffer condition
+	  occurred.
+	- AndyDude fixed the url to demodata.zip to be the recent one.
+7-Jun-2006
+	- mdmkolbe made "separate debug info" default to disabled by default
+	  on Cygwin.  All released binutils to date have a bug in them which
+	  corrupts the output files when using separate debug info on Cygwin.
+	  See <http://www.mail-archive.com/bug-binutils@gnu.org/msg00687.html>.
 6-Jun-2006
 	- Vincent fixed leak-guard enabled build.
 	- Eric Sunshine added missing #include <new> to csutil/radixsort.h.

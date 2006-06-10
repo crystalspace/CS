@@ -4917,6 +4917,50 @@ sub ACQUIRE {
 }
 
 
+############# Class : cspace::csSectorHitBeamResult ##############
+
+package cspace::csSectorHitBeamResult;
+@ISA = qw( cspace );
+%OWNER = ();
+%ITERATORS = ();
+*swig_mesh_get = *cspacec::csSectorHitBeamResult_mesh_get;
+*swig_mesh_set = *cspacec::csSectorHitBeamResult_mesh_set;
+*swig_isect_get = *cspacec::csSectorHitBeamResult_isect_get;
+*swig_isect_set = *cspacec::csSectorHitBeamResult_isect_set;
+*swig_polygon_idx_get = *cspacec::csSectorHitBeamResult_polygon_idx_get;
+*swig_polygon_idx_set = *cspacec::csSectorHitBeamResult_polygon_idx_set;
+*swig_final_sector_get = *cspacec::csSectorHitBeamResult_final_sector_get;
+*swig_final_sector_set = *cspacec::csSectorHitBeamResult_final_sector_set;
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_csSectorHitBeamResult(@_);
+    bless $self, $pkg if defined($self);
+}
+
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_csSectorHitBeamResult($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
 ############# Class : cspace::iSector ##############
 
 package cspace::iSector;

@@ -23,7 +23,8 @@
  * Template providing various comparison and ordering functions.
  */
 
-#include "csstring.h"
+class csString;
+class csStringBase;
 
 /**\addtogroup util_containers
  * @{ */

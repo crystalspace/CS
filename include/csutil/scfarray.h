@@ -19,11 +19,38 @@
 #ifndef __CS_CSUTIL_SCFARRAY_H__
 #define __CS_CSUTIL_SCFARRAY_H__
 
+/**\file
+ * Implementation for iArrayReadOnly<>-, iArrayChangeElements<>- and
+ * iArrayChangeAll<>-derived interfaces.
+ */
+
 #include "iutil/array.h"
 
 #include "csutil/array.h"
 #include "csutil/scf_implementation.h"
 
+/**\addtogroup util_containers
+ * @{ */
+
+/**
+ * Implementation for iArrayReadOnly<>-, iArrayChangeElements<>- and
+ * iArrayChangeAll<>-derived interfaces, backed by a per-instance array.
+ * The \p IF template parameter denotes the array interface to be implemented, 
+ * the optional \p Backend remplate parameter the array type internally used
+ * for storage.
+ *
+ * Usage example:
+ * \code
+ * struct iSomeArray : public iArrayChangeElements<...> { ... };
+ *
+ * void MyClass::MyMethod()
+ * {
+ *   csRef<iSomeArray> array;
+ *   array.AttachNew (new scfArray<iSomeArray>);
+ *   ...
+ * }
+ * \endcode
+ */
 template<typename IF, 
   typename Backend = csArray<typename IF::ContainedType> >
 class scfArray : 
@@ -32,9 +59,12 @@ class scfArray :
   typedef scfImplementation1<scfArray<IF, Backend>, IF> scfImplementationType;
   typedef typename IF::ContainedType ContainedType;
 public:
+  /// The array storage
   Backend storage;
 
+  /// Construct with empty storage.
   scfArray () : scfImplementationType (this) {}
+  /// Construct and copy to storage contents from given array.
   scfArray (const Backend& storage) : scfImplementationType (this), 
     storage (storage) {}
 
@@ -102,8 +132,16 @@ public:
   /** @} */
 };
 
-template<typename IF, 
-  typename Backend = csArray<typename IF::ContainedType> >
+/**
+ * Implementation for iArrayReadOnly<>-, iArrayChangeElements<>- and
+ * iArrayChangeAll<>-derived interfaces, backed by a reference to another
+ * array.
+ * The \p IF template parameter denotes the array interface to be implemented, 
+ * the \p Backend template parameter the array type used for storage.
+ * \warning It must be ensured that the referenced array used for storage is
+ *  alive as long as any instance of scfArrayWrap exists!
+ */
+template<typename IF, typename Backend>
 class scfArrayWrap : 
   public scfImplementation1<scfArrayWrap<IF, Backend>, IF>
 {
@@ -111,8 +149,10 @@ class scfArrayWrap :
     scfImplementationType;
   typedef typename IF::ContainedType ContainedType;
 public:
+  /// Reference to the array storage.
   Backend& storage;
 
+  /// Initialize with a reference to the given storage.
   scfArrayWrap (Backend& storage) : scfImplementationType (this), 
     storage (storage) {}
 
@@ -180,8 +220,15 @@ public:
   /** @} */
 };
 
-template<typename IF, 
-  typename Backend = csArray<typename IF::ContainedType> >
+/**
+ * Implementation for iArrayReadOnly<>-derived interfaces, backed by a 
+ * reference to another array.
+ * The \p IF template parameter denotes the array interface to be implemented, 
+ * the \p Backend template parameter the array type used for storage.
+ * \warning It must be ensured that the referenced array used for storage is
+ *  alive as long as any instance of scfArrayWrap exists!
+ */
+template<typename IF, typename Backend>
 class scfArrayWrapConst : 
   public scfImplementation1<scfArrayWrapConst<IF, Backend>, IF>
 {
@@ -189,8 +236,10 @@ class scfArrayWrapConst :
     scfImplementationType;
   typedef typename IF::ContainedType ContainedType;
 public:
+  /// Reference to the array storage.
   const Backend& storage;
 
+  /// Initialize with a reference to the given storage.
   scfArrayWrapConst (const Backend& storage) : scfImplementationType (this), 
     storage (storage) {}
 
@@ -215,5 +264,7 @@ public:
   }
   /** @} */
 };
+
+/** @} */
 
 #endif // __CS_CSUTIL_SCFARRAY_H__
