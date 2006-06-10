@@ -6,6 +6,8 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+10-Jun-2006
+	- res added SCF interfaces for arrays.
 9-Jun-2006
 	- mdmkolbe fixed the following:
 	  - several unused parameter warnings
