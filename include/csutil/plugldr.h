@@ -27,6 +27,7 @@
 #include "csutil/parray.h"
 #include "csutil/ref.h"
 #include "csutil/scf.h"
+#include "csutil/util.h"
 
 struct iObjectRegistry;
 

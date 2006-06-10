@@ -49,7 +49,7 @@ class csVector3;
  */
 struct iSharedVariable : public virtual iBase
 {
-  SCF_INTERFACE(iSharedVariable, 2,0,0);
+  SCF_INTERFACE(iSharedVariable, 3,0,0);
   /// Get the private object interface
   virtual iObject* QueryObject () = 0;
 
@@ -77,13 +77,20 @@ struct iSharedVariable : public virtual iBase
   /// Get the vector from the variable.
   virtual const csVector3& GetVector () const = 0;
 
+  /// Set the string from the variable.
+  virtual void SetString (const char* str) = 0;
+
+  /// Get the string from the variable.
+  virtual const char* GetString () const = 0;
+
   /// Possible types stored by this class.
   enum SharedVariableType
   {
     SV_UNKNOWN = 0,
     SV_FLOAT   = 1,
     SV_COLOR   = 2,
-    SV_VECTOR  = 3
+    SV_VECTOR  = 3,
+    SV_STRING  = 4
   };
 
   /// Get the type currently stored by this variable.

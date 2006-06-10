@@ -24,10 +24,10 @@ that you can get from:
 
 @noindent
 @ifnottex
-@url{http://www.crystalspace3d.org/support/release/cs098/maps/demodata.zip}
+@url{http://www.crystalspace3d.org/support/release/cs099/maps/demodata.zip}
 @end ifnottex
 @iftex
-@code{http://www.crystalspace3d.org/support/release/cs098/maps/}@*
+@code{http://www.crystalspace3d.org/support/release/cs099/maps/}@*
 @code{demodata.zip}
 @end iftex
 

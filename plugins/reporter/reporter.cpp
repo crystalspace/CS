@@ -19,6 +19,7 @@
 #include "cssysdef.h"
 #include <string.h>
 #include "csver.h"
+#include "csutil/csstring.h"
 #include "csutil/scf.h"
 #include "csutil/util.h"
 #include "csutil/refarr.h"

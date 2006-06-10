@@ -45,6 +45,7 @@ private:
   float value;
   csColor color;
   csVector3 vec;
+  csString str;
   csRefArray<iSharedVariableListener> listeners;
   csSharedVariableList* variables;
 
@@ -61,7 +62,9 @@ public:
   csSharedVariable (csSharedVariableList* variables) : 
     scfImplementationType (this), type (iSharedVariable::SV_UNKNOWN), 
       value (0), variables (variables)
-  { 
+  {
+    vec.Set (0, 0, 0);
+    color.Set (0, 0, 0);
   }
 
   virtual ~csSharedVariable()
@@ -89,9 +92,7 @@ public:
 
   const csColor& GetColor() const
   {
-    return (type == iSharedVariable::SV_COLOR)
-    	? color
-	: csColor (0,0,0),color;
+    return color;
   }
 
   void SetVector (const csVector3& v)
@@ -103,7 +104,18 @@ public:
 
   const csVector3& GetVector() const
   {
-    return (type == iSharedVariable::SV_VECTOR) ? vec : csVector3 (0,0,0),vec;
+    return vec;
+  }
+
+  void SetString (const char* str)
+  {
+    csSharedVariable::str = str;
+    type = iSharedVariable::SV_STRING;
+  }
+
+  const char* GetString () const
+  {
+    return (type == iSharedVariable::SV_STRING) ? str.GetData () : 0;
   }
 
   int GetType () const

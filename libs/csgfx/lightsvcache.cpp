@@ -21,6 +21,8 @@
 
 #include "csgfx/lightsvcache.h"
 
+#include "csutil/csstring.h"
+
 void csLightShaderVarCache::ClearDefVars ()
 {
   for (size_t n = 0; n < _varCount; n++) defaultVars[n] = csInvalidStringID;

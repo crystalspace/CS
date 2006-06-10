@@ -194,7 +194,6 @@ public:
 
   /**
    * Clip the polygon in pverts (having num_verts vertices) to this plane.
-   * The vertices are expected in camera space.
    * Method returns true if there is something visible, false otherwise.
    * Note that this function returns a pointer to a static array in csPlane3.
    * The contents of this array will only be valid until the next call to
