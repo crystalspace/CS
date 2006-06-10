@@ -24,6 +24,8 @@
 template<typename T>
 struct iArrayReadOnly : public virtual iBase
 {
+  typedef T ContainedType;
+
   virtual size_t GetSize () const = 0;
   virtual T const& Get (size_t n) const = 0;
   virtual T const& Top () const = 0;

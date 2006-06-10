@@ -444,7 +444,7 @@ void csFatLoopStep::BuildNodeGraph (RenderNode* node, iRenderView* rview,
 
 	// feed light SVs to shader
         csRef<iShaderVarStack> stacks;
-        stacks.AttachNew (new scfArray<iShaderVarStack, csShaderVariable*>);
+        stacks.AttachNew (new scfArray<iShaderVarStack>);
 	FillStacks (stacks, mesh, mw, hdl, shader);
 
 	csRenderMeshModes modes (*mesh);

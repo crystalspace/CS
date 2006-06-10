@@ -24,11 +24,12 @@
 #include "csutil/array.h"
 #include "csutil/scf_implementation.h"
 
-template<typename IF, typename T, typename Backend = csArray<T> >
+template<typename IF, typename Backend = csArray<IF::ContainedType> >
 class scfArray : 
-  public scfImplementation1<scfArray<IF, T, Backend>, IF>
+  public scfImplementation1<scfArray<IF, Backend>, IF>
 {
-  typedef scfImplementation1<scfArray<IF, T, Backend>, IF> scfImplementationType;
+  typedef scfImplementation1<scfArray<IF, Backend>, IF> scfImplementationType;
+  typedef typename IF::ContainedType ContainedType;
 public:
   Backend storage;
 
@@ -36,52 +37,52 @@ public:
   scfArray (const Backend& storage) : scfImplementationType (this), 
     storage (storage) {}
 
-  /**\name iArrayReadOnly<T> implementation
+  /**\name iArrayReadOnly<> implementation
    * @{ */
   virtual size_t GetSize () const
   { return storage.GetSize(); }
-  virtual T const& Get (size_t n) const
+  virtual ContainedType const& Get (size_t n) const
   { return storage.Get (n); }
-  virtual T const& Top () const
+  virtual ContainedType const& Top () const
   { return storage.Top(); }
-  virtual size_t Find (T const& which) const
+  virtual size_t Find (ContainedType const& which) const
   { return storage.Find (which); }
-  virtual size_t GetIndex (const T* which) const
+  virtual size_t GetIndex (const ContainedType* which) const
   { return storage.GetIndex (which); }
   virtual bool IsEmpty() const
   { return storage.IsEmpty(); }
-  virtual void GetAll (T* dest) const
+  virtual void GetAll (ContainedType* dest) const
   {
     for (size_t i = 0; i < storage.GetSize(); i++)
       dest[i] = storage[i];
   }
   /** @} */
   
-  /**\name iArrayChangeElements<T> implementation
+  /**\name iArrayChangeElements<> implementation
    * @{ */
-  virtual T& Get (size_t n)
+  virtual ContainedType& Get (size_t n)
   { return storage.Get (n); }
-  virtual T& Top ()
+  virtual ContainedType& Top ()
   { return storage.Top(); }
   /** @} */
 
-  /**\name iArrayChangeAll<T> implementation
+  /**\name iArrayChangeAll<> implementation
    * @{ */
-  virtual void SetSize (size_t n, T const& what)
+  virtual void SetSize (size_t n, ContainedType const& what)
   { storage.SetSize (n, what); }
   virtual void SetSize (size_t n)
   { storage.SetSize (n); }
-  virtual T& GetExtend (size_t n)
+  virtual ContainedType& GetExtend (size_t n)
   { return storage.GetExtend (n); }
-  virtual void Put (size_t n, T const& what)
+  virtual void Put (size_t n, ContainedType const& what)
   { storage.Put (n, what); }
-  virtual size_t Push (T const& what)
+  virtual size_t Push (ContainedType const& what)
   { return storage.Push (what); }
-  virtual size_t PushSmart (T const& what)
+  virtual size_t PushSmart (ContainedType const& what)
   { return storage.PushSmart (what); }
-  virtual T Pop ()
+  virtual ContainedType Pop ()
   { return storage.Pop (); }
-  virtual bool Insert (size_t n, T const& item)
+  virtual bool Insert (size_t n, ContainedType const& item)
   { return storage.Insert (n, item); }
   virtual void DeleteAll ()
   { storage.DeleteAll(); }
@@ -93,71 +94,72 @@ public:
   { return storage.DeleteIndex  (n); }
   virtual bool DeleteIndexFast (size_t n)
   { return storage.DeleteIndexFast  (n); }
-  virtual bool Delete (T const& item)
+  virtual bool Delete (ContainedType const& item)
   { return storage.Delete (item); }
-  virtual bool DeleteFast (T const& item)
+  virtual bool DeleteFast (ContainedType const& item)
   { return storage.DeleteFast (item); }
   /** @} */
 };
 
-template<typename IF, typename T, typename Backend = csArray<T> >
+template<typename IF, typename Backend = csArray<IF::ContainedType> >
 class scfArrayWrap : 
-  public scfImplementation1<scfArrayWrap<IF, T, Backend>, IF>
+  public scfImplementation1<scfArrayWrap<IF, Backend>, IF>
 {
-  typedef scfImplementation1<scfArrayWrap<IF, T, Backend>, IF> 
+  typedef scfImplementation1<scfArrayWrap<IF, Backend>, IF> 
     scfImplementationType;
+  typedef typename IF::ContainedType ContainedType;
 public:
   Backend& storage;
 
   scfArrayWrap (Backend& storage) : scfImplementationType (this), 
     storage (storage) {}
 
-  /**\name iArrayReadOnly<T> implementation
+  /**\name iArrayReadOnly<> implementation
    * @{ */
   virtual size_t GetSize () const
   { return storage.GetSize(); }
-  virtual T const& Get (size_t n) const
+  virtual ContainedType const& Get (size_t n) const
   { return storage.Get (n); }
-  virtual T const& Top () const
+  virtual ContainedType const& Top () const
   { return storage.Top(); }
-  virtual size_t Find (T const& which) const
+  virtual size_t Find (ContainedType const& which) const
   { return storage.Find (which); }
-  virtual size_t GetIndex (const T* which) const
+  virtual size_t GetIndex (const ContainedType* which) const
   { return storage.GetIndex (which); }
   virtual bool IsEmpty() const
   { return storage.IsEmpty(); }
-  virtual void GetAll (T* dest) const
+  virtual void GetAll (ContainedType* dest) const
   {
     for (size_t i = 0; i < storage.GetSize(); i++)
       dest[i] = storage[i];
   }
   /** @} */
   
-  /**\name iArrayChangeElements<T> implementation
+  /**\name iArrayChangeElements<> implementation
    * @{ */
-  virtual T& Get (size_t n)
+  virtual ContainedType& Get (size_t n)
   { return storage.Get (n); }
-  virtual T& Top ()
+  virtual ContainedType& Top ()
   { return storage.Top(); }
   /** @} */
 
-  /**\name iArrayChangeAll<T> implementation
+  /**\name iArrayChangeAll<> implementation
    * @{ */
-  virtual void SetSize (size_t n, T const& what)
+  virtual void SetSize (size_t n, ContainedType const& what)
   { storage.SetSize (n, what); }
   virtual void SetSize (size_t n)
   { storage.SetSize (n); }
-  virtual T& GetExtend (size_t n)
+  virtual ContainedType& GetExtend (size_t n)
   { return storage.GetExtend (n); }
-  virtual void Put (size_t n, T const& what)
+  virtual void Put (size_t n, ContainedType const& what)
   { storage.Put (n, what); }
-  virtual size_t Push (T const& what)
+  virtual size_t Push (ContainedType const& what)
   { return storage.Push (what); }
-  virtual size_t PushSmart (T const& what)
+  virtual size_t PushSmart (ContainedType const& what)
   { return storage.PushSmart (what); }
-  virtual T Pop ()
+  virtual ContainedType Pop ()
   { return storage.Pop (); }
-  virtual bool Insert (size_t n, T const& item)
+  virtual bool Insert (size_t n, ContainedType const& item)
   { return storage.Insert (n, item); }
   virtual void DeleteAll ()
   { storage.DeleteAll(); }
@@ -169,40 +171,41 @@ public:
   { return storage.DeleteIndex  (n); }
   virtual bool DeleteIndexFast (size_t n)
   { return storage.DeleteIndexFast  (n); }
-  virtual bool Delete (T const& item)
+  virtual bool Delete (ContainedType const& item)
   { return storage.Delete (item); }
-  virtual bool DeleteFast (T const& item)
+  virtual bool DeleteFast (ContainedType const& item)
   { return storage.DeleteFast (item); }
   /** @} */
 };
 
-template<typename IF, typename T, typename Backend = csArray<T> >
+template<typename IF, typename Backend = csArray<IF::ContainedType> >
 class scfArrayWrapConst : 
-  public scfImplementation1<scfArrayWrapConst<IF, T, Backend>, IF>
+  public scfImplementation1<scfArrayWrapConst<IF, Backend>, IF>
 {
-  typedef scfImplementation1<scfArrayWrapConst<IF, T, Backend>, IF> 
+  typedef scfImplementation1<scfArrayWrapConst<IF, Backend>, IF> 
     scfImplementationType;
+  typedef typename IF::ContainedType ContainedType;
 public:
   const Backend& storage;
 
   scfArrayWrapConst (const Backend& storage) : scfImplementationType (this), 
     storage (storage) {}
 
-  /**\name iArrayReadOnly<T> implementation
+  /**\name iArrayReadOnly<> implementation
    * @{ */
   virtual size_t GetSize () const
   { return storage.GetSize(); }
-  virtual T const& Get (size_t n) const
+  virtual ContainedType const& Get (size_t n) const
   { return storage.Get (n); }
-  virtual T const& Top () const
+  virtual ContainedType const& Top () const
   { return storage.Top(); }
-  virtual size_t Find (T const& which) const
+  virtual size_t Find (ContainedType const& which) const
   { return storage.Find (which); }
-  virtual size_t GetIndex (const T* which) const
+  virtual size_t GetIndex (const ContainedType* which) const
   { return storage.GetIndex (which); }
   virtual bool IsEmpty() const
   { return storage.IsEmpty(); }
-  virtual void GetAll (T* dest) const
+  virtual void GetAll (ContainedType* dest) const
   {
     for (size_t i = 0; i < storage.GetSize(); i++)
       dest[i] = storage[i];

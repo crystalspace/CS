@@ -60,7 +60,7 @@ csSprite2DMeshObject::csSprite2DMeshObject (csSprite2DMeshObjectFactory* factory
   material = factory->GetMaterialWrapper ();
   lighting = factory->HasLighting ();
   MixMode = factory->GetMixMode ();
-  scfVertices.AttachNew (new scfArrayWrap<iColoredVertices, csSprite2DVertex,
+  scfVertices.AttachNew (new scfArrayWrap<iColoredVertices, 
     csColoredVertices> (vertices));
 }
 
