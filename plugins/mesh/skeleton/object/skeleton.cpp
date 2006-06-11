@@ -20,6 +20,7 @@
 
 #include "csgeom/math3d.h"
 #include "csutil/event.h"
+#include "csutil/eventnames.h"
 #include "csutil/util.h"
 #include "imap/services.h"
 #include "iutil/object.h"
@@ -269,7 +270,7 @@ void csSkeletonBone::UpdateBones ()
   }
 }
 
-void csSkeletonBone::UpdateBones (csSkeletonBone* parent_bone)
+void csSkeletonBone::UpdateBones (csSkeletonBone*)
 {
   // TODO - Ragdoll
 }
@@ -1248,7 +1249,7 @@ iSkeletonSocketFactory *csSkeletonFactory::GetSocket (int i)
   return sockets[i];
 }
 
-void csSkeletonFactory::RemoveSocket (int i)
+void csSkeletonFactory::RemoveSocket (int)
 {
   //TODO
 }

@@ -20,6 +20,7 @@
 #include "awsMenu.h"
 #include "csutil/util.h"
 #include "csutil/event.h"
+#include "csutil/eventnames.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/fontserv.h"

@@ -30,6 +30,8 @@
 #include "imesh/object.h"
 #include "csutil/csuctransform.h"
 #include "csutil/scanstr.h"
+#include "csutil/csstring.h"
+#include "csutil/eventnames.h"
 #include "csgeom/math3d.h"
 #include "cstool/collider.h"
 #include "cstool/cspixmap.h"

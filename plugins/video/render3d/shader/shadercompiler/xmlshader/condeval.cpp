@@ -103,6 +103,7 @@ struct SliceAllocator
 
   static inline uint8* Alloc (size_t blocksize) 
   {
+    (void)blocksize; // Pacify compiler warnings
     CS_ASSERT(blocksize == sliceSize);
     return (uint8*)SliceAlloc().AllocUninit();
   }

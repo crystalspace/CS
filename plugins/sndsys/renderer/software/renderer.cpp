@@ -22,6 +22,7 @@
 
 #include "csutil/sysfunc.h"
 #include "csutil/event.h"
+#include "csutil/eventnames.h"
 #include "csutil/csendian.h"
 
 #include "iutil/plugin.h"

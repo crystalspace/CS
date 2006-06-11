@@ -10,6 +10,7 @@ chronological order.
 	- mdmkolbe factored into separate files parts of
 	  plugins/video/render3d/software/pixspecifica.cpp that were
 	  causing GCC to exhaust memory and crash.
+	- mdmkolbe reduced header dependencies and fixed several warnings.
 10-Jun-2006
 	- res added SCF interfaces for arrays.
 	- Adam fixed a node-deletion bug in csPartialOrder, and added more

@@ -63,7 +63,7 @@ void csTextureWrapper::SelfDestruct ()
 }
 
 csTextureWrapper::csTextureWrapper (const csTextureWrapper &t) :
-  scfImplementationType (this), engine (t.engine),
+  iBase(), scfImplementationType (this), engine (t.engine),
   flags(CS_TEXTURE_3D)
 {
   handle = t.handle;

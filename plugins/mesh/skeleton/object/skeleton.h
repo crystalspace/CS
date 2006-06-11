@@ -436,8 +436,8 @@ public:
   virtual csTicks GetTime () { return time; }
   virtual void SetTime (csTicks time)  { csSkeletonScript::time = time; }
   virtual float GetSpeed () { return time; }
-  virtual void SetSpeed (float speed)  {  }
-  virtual void SetFactor (float factor) {}
+  virtual void SetSpeed (float)  {}
+  virtual void SetFactor (float) {}
   virtual float GetFactor () { return 0; }
   virtual void SetLoop (bool loop)
   { csSkeletonScript::loop = loop; }
@@ -448,7 +448,7 @@ public:
   virtual iSkeletonScriptKeyFrame *CreateFrame(const char* name);
   virtual size_t GetFramesCount()  { return key_frames.Length(); }
   virtual iSkeletonScriptKeyFrame *GetFrame(size_t i)  { return key_frames[i]; }
-  virtual size_t FindFrameIndex(const char *name)  { return 0; }
+  virtual size_t FindFrameIndex(const char * /*name*/)  { return 0; }
   virtual void RemoveFrame(size_t i) 
     { key_frames.DeleteIndexFast(i); }
 };
@@ -713,8 +713,8 @@ public:
 
   virtual int GetFactoriesCount() { return factories.Length(); }
   virtual iSkeletonFactory *CreateFactory(const char *name);
-  virtual iSkeletonFactory *LoadFactory(const char *file_name) { return 0; }
-  virtual iSkeletonFactory *FindFactory(const char *name) { return 0; }
+  virtual iSkeletonFactory *LoadFactory(const char * /*file_name*/) { return 0; }
+  virtual iSkeletonFactory *FindFactory(const char * /*name*/) { return 0; }
   virtual iSkeleton *CreateSkeleton(iSkeletonFactory *fact, const char *name);
 
   SCF_DECLARE_IBASE;

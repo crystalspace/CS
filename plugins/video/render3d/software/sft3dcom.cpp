@@ -35,6 +35,7 @@
 #include "csutil/event.h"
 #include "csutil/scfstrset.h"
 #include "csutil/sysfunc.h"
+#include "csutil/eventnames.h"
 #include "iutil/cfgfile.h"
 #include "iutil/cmdline.h"
 #include "iutil/event.h"

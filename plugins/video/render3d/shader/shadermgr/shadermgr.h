@@ -192,13 +192,13 @@ public:
   CS_EVENTHANDLER_NAMES("crystalspace.graphics3d.shadermgr")
   
   CS_CONST_METHOD virtual const csHandlerID * GenericPrec (
-    csRef<iEventHandlerRegistry> &r1, csRef<iEventNameRegistry> &r2,
-    csEventID e) const { return 0; }
+    csRef<iEventHandlerRegistry> &, csRef<iEventNameRegistry> &,
+    csEventID) const { return 0; }
   
   csHandlerID eventSucc[2];
   CS_CONST_METHOD virtual const csHandlerID * GenericSucc (
-    csRef<iEventHandlerRegistry> &r1, csRef<iEventNameRegistry> &r2,
-    csEventID e) const 
+    csRef<iEventHandlerRegistry> &, csRef<iEventNameRegistry> &,
+    csEventID) const 
   { 
     return 0;//eventSucc; 
   }

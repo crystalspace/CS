@@ -389,6 +389,7 @@ protected:
   public:
     static void* Alloc (size_t n)
     {
+      (void)n; // Pacify compiler warnings
       CS_ASSERT(n == ValuesArrayWrapper::allocSize);
       return Allocator().AllocUninit ();
     }

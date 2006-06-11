@@ -130,6 +130,7 @@ public:
 
     inline void* operator new (size_t n)
     {
+      (void)n; // Pacify compiler warnings
       CS_ASSERT(n == sizeof (WrappedChild));
       return ChildAlloc().AllocUninit();
     }
