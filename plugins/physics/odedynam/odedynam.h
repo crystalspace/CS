@@ -26,6 +26,7 @@
 #include "csutil/dirtyaccessarray.h"
 #include "csutil/nobjvec.h"
 #include "csutil/refarr.h"
+#include "csutil/csstring.h"
 #include "iengine/mesh.h"
 #include "iengine/light.h"
 #include "iengine/camera.h"

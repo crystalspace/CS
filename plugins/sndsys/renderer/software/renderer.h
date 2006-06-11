@@ -22,6 +22,7 @@
 
 #include "csutil/cfgacc.h"
 #include "csutil/csstring.h"
+#include "csutil/scf_implementation.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "csgeom/vector3.h"

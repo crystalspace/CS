@@ -27,6 +27,7 @@
 #include "csutil/array.h"
 #include "csutil/cfgacc.h"
 #include "csutil/event.h"
+#include "csutil/eventnames.h"
 #include "iutil/event.h"
 #include "iutil/eventq.h"
 #include "csgeom/frustum.h"

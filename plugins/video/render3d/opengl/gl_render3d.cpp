@@ -36,6 +36,7 @@
 #include "cstool/fogmath.h"
 #include "cstool/rbuflock.h"
 #include "csutil/event.h"
+#include "csutil/eventnames.h"
 #include "csutil/flags.h"
 #include "csutil/objreg.h"
 #include "csutil/ref.h"

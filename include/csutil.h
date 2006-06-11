@@ -111,6 +111,7 @@
 #include "csutil/scf.h"
 #include "csutil/scf_implementation.h"
 #include "csutil/scf_interface.h"
+#include "csutil/scfarray.h"
 #include "csutil/scfstr.h"
 #include "csutil/scfstringarray.h"
 #include "csutil/scfstrset.h"

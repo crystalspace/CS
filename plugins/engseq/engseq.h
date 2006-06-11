@@ -21,6 +21,7 @@
 
 #include "csutil/util.h"
 #include "csutil/csobject.h"
+#include "csutil/csstring.h"
 #include "csutil/refcount.h"
 #include "csutil/refarr.h"
 #include "iutil/eventh.h"

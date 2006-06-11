@@ -330,9 +330,9 @@ void csBulletRigidBody::ResetShape ()
   }
 }
 
-bool csBulletRigidBody::AttachColliderMesh (iMeshWrapper* mesh,
-                                            const csOrthoTransform& trans, float friction, float density,
-                                            float elasticity, float softness)
+bool csBulletRigidBody::AttachColliderMesh (iMeshWrapper*,
+  const csOrthoTransform&, float /*friction*/, float /*density*/,
+  float /*elasticity*/, float /*softness*/)
 {
   return false;
 }
@@ -382,20 +382,21 @@ bool csBulletRigidBody::AttachColliderSphere (float radius, const csVector3 &off
   return true;
 }
 
-bool csBulletRigidBody::AttachColliderPlane (const csPlane3 &plane, float friction,
-                                             float density, float elasticity, float softness)
+bool csBulletRigidBody::AttachColliderPlane (const csPlane3 &,
+  float /*friction*/, float /*density*/,
+  float /*elasticity*/, float /*softness*/)
 {
   return false;
 }
 
-void csBulletRigidBody::AttachCollider (iDynamicsSystemCollider* collider)
+void csBulletRigidBody::AttachCollider (iDynamicsSystemCollider*)
 {
 }
 
 void csBulletRigidBody::DestroyColliders ()
 {
 }
-void csBulletRigidBody::DestroyCollider (iDynamicsSystemCollider* collider)
+void csBulletRigidBody::DestroyCollider (iDynamicsSystemCollider*)
 {
 }
 
@@ -466,8 +467,8 @@ void csBulletRigidBody::SetProperties (float mass, const csVector3& center,
   pc->GetRigidBody ()->setGravity (SimdVector3 (g.x, g.y, g.z));
 }
 
-void csBulletRigidBody::GetProperties (float* mass, csVector3* center,
-                                       csMatrix3* inertia)
+void csBulletRigidBody::GetProperties (float* /*mass*/, csVector3* /*center*/,
+                                       csMatrix3* /*inertia*/)
 {
 }
 
@@ -484,7 +485,7 @@ csMatrix3 csBulletRigidBody::GetInertia ()
 {
   return csMatrix3 ();
 }
-void csBulletRigidBody::AdjustTotalMass (float targetmass)
+void csBulletRigidBody::AdjustTotalMass (float /*targetmass*/)
 {
 }
 void csBulletRigidBody::AddForce (const csVector3& force)
@@ -492,28 +493,28 @@ void csBulletRigidBody::AddForce (const csVector3& force)
   SimdVector3 f (force.x, force.y, force.z);
   pc->GetRigidBody ()->applyCentralForce(f);
 }
-void csBulletRigidBody::AddTorque (const csVector3& force)
+void csBulletRigidBody::AddTorque (const csVector3& /*force*/)
 {
 }
-void csBulletRigidBody::AddRelForce (const csVector3& force)
+void csBulletRigidBody::AddRelForce (const csVector3& /*force*/)
 {
 }
-void csBulletRigidBody::AddRelTorque (const csVector3& force) 
+void csBulletRigidBody::AddRelTorque (const csVector3& /*force*/) 
 {
 }
-void csBulletRigidBody::AddForceAtPos (const csVector3& force, const csVector3& pos)
+void csBulletRigidBody::AddForceAtPos (const csVector3& /*force*/, const csVector3& /*pos*/)
 {
 }
-void csBulletRigidBody::AddForceAtRelPos (const csVector3& force,
-                                          const csVector3& pos)
+void csBulletRigidBody::AddForceAtRelPos (const csVector3& /*force*/,
+                                          const csVector3& /*pos*/)
 {
 }
-void csBulletRigidBody::AddRelForceAtPos (const csVector3& force,
-                                          const csVector3& pos)
+void csBulletRigidBody::AddRelForceAtPos (const csVector3& /*force*/,
+                                          const csVector3& /*pos*/)
 {
 }
-void csBulletRigidBody::AddRelForceAtRelPos (const csVector3& force,
-                                             const csVector3& pos)
+void csBulletRigidBody::AddRelForceAtRelPos (const csVector3& /*force*/,
+                                             const csVector3& /*pos*/)
 {
 }
 const csVector3 csBulletRigidBody::GetForce () const
@@ -541,13 +542,13 @@ void csBulletRigidBody::SetMoveCallback (iDynamicsMoveCallback* cb)
   if (move_cb) move_cb->DecRef ();
   move_cb = cb;
 }
-void csBulletRigidBody::SetCollisionCallback (iDynamicsCollisionCallback* cb)
+void csBulletRigidBody::SetCollisionCallback (iDynamicsCollisionCallback*)
 {
 }
-void csBulletRigidBody::Collision (iRigidBody *other)
+void csBulletRigidBody::Collision (iRigidBody *)
 {
 }
-csRef<iDynamicsSystemCollider> csBulletRigidBody::GetCollider (unsigned int index)
+csRef<iDynamicsSystemCollider> csBulletRigidBody::GetCollider (unsigned int)
 {
   return 0;
 }
@@ -718,7 +719,7 @@ bool csBulletCollider::CreateCCylinderGeometry (float /*length*/,
   return false;
 }
 void csBulletCollider::SetCollisionCallback (
-  iDynamicsColliderCollisionCallback* cb)
+  iDynamicsColliderCollisionCallback*)
 {
 }
 void csBulletCollider::SetFriction (float friction)

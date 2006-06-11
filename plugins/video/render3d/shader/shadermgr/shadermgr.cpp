@@ -25,6 +25,7 @@
 #include "cstypes.h"
 #include "csutil/objreg.h"
 #include "csutil/event.h"
+#include "csutil/eventnames.h"
 #include "csutil/ref.h"
 #include "csutil/scf.h"
 #include "iengine/engine.h"

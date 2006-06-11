@@ -23,6 +23,7 @@
 #include "csutil/csstring.h"
 #include "csutil/stringarray.h"
 #include "csutil/event.h"
+#include "csutil/eventnames.h"
 #include "csgfx/memimage.h"
 #include "iutil/objreg.h"
 #include "iutil/eventq.h"

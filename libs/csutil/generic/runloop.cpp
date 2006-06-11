@@ -19,6 +19,7 @@
 #include "cssysdef.h"
 #include "csutil/sysfunc.h"
 #include "csutil/event.h"
+#include "csutil/eventnames.h"
 #include "csutil/scf_implementation.h"
 #include "iutil/event.h"
 #include "iutil/eventh.h"
