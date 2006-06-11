@@ -28,11 +28,11 @@
 CS_PLUGIN_NAMESPACE_BEGIN(ImprovedTerrain)
 {
 
-csTerrainCell::csTerrainCell (iBase* parent, const char* name, int grid_width, int grid_height, int material_width, int material_height,
+csTerrainCell::csTerrainCell (const char* name, int grid_width, int grid_height, int material_width, int material_height,
                               const csVector2& position, const csVector2& size, iTerrainDataFeeder* feeder,
                               iTerrainCellRenderProperties* render_properties, iTerrainCellCollisionProperties* collision_properties,
                               iTerrainRenderer* renderer)
-  : scfImplementationType (this, parent)
+  : scfImplementationType (this)
 {
   this->name = name;
   
@@ -57,7 +57,7 @@ csTerrainCell::csTerrainCell (iBase* parent, const char* name, int grid_width, i
   render_data = NULL;
 
   min_height = 0;
-  max_height = 33;
+  max_height = 40;
 }
 
 csTerrainCell::~csTerrainCell ()
@@ -94,7 +94,7 @@ void csTerrainCell::Unload()
   state = NotLoaded;
 }
 
-csBox3 csTerrainCell::GetBBox()
+csBox3 csTerrainCell::GetBBox() const
 {
   csBox3 box;
   box.Set(position.x, min_height - EPSILON, position.y, position.x + size.x, max_height + EPSILON, position.y + size.y);
@@ -102,27 +102,27 @@ csBox3 csTerrainCell::GetBBox()
   return box;
 }
 
-iTerrainDataFeeder* csTerrainCell::GetDataFeeder()
+iTerrainDataFeeder* csTerrainCell::GetDataFeeder() const
 {
   return feeder;
 }
 
-const char* csTerrainCell::GetName()
+const char* csTerrainCell::GetName() const
 {
   return name.GetData();
 }
 
-iTerrainCellRenderProperties* csTerrainCell::GetRenderProperties()
+iTerrainCellRenderProperties* csTerrainCell::GetRenderProperties() const
 {
   return render_properties;
 }
 
-iTerrainCellCollisionProperties* csTerrainCell::GetCollisionProperties()
+iTerrainCellCollisionProperties* csTerrainCell::GetCollisionProperties() const
 {
   return collision_properties;
 }
 
-csRefCount* csTerrainCell::GetRenderData()
+csRefCount* csTerrainCell::GetRenderData() const
 {
   return render_data;
 }
@@ -132,12 +132,12 @@ void csTerrainCell::SetRenderData(csRefCount* data)
   render_data = data;
 }
 
-int csTerrainCell::GetGridWidth()
+int csTerrainCell::GetGridWidth() const
 {
   return grid_width;
 }
 
-int csTerrainCell::GetGridHeight()
+int csTerrainCell::GetGridHeight() const
 {
   return grid_height;
 }
@@ -157,17 +157,17 @@ void csTerrainCell::UnlockHeightData()
   renderer->OnHeightUpdate(this, locked_height_rect, heightmap.GetArray(), grid_width);
 }
 
-const csVector2& csTerrainCell::GetPosition()
+const csVector2& csTerrainCell::GetPosition() const
 {
   return position;
 }
 
-const csVector2& csTerrainCell::GetSize()
+const csVector2& csTerrainCell::GetSize() const
 {
   return size;
 }
 
-const csArray<iMaterialWrapper*>& csTerrainCell::GetMaterialPalette()
+const csArray<iMaterialWrapper*>& csTerrainCell::GetMaterialPalette() const
 {
   throw 1;
 }
@@ -176,12 +176,12 @@ void csTerrainCell::SetMaterialPalette(const csArray<iMaterialWrapper*>& array)
 {
 }
 
-int csTerrainCell::GetMaterialMapWidth()
+int csTerrainCell::GetMaterialMapWidth() const
 {
   return material_width;
 }
 
-int csTerrainCell::GetMaterialMapHeight()
+int csTerrainCell::GetMaterialMapHeight() const
 {
   return material_height;
 }
@@ -208,12 +208,12 @@ void csTerrainCell::SetMaterialMask(int material, const csArray<char>& data, int
 {
 }
 
-bool csTerrainCell::CollideRay(const csVector3& start, const csVector3& end, bool oneHit, csArray<csVector3>& points)
+bool csTerrainCell::CollideRay(const csVector3& start, const csVector3& end, bool oneHit, csArray<csVector3>& points) const
 {
   return false;
 }
 
-bool csTerrainCell::CollideSegment(const csVector3& start, const csVector3& end, bool oneHit, csArray<csVector3>& points)
+bool csTerrainCell::CollideSegment(const csVector3& start, const csVector3& end, bool oneHit, csArray<csVector3>& points) const
 {
   return false;
 }
@@ -223,7 +223,7 @@ static inline float Lerp(const float x, const float y, const float t)
   return x + (y - x) * t;
 }
 
-void csTerrainCell::LerpHelper(const csVector2& pos, int& x1, int& x2, float& xfrac, int& y1, int& y2, float& yfrac)
+void csTerrainCell::LerpHelper(const csVector2& pos, int& x1, int& x2, float& xfrac, int& y1, int& y2, float& yfrac) const
 {
   float x = (pos.x / size.x) * (grid_width - 1);
   float y = (pos.y / size.y) * (grid_height - 1);
@@ -242,12 +242,12 @@ void csTerrainCell::LerpHelper(const csVector2& pos, int& x1, int& x2, float& xf
   yfrac = y - y1;
 }
 
-float csTerrainCell::GetHeight(int x, int y)
+float csTerrainCell::GetHeight(int x, int y) const
 {
   return heightmap[y * grid_width + x];
 }
 
-float csTerrainCell::GetHeight(const csVector2& pos)
+float csTerrainCell::GetHeight(const csVector2& pos) const
 {
   int x1, y1, x2, y2;
   float xfrac, yfrac;
@@ -265,7 +265,7 @@ static inline csVector3 Lerp(const csVector3& x, const csVector3& y, const float
   return x + (y - x) * t;
 }
 
-csVector3 csTerrainCell::GetTangent(int x, int y)
+csVector3 csTerrainCell::GetTangent(int x, int y) const
 {
   float center = heightmap[y * grid_width + x];
   float left = x == 0 ? center : heightmap[y * grid_width + x - 1];
@@ -274,7 +274,7 @@ csVector3 csTerrainCell::GetTangent(int x, int y)
   return csVector3(1.0f / grid_width, right - left, 0);
 }
 
-csVector3 csTerrainCell::GetTangent(const csVector2& pos)
+csVector3 csTerrainCell::GetTangent(const csVector2& pos) const
 {
   int x1, y1, x2, y2;
   float xfrac, yfrac;
@@ -287,7 +287,7 @@ csVector3 csTerrainCell::GetTangent(const csVector2& pos)
   return Lerp(n1, n2, yfrac).Unit();
 }
 
-csVector3 csTerrainCell::GetBinormal(int x, int y)
+csVector3 csTerrainCell::GetBinormal(int x, int y) const
 {
   float center = heightmap[y * grid_width + x];
   float up = y == 0 ? center : heightmap[(y - 1) * grid_width + x];
@@ -296,7 +296,7 @@ csVector3 csTerrainCell::GetBinormal(int x, int y)
   return csVector3(0, down - up, 1.0f / grid_height);
 }
 
-csVector3 csTerrainCell::GetBinormal(const csVector2& pos)
+csVector3 csTerrainCell::GetBinormal(const csVector2& pos) const
 {
   int x1, y1, x2, y2;
   float xfrac, yfrac;
@@ -309,7 +309,7 @@ csVector3 csTerrainCell::GetBinormal(const csVector2& pos)
   return Lerp(n1, n2, yfrac).Unit();
 }
 
-csVector3 csTerrainCell::GetNormal(int x, int y)
+csVector3 csTerrainCell::GetNormal(int x, int y) const
 {
   float center = heightmap[y * grid_width + x];
   float up = y == 0 ? center : heightmap[(y - 1) * grid_width + x];
@@ -320,7 +320,7 @@ csVector3 csTerrainCell::GetNormal(int x, int y)
   return csVector3((center - left) + (center - right), 1, (center - up) + (center - down));
 }
 
-csVector3 csTerrainCell::GetNormal(const csVector2& pos)
+csVector3 csTerrainCell::GetNormal(const csVector2& pos) const
 {
   int x1, y1, x2, y2;
   float xfrac, yfrac;

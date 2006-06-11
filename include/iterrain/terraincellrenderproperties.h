@@ -25,7 +25,7 @@ struct iTerrainCellRenderProperties : public virtual iBase
 {
   SCF_INTERFACE (iTerrainCellRenderProperties, 1, 0, 0);
 
-  virtual bool GetVisible() = 0;
+  virtual bool GetVisible() const = 0;
   virtual void SetVisible(bool value) = 0;
 };
 

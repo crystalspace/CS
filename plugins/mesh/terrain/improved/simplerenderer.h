@@ -43,7 +43,7 @@ public:
 
   virtual ~csTerrainSimpleCellRenderProperties ();
 
-  virtual bool GetVisible();
+  virtual bool GetVisible() const;
   virtual void SetVisible(bool value);
 };
 

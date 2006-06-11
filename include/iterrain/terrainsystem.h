@@ -35,13 +35,13 @@ struct iTerrainSystem : public virtual iBase
   virtual iTerrainCell* GetCell(const char* name) = 0;
   virtual iTerrainCell* GetCell(const csVector2& pos) = 0;
 
-  virtual bool CollideRay(const csVector3& start, const csVector3& end, bool oneHit, csArray<csVector3>& points) =0;
-  virtual bool CollideSegment(const csVector3& start, const csVector3& end, bool oneHit, csArray<csVector3>& points) =0;
+  virtual bool CollideRay(const csVector3& start, const csVector3& end, bool oneHit, csArray<csVector3>& points) = 0;
+  virtual bool CollideSegment(const csVector3& start, const csVector3& end, bool oneHit, csArray<csVector3>& points) = 0;
 
-  virtual float GetVirtualViewDistance() = 0;
+  virtual float GetVirtualViewDistance() const = 0;
   virtual void SetVirtualViewDistance(float distance) = 0;
 
-  virtual bool GetAutoPreLoad() = 0;
+  virtual bool GetAutoPreLoad() const = 0;
   virtual void SetAutoPreLoad(bool mode) = 0;
   virtual void PreLoadCells(iRenderView* view) = 0;
   

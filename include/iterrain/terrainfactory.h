@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_ITERRAIN_TERRAINBUILDER_H__
-#define __CS_ITERRAIN_TERRAINBUILDER_H__
+#ifndef __CS_ITERRAIN_TERRAINFACTORY_H__
+#define __CS_ITERRAIN_TERRAINFACTORY_H__
 
 #include "csutil/scf.h"
 
@@ -29,14 +29,13 @@ struct iTerrainSystem;
 
 class csVector2;
 
-struct iTerrainBuilder : public virtual iBase
+struct iTerrainFactory : public virtual iBase
 {
-  SCF_INTERFACE (iTerrainBuilder, 1, 0, 0);
+  SCF_INTERFACE (iTerrainFactory, 1, 0, 0);
 
   virtual void SetRenderer(iTerrainRenderer* renderer) = 0;
   virtual void SetCollider(iTerrainCollider* collider) = 0;
   virtual void AddCell(const char* name, int grid_width, int grid_height, int material_width, int material_height, const csVector2& position, const csVector2& size, iTerrainDataFeeder* feeder) = 0;
-  virtual csPtr<iTerrainSystem> BuildTerrain() = 0;
 };
 
-#endif // __CS_ITERRAIN_TERRAINDATAFEEDER_H__
+#endif // __CS_ITERRAIN_TERRAINFACTORY_H__

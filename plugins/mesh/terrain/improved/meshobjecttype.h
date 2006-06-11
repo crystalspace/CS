@@ -16,17 +16,31 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_ITERRAIN_TERRAINCELLCOLLISIONPROPERTIES_H__
-#define __CS_ITERRAIN_TERRAINCELLCOLLISIONPROPERTIES_H__
+#ifndef __CS_TERRAIN_MESHOBJECTTYPE_H__
+#define __CS_TERRAIN_MESHOBJECTTYPE_H__
 
-#include "csutil/scf.h"
+#include "csutil/scf_implementation.h"
 
-struct iTerrainCellCollisionProperties : public virtual iBase
+#include "imesh/object.h"
+
+CS_PLUGIN_NAMESPACE_BEGIN(ImprovedTerrain)
 {
-  SCF_INTERFACE (iTerrainCellCollisionProperties, 1, 0, 0);
 
-  virtual bool GetCollideable() const = 0;
-  virtual void SetCollideable(bool value) = 0;
+class csTerrainMeshObjectType :
+  public scfImplementation1<csTerrainMeshObjectType,
+                            iMeshObjectType>
+{
+public:
+  csTerrainMeshObjectType (iBase* parent);
+
+  virtual ~csTerrainMeshObjectType ();
+
+  // ------------ iMeshObjectType implementation ------------
+
+  virtual csPtr<iMeshObjectFactory> NewFactory ();
 };
 
-#endif // __CS_ITERRAIN_TERRAINCELLCOLLISIONPROPERTIES_H__
+}
+CS_PLUGIN_NAMESPACE_END(ImprovedTerrain)
+
+#endif // __CS_TERRAIN_MESHOBJECTTYPE_H__

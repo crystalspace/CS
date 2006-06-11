@@ -21,7 +21,7 @@
 
 #include <crystalspace.h>
 
-#include "iterrain/terrainbuilder.h"
+#include "iterrain/terrainfactory.h"
 #include "iterrain/terraincell.h"
 #include "iterrain/terraincellcollisionproperties.h"
 #include "iterrain/terraincellrenderproperties.h"

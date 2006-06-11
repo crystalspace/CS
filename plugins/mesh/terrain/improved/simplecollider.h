@@ -39,7 +39,7 @@ public:
 
   virtual ~csTerrainSimpleCellCollisionProperties ();
 
-  virtual bool GetCollideable();
+  virtual bool GetCollideable() const;
   virtual void SetCollideable(bool value);
 };
 

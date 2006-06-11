@@ -16,38 +16,33 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_TERRAIN_BUILDER_H__
-#define __CS_TERRAIN_BUILDER_H__
+#include "cssysdef.h"
 
-#include "csutil/scf_implementation.h"
-
-#include "iterrain/terrainbuilder.h"
-
-#include "terrainsystem.h"
+#include "meshobjecttype.h"
+#include "factory.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(ImprovedTerrain)
 {
 
-class csTerrainBuilder :
-  public scfImplementation1<csTerrainBuilder,
-                            iTerrainBuilder>
+SCF_IMPLEMENT_FACTORY (csTerrainMeshObjectType)
+
+csTerrainMeshObjectType::csTerrainMeshObjectType (iBase* parent)
+  : scfImplementationType (this, parent)
 {
-  csRef<csTerrainSystem> terrain;
+}
+
+csTerrainMeshObjectType::~csTerrainMeshObjectType ()
+{
+}
+
+csPtr<iMeshObjectFactory> csTerrainMeshObjectType::NewFactory ()
+{
+  csRef<csTerrainFactory> factory;
+  factory.AttachNew(new csTerrainFactory (this));
   
-public:
-  csTerrainBuilder (iBase* parent);
-
-  virtual ~csTerrainBuilder ();
-
-  // ------------ iTerrainBuilder implementation ------------
-
-  virtual void SetRenderer(iTerrainRenderer* renderer);
-  virtual void SetCollider(iTerrainCollider* collider);
-  virtual void AddCell(const char* name, int grid_width, int grid_height, int material_width, int material_height, const csVector2& position, const csVector2& size, iTerrainDataFeeder* feeder);
-  virtual csPtr<iTerrainSystem> BuildTerrain();
-};
+  csRef<iMeshObjectFactory> ifact (scfQueryInterface<iMeshObjectFactory>(factory));
+  return csPtr<iMeshObjectFactory> (ifact);
+}
 
 }
 CS_PLUGIN_NAMESPACE_END(ImprovedTerrain)
-
-#endif // __CS_TERRAIN_BUILDER_H__

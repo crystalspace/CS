@@ -55,7 +55,7 @@ csTerrainSimpleCellRenderProperties::~csTerrainSimpleCellRenderProperties ()
 {
 }
 
-bool csTerrainSimpleCellRenderProperties::GetVisible()
+bool csTerrainSimpleCellRenderProperties::GetVisible() const
 {
   return visible;
 }
@@ -89,6 +89,13 @@ csRenderMesh** csTerrainSimpleRenderer::GetRenderMeshes(int& n, iRenderView* rvi
     csSimpleTerrainRenderData* rdata = (csSimpleTerrainRenderData*)cells[i]->GetRenderData();
 
     if (!rdata) continue;
+    
+    if (!rdata->material)
+    {
+      csRef<iEngine> engine = rview->GetEngine();
+
+      rdata->material = engine->GetMaterialList ()->FindByName ("Stone");
+    }
 
     bool created;
     
@@ -106,7 +113,7 @@ csRenderMesh** csTerrainSimpleRenderer::GetRenderMeshes(int& n, iRenderView* rvi
     mesh->buffers->SetRenderBuffer(CS_BUFFER_POSITION, rdata->vb_pos);
     mesh->buffers->SetRenderBuffer(CS_BUFFER_TEXCOORD0, rdata->vb_texcoord);
     mesh->buffers->SetRenderBuffer(CS_BUFFER_INDEX, rdata->ib);
-    
+
     meshes.Push(mesh);
   }
   
@@ -133,10 +140,6 @@ void csTerrainSimpleRenderer::OnHeightUpdate(iTerrainCell* cell, const csRect& r
     rdata->vb_pos = csRenderBuffer::CreateRenderBuffer(grid_width * grid_height, CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 3);
     rdata->vb_texcoord = csRenderBuffer::CreateRenderBuffer(grid_width * grid_height, CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 2);
     rdata->ib = csRenderBuffer::CreateIndexRenderBuffer(rdata->primitive_count*3, CS_BUF_STATIC, CS_BUFCOMP_UNSIGNED_SHORT, 0, grid_width * grid_height);
-
-    csRef<iEngine> engine = csQueryRegistry<iEngine> (iSCF::SCF->object_reg);
-
-    rdata->material = engine->GetMaterialList ()->FindByName ("Stone");
 
     // fill ib
     unsigned short* iptr = (unsigned short*)rdata->ib->Lock(CS_BUF_LOCK_NORMAL);

@@ -35,7 +35,7 @@ csTerrainSimpleCellCollisionProperties::~csTerrainSimpleCellCollisionProperties 
 {
 }
 
-bool csTerrainSimpleCellCollisionProperties::GetCollideable()
+bool csTerrainSimpleCellCollisionProperties::GetCollideable() const
 {
   return collideable;
 }

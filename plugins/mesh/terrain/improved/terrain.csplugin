@@ -4,29 +4,24 @@
   <scf>
     <classes>
       <class>
-        <name>crystalspace.terrain.simplerenderer</name>
+        <name>crystalspace.mesh.object.terrainimproved.simplerenderer</name>
         <implementation>csTerrainSimpleRenderer</implementation>
         <description>Simple terrain renderer</description>
       </class>
       <class>
-        <name>crystalspace.terrain.simplecollider</name>
+        <name>crystalspace.mesh.object.terrainimproved.simplecollider</name>
         <implementation>csTerrainSimpleCollider</implementation>
         <description>Simple terrain collider</description>
       </class>
       <class>
-        <name>crystalspace.terrain.terrainsystem</name>
-        <implementation>csTerrainSystem</implementation>
-        <description>Terrain system</description>
-      </class>
-      <class>
-        <name>crystalspace.terrain.simpledatafeeder</name>
+        <name>crystalspace.mesh.object.terrainimproved.simpledatafeeder</name>
         <implementation>csTerrainSimpleDataFeeder</implementation>
         <description>Terrain simple data feeder</description>
       </class>
       <class>
-        <name>crystalspace.terrain.builder</name>
-        <implementation>csTerrainBuilder</implementation>
-        <description>Terrain builder</description>
+        <name>crystalspace.mesh.object.terrainimproved</name>
+        <implementation>csTerrainMeshObjectType</implementation>
+        <description>Terrain mesh type</description>
       </class>
     </classes>
   </scf>

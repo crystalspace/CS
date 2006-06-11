@@ -79,7 +79,7 @@ bool TerrainDemo::Setup ()
 
   // Find the starting position in this level.
   csVector3 pos (0);
-  if (engine->GetCameraPositions ()->GetCount () > 0)
+  /*if (engine->GetCameraPositions ()->GetCount () > 0)
   {
     // There is a valid starting position defined in the level file.
     iCameraPosition* campos = engine->GetCameraPositions ()->Get (0);
@@ -94,7 +94,7 @@ bool TerrainDemo::Setup ()
     pos = csVector3 (0, 0, 0);
   }
   if (!room)
-    ReportError("Can't find a valid starting position!");
+    ReportError("Can't find a valid starting position!");*/
     
   room = engine->CreateSector("terrain");
     
@@ -103,16 +103,23 @@ bool TerrainDemo::Setup ()
   csRef<iMeshWrapper> terrain_mesh_wrapper = engine->CreateMeshWrapper("terrain");
   terrain_mesh_wrapper->SetMeshObject(terrain_mesh_object);
   
-  room->GetMeshes()->Add(terrain_mesh_wrapper);
+  terrain_mesh_wrapper->GetMovable()->SetSector(room);
   
   csRef<iLight> light = engine->CreateLight ("DynLight", csVector3 (23, 1, 5), 10, csColor (1, 0, 0), CS_LIGHT_DYNAMICTYPE_DYNAMIC);
   room->GetLights ()->Add(light);
   
-  pos = csVector3(0, 64, 0);
+  pos = csVector3(0, 74, 0);
 
   // Now we need to position the camera in our world.
   view->GetCamera ()->SetSector (room);
   view->GetCamera ()->GetTransform ().SetOrigin (pos);
+  
+#pragma message("terraindemo.cpp(117): comment this to hide bugs ;-) (well, to remove far plane clipping actually)")
+  csPlane3 fp(0, 0, -1, 500);
+  view->GetCamera ()->SetFarPlane(&fp);
+  
+  engine->SetClearScreen(true);
+  engine->SetClearZBuf(true);
   
   return true;
 }
@@ -247,24 +254,30 @@ bool TerrainDemo::OnInitialize(int /*argc*/, char* /*argv*/ [])
     return ReportError("Failed to set up event handler!");
     
   // Let's create a terrain.
-  csRef<iTerrainRenderer> t_renderer = scfCreateInstance<iTerrainRenderer>("crystalspace.terrain.simplerenderer");
-  csRef<iTerrainCollider> t_collider = scfCreateInstance<iTerrainCollider>("crystalspace.terrain.simplecollider");
+  csRef<iTerrainRenderer> t_renderer = scfCreateInstance<iTerrainRenderer>("crystalspace.mesh.object.terrainimproved.simplerenderer");
+  csRef<iTerrainCollider> t_collider = scfCreateInstance<iTerrainCollider>("crystalspace.mesh.object.terrainimproved.simplecollider");
   
-  csRef<iTerrainBuilder> t_builder = scfCreateInstance<iTerrainBuilder>("crystalspace.terrain.builder");
-  
-  csRef<iTerrainDataFeeder> t_feeder = scfCreateInstance<iTerrainDataFeeder>("crystalspace.terrain.simpledatafeeder");
+  csRef<iTerrainDataFeeder> t_feeder = scfCreateInstance<iTerrainDataFeeder>("crystalspace.mesh.object.terrainimproved.simpledatafeeder");
 
-  t_builder->SetRenderer(t_renderer);
-  t_builder->SetCollider(t_collider);
+  csRef<iMeshObjectType> t_mesh_type = scfCreateInstance<iMeshObjectType>("crystalspace.mesh.object.terrainimproved");
   
-  int count = 3;
-  float size = 48;
+  csRef<iMeshObjectFactory> t_mesh_factory = t_mesh_type->NewFactory();
+  
+  csRef<iTerrainFactory> t_factory = scfQueryInterface<iTerrainFactory>(t_mesh_factory);
+
+  t_factory->SetRenderer(t_renderer);
+  t_factory->SetCollider(t_collider);
+  
+  int count = 5;
+  float size = 100;
   
   for (int i = -count; i <= count; ++i)
     for (int j = -count; j <= count; ++j)
-      t_builder->AddCell("cell", 33, 33, 33, 33, csVector2(24 + size*i, 24 + size*j), csVector2(size, size), t_feeder);
+      t_factory->AddCell("cell", 33, 33, 33, 33, csVector2(24 + size*i, 24 + size*j), csVector2(size, size), t_feeder);
   
-  terrain = t_builder->BuildTerrain();
+  csRef<iMeshObject> t_mesh = t_mesh_factory->NewInstance();
+  
+  terrain = scfQueryInterface<iTerrainSystem>(t_mesh);
   
   return true;
 }
@@ -296,8 +309,10 @@ bool TerrainDemo::LoadMap ()
   csRef<iVFS> VFS (CS_QUERY_REGISTRY (GetObjectRegistry (), iVFS));
   VFS->ChDir ("/lev/terraini");
   // Load the level file which is called 'world'.
-  if (!loader->LoadMapFile ("world"))
-    ReportError("Error couldn't load level!");
+  //if (!loader->LoadMapFile ("world"))
+  //  ReportError("Error couldn't load level!");
+  if (!loader->LoadTexture ("Stone", "/lib/std/stone4.gif"))
+    ReportError("Error loading 'stone4' texture!");
 
   return true;
 }

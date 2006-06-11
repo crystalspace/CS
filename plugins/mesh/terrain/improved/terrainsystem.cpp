@@ -35,15 +35,15 @@
 CS_PLUGIN_NAMESPACE_BEGIN(ImprovedTerrain)
 {
 
-SCF_IMPLEMENT_FACTORY (csTerrainSystem)
-
-csTerrainSystem::csTerrainSystem (iBase* parent)
-  : scfImplementationType (this, parent)
+csTerrainSystem::csTerrainSystem (iMeshObjectFactory* factory)
+  : scfImplementationType (this)
 {
+  this->factory = factory;
+
   vview_distance = 2;
   auto_preload = true;
 
-  bbox.Set(-1000, -1000, -1000, 1000, 1000, 1000);
+  bbox_valid = false;
 }
 
 csTerrainSystem::~csTerrainSystem ()
@@ -55,19 +55,9 @@ void csTerrainSystem::SetRenderer(iTerrainRenderer* renderer)
   this->renderer = renderer;
 }
 
-iTerrainRenderer* csTerrainSystem::GetRenderer()
-{
-  return renderer;
-}
-
 void csTerrainSystem::SetCollider(iTerrainCollider* collider)
 {
   this->collider = collider;
-}
-
-iTerrainCollider* csTerrainSystem::GetCollider()
-{
-  return collider;
 }
 
 void csTerrainSystem::AddCell(csTerrainCell* cell)
@@ -109,7 +99,7 @@ bool csTerrainSystem::CollideSegment(const csVector3& start, const csVector3& en
   return false;
 }
 
-float csTerrainSystem::GetVirtualViewDistance()
+float csTerrainSystem::GetVirtualViewDistance() const
 {
   return vview_distance;
 }
@@ -119,7 +109,7 @@ void csTerrainSystem::SetVirtualViewDistance(float distance)
   vview_distance = distance;
 }
 
-bool csTerrainSystem::GetAutoPreLoad()
+bool csTerrainSystem::GetAutoPreLoad() const
 {
   return auto_preload;
 }
@@ -192,7 +182,7 @@ csVector3 csTerrainSystem::GetNormal(const csVector2& pos)
 
 iMeshObjectFactory* csTerrainSystem::GetFactory () const
 {
-  return 0;
+  return factory;
 }
 
 csFlags& csTerrainSystem::GetFlags ()
@@ -221,7 +211,7 @@ csRenderMesh** csTerrainSystem::GetRenderMeshes (int& num, iRenderView* rview,
     int clip_portal, clip_plane, clip_zplane;
     
     csBox3 box = cells[i]->GetBBox();
-    
+
     if (rview->ClipBBox(planes, frustum_mask, box, clip_portal, clip_plane, clip_zplane))
     {
       if (cells[i]->GetLoadState() != csTerrainCell::Loaded) cells[i]->Load();
@@ -231,6 +221,8 @@ csRenderMesh** csTerrainSystem::GetRenderMeshes (int& num, iRenderView* rview,
   }
   
   if (auto_preload) PreLoadCells(rview);
+  
+  if (imo_viscb) imo_viscb->BeforeDrawing(this, rview);
   
   return renderer->GetRenderMeshes(num, rview, movable, frustum_mask, needed_cells.GetArray(), (int)needed_cells.GetSize());
 }
@@ -272,14 +264,14 @@ bool csTerrainSystem::HitBeamObject (const csVector3& start, const csVector3& en
   return false;
 }
 
-void csTerrainSystem::SetMeshWrapper (iMeshWrapper* logparent)
+void csTerrainSystem::SetMeshWrapper (iMeshWrapper* lp)
 {
-  imo_wrapper = logparent;
+  logparent = lp;
 }
 
 iMeshWrapper* csTerrainSystem::GetMeshWrapper () const
 {
-  return imo_wrapper;
+  return logparent;
 }
 
 iObjectModel* csTerrainSystem::GetObjectModel ()
@@ -324,8 +316,19 @@ void csTerrainSystem::PositionChild (iMeshObject* child,csTicks current_time)
 {
 }
 
+void csTerrainSystem::ComputeBBox()
+{
+  bbox.StartBoundingBox();
+  
+  for (size_t i = 0; i < cells.GetSize(); ++i)
+    bbox = bbox + cells[i]->GetBBox();
+  
+  bbox_valid = true;
+}
+
 void csTerrainSystem::GetObjectBoundingBox(csBox3& box)
 {
+  if (!bbox_valid) ComputeBBox();
   box = bbox;
 }
 
@@ -337,10 +340,10 @@ void csTerrainSystem::SetObjectBoundingBox(const csBox3& box)
 
 void csTerrainSystem::GetRadius(float& radius, csVector3& center)
 {
-  csBox3 bbox;
-  GetObjectBoundingBox (bbox);
-  center = bbox.GetCenter ();
-  radius = csQsqrt (csSquaredDist::PointPoint (bbox.Max (), bbox.Min ()));
+  csBox3 box;
+  GetObjectBoundingBox (box);
+  center = box.GetCenter ();
+  radius = csQsqrt (csSquaredDist::PointPoint (box.Max (), box.Min ()));
 }
 
 }

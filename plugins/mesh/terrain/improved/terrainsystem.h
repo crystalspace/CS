@@ -45,6 +45,8 @@ class csTerrainSystem :
                             iTerrainSystem,
                             iMeshObject>
 {
+  csRef<iMeshObjectFactory> factory;
+
   csRef<iTerrainRenderer> renderer;
   csRef<iTerrainCollider> collider;
 
@@ -55,24 +57,24 @@ class csTerrainSystem :
 
   csFlags imo_flags;
   csRef<iMeshObjectDrawCallback> imo_viscb;
-  iMeshWrapper* imo_wrapper;
+  iMeshWrapper* logparent;
 
   csDirtyAccessArray<iTerrainCell*> needed_cells;
 
   csBox3 bbox;
+  bool bbox_valid;
+
+  void ComputeBBox();
 
 public:
-  csTerrainSystem (iBase* parent = 0);
+  csTerrainSystem (iMeshObjectFactory* factory = 0);
 
   virtual ~csTerrainSystem ();
 
   void AddCell(csTerrainCell* cell);
 
   void SetRenderer(iTerrainRenderer* renderer);
-  iTerrainRenderer* GetRenderer();
-
   void SetCollider(iTerrainCollider* collider);
-  iTerrainCollider* GetCollider();
 
   // ------------ iTerrainSystem implementation ------------
 
@@ -82,10 +84,10 @@ public:
   virtual bool CollideRay(const csVector3& start, const csVector3& end, bool oneHit, csArray<csVector3>& points);
   virtual bool CollideSegment(const csVector3& start, const csVector3& end, bool oneHit, csArray<csVector3>& points);
 
-  virtual float GetVirtualViewDistance();
+  virtual float GetVirtualViewDistance() const;
   virtual void SetVirtualViewDistance(float distance);
 
-  virtual bool GetAutoPreLoad();
+  virtual bool GetAutoPreLoad() const;
   virtual void SetAutoPreLoad(bool mode);
   virtual void PreLoadCells(iRenderView* view);
   
@@ -123,7 +125,7 @@ public:
         csVector3& isect, float* pr, int* polygon_idx = 0,
         iMaterialWrapper** material = 0);
 
-  virtual void SetMeshWrapper (iMeshWrapper* logparent);
+  virtual void SetMeshWrapper (iMeshWrapper* lp);
 
   virtual iMeshWrapper* GetMeshWrapper () const;
 
