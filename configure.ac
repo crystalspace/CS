@@ -2248,6 +2248,21 @@ AS_IF([test $cs_build_mode = debug],
 
 
 #------------------------------------------------------------------------------
+# Determine whether ptmalloc should be disabled.
+#------------------------------------------------------------------------------
+AC_MSG_CHECKING([whether to enable ptmalloc])
+AC_ARG_ENABLE([ptmalloc],
+    [AC_HELP_STRING([--enable-ptmalloc],
+	[enable the built-in ptmalloc which provides fast memory allocations,
+	but may cause problems in rare cases. (default YES)])],
+    [], [enable_ptmalloc=yes])
+AC_MSG_RESULT([$enable_ptmalloc])
+AS_IF([test $enable_ptmalloc != yes],
+    [CS_HEADER_PROPERTY([CS_NO_PTMALLOC])])
+
+
+
+#------------------------------------------------------------------------------
 # Determine if extensive memory debugger should be enabled.
 #------------------------------------------------------------------------------
 AC_MSG_CHECKING([whether to use extensive memory debugger])

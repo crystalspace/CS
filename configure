@@ -907,6 +907,9 @@ Optional Features:
                           as --enable-mode=profile
   --enable-mode=mode      set build mode; recognized modes are `optimize',
                           `debug', `profile' (default OPTIMIZE)
+  --enable-ptmalloc       enable the built-in ptmalloc which provides fast
+                          memory allocations, but may cause problems in rare
+                          cases. (default YES)
   --enable-extensive-memory-debugger
                           enable the extensive memory debugger which catches
                           common memory management mistakes (default NO)
@@ -70837,6 +70840,28 @@ fi
     esac
 else
   cs_debug_libbfd=no
+fi
+
+
+
+
+#------------------------------------------------------------------------------
+# Determine whether ptmalloc should be disabled.
+#------------------------------------------------------------------------------
+echo "$as_me:$LINENO: checking whether to enable ptmalloc" >&5
+echo $ECHO_N "checking whether to enable ptmalloc... $ECHO_C" >&6
+# Check whether --enable-ptmalloc or --disable-ptmalloc was given.
+if test "${enable_ptmalloc+set}" = set; then
+  enableval="$enable_ptmalloc"
+
+else
+  enable_ptmalloc=yes
+fi;
+echo "$as_me:$LINENO: result: $enable_ptmalloc" >&5
+echo "${ECHO_T}$enable_ptmalloc" >&6
+if test $enable_ptmalloc != yes; then
+  cs_header_text="${cs_header_text}#define CS_NO_PTMALLOC
+"
 fi
 
 
