@@ -93,7 +93,7 @@ PERFORMANCE OF THIS SOFTWARE.
 #define my_powerof2(x) ((((x)-1)&(x))==0)
 
 /* Already initialized? */
-static int __malloc_initialized = -1;
+//static int __malloc_initialized = -1;
 
 #ifndef RETURN_ADDRESS
 # define RETURN_ADDRESS(X_) (NULL)
@@ -225,8 +225,8 @@ void *(*__morecore)(ptrdiff_t) = __default_morecore;
 /*----------------------------------------------------------------------*/
 
 /* Arenas */
-static tsd_key_t arena_key;
-static mutex_t list_lock;
+//static tsd_key_t arena_key;
+//static mutex_t list_lock;
 
 /* Arena structure */
 struct malloc_arena {
@@ -255,7 +255,17 @@ struct malloc_arena {
 static struct malloc_arena* _int_new_arena(size_t size);
 
 /* Buffer for the main arena. */
-static struct malloc_arena main_arena;
+//static struct malloc_arena main_arena;
+struct ptmalloc_state
+{
+  struct malloc_arena main_arena;
+
+  int __malloc_initialized;
+  tsd_key_t arena_key;
+  mutex_t list_lock;
+};
+static struct ptmalloc_state* state;
+static struct ptmalloc_state** state_ptr;
 
 /* For now, store arena in footer.  This means typically 4bytes more
    overhead for each non-main-arena chunk, but is fast and easy to
@@ -267,13 +277,13 @@ static struct malloc_arena main_arena;
 #define arena_for_chunk(ptr) \
  (chunk_non_main_arena(ptr) ? *(struct malloc_arena**)              \
   ((char*)(ptr) + chunksize(ptr) - (FOOTER_OVERHEAD - SIZE_T_SIZE)) \
-  : &main_arena)
+  : &state->main_arena)
 
 /* special because of extra overhead */
 #define arena_for_mmap_chunk(ptr) \
  (chunk_non_main_arena(ptr) ? *(struct malloc_arena**)             \
   ((char*)(ptr) + chunksize(ptr) - sizeof(struct malloc_arena*))   \
-  : &main_arena)
+  : &state->main_arena)
 
 #define set_non_main_arena(mem, ar_ptr) do {                   		      \
   mchunkptr P = mem2chunk(mem);                                               \
@@ -294,7 +304,7 @@ static struct malloc_arena main_arena;
 
 #define arena_get(ptr, size) do { \
   void *vptr = NULL; \
-  ptr = (struct malloc_arena*)tsd_getspecific(arena_key, vptr); \
+  ptr = (struct malloc_arena*)tsd_getspecific(state->arena_key, vptr); \
   if(ptr && !mutex_trylock(&ptr->mutex)) { \
     THREAD_STAT(++(ptr->stat_lock_direct)); \
   } else \
@@ -308,14 +318,14 @@ arena_get2(struct malloc_arena* a_tsd, size_t size)
   int err;
 
   if(!a_tsd)
-    a = a_tsd = &main_arena;
+    a = a_tsd = &state->main_arena;
   else {
     a = a_tsd->next;
     if(!a) {
       /* This can only happen while initializing the new arena. */
-      (void)mutex_lock(&main_arena.mutex);
-      THREAD_STAT(++(main_arena.stat_lock_wait));
-      return &main_arena;
+      (void)mutex_lock(&state->main_arena.mutex);
+      THREAD_STAT(++(state->main_arena.stat_lock_wait));
+      return &state->main_arena;
     }
   }
 
@@ -324,7 +334,7 @@ arena_get2(struct malloc_arena* a_tsd, size_t size)
   do {
     if(!mutex_trylock(&a->mutex)) {
       THREAD_STAT(++(a->stat_lock_loop));
-      tsd_setspecific(arena_key, (void *)a);
+      tsd_setspecific(state->arena_key, (void *)a);
       return a;
     }
     a = a->next;
@@ -334,27 +344,27 @@ arena_get2(struct malloc_arena* a_tsd, size_t size)
      happen during `atfork', or for example on systems where thread
      creation makes it temporarily impossible to obtain _any_
      locks. */
-  if(mutex_trylock(&list_lock)) {
+  if(mutex_trylock(&state->list_lock)) {
     a = a_tsd;
     goto repeat;
   }
-  (void)mutex_unlock(&list_lock);
+  (void)mutex_unlock(&state->list_lock);
 
   /* Nothing immediately available, so generate a new arena.  */
   a = _int_new_arena(size);
   if(!a)
     return 0;
 
-  tsd_setspecific(arena_key, (void *)a);
+  tsd_setspecific(state->arena_key, (void *)a);
   mutex_init(&a->mutex);
   err = mutex_lock(&a->mutex); /* remember result */
 
   /* Add the new arena to the global list.  */
-  (void)mutex_lock(&list_lock);
-  a->next = main_arena.next;
+  (void)mutex_lock(&state->list_lock);
+  a->next = state->main_arena.next;
   atomic_write_barrier ();
-  main_arena.next = a;
-  (void)mutex_unlock(&list_lock);
+  state->main_arena.next = a;
+  (void)mutex_unlock(&state->list_lock);
 
   if(err) /* locking failed; keep arena for further attempts later */
     return 0;
@@ -496,8 +506,8 @@ malloc_starter(size_t sz, const void *caller)
   void* victim;
 
   /*ptmalloc_init_minimal();*/
-  victim = mspace_malloc(arena_to_mspace(&main_arena), sz);
-  THREAD_STAT(++main_arena.stat_starter);
+  victim = mspace_malloc(arena_to_mspace(&state->main_arena), sz);
+  THREAD_STAT(++state->main_arena.stat_starter);
 
   return victim;
 }
@@ -508,8 +518,8 @@ memalign_starter(size_t align, size_t sz, const void *caller)
   void* victim;
 
   /*ptmalloc_init_minimal();*/
-  victim = mspace_memalign(arena_to_mspace(&main_arena), align, sz);
-  THREAD_STAT(++main_arena.stat_starter);
+  victim = mspace_memalign(arena_to_mspace(&state->main_arena), align, sz);
+  THREAD_STAT(++state->main_arena.stat_starter);
 
   return victim;
 }
@@ -519,13 +529,13 @@ free_starter(void* mem, const void *caller)
 {
   if (mem) {
     mchunkptr p = mem2chunk(mem);
-    void *msp = arena_to_mspace(&main_arena);
+    void *msp = arena_to_mspace(&state->main_arena);
     if (is_mmapped(p))
       munmap_chunk(msp, p);
     else
       mspace_free(msp, mem);
   }
-  THREAD_STAT(++main_arena.stat_starter);
+  THREAD_STAT(++state->main_arena.stat_starter);
 }
 
 #endif /* !defined NO_THREADS && USE_STARTER */
@@ -559,16 +569,16 @@ malloc_atfork(size_t sz, const void *caller)
 {
   void *vptr = NULL;
 
-  tsd_getspecific(arena_key, vptr);
+  tsd_getspecific(state->arena_key, vptr);
   if(vptr == ATFORK_ARENA_PTR) {
     /* We are the only thread that may allocate at all.  */
-    return mspace_malloc(arena_to_mspace(&main_arena), sz);
+    return mspace_malloc(arena_to_mspace(&state->main_arena), sz);
   } else {
     /* Suspend the thread until the `atfork' handlers have completed.
        By that time, the hooks will have been reset as well, so that
        mALLOc() can be used again. */
-    (void)mutex_lock(&list_lock);
-    (void)mutex_unlock(&list_lock);
+    (void)mutex_lock(&state->list_lock);
+    (void)mutex_unlock(&state->list_lock);
     return public_mALLOc(sz);
   }
 }
@@ -592,7 +602,7 @@ free_atfork(void* mem, const void *caller)
   }
 
   ar_ptr = arena_for_chunk(p);
-  tsd_getspecific(arena_key, vptr);
+  tsd_getspecific(state->arena_key, vptr);
   if(vptr != ATFORK_ARENA_PTR)
     (void)mutex_lock(&ar_ptr->mutex);
   mspace_free(arena_to_mspace(ar_ptr), mem);
@@ -611,13 +621,13 @@ ptmalloc_lock_all (void)
 {
   struct malloc_arena* ar_ptr;
 
-  if(__malloc_initialized < 1)
+  if((state == NULL) || (state->__malloc_initialized < 1))
     return;
-  (void)mutex_lock(&list_lock);
-  for(ar_ptr = &main_arena;;) {
+  (void)mutex_lock(&state->list_lock);
+  for(ar_ptr = &state->main_arena;;) {
     (void)mutex_lock(&ar_ptr->mutex);
     ar_ptr = ar_ptr->next;
-    if(ar_ptr == &main_arena)
+    if(ar_ptr == &state->main_arena)
       break;
   }
   save_malloc_hook = __malloc_hook;
@@ -625,8 +635,8 @@ ptmalloc_lock_all (void)
   __malloc_hook = malloc_atfork;
   __free_hook = free_atfork;
   /* Only the current thread may perform malloc/free calls now. */
-  tsd_getspecific(arena_key, save_arena);
-  tsd_setspecific(arena_key, ATFORK_ARENA_PTR);
+  tsd_getspecific(state->arena_key, save_arena);
+  tsd_setspecific(state->arena_key, ATFORK_ARENA_PTR);
 }
 
 static void
@@ -634,17 +644,17 @@ ptmalloc_unlock_all (void)
 {
   struct malloc_arena *ar_ptr;
 
-  if(__malloc_initialized < 1)
+  if((state == NULL) || (state->__malloc_initialized < 1))
     return;
-  tsd_setspecific(arena_key, save_arena);
+  tsd_setspecific(state->arena_key, save_arena);
   __malloc_hook = save_malloc_hook;
   __free_hook = save_free_hook;
-  for(ar_ptr = &main_arena;;) {
+  for(ar_ptr = &state->main_arena;;) {
     (void)mutex_unlock(&ar_ptr->mutex);
     ar_ptr = ar_ptr->next;
-    if(ar_ptr == &main_arena) break;
+    if(ar_ptr == &state->main_arena) break;
   }
-  (void)mutex_unlock(&list_lock);
+  (void)mutex_unlock(&state->list_lock);
 }
 
 #ifdef __linux__
@@ -659,19 +669,19 @@ ptmalloc_unlock_all2(void)
 {
   struct malloc_arena *ar_ptr;
 
-  if(__malloc_initialized < 1)
+  if((state == NULL) || (state->__malloc_initialized < 1))
     return;
 #if defined _LIBC || 1 /*defined MALLOC_HOOKS*/
-  tsd_setspecific(arena_key, save_arena);
+  tsd_setspecific(state->arena_key, save_arena);
   __malloc_hook = save_malloc_hook;
   __free_hook = save_free_hook;
 #endif
-  for(ar_ptr = &main_arena;;) {
+  for(ar_ptr = &state->main_arena;;) {
     (void)mutex_init(&ar_ptr->mutex);
     ar_ptr = ar_ptr->next;
-    if(ar_ptr == &main_arena) break;
+    if(ar_ptr == &state->main_arena) break;
   }
-  (void)mutex_init(&list_lock);
+  (void)mutex_init(&state->list_lock);
 }
 
 #else
@@ -685,6 +695,15 @@ ptmalloc_unlock_all2(void)
 
 /*---------------------------------------------------------------------*/
 
+static void ptmalloc_finis (void)
+{
+  if((state == NULL) || (state->__malloc_initialized < 1))
+    return;
+  
+  CALL_MUNMAP(state, sizeof (struct ptmalloc_state));
+  sharemem_destroy (state_ptr, sizeof (struct ptmalloc_state*));
+}
+
 #if !(USE_STARTER & 2)
 static
 #endif
@@ -694,9 +713,22 @@ ptmalloc_init(void)
   const char* s;
   int secure = 0;
   void *mspace;
+  int created = 0;
 
-  if(__malloc_initialized >= 0) return;
-  __malloc_initialized = 0;
+  if(state != NULL) return;
+  state_ptr = sharemem_init (sizeof (struct ptmalloc_state*), &created);
+  if (created)
+  {
+    state = CALL_MMAP(sizeof (struct ptmalloc_state));
+    *state_ptr = state;
+    state->__malloc_initialized = 0;
+  }
+  else 
+  {
+    state = *state_ptr;
+    if(state->__malloc_initialized >= 0) return;
+  }
+  atexit (ptmalloc_finis);
 
   /*if (mp_.pagesize == 0)
     ptmalloc_init_minimal();*/
@@ -719,16 +751,16 @@ ptmalloc_init(void)
 #  endif /* !defined _LIBC */
 # endif /* USE_STARTER & 1 */
 #endif /* !defined NO_THREADS */
-  mutex_init(&main_arena.mutex);
-  main_arena.next = &main_arena;
-  mspace = create_mspace_with_base((char*)&main_arena + MSPACE_OFFSET,
-				   sizeof(main_arena) - MSPACE_OFFSET,
+  mutex_init(&state->main_arena.mutex);
+  state->main_arena.next = &state->main_arena;
+  mspace = create_mspace_with_base((char*)&state->main_arena + MSPACE_OFFSET,
+				   sizeof(state->main_arena) - MSPACE_OFFSET,
 				   0);
-  assert(mspace == arena_to_mspace(&main_arena));
+  assert(mspace == arena_to_mspace(&state->main_arena));
 
-  mutex_init(&list_lock);
-  tsd_key_create(&arena_key, NULL);
-  tsd_setspecific(arena_key, (void *)&main_arena);
+  mutex_init(&state->list_lock);
+  tsd_key_create(&state->arena_key, NULL);
+  tsd_setspecific(state->arena_key, (void *)&state->main_arena);
   thread_atfork(ptmalloc_lock_all, ptmalloc_unlock_all, ptmalloc_unlock_all2);
 #ifndef NO_THREADS
 # if USE_STARTER & 1
@@ -764,7 +796,7 @@ ptmalloc_init(void)
   }
   if (__malloc_initialize_hook != NULL)
     (*__malloc_initialize_hook)();
-  __malloc_initialized = 1;
+  state->__malloc_initialized = 1;
 }
 
 /*------------------------ Public wrappers. --------------------------------*/
@@ -778,14 +810,17 @@ public_mALLOc(size_t bytes)
   void * (*hook) (size_t, const void *) = __malloc_hook;
   if (hook != NULL)
     return (*hook)(bytes, RETURN_ADDRESS (0));
+  
+  // Can happen with dynamically loaded shared libs
+  if (!state) return malloc_hook_ini (bytes, RETURN_ADDRESS (0));
 
   arena_get(ar_ptr, bytes + FOOTER_OVERHEAD);
   if (!ar_ptr)
     return 0;
-  if (ar_ptr != &main_arena)
+  if (ar_ptr != &state->main_arena)
     bytes += FOOTER_OVERHEAD;
   victim = mspace_malloc(arena_to_mspace(ar_ptr), bytes);
-  if (victim && ar_ptr != &main_arena)
+  if (victim && ar_ptr != &state->main_arena)
     set_non_main_arena(victim, ar_ptr);
   (void)mutex_unlock(&ar_ptr->mutex);
   assert(!victim || is_mmapped(mem2chunk(victim)) ||
@@ -876,14 +911,14 @@ public_rEALLOc(void* oldmem, size_t bytes)
 
 #ifndef NO_THREADS
   /* As in malloc(), remember this arena for the next allocation. */
-  tsd_setspecific(arena_key, (void *)ar_ptr);
+  tsd_setspecific(state->arena_key, (void *)ar_ptr);
 #endif
 
-  if (ar_ptr != &main_arena)
+  if (ar_ptr != &state->main_arena)
     bytes += FOOTER_OVERHEAD;
   newp = mspace_realloc(arena_to_mspace(ar_ptr), oldmem, bytes);
 
-  if (newp && ar_ptr != &main_arena)
+  if (newp && ar_ptr != &state->main_arena)
     set_non_main_arena(newp, ar_ptr);
   (void)mutex_unlock(&ar_ptr->mutex);
 
@@ -917,11 +952,11 @@ public_mEMALIGn(size_t alignment, size_t bytes)
   if(!ar_ptr)
     return 0;
 
-  if (ar_ptr != &main_arena)
+  if (ar_ptr != &state->main_arena)
     bytes += FOOTER_OVERHEAD;
   p = mspace_memalign(arena_to_mspace(ar_ptr), alignment, bytes);
 
-  if (p && ar_ptr != &main_arena)
+  if (p && ar_ptr != &state->main_arena)
     set_non_main_arena(p, ar_ptr);
   (void)mutex_unlock(&ar_ptr->mutex);
 
@@ -939,16 +974,16 @@ public_vALLOc(size_t bytes)
   struct malloc_arena* ar_ptr;
   void *p;
 
-  if(__malloc_initialized < 0)
+  if((state == NULL) || (state->__malloc_initialized < 0))
     ptmalloc_init ();
   arena_get(ar_ptr, bytes + FOOTER_OVERHEAD + MIN_CHUNK_SIZE);
   if(!ar_ptr)
     return 0;
-  if (ar_ptr != &main_arena)
+  if (ar_ptr != &state->main_arena)
     bytes += FOOTER_OVERHEAD;
   p = mspace_memalign(arena_to_mspace(ar_ptr), 4096, bytes);
 
-  if (p && ar_ptr != &main_arena)
+  if (p && ar_ptr != &state->main_arena)
     set_non_main_arena(p, ar_ptr);
   (void)mutex_unlock(&ar_ptr->mutex);
   return p;
@@ -1012,11 +1047,11 @@ public_cALLOc(size_t n_elements, size_t elem_size)
   if(!ar_ptr)
     return 0;
 
-  if (ar_ptr != &main_arena)
+  if (ar_ptr != &state->main_arena)
     bytes += FOOTER_OVERHEAD;
   mem = mspace_calloc(arena_to_mspace(ar_ptr), bytes, 1);
 
-  if (mem && ar_ptr != &main_arena)
+  if (mem && ar_ptr != &state->main_arena)
     set_non_main_arena(mem, ar_ptr);
   (void)mutex_unlock(&ar_ptr->mutex);
   
@@ -1036,11 +1071,11 @@ public_iCALLOc(size_t n, size_t elem_size, void* chunks[])
   if (!ar_ptr)
     return 0;
 
-  if (ar_ptr != &main_arena)
+  if (ar_ptr != &state->main_arena)
     elem_size += FOOTER_OVERHEAD;
   m = mspace_independent_calloc(arena_to_mspace(ar_ptr), n, elem_size, chunks);
 
-  if (m && ar_ptr != &main_arena) {
+  if (m && ar_ptr != &state->main_arena) {
     while (n > 0)
       set_non_main_arena(m[--n], ar_ptr);
   }
@@ -1060,7 +1095,7 @@ public_iCOMALLOc(size_t n, size_t sizes[], void* chunks[])
   if (!ar_ptr)
     return 0;
 
-  if (ar_ptr != &main_arena) {
+  if (ar_ptr != &state->main_arena) {
     /* Temporary m_sizes[] array is ugly but it would be surprising to
        change the original sizes[]... */
     m_sizes = mspace_malloc(arena_to_mspace(ar_ptr), n*sizeof(size_t));
@@ -1085,7 +1120,7 @@ public_iCOMALLOc(size_t n, size_t sizes[], void* chunks[])
 
   m = mspace_independent_comalloc(arena_to_mspace(ar_ptr), n, m_sizes, chunks);
 
-  if (ar_ptr != &main_arena) {
+  if (ar_ptr != &state->main_arena) {
     mspace_free(arena_to_mspace(ar_ptr), m_sizes);
     if (m)
       for (i=0; i<n; ++i)
@@ -1110,9 +1145,9 @@ public_mTRIm(size_t s)
 {
   int result;
 
-  (void)mutex_lock(&main_arena.mutex);
-  result = mspace_trim(arena_to_mspace(&main_arena), s);
-  (void)mutex_unlock(&main_arena.mutex);
+  (void)mutex_lock(&state->main_arena.mutex);
+  result = mspace_trim(arena_to_mspace(&state->main_arena), s);
+  (void)mutex_unlock(&state->main_arena.mutex);
   return result;
 }
 
@@ -1145,9 +1180,9 @@ public_mSTATs(void)
   long stat_lock_direct = 0, stat_lock_loop = 0, stat_lock_wait = 0;
 #endif
 
-  if(__malloc_initialized < 0)
+  if((state == NULL) || (state->__malloc_initialized < 0))
     ptmalloc_init ();
-  for (i=0, ar_ptr = &main_arena;; ++i) {
+  for (i=0, ar_ptr = &state->main_arena;; ++i) {
     struct malloc_state* msp = arena_to_mspace(ar_ptr);
 
     fprintf(stderr, "Arena %d:\n", i);
@@ -1166,7 +1201,7 @@ public_mSTATs(void)
       }
     }
     ar_ptr = ar_ptr->next;
-    if (ar_ptr == &main_arena)
+    if (ar_ptr == &state->main_arena)
       break;
   }
 #if THREAD_STATS

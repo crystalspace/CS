@@ -122,6 +122,49 @@ typedef pthread_key_t tsd_key_t;
 
 #endif
 
+#include <unistd.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+
+static inline void* sharemem_init (size_t bytes, int* created)
+{
+  char buf[64];
+  int fd;
+  void* p;
+  
+  sprintf (buf, "/tmp/ptmalloc-%d", getpid());
+  fd = open (buf, O_RDWR, S_IRUSR | S_IWUSR);
+  if (fd < 0)
+  {
+    fd = open (buf, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
+    *created = 1;
+  }
+  else
+    *created = 0;
+  if (fd < 0) return NULL;
+  if (ftruncate (fd, bytes) < 0)
+  {
+    unlink (buf);
+    return NULL;
+  }
+  p = mmap (NULL, bytes, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+  if (p == MAP_FAILED)
+  {
+    unlink (buf);
+    return NULL;
+  }
+  return p;
+}
+
+static inline void sharemem_destroy (void* p, size_t bytes)
+{
+  char buf[64];
+  
+  munmap (p, bytes);
+  sprintf (buf, "/tmp/ptmalloc-%d", getpid());
+  unlink (buf);
+}
+
 /* at fork */
 #define thread_atfork(prepare, parent, child) \
                                    pthread_atfork(prepare, parent, child)
