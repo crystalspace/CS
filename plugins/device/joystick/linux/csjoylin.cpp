@@ -19,13 +19,17 @@
 
 #include "cssysdef.h"
 #include "csver.h"
-#include "csjoylin.h"
+
+#include "iutil/csinput.h" /* for JS max/mins */
 #include "iutil/verbositymanager.h"
 #include "ivaria/reporter.h"
+
+#include "csutil/array.h"
 #include "csutil/csstring.h"
 #include "csutil/event.h"
-#include "csutil/array.h"
-#include "iutil/csinput.h" /* for JS max/mins */
+#include "csutil/eventnames.h"
+
+#include "csjoylin.h"
 
 #include <errno.h>
 #include <fcntl.h>
@@ -38,42 +42,25 @@
 #define CS_LINUX_JOYSTICK_CFG "/config/joystick.cfg"
 #define CS_LINUX_JOYSTICK_KEY "Device.Joystick." CS_PLATFORM_NAME "."
 
-CS_IMPLEMENT_PLUGIN;
+CS_IMPLEMENT_PLUGIN
+
+CS_PLUGIN_NAMESPACE_BEGIN(JoyLin)
+{
 
 SCF_IMPLEMENT_FACTORY (csLinuxJoystick);
 
-SCF_IMPLEMENT_IBASE (csLinuxJoystick)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iEventPlug)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iEventHandler)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csLinuxJoystick::eiEventPlug)
-  SCF_IMPLEMENTS_INTERFACE (iEventPlug)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csLinuxJoystick::eiEventHandler)
-  SCF_IMPLEMENTS_INTERFACE (iEventHandler)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-csLinuxJoystick::csLinuxJoystick (iBase *parent):
+csLinuxJoystick::csLinuxJoystick (iBase *parent) :
+  scfImplementationType (this, parent),
   object_reg(0),
   joystick(0),
   nJoy(0),
-  bHooked(false),
-  EventOutlet(0)
+  bHooked(false)
 {
-  SCF_CONSTRUCT_IBASE(parent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiEventPlug);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiEventHandler);
 }
 
 csLinuxJoystick::~csLinuxJoystick ()
 {
   Close ();
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiEventHandler);
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiEventPlug);
-  SCF_DESTRUCT_IBASE();
 }
 
 bool csLinuxJoystick::Initialize (iObjectRegistry *oreg)
@@ -219,8 +206,8 @@ bool csLinuxJoystick::Init ()
     csRef<iEventQueue> eq (CS_QUERY_REGISTRY(object_reg, iEventQueue));
     if (eq != 0)
     {
-      eq->RegisterListener (&scfiEventHandler, PreProcess);
-      EventOutlet = eq->CreateEventOutlet (&scfiEventPlug);
+      eq->RegisterListener (static_cast<iEventHandler*> (this), PreProcess);
+      EventOutlet = eq->CreateEventOutlet (static_cast<iEventPlug*> (this));
       bHooked = true;
     }
   }
@@ -239,7 +226,7 @@ bool csLinuxJoystick::Close ()
   {
     csRef<iEventQueue> eq (CS_QUERY_REGISTRY(object_reg, iEventQueue));
     if (eq != 0)
-      eq->RemoveListener (&scfiEventHandler);
+      eq->RemoveListener (static_cast<iEventHandler*> (this));
     bHooked = false;
   }
 
@@ -259,13 +246,10 @@ void csLinuxJoystick::Report (int severity, const char* msg, ...)
 {
   va_list arg;
   va_start (arg, msg);
-  csRef<iReporter> rep (CS_QUERY_REGISTRY (object_reg, iReporter));
-  if (rep)
-    rep->ReportV (severity, "crystalspace.device.joystick.linux", msg, arg);
-  else
-  {
-    csPrintfV (msg, arg);
-    csPrintf ("\n");
-  }
+  csReportV (object_reg, severity, "crystalspace.device.joystick.linux", 
+    msg, arg);
   va_end (arg);
 }
+
+}
+CS_PLUGIN_NAMESPACE_END(JoyLin)
