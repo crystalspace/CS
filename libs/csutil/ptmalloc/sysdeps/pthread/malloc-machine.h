@@ -170,8 +170,10 @@ static inline void sharemem_destroy ()
 }
 
 /* at fork */
+#if !defined(HAVE_NO_PTHREAD_ATFORK)
 #define thread_atfork(prepare, parent, child) \
                                    pthread_atfork(prepare, parent, child)
+#endif
 
 #include <sysdeps/generic/malloc-machine.h>
 

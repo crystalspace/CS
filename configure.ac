@@ -163,6 +163,8 @@ CS_EMIT_BUILD_RESULT([cs_cv_sys_pthread], [PTHREAD])
 AS_IF([test $cs_cv_sys_pthread_mutex_recursive != no],
     [CS_HEADER_PROPERTY([CS_PTHREAD_MUTEX_RECURSIVE],
 	[$cs_cv_sys_pthread_mutex_recursive])])
+CS_CHECK_PTHREAD_ATFORK([cs_cv_sys_pthread_atfork])
+CS_EMIT_BUILD_PROPERTY([PTHREAD.ATFORK.AVAILABLE], [$cs_cv_sys_pthread_atfork])
 
 
 
