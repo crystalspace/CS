@@ -41,6 +41,7 @@
 #include "csutil/objreg.h"
 #include "csutil/ref.h"
 #include "csutil/scf.h"
+#include "csutil/scfarray.h"
 #include "csutil/strset.h"
 
 #include "igeom/clip2d.h"
@@ -1663,7 +1664,7 @@ void csGLGraphics3D::DrawInstancesNoShader (
 }
 void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
     const csRenderMeshModes& modes,
-    const csArray<csShaderVariable*> &stacks)
+    const iShaderVarStack* stacks)
 {
   if (cliptype == CS_CLIPPER_EMPTY) 
     return;
@@ -3131,7 +3132,8 @@ void csGLGraphics3D::DrawSimpleMesh (const csSimpleRenderMesh& mesh,
   
   rmesh.object2world = mesh.object2world;
 
-  csShaderVarStack stacks;
+  csRef<iShaderVarStack> stacks;
+  stacks.AttachNew(new scfArray<iShaderVarStack, csShaderVariable*>);
   shadermgr->PushVariables (stacks);
   scrapContext.PushVariables (stacks);
   if (mesh.shader != 0) mesh.shader->PushVariables (stacks);

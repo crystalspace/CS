@@ -70,58 +70,60 @@ struct csLightProperties
    * variables.
    */
   csLightProperties (size_t lightNum, csLightShaderVarCache& svcache,
-    const csShaderVarStack &stacks)
+    const iShaderVarStack* Stacks)
   {
     csStringID id;
+    csShaderVariable* sv;
+    const iArrayReadOnly<csShaderVariable*>* stacks = Stacks;
 
     id = svcache.GetLightSVId (lightNum, 
       csLightShaderVarCache::lightAttenuation);
-    if ((stacks.Length() > id) && (stacks[id] != 0))
-      stacks[id]->GetValue (attenuationConsts);
+    if ((stacks->GetSize() > id) && ((sv = stacks->Get (id)) != 0))
+      sv->GetValue (attenuationConsts);
 
     id = svcache.GetLightSVId (lightNum, 
       csLightShaderVarCache::lightPosition);
-    if ((stacks.Length() > id) && (stacks[id] != 0))
-      stacks[id]->GetValue (posObject);
+    if ((stacks->GetSize() > id) && ((sv = stacks->Get (id)) != 0))
+      sv->GetValue (posObject);
 
     id = svcache.GetLightSVId (lightNum, 
       csLightShaderVarCache::lightDirection);
-    if ((stacks.Length() > id) && (stacks[id] != 0))
-      stacks[id]->GetValue (dirObject);
+    if ((stacks->GetSize() > id) && ((sv = stacks->Get (id)) != 0))
+      sv->GetValue (dirObject);
 
     id = svcache.GetLightSVId (lightNum, 
       csLightShaderVarCache::lightDiffuse);
-    if ((stacks.Length() > id) && (stacks[id] != 0))
-      stacks[id]->GetValue (color);
+    if ((stacks->GetSize() > id) && ((sv = stacks->Get (id)) != 0))
+      sv->GetValue (color);
 
     id = svcache.GetLightSVId (lightNum, 
       csLightShaderVarCache::lightInnerFalloff);
-    if ((stacks.Length() > id) && (stacks[id] != 0))
-      stacks[id]->GetValue (spotFalloffInner);
+    if ((stacks->GetSize() > id) && ((sv = stacks->Get (id)) != 0))
+      sv->GetValue (spotFalloffInner);
 
     id = svcache.GetLightSVId (lightNum, 
       csLightShaderVarCache::lightOuterFalloff);
-    if ((stacks.Length() > id) && (stacks[id] != 0))
-      stacks[id]->GetValue (spotFalloffOuter);
+    if ((stacks->GetSize() > id) && ((sv = stacks->Get (id)) != 0))
+      sv->GetValue (spotFalloffOuter);
 
     int t = CS_LIGHT_POINTLIGHT;
     id = svcache.GetLightSVId (lightNum, 
       csLightShaderVarCache::lightType);
-    if ((stacks.Length() > id) && (stacks[id] != 0))
-      stacks[id]->GetValue (t);
+    if ((stacks->GetSize() > id) && ((sv = stacks->Get (id)) != 0))
+      sv->GetValue (t);
     type = (csLightType)t;
 
     t = CS_ATTN_NONE;
     id = svcache.GetLightSVId (lightNum, 
       csLightShaderVarCache::lightAttenuationMode);
-    if ((stacks.Length() > id) && (stacks[id] != 0))
-      stacks[id]->GetValue (t);
+    if ((stacks->GetSize() > id) && ((sv = stacks->Get (id)) != 0))
+      sv->GetValue (t);
     attenuationMode = (csLightAttenuationMode)t;
   
     id = svcache.GetLightSVId (lightNum, 
       csLightShaderVarCache::lightSpecular);
-    if ((stacks.Length() > id) && (stacks[id] != 0))
-      stacks[id]->GetValue (specular);
+    if ((stacks->GetSize() > id) && ((sv = stacks->Get (id)) != 0))
+      sv->GetValue (specular);
 }
 };
 

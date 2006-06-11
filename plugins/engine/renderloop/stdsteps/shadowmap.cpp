@@ -257,7 +257,7 @@ csShadowmapRenderStep::~csShadowmapRenderStep ()
 }
 
 void csShadowmapRenderStep::Perform (iRenderView* rview, iSector* sector,
-  csShaderVarStack &stacks)
+  iShaderVarStack* stacks)
 {
   csOrthoTransform old_transform = rview->GetCamera()->GetTransform();;
   context = engine->GetContext();
@@ -383,7 +383,7 @@ void csShadowmapRenderStep::Perform (iRenderView* rview, iSector* sector,
 	for (size_t p = 0; p < shader->GetNumberOfPasses (ticket); p ++) 
 	{
 	  shader->ActivatePass (ticket, p);
-	  stacks.Empty ();
+	  stacks->Empty ();
 	  mesh_wrappers[i]->GetSVContext ()->PushVariables (stacks);
 	  rmesh->variablecontext->PushVariables (stacks);
 	  shaderMgr->PushVariables (stacks);

@@ -31,6 +31,7 @@
 #include "csutil/bitarray.h"
 #include "csutil/cscolor.h"
 #include "csutil/flags.h"
+#include "csutil/scfarray.h"
 #include "csutil/sysfunc.h"
 #include "cstool/rendermeshlist.h"
 
@@ -263,7 +264,7 @@ public:
 };
 
 void csFatLoopStep::Perform (iRenderView* rview, iSector* sector,
-                             csShaderVarStack& /*stacks*/)
+                             iShaderVarStack* /*stacks*/)
 {
   shadervars.Clear();
   RenderNode* node = renderNodeAlloc.Alloc();
@@ -442,11 +443,18 @@ void csFatLoopStep::BuildNodeGraph (RenderNode* node, iRenderView* rview,
 	}
 
 	// feed light SVs to shader
-	csShaderVarStack stacks;
+        csRef<iShaderVarStack> stacks;
+        stacks.AttachNew (new scfArray<iShaderVarStack, csShaderVariable*>);
 	FillStacks (stacks, mesh, mw, hdl, shader);
 
 	csRenderMeshModes modes (*mesh);
-	shaderManager->GetShaderVariableStack() = stacks;
+        {
+          csRef<iShaderVarStack> smStacks;
+          smStacks = shaderManager->GetShaderVariableStack();
+          smStacks->Empty();
+          for (size_t i = 0; i < stacks->GetSize(); i++)
+            smStacks->Push (stacks->Get (i));
+        }
 	size_t ticket = shader->GetTicket (modes, stacks);
 
 	// query max light number the shader groks
@@ -510,7 +518,7 @@ csPtr<iTextureHandle> csFatLoopStep::GetAttenuationTexture (
   return csPtr<iTextureHandle> (attTex);
 }
 
-void csFatLoopStep::FillStacks (csShaderVarStack& stacks, 
+void csFatLoopStep::FillStacks (iShaderVarStack* stacks, 
                                 csRenderMesh* rm, iMeshWrapper* mw, 
                                 iMaterial* hdl, iShader* shader)
 {
@@ -518,7 +526,7 @@ void csFatLoopStep::FillStacks (csShaderVarStack& stacks,
   if (svc->IsEmpty())
     svc = 0;
 
-  stacks.Empty();
+  stacks->Empty();
   shaderManager->PushVariables (stacks);
   shadervars.PushVariables (stacks);
   if (rm->variablecontext)

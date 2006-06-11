@@ -25,6 +25,9 @@
 #include "ivideo/shader/shader.h"
 #include "iutil/selfdestruct.h"
 
+CS_PLUGIN_NAMESPACE_BEGIN(ShaderManager)
+{
+
 class csShaderManager;
 
 class csNullShader : public scfImplementationExt2<csNullShader, 
@@ -45,18 +48,18 @@ public:
   virtual ~csNullShader () { }
 
   virtual iObject* QueryObject () 
-  { return (iObject*)(csObject*)this; }
+  { return static_cast<iObject*> (this); }
 
   const char* GetFileName () { return 0; }
   void SetFileName (const char* /*filename*/) {  }
 
   virtual size_t GetTicket (const csRenderMeshModes&, 
-    const csShaderVarStack&) { return 0; }
+    const iShaderVarStack*) { return 0; }
 
   virtual size_t GetNumberOfPasses (size_t) { return 0; }
   virtual bool ActivatePass (size_t, size_t) { return false; }
   virtual bool SetupPass (size_t, const csRenderMesh*,
-    csRenderMeshModes&, const csShaderVarStack &)
+    csRenderMeshModes&, const iShaderVarStack*)
   { return false; }
   virtual bool TeardownPass (size_t)
   { return false; }
@@ -65,21 +68,26 @@ public:
   { return allShaderMeta; }
 
 
-  //=================== iShaderVariableContext ================//
+  /**\name iShaderVariableContext implementation
+   * @{ */
   void AddVariable (csShaderVariable *) { }
   csShaderVariable* GetVariable (csStringID) const { return 0; }
   const csRefArray<csShaderVariable>& GetShaderVariables () const
   { return dummySVs; }
-  void PushVariables (csShaderVarStack &) const { }
-  void PopVariables (csShaderVarStack &) const { }
+  void PushVariables (iShaderVarStack*) const { }
 
   bool IsEmpty() const { return true; }
   void ReplaceVariable (csShaderVariable*) {}
   void Clear () { }
+  /** @} */
 
-  //--------------------- iSelfDestruct implementation -------------------//
-
+  /**\name iSelfDestruct implementation
+   * @{ */
   virtual void SelfDestruct ();
+  /** @} */
 };
+
+}
+CS_PLUGIN_NAMESPACE_END(ShaderManager)
 
 #endif // __CS_NULLSHADER_H__

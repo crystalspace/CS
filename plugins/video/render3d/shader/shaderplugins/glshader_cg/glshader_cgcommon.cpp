@@ -71,7 +71,7 @@ void csShaderGLCGCommon::Deactivate()
 
 void csShaderGLCGCommon::SetupState (const csRenderMesh* /*mesh*/,
                                      csRenderMeshModes& /*modes*/,
-                                     const csShaderVarStack& stacks)
+                                     const iShaderVarStack* stacks)
 {
   size_t i;
   csRef<csShaderVariable> var;

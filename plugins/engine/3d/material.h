@@ -111,8 +111,8 @@ public:
   /// Get a texture (if none 0 is returned)
   iTextureWrapper* GetTextureWrapper (csStringID name);
 
-  //--------------------- iMaterial implementation ---------------------
-
+  /**\name iMaterial implementation
+   * @{ */
   /// Associate a shader with a shader type
   virtual void SetShader (csStringID type, iShader* shader);
   /// Get shader associated with a shader type
@@ -139,6 +139,7 @@ public:
   /// Set reflection values (diffuse, ambient, reflection).
   virtual void SetReflection (float oDiffuse, float oAmbient,
     float oReflection);
+  /** @} */
 
   /**
    * Visit all textures.
@@ -172,8 +173,8 @@ public:
   friend struct MaterialEngine;
 
 
-  //=================== iShaderVariableContext ================//
-
+  /**\name iShaderVariableContext implementation
+   * @{ */
   /// Add a variable to this context
   void AddVariable (csShaderVariable *variable)
   { svcontext.AddVariable (variable); }
@@ -190,7 +191,7 @@ public:
   * Push the variables of this context onto the variable stacks
   * supplied in the "stacks" argument
   */
-  void PushVariables (csShaderVarStack &stacks) const
+  void PushVariables (iShaderVarStack* stacks) const
   { svcontext.PushVariables (stacks); }
 
   bool IsEmpty () const 
@@ -199,6 +200,7 @@ public:
   void ReplaceVariable (csShaderVariable *variable)
   { svcontext.ReplaceVariable (variable); }
   void Clear () { svcontext.Clear(); }
+  /** @} */
 };
 
 /**
