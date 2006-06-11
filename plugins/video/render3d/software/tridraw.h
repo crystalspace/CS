@@ -21,6 +21,8 @@
 #define __CS_SOFT3D_TRIDRAW_H__
 
 #include "csgeom/polyclip.h"
+#include "csgeom/math2d.h"
+#include "cstool/rbuflock.h"
 #include "sft3dcom.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(Soft3D)
