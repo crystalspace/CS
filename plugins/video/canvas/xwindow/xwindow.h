@@ -21,8 +21,10 @@
 #define __CS_XWINDOW_H__
 
 #include <stdarg.h>
+#include "csutil/csstring.h"
 #include "csutil/hash.h"
 #include "csutil/scf.h"
+#include "csutil/scf_implementation.h"
 #include "csutil/weakref.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
