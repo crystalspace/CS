@@ -11,6 +11,8 @@ chronological order.
           in a static lib and is linked into many modules.
 	- res changed configure to apply -fvisibility=hidden not only to C++
 	  but also to C sources.
+	- res somewhat tweaked the ptmalloc unix shared mem stuff.
+	- res made various compile and warning fixes.
 9-Jun-2006
 	- res changed the way how malloc etc. are overridden to make things
 	  more friendly in case identifiers like "free" are used in code.

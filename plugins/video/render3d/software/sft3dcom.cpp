@@ -33,6 +33,7 @@
 #include "cstool/rbuflock.h"
 #include "csutil/cscolor.h"
 #include "csutil/event.h"
+#include "csutil/scfarray.h"
 #include "csutil/scfstrset.h"
 #include "csutil/sysfunc.h"
 #include "iutil/cfgfile.h"
@@ -901,7 +902,8 @@ void csSoftwareGraphics3DCommon::DrawSimpleMesh (const csSimpleRenderMesh &mesh,
 
   rmesh.object2world = mesh.object2world;
 
-  csShaderVarStack stacks;
+  csRef<iShaderVarStack> stacks;
+  stacks.AttachNew (new scfArray<iShaderVarStack>);
   shadermgr->PushVariables (stacks);
   scrapContext.PushVariables (stacks);
 
@@ -995,7 +997,7 @@ static iRenderBuffer* ColorFixup (iRenderBuffer* srcBuffer,
 
 void csSoftwareGraphics3DCommon::DrawMesh (const csCoreRenderMesh* mesh,
     const csRenderMeshModes& modes,
-    const csArray<csShaderVariable*> &stacks)
+    const iShaderVarStack* stacks)
 {
   ScanlineRendererHelper aNameThatDoesNotReallyMatter (this);
   if (!scanlineRenderer) return;
