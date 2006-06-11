@@ -21,6 +21,7 @@
 
 #include "imesh/sprite2d.h"
 #include "csutil/array.h"
+#include "csutil/csstring.h"
 #include "csutil/scf_implementation.h"
 #include "csgeom/vector2.h"
 

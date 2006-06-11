@@ -27,6 +27,7 @@
 
 #include "csutil/array.h"
 #include "csutil/cscolor.h"
+#include "csutil/csstring.h"
 #include "csutil/flags.h"
 #include "csutil/refarr.h"
 #include "csutil/leakguard.h"

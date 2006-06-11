@@ -52,9 +52,10 @@ CS_LEAKGUARD_IMPLEMENT (csSprite2DMeshObject);
 CS_LEAKGUARD_IMPLEMENT (csSprite2DMeshObjectFactory);
 
 csSprite2DMeshObject::csSprite2DMeshObject (csSprite2DMeshObjectFactory* factory) :
-  scfImplementationType (this), factory (factory), logparent (0), initialized (false),
-  current_lod (1), current_features (0), uvani (0), vertices_dirty (true),
-  texels_dirty (true), colors_dirty (true), indicesSize ((size_t)-1)
+  scfImplementationType (this), uvani (0), vertices_dirty (true), 
+  texels_dirty (true), colors_dirty (true), indicesSize ((size_t)-1), 
+  logparent (0), factory (factory), initialized (false), current_lod (1), 
+  current_features (0)
 {
   ifactory = scfQueryInterface<iMeshObjectFactory> (factory);
   material = factory->GetMaterialWrapper ();
@@ -666,8 +667,8 @@ bool csSprite2DMeshObject::HitBeamOutline(const csVector3& start,
 
 csSprite2DMeshObjectFactory::csSprite2DMeshObjectFactory (iMeshObjectType* pParent,
   iObjectRegistry* object_reg) : scfImplementationType (this, pParent),
-  material (0), MixMode (0), lighting (true), logparent (0), spr2d_type (pParent),
-  object_reg (object_reg)
+  material (0), logparent (0), spr2d_type (pParent), MixMode (0), 
+  lighting (true), object_reg (object_reg)
 {
   light_mgr = csQueryRegistry<iLightManager> (object_reg);
   g3d = csQueryRegistry<iGraphics3D> (object_reg);
