@@ -2261,7 +2261,7 @@ static const TokenTabEntry commonTokens[] = {
   {"elt2", 4, OP_VEC_ELT2},
   {"elt3", 4, OP_VEC_ELT3},
   {"elt4", 4, OP_VEC_ELT4},
-  {"frame", 4, OP_FUNC_FRAME},
+  {"frame", 5, OP_FUNC_FRAME},
   {"make-vector", 11, OP_PS_MAKE_VECTOR},
   {"max", 3, OP_FUNC_MAX},
   {"min", 3, OP_FUNC_MIN},
