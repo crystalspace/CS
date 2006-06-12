@@ -20,7 +20,7 @@
 #define __CS_IUTIL_EVENTNAMES_H__
 
 #include "iutil/strset.h"
-struct csString;
+class csString;
 
 /**\file
  * General event name resolver interface
