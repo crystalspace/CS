@@ -26,6 +26,7 @@
 #include "csgeom/transfrm.h"
 #include "csgfx/renderbuffer.h"
 #include "cstool/rbuflock.h"
+#include "csutil/scfarray.h"
 
 #include "iengine/movable.h"
 #include "iengine/rview.h"
@@ -61,10 +62,8 @@ csSprite2DMeshObject::csSprite2DMeshObject (csSprite2DMeshObjectFactory* factory
   lighting = factory->HasLighting ();
   MixMode = factory->GetMixMode ();
 
-  /*
   scfVertices.AttachNew (new scfArrayWrap<iColoredVertices, 
     csColoredVertices> (vertices));
-  */
 }
 
 csSprite2DMeshObject::~csSprite2DMeshObject ()
@@ -410,23 +409,23 @@ void csSprite2DMeshObject::UpdateLighting (
    
 void csSprite2DMeshObject::AddColor (const csColor& col)
 {
-  csColoredVertices& vertices = GetVertices ();
+  iColoredVertices* vertices = GetVertices ();
   size_t i;
-  for (i = 0 ; i < vertices.Length () ; i++)
-    vertices[i].color_init += col;
+  for (i = 0 ; i < vertices->GetSize(); i++)
+    vertices->Get (i).color_init += col;
   if (!lighting)
-    for (i = 0 ; i < vertices.Length () ; i++)
-      vertices[i].color = vertices[i].color_init;
+    for (i = 0 ; i < vertices->GetSize(); i++)
+      vertices->Get (i).color = vertices->Get (i).color_init;
 
   colors_dirty = true;
 }
 
 void csSprite2DMeshObject::ScaleBy (float factor)
 {
-  csColoredVertices& vertices = GetVertices ();
+  iColoredVertices* vertices = GetVertices ();
   size_t i;
-  for (i = 0; i < vertices.Length (); i++)
-    vertices[i].pos *= factor;
+  for (i = 0 ; i < vertices->GetSize(); i++)
+    vertices->Get (i).pos *= factor;
 
   vertices_dirty = true;
   ShapeChanged ();
@@ -434,10 +433,10 @@ void csSprite2DMeshObject::ScaleBy (float factor)
 
 void csSprite2DMeshObject::Rotate (float angle)
 {
-  csColoredVertices& vertices = GetVertices ();
+  iColoredVertices* vertices = GetVertices ();
   size_t i;
-  for (i = 0; i < vertices.Length (); i++)
-    vertices[i].pos.Rotate (angle);
+  for (i = 0 ; i < vertices->GetSize(); i++)
+    vertices->Get (i).pos.Rotate (angle);
 
   vertices_dirty = true;
   ShapeChanged ();

@@ -131,10 +131,12 @@ private:
   csBox2 bbox_2d;
   csFlags flags;
 
+  typedef csDirtyAccessArray<csSprite2DVertex> csColoredVertices;
   /**
    * Array of 3D vertices.
    */
   csColoredVertices vertices;
+  csRef<iColoredVertices> scfVertices;
 
   /**
    * If false then we don't do lighting but instead use
@@ -167,7 +169,7 @@ public:
   virtual ~csSprite2DMeshObject ();
 
   /// Get the vertex array.
-  csColoredVertices& GetVertices () { return vertices; }
+  iColoredVertices* GetVertices () { return scfVertices; }
   /**
    * Set vertices to form a regular n-polygon around (0,0),
    * optionally also set u,v to corresponding coordinates in a texture.
