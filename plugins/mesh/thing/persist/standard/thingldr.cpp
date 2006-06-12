@@ -325,26 +325,25 @@ bool csThingLoader::ParseTextureMapping (
   return true;
 }
 
-class MissingSectorCallback : public iPortalCallback
+class MissingSectorCallback : 
+  public scfImplementation1<MissingSectorCallback,
+                            iPortalCallback>
 {
 public:
   csRef<iLoaderContext> ldr_context;
-  char* sectorname;
+  csString sectorname;
   bool autoresolve;
 
-  SCF_DECLARE_IBASE;
   MissingSectorCallback (iLoaderContext* ldr_context, const char* sector,
-  	bool autoresolve)
+    bool autoresolve) : scfImplementationType (this), 
+    ldr_context (ldr_context), sectorname (sector), autoresolve (autoresolve)
   {
-    SCF_CONSTRUCT_IBASE (0);
     MissingSectorCallback::ldr_context = ldr_context;
-    sectorname = csStrNew (sector);
+    sectorname = sector;
     MissingSectorCallback::autoresolve = autoresolve;
   }
   virtual ~MissingSectorCallback ()
   {
-    delete[] sectorname;
-    SCF_DESTRUCT_IBASE ();
   }
   
   virtual bool Traverse (iPortal* portal, iBase* /*context*/)
@@ -355,17 +354,12 @@ public:
     // For efficiency reasons we deallocate the name here.
     if (!autoresolve)
     {
-      delete[] sectorname;
-      sectorname = 0;
+      sectorname.Free();
       portal->RemoveMissingSectorCallback (this);
     }
     return true;
   }
 };
-
-SCF_IMPLEMENT_IBASE (MissingSectorCallback)
-  SCF_IMPLEMENTS_INTERFACE (iPortalCallback)
-SCF_IMPLEMENT_IBASE_END
 
 bool csThingLoader::ParsePortal (
 	iDocumentNode* node, iLoaderContext* ldr_context,
@@ -373,7 +367,7 @@ bool csThingLoader::ParsePortal (
 	csMatrix3 &m, csVector3 &before, csVector3 &after,
 	iString* destSector, bool& autoresolve)
 {
-  destSector->Clear ();
+  destSector->Empty ();
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
   {
@@ -841,10 +835,10 @@ bool csThingLoader::ParsePoly3d (
 
       if (!destSector)
       {
-	MissingSectorCallback* mscb = new MissingSectorCallback (
-	    	ldr_context, destSectorName.GetData (), autoresolve);
+	csRef<MissingSectorCallback> mscb;
+        mscb.AttachNew (new MissingSectorCallback (
+	    	ldr_context, destSectorName.GetData (), autoresolve));
 	portal->SetMissingSectorCallback (mscb);
-	mscb->DecRef ();
       }
 
       if (is_texture_transparent)
