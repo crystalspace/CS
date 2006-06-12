@@ -182,7 +182,7 @@ void csGenmeshSkelAnimationControl::UpdateArrays (int num_verts)
   }
 }
 
-void csGenmeshSkelAnimationControl::UpdateVertNormArrays (int num_norms)
+void csGenmeshSkelAnimationControl::UpdateVertNormArrays (int /*num_norms*/)
 {
 }
 

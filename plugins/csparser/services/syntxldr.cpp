@@ -715,6 +715,7 @@ bool csTextSyntaxService::HandlePortalParameter (
 {
   handled = true;
   const char* value = child->GetValue ();
+  bool ww_given = false;
   csStringID id = xmltokens.Request (value);
   switch (id)
   {
@@ -728,12 +729,13 @@ bool csTextSyntaxService::HandlePortalParameter (
       break;
     case XMLTOKEN_WV:
       ParseVector (child, before);
-      after = before;
+      if (!ww_given) after = before;
       mirror = false;
       warp = true;
       break;
     case XMLTOKEN_WW:
       ParseVector (child, after);
+      ww_given = true;
       mirror = false;
       warp = true;
       break;

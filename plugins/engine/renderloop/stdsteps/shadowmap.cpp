@@ -421,8 +421,8 @@ csShadowmapRenderStep::R2TVisCallback::~R2TVisCallback ()
 }
 
 void csShadowmapRenderStep::R2TVisCallback::ObjectVisible (
-  iVisibilityObject *visobject, iMeshWrapper *mesh, uint32 /*frustum_mask*/)
+  iVisibilityObject * /*visobject*/, iMeshWrapper *mesh,
+  uint32 /*frustum_mask*/)
 {
-  //printf("adding %s\n", mesh->QueryObject()->GetName());
   parent->lightMeshes.Push (mesh);
 }

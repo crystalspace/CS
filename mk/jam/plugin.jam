@@ -54,10 +54,7 @@ rule Plugin
   $(<)_TARGET = $(target) ;
   $(<)_METAFILE = $(metafile) ;
 
-  # create target clean rule
-  Always $(<)clean ;
-  NotFile $(<)clean ;
-  Clean $(<)clean : $(objects) ; # create target clean rule 
+  local cleanfiles = $(objects) ;
 
   # Create a target for eventual static linking
   if ! $(NO_STATIC_LINKING)
@@ -119,7 +116,7 @@ rule Plugin
   if $(LINK.DEBUG.INFO.SEPARATE) = "yes"
   {
     local debugfile = [ SplitDebugInfo $(target) ] ;
-    Clean $(<)clean : $(debugfile) ;
+    cleanfiles += $(debugfile) ;
     if ! [ IsElem noinstall : $(3) ]
     {
       NoCare $(debugfile) ;
@@ -129,6 +126,11 @@ rule Plugin
 
   CFlags $(<) : $(PLUGIN.CFLAGS) : nostatic ;
   LFlags $(<) : $(LINKLIBS) $(PLUGIN.LFLAGS) : nostatic ;
+
+  # create target clean rule
+  Always $(<)clean ;
+  NotFile $(<)clean ;
+  Clean $(<)clean : $(cleanfiles) ;
 
   if ! [ IsElem nohelp : $(3) ]
   {

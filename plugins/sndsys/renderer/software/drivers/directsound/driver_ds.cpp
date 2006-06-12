@@ -348,7 +348,6 @@ void SndSysDriverDirectSound::Run()
   // This difference means that using DirectSound's writecursor will cause us to constantly
   //  overwrite a little bit of our last buffer commit.
 
-  int RealWriteCursor=0;
   while (m_bRunning)
   {
     // Wait for playback notification

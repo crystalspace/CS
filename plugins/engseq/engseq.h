@@ -370,7 +370,7 @@ public:
 public:
   csCameraCatcher () : scfImplementationType (this) { camera = 0; }
   virtual ~csCameraCatcher () { }
-  virtual void StartFrame (iEngine* engine, iRenderView* rview)
+  virtual void StartFrame (iEngine* /*engine*/, iRenderView* rview)
   {
     camera = rview->GetCamera ();
   }

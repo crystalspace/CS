@@ -10751,8 +10751,27 @@ _cspace.iHalo_swigregister(iHaloPtr)
 
 iHalo_scfGetVersion = _cspace.iHalo_scfGetVersion
 
+class iShaderVarStack(_object):
+    __swig_setmethods__ = {}
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iShaderVarStack, name, value)
+    __swig_getmethods__ = {}
+    __getattr__ = lambda self, name: _swig_getattr(self, iShaderVarStack, name)
+    def __init__(self): raise RuntimeError, "No constructor defined"
+    def __repr__(self):
+        return "<%s.%s; proxy of C++ iShaderVarStack instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
+    def __del__(self, destroy=_cspace.delete_iShaderVarStack):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
 
-csGetShaderVariableFromStack = _cspace.csGetShaderVariableFromStack
+
+class iShaderVarStackPtr(iShaderVarStack):
+    def __init__(self, this):
+        _swig_setattr(self, iShaderVarStack, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, iShaderVarStack, 'thisown', 0)
+        _swig_setattr(self, iShaderVarStack,self.__class__,iShaderVarStack)
+_cspace.iShaderVarStack_swigregister(iShaderVarStackPtr)
+
 class iShaderVariableContext(iBase):
     __swig_setmethods__ = {}
     for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
@@ -10785,6 +10804,8 @@ class iShaderVariableContextPtr(iShaderVariableContext):
         if not hasattr(self,"thisown"): _swig_setattr(self, iShaderVariableContext, 'thisown', 0)
         _swig_setattr(self, iShaderVariableContext,self.__class__,iShaderVariableContext)
 _cspace.iShaderVariableContext_swigregister(iShaderVariableContextPtr)
+
+csGetShaderVariableFromStack = _cspace.csGetShaderVariableFromStack
 
 iShaderVariableContext_scfGetVersion = _cspace.iShaderVariableContext_scfGetVersion
 
