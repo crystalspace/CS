@@ -17,6 +17,8 @@ chronological order.
 	  the runtime functions as opposed to CS functions again. Also
 	  debug-break on first nested assert.
 	- res updated spr2d to use new SCF.
+	- res changed configure to apply -fvisibility=hidden not only to C++
+	  but also to C sources.
 11-Jun-2006
 	- mdmkolbe factored into separate files parts of
 	  plugins/video/render3d/software/pixspecifica.cpp that were

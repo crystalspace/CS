@@ -669,18 +669,17 @@ AS_IF([test $cs_cv_prog_cxx_visibility_inlines_hidden_buggy != yes],
 # in code.
 #------------------------------------------------------------------------------
 CS_CHECK_BUILD_FLAGS([for symbol visibility flag],
-    [cs_cv_prog_cxx_visibility_hidden],
-    [CS_CREATE_TUPLE([-fvisibility=hidden])], [C++])
+    [cs_cv_prog_cc_visibility_hidden],
+    [CS_CREATE_TUPLE([-fvisibility=hidden])])
+AS_IF([test -n "$cs_cv_prog_cc_visibility_hidden"],
+    [CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS], 
+	[$cs_cv_prog_cc_visibility_hidden], [+])])
 
 CS_SYMBOL_QUALIFIER([how to declare default visibility],
     [cs_cv_prog_cxx_declare_visible_def],
     [__attribute__((visibility("default")))], [], [C++])
-
-AS_IF([test $cs_cv_prog_cxx_declare_visible_def != no && \
-    test -n "$cs_cv_prog_cxx_visibility_hidden"],
-    [CS_EMIT_BUILD_PROPERTY([COMPILER.C++FLAGS], 
-	[$cs_cv_prog_cxx_visibility_hidden], [+])
-    CS_HEADER_PROPERTY([CS_VISIBILITY_DEFAULT],
+AS_IF([test $cs_cv_prog_cxx_declare_visible_def != no],
+    [CS_HEADER_PROPERTY([CS_VISIBILITY_DEFAULT],
 	[$cs_cv_prog_cxx_declare_visible_def])])
 
 

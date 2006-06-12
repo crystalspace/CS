@@ -723,13 +723,13 @@ echo X"$0" |
   	  /^X\(\/\).*/{ s//\1/; q; }
   	  s/.*/./; q'`
   srcdir=$ac_confdir
-  if test ! -r $srcdir/$ac_unique_file; then
+  if test ! -r "$srcdir/$ac_unique_file"; then
     srcdir=..
   fi
 else
   ac_srcdir_defaulted=no
 fi
-if test ! -r $srcdir/$ac_unique_file; then
+if test ! -r "$srcdir/$ac_unique_file"; then
   if test "$ac_srcdir_defaulted" = yes; then
     { echo "$as_me: error: cannot find sources ($ac_unique_file) in $ac_confdir or .." >&2
    { (exit 1); exit 1; }; }
@@ -738,7 +738,7 @@ if test ! -r $srcdir/$ac_unique_file; then
    { (exit 1); exit 1; }; }
   fi
 fi
-(cd $srcdir && test -r ./$ac_unique_file) 2>/dev/null ||
+(cd $srcdir && test -r "./$ac_unique_file") 2>/dev/null ||
   { echo "$as_me: error: sources are in $srcdir, but \`cd $srcdir' does not work" >&2
    { (exit 1); exit 1; }; }
 srcdir=`echo "$srcdir" | sed 's%\([^\\/]\)[\\/]*$%\1%'`
@@ -14523,16 +14523,16 @@ fi
 #------------------------------------------------------------------------------
 echo "$as_me:$LINENO: checking for symbol visibility flag" >&5
 echo $ECHO_N "checking for symbol visibility flag... $ECHO_C" >&6
-if test "${cs_cv_prog_cxx_visibility_hidden_ok+set}" = set; then
+if test "${cs_cv_prog_cc_visibility_hidden_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
-  ac_ext=cc
-ac_cpp='$CXXCPP $CPPFLAGS'
-ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+  ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
-    cs_cflags_save="$CXXFLAGS"
+    cs_cflags_save="$CFLAGS"
     cs_lflags_save="$LDFLAGS"
     cs_libs_save="$LIBS"
     cs_build_ok=no
@@ -14594,7 +14594,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CFLAGS="$cs_cflags_test  $cs_cflags_save"
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat >conftest.$ac_ext <<_ACEOF
@@ -14621,7 +14621,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
   cat conftest.err >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_cxx_werror_flag"
+	 { ac_try='test -z "$ac_c_werror_flag"
 			 || test ! -s conftest.err'
   { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
   (eval $ac_try) 2>&5
@@ -14649,7 +14649,7 @@ fi
     done
 
 
-    CXXFLAGS=$cs_cflags_save
+    CFLAGS=$cs_cflags_save
     LDFLAGS=$cs_lflags_save
     LIBS=$cs_libs_save
     ac_ext=c
@@ -14663,16 +14663,26 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
   cs_build_cflags=`echo x$cs_cflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_cv_prog_cxx_visibility_hidden=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	    cs_cv_prog_cxx_visibility_hidden_ok="$cs_cv_prog_cxx_visibility_hidden"
+	cs_cv_prog_cc_visibility_hidden=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	    cs_cv_prog_cc_visibility_hidden_ok="$cs_cv_prog_cc_visibility_hidden"
 else
-  cs_cv_prog_cxx_visibility_hidden=''
-	    cs_cv_prog_cxx_visibility_hidden_ok=no
+  cs_cv_prog_cc_visibility_hidden=''
+	    cs_cv_prog_cc_visibility_hidden_ok=no
 fi
 
 fi
-echo "$as_me:$LINENO: result: $cs_cv_prog_cxx_visibility_hidden_ok" >&5
-echo "${ECHO_T}$cs_cv_prog_cxx_visibility_hidden_ok" >&6
+echo "$as_me:$LINENO: result: $cs_cv_prog_cc_visibility_hidden_ok" >&5
+echo "${ECHO_T}$cs_cv_prog_cc_visibility_hidden_ok" >&6
+
+if test -n "$cs_cv_prog_cc_visibility_hidden"; then
+  cs_build_prop_val="$cs_cv_prog_cc_visibility_hidden"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.CFLAGS += \"$cs_build_prop_val\" ;
+"
+fi
+
+fi
 
 
 echo "$as_me:$LINENO: checking how to declare default visibility" >&5
@@ -14830,17 +14840,8 @@ fi
 echo "$as_me:$LINENO: result: $cs_cv_prog_cxx_declare_visible_def" >&5
 echo "${ECHO_T}$cs_cv_prog_cxx_declare_visible_def" >&6
 
-
-if test $cs_cv_prog_cxx_declare_visible_def != no && \
-    test -n "$cs_cv_prog_cxx_visibility_hidden"; then
-  cs_build_prop_val="$cs_cv_prog_cxx_visibility_hidden"
-    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.C++FLAGS += \"$cs_build_prop_val\" ;
-"
-fi
-
-    cs_header_text="${cs_header_text}#define CS_VISIBILITY_DEFAULT $cs_cv_prog_cxx_declare_visible_def
+if test $cs_cv_prog_cxx_declare_visible_def != no; then
+  cs_header_text="${cs_header_text}#define CS_VISIBILITY_DEFAULT $cs_cv_prog_cxx_declare_visible_def
 "
 fi
 
@@ -71104,10 +71105,9 @@ for ac_i in : $LIBOBJS; do test "x$ac_i" = x: && continue
   # 1. Remove the extension, and $U if already installed.
   ac_i=`echo "$ac_i" |
 	 sed 's/\$U\././;s/\.o$//;s/\.obj$//'`
-  # 2. Prepend LIBOBJDIR.  When used with automake>=1.10 LIBOBJDIR
-  #    will be set to the directory where LIBOBJS objects are built.
-  ac_libobjs="$ac_libobjs \${LIBOBJDIR}$ac_i\$U.$ac_objext"
-  ac_ltlibobjs="$ac_ltlibobjs \${LIBOBJDIR}$ac_i"'$U.lo'
+  # 2. Add them.
+  ac_libobjs="$ac_libobjs $ac_i\$U.$ac_objext"
+  ac_ltlibobjs="$ac_ltlibobjs $ac_i"'$U.lo'
 done
 LIBOBJS=$ac_libobjs
 
