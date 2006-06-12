@@ -68,7 +68,7 @@ void csNullShader::SelfDestruct ()
 csShaderManager::csShaderManager(iBase* parent) : 
   scfImplementationType (this, parent)
 {
-  shaderVarStack.AttachNew (new scfArray<iShaderVarStack, csShaderVariable*>);
+  shaderVarStack.AttachNew (new scfArray<iShaderVarStack>);
   seqnumber = 0;
   eventSucc[0] = CS_HANDLERLIST_END;
   eventSucc[1] = CS_HANDLERLIST_END;

@@ -3133,7 +3133,7 @@ void csGLGraphics3D::DrawSimpleMesh (const csSimpleRenderMesh& mesh,
   rmesh.object2world = mesh.object2world;
 
   csRef<iShaderVarStack> stacks;
-  stacks.AttachNew(new scfArray<iShaderVarStack, csShaderVariable*>);
+  stacks.AttachNew(new scfArray<iShaderVarStack>);
   shadermgr->PushVariables (stacks);
   scrapContext.PushVariables (stacks);
   if (mesh.shader != 0) mesh.shader->PushVariables (stacks);

@@ -232,7 +232,7 @@ csPtr<iBase> csFuncTexLoader::Parse (iDocumentNode* node,
       context->AddVariable (currentPos);
       
       csRef<iShaderVarStack> stacks;
-      stacks.AttachNew (new scfArray<iShaderVarStack, csShaderVariable*>);
+      stacks.AttachNew (new scfArray<iShaderVarStack>);
       context->PushVariables (stacks);
 
       if (expr.Parse (exprNode))

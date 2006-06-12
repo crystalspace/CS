@@ -419,7 +419,7 @@ public:
   SVCWrapper (csShaderVariableContext& wrappedSVC) : 
     scfImplementationType (this), wrappedSVC (wrappedSVC)
   {
-    svStack.AttachNew (new scfArray<iShaderVarStack, csShaderVariable*>);
+    svStack.AttachNew (new scfArray<iShaderVarStack>);
     wrappedSVC.PushVariables (svStack);
   }
   virtual ~SVCWrapper () { }

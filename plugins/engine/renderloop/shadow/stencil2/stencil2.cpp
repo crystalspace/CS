@@ -640,7 +640,7 @@ void csStencil2ShadowStep::DrawShadow(
   cache_entry->UpdateBuffers();
 
   csRef<iShaderVarStack> stacks;
-  stacks.AttachNew (new scfArray<iShaderVarStack, csShaderVariable*>);
+  stacks.AttachNew (new scfArray<iShaderVarStack>);
 
   shmgr->PushVariables (stacks);
   g3d->SetWorldToCamera (camera->GetTransform ().GetInverse ());

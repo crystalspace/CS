@@ -493,7 +493,7 @@ void csStencilShadowStep::DrawShadow (iRenderView* rview, iLight* light,
   if (edge_start < index_range) 
   {
     csRef<iShaderVarStack> stacks;
-    stacks.AttachNew (new scfArray<iShaderVarStack, csShaderVariable*>);
+    stacks.AttachNew (new scfArray<iShaderVarStack>);
 
     shadowCacheEntry->UpdateBuffers ();
     shmgr->PushVariables (stacks);

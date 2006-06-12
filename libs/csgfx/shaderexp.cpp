@@ -353,7 +353,7 @@ bool csShaderExpression::Evaluate(csShaderVariable* var,
 {
   csRef<iShaderVarStack> wrapStacks;
   wrapStacks.AttachNew (new scfArrayWrap <iShaderVarStack, 
-    csShaderVariable*, csShaderVarStack> (stacks));
+    csShaderVarStack> (stacks));
   return Evaluate (var, wrapStacks);
 }
 
