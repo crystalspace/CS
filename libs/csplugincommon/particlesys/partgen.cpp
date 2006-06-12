@@ -156,7 +156,7 @@ void csParticleSystem::AppendRectSprite (float width, float height,
   vs[3].pos.Set (+width,-height); vs[3].u=1.; vs[3].v=1.;
   vs[3].color.Set (0, 0, 0);
   state->SetLighting (lighted);
-  part->SetColor (csColor (1.0, 1.0, 1.0));
+  sprmesh->SetColor (csColor (1.0, 1.0, 1.0));
   sprmesh->SetMaterialWrapper (mat);
   AppendParticle (sprmesh, part, state);
   ShapeChanged ();
@@ -173,7 +173,7 @@ void csParticleSystem::AppendRegularSprite (int n, float radius,
   part->ScaleBy (radius);
   if (mat) sprmesh->SetMaterialWrapper (mat);
   state->SetLighting (lighted);
-  part->SetColor (csColor (1.0, 1.0, 1.0));
+  sprmesh->SetColor (csColor (1.0, 1.0, 1.0));
 
   AppendParticle (sprmesh, part, state);
   ShapeChanged ();
@@ -184,7 +184,10 @@ void csParticleSystem::SetupMixMode ()
 {
   size_t i;
   for (i = 0 ; i < particles.Length () ; i++)
-    GetParticle (i)->SetMixMode (MixMode);
+  {
+    csRef<iMeshObject> sprmesh = scfQueryInterface<iMeshObject> (GetParticle (i));
+    sprmesh->SetMixMode (MixMode);
+  }
 }
 
 
@@ -192,7 +195,10 @@ void csParticleSystem::SetupColor ()
 {
   size_t i;
   for(i = 0 ; i < particles.Length () ; i++)
-    GetParticle (i)->SetColor (color);
+  {
+    csRef<iMeshObject> sprmesh = scfQueryInterface<iMeshObject> (GetParticle (i));
+    sprmesh->SetColor (color);
+  }
 }
 
 

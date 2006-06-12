@@ -44,14 +44,14 @@ struct csSprite2DVertex
 
 typedef csDirtyAccessArray<csSprite2DVertex> csColoredVertices;
 
-SCF_VERSION (iSprite2DUVAnimationFrame, 0, 0, 1);
-
 /**
  * This is a single frame in a UV animation. So its not much more than a set of
  * (u.v) coordinates and a duration time.
  */
-struct iSprite2DUVAnimationFrame : public iBase
+struct iSprite2DUVAnimationFrame : public virtual iBase
 {
+  SCF_INTERFACE (iSprite2DUVAnimationFrame, 1, 0, 0);
+
   /**
    * Give this frame a name.
    */
@@ -104,16 +104,16 @@ struct iSprite2DUVAnimationFrame : public iBase
   virtual void SetDuration (int duration) = 0;
 };
 
-SCF_VERSION (iSprite2DUVAnimation, 0, 0, 1);
-
 /**
  * The animation works by having all frames of an animation sequence
  * in a texture at different (u,v) locations, hence the name.
  * So it is basically a set of (u,v) coordinates plus a duration number.
  * for every frame.
  */
-struct iSprite2DUVAnimation : public iBase
+struct iSprite2DUVAnimation : public virtual iBase
 {
+  SCF_INTERFACE (iSprite2DUVAnimation, 1, 0, 0);
+
   /**
    * Give this sequence a name.
    */
@@ -159,13 +159,13 @@ struct iSprite2DUVAnimation : public iBase
 
 };
 
-SCF_VERSION (iSprite2DFactoryState, 0, 0, 1);
-
 /**
  * This interface describes the API for the sprite factory mesh object.
  */
-struct iSprite2DFactoryState : public iBase
+struct iSprite2DFactoryState : public virtual iBase
 {
+  SCF_INTERFACE (iSprite2DFactoryState, 1, 0, 0);
+
   /**
    * Set true if this sprite needs lighting (default).
    * Otherwise the given colors are used.
@@ -204,14 +204,14 @@ struct iSprite2DFactoryState : public iBase
 
 };
 
-SCF_VERSION (iSprite2DState, 0, 0, 1);
-
 /**
  * This interface describes the API for the sprite factory mesh object.
  * iSprite2DState inherits from iSprite2DFactoryState.
  */
 struct iSprite2DState : public iSprite2DFactoryState
 {
+  SCF_INTERFACE (iSprite2DState, 1, 0, 0);
+
   /// Get the vertex array.
   virtual csColoredVertices& GetVertices () = 0;
   /**
