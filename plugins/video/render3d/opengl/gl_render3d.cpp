@@ -3215,7 +3215,7 @@ void csGLGraphics3D::DrawSimpleMesh (const csSimpleRenderMesh& mesh,
   SetZMode (old_zbufmode);
 }
 
-bool csGLGraphics3D::PerformExtensionV (char const* command, va_list args)
+bool csGLGraphics3D::PerformExtensionV (char const* command, va_list /*args*/)
 {
   if (!strcasecmp (command, "applybufferchanges"))
   {
