@@ -133,7 +133,8 @@ int csSpiralMeshObject::FindOldest ()
   {
     AppendRectSprite (part_width, part_height, mat, false);	// @@@ PARAMETER
     part_idx = (int)GetNumParticles ()-1;
-    GetParticle(part_idx)->SetMixMode(MixMode);
+    csRef<iMeshObject> meshobj = scfQueryInterface<iMeshObject> (GetParticle (part_idx));
+    meshobj->SetMixMode(MixMode);
   }
   return part_idx;
 }
