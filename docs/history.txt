@@ -6,6 +6,12 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+12-Jun-2006
+	- Jorrit fixed the handling of 'ww' and 'wv' in space warping
+	  portals. If 'ww' was specified before 'wv' then 'wv' would
+	  overwrite whatever the user specified in 'ww'. This no longer
+	  happens. If you don't specify 'ww' then 'wv' will still set
+	  'ww' equal to 'wv' but not when 'ww' is already specified.
 11-Jun-2006
 	- mdmkolbe factored into separate files parts of
 	  plugins/video/render3d/software/pixspecifica.cpp that were
