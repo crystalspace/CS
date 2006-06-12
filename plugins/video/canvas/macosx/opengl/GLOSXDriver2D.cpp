@@ -104,8 +104,6 @@ bool GLOSXDriver2D::Open()
   currentFormat[glpfvAccumColorBits] = values[4];
   currentFormat[glpfvAccumAlphaBits] = 0; // No equivalent
 
-  free(values); // malloc'd in OSXDelegate2D_OpenGL.m
-
   // Context was created in initialize, window was created in
   // OSXDriver2D::Open() - bind them
   OSXDelegate2D_updateOpenGLContext(delegate);

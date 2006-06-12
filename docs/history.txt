@@ -13,6 +13,8 @@ chronological order.
 	- mdmkolbe reduced header dependencies and fixed several warnings.
 	- res converted csjoylin to new SCF.
 	- res changed csShaderVarStack& to iShaderVarStack* in interfaces.
+	- dfryer fixed a free() in glosx2d that made ptmalloc sad.  Also
+	  fixed some OS X components with bad headers.
 10-Jun-2006
 	- res added SCF interfaces for arrays.
 	- Adam fixed a node-deletion bug in csPartialOrder, and added more
