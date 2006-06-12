@@ -94,8 +94,10 @@ csSprite2DMeshObject::csSprite2DMeshObject (csSprite2DMeshObjectFactory* factory
   colors_dirty = true;
   indicesSize = (size_t)-1;
 
+  /*
   scfVertices.AttachNew (new scfArrayWrap<iColoredVertices, 
     csColoredVertices> (vertices));
+  */
 }
 
 csSprite2DMeshObject::~csSprite2DMeshObject ()
