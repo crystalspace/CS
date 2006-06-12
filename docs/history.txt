@@ -13,6 +13,9 @@ chronological order.
 	  happens. If you don't specify 'ww' then 'wv' will still set
 	  'ww' equal to 'wv' but not when 'ww' is already specified.
 	- Jorrit converted iCameraSectorListener to new scf.
+	- res changed the assert-in-assert handling to print the assert using
+	  the runtime functions as opposed to CS functions again. Also
+	  debug-break on first nested assert.
 11-Jun-2006
 	- mdmkolbe factored into separate files parts of
 	  plugins/video/render3d/software/pixspecifica.cpp that were

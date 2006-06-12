@@ -33,13 +33,15 @@ namespace CS
       
       if (assertCnt == 1)
       {
+        // Avoid csFPrintf - it may trigger an assert itself again...
 	fprintf (stderr, "Whoops, assertion while reporting assertion...\n");
-      }
-      else if (assertCnt > 1)
-      {
-	fprintf (stderr, "What the... assertion while reporting assertion "
-	  "while reporting assertion\n");
-	fprintf (stderr, "Screw it!\n");
+	fprintf (stderr, 
+	  "Assertion failed: %s\n", expr);
+	fprintf (stderr, 
+	  "Location:         %s:%d\n", filename, line);
+	if (msg) fprintf (stderr, 
+	  "Message:          %s\n", msg);
+	fflush (stderr);
 	CS_DEBUG_BREAK;
 	return;
       }
