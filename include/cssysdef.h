@@ -70,6 +70,16 @@
 #define CS_FORCEINLINE inline
 #endif
 
+/**\def CS_NO_EXCEPTIONS
+ * This is defined when the project was compiled without support for 
+ * exceptions.
+ */
+#if defined(CS_COMPILER_MSVC) && !_HAS_EXCEPTIONS
+# define CS_NO_EXCEPTIONS
+#elif defined(CS_COMPILER_GCC) && !defined(__EXCEPTIONS)
+# define CS_NO_EXCEPTIONS
+#endif
+
 /**\def CS_MAXPATHLEN
  * Maximum length of a filesystem pathname. Useful for declaring character
  * buffers for calls to system functions which return a pathname in the buffer.
@@ -592,6 +602,8 @@ inline void* platform_realloc (void* p, size_t n)
 #define realloc 	ptrealloc
 #define memalign	ptmemalign
 #define calloc 		ptcalloc
+
+#ifdef CS_NO_EXCEPTIONS
 inline void* operator new (size_t s)
 { return ptmalloc (s); }
 inline void* operator new[] (size_t s)
@@ -600,6 +612,35 @@ inline void operator delete (void* p)
 { ptfree (p); }
 inline void operator delete[] (void* p) 
 { ptfree (p); }
+#else
+#include <new>
+inline void* operator new (size_t s) throw (std::bad_alloc)
+{ 
+  void* p = ptmalloc (s);
+  if (!p) throw std::bad_alloc();
+  return p;
+}
+inline void* operator new[] (size_t s) throw (std::bad_alloc)
+{ 
+  void* p = ptmalloc (s);
+  if (!p) throw std::bad_alloc();
+  return p;
+}
+inline void operator delete (void* p) throw()
+{ ptfree (p); }
+inline void operator delete[] (void* p) throw()
+{ ptfree (p); }
+
+inline void* operator new (size_t s, const std::nothrow_t&) throw()
+{ return ptmalloc (s); }
+inline void* operator new[] (size_t s, const std::nothrow_t&) throw()
+{ return ptmalloc (s); }
+inline void operator delete (void* p, const std::nothrow_t&) throw()
+{ ptfree (p); }
+inline void operator delete[] (void* p, const std::nothrow_t&) throw()
+{ ptfree (p); }
+#endif // CS_NO_EXCEPTIONS
+
 #else
 #define platform_malloc   malloc
 #define platform_free     free

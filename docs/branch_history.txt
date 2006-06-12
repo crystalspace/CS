@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+12-Jun-2006
+        - res fixed the operator new and operator delete overrides to also
+          work for projects that have exceptions enabled.
 11-Jun-2006
         - res changed ptmalloc to better work in CS' scenario where it resides
           in a static lib and is linked into many modules.
