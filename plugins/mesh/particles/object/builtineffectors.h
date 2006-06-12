@@ -41,6 +41,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
 
     //-- iParticleBuiltinEffectorFactory
     virtual csPtr<iParticleBuiltinEffectorForce> CreateForce () const;
+    virtual csPtr<iParticleBuiltinEffectorLinColor> CreateLinColor () const;
 
     //-- iComponent
     virtual bool Initialize (iObjectRegistry*)
@@ -58,7 +59,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
   public:
     ParticleEffectorForce ()
       : scfImplementationType (this),
-      acceleration (0.0f), force (0.0f)
+      acceleration (0.0f), force (0.0f), randomAcceleration (0.0f)
     {
     }
 
@@ -89,12 +90,91 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
       return force; 
     }
 
+    virtual void SetRandomAcceleration (float magnitude)
+    {
+      randomAcceleration = magnitude;
+    }
+
+    virtual float GetRandomAcceleration () const
+    {
+      return randomAcceleration;
+    }
+
   private:
     csVector3 acceleration;
     csVector3 force;
+    float randomAcceleration;
+  };
+
+  class ParticleEffectorLinColor : public
+    scfImplementation2<ParticleEffectorLinColor,
+                       iParticleBuiltinEffectorLinColor,
+                       scfFakeInterface<iParticleEffector> >
+  {
+  public:
+    //-- ParticleEffectorLinColor
+    ParticleEffectorLinColor ();
+
+    //-- iParticleEffector
+    virtual csPtr<iParticleEffector> Clone () const;
+
+    virtual void EffectParticles (iParticleSystemBase* system,
+      const csParticleBuffer& particleBuffer, float dt, float totalTime);
+
+
+    //-- iParticleBuiltinEffectorLinColor
+    virtual size_t AddColor (const csColor& color, float endTime);
+
+    virtual void SetColor (size_t index, const csColor& color);
+
+    virtual void GetColor (size_t index, csColor& color, float& time) const
+    {
+      if (index >= colorList.GetSize ())
+        return;
+
+      color = colorList[index].color;
+      time = colorList[index].endTime;
+    }
+
+    virtual size_t GetColorCount () const
+    {
+      return colorList.GetSize ();
+    }
+
+    virtual void SetMaxAge (float max)
+    {
+      maxAge = max;
+    }
+
+    virtual float GetMaxAge () const
+    {
+      return maxAge;
+    }
+
+  private:
+    void Precalc ();
+
+    struct ColorEntry
+    {
+      csColor color;
+      float endTime;
+    };
+    csArray<ColorEntry> colorList;
+
+    struct PrecalcEntry
+    {
+      csColor mult;
+      csColor add;
+      float endTime;
+    };
+    bool precalcInvalid;
+    csArray<PrecalcEntry> precalcList;
+
+    float maxAge;
   };
 
 }
 CS_PLUGIN_NAMESPACE_END(Particles)
 
 #endif
+

@@ -401,18 +401,12 @@ bool csTextSyntaxService::ParseBox (iDocumentNode* node, csOBB &b)
     return false;
   }
 
-  csRef<iDocumentNode> matrixNode = node->GetNode ("matrix");
-
-  if (!matrixNode)
-  {
-    ReportError ("crystalspace.syntax.box", node, "Expected 'box' node!");
-    return false;
-  }
-
   if (!ParseBox (boxNode, (csBox3&)b))
     return false;
+
+  csRef<iDocumentNode> matrixNode = node->GetNode ("matrix");
   
-  if (!ParseMatrix (matrixNode, b.GetMatrix ()))
+  if (matrixNode && !ParseMatrix (matrixNode, b.GetMatrix ()))
     return false;
 
   return true;

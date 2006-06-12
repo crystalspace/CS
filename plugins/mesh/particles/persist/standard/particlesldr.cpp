@@ -216,7 +216,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ParticlesLoader)
       break;
     case XMLTOKEN_EFFECTOR:
       {
-        csRef<iParticleEffector> effector;
+        csRef<iParticleEffector> effector = ParseEffector (node);
 
         if (!effector)
         {
@@ -359,7 +359,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ParticlesLoader)
         coneAngle = child->GetContentsValueAsFloat ();
         break;
       case XMLTOKEN_BOX:
-        if (!synldr->ParseBox (child, box))
+        if (!synldr->ParseBox (node, box))
         {
           return 0;
         }
@@ -458,6 +458,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(ParticlesLoader)
 
     csRef<iParticleEffector> effector;
     csVector3 force (0.0f), acceleration (0.0f);
+    float randomAcc (0.0f), maxAge (1.0f);
+    csArray<float> timeList;
+    csArray<csColor> colorList;
 
     csRef<iDocumentNodeIterator> it = node->GetNodes ();
     while (it->HasNext ())
@@ -489,6 +492,28 @@ CS_PLUGIN_NAMESPACE_BEGIN(ParticlesLoader)
           }
         }
         break;
+      case XMLTOKEN_RANDOMACCELERATION:
+        randomAcc = child->GetContentsValueAsFloat ();
+        break;
+      case XMLTOKEN_COLOR:
+        {
+          csColor c;
+          float t (0.0f);
+          
+          if (!synldr->ParseColor (child, c))
+          {
+            synldr->ReportError ("crystalspace.particleloader.parseeffector", child,
+              "Error parsing color!");
+          }
+          
+          t = child->GetAttributeValueAsFloat ("time");
+          colorList.Push (c);
+          timeList.Push (t);
+        }
+        break;
+      case XMLTOKEN_MAXAGE:
+        maxAge = child->GetContentsValueAsFloat ();
+        break;
       default:
         synldr->ReportBadToken (child);
         return 0;
@@ -502,6 +527,17 @@ CS_PLUGIN_NAMESPACE_BEGIN(ParticlesLoader)
       effector = forceEffector;
       forceEffector->SetAcceleration (acceleration);
       forceEffector->SetForce (force);
+    }
+    else if (!strcasecmp (effectorType, "lincolor"))
+    {
+      csRef<iParticleBuiltinEffectorLinColor> colorEffector = 
+        factory->CreateLinColor ();
+      effector = colorEffector;
+      colorEffector->SetMaxAge (maxAge);
+      for (size_t i = 0; i < colorList.GetSize (); ++i)
+      {
+        colorEffector->AddColor (colorList[i], timeList[i]);
+      }
     }
     else
     {
@@ -525,12 +561,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(ParticlesLoader)
     iStreamSource* ssource, iLoaderContext* ldr_context, iBase* context)
   {
     csRef<iMeshObjectType> type = csLoadPluginCheck<iMeshObjectType> (
-  	objectRegistry, "crystalspace.mesh.loader.factory.particles", false);
+  	objectRegistry, "crystalspace.mesh.object.particles", false);
     if (!type)
     {
       synldr->ReportError (
 		  "crystalspace.particleloader.parsefactory",
-		  node, "Could not load the general mesh object plugin!");
+		  node, "Could not load the particles mesh object plugin!");
       return 0;
     }
 
@@ -556,6 +592,28 @@ CS_PLUGIN_NAMESPACE_BEGIN(ParticlesLoader)
               node, "Could not parse factory!");
             return 0;
           }
+        }
+        break;
+      case XMLTOKEN_MATERIAL:
+        {
+          const char* matname = child->GetContentsValue ();
+          iMaterialWrapper* mat = ldr_context->FindMaterial (matname);
+          if (!mat)
+          {
+            synldr->ReportError (
+              "crystalspace.genmeshfactoryloader.parse.unknownmaterial",
+              child, "Couldn't find material '%s'!", matname);
+            return 0;
+          }
+          factoryObj->SetMaterialWrapper (mat);
+        }
+        break;
+      case XMLTOKEN_MIXMODE:
+        {
+          uint mm;
+          if (!synldr->ParseMixmode (child, mm))
+            return 0;
+          factoryObj->SetMixMode (mm);
         }
         break;
       default:
@@ -613,6 +671,46 @@ CS_PLUGIN_NAMESPACE_BEGIN(ParticlesLoader)
 
             return 0;
           }
+          meshObj->SetMaterialWrapper(fact->GetMeshObjectFactory ()->GetMaterialWrapper ());
+          meshObj->SetMixMode(fact->GetMeshObjectFactory()->GetMixMode());
+        }
+        break;
+      case XMLTOKEN_MATERIAL:
+        {
+          if (!particleSystem)
+          {
+            synldr->ReportError ("crystalspace.particleloader.parsesystem",
+              child, "Specify factory first!");
+
+            return 0;
+          }
+
+          const char* matname = child->GetContentsValue ();
+          iMaterialWrapper* mat = ldr_context->FindMaterial (matname);
+          if (!mat)
+          {
+            synldr->ReportError (
+              "crystalspace.genmeshfactoryloader.parse.unknownmaterial",
+              child, "Couldn't find material '%s'!", matname);
+            return 0;
+          }
+          meshObj->SetMaterialWrapper (mat);
+        }
+        break;
+      case XMLTOKEN_MIXMODE:
+        {
+          if (!particleSystem)
+          {
+            synldr->ReportError ("crystalspace.particleloader.parsesystem",
+              child, "Specify factory first!");
+
+            return 0;
+          }
+
+          uint mm;
+          if (!synldr->ParseMixmode (child, mm))
+            return 0;
+          meshObj->SetMixMode (mm);
         }
         break;
       default:
@@ -973,6 +1071,33 @@ CS_PLUGIN_NAMESPACE_BEGIN(ParticlesLoader)
       synldr->WriteVector (forceNode, forceEffector->GetForce ());
 
       return true;
+    }
+
+    csRef<iParticleBuiltinEffectorLinColor> colorEffector =
+      scfQueryInterface<iParticleBuiltinEffectorLinColor> (effector);
+
+    if (colorEffector)
+    {
+      effectorNode->SetAttribute ("type", "lincolor");
+
+      csRef<iDocumentNode> maxNode = effectorNode->CreateNodeBefore (
+        CS_NODE_ELEMENT, 0);
+      maxNode->SetValue ("acceleration");
+      valueNode = maxNode->CreateNodeBefore (CS_NODE_TEXT, 0);
+      valueNode->SetValueAsFloat (colorEffector->GetMaxAge ());
+
+      size_t numColors = colorEffector->GetColorCount ();
+      csColor c; float t;
+      for (size_t i = 0; i < numColors; ++i)
+      {
+        colorEffector->GetColor (i, c, t);
+        csRef<iDocumentNode> colorNode = effectorNode->CreateNodeBefore (
+          CS_NODE_ELEMENT, 0);
+        colorNode->SetValue ("color");
+
+        synldr->WriteColor (colorNode, c);
+        colorNode->SetAttributeAsFloat ("time", t);
+      }
     }
 
     return true;

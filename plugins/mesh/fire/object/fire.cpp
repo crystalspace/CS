@@ -131,7 +131,7 @@ csFireMeshObject::csFireMeshObject (iObjectRegistry* object_reg,
   number = 40;
   delete_light = false;
   light_engine = 0;
-  precalc_valid = false;
+  precalc_valid = false; 
   SetupColors ();
 }
 

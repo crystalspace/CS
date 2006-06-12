@@ -18,18 +18,28 @@
 
 #include "cssysdef.h"
 
+#include "csgeom/math.h"
 #include "csutil/scf.h"
+#include "csutil/floatrand.h"
 
 #include "builtineffectors.h"
 
+
 CS_PLUGIN_NAMESPACE_BEGIN(Particles)
 {
-
   SCF_IMPLEMENT_FACTORY(ParticleEffectorFactory);
+
+  CS_IMPLEMENT_STATIC_VAR(GetVGen, csRandomVectorGen,);
 
   csPtr<iParticleBuiltinEffectorForce> ParticleEffectorFactory::CreateForce () const
   {
     return new ParticleEffectorForce;
+  }
+
+  csPtr<iParticleBuiltinEffectorLinColor> 
+    ParticleEffectorFactory::CreateLinColor () const
+  {
+    return new ParticleEffectorLinColor;
   }
 
 
@@ -37,6 +47,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
   {
     return 0;
   }
+
 
   void ParticleEffectorForce::EffectParticles (iParticleSystemBase* system,
     const csParticleBuffer& particleBuffer, float dt, float totalTime)
@@ -46,8 +57,107 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
       csParticle& particle = particleBuffer.particleData[idx];
       csParticleAux& particleAux = particleBuffer.particleAuxData[idx];
 
-      particle.linearVelocity += (acceleration + force / particle.mass) * dt;
+      csVector3 a = acceleration;
+
+      if (randomAcceleration > 0)
+        a += GetVGen()->Get () * randomAcceleration;
+
+      particle.linearVelocity += (a + force / particle.mass) * dt;
     }
+  }
+
+  ParticleEffectorLinColor::ParticleEffectorLinColor ()
+    : scfImplementationType (this),
+    precalcInvalid (true), maxAge (1.0f)
+  {
+
+  }
+
+  csPtr<iParticleEffector> ParticleEffectorLinColor::Clone () const
+  {
+    return new ParticleEffectorLinColor (*this);
+  }
+
+  void ParticleEffectorLinColor::EffectParticles (iParticleSystemBase* system,
+    const csParticleBuffer& particleBuffer, float dt, float totalTime)
+  {
+    Precalc ();
+
+    if (precalcList.GetSize () == 0)
+      return;
+
+    for (size_t idx = 0; idx < particleBuffer.particleCount; ++idx)
+    {
+      csParticle& particle = particleBuffer.particleData[idx];
+      csParticleAux& particleAux = particleBuffer.particleAuxData[idx];
+
+      float age = csMax(0.0f, maxAge - particle.timeToLive);
+
+      //Classify
+      size_t aSpan = precalcList.GetSize () - 1;
+
+      for (size_t i = 1; i < precalcList.GetSize (); ++i)
+      {
+        if (age < precalcList[i].endTime)
+        {
+          aSpan = i;
+          break;
+        }
+      }
+
+      const PrecalcEntry& ei = precalcList[aSpan];
+      particleAux.color = ei.add + ei.mult * age;
+    }
+  }
+
+  size_t ParticleEffectorLinColor::AddColor (const csColor& color, float endTime)
+  {
+    ColorEntry c;
+    c.color = color;
+    c.endTime = endTime;
+
+    colorList.Push (c);
+
+    precalcInvalid = true;
+    return colorList.GetSize () - 1;
+  }
+
+  void ParticleEffectorLinColor::SetColor (size_t index, const csColor& color)
+  {
+    if (index >= colorList.GetSize ())
+      return;
+
+    colorList[index].color = color;
+
+    precalcInvalid = true;
+  }
+
+  void ParticleEffectorLinColor::Precalc ()
+  {
+    if (!precalcInvalid)
+      return;
+
+    precalcList.SetSize (colorList.GetSize ());
+    
+    if (precalcList.GetSize () == 0)
+      return;
+
+    PrecalcEntry& e0 = precalcList[0];
+    e0.add = colorList[0].color;
+    e0.mult.Set (0,0,0);
+
+    for (size_t i = 1; i < precalcList.GetSize (); ++i)
+    {
+      PrecalcEntry& ei = precalcList[i];
+      const ColorEntry& ci = colorList[i];
+      const ColorEntry& cip = colorList[i-1];
+
+      ei.endTime = ci.endTime;
+      ei.mult = (ci.color - cip.color) / (ci.endTime - cip.endTime);
+      ei.add = ci.color - ei.mult * ei.endTime;
+    }
+
+    precalcInvalid = false;
   }
 }
 CS_PLUGIN_NAMESPACE_END(Particles)

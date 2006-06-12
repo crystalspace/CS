@@ -634,6 +634,56 @@ struct iParticleBuiltinEffectorForce : public iParticleEffector
 
   /// Get the force vector
   virtual const csVector3& GetForce () const = 0;
+
+  /// Set random acceleration magnitude
+  virtual void SetRandomAcceleration (float magnitude) = 0;
+
+  /// Get random acceleration magnitude
+  virtual float GetRandomAcceleration () const = 0;
+};
+
+/**
+ * Simple linear interpolation of particle color based on particle lifetime
+ *
+ * The age of particle P is defined as max(0, maxAge - P.TTL)
+ *
+ * The first color value is regarded as having time 0, independently of what
+ * it is set to have
+ */
+struct iParticleBuiltinEffectorLinColor : public iParticleEffector
+{
+  SCF_INTERFACE(iParticleBuiltinEffectorLinColor,1,0,0);
+
+  /** 
+   * Add color to list of colors to interpolate between.
+   * \return Index of new color
+   */
+  virtual size_t AddColor (const csColor& color, float endTime) = 0;
+
+  /**
+   * Set the color of an already existing entry
+   */
+  virtual void SetColor (size_t index, const csColor& color) = 0;
+
+  /**
+   * Get color and time
+   */
+  virtual void GetColor (size_t index, csColor& color, float& time) const = 0;
+
+  /**
+   * Get number of color entries
+   */
+  virtual size_t GetColorCount () const = 0;
+
+  /**
+   * Set max age (when particles will get the final color)
+   */
+  virtual void SetMaxAge (float max) = 0;
+
+  /**
+   * Get max age
+   */
+  virtual float GetMaxAge () const = 0;
 };
 
 /**
@@ -644,6 +694,7 @@ struct iParticleBuiltinEffectorFactory : public virtual iBase
   SCF_INTERFACE(iParticleBuiltinEffectorFactory,1,0,0);
 
   virtual csPtr<iParticleBuiltinEffectorForce> CreateForce () const = 0;
+  virtual csPtr<iParticleBuiltinEffectorLinColor> CreateLinColor () const = 0;
 };
 
 /** @} */

@@ -394,10 +394,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
         {
           const unsigned int tcIdx = idx*4;
 
-          tcs[tcIdx+0].x = -0.5f; tcs[tcIdx+0].y = -0.5f;
-          tcs[tcIdx+1].x =  0.5f; tcs[tcIdx+1].y = -0.5f;
-          tcs[tcIdx+2].x =  0.5f; tcs[tcIdx+2].y =  0.5f;
-          tcs[tcIdx+3].x = -0.5f; tcs[tcIdx+3].y =  0.5f;
+          tcs[tcIdx+0].x = -0.0f; tcs[tcIdx+0].y = -0.0f;
+          tcs[tcIdx+1].x =  1.0f; tcs[tcIdx+1].y = -0.0f;
+          tcs[tcIdx+2].x =  1.0f; tcs[tcIdx+2].y =  1.0f;
+          tcs[tcIdx+3].x = -0.0f; tcs[tcIdx+3].y =  1.0f;
         }        
       }
     }
@@ -672,6 +672,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     {
     case CS_BUFFER_COLOR:
       {
+        UpdateColorBuffer ();
         holder->SetRenderBuffer (CS_BUFFER_COLOR, colorBuffer);
       }
       break;
