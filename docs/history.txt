@@ -24,6 +24,7 @@ chronological order.
 	- res changed csShaderVariable::GetType() to call the accessor if a
 	  value has not yet been set.
 	- res converted iPortalCallback implementations to new SCF.
+	- res fixed fixed cleaning of separate debug info.
 11-Jun-2006
 	- mdmkolbe factored into separate files parts of
 	  plugins/video/render3d/software/pixspecifica.cpp that were
