@@ -42,7 +42,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
    */
   class TempHeap
   {
-    class HeapRefCounted : public CS::Memory::Heap, public csRefCount
+    class HeapRefCounted : public csRefCount, public CS::Memory::Heap
     { };
 
     CS_DECLARE_STATIC_CLASSVAR (theHeap,
