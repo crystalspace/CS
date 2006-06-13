@@ -6,6 +6,21 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+13-Jun-2006
+	- Jorrit slightly optimized iEngine->GetNearbyMeshes() and related
+	  by using a csSet for visited sectors instead of an array.
+	- Jorrit removed the ugly sector iterator pool in the engine.
+	  Also cleaned up the other iterators that are implemented
+	  internally in engine.cpp.
+	- Jorrit removed the unused csLightIt in the engine.
+	- Jorrit implemented iEngine->GetNearbySectors().
+	- Jorrit added a new version of iEngine->GetNearbySectors() that
+	  accepts a box instead of a sphere.
+	- Jorrit changed the csBox3 version of GetNearbyMeshes() and
+	  GetNearbySectors() so that it actually tests if the portal
+	  intersects with the given box. That way it makes the routine
+	  more optimal by not traversing useless portals.
+	- Jorrit cleaned up the GetNearbyBla() code in the engine a lot.
 12-Jun-2006
 	- Jorrit fixed the handling of 'ww' and 'wv' in space warping
 	  portals. If 'ww' was specified before 'wv' then 'wv' would
