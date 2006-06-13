@@ -51,9 +51,9 @@ package cspace;
 *scfRegisterStaticFactoryFunc = *cspacec::scfRegisterStaticFactoryFunc;
 *__modulo__ = *cspacec::__modulo__;
 *__rshift__ = *cspacec::__rshift__;
+*__mult_ass__ = *cspacec::__mult_ass__;
 *__divide_ass__ = *cspacec::__divide_ass__;
 *__subtr__ = *cspacec::__subtr__;
-*__mult_ass__ = *cspacec::__mult_ass__;
 *__div__ = *cspacec::__div__;
 *__add__ = *cspacec::__add__;
 *__mult__ = *cspacec::__mult__;
@@ -2250,6 +2250,7 @@ sub new {
 *SetIdentity = *cspacec::csQuaternion_SetIdentity;
 *__add_ass__ = *cspacec::csQuaternion___add_ass__;
 *__subtr_ass__ = *cspacec::csQuaternion___subtr_ass__;
+*__mult_ass__ = *cspacec::csQuaternion___mult_ass__;
 *GetConjugate = *cspacec::csQuaternion_GetConjugate;
 *Conjugate = *cspacec::csQuaternion_Conjugate;
 *Dot = *cspacec::csQuaternion_Dot;
@@ -2848,6 +2849,7 @@ package cspace::csShaderVariable;
 @ISA = qw( cspace cspace::csRefCount );
 %OWNER = ();
 %ITERATORS = ();
+*UNKNOWN = *cspacec::csShaderVariable_UNKNOWN;
 *INT = *cspacec::csShaderVariable_INT;
 *FLOAT = *cspacec::csShaderVariable_FLOAT;
 *COLOR = *cspacec::csShaderVariable_COLOR;
@@ -5906,6 +5908,7 @@ package cspace::iMeshWrapper;
 *GetWorldBoundingBox = *cspacec::iMeshWrapper_GetWorldBoundingBox;
 *GetTransformedBoundingBox = *cspacec::iMeshWrapper_GetTransformedBoundingBox;
 *GetScreenBoundingBox = *cspacec::iMeshWrapper_GetScreenBoundingBox;
+*GetRadius = *cspacec::iMeshWrapper_GetRadius;
 *ResetMinMaxRenderDistance = *cspacec::iMeshWrapper_ResetMinMaxRenderDistance;
 *SetMinimumRenderDistance = *cspacec::iMeshWrapper_SetMinimumRenderDistance;
 *GetMinimumRenderDistance = *cspacec::iMeshWrapper_GetMinimumRenderDistance;
@@ -6799,6 +6802,7 @@ package cspace::csSprite2DVertex;
 *swig_u_set = *cspacec::csSprite2DVertex_u_set;
 *swig_v_get = *cspacec::csSprite2DVertex_v_get;
 *swig_v_set = *cspacec::csSprite2DVertex_v_set;
+*__eq__ = *cspacec::csSprite2DVertex___eq__;
 sub new {
     my $pkg = shift;
     my $self = cspacec::new_csSprite2DVertex(@_);
@@ -6812,6 +6816,36 @@ sub DESTROY {
     delete $ITERATORS{$self};
     if (exists $OWNER{$self}) {
         cspacec::delete_csSprite2DVertex($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iColoredVertices ##############
+
+package cspace::iColoredVertices;
+@ISA = qw( cspace );
+%OWNER = ();
+%ITERATORS = ();
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iColoredVertices($self);
         delete $OWNER{$self};
     }
 }
@@ -7852,6 +7886,8 @@ package cspace::iTerrainObjectState;
 %ITERATORS = ();
 *SetMaterialPalette = *cspacec::iTerrainObjectState_SetMaterialPalette;
 *GetMaterialPalette = *cspacec::iTerrainObjectState_GetMaterialPalette;
+*SetMaterialMap = *cspacec::iTerrainObjectState_SetMaterialMap;
+*SetMaterialAlphaMaps = *cspacec::iTerrainObjectState_SetMaterialAlphaMaps;
 *SetLODValue = *cspacec::iTerrainObjectState_SetLODValue;
 *GetLODValue = *cspacec::iTerrainObjectState_GetLODValue;
 *SaveState = *cspacec::iTerrainObjectState_SaveState;
@@ -12356,6 +12392,9 @@ package cspace::iImage;
 *GetPalette = *cspacec::iImage_GetPalette;
 *GetAlpha = *cspacec::iImage_GetAlpha;
 *HasKeyColor = *cspacec::iImage_HasKeyColor;
+*HasKeycolor = *cspacec::iImage_HasKeycolor;
+*GetKeyColor = *cspacec::iImage_GetKeyColor;
+*GetKeycolor = *cspacec::iImage_GetKeycolor;
 *HasMipmaps = *cspacec::iImage_HasMipmaps;
 *GetMipmap = *cspacec::iImage_GetMipmap;
 *GetRawFormat = *cspacec::iImage_GetRawFormat;

@@ -622,12 +622,26 @@ struct iEngine : public virtual iBase
   	iRegion* region = 0) = 0;
 
   /**
-   * This routine returns an iterator to iterate over
-   * all nearby sectors.
-   * Assign to a csRef.
+   * This routine returns an iterator to iterate over all nearby sectors.
+   * Assign to a csRef. In the iterator you can also fetch the
+   * position for every sector. Normally that position will be equal to
+   * the given input position here (pos) but if there are space warping
+   * portals involved then the position returned by the iterator is the
+   * warped position relative to the sector returned by the iterator.
    */
   virtual csPtr<iSectorIterator> GetNearbySectors (iSector* sector,
   	const csVector3& pos, float radius) = 0;
+
+  /**
+   * This routine returns an iterator to iterate over all nearby sectors.
+   * Assign to a csRef. In the iterator you can also fetch the
+   * position for every sector. Normally that position will be equal to
+   * the given input position here (pos) but if there are space warping
+   * portals involved then the position returned by the iterator is the
+   * warped position relative to the sector returned by the iterator.
+   */
+  virtual csPtr<iSectorIterator> GetNearbySectors (iSector* sector,
+  	const csBox3& box) = 0;
 
   /**
    * Add a frame callback. This will call IncRef() on the callback
@@ -774,7 +788,7 @@ struct iEngine : public virtual iBase
    * portals. Otherwise it will limit the search to the sector passed in.
    */
   virtual csPtr<iMeshWrapperIterator> GetNearbyMeshes (iSector* sector,
-    const csVector3& pos, float radius, bool crossPortals = true ) = 0;
+    const csVector3& pos, float radius, bool crossPortals = true) = 0;
 
   /**
    * This routine returns an iterator to iterate over
@@ -784,7 +798,7 @@ struct iEngine : public virtual iBase
    * Portal visibility is tested with the center of the box.
    */
   virtual csPtr<iMeshWrapperIterator> GetNearbyMeshes (iSector* sector,
-    const csBox3& box, bool crossPortals = true ) = 0;
+    const csBox3& box, bool crossPortals = true) = 0;
 
   /**
    * This routine returns an iterator to iterate over
@@ -795,7 +809,7 @@ struct iEngine : public virtual iBase
    */
   virtual csPtr<iMeshWrapperIterator> GetNearbyMeshes (iSector* sector,
     const csVector3& start, const csVector3& end,
-    bool crossPortals = true ) = 0;
+    bool crossPortals = true) = 0;
 
   /// Get the list of meshes
   virtual iMeshList* GetMeshes () = 0;
