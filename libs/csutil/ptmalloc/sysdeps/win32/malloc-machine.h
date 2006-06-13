@@ -143,6 +143,72 @@ typedef DWORD tsd_key_t;
 /* at fork */
 #define thread_atfork(prepare, parent, child) 
 
+static HANDLE sharemem_mapping;
+
+static __inline void* sharemem_init (size_t size, int* created)
+{
+  size_t neededSize = size + sizeof(HANDLE);
+  char* p;
+  HANDLE newHandle;
+
+  if (sharemem_mapping == NULL)
+  {
+    char buf[64];
+
+    sprintf (buf, "ptmalloc-%u", GetCurrentProcessId());
+    sharemem_mapping = OpenFileMappingA (FILE_MAP_ALL_ACCESS, FALSE,
+      buf);
+    if (sharemem_mapping == NULL)
+    {
+      newHandle = CreateFileMappingA (INVALID_HANDLE_VALUE, NULL, 
+        PAGE_READWRITE, 0, (DWORD)neededSize, buf);
+      *created = 1;
+      DuplicateHandle (GetCurrentProcess(), newHandle,
+        GetCurrentProcess(), &sharemem_mapping, 0, FALSE, 
+        DUPLICATE_SAME_ACCESS);
+    }
+    else
+      *created = 0;
+    if (sharemem_mapping == NULL) return NULL;
+  }
+  else
+    *created = 0;
+  p = MapViewOfFile (sharemem_mapping, FILE_MAP_WRITE | FILE_MAP_READ,
+    0, 0, neededSize);
+  if (*created)
+    *((HANDLE*)p) = newHandle;
+  p += sizeof (HANDLE);
+  return p;
+}
+
+static __inline void sharemem_close (void* p, size_t size)
+{
+  (void)size;
+  UnmapViewOfFile (p);
+  CloseHandle (sharemem_mapping);
+}
+
+static __inline void sharemem_destroy (void)
+{
+  char buf[64];
+  HANDLE mapping;
+  HANDLE* p;
+
+  sprintf (buf, "ptmalloc-%u", GetCurrentProcessId());
+  mapping = OpenFileMappingA (FILE_MAP_ALL_ACCESS, FALSE, buf);
+  if (mapping != 0)
+  {
+    p = (HANDLE*)MapViewOfFile (mapping, FILE_MAP_WRITE | FILE_MAP_READ,
+      0, 0, sizeof (HANDLE));
+    if (p != 0)
+    {
+      CloseHandle (*p);
+      UnmapViewOfFile (p);
+    }
+    CloseHandle (mapping);
+  }
+}
+
 #include "../generic/malloc-machine.h"
 
 #endif /* !defined(_WIN32_MALLOC_MACHINE_H) */
