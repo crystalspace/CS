@@ -141,7 +141,7 @@ static JSBool RenderToTexture (JSContext *cx, JSObject *obj, uintN argc,
           go->Render (pbuf, h);					
 	          
           // Blit it to the texture.
-          for(int i=0; i<h; ++i)
+          for(int i=0; i<w; ++i)
           {
             (*to)->Blit (i,0,1,h, (const unsigned char *)pbuf);							
           }
