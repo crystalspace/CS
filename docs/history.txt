@@ -9,6 +9,7 @@ chronological order.
 14-Jun-2006
 	- caedes fixed cspace.i for changes in spr2d.
 	- caedes fixed cspython.cpp for dissaparition of evenhandler.h.
+	- res fixed an apparent typo in aws2's gradient code.
 13-Jun-2006
 	- Jorrit slightly optimized iEngine->GetNearbyMeshes() and related
 	  by using a csSet for visited sectors instead of an array.
