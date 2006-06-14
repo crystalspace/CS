@@ -26,10 +26,9 @@
 
 #include "csutil/set.h"
 #include "csutil/array.h"
+#include "csgeom/vector3.h"
 
 struct iSector;
-
-class csVector3;
 
 /**
  * Result structure for csEngineTools::FindShortestDistance().
