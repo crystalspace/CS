@@ -159,7 +159,7 @@ csPtr<iSndSysSource> csSndSysRendererSoftware::CreateSource(iSndSysStream* strea
   source->IncRef();
 
   // Notify any registered callback components
-  SourceAdded(source);
+  SourceAdded(dynamic_cast<iSndSysSource *>(source));
 
   // Queue this source for the background thread to add to its list of existent sources
   m_SourceAddQueue.QueueEntry(source);
@@ -167,7 +167,7 @@ csPtr<iSndSysSource> csSndSysRendererSoftware::CreateSource(iSndSysStream* strea
   // Add this source to the foreground list of sources that may have filters
   m_DispatchSources.Push(source);
 
-  return source;
+  return SCF_QUERY_INTERFACE(source, iSndSysSource);
 }
 
 /// Remove a stream from the sound renderer's list of streams
@@ -626,7 +626,7 @@ void csSndSysRendererSoftware::RemoveAllSources()
     sourceptr=m_ActiveSources.Get(0);
 
     // Notify any callbacks of the removal
-    SourceRemoved(sourceptr);
+    SourceRemoved(dynamic_cast<iSndSysSource *>(sourceptr));
 
     m_ActiveSources.DeleteIndex(0);
     sourceptr->DecRef();
@@ -641,7 +641,7 @@ void csSndSysRendererSoftware::RemoveAllSources()
     // Notify any callbacks of the removal
     // Although these sources never entered the renderer's background list, notification of
     // addition was sent at creation time
-    SourceRemoved(sourceptr);
+    SourceRemoved(dynamic_cast<iSndSysSource *>(sourceptr));
 
     sourceptr->DecRef();
   }
@@ -711,7 +711,7 @@ void csSndSysRendererSoftware::ProcessPendingSources()
       RecordEvent(SSEL_DEBUG, "Processing remove request for source addr [%08x]", src);
       // The source is removed from our active list.  Now queue it back to the foreground thread
       //  so that the reference count can be decreased.
-      m_SourceClearQueue.QueueEntry(src);
+      m_SourceClearQueue.QueueEntry(dynamic_cast<iSndSysSource *>(src));
     }
     else
       RecordEvent(SSEL_WARNING, "Failed remove request for source addr [%08x]. Source not in active list.", src);
@@ -778,12 +778,13 @@ void csSndSysRendererSoftware::AdvanceStreams(size_t Frames)
       maxsource = m_ActiveSources.GetSize();
       for (currentsource = 0; currentsource < maxsource; currentsource++)
       {
-        if (m_ActiveSources.Get(currentsource)->GetStream() == str)
+        csRef<iSndSysSource> currentsourceinterface;
+        if ( ( currentsourceinterface = scfQueryInterface<iSndSysSource>(m_ActiveSources.Get(currentsource)) ) && ( currentsourceinterface->GetStream() == str ) )
         {
           // This source is associated with the removed stream
           RecordEvent(SSEL_DEBUG, "Marked source index [%d] for removal due to AutoUnregistered stream.", currentsource);
           // Mark the source for removal
-          m_SourceRemoveQueue.QueueEntry (m_ActiveSources.Get(currentsource));
+          m_SourceRemoveQueue.QueueEntry (currentsourceinterface);
         }
       }
       // Now that all sources have been removed, queue the stream for cleanup

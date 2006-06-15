@@ -79,7 +79,7 @@ struct iSndSysSource : public virtual iBase
 /** 
  * \todo Document me!
  */
-struct iSndSysSourceSoftware : public iSndSysSource
+struct iSndSysSourceSoftware : public virtual iBase
 {
   /// SCF2006 - See http://www.crystalspace3d.org/cseps/csep-0010.html
   SCF_INTERFACE(iSndSysSourceSoftware,2,0,0);
@@ -93,7 +93,7 @@ struct iSndSysSourceSoftware : public iSndSysSource
    * @param frame_count  - The size of the buffer pointed to by frame_buffer in
    *                       frames.
    * @return - The number of frames that were actually filled.
-   */                       
+   */
   virtual size_t MergeIntoBuffer(csSoundSample *frame_buffer, size_t frame_count) = 0;
 
 
@@ -105,33 +105,15 @@ struct iSndSysSourceSoftware : public iSndSysSource
 /**
  * \todo Document me!
  */
-struct iSndSysSourceSoftware3D : public iSndSysSourceSoftware
+struct iSndSysSource3D : public virtual iBase
 {
   /// SCF2006 - See http://www.crystalspace3d.org/cseps/csep-0010.html
-  SCF_INTERFACE(iSndSysSourceSoftware3D,2,0,0);
+  SCF_INTERFACE(iSndSysSource3D,2,0,0);
 
   /// set position of this source
   virtual void SetPosition(csVector3 pos) = 0;
   /// get position of this source
   virtual csVector3 GetPosition() = 0;
-
-  /// set position of this source
-  virtual void SetDirection(csVector3 dir) = 0;
-  /// get position of this source
-  virtual csVector3 GetDirection() = 0;
-
-  /**
-   * The directional radiation applies to sound that are oriented in a
-   * particular direction.
-   * This value is expressed in radians and describes the half-angle of a
-   * cone spreading from the position of the source and opening
-   * in the direction of the source.
-   * Set this value to 0.0f for an omni-directional sound. 
-   */
-  virtual void SetDirectionalRadiation(float rad) = 0;
-
-  /// Retrieves the current directional radiation 
-  virtual float GetDirectionalRadiation() = 0;
 
   /**
    * Set the greatest distance from a sound at which the sound plays at full
@@ -169,6 +151,33 @@ struct iSndSysSourceSoftware3D : public iSndSysSourceSoftware
 //  virtual bool RemoveFilter(csRef<iSound2Filter> filter)= 0;
 };
 
+/**
+ * \todo Document me!
+ */
+struct iSndSysSource3DDirectionalSimple : public virtual iBase
+{
+  /// SCF2006 - See http://www.crystalspace3d.org/cseps/csep-0010.html
+  SCF_INTERFACE(iSndSysSource3DDirectionalSimple,2,0,0);
+
+  /// set position of this source
+  virtual void SetDirection(csVector3 dir) = 0;
+  /// get position of this source
+  virtual csVector3 GetDirection() = 0;
+
+  /**
+   * The directional radiation applies to sound that are oriented in a
+   * particular direction.
+   * This value is expressed in radians and describes the half-angle of a
+   * cone spreading from the position of the source and opening
+   * in the direction of the source.
+   * Set this value to 0.0f for an omni-directional sound. 
+   */
+  virtual void SetDirectionalRadiation(float rad) = 0;
+
+  /// Retrieves the current directional radiation 
+  virtual float GetDirectionalRadiation() = 0;
+
+};
 /** @} */
 
 #endif // __CS_SNDSYS_ISNDSYS_SOURCE_H__

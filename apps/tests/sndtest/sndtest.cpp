@@ -172,10 +172,10 @@ bool SndTest::LoadSound ()
   sndsource = sndrenderer->CreateSource (sndstream);
   if (!sndsource)
     return ReportError ("Can't create source for '%s'!", fname);
-  sndsource3d = SCF_QUERY_INTERFACE (sndsource, iSndSysSourceSoftware3D);
+  sndsource3d = SCF_QUERY_INTERFACE (sndsource, iSndSysSource3D);
 
   sndsource3d->SetPosition (GetSoundPos (0));
-  sndsource3d->SetVolume (1.0f);
+  sndsource->SetVolume (1.0f);
 
   sndstream->SetLoopState (CS_SNDSYS_STREAM_LOOP);
   sndstream->Unpause ();

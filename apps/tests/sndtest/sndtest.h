@@ -59,7 +59,7 @@ private:
 
   /// The sound source.
   csRef<iSndSysSource> sndsource;
-  csRef<iSndSysSourceSoftware3D> sndsource3d;
+  csRef<iSndSysSource3D> sndsource3d;
 
   /// The model that moves with the sound.
   csRef<iMeshWrapper> sprite;
