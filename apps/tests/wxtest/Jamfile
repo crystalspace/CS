@@ -6,7 +6,7 @@ if $(WX.AVAILABLE) = "yes"
   Application wxtest : [ Wildcard *.cpp *.h ] : noinstall ;
   ExternalLibs wxtest : WX ;
   LinkWith wxtest : crystalspace ;
-  Win32Resource wxtest : [ ConcatDirs $(SUBDIR) worldbuilder.rc ] ;
+  Win32Resource wxtest : [ ConcatDirs $(SUBDIR) wxtest.rc ] ;
   # To locate wx.rc
   Win32RcFlags wxtest : [ Match ^(-I.*) ^(-D.*) : [ SplitToList $(WX.CFLAGS) ] ] ;
 }
