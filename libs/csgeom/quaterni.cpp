@@ -92,7 +92,6 @@ void csQuaternion::SetMatrix (const csMatrix3& matrix)
       s = 0.5f / s;
       w = (matrix.m32 - matrix.m23) * s;
       v.y = (matrix.m12 + matrix.m21) * s;
-      v.y = (matrix.m12 + matrix.m32) * s;
       v.z = (matrix.m31 + matrix.m13) * s;
     }
     else if (matrix.m22 > matrix.m33)
