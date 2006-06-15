@@ -324,61 +324,34 @@ void csEngineMeshList::FreeMesh (iMeshWrapper* mesh)
  */
 class csSectorIt : public scfImplementation1<csSectorIt, iSectorIterator>
 {
-  //TODO: Recode
 public:
-  csSectorIt* nextPooledIt;
+  csSectorIt (csArray<csSectorPos>* list)
+    : scfImplementationType (this), list (list), 
+      num_objects ((int)list->GetSize ()), cur_idx (0) { }
+  virtual ~csSectorIt () { delete list; }
 
-  /// Construct an iterator and initialize to start.
-  csSectorIt (csEngine* engine);
-  void Init (iSector *sector, const csVector3 &pos, float radius);
-
-  /// Destructor.
-  virtual ~csSectorIt ();
-
-  /// Restart iterator.
-  virtual void Reset ();
-
-  /// Return true if there are more elements.
-  virtual bool HasNext ();
-
-  /// Get sector from iterator. Return 0 at end.
-  virtual iSector *Next ();
-
-  /**
-   * Get last position that was used from Fetch. This can be
-   * different from 'pos' because of space warping.
-   */
-  virtual const csVector3 &GetLastPosition () 
+  virtual void Reset () { cur_idx = 0; }
+  virtual iSector *Next ()
+  {
+    if (cur_idx >= num_objects) return 0;
+    cur_idx++;
+    lastPosition = (*list)[cur_idx-1].pos;
+    return (*list)[cur_idx-1].sector;
+  }
+  virtual bool HasNext () const
+  {
+    return cur_idx < num_objects;
+  }
+  virtual const csVector3 &GetLastPosition () const
   { return lastPosition; }
 
-  virtual void IncRef ();
-  virtual void DecRef ();
 private:
-  csEngine* engine;
-  // The position and radius.
-  iSector *sector;
-  csVector3 pos;
-  float radius;
+  csArray<csSectorPos>* list;
+  int num_objects;
 
-  // Polygon index (to loop over all portals).
-  // If -1 then we return current sector first.
-  int curPoly;
-
-  // If not null then this is a recursive sector iterator
-  // that we are currently using.
-  csSectorIt *recursiveIt;
-
-  // If true then this iterator has ended.
-  bool hasEnded;
-
-  // Last position (from Fetch).
+  // Current index.
+  int cur_idx;
   csVector3 lastPosition;
-
-  // Current sector.
-  iSector* currentSector;
-
-  /// Get sector from iterator. Return 0 at end.
-  iSector *FetchNext ();
 };
 
 /**
@@ -389,14 +362,22 @@ class csMeshListIt : public scfImplementation1<csMeshListIt,
 {
 public:
   /// Construct an iterator and initialize to start.
-  csMeshListIt (csArray<iMeshWrapper*>* list);
+  csMeshListIt (csArray<iMeshWrapper*>* list)
+    : scfImplementationType (this), list (list), 
+      num_objects ((int)list->GetSize ()), cur_idx (0) { }
+  virtual ~csMeshListIt () { delete list; }
 
-  /// Destructor.
-  virtual ~csMeshListIt ();
-
-  virtual void Reset ();
-  virtual iMeshWrapper* Next ();
-  virtual bool HasNext () const;
+  virtual void Reset () { cur_idx = 0; }
+  virtual iMeshWrapper* Next ()
+  {
+    if (cur_idx >= num_objects) return 0;
+    cur_idx++;
+    return (*list)[cur_idx-1];
+  }
+  virtual bool HasNext () const
+  {
+    return cur_idx < num_objects;
+  }
 
 private:
   csArray<iMeshWrapper*>* list;
@@ -409,18 +390,27 @@ private:
 /**
  * Iterator to iterate over objects in the given list.
  */
-class csObjectListIt : public scfImplementation1<csObjectListIt, iObjectIterator>
+class csObjectListIt : public scfImplementation1<csObjectListIt,
+	iObjectIterator>
 {
 public:
   /// Construct an iterator and initialize to start.
-  csObjectListIt (csArray<iObject*>* list);
+  csObjectListIt (csArray<iObject*>* list)
+    : scfImplementationType (this), list (list), 
+      num_objects ((int)list->GetSize ()), cur_idx (0) { }
+  virtual ~csObjectListIt () { delete list; }
 
-  /// Destructor.
-  virtual ~csObjectListIt ();
-
-  virtual void Reset ();
-  virtual iObject* Next ();
-  virtual bool HasNext () const;
+  virtual void Reset () { cur_idx = 0; }
+  virtual iObject* Next ()
+  {
+    if (cur_idx >= num_objects) return 0;
+    cur_idx++;
+    return (*list)[cur_idx-1];
+  }
+  virtual bool HasNext () const
+  {
+    return cur_idx < num_objects;
+  }
   virtual iObject *GetParentObj () const
   {
     return 0;
@@ -521,198 +511,6 @@ iSector *csLightIt::GetLastSector ()
 }
 
 //---------------------------------------------------------------------------
-csSectorIt* csEngine::AllocSectorIterator (iSector *sector, 
-					   const csVector3 &pos, 
-					   float radius)
-{
-  csSectorIt* newIt;
-  if (sectorItPool)
-  {
-    newIt = sectorItPool;
-    sectorItPool = sectorItPool->nextPooledIt;
-  }
-  else
-    newIt = new csSectorIt (this);
-  newIt->Init (sector, pos, radius);
-  return newIt;
-}
- 
-void csEngine::RecycleSectorIterator (csSectorIt* iterator)
-{
-  if (iterator == 0) return;
-  iterator->nextPooledIt = sectorItPool;
-  sectorItPool = iterator;
-}
-
-void csEngine::FreeSectorIteratorPool ()
-{
-  while (sectorItPool)
-  {
-    csSectorIt* toDelete = sectorItPool;
-    sectorItPool = sectorItPool->nextPooledIt;
-    delete toDelete;
-  }
-}
-
-void csSectorIt::IncRef ()
-{
-  scfRefCount++;
-}
-
-void csSectorIt::DecRef ()
-{
-  if (scfRefCount == 1)
-  {
-    engine->RecycleSectorIterator (this);
-    return;
-  }
-  scfRefCount--;
-}
-
-csSectorIt::csSectorIt (csEngine* engine)
-  : scfImplementationType (this), nextPooledIt (0), engine (engine)
-{
-}
-
-void csSectorIt::Init (iSector *sector, const csVector3 &pos,
-		       float radius)
-{
-  scfRefCount = 1;
-  csSectorIt::sector = sector;
-  csSectorIt::pos = pos;
-  csSectorIt::radius = radius;
-  recursiveIt = 0;
-
-  Reset ();
-}
-
-csSectorIt::~csSectorIt ()
-{
-  engine->RecycleSectorIterator (recursiveIt);
-}
-
-void csSectorIt::Reset ()
-{
-  curPoly = -1;
-  engine->RecycleSectorIterator (recursiveIt);
-  recursiveIt = 0;
-  hasEnded = false;
-  currentSector = 0;
-}
-
-iSector *csSectorIt::FetchNext ()
-{
-  if (hasEnded) return 0;
-
-  if (recursiveIt)
-  {
-    iSector *rc = recursiveIt->FetchNext ();
-    if (rc)
-    {
-      lastPosition = recursiveIt->GetLastPosition ();
-      return rc;
-    }
-
-    engine->RecycleSectorIterator (recursiveIt);
-    recursiveIt = 0;
-  }
-
-  if (curPoly == -1)
-  {
-    curPoly = 0;
-    lastPosition = pos;
-    return sector;
-  }
-
-  // End search.
-  hasEnded = true;
-  return 0;
-}
-
-bool csSectorIt::HasNext ()
-{
-  if (currentSector != 0) return true;
-  currentSector = FetchNext ();
-  return currentSector != 0;
-}
-
-iSector *csSectorIt::Next ()
-{
-  if (currentSector == 0)
-  {
-    currentSector = FetchNext ();
-  }
-
-  iSector* s = currentSector;
-  currentSector = 0;
-  return s;
-}
-
-
-//---------------------------------------------------------------------------
-
-
-csObjectListIt::csObjectListIt (csArray<iObject*>* list)
-  : scfImplementationType (this), list (list), 
-  num_objects ((int)list->GetSize ())
-{
-  Reset ();
-}
-
-csObjectListIt::~csObjectListIt ()
-{
-  delete list;
-}
-
-void csObjectListIt::Reset ()
-{
-  cur_idx = 0;
-}
-
-iObject* csObjectListIt::Next ()
-{
-  if (cur_idx >= num_objects) return 0;
-  cur_idx++;
-  return (*list)[cur_idx-1];
-}
-
-bool csObjectListIt::HasNext () const
-{
-  return cur_idx < num_objects;
-}
-
-//---------------------------------------------------------------------------
-
-csMeshListIt::csMeshListIt (csArray<iMeshWrapper*>* list)
-  : scfImplementationType (this), list (list),
-   num_objects ((int)list->GetSize ())
-{
-  Reset ();
-}
-
-csMeshListIt::~csMeshListIt ()
-{
-  delete list;
-}
-
-void csMeshListIt::Reset ()
-{
-  cur_idx = 0;
-}
-
-iMeshWrapper* csMeshListIt::Next ()
-{
-  if (cur_idx >= num_objects) return 0;
-  cur_idx++;
-  return (*list)[cur_idx-1];
-}
-
-bool csMeshListIt::HasNext () const
-{
-  return cur_idx < num_objects;
-}
-
-//---------------------------------------------------------------------------
 SCF_IMPLEMENT_FACTORY (csEngine)
 
 csEngine::csEngine (iBase *iParent) :
@@ -723,7 +521,6 @@ csEngine::csEngine (iBase *iParent) :
   lightAmbientBlue (CS_DEFAULT_LIGHT_LEVEL),
   sectors (this), textures (new csTextureList (this)), 
   materials (new csMaterialList), sharedVariables (new csSharedVariableList),
-  sectorItPool (0),
   renderLoopManager (0), topLevelClipper (0), resize (false),
   worldSaveable (false), maxAspectRatio (0), nextframePending (0),
   currentFrameNumber (0), 
@@ -759,8 +556,6 @@ csEngine::~csEngine ()
   delete textures;
   delete sharedVariables;
   delete renderLoopManager;
-  FreeSectorIteratorPool ();
-
 }
 
 bool csEngine::Initialize (iObjectRegistry *objectRegistry)
@@ -2293,18 +2088,197 @@ int csEngine::GetNearbyLights (
   }
 }
 
+static bool TestPortalSphere (iPortal* portal, float radius,
+	const csVector3& pos, iSector* sector,
+	csSet<csPtrKey<iSector> >& visited_sectors)
+{
+  const csPlane3& wor_plane = portal->GetWorldPlane ();
+  // Can we see the portal?
+  if (wor_plane.Classify (pos) < -0.001)
+  {
+    const csVector3* world_vertices = portal->GetWorldVertices ();
+    csVector3 poly[100];	//@@@ HARDCODE
+    int k;
+    int* idx = portal->GetVertexIndices ();
+    for (k = 0 ; k < portal->GetVertexIndicesCount () ; k++)
+    {
+      poly[k] = world_vertices[idx[k]];
+    }
+    float sqdist_portal = csSquaredDist::PointPoly (
+                  pos, poly, portal->GetVertexIndicesCount (),
+                  wor_plane);
+    if (sqdist_portal <= radius * radius)
+    {
+      portal->CompleteSector (0);
+      if (sector != portal->GetSector () && portal->GetSector ())
+      {
+        if (!visited_sectors.In (portal->GetSector ()))
+        {
+          visited_sectors.Add (portal->GetSector ());
+	  return true;
+	}
+      }
+    }
+  }
+  return false;
+}
+
+static bool TestPortalBox (iPortal* portal, const csBox3& box,
+	const csVector3& pos, iSector* sector,
+	csSet<csPtrKey<iSector> >& visited_sectors)
+{
+  const csPlane3& wor_plane = portal->GetWorldPlane ();
+  // Can we see the portal?
+  if (wor_plane.Classify (pos) < -0.001)
+  {
+    const csVector3* world_vertices = portal->GetWorldVertices ();
+    int k;
+    int* idx = portal->GetVertexIndices ();
+    const csVector3& w0 = world_vertices[idx[0]];
+    for (k = 0 ; k < portal->GetVertexIndicesCount ()-2 ; k++)
+    {
+      if (csIntersect3::BoxTriangle (box, w0, world_vertices[idx[k+1]],
+        world_vertices[idx[k+2]]))
+      {
+	portal->CompleteSector (0);
+	if (sector != portal->GetSector () && portal->GetSector ())
+	{
+	  if (!visited_sectors.In (portal->GetSector ()))
+	  {
+	    visited_sectors.Add (portal->GetSector ());
+	    return true;
+	  }
+        }
+      }
+    }
+  }
+  return false;
+}
+
+static csVector3 WarpVector (iPortal* portal, const csVector3& pos,
+	iMeshWrapper* imw)
+{
+  csReversibleTransform warp_wor;
+  portal->ObjectToWorld (imw->GetMovable ()->GetFullTransform (), warp_wor);
+  return warp_wor.Other2This (pos);
+}
+
+static csVector3 WarpVectorCond (iPortal* portal, const csVector3& pos,
+	iMeshWrapper* imw)
+{
+  if (!portal->GetFlags ().Check (CS_PORTAL_WARP))
+    return pos;
+  csReversibleTransform warp_wor;
+  portal->ObjectToWorld (imw->GetMovable ()->GetFullTransform (), warp_wor);
+  return warp_wor.Other2This (pos);
+}
+
+void csEngine::GetNearbySectorList (iSector* sector,
+    const csBox3& box, csArray<csSectorPos>& list,
+    csSet<csPtrKey<iSector> >& visited_sectors)
+{
+  iVisibilityCuller* culler = sector->GetVisibilityCuller ();
+  csRef<iVisibilityObjectIterator> visit = culler->VisTest (box);
+  csVector3 pos = box.GetCenter ();
+  list.Push (csSectorPos (sector, pos));
+
+  while (visit->HasNext ())
+  {
+    iVisibilityObject* vo = visit->Next ();
+    iMeshWrapper* imw = vo->GetMeshWrapper ();
+    if (imw)
+    {
+      if (imw->GetPortalContainer ())
+      {
+	iPortalContainer* portals = imw->GetPortalContainer ();
+        int pc = portals->GetPortalCount ();
+        int j;
+        for (j = 0 ; j < pc ; j++)
+        {
+          iPortal* portal = portals->GetPortal (j);
+          if (TestPortalBox (portal, box, pos, sector, visited_sectors))
+          {
+	    if (portal->GetFlags ().Check (CS_PORTAL_WARP))
+	    {
+	      csBox3 tbox = box;
+	      tbox.SetCenter (WarpVector (portal, pos, imw));
+	      GetNearbySectorList (portal->GetSector (), tbox,
+		    	list, visited_sectors);
+	    }
+	    else
+	    {
+	      GetNearbySectorList (portal->GetSector (), box,
+		    	list, visited_sectors);
+	    }
+          }
+	}
+      }
+    }
+  }
+}
+
+void csEngine::GetNearbySectorList (iSector* sector,
+    const csVector3& pos, float radius, csArray<csSectorPos>& list,
+    csSet<csPtrKey<iSector> >& visited_sectors)
+{
+  iVisibilityCuller* culler = sector->GetVisibilityCuller ();
+  csRef<iVisibilityObjectIterator> visit = culler->VisTest (
+  	csSphere (pos, radius));
+  list.Push (csSectorPos (sector, pos));
+
+  while (visit->HasNext ())
+  {
+    iVisibilityObject* vo = visit->Next ();
+    iMeshWrapper* imw = vo->GetMeshWrapper ();
+    if (imw)
+    {
+      if (imw->GetPortalContainer ())
+      {
+	iPortalContainer* portals = imw->GetPortalContainer ();
+        int pc = portals->GetPortalCount ();
+        int j;
+        for (j = 0 ; j < pc ; j++)
+        {
+          iPortal* portal = portals->GetPortal (j);
+	  if (TestPortalSphere (portal, radius, pos, sector, visited_sectors))
+          {
+	    GetNearbySectorList (portal->GetSector (), WarpVectorCond (portal,
+	    	pos, imw), radius, list, visited_sectors);
+          }
+	}
+      }
+    }
+  }
+}
+
 csPtr<iSectorIterator> csEngine::GetNearbySectors (
   iSector *sector,
   const csVector3 &pos,
   float radius)
 {
-  csSectorIt *it = AllocSectorIterator (sector, pos, radius);
+  csArray<csSectorPos>* list = new csArray<csSectorPos>;
+  csSet<csPtrKey<iSector> > visited_sectors;
+  visited_sectors.Add (sector);
+  GetNearbySectorList (sector, pos, radius, *list, visited_sectors);
+  csSectorIt *it = new csSectorIt (list);
+  return csPtr<iSectorIterator> (it);
+}
+
+csPtr<iSectorIterator> csEngine::GetNearbySectors (
+  iSector *sector,
+  const csBox3& box)
+{
+  csArray<csSectorPos>* list = new csArray<csSectorPos>;
+  csSet<csPtrKey<iSector> > visited_sectors;
+  visited_sectors.Add (sector);
+  GetNearbySectorList (sector, box, *list, visited_sectors);
+  csSectorIt *it = new csSectorIt (list);
   return csPtr<iSectorIterator> (it);
 }
 
 void csEngine::GetNearbyObjectList (iSector* sector,
     const csVector3& pos, float radius, csArray<iObject*>& list,
-    csArray<iSector*>& visited_sectors, bool crossPortals)
+    csSet<csPtrKey<iSector> >& visited_sectors, bool crossPortals)
 {
   iVisibilityCuller* culler = sector->GetVisibilityCuller ();
   csRef<iVisibilityObjectIterator> visit = culler->VisTest (
@@ -2326,62 +2300,10 @@ void csEngine::GetNearbyObjectList (iSector* sector,
         for (j = 0 ; j < pc ; j++)
         {
           iPortal* portal = portals->GetPortal (j);
-	  const csVector3* world_vertices = portal->GetWorldVertices ();
-          const csPlane3& wor_plane = portal->GetWorldPlane ();
-          // Can we see the portal?
-          if (wor_plane.Classify (pos) < -0.001)
+	  if (TestPortalSphere (portal, radius, pos, sector, visited_sectors))
           {
-            csVector3 poly[100];	//@@@ HARDCODE
-            int k;
-	    int* idx = portal->GetVertexIndices ();
-            for (k = 0 ; k < portal->GetVertexIndicesCount () ; k++)
-            {
-              poly[k] = world_vertices[idx[k]];
-            }
-            float sqdist_portal = csSquaredDist::PointPoly (
-                  pos, poly, portal->GetVertexIndicesCount (),
-                  wor_plane);
-            if (sqdist_portal <= radius * radius)
-            {
-              // Also handle objects in the destination sector unless
-              // it is a warping sector.
-              portal->CompleteSector (0);
-              CS_ASSERT (portal != 0);
-              if (sector != portal->GetSector () && portal->GetSector ())
-              {
-                size_t l;
-                bool already_visited = false;
-                for (l = 0 ; l < visited_sectors.Length () ; l++)
-                {
-                  if (visited_sectors[l] == portal->GetSector ())
-                  {
-                    already_visited = true;
-                    break;
-                  }
-                }
-                if (!already_visited)
-                {
-                  visited_sectors.Push (portal->GetSector ());
-		  if (portal->GetFlags ().Check (CS_PORTAL_WARP))
-		  {
-		    csReversibleTransform warp_wor;
-		    portal->ObjectToWorld (
-		    	imw->GetMovable ()->GetFullTransform (), warp_wor);
-		    csVector3 tpos = warp_wor.Other2This (pos);
-                    GetNearbyObjectList (portal->GetSector (), tpos, radius,
-		    	list, visited_sectors);
-		  }
-		  else
-		  {
-                    GetNearbyObjectList (portal->GetSector (), pos, radius,
-		    	list, visited_sectors);
-		  }
-		  // Uncommenting the below causes too many objects to be
-		  // returned in some cases.
-		  //visited_sectors.Pop ();
-                }
-              }
-            }
+	    GetNearbyObjectList (portal->GetSector (), WarpVectorCond (portal,
+	      	pos, imw), radius, list, visited_sectors, crossPortals);
           }
 	}
       }
@@ -2396,9 +2318,10 @@ csPtr<iObjectIterator> csEngine::GetNearbyObjects (
   bool crossPortals)
 {
   csArray<iObject*>* list = new csArray<iObject*>;
-  csArray<iSector*> visited_sectors;
-  visited_sectors.Push (sector);
-  GetNearbyObjectList (sector, pos, radius, *list, visited_sectors, crossPortals);
+  csSet<csPtrKey<iSector> > visited_sectors;
+  visited_sectors.Add (sector);
+  GetNearbyObjectList (sector, pos, radius, *list, visited_sectors,
+  	crossPortals);
   csObjectListIt *it = new csObjectListIt (list);
   return csPtr<iObjectIterator> (it);
 }
@@ -2419,10 +2342,27 @@ csPtr<iObjectIterator> csEngine::GetVisibleObjects (
   return 0;
 }
 
+static void HandleStaticLOD (csMeshWrapper* cmesh, const csVector3& pos,
+	csArray<iMeshWrapper*>& list)
+{
+  csStaticLODMesh* static_lod = cmesh->GetStaticLODMesh ();
+  if (!static_lod) return;
+  // We also need to add the child here that is at the right LOD
+  // distance from the start of the segment.
+  float distance = csQsqrt (cmesh->GetSquaredDistance (pos));
+  float lod = static_lod->GetLODValue (distance);
+  csArray<iMeshWrapper*>& meshes = static_lod->GetMeshesForLOD (lod);
+  size_t i;
+  // @@@ We assume here that there will be no portals as children.
+  // This is perhaps a bad assumption.
+  for (i = 0 ; i < meshes.Length () ; i++)
+    list.Push (meshes[i]);
+}
+
 void csEngine::GetNearbyMeshList (iSector* sector,
     const csVector3& start, const csVector3& end,
     csArray<iMeshWrapper*>& list,
-    csArray<iSector*>& visited_sectors, bool crossPortals)
+    csSet<csPtrKey<iSector> >& visited_sectors, bool crossPortals)
 {
   iVisibilityCuller* culler = sector->GetVisibilityCuller ();
   csRef<iVisibilityObjectIterator> visit = culler->IntersectSegment (
@@ -2437,20 +2377,8 @@ void csEngine::GetNearbyMeshList (iSector* sector,
     {
       list.Push (imw); 
       csMeshWrapper* cmesh = (csMeshWrapper*)imw;
-      csStaticLODMesh* static_lod = cmesh->GetStaticLODMesh ();
-      if (static_lod)
-      {
-	// We also need to add the child here that is at the right LOD
-	// distance from the start of the segment.
-        float distance = csQsqrt (cmesh->GetSquaredDistance (start));
-        float lod = static_lod->GetLODValue (distance);
-        csArray<iMeshWrapper*>& meshes = static_lod->GetMeshesForLOD (lod);
-        size_t i;
-	// @@@ We assume here that there will be no portals as children.
-	// This is perhaps a bad assumption.
-        for (i = 0 ; i < meshes.Length () ; i++)
-          list.Push (meshes[i]);
-      }
+      HandleStaticLOD (cmesh, start, list);
+
       if (crossPortals && imw->GetPortalContainer ())
       {
         iPortalContainer* portals = imw->GetPortalContainer ();
@@ -2468,19 +2396,9 @@ void csEngine::GetNearbyMeshList (iSector* sector,
               portal->CompleteSector (0);
               if (sector != portal->GetSector () && portal->GetSector ())
               {
-                size_t l;
-                bool already_visited = false;
-                for (l = 0 ; l < visited_sectors.Length () ; l++)
+                if (!visited_sectors.In (portal->GetSector ()))
                 {
-                  if (visited_sectors[l] == portal->GetSector ())
-                  {
-                    already_visited = true;
-                    break;
-                  }
-                }
-                if (!already_visited)
-                {
-                  visited_sectors.Push (portal->GetSector ());
+                  visited_sectors.Add (portal->GetSector ());
 		  if (portal->GetFlags ().Check (CS_PORTAL_WARP))
 		  {
 		    csReversibleTransform warp_wor;
@@ -2510,7 +2428,7 @@ void csEngine::GetNearbyMeshList (iSector* sector,
 
 void csEngine::GetNearbyMeshList (iSector* sector,
     const csVector3& pos, float radius, csArray<iMeshWrapper*>& list,
-    csArray<iSector*>& visited_sectors, bool crossPortals)
+    csSet<csPtrKey<iSector> >& visited_sectors, bool crossPortals)
 {
   iVisibilityCuller* culler = sector->GetVisibilityCuller ();
   csRef<iVisibilityObjectIterator> visit = culler->VisTest (
@@ -2525,87 +2443,20 @@ void csEngine::GetNearbyMeshList (iSector* sector,
     {
       list.Push (imw); 
       csMeshWrapper* cmesh = (csMeshWrapper*)imw;
-      csStaticLODMesh* static_lod = cmesh->GetStaticLODMesh ();
-      if (static_lod)
-      {
-	// We also need to add the child here that is at the right LOD
-	// distance from the start of the segment.
-        float distance = csQsqrt (cmesh->GetSquaredDistance (pos));
-        float lod = static_lod->GetLODValue (distance);
-        csArray<iMeshWrapper*>& meshes = static_lod->GetMeshesForLOD (lod);
-        size_t i;
-	// @@@ We assume here that there will be no portals as children.
-	// This is perhaps a bad assumption.
-        for (i = 0 ; i < meshes.Length () ; i++)
-          list.Push (meshes[i]);
-      }
+      HandleStaticLOD (cmesh, pos, list);
+
       if (crossPortals && imw->GetPortalContainer ())
       {
         iPortalContainer* portals = imw->GetPortalContainer ();
         int pc = portals->GetPortalCount ();
-        int j;
-        for (j = 0 ; j < pc ; j++)
+        for (int j = 0 ; j < pc ; j++)
         {
           iPortal* portal = portals->GetPortal (j);
-	  const csVector3* world_vertices = portal->GetWorldVertices ();
-          const csPlane3& wor_plane = portal->GetWorldPlane ();
-          // Can we see the portal?
-          if (wor_plane.Classify (pos) < -0.001)
-          {
-	    // @@@ Consider having a simpler version that looks
-	    // at center of portal instead of trying to calculate distance
-	    // to portal polygon?
-            csVector3 poly[100];	//@@@ HARDCODE
-            int k;
-	    int* idx = portal->GetVertexIndices ();
-            for (k = 0 ; k < portal->GetVertexIndicesCount () ; k++)
-            {
-              poly[k] = world_vertices[idx[k]];
-            }
-            float sqdist_portal = csSquaredDist::PointPoly (
-                  pos, poly, portal->GetVertexIndicesCount (),
-                  wor_plane);
-            if (sqdist_portal <= radius * radius)
-            {
-              // Also handle objects in the destination sector unless
-              // it is a warping sector.
-              portal->CompleteSector (0);
-              if (sector != portal->GetSector () && portal->GetSector ())
-              {
-                size_t l;
-                bool already_visited = false;
-                for (l = 0 ; l < visited_sectors.Length () ; l++)
-                {
-                  if (visited_sectors[l] == portal->GetSector ())
-                  {
-                    already_visited = true;
-                    break;
-                  }
-                }
-                if (!already_visited)
-                {
-                  visited_sectors.Push (portal->GetSector ());
-		  if (portal->GetFlags ().Check (CS_PORTAL_WARP))
-		  {
-		    csReversibleTransform warp_wor;
-		    portal->ObjectToWorld (
-		    	imw->GetMovable ()->GetFullTransform (), warp_wor);
-		    csVector3 tpos = warp_wor.Other2This (pos);
-                    GetNearbyMeshList (portal->GetSector (), tpos, radius,
-		    	list, visited_sectors);
-		  }
-		  else
-		  {
-                    GetNearbyMeshList (portal->GetSector (), pos, radius,
-		    	list, visited_sectors);
-		  }
-		  // Uncommenting the below causes too many objects to be
-		  // returned in some cases.
-		  //visited_sectors.Pop ();
-                }
-              }
-            }
-          }
+	  if (TestPortalSphere (portal, radius, pos, sector, visited_sectors))
+	  {
+	    GetNearbyMeshList (portal->GetSector (), WarpVectorCond (portal,
+	    	pos, imw), radius, list, visited_sectors);
+	  }
 	}
       }
     }
@@ -2614,7 +2465,7 @@ void csEngine::GetNearbyMeshList (iSector* sector,
 
 void csEngine::GetNearbyMeshList (iSector* sector,
     const csBox3& box, csArray<iMeshWrapper*>& list,
-    csArray<iSector*>& visited_sectors, bool crossPortals)
+    csSet<csPtrKey<iSector> >& visited_sectors, bool crossPortals)
 {
   iVisibilityCuller* culler = sector->GetVisibilityCuller ();
   csRef<iVisibilityObjectIterator> visit = culler->VisTest (box);
@@ -2629,20 +2480,7 @@ void csEngine::GetNearbyMeshList (iSector* sector,
     {
       list.Push (imw); 
       csMeshWrapper* cmesh = (csMeshWrapper*)imw;
-      csStaticLODMesh* static_lod = cmesh->GetStaticLODMesh ();
-      if (static_lod)
-      {
-	// We also need to add the child here that is at the right LOD
-	// distance from the start of the segment.
-        float distance = csQsqrt (cmesh->GetSquaredDistance (pos));
-        float lod = static_lod->GetLODValue (distance);
-        csArray<iMeshWrapper*>& meshes = static_lod->GetMeshesForLOD (lod);
-        size_t i;
-	// @@@ We assume here that there will be no portals as children.
-	// This is perhaps a bad assumption.
-        for (i = 0 ; i < meshes.Length () ; i++)
-          list.Push (meshes[i]);
-      }
+      HandleStaticLOD (cmesh, pos, list);
       if (crossPortals && imw->GetPortalContainer ())
       {
         iPortalContainer* portals = imw->GetPortalContainer ();
@@ -2651,66 +2489,20 @@ void csEngine::GetNearbyMeshList (iSector* sector,
         for (j = 0 ; j < pc ; j++)
         {
           iPortal* portal = portals->GetPortal (j);
-	  const csVector3* world_vertices = portal->GetWorldVertices ();
-          const csPlane3& wor_plane = portal->GetWorldPlane ();
-          // Can we see the portal?
-          if (wor_plane.Classify (pos) < -0.001)
+          if (TestPortalBox (portal, box, pos, sector, visited_sectors))
           {
-	    // @@@ Consider having a simpler version that looks
-	    // at center of portal instead of trying to calculate distance
-	    // to portal polygon?
-            csVector3 poly[100];	//@@@ HARDCODE
-            int k;
-	    int* idx = portal->GetVertexIndices ();
-            for (k = 0 ; k < portal->GetVertexIndicesCount () ; k++)
-            {
-              poly[k] = world_vertices[idx[k]];
-            }
-            //@@@float sqdist_portal = csSquaredDist::PointPoly (
-                  //@@@pos, poly, portal->GetVertexIndicesCount (),
-                  //@@@wor_plane);
-            //@@@if (sqdist_portal <= radius * radius)
-            {
-              // Also handle objects in the destination sector unless
-              // it is a warping sector.
-              portal->CompleteSector (0);
-              if (sector != portal->GetSector () && portal->GetSector ())
-              {
-                size_t l;
-                bool already_visited = false;
-                for (l = 0 ; l < visited_sectors.Length () ; l++)
-                {
-                  if (visited_sectors[l] == portal->GetSector ())
-                  {
-                    already_visited = true;
-                    break;
-                  }
-                }
-                if (!already_visited)
-                {
-                  visited_sectors.Push (portal->GetSector ());
-		  if (portal->GetFlags ().Check (CS_PORTAL_WARP))
-		  {
-		    csReversibleTransform warp_wor;
-		    portal->ObjectToWorld (
-		    	imw->GetMovable ()->GetFullTransform (), warp_wor);
-		    csVector3 tpos = warp_wor.Other2This (pos);
-		    csBox3 tbox = box;
-		    tbox.SetCenter (tpos);
-                    GetNearbyMeshList (portal->GetSector (), tbox,
+	    if (portal->GetFlags ().Check (CS_PORTAL_WARP))
+	    {
+	      csBox3 tbox = box;
+	      tbox.SetCenter (WarpVector (portal, pos, imw));
+	      GetNearbyMeshList (portal->GetSector (), tbox,
 		    	list, visited_sectors);
-		  }
-		  else
-		  {
-                    GetNearbyMeshList (portal->GetSector (), box,
+	    }
+	    else
+	    {
+	      GetNearbyMeshList (portal->GetSector (), box,
 		    	list, visited_sectors);
-		  }
-		  // Uncommenting the below causes too many objects to be
-		  // returned in some cases.
-		  //visited_sectors.Pop ();
-                }
-              }
-            }
+	    }
           }
 	}
       }
@@ -2725,8 +2517,8 @@ csPtr<iMeshWrapperIterator> csEngine::GetNearbyMeshes (
   bool crossPortals)
 {
   csArray<iMeshWrapper*>* list = new csArray<iMeshWrapper*>;
-  csArray<iSector*> visited_sectors;
-  visited_sectors.Push (sector);
+  csSet<csPtrKey<iSector> > visited_sectors;
+  visited_sectors.Add (sector);
   GetNearbyMeshList (sector, pos, radius, *list, visited_sectors, crossPortals);
   csMeshListIt *it = new csMeshListIt (list);
   return csPtr<iMeshWrapperIterator> (it);
@@ -2738,8 +2530,8 @@ csPtr<iMeshWrapperIterator> csEngine::GetNearbyMeshes (
   bool crossPortals)
 {
   csArray<iMeshWrapper*>* list = new csArray<iMeshWrapper*>;
-  csArray<iSector*> visited_sectors;
-  visited_sectors.Push (sector);
+  csSet<csPtrKey<iSector> > visited_sectors;
+  visited_sectors.Add (sector);
   GetNearbyMeshList (sector, box, *list, visited_sectors, crossPortals);
   csMeshListIt *it = new csMeshListIt (list);
   return csPtr<iMeshWrapperIterator> (it);
@@ -2752,8 +2544,8 @@ csPtr<iMeshWrapperIterator> csEngine::GetNearbyMeshes (
   bool crossPortals)
 {
   csArray<iMeshWrapper*>* list = new csArray<iMeshWrapper*>;
-  csArray<iSector*> visited_sectors;
-  visited_sectors.Push (sector);
+  csSet<csPtrKey<iSector> > visited_sectors;
+  visited_sectors.Add (sector);
   GetNearbyMeshList (sector, start, end, *list, visited_sectors, crossPortals);
   csMeshListIt *it = new csMeshListIt (list);
   return csPtr<iMeshWrapperIterator> (it);

@@ -1179,10 +1179,10 @@ APPLY_FOR_EACH_INTERFACE
 %extend iSprite2DState
 {
   csSprite2DVertex* GetVertexByIndex(int index)
-  { return &(self->GetVertices()[index]); }
+  { return &self->GetVertices()->Get(index); }
 
   int GetVertexCount()
-  { return self->GetVertices().Length(); }
+  { return self->GetVertices()->GetSize(); }
 }
 
 // imesh/genmesh.h
