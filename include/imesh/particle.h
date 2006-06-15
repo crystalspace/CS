@@ -40,8 +40,6 @@ class csVector3;
 
 struct csRenderMesh;
 
-SCF_VERSION (iParticle, 0, 1, 0);
-
 /**
  * A iParticle can be used in particle Systems.
  * Each particle may perform these operations in it's own manner,
@@ -49,8 +47,10 @@ SCF_VERSION (iParticle, 0, 1, 0);
  * If some are not implemented, functionality depending on that
  * feature may not work.
  */
-struct iParticle : public iBase
+struct iParticle : public virtual iBase
 {
+  SCF_INTERFACE (iParticle, 1, 0, 0);
+
   /**
    * Set the position of this particle in coordinates relative
    * to the parent particle system.
@@ -62,14 +62,10 @@ struct iParticle : public iBase
    */
   virtual void MovePosition (const csVector3& move) = 0;
 
-  /// Set the color of this particle.
-  virtual void SetColor (const csColor& col) = 0;
   /// Add color to the color of the sprite.
   virtual void AddColor (const csColor& col) = 0;
   /// Scale particle by this factor.
   virtual void ScaleBy (float factor) = 0;
-  /// Set the MixMode for the particle.
-  virtual void SetMixMode (uint mode) = 0;
   /// Rotate the particle is some particle dependent manner, in radians.
   virtual void Rotate (float angle) = 0;
 
@@ -80,10 +76,6 @@ struct iParticle : public iBase
    */
   virtual void UpdateLighting (const csArray<iLightSectorInfluence*>& lights,
       const csReversibleTransform& transform) = 0;
-
-  /// Get the rendermesh(es) of this particle.
-  virtual csRenderMesh** GetRenderMeshes (int& n, iRenderView* rview, 
-    iMovable* movable, uint32 frustum_mask) = 0;
 };
 
 /** @} */

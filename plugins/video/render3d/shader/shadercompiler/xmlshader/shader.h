@@ -84,7 +84,7 @@ class csShaderConditionResolver : public iConditionResolver
   csHash<size_t, MyBitArrayTemp, TempHeapAlloc> variantIDs;
 
   const csRenderMeshModes* modes;
-  const csShaderVarStack* stacks;
+  const iShaderVarStack* stacks;
 
   csString lastError;
   const char* SetLastError (const char* msg, ...) CS_GNUC_PRINTF (2, 3);
@@ -114,7 +114,7 @@ public:
   void ResetEvaluationCache() { evaluator.ResetEvaluationCache(); }
 
   void SetEvalParams (const csRenderMeshModes* modes,
-    const csShaderVarStack* stacks);
+    const iShaderVarStack* stacks);
   size_t GetVariant ();
   size_t GetVariantCount () const
   { return nextVariant; }
@@ -214,7 +214,7 @@ public:
   { this->filename = csStrNew(filename); }
 
   virtual size_t GetTicket (const csRenderMeshModes& modes,
-    const csShaderVarStack& stacks);
+    const iShaderVarStack* stacks);
 
   /// Get number of passes this shader have
   virtual size_t GetNumberOfPasses (size_t ticket)
@@ -232,7 +232,7 @@ public:
   /// Setup a pass.
   virtual bool SetupPass (size_t ticket, const csRenderMesh *mesh,
     csRenderMeshModes& modes,
-    const csShaderVarStack &stacks)
+    const iShaderVarStack* stacks)
   { 
     if (IsFallbackTicket (ticket))
       return fallbackShader->SetupPass (GetFallbackTicket (ticket),
@@ -276,12 +276,13 @@ public:
 
   friend class csXMLShaderCompiler;
 
-  //--------------------- iSelfDestruct implementation -------------------//
-
+  /**\name iSelfDestruct implementation
+   * @{ */
   virtual void SelfDestruct ();
+  /** @} */
 
-  //=================== iShaderVariableContext ================//
-
+  /**\name iShaderVariableContext implementation
+   * @{ */
   /// Add a variable to this context
   void AddVariable (csShaderVariable *variable)
   { 
@@ -313,7 +314,7 @@ public:
    * Push the variables of this context onto the variable stacks
    * supplied in the "stacks" argument
    */
-  void PushVariables (csShaderVarStack &stacks) const
+  void PushVariables (iShaderVarStack* stacks) const
   { 
     if (useFallbackContext)
     {
@@ -342,6 +343,7 @@ public:
       fallbackShader->Clear();
     GetUsedSVContext().Clear();
   }
+  /** @} */
 
   /// Set object description
   void SetDescription (const char *desc)
@@ -352,7 +354,8 @@ public:
 
   /// Return some info on this shader
   void DumpStats (csString& str);
-  csRef<iDocumentNode> LoadProgramFile (const char* filename);
+  csRef<iDocumentNode> OpenDocFile (const char* filename);
+  csRef<iDocumentNode> LoadProgramFile (const char* filename, size_t variant);
 public:
   //Holders
   csXMLShaderCompiler* compiler;

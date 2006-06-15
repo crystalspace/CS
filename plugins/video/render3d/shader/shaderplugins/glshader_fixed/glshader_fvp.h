@@ -41,7 +41,7 @@ public:
     TEXGEN_REFLECT_SPHERE,
     TEXGEN_REFLECT_CUBE,
     TEXGEN_FOG,
-	TEXGEN_TEXTURE3D,
+    TEXGEN_TEXTURE3D,
     TEXGEN_PROJECTION
   };
   enum TexMatrixOpType
@@ -104,6 +104,7 @@ private:
   GLenum colorMaterial;
   ProgramParam matAmbient;
   ProgramParam matDiffuse;
+  ProgramParam matEmission;
   ProgramParam matSpecular;
   ProgramParam matSpecularExp;
   bool separateSpecular;
@@ -150,7 +151,7 @@ public:
   /// Setup states needed for proper operation of the shader
   virtual void SetupState (const csRenderMesh* mesh,
     csRenderMeshModes& modes,
-    const csShaderVarStack &stacks);
+    const iShaderVarStack* stacks);
 
   /// Reset states to original
   virtual void ResetState ();

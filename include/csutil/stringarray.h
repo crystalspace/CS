@@ -28,6 +28,7 @@
 #include "csextern.h"
 #include "csutil/array.h"
 #include "csutil/util.h"
+#include "csutil/csstring.h"
 
 class csStringArrayElementHandler : public csArrayElementHandler<const char*>
 {
@@ -241,7 +242,7 @@ public:
             newString = lastDelim == -1;
             break;
           case delimIgnoreDifferent:
-            newString = lastDelim == *p;
+            newString = (lastDelim == -1) || (lastDelim == *p);
             break;
         }
         if (newString)

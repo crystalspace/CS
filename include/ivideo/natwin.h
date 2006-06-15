@@ -43,6 +43,9 @@
  * This interface represents the native window manager system.
  * At this moment this interface is nearly empty. In the future it
  * will be extended with more functionality to manage windows and so on.
+ *
+ * Main ways to get pointers to this interface:
+ * - scfQueryInterface on iGraphics2D interface.
  */
 struct iNativeWindowManager : public virtual iBase
 {
@@ -77,6 +80,9 @@ struct iNativeWindowManager : public virtual iBase
 
 /**
  * This interface represents a native window.
+ *
+ * Main ways to get pointers to this interface:
+ * - iGraphics2D::GetNativeWindow()
  */
 struct iNativeWindow : public virtual iBase
 {

@@ -182,7 +182,7 @@ void csGenmeshSkelAnimationControl::UpdateArrays (int num_verts)
   }
 }
 
-void csGenmeshSkelAnimationControl::UpdateVertNormArrays (int num_norms)
+void csGenmeshSkelAnimationControl::UpdateVertNormArrays (int /*num_norms*/)
 {
 }
 
@@ -248,33 +248,32 @@ const csVector3* csGenmeshSkelAnimationControl::UpdateVertices (csTicks current,
   return verts;
 }
 
-const csVector2* csGenmeshSkelAnimationControl::UpdateTexels (csTicks current,
-                                                              const csVector2* texels, int num_texels, uint32 version_id)
+const csVector2* csGenmeshSkelAnimationControl::UpdateTexels (csTicks,
+  const csVector2* texels, int /*num_texels*/, uint32 /*version_id*/)
 {
-  if (!animates_texels) return texels;
   return texels;
 }
 
-const csVector3* csGenmeshSkelAnimationControl::UpdateNormals (csTicks current,
-                                                               const csVector3* normals, int num_normals, uint32 version_id)
+const csVector3* csGenmeshSkelAnimationControl::UpdateNormals (csTicks,
+  const csVector3* normals, int /*num_normals*/, uint32 /*version_id*/)
 {
   return normals;
 }
 
-const csColor4* csGenmeshSkelAnimationControl::UpdateColors (csTicks current,
-                                                             const csColor4* colors, int num_colors, uint32 version_id)
+const csColor4* csGenmeshSkelAnimationControl::UpdateColors (csTicks,
+  const csColor4* colors, int /*num_colors*/, uint32 /*version_id*/)
 {
   return colors;
 }
 
-const csVector3* csGenmeshSkelAnimationControl::UpdateTangents (csTicks current, 
-                                                                const csVector3* tangents, int num_tangents, uint32 version_id)
+const csVector3* csGenmeshSkelAnimationControl::UpdateTangents (csTicks,
+  const csVector3* tangents, int /*num_tangents*/, uint32 /*version_id*/)
 {
   return tangents;
 }
 
-const csVector3* csGenmeshSkelAnimationControl::UpdateBiTangents (csTicks current, 
-                                                                  const csVector3* bitangents, int num_bitangents, uint32 version_id)
+const csVector3* csGenmeshSkelAnimationControl::UpdateBiTangents (csTicks,
+  const csVector3* bitangents, int /*num_bitangents*/, uint32 /*version_id*/)
 {
   return bitangents;
 }

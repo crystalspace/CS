@@ -62,16 +62,18 @@ void csVProcStandardProgram::Deactivate ()
 
 void csVProcStandardProgram::SetupState (const csRenderMesh* mesh,
                                          csRenderMeshModes& modes,
-                                         const csShaderVarStack& stacks)
+                                         const iShaderVarStack* Stacks)
 {
   if (numLights > 0)
   {
+    const iArrayReadOnly<csShaderVariable*>* stacks = Stacks;
     int lightsActive = 0;
     csStringID id;
     id = shaderPlugin->lsvCache.GetDefaultSVId (
       csLightShaderVarCache::varLightCount);
-    if ((stacks.Length() > id) && (stacks[id] != 0))
-      stacks[id]->GetValue (lightsActive);
+    csShaderVariable* sv;
+    if ((stacks->GetSize() > id) && ((sv = stacks->Get (id)) != 0))
+      sv->GetValue (lightsActive);
 
     iRenderBuffer *vbuf = GetBuffer (positionBuffer, modes, stacks);
     iRenderBuffer *nbuf = GetBuffer (normalBuffer, modes, stacks);
@@ -80,9 +82,9 @@ void csVProcStandardProgram::SetupState (const csRenderMesh* mesh,
     if (vbuf == 0 || nbuf == 0) return;
     
     csReversibleTransform camtrans;
-    if ((stacks.Length() > shaderPlugin->string_world2camera) 
-      && (stacks[shaderPlugin->string_world2camera] != 0))
-      stacks[shaderPlugin->string_world2camera]->GetValue (camtrans);
+    if ((stacks->GetSize() > shaderPlugin->string_world2camera) 
+      && ((sv = stacks->Get (shaderPlugin->string_world2camera)) != 0))
+      sv->GetValue (camtrans);
     csVector3 eyePos (camtrans.GetT2OTranslation ());
     csVector3 eyePosObject (mesh->object2world.Other2This (eyePos));
     
@@ -101,7 +103,7 @@ void csVProcStandardProgram::SetupState (const csRenderMesh* mesh,
       csRenderBufferLock<float> tmpColor (specBuf);
       memset (tmpColor, 0, sizeof(csColor) * elementCount);
     }
-    float shininess = GetParamFloatVal (stacks, shininessParam, 0.0f);
+    float shininess = GetParamFloatVal (Stacks, shininessParam, 0.0f);
 
     // tempdata
     {
@@ -120,7 +122,7 @@ void csVProcStandardProgram::SetupState (const csRenderMesh* mesh,
 	if ((disableMask.Length() <= lightNum) 
 	  || !disableMask.IsBitSet (lightNum))
 	{
-	  csLightProperties light (lightNum, shaderPlugin->lsvCache, stacks);
+	  csLightProperties light (lightNum, shaderPlugin->lsvCache, Stacks);
 	  iVertexLightCalculator *calc = 
 	    shaderPlugin->GetLightCalculator (light, useAttenuation);
 	  calc->CalculateLighting (light, eyePosObject, shininess, elementCount, 
@@ -138,7 +140,7 @@ void csVProcStandardProgram::SetupState (const csRenderMesh* mesh,
 	    continue;
 	  }
 	  
-	  csLightProperties light (i, shaderPlugin->lsvCache, stacks);
+	  csLightProperties light (i, shaderPlugin->lsvCache, Stacks);
 	  iVertexLightCalculator *calc = 
 	    shaderPlugin->GetLightCalculator (light, useAttenuation);
 
@@ -217,7 +219,7 @@ void csVProcStandardProgram::SetupState (const csRenderMesh* mesh,
       }
     }
 
-    float finalLightFactorReal = GetParamFloatVal (stacks, finalLightFactor,
+    float finalLightFactorReal = GetParamFloatVal (Stacks, finalLightFactor,
       1.0f);
     {
       csRenderBufferLock<csColor> tmpColor (clbuf);
@@ -420,15 +422,17 @@ bool csVProcStandardProgram::Load (iShaderDestinationResolver* /*resolve*/,
 }
 
 iRenderBuffer* csVProcStandardProgram::GetBuffer (const BufferName& name,
-  csRenderMeshModes& modes, const csShaderVarStack &stacks)
+  csRenderMeshModes& modes, 
+  const iArrayReadOnly<csShaderVariable*>* stacks)
 {
   if (name.defaultName != CS_BUFFER_NONE)
     return modes.buffers->GetRenderBuffer (name.defaultName);
 
-  if ((stacks.Length() > name.userName) && (stacks[name.userName]))
+  csShaderVariable* sv;
+  if ((stacks->GetSize() > name.userName) && ((sv = stacks->Get (name.userName))))
   {
     iRenderBuffer* buf;
-    stacks[name.userName]->GetValue (buf);
+    sv->GetValue (buf);
     return buf;
   }
   return 0;

@@ -480,7 +480,7 @@ bool csBezierSaver::WriteFactory (iBase* obj, iDocumentNode* parent)
     csRef<iDocumentNode> curvecenterNode = 
       parent->CreateNodeBefore(CS_NODE_ELEMENT, 0);
     curvecenterNode->SetValue("curvecenter");
-    synldr->WriteVector(curvecenterNode, &curvecenter);
+    synldr->WriteVector(curvecenterNode, curvecenter);
 
     //Writedown CurveScale tag
     float curvescale = fact->GetCurvesScale();
@@ -498,7 +498,7 @@ bool csBezierSaver::WriteFactory (iBase* obj, iDocumentNode* parent)
       csRef<iDocumentNode> ccNode = 
         parent->CreateNodeBefore(CS_NODE_ELEMENT, 0);
       ccNode->SetValue("curvecontrol");
-      synldr->WriteVector(ccNode, &cc_v3);
+      synldr->WriteVector(ccNode, cc_v3);
       ccNode->SetAttributeAsFloat("u", cc_v2.x);
       ccNode->SetAttributeAsFloat("v", cc_v2.y);
     }

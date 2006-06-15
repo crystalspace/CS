@@ -35,6 +35,7 @@ class csMatrix3;
 class csVector3;
 class csRect;
 
+struct csRGBcolor;
 struct csRGBpixel;
 struct csLightMapMapping;
 struct iImage;
@@ -113,7 +114,7 @@ struct iMaterial;
  */
 struct iRendererLightmap : public virtual iBase
 {
-  SCF_INTERFACE (iRendererLightmap, 2, 0, 0);
+  SCF_INTERFACE (iRendererLightmap, 2, 1, 0);
 
   /**
    * Retrieve the coordinates of this lightmap in the superlightmap, in the
@@ -123,7 +124,7 @@ struct iRendererLightmap : public virtual iBase
     int& width, int& height) = 0;
     
   /// Set the image data of this lightmap.
-  virtual void SetData (csRGBpixel* data) = 0;
+  virtual void SetData (csRGBcolor* data) = 0;
   
   virtual void SetLightCellSize (int size) = 0;
 };

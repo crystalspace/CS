@@ -46,6 +46,62 @@ typedef unsigned long csBitArrayStorageType;
 #endif
 const size_t csBitArrayDefaultInlineBits = 
   sizeof (csBitArrayStorageType) * 8;
+  
+  
+/// Base comparator for bit arrays
+template<typename BitArray>
+class csComparatorBitArray
+{
+public:
+  static int Compare (BitArray const& key1, BitArray const& key2)
+  {
+    csBitArrayStorageType const* p0 = key1.GetStore();
+    csBitArrayStorageType const* p1 = key2.GetStore();
+    size_t compareNum = MIN (key1.mLength, key2.mLength);
+    size_t i = 0;
+    for (; i < compareNum; i++)
+      if (p0[i] != p1[i])
+	return (int)p0[i] - (int)p1[i];
+    if (key1.mLength > key2.mLength)
+    {
+      for (; i < key1.mLength; i++)
+	if (p0[i] != 0)
+	  return (int)p0[i];
+    }
+    else
+    {
+      for (; i < key2.mLength; i++)
+	if (p1[i] != 0)
+	  return -((int)p1[i]);
+    }
+    return 0;
+  }
+};
+
+  
+/// Base hash computer for bit arrays
+template<typename BitArray>
+class csHashComputerBitArray
+{
+public:
+  static uint ComputeHash (BitArray const& key)
+  {
+    const size_t uintCount = sizeof (csBitArrayStorageType) / sizeof (uint);
+    uint ui[uintCount];
+    uint hash = 0;
+    csBitArrayStorageType const* p = key.GetStore();
+    // \todo Not very good. Find a better hash function; however, it should
+    // return the same hash for two bit arrays that are the same except for
+    // the amount of trailing zeros. (e.g. f(10010110) == f(100101100000...))
+    for (size_t i = 0; i < key.mLength; i++)
+    {
+      memcpy (ui, &p[i], sizeof (ui));
+      for (size_t j = 0; j < uintCount; j++)
+	hash += ui[j];
+    }
+    return hash;
+  }
+};
 
 /**
  * A one-dimensional array of bits, similar to STL bitset.
@@ -549,35 +605,6 @@ public:
   csBitArray (const csBitArray& that) : csBitArrayTweakable<> (that) { }
 };
 
-/// Base comparator for bit arrays
-template<typename BitArray>
-class csComparatorBitArray
-{
-public:
-  static int Compare (BitArray const& key1, BitArray const& key2)
-  {
-    csBitArrayStorageType const* p0 = key1.GetStore();
-    csBitArrayStorageType const* p1 = key2.GetStore();
-    size_t compareNum = MIN (key1.mLength, key2.mLength);
-    size_t i = 0;
-    for (; i < compareNum; i++)
-      if (p0[i] != p1[i])
-	return (int)p0[i] - (int)p1[i];
-    if (key1.mLength > key2.mLength)
-    {
-      for (; i < key1.mLength; i++)
-	if (p0[i] != 0)
-	  return (int)p0[i];
-    }
-    else
-    {
-      for (; i < key2.mLength; i++)
-	if (p1[i] != 0)
-	  return -((int)p1[i]);
-    }
-    return 0;
-  }
-};
 
 /**
  * csComparator<> specialization for csBitArray to allow its use as 
@@ -587,29 +614,6 @@ CS_SPECIALIZE_TEMPLATE
 class csComparator<csBitArray, csBitArray> : 
   public csComparatorBitArray<csBitArray> { };
 
-/// Base hash computer for bit arrays
-template<typename BitArray>
-class csHashComputerBitArray
-{
-public:
-  static uint ComputeHash (BitArray const& key)
-  {
-    const size_t uintCount = sizeof (csBitArrayStorageType) / sizeof (uint);
-    uint ui[uintCount];
-    uint hash = 0;
-    csBitArrayStorageType const* p = key.GetStore();
-    // \todo Not very good. Find a better hash function; however, it should
-    // return the same hash for two bit arrays that are the same except for
-    // the amount of trailing zeros. (e.g. f(10010110) == f(100101100000...))
-    for (size_t i = 0; i < key.mLength; i++)
-    {
-      memcpy (ui, &p[i], sizeof (ui));
-      for (size_t j = 0; j < uintCount; j++)
-	hash += ui[j];
-    }
-    return hash;
-  }
-};
 
 /**
  * csHashComputer<> specialization for csBitArray to allow its use as 

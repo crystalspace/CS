@@ -529,10 +529,16 @@ bool AABBNoLeafTree::Walk(GenericWalkingCallback callback, void* user_data) cons
 		/* For each axis */															\
 		for(udword j=0;j<3;j++)														\
 		{	/* Dequantize the box center */											\
-			float qc = float(mNodes[i].mAABB.mCenter[j]) * mCenterCoeff[j];			\
-			bool FixMe=true;														\
-			do																		\
-			{	/* Dequantize the box extent */										\
+			if (fabs (mExtentsCoeff[j]) < 0.00001) \
+			{ \
+			    mNodes[i].mAABB.mExtents[j]=0xffff; \
+			} \
+			else \
+			{ \
+			    float qc = float(mNodes[i].mAABB.mCenter[j]) * mCenterCoeff[j];			\
+			    bool FixMe=true;														\
+			    do																		\
+			    {	/* Dequantize the box extent */										\
 				float qe = float(mNodes[i].mAABB.mExtents[j]) * mExtentsCoeff[j];	\
 				/* Compare real & dequantized values */								\
 				if(qc+qe<Max[j] || qc-qe>Min[j])	mNodes[i].mAABB.mExtents[j]++;	\
@@ -543,7 +549,8 @@ bool AABBNoLeafTree::Walk(GenericWalkingCallback callback, void* user_data) cons
 					mNodes[i].mAABB.mExtents[j]=0xffff;								\
 					FixMe=false;													\
 				}																	\
-			}while(FixMe);															\
+			    }while(FixMe);															\
+		       } \
 		}																			\
 	}
 

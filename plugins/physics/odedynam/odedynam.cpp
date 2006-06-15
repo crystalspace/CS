@@ -26,6 +26,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "csgeom/pmtools.h"
 #include "cstool/collider.h"
 #include "csutil/event.h"
+#include "csutil/eventnames.h"
 #include "iengine/engine.h"
 #include "imesh/objmodel.h"
 #include "igeom/polymesh.h"

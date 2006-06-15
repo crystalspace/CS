@@ -44,32 +44,32 @@ site:
 
 @uref{ftp://sunsite.dk/pub/projects/crystal/}
 
-@subheading Bleeding-Edge Developmental Releases (@sc{cvs})
-@cindex CVS
+@subheading Bleeding-Edge Developmental Releases (@sc{svn})
+@cindex SVN
 @cindex Bleeding-Edge Developmental Releases
 @cindex Developmental Releases, Bleeding-Edge
 
-@anchor{CVS}
+@anchor{SVN}
 Crystal Space is being actively developed.  You can download
-@emph{bleeding-edge} versions of the project from the @sc{cvs} repository
+@emph{bleeding-edge} versions of the project from the @sc{svn} repository
 where the absolute latest copy is stored.  There are two ways to access the
 developmental version of the project.
 
-First, you can access the @sc{cvs} repository directly via a @sc{cvs} tool.
+First, you can access the @sc{svn} repository directly via a @sc{svn} tool.
 Instructions for doing so may be found here:
 
-@uref{http://sourceforge.net/cvs/?group_id=649}
+@uref{http://sourceforge.net/svn/?group_id=649}
 
-Second, you can download a snapshot of the @sc{cvs} repository using @sc{http}.
+Second, you can download a snapshot of the @sc{svn} repository using @sc{http}.
 Snapshots are generated daily and are accompanied by standard @samp{diff}-style
 @dfn{patch} files.
 
 @uref{http://www.crystalspace3d.org/cvs-snapshots/}
 
-You can also view the contents of the @sc{cvs} repository online including
-all of the historical information and administrative information.
+You can also view the contents of the @sc{svn} repository online including
+all of the historical information.
 
-@uref{http://cvs.crystalspace3d.org/cgi-bin/viewcvs.cgi/crystal/CS/}
+@uref{http://svn.sourceforge.net/viewcvs.cgi/crystal/}
 
 @subheading Documentation
 @cindex Documentation, Obtaining
@@ -165,9 +165,9 @@ unsubscribing.
 @uref{http://lists.sourceforge.net/mailman/listinfo/crystal-announce/}
 
 People who are interested in being notified of changes which are made to
-Crystal Space's @sc{cvs} repository can subscribe to the @sc{cvs}
-notification list.  A notification message is sent to members of this list
-each time a change is made to the resources within the @sc{cvs} repository.
+Crystal Space's @sc{svn} repository can subscribe to the @samp{crystal-cvs}
+mailing list.  A notification message is sent to members of this list
+each time a change is made to the resources within the @sc{svn} repository.
 This is an excellent resource for keeping up-to-date with regards to changes
 to the project. Please consider subscribing.
 

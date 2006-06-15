@@ -272,18 +272,20 @@ bool SndSysBasicStream::UnregisterCallback(iSndSysStreamCallback *pCallback)
   return m_CallbackList.Delete(pCallback);
 }
 
-bool SndSysBasicStream::RegisterFrameNotification(size_t frame_number)
+bool SndSysBasicStream::RegisterFrameNotification(size_t /*frame_number*/)
 {
   /*
-     Frame notification must be sent in the main application thread, but is triggered
-     from the sound system's processing thread which is advancing the play cursor.
-     
-     If we sort the frames that notification is desired for into a circular list then
-     we can optimize the checks for notification to a single comparison against the 'next'
-     frame.
+     Frame notification must be sent in the main application thread, but is
+     triggered from the sound system's processing thread which is advancing
+     the play cursor.  
 
-     Adding notification must also pass through a threadsafe queue.  Maintenance of the 
-     circular list should be handled in the sound system processing thread.
+     If we sort the frames that notification is desired for into a circular
+     list then we can optimize the checks for notification to a single
+     comparison against the 'next' frame.
+
+     Adding notification must also pass through a threadsafe queue.
+     Maintenance of the circular list should be handled in the sound
+     system processing thread.
   */
   return false;
 }

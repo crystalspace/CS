@@ -43,7 +43,7 @@ Go into your @file{rpm/SPECS} directory.
 Extract the @file{CS/scripts/rpm/cs.spec} file, and put it in your
 @file{rpm/SPECS/} directory. You can also get the latest @file{cs.spec} file
 at
-@uref{http://cvs.sourceforge.net/viewcvs.py/*checkout*/crystal/CS/scripts/rpm/cs.spec}
+@uref{http://svn.sourceforge.net/viewcvs.cgi/*checkout*/crystal/CS/trunk/scripts/rpm/cs.spec}
 
 @example
 cd /home/user/rpm/SPECS

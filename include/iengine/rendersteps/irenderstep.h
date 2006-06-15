@@ -36,10 +36,10 @@ struct iSector;
 /// \todo Document me!
 struct iRenderStep : public virtual iBase
 {
-  SCF_INTERFACE (iRenderStep, 2, 0, 0);
+  SCF_INTERFACE (iRenderStep, 2, 1, 0);
 
   virtual void Perform (iRenderView* rview, iSector* sector,
-    csShaderVarStack &stacks) = 0;
+    iShaderVarStack* stacks) = 0;
 };
 
 /** @} */

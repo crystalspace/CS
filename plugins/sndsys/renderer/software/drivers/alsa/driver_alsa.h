@@ -110,7 +110,9 @@ public:
   void Run ();
 
 protected:
-  /// Fill the ALSA mmap buffer with data from the renderer up to Bytes bytes
+  /// \brief Fill the ALSA mmap buffer with data from the renderer up to Bytes bytes
+  /// 
+  /// \return <0: An error occurred.  >=0 : Number of frames placed in the buffer
   snd_pcm_sframes_t FillBuffer(snd_pcm_sframes_t AvailableFrames);
 
   /// Setup ALSA 'hwparams'
@@ -122,8 +124,27 @@ protected:
   /// Send a message to the sound system event recorder as the driver
   void RecordEvent(SndSysEventLevel Severity, const char* msg, ...);
 
-  /// Returns true if a buffer underrun condition has been detected
-  bool CheckUnderrun();
+  /// Returns true if a underbuffer condition has been detected
+  bool HasUnderbuffered();
+
+  /// Called if HasUnderbuffered() returns true to recover and possibly
+  ///   take corrective action.
+  bool HandleUnderbuffer();
+
+  /// Returns true if the number of underbuffer conditions has exceeded
+  ///  the configured allowed maximum before corrective action
+  bool NeedUnderbufferCorrection();
+
+  /// Take corrective action based on repeated underbuffer events.
+  ///
+  /// \return false: An uncorrectable error occurred
+  ///         true: The situation has been handled (possibly without
+  ///               any action taken)
+  bool CorrectUnderbuffer();
+
+  /// Called to provide special-case handling for ALSA returned
+  ///  error codes.
+  bool HandleALSAError(int ErrorNumber);
 
   ////
   // Member Variables
@@ -172,6 +193,10 @@ protected:
 
   /// Number of bytes in a frame of audio
   size_t m_BytesPerFrame;
+
+  /// The number of underbuffer conditions that have occured since
+  ///  the last corrective action.
+  int m_UnderBufferCount;
 
   /// The number of underbuffer conditions that must occur before
   //   we take major corrective action

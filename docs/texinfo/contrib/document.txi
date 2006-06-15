@@ -24,7 +24,7 @@ information at @uref{http://www.texinfo.org/}.
 
 The documentation is converted from Texinfo to other formats, such as
 @sc{html}. Conversion to most important formats happens automatically within
-the @sc{cvs} repository by an automated mechanism, so you only have to commit
+the @sc{svn} repository by an automated mechanism, so you only have to commit
 the Texinfo docs if you make any changes.
 
 To make writing the documentation easier, @samp{@@node} and @samp{@@menu}
@@ -38,7 +38,7 @@ can safely write the following line, omitting the various links which the
 @@section My Section Title
 @end example
 
-The repair occurs automatically within the @sc{cvs} repository by an automated
+The repair occurs automatically within the @sc{svn} repository by an automated
 mechanism, however you can also repair the files manually if you use the
 @sc{gnu} makefile system by invoking the following command:
 
@@ -128,7 +128,7 @@ Here are some general formatting conventions.
 @item
 When creating @code{@@itemize} lists, one blank line should separate each
 @code{@@item} except for short lists of items with short descriptions.  Also
-remember to use the @code{@@bullet} directive after the @code{@@itemze}
+remember to use the @code{@@bullet} directive after the @code{@@itemize}
 directive, as in @code{@@itemize @@bullet}.
 
 @item

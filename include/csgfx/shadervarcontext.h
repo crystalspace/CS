@@ -51,7 +51,7 @@ public:
   { return variables; }
   virtual void AddVariable (csShaderVariable *variable);
   virtual csShaderVariable* GetVariable (csStringID name) const;
-  virtual void PushVariables (csShaderVarStack &stacks) const;
+  virtual void PushVariables (iShaderVarStack* stacks) const;
   virtual bool IsEmpty() const { return variables.Length() == 0; }  
   virtual void ReplaceVariable (csShaderVariable *variable);
   virtual void Clear () { variables.Empty(); }

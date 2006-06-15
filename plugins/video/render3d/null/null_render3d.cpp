@@ -370,7 +370,7 @@ void csNullGraphics3D::SetTextureState (int*, iTextureHandle**, int)
 
 void csNullGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
     const csRenderMeshModes& /*modes*/,
-    const csArray<csShaderVariable*>& /*stacks*/)
+    const iShaderVarStack* /*stacks*/)
 {
   if (bugplug)
   {

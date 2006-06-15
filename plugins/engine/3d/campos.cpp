@@ -39,7 +39,7 @@ csCameraPosition::csCameraPosition (csCameraPositionList* positions,
 }
 
 csCameraPosition::csCameraPosition (const csCameraPosition& other)
-  : scfImplementationType (this),
+  : iBase(), scfImplementationType (this),
   sector (csStrNew (other.sector)), position (other.position),
   forward (other.forward), upward (other.upward), far_plane (0), 
   positions (other.positions)

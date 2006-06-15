@@ -22,9 +22,9 @@ Try to give as much information as possible about the bug, including:
 
 @itemize @bullet
 @item
-Crystal Space version number. If it is a @sc{cvs} snapshot then include
-the time that you downloaded it. If you are using @sc{cvs} directly then
-state when it was that you last did an update.
+Crystal Space version number. If it is a @sc{svn} snapshot then include
+the time that you downloaded it. If you are using @sc{svn} directly then
+state the revision of your working copy.
 @item
 Operating System (Windows (@emph{95, 98/@sc{se}/@sc{me}, @sc{nt}4, 2000,
 @sc{xp}}), MacOS/X, Unix --- @sc{gnu}/Linux, Free@sc{bsd}, etc.  --- @dots{}).
@@ -40,7 +40,12 @@ Video settings (color depth, resolution, Crystal Space video driver, @dots{}).
 @item
 Description of the problem.
 @item
-Exact error message (or output of Crystal Space). If possible it would be nice to get the output of the Crystal Space application with @samp{-verbose} commandline option. If you are using a gcc based compiler and you compiled in optimize mode then you'll also need to add the @samp{-console} option. If you compiled with @sc{msvc} and you build in release mode then you'll need the @samp{-noconsole} option.
+Exact error message (or output of Crystal Space). If possible it would be 
+nice to get the output of the Crystal Space application with the
+@samp{-verbose=-scf} option specified on the command line. On Windows, if you 
+are using a gcc based compiler and you compiled in optimize mode then you'll 
+also need to add the @samp{-console} option. If you compiled with @sc{msvc} 
+and you build in release mode then you'll need the @samp{-noconsole} option.
 @item
 How to reproduce the crash (if it is reproducible).
 @item

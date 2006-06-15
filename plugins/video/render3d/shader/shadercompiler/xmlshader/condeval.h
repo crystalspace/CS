@@ -389,6 +389,7 @@ protected:
   public:
     static void* Alloc (size_t n)
     {
+      (void)n; // Pacify compiler warnings
       CS_ASSERT(n == ValuesArrayWrapper::allocSize);
       return Allocator().AllocUninit ();
     }
@@ -517,12 +518,12 @@ class csConditionEvaluator
     typedef int IntType;
     csConditionEvaluator& evaluator;
     const csRenderMeshModes& modes;
-    const csShaderVarStack& stacks;
+    const iArrayReadOnly<csShaderVariable*>* stacks;
 
     EvalResult GetDefaultResult() const { return false; }
 
     EvaluatorShadervar (csConditionEvaluator& evaluator,
-      const csRenderMeshModes& modes, const csShaderVarStack& stacks) : 
+      const csRenderMeshModes& modes, const iShaderVarStack* stacks) : 
         evaluator (evaluator), modes (modes), stacks (stacks)
     { }
     BoolType Boolean (const CondOperand& operand);
@@ -547,7 +548,7 @@ public:
 
   /// Evaluate a condition and return the result.
   bool Evaluate (csConditionID condition, const csRenderMeshModes& modes,
-    const csShaderVarStack& stacks);
+    const iShaderVarStack* stacks);
   /**
    * Reset the evaluation cache. Prevents same conditions from being evaled 
    * twice.

@@ -361,7 +361,7 @@ bool csSnowSaver::WriteDown (iBase* obj, iDocumentNode* parent,
     mesh->GetColor(col);
     csRef<iDocumentNode> colorNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
     colorNode->SetValue("color");
-    synldr->WriteColor(colorNode, &col);
+    synldr->WriteColor(colorNode, col);
 
     //Writedown DropSize tag
     float dw, dh;
@@ -377,13 +377,13 @@ bool csSnowSaver::WriteDown (iBase* obj, iDocumentNode* parent,
     csBox3 box(minBox, maxBox);
     csRef<iDocumentNode> boxNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
     boxNode->SetValue("box");
-    synldr->WriteBox(boxNode, &box);
+    synldr->WriteBox(boxNode, box);
 
     //Writedown FallSpeed tag
     csVector3 fallspeed = snowstate->GetFallSpeed();
     csRef<iDocumentNode> fallspeedNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
     fallspeedNode->SetValue("fallspeed");
-    synldr->WriteVector(fallspeedNode, &fallspeed);
+    synldr->WriteVector(fallspeedNode, fallspeed);
 
     //Writedown Swirl tag
     float swirl = snowstate->GetSwirl();

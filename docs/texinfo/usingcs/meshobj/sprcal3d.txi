@@ -20,7 +20,7 @@ This is an example of how to load and view a Cal3d file with the
 @file{viewmesh} program.
 
 We are going to load the @file{cally} model. The data files of this model are
-part of the standard Cal3d @sc{cvs} repository, and can be found within the
+part of the standard Cal3d @sc{svn} repository, and can be found within the
 Cal3D project at @file{cal3d/data/cally}. For this example, you should copy the
 files from this directory to @file{CS/cally}.
 

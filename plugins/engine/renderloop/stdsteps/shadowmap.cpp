@@ -96,8 +96,8 @@ bool csShadowmapRSLoader::Initialize (iObjectRegistry* object_reg)
 
 csPtr<iBase> csShadowmapRSLoader::Parse (iDocumentNode* node, 
 				       iStreamSource*,
-				       iLoaderContext* ldr_context,      
-				       iBase* context)
+				       iLoaderContext*,      
+				       iBase*)
 {
   csShadowmapRenderStep* newstep = 
     new csShadowmapRenderStep (object_reg);
@@ -257,7 +257,7 @@ csShadowmapRenderStep::~csShadowmapRenderStep ()
 }
 
 void csShadowmapRenderStep::Perform (iRenderView* rview, iSector* sector,
-  csShaderVarStack &stacks)
+  iShaderVarStack* stacks)
 {
   csOrthoTransform old_transform = rview->GetCamera()->GetTransform();;
   context = engine->GetContext();
@@ -383,7 +383,7 @@ void csShadowmapRenderStep::Perform (iRenderView* rview, iSector* sector,
 	for (size_t p = 0; p < shader->GetNumberOfPasses (ticket); p ++) 
 	{
 	  shader->ActivatePass (ticket, p);
-	  stacks.Empty ();
+	  stacks->Empty ();
 	  mesh_wrappers[i]->GetSVContext ()->PushVariables (stacks);
 	  rmesh->variablecontext->PushVariables (stacks);
 	  shaderMgr->PushVariables (stacks);
@@ -421,8 +421,8 @@ csShadowmapRenderStep::R2TVisCallback::~R2TVisCallback ()
 }
 
 void csShadowmapRenderStep::R2TVisCallback::ObjectVisible (
-  iVisibilityObject *visobject, iMeshWrapper *mesh, uint32 /*frustum_mask*/)
+  iVisibilityObject * /*visobject*/, iMeshWrapper *mesh,
+  uint32 /*frustum_mask*/)
 {
-  //printf("adding %s\n", mesh->QueryObject()->GetName());
   parent->lightMeshes.Push (mesh);
 }

@@ -46,7 +46,7 @@ struct iSndSysStream;
 struct iSndSysSource : public virtual iBase
 {
   /// SCF2006 - See http://www.crystalspace3d.org/cseps/csep-0010.html
-  SCF_INTERFACE(iSndSysSource,0,2,0);
+  SCF_INTERFACE(iSndSysSource,2,0,0);
 
   /// Set volume (range 0.0 = silence 1.0 = as provided 2.0 = twice as loud)
   virtual void SetVolume (float volume) = 0;
@@ -79,10 +79,10 @@ struct iSndSysSource : public virtual iBase
 /** 
  * \todo Document me!
  */
-struct iSndSysSourceSoftware : public virtual iSndSysSource
+struct iSndSysSourceSoftware : public iSndSysSource
 {
   /// SCF2006 - See http://www.crystalspace3d.org/cseps/csep-0010.html
-  SCF_INTERFACE(iSndSysSourceSoftware,0,1,0);
+  SCF_INTERFACE(iSndSysSourceSoftware,2,0,0);
 
   /**
    * Renderer convenience interface - requests the source to fill the
@@ -105,10 +105,10 @@ struct iSndSysSourceSoftware : public virtual iSndSysSource
 /**
  * \todo Document me!
  */
-struct iSndSysSourceSoftware3D : public virtual iSndSysSourceSoftware
+struct iSndSysSourceSoftware3D : public iSndSysSourceSoftware
 {
   /// SCF2006 - See http://www.crystalspace3d.org/cseps/csep-0010.html
-  SCF_INTERFACE(iSndSysSourceSoftware3D,0,1,0);
+  SCF_INTERFACE(iSndSysSourceSoftware3D,2,0,0);
 
   /// set position of this source
   virtual void SetPosition(csVector3 pos) = 0;

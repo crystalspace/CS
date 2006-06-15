@@ -606,6 +606,7 @@ class csVector3(_object):
     def Unit(*args): return _cspace.csVector3_Unit(*args)
     def Normalize(*args): return _cspace.csVector3_Normalize(*args)
     def IsZero(*args): return _cspace.csVector3_IsZero(*args)
+    def UnitAxisClamped(*args): return _cspace.csVector3_UnitAxisClamped(*args)
     def __add__(*args): return _cspace.csVector3___add__(*args)
     def __sub__(*args): return _cspace.csVector3___sub__(*args)
     def __mul__(*args): return _cspace.csVector3___mul__(*args)
@@ -1901,35 +1902,34 @@ class csQuaternion(_object):
     __getattr__ = lambda self, name: _swig_getattr(self, csQuaternion, name)
     def __repr__(self):
         return "<%s.%s; proxy of C++ csQuaternion instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
-    def Init(*args): return _cspace.csQuaternion_Init(*args)
     def __init__(self, *args):
         _swig_setattr(self, csQuaternion, 'this', _cspace.new_csQuaternion(*args))
         _swig_setattr(self, csQuaternion, 'thisown', 1)
+    def SetIdentity(*args): return _cspace.csQuaternion_SetIdentity(*args)
+    def __iadd__(*args): return _cspace.csQuaternion___iadd__(*args)
+    def __isub__(*args): return _cspace.csQuaternion___isub__(*args)
     def __imul__(*args): return _cspace.csQuaternion___imul__(*args)
+    def GetConjugate(*args): return _cspace.csQuaternion_GetConjugate(*args)
     def Conjugate(*args): return _cspace.csQuaternion_Conjugate(*args)
-    def Negate(*args): return _cspace.csQuaternion_Negate(*args)
-    def Invert(*args): return _cspace.csQuaternion_Invert(*args)
-    def GetAxisAngle(*args): return _cspace.csQuaternion_GetAxisAngle(*args)
-    def SetWithAxisAngle(*args): return _cspace.csQuaternion_SetWithAxisAngle(*args)
-    def PrepRotation(*args): return _cspace.csQuaternion_PrepRotation(*args)
+    def Dot(*args): return _cspace.csQuaternion_Dot(*args)
+    def SquaredNorm(*args): return _cspace.csQuaternion_SquaredNorm(*args)
+    def Norm(*args): return _cspace.csQuaternion_Norm(*args)
+    def Unit(*args): return _cspace.csQuaternion_Unit(*args)
     def Rotate(*args): return _cspace.csQuaternion_Rotate(*args)
-    def Normalize(*args): return _cspace.csQuaternion_Normalize(*args)
-    def SetWithEuler(*args): return _cspace.csQuaternion_SetWithEuler(*args)
+    def SetAxisAngle(*args): return _cspace.csQuaternion_SetAxisAngle(*args)
+    def GetAxisAngle(*args): return _cspace.csQuaternion_GetAxisAngle(*args)
+    def SetEulerAngles(*args): return _cspace.csQuaternion_SetEulerAngles(*args)
     def GetEulerAngles(*args): return _cspace.csQuaternion_GetEulerAngles(*args)
-    def ToAxisAngle(*args): return _cspace.csQuaternion_ToAxisAngle(*args)
-    def Slerp(*args): return _cspace.csQuaternion_Slerp(*args)
-    __swig_setmethods__["r"] = _cspace.csQuaternion_r_set
-    __swig_getmethods__["r"] = _cspace.csQuaternion_r_get
-    if _newclass:r = property(_cspace.csQuaternion_r_get, _cspace.csQuaternion_r_set)
-    __swig_setmethods__["x"] = _cspace.csQuaternion_x_set
-    __swig_getmethods__["x"] = _cspace.csQuaternion_x_get
-    if _newclass:x = property(_cspace.csQuaternion_x_get, _cspace.csQuaternion_x_set)
-    __swig_setmethods__["y"] = _cspace.csQuaternion_y_set
-    __swig_getmethods__["y"] = _cspace.csQuaternion_y_get
-    if _newclass:y = property(_cspace.csQuaternion_y_get, _cspace.csQuaternion_y_set)
-    __swig_setmethods__["z"] = _cspace.csQuaternion_z_set
-    __swig_getmethods__["z"] = _cspace.csQuaternion_z_get
-    if _newclass:z = property(_cspace.csQuaternion_z_get, _cspace.csQuaternion_z_set)
+    def SetMatrix(*args): return _cspace.csQuaternion_SetMatrix(*args)
+    def GetMatrix(*args): return _cspace.csQuaternion_GetMatrix(*args)
+    def NLerp(*args): return _cspace.csQuaternion_NLerp(*args)
+    def SLerp(*args): return _cspace.csQuaternion_SLerp(*args)
+    __swig_setmethods__["v"] = _cspace.csQuaternion_v_set
+    __swig_getmethods__["v"] = _cspace.csQuaternion_v_get
+    if _newclass:v = property(_cspace.csQuaternion_v_get, _cspace.csQuaternion_v_set)
+    __swig_setmethods__["w"] = _cspace.csQuaternion_w_set
+    __swig_getmethods__["w"] = _cspace.csQuaternion_w_get
+    if _newclass:w = property(_cspace.csQuaternion_w_get, _cspace.csQuaternion_w_set)
     def __add__(*args): return _cspace.csQuaternion___add__(*args)
     def __sub__(*args): return _cspace.csQuaternion___sub__(*args)
     def __mul__(*args): return _cspace.csQuaternion___mul__(*args)
@@ -2345,6 +2345,8 @@ class csRGBcolor(_object):
     def __eq__(*args): return _cspace.csRGBcolor___eq__(*args)
     def __ne__(*args): return _cspace.csRGBcolor___ne__(*args)
     def __add__(*args): return _cspace.csRGBcolor___add__(*args)
+    def UnsafeAdd(*args): return _cspace.csRGBcolor_UnsafeAdd(*args)
+    def SafeAdd(*args): return _cspace.csRGBcolor_SafeAdd(*args)
     def __del__(self, destroy=_cspace.delete_csRGBcolor):
         try:
             if self.thisown: destroy(self)
@@ -2442,6 +2444,7 @@ class csShaderVariable(csRefCount):
     __getattr__ = lambda self, name: _swig_getattr(self, csShaderVariable, name)
     def __repr__(self):
         return "<%s.%s; proxy of C++ csShaderVariable instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
+    UNKNOWN = _cspace.csShaderVariable_UNKNOWN
     INT = _cspace.csShaderVariable_INT
     FLOAT = _cspace.csShaderVariable_FLOAT
     COLOR = _cspace.csShaderVariable_COLOR
@@ -4279,6 +4282,41 @@ class iLightVisibleCallbackPtr(iLightVisibleCallback):
         _swig_setattr(self, iLightVisibleCallback,self.__class__,iLightVisibleCallback)
 _cspace.iLightVisibleCallback_swigregister(iLightVisibleCallbackPtr)
 
+class csSectorHitBeamResult(_object):
+    __swig_setmethods__ = {}
+    __setattr__ = lambda self, name, value: _swig_setattr(self, csSectorHitBeamResult, name, value)
+    __swig_getmethods__ = {}
+    __getattr__ = lambda self, name: _swig_getattr(self, csSectorHitBeamResult, name)
+    def __repr__(self):
+        return "<%s.%s; proxy of C++ csSectorHitBeamResult instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
+    __swig_setmethods__["mesh"] = _cspace.csSectorHitBeamResult_mesh_set
+    __swig_getmethods__["mesh"] = _cspace.csSectorHitBeamResult_mesh_get
+    if _newclass:mesh = property(_cspace.csSectorHitBeamResult_mesh_get, _cspace.csSectorHitBeamResult_mesh_set)
+    __swig_setmethods__["isect"] = _cspace.csSectorHitBeamResult_isect_set
+    __swig_getmethods__["isect"] = _cspace.csSectorHitBeamResult_isect_get
+    if _newclass:isect = property(_cspace.csSectorHitBeamResult_isect_get, _cspace.csSectorHitBeamResult_isect_set)
+    __swig_setmethods__["polygon_idx"] = _cspace.csSectorHitBeamResult_polygon_idx_set
+    __swig_getmethods__["polygon_idx"] = _cspace.csSectorHitBeamResult_polygon_idx_get
+    if _newclass:polygon_idx = property(_cspace.csSectorHitBeamResult_polygon_idx_get, _cspace.csSectorHitBeamResult_polygon_idx_set)
+    __swig_setmethods__["final_sector"] = _cspace.csSectorHitBeamResult_final_sector_set
+    __swig_getmethods__["final_sector"] = _cspace.csSectorHitBeamResult_final_sector_get
+    if _newclass:final_sector = property(_cspace.csSectorHitBeamResult_final_sector_get, _cspace.csSectorHitBeamResult_final_sector_set)
+    def __init__(self, *args):
+        _swig_setattr(self, csSectorHitBeamResult, 'this', _cspace.new_csSectorHitBeamResult(*args))
+        _swig_setattr(self, csSectorHitBeamResult, 'thisown', 1)
+    def __del__(self, destroy=_cspace.delete_csSectorHitBeamResult):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+
+
+class csSectorHitBeamResultPtr(csSectorHitBeamResult):
+    def __init__(self, this):
+        _swig_setattr(self, csSectorHitBeamResult, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, csSectorHitBeamResult, 'thisown', 0)
+        _swig_setattr(self, csSectorHitBeamResult,self.__class__,csSectorHitBeamResult)
+_cspace.csSectorHitBeamResult_swigregister(csSectorHitBeamResultPtr)
+
 class iSector(iBase):
     __swig_setmethods__ = {}
     for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
@@ -5127,6 +5165,7 @@ class iMeshWrapper(iBase):
     def GetWorldBoundingBox(*args): return _cspace.iMeshWrapper_GetWorldBoundingBox(*args)
     def GetTransformedBoundingBox(*args): return _cspace.iMeshWrapper_GetTransformedBoundingBox(*args)
     def GetScreenBoundingBox(*args): return _cspace.iMeshWrapper_GetScreenBoundingBox(*args)
+    def GetRadius(*args): return _cspace.iMeshWrapper_GetRadius(*args)
     def ResetMinMaxRenderDistance(*args): return _cspace.iMeshWrapper_ResetMinMaxRenderDistance(*args)
     def SetMinimumRenderDistance(*args): return _cspace.iMeshWrapper_SetMinimumRenderDistance(*args)
     def GetMinimumRenderDistance(*args): return _cspace.iMeshWrapper_GetMinimumRenderDistance(*args)
@@ -5930,6 +5969,7 @@ class csSprite2DVertex(_object):
     __swig_setmethods__["v"] = _cspace.csSprite2DVertex_v_set
     __swig_getmethods__["v"] = _cspace.csSprite2DVertex_v_get
     if _newclass:v = property(_cspace.csSprite2DVertex_v_get, _cspace.csSprite2DVertex_v_set)
+    def __eq__(*args): return _cspace.csSprite2DVertex___eq__(*args)
     def __init__(self, *args):
         _swig_setattr(self, csSprite2DVertex, 'this', _cspace.new_csSprite2DVertex(*args))
         _swig_setattr(self, csSprite2DVertex, 'thisown', 1)
@@ -5945,6 +5985,27 @@ class csSprite2DVertexPtr(csSprite2DVertex):
         if not hasattr(self,"thisown"): _swig_setattr(self, csSprite2DVertex, 'thisown', 0)
         _swig_setattr(self, csSprite2DVertex,self.__class__,csSprite2DVertex)
 _cspace.csSprite2DVertex_swigregister(csSprite2DVertexPtr)
+
+class iColoredVertices(_object):
+    __swig_setmethods__ = {}
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iColoredVertices, name, value)
+    __swig_getmethods__ = {}
+    __getattr__ = lambda self, name: _swig_getattr(self, iColoredVertices, name)
+    def __init__(self): raise RuntimeError, "No constructor defined"
+    def __repr__(self):
+        return "<%s.%s; proxy of C++ iColoredVertices instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
+    def __del__(self, destroy=_cspace.delete_iColoredVertices):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+
+
+class iColoredVerticesPtr(iColoredVertices):
+    def __init__(self, this):
+        _swig_setattr(self, iColoredVertices, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, iColoredVertices, 'thisown', 0)
+        _swig_setattr(self, iColoredVertices,self.__class__,iColoredVertices)
+_cspace.iColoredVertices_swigregister(iColoredVerticesPtr)
 
 class iSprite2DUVAnimationFrame(iBase):
     __swig_setmethods__ = {}
@@ -6848,6 +6909,8 @@ class iTerrainObjectState(iBase):
         return "<%s.%s; proxy of C++ iTerrainObjectState instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
     def SetMaterialPalette(*args): return _cspace.iTerrainObjectState_SetMaterialPalette(*args)
     def GetMaterialPalette(*args): return _cspace.iTerrainObjectState_GetMaterialPalette(*args)
+    def SetMaterialMap(*args): return _cspace.iTerrainObjectState_SetMaterialMap(*args)
+    def SetMaterialAlphaMaps(*args): return _cspace.iTerrainObjectState_SetMaterialAlphaMaps(*args)
     def SetLODValue(*args): return _cspace.iTerrainObjectState_SetLODValue(*args)
     def GetLODValue(*args): return _cspace.iTerrainObjectState_GetLODValue(*args)
     def SaveState(*args): return _cspace.iTerrainObjectState_SaveState(*args)
@@ -10715,8 +10778,27 @@ _cspace.iHalo_swigregister(iHaloPtr)
 
 iHalo_scfGetVersion = _cspace.iHalo_scfGetVersion
 
+class iShaderVarStack(_object):
+    __swig_setmethods__ = {}
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iShaderVarStack, name, value)
+    __swig_getmethods__ = {}
+    __getattr__ = lambda self, name: _swig_getattr(self, iShaderVarStack, name)
+    def __init__(self): raise RuntimeError, "No constructor defined"
+    def __repr__(self):
+        return "<%s.%s; proxy of C++ iShaderVarStack instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
+    def __del__(self, destroy=_cspace.delete_iShaderVarStack):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
 
-csGetShaderVariableFromStack = _cspace.csGetShaderVariableFromStack
+
+class iShaderVarStackPtr(iShaderVarStack):
+    def __init__(self, this):
+        _swig_setattr(self, iShaderVarStack, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, iShaderVarStack, 'thisown', 0)
+        _swig_setattr(self, iShaderVarStack,self.__class__,iShaderVarStack)
+_cspace.iShaderVarStack_swigregister(iShaderVarStackPtr)
+
 class iShaderVariableContext(iBase):
     __swig_setmethods__ = {}
     for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
@@ -10749,6 +10831,8 @@ class iShaderVariableContextPtr(iShaderVariableContext):
         if not hasattr(self,"thisown"): _swig_setattr(self, iShaderVariableContext, 'thisown', 0)
         _swig_setattr(self, iShaderVariableContext,self.__class__,iShaderVariableContext)
 _cspace.iShaderVariableContext_swigregister(iShaderVariableContextPtr)
+
+csGetShaderVariableFromStack = _cspace.csGetShaderVariableFromStack
 
 iShaderVariableContext_scfGetVersion = _cspace.iShaderVariableContext_scfGetVersion
 
@@ -11130,6 +11214,9 @@ class iImage(iBase):
     def GetPalette(*args): return _cspace.iImage_GetPalette(*args)
     def GetAlpha(*args): return _cspace.iImage_GetAlpha(*args)
     def HasKeyColor(*args): return _cspace.iImage_HasKeyColor(*args)
+    def HasKeycolor(*args): return _cspace.iImage_HasKeycolor(*args)
+    def GetKeyColor(*args): return _cspace.iImage_GetKeyColor(*args)
+    def GetKeycolor(*args): return _cspace.iImage_GetKeycolor(*args)
     def HasMipmaps(*args): return _cspace.iImage_HasMipmaps(*args)
     def GetMipmap(*args): return _cspace.iImage_GetMipmap(*args)
     def GetRawFormat(*args): return _cspace.iImage_GetRawFormat(*args)

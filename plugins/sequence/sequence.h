@@ -24,6 +24,7 @@
 #include "csutil/weakref.h"
 #include "csutil/refarr.h"
 #include "csutil/blockallocator.h"
+#include "csutil/eventnames.h"
 #include "ivaria/sequence.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"

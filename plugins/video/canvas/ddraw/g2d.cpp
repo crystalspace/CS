@@ -185,7 +185,7 @@ bool csGraphics2DDDraw3::Open ()
   HDC DC = GetDC (0);
   int desktopDepth = GetDeviceCaps (DC, BITSPIXEL);
   ReleaseDC (0, DC);
-  if (InitSurfaces () != DD_OK)
+  if (FAILED (InitSurfaces ()))
     return false;
 
   // Determine if switching from FS to windowed is allowed
@@ -405,7 +405,7 @@ bool csGraphics2DDDraw3::BeginDraw ()
   while (ret == DDERR_WASSTILLDRAWING)
     ret = m_lpddsBack->Lock (0, &ddsd, DDLOCK_SURFACEMEMORYPTR, 0);
 
-  if (ret != DD_OK)
+  if (FAILED (ret))
   {
     FinishDraw ();
     return false;
@@ -420,8 +420,7 @@ bool csGraphics2DDDraw3::BeginDraw ()
 void csGraphics2DDDraw3::FinishDraw ()
 {
   csGraphics2D::FinishDraw ();
-  if (FrameBufferLocked)
-    return;
+  if (FrameBufferLocked) return;
 
   if (m_bLocked)
   {
@@ -673,13 +672,13 @@ HRESULT csGraphics2DDDraw3::InitSurfaces ()
     ddsd.dwBackBufferCount = 1;
 
     hRet = m_lpDD->CreateSurface (&ddsd, &m_lpddsPrimary, 0);
-    if (hRet != DD_OK)
-      return InitFail (hRet, "Cannot create primary surface for DirectDraw FAILED");
+    if (FAILED (hRet))
+      return InitFail (hRet, "Cannot create primary surface for DirectDraw");
 
     ZeroMemory (&ddscaps, sizeof (ddscaps));
     ddscaps.dwCaps = DDSCAPS_BACKBUFFER;
     hRet = m_lpddsPrimary->GetAttachedSurface (&ddscaps, &m_lpddsBack);
-    if (hRet != DD_OK)
+    if (FAILED (hRet))
       return InitFail (hRet, "GetAttachedSurface FAILED");
   }
 
@@ -756,6 +755,14 @@ HRESULT csGraphics2DDDraw3::ChangeCoopLevel ()
     FinishDraw ();
   }
 
+  // Unlock the surface before switching the coop level
+  bool wasLocked = m_bLocked;
+  if (m_bLocked)
+  {
+    m_lpddsBack->Unlock (0);
+    m_bLocked = false;
+  }
+
   // Release all objects that need to be re-created for the new device
   if (FAILED (hRet = ReleaseAllObjects ()))
     return InitFail (hRet, "ReleaseAllObjects FAILED");
@@ -772,8 +779,24 @@ HRESULT csGraphics2DDDraw3::ChangeCoopLevel ()
   // Re-create the surfaces
   hRet = InitSurfaces ();
 
+  // Restore locked state
+  if (wasLocked)
+  {
+    DDSURFACEDESC ddsd;
+    ddsd.dwSize = sizeof (ddsd);
+    ddsd.lpSurface = 0;
+    HRESULT ret = DDERR_WASSTILLDRAWING;
+    while (ret == DDERR_WASSTILLDRAWING)
+      ret = m_lpddsBack->Lock (0, &ddsd, DDLOCK_SURFACEMEMORYPTR, 0);
+
+    if (FAILED (ret)) return ret;
+
+    Memory = (unsigned char *)ddsd.lpSurface;
+    m_bLocked = true;
+  }
+
   // Now restore the contents of backbuffer
-  if (oldBuffer)
+  if (SUCCEEDED (hRet) && oldBuffer)
   {
     int times;
     for (times = (m_bDoubleBuffer && FullScreen) ? 2 : 1; times; times--)
@@ -785,8 +808,8 @@ HRESULT csGraphics2DDDraw3::ChangeCoopLevel ()
 	FinishDraw ();
 	Print (0);
       }
-    delete [] oldBuffer;
   }
+  delete [] oldBuffer;
 
   return hRet;
 }

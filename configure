@@ -877,6 +877,14 @@ Optional Features:
                           processor will not work with earlier processors (for
                           example, Intel 686-specific code will not work with
                           a 586)
+  --enable-separate-debug-info
+                          split debug information into separate files.
+                          (default YES if binutils >= 2.16 detected and not on
+                          Cygwin, otherwise default NO)
+  --enable-optimize-mode-debug-info
+                          whether to enable debug information even in optimize
+                          builds. (default YES if separate debug information
+                          is enabled, otherwise default NO)
   --enable-meta-info-embedding
                           store plugin meta-information directly inside plugin
                           modules if supported by platform; if disabled,
@@ -919,14 +927,6 @@ Optional Packages:
   --with-perl             use Perl5 scripting interface (default NO)
   --without-python        do not use Python scripting interface
   --with-java             use Java scripting interface (default YES)
-  --with-separate-debug-info
-                          split debug information into separate files.
-                          (default YES if binutils >= 2.16 detected, otherwise
-                          default NO)
-  --with-optimize-debug-info
-                          whether to enable debug information even in optimize
-                          builds. (default YES if separate debug information
-                          is enabled, otherwise default NO)
   --with-x                use the X Window System
   --with-Xxf86vm=dir      specify location of libXxf86vm if not detected
                           automatically; searches dir/include, dir/lib, and
@@ -3397,6 +3397,7 @@ fi
 
 
 
+
     if test -n "$CXX"; then
   cs_build_prop_val="\$(CMD.C++)"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
@@ -3448,7 +3449,7 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
     cs_build_ok=no
 
 
-    for cs_build_item in `echo @-shared@@ | sed 'y% %#%'`
+    for cs_build_item in `echo @-shared $cs_cv_prog_cxx_pic@@ | sed 'y% %#%'`
     do
 
     set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
@@ -10204,7 +10205,20 @@ _ACEOF
 cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
-#include <jni.h>
+
+	    #if defined(__GNUC__)
+	        typedef long long __int64; /*For gcc on Windows */
+	    #endif
+
+	    /* fix for 'jlong' on x86_64 */
+	    #if defined(__x86_64)
+	    #ifdef _LP64 /* 64-bit Solaris */
+	    #undef _LP64
+	    #endif
+	    #endif
+
+	    #include <jni.h>
+
 	    JNIEXPORT void JNICALL f(JNIEnv *env, jobject obj);
 int
 main ()
@@ -10357,7 +10371,20 @@ _ACEOF
 cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
-#include <jni.h>
+
+	    #if defined(__GNUC__)
+	        typedef long long __int64; /*For gcc on Windows */
+	    #endif
+
+	    /* fix for 'jlong' on x86_64 */
+	    #if defined(__x86_64)
+	    #ifdef _LP64 /* 64-bit Solaris */
+	    #undef _LP64
+	    #endif
+	    #endif
+
+	    #include <jni.h>
+
 	    JNIEXPORT void JNICALL f(JNIEnv *env, jobject obj);
 int
 main ()
@@ -14496,16 +14523,16 @@ fi
 #------------------------------------------------------------------------------
 echo "$as_me:$LINENO: checking for symbol visibility flag" >&5
 echo $ECHO_N "checking for symbol visibility flag... $ECHO_C" >&6
-if test "${cs_cv_prog_cxx_visibility_hidden_ok+set}" = set; then
+if test "${cs_cv_prog_cc_visibility_hidden_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
-  ac_ext=cc
-ac_cpp='$CXXCPP $CPPFLAGS'
-ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+  ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
-    cs_cflags_save="$CXXFLAGS"
+    cs_cflags_save="$CFLAGS"
     cs_lflags_save="$LDFLAGS"
     cs_libs_save="$LIBS"
     cs_build_ok=no
@@ -14567,7 +14594,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CFLAGS="$cs_cflags_test  $cs_cflags_save"
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat >conftest.$ac_ext <<_ACEOF
@@ -14594,7 +14621,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
   cat conftest.err >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_cxx_werror_flag"
+	 { ac_try='test -z "$ac_c_werror_flag"
 			 || test ! -s conftest.err'
   { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
   (eval $ac_try) 2>&5
@@ -14622,7 +14649,7 @@ fi
     done
 
 
-    CXXFLAGS=$cs_cflags_save
+    CFLAGS=$cs_cflags_save
     LDFLAGS=$cs_lflags_save
     LIBS=$cs_libs_save
     ac_ext=c
@@ -14636,16 +14663,26 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
   cs_build_cflags=`echo x$cs_cflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_cv_prog_cxx_visibility_hidden=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	    cs_cv_prog_cxx_visibility_hidden_ok="$cs_cv_prog_cxx_visibility_hidden"
+	cs_cv_prog_cc_visibility_hidden=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	    cs_cv_prog_cc_visibility_hidden_ok="$cs_cv_prog_cc_visibility_hidden"
 else
-  cs_cv_prog_cxx_visibility_hidden=''
-	    cs_cv_prog_cxx_visibility_hidden_ok=no
+  cs_cv_prog_cc_visibility_hidden=''
+	    cs_cv_prog_cc_visibility_hidden_ok=no
 fi
 
 fi
-echo "$as_me:$LINENO: result: $cs_cv_prog_cxx_visibility_hidden_ok" >&5
-echo "${ECHO_T}$cs_cv_prog_cxx_visibility_hidden_ok" >&6
+echo "$as_me:$LINENO: result: $cs_cv_prog_cc_visibility_hidden_ok" >&5
+echo "${ECHO_T}$cs_cv_prog_cc_visibility_hidden_ok" >&6
+
+if test -n "$cs_cv_prog_cc_visibility_hidden"; then
+  cs_build_prop_val="$cs_cv_prog_cc_visibility_hidden"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.CFLAGS += \"$cs_build_prop_val\" ;
+"
+fi
+
+fi
 
 
 echo "$as_me:$LINENO: checking how to declare default visibility" >&5
@@ -14803,17 +14840,8 @@ fi
 echo "$as_me:$LINENO: result: $cs_cv_prog_cxx_declare_visible_def" >&5
 echo "${ECHO_T}$cs_cv_prog_cxx_declare_visible_def" >&6
 
-
-if test $cs_cv_prog_cxx_declare_visible_def != no && \
-    test -n "$cs_cv_prog_cxx_visibility_hidden"; then
-  cs_build_prop_val="$cs_cv_prog_cxx_visibility_hidden"
-    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.C++FLAGS += \"$cs_build_prop_val\" ;
-"
-fi
-
-    cs_header_text="${cs_header_text}#define CS_VISIBILITY_DEFAULT $cs_cv_prog_cxx_declare_visible_def
+if test $cs_cv_prog_cxx_declare_visible_def != no; then
+  cs_header_text="${cs_header_text}#define CS_VISIBILITY_DEFAULT $cs_cv_prog_cxx_declare_visible_def
 "
 fi
 
@@ -19023,18 +19051,26 @@ fi
 fi
 
 
-
-# Check whether --with-separate-debug-info or --without-separate-debug-info was given.
-if test "${with_separate_debug_info+set}" = set; then
-  withval="$with_separate_debug_info"
+echo "$as_me:$LINENO: checking whether to split debug information" >&5
+echo $ECHO_N "checking whether to split debug information... $ECHO_C" >&6
+# Check whether --enable-separate-debug-info or --disable-separate-debug-info was given.
+if test "${enable_separate_debug_info+set}" = set; then
+  enableval="$enable_separate_debug_info"
 
 fi;
-if test -z "$with_separate_debug_info"; then
-  with_separate_debug_info=$binutils_recent
+if test -z "$enable_separate_debug_info"; then
+  if test -z `uname | grep -i CYGWIN`; then
+  enable_separate_debug_info=$binutils_recent
+else
+  enable_separate_debug_info=no
 fi
 
+fi
 
-cs_build_prop_val="$with_separate_debug_info"
+echo "$as_me:$LINENO: result: $enable_separate_debug_info" >&5
+echo "${ECHO_T}$enable_separate_debug_info" >&6
+
+cs_build_prop_val="$enable_separate_debug_info"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     if test -n "$cs_build_prop_val"; then
   cs_jamconfig_text="${cs_jamconfig_text}LINK.DEBUG.INFO.SEPARATE ?= \"$cs_build_prop_val\" ;
@@ -19212,17 +19248,20 @@ fi
 fi
 
 
-
-# Check whether --with-optimize-debug-info or --without-optimize-debug-info was given.
-if test "${with_optimize_debug_info+set}" = set; then
-  withval="$with_optimize_debug_info"
-
+echo "$as_me:$LINENO: checking whether to enable debug information in optimize mode" >&5
+echo $ECHO_N "checking whether to enable debug information in optimize mode... $ECHO_C" >&6
+# Check whether --enable-optimize-mode-debug-info or --disable-optimize-mode-debug-info was given.
+if test "${enable_optimize_mode_debug_info+set}" = set; then
+  enableval="$enable_optimize_mode_debug_info"
+  enable_optimize_mode_debug_info=$enableval
 fi;
-if test -z "$with_optimize_debug_info"; then
-  with_optimize_debug_info=$with_separate_debug_info
+if test -z "$enable_optimize_mode_debug_info"; then
+  enable_optimize_mode_debug_info=$enable_separate_debug_info
 fi
 
-if test "$with_optimize_debug_info" != no; then
+echo "$as_me:$LINENO: result: $enable_optimize_mode_debug_info" >&5
+echo "${ECHO_T}$enable_optimize_mode_debug_info" >&6
+if test "$enable_optimize_mode_debug_info" != "no"; then
   echo "$as_me:$LINENO: checking how to enable optimize mode debugging symbols" >&5
 echo $ECHO_N "checking how to enable optimize mode debugging symbols... $ECHO_C" >&6
 if test "${cs_cv_prog_cxx_debug_symbols_normal_ok+set}" = set; then

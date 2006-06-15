@@ -458,7 +458,7 @@ bool csInstFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent,
       csVector2 texel = gfact->GetTexels()[i];
       csVector3 normal = gfact->GetNormals()[i];
       csColor4 color = gfact->GetColors()[i];
-      synldr->WriteVector(triaNode, &vertex);
+      synldr->WriteVector(triaNode, vertex);
       triaNode->SetAttributeAsFloat("u", texel.x);
       triaNode->SetAttributeAsFloat("v", texel.y);
       triaNode->SetAttributeAsFloat("nx", normal.x);
@@ -489,7 +489,7 @@ bool csInstFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent,
       csRef<iDocumentNode> colorNode = 
         paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
       colorNode->SetValue("defaultcolor");
-      synldr->WriteColor(colorNode, &col);
+      synldr->WriteColor(colorNode, col);
     }
 
     //Writedown Material tag
@@ -835,7 +835,7 @@ bool csInstMeshSaver::WriteDown (iBase* obj, iDocumentNode* parent,
     csRef<iDocumentNode> colorNode = 
       paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
     colorNode->SetValue("color");
-    synldr->WriteColor(colorNode, &col);
+    synldr->WriteColor(colorNode, col);
 
     //Writedown ManualColor tag
     synldr->WriteBool(paramsNode, "manualcolors",

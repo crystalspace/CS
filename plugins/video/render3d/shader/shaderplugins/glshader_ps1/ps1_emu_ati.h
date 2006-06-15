@@ -25,12 +25,19 @@
 #include "ps1_emu_common.h"
 #include "ps1_parser.h"
 
+CS_PLUGIN_NAMESPACE_BEGIN(GLShaderPS1)
+{
+
 class csShaderGLPS1_ATI : public csShaderGLPS1_Common
 {
 private:
   GLuint program_num;
 
-  bool GetATIShaderCommand (const csPSProgramInstruction &instruction);
+  bool CheckShaderCommand (const char* glCall,
+    const csPixelShaderParser& parser,
+    const csPSProgramInstruction &instruction);
+  bool GetATIShaderCommand (const csPixelShaderParser& parser,
+    const csPSProgramInstruction &instruction);
 public:
   csShaderGLPS1_ATI (csGLShader_PS1* shaderPlug)
     : csShaderGLPS1_Common(shaderPlug)
@@ -55,12 +62,13 @@ public:
   /// Setup states needed for proper operation of the shader
   virtual void SetupState (const csRenderMesh* mesh,
     csRenderMeshModes& modes,
-    const csShaderVarStack &stacks);
+    const iShaderVarStack* stacks);
 
   /// Reset states to original
   virtual void ResetState ();
 };
 
+}
+CS_PLUGIN_NAMESPACE_END(GLShaderPS1)
 
 #endif //__GLSHADER_PS1_ATI_H__
-

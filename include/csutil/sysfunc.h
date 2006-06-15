@@ -33,8 +33,9 @@
 #include <stdio.h>
 
 #include "csextern.h"
-#include "iutil/cfgfile.h"
+#include "csutil/ref.h"
 
+struct iConfigFile;
 struct iObjectRegistry;
 class csString;
 

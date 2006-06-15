@@ -314,13 +314,13 @@ bool csHazeFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent,
     csVector3 direct = haze->GetDirectional();
     csRef<iDocumentNode> directNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
     directNode->SetValue("directional");
-    synldr->WriteVector(directNode, &direct);
+    synldr->WriteVector(directNode, direct);
 
     //Writedown Origin tag
     csVector3 orig = haze->GetOrigin();
     csRef<iDocumentNode> origNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
     origNode->SetValue("origin");
-    synldr->WriteVector(origNode, &orig);
+    synldr->WriteVector(origNode, orig);
 
     for (int i=0; i<haze->GetLayerCount(); i++)
     {
@@ -342,7 +342,7 @@ bool csHazeFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent,
         csRef<iDocumentNode> boxNode = layerNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
         boxNode->SetValue("hazebox");
         csBox3 b(min, max);
-        synldr->WriteBox(boxNode,&b);
+        synldr->WriteBox(boxNode, b);
       }
       else if (hullcone)
       {
@@ -353,7 +353,7 @@ bool csHazeFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent,
         csRef<iDocumentNode> coneNode = layerNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
         coneNode->SetValue("hazecone");
         csBox3 b(min, max);
-        synldr->WriteBox(coneNode,&b);
+        synldr->WriteBox(coneNode, b);
         coneNode->SetAttributeAsFloat("p", p);
         coneNode->SetAttributeAsFloat("q", q);
         coneNode->SetAttributeAsInt("number", number);
@@ -573,13 +573,13 @@ bool csHazeSaver::WriteDown (iBase* obj, iDocumentNode* parent,
     csVector3 direct = haze->GetDirectional();
     csRef<iDocumentNode> directNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
     directNode->SetValue("directional");
-    synldr->WriteVector(directNode, &direct);
+    synldr->WriteVector(directNode, direct);
 
     //Writedown Origin tag
     csVector3 orig = haze->GetOrigin();
     csRef<iDocumentNode> origNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
     origNode->SetValue("origin");
-    synldr->WriteVector(origNode, &orig);
+    synldr->WriteVector(origNode, orig);
 
     for (int i=0; i<haze->GetLayerCount(); i++)
     {
@@ -601,7 +601,7 @@ bool csHazeSaver::WriteDown (iBase* obj, iDocumentNode* parent,
         csRef<iDocumentNode> boxNode = layerNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
         boxNode->SetValue("hazebox");
         csBox3 b(min, max);
-        synldr->WriteBox(boxNode,&b);
+        synldr->WriteBox(boxNode, b);
       }
       else if (hullcone)
       {
@@ -612,7 +612,7 @@ bool csHazeSaver::WriteDown (iBase* obj, iDocumentNode* parent,
         csRef<iDocumentNode> coneNode = layerNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
         coneNode->SetValue("hazecone");
         csBox3 b(min, max);
-        synldr->WriteBox(coneNode,&b);
+        synldr->WriteBox(coneNode, b);
         coneNode->SetAttributeAsFloat("p", p);
         coneNode->SetAttributeAsFloat("q", q);
         coneNode->SetAttributeAsInt("number", number);

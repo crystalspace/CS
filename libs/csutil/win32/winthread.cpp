@@ -54,8 +54,10 @@ static inline void ShowError (const char* function, const char* message,
   #endif
 #else
   /* Pacify the compiler warnings */
+  (void)function;
   (void)message;
   (void)lasterr;
+  (void)errCode;
 #endif
 }
 
