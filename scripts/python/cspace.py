@@ -4282,6 +4282,41 @@ class iLightVisibleCallbackPtr(iLightVisibleCallback):
         _swig_setattr(self, iLightVisibleCallback,self.__class__,iLightVisibleCallback)
 _cspace.iLightVisibleCallback_swigregister(iLightVisibleCallbackPtr)
 
+class csSectorHitBeamResult(_object):
+    __swig_setmethods__ = {}
+    __setattr__ = lambda self, name, value: _swig_setattr(self, csSectorHitBeamResult, name, value)
+    __swig_getmethods__ = {}
+    __getattr__ = lambda self, name: _swig_getattr(self, csSectorHitBeamResult, name)
+    def __repr__(self):
+        return "<%s.%s; proxy of C++ csSectorHitBeamResult instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
+    __swig_setmethods__["mesh"] = _cspace.csSectorHitBeamResult_mesh_set
+    __swig_getmethods__["mesh"] = _cspace.csSectorHitBeamResult_mesh_get
+    if _newclass:mesh = property(_cspace.csSectorHitBeamResult_mesh_get, _cspace.csSectorHitBeamResult_mesh_set)
+    __swig_setmethods__["isect"] = _cspace.csSectorHitBeamResult_isect_set
+    __swig_getmethods__["isect"] = _cspace.csSectorHitBeamResult_isect_get
+    if _newclass:isect = property(_cspace.csSectorHitBeamResult_isect_get, _cspace.csSectorHitBeamResult_isect_set)
+    __swig_setmethods__["polygon_idx"] = _cspace.csSectorHitBeamResult_polygon_idx_set
+    __swig_getmethods__["polygon_idx"] = _cspace.csSectorHitBeamResult_polygon_idx_get
+    if _newclass:polygon_idx = property(_cspace.csSectorHitBeamResult_polygon_idx_get, _cspace.csSectorHitBeamResult_polygon_idx_set)
+    __swig_setmethods__["final_sector"] = _cspace.csSectorHitBeamResult_final_sector_set
+    __swig_getmethods__["final_sector"] = _cspace.csSectorHitBeamResult_final_sector_get
+    if _newclass:final_sector = property(_cspace.csSectorHitBeamResult_final_sector_get, _cspace.csSectorHitBeamResult_final_sector_set)
+    def __init__(self, *args):
+        _swig_setattr(self, csSectorHitBeamResult, 'this', _cspace.new_csSectorHitBeamResult(*args))
+        _swig_setattr(self, csSectorHitBeamResult, 'thisown', 1)
+    def __del__(self, destroy=_cspace.delete_csSectorHitBeamResult):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+
+
+class csSectorHitBeamResultPtr(csSectorHitBeamResult):
+    def __init__(self, this):
+        _swig_setattr(self, csSectorHitBeamResult, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, csSectorHitBeamResult, 'thisown', 0)
+        _swig_setattr(self, csSectorHitBeamResult,self.__class__,csSectorHitBeamResult)
+_cspace.csSectorHitBeamResult_swigregister(csSectorHitBeamResultPtr)
+
 class iSector(iBase):
     __swig_setmethods__ = {}
     for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)

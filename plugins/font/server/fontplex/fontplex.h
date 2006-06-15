@@ -27,6 +27,7 @@
 #include "csutil/weakref.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
+#include "csutil/csstring.h"
 #include "csutil/refarr.h"
 #include "csutil/cfgacc.h"
 #include "csutil/hash.h"

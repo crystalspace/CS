@@ -1452,9 +1452,12 @@ void csGLRendererLightmap::SetData (csRGBcolor* data)
   csGLGraphics3D::statecache->SetTexture (
     GL_TEXTURE_2D, slm->texHandle);
 
+  const uint8* packed = csPackRGB::PackRGBcolorToRGB (data,
+    rect.Width () * rect.Height ());
   glTexSubImage2D (GL_TEXTURE_2D, 0, rect.xmin, rect.ymin, 
     rect.Width (), rect.Height (),
-    GL_RGB, GL_UNSIGNED_BYTE, data);
+    GL_RGB, GL_UNSIGNED_BYTE, packed);
+  csPackRGB::DiscardPackedRGB (packed);
 }
 
 void csGLRendererLightmap::SetLightCellSize (int size)

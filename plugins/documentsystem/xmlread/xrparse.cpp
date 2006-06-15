@@ -24,6 +24,7 @@ distribution.
 
 #include "cssysdef.h"
 #include "xr.h"
+#include "csutil/csstring.h"
 #include <ctype.h>
 
 TrXmlBase::Entity TrXmlBase::entity[ NUM_ENTITY ] = 

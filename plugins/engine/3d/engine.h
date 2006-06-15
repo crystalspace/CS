@@ -891,6 +891,7 @@ private:
 
   /// Default render loop
   csRef<iRenderLoop> defaultRenderLoop;
+  csString override_renderloop;
   /// Render loop manager
   csRenderLoopManager* renderLoopManager;
   /// The graphics loader

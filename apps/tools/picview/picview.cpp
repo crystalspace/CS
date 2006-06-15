@@ -215,11 +215,11 @@ void PicView::CreateGui ()
 
   picview_events = aws->CreateScriptObject("picView", new onPicViewEvent(this));
   
-  picview_events->SetProp("cmdFirst", PVE_FIRST);
-  picview_events->SetProp("cmdPrev", PVE_PREV);
-  picview_events->SetProp("cmdNext", PVE_NEXT);
-  picview_events->SetProp("cmdQuit", PVE_QUIT);
-  picview_events->SetProp("cmdScale", PVE_SCALE);  
+  picview_events->SetProp("cmdFirst", (int32)PVE_FIRST);
+  picview_events->SetProp("cmdPrev", (int32)PVE_PREV);
+  picview_events->SetProp("cmdNext", (int32)PVE_NEXT);
+  picview_events->SetProp("cmdQuit", (int32)PVE_QUIT);
+  picview_events->SetProp("cmdScale", (int32)PVE_SCALE);  
 
   // Load the normal skin.
   if (aws->Load ("/varia/picview.skin.js")==false)

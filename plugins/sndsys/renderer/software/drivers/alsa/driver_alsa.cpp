@@ -57,7 +57,7 @@ SCF_IMPLEMENT_FACTORY (SndSysDriverALSA)
 
 SndSysDriverALSA::SndSysDriverALSA(iBase* pParent) :
   scfImplementationType(this, pParent),
-  m_pObjectReg(0), m_pPCMDevice(0), m_bRunning(false)
+  m_pObjectReg(0), m_pPCMDevice(0), m_bRunning(false), m_UnderBufferCount(0)
 {
 }
 
@@ -432,13 +432,11 @@ void SndSysDriverRunnable::Run ()
 
 void SndSysDriverALSA::Run()
 {
-  snd_pcm_sframes_t AvailableFrames;
   int result;
-  int UnderBufferCount=0;
+  
 
   // Fill the buffer initially.  This will pull silence from the renderer
-  AvailableFrames = snd_pcm_avail_update(m_pPCMDevice);
-  result=FillBuffer(AvailableFrames - m_HWUnusableFrames);
+  result=FillBuffer(m_HWBufferFrames - m_HWUnusableFrames);
   if (result<0)
   {
     RecordEvent(SSEL_CRITICAL, "Failed to fill initial sound buffer.  Error [%s].  Aborting runloop.", snd_strerror(result));
@@ -451,72 +449,51 @@ void SndSysDriverALSA::Run()
   }
 
   // Start the sound output device
-  snd_pcm_start(m_pPCMDevice);
+  result=snd_pcm_start(m_pPCMDevice);
+  if (result < 0)
+  {
+    RecordEvent(SSEL_CRITICAL, "Failed to start sound device. Error [%s]. Aborting runloop.", snd_strerror(result));
+
+    // Stop playback and drop all queued frames
+    snd_pcm_drop(m_pPCMDevice);
+    return;
+  }
 
   // The main loop of the background thread
   while (m_bRunning)
   {
     // Retrieve the number of available frames, and only update if there's enough
     //  to make it worthwhile
-    AvailableFrames = snd_pcm_avail_update(m_pPCMDevice);
+    snd_pcm_sframes_t AvailableFrames = snd_pcm_avail_update(m_pPCMDevice);
+
+    if (HasUnderbuffered())
+    {
+      // Handle/recover from the underbuffer condition
+      if (!HandleUnderbuffer())
+      {
+        // Failed to handle underbuffer condition
+        RecordEvent(SSEL_CRITICAL, "Failed to recover from underbuffer condition! Aborting runloop.");
+        break;
+      }
+      continue;
+    }
+
+    // An error code was returned
+    if (AvailableFrames<0)
+    {
+      if (HandleALSAError(AvailableFrames))
+        continue;
+
+      // Unhandled error
+      RecordEvent(SSEL_CRITICAL, "Aborting runloop.");
+      break;
+    }
+
     if ((AvailableFrames - m_HWUnusableFrames) >= m_SoundBufferMinimumFillFrames)
     {
-      // Presume that underbuffer recovery is not needed in this cycle - for now
-      bool UnderRunRecovery=false;
-
       // Log our fill
-      RecordEvent(SSEL_DEBUG, "Filling %d available frames for %d total bytes", 
+      RecordEvent(SSEL_DEBUG, "Filling [%d] available frames for [%d] total bytes", 
         (AvailableFrames - m_HWUnusableFrames), (AvailableFrames - m_HWUnusableFrames) * m_BytesPerFrame);
-
-      if (CheckUnderrun())
-      {
-        // Add one to our under buffer counter
-        UnderBufferCount++;
-
-        RecordEvent(SSEL_ERROR, "Buffer underrun detected. %d of %d allowed.", UnderBufferCount, m_UnderBuffersAllowed); 
-
-        if (UnderBufferCount > m_UnderBuffersAllowed)
-        {
-          RecordEvent(SSEL_ERROR, "Enlarging sound buffer.  Current [%d ms]  New [%d ms].", 
-            m_BufferLengthms, m_BufferLengthms*2);
-
-          // We have exceeded the threshold, time to enlarge our underlying buffer
-          m_BufferLengthms *= 2;
-
-          // If our buffer is already too big, we can just reduce the unusable frame count
-          //  such that the effective buffer size is doubled
-
-          // We need the same amount of frames as we're already using in the buffer
-          //  in order to double it.
-          snd_pcm_sframes_t NeededFrameGrowth=m_HWBufferFrames - m_HWUnusableFrames;
-          if (m_HWUnusableFrames >= NeededFrameGrowth)
-          {
-            RecordEvent(SSEL_DEBUG, "Reducing unusable frames from %d to %d.", m_HWUnusableFrames, m_HWUnusableFrames-NeededFrameGrowth);
-            m_HWUnusableFrames-=NeededFrameGrowth;
-          }
-          else
-          {
-            // Otherwise, fall back and enlarge the real buffer
-            if (!SetupHWParams())
-              RecordEvent(SSEL_ERROR, "Failed to enlarge sound buffer to %d ms.", m_BufferLengthms);
-          }
-          UnderBufferCount=0;
-        }
-
-        // Try to recover from the underbuffer by re-preparing the output device
-        result=snd_pcm_prepare(m_pPCMDevice);
-        if (result<0)
-        {
-          RecordEvent(SSEL_CRITICAL, "Failed to recover from underbuffer.  Error [%s]", snd_strerror(result));
-          break;
-        }
-
-        // Re-request the available frame count
-        AvailableFrames = snd_pcm_avail_update(m_pPCMDevice);
-
-        // We need under run recovery at the end of this cycle now
-        UnderRunRecovery=true;
-      }
 
       // Continue mapping and filling buffers while:
       // 1) There are no errors 
@@ -534,10 +511,6 @@ void SndSysDriverALSA::Run()
       // If a mapping error occurred, break
       if (result<0)
         break;
-
-      // If an under run occurred and we are recovering, we need to issue a 'start'
-      if (UnderRunRecovery)
-        snd_pcm_start(m_pPCMDevice);
     }
     else
     {
@@ -569,13 +542,15 @@ snd_pcm_sframes_t SndSysDriverALSA::FillBuffer(snd_pcm_sframes_t AvailableFrames
 
   // Try to lock all available frames in the mmap buffer for writing
   MappedFrames=AvailableFrames;
-  mmap_offset=0;
-  result = snd_pcm_mmap_begin(m_pPCMDevice, &mmap_areas, &mmap_offset, &MappedFrames);
-  if (result < 0)
+
+  do
   {
-    RecordEvent(SSEL_CRITICAL, "Error mmaping PCM buffer from sound device! Error [%s]", snd_strerror(result));
-    return -1;
-  }
+    mmap_offset=0;
+    result = snd_pcm_mmap_begin(m_pPCMDevice, &mmap_areas, &mmap_offset, &MappedFrames);
+    if (result >= 0)
+      break;
+    RecordEvent(SSEL_WARNING, "Error mmaping PCM buffer from sound device.");
+  } while (HandleALSAError(result));
 
   // Log the number of frames we did map
   RecordEvent(SSEL_DEBUG, "Mapped %u frames", MappedFrames);
@@ -589,17 +564,19 @@ snd_pcm_sframes_t SndSysDriverALSA::FillBuffer(snd_pcm_sframes_t AvailableFrames
   // Log the number of frames the renderer filled (should be all of them)
   RecordEvent(SSEL_DEBUG, "FillDriverBuffer() filled %u frames", FilledFrames);
 
-  // Commit the written frames to the ALSA layer
-  result = snd_pcm_mmap_commit(m_pPCMDevice, mmap_offset, FilledFrames);
-  if (result < 0)
+  do
   {
-    RecordEvent(SSEL_CRITICAL, "Error committing PCM buffer to sound device! Error [%s]", snd_strerror(result));
-    return -1;
-  }
+    // Commit the written frames to the ALSA layer
+    result = snd_pcm_mmap_commit(m_pPCMDevice, mmap_offset, FilledFrames);
+    if (result >= 0)
+      break;
+    RecordEvent(SSEL_WARNING, "Error committing PCM buffer to sound device.");
+  } while (HandleALSAError(result));
+
   return FilledFrames;
 }
 
-bool SndSysDriverALSA::CheckUnderrun()
+bool SndSysDriverALSA::HasUnderbuffered()
 {
   snd_pcm_state_t devicestate = snd_pcm_state(m_pPCMDevice);
   if (devicestate == SND_PCM_STATE_XRUN)
@@ -609,6 +586,123 @@ bool SndSysDriverALSA::CheckUnderrun()
     return true;
   }
   return false;
+}
+
+bool SndSysDriverALSA::HandleUnderbuffer()
+{
+  // Try corrective action if warranted
+  if (NeedUnderbufferCorrection() && !CorrectUnderbuffer())
+    return false;
+
+  // Refill the buffer.
+  int result=FillBuffer(m_HWBufferFrames - m_HWUnusableFrames);
+  if (result<0)
+  {
+    RecordEvent(SSEL_CRITICAL, "Failed to refill sound buffer. Aborting runloop.");
+    return false;
+  }
+
+  // Try to restart the sound device and handle errors as they come up
+  do
+  {
+    // Restart the sound output
+    result=snd_pcm_start(m_pPCMDevice);
+    if (result>=0)
+      break;
+    RecordEvent(SSEL_ERROR, "Failed to restart sound device.");
+  } while (HandleALSAError(result));
+
+  // Done
+  return true;
+}
+
+bool SndSysDriverALSA::NeedUnderbufferCorrection()
+{
+  // Add one to our under buffer counter
+  m_UnderBufferCount++;
+
+  RecordEvent(SSEL_WARNING, "Underbuffer condition detected. Buffer length [%u] Count [%d].",
+              m_BufferLengthms, m_UnderBufferCount); 
+
+  // If we haven't exceeded the allowed threshold, continue
+  if (m_UnderBufferCount <= m_UnderBuffersAllowed)
+    return false;
+
+  return true;
+}
+
+
+bool SndSysDriverALSA::CorrectUnderbuffer()
+{
+  if (m_BufferLengthms >= 1000)
+  {
+    RecordEvent(SSEL_ERROR, "Sound buffer is already at [%d ms] (>= 1s). Will not grow further.", 
+      m_BufferLengthms);
+    return true;
+  }
+
+  // Reset the count
+  m_UnderBufferCount=0;
+  
+  
+  RecordEvent(SSEL_ERROR, "Corrective underbuffering protection doubling buffer size. Current [%d ms]  New [%d ms].", 
+    m_BufferLengthms, m_BufferLengthms*2);
+
+  // We have exceeded the threshold, time to enlarge our underlying buffer
+  m_BufferLengthms *= 2;
+
+  // If our buffer is already too big, we can just reduce the unusable frame count
+  //  such that the effective buffer size is doubled
+
+  // We need the same amount of frames as we're already using in the buffer
+  //  in order to double it.
+  snd_pcm_sframes_t NeededFrameGrowth=m_HWBufferFrames - m_HWUnusableFrames;
+  if (m_HWUnusableFrames >= NeededFrameGrowth)
+  {
+    RecordEvent(SSEL_DEBUG, "System provided buffer is already sufficiently large."
+                            " Reducing unusable frames from [%d] to [%d].",
+                            m_HWUnusableFrames, m_HWUnusableFrames-NeededFrameGrowth);
+    m_HWUnusableFrames-=NeededFrameGrowth;
+  }
+  else
+  {
+      // Otherwise, fall back and enlarge the real buffer
+    if (!SetupHWParams())
+    {
+      RecordEvent(SSEL_ERROR, "Failed to enlarge sound buffer to [%d ms].", m_BufferLengthms);
+      return false;
+    }
+  }
+
+  return true;
+}
+
+bool SndSysDriverALSA::HandleALSAError(int ErrorNumber)
+{
+  int result;
+
+  switch((-ErrorNumber))
+  {
+    case EBADFD:
+      RecordEvent(SSEL_WARNING, "Error [%s] (%d). This error sometimes occurs during extremely high load (such as running under valgrind)."
+                                , snd_strerror(ErrorNumber), ErrorNumber);
+     // This appears to be documented in bugs 1716, 1900 and 1975 filed against ALSA in early 2005
+     //  It may just be poorly documented 'expected' functionality.  To recover, we need to re-prepare
+     //  the device.
+      result=snd_pcm_prepare(m_pPCMDevice);
+      if (result < 0)
+      {
+        RecordEvent(SSEL_ERROR, "Failed to prepare sound output device for playback Error [%s (%d)]", 
+                    snd_strerror(result), result);
+        snd_pcm_close(m_pPCMDevice);
+        return false;
+      }
+      return true;
+    break;
+    default:
+      RecordEvent(SSEL_CRITICAL, "Unhandled ALSA error [%s (%d)].", snd_strerror(ErrorNumber), ErrorNumber);
+    return false;
+  }
 }
 
 

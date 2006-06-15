@@ -25,6 +25,7 @@
 #include "iutil/eventnames.h"
 #include "iutil/eventhandlers.h"
 #include "iutil/eventh.h"
+#include "csutil/csstring.h"
 #include "csutil/eventnames.h"
 #include "csutil/scf_implementation.h"
 #include "csutil/hash.h"
@@ -57,7 +58,7 @@ public:
    * Get a csHandlerID based upon some string.
    * This should only ever be done to reference generic 
    * (non-instantiated) handler names or single-instance handlers.
-   */	
+   */   
   CS_CONST_METHOD csHandlerID GetGenericID (const csString &);
   static CS_CONST_METHOD csHandlerID GetGenericID (iObjectRegistry *reg, 
     const csString &name) 
@@ -96,7 +97,7 @@ public:
    */
   csHandlerID GetID (csString &);
   static CS_CONST_METHOD csHandlerID GetID (iObjectRegistry *reg,
-					    csString &name)
+                                            csString &name)
   {
     return GetRegistry (reg)->GetID (name);
   }
@@ -308,27 +309,27 @@ class FrameSignpost_DebugFrame
  * handle the csevFrame event in the "logic" phase (i.e.,
  * before any handlers in the "3D" phase).
  */
-#define CS_EVENTHANDLER_PHASE_LOGIC(x)					\
-CS_EVENTHANDLER_NAMES(x)						\
-CS_EVENTHANDLER_DEFAULT_INSTANCE_CONSTRAINTS				\
-CS_CONST_METHOD virtual const csHandlerID * GenericPrec			\
-(csRef<iEventHandlerRegistry> &r1, csRef<iEventNameRegistry> &r2,	\
- csEventID) const {							\
-  return 0;								\
-}									\
-CS_CONST_METHOD virtual const csHandlerID * GenericSucc			\
-(csRef<iEventHandlerRegistry> &r1, csRef<iEventNameRegistry> &r2,	\
- csEventID event) const {						\
-  static csHandlerID succConstraint[6];					\
-  if (event != csevFrame(r2))						\
-    return 0;								\
-  succConstraint[0] = FrameSignpost_Logic3D::StaticID(r1);		\
-  succConstraint[1] = FrameSignpost_3D2D::StaticID(r1);			\
-  succConstraint[2] = FrameSignpost_2DConsole::StaticID(r1);		\
-  succConstraint[3] = FrameSignpost_ConsoleDebug::StaticID(r1);		\
-  succConstraint[4] = FrameSignpost_DebugFrame::StaticID(r1);		\
-  succConstraint[5] = CS_HANDLERLIST_END;				\
-  return succConstraint;						\
+#define CS_EVENTHANDLER_PHASE_LOGIC(x)                                  \
+CS_EVENTHANDLER_NAMES(x)                                                \
+CS_EVENTHANDLER_DEFAULT_INSTANCE_CONSTRAINTS                            \
+CS_CONST_METHOD virtual const csHandlerID * GenericPrec                 \
+(csRef<iEventHandlerRegistry> &, csRef<iEventNameRegistry> &,           \
+ csEventID) const {                                                     \
+  return 0;                                                             \
+}                                                                       \
+CS_CONST_METHOD virtual const csHandlerID * GenericSucc                 \
+(csRef<iEventHandlerRegistry> &r1, csRef<iEventNameRegistry> &r2,       \
+ csEventID event) const {                                               \
+  static csHandlerID succConstraint[6];                                 \
+  if (event != csevFrame(r2))                                           \
+    return 0;                                                           \
+  succConstraint[0] = FrameSignpost_Logic3D::StaticID(r1);              \
+  succConstraint[1] = FrameSignpost_3D2D::StaticID(r1);                 \
+  succConstraint[2] = FrameSignpost_2DConsole::StaticID(r1);            \
+  succConstraint[3] = FrameSignpost_ConsoleDebug::StaticID(r1);         \
+  succConstraint[4] = FrameSignpost_DebugFrame::StaticID(r1);           \
+  succConstraint[5] = CS_HANDLERLIST_END;                               \
+  return succConstraint;                                                \
 }
 
 /**
@@ -337,31 +338,31 @@ CS_CONST_METHOD virtual const csHandlerID * GenericSucc			\
  * after any handlers in the "logic" phase and before any
  * handlers in the "2D" phase).
  */
-#define CS_EVENTHANDLER_PHASE_3D(x)					\
-CS_EVENTHANDLER_NAMES(x)						\
-CS_EVENTHANDLER_DEFAULT_INSTANCE_CONSTRAINTS				\
-CS_CONST_METHOD virtual const csHandlerID * GenericPrec			\
-(csRef<iEventHandlerRegistry> &r1, csRef<iEventNameRegistry> &r2,	\
- csEventID event) const {						\
-  static csHandlerID precConstraint[2];					\
-  if (event != csevFrame(r2))						\
-    return 0;								\
-  precConstraint[0] = FrameSignpost_Logic3D::StaticID(r1);		\
-  precConstraint[1] = CS_HANDLERLIST_END;				\
-  return precConstraint;						\
-}									\
-CS_CONST_METHOD virtual const csHandlerID * GenericSucc			\
-(csRef<iEventHandlerRegistry> &r1, csRef<iEventNameRegistry> &r2,	\
- csEventID event) const {						\
-  static csHandlerID succConstraint[5];					\
-  if (event != csevFrame(r2))						\
-    return 0;								\
-  succConstraint[0] = FrameSignpost_3D2D::StaticID(r1);			\
-  succConstraint[1] = FrameSignpost_2DConsole::StaticID(r1);		\
-  succConstraint[2] = FrameSignpost_ConsoleDebug::StaticID(r1);		\
-  succConstraint[3] = FrameSignpost_DebugFrame::StaticID(r1);		\
-  succConstraint[4] = CS_HANDLERLIST_END;				\
-  return succConstraint;						\
+#define CS_EVENTHANDLER_PHASE_3D(x)                                     \
+CS_EVENTHANDLER_NAMES(x)                                                \
+CS_EVENTHANDLER_DEFAULT_INSTANCE_CONSTRAINTS                            \
+CS_CONST_METHOD virtual const csHandlerID * GenericPrec                 \
+(csRef<iEventHandlerRegistry> &r1, csRef<iEventNameRegistry> &r2,       \
+ csEventID event) const {                                               \
+  static csHandlerID precConstraint[2];                                 \
+  if (event != csevFrame(r2))                                           \
+    return 0;                                                           \
+  precConstraint[0] = FrameSignpost_Logic3D::StaticID(r1);              \
+  precConstraint[1] = CS_HANDLERLIST_END;                               \
+  return precConstraint;                                                \
+}                                                                       \
+CS_CONST_METHOD virtual const csHandlerID * GenericSucc                 \
+(csRef<iEventHandlerRegistry> &r1, csRef<iEventNameRegistry> &r2,       \
+ csEventID event) const {                                               \
+  static csHandlerID succConstraint[5];                                 \
+  if (event != csevFrame(r2))                                           \
+    return 0;                                                           \
+  succConstraint[0] = FrameSignpost_3D2D::StaticID(r1);                 \
+  succConstraint[1] = FrameSignpost_2DConsole::StaticID(r1);            \
+  succConstraint[2] = FrameSignpost_ConsoleDebug::StaticID(r1);         \
+  succConstraint[3] = FrameSignpost_DebugFrame::StaticID(r1);           \
+  succConstraint[4] = CS_HANDLERLIST_END;                               \
+  return succConstraint;                                                \
 }
 
 /**
@@ -370,31 +371,31 @@ CS_CONST_METHOD virtual const csHandlerID * GenericSucc			\
  * after any handlers in the "3D" phase and before any
  * handlers in the "console" phase).
  */
-#define CS_EVENTHANDLER_PHASE_2D(x)					\
-CS_EVENTHANDLER_NAMES(x)						\
-CS_EVENTHANDLER_DEFAULT_INSTANCE_CONSTRAINTS				\
-CS_CONST_METHOD virtual const csHandlerID * GenericPrec			\
-(csRef<iEventHandlerRegistry> &r1, csRef<iEventNameRegistry> &r2,	\
- csEventID event) const {						\
-  static csHandlerID precConstraint[3];					\
-  if (event != csevFrame(r2))						\
-    return 0;								\
-  precConstraint[0] = FrameSignpost_Logic3D::StaticID(r1);		\
-  precConstraint[1] = FrameSignpost_3D2D::StaticID(r1);			\
-  precConstraint[2] = CS_HANDLERLIST_END;				\
-  return precConstraint;						\
-}									\
-CS_CONST_METHOD virtual const csHandlerID * GenericSucc			\
-(csRef<iEventHandlerRegistry> &r1, csRef<iEventNameRegistry> &r2,	\
- csEventID event) const {						\
-  static csHandlerID succConstraint[4];					\
-  if (event != csevFrame(r2))						\
-    return 0;								\
-  succConstraint[0] = FrameSignpost_2DConsole::StaticID(r1);		\
-  succConstraint[1] = FrameSignpost_ConsoleDebug::StaticID(r1);		\
-  succConstraint[2] = FrameSignpost_DebugFrame::StaticID(r1);		\
-  succConstraint[3] = CS_HANDLERLIST_END;				\
-  return succConstraint;						\
+#define CS_EVENTHANDLER_PHASE_2D(x)                                     \
+CS_EVENTHANDLER_NAMES(x)                                                \
+CS_EVENTHANDLER_DEFAULT_INSTANCE_CONSTRAINTS                            \
+CS_CONST_METHOD virtual const csHandlerID * GenericPrec                 \
+(csRef<iEventHandlerRegistry> &r1, csRef<iEventNameRegistry> &r2,       \
+ csEventID event) const {                                               \
+  static csHandlerID precConstraint[3];                                 \
+  if (event != csevFrame(r2))                                           \
+    return 0;                                                           \
+  precConstraint[0] = FrameSignpost_Logic3D::StaticID(r1);              \
+  precConstraint[1] = FrameSignpost_3D2D::StaticID(r1);                 \
+  precConstraint[2] = CS_HANDLERLIST_END;                               \
+  return precConstraint;                                                \
+}                                                                       \
+CS_CONST_METHOD virtual const csHandlerID * GenericSucc                 \
+(csRef<iEventHandlerRegistry> &r1, csRef<iEventNameRegistry> &r2,       \
+ csEventID event) const {                                               \
+  static csHandlerID succConstraint[4];                                 \
+  if (event != csevFrame(r2))                                           \
+    return 0;                                                           \
+  succConstraint[0] = FrameSignpost_2DConsole::StaticID(r1);            \
+  succConstraint[1] = FrameSignpost_ConsoleDebug::StaticID(r1);         \
+  succConstraint[2] = FrameSignpost_DebugFrame::StaticID(r1);           \
+  succConstraint[3] = CS_HANDLERLIST_END;                               \
+  return succConstraint;                                                \
 }
 
 /**
@@ -403,31 +404,31 @@ CS_CONST_METHOD virtual const csHandlerID * GenericSucc			\
  * after any handlers in the "2D" phase and before any
  * handlers in the "debug" phase).
  */
-#define CS_EVENTHANDLER_PHASE_CONSOLE(x)				\
-CS_EVENTHANDLER_NAMES(x)						\
-CS_EVENTHANDLER_DEFAULT_INSTANCE_CONSTRAINTS				\
-CS_CONST_METHOD virtual const csHandlerID * GenericPrec			\
-(csRef<iEventHandlerRegistry> &r1, csRef<iEventNameRegistry> &r2,	\
- csEventID event) const {						\
-  static csHandlerID precConstraint[4];					\
-  if (event != csevFrame(r2))						\
-    return 0;								\
-  precConstraint[0] = FrameSignpost_Logic3D::StaticID(r1);		\
-  precConstraint[1] = FrameSignpost_3D2D::StaticID(r1);			\
-  precConstraint[2] = FrameSignpost_2DConsole::StaticID(r1);		\
-  precConstraint[3] = CS_HANDLERLIST_END;				\
-  return precConstraint;						\
-}									\
-CS_CONST_METHOD virtual const csHandlerID * GenericSucc			\
-(csRef<iEventHandlerRegistry> &r1, csRef<iEventNameRegistry> &r2,	\
- csEventID event) const {						\
-  static csHandlerID succConstraint[3];					\
-  if (event != csevFrame(r2))						\
-    return 0;								\
-  succConstraint[0] = FrameSignpost_ConsoleDebug::StaticID(r1);		\
-  succConstraint[1] = FrameSignpost_DebugFrame::StaticID(r1);		\
-  succConstraint[2] = CS_HANDLERLIST_END;				\
-  return succConstraint;						\
+#define CS_EVENTHANDLER_PHASE_CONSOLE(x)                                \
+CS_EVENTHANDLER_NAMES(x)                                                \
+CS_EVENTHANDLER_DEFAULT_INSTANCE_CONSTRAINTS                            \
+CS_CONST_METHOD virtual const csHandlerID * GenericPrec                 \
+(csRef<iEventHandlerRegistry> &r1, csRef<iEventNameRegistry> &r2,       \
+ csEventID event) const {                                               \
+  static csHandlerID precConstraint[4];                                 \
+  if (event != csevFrame(r2))                                           \
+    return 0;                                                           \
+  precConstraint[0] = FrameSignpost_Logic3D::StaticID(r1);              \
+  precConstraint[1] = FrameSignpost_3D2D::StaticID(r1);                 \
+  precConstraint[2] = FrameSignpost_2DConsole::StaticID(r1);            \
+  precConstraint[3] = CS_HANDLERLIST_END;                               \
+  return precConstraint;                                                \
+}                                                                       \
+CS_CONST_METHOD virtual const csHandlerID * GenericSucc                 \
+(csRef<iEventHandlerRegistry> &r1, csRef<iEventNameRegistry> &r2,       \
+ csEventID event) const {                                               \
+  static csHandlerID succConstraint[3];                                 \
+  if (event != csevFrame(r2))                                           \
+    return 0;                                                           \
+  succConstraint[0] = FrameSignpost_ConsoleDebug::StaticID(r1);         \
+  succConstraint[1] = FrameSignpost_DebugFrame::StaticID(r1);           \
+  succConstraint[2] = CS_HANDLERLIST_END;                               \
+  return succConstraint;                                                \
 }
 
 /**
@@ -436,31 +437,31 @@ CS_CONST_METHOD virtual const csHandlerID * GenericSucc			\
  * after any handlers in the "Console" phase and before any
  * handlers in the "Frame" phase).
  */
-#define CS_EVENTHANDLER_PHASE_DEBUG(x)					\
-CS_EVENTHANDLER_NAMES(x)						\
-CS_EVENTHANDLER_DEFAULT_INSTANCE_CONSTRAINTS				\
-CS_CONST_METHOD virtual const csHandlerID * GenericPrec			\
-(csRef<iEventHandlerRegistry> &r1, csRef<iEventNameRegistry> &r2,	\
- csEventID event) const {						\
-  static csHandlerID precConstraint[5];					\
-  if (event != csevFrame(r2))						\
-    return 0;								\
-  precConstraint[0] = FrameSignpost_Logic3D::StaticID(r1);		\
-  precConstraint[0] = FrameSignpost_3D2D::StaticID(r1);			\
-  precConstraint[0] = FrameSignpost_2DConsole::StaticID(r1);		\
-  precConstraint[0] = FrameSignpost_ConsoleDebug::StaticID(r1);		\
-  precConstraint[1] = CS_HANDLERLIST_END;				\
-  return precConstraint;						\
-}									\
-CS_CONST_METHOD virtual const csHandlerID * GenericSucc			\
-(csRef<iEventHandlerRegistry> &r1, csRef<iEventNameRegistry> &r2,	\
- csEventID event) const {						\
-  static csHandlerID succConstraint[2];					\
-  if (event != csevFrame(r2))						\
-    return 0;								\
-  succConstraint[0] = FrameSignpost_DebugFrame::StaticID(r1);		\
-  succConstraint[1] = CS_HANDLERLIST_END;				\
-  return succConstraint;						\
+#define CS_EVENTHANDLER_PHASE_DEBUG(x)                                  \
+CS_EVENTHANDLER_NAMES(x)                                                \
+CS_EVENTHANDLER_DEFAULT_INSTANCE_CONSTRAINTS                            \
+CS_CONST_METHOD virtual const csHandlerID * GenericPrec                 \
+(csRef<iEventHandlerRegistry> &r1, csRef<iEventNameRegistry> &r2,       \
+ csEventID event) const {                                               \
+  static csHandlerID precConstraint[5];                                 \
+  if (event != csevFrame(r2))                                           \
+    return 0;                                                           \
+  precConstraint[0] = FrameSignpost_Logic3D::StaticID(r1);              \
+  precConstraint[0] = FrameSignpost_3D2D::StaticID(r1);                 \
+  precConstraint[0] = FrameSignpost_2DConsole::StaticID(r1);            \
+  precConstraint[0] = FrameSignpost_ConsoleDebug::StaticID(r1);         \
+  precConstraint[1] = CS_HANDLERLIST_END;                               \
+  return precConstraint;                                                \
+}                                                                       \
+CS_CONST_METHOD virtual const csHandlerID * GenericSucc                 \
+(csRef<iEventHandlerRegistry> &r1, csRef<iEventNameRegistry> &r2,       \
+ csEventID event) const {                                               \
+  static csHandlerID succConstraint[2];                                 \
+  if (event != csevFrame(r2))                                           \
+    return 0;                                                           \
+  succConstraint[0] = FrameSignpost_DebugFrame::StaticID(r1);           \
+  succConstraint[1] = CS_HANDLERLIST_END;                               \
+  return succConstraint;                                                \
 }
 
 /**
@@ -469,27 +470,27 @@ CS_CONST_METHOD virtual const csHandlerID * GenericSucc			\
  * after any handlers in the "Console" phase and before any
  * handlers in the "Frame" phase).
  */
-#define CS_EVENTHANDLER_PHASE_FRAME(x)					\
-CS_EVENTHANDLER_NAMES(x)						\
-CS_EVENTHANDLER_DEFAULT_INSTANCE_CONSTRAINTS				\
-CS_CONST_METHOD virtual const csHandlerID * GenericPrec			\
-(csRef<iEventHandlerRegistry> &r1, csRef<iEventNameRegistry> &r2,	\
- csEventID event) const {						\
-  static csHandlerID precConstraint[6];					\
-  if (event != csevFrame(r2))						\
-    return 0;								\
-  precConstraint[0] = FrameSignpost_Logic3D::StaticID(r1);		\
-  precConstraint[0] = FrameSignpost_3D2D::StaticID(r1);			\
-  precConstraint[0] = FrameSignpost_2DConsole::StaticID(r1);		\
-  precConstraint[0] = FrameSignpost_ConsoleDebug::StaticID(r1);		\
-  precConstraint[0] = FrameSignpost_DebugFrame::StaticID(r1);		\
-  precConstraint[1] = CS_HANDLERLIST_END;				\
-  return precConstraint;						\
-}									\
-CS_CONST_METHOD virtual const csHandlerID * GenericSucc			\
-(csRef<iEventHandlerRegistry> &r1, csRef<iEventNameRegistry> &r2,	\
- csEventID event) const {						\
-  return 0;								\
+#define CS_EVENTHANDLER_PHASE_FRAME(x)                                  \
+CS_EVENTHANDLER_NAMES(x)                                                \
+CS_EVENTHANDLER_DEFAULT_INSTANCE_CONSTRAINTS                            \
+CS_CONST_METHOD virtual const csHandlerID * GenericPrec                 \
+(csRef<iEventHandlerRegistry> &r1, csRef<iEventNameRegistry> &r2,       \
+ csEventID event) const {                                               \
+  static csHandlerID precConstraint[6];                                 \
+  if (event != csevFrame(r2))                                           \
+    return 0;                                                           \
+  precConstraint[0] = FrameSignpost_Logic3D::StaticID(r1);              \
+  precConstraint[0] = FrameSignpost_3D2D::StaticID(r1);                 \
+  precConstraint[0] = FrameSignpost_2DConsole::StaticID(r1);            \
+  precConstraint[0] = FrameSignpost_ConsoleDebug::StaticID(r1);         \
+  precConstraint[0] = FrameSignpost_DebugFrame::StaticID(r1);           \
+  precConstraint[1] = CS_HANDLERLIST_END;                               \
+  return precConstraint;                                                \
+}                                                                       \
+CS_CONST_METHOD virtual const csHandlerID * GenericSucc                 \
+(csRef<iEventHandlerRegistry> &, csRef<iEventNameRegistry> &,           \
+ csEventID) const {                                                     \
+  return 0;                                                             \
 }
 
 

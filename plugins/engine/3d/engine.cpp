@@ -700,7 +700,13 @@ bool csEngine::HandleEvent (iEvent &Event)
     csConfigAccess cfg (objectRegistry, "/config/engine.cfg");
     // Now, try to load the user-specified default render loop.
     const char* configLoop = cfg->GetStr ("Engine.RenderLoop.Default", 0);
-    if (!configLoop)
+    if (!override_renderloop.IsEmpty ())
+    {
+      defaultRenderLoop = renderLoopManager->Load (override_renderloop);
+      if (!defaultRenderLoop)
+	return false;
+    }
+    else if (!configLoop)
     {
       defaultRenderLoop = CreateDefaultRenderLoop ();
     }
@@ -3387,7 +3393,9 @@ bool csEngine::SetOption (int id, csVariant *value)
         csEngine::lightmapCacheMode = CS_ENGINE_CACHE_READ;
       break;
     case 2:
+      override_renderloop = value->GetString ();
       LoadDefaultRenderLoop (value->GetString ());
+      break;
     default:
       return false;
   }

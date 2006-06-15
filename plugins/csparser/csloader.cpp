@@ -2611,7 +2611,8 @@ bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
 	else if (attr = child->GetAttribute ("var"))
 	{
 	  csString varname = attr->GetValue ();
-	  iSharedVariable *var = Engine->GetVariableList()->FindByName (varname);
+	  iSharedVariable *var = Engine->GetVariableList()->FindByName (
+	  	varname);
 	  if (!var)
 	  {
 	    SyntaxService->ReportError (
@@ -2642,7 +2643,8 @@ bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
 	else if (attr = child->GetAttribute ("var"))
 	{
 	  csString varname = attr->GetValue ();
-	  iSharedVariable *var = Engine->GetVariableList()->FindByName (varname);
+	  iSharedVariable *var = Engine->GetVariableList()->FindByName (
+	  	varname);
 	  if (!var)
 	  {
 	    SyntaxService->ReportError (
@@ -3976,13 +3978,13 @@ bool csLoader::LoadAddOn (iLoaderContext* ldr_context,
       
 	    if (!rc) return false;
       
-      if (Engine->GetSaveableFlag ())
-      {
-        csRef<iAddonReference> addon;
-        addon.AttachNew (new csAddonReference (plugin_name, 0, rc));
-        object_reg->Register (addon);
-        AddToRegion (ldr_context, addon->QueryObject ());
-      }
+	    if (Engine->GetSaveableFlag ())
+	    {
+		csRef<iAddonReference> addon;
+		addon.AttachNew (new csAddonReference (plugin_name, 0, rc));
+		object_reg->Register (addon);
+		AddToRegion (ldr_context, addon->QueryObject ());
+	    }
 	  }
           break;
 
@@ -4014,7 +4016,7 @@ bool csLoader::LoadAddOn (iLoaderContext* ldr_context,
 	      return false;
 	    }
 	    bool rc;
-      csRef<iBase> ret;
+	    csRef<iBase> ret;
 	    if (plug)
 	    {
 	      ret = LoadStructuredMap (ldr_context,
@@ -4032,20 +4034,21 @@ bool csLoader::LoadAddOn (iLoaderContext* ldr_context,
 	    if (!rc)
 	      return false;
       
-      if (Engine->GetSaveableFlag ())
-      {
-        csRef<iAddonReference> addon;
-        addon.AttachNew (new csAddonReference (plugin_name, fname, ret));
-        object_reg->Register (addon);
-        AddToRegion (ldr_context, addon->QueryObject ());
-      }
+	    if (Engine->GetSaveableFlag ())
+	    {
+		csRef<iAddonReference> addon;
+		addon.AttachNew (new csAddonReference (plugin_name,
+		  fname, ret));
+		object_reg->Register (addon);
+		AddToRegion (ldr_context, addon->QueryObject ());
+	    }
 	  }
           break;
 
         case XMLTOKEN_PLUGIN:
 	  {
 	    iDocumentNode* defaults = 0;
-      plugin_name = child->GetContentsValue ();
+	    plugin_name = child->GetContentsValue ();
 	    if (!loaded_plugins.FindPlugin (plugin_name,
 		  plug, binplug, defaults))
 	    {
@@ -4071,6 +4074,93 @@ bool csLoader::LoadAddOn (iLoaderContext* ldr_context,
     }
   }
   return true;
+}
+
+iRenderLoop* csLoader::ParseRenderLoop (iDocumentNode* node, bool& set)
+{
+  set = true;
+  const char* varname = node->GetAttributeValue ("variable");
+  if (varname)
+  {
+    iSharedVariableList* vl = Engine->GetVariableList ();
+    iSharedVariable* var = vl->FindByName (varname);
+    csRef<iDocumentNode> default_node;
+    csRef<iDocumentNodeIterator> it = node->GetNodes ();
+    iRenderLoop* loop = 0;
+    while (it->HasNext ())
+    {
+      csRef<iDocumentNode> child = it->Next ();
+      if (child->GetType () != CS_NODE_ELEMENT) continue;
+      const char* value = child->GetValue ();
+      csStringID id = xmltokens.Request (value);
+      switch (id)
+      {
+        case XMLTOKEN_CONDITION:
+	  if (var && var->GetString ())
+	  {
+	    csString value = child->GetAttributeValue ("value");
+	    if (value == var->GetString ())
+	    {
+	      loop = Engine->GetRenderLoopManager ()->Retrieve (
+	      	child->GetContentsValue ());
+	    }
+	  }
+	  break;
+        case XMLTOKEN_DEFAULT:
+	  default_node = child;
+	  break;
+        default:
+	  SyntaxService->ReportBadToken (child);
+          return 0;
+      }
+    }
+    if (!loop && default_node)
+    {
+      loop = Engine->GetRenderLoopManager ()->Retrieve (
+      	default_node->GetContentsValue ());
+      if (!loop)
+      {
+        SyntaxService->Report ("crystalspace.maploader.parse.settings",
+		CS_REPORTER_SEVERITY_ERROR,
+		node, "No suitable renderloop found!");
+        return 0;
+      }
+    }
+    if (!loop)
+    {
+      loop = Engine->GetCurrentDefaultRenderloop ();
+      set = false;
+    }
+
+    return loop;
+  }
+  else
+  {
+    const char* loopName = node->GetContentsValue ();
+    if (loopName)
+    {
+      iRenderLoop* loop = Engine->GetRenderLoopManager()->Retrieve (loopName);
+      if (!loop)
+      {
+        SyntaxService->Report ("crystalspace.maploader.parse.settings",
+		CS_REPORTER_SEVERITY_ERROR,
+		node, "Render loop '%s' not found",
+		loopName);
+        return 0;
+      }
+      return loop;
+    }
+    else
+    {
+      SyntaxService->Report (
+	      "crystalspace.maploader.parse.settings",
+	      CS_REPORTER_SEVERITY_ERROR,
+	      node, "Expected render loop name: %s",
+	      loopName);
+      return 0;
+    }
+  }
+  return 0;
 }
 
 bool csLoader::LoadSettings (iDocumentNode* node)
@@ -4163,34 +4253,11 @@ bool csLoader::LoadSettings (iDocumentNode* node)
 	break;
       case XMLTOKEN_RENDERLOOP:
 	{
-	  const char* loopName = child->GetContentsValue ();
-	  if (loopName)
-	  {
-	    iRenderLoop* loop = 
-	      Engine->GetRenderLoopManager()->Retrieve (loopName);
-	    if (loop)
-	    {
-	      Engine->SetCurrentDefaultRenderloop (loop);
-	    }
-	    else
-	    {
-	      SyntaxService->Report (
-		"crystalspace.maploader.parse.settings",
-		CS_REPORTER_SEVERITY_WARNING,
-		child,
-		"Render loop '%s' not found",
-		loopName);
-	    }
-	  }
-	  else
-	  {
-	    SyntaxService->Report (
-	      "crystalspace.maploader.parse.settings",
-	      CS_REPORTER_SEVERITY_WARNING,
-	      child,
-	      "Expected render loop name: %s",
-	      loopName);
-	  }
+	  bool set;
+	  iRenderLoop* loop = ParseRenderLoop (child, set);
+	  if (!loop) return false;
+	  if (set)
+	    Engine->SetCurrentDefaultRenderloop (loop);
         }
 	break;
       default:
@@ -5157,35 +5224,12 @@ iSector* csLoader::ParseSector (iLoaderContext* ldr_context,
     {
       case XMLTOKEN_RENDERLOOP:
 	{
-	  const char* loopName = child->GetContentsValue ();
-	  if (loopName)
-	  {
-	    iRenderLoop* loop = 
-	      Engine->GetRenderLoopManager()->Retrieve (loopName);
-	    if (loop)
-	    {
-	      sector->SetRenderLoop (loop);
-	    }
-	    else
-	    {
-	      SyntaxService->Report (
-		"crystalspace.maploader.parse.sector",
-		CS_REPORTER_SEVERITY_WARNING,
-		child,
-		"Render loop '%s' in sector '%s' not found",
-		loopName, secname);
-	    }
-	  }
-	  else
-	  {
-	    SyntaxService->Report (
-	      "crystalspace.maploader.parse.sector",
-	      CS_REPORTER_SEVERITY_WARNING,
-	      child,
-	      "Expected render loop name '%s' in sector '%s'",
-	      loopName, secname);
-	  }
-	}
+	  bool set;
+	  iRenderLoop* loop = ParseRenderLoop (child, set);
+	  if (!loop) return false;
+	  if (set)
+	    sector->SetRenderLoop (loop);
+        }
 	break;
       case XMLTOKEN_AMBIENT:
 	{
@@ -5501,6 +5545,7 @@ bool csLoader::ParseSharedVariable (iLoaderContext* ldr_context,
   {
     csRef<iDocumentNode> colornode = node->GetNode ("color");
     csRef<iDocumentNode> vectornode = node->GetNode ("v");
+    csRef<iDocumentAttribute> stringattr = node->GetAttribute ("string");
     if (colornode)
     {
       csColor c;
@@ -5514,6 +5559,10 @@ bool csLoader::ParseSharedVariable (iLoaderContext* ldr_context,
       if (!SyntaxService->ParseVector (vectornode, vec))
 	return false;
       v->SetVector (vec);
+    }
+    else if (stringattr)
+    {
+      v->SetString (stringattr->GetValue ());
     }
     else
     {
