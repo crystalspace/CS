@@ -1908,6 +1908,7 @@ class csQuaternion(_object):
     def SetIdentity(*args): return _cspace.csQuaternion_SetIdentity(*args)
     def __iadd__(*args): return _cspace.csQuaternion___iadd__(*args)
     def __isub__(*args): return _cspace.csQuaternion___isub__(*args)
+    def __imul__(*args): return _cspace.csQuaternion___imul__(*args)
     def GetConjugate(*args): return _cspace.csQuaternion_GetConjugate(*args)
     def Conjugate(*args): return _cspace.csQuaternion_Conjugate(*args)
     def Dot(*args): return _cspace.csQuaternion_Dot(*args)
@@ -2443,6 +2444,7 @@ class csShaderVariable(csRefCount):
     __getattr__ = lambda self, name: _swig_getattr(self, csShaderVariable, name)
     def __repr__(self):
         return "<%s.%s; proxy of C++ csShaderVariable instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
+    UNKNOWN = _cspace.csShaderVariable_UNKNOWN
     INT = _cspace.csShaderVariable_INT
     FLOAT = _cspace.csShaderVariable_FLOAT
     COLOR = _cspace.csShaderVariable_COLOR
@@ -5128,6 +5130,7 @@ class iMeshWrapper(iBase):
     def GetWorldBoundingBox(*args): return _cspace.iMeshWrapper_GetWorldBoundingBox(*args)
     def GetTransformedBoundingBox(*args): return _cspace.iMeshWrapper_GetTransformedBoundingBox(*args)
     def GetScreenBoundingBox(*args): return _cspace.iMeshWrapper_GetScreenBoundingBox(*args)
+    def GetRadius(*args): return _cspace.iMeshWrapper_GetRadius(*args)
     def ResetMinMaxRenderDistance(*args): return _cspace.iMeshWrapper_ResetMinMaxRenderDistance(*args)
     def SetMinimumRenderDistance(*args): return _cspace.iMeshWrapper_SetMinimumRenderDistance(*args)
     def GetMinimumRenderDistance(*args): return _cspace.iMeshWrapper_GetMinimumRenderDistance(*args)
@@ -5931,6 +5934,7 @@ class csSprite2DVertex(_object):
     __swig_setmethods__["v"] = _cspace.csSprite2DVertex_v_set
     __swig_getmethods__["v"] = _cspace.csSprite2DVertex_v_get
     if _newclass:v = property(_cspace.csSprite2DVertex_v_get, _cspace.csSprite2DVertex_v_set)
+    def __eq__(*args): return _cspace.csSprite2DVertex___eq__(*args)
     def __init__(self, *args):
         _swig_setattr(self, csSprite2DVertex, 'this', _cspace.new_csSprite2DVertex(*args))
         _swig_setattr(self, csSprite2DVertex, 'thisown', 1)
@@ -5946,6 +5950,27 @@ class csSprite2DVertexPtr(csSprite2DVertex):
         if not hasattr(self,"thisown"): _swig_setattr(self, csSprite2DVertex, 'thisown', 0)
         _swig_setattr(self, csSprite2DVertex,self.__class__,csSprite2DVertex)
 _cspace.csSprite2DVertex_swigregister(csSprite2DVertexPtr)
+
+class iColoredVertices(_object):
+    __swig_setmethods__ = {}
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iColoredVertices, name, value)
+    __swig_getmethods__ = {}
+    __getattr__ = lambda self, name: _swig_getattr(self, iColoredVertices, name)
+    def __init__(self): raise RuntimeError, "No constructor defined"
+    def __repr__(self):
+        return "<%s.%s; proxy of C++ iColoredVertices instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
+    def __del__(self, destroy=_cspace.delete_iColoredVertices):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+
+
+class iColoredVerticesPtr(iColoredVertices):
+    def __init__(self, this):
+        _swig_setattr(self, iColoredVertices, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, iColoredVertices, 'thisown', 0)
+        _swig_setattr(self, iColoredVertices,self.__class__,iColoredVertices)
+_cspace.iColoredVertices_swigregister(iColoredVerticesPtr)
 
 class iSprite2DUVAnimationFrame(iBase):
     __swig_setmethods__ = {}
@@ -6849,6 +6874,8 @@ class iTerrainObjectState(iBase):
         return "<%s.%s; proxy of C++ iTerrainObjectState instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
     def SetMaterialPalette(*args): return _cspace.iTerrainObjectState_SetMaterialPalette(*args)
     def GetMaterialPalette(*args): return _cspace.iTerrainObjectState_GetMaterialPalette(*args)
+    def SetMaterialMap(*args): return _cspace.iTerrainObjectState_SetMaterialMap(*args)
+    def SetMaterialAlphaMaps(*args): return _cspace.iTerrainObjectState_SetMaterialAlphaMaps(*args)
     def SetLODValue(*args): return _cspace.iTerrainObjectState_SetLODValue(*args)
     def GetLODValue(*args): return _cspace.iTerrainObjectState_GetLODValue(*args)
     def SaveState(*args): return _cspace.iTerrainObjectState_SaveState(*args)
@@ -10716,8 +10743,27 @@ _cspace.iHalo_swigregister(iHaloPtr)
 
 iHalo_scfGetVersion = _cspace.iHalo_scfGetVersion
 
+class iShaderVarStack(_object):
+    __swig_setmethods__ = {}
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iShaderVarStack, name, value)
+    __swig_getmethods__ = {}
+    __getattr__ = lambda self, name: _swig_getattr(self, iShaderVarStack, name)
+    def __init__(self): raise RuntimeError, "No constructor defined"
+    def __repr__(self):
+        return "<%s.%s; proxy of C++ iShaderVarStack instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
+    def __del__(self, destroy=_cspace.delete_iShaderVarStack):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
 
-csGetShaderVariableFromStack = _cspace.csGetShaderVariableFromStack
+
+class iShaderVarStackPtr(iShaderVarStack):
+    def __init__(self, this):
+        _swig_setattr(self, iShaderVarStack, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, iShaderVarStack, 'thisown', 0)
+        _swig_setattr(self, iShaderVarStack,self.__class__,iShaderVarStack)
+_cspace.iShaderVarStack_swigregister(iShaderVarStackPtr)
+
 class iShaderVariableContext(iBase):
     __swig_setmethods__ = {}
     for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
@@ -10750,6 +10796,8 @@ class iShaderVariableContextPtr(iShaderVariableContext):
         if not hasattr(self,"thisown"): _swig_setattr(self, iShaderVariableContext, 'thisown', 0)
         _swig_setattr(self, iShaderVariableContext,self.__class__,iShaderVariableContext)
 _cspace.iShaderVariableContext_swigregister(iShaderVariableContextPtr)
+
+csGetShaderVariableFromStack = _cspace.csGetShaderVariableFromStack
 
 iShaderVariableContext_scfGetVersion = _cspace.iShaderVariableContext_scfGetVersion
 
@@ -11131,6 +11179,9 @@ class iImage(iBase):
     def GetPalette(*args): return _cspace.iImage_GetPalette(*args)
     def GetAlpha(*args): return _cspace.iImage_GetAlpha(*args)
     def HasKeyColor(*args): return _cspace.iImage_HasKeyColor(*args)
+    def HasKeycolor(*args): return _cspace.iImage_HasKeycolor(*args)
+    def GetKeyColor(*args): return _cspace.iImage_GetKeyColor(*args)
+    def GetKeycolor(*args): return _cspace.iImage_GetKeycolor(*args)
     def HasMipmaps(*args): return _cspace.iImage_HasMipmaps(*args)
     def GetMipmap(*args): return _cspace.iImage_GetMipmap(*args)
     def GetRawFormat(*args): return _cspace.iImage_GetRawFormat(*args)

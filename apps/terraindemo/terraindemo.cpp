@@ -114,7 +114,6 @@ bool TerrainDemo::Setup ()
   view->GetCamera ()->SetSector (room);
   view->GetCamera ()->GetTransform ().SetOrigin (pos);
   
-#pragma message("terraindemo.cpp(117): comment this to hide bugs ;-) (well, to remove far plane clipping actually)")
   csPlane3 fp(0, 0, -1, 500);
   view->GetCamera ()->SetFarPlane(&fp);
   
@@ -242,6 +241,8 @@ bool TerrainDemo::OnInitialize(int /*argc*/, char* /*argv*/ [])
     CS_REQUEST_REPORTERLISTENER,
     CS_REQUEST_PLUGIN("crystalspace.collisiondetection.opcode",
                 iCollideSystem),
+    CS_REQUEST_PLUGIN("crystalspace.graphics3d.shadermanager",
+                iShaderManager),
     CS_REQUEST_END))
     return ReportError("Failed to initialize plugins!");
 
@@ -254,12 +255,13 @@ bool TerrainDemo::OnInitialize(int /*argc*/, char* /*argv*/ [])
     return ReportError("Failed to set up event handler!");
     
   // Let's create a terrain.
-  csRef<iTerrainRenderer> t_renderer = scfCreateInstance<iTerrainRenderer>("crystalspace.mesh.object.terrainimproved.simplerenderer");
-  csRef<iTerrainCollider> t_collider = scfCreateInstance<iTerrainCollider>("crystalspace.mesh.object.terrainimproved.simplecollider");
+  csRef<iTerrainRenderer> t_renderer = csLoadPlugin<iTerrainRenderer>(GetObjectRegistry(), "crystalspace.mesh.object.terrainimproved.simplerenderer");
   
-  csRef<iTerrainDataFeeder> t_feeder = scfCreateInstance<iTerrainDataFeeder>("crystalspace.mesh.object.terrainimproved.simpledatafeeder");
+  csRef<iTerrainCollider> t_collider = csLoadPlugin<iTerrainCollider>(GetObjectRegistry(), "crystalspace.mesh.object.terrainimproved.simplecollider");
+  
+  csRef<iTerrainDataFeeder> t_feeder = csLoadPlugin<iTerrainDataFeeder>(GetObjectRegistry(), "crystalspace.mesh.object.terrainimproved.simpledatafeeder");
 
-  csRef<iMeshObjectType> t_mesh_type = scfCreateInstance<iMeshObjectType>("crystalspace.mesh.object.terrainimproved");
+  csRef<iMeshObjectType> t_mesh_type = csLoadPlugin<iMeshObjectType>(GetObjectRegistry(), "crystalspace.mesh.object.terrainimproved");
   
   csRef<iMeshObjectFactory> t_mesh_factory = t_mesh_type->NewFactory();
   
@@ -268,12 +270,12 @@ bool TerrainDemo::OnInitialize(int /*argc*/, char* /*argv*/ [])
   t_factory->SetRenderer(t_renderer);
   t_factory->SetCollider(t_collider);
   
-  int count = 5;
-  float size = 100;
+  int count = 100;
+  float size = 300;
   
   for (int i = -count; i <= count; ++i)
     for (int j = -count; j <= count; ++j)
-      t_factory->AddCell("cell", 33, 33, 33, 33, csVector2(24 + size*i, 24 + size*j), csVector2(size, size), t_feeder);
+      t_factory->AddCell("cell", 33, 33, 32, 32, csVector2(24 + size*i, 24 + size*j), csVector2(size, size), t_feeder);
   
   csRef<iMeshObject> t_mesh = t_mesh_factory->NewInstance();
   
@@ -311,8 +313,33 @@ bool TerrainDemo::LoadMap ()
   // Load the level file which is called 'world'.
   //if (!loader->LoadMapFile ("world"))
   //  ReportError("Error couldn't load level!");
-  if (!loader->LoadTexture ("Stone", "/lib/std/stone4.gif"))
-    ReportError("Error loading 'stone4' texture!");
+    
+  iTextureWrapper* grass_tex = loader->LoadTexture("grass_tex", "/lev/terrain/grass.png");
+  iTextureWrapper* stone_tex = loader->LoadTexture("stone_tex", "/lib/std/stone4.gif");
+  iTextureWrapper* lava_tex = loader->LoadTexture("lava_tex", "/lev/terraini/lava.png");
+
+  csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (GetObjectRegistry(), "crystalspace.shared.stringset", iStringSet);
+  
+  csRef<iShaderManager> shmgr = CS_QUERY_REGISTRY (GetObjectRegistry(), iShaderManager);
+  
+  loader->LoadShader("/lev/terraini/shader.xml");
+  
+  iShader* shader = shmgr->GetShader("terrain_improved");
+  
+  csRefArray<iMaterialWrapper> materials;
+  
+  iMaterialWrapper* material;
+  
+  (material = engine->CreateMaterial("LavaMaterial", lava_tex))->GetMaterial()->SetShader(strings->Request("standard"), shader);
+  materials.Push(material);
+  
+  (material = engine->CreateMaterial("GrassMaterial", grass_tex))->GetMaterial()->SetShader(strings->Request("standard"), shader);
+  materials.Push(material);
+
+  (material = engine->CreateMaterial("StoneMaterial", stone_tex))->GetMaterial()->SetShader(strings->Request("standard"), shader);
+  materials.Push(material);
+  
+  terrain->SetMaterialPalette(materials);
 
   return true;
 }

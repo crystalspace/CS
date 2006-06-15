@@ -21,11 +21,11 @@
 
 #include "csutil/scf.h"
 #include "csutil/array.h"
+#include "csutil/refarr.h"
 
 struct iRenderView;
 struct iTerrainCellRenderProperties;
 struct iTerrainCellCollisionProperties;
-struct iMaterialWrapper;
 struct iImage;
 
 class csVector2;
@@ -66,16 +66,13 @@ struct iTerrainCell : public virtual iBase
   virtual const csVector2& GetPosition() const = 0;
   virtual const csVector2& GetSize() const = 0;
 
-  virtual const csArray<iMaterialWrapper*>& GetMaterialPalette() const = 0;
-  virtual void SetMaterialPalette(const csArray<iMaterialWrapper*>& array) = 0;
-
   virtual int GetMaterialMapWidth() const = 0;
   virtual int GetMaterialMapHeight() const = 0;
   virtual csLockedMaterialMap LockMaterialMap(const csRect& rectangle) = 0;
   virtual void UnlockMaterialMap() = 0;
 
-  virtual void SetMaterialMask(int material, iImage* image) = 0;
-  virtual void SetMaterialMask(int material, const csArray<char>& data, int width, int height) = 0;
+  virtual void SetMaterialMask(unsigned int material, iImage* image) = 0;
+  virtual void SetMaterialMask(unsigned int material, const unsigned char* data, unsigned int width, unsigned int height) = 0;
 
   virtual bool CollideRay(const csVector3& start, const csVector3& end, bool oneHit, csArray<csVector3>& points) const = 0;
   virtual bool CollideSegment(const csVector3& start, const csVector3& end, bool oneHit, csArray<csVector3>& points) const = 0;

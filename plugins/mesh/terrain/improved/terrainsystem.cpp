@@ -28,6 +28,8 @@
 #include "iengine/rview.h"
 #include "iengine/camera.h"
 
+#include "iengine/movable.h"
+
 #include "terrainsystem.h"
 
 #include "debug.h"
@@ -89,6 +91,18 @@ iTerrainCell* csTerrainSystem::GetCell(const csVector2& pos)
   return NULL;
 }
 
+const csRefArray<iMaterialWrapper>& csTerrainSystem::GetMaterialPalette() const
+{
+  return material_palette;
+}
+
+void csTerrainSystem::SetMaterialPalette(const csRefArray<iMaterialWrapper>& array)
+{
+  material_palette = array;
+
+  renderer->OnMaterialPaletteUpdate(material_palette);
+}
+
 bool csTerrainSystem::CollideRay(const csVector3& start, const csVector3& end, bool oneHit, csArray<csVector3>& points)
 {
   return false;
@@ -119,31 +133,31 @@ void csTerrainSystem::SetAutoPreLoad(bool mode)
   auto_preload = mode;
 }
 
-void csTerrainSystem::PreLoadCells(iRenderView* view)
+void csTerrainSystem::PreLoadCells(iRenderView* rview, iMovable* movable)
 {
   csPlane3 planes[10];
   uint32 frustum_mask;
   
-  /// Here I should not just mul by vview_distance, because it scales the frustum in N times, but does not make far plane distance equal to N
-  /// (which is the desired result)
-  /// Left for now.
+  csOrthoTransform c2ot = rview->GetCamera()->GetTransform();
+  c2ot /= movable->GetFullTransform ();
+  
+  rview->SetupClipPlanes(c2ot, planes, frustum_mask);
+  
+  /// Here I should not just multiply by vview_distance, because it scales the frustum in N times, and N has nothing to do with distance :)
+  /// Left for now, because, well, I'm not sure of the desired behavior
 
 #pragma message(PR_WARNING("vview_distance hack, frustum is enlarged too much"))
-  
-  csOrthoTransform transform = view->GetCamera()->GetTransform();
-  transform *= csOrthoTransform(csMatrix3(1/vview_distance, 0, 0,
-                                          0, 1/vview_distance, 0,
-                                          0, 0, 1/vview_distance), csVector3(0, 0, 0));
-  
-  view->SetupClipPlanes(transform, planes, frustum_mask);
+
+  for (int pi = 0; pi < 10; ++pi)
+    planes[pi].DD *= vview_distance;
   
   for (size_t i = 0; i < cells.GetSize(); ++i)
   {
-    int clip_portal, clip_plane, clip_zplane;
+    uint32 out_mask;
     
     csBox3 box = cells[i]->GetBBox();
     
-    if (view->ClipBBox(planes, frustum_mask, box, clip_portal, clip_plane, clip_zplane) && cells[i]->GetLoadState() == csTerrainCell::NotLoaded)
+    if (csIntersect3::BoxFrustum(box, planes, frustum_mask, out_mask) && cells[i]->GetLoadState() == csTerrainCell::NotLoaded)
       cells[i]->PreLoad();
   }
 }
@@ -200,19 +214,20 @@ csRenderMesh** csTerrainSystem::GetRenderMeshes (int& num, iRenderView* rview,
 {
   needed_cells.SetSize(0);
   
-  const csOrthoTransform& transform = rview->GetCamera()->GetTransform();
+  csOrthoTransform c2ot = rview->GetCamera()->GetTransform();
+  c2ot /= movable->GetFullTransform ();
   
   csPlane3 planes[10];
   
-  rview->SetupClipPlanes(transform, planes, frustum_mask);
+  rview->SetupClipPlanes(c2ot, planes, frustum_mask);
   
   for (size_t i = 0; i < cells.GetSize(); ++i)
   {
-    int clip_portal, clip_plane, clip_zplane;
+    uint32 out_mask;
     
     csBox3 box = cells[i]->GetBBox();
 
-    if (rview->ClipBBox(planes, frustum_mask, box, clip_portal, clip_plane, clip_zplane))
+    if (csIntersect3::BoxFrustum(box, planes, frustum_mask, out_mask))
     {
       if (cells[i]->GetLoadState() != csTerrainCell::Loaded) cells[i]->Load();
       
@@ -220,7 +235,7 @@ csRenderMesh** csTerrainSystem::GetRenderMeshes (int& num, iRenderView* rview,
     }
   }
   
-  if (auto_preload) PreLoadCells(rview);
+  if (auto_preload) PreLoadCells(rview, movable);
   
   if (imo_viscb) imo_viscb->BeforeDrawing(this, rview);
   

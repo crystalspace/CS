@@ -98,6 +98,8 @@ private:
   csSector* sector;
 };
 
+#include "csutil/win32/msvc_deprecated_warn_off.h"
+
 /**
  * A sector is a container for objects. It is one of
  * the base classes for the portal engine.
@@ -490,6 +492,8 @@ private:
    */
   iMeshWrapper* single_mesh;
 };
+
+#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 /// List of 3D engine sectors.
 class csSectorList : public scfImplementation1<csSectorList, iSectorList>

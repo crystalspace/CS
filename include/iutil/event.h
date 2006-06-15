@@ -24,9 +24,8 @@
 
 #include "csutil/scf.h"
 #include "csutil/csunicode.h"
-#include "csutil/strset.h"
-#include "csutil/eventnames.h"
-
+#include "csutil/ref.h"
+#include "iutil/eventnames.h"
 #include "iutil/evdefs.h"
 
 

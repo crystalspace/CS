@@ -44,5 +44,11 @@ csPtr<iMeshObjectFactory> csTerrainMeshObjectType::NewFactory ()
   return csPtr<iMeshObjectFactory> (ifact);
 }
 
+bool csTerrainMeshObjectType::Initialize (iObjectRegistry* object_reg)
+{
+  this->object_reg = object_reg;
+  return true;
+}
+
 }
 CS_PLUGIN_NAMESPACE_END(ImprovedTerrain)

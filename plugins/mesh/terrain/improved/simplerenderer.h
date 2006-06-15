@@ -28,6 +28,8 @@
 
 #include "csutil/dirtyaccessarray.h"
 
+#include "iutil/comp.h"
+
 CS_PLUGIN_NAMESPACE_BEGIN(ImprovedTerrain)
 {
 
@@ -48,12 +50,17 @@ public:
 };
 
 class csTerrainSimpleRenderer :
-  public scfImplementation1<csTerrainSimpleRenderer,
-                            iTerrainRenderer>
+  public scfImplementation2<csTerrainSimpleRenderer,
+                            iTerrainRenderer,
+                            iComponent>
 {
   csDirtyAccessArray<csRenderMesh*> meshes;
   
   csRenderMeshHolder rm_holder;
+
+  csRefArray<iMaterialWrapper> material_palette;
+
+  iObjectRegistry* object_reg;
 public:
   csTerrainSimpleRenderer (iBase* parent);
 
@@ -65,7 +72,12 @@ public:
 
   virtual csRenderMesh** GetRenderMeshes(int& n, iRenderView* rview, iMovable* movable, uint32 frustum_mask, iTerrainCell** cells, int cell_count);
   
-  virtual void OnHeightUpdate(iTerrainCell* cell, const csRect& rectangle, float* data, unsigned int pitch);
+  virtual void OnMaterialPaletteUpdate(const csRefArray<iMaterialWrapper>& material_palette);
+  virtual void OnHeightUpdate(iTerrainCell* cell, const csRect& rectangle, const float* data, unsigned int pitch);
+  virtual void OnMaterialMaskUpdate(iTerrainCell* cell, unsigned int material, const csRect& rectangle, const unsigned char* data, unsigned int pitch);
+  
+  // ------------ iComponent implementation ------------
+  virtual bool Initialize (iObjectRegistry* object_reg);
 };
 
 }

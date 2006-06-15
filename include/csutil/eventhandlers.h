@@ -24,12 +24,14 @@
 #include "csextern.h"
 #include "iutil/eventnames.h"
 #include "iutil/eventhandlers.h"
-#include "iutil/objreg.h"
 #include "iutil/eventh.h"
+#include "csutil/eventnames.h"
 #include "csutil/scf_implementation.h"
 #include "csutil/hash.h"
 #include "csutil/strset.h"
-#include "csutil/scf.h"
+#include "csutil/ref.h"
+
+struct iObjectRegistry;
 
 /**\file
  * Event handler naming, name management, indexing, and instantiation

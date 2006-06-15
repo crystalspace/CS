@@ -187,7 +187,7 @@ csTargetRenderStep::~csTargetRenderStep ()
 }
 
 void csTargetRenderStep::Perform (iRenderView* rview, iSector* sector,
-  csShaderVarStack &stacks)
+  iShaderVarStack* stacks)
 {
   iGraphics3D* g3d = rview->GetGraphics3D();
 

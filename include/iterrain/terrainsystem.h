@@ -24,6 +24,7 @@
 
 struct iRenderView;
 struct iTerrainCell;
+struct iMaterialWrapper;
 
 class csVector2;
 class csVector3;
@@ -35,6 +36,9 @@ struct iTerrainSystem : public virtual iBase
   virtual iTerrainCell* GetCell(const char* name) = 0;
   virtual iTerrainCell* GetCell(const csVector2& pos) = 0;
 
+  virtual const csRefArray<iMaterialWrapper>& GetMaterialPalette() const = 0;
+  virtual void SetMaterialPalette(const csRefArray<iMaterialWrapper>& array) = 0;
+
   virtual bool CollideRay(const csVector3& start, const csVector3& end, bool oneHit, csArray<csVector3>& points) = 0;
   virtual bool CollideSegment(const csVector3& start, const csVector3& end, bool oneHit, csArray<csVector3>& points) = 0;
 
@@ -43,7 +47,7 @@ struct iTerrainSystem : public virtual iBase
 
   virtual bool GetAutoPreLoad() const = 0;
   virtual void SetAutoPreLoad(bool mode) = 0;
-  virtual void PreLoadCells(iRenderView* view) = 0;
+  virtual void PreLoadCells(iRenderView* rview, iMovable* movable) = 0;
   
   virtual float GetHeight(const csVector2& pos) = 0;
   virtual csVector3 GetTangent(const csVector2& pos) = 0;

@@ -21,6 +21,7 @@
 #include "csgeom/transfrm.h"
 #include "csutil/cscolor.h"
 #include "csutil/event.h"
+#include "csutil/eventnames.h"
 #include "iutil/objreg.h"
 #include "iutil/plugin.h"
 #include "iutil/virtclk.h"

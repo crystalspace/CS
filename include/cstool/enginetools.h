@@ -24,11 +24,31 @@
 
 #include "csextern.h"
 
+#include "csutil/set.h"
 #include "csutil/array.h"
+#include "csgeom/vector3.h"
 
 struct iSector;
 
-class csVector3;
+/**
+ * Result structure for csEngineTools::FindShortestDistance().
+ */
+struct csShortestDistanceResult
+{
+  /**
+   * Squared distance between the two points or negative if the distance
+   * goes beyond the maximum radius.
+   */
+  float sqdistance;
+
+  /**
+   * This is a direction towards the destination point but corrected
+   * with space warping portals. That means that if you go from the
+   * start position in the direction returned here you will end up at
+   * the destination point.
+   */
+  csVector3 direction;
+};
 
 /**
  * This is a class with static helper functions for working on engine
@@ -41,7 +61,9 @@ private:
   	const csVector3& source, iSector* sourceSector,
   	const csVector3& dest, iSector* destSector,
   	float maxradius,
-	csArray<iSector*>& visited_sectors);
+	csSet<csPtrKey<iSector> >& visited_sectors,
+	csVector3& direction,
+	bool accurate);
 
 public:
   /**
@@ -60,9 +82,10 @@ public:
    * this function will check if the portal is oriented towards the source
    * point (i.e it doesn't ignore visibility with regards to backface culling).
    * <p>
-   * Note that this function only considers the center point of a portal
-   * for calculating the distance. This might skew results with very
-   * big portals.
+   * Note that this function (by default) only considers the center point
+   * of a portal for calculating the distance. This might skew results with
+   * very big portals. Set the 'accurate' parameter to true if you don't
+   * want this.
    * <p>
    * This function will correctly account for space warping portals.
    * <p>
@@ -71,13 +94,20 @@ public:
    * \param dest is the destination position to start from.
    * \param destSector is the destination for that position.
    * \param maxradius is the maximum radius before we stop recursion.
-   * \return the squared distance between the two points or a negative
-   * number if the distance goes beyond the maximum radius.
+   * \param accurate if this is true then this routine will use a more
+   * accurate distance test to see if the portal is close enough. With
+   * small portals this is probably rarely needed but if you need to be
+   * certain to find all cases then you can set this to true.
+   * \return an instance of csShortestDistanceResult which contains
+   * the squared distance between the two points or a negative
+   * number if the distance goes beyond the maximum radius. It also
+   * contains a space-warping corrected direction from the source point
+   * to the destination point.
    */
-  static float FindShortestDistance (
+  static csShortestDistanceResult FindShortestDistance (
   	const csVector3& source, iSector* sourceSector,
   	const csVector3& dest, iSector* destSector,
-  	float maxradius);
+  	float maxradius, bool accurate = false);
 };
 
 #endif // __CS_ENGINETOOLS_H__

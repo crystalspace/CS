@@ -26,7 +26,7 @@
  * \addtogroup event_handling
  * @{ */
 
-#include "csutil/scf.h"
+#include "csutil/scf_interface.h"
 #include "iutil/eventnames.h"
 #include "iutil/eventhandlers.h"
 

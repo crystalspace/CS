@@ -29,12 +29,16 @@
 
 #include "imesh/object.h"
 
+#include "iengine/material.h"
+
 #include "cell.h"
 
 #include "csutil/refarr.h"
 #include "csutil/flags.h"
 
 #include "csgeom/box.h"
+
+#include "csutil/refarr.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(ImprovedTerrain)
 {
@@ -61,6 +65,8 @@ class csTerrainSystem :
 
   csDirtyAccessArray<iTerrainCell*> needed_cells;
 
+  csRefArray<iMaterialWrapper> material_palette;
+
   csBox3 bbox;
   bool bbox_valid;
 
@@ -81,6 +87,9 @@ public:
   virtual iTerrainCell* GetCell(const char* name);
   virtual iTerrainCell* GetCell(const csVector2& pos);
 
+  virtual const csRefArray<iMaterialWrapper>& GetMaterialPalette() const;
+  virtual void SetMaterialPalette(const csRefArray<iMaterialWrapper>& array);
+
   virtual bool CollideRay(const csVector3& start, const csVector3& end, bool oneHit, csArray<csVector3>& points);
   virtual bool CollideSegment(const csVector3& start, const csVector3& end, bool oneHit, csArray<csVector3>& points);
 
@@ -89,7 +98,7 @@ public:
 
   virtual bool GetAutoPreLoad() const;
   virtual void SetAutoPreLoad(bool mode);
-  virtual void PreLoadCells(iRenderView* view);
+  virtual void PreLoadCells(iRenderView* rview, iMovable* movable);
   
   virtual float GetHeight(const csVector2& pos);
   virtual csVector3 GetTangent(const csVector2& pos);

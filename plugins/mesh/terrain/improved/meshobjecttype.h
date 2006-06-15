@@ -23,13 +23,17 @@
 
 #include "imesh/object.h"
 
+#include "iutil/comp.h"
+
 CS_PLUGIN_NAMESPACE_BEGIN(ImprovedTerrain)
 {
 
 class csTerrainMeshObjectType :
-  public scfImplementation1<csTerrainMeshObjectType,
-                            iMeshObjectType>
+  public scfImplementation2<csTerrainMeshObjectType,
+                            iMeshObjectType,
+                            iComponent>
 {
+  iObjectRegistry* object_reg;
 public:
   csTerrainMeshObjectType (iBase* parent);
 
@@ -38,6 +42,9 @@ public:
   // ------------ iMeshObjectType implementation ------------
 
   virtual csPtr<iMeshObjectFactory> NewFactory ();
+  
+  // ------------ iComponent implementation ------------
+  virtual bool Initialize (iObjectRegistry* object_reg);
 };
 
 }

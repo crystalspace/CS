@@ -24,12 +24,14 @@
 #include "iterrain/terraincollider.h"
 #include "iterrain/terraincellcollisionproperties.h"
 
+#include "iutil/comp.h"
+
 CS_PLUGIN_NAMESPACE_BEGIN(ImprovedTerrain)
 {
 
 class csTerrainSimpleCellCollisionProperties :
   public scfImplementation1<csTerrainSimpleCellCollisionProperties,
-                          iTerrainCellCollisionProperties>
+                            iTerrainCellCollisionProperties>
 {
 private:
   bool collideable;
@@ -44,20 +46,25 @@ public:
 };
 
 class csTerrainSimpleCollider :
-  public scfImplementation1<csTerrainSimpleCollider,
-                            iTerrainCollider>
+  public scfImplementation2<csTerrainSimpleCollider,
+                            iTerrainCollider,
+                            iComponent>
 {
+  iObjectRegistry* object_reg;
 public:
   csTerrainSimpleCollider (iBase* parent);
 
   virtual ~csTerrainSimpleCollider ();
 
-  // ------------ iTerrainCOLLIDER implementation ------------
+  // ------------ iTerrainCollider implementation ------------
 
   virtual csPtr<iTerrainCellCollisionProperties> CreateProperties();
 
   virtual bool CollideRay(iTerrainCell* cell, const csVector3& start, const csVector3& end, bool oneHit, csArray<csVector3>& points);
   virtual bool CollideSegment(iTerrainCell* cell, const csVector3& start, const csVector3& end, bool oneHit, csArray<csVector3>& points);
+  
+  // ------------ iComponent implementation ------------
+  virtual bool Initialize (iObjectRegistry* object_reg);
 };
 
 }

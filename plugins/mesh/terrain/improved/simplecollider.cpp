@@ -70,5 +70,11 @@ bool csTerrainSimpleCollider::CollideSegment(iTerrainCell* cell, const csVector3
   return false;
 }
 
+bool csTerrainSimpleCollider::Initialize (iObjectRegistry* object_reg)
+{
+  this->object_reg = object_reg;
+  return true;
+}
+
 }
 CS_PLUGIN_NAMESPACE_END(ImprovedTerrain)

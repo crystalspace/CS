@@ -4914,25 +4914,22 @@ iMapNode* csLoader::ParseNode (iDocumentNode* node, iSector* sec)
   return pNode;
 }
 
-class csMissingSectorCallback : public iPortalCallback
+class csMissingSectorCallback : 
+  public scfImplementation1<csMissingSectorCallback, 
+                            iPortalCallback>
 {
 public:
   csRef<iLoaderContext> ldr_context;
   csString sectorname;
   bool autoresolve;
 
-  SCF_DECLARE_IBASE;
   csMissingSectorCallback (iLoaderContext* ldr_context, const char* sector,
-  	bool autoresolve)
+    bool autoresolve) : scfImplementationType (this), ldr_context (ldr_context), 
+    sectorname (sector), autoresolve (autoresolve)
   {
-    SCF_CONSTRUCT_IBASE (0);
-    csMissingSectorCallback::ldr_context = ldr_context;
-    sectorname = sector;
-    csMissingSectorCallback::autoresolve = autoresolve;
   }
   virtual ~csMissingSectorCallback ()
   {
-    SCF_DESTRUCT_IBASE();
   }
   
   virtual bool Traverse (iPortal* portal, iBase* /*context*/)
@@ -4949,10 +4946,6 @@ public:
     return true;
   }
 };
-
-SCF_IMPLEMENT_IBASE (csMissingSectorCallback)
-  SCF_IMPLEMENTS_INTERFACE (iPortalCallback)
-SCF_IMPLEMENT_IBASE_END
 
 bool csLoader::ParsePortal (iLoaderContext* ldr_context,
 	iDocumentNode* node, iSector* sourceSector, const char* container_name,
@@ -5053,10 +5046,10 @@ bool csLoader::ParsePortal (iLoaderContext* ldr_context,
   {
     // Create a callback to find the sector at runtime when the
     // portal is first used.
-    csMissingSectorCallback* missing_cb = new csMissingSectorCallback (
-	    	ldr_context, destSectorName.GetData (), autoresolve);
+    csRef<csMissingSectorCallback> missing_cb;
+    missing_cb.AttachNew (new csMissingSectorCallback (
+      ldr_context, destSectorName.GetData (), autoresolve));
     portal->SetMissingSectorCallback (missing_cb);
-    missing_cb->DecRef ();
   }
 
   portal->GetFlags ().Set (flags);

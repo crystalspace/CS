@@ -22,6 +22,19 @@
 
 #include "csgeom/csrect.h"
 
+#include "igraphic/image.h"
+#include "iutil/objreg.h"
+#include "iutil/plugin.h"
+
+#include "csutil/refarr.h"
+#include "csutil/dirtyaccessarray.h"
+
+#include "iengine/material.h"
+
+#include "iengine/engine.h"
+
+#include "imap/loader.h"
+
 #include "simpledatafeeder.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(ImprovedTerrain)
@@ -52,7 +65,7 @@ void csTerrainSimpleDataFeeder::Load(iTerrainCell* cell)
 
   csLockedHeightData data = cell->LockHeightData(csRect(0, 0, width, height));
 
-  for (int y = 0; y < height; ++y)
+/*  for (int y = 0; y < height; ++y)
     for (int x = 0; x < width; ++x)
     {
       float xd = float(x - width/2) / width;
@@ -60,8 +73,45 @@ void csTerrainSimpleDataFeeder::Load(iTerrainCell* cell)
 
       data.data[y * data.pitch + x] = sqrtf(1 - xd*xd - yd*yd) * 60;
     }
+    
+  cell->UnlockHeightData();*/
+  csRef<iLoader> loader = CS_QUERY_REGISTRY (object_reg, iLoader); // yes, it does not work in release mode. again. :)
+  
+  csRef<iImage> map = loader->LoadImage("/lev/terraini/heightmap.png", CS_IMGFMT_PALETTED8);
+
+  for (int y = 0; y < height; ++y)
+    for (int x = 0; x < width; ++x)
+    {
+      float xd = float(x - width/2) / width;
+      float yd = float(y - height/2) / height;
+
+      data.data[y * data.pitch + x] = ((unsigned char*)map->GetImageData())[y * map->GetWidth() + x];
+    }
 
   cell->UnlockHeightData();
+  
+  int mwidth = cell->GetMaterialMapWidth();
+  int mheight = cell->GetMaterialMapHeight();
+  
+  csRef<iImage> material = loader->LoadImage("/lev/terraini/material.png", CS_IMGFMT_TRUECOLOR);
+  
+  csDirtyAccessArray<unsigned char> mdata;
+  mdata.SetSize(mwidth * mheight);
+  
+  for (int i = 0; i < 3; ++i)
+  {
+    for (int y = 0; y < mheight; ++y)
+      for (int x = 0; x < mwidth; ++x)
+        mdata[y * mwidth + x] = ((unsigned char*)material->GetImageData())[y * mwidth * 4 + x * 4 + i];
+        
+    cell->SetMaterialMask(i, mdata.GetArray(), mwidth, mheight);
+  }
+}
+
+bool csTerrainSimpleDataFeeder::Initialize (iObjectRegistry* object_reg)
+{
+  this->object_reg = object_reg;
+  return true;
 }
 
 }

@@ -23,13 +23,18 @@
 
 #include "iterrain/terraindatafeeder.h"
 
+#include "iutil/comp.h"
+
 CS_PLUGIN_NAMESPACE_BEGIN(ImprovedTerrain)
 {
 
 class csTerrainSimpleDataFeeder :
-  public scfImplementation1<csTerrainSimpleDataFeeder,
-                            iTerrainDataFeeder>
+  public scfImplementation2<csTerrainSimpleDataFeeder,
+                            iTerrainDataFeeder,
+                            iComponent>
 {
+  iObjectRegistry* object_reg;
+
 public:
   csTerrainSimpleDataFeeder (iBase* parent);
 
@@ -39,6 +44,9 @@ public:
 
   virtual void PreLoad(iTerrainCell* cell);
   virtual void Load(iTerrainCell* cell);
+  
+  // ------------ iComponent implementation ------------
+  virtual bool Initialize (iObjectRegistry* object_reg);
 };
 
 }

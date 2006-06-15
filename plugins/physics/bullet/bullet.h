@@ -288,9 +288,9 @@ public:
   csRef<iDynamicsSystemCollider> GetCollider (unsigned int index);
   int GetColliderCount ();
 
-  void AttachLight (iLight* light) {;};
+  void AttachLight (iLight*) {};
   iLight* GetAttachedLight () {return NULL;}
-  void AttachCamera (iCamera* camera) {;}
+  void AttachCamera (iCamera*) {}
   iCamera* GetAttachedCamera (){return NULL;}
 
 protected:

@@ -25,6 +25,10 @@
 #include "csgeom/vector3.h"
 #include "csgeom/csrect.h"
 
+#include "csgfx/imagebase.h"
+
+#include "debug.h"
+
 CS_PLUGIN_NAMESPACE_BEGIN(ImprovedTerrain)
 {
 
@@ -57,7 +61,7 @@ csTerrainCell::csTerrainCell (const char* name, int grid_width, int grid_height,
   render_data = NULL;
 
   min_height = 0;
-  max_height = 40;
+  max_height = 60;
 }
 
 csTerrainCell::~csTerrainCell ()
@@ -167,15 +171,6 @@ const csVector2& csTerrainCell::GetSize() const
   return size;
 }
 
-const csArray<iMaterialWrapper*>& csTerrainCell::GetMaterialPalette() const
-{
-  throw 1;
-}
-
-void csTerrainCell::SetMaterialPalette(const csArray<iMaterialWrapper*>& array)
-{
-}
-
 int csTerrainCell::GetMaterialMapWidth() const
 {
   return material_width;
@@ -200,12 +195,17 @@ void csTerrainCell::UnlockMaterialMap()
 {
 }
 
-void csTerrainCell::SetMaterialMask(int material, iImage* image)
+void csTerrainCell::SetMaterialMask(unsigned int material, iImage* image)
 {
+  if (image->GetFormat() != CS_IMGFMT_PALETTED8) return;
+  
+  SetMaterialMask(material, (const unsigned char*)image->GetImageData(), image->GetWidth(), image->GetHeight());
 }
 
-void csTerrainCell::SetMaterialMask(int material, const csArray<char>& data, int width, int height)
+void csTerrainCell::SetMaterialMask(unsigned int material, const unsigned char* data, unsigned int width, unsigned int height)
 {
+#pragma message(PR_WARNING("this is a hack actually, perhaps SetMaterialMask should not accept images of wrong width/height? or resize them..."))
+  renderer->OnMaterialMaskUpdate(this, material, csRect(0, 0, width, height), data, width);
 }
 
 bool csTerrainCell::CollideRay(const csVector3& start, const csVector3& end, bool oneHit, csArray<csVector3>& points) const

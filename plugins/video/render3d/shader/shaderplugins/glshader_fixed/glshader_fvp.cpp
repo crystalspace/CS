@@ -67,7 +67,7 @@ const uint tuFlags = csGLStateCache::activateMatrix
 
 void csGLShaderFVP::SetupState (const csRenderMesh* /*mesh*/, 
                                 csRenderMeshModes& /*modes*/,
-				const csShaderVarStack &stacks)
+				const iShaderVarStack* stacks)
 {
   size_t i;
 

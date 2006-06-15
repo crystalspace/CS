@@ -103,16 +103,13 @@ public:
   virtual const csVector2& GetPosition() const;
   virtual const csVector2& GetSize() const;
 
-  virtual const csArray<iMaterialWrapper*>& GetMaterialPalette() const;
-  virtual void SetMaterialPalette(const csArray<iMaterialWrapper*>& array);
-
   virtual int GetMaterialMapWidth() const;
   virtual int GetMaterialMapHeight() const;
   virtual csLockedMaterialMap LockMaterialMap(const csRect& rectangle);
   virtual void UnlockMaterialMap();
 
-  virtual void SetMaterialMask(int material, iImage* image);
-  virtual void SetMaterialMask(int material, const csArray<char>& data, int width, int height);
+  virtual void SetMaterialMask(unsigned int material, iImage* image);
+  virtual void SetMaterialMask(unsigned int material, const unsigned char* data, unsigned int width, unsigned int height);
 
   virtual bool CollideRay(const csVector3& start, const csVector3& end, bool oneHit, csArray<csVector3>& points) const;
   virtual bool CollideSegment(const csVector3& start, const csVector3& end, bool oneHit, csArray<csVector3>& points) const;
