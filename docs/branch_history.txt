@@ -6,6 +6,11 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+14-June-2006
+	- David H. Bronke finished a basic implementation of iStreamSource. This
+	  implementation is non-threaded, blocking, and uses synchronous I/O.
+	  Therefore, it needs some more work before it's of any use. It should,
+	  however, correctly call the callbacks for success and error.
 8-June-2006
 	- David H. Bronke audited imap/streamsource.h and made the following
 	  changes:

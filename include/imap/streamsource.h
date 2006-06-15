@@ -24,6 +24,7 @@
 #include "csutil/scf_implementation.h"
 
 struct iDataBuffer;
+struct iProgressMeter;
 
 /**\file
  * Streaming data source
