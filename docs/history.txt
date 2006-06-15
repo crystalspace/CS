@@ -12,6 +12,11 @@ chronological order.
 	- Jorrit fixed a bug in genmesh GetRadius() function. This would
 	  return the correct radius but an incorrect center (i.e. center
 	  was always 0,0,0).
+	- Jorrit (with the help of Erroroman) fixed
+	  flat_ppl_attenuation.avp so that bumpmapping no longer flickers.
+	  This fixes at least light_bumpmap technique 220. Not sure
+	  about the others. The bug still appears present in case glow
+	  is used however.
 14-Jun-2006
 	- caedes fixed cspace.i for changes in spr2d.
 	- caedes fixed cspython.cpp for dissaparition of evenhandler.h.
