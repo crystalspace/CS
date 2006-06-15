@@ -25,6 +25,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <math.h>
 #include <ctype.h>
 
+#include "csutil/scfarray.h"
 #include "csutil/sysfunc.h"
 
 #include "iutil/strset.h"
@@ -272,7 +273,7 @@ void csShaderExpression::EvalError (const char* message, ...) const
 csShaderVariable* csShaderExpression::ResolveVar (csStringID name)
 {
   if (!stacks) return 0;
-  return csGetShaderVariableFromStack (*stacks, name);
+  return csGetShaderVariableFromStack (stacks, name);
 }
 
 bool csShaderExpression::Parse(iDocumentNode * node)
@@ -350,6 +351,15 @@ bool csShaderExpression::Parse(iDocumentNode * node)
 bool csShaderExpression::Evaluate(csShaderVariable* var, 
                                   csShaderVarStack& stacks)
 {
+  csRef<iShaderVarStack> wrapStacks;
+  wrapStacks.AttachNew (new scfArrayWrap <iShaderVarStack, 
+    csShaderVarStack> (stacks));
+  return Evaluate (var, wrapStacks);
+}
+
+bool csShaderExpression::Evaluate(csShaderVariable* var, 
+                                  iShaderVarStack* stacks)
+{
 #ifdef SHADEREXP_DEBUG
   int debug_counter = 0;
 #endif
@@ -362,7 +372,7 @@ bool csShaderExpression::Evaluate(csShaderVariable* var,
   }
 
   bool eval = true;
-  this->stacks = &stacks;
+  this->stacks = stacks;
 
   oper_array::Iterator iter = opcodes.GetIterator();
 
@@ -2251,7 +2261,7 @@ static const TokenTabEntry commonTokens[] = {
   {"elt2", 4, OP_VEC_ELT2},
   {"elt3", 4, OP_VEC_ELT3},
   {"elt4", 4, OP_VEC_ELT4},
-  {"frame", 4, OP_FUNC_FRAME},
+  {"frame", 5, OP_FUNC_FRAME},
   {"make-vector", 11, OP_PS_MAKE_VECTOR},
   {"max", 3, OP_FUNC_MAX},
   {"min", 3, OP_FUNC_MIN},

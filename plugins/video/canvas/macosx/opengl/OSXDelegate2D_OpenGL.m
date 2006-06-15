@@ -74,6 +74,10 @@ NSOpenGLContext *context;
 
     // Store pixelFormatValues before pixelFormat is release'd
     // pixelFormatValues is free'd in GLOSXDriver2D.cpp
+	// -- A non-author's note, this caused crashes when using ptmalloc
+	// and also would cause crashes if the values were requested again.
+	// Right now this is left un-freed, we should make a destructor for
+	// this class.
     pixelFormatValues = (long *)malloc(sizeof(long) * 5);
 
     [pixelFormat    getValues:&return_value 

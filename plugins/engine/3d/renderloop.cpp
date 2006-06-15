@@ -70,7 +70,7 @@ void csRenderLoop::Draw (iRenderView *rview, iSector *s, iMeshWrapper* mesh)
     csRef<iClipper2D> oldClipper = rview->GetGraphics3D()->GetClipper();
     int oldClipType = rview->GetGraphics3D()->GetClipType();
 
-    csShaderVarStack &varStack = shadermanager->GetShaderVariableStack ();
+    csRef<iShaderVarStack> varStack = shadermanager->GetShaderVariableStack ();
 
     s->IncRecLevel ();
     s->PrepareDraw (rview);

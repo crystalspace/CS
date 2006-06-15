@@ -116,8 +116,6 @@ struct iTextureHandle;
 #define CS_PORTAL_VISCULL 0x00000100
 
 
-SCF_VERSION (iPortalCallback, 0, 0, 1);
-
 /**
  * When a sector is missing this callback will be called. If this callback
  * returns false then this portal will not be traversed. Otherwise this
@@ -128,8 +126,10 @@ SCF_VERSION (iPortalCallback, 0, 0, 1);
  * This callback is used by:
  * - iPortal
  */
-struct iPortalCallback : public iBase
+struct iPortalCallback : public virtual iBase
 {
+  SCF_INTERFACE (iPortalCallback, 1, 0, 0);
+
   /**
    * Traverse to the portal. It is safe to delete this callback
    * in this function.

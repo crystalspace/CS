@@ -90,7 +90,7 @@ public:
   virtual ~csTargetRenderStep ();
 
   virtual void Perform (iRenderView* rview, iSector* sector,
-    csShaderVarStack &stacks);
+    iShaderVarStack* stacks);
 
   virtual size_t AddStep (iRenderStep* step);
   virtual bool DeleteStep (iRenderStep* step);

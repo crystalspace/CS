@@ -537,7 +537,7 @@ struct iSectorIterator : public virtual iBase
 {
   SCF_INTERFACE(iSectorIterator,2,0,0);
   /// Return true if there are more elements.
-  virtual bool HasNext () = 0;
+  virtual bool HasNext () const = 0;
 
   /// Get sector from iterator. Return 0 at end.
   virtual iSector* Next () = 0;
@@ -546,7 +546,7 @@ struct iSectorIterator : public virtual iBase
    * Get last position that was used from Fetch. This can be
    * different from 'pos' because of space warping.
    */
-  virtual const csVector3& GetLastPosition () = 0;
+  virtual const csVector3& GetLastPosition () const = 0;
 
   /// Restart iterator.
   virtual void Reset () = 0;

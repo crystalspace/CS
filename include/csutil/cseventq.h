@@ -34,14 +34,12 @@
 
 #include "csutil/array.h"
 #include "csutil/hash.h"
-#include "csutil/list.h"
 #include "csutil/ref.h"
-#include "csutil/refarr.h"
 #include "csutil/scf_implementation.h"
 #include "csutil/thread.h"
 #include "csutil/weakref.h"
-#include "iutil/eventnames.h"
-#include "iutil/eventhandlers.h"
+#include "csutil/eventhandlers.h"
+#include "iutil/eventh.h"
 #include "iutil/eventq.h"
 #include "cssubscription.h"
 

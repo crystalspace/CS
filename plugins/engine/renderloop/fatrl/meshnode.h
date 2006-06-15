@@ -66,7 +66,7 @@ class csMeshRenderNode : public csRenderNode
   struct MeshBucket
   {
     csDirtyAccessArray<csRenderMesh*> rendermeshes;
-    csDirtyAccessArray<csShaderVarStack> stacks;
+    csDirtyAccessArray<csRef<iShaderVarStack> > stacks;
   };
   typedef csRedBlackTreeMap<ShaderTicketKey, MeshBucket> SortedBuckets;
   SortedBuckets buckets;
@@ -89,13 +89,13 @@ class csMeshRenderNode : public csRenderNode
 
   inline void RenderMeshes (iGraphics3D* g3d, iShader* shader, 					
     size_t ticket, csRenderMesh** meshes, size_t num,
-    const csShaderVarStack* Stacks);
+    csRef<iShaderVarStack>* Stacks);
 
   csMeshRenderNode (csMeshRenderNodeFactory* factory, csStringID shaderType,
     iShader* defShader, csShaderVariableContext& shadervars, bool zoffset);
 public:
   void AddMesh (csRenderMesh* rm, iShader* shader, 
-    const csShaderVarStack& stacks, long prio, bool keepOrder,
+    iShaderVarStack* stacks, long prio, bool keepOrder,
     size_t ticket);
   bool HasMeshes () const { return !buckets.IsEmpty(); }
 

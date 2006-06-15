@@ -22,6 +22,7 @@
 #include "csgeom/transfrm.h"
 #include "csutil/cscolor.h"
 #include "csutil/event.h"
+#include "csutil/eventnames.h"
 #include "csutil/ref.h"
 #include "imesh/particles.h"
 #include "iutil/event.h"

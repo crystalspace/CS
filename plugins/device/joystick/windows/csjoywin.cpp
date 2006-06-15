@@ -21,6 +21,7 @@
 
 #include "csutil/csstring.h"
 #include "csutil/event.h"
+#include "csutil/eventnames.h"
 #include "csutil/util.h"
 #include "csutil/win32/win32.h"
 #include "csutil/win32/wintools.h"

@@ -470,7 +470,7 @@ bool csSprite3DMD2FactoryLoader::Load (iSprite3DFactoryState* state,
  */
 csPtr<iBase> csSprite3DMD2FactoryLoader::Parse (iDataBuffer* data,
 				       iStreamSource*,
-				       iLoaderContext* ldr_context,
+				       iLoaderContext*,
 				       iBase* context)
 {
   csRef<iPluginManager> plugin_mgr (

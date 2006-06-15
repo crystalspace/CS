@@ -95,17 +95,17 @@
 #define CS_STRUCT_ALIGN_4BYTE_BEGIN
 #undef CS_STRUCT_ALIGN_4BYTE_END
 #define CS_STRUCT_ALIGN_4BYTE_END
-#undef CS_GNUC_PRINTF(format_idx, arg_idx)
+#undef CS_GNUC_PRINTF
 #define CS_GNUC_PRINTF(format_idx, arg_idx)
-#undef CS_GNUC_SCANF(format_idx, arg_idx)
+#undef CS_GNUC_SCANF
 #define CS_GNUC_SCANF(format_idx, arg_idx)
-#undef CS_GNUC_WPRINTF(format_idx, arg_idx)
+#undef CS_GNUC_WPRINTF
 #define CS_GNUC_WPRINTF(format_idx, arg_idx)
-#undef CS_GNUC_WSCANF(format_idx, arg_idx)
+#undef CS_GNUC_WSCANF
 #define CS_GNUC_WSCANF(format_idx, arg_idx)
-#undef CS_DECLARE_STATIC_CLASSVAR(a, b, c)
+#undef CS_DECLARE_STATIC_CLASSVAR
 #define CS_DECLARE_STATIC_CLASSVAR(a, b, c)
-#undef CS_SPECIALIZE_TEMPLATE template<>
+#undef CS_SPECIALIZE_TEMPLATE
 #define CS_SPECIALIZE_TEMPLATE template<>
 #undef CS_FORCEINLINE
 #define CS_FORCEINLINE
@@ -115,22 +115,24 @@
 #define CS_IMPORT_SYM
 #undef CS_CRYSTALSPACE_EXPORT
 #define CS_CRYSTALSPACE_EXPORT
-#undef CS_LEAKGUARD_DECLARE(m)
+#undef CS_LEAKGUARD_DECLARE
 #define CS_LEAKGUARD_DECLARE(m)
 #undef CS_DEPRECATED_METHOD
 #define CS_DEPRECATED_METHOD
 #undef CS_DEPRECATED_METHOD_MSG
-#define CS_DEPRECATED_METHOD_MSG
+#define CS_DEPRECATED_METHOD_MSG(msg)
 #undef CS_DEPRECATED_TYPE
 #define CS_DEPRECATED_TYPE
 #undef CS_DEPRECATED_TYPE_MSG
-#define CS_DEPRECATED_TYPE_MSG
+#define CS_DEPRECATED_TYPE_MSG(msg)
 #undef CS_PURE_METHOD
 #define CS_PURE_METHOD
 #undef CS_CONST_METHOD
 #define CS_CONST_METHOD
 #undef CS_COMPILE_ASSERT
 #define CS_COMPILE_ASSERT(x)
+#undef CS_VISIBILITY_DEFAULT
+#define CS_VISIBILITY_DEFAULT
 
 // Compatibility macros.
 #define typename_qualifier typename
@@ -1177,10 +1179,10 @@ APPLY_FOR_EACH_INTERFACE
 %extend iSprite2DState
 {
   csSprite2DVertex* GetVertexByIndex(int index)
-  { return &(self->GetVertices()[index]); }
+  { return &self->GetVertices()->Get(index); }
 
   int GetVertexCount()
-  { return self->GetVertices().Length(); }
+  { return self->GetVertices()->GetSize(); }
 }
 
 // imesh/genmesh.h

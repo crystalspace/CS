@@ -144,19 +144,23 @@ void csParticleSystem::AppendRectSprite (float width, float height,
   csRef<iMeshObject> sprmesh (spr_factory->NewInstance ());
   csRef<iParticle> part (SCF_QUERY_INTERFACE (sprmesh, iParticle));
   csRef<iSprite2DState> state (SCF_QUERY_INTERFACE (sprmesh, iSprite2DState));
-  csColoredVertices& vs = state->GetVertices();
+  csRef<iColoredVertices> vs = state->GetVertices();
 
-  vs.SetLength (4);
-  vs[0].pos.Set (-width,-height); vs[0].u=0.; vs[0].v=1.;
-  vs[0].color.Set (0, 0, 0);
-  vs[1].pos.Set (-width,+height); vs[1].u=0.; vs[1].v=0.;
-  vs[1].color.Set (0, 0, 0);
-  vs[2].pos.Set (+width,+height); vs[2].u=1.; vs[2].v=0.;
-  vs[2].color.Set (0, 0, 0);
-  vs[3].pos.Set (+width,-height); vs[3].u=1.; vs[3].v=1.;
-  vs[3].color.Set (0, 0, 0);
+  vs->SetSize (4);
+  vs->Get (0).pos.Set (-width,-height); 
+  vs->Get (0).u=0.; vs->Get (0).v=1.;
+  vs->Get (0).color.Set (0, 0, 0);
+  vs->Get (1).pos.Set (-width,+height); 
+  vs->Get (1).u=0.; vs->Get (1).v=0.;
+  vs->Get (1).color.Set (0, 0, 0);
+  vs->Get (2).pos.Set (+width,+height); 
+  vs->Get (2).u=1.; vs->Get (2).v=0.;
+  vs->Get (2).color.Set (0, 0, 0);
+  vs->Get (3).pos.Set (+width,-height); 
+  vs->Get (3).u=1.; vs->Get (3).v=1.;
+  vs->Get (3).color.Set (0, 0, 0);
   state->SetLighting (lighted);
-  part->SetColor (csColor (1.0, 1.0, 1.0));
+  sprmesh->SetColor (csColor (1.0, 1.0, 1.0));
   sprmesh->SetMaterialWrapper (mat);
   AppendParticle (sprmesh, part, state);
   ShapeChanged ();
@@ -173,7 +177,7 @@ void csParticleSystem::AppendRegularSprite (int n, float radius,
   part->ScaleBy (radius);
   if (mat) sprmesh->SetMaterialWrapper (mat);
   state->SetLighting (lighted);
-  part->SetColor (csColor (1.0, 1.0, 1.0));
+  sprmesh->SetColor (csColor (1.0, 1.0, 1.0));
 
   AppendParticle (sprmesh, part, state);
   ShapeChanged ();
@@ -184,7 +188,10 @@ void csParticleSystem::SetupMixMode ()
 {
   size_t i;
   for (i = 0 ; i < particles.Length () ; i++)
-    GetParticle (i)->SetMixMode (MixMode);
+  {
+    csRef<iMeshObject> sprmesh = scfQueryInterface<iMeshObject> (GetParticle (i));
+    sprmesh->SetMixMode (MixMode);
+  }
 }
 
 
@@ -192,7 +199,10 @@ void csParticleSystem::SetupColor ()
 {
   size_t i;
   for(i = 0 ; i < particles.Length () ; i++)
-    GetParticle (i)->SetColor (color);
+  {
+    csRef<iMeshObject> sprmesh = scfQueryInterface<iMeshObject> (GetParticle (i));
+    sprmesh->SetColor (color);
+  }
 }
 
 
@@ -306,7 +316,7 @@ csRenderMesh** csParticleSystem::GetRenderMeshes (int& n, iRenderView* rview,
   if (!movable->IsFullTransformIdentity ())
     trans /= movable->GetFullTransform ();
 
-  SetupBuffers (sprite2ds[0]->GetVertices ().Length ());
+  SetupBuffers (sprite2ds[0]->GetVertices ()->GetSize());
 
   const uint currentFrame = rview->GetCurrentFrameNumber ();
 
@@ -343,7 +353,7 @@ csRenderMesh** csParticleSystem::GetRenderMeshes (int& n, iRenderView* rview,
   csRenderBufferLock<csVector2> txt (frameData.texel_buffer);
   for (i = 0 ; i < sprite2ds.Length () ; i++)
   {
-    csColoredVertices& sprvt = sprite2ds[i]->GetVertices ();
+    iColoredVertices* sprvt = sprite2ds[i]->GetVertices ();
     // transform to eye coordinates
     csVector3 pos = trans.Other2This (particles[i]->GetPosition ());
     uint mixmode = partmeshes[i]->GetMixMode ();
@@ -352,10 +362,11 @@ csRenderMesh** csParticleSystem::GetRenderMeshes (int& n, iRenderView* rview,
     size_t j;
     for (j = 0 ; j < part_sides ; j++)
     {
-      vt[p] = pos + csVector3 (sprvt[j].pos.x, sprvt[j].pos.y, 0); 
-      c[p].Set (sprvt[j].color.red, sprvt[j].color.green, sprvt[j].color.blue, 
+      const csSprite2DVertex& vtx = sprvt->Get (j);
+      vt[p] = pos + csVector3 (vtx.pos.x, vtx.pos.y, 0); 
+      c[p].Set (vtx.color.red, vtx.color.green, vtx.color.blue, 
         alpha);
-      txt[p].Set (sprvt[j].u, sprvt[j].v);
+      txt[p].Set (vtx.u, vtx.v);
       p++;
     }
   }

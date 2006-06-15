@@ -22,6 +22,7 @@
 #include "iutil/eventq.h"
 #include "iutil/event.h"
 #include "csutil/event.h"
+#include "csutil/eventnames.h"
 
 SCF_IMPLEMENT_IBASE_EXT(awsTimer)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iEventHandler)

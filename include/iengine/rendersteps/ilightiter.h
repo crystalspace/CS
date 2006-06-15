@@ -45,10 +45,10 @@ struct iLightIterRenderStep : public virtual iBase
 /// \todo Document me!
 struct iLightRenderStep : public virtual iBase
 {
-  SCF_INTERFACE (iLightRenderStep, 2, 0, 0);
+  SCF_INTERFACE (iLightRenderStep, 2, 1, 0);
 
   virtual void Perform (iRenderView* rview, iSector* sector,
-    iLight* light, csShaderVarStack &stacks) = 0;
+    iLight* light, iShaderVarStack* stacks) = 0;
 };
 
 /** @} */

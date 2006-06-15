@@ -52,8 +52,6 @@ struct iSector;
 struct iCamera;
 struct iSceneNode;
 
-SCF_VERSION (iCameraSectorListener, 0, 0, 1);
-
 /**
  * Implement this interface if you are interested in learning when
  * the camera changes sector.
@@ -61,8 +59,10 @@ SCF_VERSION (iCameraSectorListener, 0, 0, 1);
  * This callback is used by:
  * - iCamera
  */
-struct iCameraSectorListener : public iBase
+struct iCameraSectorListener : public virtual iBase
 {
+  SCF_INTERFACE (iCameraSectorListener, 0, 0, 1);
+
   /// Fired when the sector changes.
   virtual void NewSector (iCamera* camera, iSector* sector) = 0;
 };

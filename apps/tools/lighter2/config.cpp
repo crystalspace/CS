@@ -44,7 +44,7 @@ namespace lighter
     radProperties.vPatchResolution = 4;
   }
 
-  void Configuration::Initialize (const csStringArray& files)
+  void Configuration::Initialize (const csStringArray& /*files*/)
   {
     
   }

@@ -30,6 +30,7 @@
 #include "clip_iclipper.h"
 #include "scan_pix.h"
 #include "tridraw.h"
+#include "tridraw_fill.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(Soft3D)
 {
@@ -238,7 +239,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Soft3D)
   template<typename Pix>
   static void SetupPixTypeSpecifica (csSoftwareGraphics3DCommon* g3d)
   {
-    TriDrawMatrixFiller<Pix>::Fill (g3d, g3d->triDraw);
+    TriDrawMatrixFiller_Fill<Pix> (g3d, g3d->triDraw);
     g3d->specifica = new Specifica<Pix> (Pix (
       *g3d->GetDriver2D()->GetPixelFormat()));
   }

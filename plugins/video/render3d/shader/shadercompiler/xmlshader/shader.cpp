@@ -25,6 +25,7 @@
 #include "ivaria/reporter.h"
 #include "ivideo/rendermesh.h"
 
+#include "csutil/scfarray.h"
 #include "csutil/xmltiny.h"
 
 #include "shader.h"
@@ -96,10 +97,10 @@ const char* csShaderConditionResolver::ParseCondition (const char* str,
 bool csShaderConditionResolver::Evaluate (csConditionID condition)
 {
   const csRenderMeshModes* modes = csShaderConditionResolver::modes;
-  const csShaderVarStack* stacks = csShaderConditionResolver::stacks;
+  const iShaderVarStack* stacks = csShaderConditionResolver::stacks;
 
   return evaluator.Evaluate (condition, modes ? *modes : csRenderMeshModes(),
-    stacks ? *stacks : csShaderVarStack ());
+    stacks);
 }
 
 csConditionNode* csShaderConditionResolver::NewNode (csConditionNode* parent)
@@ -176,7 +177,7 @@ void csShaderConditionResolver::FinishAdding ()
 }
 
 void csShaderConditionResolver::SetEvalParams (const csRenderMeshModes* modes,
-					       const csShaderVarStack* stacks)
+					       const iShaderVarStack* stacks)
 {
   csShaderConditionResolver::modes = modes;
   csShaderConditionResolver::stacks = stacks;
@@ -185,7 +186,7 @@ void csShaderConditionResolver::SetEvalParams (const csRenderMeshModes* modes,
 size_t csShaderConditionResolver::GetVariant ()
 {
   const csRenderMeshModes& modes = *csShaderConditionResolver::modes;
-  const csShaderVarStack& stacks = *csShaderConditionResolver::stacks;
+  const iShaderVarStack* stacks = csShaderConditionResolver::stacks;
 
   if (rootNode == 0)
   {
@@ -413,11 +414,12 @@ class SVCWrapper : public scfImplementation1<SVCWrapper,
 {
   csShaderVariableContext& wrappedSVC;
 public:
-  csShaderVarStack svStack;
+  csRef<iShaderVarStack> svStack;
 
   SVCWrapper (csShaderVariableContext& wrappedSVC) : 
     scfImplementationType (this), wrappedSVC (wrappedSVC)
   {
+    svStack.AttachNew (new scfArray<iShaderVarStack>);
     wrappedSVC.PushVariables (svStack);
   }
   virtual ~SVCWrapper () { }
@@ -429,7 +431,7 @@ public:
   { return wrappedSVC.GetVariable (name); }
   virtual const csRefArray<csShaderVariable>& GetShaderVariables () const
   { return wrappedSVC.GetShaderVariables (); }
-  virtual void PushVariables (csShaderVarStack &stacks) const
+  virtual void PushVariables (iShaderVarStack* stacks) const
   { wrappedSVC.PushVariables (stacks); }
   virtual bool IsEmpty() const
   { return wrappedSVC.IsEmpty(); }
@@ -443,7 +445,7 @@ void csXMLShader::ParseGlobalSVs (iDocumentNode* node)
 {
   SVCWrapper wrapper (globalSVContext);
   resolver->ResetEvaluationCache();
-  resolver->SetEvalParams (0, &wrapper.svStack);
+  resolver->SetEvalParams (0, wrapper.svStack);
   compiler->LoadSVBlock (node, &wrapper);
   resolver->SetEvalParams (0, 0);
 }
@@ -468,10 +470,10 @@ static void CloneNode (iDocumentNode* from, iDocumentNode* to)
 }
 
 size_t csXMLShader::GetTicket (const csRenderMeshModes& modes, 
-			       const csShaderVarStack& stacks)
+			       const iShaderVarStack* stacks)
 {
   resolver->ResetEvaluationCache();
-  resolver->SetEvalParams (&modes, &stacks);
+  resolver->SetEvalParams (&modes, stacks);
   size_t vi = resolver->GetVariant ();
 
   if (vi != csArrayItemNotFound)
