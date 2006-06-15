@@ -6,6 +6,12 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+15-Jun-2006
+	- thebolt fixed a bug in csQuaternion which caused matrix to
+	  quaternion to go wrong.
+	- Jorrit fixed a bug in genmesh GetRadius() function. This would
+	  return the correct radius but an incorrect center (i.e. center
+	  was always 0,0,0).
 14-Jun-2006
 	- caedes fixed cspace.i for changes in spr2d.
 	- caedes fixed cspython.cpp for dissaparition of evenhandler.h.
