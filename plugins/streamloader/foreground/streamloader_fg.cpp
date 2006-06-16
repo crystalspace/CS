@@ -34,7 +34,7 @@ SCF_IMPLEMENT_FACTORY (csForegroundStreamingLoader)
 
 
 /// Constructor
-csSLRequestRecord::csSLRequestRecord (iStreamDataCallback::RequestType type, const char* bufferID, iStreamDataCallback* callback, iDataBuffer* buffer, unsigned int priority, iFile* file)
+csSLRequestRecord::csSLRequestRecord (iStreamDataCallback::RequestType type, const char* bufferID, iStreamDataCallback* callback, iDataBuffer* buffer, unsigned int priority)
 {
   this->type = type;
   this->bufferID = bufferID;
@@ -43,7 +43,7 @@ csSLRequestRecord::csSLRequestRecord (iStreamDataCallback::RequestType type, con
   this->buffer = buffer;
   currentPosition = buffer->GetData ();
   bytesLeft = buffer->GetSize ();
-  this->file = file;
+  this->file = 0;
 }
 
 /// Destructor
@@ -88,10 +88,11 @@ bool csForegroundStreamingLoader::Initialize (iObjectRegistry* object_reg)
 void csForegroundStreamingLoader::QueryBuffer (const char* id, iStreamDataCallback* callback, RequestPriority priority, iProgressMeter* indicator)
 {
   CS_ASSERT (callback != 0);
-  csRef<iFile> inputfile = vfs->Open (id, VFS_FILE_READ);
-  if (inputfile.IsValid ())
+  if (vfs->Exists (id))
   {
-    csSLRequestRecord record (iStreamDataCallback::RT_LOAD, id, callback, new csDataBuffer (inputfile->GetSize ()), priority, inputfile);
+    size_t filesize;
+    filesize = vfs->GetFileSize (id, filesize);
+    csSLRequestRecord record (iStreamDataCallback::RT_LOAD, id, callback, new csDataBuffer (filesize), priority);
     csList<csSLRequestRecord>::Iterator iter (requests);
     while (iter.HasNext () && iter.Next ().targetTime < record.targetTime);
     requests.InsertBefore (iter, record);
@@ -108,10 +109,9 @@ void csForegroundStreamingLoader::QueryBuffer (const char* id, iStreamDataCallba
  */
 void csForegroundStreamingLoader::SaveBuffer (const char* id, iDataBuffer* buffer, iStreamDataCallback* callback, RequestPriority priority, iProgressMeter* indicator)
 {
-  csRef<iFile> outputfile = vfs->Open (id, VFS_FILE_READ);
-  if (outputfile.IsValid ())
+  if (vfs->Exists (id))
   {
-    csSLRequestRecord record (iStreamDataCallback::RT_SAVE, id, callback, buffer, priority, outputfile);
+    csSLRequestRecord record (iStreamDataCallback::RT_SAVE, id, callback, buffer, priority);
     csList<csSLRequestRecord>::Iterator iter (requests);
     while (iter.HasNext () && iter.Next ().targetTime < record.targetTime);
     requests.InsertBefore (iter, record);
@@ -139,6 +139,24 @@ bool csForegroundStreamingLoader::HandleEvent (iEvent &event)
     {
       if (record.type == iStreamDataCallback::RT_LOAD)
       {
+        // Open the file if it hasn't been opened yet.
+        if (!record.file.IsValid ())
+        {
+          record.file = vfs->Open (record.bufferID, VFS_FILE_READ);
+
+          if (!record.file.IsValid ())
+          {
+            // An error occurred!
+            record.callback->StreamingError (record.bufferID, iStreamDataCallback::RT_LOAD);
+
+            // Remove the record from the list.
+            csList<csSLRequestRecord>::Iterator iter (requests);
+            requests.Delete (iter);
+            record = requests.Front ();
+	    continue;
+          }
+        }
+
         // Read a block of data.
         size_t bytes_read = record.file->Read (record.currentPosition, blockSize);
         record.bytesLeft -= bytes_read;
@@ -152,6 +170,7 @@ bool csForegroundStreamingLoader::HandleEvent (iEvent &event)
           // Remove the record from the list.
           csList<csSLRequestRecord>::Iterator iter (requests);
           requests.Delete (iter);
+          record = requests.Front ();
         }
         else if (bytes_read < blockSize)
         {
@@ -161,14 +180,33 @@ bool csForegroundStreamingLoader::HandleEvent (iEvent &event)
           // Remove the record from the list.
           csList<csSLRequestRecord>::Iterator iter (requests);
           requests.Delete (iter);
+          record = requests.Front ();
         }
       }
       else
       {
+        // Open the file if it hasn't been opened yet.
+        if (!record.file.IsValid ())
+        {
+          record.file = vfs->Open (record.bufferID, VFS_FILE_WRITE);
+
+          if (!record.file.IsValid ())
+          {
+            // An error occurred!
+            record.callback->StreamingError (record.bufferID, iStreamDataCallback::RT_LOAD);
+
+            // Remove the record from the list.
+            csList<csSLRequestRecord>::Iterator iter (requests);
+            requests.Delete (iter);
+            record = requests.Front ();
+	    continue;
+          }
+        }
+
         // Write a block of data.
-        size_t bytes_read = record.file->Write (record.currentPosition, blockSize);
-        record.bytesLeft -= bytes_read;
-        record.currentPosition += bytes_read;
+        size_t bytes_written = record.file->Write (record.currentPosition, blockSize);
+        record.bytesLeft -= bytes_written;
+        record.currentPosition += bytes_written;
 
         if (record.bytesLeft == 0)
         {
@@ -178,8 +216,9 @@ bool csForegroundStreamingLoader::HandleEvent (iEvent &event)
           // Remove the record from the list.
           csList<csSLRequestRecord>::Iterator iter (requests);
           requests.Delete (iter);
+          record = requests.Front ();
         }
-        else if (bytes_read < blockSize)
+        else if (bytes_written < blockSize)
         {
           // An error occurred!
           record.callback->StreamingError (record.bufferID, iStreamDataCallback::RT_SAVE);
@@ -187,6 +226,7 @@ bool csForegroundStreamingLoader::HandleEvent (iEvent &event)
           // Remove the record from the list.
           csList<csSLRequestRecord>::Iterator iter (requests);
           requests.Delete (iter);
+          record = requests.Front ();
         }
       }
       currenttime = csGetTicks ();

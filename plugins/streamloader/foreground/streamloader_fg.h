@@ -58,7 +58,7 @@ struct csSLRequestRecord
   csRef<iFile> file;
 
   /// Constructor
-  csSLRequestRecord (iStreamDataCallback::RequestType type, const char* bufferID, iStreamDataCallback* callback, iDataBuffer* buffer, unsigned int priority, iFile* file);
+  csSLRequestRecord (iStreamDataCallback::RequestType type, const char* bufferID, iStreamDataCallback* callback, iDataBuffer* buffer, unsigned int priority);
 
   /// Destructor
   ~csSLRequestRecord ();

@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+16-June-2006
+	- David H. Bronke changed the basic iStreamSource implementation to not
+	  open the file until we actually start processing the request, to keep
+	  from having too many files open at the same time.
 15-June-2006
 	- David H. Bronke rewrote the basic iStreamSource implementation to read
 	  in blocks on a per-frame basis, until a time threshold is exceeded. This
