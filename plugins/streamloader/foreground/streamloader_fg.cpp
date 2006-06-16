@@ -25,7 +25,7 @@
 #include "ivaria/reporter.h"
 #include "csutil/databuf.h"
 
-#define CS_REPORT(severity,message) csReport (obj_reg, CS_REPORTER_SEVERITY_##severity, "cel.networklayer.client", message);
+#define CS_REPORT(severity,message) csReport (obj_reg, CS_REPORTER_SEVERITY_##severity, "crystalspace.streamloader.foreground", message);
 
 
 CS_IMPLEMENT_PLUGIN
