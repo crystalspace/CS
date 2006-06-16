@@ -1,6 +1,7 @@
 /*
     Crystal Space Virtual File System SCF interface
     Copyright (C) 1998,1999 by Andrew Zabolotny <bit@eltech.ru>
+    Copyright (C) 2006 by Brandon Hamilton <brandon.hamilton@gmail.com>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -50,6 +51,19 @@ struct csFileTime
   int mon;
   /// Year, 1768, 1900, 2001, ...
   int year;
+};
+
+/**
+ * File type structure - used to provide information about a file.
+ */
+enum csVFSFileKind
+{
+  /// The file does not exits
+  fkDoesNotExist = 0,
+  /// The file is an ordinary file
+  fkFile,
+  /// The file is a directory
+  fkDirectory
 };
 
 /// This macro can be used to assign a "struct tm" to a csFileTime
@@ -422,6 +436,72 @@ struct iVFS : public virtual iBase
    * mounted.
    */
   virtual csRef<iStringArray> GetRealMountPaths (const char *VirtualPath) = 0;
+};
+
+/**
+ * The iFilesystem Class is a plugin to access a physical filesystem.
+ * This class provides an abstract interface to a physical files sytem.
+ *
+ * Main creators of instances implementing this interface:
+ * - The Native FileSystem plugin (crystalspace.kernel.vfs.nativefilesystem)
+ * - The Archive FileSystem plugin (crystalspace.kernel.vfs.archivefilesystem)
+ * - The Network FileSystem plugin (crystalspace.kernel.vfs.networkfilesystem)
+ *
+ * Main ways to get pointers to this interface:
+ * - CS_QUERY_REGISTRY()
+ */
+class iFileSystem: public virtual iBase
+{
+  SCF_INTERFACE(iFileSystem, 1, 0, 0);
+  
+  /**
+   * Open a file on the VFS filesystem.
+   * \param FileName The VFS path of the file in the VFS filesystem.
+   * \param Mode Combination of VFS_FILE_XXX constants.
+   * \return A valid iFile if the file was opened successfully, otherwise an
+   *  invalidated iFile.  Use csRef<>::IsValid() to check validity.
+   * \sa #VFS_FILE_MODE
+   */
+  virtual csPtr<iFile> Open(const char * FileName, int mode) =0;
+  
+  /**
+   * Get an entire file at once. This is more effective than opening files 
+   * and reading the file in blocks.  Note that the returned buffer can 
+   * be null-terminated (so that it can be conveniently used with string 
+   * functions) but the extra null-terminator is not counted as part of the 
+   * returned size.
+   * \param FileName VFS path of the file to be read.
+   * \param nullterm Null-terminate the returned buffer.
+   * \return An iDataBuffer containing the file contents if the file was opened
+   *  and read successfully, otherwise an invalidated iFile.  Use
+   *  csRef<>::IsValid() to check validity.
+   * \remarks Null-termination might have a performance penalty (dependent on
+   *  where the file is stored.) Use only when needed.
+   */
+  virtual csPtr<iDataBuffer> ReadFile(const char * FileName, bool nullterm = true) =0;
+  
+  /**
+   * Write an entire file in one pass.
+   * \param Name Name of file to write.
+   * \param Data Pointer to the data to be written.
+   * \param Size Number of bytes to write.
+   * \return True if the write succeeded, else false.
+   */
+  virtual bool WriteFile(const char * Name, const char * Data, size_t Size) =0;
+  
+  /**
+   * Delete a file on VFS
+   * \return True if the deletion succeeded, else false.
+   */
+  virtual bool DeleteFile(const char * FileName) =0;
+  
+  /**
+  * Check if a file exists in the VFS, and query the type of file.
+  * \param FileName The name of the file to query
+  * \return The type of file
+  */
+  virtual csVFSFileKind Exists(const char * FileName) =0;
+
 };
 
 /** @} */
