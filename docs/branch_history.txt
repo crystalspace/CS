@@ -6,6 +6,15 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+15-June-2006
+	- David H. Bronke rewrote the basic iStreamSource implementation to read
+	  in blocks on a per-frame basis, until a time threshold is exceeded. This
+	  allows I/O with the streaming loader to be non-blocking. Also
+	  implemented basic priority handling and changed the definition of the
+	  priority constants so that a higher priority has a lower value than
+	  lower priorities. Effectively, the numerical value of a priority now
+	  stands for the amount of time to allow for the given request to be
+	  filled.
 14-June-2006
 	- David H. Bronke finished a basic implementation of iStreamSource. This
 	  implementation is non-threaded, blocking, and uses synchronous I/O.

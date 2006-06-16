@@ -20,13 +20,49 @@
 #define __CS_STREAMLOADER_H__
 
 #include "imap/streamsource.h"
-#include "iutil/comp.h"
 #include "csutil/scf.h"
 #include "csutil/scf_implementation.h"
+#include "csutil/list.h"
+#include "iutil/comp.h"
+#include "iutil/eventh.h"
 
 
 struct iObjectRegistry;
 struct iVFS;
+struct iFile;
+
+struct csSLRequestRecord
+{
+  /// The type of this request.
+  iStreamDataCallback::RequestType type;
+
+  /// The ID of the buffer we're operating on.
+  const char* bufferID;
+
+  /// The callback to be called when the operation is finished or when an error occurs.
+  csRef<iStreamDataCallback> callback;
+
+  /// The time by which we want this file loaded.
+  csTicks targetTime;
+
+  /// The data buffer being operated on.
+  csRef<iDataBuffer> buffer;
+
+  /// A pointer to the current position within the above buffer.
+  char* currentPosition;
+
+  /// The number of bytes left in this operation.
+  size_t bytesLeft;
+
+  /// The file being written to or read from.
+  csRef<iFile> file;
+
+  /// Constructor
+  csSLRequestRecord (iStreamDataCallback::RequestType type, const char* bufferID, iStreamDataCallback* callback, iDataBuffer* buffer, unsigned int priority, iFile* file);
+
+  /// Destructor
+  ~csSLRequestRecord ();
+};
 
 /**
  * This plugin will listen to a reporter plugin and uses the console,
@@ -34,8 +70,9 @@ struct iVFS;
  * what comes from the reporter plugin.
  */
 class csForegroundStreamingLoader : 
-  public scfImplementation2<csForegroundStreamingLoader, 
+  public scfImplementation3<csForegroundStreamingLoader, 
       iStreamSource,
+      iEventHandler,
       iComponent>
 {
 public:
@@ -66,6 +103,11 @@ public:
    */
   virtual void SaveBuffer (const char* id, iDataBuffer* buffer, iStreamDataCallback* callback, RequestPriority priority = RP_NORMAL, iProgressMeter* indicator = 0);
 
+  /**
+   * Event Handler
+   */
+  virtual bool HandleEvent (iEvent &event);
+
 private:
   // The base VFS path from which to retrieve all buffers.
   csString basePath;
@@ -73,8 +115,26 @@ private:
   /// A pointer to the object registry.
   iObjectRegistry* obj_reg;
 
-  /// A reference to the VFS plugin
+  /// A reference to the VFS plugin.
   csRef<iVFS> vfs;
+
+  /// The list of outstanding requests.
+  csList<csSLRequestRecord> requests;
+
+  /// The size of one block of I/O.
+  size_t blockSize;
+
+  /// The maximum amount of time to use per frame for loading.
+  csTicks timeLimit;
+
+  /// Declare the name of this event handler.
+  CS_EVENTHANDLER_NAMES("crystalspace.streamloader.foreground")
+
+  /*
+   * Declare that we're not terribly interested in having events
+   * delivered to us before or after other modules, plugins, etc.
+   */
+  CS_EVENTHANDLER_NIL_CONSTRAINTS
 };
 
 #endif // __CS_STREAMLOADER_H__

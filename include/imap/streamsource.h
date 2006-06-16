@@ -78,10 +78,10 @@ struct iStreamSource : public virtual iBase
    */
   enum RequestPriority
   {
-    RP_LOW           = 0,
-    RP_NORMAL        = 10,
-    RP_HIGH          = 100,
-    RP_TIME_CRITICAL = 1000
+    RP_LOW           = 100000,
+    RP_NORMAL        = 1000,
+    RP_HIGH          = 10,
+    RP_TIME_CRITICAL = 0
   };
 
   /**
