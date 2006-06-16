@@ -24,6 +24,7 @@
 #include "csutil/util.h"
 #include "csutil/scfstr.h"
 #include "csutil/event.h"
+#include "csutil/eventnames.h"
 #include "csutil/list.h"
 #include "iutil/event.h"
 #include "iutil/eventq.h"
