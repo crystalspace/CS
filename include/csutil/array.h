@@ -327,7 +327,7 @@ public:
  * well enough in most cases.
  */
 template<typename Threshold = csArrayThresholdVariable>
-class csArrayCapacityLinear : Threshold
+class csArrayCapacityLinear : public Threshold
 {
 public:
   //@{
@@ -367,6 +367,20 @@ public:
   }
 };
 
+// Alias for csArrayCapacityLinear<csArrayThresholdVariable> to keep
+// SWIG generated Java classes (and thus filenames) short enough for Windows.
+// Note that a typedef wont work because SWIG would expand it.
+struct csArrayCapacityDefault :
+  public csArrayCapacityLinear<csArrayThresholdVariable>
+{
+  csArrayCapacityDefault () :
+    csArrayCapacityLinear<csArrayThresholdVariable> () {}
+  csArrayCapacityDefault (const csArrayThresholdVariable& threshold) :
+    csArrayCapacityLinear<csArrayThresholdVariable> (threshold) {}
+  csArrayCapacityDefault (const size_t x) :
+    csArrayCapacityLinear<csArrayThresholdVariable> (x) {}
+} ;
+
 /**
  * This value is returned whenever an array item could not be located or does
  * not exist.
@@ -384,7 +398,7 @@ const size_t csArrayItemNotFound = (size_t)-1;
 template <class T,
 	class ElementHandler = csArrayElementHandler<T>,
         class MemoryAllocator = CS::Memory::AllocatorMalloc,
-        class CapacityHandler = csArrayCapacityLinear<csArrayThresholdVariable> >
+        class CapacityHandler = csArrayCapacityDefault>
 class csArray
 {
 public:
@@ -1212,6 +1226,8 @@ public:
       if (Get (i) != other[i]) return false;
     return true;
   }
+
+  bool operator!= (const csArray& other) const { return !(*this==other); }
 
   /// Return a reference to the allocator of this array.
   const MemoryAllocator& GetAllocator() const

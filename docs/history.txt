@@ -17,6 +17,7 @@ chronological order.
 	  This fixes at least light_bumpmap technique 220. Not sure
 	  about the others. The bug still appears present in case glow
 	  is used however.
+	- mdmkolbe brought the Java SWIG bindings a little closer to working.
 14-Jun-2006
 	- caedes fixed cspace.i for changes in spr2d.
 	- caedes fixed cspython.cpp for dissaparition of evenhandler.h.
