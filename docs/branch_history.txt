@@ -15,6 +15,8 @@ chronological order.
 	  lower priorities. Effectively, the numerical value of a priority now
 	  stands for the amount of time to allow for the given request to be
 	  filled.
+	- David H. Bronke removed SetBasePath() from the foreground iStreamSource
+	  implementation.
 14-June-2006
 	- David H. Bronke finished a basic implementation of iStreamSource. This
 	  implementation is non-threaded, blocking, and uses synchronous I/O.

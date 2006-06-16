@@ -86,11 +86,6 @@ public:
   virtual bool Initialize (iObjectRegistry* object_reg);
 
   /**
-   * Set the base VFS path from which to retrieve all buffers.
-   */
-  void SetBasePath (const char* base);
-
-  /**
    * Load a buffer given an id. This will fire the callback as soon as
    * the buffer is ready. Note that some implementations that don't support
    * asynchronous loading may call the callback immediatelly from within
@@ -109,9 +104,6 @@ public:
   virtual bool HandleEvent (iEvent &event);
 
 private:
-  // The base VFS path from which to retrieve all buffers.
-  csString basePath;
-
   /// A pointer to the object registry.
   iObjectRegistry* obj_reg;
 

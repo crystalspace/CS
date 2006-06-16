@@ -55,7 +55,6 @@ csSLRequestRecord::~csSLRequestRecord ()
 /// Constructor
 csForegroundStreamingLoader::csForegroundStreamingLoader (iBase* iParent) : scfImplementationType (this, iParent)
 {
-  basePath = "";
   blockSize = 16384; // 16KB block size by default.
   timeLimit = 20; // Number of msec to allow for loading per frame.
 }
@@ -81,14 +80,6 @@ bool csForegroundStreamingLoader::Initialize (iObjectRegistry* object_reg)
 }
 
 /**
- * Set the base VFS path from which to retrieve all buffers.
- */
-void csForegroundStreamingLoader::SetBasePath (const char* base)
-{
-  basePath = base;
-}
-
-/**
  * Load a buffer given an id. This will fire the callback as soon as
  * the buffer is ready. Note that some implementations that don't support
  * asynchronous loading may call the callback immediatelly from within
@@ -97,7 +88,6 @@ void csForegroundStreamingLoader::SetBasePath (const char* base)
 void csForegroundStreamingLoader::QueryBuffer (const char* id, iStreamDataCallback* callback, RequestPriority priority, iProgressMeter* indicator)
 {
   CS_ASSERT (callback != 0);
-  vfs->PushDir (basePath);
   csRef<iFile> inputfile = vfs->Open (id, VFS_FILE_READ);
   if (inputfile.IsValid ())
   {
@@ -111,7 +101,6 @@ void csForegroundStreamingLoader::QueryBuffer (const char* id, iStreamDataCallba
     CS_REPORT (ERROR, "Couldn't find the requested file!")
     callback->StreamingError (id, iStreamDataCallback::RT_LOAD);
   }
-  vfs->PopDir ();
 }
 
 /**
@@ -119,7 +108,6 @@ void csForegroundStreamingLoader::QueryBuffer (const char* id, iStreamDataCallba
  */
 void csForegroundStreamingLoader::SaveBuffer (const char* id, iDataBuffer* buffer, iStreamDataCallback* callback, RequestPriority priority, iProgressMeter* indicator)
 {
-  vfs->PushDir (basePath);
   csRef<iFile> outputfile = vfs->Open (id, VFS_FILE_READ);
   if (outputfile.IsValid ())
   {
@@ -133,7 +121,6 @@ void csForegroundStreamingLoader::SaveBuffer (const char* id, iDataBuffer* buffe
     CS_REPORT (ERROR, "Couldn't find the requested file!")
     callback->StreamingError (id, iStreamDataCallback::RT_SAVE);
   }
-  vfs->PopDir ();
 }
 
 /**
