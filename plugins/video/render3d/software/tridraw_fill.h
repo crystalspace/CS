@@ -37,14 +37,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(Soft3D)
 #define SPECIALIZE_FILL(PIX, NAME) \
   extern void NAME(csSoftwareGraphics3DCommon*, iTriangleDrawer**); \
   template<> \
-  inline void TriDrawMatrixFiller_Fill<PIX>(csSoftwareGraphics3DCommon* g3d, \
+  inline void TriDrawMatrixFiller_Fill<PIX >(csSoftwareGraphics3DCommon* g3d, \
     iTriangleDrawer** matrix) \
   { NAME (g3d, matrix); }
 
 #define DEFINE_FILL(PIX, NAME) \
   void NAME(csSoftwareGraphics3DCommon* g3d, \
     iTriangleDrawer** matrix) \
-  { TriDrawMatrixFiller<PIX>::Fill (g3d, matrix); }
+  { TriDrawMatrixFiller<PIX >::Fill (g3d, matrix); }
 
 #define PIX Pix_Generic<uint32>
 SPECIALIZE_FILL(PIX, TriDrawMatrixFiller_Fill_Generic_uint32)
