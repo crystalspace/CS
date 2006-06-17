@@ -11,6 +11,8 @@ chronological order.
 	- AndyDude changed the non-error CoreAudio messages to be not so 
 	  'loud'. The two CoreAudio messages that I changed were Report()'d 
 	  at very high severity levels, when it wasn't really that severe.
+	- res fixed msvcgen.jam to use the "common" directory to generate
+	  the relative path for icon resources, not the version-specific one.
 15-Jun-2006
 	- thebolt fixed a bug in csQuaternion which caused matrix to
 	  quaternion to go wrong.
