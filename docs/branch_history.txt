@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+17-Jun-2006
+	- res added some doxygen comments for the ptmalloc override stuff.
+	- res fixed compilation with MemTracker enabled.
 13-Jun-2006
 	- res implemented the ptmalloc shared memory stuff for Win32.
 12-Jun-2006

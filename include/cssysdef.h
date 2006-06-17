@@ -583,26 +583,50 @@ Type &Class::getterFunc ()                                     \
 #  define CS_FUNCTION_NAME		"<?\?\?>"
 #endif
 
-#ifndef CS_NO_PTMALLOC
-extern void* CS_CRYSTALSPACE_EXPORT ptmalloc (size_t n);
-extern void CS_CRYSTALSPACE_EXPORT ptfree (void* p);
-extern void* CS_CRYSTALSPACE_EXPORT ptrealloc (void* p, size_t n);
-extern void* CS_CRYSTALSPACE_EXPORT ptmemalign (size_t a, size_t n);
-extern void* CS_CRYSTALSPACE_EXPORT ptcalloc (size_t n, size_t s);
-
+//@{
+/**
+ * Platform-specific memory allocation.
+ * If built with ptmalloc support, these functions can be used to explicitly
+ * call the platform's default malloc/free implementations. Useful when
+ * interfacing with third party libraries.
+ */
 inline void* platform_malloc (size_t n)
 { return malloc (n); }
 inline void platform_free (void* p)
 { return free (p); }
 inline void* platform_realloc (void* p, size_t n)
 { return realloc (p, n); }
+//@}
 
+#ifndef CS_NO_PTMALLOC
+//@{
+/**
+ * ptmalloc memory allocation.
+ */
+extern void* CS_CRYSTALSPACE_EXPORT ptmalloc (size_t n);
+extern void CS_CRYSTALSPACE_EXPORT ptfree (void* p);
+extern void* CS_CRYSTALSPACE_EXPORT ptrealloc (void* p, size_t n);
+extern void* CS_CRYSTALSPACE_EXPORT ptmemalign (size_t a, size_t n);
+extern void* CS_CRYSTALSPACE_EXPORT ptcalloc (size_t n, size_t s);
+//@}
+
+/**\name Memory allocation override
+ * By default, ptmalloc is used for memory allocations, for both C-style
+ * malloc/free as well as C++ new/delete. Use of ptmalloc can be disabled
+ * for the whole project by passing <tt>--enable-ptmalloc=no</tt> to
+ * configure or adding defining <tt>CS_NO_PTMALLOC</tt> in 
+ * <tt>include/csutil/win32/csconfig.h</tt> for MSVC.
+ * To disable ptmalloc for individual source files, define 
+ * <tt>CS_NO_PTMALLOC</tt> before including <tt>cssysdef.h</tt>.
+ * @{ */
 #define malloc 		ptmalloc
 #define free 	        ptfree
 #define realloc 	ptrealloc
 #define memalign	ptmemalign
 #define calloc 		ptcalloc
 
+#if !defined(CS_MEMORY_TRACKER) && !defined(CS_MEMORY_TRACKER_IMPLEMENT) \
+  && !defined(CS_EXTENSIVE_MEMDEBUG) && !defined(CS_EXTENSIVE_MEMDEBUG_IMPLEMENT)
 #ifdef CS_NO_EXCEPTIONS
 inline void* operator new (size_t s)
 { return ptmalloc (s); }
@@ -640,11 +664,9 @@ inline void operator delete (void* p, const std::nothrow_t&) throw()
 inline void operator delete[] (void* p, const std::nothrow_t&) throw()
 { ptfree (p); }
 #endif // CS_NO_EXCEPTIONS
-
-#else
-#define platform_malloc   malloc
-#define platform_free     free
-#define platform_realloc  realloc
+#endif /* !defined(CS_MEMORY_TRACKER) && !defined(CS_MEMORY_TRACKER_IMPLEMENT)
+  && !defined(CS_EXTENSIVE_MEMDEBUG) && !defined(CS_EXTENSIVE_MEMDEBUG_IMPLEMENT) */
+/** @} */
 #endif
 
 // The following define should only be enabled if you have defined
