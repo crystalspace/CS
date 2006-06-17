@@ -8,6 +8,9 @@ chronological order.
 
 16-Jun-2006
 	- AndyDude fixed the MacOSX menu bug and launching in background bug.
+	- AndyDude changed the non-error CoreAudio messages to be not so 
+	  'loud'. The two CoreAudio messages that I changed were Report()'d 
+	  at very high severity levels, when it wasn't really that severe.
 15-Jun-2006
 	- thebolt fixed a bug in csQuaternion which caused matrix to
 	  quaternion to go wrong.
