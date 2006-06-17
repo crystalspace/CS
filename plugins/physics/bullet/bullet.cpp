@@ -338,9 +338,10 @@ bool csBulletRigidBody::AttachColliderMesh (iMeshWrapper*,
   return false;
 }
 
-bool csBulletRigidBody::AttachColliderCylinder (float length, float radius,
-                                                const csOrthoTransform& trans, float friction, float density,
-                                                float elasticity, float softness)
+bool csBulletRigidBody::AttachColliderCylinder (float /*length*/, float /*radius*/,
+                                                const csOrthoTransform& /*trans*/, float /*friction*/,
+                                                float /*density*/, float /*elasticity*/, 
+                                                float /*softness*/)
 {
   //if (pc->GetRigidBody ()->GetCollisionShape ())
   //  delete pc->GetCollisionShape ();
@@ -353,8 +354,9 @@ bool csBulletRigidBody::AttachColliderCylinder (float length, float radius,
 }
 
 bool csBulletRigidBody::AttachColliderBox (const csVector3 &size,
-                                           const csOrthoTransform& trans, float friction, float density,
-                                           float elasticity, float softness)
+                                           const csOrthoTransform& /*trans*/, float friction,
+                                           float /*density*/, float /*elasticity*/, 
+                                           float /*softness*/)
 {
   //if (pc->GetRigidBody ()->GetCollisionShape ())
   //  delete pc->GetCollisionShape ();
@@ -368,9 +370,9 @@ bool csBulletRigidBody::AttachColliderBox (const csVector3 &size,
   return true;
 }
 
-bool csBulletRigidBody::AttachColliderSphere (float radius, const csVector3 &offset,
-                                              float friction, float density, float elasticity,
-                                              float softness)
+bool csBulletRigidBody::AttachColliderSphere (float radius, const csVector3 &/*offset*/,
+                                              float friction, float /*density*/, float /*elasticity*/,
+                                              float /*softness*/)
 {
   if (pc->GetRigidBody ()->GetCollisionShape ())
     delete pc->GetCollisionShape ();
@@ -457,8 +459,8 @@ const csVector3 csBulletRigidBody::GetAngularVelocity () const
   return csVector3 (0);
 }
 
-void csBulletRigidBody::SetProperties (float mass, const csVector3& center,
-                                       const csMatrix3& inertia)
+void csBulletRigidBody::SetProperties (float mass, const csVector3& /*center*/,
+                                       const csMatrix3& /*inertia*/)
 {
   csBulletRigidBody::mass = mass;
   
