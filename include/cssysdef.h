@@ -583,6 +583,10 @@ Type &Class::getterFunc ()                                     \
 #  define CS_FUNCTION_NAME		"<?\?\?>"
 #endif
 
+/* Include now, if it's included later, the malloc re#definition below may
+ * interfere with that header. */
+#include <malloc.h>
+
 //@{
 /**
  * Platform-specific memory allocation.
