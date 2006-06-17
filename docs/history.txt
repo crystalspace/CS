@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+17-Jun-2006
+        - Piotr Obrzut fixed phystut crash on exit problem (when running
+          with bullet plugin)
 16-Jun-2006
 	- AndyDude fixed the MacOSX menu bug and launching in background bug.
 	- AndyDude changed the non-error CoreAudio messages to be not so 
