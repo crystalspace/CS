@@ -711,7 +711,7 @@ public:
   bool Initialize (iObjectRegistry* object_reg);
   bool HandleEvent (iEvent& ev);
 
-  virtual int GetFactoriesCount() { return factories.Length(); }
+  virtual size_t GetFactoriesCount() { return factories.Length(); }
   virtual iSkeletonFactory *CreateFactory(const char *name);
   virtual iSkeletonFactory *LoadFactory(const char * /*file_name*/) { return 0; }
   virtual iSkeletonFactory *FindFactory(const char * /*name*/) { return 0; }

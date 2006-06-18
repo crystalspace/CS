@@ -552,19 +552,19 @@ void csBugPlug::MouseButtonLeft (iCamera* camera)
   iSector* sector = camera->GetSector ();
   CS_ASSERT (sector != 0);
   csVector3 origin = camera->GetTransform ().GetO2TTranslation ();
-  csVector3 isect;
+  
+  csSectorHitBeamResult hitBeamResult = sector->HitBeam (origin, end);
+  iMeshWrapper* sel = hitBeamResult.mesh;
 
-  int polyidx = -1;
-  iMeshWrapper* sel = sector->HitBeam (origin, end, isect, &polyidx);
   const char* poly_name = 0;
-  if (polyidx != -1)
+  if (hitBeamResult.polygon_idx != -1)
   {
     csRef<iThingFactoryState> tfs = scfQueryInterface<iThingFactoryState> 
       (sel->GetMeshObject ()->GetFactory());
     if (tfs)
     {
-      poly_name = tfs->GetPolygonName (polyidx);
-      Dump (tfs, polyidx);
+      poly_name = tfs->GetPolygonName (hitBeamResult.polygon_idx);
+      Dump (tfs, hitBeamResult.polygon_idx);
     }
   }
   else
@@ -572,7 +572,7 @@ void csBugPlug::MouseButtonLeft (iCamera* camera)
     poly_name = 0;
   }
 
-  csVector3 vw = isect;
+  csVector3 vw = hitBeamResult.isect;
   v = camera->GetTransform ().Other2This (vw);
   Report (CS_REPORTER_SEVERITY_NOTIFY,
     "LMB down : c:(%f,%f,%f) w:(%f,%f,%f) p:'%s'",

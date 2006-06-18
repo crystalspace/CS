@@ -415,7 +415,7 @@ void awsTextBox::OnDraw (csRect /*clip*/)
 
       if (should_mask && maskchar && saved)
       {
-	text->Clear ();
+	text->Empty ();
 	text->Append (saved);
 	saved = 0;
       }
@@ -545,11 +545,11 @@ bool awsTextBox::OnKeyboard (const csKeyEventData& eventData)
         {
           csString tmp (text->GetData ());
          tmp.DeleteAt (strCursor, chSize);
-		text->Clear ();
+		text->Empty ();
 		text->Append (tmp);
         }
         else
-          text->Clear ();
+          text->Empty ();
 
 /*        cursor--;
         if (cursor - start < 5) start = cursor - 5;
@@ -583,11 +583,11 @@ bool awsTextBox::OnKeyboard (const csKeyEventData& eventData)
         {
           csString tmp (text->GetData ());
           tmp.DeleteAt (strCursor, chSize);
-	  text->Clear ();
+	  text->Empty ();
 	  text->Append (tmp);
         }
         else
-          text->Clear ();
+          text->Empty ();
       }
 /*      if (cursor > 0 && cursor == text->Length ()) cursor--;
       if (cursor - start < 5) start = cursor - 5;

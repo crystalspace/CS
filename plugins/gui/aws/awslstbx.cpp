@@ -223,9 +223,9 @@ bool awsListBox::Setup (iAws *_wmgr, iAwsComponentNode *settings)
   for (i = 0; i < ncolumns; ++i)
   {
     cs_snprintf (buf, 64, "Column%dImg", i);
-    if (!pm->GetString (settings, buf, tn1)) tn1->Clear();
+    if (!pm->GetString (settings, buf, tn1)) tn1->Empty();
     cs_snprintf (buf, 64, "Column%dBkg", i);
-    if (!pm->GetString (settings, buf, tn2)) tn2->Clear();
+    if (!pm->GetString (settings, buf, tn2)) tn2->Empty();
     cs_snprintf (buf, 64, "Column%dCaption", i);
     columns[i].caption.AttachNew (new scfString (""));
     pm->GetString (settings, buf, columns[i].caption);

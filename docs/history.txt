@@ -7,6 +7,8 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 18-Jun-2006
+        - Arianna fixed some warnings: size_t/uint conversions and some
+          deprecated method.
 	- mdmkolbe converted the remainder of of apps/ to the new SCF.
 17-Jun-2006
         - Piotr Obrzut fixed phystut crash on exit problem (when running

@@ -157,7 +157,7 @@ void scriptObject::Exec(const char *_code)
 	jsval rv;
 	csString code(_code);
 	
-	JS_EvaluateScript(cx, so, code.GetData(), code.Length(), "nofile", 1, &rv);
+	JS_EvaluateScript(cx, so, code.GetData(), (uintN)code.Length(), "nofile", 1, &rv);
 }
 
 

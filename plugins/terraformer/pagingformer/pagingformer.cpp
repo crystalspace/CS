@@ -267,7 +267,7 @@ void csPagingFormer::SetHeightmapDir (const char* path, const char *type)
   sscanf(lastname.GetData(),"%d",&numy);
   numy++;
 
-  uint numx = heightmapnames->GetSize() / numy;
+  uint numx = (uint)heightmapnames->GetSize() / numy;
   countx = numx;
   county = numy;
 
@@ -297,7 +297,7 @@ void csPagingFormer::SetIntmapDir (const csStringID type,
   sscanf(lastname.GetData(),"%d",&numy);
   numy++;
 
-  uint numx = heightmapnames->GetSize() / numy;
+  uint numx = (uint)heightmapnames->GetSize() / numy;
 
   if (numx == countx && numy == county)
   {
@@ -323,7 +323,7 @@ void csPagingFormer::SetFloatmapDir (const csStringID type,
   sscanf(lastname.GetData(),"%d",&numy);
   numy++;
 
-  uint numx = heightmapnames->GetSize() / numy;
+  uint numx = (uint)heightmapnames->GetSize() / numy;
 
   if (numx == countx && numy == county)
   {
@@ -680,12 +680,12 @@ void csPagingSampler::CachePositions ()
   positions = new csVector3[resx*resz];
 
   // buffer for all the samplers maps
-  uint num = sampler.GetSize();
+  size_t num = sampler.GetSize();
   const csVector3 **maps = new const csVector3*[num];
 
   // first get the raw data from all the samplers
   // @@@ excluded from loop below for easier profiling
-  uint k;
+  size_t k;
   //uint sumresx = 0;
   //uint sumresz = 0;
   //uint formerresx;
@@ -1020,12 +1020,12 @@ const int *csPagingSampler::SampleInteger (csStringID type)
     int *map = new int[resx*resz];
 
     // buffer for all the samplers maps
-    uint num = sampler.GetSize();
+    size_t num = sampler.GetSize();
     const int **maps = new const int*[num];
 
   // first get the raw data from all the samplers
   // @@@ excluded from loop below for easier profiling
-  uint k;
+  size_t k;
   //uint sumresx = 0;
   //uint sumresz = 0;
   //uint formerresx;
