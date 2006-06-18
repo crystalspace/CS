@@ -14,6 +14,9 @@ chronological order.
 	    conveniance --> convenience
 	    conveniant	--> convenient
 	- res fixed spr2d's SetColor() to actually do something again.
+	- res added convenience includes to disable/enable CS' 'new' and 
+	    'delete' overrides when the memtracker is enabled.
+	- res added some missing custom new re-enablings.
 17-Jun-2006
         - Piotr Obrzut fixed phystut crash on exit problem (when running
           with bullet plugin)
