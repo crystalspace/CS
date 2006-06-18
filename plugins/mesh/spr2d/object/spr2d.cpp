@@ -420,6 +420,20 @@ void csSprite2DMeshObject::AddColor (const csColor& col)
   colors_dirty = true;
 }
 
+bool csSprite2DMeshObject::SetColor (const csColor& col)
+{
+  iColoredVertices* vertices = GetVertices ();
+  size_t i;
+  for (i = 0 ; i < vertices->GetSize(); i++)
+    vertices->Get (i).color_init = col;
+  if (!lighting)
+    for (i = 0 ; i < vertices->GetSize(); i++)
+      vertices->Get (i).color = col;
+
+  colors_dirty = true;
+  return true;
+}
+
 void csSprite2DMeshObject::ScaleBy (float factor)
 {
   iColoredVertices* vertices = GetVertices ();
