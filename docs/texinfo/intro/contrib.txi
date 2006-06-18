@@ -1095,10 +1095,10 @@ Philip Walls (@email{malverian@@lockless.dyndns.org})
 Philip added software cursor drawing to the @sc{svgalib} canvas.
 
 @item
-Philip Wyett (@email{philip.wyett@@w-tech.co.uk})
+Philip Wyett (@email{philipwyett@@blueyonder.co.uk})
 
 Philip acted as general maintainer of the Window port for quite a while (and
-performed some general maintenance), wrote build instructions for @sc{msvc},
+performed general maintenance), wrote build instructions for @sc{msvc},
 Mingw, and Cygwin, and created installable packages of support libraries for
 Crystal Space on Windows, from time to time.
 
