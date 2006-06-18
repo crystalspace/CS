@@ -908,7 +908,15 @@ void mtiRegisterModule (char* Class)
         iMemoryTracker);
     if (!mtiTR)
     {
+#ifdef CS_NO_PTMALLOC
       mtiTR.AttachNew (new csMemTrackerRegistry);
+#else
+      // 'new' wouldn't use ptmalloc here, so call malloc explicitly
+      csMemTrackerRegistry* newMTR = 
+        (csMemTrackerRegistry*)malloc (sizeof (csMemTrackerRegistry));
+      new (newMTR) csMemTrackerRegistry;
+      mtiTR.AttachNew (newMTR);
+#endif
       iSCF::SCF->object_reg->Register (mtiTR,
         "crystalspace.utilities.memorytracker");
     }
