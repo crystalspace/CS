@@ -42,25 +42,24 @@ using namespace CS;
  * returned by the allocators in order to detect corruption, and, since
  * the cookie value is different per module, freeing memory across 
  * modules. */
-typedef time_t CookieType;
+typedef uint32 CookieType;
 static CookieType cookie;
-inline static CookieType CookieSwap (CookieType x)
+CS_FORCEINLINE static CookieType CookieSwap (CookieType x)
 {
-  if (sizeof (CookieType) >= 8)
-    return csSwapBytes::UInt64 (x);
-  else
-    return csSwapBytes::UInt32 (x);
+  return csSwapBytes::UInt32 (x);
 }
 static CookieType GetCookie (void* p)
 {
   while (cookie == 0)
   {
+    time_t T;
     // Semi-random
-    time (&cookie);
+    time (&T);
+    cookie = uint32(T);
     // Make somewhat unique
-    cookie = cookie ^ (CookieType)&cookie;
+    cookie = cookie ^ (CookieType)((intptr_t)&cookie);
   }
-  return CookieSwap (cookie) ^ CookieType (p);
+  return cookie ^ CookieType (intptr_t (p));
 }
 #endif
 
