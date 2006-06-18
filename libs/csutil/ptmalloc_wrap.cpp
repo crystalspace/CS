@@ -154,7 +154,7 @@ void* ptmemalign (size_t a, size_t n)
 void* ptcalloc (size_t n, size_t s)
 { 
 #ifdef CS_DEBUG
-  return ptmalloc_::ptmalloc (n * s); 
+  return ptmalloc (n * s); 
 #else
   return ptmalloc_::ptcalloc (n, s); 
 #endif
