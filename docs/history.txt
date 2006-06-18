@@ -6,6 +6,26 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+18-Jun-2006
+        - Arianna fixed some warnings: size_t/uint conversions and some
+          deprecated method.
+	- mdmkolbe converted the remainder of of apps/ to the new SCF.
+	- Eric Sunshine performed project-wide spelling corrections:
+	    conveniance --> convenience
+	    conveniant	--> convenient
+17-Jun-2006
+        - Piotr Obrzut fixed phystut crash on exit problem (when running
+          with bullet plugin)
+        - Piotr Obrzut fixes bullet plugin unused parameter/variable warnings
+	- mdmkolbe converted libs/csplugincommon/opengl to the new SCF.
+16-Jun-2006
+	- AndyDude fixed the MacOSX menu bug and launching in background bug.
+	- AndyDude changed the non-error CoreAudio messages to be not so 
+	  'loud'. The two CoreAudio messages that I changed were Report()'d 
+	  at very high severity levels, when it wasn't really that severe.
+	- res fixed msvcgen.jam to use the "common" directory to generate
+	  the relative path for icon resources, not the version-specific one.
+	- mdmkolbe fixed a few unused parameter warnings.
 15-Jun-2006
 	- thebolt fixed a bug in csQuaternion which caused matrix to
 	  quaternion to go wrong.
@@ -691,7 +711,7 @@ chronological order.
 27-Apr-2006
 	- Jorrit did a few more fixes to csMeshOnTexture. It finally starts
 	  to work now.
-	- Jorrit added a new conveniance method: csQueryRegistryOrLoad().
+	- Jorrit added a new convenience method: csQueryRegistryOrLoad().
 	  This method will first look for an interface in the object registry.
 	  If it is not there it will try to load the plugin and register
 	  that to the object registry.
@@ -1737,7 +1757,7 @@ chronological order.
 	- res fixed gl3d to properly activate buffers from a holder bound to 
 	  the secondary color.
 	- res changed the xmlshader plugin to not have buffer mappings for
-	  the color, normal and texcoord buffers by default. While conveniant,
+	  the color, normal and texcoord buffers by default. While convenient,
 	  it could also result in subtle performance issues, e.g. when a
 	  buffer is autobound that has to be calculated relatively expensively
 	  by a buffer getter, yet is not used in the actual shader (e.g. Thing
@@ -1902,7 +1922,7 @@ chronological order.
 	  missing. Now the factory material is really optional.
 	- Jorrit added a new md2 loader for spr3d. This will help replace
 	  the model importing system.
-	- Jorrit added a new iModelLoader interface. This is a conveniance
+	- Jorrit added a new iModelLoader interface. This is a convenience
 	  interface that some loading plugins can implement. This makes it
 	  easier to create a mesh factory from a model file. Currently
 	  this is implemented by the new gmesh3ds and spr3md2 plugins.
@@ -3327,7 +3347,7 @@ chronological order.
 	  AWS2.
 27-Sep-2005
 	- Jorrit added csTransform::GetUp(), GetFront(), and GetRight().
-	  These three conveniance functions get the up, front, and right
+	  These three convenience functions get the up, front, and right
 	  vectors in 'other' space. They are very efficient.
 	- Jorrit fixed the loader so it is no longer an error if the
 	  sound loader is not present. Sounds will simply be ignored then.
@@ -3410,7 +3430,7 @@ chronological order.
 	  scfFakeInterface<If> by having scfFakeInterface<> inherit from If,
 	  to make things work again until Marten can take a look.
 	- res removed csDataStream since it overlapped with csMemFile; the
-	  conveniance functions have been moved to csFileReadHelper.
+	  convenience functions have been moved to csFileReadHelper.
 	- res moved csVideoPreferences into the simpvs app.
 	- mdmkolbe fixed some inheritance ambiguity warnings due to virtual
 	  inheritance from iBase.

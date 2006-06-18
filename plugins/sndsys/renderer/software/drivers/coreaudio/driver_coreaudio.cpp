@@ -209,7 +209,7 @@ bool csSndSysDriverCoreAudio::Open (csSndSysRendererSoftware *renderer,
   // packet since we don't have any padding in a packet here
   inStreamDesc.mBytesPerPacket = 4;
 */	
-	Report(CS_REPORTER_SEVERITY_WARNING,"Read in hardware properties of to Freq=%f Channels=%d Bits=%d FormatID=%s Flags=%x", outStreamDesc.mSampleRate,
+	Report(CS_REPORTER_SEVERITY_DEBUG,"Read in hardware properties of to Freq=%f Channels=%d Bits=%d FormatID=%s Flags=%x", outStreamDesc.mSampleRate,
 	   outStreamDesc.mChannelsPerFrame, outStreamDesc.mBitsPerChannel, &outStreamDesc.mFormatID, outStreamDesc.mFormatFlags );
   // Set up destination stream parameters
   outStreamDesc.mSampleRate = 44100.00;
@@ -276,7 +276,7 @@ bool csSndSysDriverCoreAudio::StartThread()
   // Since the Core Audio API is callback driven, we don't actually start a
   // thread here ourselves.  Instead we start the audio device pulling from the
   // audio procedure.  This runs in its own thread that we don't see.
-  Report(CS_REPORTER_SEVERITY_ERROR, "Getting our thread on!");
+  Report(CS_REPORTER_SEVERITY_DEBUG, "Getting our thread on!");
   status = AudioDeviceStart(outputDeviceID, StaticAudioProc);
   if (status != 0)
   {

@@ -21,6 +21,7 @@
 
 #include "csgeom/math3d.h"
 #include "iengine/portal.h"
+#include "csutil/scf_implementation.h"
 
 class csSparse3D;
 class csWideSparse3D;
@@ -100,15 +101,15 @@ public:
  * Structure that is kept with a portal to remember lighting information
  * that still has to be computed.
  */
-struct InfPortalCS : public iPortalCallback
+struct InfPortalCS :
+  public scfImplementation1<InfPortalCS, iPortalCallback>
 {
   LV* lviews;
   int x1, y1, z1;
   int x2, y2, z2;
 
-  SCF_DECLARE_IBASE;
-  InfPortalCS ();
-  virtual ~InfPortalCS ();
+  InfPortalCS () : scfImplementationType(this), lviews(0) { }
+  virtual ~InfPortalCS () { }
   virtual bool Traverse (iPortal* portal, iBase* context);
 };
 

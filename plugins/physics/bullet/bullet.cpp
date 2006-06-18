@@ -107,7 +107,6 @@ void csBulletDynamics::Step (float stepsize)
 csBulletDynamicsSystem::csBulletDynamicsSystem ()
 :  scfImplementationType (this)
 {
-  ConstraintSolver* solver = new SimpleConstraintSolver;
   CollisionDispatcher* dispatcher = new CollisionDispatcher ();
   BroadphaseInterface* broadphase = new SimpleBroadphase();
 
@@ -115,6 +114,8 @@ csBulletDynamicsSystem::csBulletDynamicsSystem ()
 }
 csBulletDynamicsSystem::~csBulletDynamicsSystem ()
 {
+  bodies.DeleteAll ();
+  delete bullet_sys;
 }
 void csBulletDynamicsSystem::SetGravity (const csVector3& v)
 {
@@ -270,6 +271,7 @@ csBulletRigidBody::csBulletRigidBody (csBulletDynamicsSystem* dynsys)
   ccdObjectCi.m_collisionShape->SetMargin (1);
   ccdObjectCi.m_gravity = SimdVector3(0,0,0);
   ccdObjectCi.m_localInertiaTensor = SimdVector3(0,0,0);
+  ccdObjectCi.m_physicsEnv = dynsys->GetBulletSys ();
   mass = ccdObjectCi.m_mass = 1;
 
   ccdObjectCi.m_MotionState = ms;
@@ -320,7 +322,6 @@ void csBulletRigidBody::ResetShape ()
   if (pc->GetCollisionShape ()->GetShapeType () != EMPTY_SHAPE_PROXYTYPE)
   {
     BroadphaseProxy* bpproxy = (BroadphaseProxy*)pc->GetRigidBody ()->m_broadphaseHandle;
-    //bpproxy->SetClientObjectType(pc->GetRigidBody()->GetCollisionShape()->GetShapeType());
     ds->GetBulletSys ()->GetBroadphase()->CleanProxyFromPairs(bpproxy);
 
     SimdVector3 newinertia;
@@ -337,9 +338,10 @@ bool csBulletRigidBody::AttachColliderMesh (iMeshWrapper*,
   return false;
 }
 
-bool csBulletRigidBody::AttachColliderCylinder (float length, float radius,
-                                                const csOrthoTransform& trans, float friction, float density,
-                                                float elasticity, float softness)
+bool csBulletRigidBody::AttachColliderCylinder (float /*length*/, float /*radius*/,
+                                                const csOrthoTransform& /*trans*/, float /*friction*/,
+                                                float /*density*/, float /*elasticity*/, 
+                                                float /*softness*/)
 {
   //if (pc->GetRigidBody ()->GetCollisionShape ())
   //  delete pc->GetCollisionShape ();
@@ -352,11 +354,12 @@ bool csBulletRigidBody::AttachColliderCylinder (float length, float radius,
 }
 
 bool csBulletRigidBody::AttachColliderBox (const csVector3 &size,
-                                           const csOrthoTransform& trans, float friction, float density,
-                                           float elasticity, float softness)
+                                           const csOrthoTransform& /*trans*/, float friction,
+                                           float /*density*/, float /*elasticity*/, 
+                                           float /*softness*/)
 {
-  if (pc->GetRigidBody ()->GetCollisionShape ())
-    delete pc->GetCollisionShape ();
+  //if (pc->GetRigidBody ()->GetCollisionShape ())
+  //  delete pc->GetCollisionShape ();
 
   SimdVector3 s (size.x / 2, size.y / 2, size.z / 2); 
   pc->GetRigidBody ()->SetCollisionShape (new BoxShape (s));
@@ -367,9 +370,9 @@ bool csBulletRigidBody::AttachColliderBox (const csVector3 &size,
   return true;
 }
 
-bool csBulletRigidBody::AttachColliderSphere (float radius, const csVector3 &offset,
-                                              float friction, float density, float elasticity,
-                                              float softness)
+bool csBulletRigidBody::AttachColliderSphere (float radius, const csVector3 &/*offset*/,
+                                              float friction, float /*density*/, float /*elasticity*/,
+                                              float /*softness*/)
 {
   if (pc->GetRigidBody ()->GetCollisionShape ())
     delete pc->GetCollisionShape ();
@@ -456,8 +459,8 @@ const csVector3 csBulletRigidBody::GetAngularVelocity () const
   return csVector3 (0);
 }
 
-void csBulletRigidBody::SetProperties (float mass, const csVector3& center,
-                                       const csMatrix3& inertia)
+void csBulletRigidBody::SetProperties (float mass, const csVector3& /*center*/,
+                                       const csMatrix3& /*inertia*/)
 {
   csBulletRigidBody::mass = mass;
   
@@ -678,9 +681,7 @@ csBulletCollider::~csBulletCollider ()
 }
 void csBulletCollider::ResetShape ()
 {
-
   BroadphaseProxy* bpproxy = (BroadphaseProxy*)pc->GetRigidBody ()->m_broadphaseHandle;
-  //bpproxy->SetClientObjectType(pc->GetRigidBody()->GetCollisionShape()->GetShapeType());
   ds->GetBulletSys ()->GetBroadphase()->CleanProxyFromPairs(bpproxy);
 
   SimdVector3 newinertia;

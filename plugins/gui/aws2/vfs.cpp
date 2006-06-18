@@ -169,7 +169,7 @@ static JSBool FindFiles (JSContext *cx, JSObject *obj, uintN argc, jsval *argv,
      }
      
      // Create a new array object
-     JSObject *array = JS_NewArrayObject(cx, files->GetSize(), entries);
+     JSObject *array = JS_NewArrayObject(cx, (jsint)files->GetSize(), entries);
      
      // Return the object
      *rval = OBJECT_TO_JSVAL(array);
