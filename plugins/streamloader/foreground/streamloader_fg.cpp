@@ -20,10 +20,12 @@
 
 #include "streamloader_fg.h"
 #include "iutil/event.h"
+#include "iutil/eventq.h"
 #include "iutil/objreg.h"
 #include "iutil/vfs.h"
 #include "ivaria/reporter.h"
 #include "csutil/databuf.h"
+#include "csutil/eventnames.h"
 
 #define CS_REPORT(severity,message) csReport (obj_reg, CS_REPORTER_SEVERITY_##severity, "crystalspace.streamloader.foreground", message);
 
@@ -73,6 +75,20 @@ bool csForegroundStreamingLoader::Initialize (iObjectRegistry* object_reg)
   if (!vfs.IsValid ())
   {
     CS_REPORT (ERROR, "Can't find the VFS plugin!")
+    return false;
+  }
+
+  // Register as an event listener.
+  csRef<iEventQueue> q = csQueryRegistry<iEventQueue> (object_reg);
+  frameEventName = csevFrame (object_reg);
+  if (q.IsValid ())
+  {
+    csEventID subEvents[] = { frameEventName, CS_EVENTLIST_END };
+    q->RegisterListener (this, subEvents);
+  }
+  else
+  {
+    CS_REPORT (ERROR, "Can't find the event queue!")
     return false;
   }
 
@@ -128,7 +144,7 @@ void csForegroundStreamingLoader::SaveBuffer (const char* id, iDataBuffer* buffe
  */
 bool csForegroundStreamingLoader::HandleEvent (iEvent &event)
 {
-  if (event.Name == csevPostProcess (obj_reg))
+  if (event.Name == frameEventName)
   {
     csTicks starttime = csGetTicks();
     csTicks currenttime = starttime;

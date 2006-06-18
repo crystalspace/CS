@@ -20,11 +20,12 @@
 #define __CS_STREAMLOADER_H__
 
 #include "imap/streamsource.h"
+#include "iutil/comp.h"
+#include "iutil/eventh.h"
 #include "csutil/scf.h"
 #include "csutil/scf_implementation.h"
 #include "csutil/list.h"
-#include "iutil/comp.h"
-#include "iutil/eventh.h"
+#include "csutil/csstring.h"
 
 
 struct iObjectRegistry;
@@ -103,9 +104,21 @@ public:
    */
   virtual bool HandleEvent (iEvent &event);
 
+  /// Declare the name of this event handler.
+  CS_EVENTHANDLER_NAMES("crystalspace.streamloader.foreground")
+
+  /*
+   * Declare that we're not terribly interested in having events
+   * delivered to us before or after other modules, plugins, etc.
+   */
+  CS_EVENTHANDLER_NIL_CONSTRAINTS
+
 private:
   /// A pointer to the object registry.
   iObjectRegistry* obj_reg;
+
+  /// The Frame event's name.
+  csEventID frameEventName;
 
   /// A reference to the VFS plugin.
   csRef<iVFS> vfs;
@@ -118,15 +131,6 @@ private:
 
   /// The maximum amount of time to use per frame for loading.
   csTicks timeLimit;
-
-  /// Declare the name of this event handler.
-  CS_EVENTHANDLER_NAMES("crystalspace.streamloader.foreground")
-
-  /*
-   * Declare that we're not terribly interested in having events
-   * delivered to us before or after other modules, plugins, etc.
-   */
-  CS_EVENTHANDLER_NIL_CONSTRAINTS
 };
 
 #endif // __CS_STREAMLOADER_H__
