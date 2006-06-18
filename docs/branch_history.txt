@@ -14,6 +14,7 @@ chronological order.
 	  and SCF parent argument.
 	- res made an interface version iGradient of csGradient, so you can
 	  pass them across plugins.
+	- res fixed spr2d's SetColor() to actually do something again.
 17-Jun-2006
 	- res added some doxygen comments for the ptmalloc override stuff.
 	- res fixed compilation with MemTracker enabled.

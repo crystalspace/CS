@@ -225,7 +225,7 @@ public:
   /** @} */
 
   virtual iObjectModel* GetObjectModel () { return static_cast<iObjectModel*> (this); }
-  virtual bool SetColor (const csColor&) { return false; }
+  virtual bool SetColor (const csColor&);
   virtual bool GetColor (csColor&) const { return false; }
   virtual bool SetMaterialWrapper (iMaterialWrapper* mat)
   {
