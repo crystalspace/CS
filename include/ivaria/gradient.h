@@ -18,22 +18,69 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_CSGFX_GRADIENT_H__
-#define __CS_CSGFX_GRADIENT_H__
+#ifndef __CS_IVARIA_GRADIENT_H__
+#define __CS_IVARIA_GRADIENT_H__
 
 /**\file
- * Simple color gradient implementation
+ * Simple color gradient interfaces
  */
 
-#include "csextern.h"
+#include "iutil/array.h"
 
-#include "ivaria/gradient.h"
-
-#include "csutil/array.h"
 #include "csutil/cscolor.h"
-#include "csutil/scf_implementation.h"
-#include "csutil/scfarray.h"
 #include "csgfx/rgbpixel.h"
+
+/**
+ * An entry in an iGradient gradient.
+ */
+struct csGradientShade
+{
+  /// Color of the left side
+  csColor4 left;
+  /// Color of the right side
+  csColor4 right;
+  /// Position in the gradient
+  float position;
+  
+  /// Construct with all values set to 0
+  csGradientShade () : left (0, 0, 0, 1.0f), right (0, 0, 0, 1.0f), 
+    position (0) {}
+      
+  /// Construct supplying all values
+  csGradientShade (const csColor4& left_color, const csColor4& right_color, 
+    float pos)  : left (left_color), right (right_color), position (pos) {}
+  /// Construct supplying all values
+  explicit csGradientShade (const csColor& left_color, 
+    const csColor& right_color, float pos) : left (left_color), 
+    right (right_color), position (pos) {}
+      
+  /**
+   * Construct using a color and position. Both left and right will have the 
+   * value of color.
+   */
+  csGradientShade (const csColor4& color, float pos) : left (color), 
+    right (color), position (pos) {}
+  /**
+   * Construct using a color and position. Both left and right will have the 
+   * value of color.
+   */
+  explicit csGradientShade (const csColor& color, float pos) : 
+    left (color), right (color), position (pos) {}
+
+  bool operator== (const csGradientShade& other)
+  { 
+    return (left == other.left) && (right == other.right)
+      && (position == other.position);
+  }
+};
+
+/**
+ * An array of gradient shades.
+ */
+struct iGradientShades : public iArrayReadOnly<csGradientShade>
+{
+  SCF_IARRAYREADONLY_INTERFACE(iGradientShades);
+};
 
 /**
  * A simple color gradient.
@@ -52,37 +99,45 @@
  * when moving on. This feature can be used for sharp transitions; for smooth 
  * ones they are simply set to the same value.
  *
- * For some examples see the iGradient documentation.
+ * This interface is implemented by csGradient.
+ *
+ * Examples:
+ * \code
+ * csRef<iGradient> grad;
+ * // Rainbow-ish
+ * grad->AddShade (csColor4 (1.0f, 0.0f, 0.0f, 1.0f), 0.0f);
+ * grad->AddShade (csColor4 (1.0f, 1.0f, 0.0f, 1.0f), 0.2f);
+ * grad->AddShade (csColor4 (0.0f, 1.0f, 0.0f, 1.0f), 0.4f);
+ * grad->AddShade (csColor4 (0.0f, 1.0f, 1.0f, 1.0f), 0.6f);
+ * grad->AddShade (csColor4 (0.0f, 0.0f, 1.0f, 1.0f), 0.8f);
+ * grad->AddShade (csColor4 (1.0f, 0.0f, 1.0f, 1.0f), 1.0f);
+ *
+ * // German flag
+ * grad->Clear ();
+ * grad->AddShade (csColor4 (0.0f, 0.0f, 0.0f, 1.0f), 0.0f);
+ * grad->AddShade (csColor4 (0.0f, 0.0f, 0.0f, 1.0f), 
+ *   csColor4 (1.0f, 0.0f, 0.0f, 1.0f), 0.33f);
+ * grad->AddShade (csColor4 (1.0f, 0.0f, 0.0f, 1.0f), 
+ *  csColor4 (1.0f, 1.0f, 0.0f, 1.0f),
+ *  0.66f);
+ * grad->AddShade (csColor4 (1.0f, 1.0f, 0.0f, 1.0f), 1.0f);
+ * \endcode
+ * \todo More shade management (e.g. getting, deleting of single shades.)
  */
-class CS_CRYSTALSPACE_EXPORT csGradient :
-  public scfImplementation1<csGradient, iGradient>
+struct iGradient : public virtual iBase
 {
-protected:
-  /// The entries in this gradient.
-  csArray<csGradientShade> shades;
-  struct scfGradientShadesArray : public scfArrayWrapConst<iGradientShades,
-    csArray<csGradientShade> >
-  {
-    scfGradientShadesArray (csGradient* parent) : 
-      scfArrayWrapConst (parent->shades, parent) {}
-  };
-public:
-  /// Construct an empty gradient.
-  csGradient ();
-  /// Construct with \p first at position 0 and \p last at 1.
-  csGradient (csColor4 first, csColor4 last);
+  SCF_INTERFACE(iGradient, 0, 0, 1);
   
-  /// Add a shade
   //@{
   /// Add a shade
-  void AddShade (const csGradientShade& shade);
-  void AddShade (const csColor4& color, float position);
-  void AddShade (const csColor4& left, const csColor4& right, 
-    float position);
+  virtual void AddShade (const csGradientShade& shade) = 0;
+  virtual void AddShade (const csColor4& color, float position) = 0;
+  virtual void AddShade (const csColor4& left, const csColor4& right, 
+    float position) = 0;
   //@}
   
   /// Clear all shades
-  void Clear ();
+  virtual void Clear () = 0;
   
   /**
    * Interpolate the colors over a part of the gradient.
@@ -100,8 +155,8 @@ public:
    *  the gradient (i.e. both smaller/large than the first resp. last
    *  shade's position.)
    */
-  bool Render (csRGBcolor* pal, size_t count, float begin = 0.0f, 
-    float end = 1.0f) const;
+  virtual bool Render (csRGBcolor* pal, size_t count, float begin = 0.0f, 
+    float end = 1.0f) const = 0;
   
   /**
    * Interpolate the colors over a part of the gradient.
@@ -119,12 +174,12 @@ public:
    *  the gradient (i.e. both smaller/large than the first resp. last
    *  shade's position.)
    */  
-  bool Render (csRGBpixel* pal, size_t count, float begin = 0.0f, 
-    float end = 1.0f) const;
+  virtual bool Render (csRGBpixel* pal, size_t count, float begin = 0.0f, 
+    float end = 1.0f) const = 0;
 
   /// Get the array of shades
-  csPtr<iGradientShades> GetShades ();
+  virtual csPtr<iGradientShades> GetShades () = 0;
 };
 
 
-#endif // __CS_CSGFX_GRADIENT_H__
+#endif // __CS_IVARIA_GRADIENT_H__

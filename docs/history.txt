@@ -19,6 +19,8 @@ chronological order.
 	- res added some missing custom new re-enablings.
 	- res augmented the scfArray* classes with constructors that also take
 	  and SCF parent argument.
+	- res made an interface version iGradient of csGradient, so you can
+	  pass them across plugins.
 17-Jun-2006
         - Piotr Obrzut fixed phystut crash on exit problem (when running
           with bullet plugin)
