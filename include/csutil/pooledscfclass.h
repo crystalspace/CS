@@ -124,7 +124,7 @@ public:
         p.mti = mtiRegisterAlloc (n, typeid (Pool).name());
       }
       else
-        mtiUpdateAmount (p.mti, 1, n);
+        mtiUpdateAmount (p.mti, 1, (int)n);
     #endif
     }
     p.allocedEntries++;
