@@ -22,8 +22,6 @@
 
 #include <stdio.h>
 
-
-
 #ifdef CS_DEBUG_RECT_REG
 #include <time.h>
 #include "csutil/randomgen.h"
@@ -32,48 +30,17 @@
 const int MODE_EXCLUDE = 0;
 const int MODE_INCLUDE = 1;
 
-csRectRegion::csRectRegion () :
-  region(0),
-  region_count(0),
-  region_max(0)
-
+csRectRegion::csRectRegion ()
 {
 }
 
 csRectRegion::~csRectRegion ()
 {
-  if (region != 0)
-    free (region);
 }
 
-void csRectRegion::pushRect (csRect const &r)
+void csRectRegion::MakeEmpty ()
 {
-  if (region_count >= region_max)
-  {
-    region_max += 64;
-
-    int const nbytes = region_max * sizeof (region[0]);
-    if (region == 0)
-      region = (csRect *)malloc (nbytes);
-    else
-      region = (csRect *)realloc (region, nbytes);
-  }
-
-  region[region_count++] = r;
-}
-
-void csRectRegion::deleteRect (int i)
-{
-  if (region_count > 0 && i >= 0 && i < --region_count)
-    memmove (
-      region + i,
-      region + i + 1,
-      (region_count - i) * sizeof (region[0]));
-}
-
-void csRectRegion::makeEmpty ()
-{
-  region_count = 0;
+  region.Empty();
 }
 
 //  This operation takes a rect r1 which completely contains rect r2
@@ -102,95 +69,95 @@ void csRectRegion::fragmentContainedRect (csRect &r1t, csRect &r2t)
       // This is the easy case. Split the r1 into four pieces that exclude r2.
       // The include function pre-checks for this case and exits, so it is
       // properly handled.
-      pushRect (csRect (r1.xmin, r1.ymin, r2.xmin, r1.ymax)); //left
-      pushRect (csRect (r2.xmax, r1.ymin, r1.xmax, r1.ymax)); //right
-      pushRect (csRect (r2.xmin, r1.ymin, r2.xmax, r2.ymin)); //top
-      pushRect (csRect (r2.xmin, r2.ymax, r2.xmax, r1.ymax)); //bottom
+      region.Push (csRect (r1.xmin, r1.ymin, r2.xmin, r1.ymax)); //left
+      region.Push (csRect (r2.xmax, r1.ymin, r1.xmax, r1.ymax)); //right
+      region.Push (csRect (r2.xmin, r1.ymin, r2.xmax, r2.ymin)); //top
+      region.Push (csRect (r2.xmin, r2.ymax, r2.xmax, r1.ymax)); //bottom
       return;
 
     case 1:
       // Three rects (top, right, bottom) [rect on left side, middle]
-      pushRect (csRect (r1.xmin, r1.ymin, r1.xmax, r2.ymin)); //top
-      pushRect (csRect (r2.xmax, r2.ymin, r1.xmax, r2.ymax)); //right
-      pushRect (csRect (r1.xmin, r2.ymax, r1.xmax, r1.ymax)); //bot
+      region.Push (csRect (r1.xmin, r1.ymin, r1.xmax, r2.ymin)); //top
+      region.Push (csRect (r2.xmax, r2.ymin, r1.xmax, r2.ymax)); //right
+      region.Push (csRect (r1.xmin, r2.ymax, r1.xmax, r1.ymax)); //bot
       return;
 
     case 2:
       // Three rects (bot, left, right)   [rect on top side, middle]
-      pushRect (csRect (r1.xmin, r2.ymax, r1.xmax, r1.ymax)); //bot
-      pushRect (csRect (r1.xmin, r1.ymin, r2.xmin, r2.ymax)); //left
-      pushRect (csRect (r2.xmax, r1.ymin, r1.xmax, r2.ymax)); //right
+      region.Push (csRect (r1.xmin, r2.ymax, r1.xmax, r1.ymax)); //bot
+      region.Push (csRect (r1.xmin, r1.ymin, r2.xmin, r2.ymax)); //left
+      region.Push (csRect (r2.xmax, r1.ymin, r1.xmax, r2.ymax)); //right
       return;
 
     case 3:
       // Two rects (right, bottom)        [rect on top left corner]
-      pushRect (csRect (r2.xmax, r1.ymin, r1.xmax, r2.ymax)); //right
-      pushRect (csRect (r1.xmin, r2.ymax, r1.xmax, r1.ymax)); //bot
+      region.Push (csRect (r2.xmax, r1.ymin, r1.xmax, r2.ymax)); //right
+      region.Push (csRect (r1.xmin, r2.ymax, r1.xmax, r1.ymax)); //bot
       return;
 
     case 4:
       // Three rects (top, left, bottom)  [rect on right side, middle]
-      pushRect (csRect (r1.xmin, r1.ymin, r1.xmax, r2.ymin)); //top
-      pushRect (csRect (r1.xmin, r2.ymin, r2.xmin, r2.ymax)); //left
-      pushRect (csRect (r1.xmin, r2.ymax, r1.xmax, r1.ymax)); //bot
+      region.Push (csRect (r1.xmin, r1.ymin, r1.xmax, r2.ymin)); //top
+      region.Push (csRect (r1.xmin, r2.ymin, r2.xmin, r2.ymax)); //left
+      region.Push (csRect (r1.xmin, r2.ymax, r1.xmax, r1.ymax)); //bot
       return;
 
     case 5:
       // Two rects (top, bottom)          [rect in middle, horizontally
       //                                  touches left and right sides]
-      pushRect (csRect (r1.xmin, r1.ymin, r1.xmax, r2.ymin)); //top
-      pushRect (csRect (r1.xmin, r2.ymax, r1.xmax, r1.ymax)); //bot
+      region.Push (csRect (r1.xmin, r1.ymin, r1.xmax, r2.ymin)); //top
+      region.Push (csRect (r1.xmin, r2.ymax, r1.xmax, r1.ymax)); //bot
       return;
 
     case 6:
       // Two rects (left, bottom)         [rect on top, right corner]
-      pushRect (csRect (r1.xmin, r1.ymin, r2.xmin, r1.ymax)); //left
-      pushRect (csRect (r2.xmin, r2.ymax, r1.xmax, r1.ymax)); //bot
+      region.Push (csRect (r1.xmin, r1.ymin, r2.xmin, r1.ymax)); //left
+      region.Push (csRect (r2.xmin, r2.ymax, r1.xmax, r1.ymax)); //bot
       return;
 
     case 7:
       // One rect (bottom)                [rect covers entire top]
-      pushRect (csRect (r1.xmin, r2.ymax, r1.xmax, r1.ymax)); //bot
+      region.Push (csRect (r1.xmin, r2.ymax, r1.xmax, r1.ymax)); //bot
       return;
 
     case 8:
       // Three rects (top, left, right)   [rect on bottom side, middle]
-      pushRect (csRect (r1.xmin, r1.ymin, r1.xmax, r2.ymin)); //top
-      pushRect (csRect (r1.xmin, r2.ymin, r2.xmin, r1.ymax)); //left
-      pushRect (csRect (r2.xmax, r2.ymin, r1.xmax, r1.ymax)); //right
+      region.Push (csRect (r1.xmin, r1.ymin, r1.xmax, r2.ymin)); //top
+      region.Push (csRect (r1.xmin, r2.ymin, r2.xmin, r1.ymax)); //left
+      region.Push (csRect (r2.xmax, r2.ymin, r1.xmax, r1.ymax)); //right
       return;
 
     case 9:
       // Two rects (right, top)           [rect on bottom, left corner]
-      pushRect (csRect (r2.xmax, r2.ymin, r1.xmax, r1.ymax)); //right
-      pushRect (csRect (r1.xmin, r1.ymin, r1.xmax, r2.ymin)); //top
+      region.Push (csRect (r2.xmax, r2.ymin, r1.xmax, r1.ymax)); //right
+      region.Push (csRect (r1.xmin, r1.ymin, r1.xmax, r2.ymin)); //top
       return;
 
     case 10:
       // Two rects (left, right)          [rect middle, vert touches top/bot]
-      pushRect (csRect (r1.xmin, r1.ymin, r2.xmin, r1.ymax)); //left
-      pushRect (csRect (r2.xmax, r1.ymin, r1.xmax, r1.ymax)); //right
+      region.Push (csRect (r1.xmin, r1.ymin, r2.xmin, r1.ymax)); //left
+      region.Push (csRect (r2.xmax, r1.ymin, r1.xmax, r1.ymax)); //right
       return;
 
     case 11:
       // One rect (right)                 [rect left, vert touches top/bot]
-      pushRect (csRect (r2.xmax, r1.ymin, r1.xmax, r1.ymax)); //right
+      region.Push (csRect (r2.xmax, r1.ymin, r1.xmax, r1.ymax)); //right
       return;
 
     case 12:
       // Two rects (left, top)            [rect bottom, right corner]
-      pushRect (csRect (r1.xmin, r1.ymin, r2.xmin, r1.ymax)); //left
-      pushRect (csRect (r2.xmin, r1.ymin, r1.xmax, r2.ymin)); //top
+      region.Push (csRect (r1.xmin, r1.ymin, r2.xmin, r1.ymax)); //left
+      region.Push (csRect (r2.xmin, r1.ymin, r1.xmax, r2.ymin)); //top
       return;
 
     case 13:
       // One rect (top)                   [rect bottom, hor touches left/right]
-      pushRect (csRect (r1.xmin, r1.ymin, r1.xmax, r2.ymin)); //top
+      region.Push (csRect (r1.xmin, r1.ymin, r1.xmax, r2.ymin)); //top
       return;
 
     case 14:
       // One rect (left)                   [rect right, vert touches top/bot]
-      pushRect (csRect (r1.xmin, r1.ymin, r2.xmin, r1.ymax)); //bottom
+      region.Push (csRect (r1.xmin, r1.ymin, r2.xmin, r1.ymax)); //bottom
       return;
 
     case 15:
@@ -235,7 +202,7 @@ void csRectRegion::fragmentRect (csRect &r1, csRect &r2, int mode)
       }
 
       // Push r1 back into the regions list
-      pushRect (r1);
+      region.Push (r1);
 
       // Perform fragment and gather.
       markForGather ();
@@ -253,14 +220,14 @@ void csRectRegion::fragmentRect (csRect &r1, csRect &r2, int mode)
 
 void csRectRegion::markForGather ()
 {
-  gather_mark = region_count;
+  gather_mark = region.GetSize();
 }
 
 void csRectRegion::gatherFragments ()
 {
-  int i, j = gather_mark;
+  size_t i, j = gather_mark;
 
-  while (j < region_count)
+  while (j < region.GetSize())
   {
     for (i = 0; i < FRAGMENT_BUFFER_SIZE; ++i)
       if (fragment[i].IsEmpty ())
@@ -272,7 +239,7 @@ void csRectRegion::gatherFragments ()
     j++;
   }
 
-  region_count = gather_mark;
+  region.Truncate (gather_mark);
 }
 
 void csRectRegion::nkSplit (csRect &r1, csRect &r2)
@@ -281,23 +248,23 @@ void csRectRegion::nkSplit (csRect &r1, csRect &r2)
 
   if (r1.ymin < r2.ymin) // upper stripe
   {
-    pushRect (csRect(r1.xmin,r1.ymin, r1.xmax, r2.ymin));
+    region.Push (csRect(r1.xmin,r1.ymin, r1.xmax, r2.ymin));
   }
 
   if (r1.xmin < r2.xmin) // left stripe
   {
-    pushRect (csRect(r1.xmin,r2.ymin, r2.xmin, r2.ymax));
+    region.Push (csRect(r1.xmin,r2.ymin, r2.xmin, r2.ymax));
   }
 
   if (r1.xmax > r2.xmax) // right stripe
   {
-    //pushRect (csRect(r2.xmin, r2.ymin, r1.xmax, r2.ymax));
-    pushRect( csRect(r2.xmax, r2.ymin, r1.xmax, r2.ymax) );
+    //region.Push (csRect(r2.xmin, r2.ymin, r1.xmax, r2.ymax));
+    region.Push( csRect(r2.xmax, r2.ymin, r1.xmax, r2.ymax) );
   }
 
   if (r1.ymax > r2.ymax) // lower stripe
   {
-    pushRect (csRect(r1.xmin, r2.ymax, r1.xmax, r1.ymax));
+    region.Push (csRect(r1.xmin, r2.ymax, r1.xmax, r1.ymax));
   }
 }
 
@@ -308,13 +275,13 @@ void csRectRegion::Include (const csRect &nrect)
     return;
 
   // If there are no rects in the region, add this and leave.
-  if (region_count == 0)
+  if (region.IsEmpty())
   {
-    pushRect (nrect);
+    region.Push (nrect);
     return;
   }
 
-  int i;
+  size_t i;
   bool no_fragments;
   csRect rect (nrect);
 
@@ -329,7 +296,7 @@ void csRectRegion::Include (const csRect &nrect)
 
     // Otherwise, we have to see if this rect creates a union with any other
     // rectangles.
-    int last_to_consider = region_count;
+    size_t last_to_consider = region.GetSize();
     for (i = 0; i < last_to_consider; i++)
     {
       csRect &r1 = region[i];
@@ -354,7 +321,7 @@ void csRectRegion::Include (const csRect &nrect)
       if (r2.IsEmpty ())
       {
         // Kill from list
-        deleteRect (i);
+        region.DeleteIndex (i);
         i--;
         last_to_consider--;
         // Iterate
@@ -370,7 +337,7 @@ void csRectRegion::Include (const csRect &nrect)
       r2.Set (rect);
 
       // Kill rect from list
-      deleteRect (i);
+      region.DeleteIndex (i);
 
       // Fragment it
       fragmentRect (r1, r2, MODE_INCLUDE);
@@ -378,7 +345,7 @@ void csRectRegion::Include (const csRect &nrect)
 
       r2.Set (rect);
       nkSplit (r1, r2);
-      deleteRect (i);
+      region.DeleteIndex (i);
       i--;
       last_to_consider--;
       // Mark it
@@ -387,7 +354,7 @@ void csRectRegion::Include (const csRect &nrect)
 
     // In the end, we need to put the rect on the stack
     if (!rect.IsEmpty () && untouched)
-      pushRect (rect);
+      region.Push (rect);
 
     // Check and see if we have fragments to consider
     for (i = 0; i < FRAGMENT_BUFFER_SIZE; ++i)
@@ -410,10 +377,10 @@ void csRectRegion::Exclude (const csRect &nrect)
     return;
 
   // If there are no rects in the region, just leave.
-  if (region_count == 0)
+  if (region.IsEmpty())
     return;
 
-  int i;
+  size_t i;
   csRect rect (nrect);
 
   /// Clear the fragment buffer
@@ -421,7 +388,7 @@ void csRectRegion::Exclude (const csRect &nrect)
     fragment[i].MakeEmpty ();
 
   // Otherwise, we have to see if this rect overlaps or touches any other.
-  for (i = 0; i < region_count; i++)
+  for (i = 0; i < region.GetSize(); i++)
   {
     csRect r1 (region[i]);
     csRect r2 (rect);
@@ -434,7 +401,7 @@ void csRectRegion::Exclude (const csRect &nrect)
     r1.Exclude (r2);
     if (r1.IsEmpty ())
     {
-      deleteRect (i);
+      region.DeleteIndex (i);
       i--;
       continue;
     }
@@ -446,7 +413,7 @@ void csRectRegion::Exclude (const csRect &nrect)
     if (r2.IsEmpty ())
     {
       r2.Set (rect);
-      deleteRect (i);
+      region.DeleteIndex (i);
       fragmentContainedRect (r1, r2);
       i = 0;
       continue;
@@ -460,7 +427,7 @@ void csRectRegion::Exclude (const csRect &nrect)
     // code should be handled inside fragment rect.
 
     // Kill rect from list
-    deleteRect (i);
+    region.DeleteIndex (i);
     i--;
 
     // Fragment it
@@ -470,11 +437,12 @@ void csRectRegion::Exclude (const csRect &nrect)
 
 void csRectRegion::ClipTo (csRect &clip)
 {
-  for (int i = region_count - 1; i >= 0; i--)
+  size_t i = region.GetSize();
+  while (i-- > 0)
   {
     region[i].Intersect (clip);
     if (region[i].IsEmpty ())
-      deleteRect (i);
+      region.DeleteIndex (i);
   }
 }
 
