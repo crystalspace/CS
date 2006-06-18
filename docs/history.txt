@@ -7,7 +7,8 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 19-Jun-2006
-  - Philip Wyett made Quick Start more explanatory for the CS newcomers.
+	- Philip Wyett made Quick Start more explanatory for the CS newcomers.
+	- res changed csRectRegion to use a csArray<> for rectangle storage.
 18-Jun-2006
         - Arianna fixed some warnings: size_t/uint conversions and some
           deprecated method.
@@ -23,11 +24,11 @@ chronological order.
 	  and SCF parent argument.
 	- res made an interface version iGradient of csGradient, so you can
 	  pass them across plugins.
-  - Philip Wyett changed his email address in docs. Changed 'written by' to
-    'originally written by' for Windows related documentation as I will
-    no longer being working with the Windows codebase daily (as I have not
-    done for a long time) and will be concentrating on Linux.
-  - Philip Wyett starts some maintenance work and changes to documentation.
+	- Philip Wyett changed his email address in docs. Changed 'written by' to
+	  'originally written by' for Windows related documentation as I will
+	  no longer being working with the Windows codebase daily (as I have not
+	  done for a long time) and will be concentrating on Linux.
+	- Philip Wyett starts some maintenance work and changes to documentation.
 17-Jun-2006
         - Piotr Obrzut fixed phystut crash on exit problem (when running
           with bullet plugin)
