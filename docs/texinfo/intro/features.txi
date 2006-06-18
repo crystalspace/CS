@@ -20,8 +20,8 @@ system is listed here it does not necessarily mean that it is 100% supported:
 Microsoft@registeredsymbol{} Windows (9x/@sc{nt}/@sc{me}/2000/@sc{xp})
 
 @item
-Unix like Operating Systems (@sc{gnu} Linux@registeredsymbol{}, 
-FreeBSD@registeredsymbol{}, etc.)
+Unix@registeredsymbol{} like Operating Systems (@sc{gnu}
+Linux@registeredsymbol{}, FreeBSD@registeredsymbol{}, etc.)
 
 @item
 Apple@registeredsymbol{} Mac OS@registeredsymbol{} X
@@ -75,7 +75,7 @@ Flexible and extensible event system.
 Full screen effects (fading, whiteout, etc).
 
 @item
-Level of Detail. @xref{Level of Detail}.
+Level of Detail @sc{lod}. @xref{Level of Detail}.
 
 @item
 Various types of mesh objects: bezier curves, polygonal lightmapped
@@ -146,7 +146,7 @@ sounds. @xref{Sound Drivers}.
 
 @item
 Terrain engine with support for texture splatting (blending multiple materials 
-on a terrain) and @sc{lod}. @xref{MeshObject TerrFunc}.
+on a terrain) and Level Of Detail @sc{lod}. @xref{MeshObject TerrFunc}.
 
 @item
 Particle system to make fire, explosions, rain, snow, fountains, and much
