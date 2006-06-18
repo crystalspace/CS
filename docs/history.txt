@@ -6,6 +6,8 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+18-Jun-2006
+	- mdmkolbe converted the remainder of of apps/ to the new SCF.
 17-Jun-2006
         - Piotr Obrzut fixed phystut crash on exit problem (when running
           with bullet plugin)

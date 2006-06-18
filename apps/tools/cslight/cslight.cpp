@@ -50,21 +50,10 @@ Lighter* System;
 
 //-----------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE (csCsLightProgressMeter)
-  SCF_IMPLEMENTS_INTERFACE (iProgressMeter)
-SCF_IMPLEMENT_IBASE_END
-
-csCsLightProgressMeter::csCsLightProgressMeter (int n)
-	: granularity(10), total(n), current(0), tick_scale(2),
-	  anchor(0)
-{
-  SCF_CONSTRUCT_IBASE (0);
-}
-
-csCsLightProgressMeter::~csCsLightProgressMeter()
-{
-  SCF_DESTRUCT_IBASE ();
-}
+csCsLightProgressMeter::csCsLightProgressMeter (int n) :
+  scfImplementationType(this),
+  granularity(10), total(n), current(0), tick_scale(2), anchor(0)
+{ }
 
 void csCsLightProgressMeter::SetProgressDescription (const char* id,
 	const char* description, ...)
