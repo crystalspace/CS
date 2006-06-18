@@ -10,6 +10,8 @@ chronological order.
 	- res added conveniance includes to disable/enable CS' 'new' and 
 	  'delete' overrides when the memtracker is enabled.
 	- res added some missing custom new re-enablings.
+	- res augmented the scfArray* classes with constructors that also take
+	  and SCF parent argument.
 17-Jun-2006
 	- res added some doxygen comments for the ptmalloc override stuff.
 	- res fixed compilation with MemTracker enabled.
