@@ -184,7 +184,7 @@ Philip Wyett (@email{philipwyett@@blueyonder.co.uk})
 Philip took over from Frank O'Connor as the Windows port maintainer.
 He also wrote and maintained the instructions for building Crystal
 Space on Windows. Philip is after a while of inactivity is now back working
-on Crystal Space, but with concentration on the Linux port.
+on Crystal Space, but with concentration on the @sc{gnu} Linux port.
 
 @item
 Andreas Busch (@email{nobita@@t-online.de})
