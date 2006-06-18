@@ -10,6 +10,7 @@ chronological order.
         - Piotr Obrzut fixed phystut crash on exit problem (when running
           with bullet plugin)
         - Piotr Obrzut fixes bullet plugin unused parameter/variable warnings
+	- mdmkolbe converted libs/csplugincommon/opengl to the new SCF.
 16-Jun-2006
 	- AndyDude fixed the MacOSX menu bug and launching in background bug.
 	- AndyDude changed the non-error CoreAudio messages to be not so 
