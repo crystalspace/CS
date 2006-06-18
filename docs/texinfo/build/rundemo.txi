@@ -16,9 +16,34 @@ files are generally placed in the @file{CS/data} directory, but this not
 required.  Please note that the map @sc{zip} files should @emph{not} be
 unpacked.  Crystal Space can read these files directly.
 
-In this example, we will run @samp{walktest}, the quintessential Crystal Space
-demonstration program.  To run @samp{walktest} with a specific map you can
-specify the map name on the command line:
+In the following examples we will run @samp{walktest}, the quintessential
+Crystal Space demonstration program in various ways.
+
+When running @samp{walktest} for the first time we must update it's lightmaps.
+ This is accomplished by adding @samp{-relight} to the command line.
+
+On Windows:
+
+@example
+walktest.exe -relight
+@end example
+
+On other Operating Systems:
+
+@example
+./walktest -relight
+@end example
+
+In this example, we will run @samp{walktest} and specify the map it should load
+and use.
+
+On Windows:
+
+@example
+walktest.exe @var{map}
+@end example
+
+On other Operating Systems:
 
 @example
 ./walktest @var{map}
@@ -28,16 +53,18 @@ Replace @var{map} with any map file name which you have downloaded and
 placed in your @file{CS/data} directory.  For instance:
 
 @example
-walktest flarge
+walktest partsys
 @end example
 
-If your map is not one of those from the CS homepage, you may also have to add
-it to @file{vfs.cfg}.  Look at the entries for the other maps to see how to do
-this.
+If your map is not one of those from the @sc{cs} homepage, you may also
+have to add it to @file{vfs.cfg}.  Look at the entries for the other maps
+to see how to do this.
 
-Note that the very first time you start a lightmap based map (like
-@samp{flarge}) you must use the @samp{-relight} commandline option to update
-the lightmaps.
+Note when running lightmap based maps you must as above in our initial example
+update it's lightmaps.  This is accomplished as stated by adding @samp{-relight}
+to the command line. Do not worry about this too much, if lightmaps are out
+of date you will in most cases be prompted of the fact in your terminal and
+advised to re-run the application with @samp{-relight}.
 
 You can also use other command line parameters when running Crystal Space
 applications.  @xref{Common Command Line Options}.  Detailed setup can be done
