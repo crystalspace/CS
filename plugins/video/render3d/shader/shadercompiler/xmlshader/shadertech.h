@@ -76,13 +76,10 @@ private:
     csRenderBufferName defaultMappings[STREAMMAX];
     csArray<csStringID> custommapping_id;
     csDirtyAccessArray<csVertexAttrib> custommapping_attrib;
-    csDirtyAccessArray<csRef<csShaderVariable> > custommapping_variables;
     csArray<csRenderBufferName> custommapping_buffer;
 
     // texture mappings
     csStringID textureID[TEXTUREMAX];
-    csRef<csShaderVariable> textureRef[TEXTUREMAX];
-    csRef<csShaderVariable> autoAlphaTexRef;
     int textureCount;
 
     // programs
@@ -92,9 +89,6 @@ private:
 
     // writemasks
     bool wmRed, wmGreen, wmBlue, wmAlpha;
-
-    // variable context
-    csShaderVariableContext svcontext;
 
     csXMLShaderTech* owner;
   };
@@ -136,12 +130,12 @@ private:
   void SetupInstances (csRenderMeshModes& modes, shaderPass *thispass);
 
   // load one pass, return false if it fails
-  bool LoadPass (iDocumentNode *node, shaderPass *pass);
+  bool LoadPass (iDocumentNode *node, shaderPass *pass, size_t variant);
   // load a shaderdefinition block
   //bool LoadSVBlock (iDocumentNode *node, iShaderVariableContext *context);
   // load a shaderprogram
   csPtr<iShaderProgram> LoadProgram (iShaderDestinationResolver* resolve,
-  	iDocumentNode *node, shaderPass *pass);
+  	iDocumentNode *node, shaderPass *pass, size_t variant);
   // Set reason for failure.
   void SetFailReason (const char* reason, ...) CS_GNUC_PRINTF (2, 3);
 
@@ -157,11 +151,11 @@ public:
   bool ActivatePass (size_t number);
   bool SetupPass  (const csRenderMesh *mesh,
     csRenderMeshModes& modes,
-    const csShaderVarStack &stacks);
+    const iShaderVarStack* stacks);
   bool TeardownPass();
   bool DeactivatePass();
 
-  bool Load (iDocumentNode* node, iDocumentNode* parentSV);
+  bool Load (iDocumentNode* node, iDocumentNode* parentSV, size_t variant);
 
   const char* GetFailReason()
   { return fail_reason.GetData(); }

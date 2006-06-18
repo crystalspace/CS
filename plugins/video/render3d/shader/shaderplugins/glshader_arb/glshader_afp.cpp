@@ -63,7 +63,7 @@ void csShaderGLAFP::Deactivate()
 
 void csShaderGLAFP::SetupState (const csRenderMesh* /*mesh*/, 
                                 csRenderMeshModes& /*modes*/,
-	                        const csShaderVarStack &stacks)
+	                        const iShaderVarStack* stacks)
 {
   size_t i;
   const csGLExtensionManager* ext = shaderPlug->ext;

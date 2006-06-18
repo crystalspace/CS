@@ -36,15 +36,16 @@ class csReversibleTransform;
 class csVector2;
 class csVector3;
 
-SCF_VERSION  (iGenMeshSkeletonControlState, 0, 0, 1);
 
 /**
  * This interface describes the API for setting up the skeleton animation
  * control as implemented by the 'gmeshskelanim' plugin. The objects that
  * implement iGenMeshSkeletonControlState also implement this interface.
  */
-struct iGenMeshSkeletonControlState : public iBase
+struct iGenMeshSkeletonControlState : public virtual iBase
 {
+  SCF_INTERFACE(iGenMeshSkeletonControlState, 2, 0, 0);
+
   /**
    * Get animated vertices 
    */

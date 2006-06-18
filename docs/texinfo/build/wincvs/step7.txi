@@ -1,3 +1,0 @@
-@c -*-texinfo-*-
-@node WinCVS Tutorial Step 7, WinCVS Tutorial Step 8, WinCVS Tutorial Step 6, WinCVS Tutorial
-@subsubsection Step 7: Checking out Crystal Space

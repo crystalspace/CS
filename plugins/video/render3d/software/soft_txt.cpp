@@ -256,133 +256,6 @@ bool csSoftwareTextureHandle::GetRendererDimensions (int &mw, int &mh)
   return true;
 }
 
-//----------------------------------------------------------------------------//
-
-void csSoftRendererLightmap::DecRef ()
-{
-  if (scfRefCount == 1)							
-  {									
-    CS_ASSERT (slm != 0);
-    slm->FreeRLM (this);
-    return;								
-  }									
-  scfRefCount--;							
-}
-
-csSoftRendererLightmap::csSoftRendererLightmap () : 
-  scfImplementationType (this)
-{
-  dirty = false;
-  data = 0;
-
-  lightCellSize = 0;
-  memset (cacheData, 0, sizeof (cacheData));
-}
-
-csSoftRendererLightmap::~csSoftRendererLightmap ()
-{
-  delete[] data;
-}
-
-void csSoftRendererLightmap::SetSize (size_t lmPixels)
-{
-  delete[] data;
-  lmSize = lmPixels;
-  data = new csRGBpixel[lmSize];
-  lmSize *= sizeof (csRGBpixel);
-}
-
-void csSoftRendererLightmap::GetSLMCoords (int& left, int& top, 
-                                           int& width, int& height)
-{
-  left = rect.xmin; top  = rect.xmin;
-  width = rect.Width (); height = rect.Height ();
-}
-
-void csSoftRendererLightmap::SetData (csRGBpixel* data)
-{
-  memcpy (csSoftRendererLightmap::data, data,
-    lmSize);
-  dirty = true;
-}
-
-void csSoftRendererLightmap::SetLightCellSize (int size)
-{
-  lightCellSize = size;
-  lightCellShift = csLog2 (lightCellSize);
-}
-
-int csSoftRendererLightmap::GetLightCellSize ()
-{
-  return lightCellSize;
-}
-
-//---------------------------------------------------------------------------
-
-csSoftSuperLightmap::csSoftSuperLightmap (csSoftwareTextureManager* texman, 
-					  int width, int height) : 
-  scfImplementationType (this), RLMs(32)
-{
-  w = width;
-  h = height;
-  tex.AttachNew (new csSoftwareTextureHandle (texman, 0, 0));
-}
-
-csSoftSuperLightmap::~csSoftSuperLightmap ()
-{
-}
-
-void csSoftSuperLightmap::FreeRLM (csSoftRendererLightmap* rlm)
-{
-  // IncRef() ourselves manually.
-  // Otherwise freeing the RLM could trigger our own destruction -
-  // causing an assertion in block allocator (due to how BA frees items and
-  // the safety assertions on BA destruction.)
-  scfRefCount++;
-  int id = idmap.GetKey (rlm, ~0);
-  if (id != ~0)
-  {
-    idmap.Delete (id, rlm);
-  }
-  RLMs.Free (rlm);
-  DecRef ();
-}
-
-csSoftRendererLightmap* csSoftSuperLightmap::GetRlmForID (int id)
-{
-  return idmap.Get (id, 0);
-}
-
-csPtr<iRendererLightmap> csSoftSuperLightmap::RegisterLightmap (int left, int top, 
-                                                                int width, int height)
-{
-  csSoftRendererLightmap* rlm = RLMs.Alloc ();
-  rlm->SetSize (width * height);
-  rlm->slm = this;
-  rlm->rect.Set (left, top, left + width, top + height);
-
-  rlm->u1 = left;
-  rlm->v1 = top;
-  rlm->u2 = left + width;
-  rlm->v2 = top  + height;
-
-  const int id = ComputeRlmID (left, top);
-  idmap.Put (id, rlm);
-
-  return csPtr<iRendererLightmap> (rlm);
-}
-
-csPtr<iImage> csSoftSuperLightmap::Dump ()
-{
-  return 0;
-}
-
-iTextureHandle* csSoftSuperLightmap::GetTexture ()
-{
-  return tex;
-}
-
-
 //----------------------------------------------- csSoftwareTextureManager ---//
 
 csSoftwareTextureManager::csSoftwareTextureManager (
@@ -458,9 +331,9 @@ void csSoftwareTextureManager::UnregisterTexture (
 }
 
 csPtr<iSuperLightmap> csSoftwareTextureManager::CreateSuperLightmap (
-  int width, int height)
+  int /*width*/, int /*height*/)
 {
-  return csPtr<iSuperLightmap> (new csSoftSuperLightmap (this, width, height));
+  return 0;
 }
 
 void csSoftwareTextureManager::GetMaxTextureSize (int& w, int& h, int& aspect)
@@ -475,10 +348,7 @@ void csSoftwareTextureManager::GetLightmapRendererCoords (
 {
   lm_u1 = lm_x1;
   lm_v1 = lm_y1;
-  /*lm_u2 = lm_x2 + 1;
-  lm_v2 = lm_y2 + 1;
-  lm_u1 = lm_x1;
-  lm_v1 =*/ lm_u2 = lm_v2 = 0.0f;
+  lm_u2 = lm_v2 = 0.0f;
 }
 
 }

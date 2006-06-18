@@ -24,6 +24,9 @@
 
 #include "ps1_parser.h"
 
+CS_PLUGIN_NAMESPACE_BEGIN(GLShaderPS1)
+{
+
 class csPS1xTo14Converter
 {
 protected:
@@ -54,5 +57,8 @@ public:
   const char* GetNewInstructions (
     const csArray<csPSProgramInstruction>*& instrs);
 };
+
+}
+CS_PLUGIN_NAMESPACE_END(GLShaderPS1)
 
 #endif // __GLSHADER_PS1_PS1XTO14_H__

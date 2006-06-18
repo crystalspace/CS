@@ -8,12 +8,12 @@
 * Writing Documentation::
 * Portability::
 * Coding Style::
-* CVS Guide:: @sc{cvs} Etiquette Guidelines
+* SVN Guide:: @sc{svn} Etiquette Guidelines
 * Porting:: Porting to a New Platform
 @end menu
 
 @imports{contrib,document.txi}
 @imports{contrib,portable.txi}
 @imports{contrib,coding.txi}
-@imports{contrib,cvs.txi}
+@imports{contrib,svn.txi}
 @imports{contrib,porting.txi}

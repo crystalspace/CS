@@ -24,11 +24,7 @@
 #include "csplugincommon/softshader/scanline.h"
 #include "csutil/scf_implementation.h"
 
-namespace CS
-{
-namespace Plugins
-{
-namespace SoftShader
+CS_PLUGIN_NAMESPACE_BEGIN(SoftShader)
 {
 
   using namespace CS::PluginCommon::SoftShader;
@@ -68,8 +64,7 @@ namespace SoftShader
     void SetColorSum (bool enable) { colorSum = enable; }
   };
 
-} // namespace SoftShader
-} // namespace Plugins
-} // namespace CS
+}
+CS_PLUGIN_NAMESPACE_END(SoftShader)
 
 #endif // __CS_SOFTSHADER_SCANLINE_BASE_H__

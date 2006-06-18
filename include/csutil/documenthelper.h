@@ -24,9 +24,11 @@
  * iDocumentNodeIterator.
  */
 
+#include "csutil/csstring.h"
 #include "csutil/refarr.h"
 #include "csutil/regexp.h"
 #include "csutil/scf_implementation.h"
+#include "csutil/util.h"
 
 #include "iutil/document.h"
 

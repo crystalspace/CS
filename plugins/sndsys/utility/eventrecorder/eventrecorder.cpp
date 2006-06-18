@@ -26,6 +26,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "iutil/cmdline.h"
 #include "iutil/cfgfile.h"
 #include "csutil/sysfunc.h"
+#include "csutil/eventnames.h"
 #include "ivaria/reporter.h"
 
 #include "csutil/cfgacc.h"

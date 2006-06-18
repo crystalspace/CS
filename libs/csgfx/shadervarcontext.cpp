@@ -74,14 +74,14 @@ csShaderVariable* csShaderVariableContext::GetVariable
 }
 
 void csShaderVariableContext::PushVariables 
-  (csShaderVarStack &stacks) const
+  (iShaderVarStack* stacks) const
 {
   for (size_t i=0; i<variables.GetSize (); ++i)
   {
     csStringID name = variables[i]->GetName ();
-    if (stacks.GetSize () <= (size_t)name)
-      stacks.SetSize (name+1, 0);
-    stacks[name] = variables[i];
+    if (stacks->GetSize () <= (size_t)name)
+      stacks->SetSize (name+1, 0);
+    stacks->Put (name, variables[i]);
   }
 }
 

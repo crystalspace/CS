@@ -204,7 +204,7 @@ bool csSaver::SaveTextures(iDocumentNode *parent)
       if (r != r2 || g != g2 || b != b2)
       {
         csColor col (r * ONE_OVER_255, g * ONE_OVER_255, b * ONE_OVER_255);
-        synldr->WriteColor (CreateNode (child, "transparent"), &col);
+        synldr->WriteColor (CreateNode (child, "transparent"), col);
       }
     }
   
@@ -370,7 +370,7 @@ bool csSaver::SaveMaterials(iDocumentNode *parent)
     {
       csColor col (color.red * ONE_OVER_255, color.green * ONE_OVER_255,
 	      color.blue * ONE_OVER_255);
-      synldr->WriteColor (CreateNode (child, "color"), &col);     
+      synldr->WriteColor (CreateNode (child, "color"), col);     
     }
 
     if(texWrap)
@@ -582,15 +582,15 @@ bool csSaver::SaveCameraPositions(iDocumentNode *parent)
       
     // write position
     csVector3 pos = cam->GetPosition ();
-    synldr->WriteVector (CreateNode (n, "position"), &pos);
+    synldr->WriteVector (CreateNode (n, "position"), pos);
 
     // write up vector
     csVector3 up = cam->GetUpwardVector ();
-    synldr->WriteVector (CreateNode (n, "up"), &up);
+    synldr->WriteVector (CreateNode (n, "up"), up);
 
     // write forward vector
     csVector3 forward = cam->GetForwardVector ();
-    synldr->WriteVector (CreateNode (n, "forward"), &forward);
+    synldr->WriteVector (CreateNode (n, "forward"), forward);
 
     // write farplane if available
     csPlane3 *fp = cam->GetFarPlane();
@@ -686,7 +686,7 @@ bool csSaver::SaveMeshFactories(iMeshFactoryList* factList,
       CreateNode (factNode, "priority")->CreateNodeBefore (CS_NODE_TEXT)->SetValue (pname);
 
     csZBufMode zmode = meshfactwrap->GetZBufMode ();
-    synldr->WriteZMode (factNode, &zmode, false);
+    synldr->WriteZMode (factNode, zmode, false);
 
     // Save sprite3d specific material...Because it's not handled in sprite3d loader?
       if (meshfact->GetMaterialWrapper ())
@@ -701,8 +701,8 @@ bool csSaver::SaveMeshFactories(iMeshFactoryList* factList,
       csRef<iDocumentNode> move = CreateNode (factNode, "move");
       csMatrix3 t2o = rt.GetT2O ();
       csVector3 t2ot = rt.GetT2OTranslation ();
-      synldr->WriteMatrix (CreateNode (move, "matrix"), &t2o);
-      synldr->WriteVector (CreateNode (move, "v"), &t2ot);
+      synldr->WriteMatrix (CreateNode (move, "matrix"), t2o);
+      synldr->WriteVector (CreateNode (move, "v"), t2ot);
 
       // LBD: LOD level
     }
@@ -743,7 +743,7 @@ bool csSaver::SaveSectors(iDocumentNode *parent)
     engine->GetDefaultAmbientLight (defaultAmbient);
     if (ambient != defaultAmbient)
     {
-      synldr->WriteColor (CreateNode (sectorNode, "ambient"), &ambient);
+      synldr->WriteColor (CreateNode (sectorNode, "ambient"), ambient);
     }
     
     // TBD: cullerp, polymesh, node
@@ -841,7 +841,7 @@ bool csSaver::SaveSectorMeshes(iMeshList* meshList,
     }
 
     csZBufMode zmode = meshwrapper->GetZBufMode ();
-    synldr->WriteZMode (meshNode, &zmode, false);
+    synldr->WriteZMode (meshNode, zmode, false);
 
     const char* pname = engine->GetRenderPriorityName (meshwrapper->GetRenderPriority ());
     if (pname && *pname)
@@ -862,14 +862,14 @@ bool csSaver::SaveSectorMeshes(iMeshList* meshList,
       if (!moveMatrix.IsIdentity())
       {
         csRef<iDocumentNode> matrixNode = CreateNode(moveNode, "matrix");
-        synldr->WriteMatrix(matrixNode, &moveMatrix);
+        synldr->WriteMatrix(matrixNode, moveMatrix);
       }
 
       //Add the v tag
       if (moveVect != 0)
       {
         csRef<iDocumentNode> vNode = CreateNode(moveNode, "v");
-        synldr->WriteVector(vNode, &moveVect);
+        synldr->WriteVector(vNode, moveVect);
       }
     }
 
@@ -958,7 +958,7 @@ bool csSaver::SaveSectorMeshes(const csRefArray<iSceneNode>& meshList,
     }
 
     csZBufMode zmode = meshwrapper->GetZBufMode ();
-    synldr->WriteZMode (meshNode, &zmode, false);
+    synldr->WriteZMode (meshNode, zmode, false);
 
     //TBD: write <priority>
     //TBD: write other tags
@@ -977,14 +977,14 @@ bool csSaver::SaveSectorMeshes(const csRefArray<iSceneNode>& meshList,
       if (!moveMatrix.IsIdentity())
       {
         csRef<iDocumentNode> matrixNode = CreateNode(moveNode, "matrix");
-        synldr->WriteMatrix(matrixNode, &moveMatrix);
+        synldr->WriteMatrix(matrixNode, moveMatrix);
       }
 
       //Add the v tag
       if (moveVect != 0)
       {
         csRef<iDocumentNode> vNode = CreateNode(moveNode, "v");
-        synldr->WriteVector(vNode, &moveVect);
+        synldr->WriteVector(vNode, moveVect);
       }
     }
 
@@ -1154,13 +1154,13 @@ bool csSaver::SaveVariables (iDocumentNode* node)
       case iSharedVariable::SV_COLOR:
       {
         csColor c = var->GetColor ();
-        synldr->WriteColor (CreateNode (variableNode, "color"), &c);
+        synldr->WriteColor (CreateNode (variableNode, "color"), c);
         break;
       }
       case iSharedVariable::SV_VECTOR:
       {
         csVector3 v = var->GetVector ();
-        synldr->WriteVector (CreateNode (variableNode, "v"), &v);
+        synldr->WriteVector (CreateNode (variableNode, "v"), v);
         break;
       }
       default:
@@ -1197,7 +1197,7 @@ bool csSaver::SaveSettings (iDocumentNode* node)
   csRef<iDocumentNode> ambientNode = CreateNode(settingsNode, "ambient");
   csColor c;
   engine->GetAmbientLight(c);
-  synldr->WriteColor(ambientNode, &c);
+  synldr->WriteColor(ambientNode, c);
 
   iRenderLoop* renderloop = engine->GetCurrentDefaultRenderloop();
   const char* loopName = engine->GetRenderLoopManager()->GetName(renderloop);

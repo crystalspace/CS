@@ -22,6 +22,9 @@
 #include "ps1_1xto14.h"
 #include "ps1_instr.h"
 
+CS_PLUGIN_NAMESPACE_BEGIN(GLShaderPS1)
+{
+
 #define BIT_RGB			    0x1
 #define BIT_ALPHA		    0x2
 #define BIT_RGBA		    0x3
@@ -498,3 +501,6 @@ const char* csPS1xTo14Converter::GetNewInstructions (
   instrs = &newInstructions;
   return 0;
 }
+
+}
+CS_PLUGIN_NAMESPACE_END(GLShaderPS1)

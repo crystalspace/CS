@@ -53,8 +53,8 @@ package cspace;
 *__rshift__ = *cspacec::__rshift__;
 *__mult_ass__ = *cspacec::__mult_ass__;
 *__divide_ass__ = *cspacec::__divide_ass__;
-*__div__ = *cspacec::__div__;
 *__subtr__ = *cspacec::__subtr__;
+*__div__ = *cspacec::__div__;
 *__add__ = *cspacec::__add__;
 *__mult__ = *cspacec::__mult__;
 *__eq__ = *cspacec::__eq__;
@@ -219,6 +219,42 @@ sub DESTROY {
     delete $ITERATORS{$self};
     if (exists $OWNER{$self}) {
         cspacec::delete_csArrayThresholdVariable($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::csArrayCapacityDefault ##############
+
+package cspace::csArrayCapacityDefault;
+@ISA = qw( cspace );
+%OWNER = ();
+%ITERATORS = ();
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_csArrayCapacityDefault(@_);
+    bless $self, $pkg if defined($self);
+}
+
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_csArrayCapacityDefault($self);
         delete $OWNER{$self};
     }
 }
@@ -824,6 +860,7 @@ sub new {
 *Unit = *cspacec::csVector3_Unit;
 *Normalize = *cspacec::csVector3_Normalize;
 *IsZero = *cspacec::csVector3_IsZero;
+*UnitAxisClamped = *cspacec::csVector3_UnitAxisClamped;
 *__add__ = *cspacec::csVector3___add__;
 *__subtr__ = *cspacec::csVector3___subtr__;
 *__mult__ = *cspacec::csVector3___mult__;
@@ -2240,34 +2277,35 @@ package cspace::csQuaternion;
 @ISA = qw( cspace );
 %OWNER = ();
 %ITERATORS = ();
-*Init = *cspacec::csQuaternion_Init;
 sub new {
     my $pkg = shift;
     my $self = cspacec::new_csQuaternion(@_);
     bless $self, $pkg if defined($self);
 }
 
+*SetIdentity = *cspacec::csQuaternion_SetIdentity;
+*__add_ass__ = *cspacec::csQuaternion___add_ass__;
+*__subtr_ass__ = *cspacec::csQuaternion___subtr_ass__;
 *__mult_ass__ = *cspacec::csQuaternion___mult_ass__;
+*GetConjugate = *cspacec::csQuaternion_GetConjugate;
 *Conjugate = *cspacec::csQuaternion_Conjugate;
-*Negate = *cspacec::csQuaternion_Negate;
-*Invert = *cspacec::csQuaternion_Invert;
-*GetAxisAngle = *cspacec::csQuaternion_GetAxisAngle;
-*SetWithAxisAngle = *cspacec::csQuaternion_SetWithAxisAngle;
-*PrepRotation = *cspacec::csQuaternion_PrepRotation;
+*Dot = *cspacec::csQuaternion_Dot;
+*SquaredNorm = *cspacec::csQuaternion_SquaredNorm;
+*Norm = *cspacec::csQuaternion_Norm;
+*Unit = *cspacec::csQuaternion_Unit;
 *Rotate = *cspacec::csQuaternion_Rotate;
-*Normalize = *cspacec::csQuaternion_Normalize;
-*SetWithEuler = *cspacec::csQuaternion_SetWithEuler;
+*SetAxisAngle = *cspacec::csQuaternion_SetAxisAngle;
+*GetAxisAngle = *cspacec::csQuaternion_GetAxisAngle;
+*SetEulerAngles = *cspacec::csQuaternion_SetEulerAngles;
 *GetEulerAngles = *cspacec::csQuaternion_GetEulerAngles;
-*ToAxisAngle = *cspacec::csQuaternion_ToAxisAngle;
-*Slerp = *cspacec::csQuaternion_Slerp;
-*swig_r_get = *cspacec::csQuaternion_r_get;
-*swig_r_set = *cspacec::csQuaternion_r_set;
-*swig_x_get = *cspacec::csQuaternion_x_get;
-*swig_x_set = *cspacec::csQuaternion_x_set;
-*swig_y_get = *cspacec::csQuaternion_y_get;
-*swig_y_set = *cspacec::csQuaternion_y_set;
-*swig_z_get = *cspacec::csQuaternion_z_get;
-*swig_z_set = *cspacec::csQuaternion_z_set;
+*SetMatrix = *cspacec::csQuaternion_SetMatrix;
+*GetMatrix = *cspacec::csQuaternion_GetMatrix;
+*NLerp = *cspacec::csQuaternion_NLerp;
+*SLerp = *cspacec::csQuaternion_SLerp;
+*swig_v_get = *cspacec::csQuaternion_v_get;
+*swig_v_set = *cspacec::csQuaternion_v_set;
+*swig_w_get = *cspacec::csQuaternion_w_get;
+*swig_w_set = *cspacec::csQuaternion_w_set;
 *__add__ = *cspacec::csQuaternion___add__;
 *__subtr__ = *cspacec::csQuaternion___subtr__;
 *__mult__ = *cspacec::csQuaternion___mult__;
@@ -2730,6 +2768,8 @@ sub new {
 *__eq__ = *cspacec::csRGBcolor___eq__;
 *__ne__ = *cspacec::csRGBcolor___ne__;
 *__add__ = *cspacec::csRGBcolor___add__;
+*UnsafeAdd = *cspacec::csRGBcolor_UnsafeAdd;
+*SafeAdd = *cspacec::csRGBcolor_SafeAdd;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -2845,6 +2885,7 @@ package cspace::csShaderVariable;
 @ISA = qw( cspace cspace::csRefCount );
 %OWNER = ();
 %ITERATORS = ();
+*UNKNOWN = *cspacec::csShaderVariable_UNKNOWN;
 *INT = *cspacec::csShaderVariable_INT;
 *FLOAT = *cspacec::csShaderVariable_FLOAT;
 *COLOR = *cspacec::csShaderVariable_COLOR;
@@ -3037,6 +3078,7 @@ sub new {
 *DeleteIndexFast = *cspacec::csPluginRequestArray_DeleteIndexFast;
 *DeleteRange = *cspacec::csPluginRequestArray_DeleteRange;
 *__eq__ = *cspacec::csPluginRequestArray___eq__;
+*__ne__ = *cspacec::csPluginRequestArray___ne__;
 *GetAllocator = *cspacec::csPluginRequestArray_GetAllocator;
 sub DISOWN {
     my $self = shift;
@@ -4914,6 +4956,50 @@ sub ACQUIRE {
 }
 
 
+############# Class : cspace::csSectorHitBeamResult ##############
+
+package cspace::csSectorHitBeamResult;
+@ISA = qw( cspace );
+%OWNER = ();
+%ITERATORS = ();
+*swig_mesh_get = *cspacec::csSectorHitBeamResult_mesh_get;
+*swig_mesh_set = *cspacec::csSectorHitBeamResult_mesh_set;
+*swig_isect_get = *cspacec::csSectorHitBeamResult_isect_get;
+*swig_isect_set = *cspacec::csSectorHitBeamResult_isect_set;
+*swig_polygon_idx_get = *cspacec::csSectorHitBeamResult_polygon_idx_get;
+*swig_polygon_idx_set = *cspacec::csSectorHitBeamResult_polygon_idx_set;
+*swig_final_sector_get = *cspacec::csSectorHitBeamResult_final_sector_get;
+*swig_final_sector_set = *cspacec::csSectorHitBeamResult_final_sector_set;
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_csSectorHitBeamResult(@_);
+    bless $self, $pkg if defined($self);
+}
+
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_csSectorHitBeamResult($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
 ############# Class : cspace::iSector ##############
 
 package cspace::iSector;
@@ -5859,6 +5945,7 @@ package cspace::iMeshWrapper;
 *GetWorldBoundingBox = *cspacec::iMeshWrapper_GetWorldBoundingBox;
 *GetTransformedBoundingBox = *cspacec::iMeshWrapper_GetTransformedBoundingBox;
 *GetScreenBoundingBox = *cspacec::iMeshWrapper_GetScreenBoundingBox;
+*GetRadius = *cspacec::iMeshWrapper_GetRadius;
 *ResetMinMaxRenderDistance = *cspacec::iMeshWrapper_ResetMinMaxRenderDistance;
 *SetMinimumRenderDistance = *cspacec::iMeshWrapper_SetMinimumRenderDistance;
 *GetMinimumRenderDistance = *cspacec::iMeshWrapper_GetMinimumRenderDistance;
@@ -6752,6 +6839,7 @@ package cspace::csSprite2DVertex;
 *swig_u_set = *cspacec::csSprite2DVertex_u_set;
 *swig_v_get = *cspacec::csSprite2DVertex_v_get;
 *swig_v_set = *cspacec::csSprite2DVertex_v_set;
+*__eq__ = *cspacec::csSprite2DVertex___eq__;
 sub new {
     my $pkg = shift;
     my $self = cspacec::new_csSprite2DVertex(@_);
@@ -6765,6 +6853,36 @@ sub DESTROY {
     delete $ITERATORS{$self};
     if (exists $OWNER{$self}) {
         cspacec::delete_csSprite2DVertex($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iColoredVertices ##############
+
+package cspace::iColoredVertices;
+@ISA = qw( cspace );
+%OWNER = ();
+%ITERATORS = ();
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iColoredVertices($self);
         delete $OWNER{$self};
     }
 }
@@ -7797,6 +7915,61 @@ sub ACQUIRE {
 }
 
 
+############# Class : cspace::csCharArrayArray ##############
+
+package cspace::csCharArrayArray;
+@ISA = qw( cspace );
+%OWNER = ();
+%ITERATORS = ();
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_csCharArrayArray($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_csCharArrayArray(@_);
+    bless $self, $pkg if defined($self);
+}
+
+*GetSize = *cspacec::csCharArrayArray_GetSize;
+*Length = *cspacec::csCharArrayArray_Length;
+*Get = *cspacec::csCharArrayArray_Get;
+*Put = *cspacec::csCharArrayArray_Put;
+*Push = *cspacec::csCharArrayArray_Push;
+*Pop = *cspacec::csCharArrayArray_Pop;
+*Top = *cspacec::csCharArrayArray_Top;
+*Insert = *cspacec::csCharArrayArray_Insert;
+*Contains = *cspacec::csCharArrayArray_Contains;
+*Truncate = *cspacec::csCharArrayArray_Truncate;
+*Empty = *cspacec::csCharArrayArray_Empty;
+*IsEmpty = *cspacec::csCharArrayArray_IsEmpty;
+*SetMinimalCapacity = *cspacec::csCharArrayArray_SetMinimalCapacity;
+*DeleteIndex = *cspacec::csCharArrayArray_DeleteIndex;
+*DeleteIndexFast = *cspacec::csCharArrayArray_DeleteIndexFast;
+*DeleteRange = *cspacec::csCharArrayArray_DeleteRange;
+*__eq__ = *cspacec::csCharArrayArray___eq__;
+*__ne__ = *cspacec::csCharArrayArray___ne__;
+*GetAllocator = *cspacec::csCharArrayArray_GetAllocator;
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
 ############# Class : cspace::iTerrainObjectState ##############
 
 package cspace::iTerrainObjectState;
@@ -7805,6 +7978,8 @@ package cspace::iTerrainObjectState;
 %ITERATORS = ();
 *SetMaterialPalette = *cspacec::iTerrainObjectState_SetMaterialPalette;
 *GetMaterialPalette = *cspacec::iTerrainObjectState_GetMaterialPalette;
+*SetMaterialMap = *cspacec::iTerrainObjectState_SetMaterialMap;
+*SetMaterialAlphaMaps = *cspacec::iTerrainObjectState_SetMaterialAlphaMaps;
 *SetLODValue = *cspacec::iTerrainObjectState_SetLODValue;
 *GetLODValue = *cspacec::iTerrainObjectState_GetLODValue;
 *SaveState = *cspacec::iTerrainObjectState_SaveState;
@@ -11833,6 +12008,36 @@ sub ACQUIRE {
 }
 
 
+############# Class : cspace::iShaderVarStack ##############
+
+package cspace::iShaderVarStack;
+@ISA = qw( cspace );
+%OWNER = ();
+%ITERATORS = ();
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iShaderVarStack($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
 ############# Class : cspace::iShaderVariableContext ##############
 
 package cspace::iShaderVariableContext;
@@ -12279,6 +12484,9 @@ package cspace::iImage;
 *GetPalette = *cspacec::iImage_GetPalette;
 *GetAlpha = *cspacec::iImage_GetAlpha;
 *HasKeyColor = *cspacec::iImage_HasKeyColor;
+*HasKeycolor = *cspacec::iImage_HasKeycolor;
+*GetKeyColor = *cspacec::iImage_GetKeyColor;
+*GetKeycolor = *cspacec::iImage_GetKeycolor;
 *HasMipmaps = *cspacec::iImage_HasMipmaps;
 *GetMipmap = *cspacec::iImage_GetMipmap;
 *GetRawFormat = *cspacec::iImage_GetRawFormat;
@@ -12298,6 +12506,61 @@ sub DESTROY {
 }
 
 *scfGetVersion = *cspacec::iImage_scfGetVersion;
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::csImageIOFileFormatDescriptions ##############
+
+package cspace::csImageIOFileFormatDescriptions;
+@ISA = qw( cspace );
+%OWNER = ();
+%ITERATORS = ();
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_csImageIOFileFormatDescriptions($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_csImageIOFileFormatDescriptions(@_);
+    bless $self, $pkg if defined($self);
+}
+
+*GetSize = *cspacec::csImageIOFileFormatDescriptions_GetSize;
+*Length = *cspacec::csImageIOFileFormatDescriptions_Length;
+*Get = *cspacec::csImageIOFileFormatDescriptions_Get;
+*Put = *cspacec::csImageIOFileFormatDescriptions_Put;
+*Push = *cspacec::csImageIOFileFormatDescriptions_Push;
+*Pop = *cspacec::csImageIOFileFormatDescriptions_Pop;
+*Top = *cspacec::csImageIOFileFormatDescriptions_Top;
+*Insert = *cspacec::csImageIOFileFormatDescriptions_Insert;
+*Contains = *cspacec::csImageIOFileFormatDescriptions_Contains;
+*Truncate = *cspacec::csImageIOFileFormatDescriptions_Truncate;
+*Empty = *cspacec::csImageIOFileFormatDescriptions_Empty;
+*IsEmpty = *cspacec::csImageIOFileFormatDescriptions_IsEmpty;
+*SetMinimalCapacity = *cspacec::csImageIOFileFormatDescriptions_SetMinimalCapacity;
+*DeleteIndex = *cspacec::csImageIOFileFormatDescriptions_DeleteIndex;
+*DeleteIndexFast = *cspacec::csImageIOFileFormatDescriptions_DeleteIndexFast;
+*DeleteRange = *cspacec::csImageIOFileFormatDescriptions_DeleteRange;
+*__eq__ = *cspacec::csImageIOFileFormatDescriptions___eq__;
+*__ne__ = *cspacec::csImageIOFileFormatDescriptions___ne__;
+*GetAllocator = *cspacec::csImageIOFileFormatDescriptions_GetAllocator;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);

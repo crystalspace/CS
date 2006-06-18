@@ -65,7 +65,7 @@ struct iTextureHandle;
  * If this flag is set then this portal will do a Z-fill after
  * rendering the contents. This is mainly useful for floating portals
  * where it is possible that there is geometry in the same sector
- * that will be rendered behind the portal (and does could accidently
+ * that will be rendered behind the portal (and thus could accidently
  * get written in the portal sector because the Z-buffer cannot
  * be trusted).
  */
@@ -116,8 +116,6 @@ struct iTextureHandle;
 #define CS_PORTAL_VISCULL 0x00000100
 
 
-SCF_VERSION (iPortalCallback, 0, 0, 1);
-
 /**
  * When a sector is missing this callback will be called. If this callback
  * returns false then this portal will not be traversed. Otherwise this
@@ -128,8 +126,10 @@ SCF_VERSION (iPortalCallback, 0, 0, 1);
  * This callback is used by:
  * - iPortal
  */
-struct iPortalCallback : public iBase
+struct iPortalCallback : public virtual iBase
 {
+  SCF_INTERFACE (iPortalCallback, 1, 0, 0);
+
   /**
    * Traverse to the portal. It is safe to delete this callback
    * in this function.
@@ -358,7 +358,7 @@ struct iPortal : public virtual iBase
    */
   virtual iMeshWrapper* HitBeamPortals (const csReversibleTransform& t,
 	const csVector3& start, const csVector3& end,
-  	csVector3& isect, int* polygon_idx) = 0;
+  	csVector3& isect, int* polygon_idx, iSector** final_sector = 0) = 0;
 
   /**
    * Get number of vertices in the array returned by GetVertices().

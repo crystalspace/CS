@@ -32,6 +32,9 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "glshader_ps1.h"
 #include "ps1_parser.h"
 
+CS_PLUGIN_NAMESPACE_BEGIN(GLShaderPS1)
+{
+
 void csPixelShaderParser::RegisterInstructions ()
 {
   PS_Instructions[CS_PS_INS_INVALID].arguments = 0;
@@ -459,8 +462,6 @@ bool csPixelShaderParser::ParseProgram (iDataBuffer* program)
   return true;
 }
 
-#ifdef CS_DEBUG
-
 static char GetRegType (csPSRegisterType type)
 {
   switch (type)
@@ -501,10 +502,9 @@ static void GetSrcRegname (csPSRegisterType type, int num, uint mods,
   if (mods & CS_PS_RMOD_XYZ) str << ".xyz";
   if (mods & CS_PS_RMOD_XYW) str << ".xyw";
 }
-#endif
 
 void csPixelShaderParser::GetInstructionString (
-  const csPSProgramInstruction& instr, csString& str)
+  const csPSProgramInstruction& instr, csString& str) const
 {
   str << instrStrings.Request (instr.instruction);
   if (instr.inst_mods & CS_PS_IMOD_X2) str << "_x2";
@@ -516,7 +516,33 @@ void csPixelShaderParser::GetInstructionString (
   if (instr.inst_mods & CS_PS_IMOD_SAT) str << "_sat";
 }
 
-#ifdef CS_DEBUG
+void csPixelShaderParser::GetInstructionLine (
+  const csPSProgramInstruction& instr, csString& str) const
+{
+  csString instrStr;
+  GetInstructionString (instr, instrStr);
+  str << instrStr;
+
+  str << ' ';
+  str << GetRegType (instr.dest_reg);
+  str << instr.dest_reg_num;
+
+  if (instr.dest_reg_mods != 0) str << '.';
+  if (instr.dest_reg_mods & CS_PS_WMASK_RED) str << 'r';
+  if (instr.dest_reg_mods & CS_PS_WMASK_GREEN) str << 'g';
+  if (instr.dest_reg_mods & CS_PS_WMASK_BLUE) str << 'b';
+  if (instr.dest_reg_mods & CS_PS_WMASK_ALPHA) str << 'a';
+
+  for (int j = 0; j < 3; j++)
+  {
+    if (instr.src_reg[j] == CS_PS_REG_NONE) break;
+    str << ", ";
+    
+    GetSrcRegname (instr.src_reg[j], instr.src_reg_num[j], 
+	instr.src_reg_mods[j], str);
+  }
+}
+
 void csPixelShaderParser::WriteProgram (
 	const csArray<csPSProgramInstruction>& instrs, 
 	csString& str)
@@ -525,30 +551,12 @@ void csPixelShaderParser::WriteProgram (
   {
     const csPSProgramInstruction& instr = instrs.Get (i);
 
-    csString instrStr;
-    GetInstructionString (instr, instrStr);
-    str << instrStr;
-
-    str << ' ';
-    str << GetRegType (instr.dest_reg);
-    str << instr.dest_reg_num;
-
-    if (instr.dest_reg_mods != 0) str << '.';
-    if (instr.dest_reg_mods & CS_PS_WMASK_RED) str << 'r';
-    if (instr.dest_reg_mods & CS_PS_WMASK_GREEN) str << 'g';
-    if (instr.dest_reg_mods & CS_PS_WMASK_BLUE) str << 'b';
-    if (instr.dest_reg_mods & CS_PS_WMASK_ALPHA) str << 'a';
-
-    for (int j = 0; j < 3; j++)
-    {
-      if (instr.src_reg[j] == CS_PS_REG_NONE) break;
-      str << ", ";
-      
-      GetSrcRegname (instr.src_reg[j], instr.src_reg_num[j], 
-	instr.src_reg_mods[j], str);
-    }
-
+    csString line;
+    GetInstructionLine (instr, line);
+    str << line;
     str << '\n';
   }
 }
-#endif
+
+}
+CS_PLUGIN_NAMESPACE_END(GLShaderPS1)

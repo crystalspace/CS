@@ -607,7 +607,7 @@ public:
   virtual void GetRadius (float& rad, csVector3& cent)
   {
     rad = GetRadius ();
-    cent.Set (0.0f);
+    cent = object_bbox.GetCenter ();
   }
   /** @} */
 

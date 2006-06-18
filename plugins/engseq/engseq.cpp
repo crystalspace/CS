@@ -29,6 +29,7 @@
 #include "csutil/randomgen.h"
 #include "csutil/weakref.h"
 #include "csutil/event.h"
+#include "csutil/eventnames.h"
 #include "iutil/objreg.h"
 #include "iutil/event.h"
 #include "iutil/eventq.h"

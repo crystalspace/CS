@@ -22,6 +22,9 @@
 
 #include "cstool/bitmasktostr.h"
 
+CS_PLUGIN_NAMESPACE_BEGIN(GLShaderPS1)
+{
+
 enum csPixelShaderVersion
 {
   CS_PS_INVALID = 0,
@@ -113,5 +116,8 @@ enum csPSRegisterType
 
 extern const char* GetInstructionName (int instrID);
 extern const char* GetVersionString (csPixelShaderVersion ver);
+
+}
+CS_PLUGIN_NAMESPACE_END(GLShaderPS1)
 
 #endif // __GLSHADER_PS1_INSTR_H__

@@ -26,6 +26,7 @@
 #include "csgeom/transfrm.h"
 #include "csgfx/renderbuffer.h"
 #include "cstool/rbuflock.h"
+#include "csutil/scfarray.h"
 
 #include "iengine/movable.h"
 #include "iengine/rview.h"
@@ -42,67 +43,32 @@
 
 #include "spr2d.h"
 
+CS_IMPLEMENT_PLUGIN
+
+CS_PLUGIN_NAMESPACE_BEGIN(Spr2D)
+{
 
 CS_LEAKGUARD_IMPLEMENT (csSprite2DMeshObject);
 CS_LEAKGUARD_IMPLEMENT (csSprite2DMeshObjectFactory);
 
-CS_IMPLEMENT_PLUGIN
-
-SCF_IMPLEMENT_IBASE (csSprite2DMeshObject)
-  SCF_IMPLEMENTS_INTERFACE (iMeshObject)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iObjectModel)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iSprite2DState)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iParticle)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csSprite2DMeshObject::ObjectModel)
-  SCF_IMPLEMENTS_INTERFACE (iObjectModel)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csSprite2DMeshObject::Sprite2DState)
-  SCF_IMPLEMENTS_INTERFACE (iSprite2DState)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csSprite2DMeshObject::Particle)
-  SCF_IMPLEMENTS_INTERFACE (iParticle)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csSprite2DMeshObject::eiRenderBufferAccessor)
-  SCF_IMPLEMENTS_INTERFACE (iRenderBufferAccessor)
-SCF_IMPLEMENT_IBASE_END
-
-csSprite2DMeshObject::csSprite2DMeshObject (csSprite2DMeshObjectFactory* factory)
+csSprite2DMeshObject::csSprite2DMeshObject (csSprite2DMeshObjectFactory* factory) :
+  scfImplementationType (this), uvani (0), vertices_dirty (true), 
+  texels_dirty (true), colors_dirty (true), indicesSize ((size_t)-1), 
+  logparent (0), factory (factory), initialized (false), current_lod (1), 
+  current_features (0)
 {
-  SCF_CONSTRUCT_IBASE (0);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObjectModel);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiSprite2DState);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiParticle);
-  csSprite2DMeshObject::factory = factory;
-  logparent = 0;
-  ifactory = SCF_QUERY_INTERFACE (factory, iMeshObjectFactory);
+  ifactory = scfQueryInterface<iMeshObjectFactory> (factory);
   material = factory->GetMaterialWrapper ();
   lighting = factory->HasLighting ();
   MixMode = factory->GetMixMode ();
-  initialized = false;
-  vis_cb = 0;
-  current_lod = 1;
-  current_features = 0;
-  uvani = 0;
 
-  vertices_dirty = true;
-  texels_dirty = true;
-  colors_dirty = true;
-  indicesSize = (size_t)-1;
+  scfVertices.AttachNew (new scfArrayWrap<iColoredVertices, 
+    csColoredVertices> (vertices));
 }
 
 csSprite2DMeshObject::~csSprite2DMeshObject ()
 {
-  if (vis_cb) vis_cb->DecRef ();
   delete uvani;
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiObjectModel);
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiSprite2DState);
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiParticle);
-  SCF_DESTRUCT_IBASE ();
 }
 
 void csSprite2DMeshObject::SetupObject ()
@@ -131,7 +97,7 @@ void csSprite2DMeshObject::SetupObject ()
 
     bufferHolder.AttachNew (new csRenderBufferHolder);
     csRef<iRenderBufferAccessor> newAccessor;
-    newAccessor.AttachNew (new eiRenderBufferAccessor (this));
+    newAccessor.AttachNew (new RenderBufferAccessor (this));
     bufferHolder->SetAccessor (newAccessor, (uint32)CS_BUFFER_ALL_MASK);
     svcontext.AttachNew (new csShaderVariableContext);
   }
@@ -418,7 +384,7 @@ void csSprite2DMeshObject::CreateRegularVertices (int n, bool setuv)
   texels_dirty = true;
   colors_dirty = true;
 
-  scfiObjectModel.ShapeChanged ();
+  ShapeChanged ();
 }
 
 void csSprite2DMeshObject::NextFrame (csTicks current_time,
@@ -432,167 +398,142 @@ void csSprite2DMeshObject::NextFrame (csTicks current_time,
   }
 }
 
-void csSprite2DMeshObject::Particle::UpdateLighting (
+void csSprite2DMeshObject::UpdateLighting (
 	const csArray<iLightSectorInfluence*>& lights,
 	const csReversibleTransform& transform)
 {
   csVector3 new_pos = transform.This2Other (part_pos);
-  scfParent->UpdateLighting (lights, new_pos);
+  UpdateLighting (lights, new_pos);
 }
 
    
-csRenderMesh** csSprite2DMeshObject::Particle::GetRenderMeshes (int& n, 
-	iRenderView* rview, iMovable* movable, uint32 frustum_mask)
+void csSprite2DMeshObject::AddColor (const csColor& col)
 {
-  return scfParent->GetRenderMeshes (n, rview, movable, frustum_mask, part_pos);
-}
-
-void csSprite2DMeshObject::Particle::SetColor (const csColor& col)
-{
-  csColoredVertices& vertices = scfParent->GetVertices ();
+  iColoredVertices* vertices = GetVertices ();
   size_t i;
-  for (i = 0 ; i < vertices.Length () ; i++)
-    vertices[i].color_init = col;
-  if (!scfParent->lighting)
-    for (i = 0 ; i < vertices.Length () ; i++)
-      vertices[i].color = col;
+  for (i = 0 ; i < vertices->GetSize(); i++)
+    vertices->Get (i).color_init += col;
+  if (!lighting)
+    for (i = 0 ; i < vertices->GetSize(); i++)
+      vertices->Get (i).color = vertices->Get (i).color_init;
 
-  scfParent->colors_dirty = true;
-
+  colors_dirty = true;
 }
 
-void csSprite2DMeshObject::Particle::AddColor (const csColor& col)
+void csSprite2DMeshObject::ScaleBy (float factor)
 {
-  csColoredVertices& vertices = scfParent->GetVertices ();
+  iColoredVertices* vertices = GetVertices ();
   size_t i;
-  for (i = 0 ; i < vertices.Length () ; i++)
-    vertices[i].color_init += col;
-  if (!scfParent->lighting)
-    for (i = 0 ; i < vertices.Length () ; i++)
-      vertices[i].color = vertices[i].color_init;
+  for (i = 0 ; i < vertices->GetSize(); i++)
+    vertices->Get (i).pos *= factor;
 
-  scfParent->colors_dirty = true;
-
+  vertices_dirty = true;
+  ShapeChanged ();
 }
 
-void csSprite2DMeshObject::Particle::ScaleBy (float factor)
+void csSprite2DMeshObject::Rotate (float angle)
 {
-  csColoredVertices& vertices = scfParent->GetVertices ();
+  iColoredVertices* vertices = GetVertices ();
   size_t i;
-  for (i = 0; i < vertices.Length (); i++)
-    vertices[i].pos *= factor;
+  for (i = 0 ; i < vertices->GetSize(); i++)
+    vertices->Get (i).pos.Rotate (angle);
 
-  scfParent->vertices_dirty = true;
-
-  scfParent->scfiObjectModel.ShapeChanged ();
+  vertices_dirty = true;
+  ShapeChanged ();
 }
 
-void csSprite2DMeshObject::Particle::Rotate (float angle)
-{
-  csColoredVertices& vertices = scfParent->GetVertices ();
-  size_t i;
-  for (i = 0; i < vertices.Length (); i++)
-    vertices[i].pos.Rotate (angle);
-
-  scfParent->vertices_dirty = true;
-
-  scfParent->scfiObjectModel.ShapeChanged ();
-}
-
-void csSprite2DMeshObject::Sprite2DState::SetUVAnimation (const char *name,
+void csSprite2DMeshObject::SetUVAnimation (const char *name,
 	int style, bool loop)
 {
   if (name)
   {
-    iSprite2DUVAnimation *ani = scfParent->factory->GetUVAnimation (name);
+    iSprite2DUVAnimation *ani = factory->GetUVAnimation (name);
     if (ani && ani->GetFrameCount ())
     {
-      scfParent->uvani = new uvAnimationControl ();
-      scfParent->uvani->ani = ani;
-      scfParent->uvani->last_time = 0;
-      scfParent->uvani->frameindex = 0;
-      scfParent->uvani->framecount = ani->GetFrameCount ();
-      scfParent->uvani->frame = ani->GetFrame (0);
-      scfParent->uvani->style = style;
-      scfParent->uvani->counter = 0;
-      scfParent->uvani->loop = loop;
-      scfParent->uvani->halted = false;
+      uvani = new uvAnimationControl ();
+      uvani->ani = ani;
+      uvani->last_time = 0;
+      uvani->frameindex = 0;
+      uvani->framecount = ani->GetFrameCount ();
+      uvani->frame = ani->GetFrame (0);
+      uvani->style = style;
+      uvani->counter = 0;
+      uvani->loop = loop;
+      uvani->halted = false;
     }
   }
   else
   {
     // stop animation and show the normal texture
-    delete scfParent->uvani;
-    scfParent->uvani = 0;
+    delete uvani;
+    uvani = 0;
   }
 }
 
-void csSprite2DMeshObject::Sprite2DState::StopUVAnimation (int idx)
+void csSprite2DMeshObject::StopUVAnimation (int idx)
 {
-  if (scfParent->uvani)
+  if (uvani)
   {
     if (idx != -1)
     {
-      scfParent->uvani->frameindex = MIN(MAX(idx, 0),
-      	scfParent->uvani->framecount-1);
-      scfParent->uvani->frame = scfParent->uvani->ani->GetFrame (
-      	scfParent->uvani->frameindex);
+      uvani->frameindex = MIN(MAX(idx, 0), uvani->framecount-1);
+      uvani->frame = uvani->ani->GetFrame (uvani->frameindex);
     }
-    scfParent->uvani->halted = true;
+    uvani->halted = true;
   }
 }
 
-void csSprite2DMeshObject::Sprite2DState::PlayUVAnimation (int idx, int style, bool loop)
+void csSprite2DMeshObject::PlayUVAnimation (int idx, int style, bool loop)
 {
-  if (scfParent->uvani)
+  if (uvani)
   {
     if (idx != -1)
     {
-      scfParent->uvani->frameindex = MIN(MAX(idx, 0), scfParent->uvani->framecount-1);
-      scfParent->uvani->frame = scfParent->uvani->ani->GetFrame (scfParent->uvani->frameindex);
+      uvani->frameindex = MIN(MAX(idx, 0), uvani->framecount-1);
+      uvani->frame = uvani->ani->GetFrame (uvani->frameindex);
     }
-    scfParent->uvani->halted = false;
-    scfParent->uvani->counter = 0;
-    scfParent->uvani->last_time = 0;
-    scfParent->uvani->loop = loop;
-    scfParent->uvani->style = style;
+    uvani->halted = false;
+    uvani->counter = 0;
+    uvani->last_time = 0;
+    uvani->loop = loop;
+    uvani->style = style;
   }
 }
 
-int csSprite2DMeshObject::Sprite2DState::GetUVAnimationCount () const
+int csSprite2DMeshObject::GetUVAnimationCount () const
 {
-  return scfParent->factory->GetUVAnimationCount ();
+  return factory->GetUVAnimationCount ();
 }
 
-iSprite2DUVAnimation *csSprite2DMeshObject::Sprite2DState::CreateUVAnimation ()
+iSprite2DUVAnimation *csSprite2DMeshObject::CreateUVAnimation ()
 {
-  return scfParent->factory->CreateUVAnimation ();
+  return factory->CreateUVAnimation ();
 }
 
-void csSprite2DMeshObject::Sprite2DState::RemoveUVAnimation (
+void csSprite2DMeshObject::RemoveUVAnimation (
 	iSprite2DUVAnimation *anim)
 {
-  scfParent->factory->RemoveUVAnimation (anim);
+  factory->RemoveUVAnimation (anim);
 }
 
-iSprite2DUVAnimation *csSprite2DMeshObject::Sprite2DState::GetUVAnimation (
+iSprite2DUVAnimation *csSprite2DMeshObject::GetUVAnimation (
 	const char *name) const
 {
-  return scfParent->factory->GetUVAnimation (name);
+  return factory->GetUVAnimation (name);
 }
 
-iSprite2DUVAnimation *csSprite2DMeshObject::Sprite2DState::GetUVAnimation (
+iSprite2DUVAnimation *csSprite2DMeshObject::GetUVAnimation (
 	int idx) const
 {
-  return scfParent->factory->GetUVAnimation (idx);
+  return factory->GetUVAnimation (idx);
 }
 
-iSprite2DUVAnimation *csSprite2DMeshObject::Sprite2DState::GetUVAnimation (
+iSprite2DUVAnimation *csSprite2DMeshObject::GetUVAnimation (
 	int idx, int &style, bool &loop) const
 {
-  style = scfParent->uvani->style;
-  loop = scfParent->uvani->loop;
-  return scfParent->factory->GetUVAnimation (idx);
+  style = uvani->style;
+  loop = uvani->loop;
+  return factory->GetUVAnimation (idx);
 }
 
 
@@ -725,79 +666,49 @@ bool csSprite2DMeshObject::HitBeamOutline(const csVector3& start,
 
 //----------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE (csSprite2DMeshObjectFactory)
-  SCF_IMPLEMENTS_INTERFACE (iMeshObjectFactory)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iSprite2DFactoryState)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csSprite2DMeshObjectFactory::Sprite2DFactoryState)
-  SCF_IMPLEMENTS_INTERFACE (iSprite2DFactoryState)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 csSprite2DMeshObjectFactory::csSprite2DMeshObjectFactory (iMeshObjectType* pParent,
-	iObjectRegistry* object_reg)
+  iObjectRegistry* object_reg) : scfImplementationType (this, pParent),
+  material (0), logparent (0), spr2d_type (pParent), MixMode (0), 
+  lighting (true), object_reg (object_reg)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiSprite2DFactoryState);
-  material = 0;
-  MixMode = 0;
-  lighting = true;
-  logparent = 0;
-  spr2d_type = pParent;
-  csSprite2DMeshObjectFactory::object_reg = object_reg;
-  light_mgr = CS_QUERY_REGISTRY (object_reg, iLightManager);
-  g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
-  csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg,
-    "crystalspace.shared.stringset", iStringSet);
+  light_mgr = csQueryRegistry<iLightManager> (object_reg);
+  g3d = csQueryRegistry<iGraphics3D> (object_reg);
+  csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet> (
+    object_reg, "crystalspace.shared.stringset");
 }
 
 csSprite2DMeshObjectFactory::~csSprite2DMeshObjectFactory ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiSprite2DFactoryState);
-  SCF_DESTRUCT_IBASE ();
 }
 
 csPtr<iMeshObject> csSprite2DMeshObjectFactory::NewInstance ()
 {
-  csSprite2DMeshObject* cm = new csSprite2DMeshObject (this);
-  csRef<iMeshObject> im (SCF_QUERY_INTERFACE (cm, iMeshObject));
-  cm->DecRef ();
+  csRef<csSprite2DMeshObject> cm;
+  cm.AttachNew (new csSprite2DMeshObject (this));
+  csRef<iMeshObject> im (scfQueryInterface<iMeshObject> (cm));
   return csPtr<iMeshObject> (im);
 }
 
 //----------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE (csSprite2DMeshObjectType)
-  SCF_IMPLEMENTS_INTERFACE (iMeshObjectType)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csSprite2DMeshObjectType::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 SCF_IMPLEMENT_FACTORY (csSprite2DMeshObjectType)
 
-
-csSprite2DMeshObjectType::csSprite2DMeshObjectType (iBase* pParent)
+csSprite2DMeshObjectType::csSprite2DMeshObjectType (iBase* pParent) :
+  scfImplementationType (this, pParent)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 csSprite2DMeshObjectType::~csSprite2DMeshObjectType ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 csPtr<iMeshObjectFactory> csSprite2DMeshObjectType::NewFactory ()
 {
-  csSprite2DMeshObjectFactory* cm = new csSprite2DMeshObjectFactory (this,
-  	object_reg);
+  csRef<csSprite2DMeshObjectFactory> cm;
+  cm.AttachNew (new csSprite2DMeshObjectFactory (this,
+  	object_reg));
   csRef<iMeshObjectFactory> ifact =
-  	SCF_QUERY_INTERFACE (cm, iMeshObjectFactory);
-  cm->DecRef ();
+  	scfQueryInterface<iMeshObjectFactory> (cm);
   return csPtr<iMeshObjectFactory> (ifact);
 }
 
@@ -806,3 +717,6 @@ bool csSprite2DMeshObjectType::Initialize (iObjectRegistry* object_reg)
   csSprite2DMeshObjectType::object_reg = object_reg;
   return true;
 }
+
+}
+CS_PLUGIN_NAMESPACE_END(Spr2D)

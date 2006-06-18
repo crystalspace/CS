@@ -557,15 +557,47 @@ csRenderMeshList *csSector::GetVisibleMeshes (iRenderView *rview)
 }
 
 
+csSectorHitBeamResult csSector::HitBeamPortals (
+  const csVector3 &start,
+  const csVector3 &end)
+{
+  csSectorHitBeamResult rc;
+  rc.mesh = 0;
+  rc.final_sector = static_cast<iSector*> (this);
+  int p = IntersectSegment (start, end, rc.isect, 0, false,
+		  &rc.mesh);
+  if (p != -1)
+  {
+    iPortalContainer* portals = rc.mesh->GetPortalContainer ();
+    if (portals)
+    {
+      // There are portals.
+      iPortal* po = portals->GetPortal (p);
+      if (po)
+      {
+	drawBusy++;
+	csVector3 new_start = rc.isect;
+	rc.mesh = po->HitBeamPortals (rc.mesh->GetMovable ()
+		->GetFullTransform (),
+		new_start, end, rc.isect, &p, &rc.final_sector);
+	drawBusy--;
+      }
+    }
+  }
+  rc.polygon_idx = p;
+  return rc;
+}
+
 iMeshWrapper* csSector::HitBeamPortals (
   const csVector3 &start,
   const csVector3 &end,
   csVector3 &isect,
-  int* polygon_idx)
+  int* polygon_idx,
+  iSector** final_sector)
 {
   iMeshWrapper* mesh = 0;
-  int p = IntersectSegment (start, end, isect, 0, false,
-		  &mesh);
+  int p = IntersectSegment (start, end, isect, 0, false, &mesh);
+  if (final_sector) *final_sector = static_cast<iSector*> (this);
   if (p != -1)
   {
     iPortalContainer* portals = mesh->GetPortalContainer ();
@@ -578,13 +610,30 @@ iMeshWrapper* csSector::HitBeamPortals (
 	drawBusy++;
 	csVector3 new_start = isect;
 	mesh = po->HitBeamPortals (mesh->GetMovable ()->GetFullTransform (),
-		      new_start, end, isect, &p);
+		      new_start, end, isect, &p, final_sector);
 	drawBusy--;
       }
     }
   }
   if (polygon_idx) *polygon_idx = p;
   return mesh;
+}
+
+csSectorHitBeamResult csSector::HitBeam (
+  const csVector3 &start,
+  const csVector3 &end,
+  bool accurate)
+{
+  GetVisibilityCuller ();
+  float r;
+  csSectorHitBeamResult rc;
+  rc.mesh = 0;
+  rc.polygon_idx = -1;
+  rc.final_sector = 0;
+  bool result = culler->IntersectSegment (start, end, rc.isect, &r, &rc.mesh,
+  	&rc.polygon_idx, accurate);
+  if (!result) rc.mesh = 0;
+  return rc;
 }
 
 iMeshWrapper *csSector::HitBeam (

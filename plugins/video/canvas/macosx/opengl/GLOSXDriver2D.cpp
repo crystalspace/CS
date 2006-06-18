@@ -76,6 +76,8 @@ bool GLOSXDriver2D::Initialize(iObjectRegistry *reg)
 // Open the window/switch to fullscreen as necessary
 bool GLOSXDriver2D::Open()
 {
+  long * values;
+
   // Check if already open has already been called
   if (is_open)
     return true;
@@ -91,6 +93,16 @@ bool GLOSXDriver2D::Open()
 
   // Initialize function pointers
   SetupDrawingFunctions();
+
+  // Initialize currentFormat with bit-depth & other info
+  values = OSXDelegate2D_getOpenGLPixelFormatValues(delegate);
+
+  currentFormat[glpfvColorBits] = values[0];
+  currentFormat[glpfvAlphaBits] = values[1];
+  currentFormat[glpfvDepthBits] = values[2];
+  currentFormat[glpfvStencilBits] = values[3];
+  currentFormat[glpfvAccumColorBits] = values[4];
+  currentFormat[glpfvAccumAlphaBits] = 0; // No equivalent
 
   // Context was created in initialize, window was created in
   // OSXDriver2D::Open() - bind them

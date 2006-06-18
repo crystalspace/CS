@@ -171,7 +171,7 @@ protected:
    * Query the value of a ProgramParam variable by reading the constant or
    * resolving the shader variable.
    */
-  inline csVector4 GetParamVectorVal (const csShaderVarStack &stacks, 
+  inline csVector4 GetParamVectorVal (const iShaderVarStack* stacks, 
     const ProgramParam &param, const csVector4& defVal)
   {
     csRef<csShaderVariable> var;
@@ -188,7 +188,7 @@ protected:
     var->GetValue (v);
     return v;
   }
-  inline csReversibleTransform GetParamTransformVal (const csShaderVarStack &stacks, 
+  inline csReversibleTransform GetParamTransformVal (const iShaderVarStack* stacks, 
     const ProgramParam &param, const csReversibleTransform& defVal)
   {
     csRef<csShaderVariable> var;
@@ -205,7 +205,7 @@ protected:
     var->GetValue (t);
     return t;
   }
-  inline float GetParamFloatVal (const csShaderVarStack &stacks, 
+  inline float GetParamFloatVal (const iShaderVarStack* stacks, 
     const ProgramParam &param, float defVal)
   {
     csRef<csShaderVariable> var;

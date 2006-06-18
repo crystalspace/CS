@@ -22,6 +22,7 @@
 
 #include "csutil/csmd5.h"
 #include "csutil/ref.h"
+#include "csutil/scfarray.h"
 #include "csgfx/memimage.h"
 #include "csgfx/shaderexp.h"
 #include "csgfx/shadervarcontext.h"
@@ -230,7 +231,8 @@ csPtr<iBase> csFuncTexLoader::Parse (iDocumentNode* node,
       currentPos.AttachNew (new csShaderVariable (strings->Request ("position")));
       context->AddVariable (currentPos);
       
-      csShaderVarStack stacks;
+      csRef<iShaderVarStack> stacks;
+      stacks.AttachNew (new scfArray<iShaderVarStack>);
       context->PushVariables (stacks);
 
       if (expr.Parse (exprNode))

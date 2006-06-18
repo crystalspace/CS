@@ -469,8 +469,9 @@ public:
   {
     return (iShaderVariableContext*)this;
   }
-  //=================== iShaderVariableContext ================//
 
+  /**\name iShaderVariableContext implementation
+   * @{ */
   /// Add a variable to this context
   void AddVariable (csShaderVariable *variable)
   { svcontext.AddVariable (variable); }
@@ -492,7 +493,7 @@ public:
    * Push the variables of this context onto the variable stacks
    * supplied in the "stacks" argument
    */
-  void PushVariables (csShaderVarStack &stacks) const
+  void PushVariables (iShaderVarStack* stacks) const
   { 
     svcontext.PushVariables (stacks); 
   }
@@ -506,6 +507,7 @@ public:
   { svcontext.ReplaceVariable (variable); }
 
   void Clear () { svcontext.Clear(); }
+  /** @} */
 
   //----------------------------------------------------------------------
   // Light influence stuff.

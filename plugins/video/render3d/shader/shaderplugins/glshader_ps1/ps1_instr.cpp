@@ -21,6 +21,9 @@
 
 #include "ps1_instr.h"
 
+CS_PLUGIN_NAMESPACE_BEGIN(GLShaderPS1)
+{
+
 const char* GetInstructionName (int instrID)
 {
 #define PS_INSTR(instr, args, psversion)	      \
@@ -46,3 +49,6 @@ const char* GetVersionString (csPixelShaderVersion ver)
     default: return "[invalid]";
   }
 }
+
+}
+CS_PLUGIN_NAMESPACE_END(GLShaderPS1)
