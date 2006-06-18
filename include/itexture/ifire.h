@@ -30,7 +30,7 @@
  
 #include "csutil/scf.h"
 
-class csGradient;
+struct iGradient;
 
 /**
  * Interface to the 'fire' procedural texture.
@@ -108,7 +108,7 @@ struct iFireTexture : public virtual iBase
    * Position 0 = darkest areas (background, actually), 
    * position 1 = brightest areas.
    */
-  virtual void SetPalette (const csGradient gradient) = 0;
+  virtual void SetPalette (iGradient* gradient) = 0;
 };
 
 /** @} */

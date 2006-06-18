@@ -939,8 +939,9 @@ bool csTextSyntaxService::WriteGradientShade (iDocumentNode* node,
 }
 
 bool csTextSyntaxService::ParseGradient (iDocumentNode* node,
-					 csGradient& gradient)
+					 iGradient* gradient)
 {
+  gradient->Clear();
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
   {
@@ -959,7 +960,7 @@ bool csTextSyntaxService::ParseGradient (iDocumentNode* node,
 	  }
 	  else
 	  {
-	    gradient.AddShade (shade);
+	    gradient->AddShade (shade);
 	  }
 	}
 	break;
@@ -972,13 +973,12 @@ bool csTextSyntaxService::ParseGradient (iDocumentNode* node,
 }
 
 bool csTextSyntaxService::WriteGradient (iDocumentNode* node,
-					 const csGradient& gradient)
+					 iGradient* gradient)
 {
-  const csArray<csGradientShade>& shades = gradient.GetShades ();
-  csArray<csGradientShade>::ConstIterator it = shades.GetIterator ();
-  while (it.HasNext ())
+  csRef<iGradientShades> shades = gradient->GetShades ();
+  for (size_t i = 0; i < shades->GetSize(); i++)
   {
-    const csGradientShade& shade = it.Next ();
+    const csGradientShade& shade = shades->Get (i);
     csRef<iDocumentNode> child = node->CreateNodeBefore (CS_NODE_ELEMENT, 0);
     child->SetValue ("shade");
     WriteGradientShade (child, shade);

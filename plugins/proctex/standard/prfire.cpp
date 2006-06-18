@@ -30,12 +30,9 @@
 
 #include "prfire.h"
 
-SCF_IMPLEMENT_IBASE_EXT(csProcFire)
-  SCF_IMPLEMENTS_INTERFACE(iFireTexture)
-SCF_IMPLEMENT_IBASE_EXT_END
-
 /// the implementation of the fire texture
-csProcFire::csProcFire (iTextureFactory* p,int w, int h) : csProcTexture(p)
+csProcFire::csProcFire (iTextureFactory* p,int w, int h) : 
+  scfImplementationType (this, p)
 {
   palsize = 0;
   palette = 0;
@@ -377,9 +374,9 @@ int csProcFire::GetPostSmoothing ()
   return postsmooth;
 }
 
-void csProcFire::SetPalette (const csGradient gradient)
+void csProcFire::SetPalette (iGradient* gradient)
 {
   palsize = 256;
   if (!palette) palette = new csRGBcolor[palsize];
-  gradient.Render (palette, palsize, -0.5f, 1.5f);
+  gradient->Render (palette, palsize, -0.5f, 1.5f);
 }
