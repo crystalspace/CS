@@ -36,7 +36,7 @@ namespace CS
         char* s = abi::__cxa_demangle (symbol, 0, 0, &status);
         if (status == 0)
           str = s;
-        if (s != 0) free (s);
+        if (s != 0) platform_free (s);
         if (status == 0) return;
       }
     #endif

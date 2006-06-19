@@ -200,7 +200,7 @@ static void CompactMemEntries (unsigned long older_age)
     {
       if (mem_table[i].freed && mem_table[i].age < older_age)
       {
-        free (mem_table[i].start-DETECT_WALL-4);
+        cs_free (mem_table[i].start-DETECT_WALL-4);
       }
       else
       {
