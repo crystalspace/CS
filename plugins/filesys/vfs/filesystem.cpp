@@ -27,83 +27,12 @@
 #include "csutil/scfstringarray.h"
 #include "iutil/objreg.h"
 
-namespace cspluginVFS
+CS_PLUGIN_NAMESPACE_BEGIN(vfs)
 {
+// ----------------------------------------------------- csFile ---------- //
 
-// --------------------------------------------------------------- VfsNode --- //
 
-// Private structure used to keep a "node" in virtual filesystem tree.
-// The program can be made even fancier if we use a object for each
-// "real" path (i.e. each VfsNode will contain an array of real-world
-// nodes - both "directory" and "archive" types) but since we have to
-// balance between pretty understandable code and effective code, this
-// time we choose effectivity - the cost can become very big in this case.
-class VfsNode
-{
-public:
-  // The virtual path
-  char *VPath;
-
-  // Configuration section key
-  char *ConfigKey;
-
-  // The array of real paths/archives bound to this virtual path
-  csStringArray RPathV;
-
-  // The array of unexpanded real paths
-  csStringArray UPathV;
-
-  // The object registry.
-  iObjectRegistry *object_reg;
-
-  // Verbosity flags.
-  unsigned int verbosity;
-
-  // Initialize the object
-  VfsNode (char *iPath, const char *iConfigKey, iObjectRegistry *object_reg, unsigned int verbosity);
-
-  // Destroy the object
-  virtual ~VfsNode ();
-
-  // Parse a directory link directive and fill RPathV
-  bool AddRPath (const char *RealPath, csVFS *Parent);
-
-  // Remove a real-world path
-  bool RemoveRPath (const char *RealPath, csVFS *Parent);
-
-  // Find all files in a subpath
-  void FindFiles(const char *Suffix, const char *Mask, iStringArray *FileList);
-
-  // Find a file and return the appropiate csFile object
-  iFile *Open (int Mode, const char *Suffix);
-
-  // Delete a file
-  bool Delete (const char *Suffix);
-
-  // Does file exists?
-  bool Exists (const char *Suffix);
-
-  // Query date/time
-  bool GetFileTime (const char *Suffix, csFileTime &oTime) const;
-
-  // Set date/time
-  bool SetFileTime (const char *Suffix, const csFileTime &iTime);
-
-  // Get file size
-  bool GetFileSize (const char *Suffix, size_t &oSize);
-
-private:
-  // Get value of a variable
-  const char *GetValue (csVFS *Parent, const char *VarName);
-
-  // Copy a string from src to dst and expand all variables
-  csString Expand (csVFS *Parent, char const *src);
-
-  // Find a file either on disk or in archive - in this node only
-  //bool FindFile (const char *Suffix, char *RealPath, csArchive *&) const;
-};
-
-// --------------------------------------------------------------- csFileSystem --- //
+// ------------------------------------------------------ csFileSystem --- //
 csFileSystem::csFileSystem(iBase *iParent) :
   scfImplementationType(this, iParent),
   object_reg(0)
@@ -122,7 +51,7 @@ bool csFileSystem::Initialize (iObjectRegistry* r)
   return true;
 }
 
-// --------------------------------------------------------------- csNativeFileSystem --- //
+// ------------------------------------------------ csNativeFileSystem --- //
 SCF_IMPLEMENT_FACTORY (csNativeFileSystem)
 
 csNativeFileSystem::csNativeFileSystem(iBase *iParent) :
@@ -138,15 +67,16 @@ csNativeFileSystem::~csNativeFileSystem()
 
 csPtr<iFile> csNativeFileSystem::Open(const char * FileName, int mode)
 {
-	return NULL;
+	return 0;
 }
 
-csPtr<iDataBuffer> csNativeFileSystem::ReadFile(const char * FileName, bool nullterm)
+csPtr<iDataBuffer> csNativeFileSystem::ReadFile(const char * FileName)
 {
-	return NULL;
+	return 0;
 }
 
-bool csNativeFileSystem::WriteFile(const char * Name, const char * Data, size_t Size)
+bool csNativeFileSystem::WriteFile(const char * Name, const char * Data,
+								   size_t Size)
 {
 	return true;
 }
@@ -161,7 +91,7 @@ csVFSFileKind csNativeFileSystem::Exists(const char * FileName)
 	return fkDoesNotExist;
 }
 
-// --------------------------------------------------------------- csArchiveFileSystem --- //
+// ----------------------------------------------- csArchiveFileSystem --- //
 SCF_IMPLEMENT_FACTORY (csArchiveFileSystem)
 
 csArchiveFileSystem::csArchiveFileSystem(iBase *iParent) :
@@ -177,15 +107,16 @@ csArchiveFileSystem::~csArchiveFileSystem()
 
 csPtr<iFile> csArchiveFileSystem::Open(const char * FileName, int mode)
 {
-	return NULL;
+	return 0;
 }
 
-csPtr<iDataBuffer> csArchiveFileSystem::ReadFile(const char * FileName, bool nullterm)
+csPtr<iDataBuffer> csArchiveFileSystem::ReadFile(const char * FileName)
 {
-	return NULL;
+	return 0;
 }
 
-bool csArchiveFileSystem::WriteFile(const char * Name, const char * Data, size_t Size)
+bool csArchiveFileSystem::WriteFile(const char * Name, const char * Data, 
+									size_t Size)
 {
 	return true;
 }
@@ -200,44 +131,4 @@ csVFSFileKind csArchiveFileSystem::Exists(const char * FileName)
 	return fkDoesNotExist;
 }
 
-// --------------------------------------------------------------- csNetworkFileSystem --- //
-SCF_IMPLEMENT_FACTORY (csNetworkFileSystem)
-
-csNetworkFileSystem::csNetworkFileSystem(iBase *iParent) :
-	scfImplementationExt0(this, iParent)
-{
-
-}
-
-csNetworkFileSystem::~csNetworkFileSystem()
-{
-
-}
-
-csPtr<iFile> csNetworkFileSystem::Open(const char * FileName, int mode)
-{
-	return NULL;
-}
-
-csPtr<iDataBuffer> csNetworkFileSystem::ReadFile(const char * FileName, bool nullterm)
-{
-	return NULL;
-}
-
-bool csNetworkFileSystem::WriteFile(const char * Name, const char * Data, size_t Size)
-{
-	return true;
-}
-
-bool csNetworkFileSystem::DeleteFile(const char * FileName)
-{
-	return true;
-}
-
-csVFSFileKind csNetworkFileSystem::Exists(const char * FileName)
-{
-	return fkDoesNotExist;
-}
-
-
-} // namespace cspluginVFS
+} CS_PLUGIN_NAMESPACE_END(vfs)

@@ -22,14 +22,24 @@
 #define __CS_VFS_H__
 
 #include "csutil/refarr.h"
+#include "csutil/parray.h"
 #include "csutil/scf_implementation.h"
 #include "csutil/scopedmutexlock.h"
 #include "iutil/vfs.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 
-namespace cspluginVFS
+CS_PLUGIN_NAMESPACE_BEGIN(vfs)
 {
+
+class VfsNode;
+
+class VfsVector : public csPDelArray<VfsNode>
+{
+   public:
+      static int Compare (VfsNode* const&, VfsNode* const&);
+};
+
 
 /**
  * TODO: Rewrite class description.
@@ -66,7 +76,8 @@ public:
    * 'current virtual directory'. Return a new iString object.
    * If IsDir is true, expanded path ends in an '/', otherwise no.
    */
-  virtual csPtr<iDataBuffer> ExpandPath (const char *Path, bool IsDir = false) const;
+  virtual csPtr<iDataBuffer> ExpandPath (const char *Path, 
+	  bool IsDir = false) const;
 
   /// Check whenever a file exists
   virtual bool Exists (const char *Path) const;
@@ -87,7 +98,8 @@ public:
   virtual csPtr<iDataBuffer> ReadFile (const char *FileName, bool nullterm);
 
   /// Write an entire file in one pass.
-  virtual bool WriteFile (const char *FileName, const char *Data, size_t Size);
+  virtual bool WriteFile (const char *FileName, const char *Data, 
+	  size_t Size);
 
   /// Delete a file on VFS
   virtual bool DeleteFile (const char *FileName);
@@ -109,7 +121,8 @@ public:
   virtual bool LoadMountsFromFile (iConfigFile* file);
 
   /// Auto-mount ChDir.
-  virtual bool ChDirAuto (const char* path, const csStringArray* paths = 0,	const char* vfspath = 0, const char* filename = 0);
+  virtual bool ChDirAuto (const char* path, const csStringArray* paths = 0,
+	  const char* vfspath = 0, const char* filename = 0);
 
   /// Query file local date/time
   virtual bool GetFileTime (const char *FileName, csFileTime &oTime) const;
@@ -144,11 +157,21 @@ private:
   /// Currently registered FileSystem plugins
   csRefArray<iFileSystem> fsPlugins;
 
-  // Reference to the object registry.
+  /// Reference to the object registry.
   iObjectRegistry *object_reg;
+
+  /// A pointer to the root node of the vfs
+  VfsNode *RootNode;
+
+  /// A pointer to the current working directory
+  VfsNode *CwdNode;
+
+  /// A stack to implement directory changes
+  VfsVector DirectoryStack;
+
 };
 
-} // namespace cspluginVFS
+} CS_PLUGIN_NAMESPACE_END(vfs)
 
 #endif  // __CS_VFS_H__
 

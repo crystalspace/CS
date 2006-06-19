@@ -33,15 +33,57 @@
 
 CS_IMPLEMENT_PLUGIN
 
-namespace cspluginVFS
+CS_PLUGIN_NAMESPACE_BEGIN(vfs)
 {
 
-// --------------------------------------------------------------- csVFS --- //
+// ----------------------------------------------------------- VfsNode --- //
+class VfsNode
+{
+public:
+  // Constructor
+  VfsNode(char *virtualPathname, csVFS *parentVFS, VfsNode* parentNode, 
+	  int pluginIndex);
+
+  // A pointer to the parent of this node
+  VfsNode *ParentNode;
+
+  // The name of this node in the VFS tree
+  char *VirtualPathname;
+
+private:
+  int FileSystemPlugin;
+
+  // A vector of pointers to the subdirectories of this node
+  VfsVector SubDirectories;
+
+  // Allow VFS to access node internals
+  csVFS *ParentVFS;
+};
+
+
+VfsNode::VfsNode(char *virtualPathname, csVFS *parentVFS, VfsNode* parentNode, 
+				 int pluginIndex)
+: VirtualPathname(virtualPathname), ParentVFS(parentVFS), 
+  ParentNode(parentNode), FileSystemPlugin(pluginIndex)
+{
+	
+}
+
+// --------------------------------------------------------- VfsVector --- //
+int VfsVector::Compare (VfsNode* const& Item1, VfsNode* const& Item2)
+{
+  return strcmp (Item1->VirtualPathname, Item2->VirtualPathname);
+}
+
+
+// ------------------------------------------------------------- csVFS --- //
 SCF_IMPLEMENT_FACTORY (csVFS)
 
 // csVFS contructor
 csVFS::csVFS (iBase *iParent) :
   scfImplementationType(this, iParent),
+  RootNode(0),
+  CwdNode(0),
  /* basedir(0),
   resdir(0),
   appdir(0),
@@ -56,7 +98,7 @@ csVFS::csVFS (iBase *iParent) :
   mutex = csMutex::Create (true); // We need a recursive mutex.
 }
 
-  //
+ //
 csVFS::~csVFS ()
 {
   /*delete [] cwd;
@@ -68,7 +110,7 @@ csVFS::~csVFS ()
 bool csVFS::Initialize (iObjectRegistry* r)
 {
   object_reg = r;
-  /*
+ /*
 #ifdef NEW_CONFIG_SCANNING
   static const char* vfsSubdirs[] = {
     "etc/" CS_PACKAGE_NAME,
@@ -170,17 +212,17 @@ bool csVFS::Exists (const char *Path) const
 
 csPtr<iStringArray> csVFS::FindFiles (const char *Path) const
 {
-	return NULL;	
+	return 0;	
 }
 
 csPtr<iFile> csVFS::Open (const char *FileName, int Mode)
 {
-	return NULL;	
+	return 0;	
 }
   
 csPtr<iDataBuffer> csVFS::ReadFile (const char *FileName, bool nullterm)
 {
-	return NULL;	
+	return 0;	
 }
 
 bool csVFS::WriteFile (const char *FileName, const char *Data, size_t Size)
@@ -223,7 +265,8 @@ bool csVFS::LoadMountsFromFile (iConfigFile* file)
 		return true;	
 }
 
-bool csVFS::ChDirAuto (const char* path, const csStringArray* paths,	const char* vfspath, const char* filename)
+bool csVFS::ChDirAuto (const char* path, const csStringArray* paths,
+					   const char* vfspath, const char* filename)
 {
 			return true;
 }
@@ -245,17 +288,17 @@ bool csVFS::GetFileSize (const char *FileName, size_t &oSize)
 
 csPtr<iDataBuffer> csVFS::GetRealPath (const char *FileName)
 {
-		return NULL;
+		return 0;
 }
 
 csRef<iStringArray> csVFS::GetMounts ()
 {
-		return NULL;
+		return 0;
 }
 
 csRef<iStringArray> csVFS::GetRealMountPaths (const char *VirtualPath)
 {
-		return NULL;
+		return 0;
 }
 
 // Register a filesystem plugin
@@ -266,4 +309,4 @@ bool csVFS::RegisterPlugin(csRef<iFileSystem> FileSystem)
 	return true;
 }
 
-} // namespace cspluginVFS
+} CS_PLUGIN_NAMESPACE_END(vfs)

@@ -226,7 +226,7 @@ struct iFileSystem: public virtual iBase
    * \remarks Null-termination might have a performance penalty (dependent on
    *  where the file is stored.) Use only when needed.
    */
-  virtual csPtr<iDataBuffer> ReadFile(const char * FileName, bool nullterm = true) =0;
+  virtual csPtr<iDataBuffer> ReadFile(const char * FileName) =0;
   
   /**
    * Write an entire file in one pass.
