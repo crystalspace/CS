@@ -600,6 +600,8 @@ inline void platform_free (void* p)
 { return free (p); }
 inline void* platform_realloc (void* p, size_t n)
 { return realloc (p, n); }
+inline void* platform_calloc (site_t n, size_t s)
+{ return calloc (n, s); }
 //@}
 
 #ifndef CS_NO_PTMALLOC
