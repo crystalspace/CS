@@ -27,6 +27,8 @@ chronological order.
         - Philip Wyett began adding more of the bundled CS applications with
           basic descriptions to the application overview section of the
           documentation.
+	- res changed the configure optimization flag detection to try
+	  -march=prescott before -march=i686 on Intel Macs.
 18-Jun-2006
         - Arianna fixed some warnings: size_t/uint conversions and some
           deprecated method.
