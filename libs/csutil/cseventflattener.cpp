@@ -426,11 +426,11 @@ csEventFlattenerError csEventFlattener::Unflatten (iObjectRegistry *object_reg,
   b.Read((char *)&event->Broadcast, sizeof(uint8));    // iEvent.Broadcast flag
   b.Read((char *)&ui16, sizeof(uint16));               // textual name length
   ui16 = csLittleEndian::Convert (ui16);
-  char *buf = (char *) malloc(ui16+1);
+  char *buf = (char *) cs_malloc(ui16+1);
   b.Read(buf, ui16);                                   // textual name
   buf[ui16] = '\0';
   event->Name = csEventNameRegistry::GetID(object_reg, buf); // EventID
-  free(buf);
+  cs_free(buf);
 
   while (b.GetPos() < size)
   {

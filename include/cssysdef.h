@@ -614,6 +614,23 @@ extern void* CS_CRYSTALSPACE_EXPORT ptmemalign (size_t a, size_t n);
 extern void* CS_CRYSTALSPACE_EXPORT ptcalloc (size_t n, size_t s);
 //@}
 
+//@{
+/**
+ * Default CS memory allocation.
+ * Always the same memory allocation functions as internally used by 
+ * CrystalSpace.
+ */
+inline void* cs_malloc (size_t n)
+{ return ptmalloc (n); }
+inline void cs_free (void* p)
+{ ptfree (p); }
+inline void* cs_realloc (void* p, size_t n)
+{ return ptrealloc (p, n); }
+inline void* cs_calloc (size_t n, size_t s)
+{ return ptcalloc (n, s); }
+//@}
+
+#ifndef CS_NO_MALLOC_OVERRIDE
 /**\name Memory allocation override
  * By default, ptmalloc is used for memory allocations, for both C-style
  * malloc/free as well as C++ new/delete. Use of ptmalloc can be disabled
@@ -621,16 +638,19 @@ extern void* CS_CRYSTALSPACE_EXPORT ptcalloc (size_t n, size_t s);
  * configure or adding defining <tt>CS_NO_PTMALLOC</tt> in 
  * <tt>include/csutil/win32/csconfig.h</tt> for MSVC.
  * To disable ptmalloc for individual source files, define 
- * <tt>CS_NO_PTMALLOC</tt> before including <tt>cssysdef.h</tt>.
+ * <tt>CS_NO_MALLOC_OVERRIDE</tt> resp. <tt>CS_NO_NEW_OVERRIDE</tt>before 
+ * including <tt>cssysdef.h</tt>.
  * @{ */
-#define malloc 		ptmalloc
-#define free 	        ptfree
-#define realloc 	ptrealloc
-#define memalign	ptmemalign
-#define calloc 		ptcalloc
+#define malloc 		cs_malloc
+#define free 	        cs_free
+#define realloc 	cs_realloc
+#define calloc 		cs_calloc
+#endif // CS_NO_MALLOC_OVERRIDE
 
+#ifndef CS_NO_NEW_OVERRIDE
 #if !defined(CS_MEMORY_TRACKER) && !defined(CS_MEMORY_TRACKER_IMPLEMENT) \
   && !defined(CS_EXTENSIVE_MEMDEBUG) && !defined(CS_EXTENSIVE_MEMDEBUG_IMPLEMENT)
+
 #ifdef CS_NO_EXCEPTIONS
 inline void* operator new (size_t s)
 { return ptmalloc (s); }
@@ -668,10 +688,22 @@ inline void operator delete (void* p, const std::nothrow_t&) throw()
 inline void operator delete[] (void* p, const std::nothrow_t&) throw()
 { ptfree (p); }
 #endif // CS_NO_EXCEPTIONS
+
 #endif /* !defined(CS_MEMORY_TRACKER) && !defined(CS_MEMORY_TRACKER_IMPLEMENT)
   && !defined(CS_EXTENSIVE_MEMDEBUG) && !defined(CS_EXTENSIVE_MEMDEBUG_IMPLEMENT) */
+#endif // CS_NO_NEW_OVERRIDE
 /** @} */
-#endif
+
+#else // CS_NO_PTMALLOC
+inline void* cs_malloc (size_t n)
+{ return platform_malloc (n); }
+inline void cs_free (void* p)
+{ platform_free (p); }
+inline void* cs_realloc (void* p, size_t n)
+{ return platform_realloc (p, n); }
+inline void* cs_calloc (size_t n, size_t s)
+{ return platform_calloc (n, s); }
+#endif // CS_NO_PTMALLOC
 
 // The following define should only be enabled if you have defined
 // a special version of overloaded new that accepts two additional

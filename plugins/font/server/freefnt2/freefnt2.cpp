@@ -440,7 +440,7 @@ csPtr<iDataBuffer> csFreeType2Font::GetGlyphAlphaBitmap (utf32_char c,
   int stride = face->face->glyph->bitmap.width;
   int maxrows = (size->metrics.height + 63) >> 6;
   int bitmapsize = maxrows * stride;
-  // malloc at least 1 byte (malloc 0 bytes is undefined).
+  // Allocate at least 1 byte
   uint8* bitmap = (bitmapsize > 0) ? new uint8 [bitmapsize] : new uint8[1];
   memset (bitmap, 0, bitmapsize);
 

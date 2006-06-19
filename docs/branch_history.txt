@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+19-Jun-2006
+	- res added functions cs_malloc() etc. that always resolve to the same
+	  allocation functions CS uses. Also replaced malloc with cs_malloc in
+	  CS itself.
 18-Jun-2006
 	- res added conveniance includes to disable/enable CS' 'new' and 
 	  'delete' overrides when the memtracker is enabled.

@@ -41,7 +41,7 @@ namespace CS
     #ifdef CS_HAVE__ALIGNED_MALLOC
       return _aligned_malloc (size, align);
     #else
-      void *mallocPtr = malloc (size + align + sizeof(void*));
+      void *mallocPtr = cs_malloc (size + align + sizeof(void*));
       uintptr_t ptrInt = (intptr_t)mallocPtr;
     
       ptrInt = (ptrInt + align + sizeof(void*)) / align * align;
@@ -57,7 +57,7 @@ namespace CS
     #ifdef CS_HAVE__ALIGNED_MALLOC
       _aligned_free (ptr);
     #else
-      free (*(((void**)ptr) - 1));
+      cs_free (*(((void**)ptr) - 1));
     #endif
     }
     
@@ -76,7 +76,7 @@ namespace CS
     #else
       void* orgPtr = *(((void**)ptr) - 1);
       uintptr_t offsetToData = (uintptr_t)ptr - (uintptr_t)orgPtr;
-      void* newPtr = realloc (orgPtr, size + align + sizeof(void*));
+      void* newPtr = cs_realloc (orgPtr, size + align + sizeof(void*));
       
       uintptr_t ptrInt = (intptr_t)newPtr;
       ptrInt = (ptrInt + align + sizeof(void*)) / align * align;
