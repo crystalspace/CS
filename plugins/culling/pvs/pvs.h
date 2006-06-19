@@ -46,6 +46,33 @@ struct iThingState;
 
 struct FrustTestCameraData;
 
+/// Data at every node for the static KD tree
+class csPVSNodeData
+{
+  csPVSNodeData (int total)
+  {
+    pvs = new iVisibilityObject*[total];
+    memset ((void*) pvs, 0, sizeof(iVisibilityObject*) * total);
+    pvsnames = new csString[total];
+    numRegistered = 0;
+    numTotal = total;
+  }
+
+  ~csPVSNodeData ()
+  {
+    delete[] pvs;
+    delete[] pvsnames;
+  }
+
+  // Set of all objects potentially visible from this node
+  iVisibilityObject** pvs;
+  // Set of all names of objects we expect to be in the PVS.
+  csString* pvsnames;
+  
+  int numRegistered;  // Number of registered objects from pvsnames
+  int numTotal;  // Total number of objects in pvsnames
+};
+
 /**
  * This object is a wrapper for an iVisibilityObject from the engine.
  */
@@ -58,6 +85,7 @@ public:
   csKDTreeChild* child;
   long update_number;	// Last used update_number from movable.
   long shape_number;	// Last used shape_number from model.
+  bool isStatic;  // Object is static and is found in some PVS set
 
   // Optional data for shadows. Both fields can be 0.
   csRef<iMeshWrapper> mesh;

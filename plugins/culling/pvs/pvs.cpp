@@ -153,7 +153,7 @@ void csPVSVisObjectWrapper::MovableChanged (iMovable* /*movable*/)
   pvsvis->AddObjectToUpdateQueue (this);
 }
 
-class csPVSVisObjectDescriptor : public scfImplementation1<
+/*class csPVSVisObjectDescriptor : public scfImplementation1<
 	csPVSVisObjectDescriptor, iKDTreeObjectDescriptor>
 {
 public:
@@ -171,7 +171,7 @@ public:
 	b.MaxX (), b.MaxY (), b.MaxZ ());
     return str;
   }
-};
+}; */
 
 //----------------------------------------------------------------------
 

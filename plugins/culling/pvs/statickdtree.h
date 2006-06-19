@@ -49,6 +49,8 @@ public:
   /// Get the user data.
   void* GetObject () { return object; }
 
+  uint32 timestamp;
+
 private:
   csBox3 box;
   void* object;
@@ -60,14 +62,18 @@ class csStaticKDTree {
   static uint32 globalTimestamp;
 
 public:
-  csStaticKDTree (csArray<csStaticKDTreeObject*>& items);
+  csStaticKDTree (csStaticKDTree *parent, bool isChild1, int axis, 
+        float splitLocation);
+  csStaticKDTree (csStaticKDTree *parent, bool isChild1,
+      csArray<csStaticKDTreeObject*> &items);
+  csStaticKDTree (csArray<csStaticKDTreeObject*> &items);
   ~csStaticKDTree ();
   csStaticKDTreeObject* AddObject (const csBox3& bbox, void* userdata);
   void UnlinkObject (csStaticKDTreeObject* object);
   void RemoveObject (csStaticKDTreeObject* object);
   void MoveObject (const csBox3& bbox_new, csStaticKDTreeObject* object);
-  csStaticKDTree* getChild1 () { return child1; }
-  csStaticKDTree* getChild2 () { return child2; }
+  csStaticKDTree* GetChild1 () { return child1; }
+  csStaticKDTree* GetChild2 () { return child2; }
   void TraverseRandom (csStaticKDTreeVisitFunc* func, 
       void* userdata, uint32 cur_timestamp, uint32 frustum_mask);
   void Front2Back (const csVector3& pos, csStaticKDTreeVisitFunc* func, 

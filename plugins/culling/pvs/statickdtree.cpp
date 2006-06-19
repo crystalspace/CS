@@ -23,15 +23,16 @@ csStaticKDTree::csStaticKDTree (csArray<csStaticKDTreeObject*> &items)
 {
   // Base case:  if there are less than a certain threshold, stop recursing.
   if (items.Length () < 10) {
-    objects = new csArray < csStaticKDTreeObject * >(items);
-    csArray < csStaticKDTreeObject * >::Iterator it = items.GetIterator ();
+    objects = new csArray<csStaticKDTreeObject*>(items);
+    csArray<csStaticKDTreeObject*>::Iterator it = items.GetIterator ();
     while (it.HasNext ())
       it.Next ()->leafs.Push (this);
+    child1 = child2 = NULL;
   }
   // Otherwise find the axis with the longest min-max distance and use the 
   // midpoint as a splitting axis.
   else {
-    csArray < csStaticKDTreeObject * >::Iterator it = items.GetIterator ();
+    csArray<csStaticKDTreeObject*>::Iterator it = items.GetIterator ();
     float xmin = 0, ymin = 0, zmin = 0;
     float xmax = 0, ymax = 0, zmax = 0;
     while (it.HasNext ()) {
@@ -81,6 +82,45 @@ csStaticKDTree::csStaticKDTree (csArray<csStaticKDTreeObject*> &items)
     child1 = new csStaticKDTree (left);
     child2 = new csStaticKDTree (right);
   }
+}
+
+csStaticKDTree::csStaticKDTree (csStaticKDTree *parent, bool isChild1, 
+    int axis, float splitLocation)
+{
+  if (parent != NULL) {
+    if (isChild1) {
+      CS_ASSERT(parent->child1 != NULL);
+      parent->child1 = this;
+    }
+    else {
+      CS_ASSERT(parent->child2 != NULL);
+      parent->child2 = this;
+    }
+  }
+
+  csStaticKDTree::axis = axis;
+  csStaticKDTree::splitLocation = splitLocation;
+}
+
+csStaticKDTree::csStaticKDTree (csStaticKDTree *parent, bool isChild1,
+    csArray<csStaticKDTreeObject*> &items)
+{
+  if (parent != NULL) {
+    if (isChild1) {
+      CS_ASSERT(parent->child1 != NULL);
+      parent->child1 = this;
+    }
+    else {
+      CS_ASSERT(parent->child2 != NULL);
+      parent->child2 = this;
+    }
+  }
+
+  objects = new csArray<csStaticKDTreeObject*> (items);
+  csArray < csStaticKDTreeObject * >::Iterator it = items.GetIterator ();
+  while (it.HasNext ())
+      it.Next ()->leafs.Push (this);
+  child1 = child2 = NULL;
 }
 
 csStaticKDTree::~csStaticKDTree ()
