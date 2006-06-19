@@ -10,6 +10,18 @@ chronological order.
 	- Philip Wyett made Quick Start more explanatory for the CS newcomers.
 	- res changed csRectRegion to use a csArray<> for rectangle storage.
 	- res fixed fallout from the csRectRegion change.
+	- mdmkolbe converted the following plugins to the new SCF:
+	    - plugins/mesh/bezier/
+	    - plugins/mesh/fountain/
+	    - plugins/mesh/skeleton/
+	    - plugins/mesh/fire/
+	    - plugins/mesh/snow/
+	    - plugins/mesh/explo/
+	    - plugins/mesh/rain/
+	    - plugins/mesh/instmesh/
+	    - plugins/mesh/spiral/
+	    - plugins/mesh/spr2d/
+	    - plugins/mesh/emit/
 	- Jorrit fixed compilation of csGradient.
 18-Jun-2006
         - Arianna fixed some warnings: size_t/uint conversions and some
