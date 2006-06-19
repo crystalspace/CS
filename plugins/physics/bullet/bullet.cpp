@@ -25,6 +25,8 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "iengine/movable.h"
 #include "imesh/genmesh.h"
 
+#include "csutil/custom_new_disable.h"
+
 //bullet includes
 #include <CcdPhysics/CcdPhysicsController.h>
 #include <Dynamics/RigidBody.h>
@@ -40,6 +42,9 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <SimdMatrix3x3.h>
 #include <Dynamics/MassProps.h>
 #include <CollisionDispatch/CollisionDispatcher.h>
+
+#include "csutil/custom_new_enable.h"
+
 
 #include "bullet.h"
 
