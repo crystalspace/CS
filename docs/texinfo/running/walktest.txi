@@ -32,12 +32,12 @@ Space.  It takes a set of command line options, and the name of a map to open.
 By default, it will open the @file{/lev/flarge} directory.
 
 If this is the first time running Walktest (or any Crystal Space application),
-you will need to recalculate the light maps for the level.  The option
-@code{-relight} does this.  Also use this if you modify a map such that its
+you will need to recalculate the lightmaps for the level.  The option
+@samp{-relight} does this.  Also use this if you modify a map such that its
 geometry has changed.
 
-The other most useful options are @code{-help} to list available options, and
-@code{-video=software} or @code{-video=opengl} to change the renderer used.
+The other most useful options are @samp{-help} to list available options, and
+@samp{-video=software} or @samp{-video=opengl} to change the renderer used.
 
 Once Walktest is running, you can move about the world using the mouse and
 arrow keys, similar to many First Person Shooter games.  The movement commands
@@ -50,9 +50,9 @@ are detailed later.  @xref{Walktest Special Keys}.
 @cindex Hit polygon
 @cindex Hit mesh
 
-The mouse is used for pointing at things, not movement, unless the ``freelook''
-option is set on.  In this case, moving the mouse steers the camera, and Button
-1 moves forward.
+The mouse is used for pointing at things, not movement, unless the
+@samp{freelock} option is set on.  In this case, moving the mouse steers the
+camera, and Button 1 moves forward.
 
 @itemize @bullet
 @item
@@ -204,7 +204,7 @@ Commands are of various types:
  
 @itemize @bullet
 @item
-General commands, DO something instead of changing a variable.  How the
+General commands, @sc{do} something instead of changing a variable.  How the
 argument is interpreted depends on the command
 
 @item
@@ -218,9 +218,9 @@ display.
 @item
 Value commands has some value associated with it.  Typing the command without
 arguments will show the current value.  Just type the value after the command
-to change it.  Using a `++' or `--' operator before the value will increase or
-decrease the value with the given amount.  Example (gamma command doesn't
-exist, this is only an example):
+to change it.  Using a @samp{++} or @samp{--} operator before the value will
+increase or decrease the value with the given amount.  Example (gamma
+command doesn't exist, this is only an example):
 
 @itemize @bullet
 @item @samp{gamma}: show current gamma value 
@@ -275,7 +275,7 @@ This command is used extensively in @file{/data/config/autoexec.cfg} to set up
 the key bindings for walktest.
 
 Note that pressing a key executes the command once only, unless the modifier
-``status'' is given.  For example, bind @key{left} rotate_left will execute
+@samp{status} is given.  For example, bind @key{left} rotate_left will execute
 only one rotate_left command when the left arrow is pressed, but bind
 @key{status-left} rotate_left will continue to rotate while the key is pressed.
 
@@ -641,11 +641,11 @@ mesh in an external modelling program.
 @table @code
 @item loadmesh file, factory, texture
 Loads a mesh from the @file{file} (@sc{vfs} path).  Give it the name
-@samp{factory} for use in addmesh.  The ``texture'' must already by loaded.
+@samp{factory} for use in addmesh.  The @samp{texture} must already by loaded.
 
 @item addmesh factory, mesh, size
-Adds named mesh to world at current location using a ``factory'' specified by
-loadmesh.  The ``mesh'' parameter can be used later in delmesh.
+Adds named mesh to world at current location using a @samp{factory} specified
+by loadmesh.  The @samp{mesh} parameter can be used later in delmesh.
 
 @item delmesh mesh
 Delete named mesh.
@@ -798,7 +798,7 @@ draw as the default texture on the polygon
 @item sprlight Boolean [@key{s}]
 Change quality setting of sprite lighting.  If yes every vertex will be lit
 according to the correct distance with the light.  If no then the distances for
-all vertices are calculated to the center of the sprite.  Default is `no'.
+all vertices are calculated to the center of the sprite.  Default is @samp{no}.
 
 @item hi Boolean
 This is intended to hilight the active polygon, but is currently disabled.
