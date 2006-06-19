@@ -172,7 +172,7 @@ optimized away.
 @item
 Anuj Goyal (@email{agoyal@@coverty.com})
 
-Anuj reported a few leak/memory corruption issues in CS.
+Anuj reported a few leak/memory corruption issues in @sc{cs}.
 
 @item
 Aren Blondahl (@email{rean@@pathcom.ca})
@@ -469,7 +469,7 @@ domain-based configuration facility which allows higher-priority components to
 override settings of lower-priority components, and which maintains
 user-specific settings separately from factory-supplied (read-only) settings
 (the user-specific settings can roam with the user if supported by the
-platform); the ``object registry'', which is a general-purpose container
+platform); the @samp{object registry}, which is a general-purpose container
 accessible to all components, and into which components can place any resources
 they wish to share with other components; instigation of the event system
 overhaul to take it from a monolithic, unalterable facility to a completely
@@ -491,7 +491,7 @@ throughout the project in order to entirely eliminate manual maintenance of
 these files.
 
 @item
-Added automated generation of @sc{cvs} ``snapshots''. These are packages
+Added automated generation of @sc{cvs} @samp{snapshots}. These are packages
 (archive files) containing the complete @sc{cvs} tree. Also, log files and
 @dfn{diff} files are generated.
 
@@ -602,8 +602,8 @@ initial palette table in the software renderer.
 
 @item Hariharan Bhasker (@email{hbhasker@@yahoo.com})
 
-Hariharan wrote the ``pathtut tutorial'' for Crystal Space, which shows how to
-use the @code{csPath} class to smoothly move an object along some path.
+Hariharan wrote the @samp{pathtut tutorial} for Crystal Space, which shows
+how to use the @code{csPath} class to smoothly move an object along some path.
 
 @item
 Helge Foerster (@email{Helge.Foerster@@t-online.de})
@@ -834,11 +834,12 @@ a sample program which demonstrates its use. Martin added the model data
 classes and rewrote the old model importer in a more modular way. He also
 cleaned up some of the utility classes, parts of the (defunct) @dfn{system
 driver} and parts of the engine, added the configuration manager which was
-designed by Eric Sunshine, changed many applications to use the ``engine'' as a
-plug-in (rather than linking it statically), and added the simplept
-application. He added ``fast interfaces'' to @sc{scf}. Martin also completely
-rewrote the ``Software'' and ``DirectSound'' sound renderers, and modified the
-map file loader and the image loader to work as plug-ins.
+designed by Eric Sunshine, changed many applications to use the @samp{engine}
+as a plug-in (rather than linking it statically), and added the simplept
+application. He added @samp{fast interfaces} to @sc{scf}. Martin also
+completely rewrote the @samp{Software} and @samp{DirectSound} sound
+renderers, and modified the map file loader and the image loader to
+work as plug-ins.
 
 @item
 Matt Reda (@email{mreda@@mac.com})
@@ -935,9 +936,9 @@ Michael Voase (@email{mvoase@@midcoast.com.au})
 Michael cleaned up the texture manager in the software renderer and added some
 minor features. He also fixed several bugs, most importantly, buggy
 implementations of @code{HitBeamObject()} in several mesh objects; and fixed
-bounding box problems. He moved ``metaballs'' to a mesh object plugin, and
+bounding box problems. He moved @file{metaballs} to a mesh object plugin, and
 added a blobby texture for them. He wrote the motion manager and contributed a
-shuttle model for ``csdemo''.
+shuttle model for @file{csdemo}.
 
 @item
 Mike Bond (@email{mbond@@cox.rr.com})
@@ -981,7 +982,7 @@ enhanced the (now non-existant) @sc{csar} utility.  He also helped develop the
 Windows/Direct3D and Windows/OpenGL versions and is co-author of the (now
 defunct) Glide port.  He made some enhancements to the 3D sprites including two
 convertors from Quake @file{.mdl} and Quake 2 @file{.md2} to Crystal Space (now
-combined into the single mdl2spr utility.
+combined into the single @file{mdl2spr} utility.
 
 @item
 Neil Mosafi (@email{nmosafi@@gmail.com})
@@ -1022,14 +1023,15 @@ many of them, fixed the @sc{bmp} loader to be endian correct and added
 @sc{rle8} encoding to the @sc{bmp} loader.  Norman also added the
 @samp{csQuaternion} class and updated the (now defunct) Glide drivers.  Norman
 contributed a FreeType font server plug-in.  He added a grid-view to @sc{csws}.
-He also added a sound renderer using the ``artsd'' sound server that comes with
-the ``aRts'' system (www.arts-project.org).  Norman added an export script for
-Blender.  He added texture coordinate animation to 2D sprites.  He worked on
-the video file streamer.  Norman also added the (unused and removed)
-@samp{csCrystalBall} culler and the fancy console plugin.  In addition he also
-did a good deal of work on the OpenGL renderer (mostly support for extensions).
-Norman worked on @sc{aws} and created a convertor from @sc{qt} to @sc{aws}.
-Norman also added several sound related modules, such as ``ogg''.
+He also added a sound renderer using the @samp{artsd} sound server that
+comes with the @samp{aRts} system (www.arts-project.org).  Norman added an
+export script for Blender.  He added texture coordinate animation to 2D
+sprites.  He worked on the video file streamer.  Norman also added the
+(unused and removed) @samp{csCrystalBall} culler and the fancy console plugin.
+ In addition he also did a good deal of work on the OpenGL renderer
+(mostly support for extensions).  Norman worked on @sc{aws} and created a
+convertor from @sc{qt} to @sc{aws}. Norman also added several sound related
+modules, such as @samp{ogg}.
 
 @item
 Olivier Langlois (@email{olanglois@@sympatico.ca})
@@ -1148,7 +1150,7 @@ provided a set of export scripts for Blender.
 Rene Jager (@email{renej.frog@@yucom.be})
 
 Rene performed the bulk of the work on Crystal Space's language-agnostic Swig
-interface file (@samp{cspace.i}).  This file is used by all present external
+interface file (@file{cspace.i}).  This file is used by all present external
 language bindings, and should be usable by future ones, as well.  He is also
 responsible for the Java bindings, and the present incarnation of the Python
 scripting module.  Rene also applied some fixes the @sc{opcode} plugin.
@@ -1173,14 +1175,14 @@ Robert maintained the (now defunct) pre-Carbon Macintosh port.
 @item
 Robert Blum (@email{r.blum@@advertainment.com})
 
-Robert patched Dan Ogles' @samp{printf()} patch to avoid buffer overrun, and
+Robert patched Dan Ogles' @code{printf()} patch to avoid buffer overrun, and
 also found a bug in the @sc{gif} loading code.  He also ran a memory debugger
 on Crystal Space and found and fixed many bugs thus reported.
 
 @item
 Rodolphe Ortalo (@email{ortalo@@laas.fr})
 
-Rodolphe patched the Glide driver to work on @sc{gnu}/Linux.  He also provided
+Rodolphe patched the Glide driver to work on @sc{gnu} Linux.  He also provided
 output from Purify which helped track down some problems.
 
 @item
@@ -1217,7 +1219,7 @@ Sebastian Duell (@email{wastel7@@gmx.de})
 Sebastian contributed a Blender export script.
 
 @item
-Serguei ``Snaar'' Narojnyi (@email{snaar@@idirect.ca})
+Serguei @samp{Snaar} Narojnyi (@email{snaar@@idirect.ca})
 
 Serguei added the first integrated networking code to Crystal Space (long
 defunct).  His code was @sc{com}-compatible so it could be easily extended for
@@ -1227,11 +1229,11 @@ platform-dependent extensions.
 Seth Galbraith (@email{sgalbrai@@linknet.kitsap.lib.wa.us})
 
 Seth contributed a nice missile sprite for Walktest, and he fixed the texture
-bug in mdl2spr.  Seth was also a source of suggestions and bug reports.  Seth
-updated the (now defunct) @sc{dos}/@sc{djgpp} documentation and tutorial.  He
-also wrote the (long defunct) Squawk (@emph{Squawk}) demo which illustrated a
-sky box and multiple cameras.  Seth changed the @samp{csCamera} and
-@samp{csView} classes to make the @sc{fov} non-static, and so that it is
+bug in @file{mdl2spr}.  Seth was also a source of suggestions and bug reports.
+ Seth updated the (now defunct) @sc{dos}/@sc{djgpp} documentation and
+tutorial.  He also wrote the (long defunct) Squawk (@emph{Squawk}) demo which
+illustrated a sky box and multiple cameras.  Seth changed the @samp{csCamera}
+and @samp{csView} classes to make the @sc{fov} non-static, and so that it is
 possible to recenter each view separately.  He added sprite vertex tweening and
 new lighting attenuation settings.  He also worked on vertex/texel merging in
 sprites, and on sprites in general, and he added several other features to the
@@ -1265,13 +1267,13 @@ display support.
 Stephan Goetter (@email{sg17@@irz301.inf.tu-dresden.de})
 
 Stephan made a very early (but never completed) attempt to add shared-library
-creation support on @sc{gnu}/Linux to the makefile system.
+creation support on @sc{gnu} Linux to the makefile system.
 
 @item
 Steve Israelson (@email{pfhorte@@rogers.wave.ca})
 
 Steve made the pre-Carbon Macintosh port of Crystal Space.  He also made some
-optimizations to the assembly code @samp{draw_scanline()} routines in the
+optimizations to the assembly code @code{draw_scanline()} routines in the
 software renderer.  Steve made the first preliminary physics system and also
 implemented an simple uniform form of dynamic lighting useful for fluorescent
 lights and such.  Steve greatly enhanced the routines to parse the map format.
@@ -1307,10 +1309,10 @@ time and has also contributed in various other ways.  He wrote
 @code{DrawPolygonFX()} for the software renderer.  He added the (long defunct)
 @samp{csGame} library and the Crystal Shooter application.  He also
 significantly enhanced and maintained the Windows port and, especially, the
-Direct3D port (presently defunct). Thomas also wrote map2cs, a converter which
-translates Quake maps to Crystal Space format. He provided a shuttle sprite and
-a space station sprite for csdemo. Thomas introduced the concept of map nodes
-and key/value pairs for engine objects.
+Direct3D port (presently defunct). Thomas also wrote @file{map2cs}, a
+converter which translates Quake maps to Crystal Space format. He provided a
+shuttle sprite and a space station sprite for @file{csdemo}. Thomas introduced
+the concept of map nodes and key/value pairs for engine objects.
 
 @item
 Thomas Krug (@email{thomas.krug@@assix.de})
@@ -1326,8 +1328,9 @@ a Java Crystal Space map file editor.
 @item
 Thomas Riemer (@email{triemer@@apt4g.a3nyc.com})
 
-Thomas contributed a (long defunct and highly incomplete) ``network manager'',
-as well as @sc{nstp}, a plug-in for the long ago defunct NetSpace project.
+Thomas contributed a (long defunct and highly incomplete)
+@samp{network manager}, as well as @sc{nstp}, a plug-in for the long ago
+defunct NetSpace project.
 
 @item
 Thomas Skoldenborg (@email{thomas@@dum.chalmers.se})
@@ -1345,8 +1348,8 @@ terrain plugins.
 Toni Asco Gonzalez (@email{e3445510@@est.fib.upc.es})
 
 Toni implemented a faster version of @code{DrawPolygonMesh()} for OpenGL. He
-also fixed some bugs in 3ds2lev. Toni made some modifications to map2cs, and to
-walktest to support generic mesh placement.
+also fixed some bugs in @file{3ds2lev}. Toni made some modifications to
+@file{map2cs}, and to @file{walktest} to support generic mesh placement.
 
 @item
 Tor Andersson (@email{d97ta@@efd.lth.se})
@@ -1381,8 +1384,8 @@ with Nathaniel)!
 @item
 Troy Chard (@email{troy.chard@@shaw.ca})
 
-Troy contributed several improvements to 3ds2lev, as well as numerous
-enhancements for the odedynam plugin.
+Troy contributed several improvements to @file{3ds2lev}, as well as numerous
+enhancements for the @file{odedynam} plugin.
 
 @item
 Vincent Knecht (@email{vince@@iefr.ath.cx})
@@ -1428,7 +1431,7 @@ Wyatt Miler (@email{wmiler@@nyx.net})
 Wyatt had performed some editing of Crystal Space's (long defunct) LaTeX
 documentation files. Wyatt added the background music to Blocks. He has also
 worked on correcting errors in the texinfo documentation, and hosts his own
-Crystal Space site for MacOS/X users which provides daily builds and other
+Crystal Space site for Mac OS X users which provides daily builds and other
 resources.
 
 @item

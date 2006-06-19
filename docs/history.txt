@@ -23,6 +23,7 @@ chronological order.
 	    - plugins/mesh/spr2d/
 	    - plugins/mesh/emit/
 	- Jorrit fixed compilation of csGradient.
+        - Philip Wyett continued docs cleanup.
 18-Jun-2006
         - Arianna fixed some warnings: size_t/uint conversions and some
           deprecated method.

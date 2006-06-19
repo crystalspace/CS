@@ -16,8 +16,8 @@ bugs, please visit the Developer's Project page at SourceForge:
 @uref{http://sourceforge.net/projects/crystal/}
 
 CrystalSpace is free and should remain free.  CrystalSpace falls under the
-GNU copyleft license for libraries @sc{lgpl}.  A copy of of the @sc{lgpl} is
-included in this manual for your perusal (@pxref{Licenses}). In short, the
+@sc{gnu} copyleft license for libraries @sc{lgpl}.  A copy of of the @sc{lgpl}
+is included in this manual for your perusal (@pxref{Licenses}). In short, the
 @sc{lgpl} allows you to use CrystalSpace as a library in your products, even 
 commercial products, but modifications to the library or derivative
 works incorporating parts of the library must be made freely available
