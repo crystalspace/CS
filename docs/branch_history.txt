@@ -13,6 +13,8 @@ chronological order.
 	- res fixed fallout from the csRectRegion change.
 	- res augmented csMemFile to support a cs_free as well as a 
 	  platform_free disposition.
+	- res fixed the ptmalloc wrapper to not let very large allocation 
+	  sizes cause overflows.
 18-Jun-2006
 	- res added conveniance includes to disable/enable CS' 'new' and 
 	  'delete' overrides when the memtracker is enabled.

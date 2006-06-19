@@ -52,11 +52,20 @@ CS_FORCEINLINE static CookieType GetCookie (void* p)
 {
   return CookieType (intptr_t (&cookie) ^ intptr_t (p));
 }
+static const size_t cookieOverhead = 
+  sizeof (size_t) + 2*sizeof (CookieType);
+// Maximum allocatable size, to avoid wraparound when the cookies are added
+static const size_t maxRequest = (~(size_t)0) - cookieOverhead;
 #endif
 
 void* ptmalloc (size_t n)
 { 
 #ifdef CS_DEBUG
+  if (n > maxRequest)
+  {
+    errno = ENOMEM;
+    return 0;
+  }
   uint8* p = (uint8*)ptmalloc_::ptmalloc (
     n + sizeof (size_t) + 2*sizeof (CookieType));
   const CookieType startCookie = GetCookie (p);
@@ -103,6 +112,11 @@ void* ptrealloc (void* P, size_t n)
 { 
 #ifdef CS_DEBUG
   if (P == 0) return ptmalloc (n);
+  if (n > maxRequest)
+  {
+    errno = ENOMEM;
+    return 0;
+  }
   // Compute original allocated address
   uint8* p = (uint8*)P;
   p -= sizeof(CookieType);
@@ -144,8 +158,16 @@ void* ptmemalign (size_t a, size_t n)
 void* ptcalloc (size_t n, size_t s)
 { 
 #ifdef CS_DEBUG
-  void* p = ptmalloc (n * s); 
-  memset (p, 0, n * s);
+  // Overflow test lifted from dlmalloc
+  const size_t halfSizeT = (~(size_t)0) >> (sizeof (size_t) * 4);
+  size_t req = n*s;
+  if (((n | s) & ~halfSizeT) && (req / n != s))
+  {
+    errno = ENOMEM;
+    return 0;
+  }
+  void* p = ptmalloc (n * s);
+  if (p != 0) memset (p, 0, n * s);
   return p;
 #else
   return ptmalloc_::ptcalloc (n, s); 
