@@ -38,7 +38,7 @@ struct iGradient;
  */
 struct iFireTexture : public virtual iBase
 {
-  SCF_INTERFACE(iFireTexture, 2, 0, 0);
+  SCF_INTERFACE(iFireTexture, 2, 1, 0);
 
   /**
    * Set animation parameter: possible burn (0..)

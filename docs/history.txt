@@ -6,6 +6,27 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+19-Jun-2006
+	- Philip Wyett made Quick Start more explanatory for the CS newcomers.
+	- res changed csRectRegion to use a csArray<> for rectangle storage.
+	- res fixed fallout from the csRectRegion change.
+	- mdmkolbe converted the following plugins to the new SCF:
+	    - plugins/mesh/bezier/
+	    - plugins/mesh/fountain/
+	    - plugins/mesh/skeleton/
+	    - plugins/mesh/fire/
+	    - plugins/mesh/snow/
+	    - plugins/mesh/explo/
+	    - plugins/mesh/rain/
+	    - plugins/mesh/instmesh/
+	    - plugins/mesh/spiral/
+	    - plugins/mesh/spr2d/
+	    - plugins/mesh/emit/
+	- Jorrit fixed compilation of csGradient.
+        - Philip Wyett continued docs cleanup.
+        - Philip Wyett began adding more of the bundled CS applications with
+          basic descriptions to the application overview section of the
+          documentation.
 18-Jun-2006
         - Arianna fixed some warnings: size_t/uint conversions and some
           deprecated method.
@@ -13,6 +34,20 @@ chronological order.
 	- Eric Sunshine performed project-wide spelling corrections:
 	    conveniance --> convenience
 	    conveniant	--> convenient
+	- res fixed spr2d's SetColor() to actually do something again.
+	- res added convenience includes to disable/enable CS' 'new' and 
+	    'delete' overrides when the memtracker is enabled.
+	- res added some missing custom new re-enablings.
+	- res augmented the scfArray* classes with constructors that also take
+	  and SCF parent argument.
+	- res made an interface version iGradient of csGradient, so you can
+	  pass them across plugins.
+	- Philip Wyett changed his email address in docs. Changed 'written by'
+	  to 'originally written by' for Windows related documentation as I
+	  will no longer being working with the Windows codebase daily (as I
+	  have not done for a long time) and will be concentrating on Linux.
+	- Philip Wyett starts some maintenance work and changes to
+	  documentation.
 17-Jun-2006
         - Piotr Obrzut fixed phystut crash on exit problem (when running
           with bullet plugin)

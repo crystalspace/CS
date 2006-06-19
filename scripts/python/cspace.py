@@ -1908,7 +1908,7 @@ class csRectRegion(_object):
     def ClipTo(*args): return _cspace.csRectRegion_ClipTo(*args)
     def Count(*args): return _cspace.csRectRegion_Count(*args)
     def RectAt(*args): return _cspace.csRectRegion_RectAt(*args)
-    def makeEmpty(*args): return _cspace.csRectRegion_makeEmpty(*args)
+    def MakeEmpty(*args): return _cspace.csRectRegion_MakeEmpty(*args)
 
 class csRectRegionPtr(csRectRegion):
     def __init__(self, this):
@@ -1916,7 +1916,6 @@ class csRectRegionPtr(csRectRegion):
         if not hasattr(self,"thisown"): _swig_setattr(self, csRectRegion, 'thisown', 0)
         _swig_setattr(self, csRectRegion,self.__class__,csRectRegion)
 _cspace.csRectRegion_swigregister(csRectRegionPtr)
-FRAGMENT_BUFFER_SIZE = cvar.FRAGMENT_BUFFER_SIZE
 
 class csQuaternion(_object):
     __swig_setmethods__ = {}

@@ -16,6 +16,39 @@ particular application may be found in subsequent sections.
 @item 3ds2lev
 A @sc{3ds} to Crystal Space map converter (work in progress!).
 
+@table @code
+@cindex @file{awstest}
+@cindex Applications, @file{awstest}
+@item awstest
+A test application for the Crystal Space Alternate Windows System @sc{aws}
+plugin. In the future this will become the test application for the work in
+progress @sc{aws}2 plugin.
+
+@table @code
+@cindex @file{awstut}
+@cindex Applications, @file{awstut}
+@item awstut
+A Crystal Space tutorial application demonstrating use of the Alternate
+Windows System @sc{aws}.
+
+@table @code
+@cindex @file{ceguitest}
+@cindex Applications, @file{ceguitest}
+@item ceguitest
+A test application for the Crystal Space Crazy Eddie's @sc{gui} System plugin.
+
+@table @code
+@cindex @file{consoletest}
+@cindex Applications, @file{consoletest}
+@item consoletest
+A Crystal Space console output testing application.
+
+@table @code
+@cindex @file{csbench}
+@cindex Applications, @file{csbench}
+@item csbench
+A Crystal Space benchmarking application.
+
 @cindex @file{csdemo}
 @cindex Applications, @file{csdemo}
 @item csdemo
@@ -36,10 +69,11 @@ that you can get from:
 @item csfgen
 A @emph{TrueType} to Crystal Space font converter.
 
-@cindex @file{csvid}
-@cindex Applications, @file{csvid}
-@item csvid
-A test application for the Open DivX video plugin.
+@table @code
+@cindex @file{eventtest}
+@cindex Applications, @file{eventtest}
+@item eventtest
+A Crystal Space event system testing application.
 
 @cindex @file{g2dtest}
 @cindex Applications, @file{g2dtest}

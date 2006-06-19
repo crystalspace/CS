@@ -24,19 +24,18 @@
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "csutil/strhash.h"
+#include "csutil/scf_implementation.h"
 
-struct iEngine;
 struct iReporter;
-struct iPluginManager;
 struct iObjectRegistry;
 struct iSyntaxService;
-struct iInstancingFactoryState;
-struct iInstancingMeshState;
 
 /**
  * General Mesh factory loader.
  */
-class csInstFactoryLoader : public iLoaderPlugin
+class csInstFactoryLoader :
+  public scfImplementation2<csInstFactoryLoader,
+    iLoaderPlugin, iComponent>
 {
 private:
   iObjectRegistry* object_reg;
@@ -45,8 +44,6 @@ private:
   csStringHash xmltokens;
 
 public:
-  SCF_DECLARE_IBASE;
-
   /// Constructor.
   csInstFactoryLoader (iBase*);
 
@@ -59,19 +56,14 @@ public:
   /// Parse a given node and return a new object for it.
   virtual csPtr<iBase> Parse (iDocumentNode* node,
     iStreamSource*, iLoaderContext* ldr_context, iBase* context);
-
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csInstFactoryLoader);
-    virtual bool Initialize (iObjectRegistry* p)
-    { return scfParent->Initialize(p); }
-  } scfiComponent;
 };
 
 /**
  * General Mesh factory saver.
  */
-class csInstFactorySaver : public iSaverPlugin
+class csInstFactorySaver :
+  public scfImplementation2<csInstFactorySaver,
+    iSaverPlugin, iComponent>
 {
 private:
   iObjectRegistry* object_reg;
@@ -79,8 +71,6 @@ private:
   csRef<iSyntaxService> synldr;
 
 public:
-  SCF_DECLARE_IBASE;
-
   /// Constructor.
   csInstFactorySaver (iBase*);
 
@@ -93,19 +83,14 @@ public:
   /// Write down given object and add to iDocumentNode.
   virtual bool WriteDown (iBase *obj, iDocumentNode* parent,
   	iStreamSource*);
-
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csInstFactorySaver);
-    virtual bool Initialize (iObjectRegistry* p)
-    { return scfParent->Initialize(p); }
-  } scfiComponent;
 };
 
 /**
  * General Mesh loader.
  */
-class csInstMeshLoader : public iLoaderPlugin
+class csInstMeshLoader :
+  public scfImplementation2<csInstMeshLoader,
+    iLoaderPlugin, iComponent>
 {
 private:
   iObjectRegistry* object_reg;
@@ -114,8 +99,6 @@ private:
   csStringHash xmltokens;
 
 public:
-  SCF_DECLARE_IBASE;
-
   /// Constructor.
   csInstMeshLoader (iBase*);
 
@@ -129,19 +112,14 @@ public:
   virtual csPtr<iBase> Parse (iDocumentNode* node,
     iStreamSource*, iLoaderContext* ldr_context, iBase* context);
   /// Parse a render buffer node
-
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csInstMeshLoader);
-    virtual bool Initialize (iObjectRegistry* p)
-    { return scfParent->Initialize(p); }
-  } scfiComponent;
 };
 
 /**
  * General Mesh saver.
  */
-class csInstMeshSaver : public iSaverPlugin
+class csInstMeshSaver :
+  public scfImplementation2<csInstMeshSaver,
+    iSaverPlugin, iComponent>
 {
 private:
   iObjectRegistry* object_reg;
@@ -149,8 +127,6 @@ private:
   csRef<iSyntaxService> synldr;
 
 public:
-  SCF_DECLARE_IBASE;
-
   /// Constructor.
   csInstMeshSaver (iBase*);
 
@@ -163,13 +139,6 @@ public:
   /// Write down given object and add to iDocumentNode.
   virtual bool WriteDown (iBase *obj, iDocumentNode* parent,
   	iStreamSource*);
-
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csInstMeshSaver);
-    virtual bool Initialize (iObjectRegistry* p)
-    { return scfParent->Initialize(p); }
-  } scfiComponent;
 };
 
 #endif // __CS_INSTMESHLDR_H__

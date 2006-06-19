@@ -3,9 +3,9 @@
 @chapter Introduction
 @cindex Introduction
 
-CrystalSpace is a portable modular 3D SDK, including many components
+CrystalSpace is a portable modular 3D @sc{sdk}, including many components
 for building various applications and games - these are still quite
-useful for projects that do not involve 3D. CS is still very much in 
+useful for projects that do not involve 3D. @sc{cs} is still very much in 
 development, so anyone who feels inclined to do so can contribute to the
 source. There are a number of incomplete components still needing to be 
 finished, and a wide array of possibilities for new contributions; for
@@ -16,12 +16,12 @@ bugs, please visit the Developer's Project page at SourceForge:
 @uref{http://sourceforge.net/projects/crystal/}
 
 CrystalSpace is free and should remain free.  CrystalSpace falls under the
-GNU copyleft license for libraries (LGPL).  A copy of of the LGPL is
-included in this manual for your perusal (@pxref{Licenses}). In short, the
-LGPL allows you to use CrystalSpace as a library in your products, even 
+@sc{gnu} copyleft license for libraries @sc{lgpl}.  A copy of of the @sc{lgpl}
+is included in this manual for your perusal (@pxref{Licenses}). In short, the
+@sc{lgpl} allows you to use CrystalSpace as a library in your products, even 
 commercial products, but modifications to the library or derivative
 works incorporating parts of the library must be made freely available
-to everyone, under the LGPL's terms.
+to everyone, under the @sc{lgpl}'s terms.
 
 Please read the @sc{faq} if you have any questions.  If you don't find the
 answer there you can always email the mailing lists. @xref{FAQ}, or
