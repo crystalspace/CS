@@ -228,6 +228,44 @@ bool csPVSVis::HandleEvent (iEvent& ev)
   return false;
 }
 
+static csStaticKDTree* MakeTestPVSTree () 
+{
+  // Here are the objects in pvstest
+  // Object "floor"
+  // extends in x and z directions from about -3 to +3, y=-1
+  // around (0, -1, 0)
+  // Object "wallN"
+  // around (0, 0, 5)
+  // Object "Suzanne"
+  // around (0,0,-6)
+
+  // The tree we will construct for them
+  // Root:  (0,0,4) on Z-axis (fws) []
+  //   >4: (1,0,0) on X-axis (w) [w]
+  //     >1: leaf node (w) [w]
+  //     <1: leaf node (w) [w]
+  //   <4: (0,0,0) on X-axis (fs) []
+  //     >0: (0,1,0) on Y-axis (fs) []
+  //       <1: leaf node (f) [f]
+  //       >1: leaf node (s) [s]
+  //     <0: leaf node (fs) [fs]
+
+  csArray<csStaticKDTreeObject*> emptylist;
+  csStaticKDTree *root, *frnt, *back;
+
+  root = new csStaticKDTree(NULL, 1, CS_ZAXIS, 4);
+    frnt = new csStaticKDTree(root, 0, CS_XAXIS, 1);
+      frnt = new csStaticKDTree(frnt, 0, emptylist);
+      back = new csStaticKDTree(frnt, 1, emptylist);
+    back = new csStaticKDTree(root, true, CS_XAXIS, 0);
+      frnt = new csStaticKDTree(back, 0, CS_YAXIS, 1);
+        frnt = new csStaticKDTree(frnt, 0, emptylist);
+        back = new csStaticKDTree(frnt, 1, emptylist);
+      back = new csStaticKDTree(back, 1, emptylist);
+
+  return root;
+}
+
 bool csPVSVis::Initialize (iObjectRegistry *object_reg)
 {
   csPVSVis::object_reg = object_reg;

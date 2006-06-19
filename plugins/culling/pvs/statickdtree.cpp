@@ -117,7 +117,7 @@ csStaticKDTree::csStaticKDTree (csStaticKDTree *parent, bool isChild1,
   }
 
   objects = new csArray<csStaticKDTreeObject*> (items);
-  csArray < csStaticKDTreeObject * >::Iterator it = items.GetIterator ();
+  csArray<csStaticKDTreeObject*>::Iterator it = items.GetIterator ();
   while (it.HasNext ())
       it.Next ()->leafs.Push (this);
   child1 = child2 = NULL;
@@ -130,11 +130,15 @@ csStaticKDTree::~csStaticKDTree ()
     CS_ASSERT (objects);
 
     csArray<csStaticKDTreeObject*>::Iterator it = objects->GetIterator ();
-    while (it.HasNext ())
-      it.Next ()->leafs.DeleteFast (this);
-    if (objects->IsEmpty ())
-      delete objects;
-  } else {
+    while (it.HasNext ()) {
+      csStaticKDTreeObject* obj = it.Next ();
+      obj->leafs.DeleteFast (this);
+      if (obj->leafs.IsEmpty ())
+        delete obj;
+    }
+    delete objects;
+  }
+  else {
     CS_ASSERT (child2);
     CS_ASSERT (!objects);
     delete child1;

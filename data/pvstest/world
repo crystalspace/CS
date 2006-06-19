@@ -10,11 +10,17 @@
     <plugin name="genmeshfact">crystalspace.mesh.loader.factory.genmesh</plugin>
   </plugins>
   <textures>
+        <texture name="tile">
+            <file>/lib/stdtex/tile.png</file>
+        </texture>
         <texture name="oldbrick">
             <file>/lib/stdtex/oldbrick.jpg</file>
         </texture>
   </textures>
   <materials>
+        <material name="tile">
+            <texture>tile</texture>
+        </material>
         <material name="oldbrick">
             <texture>oldbrick</texture>
         </material>
@@ -86,7 +92,7 @@
       </params>
       <zuse/>
       <move>
-        <v x="0" y="1.17356" z="4.01693e-008"/>
+        <v x="0" y="-1" z="0"/>
       </move>
     </meshobj>
     <light name="Lamp">
@@ -6575,7 +6581,7 @@
       </params>
       <zuse/>
       <move>
-        <v x="0.0815147" y="4.32635" z="13.3603"/>
+        <v x="0" y="0" z="-6"/>
         <matrix>
           <rotx>-1.5708</rotx>
         </matrix>
@@ -6593,7 +6599,7 @@
           <v>2</v>
           <v>3</v>
           <v>0</v>
-          <material>oldbrick</material>
+          <material>tile</material>
           <texmap>
             <uv idx="0" u="0" v="0"/>
             <uv idx="1" u="0" v="1"/>
@@ -6605,7 +6611,7 @@
           <v>3</v>
           <v>2</v>
           <v>1</v>
-          <material>oldbrick</material>
+          <material>tile</material>
           <texmap>
             <uv idx="0" u="0" v="0"/>
             <uv idx="1" u="0" v="1"/>
@@ -6617,7 +6623,7 @@
       <staticpos/>
       <staticshape/>
       <move>
-        <v x="-0.0284809" y="4.32635" z="5.63305"/>
+        <v x="0" y="4.32635" z="5"/>
         <matrix>
           <rotx>-1.5708</rotx>
         </matrix>
