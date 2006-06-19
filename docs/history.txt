@@ -24,6 +24,9 @@ chronological order.
 	    - plugins/mesh/emit/
 	- Jorrit fixed compilation of csGradient.
         - Philip Wyett continued docs cleanup.
+        - Philip Wyett began adding more of the bundled CS applications with
+          basic descriptions to the application overview section of the
+          documentation.
 18-Jun-2006
         - Arianna fixed some warnings: size_t/uint conversions and some
           deprecated method.
