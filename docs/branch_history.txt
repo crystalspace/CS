@@ -11,6 +11,8 @@ chronological order.
 	  allocation functions CS uses. Also replaced malloc with cs_malloc in
 	  CS itself.
 	- res fixed fallout from the csRectRegion change.
+	- res augmented csMemFile to support a cs_free as well as a 
+	  platform_free disposition.
 18-Jun-2006
 	- res added conveniance includes to disable/enable CS' 'new' and 
 	  'delete' overrides when the memtracker is enabled.
