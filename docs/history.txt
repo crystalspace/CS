@@ -9,6 +9,7 @@ chronological order.
 19-Jun-2006
 	- Philip Wyett made Quick Start more explanatory for the CS newcomers.
 	- res changed csRectRegion to use a csArray<> for rectangle storage.
+	- res fixed fallout from the csRectRegion change.
 18-Jun-2006
         - Arianna fixed some warnings: size_t/uint conversions and some
           deprecated method.

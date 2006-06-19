@@ -94,7 +94,7 @@ void awsPanel::OnDraw (csRect /*clip*/)
   // If the child exclude region is dirty, refresh it.
   if (todraw_dirty)
   {
-    todraw.makeEmpty ();
+    todraw.MakeEmpty ();
     todraw.Include (ClientFrame ());
     for (iAwsComponent* cmp = GetTopChild (); cmp; cmp = cmp->ComponentBelow ())
     {
