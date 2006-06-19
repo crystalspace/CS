@@ -19,6 +19,7 @@
 
 
 #include "cssysdef.h"
+#include "csutil/util.h"
 #include "csplugincommon/sndsys/snddata.h"
 
 using namespace CS::SndSys;

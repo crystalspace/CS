@@ -83,7 +83,7 @@ keywords.  @xref{MeshObject PartSys}.
 
 @table @code
 @item <dropsize w="" h="" />
-Size of the droplets for the snow (width and height).
+Size of the particles of the explosion (width and height).
 @item <center x="" y="" z="" />
 Center of the explosion.  In most cases you should use the origin here (0,0,0)
 and let the engine control the position of the explosion.

@@ -33,7 +33,8 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "softshader.h"
 #include "softshader_fp.h"
 
-using namespace CS::Plugins::SoftShader;
+CS_PLUGIN_NAMESPACE_BEGIN(SoftShader)
+{
 
 void csSoftShader_FP::Activate()
 {
@@ -115,7 +116,7 @@ static inline int FactorToShift (float f)
 
 void csSoftShader_FP::SetupState (const csRenderMesh* /*mesh*/,
 				  csRenderMeshModes& /*modes*/,
-				  const csShaderVarStack& stacks)
+				  const iShaderVarStack* stacks)
 {
   csVector4 v = GetParamVectorVal (stacks, flatColor, csVector4 (1));
   shaderPlug->scanlineRenderer->SetFlatColor (v);
@@ -131,3 +132,5 @@ bool csSoftShader_FP::Compile()
   return true;
 }
 
+}
+CS_PLUGIN_NAMESPACE_END(SoftShader)

@@ -604,11 +604,12 @@ public:
   /// Drawroutine. Only way to draw stuff
   virtual void DrawMesh (const csCoreRenderMesh* mymesh,
     const csRenderMeshModes& modes,
-    const csArray<csShaderVariable*> &stacks);
+    const iShaderVarStack* stacks);
   void DrawSimpleMesh (const csSimpleRenderMesh &mesh, uint flags = 0);
 
-  bool PerformExtension (char const* command, ...) { return false; }
-  bool PerformExtensionV (char const* command, va_list args) { return false; }
+  bool PerformExtension (char const* /*command*/, ...) { return false; }
+  bool PerformExtensionV (char const* /*command*/, va_list /*args*/)
+  { return false; }
 
   /// Controls shadow drawing
   virtual void SetShadowState (int /*state*/)

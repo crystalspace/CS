@@ -53,6 +53,8 @@ void csKeyEventHelper::GetModifiers (const iEvent* event,
 
 void csKeyEventHelper::GetModifiers (uint32 mask, csKeyModifiers& modifiers)
 {
+  memset (&modifiers, 0, sizeof (modifiers));
+
   for (int type = 0; type < csKeyModifierTypeLast; type++)
     if (mask & (1 << type))
       modifiers.modifiers[type] = (1 << csKeyModifierNumAny);

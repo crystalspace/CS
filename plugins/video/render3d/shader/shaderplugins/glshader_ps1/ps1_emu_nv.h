@@ -26,6 +26,9 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "ps1_emu_common.h"
 #include "ps1_parser.h"
 
+CS_PLUGIN_NAMESPACE_BEGIN(GLShaderPS1)
+{
+
 class csShaderGLPS1_NV : public csShaderGLPS1_Common
 {
 private:
@@ -117,12 +120,13 @@ public:
   /// Setup states needed for proper operation of the shader
   virtual void SetupState (const csRenderMesh* mesh,
     csRenderMeshModes& modes,
-    const csShaderVarStack &stacks);
+    const iShaderVarStack* stacks);
 
   /// Reset states to original
   virtual void ResetState ();
 };
 
+}
+CS_PLUGIN_NAMESPACE_END(GLShaderPS1)
 
 #endif //__GLSHADER_PS1_NV_H__
-

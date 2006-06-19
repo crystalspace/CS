@@ -38,6 +38,9 @@
 #include "ps1_parser.h"
 #include "glshader_ps1.h"
 
+CS_PLUGIN_NAMESPACE_BEGIN(GLShaderPS1)
+{
+
 void csShaderGLPS1_NV::Activate ()
 {
   // enable it
@@ -61,7 +64,7 @@ void csShaderGLPS1_NV::Deactivate()
 
 void csShaderGLPS1_NV::SetupState (const csRenderMesh* /*mesh*/, 
                                    csRenderMeshModes& /*modes*/,
-	                           const csShaderVarStack& stacks)
+	                           const iShaderVarStack* stacks)
 {
   csGLExtensionManager *ext = shaderPlug->ext;
 
@@ -777,3 +780,6 @@ bool csShaderGLPS1_NV::LoadProgramStringToGL ()
 
   return ret;
 }
+
+}
+CS_PLUGIN_NAMESPACE_END(GLShaderPS1)

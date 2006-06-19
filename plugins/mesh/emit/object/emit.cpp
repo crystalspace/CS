@@ -678,7 +678,8 @@ void csEmitMeshObject::StartParticle (int i)
   startspeed->GetValue(part_speed[i], pos);
   startaccel->GetValue(part_accel[i], pos);
   if(attractor) attractor->GetValue(part_attract[i], pos);
-  GetParticle (i)->SetMixMode (MixMode);
+  csRef<iMeshObject> meshobj = scfQueryInterface<iMeshObject> (GetParticle (i));
+  meshobj->SetMixMode (MixMode);
   GetParticle (i)->SetPosition (pos);
   part_pos[i] = pos;
   bbox.AddBoundingVertex(part_pos[i]);
@@ -690,13 +691,13 @@ void csEmitMeshObject::StartParticle (int i)
   {
     csColor col = aging->color;
     col *= (1.-aging->alpha);
-    GetParticle(i)->SetColor(col);
+    meshobj->SetColor(col);
   }
   else
   {
-    GetParticle(i)->SetColor(aging->color);
+    meshobj->SetColor (aging->color);
     if(aging->alpha!=0.0)
-      GetParticle(i)->SetMixMode(MixMode | CS_FX_SETALPHA(aging->alpha));
+      meshobj->SetMixMode (MixMode | CS_FX_SETALPHA(aging->alpha));
   }
 }
 
@@ -767,17 +768,19 @@ void csEmitMeshObject::MoveAgeParticle (int i, int elapsed, float delta_t)
   if (ABS (oldscale) < .0001) oldscale = 1;
   GetParticle(i)->ScaleBy(newscale / oldscale);
   GetParticle(i)->Rotate(rotspeed * delta_t);
+  csRef<iMeshObject> meshobj = scfQueryInterface<iMeshObject> (GetParticle (i));
   if(MixMode & CS_FX_ADD)
   {
     col *= (1.-alpha);
-    GetParticle(i)->SetColor(col);
+    meshobj->SetColor (col);
   }
   else
   {
-    GetParticle(i)->SetColor(col);
+    meshobj->SetColor(col);
     if(alpha!=0.0)
-      GetParticle(i)->SetMixMode(MixMode | CS_FX_SETALPHA(alpha));
-    else GetParticle(i)->SetMixMode(MixMode);
+      meshobj->SetMixMode (MixMode | CS_FX_SETALPHA(alpha));
+    else 
+      meshobj->SetMixMode (MixMode);
   }
 
   /// move the particle

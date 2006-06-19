@@ -266,6 +266,7 @@ bool csDocumentSystemMultiplexer::Initialize (iObjectRegistry* object_reg)
     plugin_mgr = csQueryRegistry<iPluginManager> (object_reg);
 
     csSet<csString> usedPlugins;
+    usedPlugins.Add (DOCPLEX_CLASSNAME);
     int idx;
     int errorcount = 0;
     for (idx = 1; ; idx++)
@@ -282,12 +283,14 @@ bool csDocumentSystemMultiplexer::Initialize (iObjectRegistry* object_reg)
       else
       {
 	errorcount = 0;	
+        csRef<iFactory> fact = scfQueryInterface<iFactory> (b);
+        const char* classId = fact->QueryClassID ();
+        if (usedPlugins.Contains (classId)) continue;
 	csRef<iDocumentSystem> ds (scfQueryInterface<iDocumentSystem> (b));
         if (ds.IsValid()) 
         {
           orderedlist.Push (ds);
-          csRef<iFactory> fact = scfQueryInterface<iFactory> (b);
-          usedPlugins.Add (fact->QueryClassID ());
+          usedPlugins.AddNoTest (classId);
         }
       }
     }
@@ -307,8 +310,7 @@ bool csDocumentSystemMultiplexer::Initialize (iObjectRegistry* object_reg)
     for (size_t i = 0; i < scfClassList->GetSize(); i++)
     {
       const char* scfClass = scfClassList->Get (i);
-      if ((strcasecmp (scfClass, DOCPLEX_CLASSNAME) != 0)
-        && !usedPlugins.Contains (scfClass))
+      if (!usedPlugins.Contains (scfClass))
       {
         classlist.Push (scfClass);
       }

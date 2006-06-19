@@ -20,6 +20,7 @@
 #ifndef __CS_SOFT3D_CLIP_ZNEAR_H__
 #define __CS_SOFT3D_CLIP_ZNEAR_H__
 
+#include "csgeom/tri.h"
 #include "clipper.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(Soft3D)

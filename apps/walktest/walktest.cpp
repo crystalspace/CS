@@ -68,7 +68,7 @@ WalkTest::WalkTest () :
   anim_dirlight = 0;
 
   do_edges = false;
-  do_show_coord = false;
+  do_show_coord = true;
   busy_perf_test = false;
   do_show_z = false;
   do_show_palette = false;

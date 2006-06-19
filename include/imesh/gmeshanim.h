@@ -28,15 +28,15 @@
 /**\addtogroup meshplugins
  * @{ */
 
-SCF_VERSION (iGenMeshAnimationControlState, 0, 0, 3);
-
 /**
  * This interface describes the API for setting up the animation
  * control as implemented by the 'gmeshanim' plugin. The objects that
  * implement iGenMeshAnimationControl also implement this interface.
  */
-struct iGenMeshAnimationControlState : public iBase
+struct iGenMeshAnimationControlState : public virtual iBase
 {
+  SCF_INTERFACE(iGenMeshAnimationControlState, 2, 0, 0);
+
   /**
    * Execute the given animation script. This will be done in addition
    * to the scripts that are already running. Returns false in case of

@@ -28,13 +28,8 @@
 
 #include "softshader.h"
 
-namespace CS
+CS_PLUGIN_NAMESPACE_BEGIN(SoftShader)
 {
-namespace Plugins
-{
-namespace SoftShader
-{
-
 
 class csSoftShader_FP : public csShaderProgram
 {
@@ -74,7 +69,7 @@ public:
 
   virtual void SetupState (const csRenderMesh* mesh,
     csRenderMeshModes& modes,
-    const csShaderVarStack &stacks);
+    const iShaderVarStack* stacks);
 
   virtual void ResetState () {}
 
@@ -90,8 +85,7 @@ public:
   virtual bool Compile();
 };
 
-} // namespace SoftShader
-} // namespace Plugins
-} // namespace CS
-#endif //__SOFTSHADER_FP_H__
+}
+CS_PLUGIN_NAMESPACE_END(SoftShader)
 
+#endif //__SOFTSHADER_FP_H__

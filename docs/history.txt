@@ -6,6 +6,248 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+15-Jun-2006
+	- thebolt fixed a bug in csQuaternion which caused matrix to
+	  quaternion to go wrong.
+	- Jorrit fixed a bug in genmesh GetRadius() function. This would
+	  return the correct radius but an incorrect center (i.e. center
+	  was always 0,0,0).
+	- Jorrit (with the help of Erroroman) fixed
+	  flat_ppl_attenuation.avp so that bumpmapping no longer flickers.
+	  This fixes at least light_bumpmap technique 220. Not sure
+	  about the others. The bug still appears present in case glow
+	  is used however.
+	- mdmkolbe brought the Java SWIG bindings a little closer to working.
+14-Jun-2006
+	- caedes fixed cspace.i for changes in spr2d.
+	- caedes fixed cspython.cpp for dissaparition of evenhandler.h.
+	- res fixed an apparent typo in aws2's gradient code.
+	- res changed wxtest to also include wx.rc.
+	- Jorrit did the following to csEngineTools::FindShortestDistance().
+	    - It now returns the result in a csShortestDistanceResult
+	      structure.
+	    - In addition to the squared distance it now also returns
+	      the direction to follow (starting from the source position)
+	      which would make you end up at the destination. Usually
+	      that will be equal to 'destination-source' but if there are
+	      space warping portals involved then this can be different.
+	    - Added an optional 'accurate' parameter so that the calculation
+	      of the distance between the start point and the portal is
+	      more accurate.
+	    - Cleaned up the code considerably and also optimized it
+	      slightly by using a csSet for visited sectors.
+13-Jun-2006
+	- Jorrit slightly optimized iEngine->GetNearbyMeshes() and related
+	  by using a csSet for visited sectors instead of an array.
+	- Jorrit removed the ugly sector iterator pool in the engine.
+	  Also cleaned up the other iterators that are implemented
+	  internally in engine.cpp.
+	- Jorrit removed the unused csLightIt in the engine.
+	- Jorrit implemented iEngine->GetNearbySectors().
+	- Jorrit added a new version of iEngine->GetNearbySectors() that
+	  accepts a box instead of a sphere.
+	- Jorrit changed the csBox3 version of GetNearbyMeshes() and
+	  GetNearbySectors() so that it actually tests if the portal
+	  intersects with the given box. That way it makes the routine
+	  more optimal by not traversing useless portals.
+	- Jorrit cleaned up the GetNearbyBla() code in the engine a lot.
+12-Jun-2006
+	- Jorrit fixed the handling of 'ww' and 'wv' in space warping
+	  portals. If 'ww' was specified before 'wv' then 'wv' would
+	  overwrite whatever the user specified in 'ww'. This no longer
+	  happens. If you don't specify 'ww' then 'wv' will still set
+	  'ww' equal to 'wv' but not when 'ww' is already specified.
+	- Jorrit converted iCameraSectorListener to new scf.
+	- res changed the assert-in-assert handling to print the assert using
+	  the runtime functions as opposed to CS functions again. Also
+	  debug-break on first nested assert.
+	- res updated spr2d to use new SCF.
+	- res changed configure to apply -fvisibility=hidden not only to C++
+	  but also to C sources.
+	- res changed the spr2d to use an iArray instead of a csArray for the 
+	  "colored vertices".
+	- res changed csShaderVariable::GetType() to call the accessor if a
+	  value has not yet been set.
+	- res converted iPortalCallback implementations to new SCF.
+	- res fixed fixed cleaning of separate debug info.
+11-Jun-2006
+	- mdmkolbe factored into separate files parts of
+	  plugins/video/render3d/software/pixspecifica.cpp that were
+	  causing GCC to exhaust memory and crash.
+	- mdmkolbe reduced header dependencies and fixed several warnings.
+	- res converted csjoylin to new SCF.
+	- res changed csShaderVarStack& to iShaderVarStack* in interfaces.
+	- dfryer fixed a free() in glosx2d that made ptmalloc sad.  Also
+	  fixed some OS X components with bad headers.
+	- mdmkolbe fixed a few warnings and some SWIG errors.
+10-Jun-2006
+	- res added SCF interfaces for arrays.
+	- Adam fixed a node-deletion bug in csPartialOrder, and added more
+	  unit tests to boot.
+9-Jun-2006
+	- mdmkolbe fixed the following:
+	  - several unused parameter warnings
+	  - the CS_DEPRECATED_METHOD tag on iString::Clear()
+	  - CS_PRId64 vs PRId64 in include/csutil/timemeasure.h
+	    (Use the first for csPrintf and the second for printf.)
+	- mdmkolbe fixed a suspected variable name typo.
+	- Jorrit added support for strings to iSharedVariable.
+	- Jorrit added std_rloop_standard.xml which corresponds to the
+	  standard default renderloop as created internally by the engine.
+	- Jorrit added support for conditional renderloops in a map file.
+	  You can now say something like this:
+		<renderloop variable="quality">
+		    <condition value="low">std_rloop_standard</condition>
+		    <condition value="high">std_rloop_shadowmap</condition>
+		    <default>std_rloop_diffuse</default>
+		</renderloop>
+	  It will use the shared variable 'quality' to determine which
+	  renderloop to select.
+	- Jorrit fixed the engine renderloop commandline option so
+	  that it actually works. Previously it would set a default
+	  renderloop and later on it would be overwritten again by
+	  the usual default renderloop.
+	- mdmkolbe fixed overload ambiguity error in picView.
+	- mdmkolbe removed unneeded includes from:
+	  - include/csgeom/math3d.h
+	  - include/iutil/event.h
+	  - include/csutil/comparator.h
+	  - include/csutil/sysfunc.h
+	  Files that assumed these headers included things such as csstring.h
+	  and util.h were corrected.
+	- Jorrit fixed a compile error in tinypars.cpp after the removal
+	  of several includes.
+8-Jun-2006
+	- Andres added a stupid filter to the annotation facility to filter
+	  obvious spam.
+	- Jorrit added new versions of iSector->HitBeamPortals() and
+	  iSector->HitBeam() which return their results in a
+	  csSectorHitBeamResult class instead of through their parameters.
+	  That is more friendly for python, java, perl, ...
+	- Jorrit extended iSector->HitBeamPortals() so that it also returns
+	  the last sector we entered.
+	- Jorrit fixed a bug in the new iSector->HitBeamPortals() with
+	  regards to the final_sector.
+	- Jorrit added updated ambient shader from Erroroman/caedes which
+	  adds support for glow.
+	- Jorrit added new parallaxAtt shader from Erroroman.
+	- res changed "CS_STRICT_ALIGNMENT" from being defined on all but x86
+	  processors to be only defined on Sparc (where it was originally 
+	  needed).
+	- res fixed the GL renderer to repack csRGBcolor to an RGB bytestream
+	  on platforms that need it.
+	- Rhad added more robust error handling to the ALSA sound driver.
+	  This should correct some cases where the sound device was entering
+	  a bad state and never coming out when an underbuffer condition
+	  occurred.
+	- AndyDude fixed the url to demodata.zip to be the recent one.
+7-Jun-2006
+	- mdmkolbe made "separate debug info" default to disabled by default
+	  on Cygwin.  All released binutils to date have a bug in them which
+	  corrupts the output files when using separate debug info on Cygwin.
+	  See <http://www.mail-archive.com/bug-binutils@gnu.org/msg00687.html>.
+6-Jun-2006
+	- Vincent fixed leak-guard enabled build.
+	- Eric Sunshine added missing #include <new> to csutil/radixsort.h.
+5-Jun-2006
+	- res fixed createproject.sh to not copy cs_check_host.m4 any more
+	  (since it has moved).
+	- res fixed the Jam project template to utilize include custom.cslib.
+	- res changed the "separate debug info" and "optimize mode debug info"
+	  configure options to more appropriately use --enable-... instead of
+	  --with-...
+	- Marten fixed the interface and scfImplementation lines for sound
+	  sources.
+	- AndyDude fixed further spelling mistakes in (xmlfmt.txi).
+4-Jun-2006
+	- Marten made another fix to the quaternion class. Matrix->Quat->
+	  Matrix seems to yield the original matrix (within tolerable
+	  errors) for all tested matrices now.
+	- DaveG fixed csKeyEventHelper to initialize passed csKeyModifiers&
+	  to 0 when converting from a bit mask, to prevent undefined mods.
+	- iceeey worked more on the 'ice' CEGUI skin. It should be fairly
+	  complete now.
+	- Rhad changed csLoader::LoadSoundSysData() so that it creates the
+	  iSndSysData object with the filename as the description.
+	- mdmkolbe fixed Java detection under Cygwin.
+3-Jun-2006
+	- iceeey made some more changes to 'ice' CEGUI skin.
+	- Rhad updated the windows software sound driver (directsound)
+	  so that it should better detect and respond to underbuffer
+	  conditions.
+2-Jun-2006
+	- res fixed compilation of glshader_ps1 on gcc 3.3.
+	- Jorrit fixed two errors in the documentation as reported
+	  by schorsch_76 on the forums.
+	- iceeey added example of handling a CEGUI event to ceguitest.
+	- iceeey made various changes to the 'ice' CEGUI skin -- work
+	  in progress.
+	- AndyDude fixed the 'glosx2d' plugin to get proper bit-depth info.
+1-Jun-2006
+	- Jorrit fixed a bug in csMeshOnTexture where it would add the
+	  begindraw flags from the engine and this would prevent the
+	  persistent flag from working.
+	- res fixed building with gcc 4.1.1 on AMD64 by adding utilizing
+	  the -fPIC flag when testing for -shared.
+	- AndyDude fixed spelling mistakes in my additions (xmlfmt.txi).
+31-May-2006
+	- res tweaked the Thing lightmap loader to use a block allocator
+	  instead of a pool for the lightmap buffers.
+	- Marten fixed the quaternion class. The woman in flarge now looks
+	  normal, or at least as normal as before.
+30-May-2006
+	- res improved the debug facilities for the ATI_fragment_shader 
+	  support in glshader_ps1.
+	- res changed glshader_ps1 to use a plugin namespace.
+	- res fixed the software canvases to properly flip alpha component
+	  of colors again before before doing alpha-blended 2D ops.
+	- res changed the Thing lightmap loading to do somewhat less memory
+	  allocations.
+29-May-2006
+	- Jorrit mentioned the new location of Cal3d (gna.org) in the
+	  manual.
+	- Jorrit fixed a big performance problem in the opcode plugin.
+	  In some cases (i.e. flat surfaces) it would fall into a very
+	  bad loop when initialization colliders. This badly affected
+	  terrain since that is now initialization colliders constantly.
+	  Performance when moving on one particular spot in a test
+	  level I got went up from 0.2 to 23 fps.
+	- res fixed the software canvases to not strip the alpha component
+	  off colors before before doing alpha-blended 2D ops.
+	- res changed the Win32 custom cursor code to only create cursors with
+	  an alpha channel when the color depth is at least 24bpp.
+	- res tweaked dsplex to not recursively use itself in all cases.
+	- res tweaked the TGA loader to reject unusually large images. (TGAs
+	  don't have a "magic" file identifier, so it can happen that some
+	  random file is interpreted as a TGA image. So some heuristics to
+	  reject bogus "images" are needed.)
+	- res fixed a crash in the ddraw2d plugin when switching the double
+	  buffer mode while in a BeginDraw()/EndDraw().
+	- res changed fontplex to also use any available font server 
+	  automatically and not just those explicitly specified by the user.
+	  This behaviour is more like the other multiplexers.
+	- res changed picview so it really starts on the first file on startup
+	  and also skips over directories properly when seeking the next/prev
+	  image.
+	- res added a picview.cfg.
+	- res removed support for per-pass SVs from xmlshader.
+28-May-2006
+	- Jorrit copied some documentation out of the wiki into CS.
+	  Documentation contributed by 'adu'. He added the 'sounds'
+	  and 'variables' section to the XML map format documentation.
+	- Jorrit made stdrep more robust so it no longer crashes
+	  with empty lines. Apparently a SplitString() can return 0
+	  strings.
+	- Jorrit fixed bugplug so that it no longer outputs a useless
+	  empty string.
+	- Jorrit updated the features section in the manual a bit.
+	- res added material emission support to glshader_fixed. Closes bug
+	  (should've really been an RFE) #1396182.
+	- res reworded, reordered and somewhat compacted the feature list.
+	- Jorrit completed the portal container documentation.
+	- res changed iSyntaxService to let the various Write*() methods take
+	  const refs instead of pointers of the values to write.
+	- res moved cssynldr to new SCF.
 27-May-2006
 	- res fixed the delimIgnoreDifferent mode for 
 	  csStringArray::SplitString() to work as it should.

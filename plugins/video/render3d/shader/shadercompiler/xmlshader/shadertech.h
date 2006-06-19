@@ -76,13 +76,10 @@ private:
     csRenderBufferName defaultMappings[STREAMMAX];
     csArray<csStringID> custommapping_id;
     csDirtyAccessArray<csVertexAttrib> custommapping_attrib;
-    csDirtyAccessArray<csRef<csShaderVariable> > custommapping_variables;
     csArray<csRenderBufferName> custommapping_buffer;
 
     // texture mappings
     csStringID textureID[TEXTUREMAX];
-    csRef<csShaderVariable> textureRef[TEXTUREMAX];
-    csRef<csShaderVariable> autoAlphaTexRef;
     int textureCount;
 
     // programs
@@ -92,9 +89,6 @@ private:
 
     // writemasks
     bool wmRed, wmGreen, wmBlue, wmAlpha;
-
-    // variable context
-    csShaderVariableContext svcontext;
 
     csXMLShaderTech* owner;
   };
@@ -157,7 +151,7 @@ public:
   bool ActivatePass (size_t number);
   bool SetupPass  (const csRenderMesh *mesh,
     csRenderMeshModes& modes,
-    const csShaderVarStack &stacks);
+    const iShaderVarStack* stacks);
   bool TeardownPass();
   bool DeactivatePass();
 

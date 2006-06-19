@@ -866,7 +866,7 @@ void csInstmeshMeshObject::CastShadows (iMovable* movable, iFrustumView* fview)
 }
 
 void csInstmeshMeshObject::UpdateLightingOne (
-  const csReversibleTransform& trans, iLight* li)
+  const csReversibleTransform& /*trans*/, iLight* /*li*/)
 {
   //const csVector3* normals = fact_normals.GetArray ();
   //csColor4* colors = lit_fact_colors;
@@ -937,8 +937,8 @@ sr   mc   l    formula
 */
 
 void csInstmeshMeshObject::UpdateLighting (
-  const csArray<iLightSectorInfluence*>& lights,
-  iMovable* movable)
+  const csArray<iLightSectorInfluence*>& /*lights*/,
+  iMovable* /*movable*/)
 {
   //size_t i;
   //if (cur_movablenr != movable->GetUpdateNumber ())

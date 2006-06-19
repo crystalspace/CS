@@ -26,6 +26,7 @@
 #include "csutil/dirtyaccessarray.h"
 #include "csutil/flags.h"
 #include "csutil/scf.h"
+#include "csutil/scfarray.h"
 #include "csutil/xmltiny.h"
 #include "csgeom/sphere.h"
 
@@ -491,8 +492,8 @@ void csStencilShadowStep::DrawShadow (iRenderView* rview, iLight* light,
   // but just in case, no need to draw if no edges are drawn
   if (edge_start < index_range) 
   {
-    static csShaderVarStack stacks; // @@@ use STATIC macros
-    stacks.Empty ();
+    csRef<iShaderVarStack> stacks;
+    stacks.AttachNew (new scfArray<iShaderVarStack>);
 
     shadowCacheEntry->UpdateBuffers ();
     shmgr->PushVariables (stacks);
@@ -524,14 +525,14 @@ void csStencilShadowStep::DrawShadow (iRenderView* rview, iLight* light,
 }
 
 void csStencilShadowStep::Perform (iRenderView* /*rview*/, iSector* /*sector*/,
-  csShaderVarStack& /*stacks*/)
+  iShaderVarStack* /*stacks*/)
 {
   /// TODO: Report error (no light)
   return;
 }
 
 void csStencilShadowStep::Perform (iRenderView* rview, iSector* sector,
-	iLight* light, csShaderVarStack &stacks)
+	iLight* light, iShaderVarStack* stacks)
 {
   iShader* shadow;
   if (!enableShadows || ((shadow = type->GetShadow ()) == 0))

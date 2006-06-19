@@ -383,7 +383,7 @@ bool csFireSaver::WriteDown (iBase* obj, iDocumentNode* parent,
     mesh->GetColor(col);
     csRef<iDocumentNode> colorNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
     colorNode->SetValue("color");
-    synldr->WriteColor(colorNode, &col);
+    synldr->WriteColor(colorNode, col);
 
     //Writedown DropSize tag
     float dw, dh;
@@ -397,13 +397,13 @@ bool csFireSaver::WriteDown (iBase* obj, iDocumentNode* parent,
     csRef<iDocumentNode> originboxNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
     originboxNode->SetValue("originbox");
     csBox3 originbox = firestate->GetOrigin();
-    synldr->WriteBox(originboxNode, &originbox);
+    synldr->WriteBox(originboxNode, originbox);
 
     //Writedown Direction tag
     csRef<iDocumentNode> directionNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
     directionNode->SetValue("direction");
     csVector3 direction = firestate->GetDirection();
-    synldr->WriteVector(directionNode, &direction);
+    synldr->WriteVector(directionNode, direction);
 
     //Writedown Swirl tag
     float swirl = firestate->GetSwirl();

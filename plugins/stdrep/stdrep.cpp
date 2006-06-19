@@ -21,6 +21,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "csver.h"
 
 #include "csutil/event.h"
+#include "csutil/eventnames.h"
 #include "csutil/scf.h"
 #include "csutil/stringarray.h"
 #include "csutil/sysfunc.h"
@@ -330,9 +331,10 @@ bool csReporterListener::Report (iReporter*, int severity,
   }
 
   csStringArray lines;
-  size_t n = lines.SplitString (description, "\r\n", csStringArray::delimIgnoreDifferent);
+  size_t n = lines.SplitString (description, "\r\n",
+      csStringArray::delimIgnoreDifferent);
   for (size_t i = 0; i < n; i++)
-    WriteLine (severity, msgID, lines[i]);
+    WriteLine (severity, msgID, lines[i] ? lines[i] : "");
   return msg_remove[severity];
 }
 

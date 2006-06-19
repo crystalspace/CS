@@ -25,6 +25,7 @@
 #include "cstypes.h"
 #include "csutil/objreg.h"
 #include "csutil/event.h"
+#include "csutil/eventnames.h"
 #include "csutil/ref.h"
 #include "csutil/scf.h"
 #include "iengine/engine.h"
@@ -51,6 +52,9 @@
 // Pluginstuff
 CS_IMPLEMENT_PLUGIN
 
+CS_PLUGIN_NAMESPACE_BEGIN(ShaderManager)
+{
+
 SCF_IMPLEMENT_FACTORY (csShaderManager)
 
 void csNullShader::SelfDestruct ()
@@ -64,6 +68,7 @@ void csNullShader::SelfDestruct ()
 csShaderManager::csShaderManager(iBase* parent) : 
   scfImplementationType (this, parent)
 {
+  shaderVarStack.AttachNew (new scfArray<iShaderVarStack>);
   seqnumber = 0;
   eventSucc[0] = CS_HANDLERLIST_END;
   eventSucc[1] = CS_HANDLERLIST_END;
@@ -383,3 +388,6 @@ void csShaderManager::SetActiveLights (const csArray<iLight*>& lights)
   activeLights.Empty ();
   activeLights = lights;
 }
+
+}
+CS_PLUGIN_NAMESPACE_END(ShaderManager)

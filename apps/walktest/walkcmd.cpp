@@ -1213,11 +1213,11 @@ bool CommandHandler (const char *cmd, const char *arg)
   {
     csVector3 where = Sys->view->GetCamera ()->GetTransform ().This2Other (
     	3.0f*CS_VEC_FORWARD);
-    int pidx;
-    csVector3 isect;
-    iMeshWrapper* mesh = 
-      Sys->view->GetCamera ()->GetSector ()->HitBeamPortals (
-      Sys->view->GetCamera ()->GetTransform ().GetOrigin (), where, isect, &pidx);
+    csSectorHitBeamResult rc = Sys->view->GetCamera ()->GetSector ()
+    	->HitBeamPortals (
+	    Sys->view->GetCamera ()->GetTransform ().GetOrigin (), where);
+    int pidx = rc.polygon_idx;
+    iMeshWrapper* mesh = rc.mesh;
 
     if (mesh && pidx != -1)
     {

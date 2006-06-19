@@ -28,16 +28,19 @@
 #include "iutil/plugin.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
+
 #include <ft2build.h>
 #include FT_INTERNAL_OBJECTS_H
 #include FT_FREETYPE_H
 #include FT_GLYPH_H
 #include FT_MODULE_H
+
 #include "freefnt2.h"
 
 CS_IMPLEMENT_PLUGIN
 
-using namespace CS::Plugins::FreeFont2;
+CS_PLUGIN_NAMESPACE_BEGIN(FreeFont2)
+{
 
 SCF_IMPLEMENT_FACTORY (csFreeType2Server)
 
@@ -665,3 +668,5 @@ int csFreeType2Font::GetUnderlineThickness ()
   return underline_thickness;
 }
 
+}
+CS_PLUGIN_NAMESPACE_END(FreeFont2)

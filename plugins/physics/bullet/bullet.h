@@ -140,8 +140,8 @@ public:
 
   void Execute (iMeshWrapper* mesh, csOrthoTransform& t);
   void Execute (csOrthoTransform& t);
-  void Execute (iLight* light, csOrthoTransform& t){;}
-  void Execute (iCamera* camera, csOrthoTransform& t) {;}
+  void Execute (iLight*, csOrthoTransform&) {}
+  void Execute (iCamera*, csOrthoTransform&) {}
 };
 
 class	MyMotionState : public PHY_IMotionState
@@ -288,9 +288,9 @@ public:
   csRef<iDynamicsSystemCollider> GetCollider (unsigned int index);
   int GetColliderCount ();
 
-  void AttachLight (iLight* light) {;};
+  void AttachLight (iLight*) {};
   iLight* GetAttachedLight () {return NULL;}
-  void AttachCamera (iCamera* camera) {;}
+  void AttachCamera (iCamera*) {}
   iCamera* GetAttachedCamera (){return NULL;}
 
 protected:

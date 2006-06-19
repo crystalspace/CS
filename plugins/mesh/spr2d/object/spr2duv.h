@@ -21,20 +21,24 @@
 
 #include "imesh/sprite2d.h"
 #include "csutil/array.h"
+#include "csutil/csstring.h"
+#include "csutil/scf_implementation.h"
 #include "csgeom/vector2.h"
 
-class csSprite2DUVAnimationFrame : public iSprite2DUVAnimationFrame
+CS_PLUGIN_NAMESPACE_BEGIN(Spr2D)
+{
+
+class csSprite2DUVAnimationFrame : 
+  public scfImplementation1<csSprite2DUVAnimationFrame, 
+                            iSprite2DUVAnimationFrame>
 {
  protected:
-  char *name;
+  csString name;
   int duration;
   typedef csDirtyAccessArray<csVector2> UVArray;
   UVArray vCoo;
 
  public:
-  SCF_DECLARE_IBASE;
-
-
   csSprite2DUVAnimationFrame (iBase*);
   virtual ~csSprite2DUVAnimationFrame ();
 
@@ -90,10 +94,12 @@ class csSprite2DUVAnimationFrame : public iSprite2DUVAnimationFrame
   virtual void SetDuration (int duration);
 };
 
-class csSprite2DUVAnimation : public iSprite2DUVAnimation
+class csSprite2DUVAnimation : 
+  public scfImplementation1<csSprite2DUVAnimation, 
+                            iSprite2DUVAnimation>
 {
 protected:
-  char *name;
+  csString name;
 
   class frameVector : public csArray<csSprite2DUVAnimationFrame*>
   {
@@ -115,8 +121,6 @@ protected:
   frameVector vFrames;
 
 public:
-  SCF_DECLARE_IBASE;
-
   csSprite2DUVAnimation (iBase*);
   virtual ~csSprite2DUVAnimation ();
 
@@ -161,5 +165,8 @@ public:
   virtual void RemoveFrame (int idx);
 
 };
+
+}
+CS_PLUGIN_NAMESPACE_END(Spr2D)
 
 #endif // __CS_SPR2D_UV_ANIMATION_H__

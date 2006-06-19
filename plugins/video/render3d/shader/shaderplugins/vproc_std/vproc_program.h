@@ -49,7 +49,7 @@ public:
   /// Setup states needed for proper operation of the shader
   virtual void SetupState (const csRenderMesh* mesh,
                            csRenderMeshModes& modes,
-                           const csShaderVarStack &stacks);
+                           const iShaderVarStack* stacks);
 
   /// Reset states to original
   virtual void ResetState ();
@@ -111,7 +111,8 @@ private:
   bool ParseLightMixMode (iDocumentNode* child, LightMixmode& mixmode);
   bool ParseBufferName (iDocumentNode* child, BufferName& name);
   iRenderBuffer* GetBuffer (const BufferName& name,
-    csRenderMeshModes& modes, const csShaderVarStack &stacks);
+    csRenderMeshModes& modes, 
+    const iArrayReadOnly<csShaderVariable*>* stacks);
 };
 
 }

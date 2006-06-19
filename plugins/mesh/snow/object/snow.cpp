@@ -65,7 +65,8 @@ void csSnowMeshObject::SetupObject ()
     for (i=0 ; i < number ; i++)
     {
       AppendRectSprite (drop_width, drop_height, mat, lighted_particles);
-      GetParticle (i)->SetMixMode (MixMode);
+      csRef<iMeshObject> meshobj = scfQueryInterface<iMeshObject> (GetParticle (i));
+      meshobj->SetMixMode (MixMode);
       pos = GetRandomDirection (size, rainbox.Min ()) ;
       GetParticle (i)->SetPosition (pos);
       part_pos[i] = pos;

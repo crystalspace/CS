@@ -20,6 +20,7 @@
 #include <math.h>
 #include "csgeom/plane3.h"
 #include "csgeom/math3d.h"
+#include "csutil/csstring.h"
 #include "csutil/dirtyaccessarray.h"
 
 //---------------------------------------------------------------------------

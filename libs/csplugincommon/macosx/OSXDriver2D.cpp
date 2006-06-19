@@ -15,6 +15,7 @@
 #include "ivaria/reporter.h"
 #include "csver.h"
 #include "csutil/event.h"
+#include "csutil/eventnames.h"
 
 #include "csplugincommon/macosx/OSXDriver2D.h"
 

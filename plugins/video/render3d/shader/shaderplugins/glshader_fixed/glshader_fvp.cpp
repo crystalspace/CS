@@ -67,7 +67,7 @@ const uint tuFlags = csGLStateCache::activateMatrix
 
 void csGLShaderFVP::SetupState (const csRenderMesh* /*mesh*/, 
                                 csRenderMeshModes& /*modes*/,
-				const csShaderVarStack &stacks)
+				const iShaderVarStack* stacks)
 {
   size_t i;
 
@@ -76,7 +76,8 @@ void csGLShaderFVP::SetupState (const csRenderMesh* /*mesh*/,
   if (do_lighting)
   {
     csVector4 v;
-    const csVector4 zero (0);
+    const csVector4 zero (0, 0, 0, 1);
+    const csVector4 one (1);
 
     for(i = 0; i < lights.Length(); ++i)
     {
@@ -111,11 +112,12 @@ void csGLShaderFVP::SetupState (const csRenderMesh* /*mesh*/,
       glLightfv (glLight, GL_SPOT_DIRECTION, (float*)&v);
     }
 
-    const csVector4 one (1);
     v = GetParamVectorVal (stacks, matAmbient, one);
     glMaterialfv (GL_FRONT_AND_BACK, GL_AMBIENT, (float*)&v);
     v = GetParamVectorVal (stacks, matDiffuse, one);
     glMaterialfv (GL_FRONT_AND_BACK, GL_DIFFUSE, (float*)&v);
+    v = GetParamVectorVal (stacks, matEmission, zero);
+    glMaterialfv (GL_FRONT_AND_BACK, GL_EMISSION, (float*)&v);
     v = GetParamVectorVal (stacks, matSpecular, zero);
     glMaterialfv (GL_FRONT_AND_BACK, GL_SPECULAR, (float*)&v);
     float f = GetParamFloatVal (stacks, matSpecularExp, 0);
@@ -917,13 +919,18 @@ bool csGLShaderFVP::Load(iShaderDestinationResolver* resolve,
 	    }
 	  }
 	  break;
+	case XMLTOKEN_MATAMBIENT:
+	  if (!ParseProgramParam (child, matAmbient,
+	    ParamVector | ParamShaderExp))
+	    return false;
+	  break;
 	case XMLTOKEN_MATDIFFUSE:
 	  if (!ParseProgramParam (child, matDiffuse,
 	    ParamVector | ParamShaderExp))
 	    return false;
 	  break;
-	case XMLTOKEN_MATAMBIENT:
-	  if (!ParseProgramParam (child, matAmbient,
+	case XMLTOKEN_MATEMISSION:
+	  if (!ParseProgramParam (child, matEmission,
 	    ParamVector | ParamShaderExp))
 	    return false;
 	  break;

@@ -19,7 +19,7 @@
 #ifndef __CS_CSJOYWIN_H__
 #define __CS_CSJOYWIN_H__
 
-#include "csutil/scf.h"
+#include "csutil/scf_implementation.h"
 #include "iutil/event.h"
 #include "iutil/eventh.h"
 #include "iutil/eventq.h"

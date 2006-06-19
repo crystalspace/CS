@@ -19,7 +19,7 @@
 #ifndef __CS_IUTIL_EVENTHANDLERS_H__
 #define __CS_IUTIL_EVENTHANDLERS_H__
 
-#include "csutil/strset.h"
+#include "csutil/hash.h"
 
 /**\file
  * General event handler naming, name management, indexing, and instantiation interface.

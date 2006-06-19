@@ -636,7 +636,7 @@ void csPolygonRenderer::BufferAccessor::PreGetBuffer (
 	  CS_ASSERT((lmX >= 0) && (lmX < lmW));
 	  int lmY = (int)l.y;
 	  CS_ASSERT((lmY >= 0) && (lmY < lmH));
-	  csRGBpixel& lmp = finalLM[lmY * lmW + lmX];
+	  csRGBcolor& lmp = finalLM[lmY * lmW + lmX];
 	  colors->Set (
 	    lmp.red / 255.0f, lmp.green / 255.0f, lmp.blue / 255.0f);
 	  colors++;

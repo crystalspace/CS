@@ -344,7 +344,7 @@ bool csNullFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent,
     nullfact->GetBoundingBox(box);
     csRef<iDocumentNode> boxNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
     boxNode->SetValue ("box");
-    synldr->WriteBox(boxNode, &box);
+    synldr->WriteBox(boxNode, box);
 
     //Writedown Radius tag
     float radius = nullfact->GetRadius();
@@ -512,7 +512,7 @@ bool csNullMeshSaver::WriteDown (iBase* obj, iDocumentNode* parent,
     {
       csRef<iDocumentNode> boxNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
       boxNode->SetValue("box");
-      synldr->WriteBox(boxNode, &box);
+      synldr->WriteBox(boxNode, box);
     }
 
     //Writedown Radius tag

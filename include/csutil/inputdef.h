@@ -29,6 +29,7 @@
 
 #include "csutil/csstring.h"
 #include "csutil/comparator.h"
+#include "csutil/eventnames.h"
 #include "csutil/hash.h"
 
 #include "iutil/evdefs.h"
