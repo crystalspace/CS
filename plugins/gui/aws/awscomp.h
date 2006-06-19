@@ -376,7 +376,7 @@ public:
   virtual unsigned int Flags ();
 
   /// Returns true if this window overlaps the given rect.
-  virtual bool Overlaps (csRect &r);
+  virtual bool Overlaps (const csRect &r);
 
   /// Returns the state of the hidden flag.
   virtual bool isHidden ();

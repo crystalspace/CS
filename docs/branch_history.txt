@@ -10,6 +10,7 @@ chronological order.
 	- res added functions cs_malloc() etc. that always resolve to the same
 	  allocation functions CS uses. Also replaced malloc with cs_malloc in
 	  CS itself.
+	- res fixed fallout from the csRectRegion change.
 18-Jun-2006
 	- res added conveniance includes to disable/enable CS' 'new' and 
 	  'delete' overrides when the memtracker is enabled.

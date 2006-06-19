@@ -515,7 +515,7 @@ void awsWindow::OnDraw (csRect clip)
     r.xmax -= insets.xmax;
     r.ymax -= insets.ymax;
     csRectRegion reg;
-    reg.makeEmpty();
+    reg.MakeEmpty();
     if (!r.IsEmpty())
       frame_drawer.Draw(r, fsSunken, Frame(), Frame(), &reg);
   }
