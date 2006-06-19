@@ -60,6 +60,8 @@
 #include "csutil/cssubscription.h"
 #include "csutil/csuctransform.h"
 #include "csutil/csunicode.h"
+#include "csutil/custom_new_disable.h"
+#include "csutil/custom_new_enable.h"
 #include "csutil/databuf.h"
 #include "csutil/debug.h"
 #include "csutil/dirtyaccessarray.h"

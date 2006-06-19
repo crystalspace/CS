@@ -2257,7 +2257,7 @@ sub DESTROY {
 *ClipTo = *cspacec::csRectRegion_ClipTo;
 *Count = *cspacec::csRectRegion_Count;
 *RectAt = *cspacec::csRectRegion_RectAt;
-*makeEmpty = *cspacec::csRectRegion_makeEmpty;
+*MakeEmpty = *cspacec::csRectRegion_MakeEmpty;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -15489,7 +15489,6 @@ my %__iSCF_SCF_hash;
 tie %__iSCF_SCF_hash,"cspace::iSCF", $cspacec::iSCF_SCF;
 $iSCF_SCF= \%__iSCF_SCF_hash;
 bless $iSCF_SCF, cspace::iSCF;
-*FRAGMENT_BUFFER_SIZE = *cspacec::FRAGMENT_BUFFER_SIZE;
 *aws_debug = *cspacec::aws_debug;
 *AWSF_AlwaysEraseWindows = *cspacec::AWSF_AlwaysEraseWindows;
 *AWSF_AlwaysRedrawWindows = *cspacec::AWSF_AlwaysRedrawWindows;
