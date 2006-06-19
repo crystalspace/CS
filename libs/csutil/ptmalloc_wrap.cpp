@@ -48,18 +48,9 @@ CS_FORCEINLINE static CookieType CookieSwap (CookieType x)
 {
   return csSwapBytes::UInt32 (x);
 }
-static CookieType GetCookie (void* p)
+CS_FORCEINLINE static CookieType GetCookie (void* p)
 {
-  while (cookie == 0)
-  {
-    time_t T;
-    // Semi-random
-    time (&T);
-    cookie = uint32(T);
-    // Make somewhat unique
-    cookie = cookie ^ (CookieType)((intptr_t)&cookie);
-  }
-  return cookie ^ CookieType (intptr_t (p));
+  return CookieType (intptr_t (&cookie) ^ intptr_t (p));
 }
 #endif
 
