@@ -26,16 +26,16 @@
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "csutil/strhash.h"
+#include "csutil/scf_implementation.h"
 
-struct iEngine;
-struct iPluginManager;
 struct iObjectRegistry;
 struct iReporter;
 
 /**
  * Snow factory loader.
  */
-class csSnowFactoryLoader : public iLoaderPlugin
+class csSnowFactoryLoader :
+  public scfImplementation2<csSnowFactoryLoader, iLoaderPlugin, iComponent>
 {
 private:
   iObjectRegistry* object_reg;
@@ -49,34 +49,22 @@ public:
 
   bool Initialize (iObjectRegistry* p);
 
-public:
   //------------------------ iLoaderPlugin implementation --------------
-  SCF_DECLARE_IBASE;
-
   /// Parse a given node and return a new object for it.
   virtual csPtr<iBase> Parse (iDocumentNode* node,
     iStreamSource*, iLoaderContext* ldr_context, iBase* context);
-
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csSnowFactoryLoader);
-    virtual bool Initialize (iObjectRegistry* p)
-    { return scfParent->Initialize (p); }
-  } scfiComponent;
-  friend struct eiComponent;
 };
 
 /**
  * Snow factory saver.
  */
-class csSnowFactorySaver : public iSaverPlugin
+class csSnowFactorySaver :
+  public scfImplementation2<csSnowFactorySaver, iSaverPlugin, iComponent>
 {
 private:
   iObjectRegistry* object_reg;
 
 public:
-  SCF_DECLARE_IBASE;
-
   /// Constructor.
   csSnowFactorySaver (iBase*);
 
@@ -88,20 +76,13 @@ public:
   /// Write down given object and add to iDocumentNode.
   virtual bool WriteDown (iBase *obj, iDocumentNode* parent,
   	iStreamSource*);
-
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csSnowFactorySaver);
-    virtual bool Initialize (iObjectRegistry* p)
-    { return scfParent->Initialize (p); }
-  } scfiComponent;
-  friend struct eiComponent;
 };
 
 /**
  * Snow loader.
  */
-class csSnowLoader : public iLoaderPlugin
+class csSnowLoader :
+  public scfImplementation2<csSnowLoader, iLoaderPlugin, iComponent>
 {
 private:
   iObjectRegistry* object_reg;
@@ -110,8 +91,6 @@ private:
   csStringHash xmltokens;
 
 public:
-  SCF_DECLARE_IBASE;
-
   /// Constructor.
   csSnowLoader (iBase*);
 
@@ -123,28 +102,19 @@ public:
   /// Parse a given node and return a new object for it.
   virtual csPtr<iBase> Parse (iDocumentNode* node,
     iStreamSource*, iLoaderContext* ldr_context, iBase* context);
-
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csSnowLoader);
-    virtual bool Initialize (iObjectRegistry* p)
-    { return scfParent->Initialize (p); }
-  } scfiComponent;
-  friend struct eiComponent;
 };
 
 /**
  * Snow saver.
  */
-class csSnowSaver : public iSaverPlugin
+class csSnowSaver :
+  public scfImplementation2<csSnowSaver, iSaverPlugin, iComponent>
 {
 private:
   iObjectRegistry* object_reg;
   csRef<iSyntaxService> synldr;
 
 public:
-  SCF_DECLARE_IBASE;
-
   /// Constructor.
   csSnowSaver (iBase*);
 
@@ -156,14 +126,6 @@ public:
   /// Write down given object and add to iDocumentNode.
   virtual bool WriteDown (iBase *obj, iDocumentNode* parent,
   	iStreamSource*);
-
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csSnowSaver);
-    virtual bool Initialize (iObjectRegistry* p)
-    { return scfParent->Initialize (p); }
-  } scfiComponent;
-  friend struct eiComponent;
 };
 
 #endif // __CS_SNOWLDR_H__

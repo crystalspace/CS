@@ -21,12 +21,15 @@
 
 #include "csplugincommon/particlesys/particle.h"
 #include "imesh/rain.h"
+#include "csutil/scf_implementation.h"
 
 /**
  * A rain particle system. Particles start falling down.
  * Since speed if fixed due to air friction, this is not a NewtonianPartSys.
  */
-class csRainMeshObject : public csNewParticleSystem
+class csRainMeshObject :
+  public scfImplementationExt1<csRainMeshObject, csNewParticleSystem,
+    iRainState>
 {
 protected:
   /// falling speed
@@ -45,7 +48,7 @@ public:
   /// spread rain particles throughout the rain box
   void Spread (int first, int limit);
 
-  /// iRainState functions
+  //------------------------- iRainState implementation ----------------
   void SetParticleCount (int num);
   void SetDropSize (float dropwidth, float dropheight);
   void SetBox (const csVector3& minbox, const csVector3& maxbox);
@@ -57,38 +60,11 @@ public:
   void SetCollisionDetection (bool cd);
   bool GetCollisionDetection () const;
 
-  SCF_DECLARE_IBASE_EXT (csNewParticleSystem);
-
-  //------------------------- iRainState implementation ----------------
-  class RainState : public iRainState
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csRainMeshObject);
-    virtual void SetParticleCount (int num)
-    { scfParent->SetParticleCount (num); }
-    virtual void SetDropSize (float dropwidth, float dropheight)
-    { scfParent->SetDropSize (dropwidth, dropheight); }
-    virtual void SetBox (const csVector3& minbox, const csVector3& maxbox)
-    { scfParent->SetBox (minbox, maxbox); }
-    virtual void SetLighting (bool l)
-    { scfParent->SetLighting (l); }
-    virtual void SetFallSpeed (const csVector3& fspeed)
-    { scfParent->SetFallSpeed (fspeed); }
-    virtual int GetParticleCount () const
-    { return scfParent->ParticleCount; }
-    virtual void GetDropSize (float& dropwidth, float& dropheight) const
-    { scfParent->GetDropSize(dropwidth, dropheight); }
-    virtual void GetBox (csVector3& minbox, csVector3& maxbox) const
-    { scfParent->GetBox(minbox, maxbox); }
-    virtual bool GetLighting () const
-    { return scfParent->GetLighting(); }
-    virtual const csVector3& GetFallSpeed () const
-    { return scfParent->GetFallSpeed(); }
-    virtual void SetCollisionDetection(bool cd)
-    { scfParent->SetCollisionDetection(cd); };
-    virtual bool GetCollisionDetection() const
-    { return scfParent->GetCollisionDetection(); };
-  } scfiRainState;
-  friend class RainState;
+  // Redirect these functions to csNewParticleSystem
+  virtual void SetLighting (bool l)
+  { csNewParticleSystem::SetLighting (l); }
+  virtual bool GetLighting () const
+  { return csNewParticleSystem::GetLighting(); }
 };
 
 #endif // __CS_RAIN_H__

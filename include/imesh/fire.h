@@ -24,22 +24,21 @@
  * Fire particle mesh object
  */ 
 
-#include "csutil/scf.h"
+#include "csutil/scf_interface.h"
 
 /**\addtogroup meshplugins
  * @{ */
 
 class csBox3;
-class csColor;
 class csVector3;
-
-SCF_VERSION (iFireState, 0, 0, 1);
 
 /**
  * This interface describes the API for the fire mesh object.
  */
-struct iFireState : public iBase
+struct iFireState : public virtual iBase
 {
+  SCF_INTERFACE(iFireState, 2, 0, 0);
+
   /// Set the number of particles to use.
   virtual void SetParticleCount (int num) = 0;
   /// Get the number of particles.

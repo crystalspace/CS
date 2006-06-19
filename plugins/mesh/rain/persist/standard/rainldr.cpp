@@ -58,58 +58,18 @@ enum
   XMLTOKEN_BOX
 };
 
-SCF_IMPLEMENT_IBASE (csRainFactoryLoader)
-  SCF_IMPLEMENTS_INTERFACE (iLoaderPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csRainFactoryLoader::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csRainFactorySaver)
-  SCF_IMPLEMENTS_INTERFACE (iSaverPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csRainFactorySaver::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csRainLoader)
-  SCF_IMPLEMENTS_INTERFACE (iLoaderPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csRainLoader::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csRainSaver)
-  SCF_IMPLEMENTS_INTERFACE (iSaverPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csRainSaver::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 SCF_IMPLEMENT_FACTORY (csRainFactoryLoader)
 SCF_IMPLEMENT_FACTORY (csRainFactorySaver)
 SCF_IMPLEMENT_FACTORY (csRainLoader)
 SCF_IMPLEMENT_FACTORY (csRainSaver)
 
-
-csRainFactoryLoader::csRainFactoryLoader (iBase* pParent)
+csRainFactoryLoader::csRainFactoryLoader (iBase* pParent) :
+  scfImplementationType(this, pParent)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 csRainFactoryLoader::~csRainFactoryLoader ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csRainFactoryLoader::Initialize (iObjectRegistry* object_reg)
@@ -129,16 +89,13 @@ csPtr<iBase> csRainFactoryLoader::Parse (iDocumentNode* /*node*/,
 }
 
 //---------------------------------------------------------------------------
-csRainFactorySaver::csRainFactorySaver (iBase* pParent)
+csRainFactorySaver::csRainFactorySaver (iBase* pParent):
+  scfImplementationType(this, pParent)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 csRainFactorySaver::~csRainFactorySaver ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csRainFactorySaver::Initialize (iObjectRegistry* object_reg)
@@ -157,16 +114,13 @@ bool csRainFactorySaver::WriteDown (iBase* /*obj*/, iDocumentNode* parent,
 }
 //---------------------------------------------------------------------------
 
-csRainLoader::csRainLoader (iBase* pParent)
+csRainLoader::csRainLoader (iBase* pParent):
+  scfImplementationType(this, pParent)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 csRainLoader::~csRainLoader ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csRainLoader::Initialize (iObjectRegistry* object_reg)
@@ -310,16 +264,13 @@ csPtr<iBase> csRainLoader::Parse (iDocumentNode* node,
 
 //---------------------------------------------------------------------------
 
-csRainSaver::csRainSaver (iBase* pParent)
+csRainSaver::csRainSaver (iBase* pParent):
+  scfImplementationType(this, pParent)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 csRainSaver::~csRainSaver ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csRainSaver::Initialize (iObjectRegistry* object_reg)

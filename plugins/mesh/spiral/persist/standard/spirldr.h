@@ -26,23 +26,21 @@
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "csutil/strhash.h"
+#include "csutil/scf_implementation.h"
 
-struct iEngine;
-struct iPluginManager;
 struct iObjectRegistry;
 struct iReporter;
 
 /**
  * Spiral factory loader.
  */
-class csSpiralFactoryLoader : public iLoaderPlugin
+class csSpiralFactoryLoader :
+  public scfImplementation2<csSpiralFactoryLoader, iLoaderPlugin, iComponent>
 {
 private:
   iObjectRegistry* object_reg;
 
 public:
-  SCF_DECLARE_IBASE;
-
   /// Constructor.
   csSpiralFactoryLoader (iBase*);
 
@@ -54,27 +52,18 @@ public:
   /// Parse a given node and return a new object for it.
   virtual csPtr<iBase> Parse (iDocumentNode* node,
     iStreamSource*, iLoaderContext* ldr_context, iBase* context);
-
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csSpiralFactoryLoader);
-    virtual bool Initialize (iObjectRegistry* p)
-    { return scfParent->Initialize (p); }
-  } scfiComponent;
-  friend struct eiComponent;
 };
 
 /**
  * Spiral factory saver.
  */
-class csSpiralFactorySaver : public iSaverPlugin
+class csSpiralFactorySaver :
+  public scfImplementation2<csSpiralFactorySaver, iSaverPlugin, iComponent>
 {
 private:
   iObjectRegistry* object_reg;
 
 public:
-  SCF_DECLARE_IBASE;
-
   /// Constructor.
   csSpiralFactorySaver (iBase*);
 
@@ -86,20 +75,13 @@ public:
   /// Write down given object and add to iDocumentNode.
   virtual bool WriteDown (iBase *obj, iDocumentNode* parent,
   	iStreamSource*);
-
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csSpiralFactorySaver);
-    virtual bool Initialize (iObjectRegistry* p)
-    { return scfParent->Initialize (p); }
-  } scfiComponent;
-  friend struct eiComponent;
 };
 
 /**
  * Spiral loader.
  */
-class csSpiralLoader : public iLoaderPlugin
+class csSpiralLoader :
+  public scfImplementation2<csSpiralLoader, iLoaderPlugin, iComponent>
 {
 private:
   iObjectRegistry* object_reg;
@@ -108,8 +90,6 @@ private:
   csStringHash xmltokens;
 
 public:
-  SCF_DECLARE_IBASE;
-
   /// Constructor.
   csSpiralLoader (iBase*);
 
@@ -121,28 +101,19 @@ public:
   /// Parse a given node and return a new object for it.
   virtual csPtr<iBase> Parse (iDocumentNode* node,
     iStreamSource*, iLoaderContext* ldr_context, iBase* context);
-
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csSpiralLoader);
-    virtual bool Initialize (iObjectRegistry* p)
-    { return scfParent->Initialize (p); }
-  } scfiComponent;
-  friend struct eiComponent;
 };
 
 /**
  * Spiral saver.
  */
-class csSpiralSaver : public iSaverPlugin
+class csSpiralSaver :
+  public scfImplementation2<csSpiralSaver, iSaverPlugin, iComponent>
 {
 private:
   iObjectRegistry* object_reg;
   csRef<iSyntaxService> synldr;
 
 public:
-  SCF_DECLARE_IBASE;
-
   /// Constructor.
   csSpiralSaver (iBase*);
 
@@ -154,14 +125,6 @@ public:
   /// Write down given object and add to iDocumentNode.
   virtual bool WriteDown (iBase *obj, iDocumentNode* parent,
   	iStreamSource*);
-
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csSpiralSaver);
-    virtual bool Initialize (iObjectRegistry* p)
-    { return scfParent->Initialize (p); }
-  } scfiComponent;
-  friend struct eiComponent;
 };
 
 #endif // __CS_SPIRALLDR_H__

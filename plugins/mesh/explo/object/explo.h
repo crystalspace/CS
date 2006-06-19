@@ -23,6 +23,7 @@
 #include "csgeom/box.h"
 #include "csutil/cscolor.h"
 #include "csutil/refarr.h"
+#include "csutil/scf_implementation.h"
 #include "csplugincommon/particlesys/partgen.h"
 #include "imesh/explode.h"
 #include "iutil/eventh.h"
@@ -36,7 +37,9 @@ struct iEngine;
  * An explosive particle system.
  * particles explode outward from defined center.
  */
-class csExploMeshObject : public csNewtonianParticleSystem
+class csExploMeshObject :
+  public scfImplementationExt1<csExploMeshObject, csNewtonianParticleSystem,
+    iExplosionState>
 {
 protected:
   /// Center of explosion.
@@ -72,6 +75,8 @@ public:
   csExploMeshObject (iObjectRegistry* object_reg, iMeshObjectFactory* factory);
   /// Destructor.
   virtual ~csExploMeshObject ();
+
+  //------------------------- iExplosionState implementation ----------------
 
   /// Set the number of particles to use.
   virtual void SetParticleCount (int num)
@@ -171,101 +176,13 @@ public:
   /// For iMeshObject.
   virtual void HardTransform (const csReversibleTransform& t);
   virtual bool SupportsHardTransform () const { return true; }
-
-  SCF_DECLARE_IBASE_EXT (csParticleSystem);
-
-  //------------------------- iExplosionState implementation ----------------
-  class ExplosionState : public iExplosionState
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csExploMeshObject);
-    virtual void SetParticleCount (int num)
-    {
-      scfParent->SetParticleCount (num);
-    }
-    virtual int GetParticleCount () const
-    {
-      return scfParent->GetParticleCount();
-    }
-    virtual void SetCenter (const csVector3& center)
-    {
-      scfParent->SetCenter (center);
-    }
-    virtual const csVector3 &GetCenter () const
-    {
-      return scfParent->GetCenter ();
-    }
-    virtual void SetLighting (bool l)
-    {
-      scfParent->SetLighting (l);
-    }
-    virtual bool GetLighting () const
-    {
-      return scfParent->GetLighting ();
-    }
-    virtual void SetPush (const csVector3& push)
-    {
-      scfParent->SetPush (push);
-    }
-    virtual const csVector3 &GetPush () const
-    {
-      return scfParent->GetPush ();
-    }
-    virtual void SetNrSides (int nr_sides)
-    {
-      scfParent->SetNrSides (nr_sides);
-    }
-    virtual int GetNrSides () const
-    {
-      return scfParent->GetNrSides();
-    }
-    virtual void SetPartRadius (float part_radius)
-    {
-      scfParent->SetPartRadius (part_radius);
-    }
-    virtual float GetPartRadius () const
-    {
-      return scfParent->GetPartRadius ();
-    }
-    virtual void SetSpreadPos (float spread_pos)
-    {
-      scfParent->SetSpreadPos (spread_pos);
-    }
-    virtual float GetSpreadPos () const
-    {
-      return scfParent->GetSpreadPos ();
-    }
-    virtual void SetSpreadSpeed (float spread_speed)
-    {
-      scfParent->SetSpreadSpeed (spread_speed);
-    }
-    virtual float GetSpreadSpeed () const
-    {
-      return scfParent->GetSpreadSpeed ();
-    }
-    virtual void SetSpreadAcceleration (float spread_accel)
-    {
-      scfParent->SetSpreadAcceleration (spread_accel);
-    }
-    virtual float GetSpreadAcceleration () const
-    {
-      return scfParent->GetSpreadAcceleration ();
-    }
-    virtual void SetFadeSprites (csTicks fade_time)
-    {
-      scfParent->SetFadeSprites (fade_time);
-    }
-    virtual bool GetFadeSprites (csTicks& fade_time) const
-    {
-      return scfParent->GetFadeSprites (fade_time);
-    }
-  } scfiExplosionState;
-  friend class ExplosionState;
 };
 
 /**
  * Factory for explosions.
  */
-class csExploMeshObjectFactory : public iMeshObjectFactory
+class csExploMeshObjectFactory :
+  public scfImplementation1<csExploMeshObjectFactory, iMeshObjectFactory>
 {
 private:
   iObjectRegistry* object_reg;
@@ -282,8 +199,6 @@ public:
   virtual ~csExploMeshObjectFactory ();
 
   //------------------------ iMeshObjectFactory implementation --------------
-  SCF_DECLARE_IBASE;
-
   virtual csFlags& GetFlags () { return flags; }
   virtual csPtr<iMeshObject> NewInstance ();
   virtual csPtr<iMeshObjectFactory> Clone () { return 0; }
@@ -305,14 +220,14 @@ public:
  * Explosion type. This is the plugin you have to use to create instances
  * of csExploMeshObjectFactory.
  */
-class csExploMeshObjectType : public iMeshObjectType
+class csExploMeshObjectType :
+  public scfImplementation2<csExploMeshObjectType,
+    iMeshObjectType, iComponent>
 {
 private:
   iObjectRegistry* object_reg;
 
 public:
-  SCF_DECLARE_IBASE;
-
   /// Constructor.
   csExploMeshObjectType (iBase*);
   /// Destructor.
@@ -320,13 +235,9 @@ public:
   /// Draw.
   virtual csPtr<iMeshObjectFactory> NewFactory ();
 
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csExploMeshObjectType);
-    virtual bool Initialize (iObjectRegistry* p)
-    { scfParent->object_reg = p; return true; }
-  } scfiComponent;
-  friend struct eiComponent;
+  //------------------------ iComponent implementation --------------
+  virtual bool Initialize (iObjectRegistry* p)
+  { this->object_reg = p; return true; }
 };
 
 #endif // __CS_EXPLOSION_H__
