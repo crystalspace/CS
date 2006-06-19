@@ -29,6 +29,8 @@ chronological order.
           documentation.
 	- res changed the configure optimization flag detection to try
 	  -march=prescott before -march=i686 on Intel Macs.
+	- res excluded the custom new enabling/disabling headers from the
+	  master headers.
 18-Jun-2006
         - Arianna fixed some warnings: size_t/uint conversions and some
           deprecated method.
