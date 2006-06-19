@@ -64,7 +64,8 @@ protected:
     csArray<csGradientShade> >
   {
     scfGradientShadesArray (csGradient* parent) : 
-      scfArrayWrapConst (parent->shades, parent) {}
+      scfArrayWrapConst<iGradientShades, csArray<csGradientShade> > (
+      	parent->shades, parent) {}
   };
 public:
   /// Construct an empty gradient.
