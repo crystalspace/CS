@@ -23,6 +23,8 @@ chronological order.
 	  dialog boxes.
 	- David H. Bronke fixed an error in libs/csutil/eventhandlers.cpp where a
 	  const char* was being used as a csString.
+	- David H. Bronke committed a patch by lindquist to fix the CEGUI plugin
+	  for the latest SVN version of CEGUI.
 19-Jun-2006
 	- Philip Wyett made Quick Start more explanatory for the CS newcomers.
 	- res changed csRectRegion to use a csArray<> for rectangle storage.
