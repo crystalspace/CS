@@ -956,8 +956,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
 
   if (!csInitializer::SetupConfigManager (object_reg, iConfigName))
   {
-    Report (CS_REPORTER_SEVERITY_ERROR, "Failed to initialize config!");
-    Report (CS_REPORTER_SEVERITY_ERROR,
+    Report (CS_REPORTER_SEVERITY_ERROR, "Failed to initialize config!\n"
       " (A common cause is the CRYSTAL environment variable "
       "not being set correctly.)");
     return false;

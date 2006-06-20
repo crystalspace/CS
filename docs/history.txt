@@ -19,6 +19,8 @@ chronological order.
         - Philip Wyett corrected a copy and paste error he made in documents.
         - Philip Wyett edited Jorrits genesis for the youngsters to let
           them know that comp.graphics.algoritms is a newsgroup.
+	- mdmkolbe tweaked the previous message change for compatibility with
+	  dialog boxes.
 19-Jun-2006
 	- Philip Wyett made Quick Start more explanatory for the CS newcomers.
 	- res changed csRectRegion to use a csArray<> for rectangle storage.
