@@ -13,6 +13,7 @@ chronological order.
 	    - plugins/mesh/genmesh/
 	    - plugins/mesh/haze/
 	    - plugins/mesh/terrain/
+	- mdmkolbe made a few messages more informative.
 19-Jun-2006
 	- Philip Wyett made Quick Start more explanatory for the CS newcomers.
 	- res changed csRectRegion to use a csArray<> for rectangle storage.
