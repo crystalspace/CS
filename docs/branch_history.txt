@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+20-Jun-2006
+        - res added a check to configure to test whether <malloc.h> can be
+          included without a warning. Only then cssysdef.h includes it.
 19-Jun-2006
 	- res added functions cs_malloc() etc. that always resolve to the same
 	  allocation functions CS uses. Also replaced malloc with cs_malloc in

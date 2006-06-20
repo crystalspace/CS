@@ -1715,6 +1715,18 @@ CS_CHECK_BUILD([for _aligned_malloc], [cs_cv__aligned_malloc],
 
 
 #------------------------------------------------------------------------------
+# Check whether malloc.h can be included without a warning.
+#------------------------------------------------------------------------------
+CS_CHECK_BUILD([if <malloc.h> can be included], [cs_cv_malloc_h_includeable],
+    [AC_LANG_PROGRAM(
+        [[#include <malloc.h>]])],
+    [], [C++], 
+    [CS_HEADER_PROPERTY([CS_HAVE_MALLOC_H])], [],
+    [$cs_cv_prog_cxx_enable_warnings $cs_cv_prog_cxx_enable_errors])
+
+
+
+#------------------------------------------------------------------------------
 # Check if cxxabi.h is available and if the abi::__cxa_demangle() function is 
 # available.
 #------------------------------------------------------------------------------
