@@ -12,6 +12,8 @@ chronological order.
 	- res added an implementation of a "normal" new for memtracker builds 
 	  to memdebug.cpp. This improves things in cases the memtracker new
 	  (also recording filename and line) and normal new are mixed.
+	- res fixed the generated AWS lexer source to not include a #line 
+	  statement (despite instructing flex to not emit #line statements).
 19-Jun-2006
 	- res added functions cs_malloc() etc. that always resolve to the same
 	  allocation functions CS uses. Also replaced malloc with cs_malloc in

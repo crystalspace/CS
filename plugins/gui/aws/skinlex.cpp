@@ -1,5 +1,5 @@
 
-#line 3 "<stdout>"
+
 
 #define  YY_INT_ALIGNED short int
 
