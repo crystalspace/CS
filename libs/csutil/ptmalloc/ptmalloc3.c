@@ -1202,8 +1202,8 @@ public_mSTATs(void)
     if (MALLOC_DEBUG > 1) {
       struct malloc_segment* mseg = &msp->seg;
       while (mseg) {
-	fprintf(stderr, " seg %08lx-%08lx\n", (unsigned long)mseg->base,
-		(unsigned long)(mseg->base + mseg->size));
+	fprintf(stderr, " seg %p-%p\n", mseg->base,
+		(mseg->base + mseg->size));
 	mseg = mseg->next;
       }
     }
