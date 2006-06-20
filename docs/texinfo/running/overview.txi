@@ -64,7 +64,6 @@ that you can get from:
 @item csfgen
 A @emph{TrueType} to Crystal Space font converter.
 
-@table @code
 @cindex @file{eventtest}
 @cindex Applications, @file{eventtest}
 @item eventtest
