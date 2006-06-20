@@ -908,15 +908,7 @@ void mtiRegisterModule (char* Class)
         iMemoryTracker);
     if (!mtiTR)
     {
-#ifdef CS_NO_PTMALLOC
       mtiTR.AttachNew (new csMemTrackerRegistry);
-#else
-      // 'new' wouldn't use ptcs_malloc here, so call cs_malloc explicitly
-      csMemTrackerRegistry* newMTR = 
-        (csMemTrackerRegistry*)cs_malloc (sizeof (csMemTrackerRegistry));
-      new (newMTR) csMemTrackerRegistry;
-      mtiTR.AttachNew (newMTR);
-#endif
       iSCF::SCF->object_reg->Register (mtiTR,
         "crystalspace.utilities.memorytracker");
     }
@@ -1004,12 +996,26 @@ void* operator new[] (size_t s, void* filename, int /*line*/)
   *rc++ = 0xdeadbeef;
   return (void*)rc;
 }
+void* operator new (size_t s)
+{
+  return operator new (s, __FILE__ " standard operator new", 
+    0);
+}
+void* operator new[] (size_t s)
+{
+  return operator new[] (s, __FILE__ " standard operator new[]", 
+    0);
+}
 void operator delete (void* p)
 {
   if (p)
   {
     uintptr_t* rc = ((uintptr_t*)p)-4;
-    if (rc[3] != 0xdeadbeef) { cs_free (p); return; }
+    if (rc[3] != 0xdeadbeef) 
+    { 
+      platform_free (p); // Not nice, but at least try.
+      return; 
+    }
     size_t s = rc[0];
     csMemTrackerInfo* mti = (csMemTrackerInfo*)rc[2];
     cs_free ((void*)rc);
@@ -1021,7 +1027,11 @@ void operator delete[] (void* p)
   if (p)
   {
     uintptr_t* rc = ((uintptr_t*)p)-4;
-    if (rc[3] != 0xdeadbeef) { cs_free (p); return; }
+    if (rc[3] != 0xdeadbeef) 
+    { 
+      platform_free (p); // Not nice, but at least try.
+      return; 
+    }
     size_t s = rc[0];
     csMemTrackerInfo* mti = (csMemTrackerInfo*)rc[2];
     cs_free ((void*)rc);

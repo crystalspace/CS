@@ -9,6 +9,9 @@ chronological order.
 20-Jun-2006
         - res added a check to configure to test whether <malloc.h> can be
           included without a warning. Only then cssysdef.h includes it.
+	- res added an implementation of a "normal" new for memtracker builds 
+	  to memdebug.cpp. This improves things in cases the memtracker new
+	  (also recording filename and line) and normal new are mixed.
 19-Jun-2006
 	- res added functions cs_malloc() etc. that always resolve to the same
 	  allocation functions CS uses. Also replaced malloc with cs_malloc in
