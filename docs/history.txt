@@ -14,6 +14,8 @@ chronological order.
 	    - plugins/mesh/haze/
 	    - plugins/mesh/terrain/
 	- mdmkolbe made a few messages more informative.
+	- mdmkolbe changed iEventHandlerRegistry so it doesn't
+	  use csStrings in the interface.
 19-Jun-2006
 	- Philip Wyett made Quick Start more explanatory for the CS newcomers.
 	- res changed csRectRegion to use a csArray<> for rectangle storage.
