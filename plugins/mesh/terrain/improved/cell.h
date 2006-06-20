@@ -49,7 +49,8 @@ private:
   csString name;
   int grid_width, grid_height;
   int material_width, material_height;
-  csVector2 position, size;
+  csVector2 position;
+  csVector3 size;
   csRef<iTerrainDataFeeder> feeder;
   csRef<iTerrainCellRenderProperties> render_properties;
   csRef<iTerrainCellCollisionProperties> collision_properties;
@@ -65,13 +66,16 @@ private:
 
   csRef<csRefCount> render_data;
 
-  float min_height, max_height;
-
   void LerpHelper (const csVector2& pos, int& x1, int& x2, float& xfrac,
                                     int& y1, int& y2, float& yfrac) const;
 
 public:
-  csTerrainCell (const char* name, int grid_width, int grid_height, int material_width, int material_height, const csVector2& position, const csVector2& size, iTerrainDataFeeder* feeder, iTerrainCellRenderProperties* render_properties, iTerrainCellCollisionProperties* collision_properties, iTerrainRenderer* renderer);
+  csTerrainCell (const char* name, int grid_width, int grid_height,
+                 int material_width, int material_height, const csVector2&
+                 position, const csVector3& size, iTerrainDataFeeder* feeder,
+                 iTerrainCellRenderProperties* render_properties,
+                 iTerrainCellCollisionProperties* collision_properties,
+                 iTerrainRenderer* renderer);
 
   virtual ~csTerrainCell ();
 
@@ -101,7 +105,7 @@ public:
   virtual void UnlockHeightData ();
 
   virtual const csVector2& GetPosition () const;
-  virtual const csVector2& GetSize () const;
+  virtual const csVector3& GetSize () const;
 
   virtual int GetMaterialMapWidth () const;
   virtual int GetMaterialMapHeight () const;

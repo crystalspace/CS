@@ -64,7 +64,7 @@ struct iTerrainCell : public virtual iBase
   virtual void UnlockHeightData () = 0;
 
   virtual const csVector2& GetPosition () const = 0;
-  virtual const csVector2& GetSize () const = 0;
+  virtual const csVector3& GetSize () const = 0;
 
   virtual int GetMaterialMapWidth () const = 0;
   virtual int GetMaterialMapHeight () const = 0;

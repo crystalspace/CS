@@ -34,7 +34,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ImprovedTerrain)
 
 csTerrainCell::csTerrainCell (const char* name, int grid_width,
 int grid_height, int material_width, int material_height,
-const csVector2& position, const csVector2& size, iTerrainDataFeeder* feeder,
+const csVector2& position, const csVector3& size, iTerrainDataFeeder* feeder,
 iTerrainCellRenderProperties* render_properties,
 iTerrainCellCollisionProperties* collision_properties,
 iTerrainRenderer* renderer)
@@ -61,9 +61,6 @@ iTerrainRenderer* renderer)
   state = NotLoaded;
 
   render_data = NULL;
-
-  min_height = 0;
-  max_height = 60;
 }
 
 csTerrainCell::~csTerrainCell ()
@@ -103,8 +100,8 @@ void csTerrainCell::Unload ()
 csBox3 csTerrainCell::GetBBox () const
 {
   csBox3 box;
-  box.Set (position.x, min_height - EPSILON, position.y,
-  position.x + size.x, max_height + EPSILON, position.y + size.y);
+  box.Set (position.x, 0, position.y,
+  position.x + size.x, size.z, position.y + size.y);
 
   return box;
 }
@@ -171,7 +168,7 @@ const csVector2& csTerrainCell::GetPosition () const
   return position;
 }
 
-const csVector2& csTerrainCell::GetSize () const
+const csVector3& csTerrainCell::GetSize () const
 {
   return size;
 }

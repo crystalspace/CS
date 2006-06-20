@@ -65,19 +65,9 @@ void csTerrainSimpleDataFeeder::Load (iTerrainCell* cell)
 
   csLockedHeightData data = cell->LockHeightData (csRect(0, 0, width, height));
 
-/*  for (int y = 0; y < height; ++y)
-    for (int x = 0; x < width; ++x)
-    {
-      float xd = float(x - width/2) / width;
-      float yd = float(y - height/2) / height;
-
-      data.data[y * data.pitch + x] = sqrtf(1 - xd*xd - yd*yd) * 60;
-    }
-    
-  cell->UnlockHeightData();*/
   csRef<iLoader> loader = CS_QUERY_REGISTRY (object_reg, iLoader);
   
-  csRef<iImage> map = loader->LoadImage ("/lev/terraini/heightmap.png",
+  csRef<iImage> map = loader->LoadImage (heightmap_source,
   CS_IMGFMT_PALETTED8);
   
   for (int y = 0; y < height; ++y)
@@ -87,7 +77,7 @@ void csTerrainSimpleDataFeeder::Load (iTerrainCell* cell)
       float yd = float(y - height/2) / height;
 
       data.data[y * data.pitch + x] = ((unsigned char*)map->GetImageData ())
-      [y * map->GetWidth () + x];
+      [y * map->GetWidth () + x] / 255.0f * cell->GetSize().z;
     }
 
   cell->UnlockHeightData ();
@@ -95,7 +85,7 @@ void csTerrainSimpleDataFeeder::Load (iTerrainCell* cell)
   int mwidth = cell->GetMaterialMapWidth ();
   int mheight = cell->GetMaterialMapHeight ();
   
-  csRef<iImage> material = loader->LoadImage ("/lev/terraini/material.png",
+  csRef<iImage> material = loader->LoadImage (mmap_source,
   CS_IMGFMT_TRUECOLOR);
   
   csDirtyAccessArray<unsigned char> mdata;
@@ -116,6 +106,18 @@ bool csTerrainSimpleDataFeeder::Initialize (iObjectRegistry* object_reg)
 {
   this->object_reg = object_reg;
   return true;
+}
+
+void csTerrainSimpleDataFeeder::SetParam(const char* param, const char* value)
+{
+  if (!strcmp(param, "heightmap source"))
+  {
+    heightmap_source = value;
+  }
+  else if (!strcmp(param, "materialmap source"))
+  {
+    mmap_source = value;
+  }
 }
 
 }

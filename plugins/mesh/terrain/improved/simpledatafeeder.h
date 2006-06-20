@@ -23,6 +23,7 @@
 
 #include "iterrain/terraindatafeeder.h"
 
+#include "csutil/csstring.h"
 #include "iutil/comp.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(ImprovedTerrain)
@@ -35,6 +36,8 @@ class csTerrainSimpleDataFeeder :
 {
   iObjectRegistry* object_reg;
 
+  csString heightmap_source, mmap_source;
+
 public:
   csTerrainSimpleDataFeeder (iBase* parent);
 
@@ -44,6 +47,8 @@ public:
 
   virtual void PreLoad (iTerrainCell* cell);
   virtual void Load (iTerrainCell* cell);
+
+  virtual void SetParam(const char* param, const char* value);
   
   // ------------ iComponent implementation ------------
   virtual bool Initialize (iObjectRegistry* object_reg);

@@ -120,7 +120,7 @@ void csTerrainFactory::SetCollider (iTerrainCollider* collider)
 
 void csTerrainFactory::AddCell(const char* name, int grid_width,
 int grid_height, int material_width, int material_height,
-const csVector2& position, const csVector2& size, iTerrainDataFeeder* feeder)
+const csVector2& position, const csVector3& size, iTerrainDataFeeder* feeder)
 {
   csRef<iTerrainCellRenderProperties> render_properties =
   renderer->CreateProperties ();

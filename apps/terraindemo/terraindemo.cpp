@@ -270,6 +270,37 @@ bool TerrainDemo::OnInitialize(int /*argc*/, char* /*argv*/ [])
   GetObjectRegistry(),
   "crystalspace.mesh.object.terrainimproved.simpledatafeeder");
 
+  t_feeder->SetParam("heightmap source", "/lev/terraini/heightmap.png");
+  t_feeder->SetParam("materialmap source", "/lev/terraini/material.png");
+
+  csRef<iTerrainDataFeeder> t_feeder_00 = csLoadPlugin<iTerrainDataFeeder>(
+  GetObjectRegistry(),
+  "crystalspace.mesh.object.terrainimproved.simpledatafeeder");
+
+  t_feeder_00->SetParam("heightmap source", "/lev/terraini/heightmap_00.png");
+  t_feeder_00->SetParam("materialmap source", "/lev/terraini/material_00.png");
+
+  csRef<iTerrainDataFeeder> t_feeder_01 = csLoadPlugin<iTerrainDataFeeder>(
+  GetObjectRegistry(),
+  "crystalspace.mesh.object.terrainimproved.simpledatafeeder");
+
+  t_feeder_01->SetParam("heightmap source", "/lev/terraini/heightmap_01.png");
+  t_feeder_01->SetParam("materialmap source", "/lev/terraini/material_01.png");
+
+  csRef<iTerrainDataFeeder> t_feeder_10 = csLoadPlugin<iTerrainDataFeeder>(
+  GetObjectRegistry(),
+  "crystalspace.mesh.object.terrainimproved.simpledatafeeder");
+
+  t_feeder_10->SetParam("heightmap source", "/lev/terraini/heightmap_10.png");
+  t_feeder_10->SetParam("materialmap source", "/lev/terraini/material_10.png");
+
+  csRef<iTerrainDataFeeder> t_feeder_11 = csLoadPlugin<iTerrainDataFeeder>(
+  GetObjectRegistry(),
+  "crystalspace.mesh.object.terrainimproved.simpledatafeeder");
+
+  t_feeder_11->SetParam("heightmap source", "/lev/terraini/heightmap_11.png");
+  t_feeder_11->SetParam("materialmap source", "/lev/terraini/material_11.png");
+
   csRef<iMeshObjectType> t_mesh_type = csLoadPlugin<iMeshObjectType>(
   GetObjectRegistry(),
   "crystalspace.mesh.object.terrainimproved");
@@ -282,11 +313,18 @@ bool TerrainDemo::OnInitialize(int /*argc*/, char* /*argv*/ [])
   t_factory->SetRenderer(t_renderer);
   t_factory->SetCollider(t_collider);
   
-  t_factory->AddCell("cell", 33, 33, 32, 32, csVector2(24, 24),
-  csVector2(100, 100), t_feeder);
-  t_factory->AddCell("cell", 33, 33, 32, 32, csVector2(124, 124),
-  csVector2(100, 100), t_feeder);
+  t_factory->AddCell("cell", 65, 65, 64, 64, csVector2(-60, -60),
+  csVector3(100, 100, 30), t_feeder);
   
+  t_factory->AddCell("cell", 33, 33, 32, 32, csVector2(48, 48),
+  csVector3(50, 50, 30), t_feeder_00);
+  t_factory->AddCell("cell", 33, 33, 32, 32, csVector2(98, 48),
+  csVector3(50, 50, 30), t_feeder_10);
+  t_factory->AddCell("cell", 33, 33, 32, 32, csVector2(48, 98),
+  csVector3(50, 50, 30), t_feeder_01);
+  t_factory->AddCell("cell", 33, 33, 32, 32, csVector2(98, 98),
+  csVector3(50, 50, 30), t_feeder_11);
+
   csRef<iMeshObject> t_mesh = t_mesh_factory->NewInstance();
   
   terrain = scfQueryInterface<iTerrainSystem>(t_mesh);
@@ -331,7 +369,8 @@ bool TerrainDemo::LoadMap ()
   iTextureWrapper* lava_tex = loader->LoadTexture("lava_tex",
   "/lev/terraini/lava.png");
   
-  rloop = engine->GetRenderLoopManager()->Load("/shader/std_rloop_terrainimproved.xml");
+  rloop = engine->GetRenderLoopManager()->Load(
+  "/shader/std_rloop_terrainimproved.xml");
 
   csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
   GetObjectRegistry(), "crystalspace.shared.stringset", iStringSet);

@@ -85,7 +85,7 @@ iTerrainCell* csTerrainSystem::GetCell (const csVector2& pos)
   for (size_t i = 0; i < cells.GetSize (); ++i)
   {
     const csVector2& cell_pos = cells[i]->GetPosition ();
-    const csVector2& cell_size = cells[i]->GetSize ();
+    const csVector3& cell_size = cells[i]->GetSize ();
 
     if (cell_pos.x <= pos.x + EPSILON &&
         cell_pos.x + cell_size.x >= pos.x - EPSILON &&

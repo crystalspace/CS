@@ -167,6 +167,9 @@ const csRect& rectangle, const float* data, unsigned int pitch)
 
   int grid_width = cell->GetGridWidth ();
   int grid_height = cell->GetGridHeight ();
+  
+  int mm_width = cell->GetMaterialMapWidth();
+  int mm_height = cell->GetMaterialMapHeight();
 
   if (!rdata)
   {
@@ -220,11 +223,14 @@ const csRect& rectangle, const float* data, unsigned int pitch)
     float u_offset = 1.0f / (grid_width - 1);
     float v_offset = 1.0f / (grid_height - 1);
     
+    float u_correct = 0.5f / mm_width;
+    float v_correct = 0.5f / mm_height;
+    
     for (int y = 0; y < grid_height; ++y)
       for (int x = 0; x < grid_width; ++x)
       {
-        *vptr++ = x * u_offset;
-        *vptr++ = y * v_offset;
+        *vptr++ = x * u_offset + u_correct;
+        *vptr++ = y * v_offset + v_correct;
       }
 
     rdata->vb_texcoord->Release();

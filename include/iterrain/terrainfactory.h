@@ -28,6 +28,7 @@ struct iTerrainDataFeeder;
 struct iTerrainSystem;
 
 class csVector2;
+class csVector3;
 
 struct iTerrainFactory : public virtual iBase
 {
@@ -37,7 +38,7 @@ struct iTerrainFactory : public virtual iBase
   virtual void SetCollider (iTerrainCollider* collider) = 0;
   virtual void AddCell (const char* name, int grid_width, int grid_height,
                         int material_width, int material_height,
-                        const csVector2& position, const csVector2& size,
+                        const csVector2& position, const csVector3& size,
                         iTerrainDataFeeder* feeder) = 0;
 };
 

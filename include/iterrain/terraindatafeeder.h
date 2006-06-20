@@ -29,6 +29,8 @@ struct iTerrainDataFeeder : public virtual iBase
 
   virtual void PreLoad (iTerrainCell* cell) = 0;
   virtual void Load (iTerrainCell* cell) = 0;
+  
+  virtual void SetParam(const char* param, const char* value) = 0;
 };
 
 #endif // __CS_ITERRAIN_TERRAINDATAFEEDER_H__
