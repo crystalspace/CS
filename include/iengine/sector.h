@@ -30,6 +30,7 @@
 
 #include "csutil/scf.h"
 #include "csutil/set.h"
+#include "csgeom/vector3.h"
 
 struct iMeshWrapper;
 struct iMeshGenerator;

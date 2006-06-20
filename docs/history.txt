@@ -25,6 +25,7 @@ chronological order.
 	  const char* was being used as a csString.
 	- David H. Bronke committed a patch by lindquist to fix the CEGUI plugin
 	  for the latest SVN version of CEGUI.
+	- David H. Bronke added a missing #include to include/iengine/sector.h.
 19-Jun-2006
 	- Philip Wyett made Quick Start more explanatory for the CS newcomers.
 	- res changed csRectRegion to use a csArray<> for rectangle storage.
