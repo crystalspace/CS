@@ -49,7 +49,14 @@ csImposterProcTex::csImposterProcTex (csEngine* engine,
 
   texFlags = CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS;
 
-  csProcTexture::Initialize (engine->objectRegistry);
+  mesh_on_texture = new csMeshOnTexture(engine->objectRegistry);
+
+  csRef<iGraphics3D> g3d =
+    csQueryRegistry<iGraphics3D>(engine->objectRegistry);
+  csProcTexture::Initialize (engine->objectRegistry, engine,
+                            g3d->GetTextureManager(), "test");
+  SetAlwaysAnimate(true);
+  if (PrepareAnim()) printf("prepare success\n");
 }
 
 csImposterProcTex::~csImposterProcTex ()
@@ -68,6 +75,16 @@ bool csImposterProcTex::PrepareAnim ()
 
 void csImposterProcTex::Animate (csTicks CurrentTime)
 {
+  printf("animating imposter\n");
+  csRef<iTextureHandle> handle = tex->GetTextureHandle ();
+  csRef<iMeshWrapper> originalmesh = mesh->GetParent ();
+  if (mesh_on_texture->Render(originalmesh,handle))
+  {
+    printf("rendered\n");
+    mesh->SetImposterReady(true);
+  }
+
+/*
   CS_ASSERT_MSG("Cannot remove this", 0);
   // move the camera
   csVector3 Position (-0.5, 0, 3 + sin (CurrentTime / (10*1000.0))*1);
@@ -86,15 +103,18 @@ void csImposterProcTex::Animate (csTicks CurrentTime)
   // Determine and save the actual polygon on which the texture will be rendered
   mesh->FindImposterRectangle (View->GetCamera () );
 
+  //@@@
+  g3d->GetDriver2D()->Clear (g3d->GetDriver2D()->FindRGB (0, 0, 0, 0));
+
+
   // This actually draws the mesh on the backbuffer
-/*  mesh->GetParent()->GetMeshObject()->Draw (View, 
-        &mesh->GetParent()->GetCsMovable().scfiMovable, 
-	mesh->GetParent()->GetZBufMode());*/
+  View->Draw(mesh);
   
   // This copies the backbuffer to the iTextureHandle I think.
   g3d->FinishDraw ();
 
   // switch back to the old context
   engine->SetContext (oldContext);
+*/
 }
 

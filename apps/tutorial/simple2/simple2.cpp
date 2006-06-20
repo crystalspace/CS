@@ -294,6 +294,18 @@ void Simple::CreateSprites ()
   // can do this.
   sprite->SetZBufMode (CS_ZBUF_USE);
   sprite->SetRenderPriority (engine->GetObjectRenderPriority ());
+
+  //iMeshObject* test = sprite->GetMeshObject();
+  csRef<iImposter> i = scfQueryInterface<iImposter> (sprite);
+  if (!i) printf ("nix is\n");
+  i->SetImposterActive(true);
+  iSharedVariableList* varlist = engine->GetVariableList();
+  csRef<iSharedVariable> distvar = varlist->New();
+  distvar->Set(0.0f);
+  varlist->Add(distvar);
+  i->SetMinDistance(distvar);
+  i->SetRotationTolerance(distvar);
+  printf("done...\n");
 }
 
 /*-------------------------------------------------------------------------*

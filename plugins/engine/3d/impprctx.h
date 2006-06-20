@@ -24,6 +24,7 @@
 #include "csgeom/vector3.h"
 #include "iengine/engine.h"
 #include "iengine/rview.h"
+#include "cstool/procmesh.h"
 
 class csEngine;
 class csEngineProcTex;
@@ -36,6 +37,7 @@ private:
   iRenderView* View;
   csImposterMesh *mesh;
   bool imposter_ready;
+  csMeshOnTexture* mesh_on_texture;
 
 public:
   csImposterProcTex (csEngine* engine, csImposterMesh *parent);

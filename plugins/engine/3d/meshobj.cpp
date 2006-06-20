@@ -583,9 +583,16 @@ const csArray<iLightSectorInfluence*>& csMeshWrapper::GetRelevantLights (
 csRenderMesh** csMeshWrapper::GetRenderMeshes (int& n, iRenderView* rview, 
 					       uint32 frustum_mask)
 {
-  //if (imposter_active && CheckImposterRelevant (rview))
-    //if (DrawImposter (rview))
-      //return;
+  if (imposter_active && CheckImposterRelevant (rview))
+  {
+    printf("trying imposter... ");
+    if (DrawImposter (rview))
+    {
+      printf("drawn\n");
+      return 0;
+    }
+  }
+  printf("failed\n");
 
   // Callback are traversed in reverse order so that they can safely
   // delete themselves.
@@ -846,17 +853,24 @@ bool csMeshWrapper::DrawImposter (iRenderView *rview)
   // Check for imposter existence.  If not, create it.
   if (!imposter_mesh)
   {
+    printf("Imposter doesn't exist!\n");
     return false;
   }
 
   // Check for imposter already ready
   if (!imposter_mesh->GetImposterReady ())
+  {
+    printf("not ready\n");
     return false;
+  }
 
   // Check for too much camera movement since last imposter render
   if (!imposter_mesh->CheckIncidenceAngle (rview,
 	imposter_rotation_tolerance->Get ()))
+  {
     return false;
+    printf("too much movement\n");
+  }
 
   // Else draw imposter as-is.
   imposter_mesh->Draw (rview);
@@ -868,6 +882,7 @@ void csMeshWrapper::SetImposterActive (bool flag)
   imposter_active = flag;
   if (flag)
   {
+    printf("setting imposter active\n");
     imposter_mesh = new csImposterMesh (engine, this);
     imposter_mesh->SetImposterReady (false);
   }

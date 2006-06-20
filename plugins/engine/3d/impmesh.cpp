@@ -83,35 +83,26 @@ void csImposterMesh::FindImposterRectangle (const iCamera* /*camera*/)
 #endif
 }
 
-void csImposterMesh::Draw (iRenderView* /*rview*/)
+void csImposterMesh::Draw (iRenderView* rview)
 {
-#if 0  
-  iGraphics3D *g3d = rview->GetG3D();
-  G3DPolygonDP poly;
-  memset (&poly, 0, sizeof(poly));
+  iGraphics3D *g3d = rview->GetGraphics3D();
+  csSimpleRenderMesh poly;
 
   csMatrix3 m_cam2tex;
   csVector3 v_cam2tex;
 
   poly.mixmode = CS_FX_COPY;
-  poly.use_fog = false;
-  poly.do_fullbright = false;
-  poly.plane.m_cam2tex = &m_cam2tex;
-  poly.plane.v_cam2tex = &v_cam2tex;
+  
 
   //  poly.mat_handle = tex->GetMaterial ();
-  poly.flat_color_r = 128;
-  poly.flat_color_g = 128;
-  poly.flat_color_b = 128;
 
-  m_cam2tex = pol.m_obj2tex * o2c.GetT2O ();
-  v_cam2tex = o2c.Other2This (pol.v_obj2tex);
+  //m_cam2tex = poly.m_obj2tex * o2c.GetT2O ();
+  //v_cam2tex = o2c.Other2This (poly.v_obj2tex);
 
-  poly.poly_texture = 0; // pol.poly_texture; when imposter is rendered correctly
+  poly.texture = 0; // pol.poly_texture; when imposter is rendered correctly
 
   // project screen bounding box into poly vertex list here
 
   // ok now actually draw it
-  g3d->DrawPolygon (poly);
-#endif
+  //g3d->DrawSimpleMesh(poly);
 }

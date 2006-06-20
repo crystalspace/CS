@@ -1,0 +1,13 @@
+Crystal Space detailed change log.
+http://www.crystalspace3d.org/ 
+
+The overall history is in reverse (descending) chronological order, so that
+each new day's entries apears before the previous day's entries.  The
+individual changes for each given day, however, are in normal (ascending)
+chronological order.
+
+This file describes the history of the SoC imposter branch.
+
+20-Jun-2006
+	- Fossi adds the few first fixes to the older code of keith. Lot's
+	  debug output too.
