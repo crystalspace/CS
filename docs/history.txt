@@ -17,6 +17,8 @@ chronological order.
 	- mdmkolbe changed iEventHandlerRegistry so it doesn't
 	  use csStrings in the interface.
         - Philip Wyett corrected a copy and paste error he made in documents.
+        - Philip Wyett edited Jorrits genesis for the youngsters to let
+          them know that comp.graphics.algoritms is a newsgroup.
 19-Jun-2006
 	- Philip Wyett made Quick Start more explanatory for the CS newcomers.
 	- res changed csRectRegion to use a csArray<> for rectangle storage.
