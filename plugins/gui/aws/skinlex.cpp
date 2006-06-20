@@ -576,6 +576,14 @@ char *awstext;
   result = static_awsparser->Read(buf, max_size);	\
 }
 
+static char* awsstrdup (const char* str)
+{
+  size_t len = strlen (str)+1;
+  char* p = (char*)cs_malloc (len);
+  memcpy (p, str, len);
+  return p;
+}
+
 #define INITIAL 0
 
 #ifndef YY_NO_UNISTD_H
@@ -854,11 +862,11 @@ YY_RULE_SETUP
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-/* printf("<attr>-"); */ awslval->str = strdup(awstext); return TOKEN_ATTR;
+/* printf("<attr>-"); */ awslval->str = awsstrdup(awstext); return TOKEN_ATTR;
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-/* printf("<str>-");  */ awstext[awsleng-1]=0; awslval->str = strdup(awstext+1); return TOKEN_STR;
+/* printf("<str>-");  */ awstext[awsleng-1]=0; awslval->str = awsstrdup(awstext+1); return TOKEN_STR;
 	YY_BREAK
 case 12:
 /* rule 12 can match eol */
