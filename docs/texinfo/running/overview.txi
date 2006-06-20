@@ -16,7 +16,6 @@ particular application may be found in subsequent sections.
 @item 3ds2lev
 A @sc{3ds} to Crystal Space map converter (work in progress!).
 
-@table @code
 @cindex @file{awstest}
 @cindex Applications, @file{awstest}
 @item awstest
@@ -24,26 +23,22 @@ A test application for the Crystal Space Alternate Windows System @sc{aws}
 plugin. In the future this will become the test application for the work in
 progress @sc{aws}2 plugin.
 
-@table @code
 @cindex @file{awstut}
 @cindex Applications, @file{awstut}
 @item awstut
 A Crystal Space tutorial application demonstrating use of the Alternate
 Windows System @sc{aws}.
 
-@table @code
 @cindex @file{ceguitest}
 @cindex Applications, @file{ceguitest}
 @item ceguitest
 A test application for the Crystal Space Crazy Eddie's @sc{gui} System plugin.
 
-@table @code
 @cindex @file{consoletest}
 @cindex Applications, @file{consoletest}
 @item consoletest
 A Crystal Space console output testing application.
 
-@table @code
 @cindex @file{csbench}
 @cindex Applications, @file{csbench}
 @item csbench
