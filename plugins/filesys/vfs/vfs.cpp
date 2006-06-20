@@ -44,13 +44,27 @@ public:
   VfsNode(char *virtualPathname, csVFS *parentVFS, VfsNode* parentNode, 
 	  int pluginIndex);
 
+  ~VfsNode();
   // A pointer to the parent of this node
   VfsNode *ParentNode;
 
   // The name of this node in the VFS tree
   char *VirtualPathname;
 
+  // The real paths mapped to this node
+  csStringArray RealPaths;
+
+  // The virtual paths mapped to this node (symbolic links)
+  csStringArray SymbolicLinks;
+
+  // List the files in this directory tree
+  csPtr<iStringArray> FindFiles(const char *Suffix, const char *Mask);
+
+  // Return a pointer to a node representing a virtual path
+  VfsNode *FindNode(const char *VirtualPath);
+
 private:
+  // Index into the filesystem plugins associated with this node
   int FileSystemPlugin;
 
   // A vector of pointers to the subdirectories of this node
@@ -69,6 +83,40 @@ VfsNode::VfsNode(char *virtualPathname, csVFS *parentVFS, VfsNode* parentNode,
 	
 }
 
+VfsNode::~VfsNode()
+{
+  SubDirectories.DeleteAll();
+  delete [] VirtualPathname;
+}
+
+VfsNode * VfsNode::FindNode(const char *VirtualPath)
+{
+  if (strlen(VirtualPath) < strlen(VirtualPathname))
+    return 0;
+
+  if (strcmp(VirtualPath, VirtualPathname) == 0)
+    return this;
+
+  size_t low = 0;
+  size_t high = SubDirectories.Length();
+  int cmp = 0;
+  size_t i = 0;
+
+  while (low <= high)
+  {
+    i = (high - low) >> 1;
+    cmp = strncmp(SubDirectories.Get(i)->VirtualPathname, VirtualPath, strlen(SubDirectories.Get(i)->VirtualPathname));
+	if (cmp == 0)
+	  return SubDirectories.Get(i)->FindNode(VirtualPath);
+    if (cmp < 0)
+	  low = i + 1;	
+    else
+      high = i - 1;
+  }
+
+  return 0;
+}
+
 // --------------------------------------------------------- VfsVector --- //
 int VfsVector::Compare (VfsNode* const& Item1, VfsNode* const& Item2)
 {
@@ -77,6 +125,7 @@ int VfsVector::Compare (VfsNode* const& Item1, VfsNode* const& Item2)
 
 
 // ------------------------------------------------------------- csVFS --- //
+
 SCF_IMPLEMENT_FACTORY (csVFS)
 
 // csVFS contructor
@@ -84,119 +133,78 @@ csVFS::csVFS (iBase *iParent) :
   scfImplementationType(this, iParent),
   RootNode(0),
   CwdNode(0),
- /* basedir(0),
-  resdir(0),
-  appdir(0),
-  dirstack(8,8),*/
-  object_reg(0)/*,
-  auto_name_counter(0),
-  verbosity(VERBOSITY_NONE)*/
+  object_reg(0)
 {
-  /*cwd = new char [2];
-  cwd [0] = VFS_PATH_SEPARATOR;
-  cwd [1] = 0;*/
   mutex = csMutex::Create (true); // We need a recursive mutex.
 }
 
- //
+// csVFS destructor
 csVFS::~csVFS ()
 {
-  /*delete [] cwd;
-  delete [] basedir;
-  delete [] resdir;
-  delete [] appdir;*/
+  // Free memory used by VFS Nodes
+  delete RootNode;
 }
 
 bool csVFS::Initialize (iObjectRegistry* r)
 {
   object_reg = r;
- /*
-#ifdef NEW_CONFIG_SCANNING
-  static const char* vfsSubdirs[] = {
-    "etc/" CS_PACKAGE_NAME,
-    "etc", 
-    "",
-    0};
-
-  csPathsList configPaths;
-  const char* crystalconfig = getenv("CRYSTAL_CONFIG");
-  if (crystalconfig)
-    configPaths.AddUniqueExpanded (crystalconfig);
-  
-  csPathsList* basedirs = 
-    csInstallationPathsHelper::GetPlatformInstallationPaths();
-  configPaths.AddUniqueExpanded (*basedirs * csPathsList  (vfsSubdirs));
-  delete basedirs;
-
-  configPaths.AddUniqueExpanded (".");
-#ifdef CS_CONFIGDIR
-  configPaths.AddUniqueExpanded (CS_CONFIGDIR);
-#endif
-
-  configPaths = csPathsUtilities::LocateFile (configPaths, "vfs.cfg", true);
-  if (configPaths.Length() > 0)
-  {
-    basedir = alloc_normalized_path (configPaths[0].path);
-  }
-#else
-  basedir = alloc_normalized_path(csGetConfigPath());
-#endif
-
-  csRef<iVerbosityManager> vm (
-    CS_QUERY_REGISTRY (object_reg, iVerbosityManager));
-  if (vm.IsValid()) 
-  {
-    verbosity = VERBOSITY_NONE;
-    if (vm->Enabled("vfs.debug", false)) verbosity |= VERBOSITY_DEBUG;
-    if (vm->Enabled("vfs.scan",  true )) verbosity |= VERBOSITY_SCAN;
-    if (vm->Enabled("vfs.mount", true )) verbosity |= VERBOSITY_MOUNT;
-  }
-
-  csRef<iCommandLineParser> cmdline =
-    CS_QUERY_REGISTRY (object_reg, iCommandLineParser);
-  if (cmdline)
-  {
-    resdir = alloc_normalized_path(cmdline->GetResourceDir());
-    appdir = alloc_normalized_path(cmdline->GetAppDir());
-  }
-  
-  // Order-sensitive: Mounts in first-loaded configuration file take precedence
-  // over conflicting mounts in files loaded later.
-  csStringSet seen;
-  bool const verbose_scan = IsVerbose(VERBOSITY_SCAN);
-  load_vfs_config(config, resdir,  seen, verbose_scan);
-  load_vfs_config(config, appdir,  seen, verbose_scan);
-#ifdef NEW_CONFIG_SCANNING
-  bool result =	load_vfs_config(config, resdir,  seen, verbose_scan);
-  if (result && (basedir == 0))
-    basedir = alloc_normalized_path (resdir);
-  result = load_vfs_config(config, appdir,  seen, verbose_scan);
-  if (result && (basedir == 0))
-    basedir = alloc_normalized_path (appdir);
-  for (size_t i = 0; i < configPaths.Length(); i++)
-  {
-    load_vfs_config(config, configPaths[i].path,  seen, verbose_scan);
-  }
-#else
-  load_vfs_config(config, basedir, seen, verbose_scan);
-#endif
-
-  return ReadConfig ();*/
   return true;
 }
 
 bool csVFS::ChDir (const char *Path)
 {
+  if (strlen(Path) == 0)
+    return false;
+
+  VfsNode *newCwd;
+  // Absolute Path
+  if (Path[0] == VFS_PATH_SEPARATOR)
+  {
+    newCwd = RootNode->FindNode(Path);
+  }
+  // Relative Path
+  else
+  {
+	size_t cwdLen = strlen(CwdNode->VirtualPathname);
+
+    char *path = new char[cwdLen + strlen(Path) + 1];
+	
+	strcpy (path, CwdNode->VirtualPathname);
+	path[cwdLen] = VFS_PATH_SEPARATOR;
+	strcpy (path + cwdLen + 1, Path);
+
+    newCwd = CwdNode->FindNode(path);
+
+	delete [] path;
+  }
+
+  // Assign new Cwd
+  if (newCwd)
+  {
+	CwdNode = newCwd;
 	return true;
+  }
+
+  return false;
 }
 
 void csVFS::PushDir (char const* Path)
 {
-	
+	// Push the current directory onto the stack
+	DirectoryStack.Push(CwdNode);
+
+	// Change the current directory
+    ChDir(Path);
 }
 
 bool csVFS::PopDir ()
 {
+	// Check that the stack is not empty
+	if (DirectoryStack.Length() < 1)
+		return false;
+
+	// Pop the stack and change the cwd
+	CwdNode = DirectoryStack.Pop();
 	return true;
 }
 
@@ -257,7 +265,7 @@ csRef<iStringArray> csVFS::MountRoot (const char *VirtualPath)
 
 bool csVFS::SaveMounts (const char *FileName)
 {
-			return true;
+		return true;
 }
 
 bool csVFS::LoadMountsFromFile (iConfigFile* file)
@@ -302,10 +310,15 @@ csRef<iStringArray> csVFS::GetRealMountPaths (const char *VirtualPath)
 }
 
 // Register a filesystem plugin
-bool csVFS::RegisterPlugin(csRef<iFileSystem> FileSystem)
+size_t csVFS::RegisterPlugin(csRef<iFileSystem> FileSystem)
 {
 	// Add the plugin
-	fsPlugins.PushSmart(FileSystem);
+	return fsPlugins.PushSmart(FileSystem);
+}
+
+// Create or add a symbolic link
+bool csVFS::SymbolicLink(const char *Target, const char *Link, bool Overwrite)
+{
 	return true;
 }
 

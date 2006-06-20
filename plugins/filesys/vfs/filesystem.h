@@ -21,6 +21,7 @@
 #define __CS_FILESYSTEM_H__
 
 #include "csutil/scf_implementation.h"
+#include "csutil/physfile.h"
 #include "iutil/vfs.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
@@ -38,6 +39,45 @@ class csFileSystem
 : public scfImplementation2<csFileSystem, iFileSystem, iComponent>
 {
 public:
+
+  /**
+   * TODO: write class description
+   */
+  class csFile : public scfImplementation1<csFile, iFile>
+  {
+    protected:
+	  // File size (initialized in constructor)
+      size_t Size;
+      // Filename in VFS
+      char *Name;
+	  // Error status
+	  int Error;
+	  // The constructor for csFile
+      csFile (const char *Name);
+    public:
+      /// Instead of fclose() do "delete file" or file->DecRef ()
+      virtual ~csFile ();
+	  /// Query file name (in VFS)
+      virtual const char *GetName () { return Name; }
+      /// Query file size
+      virtual size_t GetSize () { return Size; }
+      /// Check (and clear) file last error status
+      virtual int GetStatus ();
+	  /// Replacement for standard fread()
+      virtual size_t Read (char *Data, size_t DataSize) = 0;
+      /// Replacement for standard fwrite()
+      virtual size_t Write (const char *Data, size_t DataSize) = 0;
+      /// Flush stream.
+      virtual void Flush () = 0;
+      /// Replacement for standard feof()
+      virtual bool AtEOF () = 0;
+      /// Query current file pointer
+      virtual size_t GetPos () = 0;
+      /// Get entire file data at once, if possible, or 0
+      virtual csPtr<iDataBuffer> GetAllData () = 0;
+      /// Set new file pointer
+      virtual bool SetPos (size_t newpos) = 0;
+  };
 
   /// Vritual Destructor
   virtual ~csFileSystem ();
@@ -81,6 +121,7 @@ protected:
 
 /**
  * TODO: write class description
+ * The native file system plugin will use csPhysicalFile for access to the physical file system
  */
 class csNativeFileSystem 
 	: public scfImplementationExt0<csNativeFileSystem, csFileSystem>

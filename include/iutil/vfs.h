@@ -283,7 +283,7 @@ struct iFileSystem: public virtual iBase
  */
 struct iVFS : public virtual iBase
 {
-  SCF_INTERFACE(iVFS, 2, 0, 0);
+  SCF_INTERFACE(iVFS, 2, 1, 0);
 
   /// Set current working directory
   virtual bool ChDir (const char *Path) = 0;
@@ -502,11 +502,23 @@ struct iVFS : public virtual iBase
    */
   virtual csRef<iStringArray> GetRealMountPaths (const char *VirtualPath) = 0;
 
-  /** Register a filesystem plugin
+  /** 
+   * Register a filesystem plugin
    * \param FileSystem A reference to the file system plugin to register.
+   * \return The index assigned to the plugin
+   */
+  virtual size_t RegisterPlugin(csRef<iFileSystem> FileSystem) = 0;
+
+  /**
+   * Create or add a symbolic link within the VFS (works like unix 'ln -s' command)
+   * If the link already exists, then the target will be added to the link
+   * \param Target The target that th link will point to
+   * \param Link The path of the link within the VFS, if this is 0 then the link will
+   *        be created in the current directory with the same name as the target
+   * \param Overwrite If conflicting files are found must they be overwritten by the new link
    * \return True if successful, else false.
    */
-  virtual bool RegisterPlugin(csRef<iFileSystem> FileSystem) = 0;
+  virtual bool SymbolicLink(const char *Target, const char *Link = 0, bool Overwrite = true) = 0;
 };
 
 /** @} */

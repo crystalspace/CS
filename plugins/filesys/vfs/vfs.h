@@ -34,12 +34,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(vfs)
 
 class VfsNode;
 
+/**
+ * An array holding pointers to nodes in the VFS, which are compared by name.
+ */
 class VfsVector : public csPDelArray<VfsNode>
 {
    public:
+      /// Comparison method
       static int Compare (VfsNode* const&, VfsNode* const&);
 };
-
 
 /**
  * TODO: Rewrite class description.
@@ -82,7 +85,8 @@ public:
   /// Check whenever a file exists
   virtual bool Exists (const char *Path) const;
 
-  /// Find all files in a virtual directory and return an array of their names
+  /// Find all files in a virtual directory and return an array of their 
+  /// names
   virtual csPtr<iStringArray> FindFiles (const char *Path) const;
 
   /// Replacement for standard fopen()
@@ -93,7 +97,8 @@ public:
    * after usage. This is more effective than opening files and reading
    * the file in blocks.  Note that the returned buffer is always null-
    * terminated (so that it can be conveniently used with string functions)
-   * but the extra null-terminator is not counted as part of the returned size.
+   * but the extra null-terminator is not counted as part of the returned 
+   * size.
    */
   virtual csPtr<iDataBuffer> ReadFile (const char *FileName, bool nullterm);
 
@@ -147,7 +152,10 @@ public:
   virtual csRef<iStringArray> GetRealMountPaths (const char *VirtualPath);
 
   /// Register a filesystem plugin
-  virtual bool RegisterPlugin(csRef<iFileSystem> FileSystem);
+  virtual size_t RegisterPlugin(csRef<iFileSystem> FileSystem);
+
+  /// Create or add a symbolic link
+  virtual bool SymbolicLink(const char *Target, const char *Link = 0, bool Overwrite = true);
 
 private:
 
@@ -174,4 +182,3 @@ private:
 } CS_PLUGIN_NAMESPACE_END(vfs)
 
 #endif  // __CS_VFS_H__
-

@@ -1,5 +1,5 @@
 /*
-    Crystal Space File System Plugin classes
+    Crystal Space Virtual File System Plugin classes
     Copyright (C) 2006 by Brandon Hamilton <brandon.hamilton@gmail.com>
 
     This library is free software; you can redistribute it and/or
@@ -30,8 +30,24 @@
 CS_PLUGIN_NAMESPACE_BEGIN(vfs)
 {
 // ----------------------------------------------------- csFile ---------- //
+csFileSystem::csFile::csFile (const char *Name) :
+  scfImplementationType(this, 0)
+{
+  Size = 0;
+  Error = VFS_STATUS_OK;
+}
 
+csFileSystem::csFile::~csFile ()
+{
+  delete [] Name;
+}
 
+int csFileSystem::csFile::GetStatus ()
+{
+  int rc = Error;
+  Error = VFS_STATUS_OK;
+  return rc;
+}
 // ------------------------------------------------------ csFileSystem --- //
 csFileSystem::csFileSystem(iBase *iParent) :
   scfImplementationType(this, iParent),
