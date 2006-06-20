@@ -18,9 +18,11 @@
 
 #include "ceguitest.h"
 
-#include "CEGUI.h"
-#include "CEGUIWindowManager.h" 
-#include "CEGUILogger.h"
+#include "csutil/custom_new_disable.h"
+#include <CEGUI.h>
+#include <CEGUIWindowManager.h>
+#include <CEGUILogger.h>
+#include "csutil/custom_new_enable.h"
 
 
 CS_IMPLEMENT_APPLICATION

@@ -41,7 +41,7 @@
  *  }
  * \endcode
  */
-class CS_CRYSTALSPACE_EXPORT csScopedMutexLock
+class csScopedMutexLock
 {
 public:
   csScopedMutexLock (csMutex* newmutex)
@@ -51,6 +51,19 @@ public:
   { mutex->Release (); }
 
   csMutex* mutex;
+};
+
+template<class T>
+class csScopedLock
+{
+public:
+  csScopedLock (T& lock)
+    : lock (lock)
+  { lock.LockWait (); }
+  ~csScopedLock ()
+  { lock.Release (); }
+
+  T& lock;
 };
 
 #endif

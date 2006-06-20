@@ -82,7 +82,7 @@ csSndSysDriverCoreAudio::~csSndSysDriverCoreAudio()
 {
   SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
   SCF_DESTRUCT_IBASE();
-  free(convert_buffer);
+  cs_free(convert_buffer);
 }
 
 void csSndSysDriverCoreAudio::Report(int severity, const char* msg, ...)
@@ -154,7 +154,7 @@ bool csSndSysDriverCoreAudio::Open (csSndSysRendererSoftware *renderer,
 	
   convert_size = requested_format->Freq / 10;
 	
-  convert_buffer = malloc(convert_size * requested_format->Channels * requested_format->Bits/8);
+  convert_buffer = cs_malloc(convert_size * requested_format->Channels * requested_format->Bits/8);
 	
   status = AudioDeviceSetProperty(outputDeviceID, 0, 0, false,
     kAudioDevicePropertyBufferSize, propertysize, &buffersize);
@@ -163,7 +163,7 @@ bool csSndSysDriverCoreAudio::Open (csSndSysRendererSoftware *renderer,
     Report(CS_REPORTER_SEVERITY_ERROR,
 	   "Failed to set buffersize to %d bytes for CoreAudio output device. "
 	   "Return of %d.", buffersize, (int)status);
-	free(convert_buffer);
+	cs_free(convert_buffer);
     return false;
   }
   
@@ -266,7 +266,7 @@ void csSndSysDriverCoreAudio::Close ()
 {
   StopThread();
   AudioDeviceRemoveIOProc(outputDeviceID, StaticAudioProc);
-  free(convert_buffer);
+  cs_free(convert_buffer);
   convert_buffer = 0;
 }
 

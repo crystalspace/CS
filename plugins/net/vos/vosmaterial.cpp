@@ -125,7 +125,7 @@ void ConstructMaterialTask::doTask()
 
     if(layers.size() > 0)
     {
-      iTextureWrapper** layertws = (iTextureWrapper**)malloc(
+      iTextureWrapper** layertws = (iTextureWrapper**)cs_malloc(
         layers.size() * sizeof(iTextureWrapper*));
       for(unsigned int i = 0; i < layers.size(); i++)
       {
@@ -137,8 +137,8 @@ void ConstructMaterialTask::doTask()
 
       // XXX add texture layers using shaders
 
-      free(layertws);
-      free(coords);
+      cs_free(layertws);
+      cs_free(coords);
     }
     else
     {
@@ -282,7 +282,7 @@ void csMetaMaterial::Setup(csVosA3DL* vosa3dl)
       txt++;
       if(txt.hasMore())
       {
-        cmt->coords = (TextureLayer*)malloc(txt.remaining()
+        cmt->coords = (TextureLayer*)cs_malloc(txt.remaining()
                                             * sizeof(TextureLayer));
         float uscale = 1, vscale = 1, ushift = 0, vshift = 0;
         for(int i = 0; txt.hasMore(); txt++, i++)

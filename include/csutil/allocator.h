@@ -34,7 +34,7 @@ namespace CS
   namespace Memory
   {
     /**
-     * A default memory allocator that allocates from the heap.
+     * A default memory allocator that allocates with cs_malloc().
      */
     class AllocatorMalloc
     {
@@ -50,13 +50,13 @@ namespace CS
       void* Alloc (const size_t n)
       {
       #ifdef CS_MEMORY_TRACKER
-	size_t* p = (size_t*)malloc (n + sizeof (size_t));
+	size_t* p = (size_t*)cs_malloc (n + sizeof (size_t));
 	*p = n;
 	p++;
 	if (mti) mtiUpdateAmount (mti, 1, int (n));
 	return p;
       #else
-	return malloc (n);
+	return cs_malloc (n);
       #endif
       }
       /// Free the block \p p.
@@ -66,10 +66,10 @@ namespace CS
 	size_t* x = (size_t*)p;
 	x--;
 	size_t allocSize = *x;
-	free (x);
+	cs_free (x);
 	if (mti) mtiUpdateAmount (mti, -1, -int (allocSize));
       #else
-	free (p);
+	cs_free (p);
       #endif
       }
       /// Resize the allocated block \p p to size \p newSize.
@@ -80,13 +80,13 @@ namespace CS
 	size_t* x = (size_t*)p;
 	x--;
 	if (mti) mtiUpdateAmount (mti, -1, -int (*x));
-	size_t* np = (size_t*)realloc (x, newSize + sizeof (size_t));
+	size_t* np = (size_t*)cs_realloc (x, newSize + sizeof (size_t));
 	*np = newSize;
 	np++;
 	if (mti) mtiUpdateAmount (mti, 1, int (newSize));
 	return np;
       #else
-	return realloc (p, newSize);
+	return cs_realloc (p, newSize);
       #endif
       }
       /// Set the information used for memory tracking.

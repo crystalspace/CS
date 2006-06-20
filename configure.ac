@@ -163,6 +163,8 @@ CS_EMIT_BUILD_RESULT([cs_cv_sys_pthread], [PTHREAD])
 AS_IF([test $cs_cv_sys_pthread_mutex_recursive != no],
     [CS_HEADER_PROPERTY([CS_PTHREAD_MUTEX_RECURSIVE],
 	[$cs_cv_sys_pthread_mutex_recursive])])
+CS_CHECK_PTHREAD_ATFORK([cs_cv_sys_pthread_atfork])
+CS_EMIT_BUILD_PROPERTY([PTHREAD.ATFORK.AVAILABLE], [$cs_cv_sys_pthread_atfork])
 
 
 
@@ -1713,6 +1715,18 @@ CS_CHECK_BUILD([for _aligned_malloc], [cs_cv__aligned_malloc],
 
 
 #------------------------------------------------------------------------------
+# Check whether malloc.h can be included without a warning.
+#------------------------------------------------------------------------------
+CS_CHECK_BUILD([if <malloc.h> can be included], [cs_cv_malloc_h_includeable],
+    [AC_LANG_PROGRAM(
+        [[#include <malloc.h>]])],
+    [], [C++], 
+    [CS_HEADER_PROPERTY([CS_HAVE_MALLOC_H])], [],
+    [$cs_cv_prog_cxx_enable_warnings $cs_cv_prog_cxx_enable_errors])
+
+
+
+#------------------------------------------------------------------------------
 # Check if cxxabi.h is available and if the abi::__cxa_demangle() function is 
 # available.
 #------------------------------------------------------------------------------
@@ -2245,6 +2259,21 @@ AS_IF([test $cs_build_mode = debug],
 	*) cs_debug_libbfd=no ;;
     esac],
     [cs_debug_libbfd=no])
+
+
+
+#------------------------------------------------------------------------------
+# Determine whether ptmalloc should be disabled.
+#------------------------------------------------------------------------------
+AC_MSG_CHECKING([whether to enable ptmalloc])
+AC_ARG_ENABLE([ptmalloc],
+    [AC_HELP_STRING([--enable-ptmalloc],
+	[enable the built-in ptmalloc which provides fast memory allocations,
+	but may cause problems in rare cases. (default YES)])],
+    [], [enable_ptmalloc=yes])
+AC_MSG_RESULT([$enable_ptmalloc])
+AS_IF([test $enable_ptmalloc != yes],
+    [CS_HEADER_PROPERTY([CS_NO_PTMALLOC])])
 
 
 

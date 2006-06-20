@@ -26,6 +26,26 @@ chronological order.
 	- David H. Bronke committed a patch by lindquist to fix the CEGUI plugin
 	  for the latest SVN version of CEGUI.
 	- David H. Bronke added a missing #include to include/iengine/sector.h.
+	- res merged the ptmalloc branch.
+	  The main change is that an implementation of ptmalloc3 is used as 
+	  the default memory allocator throughout CS (and also external 
+	  projects).
+	  Use of ptmalloc can be disabled for the whole project by passing 
+	  --enable-ptmalloc=no to configure, or defining CS_NO_PTMALLOC in 
+	  include/csutil/win32/csconfig.h for MSVC.
+	  The platform-default memory allocation can be access by using the
+	  platform_malloc() etc. functions. CS' default allocator - ptmalloc3,
+	  or the platform's default, depending on the users choice - can be
+	  accessed by using cs_malloc() etc. All memory allocations in CS
+	  itself should use the cs_ functions.
+	  By default, malloc() etc. are overridden with the cs_malloc() etc.
+	  functions. To disable that for individual source files, define 
+	  CS_NO_MALLOC_OVERRIDE	before including cssysdef.h.
+	  Likewise, new and delete are overridden to use cs_malloc()/cs_free()
+	  by default, this can be disabled by defining CS_NO_NEW_OVERRIDE
+	  before including cssysdef.h. This is useful to interface with some
+	  3rd party libraries that take ownership of pointers passed into the
+	  library (and later attempt to free it with the default allocator).
 19-Jun-2006
 	- Philip Wyett made Quick Start more explanatory for the CS newcomers.
 	- res changed csRectRegion to use a csArray<> for rectangle storage.
