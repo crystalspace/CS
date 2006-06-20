@@ -25,22 +25,24 @@ CS_PLUGIN_NAMESPACE_BEGIN(ImprovedTerrain)
 
 SCF_IMPLEMENT_FACTORY (csTerrainSimpleCollider)
 
-csTerrainSimpleCellCollisionProperties::csTerrainSimpleCellCollisionProperties (iBase* parent)
+csTerrainSimpleCellCollisionProperties::csTerrainSimpleCellCollisionProperties
+ (iBase* parent)
   : scfImplementationType (this, parent)
 {
   collideable = true;
 }
 
-csTerrainSimpleCellCollisionProperties::~csTerrainSimpleCellCollisionProperties ()
+csTerrainSimpleCellCollisionProperties::~csTerrainSimpleCellCollisionProperties
+()
 {
 }
 
-bool csTerrainSimpleCellCollisionProperties::GetCollideable() const
+bool csTerrainSimpleCellCollisionProperties::GetCollideable () const
 {
   return collideable;
 }
 
-void csTerrainSimpleCellCollisionProperties::SetCollideable(bool value)
+void csTerrainSimpleCellCollisionProperties::SetCollideable (bool value)
 {
   collideable = value;
 }
@@ -55,17 +57,22 @@ csTerrainSimpleCollider::~csTerrainSimpleCollider ()
 {
 }
 
-csPtr<iTerrainCellCollisionProperties> csTerrainSimpleCollider::CreateProperties()
+csPtr<iTerrainCellCollisionProperties> csTerrainSimpleCollider::
+CreateProperties ()
 {
-  return new csTerrainSimpleCellCollisionProperties(0);
+  return new csTerrainSimpleCellCollisionProperties(NULL);
 }
 
-bool csTerrainSimpleCollider::CollideRay(iTerrainCell* cell, const csVector3& start, const csVector3& end, bool oneHit, csArray<csVector3>& points)
+bool csTerrainSimpleCollider::CollideRay (iTerrainCell* cell,
+const csVector3& start, const csVector3& end, bool oneHit,
+csArray<csVector3>& points)
 {
   return false;
 }
 
-bool csTerrainSimpleCollider::CollideSegment(iTerrainCell* cell, const csVector3& start, const csVector3& end, bool oneHit, csArray<csVector3>& points)
+bool csTerrainSimpleCollider::CollideSegment (iTerrainCell* cell,
+const csVector3& start, const csVector3& end, bool oneHit,
+csArray<csVector3>& points)
 {
   return false;
 }

@@ -52,96 +52,108 @@ csTerrainSystem::~csTerrainSystem ()
 {
 }
 
-void csTerrainSystem::SetRenderer(iTerrainRenderer* renderer)
+void csTerrainSystem::SetRenderer (iTerrainRenderer* renderer)
 {
   this->renderer = renderer;
 }
 
-void csTerrainSystem::SetCollider(iTerrainCollider* collider)
+void csTerrainSystem::SetCollider (iTerrainCollider* collider)
 {
   this->collider = collider;
 }
 
-void csTerrainSystem::AddCell(csTerrainCell* cell)
+void csTerrainSystem::AddCell (csTerrainCell* cell)
 {
-  cells.Push(cell);
+  cells.Push (cell);
 }
 
-iTerrainCell* csTerrainSystem::GetCell(const char* name)
+iTerrainCell* csTerrainSystem::GetCell (const char* name)
 {
-  for (size_t i = 0; i < cells.GetSize(); ++i)
-    if (!strcmp(cells[i]->GetName(), name))
-      return cells[i];
-  
-  return NULL;
-}
-
-iTerrainCell* csTerrainSystem::GetCell(const csVector2& pos)
-{
-  for (size_t i = 0; i < cells.GetSize(); ++i)
+  for (size_t i = 0; i < cells.GetSize (); ++i)
   {
-    const csVector2& cell_pos = cells[i]->GetPosition();
-    const csVector2& cell_size = cells[i]->GetSize();
-
-    if (cell_pos.x <= pos.x + EPSILON && cell_pos.x + cell_size.x >= pos.x - EPSILON &&
-        cell_pos.y <= pos.y + EPSILON && cell_pos.y + cell_size.y >= pos.y - EPSILON)
-      return cells[i];                
+    if (!strcmp (cells[i]->GetName (), name))
+    {
+      return cells[i];
+    }
   }
 
   return NULL;
 }
 
-const csRefArray<iMaterialWrapper>& csTerrainSystem::GetMaterialPalette() const
+iTerrainCell* csTerrainSystem::GetCell (const csVector2& pos)
+{
+  for (size_t i = 0; i < cells.GetSize (); ++i)
+  {
+    const csVector2& cell_pos = cells[i]->GetPosition ();
+    const csVector2& cell_size = cells[i]->GetSize ();
+
+    if (cell_pos.x <= pos.x + EPSILON &&
+        cell_pos.x + cell_size.x >= pos.x - EPSILON &&
+        cell_pos.y <= pos.y + EPSILON &&
+        cell_pos.y + cell_size.y >= pos.y - EPSILON)
+    {
+      return cells[i];
+    }
+  }
+
+  return NULL;
+}
+
+const csRefArray<iMaterialWrapper>& csTerrainSystem::GetMaterialPalette ()
+                                                                       const
 {
   return material_palette;
 }
 
-void csTerrainSystem::SetMaterialPalette(const csRefArray<iMaterialWrapper>& array)
+void csTerrainSystem::SetMaterialPalette (const csRefArray<iMaterialWrapper>&
+                                          array)
 {
   material_palette = array;
 
-  renderer->OnMaterialPaletteUpdate(material_palette);
+  renderer->OnMaterialPaletteUpdate (material_palette);
 }
 
-bool csTerrainSystem::CollideRay(const csVector3& start, const csVector3& end, bool oneHit, csArray<csVector3>& points)
+bool csTerrainSystem::CollideRay (const csVector3& start, const csVector3& end,
+                                  bool oneHit, csArray<csVector3>& points)
 {
   return false;
 }
 
-bool csTerrainSystem::CollideSegment(const csVector3& start, const csVector3& end, bool oneHit, csArray<csVector3>& points)
+bool csTerrainSystem::CollideSegment (const csVector3& start, const csVector3&
+                                 end, bool oneHit, csArray<csVector3>& points)
 {
   return false;
 }
 
-float csTerrainSystem::GetVirtualViewDistance() const
+float csTerrainSystem::GetVirtualViewDistance () const
 {
   return vview_distance;
 }
 
-void csTerrainSystem::SetVirtualViewDistance(float distance)
+void csTerrainSystem::SetVirtualViewDistance (float distance)
 {
   vview_distance = distance;
 }
 
-bool csTerrainSystem::GetAutoPreLoad() const
+bool csTerrainSystem::GetAutoPreLoad () const
 {
   return auto_preload;
 }
 
-void csTerrainSystem::SetAutoPreLoad(bool mode)
+void csTerrainSystem::SetAutoPreLoad (bool mode)
 {
   auto_preload = mode;
 }
 
-void csTerrainSystem::PreLoadCells(iRenderView* rview, iMovable* movable)
+void csTerrainSystem::PreLoadCells (iRenderView* rview, iMovable* movable)
 {
   csPlane3 planes[10];
   uint32 frustum_mask;
   
-  csOrthoTransform c2ot = rview->GetCamera()->GetTransform();
+  csOrthoTransform c2ot = rview->GetCamera ()->GetTransform ();
   c2ot /= movable->GetFullTransform ();
   
-  rview->SetupClipPlanes(c2ot, planes, frustum_mask);
+  rview->SetupClipPlanes (c2ot, planes, frustum_mask);
   
   /// Here I should not just multiply by vview_distance, because it scales the frustum in N times, and N has nothing to do with distance :)
   /// Left for now, because, well, I'm not sure of the desired behavior
@@ -149,48 +161,53 @@ void csTerrainSystem::PreLoadCells(iRenderView* rview, iMovable* movable)
 #pragma message(PR_WARNING("vview_distance hack, frustum is enlarged too much"))
 
   for (int pi = 0; pi < 10; ++pi)
+  {
     planes[pi].DD *= vview_distance;
+  }
   
   for (size_t i = 0; i < cells.GetSize(); ++i)
   {
     uint32 out_mask;
     
-    csBox3 box = cells[i]->GetBBox();
+    csBox3 box = cells[i]->GetBBox ();
     
-    if (csIntersect3::BoxFrustum(box, planes, frustum_mask, out_mask) && cells[i]->GetLoadState() == csTerrainCell::NotLoaded)
-      cells[i]->PreLoad();
+    if (csIntersect3::BoxFrustum (box, planes, frustum_mask, out_mask) &&
+        cells[i]->GetLoadState () == csTerrainCell::NotLoaded)
+    {
+      cells[i]->PreLoad ();
+    }
   }
 }
 
-float csTerrainSystem::GetHeight(const csVector2& pos)
+float csTerrainSystem::GetHeight (const csVector2& pos)
 {
-  iTerrainCell* cell = GetCell(pos);
+  iTerrainCell* cell = GetCell (pos);
   
-  if (cell) return cell->GetHeight(pos - cell->GetPosition());
+  if (cell) return cell->GetHeight (pos - cell->GetPosition ());
   else return 0;
 }
 
-csVector3 csTerrainSystem::GetTangent(const csVector2& pos)
+csVector3 csTerrainSystem::GetTangent (const csVector2& pos)
 {
-  iTerrainCell* cell = GetCell(pos);
+  iTerrainCell* cell = GetCell (pos);
   
-  if (cell) return cell->GetTangent(pos - cell->GetPosition());
+  if (cell) return cell->GetTangent (pos - cell->GetPosition ());
   else return csVector3(0, 0, 0);
 }
 
-csVector3 csTerrainSystem::GetBinormal(const csVector2& pos)
+csVector3 csTerrainSystem::GetBinormal (const csVector2& pos)
 {
-  iTerrainCell* cell = GetCell(pos);
+  iTerrainCell* cell = GetCell (pos);
   
-  if (cell) return cell->GetBinormal(pos - cell->GetPosition());
+  if (cell) return cell->GetBinormal (pos - cell->GetPosition ());
   else return csVector3(0, 0, 0);
 }
 
-csVector3 csTerrainSystem::GetNormal(const csVector2& pos)
+csVector3 csTerrainSystem::GetNormal (const csVector2& pos)
 {
-  iTerrainCell* cell = GetCell(pos);
+  iTerrainCell* cell = GetCell (pos);
   
-  if (cell) return cell->GetNormal(pos - cell->GetPosition());
+  if (cell) return cell->GetNormal (pos - cell->GetPosition ());
   else return csVector3(0, 0, 0);
 }
 
@@ -212,34 +229,38 @@ csPtr<iMeshObject> csTerrainSystem::Clone ()
 csRenderMesh** csTerrainSystem::GetRenderMeshes (int& num, iRenderView* rview, 
     iMovable* movable, uint32 frustum_mask)
 {
-  needed_cells.SetSize(0);
+  needed_cells.SetSize (0);
   
-  csOrthoTransform c2ot = rview->GetCamera()->GetTransform();
+  csOrthoTransform c2ot = rview->GetCamera ()->GetTransform ();
   c2ot /= movable->GetFullTransform ();
   
   csPlane3 planes[10];
   
-  rview->SetupClipPlanes(c2ot, planes, frustum_mask);
+  rview->SetupClipPlanes (c2ot, planes, frustum_mask);
   
-  for (size_t i = 0; i < cells.GetSize(); ++i)
+  for (size_t i = 0; i < cells.GetSize (); ++i)
   {
     uint32 out_mask;
     
-    csBox3 box = cells[i]->GetBBox();
+    csBox3 box = cells[i]->GetBBox ();
 
-    if (csIntersect3::BoxFrustum(box, planes, frustum_mask, out_mask))
+    if (csIntersect3::BoxFrustum (box, planes, frustum_mask, out_mask))
     {
-      if (cells[i]->GetLoadState() != csTerrainCell::Loaded) cells[i]->Load();
+      if (cells[i]->GetLoadState () != csTerrainCell::Loaded)
+      {
+        cells[i]->Load ();
+      }
       
-      needed_cells.Push(cells[i]);
+      needed_cells.Push (cells[i]);
     }
   }
   
-  if (auto_preload) PreLoadCells(rview, movable);
+  if (auto_preload) PreLoadCells (rview, movable);
   
-  if (imo_viscb) imo_viscb->BeforeDrawing(this, rview);
+  if (imo_viscb) imo_viscb->BeforeDrawing (this, rview);
   
-  return renderer->GetRenderMeshes(num, rview, movable, frustum_mask, needed_cells.GetArray(), (int)needed_cells.GetSize());
+  return renderer->GetRenderMeshes (num, rview, movable, frustum_mask,
+           needed_cells.GetArray (), (int)needed_cells.GetSize ());
 }
 
 void csTerrainSystem::SetVisibleCallback (iMeshObjectDrawCallback* cb)
@@ -252,7 +273,7 @@ iMeshObjectDrawCallback* csTerrainSystem::GetVisibleCallback () const
   return imo_viscb;
 }
 
-void csTerrainSystem::NextFrame (csTicks current_time,const csVector3& pos,
+void csTerrainSystem::NextFrame (csTicks current_time, const csVector3& pos,
     uint currentFrame)
 {
 }
@@ -272,7 +293,8 @@ bool csTerrainSystem::HitBeamOutline (const csVector3& start,
   return false;
 }
 
-bool csTerrainSystem::HitBeamObject (const csVector3& start, const csVector3& end,
+bool csTerrainSystem::HitBeamObject (const csVector3& start,
+        const csVector3& end,
         csVector3& isect, float* pr, int* polygon_idx,
         iMaterialWrapper** material )
 {
@@ -331,29 +353,31 @@ void csTerrainSystem::PositionChild (iMeshObject* child,csTicks current_time)
 {
 }
 
-void csTerrainSystem::ComputeBBox()
+void csTerrainSystem::ComputeBBox ()
 {
-  bbox.StartBoundingBox();
+  bbox.StartBoundingBox ();
   
-  for (size_t i = 0; i < cells.GetSize(); ++i)
-    bbox = bbox + cells[i]->GetBBox();
+  for (size_t i = 0; i < cells.GetSize (); ++i)
+  {
+    bbox = bbox + cells[i]->GetBBox ();
+  }
   
   bbox_valid = true;
 }
 
-void csTerrainSystem::GetObjectBoundingBox(csBox3& box)
+void csTerrainSystem::GetObjectBoundingBox (csBox3& box)
 {
-  if (!bbox_valid) ComputeBBox();
+  if ( !bbox_valid ) ComputeBBox ();
   box = bbox;
 }
 
-void csTerrainSystem::SetObjectBoundingBox(const csBox3& box)
+void csTerrainSystem::SetObjectBoundingBox (const csBox3& box)
 {
   bbox = box;
   ShapeChanged ();
 }
 
-void csTerrainSystem::GetRadius(float& radius, csVector3& center)
+void csTerrainSystem::GetRadius (float& radius, csVector3& center)
 {
   csBox3 box;
   GetObjectBoundingBox (box);

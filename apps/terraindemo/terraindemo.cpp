@@ -105,7 +105,8 @@ bool TerrainDemo::Setup ()
   
   terrain_mesh_wrapper->GetMovable()->SetSector(room);
   
-  csRef<iLight> light = engine->CreateLight ("DynLight", csVector3 (23, 1, 5), 10, csColor (1, 0, 0), CS_LIGHT_DYNAMICTYPE_DYNAMIC);
+  csRef<iLight> light = engine->CreateLight ("DynLight", csVector3 (23, 1, 5),
+  10, csColor (1, 0, 0), CS_LIGHT_DYNAMICTYPE_DYNAMIC);
   room->GetLights ()->Add(light);
   
   pos = csVector3(0, 74, 0);
@@ -255,27 +256,34 @@ bool TerrainDemo::OnInitialize(int /*argc*/, char* /*argv*/ [])
     return ReportError("Failed to set up event handler!");
     
   // Let's create a terrain.
-  csRef<iTerrainRenderer> t_renderer = csLoadPlugin<iTerrainRenderer>(GetObjectRegistry(), "crystalspace.mesh.object.terrainimproved.simplerenderer");
+  csRef<iTerrainRenderer> t_renderer = csLoadPlugin<iTerrainRenderer>(
+  GetObjectRegistry(),
+  "crystalspace.mesh.object.terrainimproved.simplerenderer");
   
-  csRef<iTerrainCollider> t_collider = csLoadPlugin<iTerrainCollider>(GetObjectRegistry(), "crystalspace.mesh.object.terrainimproved.simplecollider");
+  csRef<iTerrainCollider> t_collider = csLoadPlugin<iTerrainCollider>(
+  GetObjectRegistry(),
+  "crystalspace.mesh.object.terrainimproved.simplecollider");
   
-  csRef<iTerrainDataFeeder> t_feeder = csLoadPlugin<iTerrainDataFeeder>(GetObjectRegistry(), "crystalspace.mesh.object.terrainimproved.simpledatafeeder");
+  csRef<iTerrainDataFeeder> t_feeder = csLoadPlugin<iTerrainDataFeeder>(
+  GetObjectRegistry(),
+  "crystalspace.mesh.object.terrainimproved.simpledatafeeder");
 
-  csRef<iMeshObjectType> t_mesh_type = csLoadPlugin<iMeshObjectType>(GetObjectRegistry(), "crystalspace.mesh.object.terrainimproved");
+  csRef<iMeshObjectType> t_mesh_type = csLoadPlugin<iMeshObjectType>(
+  GetObjectRegistry(),
+  "crystalspace.mesh.object.terrainimproved");
   
   csRef<iMeshObjectFactory> t_mesh_factory = t_mesh_type->NewFactory();
   
-  csRef<iTerrainFactory> t_factory = scfQueryInterface<iTerrainFactory>(t_mesh_factory);
+  csRef<iTerrainFactory> t_factory = scfQueryInterface<iTerrainFactory>(
+  t_mesh_factory);
 
   t_factory->SetRenderer(t_renderer);
   t_factory->SetCollider(t_collider);
   
-  int count = 100;
-  float size = 300;
-  
-  for (int i = -count; i <= count; ++i)
-    for (int j = -count; j <= count; ++j)
-      t_factory->AddCell("cell", 33, 33, 32, 32, csVector2(24 + size*i, 24 + size*j), csVector2(size, size), t_feeder);
+  t_factory->AddCell("cell", 33, 33, 32, 32, csVector2(24, 24),
+  csVector2(100, 100), t_feeder);
+  t_factory->AddCell("cell", 33, 33, 32, 32, csVector2(124, 124),
+  csVector2(100, 100), t_feeder);
   
   csRef<iMeshObject> t_mesh = t_mesh_factory->NewInstance();
   
@@ -314,29 +322,39 @@ bool TerrainDemo::LoadMap ()
   //if (!loader->LoadMapFile ("world"))
   //  ReportError("Error couldn't load level!");
     
-  iTextureWrapper* grass_tex = loader->LoadTexture("grass_tex", "/lev/terrain/grass.png");
-  iTextureWrapper* stone_tex = loader->LoadTexture("stone_tex", "/lib/std/stone4.gif");
-  iTextureWrapper* lava_tex = loader->LoadTexture("lava_tex", "/lev/terraini/lava.png");
+  iTextureWrapper* grass_tex = loader->LoadTexture("grass_tex",
+  "/lev/terrain/grass.png");
+  iTextureWrapper* stone_tex = loader->LoadTexture("stone_tex",
+  "/lib/std/stone4.gif");
+  iTextureWrapper* lava_tex = loader->LoadTexture("lava_tex",
+  "/lev/terraini/lava.png");
 
-  csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (GetObjectRegistry(), "crystalspace.shared.stringset", iStringSet);
+  csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
+  GetObjectRegistry(), "crystalspace.shared.stringset", iStringSet);
   
-  csRef<iShaderManager> shmgr = CS_QUERY_REGISTRY (GetObjectRegistry(), iShaderManager);
+  csRef<iShaderManager> shmgr = CS_QUERY_REGISTRY (GetObjectRegistry(),
+  iShaderManager);
   
-  loader->LoadShader("/lev/terraini/shader.xml");
+  loader->LoadShader("/lev/terraini/shader_base.xml");
+  loader->LoadShader("/lev/terraini/shader_add.xml");
   
-  iShader* shader = shmgr->GetShader("terrain_improved");
+  iShader* shader_base = shmgr->GetShader("terrain_improved_base");
+  iShader* shader_add = shmgr->GetShader("terrain_improved_add");
   
   csRefArray<iMaterialWrapper> materials;
   
   iMaterialWrapper* material;
   
-  (material = engine->CreateMaterial("LavaMaterial", lava_tex))->GetMaterial()->SetShader(strings->Request("standard"), shader);
+  (material = engine->CreateMaterial("LavaMaterial", lava_tex))->
+  GetMaterial()->SetShader(strings->Request("standard"), shader_base);
   materials.Push(material);
   
-  (material = engine->CreateMaterial("GrassMaterial", grass_tex))->GetMaterial()->SetShader(strings->Request("standard"), shader);
+  (material = engine->CreateMaterial("GrassMaterial", grass_tex))->
+  GetMaterial()->SetShader(strings->Request("standard"), shader_add);
   materials.Push(material);
 
-  (material = engine->CreateMaterial("StoneMaterial", stone_tex))->GetMaterial()->SetShader(strings->Request("standard"), shader);
+  (material = engine->CreateMaterial("StoneMaterial", stone_tex))->
+  GetMaterial()->SetShader(strings->Request("standard"), shader_add);
   materials.Push(material);
   
   terrain->SetMaterialPalette(materials);

@@ -6,8 +6,8 @@
   </variables>
 
   <plugins>
-    <plugin name="terrainFact">crystalspace.mesh.loader.factory.terrain</plugin>
-    <plugin name="terrain">crystalspace.mesh.loader.terrain</plugin>
+    <plugin name="terrainFact">crystalspace.mesh.loader.factory.terrainimproved</plugin>
+    <plugin name="terrain">crystalspace.mesh.loader.terrainimproved</plugin>
   </plugins>
 
   <textures>

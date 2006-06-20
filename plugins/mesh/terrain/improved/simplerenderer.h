@@ -30,6 +30,10 @@
 
 #include "iutil/comp.h"
 
+#include "ivideo/graph3d.h"
+
+#include "iutil/strset.h"
+
 CS_PLUGIN_NAMESPACE_BEGIN(ImprovedTerrain)
 {
 
@@ -45,8 +49,8 @@ public:
 
   virtual ~csTerrainSimpleCellRenderProperties ();
 
-  virtual bool GetVisible() const;
-  virtual void SetVisible(bool value);
+  virtual bool GetVisible () const;
+  virtual void SetVisible (bool value);
 };
 
 class csTerrainSimpleRenderer :
@@ -61,6 +65,9 @@ class csTerrainSimpleRenderer :
   csRefArray<iMaterialWrapper> material_palette;
 
   iObjectRegistry* object_reg;
+
+  csRef<iGraphics3D> g3d;
+  csRef<iStringSet> strings;
 public:
   csTerrainSimpleRenderer (iBase* parent);
 
@@ -68,13 +75,19 @@ public:
 
   // ------------ iTerrainRenderer implementation ------------
 
-  virtual csPtr<iTerrainCellRenderProperties> CreateProperties();
+  virtual csPtr<iTerrainCellRenderProperties> CreateProperties ();
 
-  virtual csRenderMesh** GetRenderMeshes(int& n, iRenderView* rview, iMovable* movable, uint32 frustum_mask, iTerrainCell** cells, int cell_count);
-  
-  virtual void OnMaterialPaletteUpdate(const csRefArray<iMaterialWrapper>& material_palette);
-  virtual void OnHeightUpdate(iTerrainCell* cell, const csRect& rectangle, const float* data, unsigned int pitch);
-  virtual void OnMaterialMaskUpdate(iTerrainCell* cell, unsigned int material, const csRect& rectangle, const unsigned char* data, unsigned int pitch);
+  virtual csRenderMesh** GetRenderMeshes (int& n, iRenderView* rview,
+                                   iMovable* movable, uint32 frustum_mask,
+                                   iTerrainCell** cells, int cell_count);
+
+  virtual void OnMaterialPaletteUpdate (const csRefArray<iMaterialWrapper>&
+                                        material_palette);
+  virtual void OnHeightUpdate (iTerrainCell* cell, const csRect& rectangle,
+                               const float* data, unsigned int pitch);
+  virtual void OnMaterialMaskUpdate (iTerrainCell* cell, unsigned int material,
+                               const csRect& rectangle, const unsigned char*
+                               data, unsigned int pitch);
   
   // ------------ iComponent implementation ------------
   virtual bool Initialize (iObjectRegistry* object_reg);

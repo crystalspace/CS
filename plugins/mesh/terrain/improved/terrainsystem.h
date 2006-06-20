@@ -77,33 +77,35 @@ public:
 
   virtual ~csTerrainSystem ();
 
-  void AddCell(csTerrainCell* cell);
+  void AddCell (csTerrainCell* cell);
 
-  void SetRenderer(iTerrainRenderer* renderer);
-  void SetCollider(iTerrainCollider* collider);
+  void SetRenderer (iTerrainRenderer* renderer);
+  void SetCollider (iTerrainCollider* collider);
 
   // ------------ iTerrainSystem implementation ------------
 
-  virtual iTerrainCell* GetCell(const char* name);
-  virtual iTerrainCell* GetCell(const csVector2& pos);
+  virtual iTerrainCell* GetCell (const char* name);
+  virtual iTerrainCell* GetCell (const csVector2& pos);
 
-  virtual const csRefArray<iMaterialWrapper>& GetMaterialPalette() const;
-  virtual void SetMaterialPalette(const csRefArray<iMaterialWrapper>& array);
+  virtual const csRefArray<iMaterialWrapper>& GetMaterialPalette () const;
+  virtual void SetMaterialPalette (const csRefArray<iMaterialWrapper>& array);
 
-  virtual bool CollideRay(const csVector3& start, const csVector3& end, bool oneHit, csArray<csVector3>& points);
-  virtual bool CollideSegment(const csVector3& start, const csVector3& end, bool oneHit, csArray<csVector3>& points);
+  virtual bool CollideRay (const csVector3& start, const csVector3& end,
+                           bool oneHit, csArray<csVector3>& points);
+  virtual bool CollideSegment (const csVector3& start, const csVector3& end,
+                           bool oneHit, csArray<csVector3>& points);
 
-  virtual float GetVirtualViewDistance() const;
-  virtual void SetVirtualViewDistance(float distance);
+  virtual float GetVirtualViewDistance () const;
+  virtual void SetVirtualViewDistance (float distance);
 
-  virtual bool GetAutoPreLoad() const;
-  virtual void SetAutoPreLoad(bool mode);
-  virtual void PreLoadCells(iRenderView* rview, iMovable* movable);
+  virtual bool GetAutoPreLoad () const;
+  virtual void SetAutoPreLoad (bool mode);
+  virtual void PreLoadCells (iRenderView* rview, iMovable* movable);
   
-  virtual float GetHeight(const csVector2& pos);
-  virtual csVector3 GetTangent(const csVector2& pos);
-  virtual csVector3 GetBinormal(const csVector2& pos);
-  virtual csVector3 GetNormal(const csVector2& pos);
+  virtual float GetHeight (const csVector2& pos);
+  virtual csVector3 GetTangent (const csVector2& pos);
+  virtual csVector3 GetBinormal (const csVector2& pos);
+  virtual csVector3 GetNormal (const csVector2& pos);
   
   // ------------ iMeshObject implementation ------------
 
@@ -156,10 +158,10 @@ public:
   virtual void PositionChild (iMeshObject* child,csTicks current_time);
 
   // ------------ iObjectModel implementation ------------
-  virtual void GetObjectBoundingBox(csBox3& box);
-  virtual void SetObjectBoundingBox(const csBox3& box);
+  virtual void GetObjectBoundingBox (csBox3& box);
+  virtual void SetObjectBoundingBox (const csBox3& box);
 
-  virtual void GetRadius(float& radius, csVector3& center);
+  virtual void GetRadius (float& radius, csVector3& center);
 };
 
 }

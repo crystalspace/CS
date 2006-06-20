@@ -36,12 +36,18 @@ struct iTerrainRenderer : public virtual iBase
 {
   SCF_INTERFACE (iTerrainRenderer, 1, 0, 0);
 
-  virtual csPtr<iTerrainCellRenderProperties> CreateProperties() = 0;
-  virtual csRenderMesh** GetRenderMeshes(int& n, iRenderView* rview, iMovable* movable, uint32 frustum_mask, iTerrainCell** cells, int cell_count) = 0;
+  virtual csPtr<iTerrainCellRenderProperties> CreateProperties () = 0;
+  virtual csRenderMesh** GetRenderMeshes (int& n, iRenderView* rview,
+                                   iMovable* movable, uint32 frustum_mask,
+                                   iTerrainCell** cells, int cell_count) = 0;
 
-  virtual void OnMaterialPaletteUpdate(const csRefArray<iMaterialWrapper>& material_palette) = 0;
-  virtual void OnHeightUpdate(iTerrainCell* cell, const csRect& rectangle, const float* data, unsigned int pitch) = 0;
-  virtual void OnMaterialMaskUpdate(iTerrainCell* cell, unsigned int material, const csRect& rectangle, const unsigned char* data, unsigned int pitch) = 0;
+  virtual void OnMaterialPaletteUpdate (const csRefArray<iMaterialWrapper>&
+                                        material_palette) = 0;
+  virtual void OnHeightUpdate (iTerrainCell* cell, const csRect& rectangle,
+                               const float* data, unsigned int pitch) = 0;
+  virtual void OnMaterialMaskUpdate (iTerrainCell* cell, unsigned int material,
+                               const csRect& rectangle, const unsigned char*
+                               data, unsigned int pitch) = 0;
 };
 
 #endif // __CS_ITERRAIN_TERRAINRENDERER_H__

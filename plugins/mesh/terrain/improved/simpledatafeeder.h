@@ -42,8 +42,8 @@ public:
 
   // ------------ iTerrainDataFeeder implementation ------------
 
-  virtual void PreLoad(iTerrainCell* cell);
-  virtual void Load(iTerrainCell* cell);
+  virtual void PreLoad (iTerrainCell* cell);
+  virtual void Load (iTerrainCell* cell);
   
   // ------------ iComponent implementation ------------
   virtual bool Initialize (iObjectRegistry* object_reg);

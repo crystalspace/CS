@@ -106,27 +106,33 @@ uint csTerrainFactory::GetMixMode () const
   return 0;
 }
 
-void csTerrainFactory::SetRenderer(iTerrainRenderer* renderer)
+void csTerrainFactory::SetRenderer (iTerrainRenderer* renderer)
 {
   this->renderer = renderer;
-  terrain->SetRenderer(renderer);
+  terrain->SetRenderer (renderer);
 }
 
-void csTerrainFactory::SetCollider(iTerrainCollider* collider)
+void csTerrainFactory::SetCollider (iTerrainCollider* collider)
 {
   this->collider = collider;
-  terrain->SetCollider(collider);
+  terrain->SetCollider (collider);
 }
 
-void csTerrainFactory::AddCell(const char* name, int grid_width, int grid_height, int material_width, int material_height, const csVector2& position, const csVector2& size, iTerrainDataFeeder* feeder)
+void csTerrainFactory::AddCell(const char* name, int grid_width,
+int grid_height, int material_width, int material_height,
+const csVector2& position, const csVector2& size, iTerrainDataFeeder* feeder)
 {
-  csRef<iTerrainCellRenderProperties> render_properties = renderer->CreateProperties();
-  csRef<iTerrainCellCollisionProperties> collision_properties = collider->CreateProperties();
+  csRef<iTerrainCellRenderProperties> render_properties =
+  renderer->CreateProperties ();
+  csRef<iTerrainCellCollisionProperties> collision_properties =
+  collider->CreateProperties ();
   
   csRef<csTerrainCell> cell;
-  cell.AttachNew(new csTerrainCell(name, grid_width, grid_height, material_width, material_height, position, size, feeder, render_properties, collision_properties, renderer));
+  cell.AttachNew (new csTerrainCell(name, grid_width, grid_height,
+  material_width, material_height, position, size, feeder, render_properties,
+  collision_properties, renderer));
                                      
-  terrain->AddCell(cell);
+  terrain->AddCell (cell);
 }
 
 }

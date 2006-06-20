@@ -31,9 +31,11 @@ struct iTerrainCollider : public virtual iBase
 {
   SCF_INTERFACE (iTerrainCollider, 1, 0, 0);
 
-  virtual csPtr<iTerrainCellCollisionProperties> CreateProperties() = 0;
-  virtual bool CollideRay(iTerrainCell* cell, const csVector3& start, const csVector3& end, bool oneHit, csArray<csVector3>& points) = 0;
-  virtual bool CollideSegment(iTerrainCell* cell, const csVector3& start, const csVector3& end, bool oneHit, csArray<csVector3>& points) = 0;
+  virtual csPtr<iTerrainCellCollisionProperties> CreateProperties () = 0;
+  virtual bool CollideRay (iTerrainCell* cell, const csVector3& start,
+           const csVector3& end, bool oneHit, csArray<csVector3>& points) = 0;
+  virtual bool CollideSegment (iTerrainCell* cell, const csVector3& start,
+           const csVector3& end, bool oneHit, csArray<csVector3>& points) = 0;
 };
 
 #endif // __CS_ITERRAIN_TERRAINCOLLIDER_H__

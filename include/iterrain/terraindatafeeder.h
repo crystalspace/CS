@@ -27,8 +27,8 @@ struct iTerrainDataFeeder : public virtual iBase
 {
   SCF_INTERFACE (iTerrainDataFeeder, 1, 0, 0);
 
-  virtual void PreLoad(iTerrainCell* cell) = 0;
-  virtual void Load(iTerrainCell* cell) = 0;
+  virtual void PreLoad (iTerrainCell* cell) = 0;
+  virtual void Load (iTerrainCell* cell) = 0;
 };
 
 #endif // __CS_ITERRAIN_TERRAINDATAFEEDER_H__

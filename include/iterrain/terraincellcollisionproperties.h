@@ -25,8 +25,8 @@ struct iTerrainCellCollisionProperties : public virtual iBase
 {
   SCF_INTERFACE (iTerrainCellCollisionProperties, 1, 0, 0);
 
-  virtual bool GetCollideable() const = 0;
-  virtual void SetCollideable(bool value) = 0;
+  virtual bool GetCollideable () const = 0;
+  virtual void SetCollideable (bool value) = 0;
 };
 
 #endif // __CS_ITERRAIN_TERRAINCELLCOLLISIONPROPERTIES_H__

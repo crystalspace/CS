@@ -81,9 +81,12 @@ public:
 
   // ------------ iTerrainFactory implementation ------------
 
-  virtual void SetRenderer(iTerrainRenderer* renderer);
-  virtual void SetCollider(iTerrainCollider* collider);
-  virtual void AddCell(const char* name, int grid_width, int grid_height, int material_width, int material_height, const csVector2& position, const csVector2& size, iTerrainDataFeeder* feeder);
+  virtual void SetRenderer (iTerrainRenderer* renderer);
+  virtual void SetCollider (iTerrainCollider* collider);
+  virtual void AddCell (const char* name, int grid_width, int grid_height,
+                        int material_width, int material_height,
+                        const csVector2& position, const csVector2& size,
+                        iTerrainDataFeeder* feeder);
 };
 
 }

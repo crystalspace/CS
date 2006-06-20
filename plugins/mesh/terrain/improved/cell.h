@@ -67,64 +67,67 @@ private:
 
   float min_height, max_height;
 
-  void LerpHelper(const csVector2& pos, int& x1, int& x2, float& xfrac, int& y1, int& y2, float& yfrac) const;
+  void LerpHelper (const csVector2& pos, int& x1, int& x2, float& xfrac,
+                                    int& y1, int& y2, float& yfrac) const;
 
 public:
-
   csTerrainCell (const char* name, int grid_width, int grid_height, int material_width, int material_height, const csVector2& position, const csVector2& size, iTerrainDataFeeder* feeder, iTerrainCellRenderProperties* render_properties, iTerrainCellCollisionProperties* collision_properties, iTerrainRenderer* renderer);
 
   virtual ~csTerrainCell ();
 
-  iTerrainDataFeeder* GetDataFeeder() const;
+  iTerrainDataFeeder* GetDataFeeder () const;
 
-  LoadState GetLoadState() const;
+  LoadState GetLoadState () const;
 
-  void PreLoad();
-  void Load();
-  void Unload();
+  void PreLoad ();
+  void Load ();
+  void Unload ();
 
-  csBox3 GetBBox() const;
+  csBox3 GetBBox () const;
 
   // ------------ iTerrainCell implementation ------------
 
-  virtual const char* GetName() const;
-  virtual iTerrainCellRenderProperties* GetRenderProperties() const;
-  virtual iTerrainCellCollisionProperties* GetCollisionProperties() const;
+  virtual const char* GetName () const;
+  virtual iTerrainCellRenderProperties* GetRenderProperties () const;
+  virtual iTerrainCellCollisionProperties* GetCollisionProperties () const;
 
-  virtual csRefCount* GetRenderData() const;
-  virtual void SetRenderData(csRefCount* data);
+  virtual csRefCount* GetRenderData () const;
+  virtual void SetRenderData (csRefCount* data);
 
-  virtual int GetGridWidth() const;
-  virtual int GetGridHeight() const;
+  virtual int GetGridWidth () const;
+  virtual int GetGridHeight () const;
 
-  virtual csLockedHeightData LockHeightData(const csRect& rectangle);
-  virtual void UnlockHeightData();
+  virtual csLockedHeightData LockHeightData (const csRect& rectangle);
+  virtual void UnlockHeightData ();
 
-  virtual const csVector2& GetPosition() const;
-  virtual const csVector2& GetSize() const;
+  virtual const csVector2& GetPosition () const;
+  virtual const csVector2& GetSize () const;
 
-  virtual int GetMaterialMapWidth() const;
-  virtual int GetMaterialMapHeight() const;
-  virtual csLockedMaterialMap LockMaterialMap(const csRect& rectangle);
-  virtual void UnlockMaterialMap();
+  virtual int GetMaterialMapWidth () const;
+  virtual int GetMaterialMapHeight () const;
+  virtual csLockedMaterialMap LockMaterialMap (const csRect& rectangle);
+  virtual void UnlockMaterialMap ();
 
-  virtual void SetMaterialMask(unsigned int material, iImage* image);
-  virtual void SetMaterialMask(unsigned int material, const unsigned char* data, unsigned int width, unsigned int height);
+  virtual void SetMaterialMask (unsigned int material, iImage* image);
+  virtual void SetMaterialMask (unsigned int material, const unsigned char*
+                             data, unsigned int width, unsigned int height);
 
-  virtual bool CollideRay(const csVector3& start, const csVector3& end, bool oneHit, csArray<csVector3>& points) const;
-  virtual bool CollideSegment(const csVector3& start, const csVector3& end, bool oneHit, csArray<csVector3>& points) const;
+  virtual bool CollideRay (const csVector3& start, const csVector3& end, 
+                           bool oneHit, csArray<csVector3>& points) const;
+  virtual bool CollideSegment (const csVector3& start, const csVector3& end,
+                           bool oneHit, csArray<csVector3>& points) const;
 
-  virtual float GetHeight(int x, int y) const;
-  virtual float GetHeight(const csVector2& pos) const;
+  virtual float GetHeight (int x, int y) const;
+  virtual float GetHeight (const csVector2& pos) const;
   
-  virtual csVector3 GetTangent(int x, int y) const;
-  virtual csVector3 GetTangent(const csVector2& pos) const;
+  virtual csVector3 GetTangent (int x, int y) const;
+  virtual csVector3 GetTangent (const csVector2& pos) const;
 
-  virtual csVector3 GetBinormal(int x, int y) const;
-  virtual csVector3 GetBinormal(const csVector2& pos) const;
+  virtual csVector3 GetBinormal (int x, int y) const;
+  virtual csVector3 GetBinormal (const csVector2& pos) const;
 
-  virtual csVector3 GetNormal(int x, int y) const;
-  virtual csVector3 GetNormal(const csVector2& pos) const;
+  virtual csVector3 GetNormal (int x, int y) const;
+  virtual csVector3 GetNormal (const csVector2& pos) const;
 };
 
 }

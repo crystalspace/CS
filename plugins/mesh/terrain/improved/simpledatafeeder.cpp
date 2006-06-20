@@ -51,19 +51,19 @@ csTerrainSimpleDataFeeder::~csTerrainSimpleDataFeeder ()
 {
 }
 
-void csTerrainSimpleDataFeeder::PreLoad(iTerrainCell* cell)
+void csTerrainSimpleDataFeeder::PreLoad (iTerrainCell* cell)
 {
   printf("preload!\n");
 }
 
-void csTerrainSimpleDataFeeder::Load(iTerrainCell* cell)
+void csTerrainSimpleDataFeeder::Load (iTerrainCell* cell)
 {
   printf("load!\n");
 
-  int width = cell->GetGridWidth();
-  int height = cell->GetGridHeight();
+  int width = cell->GetGridWidth ();
+  int height = cell->GetGridHeight ();
 
-  csLockedHeightData data = cell->LockHeightData(csRect(0, 0, width, height));
+  csLockedHeightData data = cell->LockHeightData (csRect(0, 0, width, height));
 
 /*  for (int y = 0; y < height; ++y)
     for (int x = 0; x < width; ++x)
@@ -75,36 +75,40 @@ void csTerrainSimpleDataFeeder::Load(iTerrainCell* cell)
     }
     
   cell->UnlockHeightData();*/
-  csRef<iLoader> loader = CS_QUERY_REGISTRY (object_reg, iLoader); // yes, it does not work in release mode. again. :)
+  csRef<iLoader> loader = CS_QUERY_REGISTRY (object_reg, iLoader);
   
-  csRef<iImage> map = loader->LoadImage("/lev/terraini/heightmap.png", CS_IMGFMT_PALETTED8);
-
+  csRef<iImage> map = loader->LoadImage ("/lev/terraini/heightmap.png",
+  CS_IMGFMT_PALETTED8);
+  
   for (int y = 0; y < height; ++y)
     for (int x = 0; x < width; ++x)
     {
       float xd = float(x - width/2) / width;
       float yd = float(y - height/2) / height;
 
-      data.data[y * data.pitch + x] = ((unsigned char*)map->GetImageData())[y * map->GetWidth() + x];
+      data.data[y * data.pitch + x] = ((unsigned char*)map->GetImageData ())
+      [y * map->GetWidth () + x];
     }
 
-  cell->UnlockHeightData();
+  cell->UnlockHeightData ();
   
-  int mwidth = cell->GetMaterialMapWidth();
-  int mheight = cell->GetMaterialMapHeight();
+  int mwidth = cell->GetMaterialMapWidth ();
+  int mheight = cell->GetMaterialMapHeight ();
   
-  csRef<iImage> material = loader->LoadImage("/lev/terraini/material.png", CS_IMGFMT_TRUECOLOR);
+  csRef<iImage> material = loader->LoadImage ("/lev/terraini/material.png",
+  CS_IMGFMT_TRUECOLOR);
   
   csDirtyAccessArray<unsigned char> mdata;
-  mdata.SetSize(mwidth * mheight);
+  mdata.SetSize (mwidth * mheight);
   
   for (int i = 0; i < 3; ++i)
   {
     for (int y = 0; y < mheight; ++y)
       for (int x = 0; x < mwidth; ++x)
-        mdata[y * mwidth + x] = ((unsigned char*)material->GetImageData())[y * mwidth * 4 + x * 4 + i];
+        mdata[y * mwidth + x] = ((unsigned char*)material->GetImageData ())
+        [y * mwidth * 4 + x * 4 + i];
         
-    cell->SetMaterialMask(i, mdata.GetArray(), mwidth, mheight);
+    cell->SetMaterialMask (i, mdata.GetArray (), mwidth, mheight);
   }
 }
 

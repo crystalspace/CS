@@ -33,26 +33,29 @@ struct iTerrainSystem : public virtual iBase
 {
   SCF_INTERFACE (iTerrainSystem, 1, 0, 0);
 
-  virtual iTerrainCell* GetCell(const char* name) = 0;
-  virtual iTerrainCell* GetCell(const csVector2& pos) = 0;
+  virtual iTerrainCell* GetCell (const char* name) = 0;
+  virtual iTerrainCell* GetCell (const csVector2& pos) = 0;
 
-  virtual const csRefArray<iMaterialWrapper>& GetMaterialPalette() const = 0;
-  virtual void SetMaterialPalette(const csRefArray<iMaterialWrapper>& array) = 0;
+  virtual const csRefArray<iMaterialWrapper>& GetMaterialPalette () const = 0;
+  virtual void SetMaterialPalette (const csRefArray<iMaterialWrapper>& array)
+                                                                          = 0;
 
-  virtual bool CollideRay(const csVector3& start, const csVector3& end, bool oneHit, csArray<csVector3>& points) = 0;
-  virtual bool CollideSegment(const csVector3& start, const csVector3& end, bool oneHit, csArray<csVector3>& points) = 0;
+  virtual bool CollideRay (const csVector3& start, const csVector3& end,
+                           bool oneHit, csArray<csVector3>& points) = 0;
+  virtual bool CollideSegment (const csVector3& start, const csVector3& end,
+                           bool oneHit, csArray<csVector3>& points) = 0;
 
-  virtual float GetVirtualViewDistance() const = 0;
-  virtual void SetVirtualViewDistance(float distance) = 0;
+  virtual float GetVirtualViewDistance () const = 0;
+  virtual void SetVirtualViewDistance (float distance) = 0;
 
-  virtual bool GetAutoPreLoad() const = 0;
-  virtual void SetAutoPreLoad(bool mode) = 0;
-  virtual void PreLoadCells(iRenderView* rview, iMovable* movable) = 0;
+  virtual bool GetAutoPreLoad () const = 0;
+  virtual void SetAutoPreLoad (bool mode) = 0;
+  virtual void PreLoadCells (iRenderView* rview, iMovable* movable) = 0;
   
-  virtual float GetHeight(const csVector2& pos) = 0;
-  virtual csVector3 GetTangent(const csVector2& pos) = 0;
-  virtual csVector3 GetBinormal(const csVector2& pos) = 0;
-  virtual csVector3 GetNormal(const csVector2& pos) = 0;
+  virtual float GetHeight (const csVector2& pos) = 0;
+  virtual csVector3 GetTangent (const csVector2& pos) = 0;
+  virtual csVector3 GetBinormal (const csVector2& pos) = 0;
+  virtual csVector3 GetNormal (const csVector2& pos) = 0;
 };
 
 #endif // __CS_ITERRAIN_TERRAINSYSTEM_H__

@@ -50,44 +50,47 @@ struct iTerrainCell : public virtual iBase
 {
   SCF_INTERFACE (iTerrainCell, 1, 0, 0);
 
-  virtual const char* GetName() const = 0;
-  virtual iTerrainCellRenderProperties* GetRenderProperties() const = 0;
-  virtual iTerrainCellCollisionProperties* GetCollisionProperties() const = 0;
+  virtual const char* GetName () const = 0;
+  virtual iTerrainCellRenderProperties* GetRenderProperties () const = 0;
+  virtual iTerrainCellCollisionProperties* GetCollisionProperties () const = 0;
 
-  virtual csRefCount* GetRenderData() const = 0;
-  virtual void SetRenderData(csRefCount* data) = 0;
+  virtual csRefCount* GetRenderData () const = 0;
+  virtual void SetRenderData (csRefCount* data) = 0;
 
-  virtual int GetGridWidth() const = 0;
-  virtual int GetGridHeight() const = 0;
+  virtual int GetGridWidth () const = 0;
+  virtual int GetGridHeight () const = 0;
 
-  virtual csLockedHeightData LockHeightData(const csRect& rectangle) = 0;
-  virtual void UnlockHeightData() = 0;
+  virtual csLockedHeightData LockHeightData (const csRect& rectangle) = 0;
+  virtual void UnlockHeightData () = 0;
 
-  virtual const csVector2& GetPosition() const = 0;
-  virtual const csVector2& GetSize() const = 0;
+  virtual const csVector2& GetPosition () const = 0;
+  virtual const csVector2& GetSize () const = 0;
 
-  virtual int GetMaterialMapWidth() const = 0;
-  virtual int GetMaterialMapHeight() const = 0;
-  virtual csLockedMaterialMap LockMaterialMap(const csRect& rectangle) = 0;
+  virtual int GetMaterialMapWidth () const = 0;
+  virtual int GetMaterialMapHeight () const = 0;
+  virtual csLockedMaterialMap LockMaterialMap (const csRect& rectangle) = 0;
   virtual void UnlockMaterialMap() = 0;
 
-  virtual void SetMaterialMask(unsigned int material, iImage* image) = 0;
-  virtual void SetMaterialMask(unsigned int material, const unsigned char* data, unsigned int width, unsigned int height) = 0;
+  virtual void SetMaterialMask (unsigned int material, iImage* image) = 0;
+  virtual void SetMaterialMask (unsigned int material, const unsigned char*
+                          data, unsigned int width, unsigned int height) = 0;
 
-  virtual bool CollideRay(const csVector3& start, const csVector3& end, bool oneHit, csArray<csVector3>& points) const = 0;
-  virtual bool CollideSegment(const csVector3& start, const csVector3& end, bool oneHit, csArray<csVector3>& points) const = 0;
+  virtual bool CollideRay (const csVector3& start, const csVector3& end,
+                           bool oneHit, csArray<csVector3>& points) const = 0;
+  virtual bool CollideSegment (const csVector3& start, const csVector3& end,
+                           bool oneHit, csArray<csVector3>& points) const = 0;
 
-  virtual float GetHeight(int x, int y) const = 0;
-  virtual float GetHeight(const csVector2& pos) const = 0;
+  virtual float GetHeight (int x, int y) const = 0;
+  virtual float GetHeight (const csVector2& pos) const = 0;
   
-  virtual csVector3 GetTangent(int x, int y) const = 0;
-  virtual csVector3 GetTangent(const csVector2& pos) const = 0;
+  virtual csVector3 GetTangent (int x, int y) const = 0;
+  virtual csVector3 GetTangent (const csVector2& pos) const = 0;
 
-  virtual csVector3 GetBinormal(int x, int y) const = 0;
-  virtual csVector3 GetBinormal(const csVector2& pos) const = 0;
+  virtual csVector3 GetBinormal (int x, int y) const = 0;
+  virtual csVector3 GetBinormal (const csVector2& pos) const = 0;
 
-  virtual csVector3 GetNormal(int x, int y) const = 0;
-  virtual csVector3 GetNormal(const csVector2& pos) const = 0;
+  virtual csVector3 GetNormal (int x, int y) const = 0;
+  virtual csVector3 GetNormal (const csVector2& pos) const = 0;
 };
 
 #endif // __CS_ITERRAIN_TERRAINCELL_H__

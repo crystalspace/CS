@@ -31,12 +31,16 @@
 
 #include "csutil/objreg.h"
 
-#include "ivideo/graph3d.h"
-#include "ivideo/txtmgr.h"
 #include "csgfx/shadervar.h"
 
 #include "csgfx/rgbpixel.h"
 #include "csgfx/memimage.h"
+
+#include "csutil/refarr.h"
+
+#include "ivideo/txtmgr.h"
+
+#include "cstool/rbuflock.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(ImprovedTerrain)
 {
@@ -58,7 +62,8 @@ struct csSimpleTerrainRenderData: public csRefCount
   unsigned int primitive_count;
 };
 
-csTerrainSimpleCellRenderProperties::csTerrainSimpleCellRenderProperties (iBase* parent)
+csTerrainSimpleCellRenderProperties::csTerrainSimpleCellRenderProperties
+  (iBase* parent)
   : scfImplementationType (this, parent)
 {
   visible = true;
@@ -90,29 +95,34 @@ csTerrainSimpleRenderer::~csTerrainSimpleRenderer ()
 
 csPtr<iTerrainCellRenderProperties> csTerrainSimpleRenderer::CreateProperties()
 {
-  return new csTerrainSimpleCellRenderProperties(0);
+  return new csTerrainSimpleCellRenderProperties(NULL);
 }
 
-csRenderMesh** csTerrainSimpleRenderer::GetRenderMeshes(int& n, iRenderView* rview, iMovable* movable, uint32 frustum_mask, iTerrainCell** cells, int cell_count)
+csRenderMesh** csTerrainSimpleRenderer::GetRenderMeshes (int& n,
+      iRenderView* rview, iMovable* movable, uint32 frustum_mask,
+      iTerrainCell** cells, int cell_count)
 {
-  meshes.Empty();
+  meshes.Empty ();
   
-  bool do_mirroring = rview->GetCamera()->IsMirrored();
+  bool do_mirroring = rview->GetCamera ()->IsMirrored ();
   
-  const csReversibleTransform& o2wt = movable->GetFullTransform();
+  const csReversibleTransform& o2wt = movable->GetFullTransform ();
   const csVector3& wo = o2wt.GetOrigin ();
   
-    for (unsigned int j = 0; j < material_palette.GetSize(); ++j)
-  {
   for (int i = 0; i < cell_count; ++i)
-    {
-    csSimpleTerrainRenderData* rdata = (csSimpleTerrainRenderData*)cells[i]->GetRenderData();
+  {
+    csSimpleTerrainRenderData* rdata = (csSimpleTerrainRenderData*)
+                                           cells[i]->GetRenderData ();
 
     if (!rdata) continue;
-    
+
+    for (unsigned int j = 0; j < material_palette.GetSize (); ++j)
+    {
       bool created;
     
-      csRenderMesh*& mesh = rm_holder.GetUnusedMesh(created, rview->GetCurrentFrameNumber());
+      csRenderMesh*& mesh = rm_holder.GetUnusedMesh (created,
+                                         rview->GetCurrentFrameNumber ());
+
     
       mesh->meshtype = CS_MESHTYPE_TRIANGLES;
     
@@ -128,47 +138,57 @@ csRenderMesh** csTerrainSimpleRenderer::GetRenderMeshes(int& n, iRenderView* rvi
       mesh->object2world = o2wt;
       mesh->worldspace_origin = wo;
       
-      mesh->buffers.AttachNew(new csRenderBufferHolder);
+      if (created) mesh->buffers.AttachNew (new csRenderBufferHolder);
     
-      mesh->buffers->SetRenderBuffer(CS_BUFFER_POSITION, rdata->vb_pos);
-      mesh->buffers->SetRenderBuffer(CS_BUFFER_TEXCOORD0, rdata->vb_texcoord);
-      mesh->buffers->SetRenderBuffer(CS_BUFFER_INDEX, rdata->ib);
+      mesh->buffers->SetRenderBuffer (CS_BUFFER_POSITION, rdata->vb_pos);
+      mesh->buffers->SetRenderBuffer (CS_BUFFER_TEXCOORD0, rdata->vb_texcoord);
+      mesh->buffers->SetRenderBuffer (CS_BUFFER_INDEX, rdata->ib);
       
-      meshes.Push(mesh);
+      meshes.Push (mesh);
     }
   }
   
-  n = (int)meshes.GetSize();
+  n = (int)meshes.GetSize ();
   
-  return meshes.GetArray();
+  return meshes.GetArray ();
 }
 
-void csTerrainSimpleRenderer::OnMaterialPaletteUpdate(const csRefArray<iMaterialWrapper>& material_palette)
+void csTerrainSimpleRenderer::OnMaterialPaletteUpdate (
+const csRefArray<iMaterialWrapper>& material_palette)
 {
   this->material_palette = material_palette;
 }
 
-void csTerrainSimpleRenderer::OnHeightUpdate(iTerrainCell* cell, const csRect& rectangle, const float* data, unsigned int pitch)
+void csTerrainSimpleRenderer::OnHeightUpdate (iTerrainCell* cell,
+const csRect& rectangle, const float* data, unsigned int pitch)
 {
-  csRef<csSimpleTerrainRenderData> rdata = (csSimpleTerrainRenderData*)cell->GetRenderData();
+  csRef<csSimpleTerrainRenderData> rdata = (csSimpleTerrainRenderData*)
+  cell->GetRenderData ();
 
-  int grid_width = cell->GetGridWidth();
-  int grid_height = cell->GetGridHeight();
+  int grid_width = cell->GetGridWidth ();
+  int grid_height = cell->GetGridHeight ();
 
   if (!rdata)
   {
-    rdata.AttachNew(new csSimpleTerrainRenderData());
+    rdata.AttachNew (new csSimpleTerrainRenderData);
 
-    cell->SetRenderData(rdata);
+    cell->SetRenderData (rdata);
 
     rdata->primitive_count = (grid_width-1)*(grid_height-1)*2;
 
-    rdata->vb_pos = csRenderBuffer::CreateRenderBuffer(grid_width * grid_height, CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 3);
-    rdata->vb_texcoord = csRenderBuffer::CreateRenderBuffer(grid_width * grid_height, CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 2);
-    rdata->ib = csRenderBuffer::CreateIndexRenderBuffer(rdata->primitive_count*3, CS_BUF_STATIC, CS_BUFCOMP_UNSIGNED_SHORT, 0, grid_width * grid_height);
+    rdata->vb_pos = csRenderBuffer::CreateRenderBuffer (
+    grid_width * grid_height, CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 3);
+    
+    rdata->vb_texcoord = csRenderBuffer::CreateRenderBuffer (
+    grid_width * grid_height, CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 2);
+
+    rdata->ib = csRenderBuffer::CreateIndexRenderBuffer (
+    rdata->primitive_count*3, CS_BUF_STATIC, CS_BUFCOMP_UNSIGNED_SHORT, 0,
+    grid_width * grid_height);
 
     // fill ib
-    unsigned short* iptr = (unsigned short*)rdata->ib->Lock(CS_BUF_LOCK_NORMAL);
+    csRenderBufferLock<unsigned short> ilocker(rdata->ib);
+    unsigned short* iptr = ilocker;
 
     for (int y = 0; y < grid_height - 1; ++y)
       for (int x = 0; x < grid_width - 1; ++x)
@@ -191,10 +211,11 @@ void csTerrainSimpleRenderer::OnHeightUpdate(iTerrainCell* cell, const csRect& r
         *iptr++ = br;
       }
 
-    rdata->ib->Release();
+    rdata->ib->Release ();
 
     // fill tex coords
-    float* vptr = (float*)rdata->vb_texcoord->Lock(CS_BUF_LOCK_NORMAL);
+    csRenderBufferLock<float> vlocker(rdata->vb_texcoord);
+    float* vptr = vlocker;
 
     float u_offset = 1.0f / (grid_width - 1);
     float v_offset = 1.0f / (grid_height - 1);
@@ -209,13 +230,14 @@ void csTerrainSimpleRenderer::OnHeightUpdate(iTerrainCell* cell, const csRect& r
     rdata->vb_texcoord->Release();
   }
 
-  float* vptr = (float*)rdata->vb_pos->Lock(CS_BUF_LOCK_NORMAL);
+  csRenderBufferLock<float> vlocker(rdata->vb_pos);
+  float* vptr = vlocker;
 
-  float offset_x = cell->GetPosition().x;
-  float offset_y = cell->GetPosition().y;
+  float offset_x = cell->GetPosition ().x;
+  float offset_y = cell->GetPosition ().y;
 
-  float scale_x = cell->GetSize().x / (grid_width - 1);
-  float scale_y = cell->GetSize().y / (grid_height - 1);
+  float scale_x = cell->GetSize ().x / (grid_width - 1);
+  float scale_y = cell->GetSize ().y / (grid_height - 1);
 
    for (int y = rectangle.ymin; y < rectangle.ymax; ++y)
      for (int x = rectangle.xmin; x < rectangle.xmax; ++x)
@@ -224,68 +246,81 @@ void csTerrainSimpleRenderer::OnHeightUpdate(iTerrainCell* cell, const csRect& r
        *vptr++ = data[y * pitch + x];
        *vptr++ = y * scale_y + offset_y;
      }
-
-  rdata->vb_pos->Release();
 }
 
-void csTerrainSimpleRenderer::OnMaterialMaskUpdate(iTerrainCell* cell, unsigned int material, const csRect& rectangle, const unsigned char* data, unsigned int pitch)
+void csTerrainSimpleRenderer::OnMaterialMaskUpdate (iTerrainCell* cell,
+unsigned int material, const csRect& rectangle, const unsigned char* data, unsigned int pitch)
 {
-  csRef<csSimpleTerrainRenderData> rdata = (csSimpleTerrainRenderData*)cell->GetRenderData();
+  csRef<csSimpleTerrainRenderData> rdata = (csSimpleTerrainRenderData*)
+  cell->GetRenderData ();
 
   if (!rdata)
   {
-    rdata.AttachNew(new csSimpleTerrainRenderData());
+    rdata.AttachNew (new csSimpleTerrainRenderData);
 
-    cell->SetRenderData(rdata);
+    cell->SetRenderData (rdata);
   }
 
-  if (rdata->sv_context.GetSize() <= material)
-    rdata->sv_context.SetSize(material + 1);
+  if (rdata->sv_context.GetSize () <= material)
+  {
+    rdata->sv_context.SetSize (material + 1);
+  }
   
   if (!rdata->sv_context[material])
   {
-    rdata->sv_context[material] = new csShaderVariableContext();
+    rdata->sv_context[material].AttachNew (new csShaderVariableContext);
    
-    csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg, "crystalspace.shared.stringset", iStringSet);
-
-    csRef<csShaderVariable> var = new csShaderVariable(strings->Request("splat base pass"));
+    csRef<csShaderVariable> var;
+    var.AttachNew (new csShaderVariable(strings->Request ("splat base pass")));
     var->SetType (csShaderVariable::INT);
     var->SetValue (material == 0);
     rdata->sv_context[material]->AddVariable (var);
   }
     
-  if (rdata->alpha_map.GetSize() <= material)
-    rdata->alpha_map.SetSize(material + 1);
+  if (rdata->alpha_map.GetSize () <= material)
+  {
+    rdata->alpha_map.SetSize (material + 1);
+  }
 
   if (!rdata->alpha_map[material])
   {
-    csRef<iGraphics3D> g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
-    csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg, "crystalspace.shared.stringset", iStringSet);
-    csRef<iTextureManager> mgr = g3d->GetTextureManager ();
-    
-    csRef<iImage> image = csPtr<iImage> (new csImageMemory (cell->GetMaterialMapWidth(), cell->GetMaterialMapHeight(), CS_IMGFMT_TRUECOLOR));
+    csRef<iImage> image;
+    image.AttachNew (new csImageMemory (cell->GetMaterialMapWidth (),
+    cell->GetMaterialMapHeight (), CS_IMGFMT_TRUECOLOR));
 
-    rdata->alpha_map[material] = mgr->RegisterTexture (image, CS_TEXTURE_2D | CS_TEXTURE_3D | CS_TEXTURE_CLAMP);
-  
-    csRef<csShaderVariable> var = new csShaderVariable(strings->Request("splat alpha map"));
+    rdata->alpha_map[material] = g3d->GetTextureManager()->RegisterTexture
+    (image, CS_TEXTURE_2D | CS_TEXTURE_3D | CS_TEXTURE_CLAMP);
+    
+    csRef<csShaderVariable> var;
+    var.AttachNew (new csShaderVariable(strings->Request ("splat alpha map")));
     var->SetType (csShaderVariable::TEXTURE);
     var->SetValue (rdata->alpha_map[material]);
     rdata->sv_context[material]->AddVariable (var);
   }
   
   csDirtyAccessArray<csRGBpixel> image_data;
-  image_data.SetSize(rectangle.Width() * rectangle.Height());
+  image_data.SetSize (rectangle.Width () * rectangle.Height ());
   
-  for (int y = 0; y < rectangle.Width(); ++y)
-    for (int x = 0; x < rectangle.Height(); ++x)
-      image_data[y * rectangle.Width() + x].Set(data[y * pitch + x], data[y * pitch + x], data[y * pitch + x], data[y * pitch + x]);
+  for (int y = 0; y < rectangle.Width (); ++y)
+    for (int x = 0; x < rectangle.Height (); ++x)
+      image_data[y * rectangle.Width () + x].Set (
+      data[y * pitch + x], data[y * pitch + x],
+      data[y * pitch + x], data[y * pitch + x]);
       
-  rdata->alpha_map[material]->Blit(rectangle.xmin, rectangle.ymin, rectangle.Width(), rectangle.Height(), (unsigned char*)image_data.GetArray(), iTextureHandle::RGBA8888);
+  rdata->alpha_map[material]->Blit (rectangle.xmin, rectangle.ymin,
+  rectangle.Width (), rectangle.Height (), (unsigned char*)
+  image_data.GetArray (), iTextureHandle::RGBA8888);
 }
 
 bool csTerrainSimpleRenderer::Initialize (iObjectRegistry* object_reg)
 {
   this->object_reg = object_reg;
+   
+  g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+  
+  strings = CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg,
+  "crystalspace.shared.stringset", iStringSet);
+    
   return true;
 }
 
