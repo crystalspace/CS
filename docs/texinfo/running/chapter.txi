@@ -3,7 +3,7 @@
 @chapter Running The Demos
 @cindex Running The Demos
 
-This chapter describes the demos, tutorial and test applications which are
+This chapter describes the demo, tutorial and test applications which are
 bundled with Crystal Space.  These applications can often serve as good
 demonstrations of how Crystal Spaces features can be utilized in your own
 programs and also serve as good examples of how to actually program with
