@@ -6,3 +6,5 @@ Plugin terrain
         : [ Wildcard *.cpp *.h ]
 ;
 LinkWith terrain : crystalspace ;
+
+CompileGroups terrain :  meshes ;

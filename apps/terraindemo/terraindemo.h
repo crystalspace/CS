@@ -74,6 +74,8 @@ private:
   
   /// Here goes the terrain stuff
   csRef<iTerrainSystem> terrain;
+  
+  csRef<iRenderLoop> rloop;
 
   float rotX, rotY;
 

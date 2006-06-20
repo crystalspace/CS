@@ -121,6 +121,8 @@ bool TerrainDemo::Setup ()
   engine->SetClearScreen(true);
   engine->SetClearZBuf(true);
   
+  engine->SetCurrentDefaultRenderloop(rloop);
+  
   return true;
 }
 void TerrainDemo::ProcessFrame ()
@@ -328,6 +330,8 @@ bool TerrainDemo::LoadMap ()
   "/lib/std/stone4.gif");
   iTextureWrapper* lava_tex = loader->LoadTexture("lava_tex",
   "/lev/terraini/lava.png");
+  
+  rloop = engine->GetRenderLoopManager()->Load("/shader/std_rloop_terrainimproved.xml");
 
   csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
   GetObjectRegistry(), "crystalspace.shared.stringset", iStringSet);
@@ -336,25 +340,25 @@ bool TerrainDemo::LoadMap ()
   iShaderManager);
   
   loader->LoadShader("/lev/terraini/shader_base.xml");
-  loader->LoadShader("/lev/terraini/shader_add.xml");
+  loader->LoadShader("/lev/terraini/shader_splat.xml");
   
   iShader* shader_base = shmgr->GetShader("terrain_improved_base");
-  iShader* shader_add = shmgr->GetShader("terrain_improved_add");
+  iShader* shader_splat = shmgr->GetShader("terrain_improved_splatting");
   
   csRefArray<iMaterialWrapper> materials;
   
   iMaterialWrapper* material;
   
   (material = engine->CreateMaterial("LavaMaterial", lava_tex))->
-  GetMaterial()->SetShader(strings->Request("standard"), shader_base);
+  GetMaterial()->SetShader(strings->Request("ambient"), shader_base);
   materials.Push(material);
   
   (material = engine->CreateMaterial("GrassMaterial", grass_tex))->
-  GetMaterial()->SetShader(strings->Request("standard"), shader_add);
+  GetMaterial()->SetShader(strings->Request("terrain splat"), shader_splat);
   materials.Push(material);
 
   (material = engine->CreateMaterial("StoneMaterial", stone_tex))->
-  GetMaterial()->SetShader(strings->Request("standard"), shader_add);
+  GetMaterial()->SetShader(strings->Request("terrain splat"), shader_splat);
   materials.Push(material);
   
   terrain->SetMaterialPalette(materials);
