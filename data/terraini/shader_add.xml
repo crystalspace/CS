@@ -1,0 +1,30 @@
+<shader compiler="xmlshader" name="terrain_improved_add">
+  <technique priority="100">
+    <pass>
+      <mixmode> <add /> </mixmode>
+
+      <buffer source="texture coordinate 0" destination="texture coordinate 0" />
+      <buffer source="texture coordinate 0" destination="texture coordinate 1" />
+      <vp plugin="glfixed">
+       <fixedvp>
+       </fixedvp>
+      </vp>
+      <texture destination="unit 0" name="tex diffuse" />
+      <texture destination="unit 1" name="splat alpha map" />
+      <fp plugin="glfixed">
+        <fixedfp>
+          <layer>
+            <colorsource num="0" source="primary color" modifier="color" />
+            <colorsource num="1" source="texture" modifier="color" />
+            <coloroperation operation="modulate" />
+          </layer>
+          <layer>
+            <colorsource num="0" source="previous layer" modifier="color" />
+            <colorsource num="1" source="texture" modifier="color" />
+            <coloroperation operation="modulate" />
+          </layer>
+        </fixedfp>
+      </fp>
+    </pass>
+  </technique>
+</shader>
