@@ -19,7 +19,7 @@
 #ifndef __CS_IMESH_PARTICLES_H__
 #define __CS_IMESH_PARTICLES_H__
 
-#include "csutil/scf.h"
+#include "csutil/scf_interface.h"
 
 #include "csgeom/vector3.h"
 #include "csgeom/vector4.h"
@@ -35,7 +35,6 @@
 
 struct iMaterialWrapper;
 
-class csColor;
 class csMatrix3;
 class csReversibleTransform;
 
@@ -85,15 +84,15 @@ struct csParticlesData
   float sort;
 };
 
-SCF_VERSION (iParticlesColorCallback, 0, 0, 1);
-
 /**
  * Particles state can be set up to retrieve color via a callback.  This
  * interface must be implemented by objects which wish to provide color
  * information to the particles state.
  */
-struct iParticlesColorCallback : public iBase
+struct iParticlesColorCallback : public virtual iBase
 {
+  SCF_INTERFACE(iParticlesColorCallback, 2, 0, 0);
+
   /**
    * Return a color appropriate for a particle at a given time.
    * \param time Time left for particle
@@ -102,13 +101,13 @@ struct iParticlesColorCallback : public iBase
   virtual csColor GetColor (float time) = 0;
 };
 
-SCF_VERSION (iParticlesStateBase, 1, 1, 0);
-
 /**
  * Particles shared state interface
  */
-struct iParticlesStateBase : public iBase
+struct iParticlesStateBase : public virtual iBase
 {
+  SCF_INTERFACE(iParticlesStateBase, 2, 0, 0);
+
   /// Sets the particles to be emitted per second
   virtual void SetParticlesPerSecond (int count) = 0;
 
@@ -320,9 +319,6 @@ struct iParticlesStateBase : public iBase
   virtual bool IsZSortEnabled () const = 0;
 };
 
-
-SCF_VERSION (iParticlesObjectState, 1, 0, 1);
-
 /**
  * Particles state object.
  */
@@ -332,7 +328,7 @@ struct iParticlesObjectState : public iParticlesStateBase
   virtual void GetEmitPosition (csVector3 &position) = 0;
 
   /// Get the object rotation matrix
-  virtual const csMatrix3 &GetRotation () = 0;
+  virtual const csMatrix3& GetRotation () = 0;
 
   /// Get the camera transform
   virtual csReversibleTransform GetObjectToCamera () = 0;
@@ -357,13 +353,13 @@ struct iParticlesObjectState : public iParticlesStateBase
   virtual bool IsRunning () = 0;
 };
 
-SCF_VERSION (iParticlesFactoryState, 1, 0, 1);
-
 /**
  * Particles factory state.
  */
 struct iParticlesFactoryState : public iParticlesStateBase
 {
+  SCF_INTERFACE(iParticlesFactoryState, 2, 0, 0);
+
   /// Set the material to use for this particle factory
   virtual void SetMaterial (iMaterialWrapper *material) = 0;
 
@@ -377,14 +373,13 @@ struct iParticlesFactoryState : public iParticlesStateBase
   virtual void SetPhysicsPlugin (const char *plugin) = 0;
 };
 
-
-SCF_VERSION (iParticlesPhysics, 0, 1, 0);
-
 /**
  * Particles physics interface.
  */
-struct iParticlesPhysics : public iBase
+struct iParticlesPhysics : public virtual iBase
 {
+  SCF_INTERFACE(iParticlesPhysics, 2, 0, 0);
+
   /**
    * Register a particles object with the physics plugin
    */

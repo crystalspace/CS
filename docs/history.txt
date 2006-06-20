@@ -6,6 +6,13 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+20-Jun-2006
+	- mdmkolbe converted the following plugins to the new SCF:
+	    - plugins/mesh/lghtng/
+	    - plugins/mesh/particles/
+	    - plugins/mesh/genmesh/
+	    - plugins/mesh/haze/
+	    - plugins/mesh/terrain/
 19-Jun-2006
 	- Philip Wyett made Quick Start more explanatory for the CS newcomers.
 	- res changed csRectRegion to use a csArray<> for rectangle storage.

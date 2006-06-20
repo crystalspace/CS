@@ -77,58 +77,18 @@ enum
   XMLTOKEN_COMPRESS
 };
 
-SCF_IMPLEMENT_IBASE (csGeneralFactoryLoader)
-  SCF_IMPLEMENTS_INTERFACE (iLoaderPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csGeneralFactoryLoader::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csGeneralFactorySaver)
-  SCF_IMPLEMENTS_INTERFACE (iSaverPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csGeneralFactorySaver::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csGeneralMeshLoader)
-  SCF_IMPLEMENTS_INTERFACE (iLoaderPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csGeneralMeshLoader::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csGeneralMeshSaver)
-  SCF_IMPLEMENTS_INTERFACE (iSaverPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csGeneralMeshSaver::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 SCF_IMPLEMENT_FACTORY (csGeneralFactoryLoader)
 SCF_IMPLEMENT_FACTORY (csGeneralFactorySaver)
 SCF_IMPLEMENT_FACTORY (csGeneralMeshLoader)
 SCF_IMPLEMENT_FACTORY (csGeneralMeshSaver)
 
-
-csGeneralFactoryLoader::csGeneralFactoryLoader (iBase* pParent)
+csGeneralFactoryLoader::csGeneralFactoryLoader (iBase* pParent) :
+  scfImplementationType(this, pParent)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 csGeneralFactoryLoader::~csGeneralFactoryLoader ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csGeneralFactoryLoader::Initialize (iObjectRegistry* object_reg)
@@ -699,16 +659,13 @@ csPtr<iBase> csGeneralFactoryLoader::Parse (iDocumentNode* node,
 
 //---------------------------------------------------------------------------
 
-csGeneralFactorySaver::csGeneralFactorySaver (iBase* pParent)
+csGeneralFactorySaver::csGeneralFactorySaver (iBase* pParent) :
+  scfImplementationType(this, pParent)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 csGeneralFactorySaver::~csGeneralFactorySaver ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csGeneralFactorySaver::Initialize (iObjectRegistry* object_reg)
@@ -898,16 +855,13 @@ bool csGeneralFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent,
 
 //---------------------------------------------------------------------------
 
-csGeneralMeshLoader::csGeneralMeshLoader (iBase* pParent)
+csGeneralMeshLoader::csGeneralMeshLoader (iBase* pParent) :
+  scfImplementationType(this, pParent)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 csGeneralMeshLoader::~csGeneralMeshLoader ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csGeneralMeshLoader::Initialize (iObjectRegistry* object_reg)
@@ -1199,16 +1153,13 @@ csPtr<iBase> csGeneralMeshLoader::Parse (iDocumentNode* node,
 
 //---------------------------------------------------------------------------
 
-csGeneralMeshSaver::csGeneralMeshSaver (iBase* pParent)
+csGeneralMeshSaver::csGeneralMeshSaver (iBase* pParent) :
+  scfImplementationType(this, pParent)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 csGeneralMeshSaver::~csGeneralMeshSaver ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csGeneralMeshSaver::Initialize (iObjectRegistry* object_reg)

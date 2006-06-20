@@ -58,27 +58,15 @@ enum
   XMLTOKEN_CASTSHADOWS
 };
 
-SCF_IMPLEMENT_IBASE (csTerrainFactoryLoader)
-  SCF_IMPLEMENTS_INTERFACE (iLoaderPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csTerrainFactoryLoader::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 SCF_IMPLEMENT_FACTORY (csTerrainFactoryLoader)
 
-csTerrainFactoryLoader::csTerrainFactoryLoader (iBase* parent)
+csTerrainFactoryLoader::csTerrainFactoryLoader (iBase* parent) :
+  scfImplementationType(this, parent)
 {
-  SCF_CONSTRUCT_IBASE (parent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
 }
 
 csTerrainFactoryLoader::~csTerrainFactoryLoader ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csTerrainFactoryLoader::Initialize (iObjectRegistry* objreg)
@@ -172,27 +160,15 @@ csPtr<iBase> csTerrainFactoryLoader::Parse (iDocumentNode* node,
   return csPtr<iBase> (fact);
 }
 
-SCF_IMPLEMENT_IBASE (csTerrainFactorySaver)
-  SCF_IMPLEMENTS_INTERFACE (iSaverPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csTerrainFactorySaver::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 SCF_IMPLEMENT_FACTORY (csTerrainFactorySaver)
 
-csTerrainFactorySaver::csTerrainFactorySaver (iBase* parent)
+csTerrainFactorySaver::csTerrainFactorySaver (iBase* parent) :
+  scfImplementationType(this, parent)
 { 
-  SCF_CONSTRUCT_IBASE (parent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
 }
 
 csTerrainFactorySaver::~csTerrainFactorySaver ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csTerrainFactorySaver::Initialize (iObjectRegistry* objreg)
@@ -252,27 +228,15 @@ bool csTerrainFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent,
   return true;
 }
 
-SCF_IMPLEMENT_IBASE (csTerrainObjectLoader)
-  SCF_IMPLEMENTS_INTERFACE (iLoaderPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csTerrainObjectLoader::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 SCF_IMPLEMENT_FACTORY (csTerrainObjectLoader)
 
-csTerrainObjectLoader::csTerrainObjectLoader (iBase* parent)
+csTerrainObjectLoader::csTerrainObjectLoader (iBase* parent) :
+  scfImplementationType(this, parent)
 {
-  SCF_CONSTRUCT_IBASE (parent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
 }
 
 csTerrainObjectLoader::~csTerrainObjectLoader ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csTerrainObjectLoader::Initialize (iObjectRegistry* objreg)
@@ -479,27 +443,15 @@ bool csTerrainObjectLoader::ParseMaterialPalette (iDocumentNode *node,
   return true;
 }
 
-SCF_IMPLEMENT_IBASE (csTerrainObjectSaver)
-  SCF_IMPLEMENTS_INTERFACE (iSaverPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csTerrainObjectSaver::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 SCF_IMPLEMENT_FACTORY (csTerrainObjectSaver)
 
-csTerrainObjectSaver::csTerrainObjectSaver (iBase* parent)
+csTerrainObjectSaver::csTerrainObjectSaver (iBase* parent) :
+  scfImplementationType(this, parent)
 {
-  SCF_CONSTRUCT_IBASE (parent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
 }
 
 csTerrainObjectSaver::~csTerrainObjectSaver ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csTerrainObjectSaver::Initialize (iObjectRegistry *objreg)
