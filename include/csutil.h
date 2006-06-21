@@ -120,6 +120,7 @@
 #include "csutil/set.h"
 #include "csutil/snprintf.h"
 #include "csutil/sparse3d.h"
+#include "csutil/spinlock.h"
 #include "csutil/strhash.h"
 #include "csutil/stringarray.h"
 #include "csutil/stringreader.h"
