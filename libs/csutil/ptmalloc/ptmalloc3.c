@@ -703,7 +703,6 @@ static void ptmalloc_finis (void)
   state->refcount--;
   if (state->refcount > 0) return;
   CALL_MUNMAP(state, sizeof (struct ptmalloc_state));
-  sharemem_destroy ();
 }
 
 #if !(USE_STARTER & 2)
@@ -727,12 +726,12 @@ ptmalloc_init(void)
     *state_ptr = state;
     state->refcount = 1;
     state->__malloc_initialized = 0;
-    sharemem_close (state_ptr, sizeof (struct ptmalloc_state*));
+    sharemem_destroy (state_ptr, sizeof (struct ptmalloc_state*));
   }
   else 
   {
     state = *state_ptr;
-    sharemem_close (state_ptr, sizeof (struct ptmalloc_state*));
+    sharemem_destroy (state_ptr, sizeof (struct ptmalloc_state*));
     state->refcount++;
     if(state->__malloc_initialized >= 0) return;
   }
