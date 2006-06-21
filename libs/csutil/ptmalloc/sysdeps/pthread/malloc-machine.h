@@ -132,7 +132,7 @@ static inline void* sharemem_init (size_t bytes, int* created)
   int fd;
   void* p;
   
-  sprintf (buf, "/tmp/ptmalloc-%d", getpid());
+  sprintf (buf, "/tmp/ptmalloc-%d-%d", getppid(), getpid());
   fd = open (buf, O_RDWR, S_IRUSR | S_IWUSR);
   if (fd < 0)
   {
@@ -156,12 +156,16 @@ static inline void* sharemem_init (size_t bytes, int* created)
   return p;
 }
 
-static inline void sharemem_destroy (void* p, size_t bytes)
+static inline void sharemem_close (void* p, size_t bytes)
+{
+  munmap (p, bytes);
+}
+
+static inline void sharemem_destroy ()
 {
   char buf[64];
   
-  munmap (p, bytes);
-  sprintf (buf, "/tmp/ptmalloc-%d", getpid());
+  sprintf (buf, "/tmp/ptmalloc-%d-%d", getppid(), getpid());
   unlink (buf);
 }
 
