@@ -19,14 +19,22 @@
 #include "cssysdef.h"
 #include "statickdtree.h"
 
+uint32 csStaticKDTree::globalTimestamp = 0;
+csArray<csStaticKDTreeObject*> csStaticKDTree::emptyList;
+
 csStaticKDTree::csStaticKDTree (csArray<csStaticKDTreeObject*> &items)
 {
   // Base case:  if there are less than a certain threshold, stop recursing.
   if (items.Length () < 10) {
+    nodeBBox.StartBoundingBox();
     objects = new csArray<csStaticKDTreeObject*>(items);
     csArray<csStaticKDTreeObject*>::Iterator it = items.GetIterator ();
     while (it.HasNext ())
-      it.Next ()->leafs.Push (this);
+    {
+      csStaticKDTreeObject* obj = it.Next ();
+      nodeBBox += obj->box;
+      obj->leafs.Push (this);
+    }
     child1 = child2 = NULL;
   }
   // Otherwise find the axis with the longest min-max distance and use the 
@@ -79,8 +87,12 @@ csStaticKDTree::csStaticKDTree (csArray<csStaticKDTreeObject*> &items)
       }
     }
 
+    objects = NULL;
     child1 = new csStaticKDTree (left);
     child2 = new csStaticKDTree (right);
+    nodeBBox.StartBoundingBox();
+    nodeBBox += child1->nodeBBox;
+    nodeBBox += child2->nodeBBox;
   }
 }
 
@@ -88,30 +100,34 @@ csStaticKDTree::csStaticKDTree (csStaticKDTree *parent, bool isChild1,
     int axis, float splitLocation)
 {
   if (parent != NULL) {
+    CS_ASSERT(parent->objects == NULL);
     if (isChild1) {
-      CS_ASSERT(parent->child1 != NULL);
+      CS_ASSERT(parent->child1 == NULL);
       parent->child1 = this;
     }
     else {
-      CS_ASSERT(parent->child2 != NULL);
+      CS_ASSERT(parent->child2 == NULL);
       parent->child2 = this;
     }
   }
 
+  objects = NULL;
   csStaticKDTree::axis = axis;
   csStaticKDTree::splitLocation = splitLocation;
+  child1 = child2 = NULL;
 }
 
 csStaticKDTree::csStaticKDTree (csStaticKDTree *parent, bool isChild1,
     csArray<csStaticKDTreeObject*> &items)
 {
   if (parent != NULL) {
+    CS_ASSERT(parent->objects == NULL);
     if (isChild1) {
-      CS_ASSERT(parent->child1 != NULL);
+      CS_ASSERT(parent->child1 == NULL);
       parent->child1 = this;
     }
     else {
-      CS_ASSERT(parent->child2 != NULL);
+      CS_ASSERT(parent->child2 == NULL);
       parent->child2 = this;
     }
   }
@@ -125,7 +141,7 @@ csStaticKDTree::csStaticKDTree (csStaticKDTree *parent, bool isChild1,
 
 csStaticKDTree::~csStaticKDTree ()
 {
-  if (isLeafNode ()) {
+  if (IsLeafNode ()) {
     CS_ASSERT (!child2);
     CS_ASSERT (objects);
 
@@ -149,22 +165,26 @@ csStaticKDTree::~csStaticKDTree ()
 csStaticKDTreeObject *csStaticKDTree::AddObject (const csBox3 & bbox,
                                                  void *userdata)
 {
+  nodeBBox += bbox;
   csStaticKDTreeObject *ref = new csStaticKDTreeObject (bbox, userdata);
   AddObject (ref);
   return ref;
 }
 
-void csStaticKDTree::AddObject (csStaticKDTreeObject * object)
+void csStaticKDTree::AddObject (csStaticKDTreeObject *object)
 {
-  if (isLeafNode ()) {
+  SanityCheck();
+  if (IsLeafNode ()) {
     objects->Push (object);
     object->leafs.Push (this);
   } 
   else {
+    CS_ASSERT(child1);
+    CS_ASSERT(child2);
     float min = getMin (axis, object->box), max = getMax (axis, object->box);
-    if (splitLocation < min)
+    if (max <= splitLocation)
       child1->AddObject (object);
-    else if (splitLocation > max)
+    else if (min >= splitLocation)
       child2->AddObject (object);
     else {
       child1->AddObject (object);
@@ -224,11 +244,32 @@ void csStaticKDTree::Front2Back (const csVector3& pos,
   }
 }
 
-void csStaticKDTree::MoveObject (const csBox3 &bbox_new,
-                                 csStaticKDTreeObject *object)
+void csStaticKDTree::MoveObject (csStaticKDTreeObject *object,
+                                 const csBox3 &bbox_new)
 {
   // TODO:  optimization would be to check if new box is in same node
   UnlinkObject (object);
   object->box = bbox_new;
   AddObject (object);
+}
+
+void csStaticKDTree::CalculateBBox () 
+{
+  if (IsLeafNode()) 
+  {
+    nodeBBox.StartBoundingBox();
+    csArray<csStaticKDTreeObject*>::Iterator it = objects->GetIterator ();
+    while (it.HasNext())
+    {
+      nodeBBox += it.Next()->box;
+    }
+  }
+  else
+  {
+    child1->CalculateBBox();
+    child2->CalculateBBox();
+    nodeBBox.StartBoundingBox();
+    nodeBBox += child1->nodeBBox;
+    nodeBBox += child2->nodeBBox;
+  }
 }

@@ -36,8 +36,8 @@
 #include "iengine/mesh.h"
 #include "imesh/thing.h"
 
-class csKDTree;
-class csKDTreeChild;
+class csStaticKDTree;
+class csStaticKDTreeObject;
 class csPVSVis;
 struct iPolygonMesh;
 struct iMovable;
@@ -82,7 +82,7 @@ class csPVSVisObjectWrapper : public iObjectModelListener,
 public:
   csPVSVis* pvsvis;
   iVisibilityObject* visobj;
-  csKDTreeChild* child;
+  csStaticKDTreeObject* child;
   long update_number;	// Last used update_number from movable.
   long shape_number;	// Last used shape_number from model.
   bool isStatic;  // Object is static and is found in some PVS set
@@ -124,7 +124,7 @@ public:
 private:
   iObjectRegistry *object_reg;
   csEventID CanvasResize;
-  csKDTree* kdtree;
+  csStaticKDTree* kdtree;
   // Ever growing box of all objects that were ever in the tree.
   // This puts an upper limit of all boxes in the kdtree itself because
   // those go off to infinity.
@@ -148,7 +148,7 @@ private:
   void CalculateVisObjBBox (iVisibilityObject* visobj, csBox3& bbox);
 
   // Traverse the kdtree for frustum culling.
-  void FrustTest_Traverse (csKDTree* treenode,
+  void FrustTest_Traverse (csStaticKDTree* treenode,
 	FrustTestCameraData* data,
 	uint32 cur_timestamp, uint32 frustum_mask);
 
@@ -166,7 +166,7 @@ public:
   // 1 if visible normally, or 0 if not visible.
   // This function will also modify the frustum_mask in 'data'. So
   // take care to restore this later if you recurse down.
-  int TestNodeVisibility (csKDTree* treenode,
+  int TestNodeVisibility (csStaticKDTree* treenode,
   	FrustTestCameraData* data, uint32& frustum_mask);
 
   // Test visibility for the given object. Returns true if visible.

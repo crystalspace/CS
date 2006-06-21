@@ -60,6 +60,7 @@ private:
 // TODO:  use a block allocator for storing leaves and nodes?
 class csStaticKDTree {
   static uint32 globalTimestamp;
+  static csArray<csStaticKDTreeObject*> emptyList;
 
 public:
   csStaticKDTree (csStaticKDTree *parent, bool isChild1, int axis, 
@@ -71,15 +72,42 @@ public:
   csStaticKDTreeObject* AddObject (const csBox3& bbox, void* userdata);
   void UnlinkObject (csStaticKDTreeObject* object);
   void RemoveObject (csStaticKDTreeObject* object);
-  void MoveObject (const csBox3& bbox_new, csStaticKDTreeObject* object);
+  void MoveObject (csStaticKDTreeObject* object, const csBox3& bbox_new);
   csStaticKDTree* GetChild1 () { return child1; }
   csStaticKDTree* GetChild2 () { return child2; }
   void TraverseRandom (csStaticKDTreeVisitFunc* func, 
-      void* userdata, uint32 cur_timestamp, uint32 frustum_mask);
+      void* userdata, uint32 frustum_mask) {
+    TraverseRandom(func, userdata, NewTraversal(), frustum_mask);
+  }
   void Front2Back (const csVector3& pos, csStaticKDTreeVisitFunc* func, 
-      void* userdata, uint32 cur_timestamp, uint32 frustum_mask);
+      void* userdata, uint32 frustum_mask) {
+    Front2Back(pos, func, userdata, NewTraversal(), frustum_mask);
+  }
   void* GetNodeData () { return nodeData; }
   void SetNodeData (void *ptr) { nodeData = ptr; }
+  uint32 NewTraversal() { return globalTimestamp++; }
+  int GetObjectCount() 
+  { 
+    return (IsLeafNode()) ? objects->Length() : 0;
+  }
+  csArray<csStaticKDTreeObject*>& GetObjects()
+  {
+    return (IsLeafNode()) ? *objects : emptyList;
+  }
+  const csBox3& GetNodeBBox() const {
+    return nodeBBox;
+  }
+  float GetSplitLocation() const { return splitLocation; }
+  int GetAxis() const { return axis; }
+
+  bool IsLeafNode () { return objects; }
+
+  // WARNING:  not safe to call if not a leaf node.
+//  csStaticKDTreeObject* operator[](int index) 
+//  { 
+//      return (*objects[i]);
+//  }
+
 
 private:
   csStaticKDTree* child1;
@@ -93,9 +121,13 @@ private:
   // If no children, this node contains objects
   csArray<csStaticKDTreeObject*>* objects;
 
-  bool isLeafNode () { return child1; }
+  void TraverseRandom (csStaticKDTreeVisitFunc* func, 
+      void* userdata, uint32 cur_timestamp, uint32 frustum_mask);
+  void Front2Back (const csVector3& pos, csStaticKDTreeVisitFunc* func, 
+      void* userdata, uint32 cur_timestamp, uint32 frustum_mask);
 
-  static float getMin (int axis, const csBox3& box) {
+  static float getMin (int axis, const csBox3& box) 
+  {
     if (axis == CS_XAXIS) return box.MinX ();
     else if (axis == CS_YAXIS) return box.MinY ();
     else if (axis == CS_ZAXIS) return box.MinZ ();
@@ -103,13 +135,32 @@ private:
     return 0;
   }
 
-  static float getMax(int axis, const csBox3& box) {
+  static float getMax(int axis, const csBox3& box) 
+  {
     if (axis == CS_XAXIS) return box.MaxX ();
     else if (axis == CS_YAXIS) return box.MaxY ();
     else if (axis == CS_ZAXIS) return box.MaxZ ();
     CS_ASSERT (false);
     return 0;
   }
+
+  void SanityCheck() 
+  {
+    if (IsLeafNode()) 
+    {
+      CS_ASSERT(!child1);
+      CS_ASSERT(!child2);
+      CS_ASSERT(objects);
+    }
+    else 
+    {
+      CS_ASSERT(child1);
+      CS_ASSERT(child2);
+      CS_ASSERT(!objects);
+    }
+  }
+
+  void CalculateBBox();
 
   void AddObject (csStaticKDTreeObject* object);
 };

@@ -241,27 +241,26 @@ static csStaticKDTree* MakeTestPVSTree ()
 
   // The tree we will construct for them
   // Root:  (0,0,4) on Z-axis (fws) []
-  //   >4: (1,0,0) on X-axis (w) [w]
-  //     >1: leaf node (w) [w]
-  //     <1: leaf node (w) [w]
   //   <4: (0,0,0) on X-axis (fs) []
+  //     <0: leaf node (fs) [fs]
   //     >0: (0,1,0) on Y-axis (fs) []
   //       <1: leaf node (f) [f]
   //       >1: leaf node (s) [s]
-  //     <0: leaf node (fs) [fs]
-
+  //   >4: (1,0,0) on X-axis (w) [w]
+  //     <1: leaf node (w) [w]
+  //     >1: leaf node (w) [w]
   csArray<csStaticKDTreeObject*> emptylist;
-  csStaticKDTree *root, *frnt, *back;
+  csStaticKDTree *root, *frnt1, *back1, *frnt2, *back2, *frnt3, *back3;
 
   root = new csStaticKDTree(NULL, 1, CS_ZAXIS, 4);
-    frnt = new csStaticKDTree(root, 0, CS_XAXIS, 1);
-      frnt = new csStaticKDTree(frnt, 0, emptylist);
-      back = new csStaticKDTree(frnt, 1, emptylist);
-    back = new csStaticKDTree(root, true, CS_XAXIS, 0);
-      frnt = new csStaticKDTree(back, 0, CS_YAXIS, 1);
-        frnt = new csStaticKDTree(frnt, 0, emptylist);
-        back = new csStaticKDTree(frnt, 1, emptylist);
-      back = new csStaticKDTree(back, 1, emptylist);
+    frnt1 = new csStaticKDTree(root, 1, CS_XAXIS, 0);
+      frnt2 = new csStaticKDTree(frnt1, 1, emptylist);
+      back2 = new csStaticKDTree(frnt1, 0, CS_YAXIS, .5);
+        frnt3 = new csStaticKDTree(back2, 1, emptylist);
+        back3 = new csStaticKDTree(back2, 0, emptylist);
+    back1 = new csStaticKDTree(root, 0, CS_XAXIS, 1);
+      frnt2 = new csStaticKDTree(back1, 1, emptylist);
+      back2 = new csStaticKDTree(back1, 0, emptylist);
 
   return root;
 }
@@ -272,7 +271,8 @@ bool csPVSVis::Initialize (iObjectRegistry *object_reg)
 
   delete kdtree;
 
-  kdtree = new csKDTree ();
+  // TODO:  load from file
+  kdtree = MakeTestPVSTree ();
   // TODO:  add debug descriptor to static KD tree
   //csPVSVisObjectDescriptor* desc = new csPVSVisObjectDescriptor ();
   //kdtree->SetObjectDescriptor (desc);
@@ -296,6 +296,30 @@ bool csPVSVis::Initialize (iObjectRegistry *object_reg)
   }
 
   return true;
+}
+
+static void PrintTree(csStaticKDTree* node)
+{
+  if (node->IsLeafNode())
+  {
+    csArray<csStaticKDTreeObject*>& objects = node->GetObjects();
+    int num = node->GetObjectCount();
+    printf("LEAF NODE\n");
+    for (int i = 0; i < num; i++) {
+      csPVSVisObjectWrapper *obj = (csPVSVisObjectWrapper*) 
+        objects[i]->GetObject ();
+      printf("  Node name: %s\n", 
+          obj->visobj->GetMeshWrapper()->QueryObject()->GetName ());
+    }
+  }
+  else
+  {
+    printf("INTERIOR NODE:  axis %d, split location %f\n",
+        node->GetAxis(), node->GetSplitLocation());
+    PrintTree(node->GetChild1());
+    PrintTree(node->GetChild2());
+    printf("NODE DONE\n");
+  }
 }
 
 void csPVSVis::Setup (const char* /*name*/)
@@ -365,6 +389,8 @@ void csPVSVis::RegisterVisObject (iVisibilityObject* visobj)
 		  (iObjectModelListener*)visobj_wrap);
 
   visobj_vector.Push (visobj_wrap);
+  printf("\n-----------------------------------------------\n\n");
+  PrintTree(kdtree);
 }
 
 void csPVSVis::UnregisterVisObject (iVisibilityObject* visobj)
@@ -514,7 +540,7 @@ struct FrustTestCameraData
   iVisibilityCullerListener* viscallback;
 };
 
-int csPVSVis::TestNodeVisibility (csKDTree* treenode,
+int csPVSVis::TestNodeVisibility (csStaticKDTree* treenode,
 	FrustTestCameraData* data, uint32& frustum_mask)
 {
   csBox3 node_bbox = treenode->GetNodeBBox ();
@@ -582,11 +608,11 @@ bool csPVSVis::TestObjectVisibility (csPVSVisObjectWrapper* obj,
     }
 } */
 
-static void CallVisibilityCallbacksForSubtree (csKDTree* treenode,
+static void CallVisibilityCallbacksForSubtree (csStaticKDTree* treenode,
 	FrustTestCameraData* data, uint32 cur_timestamp)
 {
   int num_objects = treenode->GetObjectCount ();
-  csKDTreeChild** objects = treenode->GetObjects ();
+  csArray<csStaticKDTreeObject*>& objects = treenode->GetObjects ();
   int i;
   for (i = 0 ; i < num_objects ; i++)
   {
@@ -601,9 +627,9 @@ static void CallVisibilityCallbacksForSubtree (csKDTree* treenode,
     }
   }
 
-  csKDTree* child1 = treenode->GetChild1 ();
+  csStaticKDTree* child1 = treenode->GetChild1 ();
   if (child1) CallVisibilityCallbacksForSubtree (child1, data, cur_timestamp);
-  csKDTree* child2 = treenode->GetChild2 ();
+  csStaticKDTree* child2 = treenode->GetChild2 ();
   if (child2) CallVisibilityCallbacksForSubtree (child2, data, cur_timestamp);
 
 }
@@ -642,7 +668,7 @@ static void CallVisibilityCallbacksForSubtree (csKDTree* treenode,
     }
 } */
 
-void csPVSVis::FrustTest_Traverse (csKDTree* treenode,
+void csPVSVis::FrustTest_Traverse (csStaticKDTree* treenode,
 	FrustTestCameraData* data,
 	uint32 cur_timestamp, uint32 frustum_mask)
 {
@@ -664,12 +690,11 @@ void csPVSVis::FrustTest_Traverse (csKDTree* treenode,
     return;
   }
 
-  treenode->Distribute ();
+//  treenode->Distribute ();
 
   int num_objects;
-  csKDTreeChild** objects;
+  csArray<csStaticKDTreeObject*>& objects = treenode->GetObjects();
   num_objects = treenode->GetObjectCount ();
-  objects = treenode->GetObjects ();
   int i;
   for (i = 0 ; i < num_objects ; i++)
   {
@@ -682,9 +707,9 @@ void csPVSVis::FrustTest_Traverse (csKDTree* treenode,
     }
   }
 
-  csKDTree* child1 = treenode->GetChild1 ();
+  csStaticKDTree* child1 = treenode->GetChild1 ();
   if (child1) FrustTest_Traverse (child1, data, cur_timestamp, frustum_mask);
-  csKDTree* child2 = treenode->GetChild2 ();
+  csStaticKDTree* child2 = treenode->GetChild2 ();
   if (child2) FrustTest_Traverse (child2, data, cur_timestamp, frustum_mask);
 
   return;
@@ -769,7 +794,7 @@ struct FrustTestPlanes_Front2BackData
   } */
 };
 
-static bool FrustTestPlanes_Front2Back (csKDTree* treenode,
+static bool FrustTestPlanes_Front2Back (csStaticKDTree* treenode,
 	void* userdata, uint32 cur_timestamp, uint32& frustum_mask)
 {
   FrustTestPlanes_Front2BackData* data
@@ -787,12 +812,11 @@ static bool FrustTestPlanes_Front2Back (csKDTree* treenode,
 
   frustum_mask = new_mask;
 
-  treenode->Distribute ();
+//  treenode->Distribute ();
 
   int num_objects;
-  csKDTreeChild** objects;
+  csArray<csStaticKDTreeObject*>& objects = treenode->GetObjects();
   num_objects = treenode->GetObjectCount ();
-  objects = treenode->GetObjects ();
   int i;
   for (i = 0 ; i < num_objects ; i++)
   {
@@ -903,7 +927,7 @@ struct FrustTestBox_Front2BackData
 //  }
 };
 
-static bool FrustTestBox_Front2Back (csKDTree* treenode, void* userdata,
+static bool FrustTestBox_Front2Back (csStaticKDTree* treenode, void* userdata,
 	uint32 cur_timestamp, uint32&)
 {
   FrustTestBox_Front2BackData* data = (FrustTestBox_Front2BackData*)userdata;
@@ -917,10 +941,10 @@ static bool FrustTestBox_Front2Back (csKDTree* treenode, void* userdata,
     return false;
   }
 
-  treenode->Distribute ();
+//  treenode->Distribute ();
 
   int num_objects;
-  csKDTreeChild** objects;
+  csArray<csStaticKDTreeObject*>& objects = treenode->GetObjects();
   num_objects = treenode->GetObjectCount ();
   objects = treenode->GetObjects ();
 
@@ -1018,7 +1042,7 @@ struct FrustTestSphere_Front2BackData
 //  }
 };
 
-static bool FrustTestSphere_Front2Back (csKDTree* treenode,
+static bool FrustTestSphere_Front2Back (csStaticKDTree* treenode,
 	void* userdata, uint32 cur_timestamp, uint32&)
 {
   FrustTestSphere_Front2BackData* data =
@@ -1033,10 +1057,10 @@ static bool FrustTestSphere_Front2Back (csKDTree* treenode,
     return false;
   }
 
-  treenode->Distribute ();
+//  treenode->Distribute ();
 
   int num_objects;
-  csKDTreeChild** objects;
+  csArray<csStaticKDTreeObject*>& objects = treenode->GetObjects();
   num_objects = treenode->GetObjectCount ();
   objects = treenode->GetObjects ();
 
@@ -1166,7 +1190,7 @@ struct IntersectSegment_Front2BackData
   } */
 };
 
-static bool IntersectSegmentSloppy_Front2Back (csKDTree* treenode,
+static bool IntersectSegmentSloppy_Front2Back (csStaticKDTree* treenode,
 	void* userdata, uint32 cur_timestamp, uint32&)
 {
   IntersectSegment_Front2BackData* data
@@ -1183,10 +1207,10 @@ static bool IntersectSegmentSloppy_Front2Back (csKDTree* treenode,
     return false;
   }
 
-  treenode->Distribute ();
+//  treenode->Distribute ();
 
   int num_objects;
-  csKDTreeChild** objects;
+  csArray<csStaticKDTreeObject*>& objects = treenode->GetObjects();
   num_objects = treenode->GetObjectCount ();
   objects = treenode->GetObjects ();
 
@@ -1214,7 +1238,7 @@ static bool IntersectSegmentSloppy_Front2Back (csKDTree* treenode,
   return true;
 }
 
-static bool IntersectSegment_Front2Back (csKDTree* treenode,
+static bool IntersectSegment_Front2Back (csStaticKDTree* treenode,
 	void* userdata, uint32 cur_timestamp, uint32&)
 {
   IntersectSegment_Front2BackData* data
@@ -1242,10 +1266,10 @@ static bool IntersectSegment_Front2Back (csKDTree* treenode,
     return false;
   }
 
-  treenode->Distribute ();
+//  treenode->Distribute ();
 
   int num_objects;
-  csKDTreeChild** objects;
+  csArray<csStaticKDTreeObject*>& objects = treenode->GetObjects();
   num_objects = treenode->GetObjectCount ();
   objects = treenode->GetObjects ();
 
@@ -1411,7 +1435,7 @@ static int compare_shadobj (const void* el1, const void* el2)
   return 0;
 }
 
-static bool CastShadows_Front2Back (csKDTree* treenode, void* userdata,
+static bool CastShadows_Front2Back (csStaticKDTree* treenode, void* userdata,
 	uint32 cur_timestamp, uint32& planes_mask)
 {
   CastShadows_Front2BackData* data = (CastShadows_Front2BackData*)userdata;
@@ -1439,10 +1463,10 @@ static bool CastShadows_Front2Back (csKDTree* treenode, void* userdata,
     planes_mask = out_mask;
   }
 
-  treenode->Distribute ();
+//  treenode->Distribute ();
 
   int num_objects;
-  csKDTreeChild** objects;
+  csArray<csStaticKDTreeObject*>& objects = treenode->GetObjects();
   num_objects = treenode->GetObjectCount ();
   objects = treenode->GetObjects ();
 
