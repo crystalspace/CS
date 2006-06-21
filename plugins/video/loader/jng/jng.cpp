@@ -222,7 +222,7 @@ struct jpg_datastore{
   size_t len;
 
   jpg_datastore () { data = 0; len = 0; }
-  ~jpg_datastore () { free (data); }
+  ~jpg_datastore () { cs_free (data); }
 };
 
 
@@ -250,7 +250,7 @@ static jpeg_boolean empty_output_buffer (j_compress_ptr cinfo)
 {
   my_dst_mgr *dest = (my_dst_mgr*)cinfo->dest;
 
-  dest->ds->data = (unsigned char*)realloc (dest->ds->data,
+  dest->ds->data = (unsigned char*)cs_realloc (dest->ds->data,
     dest->ds->len + sizeof(JOCTET) * my_dst_mgr::buf_len);
   if (!dest->ds->data)
     ERREXITS(cinfo,JERR_OUT_OF_MEMORY, "Could not reallocate enough memory");
@@ -269,7 +269,7 @@ static void term_destination (j_compress_ptr cinfo)
 
   if (len > 0)
   {
-    dest->ds->data = (unsigned char*)realloc (dest->ds->data,
+    dest->ds->data = (unsigned char*)cs_realloc (dest->ds->data,
       dest->ds->len + sizeof(JOCTET) * len);
     if (!dest->ds->data)
       ERREXITS(cinfo,JERR_OUT_OF_MEMORY, "Could not reallocate enough memory");

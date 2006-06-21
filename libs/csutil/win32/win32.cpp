@@ -1000,13 +1000,13 @@ void Win32Assistant::DisableConsole ()
     char* buf = 0;
     while (lasterr == ERROR_INSUFFICIENT_BUFFER)
     {
-      buf = (char*)realloc (buf, bufSize);
+      buf = (char*)cs_realloc (buf, bufSize);
       GetModuleFileName (0, buf, bufSize);
       bufSize += MAX_PATH;
       lasterr = GetLastError ();
     }
     outName = buf;
-    free (buf);
+    cs_free (buf);
   }
 
   {

@@ -32,14 +32,6 @@
 
 CS_IMPLEMENT_PLUGIN
 
-SCF_IMPLEMENT_IBASE_EXT (csFireMeshObject)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iFireState)
-SCF_IMPLEMENT_IBASE_EXT_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csFireMeshObject::FireState)
-  SCF_IMPLEMENTS_INTERFACE (iFireState)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 // Aging ratios
 #define COL_AGE0	0.0f
 #define COL_AGE1	0.05f
@@ -117,9 +109,9 @@ void csFireMeshObject::SetupObject ()
 }
 
 csFireMeshObject::csFireMeshObject (iObjectRegistry* object_reg,
-  iMeshObjectFactory* factory) : csParticleSystem (object_reg, factory)
+  iMeshObjectFactory* factory) :
+  scfImplementationType(this, object_reg, factory)
 {
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiFireState);
   part_pos = 0;
   part_speed = 0;
   part_age = 0;
@@ -145,7 +137,6 @@ csFireMeshObject::~csFireMeshObject()
   delete[] part_pos;
   delete[] part_speed;
   delete[] part_age;
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiFireState);
 }
 
 void csFireMeshObject::SetControlledLight (iLight *l)
@@ -263,13 +254,10 @@ void csFireMeshObject::HardTransform (const csReversibleTransform& t)
 
 //----------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE (csFireMeshObjectFactory)
-  SCF_IMPLEMENTS_INTERFACE (iMeshObjectFactory)
-SCF_IMPLEMENT_IBASE_END
-
-csFireMeshObjectFactory::csFireMeshObjectFactory(iMeshObjectType* b, iObjectRegistry* s)
+csFireMeshObjectFactory::csFireMeshObjectFactory(iMeshObjectType* b,
+  iObjectRegistry* s) :
+  scfImplementationType(this, b)
 {
-  SCF_CONSTRUCT_IBASE (b);
   logparent = 0;
   fire_type= b;
   object_reg = s;
@@ -277,7 +265,6 @@ csFireMeshObjectFactory::csFireMeshObjectFactory(iMeshObjectType* b, iObjectRegi
 
 csFireMeshObjectFactory::~csFireMeshObjectFactory ()
 {
-  SCF_DESTRUCT_IBASE ();
 }
 
 csPtr<iMeshObject> csFireMeshObjectFactory::NewInstance ()
@@ -291,28 +278,15 @@ csPtr<iMeshObject> csFireMeshObjectFactory::NewInstance ()
 
 //----------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE (csFireMeshObjectType)
-  SCF_IMPLEMENTS_INTERFACE (iMeshObjectType)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csFireMeshObjectType::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 SCF_IMPLEMENT_FACTORY (csFireMeshObjectType)
 
-
-csFireMeshObjectType::csFireMeshObjectType (iBase* pParent)
+csFireMeshObjectType::csFireMeshObjectType (iBase* pParent) :
+  scfImplementationType(this, pParent)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 csFireMeshObjectType::~csFireMeshObjectType ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 csPtr<iMeshObjectFactory> csFireMeshObjectType::NewFactory ()

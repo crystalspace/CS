@@ -59,58 +59,18 @@ enum
   XMLTOKEN_CLIMBSPEED
 };
 
-SCF_IMPLEMENT_IBASE (csSpiralFactoryLoader)
-  SCF_IMPLEMENTS_INTERFACE (iLoaderPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csSpiralFactoryLoader::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csSpiralFactorySaver)
-  SCF_IMPLEMENTS_INTERFACE (iSaverPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csSpiralFactorySaver::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csSpiralLoader)
-  SCF_IMPLEMENTS_INTERFACE (iLoaderPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csSpiralLoader::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csSpiralSaver)
-  SCF_IMPLEMENTS_INTERFACE (iSaverPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csSpiralSaver::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 SCF_IMPLEMENT_FACTORY (csSpiralFactoryLoader)
 SCF_IMPLEMENT_FACTORY (csSpiralFactorySaver)
 SCF_IMPLEMENT_FACTORY (csSpiralLoader)
 SCF_IMPLEMENT_FACTORY (csSpiralSaver)
 
-
-csSpiralFactoryLoader::csSpiralFactoryLoader (iBase* pParent)
+csSpiralFactoryLoader::csSpiralFactoryLoader (iBase* pParent) :
+  scfImplementationType(this, pParent)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 csSpiralFactoryLoader::~csSpiralFactoryLoader ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csSpiralFactoryLoader::Initialize (iObjectRegistry* object_reg)
@@ -130,16 +90,13 @@ csPtr<iBase> csSpiralFactoryLoader::Parse (iDocumentNode* /*node*/,
 }
 
 //---------------------------------------------------------------------------
-csSpiralFactorySaver::csSpiralFactorySaver (iBase* pParent)
+csSpiralFactorySaver::csSpiralFactorySaver (iBase* pParent) :
+  scfImplementationType(this, pParent)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 csSpiralFactorySaver::~csSpiralFactorySaver ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csSpiralFactorySaver::Initialize (iObjectRegistry* object_reg)
@@ -157,16 +114,13 @@ bool csSpiralFactorySaver::WriteDown (iBase* /*obj*/, iDocumentNode* parent,
   return true;
 }
 //---------------------------------------------------------------------------
-csSpiralLoader::csSpiralLoader (iBase* pParent)
+csSpiralLoader::csSpiralLoader (iBase* pParent) :
+  scfImplementationType(this, pParent)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 csSpiralLoader::~csSpiralLoader ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csSpiralLoader::Initialize (iObjectRegistry* object_reg)
@@ -302,16 +256,13 @@ csPtr<iBase> csSpiralLoader::Parse (iDocumentNode* node,
 
 //---------------------------------------------------------------------------
 
-csSpiralSaver::csSpiralSaver (iBase* pParent)
+csSpiralSaver::csSpiralSaver (iBase* pParent) :
+  scfImplementationType(this, pParent)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 csSpiralSaver::~csSpiralSaver ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csSpiralSaver::Initialize (iObjectRegistry* object_reg)

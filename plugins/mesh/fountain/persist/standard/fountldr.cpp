@@ -62,58 +62,18 @@ enum
   XMLTOKEN_SPEED
 };
 
-SCF_IMPLEMENT_IBASE (csFountainFactoryLoader)
-  SCF_IMPLEMENTS_INTERFACE (iLoaderPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csFountainFactoryLoader::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csFountainFactorySaver)
-  SCF_IMPLEMENTS_INTERFACE (iSaverPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csFountainFactorySaver::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csFountainLoader)
-  SCF_IMPLEMENTS_INTERFACE (iLoaderPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csFountainLoader::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csFountainSaver)
-  SCF_IMPLEMENTS_INTERFACE (iSaverPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csFountainSaver::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 SCF_IMPLEMENT_FACTORY (csFountainFactoryLoader)
 SCF_IMPLEMENT_FACTORY (csFountainFactorySaver)
 SCF_IMPLEMENT_FACTORY (csFountainLoader)
 SCF_IMPLEMENT_FACTORY (csFountainSaver)
 
-
-csFountainFactoryLoader::csFountainFactoryLoader (iBase* pParent)
+csFountainFactoryLoader::csFountainFactoryLoader (iBase* pParent) :
+  scfImplementationType(this, pParent)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 csFountainFactoryLoader::~csFountainFactoryLoader ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csFountainFactoryLoader::Initialize (iObjectRegistry* object_reg)
@@ -134,16 +94,13 @@ csPtr<iBase> csFountainFactoryLoader::Parse (iDocumentNode* /*node*/,
 
 //---------------------------------------------------------------------------
 
-csFountainFactorySaver::csFountainFactorySaver (iBase* pParent)
+csFountainFactorySaver::csFountainFactorySaver (iBase* pParent) :
+  scfImplementationType(this, pParent)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 csFountainFactorySaver::~csFountainFactorySaver ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csFountainFactorySaver::Initialize (iObjectRegistry* object_reg)
@@ -163,16 +120,13 @@ bool csFountainFactorySaver::WriteDown (iBase* /*obj*/, iDocumentNode* parent,
 
 //---------------------------------------------------------------------------
 
-csFountainLoader::csFountainLoader (iBase* pParent)
+csFountainLoader::csFountainLoader (iBase* pParent) :
+  scfImplementationType(this, pParent)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 csFountainLoader::~csFountainLoader ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csFountainLoader::Initialize (iObjectRegistry* object_reg)
@@ -332,16 +286,13 @@ csPtr<iBase> csFountainLoader::Parse (iDocumentNode* node,
 //---------------------------------------------------------------------------
 
 
-csFountainSaver::csFountainSaver (iBase* pParent)
+csFountainSaver::csFountainSaver (iBase* pParent) :
+  scfImplementationType(this, pParent)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 csFountainSaver::~csFountainSaver ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csFountainSaver::Initialize (iObjectRegistry* object_reg)

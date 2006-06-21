@@ -24,23 +24,20 @@
  * Rain particle mesh object
  */ 
 
-#include "csutil/scf.h"
+#include "csutil/scf_interface.h"
 
 /**\addtogroup meshplugins
  * @{ */
 
-struct iMaterialWrapper;
-
-class csColor;
 class csVector3;
-
-SCF_VERSION (iRainState, 0, 0, 1);
 
 /**
  * This interface describes the API for the rain mesh object.
  */
-struct iRainState : public iBase
+struct iRainState : public virtual iBase
 {
+  SCF_INTERFACE(iRainState, 2, 0, 0);
+
   /// Set the number of particles to use.
   virtual void SetParticleCount (int num) = 0;
   /// Get the number of particles used.

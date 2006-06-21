@@ -28,11 +28,7 @@
 #include "csutil/allocator.h"
 #include "csutil/comparator.h"
 
-// Hack: Work around problems caused by #defining 'new'.
-#if defined(CS_EXTENSIVE_MEMDEBUG) || defined(CS_MEMORY_TRACKER)
-# undef new
-#endif
-#include <new>
+#include "csutil/custom_new_disable.h"
 
 #if defined(CS_MEMORY_TRACKER)
 #include "csutil/memdebug.h"
@@ -1257,9 +1253,7 @@ public:
   }
 };
 
-#if defined(CS_EXTENSIVE_MEMDEBUG) || defined(CS_MEMORY_TRACKER)
-# define new CS_EXTENSIVE_MEMDEBUG_NEW
-#endif
+#include "csutil/custom_new_enable.h"
 
 /** @} */
 

@@ -283,7 +283,7 @@ struct iSkeletonFactory : public virtual iBase
 struct iSkeletonGraveyard : public virtual iBase
 {
   SCF_INTERFACE (iSkeletonGraveyard, 1, 0, 0);
-  virtual int GetFactoriesCount() = 0;
+  virtual size_t GetFactoriesCount() = 0;
   virtual iSkeletonFactory *CreateFactory(const char *name) = 0;
   virtual iSkeletonFactory *LoadFactory(const char *file_name) = 0;
   virtual iSkeletonFactory *FindFactory(const char *name) = 0;

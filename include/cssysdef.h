@@ -70,6 +70,16 @@
 #define CS_FORCEINLINE inline
 #endif
 
+/**\def CS_NO_EXCEPTIONS
+ * This is defined when the project was compiled without support for 
+ * exceptions.
+ */
+#if defined(CS_COMPILER_MSVC) && !_HAS_EXCEPTIONS
+# define CS_NO_EXCEPTIONS
+#elif defined(CS_COMPILER_GCC) && !defined(__EXCEPTIONS)
+# define CS_NO_EXCEPTIONS
+#endif
+
 /**\def CS_MAXPATHLEN
  * Maximum length of a filesystem pathname. Useful for declaring character
  * buffers for calls to system functions which return a pathname in the buffer.
@@ -573,6 +583,134 @@ Type &Class::getterFunc ()                                     \
 #  define CS_FUNCTION_NAME		"<?\?\?>"
 #endif
 
+/* Include now, if it's included later, the malloc re#definition below may
+ * interfere with that header. */
+#include <stdlib.h>
+#ifdef CS_HAVE_MALLOC_H
+#include <malloc.h>
+#endif
+
+/**\name Platform-specific memory allocation
+ * If built with ptmalloc support, these functions can be used to explicitly
+ * call the platform's default malloc/free implementations. Useful when
+ * interfacing with third party libraries.
+ */
+//@{
+inline void* platform_malloc (size_t n)
+{ return malloc (n); }
+inline void platform_free (void* p)
+{ return free (p); }
+inline void* platform_realloc (void* p, size_t n)
+{ return realloc (p, n); }
+inline void* platform_calloc (size_t n, size_t s)
+{ return calloc (n, s); }
+//@}
+
+#ifndef CS_NO_PTMALLOC
+//@{
+/**\name ptmalloc memory allocation
+ * Directly use the ptmalloc allocation functions. Usually, this is not needed -
+ * use cs_malloc() etc instead.
+ */
+extern void* CS_CRYSTALSPACE_EXPORT ptmalloc (size_t n);
+extern void CS_CRYSTALSPACE_EXPORT ptfree (void* p);
+extern void* CS_CRYSTALSPACE_EXPORT ptrealloc (void* p, size_t n);
+extern void* CS_CRYSTALSPACE_EXPORT ptmemalign (size_t a, size_t n);
+extern void* CS_CRYSTALSPACE_EXPORT ptcalloc (size_t n, size_t s);
+//@}
+
+/**\name Default Crystal Space memory allocation
+ * Always the same memory allocation functions as internally used by 
+ * Crystal Space.
+ */
+//@{
+inline void* cs_malloc (size_t n)
+{ return ptmalloc (n); }
+inline void cs_free (void* p)
+{ ptfree (p); }
+inline void* cs_realloc (void* p, size_t n)
+{ return ptrealloc (p, n); }
+inline void* cs_calloc (size_t n, size_t s)
+{ return ptcalloc (n, s); }
+//@}
+
+/**\name Memory allocation override
+ * By default, ptmalloc is used for memory allocations, for both C-style
+ * malloc/free as well as C++ new/delete. Use of ptmalloc can be disabled
+ * for the whole project by passing <tt>--enable-ptmalloc=no</tt> to
+ * configure or defining <tt>CS_NO_PTMALLOC</tt> in 
+ * <tt>include/csutil/win32/csconfig.h</tt> for MSVC.
+ *
+ * To disable ptmalloc for individual source files, define 
+ * <tt>CS_NO_MALLOC_OVERRIDE</tt> resp. <tt>CS_NO_NEW_OVERRIDE</tt> before 
+ * including <tt>cssysdef.h</tt>.
+ */
+//@{
+#ifndef CS_NO_MALLOC_OVERRIDE
+#define malloc 		cs_malloc
+#define free 	        cs_free
+#define realloc 	cs_realloc
+#define calloc 		cs_calloc
+#endif // CS_NO_MALLOC_OVERRIDE
+
+#ifndef CS_NO_NEW_OVERRIDE
+#if !defined(CS_MEMORY_TRACKER) && !defined(CS_MEMORY_TRACKER_IMPLEMENT) \
+  && !defined(CS_EXTENSIVE_MEMDEBUG) && !defined(CS_EXTENSIVE_MEMDEBUG_IMPLEMENT)
+
+#ifdef CS_NO_EXCEPTIONS
+inline void* operator new (size_t s)
+{ return ptmalloc (s); }
+inline void* operator new[] (size_t s)
+{ return ptmalloc (s); }
+inline void operator delete (void* p) 
+{ ptfree (p); }
+inline void operator delete[] (void* p) 
+{ ptfree (p); }
+#else
+#include <new>
+inline void* operator new (size_t s) throw (std::bad_alloc)
+{ 
+  void* p = ptmalloc (s);
+  if (!p) throw std::bad_alloc();
+  return p;
+}
+inline void* operator new[] (size_t s) throw (std::bad_alloc)
+{ 
+  void* p = ptmalloc (s);
+  if (!p) throw std::bad_alloc();
+  return p;
+}
+inline void operator delete (void* p) throw()
+{ ptfree (p); }
+inline void operator delete[] (void* p) throw()
+{ ptfree (p); }
+
+inline void* operator new (size_t s, const std::nothrow_t&) throw()
+{ return ptmalloc (s); }
+inline void* operator new[] (size_t s, const std::nothrow_t&) throw()
+{ return ptmalloc (s); }
+inline void operator delete (void* p, const std::nothrow_t&) throw()
+{ ptfree (p); }
+inline void operator delete[] (void* p, const std::nothrow_t&) throw()
+{ ptfree (p); }
+#endif // CS_NO_EXCEPTIONS
+
+#endif /* !defined(CS_MEMORY_TRACKER) && !defined(CS_MEMORY_TRACKER_IMPLEMENT)
+  && !defined(CS_EXTENSIVE_MEMDEBUG) && !defined(CS_EXTENSIVE_MEMDEBUG_IMPLEMENT) */
+#endif // CS_NO_NEW_OVERRIDE
+
+#else // CS_NO_PTMALLOC
+inline void* cs_malloc (size_t n)
+{ return platform_malloc (n); }
+inline void cs_free (void* p)
+{ platform_free (p); }
+inline void* cs_realloc (void* p, size_t n)
+{ return platform_realloc (p, n); }
+inline void* cs_calloc (size_t n, size_t s)
+{ return platform_calloc (n, s); }
+#endif // CS_NO_PTMALLOC
+//@}
+
 // The following define should only be enabled if you have defined
 // a special version of overloaded new that accepts two additional
 // parameters: a (void*) pointing to the filename and an int with the
@@ -914,9 +1052,7 @@ inline void operator delete[] (void* p, void*, int) { operator delete[] (p); }
 # define CS_NAMESPACE_PACKAGE_NAME       CS
 #endif
 
-//@{
-/**
- * Plugin namespace helpers.
+/**\name Plugin namespace helpers
  * To avoid symbol conflicts when employing static linking, it is a good
  * idea to put everything into a private namespace. The 
  * CS_PLUGIN_NAMESPACE_BEGIN and CS_PLUGIN_NAMESPACE_END macros help with 
@@ -938,13 +1074,13 @@ inline void operator delete[] (void* p, void*, int) { operator delete[] (p); }
  * \endcode
  * To refer to members of the namespace (e.g. for template specializations,
  * use CS_PLUGIN_NAMESPACE_NAME.
- */
+ * @{ */
 #define CS_PLUGIN_NAMESPACE_BEGIN(name)                                     \
   namespace CS_NAMESPACE_PACKAGE_NAME { namespace Plugin { namespace name
 #define CS_PLUGIN_NAMESPACE_END(name)                                       \
   } }
 #define CS_PLUGIN_NAMESPACE_NAME(name)                                      \
   CS_NAMESPACE_PACKAGE_NAME::Plugin::name
-//@}
+/** @} */
 
 #endif // __CS_CSSYSDEF_H__

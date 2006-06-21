@@ -1560,12 +1560,10 @@ void csEngine::AddHalo (iCamera* camera, csLight *Light)
   if (!topLevelClipper->GetClipper ()->IsInside (csVector2 (v.x, v.y))) return ;
 
   // Check if light is not obscured by anything
-  csVector3 isect;
-  int polyidx = 0;
-  if(camera->GetSector ()->HitBeamPortals (camera->GetTransform().GetOrigin(), 
-      light_pos, isect, &polyidx))
+  csSectorHitBeamResult hbresult = camera->GetSector ()->HitBeamPortals (camera->GetTransform().GetOrigin(), light_pos );
+  if(hbresult.mesh)
     return; // hit a mesh
-  if(polyidx != -1) // double check on the above.
+  if(hbresult.polygon_idx != -1) // double check on the above.
     return; // hit a polygon
 
   // Halo size is 1/4 of the screen height; also we make sure its odd

@@ -3,9 +3,9 @@
 @section How To Read This Manual
 
 This manual has been written by numerous volunteers, and as such, conventions
-within the manual are not always the same. Where possible, the overall
+within the manual are not always the same.  Where possible, the overall
 maintainers of this manual have modified the original documents to fit a more
-standard convention for easier reading. If you find anything in this manual
+standard convention for easier reading.  If you find anything in this manual
 which is not correct, please submit a bug report either to the mailing list,
 or to the SourceForge bug tracking system. @xref{Feedback}.
 
@@ -22,14 +22,14 @@ what's new.
 @section Current Status
 
 Crystal Space (@sc{cs}) is a mature project, though portions are still under
-development. This means that there may be some bugs and some things may not
+development.  This means that there may be some bugs and some things may not
 work as expected or might be incomplete.  For information about known bugs and
 unfinished items, refer to the Developer's Project page at SourceForge:
 
 @noindent
 @uref{http://sourceforge.net/projects/crystal/}
 
-There are already a number of projects using Crystal Space. For more
+There are already a number of projects using Crystal Space.  For more
 information, please visit the Related Projects page: 
 
 @noindent
@@ -42,9 +42,9 @@ information, please visit the Related Projects page:
 @end iftex
 
 Crystal Space includes both a hardware (OpenGL) and software 3D
-renderer. For decent performance in the software renderer, a reasonably
-modern machine should be used. With an OpenGL 3D card, Crystal Space can really
-shine.
+renderer.  For decent performance in the software renderer, a reasonably
+modern machine should be used.  With an OpenGL 3D card, Crystal Space can
+really shine.
 
 There is a very active list of developers working to make Crystal Space as
 usable as possible, so things are improving constantly.
@@ -54,14 +54,14 @@ usable as possible, so things are improving constantly.
 
 What if you want to use Crystal Space in your project?
 The best approach at this point in time is to become a member of the
-mailing lists and listen to how everything develops. If you're really
+mailing lists and listen to how everything develops.  If you're really
 serious about things you can join discussions and develop for the
-engine. Jorrit will gladly add contributed code to Crystal Space
+engine.  Jorrit will gladly add contributed code to Crystal Space
 provided he can use the code.
 
 Note that you also need to agree to the @sc{lgpl} details but it
-shouldn't be a real problem for OSS developers. @xref{Licenses}.
+shouldn't be a real problem for @sc{oss} developers. @xref{Licenses}.
 
 We are always interested in hearing what other people are doing with
-Crystal Space. Even if you only use Crystal Space for small private projects
+Crystal Space.  Even if you only use Crystal Space for small private projects
 we would like to hear about it just to satisfy our curiosity.

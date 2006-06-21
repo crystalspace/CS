@@ -26,6 +26,7 @@
 #include "iutil/comp.h"
 #include "imap/services.h"
 #include "csutil/strhash.h"
+#include "csutil/scf_implementation.h"
 
 struct iEngine;
 struct iPluginManager;
@@ -38,14 +39,13 @@ struct iEmitFactoryState;
 /**
  * Emit factory loader.
  */
-class csEmitFactoryLoader : public iLoaderPlugin
+class csEmitFactoryLoader :
+  public scfImplementation2<csEmitFactoryLoader, iLoaderPlugin, iComponent>
 {
 private:
   iObjectRegistry* object_reg;
 
 public:
-  SCF_DECLARE_IBASE;
-
   /// Constructor.
   csEmitFactoryLoader (iBase*);
 
@@ -57,27 +57,18 @@ public:
   /// Parse a given node and return a new object for it.
   virtual csPtr<iBase> Parse (iDocumentNode* node,
     iStreamSource*, iLoaderContext* ldr_context, iBase* context);
-
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csEmitFactoryLoader);
-    virtual bool Initialize (iObjectRegistry* p)
-    { return scfParent->Initialize (p); }
-  } scfiComponent;
-  friend struct eiComponent;
 };
 
 /**
  * Emit factory saver.
  */
-class csEmitFactorySaver : public iSaverPlugin
+class csEmitFactorySaver :
+  public scfImplementation2<csEmitFactorySaver, iSaverPlugin, iComponent>
 {
 private:
   iObjectRegistry* object_reg;
 
 public:
-  SCF_DECLARE_IBASE;
-
   /// Constructor.
   csEmitFactorySaver (iBase*);
 
@@ -89,20 +80,13 @@ public:
   /// Write down given object and add to iDocumentNode.
   virtual bool WriteDown (iBase *obj, iDocumentNode* parent,
   	iStreamSource*);
-
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csEmitFactorySaver);
-    virtual bool Initialize (iObjectRegistry* p)
-    { return scfParent->Initialize (p); }
-  } scfiComponent;
-  friend struct eiComponent;
 };
 
 /**
  * Emit loader.
  */
-class csEmitLoader : public iLoaderPlugin
+class csEmitLoader :
+  public scfImplementation2<csEmitLoader, iLoaderPlugin, iComponent>
 {
 private:
   iObjectRegistry* object_reg;
@@ -114,8 +98,6 @@ private:
 	      iEmitFactoryState *fstate, float* weight);
 
 public:
-  SCF_DECLARE_IBASE;
-
   /// Constructor.
   csEmitLoader (iBase*);
 
@@ -127,28 +109,19 @@ public:
   /// Parse a given node and return a new object for it.
   virtual csPtr<iBase> Parse (iDocumentNode* node,
     iStreamSource*, iLoaderContext* ldr_context, iBase* context);
-
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csEmitLoader);
-    virtual bool Initialize (iObjectRegistry* p)
-    { return scfParent->Initialize (p); }
-  } scfiComponent;
-  friend struct eiComponent;
 };
 
 /**
  * Emit saver.
  */
-class csEmitSaver : public iSaverPlugin
+class csEmitSaver :
+  public scfImplementation2<csEmitSaver, iSaverPlugin, iComponent>
 {
 private:
   iObjectRegistry* object_reg;
   csRef<iSyntaxService> synldr;
 
 public:
-  SCF_DECLARE_IBASE;
-
   /// Constructor.
   csEmitSaver (iBase*);
 
@@ -161,14 +134,6 @@ public:
   virtual bool WriteDown(iBase *obj, iDocumentNode* parent,
   	iStreamSource*);
   virtual bool WriteEmit(iEmitGen3D* emit, iDocumentNode* parent);
-
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csEmitSaver);
-    virtual bool Initialize (iObjectRegistry* p)
-    { return scfParent->Initialize (p); }
-  } scfiComponent;
-  friend struct eiComponent;
 };
 
 #endif // __CS_EMITLDR_H__

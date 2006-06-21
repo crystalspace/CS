@@ -25,10 +25,14 @@
 #include "csutil/xmltiny.h"
 #include "csutil/scfstr.h"
 #include "fvg_shape.h"
-#include <map>
 
-/** file Flexible Vector Graphics parser
-*/
+#include "csutil/custom_new_disable.h"
+#include <map>
+#include "csutil/custom_new_enable.h"
+
+/**\file 
+ * Flexible Vector Graphics parser
+ */
 
 namespace aws
 {  

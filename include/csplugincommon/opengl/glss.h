@@ -26,6 +26,7 @@
 
 #include "csextern_gl.h"
 #include "csplugincommon/canvas/scrshot.h"
+#include "csutil/scf_implementation.h"
 
 class csGraphics2DGLCommon;
 
@@ -35,7 +36,8 @@ class csGraphics2DGLCommon;
 /**
  * OpenGL screen shot.
  */
-class CS_CSPLUGINCOMMON_GL_EXPORT csGLScreenShot : public csImageBase
+class CS_CSPLUGINCOMMON_GL_EXPORT csGLScreenShot :
+  public scfImplementationExt0<csGLScreenShot, csImageBase>
 {
   csGraphics2DGLCommon* G2D;
   int Format;
@@ -45,8 +47,6 @@ class CS_CSPLUGINCOMMON_GL_EXPORT csGLScreenShot : public csImageBase
 
 public:
   csGLScreenShot* poolNext;
-
-  SCF_DECLARE_IBASE;
 
   csGLScreenShot (csGraphics2DGLCommon*);
   virtual ~csGLScreenShot ();
@@ -60,6 +60,9 @@ public:
   virtual int GetFormat () const
   { return Format; }
   void SetData (void*);
+
+  void IncRef ();
+  void DecRef ();
 };
 
 /** @} */

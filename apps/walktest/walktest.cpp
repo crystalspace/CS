@@ -956,7 +956,9 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
 
   if (!csInitializer::SetupConfigManager (object_reg, iConfigName))
   {
-    Report (CS_REPORTER_SEVERITY_ERROR, "Failed to initialize config!");
+    Report (CS_REPORTER_SEVERITY_ERROR, "Failed to initialize config!\n"
+      " (A common cause is the CRYSTAL environment variable "
+      "not being set correctly.)");
     return false;
   }
 
@@ -1477,7 +1479,8 @@ int main (int argc, char* argv[])
   // (3D, 2D, network, sound, ..., engine) and initialize them.
   if (!Sys->Initialize (argc, argv, "/config/walktest.cfg"))
   {
-    Sys->Report (CS_REPORTER_SEVERITY_ERROR, "Error initializing system!");
+    Sys->Report (CS_REPORTER_SEVERITY_ERROR,
+      "Error initializing system!");
     Cleanup();
     exit (-1);
   }

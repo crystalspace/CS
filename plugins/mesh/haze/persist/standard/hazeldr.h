@@ -26,9 +26,8 @@
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "csutil/strhash.h"
+#include "csutil/scf_implementation.h"
 
-struct iEngine;
-struct iPluginManager;
 struct iObjectRegistry;
 struct iReporter;
 struct iDocumentNode;
@@ -38,7 +37,8 @@ struct iHazeHull;
 /**
  * Haze factory loader.
  */
-class csHazeFactoryLoader : public iLoaderPlugin
+class csHazeFactoryLoader :
+  public scfImplementation2<csHazeFactoryLoader, iLoaderPlugin, iComponent>
 {
 private:
   iObjectRegistry* object_reg;
@@ -47,8 +47,6 @@ private:
   csStringHash xmltokens;
 
 public:
-  SCF_DECLARE_IBASE;
-
   /// Constructor.
   csHazeFactoryLoader (iBase*);
 
@@ -60,28 +58,19 @@ public:
   /// Parse a given node and return a new object for it.
   virtual csPtr<iBase> Parse (iDocumentNode* node,
     iStreamSource*, iLoaderContext* ldr_context, iBase* context);
-
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csHazeFactoryLoader);
-    virtual bool Initialize (iObjectRegistry* p)
-    { return scfParent->Initialize (p); }
-  } scfiComponent;
-  friend struct eiComponent;
 };
 
 /**
  * Haze factory saver.
  */
-class csHazeFactorySaver : public iSaverPlugin
+class csHazeFactorySaver :
+  public scfImplementation2<csHazeFactorySaver, iSaverPlugin, iComponent>
 {
 private:
   iObjectRegistry* object_reg;
   csRef<iSyntaxService> synldr;
 
 public:
-  SCF_DECLARE_IBASE;
-
   /// Constructor.
   csHazeFactorySaver (iBase*);
 
@@ -93,20 +82,13 @@ public:
   /// Write down given object and add to iDocumentNode.
   virtual bool WriteDown (iBase *obj, iDocumentNode* parent,
   	iStreamSource*);
-
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csHazeFactorySaver);
-    virtual bool Initialize (iObjectRegistry* p)
-    { return scfParent->Initialize (p); }
-  } scfiComponent;
-  friend struct eiComponent;
 };
 
 /**
  * Haze loader.
  */
-class csHazeLoader : public iLoaderPlugin
+class csHazeLoader :
+  public scfImplementation2<csHazeLoader, iLoaderPlugin, iComponent>
 {
 private:
   iObjectRegistry* object_reg;
@@ -115,8 +97,6 @@ private:
   csStringHash xmltokens;
 
 public:
-  SCF_DECLARE_IBASE;
-
   /// Constructor.
   csHazeLoader (iBase*);
 
@@ -128,28 +108,19 @@ public:
   /// Parse a given node and return a new object for it.
   virtual csPtr<iBase> Parse (iDocumentNode* node,
     iStreamSource*, iLoaderContext* ldr_context, iBase* context);
-
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csHazeLoader);
-    virtual bool Initialize (iObjectRegistry* p)
-    { return scfParent->Initialize (p); }
-  } scfiComponent;
-  friend struct eiComponent;
 };
 
 /**
  * Haze saver.
  */
-class csHazeSaver : public iSaverPlugin
+class csHazeSaver :
+  public scfImplementation2<csHazeSaver, iSaverPlugin, iComponent>
 {
 private:
   iObjectRegistry* object_reg;
   csRef<iSyntaxService> synldr;
 
 public:
-  SCF_DECLARE_IBASE;
-
   /// Constructor.
   csHazeSaver (iBase*);
 
@@ -161,14 +132,6 @@ public:
   /// Write down given object and add to iDocumentNode.
   virtual bool WriteDown (iBase *obj, iDocumentNode* parent,
   	iStreamSource*);
-
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csHazeSaver);
-    virtual bool Initialize (iObjectRegistry* p)
-    { return scfParent->Initialize (p); }
-  } scfiComponent;
-  friend struct eiComponent;
 };
 
 #endif // __CS_HAZELDR_H__

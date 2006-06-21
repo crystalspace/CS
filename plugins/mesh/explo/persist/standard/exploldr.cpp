@@ -62,58 +62,18 @@ enum
   XMLTOKEN_SPREADACCEL
 };
 
-SCF_IMPLEMENT_IBASE (csExplosionFactoryLoader)
-  SCF_IMPLEMENTS_INTERFACE (iLoaderPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csExplosionFactoryLoader::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csExplosionFactorySaver)
-  SCF_IMPLEMENTS_INTERFACE (iSaverPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csExplosionFactorySaver::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csExplosionLoader)
-  SCF_IMPLEMENTS_INTERFACE (iLoaderPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csExplosionLoader::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csExplosionSaver)
-  SCF_IMPLEMENTS_INTERFACE (iSaverPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csExplosionSaver::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 SCF_IMPLEMENT_FACTORY (csExplosionFactoryLoader)
 SCF_IMPLEMENT_FACTORY (csExplosionFactorySaver)
 SCF_IMPLEMENT_FACTORY (csExplosionLoader)
 SCF_IMPLEMENT_FACTORY (csExplosionSaver)
 
-
-csExplosionFactoryLoader::csExplosionFactoryLoader (iBase* pParent)
+csExplosionFactoryLoader::csExplosionFactoryLoader (iBase* pParent) :
+  scfImplementationType(this, pParent)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 csExplosionFactoryLoader::~csExplosionFactoryLoader ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csExplosionFactoryLoader::Initialize (iObjectRegistry* object_reg)
@@ -134,16 +94,13 @@ csPtr<iBase> csExplosionFactoryLoader::Parse (iDocumentNode* /*node*/,
 
 //---------------------------------------------------------------------------
 
-csExplosionFactorySaver::csExplosionFactorySaver (iBase* pParent)
+csExplosionFactorySaver::csExplosionFactorySaver (iBase* pParent) :
+  scfImplementationType(this, pParent)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 csExplosionFactorySaver::~csExplosionFactorySaver ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csExplosionFactorySaver::Initialize (iObjectRegistry* object_reg)
@@ -163,16 +120,13 @@ bool csExplosionFactorySaver::WriteDown (iBase* /*obj*/, iDocumentNode* parent,
 
 //---------------------------------------------------------------------------
 
-csExplosionLoader::csExplosionLoader (iBase* pParent)
+csExplosionLoader::csExplosionLoader (iBase* pParent) :
+  scfImplementationType(this, pParent)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 csExplosionLoader::~csExplosionLoader ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csExplosionLoader::Initialize (iObjectRegistry* object_reg)
@@ -324,16 +278,13 @@ csPtr<iBase> csExplosionLoader::Parse (iDocumentNode* node,
 //---------------------------------------------------------------------------
 
 
-csExplosionSaver::csExplosionSaver (iBase* pParent)
+csExplosionSaver::csExplosionSaver (iBase* pParent) :
+  scfImplementationType(this, pParent)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 csExplosionSaver::~csExplosionSaver ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csExplosionSaver::Initialize (iObjectRegistry* object_reg)

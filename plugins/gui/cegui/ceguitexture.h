@@ -67,8 +67,13 @@ public:
    * Load a texture directly from memory. This is called from CEGUI,
    * for example, when a font should be loaded.
    */
+  #if CEGUI_VERSION_MINOR < 5
   virtual void loadFromMemory (const void *buffPtr, 
     CEGUI::uint buffWidth, CEGUI::uint buffHeight);
+  #else
+  virtual void loadFromMemory (const void *buffPtr,
+    CEGUI::uint buffWidth, CEGUI::uint buffHeight, CEGUI::Texture::PixelFormat pixFmt);
+  #endif
 
   /// Get a handle to the texture.
   iTextureHandle* GetTexHandle();

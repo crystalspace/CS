@@ -23,21 +23,20 @@
  * Explosion particle mesh object
  */ 
 
-#include "csutil/scf.h"
+#include "csutil/scf_interface.h"
 
-class csColor;
 class csVector3;
 
 /**\addtogroup meshplugins
  * @{ */
 
-SCF_VERSION (iExplosionState, 0, 0, 2);
-
 /**
  * This interface describes the API for the explosion mesh object.
  */
-struct iExplosionState : public iBase
+struct iExplosionState : public virtual iBase
 {
+  SCF_INTERFACE(iExplosionState, 2, 0, 0);
+
   /// Set the number of particles to use.
   virtual void SetParticleCount (int num) = 0;
   /// Get the number of particles
