@@ -63,7 +63,8 @@ public:
   // Return a pointer to a node representing a virtual path
   VfsNode *FindNode(const char *VirtualPath);
 
-private:
+  int FileSystem() { return FileSystemPlugin; }
+
   // Index into the filesystem plugins associated with this node
   int FileSystemPlugin;
 
@@ -77,43 +78,50 @@ private:
 
 VfsNode::VfsNode(char *virtualPathname, csVFS *parentVFS, VfsNode* parentNode, 
 				 int pluginIndex)
-: VirtualPathname(virtualPathname), ParentVFS(parentVFS), 
+: ParentVFS(parentVFS), 
   ParentNode(parentNode), FileSystemPlugin(pluginIndex)
 {
-	
+	VirtualPathname = virtualPathname;
 }
 
 VfsNode::~VfsNode()
 {
   SubDirectories.DeleteAll();
-  delete [] VirtualPathname;
 }
 
 VfsNode * VfsNode::FindNode(const char *VirtualPath)
 {
+  printf("  -> Called FindNode('%s') from '%s'\n", VirtualPath, VirtualPathname);
+
   if (strlen(VirtualPath) < strlen(VirtualPathname))
     return 0;
 
   if (strcmp(VirtualPath, VirtualPathname) == 0)
     return this;
 
-  size_t low = 0;
+  printf("    -> Searching subdirectories...\n");
+  size_t low = -1;
   size_t high = SubDirectories.Length();
   int cmp = 0;
   size_t i = 0;
 
-  while (low <= high)
+  while (high - low > 1)
   {
-    i = (high - low) >> 1;
+    i = (low + high) >> 1;
+	printf("      -> Low = %d, High = %d, mid = %d\n", low, high, i);
+	printf("        -> Comparing %d characters of '%s' with '%s'....", strlen(SubDirectories.Get(i)->VirtualPathname), SubDirectories.Get(i)->VirtualPathname, VirtualPath);
     cmp = strncmp(SubDirectories.Get(i)->VirtualPathname, VirtualPath, strlen(SubDirectories.Get(i)->VirtualPathname));
+	printf("%d\n", cmp);
 	if (cmp == 0)
 	  return SubDirectories.Get(i)->FindNode(VirtualPath);
     if (cmp < 0)
-	  low = i + 1;	
+	  low = i;	
     else
-      high = i - 1;
+      high = i;
   }
 
+  printf("    -> Finished Searching\n");
+  printf("  -> '%s' Not Found !\n", VirtualPath);
   return 0;
 }
 
@@ -136,6 +144,16 @@ csVFS::csVFS (iBase *iParent) :
   object_reg(0)
 {
   mutex = csMutex::Create (true); // We need a recursive mutex.
+  RootNode = new VfsNode("/", this, 0, 0);
+  RootNode->SubDirectories.Push(new VfsNode("/aswell" , this, RootNode, 0));
+  RootNode->SubDirectories.Push(new VfsNode("/cool" , this, RootNode, 0));
+  RootNode->SubDirectories.Push(new VfsNode("/doingit" , this, RootNode, 0));
+  RootNode->SubDirectories.Push(new VfsNode("/mnt" , this, RootNode, 0));
+  RootNode->SubDirectories.Get(3)->SubDirectories.Push(new VfsNode("/mnt/alternate" , this, RootNode->SubDirectories.Get(0), 0));
+  RootNode->SubDirectories.Get(3)->SubDirectories.Push(new VfsNode("/mnt/dumbass" , this, RootNode->SubDirectories.Get(0), 0));
+  RootNode->SubDirectories.Push(new VfsNode("/other" , this, RootNode, 0));
+  RootNode->SubDirectories.Push(new VfsNode("/things" , this, RootNode, 0));
+  CwdNode = RootNode;
 }
 
 // csVFS destructor
@@ -174,8 +192,6 @@ bool csVFS::ChDir (const char *Path)
 	strcpy (path + cwdLen + 1, Path);
 
     newCwd = CwdNode->FindNode(path);
-
-	delete [] path;
   }
 
   // Assign new Cwd
@@ -184,7 +200,6 @@ bool csVFS::ChDir (const char *Path)
 	CwdNode = newCwd;
 	return true;
   }
-
   return false;
 }
 
@@ -215,7 +230,36 @@ csPtr<iDataBuffer> csVFS::ExpandPath (const char *Path, bool IsDir) const
 
 bool csVFS::Exists (const char *Path) const
 {
-		return true;
+  if (strlen(Path) == 0)
+    return false;
+
+  // Find the parent directory of the files we are checking
+  VfsNode *ParentDirectoryNode;
+	
+  const char *Suffix = strrchr(Path, VFS_PATH_SEPARATOR);
+  char *Directory = new char[Suffix - Path + 1];
+  strncpy(Directory, Path, Suffix - Path);
+
+  // Absolute Path
+  if (Directory[0] == VFS_PATH_SEPARATOR)
+  {
+    ParentDirectoryNode = RootNode->FindNode(Directory);
+  }
+  // Relative Path
+  else
+  {
+	size_t cwdLen = strlen(CwdNode->VirtualPathname);
+
+    char *path = new char[cwdLen + strlen(Directory) + 1];
+	
+	strcpy (path, CwdNode->VirtualPathname);
+	path[cwdLen] = VFS_PATH_SEPARATOR;
+	strcpy (path + cwdLen + 1, Directory);
+
+    ParentDirectoryNode = CwdNode->FindNode(path);
+  }
+ 
+  return (fsPlugins.Get(ParentDirectoryNode->FileSystem())->Exists(Path) != fkDoesNotExist);
 }
 
 csPtr<iStringArray> csVFS::FindFiles (const char *Path) const
@@ -276,7 +320,7 @@ bool csVFS::LoadMountsFromFile (iConfigFile* file)
 bool csVFS::ChDirAuto (const char* path, const csStringArray* paths,
 					   const char* vfspath, const char* filename)
 {
-			return true;
+  return true;
 }
 
 bool csVFS::GetFileTime (const char *FileName, csFileTime &oTime) const
