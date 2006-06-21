@@ -244,7 +244,7 @@ static csStaticKDTree* MakeTestPVSTree ()
   //   <4: (0,0,0) on X-axis (fs) []
   //     <0: leaf node (fs) [fs]
   //     >0: (0,1,0) on Y-axis (fs) []
-  //       <1: leaf node (f) [f]
+  //       <1: leaf node (f) [fs]
   //       >1: leaf node (s) [s]
   //   >4: (1,0,0) on X-axis (w) [w]
   //     <1: leaf node (w) [w]
@@ -310,12 +310,20 @@ static void PrintTree(csStaticKDTree* node)
         objects[i]->GetObject ();
       printf("  Node name: %s\n", 
           obj->visobj->GetMeshWrapper()->QueryObject()->GetName ());
+      const csBox3& box = objects[i]->GetBBox();
+      printf("  Bounding box: (%f,%f,%f)-(%f,%f,%f)\n",
+        box.MinX(), box.MinY(), box.MinZ(), 
+        box.MaxX(), box.MaxY(), box.MaxZ());
     }
   }
   else
   {
     printf("INTERIOR NODE:  axis %d, split location %f\n",
         node->GetAxis(), node->GetSplitLocation());
+    const csBox3& box = node->GetNodeBBox();
+    printf("  Bounding box: (%f,%f,%f)-(%f,%f,%f)\n",
+        box.MinX(), box.MinY(), box.MinZ(), 
+        box.MaxX(), box.MaxY(), box.MaxZ());
     PrintTree(node->GetChild1());
     PrintTree(node->GetChild2());
     printf("NODE DONE\n");

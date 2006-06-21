@@ -24,6 +24,7 @@ csArray<csStaticKDTreeObject*> csStaticKDTree::emptyList;
 
 csStaticKDTree::csStaticKDTree (csArray<csStaticKDTreeObject*> &items)
 {
+  nodeData = NULL;
   // Base case:  if there are less than a certain threshold, stop recursing.
   if (items.Length () < 10) {
     nodeBBox.StartBoundingBox();
@@ -115,6 +116,7 @@ csStaticKDTree::csStaticKDTree (csStaticKDTree *parent, bool isChild1,
   csStaticKDTree::axis = axis;
   csStaticKDTree::splitLocation = splitLocation;
   child1 = child2 = NULL;
+  nodeData = NULL;
 }
 
 csStaticKDTree::csStaticKDTree (csStaticKDTree *parent, bool isChild1,
@@ -137,6 +139,7 @@ csStaticKDTree::csStaticKDTree (csStaticKDTree *parent, bool isChild1,
   while (it.HasNext ())
       it.Next ()->leafs.Push (this);
   child1 = child2 = NULL;
+  nodeData = NULL;
 }
 
 csStaticKDTree::~csStaticKDTree ()
@@ -160,12 +163,12 @@ csStaticKDTree::~csStaticKDTree ()
     delete child1;
     delete child2;
   }
+//  delete nodeData;
 }
 
-csStaticKDTreeObject *csStaticKDTree::AddObject (const csBox3 & bbox,
-                                                 void *userdata)
+csStaticKDTreeObject *csStaticKDTree::AddObject (const csBox3 &bbox, 
+    void *userdata)
 {
-  nodeBBox += bbox;
   csStaticKDTreeObject *ref = new csStaticKDTreeObject (bbox, userdata);
   AddObject (ref);
   return ref;
@@ -174,6 +177,7 @@ csStaticKDTreeObject *csStaticKDTree::AddObject (const csBox3 & bbox,
 void csStaticKDTree::AddObject (csStaticKDTreeObject *object)
 {
   SanityCheck();
+  nodeBBox += object->box;
   if (IsLeafNode ()) {
     objects->Push (object);
     object->leafs.Push (this);
@@ -182,13 +186,19 @@ void csStaticKDTree::AddObject (csStaticKDTreeObject *object)
     CS_ASSERT(child1);
     CS_ASSERT(child2);
     float min = getMin (axis, object->box), max = getMax (axis, object->box);
-    if (max <= splitLocation)
+    if (max <= splitLocation) {
       child1->AddObject (object);
-    else if (min >= splitLocation)
+      child1->nodeBBox.SetMax(axis, splitLocation);
+    }
+    else if (min > splitLocation) {
       child2->AddObject (object);
+      child2->nodeBBox.SetMin(axis, splitLocation);
+    }
     else {
       child1->AddObject (object);
       child2->AddObject (object);
+      child1->nodeBBox.SetMax(axis, splitLocation);
+      child2->nodeBBox.SetMin(axis, splitLocation);
     }
   }
 }
@@ -255,6 +265,7 @@ void csStaticKDTree::MoveObject (csStaticKDTreeObject *object,
 
 void csStaticKDTree::CalculateBBox () 
 {
+  // TODO:  code is wrong--needs to reduce bounding box by axis every time
   if (IsLeafNode()) 
   {
     nodeBBox.StartBoundingBox();
