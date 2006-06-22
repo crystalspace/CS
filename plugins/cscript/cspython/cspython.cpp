@@ -20,9 +20,10 @@
 #undef _DEBUG
 #endif
 
-#include "cssysdef.h"
 #include <Python.h>
 #include <stdio.h>
+
+#include "cssysdef.h"
 #include "csutil/sysfunc.h"
 #include "csutil/syspath.h"
 #include "csutil/csstring.h"
