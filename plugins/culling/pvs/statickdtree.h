@@ -35,11 +35,13 @@ class csStaticKDTree;
 typedef bool (csStaticKDTreeVisitFunc)(csStaticKDTree* treenode, 
     void* userdata, uint32 timestamp, uint32& frustum_mask);
 
-class csStaticKDTreeObject {
+class csStaticKDTreeObject 
+{
 public:
   friend class csStaticKDTree;
 
-  csStaticKDTreeObject (const csBox3& box, void* object) {
+  csStaticKDTreeObject (const csBox3& box, void* object) 
+  {
     csStaticKDTreeObject::box = box;
     csStaticKDTreeObject::object = object;
   }
@@ -58,7 +60,8 @@ private:
 };
 
 // TODO:  use a block allocator for storing leaves and nodes?
-class csStaticKDTree {
+class csStaticKDTree 
+{
   static uint32 globalTimestamp;
   static csArray<csStaticKDTreeObject*> emptyList;
 
@@ -70,6 +73,7 @@ public:
   csStaticKDTree (csArray<csStaticKDTreeObject*> &items);
   ~csStaticKDTree ();
   csStaticKDTreeObject* AddObject (const csBox3& bbox, void* userdata);
+  void AddObject (csStaticKDTreeObject* object);
   void UnlinkObject (csStaticKDTreeObject* object);
   void RemoveObject (csStaticKDTreeObject* object);
   void MoveObject (csStaticKDTreeObject* object, const csBox3& bbox_new);
@@ -97,6 +101,9 @@ public:
   const csBox3& GetNodeBBox() const {
     return nodeBBox;
   }
+  csBox3& GetNodeBBox() {
+    return nodeBBox;
+  }
   float GetSplitLocation() const { return splitLocation; }
   int GetAxis() const { return axis; }
 
@@ -109,7 +116,7 @@ public:
 //  }
 
 
-private:
+protected:
   csStaticKDTree* child1;
   csStaticKDTree* child2;
   csBox3 nodeBBox;  // TODO:  calculate node bounding box
@@ -162,7 +169,6 @@ private:
 
   void CalculateBBox();
 
-  void AddObject (csStaticKDTreeObject* object);
 };
 
 #endif

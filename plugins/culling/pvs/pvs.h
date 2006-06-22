@@ -38,6 +38,7 @@
 
 class csStaticKDTree;
 class csStaticKDTreeObject;
+class csPVSVisObjectWrapper;
 class csPVSVis;
 struct iPolygonMesh;
 struct iMovable;
@@ -49,23 +50,15 @@ struct FrustTestCameraData;
 /// Data at every node for the static KD tree
 class csPVSNodeData
 {
-  csPVSNodeData (int total)
-  {
-    pvs = new iVisibilityObject*[total];
-    memset ((void*) pvs, 0, sizeof(iVisibilityObject*) * total);
-    pvsnames = new csString[total];
-    numRegistered = 0;
-    numTotal = total;
-  }
-
-  ~csPVSNodeData ()
-  {
-    delete[] pvs;
-    delete[] pvsnames;
-  }
+public:
+  csPVSNodeData (csString* names, int total);
+  ~csPVSNodeData ();
+  bool PVSNamesContains (const char* name);
+  void FlagVisible(iVisibilityCullerListener* listener, uint32 timestamp,
+      uint32 frustumMask);
 
   // Set of all objects potentially visible from this node
-  iVisibilityObject** pvs;
+  csPVSVisObjectWrapper** pvs;
   // Set of all names of objects we expect to be in the PVS.
   csString* pvsnames;
   
@@ -85,7 +78,7 @@ public:
   csStaticKDTreeObject* child;
   long update_number;	// Last used update_number from movable.
   long shape_number;	// Last used shape_number from model.
-  bool isStatic;  // Object is static and is found in some PVS set
+  //bool isStatic;  // Object is static and is found in some PVS set
 
   // Optional data for shadows. Both fields can be 0.
   csRef<iMeshWrapper> mesh;
@@ -130,6 +123,7 @@ private:
   // those go off to infinity.
   csBox3 kdtree_box;
   csPDelArray<csPVSVisObjectWrapper> visobj_vector;
+  csArray<csPVSNodeData*> nodedata_vector;
   int scr_width, scr_height;	// Screen dimensions.
   uint32 current_vistest_nr;
 
@@ -149,8 +143,10 @@ private:
 
   // Traverse the kdtree for frustum culling.
   void FrustTest_Traverse (csStaticKDTree* treenode,
-	FrustTestCameraData* data,
-	uint32 cur_timestamp, uint32 frustum_mask);
+    FrustTestCameraData* data,
+    uint32 cur_timestamp, uint32 frustum_mask);
+
+  void CreateDummyNodeData (csStaticKDTree *node);
 
 public:
   SCF_DECLARE_IBASE;
@@ -226,7 +222,7 @@ public:
       if (parent) return parent->HandleEvent (ev);
       else return false;
     }
-    CS_EVENTHANDLER_NAMES("crystalspace.frustvis")
+    CS_EVENTHANDLER_NAMES("crystalspace.pvsvis")
     CS_EVENTHANDLER_NIL_CONSTRAINTS
   } * scfiEventHandler;
 

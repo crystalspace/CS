@@ -176,13 +176,14 @@ csStaticKDTreeObject *csStaticKDTree::AddObject (const csBox3 &bbox,
 
 void csStaticKDTree::AddObject (csStaticKDTreeObject *object)
 {
-  SanityCheck();
   nodeBBox += object->box;
-  if (IsLeafNode ()) {
+  if (IsLeafNode ()) 
+  {
     objects->Push (object);
     object->leafs.Push (this);
   } 
-  else {
+  else 
+  {
     CS_ASSERT(child1);
     CS_ASSERT(child2);
     float min = getMin (axis, object->box), max = getMax (axis, object->box);
