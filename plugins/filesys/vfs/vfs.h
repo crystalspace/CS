@@ -177,6 +177,12 @@ private:
   /// A stack to implement directory changes
   VfsVector DirectoryStack;
 
+  /// Get the directory node
+  VfsNode* GetDirectoryNode(const char *path) const;
+
+  /// Get the parent directory node from the path
+  /// If create is true, the directories along the path that do not exist will be created.
+  VfsNode* GetParentDirectoryNode(const char *path, bool create = false) const;
 };
 
 } CS_PLUGIN_NAMESPACE_END(vfs)

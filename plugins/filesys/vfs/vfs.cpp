@@ -27,6 +27,7 @@
 #include "vfs.h"
 #include "csutil/scf_implementation.h"
 #include "csutil/scfstringarray.h"
+#include "csutil/csstring.h"
 #include "iutil/objreg.h"
 
 #define NEW_CONFIG_SCANNING
@@ -41,7 +42,7 @@ class VfsNode
 {
 public:
   // Constructor
-  VfsNode(char *virtualPathname, csVFS *parentVFS, VfsNode* parentNode, 
+  VfsNode(char *virtualPathname, const csVFS *parentVFS, VfsNode* parentNode, 
 	  int pluginIndex);
 
   ~VfsNode();
@@ -72,16 +73,17 @@ public:
   VfsVector SubDirectories;
 
   // Allow VFS to access node internals
-  csVFS *ParentVFS;
+  const csVFS *ParentVFS;
 };
 
 
-VfsNode::VfsNode(char *virtualPathname, csVFS *parentVFS, VfsNode* parentNode, 
+VfsNode::VfsNode(char *virtualPathname, const csVFS *parentVFS, VfsNode* parentNode, 
 				 int pluginIndex)
 : ParentVFS(parentVFS), 
   ParentNode(parentNode), FileSystemPlugin(pluginIndex)
 {
-	VirtualPathname = virtualPathname;
+	VirtualPathname = new char[strlen(virtualPathname)];
+	strcpy(VirtualPathname, virtualPathname);
 }
 
 VfsNode::~VfsNode()
@@ -91,27 +93,22 @@ VfsNode::~VfsNode()
 
 VfsNode * VfsNode::FindNode(const char *VirtualPath)
 {
-  printf("  -> Called FindNode('%s') from '%s'\n", VirtualPath, VirtualPathname);
-
   if (strlen(VirtualPath) < strlen(VirtualPathname))
     return 0;
 
   if (strcmp(VirtualPath, VirtualPathname) == 0)
     return this;
 
-  printf("    -> Searching subdirectories...\n");
   size_t low = -1;
   size_t high = SubDirectories.Length();
   int cmp = 0;
   size_t i = 0;
 
+  // Use a binary search to find subdirectory
   while (high - low > 1)
   {
     i = (low + high) >> 1;
-	printf("      -> Low = %d, High = %d, mid = %d\n", low, high, i);
-	printf("        -> Comparing %d characters of '%s' with '%s'....", strlen(SubDirectories.Get(i)->VirtualPathname), SubDirectories.Get(i)->VirtualPathname, VirtualPath);
     cmp = strncmp(SubDirectories.Get(i)->VirtualPathname, VirtualPath, strlen(SubDirectories.Get(i)->VirtualPathname));
-	printf("%d\n", cmp);
 	if (cmp == 0)
 	  return SubDirectories.Get(i)->FindNode(VirtualPath);
     if (cmp < 0)
@@ -119,9 +116,6 @@ VfsNode * VfsNode::FindNode(const char *VirtualPath)
     else
       high = i;
   }
-
-  printf("    -> Finished Searching\n");
-  printf("  -> '%s' Not Found !\n", VirtualPath);
   return 0;
 }
 
@@ -145,14 +139,18 @@ csVFS::csVFS (iBase *iParent) :
 {
   mutex = csMutex::Create (true); // We need a recursive mutex.
   RootNode = new VfsNode("/", this, 0, 0);
-  RootNode->SubDirectories.Push(new VfsNode("/aswell" , this, RootNode, 0));
+ 
+  // Testing purposes
+
+  /*RootNode->SubDirectories.Push(new VfsNode("/aswell" , this, RootNode, 0));
   RootNode->SubDirectories.Push(new VfsNode("/cool" , this, RootNode, 0));
   RootNode->SubDirectories.Push(new VfsNode("/doingit" , this, RootNode, 0));
   RootNode->SubDirectories.Push(new VfsNode("/mnt" , this, RootNode, 0));
   RootNode->SubDirectories.Get(3)->SubDirectories.Push(new VfsNode("/mnt/alternate" , this, RootNode->SubDirectories.Get(0), 0));
   RootNode->SubDirectories.Get(3)->SubDirectories.Push(new VfsNode("/mnt/dumbass" , this, RootNode->SubDirectories.Get(0), 0));
   RootNode->SubDirectories.Push(new VfsNode("/other" , this, RootNode, 0));
-  RootNode->SubDirectories.Push(new VfsNode("/things" , this, RootNode, 0));
+  RootNode->SubDirectories.Push(new VfsNode("/things" , this, RootNode, 0));*/
+
   CwdNode = RootNode;
 }
 
@@ -174,26 +172,8 @@ bool csVFS::ChDir (const char *Path)
   if (strlen(Path) == 0)
     return false;
 
-  VfsNode *newCwd;
-  // Absolute Path
-  if (Path[0] == VFS_PATH_SEPARATOR)
-  {
-    newCwd = RootNode->FindNode(Path);
-  }
-  // Relative Path
-  else
-  {
-	size_t cwdLen = strlen(CwdNode->VirtualPathname);
-
-    char *path = new char[cwdLen + strlen(Path) + 1];
-	
-	strcpy (path, CwdNode->VirtualPathname);
-	path[cwdLen] = VFS_PATH_SEPARATOR;
-	strcpy (path + cwdLen + 1, Path);
-
-    newCwd = CwdNode->FindNode(path);
-  }
-
+  VfsNode *newCwd = GetDirectoryNode(Path);
+  
   // Assign new Cwd
   if (newCwd)
   {
@@ -232,32 +212,19 @@ bool csVFS::Exists (const char *Path) const
 {
   if (strlen(Path) == 0)
     return false;
-
-  // Find the parent directory of the files we are checking
-  VfsNode *ParentDirectoryNode;
 	
   const char *Suffix = strrchr(Path, VFS_PATH_SEPARATOR);
   char *Directory = new char[Suffix - Path + 1];
   strncpy(Directory, Path, Suffix - Path);
 
-  // Absolute Path
-  if (Directory[0] == VFS_PATH_SEPARATOR)
-  {
-    ParentDirectoryNode = RootNode->FindNode(Directory);
-  }
-  // Relative Path
-  else
-  {
-	size_t cwdLen = strlen(CwdNode->VirtualPathname);
+  const char *pathToFind = Directory;
 
-    char *path = new char[cwdLen + strlen(Directory) + 1];
-	
-	strcpy (path, CwdNode->VirtualPathname);
-	path[cwdLen] = VFS_PATH_SEPARATOR;
-	strcpy (path + cwdLen + 1, Directory);
+  // Find the parent directory of the files we are checking
+  VfsNode *ParentDirectoryNode;
+  ParentDirectoryNode = GetDirectoryNode(Directory);
 
-    ParentDirectoryNode = CwdNode->FindNode(path);
-  }
+  if (!ParentDirectoryNode)
+	  return false;
  
   return (fsPlugins.Get(ParentDirectoryNode->FileSystem())->Exists(Path) != fkDoesNotExist);
 }
@@ -304,11 +271,12 @@ bool csVFS::Unmount (const char *VirtualPath, const char *RealPath)
   
 csRef<iStringArray> csVFS::MountRoot (const char *VirtualPath)
 {
-		return NULL;
+		return 0;
 }
 
 bool csVFS::SaveMounts (const char *FileName)
 {
+		GetParentDirectoryNode(FileName, true);
 		return true;
 }
 
@@ -340,7 +308,7 @@ bool csVFS::GetFileSize (const char *FileName, size_t &oSize)
 
 csPtr<iDataBuffer> csVFS::GetRealPath (const char *FileName)
 {
-		return 0;
+	return 0;
 }
 
 csRef<iStringArray> csVFS::GetMounts ()
@@ -361,9 +329,116 @@ size_t csVFS::RegisterPlugin(csRef<iFileSystem> FileSystem)
 }
 
 // Create or add a symbolic link
-bool csVFS::SymbolicLink(const char *Target, const char *Link, bool Overwrite)
+bool csVFS::SymbolicLink(const char *Target, const char *Link, 
+						 bool Overwrite)
 {
-	return true;
+  VfsNode *Directory = GetDirectoryNode(Link);
+
+  // Link does not exist
+  if (!Directory)
+  {
+	  csString tmp = Link;
+	  tmp.Append("/tmp");
+	  Directory = GetParentDirectoryNode((const char *) tmp, true);
+  }
+
+  // Add the target to the symlinks of the directory
+  if (Overwrite)
+  {
+	  if (!Directory->SymbolicLinks.Contains(Target, true))
+	  {
+		  Directory->SymbolicLinks.Insert(0, Target);
+	  }
+  }
+  else
+  {
+	  Directory->SymbolicLinks.PushSmart(Target);
+  }
+
+  return true;
 }
+
+VfsNode* csVFS::GetDirectoryNode(const char *Path) const
+{
+  VfsNode *node = 0;
+
+  // TODO: Check for trailing '/'
+
+  // Absolute Path
+  if (Path[0] == VFS_PATH_SEPARATOR)
+  {
+	// Recursively find node
+    node = RootNode->FindNode(Path);
+  }
+  // Relative Path
+  else
+  {
+	size_t cwdLen = strlen(CwdNode->VirtualPathname);
+
+    char *path;
+	path = new char[cwdLen + strlen(Path) + 1];
+	
+	strcpy (path, CwdNode->VirtualPathname);
+	path[cwdLen] = VFS_PATH_SEPARATOR;
+	strcpy (path + cwdLen + 1, Path);
+
+	// Recursively find node
+    node = CwdNode->FindNode(path);
+  }
+
+  return node;
+}
+
+VfsNode* csVFS::GetParentDirectoryNode(const char *path, bool create) const
+{
+  if (strlen(path) == 0)
+	  return 0;
+
+  csStringArray directories;
+  directories.SplitString(path, "/");
+
+  // TODO: Check for trailing '/'
+
+  VfsNode * node;
+  VfsNode * tmpNode;
+  size_t counter = 0;
+  csString currentDir;
+
+  // Absolute Path
+  if (path[0] == VFS_PATH_SEPARATOR)
+  {
+    node = RootNode;
+	counter = 1;
+	currentDir = "";
+  }
+  // Relative Path
+  else
+  {
+    node = CwdNode;
+	if (strcmp(node->VirtualPathname, "/") != 0)
+	  currentDir = node->VirtualPathname;
+  }
+
+  while(counter < directories.Length() - 1)
+  {
+    currentDir.Append('/');
+	currentDir.Append(directories[counter]);
+	tmpNode = node->FindNode((const char *) currentDir);
+	if (!tmpNode)
+	{
+	  if (!create)
+	  {
+        return 0;
+	  }
+      tmpNode = new VfsNode((char *) (const char *)currentDir, this, node, 0);
+	  node->SubDirectories.Push(tmpNode);
+	}
+	node = tmpNode;
+	counter++;
+  }
+
+  return node;
+}
+
 
 } CS_PLUGIN_NAMESPACE_END(vfs)
