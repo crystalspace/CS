@@ -516,7 +516,7 @@ void csPVSVis::CalculateVisObjBBox (iVisibilityObject* visobj, csBox3& bbox)
   }
 }
 
-static void AddStaticObject (csStaticKDTree* node, 
+bool AddStaticObject (csStaticKDTree* node, 
     csStaticKDTreeObject* object)
 {
   // NOTE:  This code currently does not move all the way down to the leaf
@@ -526,6 +526,7 @@ static void AddStaticObject (csStaticKDTree* node,
   {
     // Place for static object was not found.  Treat as a dynamic object.
     node->AddObject(object);
+    return false;
   } 
   else 
   {
@@ -549,32 +550,26 @@ static void AddStaticObject (csStaticKDTree* node,
         delete[] nodeData->pvsnames;
         nodeData->pvsnames = NULL;
       }
+      return true;
     }
     else
     {
       // This node's PVS did not contain our object.  Keep recursing,
       // making sure to update the bounding box.
-      float splitLocation = node->GetSplitLocation ();
+      bool ret = false;
       int axis = node->GetAxis ();
-      float min = object->GetBBox().Min(axis), 
-            max = object->GetBBox().Max(axis);
-      if (max <= splitLocation) 
+      float splitLocation = node->GetSplitLocation ();
+      if (AddStaticObject (node->GetChild1 (), object))
       {
-        AddStaticObject (node->GetChild1 (), object);
-        node->GetChild1 ()->GetNodeBBox().SetMax(axis, splitLocation);
+        node->GetChild1 ()->GetNodeBBox ().SetMax (axis, splitLocation);
+        ret = true;
       }
-      else if (min > splitLocation) 
+      if (AddStaticObject (node->GetChild2 (), object))
       {
-        AddStaticObject (node->GetChild2 (), object);
-        node->GetChild2 ()->GetNodeBBox().SetMin(axis, splitLocation);
+        node->GetChild2 ()->GetNodeBBox ().SetMin (axis, splitLocation);
+        ret = true;
       }
-      else 
-      {
-        AddStaticObject (node->GetChild1 (), object);
-        node->GetChild1 ()->GetNodeBBox().SetMax(axis, splitLocation);
-        AddStaticObject (node->GetChild2 (), object);
-        node->GetChild2 ()->GetNodeBBox().SetMin(axis, splitLocation);
-      }
+      return ret;
     }
   }
 }
