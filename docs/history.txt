@@ -11,6 +11,18 @@ chronological order.
           python plugin on GNU Linux with Python 2.3.
         - Philip Wyett continued changes to docs.
 	- Jorrit fixed handling of the ':' in path names with viewmesh.
+	- Jorrit fixed several problems in the genmeshanim2 plugin related
+	  to the recent convertion to new SCF. The problem is that it is
+	  unsafe to do this in a header:
+	    virtual iBla* GetBla ()
+	    {
+	      return (iBla*) bla;
+	    }
+	  When the definition of 'bla' is not known this will cause the
+	  cast to go wrong with bad results. To avoid this problem better
+	  use static_cast<iBla*> so that the compiler can catch this.
+	  The correct fix is then to not inline that method and put the
+	  implementation in the cpp file instead.
 20-Jun-2006
 	- mdmkolbe converted the following plugins to the new SCF:
 	    - plugins/mesh/lghtng/

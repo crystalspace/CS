@@ -106,8 +106,7 @@ public:
     { cb = callback; }
   virtual iSkeletonBoneUpdateCallback *GetUpdateCallback () 
     { return cb; };
-  virtual iSkeletonBoneFactory *GetFactory() 
-    { return (iSkeletonBoneFactory *)factory_bone; }
+  virtual iSkeletonBoneFactory *GetFactory();
   virtual size_t FindChildIndex (iSkeletonBone *child);
   virtual void SetSkinBox (csBox3 & box) { skin_box = box; }
   virtual csBox3 & GetSkinBox () { return skin_box; }
@@ -180,8 +179,7 @@ public:
   { csSkeletonSocket::node = node; }
     virtual iSceneNode *GetSceneNode ()
   { return node; }
-    virtual iSkeletonSocketFactory *GetFactory ()
-  { return (iSkeletonSocketFactory *)factory; }
+    virtual iSkeletonSocketFactory *GetFactory ();
 };
 
 
@@ -600,8 +598,7 @@ public:
   virtual void Stop (const char* scriptname);
   virtual void Stop (iSkeletonScript *script);
   virtual size_t FindBoneIndex (const char* bonename);
-  virtual iSkeletonFactory *GetFactory() 
-  { return (iSkeletonFactory *)(csSkeletonFactory*)factory; }
+  virtual iSkeletonFactory *GetFactory();
     virtual void SetScriptCallback(iSkeletonScriptCallback *cb)
   { script_callback = cb; }
     virtual iSkeletonSocket* FindSocket (const char *socketname);
@@ -653,7 +650,7 @@ public:
   virtual iSkeletonScript *CreateScript(const char *name);
   virtual iSkeletonScript *FindScript(const char *name);
   virtual iSkeletonBoneFactory *FindBone (const char *name);
-  virtual iSkeletonGraveyard *GetGraveyard  () { return (iSkeletonGraveyard *)graveyard; }
+  virtual iSkeletonGraveyard *GetGraveyard  ();
   virtual size_t FindBoneIndex (const char* bonename);
 
   virtual iSkeletonSocketFactory *CreateSocket(const char *name, iSkeletonBoneFactory *bone);
