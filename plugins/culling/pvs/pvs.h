@@ -56,6 +56,7 @@ public:
   bool PVSNamesContains (const char* name);
   void FlagVisible(iVisibilityCullerListener* listener, uint32 timestamp,
       uint32 frustumMask);
+  void RemoveFromPVS(csPVSVisObjectWrapper *object);
 
   // Set of all objects potentially visible from this node
   csPVSVisObjectWrapper** pvs;

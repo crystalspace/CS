@@ -236,6 +236,18 @@ void csPVSNodeData::FlagVisible(iVisibilityCullerListener* listener,
   }
 }
 
+void csPVSNodeData::RemoveFromPVS(csPVSVisObjectWrapper *object)
+{
+  for (int i = 0; i < numRegistered; i++)
+  {
+    if (pvs[i] == object)
+    {
+      pvs[i] = pvs[(numRegistered--) - 1];
+      break;
+    }
+  }
+}
+
 static void FlagVisible(csStaticKDTree *node, 
     iVisibilityCullerListener* listener, uint32 timestamp, uint32 mask)
 {
@@ -286,6 +298,8 @@ csPVSVis::~csPVSVis ()
   while (nodedata_vector.Length() > 0)
   {
     csPVSNodeData* data = nodedata_vector.Pop ();
+    for (int i = 0; i < data->numRegistered; i++)
+      data->pvs[i]->visobj->DecRef();
     delete data;
   }
 
@@ -305,7 +319,8 @@ bool csPVSVis::HandleEvent (iEvent& ev)
   return false;
 }
 
-static csString* IntersectPVS(csString* set1, int set1count, 
+// Code for calculating PVS sets based on leaf nodes.
+/*static csString* IntersectPVS(csString* set1, int set1count, 
     csString* set2, int set2count, int& resultCount)
 {
   // Set can not be bigger than set1count or set2count
@@ -337,26 +352,6 @@ static void CreateNodeData(csStaticKDTree *node)
   csString *pvs;
   int pvsCount;
 
-  /*if (node->IsLeafNode ())
-   {
-    // BAD CODE:  makes assumption that leaf node's PVS is the same thing
-    // as the objects in the leaf node.
-    pvsCount = node->GetObjectCount ();
-    if (pvsCount > 0)
-      pvs = new csString[pvsCount];
-    else
-      pvs = NULL;
-
-    csArray<csStaticKDTreeObject*>& objects = node->GetObjects ();
-    for (int i = 0; i < pvsCount; i++)
-    {
-      csPVSVisObjectWrapper *wrapper = 
-        (csPVSVisObjectWrapper*) objects[i]->GetObject ();
-      const char* name = 
-        wrapper->visobj->GetMeshWrapper()->QueryObject()->GetName ();
-      pvs[i] = name;
-    }
-  } */
   if (!node->IsLeafNode())
   {
     // Generate PVS set as the intersection of the two children.
@@ -376,6 +371,7 @@ static void CreateNodeData(csStaticKDTree *node)
   csPVSNodeData *nodeData = new csPVSNodeData (pvs, pvsCount);
   node->SetNodeData(nodeData);
 }
+*/
 
 void csPVSVis::CreateDummyNodeData (csStaticKDTree *node)
 {
