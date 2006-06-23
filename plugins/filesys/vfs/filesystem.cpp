@@ -83,6 +83,7 @@ csNativeFileSystem::~csNativeFileSystem()
 
 csPtr<iFile> csNativeFileSystem::Open(const char * FileName, int mode)
 {
+	//csPhysicalFile* file = new csPhysicalFile(FileName, mode);
 	return 0;
 }
 
@@ -105,6 +106,11 @@ bool csNativeFileSystem::DeleteFile(const char * FileName)
 csVFSFileKind csNativeFileSystem::Exists(const char * FileName)
 {
 	return fkDoesNotExist;
+}
+
+bool csNativeFileSystem::CanHandleMount(const char *FileName)
+{
+  return true;
 }
 
 // ----------------------------------------------- csArchiveFileSystem --- //
@@ -145,6 +151,20 @@ bool csArchiveFileSystem::DeleteFile(const char * FileName)
 csVFSFileKind csArchiveFileSystem::Exists(const char * FileName)
 {
 	return fkDoesNotExist;
+}
+
+bool csArchiveFileSystem::CanHandleMount(const char *FileName)
+{
+  FILE* f = fopen (FileName, "rb");
+  if (!f) return false;
+
+  char header[4];
+  bool ret = ((fread (header, sizeof(header), 1, f) == 1)
+    && (header[0] == 'P') && (header[1] == 'K')
+    && (header[2] ==   3) && (header[3] ==   4));
+  fclose (f);
+
+  return ret;
 }
 
 } CS_PLUGIN_NAMESPACE_END(vfs)

@@ -250,6 +250,12 @@ struct iFileSystem: public virtual iBase
   */
   virtual csVFSFileKind Exists(const char * FileName) =0;
 
+  /**
+   * Check if this plugin could be used to access a path to be mounted
+   * \param FileName The name of the file to query
+   * \return True if it can, else false
+   */
+  virtual bool CanHandleMount(const char *FileName) = 0;
 };
 
 /**
@@ -507,7 +513,7 @@ struct iVFS : public virtual iBase
    * \param FileSystem A reference to the file system plugin to register.
    * \return The index assigned to the plugin
    */
-  virtual size_t RegisterPlugin(csRef<iFileSystem> FileSystem) = 0;
+  virtual size_t RegisterPlugin(iFileSystem *FileSystem) = 0;
 
   /**
    * Create or add a symbolic link within the VFS (works like unix 'ln -s' command)
@@ -519,6 +525,20 @@ struct iVFS : public virtual iBase
    * \return True if successful, else false.
    */
   virtual bool SymbolicLink(const char *Target, const char *Link = 0, bool Overwrite = true) = 0;
+
+  /**
+   * Mount an VFS path on a "real-world-filesystem" path.
+   * \param VirtualPath The location in the virtual filesystem in which to
+   *   mount RealPath.
+   * \param RealPath The physical filesystem path to mount at VirtualPath.
+   *   All VFS pseudo-variables and anything that appears in the right-hand
+   *   side of an equal sign in vfs.cfg is valid.
+   * \param priority The priority of the RealPath, a higher priority will take preference over a lower one
+   *        if files with the same name exist in different RealPaths
+   * \param plugin The index of the iFileSystem plugin, if 0 then autodetect (with performance cost)
+   * \return True if the mount succeeded, else false.
+   */
+  virtual bool Mount(const char *VirtualPath, const char *RealPath, int priority, size_t plugin = 0) = 0;
 };
 
 /** @} */

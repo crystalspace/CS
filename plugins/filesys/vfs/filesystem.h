@@ -108,6 +108,8 @@ public:
   // Check if must be abstract
   virtual csVFSFileKind Exists(const char * FileName)  = 0;
 
+  // Can this plugin handle a mount
+  virtual bool CanHandleMount(const char *FileName) = 0;
 
 protected:
   /// The constructor for csFileSystem
@@ -153,6 +155,9 @@ public:
 
   // Check if must be abstract
   virtual csVFSFileKind Exists(const char * FileName);
+
+  // Can this plugin handle a mount
+  virtual bool CanHandleMount(const char *FileName);
 };
 
 
@@ -189,6 +194,9 @@ public:
 
   // Check if must be abstract
   virtual csVFSFileKind Exists(const char * FileName);
+
+  // Can this plugin handle a mount
+  virtual bool CanHandleMount(const char *FileName);
 };
 
 } CS_PLUGIN_NAMESPACE_END(vfs)

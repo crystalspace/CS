@@ -152,10 +152,13 @@ public:
   virtual csRef<iStringArray> GetRealMountPaths (const char *VirtualPath);
 
   /// Register a filesystem plugin
-  virtual size_t RegisterPlugin(csRef<iFileSystem> FileSystem);
+  virtual size_t RegisterPlugin(iFileSystem *FileSystem);
 
   /// Create or add a symbolic link
   virtual bool SymbolicLink(const char *Target, const char *Link = 0, bool Overwrite = true);
+
+  /// Mount a file
+  virtual bool Mount(const char *VirtualPath, const char *RealPath, int priority, size_t plugin = 0);
 
 private:
 
@@ -183,6 +186,9 @@ private:
   /// Get the parent directory node from the path
   /// If create is true, the directories along the path that do not exist will be created.
   VfsNode* GetParentDirectoryNode(const char *path, bool create = true) const;
+
+  // Check if the path is a valid real directory
+  bool isDirectory(const char *path);
 };
 
 } CS_PLUGIN_NAMESPACE_END(vfs)
