@@ -23,6 +23,8 @@ chronological order.
 	  basic math classes unless you know the maths there.
 	- caedes fixed skeleton and gmeshskelanim2 to work again correctly
 	  with the good quaternion math.
+	- caedes added a more finished version of the ambient with additive
+	  layer (pulse is still not handled totally correctly though).
 22-Jun-2006
         - Philip Wyett eliminated _POSIX_C_SOURCE redefinition warning in
           python plugin on GNU Linux with Python 2.3.
