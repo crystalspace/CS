@@ -189,7 +189,7 @@ const csVector3* csGenmeshSkelAnimationControl::UpdateVertices (csTicks current,
         skeleton->GetBone(bone_idx)->GetFullTransform();
 
       csShaderVariable* boneQuat = _bones->GetArrayElement (i*2+0);
-      csQuaternion quat; quat.SetMatrix(offset_tr.GetO2T());
+      csQuaternion quat; quat.SetMatrix(offset_tr.GetT2O());
       boneQuat->SetValue(csVector4 (quat.v.x, quat.v.y, quat.v.z, quat.w));
 
       csShaderVariable *boneOffs = _bones->GetArrayElement (i*2+1);

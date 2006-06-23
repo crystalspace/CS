@@ -21,6 +21,8 @@ chronological order.
 	  csQuaternion::SetMatrix was correct as it is, it must be 
 	  gmeshskelanim2 that is buggy. Please people, do not change the
 	  basic math classes unless you know the maths there.
+	- caedes fixed skeleton and gmeshskelanim2 to work again correctly
+	  with the good quaternion math.
 22-Jun-2006
         - Philip Wyett eliminated _POSIX_C_SOURCE redefinition warning in
           python plugin on GNU Linux with Python 2.3.

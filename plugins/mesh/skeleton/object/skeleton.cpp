@@ -498,7 +498,7 @@ void csSkeletonRunnable::ParseFrame(csSkeletonScriptKeyFrame *frame)
       m.position = bone_transform->pos;
       m.type = 1;
       //m.quat = csQuaternion (transform.GetT2O());
-      m.quat.SetMatrix (transform.GetT2O());
+      m.quat.SetMatrix (transform.GetO2T());
       m.final_position = transform.GetOrigin();
 
       csVector3 delta;
