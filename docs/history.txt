@@ -15,6 +15,8 @@ chronological order.
 	- res changed csconout to use RGBA instead of RGB colors for 
 	  foreground/background/shadows.
 	- caedes added floor operation to shader expressions.
+	- Jorrit fixed csQuaternion::SetMatrix() so that gmeshskelanim2
+	  again works correctly.
 22-Jun-2006
         - Philip Wyett eliminated _POSIX_C_SOURCE redefinition warning in
           python plugin on GNU Linux with Python 2.3.

@@ -66,6 +66,63 @@ csVector3 csQuaternion::GetEulerAngles () const
   return angles;
 }
 
+#if 1
+void csQuaternion::SetMatrix (const csMatrix3& matrix)
+{
+  // Ken Shoemake's article in 1987 SIGGRAPH course notes
+ 
+  csMatrix3 mat = csMatrix3( matrix.m11, matrix.m21, matrix.m31,
+                          matrix.m12, matrix.m22, matrix.m32,
+                          matrix.m13, matrix.m23, matrix.m33);
+ 
+  const float trace = mat.m11 + mat.m22 + mat.m33;
+ 
+  if (trace >= 0.0f)
+  {
+    // Quick-route
+    float s = sqrtf (trace + 1.0f);
+    w = 0.5f * s;
+    s = 0.5f / s;
+    v.x = (mat.m32 - mat.m23) * s;
+    v.y = (mat.m13 - mat.m31) * s;
+    v.z = (mat.m21 - mat.m12) * s;
+  }
+  else
+  {
+    //Check biggest diagonal elmenet
+    if (mat.m11 > mat.m22 && mat.m11 > mat.m33)
+    {
+      //X biggest
+      float s = sqrtf (1.0f + mat.m11 - mat.m22 - mat.m33);
+      v.x = 0.5f * s;
+      s = 0.5f / s;
+      w = (mat.m32 - mat.m23) * s;
+      v.y = (mat.m12 + mat.m21) * s;
+      v.z = (mat.m31 + mat.m13) * s;
+    }
+    else if (mat.m22 > mat.m33)
+    {
+      //Y biggest
+      float s = sqrtf (1.0f + mat.m22 - mat.m11 - mat.m33);
+      v.y = 0.5f * s;
+      s = 0.5f / s;
+      w = (mat.m13 - mat.m31) * s;
+      v.x = (mat.m12 + mat.m21) * s;
+      v.z = (mat.m23 + mat.m32) * s;
+    }
+    else
+    {
+      //Z biggest
+      float s = sqrtf (1.0f + mat.m33 - mat.m11 - mat.m22);
+      v.z = 0.5f * s;
+      s = 0.5f / s;
+      w = (mat.m21 - mat.m12) * s;
+      v.x = (mat.m31 + mat.m13) * s;
+      v.y = (mat.m23 + mat.m32) * s;
+    }
+  }
+}
+#else
 void csQuaternion::SetMatrix (const csMatrix3& matrix)
 {
   // Ken Shoemake's article in 1987 SIGGRAPH course notes
@@ -116,6 +173,7 @@ void csQuaternion::SetMatrix (const csMatrix3& matrix)
     }
   }
 }
+#endif
 
 csMatrix3 csQuaternion::GetMatrix () const
 {
