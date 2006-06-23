@@ -27,6 +27,8 @@ chronological order.
 	  layer (pulse is still not handled totally correctly though).
 	- caedes removed glow from parallax.xml and related files as its now
 	  handled in a more general way in ambient.
+	- caedes removed ambient2.xml and specifyambient.xml files as they 
+	  don't seem to have any useful difference with ambient.xml.
 22-Jun-2006
         - Philip Wyett eliminated _POSIX_C_SOURCE redefinition warning in
           python plugin on GNU Linux with Python 2.3.
