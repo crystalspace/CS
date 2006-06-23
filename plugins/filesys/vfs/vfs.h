@@ -182,7 +182,7 @@ private:
 
   /// Get the parent directory node from the path
   /// If create is true, the directories along the path that do not exist will be created.
-  VfsNode* GetParentDirectoryNode(const char *path, bool create = false) const;
+  VfsNode* GetParentDirectoryNode(const char *path, bool create = true) const;
 };
 
 } CS_PLUGIN_NAMESPACE_END(vfs)

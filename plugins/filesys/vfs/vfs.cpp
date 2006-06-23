@@ -64,6 +64,9 @@ public:
   // Return a pointer to a node representing a virtual path
   VfsNode *FindNode(const char *VirtualPath);
 
+  // Get all the current mounted directories
+  void GetMounts(scfStringArray *MountArray);
+
   int FileSystem() { return FileSystemPlugin; }
 
   // Index into the filesystem plugins associated with this node
@@ -108,15 +111,25 @@ VfsNode * VfsNode::FindNode(const char *VirtualPath)
   while (high - low > 1)
   {
     i = (low + high) >> 1;
-    cmp = strncmp(SubDirectories.Get(i)->VirtualPathname, VirtualPath, strlen(SubDirectories.Get(i)->VirtualPathname));
+    cmp = strncmp(SubDirectories[i]->VirtualPathname, VirtualPath, strlen(SubDirectories.Get(i)->VirtualPathname));
 	if (cmp == 0)
-	  return SubDirectories.Get(i)->FindNode(VirtualPath);
+	  return SubDirectories[i]->FindNode(VirtualPath);
     if (cmp < 0)
 	  low = i;	
     else
       high = i;
   }
   return 0;
+}
+
+void VfsNode::GetMounts(scfStringArray * MountArray)
+{
+  // Save each node path into the array
+  MountArray->Push(VirtualPathname);
+  for (size_t i =0; i < SubDirectories.Length(); i++)
+  {
+	  SubDirectories[i]->GetMounts(MountArray);  
+  }
 }
 
 // --------------------------------------------------------- VfsVector --- //
@@ -142,14 +155,14 @@ csVFS::csVFS (iBase *iParent) :
  
   // Testing purposes
 
-  /*RootNode->SubDirectories.Push(new VfsNode("/aswell" , this, RootNode, 0));
+  RootNode->SubDirectories.Push(new VfsNode("/aswell" , this, RootNode, 0));
   RootNode->SubDirectories.Push(new VfsNode("/cool" , this, RootNode, 0));
   RootNode->SubDirectories.Push(new VfsNode("/doingit" , this, RootNode, 0));
   RootNode->SubDirectories.Push(new VfsNode("/mnt" , this, RootNode, 0));
   RootNode->SubDirectories.Get(3)->SubDirectories.Push(new VfsNode("/mnt/alternate" , this, RootNode->SubDirectories.Get(0), 0));
   RootNode->SubDirectories.Get(3)->SubDirectories.Push(new VfsNode("/mnt/dumbass" , this, RootNode->SubDirectories.Get(0), 0));
   RootNode->SubDirectories.Push(new VfsNode("/other" , this, RootNode, 0));
-  RootNode->SubDirectories.Push(new VfsNode("/things" , this, RootNode, 0));*/
+  RootNode->SubDirectories.Push(new VfsNode("/things" , this, RootNode, 0));
 
   CwdNode = RootNode;
 }
@@ -293,32 +306,64 @@ bool csVFS::ChDirAuto (const char* path, const csStringArray* paths,
 
 bool csVFS::GetFileTime (const char *FileName, csFileTime &oTime) const
 {
-			return true;
+  return true;
 }		
 
 bool csVFS::SetFileTime (const char *FileName, const csFileTime &iTime)
 {
-			return true;
+  return true;
 }
 
 bool csVFS::GetFileSize (const char *FileName, size_t &oSize)
 {
-			return true;
+  return true;
 }
 
 csPtr<iDataBuffer> csVFS::GetRealPath (const char *FileName)
 {
-	return 0;
+  return 0;
 }
 
+// Get virtual mount paths
 csRef<iStringArray> csVFS::GetMounts ()
 {
-		return 0;
+  // An array to hold the mounts
+  scfStringArray* mounts = new scfStringArray;
+
+  // Get all mounted nodes
+  RootNode->GetMounts(mounts);  
+
+  csRef<iStringArray> m (mounts);
+  mounts->DecRef ();
+
+  return m;
+
 }
 
 csRef<iStringArray> csVFS::GetRealMountPaths (const char *VirtualPath)
 {
-		return 0;
+  if (!VirtualPath)
+    return 0;
+
+  // Find the node
+  VfsNode *node = GetDirectoryNode(VirtualPath);
+  
+  if (!node)
+    return 0;
+
+  scfStringArray *rmounts = new scfStringArray;
+
+  // Copy the real paths
+  for (size_t i = 0; i < node->RealPaths.Length(); i++)
+  {
+	  rmounts->Push(node->RealPaths[i]);
+  }
+
+  // return the results
+  csRef<iStringArray> r (rmounts);
+  rmounts->DecRef();
+
+  return r;
 }
 
 // Register a filesystem plugin
@@ -358,6 +403,7 @@ bool csVFS::SymbolicLink(const char *Target, const char *Link,
   return true;
 }
 
+// Get a node corresponding to a directory
 VfsNode* csVFS::GetDirectoryNode(const char *Path) const
 {
   VfsNode *node = 0;
@@ -389,6 +435,7 @@ VfsNode* csVFS::GetDirectoryNode(const char *Path) const
   return node;
 }
 
+// Get a node corresponding to a parent directory
 VfsNode* csVFS::GetParentDirectoryNode(const char *path, bool create) const
 {
   if (strlen(path) == 0)
