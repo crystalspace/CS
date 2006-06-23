@@ -6,8 +6,8 @@
   </plugins>
 
   <textures>
-    <texture name="andrew_marble4.jpg">
-      <file>/lib/stdtex/andrew_marble4.jpg</file>
+    <texture name="lava.png">
+      <file>/lev/terraini/lava.png</file>
     </texture>
     <texture name="stone4.gif">
       <file>/lib/std/stone4.gif</file>
@@ -15,48 +15,38 @@
     <texture name="grass.png">
       <file>/lev/terrain/grass.png</file>
     </texture>
-    <texture name="materialmap_base.png">
-      <file>/lev/terrain/materialmap_base.png</file>
-    </texture>
   </textures>
 
   <shaders>
-    <shader><file>/shader/terrain_fixed_base.xml</file></shader>
-    <shader><file>/shader/terrain_fixed_splatting.xml</file></shader>
+    <shader><file>/lev/terraini/shader_base.xml</file></shader>
+    <shader><file>/lev/terraini/shader_splat.xml</file></shader>
   </shaders>
 
   <materials>
-    <material name="Base">
-      <texture>materialmap_base.png</texture>
-      <shader type="ambient">terrain_fixed_base</shader>
-    </material>
-    <material name="Marble">
-      <texture>andrew_marble4.jpg</texture>
-      <shadervar name="texture scale" type="vector2">32,32</shadervar>
-      <shader type="terrain splat">terrain_fixed_splatting</shader>
-    </material>
-    <material name="Stone">
-      <texture>stone4.gif</texture>
-      <shadervar name="texture scale" type="vector2">128,128</shadervar>
-      <shader type="terrain splat">terrain_fixed_splatting</shader>
+    <material name="Lava">
+      <texture>lava.png</texture>
+      <shader type="ambient">terrain_improved_base</shader>
     </material>
     <material name="Grass">
       <texture>grass.png</texture>
-      <shadervar name="texture scale" type="vector2">256,256</shadervar>
-      <shader type="terrain splat">terrain_fixed_splatting</shader>
+      <shader type="terrain splat">terrain_improved_splatting</shader>
+    </material>
+    <material name="Stone">
+      <texture>stone4.gif</texture>
+      <shader type="terrain splat">terrain_improved_splatting</shader>
     </material>
   </materials>
 
   <addon>
     <plugin>crystalspace.renderloop.loop.loader</plugin>
-    <paramsfile>/shader/std_rloop_terrainfixed.xml</paramsfile>
+    <paramsfile>/shader/std_rloop_terrainimproved.xml</paramsfile>
   </addon>
     
   <settings>
     <clearscreen>yes</clearscreen>
     <clearzbuf>yes</clearzbuf>
     <lightmapcellsize>16</lightmapcellsize>
-    <!--renderloop>std_rloop_terrainfixed</renderloop-->
+    <renderloop>std_rloop_terrainimproved</renderloop>
   </settings>
 
   <start>
@@ -66,22 +56,78 @@
     <up x="0" y="1" z="0" />
   </start>
 
-  <addon plugin="crystalspace.terraformer.simple.loader">
-      <name>simple</name>
-      <heightmap>/lev/terrain/heightmap.png</heightmap>
-      <scale x="256" y="32" z="256" />
-      <materialmap image="/lev/terrain/materialmap.png" />
-  </addon>
-
   <meshfact name="TerrainFact">
     <plugin>terrainFact</plugin>
     <params>
-      <plugin>crystalspace.mesh.object.terrain.bruteblock</plugin>
-      <terraformer>simple</terraformer>
-      <sampleregion>
-        <min x="-256" y="-256" />
-        <max x="256" y="256" />
-      </sampleregion>
+      <renderer>crystalspace.mesh.object.terrainimproved.simplerenderer</renderer>
+<!--      <collider>crystalspace.mesh.object.terrainimproved.simplecollider</collider> -->
+
+      <cells>
+        <cell name="main">
+          <grid_size x="65" y="65" />
+          <material_size x="64" y="64" />
+          <position x="-60" y="-60" />
+          <size x="100" y="100" z="30" />
+
+          <feeder>
+            <plugin>crystalspace.mesh.object.terrainimproved.simpledatafeeder</plugin>
+            <param name="heightmap source" value="/lev/terraini/heightmap.png" />
+            <param name="materialmap source" value="/lev/terraini/material.png" />
+          </feeder>
+        </cell>
+
+        <cell>
+          <grid_size x="33" y="33" />
+          <material_size x="32" y="32" />
+          <position x="48" y="48" />
+          <size x="50" y="50" z="30" />
+
+          <feeder>
+            <plugin>crystalspace.mesh.object.terrainimproved.simpledatafeeder</plugin>
+            <param name="heightmap source" value="/lev/terraini/heightmap_00.png" />
+            <param name="materialmap source" value="/lev/terraini/material_00.png" />
+          </feeder>
+        </cell>
+        
+        <cell>
+          <grid_size x="33" y="33" />
+          <material_size x="32" y="32" />
+          <position x="48" y="98" />
+          <size x="50" y="50" z="30" />
+
+          <feeder>
+            <plugin>crystalspace.mesh.object.terrainimproved.simpledatafeeder</plugin>
+            <param name="heightmap source" value="/lev/terraini/heightmap_01.png" />
+            <param name="materialmap source" value="/lev/terraini/material_01.png" />
+          </feeder>
+        </cell>
+
+        <cell>
+          <grid_size x="33" y="33" />
+          <material_size x="32" y="32" />
+          <position x="98" y="48" />
+          <size x="50" y="50" z="30" />
+
+          <feeder>
+            <plugin>crystalspace.mesh.object.terrainimproved.simpledatafeeder</plugin>
+            <param name="heightmap source" value="/lev/terraini/heightmap_10.png" />
+            <param name="materialmap source" value="/lev/terraini/material_10.png" />
+          </feeder>
+        </cell>
+
+        <cell>
+          <grid_size x="33" y="33" />
+          <material_size x="32" y="32" />
+          <position x="98" y="98" />
+          <size x="50" y="50" z="30" />
+
+          <feeder>
+            <plugin>crystalspace.mesh.object.terrainimproved.simpledatafeeder</plugin>
+            <param name="heightmap source" value="/lev/terraini/heightmap_11.png" />
+            <param name="materialmap source" value="/lev/terraini/material_11.png" />
+          </feeder>
+        </cell>
+      </cells>
     </params>
   </meshfact>
 
@@ -96,19 +142,11 @@
       <plugin>terrain</plugin>
       <params>
         <factory>TerrainFact</factory>
-        <material>Base</material>
         <materialpalette>
+          <material>Lava</material>
           <material>Grass</material>
-          <material>Marble</material>
           <material>Stone</material>
         </materialpalette>
-        <lodvalue name="splatting distance">200</lodvalue>
-        <lodvalue name="block resolution">16</lodvalue>
-        <lodvalue name="block split distance">8</lodvalue>
-        <lodvalue name="minimum block size">32</lodvalue>
-        <lodvalue name="cd resolution">256</lodvalue>
-        <staticlighting>no</staticlighting>
-        <castshadows>no</castshadows>
       </params>
       <move> 
         <v x="0" y="0" z="0" /> 

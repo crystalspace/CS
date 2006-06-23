@@ -121,7 +121,7 @@ bool TerrainDemo::Setup ()
   engine->SetClearScreen(true);
   engine->SetClearZBuf(true);
   
-  engine->SetCurrentDefaultRenderloop(rloop);
+  //engine->SetCurrentDefaultRenderloop(rloop);
   
   return true;
 }

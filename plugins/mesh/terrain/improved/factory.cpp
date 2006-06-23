@@ -35,6 +35,9 @@ csTerrainFactory::csTerrainFactory (iMeshObjectType *pParent)
 {
   terrain = new csTerrainSystem(this);
   type = pParent;
+
+  renderer = NULL;
+  collider = NULL;
 }
 
 csTerrainFactory::~csTerrainFactory ()
@@ -125,7 +128,7 @@ const csVector2& position, const csVector3& size, iTerrainDataFeeder* feeder)
   csRef<iTerrainCellRenderProperties> render_properties =
   renderer->CreateProperties ();
   csRef<iTerrainCellCollisionProperties> collision_properties =
-  collider->CreateProperties ();
+  collider ? collider->CreateProperties () : 0;
   
   csRef<csTerrainCell> cell;
   cell.AttachNew (new csTerrainCell(name, grid_width, grid_height,
