@@ -11,6 +11,9 @@ chronological order.
 	- res (blindly) fixed the core audio driver reinterpreting pointers 
 	  to 32bit values as strings which is problematic since quite a bit
 	  of random data may appear before the saving null terminator.
+	- res converted csconout to new SCF.
+	- res changed csconout to use RGBA instead of RGB colors for 
+	  foreground/background/shadows.
 22-Jun-2006
         - Philip Wyett eliminated _POSIX_C_SOURCE redefinition warning in
           python plugin on GNU Linux with Python 2.3.
