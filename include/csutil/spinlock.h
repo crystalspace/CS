@@ -85,7 +85,7 @@ namespace CS
 	  if ((++spins & spinsPerYield) == 0) {
     #if defined (__SVR4) && defined (__sun) /* solaris */
 	    thr_yield();
-    #elif defined(linux)
+    #elif defined(linux) || defined(CS_PLATFORM_MACOSX)
 	    sched_yield();
     #elif defined(CS_PLATFORM_WIN32)
 	    SleepEx (0, FALSE);
