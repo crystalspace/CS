@@ -38,7 +38,7 @@ class csReversibleTransform;
  */
 struct iImposter : public virtual iBase
 {
-  SCF_INTERFACE(iImposter, 2, 0, 0);
+  SCF_INTERFACE(iImposter, 3, 0, 0);
 
   /// Self explanatory
   virtual void SetImposterActive (bool flag)=0;
@@ -66,9 +66,6 @@ struct iImposter : public virtual iBase
    * for use by main render process later.
    */
   virtual void CreateImposter (csReversibleTransform& pov) = 0;
-
-  /// Draw imposter on screen.
-  /// private: virtual void Draw(iRenderView* rview) = 0;
 
   /// Determine if imposter or true rendering will be used
   virtual bool WouldUseImposter (csReversibleTransform& pov) const = 0;

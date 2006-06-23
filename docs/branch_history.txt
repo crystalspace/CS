@@ -8,6 +8,10 @@ chronological order.
 
 This file describes the history of the SoC imposter branch.
 
+23-Jun-2006
+	- Fossi modified the imposter code some more
+	- Fossi made the parameter of GetScreenBoundingBox const
+	- Fossi added a color parameter to csMeshOnTexture::Draw
 20-Jun-2006
 	- Fossi adds the few first fixes to the older code of keith. Lot's
 	  debug output too.

@@ -36,6 +36,11 @@
 #include "plugins/engine/3d/impmesh.h"
 #include "plugins/engine/3d/meshobj.h"
 
+//@@@ debugging
+#include "cstool/debugimagewriter.h"
+#include "csgfx/memimage.h"
+
+
 //#include "iutil/vfs.h"
 
 csImposterProcTex::csImposterProcTex (csEngine* engine, 
@@ -44,10 +49,9 @@ csImposterProcTex::csImposterProcTex (csEngine* engine,
 {
   mesh = parent;
 
-  mat_w = 256;
-  mat_h = 256;
+  mat_w = mat_h = 256;
 
-  texFlags = CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS;
+  //texFlags = CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS;
 
   mesh_on_texture = new csMeshOnTexture(engine->objectRegistry);
 
@@ -78,43 +82,11 @@ void csImposterProcTex::Animate (csTicks CurrentTime)
   printf("animating imposter\n");
   csRef<iTextureHandle> handle = tex->GetTextureHandle ();
   csRef<iMeshWrapper> originalmesh = mesh->GetParent ();
-  if (mesh_on_texture->Render(originalmesh,handle))
+  int transparent = g2d->FindRGB (0,255,255,0);
+  if (mesh_on_texture->Render(originalmesh,handle,0,transparent))
   {
     printf("rendered\n");
     mesh->SetImposterReady(true);
   }
-
-/*
-  CS_ASSERT_MSG("Cannot remove this", 0);
-  // move the camera
-  csVector3 Position (-0.5, 0, 3 + sin (CurrentTime / (10*1000.0))*1);
-  View->GetCamera ()->Move (Position - View->GetCamera ()
-  	->GetTransform ().GetOrigin ());
-
-  g3d->SetRenderTarget (tex->GetTextureHandle ());
-
-  // Switch to the context of the procedural texture.
-  iTextureHandle *oldContext = engine->GetContext ();
-  engine->SetContext (tex->GetTextureHandle ());
-
-  // Draw the engine view.
-  g3d->BeginDraw (CSDRAW_3DGRAPHICS | engine->GetBeginDrawFlags ());
-
-  // Determine and save the actual polygon on which the texture will be rendered
-  mesh->FindImposterRectangle (View->GetCamera () );
-
-  //@@@
-  g3d->GetDriver2D()->Clear (g3d->GetDriver2D()->FindRGB (0, 0, 0, 0));
-
-
-  // This actually draws the mesh on the backbuffer
-  View->Draw(mesh);
-  
-  // This copies the backbuffer to the iTextureHandle I think.
-  g3d->FinishDraw ();
-
-  // switch back to the old context
-  engine->SetContext (oldContext);
-*/
 }
 

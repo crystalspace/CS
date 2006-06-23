@@ -23,6 +23,9 @@
 #include "iengine/sector.h"
 #include "csgeom/poly3d.h"
 #include "csgeom/box.h"
+#include "ivideo/rendermesh.h"
+#include "cstool/rendermeshholder.h"
+#include "iengine/mesh.h"
 
 #include "impprctx.h"
 
@@ -41,8 +44,8 @@ private:
   csPoly3D cutout;           // Rect for cardboard cutout version
   bool     ready;            // Whether texture must be redrawn
   float    incidence_dist;   // Angle of incidence to camera last time rendered
-  csBox2   screen_rect;      // Rectangle occupied by imposter on screen
-  csBox3   camera_box;       // Bounding box of object being impostered
+  csScreenBoxResult res;
+  csRenderMeshHolder rmHolder;
 
 public:
   csImposterMesh (csEngine* engine, csMeshWrapper *parent);
@@ -50,7 +53,7 @@ public:
   float CalcIncidenceAngleDist (iRenderView *rview);
   bool CheckIncidenceAngle (iRenderView *rview,float tolerance);
   void FindImposterRectangle (const iCamera *camera);
-  void Draw (iRenderView *rview);
+  csRenderMesh** GetRenderMesh (iRenderView *rview);
 
   bool GetImposterReady () { return ready; }
   void SetImposterReady (bool r) { ready=r; }

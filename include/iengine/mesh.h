@@ -600,8 +600,8 @@ struct iMeshWrapper : public virtual iBase
    */
   CS_DEPRECATED_METHOD_MSG("Use GetScreenBoundingBox() that returns a "
                            "csScreenBoxResult instead")
-  virtual float GetScreenBoundingBox (iCamera* camera, csBox2& sbox, 
-    csBox3& cbox) = 0;
+  virtual float GetScreenBoundingBox (const iCamera* camera, 
+    csBox2& sbox, csBox3& cbox) = 0;
 
   /**
    * Get the bounding box of this object in world space.
@@ -623,7 +623,7 @@ struct iMeshWrapper : public virtual iBase
    * Returns -1 if object behind the camera or else the distance between
    * the camera and the furthest point of the 3D box.
    */
-  virtual csScreenBoxResult GetScreenBoundingBox (iCamera* camera) = 0;
+  virtual csScreenBoxResult GetScreenBoundingBox (const iCamera* camera) = 0;
 
   /**
    * Get the radius of this mesh and all its children.

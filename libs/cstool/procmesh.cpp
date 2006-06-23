@@ -32,6 +32,9 @@
 #include "iengine/mesh.h"
 #include "iengine/camera.h"
 
+#include "igraphic/image.h"
+#include "cstool/debugimagewriter.h"
+
 csMeshOnTexture::csMeshOnTexture (iObjectRegistry* object_reg)
 {
   engine = csQueryRegistry<iEngine> (object_reg);
@@ -109,7 +112,7 @@ void csMeshOnTexture::UpdateView (int w, int h)
 }
 
 bool csMeshOnTexture::Render (iMeshWrapper* mesh, iTextureHandle* handle,
-    bool persistent)
+    bool persistent, int color)
 {
   g3d->SetRenderTarget (handle, persistent);
   iTextureHandle *oldContext = engine->GetContext ();
@@ -121,8 +124,25 @@ bool csMeshOnTexture::Render (iMeshWrapper* mesh, iTextureHandle* handle,
   // Draw the engine view.
   g3d->BeginDraw (CSDRAW_3DGRAPHICS | engine->GetBeginDrawFlags () 
     | CSDRAW_CLEARZBUFFER | (persistent ? 0 : CSDRAW_CLEARSCREEN));
-  //g3d->GetDriver2D()->Clear (g3d->GetDriver2D()->FindRGB (0, 255, 0));
+  g3d->GetDriver2D()->Clear (
+                             color == -1 ?
+                             g3d->GetDriver2D()->FindRGB (0, 0, 0) :
+                             color
+  );
   view->Draw (mesh);
+
+    iGraphics2D* g2d = g3d->GetDriver2D ();
+    csRef<iImage> shot = csPtr<iImage> (g2d->ScreenShot ());
+    if (shot)
+    {
+        csString filename;
+        filename = "/tmp/";
+        filename += rand();
+        filename += ".png";
+        csDebugImageWriter a;
+        a.DebugImageWrite(shot, filename);
+    }
+
   g3d->FinishDraw ();
 
   // switch back to the old context
