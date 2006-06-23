@@ -1,10 +1,10 @@
 SubDir TOP plugins mesh terrain persist improved ;
 
-Description terrainimprovedloader : "Improved Terrain object loader" ;
+Description terrainimprovedldr : "Improved Terrain object loader" ;
 
-Plugin terrainimprovedloader
+Plugin terrainimprovedldr
         : [ Wildcard *.cpp *.h ]
 ;
-LinkWith terrainimprovedloader : crystalspace ;
+LinkWith terrainimprovedldr : crystalspace ;
 
-CompileGroups terrainimprovedloader :  meshes ;
+CompileGroups terrainimprovedldr :  meshes ;
