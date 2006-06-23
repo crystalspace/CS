@@ -66,7 +66,7 @@ csVector3 csQuaternion::GetEulerAngles () const
   return angles;
 }
 
-#if 1
+#if 0
 void csQuaternion::SetMatrix (const csMatrix3& matrix)
 {
   // Ken Shoemake's article in 1987 SIGGRAPH course notes

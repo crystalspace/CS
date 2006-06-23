@@ -17,6 +17,10 @@ chronological order.
 	- caedes added floor operation to shader expressions.
 	- Jorrit fixed csQuaternion::SetMatrix() so that gmeshskelanim2
 	  again works correctly.
+	- Marten reverted jorrits change to csQuaternion as it is wrong.
+	  csQuaternion::SetMatrix was correct as it is, it must be 
+	  gmeshskelanim2 that is buggy. Please people, do not change the
+	  basic math classes unless you know the maths there.
 22-Jun-2006
         - Philip Wyett eliminated _POSIX_C_SOURCE redefinition warning in
           python plugin on GNU Linux with Python 2.3.
