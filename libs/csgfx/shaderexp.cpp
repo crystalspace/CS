@@ -71,6 +71,7 @@ enum
   OP_FUNC_CROSS,
   OP_FUNC_VEC_LEN, 
   OP_FUNC_NORMAL,
+  OP_FUNC_FLOOR,
 
   OP_FUNC_ARCSIN,
   OP_FUNC_ARCCOS,
@@ -118,6 +119,7 @@ static const char* const opNames[OP_LAST] = {
   "CROSS",
   "VECLEN",
   "NORMAL",
+  "FLOOR",
   "ARCSIN",
   "ARCCOS",
   "ARCTAN",
@@ -217,6 +219,7 @@ static const op_args_info optimize_arg_table[] =
   { 1, 1, false }, // OP_FUNC_CROSS
   { 1, 1, false }, // OP_FUNC_VEC_LEN
   { 1, 1, false }, // OP_FUNC_NORMAL
+  { 1, 1, false }, // OP_FUNC_FLOOR
 
   { 1, 1, false }, //  OP_FUNC_ARCSIN
   { 1, 1, false }, //  OP_FUNC_ARCCOS
@@ -900,6 +903,7 @@ bool csShaderExpression::eval_oper(int oper, oper_arg arg1, oper_arg & output)
   case OP_FUNC_ARCTAN:  return eval_arctan(arg1, output);
   case OP_FUNC_VEC_LEN: return eval_vec_len(arg1, output);
   case OP_FUNC_NORMAL: return eval_normal(arg1, output);
+  case OP_FUNC_FLOOR: return eval_floor(arg1, output);
 
   case OP_INT_LOAD: return eval_load(arg1, output);
 
@@ -1202,6 +1206,29 @@ bool csShaderExpression::eval_arctan(const oper_arg & arg1, oper_arg & output) c
   return true;  
 }
 
+bool csShaderExpression::eval_floor(const oper_arg & arg1, oper_arg & output) const 
+{
+  switch (arg1.type)
+  {
+    case TYPE_VECTOR4:
+      output.vec4.w = floorf(arg1.vec4.w);
+    case TYPE_VECTOR3:
+      output.vec4.z = floorf(arg1.vec4.z);
+    case TYPE_VECTOR2:
+      output.vec4.y = floorf(arg1.vec4.y);
+      output.vec4.x = floorf(arg1.vec4.x);
+      break;
+    case TYPE_NUMBER:
+      output.num = floorf(arg1.num);
+      break;
+    default:
+      EvalError ("Invalid type for argument to floor, %s.", GetTypeName (arg1.type));
+      return false;
+  }
+  output.type = arg1.type;
+  return true;  
+}
+
 bool csShaderExpression::eval_dot(const oper_arg & arg1, const oper_arg & arg2, oper_arg & output) const 
 {
   if (arg1.type != TYPE_VECTOR2 ||
@@ -1366,7 +1393,8 @@ bool csShaderExpression::eval_selt12(const oper_arg & arg1, const oper_arg & arg
 {
   if (arg1.type != TYPE_NUMBER || arg2.type != TYPE_NUMBER)
   {
-    EvalError ("Arguments to selt12 aren't numbers.");
+    EvalError ("Arguments to selt12 aren't numbers (%s, %s).",
+      GetTypeName (arg1.type), GetTypeName (arg2.type));
 
     return false;
   }
@@ -2261,6 +2289,7 @@ static const TokenTabEntry commonTokens[] = {
   {"elt2", 4, OP_VEC_ELT2},
   {"elt3", 4, OP_VEC_ELT3},
   {"elt4", 4, OP_VEC_ELT4},
+  {"floor", 5, OP_FUNC_FLOOR},
   {"frame", 5, OP_FUNC_FRAME},
   {"make-vector", 11, OP_PS_MAKE_VECTOR},
   {"max", 3, OP_FUNC_MAX},

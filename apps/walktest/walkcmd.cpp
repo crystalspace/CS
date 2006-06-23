@@ -683,7 +683,7 @@ void BuildSprite(iSector * sector, iObjectIterator* it, csVector3 position)
 
 
 
-void BuildObject(iObjectRegistry* object_reg, iSector * sector,
+void BuildObject(iSector * sector,
 	iObjectIterator* it, iEngine* Engine,
 	csVector3 position, iGraphics3D* MyG3D, iLoader* loader,
 	iObjectRegistry* objReg)
@@ -718,7 +718,7 @@ void WalkTest::ParseKeyNodes(iObject* src)
     }
     csRef<iObjectIterator> it2 (node_obj->GetIterator());
 
-    BuildObject(object_reg, sector,it2, Engine, node->GetPosition(), myG3D,
+    BuildObject(sector, it2, Engine, node->GetPosition(), myG3D,
 		LevelLoader, object_reg);
   }
 }

@@ -92,6 +92,29 @@ class csArrayThresholdVariablePtr(csArrayThresholdVariable):
         _swig_setattr(self, csArrayThresholdVariable,self.__class__,csArrayThresholdVariable)
 _cspace.csArrayThresholdVariable_swigregister(csArrayThresholdVariablePtr)
 
+class csArrayCapacityDefault(_object):
+    __swig_setmethods__ = {}
+    __setattr__ = lambda self, name, value: _swig_setattr(self, csArrayCapacityDefault, name, value)
+    __swig_getmethods__ = {}
+    __getattr__ = lambda self, name: _swig_getattr(self, csArrayCapacityDefault, name)
+    def __repr__(self):
+        return "<%s.%s; proxy of C++ csArrayCapacityDefault instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
+    def __init__(self, *args):
+        _swig_setattr(self, csArrayCapacityDefault, 'this', _cspace.new_csArrayCapacityDefault(*args))
+        _swig_setattr(self, csArrayCapacityDefault, 'thisown', 1)
+    def __del__(self, destroy=_cspace.delete_csArrayCapacityDefault):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+
+
+class csArrayCapacityDefaultPtr(csArrayCapacityDefault):
+    def __init__(self, this):
+        _swig_setattr(self, csArrayCapacityDefault, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, csArrayCapacityDefault, 'thisown', 0)
+        _swig_setattr(self, csArrayCapacityDefault,self.__class__,csArrayCapacityDefault)
+_cspace.csArrayCapacityDefault_swigregister(csArrayCapacityDefaultPtr)
+
 
 scfCompatibleVersion = _cspace.scfCompatibleVersion
 class iBase(_object):
@@ -1885,7 +1908,7 @@ class csRectRegion(_object):
     def ClipTo(*args): return _cspace.csRectRegion_ClipTo(*args)
     def Count(*args): return _cspace.csRectRegion_Count(*args)
     def RectAt(*args): return _cspace.csRectRegion_RectAt(*args)
-    def makeEmpty(*args): return _cspace.csRectRegion_makeEmpty(*args)
+    def MakeEmpty(*args): return _cspace.csRectRegion_MakeEmpty(*args)
 
 class csRectRegionPtr(csRectRegion):
     def __init__(self, this):
@@ -1893,7 +1916,6 @@ class csRectRegionPtr(csRectRegion):
         if not hasattr(self,"thisown"): _swig_setattr(self, csRectRegion, 'thisown', 0)
         _swig_setattr(self, csRectRegion,self.__class__,csRectRegion)
 _cspace.csRectRegion_swigregister(csRectRegionPtr)
-FRAGMENT_BUFFER_SIZE = cvar.FRAGMENT_BUFFER_SIZE
 
 class csQuaternion(_object):
     __swig_setmethods__ = {}
@@ -2668,6 +2690,7 @@ class csPluginRequestArray(_object):
     def DeleteIndexFast(*args): return _cspace.csPluginRequestArray_DeleteIndexFast(*args)
     def DeleteRange(*args): return _cspace.csPluginRequestArray_DeleteRange(*args)
     def __eq__(*args): return _cspace.csPluginRequestArray___eq__(*args)
+    def __ne__(*args): return _cspace.csPluginRequestArray___ne__(*args)
     def GetAllocator(*args): return _cspace.csPluginRequestArray_GetAllocator(*args)
 
 class csPluginRequestArrayPtr(csPluginRequestArray):
@@ -6896,6 +6919,48 @@ class iThingEnvironmentPtr(iThingEnvironment):
         if not hasattr(self,"thisown"): _swig_setattr(self, iThingEnvironment, 'thisown', 0)
         _swig_setattr(self, iThingEnvironment,self.__class__,iThingEnvironment)
 _cspace.iThingEnvironment_swigregister(iThingEnvironmentPtr)
+
+class csCharArrayArray(_object):
+    __swig_setmethods__ = {}
+    __setattr__ = lambda self, name, value: _swig_setattr(self, csCharArrayArray, name, value)
+    __swig_getmethods__ = {}
+    __getattr__ = lambda self, name: _swig_getattr(self, csCharArrayArray, name)
+    def __repr__(self):
+        return "<%s.%s; proxy of C++ csArray<csArray<char > > instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
+    def __del__(self, destroy=_cspace.delete_csCharArrayArray):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+
+    def __init__(self, *args):
+        _swig_setattr(self, csCharArrayArray, 'this', _cspace.new_csCharArrayArray(*args))
+        _swig_setattr(self, csCharArrayArray, 'thisown', 1)
+    def GetSize(*args): return _cspace.csCharArrayArray_GetSize(*args)
+    def Length(*args): return _cspace.csCharArrayArray_Length(*args)
+    def Get(*args): return _cspace.csCharArrayArray_Get(*args)
+    def Put(*args): return _cspace.csCharArrayArray_Put(*args)
+    def Push(*args): return _cspace.csCharArrayArray_Push(*args)
+    def Pop(*args): return _cspace.csCharArrayArray_Pop(*args)
+    def Top(*args): return _cspace.csCharArrayArray_Top(*args)
+    def Insert(*args): return _cspace.csCharArrayArray_Insert(*args)
+    def Contains(*args): return _cspace.csCharArrayArray_Contains(*args)
+    def Truncate(*args): return _cspace.csCharArrayArray_Truncate(*args)
+    def Empty(*args): return _cspace.csCharArrayArray_Empty(*args)
+    def IsEmpty(*args): return _cspace.csCharArrayArray_IsEmpty(*args)
+    def SetMinimalCapacity(*args): return _cspace.csCharArrayArray_SetMinimalCapacity(*args)
+    def DeleteIndex(*args): return _cspace.csCharArrayArray_DeleteIndex(*args)
+    def DeleteIndexFast(*args): return _cspace.csCharArrayArray_DeleteIndexFast(*args)
+    def DeleteRange(*args): return _cspace.csCharArrayArray_DeleteRange(*args)
+    def __eq__(*args): return _cspace.csCharArrayArray___eq__(*args)
+    def __ne__(*args): return _cspace.csCharArrayArray___ne__(*args)
+    def GetAllocator(*args): return _cspace.csCharArrayArray_GetAllocator(*args)
+
+class csCharArrayArrayPtr(csCharArrayArray):
+    def __init__(self, this):
+        _swig_setattr(self, csCharArrayArray, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, csCharArrayArray, 'thisown', 0)
+        _swig_setattr(self, csCharArrayArray,self.__class__,csCharArrayArray)
+_cspace.csCharArrayArray_swigregister(csCharArrayArrayPtr)
 
 class iTerrainObjectState(iBase):
     __swig_setmethods__ = {}
@@ -11240,6 +11305,48 @@ class iImagePtr(iImage):
 _cspace.iImage_swigregister(iImagePtr)
 
 iImage_scfGetVersion = _cspace.iImage_scfGetVersion
+
+class csImageIOFileFormatDescriptions(_object):
+    __swig_setmethods__ = {}
+    __setattr__ = lambda self, name, value: _swig_setattr(self, csImageIOFileFormatDescriptions, name, value)
+    __swig_getmethods__ = {}
+    __getattr__ = lambda self, name: _swig_getattr(self, csImageIOFileFormatDescriptions, name)
+    def __repr__(self):
+        return "<%s.%s; proxy of C++ csArray<csImageIOFileFormatDescription const * > instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
+    def __del__(self, destroy=_cspace.delete_csImageIOFileFormatDescriptions):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+
+    def __init__(self, *args):
+        _swig_setattr(self, csImageIOFileFormatDescriptions, 'this', _cspace.new_csImageIOFileFormatDescriptions(*args))
+        _swig_setattr(self, csImageIOFileFormatDescriptions, 'thisown', 1)
+    def GetSize(*args): return _cspace.csImageIOFileFormatDescriptions_GetSize(*args)
+    def Length(*args): return _cspace.csImageIOFileFormatDescriptions_Length(*args)
+    def Get(*args): return _cspace.csImageIOFileFormatDescriptions_Get(*args)
+    def Put(*args): return _cspace.csImageIOFileFormatDescriptions_Put(*args)
+    def Push(*args): return _cspace.csImageIOFileFormatDescriptions_Push(*args)
+    def Pop(*args): return _cspace.csImageIOFileFormatDescriptions_Pop(*args)
+    def Top(*args): return _cspace.csImageIOFileFormatDescriptions_Top(*args)
+    def Insert(*args): return _cspace.csImageIOFileFormatDescriptions_Insert(*args)
+    def Contains(*args): return _cspace.csImageIOFileFormatDescriptions_Contains(*args)
+    def Truncate(*args): return _cspace.csImageIOFileFormatDescriptions_Truncate(*args)
+    def Empty(*args): return _cspace.csImageIOFileFormatDescriptions_Empty(*args)
+    def IsEmpty(*args): return _cspace.csImageIOFileFormatDescriptions_IsEmpty(*args)
+    def SetMinimalCapacity(*args): return _cspace.csImageIOFileFormatDescriptions_SetMinimalCapacity(*args)
+    def DeleteIndex(*args): return _cspace.csImageIOFileFormatDescriptions_DeleteIndex(*args)
+    def DeleteIndexFast(*args): return _cspace.csImageIOFileFormatDescriptions_DeleteIndexFast(*args)
+    def DeleteRange(*args): return _cspace.csImageIOFileFormatDescriptions_DeleteRange(*args)
+    def __eq__(*args): return _cspace.csImageIOFileFormatDescriptions___eq__(*args)
+    def __ne__(*args): return _cspace.csImageIOFileFormatDescriptions___ne__(*args)
+    def GetAllocator(*args): return _cspace.csImageIOFileFormatDescriptions_GetAllocator(*args)
+
+class csImageIOFileFormatDescriptionsPtr(csImageIOFileFormatDescriptions):
+    def __init__(self, this):
+        _swig_setattr(self, csImageIOFileFormatDescriptions, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, csImageIOFileFormatDescriptions, 'thisown', 0)
+        _swig_setattr(self, csImageIOFileFormatDescriptions,self.__class__,csImageIOFileFormatDescriptions)
+_cspace.csImageIOFileFormatDescriptions_swigregister(csImageIOFileFormatDescriptionsPtr)
 
 CS_IMAGEIO_LOAD = _cspace.CS_IMAGEIO_LOAD
 CS_IMAGEIO_SAVE = _cspace.CS_IMAGEIO_SAVE

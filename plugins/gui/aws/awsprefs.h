@@ -29,7 +29,10 @@
 #include "ivideo/fontserv.h"
 #include "ivideo/graph2d.h"
 #include "awstex.h"
+
+#include "csutil/custom_new_disable.h"
 #include <string>
+#include "csutil/custom_new_enable.h"
 
 /**\file
  * This is the pseudo-symbol table for the definitions keeper.  Windows and

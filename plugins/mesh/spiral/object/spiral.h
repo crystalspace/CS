@@ -23,6 +23,7 @@
 #include "csgeom/box.h"
 #include "csutil/cscolor.h"
 #include "csutil/refarr.h"
+#include "csutil/scf_implementation.h"
 #include "csplugincommon/particlesys/partgen.h"
 #include "imesh/spiral.h"
 #include "iutil/eventh.h"
@@ -32,7 +33,9 @@
  * This class has a set of particles that act like a spiraling
  * particle fountain.
  */
-class csSpiralMeshObject : public csParticleSystem
+class csSpiralMeshObject :
+  public scfImplementationExt1<csSpiralMeshObject, csParticleSystem,
+    iSpiralState>
 {
 protected:
   float part_time;
@@ -115,76 +118,19 @@ public:
   virtual void HardTransform (const csReversibleTransform& t);
   virtual bool SupportsHardTransform () const { return true; }
 
-  SCF_DECLARE_IBASE_EXT (csParticleSystem);
-
   //------------------------- iSpiralState implementation ----------------
-  class SpiralState : public iSpiralState
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csSpiralMeshObject);
-    virtual void SetParticleCount (int num)
-    {
-      scfParent->SetParticleCount (num);
-    }
-    virtual int GetParticleCount () const
-    {
-      return (int)scfParent->GetParticleCount();
-    }
-    virtual void SetParticleSize (float partwidth, float partheight)
-    {
-        scfParent->SetParticleSize( partwidth, partheight );
-    }
-    virtual void GetParticleSize (float& partwidth, float& partheight) const
-    {
-        scfParent->GetParticleSize(partwidth, partheight);
-    }
-    virtual void SetSource (const csVector3& source)
-    {
-      scfParent->SetSource (source);
-    }
-    virtual const csVector3& GetSource () const
-    {
-      return scfParent->GetSource();
-    }
-    virtual void SetParticleTime (csTicks ttl)
-    {
-      scfParent->SetParticleTime (ttl);
-    }
-    virtual csTicks GetParticleTime () const
-    {
-      return scfParent->GetParticleTime();
-    }
-    virtual void SetRadialSpeed (float speed)
-    {
-      scfParent->SetRadialSpeed (speed);
-    }
-    virtual float GetRadialSpeed () const
-    {
-      return scfParent->GetRadialSpeed();
-    }
-    virtual void SetRotationSpeed (float speed)
-    {
-      scfParent->SetRotationSpeed (speed);
-    }
-    virtual float GetRotationSpeed () const
-    {
-      return scfParent->GetRotationSpeed();
-    }
-    virtual void SetClimbSpeed (float speed)
-    {
-      scfParent->SetClimbSpeed (speed);
-    }
-    virtual float GetClimbSpeed () const
-    {
-      return scfParent->GetClimbSpeed();
-    }
-  } scfiSpiralState;
-  friend class SpiralState;
+  // Redirect these functions to csParticleSystem
+  virtual void SetParticleCount (int num)
+  { csParticleSystem::SetParticleCount (num); }
+  virtual int GetParticleCount () const
+  { return csParticleSystem::GetParticleCount(); }
 };
 
 /**
  * Factory for spiral.
  */
-class csSpiralMeshObjectFactory : public iMeshObjectFactory
+class csSpiralMeshObjectFactory :
+  public scfImplementation1<csSpiralMeshObjectFactory, iMeshObjectFactory>
 {
 private:
   iObjectRegistry* object_reg;
@@ -195,14 +141,12 @@ private:
 public:
   /// Constructor.
   csSpiralMeshObjectFactory (iMeshObjectType* pParent,
-  	iObjectRegistry* object_reg);
+    iObjectRegistry* object_reg);
 
   /// Destructor.
   virtual ~csSpiralMeshObjectFactory ();
 
   //------------------------ iMeshObjectFactory implementation --------------
-  SCF_DECLARE_IBASE;
-
   virtual csFlags& GetFlags () { return flags; }
   virtual csPtr<iMeshObject> NewInstance ();
   virtual csPtr<iMeshObjectFactory> Clone () { return 0; }
@@ -224,14 +168,14 @@ public:
  * Spiral type. This is the plugin you have to use to create instances
  * of csSpiralMeshObjectFactory.
  */
-class csSpiralMeshObjectType : public iMeshObjectType
+class csSpiralMeshObjectType :
+  public scfImplementation2<csSpiralMeshObjectType,
+    iMeshObjectType, iComponent>
 {
 private:
   iObjectRegistry* object_reg;
 
 public:
-  SCF_DECLARE_IBASE;
-
   /// Constructor.
   csSpiralMeshObjectType (iBase*);
 
@@ -240,13 +184,8 @@ public:
 
   virtual csPtr<iMeshObjectFactory> NewFactory ();
 
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csSpiralMeshObjectType);
-    virtual bool Initialize(iObjectRegistry* p)
-    { scfParent->object_reg = p; return true; }
-  } scfiComponent;
-  friend struct eiComponent;
+  virtual bool Initialize(iObjectRegistry* p)
+  { this->object_reg = p; return true; }
 };
 
 #endif // __CS_SPIRAL_H__

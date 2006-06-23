@@ -52,7 +52,7 @@ public class CS extends cspace
 
     public static boolean requestPlugins (Vector plugins)
     {
-	csPluginRequestArray arr = new csPluginRequestArray(0,0);
+	csPluginRequestArray arr = new csPluginRequestArray(0);
 	Enumeration e = plugins.elements();
 	while (e.hasMoreElements())
 	    arr.Push((csPluginRequest)e.nextElement());

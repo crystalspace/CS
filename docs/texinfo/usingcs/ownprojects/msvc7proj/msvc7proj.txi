@@ -4,7 +4,7 @@
 @cindex MSVC, external projects
 
 @noindent
-@emph{Written by Philip Wyett @email{philip.wyett@@w-tech.co.uk}.}
+Originally written by Philip Wyett @email{philipwyett@@blueyonder.co.uk}.
 @noindent
 @emph{Last updated 20 January 2006.}
 

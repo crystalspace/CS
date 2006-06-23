@@ -3,13 +3,13 @@
 @chapter Using Crystal Space
 @cindex Using Crystal Space
 
-In this chapter you can find all information related to using Crystal Space for your
-own 3D applications.
+In this chapter you can find all information related to using Crystal
+Space for your own 3D applications.
 
 @menu
 * The Basics:: Basics and Overview
 * Tutorials::
-* SCF Chapter:: Plugins, Reference counting, Interfaces (SCF)
+* SCF Chapter:: Plugins, Reference counting, Interfaces (@sc{scf})
 * Options:: Configuring Crystal Space
 * Libraries:: Basic Libraries
 * VFS:: Virtual File System (@sc{vfs})
@@ -26,7 +26,7 @@ own 3D applications.
 * Scripting Languages::
 * AWS:: Alternate Windowing System (@sc{aws})
 * AWS2:: Alternate Windowing System 2 (@sc{aws2})
-* CEGUI:: CEGUI Introduction
+* CEGUI:: @sc{cegui} Introduction
 * Making Own Projects:: Making Projects Using Crystal Space
 * HOWTO::
 @end menu
@@ -53,4 +53,3 @@ own 3D applications.
 @importss{usingcs,cegui,cegui.txi}
 @importss{usingcs,ownprojects,chapter.txi}
 @importss{usingcs,howto,howto.txi}
-

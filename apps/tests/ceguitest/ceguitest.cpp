@@ -18,9 +18,11 @@
 
 #include "ceguitest.h"
 
-#include "CEGUI.h"
-#include "CEGUIWindowManager.h" 
-#include "CEGUILogger.h"
+#include "csutil/custom_new_disable.h"
+#include <CEGUI.h>
+#include <CEGUIWindowManager.h>
+#include <CEGUILogger.h>
+#include "csutil/custom_new_enable.h"
 
 
 CS_IMPLEMENT_APPLICATION
@@ -203,7 +205,7 @@ bool CEGUITest::Application()
   return true;
 }
 
-bool CEGUITest::OnExitButtonClicked (const CEGUI::EventArgs& e)
+bool CEGUITest::OnExitButtonClicked (const CEGUI::EventArgs&)
 {
   csRef<iEventQueue> q =
     CS_QUERY_REGISTRY(GetObjectRegistry(), iEventQueue);

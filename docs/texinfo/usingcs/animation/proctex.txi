@@ -5,16 +5,16 @@
 @cindex @code{SetRenderTarget}
 @cindex @code{csProcTexture}
 
-Crystal Space supports procedural textures. These are textures that you can
+Crystal Space supports procedural textures.  These are textures that you can
 change dynamically (at runtime) so that you get the appearance of an
 animated texture.
 
 The current implementation of procedural textures works by rendering
 the contents of the texture on screen and then doing a copy to the
-texture memory. This means that procedural textures must be updated before
+texture memory.  This means that procedural textures must be updated before
 the 3D view starts rendering and it also means that the 3D view must make
 sure that that part of the screen is changed (i.e. either put geometry
-there or manually clear screen every frame). Note that all textures
+there or manually clear screen every frame).  Note that all textures
 can be updated with this technique. i.e. you don't need to mark a texture
 as being procedural.
 
@@ -38,27 +38,27 @@ The following code demonstrates how you can update a texture image:
 @end example
 
 It is also possible to do 3D graphics on a procedural texture. Note that
-the code above overwrites what is currently displayed on screen! So make
+the code above overwrites what is currently displayed on screen!  So make
 sure to do it before anything you need is rendered.
 
 A useful function with procedural textures is @code{iGraphics2D->Blit()}
-which can copy a @sc{rgb} buffer from memory directly to the screen. This
+which can copy a @sc{rgb} buffer from memory directly to the screen.  This
 is often useful for procedural textures.
 
 @code{SetRenderTarget} also has a second parameter which is called
-@samp{persistant} and which is set to false by default. If you set this to
+@samp{persistant} and which is set to false by default.  If you set this to
 true then the previous contents of the texture is copied on screen first.
-That means you can make modifications to an existing texture. With this
+That means you can make modifications to an existing texture.  With this
 parameter set to false (default) you have to create the entire texture
-again. Note that setting @samp{persistant} to true is slower if you intend
+again.  Note that setting @samp{persistant} to true is slower if you intend
 to update the entire texture area anyway.
 
 @subsubheading Using csProcTexture
 @cindex @code{csProcTexture}
 
 In the @samp{cstool} module there is a convenience class you can use
-to make updating of procedural textures easier. This class is called
-@code{csProcTexture}. Basically you make a subclass of this class like this:
+to make updating of procedural textures easier.  This class is called
+@code{csProcTexture}.  Basically you make a subclass of this class like this:
 
 @example
 #include "cstool/proctex.h"
@@ -86,7 +86,6 @@ void MyProcTexture::Animate (csTicks current_time)
   @dots{}
   g3d->FinishDraw ();
 @}
-
 @end example
 
 To use this procedural texture you must do the following:
@@ -102,19 +101,18 @@ To use this procedural texture you must do the following:
 @end example
 
 @code{csProcTexture} will make sure that your @code{Animate} routine
-is called when needed. In practice this means that your animate routine
-will be called AFTER the first time the texture was needed. This is because
-@code{Animate} will change the display (because procedural textures
-render on screen) so it can't be done while rendering other objects. In
+is called when needed.  In practice this means that your animate routine
+will be called @sc{after} the first time the texture was needed.  This is
+because @code{Animate} will change the display (because procedural textures
+render on screen) so it can't be done while rendering other objects.  In
 general this is not really a problem since typically the material will be
 needed as soon as only a tiny part of the object is visible and this will
 only be visible for one frame.
 
 To minimize the impact of this effect you can make sure that the initial
-contents of the procedural texture is reasonable. You can do that by
+contents of the procedural texture is reasonable.  You can do that by
 manually calling @code{Animate} for example.
 
 Another way to fix this is by letting your procedural texture subclass
-set the @samp{always_animate} flag to true. Of course this will make
+set the @samp{always_animate} flag to true.  Of course this will make
 things slower.
-

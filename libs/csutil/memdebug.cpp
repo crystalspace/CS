@@ -200,7 +200,7 @@ static void CompactMemEntries (unsigned long older_age)
     {
       if (mem_table[i].freed && mem_table[i].age < older_age)
       {
-        free (mem_table[i].start-DETECT_WALL-4);
+        cs_free (mem_table[i].start-DETECT_WALL-4);
       }
       else
       {
@@ -400,7 +400,7 @@ void* operator new (size_t s)
   if (global_age % DETECT_CHECK_MEMORY == 0) MemoryCheck ();
 #endif
   if (s <= 0) DumpError ("BAD SIZE in new %zu\n", s, 0);
-  char* rc = (char*)malloc (s+4+DETECT_WALL+DETECT_WALL);
+  char* rc = (char*)cs_malloc (s+4+DETECT_WALL+DETECT_WALL);
   memcpy (rc, DETECT, DETECT_WALL);
   memcpy (rc+DETECT_WALL, &s, 4);
   memcpy (rc+DETECT_WALL+4+s, DETECT, DETECT_WALL);
@@ -431,7 +431,7 @@ void* operator new[] (size_t s)
   if (global_age % DETECT_CHECK_MEMORY == 0) MemoryCheck ();
 #endif
   if (s <= 0) DumpError ("BAD SIZE in new[] %zu\n", s, 0);
-  char* rc = (char*)malloc (s+4+DETECT_WALL+DETECT_WALL);
+  char* rc = (char*)cs_malloc (s+4+DETECT_WALL+DETECT_WALL);
   memcpy (rc, DETECTAR, DETECT_WALL);
   memcpy (rc+DETECT_WALL, &s, 4);
   memcpy (rc+DETECT_WALL+4+s, DETECTAR, DETECT_WALL);
@@ -489,10 +489,10 @@ void operator delete (void* p)
   me->age = global_age;
 # else
   me->start = 0;
-  free (rc);
+  cs_free (rc);
 # endif
 #else
-  free (rc);
+  cs_free (rc);
 #endif
 }
 
@@ -533,10 +533,10 @@ void operator delete[] (void* p)
   me->age = global_age;
 # else
   me->start = 0;
-  free (rc);
+  cs_free (rc);
 # endif
 #else
-  free (rc);
+  cs_free (rc);
 #endif
 }
 
@@ -553,7 +553,7 @@ void* operator new (size_t s, void* filename, int line)
 {
   alloc_total += s;
   alloc_cnt++;
-  uint32* rc = (uint32*)malloc (s+8);
+  uint32* rc = (uint32*)cs_malloc (s+8);
   *rc++ = 0xdeadbeef;
   *rc++ = s;
   csPrintf ("+ %p %zu %zu %s\n",
@@ -565,7 +565,7 @@ void* operator new[] (size_t s, void* filename, int line)
 {
   alloc_total += s;
   alloc_cnt++;
-  uint32* rc = (uint32*)malloc (s+8);
+  uint32* rc = (uint32*)cs_malloc (s+8);
   *rc++ = 0xdeadbeef;
   *rc++ = s;
   csPrintf ("+ %p %zu %zu %s\n",
@@ -581,7 +581,7 @@ void operator delete (void* p)
     CS_ASSERT (*rc == 0xdeadbeef);
     alloc_total -= rc[1];
     alloc_cnt--;
-    free ((void*)rc);
+    cs_free ((void*)rc);
     csPrintf ("- %p %zu %zu\n", &alloc_total, alloc_total, alloc_cnt);
   }
 }
@@ -593,7 +593,7 @@ void operator delete[] (void* p)
     CS_ASSERT (*rc == 0xdeadbeef);
     alloc_total -= rc[1];
     alloc_cnt--;
-    free ((void*)rc);
+    cs_free ((void*)rc);
     csPrintf ("- %p %zu %zu\n", &alloc_total, alloc_total, alloc_cnt);
   }
 }
@@ -614,7 +614,7 @@ void* operator new (size_t s, void* filename, int line)
   alloc_cnt++;
   if (s > 1000) { csPrintf ("new s=%zu tot=%zu/%zu file=%s line=%d\n",
         s, alloc_total, alloc_cnt, filename, line); fflush (stdout); }
-  return (void*)malloc (s);
+  return (void*)cs_malloc (s);
 }
 void* operator new[] (size_t s, void* filename, int line)
 {
@@ -623,15 +623,15 @@ void* operator new[] (size_t s, void* filename, int line)
   if (s > 1000)
     csPrintf ("new[] s=%zu tot=%zu/%zu file=%s line=%d\n",
               s, alloc_total, alloc_cnt, filename, line); fflush (stdout);
-  return (void*)malloc (s);
+  return (void*)cs_malloc (s);
 }
 void operator delete (void* p)
 {
-  if (p) free (p);
+  if (p) cs_free (p);
 }
 void operator delete[] (void* p)
 {
-  if (p) free (p);
+  if (p) cs_free (p);
 }
 #endif  // CS_EXTENSIVE_MEMDEBUG_IMPLEMENT
 
@@ -645,19 +645,19 @@ void operator delete[] (void* p)
 #undef new
 void* operator new (size_t s, void*, int)
 {
-  return (void*)malloc (s);
+  return (void*)cs_malloc (s);
 }
 void* operator new[] (size_t s, void*, int)
 {
-  return (void*)malloc (s);
+  return (void*)cs_malloc (s);
 }
 void operator delete (void* p)
 {
-  if (p) free (p);
+  if (p) cs_free (p);
 }
 void operator delete[] (void* p)
 {
-  if (p) free (p);
+  if (p) cs_free (p);
 }
 #endif  // CS_EXTENSIVE_MEMDEBUG_IMPLEMENT
 
@@ -703,7 +703,7 @@ public:
           sizeof (csMemTrackerInfo*) * tomove);
     mti_table_count++;
     CS_ASSERT(mti_table_count <= mti_table_max);
-    mti_table[idx] = (csMemTrackerInfo*)malloc (sizeof (csMemTrackerInfo));
+    mti_table[idx] = (csMemTrackerInfo*)cs_malloc (sizeof (csMemTrackerInfo));
     mti_table[idx]->Init (filename);
   }
 
@@ -714,7 +714,7 @@ public:
     if (mti_table_count <= 0)
     {
       mti_table_count++;
-      mti_table[0] = (csMemTrackerInfo*)malloc (sizeof (csMemTrackerInfo));
+      mti_table[0] = (csMemTrackerInfo*)cs_malloc (sizeof (csMemTrackerInfo));
       mti_table[0]->Init (filename);
       return mti_table[0];
     }
@@ -977,7 +977,7 @@ void mtiUpdateAmount (csMemTrackerInfo* mti, int dcount, int dsize)
 void* operator new (size_t s, void* filename, int /*line*/)
 {
   //CS_ASSERT (s > 0);
-  uintptr_t* rc = (uintptr_t*)malloc (s+4*sizeof(uintptr_t));
+  uintptr_t* rc = (uintptr_t*)cs_malloc (s+4*sizeof(uintptr_t));
   memset (rc, 0xfe, s+4*sizeof(uintptr_t));
   *rc++ = s;
   *rc++ = 0xbeebbeeb;
@@ -988,7 +988,7 @@ void* operator new (size_t s, void* filename, int /*line*/)
 void* operator new[] (size_t s, void* filename, int /*line*/)
 {
   //CS_ASSERT (s > 0);
-  uintptr_t* rc = (uintptr_t*)malloc (s+4*sizeof(uintptr_t));
+  uintptr_t* rc = (uintptr_t*)cs_malloc (s+4*sizeof(uintptr_t));
   memset (rc, 0xfe, s+4*sizeof(uintptr_t));
   *rc++ = s;
   *rc++ = 0xfeedbeef;
@@ -996,15 +996,29 @@ void* operator new[] (size_t s, void* filename, int /*line*/)
   *rc++ = 0xdeadbeef;
   return (void*)rc;
 }
+void* operator new (size_t s)
+{
+  return operator new (s, __FILE__ " standard operator new", 
+    0);
+}
+void* operator new[] (size_t s)
+{
+  return operator new[] (s, __FILE__ " standard operator new[]", 
+    0);
+}
 void operator delete (void* p)
 {
   if (p)
   {
     uintptr_t* rc = ((uintptr_t*)p)-4;
-    if (rc[3] != 0xdeadbeef) { free (p); return; }
+    if (rc[3] != 0xdeadbeef) 
+    { 
+      platform_free (p); // Not nice, but at least try.
+      return; 
+    }
     size_t s = rc[0];
     csMemTrackerInfo* mti = (csMemTrackerInfo*)rc[2];
-    free ((void*)rc);
+    cs_free ((void*)rc);
     mtiRegisterFree (mti, s);
   }
 }
@@ -1013,10 +1027,14 @@ void operator delete[] (void* p)
   if (p)
   {
     uintptr_t* rc = ((uintptr_t*)p)-4;
-    if (rc[3] != 0xdeadbeef) { free (p); return; }
+    if (rc[3] != 0xdeadbeef) 
+    { 
+      platform_free (p); // Not nice, but at least try.
+      return; 
+    }
     size_t s = rc[0];
     csMemTrackerInfo* mti = (csMemTrackerInfo*)rc[2];
-    free ((void*)rc);
+    cs_free ((void*)rc);
     mtiRegisterFree (mti, s);
   }
 }

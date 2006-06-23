@@ -79,7 +79,7 @@ bool TerrainDemo::Setup ()
 
   // Find the starting position in this level.
   csVector3 pos (0);
-  /*if (engine->GetCameraPositions ()->GetCount () > 0)
+  if (engine->GetCameraPositions ()->GetCount () > 0)
   {
     // There is a valid starting position defined in the level file.
     iCameraPosition* campos = engine->GetCameraPositions ()->Get (0);
@@ -94,16 +94,16 @@ bool TerrainDemo::Setup ()
     pos = csVector3 (0, 0, 0);
   }
   if (!room)
-    ReportError("Can't find a valid starting position!");*/
-    
-  room = engine->CreateSector("terrain");
+    room = engine->CreateSector("terrain");
     
   // Attach terrain
+  /*
   csRef<iMeshObject> terrain_mesh_object = scfQueryInterface<iMeshObject>(terrain);
   csRef<iMeshWrapper> terrain_mesh_wrapper = engine->CreateMeshWrapper("terrain");
   terrain_mesh_wrapper->SetMeshObject(terrain_mesh_object);
   
   terrain_mesh_wrapper->GetMovable()->SetSector(room);
+  */
   
   csRef<iLight> light = engine->CreateLight ("DynLight", csVector3 (23, 1, 5),
   10, csColor (1, 0, 0), CS_LIGHT_DYNAMICTYPE_DYNAMIC);
@@ -258,6 +258,7 @@ bool TerrainDemo::OnInitialize(int /*argc*/, char* /*argv*/ [])
     return ReportError("Failed to set up event handler!");
     
   // Let's create a terrain.
+/*
   csRef<iTerrainRenderer> t_renderer = csLoadPlugin<iTerrainRenderer>(
   GetObjectRegistry(),
   "crystalspace.mesh.object.terrainimproved.simplerenderer");
@@ -328,7 +329,7 @@ bool TerrainDemo::OnInitialize(int /*argc*/, char* /*argv*/ [])
   csRef<iMeshObject> t_mesh = t_mesh_factory->NewInstance();
   
   terrain = scfQueryInterface<iTerrainSystem>(t_mesh);
-  
+*/  
   return true;
 }
 
@@ -359,10 +360,8 @@ bool TerrainDemo::LoadMap ()
   csRef<iVFS> VFS (CS_QUERY_REGISTRY (GetObjectRegistry (), iVFS));
   VFS->ChDir ("/lev/terraini");
   // Load the level file which is called 'world'.
-  //if (!loader->LoadMapFile ("world"))
-  //  ReportError("Error couldn't load level!");
     
-  iTextureWrapper* grass_tex = loader->LoadTexture("grass_tex",
+/*  iTextureWrapper* grass_tex = loader->LoadTexture("grass_tex",
   "/lev/terrain/grass.png");
   iTextureWrapper* stone_tex = loader->LoadTexture("stone_tex",
   "/lib/std/stone4.gif");
@@ -400,7 +399,9 @@ bool TerrainDemo::LoadMap ()
   GetMaterial()->SetShader(strings->Request("terrain splat"), shader_splat);
   materials.Push(material);
   
-  terrain->SetMaterialPalette(materials);
+  terrain->SetMaterialPalette(materials);*/
+  if (!loader->LoadMapFile ("world"))
+    ReportError("Error couldn't load level!");
 
   return true;
 }

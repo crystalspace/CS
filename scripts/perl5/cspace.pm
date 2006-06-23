@@ -236,6 +236,42 @@ sub ACQUIRE {
 }
 
 
+############# Class : cspace::csArrayCapacityDefault ##############
+
+package cspace::csArrayCapacityDefault;
+@ISA = qw( cspace );
+%OWNER = ();
+%ITERATORS = ();
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_csArrayCapacityDefault(@_);
+    bless $self, $pkg if defined($self);
+}
+
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_csArrayCapacityDefault($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
 ############# Class : cspace::iBase ##############
 
 package cspace::iBase;
@@ -2221,7 +2257,7 @@ sub DESTROY {
 *ClipTo = *cspacec::csRectRegion_ClipTo;
 *Count = *cspacec::csRectRegion_Count;
 *RectAt = *cspacec::csRectRegion_RectAt;
-*makeEmpty = *cspacec::csRectRegion_makeEmpty;
+*MakeEmpty = *cspacec::csRectRegion_MakeEmpty;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -3042,6 +3078,7 @@ sub new {
 *DeleteIndexFast = *cspacec::csPluginRequestArray_DeleteIndexFast;
 *DeleteRange = *cspacec::csPluginRequestArray_DeleteRange;
 *__eq__ = *cspacec::csPluginRequestArray___eq__;
+*__ne__ = *cspacec::csPluginRequestArray___ne__;
 *GetAllocator = *cspacec::csPluginRequestArray_GetAllocator;
 sub DISOWN {
     my $self = shift;
@@ -7878,6 +7915,61 @@ sub ACQUIRE {
 }
 
 
+############# Class : cspace::csCharArrayArray ##############
+
+package cspace::csCharArrayArray;
+@ISA = qw( cspace );
+%OWNER = ();
+%ITERATORS = ();
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_csCharArrayArray($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_csCharArrayArray(@_);
+    bless $self, $pkg if defined($self);
+}
+
+*GetSize = *cspacec::csCharArrayArray_GetSize;
+*Length = *cspacec::csCharArrayArray_Length;
+*Get = *cspacec::csCharArrayArray_Get;
+*Put = *cspacec::csCharArrayArray_Put;
+*Push = *cspacec::csCharArrayArray_Push;
+*Pop = *cspacec::csCharArrayArray_Pop;
+*Top = *cspacec::csCharArrayArray_Top;
+*Insert = *cspacec::csCharArrayArray_Insert;
+*Contains = *cspacec::csCharArrayArray_Contains;
+*Truncate = *cspacec::csCharArrayArray_Truncate;
+*Empty = *cspacec::csCharArrayArray_Empty;
+*IsEmpty = *cspacec::csCharArrayArray_IsEmpty;
+*SetMinimalCapacity = *cspacec::csCharArrayArray_SetMinimalCapacity;
+*DeleteIndex = *cspacec::csCharArrayArray_DeleteIndex;
+*DeleteIndexFast = *cspacec::csCharArrayArray_DeleteIndexFast;
+*DeleteRange = *cspacec::csCharArrayArray_DeleteRange;
+*__eq__ = *cspacec::csCharArrayArray___eq__;
+*__ne__ = *cspacec::csCharArrayArray___ne__;
+*GetAllocator = *cspacec::csCharArrayArray_GetAllocator;
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
 ############# Class : cspace::iTerrainObjectState ##############
 
 package cspace::iTerrainObjectState;
@@ -12427,6 +12519,61 @@ sub ACQUIRE {
 }
 
 
+############# Class : cspace::csImageIOFileFormatDescriptions ##############
+
+package cspace::csImageIOFileFormatDescriptions;
+@ISA = qw( cspace );
+%OWNER = ();
+%ITERATORS = ();
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_csImageIOFileFormatDescriptions($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_csImageIOFileFormatDescriptions(@_);
+    bless $self, $pkg if defined($self);
+}
+
+*GetSize = *cspacec::csImageIOFileFormatDescriptions_GetSize;
+*Length = *cspacec::csImageIOFileFormatDescriptions_Length;
+*Get = *cspacec::csImageIOFileFormatDescriptions_Get;
+*Put = *cspacec::csImageIOFileFormatDescriptions_Put;
+*Push = *cspacec::csImageIOFileFormatDescriptions_Push;
+*Pop = *cspacec::csImageIOFileFormatDescriptions_Pop;
+*Top = *cspacec::csImageIOFileFormatDescriptions_Top;
+*Insert = *cspacec::csImageIOFileFormatDescriptions_Insert;
+*Contains = *cspacec::csImageIOFileFormatDescriptions_Contains;
+*Truncate = *cspacec::csImageIOFileFormatDescriptions_Truncate;
+*Empty = *cspacec::csImageIOFileFormatDescriptions_Empty;
+*IsEmpty = *cspacec::csImageIOFileFormatDescriptions_IsEmpty;
+*SetMinimalCapacity = *cspacec::csImageIOFileFormatDescriptions_SetMinimalCapacity;
+*DeleteIndex = *cspacec::csImageIOFileFormatDescriptions_DeleteIndex;
+*DeleteIndexFast = *cspacec::csImageIOFileFormatDescriptions_DeleteIndexFast;
+*DeleteRange = *cspacec::csImageIOFileFormatDescriptions_DeleteRange;
+*__eq__ = *cspacec::csImageIOFileFormatDescriptions___eq__;
+*__ne__ = *cspacec::csImageIOFileFormatDescriptions___ne__;
+*GetAllocator = *cspacec::csImageIOFileFormatDescriptions_GetAllocator;
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
 ############# Class : cspace::csImageIOFileFormatDescription ##############
 
 package cspace::csImageIOFileFormatDescription;
@@ -15342,7 +15489,6 @@ my %__iSCF_SCF_hash;
 tie %__iSCF_SCF_hash,"cspace::iSCF", $cspacec::iSCF_SCF;
 $iSCF_SCF= \%__iSCF_SCF_hash;
 bless $iSCF_SCF, cspace::iSCF;
-*FRAGMENT_BUFFER_SIZE = *cspacec::FRAGMENT_BUFFER_SIZE;
 *aws_debug = *cspacec::aws_debug;
 *AWSF_AlwaysEraseWindows = *cspacec::AWSF_AlwaysEraseWindows;
 *AWSF_AlwaysRedrawWindows = *cspacec::AWSF_AlwaysRedrawWindows;

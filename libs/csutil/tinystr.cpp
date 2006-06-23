@@ -45,7 +45,7 @@ TiXmlString::TiXmlString (const char* instring)
     return;
   }
   newlen = strlen (instring) + 1;
-  newstring = (char*)malloc (newlen);
+  newstring = (char*)cs_malloc (newlen);
   strcpy (newstring, instring);
   allocated = newlen;
   cstring = newstring;
@@ -66,7 +66,7 @@ TiXmlString::TiXmlString (const TiXmlString& copy)
     return;
   }
   newlen = copy . length() + 1;
-  newstring = (char*)malloc (newlen);
+  newstring = (char*)cs_malloc (newlen);
   strcpy (newstring, copy . cstring);
   allocated = newlen;
   cstring = newstring;
@@ -85,7 +85,7 @@ void TiXmlString ::operator = (const char * content)
     return;
   }
   newlen = strlen (content) + 1;
-  newstring = (char*)malloc (newlen);
+  newstring = (char*)cs_malloc (newlen);
   strcpy (newstring, content);
   empty_it ();
   allocated = newlen;
@@ -105,7 +105,7 @@ void TiXmlString ::operator = (const TiXmlString & copy)
     return;
   }
   newlen = copy . length () + 1;
-  newstring = (char*)malloc (newlen);
+  newstring = (char*)cs_malloc (newlen);
   strcpy (newstring, copy . c_str ());
   empty_it ();
   allocated = newlen;
@@ -138,9 +138,9 @@ void TiXmlString::append( const char* str, size_t len )
 
     // allocate new buffer
     if (allocated && cstring)
-      cstring = (char*)realloc (cstring, new_alloc);
+      cstring = (char*)cs_realloc (cstring, new_alloc);
     else
-      cstring = (char*)malloc (new_alloc);
+      cstring = (char*)cs_malloc (new_alloc);
 
     // append the suffix. It does exist, otherwize we wouldn't be expanding 
     memcpy (cstring + length(), str, len);
@@ -173,9 +173,9 @@ void TiXmlString::append( char single )
 
     // allocate new buffer
     if (allocated && cstring)
-      cstring = (char*)realloc (cstring, new_alloc);
+      cstring = (char*)cs_realloc (cstring, new_alloc);
     else
-      cstring = (char*)malloc (new_alloc);
+      cstring = (char*)cs_malloc (new_alloc);
 
     // append the suffix. It does exist, otherwize we wouldn't be expanding 
     cstring [new_size - 2] = single;

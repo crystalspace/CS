@@ -59,7 +59,7 @@ public:
    * This should only ever be done to reference generic 
    * (non-instantiated) handler names or single-instance handlers.
    */   
-  CS_CONST_METHOD csHandlerID GetGenericID (const csString &);
+  CS_CONST_METHOD csHandlerID GetGenericID (const char*);
   static CS_CONST_METHOD csHandlerID GetGenericID (iObjectRegistry *reg, 
     const csString &name) 
   {
@@ -95,7 +95,7 @@ public:
    * ":pre" and ":post" signpost handlers or any other such
    * bookkeeping magic.
    */
-  csHandlerID GetID (csString &);
+  csHandlerID GetID (const char*);
   static CS_CONST_METHOD csHandlerID GetID (iObjectRegistry *reg,
                                             csString &name)
   {

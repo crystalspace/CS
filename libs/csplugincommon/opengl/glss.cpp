@@ -24,32 +24,9 @@
 #include "csplugincommon/opengl/glcommon2d.h"
 #include "csplugincommon/opengl/glss.h"
 
-void csGLScreenShot::IncRef ()
+csGLScreenShot::csGLScreenShot (csGraphics2DGLCommon* G2D) :
+  scfImplementationType(this)
 {
-  scfRefCount++;
-}
-
-void csGLScreenShot::DecRef()
-{
-  if (scfRefCount == 1)
-  {
-    G2D->RecycleScreenShot (this);
-    return;
-  }
-  scfRefCount--;
-}
-
-SCF_IMPLEMENT_IBASE_GETREFCOUNT(csGLScreenShot)
-SCF_IMPLEMENT_IBASE_REFOWNER(csGLScreenShot)
-SCF_IMPLEMENT_IBASE_REMOVE_REF_OWNERS(csGLScreenShot)
-SCF_IMPLEMENT_IBASE_QUERY(csGLScreenShot)
-  SCF_IMPLEMENTS_INTERFACE(iImage)
-SCF_IMPLEMENT_IBASE_END
-
-csGLScreenShot::csGLScreenShot (csGraphics2DGLCommon* G2D)
-{
-  SCF_CONSTRUCT_IBASE(0);
-
   poolNext = 0;
   csGLScreenShot::G2D = G2D;
   /* @@@ FIXME:
@@ -66,7 +43,6 @@ csGLScreenShot::csGLScreenShot (csGraphics2DGLCommon* G2D)
 csGLScreenShot::~csGLScreenShot ()
 {
   delete[] Data;
-  SCF_DESTRUCT_IBASE();
 }
 
 void csGLScreenShot::SetData (void* data)
@@ -91,3 +67,19 @@ void csGLScreenShot::SetData (void* data)
   }
 }
 
+void csGLScreenShot::IncRef ()
+{
+  scfRefCount++;
+}
+
+void csGLScreenShot::DecRef()
+{
+  if (scfRefCount == 1)
+  {
+    G2D->RecycleScreenShot (this);
+  }
+  else
+  {
+    scfRefCount--;
+  }
+}

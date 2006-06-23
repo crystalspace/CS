@@ -24,7 +24,9 @@
  */
 
 #include "csutil/scf.h"
-#include "CEGUI.h"
+#include "csutil/custom_new_disable.h"
+#include <CEGUI.h>
+#include "csutil/custom_new_enable.h"
 
 SCF_VERSION (iCEGUI, 0, 0, 1);
 

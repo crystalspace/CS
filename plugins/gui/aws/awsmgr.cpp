@@ -563,7 +563,7 @@ void awsManager::InvalidateUpdateStore ()
 bool awsManager::ComponentIsDirty (iAwsComponent *win)
 {
   if (!win->isHidden ())
-    for (int i = 0; i < dirty.Count (); ++i)
+    for (size_t i = 0; i < dirty.Count (); ++i)
       if (win->Overlaps (dirty.RectAt (i)))
 	return true;
   return false;
@@ -586,7 +586,7 @@ void awsManager::UpdateStore ()
   {
     iAwsComponent *cur = top;
 
-    updatestore.makeEmpty ();
+    updatestore.MakeEmpty ();
 
     // Get all frames into the store.
     while (cur)
@@ -608,7 +608,7 @@ void awsManager::Print (iGraphics3D *g3d, uint8 Alpha)
 {
   UpdateStore ();
 
-  int i;
+  size_t i;
   csRect clip (0, 0, g3d->GetWidth () - 1, g3d->GetHeight () - 1);
 
   updatestore.ClipTo (clip);
@@ -625,7 +625,7 @@ void awsManager::Print (iGraphics3D *g3d, uint8 Alpha)
       canvas->Show (&r, g3d, Alpha);
     }
 
-    erase.makeEmpty ();
+    erase.MakeEmpty ();
   }
   else
   {
@@ -660,7 +660,7 @@ void awsManager::Redraw ()
   static unsigned redraw_tag = 1;
 
   int erasefill = GetPrefMgr ()->GetColor (AC_TRANSPARENT);
-  int i;
+  size_t i;
   iAwsComponent *curwin = top, *oldwin = 0;
 
   redraw_tag++;
@@ -798,7 +798,7 @@ void awsManager::Redraw ()
   //ptG3D->FinishDraw ();
 
   // Reset the dirty region
-  dirty.makeEmpty ();
+  dirty.MakeEmpty ();
   // done with the redraw!
 }
 

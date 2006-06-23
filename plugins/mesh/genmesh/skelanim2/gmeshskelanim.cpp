@@ -37,32 +37,15 @@
 
 CS_IMPLEMENT_PLUGIN
 
-SCF_IMPLEMENT_IBASE (csGenmeshSkelAnimationControlType)
-SCF_IMPLEMENTS_INTERFACE (iGenMeshAnimationControlType)
-SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csGenmeshSkelAnimationControlType::eiComponent)
-SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 SCF_IMPLEMENT_FACTORY (csGenmeshSkelAnimationControlType)
-
-SCF_IMPLEMENT_IBASE (csGenmeshSkelAnimationControlFactory)
-SCF_IMPLEMENTS_INTERFACE (iGenMeshAnimationControlFactory)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csGenmeshSkelAnimationControl)
-SCF_IMPLEMENTS_INTERFACE (iGenMeshAnimationControl)
-SCF_IMPLEMENTS_INTERFACE (iGenMeshSkeletonControlState)
-SCF_IMPLEMENT_IBASE_END
 
 //-------------------------------------------------------------------------
 
 csGenmeshSkelAnimationControl::csGenmeshSkelAnimationControl (
-  csGenmeshSkelAnimationControlFactory* fact, iMeshObject *mesh, iObjectRegistry* object_reg)
+  csGenmeshSkelAnimationControlFactory* fact, iMeshObject *mesh,
+  iObjectRegistry* object_reg) :
+  scfImplementationType(this)
 {
-  SCF_CONSTRUCT_IBASE (0);
   csGenmeshSkelAnimationControl::object_reg = object_reg;
   mesh_obj = mesh;
   factory = fact;
@@ -121,7 +104,6 @@ csGenmeshSkelAnimationControl::~csGenmeshSkelAnimationControl ()
   delete[] animated_vert_norms;
   delete[] animated_tangents;
   delete[] animated_bitangents;
-  SCF_DESTRUCT_IBASE ();
 }
 
 void csGenmeshSkelAnimationControl::Initialize ()
@@ -281,9 +263,9 @@ const csVector3* csGenmeshSkelAnimationControl::UpdateBiTangents (csTicks,
 //-------------------------------------------------------------------------
 
 csGenmeshSkelAnimationControlFactory::csGenmeshSkelAnimationControlFactory (
-  csGenmeshSkelAnimationControlType* type, iObjectRegistry* object_reg)
+  csGenmeshSkelAnimationControlType* type, iObjectRegistry* object_reg) :
+  scfImplementationType(this, type)
 {
-  SCF_CONSTRUCT_IBASE (type);
   csGenmeshSkelAnimationControlFactory::type = type;
   csGenmeshSkelAnimationControlFactory::object_reg = object_reg;
   InitTokenTable (xmltokens);
@@ -300,7 +282,6 @@ csGenmeshSkelAnimationControlFactory::csGenmeshSkelAnimationControlFactory (
 
 csGenmeshSkelAnimationControlFactory::~csGenmeshSkelAnimationControlFactory ()
 {
-  SCF_DESTRUCT_IBASE ();
 }
 
 csPtr<iGenMeshAnimationControl> csGenmeshSkelAnimationControlFactory::
@@ -449,17 +430,13 @@ const char* csGenmeshSkelAnimationControlFactory::Save (iDocumentNode* parent)
 //-------------------------------------------------------------------------
 
 csGenmeshSkelAnimationControlType::csGenmeshSkelAnimationControlType (
-  iBase* pParent)
+  iBase* pParent) :
+  scfImplementationType(this, pParent)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
-
 }
 
 csGenmeshSkelAnimationControlType::~csGenmeshSkelAnimationControlType ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csGenmeshSkelAnimationControlType::Initialize (iObjectRegistry* object_reg)

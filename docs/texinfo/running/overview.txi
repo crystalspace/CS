@@ -16,6 +16,34 @@ particular application may be found in subsequent sections.
 @item 3ds2lev
 A @sc{3ds} to Crystal Space map converter (work in progress!).
 
+@cindex @file{awstest}
+@cindex Applications, @file{awstest}
+@item awstest
+A test application for the Crystal Space Alternate Windows System @sc{aws}
+plugin. In the future this will become the test application for the work in
+progress @sc{aws}2 plugin.
+
+@cindex @file{awstut}
+@cindex Applications, @file{awstut}
+@item awstut
+A Crystal Space tutorial application demonstrating use of the Alternate
+Windows System @sc{aws}.
+
+@cindex @file{ceguitest}
+@cindex Applications, @file{ceguitest}
+@item ceguitest
+A test application for the Crystal Space Crazy Eddie's @sc{gui} System plugin.
+
+@cindex @file{consoletest}
+@cindex Applications, @file{consoletest}
+@item consoletest
+A Crystal Space console output testing application.
+
+@cindex @file{csbench}
+@cindex Applications, @file{csbench}
+@item csbench
+A Crystal Space benchmarking application.
+
 @cindex @file{csdemo}
 @cindex Applications, @file{csdemo}
 @item csdemo
@@ -36,10 +64,20 @@ that you can get from:
 @item csfgen
 A @emph{TrueType} to Crystal Space font converter.
 
-@cindex @file{csvid}
-@cindex Applications, @file{csvid}
-@item csvid
-A test application for the Open DivX video plugin.
+@cindex @file{cslight}
+@cindex Applications, @file{cslight}
+@item cslight
+todo
+
+@cindex @file{docconv}
+@cindex Applications, @file{docconv}
+@item docconv
+todo
+
+@cindex @file{eventtest}
+@cindex Applications, @file{eventtest}
+@item eventtest
+A Crystal Space event system testing application.
 
 @cindex @file{g2dtest}
 @cindex Applications, @file{g2dtest}
@@ -57,21 +95,126 @@ The Crystal Space image manipulator.
 An application demonstrating how you can use the 3D engine to simulate
 a semi-isometric view.
 
+@cindex @file{joytest}
+@cindex Applications, @file{joytest}
+@item joytest
+todo
+
+@cindex @file{levtool}
+@cindex Applications, @file{levtool}
+@item levtool
+todo
+
+@cindex @file{lghtngtest}
+@cindex Applications, @file{lghtngtest}
+@item lghtngtest
+todo
+
+@cindex @file{lighter2}
+@cindex Applications, @file{lighter2}
+@item lighter2
+todo
+
+@cindex @file{maya2spr}
+@cindex Applications, @file{maya2spr}
+@item maya2spr
+todo
+
+@cindex @file{mazing}
+@cindex Applications, @file{mazing}
+@item mazing
+todo
+
+@cindex @file{md32spr}
+@cindex Applications, @file{md32spr}
+@item md32spr
+todo
+
 @cindex @file{mdl2spr}
 @cindex Applications, @file{mdl2spr}
 @item mdl2spr
 This application is a Quake @file{.mdl} and @file{.md2} model converter.  It
 converts model files into native Crystal Space sprites. @xref{mdl2spr}.
 
-@cindex @file{perftest}
-@cindex Applications, @file{perftest}
-@item perftest
-This is a tool to test graphics performance.
+@cindex @file{partedit}
+@cindex Applications, @file{partedit}
+@item partedit
+todo
+
+@cindex @file{partedit2}
+@cindex Applications, @file{partedit2}
+@item partedit2
+todo
+
+@cindex @file{pathtut}
+@cindex Applications, @file{pathtut}
+@item pathtut
+todo
+
+@cindex @file{phystut}
+@cindex Applications, @file{phystut}
+@item phystut
+todo
+
+@cindex @file{picview}
+@cindex Applications, @file{picview}
+@item picview
+todo
 
 @cindex @file{pysimp}
 @cindex Applications, @file{pysimp}
 @item pysimp
 An extremely simple example demonstrating use of the Python plug-in module.
+
+@cindex @file{simpcd}
+@cindex Applications, @file{simpcd}
+@item simpcd
+todo
+
+@cindex @file{simple1}
+@cindex Applications, @file{simple1}
+@item simple1
+todo
+
+@cindex @file{simple2}
+@cindex Applications, @file{simple2}
+@item simple2
+todo
+
+@cindex @file{simplept}
+@cindex Applications, @file{simplept}
+@item simplept
+todo
+
+@cindex @file{simpmap}
+@cindex Applications, @file{simpmap}
+@item simpmap
+todo
+
+@cindex @file{simpvs}
+@cindex Applications, @file{simpvs}
+@item simpvs
+todo
+
+@cindex @file{sndtest}
+@cindex Applications, @file{sndtest}
+@item sndtest
+An application for testing the Crystal Space @sc{sndsys} sound system.
+
+@cindex @file{startme}
+@cindex Applications, @file{startme}
+@item startme
+todo
+
+@cindex @file{unittest}
+@cindex Applications, @file{unittest}
+@item unittest
+todo
+
+@cindex @file{viewmesh}
+@cindex Applications, @file{viewmesh}
+@item viewmesh
+todo
 
 @cindex @file{vsh}
 @cindex Applications, @file{vsh}
@@ -87,4 +230,9 @@ harness for most of the features which get added to the engine.  It is not
 necessarily a good programming example, but if you are interested in seeing
 an engine feature in action, this is probably the place to look.
 @xref{Walktest}.
+
+@cindex @file{waterdemo}
+@cindex Applications, @file{waterdemo}
+@item waterdemo
+todo
 @end table

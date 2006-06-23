@@ -23,7 +23,7 @@
  * General mesh object
  */ 
 
-#include "csutil/scf.h"
+#include "csutil/scf_interface.h"
 
 struct iDocumentNode;
 struct iGenMeshAnimationControl;
@@ -359,8 +359,6 @@ struct iGeneralFactoryState : public virtual iGeneralMeshCommonState
   	const = 0;
 };
 
-SCF_VERSION (iGenMeshAnimationControl, 0, 0, 1);
-
 /**
  * Implementing this class allows the creation of classes that control
  * animation of vertex, texel, normal, and color data right before it is
@@ -381,6 +379,8 @@ SCF_VERSION (iGenMeshAnimationControl, 0, 0, 1);
  */
 struct iGenMeshAnimationControl : public virtual iBase
 {
+  SCF_INTERFACE(iGenMeshAnimationControl, 2, 0, 0);
+
   /// Returns true if this control animates vertices.
   virtual bool AnimatesVertices () const = 0;
   /// Returns true if this control animates texels.
@@ -439,10 +439,6 @@ struct iGenMeshAnimationControl : public virtual iBase
   	const csColor4* colors, int num_colors, uint32 version_id) = 0;
 };
 
-SCF_VERSION (iGenMeshAnimationControlFactory, 0, 0, 1);
-
-struct iDocumentNode;
-
 /**
  * This class is a factory for creating animation controls.
  * 
@@ -455,8 +451,10 @@ struct iDocumentNode;
  * Main users of this interface:
  * - Genmesh plugin (crystalspace.mesh.object.genmesh)
  */
-struct iGenMeshAnimationControlFactory : public iBase
+struct iGenMeshAnimationControlFactory : public virtual iBase
 {
+  SCF_INTERFACE(iGenMeshAnimationControlFactory, 2, 0, 0);
+
   /**
    * Create a new animation control.
    */
@@ -476,8 +474,6 @@ struct iGenMeshAnimationControlFactory : public iBase
   virtual const char* Save (iDocumentNode* parent) = 0;
 };
 
-SCF_VERSION (iGenMeshAnimationControlType, 0, 0, 1);
-
 /**
  * This class is the animation control type.
  * 
@@ -492,17 +488,17 @@ SCF_VERSION (iGenMeshAnimationControlType, 0, 0, 1);
  * - Genmesh plugin (crystalspace.mesh.object.genmesh)
  *   
  */
-struct iGenMeshAnimationControlType : public iBase
+struct iGenMeshAnimationControlType : public virtual iBase
 {
+  SCF_INTERFACE(iGenMeshAnimationControlType, 2, 0, 0);
+
   /**
    * Create a new animation control factory.
    */
   virtual csPtr<iGenMeshAnimationControlFactory> CreateAnimationControlFactory
   	() = 0;
-
 };
 
 /** @} */
 
 #endif // __CS_IMESH_GENMESH_H__
-

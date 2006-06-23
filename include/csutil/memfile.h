@@ -40,10 +40,21 @@ public:
   {
     /// Deallocate with delete[].
     DISPOSITION_DELETE,
-    /// Deallocate with free().
-    DISPOSITION_FREE,
+    /// Deallocate with platform_free().
+    DISPOSITION_PLATFORM_FREE,
     /// Ignore; assume that outside agent owns buffer.
-    DISPOSITION_IGNORE
+    DISPOSITION_IGNORE,
+    /// Deallocate with cs_free().
+    DISPOSITION_CS_FREE,
+  #ifndef CS_NO_MALLOC_OVERRIDE
+    /** 
+     * Deallocate with platform_free() or cs_free(), depending on whether
+     * malloc override is disabled or not.
+     */
+    DISPOSITION_FREE = DISPOSITION_CS_FREE
+  #else
+    DISPOSITION_FREE = DISPOSITION_PLATFORM_FREE
+  #endif
   };
 
 public:
