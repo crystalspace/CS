@@ -163,6 +163,8 @@ private:
   	oper_arg & output) const;
   bool eval_vec_len(const oper_arg & arg1, oper_arg & output) const;
   bool eval_normal(const oper_arg & arg1, oper_arg & output) const;
+  /// Floor operator
+  bool eval_floor(const oper_arg & arg1, oper_arg & output) const;
 
   bool eval_pow(const oper_arg & arg1, const oper_arg & arg2,
   	oper_arg & output) const;

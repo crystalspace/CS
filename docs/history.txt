@@ -14,6 +14,7 @@ chronological order.
 	- res converted csconout to new SCF.
 	- res changed csconout to use RGBA instead of RGB colors for 
 	  foreground/background/shadows.
+	- caedes added floor operation to shader expressions.
 22-Jun-2006
         - Philip Wyett eliminated _POSIX_C_SOURCE redefinition warning in
           python plugin on GNU Linux with Python 2.3.
