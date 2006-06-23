@@ -91,7 +91,7 @@ namespace CS
 	    SleepEx (0, FALSE);
     #else  /* no-op yield on unknown systems */
 	    ;
-    #endif /* solaris, linux, CS_PLATFORM_WIN32 */
+    #endif /* solaris, linux, CS_PLATFORM_MACOSX, CS_PLATFORM_WIN32 */
 	  }
 	}
       }
@@ -100,7 +100,7 @@ namespace CS
     CS_FORCEINLINE bool DoLockTry()
     {
       int ret;
-      __asm__ __volatile__ ("lock cmpxchgl %2,(%1)" : "=a" (ret) : "r" (&l), "r" (1), "a" (0));
+      __asm__ __volatile__ ("lock; cmpxchgl %2,(%1)" : "=a" (ret) : "r" (&l), "r" (1), "a" (0));
       if(!ret){
 	CS_ASSERT(!threadid);
 	threadid = CurrentThreadID();
