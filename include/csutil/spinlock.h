@@ -74,7 +74,7 @@ namespace CS
 	int spins = 0;
 	for (;;) {
 	  int ret;
-	  __asm__ __volatile__ ("lock cmpxchgl %2,(%1)" : "=a" (ret) : "r" (&l), "r" (1), "a" (0));
+	  __asm__ __volatile__ ("lock; cmpxchgl %2,(%1)" : "=a" (ret) : "r" (&l), "r" (1), "a" (0));
 	  if(!ret) 
 	  {
 	    CS_ASSERT(!threadid);
