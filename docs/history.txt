@@ -9,6 +9,10 @@ chronological order.
 24-Jun-2006
 	- Peter Amstutz deleted the vos plugin from the Crystal Space tree,
 	  as it will now be maintained directly as part of the VOS tree.
+	- Peter Amstutz modified the cs-config script to search for the
+	  CS link libraries under several different possible names, so
+	  as to support finding and linking with the shared library 
+	  version of libcrystalspace.
 23-Jun-2006
 	- res fixed spinlock.h compilation for Intel Macs.
 	- res (blindly) fixed the core audio driver reinterpreting pointers 
