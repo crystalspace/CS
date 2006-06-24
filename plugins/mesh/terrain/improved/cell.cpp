@@ -26,6 +26,8 @@
 #include "csgeom/csrect.h"
 
 #include "csgfx/imagebase.h"
+#include "csgfx/memimage.h"
+#include "csgfx/imagemanipulate.h"
 
 #include "debug.h"
 
@@ -201,16 +203,27 @@ void csTerrainCell::SetMaterialMask (unsigned int material, iImage* image)
 {
   if (image->GetFormat () != CS_IMGFMT_PALETTED8) return;
   
-  SetMaterialMask(material, (const unsigned char*)image->GetImageData (),
-  image->GetWidth (), image->GetHeight ());
+  csRef<iImage> rescaled_image;
+
+  if (image->GetWidth () != material_width || image->GetHeight () !=
+    material_height)
+  {
+    rescaled_image = csImageManipulate::Rescale (image, material_width,
+      material_height);
+    image = rescaled_image;
+  }
+
+  renderer->OnMaterialMaskUpdate(this, material,
+  csRect(0, 0, image->GetWidth (), image->GetHeight ()),
+  (const unsigned char*)image->GetImageData (), image->GetWidth ());
 }
 
 void csTerrainCell::SetMaterialMask (unsigned int material,
 const unsigned char* data, unsigned int width, unsigned int height)
 {
-#pragma message(PR_WARNING("this is a hack actually, perhaps SetMaterialMask should not accept images of wrong width/height? or resize them..."))
-  renderer->OnMaterialMaskUpdate (this, material,
-  csRect(0, 0, width, height), data, width);
+	csImageMemory image(width, height, (void*)data, false, CS_IMGFMT_PALETTED8);
+	
+	SetMaterialMask(material, &image);
 }
 
 bool csTerrainCell::CollideRay (const csVector3& start, const csVector3& end,

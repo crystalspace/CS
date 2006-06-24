@@ -34,7 +34,6 @@
 #include "iutil/object.h"
 #include "iutil/objreg.h"
 #include "iutil/plugin.h"
-#include "iutil/vfs.h"
 
 #include "iterrain/terrainsystem.h"
 #include "iterrain/terrainrenderer.h"
@@ -66,34 +65,23 @@ enum
   XMLTOKEN_MATERIAL,
 };
 
-SCF_IMPLEMENT_IBASE (csTerrainFactoryLoader)
-  SCF_IMPLEMENTS_INTERFACE (iLoaderPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csTerrainFactoryLoader::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 SCF_IMPLEMENT_FACTORY (csTerrainFactoryLoader)
 
+SCF_IMPLEMENT_FACTORY (csTerrainObjectLoader)
+
 csTerrainFactoryLoader::csTerrainFactoryLoader (iBase* parent)
+ : scfImplementationType (this, parent)
 {
-  SCF_CONSTRUCT_IBASE (parent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
 }
 
 csTerrainFactoryLoader::~csTerrainFactoryLoader ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csTerrainFactoryLoader::Initialize (iObjectRegistry* objreg)
 {
   object_reg = objreg;
-  synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
-  vfs = CS_QUERY_REGISTRY (object_reg, iVFS);
+  synldr = csQueryRegistry<iSyntaxService> (object_reg);
 
   xmltokens.Register ("renderer", XMLTOKEN_RENDERER);
   xmltokens.Register ("collider", XMLTOKEN_COLLIDER);
@@ -113,16 +101,16 @@ bool csTerrainFactoryLoader::Initialize (iObjectRegistry* objreg)
 csPtr<iBase> csTerrainFactoryLoader::Parse (iDocumentNode* node,
   iStreamSource*, iLoaderContext* /*ldr_context*/, iBase* /*context*/)
 {
-  csRef<iPluginManager> plugin_mgr = CS_QUERY_REGISTRY (object_reg,
-    iPluginManager);
-
-  csRef<iMeshObjectType> mesh_type = csLoadPlugin<iMeshObjectType>(
-  object_reg, "crystalspace.mesh.object.terrainimproved");
+  csRef<iPluginManager> plugin_mgr = csQueryRegistry<iPluginManager> (
+    object_reg);
+    
+  csRef<iMeshObjectType> mesh_type = csLoadPlugin<iMeshObjectType> (
+    object_reg, "crystalspace.mesh.object.terrainimproved");
   
-  csRef<iMeshObjectFactory> mesh_factory = mesh_type->NewFactory();
+  csRef<iMeshObjectFactory> mesh_factory = mesh_type->NewFactory ();
   
-  csRef<iTerrainFactory> factory = scfQueryInterface<iTerrainFactory>(
-  mesh_factory);
+  csRef<iTerrainFactory> factory = scfQueryInterface<iTerrainFactory> (
+    mesh_factory);
   
   csRef<iTerrainRenderer> renderer;
   csRef<iTerrainCollider> collider;
@@ -247,8 +235,8 @@ csPtr<iBase> csTerrainFactoryLoader::Parse (iDocumentNode* node,
                           feeder = csLoadPlugin<iTerrainDataFeeder> (
                             plugin_mgr, pluginname);
               
-                              if (!feeder)
-                              {
+                          if (!feeder)
+                          {
                             synldr->ReportError (
                               "crystalspace.terrain.loader.factory",
                               node, "Could not load %s!", pluginname);
@@ -264,7 +252,8 @@ csPtr<iBase> csTerrainFactoryLoader::Parse (iDocumentNode* node,
                           break;
                         }
                         default:
-                          synldr->ReportError ("crystalspace.terrain.factory.loader",
+                          synldr->ReportError (
+                            "crystalspace.terrain.factory.loader",
                             child, "Unknown token!");
                       }
                     }
@@ -299,34 +288,19 @@ csPtr<iBase> csTerrainFactoryLoader::Parse (iDocumentNode* node,
   return csPtr<iBase> (mesh_factory);
 }
 
-SCF_IMPLEMENT_IBASE (csTerrainObjectLoader)
-  SCF_IMPLEMENTS_INTERFACE (iLoaderPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csTerrainObjectLoader::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_FACTORY (csTerrainObjectLoader)
-
 csTerrainObjectLoader::csTerrainObjectLoader (iBase* parent)
+ : scfImplementationType (this, parent)
 {
-  SCF_CONSTRUCT_IBASE (parent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
 }
 
 csTerrainObjectLoader::~csTerrainObjectLoader ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csTerrainObjectLoader::Initialize (iObjectRegistry* objreg)
 {
   object_reg = objreg;
-  synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
-  vfs = CS_QUERY_REGISTRY (object_reg, iVFS);
+  synldr = csQueryRegistry<iSyntaxService> (object_reg);
 
   xmltokens.Register ("factory", XMLTOKEN_FACTORY);
   xmltokens.Register ("materialpalette", XMLTOKEN_MATERIALPALETTE);
@@ -366,11 +340,11 @@ csPtr<iBase> csTerrainObjectLoader::Parse (iDocumentNode* node,
         if (!terrain)
         {
           synldr->ReportError (
-                    "crystalspace.terrain.parse.badfactory",
-                    child, "Factory '%s' doesn't appear to be a terrain factory!",
+                    "crystalspace.terrain.parse.badfactory", child,
+                    "Factory '%s' doesn't appear to be a terrain factory!",
                     factname);
-              return 0;
-            }
+          return 0;
+        }
             
         break;
       }

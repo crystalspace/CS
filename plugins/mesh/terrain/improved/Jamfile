@@ -1,10 +1,10 @@
 SubDir TOP plugins mesh terrain improved ;
 
-Description terrain : "Improved Terrain plugin" ;
+Description terrainimproved : "Improved Terrain plugin" ;
 
-Plugin terrain
+Plugin terrainimproved
         : [ Wildcard *.cpp *.h ]
 ;
-LinkWith terrain : crystalspace ;
+LinkWith terrainimproved : crystalspace ;
 
-CompileGroups terrain :  meshes ;
+CompileGroups terrainimproved :  meshes ;

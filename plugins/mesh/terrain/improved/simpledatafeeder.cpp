@@ -29,6 +29,8 @@
 #include "csutil/refarr.h"
 #include "csutil/dirtyaccessarray.h"
 
+#include "csgfx/imagemanipulate.h"
+
 #include "iengine/material.h"
 
 #include "iengine/engine.h"
@@ -65,10 +67,15 @@ void csTerrainSimpleDataFeeder::Load (iTerrainCell* cell)
 
   csLockedHeightData data = cell->LockHeightData (csRect(0, 0, width, height));
 
-  csRef<iLoader> loader = CS_QUERY_REGISTRY (object_reg, iLoader);
+  csRef<iLoader> loader = csQueryRegistry<iLoader> (object_reg);
   
   csRef<iImage> map = loader->LoadImage (heightmap_source,
   CS_IMGFMT_PALETTED8);
+
+  if (map->GetWidth () != width || map->GetHeight () != height)
+  {
+    map = csImageManipulate::Rescale (map, width, height);
+  }
   
   for (int y = 0; y < height; ++y)
     for (int x = 0; x < width; ++x)
@@ -82,12 +89,12 @@ void csTerrainSimpleDataFeeder::Load (iTerrainCell* cell)
 
   cell->UnlockHeightData ();
   
-  int mwidth = cell->GetMaterialMapWidth ();
-  int mheight = cell->GetMaterialMapHeight ();
-  
   csRef<iImage> material = loader->LoadImage (mmap_source,
   CS_IMGFMT_TRUECOLOR);
   
+  int mwidth = material->GetWidth ();
+  int mheight = material->GetHeight ();
+
   csDirtyAccessArray<unsigned char> mdata;
   mdata.SetSize (mwidth * mheight);
   

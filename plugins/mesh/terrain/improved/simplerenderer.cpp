@@ -255,7 +255,8 @@ const csRect& rectangle, const float* data, unsigned int pitch)
 }
 
 void csTerrainSimpleRenderer::OnMaterialMaskUpdate (iTerrainCell* cell,
-unsigned int material, const csRect& rectangle, const unsigned char* data, unsigned int pitch)
+unsigned int material, const csRect& rectangle, const unsigned char* data,
+unsigned int pitch)
 {
   csRef<csSimpleTerrainRenderData> rdata = (csSimpleTerrainRenderData*)
   cell->GetRenderData ();
@@ -322,10 +323,10 @@ bool csTerrainSimpleRenderer::Initialize (iObjectRegistry* object_reg)
 {
   this->object_reg = object_reg;
    
-  g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+  g3d = csQueryRegistry<iGraphics3D> (object_reg);
   
-  strings = CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg,
-  "crystalspace.shared.stringset", iStringSet);
+  strings = csQueryRegistryTagInterface<iStringSet> (object_reg,
+  "crystalspace.shared.stringset");
     
   return true;
 }

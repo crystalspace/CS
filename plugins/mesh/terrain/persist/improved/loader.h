@@ -31,17 +31,17 @@ struct iVFS;
 /**
  *
  */
-class csTerrainFactoryLoader : public iLoaderPlugin
+class csTerrainFactoryLoader :
+  public scfImplementation2<csTerrainFactoryLoader,
+                            iLoaderPlugin,
+                            iComponent>
 {
 private:
   iObjectRegistry* object_reg;
   csRef<iSyntaxService> synldr;
-  csRef<iVFS> vfs;
   csStringHash xmltokens;
 
 public:
-  SCF_DECLARE_IBASE;
-
   /// Constructor
   csTerrainFactoryLoader (iBase*);
   /// Destructor
@@ -54,28 +54,21 @@ public:
   csPtr<iBase> Parse (iDocumentNode *node,
     iStreamSource*, iLoaderContext *ldr_context,
     iBase* context);	
-
-  struct eiComponent : public iComponent
-  { 
-    SCF_DECLARE_EMBEDDED_IBASE (csTerrainFactoryLoader);
-    virtual bool Initialize (iObjectRegistry *p)
-    { return scfParent->Initialize (p); }
-  } scfiComponent;
 };
 
 /**
  *
  */
-class csTerrainObjectLoader : public iLoaderPlugin
+class csTerrainObjectLoader :
+  public scfImplementation2<csTerrainObjectLoader,
+                            iLoaderPlugin,
+                            iComponent>
 {
 private:
   iObjectRegistry* object_reg;
   csRef<iSyntaxService> synldr;
-  csRef<iVFS> vfs;
   csStringHash xmltokens;
 public:
-  SCF_DECLARE_IBASE;
-
   /// Constructor
   csTerrainObjectLoader (iBase*);
 
@@ -89,13 +82,6 @@ public:
   csPtr<iBase> Parse (iDocumentNode* node,
     iStreamSource*, iLoaderContext* ldr_context,
     iBase *context);
-
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csTerrainObjectLoader);
-    virtual bool Initialize (iObjectRegistry* p)
-    { return scfParent->Initialize (p); }
-  } scfiComponent;
 };
 
 #endif // __CS_CHUNKLDR_H
