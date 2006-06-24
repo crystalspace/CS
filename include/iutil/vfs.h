@@ -519,12 +519,14 @@ struct iVFS : public virtual iBase
    * Create or add a symbolic link within the VFS (works like unix 'ln -s' command)
    * If the link already exists, then the target will be added to the link
    * \param Target The target that th link will point to
-   * \param Link The path of the link within the VFS, if this is 0 then the link will
-   *        be created in the current directory with the same name as the target
-   * \param Overwrite If conflicting files are found must they be overwritten by the new link
+   * \param Link The path of the link within the VFS, if this is 0 then the link 
+   *        will be created in the current directory with the same name as the target
+   * \param Overwrite If conflicting files are found must they be overwritten 
+   *        by the new link
    * \return True if successful, else false.
    */
-  virtual bool SymbolicLink(const char *Target, const char *Link = 0, bool Overwrite = true) = 0;
+  virtual bool SymbolicLink(const char *Target, const char *Link = 0, 
+    int priority = 0) = 0;
 
   /**
    * Mount an VFS path on a "real-world-filesystem" path.
@@ -538,7 +540,15 @@ struct iVFS : public virtual iBase
    * \param plugin The index of the iFileSystem plugin, if 0 then autodetect (with performance cost)
    * \return True if the mount succeeded, else false.
    */
-  virtual bool Mount(const char *VirtualPath, const char *RealPath, int priority, size_t plugin = 0) = 0;
+  virtual bool Mount(const char *VirtualPath, const char *RealPath, 
+    int priority, size_t plugin = 0) = 0;
+
+  /**
+   * Return a registered iFileSystem plugin.
+   * /param index The index of the plugin
+   * /return The iFileSystem plugin
+   */
+  virtual iFileSystem* GetPlugin(size_t index) = 0;
 };
 
 /** @} */

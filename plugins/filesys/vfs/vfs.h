@@ -155,10 +155,13 @@ public:
   virtual size_t RegisterPlugin(iFileSystem *FileSystem);
 
   /// Create or add a symbolic link
-  virtual bool SymbolicLink(const char *Target, const char *Link = 0, bool Overwrite = true);
+  virtual bool SymbolicLink(const char *Target, const char *Link = 0, int priority = 0);
 
   /// Mount a file
   virtual bool Mount(const char *VirtualPath, const char *RealPath, int priority, size_t plugin = 0);
+
+  /// Return a filesystem plugin
+  virtual iFileSystem* GetPlugin(size_t index);
 
 private:
 
@@ -189,6 +192,9 @@ private:
 
   // Check if the path is a valid real directory
   bool isDirectory(const char *path);
+
+protected:
+  friend class VfsNode;
 };
 
 } CS_PLUGIN_NAMESPACE_END(vfs)

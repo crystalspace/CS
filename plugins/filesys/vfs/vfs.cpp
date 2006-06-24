@@ -36,15 +36,32 @@ CS_IMPLEMENT_PLUGIN
 
 CS_PLUGIN_NAMESPACE_BEGIN(vfs)
 {
+// ----------------------------------------------------------- VfsNode --- //
 
-struct RealPathData
+// Structure to hold data about VfsNode paths
+struct MappedPathData
 {
+  // The name of the path
   csString name;
+
+  // Index into csVfs fsPlugins array
   size_t pluginIndex;
+
+  // The priority of the path
   int priority;
+
+  // Is this a symbolic link
+  bool symlink;
 };
 
-// ----------------------------------------------------------- VfsNode --- //
+int CompareMappedPaths(const MappedPathData &a, const MappedPathData &b)
+{
+  return (a.priority - b.priority);
+}
+
+/**
+ * TODO: write class description
+ */
 class VfsNode
 {
 public:
@@ -58,11 +75,8 @@ public:
   // The name of this node in the VFS tree
   csString VirtualPathname;
 
-  // The real paths mapped to this node
-  csArray<RealPathData> RealPaths;
-
-  // The virtual paths mapped to this node (symbolic links)
-  csStringArray SymbolicLinks;
+  // The real paths and symbolic links mapped to this node
+  csArray<MappedPathData> MappedPaths;
 
   // List the files in this directory tree
   csPtr<iStringArray> FindFiles(const char *Suffix, const char *Mask);
@@ -78,6 +92,9 @@ public:
 
   // A vector of pointers to the subdirectories of this node
   VfsVector SubDirectories;
+
+  // Does this node contain a file
+  bool ContainsFile(const char *FileName);
 
   // Allow VFS to access node internals
   const csVFS *ParentVFS;
@@ -136,6 +153,37 @@ void VfsNode::GetMounts(scfStringArray * MountArray)
 
 csPtr<iFile> VfsNode::Open (const char *FileName, int Mode)
 {
+  for (size_t i = 0; i < MappedPaths.Length(); i++)
+  {
+    if (MappedPaths[i].symlink)
+    {
+       if(ParentVFS->GetDirectoryNode(MappedPaths[i].name)->ContainsFile(FileName))
+         return ParentVFS->GetDirectoryNode(MappedPaths[i].name)->Open(FileName, Mode);
+    }
+    else
+    {
+       // TODO: RealPath stuff
+       // return ParentVFS->GetPlugin(MappedPaths[i].pluginIndex)->Open(FileName, Mode);
+    }
+  }
+  return 0;
+}
+
+bool VfsNode::ContainsFile(const char *FileName)
+{
+  for (size_t i = 0; i < MappedPaths.Length(); i++)
+  {
+    if (MappedPaths[i].symlink)
+    {
+       if (ParentVFS->GetDirectoryNode(MappedPaths[i].name)->ContainsFile(FileName))
+         return true;
+    }
+    else
+    {
+       // TODO: Check about RealPaths
+       //ParentVFS->GetPlugin(MappedPaths[i].pluginIndex)->
+    }
+  }
   return 0;
 }
 
@@ -263,7 +311,7 @@ csPtr<iFile> csVFS::Open (const char *FileName, int Mode)
   VfsNode *node = GetParentDirectoryNode(FileName, false);
 
   if (!node)
-    return 0;
+   return 0;
 
   return node->Open(FileName, Mode);
 }
@@ -275,17 +323,17 @@ csPtr<iDataBuffer> csVFS::ReadFile (const char *FileName, bool nullterm)
 
 bool csVFS::WriteFile (const char *FileName, const char *Data, size_t Size)
 {
-		return true;	
+	return true;	
 }
 
 bool csVFS::DeleteFile (const char *FileName)
 {
-		return true;	
+	return true;	
 }
 
 bool csVFS::Sync ()
 {
-		return true;	
+	return true;	
 }
 
 bool csVFS::Mount (const char *VirtualPath, const char *RealPath)
@@ -306,21 +354,23 @@ bool csVFS::Mount(const char *VirtualPath, const char *RealPath, int priority, s
   if (!node)
 	  return false;
 
-  struct RealPathData rp;
-  rp.name = RealPath;
-  rp.priority = priority;
-  rp.pluginIndex = plugin;
+  struct MappedPathData pathData;
+  pathData.name = RealPath;
+  pathData.priority = priority;
+  pathData.pluginIndex = plugin;
+  pathData.symlink = false;
 
+  // Check for autodetect
   if (plugin != 0)
   {
-    node->RealPaths.Push(rp);
-	return true;
+    node->MappedPaths.InsertSorted(pathData, CompareMappedPaths);
+    return true;
   }
 
   // Real Path is a directory
   if (isDirectory(RealPath))
   {
-	  node->RealPaths.Push(rp);
+    node->MappedPaths.InsertSorted(pathData, CompareMappedPaths);
 	  return true;
   }
 
@@ -328,11 +378,11 @@ bool csVFS::Mount(const char *VirtualPath, const char *RealPath, int priority, s
   for (size_t i = 0; i < fsPlugins.Length(); i++)
   {
     if(fsPlugins[i]->CanHandleMount(RealPath))
-	{
-      rp.pluginIndex = i;
-      node->RealPaths.Push(rp);
-	  return true;
-	}
+    {
+      pathData.pluginIndex = i;
+      node->MappedPaths.InsertSorted(pathData, CompareMappedPaths);
+      return true;
+    }
   }
 
   // RealPath is not valid
@@ -346,27 +396,35 @@ bool csVFS::Unmount (const char *VirtualPath, const char *RealPath)
 
   VfsNode *node = GetDirectoryNode(VirtualPath);
 
-  for (size_t i = 0; i < node->RealPaths.Length(); i++)
+  for (size_t i = 0; i < node->MappedPaths.Length(); i++)
   {
-	 // TODO: search for RealPAth and remove it
+    if (!node->MappedPaths[i].symlink)
+    {
+      if (node->MappedPaths[i].name.Compare(RealPath))
+      {
+        return node->MappedPaths.DeleteIndex(i);
+      }
+    }
   }
   
-  return true;	
+  return false;	
 }
   
 csRef<iStringArray> csVFS::MountRoot (const char *VirtualPath)
 {
-		return 0;
+	return 0;
 }
 
 bool csVFS::SaveMounts (const char *FileName)
 {
-		return true;
+	return true;
 }
 
 bool csVFS::LoadMountsFromFile (iConfigFile* file)
 {
-		return true;	
+  
+
+	return true;	
 }
 
 bool csVFS::ChDirAuto (const char* path, const csStringArray* paths,
@@ -425,9 +483,10 @@ csRef<iStringArray> csVFS::GetRealMountPaths (const char *VirtualPath)
   scfStringArray *rmounts = new scfStringArray;
 
   // Copy the real paths
-  for (size_t i = 0; i < node->RealPaths.Length(); i++)
+  for (size_t i = 0; i < node->MappedPaths.Length(); i++)
   {
-	  rmounts->Push(node->RealPaths[i].name);
+    if (!node->MappedPaths[i].symlink)
+	    rmounts->Push(node->MappedPaths[i].name);
   }
 
   // return the results
@@ -445,31 +504,27 @@ size_t csVFS::RegisterPlugin(iFileSystem *FileSystem)
 }
 
 // Create or add a symbolic link
-bool csVFS::SymbolicLink(const char *Target, const char *Link, 
-						 bool Overwrite)
+bool csVFS::SymbolicLink(const char *Target, const char *Link, int priority)
 {
   VfsNode *Directory = GetDirectoryNode(Link);
 
-  // Link does not exist
+  // Node does not exist
   if (!Directory)
   {
+    // Create the node
 	  csString tmp = Link;
 	  tmp.Append("/tmp");
 	  Directory = GetParentDirectoryNode((const char *) tmp, true);
   }
 
+  struct MappedPathData mp;
+  mp.name = Target;
+  mp.pluginIndex = 0;
+  mp.priority = priority;
+  mp.symlink = true;
+
   // Add the target to the symlinks of the directory
-  if (Overwrite)
-  {
-	  if (!Directory->SymbolicLinks.Contains(Target, true))
-	  {
-		  Directory->SymbolicLinks.Insert(0, Target);
-	  }
-  }
-  else
-  {
-	  Directory->SymbolicLinks.PushSmart(Target);
-  }
+  Directory->MappedPaths.InsertSorted(mp, CompareMappedPaths);
 
   return true;
 }
@@ -566,6 +621,11 @@ bool csVFS::isDirectory(const char *path)
 
   // path is a directory
   return ((stats.st_mode & _S_IFDIR) != 0);
+}
+
+iFileSystem* csVFS::GetPlugin(size_t index)
+{
+  return fsPlugins.Get(index);
 }
 
 } CS_PLUGIN_NAMESPACE_END(vfs)
