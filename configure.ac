@@ -1399,35 +1399,6 @@ AS_IF([test $cs_cv_libsdl = yes],
 	[$cs_cv_libsdl_cflags], [$cs_cv_libsdl_lflags], [$cs_cv_libsdl_libs])])
 
 
-
-#------------------------------------------------------------------------------
-# Check for VOS.
-#------------------------------------------------------------------------------
-CS_CHECK_LIB_WITH([metaobject_a3dl],
-    [AC_LANG_PROGRAM(
-	[[#include <vos/metaobjects/a3dl/object3d.hh>]],
-	[A3DL::Object3D o(0); o.setPosition(0,0,0);])],
-    [], [C++], [], [], [], [], 
-    [-lboost_thread -lvutil -lvip -lvos], 
-    [libmetaobject_a3dl])
-
-AS_IF([test $cs_cv_libmetaobject_a3dl = yes],
-    [CS_CHECK_LIB_WITH([metaobject_misc],
-	[AC_LANG_PROGRAM(
-	    [[#include <vos/metaobjects/misc/metadata.hh>]],
-	    [VOS::Metadata m(0); m.setCreationTime(0);])],
-	[], [C++], [], [],
-	[$cs_cv_libmetaobject_a3dl_cflags],
-	[$cs_cv_libmetaobject_a3dl_lflags],
-	[$cs_cv_libmetaobject_a3dl_libs -lircclient],
-	[libmetaobject_misc])],
-    [cs_cv_libmetaobject_misc=no])
-
-AS_IF([test $cs_cv_libmetaobject_misc = yes],
-    [CS_EMIT_BUILD_RESULT([cs_cv_libmetaobject_misc], [VOS])])
-
-
-
 #------------------------------------------------------------------------------
 # Check for wxWidgets. Also check if it was built with OpenGL support since it
 # is required by the Crystal Space wxWidgets canvas.
