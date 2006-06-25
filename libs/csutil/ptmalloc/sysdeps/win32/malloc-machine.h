@@ -155,7 +155,7 @@ static __inline void* sharemem_init (size_t size, int* created)
   {
     char buf[64];
 
-    sprintf (buf, "ptmalloc-%u", GetCurrentProcessId());
+    sprintf (buf, "ptmalloc-%lu", GetCurrentProcessId());
     sharemem_mapping = OpenFileMappingA (FILE_MAP_ALL_ACCESS, FALSE,
       buf);
     if (sharemem_mapping == NULL)
@@ -194,7 +194,7 @@ static __inline void sharemem_destroy (void)
   HANDLE mapping;
   HANDLE* p;
 
-  sprintf (buf, "ptmalloc-%u", GetCurrentProcessId());
+  sprintf (buf, "ptmalloc-%lu", GetCurrentProcessId());
   mapping = OpenFileMappingA (FILE_MAP_ALL_ACCESS, FALSE, buf);
   if (mapping != 0)
   {
