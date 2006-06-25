@@ -592,8 +592,8 @@ Type &Class::getterFunc ()                                     \
 
 /**\name Platform-specific memory allocation
  * If built with ptmalloc support, these functions can be used to explicitly
- * call the platform's default malloc/free implementations. Useful when
- * interfacing with third party libraries.
+ * call the platform's default malloc/free resp. operator new/operator delete
+ * implementations. Useful when interfacing with third party libraries.
  */
 //@{
 inline void* platform_malloc (size_t n)
@@ -604,6 +604,19 @@ inline void* platform_realloc (void* p, size_t n)
 { return realloc (p, n); }
 inline void* platform_calloc (size_t n, size_t s)
 { return calloc (n, s); }
+
+namespace CS
+{
+  struct AllocPlatform {};
+}
+extern void* CS_CRYSTALSPACE_EXPORT operator new (size_t s, 
+  const CS::AllocPlatform&);
+extern void* CS_CRYSTALSPACE_EXPORT operator new[] (size_t s, 
+  const CS::AllocPlatform&);
+extern void CS_CRYSTALSPACE_EXPORT operator delete (void* p, 
+  const CS::AllocPlatform&);
+extern void CS_CRYSTALSPACE_EXPORT operator delete[] (void* p, 
+  const CS::AllocPlatform&);
 //@}
 
 #ifndef CS_NO_PTMALLOC
@@ -641,9 +654,14 @@ inline void* cs_calloc (size_t n, size_t s)
  * configure or defining <tt>CS_NO_PTMALLOC</tt> in 
  * <tt>include/csutil/win32/csconfig.h</tt> for MSVC.
  *
- * To disable ptmalloc for individual source files, define 
- * <tt>CS_NO_MALLOC_OVERRIDE</tt> resp. <tt>CS_NO_NEW_OVERRIDE</tt> before 
- * including <tt>cssysdef.h</tt>.
+ * To disable malloc overriding fot individual source files, define 
+ * <tt>CS_NO_MALLOC_OVERRIDE</tt> before  including <tt>cssysdef.h</tt>.
+ *
+ * new overriding can be disabled with <tt>CS_NO_NEW_OVERRIDE</tt>, 
+ * however, this is not recommended since it may result in mismatches
+ * between new and delete calls, where one may be overridden, while the
+ * other is not. If you need to call the platform's operator new,
+ * use operator new(size_t,const CS::AllocPlatform&).
  */
 //@{
 #ifndef CS_NO_MALLOC_OVERRIDE
@@ -658,40 +676,39 @@ inline void* cs_calloc (size_t n, size_t s)
   && !defined(CS_EXTENSIVE_MEMDEBUG) && !defined(CS_EXTENSIVE_MEMDEBUG_IMPLEMENT)
 
 #ifdef CS_NO_EXCEPTIONS
-inline void* operator new (size_t s)
+static inline void* operator new (size_t s)
 { return ptmalloc (s); }
-inline void* operator new[] (size_t s)
+static inline void* operator new[] (size_t s)
 { return ptmalloc (s); }
-inline void operator delete (void* p) 
+static inline void operator delete (void* p) 
 { ptfree (p); }
-inline void operator delete[] (void* p) 
+static inline void operator delete[] (void* p) 
 { ptfree (p); }
 #else
-#include <new>
-inline void* operator new (size_t s) throw (std::bad_alloc)
+static inline void* operator new (size_t s) throw (std::bad_alloc)
 { 
   void* p = ptmalloc (s);
   if (!p) throw std::bad_alloc();
   return p;
 }
-inline void* operator new[] (size_t s) throw (std::bad_alloc)
+static inline void* operator new[] (size_t s) throw (std::bad_alloc)
 { 
   void* p = ptmalloc (s);
   if (!p) throw std::bad_alloc();
   return p;
 }
-inline void operator delete (void* p) throw()
+static inline void operator delete (void* p) throw()
 { ptfree (p); }
-inline void operator delete[] (void* p) throw()
+static inline void operator delete[] (void* p) throw()
 { ptfree (p); }
 
-inline void* operator new (size_t s, const std::nothrow_t&) throw()
+static inline void* operator new (size_t s, const std::nothrow_t&) throw()
 { return ptmalloc (s); }
-inline void* operator new[] (size_t s, const std::nothrow_t&) throw()
+static inline void* operator new[] (size_t s, const std::nothrow_t&) throw()
 { return ptmalloc (s); }
-inline void operator delete (void* p, const std::nothrow_t&) throw()
+static inline void operator delete (void* p, const std::nothrow_t&) throw()
 { ptfree (p); }
-inline void operator delete[] (void* p, const std::nothrow_t&) throw()
+static inline void operator delete[] (void* p, const std::nothrow_t&) throw()
 { ptfree (p); }
 #endif // CS_NO_EXCEPTIONS
 
@@ -740,6 +757,12 @@ inline void operator delete (void* p, void*, int) { operator delete (p); }
 extern void* CS_CRYSTALSPACE_EXPORT operator new[] (size_t s, 
   void* filename, int line);
 inline void operator delete[] (void* p, void*, int) { operator delete[] (p); }
+
+static inline void* operator new (size_t s)
+{ return operator new (s, (void*)__FILE__, 0); }
+static inline void* operator new[] (size_t s)
+{ return operator new (s, (void*)__FILE__, 0); }
+
 #define CS_EXTENSIVE_MEMDEBUG_NEW new ((void*)CS_FUNCTION_NAME, __LINE__)
 #define new CS_EXTENSIVE_MEMDEBUG_NEW
 #endif
