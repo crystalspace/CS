@@ -81,35 +81,101 @@ csNativeFileSystem::~csNativeFileSystem()
 
 }
 
-csPtr<iFile> csNativeFileSystem::Open(const char * FileName, int mode)
+iFile* csNativeFileSystem::Open(const char * FileName, int mode)
 {
-	//csPhysicalFile* file = new csPhysicalFile(FileName, mode);
-	return 0;
+  csPhysicalFile* file;
+
+  if ((mode & VFS_FILE_MODE) == VFS_FILE_WRITE)
+        file = new csPhysicalFile(FileName, "wb");
+  else if ((mode & VFS_FILE_MODE) == VFS_FILE_APPEND)
+        file = new csPhysicalFile(FileName, "ab");
+  else
+        file = new csPhysicalFile(FileName, "rb");
+
+	return file;
 }
 
-csPtr<iDataBuffer> csNativeFileSystem::ReadFile(const char * FileName)
+bool csNativeFileSystem::Delete(const char * FileName)
 {
-	return 0;
-}
-
-bool csNativeFileSystem::WriteFile(const char * Name, const char * Data,
-								   size_t Size)
-{
-	return true;
-}
-
-bool csNativeFileSystem::DeleteFile(const char * FileName)
-{
-	return true;
+  return (unlink (FileName) == 0);
 }
 
 csVFSFileKind csNativeFileSystem::Exists(const char * FileName)
 {
-	return fkDoesNotExist;
+  struct stat stats;
+  if (stat (FileName, &stats) == 0)
+    return fkDoesNotExist;
+
+
+  if ((stats.st_mode & _S_IFDIR) != 0)
+    return fkFile;
+  else
+    return fkDirectory;
 }
 
 bool csNativeFileSystem::CanHandleMount(const char *FileName)
 {
+  struct stat stats;
+  if (stat (FileName, &stats) == 0)
+    return false;
+
+  return true;
+}
+
+void csNativeFileSystem::GetFilenames(const char *Path, const char *Mask,
+                                      iStringArray *Names)
+{
+  csString vpath;
+  DIR *dh;
+  struct dirent *de;
+
+  dh = opendir (Path);
+  if (dh == 0)
+    return;
+  while ((de = readdir (dh)) != 0)
+  {
+    if ((strcmp (de->d_name, ".") == 0) || (strcmp (de->d_name, "..") == 0))
+          continue;
+    if (!csGlobMatches (de->d_name, Mask))
+          continue;
+
+    Names->Push(de->d_name);
+  }
+  closedir (dh);
+}
+
+// Query file date/time.
+bool csNativeFileSystem::GetFileTime (const char *FileName, 
+                                      csFileTime &oTime) const
+{
+  struct stat st;
+
+  if (stat (FileName, &st))
+    return false;
+
+  const time_t mtime = st.st_mtime;
+  struct tm *curtm = localtime (&mtime);
+
+  ASSIGN_FILETIME (oTime, *curtm);
+
+  return true;
+}
+  
+// Set file date/time.
+bool csNativeFileSystem::SetFileTime (const char *FileName, 
+                                      const csFileTime &iTime)
+{
+  // Cannot do this in platform independant way
+  return true;
+}
+
+// Query file size (without opening it).
+bool csNativeFileSystem::GetFileSize (const char *FileName, size_t &oSize)
+{
+  struct stat st;
+  if (stat (FileName, &st))
+      return false;
+  oSize = st.st_size;
   return true;
 }
 
@@ -127,23 +193,12 @@ csArchiveFileSystem::~csArchiveFileSystem()
 
 }
 
-csPtr<iFile> csArchiveFileSystem::Open(const char * FileName, int mode)
+iFile* csArchiveFileSystem::Open(const char * FileName, int mode)
 {
 	return 0;
 }
 
-csPtr<iDataBuffer> csArchiveFileSystem::ReadFile(const char * FileName)
-{
-	return 0;
-}
-
-bool csArchiveFileSystem::WriteFile(const char * Name, const char * Data, 
-									size_t Size)
-{
-	return true;
-}
-
-bool csArchiveFileSystem::DeleteFile(const char * FileName)
+bool csArchiveFileSystem::Delete(const char * FileName)
 {
 	return true;
 }
@@ -167,4 +222,26 @@ bool csArchiveFileSystem::CanHandleMount(const char *FileName)
   return ret;
 }
 
+void csArchiveFileSystem::GetFilenames(const char *Path, const char *Mask, iStringArray *Names)
+{
+
+}
+
+// Query file date/time.
+bool csArchiveFileSystem::GetFileTime (const char *FileName, csFileTime &oTime) const
+{
+  return true;
+}
+  
+// Set file date/time.
+bool csArchiveFileSystem::SetFileTime (const char *FileName, const csFileTime &iTime)
+{
+  return true;
+}
+
+// Query file size (without opening it).
+bool csArchiveFileSystem::GetFileSize (const char *FileName, size_t &oSize)
+{
+  return true;
+}
 } CS_PLUGIN_NAMESPACE_END(vfs)

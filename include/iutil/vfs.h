@@ -210,38 +210,13 @@ struct iFileSystem: public virtual iBase
    *  invalidated iFile.  Use csRef<>::IsValid() to check validity.
    * \sa #VFS_FILE_MODE
    */
-  virtual csPtr<iFile> Open(const char * FileName, int mode) =0;
-  
-  /**
-   * Get an entire file at once. This is more effective than opening files 
-   * and reading the file in blocks.  Note that the returned buffer can 
-   * be null-terminated (so that it can be conveniently used with string 
-   * functions) but the extra null-terminator is not counted as part of the 
-   * returned size.
-   * \param FileName VFS path of the file to be read.
-   * \param nullterm Null-terminate the returned buffer.
-   * \return An iDataBuffer containing the file contents if the file was opened
-   *  and read successfully, otherwise an invalidated iFile.  Use
-   *  csRef<>::IsValid() to check validity.
-   * \remarks Null-termination might have a performance penalty (dependent on
-   *  where the file is stored.) Use only when needed.
-   */
-  virtual csPtr<iDataBuffer> ReadFile(const char * FileName) =0;
-  
-  /**
-   * Write an entire file in one pass.
-   * \param Name Name of file to write.
-   * \param Data Pointer to the data to be written.
-   * \param Size Number of bytes to write.
-   * \return True if the write succeeded, else false.
-   */
-  virtual bool WriteFile(const char * Name, const char * Data, size_t Size) =0;
-  
+  virtual iFile* Open(const char * FileName, int mode) =0;
+    
   /**
    * Delete a file on VFS
    * \return True if the deletion succeeded, else false.
    */
-  virtual bool DeleteFile(const char * FileName) =0;
+  virtual bool Delete(const char * FileName) =0;
   
   /**
   * Check if a file exists in the VFS, and query the type of file.
@@ -256,6 +231,30 @@ struct iFileSystem: public virtual iBase
    * \return True if it can, else false
    */
   virtual bool CanHandleMount(const char *FileName) = 0;
+
+  /*
+   * Get the names of all files within the path (similar to unix 'ls' command)
+   * \param Path The path to query
+   * \param Names The array that will hold the names of the files
+   */
+  virtual void GetFilenames(const char *Path, const char *Mask, iStringArray *Names) = 0;
+
+  /**
+   * Query file date/time.
+   * \return True if the query succeeded, else false.
+   */
+  virtual bool GetFileTime (const char *FileName, csFileTime &oTime) const = 0;
+  /**
+   * Set file date/time.
+   * \return True if the operation succeeded, else false.
+   */
+  virtual bool SetFileTime (const char *FileName, const csFileTime &iTime) = 0;
+
+  /**
+   * Query file size (without opening it).
+   * \return True if the query succeeded, else false.
+   */
+  virtual bool GetFileSize (const char *FileName, size_t &oSize) = 0;
 };
 
 /**
@@ -548,7 +547,7 @@ struct iVFS : public virtual iBase
    * /param index The index of the plugin
    * /return The iFileSystem plugin
    */
-  virtual iFileSystem* GetPlugin(size_t index) = 0;
+  virtual iFileSystem* GetPlugin(size_t index) const = 0;
 };
 
 /** @} */

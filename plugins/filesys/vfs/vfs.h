@@ -161,7 +161,7 @@ public:
   virtual bool Mount(const char *VirtualPath, const char *RealPath, int priority, size_t plugin = 0);
 
   /// Return a filesystem plugin
-  virtual iFileSystem* GetPlugin(size_t index);
+  virtual iFileSystem* GetPlugin(size_t index) const;
 
 private:
 
@@ -183,6 +183,9 @@ private:
   /// A stack to implement directory changes
   VfsVector DirectoryStack;
 
+  /// A counter for ChDirAuto
+  int auto_name_counter;
+
   /// Get the directory node
   VfsNode* GetDirectoryNode(const char *path) const;
 
@@ -192,6 +195,12 @@ private:
 
   // Check if the path is a valid real directory
   bool isDirectory(const char *path);
+
+  // Expand Path
+  csString _ExpandPath (const char *Path) const;
+
+  // Try change directory
+  bool TryChDirAuto(const char *Path, const char *FileName);
 
 protected:
   friend class VfsNode;

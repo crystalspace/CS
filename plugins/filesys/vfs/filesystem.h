@@ -86,30 +86,28 @@ public:
   virtual bool Initialize (iObjectRegistry *object_reg);
 
   /// Replacement for standard fopen()
-  virtual csPtr<iFile> Open(const char * FileName, int mode) = 0;
-
-  /**
-   * Get an entire file at once. You should delete[] returned data
-   * after usage. This is more effective than opening files and reading
-   * the file in blocks.  Note that the returned buffer is always null-
-   * terminated (so that it can be conveniently used with string functions)
-   * but the extra null-terminator is not counted as part of the returned 
-   * size.
-   */
-  virtual csPtr<iDataBuffer> ReadFile(const char * FileName) = 0;
-
-  /// Write an entire file in one pass.
-  virtual bool WriteFile(const char * Name, const char * Data, size_t Size) 
-	  = 0;
+  virtual iFile* Open(const char * FileName, int mode) = 0;
 
   /// Delete a file on VFS
-  virtual bool DeleteFile(const char * FileName) = 0;
+  virtual bool Delete(const char * FileName) = 0;
 
   // Check if must be abstract
   virtual csVFSFileKind Exists(const char * FileName)  = 0;
 
   // Can this plugin handle a mount
   virtual bool CanHandleMount(const char *FileName) = 0;
+
+  // Get names of files within the path
+  virtual void GetFilenames(const char *Path, const char *Mask, iStringArray *Names) = 0;
+
+  // Query file date/time.
+  virtual bool GetFileTime (const char *FileName, csFileTime &oTime) const = 0;
+  
+  // Set file date/time.
+  virtual bool SetFileTime (const char *FileName, const csFileTime &iTime) = 0;
+
+  // Query file size (without opening it).
+  virtual bool GetFileSize (const char *FileName, size_t &oSize) = 0;
 
 protected:
   /// The constructor for csFileSystem
@@ -136,28 +134,28 @@ public:
   virtual ~csNativeFileSystem();
 
 	/// Replacement for standard fopen()
-  virtual csPtr<iFile> Open(const char * FileName, int mode);
-
-  /**
-   * Get an entire file at once. You should delete[] returned data
-   * after usage. This is more effective than opening files and reading
-   * the file in blocks.  Note that the returned buffer is always null-
-   * terminated (so that it can be conveniently used with string functions)
-   * but the extra null-terminator is not counted as part of the returned size.
-   */
-  virtual csPtr<iDataBuffer> ReadFile(const char * FileName);
-
-  /// Write an entire file in one pass.
-  virtual bool WriteFile(const char * Name, const char * Data, size_t Size);
+  virtual iFile* Open(const char * FileName, int mode);
 
   /// Delete a file on VFS
-  virtual bool DeleteFile(const char * FileName);
+  virtual bool Delete(const char * FileName);
 
   // Check if must be abstract
   virtual csVFSFileKind Exists(const char * FileName);
 
   // Can this plugin handle a mount
   virtual bool CanHandleMount(const char *FileName);
+
+  // Get names of files within the path
+  virtual void GetFilenames(const char *Path, const char *Mask, iStringArray *Names);
+
+  // Query file date/time.
+  virtual bool GetFileTime (const char *FileName, csFileTime &oTime) const;
+  
+  // Set file date/time.
+  virtual bool SetFileTime (const char *FileName, const csFileTime &iTime);
+
+  // Query file size (without opening it).
+  virtual bool GetFileSize (const char *FileName, size_t &oSize);
 };
 
 
@@ -175,28 +173,28 @@ public:
   virtual ~csArchiveFileSystem();
 
 	/// Replacement for standard fopen()
-  virtual csPtr<iFile> Open(const char * FileName, int mode);
-
-  /**
-   * Get an entire file at once. You should delete[] returned data
-   * after usage. This is more effective than opening files and reading
-   * the file in blocks.  Note that the returned buffer is always null-
-   * terminated (so that it can be conveniently used with string functions)
-   * but the extra null-terminator is not counted as part of the returned size.
-   */
-  virtual csPtr<iDataBuffer> ReadFile(const char * FileName);
-
-  /// Write an entire file in one pass.
-  virtual bool WriteFile(const char * Name, const char * Data, size_t Size);
+  virtual iFile* Open(const char * FileName, int mode);
 
   /// Delete a file on VFS
-  virtual bool DeleteFile(const char * FileName);
+  virtual bool Delete(const char * FileName);
 
   // Check if must be abstract
   virtual csVFSFileKind Exists(const char * FileName);
 
   // Can this plugin handle a mount
   virtual bool CanHandleMount(const char *FileName);
+
+  // Get names of files within the path
+  virtual void GetFilenames(const char *Path, const char *Mask, iStringArray *Names);
+
+    // Query file date/time.
+  virtual bool GetFileTime (const char *FileName, csFileTime &oTime) const;
+  
+  // Set file date/time.
+  virtual bool SetFileTime (const char *FileName, const csFileTime &iTime);
+
+  // Query file size (without opening it).
+  virtual bool GetFileSize (const char *FileName, size_t &oSize);
 };
 
 } CS_PLUGIN_NAMESPACE_END(vfs)
