@@ -6,6 +6,8 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+25-Jun-2006
+        - Piotr Obrzut added setting color feature for flare halo components.
 24-Jun-2006
 	- Peter Amstutz deleted the vos plugin from the Crystal Space tree,
 	  as it will now be maintained directly as part of the VOS tree.

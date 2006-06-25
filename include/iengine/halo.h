@@ -103,9 +103,15 @@ struct iFlareHalo : public virtual iBase
    * Add a visual component to the flare.
    * give position, size, image and mixmode.
    * The component is added at the end of the list - to be displayed last.
+   * Returns added component id.
    */
-  virtual void AddComponent (float pos, float w, float h, uint mode,
+  virtual uint AddComponent (float pos, float w, float h, uint mode,
     iMaterialWrapper *image) = 0;
+
+  /**
+   * Set component color, use id retrieved from AddComponent.
+   */
+  virtual void SetComponentColor (uint component, const csVector4& color) = 0;
 };
 
 /** @} */
