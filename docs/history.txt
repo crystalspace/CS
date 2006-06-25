@@ -7,10 +7,10 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 25-Jun-2006
-        - Added decal support for thing mesh.
-        - Fixed a problem in csPoly3D when a polygon with less than 3 vertices
+        - Andrew Robberts added decal support for thing mesh.
+        - Andrew Robberts fixed a problem in csPoly3D when a polygon with less than 3 vertices
           was clipped
-        - Added a TestPolygons function to iMeshObject which builds a list of
+        - Andrew Robberts added a TestPolygons function to iMeshObject which builds a list of
           all polygons in or intersecting a sphere.  Added an implementation
           thing mesh.
 24-Jun-2006
