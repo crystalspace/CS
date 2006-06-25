@@ -192,6 +192,12 @@ public:
   }
   /** @} */
 
+  virtual size_t TestPolygons(const csVector3 * center, float radius,
+      iPolygonCallback * polyCallback)
+  {
+    return 0;
+  }
+
   /**\name iRenderBufferAccessor implementation
    * @{ */
   class RenderBufferAccessor : 

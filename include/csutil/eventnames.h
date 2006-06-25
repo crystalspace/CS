@@ -27,6 +27,7 @@
 #include "iutil/objreg.h"
 #include "csutil/hash.h"
 #include "csutil/strset.h"
+#include "csutil/csstring.h"
 
 /**\file
  * Event naming and name relations

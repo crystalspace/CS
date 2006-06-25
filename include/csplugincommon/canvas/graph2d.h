@@ -30,6 +30,7 @@
 #include "csutil/scf.h"
 #include "csutil/scf_implementation.h"
 #include "csutil/weakref.h"
+#include "csutil/csstring.h"
 
 #include "iutil/comp.h"
 #include "iutil/dbghelp.h"

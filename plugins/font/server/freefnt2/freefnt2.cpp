@@ -28,16 +28,19 @@
 #include "iutil/plugin.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
+
 #include <ft2build.h>
 #include FT_INTERNAL_OBJECTS_H
 #include FT_FREETYPE_H
 #include FT_GLYPH_H
 #include FT_MODULE_H
+
 #include "freefnt2.h"
 
 CS_IMPLEMENT_PLUGIN
 
-using namespace CS::Plugins::FreeFont2;
+CS_PLUGIN_NAMESPACE_BEGIN(FreeFont2)
+{
 
 SCF_IMPLEMENT_FACTORY (csFreeType2Server)
 
@@ -437,7 +440,7 @@ csPtr<iDataBuffer> csFreeType2Font::GetGlyphAlphaBitmap (utf32_char c,
   int stride = face->face->glyph->bitmap.width;
   int maxrows = (size->metrics.height + 63) >> 6;
   int bitmapsize = maxrows * stride;
-  // malloc at least 1 byte (malloc 0 bytes is undefined).
+  // Allocate at least 1 byte
   uint8* bitmap = (bitmapsize > 0) ? new uint8 [bitmapsize] : new uint8[1];
   memset (bitmap, 0, bitmapsize);
 
@@ -665,3 +668,5 @@ int csFreeType2Font::GetUnderlineThickness ()
   return underline_thickness;
 }
 
+}
+CS_PLUGIN_NAMESPACE_END(FreeFont2)

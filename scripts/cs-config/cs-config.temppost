@@ -3,30 +3,39 @@
 libdir=""
 lflags=""
 
-if test -r "$prefix/Jamfile" && \
-    test -r "$prefix/$makeout/libs/libcrystalspace.a"; then
-    libdir="$prefix/$makeout/libs"
-    lflags="-L$libdir"
-elif test -z "$libdir" && test -r "${exec_prefix}/lib/libcrystalspace.a"; then
-    libdir="${exec_prefix}/lib"
-    lflags="-L${exec_prefix}/lib"
-else
-    my_IFS=$IFS; IFS=$PATH_SEPARATOR
-    for p in $CRYSTAL
-    do
-	if test -r "$p/Jamfile" && \
-	    test -r "$p/$makeout/libs/libcrystalspace.a"; then
-	    libdir="$p/$makeout/libs"
-	    lflags="-L$libdir"
-	    break
-	elif test -z "$libdir" && test -r "${p}/lib/libcrystalspace.a"; then
-	    libdir="${p}/lib"
-	    lflags="-L$libdir"
-	    break
-	fi
-    done
-    IFS=$my_IFS
-fi
+for libname in libcrystalspace.so \
+	       libcrystalspace.dylib \
+	       libcrystalspace.dll.a \
+	       libcrystalspace.a \
+	       ; do
+    if test -r "$prefix/Jamfile" && \
+	test -r "$prefix/$makeout/libs/$libname"; then
+	libdir="$prefix/$makeout/libs"
+	lflags="-L$libdir"
+    elif test -z "$libdir" && test -r "${exec_prefix}/lib/$libname"; then
+	libdir="${exec_prefix}/lib"
+	lflags="-L${exec_prefix}/lib"
+    else
+	my_IFS=$IFS; IFS=$PATH_SEPARATOR
+	for p in $CRYSTAL
+	  do
+	  if test -r "$p/Jamfile" && \
+	      test -r "$p/$makeout/libs/$libname"; then
+	      libdir="$p/$makeout/libs"
+	      lflags="-L$libdir"
+	      break
+	  elif test -z "$libdir" && test -r "${p}/lib/$libname"; then
+	      libdir="${p}/lib"
+	      lflags="-L$libdir"
+	      break
+	  fi
+	done
+	IFS=$my_IFS
+    fi
+    if test -n "$lflags" ; then
+        break
+    fi
+done
 
 # Check for optional libs, add to list if present.
 

@@ -25,6 +25,7 @@ SubInclude TOP plugins sndsys ;
 SubInclude TOP plugins stdrep ;
 SubInclude TOP plugins terraformer ;
 SubInclude TOP plugins video ;
+SubInclude TOP plugins decal ;
 
 # Assemble big static plugins lib
 if [ Property build : projgen ] = msvc

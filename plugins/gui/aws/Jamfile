@@ -22,6 +22,7 @@ if ! [ Property build : projgen ]
     local parseh = [ DoObjectGrist skinpars.hpp ] ;
     Depends $(lex) : $(parse) ;
     Includes $(parse) : $(parseh) ;
+    Clean awsclean : $(lex) $(parse) $(parseh) ;
 
     # @@@ Have the build order above respected for static builds.
     {

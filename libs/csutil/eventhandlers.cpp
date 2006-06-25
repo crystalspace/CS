@@ -43,21 +43,22 @@ csEventHandlerRegistry::~csEventHandlerRegistry()
 {
 }
 
-csHandlerID csEventHandlerRegistry::GetGenericID (const csString &name)
+csHandlerID csEventHandlerRegistry::GetGenericID (const char *name)
 {
-  CS_ASSERT (name.FindFirst(':') == (size_t)-1);
+  csString nameStr = name;
+  CS_ASSERT (nameStr.FindFirst(':') == (size_t)-1);
   csHandlerID res;
-  if (names.Contains(name)) 
+  if (names.Contains(nameStr)) 
   {
-    res = names.Request(name);
+    res = names.Request(nameStr);
   } 
   else 
   {
-    res = names.Request(name);
+    res = names.Request(nameStr);
     csString p;
-    p = name + csString(":pre");
+    p = nameStr + ":pre";
     handlerPres.PutUnique(res, names.Request((const char *)p));
-    p = name + csString(":post");
+    p = nameStr + ":post";
     handlerPosts.PutUnique(res, names.Request((const char *)p));
   }
   return res;
@@ -97,7 +98,7 @@ csHandlerID csEventHandlerRegistry::GetID (iEventHandler *handler)
   return res;
 }
 
-csHandlerID csEventHandlerRegistry::GetID (csString &name)
+csHandlerID csEventHandlerRegistry::GetID (const char *name)
 {
   return names.Request (name);
 }
@@ -170,9 +171,9 @@ csRef<iEventHandlerRegistry> csEventHandlerRegistry::GetRegistry (
 
 
 CS_CONST_METHOD const csHandlerID * 
-FrameSignpost_Logic3D::GenericPrec(csRef<iEventHandlerRegistry> &r1,
-				   csRef<iEventNameRegistry> &r2,
-				   csEventID e) const
+FrameSignpost_Logic3D::GenericPrec(csRef<iEventHandlerRegistry> &,
+				   csRef<iEventNameRegistry> &,
+				   csEventID) const
 {
   return 0;
 }
@@ -194,9 +195,9 @@ FrameSignpost_Logic3D::GenericSucc(csRef<iEventHandlerRegistry> &r1,
 
 
 CS_CONST_METHOD const csHandlerID * 
-FrameSignpost_3D2D::GenericPrec(csRef<iEventHandlerRegistry> &r1,
-				csRef<iEventNameRegistry> &r2,
-				csEventID e) const
+FrameSignpost_3D2D::GenericPrec(csRef<iEventHandlerRegistry> &,
+				csRef<iEventNameRegistry> &,
+				csEventID) const
 {
   return 0;
 }
@@ -218,9 +219,9 @@ FrameSignpost_3D2D::GenericSucc(csRef<iEventHandlerRegistry> &r1,
 
 
 CS_CONST_METHOD const csHandlerID * 
-FrameSignpost_2DConsole::GenericPrec(csRef<iEventHandlerRegistry> &r1,
-				   csRef<iEventNameRegistry> &r2,
-				   csEventID e) const
+FrameSignpost_2DConsole::GenericPrec(csRef<iEventHandlerRegistry> &,
+				   csRef<iEventNameRegistry> &,
+				   csEventID) const
 {
   return 0;
 }
@@ -242,9 +243,9 @@ FrameSignpost_2DConsole::GenericSucc(csRef<iEventHandlerRegistry> &r1,
 
 
 CS_CONST_METHOD const csHandlerID * 
-FrameSignpost_ConsoleDebug::GenericPrec(csRef<iEventHandlerRegistry> &r1,
-					csRef<iEventNameRegistry> &r2,
-					csEventID e) const
+FrameSignpost_ConsoleDebug::GenericPrec(csRef<iEventHandlerRegistry> &,
+					csRef<iEventNameRegistry> &,
+					csEventID) const
 {
   return 0;
 }
@@ -266,17 +267,17 @@ FrameSignpost_ConsoleDebug::GenericSucc(csRef<iEventHandlerRegistry> &r1,
 
 
 CS_CONST_METHOD const csHandlerID * 
-FrameSignpost_DebugFrame::GenericPrec(csRef<iEventHandlerRegistry> &r1,
-				      csRef<iEventNameRegistry> &r2,
-				      csEventID e) const
+FrameSignpost_DebugFrame::GenericPrec(csRef<iEventHandlerRegistry> &,
+				      csRef<iEventNameRegistry> &,
+				      csEventID) const
 {
   return 0;
 }
 
 CS_CONST_METHOD const csHandlerID * 
-FrameSignpost_DebugFrame::GenericSucc(csRef<iEventHandlerRegistry> &r1,
-				      csRef<iEventNameRegistry> &r2,
-				      csEventID e) const 
+FrameSignpost_DebugFrame::GenericSucc(csRef<iEventHandlerRegistry> &,
+				      csRef<iEventNameRegistry> &,
+				      csEventID) const 
 {
   return 0;
 }

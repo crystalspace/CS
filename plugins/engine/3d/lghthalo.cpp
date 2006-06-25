@@ -157,17 +157,17 @@ bool csLightHalo::IsVisible (iCamera* camera, csEngine* Engine, csVector3 &v)
     v.x = v.x * iz + camera->GetShiftX ();
     v.y = Engine->frameHeight - 1 - (v.y * iz + camera->GetShiftY ());
 
-    if (Engine->GetTopLevelClipper ()->GetClipper ()->IsInside (csVector2 (v.x, v.y)))
+    if (Engine->GetTopLevelClipper ()->GetClipper ()->IsInside (
+    	csVector2 (v.x, v.y)))
     {
-      csVector3 isect;
-      int polyidx = 0;
-      if(camera->GetSector ()->HitBeamPortals (
-	camera->GetTransform().GetOrigin(),
-	Light->GetFullCenter(), isect, &polyidx))
-	  return false; // hit a mesh
-      if(polyidx != -1) // double check on the above if
-	return false; // hit a polygon
-      return true;
+        csSectorHitBeamResult hbresult;
+        hbresult = camera->GetSector ()->HitBeamPortals (
+	    camera->GetTransform().GetOrigin(),	Light->GetFullCenter());
+        if(hbresult.mesh)
+            return false; // hit a mesh
+        if(hbresult.polygon_idx != -1) // double check on the above if
+            return false; // hit a polygon
+        return true;
     }
   }
 

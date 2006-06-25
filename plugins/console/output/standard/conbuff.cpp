@@ -20,6 +20,9 @@
 #include "csutil/csstring.h"
 #include "conbuff.h"
 
+CS_PLUGIN_NAMESPACE_BEGIN(ConOut)
+{
+
 csConsoleBuffer::csConsoleBuffer (int length, int size)
 {
   buffer = 0;
@@ -208,3 +211,6 @@ void csConsoleBuffer::DeleteLine(int line)
   buffer [pos] = 0;
   dirty [pos] = true;
 }
+
+}
+CS_PLUGIN_NAMESPACE_END(ConOut)

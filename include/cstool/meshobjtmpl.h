@@ -233,6 +233,11 @@ public:
    */
   virtual void PositionChild (iMeshObject* /*child*/,csTicks /*current_time*/) { }
 
+  virtual size_t TestPolygons(const csVector3 * center, float radius,
+      iPolygonCallback * polyCallback)
+  {
+    return 0;
+  }
   /**
    * See imesh/objmodel.h for specification. The default implementation
    * returns an infinite bounding box.

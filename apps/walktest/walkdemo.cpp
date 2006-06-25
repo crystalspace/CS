@@ -23,6 +23,7 @@
 #include "csgeom/poly3d.h"
 #include "cstool/collider.h"
 #include "cstool/cspixmap.h"
+#include "csutil/csstring.h"
 #include "csutil/flags.h"
 #include "csutil/scanstr.h"
 #include "iengine/camera.h"
@@ -53,6 +54,7 @@
 #include "ivaria/reporter.h"
 #include "ivaria/view.h"
 #include "ivideo/graph3d.h"
+#include "igeom/decal.h"
 
 #include "bot.h"
 #include "command.h"
@@ -676,6 +678,51 @@ void fire_missile ()
     sp->GetMovable ()->SetTransform (m);
     sp->GetMovable ()->UpdateMove ();
   }
+}
+
+void test_decal ()
+{
+  csRef<iDecalManager> decalMgr = csLoadPluginCheck<iDecalManager> (
+  	Sys->object_reg, "crystalspace.decal.manager");
+  if (!decalMgr)
+    return;
+
+  iMaterialWrapper * material = 
+    Sys->view->GetEngine()->GetMaterialList()->FindByName("decal");
+  if (!material)
+  {
+    csRef<iLoader> loader = csQueryRegistry<iLoader>(Sys->object_reg);
+    if (!loader)
+    {
+      Sys->Report(CS_REPORTER_SEVERITY_NOTIFY, "Couldn't find iLoader");
+      return; 
+    }
+
+    if (!loader->LoadTexture ("decal", "/this/data/pokey.gif"))
+      Sys->Report(CS_REPORTER_SEVERITY_NOTIFY, 
+                  "Couldn't load decal texture!");
+
+    material = Sys->view->GetEngine()->GetMaterialList()->FindByName("decal");
+    if (!material)
+    {
+      Sys->Report(CS_REPORTER_SEVERITY_NOTIFY, 
+                  "Error finding decal material");
+      return;
+    }
+  }
+  
+  csVector3 start = Sys->view->GetCamera()->GetTransform().GetOrigin();
+  csVector3 end = start + 
+    Sys->view->GetCamera()->GetTransform().This2OtherRelative(
+        csVector3(0,0,1)) * 100.0f;
+  
+  csVector3 normal = start - end;
+  csVector3 up =
+    Sys->view->GetCamera()->GetTransform().This2OtherRelative(
+        csVector3(0,1,0));
+
+  decalMgr->ProjectDecal(material, Sys->view->GetCamera()->GetSector(), 
+      &start, &end, &up, &normal, 1.0f, 1.0f);
 }
 
 void AttachRandomLight (iLight* light)

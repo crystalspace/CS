@@ -78,7 +78,7 @@ public:
 private:
   iObjectRegistry * obj_reg;
   /// Variables used for evaluation
-  csShaderVarStack* stacks;
+  csRef<iShaderVarStack> stacks;
   /// String set for producing String IDs
   csRef<iStringSet> strset;
   /// Compiled array of opcodes for evaluation
@@ -163,6 +163,8 @@ private:
   	oper_arg & output) const;
   bool eval_vec_len(const oper_arg & arg1, oper_arg & output) const;
   bool eval_normal(const oper_arg & arg1, oper_arg & output) const;
+  /// Floor operator
+  bool eval_floor(const oper_arg & arg1, oper_arg & output) const;
 
   bool eval_pow(const oper_arg & arg1, const oper_arg & arg2,
   	oper_arg & output) const;
@@ -220,11 +222,14 @@ public:
 
   /// Parse in the XML in the context of a symbol table.
   bool Parse(iDocumentNode *);
+  //@{
   /**
    * Evaluate this expression into a variable.
    * It will use the symbol table it was initialized with.
    */
   bool Evaluate(csShaderVariable *, csShaderVarStack& stacks);
+  bool Evaluate(csShaderVariable *, iShaderVarStack* stacks);
+  //@}
 
   /// Retrieve the error message if the evaluation or parsing failed.
   const char* GetError() const { return errorMsg; }

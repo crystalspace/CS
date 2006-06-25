@@ -57,8 +57,8 @@ int csCEGUIScriptModule::executeScriptGlobal (
 }
 
 bool csCEGUIScriptModule::executeScriptedEventHandler (
-  const CEGUI::String &handler_name,
-  const CEGUI::EventArgs &e)
+  const CEGUI::String & /*handler_name*/,
+  const CEGUI::EventArgs & /*e*/)
 {
   // @@@: Not implemented
 

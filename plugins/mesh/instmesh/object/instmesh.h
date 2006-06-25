@@ -307,6 +307,12 @@ public:
   */
   virtual void PositionChild (iMeshObject* /*child*/, csTicks /*current_time*/) { }
 
+  virtual size_t TestPolygons(const csVector3 * center, float radius,
+      iPolygonCallback * polyCallback)
+  {
+    return 0;
+  }
+
   /// Calculate bounding box and radius.
   void CalculateBBoxRadius ();
   const csBox3& GetObjectBoundingBox ();

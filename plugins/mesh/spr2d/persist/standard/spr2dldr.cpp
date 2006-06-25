@@ -59,58 +59,18 @@ enum
   XMLTOKEN_ANIMATE
 };
 
-SCF_IMPLEMENT_IBASE (csSprite2DFactoryLoader)
-  SCF_IMPLEMENTS_INTERFACE (iLoaderPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csSprite2DFactoryLoader::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csSprite2DFactorySaver)
-  SCF_IMPLEMENTS_INTERFACE (iSaverPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csSprite2DFactorySaver::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csSprite2DLoader)
-  SCF_IMPLEMENTS_INTERFACE (iLoaderPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csSprite2DLoader::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csSprite2DSaver)
-  SCF_IMPLEMENTS_INTERFACE (iSaverPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csSprite2DSaver::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 SCF_IMPLEMENT_FACTORY (csSprite2DFactoryLoader)
 SCF_IMPLEMENT_FACTORY (csSprite2DFactorySaver)
 SCF_IMPLEMENT_FACTORY (csSprite2DLoader)
 SCF_IMPLEMENT_FACTORY (csSprite2DSaver)
 
-
-csSprite2DFactoryLoader::csSprite2DFactoryLoader (iBase* pParent)
+csSprite2DFactoryLoader::csSprite2DFactoryLoader (iBase* pParent) :
+  scfImplementationType(this, pParent)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 csSprite2DFactoryLoader::~csSprite2DFactoryLoader ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csSprite2DFactoryLoader::Initialize (iObjectRegistry* object_reg)
@@ -268,16 +228,13 @@ csPtr<iBase> csSprite2DFactoryLoader::Parse (iDocumentNode* node,
 }
 
 //---------------------------------------------------------------------------
-csSprite2DFactorySaver::csSprite2DFactorySaver (iBase* pParent)
+csSprite2DFactorySaver::csSprite2DFactorySaver (iBase* pParent) :
+  scfImplementationType(this, pParent)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 csSprite2DFactorySaver::~csSprite2DFactorySaver ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csSprite2DFactorySaver::Initialize (iObjectRegistry* object_reg)
@@ -356,16 +313,13 @@ bool csSprite2DFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent,
 }
 //---------------------------------------------------------------------------
 
-csSprite2DLoader::csSprite2DLoader (iBase* pParent)
+csSprite2DLoader::csSprite2DLoader (iBase* pParent) :
+  scfImplementationType(this, pParent)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 csSprite2DLoader::~csSprite2DLoader ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csSprite2DLoader::Initialize (iObjectRegistry* object_reg)
@@ -400,7 +354,7 @@ csPtr<iBase> csSprite2DLoader::Parse (iDocumentNode* node,
 {
   csRef<iMeshObject> mesh;
   csRef<iSprite2DState> spr2dLook;
-  csColoredVertices* verts = 0;
+  iColoredVertices* verts = 0;
   int vnum = 0;
   int uvnum = 0;
   int colnum = 0;
@@ -435,7 +389,7 @@ csPtr<iBase> csSprite2DLoader::Parse (iDocumentNode* node,
 		factname);
 	    return 0;
 	  }
-	  verts = &(spr2dLook->GetVertices ());
+	  verts = spr2dLook->GetVertices ();
 	}
 	break;
       case XMLTOKEN_MATERIAL:
@@ -468,11 +422,12 @@ csPtr<iBase> csSprite2DLoader::Parse (iDocumentNode* node,
 	  float y = child->GetAttributeValueAsFloat ("y");
 	  vnum++;
 	  if (vnum > uvnum && vnum > colnum)
-	    verts->SetLength (vnum);
-	  (*verts)[vnum-1].pos.x = x;
-	  (*verts)[vnum-1].pos.y = y;
-	  (*verts)[vnum-1].color_init.Set (0, 0, 0);
-	  (*verts)[vnum-1].color.Set (0, 0, 0);
+	    verts->SetSize (vnum);
+          csSprite2DVertex& v = verts->Get (vnum-1);
+	  v.pos.x = x;
+	  v.pos.y = y;
+	  v.color_init.Set (0, 0, 0);
+	  v.color.Set (0, 0, 0);
         }
         break;
       case XMLTOKEN_UV:
@@ -481,9 +436,10 @@ csPtr<iBase> csSprite2DLoader::Parse (iDocumentNode* node,
 	  float v = child->GetAttributeValueAsFloat ("v");
 	  uvnum++;
 	  if (uvnum > vnum && uvnum > colnum)
-	    verts->SetLength (uvnum);
-	  (*verts)[uvnum-1].u = u;
-	  (*verts)[uvnum-1].v = v;
+	    verts->SetSize (uvnum);
+          csSprite2DVertex& V = verts->Get (uvnum-1);
+	  V.u = u;
+	  V.v = v;
         }
         break;
       case XMLTOKEN_COLOR:
@@ -493,10 +449,11 @@ csPtr<iBase> csSprite2DLoader::Parse (iDocumentNode* node,
 	  float b = child->GetAttributeValueAsFloat ("blue");
 	  colnum++;
 	  if (colnum > vnum && colnum > uvnum)
-	    verts->SetLength (colnum);
-	  (*verts)[colnum-1].color_init.red = r;
-	  (*verts)[colnum-1].color_init.green = g;
-	  (*verts)[colnum-1].color_init.blue = b;
+	    verts->SetSize (colnum);
+          csSprite2DVertex& v = verts->Get (colnum-1);
+	  v.color_init.red = r;
+	  v.color_init.green = g;
+	  v.color_init.blue = b;
         }
         break;
       case XMLTOKEN_LIGHTING:
@@ -541,16 +498,13 @@ csPtr<iBase> csSprite2DLoader::Parse (iDocumentNode* node,
 
 //---------------------------------------------------------------------------
 
-csSprite2DSaver::csSprite2DSaver (iBase* pParent)
+csSprite2DSaver::csSprite2DSaver (iBase* pParent) :
+  scfImplementationType(this, pParent)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 csSprite2DSaver::~csSprite2DSaver ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csSprite2DSaver::Initialize (iObjectRegistry* object_reg)
@@ -590,23 +544,21 @@ bool csSprite2DSaver::WriteDown (iBase* obj, iDocumentNode* parent,
   }
 
   //Writedown vertex tag
-  csColoredVertices vertex = sprite->GetVertices();
-  csColoredVertices::Iterator iter = vertex.GetIterator();
-  while (iter.HasNext())
+  iColoredVertices* vertices = sprite->GetVertices();
+  for (size_t i = 0; i < vertices->GetSize(); i++)
   {
-    csSprite2DVertex vertex = iter.Next();
+    const csSprite2DVertex& vertex = vertices->Get (i);
 
     csRef<iDocumentNode> vNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
     vNode->SetValue("v");
     vNode->SetAttributeAsFloat("x", vertex.pos.x);
-    vNode->SetAttributeAsFloat("x", vertex.pos.y);
+    vNode->SetAttributeAsFloat("y", vertex.pos.y);
   }
 
   //Writedown uv tag
-  iter.Reset();
-  while (iter.HasNext())
+  for (size_t i = 0; i < vertices->GetSize(); i++)
   {
-    csSprite2DVertex vertex = iter.Next();
+    const csSprite2DVertex& vertex = vertices->Get (i);
 
     csRef<iDocumentNode> uvNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
     uvNode->SetValue("uv");
@@ -630,10 +582,9 @@ bool csSprite2DSaver::WriteDown (iBase* obj, iDocumentNode* parent,
   }    
 
   //Writedown color tag
-  iter.Reset();
-  while (iter.HasNext())
+  for (size_t i = 0; i < vertices->GetSize(); i++)
   {
-    csSprite2DVertex vertex = iter.Next();
+    const csSprite2DVertex& vertex = vertices->Get (i);
 
     csRef<iDocumentNode> colorNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
     colorNode->SetValue("color");

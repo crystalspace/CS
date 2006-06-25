@@ -56,7 +56,8 @@ public:
 };
 
 /// a haze hull
-class csHazeHull : public iHazeHull
+class csHazeHull :
+  public scfImplementation1<csHazeHull, iHazeHull>
 {
 protected:
   /// total counts
@@ -75,7 +76,6 @@ protected:
   int **pol_edges;
 
 public:
-  SCF_DECLARE_IBASE;
   /// create empty, new[] content by subclass.
   csHazeHull();
   /// destructs content, using delete[].
@@ -139,62 +139,57 @@ public:
 
 
 /** box haze hull */
-class csHazeHullBox : public csHazeHull
+class csHazeHullBox :
+  public scfImplementationExt1<csHazeHullBox, csHazeHull, iHazeHullBox>
 {
   csVector3 min, max;
 public:
-  SCF_DECLARE_IBASE_EXT(csHazeHull);
   /// create new.
   csHazeHullBox(const csVector3& a, const csVector3& b);
   ///
   virtual ~csHazeHullBox();
   //------------------------- iHazeHullBox implementation ----------------
-  class HazeHullBox : public iHazeHullBox
+  /// get settings
+  virtual void GetSettings(csVector3& a, csVector3& b)
   {
-    SCF_DECLARE_EMBEDDED_IBASE (csHazeHullBox);
-    /// get settings
-    virtual void GetSettings(csVector3& a, csVector3& b)
-    {a=scfParent->min; b=scfParent->max;}
-  } scfiHazeHullBox;
-  friend class HazeHullBox;
+    a = this->min;
+    b = this->max;
+  }
 };
 
 /** cone haze hull */
-class csHazeHullCone : public csHazeHull
+class csHazeHullCone :
+  public scfImplementationExt1<csHazeHullCone, csHazeHull, iHazeHullCone>
 {
   int nr_sides;
   csVector3 start, end;
   float start_radius, end_radius;
 public:
-  SCF_DECLARE_IBASE_EXT(csHazeHull);
   /// create new.
   csHazeHullCone(int nr, const csVector3& a, const csVector3& b, float ra,
     float rb);
   ///
   virtual ~csHazeHullCone();
   //------------------------- iHazeHullCone implementation ----------------
-  class HazeHullCone : public iHazeHullCone
+  /// get settings
+  virtual void GetSettings(int &nr, csVector3& a, csVector3& b, float &ra,
+    float &rb)
   {
-    SCF_DECLARE_EMBEDDED_IBASE (csHazeHullCone);
-    /// get settings
-    virtual void GetSettings(int &nr, csVector3& a, csVector3& b, float &ra,
-      float &rb)
-    {
-      nr = scfParent->nr_sides;
-      a=scfParent->start;
-      b=scfParent->end;
-      ra = scfParent->start_radius;
-      rb = scfParent->end_radius;
-    }
-  } scfiHazeHullCone;
-  friend class HazeHullCone;
+    nr = this->nr_sides;
+    a = this->start;
+    b = this->end;
+    ra = this->start_radius;
+    rb = this->end_radius;
+  }
 };
 
 
 /**
  * Haze mesh object.
  */
-class csHazeMeshObject : public iMeshObject
+class csHazeMeshObject :
+  public scfImplementationExt3<csHazeMeshObject, csObjectModel,
+    iMeshObject, iHazeState, scfFakeInterface<iHazeFactoryState> >
 {
 private:
   csRef<iMeshObjectFactory> ifactory;
@@ -287,14 +282,15 @@ public:
   void ProjectO2S(csReversibleTransform& tr_o2c, float fov, float shiftx,
     float shifty, const csVector3& objpos, csVector3& scrpos, 
     csVector3* campos);
+
+  //------------------------- iObjectModel implementation ----------------
   void GetObjectBoundingBox (csBox3& bbox);
   void SetObjectBoundingBox (const csBox3& bbox);
   void GetRadius (float& rad, csVector3& cent)
   { rad = radius; cent = bbox.GetCenter (); }
+  virtual iTerraFormer* GetTerraFormerColldet () { return 0; }
 
   ///--------------------- iMeshObject implementation ------------------------
-  SCF_DECLARE_IBASE;
-
   virtual iMeshObjectFactory* GetFactory () const { return ifactory; }
   virtual csFlags& GetFlags () { return flags; }
   virtual csPtr<iMeshObject> Clone () { return 0; }
@@ -336,27 +332,7 @@ public:
   virtual void SetMeshWrapper (iMeshWrapper* lp) { logparent = lp; }
   virtual iMeshWrapper* GetMeshWrapper () const { return logparent; }
 
-  //------------------------- iObjectModel implementation ----------------
-  class ObjectModel : public csObjectModel
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csHazeMeshObject);
-    virtual void GetObjectBoundingBox (csBox3& bbox)
-    {
-      scfParent->GetObjectBoundingBox (bbox);
-    }
-    virtual void SetObjectBoundingBox (const csBox3& bbox)
-    {
-      scfParent->SetObjectBoundingBox (bbox);
-    }
-    virtual void GetRadius (float& rad, csVector3& cent)
-    {
-      scfParent->GetRadius (rad, cent);
-    }
-    virtual iTerraFormer* GetTerraFormerColldet () { return 0; }
-  } scfiObjectModel;
-  friend class ObjectModel;
-
-  virtual iObjectModel* GetObjectModel () { return &scfiObjectModel; }
+  virtual iObjectModel* GetObjectModel () { return this; }
   virtual bool SetColor (const csColor&) { return false; }
   virtual bool GetColor (csColor&) const { return false; }
   virtual bool SetMaterialWrapper (iMaterialWrapper* mat)
@@ -374,51 +350,46 @@ public:
    */
   virtual void PositionChild (iMeshObject* /*child*/, csTicks /*current_time*/) { }
 
-  //------------------------- iHazeState implementation ----------------
-  class HazeState : public iHazeState
+  virtual size_t TestPolygons(const csVector3 * center, float radius,
+      iPolygonCallback * polyCallback)
   {
-    SCF_DECLARE_EMBEDDED_IBASE (csHazeMeshObject);
-    virtual void SetMaterialWrapper (iMaterialWrapper* material)
-    {
-      scfParent->material = material;
-    }
-    virtual iMaterialWrapper* GetMaterialWrapper () const
-    { return scfParent->material; }
-    virtual void SetMixMode (uint mode) { scfParent->MixMode = mode; }
-    virtual uint GetMixMode () const { return scfParent->MixMode; }
-    virtual void SetOrigin(const csVector3& pos) { scfParent->origin = pos; }
-    virtual const csVector3& GetOrigin() const {return scfParent->origin;}
-    virtual void SetDirectional(const csVector3& pos)
-    { scfParent->directional=pos;}
-    virtual const csVector3& GetDirectional() const
-    {return scfParent->directional;}
-    virtual int GetLayerCount() const {return (int)scfParent->layers.Length();}
-    virtual void AddLayer(iHazeHull *hull, float scale)
-    {
-      csHazeLayer *lay = new csHazeLayer(hull, scale);
-      scfParent->layers.Push(lay);
-    }
-    virtual void SetLayerHull(int layer, iHazeHull* hull)
-    {
-      if (hull) hull->IncRef();
-      if (scfParent->layers[layer]->hull)
-        scfParent->layers[layer]->hull->DecRef();
-      scfParent->layers[layer]->hull = hull;
-    }
-    virtual iHazeHull* GetLayerHull(int layer) const
-    { return scfParent->layers[layer]->hull; }
-    virtual void SetLayerScale(int layer, float scale)
-    { scfParent->layers[layer]->scale = scale; }
-    virtual float GetLayerScale(int layer) const
-    { return scfParent->layers[layer]->scale; }
-  } scfiHazeState;
-  friend class HazeState;
+    return 0;
+  }
+
+  //------------------------- iHazeState implementation ----------------
+  virtual void SetOrigin(const csVector3& pos) { this->origin = pos; }
+  virtual const csVector3& GetOrigin() const {return this->origin;}
+  virtual void SetDirectional(const csVector3& pos)
+  { this->directional=pos;}
+  virtual const csVector3& GetDirectional() const
+  {return this->directional;}
+  virtual int GetLayerCount() const {return this->layers.Length();}
+  virtual void AddLayer(iHazeHull *hull, float scale)
+  {
+    csHazeLayer *lay = new csHazeLayer(hull, scale);
+    this->layers.Push(lay);
+  }
+  virtual void SetLayerHull(int layer, iHazeHull* hull)
+  {
+    if (hull) hull->IncRef();
+    if (this->layers[layer]->hull)
+      this->layers[layer]->hull->DecRef();
+    this->layers[layer]->hull = hull;
+  }
+  virtual iHazeHull* GetLayerHull(int layer) const
+  { return this->layers[layer]->hull; }
+  virtual void SetLayerScale(int layer, float scale)
+  { this->layers[layer]->scale = scale; }
+  virtual float GetLayerScale(int layer) const
+  { return this->layers[layer]->scale; }
 };
 
 /**
  * Factory for 2D sprites. This factory also implements iHazeFactoryState.
  */
-class csHazeMeshObjectFactory : public iMeshObjectFactory
+class csHazeMeshObjectFactory :
+  public scfImplementation3<csHazeMeshObjectFactory,
+    iMeshObjectFactory, iHazeFactoryState, iHazeHullCreation>
 {
 private:
   csRef<iMaterialWrapper> material;
@@ -441,14 +412,8 @@ public:
 
   /// Get the layers vector
   csPDelArray<csHazeLayer>* GetLayers() {return &layers;}
-  /// get the origin
-  const csVector3& GetOrigin() const {return origin;}
-  /// get the directional
-  const csVector3& GetDirectional() const {return directional;}
 
   //------------------------ iMeshObjectFactory implementation --------------
-  SCF_DECLARE_IBASE;
-
   virtual csFlags& GetFlags () { return flags; }
   virtual csPtr<iMeshObject> NewInstance ();
   virtual csPtr<iMeshObjectFactory> Clone () { return 0; }
@@ -470,72 +435,62 @@ public:
   virtual uint GetMixMode () const { return MixMode; }
 
   //------------------------- iHazeFactoryState implementation ----------------
-  class HazeFactoryState : public iHazeFactoryState
+  virtual void SetOrigin(const csVector3& pos) { this->origin = pos; }
+  virtual const csVector3& GetOrigin() const {return this->origin;}
+  virtual void SetDirectional(const csVector3& pos)
+  { this->directional=pos;}
+  virtual const csVector3& GetDirectional() const
+  {return this->directional;}
+  virtual int GetLayerCount() const {return this->layers.Length();}
+  virtual void AddLayer(iHazeHull *hull, float scale)
   {
-    SCF_DECLARE_EMBEDDED_IBASE (csHazeMeshObjectFactory);
-    virtual void SetOrigin(const csVector3& pos) { scfParent->origin = pos; }
-    virtual const csVector3& GetOrigin() const {return scfParent->origin;}
-    virtual void SetDirectional(const csVector3& pos)
-    { scfParent->directional=pos;}
-    virtual const csVector3& GetDirectional() const
-    {return scfParent->directional;}
-    virtual int GetLayerCount() const {return (int)scfParent->layers.Length();}
-    virtual void AddLayer(iHazeHull *hull, float scale)
-    {
-      csHazeLayer *lay = new csHazeLayer(hull, scale);
-      scfParent->layers.Push(lay);
-    }
-    virtual void SetLayerHull(int layer, iHazeHull* hull)
-    {
-      if(hull) hull->IncRef();
-      if(scfParent->layers[layer]->hull)
-        scfParent->layers[layer]->hull->DecRef();
-      scfParent->layers[layer]->hull = hull;
-    }
-    virtual iHazeHull* GetLayerHull(int layer) const
-    { return scfParent->layers[layer]->hull; }
-    virtual void SetLayerScale(int layer, float scale)
-    { scfParent->layers[layer]->scale = scale; }
-    virtual float GetLayerScale(int layer) const
-    { return scfParent->layers[layer]->scale; }
-  } scfiHazeFactoryState;
-  friend class HazeFactoryState;
+    csHazeLayer *lay = new csHazeLayer(hull, scale);
+    this->layers.Push(lay);
+  }
+  virtual void SetLayerHull(int layer, iHazeHull* hull)
+  {
+    if(hull) hull->IncRef();
+    if(this->layers[layer]->hull)
+      this->layers[layer]->hull->DecRef();
+    this->layers[layer]->hull = hull;
+  }
+  virtual iHazeHull* GetLayerHull(int layer) const
+  { return this->layers[layer]->hull; }
+  virtual void SetLayerScale(int layer, float scale)
+  { this->layers[layer]->scale = scale; }
+  virtual float GetLayerScale(int layer) const
+  { return this->layers[layer]->scale; }
 
   //------------------------- iHazeHullCreation implementation ----------------
-  class HazeHullCreation : public iHazeHullCreation
+  virtual csRef<iHazeHullBox> CreateBox(
+    const csVector3& a, const csVector3& b) const
   {
-    SCF_DECLARE_EMBEDDED_IBASE (csHazeMeshObjectFactory);
-    virtual csRef<iHazeHullBox> CreateBox(
-	const csVector3& a, const csVector3& b) const
-    {
-      csHazeHullBox* c = new csHazeHullBox(a, b);
-      csRef<iHazeHullBox> x;
-      x.AttachNew(&c->scfiHazeHullBox);
-      return x;
-    }
-    virtual csRef<iHazeHullCone> CreateCone(int nr_sides,
-      const csVector3& start, const csVector3& end, float srad,
-      float erad) const
-    {
-      csHazeHullCone* c = new csHazeHullCone(nr_sides, start, end, srad, erad);
-      csRef<iHazeHullCone> x;
-      x.AttachNew(&c->scfiHazeHullCone);
-      return x;
-    }
-
-  } scfiHazeHullCreation;
-  friend class HazeHullCreation;
+    csHazeHullBox* c = new csHazeHullBox(a, b);
+    csRef<iHazeHullBox> x;
+    x.AttachNew(c);
+    return x;
+  }
+  virtual csRef<iHazeHullCone> CreateCone(int nr_sides,
+    const csVector3& start, const csVector3& end, float srad,
+    float erad) const
+  {
+    csHazeHullCone* c = new csHazeHullCone(nr_sides, start, end, srad, erad);
+    csRef<iHazeHullCone> x;
+    x.AttachNew(c);
+    return x;
+  }
 };
 
 /**
  * Sprite 2D type. This is the plugin you have to use to create instances
  * of csHazeMeshObjectFactory.
  */
-class csHazeMeshObjectType : public iMeshObjectType
+class csHazeMeshObjectType :
+  public scfImplementation2<csHazeMeshObjectType,
+    iMeshObjectType, iComponent>
 {
 public:
   iObjectRegistry* object_reg;
-  SCF_DECLARE_IBASE;
 
   /// Constructor.
   csHazeMeshObjectType (iBase*);
@@ -544,12 +499,8 @@ public:
   /// New Factory.
   virtual csPtr<iMeshObjectFactory> NewFactory ();
 
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csHazeMeshObjectType);
-    virtual bool Initialize (iObjectRegistry* object_reg) 
-    { scfParent->object_reg = object_reg; return true; }
-  } scfiComponent;
+  virtual bool Initialize (iObjectRegistry* object_reg) 
+  { this->object_reg = object_reg; return true; }
 };
 
 #endif // __CS_HAZE_H__

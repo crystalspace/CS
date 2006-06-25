@@ -87,6 +87,11 @@ SubInclude TOP libs csplugincommon ;
 
 SubDir TOP libs ;
 
+if [ Property build : projgen ] = msvc
+{
+  IncludeDir  $(CSLIB.ROOT) csutil ptmalloc sysdeps win32 : crystalspace ;
+}
+
 Description crystalspace : "Crystal Space library" ;
 Library crystalspace : $(CSLIB.SOURCES) : shared notest ;
 UnitTest crystalspace : $(CSLIB.TESTS) ;

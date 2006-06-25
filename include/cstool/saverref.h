@@ -26,6 +26,7 @@
 #include "csextern.h"
 
 #include "csutil/csobject.h"
+#include "csutil/csstring.h"
 #include "csutil/scf_implementation.h"
 #include "imap/saverref.h"
 

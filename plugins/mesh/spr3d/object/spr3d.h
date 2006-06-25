@@ -1451,6 +1451,12 @@ public:
   virtual void PositionChild (iMeshObject* child,csTicks current_time);
   /** @} */
 
+  virtual size_t TestPolygons(const csVector3 * center, float radius,
+      iPolygonCallback * polyCallback)
+  {
+    return 0;
+  }
+
   virtual iObjectModel* GetObjectModel () { return factory->GetObjectModel (); }
 
   /**\name iLODControl implementation

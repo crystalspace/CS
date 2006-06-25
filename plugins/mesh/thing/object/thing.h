@@ -1009,7 +1009,9 @@ public:
   virtual bool SetMaterialWrapper (iMaterialWrapper*) { return false; }
   virtual iMaterialWrapper* GetMaterialWrapper () const { return 0; }
   virtual void PositionChild (iMeshObject* /*child*/, csTicks /*current_time*/) { }
-
+  virtual size_t TestPolygons(const csVector3 * center, float radius,
+      iPolygonCallback * polyCallback);
+  
   //-------------------- iPolygonMesh interface implementation ----------------
   //csRef<PolyMeshHelper> polygonMesh;
   //-------------------- CD iPolygonMesh implementation -----------------------

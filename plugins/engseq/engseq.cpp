@@ -29,6 +29,7 @@
 #include "csutil/randomgen.h"
 #include "csutil/weakref.h"
 #include "csutil/event.h"
+#include "csutil/eventnames.h"
 #include "iutil/objreg.h"
 #include "iutil/event.h"
 #include "iutil/eventq.h"
@@ -1950,10 +1951,10 @@ bool csEngineSequenceManager::HandleEvent (iEvent &event)
       iSector* sector = camera->GetSector ();
       if (!sector) return false;
       csVector3 origin = camera->GetTransform ().GetO2TTranslation ();
-      csVector3 isect, end = origin + (vw - origin) * 120;
-
-      int polyidx = -1;
-      iMeshWrapper* sel = sector->HitBeam (origin, end, isect, &polyidx);
+      csVector3 end = origin + (vw - origin) * 120;
+     
+      csSectorHitBeamResult hitBeamResult = sector->HitBeam (origin, end);
+      iMeshWrapper * sel = hitBeamResult.mesh;
 
       size_t i;
       for (i = 0 ; i < mesh_triggers.Length () ; i++)

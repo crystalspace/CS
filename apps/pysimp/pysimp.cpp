@@ -37,7 +37,7 @@ PySimple::~PySimple ()
 {
 }
 
-bool PySimple::OnInitialize (int argc, char* argv[])
+bool PySimple::OnInitialize (int /*argc*/, char* /*argv*/[])
 {
   if (!csInitializer::RequestPlugins (GetObjectRegistry(),
   	CS_REQUEST_VFS,

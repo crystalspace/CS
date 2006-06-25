@@ -52,7 +52,9 @@ if ($action=="") {
     $newentry->author=$authorname;
     $newentry->email=$emailname;
     if ($authorname=="" && $emailname=="")
-	die ("<br><h2>Please give name or email!</h2>\n");
+	die ("<br/><h2 style='color: #ff000000'>Please give name or email!</h2>\n");
+    if (preg_match("/(ftp|http|https):\/\/[a-zA-Z0-9.-_\/]*/", $texttext))
+      die("<br/><h2 style='color: #ff0000'>No urls allowed!</h2>");
     $newentry->date=time();
     $newentry->addr=$REMOTE_ADDR;
     $newentry->agent=$HTTP_USER_AGENT;

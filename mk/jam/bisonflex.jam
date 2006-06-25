@@ -20,19 +20,22 @@
 
 if $(CMD.FLEX)
 {
-  # Some versions of Flex-generated files want to include <unistd.h> which is
-  # not normally available on Windows, so we need to protect it.  We also
-  # filter out CVS `Header' keywords in order to prevent CVS from thinking that
-  # the file has changed simply because the Header information is different.
-  FLEX.SED_SCRIPT =
-    "'s/\\([ 	]*#[ 	]*include[ 	][ 	]*<unistd.h>\\)/#ifndef WIN32\\
-    \\1\\
-    #endif/;/\$Header:/d'" ;
-
   # Compilers such as MSVC do not like #line directives.  Since the generated
   # file might get stored in CVS and used by MSVC users (even if generated on
   # Unix, for instance), we want to suppress #line directives in all cases.
   FLEX.FLAGS += -L ;
+
+  # Some versions of Flex-generated files want to include <unistd.h> which is
+  # not normally available on Windows, so we need to protect it.  We also
+  # filter out CVS `Header' keywords in order to prevent CVS from thinking that
+  # the file has changed simply because the Header information is different.
+  # Also, despite the -L argument, some versions *still* emit a sole #line
+  # directive; filter it out as well.
+  FLEX.SED_SCRIPT =
+    "'s/\\([ 	]*#[ 	]*include[ 	][ 	]*<unistd.h>\\)/#ifndef WIN32\\
+    \\1\\
+    #endif/;/\$Header:/d
+    s/[ 	]*#[ 	]*line.*//g'" ;
 
   rule FlexRule
   {

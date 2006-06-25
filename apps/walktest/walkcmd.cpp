@@ -683,7 +683,7 @@ void BuildSprite(iSector * sector, iObjectIterator* it, csVector3 position)
 
 
 
-void BuildObject(iObjectRegistry* object_reg, iSector * sector,
+void BuildObject(iSector * sector,
 	iObjectIterator* it, iEngine* Engine,
 	csVector3 position, iGraphics3D* MyG3D, iLoader* loader,
 	iObjectRegistry* objReg)
@@ -718,7 +718,7 @@ void WalkTest::ParseKeyNodes(iObject* src)
     }
     csRef<iObjectIterator> it2 (node_obj->GetIterator());
 
-    BuildObject(object_reg, sector,it2, Engine, node->GetPosition(), myG3D,
+    BuildObject(sector, it2, Engine, node->GetPosition(), myG3D,
 		LevelLoader, object_reg);
   }
 }
@@ -1213,11 +1213,11 @@ bool CommandHandler (const char *cmd, const char *arg)
   {
     csVector3 where = Sys->view->GetCamera ()->GetTransform ().This2Other (
     	3.0f*CS_VEC_FORWARD);
-    int pidx;
-    csVector3 isect;
-    iMeshWrapper* mesh = 
-      Sys->view->GetCamera ()->GetSector ()->HitBeamPortals (
-      Sys->view->GetCamera ()->GetTransform ().GetOrigin (), where, isect, &pidx);
+    csSectorHitBeamResult rc = Sys->view->GetCamera ()->GetSector ()
+    	->HitBeamPortals (
+	    Sys->view->GetCamera ()->GetTransform ().GetOrigin (), where);
+    int pidx = rc.polygon_idx;
+    iMeshWrapper* mesh = rc.mesh;
 
     if (mesh && pidx != -1)
     {
@@ -1752,6 +1752,11 @@ bool CommandHandler (const char *cmd, const char *arg)
     RECORD_CMD (cmd);
     extern void fire_missile ();
     fire_missile ();
+  }
+  else if (!csStrCaseCmp (cmd, "decal_test"))
+  {
+    extern void test_decal();
+    test_decal ();
   }
   else if (!csStrCaseCmp (cmd, "lightning"))
   {

@@ -26,6 +26,7 @@
 #include "csutil/cscolor.h"
 #include "csutil/randomgen.h"
 #include "csutil/refarr.h"
+#include "csutil/scf_implementation.h"
 #include "imesh/genmesh.h"
 #include "imesh/lghtng.h"
 #include "imesh/object.h"
@@ -36,13 +37,14 @@
 #include "csutil/flags.h"
 
 struct iMaterialWrapper;
-struct iCamera;
 class csLightningMeshObjectFactory;
 
 /**
  * Lightning mesh object.
  */
-class csLightningMeshObject : public iMeshObject
+class csLightningMeshObject :
+  public scfImplementationExt3<csLightningMeshObject, csObjectModel,
+    iMeshObject, iLightningState, scfFakeInterface<iLightningState> >
 {
   csLightningMeshObjectFactory *LightningFact;
   csRef<iMeshObject> GenMesh;
@@ -76,13 +78,14 @@ public:
 
   /// Destructor.
   virtual ~csLightningMeshObject ();
+
+  //------------------------- iObjectModel implementation ----------------
   void GetObjectBoundingBox (csBox3& bbox);
   void SetObjectBoundingBox (const csBox3& bbox);
   void GetRadius (float& rad, csVector3& cent);
+  virtual iTerraFormer* GetTerraFormerColldet () { return 0; }
 
   ///--------------------- iMeshObject implementation ------------------------
-  SCF_DECLARE_IBASE;
-
   virtual iMeshObjectFactory* GetFactory () const { return ifactory; }
   virtual csFlags& GetFlags () { return flags; }
   virtual csPtr<iMeshObject> Clone () { return 0; }
@@ -111,27 +114,7 @@ public:
   virtual void SetMeshWrapper (iMeshWrapper* lp) { logparent = lp; }
   virtual iMeshWrapper* GetMeshWrapper () const { return logparent; }
 
-  //------------------------- iObjectModel implementation ----------------
-  class ObjectModel : public csObjectModel
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csLightningMeshObject);
-    virtual void GetObjectBoundingBox (csBox3& bbox)
-    {
-      scfParent->GetObjectBoundingBox (bbox);
-    }
-    virtual void SetObjectBoundingBox (const csBox3& bbox)
-    {
-      scfParent->SetObjectBoundingBox (bbox);
-    }
-    virtual void GetRadius (float& rad, csVector3& cent)
-    {
-      scfParent->GetRadius (rad, cent);
-    }
-    virtual iTerraFormer* GetTerraFormerColldet () { return 0; }
-  } scfiObjectModel;
-  friend class ObjectModel;
-
-  virtual iObjectModel* GetObjectModel () { return &scfiObjectModel; }
+  virtual iObjectModel* GetObjectModel () { return this; }
   virtual bool SetColor (const csColor&) { return false; }
   virtual bool GetColor (csColor&) const { return false; }
   virtual bool SetMaterialWrapper (iMaterialWrapper*) { return false; }
@@ -145,82 +128,39 @@ public:
    */
   virtual void PositionChild (iMeshObject* /*child*/, csTicks /*current_time*/) { }
 
-  //------------------------- iLightningState implementation ----------------
-  class LightningState : public iLightningState
+  virtual size_t TestPolygons(const csVector3 * center, float radius,
+      iPolygonCallback * polyCallback)
   {
-    SCF_DECLARE_EMBEDDED_IBASE (csLightningMeshObject);
-    virtual void SetMaterialWrapper (iMaterialWrapper* material)
-    {
-      scfParent->material = material;
-    }
-    virtual iMaterialWrapper* GetMaterialWrapper () const
-    { 
-      return scfParent->material; 
-    }
-    virtual void SetMixMode (uint mode) { scfParent->MixMode = mode; }
-    virtual uint GetMixMode () const { return scfParent->MixMode; }
-    virtual void SetOrigin(const csVector3& pos) { scfParent->origin = pos; }
-    virtual const csVector3& GetOrigin() const {return scfParent->origin;}
-    virtual int GetPointCount() const
-    {      
-      return 0;
-    }
-    virtual float GetLength() const
-    {
-      return scfParent->length;
-    }
-    virtual void SetLength(float value)
-    {
-      scfParent->length = value;
-    }
-    virtual void SetPointCount(int /*n*/)
-    {      
-    }    
-    virtual float GetWildness() const
-    {
-      return scfParent->wildness;
-    }
-    virtual void SetWildness(float /*value*/)
-    {
-    }
-    virtual float GetVibration() const
-    {
-      return scfParent->vibration;
-    }
-    virtual void SetVibration(float /*value*/)
-    {
-    }
-    virtual void SetDirectional(const csVector3 &pos)
-    {
-      scfParent->directional = pos;
-    }
-    virtual const csVector3& GetDirectional()
-    {      
-      return scfParent->directional;
-    }
-    virtual csTicks GetUpdateInterval () const
-    {
-      return 0;
-    }
-    virtual void SetUpdateInterval (csTicks /*value*/)
-    {
-      
-    }
-    virtual float GetBandWidth () const
-    {
-      return scfParent->bandwidth;
-    }
-    virtual void SetBandWidth (float /*value*/)
-    {
-    }
-  } scfiLightningState;
-  friend class LightningState;
+    return 0;
+  }
+
+  //------------------------- iLightningState implementation ----------------
+  virtual void SetOrigin(const csVector3& pos) { this->origin = pos; }
+  virtual const csVector3& GetOrigin() const {return this->origin;}
+  virtual int GetPointCount() const { return 0; }
+  virtual float GetLength() const { return this->length; }
+  virtual void SetLength(float value) { this->length = value; }
+  virtual void SetPointCount(int /*n*/) { }    
+  virtual float GetWildness() const { return this->wildness; }
+  virtual void SetWildness(float /*value*/) { }
+  virtual float GetVibration() const { return this->vibration; }
+  virtual void SetVibration(float /*value*/) { }
+  virtual void SetDirectional(const csVector3 &pos)
+  { this->directional = pos; }
+  virtual const csVector3& GetDirectional()
+  { return this->directional; }
+  virtual csTicks GetUpdateInterval () const { return 0; }
+  virtual void SetUpdateInterval (csTicks /*value*/) { }
+  virtual float GetBandWidth () const { return this->bandwidth; }
+  virtual void SetBandWidth (float /*value*/) { }
 };
 
 /**
  * Factory for 2D sprites. This factory also implements iLightningFactoryState.
  */
-class csLightningMeshObjectFactory : public iMeshObjectFactory
+class csLightningMeshObjectFactory :
+  public scfImplementation2<csLightningMeshObjectFactory,
+    iMeshObjectFactory, iLightningFactoryState>
 {
 private:
 
@@ -256,10 +196,8 @@ public:
   	iObjectRegistry *object_registry);
   /// Destructor.
   virtual ~csLightningMeshObjectFactory ();
-  /// Get the origin
-  const csVector3& GetOrigin () const { return origin; }
+
   iMeshObjectFactory *GetMeshFactory () { return GenMeshFact; }
-  const csVector3& GetDirectional () { return directional; }
   /// Get length
   const float GetLength () { return length; }
   /// Get number of points
@@ -272,8 +210,6 @@ public:
   const float GetBandWidth () { return bandwidth; }
 
   //------------------------ iMeshObjectFactory implementation --------------
-  SCF_DECLARE_IBASE;
-
   virtual csFlags& GetFlags () { return flags; }
   virtual csPtr<iMeshObject> NewInstance ();
   virtual csPtr<iMeshObjectFactory> Clone () { return 0; }
@@ -344,95 +280,88 @@ public:
   virtual uint GetMixMode () const { return MixMode; }
 
   //---------------------- iLightningFactoryState implementation --------------
-  class LightningFactoryState : public iLightningFactoryState
+  virtual void SetOrigin(const csVector3& pos) 
+  {       
+    this->origin = pos; 
+    this->Invalidate();
+  }
+  virtual const csVector3& GetOrigin () const 
+  {      
+    return this->origin;
+  }
+
+  virtual float GetLength () const
   {
-    SCF_DECLARE_EMBEDDED_IBASE (csLightningMeshObjectFactory);
+    return this->length;
+  }
+  virtual void SetLength (float value)
+  {
+    this->length = value;
+    this->Invalidate ();
+  }
 
-    csTicks update_counter;
+  virtual int GetPointCount() const
+  {
+    return this->MaxPoints;
+  }
+  virtual void SetPointCount (int n)
+  {      
+    this->MaxPoints = n;
+    this->Invalidate ();
+  }
 
-    virtual void SetOrigin(const csVector3& pos) 
-    {       
-      scfParent->origin = pos; 
-      scfParent->Invalidate();
-    }
-    virtual const csVector3& GetOrigin () const 
-    {      
-      return scfParent->origin;
-    }
-
-    virtual float GetLength () const
-    {
-      return scfParent->length;
-    }
-    virtual void SetLength (float value)
-    {
-      scfParent->length = value;
-      scfParent->Invalidate ();
-    }
-    virtual int GetPointCount() const
-    {
-      return scfParent->MaxPoints;
-    }
-    virtual void SetPointCount (int n)
-    {      
-      scfParent->MaxPoints = n;
-      scfParent->Invalidate ();
-    }
-
-    virtual float GetWildness () const
-    {
-      return scfParent->wildness;
-    }
-    virtual void SetWildness(float value)
-    {
-      scfParent->wildness = value;
-    }
+  virtual float GetWildness () const
+  {
+    return this->wildness;
+  }
+  virtual void SetWildness(float value)
+  {
+    this->wildness = value;
+  }
     
-    virtual float GetVibration () const
-    {
-      return scfParent->vibrate;
-    }
-        
-    virtual void SetVibration (float value)
-    {
-      scfParent->vibrate = value;
-    }
+  virtual float GetVibration () const
+  {
+    return this->vibrate;
+  }
 
-    virtual void SetDirectional (const csVector3 &pos)
-    {
-      scfParent->directional = pos;
-    }
+  virtual void SetVibration (float value)
+  {
+    this->vibrate = value;
+  }
 
-    virtual const csVector3& GetDirectional ()
-    {
-      return scfParent->directional;
-    }
-    virtual csTicks GetUpdateInterval () const
-    {
-      return scfParent->update_interval;
-    }
-    virtual void SetUpdateInterval (csTicks value)
-    {
-      scfParent->update_interval = value;
-    }
-    virtual float GetBandWidth () const
-    {
-      return scfParent->bandwidth;
-    }
-    virtual void SetBandWidth (float value)
-    {
-      scfParent->bandwidth = value;
-    }
-  } scfiLightningFactoryState;
-  friend class LightningFactoryState;
+  virtual void SetDirectional (const csVector3 &pos)
+  {
+    this->directional = pos;
+  }
+  virtual const csVector3& GetDirectional ()
+  {
+    return directional;
+  }
+
+  virtual csTicks GetUpdateInterval () const
+  {
+    return this->update_interval;
+  }
+  virtual void SetUpdateInterval (csTicks value)
+  {
+    this->update_interval = value;
+  }
+  virtual float GetBandWidth () const
+  {
+    return this->bandwidth;
+  }
+  virtual void SetBandWidth (float value)
+  {
+    this->bandwidth = value;
+  }
 };
 
-class csLightningMeshObjectType : public iMeshObjectType
+class csLightningMeshObjectType :
+  public scfImplementation2<csLightningMeshObjectType,
+    iMeshObjectType, iComponent>
 {
   iObjectRegistry *Registry;
 public:
-  SCF_DECLARE_IBASE;
-
   /// Constructor.
   csLightningMeshObjectType (iBase*);
   /// Destructor.
@@ -445,15 +374,6 @@ public:
     Registry = object_reg;
     return true;
   }
-
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csLightningMeshObjectType);
-    virtual bool Initialize (iObjectRegistry *object_reg) 
-    {      
-      return scfParent->Initialize (object_reg);
-    }
-  } scfiComponent;
 };
 
 #endif // __CS_LGHTNG_H__

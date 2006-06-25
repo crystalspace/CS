@@ -352,6 +352,12 @@ public:
   virtual void PositionChild (iMeshObject* /*child*/, csTicks /*current_time*/) { }
   /** @} */
 
+  virtual size_t TestPolygons(const csVector3 * center, float radius,
+      iPolygonCallback * polyCallback)
+  {
+    return 0;
+  }
+
   class RenderBufferAccessor : 
     public scfImplementation1<RenderBufferAccessor, iRenderBufferAccessor>
   {
@@ -607,7 +613,7 @@ public:
   virtual void GetRadius (float& rad, csVector3& cent)
   {
     rad = GetRadius ();
-    cent.Set (0.0f);
+    cent = object_bbox.GetCenter ();
   }
   /** @} */
 

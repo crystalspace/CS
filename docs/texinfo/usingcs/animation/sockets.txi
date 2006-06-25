@@ -6,9 +6,9 @@
 @cindex Sockets
 
 When you have an animated actor you often want that actor to hold something
-in its hands. Or put a helmet on its head. For this purpose Crystal Space
-has the concept of @dfn{sockets}. Basically a socket is a triangle of the
-mesh on which you can attach other meshes. So when the triangle moves (because
+in its hands.  Or put a helmet on its head. For this purpose Crystal Space
+has the concept of @dfn{sockets}.  Basically a socket is a triangle of the
+mesh on which you can attach other meshes.  So when the triangle moves (because
 the model animates) the other mesh (like a weapon) will move with it.
 At this moment both 3D sprites (@pxref{MeshObject Spr3D}, and Cal3D sprites
 (@pxref{MeshObject SprCal3D}) support this feature.
@@ -30,7 +30,7 @@ For Cal3D models this happens with something like this:
 @end example
 
 Basically you have to find out the mesh, submesh, and triangle that specifies
-the place where you want to attach things. In the example above we created
+the place where you want to attach things.  In the example above we created
 two sockets, one for the left hand and one for the right hand.
 
 For Spr3D models you have to do it like this:
@@ -100,4 +100,3 @@ bool DetachMesh (iMeshWrapper* actorMesh, const char* socketName)
   return true;
 @}
 @end example
-

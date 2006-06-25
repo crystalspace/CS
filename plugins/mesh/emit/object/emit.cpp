@@ -36,51 +36,6 @@
 
 CS_IMPLEMENT_PLUGIN
 
-SCF_IMPLEMENT_IBASE (csEmitFixed)
-  SCF_IMPLEMENTS_INTERFACE (iEmitFixed)
-  SCF_IMPLEMENTS_INTERFACE (iEmitGen3D)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csEmitSphere)
-  SCF_IMPLEMENTS_INTERFACE (iEmitSphere)
-  SCF_IMPLEMENTS_INTERFACE (iEmitGen3D)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csEmitBox)
-  SCF_IMPLEMENTS_INTERFACE (iEmitBox)
-  SCF_IMPLEMENTS_INTERFACE (iEmitGen3D)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csEmitCone)
-  SCF_IMPLEMENTS_INTERFACE (iEmitCone)
-  SCF_IMPLEMENTS_INTERFACE (iEmitGen3D)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csEmitMix)
-  SCF_IMPLEMENTS_INTERFACE (iEmitMix)
-  SCF_IMPLEMENTS_INTERFACE (iEmitGen3D)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csEmitCylinder)
-  SCF_IMPLEMENTS_INTERFACE (iEmitCylinder)
-  SCF_IMPLEMENTS_INTERFACE (iEmitGen3D)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csEmitLine)
-  SCF_IMPLEMENTS_INTERFACE (iEmitLine)
-  SCF_IMPLEMENTS_INTERFACE (iEmitGen3D)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csEmitSphereTangent)
-  SCF_IMPLEMENTS_INTERFACE (iEmitSphereTangent)
-  SCF_IMPLEMENTS_INTERFACE (iEmitGen3D)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csEmitCylinderTangent)
-  SCF_IMPLEMENTS_INTERFACE (iEmitCylinderTangent)
-  SCF_IMPLEMENTS_INTERFACE (iEmitGen3D)
-SCF_IMPLEMENT_IBASE_END
-
 /// helper particle sorting structure
 struct csEmitCompPart
 {
@@ -88,15 +43,14 @@ struct csEmitCompPart
   iParticle* part;
 };
 
-csEmitFixed::csEmitFixed(iBase *parent)
+csEmitFixed::csEmitFixed(iBase *parent) :
+  scfImplementationType(this, parent)
 {
-  SCF_CONSTRUCT_IBASE(parent);
   val.Set(0,0,0);
 }
 
 csEmitFixed::~csEmitFixed()
 {
-  SCF_DESTRUCT_IBASE();
 }
 
 void csEmitFixed::GetValue(csVector3& value, csVector3& /*given*/)
@@ -109,16 +63,15 @@ void csEmitFixed::SetValue(const csVector3& value)
   val = value;
 }
 
-csEmitBox::csEmitBox(iBase *parent)
+csEmitBox::csEmitBox(iBase *parent) :
+  scfImplementationType(this, parent)
 {
-  SCF_CONSTRUCT_IBASE(parent);
   min.Set(0,0,0);
   max.Set(0,0,0);
 }
 
 csEmitBox::~csEmitBox()
 {
-  SCF_DESTRUCT_IBASE();
 }
 
 void csEmitBox::GetValue(csVector3& value, csVector3& /*given*/)
@@ -143,9 +96,9 @@ void csEmitBox::GetContent(csVector3& min, csVector3& max)
   max = csEmitBox::max;
 }
 
-csEmitSphere::csEmitSphere(iBase *parent)
+csEmitSphere::csEmitSphere(iBase *parent) :
+  scfImplementationType(this, parent)
 {
-  SCF_CONSTRUCT_IBASE(parent);
   center.Set(0,0,0);
   min = 0;
   max = 0;
@@ -153,7 +106,6 @@ csEmitSphere::csEmitSphere(iBase *parent)
 
 csEmitSphere::~csEmitSphere()
 {
-  SCF_DESTRUCT_IBASE();
 }
 
 void csEmitSphere::GetValue(csVector3& value, csVector3& /*given*/)
@@ -201,9 +153,9 @@ void csEmitSphere::GetContent(csVector3& center, float& min, float& max)
   max = csEmitSphere::max;
 }
 
-csEmitCone::csEmitCone(iBase *parent)
+csEmitCone::csEmitCone(iBase *parent) :
+  scfImplementationType(this, parent)
 {
-  SCF_CONSTRUCT_IBASE(parent);
   origin.Set(0,0,0);
   elevation = 0;
   azimuth = 0;
@@ -214,7 +166,6 @@ csEmitCone::csEmitCone(iBase *parent)
 
 csEmitCone::~csEmitCone()
 {
-  SCF_DESTRUCT_IBASE();
 }
 
 void csEmitCone::GetValue(csVector3& value, csVector3& /*given*/)
@@ -268,9 +219,9 @@ void csEmitCone::GetContent(csVector3& origin, float& elevation,
   max = csEmitCone::max;
 }
 
-csEmitMix::csEmitMix(iBase *parent)
+csEmitMix::csEmitMix(iBase *parent) :
+  scfImplementationType(this, parent)
 {
-  SCF_CONSTRUCT_IBASE(parent);
   list = 0;
   totalweight = 0.0;
   nr = 0;
@@ -285,7 +236,6 @@ csEmitMix::~csEmitMix()
     delete p;
     p = np;
   }
-  SCF_DESTRUCT_IBASE();
 }
 
 void csEmitMix::GetValue(csVector3& value, csVector3& given)
@@ -379,16 +329,15 @@ void csEmitMix::GetContent(int num, float& weight, iEmitGen3D*& emit)
   emit = p->emit;
 }
 
-csEmitLine::csEmitLine(iBase *parent)
+csEmitLine::csEmitLine(iBase *parent) :
+  scfImplementationType(this, parent)
 {
-  SCF_CONSTRUCT_IBASE(parent);
   start.Set(0,0,0);
   end.Set(0,0,0);
 }
 
 csEmitLine::~csEmitLine()
 {
-  SCF_DESTRUCT_IBASE();
 }
 
 void csEmitLine::GetValue(csVector3& value, csVector3& /*given*/)
@@ -409,13 +358,17 @@ void csEmitLine::GetContent(csVector3& start, csVector3& end)
   end = csEmitLine::end;
 }
 
-csEmitCylinder::csEmitCylinder(iBase *parent)
+csEmitCylinder::csEmitCylinder(iBase *parent) :
+  scfImplementationType(this, parent)
 {
-  SCF_CONSTRUCT_IBASE(parent);
   start.Set(0,0,0);
   end.Set(0,0,0);
   min = 0;
   max = 0;
+}
+
+csEmitCylinder::~csEmitCylinder()
+{
 }
 
 /// helper func to find a vector (any vector) 90 degrees on the given one
@@ -432,11 +385,6 @@ static void FindAxis(const csVector3& n, csVector3& res)
   // so that nx*resx = 0
   // and  ny*resy + nz*resz will be
   //     -ny*nz + nz*ny which is 0
-}
-
-csEmitCylinder::~csEmitCylinder()
-{
-  SCF_DESTRUCT_IBASE();
 }
 
 void csEmitCylinder::GetValue(csVector3& value, csVector3& /*given*/)
@@ -477,9 +425,9 @@ void csEmitCylinder::GetContent(csVector3& start, csVector3& end,
   max = csEmitCylinder::max;
 }
 
-csEmitCylinderTangent::csEmitCylinderTangent(iBase *parent)
+csEmitCylinderTangent::csEmitCylinderTangent(iBase *parent) :
+  scfImplementationType(this, parent)
 {
-  SCF_CONSTRUCT_IBASE(parent);
   start.Set(0,0,0);
   end.Set(0,0,0);
   min = 0;
@@ -488,7 +436,6 @@ csEmitCylinderTangent::csEmitCylinderTangent(iBase *parent)
 
 csEmitCylinderTangent::~csEmitCylinderTangent()
 {
-  SCF_DESTRUCT_IBASE();
 }
 
 void csEmitCylinderTangent::GetValue(csVector3& value, csVector3& given)
@@ -530,9 +477,9 @@ void csEmitCylinderTangent::GetContent(csVector3& start, csVector3& end,
   max = csEmitCylinderTangent::max;
 }
 
-csEmitSphereTangent::csEmitSphereTangent(iBase *parent)
+csEmitSphereTangent::csEmitSphereTangent(iBase *parent) :
+  scfImplementationType(this, parent)
 {
-  SCF_CONSTRUCT_IBASE(parent);
   center.Set(0,0,0);
   min = 0;
   max = 0;
@@ -540,7 +487,6 @@ csEmitSphereTangent::csEmitSphereTangent(iBase *parent)
 
 csEmitSphereTangent::~csEmitSphereTangent()
 {
-  SCF_DESTRUCT_IBASE();
 }
 
 void csEmitSphereTangent::GetValue(csVector3& value, csVector3& given)
@@ -577,15 +523,6 @@ void csEmitSphereTangent::GetContent(csVector3& center, float& min, float& max)
 
 
 //----------------- csEmitMeshObject -----------------------------------
-
-SCF_IMPLEMENT_IBASE_EXT (csEmitMeshObject)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iEmitState)
-SCF_IMPLEMENT_IBASE_EXT_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csEmitMeshObject::EmitState)
-  SCF_IMPLEMENTS_INTERFACE (iEmitState)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 
 void csEmitMeshObject::SetupObject ()
 {
@@ -628,10 +565,9 @@ void csEmitMeshObject::SetupObject ()
 }
 
 csEmitMeshObject::csEmitMeshObject (iObjectRegistry* object_reg,
-  iMeshObjectFactory* factory)
-	: csParticleSystem (object_reg, factory)
+  iMeshObjectFactory* factory) :
+  scfImplementationType(this, object_reg, factory)
 {
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiEmitState);
   lighted_particles = false;
   number = 50;
   ages = 0;
@@ -667,7 +603,6 @@ csEmitMeshObject::~csEmitMeshObject()
     delete p;
     p = np;
   }
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiEmitState);
 }
 
 void csEmitMeshObject::StartParticle (int i)
@@ -678,7 +613,8 @@ void csEmitMeshObject::StartParticle (int i)
   startspeed->GetValue(part_speed[i], pos);
   startaccel->GetValue(part_accel[i], pos);
   if(attractor) attractor->GetValue(part_attract[i], pos);
-  GetParticle (i)->SetMixMode (MixMode);
+  csRef<iMeshObject> meshobj = scfQueryInterface<iMeshObject> (GetParticle (i));
+  meshobj->SetMixMode (MixMode);
   GetParticle (i)->SetPosition (pos);
   part_pos[i] = pos;
   bbox.AddBoundingVertex(part_pos[i]);
@@ -690,13 +626,13 @@ void csEmitMeshObject::StartParticle (int i)
   {
     csColor col = aging->color;
     col *= (1.-aging->alpha);
-    GetParticle(i)->SetColor(col);
+    meshobj->SetColor(col);
   }
   else
   {
-    GetParticle(i)->SetColor(aging->color);
+    meshobj->SetColor (aging->color);
     if(aging->alpha!=0.0)
-      GetParticle(i)->SetMixMode(MixMode | CS_FX_SETALPHA(aging->alpha));
+      meshobj->SetMixMode (MixMode | CS_FX_SETALPHA(aging->alpha));
   }
 }
 
@@ -767,17 +703,19 @@ void csEmitMeshObject::MoveAgeParticle (int i, int elapsed, float delta_t)
   if (ABS (oldscale) < .0001) oldscale = 1;
   GetParticle(i)->ScaleBy(newscale / oldscale);
   GetParticle(i)->Rotate(rotspeed * delta_t);
+  csRef<iMeshObject> meshobj = scfQueryInterface<iMeshObject> (GetParticle (i));
   if(MixMode & CS_FX_ADD)
   {
     col *= (1.-alpha);
-    GetParticle(i)->SetColor(col);
+    meshobj->SetColor (col);
   }
   else
   {
-    GetParticle(i)->SetColor(col);
+    meshobj->SetColor(col);
     if(alpha!=0.0)
-      GetParticle(i)->SetMixMode(MixMode | CS_FX_SETALPHA(alpha));
-    else GetParticle(i)->SetMixMode(MixMode);
+      meshobj->SetMixMode (MixMode | CS_FX_SETALPHA(alpha));
+    else 
+      meshobj->SetMixMode (MixMode);
   }
 
   /// move the particle
@@ -956,20 +894,10 @@ void csEmitMeshObject::ReplaceAge(int time, const csColor& color, float alpha,
 
 //----------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE (csEmitMeshObjectFactory)
-  SCF_IMPLEMENTS_INTERFACE (iMeshObjectFactory)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iEmitFactoryState)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csEmitMeshObjectFactory::EmitFactoryState)
-  SCF_IMPLEMENTS_INTERFACE (iEmitFactoryState)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 csEmitMeshObjectFactory::csEmitMeshObjectFactory (iMeshObjectType *p,
-  iObjectRegistry* s)
+  iObjectRegistry* s) :
+  scfImplementationType(this, p)
 {
-  SCF_CONSTRUCT_IBASE (p);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiEmitFactoryState);
   object_reg = s;
   logparent = 0;
   emit_type = p;
@@ -977,8 +905,6 @@ csEmitMeshObjectFactory::csEmitMeshObjectFactory (iMeshObjectType *p,
 
 csEmitMeshObjectFactory::~csEmitMeshObjectFactory ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiEmitFactoryState);
-  SCF_DESTRUCT_IBASE ();
 }
 
 csPtr<iMeshObject> csEmitMeshObjectFactory::NewInstance ()
@@ -992,28 +918,15 @@ csPtr<iMeshObject> csEmitMeshObjectFactory::NewInstance ()
 
 //----------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE (csEmitMeshObjectType)
-  SCF_IMPLEMENTS_INTERFACE (iMeshObjectType)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csEmitMeshObjectType::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 SCF_IMPLEMENT_FACTORY (csEmitMeshObjectType)
 
-
-csEmitMeshObjectType::csEmitMeshObjectType (iBase* pParent)
+csEmitMeshObjectType::csEmitMeshObjectType (iBase* pParent) :
+  scfImplementationType(this, pParent)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 csEmitMeshObjectType::~csEmitMeshObjectType ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 csPtr<iMeshObjectFactory> csEmitMeshObjectType::NewFactory ()

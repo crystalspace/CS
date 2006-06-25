@@ -20,6 +20,7 @@
 #define __CS_IMESH_OBJECT_H__
 
 #include "csutil/scf.h"
+#include "iutil/array.h"
 
 /**\file
  * Mesh object and mesh object factory interfaces
@@ -40,6 +41,7 @@ struct iMovable;
 struct iObjectModel;
 struct iPortal;
 struct iRenderView;
+struct iPolygonCallback;
 
 struct csRenderMesh;
 
@@ -47,6 +49,7 @@ class csColor;
 class csFlags;
 class csReversibleTransform;
 class csVector3;
+class csIntersectingTriangle;
 
 /** \name Mesh object flags
  * @{ */
@@ -270,6 +273,9 @@ struct iMeshObject : public virtual iBase
    * it's current state.
    */
   virtual void PositionChild (iMeshObject* child,csTicks current_time) = 0;
+
+  virtual size_t TestPolygons(const csVector3 * center, float radius,
+      iPolygonCallback * polyCallback) = 0;
 };
 
 /**

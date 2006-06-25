@@ -21,6 +21,7 @@
 #include "csgeom/transfrm.h"
 #include "csutil/cscolor.h"
 #include "csutil/event.h"
+#include "csutil/eventnames.h"
 #include "iutil/objreg.h"
 #include "iutil/plugin.h"
 #include "iutil/virtclk.h"
@@ -30,34 +31,11 @@
 
 CS_IMPLEMENT_PLUGIN
 
-SCF_IMPLEMENT_IBASE (csODEParticlePhysics)
-  SCF_IMPLEMENTS_INTERFACE (iParticlesPhysics)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iODEFrameUpdateCallback)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iEventHandler)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csODEParticlePhysics::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csODEParticlePhysics::eiODEFrameUpdateCallback)
-  SCF_IMPLEMENTS_INTERFACE (iODEFrameUpdateCallback)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csODEParticlePhysics::eiEventHandler)
-  SCF_IMPLEMENTS_INTERFACE (iEventHandler)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 SCF_IMPLEMENT_FACTORY (csODEParticlePhysics)
 
-csODEParticlePhysics::csODEParticlePhysics (iBase *p)
+csODEParticlePhysics::csODEParticlePhysics (iBase *p) :
+  scfImplementationType(this, p)
 {
-  SCF_CONSTRUCT_IBASE (p);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiODEFrameUpdateCallback);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiEventHandler);
-
   objreg = 0;
   dyn = 0;
   partobjects.SetLength (0);
@@ -65,12 +43,7 @@ csODEParticlePhysics::csODEParticlePhysics (iBase *p)
 
 csODEParticlePhysics::~csODEParticlePhysics ()
 {
-  odestate->RemoveFrameUpdateCallback (&scfiODEFrameUpdateCallback);
-
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiEventHandler);
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiODEFrameUpdateCallback);
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
-  SCF_DESTRUCT_IBASE ();
+  odestate->RemoveFrameUpdateCallback (this);
 }
 
 
@@ -130,7 +103,7 @@ bool csODEParticlePhysics::Initialize (iObjectRegistry* reg)
 	"EventProcessing disabled in odedynam, will enable Step() now invalid");
   }
   odestate->EnableEventProcessing (true);
-  odestate->AddFrameUpdateCallback (&scfiODEFrameUpdateCallback);
+  odestate->AddFrameUpdateCallback (this);
 
   PreProcess = csevPreProcess(objreg);
 
@@ -142,7 +115,7 @@ bool csODEParticlePhysics::Initialize (iObjectRegistry* reg)
 	"No event queue available");
       return false;
   }
-  eq->RegisterListener (&scfiEventHandler, PreProcess);
+  eq->RegisterListener (this, PreProcess);
 
   clock = CS_QUERY_REGISTRY (objreg, iVirtualClock);
   if (clock == 0) 

@@ -61,6 +61,14 @@
   result = static_awsparser->Read(buf, max_size);	\
 }
 
+static char* awsstrdup (const char* str)
+{
+  size_t len = strlen (str)+1;
+  char* p = (char*)cs_malloc (len);
+  memcpy (p, str, len);
+  return p;
+}
+
 %}
 
 %option noyywrap
@@ -79,8 +87,8 @@ for                     /* printf("for-");    */ return TOKEN_FOR;
 from                    /* printf("from-");   */ return TOKEN_FROM;
 [0-9]+                  /* printf("<int>-");  */ awslval->val = atoi(awstext);   return TOKEN_NUM;
 [0-9]*\.[0-9]+          /* printf("<float>-"); */ awslval->fval = atof(awstext);   return TOKEN_FLOAT;
-[a-zA-Z]+[a-zA-Z0-9]*   /* printf("<attr>-"); */ awslval->str = strdup(awstext); return TOKEN_ATTR;
-\"[^\n\"]*\"             /* printf("<str>-");  */ awstext[awsleng-1]=0; awslval->str = strdup(awstext+1); return TOKEN_STR;
+[a-zA-Z]+[a-zA-Z0-9]*   /* printf("<attr>-"); */ awslval->str = awsstrdup(awstext); return TOKEN_ATTR;
+\"[^\n\"]*\"             /* printf("<str>-");  */ awstext[awsleng-1]=0; awslval->str = awsstrdup(awstext+1); return TOKEN_STR;
 [ \t\r\n]+              /* eat all spaces and stuff */
 \/\/.*\n 		/* eat comments */
 #.*\n                   /* eat comments */

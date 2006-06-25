@@ -28,6 +28,7 @@
 #include "csextern.h"
 #include "csutil/array.h"
 #include "csutil/util.h"
+#include "csutil/csstring.h"
 
 class csStringArrayElementHandler : public csArrayElementHandler<const char*>
 {

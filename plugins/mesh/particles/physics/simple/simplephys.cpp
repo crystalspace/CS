@@ -22,6 +22,7 @@
 #include "csgeom/transfrm.h"
 #include "csutil/cscolor.h"
 #include "csutil/event.h"
+#include "csutil/eventnames.h"
 #include "csutil/ref.h"
 #include "imesh/particles.h"
 #include "iutil/event.h"
@@ -33,34 +34,15 @@
 
 CS_IMPLEMENT_PLUGIN
 
-SCF_IMPLEMENT_IBASE (csParticlesPhysicsSimple)
-  SCF_IMPLEMENTS_INTERFACE (iParticlesPhysics)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iEventHandler)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csParticlesPhysicsSimple::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csParticlesPhysicsSimple::eiEventHandler)
-  SCF_IMPLEMENTS_INTERFACE (iEventHandler)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 SCF_IMPLEMENT_FACTORY (csParticlesPhysicsSimple)
 
-csParticlesPhysicsSimple::csParticlesPhysicsSimple (iBase *p)
+csParticlesPhysicsSimple::csParticlesPhysicsSimple (iBase *p) :
+  scfImplementationType(this, p)
 {
-  SCF_CONSTRUCT_IBASE (p);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiEventHandler);
 }
 
 csParticlesPhysicsSimple::~csParticlesPhysicsSimple ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiEventHandler);
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csParticlesPhysicsSimple::Initialize (iObjectRegistry* reg)
@@ -70,7 +52,7 @@ bool csParticlesPhysicsSimple::Initialize (iObjectRegistry* reg)
   PreProcess = csevPreProcess (object_reg);
   csRef<iEventQueue> eq (CS_QUERY_REGISTRY (object_reg, iEventQueue));
   if (eq == 0) return false;
-  eq->RegisterListener (&scfiEventHandler, PreProcess);
+  eq->RegisterListener (this, PreProcess);
 
   vclock = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
   leftover_time = 0;

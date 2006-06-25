@@ -68,6 +68,8 @@
 #include "polyrender.h"
 #include "polytext.h"
 #include "thing.h"
+#include "ivaria/collider.h"
+#include "igeom/polycallback.h"
 
 #ifdef CS_DEBUG
   //#define LIGHTMAP_DEBUG
@@ -1906,6 +1908,31 @@ void csThing::InvalidateThing ()
 
   delete [] static_data->obj_normals; static_data->obj_normals = 0;
   static_data->InvalidateShape ();
+}
+
+size_t csThing::TestPolygons(const csVector3 * center, float radius,
+    iPolygonCallback * polyCallback)
+{
+  size_t count = 0;
+  size_t i;
+  
+  // @@@ This routine is not very optimal. Especially for things
+  // with large number of polygons.
+  for (i = 0; i < static_data->static_polygons.Length (); i++)
+  {
+    csPolygon3DStatic *p = static_data->static_polygons.Get (i);
+    if (p->InSphere(*center, radius))
+    {
+      ++count;
+
+      csPoly3D poly;
+      for (int a=0; a<p->GetVertexCount(); ++a)
+        poly.AddVertex(p->Vobj(a));
+
+      polyCallback->AddPolygon(poly);
+    }
+  }
+  return count;
 }
 
 bool csThing::HitBeamOutline (const csVector3& start,

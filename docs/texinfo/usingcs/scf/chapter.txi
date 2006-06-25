@@ -1,6 +1,6 @@
 @c -*-texinfo-*-
 @node SCF Chapter, Options, Tutorials, Using Crystal Space
-@section Plugins, Reference counting, Interfaces (SCF)
+@section Plugins, Reference counting, Interfaces (@sc{scf})
 @cindex SCF
 @cindex reference counting
 @cindex interface

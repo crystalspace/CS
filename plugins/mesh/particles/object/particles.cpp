@@ -44,31 +44,18 @@
 
 CS_LEAKGUARD_IMPLEMENT (csParticlesFactory);
 CS_LEAKGUARD_IMPLEMENT (csParticlesObject);
-CS_LEAKGUARD_IMPLEMENT (csParticlesObject::eiRenderBufferAccessor);
 
 CS_IMPLEMENT_PLUGIN
 
-SCF_IMPLEMENT_IBASE (csParticlesType)
-  SCF_IMPLEMENTS_INTERFACE (iMeshObjectType)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csParticlesType::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 SCF_IMPLEMENT_FACTORY (csParticlesType)
 
-csParticlesType::csParticlesType (iBase* p) : parent(p)
+csParticlesType::csParticlesType (iBase* p) :
+  scfImplementationType(this, p), parent(p)
 {
-  SCF_CONSTRUCT_IBASE (parent)
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent)
 }
 
 csParticlesType::~csParticlesType ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 csPtr<iMeshObjectFactory> csParticlesType::NewFactory ()
@@ -77,22 +64,10 @@ csPtr<iMeshObjectFactory> csParticlesType::NewFactory ()
 	(new csParticlesFactory (this, object_reg));
 }
 
-SCF_IMPLEMENT_IBASE (csParticlesFactory)
-  SCF_IMPLEMENTS_INTERFACE (iMeshObjectFactory)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iParticlesFactoryState)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csParticlesFactory::eiParticlesFactoryState)
-  SCF_IMPLEMENTS_INTERFACE (iParticlesFactoryState)
-  SCF_IMPLEMENTS_INTERFACE (iParticlesStateBase)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 csParticlesFactory::csParticlesFactory (csParticlesType* p,
-  iObjectRegistry* objreg) : particles_type(p), object_reg (objreg)
+  iObjectRegistry* objreg) :
+  scfImplementationType(this, p), particles_type(p), object_reg (objreg)
 {
-  SCF_CONSTRUCT_IBASE (p)
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiParticlesFactoryState)
-
   g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
   shmgr = CS_QUERY_REGISTRY (object_reg, iShaderManager);
 
@@ -151,32 +126,9 @@ csPtr<iMeshObject> csParticlesFactory::NewInstance ()
   return csPtr<iMeshObject>(new csParticlesObject (this));
 }
 
-SCF_IMPLEMENT_IBASE (csParticlesObject)
-  SCF_IMPLEMENTS_INTERFACE (iMeshObject)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iParticlesObjectState)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iObjectModel)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csParticlesObject::eiParticlesObjectState)
-  SCF_IMPLEMENTS_INTERFACE (iParticlesObjectState)
-  SCF_IMPLEMENTS_INTERFACE (iParticlesStateBase)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csParticlesObject::eiObjectModel)
-  SCF_IMPLEMENTS_INTERFACE (iObjectModel)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csParticlesObject::eiRenderBufferAccessor)
-  SCF_IMPLEMENTS_INTERFACE (iRenderBufferAccessor)
-SCF_IMPLEMENT_IBASE_END
-
-csParticlesObject::csParticlesObject (csParticlesFactory* p)
-  : logparent (0), pFactory (p)
+csParticlesObject::csParticlesObject (csParticlesFactory* p) :
+  scfImplementationType(this, p), logparent (0), pFactory (p)
 {
-  SCF_CONSTRUCT_IBASE (p)
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiParticlesObjectState)
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObjectModel)
-
   mesh = 0;
   meshpp = 0;
   meshppsize = 0;
@@ -249,9 +201,7 @@ csParticlesObject::csParticlesObject (csParticlesFactory* p)
   svcontext.AttachNew (new csShaderVariableContext);
   bufferHolder.AttachNew (new csRenderBufferHolder);
 
-  scfiRenderBufferAccessor.AttachNew (new eiRenderBufferAccessor (this));
-
-  bufferHolder->SetAccessor (scfiRenderBufferAccessor, (uint32)~0);
+  bufferHolder->SetAccessor (this, (uint32)~0);
 
   csShaderVariable* sv;
   sv = svcontext->GetVariableAdd (radius_name);
@@ -270,11 +220,7 @@ csParticlesObject::csParticlesObject (csParticlesFactory* p)
 csParticlesObject::~csParticlesObject ()
 {
   if (physics)
-    physics->RemoveParticles (&scfiParticlesObjectState);
-
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiObjectModel)
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiParticlesObjectState)
-  SCF_DESTRUCT_IBASE ()
+    physics->RemoveParticles (this);
   
   delete [] meshpp;
   delete mesh;
@@ -372,7 +318,7 @@ bool csParticlesObject::LoadPhysicsPlugin (const char *plugin_id)
 {
   if(physics)
   {
-    physics->RemoveParticles (&scfiParticlesObjectState);
+    physics->RemoveParticles (this);
   }
 
   physics = csLoadPluginCheck<iParticlesPhysics> (pFactory->object_reg,
@@ -384,7 +330,7 @@ bool csParticlesObject::LoadPhysicsPlugin (const char *plugin_id)
       "Could not load the particles physics plugin '%s'!", plugin_id);
     return false;
   }
-  point_data = physics->RegisterParticles (&scfiParticlesObjectState);
+  point_data = physics->RegisterParticles (this);
   return true;
 }
 
@@ -394,8 +340,8 @@ void csParticlesObject::EnableZSort (bool en)
   zsort_enabled = en;
   if (physics)
   {
-    physics->RemoveParticles (&scfiParticlesObjectState);
-    physics->RegisterParticles (&scfiParticlesObjectState);
+    physics->RemoveParticles (this);
+    physics->RegisterParticles (this);
   }
 }
 
@@ -581,7 +527,7 @@ csRenderMesh** csParticlesObject::GetRenderMeshes (int& n, iRenderView* rview,
     if (new_radius>radius)
     {
       radius = new_radius;
-      scfiObjectModel.ShapeChanged ();
+      this->ShapeChanged ();
     }
     running = true;
   }
@@ -690,13 +636,13 @@ void csParticlesObject::Start ()
   if(point_data->Length () < 1) {
     buffer_length = 0;
   }
-  physics->Start (&scfiParticlesObjectState);
+  physics->Start (this);
   running = true;
 }
 
 void csParticlesObject::Stop ()
 {
-  physics->Stop (&scfiParticlesObjectState);
+  physics->Stop (this);
 }
 
 void csParticlesObject::NextFrame (csTicks, const csVector3 &, uint)

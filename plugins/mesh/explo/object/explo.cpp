@@ -31,14 +31,6 @@
 
 CS_IMPLEMENT_PLUGIN
 
-SCF_IMPLEMENT_IBASE_EXT (csExploMeshObject)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iExplosionState)
-SCF_IMPLEMENT_IBASE_EXT_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csExploMeshObject::ExplosionState)
-  SCF_IMPLEMENTS_INTERFACE (iExplosionState)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 void csExploMeshObject::SetupObject ()
 {
   if (!initialized)
@@ -87,9 +79,9 @@ void csExploMeshObject::SetupObject ()
 }
 
 csExploMeshObject::csExploMeshObject (iObjectRegistry* object_reg,
-  iMeshObjectFactory* factory) : csNewtonianParticleSystem (object_reg, factory)
+  iMeshObjectFactory* factory) :
+  scfImplementationType(this, object_reg, factory)
 {
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiExplosionState);
   /// defaults
   scale_particles = false;
   lighted_particles = false;
@@ -106,7 +98,6 @@ csExploMeshObject::csExploMeshObject (iObjectRegistry* object_reg,
 
 csExploMeshObject::~csExploMeshObject()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiExplosionState);
 }
 
 
@@ -133,14 +124,10 @@ void csExploMeshObject::HardTransform (const csReversibleTransform& t)
 
 //----------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE (csExploMeshObjectFactory)
-  SCF_IMPLEMENTS_INTERFACE (iMeshObjectFactory)
-SCF_IMPLEMENT_IBASE_END
-
 csExploMeshObjectFactory::csExploMeshObjectFactory (iMeshObjectType *p,
-	iObjectRegistry* s)
+  iObjectRegistry* s) :
+  scfImplementationType(this)
 {
-  SCF_CONSTRUCT_IBASE (p);
   logparent = 0;
   explo_type = p;
   object_reg = s;
@@ -148,7 +135,6 @@ csExploMeshObjectFactory::csExploMeshObjectFactory (iMeshObjectType *p,
 
 csExploMeshObjectFactory::~csExploMeshObjectFactory ()
 {
-  SCF_DESTRUCT_IBASE ();
 }
 
 csPtr<iMeshObject> csExploMeshObjectFactory::NewInstance ()
@@ -162,28 +148,15 @@ csPtr<iMeshObject> csExploMeshObjectFactory::NewInstance ()
 
 //----------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE (csExploMeshObjectType)
-  SCF_IMPLEMENTS_INTERFACE (iMeshObjectType)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csExploMeshObjectType::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 SCF_IMPLEMENT_FACTORY (csExploMeshObjectType)
 
-
-csExploMeshObjectType::csExploMeshObjectType (iBase* pParent)
+csExploMeshObjectType::csExploMeshObjectType (iBase* pParent) :
+  scfImplementationType(this, pParent)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 csExploMeshObjectType::~csExploMeshObjectType ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 csPtr<iMeshObjectFactory> csExploMeshObjectType::NewFactory ()

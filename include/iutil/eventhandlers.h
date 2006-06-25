@@ -19,7 +19,7 @@
 #ifndef __CS_IUTIL_EVENTHANDLERS_H__
 #define __CS_IUTIL_EVENTHANDLERS_H__
 
-#include "csutil/strset.h"
+#include "csutil/hash.h"
 
 /**\file
  * General event handler naming, name management, indexing, and instantiation interface.
@@ -57,14 +57,14 @@ struct iEventHandler;
  */
 struct iEventHandlerRegistry : public virtual iBase
 {
-  SCF_INTERFACE(iEventHandlerRegistry, 1, 1, 1);
+  SCF_INTERFACE(iEventHandlerRegistry, 1, 2, 0);
 
   /**
    * Get a csHandlerID based upon some string.
    * This should only ever be done to reference generic 
    * (non-instantiated) handler names or single-instance handlers.
    */	
-  virtual CS_CONST_METHOD csHandlerID GetGenericID (const csString &) = 0;
+  virtual CS_CONST_METHOD csHandlerID GetGenericID (const char*) = 0;
   virtual CS_CONST_METHOD csHandlerID GetGenericPreBoundID (csHandlerID) = 0;
   virtual CS_CONST_METHOD csHandlerID GetGenericPostBoundID (csHandlerID) = 0;
   /**
@@ -78,7 +78,7 @@ struct iEventHandlerRegistry : public virtual iBase
    * should only be used internally by other CS libraries when you KNOW 
    * these aren't needed.
    */
-  virtual csHandlerID GetID (csString &) = 0;
+  virtual csHandlerID GetID (const char*) = 0;
   /**
    * Used when an iEventHandler is desroyed to remove our reference.
    */

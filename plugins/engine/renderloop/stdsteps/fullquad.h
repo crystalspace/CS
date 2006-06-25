@@ -86,7 +86,7 @@ public:
   virtual ~csFullScreenQuadRenderStep ();
 
   virtual void Perform (iRenderView* rview, iSector* sector,
-    csShaderVarStack &stacks);
+    iShaderVarStack* stacks);
 
   /*void SetMaterial (const char* m)
   { material = m; }

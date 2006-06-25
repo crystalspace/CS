@@ -30,17 +30,83 @@
 #include "iengine/portalcontainer.h"
 #include "iengine/sector.h"
 
+static bool TestPortalSphere (iPortal* portal, float radius,
+	const csVector3& pos, csSet<csPtrKey<iSector> >& visited_sectors)
+{
+  const csPlane3& wor_plane = portal->GetWorldPlane ();
+  // Can we see the portal?
+  if (wor_plane.Classify (pos) < -0.001)
+  {
+    const csVector3* world_vertices = portal->GetWorldVertices ();
+    csVector3 poly[100];	//@@@ HARDCODE
+    int k;
+    int* idx = portal->GetVertexIndices ();
+    for (k = 0 ; k < portal->GetVertexIndicesCount () ; k++)
+    {
+      poly[k] = world_vertices[idx[k]];
+    }
+    float sqdist_portal = csSquaredDist::PointPoly (
+                  pos, poly, portal->GetVertexIndicesCount (),
+                  wor_plane);
+    if (sqdist_portal <= radius * radius)
+    {
+      portal->CompleteSector (0);
+      iSector* portal_sector = portal->GetSector ();
+      if (portal_sector && !visited_sectors.In (portal_sector))
+      {
+        visited_sectors.Add (portal_sector);
+	return true;
+      }
+    }
+  }
+  return false;
+}
+
+static bool TestCenterPortalSphere (iPortal* portal, float radius,
+	const csVector3& pos, csSet<csPtrKey<iSector> >& visited_sectors)
+{
+  const csPlane3& wor_plane = portal->GetWorldPlane ();
+  // Can we see the portal?
+  if (wor_plane.Classify (pos) < -0.001)
+  {
+    const csVector3* world_vertices = portal->GetWorldVertices ();
+    int* indices = portal->GetVertexIndices ();
+    // Take the average of vertex 0 and 2 under the assumption that
+    // this will usually be a point near enough to the center of the portal.
+    const csVector3& v1 = world_vertices[indices[0]];
+    const csVector3& v2 = world_vertices[indices[2]];
+    csVector3 portal_vert = (v1 + v2) / 2.0f;
+    float sqdist_portal = csSquaredDist::PointPoint (pos, portal_vert);
+    if (sqdist_portal <= radius * radius)
+    {
+      portal->CompleteSector (0);
+      iSector* portal_sector = portal->GetSector ();
+      if (portal_sector && !visited_sectors.In (portal_sector))
+      {
+        visited_sectors.Add (portal_sector);
+	return true;
+      }
+    }
+  }
+  return false;
+}
+
 float csEngineTools::FindShortestDistance (
   	const csVector3& source, iSector* sourceSector,
   	const csVector3& dest, iSector* destSector,
   	float maxradius,
-	csArray<iSector*>& visited_sectors)
+	csSet<csPtrKey<iSector> >& visited_sectors,
+	csVector3& direction,
+	bool accurate)
 {
   if (sourceSector == destSector)
   {
     float sqdist = csSquaredDist::PointPoint (source, dest);
     if (sqdist <= maxradius * maxradius)
+    {
+      direction = dest-source;
       return sqdist;
+    }
     else
       return -1.0f;
   }
@@ -59,80 +125,57 @@ float csEngineTools::FindShortestDistance (
     for (i = 0 ; i < portal_container->GetPortalCount () ; i++)
     {
       iPortal* portal = portal_container->GetPortal (i);
-      const csPlane3& wor_plane = portal->GetWorldPlane ();
-      // Can we see the portal?
-      if (wor_plane.Classify (source) < -0.001)
+      bool rc;
+      if (accurate)
+        rc = TestPortalSphere (portal, maxradius, source, visited_sectors);
+      else
+        rc = TestCenterPortalSphere (portal, maxradius, source,
+		visited_sectors);
+      if (rc)
       {
-        const csVector3* world_vertices = portal->GetWorldVertices ();
-        int* indices = portal->GetVertexIndices ();
-        // Take the average of vertex 0 and 2 under the assumption that
-        // this will usually be a point near enough to the center of the portal.
-        const csVector3& v1 = world_vertices[indices[0]];
-        const csVector3& v2 = world_vertices[indices[2]];
-        csVector3 portal_vert = (v1 + v2) / 2.0f;
-        float sqdist_portal = csSquaredDist::PointPoint (source, portal_vert);
-        if (sqdist_portal <= maxradius * maxradius)
+        csVector3 new_source = source;
+        // Now we have to consider space warping for the portal.
+	bool do_warp = portal->GetFlags ().Check (CS_PORTAL_WARP);
+	if (do_warp)
         {
-          // Ok, we go on. The portal is in our sphere of interest.
-	  portal->CompleteSector (0);
-	  iSector* portal_sector = portal->GetSector ();
-	  if (portal_sector)
-	  {
-	    size_t l;
-	    bool already_visited = false;
-            for (l = 0 ; l < visited_sectors.Length () ; l++)
-            {
-              if (visited_sectors[l] == portal_sector)
-              {
-                already_visited = true;
-                break;
-              }
-            }
-            if (!already_visited)
-            {
-              visited_sectors.Push (portal_sector);
-
-	      float sqdist;
-              // Now we have to consider space warping for the portal.
-              if (portal->GetFlags ().Check (CS_PORTAL_WARP))
-              {
-                iMovable* movable = portal_mesh->GetMovable ();
-                csReversibleTransform trans = movable->GetFullTransform ();
-
-                csReversibleTransform warp_wor;
-                portal->ObjectToWorld (trans, warp_wor);
-                csVector3 new_source = portal->Warp (warp_wor, source);
-	        sqdist = FindShortestDistance (new_source, portal_sector,
-	  	    dest, destSector, maxradius, visited_sectors);
-              }
-	      else
-	      {
-	        sqdist = FindShortestDistance (source, portal_sector,
-	  	    dest, destSector, maxradius, visited_sectors);
-	      }
-	      if (sqdist >= 0 && sqdist < best_sqdist)
-	      {
-	        best_found = true;
-	        best_sqdist = sqdist;
-              }
-	      visited_sectors.Pop ();
-	    }
-	  }
+          iMovable* movable = portal_mesh->GetMovable ();
+          csReversibleTransform trans = movable->GetFullTransform ();
+          csReversibleTransform warp_wor;
+          portal->ObjectToWorld (trans, warp_wor);
+          new_source = portal->Warp (warp_wor, source);
         }
+	csVector3 local_direction;
+        iSector* portal_sector = portal->GetSector ();
+	float sqdist = FindShortestDistance (new_source, portal_sector,
+	  	    dest, destSector, maxradius, visited_sectors,
+		    local_direction, accurate);
+	if (sqdist >= 0 && sqdist < best_sqdist)
+	{
+	  best_found = true;
+	  best_sqdist = sqdist;
+	  if (do_warp)
+	    direction = portal->GetWarp ().Other2ThisRelative (local_direction);
+	  else
+	    direction = local_direction;
+        }
+	visited_sectors.Delete (portal_sector);
       }
     }
   }
   return best_found ? best_sqdist : -1.0f;
 }
 
-float csEngineTools::FindShortestDistance (
+csShortestDistanceResult csEngineTools::FindShortestDistance (
   	const csVector3& source, iSector* sourceSector,
   	const csVector3& dest, iSector* destSector,
-  	float maxradius)
+  	float maxradius, bool accurate)
 {
-  csArray<iSector*> visited_sectors;
-  return FindShortestDistance (source, sourceSector, dest,
-  	destSector, maxradius, visited_sectors);
+  csSet<csPtrKey<iSector> > visited_sectors;
+  csShortestDistanceResult rc;
+  rc.direction.Set (0, 0, 0);
+  rc.sqdistance = FindShortestDistance (source, sourceSector, dest,
+  	destSector, maxradius, visited_sectors, rc.direction, accurate);
+  return rc;
 }
 
 //----------------------------------------------------------------------

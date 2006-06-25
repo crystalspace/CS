@@ -110,7 +110,8 @@ struct iString : public virtual iBase
    *   in terms of human language.
    * \deprecated Use Empty() instead.
    */
-  /* CS_DEPRECATED_METHOD */ virtual void Clear () = 0;
+  CS_DEPRECATED_METHOD_MSG("Use Empty() instead")
+  virtual void Clear () = 0;
 
   /// Get a copy of this string
   virtual csRef<iString> Clone () const = 0;

@@ -20,9 +20,10 @@
 #undef _DEBUG
 #endif
 
-#include "cssysdef.h"
 #include <Python.h>
 #include <stdio.h>
+
+#include "cssysdef.h"
 #include "csutil/sysfunc.h"
 #include "csutil/syspath.h"
 #include "csutil/csstring.h"
@@ -30,6 +31,7 @@
 #include "iutil/cmdline.h"
 #include "iutil/eventq.h"
 #include "csutil/event.h"
+#include "csutil/eventhandlers.h"
 #include "iutil/objreg.h"
 #include "iutil/vfs.h"
 #include "ivaria/reporter.h"

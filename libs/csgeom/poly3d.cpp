@@ -339,6 +339,9 @@ void csPoly3D::SplitWithPlane (
 
 void csPoly3D::CutToPlane (const csPlane3 &split_plane)
 {
+  if (vertices.GetSize() < 3)
+    return; 
+
   csPoly3D old (*this);
   MakeEmpty ();
 

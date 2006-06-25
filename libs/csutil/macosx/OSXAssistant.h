@@ -25,6 +25,7 @@
 #include "csutil/macosx/OSXAssistant.h"
 #include "iutil/event.h"
 #include "iutil/eventh.h"
+#include "csutil/csstring.h"
 struct iEventQueue;
 struct iObjectRegistry;
 struct iVirtualClock;

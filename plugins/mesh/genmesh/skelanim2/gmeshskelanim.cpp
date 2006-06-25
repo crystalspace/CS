@@ -37,32 +37,15 @@
 
 CS_IMPLEMENT_PLUGIN
 
-SCF_IMPLEMENT_IBASE (csGenmeshSkelAnimationControlType)
-SCF_IMPLEMENTS_INTERFACE (iGenMeshAnimationControlType)
-SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csGenmeshSkelAnimationControlType::eiComponent)
-SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 SCF_IMPLEMENT_FACTORY (csGenmeshSkelAnimationControlType)
-
-SCF_IMPLEMENT_IBASE (csGenmeshSkelAnimationControlFactory)
-SCF_IMPLEMENTS_INTERFACE (iGenMeshAnimationControlFactory)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csGenmeshSkelAnimationControl)
-SCF_IMPLEMENTS_INTERFACE (iGenMeshAnimationControl)
-SCF_IMPLEMENTS_INTERFACE (iGenMeshSkeletonControlState)
-SCF_IMPLEMENT_IBASE_END
 
 //-------------------------------------------------------------------------
 
 csGenmeshSkelAnimationControl::csGenmeshSkelAnimationControl (
-  csGenmeshSkelAnimationControlFactory* fact, iMeshObject *mesh, iObjectRegistry* object_reg)
+  csGenmeshSkelAnimationControlFactory* fact, iMeshObject *mesh,
+  iObjectRegistry* object_reg) :
+  scfImplementationType(this)
 {
-  SCF_CONSTRUCT_IBASE (0);
   csGenmeshSkelAnimationControl::object_reg = object_reg;
   mesh_obj = mesh;
   factory = fact;
@@ -121,7 +104,6 @@ csGenmeshSkelAnimationControl::~csGenmeshSkelAnimationControl ()
   delete[] animated_vert_norms;
   delete[] animated_tangents;
   delete[] animated_bitangents;
-  SCF_DESTRUCT_IBASE ();
 }
 
 void csGenmeshSkelAnimationControl::Initialize ()
@@ -182,7 +164,7 @@ void csGenmeshSkelAnimationControl::UpdateArrays (int num_verts)
   }
 }
 
-void csGenmeshSkelAnimationControl::UpdateVertNormArrays (int num_norms)
+void csGenmeshSkelAnimationControl::UpdateVertNormArrays (int /*num_norms*/)
 {
 }
 
@@ -207,7 +189,7 @@ const csVector3* csGenmeshSkelAnimationControl::UpdateVertices (csTicks current,
         skeleton->GetBone(bone_idx)->GetFullTransform();
 
       csShaderVariable* boneQuat = _bones->GetArrayElement (i*2+0);
-      csQuaternion quat; quat.SetMatrix(offset_tr.GetO2T());
+      csQuaternion quat; quat.SetMatrix(offset_tr.GetT2O());
       boneQuat->SetValue(csVector4 (quat.v.x, quat.v.y, quat.v.z, quat.w));
 
       csShaderVariable *boneOffs = _bones->GetArrayElement (i*2+1);
@@ -248,33 +230,32 @@ const csVector3* csGenmeshSkelAnimationControl::UpdateVertices (csTicks current,
   return verts;
 }
 
-const csVector2* csGenmeshSkelAnimationControl::UpdateTexels (csTicks current,
-                                                              const csVector2* texels, int num_texels, uint32 version_id)
+const csVector2* csGenmeshSkelAnimationControl::UpdateTexels (csTicks,
+  const csVector2* texels, int /*num_texels*/, uint32 /*version_id*/)
 {
-  if (!animates_texels) return texels;
   return texels;
 }
 
-const csVector3* csGenmeshSkelAnimationControl::UpdateNormals (csTicks current,
-                                                               const csVector3* normals, int num_normals, uint32 version_id)
+const csVector3* csGenmeshSkelAnimationControl::UpdateNormals (csTicks,
+  const csVector3* normals, int /*num_normals*/, uint32 /*version_id*/)
 {
   return normals;
 }
 
-const csColor4* csGenmeshSkelAnimationControl::UpdateColors (csTicks current,
-                                                             const csColor4* colors, int num_colors, uint32 version_id)
+const csColor4* csGenmeshSkelAnimationControl::UpdateColors (csTicks,
+  const csColor4* colors, int /*num_colors*/, uint32 /*version_id*/)
 {
   return colors;
 }
 
-const csVector3* csGenmeshSkelAnimationControl::UpdateTangents (csTicks current, 
-                                                                const csVector3* tangents, int num_tangents, uint32 version_id)
+const csVector3* csGenmeshSkelAnimationControl::UpdateTangents (csTicks,
+  const csVector3* tangents, int /*num_tangents*/, uint32 /*version_id*/)
 {
   return tangents;
 }
 
-const csVector3* csGenmeshSkelAnimationControl::UpdateBiTangents (csTicks current, 
-                                                                  const csVector3* bitangents, int num_bitangents, uint32 version_id)
+const csVector3* csGenmeshSkelAnimationControl::UpdateBiTangents (csTicks,
+  const csVector3* bitangents, int /*num_bitangents*/, uint32 /*version_id*/)
 {
   return bitangents;
 }
@@ -282,9 +263,9 @@ const csVector3* csGenmeshSkelAnimationControl::UpdateBiTangents (csTicks curren
 //-------------------------------------------------------------------------
 
 csGenmeshSkelAnimationControlFactory::csGenmeshSkelAnimationControlFactory (
-  csGenmeshSkelAnimationControlType* type, iObjectRegistry* object_reg)
+  csGenmeshSkelAnimationControlType* type, iObjectRegistry* object_reg) :
+  scfImplementationType(this, type)
 {
-  SCF_CONSTRUCT_IBASE (type);
   csGenmeshSkelAnimationControlFactory::type = type;
   csGenmeshSkelAnimationControlFactory::object_reg = object_reg;
   InitTokenTable (xmltokens);
@@ -301,7 +282,6 @@ csGenmeshSkelAnimationControlFactory::csGenmeshSkelAnimationControlFactory (
 
 csGenmeshSkelAnimationControlFactory::~csGenmeshSkelAnimationControlFactory ()
 {
-  SCF_DESTRUCT_IBASE ();
 }
 
 csPtr<iGenMeshAnimationControl> csGenmeshSkelAnimationControlFactory::
@@ -450,17 +430,13 @@ const char* csGenmeshSkelAnimationControlFactory::Save (iDocumentNode* parent)
 //-------------------------------------------------------------------------
 
 csGenmeshSkelAnimationControlType::csGenmeshSkelAnimationControlType (
-  iBase* pParent)
+  iBase* pParent) :
+  scfImplementationType(this, pParent)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
-
 }
 
 csGenmeshSkelAnimationControlType::~csGenmeshSkelAnimationControlType ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csGenmeshSkelAnimationControlType::Initialize (iObjectRegistry* object_reg)

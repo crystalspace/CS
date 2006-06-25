@@ -30,6 +30,7 @@
 #include "iutil/virtclk.h"
 #include "csutil/cfgacc.h"
 #include "csutil/util.h"
+#include "csutil/eventnames.h"
 #include "nuppelwriter.h"
 
 struct iObjectRegistry;
