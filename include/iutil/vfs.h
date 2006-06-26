@@ -292,7 +292,10 @@ struct iVFS : public virtual iBase
 {
   SCF_INTERFACE(iVFS, 2, 1, 0);
 
-  /// Set current working directory
+  /*
+   *Set current working directory
+   * \remarks If Path is not mounted, this method will attempt to mount it.
+   */
   virtual bool ChDir (const char *Path) = 0;
 
   /// Get current working directory

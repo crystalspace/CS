@@ -35,6 +35,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(vfs)
 csFileSystem::csFile::csFile (const char *Name) :
   scfImplementationType(this, 0)
 {
+  this->Name = new char[strlen(Name) +1];
+  strcpy(this->Name, Name);
+  this->Name[strlen(Name)] = 0;
+
   Size = 0;
   Error = VFS_STATUS_OK;
 }
@@ -105,7 +109,7 @@ bool csNativeFileSystem::Delete(const char * FileName)
 csVFSFileKind csNativeFileSystem::Exists(const char * FileName)
 {
   struct stat stats;
-  if (stat (FileName, &stats) == 0)
+  if (stat (FileName, &stats) != 0)
     return fkDoesNotExist;
 
 
@@ -119,6 +123,9 @@ bool csNativeFileSystem::CanHandleMount(const char *FileName)
 {
   struct stat stats;
   if (stat (FileName, &stats) != 0)
+    return false;
+
+  if ((stats.st_mode & _S_IFDIR) != 0)
     return false;
 
   return true;
@@ -153,7 +160,8 @@ void csNativeFileSystem::GetFilenames(const char *Path, const char *Mask,
     if (!csGlobMatches (de->d_name, Mask))
           continue;
 
-    Names->Push(de->d_name);
+    if (Names->Find(de->d_name) == csArrayItemNotFound)
+      Names->Push(de->d_name);
   }
   closedir (dh);
 }
@@ -277,12 +285,14 @@ SCF_IMPLEMENT_FACTORY (csArchiveFileSystem)
 csArchiveFileSystem::csArchiveFileSystem(iBase *iParent) :
 	scfImplementationExt0(this, iParent)
 {
-
+  ArchiveCache = new VfsArchiveCache ();
 }
 
 csArchiveFileSystem::~csArchiveFileSystem()
 {
-
+  CS_ASSERT (ArchiveCache);
+  delete ArchiveCache;
+  ArchiveCache = 0;
 }
 
 csArchiveFileSystem::VfsArchive * csArchiveFileSystem::FindFile(const char *FileName) const
@@ -307,9 +317,11 @@ csArchiveFileSystem::VfsArchive * csArchiveFileSystem::FindFile(const char *File
 
   if (a->FileExists ((const char *) ExtractFileName(FileName), 0))
   {
+    ArchiveCache->CheckUp ();
     return a;
   }
 
+  ArchiveCache->CheckUp ();
 	return 0;
 }
 
@@ -339,6 +351,7 @@ iFile* csArchiveFileSystem::Open(const char * FileName, int mode)
 	  f = 0;
   }
 
+  ArchiveCache->CheckUp ();
 	return f;
 }
 
@@ -409,10 +422,12 @@ void csArchiveFileSystem::GetFilenames(const char *Path, const char *Mask,
 	  size_t fnl = strlen (fname);
 	  if (csGlobMatches (fname, Mask))
 	  {
+      if (Names->Find(fname) == csArrayItemNotFound)
         Names->Push(fname);
     }
   }
 
+  ArchiveCache->CheckUp ();
 }
 
 // Query file date/time.
@@ -430,6 +445,7 @@ bool csArchiveFileSystem::GetFileTime (const char *FileName, csFileTime &oTime) 
     
   a->GetFileTime(e, oTime);
 
+  ArchiveCache->CheckUp ();
   return true;
 }
   
@@ -448,6 +464,7 @@ bool csArchiveFileSystem::SetFileTime (const char *FileName, const csFileTime &i
     
   a->SetFileTime(e, iTime);
 
+  ArchiveCache->CheckUp ();
   return true;
 }
 
@@ -466,38 +483,50 @@ bool csArchiveFileSystem::GetFileSize (const char *FileName, size_t &oSize)
     
   oSize = a->GetFileSize(e);
 
+  ArchiveCache->CheckUp ();
   return true;
 }
 
 csString csArchiveFileSystem::ExtractArchiveName(const char *path) const
 {
   csString strPath = path;
+  csString strFileName;
 
     // Remove trailing slash
+#if defined (CS_PLATFORM_DOS) || defined (CS_PLATFORM_WIN32)
+  if (strPath.GetAt(strPath.Length() - 1) == '\\')
+    strPath.Truncate(strPath.Length() - 1);
+
+  size_t newlen = strPath.FindLast('\\');
+#else
   if (strPath.GetAt(strPath.Length() - 1) == VFS_PATH_SEPARATOR)
     strPath.Truncate(strPath.Length() - 1);
 
-  csString strFileName;
-
   size_t newlen = strPath.FindLast(VFS_PATH_SEPARATOR);
-  strPath.SubString(strFileName, 0, newlen);
+#endif
 
+  strPath.SubString(strFileName, 0, newlen);
   return strFileName;
 }
 
 csString csArchiveFileSystem::ExtractFileName(const char *path) const
 {
   csString strPath = path;
-
+  csString strFileName;
     // Remove trailing slash
+#if defined (CS_PLATFORM_DOS) || defined (CS_PLATFORM_WIN32)
+  if (strPath.GetAt(strPath.Length() - 1) == '\\')
+    strPath.Truncate(strPath.Length() - 1);
+
+  size_t newlen = strPath.FindLast('\\');
+#else
   if (strPath.GetAt(strPath.Length() - 1) == VFS_PATH_SEPARATOR)
     strPath.Truncate(strPath.Length() - 1);
 
-  csString strFileName;
-
   size_t newlen = strPath.FindLast(VFS_PATH_SEPARATOR);
-  strPath.SubString(strFileName, newlen+1);
+#endif
 
+  strPath.SubString(strFileName, newlen+1);
   return strFileName;
 }
 

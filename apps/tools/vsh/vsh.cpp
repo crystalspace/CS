@@ -52,6 +52,7 @@ static void cmd_create (char *args);
 static void cmd_exists (char *args);
 static void cmd_help (char *args);
 static void cmd_ls (char *args);
+static void cmd_ln (char *args);
 static void cmd_mount (char *args);
 static void cmd_pwd (char *args);
 static void cmd_quit (char *args);
@@ -86,6 +87,7 @@ VshCmdList const cmdlist [] =
   { "exit",    cmd_quit    },
   { "help",    cmd_help    },
   { "ls",      cmd_ls      },
+  { "ln",      cmd_ln      },
   { "mount",   cmd_mount   },
   { "mounts",  cmd_mounts  },
   { "pwd",     cmd_pwd     },
@@ -169,13 +171,14 @@ static void cmd_help (char *)
   csPrintf (
 "----========************* Virtual Shell commands: *************========----\n"
 "cat {-} file           Display file contents to console; with '-' in one pass\n"
-"cd {path}              Change directory to path; or to root if path not given\n"
+"cd {path}              Change directory to path; changed to '/' if no path given\n"
 "config {-} file        Parse a VFS config file; with '-' file is on real FS\n"
 "cp {-} src dst         Copy file src to file dst; with '-' in one pass\n"
 "create file            Create a file and copy from stdin to file until EOF\n"
 "exists file            Test if file exists on VFS\n"
 "exit                   Exit Virtual Shell\n"
 "ls {-} {path}          List files; with '-' shows full pathname\n"
+"ln target {link}       Create symbolic link to target\n"
 "mount vpath rpath      Add a virtual path mapped to given real path\n"
 "mounts                 Display all virtual mounts\n"
 "pwd                    Print working directory\n"
@@ -523,6 +526,16 @@ static void cmd_rpath (char *args)
   }
 
   puts ((char *)db->GetData ());
+}
+
+static void cmd_ln (char *args)
+{
+  char *target, *link;
+  if (!get2args ("ln", args, target, link, false))
+    return;
+
+  if (!VFS->SymbolicLink(target, link))
+    csPrintfErr ("ln: cannot create link \"%s\" to \"%s\"\n", link, target);
 }
 
 static void cmd_mounts (char* /*args*/)
