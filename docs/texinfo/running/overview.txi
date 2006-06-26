@@ -64,6 +64,16 @@ that you can get from:
 @item csfgen
 A @emph{TrueType} to Crystal Space font converter.
 
+@cindex @file{cslight}
+@cindex Applications, @file{cslight}
+@item cslight
+todo
+
+@cindex @file{docconv}
+@cindex Applications, @file{docconv}
+@item docconv
+todo
+
 @cindex @file{eventtest}
 @cindex Applications, @file{eventtest}
 @item eventtest
@@ -85,9 +95,39 @@ The Crystal Space image manipulator.
 An application demonstrating how you can use the 3D engine to simulate
 a semi-isometric view.
 
+@cindex @file{joytest}
+@cindex Applications, @file{joytest}
+@item joytest
+todo
+
+@cindex @file{levtool}
+@cindex Applications, @file{levtool}
+@item levtool
+todo
+
+@cindex @file{lghtngtest}
+@cindex Applications, @file{lghtngtest}
+@item lghtngtest
+todo
+
+@cindex @file{lighter2}
+@cindex Applications, @file{lighter2}
+@item lighter2
+todo
+
+@cindex @file{maya2spr}
+@cindex Applications, @file{maya2spr}
+@item maya2spr
+todo
+
 @cindex @file{mazing}
 @cindex Applications, @file{mazing}
 @item mazing
+todo
+
+@cindex @file{md32spr}
+@cindex Applications, @file{md32spr}
+@item md32spr
 todo
 
 @cindex @file{mdl2spr}
@@ -96,10 +136,15 @@ todo
 This application is a Quake @file{.mdl} and @file{.md2} model converter.  It
 converts model files into native Crystal Space sprites. @xref{mdl2spr}.
 
-@cindex @file{perftest}
-@cindex Applications, @file{perftest}
-@item perftest
-This is a tool to test graphics performance.
+@cindex @file{partedit}
+@cindex Applications, @file{partedit}
+@item partedit
+todo
+
+@cindex @file{partedit2}
+@cindex Applications, @file{partedit2}
+@item partedit2
+todo
 
 @cindex @file{pathtut}
 @cindex Applications, @file{pathtut}
@@ -109,6 +154,11 @@ todo
 @cindex @file{phystut}
 @cindex Applications, @file{phystut}
 @item phystut
+todo
+
+@cindex @file{picview}
+@cindex Applications, @file{picview}
+@item picview
 todo
 
 @cindex @file{pysimp}
@@ -150,6 +200,21 @@ todo
 @cindex Applications, @file{sndtest}
 @item sndtest
 An application for testing the Crystal Space @sc{sndsys} sound system.
+
+@cindex @file{startme}
+@cindex Applications, @file{startme}
+@item startme
+todo
+
+@cindex @file{unittest}
+@cindex Applications, @file{unittest}
+@item unittest
+todo
+
+@cindex @file{viewmesh}
+@cindex Applications, @file{viewmesh}
+@item viewmesh
+todo
 
 @cindex @file{vsh}
 @cindex Applications, @file{vsh}

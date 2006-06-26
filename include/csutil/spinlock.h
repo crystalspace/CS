@@ -74,7 +74,7 @@ namespace CS
 	int spins = 0;
 	for (;;) {
 	  int ret;
-	  __asm__ __volatile__ ("lock cmpxchgl %2,(%1)" : "=a" (ret) : "r" (&l), "r" (1), "a" (0));
+	  __asm__ __volatile__ ("lock; cmpxchgl %2,(%1)" : "=a" (ret) : "r" (&l), "r" (1), "a" (0));
 	  if(!ret) 
 	  {
 	    CS_ASSERT(!threadid);
@@ -85,13 +85,13 @@ namespace CS
 	  if ((++spins & spinsPerYield) == 0) {
     #if defined (__SVR4) && defined (__sun) /* solaris */
 	    thr_yield();
-    #elif defined(linux)
+    #elif defined(linux) || defined(CS_PLATFORM_MACOSX)
 	    sched_yield();
     #elif defined(CS_PLATFORM_WIN32)
 	    SleepEx (0, FALSE);
     #else  /* no-op yield on unknown systems */
 	    ;
-    #endif /* solaris, linux, CS_PLATFORM_WIN32 */
+    #endif /* solaris, linux, CS_PLATFORM_MACOSX, CS_PLATFORM_WIN32 */
 	  }
 	}
       }
@@ -100,7 +100,7 @@ namespace CS
     CS_FORCEINLINE bool DoLockTry()
     {
       int ret;
-      __asm__ __volatile__ ("lock cmpxchgl %2,(%1)" : "=a" (ret) : "r" (&l), "r" (1), "a" (0));
+      __asm__ __volatile__ ("lock; cmpxchgl %2,(%1)" : "=a" (ret) : "r" (&l), "r" (1), "a" (0));
       if(!ret){
 	CS_ASSERT(!threadid);
 	threadid = CurrentThreadID();

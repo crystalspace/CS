@@ -6,6 +6,55 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+25-Jun-2006
+        - Piotr Obrzut added setting color feature for flare halo components.
+24-Jun-2006
+	- Peter Amstutz deleted the vos plugin from the Crystal Space tree,
+	  as it will now be maintained directly as part of the VOS tree.
+	- Peter Amstutz modified the cs-config script to search for the
+	  CS link libraries under several different possible names, so
+	  as to support finding and linking with the shared library 
+	  version of libcrystalspace.
+23-Jun-2006
+	- res fixed spinlock.h compilation for Intel Macs.
+	- res (blindly) fixed the core audio driver reinterpreting pointers 
+	  to 32bit values as strings which is problematic since quite a bit
+	  of random data may appear before the saving null terminator.
+	- res converted csconout to new SCF.
+	- res changed csconout to use RGBA instead of RGB colors for 
+	  foreground/background/shadows.
+	- caedes added floor operation to shader expressions.
+	- Jorrit fixed csQuaternion::SetMatrix() so that gmeshskelanim2
+	  again works correctly.
+	- Marten reverted jorrits change to csQuaternion as it is wrong.
+	  csQuaternion::SetMatrix was correct as it is, it must be 
+	  gmeshskelanim2 that is buggy. Please people, do not change the
+	  basic math classes unless you know the maths there.
+	- caedes fixed skeleton and gmeshskelanim2 to work again correctly
+	  with the good quaternion math.
+	- caedes added a more finished version of the ambient with additive
+	  layer (pulse is still not handled totally correctly though).
+	- caedes removed glow from parallax.xml and related files as its now
+	  handled in a more general way in ambient.
+	- caedes removed ambient2.xml and specifyambient.xml files as they 
+	  don't seem to have any useful difference with ambient.xml.
+22-Jun-2006
+        - Philip Wyett eliminated _POSIX_C_SOURCE redefinition warning in
+          python plugin on GNU Linux with Python 2.3.
+        - Philip Wyett continued changes to docs.
+	- Jorrit fixed handling of the ':' in path names with viewmesh.
+	- Jorrit fixed several problems in the genmeshanim2 plugin related
+	  to the recent convertion to new SCF. The problem is that it is
+	  unsafe to do this in a header:
+	    virtual iBla* GetBla ()
+	    {
+	      return (iBla*) bla;
+	    }
+	  When the definition of 'bla' is not known this will cause the
+	  cast to go wrong with bad results. To avoid this problem better
+	  use static_cast<iBla*> so that the compiler can catch this.
+	  The correct fix is then to not inline that method and put the
+	  implementation in the cpp file instead.
 20-Jun-2006
 	- mdmkolbe converted the following plugins to the new SCF:
 	    - plugins/mesh/lghtng/
@@ -21,8 +70,8 @@ chronological order.
           them know that comp.graphics.algoritms is a newsgroup.
 	- mdmkolbe tweaked the previous message change for compatibility with
 	  dialog boxes.
-	- David H. Bronke fixed an error in libs/csutil/eventhandlers.cpp where a
-	  const char* was being used as a csString.
+	- David H. Bronke fixed an error in libs/csutil/eventhandlers.cpp
+	  where a const char* was being used as a csString.
 	- David H. Bronke committed a patch by lindquist to fix the CEGUI plugin
 	  for the latest SVN version of CEGUI.
 	- David H. Bronke added a missing #include to include/iengine/sector.h.

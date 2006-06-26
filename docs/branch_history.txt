@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+25-June-2006
+	- David H. Bronke merged changes from revisions 24745 through 24791 of
+	  trunk into the streamloader branch.
 21-June-2006
 	- David H. Bronke merged changes from revisions 24643 through 24745 of
 	  trunk into the streamloader branch.

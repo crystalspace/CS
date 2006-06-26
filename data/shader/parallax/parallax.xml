@@ -18,9 +18,6 @@
       <texture destination="TexNormal" name="tex normal" />
       <texture destination="TexDiffuse" name="tex diffuse" />
       <texture destination="TexHeight" name="tex height" />
-      <?if vars."tex glow".texture ?>
-        <texture destination="TexGlow" name="tex glow" />
-      <?endif?>
       <fp plugin="glcg">
         <cgfp>
           <?Include parallax.cgfp ?>

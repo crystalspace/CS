@@ -1,6 +1,5 @@
-/* -*- Mode: C++; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 2 -*-
-    Copyright (C) 2004 by Peter Amstutz <tetron@interreality.org>
-    Written by Peter Amstutz <tetron@interreality.org>
+/*
+    Copyright (C) 2006 by Frank Richter
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -17,19 +16,19 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_INETWORK_VOSAPI_H__
-#define __CS_INETWORK_VOSAPI_H__
+/* This file is intended to wrap the platform's default operator new,
+ * we definitely don't want  the ptmalloc-overridden version.
+ */
+#define CS_NO_NEW_OVERRIDE
+#include "cssysdef.h"
 
-#include "csutil/scf.h"
+#include <new>
 
-#include <vos/vos/vos.hh>
-
-SCF_VERSION (iVosApi, 0, 1, 1);
-
-/// \todo Document me!
-struct iVosApi : public virtual iBase
-{
-  virtual VUtil::vRef<VOS::Vobject> GetVobject() = 0;
-};
-
-#endif
+void* operator new (size_t s, const CS::AllocPlatform&)
+{ return ::operator new (s); }
+void* operator new[] (size_t s, const CS::AllocPlatform&)
+{ return ::operator new (s); }
+void operator delete (void* p, const CS::AllocPlatform&)
+{ ::operator delete (p); }
+void operator delete[] (void* p, const CS::AllocPlatform&)
+{ ::operator delete (p); }
