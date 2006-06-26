@@ -56,22 +56,6 @@ struct iSndSysSource : public virtual iBase
   /// Retrieve the iSoundStream attached to this source
   virtual csRef<iSndSysStream> GetStream() = 0;
 
-  /// Add an output filter at the specified location.
-  //  Output filters can only receive sound data and cannot modify it.  They will receive data
-  //   from the same thread that the CS event handler executes in, once per frame.
-  //
-  //  Valid Locations:  SS_FILTER_LOC_SOURCEOUT, SS_FILTER_LOC_SOURCEIN
-  //  
-  //  Returns FALSE if the filter could not be added.
-  virtual bool AddOutputFilter(SndSysFilterLocation Location, iSndSysSoftwareOutputFilter *pFilter) = 0;
-
-  /// Remove an output filter from the registered list
-  //
-  //  Valid Locations:  SS_FILTER_LOC_SOURCEOUT, SS_FILTER_LOC_SOURCEIN
-  //
-  // Returns FALSE if the filter is not in the list at the time of the call.
-  virtual bool RemoveOutputFilter(SndSysFilterLocation Location, iSndSysSoftwareOutputFilter *pFilter) = 0;
-
   /// Retrieve a direct pointer to this object
   virtual iSndSysSource *GetPtr() = 0;
 };
@@ -99,6 +83,45 @@ struct iSndSysSourceSoftware : public virtual iBase
 
   /// Renderer convenience interface - Called to provide processing of output filters
   virtual void ProcessOutputFilters() = 0;
+
+  /// Add an output filter at the specified location.
+  //  Output filters can only receive sound data and cannot modify it.  They will receive data
+  //   from the same thread that the CS event handler executes in, once per frame.
+  //
+  //  Valid Locations:  SS_FILTER_LOC_SOURCEOUT, SS_FILTER_LOC_SOURCEIN
+  //  
+  //  Returns FALSE if the filter could not be added.
+  virtual bool AddOutputFilter(SndSysFilterLocation Location, iSndSysSoftwareOutputFilter *pFilter) = 0;
+
+  /// Remove an output filter from the registered list
+  //
+  //  Valid Locations:  SS_FILTER_LOC_SOURCEOUT, SS_FILTER_LOC_SOURCEIN
+  //
+  // Returns FALSE if the filter is not in the list at the time of the call.
+  virtual bool RemoveOutputFilter(SndSysFilterLocation Location, iSndSysSoftwareOutputFilter *pFilter) = 0;
+};
+
+/**
+ * Interface for OpenAL sound sources
+ *
+ * @note Should only be used internally by the OpenAL renderer.
+ */
+struct iSndSysSourceOpenAL : public virtual iBase
+{
+  /// SCF2006 - See http://www.crystalspace3d.org/cseps/csep-0010.html
+  SCF_INTERFACE(iSndSysSourceOpenAL,1,0,0);
+
+  /**
+   * Function to update the source, ie. perform any pending operations, and
+   * possibly refill any pending buffers.
+   *
+   * @note Should only be called from the OpenAL renderer.
+   * @note It is expected that the renderer has set the correct OpenAL context
+   *       before calling the method.
+   * @note DO NOT attempt to lock the renderer in this function, this has
+   *       already been done for you.
+   */
+  virtual void PerformUpdate() = 0;
 
 };
 

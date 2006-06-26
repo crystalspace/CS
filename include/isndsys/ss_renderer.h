@@ -138,6 +138,25 @@ struct iSndSysRendererSoftware : public virtual iBase
 };
 
 
+struct iSndSysRendererOpenAL : public virtual iBase
+{
+  /// SCF2006 - See http://www.crystalspace3d.org/cseps/csep-0010.html
+  SCF_INTERFACE(iSndSysRendererOpenAL,0,1,1);
+
+  /** Requests the use of the renderers OpenAL context.
+   *
+   * @note Should only be used internally by the OpenAL renderer.
+   * @note Should be matched by a call to ReleaseContext.
+   */
+  virtual bool LockWait() = 0;
+
+  /** Releases the use of the renderers OpenAL context.
+   *
+   * @note Should only be used internally by the OpenAL renderer.
+   */
+  virtual void Release() = 0;
+};
+
 
 /** @} */
 
