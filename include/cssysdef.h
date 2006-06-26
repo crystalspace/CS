@@ -685,6 +685,7 @@ static inline void operator delete (void* p)
 static inline void operator delete[] (void* p) 
 { ptfree (p); }
 #else
+#include <new>
 static inline void* operator new (size_t s) throw (std::bad_alloc)
 { 
   void* p = ptmalloc (s);
