@@ -386,12 +386,10 @@ bool VfsNode::Delete(const char *FileName)
 
 void VfsNode::FindFiles(const char *Mask, iStringArray *FileList)
 {
-  printf("Calling FindFiles(%s) from %s\n", Mask, (const char *) VirtualPathname);
   // First add names of all subdirectories
   for (size_t i = 0; i < SubDirectories.Length(); i++)
   {
-    if (!FileList->Contains(ExtractFileName(SubDirectories[i]->VirtualPathname), true))
-       FileList->Push(ExtractFileName(SubDirectories[i]->VirtualPathname));
+      FileList->Push(ExtractFileName(SubDirectories[i]->VirtualPathname));
   }
 
   // Add names from the paths
@@ -610,7 +608,10 @@ csString csVFS::_ExpandPath (const char *Path) const
 
   if (Path[0] != VFS_PATH_SEPARATOR)
   {
-    ExpandedPath = CwdNode->VirtualPathname;
+    if (strcmp((const char *) CwdNode->VirtualPathname, "/") != 0)
+    {
+      ExpandedPath = CwdNode->VirtualPathname;
+    }
     loop = 0;
   }
 
@@ -671,7 +672,6 @@ bool csVFS::Exists (const char *Path) const
 
 csPtr<iStringArray> csVFS::FindFiles (const char *Path) const
 {
-//  printf("Called FindFiles('%s')\n", Path); 
   csScopedMutexLock lock (mutex);
 
   // Get parent node
@@ -688,8 +688,6 @@ csPtr<iStringArray> csVFS::FindFiles (const char *Path) const
     }
     strMask = ExtractFileName(Path);
   }
-
-//  printf("Finding files in node '%s'\n", node->GetName()); 
 
   // Array to store cosntents
   scfStringArray *fl = new scfStringArray;
@@ -812,8 +810,6 @@ bool csVFS::Mount(const char *VirtualPath, const char *RealPath, int priority, s
   if (!VirtualPath || !RealPath)
 	  return false;
 
-  printf(" [+] Mounting %s at %s\n", RealPath, VirtualPath);
-
   // Create the node for the mount
   csString tmp = VirtualPath;
   tmp.Append("/tmp");
@@ -823,7 +819,6 @@ bool csVFS::Mount(const char *VirtualPath, const char *RealPath, int priority, s
 
   if (!node)
   {
-    printf(" [!] Could not create node !!\n");
 	  return false;
   }
   // Create the data structure

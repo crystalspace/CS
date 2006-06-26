@@ -153,8 +153,7 @@ void csNativeFileSystem::GetFilenames(const char *Path, const char *Mask,
     if (!csGlobMatches (de->d_name, Mask))
           continue;
 
-    if (!Names->Contains(de->d_name))
-      Names->Push(de->d_name);
+    Names->Push(de->d_name);
   }
   closedir (dh);
 }
@@ -410,7 +409,6 @@ void csArchiveFileSystem::GetFilenames(const char *Path, const char *Mask,
 	  size_t fnl = strlen (fname);
 	  if (csGlobMatches (fname, Mask))
 	  {
-      if (!Names->Contains(fname))
         Names->Push(fname);
     }
   }
