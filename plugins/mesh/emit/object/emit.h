@@ -24,6 +24,7 @@
 #include "csgeom/transfrm.h"
 #include "csutil/cscolor.h"
 #include "csutil/refarr.h"
+#include "csutil/scf_implementation.h"
 #include "csplugincommon/particlesys/partgen.h"
 #include "imesh/emit.h"
 #include "iutil/eventh.h"
@@ -34,12 +35,13 @@ struct iMaterialWrapper;
 class csEmitMeshObject;
 
 /** fixed value emitter */
-class csEmitFixed : public iEmitFixed
+class csEmitFixed :
+  public scfImplementation2<csEmitFixed,
+    iEmitFixed, scfFakeInterface<iEmitGen3D> >
 {
 private:
   csVector3 val;
 public:
-  SCF_DECLARE_IBASE;
   csEmitFixed (iBase *parent);
   virtual ~csEmitFixed ();
   virtual void GetValue (csVector3& value, csVector3 &given);
@@ -47,14 +49,15 @@ public:
 };
 
 /** box value emitter */
-class csEmitBox : public iEmitBox
+class csEmitBox :
+  public scfImplementation2<csEmitBox,
+    iEmitBox, scfFakeInterface<iEmitGen3D> >
 {
 private:
   csVector3 min, max;
   csVector3 mult;
   csRandomFloatGen randgen;
 public:
-  SCF_DECLARE_IBASE;
   csEmitBox (iBase *parent);
   virtual ~csEmitBox ();
   virtual void GetValue (csVector3& value, csVector3 &given);
@@ -63,7 +66,9 @@ public:
 };
 
 /** Sphere value emitter */
-class csEmitSphere : public iEmitSphere
+class csEmitSphere :
+  public scfImplementation2<csEmitSphere,
+    iEmitSphere, scfFakeInterface<iEmitGen3D> >
 {
 private:
   csVector3 center;
@@ -71,7 +76,6 @@ private:
   float rand_min, rand_mult;
   csRandomFloatGen randgen;
 public:
-  SCF_DECLARE_IBASE;
   csEmitSphere (iBase *parent);
   virtual ~csEmitSphere ();
   virtual void GetValue (csVector3& value, csVector3 &given);
@@ -80,14 +84,15 @@ public:
 };
 
 /** Cone value emitter */
-class csEmitCone : public iEmitCone
+class csEmitCone :
+  public scfImplementation2<csEmitCone,
+    iEmitCone, scfFakeInterface<iEmitGen3D> >
 {
 private:
   csVector3 origin;
   float elevation, azimuth, aperture, min, max;
   csRandomFloatGen randgen;
 public:
-  SCF_DECLARE_IBASE;
   csEmitCone (iBase *parent);
   virtual ~csEmitCone ();
   virtual void GetValue (csVector3& value, csVector3 &given);
@@ -98,7 +103,9 @@ public:
 };
 
 /** Mix value emitter */
-class csEmitMix : public iEmitMix
+class csEmitMix :
+  public scfImplementation2<csEmitMix,
+    iEmitMix, scfFakeInterface<iEmitGen3D> >
 {
 private:
   struct part
@@ -111,7 +118,6 @@ private:
   int nr;
   csRandomFloatGen randgen;
 public:
-  SCF_DECLARE_IBASE;
   csEmitMix (iBase *parent);
   virtual ~csEmitMix ();
   virtual void GetValue (csVector3& value, csVector3 &given);
@@ -124,13 +130,14 @@ public:
 };
 
 /** Line value emitter */
-class csEmitLine : public iEmitLine
+class csEmitLine :
+  public scfImplementation2<csEmitLine,
+    iEmitLine, scfFakeInterface<iEmitGen3D> >
 {
 private:
   csVector3 start, end;
   csRandomFloatGen randgen;
 public:
-  SCF_DECLARE_IBASE;
   csEmitLine (iBase *parent);
   virtual ~csEmitLine ();
   virtual void GetValue (csVector3& value, csVector3 &given);
@@ -139,14 +146,15 @@ public:
 };
 
 /** Cylinder value emitter */
-class csEmitCylinder : public iEmitCylinder
+class csEmitCylinder :
+  public scfImplementation2<csEmitCylinder,
+    iEmitCylinder, scfFakeInterface<iEmitGen3D> >
 {
 private:
   csVector3 start, end;
   float min, max;
   csRandomFloatGen randgen;
 public:
-  SCF_DECLARE_IBASE;
   csEmitCylinder (iBase *parent);
   virtual ~csEmitCylinder ();
   virtual void GetValue (csVector3& value, csVector3 &given);
@@ -157,14 +165,15 @@ public:
 };
 
 /** SphereTangent value emitter */
-class csEmitSphereTangent : public iEmitSphereTangent
+class csEmitSphereTangent :
+  public scfImplementation2<csEmitSphereTangent,
+    iEmitSphereTangent, scfFakeInterface<iEmitGen3D> >
 {
 private:
   csVector3 center;
   float min, max;
   csRandomFloatGen randgen;
 public:
-  SCF_DECLARE_IBASE;
   csEmitSphereTangent (iBase *parent);
   virtual ~csEmitSphereTangent ();
   virtual void GetValue (csVector3& value, csVector3 &given);
@@ -173,14 +182,15 @@ public:
 };
 
 /** CylinderTangent value emitter */
-class csEmitCylinderTangent : public iEmitCylinderTangent
+class csEmitCylinderTangent :
+  public scfImplementation2<csEmitCylinderTangent,
+    iEmitCylinderTangent, scfFakeInterface<iEmitGen3D> >
 {
 private:
   csVector3 start, end;
   float min, max;
   csRandomFloatGen randgen;
 public:
-  SCF_DECLARE_IBASE;
   csEmitCylinderTangent (iBase *parent);
   virtual ~csEmitCylinderTangent ();
   virtual void GetValue (csVector3& value, csVector3 &given);
@@ -218,7 +228,8 @@ public:
  * and start acceleration.
  * Depending on the age of each particle, it can be coloured, scaled, faded...
  */
-class csEmitMeshObject : public csParticleSystem
+class csEmitMeshObject :
+  public scfImplementationExt1<csEmitMeshObject, csParticleSystem, iEmitState>
 {
 protected:
   /// true if particles should be lighted
@@ -425,89 +436,19 @@ public:
   virtual void HardTransform (const csReversibleTransform& t);
   virtual bool SupportsHardTransform () const { return false; }
 
-  SCF_DECLARE_IBASE_EXT (csParticleSystem);
-
-  //------------------------- iEmitState implementation ----------------
-  class EmitState : public iEmitState
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csEmitMeshObject);
-    virtual void SetParticleCount (int num)
-    { scfParent->SetParticleCount (num); }
-    virtual void SetLighting (bool l)
-    { scfParent->SetLighting (l); }
-    virtual int GetParticleCount () const
-    { return (int)scfParent->GetParticleCount (); }
-    virtual bool GetLighting () const
-    { return scfParent->GetLighting (); }
-    virtual void SetParticleTime (int l)
-    { scfParent->SetParticleTime (l); }
-    virtual int GetParticleTime () const
-    { return scfParent->GetParticleTime (); }
-    virtual void SetStartPosEmit (iEmitGen3D *emit)
-    { scfParent->SetStartPosEmit (emit); }
-    virtual iEmitGen3D* GetStartPosEmit () const
-    { return scfParent->GetStartPosEmit (); }
-    virtual void SetStartSpeedEmit (iEmitGen3D *emit)
-    { scfParent->SetStartSpeedEmit (emit); }
-    virtual iEmitGen3D* GetStartSpeedEmit () const
-    { return scfParent->GetStartSpeedEmit (); }
-    virtual void SetStartAccelEmit (iEmitGen3D *emit)
-    { scfParent->SetStartAccelEmit (emit); }
-    virtual iEmitGen3D* GetStartAccelEmit () const
-    { return scfParent->GetStartAccelEmit (); }
-    virtual void SetAttractorEmit (iEmitGen3D *emit)
-    { scfParent->SetAttractorEmit (emit); }
-    virtual iEmitGen3D* GetAttractorEmit () const
-    { return scfParent->GetAttractorEmit (); }
-    virtual void SetAttractorForce (float f)
-    {scfParent->SetAttractorForce (f);}
-    virtual float GetAttractorForce () const
-    {return scfParent->GetAttractorForce ();}
-    virtual void SetFieldSpeedEmit (iEmitGen3D *emit)
-    { scfParent->SetFieldSpeedEmit (emit); }
-    virtual iEmitGen3D* GetFieldSpeedEmit () const
-    { return scfParent->GetFieldSpeedEmit (); }
-    virtual void SetFieldAccelEmit (iEmitGen3D *emit)
-    { scfParent->SetFieldAccelEmit (emit); }
-    virtual iEmitGen3D* GetFieldAccelEmit () const
-    { return scfParent->GetFieldAccelEmit (); }
-    virtual int GetAgingCount () const { return scfParent->GetAgingCount ();}
-    virtual void AddAge (int time, const csColor& color, float alpha,
-        float swirl, float rotspeed, float scale)
-    { scfParent->AddAge (time, color, alpha, swirl, rotspeed, scale);}
-    virtual void RemoveAge (int time, const csColor& color, float alpha,
-        float swirl, float rotspeed, float scale)
-    { scfParent->RemoveAge (time, color, alpha, swirl, rotspeed, scale);}
-    virtual void GetAgingMoment(int i, int& time, csColor& color, float &alpha,
-        float& swirl, float& rotspeed, float& scale)
-    {scfParent->GetAgingMoment(i, time, color, alpha, swirl, rotspeed, scale);}
-    virtual void ReplaceAge (int time, const csColor& color, float alpha,
-        float swirl, float rotspeed, float scale)
-    { scfParent->ReplaceAge (time, color, alpha, swirl, rotspeed, scale);}
-    virtual void SetRectParticles (float w, float h)
-    { scfParent->SetRectParticles (w,h); }
-    virtual void SetRegularParticles (int s, float r)
-    { scfParent->SetRegularParticles (s,r); }
-    virtual bool UsingRectParticles () const
-    { return scfParent->UsingRectParticles (); }
-    virtual void GetRectParticles (float &w, float &h) const
-    { scfParent->GetRectParticles (w,h); }
-    virtual void GetRegularParticles (int &s, float &r) const
-    { scfParent->GetRegularParticles (s,r); }
-    virtual void SetContainerBox (bool enabled, const csVector3& min,
-      const csVector3& max)
-    { scfParent->SetContainerBox (enabled, min, max); }
-    virtual bool GetContainerBox (csVector3& min, csVector3& max) const
-    { return scfParent->GetContainerBox (min, max); }
-
-  } scfiEmitState;
-  friend class EmitState;
+  // Redirect some iEmitState functions to the csParticleSystem implemenation
+  virtual void SetParticleCount (int num)
+  { csParticleSystem::SetParticleCount (num); }
+  virtual int GetParticleCount () const
+  { return csParticleSystem::GetParticleCount (); }
 };
 
 /**
  * Factory for emitter.
  */
-class csEmitMeshObjectFactory : public iMeshObjectFactory
+class csEmitMeshObjectFactory :
+  public scfImplementation2<csEmitMeshObjectFactory,
+    iMeshObjectFactory, iEmitFactoryState>
 {
 private:
   iObjectRegistry* object_reg;
@@ -523,8 +464,6 @@ public:
   virtual ~csEmitMeshObjectFactory ();
 
   //------------------------ iMeshObjectFactory implementation --------------
-  SCF_DECLARE_IBASE;
-
   virtual csFlags& GetFlags () { return flags; }
   virtual csPtr<iMeshObject> NewInstance ();
   virtual csPtr<iMeshObjectFactory> Clone () { return 0; }
@@ -542,43 +481,38 @@ public:
   virtual uint GetMixMode () const { return 0; }
 
   //------------------------- iEmitFactoryState implementation ----------------
-  class EmitFactoryState : public iEmitFactoryState
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csEmitMeshObjectFactory);
-    virtual csRef<iEmitFixed> CreateFixed ()
-    { return new csEmitFixed (0); }
-    virtual csRef<iEmitBox> CreateBox ()
-    { return new csEmitBox (0); }
-    virtual csRef<iEmitSphere> CreateSphere ()
-    { return new csEmitSphere (0); }
-    virtual csRef<iEmitCone> CreateCone ()
-    { return new csEmitCone (0); }
-    virtual csRef<iEmitMix> CreateMix ()
-    { return new csEmitMix (0); }
-    virtual csRef<iEmitLine> CreateLine ()
-    { return new csEmitLine (0); }
-    virtual csRef<iEmitCylinder> CreateCylinder ()
-    { return new csEmitCylinder (0); }
-    virtual csRef<iEmitSphereTangent> CreateSphereTangent ()
-    { return new csEmitSphereTangent (0); }
-    virtual csRef<iEmitCylinderTangent> CreateCylinderTangent ()
-    { return new csEmitCylinderTangent (0); }
-  } scfiEmitFactoryState;
-  friend class EmitFactoryState;
+  virtual csRef<iEmitFixed> CreateFixed ()
+  { return new csEmitFixed (0); }
+  virtual csRef<iEmitBox> CreateBox ()
+  { return new csEmitBox (0); }
+  virtual csRef<iEmitSphere> CreateSphere ()
+  { return new csEmitSphere (0); }
+  virtual csRef<iEmitCone> CreateCone ()
+  { return new csEmitCone (0); }
+  virtual csRef<iEmitMix> CreateMix ()
+  { return new csEmitMix (0); }
+  virtual csRef<iEmitLine> CreateLine ()
+  { return new csEmitLine (0); }
+  virtual csRef<iEmitCylinder> CreateCylinder ()
+  { return new csEmitCylinder (0); }
+  virtual csRef<iEmitSphereTangent> CreateSphereTangent ()
+  { return new csEmitSphereTangent (0); }
+  virtual csRef<iEmitCylinderTangent> CreateCylinderTangent ()
+  { return new csEmitCylinderTangent (0); }
 };
 
 /**
  * Emit type. This is the plugin you have to use to create instances
  * of csEmitMeshObjectFactory.
  */
-class csEmitMeshObjectType : public iMeshObjectType
+class csEmitMeshObjectType :
+  public scfImplementation2<csEmitMeshObjectType,
+    iMeshObjectType, iComponent>
 {
 private:
   iObjectRegistry* object_reg;
 
 public:
-  SCF_DECLARE_IBASE;
-
   /// Constructor.
   csEmitMeshObjectType (iBase*);
   /// Destructor.
@@ -586,13 +520,8 @@ public:
   /// Draw.
   virtual csPtr<iMeshObjectFactory> NewFactory ();
 
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csEmitMeshObjectType);
-    virtual bool Initialize (iObjectRegistry* p)
-    { scfParent->object_reg = p; return true; }
-  } scfiComponent;
-  friend struct eiComponent;
+  virtual bool Initialize (iObjectRegistry* p)
+  { this->object_reg = p; return true; }
 };
 
 #endif // __CS_EMIT_H__

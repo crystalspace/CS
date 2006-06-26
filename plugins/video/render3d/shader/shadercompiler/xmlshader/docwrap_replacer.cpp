@@ -52,6 +52,8 @@ bool csReplacerDocumentNode::Equals (iDocumentNode* other)
   return ((csReplacerDocumentNode*)other)->Equals (wrappedNode);
 }
 
+#include "csutil/custom_new_disable.h"
+
 csRef<iDocumentNodeIterator> csReplacerDocumentNode::GetNodes ()
 {
   csReplacerDocumentNodeIterator* iter = 
@@ -74,6 +76,8 @@ csReplacerDocumentNode::GetAttributes ()
     new (shared->attrIterPool) csReplacerDocumentAttributeIterator (this);
   return csPtr<iDocumentAttributeIterator> (iter);
 }
+
+#include "csutil/custom_new_enable.h"
 
 CS_IMPLEMENT_STATIC_VAR (ReplacerAttrAlloc, 
                          csBlockAllocator<csReplacerDocumentAttribute>, ())
@@ -193,6 +197,8 @@ csReplacerDocumentNodeFactory::csReplacerDocumentNodeFactory ()
 {
 }
 
+#include "csutil/custom_new_disable.h"
+
 csRef<iDocumentNode> csReplacerDocumentNodeFactory::CreateWrapper (
   iDocumentNode* wrappedNode, csReplacerDocumentNode* parent, 
   Substitutions* subst)
@@ -201,6 +207,8 @@ csRef<iDocumentNode> csReplacerDocumentNodeFactory::CreateWrapper (
     new (nodePool) csReplacerDocumentNode (wrappedNode, parent, this, subst);
   return csPtr<iDocumentNode> (newNode);
 }
+
+#include "csutil/custom_new_enable.h"
 
 void csReplacerDocumentNodeFactory::Substitute (const char* in, 
 						csString& out, 

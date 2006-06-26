@@ -2740,27 +2740,15 @@ const csBox2& csTerrainFactory::GetSamplerRegion ()
 
 //----------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE (csTerrainObjectType)
-  SCF_IMPLEMENTS_INTERFACE (iMeshObjectType)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csTerrainObjectType::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 SCF_IMPLEMENT_FACTORY (csTerrainObjectType)
 
-csTerrainObjectType::csTerrainObjectType (iBase* pParent)
+csTerrainObjectType::csTerrainObjectType (iBase* pParent) :
+  scfImplementationType(this, pParent)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 csTerrainObjectType::~csTerrainObjectType ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 csPtr<iMeshObjectFactory> csTerrainObjectType::NewFactory()

@@ -23,7 +23,7 @@
  * General mesh object skeletal animation
  */ 
 
-#include "csutil/scf.h"
+#include "csutil/scf_interface.h"
 
 #include "imesh/genmesh.h"
 
@@ -150,13 +150,13 @@ struct iGenMeshSkeletonControlState : public virtual iBase
   virtual int GetAnimatedVertNormalsCount() = 0;
 };
 
-SCF_VERSION  (iGenMeshSkeletonControlFactory, 0, 0, 1);
-
 /**
  * \todo Document me!
  */
-struct iGenMeshSkeletonControlFactory: public iGenMeshAnimationControlFactory 
+struct iGenMeshSkeletonControlFactory : public iGenMeshAnimationControlFactory 
 {
+  SCF_INTERFACE(iGenMeshSkeletonControlFactory, 2, 0, 0);
+
   /**
    * Load animation script from file
    */
@@ -173,10 +173,10 @@ struct iGenMeshSkeletonControlFactory: public iGenMeshAnimationControlFactory
   virtual void DeleteAllScripts() = 0;
 };
 
-SCF_VERSION  (iGenMeshSkeletonBone, 0, 0, 1);
-
-struct iGenMeshSkeletonBone : public iBase
+struct iGenMeshSkeletonBone : public virtual iBase
 {
+  SCF_INTERFACE(iGenMeshSkeletonBone, 2, 0, 0);
+
   /**
    * Get bone name.
    */
@@ -265,24 +265,24 @@ struct iGenMeshSkeletonBone : public iBase
   virtual iGenMeshSkeletonBoneUpdateCallback *GetUpdateCallback () = 0;
 };
 
-SCF_VERSION  (iGenMeshSkeletonBoneUpdateCallback, 0, 0, 1);
-
 /**
  * \todo Document me!
  */
-struct iGenMeshSkeletonBoneUpdateCallback : public iBase
+struct iGenMeshSkeletonBoneUpdateCallback : public virtual iBase
 {
+  SCF_INTERFACE(iGenMeshSkeletonBoneUpdateCallback, 2, 0, 0);
+
   virtual void UpdateTransform(iGenMeshSkeletonBone *bone,
 		const csReversibleTransform & transform) = 0;
 };
 
-SCF_VERSION  (iGenMeshSkeletonScript, 0, 0, 1);
-
 /**
  * \todo Document me!
  */
-struct iGenMeshSkeletonScript : public iBase
+struct iGenMeshSkeletonScript : public virtual iBase
 {
+  SCF_INTERFACE(iGenMeshSkeletonScript, 2, 0, 0);
+
   /**
    * Get script name.
    */

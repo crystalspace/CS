@@ -37,13 +37,13 @@ namespace CS
   /**
    * Simple helper class to measure execution time of a block.
    * When destructed, csPrintf()s the time that has passed between
-   * construction and destruction in &micro;s.
+   * construction and destruction in microseconds.
    * 
    * Use like:
    * \code
    * void Foo (int x)
    * {
-   *   csMeasureTime measureFoo ("Foo (%d) time", x);
+   *   CS::MeasureTime measureFoo ("Foo (%d) time", x);
    *   
    *   // ...
    * }

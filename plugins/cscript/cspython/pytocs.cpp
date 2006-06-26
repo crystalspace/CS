@@ -21,8 +21,9 @@
 #undef _DEBUG
 #endif
 
-#include "cssysdef.h"
 #include <Python.h>
+
+#include "cssysdef.h"
 #include "csutil/csstring.h"
 #include "cspython.h"
 

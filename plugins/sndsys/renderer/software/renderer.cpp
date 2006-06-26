@@ -238,7 +238,8 @@ bool csSndSysRendererSoftware::Initialize (iObjectRegistry *obj_reg)
   m_pObjectRegistry=obj_reg;
 
   // Use report here since the eventrecorder isn't ready yet
-  Report (CS_REPORTER_SEVERITY_DEBUG, "Software Renderer Initializing..");
+  Report (CS_REPORTER_SEVERITY_DEBUG,
+    "Sound System Software Renderer Initializing...");
 
   // Get an interface for the plugin manager
   csRef<iPluginManager> plugin_mgr (

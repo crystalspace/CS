@@ -42,7 +42,7 @@ struct CS_CRYSTALSPACE_EXPORT csMemTrackerInfo
   size_t totalDeallocCount;
   void Init (const char* filename)
   {
-    file = (char*)malloc (strlen (filename)+1);
+    file = (char*)cs_malloc (strlen (filename)+1);
     strcpy (file, filename);
     max_alloc = 0;
     current_alloc = 0;

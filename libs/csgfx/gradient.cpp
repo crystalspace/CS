@@ -22,44 +22,16 @@
 
 #include "csqint.h"
 #include "csgfx/gradient.h"
-
-csGradientShade::csGradientShade() :
-  left (0, 0, 0, 1.0f), right (0, 0, 0, 1.0f), position (0)
-{
-}
-
-csGradientShade::csGradientShade (csColor4 left_color, csColor4 right_color, 
-				  float pos) :
-  left (left_color), right (right_color), position (pos)
-{
-}
-
-csGradientShade::csGradientShade (csColor left_color, csColor right_color, 
-				  float pos) :
-  position (pos)
-{
-	left.Set(left_color.red, left_color.green, left_color.blue, 1.0f);
-	right.Set(right_color.red, right_color.green, right_color.blue, 1.0f);	
-}
-
-csGradientShade::csGradientShade (csColor4 color, float pos) :
-  left (color), right (color), position (pos)
-{
-}
-
-csGradientShade::csGradientShade (csColor color, float pos):position(pos)
-{
-	left.Set(color.red, color.green, color.blue);
-	right.Set(color.red, color.green, color.blue);	
-}
+#include "csgeom/math.h"
 
 /////////////////////// csGradient //////////////////////////
 
-csGradient::csGradient()
+csGradient::csGradient() : scfImplementationType (this)
 {
 }
 
-csGradient::csGradient (csColor4 first, csColor4 last)
+csGradient::csGradient (csColor4 first, csColor4 last) : 
+  scfImplementationType (this)
 {
   AddShade (csGradientShade (first, 0.0f));
   AddShade (csGradientShade (last, 1.0f));
@@ -76,9 +48,20 @@ static int ShadeCompare (csGradientShade const& item,
     return 0;
 }
 
-void csGradient::AddShade (csGradientShade shade)
+void csGradient::AddShade (const csGradientShade& shade)
 {
   shades.InsertSorted (shade, &ShadeCompare);
+}
+
+void csGradient::AddShade (const csColor4& color, float position)
+{
+  shades.InsertSorted (csGradientShade (color, position), &ShadeCompare);
+}
+
+void csGradient::AddShade (const csColor4& left, const csColor4& right, 
+  float position)
+{
+  shades.InsertSorted (csGradientShade (left, right, position), &ShadeCompare);
 }
 
 void csGradient::Clear ()
@@ -86,27 +69,24 @@ void csGradient::Clear ()
   shades.DeleteAll ();
 }
 
-#define CLAMP(x) ((x<EPSILON)?0.0f:(((x-1.0f)>EPSILON)?1.0f:x))
-
 bool csGradient::Render (csRGBcolor* pal, size_t count,
 			 float begin, float end) const
 {
+  csRGBpixel *tmp = new csRGBpixel[count];
+	
+  bool result = Render(tmp, count, begin, end);	
+	
+  if (result)
+  {
+    for(size_t i=0; i<count; ++i)
+    {
+      pal[i].Set (tmp[i].red, tmp[i].green, tmp[i].blue);			
+    }	
+  }	
 
-	csRGBpixel *tmp = new csRGBpixel[count];
+  delete [] tmp;
 	
-	bool result = Render(tmp, count, begin, end);	
-	
-	if (result)
-	{
-		for(size_t i=0; i<count; ++i)
-		{
-			pal[i].Set(tmp[i].red, tmp[i].green, tmp[i].blue);			
-		}	
-	}	
-	
-	delete [] tmp;
-	
-	return result;
+  return result;
 }
 
 bool csGradient::Render (csRGBpixel* pal, size_t count,
@@ -151,10 +131,10 @@ bool csGradient::Render (csRGBpixel* pal, size_t count,
       }
     }
 
-    pal[i].red = csQint (CLAMP (color.red) * 255.99f);
-    pal[i].green = csQint (CLAMP (color.green) * 255.99f);
-    pal[i].blue = csQint (CLAMP (color.blue) * 255.99f);
-    pal[i].alpha = csQint (CLAMP (color.alpha) * 255.99f);
+    pal[i].red = csQint (csClamp (color.red, 1.0f, 0.0f) * 255.99f);
+    pal[i].green = csQint (csClamp (color.green, 1.0f, 0.0f) * 255.99f);
+    pal[i].blue = csQint (csClamp (color.blue, 1.0f, 0.0f) * 255.99f);
+    pal[i].alpha = csQint (csClamp (color.alpha, 1.0f, 0.0f) * 255.99f);
 
     color += delta;
     gradpos += step;
@@ -163,3 +143,9 @@ bool csGradient::Render (csRGBpixel* pal, size_t count,
   return true;
 }
 
+csPtr<iGradientShades> csGradient::GetShades ()
+{
+  csRef<iGradientShades> shadesArray;
+  shadesArray.AttachNew (new scfGradientShadesArray (this));
+  return csPtr<iGradientShades> (shadesArray);
+}

@@ -42,7 +42,7 @@ namespace CS
     BfdSymbols::~BfdSymbols ()
     {
       if (abfd != 0) bfd_close (abfd);
-      if (syms != 0) free (syms);
+      if (syms != 0) cs_free (syms);
     }
     
     bool BfdSymbols::CheckValid()
@@ -56,7 +56,7 @@ namespace CS
     {
       int symsize = bfd_get_symtab_upper_bound (abfd);
       if (symsize < 0) return false;
-      syms = (asymbol**)malloc (symsize);
+      syms = (asymbol**)cs_malloc (symsize);
       
       int numSyms = bfd_canonicalize_symtab (abfd, syms);
       return numSyms > 0;

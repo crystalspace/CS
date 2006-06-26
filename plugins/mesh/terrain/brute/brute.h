@@ -30,6 +30,7 @@
 #include "csutil/list.h"
 #include "csutil/refarr.h"
 #include "csutil/sysfunc.h"
+#include "csutil/scf_implementation.h"
 #include "csutil/thread.h"
 #include "csutil/weakref.h"
 #include "iengine/lightmgr.h"
@@ -624,43 +625,6 @@ public:
 
   virtual csFlags& GetFlags () { return flags; }
 
-#if 0
-  class eiTerrainFactoryState : public iTerrainFactoryState
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csTerrainFactory);
-    virtual void SetTerraFormer (iTerraFormer* form)
-    {
-      scfParent->SetTerraFormer (form);
-    }
-
-    virtual iTerraFormer* GetTerraFormer ()
-    {
-      return scfParent->GetTerraFormer ();
-    }
-
-    virtual void SetSamplerRegion (const csBox2& region)
-    {
-      scfParent->SetSamplerRegion (region);
-    }
-
-    virtual const csBox2& GetSamplerRegion ()
-    {
-      return scfParent->GetSamplerRegion ();
-    }
-
-    virtual bool SaveState (const char* /*filename*/)
-    {
-      return true;
-    }
-    virtual bool RestoreState (const char* /*filename*/)
-    {
-      return true;
-    }
-  } scfiTerrainFactoryState;
-
-  friend class eiTerrainFactoryState;
-#endif
-
   /**\name iObjectModel implementation
    * @{ */
   iTerraFormer* GetTerraFormerColldet () { return terraformer; }
@@ -668,27 +632,6 @@ public:
   void SetObjectBoundingBox (const csBox3& /*bbox*/) { }
   void GetRadius (float& /*rad*/, csVector3& /*cent*/) { }
   /** @} */
-#if 0
-  class eiObjectModel : public csObjectModel
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csTerrainFactory);
-    virtual void GetObjectBoundingBox (csBox3& /*bbox*/)
-    {
-      //scfParent->GetObjectBoundingBox (bbox);
-    }
-    virtual void SetObjectBoundingBox (const csBox3& /*bbox*/)
-    {
-      //scfParent->SetObjectBoundingBox (bbox);
-    }
-    virtual void GetRadius (float& /*rad*/, csVector3& /*cent*/)
-    {
-      //scfParent->GetRadius (rad, cent);
-    }
-    virtual iTerraFormer* GetTerraFormerColldet ()
-    { return scfParent->terraformer; }
-  } scfiObjectModel;
-  friend class eiObjectModel;
-#endif
 
   virtual iObjectModel* GetObjectModel () { return this; }
   virtual bool SetMaterialWrapper (iMaterialWrapper*) { return false; }
@@ -701,14 +644,14 @@ public:
 * TerrFunc type. This is the plugin you have to use to create instances
 * of csTerrainFactory.
 */
-class csTerrainObjectType : public iMeshObjectType
+class csTerrainObjectType :
+  public scfImplementation2<csTerrainObjectType,
+    iMeshObjectType, iComponent>
 {
 private:
   iObjectRegistry *object_reg;
 
 public:
-  SCF_DECLARE_IBASE;
-
   /// Constructor.
   csTerrainObjectType (iBase*);
   /// Destructor.
@@ -717,13 +660,8 @@ public:
   /// create a new factory.
   virtual csPtr<iMeshObjectFactory> NewFactory ();
 
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csTerrainObjectType);
-    virtual bool Initialize (iObjectRegistry* p)
-    { scfParent->object_reg = p; return true; }
-  } scfiComponent;
-  friend struct eiComponent;
+  virtual bool Initialize (iObjectRegistry* p)
+  { this->object_reg = p; return true; }
 };
 
 }

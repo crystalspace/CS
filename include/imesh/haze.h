@@ -23,17 +23,14 @@
  * Haze mesh object
  */ 
 
-#include "csutil/scf.h"
+#include "csutil/scf_interface.h"
 
 /**\addtogroup meshplugins
  * @{ */
 
 struct iMaterialWrapper;
 
-class csVector2;
 class csVector3;
-
-SCF_VERSION (iHazeHull, 0, 0, 1);
 
 /**
  * A mesh specially meant for use by the haze.
@@ -50,8 +47,10 @@ SCF_VERSION (iHazeHull, 0, 0, 1);
  * For a particular polygon, the edges return their points in clockwise
  * ordering.
  */
-struct iHazeHull : public iBase
+struct iHazeHull : public virtual iBase
 {
+  SCF_INTERFACE(iHazeHull, 2, 0, 0);
+
   /// get the number of polygons
   virtual int GetPolygonCount() const = 0;
   /// get the total number of vertices
@@ -78,37 +77,37 @@ struct iHazeHull : public iBase
     int& end_idx) const = 0;
 };
 
-SCF_VERSION (iHazeHullBox, 0, 0, 1);
-
 /**
  * A predefined hull.
  */
-struct iHazeHullBox : public iBase
+struct iHazeHullBox : public virtual iBase
 {
+  SCF_INTERFACE(iHazeHullBox, 2, 0, 0);
+
   /// get box settings, min and max
   virtual void GetSettings(csVector3& min, csVector3& max) = 0;
 };
 
-SCF_VERSION (iHazeHullCone, 0, 0, 1);
-
 /**
  * A predefined hull.
  */
-struct iHazeHullCone : public iBase
+struct iHazeHullCone : public virtual iBase
 {
+  SCF_INTERFACE(iHazeHullCone, 2, 0, 0);
+
   /// get Cone settings, nr_sides, start, end and radii of those
   virtual void GetSettings(int &nr, csVector3& a, csVector3& b, float &ra,
         float &rb) = 0;
 };
 
-SCF_VERSION (iHazeHullCreation, 0, 0, 2);
-
 /**
  * This interface is implemented by the haze factory in order to be able to
  * create the predefined haze hulls.
  */
-struct iHazeHullCreation : public iBase
+struct iHazeHullCreation : public virtual iBase
 {
+  SCF_INTERFACE(iHazeHullCreation, 2, 0, 0);
+
   /// create a predefined hull: a box given min and max.
   virtual csRef<iHazeHullBox> CreateBox(const csVector3& min,
     const csVector3& max) const = 0;
@@ -117,8 +116,6 @@ struct iHazeHullCreation : public iBase
     const csVector3& end, float srad, float erad) const = 0;
 };
 
-SCF_VERSION (iHazeFactoryState, 0, 0, 1);
-
 /**
  * This interface describes the API for the sprite factory mesh object.
  * When multiple hulls are used, they must have the same number of
@@ -126,8 +123,10 @@ SCF_VERSION (iHazeFactoryState, 0, 0, 1);
  * 
  * The factory also implements the iHazeHullCreation interface
  */
-struct iHazeFactoryState : public iBase
+struct iHazeFactoryState : public virtual iBase
 {
+  SCF_INTERFACE(iHazeFactoryState, 2, 0, 0);
+
   /// Set the point of origin, the center of the texture.
   virtual void SetOrigin(const csVector3& pos) = 0;
   /// Get the point of origin
@@ -152,14 +151,13 @@ struct iHazeFactoryState : public iBase
   virtual float GetLayerScale(int layer) const = 0;
 };
 
-SCF_VERSION (iHazeState, 0, 0, 1);
-
 /**
  * This interface describes the API for the sprite factory mesh object.
  * iHazeState inherits from iHazeFactoryState.
  */
 struct iHazeState : public iHazeFactoryState
 {
+  SCF_INTERFACE(iHazeState, 2, 0, 0);
 };
 
 /** @} */

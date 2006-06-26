@@ -157,7 +157,7 @@ namespace CS
       }
       ret = vfs->ChDir (path);
 
-      free (cwd);
+      platform_free (cwd);
       return ret;
     }
 

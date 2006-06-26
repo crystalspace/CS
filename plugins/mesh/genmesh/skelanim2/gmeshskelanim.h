@@ -68,8 +68,8 @@ struct iEvent;
  */
 
 class csGenmeshSkelAnimationControl :
-	public iGenMeshAnimationControl,
-	public iGenMeshSkeletonControlState
+  public scfImplementation2<csGenmeshSkelAnimationControl,
+    iGenMeshAnimationControl, iGenMeshSkeletonControlState>
 {
 private:
 	iObjectRegistry* object_reg;
@@ -142,8 +142,6 @@ public:
 	/// Destructor.
 	virtual ~csGenmeshSkelAnimationControl ();
 
-	SCF_DECLARE_IBASE;
-
 	// --- For iGenMeshAnimationControl --------------------------------
 	virtual bool AnimatesVertices () const { return animates_vertices; }
 	virtual bool AnimatesTexels () const { return animates_texels; }
@@ -206,7 +204,9 @@ public:
 /**
  * Genmesh animation control factory.
  */
-class csGenmeshSkelAnimationControlFactory : public iGenMeshAnimationControlFactory
+class csGenmeshSkelAnimationControlFactory :
+  public scfImplementation1<csGenmeshSkelAnimationControlFactory,
+    iGenMeshAnimationControlFactory>
 {
 private:
 	csGenmeshSkelAnimationControlType* type;
@@ -267,8 +267,6 @@ public:
 	bool AnimatesColors () const { return animates_colors; }
 	bool HasHierarchicalBones () const { return has_hierarchical_bones; }
 
-	SCF_DECLARE_IBASE;
-
 	// --- For iGenMeshAnimationControlFactory -------------------------
 	virtual const char* Load (iDocumentNode* node);
 	virtual const char* Save (iDocumentNode* parent);
@@ -277,7 +275,9 @@ public:
 /**
  * Genmesh animation control type.
  */
-class csGenmeshSkelAnimationControlType : public iGenMeshAnimationControlType
+class csGenmeshSkelAnimationControlType :
+  public scfImplementation2<csGenmeshSkelAnimationControlType,
+    iGenMeshAnimationControlType, iComponent>
 {
 private:
 	iObjectRegistry* object_reg;
@@ -294,17 +294,6 @@ public:
 	bool Initialize (iObjectRegistry* object_reg);
 
 	virtual csPtr<iGenMeshAnimationControlFactory> CreateAnimationControlFactory ();
-
-	SCF_DECLARE_IBASE;
-
-	struct eiComponent : public iComponent
-	{
-		SCF_DECLARE_EMBEDDED_IBASE (csGenmeshSkelAnimationControlType);
-		virtual bool Initialize (iObjectRegistry* object_reg)
-		{
-			return scfParent->Initialize (object_reg);
-		}
-	} scfiComponent;
 };
 
 #endif // __CS_GENMESHSKELANIM_H__

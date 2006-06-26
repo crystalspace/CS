@@ -31,17 +31,16 @@
 #include "csutil/refarr.h"
 #include "csutil/strhash.h"
 #include "csutil/stringarray.h"
+#include "csutil/scf_implementation.h"
 #include "imesh/genmesh.h"
 #include "imesh/gmeshskel.h"
 #include "iutil/comp.h"
 #include "iutil/eventh.h"
 #include "iutil/virtclk.h"
 #include "imesh/object.h"
-//#include "ivaria/dynamics.h"
 #include "imesh/skeleton.h"
 #include <iengine/scenenode.h>
 #include <iengine/movable.h>
-//#include <iphysics/dynamics.h>
 
 class csSkeleton;
 class csSkeletonFactory;
@@ -49,7 +48,8 @@ class csSkeletonBoneFactory;
 class csSkeletonGraveyard;
 class csSkeletonSocketFactory;
 
-class csSkeletonBone : public iSkeletonBone
+class csSkeletonBone :
+  public scfImplementation1<csSkeletonBone, iSkeletonBone>
 {
 private:
   csString name;
@@ -87,14 +87,13 @@ public:
   csSkeletonBone (csSkeleton *skeleton, csSkeletonBoneFactory *factory_bone);
   virtual ~csSkeletonBone ();
 
-  SCF_DECLARE_IBASE;
   virtual const char* GetName () const { return name.GetData(); }
   virtual void SetName (const char* name) { csSkeletonBone::name = name; }
   virtual csReversibleTransform &GetTransform () { return transform; }
   virtual void SetTransform (const csReversibleTransform &transform) 
   {
     csSkeletonBone::transform = transform;
-    rot_quat.SetMatrix (transform.GetT2O());
+    rot_quat.SetMatrix (transform.GetO2T());
   }
   virtual csReversibleTransform &GetFullTransform () 
     { return full_transform; }
@@ -107,8 +106,7 @@ public:
     { cb = callback; }
   virtual iSkeletonBoneUpdateCallback *GetUpdateCallback () 
     { return cb; };
-  virtual iSkeletonBoneFactory *GetFactory() 
-    { return (iSkeletonBoneFactory *)factory_bone; }
+  virtual iSkeletonBoneFactory *GetFactory();
   virtual size_t FindChildIndex (iSkeletonBone *child);
   virtual void SetSkinBox (csBox3 & box) { skin_box = box; }
   virtual csBox3 & GetSkinBox () { return skin_box; }
@@ -131,21 +129,16 @@ public:
   { return transform_mode; }
 };
 
-class csSkeletonBoneDefaultUpdateCallback : public iSkeletonBoneUpdateCallback
+class csSkeletonBoneDefaultUpdateCallback :
+  public scfImplementation1<csSkeletonBoneDefaultUpdateCallback,
+    iSkeletonBoneUpdateCallback>
 {
 public:
-  SCF_DECLARE_IBASE;
-  csSkeletonBoneDefaultUpdateCallback()
-  {
-    SCF_CONSTRUCT_IBASE(0);
-  }
-  
-  virtual ~csSkeletonBoneDefaultUpdateCallback()
-  {
-    SCF_DESTRUCT_IBASE();
-  }
+  csSkeletonBoneDefaultUpdateCallback() : scfImplementationType(this) { }
+  virtual ~csSkeletonBoneDefaultUpdateCallback() { }
 
-  virtual void UpdateTransform(iSkeletonBone *bone, const csReversibleTransform & transform)
+  virtual void UpdateTransform(iSkeletonBone *bone,
+    const csReversibleTransform & transform)
   {
     //bone->GetTransform().SetO2T(transform.GetO2T());
     //bone->GetTransform().SetOrigin(transform.GetOrigin());
@@ -155,7 +148,8 @@ public:
 
 //----------------------------------------- csSkeletonSocket ------------------------------------------
 
-class csSkeletonSocket : public iSkeletonSocket
+class csSkeletonSocket :
+  public scfImplementation1<csSkeletonSocket, iSkeletonSocket>
 {
 private:
   csString name;
@@ -167,7 +161,6 @@ private:
 public:
   csSkeletonSocket (csSkeleton *skeleton, csSkeletonSocketFactory *socket_factory);
   virtual ~csSkeletonSocket ();
-  SCF_DECLARE_IBASE;
   virtual const char* GetName () const
   { return name; }
   virtual void SetName (const char* name)
@@ -186,14 +179,14 @@ public:
   { csSkeletonSocket::node = node; }
     virtual iSceneNode *GetSceneNode ()
   { return node; }
-    virtual iSkeletonSocketFactory *GetFactory ()
-  { return (iSkeletonSocketFactory *)factory; }
+    virtual iSkeletonSocketFactory *GetFactory ();
 };
 
 
 //----------------------------- csSkeletonBoneFactory -------------------------------
 
-class csSkeletonBoneFactory : public iSkeletonBoneFactory
+class csSkeletonBoneFactory :
+  public scfImplementation1<csSkeletonBoneFactory, iSkeletonBoneFactory>
 {
 private:
   csString name;
@@ -215,7 +208,6 @@ public:
   csSkeletonBoneFactory (csSkeletonFactory *);
   virtual ~csSkeletonBoneFactory ();
 
-  SCF_DECLARE_IBASE;
   virtual const char* GetName () const { return name.GetData(); }
   virtual void SetName (const char* name){ csSkeletonBoneFactory::name = name; }
   virtual csReversibleTransform &GetTransform () { return transform; }
@@ -236,7 +228,9 @@ public:
 
 //---------------------------------iSkeletonBoneRagdollInfo ----------
 
-class csSkeletonBoneRagdollInfo : public iSkeletonBoneRagdollInfo
+class csSkeletonBoneRagdollInfo :
+  public scfImplementation1<csSkeletonBoneRagdollInfo,
+    iSkeletonBoneRagdollInfo>
 {
 private:
   bool enabled;
@@ -257,7 +251,6 @@ public:
   csSkeletonBoneRagdollInfo (csSkeletonBoneFactory *bone_fact);
   virtual ~csSkeletonBoneRagdollInfo ();
 
-  SCF_DECLARE_IBASE;
   virtual void SetEnabled(bool enabled)
   { csSkeletonBoneRagdollInfo::enabled = enabled; }
   virtual bool GetEnabled()
@@ -332,7 +325,8 @@ public:
 };
 
 
-class csSkeletonScriptKeyFrame: public iSkeletonScriptKeyFrame
+class csSkeletonScriptKeyFrame :
+  public scfImplementation1<csSkeletonScriptKeyFrame, iSkeletonScriptKeyFrame>
 {
   private:
     csString name;
@@ -350,7 +344,6 @@ class csSkeletonScriptKeyFrame: public iSkeletonScriptKeyFrame
     csSkeletonScriptKeyFrame (const char* name);
     virtual ~csSkeletonScriptKeyFrame ();
 
-    SCF_DECLARE_IBASE;
     virtual const char* GetName () const { return name; }
     virtual void SetName (const char* name)
       { csSkeletonScriptKeyFrame::name = name; }
@@ -403,7 +396,8 @@ class csSkeletonScriptKeyFrame: public iSkeletonScriptKeyFrame
     }
 };
 
-class csSkeletonScript : public iSkeletonScript
+class csSkeletonScript :
+  public scfImplementation1<csSkeletonScript, iSkeletonScript>
 {
 private:
   csString name;
@@ -415,8 +409,6 @@ public:
 
   csSkeletonScript (const char* name);
   virtual ~csSkeletonScript ();
-
-  SCF_DECLARE_IBASE;
 
   void SetForcedDuration(csTicks new_duration)
   { forced_duration = new_duration; }
@@ -537,7 +529,8 @@ public:
   void SetSpeed (float speed) { return script->SetSpeed (speed); }
 };
 
-class csSkeleton : public iSkeleton
+class csSkeleton :
+  public scfImplementation1<csSkeleton, iSkeleton>
 {
 private:
   csString name;
@@ -587,8 +580,6 @@ public:
   csSkeleton (csSkeletonFactory* fact);
   virtual ~csSkeleton ();
 
-  SCF_DECLARE_IBASE;
-
   virtual const char* GetName () const { return name; }
   virtual void SetName (const char* name) 
     { csSkeleton::name = name; }
@@ -607,8 +598,7 @@ public:
   virtual void Stop (const char* scriptname);
   virtual void Stop (iSkeletonScript *script);
   virtual size_t FindBoneIndex (const char* bonename);
-  virtual iSkeletonFactory *GetFactory() 
-  { return (iSkeletonFactory *)(csSkeletonFactory*)factory; }
+  virtual iSkeletonFactory *GetFactory();
     virtual void SetScriptCallback(iSkeletonScriptCallback *cb)
   { script_callback = cb; }
     virtual iSkeletonSocket* FindSocket (const char *socketname);
@@ -626,7 +616,8 @@ public:
   { update_callbacks.DeleteIndexFast(callback_idx); }
 };
 
-class csSkeletonFactory : public iSkeletonFactory
+class csSkeletonFactory :
+  public scfImplementation1<csSkeletonFactory, iSkeletonFactory>
 {
 private:
   csString name;
@@ -644,7 +635,6 @@ public:
   csSkeletonFactory (csSkeletonGraveyard* graveyard,
     iObjectRegistry* object_reg);
   virtual ~csSkeletonFactory ();
-  SCF_DECLARE_IBASE;
 
   virtual iSkeletonBoneFactory *CreateBone(const char *name);
   virtual const char* GetName () const { return name; }
@@ -660,7 +650,7 @@ public:
   virtual iSkeletonScript *CreateScript(const char *name);
   virtual iSkeletonScript *FindScript(const char *name);
   virtual iSkeletonBoneFactory *FindBone (const char *name);
-  virtual iSkeletonGraveyard *GetGraveyard  () { return (iSkeletonGraveyard *)graveyard; }
+  virtual iSkeletonGraveyard *GetGraveyard  ();
   virtual size_t FindBoneIndex (const char* bonename);
 
   virtual iSkeletonSocketFactory *CreateSocket(const char *name, iSkeletonBoneFactory *bone);
@@ -670,7 +660,8 @@ public:
   virtual size_t GetSocketsCount();
 };
 
-class csSkeletonSocketFactory : public iSkeletonSocketFactory
+class csSkeletonSocketFactory :
+  public scfImplementation1<csSkeletonSocketFactory, iSkeletonSocketFactory>
 {
 private:
   csString name;
@@ -680,7 +671,6 @@ private:
 public:
   csSkeletonSocketFactory (const char *name, iSkeletonBoneFactory *bone);
   virtual ~csSkeletonSocketFactory ();
-  SCF_DECLARE_IBASE;
   virtual const char* GetName () const
   { return name; }
   virtual void SetName (const char* name)
@@ -697,7 +687,9 @@ public:
   { return bone; }
 };
 
-class csSkeletonGraveyard : public iSkeletonGraveyard
+class csSkeletonGraveyard :
+  public scfImplementation3<csSkeletonGraveyard,
+    iSkeletonGraveyard, iComponent, iEventHandler>
 {
 private:
   iObjectRegistry* object_reg;
@@ -711,33 +703,14 @@ public:
   bool Initialize (iObjectRegistry* object_reg);
   bool HandleEvent (iEvent& ev);
 
-  virtual int GetFactoriesCount() { return factories.Length(); }
+  virtual size_t GetFactoriesCount() { return factories.Length(); }
   virtual iSkeletonFactory *CreateFactory(const char *name);
   virtual iSkeletonFactory *LoadFactory(const char * /*file_name*/) { return 0; }
   virtual iSkeletonFactory *FindFactory(const char * /*name*/) { return 0; }
   virtual iSkeleton *CreateSkeleton(iSkeletonFactory *fact, const char *name);
 
-  SCF_DECLARE_IBASE;
-
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csSkeletonGraveyard);
-    virtual bool Initialize (iObjectRegistry* object_reg)
-    {
-      return scfParent->Initialize (object_reg);
-    }
-  } scfiComponent;
-
-  struct EventHandler : public iEventHandler
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csSkeletonGraveyard);
-    virtual bool HandleEvent (iEvent &event)
-    { return scfParent->HandleEvent (event); }
-    CS_EVENTHANDLER_NAMES("crystalspace.skeleton.graveyard")
-    CS_EVENTHANDLER_NIL_CONSTRAINTS
-  } scfiEventHandler;
-  friend struct EventHandler;
-
+  CS_EVENTHANDLER_NAMES("crystalspace.skeleton.graveyard")
+  CS_EVENTHANDLER_NIL_CONSTRAINTS
 };
 
 #endif // __CS_SKELETON_H__

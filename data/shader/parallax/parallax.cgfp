@@ -17,9 +17,6 @@ float4 main (vertex2fragment IN,
 			uniform float4 specular,
 			uniform sampler2D TexNormal,
 			uniform sampler2D TexDiffuse,
-<?if vars."tex glow".texture ?>
-			uniform sampler2D TexGlow,
-<?endif?>
 			uniform sampler2D TexHeight) : COLOR
 {
 	float3 normEye = IN.EyeVec.xyz;
@@ -31,11 +28,6 @@ float4 main (vertex2fragment IN,
 	float2 newTexcoord = (height * normEye).xy + IN.TexCoord;
 	
 	float4 diffuseCol = tex2D(TexDiffuse, newTexcoord);
-	<?if vars."tex glow".texture ?>
-	float4 glowCol = tex2D(TexGlow, newTexcoord);
-	<?else?>
-	float4 glowCol = float4(0);
-	<?endif?>
 	float4 bumpNormal = tex2D(TexNormal, newTexcoord);
 	bumpNormal *= 2;
 	bumpNormal -= 1;
@@ -53,7 +45,7 @@ float4 main (vertex2fragment IN,
 	float4 result = selfOcclusion*saturate(outCol*diffuseCol);
 	<?endif?>
 
-	return result + glowCol;
+	return result;
 }
 
 </program>

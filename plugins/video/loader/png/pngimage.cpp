@@ -54,7 +54,7 @@ struct datastore{
   size_t length;
 
   datastore () { data = 0; pos = 0; length = 0; }
-  ~datastore () { free (data); }
+  ~datastore () { cs_free (data); }
 };
 
 static void png_write (png_structp png, png_bytep data, png_size_t length)
@@ -62,7 +62,7 @@ static void png_write (png_structp png, png_bytep data, png_size_t length)
   datastore *ds = (datastore *)png->io_ptr;
   if (ds->pos + (long)length > ds->length)
   {
-    ds->data = (unsigned char*)realloc (ds->data, ds->pos + (long)length);
+    ds->data = (unsigned char*)cs_realloc (ds->data, ds->pos + (long)length);
     if (!ds->data)
       png_error (png, "memory allocation error");
     else
@@ -223,7 +223,7 @@ error2:
   {
     const csRGBpixel *pal = Image->GetPalette ();
     
-    palette = (png_colorp)malloc (256 * sizeof (png_color));
+    palette = (png_colorp)cs_malloc (256 * sizeof (png_color));
     int i;
     for (i = 0; i < 256; i++)
     {
@@ -323,7 +323,7 @@ error2:
   /* clean up after the write, and free any memory allocated */
   png_destroy_write_struct (&png, &info);
   if (palette)
-    free(palette);
+    cs_free(palette);
 
   /* Free the row pointers */
   delete [] row_pointers;

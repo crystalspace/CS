@@ -25,12 +25,15 @@
 #include "iutil/virtclk.h"
 #include "imesh/particles.h"
 #include "csutil/randomgen.h"
+#include "csutil/scf_implementation.h"
 
 /**
  * This is an abstract implementation of iParticlePhysics. It can be
  * used to write custom particle physics implementations more easily.
  */
-class csParticlesPhysicsSimple : public iParticlesPhysics
+class csParticlesPhysicsSimple :
+  public scfImplementation3<csParticlesPhysicsSimple,
+    iParticlesPhysics, iComponent, iEventHandler>
 {
   /// Object registry.
   iObjectRegistry* object_reg;
@@ -56,8 +59,6 @@ class csParticlesPhysicsSimple : public iParticlesPhysics
   static int ZSort(csParticlesData const&, csParticlesData const&);
 
 public:
-  SCF_DECLARE_IBASE;
-
   /// Constructor
   csParticlesPhysicsSimple (iBase *p);
 
@@ -91,25 +92,8 @@ public:
    */
   bool HandleEvent (iEvent &event);
 
-  /**
-   * iComponent implementation.
-   */
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csParticlesPhysicsSimple);
-    virtual bool Initialize (iObjectRegistry* p)
-    { return scfParent->Initialize (p); }
-  } scfiComponent;
-
-  struct eiEventHandler : public iEventHandler
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csParticlesPhysicsSimple);
-    virtual bool HandleEvent (iEvent &event)
-    { return scfParent->HandleEvent (event); }
-    CS_EVENTHANDLER_NAMES("crystalspace.mesh.particles.physics")
-    CS_EVENTHANDLER_NIL_CONSTRAINTS
-  } scfiEventHandler;
-  friend struct eiEventHandler;
+  CS_EVENTHANDLER_NAMES("crystalspace.mesh.particles.physics")
+  CS_EVENTHANDLER_NIL_CONSTRAINTS
 
   csEventID PreProcess;
 };
