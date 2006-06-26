@@ -45,6 +45,7 @@
   //				   * used by clients */
   //#pragma warning(disable:4275)   /* non-DLL-interface used as base for
   //                                 * DLL-interface */
+  #pragma warning(disable:4290)   // C++ exception specification ignored
   //#pragma warning(disable:4291)   // no matching operator delete found
   #pragma warning(disable:4312)	  /* 'variable' : conversion from 'type' to 
 				   * 'type' of greater size */

@@ -24,11 +24,35 @@
 
 #include <new>
 
-void* operator new (size_t s, const CS::AllocPlatform&)
-{ return ::operator new (s); }
-void* operator new[] (size_t s, const CS::AllocPlatform&)
-{ return ::operator new (s); }
-void operator delete (void* p, const CS::AllocPlatform&)
-{ ::operator delete (p); }
-void operator delete[] (void* p, const CS::AllocPlatform&)
-{ ::operator delete (p); }
+namespace CS
+{
+  const AllocPlatform allocPlatform = AllocPlatform();
+}
+
+void* operator new (size_t s, const CS::AllocPlatform&) throw ()
+{ 
+  /* @@@ Technically, this is a guess: while likely most platforms do
+   * resort to malloc for the default new implementation, some may
+   * theoretically do something completely different.
+   *
+   * It would be preferable to use the real original platform's
+   * operator new, however, this is tricky: it has the exact same
+   * signature as our own override operator new (after all, that's how
+   * the whole override thing works), so using the original operator new
+   * is non-trivial here. 
+   * For now, solve the issue pragmatically and employ platform_malloc().
+   */
+  return platform_malloc (s);
+}
+void* operator new[] (size_t s, const CS::AllocPlatform&) throw ()
+{ 
+  return platform_malloc (s);
+}
+void operator delete (void* p, const CS::AllocPlatform&) throw ()
+{ 
+  platform_free (p);
+}
+void operator delete[] (void* p, const CS::AllocPlatform&) throw ()
+{ 
+  platform_free (p);
+}

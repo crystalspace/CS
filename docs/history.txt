@@ -6,8 +6,20 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+27-Jun-2006
+	- res took another jab at the operator new issues:
+	    - Removed "static" again since that makes gcc complain (and wasn't
+	      very clean either).
+	    - Pragmatically implemented the platform-specific new by using
+	      platform_malloc() instead of trying to employ trickery to use the 
+	      platform's default operator new.
 25-Jun-2006
         - Piotr Obrzut added setting color feature for flare halo components.
+	- res made CS' own overriding operator new/delete static to avoid
+	  having them used by other object files.
+	- res added operator new overloads to call the platform-specific
+	  operator new.
+	- res fixed sprcal3d to use those new overloads.
 24-Jun-2006
 	- Peter Amstutz deleted the vos plugin from the Crystal Space tree,
 	  as it will now be maintained directly as part of the VOS tree.

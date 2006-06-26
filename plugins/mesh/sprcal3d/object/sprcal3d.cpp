@@ -355,8 +355,7 @@ void csSpriteCal3DMeshObjectFactory::CalculateAllBoneBoundingBoxes()
 
 int csSpriteCal3DMeshObjectFactory::AddMorphAnimation(const char *name)
 {
-  CS::AllocPlatform alloc;
-  int id = calCoreModel.addCoreMorphAnimation(new (alloc)
+  int id = calCoreModel.addCoreMorphAnimation(new (allocPlatform)
     CalCoreMorphAnimation());
   morph_animation_names.Push(name);
   return id;
@@ -559,8 +558,7 @@ int csSpriteCal3DMeshObjectFactory::FindMorphAnimationName (
 
 bool csSpriteCal3DMeshObjectFactory::AddCoreMaterial(iMaterialWrapper *mat)
 {
-  CS::AllocPlatform alloc;
-  CalCoreMaterial *newmat = new (alloc) CalCoreMaterial;
+  CalCoreMaterial *newmat = new (allocPlatform) CalCoreMaterial;
   CalCoreMaterial::Map newmap;
   newmap.userData = mat;
 
