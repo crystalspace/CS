@@ -27,6 +27,7 @@
  * @{ */
 
 #include "csutil/scf.h"
+#include "csgeom/vector4.h"
 
 struct iMaterialWrapper;
 
