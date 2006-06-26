@@ -118,7 +118,7 @@ csVFSFileKind csNativeFileSystem::Exists(const char * FileName)
 bool csNativeFileSystem::CanHandleMount(const char *FileName)
 {
   struct stat stats;
-  if (stat (FileName, &stats) == 0)
+  if (stat (FileName, &stats) != 0)
     return false;
 
   return true;
@@ -131,9 +131,21 @@ void csNativeFileSystem::GetFilenames(const char *Path, const char *Mask,
   DIR *dh;
   struct dirent *de;
 
-  dh = opendir (Path);
+  csString dpath = Path;
+
+  // Make sure drive letter slash is correct on windows
+#if defined (CS_PLATFORM_DOS) || defined (CS_PLATFORM_WIN32)
+  if (strlen(Path) > 3)
+    if ((Path[1] == ':') && (Path[2] != '\\'))
+      dpath.Insert(2, '\\');
+#endif
+
+  dh = opendir ((const char *) dpath);
+
   if (dh == 0)
+  {
     return;
+  }
   while ((de = readdir (dh)) != 0)
   {
     if ((strcmp (de->d_name, ".") == 0) || (strcmp (de->d_name, "..") == 0))
@@ -141,7 +153,8 @@ void csNativeFileSystem::GetFilenames(const char *Path, const char *Mask,
     if (!csGlobMatches (de->d_name, Mask))
           continue;
 
-    Names->Push(de->d_name);
+    if (!Names->Contains(de->d_name))
+      Names->Push(de->d_name);
   }
   closedir (dh);
 }
@@ -152,7 +165,7 @@ bool csNativeFileSystem::GetFileTime (const char *FileName,
 {
   struct stat st;
 
-  if (stat (FileName, &st))
+  if (stat (FileName, &st) != 0)
     return false;
 
   const time_t mtime = st.st_mtime;
@@ -175,7 +188,7 @@ bool csNativeFileSystem::SetFileTime (const char *FileName,
 bool csNativeFileSystem::GetFileSize (const char *FileName, size_t &oSize)
 {
   struct stat st;
-  if (stat (FileName, &st))
+  if (stat (FileName, &st) != 0)
       return false;
   oSize = st.st_size;
   return true;
@@ -397,7 +410,8 @@ void csArchiveFileSystem::GetFilenames(const char *Path, const char *Mask,
 	  size_t fnl = strlen (fname);
 	  if (csGlobMatches (fname, Mask))
 	  {
-       Names->Push(fname);
+      if (!Names->Contains(fname))
+        Names->Push(fname);
     }
   }
 

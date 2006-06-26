@@ -65,8 +65,7 @@ public:
   virtual bool ChDir (const char *Path);
 
   /// Get current working directory
-  virtual const char *GetCwd () const { return "/";//return cwd; 
-  }
+  virtual const char *GetCwd () const; 
 
   /// Push current directory
   virtual void PushDir (char const* Path = 0);
