@@ -21,7 +21,9 @@
 #define __CS_FILESYSTEM_H__
 
 #include "csutil/scf_implementation.h"
+#include "csutil/archive.h"
 #include "csutil/physfile.h"
+#include "csutil/scopedmutexlock.h"
 #include "iutil/vfs.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
@@ -50,20 +52,20 @@ public:
       size_t Size;
       // Filename in VFS
       char *Name;
-	  // Error status
-	  int Error;
-	  // The constructor for csFile
+      // Error status
+      int Error;
+      // The constructor for csFile
       csFile (const char *Name);
     public:
       /// Instead of fclose() do "delete file" or file->DecRef ()
       virtual ~csFile ();
-	  /// Query file name (in VFS)
+	    /// Query file name (in VFS)
       virtual const char *GetName () { return Name; }
       /// Query file size
       virtual size_t GetSize () { return Size; }
       /// Check (and clear) file last error status
       virtual int GetStatus ();
-	  /// Replacement for standard fread()
+      /// Replacement for standard fread()
       virtual size_t Read (char *Data, size_t DataSize) = 0;
       /// Replacement for standard fwrite()
       virtual size_t Write (const char *Data, size_t DataSize) = 0;
@@ -74,7 +76,7 @@ public:
       /// Query current file pointer
       virtual size_t GetPos () = 0;
       /// Get entire file data at once, if possible, or 0
-      virtual csPtr<iDataBuffer> GetAllData () = 0;
+      virtual csPtr<iDataBuffer> GetAllData (bool nullterm = false) = 0;
       /// Set new file pointer
       virtual bool SetPos (size_t newpos) = 0;
   };
@@ -158,6 +160,8 @@ public:
   virtual bool GetFileSize (const char *FileName, size_t &oSize);
 };
 
+// Minimal time (msec) that an unused archive will be kept unclosed
+#define VFS_KEEP_UNUSED_ARCHIVE_TIME	10000
 
 /**
  * TODO: write class description
@@ -166,6 +170,100 @@ class csArchiveFileSystem
 	: public scfImplementationExt0<csArchiveFileSystem, csFileSystem>
 {
 public:
+
+  class VfsArchive;
+
+  /**
+   * TODO: write class description
+   */
+  class csArchiveFile : public scfImplementationExt0<csArchiveFile, csFile>
+  {
+    private:
+      // parent archive
+      VfsArchive *Archive;
+
+      // The file handle
+      void *FileHandle;
+
+      // file data (for read mode)
+      char *FileData;
+
+      // buffer, where read mode data is contained
+      csRef<iDataBuffer> DataBuffer;
+
+      // current data pointer
+      size_t fpos;
+
+      // constructor
+      csArchiveFile(int Mode, const char *Name, VfsArchive *ParentArchive);
+
+      friend class csArchiveFileSystem;
+    public:
+      // destructor
+      virtual ~csArchiveFile();
+
+      // read a block of data
+      virtual size_t Read (char *Data, size_t DataSize);
+
+      // write a block of data
+      virtual size_t Write (const char *Data, size_t DataSize);
+
+      // check for EOF
+      virtual bool AtEOF ();
+
+      /// flush stream
+      virtual void Flush ();
+
+      /// Query current file pointer
+      virtual size_t GetPos ();
+
+      /// Get all the data at once
+      virtual csPtr<iDataBuffer> GetAllData (bool nullterm = false);
+
+      /// Set current file pointer
+      virtual bool SetPos (size_t newpos);
+  };
+
+  /**
+   * TODO: write class description
+   */
+  class VfsArchive : public csArchive
+  {
+    public:
+      /// Mutex to make VFS thread-safe.
+      csRef<csMutex> archive_mutex;
+
+      // Last time this archive was used
+      long LastUseTime;
+
+      // Number of references (open files) to this archive
+      int RefCount;
+
+      // number of open for writing files in this archive
+      int Writing;
+
+      // The system driver
+      iObjectRegistry *object_reg;
+    
+      // Constructor
+      VfsArchive (const char *filename);
+
+      // Destructor
+      virtual ~VfsArchive ();
+
+      // Update archive time
+      void UpdateTime ();
+
+      // Reference counting
+      void IncRef ();
+
+      // Reference counting
+      void DecRef ();
+
+
+      bool CheckUp ();
+    };
+
   /// The constructor for csFileSystem
   csArchiveFileSystem(iBase *iParent = 0);
 
@@ -195,6 +293,18 @@ public:
 
   // Query file size (without opening it).
   virtual bool GetFileSize (const char *FileName, size_t &oSize);
+
+
+private:
+
+  // Extract the name of an archive from the path
+  csString ExtractArchiveName(const char *path) const;
+
+  // Extract the name of a file within an archive from the path
+  csString ExtractFileName(const char *path) const;
+
+  // Return the archive that contains a file
+  VfsArchive *FindFile(const char *FileName) const;
 };
 
 } CS_PLUGIN_NAMESPACE_END(vfs)

@@ -63,7 +63,9 @@ enum csVFSFileKind
   /// The file is an ordinary file
   fkFile,
   /// The file is a directory
-  fkDirectory
+  fkDirectory,
+  /// The file is compressed into an archive
+  fkArchiveFile
 };
 
 /// This macro can be used to assign a "struct tm" to a csFileTime
