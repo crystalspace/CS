@@ -586,7 +586,7 @@ csRenderMesh** csMeshWrapper::GetRenderMeshes (int& n, iRenderView* rview,
   if (imposter_active && CheckImposterRelevant (rview))
   {
     printf("trying imposter... ");
-    if (DrawImposter (rview))
+    if (GetImposter (rview))
     {
       printf("drawn\n");
       return 0;
@@ -848,7 +848,7 @@ bool csMeshWrapper::CheckImposterRelevant (iRenderView *rview)
   return (wor_sq_dist > dist*dist);
 }
 
-bool csMeshWrapper::DrawImposter (iRenderView *rview)
+csRenderMesh** csMeshWrapper::GetImposter (iRenderView *rview)
 {
   // Check for imposter existence.  If not, create it.
   if (!imposter_mesh)
@@ -873,8 +873,7 @@ bool csMeshWrapper::DrawImposter (iRenderView *rview)
   }
 
   // Else draw imposter as-is.
-  imposter_mesh->Draw (rview);
-  return true;
+  return imposter_mesh->GetRenderMesh (rview);
 }
 
 void csMeshWrapper::SetImposterActive (bool flag)
@@ -1205,7 +1204,7 @@ void csMeshWrapper::GetTransformedBoundingBox (
   cbox = GetTransformedBoundingBox (trans);
 }
 
-csScreenBoxResult csMeshWrapper::GetScreenBoundingBox (iCamera *camera)
+csScreenBoxResult csMeshWrapper::GetScreenBoundingBox (const iCamera *camera)
 {
   csScreenBoxResult rc;
   rc.distance = GetScreenBoundingBox (camera, rc.sbox, rc.cbox);
@@ -1213,7 +1212,7 @@ csScreenBoxResult csMeshWrapper::GetScreenBoundingBox (iCamera *camera)
 }
 
 float csMeshWrapper::GetScreenBoundingBox (
-  iCamera *camera,
+  const iCamera *camera,
   csBox2 &sbox,
   csBox3 &cbox)
 {
