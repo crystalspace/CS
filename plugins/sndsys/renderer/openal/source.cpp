@@ -88,7 +88,6 @@ void SndSysSourceOpenAL2D::PerformUpdate ()
     // Unqueue any processed buffers
     ALuint unqueued[s_NumberOfBuffers];
     alSourceUnqueueBuffers (m_Source, processedBuffers, unqueued);
-    printf ("Processed buffers: %d, %d, %d\n", processedBuffers, unqueued[0], m_Buffers[m_EmptyBuffer]);
     CS_ASSERT (unqueued[0] == m_Buffers[m_EmptyBuffer]);
 
     // Update the current buffer index.
@@ -100,7 +99,6 @@ void SndSysSourceOpenAL2D::PerformUpdate ()
   alGetSourcei (m_Source, AL_BUFFERS_QUEUED, &queuedBuffers);
   if (queuedBuffers < s_NumberOfBuffers)
   {
-    printf( "Queued buffers: %d\n", queuedBuffers );
     // Fill any emptied buffers
     do
     {
@@ -108,7 +106,6 @@ void SndSysSourceOpenAL2D::PerformUpdate ()
       {
         // Queue the newly filled buffer.
         alSourceQueueBuffers (m_Source, 1, &m_Buffers[m_EmptyBuffer]);
-        printf( "Buffer %d (%d, %d) queued\n", m_EmptyBuffer, m_Buffers[m_EmptyBuffer], m_Source );
         // Advance the empty pointer;
         m_EmptyBuffer = (m_EmptyBuffer + 1) % s_NumberOfBuffers;
       }
@@ -179,16 +176,12 @@ bool SndSysSourceOpenAL2D::FillBuffer (ALuint buffer) {
   size_t length1, length2;
   m_Stream->GetDataPointers (&m_PositionMarker, 16384, &data1, &length1, &data2, &length2);
 
-  printf( "Filling Buffer  - (%x, %d), (%x, %d)\n", data1, length1, data2, length2 );
-  printf( "Loading as: %d, %d\n", m_Format, m_SampleRate );
-
   // Determine if/how the data must be combined.
   if (length1 == 0)
   {
     if (length2 == 0 )
     {
       // No data available
-      printf( "No data available!\n" );
       return false;
     }
     else
