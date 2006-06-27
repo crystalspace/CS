@@ -21,6 +21,7 @@
 #include "cell.h"
 
 #include "iterrain/terrainrenderer.h"
+#include "iterrain/terrainsystem.h"
 
 #include "csgeom/vector3.h"
 #include "csgeom/csrect.h"
@@ -34,7 +35,8 @@
 CS_PLUGIN_NAMESPACE_BEGIN(ImprovedTerrain)
 {
 
-csTerrainCell::csTerrainCell (const char* name, int grid_width,
+csTerrainCell::csTerrainCell (iTerrainSystem* parent, const char* name,
+int grid_width,
 int grid_height, int material_width, int material_height,
 const csVector2& position, const csVector3& size, iTerrainDataFeeder* feeder,
 iTerrainCellRenderProperties* render_properties,
@@ -42,6 +44,8 @@ iTerrainCellCollisionProperties* collision_properties,
 iTerrainRenderer* renderer)
   : scfImplementationType (this)
 {
+  this->parent = parent;
+  
   this->name = name;
   
   this->grid_width = grid_width;
@@ -188,15 +192,37 @@ int csTerrainCell::GetMaterialMapHeight () const
 csLockedMaterialMap csTerrainCell::LockMaterialMap (const csRect& rectangle)
 {
   csLockedMaterialMap data;
+  
+  materialmap.SetSize (rectangle.Width () * rectangle.Height ());
+  mm_rect = rectangle;
 
-  data.data = NULL;
-  data.pitch = material_width;
+  data.data = materialmap.GetArray ();
+  data.pitch = rectangle.Width();
 
   return data;
 }
 
 void csTerrainCell::UnlockMaterialMap ()
 {
+  csDirtyAccessArray<unsigned char> alpha;
+  alpha.SetSize (mm_rect.Width () * mm_rect.Height ());
+  
+  for (int i = 0; i < parent->GetMaterialPalette ().Length (); ++i)
+  {
+    for (int y = 0; y < mm_rect.Height (); ++y)
+    {
+      for (int x = 0; x < mm_rect.Width (); ++x)
+      {
+        unsigned char p = materialmap[y * mm_rect.Width () + x];
+        alpha[y * mm_rect.Width () + x] = (p == i) ? 255 : 0;
+      }
+    }
+    
+    renderer->OnMaterialMaskUpdate (this, i, mm_rect, alpha.GetArray (),
+      mm_rect.Width ());
+  }
+
+  materialmap.Empty ();
 }
 
 void csTerrainCell::SetMaterialMask (unsigned int material, iImage* image)

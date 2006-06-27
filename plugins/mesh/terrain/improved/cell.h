@@ -22,6 +22,7 @@
 #include "csutil/scf_implementation.h"
 #include "csutil/refcount.h"
 
+#include "iterrain/terrainsystem.h"
 #include "iterrain/terraincell.h"
 #include "iterrain/terraindatafeeder.h"
 #include "iterrain/terraincellrenderproperties.h"
@@ -46,6 +47,8 @@ public:
   enum LoadState {NotLoaded, PreLoaded, Loaded};
 
 private:
+  iTerrainSystem* parent;
+  
   csString name;
   int grid_width, grid_height;
   int material_width, material_height;
@@ -54,8 +57,11 @@ private:
   csRef<iTerrainDataFeeder> feeder;
   csRef<iTerrainCellRenderProperties> render_properties;
   csRef<iTerrainCellCollisionProperties> collision_properties;
-
+  
+  csDirtyAccessArray<unsigned char> materialmap;
   csDirtyAccessArray<float> heightmap;
+  
+  csRect mm_rect;
 
   LoadState state;
 
@@ -70,9 +76,10 @@ private:
                                     int& y1, int& y2, float& yfrac) const;
 
 public:
-  csTerrainCell (const char* name, int grid_width, int grid_height,
-                 int material_width, int material_height, const csVector2&
-                 position, const csVector3& size, iTerrainDataFeeder* feeder,
+  csTerrainCell (iTerrainSystem* parent, const char* name, int grid_width,
+                 int grid_height, int material_width, int material_height,
+                 const csVector2& position, const csVector3& size,
+                 iTerrainDataFeeder* feeder,
                  iTerrainCellRenderProperties* render_properties,
                  iTerrainCellCollisionProperties* collision_properties,
                  iTerrainRenderer* renderer);

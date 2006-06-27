@@ -21,10 +21,12 @@
 
 #include "csutil/scf.h"
 #include "csutil/array.h"
+#include "csutil/refarr.h"
 
 struct iRenderView;
 struct iTerrainCell;
 struct iMaterialWrapper;
+struct iMovable;
 
 class csVector2;
 class csVector3;

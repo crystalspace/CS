@@ -131,7 +131,7 @@ const csVector2& position, const csVector3& size, iTerrainDataFeeder* feeder)
   collider ? collider->CreateProperties () : 0;
   
   csRef<csTerrainCell> cell;
-  cell.AttachNew (new csTerrainCell(name, grid_width, grid_height,
+  cell.AttachNew (new csTerrainCell(terrain, name, grid_width, grid_height,
   material_width, material_height, position, size, feeder, render_properties,
   collision_properties, renderer));
                                      

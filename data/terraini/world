@@ -144,8 +144,8 @@
         <factory>TerrainFact</factory>
         <materialpalette>
           <material>Lava</material>
-          <material>Grass</material>
           <material>Stone</material>
+          <material>Grass</material>
         </materialpalette>
       </params>
       <move> 

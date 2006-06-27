@@ -90,23 +90,24 @@ void csTerrainSimpleDataFeeder::Load (iTerrainCell* cell)
   cell->UnlockHeightData ();
   
   csRef<iImage> material = loader->LoadImage (mmap_source,
-  CS_IMGFMT_TRUECOLOR);
+    CS_IMGFMT_PALETTED8);
+  
+  if (material->GetWidth () != cell->GetMaterialMapWidth () ||
+    material->GetHeight () != cell->GetMaterialMapHeight ())
+    material = csImageManipulate::Rescale (material,
+      cell->GetMaterialMapWidth (), cell->GetMaterialMapHeight ());
   
   int mwidth = material->GetWidth ();
   int mheight = material->GetHeight ();
 
-  csDirtyAccessArray<unsigned char> mdata;
-  mdata.SetSize (mwidth * mheight);
+  csLockedMaterialMap mdata = cell->LockMaterialMap (csRect (0, 0, mwidth,
+    mheight));
   
-  for (int i = 0; i < 3; ++i)
-  {
-    for (int y = 0; y < mheight; ++y)
-      for (int x = 0; x < mwidth; ++x)
-        mdata[y * mwidth + x] = ((unsigned char*)material->GetImageData ())
-        [y * mwidth * 4 + x * 4 + i];
-        
-    cell->SetMaterialMask (i, mdata.GetArray (), mwidth, mheight);
-  }
+  for (int y = 0; y < mheight; ++y)
+    memcpy(mdata.data + mdata.pitch * y, (const unsigned char*)material->
+      GetImageData() + mwidth * y, mwidth);
+   
+  cell->UnlockMaterialMap();
 }
 
 bool csTerrainSimpleDataFeeder::Initialize (iObjectRegistry* object_reg)
