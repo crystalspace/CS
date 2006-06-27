@@ -398,11 +398,11 @@ bool csFireSaver::WriteDown (iBase* obj, iDocumentNode* parent,
     synldr->WriteBool(paramsNode, "lighting", firestate->GetLighting(), true);
 
     //Writedown Number tag
-    int number = firestate->GetParticleCount();
+    size_t number = firestate->GetParticleCount();
     csRef<iDocumentNode> numberNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
     numberNode->SetValue("number");
     csRef<iDocumentNode> numberValueNode = numberNode->CreateNodeBefore(CS_NODE_TEXT, 0);
-    numberValueNode->SetValueAsInt(number);
+    numberValueNode->SetValueAsInt((int)number);
   }
 
   paramsNode=0;

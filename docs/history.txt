@@ -7,6 +7,7 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 27-Jun-2006
+        - Arianna fixed other warnings: size_t/int issues, mainly.
 	- res took another jab at the operator new issues:
 	    - Removed "static" again since that makes gcc complain (and wasn't
 	      very clean either).
