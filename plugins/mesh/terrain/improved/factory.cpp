@@ -133,7 +133,7 @@ const csVector2& position, const csVector3& size, iTerrainDataFeeder* feeder)
   csRef<csTerrainCell> cell;
   cell.AttachNew (new csTerrainCell(terrain, name, grid_width, grid_height,
   material_width, material_height, position, size, feeder, render_properties,
-  collision_properties, renderer));
+  collision_properties, renderer, collider));
                                      
   terrain->AddCell (cell);
 }

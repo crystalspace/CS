@@ -70,6 +70,8 @@ class csTerrainSystem :
   csBox3 bbox;
   bool bbox_valid;
 
+  csArray<csVector3> collision_result;
+
   void ComputeBBox();
 
 public:
@@ -90,8 +92,6 @@ public:
   virtual const csRefArray<iMaterialWrapper>& GetMaterialPalette () const;
   virtual void SetMaterialPalette (const csRefArray<iMaterialWrapper>& array);
 
-  virtual bool CollideRay (const csVector3& start, const csVector3& end,
-                           bool oneHit, csArray<csVector3>& points);
   virtual bool CollideSegment (const csVector3& start, const csVector3& end,
                            bool oneHit, csArray<csVector3>& points);
 

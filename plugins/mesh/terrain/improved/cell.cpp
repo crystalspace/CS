@@ -22,6 +22,7 @@
 
 #include "iterrain/terrainrenderer.h"
 #include "iterrain/terrainsystem.h"
+#include "iterrain/terraincollider.h"
 
 #include "csgeom/vector3.h"
 #include "csgeom/csrect.h"
@@ -41,7 +42,7 @@ int grid_height, int material_width, int material_height,
 const csVector2& position, const csVector3& size, iTerrainDataFeeder* feeder,
 iTerrainCellRenderProperties* render_properties,
 iTerrainCellCollisionProperties* collision_properties,
-iTerrainRenderer* renderer)
+iTerrainRenderer* renderer, iTerrainCollider* collider)
   : scfImplementationType (this)
 {
   this->parent = parent;
@@ -63,6 +64,7 @@ iTerrainRenderer* renderer)
   this->collision_properties = collision_properties;
 
   this->renderer = renderer;
+  this->collider = collider;
 
   state = NotLoaded;
 
@@ -142,6 +144,16 @@ void csTerrainCell::SetRenderData (csRefCount* data)
   render_data = data;
 }
 
+csRefCount* csTerrainCell::GetCollisionData () const
+{
+  return collision_data;
+}
+
+void csTerrainCell::SetCollisionData (csRefCount* data)
+{
+  collision_data = data;
+}
+
 int csTerrainCell::GetGridWidth () const
 {
   return grid_width;
@@ -166,7 +178,11 @@ csLockedHeightData csTerrainCell::LockHeightData (const csRect& rectangle)
 void csTerrainCell::UnlockHeightData ()
 {
   renderer->OnHeightUpdate (this, locked_height_rect, heightmap.GetArray (),
-  grid_width);
+    grid_width);
+  
+  if (collider)
+    collider->OnHeightUpdate (this, locked_height_rect, heightmap.GetArray (),
+      grid_width);
 }
 
 const csVector2& csTerrainCell::GetPosition () const
@@ -207,7 +223,7 @@ void csTerrainCell::UnlockMaterialMap ()
   csDirtyAccessArray<unsigned char> alpha;
   alpha.SetSize (mm_rect.Width () * mm_rect.Height ());
   
-  for (int i = 0; i < parent->GetMaterialPalette ().Length (); ++i)
+  for (unsigned int i = 0; i < parent->GetMaterialPalette ().Length (); ++i)
   {
     for (int y = 0; y < mm_rect.Height (); ++y)
     {
@@ -301,10 +317,8 @@ float csTerrainCell::GetHeight (const csVector2& pos) const
 
   LerpHelper(pos, x1, x2, xfrac, y1, y2, yfrac);
 
-  float h1 = Lerp (heightmap[y1 * grid_width + x1],
-  heightmap[y1 * grid_width + x2], xfrac);
-  float h2 = Lerp (heightmap[y2 * grid_width + x1],
-  heightmap[y2 * grid_width + x2], xfrac);
+  float h1 = Lerp (GetHeight (x1, y1), GetHeight (x2, y1), xfrac);
+  float h2 = Lerp (GetHeight (x1, y2), GetHeight (x2, y2), xfrac);
 
   return Lerp (h1, h2, yfrac);
 }
@@ -317,10 +331,9 @@ const float t)
 
 csVector3 csTerrainCell::GetTangent (int x, int y) const
 {
-  float center = heightmap[y * grid_width + x];
-  float left = x == 0 ? center : heightmap[y * grid_width + x - 1];
-  float right = x + 1 == grid_width ? center :
-  heightmap[y * grid_width + x + 1];
+  float center = GetHeight (x, y);
+  float left = x == 0 ? center : GetHeight (x-1, y);
+  float right = x + 1 == grid_width ? center : GetHeight (x+1, y);
 
   return csVector3(1.0f / grid_width, right - left, 0);
 }
@@ -340,10 +353,9 @@ csVector3 csTerrainCell::GetTangent (const csVector2& pos) const
 
 csVector3 csTerrainCell::GetBinormal (int x, int y) const
 {
-  float center = heightmap[y * grid_width + x];
-  float up = y == 0 ? center : heightmap[(y - 1) * grid_width + x];
-  float down = y + 1 == grid_height ? center :
-  heightmap[(y + 1) * grid_width + x];
+  float center = GetHeight (x, y);
+  float up = y == 0 ? center : GetHeight (x, y-1);
+  float down = y + 1 == grid_height ? center : GetHeight (x, y+1);
 
   return csVector3(0, down - up, 1.0f / grid_height);
 }
@@ -363,13 +375,11 @@ csVector3 csTerrainCell::GetBinormal (const csVector2& pos) const
 
 csVector3 csTerrainCell::GetNormal (int x, int y) const
 {
-  float center = heightmap[y * grid_width + x];
-  float up = y == 0 ? center : heightmap[(y - 1) * grid_width + x];
-  float down = y + 1 == grid_height ? center :
-  heightmap[(y + 1) * grid_width + x];
-  float left = x == 0 ? center : heightmap[y * grid_width + x - 1];
-  float right = x + 1 == grid_width ? center :
-  heightmap[y * grid_width + x + 1];
+  float center = GetHeight (x, y);
+  float up = y == 0 ? center : GetHeight (x, y-1);
+  float down = y + 1 == grid_height ? center : GetHeight (x, y+1);
+  float left = x == 0 ? center : GetHeight (x-1, y);
+  float right = x + 1 == grid_width ? center : GetHeight (x+1, y);
 
   return csVector3((center - left) + (center - right), 1,
   (center - up) + (center - down));

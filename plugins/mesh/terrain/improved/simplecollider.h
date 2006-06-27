@@ -60,11 +60,12 @@ public:
 
   virtual csPtr<iTerrainCellCollisionProperties> CreateProperties();
 
-  virtual bool CollideRay(iTerrainCell* cell, const csVector3& start,
-              const csVector3& end, bool oneHit, csArray<csVector3>& points);
   virtual bool CollideSegment(iTerrainCell* cell, const csVector3& start,
               const csVector3& end, bool oneHit, csArray<csVector3>& points);
-  
+
+  virtual void OnHeightUpdate (iTerrainCell* cell, const csRect& rectangle,
+                               const float* data, unsigned int pitch);
+
   // ------------ iComponent implementation ------------
   virtual bool Initialize (iObjectRegistry* object_reg);
 };

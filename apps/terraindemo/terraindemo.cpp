@@ -118,8 +118,14 @@ bool TerrainDemo::Setup ()
   csPlane3 fp(0, 0, -1, 500);
   view->GetCamera ()->SetFarPlane(&fp);
   
-  engine->SetClearScreen(true);
-  engine->SetClearZBuf(true);
+  // Initialize our collider actor.
+  collider_actor.SetCollideSystem (cdsys);
+  collider_actor.SetEngine (engine);
+  csVector3 legs (.2f, .3f, .2f);
+  csVector3 body (.2f, 1.2f, .2f);
+  csVector3 shift (0, -1, 0);
+  collider_actor.InitializeColliders (view->GetCamera (),
+  	legs, body, shift);
   
   //engine->SetCurrentDefaultRenderloop(rloop);
   
@@ -135,19 +141,22 @@ void TerrainDemo::ProcessFrame ()
 
   iCamera* c = view->GetCamera();
 
+  csVector3 obj_move (0);
+  csVector3 obj_rotate (0);
+
   if (kbd->GetKeyState (CSKEY_SHIFT))
   {
     // If the user is holding down shift, the arrow keys will cause
     // the camera to strafe up, down, left or right from it's
     // current position.
     if (kbd->GetKeyState (CSKEY_RIGHT))
-      c->Move (CS_VEC_RIGHT * 4000 * speed);
+      obj_move = CS_VEC_RIGHT * 3.0f;
     if (kbd->GetKeyState (CSKEY_LEFT))
-      c->Move (CS_VEC_LEFT * 40 * speed);
+      obj_move = CS_VEC_LEFT * 3.0f;
     if (kbd->GetKeyState (CSKEY_UP))
-      c->Move (CS_VEC_UP * 40 * speed);
+      obj_move = CS_VEC_UP * 3.0f;
     if (kbd->GetKeyState (CSKEY_DOWN))
-      c->Move (CS_VEC_DOWN * 40 * speed);
+      obj_move = CS_VEC_DOWN * 3.0f;
   }
   else
   {
@@ -156,19 +165,21 @@ void TerrainDemo::ProcessFrame ()
     // _camera's_ X axis (more on this in a second) and up and down
     // arrows cause the camera to go forwards and backwards.
     if (kbd->GetKeyState (CSKEY_RIGHT))
-      rotY += speed;
+      obj_rotate.Set (0, 1, 0);
     if (kbd->GetKeyState (CSKEY_LEFT))
-      rotY -= speed;
+      obj_rotate.Set (0, -1, 0);
     if (kbd->GetKeyState (CSKEY_PGUP))
-      rotX += speed;
+      obj_rotate.Set (1, 0, 0);
     if (kbd->GetKeyState (CSKEY_PGDN))
-      rotX -= speed;
+      obj_rotate.Set (-1, 0, 0);
     if (kbd->GetKeyState (CSKEY_UP))
-      c->Move (CS_VEC_FORWARD * 400 * speed);
+      obj_move = CS_VEC_FORWARD * 3.0f;
     if (kbd->GetKeyState (CSKEY_DOWN))
-      c->Move (CS_VEC_BACKWARD * 400 * speed);
+      obj_move = CS_VEC_BACKWARD * 3.0f;
   }
-
+  
+  //collider_actor.Move (float (elapsed_time) / 1000.0f, 1.0f,
+  //    	obj_move, obj_rotate);
   // We now assign a new rotation transformation to the camera.  You
   // can think of the rotation this way: starting from the zero
   // position, you first rotate "rotY" radians on your Y axis to get
@@ -177,10 +188,15 @@ void TerrainDemo::ProcessFrame ()
   // individual rotations on each axis together to get a single
   // rotation matrix.  The rotations are applied in right to left
   // order .
+  rotX += obj_rotate.x * speed;
+  rotY += obj_rotate.y * speed;
+  
   csMatrix3 rot = csXRotMatrix3 (rotX) * csYRotMatrix3 (rotY);
   csOrthoTransform ot (rot, c->GetTransform().GetOrigin ());
   c->SetTransform (ot);
-
+  
+  c->Move(obj_move);
+  
   // Tell 3D driver we're going to display 3D things.
   if (!g3d->BeginDraw (engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS))
     return;

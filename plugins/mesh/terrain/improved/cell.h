@@ -35,6 +35,7 @@
 #include "csutil/dirtyaccessarray.h"
 
 struct iTerrainRenderer;
+struct iTerrainCollider;
 
 CS_PLUGIN_NAMESPACE_BEGIN(ImprovedTerrain)
 {
@@ -69,8 +70,9 @@ private:
   csRect locked_height_rect;
 
   csRef<iTerrainRenderer> renderer;
+  csRef<iTerrainCollider> collider;
 
-  csRef<csRefCount> render_data;
+  csRef<csRefCount> render_data, collision_data;
 
   void LerpHelper (const csVector2& pos, int& x1, int& x2, float& xfrac,
                                     int& y1, int& y2, float& yfrac) const;
@@ -82,7 +84,7 @@ public:
                  iTerrainDataFeeder* feeder,
                  iTerrainCellRenderProperties* render_properties,
                  iTerrainCellCollisionProperties* collision_properties,
-                 iTerrainRenderer* renderer);
+                 iTerrainRenderer* renderer, iTerrainCollider* collider);
 
   virtual ~csTerrainCell ();
 
@@ -104,6 +106,9 @@ public:
 
   virtual csRefCount* GetRenderData () const;
   virtual void SetRenderData (csRefCount* data);
+
+  virtual csRefCount* GetCollisionData () const;
+  virtual void SetCollisionData (csRefCount* data);
 
   virtual int GetGridWidth () const;
   virtual int GetGridHeight () const;

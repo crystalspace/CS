@@ -113,16 +113,32 @@ void csTerrainSystem::SetMaterialPalette (const csRefArray<iMaterialWrapper>&
   renderer->OnMaterialPaletteUpdate (material_palette);
 }
 
-bool csTerrainSystem::CollideRay (const csVector3& start, const csVector3& end,
-                                  bool oneHit, csArray<csVector3>& points)
-{
-  return false;
-}
-
 bool csTerrainSystem::CollideSegment (const csVector3& start, const csVector3&
                                  end, bool oneHit, csArray<csVector3>& points)
 {
-  return false;
+  if (!collider) return false;
+
+  csSegment3 seg(start, end);
+  csVector3 isect;
+
+  for (size_t i = 0; i < cells.GetSize(); ++i)
+  {
+    csBox3 box = cells[i]->GetBBox ();
+
+    if (csIntersect3::BoxSegment (box, seg, isect))
+    {
+      if (cells[i]->GetLoadState () != csTerrainCell::Loaded)
+      {
+        cells[i]->Load ();
+      }
+
+      if (collider->CollideSegment (cells[i], start, end, oneHit, points) &&
+        oneHit)
+        return true;
+    }
+  }
+
+  return !points.IsEmpty();
 }
 
 float csTerrainSystem::GetVirtualViewDistance () const
@@ -290,6 +306,36 @@ bool csTerrainSystem::SupportsHardTransform () const
 bool csTerrainSystem::HitBeamOutline (const csVector3& start,
         const csVector3& end, csVector3& isect, float* pr)
 {
+  collision_result.SetSize (0);
+
+  if (CollideSegment (start, end, true, collision_result))
+  {
+    isect = collision_result[0];
+
+    if (pr)
+    {
+#pragma message(PR_WARNING("hrm... this is ugly."))
+      int gr = 0;
+      float gr_max = end.x - start.x;
+
+      if (end.y - start.y > gr_max)
+      {
+        gr = 1;
+        gr_max = end.y - start.y;
+      }
+
+      if (end.z - start.z > gr_max)
+      {
+        gr = 2;
+        gr_max = end.y - start.y;
+      }
+
+      *pr = (collision_result[0][gr] - start[gr]) / gr_max;
+    }
+
+    return true;
+  }
+
   return false;
 }
 
@@ -298,7 +344,10 @@ bool csTerrainSystem::HitBeamObject (const csVector3& start,
         csVector3& isect, float* pr, int* polygon_idx,
         iMaterialWrapper** material )
 {
-  return false;
+  if (polygon_idx) *polygon_idx = -1;
+  if (material) *material = NULL;
+
+  return HitBeamOutline (start, end, isect, pr);
 }
 
 void csTerrainSystem::SetMeshWrapper (iMeshWrapper* lp)

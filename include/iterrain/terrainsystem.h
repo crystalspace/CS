@@ -42,8 +42,6 @@ struct iTerrainSystem : public virtual iBase
   virtual void SetMaterialPalette (const csRefArray<iMaterialWrapper>& array)
                                                                           = 0;
 
-  virtual bool CollideRay (const csVector3& start, const csVector3& end,
-                           bool oneHit, csArray<csVector3>& points) = 0;
   virtual bool CollideSegment (const csVector3& start, const csVector3& end,
                            bool oneHit, csArray<csVector3>& points) = 0;
 

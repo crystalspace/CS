@@ -3,6 +3,8 @@
   <plugins>
     <plugin name="terrainFact">crystalspace.mesh.loader.factory.terrainimproved</plugin>
     <plugin name="terrain">crystalspace.mesh.loader.terrainimproved</plugin>
+    <plugin name="foliageFact">crystalspace.mesh.loader.factory.foliage</plugin>
+    <plugin name="foliage">crystalspace.mesh.loader.foliage</plugin>
   </plugins>
 
   <textures>
@@ -37,6 +39,13 @@
     </material>
   </materials>
 
+  <library>grass.lib</library>
+  <library>rock.lib</library>
+  <library>tree.lib</library>
+  <library>tree_skimp.lib</library>
+  <library>treebark_bare.lib</library>
+  <library>bush2.lib</library>
+
   <addon>
     <plugin>crystalspace.renderloop.loop.loader</plugin>
     <paramsfile>/shader/std_rloop_terrainimproved.xml</paramsfile>
@@ -60,7 +69,7 @@
     <plugin>terrainFact</plugin>
     <params>
       <renderer>crystalspace.mesh.object.terrainimproved.simplerenderer</renderer>
-<!--      <collider>crystalspace.mesh.object.terrainimproved.simplecollider</collider> -->
+      <collider>crystalspace.mesh.object.terrainimproved.simplecollider</collider>
 
       <cells>
         <cell name="main">
@@ -153,5 +162,81 @@
       </move>
       <priority>wall</priority>
     </meshobj>
+
+     <meshgen name="grass">
+        <geometry>
+	    <factory maxdist="50" name="treebark_bare" />
+	    <radius>1</radius>
+	    <density>0.02</density>
+	    <materialfactor material="Grass" factor=".4" />
+	    <defaultmaterialfactor>.7</defaultmaterialfactor>
+        </geometry>
+        <geometry>
+	    <factory maxdist="50" name="tree" />
+	    <radius>1</radius>
+	    <density>0.02</density>
+	    <materialfactor material="Grass" factor="1" />
+	    <defaultmaterialfactor>.1</defaultmaterialfactor>
+        </geometry>
+        <geometry>
+	    <factory maxdist="50" name="tree_skimp" />
+	    <radius>1</radius>
+	    <density>0.01</density>
+	    <materialfactor material="Grass" factor="1" />
+	    <defaultmaterialfactor>.1</defaultmaterialfactor>
+        </geometry>
+        <geometry>
+	    <factory maxdist="50" name="Grass" />
+	    <factory maxdist="50" name="GrassLow" />
+	    <radius>1</radius>
+	    <density>0.4</density>
+	    <materialfactor material="Grass" factor="1" />
+        </geometry>
+        <geometry>
+	    <factory maxdist="50" name="bush2" />
+	    <radius>1</radius>
+	    <density>0.04</density>
+	    <materialfactor material="Marble" factor="1" />
+	    <materialfactor material="Stone" factor="1" />
+	    <defaultmaterialfactor>.1</defaultmaterialfactor>
+        </geometry>
+        <geometry>
+	    <factory maxdist="50" name="TallGrass" />
+	    <factory maxdist="50" name="TallGrassLow" />
+	    <radius>1</radius>
+	    <density>.08</density>
+	    <materialfactor material="Grass" factor="1" />
+        </geometry>
+        <geometry>
+	    <factory maxdist="50" name="Rock" />
+	    <radius>1</radius>
+	    <density>.010</density>
+	    <materialfactor material="Marble" factor="1" />
+	    <materialfactor material="Stone" factor="0" />
+	    <defaultmaterialfactor>.3</defaultmaterialfactor>
+        </geometry>
+        <geometry>
+	    <factory maxdist="50" name="RockSmall" />
+	    <radius>1</radius>
+	    <density>.10</density>
+	    <materialfactor material="Marble" factor="1" />
+	    <materialfactor material="Stone" factor="0" />
+	    <defaultmaterialfactor>.3</defaultmaterialfactor>
+        </geometry>
+	<!--
+        <geometry>
+	    <factory maxdist="30" name="squareInst" />
+	    <radius>1</radius>
+	    <density>.3</density>
+        </geometry>
+	-->
+	<!--<densityscale mindist="26" maxdist="30" maxfactor="0" />-->
+	<alphascale mindist="22" maxdist="26" />
+	<samplebox>
+	    <min x="-256" y="-200" z="-256" />
+	    <max x="256" y="200" z="256" />
+	</samplebox>
+	<meshobj>Terrain</meshobj>
+     </meshgen>
   </sector>
 </world>

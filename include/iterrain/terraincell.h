@@ -57,6 +57,9 @@ struct iTerrainCell : public virtual iBase
   virtual csRefCount* GetRenderData () const = 0;
   virtual void SetRenderData (csRefCount* data) = 0;
 
+  virtual csRefCount* GetCollisionData () const = 0;
+  virtual void SetCollisionData (csRefCount* data) = 0;
+
   virtual int GetGridWidth () const = 0;
   virtual int GetGridHeight () const = 0;
 
