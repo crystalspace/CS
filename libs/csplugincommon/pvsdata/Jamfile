@@ -1,0 +1,9 @@
+SubDir TOP libs csplugincommon pvsdata ;
+
+Description crystalspace_pvsdata : "Saves and loads PVS files" ;
+Library crystalspace_pvsdata : 
+[ Wildcard *.cpp *.h ] 
+[ Wildcard [ ConcatDirs $(DOTDOT) $(DOTDOT) $(DOTDOT) include
+             csplugincommon pvsdata ] : *.h ]
+: shared ;
+LibDepends crystalspace_pvsdata : crystalspace ;

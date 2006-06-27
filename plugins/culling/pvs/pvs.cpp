@@ -35,7 +35,7 @@
 #include "csgeom/segment.h"
 #include "csgeom/sphere.h"
 #include "csgeom/kdtree.h"
-#include "statickdtree.h"
+#include "csgeom/statickdtree.h"
 #include "igeom/polymesh.h"
 #include "imesh/objmodel.h"
 #include "csutil/flags.h"
@@ -55,6 +55,7 @@
 #include "iutil/object.h"
 #include "ivaria/reporter.h"
 #include "pvs.h"
+#include "csplugincommon/pvsdata/pvsdata.h"
 
 CS_IMPLEMENT_PLUGIN
 
@@ -137,24 +138,6 @@ SCF_IMPLEMENT_IBASE_END
 
 //----------------------------------------------------------------------
 
-
-SCF_IMPLEMENT_IBASE (csPVSVisObjectWrapper)
-  SCF_IMPLEMENTS_INTERFACE (iObjectModelListener)
-  SCF_IMPLEMENTS_INTERFACE (iMovableListener)
-SCF_IMPLEMENT_IBASE_END
-
-void csPVSVisObjectWrapper::ObjectModelChanged (iObjectModel* /*model*/)
-{
-  pvsvis->AddObjectToUpdateQueue (this);
-}
-
-void csPVSVisObjectWrapper::MovableChanged (iMovable* /*movable*/)
-{
-  pvsvis->AddObjectToUpdateQueue (this);
-}
-
-//----------------------------------------------------------------------
-
 /*class csPVSVisObjectDescriptor : public scfImplementation1<
         csPVSVisObjectDescriptor, iKDTreeObjectDescriptor>
 {
@@ -177,53 +160,24 @@ public:
 
 //----------------------------------------------------------------------
 
-csPVSNodeData::csPVSNodeData (csString* names, int total)
+SCF_IMPLEMENT_IBASE (csPVSVisObjectWrapper)
+  SCF_IMPLEMENTS_INTERFACE (iObjectModelListener)
+  SCF_IMPLEMENTS_INTERFACE (iMovableListener)
+SCF_IMPLEMENT_IBASE_END
+
+void csPVSVisObjectWrapper::ObjectModelChanged (iObjectModel* /*model*/)
 {
-  if (total > 0)
-  {
-    pvs = new csPVSVisObjectWrapper*[total];
-    memset ((void*) pvs, 0, sizeof(csPVSVisObjectWrapper*) * total);
-    pvsnames = names;
-    numRegistered = 0;
-    numTotal = total;
-  }
-  else
-  {
-    pvs = NULL;
-    pvsnames = NULL;
-    numRegistered = numTotal = 0;
-  }
+  pvsvis->AddObjectToUpdateQueue (this);
 }
 
-csPVSNodeData::~csPVSNodeData ()
+void csPVSVisObjectWrapper::MovableChanged (iMovable* /*movable*/)
 {
-  delete[] pvs;
-  delete[] pvsnames;
+  pvsvis->AddObjectToUpdateQueue (this);
 }
 
-bool csPVSNodeData::PVSNamesContains(const char* name)
-{
-  //iVisibilityObject *vis = reg->visobj;
-  //csFlags flags = reg->GetMeshWrapper ()->GetMeshObject()->GetFlags ();
-  // If mesh is not staticpos or staticshape, we will not find it in
-  // the pvsnames list.
-  //if (!(flags & (CS_MESH_STATICPOS | CS_MESH_STATICSHAPE)))
-  //  return false;
-  // If pvsnames is NULL, reg's name is not in
-  if (!pvsnames)
-    return false;
-  if (pvsnames) 
-  {
-    for (int i = 0; i < numTotal; i++)
-    {
-      if (pvsnames[i] == name)
-        return true;
-    }
-  }
-  return false;
-}
+//----------------------------------------------------------------------
 
-void csPVSNodeData::FlagVisible(iVisibilityCullerListener* listener, 
+/*void csPVSNodeData::FlagVisible(iVisibilityCullerListener* listener, 
     uint32 timestamp, uint32 frustumMask)
 {
   for (int i = 0; i < numRegistered; i++) 
@@ -234,25 +188,22 @@ void csPVSNodeData::FlagVisible(iVisibilityCullerListener* listener,
       listener->ObjectVisible (pvs[i]->visobj, pvs[i]->mesh, frustumMask);
     }
   }
-}
-
-void csPVSNodeData::RemoveFromPVS(csPVSVisObjectWrapper *object)
-{
-  for (int i = 0; i < numRegistered; i++)
-  {
-    if (pvs[i] == object)
-    {
-      pvs[i] = pvs[(numRegistered--) - 1];
-      break;
-    }
-  }
-}
+}*/
 
 static void FlagVisible(csStaticKDTree *node, 
-    iVisibilityCullerListener* listener, uint32 timestamp, uint32 mask)
+    iVisibilityCullerListener* listener, uint32 timestamp, uint32 frustumMask)
 {
-  ((csPVSNodeData*) node->GetNodeData ())->FlagVisible
-    (listener, timestamp, mask);
+  csPVSNodeData *data = (csPVSNodeData*) node->GetNodeData ();
+
+  for (int i = 0; i < data->numRegistered; i++) 
+  {
+    csPVSVisObjectWrapper *wrapper = (csPVSVisObjectWrapper*) data->pvs[i];
+    if (wrapper->child->timestamp != timestamp) 
+    {
+      wrapper->child->timestamp = timestamp;
+      listener->ObjectVisible (wrapper->visobj, wrapper->mesh, frustumMask);
+    }
+  }
 }
 
 //----------------------------------------------------------------------
@@ -299,7 +250,7 @@ csPVSVis::~csPVSVis ()
   {
     csPVSNodeData* data = nodedata_vector.Pop ();
     for (int i = 0; i < data->numRegistered; i++)
-      data->pvs[i]->visobj->DecRef();
+      ((csPVSVisObjectWrapper*)data->pvs[i])->visobj->DecRef();
     delete data;
   }
 

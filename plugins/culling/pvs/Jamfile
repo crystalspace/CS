@@ -5,4 +5,4 @@ Description pvs : "PVS Visibility System" ;
 Plugin pvs
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith pvs : crystalspace ;
+LinkWith pvs : crystalspace crystalspace_pvsdata ;

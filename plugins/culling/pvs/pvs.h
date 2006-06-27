@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2002 by Jorrit Tyberghein
+    Copyright (C) 2002 by Jorrit Tyberghein and Benjamin Stover
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -35,37 +35,18 @@
 #include "iengine/shadcast.h"
 #include "iengine/mesh.h"
 #include "imesh/thing.h"
+#include "csplugincommon/pvsdata/pvsdata.h"
 
 class csStaticKDTree;
 class csStaticKDTreeObject;
-class csPVSVisObjectWrapper;
 class csPVSVis;
+class csPVSVisObjectWrapper;
 struct iPolygonMesh;
 struct iMovable;
 struct iMeshWrapper;
 struct iThingState;
 
 struct FrustTestCameraData;
-
-/// Data at every node for the static KD tree
-class csPVSNodeData
-{
-public:
-  csPVSNodeData (csString* names, int total);
-  ~csPVSNodeData ();
-  bool PVSNamesContains (const char* name);
-  void FlagVisible(iVisibilityCullerListener* listener, uint32 timestamp,
-      uint32 frustumMask);
-  void RemoveFromPVS(csPVSVisObjectWrapper *object);
-
-  // Set of all objects potentially visible from this node
-  csPVSVisObjectWrapper** pvs;
-  // Set of all names of objects we expect to be in the PVS.
-  csString* pvsnames;
-  
-  int numRegistered;  // Number of registered objects from pvsnames
-  int numTotal;  // Total number of objects in pvsnames
-};
 
 /**
  * This object is a wrapper for an iVisibilityObject from the engine.

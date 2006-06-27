@@ -21,4 +21,5 @@ SubInclude TOP libs csplugincommon directx ;
 SubInclude TOP libs csplugincommon macosx ;
 SubInclude TOP libs csplugincommon opengl ;
 SubInclude TOP libs csplugincommon win32 ;
+SubInclude TOP libs csplugincommon pvsdata ;
 }
