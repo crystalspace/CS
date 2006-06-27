@@ -109,7 +109,8 @@ enum csVFSFileKind
 /// Not enough system resources
 #define VFS_STATUS_RESOURCES	3
 /**
- * Access denied: either you have no write access, the filesystem is read-only
+ * Access denied: either you have no write access, the filesystem is 
+ * read-only
  * or you tried to read a file opened for write access
  */
 #define VFS_STATUS_ACCESSDENIED	4
@@ -141,8 +142,8 @@ struct iFile : public virtual iBase
 
   /**
    * Read DataSize bytes and place them into the buffer at which Data points.
-   * \param Data Pointer to the buffer into which the data should be read.  The
-   *   buffer should be at least DataSize bytes in size.
+   * \param Data Pointer to the buffer into which the data should be read.  
+   *   The buffer should be at least DataSize bytes in size.
    * \param DataSize Number of bytes to read.
    * \return The number of bytes actually read.  If an error occurs, zero is
    *   returned.  Invoke GetStatus() to retrieve the error code.
@@ -153,8 +154,8 @@ struct iFile : public virtual iBase
    * Write DataSize bytes from the buffer at which Data points.
    * \param Data Pointer to the data to be written.
    * \param DataSize Number of bytes to write.
-   * \return The number of bytes actually written.  If an error occurs, zero is
-   *   returned.  Invoke GetStatus() to retrieve the error code.
+   * \return The number of bytes actually written.  If an error occurs, zero 
+   *   is returned.  Invoke GetStatus() to retrieve the error code.
    */
   virtual size_t Write (const char *Data, size_t DataSize) = 0;
 
@@ -178,12 +179,12 @@ struct iFile : public virtual iBase
    * Request whole content of the file as a single data buffer.
    * \param nullterm Set this to true if you want a null char to be appended
    *  to the buffer (e.g. for use with string functions.)
-   * \remarks Null-termination might have a performance penalty (depending upon
-   *  where the file is stored.) Use only when needed.
-   * \return The complete data contained in the file; or an invalidated pointer
-   *  if this object does not support this function (e.g. write-only VFS
-   *  files).  Check for an invalidated result via csRef<>::IsValid().  Do not
-   *  modify the contained data!
+   * \remarks Null-termination might have a performance penalty (depending 
+   *  upon where the file is stored.) Use only when needed.
+   * \return The complete data contained in the file; or an invalidated 
+   *  pointer if this object does not support this function (e.g. write-only
+   *  VFS files).  Check for an invalidated result via csRef<>::IsValid().  
+   *  Do not modify the contained data!
    */
   virtual csPtr<iDataBuffer> GetAllData (bool nullterm = false) = 0;
 };
@@ -193,9 +194,9 @@ struct iFile : public virtual iBase
  * This class provides an abstract interface to a physical files sytem.
  *
  * Main creators of instances implementing this interface:
- * - The Native FileSystem plugin (crystalspace.kernel.vfs.nativefilesystem)
- * - The Archive FileSystem plugin (crystalspace.kernel.vfs.archivefilesystem)
- * - The Network FileSystem plugin (crystalspace.kernel.vfs.networkfilesystem)
+ * -The Native FileSystem plugin (crystalspace.kernel.vfs.nativefilesystem)
+ * -The Archive FileSystem plugin (crystalspace.kernel.vfs.archivefilesystem)
+ * -The Network FileSystem plugin (crystalspace.kernel.vfs.networkfilesystem)
  *
  * Main ways to get pointers to this interface:
  * - CS_QUERY_REGISTRY()
@@ -235,28 +236,38 @@ struct iFileSystem: public virtual iBase
   virtual bool CanHandleMount(const char *FileName) = 0;
 
   /*
-   * Get the names of all files within the path (similar to unix 'ls' command)
+   * Get the names of all files within the path 
+   *   (similar to unix 'ls' command)
    * \param Path The path to query
    * \param Names The array that will hold the names of the files
    */
-  virtual void GetFilenames(const char *Path, const char *Mask, iStringArray *Names) = 0;
+  virtual void GetFilenames(const char *Path, const char *Mask, 
+    iStringArray *Names) = 0;
 
   /**
    * Query file date/time.
    * \return True if the query succeeded, else false.
    */
-  virtual bool GetFileTime (const char *FileName, csFileTime &oTime) const = 0;
+  virtual bool GetFileTime (const char *FileName, csFileTime &oTime) const 
+    = 0;
   /**
    * Set file date/time.
    * \return True if the operation succeeded, else false.
    */
-  virtual bool SetFileTime (const char *FileName, const csFileTime &iTime) = 0;
+  virtual bool SetFileTime (const char *FileName, const csFileTime &iTime) 
+    = 0;
 
   /**
    * Query file size (without opening it).
    * \return True if the query succeeded, else false.
    */
   virtual bool GetFileSize (const char *FileName, size_t &oSize) = 0;
+
+  /**
+   * Close all opened archives, free temporary storage etc.
+   * \return True if the synchronization succeeded, else false.
+   */
+  virtual bool Sync () = 0;
 };
 
 /**
@@ -373,7 +384,8 @@ struct iVFS : public virtual iBase
    * \param Size Number of bytes to write.
    * \return True if the write succeeded, else false.
    */
-  virtual bool WriteFile (const char *Name, const char *Data, size_t Size) = 0;
+  virtual bool WriteFile (const char *Name, const char *Data, size_t Size) 
+    = 0;
 
   /**
    * Delete a file on VFS
@@ -470,12 +482,14 @@ struct iVFS : public virtual iBase
    * Query file date/time.
    * \return True if the query succeeded, else false.
    */
-  virtual bool GetFileTime (const char *FileName, csFileTime &oTime) const = 0;
+  virtual bool GetFileTime (const char *FileName, csFileTime &oTime) const 
+    = 0;
   /**
    * Set file date/time.
    * \return True if the operation succeeded, else false.
    */
-  virtual bool SetFileTime (const char *FileName, const csFileTime &iTime) = 0;
+  virtual bool SetFileTime (const char *FileName, const csFileTime &iTime) 
+    = 0;
 
   /**
    * Query file size (without opening it).
@@ -510,7 +524,8 @@ struct iVFS : public virtual iBase
    * with the VirtualPath mount, or an empty array if the VirtualPath isn't
    * mounted.
    */
-  virtual csRef<iStringArray> GetRealMountPaths (const char *VirtualPath) = 0;
+  virtual csRef<iStringArray> GetRealMountPaths (const char *VirtualPath) 
+    = 0;
 
   /** 
    * Register a filesystem plugin
@@ -520,11 +535,13 @@ struct iVFS : public virtual iBase
   virtual size_t RegisterPlugin(iFileSystem *FileSystem) = 0;
 
   /**
-   * Create or add a symbolic link within the VFS (works like unix 'ln -s' command)
+   * Create or add a symbolic link within the VFS 
+   *  (works like unix 'ln -s' command)
    * If the link already exists, then the target will be added to the link
    * \param Target The target that th link will point to
-   * \param Link The path of the link within the VFS, if this is 0 then the link 
-   *        will be created in the current directory with the same name as the target
+   * \param Link The path of the link within the VFS, if this is 0 then the 
+   *  link will be created in the current directory with the same name as 
+   *  the target
    * \param Overwrite If conflicting files are found must they be overwritten 
    *        by the new link
    * \return True if successful, else false.
@@ -539,9 +556,11 @@ struct iVFS : public virtual iBase
    * \param RealPath The physical filesystem path to mount at VirtualPath.
    *   All VFS pseudo-variables and anything that appears in the right-hand
    *   side of an equal sign in vfs.cfg is valid.
-   * \param priority The priority of the RealPath, a higher priority will take preference over a lower one
-   *        if files with the same name exist in different RealPaths
-   * \param plugin The index of the iFileSystem plugin, if 0 then autodetect (with performance cost)
+   * \param priority The priority of the RealPath, a higher priority will 
+   *    take preference over a lower one if files with the same name exist
+   *    in different RealPaths
+   * \param plugin The index of the iFileSystem plugin, if 0 then autodetect
+   *    (with performance cost)
    * \return True if the mount succeeded, else false.
    */
   virtual bool Mount(const char *VirtualPath, const char *RealPath, 
