@@ -24,10 +24,13 @@
 #include "csutil/refarr.h"
 #include "csutil/parray.h"
 #include "csutil/scf_implementation.h"
+#include "csutil/cfgfile.h"
 #include "csutil/scopedmutexlock.h"
 #include "iutil/vfs.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
+
+struct iConfigFile;
 
 CS_PLUGIN_NAMESPACE_BEGIN(vfs)
 {
@@ -82,11 +85,11 @@ public:
 	  bool IsDir = false) const;
 
   /// Check whenever a file exists
-  virtual bool Exists (const char *Path) const;
+  virtual bool Exists (const char *Path);
 
   /// Find all files in a virtual directory and return an array of their 
   /// names
-  virtual csPtr<iStringArray> FindFiles (const char *Path) const;
+  virtual csPtr<iStringArray> FindFiles (const char *Path);
 
   /// Replacement for standard fopen()
   virtual csPtr<iFile> Open (const char *FileName, int Mode);
@@ -129,7 +132,7 @@ public:
 	  const char* vfspath = 0, const char* filename = 0);
 
   /// Query file local date/time
-  virtual bool GetFileTime (const char *FileName, csFileTime &oTime) const;
+  virtual bool GetFileTime (const char *FileName, csFileTime &oTime);
   /// Set file local date/time
   virtual bool SetFileTime (const char *FileName, const csFileTime &iTime);
 
@@ -188,13 +191,13 @@ private:
   int auto_name_counter;
 
   /// Get the directory node
-  VfsNode* GetDirectoryNode(const char *path) const;
+  VfsNode* GetDirectoryNode(const char *path);
 
   /// Get the parent directory node from the path
   /// If create is true, the directories along the path that do not 
   // exist will be created.
   VfsNode* GetParentDirectoryNode(const char *path, 
-    bool create = true) const;
+    bool create = false, bool mount = false);
 
   // Check if the path is a valid real directory
   bool isDirectory(const char *path);
