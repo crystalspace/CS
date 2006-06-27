@@ -560,6 +560,9 @@ TYPEMAP_OUT_csWrapPtr
 %include "csutil/scf_interface.h"
 %include "csutil/scf.h"
 
+// hand made scf template wrappers
+%include "ivaria/scf.i"
+
 #ifndef CS_MINI_SWIG
 %include "iutil/dbghelp.h"
 %include "iutil/cmdline.h"
@@ -918,6 +921,7 @@ TYPEMAP_OUT_csWrapPtr
 %include "igeom/clip2d.h"
 %include "imesh/objmodel.h"
 %include "igeom/path.h"
+%template(scfPath) scfImplementation1<csPath,iPath >;
 %include "igeom/polymesh.h"
 %include "csgeom/path.h"
 %include "csgeom/polymesh.h"

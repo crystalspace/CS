@@ -13,6 +13,8 @@ chronological order.
 	    - Pragmatically implemented the platform-specific new by using
 	      platform_malloc() instead of trying to employ trickery to use the 
 	      platform's default operator new.
+	- caedes added initial interface code for the scfImplementation macros
+	  to the swig wrappers (file ivaria/scf.i).
 25-Jun-2006
         - Piotr Obrzut added setting color feature for flare halo components.
 	- res made CS' own overriding operator new/delete static to avoid
