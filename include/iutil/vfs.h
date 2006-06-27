@@ -342,13 +342,13 @@ struct iVFS : public virtual iBase
     const char *Path, bool IsDir = false) const = 0;
 
   /// Check whenever a file exists
-  virtual bool Exists (const char *Path) const = 0;
+  virtual bool Exists (const char *Path) = 0;
 
   /**
    * Find absolute paths of all files in a virtual directory and return an
    * array with their names.
    */
-  virtual csPtr<iStringArray> FindFiles (const char *Path) const = 0;
+  virtual csPtr<iStringArray> FindFiles (const char *Path) = 0;
 
   /**
    * Open a file on the VFS filesystem.
@@ -482,7 +482,7 @@ struct iVFS : public virtual iBase
    * Query file date/time.
    * \return True if the query succeeded, else false.
    */
-  virtual bool GetFileTime (const char *FileName, csFileTime &oTime) const 
+  virtual bool GetFileTime (const char *FileName, csFileTime &oTime) 
     = 0;
   /**
    * Set file date/time.
