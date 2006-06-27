@@ -22,6 +22,8 @@
 #include "cssysdef.h"
 #include "csutil/csstring.h"
 
+class StaticKDTree;
+
 /// Data at every node for the static KD tree
 class csPVSNodeData
 {
@@ -39,5 +41,8 @@ public:
   int numRegistered;  // Number of registered objects from pvsnames
   int numTotal;  // Total number of objects in pvsnames
 };
+
+void SavePVSDataFile(const char* filename, const StaticKDTree* tree);
+StaticKDTree* LoadPVSDataFile(const char* filename);
 
 #endif
