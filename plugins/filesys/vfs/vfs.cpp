@@ -40,7 +40,6 @@ CS_IMPLEMENT_PLUGIN
 
 /*********************************************
   TODO : Sort out circular symbolic links !!
-         Fix problems with FindFiles in nodes with symlinks
 **************************************************/
 
 CS_PLUGIN_NAMESPACE_BEGIN(vfs)
@@ -94,11 +93,19 @@ int CompareMappedPaths(const MappedPathData &a, const MappedPathData &b)
 class VfsNode
 {
 public:
+  ~VfsNode();
+
+  // Get the name of this node
+  const char * GetName() const 
+  { return ((const char*) VirtualPathname); }
+
+private:
+  friend class csVFS;
+
   // Constructor
   VfsNode(const char *virtualPathname, const csVFS *parentVFS, 
     VfsNode* parentNode);
 
-  ~VfsNode();
   // A pointer to the parent of this node
   VfsNode *ParentNode;
 
@@ -140,10 +147,6 @@ public:
 
   // Get the real path of a file in this node
   bool GetRealPath(const char *FileName, csString &path) const;
-
-  // Get the name of this node
-  const char * GetName() const 
-  { return ((const char*) VirtualPathname); }
 
   // Add a subdirectory to this node
   bool AddSubDirectory(VfsNode *SubDir);
@@ -500,6 +503,7 @@ void VfsNode::FindFiles(const char *Mask, iStringArray *FileList)
   if (!FileList)
     return;
 
+  int counter = 0;
   // First add names of all subdirectories
   for (size_t i = 0; i < SubDirectories.Length(); i++)
   {
@@ -510,6 +514,7 @@ void VfsNode::FindFiles(const char *Mask, iStringArray *FileList)
       FileList->Push(
       (const char *) ExtractFileName(SubDirectories[i]->VirtualPathname));
     }
+    counter++;
   }
 
   // Add names from the paths
@@ -519,7 +524,7 @@ void VfsNode::FindFiles(const char *Mask, iStringArray *FileList)
     if (MappedPaths[j].symlink)
     {
       VfsNode *symlinkNode = 
-        ParentVFS->GetDirectoryNode(MappedPaths[j].name);
+        ParentVFS->GetDirectoryNode((const char *) MappedPaths[j].name);
       if (symlinkNode)
       {
         symlinkNode->FindFiles(Mask, FileList);
@@ -531,6 +536,7 @@ void VfsNode::FindFiles(const char *Mask, iStringArray *FileList)
       iFileSystem *fs = ParentVFS->GetPlugin(MappedPaths[j].pluginIndex);
       if (!fs)
         continue;
+
       fs->GetFilenames(MappedPaths[j].name, Mask, FileList);
     }
   }
@@ -676,8 +682,7 @@ bool VfsNode::GetFileSize (const char *FileName, size_t &oSize)
 // Comparison method to compare nodes
 int VfsVector::Compare (VfsNode* const& Item1, VfsNode* const& Item2)
 {
-  return strcmp ((const char *) Item1->VirtualPathname, 
-    (const char *) Item2->VirtualPathname);
+  return strcmp (Item1->GetName(), Item2->GetName());
 }
 
 
@@ -915,7 +920,6 @@ csPtr<iStringArray> csVFS::FindFiles (const char *Path) const
   {
     strMask = "*";
   }
-
   // Get file from node
   node->FindFiles((const char *) strMask, fl);
 
@@ -1458,7 +1462,7 @@ bool csVFS::SymbolicLink(const char *Target, const char *Link, int priority)
   }
 
   struct MappedPathData mp;
-  mp.name = Target;
+  mp.name = _ExpandPath((const char*) Target);
   mp.pluginIndex = 0;
   mp.priority = priority;
   mp.symlink = true;
