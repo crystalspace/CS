@@ -18,6 +18,9 @@ chronological order.
 	  to the swig wrappers (file ivaria/scf.i).
 	- caedes made a workaround in cspace.i so python bindings can also be
 	  generated using swig 1.3.28.
+	- res renamed timemeasure.h to measuretime.h.
+	- res split the CS::MeasureTime time printing code out into a separate
+	  source file to avoid a warning in -ansi -pedantic.
 25-Jun-2006
         - Piotr Obrzut added setting color feature for flare halo components.
 	- res made CS' own overriding operator new/delete static to avoid
