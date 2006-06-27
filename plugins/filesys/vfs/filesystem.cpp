@@ -201,6 +201,12 @@ bool csNativeFileSystem::GetFileSize (const char *FileName, size_t &oSize)
   return true;
 }
 
+// Sync
+bool csNativeFileSystem::Sync ()
+{
+  return true;
+}
+
 // ----------------------------------------------- csArchiveFileSystem --- //
 class VfsArchiveCache
 {
@@ -295,7 +301,8 @@ csArchiveFileSystem::~csArchiveFileSystem()
   ArchiveCache = 0;
 }
 
-csArchiveFileSystem::VfsArchive * csArchiveFileSystem::FindFile(const char *FileName) const
+csArchiveFileSystem::VfsArchive * csArchiveFileSystem::FindFile(
+  const char *FileName) const
 {
   csString archiveName = ExtractArchiveName(FileName);
 
@@ -328,7 +335,8 @@ csArchiveFileSystem::VfsArchive * csArchiveFileSystem::FindFile(const char *File
 iFile* csArchiveFileSystem::Open(const char * FileName, int mode)
 {
   // rpath is an archive
-  size_t idx = ArchiveCache->FindKey((const char *) ExtractArchiveName(FileName));
+  size_t idx = ArchiveCache->FindKey((const char *) 
+    ExtractArchiveName(FileName));
   
   // archive not in cache?
   if (idx == csArrayItemNotFound)
@@ -341,10 +349,12 @@ iFile* csArchiveFileSystem::Open(const char * FileName, int mode)
 	  }
 
     idx = ArchiveCache->Length ();
-    ArchiveCache->Push (new VfsArchive ((const char *) ExtractArchiveName(FileName)));
+    ArchiveCache->Push (new VfsArchive ((const char *) 
+      ExtractArchiveName(FileName)));
   }
 
-  csFile *f = new csArchiveFile(mode, (const char *) ExtractFileName(FileName), ArchiveCache->Get(idx));
+  csFile *f = new csArchiveFile(mode, (const char *) 
+    ExtractFileName(FileName), ArchiveCache->Get(idx));
   if (f->GetStatus () != VFS_STATUS_OK)
   {
     delete f;
@@ -431,7 +441,8 @@ void csArchiveFileSystem::GetFilenames(const char *Path, const char *Mask,
 }
 
 // Query file date/time.
-bool csArchiveFileSystem::GetFileTime (const char *FileName, csFileTime &oTime) const
+bool csArchiveFileSystem::GetFileTime (const char *FileName, 
+                                       csFileTime &oTime) const
 {
   VfsArchive *a = FindFile(FileName);
  
@@ -450,7 +461,8 @@ bool csArchiveFileSystem::GetFileTime (const char *FileName, csFileTime &oTime) 
 }
   
 // Set file date/time.
-bool csArchiveFileSystem::SetFileTime (const char *FileName, const csFileTime &iTime)
+bool csArchiveFileSystem::SetFileTime (const char *FileName, 
+                                       const csFileTime &iTime)
 {
   VfsArchive *a = FindFile(FileName);
  
@@ -530,7 +542,7 @@ csString csArchiveFileSystem::ExtractFileName(const char *path) const
   return strFileName;
 }
 
-// ------------------------------------------------ VfsArchive--------------------- //
+// ------------------------------------------------ VfsArchive------------ //
 void csArchiveFileSystem::VfsArchive::UpdateTime ()
 {
     LastUseTime = csGetTicks ();
@@ -574,9 +586,10 @@ csArchiveFileSystem::VfsArchive::~VfsArchive ()
   Flush ();
 }
 
-// -------------------------------------------------------------------------------- csArchiveFile --- //
+// ----------------------------------------------------- csArchiveFile --- //
 
-csArchiveFileSystem::csArchiveFile::csArchiveFile (int Mode, const char *Name, VfsArchive *ParentArchive) :
+csArchiveFileSystem::csArchiveFile::csArchiveFile (int Mode, 
+  const char *Name, VfsArchive *ParentArchive) :
   scfImplementationType(this, Name)
 {
   Archive = ParentArchive;
@@ -605,7 +618,8 @@ csArchiveFileSystem::csArchiveFile::csArchiveFile (int Mode, const char *Name, V
   }
   else if ((Mode & VFS_FILE_MODE) == VFS_FILE_WRITE)
   {
-    if ((FileHandle = Archive->NewFile(Name,0,!(Mode & VFS_FILE_UNCOMPRESSED))))
+    if ((FileHandle = Archive->NewFile(Name,0,!(
+      Mode & VFS_FILE_UNCOMPRESSED))))
     {
       Error = VFS_STATUS_OK;
       Archive->Writing++;
@@ -640,7 +654,8 @@ size_t csArchiveFileSystem::csArchiveFile::Read (char *Data, size_t DataSize)
   }
 }
 
-size_t csArchiveFileSystem::csArchiveFile::Write (const char *Data, size_t DataSize)
+size_t csArchiveFileSystem::csArchiveFile::Write (const char *Data, 
+                                                  size_t DataSize)
 {
   if (FileData)
   {
@@ -691,7 +706,8 @@ bool csArchiveFileSystem::csArchiveFile::SetPos (size_t newpos)
   }
 }
 
-csPtr<iDataBuffer>csArchiveFileSystem::csArchiveFile::GetAllData(bool nullterm)
+csPtr<iDataBuffer> csArchiveFileSystem::csArchiveFile::GetAllData(bool 
+                                                                  nullterm)
 {
   if (FileData)
   {
@@ -701,6 +717,13 @@ csPtr<iDataBuffer>csArchiveFileSystem::csArchiveFile::GetAllData(bool nullterm)
   {
     return 0;
   }
+}
+
+// Sync
+bool csArchiveFileSystem::Sync ()
+{
+  ArchiveCache->FlushAll ();
+  return true;
 }
 
 } CS_PLUGIN_NAMESPACE_END(vfs)

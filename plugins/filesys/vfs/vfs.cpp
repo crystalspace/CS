@@ -1,7 +1,7 @@
 /*
     Crystal Space Virtual File System class
     Copyright (C) 1998,1999,2000 by Andrew Zabolotny <bit@eltech.ru>
-	Copyright (C) 2006 by Brandon Hamilton <brandon.hamilton@gmail.com>
+	  Copyright (C) 2006 by Brandon Hamilton <brandon.hamilton@gmail.com>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -63,7 +63,7 @@ csString ExtractFileName(const char *FullPath)
   return strFileName;
 }
 
-// ----------------------------------------------------------- VfsNode --- //
+// ----------------------------------------------------------- VfsNode ---//
 
 // Structure to hold data about VfsNode paths
 struct MappedPathData
@@ -81,6 +81,7 @@ struct MappedPathData
   bool symlink;
 };
 
+// Comparison function for mapped paths
 int CompareMappedPaths(const MappedPathData &a, const MappedPathData &b)
 {
   return (a.priority - b.priority);
@@ -94,7 +95,8 @@ class VfsNode
 {
 public:
   // Constructor
-  VfsNode(const char *virtualPathname, const csVFS *parentVFS, VfsNode* parentNode);
+  VfsNode(const char *virtualPathname, const csVFS *parentVFS, 
+    VfsNode* parentNode);
 
   ~VfsNode();
   // A pointer to the parent of this node
@@ -127,15 +129,21 @@ public:
   // Does this node contain a file
   bool ContainsFile(const char *FileName) const;
 
+  // Get the timestamp of a file in this node
   bool GetFileTime (const char *FileName, csFileTime &oTime) const;
 
+  // Set the timestamp of a file in this node
   bool SetFileTime (const char *FileName, const csFileTime &iTime);
 
+  // Get the size of a file in this node
   bool GetFileSize (const char *FileName, size_t &oSize);
 
+  // Get the real path of a file in this node
   bool GetRealPath(const char *FileName, csString &path) const;
 
-  const char * GetName() const { return ((const char*) VirtualPathname); }
+  // Get the name of this node
+  const char * GetName() const 
+  { return ((const char*) VirtualPathname); }
 
   // Add a subdirectory to this node
   bool AddSubDirectory(VfsNode *SubDir);
@@ -147,116 +155,147 @@ public:
   const csVFS *ParentVFS;
 };
 
-VfsNode::VfsNode(const char *virtualPathname, const csVFS *parentVFS, VfsNode* parentNode)
-: ParentVFS(parentVFS), 
-  ParentNode(parentNode)
+// Constructor
+VfsNode::VfsNode(const char *virtualPathname, const csVFS *parentVFS, 
+                 VfsNode* parentNode)
 {
+  // Create the name
 	VirtualPathname = virtualPathname;
+
+  ParentVFS = parentVFS;
+
+  if (!ParentVFS)
+  {
+    delete this;
+    return;
+  }
+
+  ParentNode = parentNode;
 
   SubDirectories.Empty();
 
   if (parentNode)
   {
+    // Add this node to the parents directory
     parentNode->AddSubDirectory(this);
   }
 }
 
+// Destructor
 VfsNode::~VfsNode()
 {
+  // Delete all subdirectory nodes
   SubDirectories.DeleteAll();
 }
 
+// Add a directory to this node
 bool VfsNode::AddSubDirectory(VfsNode *SubDir)
 {
-    size_t m = 0, l = 0, r = SubDirectories.Length ();
-    while (l < r)
+  // Find the index to place the subdirectory
+  size_t m = 0;
+  size_t l = 0;
+  size_t r = SubDirectories.Length ();
+
+  while (l < r)
+  {
+    m = (l + r) / 2;
+    int cmp = strcmp(SubDirectories[m]->GetName(), SubDir->GetName());
+
+    if (cmp == 0)
     {
-      m = (l + r) / 2;
-      int cmp = strcmp(SubDirectories[m]->GetName(), SubDir->GetName());
-
-      if (cmp == 0)
-      {
-        // Duplicate Entry
-        return false;
-      }
-      else if (cmp < 0)
-        l = m + 1;
-      else
-        r = m;
+      // Duplicate Entry
+      return false;
     }
-    if ((m + 1) == r)
-      m++;
+    else if (cmp < 0)
+      l = m + 1;
+    else
+      r = m;
+  }
+  if ((m + 1) == r)
+    m++;
 
-    SubDirectories.Insert(m, SubDir);
-    return true;
+  // Insert the subdirectory
+  SubDirectories.Insert(m, SubDir);
+  return true;
 }
 
+// Remove a subdirectory from this node
 bool VfsNode::RemoveSubDirectory(VfsNode *SubDir)
 {
-    size_t m = 0, l = 0, r = SubDirectories.Length ();
-    while (l < r)
-    {
-      m = (l + r) / 2;
-      int cmp = strcmp(SubDirectories[m]->GetName(), SubDir->GetName());
+  size_t m = 0;
+  size_t l = 0;
+  size_t r = SubDirectories.Length();
+  
+  while (l < r)
+  {
+    m = (l + r) / 2;
+    int cmp = strcmp(SubDirectories[m]->GetName(), SubDir->GetName());
 
-      if (cmp == 0)
-      {
-        SubDirectories.DeleteIndex(m);
-        return true;
-      }
-      else if (cmp < 0)
-        l = m + 1;
-      else
-        r = m;
+    if (cmp == 0)
+    {
+      // Delete the subdirectory
+      SubDirectories.DeleteIndex(m);
+      return true;
     }
-    // Not found
-    return false;
+    else if (cmp < 0)
+      l = m + 1;
+    else
+      r = m;
+  }
+  
+  // Not found
+  return false;
 }
 
-
+// Find a node
 VfsNode * VfsNode::FindNode(const char *VirtualPath)
 {
   if (strlen(VirtualPath) < VirtualPathname.Length())
     return 0;
 
+  // This is the node
   if (VirtualPathname.Compare(VirtualPath))
     return this;
 
-  size_t low = -1;
-  size_t high = SubDirectories.Length();
+  size_t m = 0;
+  size_t l = 0;
+  size_t r = SubDirectories.Length();
   int cmp = 0;
-  size_t i = 0;
   
   // Use a binary search to find subdirectory
-  while (high - low > 1)
+  while (l < r)
   {
-    i = (low + high) >> 1;
-
-    cmp = strcmp(SubDirectories[i]->GetName(), VirtualPath);
+    m = (l + r) / 2;
+    cmp = strcmp(SubDirectories[m]->GetName(), VirtualPath);
 
 	  if (cmp == 0)
-	    return SubDirectories[i]->FindNode(VirtualPath);
+	    return SubDirectories[m]->FindNode(VirtualPath);
 
     if (cmp < 0)
-	    low = i;	
+	    l = m + 1;
 
     else
-      high = i;
+      r = m;
   }
 
+  // Not found
   return 0;
 }
 
+// Get all mounts
 void VfsNode::GetMounts(scfStringArray * MountArray)
 {
-  // Save each node path into the array
+  // Add this node
   MountArray->Push((const char *) VirtualPathname);
+
+  // Add all subdirectories
   for (size_t i =0; i < SubDirectories.Length(); i++)
   {
 	  SubDirectories[i]->GetMounts(MountArray);  
   }
 }
 
+// Open a file in this node
 iFile* VfsNode::Open (const char *FileName, int Mode)
 {
   if (!FileName)
@@ -264,28 +303,43 @@ iFile* VfsNode::Open (const char *FileName, int Mode)
 
   csString FileToFind;
   iFile* file = 0;
+
+  // Find the file within the node mappings
   for (size_t i = 0; i < MappedPaths.Length(); i++)
   {
     if (MappedPaths[i].symlink)
     {
-      file = ParentVFS->GetDirectoryNode(MappedPaths[i].name)->Open(FileName, Mode);
-      if (file)
-        return file;
+      VfsNode *symlinkNode 
+        = ParentVFS->GetDirectoryNode(MappedPaths[i].name);
+      if (symlinkNode)
+      {
+        file = symlinkNode->Open(FileName, Mode);
+
+        if (file)
+          return file;
+      }
     }
     else
     {
       FileToFind.Clear();
       FileToFind = MappedPaths[i].name;
 #if defined (CS_PLATFORM_DOS) || defined (CS_PLATFORM_WIN32)
-       FileToFind.Append('\\');
+      if (FileToFind[FileToFind.Length() -1] != '\\')
+        FileToFind.Append('\\');
 #else
-       FileToFind.Append(VFS_PATH_SEPARATOR);
+      if (FileToFind[FileToFind.Length() -1] != VFS_PATH_SEPARATOR)
+        FileToFind.Append(VFS_PATH_SEPARATOR);
 #endif
       FileToFind.Append(FileName);
-
+      
+      // Open the file using the correct iFileSystem plugin
       iFileSystem *fs = ParentVFS->GetPlugin(MappedPaths[i].pluginIndex);
+      if (!fs)
+        continue;
+
       file = fs->Open((const char *) FileToFind, Mode);
 
+      // Found the file
       if (file)
         return file;
     }
@@ -295,6 +349,7 @@ iFile* VfsNode::Open (const char *FileName, int Mode)
   return 0;
 }
 
+// Does this node contain the file
 bool VfsNode::ContainsFile(const char *FileName) const
 {
   if (!FileName)
@@ -305,20 +360,32 @@ bool VfsNode::ContainsFile(const char *FileName) const
   {
     if (MappedPaths[i].symlink)
     {
-       if (ParentVFS->GetDirectoryNode(MappedPaths[i].name)->ContainsFile(FileName))
-         return true;
+      VfsNode *symlinkNode 
+        = ParentVFS->GetDirectoryNode(MappedPaths[i].name);
+      if (symlinkNode)
+      {
+        if (symlinkNode->ContainsFile(FileName))
+          return true;
+      }
     }
     else
     {
        FileToFind.Clear();
        FileToFind = MappedPaths[i].name;
 #if defined (CS_PLATFORM_DOS) || defined (CS_PLATFORM_WIN32)
-       FileToFind.Append('\\');
+      if (FileToFind[FileToFind.Length() -1] != '\\')
+        FileToFind.Append('\\');
 #else
-       FileToFind.Append(VFS_PATH_SEPARATOR);
+      if (FileToFind[FileToFind.Length() -1] != VFS_PATH_SEPARATOR)
+        FileToFind.Append(VFS_PATH_SEPARATOR);
 #endif
        FileToFind.Append(FileName);
        iFileSystem *fs = ParentVFS->GetPlugin(MappedPaths[i].pluginIndex);
+
+       if (!fs)
+         continue;
+
+       // Checkl if the file exists
        if (fs->Exists((const char *) FileToFind) != fkDoesNotExist)
          return true;
     }
@@ -328,6 +395,7 @@ bool VfsNode::ContainsFile(const char *FileName) const
   return false;
 }
 
+// Get the real path of a file
 bool VfsNode::GetRealPath(const char *FileName, csString &path) const
 {
   if (!FileName)
@@ -342,28 +410,38 @@ bool VfsNode::GetRealPath(const char *FileName, csString &path) const
   {
     if (MappedPaths[i].symlink)
     {
-       if (ParentVFS->GetDirectoryNode(MappedPaths[i].name)->GetRealPath(FileName, path))
+       VfsNode *symlinkNode 
+         = ParentVFS->GetDirectoryNode(MappedPaths[i].name);
+       if (symlinkNode)
        {
-          return true;
+         if (symlinkNode->GetRealPath(FileName, path))
+           return true;
        }
     }
     else
     {
-       FileToFind.Clear();
-       FileToFind = MappedPaths[i].name;
+      FileToFind.Clear();
+      FileToFind = MappedPaths[i].name;
 #if defined (CS_PLATFORM_DOS) || defined (CS_PLATFORM_WIN32)
-       FileToFind.Append('\\');
+      if (FileToFind[FileToFind.Length() -1] != '\\')
+        FileToFind.Append('\\');
 #else
-       FileToFind.Append(VFS_PATH_SEPARATOR);
+      if (FileToFind[FileToFind.Length() -1] != VFS_PATH_SEPARATOR)
+        FileToFind.Append(VFS_PATH_SEPARATOR);
 #endif
-       FileToFind.Append(FileName);
-       iFileSystem *fs = ParentVFS->GetPlugin(MappedPaths[i].pluginIndex);
+      FileToFind.Append(FileName);
+      iFileSystem *fs = ParentVFS->GetPlugin(MappedPaths[i].pluginIndex);
+      
+      if (!fs)
+        continue;
 
-       if (fs->Exists((const char *) FileToFind) != fkDoesNotExist)
-       {
-         path = FileToFind;
-         return true;
-       }
+      // Check if the file exists
+      if (fs->Exists((const char *) FileToFind) != fkDoesNotExist)
+      {
+        // The real path is correct
+        path = FileToFind;
+        return true;
+      }
     }
   }
 
@@ -371,6 +449,7 @@ bool VfsNode::GetRealPath(const char *FileName, csString &path) const
   return false;
 }
 
+// Delete a file from this node
 bool VfsNode::Delete(const char *FileName)
 {
   if (!FileName)
@@ -381,22 +460,33 @@ bool VfsNode::Delete(const char *FileName)
   {
     if (MappedPaths[i].symlink)
     {
-       if (ParentVFS->GetDirectoryNode(MappedPaths[i].name)->Delete(FileName))
-         return true;
+      VfsNode *symlinkNode 
+        = ParentVFS->GetDirectoryNode(MappedPaths[i].name);
+      if (symlinkNode)
+      {
+        if (symlinkNode->Delete(FileName))
+          return true;
+      }
     }
     else
     {
-       FileToFind.Clear();
-       FileToFind = MappedPaths[i].name;
+      FileToFind.Clear();
+      FileToFind = MappedPaths[i].name;
 #if defined (CS_PLATFORM_DOS) || defined (CS_PLATFORM_WIN32)
-       FileToFind.Append('\\');
+      if (FileToFind[FileToFind.Length() -1] != '\\')
+        FileToFind.Append('\\');
 #else
-       FileToFind.Append(VFS_PATH_SEPARATOR);
+      if (FileToFind[FileToFind.Length() -1] != VFS_PATH_SEPARATOR)
+        FileToFind.Append(VFS_PATH_SEPARATOR);
 #endif
-       FileToFind.Append(FileName);
-       iFileSystem *fs = ParentVFS->GetPlugin(MappedPaths[i].pluginIndex);
-       if (fs->Delete((const char *) FileToFind))
-         return true;
+      FileToFind.Append(FileName);
+      iFileSystem *fs = ParentVFS->GetPlugin(MappedPaths[i].pluginIndex);
+      
+      if (!fs)
+        continue;
+
+      if (fs->Delete((const char *) FileToFind))
+        return true;
     }
   }
 
@@ -404,14 +494,22 @@ bool VfsNode::Delete(const char *FileName)
   return false;
 }
 
+// Get a list of files in this node
 void VfsNode::FindFiles(const char *Mask, iStringArray *FileList)
 {
- 
+  if (!FileList)
+    return;
+
   // First add names of all subdirectories
   for (size_t i = 0; i < SubDirectories.Length(); i++)
   {
-    if (FileList->Find((const char *) ExtractFileName(SubDirectories[i]->VirtualPathname)) == csArrayItemNotFound)
-      FileList->Push((const char *) ExtractFileName(SubDirectories[i]->VirtualPathname));
+    if (FileList->Find(
+      (const char *) ExtractFileName(SubDirectories[i]->VirtualPathname))
+      == csArrayItemNotFound)
+    {
+      FileList->Push(
+      (const char *) ExtractFileName(SubDirectories[i]->VirtualPathname));
+    }
   }
 
   // Add names from the paths
@@ -420,12 +518,19 @@ void VfsNode::FindFiles(const char *Mask, iStringArray *FileList)
     // Add names in symbolic links
     if (MappedPaths[j].symlink)
     {
-      ParentVFS->GetDirectoryNode(MappedPaths[j].name)->FindFiles(Mask, FileList);
+      VfsNode *symlinkNode = 
+        ParentVFS->GetDirectoryNode(MappedPaths[j].name);
+      if (symlinkNode)
+      {
+        symlinkNode->FindFiles(Mask, FileList);
+      }
     }
     // Add names from FileSystems
     else
     {
       iFileSystem *fs = ParentVFS->GetPlugin(MappedPaths[j].pluginIndex);
+      if (!fs)
+        continue;
       fs->GetFilenames(MappedPaths[j].name, Mask, FileList);
     }
   }
@@ -433,25 +538,40 @@ void VfsNode::FindFiles(const char *Mask, iStringArray *FileList)
 
 bool VfsNode::GetFileTime (const char *FileName, csFileTime &oTime) const
 {
+  if (!FileName)
+    return false;
+
   csString FileToFind;
   for (size_t i = 0; i < MappedPaths.Length(); i++)
   {
     if (MappedPaths[i].symlink)
     {
-       if (ParentVFS->GetDirectoryNode(MappedPaths[i].name)->GetFileTime(FileName, oTime))
-         return true;
+      VfsNode *symlinkNode = 
+        ParentVFS->GetDirectoryNode(MappedPaths[i].name);
+      if (symlinkNode)
+      {
+        if (symlinkNode->GetFileTime(FileName, oTime))
+          return true;
+      }
     }
     else
     {
        FileToFind.Clear();
        FileToFind = MappedPaths[i].name;
 #if defined (CS_PLATFORM_DOS) || defined (CS_PLATFORM_WIN32)
-       FileToFind.Append('\\');
+      if (FileToFind[FileToFind.Length() -1] != '\\')
+        FileToFind.Append('\\');
 #else
-       FileToFind.Append(VFS_PATH_SEPARATOR);
+      if (FileToFind[FileToFind.Length() -1] != VFS_PATH_SEPARATOR)
+        FileToFind.Append(VFS_PATH_SEPARATOR);
 #endif
        FileToFind.Append(FileName);
        iFileSystem *fs = ParentVFS->GetPlugin(MappedPaths[i].pluginIndex);
+
+       if (!fs)
+         continue;
+
+       // Get the file time from the iFileSystem plugin
        if (fs->GetFileTime((const char *) FileToFind, oTime))
          return true;
     }
@@ -463,25 +583,40 @@ bool VfsNode::GetFileTime (const char *FileName, csFileTime &oTime) const
 
 bool VfsNode::SetFileTime (const char *FileName, const csFileTime &iTime)
 {
+  if (!FileName)
+    return false;
+
   csString FileToFind;
   for (size_t i = 0; i < MappedPaths.Length(); i++)
   {
     if (MappedPaths[i].symlink)
     {
-       if (ParentVFS->GetDirectoryNode(MappedPaths[i].name)->SetFileTime(FileName, iTime))
-         return true;
+      VfsNode *symlinkNode = 
+        ParentVFS->GetDirectoryNode(MappedPaths[i].name);
+      if (symlinkNode)
+      {
+        if (symlinkNode->SetFileTime(FileName, iTime))
+          return true;
+      }
     }
     else
     {
        FileToFind.Clear();
        FileToFind = MappedPaths[i].name;
 #if defined (CS_PLATFORM_DOS) || defined (CS_PLATFORM_WIN32)
-       FileToFind.Append('\\');
+      if (FileToFind[FileToFind.Length() -1] != '\\')
+        FileToFind.Append('\\');
 #else
-       FileToFind.Append(VFS_PATH_SEPARATOR);
+      if (FileToFind[FileToFind.Length() -1] != VFS_PATH_SEPARATOR)
+        FileToFind.Append(VFS_PATH_SEPARATOR);
 #endif
        FileToFind.Append(FileName);
        iFileSystem *fs = ParentVFS->GetPlugin(MappedPaths[i].pluginIndex);
+
+       if (!fs)
+         continue;
+
+       // Set the file time with the iFileSystem plugin
        if (fs->SetFileTime((const char *) FileToFind, iTime))
          return true;
     }
@@ -493,25 +628,40 @@ bool VfsNode::SetFileTime (const char *FileName, const csFileTime &iTime)
 
 bool VfsNode::GetFileSize (const char *FileName, size_t &oSize)
 {
+  if (!FileName)
+    return false;
+
   csString FileToFind;
   for (size_t i = 0; i < MappedPaths.Length(); i++)
   {
     if (MappedPaths[i].symlink)
     {
-       if (ParentVFS->GetDirectoryNode(MappedPaths[i].name)->GetFileSize(FileName, oSize))
-         return true;
+      VfsNode *symlinkNode = 
+        ParentVFS->GetDirectoryNode(MappedPaths[i].name);
+      if (symlinkNode)
+      {
+        if (symlinkNode->GetFileSize(FileName, oSize))
+          return true;
+      }
     }
     else
     {
        FileToFind.Clear();
        FileToFind = MappedPaths[i].name;
 #if defined (CS_PLATFORM_DOS) || defined (CS_PLATFORM_WIN32)
-       FileToFind.Append('\\');
+      if (FileToFind[FileToFind.Length() -1] != '\\')
+        FileToFind.Append('\\');
 #else
-       FileToFind.Append(VFS_PATH_SEPARATOR);
+      if (FileToFind[FileToFind.Length() -1] != VFS_PATH_SEPARATOR)
+        FileToFind.Append(VFS_PATH_SEPARATOR);
 #endif
        FileToFind.Append(FileName);
        iFileSystem *fs = ParentVFS->GetPlugin(MappedPaths[i].pluginIndex);
+
+       if (!fs)
+         continue;
+
+       // Get the file size from the iFileSystem plugin
        if (fs->GetFileSize((const char *) FileToFind, oSize))
          return true;
     }
@@ -521,15 +671,17 @@ bool VfsNode::GetFileSize (const char *FileName, size_t &oSize)
   return false;
 }
 
-// --------------------------------------------------------- VfsVector --- //
+// --------------------------------------------------------- VfsVector ---//
+
+// Comparison method to compare nodes
 int VfsVector::Compare (VfsNode* const& Item1, VfsNode* const& Item2)
 {
-  return strcmp ((const char *) Item1->VirtualPathname, (const char *) Item2->VirtualPathname);
+  return strcmp ((const char *) Item1->VirtualPathname, 
+    (const char *) Item2->VirtualPathname);
 }
 
 
-// ------------------------------------------------------------- csVFS --- //
-
+// ------------------------------------------------------------- csVFS ---//
 SCF_IMPLEMENT_FACTORY (csVFS)
 
 // csVFS contructor
@@ -540,14 +692,19 @@ csVFS::csVFS (iBase *iParent) :
   auto_name_counter(0),
   object_reg(0)
 {
-  mutex = csMutex::Create (true); // We need a recursive mutex.
+  // We need a recursive mutex.
+  mutex = csMutex::Create (true); 
 
   // Always register native filesystem plugin at index 0;
   fsPlugins.Push(new csNativeFileSystem(this));
+
+  // Register the archive plugin
   fsPlugins.Push(new csArchiveFileSystem(this));
 
+  // Create the root node
   RootNode = new VfsNode("/", this, 0);
 
+  // Set the current node to the root node
   CwdNode = RootNode;
 }
 
@@ -560,6 +717,7 @@ csVFS::~csVFS ()
 
 const char * csVFS::GetCwd () const
 { 
+  // Get the name of the current directory
   return CwdNode->GetName(); 
 }
 
@@ -572,20 +730,24 @@ bool csVFS::Initialize (iObjectRegistry* r)
 
 bool csVFS::ChDir (const char *Path)
 {
+  // Must be a path
   if (strlen(Path) == 0)
     return false;
 
   csScopedMutexLock lock (mutex);
 
+  // See if path exists
   VfsNode *newCwd = GetDirectoryNode(Path);
   
   // Assign new Cwd
   if (newCwd)
   {
+    // Path exists
 	  CwdNode = newCwd;
 	  return true;
   }
 
+  // Try mount path
   csString strPath;
   newCwd = GetParentDirectoryNode(Path, false);
 
@@ -602,17 +764,20 @@ bool csVFS::ChDir (const char *Path)
   }
   newPath.Append(Path);
 
+  // Try and mount path
   if (!Mount((const char *) newPath, (const char *) strPath))
     return false;
   
   newCwd = GetDirectoryNode((const char *) newPath);
 
+  // mount succeeded
   if (newCwd)
   {
 	  CwdNode = newCwd;
 	  return true;
   }
 
+  // failure to change directory
   return false;
 }
 
@@ -622,7 +787,8 @@ void csVFS::PushDir (char const* Path)
 	DirectoryStack.Push(CwdNode);
 
 	// Change the current directory
-  ChDir(Path);
+  if (!ChDir(Path))
+    DirectoryStack.Pop();
 }
 
 bool csVFS::PopDir ()
@@ -635,6 +801,7 @@ bool csVFS::PopDir ()
 
 	// Pop the stack and change the cwd
 	CwdNode = DirectoryStack.Pop();
+
 	return true;
 }
 
@@ -661,11 +828,13 @@ csString csVFS::_ExpandPath (const char *Path) const
 
   while(loop < directories.Length() && directories[loop])
   {
+    // Parent directory
     if (strcmp(directories[loop], "..") == 0)
     {
       size_t newlen = ExpandedPath.FindLast(VFS_PATH_SEPARATOR);
       ExpandedPath.Truncate(newlen);
     }
+    // Current directory
     else if (strcmp(directories[loop], ".") == 0)
     {
       // Do nothing
@@ -700,7 +869,7 @@ csPtr<iDataBuffer> csVFS::ExpandPath (const char *Path, bool IsDir) const
 
 bool csVFS::Exists (const char *Path) const
 {
-  if (strlen(Path) == 0)
+  if (!Path)
     return false;
 
   csScopedMutexLock lock (mutex);
@@ -711,23 +880,29 @@ bool csVFS::Exists (const char *Path) const
   if (!node)
 	  return false;
  
+  // Check if the node contains the file
   return node->ContainsFile(ExtractFileName(Path));
 }
 
 csPtr<iStringArray> csVFS::FindFiles (const char *Path) const
 {
+  if (!Path)
+    return 0;
+
   csScopedMutexLock lock (mutex);
 
-  // Get parent node
+  // Get directory node
 	VfsNode *node = GetDirectoryNode(Path);
 
   csString strMask;
 
 	if (!node)
   {
+    // Get parent directory node
     node = GetParentDirectoryNode(Path, false);
     if (!node)
     {
+      // Does not exist
       return 0;
     }
     strMask = ExtractFileName(Path);
@@ -761,7 +936,7 @@ csPtr<iFile> csVFS::Open (const char *FileName, int Mode)
   VfsNode *node = GetParentDirectoryNode(FileName, false);
 
   if (!node)
-   return 0;
+    return 0;
 
   // Get the file pointer
   iFile *f = node->Open((const char *) ExtractFileName(FileName), Mode);
@@ -772,7 +947,10 @@ csPtr<iFile> csVFS::Open (const char *FileName, int Mode)
   
 csPtr<iDataBuffer> csVFS::ReadFile (const char *FileName, bool nullterm)
 {
-  // Lock
+  if (!FileName)
+    return 0;
+
+  // Acquire Lock
   csScopedMutexLock lock (mutex);
 
   // Open File for reading
@@ -795,7 +973,8 @@ csPtr<iDataBuffer> csVFS::ReadFile (const char *FileName, bool nullterm)
   if (!buff)
     return 0;
 
-  // Make the file zero-terminated in the case we'll use it as an ASCIIZ string
+  // Make the file zero-terminated in the case we'll use it as an 
+  // ASCIIZ string
   buff [Size] = 0;
   if (F->Read(buff, Size) != Size)
   {
@@ -827,7 +1006,7 @@ bool csVFS::DeleteFile (const char *FileName)
 
   csScopedMutexLock lock (mutex);
 
-  // Get the parent node
+  // Get the parent directory node
   VfsNode *node = GetParentDirectoryNode(FileName, false);
 
   if (!node)
@@ -838,8 +1017,13 @@ bool csVFS::DeleteFile (const char *FileName)
 
 bool csVFS::Sync ()
 {
-  // Used with Cached Filesystems
-  // TODO: investigate how to handle this
+  // Acquire lock
+  csScopedMutexLock lock (mutex);
+
+  // Sync all iFileSystem plugins
+  for (size_t i = 0; i < fsPlugins.Length(); i++)
+    fsPlugins[i]->Sync();
+
 	return true;	
 }
 
@@ -849,7 +1033,8 @@ bool csVFS::Mount (const char *VirtualPath, const char *RealPath)
   return Mount(VirtualPath, RealPath, 0, 0);
 }
 
-bool csVFS::Mount(const char *VirtualPath, const char *RealPath, int priority, size_t plugin)
+bool csVFS::Mount(const char *VirtualPath, const char *RealPath, 
+                  int priority, size_t plugin)
 {
   if (!VirtualPath || !RealPath)
 	  return false;
@@ -878,6 +1063,8 @@ bool csVFS::Mount(const char *VirtualPath, const char *RealPath, int priority, s
     {
 	    return false;
     }
+
+    // Insert the mount into the node
     node->MappedPaths.InsertSorted(pathData, CompareMappedPaths);
     return true;
   }
@@ -891,6 +1078,8 @@ bool csVFS::Mount(const char *VirtualPath, const char *RealPath, int priority, s
     {
 	    return false;
     }
+
+    // Insert the mount into the node
     node->MappedPaths.InsertSorted(pathData, CompareMappedPaths);
 	  return true;
   }
@@ -898,7 +1087,8 @@ bool csVFS::Mount(const char *VirtualPath, const char *RealPath, int priority, s
   // Find the correct plugin for handling the RealPath
   for (size_t i = 1; i < fsPlugins.Length(); i++)
   {
-    // Start from 1 because we don't want to check the NativeFileSystem
+    // Start from 1 because we don't want to 
+    // check the NativeFileSystem first
     if(fsPlugins[i]->CanHandleMount(RealPath))
     {
       node = GetParentDirectoryNode((const char *) tmp, true);
@@ -907,13 +1097,18 @@ bool csVFS::Mount(const char *VirtualPath, const char *RealPath, int priority, s
       {
 	      return false;
       }
+
       pathData.pluginIndex = i;
+
+      // Insert the mount into the node
       node->MappedPaths.InsertSorted(pathData, CompareMappedPaths);
       return true;
     }
   }
 
+  // Try remove the node if it was made
   Unmount(VirtualPath, 0);
+
   // RealPath is not valid
   return false;	
 }
@@ -932,9 +1127,10 @@ bool csVFS::Unmount (const char *VirtualPath, const char *RealPath)
   if (!node)
     return false;
   
-
+  
   if (!RealPath)
   {
+    // Delete the node
     if (node->ParentNode)
       node->ParentNode->RemoveSubDirectory(node);
     return true;
@@ -945,7 +1141,7 @@ bool csVFS::Unmount (const char *VirtualPath, const char *RealPath)
   {
     if (node->MappedPaths[i].name.Compare(RealPath))
     {
-        // Delete the RealPAth if it is found
+        // Delete the RealPath if it is found
        return node->MappedPaths.DeleteIndex(i);
     }
   }
@@ -960,61 +1156,59 @@ csRef<iStringArray> csVFS::MountRoot (const char *VirtualPath)
 
   csScopedMutexLock lock (mutex);
 
-  if (VirtualPath != 0)
+  csRef<iStringArray> roots = csInstallationPathsHelper::FindSystemRoots();
+  size_t i;
+  size_t n = roots->Length ();
+
+  VfsNode *node;
+  for (i = 0 ; i < n ; i++)
   {
-    csRef<iStringArray> roots = csInstallationPathsHelper::FindSystemRoots();
-    size_t i;
-    size_t n = roots->Length ();
+    char const* t = roots->Get(i);
 
-    VfsNode *node;
-    for (i = 0 ; i < n ; i++)
+    csString s(t);
+    size_t const slen = s.Length();
+    char c = '\0';
+
+    csString vfs_dir;
+    vfs_dir << VirtualPath << '/';
+
+    for (size_t j = 0; j < slen; j++)
     {
-      char const* t = roots->Get(i);
+      c = s.GetAt(j);
+      if (c == '_' || c == '-' || isalnum(c))
+     vfs_dir << (char)tolower(c);
+    }
 
-      csString s(t);
-      size_t const slen = s.Length();
-      char c = '\0';
-
-      csString vfs_dir;
-      vfs_dir << VirtualPath << '/';
-
-      for (size_t j = 0; j < slen; j++)
-      {
-        c = s.GetAt(j);
-        if (c == '_' || c == '-' || isalnum(c))
-	      vfs_dir << (char)tolower(c);
-      }
-
-      csString real_dir(s);
+    csString real_dir(s);
 
 // Remove trailing slash
-#if !(defined (CS_PLATFORM_DOS) || defined (CS_PLATFORM_WIN32))
-      if (slen > 0 && (c = real_dir.GetAt(slen - 1)) == '/' || c == '\\')
-        real_dir.Truncate(slen - 1);
+#if!(defined (CS_PLATFORM_DOS) || defined (CS_PLATFORM_WIN32))
+    if (slen > 0 && (c = real_dir.GetAt(slen - 1)) == '/' || c == '\\')
+      real_dir.Truncate(slen - 1);
+
 #else
-      if (slen > 4 && (c = real_dir.GetAt(slen - 1)) == '/' || c == '\\')
-        real_dir.Truncate(slen - 1);
+    if (slen > 4 && (c = real_dir.GetAt(slen - 1)) == '/' || c == '\\')
+      real_dir.Truncate(slen - 1);
 #endif
 
-      outv->Push (vfs_dir);
+    outv->Push (vfs_dir);
 
-      vfs_dir.Append("/tmp");
+    vfs_dir.Append("/tmp");
 
-      node = GetParentDirectoryNode((const char *) vfs_dir, true);
+    node = GetParentDirectoryNode((const char *) vfs_dir, true);
 
-      if (!node)
-      {
-        continue;
-      }
-      // Create the data structure
-      struct MappedPathData pathData;
-      pathData.name = real_dir;
-      pathData.priority = 0;
-      pathData.pluginIndex = 0;
-      pathData.symlink = false;
-
-      node->MappedPaths.InsertSorted(pathData, CompareMappedPaths);
+    if (!node)
+    {
+      continue;
     }
+    // Create the data structure
+    struct MappedPathData pathData;
+    pathData.name = real_dir;
+    pathData.priority = 0;
+    pathData.pluginIndex = 0;
+    pathData.symlink = false;
+
+    node->MappedPaths.InsertSorted(pathData, CompareMappedPaths);
   }
 
   csRef<iStringArray> v(outv);
@@ -1036,6 +1230,7 @@ bool csVFS::LoadMountsFromFile (iConfigFile* file)
 
 bool csVFS::TryChDirAuto(const char *Path, const char *FileName)
 {
+  // Acquire lock
   csScopedMutexLock lock (mutex);
 
   // Check if the VFS Path exists
@@ -1044,7 +1239,7 @@ bool csVFS::TryChDirAuto(const char *Path, const char *FileName)
   if (!node)
     return false;
 
-
+  // Check for filename
   if (FileName)
   {
      if (node->ContainsFile(FileName))
@@ -1075,19 +1270,28 @@ bool csVFS::ChDirAuto (const char* path, const csStringArray* paths,
     for (size_t i = 0; i < paths->Length(); i++)
     {
       csString testpath = paths->Get(i);
-      if (testpath.GetAt(testpath.Length() - 1) != VFS_PATH_SEPARATOR && path[0] != VFS_PATH_SEPARATOR)
+      if (testpath.GetAt(testpath.Length() - 1) != VFS_PATH_SEPARATOR 
+        && path[0] != VFS_PATH_SEPARATOR)
+      {
         testpath.Append(VFS_PATH_SEPARATOR);
-      else if (testpath.GetAt(testpath.Length() - 1) == VFS_PATH_SEPARATOR && path[0] == VFS_PATH_SEPARATOR)
+      }
+      else if (testpath.GetAt(testpath.Length() - 1) == VFS_PATH_SEPARATOR
+        && path[0] == VFS_PATH_SEPARATOR)
+      {
         testpath.Truncate(testpath.Length() -1);
+      }
 
       testpath.Append(path);
 
+      // Test if the path exists
       if (TryChDirAuto((const char *) testpath, filename))
         return true;
     }
   }
   
   csString vpath;
+
+  // Mount
 
   if (vfspath)
     vpath = vfspath;
@@ -1100,6 +1304,7 @@ bool csVFS::ChDirAuto (const char* path, const csStringArray* paths,
   if (!Mount(vpath, path))
     return false;
 
+  // Try change directory
   return ChDir(vpath);
 }
 
@@ -1154,17 +1359,23 @@ csPtr<iDataBuffer> csVFS::GetRealPath (const char *FileName)
     return 0;
 
   csScopedMutexLock lock (mutex);
-  VfsNode *node = GetParentDirectoryNode(FileName, false);
+  VfsNode *node = GetDirectoryNode(FileName);
 
   if (!node)
-    return false;
+  {
+    node = GetParentDirectoryNode(FileName, false);
+    if (!node)
+      return false;
+  }
 
   csString path;
   
+  // Try get the real path
   if (!node->GetRealPath(ExtractFileName(FileName), path))
     return 0;
 
-  return csPtr<iDataBuffer> (new csDataBuffer (csStrNew ((const char *) path), path.Length() + 1));
+  return csPtr<iDataBuffer> (new csDataBuffer (
+    csStrNew ((const char *) path), path.Length() + 1));
 }
 
 // Get virtual mount paths
@@ -1200,7 +1411,7 @@ csRef<iStringArray> csVFS::GetRealMountPaths (const char *VirtualPath)
 
   scfStringArray *rmounts = new scfStringArray;
 
-  // Copy the real paths
+  // Add only the real paths
   for (size_t i = 0; i < node->MappedPaths.Length(); i++)
   {
     if (!node->MappedPaths[i].symlink)
@@ -1228,15 +1439,22 @@ bool csVFS::SymbolicLink(const char *Target, const char *Link, int priority)
 {
   csScopedMutexLock lock (mutex);
 
-  VfsNode *Directory = GetDirectoryNode(Link);
+  VfsNode *node = GetDirectoryNode(Link);
 
   // Node does not exist
-  if (!Directory)
+  if (!node)
   {
     // Create the node
 	  csString tmp = Link;
+
+    // Remove trailing slash
+    if (tmp.GetAt(tmp.Length() - 1) == VFS_PATH_SEPARATOR)
+      tmp.Truncate(tmp.Length() - 1);
+
 	  tmp.Append("/tmp");
-	  Directory = GetParentDirectoryNode((const char *) tmp, true);
+	  node = GetParentDirectoryNode((const char *) tmp, true);
+    if (!node)
+      return false;
   }
 
   struct MappedPathData mp;
@@ -1246,7 +1464,7 @@ bool csVFS::SymbolicLink(const char *Target, const char *Link, int priority)
   mp.symlink = true;
 
   // Add the target to the symlinks of the directory
-  Directory->MappedPaths.InsertSorted(mp, CompareMappedPaths);
+  node->MappedPaths.InsertSorted(mp, CompareMappedPaths);
 
   return true;
 }
@@ -1312,7 +1530,7 @@ VfsNode* csVFS::GetParentDirectoryNode(const char *path, bool create) const
     if (strcmp (directories[counter], "..") == 0)
     {
       if (node->ParentNode)
-       node = node->ParentNode;
+        node = node->ParentNode;
 
       counter++;
       continue;
@@ -1324,23 +1542,32 @@ VfsNode* csVFS::GetParentDirectoryNode(const char *path, bool create) const
     }
     currentDir.Append(VFS_PATH_SEPARATOR);
 	  currentDir.Append(directories[counter]);
+
+    // Try find the node
 	  tmpNode = node->FindNode((const char *) currentDir);
 	  if (!tmpNode)
 	  {
 	    if (!create)
 	    {
-          return 0;
+        // Node does not exist
+        return 0;
 	    }
+      // Create the node
       tmpNode = new VfsNode((const char *)currentDir, this, node);
 	  }
 	  node = tmpNode;
 	  counter++;
   }
+
   return node;
 }
 
 bool csVFS::isDirectory(const char *path)
 {
+  if (!path)
+    return false;
+
+  // stat the path
   struct stat stats;
   if (stat (path, &stats) != 0)
     return false;
@@ -1351,6 +1578,10 @@ bool csVFS::isDirectory(const char *path)
 
 iFileSystem* csVFS::GetPlugin(size_t index) const
 {
+  if (index >= fsPlugins.Length())
+    return 0;
+
+  // Return a pointer to the plugin
   return fsPlugins.Get(index);
 }
 

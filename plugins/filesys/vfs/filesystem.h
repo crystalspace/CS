@@ -100,16 +100,22 @@ public:
   virtual bool CanHandleMount(const char *FileName) = 0;
 
   // Get names of files within the path
-  virtual void GetFilenames(const char *Path, const char *Mask, iStringArray *Names) = 0;
+  virtual void GetFilenames(const char *Path, const char *Mask, 
+    iStringArray *Names) = 0;
 
   // Query file date/time.
-  virtual bool GetFileTime (const char *FileName, csFileTime &oTime) const = 0;
+  virtual bool GetFileTime (const char *FileName, 
+    csFileTime &oTime) const = 0;
   
   // Set file date/time.
-  virtual bool SetFileTime (const char *FileName, const csFileTime &iTime) = 0;
+  virtual bool SetFileTime (const char *FileName, 
+    const csFileTime &iTime) = 0;
 
   // Query file size (without opening it).
   virtual bool GetFileSize (const char *FileName, size_t &oSize) = 0;
+
+  // Sync
+  virtual bool Sync () = 0;
 
 protected:
   /// The constructor for csFileSystem
@@ -123,7 +129,8 @@ protected:
 
 /**
  * TODO: write class description
- * The native file system plugin will use csPhysicalFile for access to the physical file system
+ * The native file system plugin will use csPhysicalFile for 
+ * access to the physical file system
  */
 class csNativeFileSystem 
 	: public scfImplementationExt0<csNativeFileSystem, csFileSystem>
@@ -148,7 +155,8 @@ public:
   virtual bool CanHandleMount(const char *FileName);
 
   // Get names of files within the path
-  virtual void GetFilenames(const char *Path, const char *Mask, iStringArray *Names);
+  virtual void GetFilenames(const char *Path, const char *Mask, 
+    iStringArray *Names);
 
   // Query file date/time.
   virtual bool GetFileTime (const char *FileName, csFileTime &oTime) const;
@@ -158,6 +166,9 @@ public:
 
   // Query file size (without opening it).
   virtual bool GetFileSize (const char *FileName, size_t &oSize);
+
+  // Sync
+  virtual bool Sync ();
 };
 
 // Minimal time (msec) that an unused archive will be kept unclosed
@@ -283,17 +294,21 @@ public:
   virtual bool CanHandleMount(const char *FileName);
 
   // Get names of files within the path
-  virtual void GetFilenames(const char *Path, const char *Mask, iStringArray *Names);
+  virtual void GetFilenames(const char *Path, const char *Mask, 
+    iStringArray *Names);
 
     // Query file date/time.
   virtual bool GetFileTime (const char *FileName, csFileTime &oTime) const;
   
   // Set file date/time.
-  virtual bool SetFileTime (const char *FileName, const csFileTime &iTime);
+  virtual bool SetFileTime (const char *FileName, 
+    const csFileTime &iTime);
 
   // Query file size (without opening it).
   virtual bool GetFileSize (const char *FileName, size_t &oSize);
-
+  
+  // Sync
+  virtual bool Sync ();
 
 private:
 

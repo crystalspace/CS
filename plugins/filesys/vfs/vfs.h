@@ -1,7 +1,7 @@
 /*
     Crystal Space Virtual File System class
     Copyright (C) 1998,1999,2000 by Andrew Zabolotny <bit@eltech.ru>
-	Copyright (C) 2006 by Brandon Hamilton <brandon.hamilton@gmail.com>
+    Copyright (C) 2006 by Brandon Hamilton <brandon.hamilton@gmail.com>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -154,10 +154,12 @@ public:
   virtual size_t RegisterPlugin(iFileSystem *FileSystem);
 
   /// Create or add a symbolic link
-  virtual bool SymbolicLink(const char *Target, const char *Link = 0, int priority = 0);
+  virtual bool SymbolicLink(const char *Target, const char *Link = 0, 
+    int priority = 0);
 
   /// Mount a file
-  virtual bool Mount(const char *VirtualPath, const char *RealPath, int priority, size_t plugin = 0);
+  virtual bool Mount(const char *VirtualPath, const char *RealPath, 
+    int priority, size_t plugin = 0);
 
   /// Return a filesystem plugin
   virtual iFileSystem* GetPlugin(size_t index) const;
@@ -189,8 +191,10 @@ private:
   VfsNode* GetDirectoryNode(const char *path) const;
 
   /// Get the parent directory node from the path
-  /// If create is true, the directories along the path that do not exist will be created.
-  VfsNode* GetParentDirectoryNode(const char *path, bool create = true) const;
+  /// If create is true, the directories along the path that do not 
+  // exist will be created.
+  VfsNode* GetParentDirectoryNode(const char *path, 
+    bool create = true) const;
 
   // Check if the path is a valid real directory
   bool isDirectory(const char *path);
