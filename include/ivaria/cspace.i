@@ -560,6 +560,9 @@ TYPEMAP_OUT_csWrapPtr
 %include "csutil/scf_interface.h"
 %include "csutil/scf.h"
 
+// hand made scf template wrappers
+%include "ivaria/scf.i"
+
 #ifndef CS_MINI_SWIG
 %include "iutil/dbghelp.h"
 %include "iutil/cmdline.h"
@@ -918,6 +921,7 @@ TYPEMAP_OUT_csWrapPtr
 %include "igeom/clip2d.h"
 %include "imesh/objmodel.h"
 %include "igeom/path.h"
+%template(scfPath) scfImplementation1<csPath,iPath >;
 %include "igeom/polymesh.h"
 %include "csgeom/path.h"
 %include "csgeom/polymesh.h"
@@ -1037,7 +1041,9 @@ TYPEMAP_OUT_csWrapPtr
 %rename(RetrieveUInt32) iEvent::Retrieve(const char *, uint32 &) const;
 %rename(RetrieveFloat) iEvent::Retrieve(const char *, float &) const;
 %rename(RetrieveDouble) iEvent::Retrieve(const char *, double &) const;
-%rename(RetrieveString) iEvent::Retrieve(const char *, char **) const;
+// workaround RetrieveString as following line gives problems with swig 1.3.28
+//%rename(RetrieveString) iEvent::Retrieve(const char *, const char *&) const;
+%ignore iEvent::Retrieve(const char *, const char *&) const;
 %rename(RetrieveBool) iEvent::Retrieve(const char *, bool &) const;
 %rename(RetrieveVoidPtr) iEvent::Retrieve(const char*, void**, size_t&) const;
 #pragma SWIG nowarn=312; // nested union not supported
@@ -1046,6 +1052,12 @@ TYPEMAP_OUT_csWrapPtr
 %ignore csJoystickEventHelper::GetY;
 %include "iutil/event.h"
 %include "csutil/event.h"
+%extend iEvent {
+	csEventError RetrieveString(const char *name, char *&v)
+	{
+		return self->Retrieve(name,(const char *&)v);
+	}
+}
 
 %include "iutil/evdefs.h"
 %include "iutil/eventq.h"
