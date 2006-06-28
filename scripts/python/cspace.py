@@ -3655,6 +3655,30 @@ _cspace.iPath_swigregister(iPathPtr)
 
 iPath_scfGetVersion = _cspace.iPath_scfGetVersion
 
+class scfPath(iPath):
+    __swig_setmethods__ = {}
+    for _s in [iPath]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, scfPath, name, value)
+    __swig_getmethods__ = {}
+    for _s in [iPath]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, scfPath, name)
+    def __init__(self): raise RuntimeError, "No constructor defined"
+    def __repr__(self):
+        return "<%s.%s; proxy of C++ scfImplementation1<csPath,iPath > instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
+    def IncRef(*args): return _cspace.scfPath_IncRef(*args)
+    def DecRef(*args): return _cspace.scfPath_DecRef(*args)
+    def GetRefCount(*args): return _cspace.scfPath_GetRefCount(*args)
+    def QueryInterface(*args): return _cspace.scfPath_QueryInterface(*args)
+    def AddRefOwner(*args): return _cspace.scfPath_AddRefOwner(*args)
+    def RemoveRefOwner(*args): return _cspace.scfPath_RemoveRefOwner(*args)
+
+class scfPathPtr(scfPath):
+    def __init__(self, this):
+        _swig_setattr(self, scfPath, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, scfPath, 'thisown', 0)
+        _swig_setattr(self, scfPath,self.__class__,scfPath)
+_cspace.scfPath_swigregister(scfPathPtr)
+
 CS_POLYMESH_CLOSED = _cspace.CS_POLYMESH_CLOSED
 CS_POLYMESH_NOTCLOSED = _cspace.CS_POLYMESH_NOTCLOSED
 CS_POLYMESH_CONVEX = _cspace.CS_POLYMESH_CONVEX
@@ -3727,10 +3751,12 @@ _cspace.iPolygonMesh_swigregister(iPolygonMeshPtr)
 
 iPolygonMesh_scfGetVersion = _cspace.iPolygonMesh_scfGetVersion
 
-class csPath(_object):
+class csPath(scfPath):
     __swig_setmethods__ = {}
+    for _s in [scfPath]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, csPath, name, value)
     __swig_getmethods__ = {}
+    for _s in [scfPath]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, csPath, name)
     def __repr__(self):
         return "<%s.%s; proxy of C++ csPath instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
@@ -8765,6 +8791,7 @@ class iEvent(iBase):
     def Remove(*args): return _cspace.iEvent_Remove(*args)
     def RemoveAll(*args): return _cspace.iEvent_RemoveAll(*args)
     def GetAttributeIterator(*args): return _cspace.iEvent_GetAttributeIterator(*args)
+    def RetrieveString(*args): return _cspace.iEvent_RetrieveString(*args)
     def __del__(self, destroy=_cspace.delete_iEvent):
         try:
             if self.thisown: destroy(self)

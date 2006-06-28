@@ -4193,6 +4193,30 @@ sub ACQUIRE {
 }
 
 
+############# Class : cspace::scfPath ##############
+
+package cspace::scfPath;
+@ISA = qw( cspace cspace::iPath );
+%OWNER = ();
+*IncRef = *cspacec::scfPath_IncRef;
+*DecRef = *cspacec::scfPath_DecRef;
+*GetRefCount = *cspacec::scfPath_GetRefCount;
+*QueryInterface = *cspacec::scfPath_QueryInterface;
+*AddRefOwner = *cspacec::scfPath_AddRefOwner;
+*RemoveRefOwner = *cspacec::scfPath_RemoveRefOwner;
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
 ############# Class : cspace::csMeshedPolygon ##############
 
 package cspace::csMeshedPolygon;
@@ -4277,7 +4301,7 @@ sub ACQUIRE {
 ############# Class : cspace::csPath ##############
 
 package cspace::csPath;
-@ISA = qw( cspace );
+@ISA = qw( cspace cspace::scfPath );
 %OWNER = ();
 %ITERATORS = ();
 sub new {
@@ -9957,6 +9981,7 @@ package cspace::iEvent;
 *Remove = *cspacec::iEvent_Remove;
 *RemoveAll = *cspacec::iEvent_RemoveAll;
 *GetAttributeIterator = *cspacec::iEvent_GetAttributeIterator;
+*RetrieveString = *cspacec::iEvent_RetrieveString;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
