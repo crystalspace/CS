@@ -58,8 +58,8 @@ public:
 template<typename T>
 class csBlockAllocatorDisposeLeaky
 {
-#ifdef CS_DEBUG
   bool doWarn;
+#ifdef CS_DEBUG
   const char* parentClass;
   const void* parent;
   size_t count;
@@ -81,8 +81,8 @@ public:
   }
 #else
   template<typename BA>
-  csBlockAllocatorDisposeLeaky (const BA&, bool legit)
-  { (void)legit; }
+  csBlockAllocatorDisposeLeaky (const BA&, bool legit) : doWarn (!legit)
+  { }
 #endif
   ~csBlockAllocatorDisposeLeaky()
   {
