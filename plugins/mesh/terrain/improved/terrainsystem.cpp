@@ -114,25 +114,31 @@ void csTerrainSystem::SetMaterialPalette (const csRefArray<iMaterialWrapper>&
 }
 
 bool csTerrainSystem::CollideSegment (const csVector3& start, const csVector3&
-                                 end, bool oneHit, csArray<csVector3>& points)
+                               end, bool oneHit, iTerrainVector3Array& points)
 {
   if (!collider) return false;
 
-  csSegment3 seg(start, end);
-  csVector3 isect;
-
   for (size_t i = 0; i < cells.GetSize(); ++i)
   {
+    csSegment3 seg(start, end);
     csBox3 box = cells[i]->GetBBox ();
 
-    if (csIntersect3::BoxSegment (box, seg, isect))
+    csVector3 isect;
+
+    if (csIntersect3::BoxSegment (box, seg, isect) >= 0)
     {
+      seg.SetStart( seg.End ());
+      seg.SetEnd (isect);
+      
+      if (csIntersect3::BoxSegment (box, seg, isect) >= 0)
+        seg.SetStart (isect);
+      
       if (cells[i]->GetLoadState () != csTerrainCell::Loaded)
       {
         cells[i]->Load ();
       }
 
-      if (collider->CollideSegment (cells[i], start, end, oneHit, points) &&
+      if (collider->CollideSegment (cells[i], seg.End (), seg.Start (), oneHit, points) &&
         oneHit)
         return true;
     }
@@ -310,27 +316,27 @@ bool csTerrainSystem::HitBeamOutline (const csVector3& start,
 
   if (CollideSegment (start, end, true, collision_result))
   {
-    isect = collision_result[0];
+    isect = collision_result.Get (0);
 
     if (pr)
     {
 #pragma message(PR_WARNING("hrm... this is ugly."))
       int gr = 0;
-      float gr_max = end.x - start.x;
+      float gr_max = fabsf(end.x - start.x);
 
-      if (end.y - start.y > gr_max)
+      if (fabsf(end.y - start.y) > gr_max)
       {
         gr = 1;
-        gr_max = end.y - start.y;
+        gr_max = fabsf(end.y - start.y);
       }
 
-      if (end.z - start.z > gr_max)
+      if (fabsf(end.z - start.z) > gr_max)
       {
         gr = 2;
-        gr_max = end.y - start.y;
+        gr_max = fabsf(end.y - start.y);
       }
 
-      *pr = (collision_result[0][gr] - start[gr]) / gr_max;
+      *pr = fabsf(collision_result.Get (0)[gr] - start[gr]) / gr_max;
     }
 
     return true;

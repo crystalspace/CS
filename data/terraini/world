@@ -163,7 +163,7 @@
       <priority>wall</priority>
     </meshobj>
 
-     <meshgen name="grass">
+<!--     <meshgen name="grass">
         <geometry>
 	    <factory maxdist="50" name="treebark_bare" />
 	    <radius>1</radius>
@@ -223,20 +223,12 @@
 	    <materialfactor material="Stone" factor="0" />
 	    <defaultmaterialfactor>.3</defaultmaterialfactor>
         </geometry>
-	<!--
-        <geometry>
-	    <factory maxdist="30" name="squareInst" />
-	    <radius>1</radius>
-	    <density>.3</density>
-        </geometry>
-	-->
-	<!--<densityscale mindist="26" maxdist="30" maxfactor="0" />-->
 	<alphascale mindist="22" maxdist="26" />
 	<samplebox>
 	    <min x="-256" y="-200" z="-256" />
 	    <max x="256" y="200" z="256" />
 	</samplebox>
 	<meshobj>Terrain</meshobj>
-     </meshgen>
+     </meshgen> -->
   </sector>
 </world>

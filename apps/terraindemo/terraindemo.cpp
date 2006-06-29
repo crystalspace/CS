@@ -18,6 +18,8 @@
 
 #include "terraindemo.h"
 
+#include <gl/gl.h>
+
 #include "plugins/engine/3d/rview.h"
 #include "plugins/engine/3d/rview.cpp"
 
@@ -31,6 +33,9 @@ TerrainDemo::TerrainDemo ()
   
   rotX = -20 * 3.1415926f/180;
   rotY = 45 * 3.1415926f/180;
+
+  r_start = csVector3 (-60, -1, -60);
+  r_end = csVector3 (140, 30, 140);
 }
 
 TerrainDemo::~TerrainDemo ()
@@ -127,6 +132,8 @@ bool TerrainDemo::Setup ()
   collider_actor.InitializeColliders (view->GetCamera (),
   	legs, body, shift);
   
+  terrain = scfQueryInterface<iTerrainSystem> (
+    room->GetMeshes ()->FindByName ("Terrain")->GetMeshObject ());
   //engine->SetCurrentDefaultRenderloop(rloop);
   
   return true;
@@ -178,6 +185,16 @@ void TerrainDemo::ProcessFrame ()
       obj_move = CS_VEC_BACKWARD * 3.0f;
   }
   
+  if (kbd->GetKeyState('1')) r_start.x--;
+  if (kbd->GetKeyState('2')) r_start.x++;
+  if (kbd->GetKeyState('3')) r_start.z--;
+  if (kbd->GetKeyState('4')) r_start.z++;
+
+  if (kbd->GetKeyState('5')) r_end.x--;
+  if (kbd->GetKeyState('6')) r_end.x++;
+  if (kbd->GetKeyState('7')) r_end.z--;
+  if (kbd->GetKeyState('8')) r_end.z++;
+  
   //collider_actor.Move (float (elapsed_time) / 1000.0f, 1.0f,
   //    	obj_move, obj_rotate);
   // We now assign a new rotation transformation to the camera.  You
@@ -213,6 +230,52 @@ void TerrainDemo::ProcessFrame ()
 
 void TerrainDemo::FinishFrame ()
 {
+  // Yes, nobody answered me on #crystalspace, so...
+  glColor3f(1, 1, 1);
+  glDisable(GL_BLEND);
+  glDepthMask(GL_FALSE);
+  glBegin(GL_LINES);
+  glVertex3f(r_start.x, r_start.y, r_start.z);
+  glVertex3f(r_end.x, r_end.y, r_end.z);
+  glEnd();
+  
+  glPointSize(6);
+
+  scfArray<iTerrainVector3Array> isect;
+  
+  terrain->CollideSegment (r_start, r_end, false, isect);
+  
+  glColor3f(1, 0, 0);
+  
+  glBegin(GL_POINTS);
+  for (size_t i = 0; i < isect.GetSize (); ++i)
+    glVertex3fv (&isect.Get(i).x);
+  glEnd();
+  
+  isect.Empty();
+  
+  terrain->CollideSegment (r_start, r_end, false, isect);
+  
+  glColor3f(0, 1, 0);
+  
+  glBegin(GL_POINTS);
+  for (size_t i = 0; i < isect.GetSize (); ++i)
+    glVertex3fv (&isect.Get(i).x);
+  glEnd();
+
+  isect.Empty();
+  
+  terrain->CollideSegment (r_start, r_end, false, isect);
+  
+  glColor3f(0, 0, 1);
+  
+  glBegin(GL_POINTS);
+  for (size_t i = 0; i < isect.GetSize (); ++i)
+    glVertex3fv (&isect.Get(i).x);
+  glEnd();
+
+  glDepthMask(GL_TRUE);
+
   // Just tell the 3D renderer that everything has been rendered.
   g3d->FinishDraw ();
   g3d->Print (0);

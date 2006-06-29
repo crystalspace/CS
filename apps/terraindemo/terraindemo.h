@@ -16,6 +16,7 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+
 #ifndef __SIMPMAP_H__
 #define __SIMPMAP_H__
 
@@ -73,11 +74,13 @@ private:
   csColliderActor collider_actor;
   
   /// Here goes the terrain stuff
-/*  csRef<iTerrainSystem> terrain;
+  csRef<iTerrainSystem> terrain;
   
-  csRef<iRenderLoop> rloop;*/
+//  csRef<iRenderLoop> rloop;
 
   float rotX, rotY;
+  
+  csVector3 r_start, r_end;
 
   /**
    * Handle keyboard events - ie key presses and releases.

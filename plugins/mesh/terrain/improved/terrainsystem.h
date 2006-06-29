@@ -35,6 +35,7 @@
 
 #include "csutil/refarr.h"
 #include "csutil/flags.h"
+#include "csutil/scfarray.h"
 
 #include "csgeom/box.h"
 
@@ -70,7 +71,7 @@ class csTerrainSystem :
   csBox3 bbox;
   bool bbox_valid;
 
-  csArray<csVector3> collision_result;
+  scfArray<iTerrainVector3Array> collision_result;
 
   void ComputeBBox();
 
@@ -93,7 +94,7 @@ public:
   virtual void SetMaterialPalette (const csRefArray<iMaterialWrapper>& array);
 
   virtual bool CollideSegment (const csVector3& start, const csVector3& end,
-                           bool oneHit, csArray<csVector3>& points);
+                        bool oneHit, iTerrainVector3Array& points);
 
   virtual float GetVirtualViewDistance () const;
   virtual void SetVirtualViewDistance (float distance);
