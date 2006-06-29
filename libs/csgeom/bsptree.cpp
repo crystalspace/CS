@@ -24,8 +24,12 @@
 
 //---------------------------------------------------------------------------
 
-csBlockAllocator<csBSPTree> csBSPTree::tree_nodes (1000);
-csDirtyAccessArray<int> csBSPTree::b2f_array;
+CS_IMPLEMENT_STATIC_CLASSVAR_REF (csBSPTree, b2fArray, B2fArray, 
+  csDirtyAccessArray<int>, ());
+namespace
+{
+  CS_IMPLEMENT_STATIC_VAR (TreeNodes, csBlockAllocator<csBSPTree>, (1000));
+};
 
 csBSPTree::csBSPTree ()
 {
@@ -42,12 +46,12 @@ void csBSPTree::Clear ()
 {
   if (child1)
   {
-    tree_nodes.Free (child1);
+    TreeNodes()->Free (child1);
     child1 = 0;
   }
   if (child2)
   {
-    tree_nodes.Free (child2);
+    TreeNodes()->Free (child2);
     child2 = 0;
   }
 }
@@ -169,12 +173,12 @@ void csBSPTree::Build (csTriangle* triangles, csPlane3* planes,
     }
   if (left.Length () > 0)
   {
-    child1 = tree_nodes.Alloc ();
+    child1 = TreeNodes()->Alloc ();
     child1->Build (triangles, planes, num_triangles, vertices, left);
   }
   if (right.Length () > 0)
   {
-    child2 = tree_nodes.Alloc ();
+    child2 = TreeNodes()->Alloc ();
     child2->Build (triangles, planes, num_triangles, vertices, right);
   }
 }
@@ -230,9 +234,9 @@ void csBSPTree::Back2Front (const csVector3& pos, csDirtyAccessArray<int>& arr,
 
 const csDirtyAccessArray<int>& csBSPTree::Back2Front (const csVector3& pos)
 {
-  b2f_array.Empty ();
+  B2fArray().Empty ();
   csSet<int> used_indices;
-  Back2Front (pos, b2f_array, used_indices);
-  return b2f_array;
+  Back2Front (pos, B2fArray(), used_indices);
+  return B2fArray();
 }
 

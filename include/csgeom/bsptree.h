@@ -45,8 +45,7 @@ struct csTriangle;
 class CS_CRYSTALSPACE_EXPORT csBSPTree
 {
 private:
-  static csBlockAllocator<csBSPTree> tree_nodes;
-  static csDirtyAccessArray<int> b2f_array;
+  CS_DECLARE_STATIC_CLASSVAR_REF(b2fArray, B2fArray, csDirtyAccessArray<int>);
 
   csBSPTree* child1;		// If child1 is not 0 then child2 will
   csBSPTree* child2;		// also be not 0.

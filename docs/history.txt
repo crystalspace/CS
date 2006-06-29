@@ -6,6 +6,11 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+29-Jun-2006
+	- res split csFixedSizeAllocator off csBlockAllocator, which only
+	  allocates blocks of fixed size. csBlockAllocator now builds upon
+	  csFixedSizeAllocator; handling of unfreed objects is now handled
+	  via a template parameter.
 27-Jun-2006
         - Arianna fixed other warnings: size_t/int issues, mainly.
 	- res took another jab at the operator new issues:
