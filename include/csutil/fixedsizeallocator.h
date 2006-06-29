@@ -190,6 +190,7 @@ protected: // 'protected' allows access by test-suite.
     { 
     }
   #else
+    template<typename BA>
     DefaultDisposer (const BA&, bool legit)
     { (void)legit; }
   #endif
@@ -408,7 +409,7 @@ public:
     return TryFree (disposer, p);
   }
   /// Query number of elements per block.
-  size_t GetBlockElements() const { return size; }
+  size_t GetBlockElements() const { return elcount; }
   
   /**\name Functions for useability as a allocator template parameter
    * @{ */

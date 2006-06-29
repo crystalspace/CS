@@ -80,6 +80,7 @@ public:
   { 
   }
 #else
+  template<typename BA>
   csBlockAllocatorDisposeLeaky (const BA&, bool legit)
   { (void)legit; }
 #endif
@@ -136,9 +137,9 @@ public:
 protected:
   typedef csFixedSizeAllocator<sizeof (T), Allocator> superclass;
 private:
-  void* Alloc (size_t /*n*/) { }                      // Illegal
-  void* Alloc (void* /*p*/, size_t /*newSize*/) { }   // Illegal
-  void SetMemTrackerInfo (const char* /*info*/) { }   // Illegal
+  void* Alloc (size_t /*n*/) { return 0; }                       // Illegal
+  void* Alloc (void* /*p*/, size_t /*newSize*/) { return 0; }   // Illegal
+  void SetMemTrackerInfo (const char* /*info*/) { }             // Illegal
 public:
   /**
    * Construct a new block allocator.
