@@ -11,6 +11,7 @@ chronological order.
 	  allocates blocks of fixed size. csBlockAllocator now builds upon
 	  csFixedSizeAllocator; handling of unfreed objects is now handled
 	  via a template parameter.
+	- Vincent fixed build error with gcc about extra semicolon.
 27-Jun-2006
         - Arianna fixed other warnings: size_t/int issues, mainly.
 	- res took another jab at the operator new issues:
