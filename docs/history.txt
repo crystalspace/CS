@@ -12,6 +12,8 @@ chronological order.
 	  csFixedSizeAllocator; handling of unfreed objects is now handled
 	  via a template parameter.
 	- Vincent fixed build error with gcc about extra semicolon.
+	- Marten fixed some compilation errors introdu9ced by res recent
+	  split of csBlockAllocator.
 27-Jun-2006
         - Arianna fixed other warnings: size_t/int issues, mainly.
 	- res took another jab at the operator new issues:

@@ -195,19 +195,6 @@ public:
     return new (superclass::Alloc()) T;
   }
 
-
-  /// @@@ Document me!
-  T* AllocUninit() 
-  {
-    return superclass::Alloc();
-  }
-
-  /// @@@ Document me!
-  void FreeUninit (void* p)
-  {
-    superclass::Free(p);
-  }
-
   /**
    * Deallocate an object. It is safe to provide a null pointer.
    * \param p Pointer to deallocate.

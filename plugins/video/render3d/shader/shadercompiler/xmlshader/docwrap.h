@@ -124,6 +124,9 @@ public:
       conditionValue = true;
     }
 
+    //typedef csFixedSizeAllocator<sizeof(WrappedChild)> WrappedChildAlloc;
+    //CS_DECLARE_STATIC_CLASSVAR_REF (childAlloc, ChildAlloc, WrappedChildAlloc);
+
     void* operator new (size_t n);
     void operator delete (void* p);
 #if defined(CS_EXTENSIVE_MEMDEBUG) || defined(CS_MEMORY_TRACKER)
