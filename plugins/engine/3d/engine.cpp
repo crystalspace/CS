@@ -1656,6 +1656,15 @@ void csEngine::StartDraw (iCamera *c, iClipper2D* /*view*/, csRenderView &rview)
   float topy = -c->GetShiftY () * c->GetInvFOV ();
   float boty = (frameHeight - c->GetShiftY ()) * c->GetInvFOV ();
   rview.SetFrustum (leftx, rightx, topy, boty);
+
+  //Imposter updating where needed
+  csRef<iRenderView> irview = scfQueryInterface<iRenderView>(&rview);
+  csWeakRefArray<csImposterProcTex>::Iterator it = 
+    imposterUpdateList.GetIterator ();
+  while (it.HasNext ())
+  {
+    it.Next ()->Animate (irview);
+  }
 }
 
 void csEngine::Draw (iCamera *c, iClipper2D *view, iMeshWrapper* mesh)

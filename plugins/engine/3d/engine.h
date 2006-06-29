@@ -31,6 +31,7 @@
 #include "csutil/scf_implementation.h"
 #include "csutil/stringarray.h"
 #include "csutil/weakref.h"
+#include "csutil/weakrefarr.h"
 #include "csutil/eventnames.h"
 #include "iengine/campos.h"
 #include "iengine/collectn.h"
@@ -809,6 +810,8 @@ public:
    * Config value: light ambient blue value.
    */
   int lightAmbientBlue;
+
+  csWeakRefArray<csImposterProcTex> imposterUpdateList;
 
 private:
 

@@ -458,7 +458,8 @@ static int compare_light (const void *p1, const void *p2)
   return 0;
 }
 
-const csArray<iLightSectorInfluence*>& csMeshWrapper::GetRelevantLights (
+const csArray<iLightSectorInfluence*>& csMeshWrapper::GetRelevantLights 
+(
     	int maxLights, bool desireSorting)
 {
   bool always_update = relevant_lights_flags.Check (
@@ -589,7 +590,7 @@ csRenderMesh** csMeshWrapper::GetRenderMeshes (int& n, iRenderView* rview,
     if (GetImposter (rview))
     {
       printf("drawn\n");
-      return 0;
+      return imposter;
     }
   }
   printf("failed\n");
@@ -854,25 +855,25 @@ csRenderMesh** csMeshWrapper::GetImposter (iRenderView *rview)
   if (!imposter_mesh)
   {
     printf("Imposter doesn't exist!\n");
-    return false;
+    return 0;
   }
 
   // Check for imposter already ready
   if (!imposter_mesh->GetImposterReady ())
   {
     printf("not ready\n");
-    return false;
+    return 0;
   }
 
   // Check for too much camera movement since last imposter render
   if (!imposter_mesh->CheckIncidenceAngle (rview,
 	imposter_rotation_tolerance->Get ()))
   {
-    return false;
     printf("too much movement\n");
+//    return 0;
   }
 
-  // Else draw imposter as-is.
+  // Get imposter rendermesh
   return imposter_mesh->GetRenderMesh (rview);
 }
 

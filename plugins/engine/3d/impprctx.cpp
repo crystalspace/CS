@@ -19,7 +19,6 @@
 #include "cssysdef.h"
 #include "csgfx/memimage.h"
 #include "cstool/csview.h"
-#include "cstool/proctex.h"
 #include "csutil/cscolor.h"
 #include "iengine/camera.h"
 #include "iengine/engine.h"
@@ -31,62 +30,52 @@
 #include "ivideo/texture.h"
 #include "ivideo/txtmgr.h"
 #include "plugins/engine/3d/engine.h"
-#include "plugins/engine/3d/impprctx.h"
-
 #include "plugins/engine/3d/impmesh.h"
 #include "plugins/engine/3d/meshobj.h"
+#include "plugins/engine/3d/impprctx.h"
 
 //@@@ debugging
 #include "cstool/debugimagewriter.h"
 #include "csgfx/memimage.h"
 
 
-//#include "iutil/vfs.h"
-
-csImposterProcTex::csImposterProcTex (csEngine* engine, 
-                                      csImposterMesh *parent) : 
-  csProcTexture (), engine (engine)
+csImposterProcTex::csImposterProcTex (csEngine* engine, csImposterMesh 
+*parent) : scfImplementationType(this), engine(engine)
 {
   mesh = parent;
 
-  mat_w = mat_h = 256;
-
-  //texFlags = CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS;
+  int texFlags = CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS;
 
   mesh_on_texture = new csMeshOnTexture(engine->objectRegistry);
 
-  csRef<iGraphics3D> g3d =
-    csQueryRegistry<iGraphics3D>(engine->objectRegistry);
-  csProcTexture::Initialize (engine->objectRegistry, engine,
-                            g3d->GetTextureManager(), "test");
-  SetAlwaysAnimate(true);
-  if (PrepareAnim()) printf("prepare success\n");
+  g3d = csQueryRegistry<iGraphics3D>(engine->objectRegistry);
+  g2d = csQueryRegistry<iGraphics2D>(engine->objectRegistry);
+  engine->imposterUpdateList.Push(
+    csWeakRef<csImposterProcTex>(this));
+
+  //@@@ replace proctex initialize!
+  csRef<iImage> thisImage = new csImageMemory (256,256);
+  tex = engine->GetTextureList ()->NewTexture (thisImage);
+  tex->SetFlags (tex->GetFlags() | texFlags);
+  thisImage = 0;
 }
 
 csImposterProcTex::~csImposterProcTex ()
 {
 }
 
-bool csImposterProcTex::PrepareAnim ()
-{
-  if (anim_prepared) return true;
-  if (!csProcTexture::PrepareAnim ()) return false;
-
-  // special things may be necessary here
-
-  return true;
-}
-
-void csImposterProcTex::Animate (csTicks CurrentTime)
+void csImposterProcTex::Animate (iRenderView *rview)
 {
   printf("animating imposter\n");
   csRef<iTextureHandle> handle = tex->GetTextureHandle ();
+  if (!mesh) return;
   csRef<iMeshWrapper> originalmesh = mesh->GetParent ();
   int transparent = g2d->FindRGB (0,255,255,0);
-  if (mesh_on_texture->Render(originalmesh,handle,0,transparent))
+  if (mesh_on_texture->Render (originalmesh,handle,0,transparent))
   {
     printf("rendered\n");
-    mesh->SetImposterReady(true);
+    mesh->FindImposterRectangle (rview->GetCamera ());
+    mesh->SetImposterReady (true);
   }
 }
 

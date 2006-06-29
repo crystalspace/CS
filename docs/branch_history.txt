@@ -8,6 +8,8 @@ chronological order.
 
 This file describes the history of the SoC imposter branch.
 
+29-Jun-2006
+	- Fossi moved the imposter updating to StartDraw
 23-Jun-2006
 	- Fossi modified the imposter code some more
 	- Fossi made the parameter of GetScreenBoundingBox const

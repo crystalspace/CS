@@ -20,17 +20,15 @@
 #define __CS_IMPPRCTX_H__
 
 #include "csutil/ref.h"
-#include "cstool/proctex.h"
 #include "csgeom/vector3.h"
 #include "iengine/engine.h"
 #include "iengine/rview.h"
 #include "cstool/procmesh.h"
 
 class csEngine;
-class csEngineProcTex;
 class csImposterMesh;
 
-class csImposterProcTex : public csProcTexture
+class csImposterProcTex : public scfImplementation0<csImposterProcTex>
 {
 private:
   csEngine* engine;
@@ -38,6 +36,9 @@ private:
   csImposterMesh *mesh;
   bool imposter_ready;
   csMeshOnTexture* mesh_on_texture;
+  csRef<iGraphics3D> g3d;
+  csRef<iGraphics2D> g2d;
+  iTextureWrapper *tex;
 
 public:
   csImposterProcTex (csEngine* engine, csImposterMesh *parent);
@@ -45,8 +46,7 @@ public:
 
   bool GetImposterReady () { return imposter_ready; }
   void SetImposterReady (bool r) { imposter_ready = r; }
-  virtual bool PrepareAnim ();
-  virtual void Animate (csTicks current_time);
+  void Animate (iRenderView *rview);
 };
 
 #endif // __CS_IMPPRCTX_H__
