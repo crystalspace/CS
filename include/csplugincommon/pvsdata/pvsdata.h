@@ -20,9 +20,11 @@
 #define __CS_PVSDATA_H
 
 #include "cssysdef.h"
+#include "csutil/array.h"
 #include "csutil/csstring.h"
 
-class StaticKDTree;
+class csStaticKDTree;
+class iObjectRegistry;
 
 /// Data at every node for the static KD tree
 class csPVSNodeData
@@ -42,7 +44,24 @@ public:
   int numTotal;  // Total number of objects in pvsnames
 };
 
-void SavePVSDataFile(const char* filename, const StaticKDTree* tree);
-StaticKDTree* LoadPVSDataFile(const char* filename);
+class csPVSID
+{
+public:
+  csString name;
+  csArray<csPVSNodeData*> nodes;
+
+  csPVSID(int numnodes, const csString& name);
+  /// Iterates through every node and adds a new visibility object.
+  void Register(void* data);
+  /// Iterates through every node and removes the visibility object.
+  void Unregister(void* data);
+};
+
+void SavePVSDataFile(iObjectRegistry* registry, const char* filename,
+    const csStaticKDTree* tree);
+void SavePVSDataFile(iObjectRegistry* registry, const char* filename,
+    const csStaticKDTree* tree, csArray<csPVSID>& idlist);
+csStaticKDTree* LoadPVSDataFile(iObjectRegistry* registry, 
+    const char* filename, csArray<csPVSID>& idlist);
 
 #endif

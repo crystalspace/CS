@@ -77,6 +77,8 @@ public:
   void UnlinkObject (csStaticKDTreeObject* object);
   void RemoveObject (csStaticKDTreeObject* object);
   void MoveObject (csStaticKDTreeObject* object, const csBox3& bbox_new);
+  const csStaticKDTree* GetChild1 () const { return child1; }
+  const csStaticKDTree* GetChild2 () const { return child2; }
   csStaticKDTree* GetChild1 () { return child1; }
   csStaticKDTree* GetChild2 () { return child2; }
   void TraverseRandom (csStaticKDTreeVisitFunc* func, 
@@ -88,9 +90,10 @@ public:
     Front2Back(pos, func, userdata, NewTraversal(), frustum_mask);
   }
   void* GetNodeData () { return nodeData; }
+  const void* GetNodeData () const { return nodeData; }
   void SetNodeData (void *ptr) { nodeData = ptr; }
   uint32 NewTraversal() { return globalTimestamp++; }
-  int GetObjectCount() 
+  int GetObjectCount() const
   { 
     return (IsLeafNode()) ? objects->Length() : 0;
   }
@@ -107,7 +110,7 @@ public:
   float GetSplitLocation() const { return splitLocation; }
   int GetAxis() const { return axis; }
 
-  bool IsLeafNode () { return objects; }
+  bool IsLeafNode () const { return objects; }
 
   // WARNING:  not safe to call if not a leaf node.
 //  csStaticKDTreeObject* operator[](int index) 
