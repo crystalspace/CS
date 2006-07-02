@@ -410,13 +410,13 @@ _csWrapPtr_to_Python (const csWrapPtr & wp)
 			return false;
 		return true;
 	}
+        bool __delitem__(idxtype n) { return self-> ## removemethod ## (n); }
+        int __len__() { return self-> ## countmethod ## (); }
+        void append(typename *e) { self-> ## addmethod ## (e); }
         %pythoncode %{
         def content_iterator(self):
                 for idx in xrange(len(self)):
-                        yield _cspace. ## classname ## _ ## getmethod ## (self,idx)
-        def __delitem__(*args): return _cspace. ## classname ## _ ## removemethod ## (*args)
-        def __len__(*args): return _cspace. ## classname ## _ ## countmethod ## (*args)
-        def append(*args): return _cspace. ## classname ## _ ## addmethod ## (*args)
+                        yield self. ## getmethod ## (idx)
         def __iter__(self): return self.content_iterator()  %}
 }
 %enddef
