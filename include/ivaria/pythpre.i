@@ -399,6 +399,42 @@ _csWrapPtr_to_Python (const csWrapPtr & wp)
     return CSMutableArrayHelper(self.GetNormalByIndex, self.GetVertexCount)
 %}
 
+/* List Methods*/
+
+%define PYLIST_BASE_FUNCTIONS(classname,typename,idxtype,countmethod,getmethod,addmethod,removemethod,findmethod)
+%extend classname {
+        typename *__getitem__( idxtype n) {return self-> ## getmethod ## (n);}
+	bool __contains__(typename *obj) {
+		if (self-> ## findmethod ## (obj) == 
+				(idxtype)csArrayItemNotFound)
+			return false;
+		return true;
+	}
+        %pythoncode %{
+        def content_iterator(self):
+                for idx in xrange(len(self)):
+                        yield _cspace. ## classname ## _ ## getmethod ## (self,idx)
+        def __delitem__(*args): return _cspace. ## classname ## _ ## removemethod ## (*args)
+        def __len__(*args): return _cspace. ## classname ## _ ## countmethod ## (*args)
+        def append(*args): return _cspace. ## classname ## _ ## addmethod ## (*args)
+        def __iter__(self): return self.content_iterator()  %}
+}
+%enddef
+%define PYLIST_BYNAME_FUNCTIONS(classname,typename,findbynamemethod)
+%extend classname {
+	typename *__getitem__( const char* name) {return self-> ## findbynamemethod ## (name);}
+	bool __contains__(const char *name) {
+		if (self-> ## findbynamemethod ## (name))
+			return true;
+		return false;
+	}
+}
+%enddef
+%define LIST_OBJECT_FUNCTIONS(classname,typename)
+        PYLIST_BASE_FUNCTIONS(classname,typename,int,GetCount,Get,Add,Remove,Find)
+        PYLIST_BYNAME_FUNCTIONS(classname,typename,FindByName)
+%enddef
+
 #endif // ifndef CS_MINI_SWIG
 
 #endif // SWIGPYTHON

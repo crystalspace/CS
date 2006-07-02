@@ -20,6 +20,12 @@
 
 #include <csutil/csstring.h>
 
+/****************************************
+ * Fill the following to wrap list interfaces in a special way.
+ **************************************************************/
+%define LIST_OBJECT_FUNCTIONS(classname,typename)
+%enddef
+
 /****************************************************************************
  * Renaming operators is the first stage of wrapping them.
  * We ignore operator [] and () and unary *

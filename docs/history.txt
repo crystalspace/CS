@@ -6,6 +6,25 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+2-Jul-2006
+	- caedes added wrappers so cspace Lists (like iMeshList) can be used 
+	  as python lists where applicable. Allows search by index and name by
+	  using [], also can iterate normally over their contents, and use 
+	  len(list) and list.append.
+	- caedes added dummy templates for list wrapping to the java and perl
+	  interface files.
+	- caedes fixed or silenced most warnings on generation of python
+          interfaces (tested on linux_x86, swig .24, and from .27 to .29):
+	    - removed reference to cspoint.h (deprecated).
+	    - silenced scfImplementation* warnings, now we can wrap this but
+	      should not be done in all situations, the silenced warnings can
+	      be controlled at include/ivaria/scf.i.
+	    - declared csShaderVariable and csSprite2DVertex necessary array
+	      templates.
+	    - made some workaround for the situation where swig would need
+	      directives in the middle of csutil/array.h to understand the
+	      templated class hierachy.
+	    - declare iSCF::SCF as immutable.
 29-Jun-2006
 	- res split csFixedSizeAllocator off csBlockAllocator, which only
 	  allocates blocks of fixed size. csBlockAllocator now builds upon
