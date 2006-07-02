@@ -14,6 +14,8 @@ chronological order.
 	- Vincent fixed build error with gcc about extra semicolon.
 	- Marten fixed some compilation errors introdu9ced by res recent
 	  split of csBlockAllocator.
+	- mdmkolbe fixed some of the event handlers in plugins/mesh so they
+	  the listeners are only removed if they have already been added.
 27-Jun-2006
         - Arianna fixed other warnings: size_t/int issues, mainly.
 	- res took another jab at the operator new issues:

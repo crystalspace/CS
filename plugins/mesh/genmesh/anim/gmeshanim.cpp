@@ -925,20 +925,23 @@ const char* csGenmeshAnimationControlFactory::Save (iDocumentNode* parent)
 
 csGenmeshAnimationControlType::csGenmeshAnimationControlType (
   iBase* pParent) :
-  scfImplementationType(this, pParent)
+  scfImplementationType(this, pParent), object_reg(0)
 {
 }
 
 csGenmeshAnimationControlType::~csGenmeshAnimationControlType ()
 {
-  csRef<iEventQueue> q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
-  if (q)
-    q->RemoveListener (this);
+  if (object_reg)
+  {
+    csRef<iEventQueue> q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+    if (q)
+      q->RemoveListener (this);
+  }
 }
 
 bool csGenmeshAnimationControlType::Initialize (iObjectRegistry* object_reg)
 {
-  csGenmeshAnimationControlType::object_reg = object_reg;
+  object_reg = object_reg;
   Frame = csevFrame (object_reg);
   PreProcess = csevPreProcess (object_reg);
   csRef<iEventQueue> q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
