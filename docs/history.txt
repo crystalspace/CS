@@ -9,7 +9,7 @@ chronological order.
 3-Jul-2006
 	- caedes corrected an error in the swig list wrapper extensions 
 	  that would make them unusable for wrapping interfaces in cel.
-	- Philip Wyett fixed eliminated error when using 'alt-r' t start
+	- Philip Wyett fixed eliminated error when using 'alt-r' to start
           recording a movie with the movie recorder plugin. Plugin was
           starting and stopping and only recording one frame.
 2-Jul-2006
