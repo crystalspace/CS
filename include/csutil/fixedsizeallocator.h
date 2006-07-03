@@ -143,7 +143,7 @@ protected: // 'protected' allows access by test-suite.
   }
 
   /**
-   * Destroy an object, optionally warning if pedanticism is desired.
+   * Destroy an object.
    */
   template<typename Disposer>
   void DestroyObject (Disposer& disposer, void* p) const
@@ -213,8 +213,8 @@ protected: // 'protected' allows access by test-suite.
   };
   /**
    * Destroys all living objects and releases all memory allocated by the pool.
-   * \param warn_unfreed If true, in debug mode warn about objects not
-   *   explicitly released via Free().
+   * \param diposer Object with a Dispose(void* p) method which is called prior
+   *  to freeing the actual memory.
    */
   template<typename Disposer>
   void DisposeAll(Disposer& disposer)
@@ -236,6 +236,7 @@ protected: // 'protected' allows access by test-suite.
 
   /**
    * Deallocate a chunk of memory. It is safe to provide a null pointer.
+   * \param disposer Disposer object that is passed to DestroyObject().
    * \param p Pointer to deallocate.
    */
   template<typename Disposer>

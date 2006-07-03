@@ -23,6 +23,7 @@ chronological order.
 	  latest version (which reports "2.17").
 	- res added a detection for __attribute__((visibility("hidden"))) to
 	  configure (to complement the detection for default visibility).
+	- res updated the doxygen stylesheets for doxygen 1.4.7.
 2-Jul-2006
 	- caedes added wrappers so cspace Lists (like iMeshList) can be used 
 	  as python lists where applicable. Allows search by index and name by

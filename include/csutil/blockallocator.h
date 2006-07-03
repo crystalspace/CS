@@ -112,11 +112,11 @@ public:
  * any specific allocator can be used for just one type of object (the type for
  * which the template is instantiated).
  * \remarks The objects are properly constructed and destructed.
- * <p>
+ *
  * \remarks Assumes that the class \c T with which the template is instantiated
  *   has a default (zero-argument) constructor. Alloc() uses this constructor
  *   to initialize each vended object.
- * <p>
+ *
  * \remarks Defining the macro CS_BLOCKALLOC_DEBUG will cause freed objects to
  *   be overwritten with '0xfb' bytes. This can be useful to track use of
  *   already freed objects, as they can be more easily recognized (as some
@@ -144,8 +144,6 @@ public:
   /**
    * Construct a new block allocator.
    * \param nelem Number of elements to store in each allocation unit.
-   * \param warn_unfreed If true, in debug mode warn about objects not
-   *   explicitly released via Free().
    * \remarks Bigger values for \c nelem will improve allocation performance,
    *   but at the cost of having some potential waste if you do not add
    *   \c nelem elements to each pool.  For instance, if \c nelem is 50 but you
@@ -198,9 +196,6 @@ public:
   /**
    * Deallocate an object. It is safe to provide a null pointer.
    * \param p Pointer to deallocate.
-   * \param invokeDtor If true, the destructor of \a T is invoked. If false, 
-   *   the memory is only freed. This is mostly useful for custom 
-   *   \c delete implementations.
    */
   void Free (T* p)
   {
