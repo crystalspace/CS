@@ -71,13 +71,14 @@ class ConditionTree
     }
     ~Node ()
     {
+      if (branches[0]) branches[0]->~Node();
       owner->nodeAlloc.Free (branches[0]);
+      if (branches[1]) branches[1]->~Node();
       owner->nodeAlloc.Free (branches[1]);
     }
   };
 
-  //csBlockAllocator<Node, TempHeapAlloc> nodeAlloc;
-  csFixedSizeAllocator<sizeof(Node), TempHeapAlloc> nodeAlloc;
+  csFixedSizeAllocator<sizeof (Node), TempHeapAlloc> nodeAlloc;
   Node* root;
   int currentBranch;
   typedef csArray<Node*, csArrayElementHandler<Node*>, TempHeapAlloc> 
@@ -112,6 +113,7 @@ public:
   }
   ~ConditionTree ()
   {
+    root->~Node();
     nodeAlloc.Free (root);
   }
 
@@ -345,23 +347,22 @@ bool ConditionTree::HasContainingCondition (Node* node,
 
 //---------------------------------------------------------------------------
 
-CS_LEAKGUARD_IMPLEMENT(csWrappedDocumentNode);
-
-
-typedef csFixedSizeAllocator<sizeof(csWrappedDocumentNode::WrappedChild)> 
-  WrappedChildAllocator;
-CS_IMPLEMENT_STATIC_VAR(ChildAlloc, WrappedChildAllocator, (256));
+typedef csFixedSizeAllocator<sizeof (csWrappedDocumentNode::WrappedChild)> 
+  WrappedChildAlloc;
+CS_IMPLEMENT_STATIC_VAR (ChildAlloc, WrappedChildAlloc, (256));
 
 void* csWrappedDocumentNode::WrappedChild::operator new (size_t n)
-{ 
-  return ChildAlloc ()->Alloc (n);
+{
+  return ChildAlloc()->Alloc (n);
 }
-
 void csWrappedDocumentNode::WrappedChild::operator delete (void* p)
 {
-
-  ChildAlloc ()->Free (p);
+  ChildAlloc()->Free (p);
 }
+
+//---------------------------------------------------------------------------
+
+CS_LEAKGUARD_IMPLEMENT(csWrappedDocumentNode);
 
 template<typename ConditionEval>
 csWrappedDocumentNode::csWrappedDocumentNode (ConditionEval& eval,
