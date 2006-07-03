@@ -684,6 +684,13 @@ AS_IF([test $cs_cv_prog_cxx_declare_visible_def != no],
     [CS_HEADER_PROPERTY([CS_VISIBILITY_DEFAULT],
 	[$cs_cv_prog_cxx_declare_visible_def])])
 
+CS_SYMBOL_QUALIFIER([how to declare hidden visibility],
+    [cs_cv_prog_cxx_declare_visible_hidden],
+    [__attribute__((visibility("hidden")))], [], [C++])
+AS_IF([test $cs_cv_prog_cxx_declare_visible_hidden != no],
+    [CS_HEADER_PROPERTY([CS_VISIBILITY_HIDDEN],
+	[$cs_cv_prog_cxx_declare_visible_hidden])])
+
 
 
 #------------------------------------------------------------------------------
@@ -826,7 +833,7 @@ CS_CHECK_OPTIMIZE_FLAGS
 #------------------------------------------------------------------------------
 binutils_recent=no
 AS_IF([test -n "$OBJCOPY"],
-    [CS_CHECK_PROG_VERSION([binutils], [$OBJCOPY -V], [2.16.0], [9.9.9|.9.9],
+    [CS_CHECK_PROG_VERSION([binutils], [$OBJCOPY -V], [2.16], [9.9|.9.9.9],
         [binutils_recent=yes])])
 
 AC_MSG_CHECKING([whether to split debug information])

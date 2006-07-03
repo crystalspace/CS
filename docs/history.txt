@@ -19,6 +19,10 @@ chronological order.
 	  implement their own extensions.
 	- caedes declared csSet<csStringID> for wrapping in cspace.i.
 	- mdmkolbe fixed a mistake in his previous commit.
+	- res fixed the binutils version detection to also work with the
+	  latest version (which reports "2.17").
+	- res added a detection for __attribute__((visibility("hidden"))) to
+	  configure (to complement the detection for default visibility).
 2-Jul-2006
 	- caedes added wrappers so cspace Lists (like iMeshList) can be used 
 	  as python lists where applicable. Allows search by index and name by
