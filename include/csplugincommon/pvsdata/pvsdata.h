@@ -50,6 +50,7 @@ public:
   csString name;
   csArray<csPVSNodeData*> nodes;
 
+  csPVSID(const csString& name);
   csPVSID(int numnodes, const csString& name);
   /// Iterates through every node and adds a new visibility object.
   void Register(void* data);
@@ -57,11 +58,11 @@ public:
   void Unregister(void* data);
 };
 
-void SavePVSDataFile(iObjectRegistry* registry, const char* filename,
-    const csStaticKDTree* tree);
-void SavePVSDataFile(iObjectRegistry* registry, const char* filename,
+void csSavePVSDataFile(iObjectRegistry* registry, const char* filename,
+    csStaticKDTree* tree);
+void csSavePVSDataFile(iObjectRegistry* registry, const char* filename,
     const csStaticKDTree* tree, csArray<csPVSID>& idlist);
-csStaticKDTree* LoadPVSDataFile(iObjectRegistry* registry, 
+csStaticKDTree* csLoadPVSDataFile(iObjectRegistry* registry, 
     const char* filename, csArray<csPVSID>& idlist);
 
 #endif

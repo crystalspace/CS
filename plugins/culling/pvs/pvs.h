@@ -129,6 +129,7 @@ private:
     uint32 cur_timestamp, uint32 frustum_mask);
 
   void CreateDummyNodeData (csStaticKDTree *node);
+  void RegisterNodeData (csStaticKDTree *node);
 
 public:
   SCF_DECLARE_IBASE;

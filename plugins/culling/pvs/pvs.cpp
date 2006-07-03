@@ -96,6 +96,7 @@ public:
     if (vistest_objects_inuse) *vistest_objects_inuse = true;
     Reset ();
   }
+
   virtual ~csPVSVisObjIt ()
   {
     // If the vistest_objects_inuse pointer is not 0 we set the
@@ -324,13 +325,24 @@ static void CreateNodeData(csStaticKDTree *node)
 }
 */
 
+void csPVSVis::RegisterNodeData (csStaticKDTree *node)
+{
+  nodedata_vector.Push ((csPVSNodeData*) node->GetNodeData ());
+
+  if (!node->IsLeafNode ())
+  {
+    RegisterNodeData (node->GetChild1 ());
+    RegisterNodeData (node->GetChild2 ());
+  }
+}
+
 void csPVSVis::CreateDummyNodeData (csStaticKDTree *node)
 {
-  csPVSNodeData *data = new csPVSNodeData(NULL, 0);
+  csPVSNodeData *data = new csPVSNodeData (NULL, 0);
   nodedata_vector.Push (data);
-  node->SetNodeData(data);
+  node->SetNodeData (data);
 
-  if (!node->IsLeafNode())
+  if (!node->IsLeafNode ())
   {
     CreateDummyNodeData (node->GetChild1 ());
     CreateDummyNodeData (node->GetChild2 ());
@@ -381,8 +393,8 @@ bool csPVSVis::Initialize (iObjectRegistry *object_reg)
   delete kdtree;
 
   // TODO:  load from file
-  kdtree = MakeTestPVSTree ();
-  CreateDummyNodeData(kdtree);
+  //kdtree = MakeTestPVSTree ();
+  //CreateDummyNodeData(kdtree);
   // TODO:  add debug descriptor to static KD tree
   //csPVSVisObjectDescriptor* desc = new csPVSVisObjectDescriptor ();
   //kdtree->SetObjectDescriptor (desc);
@@ -442,6 +454,14 @@ static void PrintTree(csStaticKDTree* node)
 
 void csPVSVis::Setup (const char* /*name*/)
 {
+  csArray<csPVSID> pvsids;
+  kdtree = csLoadPVSDataFile (object_reg, "/this/test.pvs", pvsids);
+  RegisterNodeData (kdtree);
+
+  // TODO:  use pvsids to register objects
+
+//  printf("\n-----------------------------------------------\n\n");
+//  PrintTree(kdtree);
 }
 
 void csPVSVis::CalculateVisObjBBox (iVisibilityObject* visobj, csBox3& bbox)

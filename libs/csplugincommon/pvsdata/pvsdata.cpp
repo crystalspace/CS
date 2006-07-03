@@ -35,6 +35,7 @@ class csBinaryFileHelper
 public:
   csBinaryFileHelper(csRef<iFile> file) : file(file)
   {
+    CS_ASSERT(file);
   }
 
   void Read(char* c, int size)
@@ -133,6 +134,7 @@ static csBinaryFileHelper* OpenForReading (const char* file,
     iObjectRegistry* registry)
 {
   iVFS* vfs = csInitializer::SetupVFS (registry);
+  CS_ASSERT (vfs);
   return new csBinaryFileHelper(vfs->Open(file, VFS_FILE_READ));
 }
 
@@ -140,6 +142,7 @@ static csBinaryFileHelper* OpenForWriting (const char* file,
     iObjectRegistry* registry)
 {
   iVFS* vfs = csInitializer::SetupVFS (registry);
+  CS_ASSERT (vfs);
   return new csBinaryFileHelper(vfs->Open(file, VFS_FILE_WRITE));
 }
 
@@ -201,6 +204,10 @@ void csPVSNodeData::RemoveFromPVS (void *object)
   }
 }
 
+csPVSID::csPVSID (const csString& name) : name (name)
+{
+}
+
 csPVSID::csPVSID (int numnodes, const csString& name) : name (name),
     nodes (numnodes)
 {
@@ -219,13 +226,14 @@ int FindIndex (const csString& string, csArray<csPVSID>& idarray)
   return -1;
 }
 
-void WriteNode (csBinaryFileHelper* file, const csStaticKDTree* node,
+static void WriteNode (csBinaryFileHelper* file, const csStaticKDTree* node,
     csArray<csPVSID>& idarray)
 {
   file->WriteChar (node->IsLeafNode() ? 'L' : 'I');
 
   // Write the PVS array
   csPVSNodeData* nodedata = (csPVSNodeData*) node->GetNodeData ();
+  CS_ASSERT(nodedata);
   file->WriteInt32 (nodedata->numTotal);
   for (int i = 0; i < nodedata->numTotal; i++)
     file->WriteInt32 (FindIndex (nodedata->pvsnames[i], idarray));
@@ -246,7 +254,37 @@ void WriteNode (csBinaryFileHelper* file, const csStaticKDTree* node,
   }
 }
 
-void SavePVSDataFile (iObjectRegistry* registry, const char* filename, 
+static void GeneratePVSID (csStaticKDTree* tree, csArray<csPVSID>& array)
+{
+  csPVSNodeData* nodedata = (csPVSNodeData*) tree->GetNodeData ();
+  CS_ASSERT(nodedata);
+  for (int i = 0; i < nodedata->numTotal; i++)
+  {
+    int index = FindIndex (nodedata->pvsnames[i], array);
+    if (index == -1)
+    {
+      array.Push (csPVSID(nodedata->pvsnames[i]));
+      index = array.Length () - 1;
+    }
+    array[index].nodes.Push (nodedata);
+  }
+
+  if (!tree->IsLeafNode ())
+  {
+    GeneratePVSID (tree->GetChild1 (), array);
+    GeneratePVSID (tree->GetChild2 (), array);
+  }
+}
+
+void csSavePVSDataFile (iObjectRegistry* registry, const char* filename,
+    csStaticKDTree* tree)
+{
+  csArray<csPVSID> ids;
+  GeneratePVSID (tree, ids);
+  csSavePVSDataFile (registry, filename, tree, ids);
+}
+
+void csSavePVSDataFile (iObjectRegistry* registry, const char* filename, 
     const csStaticKDTree* tree, csArray<csPVSID>& idarray)
 {
   // Open file for writing
@@ -314,7 +352,7 @@ static csStaticKDTree* ReadNode (csBinaryFileHelper* file,
   return ret;
 }
 
-csStaticKDTree* LoadPVSDataFile (iObjectRegistry* registry, 
+csStaticKDTree* csLoadPVSDataFile (iObjectRegistry* registry, 
     const char* filename, csArray<csPVSID>& idarray)
 {
   // Use iFile to read data
