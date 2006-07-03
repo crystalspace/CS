@@ -1243,7 +1243,7 @@ csSkeletonGraveyard::~csSkeletonGraveyard ()
 
 bool csSkeletonGraveyard::Initialize (iObjectRegistry* object_reg)
 {
-  object_reg = object_reg;
+  this->object_reg = object_reg;
   vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
   PreProcess = csevPreProcess (object_reg);
   csRef<iEventQueue> eq (CS_QUERY_REGISTRY (object_reg, iEventQueue));

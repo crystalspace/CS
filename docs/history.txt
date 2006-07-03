@@ -18,6 +18,7 @@ chronological order.
 	  specific ways. Only implemented for python but other languages can
 	  implement their own extensions.
 	- caedes declared csSet<csStringID> for wrapping in cspace.i.
+	- mdmkolbe fixed a mistake in his previous commit.
 2-Jul-2006
 	- caedes added wrappers so cspace Lists (like iMeshList) can be used 
 	  as python lists where applicable. Allows search by index and name by

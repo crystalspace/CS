@@ -941,7 +941,7 @@ csGenmeshAnimationControlType::~csGenmeshAnimationControlType ()
 
 bool csGenmeshAnimationControlType::Initialize (iObjectRegistry* object_reg)
 {
-  object_reg = object_reg;
+  this->object_reg = object_reg;
   Frame = csevFrame (object_reg);
   PreProcess = csevPreProcess (object_reg);
   csRef<iEventQueue> q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
