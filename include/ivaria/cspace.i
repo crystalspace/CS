@@ -603,7 +603,15 @@ csArrayCapacityLinear<csArrayThresholdVariable >;
 %ignore csStringSet::GlobalIterator;
 %ignore csStringSet::GetIterator;
 %include "csutil/strset.h"
-
+%ignore csSet::GlobalIterator;
+%ignore csSet::GetIterator;
+%include "csutil/set.h"
+/* helper macro to declare csSet templated classes */
+%define SET_HELPER(typename)
+%template (typename ## Set) csSet<typename>;
+SET_OBJECT_FUNCTIONS(csSet<typename>,typename)
+%enddef
+SET_HELPER(csStringID)
 %ignore iString::SetCapacity;
 %ignore iString::GetCapacity;
 %ignore iString::SetGrowsBy;

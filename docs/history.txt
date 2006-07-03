@@ -12,6 +12,12 @@ chronological order.
 	- Philip Wyett fixed eliminated error when using 'alt-r' to start
           recording a movie with the movie recorder plugin. Plugin was
           starting and stopping and only recording one frame.
+	- caedes added swig wrapper helper for csSet template, it allows
+	  using len(set), set.append(id), a in set (test only), del set[id].
+	  This introduces a new %define for extending csSet in language 
+	  specific ways. Only implemented for python but other languages can
+	  implement their own extensions.
+	- caedes declared csSet<csStringID> for wrapping in cspace.i.
 2-Jul-2006
 	- caedes added wrappers so cspace Lists (like iMeshList) can be used 
 	  as python lists where applicable. Allows search by index and name by

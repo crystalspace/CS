@@ -23,8 +23,11 @@
 
 %javaconst(1);
 
-// Fill LIST_OBJECT_FUNCTIONS to wrap list interfaces in a special way.
+// Fill LIST_OBJECT_FUNCTIONS to extend list interfaces.
 %define LIST_OBJECT_FUNCTIONS(classname,typename)
+%enddef
+// Fill SET_OBJECT_FUNCTIONS to extend csSet interfaces.
+%define SET_OBJECT_FUNCTIONS(classname,typename)
 %enddef
 
 // We still support Swig versions older than 1.3.22, so regress to the 'enum'

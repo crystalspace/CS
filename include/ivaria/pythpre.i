@@ -434,6 +434,14 @@ _csWrapPtr_to_Python (const csWrapPtr & wp)
         PYLIST_BASE_FUNCTIONS(classname,typename,int,GetCount,Get,Add,Remove,Find)
         PYLIST_BYNAME_FUNCTIONS(classname,typename,FindByName)
 %enddef
+%define SET_OBJECT_FUNCTIONS(classname,typename)
+%extend classname {
+	int __len__() {return self->GetSize();}
+	bool __contains__( typename o) {return self->Contains(o);}
+	void append( typename o) {return self->Add(o);}
+	bool __delitem__( typename o) { return self->Delete(o);}
+}
+%enddef
 
 #endif // ifndef CS_MINI_SWIG
 
