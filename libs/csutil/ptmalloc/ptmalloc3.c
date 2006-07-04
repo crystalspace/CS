@@ -734,6 +734,8 @@ ptmalloc_init(void)
     state = *state_ptr;
     sharemem_close (state_ptr, sizeof (struct ptmalloc_state*));
     state->refcount++;
+    /* hack: force dlmalloc() to initialize it's (static) mparams struct */
+    mspace_mallopt (0xdeadbeef, 0x0f00);
     if(state->__malloc_initialized >= 0) return;
   }
 

@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+4-Jul-2006
+	- res fixed an issue in ptmalloc where one of dlmalloc's internal
+	  structures would not be always initialized properly.
 3-Jul-2006
 	- caedes corrected an error in the swig list wrapper extensions 
 	  that would make them unusable for wrapping interfaces in cel.
