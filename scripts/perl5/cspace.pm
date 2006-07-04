@@ -695,6 +695,51 @@ sub ACQUIRE {
 }
 
 
+############# Class : cspace::csStringIDSet ##############
+
+package cspace::csStringIDSet;
+@ISA = qw( cspace );
+%OWNER = ();
+%ITERATORS = ();
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_csStringIDSet(@_);
+    bless $self, $pkg if defined($self);
+}
+
+*Add = *cspacec::csStringIDSet_Add;
+*AddNoTest = *cspacec::csStringIDSet_AddNoTest;
+*Contains = *cspacec::csStringIDSet_Contains;
+*In = *cspacec::csStringIDSet_In;
+*DeleteAll = *cspacec::csStringIDSet_DeleteAll;
+*Empty = *cspacec::csStringIDSet_Empty;
+*Delete = *cspacec::csStringIDSet_Delete;
+*GetSize = *cspacec::csStringIDSet_GetSize;
+*IsEmpty = *cspacec::csStringIDSet_IsEmpty;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_csStringIDSet($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
 ############# Class : cspace::iString ##############
 
 package cspace::iString;

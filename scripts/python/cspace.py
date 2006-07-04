@@ -489,6 +489,42 @@ class csStringSetPtr(csStringSet):
         _swig_setattr(self, csStringSet,self.__class__,csStringSet)
 _cspace.csStringSet_swigregister(csStringSetPtr)
 
+class csStringIDSet(_object):
+    __swig_setmethods__ = {}
+    __setattr__ = lambda self, name, value: _swig_setattr(self, csStringIDSet, name, value)
+    __swig_getmethods__ = {}
+    __getattr__ = lambda self, name: _swig_getattr(self, csStringIDSet, name)
+    def __repr__(self):
+        return "<%s.%s; proxy of C++ csSet<csStringID > instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
+    def __init__(self, *args):
+        _swig_setattr(self, csStringIDSet, 'this', _cspace.new_csStringIDSet(*args))
+        _swig_setattr(self, csStringIDSet, 'thisown', 1)
+    def Add(*args): return _cspace.csStringIDSet_Add(*args)
+    def AddNoTest(*args): return _cspace.csStringIDSet_AddNoTest(*args)
+    def Contains(*args): return _cspace.csStringIDSet_Contains(*args)
+    def In(*args): return _cspace.csStringIDSet_In(*args)
+    def DeleteAll(*args): return _cspace.csStringIDSet_DeleteAll(*args)
+    def Empty(*args): return _cspace.csStringIDSet_Empty(*args)
+    def Delete(*args): return _cspace.csStringIDSet_Delete(*args)
+    def GetSize(*args): return _cspace.csStringIDSet_GetSize(*args)
+    def IsEmpty(*args): return _cspace.csStringIDSet_IsEmpty(*args)
+    def __len__(*args): return _cspace.csStringIDSet___len__(*args)
+    def __contains__(*args): return _cspace.csStringIDSet___contains__(*args)
+    def append(*args): return _cspace.csStringIDSet_append(*args)
+    def __delitem__(*args): return _cspace.csStringIDSet___delitem__(*args)
+    def __del__(self, destroy=_cspace.delete_csStringIDSet):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+
+
+class csStringIDSetPtr(csStringIDSet):
+    def __init__(self, this):
+        _swig_setattr(self, csStringIDSet, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, csStringIDSet, 'thisown', 0)
+        _swig_setattr(self, csStringIDSet,self.__class__,csStringIDSet)
+_cspace.csStringIDSet_swigregister(csStringIDSetPtr)
+
 class iString(iBase):
     __swig_setmethods__ = {}
     for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
