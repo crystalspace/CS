@@ -178,7 +178,7 @@ struct iSequence : public virtual iBase
  */
 struct iSequenceManager : public virtual iBase
 {
-  SCF_VERSION (iSequenceManager, 1, 0, 0);
+  SCF_INTERFACE (iSequenceManager, 1, 0, 0);
 
   /**
    * Clear all sequence operations currently in memory (this will
