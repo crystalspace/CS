@@ -32,6 +32,8 @@
 
 struct iConfigFile;
 
+#define VFS_AUTOCONFIGURE
+
 CS_PLUGIN_NAMESPACE_BEGIN(vfs)
 {
 
@@ -167,7 +169,7 @@ public:
   /// Return a filesystem plugin
   virtual iFileSystem* GetPlugin(size_t index) const;
 
-private:
+protected:
 
   /// Mutex to make VFS thread-safe.
   csRef<csMutex> mutex;
@@ -213,6 +215,19 @@ private:
 
 protected:
   friend class VfsNode;
+
+  // Class to automatically configure the csVFS
+  class AutoConfig : public scfImplementation1<AutoConfig, iVFSAutoConfig>
+  {
+    public: 
+      // Constructor
+      AutoConfig();
+
+      // Configure the file system
+      virtual bool Configure(iVFS *vfs, iObjectRegistry *object_reg);
+  } AutoConfigPlugin;
+
+  friend class AutoConfig;
 };
 
 } CS_PLUGIN_NAMESPACE_END(vfs)

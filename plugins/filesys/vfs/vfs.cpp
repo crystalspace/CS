@@ -26,6 +26,7 @@
 
 #include "vfs.h"
 #include "filesystem.h"
+#include "csutil/cmdline.h"
 #include "csutil/databuf.h"
 #include "csutil/scfstringarray.h"
 #include "csutil/csstring.h"
@@ -732,6 +733,11 @@ bool csVFS::Initialize (iObjectRegistry* r)
 {
   // TODO: complete initialize
   object_reg = r;
+
+  // Autoconfiguration
+#ifdef VFS_AUTOCONFIGURE
+  AutoConfigPlugin.Configure(this, r);
+#endif
 
   // !! ADD vfs search path
   return true;
@@ -1683,6 +1689,30 @@ iFileSystem* csVFS::GetPlugin(size_t index) const
 
   // Return a pointer to the plugin
   return fsPlugins.Get(index);
+}
+
+// ----------------------------------------------------- AutoConfig-------- //
+csVFS::AutoConfig::AutoConfig(): scfImplementationType(this)
+{
+
+}
+
+// Automatically configure the csVFS class
+bool csVFS::AutoConfig::Configure(iVFS *vfs, iObjectRegistry *object_reg)
+{
+  if (!vfs)
+    return false;
+
+  csRef<iCommandLineParser> cmdline =
+    CS_QUERY_REGISTRY (object_reg, iCommandLineParser);
+
+  if (cmdline)
+  {
+    vfs->Mount("/mnt/resource", cmdline->GetResourceDir());
+    vfs->Mount("/mnt/app", cmdline->GetAppDir());
+  }
+
+  return true;
 }
 
 } CS_PLUGIN_NAMESPACE_END(vfs)

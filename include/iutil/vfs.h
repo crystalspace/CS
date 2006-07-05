@@ -574,6 +574,27 @@ struct iVFS : public virtual iBase
   virtual iFileSystem* GetPlugin(size_t index) const = 0;
 };
 
+/**
+ * The AutoConfig is a class that provides a mechanism for 
+ * an iVFS class to be automatically configured and setup
+ * to provide a dynamic namespace.
+ *
+ * Main creators of instances implementing this interface:
+ * - The VFS plugin (crystalspace.kernel.vfs)
+ *
+ */
+struct iVFSAutoConfig : public virtual iBase
+{
+  SCF_INTERFACE(iVFSAutoConfig, 2, 0, 0);
+
+  /**
+   * Automatically Configure the VFS
+   * \param vfs The iVFS that will be configured
+   * \return True if successful, else False
+   */
+  virtual bool Configure(iVFS *vfs, iObjectRegistry *object_reg) = 0;
+};
+
 /** @} */
 
 #endif // __CS_IUTIL_VFS_H__
