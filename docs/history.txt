@@ -8,6 +8,8 @@ chronological order.
 
 5-Jul-2006
 	- Fossi made a small bugfix to the sequence manager header
+	- res re-enabled the ATI "hidden NPOTS" support as it seems to be
+	  supported properly with the latest drivers.
 4-Jul-2006
 	- res fixed an issue in ptmalloc where one of dlmalloc's internal
 	  structures would not be always initialized properly.
