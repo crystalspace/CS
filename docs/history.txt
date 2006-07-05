@@ -9,6 +9,7 @@ chronological order.
 4-Jul-2006
 	- res fixed an issue in ptmalloc where one of dlmalloc's internal
 	  structures would not be always initialized properly.
+	- res completely converted engseq to new SCF.
 3-Jul-2006
 	- caedes corrected an error in the swig list wrapper extensions 
 	  that would make them unusable for wrapping interfaces in cel.

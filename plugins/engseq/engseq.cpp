@@ -55,40 +55,29 @@ CS_IMPLEMENT_PLUGIN
 
 //---------------------------------------------------------------------------
 
+CS_PLUGIN_NAMESPACE_BEGIN(EngSeq)
+{
+
 /**
  * The superclass of all sequence operations.
  */
-class OpStandard : public iSequenceOperation
+class OpStandard : 
+  public scfImplementation1<OpStandard, iSequenceOperation>
 {
-protected:
-  virtual ~OpStandard() { SCF_DESTRUCT_IBASE(); }
-
 public:
-  SCF_DECLARE_IBASE;
-  OpStandard () { SCF_CONSTRUCT_IBASE (0); }
+  OpStandard () : scfImplementationType (this) { }
   virtual void CleanupSequences () { }
 };
-
-SCF_IMPLEMENT_IBASE (OpStandard)
-  SCF_IMPLEMENTS_INTERFACE (iSequenceOperation)
-SCF_IMPLEMENT_IBASE_END
 
 /**
  * The superclass of all sequence conditions.
  */
-class CondStandard : public iSequenceCondition
+class CondStandard : 
+  public scfImplementation1<CondStandard, iSequenceCondition>
 {
-protected:
-  virtual ~CondStandard() { SCF_DESTRUCT_IBASE(); }
-
 public:
-  SCF_DECLARE_IBASE;
-  CondStandard () { SCF_CONSTRUCT_IBASE (0); }
+  CondStandard () : scfImplementationType (this) { }
 };
-
-SCF_IMPLEMENT_IBASE (CondStandard)
-  SCF_IMPLEMENTS_INTERFACE (iSequenceCondition)
-SCF_IMPLEMENT_IBASE_END
 
 //---------------------------------------------------------------------------
 
@@ -127,18 +116,18 @@ public:
   }
 };
 
-class FadeFogInfo : public iSequenceTimedOperation
+class FadeFogInfo : 
+  public scfImplementation1<FadeFogInfo, iSequenceTimedOperation>
 {
 public:
   csRef<iSector> sector;
   csColor start_col, end_col;
   float start_density, end_density;
 
-  SCF_DECLARE_IBASE;
-  FadeFogInfo ()
-  { SCF_CONSTRUCT_IBASE (0); }
+  FadeFogInfo () : scfImplementationType (this)
+  { }
   virtual ~FadeFogInfo ()
-  { SCF_DESTRUCT_IBASE(); }
+  { }
 
   virtual void Do (float time, iBase*)
   {
@@ -155,10 +144,6 @@ public:
     }
   }
 };
-
-SCF_IMPLEMENT_IBASE (FadeFogInfo)
-  SCF_IMPLEMENTS_INTERFACE (iSequenceTimedOperation)
-SCF_IMPLEMENT_IBASE_END
 
 /**
  * Fade fog operation.
@@ -413,17 +398,17 @@ public:
   }
 };
 
-class FadeLightInfo : public iSequenceTimedOperation
+class FadeLightInfo : 
+  public scfImplementation1<FadeLightInfo, iSequenceTimedOperation>
 {
 public:
   csRef<iLight> light;
   csColor start_col, end_col;
 
-  SCF_DECLARE_IBASE;
-  FadeLightInfo ()
-  { SCF_CONSTRUCT_IBASE (0); }
+  FadeLightInfo () : scfImplementationType (this)
+  { }
   virtual ~FadeLightInfo ()
-  { SCF_DESTRUCT_IBASE(); }
+  { }
 
   virtual void Do (float time, iBase*)
   {
@@ -434,10 +419,6 @@ public:
     light->SetColor (color);
   }
 };
-
-SCF_IMPLEMENT_IBASE (FadeLightInfo)
-  SCF_IMPLEMENTS_INTERFACE (iSequenceTimedOperation)
-SCF_IMPLEMENT_IBASE_END
 
 /**
  * Fade light operation.
@@ -513,17 +494,17 @@ public:
   }
 };
 
-class FadeAmbientLightInfo : public iSequenceTimedOperation
+class FadeAmbientLightInfo : 
+  public scfImplementation1<FadeAmbientLightInfo, iSequenceTimedOperation>
 {
 public:
   csRef<iSector> sector;
   csColor start_col, end_col;
 
-  SCF_DECLARE_IBASE;
-  FadeAmbientLightInfo ()
-  { SCF_CONSTRUCT_IBASE (0); }
+  FadeAmbientLightInfo () : scfImplementationType (this)
+  { }
   virtual ~FadeAmbientLightInfo ()
-  { SCF_DESTRUCT_IBASE(); }
+  { }
 
   virtual void Do (float time, iBase*)
   {
@@ -534,10 +515,6 @@ public:
     sector->SetDynamicAmbientLight (color);
   }
 };
-
-SCF_IMPLEMENT_IBASE (FadeAmbientLightInfo)
-  SCF_IMPLEMENTS_INTERFACE (iSequenceTimedOperation)
-SCF_IMPLEMENT_IBASE_END
 
 /**
  * Fade light operation.
@@ -603,18 +580,18 @@ public:
   }
 };
 
-class FadeMeshColorInfo : public iSequenceTimedOperation
+class FadeMeshColorInfo : 
+  public scfImplementation1<FadeMeshColorInfo, iSequenceTimedOperation>
 {
 public:
   csRef<iMeshWrapper> mesh;
   csColor start_col, end_col;
   float start_density, end_density;
 
-  SCF_DECLARE_IBASE;
-  FadeMeshColorInfo ()
-  { SCF_CONSTRUCT_IBASE (0); }
+  FadeMeshColorInfo () : scfImplementationType (this)
+  { }
   virtual ~FadeMeshColorInfo ()
-  { SCF_DESTRUCT_IBASE(); }
+  { }
 
   virtual void Do (float time, iBase*)
   {
@@ -625,10 +602,6 @@ public:
     mesh->GetMeshObject ()->SetColor (color);
   }
 };
-
-SCF_IMPLEMENT_IBASE (FadeMeshColorInfo)
-  SCF_IMPLEMENTS_INTERFACE (iSequenceTimedOperation)
-SCF_IMPLEMENT_IBASE_END
 
 /**
  * Fade mesh operation.
@@ -672,7 +645,8 @@ public:
 
 //---------------------------------------------------------------------------
 
-class RotateInfo : public iSequenceTimedOperation
+class RotateInfo : 
+  public scfImplementation1<RotateInfo, iSequenceTimedOperation>
 {
 public:
   csRef<iMovable> movable;
@@ -681,11 +655,10 @@ public:
   csVector3 offset;
   csReversibleTransform start_transform;
 
-  SCF_DECLARE_IBASE;
-  RotateInfo ()
-  { SCF_CONSTRUCT_IBASE (0); }
+  RotateInfo () : scfImplementationType (this)
+  { }
   virtual ~RotateInfo ()
-  { SCF_DESTRUCT_IBASE(); }
+  { }
 
   virtual void Do (float time, iBase*)
   {
@@ -739,10 +712,6 @@ public:
     movable->UpdateMove ();
   }
 };
-
-SCF_IMPLEMENT_IBASE (RotateInfo)
-  SCF_IMPLEMENTS_INTERFACE (iSequenceTimedOperation)
-SCF_IMPLEMENT_IBASE_END
 
 /**
  * Rotate operation.
@@ -825,18 +794,18 @@ public:
 
 //---------------------------------------------------------------------------
 
-class MoveLightInfo : public iSequenceTimedOperation
+class MoveLightInfo : 
+  public scfImplementation1<MoveLightInfo, iSequenceTimedOperation>
 {
 public:
   csRef<iLight> light;
   csVector3 start_pos;
   csVector3 offset;
 
-  SCF_DECLARE_IBASE;
-  MoveLightInfo ()
-  { SCF_CONSTRUCT_IBASE (0); }
+  MoveLightInfo () : scfImplementationType (this)
+  { }
   virtual ~MoveLightInfo ()
-  { SCF_DESTRUCT_IBASE(); }
+  { }
 
   virtual void Do (float time, iBase*)
   {
@@ -845,22 +814,18 @@ public:
   }
 };
 
-SCF_IMPLEMENT_IBASE (MoveLightInfo)
-  SCF_IMPLEMENTS_INTERFACE (iSequenceTimedOperation)
-SCF_IMPLEMENT_IBASE_END
-
-class MoveInfo : public iSequenceTimedOperation
+class MoveInfo : 
+  public scfImplementation1<MoveInfo, iSequenceTimedOperation>
 {
 public:
   csRef<iMeshWrapper> mesh;
   csVector3 start_pos;
   csVector3 offset;
 
-  SCF_DECLARE_IBASE;
-  MoveInfo ()
-  { SCF_CONSTRUCT_IBASE (0); }
+  MoveInfo () : scfImplementationType (this)
+  { }
   virtual ~MoveInfo ()
-  { SCF_DESTRUCT_IBASE(); }
+  { }
 
   virtual void Do (float time, iBase*)
   {
@@ -869,10 +834,6 @@ public:
     mesh->GetMovable ()->UpdateMove ();
   }
 };
-
-SCF_IMPLEMENT_IBASE (MoveInfo)
-  SCF_IMPLEMENTS_INTERFACE (iSequenceTimedOperation)
-SCF_IMPLEMENT_IBASE_END
 
 /**
  * Move operation.
@@ -1078,28 +1039,24 @@ public:
 
 //---------------------------------------------------------------------------
 
-class esmPar : public iParameterESM
+class esmPar : public scfImplementation1<esmPar, iParameterESM>
 {
 private:
   size_t idx;
 
 public:
-  SCF_DECLARE_IBASE;
-  esmPar (size_t idx)
+  esmPar (size_t idx) : scfImplementationType (this)
   {
-    SCF_CONSTRUCT_IBASE (0);
     esmPar::idx = idx;
   }
   virtual ~esmPar ()
   {
-    SCF_DESTRUCT_IBASE();
   }
   virtual iBase* GetValue (iBase* params = 0) const
   {
-    // The following cast is in theory unsafe but in this case it is
-    // ok since there is no way some other 'params' instance could get
-    // here.
-    iEngineSequenceParameters* par = (iEngineSequenceParameters*)params;
+    if (!params) return 0;
+    csRef<iEngineSequenceParameters> par = 
+      scfQueryInterface<iEngineSequenceParameters> (params);
     return par->GetParameter (idx);
   }
   virtual bool IsConstant () const
@@ -1108,25 +1065,18 @@ public:
   }
 };
 
-SCF_IMPLEMENT_IBASE (esmPar)
-  SCF_IMPLEMENTS_INTERFACE (iParameterESM)
-SCF_IMPLEMENT_IBASE_END
-
-class constantPar : public iParameterESM
+class constantPar : public scfImplementation1<constantPar, iParameterESM>
 {
 private:
   csWeakRef<iBase> value;
 
 public:
-  SCF_DECLARE_IBASE;
-  constantPar (iBase* value)
+  constantPar (iBase* value) : scfImplementationType (this)
   {
-    SCF_CONSTRUCT_IBASE (0);
     constantPar::value = value;
   }
   virtual ~constantPar ()
   {
-    SCF_DESTRUCT_IBASE();
   }
   virtual iBase* GetValue (iBase* params = 0) const
   {
@@ -1139,15 +1089,7 @@ public:
   }
 };
 
-SCF_IMPLEMENT_IBASE (constantPar)
-  SCF_IMPLEMENTS_INTERFACE (iParameterESM)
-SCF_IMPLEMENT_IBASE_END
-
 //---------------------------------------------------------------------------
-
-SCF_IMPLEMENT_IBASE (csEngineSequenceParameters)
-  SCF_IMPLEMENTS_INTERFACE (iEngineSequenceParameters)
-SCF_IMPLEMENT_IBASE_END
 
 csPtr<iParameterESM> csEngineSequenceParameters::CreateParameterESM (
 	const char* name)
@@ -1174,7 +1116,7 @@ csSequenceWrapper::~csSequenceWrapper ()
 
 void csSequenceWrapper::SelfDestruct ()
 {
-  eseqmgr->RemoveSequence ((iSequenceWrapper*)this);
+  eseqmgr->RemoveSequence (static_cast<iSequenceWrapper*> (this));
 }
 
 iEngineSequenceParameters* csSequenceWrapper::CreateBaseParameterBlock ()
@@ -1486,7 +1428,8 @@ public:
 /**
  * Callback that will activate trigger when light crosses threshold value.
  */
-class csTriggerLightCallback : public iLightCallback
+class csTriggerLightCallback : 
+  public scfImplementation1<csTriggerLightCallback, iLightCallback>
 {
 private:
   csSequenceTrigger* trigger;
@@ -1495,12 +1438,9 @@ private:
   unsigned int framenr;
 
 public:
-  SCF_DECLARE_IBASE;
-
   csTriggerLightCallback (csSequenceTrigger* trigger,
-	int oper, const csColor& col)
+    int oper, const csColor& col) : scfImplementationType (this)
   {
-    SCF_CONSTRUCT_IBASE (0);
     csTriggerLightCallback::trigger = trigger;
     operation = oper;
     trigger_color = col;
@@ -1508,7 +1448,6 @@ public:
   }
   virtual ~csTriggerLightCallback ()
   {
-    SCF_DESTRUCT_IBASE();
   }
 
   float AverageColor (const csColor& col)
@@ -1543,10 +1482,6 @@ public:
   virtual void OnDestroy (iLight*) { }
   virtual void OnAttenuationChange (iLight* /*light*/, int /*newatt*/) { }
 };
-
-SCF_IMPLEMENT_IBASE (csTriggerLightCallback)
-  SCF_IMPLEMENTS_INTERFACE (iLightCallback)
-SCF_IMPLEMENT_IBASE_END
 
 //---------------------------------------------------------------------------
 
@@ -1623,7 +1558,7 @@ csSequenceTrigger::~csSequenceTrigger ()
 
 void csSequenceTrigger::SelfDestruct ()
 {
-  eseqmgr->RemoveTrigger ((iSequenceTrigger*)this);
+  eseqmgr->RemoveTrigger (static_cast<iSequenceTrigger*> (this));
 }
 
 void csSequenceTrigger::AddConditionInSector (iSector* sector,
@@ -1728,7 +1663,7 @@ void csSequenceTrigger::Fire ()
       last_trigger_state = true;
       // Only fire if trigger is enabled. Otherwise we are only
       // doing the test.
-      csSequenceWrapper* wf = (csSequenceWrapper*)fire_sequence;
+      csSequenceWrapper* wf = static_cast<csSequenceWrapper*> (fire_sequence);
       eseqmgr->GetSequenceManager ()->RunSequence (fire_delay,
     	  fire_sequence->GetSequence (), params, wf->GetSequenceID ());
       enabled = false;
@@ -1767,7 +1702,7 @@ void csSequenceTrigger::Fire ()
 
 void csSequenceTrigger::ForceFire (bool now)
 {
-  csSequenceWrapper* wf = (csSequenceWrapper*)fire_sequence;
+  csSequenceWrapper* wf = static_cast<csSequenceWrapper*> (fire_sequence);
   eseqmgr->GetSequenceManager ()->RunSequence (now ? 0 : fire_delay,
     	  fire_sequence->GetSequence (), params, wf->GetSequenceID ());
 }
@@ -1829,24 +1764,9 @@ void csSequenceTrigger::TestConditions (csTicks delay)
 SCF_IMPLEMENT_FACTORY (csEngineSequenceManager)
 
 
-SCF_IMPLEMENT_IBASE (csEngineSequenceManager)
-  SCF_IMPLEMENTS_INTERFACE (iEngineSequenceManager)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csEngineSequenceManager::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csEngineSequenceManager::EventHandler)
-  SCF_IMPLEMENTS_INTERFACE (iEventHandler)
-SCF_IMPLEMENT_IBASE_END
-
-csEngineSequenceManager::csEngineSequenceManager (iBase *iParent)
+csEngineSequenceManager::csEngineSequenceManager (iBase *iParent) :
+  scfImplementationType (this, iParent)
 {
-  SCF_CONSTRUCT_IBASE (iParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
-  scfiEventHandler = 0;
   object_reg = 0;
   global_framenr = 1;
   debug_eseqmgr = this;//@@@@@@@@@@@@@
@@ -1854,29 +1774,25 @@ csEngineSequenceManager::csEngineSequenceManager (iBase *iParent)
 
 csEngineSequenceManager::~csEngineSequenceManager ()
 {
-  if (scfiEventHandler)
+  if (eventHandler.IsValid())
   {
     csRef<iEventQueue> q (CS_QUERY_REGISTRY(object_reg, iEventQueue));
     if (q != 0)
-      q->RemoveListener (scfiEventHandler);
-    scfiEventHandler->DecRef ();
+      q->RemoveListener (eventHandler);
   }
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
-  SCF_DESTRUCT_IBASE();
 }
 
 bool csEngineSequenceManager::Initialize (iObjectRegistry *r)
 {
   object_reg = r;
-  if (!scfiEventHandler)
-    scfiEventHandler = new EventHandler (this);
+  eventHandler.AttachNew (new EventHandler (this));
   PostProcess = csevPostProcess (object_reg);
   MouseEvent = csevMouseEvent (object_reg);
   csRef<iEventQueue> q (CS_QUERY_REGISTRY(object_reg, iEventQueue));
   if (q != 0)
   {
     csEventID events[3] = { PostProcess, MouseEvent, CS_EVENTLIST_END };
-    q->RegisterListener (scfiEventHandler, events);
+    q->RegisterListener (eventHandler, events);
   }
 
   csRef<iPluginManager> plugin_mgr (CS_QUERY_REGISTRY (object_reg,
@@ -1988,8 +1904,8 @@ csPtr<iSequenceTrigger> csEngineSequenceManager::CreateTrigger (
 {
   csSequenceTrigger* trig = new csSequenceTrigger (this);
   trig->SetName (name);
-  triggers.Push ((iSequenceTrigger*)trig);
-  return (iSequenceTrigger*)trig;
+  triggers.Push (static_cast<iSequenceTrigger*> (trig));
+  return static_cast<iSequenceTrigger*> (trig);
 }
 
 csPtr<iParameterESM> csEngineSequenceManager::CreateParameterESM (iBase* value)
@@ -1999,7 +1915,7 @@ csPtr<iParameterESM> csEngineSequenceManager::CreateParameterESM (iBase* value)
 
 void csEngineSequenceManager::RemoveTrigger (iSequenceTrigger* trigger)
 {
-  mesh_triggers.Delete ((csSequenceTrigger*)trigger);
+  mesh_triggers.Delete (static_cast<csSequenceTrigger*> (trigger));
   triggers.Delete (trigger);
 }
 
@@ -2050,8 +1966,8 @@ csPtr<iSequenceWrapper> csEngineSequenceManager::CreateSequence (
   csSequenceWrapper* seqwrap = new csSequenceWrapper (this, seq,
       seqmgr->GetUniqueID ());
   seqwrap->SetName (name);
-  sequences.Push ((iSequenceWrapper*)seqwrap);
-  return (iSequenceWrapper*)seqwrap;
+  sequences.Push (static_cast<iSequenceWrapper*> (seqwrap));
+  return static_cast<iSequenceWrapper*> (seqwrap);
 }
 
 void csEngineSequenceManager::RemoveSequence (iSequenceWrapper* seq)
@@ -2092,7 +2008,7 @@ bool csEngineSequenceManager::RunSequenceByName (
   iSequenceWrapper *seq = FindSequenceByName(name);
   if (seq)
   {
-    csSequenceWrapper* wf = (csSequenceWrapper*)seq;
+    csSequenceWrapper* wf = static_cast<csSequenceWrapper*> (seq);
     seqmgr->RunSequence (delay, seq->GetSequence (), 0,
 	wf->GetSequenceID ());
     return true;
@@ -2118,4 +2034,5 @@ void csEngineSequenceManager::FireTimedOperation (csTicks delta,
   top->DecRef ();
 }
 
-
+}
+CS_PLUGIN_NAMESPACE_END(EngSeq)
