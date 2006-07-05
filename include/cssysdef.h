@@ -674,8 +674,8 @@ CS_FORCEINLINE void* cs_calloc (size_t n, size_t s)
  * configure or defining <tt>CS_NO_PTMALLOC</tt> in 
  * <tt>include/csutil/win32/csconfig.h</tt> for MSVC.
  *
- * To disable malloc overriding fot individual source files, define 
- * <tt>CS_NO_MALLOC_OVERRIDE</tt> before  including <tt>cssysdef.h</tt>.
+ * To disable malloc overriding for individual source files, define 
+ * <tt>CS_NO_MALLOC_OVERRIDE</tt> before including <tt>cssysdef.h</tt>.
  *
  * new overriding can be disabled with <tt>CS_NO_NEW_OVERRIDE</tt>, 
  * however, this is not recommended since it may result in mismatches
