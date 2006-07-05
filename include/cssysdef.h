@@ -70,7 +70,11 @@
  */
 
 #ifndef CS_FORCEINLINE
-#define CS_FORCEINLINE inline
+# ifdef CS_COMPILER_GCC
+#  define CS_FORCEINLINE inline __attribute__((always_inline))
+# else
+#  define CS_FORCEINLINE inline
+# endif
 #endif
 
 /**\def CS_NO_EXCEPTIONS
@@ -603,13 +607,13 @@ Type &Class::getterFunc ()                                     \
  * implementations. Useful when interfacing with third party libraries.
  */
 //@{
-inline void* platform_malloc (size_t n)
+CS_FORCEINLINE void* platform_malloc (size_t n)
 { return malloc (n); }
-inline void platform_free (void* p)
+CS_FORCEINLINE void platform_free (void* p)
 { return free (p); }
-inline void* platform_realloc (void* p, size_t n)
+CS_FORCEINLINE void* platform_realloc (void* p, size_t n)
 { return realloc (p, n); }
-inline void* platform_calloc (size_t n, size_t s)
+CS_FORCEINLINE void* platform_calloc (size_t n, size_t s)
 { return calloc (n, s); }
 
 namespace CS
@@ -653,13 +657,13 @@ extern void* CS_CRYSTALSPACE_EXPORT ptcalloc (size_t n, size_t s);
  * Crystal Space.
  */
 //@{
-inline void* cs_malloc (size_t n)
+CS_FORCEINLINE void* cs_malloc (size_t n)
 { return ptmalloc (n); }
-inline void cs_free (void* p)
+CS_FORCEINLINE void cs_free (void* p)
 { ptfree (p); }
-inline void* cs_realloc (void* p, size_t n)
+CS_FORCEINLINE void* cs_realloc (void* p, size_t n)
 { return ptrealloc (p, n); }
-inline void* cs_calloc (size_t n, size_t s)
+CS_FORCEINLINE void* cs_calloc (size_t n, size_t s)
 { return ptcalloc (n, s); }
 //@}
 
@@ -693,40 +697,40 @@ inline void* cs_calloc (size_t n, size_t s)
   && !defined(CS_EXTENSIVE_MEMDEBUG) && !defined(CS_EXTENSIVE_MEMDEBUG_IMPLEMENT)
 
 #ifndef CS_NO_EXCEPTIONS
-inline void* operator new (size_t s) throw (std::bad_alloc)
+CS_FORCEINLINE void* operator new (size_t s) throw (std::bad_alloc)
 { 
   void* p = ptmalloc (s);
   if (!p) throw std::bad_alloc();
   return p;
 }
-inline void* operator new[] (size_t s) throw (std::bad_alloc)
+CS_FORCEINLINE void* operator new[] (size_t s) throw (std::bad_alloc)
 { 
   void* p = ptmalloc (s);
   if (!p) throw std::bad_alloc();
   return p;
 }
 #else
-inline void* operator new (size_t s) throw ()
+CS_FORCEINLINE void* operator new (size_t s) throw ()
 { 
   return ptmalloc (s);
 }
-inline void* operator new[] (size_t s) throw ()
+CS_FORCEINLINE void* operator new[] (size_t s) throw ()
 { 
   return ptmalloc (s);
 }
 #endif
-inline void operator delete (void* p) throw()
+CS_FORCEINLINE void operator delete (void* p) throw()
 { ptfree (p); }
-inline void operator delete[] (void* p) throw()
+CS_FORCEINLINE void operator delete[] (void* p) throw()
 { ptfree (p); }
 
-inline void* operator new (size_t s, const std::nothrow_t&) throw()
+CS_FORCEINLINE void* operator new (size_t s, const std::nothrow_t&) throw()
 { return ptmalloc (s); }
-inline void* operator new[] (size_t s, const std::nothrow_t&) throw()
+CS_FORCEINLINE void* operator new[] (size_t s, const std::nothrow_t&) throw()
 { return ptmalloc (s); }
-inline void operator delete (void* p, const std::nothrow_t&) throw()
+CS_FORCEINLINE void operator delete (void* p, const std::nothrow_t&) throw()
 { ptfree (p); }
-inline void operator delete[] (void* p, const std::nothrow_t&) throw()
+CS_FORCEINLINE void operator delete[] (void* p, const std::nothrow_t&) throw()
 { ptfree (p); }
 
 #endif /* !defined(CS_MEMORY_TRACKER) && !defined(CS_MEMORY_TRACKER_IMPLEMENT)
@@ -734,13 +738,13 @@ inline void operator delete[] (void* p, const std::nothrow_t&) throw()
 #endif // CS_NO_NEW_OVERRIDE
 
 #else // CS_NO_PTMALLOC
-inline void* cs_malloc (size_t n)
+CS_FORCEINLINE void* cs_malloc (size_t n)
 { return platform_malloc (n); }
-inline void cs_free (void* p)
+CS_FORCEINLINE void cs_free (void* p)
 { platform_free (p); }
-inline void* cs_realloc (void* p, size_t n)
+CS_FORCEINLINE void* cs_realloc (void* p, size_t n)
 { return platform_realloc (p, n); }
-inline void* cs_calloc (size_t n, size_t s)
+CS_FORCEINLINE void* cs_calloc (size_t n, size_t s)
 { return platform_calloc (n, s); }
 #endif // CS_NO_PTMALLOC
 //@}

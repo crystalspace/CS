@@ -10,6 +10,10 @@ chronological order.
 	- Fossi made a small bugfix to the sequence manager header
 	- res re-enabled the ATI "hidden NPOTS" support as it seems to be
 	  supported properly with the latest drivers.
+	- res added a gcc version of CS_FORCEINLINE.
+	- res declared the overridden operator new etc. as forced inline.
+	  This also seems to fix some issues with ptmalloc for external
+	  projects.
 4-Jul-2006
 	- res fixed an issue in ptmalloc where one of dlmalloc's internal
 	  structures would not be always initialized properly.
