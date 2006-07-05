@@ -79,17 +79,11 @@ csString csFileSystem::ExtractParentName(const char *path) const
   csString strFileName;
 
     // Remove trailing slash
-#if defined (CS_PLATFORM_DOS) || defined (CS_PLATFORM_WIN32)
-  if (strPath.GetAt(strPath.Length() - 1) == '\\')
+  if (strPath.GetAt(strPath.Length() - 1) == CS_PATH_SEPARATOR)
     strPath.Truncate(strPath.Length() - 1);
 
-  size_t newlen = strPath.FindLast('\\');
-#else
-  if (strPath.GetAt(strPath.Length() - 1) == VFS_PATH_SEPARATOR)
-    strPath.Truncate(strPath.Length() - 1);
+  size_t newlen = strPath.FindLast(CS_PATH_SEPARATOR);
 
-  size_t newlen = strPath.FindLast(VFS_PATH_SEPARATOR);
-#endif
 
   strPath.SubString(strFileName, 0, newlen);
   return strFileName;
@@ -99,18 +93,12 @@ csString csFileSystem::ExtractFileName(const char *path) const
 {
   csString strPath = path;
   csString strFileName;
-    // Remove trailing slash
-#if defined (CS_PLATFORM_DOS) || defined (CS_PLATFORM_WIN32)
-  if (strPath.GetAt(strPath.Length() - 1) == '\\')
+   
+  // Remove trailing slash
+  if (strPath.GetAt(strPath.Length() - 1) == CS_PATH_SEPARATOR)
     strPath.Truncate(strPath.Length() - 1);
 
-  size_t newlen = strPath.FindLast('\\');
-#else
-  if (strPath.GetAt(strPath.Length() - 1) == VFS_PATH_SEPARATOR)
-    strPath.Truncate(strPath.Length() - 1);
-
-  size_t newlen = strPath.FindLast(VFS_PATH_SEPARATOR);
-#endif
+  size_t newlen = strPath.FindLast(CS_PATH_SEPARATOR);
 
   strPath.SubString(strFileName, newlen+1);
   return strFileName;
@@ -162,8 +150,6 @@ csVFSFileKind csNativeFileSystem::Exists(const char * FileName)
   else
     return fkDirectory;
 }
-
-csString ExtractFileName(const char *FullPath);
 
 bool csNativeFileSystem::CanHandleMount(const char *FileName)
 {
@@ -427,9 +413,7 @@ bool csArchiveFileSystem::Delete(const char * FileName)
 
 csVFSFileKind csArchiveFileSystem::Exists(const char * FileName)
 {
-  csString strPath = FileName;
-
-  if (FindFile((const char *) strPath))
+  if (FindFile(FileName))
   {
     return fkArchiveFile;
   }

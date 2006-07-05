@@ -39,6 +39,19 @@ CS_PLUGIN_NAMESPACE_BEGIN(vfs)
 
 class VfsNode;
 
+// Class to automatically configure the csVFS
+class VfsAutoConfig
+{
+  public: 
+    // Destructor
+    virtual ~VfsAutoConfig() = 0;
+
+    // Configure the file system
+    virtual bool Configure(iVFS *vfs, iObjectRegistry *object_reg) = 0;
+};
+
+inline VfsAutoConfig::~VfsAutoConfig() { }
+
 /**
  * An array holding pointers to nodes in the VFS, which are compared by name.
  */
@@ -213,21 +226,23 @@ protected:
   // Try change directory
   bool TryChDirAuto(const char *Path, const char *FileName);
 
-protected:
   friend class VfsNode;
 
-  // Class to automatically configure the csVFS
-  class AutoConfig : public scfImplementation1<AutoConfig, iVFSAutoConfig>
+  // Plugin for Autoconfiguration
+  VfsAutoConfig *AutoConfigPluginPtr;
+
+  friend class VfsAutoConfig;
+
+  class AutoConfigPlugin : public VfsAutoConfig
   {
     public: 
-      // Constructor
-      AutoConfig();
+    // Destructor
+    virtual ~AutoConfigPlugin();
 
-      // Configure the file system
-      virtual bool Configure(iVFS *vfs, iObjectRegistry *object_reg);
-  } AutoConfigPlugin;
+    // Configure the file system
+    virtual bool Configure(iVFS *vfs, iObjectRegistry *object_reg);
+  };
 
-  friend class AutoConfig;
 };
 
 } CS_PLUGIN_NAMESPACE_END(vfs)

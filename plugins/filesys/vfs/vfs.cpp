@@ -46,7 +46,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(vfs)
 {
 
 // Extract a filename from a full path
-csString ExtractFileName(const char *FullPath)
+static csString ExtractFileName(const char *FullPath)
 {
   csString strPath = FullPath;
 
@@ -328,13 +328,10 @@ iFile* VfsNode::Open (const char *FileName, int Mode)
     {
       FileToFind.Clear();
       FileToFind = MappedPaths[i].name;
-#if defined (CS_PLATFORM_DOS) || defined (CS_PLATFORM_WIN32)
-      if (FileToFind[FileToFind.Length() -1] != '\\')
-        FileToFind.Append('\\');
-#else
-      if (FileToFind[FileToFind.Length() -1] != VFS_PATH_SEPARATOR)
-        FileToFind.Append(VFS_PATH_SEPARATOR);
-#endif
+
+      if (FileToFind[FileToFind.Length() -1] != CS_PATH_SEPARATOR)
+        FileToFind.Append(CS_PATH_SEPARATOR);
+
       FileToFind.Append(FileName);
       
       // Open the file using the correct iFileSystem plugin
@@ -377,13 +374,10 @@ bool VfsNode::ContainsFile(const char *FileName) const
     {
        FileToFind.Clear();
        FileToFind = MappedPaths[i].name;
-#if defined (CS_PLATFORM_DOS) || defined (CS_PLATFORM_WIN32)
-      if (FileToFind[FileToFind.Length() -1] != '\\')
-        FileToFind.Append('\\');
-#else
-      if (FileToFind[FileToFind.Length() -1] != VFS_PATH_SEPARATOR)
-        FileToFind.Append(VFS_PATH_SEPARATOR);
-#endif
+
+       if (FileToFind[FileToFind.Length() -1] != CS_PATH_SEPARATOR)
+         FileToFind.Append(CS_PATH_SEPARATOR);
+
        FileToFind.Append(FileName);
        iFileSystem *fs = ParentVFS->GetPlugin(MappedPaths[i].pluginIndex);
 
@@ -427,13 +421,10 @@ bool VfsNode::GetRealPath(const char *FileName, csString &path) const
     {
       FileToFind.Clear();
       FileToFind = MappedPaths[i].name;
-#if defined (CS_PLATFORM_DOS) || defined (CS_PLATFORM_WIN32)
-      if (FileToFind[FileToFind.Length() -1] != '\\')
-        FileToFind.Append('\\');
-#else
-      if (FileToFind[FileToFind.Length() -1] != VFS_PATH_SEPARATOR)
-        FileToFind.Append(VFS_PATH_SEPARATOR);
-#endif
+
+      if (FileToFind[FileToFind.Length() -1] != CS_PATH_SEPARATOR)
+        FileToFind.Append(CS_PATH_SEPARATOR);
+
       FileToFind.Append(FileName);
       iFileSystem *fs = ParentVFS->GetPlugin(MappedPaths[i].pluginIndex);
       
@@ -477,13 +468,10 @@ bool VfsNode::Delete(const char *FileName)
     {
       FileToFind.Clear();
       FileToFind = MappedPaths[i].name;
-#if defined (CS_PLATFORM_DOS) || defined (CS_PLATFORM_WIN32)
-      if (FileToFind[FileToFind.Length() -1] != '\\')
-        FileToFind.Append('\\');
-#else
-      if (FileToFind[FileToFind.Length() -1] != VFS_PATH_SEPARATOR)
-        FileToFind.Append(VFS_PATH_SEPARATOR);
-#endif
+
+      if (FileToFind[FileToFind.Length() -1] != CS_PATH_SEPARATOR)
+        FileToFind.Append(CS_PATH_SEPARATOR);
+
       FileToFind.Append(FileName);
       iFileSystem *fs = ParentVFS->GetPlugin(MappedPaths[i].pluginIndex);
       
@@ -566,13 +554,11 @@ bool VfsNode::GetFileTime (const char *FileName, csFileTime &oTime) const
     {
        FileToFind.Clear();
        FileToFind = MappedPaths[i].name;
-#if defined (CS_PLATFORM_DOS) || defined (CS_PLATFORM_WIN32)
-      if (FileToFind[FileToFind.Length() -1] != '\\')
-        FileToFind.Append('\\');
-#else
-      if (FileToFind[FileToFind.Length() -1] != VFS_PATH_SEPARATOR)
-        FileToFind.Append(VFS_PATH_SEPARATOR);
-#endif
+
+
+       if (FileToFind[FileToFind.Length() -1] != CS_PATH_SEPARATOR)
+         FileToFind.Append(CS_PATH_SEPARATOR);
+
        FileToFind.Append(FileName);
        iFileSystem *fs = ParentVFS->GetPlugin(MappedPaths[i].pluginIndex);
 
@@ -611,13 +597,10 @@ bool VfsNode::SetFileTime (const char *FileName, const csFileTime &iTime)
     {
        FileToFind.Clear();
        FileToFind = MappedPaths[i].name;
-#if defined (CS_PLATFORM_DOS) || defined (CS_PLATFORM_WIN32)
-      if (FileToFind[FileToFind.Length() -1] != '\\')
-        FileToFind.Append('\\');
-#else
-      if (FileToFind[FileToFind.Length() -1] != VFS_PATH_SEPARATOR)
-        FileToFind.Append(VFS_PATH_SEPARATOR);
-#endif
+
+       if (FileToFind[FileToFind.Length() -1] != CS_PATH_SEPARATOR)
+         FileToFind.Append(CS_PATH_SEPARATOR);
+
        FileToFind.Append(FileName);
        iFileSystem *fs = ParentVFS->GetPlugin(MappedPaths[i].pluginIndex);
 
@@ -656,13 +639,10 @@ bool VfsNode::GetFileSize (const char *FileName, size_t &oSize)
     {
        FileToFind.Clear();
        FileToFind = MappedPaths[i].name;
-#if defined (CS_PLATFORM_DOS) || defined (CS_PLATFORM_WIN32)
-      if (FileToFind[FileToFind.Length() -1] != '\\')
-        FileToFind.Append('\\');
-#else
-      if (FileToFind[FileToFind.Length() -1] != VFS_PATH_SEPARATOR)
-        FileToFind.Append(VFS_PATH_SEPARATOR);
-#endif
+
+       if (FileToFind[FileToFind.Length() -1] != CS_PATH_SEPARATOR)
+         FileToFind.Append(CS_PATH_SEPARATOR);
+
        FileToFind.Append(FileName);
        iFileSystem *fs = ParentVFS->GetPlugin(MappedPaths[i].pluginIndex);
 
@@ -714,6 +694,8 @@ csVFS::csVFS (iBase *iParent) :
 
   // Set the current node to the root node
   CwdNode = RootNode;
+
+  AutoConfigPluginPtr = new AutoConfigPlugin();
 }
 
 // csVFS destructor
@@ -736,7 +718,7 @@ bool csVFS::Initialize (iObjectRegistry* r)
 
   // Autoconfiguration
 #ifdef VFS_AUTOCONFIGURE
-  AutoConfigPlugin.Configure(this, r);
+  AutoConfigPluginPtr->Configure(this, r);
 #endif
 
   // !! ADD vfs search path
@@ -1692,13 +1674,13 @@ iFileSystem* csVFS::GetPlugin(size_t index) const
 }
 
 // ----------------------------------------------------- AutoConfig-------- //
-csVFS::AutoConfig::AutoConfig(): scfImplementationType(this)
+csVFS::AutoConfigPlugin::~AutoConfigPlugin()
 {
 
 }
 
 // Automatically configure the csVFS class
-bool csVFS::AutoConfig::Configure(iVFS *vfs, iObjectRegistry *object_reg)
+bool csVFS::AutoConfigPlugin::Configure(iVFS *vfs, iObjectRegistry *object_reg)
 {
   if (!vfs)
     return false;
