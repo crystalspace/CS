@@ -184,6 +184,9 @@ private:
   /// A pointer to the current working directory
   VfsNode *CwdNode;
 
+  /// A pointer to a stale current working directory
+  VfsNode *StaleCwd;
+
   /// A stack to implement directory changes
   VfsVector DirectoryStack;
 

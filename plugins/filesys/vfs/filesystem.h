@@ -34,6 +34,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(vfs)
 class csVFS;
 class VfsNode;
 
+
 /**
  * TODO: write class description
  */
@@ -41,7 +42,6 @@ class csFileSystem
 : public scfImplementation2<csFileSystem, iFileSystem, iComponent>
 {
 public:
-
   /**
    * TODO: write class description
    */
@@ -123,6 +123,12 @@ protected:
 
   // Reference to the object registry.
   iObjectRegistry *object_reg;
+  
+  // Extract the name of an archive from the path
+  csString ExtractParentName(const char *path) const;
+
+  // Extract the name of a file within an archive from the path
+  csString ExtractFileName(const char *path) const;
 
   friend class csVFS;
 };
@@ -311,13 +317,6 @@ public:
   virtual bool Sync ();
 
 private:
-
-  // Extract the name of an archive from the path
-  csString ExtractArchiveName(const char *path) const;
-
-  // Extract the name of a file within an archive from the path
-  csString ExtractFileName(const char *path) const;
-
   // Return the archive that contains a file
   VfsArchive *FindFile(const char *FileName) const;
 };

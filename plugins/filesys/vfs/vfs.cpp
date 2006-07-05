@@ -695,6 +695,7 @@ csVFS::csVFS (iBase *iParent) :
   scfImplementationType(this, iParent),
   RootNode(0),
   CwdNode(0),
+  StaleCwd(0),
   auto_name_counter(0),
   object_reg(0)
 {
@@ -733,7 +734,6 @@ bool csVFS::Initialize (iObjectRegistry* r)
   object_reg = r;
 
   // !! ADD vfs search path
-
   return true;
 }
 
@@ -758,6 +758,14 @@ bool csVFS::ChDir (const char *Path)
   {
     // Path exists
 	  CwdNode = newCwd;
+
+    // Free memory used by stale Cwd Node
+    if (StaleCwd)
+    {
+      delete StaleCwd;
+      StaleCwd = 0;
+    }
+
 	  return true;
   }
 
@@ -769,9 +777,9 @@ bool csVFS::ChDir (const char *Path)
     return false;
 
   newCwd->GetRealPath((const char *) ExtractFileName(fullPath), strPath);
-
+  
   // Try and mount path
-  if (!Mount((const char *) fullPath, (const char *) strPath))
+  if (!Mount((const char *) fullPath, (const char *) strPath, 0, 0))
     return false;
   
   newCwd = GetDirectoryNode((const char *) fullPath);
@@ -815,6 +823,9 @@ csString csVFS::_ExpandPath (const char *Path) const
 {
   csString ExpandedPath = Path;
 
+  if (ExpandedPath.Length() == 0)
+    return ExpandedPath;
+
     // Remove trailing slash
   if (ExpandedPath.GetAt(ExpandedPath.Length() - 1) == VFS_PATH_SEPARATOR)
     ExpandedPath.Truncate(ExpandedPath.Length() - 1);
@@ -827,10 +838,6 @@ csString csVFS::_ExpandPath (const char *Path) const
     ExpandedPath = "/";
   else
     ExpandedPath = "";
-
- /* printf("There are %d elements\n", directories.Length());
-  for (size_t p = 0; p < directories.Length(); p++)
-    printf("\t'%s'\n", directories[p]);*/
 
   size_t loop = 1;
 
@@ -875,9 +882,6 @@ csString csVFS::_ExpandPath (const char *Path) const
 
 csPtr<iDataBuffer> csVFS::ExpandPath (const char *Path, bool IsDir) const
 {
-  if (!Path)
-    return 0;
-
   csString strXp = _ExpandPath(Path);
   char *xp = new char[strXp.Length() +1];
   strcpy(xp, (const char *) strXp);
@@ -905,8 +909,14 @@ bool csVFS::Exists (const char *Path)
 
 csPtr<iStringArray> csVFS::FindFiles (const char *Path)
 {
+  // Array to store cosntents
+  scfStringArray *fl = new scfStringArray;
+
   if (!Path)
-    return 0;
+  {
+    csPtr<iStringArray> v(fl);
+    return v;
+  }
 
   csScopedMutexLock lock (mutex);
 
@@ -922,13 +932,11 @@ csPtr<iStringArray> csVFS::FindFiles (const char *Path)
     if (!node)
     {
       // Does not exist
-      return 0;
+      csPtr<iStringArray> v(fl);
+      return v;
     }
     strMask = ExtractFileName(Path);
   }
-
-  // Array to store cosntents
-  scfStringArray *fl = new scfStringArray;
 
   if (strMask.Length() == 0)
   {
@@ -945,9 +953,14 @@ csPtr<iStringArray> csVFS::FindFiles (const char *Path)
 
 csPtr<iFile> csVFS::Open (const char *FileName, int Mode)
 {
+  iFile *f = 0;
+
   if (!FileName)
-    return 0;
-  
+  {
+    // Return the results
+    return csPtr<iFile> (f);
+  }
+
   csScopedMutexLock lock (mutex);
 
   csString fullPath = _ExpandPath(FileName);
@@ -959,10 +972,13 @@ csPtr<iFile> csVFS::Open (const char *FileName, int Mode)
   VfsNode *node = GetParentDirectoryNode((const char *) fullPath, true, true);
 
   if (!node)
-    return 0;
+  {
+    // Return the results
+    return csPtr<iFile> (f);
+  }
 
   // Get the file pointer
-  iFile *f = node->Open((const char *) ExtractFileName((const char *) fullPath), Mode);
+  f = node->Open((const char *) ExtractFileName((const char *) fullPath), Mode);
 
   // Return the results
   return csPtr<iFile> (f);
@@ -971,7 +987,7 @@ csPtr<iFile> csVFS::Open (const char *FileName, int Mode)
 csPtr<iDataBuffer> csVFS::ReadFile (const char *FileName, bool nullterm)
 {
   if (!FileName)
-    return 0;
+    return csPtr<iDataBuffer> (0);
 
   // Acquire Lock
   csScopedMutexLock lock (mutex);
@@ -980,7 +996,7 @@ csPtr<iDataBuffer> csVFS::ReadFile (const char *FileName, bool nullterm)
   csRef<iFile> F (Open (FileName, VFS_FILE_READ));
 
   if (!F)
-    return 0;
+    return csPtr<iDataBuffer> (0);
 
   // Get size
   size_t Size = F->GetSize();
@@ -1002,7 +1018,7 @@ csPtr<iDataBuffer> csVFS::ReadFile (const char *FileName, bool nullterm)
   if (F->Read(buff, Size) != Size)
   {
     delete [] buff;
-    return 0;
+    return csPtr<iDataBuffer> (0);
   }
 
   return csPtr<iDataBuffer> (new csDataBuffer (buff, Size));
@@ -1053,7 +1069,7 @@ bool csVFS::Sync ()
 bool csVFS::Mount (const char *VirtualPath, const char *RealPath)
 {
   // Mount without priority and autodetect plugin
-  return Mount(VirtualPath, RealPath, 0, 0);
+  return  Mount(VirtualPath, RealPath, 0, 0);
 }
 
 bool csVFS::Mount(const char *VirtualPath, const char *RealPath, 
@@ -1112,6 +1128,7 @@ bool csVFS::Mount(const char *VirtualPath, const char *RealPath,
 	  return true;
   }
 
+  csString mountName = "";
   // Find the correct plugin for handling the RealPath
   for (size_t i = 1; i < fsPlugins.Length(); i++)
   {
@@ -1120,7 +1137,7 @@ bool csVFS::Mount(const char *VirtualPath, const char *RealPath,
     if(fsPlugins[i]->CanHandleMount(RealPath))
     {
       node = GetParentDirectoryNode((const char *) tmp, true);
-
+      
       if (!node)
       {
 	      return false;
@@ -1160,12 +1177,10 @@ bool csVFS::Unmount (const char *VirtualPath, const char *RealPath)
   if (!node)
     return false;
 
-  VfsNode *newCwd = 0;
+  StaleCwd = 0;
   if (strncmp(CwdNode->GetName(), fullPath, strlen(fullPath)) == 0)
   {
-     newCwd = GetParentDirectoryNode(fullPath, false);
-     if (!newCwd)
-       newCwd = RootNode;
+     StaleCwd = new VfsNode(CwdNode->GetName(), this, 0);
   }
   
   if (!RealPath)
@@ -1184,8 +1199,8 @@ bool csVFS::Unmount (const char *VirtualPath, const char *RealPath)
     {
       node->MappedPaths.Empty();
     }
-    if (newCwd)
-      CwdNode = newCwd;
+    if (StaleCwd)
+      CwdNode = StaleCwd;
     return true;
   }
 
@@ -1197,8 +1212,8 @@ bool csVFS::Unmount (const char *VirtualPath, const char *RealPath)
        if (!node->MappedPaths.DeleteIndex(i))
          return false;
 
-       if (newCwd)
-          CwdNode = newCwd;
+       if (StaleCwd)
+          CwdNode = StaleCwd;
 
        return true;
     }
@@ -1427,7 +1442,7 @@ bool csVFS::GetFileSize (const char *FileName, size_t &oSize)
 csPtr<iDataBuffer> csVFS::GetRealPath (const char *FileName)
 {
   if (!FileName)
-    return 0;
+    csPtr<iDataBuffer> (0);
 
   csScopedMutexLock lock (mutex);
   VfsNode *node = GetDirectoryNode(FileName);
@@ -1436,14 +1451,14 @@ csPtr<iDataBuffer> csVFS::GetRealPath (const char *FileName)
   {
     node = GetParentDirectoryNode(FileName, false);
     if (!node)
-      return false;
+      return csPtr<iDataBuffer> (0);
   }
 
   csString path;
   
   // Try get the real path
   if (!node->GetRealPath(ExtractFileName(FileName), path))
-    return 0;
+     return csPtr<iDataBuffer> (0);
 
   return csPtr<iDataBuffer> (new csDataBuffer (
     csStrNew ((const char *) path), path.Length() + 1));
@@ -1469,24 +1484,24 @@ csRef<iStringArray> csVFS::GetMounts ()
 
 csRef<iStringArray> csVFS::GetRealMountPaths (const char *VirtualPath)
 {
-  if (!VirtualPath)
-    return 0;
-
-  csScopedMutexLock lock (mutex);
-
-  // Find the node
-  VfsNode *node = GetDirectoryNode(VirtualPath);
-  
-  if (!node)
-    return 0;
-
   scfStringArray *rmounts = new scfStringArray;
 
-  // Add only the real paths
-  for (size_t i = 0; i < node->MappedPaths.Length(); i++)
+  if (VirtualPath)
   {
-    if (!node->MappedPaths[i].symlink)
-	    rmounts->Push(node->MappedPaths[i].name);
+    csScopedMutexLock lock (mutex);
+
+    // Find the node
+    VfsNode *node = GetDirectoryNode(VirtualPath);
+  
+    if (node)
+    {
+      // Add only the real paths
+      for (size_t i = 0; i < node->MappedPaths.Length(); i++)
+      {
+        if (!node->MappedPaths[i].symlink)
+	        rmounts->Push(node->MappedPaths[i].name);
+      }
+    }
   }
 
   // return the results
@@ -1630,7 +1645,7 @@ VfsNode* csVFS::GetParentDirectoryNode(const char *path, bool create, bool mount
       {
         csString realPath;
         node->GetRealPath((const char *) ExtractFileName((const char *)currentDir), realPath);
-        if (!Mount((const char *) currentDir, (const char *) realPath, 0, 0))
+        if (!Mount((const char *) currentDir, (const char *) realPath))
           return 0;
         tmpNode = GetDirectoryNode((const char *) currentDir);
       }
