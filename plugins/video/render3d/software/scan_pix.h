@@ -38,7 +38,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Soft3D)
 
   private:
     template<int v>
-    CS_FORCEINLINE
+    CS_FORCEINLINE_TEMPLATEMETHOD
     static PixType Shift (const uint x)
     {
       if (v > 0)
@@ -47,7 +47,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Soft3D)
         return x >> ABS(v);
     }
     template<int v>
-    CS_FORCEINLINE
+    CS_FORCEINLINE_TEMPLATEMETHOD
     static uint Unshift (const PixType x)
     {
       if (v > 0)
@@ -58,7 +58,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Soft3D)
   public:
     Pix_Fix (const csPixelFormat& /*pfmt*/) {}
 
-    CS_FORCEINLINE
+    CS_FORCEINLINE_TEMPLATEMETHOD
     void WritePix (PixType* dest, const Pixel p) const
     {
       *dest = Shift<sa> (p.c.a & ma)
@@ -131,7 +131,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Soft3D)
       }
     }
 
-    CS_FORCEINLINE
+    CS_FORCEINLINE_TEMPLATEMETHOD
     void WritePix (PixType* dest, const Pixel p) const
     {
       *dest = ((p.c.a & aMask) << aShift) 
@@ -140,7 +140,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Soft3D)
 	| ((p.c.b & bMask) >> bShift);
     }
 
-    CS_FORCEINLINE
+    CS_FORCEINLINE_TEMPLATEMETHOD
     Pixel GetPix (PixType* dest) const
     {
       Pixel p;

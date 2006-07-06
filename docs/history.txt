@@ -16,6 +16,8 @@ chronological order.
 	    - plugins/bugplug/
 	    - plugins/cssaver/
 	    - plugins/collide/
+	- res worked around a gcc 3.4 bug where __attribute__((always_inline))
+	  is not always supported.
 5-Jul-2006
 	- Fossi made a small bugfix to the sequence manager header
 	- res re-enabled the ATI "hidden NPOTS" support as it seems to be

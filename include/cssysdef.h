@@ -72,9 +72,16 @@
 #ifndef CS_FORCEINLINE
 # ifdef CS_COMPILER_GCC
 #  define CS_FORCEINLINE inline __attribute__((always_inline))
+#  if (__GNUC__ == 3) && (__GNUC_MINOR__ == 4)
+    // Work around a gcc 3.4 issue where forcing inline doesn't always work
+#   define CS_FORCEINLINE_TEMPLATEMETHOD inline
+#  endif
 # else
 #  define CS_FORCEINLINE inline
 # endif
+#endif
+#ifndef CS_FORCEINLINE_TEMPLATEMETHOD
+# define CS_FORCEINLINE_TEMPLATEMETHOD CS_FORCEINLINE
 #endif
 
 /**\def CS_NO_EXCEPTIONS

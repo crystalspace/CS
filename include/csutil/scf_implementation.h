@@ -109,9 +109,10 @@ public:
   struct InterfaceTraits 
   {
     typedef If InterfaceType;
-    CS_FORCEINLINE static scfInterfaceVersion GetVersion()
+    CS_FORCEINLINE_TEMPLATEMETHOD 
+    static scfInterfaceVersion GetVersion()
     { return If::InterfaceTraits::GetVersion(); }
-    CS_FORCEINLINE static char const * GetName() 
+    CS_FORCEINLINE_TEMPLATEMETHOD static char const * GetName() 
     { return If::InterfaceTraits::GetName(); }
   };
 };
