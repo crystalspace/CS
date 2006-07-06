@@ -14,6 +14,8 @@ chronological order.
 	- res declared the overridden operator new etc. as forced inline.
 	  This also seems to fix some issues with ptmalloc for external
 	  projects.
+	- res changed the aligned alloc functions to use ptmemalign if
+	  ptmalloc is enabled.
 4-Jul-2006
 	- res fixed an issue in ptmalloc where one of dlmalloc's internal
 	  structures would not be always initialized properly.

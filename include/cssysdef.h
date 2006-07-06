@@ -648,7 +648,6 @@ extern void CS_CRYSTALSPACE_EXPORT operator delete[] (void* p,
 extern void* CS_CRYSTALSPACE_EXPORT ptmalloc (size_t n);
 extern void CS_CRYSTALSPACE_EXPORT ptfree (void* p);
 extern void* CS_CRYSTALSPACE_EXPORT ptrealloc (void* p, size_t n);
-extern void* CS_CRYSTALSPACE_EXPORT ptmemalign (size_t a, size_t n);
 extern void* CS_CRYSTALSPACE_EXPORT ptcalloc (size_t n, size_t s);
 //@}
 
