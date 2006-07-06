@@ -10,6 +10,12 @@ chronological order.
 	- res added the ability to override the default and portal shader with
 	  config file settings (instead of being purely hardcoded in the 
 	  engine).
+	- mdmkolbe converted the following plugins to the new SCF:
+	    - plugins/csparser/prshtgen.cpp (other parts of csparser remain)
+	    - plugins/console/
+	    - plugins/bugplug/
+	    - plugins/cssaver/
+	    - plugins/collide/
 5-Jul-2006
 	- Fossi made a small bugfix to the sequence manager header
 	- res re-enabled the ATI "hidden NPOTS" support as it seems to be

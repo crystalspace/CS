@@ -49,22 +49,7 @@
 
 CS_IMPLEMENT_PLUGIN
 
-SCF_IMPLEMENT_IBASE(csFancyConsole)
-  SCF_IMPLEMENTS_INTERFACE(iConsoleOutput)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csFancyConsole::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE(iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csFancyConsole::EventHandler)
-  SCF_IMPLEMENTS_INTERFACE(iEventHandler)
-SCF_IMPLEMENT_IBASE_END
-
 SCF_IMPLEMENT_FACTORY(csFancyConsole)
-
-
 
 void csFancyConsole::Report (int severity, const char* msg, ...)
 {
@@ -82,25 +67,20 @@ void csFancyConsole::Report (int severity, const char* msg, ...)
 }
 
 csFancyConsole::csFancyConsole (iBase *p) :
+  scfImplementationType(this, p),
   object_reg(0), border_computed(false),
   pix_loaded(false), system_ready(false), auto_update(true), visible(true)
 {
-  SCF_CONSTRUCT_IBASE (p);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-  scfiEventHandler = 0;
 }
 
 csFancyConsole::~csFancyConsole ()
 {
-  if (scfiEventHandler)
+  if (object_reg)
   {
     csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
     if (q)
-      q->RemoveListener (scfiEventHandler);
-    scfiEventHandler->DecRef ();
+      q->RemoveListener (this);
   }
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csFancyConsole::Initialize (iObjectRegistry *object_reg)
@@ -129,13 +109,11 @@ bool csFancyConsole::Initialize (iObjectRegistry *object_reg)
 
   // Tell event queue that we want to handle broadcast events
   CS_INITIALIZE_SYSTEM_EVENT_SHORTCUTS (object_reg);
-  if (!scfiEventHandler)
-    scfiEventHandler = new EventHandler (this);
   csRef<iEventQueue> q (CS_QUERY_REGISTRY(object_reg, iEventQueue));
   if (q != 0)
   {
     csEventID events[3] = { SystemOpen, SystemClose, CS_EVENTLIST_END };
-    q->RegisterListener (scfiEventHandler, events);
+    q->RegisterListener (this, events);
   }
 
   int x, y, w, h;
