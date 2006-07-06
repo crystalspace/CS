@@ -83,7 +83,7 @@ namespace CS
     #if !defined(CS_NO_PTMALLOC)
       void* newPtr = ptmalloc_::ptrealloc (ptr, size);
       if ((newPtr != ptr)
-        && ((((intptr_t)newPtr) / align * align) != (intptr_t)newPtr))
+        && ((((uintptr_t)newPtr) / align * align) != (uintptr_t)newPtr))
       {
         // Bah, alignment borked. Need to alloc again :(
         void* newPtrAligned = ptmalloc_::ptmemalign (align, size);
