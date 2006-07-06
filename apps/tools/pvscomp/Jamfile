@@ -1,0 +1,5 @@
+SubDir TOP apps tools pvscomp ;
+
+Description pvscomp : "PVS Compiler:  Calculates PVS for a CS level" ;
+Application pvscomp : [ Wildcard *.cpp *.h ] ;
+LinkWith pvscomp : crystalspace crystalspace_pvsdata ;
