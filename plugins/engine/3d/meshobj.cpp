@@ -587,7 +587,8 @@ csRenderMesh** csMeshWrapper::GetRenderMeshes (int& n, iRenderView* rview,
   if (imposter_active && CheckImposterRelevant (rview))
   {
     printf("trying imposter... ");
-    if (GetImposter (rview))
+    csRenderMesh** imposter = GetImposter (rview);
+    if (imposter)
     {
       printf("drawn\n");
       return imposter;
