@@ -73,6 +73,7 @@ class csSectorList;
 class csTextureList;
 struct iClipper2D;
 struct iConfigFile;
+struct iDocumentSystem;
 struct iLight;
 struct iMaterialWrapper;
 struct iObjectRegistry;
@@ -681,7 +682,7 @@ private:
   // Renderloop loading/creation
   csPtr<iRenderLoop> CreateDefaultRenderLoop ();
   void LoadDefaultRenderLoop (const char* fileName);
-  csRef<iShader> LoadShader (iDocument* shaderDoc, iShaderCompiler* shcom,
+  csRef<iShader> LoadShader (iDocumentSystem* docsys, iShaderCompiler* shcom,
     const char* filename);
 
   /**

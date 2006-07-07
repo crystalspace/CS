@@ -667,18 +667,17 @@ bool csEngine::HandleEvent (iEvent &Event)
 	CS_QUERY_REGISTRY(objectRegistry, iDocumentSystem));
       if (!docsys.IsValid())
 	docsys.AttachNew (new csTinyDocumentSystem ());
-      csRef<iDocument> shaderDoc = docsys->CreateDocument ();
 
       const char* shaderPath;
       shaderPath = cfg->GetStr ("Engine.Shader.Default", 
         "/shader/std_lighting.xml");
-      defaultShader = LoadShader (shaderDoc, shcom, shaderPath);
+      defaultShader = LoadShader (docsys, shcom, shaderPath);
       if (!defaultShader.IsValid())
 	Warn ("Shader %s not available", shaderPath);
 
       shaderPath = cfg->GetStr ("Engine.Shader.Portal", 
         "/shader/std_lighting_portal.xml");
-      csRef<iShader> portal_shader = LoadShader (shaderDoc, shcom, shaderPath);
+      csRef<iShader> portal_shader = LoadShader (docsys, shcom, shaderPath);
       if (!portal_shader.IsValid())
 	Warn ("Shader %s not available", shaderPath);
     }
@@ -1523,10 +1522,11 @@ void csEngine::LoadDefaultRenderLoop (const char* fileName)
     defaultRenderLoop = newDefault;
 }
 
-csRef<iShader> csEngine::LoadShader (iDocument* shaderDoc, 
+csRef<iShader> csEngine::LoadShader (iDocumentSystem* docsys,
                                      iShaderCompiler* shcom,
                                      const char* filename)
 {
+  csRef<iDocument> shaderDoc = docsys->CreateDocument ();
   csRef<iShader> shader;
   csString shaderFn (filename);
   csString shaderDir;
