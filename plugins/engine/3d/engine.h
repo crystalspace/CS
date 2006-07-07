@@ -681,6 +681,8 @@ private:
   // Renderloop loading/creation
   csPtr<iRenderLoop> CreateDefaultRenderLoop ();
   void LoadDefaultRenderLoop (const char* fileName);
+  csRef<iShader> LoadShader (iDocument* shaderDoc, iShaderCompiler* shcom,
+    const char* filename);
 
   /**
    * Setup for starting a Draw or DrawFunc.

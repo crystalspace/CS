@@ -124,6 +124,7 @@ public:
       scfParent->GetRadius (rad, cent);
     }
     virtual iTerraFormer* GetTerraFormerColldet () { return 0; }
+    virtual iTerrainSystem* GetTerrainColldet () { return 0; }
   } scfiObjectModel;
   friend class ObjectModel;
 

@@ -1,6 +1,6 @@
-/* -*- Mode: C++; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 2 -*-
-    Copyright (C) 2004 by Peter Amstutz <tetron@interreality.org>
-    Written by Peter Amstutz <tetron@interreality.org>
+/*
+    Copyright (C) 2004-2006 by Jorrit Tyberghein
+              (C) 2004-2006 by Frank Richter
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -17,19 +17,14 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_INETWORK_VOSAPI_H__
-#define __CS_INETWORK_VOSAPI_H__
+#include "cssysdef.h"
+#include "csutil/measuretime.h"
 
-#include "csutil/scf.h"
-
-#include <vos/vos/vos.hh>
-
-SCF_VERSION (iVosApi, 0, 1, 1);
-
-/// \todo Document me!
-struct iVosApi : public virtual iBase
+namespace CS
 {
-  virtual VUtil::vRef<VOS::Vobject> GetVobject() = 0;
-};
-
-#endif
+  void MeasureTime::PrintTime (const char* prefix, int64 time, 
+    const char* suffix)
+  {
+    csPrintf ("%s%" CS_PRId64 "%s", prefix, time, suffix);
+  }
+} // namespace CS

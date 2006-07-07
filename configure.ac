@@ -684,6 +684,13 @@ AS_IF([test $cs_cv_prog_cxx_declare_visible_def != no],
     [CS_HEADER_PROPERTY([CS_VISIBILITY_DEFAULT],
 	[$cs_cv_prog_cxx_declare_visible_def])])
 
+CS_SYMBOL_QUALIFIER([how to declare hidden visibility],
+    [cs_cv_prog_cxx_declare_visible_hidden],
+    [__attribute__((visibility("hidden")))], [], [C++])
+AS_IF([test $cs_cv_prog_cxx_declare_visible_hidden != no],
+    [CS_HEADER_PROPERTY([CS_VISIBILITY_HIDDEN],
+	[$cs_cv_prog_cxx_declare_visible_hidden])])
+
 
 
 #------------------------------------------------------------------------------
@@ -826,7 +833,7 @@ CS_CHECK_OPTIMIZE_FLAGS
 #------------------------------------------------------------------------------
 binutils_recent=no
 AS_IF([test -n "$OBJCOPY"],
-    [CS_CHECK_PROG_VERSION([binutils], [$OBJCOPY -V], [2.16.0], [9.9.9|.9.9],
+    [CS_CHECK_PROG_VERSION([binutils], [$OBJCOPY -V], [2.16], [9.9|.9.9.9],
         [binutils_recent=yes])])
 
 AC_MSG_CHECKING([whether to split debug information])
@@ -1397,35 +1404,6 @@ AS_IF([test $cs_cv_libsdl = yes],
 	    [SDL_EnableKeyRepeat(0,0)])],
 	[], [], [CS_EMIT_BUILD_RESULT([cs_cv_libsdl], [SDL])], [], [],
 	[$cs_cv_libsdl_cflags], [$cs_cv_libsdl_lflags], [$cs_cv_libsdl_libs])])
-
-
-
-#------------------------------------------------------------------------------
-# Check for VOS.
-#------------------------------------------------------------------------------
-CS_CHECK_LIB_WITH([metaobject_a3dl],
-    [AC_LANG_PROGRAM(
-	[[#include <vos/metaobjects/a3dl/object3d.hh>]],
-	[A3DL::Object3D o(0); o.setPosition(0,0,0);])],
-    [], [C++], [], [], [], [], 
-    [-lboost_thread -lvutil -lvip -lvos], 
-    [libmetaobject_a3dl])
-
-AS_IF([test $cs_cv_libmetaobject_a3dl = yes],
-    [CS_CHECK_LIB_WITH([metaobject_misc],
-	[AC_LANG_PROGRAM(
-	    [[#include <vos/metaobjects/misc/metadata.hh>]],
-	    [VOS::Metadata m(0); m.setCreationTime(0);])],
-	[], [C++], [], [],
-	[$cs_cv_libmetaobject_a3dl_cflags],
-	[$cs_cv_libmetaobject_a3dl_lflags],
-	[$cs_cv_libmetaobject_a3dl_libs -lircclient],
-	[libmetaobject_misc])],
-    [cs_cv_libmetaobject_misc=no])
-
-AS_IF([test $cs_cv_libmetaobject_misc = yes],
-    [CS_EMIT_BUILD_RESULT([cs_cv_libmetaobject_misc], [VOS])])
-
 
 
 #------------------------------------------------------------------------------

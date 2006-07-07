@@ -268,16 +268,24 @@ const unsigned char* data, unsigned int width, unsigned int height)
 	SetMaterialMask(material, &image);
 }
 
-bool csTerrainCell::CollideRay (const csVector3& start, const csVector3& end,
-bool oneHit, csArray<csVector3>& points) const
+bool csTerrainCell::CollideSegment (const csVector3& start, const csVector3&
+end, bool oneHit, iTerrainVector3Array& points)
 {
-  return false;
+  if (!collider || !collision_properties->GetCollideable ()) return false;
+
+  return collider->CollideSegment (this, start, end, oneHit, points);
 }
 
-bool csTerrainCell::CollideSegment (const csVector3& start, const csVector3&
-end, bool oneHit, csArray<csVector3>& points) const
+bool csTerrainCell::CollideTriangles (const csVector3* vertices,
+                       unsigned int tri_count,
+                       const unsigned int* indices, float radius,
+                       const csReversibleTransform* trans,
+                       bool oneHit, iTerrainCollisionPairArray& pairs)
 {
-  return false;
+  if (!collider || !collision_properties->GetCollideable ()) return false;
+
+  return collider->CollideTriangles (this, vertices, tri_count, indices,
+                                     radius, trans, oneHit, pairs);
 }
 
 static inline float Lerp (const float x, const float y, const float t)

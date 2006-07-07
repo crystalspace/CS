@@ -365,6 +365,7 @@ public:
   }
   virtual iMaterialWrapper* GetMaterialWrapper () const { return mat; }
   virtual iTerraFormer* GetTerraFormerColldet () { return 0; }
+  virtual iTerrainSystem* GetTerrainColldet () { return 0; }
   //------------------------- iParticleState implementation ----------------
   virtual void SetMixMode (uint mode)
   {

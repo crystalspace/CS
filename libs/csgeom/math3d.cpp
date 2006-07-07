@@ -772,10 +772,10 @@ int csIntersect3::BoxSegment (
           isect.y = r * (v.y - u.y) + u.y;
           isect.z = r * (v.z - u.z) + u.z;
           if (
-            isect.y >= box.MinY () &&
-            isect.y <= box.MaxY () &&
-            isect.z >= box.MinZ () &&
-            isect.z <= box.MaxZ ())
+            isect.y + EPSILON >= box.MinY () &&
+            isect.y - EPSILON <= box.MaxY () &&
+            isect.z + EPSILON >= box.MinZ () &&
+            isect.z - EPSILON <= box.MaxZ ())
           {
             if (pr) *pr = r;
             return sides[i];

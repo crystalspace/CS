@@ -22,6 +22,7 @@
 #include "csgeom/plane3.h"
 #include "csgeom/transfrm.h"
 #include "csgeom/box.h"
+#include "csgeom/sphere.h"
 #include "csgeom/math3d.h"
 #include "csqsqrt.h"
 
@@ -118,6 +119,8 @@ bool csTerrainSystem::CollideSegment (const csVector3& start, const csVector3&
 {
   if (!collider) return false;
 
+  size_t size = points.GetSize ();
+
   for (size_t i = 0; i < cells.GetSize(); ++i)
   {
     csSegment3 seg(start, end);
@@ -138,13 +141,47 @@ bool csTerrainSystem::CollideSegment (const csVector3& start, const csVector3&
         cells[i]->Load ();
       }
 
-      if (collider->CollideSegment (cells[i], seg.End (), seg.Start (), oneHit, points) &&
-        oneHit)
+      if (cells[i]->CollideSegment (seg.End (), seg.Start (), oneHit, points)
+          && oneHit)
         return true;
     }
   }
 
-  return !points.IsEmpty();
+  return size != points.GetSize ();
+}
+
+bool csTerrainSystem::CollideTriangles (const csVector3* vertices,
+                       unsigned int tri_count,
+                       const unsigned int* indices, float radius,
+                       const csReversibleTransform* trans,
+                       bool oneHit, iTerrainCollisionPairArray& pairs)
+{
+  if (!collider) return false;
+
+  size_t size = pairs.GetSize ();
+
+  csSphere sphere (csVector3 (0, 0, 0), radius);
+  
+  sphere = trans->Other2This (sphere);
+  
+  for (size_t i = 0; i < cells.GetSize (); ++i)
+  {
+    csBox3 box = cells[i]->GetBBox ();
+
+    if (csIntersect3::BoxSphere (box, sphere.GetCenter (), sphere.GetRadius ()))
+    {
+      if (cells[i]->GetLoadState () != csTerrainCell::Loaded)
+      {
+        cells[i]->Load ();
+      }
+
+      if (cells[i]->CollideTriangles (vertices, tri_count, indices, radius,
+          trans, oneHit, pairs) && oneHit)
+        return true;
+    }
+  }
+
+  return size != pairs.GetSize ();
 }
 
 float csTerrainSystem::GetVirtualViewDistance () const
@@ -438,6 +475,11 @@ void csTerrainSystem::GetRadius (float& radius, csVector3& center)
   GetObjectBoundingBox (box);
   center = box.GetCenter ();
   radius = csQsqrt (csSquaredDist::PointPoint (box.Max (), box.Min ()));
+}
+
+csColliderType csTerrainSystem::GetColliderType ()
+{
+  return CS_TERRAIN_COLLIDER;
 }
 
 }

@@ -27,7 +27,8 @@
 
 #include "csgeom/vector2.h"
 #include "csutil/cscolor.h"
-#include "csutil/scf.h"
+#include "csutil/ref.h"
+#include "csutil/scf_interface.h"
 
 struct iImage;
 
@@ -177,14 +178,13 @@ public:
   void AddLayer(float value, csGenerateImageTexture *tex);
 };
 
-SCF_VERSION (iGenerateImageFunction, 0, 0, 1);
-
 /**
  * This class represents a function for csGenerateImageValueFunc. Expects
  * values for dx and dy between 0 and 1 and returns a height or slope.
  */
-struct iGenerateImageFunction : public iBase
+struct iGenerateImageFunction : public virtual iBase
 {
+  SCF_INTERFACE (iGenerateImageFunction, 2, 0, 0);
   /// Get height or slope.
   virtual float GetValue (float dx, float dy) = 0;
 };

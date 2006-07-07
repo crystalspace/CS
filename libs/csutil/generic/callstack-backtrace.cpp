@@ -52,7 +52,7 @@ bool CallStackNameResolverBacktrace::GetAddressSymbol (void* addr,
   char** s = backtrace_symbols (&addr, 1);
   if (!s) return false;
   sym = s[0];
-  cs_free(s);
+  platform_free(s);
   // Try demangling... for this, try to extract the symbol name from the line
   {
     size_t symStart = sym.FindFirst ('(');

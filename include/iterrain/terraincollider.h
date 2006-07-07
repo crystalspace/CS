@@ -22,12 +22,14 @@
 #include "csutil/scf.h"
 #include "iutil/array.h"
 
-#include "terrainvector3array.h"
+#include "terrainarray.h"
 
 struct iTerrainCellCollisionProperties;
 struct iTerrainCell;
 
 class csRect;
+class csVector3;
+class csReversibleTransform;
 
 struct iTerrainCollider : public virtual iBase
 {
@@ -37,6 +39,12 @@ struct iTerrainCollider : public virtual iBase
   
   virtual bool CollideSegment (iTerrainCell* cell, const csVector3& start,
         const csVector3& end, bool oneHit, iTerrainVector3Array& points) = 0;
+
+  virtual bool CollideTriangles (iTerrainCell* cell, const csVector3* vertices,
+                       unsigned int tri_count,
+                       const unsigned int* indices, float radius,
+                       const csReversibleTransform* trans,
+                       bool oneHit, iTerrainCollisionPairArray& pairs) = 0;
 
   virtual void OnHeightUpdate (iTerrainCell* cell, const csRect& rectangle,
                                const float* data, unsigned int pitch) = 0;

@@ -114,7 +114,7 @@ bool TerrainDemo::Setup ()
   10, csColor (1, 0, 0), CS_LIGHT_DYNAMICTYPE_DYNAMIC);
   room->GetLights ()->Add(light);
   
-  pos = csVector3(0, 74, 0);
+  pos = csVector3(0, 4, 0);
 
   // Now we need to position the camera in our world.
   view->GetCamera ()->SetSector (room);
@@ -131,6 +131,7 @@ bool TerrainDemo::Setup ()
   csVector3 shift (0, -1, 0);
   collider_actor.InitializeColliders (view->GetCamera (),
   	legs, body, shift);
+  collider_actor.SetGravity (1);
   
   terrain = scfQueryInterface<iTerrainSystem> (
     room->GetMeshes ()->FindByName ("Terrain")->GetMeshObject ());
@@ -184,6 +185,9 @@ void TerrainDemo::ProcessFrame ()
     if (kbd->GetKeyState (CSKEY_DOWN))
       obj_move = CS_VEC_BACKWARD * 3.0f;
   }
+
+  collider_actor.Move (float (elapsed_time) / 1000.0f, 1.0f,
+    	obj_move, obj_rotate);
   
   if (kbd->GetKeyState('1')) r_start.x--;
   if (kbd->GetKeyState('2')) r_start.x++;
@@ -195,8 +199,8 @@ void TerrainDemo::ProcessFrame ()
   if (kbd->GetKeyState('7')) r_end.z--;
   if (kbd->GetKeyState('8')) r_end.z++;
   
-  //collider_actor.Move (float (elapsed_time) / 1000.0f, 1.0f,
-  //    	obj_move, obj_rotate);
+  collider_actor.Move (float (elapsed_time) / 1000.0f, 1.0f,
+      	obj_move, obj_rotate);
   // We now assign a new rotation transformation to the camera.  You
   // can think of the rotation this way: starting from the zero
   // position, you first rotate "rotY" radians on your Y axis to get
@@ -205,14 +209,13 @@ void TerrainDemo::ProcessFrame ()
   // individual rotations on each axis together to get a single
   // rotation matrix.  The rotations are applied in right to left
   // order .
-  rotX += obj_rotate.x * speed;
-  rotY += obj_rotate.y * speed;
+//  rotX += obj_rotate.x * speed;
+//  rotY += obj_rotate.y * speed;
   
-  csMatrix3 rot = csXRotMatrix3 (rotX) * csYRotMatrix3 (rotY);
-  csOrthoTransform ot (rot, c->GetTransform().GetOrigin ());
-  c->SetTransform (ot);
-  
-  c->Move(obj_move);
+//  csMatrix3 rot = csXRotMatrix3 (rotX) * csYRotMatrix3 (rotY);
+//  csOrthoTransform ot (rot, c->GetTransform().GetOrigin ());
+//  c->SetTransform (ot);
+//  c->Move(obj_move);
   
   // Tell 3D driver we're going to display 3D things.
   if (!g3d->BeginDraw (engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS))
@@ -231,41 +234,39 @@ void TerrainDemo::ProcessFrame ()
 void TerrainDemo::FinishFrame ()
 {
   // Yes, nobody answered me on #crystalspace, so...
-  glColor3f(1, 1, 1);
   glDisable(GL_BLEND);
   glDepthMask(GL_FALSE);
-  glBegin(GL_LINES);
-  glVertex3f(r_start.x, r_start.y, r_start.z);
-  glVertex3f(r_end.x, r_end.y, r_end.z);
-  glEnd();
   
   glPointSize(6);
 
+  csVector3 vertices[3] =
+  {
+    r_start,
+    r_end,
+    csVector3(0, 30, 160)
+  };
+  
+  unsigned int indices[] = {0, 1, 2};
+  
   scfArray<iTerrainVector3Array> isect;
   
-  terrain->CollideSegment (r_start, r_end, false, isect);
+  terrain->CollideSegment (vertices[2], vertices[0], false, isect);
+  terrain->CollideSegment (vertices[1], vertices[2], false, isect);
+  terrain->CollideSegment (vertices[0], vertices[1], false, isect);
   
-  glColor3f(1, 0, 0);
+  scfArray<iTerrainCollisionPairArray> tsect;
   
-  glBegin(GL_POINTS);
-  for (size_t i = 0; i < isect.GetSize (); ++i)
-    glVertex3fv (&isect.Get(i).x);
+  csReversibleTransform trans;
+  
+  //terrain->CollideTriangles(vertices, 1, indices, 0, &trans, false, tsect);
+  
+  glColor3f(1, 1, 1);
+  
+  glBegin(GL_LINE_LOOP);
+  glVertex3fv (&vertices[0].x);
+  glVertex3fv (&vertices[1].x);
+  glVertex3fv (&vertices[2].x);
   glEnd();
-  
-  isect.Empty();
-  
-  terrain->CollideSegment (r_start, r_end, false, isect);
-  
-  glColor3f(0, 1, 0);
-  
-  glBegin(GL_POINTS);
-  for (size_t i = 0; i < isect.GetSize (); ++i)
-    glVertex3fv (&isect.Get(i).x);
-  glEnd();
-
-  isect.Empty();
-  
-  terrain->CollideSegment (r_start, r_end, false, isect);
   
   glColor3f(0, 0, 1);
   
@@ -273,6 +274,17 @@ void TerrainDemo::FinishFrame ()
   for (size_t i = 0; i < isect.GetSize (); ++i)
     glVertex3fv (&isect.Get(i).x);
   glEnd();
+  
+  glColor3f(1, 0, 0);
+
+  for (size_t i = 0; i < tsect.GetSize (); ++i)
+  {
+    glBegin(GL_LINE_LOOP);
+    glVertex3fv (&tsect.Get(i).a2.x);
+    glVertex3fv (&tsect.Get(i).b2.x);
+    glVertex3fv (&tsect.Get(i).c2.x);
+    glEnd();
+  }
 
   glDepthMask(GL_TRUE);
 

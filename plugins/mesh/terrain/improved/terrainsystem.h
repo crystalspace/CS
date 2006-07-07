@@ -41,14 +41,17 @@
 
 #include "csutil/refarr.h"
 
+#include "ivaria/collider.h"
+
 CS_PLUGIN_NAMESPACE_BEGIN(ImprovedTerrain)
 {
 
 class csTerrainSystem :
-  public scfImplementationExt2<csTerrainSystem,
+  public scfImplementationExt3<csTerrainSystem,
                             csObjectModel,
                             iTerrainSystem,
-                            iMeshObject>
+                            iMeshObject,
+                            iCollider>
 {
   csRef<iMeshObjectFactory> factory;
 
@@ -95,6 +98,12 @@ public:
 
   virtual bool CollideSegment (const csVector3& start, const csVector3& end,
                         bool oneHit, iTerrainVector3Array& points);
+
+  virtual bool CollideTriangles (const csVector3* vertices,
+                       unsigned int tri_count,
+                       const unsigned int* indices, float radius,
+                       const csReversibleTransform* trans,
+                       bool oneHit, iTerrainCollisionPairArray& pairs);
 
   virtual float GetVirtualViewDistance () const;
   virtual void SetVirtualViewDistance (float distance);
@@ -163,6 +172,11 @@ public:
   virtual void SetObjectBoundingBox (const csBox3& box);
 
   virtual void GetRadius (float& radius, csVector3& center);
+
+  virtual iTerrainSystem* GetTerrainColldet () { return this; }
+  
+  // ------------ iCollider implementation ------------
+  virtual csColliderType GetColliderType ();
 };
 
 }

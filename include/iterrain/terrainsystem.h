@@ -23,7 +23,7 @@
 #include "csutil/array.h"
 #include "csutil/refarr.h"
 
-#include "terrainvector3array.h"
+#include "terrainarray.h"
 
 struct iRenderView;
 struct iTerrainCell;
@@ -32,6 +32,8 @@ struct iMovable;
 
 class csVector2;
 class csVector3;
+
+class csReversibleTransform;
 
 struct iTerrainSystem : public virtual iBase
 {
@@ -46,6 +48,11 @@ struct iTerrainSystem : public virtual iBase
 
   virtual bool CollideSegment (const csVector3& start, const csVector3& end,
                            bool oneHit, iTerrainVector3Array& points) = 0;
+  virtual bool CollideTriangles (const csVector3* vertices,
+                       unsigned int tri_count,
+                       const unsigned int* indices, float radius,
+                       const csReversibleTransform* trans,
+                       bool oneHit, iTerrainCollisionPairArray& pairs) = 0;
 
   virtual float GetVirtualViewDistance () const = 0;
   virtual void SetVirtualViewDistance (float distance) = 0;

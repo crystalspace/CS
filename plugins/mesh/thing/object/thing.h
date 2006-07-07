@@ -49,6 +49,7 @@
 #include "iutil/dbghelp.h"
 #include "iutil/eventh.h"
 #include "iutil/pluginconfig.h"
+#include "ivideo/rendermesh.h"
 #include "ivideo/shader/shader.h"
 #include "ivideo/txtmgr.h"
 
@@ -572,6 +573,7 @@ public:
 
   virtual iObjectModel* GetObjectModel () { return (iObjectModel*)this; }
   virtual iTerraFormer* GetTerraFormerColldet () { return 0; }
+  virtual iTerrainSystem* GetTerrainColldet () { return 0; }
 };
 
 /**

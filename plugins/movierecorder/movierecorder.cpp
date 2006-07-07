@@ -279,7 +279,7 @@ bool csMovieRecorder::HandleEvent (iEvent &event)
 bool csMovieRecorder::EatKey (iEvent& event)
 {
   SetupPlugin();
-  bool down = (csKeyEventHelper::GetEventType (&event) != (csKeyEventType)-1);
+  bool down = csKeyEventHelper::GetEventType (&event);
   csKeyModifiers m;
   csKeyEventHelper::GetModifiers (&event, m);
   bool alt = m.modifiers[csKeyModifierTypeAlt] != 0;
@@ -591,4 +591,3 @@ void csMovieRecorder::GetKeyCode (const char* keystring, struct keyBinding &key)
 }
 
 //---------------------------------------------------------------------------
-

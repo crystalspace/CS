@@ -23,10 +23,16 @@
 #include "iutil/array.h"
 
 class csVector3;
+struct csCollisionPair;
 
 struct iTerrainVector3Array : public iArrayChangeAll<csVector3>
 {
   SCF_IARRAYCHANGEALL_INTERFACE(iTerrainVector3Array);
+};
+
+struct iTerrainCollisionPairArray : public iArrayChangeAll<csCollisionPair>
+{
+  SCF_IARRAYCHANGEALL_INTERFACE(iTerrainCollisionPairArray);
 };
 
 #endif // __CS_ITERRAIN_TERRAINVECTOR3ARRAY_H__

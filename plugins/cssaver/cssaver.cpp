@@ -73,27 +73,14 @@ CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_FACTORY(csSaver)
 
-SCF_IMPLEMENT_IBASE(csSaver);
-  SCF_IMPLEMENTS_INTERFACE(iSaver);
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iComponent);
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csSaver::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-csSaver::csSaver(iBase *p)
+csSaver::csSaver(iBase *p) : scfImplementationType(this, p)
 {
-  SCF_CONSTRUCT_IBASE(p);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
   object_reg = 0;
   curRegion = 0;
 }
 
 csSaver::~csSaver()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE();
 }
 
 bool csSaver::Initialize(iObjectRegistry* p)

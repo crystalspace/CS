@@ -23,20 +23,20 @@
  * Engine contents saving
  */
 
-#include "csutil/scf.h"
+#include "csutil/scf_interface.h"
 
 struct iDocumentNode;
 struct iString;
 struct iRegion;
 
-SCF_VERSION (iSaver, 0, 0, 4);
-
 /**
  * This interface is used to serialize the engine
  * contents.
  */ 
-struct iSaver : public iBase
+struct iSaver : public virtual iBase
 {
+  SCF_INTERFACE (iSaver, 2, 0, 0);
+
   /// Save the current engine contents to the filename.
   virtual bool SaveMapFile(const char *filename) = 0;
   /// Return the current engine contents as a string.

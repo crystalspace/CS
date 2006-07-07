@@ -348,7 +348,7 @@ void awsfree (void *  );
 
 /* Begin user sect3 */
 
-#define awswrap(n) 1
+#define awswrap() 1
 #define YY_SKIP_YYWRAP
 
 typedef unsigned char YY_CHAR;
@@ -374,7 +374,7 @@ static void yy_fatal_error (yyconst char msg[]  );
  */
 #define YY_DO_BEFORE_ACTION \
 	(yytext_ptr) = yy_bp; \
-	awsleng = (size_t) (yy_cp - yy_bp); \
+	awsleng = (yy_cp - yy_bp); \
 	(yy_hold_char) = *yy_cp; \
 	*yy_cp = '\0'; \
 	(yy_c_buf_p) = yy_cp;
@@ -1579,7 +1579,7 @@ static void awsensure_buffer_stack (void)
 		/* Increase the buffer to prepare for a possible push. */
 		int grow_size = 8 /* arbitrary grow size */;
 
-		num_to_alloc = (yy_buffer_stack_max) + grow_size;
+		num_to_alloc = (int)(yy_buffer_stack_max) + grow_size;
 		(yy_buffer_stack) = (struct yy_buffer_state**)awsrealloc
 								((yy_buffer_stack),
 								num_to_alloc * sizeof(struct yy_buffer_state*)
@@ -1637,7 +1637,7 @@ YY_BUFFER_STATE aws_scan_buffer  (char * base, yy_size_t  size )
 YY_BUFFER_STATE aws_scan_string (yyconst char * __yystr )
 {
     
-	return aws_scan_bytes(__yystr,strlen(__yystr) );
+	return aws_scan_bytes(__yystr, (int)strlen(__yystr) );
 }
 
 /** Setup the input buffer state to scan the given bytes. The next call to awslex() will

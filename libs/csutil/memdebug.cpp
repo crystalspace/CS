@@ -996,16 +996,6 @@ void* operator new[] (size_t s, void* filename, int /*line*/)
   *rc++ = 0xdeadbeef;
   return (void*)rc;
 }
-void* operator new (size_t s)
-{
-  return operator new (s, __FILE__ " standard operator new", 
-    0);
-}
-void* operator new[] (size_t s)
-{
-  return operator new[] (s, __FILE__ " standard operator new[]", 
-    0);
-}
 void operator delete (void* p)
 {
   if (p)

@@ -539,6 +539,7 @@ public:
    * @{ */
   virtual iTerraFormer* GetTerraFormerColldet ()
   { return terraformer; }
+  virtual iTerrainSystem* GetTerrainColldet () { return 0; }
   /** @} */
 
   virtual iObjectModel* GetObjectModel () { return this; }

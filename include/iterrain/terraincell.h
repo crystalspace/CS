@@ -23,6 +23,8 @@
 #include "csutil/array.h"
 #include "csutil/refarr.h"
 
+#include "terrainarray.h"
+
 struct iRenderView;
 struct iTerrainCellRenderProperties;
 struct iTerrainCellCollisionProperties;
@@ -32,6 +34,7 @@ class csVector2;
 class csVector3;
 class csRect;
 class csRefCount;
+class csReversibleTransform;
 
 struct csLockedHeightData
 {
@@ -78,10 +81,14 @@ struct iTerrainCell : public virtual iBase
   virtual void SetMaterialMask (unsigned int material, const unsigned char*
                           data, unsigned int width, unsigned int height) = 0;
 
-  virtual bool CollideRay (const csVector3& start, const csVector3& end,
-                           bool oneHit, csArray<csVector3>& points) const = 0;
   virtual bool CollideSegment (const csVector3& start, const csVector3& end,
-                           bool oneHit, csArray<csVector3>& points) const = 0;
+                           bool oneHit, iTerrainVector3Array& points) = 0;
+
+  virtual bool CollideTriangles (const csVector3* vertices,
+                       unsigned int tri_count,
+                       const unsigned int* indices, float radius,
+                       const csReversibleTransform* trans,
+                       bool oneHit, iTerrainCollisionPairArray& pairs) = 0;
 
   virtual float GetHeight (int x, int y) const = 0;
   virtual float GetHeight (const csVector2& pos) const = 0;

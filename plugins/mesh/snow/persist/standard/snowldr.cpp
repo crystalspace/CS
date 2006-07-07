@@ -366,11 +366,11 @@ bool csSnowSaver::WriteDown (iBase* obj, iDocumentNode* parent,
     synldr->WriteBool(paramsNode, "lighting", snowstate->GetLighting(), true);
 
     //Writedown Number tag
-    int number = snowstate->GetParticleCount();
+    size_t number = snowstate->GetParticleCount();
     csRef<iDocumentNode> numberNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
     numberNode->SetValue("number");
     csRef<iDocumentNode> numberValueNode = numberNode->CreateNodeBefore(CS_NODE_TEXT, 0);
-    numberValueNode->SetValueAsInt(number);
+    numberValueNode->SetValueAsInt((int)number);
   }
 
   paramsNode=0;

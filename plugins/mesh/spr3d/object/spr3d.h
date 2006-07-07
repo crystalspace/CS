@@ -725,6 +725,7 @@ public:
   }
   
   iTerraFormer* GetTerraFormerColldet () { return 0; }
+  virtual iTerrainSystem* GetTerrainColldet () { return 0; }
 
   /** @} */
 };

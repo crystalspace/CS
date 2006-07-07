@@ -24,14 +24,16 @@
  * Mesh collider interfaces
  */
 
-#include "csutil/scf.h"
+#include "csutil/scf_interface.h"
 #include "csgeom/vector3.h"
 #include "csutil/array.h"
+#include "csutil/ref.h"
 
 struct iPolygonMesh;
 struct iTerraFormer;
 struct iMeshObject;
 class csReversibleTransform;
+struct iTerrainSystem;
 
 /**
  * A structure used to return collision pairs.
@@ -47,6 +49,13 @@ struct csCollisionPair
   // Second triangle
   csVector3 a2, b2, c2;	
   //@}
+
+  /// A comparison operator in order for it to fit into iArray
+  bool operator==(const csCollisionPair& p) const
+  {
+    return (a1 == p.a1 && b1 == p.b1 && c1 == p.c1 &&
+            a2 == p.a2 && b2 == p.b2 && c2 == p.c2);
+  }
 };
 
 /**
@@ -62,7 +71,8 @@ struct csIntersectingTriangle
 enum csColliderType
 {
   CS_MESH_COLLIDER = 0,
-  CS_TERRAFORMER_COLLIDER
+  CS_TERRAFORMER_COLLIDER,
+  CS_TERRAIN_COLLIDER
 };
 
 /**
@@ -83,8 +93,6 @@ struct iCollider : public virtual iBase
   virtual csColliderType GetColliderType () = 0;
 };
 
-SCF_VERSION (iCollideSystem, 0, 0, 4);
-
 /**
  * This is the Collide plug-in. This plugin is a factory for creating
  * iCollider entities. A collider represents an entity in the
@@ -101,8 +109,9 @@ SCF_VERSION (iCollideSystem, 0, 0, 4);
  * - csColliderWrapper
  * - csColliderHelper
  */
-struct iCollideSystem : public iBase
+struct iCollideSystem : public virtual iBase
 {
+  SCF_INTERFACE (iCollideSystem, 2, 0, 0);
   /**
    * Create a iCollider for the given mesh geometry.
    * \param mesh is a structure describing the geometry from which the
@@ -121,6 +130,11 @@ struct iCollideSystem : public iBase
    */
   virtual csPtr<iCollider> CreateCollider (iTerraFormer* mesh) = 0;
   
+  /**
+   * Create a Collider from a terrain.
+   */
+  virtual csPtr<iCollider> CreateCollider (iTerrainSystem* mesh) = 0;
+
   /**
    * Test collision between two colliders.
    * This is only supported for iCollider objects created by

@@ -24,6 +24,7 @@
  * Simple helper class to measure execution time of a block.
  */
 
+#include "csutil/csstring.h"
 #include "csutil/util.h"
 #include "csutil/sysfunc.h"
 
@@ -50,11 +51,12 @@ namespace CS
    * \endcode
    * This will print the total execution time of Foo().
    */ 
-  class MeasureTime
+  class CS_CRYSTALSPACE_EXPORT MeasureTime
   {
   protected:
     int64 offsetTime;
     csString text;
+    void PrintTime (const char* prefix, int64 time, const char* suffix);
   public:
     /**
      * Construct with a formatted description string.
@@ -72,8 +74,8 @@ namespace CS
     ~MeasureTime ()
     {
       csTicks endTime = csGetMicroTicks ();
-      csPrintf ("%s: %" CS_PRId64 " \xC2\xB5s\n",
-        text.GetData(), endTime - offsetTime);
+      PrintTime ((text + ": ").GetData(), endTime - offsetTime, 
+	" \xC2\xB5s\n");
     }
     
     /// Print an intermediate measurement.
@@ -86,7 +88,7 @@ namespace CS
       va_start (args, descr);
       csPrintfV (descr, args);
       va_end (args);
-      csPrintf (": %" CS_PRId64 " \xC2\xB5s\n", currentTime - offsetTime);
+      PrintTime (": ", currentTime - offsetTime, " \xC2\xB5s\n");
       
       int64 currentTime2 = csGetMicroTicks ();
       // Correct difference from printing

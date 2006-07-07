@@ -368,6 +368,7 @@ public:
   friend struct PolyMesh;
 
   virtual iTerraFormer* GetTerraFormerColldet () { return 0; }
+  virtual iTerrainSystem* GetTerrainColldet () { return 0; }
   virtual iObjectModel* GetObjectModel () { return this; }
 
   void PreGetBuffer (csRenderBufferHolder* holder, csRenderBufferName buffer);

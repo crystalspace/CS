@@ -80,6 +80,16 @@ csColliderWrapper::csColliderWrapper (iObject* parent,
 }
 
 csColliderWrapper::csColliderWrapper (iObject* parent,
+    iCollideSystem* collide_system,
+  	iTerrainSystem* terrain)
+  : scfImplementationType (this)
+{
+  parent->ObjAdd (this);
+  csColliderWrapper::collide_system = collide_system;
+  collider = collide_system->CreateCollider (terrain);
+}
+
+csColliderWrapper::csColliderWrapper (iObject* parent,
 	iCollideSystem* collide_system,
 	iCollider* collider)
   : scfImplementationType (this)
@@ -147,6 +157,7 @@ csColliderWrapper* csColliderHelper::InitializeCollisionWrapper (
   iObjectModel* obj_objmodel = mesh->GetMeshObject ()->GetObjectModel ();
   iPolygonMesh* obj_polymesh = obj_objmodel->GetPolygonMeshColldet ();
   iTerraFormer* obj_terraformer = obj_objmodel->GetTerraFormerColldet ();
+  iTerrainSystem* obj_terrain = obj_objmodel->GetTerrainColldet ();
 
   iMeshFactoryWrapper* factory = mesh->GetFactory ();
   csColliderWrapper* cw = 0;
@@ -234,6 +245,13 @@ csColliderWrapper* csColliderHelper::InitializeCollisionWrapper (
   {
     cw = new csColliderWrapper (mesh->QueryObject (),
       colsys, obj_terraformer);
+    cw->SetName (mesh->QueryObject ()->GetName());
+    cw->DecRef ();
+  }
+  else if (obj_terrain)
+  {
+    cw = new csColliderWrapper (mesh->QueryObject (),
+      colsys, obj_terrain);
     cw->SetName (mesh->QueryObject ()->GetName());
     cw->DecRef ();
   }

@@ -128,10 +128,14 @@ public:
   virtual void SetMaterialMask (unsigned int material, const unsigned char*
                              data, unsigned int width, unsigned int height);
 
-  virtual bool CollideRay (const csVector3& start, const csVector3& end, 
-                           bool oneHit, csArray<csVector3>& points) const;
   virtual bool CollideSegment (const csVector3& start, const csVector3& end,
-                           bool oneHit, csArray<csVector3>& points) const;
+                           bool oneHit, iTerrainVector3Array& points);
+
+  virtual bool CollideTriangles (const csVector3* vertices,
+                       unsigned int tri_count,
+                       const unsigned int* indices, float radius,
+                       const csReversibleTransform* trans,
+                       bool oneHit, iTerrainCollisionPairArray& pairs);
 
   virtual float GetHeight (int x, int y) const;
   virtual float GetHeight (const csVector2& pos) const;

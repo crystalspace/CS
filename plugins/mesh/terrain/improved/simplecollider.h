@@ -58,10 +58,16 @@ public:
 
   // ------------ iTerrainCollider implementation ------------
 
-  virtual csPtr<iTerrainCellCollisionProperties> CreateProperties();
+  virtual csPtr<iTerrainCellCollisionProperties> CreateProperties ();
 
-  virtual bool CollideSegment(iTerrainCell* cell, const csVector3& start,
+  virtual bool CollideSegment (iTerrainCell* cell, const csVector3& start,
             const csVector3& end, bool oneHit, iTerrainVector3Array& points);
+
+  virtual bool CollideTriangles (iTerrainCell* cell, const csVector3* vertices,
+                       unsigned int tri_count,
+                       const unsigned int* indices, float radius,
+                       const csReversibleTransform* trans,
+                       bool oneHit, iTerrainCollisionPairArray& pairs);
 
   virtual void OnHeightUpdate (iTerrainCell* cell, const csRect& rectangle,
                                const float* data, unsigned int pitch);

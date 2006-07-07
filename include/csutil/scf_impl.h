@@ -238,7 +238,7 @@ protected:
 
 private:
   template<typename I>
-  CS_FORCEINLINE static void* GetInterface(
+  CS_FORCEINLINE_TEMPLATEMETHOD static void* GetInterface (
     Class* scfObject, scfInterfaceID id, scfInterfaceVersion version)
   {
     if (id == scfInterfaceTraits<I>::GetID() &&
@@ -255,7 +255,8 @@ private:
   }
 
   template<typename I>
-  CS_FORCEINLINE static void AddReftrackerAlias (Class* scfObject)
+  CS_FORCEINLINE_TEMPLATEMETHOD static void AddReftrackerAlias (
+    Class* scfObject)
   {
     csRefTrackerAccess::AddAlias(
       static_cast<
@@ -264,7 +265,8 @@ private:
   }
 
   template<typename I>
-  CS_FORCEINLINE static void RemoveReftrackerAlias (Class* scfObject)
+  CS_FORCEINLINE_TEMPLATEMETHOD static void RemoveReftrackerAlias (
+    Class* scfObject)
   {
     csRefTrackerAccess::RemoveAlias(
       static_cast<

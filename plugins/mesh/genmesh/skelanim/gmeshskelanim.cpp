@@ -1661,20 +1661,23 @@ void csGenmeshSkelAnimationControlFactory::UnregisterAUAnimation (csGenmeshSkelA
 
 csGenmeshSkelAnimationControlType::csGenmeshSkelAnimationControlType (
   iBase* pParent) :
-  scfImplementationType(this, pParent)
+  scfImplementationType(this, pParent), object_reg(0)
 {
 }
 
 csGenmeshSkelAnimationControlType::~csGenmeshSkelAnimationControlType ()
 {
-  csRef<iEventQueue> q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
-  if (q)
-    q->RemoveListener (this);
+  if (object_reg)
+  {
+    csRef<iEventQueue> q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+    if (q)
+      q->RemoveListener (this);
+  }
 }
 
 bool csGenmeshSkelAnimationControlType::Initialize (iObjectRegistry* object_reg)
 {
-  csGenmeshSkelAnimationControlType::object_reg = object_reg;
+  this->object_reg = object_reg;
   PreProcess = csevPreProcess (object_reg);
   csRef<iEventQueue> q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
   vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);

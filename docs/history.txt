@@ -6,6 +6,110 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+6-Jul-2006
+	- res added the ability to override the default and portal shader with
+	  config file settings (instead of being purely hardcoded in the 
+	  engine).
+	- mdmkolbe converted the following plugins to the new SCF:
+	    - plugins/csparser/prshtgen.cpp (other parts of csparser remain)
+	    - plugins/console/
+	    - plugins/bugplug/
+	    - plugins/cssaver/
+	    - plugins/collide/
+	- res worked around a gcc 3.4 bug where __attribute__((always_inline))
+	  is not always supported.
+	- res augmented the CS python module building to also split debug info
+	  off.
+5-Jul-2006
+	- Fossi made a small bugfix to the sequence manager header
+	- res re-enabled the ATI "hidden NPOTS" support as it seems to be
+	  supported properly with the latest drivers.
+	- res added a gcc version of CS_FORCEINLINE.
+	- res declared the overridden operator new etc. as forced inline.
+	  This also seems to fix some issues with ptmalloc for external
+	  projects.
+	- res changed the aligned alloc functions to use ptmemalign if
+	  ptmalloc is enabled.
+4-Jul-2006
+	- res fixed an issue in ptmalloc where one of dlmalloc's internal
+	  structures would not be always initialized properly.
+	- res completely converted engseq to new SCF.
+3-Jul-2006
+	- caedes corrected an error in the swig list wrapper extensions 
+	  that would make them unusable for wrapping interfaces in cel.
+	- Philip Wyett fixed eliminated error when using 'alt-r' to start
+          recording a movie with the movie recorder plugin. Plugin was
+          starting and stopping and only recording one frame.
+	- caedes added swig wrapper helper for csSet template, it allows
+	  using len(set), set.append(id), a in set (test only), del set[id].
+	  This introduces a new %define for extending csSet in language 
+	  specific ways. Only implemented for python but other languages can
+	  implement their own extensions.
+	- caedes declared csSet<csStringID> for wrapping in cspace.i.
+	- mdmkolbe fixed a mistake in his previous commit.
+	- res fixed the binutils version detection to also work with the
+	  latest version (which reports "2.17").
+	- res added a detection for __attribute__((visibility("hidden"))) to
+	  configure (to complement the detection for default visibility).
+	- res updated the doxygen stylesheets for doxygen 1.4.7.
+2-Jul-2006
+	- caedes added wrappers so cspace Lists (like iMeshList) can be used 
+	  as python lists where applicable. Allows search by index and name by
+	  using [], also can iterate normally over their contents, and use 
+	  len(list) and list.append.
+	- caedes added dummy templates for list wrapping to the java and perl
+	  interface files.
+	- caedes fixed or silenced most warnings on generation of python
+          interfaces (tested on linux_x86, swig .24, and from .27 to .29):
+	    - removed reference to cspoint.h (deprecated).
+	    - silenced scfImplementation* warnings, now we can wrap this but
+	      should not be done in all situations, the silenced warnings can
+	      be controlled at include/ivaria/scf.i.
+	    - declared csShaderVariable and csSprite2DVertex necessary array
+	      templates.
+	    - made some workaround for the situation where swig would need
+	      directives in the middle of csutil/array.h to understand the
+	      templated class hierachy.
+	    - declare iSCF::SCF as immutable.
+29-Jun-2006
+	- res split csFixedSizeAllocator off csBlockAllocator, which only
+	  allocates blocks of fixed size. csBlockAllocator now builds upon
+	  csFixedSizeAllocator; handling of unfreed objects is now handled
+	  via a template parameter.
+	- Vincent fixed build error with gcc about extra semicolon.
+	- Marten fixed some compilation errors introdu9ced by res recent
+	  split of csBlockAllocator.
+	- mdmkolbe fixed some of the event handlers in plugins/mesh so they
+	  the listeners are only removed if they have already been added.
+27-Jun-2006
+        - Arianna fixed other warnings: size_t/int issues, mainly.
+	- res took another jab at the operator new issues:
+	    - Removed "static" again since that makes gcc complain (and wasn't
+	      very clean either).
+	    - Pragmatically implemented the platform-specific new by using
+	      platform_malloc() instead of trying to employ trickery to use the 
+	      platform's default operator new.
+	- caedes added initial interface code for the scfImplementation macros
+	  to the swig wrappers (file ivaria/scf.i).
+	- caedes made a workaround in cspace.i so python bindings can also be
+	  generated using swig 1.3.28.
+	- res renamed timemeasure.h to measuretime.h.
+	- res split the CS::MeasureTime time printing code out into a separate
+	  source file to avoid a warning in -ansi -pedantic.
+25-Jun-2006
+        - Piotr Obrzut added setting color feature for flare halo components.
+	- res made CS' own overriding operator new/delete static to avoid
+	  having them used by other object files.
+	- res added operator new overloads to call the platform-specific
+	  operator new.
+	- res fixed sprcal3d to use those new overloads.
+24-Jun-2006
+	- Peter Amstutz deleted the vos plugin from the Crystal Space tree,
+	  as it will now be maintained directly as part of the VOS tree.
+	- Peter Amstutz modified the cs-config script to search for the
+	  CS link libraries under several different possible names, so
+	  as to support finding and linking with the shared library 
+	  version of libcrystalspace.
 23-Jun-2006
 	- res fixed spinlock.h compilation for Intel Macs.
 	- res (blindly) fixed the core audio driver reinterpreting pointers 
@@ -15,6 +119,20 @@ chronological order.
 	- res changed csconout to use RGBA instead of RGB colors for 
 	  foreground/background/shadows.
 	- caedes added floor operation to shader expressions.
+	- Jorrit fixed csQuaternion::SetMatrix() so that gmeshskelanim2
+	  again works correctly.
+	- Marten reverted jorrits change to csQuaternion as it is wrong.
+	  csQuaternion::SetMatrix was correct as it is, it must be 
+	  gmeshskelanim2 that is buggy. Please people, do not change the
+	  basic math classes unless you know the maths there.
+	- caedes fixed skeleton and gmeshskelanim2 to work again correctly
+	  with the good quaternion math.
+	- caedes added a more finished version of the ambient with additive
+	  layer (pulse is still not handled totally correctly though).
+	- caedes removed glow from parallax.xml and related files as its now
+	  handled in a more general way in ambient.
+	- caedes removed ambient2.xml and specifyambient.xml files as they 
+	  don't seem to have any useful difference with ambient.xml.
 22-Jun-2006
         - Philip Wyett eliminated _POSIX_C_SOURCE redefinition warning in
           python plugin on GNU Linux with Python 2.3.

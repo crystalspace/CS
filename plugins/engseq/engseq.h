@@ -32,31 +32,34 @@
 #include "iengine/engine.h"
 
 struct iObjectRegistry;
+struct iSharedVariable;
+
+CS_PLUGIN_NAMESPACE_BEGIN(EngSeq)
+{
+
 class csEngineSequenceManager;
 class OpStandard;
-struct iSharedVariable;
 
 /**
  * Implementation of iEngineSequenceParameters.
  */
-class csEngineSequenceParameters : public iEngineSequenceParameters
+class csEngineSequenceParameters : 
+  public scfImplementation1<csEngineSequenceParameters, 
+                            iEngineSequenceParameters>
 {
 private:
   struct par : public csRefCount
   {
-    char* name;
+    csString name;
     csRef<iBase> value;
-    virtual ~par () { delete[] name; }
   };
   csRefArray<par> params;
 
 public:
-  SCF_DECLARE_IBASE;
-
-  csEngineSequenceParameters ()
-  { SCF_CONSTRUCT_IBASE (0); }
+  csEngineSequenceParameters () : scfImplementationType (this)
+  { }
   virtual ~csEngineSequenceParameters ()
-  { SCF_DESTRUCT_IBASE(); }
+  { }
 
   virtual size_t GetParameterCount () const
   {
@@ -89,7 +92,7 @@ public:
   virtual void AddParameter (const char* name, iBase* def_value = 0)
   {
     par* p = new par;
-    p->name = csStrNew (name);
+    p->name = name;
     p->value = def_value;
     params.Push (p);
     p->DecRef ();
@@ -379,7 +382,10 @@ public:
 /**
  * Implementation of iEngineSequenceManager.
  */
-class csEngineSequenceManager : public iEngineSequenceManager
+class csEngineSequenceManager : 
+  public scfImplementation2<csEngineSequenceManager, 
+                            iEngineSequenceManager,
+                            iComponent>
 {
 private:
   iObjectRegistry *object_reg;
@@ -405,8 +411,6 @@ private:
   csWeakRef<iEngine> engine;
 
 public:
-  SCF_DECLARE_IBASE;
-
   csEngineSequenceManager (iBase *iParent);
   virtual ~csEngineSequenceManager ();
   virtual bool Initialize (iObjectRegistry *object_reg);
@@ -446,36 +450,30 @@ public:
   /// Get the global frame number.
   uint32 GetGlobalFrameNr () const { return global_framenr; }
 
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csEngineSequenceManager);
-    virtual bool Initialize (iObjectRegistry* p)
-    { return scfParent->Initialize(p); }
-  } scfiComponent;
-
-  struct EventHandler : public iEventHandler
+  struct EventHandler : 
+    public scfImplementation1<EventHandler, iEventHandler>
   {
   private:
-    csEngineSequenceManager* parent;
+    csWeakRef<csEngineSequenceManager> parent;
   public:
-    SCF_DECLARE_IBASE;
-    EventHandler (csEngineSequenceManager* p)
-    {
-      SCF_CONSTRUCT_IBASE (0);
-      parent = p;
-    }
+    EventHandler (csEngineSequenceManager* p) : scfImplementationType (this),
+      parent (p)
+    { }
     virtual ~EventHandler ()
-    {
-      SCF_DESTRUCT_IBASE ();
-    }
-    virtual bool HandleEvent (iEvent& e) { return parent->HandleEvent(e); }
+    { }
+    virtual bool HandleEvent (iEvent& e) 
+    { return parent ? parent->HandleEvent(e) : false; }
     CS_EVENTHANDLER_NAMES("crystalspace.utilities.sequence.engine")
     CS_EVENTHANDLER_NIL_CONSTRAINTS
-  } * scfiEventHandler;
+  };
+  csRef<EventHandler> eventHandler;
 
   csEventID PostProcess;
   csEventID MouseEvent;
 };
+
+}
+CS_PLUGIN_NAMESPACE_END(EngSeq)
 
 #endif // __CS_ENGSEQ_H__
 

@@ -35,6 +35,7 @@
 #include "csutil/scfstr.h"
 #include "iutil/string.h"
 #include "ivaria/reporter.h"
+#include "csutil/scfarray.h"
 
 CS_IMPLEMENT_PLUGIN
 
@@ -42,15 +43,6 @@ CS_IMPLEMENT_PLUGIN
 
 CS_PLUGIN_NAMESPACE_BEGIN(csOpcode)
 {
-
-SCF_IMPLEMENT_IBASE (csOPCODECollideSystem)
-  SCF_IMPLEMENTS_INTERFACE (iCollideSystem)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csOPCODECollideSystem::Component)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csOPCODECollideSystem)
 
@@ -86,10 +78,9 @@ void csOPCODECollideSystem::OpcodeReportV (int severity, const char* message,
     severity, "crystalspace.collisiondetection.opcode", message, args);
 }
 
-csOPCODECollideSystem::csOPCODECollideSystem (iBase *pParent)
+csOPCODECollideSystem::csOPCODECollideSystem (iBase *pParent) :
+  scfImplementationType(this, pParent)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
   TreeCollider.SetFirstContact (false);
   TreeCollider.SetFullBoxBoxTest (false);
   TreeCollider.SetFullPrimBoxTest (false);
@@ -101,8 +92,6 @@ csOPCODECollideSystem::csOPCODECollideSystem (iBase *pParent)
 
 csOPCODECollideSystem::~csOPCODECollideSystem ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
-  SCF_DESTRUCT_IBASE ();
   rep_object_reg = 0;
 }
 
@@ -125,6 +114,12 @@ csPtr<iCollider> csOPCODECollideSystem::CreateCollider (iTerraFormer* terraforme
   csTerraFormerCollider* col = new csTerraFormerCollider (terraformer, object_reg);
   return csPtr<iCollider> (col);
 }
+
+csPtr<iCollider> csOPCODECollideSystem::CreateCollider (iTerrainSystem* mesh)
+{
+  return csPtr<iCollider> (scfQueryInterface<iCollider> (mesh));
+}
+
 bool csOPCODECollideSystem::TestTriangleTerraFormer (csVector3 triangle[3], 
                                                    csTerraFormerCollider* c,
                                                    csCollisionPair* pair)
@@ -194,6 +189,27 @@ void csOPCODECollideSystem::CopyCollisionPairs (csOPCODECollider* col1,
   }
 }
 bool csOPCODECollideSystem::Collide (
+  csOPCODECollider* collider1, const csReversibleTransform* trans1,
+    iTerrainSystem* terrain)
+{
+  unsigned int tri_count = collider1->opcMeshInt.GetNbTriangles ();
+  const unsigned int* tris = collider1->indexholder;
+  const Point* verts = collider1->vertholder;
+  
+  scfArray<iTerrainCollisionPairArray> c_pairs;
+  
+  if (terrain->CollideTriangles ((const csVector3*)verts, tri_count,
+    tris, collider1->radius, trans1, false, c_pairs))
+  {
+    for (size_t i = 0; i < c_pairs.GetSize (); ++i)
+      pairs.Push (c_pairs.Get (i));
+      
+    return true;
+  }
+  else return false;
+}
+
+bool csOPCODECollideSystem::Collide (
   csOPCODECollider* col1, const csReversibleTransform* trans1,
   csTerraFormerCollider* terraformer)
 {
@@ -253,6 +269,20 @@ bool csOPCODECollideSystem::Collide (
   if (collider2->GetColliderType () == CS_TERRAFORMER_COLLIDER && 
     collider1->GetColliderType () == CS_MESH_COLLIDER)
     return Collide ((csOPCODECollider*)collider1, trans1, (csTerraFormerCollider*)collider2);
+
+  if (collider1->GetColliderType () == CS_TERRAIN_COLLIDER && 
+    collider2->GetColliderType () == CS_MESH_COLLIDER)
+    {
+      csRef<iTerrainSystem> terrain = scfQueryInterface<iTerrainSystem> (collider1);
+      return Collide ((csOPCODECollider*)collider2, trans2, terrain);
+    }
+    
+  if (collider2->GetColliderType () == CS_TERRAIN_COLLIDER && 
+    collider1->GetColliderType () == CS_MESH_COLLIDER)
+    {
+      csRef<iTerrainSystem> terrain = scfQueryInterface<iTerrainSystem> (collider2);
+      return Collide ((csOPCODECollider*)collider1, trans1, terrain);
+    }
 
   csOPCODECollider* col1 = (csOPCODECollider*) collider1;
   csOPCODECollider* col2 = (csOPCODECollider*) collider2;
