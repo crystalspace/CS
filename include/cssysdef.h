@@ -150,25 +150,6 @@
 #  endif
 #endif
 
-#ifdef CS_USE_CUSTOM_ISDIR
-static inline bool isdir (const char *path, struct dirent *de)
-{
-  int pathlen = strlen (path);
-  char* fullname = new char[pathlen + 2 + strlen (de->d_name)];
-  memcpy (fullname, path, pathlen + 1);
-  if ((pathlen) && (fullname[pathlen-1] != CS_PATH_SEPARATOR))
-  {
-    fullname[pathlen++] = CS_PATH_SEPARATOR;
-    fullname[pathlen] = 0;
-  }
-  strcat (&fullname [pathlen], de->d_name);
-  struct stat st;
-  stat (fullname, &st);
-  delete[] fullname;
-  return ((st.st_mode & S_IFMT) == S_IFDIR);
-}
-#endif
-
 /**\def CS_HAVE_POSIX_MMAP
  * Platforms which support POSIX mmap() should #define CS_HAVE_POSIX_MMAP. This
  * can be done via the platform-specific csosdef.h or via the configure script.
@@ -725,6 +706,7 @@ CS_FORCEINLINE void* operator new[] (size_t s) throw ()
   return ptmalloc (s);
 }
 #endif
+
 CS_FORCEINLINE void operator delete (void* p) throw()
 { ptfree (p); }
 CS_FORCEINLINE void operator delete[] (void* p) throw()
@@ -754,6 +736,26 @@ CS_FORCEINLINE void* cs_calloc (size_t n, size_t s)
 { return platform_calloc (n, s); }
 #endif // CS_NO_PTMALLOC
 //@}
+
+#ifdef CS_USE_CUSTOM_ISDIR
+static inline bool isdir (const char *path, struct dirent *de)
+{
+  int pathlen = strlen (path);
+  char* fullname = new char[pathlen + 2 + strlen (de->d_name)];
+  memcpy (fullname, path, pathlen + 1);
+  if ((pathlen) && (fullname[pathlen-1] != CS_PATH_SEPARATOR))
+  {
+    fullname[pathlen++] = CS_PATH_SEPARATOR;
+    fullname[pathlen] = 0;
+  }
+  strcat (&fullname [pathlen], de->d_name);
+  struct stat st;
+  stat (fullname, &st);
+  delete[] fullname;
+  return ((st.st_mode & S_IFMT) == S_IFDIR);
+}
+#endif
+
 
 // The following define should only be enabled if you have defined
 // a special version of overloaded new that accepts two additional
