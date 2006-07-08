@@ -279,7 +279,7 @@ bool csMovieRecorder::HandleEvent (iEvent &event)
 bool csMovieRecorder::EatKey (iEvent& event)
 {
   SetupPlugin();
-  bool down = csKeyEventHelper::GetEventType (&event);
+  bool down = csKeyEventHelper::GetEventType (&event) == csKeyEventTypeDown;
   csKeyModifiers m;
   csKeyEventHelper::GetModifiers (&event, m);
   bool alt = m.modifiers[csKeyModifierTypeAlt] != 0;
