@@ -461,6 +461,9 @@ void csEventTree::FatRecordObject::UnsubscribeInternal(csHandlerID id)
      * and their deleted endpoint will never appear again
      * (instance IDs are non-repeating). */
     SubscriberGraph->Delete(id);
+
+    // Flag SQ for regeneration
+    StaleSubscriberQueue = true;
   }
 }
 
