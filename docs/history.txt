@@ -6,6 +6,13 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+8-Jul-2006
+	- res changed the event handler ID registration. Since the handler
+	  registry keeps a reference to registered handlers, handlers have to
+	  be unregistered properly to ensure none are leaking. Changed GetID()
+	  to not auto-register handlers; instead, RegisterID() has to be used
+	  (where each call must be balanced with a call to ReleaseID() for
+	  proper housekeeping).
 7-Jul-2006
 	- res fixed the engine default shader loading to not reuse the same
 	  document, but create a new one instead. Fixes some crashing.

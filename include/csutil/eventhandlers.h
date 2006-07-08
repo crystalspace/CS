@@ -61,7 +61,7 @@ public:
    */	
   CS_CONST_METHOD csHandlerID GetGenericID (const char*);
   static CS_CONST_METHOD csHandlerID GetGenericID (iObjectRegistry *reg, 
-    const csString &name) 
+    const char* name) 
   {
     return GetRegistry (reg)->GetGenericID (name);
   }
@@ -89,6 +89,13 @@ public:
     return GetRegistry (reg)->GetID (h);
   }
 
+  csHandlerID RegisterID (iEventHandler *);
+  static CS_CONST_METHOD csHandlerID RegisterID (iObjectRegistry *reg, 
+    iEventHandler *h) 
+  {
+    return GetRegistry (reg)->RegisterID (h);
+  }
+
   /**
    * Get the ID for a given event handler name.  This should usually
    * not be used, since it does not handle magic creation of
@@ -97,7 +104,7 @@ public:
    */
   csHandlerID GetID (const char*);
   static CS_CONST_METHOD csHandlerID GetID (iObjectRegistry *reg,
-					    csString &name)
+					    const char* name)
   {
     return GetRegistry (reg)->GetID (name);
   }
@@ -150,7 +157,7 @@ public:
    */
   CS_CONST_METHOD bool const IsInstance (csHandlerID id);
   static inline CS_CONST_METHOD bool IsInstance (iObjectRegistry *reg, 
-  csHandlerID id) 
+    csHandlerID id) 
   {
     return GetRegistry (reg)->IsInstance (id);
   };
@@ -182,8 +189,16 @@ public:
   iObjectRegistry *object_reg;
   csStringSet names;
   csHash<csHandlerID, csHandlerID> instantiation; 
-  csHash<csRef<iEventHandler>, csHandlerID> idToHandler;
-  csHash<csHandlerID, csRef<iEventHandler> > handlerToID;
+  struct KnownEventHandler
+  {
+    csRef<iEventHandler> handler;
+    int refcount;
+
+    KnownEventHandler (iEventHandler* handler) : handler (handler),
+      refcount (1) {}
+  };
+  csHash<KnownEventHandler, csHandlerID> idToHandler;
+  csHash<csHandlerID, csPtrKey<iEventHandler> > handlerToID;
   csHash<csHandlerID, csHandlerID> handlerPres;
   csHash<csHandlerID, csHandlerID> handlerPosts;
   uint32 instanceCounter;

@@ -35,6 +35,7 @@
 #include "csutil/array.h"
 #include "csutil/hash.h"
 #include "csutil/ref.h"
+#include "csutil/refarr.h"
 #include "csutil/scf_implementation.h"
 #include "csutil/thread.h"
 #include "csutil/weakref.h"
@@ -97,6 +98,8 @@ private:
   csHash<csEventCord *, csEventID> EventCords;
   // Pool of event objects
   csPoolEvent* EventPool;
+  /// Registered event handler (used for proper cleanup in RemoveAllListeners())
+  csRefArray<iEventHandler> handlers;
 
   // Enlarge the queue size.
   void Resize (size_t iLength);

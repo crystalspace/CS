@@ -92,8 +92,9 @@ csEventTree *csEventTree::FindNodeInternal(csEventID &name, csEventQueue *q)
     csEventTree *wrk_parent = FindNodeInternal(parentID, q);
     for (size_t iter=0 ; iter<wrk_parent->children.Length() ; iter++) 
     {
-      if (((csEventTree *)wrk_parent->children[iter])->self == name)
-	return (csEventTree *) wrk_parent->children[iter];
+      csEventTree* child = (static_cast<csEventTree *> (wrk_parent->children[iter]));
+      if (child->self == name)
+	return child;
     }
     csEventTree *added = new csEventTree(handler_reg, name_reg, name,
     	wrk_parent, q);
@@ -599,19 +600,22 @@ void csEventTree::SubscriberIterator::GraphMode()
 
   record->SubscriberGraph->ClearMark();
 
-  csList<iEventHandler *>::Iterator zit(*record->SubscriberQueue);
-  while (zit.HasNext()) 
+  if (record->SubscriberQueue)
   {
-    /**
-     * This loop marks every node in the graph that the queue iterator (qit)
-     * has already visited.  From here forward, we do everything on the graph
-     * itself and do not look at the SubscriberQueue.
-     */
-    iEventHandler *h = zit.Next();
-    csHandlerID hid = handler_reg->GetID(h);
-    record->SubscriberGraph->Mark(hid);
-    if (h == qit.FetchCurrent())
-      break;
+    csList<iEventHandler *>::Iterator zit(*record->SubscriberQueue);
+    while (zit.HasNext()) 
+    {
+      /**
+       * This loop marks every node in the graph that the queue iterator (qit)
+       * has already visited.  From here forward, we do everything on the graph
+       * itself and do not look at the SubscriberQueue.
+       */
+      iEventHandler *h = zit.Next();
+      csHandlerID hid = handler_reg->GetID(h);
+      record->SubscriberGraph->Mark(hid);
+      if (qit && (h == qit->FetchCurrent()))
+        break;
+    }
   }
 
   mode = SI_GRAPH;
