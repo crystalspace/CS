@@ -13,6 +13,7 @@ chronological order.
 	  to not auto-register handlers; instead, RegisterID() has to be used
 	  (where each call must be balanced with a call to ReleaseID() for
 	  proper housekeeping).
+	- res fixed some errors to not cause crashes any more.
 7-Jul-2006
 	- res fixed the engine default shader loading to not reuse the same
 	  document, but create a new one instead. Fixes some crashing.
