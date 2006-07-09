@@ -24337,6 +24337,19 @@ else
 
 fi
 
+    # Extract the GL library name
+    if test "x$cs_cv_libgl" = "xyes"; then
+  gl_plat_libs_trimmed=`echo x$cs_gl_plat_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+        libgl_name=`echo $cs_cv_libgl_libs | sed "s/$gl_plat_libs_trimmed//" | sed 's/-l//'`
+        cs_build_prop_val="$libgl_name"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}GL.LIBNAME ?= \"$cs_build_prop_val\" ;
+"
+fi
+
+fi
+
 if test $cs_cv_libgl = yes; then
   # Check for GLhandleARB.
     if test "" != yes; then

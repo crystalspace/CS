@@ -6,6 +6,14 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+9-Jul-2006
+        - res disabled RTLD_GLOBAL for unix plugin loading again, since it has
+          undesireable side effects; for one, static libraries are suddenly
+          not static anymore, as e.g. symbols may be taken from other plugins.
+          Approached the original reason for adding this (DRI drivers failing
+	  to load otherwise) by a workaround in glx2d: it now manually loads 
+	  libGL.so with the RTLD_GLOBAL flag. This is sufficient to make DRI
+	  drivers happy.
 8-Jul-2006
 	- res changed the event handler ID registration. Since the handler
 	  registry keeps a reference to registered handlers, handlers have to
