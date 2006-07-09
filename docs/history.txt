@@ -16,6 +16,7 @@ chronological order.
 	  drivers happy.
 	- res fixed a crash in the GL driver db when it was closed without
 	  being opened.
+	- res fixed XK_MISCELLANY redefined warnings.
 8-Jul-2006
 	- res changed the event handler ID registration. Since the handler
 	  registry keeps a reference to registered handlers, handlers have to
