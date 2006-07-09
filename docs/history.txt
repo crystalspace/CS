@@ -14,6 +14,8 @@ chronological order.
 	  to load otherwise) by a workaround in glx2d: it now manually loads 
 	  libGL.so with the RTLD_GLOBAL flag. This is sufficient to make DRI
 	  drivers happy.
+	- res fixed a crash in the GL driver db when it was closed without
+	  being opened.
 8-Jul-2006
 	- res changed the event handler ID registration. Since the handler
 	  registry keeps a reference to registered handlers, handlers have to
