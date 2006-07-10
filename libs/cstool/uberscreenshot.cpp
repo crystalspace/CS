@@ -38,7 +38,7 @@ namespace CS
     
     shotView->GetCamera()->SetPerspectiveCenter (
       ((int)ubershotW / 2) - (int)tileLeft, 
-      (int)screenH - (((int)ubershotH / 2) - (int)tileTop)); 
+      (int)tileH - (((int)ubershotH / 2) - (int)tileTop)); 
     if (!g3d->BeginDraw (engine->GetBeginDrawFlags () 
       | CSDRAW_3DGRAPHICS | CSDRAW_CLEARZBUFFER))
       return 0;
