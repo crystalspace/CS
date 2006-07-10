@@ -44,22 +44,8 @@
 
 CS_IMPLEMENT_PLUGIN
 
-SCF_IMPLEMENT_IBASE (csMovieRecorder)
-  SCF_IMPLEMENTS_INTERFACE (iMovieRecorder)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csMovieRecorder::EventHandler)
-  SCF_IMPLEMENTS_INTERFACE (iEventHandler)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csMovieRecorder::VirtualClock)
-  SCF_IMPLEMENTS_INTERFACE (iVirtualClock)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_FACTORY (csMovieRecorder)
-
-
+CS_PLUGIN_NAMESPACE_BEGIN(Movierecorder)
+{
 
 void csMovieRecorder::Report (int severity, const char* msg, ...)
 {
@@ -76,11 +62,9 @@ void csMovieRecorder::Report (int severity, const char* msg, ...)
   va_end (arg);
 }
 
-csMovieRecorder::csMovieRecorder (iBase* parent)
+csMovieRecorder::csMovieRecorder (iBase* parent) : 
+  scfImplementationType (this, parent)
 {
-  SCF_CONSTRUCT_IBASE (parent);
-  scfiEventHandler = 0;
-  scfiVirtualClock = 0;
   object_reg = 0;
   initialized = false;
   writer = 0;
@@ -94,23 +78,19 @@ csMovieRecorder::~csMovieRecorder ()
 {
   Stop();
     
-  if (scfiEventHandler)
+  if (eventHandler)
   {
     csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
     if (q)
-      q->RemoveListener (scfiEventHandler);
-    scfiEventHandler->DecRef ();
+      q->RemoveListener (eventHandler);
   }
 
-  if (scfiVirtualClock)
+  if (virtualClock)
   {
     // Put back the real virtual clock :)
-    object_reg->Unregister(scfiVirtualClock, "iVirtualClock");
+    object_reg->Unregister(virtualClock, "iVirtualClock");
     object_reg->Register(realVirtualClock, "iVirtualClock");
-    scfiVirtualClock->DecRef ();
   }
-
-  SCF_DESTRUCT_IBASE();
 }
 
 bool csMovieRecorder::Initialize (iObjectRegistry* iobject_reg)
@@ -122,9 +102,9 @@ bool csMovieRecorder::Initialize (iObjectRegistry* iobject_reg)
 
   // We need to receive keyboard events for our hotkeys, and the nothing
   // event for the actual movie recording.
-  if (!scfiEventHandler)
+  if (!eventHandler)
   {
-    scfiEventHandler = new EventHandler (this);
+    eventHandler.AttachNew (new EventHandler (this));
   }
   csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
   if (q != 0)
@@ -135,7 +115,7 @@ bool csMovieRecorder::Initialize (iObjectRegistry* iobject_reg)
 			    CS_EVENTLIST_END };
     /* DOME : This is a prime example of an application for event ordering;
        we want to capture csevKeyboardEvent early, and catch the frame event absolutely last. */
-    q->RegisterListener (scfiEventHandler, events);
+    q->RegisterListener (eventHandler, events);
   }
 
   // Unregister the normal virtual clock and register our own
@@ -145,13 +125,13 @@ bool csMovieRecorder::Initialize (iObjectRegistry* iobject_reg)
   //        loaded in initialization, but some modules might see the
   //        real VC. Additionally, this won't work at all if the app
   //        loads us after the app gets a VC reference.
-  if (!scfiVirtualClock)
+  if (!virtualClock)
   {
-    scfiVirtualClock = new VirtualClock (this);
+    virtualClock.AttachNew (new VirtualClock (this));
   }
-  realVirtualClock = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
+  realVirtualClock = csQueryRegistry<iVirtualClock> (object_reg);
   object_reg->Unregister(realVirtualClock, "iVirtualClock");
-  object_reg->Register(scfiVirtualClock, "iVirtualClock");
+  object_reg->Register(virtualClock, "iVirtualClock");
 
   return true;
 }
@@ -517,3 +497,6 @@ void csMovieRecorder::GetKeyCode (const char* keystring, struct keyBinding &key)
 }
 
 //---------------------------------------------------------------------------
+
+}
+CS_PLUGIN_NAMESPACE_END(Movierecorder)

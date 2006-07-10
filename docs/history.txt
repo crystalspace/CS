@@ -21,6 +21,7 @@ chronological order.
 	- res fixed csImageMemory::Copy() to ensure that an image buffers
 	  is available as well as converting the source image to the
 	  format of the destination image.
+	- res converted the movierecorder plugin to new SCF.
 9-Jul-2006
         - res disabled RTLD_GLOBAL for unix plugin loading again, since it has
           undesireable side effects; for one, static libraries are suddenly
