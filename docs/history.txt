@@ -6,6 +6,16 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+10-Jul-2006
+	- Jorrit fixed a fundamental problem with the engine sequence
+	  manager and timed operations. This problem would cause timed
+	  operations to remain in memory even after the sequence was
+	  destroyed. The result was crashes when unloading maps using
+	  these kinds of sequences. Fixed it by using the unique sequence_id
+	  that is already assigned to engine sequences and attaching
+	  that id to every timed operation in the engine sequence manager.
+	  When the sequence wrapper is destroyed it will then remove
+	  the timed operations.
 9-Jul-2006
         - res disabled RTLD_GLOBAL for unix plugin loading again, since it has
           undesireable side effects; for one, static libraries are suddenly

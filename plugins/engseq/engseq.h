@@ -338,19 +338,22 @@ class csTimedOperation
 private:
   int ref;
   csRef<iBase> params;
+  uint sequence_id;
 
 public:
   csRef<iSequenceTimedOperation> op;
   csTicks start, end;
 
 public:
-  csTimedOperation (iSequenceTimedOperation* iop, iBase* iparams) : ref (1)
+  csTimedOperation (iSequenceTimedOperation* iop, iBase* iparams,
+      uint sequence_id) : ref (1), sequence_id (sequence_id)
   {
     op = iop;
     params = iparams;
   }
   virtual ~csTimedOperation () { }
   iBase* GetParams () { return params; }
+  uint GetSequenceID () const { return sequence_id; }
 
   void IncRef () { ref++; }
   void DecRef ()
@@ -436,7 +439,8 @@ public:
   virtual bool RunSequenceByName (const char *name,int delay) const;
   virtual void FireTimedOperation (csTicks delta,
   	csTicks duration, iSequenceTimedOperation* op,
-	iBase* params = 0);
+	iBase* params = 0, uint sequence_id = 0);
+  virtual void DestroyTimedOperations (uint sequence_id);
 
   /**
    * Register a trigger that will be called whenever a mesh is clicked.

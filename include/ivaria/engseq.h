@@ -790,9 +790,19 @@ struct iEngineSequenceManager : public virtual iBase
    * already elapsed since the beginning of the timed operation.
    * The params block is increffed for as long as is needed so you
    * can release your reference.
+   * \param sequence_id This identifier can be used to get track of
+   *   a given sequence. You can use this id to remove all operations that
+   *   have this id. Use iSequenceManager->GetUniqueID() to fetch a suitable
+   *   id here or else use the same id as the sequence has.
    */
   virtual void FireTimedOperation (csTicks delta, csTicks duration,
-  	iSequenceTimedOperation* op, iBase* params = 0) = 0;
+  	iSequenceTimedOperation* op, iBase* params = 0,
+	uint sequence_id = 0) = 0;
+
+  /**
+   * Destroy all timed operations with a given sequence id.
+   */
+  virtual void DestroyTimedOperations (uint sequence_id) = 0;
 
   //-----------------------------------------------------------------------
 };
