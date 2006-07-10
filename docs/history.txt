@@ -24,6 +24,7 @@ chronological order.
 	- res converted the movierecorder plugin to new SCF.
 	- res added a helper for "uberscreenshots", to create screenshots
 	  larger than the framebuffer resolution.
+	- res tweaked the uberscreenshot helper to facilitate customization.
 9-Jul-2006
         - res disabled RTLD_GLOBAL for unix plugin loading again, since it has
           undesireable side effects; for one, static libraries are suddenly

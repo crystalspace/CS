@@ -28,29 +28,37 @@
 
 namespace CS
 {
-  csRef<iImage> UberScreenshotMaker::ShootTile (uint tileLeft, 
-    uint tileTop, uint tileRight, uint tileBottom)
+  bool UberScreenshotMaker::DrawTile3D (uint tileLeft, uint tileTop,
+      uint tileRight, uint tileBottom)
   {
     const uint tileW = tileRight - tileLeft;
     const uint tileH = tileBottom - tileTop;
     
-    shotView->SetRectangle (0, 0, tileW, tileH);
+    shotView->SetRectangle (0, screenH - tileH, tileW, tileH);
     
     shotView->GetCamera()->SetPerspectiveCenter (
       ((int)ubershotW / 2) - (int)tileLeft, 
-      (int)tileH - (((int)ubershotH / 2) - (int)tileTop)); 
+      (int)tileH - (((int)ubershotH / 2) - (int)tileTop) + (int)(screenH - tileH)); 
     if (!g3d->BeginDraw (engine->GetBeginDrawFlags () 
       | CSDRAW_3DGRAPHICS | CSDRAW_CLEARZBUFFER))
-      return 0;
+      return false;
     
     shotView->Draw ();
 
     g3d->FinishDraw ();
     g3d->Print (0);
-  
+    return true;
+  }
+
+  csRef<iImage> UberScreenshotMaker::TakeScreenshot (uint tileLeft, 
+    uint tileTop, uint tileRight, uint tileBottom)
+  {
     csRef<iImage> shot = g2d->ScreenShot();
+
+    const uint tileW = tileRight - tileLeft;
+    const uint tileH = tileBottom - tileTop;
     if ((tileW < screenW) || (tileH < screenH))
-      shot = csImageManipulate::Crop (shot, 0, screenH - tileH, tileW, tileH);
+      shot = csImageManipulate::Crop (shot, 0, 0, tileW, tileH);
     return shot;
   }
   
