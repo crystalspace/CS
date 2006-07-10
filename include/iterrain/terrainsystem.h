@@ -29,6 +29,7 @@ struct iRenderView;
 struct iTerrainCell;
 struct iMaterialWrapper;
 struct iMovable;
+struct iCollider;
 
 class csVector2;
 class csVector3;
@@ -53,6 +54,9 @@ struct iTerrainSystem : public virtual iBase
                        const unsigned int* indices, float radius,
                        const csReversibleTransform* trans,
                        bool oneHit, iTerrainCollisionPairArray& pairs) = 0;
+  virtual bool Collide (iCollider* collider, float radius,
+                       const csReversibleTransform* trans, bool oneHit,
+                       iTerrainCollisionPairArray& pairs) = 0;
 
   virtual float GetVirtualViewDistance () const = 0;
   virtual void SetVirtualViewDistance (float distance) = 0;

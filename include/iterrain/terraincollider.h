@@ -26,6 +26,7 @@
 
 struct iTerrainCellCollisionProperties;
 struct iTerrainCell;
+struct iCollider;
 
 class csRect;
 class csVector3;
@@ -44,6 +45,10 @@ struct iTerrainCollider : public virtual iBase
                        unsigned int tri_count,
                        const unsigned int* indices, float radius,
                        const csReversibleTransform* trans,
+                       bool oneHit, iTerrainCollisionPairArray& pairs) = 0;
+
+  virtual bool Collide (iTerrainCell* cell, iCollider* collider,
+                       float radius, const csReversibleTransform* trans,
                        bool oneHit, iTerrainCollisionPairArray& pairs) = 0;
 
   virtual void OnHeightUpdate (iTerrainCell* cell, const csRect& rectangle,

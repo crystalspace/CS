@@ -184,6 +184,38 @@ bool csTerrainSystem::CollideTriangles (const csVector3* vertices,
   return size != pairs.GetSize ();
 }
 
+bool csTerrainSystem::Collide (iCollider* collider,
+                       float radius, const csReversibleTransform* trans,
+                       bool oneHit, iTerrainCollisionPairArray& pairs)
+{
+  if (!this->collider) return false;
+
+  size_t size = pairs.GetSize ();
+
+  csSphere sphere (csVector3 (0, 0, 0), radius);
+  
+  sphere = trans->Other2This (sphere);
+  
+  for (size_t i = 0; i < cells.GetSize (); ++i)
+  {
+    csBox3 box = cells[i]->GetBBox ();
+
+    if (csIntersect3::BoxSphere (box, sphere.GetCenter (), sphere.GetRadius ()))
+    {
+      if (cells[i]->GetLoadState () != csTerrainCell::Loaded)
+      {
+        cells[i]->Load ();
+      }
+
+      if (cells[i]->Collide (collider, radius, trans, oneHit, pairs) &&
+        oneHit)
+        return true;
+    }
+  }
+
+  return size != pairs.GetSize ();
+}
+
 float csTerrainSystem::GetVirtualViewDistance () const
 {
   return vview_distance;

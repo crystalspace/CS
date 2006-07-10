@@ -288,6 +288,17 @@ bool csTerrainCell::CollideTriangles (const csVector3* vertices,
                                      radius, trans, oneHit, pairs);
 }
 
+bool csTerrainCell::Collide (iCollider* collider, float radius,
+                       const csReversibleTransform* trans, bool oneHit,
+                       iTerrainCollisionPairArray& pairs)
+{
+  if (!this->collider || !collision_properties->GetCollideable ())
+    return false;
+
+  return this->collider->Collide (this, collider, radius, trans, oneHit,
+    pairs);
+}
+
 static inline float Lerp (const float x, const float y, const float t)
 {
   return x + (y - x) * t;

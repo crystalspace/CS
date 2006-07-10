@@ -30,6 +30,8 @@ struct iTerrainCellRenderProperties;
 struct iTerrainCellCollisionProperties;
 struct iImage;
 
+struct iCollider;
+
 class csVector2;
 class csVector3;
 class csRect;
@@ -89,6 +91,10 @@ struct iTerrainCell : public virtual iBase
                        const unsigned int* indices, float radius,
                        const csReversibleTransform* trans,
                        bool oneHit, iTerrainCollisionPairArray& pairs) = 0;
+
+  virtual bool Collide (iCollider* collider, float radius,
+                       const csReversibleTransform* trans, bool oneHit,
+                       iTerrainCollisionPairArray& pairs) = 0;
 
   virtual float GetHeight (int x, int y) const = 0;
   virtual float GetHeight (const csVector2& pos) const = 0;

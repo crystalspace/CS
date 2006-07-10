@@ -9,11 +9,6 @@
         <description>Simple terrain renderer</description>
       </class>
       <class>
-        <name>crystalspace.mesh.object.terrainimproved.simplecollider</name>
-        <implementation>csTerrainSimpleCollider</implementation>
-        <description>Simple terrain collider</description>
-      </class>
-      <class>
         <name>crystalspace.mesh.object.terrainimproved.simpledatafeeder</name>
         <implementation>csTerrainSimpleDataFeeder</implementation>
         <description>Terrain simple data feeder</description>

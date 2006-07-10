@@ -137,6 +137,10 @@ public:
                        const csReversibleTransform* trans,
                        bool oneHit, iTerrainCollisionPairArray& pairs);
 
+  virtual bool Collide (iCollider* collider, float radius,
+                       const csReversibleTransform* trans, bool oneHit,
+                       iTerrainCollisionPairArray& pairs);
+
   virtual float GetHeight (int x, int y) const;
   virtual float GetHeight (const csVector2& pos) const;
   

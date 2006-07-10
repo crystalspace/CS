@@ -105,6 +105,10 @@ public:
                        const csReversibleTransform* trans,
                        bool oneHit, iTerrainCollisionPairArray& pairs);
 
+  virtual bool Collide (iCollider* collider, float radius,
+                       const csReversibleTransform* trans,
+                       bool oneHit, iTerrainCollisionPairArray& pairs);
+
   virtual float GetVirtualViewDistance () const;
   virtual void SetVirtualViewDistance (float distance);
 

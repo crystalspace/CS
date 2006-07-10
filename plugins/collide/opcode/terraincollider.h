@@ -26,35 +26,41 @@
 
 #include "iutil/comp.h"
 
-CS_PLUGIN_NAMESPACE_BEGIN(ImprovedTerrain)
+#include "Opcode.h"
+
+CS_PLUGIN_NAMESPACE_BEGIN(csOpcode)
 {
 
-class csTerrainSimpleCellCollisionProperties :
-  public scfImplementation1<csTerrainSimpleCellCollisionProperties,
+class csTerrainCellCollisionProperties :
+  public scfImplementation1<csTerrainCellCollisionProperties,
                             iTerrainCellCollisionProperties>
 {
 private:
   bool collideable;
 
 public:
-  csTerrainSimpleCellCollisionProperties (iBase* parent);
+  csTerrainCellCollisionProperties (iBase* parent);
 
-  virtual ~csTerrainSimpleCellCollisionProperties ();
+  virtual ~csTerrainCellCollisionProperties ();
 
   virtual bool GetCollideable () const;
   virtual void SetCollideable (bool value);
 };
 
-class csTerrainSimpleCollider :
-  public scfImplementation2<csTerrainSimpleCollider,
+class csTerrainCollider :
+  public scfImplementation2<csTerrainCollider,
                             iTerrainCollider,
                             iComponent>
 {
   iObjectRegistry* object_reg;
-public:
-  csTerrainSimpleCollider (iBase* parent);
+  
+  Opcode::AABBTreeCollider TreeCollider;
+  Opcode::BVTCache ColCache;
 
-  virtual ~csTerrainSimpleCollider ();
+public:
+  csTerrainCollider (iBase* parent);
+
+  virtual ~csTerrainCollider ();
 
   // ------------ iTerrainCollider implementation ------------
 
@@ -69,6 +75,10 @@ public:
                        const csReversibleTransform* trans,
                        bool oneHit, iTerrainCollisionPairArray& pairs);
 
+  virtual bool Collide (iTerrainCell* cell, iCollider* collider,
+                       float radius, const csReversibleTransform* trans,
+                       bool oneHit, iTerrainCollisionPairArray& pairs);
+
   virtual void OnHeightUpdate (iTerrainCell* cell, const csRect& rectangle,
                                const float* data, unsigned int pitch);
 
@@ -77,6 +87,6 @@ public:
 };
 
 }
-CS_PLUGIN_NAMESPACE_END(ImprovedTerrain)
+CS_PLUGIN_NAMESPACE_END(csOpcode)
 
 #endif // __CS_TERRAIN_SIMPLECOLLIDER_H__

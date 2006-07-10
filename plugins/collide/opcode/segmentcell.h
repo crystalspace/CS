@@ -16,7 +16,7 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-CS_PLUGIN_NAMESPACE_BEGIN(ImprovedTerrain)
+CS_PLUGIN_NAMESPACE_BEGIN(csOpcode)
 {
 
 class csTerrainSegmentCellCollider
@@ -243,4 +243,4 @@ public:
 };
 
 }
-CS_PLUGIN_NAMESPACE_END(ImprovedTerrain)
+CS_PLUGIN_NAMESPACE_END(csOpcode)
