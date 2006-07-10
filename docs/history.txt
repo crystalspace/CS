@@ -16,6 +16,8 @@ chronological order.
 	  that id to every timed operation in the engine sequence manager.
 	  When the sequence wrapper is destroyed it will then remove
 	  the timed operations.
+	- res moved the "numbered filename" logic out of bugplug/movierecorder
+	  into its own class, CS::NumberedFilenameHelper.
 9-Jul-2006
         - res disabled RTLD_GLOBAL for unix plugin loading again, since it has
           undesireable side effects; for one, static libraries are suddenly

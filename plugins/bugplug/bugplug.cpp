@@ -150,8 +150,6 @@ csBugPlug::csBugPlug (iBase *iParent)
   debug_view.object = 0;
   debug_view.drag_point = -1;
 
-  captureFormat = 0;
-
   do_shadow_debug = false;
   delay_command = DEBUGCMD_UNKNOWN;
 }
@@ -175,7 +173,6 @@ csBugPlug::~csBugPlug ()
       q->RemoveListener (scfiEventHandler);
     scfiEventHandler->DecRef ();
   }
-  delete[] captureFormat;
 
   delete shadow;
 }
@@ -271,74 +268,10 @@ void csBugPlug::SetupPlugin ()
   ReadKeyBindings (config->GetStr ("Bugplug.Keybindings", 
     "/config/bugplug.key"));
 
-  captureFormat = csStrNew (config->GetStr ("Bugplug.Capture.FilenameFormat",
+  captureFormat.SetMask (config->GetStr ("Bugplug.Capture.FilenameFormat",
     "/this/cryst000.png"));
-  // since this string is passed to format later,
-  // replace all '%' with '%%'
-  {
-    char* newstr = new char[strlen(captureFormat)*2 + 1];
-    memset (newstr, 0, strlen(captureFormat)*2 + 1);
-
-    char* pos = captureFormat;
-    while (pos)
-    {
-      char* percent = strchr (pos, '%');
-      if (percent)
-      {
-	strncat (newstr, pos, percent-pos);
-	strcat (newstr, "%%");
-	pos = percent + 1;
-      }
-      else
-      {
-	strcat (newstr, pos);
-	pos = 0;
-      }
-    }
-    delete[] captureFormat;
-    captureFormat = newstr;
-  }
-  // scan for the rightmost string of digits
-  // and create an appropriate format string
-  {
-    captureFormatNumberMax = 1;
-    uint captureFormatNumberDigits = 0;
-
-    char* end = strrchr (captureFormat, 0);
-    if (end != captureFormat)
-    {
-      do
-      {
-	end--;
-      }
-      while ((end >= captureFormat) && (!isdigit (*end)));
-      if (end >= captureFormat)
-      {
-	do
-	{
-	  captureFormatNumberMax *= 10;
-	  captureFormatNumberDigits++; 
-	  end--;
-	}
-	while ((end >= captureFormat) && (isdigit (*end)));
-	
-	csString nameForm;
-	nameForm.Format ("%%0%uu", captureFormatNumberDigits);
-
-        csString newCapForm;
-        newCapForm.Append (captureFormat, end-captureFormat+1);
-        newCapForm.Append (nameForm);
-        newCapForm.Append (end+captureFormatNumberDigits+1);
-
-	delete[] captureFormat;
-	captureFormat = csStrNew (newCapForm);
-      }
-    }
-  }
-
   captureMIME = config->GetStr ("Bugplug.Capture.Image.MIME",
     "image/png");
-
   captureOptions = config->GetStr ("Bugplug.Capture.Image.Options");
 
   initialized = true;
@@ -1273,23 +1206,7 @@ bool csBugPlug::ExecCommand (int cmd, const csString& args)
 
 void csBugPlug::CaptureScreen ()
 {
-  uint i = 0;
-  csString name;
-
-  bool exists = false;
-  do
-  {
-    name.Format (captureFormat, i);
-    if (exists = VFS->Exists (name)) i++;
-  }
-  while ((i < captureFormatNumberMax) && (exists));
-
-  if (i >= captureFormatNumberMax)
-  {
-    Report (CS_REPORTER_SEVERITY_NOTIFY,
-    	"Too many screenshot files in current directory");
-    return;
-  }
+  csString name = captureFormat.FindNextFilename (VFS);
 
   csRef<iImage> img (csPtr<iImage> (G2D->ScreenShot ()));
   if (!img)

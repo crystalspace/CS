@@ -31,6 +31,7 @@
 #include "csutil/cfgacc.h"
 #include "csutil/util.h"
 #include "csutil/eventnames.h"
+#include "cstool/numberedfilenamehelper.h"
 #include "nuppelwriter.h"
 
 struct iObjectRegistry;
@@ -78,9 +79,8 @@ private:
   csTicks frameStartTime, totalFrameTime, minFrameTime, maxFrameTime;
 
   /// format of the movie filename (e.g. "/this/cryst%03d.nuv")
-  char* captureFormat;
-  int captureFormatNumberMax;
-  char movieFileName[CS_MAXPATHLEN];
+  CS::NumberedFilenameHelper captureFormat;
+  csString movieFileName;
 
   /// Capture settings
   float frameRate, rtjQuality;

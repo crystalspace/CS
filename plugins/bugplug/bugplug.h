@@ -26,6 +26,7 @@
 #include "csutil/util.h"
 #include "csutil/weakref.h"
 #include "csutil/weakrefarr.h"
+#include "cstool/numberedfilenamehelper.h"
 #include "iutil/comp.h"
 #include "iutil/csinput.h"
 #include "iutil/eventh.h"
@@ -302,9 +303,8 @@ private:
   const char* captureMIME;
   /// image saver options for the screenshot file
   const char* captureOptions;
-  /// format of the screenshot filename (e.g. "/tmp/cryst%03d.png")
-  char* captureFormat;
-  uint captureFormatNumberMax;
+  /// Helper for screenshot filename (e.g. "/tmp/cryst%03d.png")
+  CS::NumberedFilenameHelper captureFormat;
   /**
    * Make a screenshot.
    */

@@ -190,71 +190,8 @@ void csMovieRecorder::SetupPlugin()
   GetKeyCode(config->GetStr("MovieRecorder.Keys.Record", "alt-r"), keyRecord);
   GetKeyCode(config->GetStr("MovieRecorder.Keys.Pause", "alt-p"), keyPause);
 
-  // Filename formatting code ripped from Bugplug's screenshotter
-  captureFormat = csStrNew (config->GetStr ("MovieRecorder.Capture.FilenameFormat",
+  captureFormat.SetMask (config->GetStr ("MovieRecorder.Capture.FilenameFormat",
     "/tmp/crystal000.nuv"));
-  // since this string is passed to format later,
-  // replace all '%' with '%%'
-  {
-    char* newstr = new char[strlen(captureFormat)*2 + 1];
-    memset (newstr, 0, strlen(captureFormat)*2 + 1);
-
-    char* pos = captureFormat;
-    while (pos)
-    {
-      char* percent = strchr (pos, '%');
-      if (percent)
-      {
-	strncat (newstr, pos, percent-pos);
-	strcat (newstr, "%%");
-	pos = percent + 1;
-      }
-      else
-      {
-	strcat (newstr, pos);
-	pos = 0;
-      }
-    }
-    delete[] captureFormat;
-    captureFormat = newstr;
-  }
-  // scan for the rightmost string of digits
-  // and create an appropriate format string
-  {
-    captureFormatNumberMax = 1;
-    int captureFormatNumberDigits = 0;
-
-    char* end = strrchr (captureFormat, 0);
-    if (end != captureFormat)
-    {
-      do
-      {
-	end--;
-      }
-      while ((end >= captureFormat) && (!isdigit (*end)));
-      if (end >= captureFormat)
-      {
-	do
-	{
-	  captureFormatNumberMax *= 10;
-	  captureFormatNumberDigits++; 
-	  end--;
-	}
-	while ((end >= captureFormat) && (isdigit (*end)));
-	
-	csString nameForm;
-	nameForm.Format ("%%0%dd", captureFormatNumberDigits);
-
-        csString newCapForm;
-        newCapForm.Append (captureFormat, end-captureFormat+1);
-        newCapForm.Append (nameForm);
-        newCapForm.Append (end+captureFormatNumberDigits+1);
-
-	delete[] captureFormat;
-	captureFormat = csStrNew (newCapForm);
-      }
-    }
-  }
 
   initialized = true;
 }
@@ -373,22 +310,7 @@ void csMovieRecorder::Start(void)
   if (IsRecording())
     Stop();
 
-  // Filename forming code, ripped from Bugplug's screenshotter
-  int i = 0;
-  bool exists = false;
-  do
-  {
-    cs_snprintf (movieFileName, CS_MAXPATHLEN, captureFormat, i);
-    if (exists = VFS->Exists (movieFileName)) i++;
-  }
-  while ((i < captureFormatNumberMax) && (exists));
-
-  if (i >= captureFormatNumberMax)
-  {
-    Report (CS_REPORTER_SEVERITY_NOTIFY,
-    	"Too many video recording files in current directory");
-    return;
-  }
+  movieFileName = captureFormat.FindNextFilename (VFS);
 
   // If the config specified 0x0, that means we use the current resolution unscaled
   int w = recordWidth  ? recordWidth  : G2D->GetWidth();
@@ -403,7 +325,7 @@ void csMovieRecorder::Start(void)
   if (!movieFile)
   {
     Report (CS_REPORTER_SEVERITY_WARNING,
-    	"Couldn't open file '%s' for recording", movieFileName);
+    	"Couldn't open file '%s' for recording", movieFileName.GetData());
     return;
   }
   fakeTicksPerFrame = (1000 / frameRate);
@@ -414,7 +336,8 @@ void csMovieRecorder::Start(void)
   writer = new NuppelWriter(w, h, &WriterCallback, this, frameRate,
 			    rtjQuality, useRTJpeg, useLZO, useRGB);
 
-  Report (CS_REPORTER_SEVERITY_NOTIFY, "Video recorder started - %s", movieFileName);
+  Report (CS_REPORTER_SEVERITY_NOTIFY, "Video recorder started - %s", 
+    movieFileName.GetData());
 }
 
 void csMovieRecorder::Stop(void)
@@ -423,7 +346,8 @@ void csMovieRecorder::Stop(void)
     delete writer;
     writer = 0;
     movieFile = 0;
-    Report (CS_REPORTER_SEVERITY_NOTIFY, "Video recorder stopped - %s", movieFileName);
+    Report (CS_REPORTER_SEVERITY_NOTIFY, "Video recorder stopped - %s", 
+      movieFileName.GetData());
 
     if (numFrames != 0)
     {
@@ -441,7 +365,7 @@ void csMovieRecorder::Stop(void)
 	"\n"
 	" Frame time in relation to real time: x%.4f\n"
 	" Theoretical video FPS recordable in real-time: %.2f\n",
-	movieFileName, 
+	movieFileName.GetData(), 
 	numFrames,
 	((float)totalFrameEncodeTime / 1000.0f),
 	  minFrameEncodeTime, avgFrameEncodeTime, maxFrameEncodeTime,
@@ -467,7 +391,8 @@ void csMovieRecorder::Pause(void)
   if (!IsRecording())
     return;
   paused = true;
-  Report (CS_REPORTER_SEVERITY_NOTIFY, "Video recorder paused - %s", movieFileName);
+  Report (CS_REPORTER_SEVERITY_NOTIFY, "Video recorder paused - %s", 
+    movieFileName.GetData());
 }
 
 void csMovieRecorder::UnPause(void)
@@ -476,7 +401,8 @@ void csMovieRecorder::UnPause(void)
     return;
   paused = false;
   ffakeClockTicks = fakeClockTicks;
-  Report (CS_REPORTER_SEVERITY_NOTIFY, "Video recorder unpaused - %s", movieFileName);
+  Report (CS_REPORTER_SEVERITY_NOTIFY, "Video recorder unpaused - %s", 
+    movieFileName.GetData());
 }
 
 void csMovieRecorder::WriterCallback(const void *data, long bytes, void *extra)
