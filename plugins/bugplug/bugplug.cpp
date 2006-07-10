@@ -30,6 +30,7 @@
 #include "csgeom/vector3.h"
 #include "cstool/collider.h"
 #include "cstool/csview.h"
+#include "cstool/uberscreenshot.h"
 #include "csutil/cscolor.h"
 #include "csutil/csuctransform.h"
 #include "csutil/debug.h"
@@ -1198,6 +1199,17 @@ bool csBugPlug::ExecCommand (int cmd, const csString& args)
     case DEBUGCMD_LISTPLUGINS:
 	ListLoadedPlugins();
 	break;
+    case DEBUGCMD_UBERSCREENSHOT:
+        {
+          uint shotW, shotH;
+          if (args.IsEmpty() || (sscanf (args, "%u %u", &shotW, &shotH) != 2))
+          {
+            shotW = 2048;
+            shotH = 1536;
+	  }
+	  CaptureUberScreen (shotW, shotH);
+        }
+        break;
     default:
         return false;
   }
@@ -1206,8 +1218,6 @@ bool csBugPlug::ExecCommand (int cmd, const csString& args)
 
 void csBugPlug::CaptureScreen ()
 {
-  csString name = captureFormat.FindNextFilename (VFS);
-
   csRef<iImage> img (csPtr<iImage> (G2D->ScreenShot ()));
   if (!img)
   {
@@ -1222,18 +1232,70 @@ void csBugPlug::CaptureScreen ()
       captureOptions));
     if (db)
     {
-      Report (CS_REPORTER_SEVERITY_NOTIFY, "Screenshot: %s", name.GetData());
+      csString name = captureFormat.FindNextFilename (VFS);
       if (!VFS->WriteFile (name, (const char*)db->GetData (),
       		db->GetSize ()))
       {
         Report (CS_REPORTER_SEVERITY_NOTIFY,
-		"There was an error while writing screen shot");
+		"There was an error while writing screen shot to %s",
+		name.GetData());
       }
+      else
+        Report (CS_REPORTER_SEVERITY_NOTIFY, "Wrote screenshot %s", name.GetData());
     }
     else
     {
       Report (CS_REPORTER_SEVERITY_NOTIFY, 
 	      "Could not encode screen shot");
+    }
+  }
+}
+
+void csBugPlug::CaptureUberScreen (uint w, uint h)
+{
+  csString descr; descr.Format ("%ux%u \xC3\xBC" "berscreenshot", w, h);
+
+  if (!catcher->camera)
+  {
+    Report (CS_REPORTER_SEVERITY_NOTIFY,
+    	"Could not take %s: no camera", descr.GetData());
+    return;
+  }
+
+  csRef<iImage> img;
+  {
+    CS::UberScreenshotMaker shotMaker (w, h, catcher->camera, Engine, G3D);
+    img = shotMaker.Shoot();
+  }
+  if (!img)
+  {
+    Report (CS_REPORTER_SEVERITY_NOTIFY,
+    	"Could not take %s", descr.GetData());
+    return;
+  }
+  csRef<iImageIO> imageio (CS_QUERY_REGISTRY (object_reg, iImageIO));
+  if (imageio)
+  {
+    csRef<iDataBuffer> db (imageio->Save (img, captureMIME, 
+      captureOptions));
+    if (db)
+    {
+      csString name = captureFormat.FindNextFilename (VFS);
+      if (!VFS->WriteFile (name, (const char*)db->GetData (),
+      		db->GetSize ()))
+      {
+        Report (CS_REPORTER_SEVERITY_NOTIFY,
+		"There was an error while writing %s to %s", descr.GetData(), 
+		name.GetData());
+      }
+      else
+	Report (CS_REPORTER_SEVERITY_NOTIFY, "Wrote %s %s", descr.GetData(), 
+	  name.GetData());
+    }
+    else
+    {
+      Report (CS_REPORTER_SEVERITY_NOTIFY, 
+	      "Could not encode %s", descr.GetData());
     }
   }
 }
@@ -1987,6 +2049,7 @@ int csBugPlug::GetCommandCode (const char* cmdstr, csString& args)
   if (!strcmp (cmd, "listplugins"))	return DEBUGCMD_LISTPLUGINS;
   if (!strcmp (cmd, "profdump"))	return DEBUGCMD_PROFDUMP;
   if (!strcmp (cmd, "profreset"))	return DEBUGCMD_PROFRESET;
+  if (!strcmp (cmd, "uberscreenshot"))	return DEBUGCMD_UBERSCREENSHOT;
 
   return DEBUGCMD_UNKNOWN;
 }
