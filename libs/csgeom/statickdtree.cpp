@@ -22,11 +22,164 @@
 uint32 csStaticKDTree::globalTimestamp = 0;
 csArray<csStaticKDTreeObject*> csStaticKDTree::emptyList;
 
+#define REALLY_BAD_SCORE 1000000
+
+static void debugScore (csArray<csStaticKDTreeObject*> &items,
+    float splitLocation, int axis)
+{
+  unsigned int leftCount = 0;
+  unsigned int rightCount = 0;
+  int bothCount = 0;
+
+  csArray<csStaticKDTreeObject*>::Iterator it = items.GetIterator ();
+  while (it.HasNext ())
+  {
+    csStaticKDTreeObject *obj = it.Next ();
+    const csBox3& box = obj->GetBBox ();
+
+    float min = box.Min (axis), max = box.Max (axis);
+    if (max <= splitLocation)
+      leftCount++;
+    else if (min > splitLocation)
+      rightCount++;
+    else
+      bothCount++;
+  }
+
+  leftCount += bothCount;
+  rightCount += bothCount;
+
+  printf ("analysis of split %f on %d\n", splitLocation, axis);
+  printf ("  total: %d | l/r: %d/%d | both:  %d | preliminary score: %d\n",
+      items.Length (), leftCount, rightCount, bothCount,
+      abs (leftCount - rightCount) + bothCount);
+  if (leftCount == items.Length () || rightCount == items.Length ())
+    printf("  BAD SPLIT.\n");
+  else
+    printf("  Good split.\n");
+}
+
+// Evaluate a choice of splitting plane.
+static int findScore (csArray<csStaticKDTreeObject*> &items,
+    float splitLocation, int axis)
+{
+  unsigned int leftCount = 0;
+  unsigned int rightCount = 0;
+  int bothCount = 0;
+
+  csArray<csStaticKDTreeObject*>::Iterator it = items.GetIterator ();
+  while (it.HasNext ())
+  {
+    csStaticKDTreeObject *obj = it.Next ();
+    const csBox3& box = obj->GetBBox ();
+
+    float min = box.Min (axis), max = box.Max (axis);
+    if (max <= splitLocation)
+      leftCount++;
+    else if (min > splitLocation)
+      rightCount++;
+    else
+      bothCount++;
+  }
+
+  leftCount += bothCount;
+  rightCount += bothCount;
+
+  if (leftCount == items.Length () || rightCount == items.Length ())
+    return REALLY_BAD_SCORE;
+  else
+    return abs (leftCount - rightCount) + bothCount;
+}
+
+// Tries to find a split location that works.  If nothing good is found, return
+// false.
+static bool findBestSplit (csArray<csStaticKDTreeObject*> &items,
+    float& bestSplitLocation, int& bestAxis)
+{
+  // Pick an axis with the longest distance between the minimum coordinate and
+  // maximum coordinate.  Assuming on average all objects have a similar
+  // variance, this picks the axis that has the most space for good split
+  // locations.
+
+  csArray<csStaticKDTreeObject*>::Iterator it = items.GetIterator ();
+  float xmin = 0, ymin = 0, zmin = 0;
+  float xmax = 0, ymax = 0, zmax = 0;
+  while (it.HasNext ()) 
+  {
+    csStaticKDTreeObject* obj = it.Next ();
+    const csBox3& box = obj->GetBBox ();
+    xmin = fmin (box.MinX (), xmin);
+    ymin = fmin (box.MinY (), ymin);
+    zmin = fmin (box.MinZ (), zmin);
+    xmax = fmin (box.MaxX (), xmax);
+    ymax = fmin (box.MaxY (), ymax);
+    zmax = fmin (box.MaxZ (), zmax);
+  }
+
+  float xdist = xmax - xmin;
+  float ydist = ymax - ymin;
+  float zdist = zmax - zmin;
+  float maxdist = fmax (xdist, fmax (ydist, zdist));
+
+  if (xdist == maxdist) {
+    bestAxis = CS_XAXIS;
+  } else if (ydist == maxdist) {
+    bestAxis = CS_YAXIS;
+  } else {
+    bestAxis = CS_ZAXIS;
+  }
+
+  // Look at min and max of every box.
+  int bestScore = REALLY_BAD_SCORE;
+  it = items.GetIterator ();
+  while (it.HasNext ()) 
+  {
+    csStaticKDTreeObject *obj = it.Next ();
+    const csBox3& box = obj->GetBBox ();
+    float min = box.Min(bestAxis), max = box.Max(bestAxis);
+
+    int score;
+    
+    score = findScore (items, min, bestAxis);  // min
+    if (score < bestScore) 
+    {
+      bestSplitLocation = min;
+      bestScore = score;
+    }
+
+    score = findScore (items, max, bestAxis);  // max
+    if (score < bestScore) 
+    {
+      bestSplitLocation = max;
+      bestScore = score;
+    }
+  }
+
+  if (bestScore == REALLY_BAD_SCORE)
+  {
+    printf("\nWARNING:  Bad score.\n");
+    debugScore (items, bestSplitLocation, bestAxis);
+    return false;
+  }
+  else
+    return true;
+}
+
+
 csStaticKDTree::csStaticKDTree (csArray<csStaticKDTreeObject*> &items)
 {
   nodeData = NULL;
-  // Base case:  if there are less than a certain threshold, stop recursing.
-  if (items.Length () < 10) {
+
+  // Determine if we need to keep recursing.
+  bool recurse = false;
+  if (items.Length () >= 10)
+    recurse = findBestSplit (items, splitLocation, axis);
+  else
+    recurse = false;
+
+  // Base case:  all items will go into leaf node.
+  if (!recurse)
+  {
     nodeBBox.StartBoundingBox();
     objects = new csArray<csStaticKDTreeObject*>(items);
     csArray<csStaticKDTreeObject*>::Iterator it = items.GetIterator ();
@@ -38,54 +191,35 @@ csStaticKDTree::csStaticKDTree (csArray<csStaticKDTreeObject*> &items)
     }
     child1 = child2 = NULL;
   }
-  // Otherwise find the axis with the longest min-max distance and use the 
-  // midpoint as a splitting axis.
+  // Otherwise find a split location and axis, classify objects according to
+  // them, and recurse.
   else {
+    findBestSplit (items, splitLocation, axis);
+
     csArray<csStaticKDTreeObject*>::Iterator it = items.GetIterator ();
-    float xmin = 0, ymin = 0, zmin = 0;
-    float xmax = 0, ymax = 0, zmax = 0;
-    while (it.HasNext ()) {
-      csStaticKDTreeObject & obj = *it.Next ();
-      xmin = fmin (obj.box.MinX (), xmin);
-      ymin = fmin (obj.box.MinY (), ymin);
-      zmin = fmin (obj.box.MinZ (), zmin);
-      xmax = fmin (obj.box.MaxX (), xmax);
-      ymax = fmin (obj.box.MaxY (), ymax);
-      zmax = fmin (obj.box.MaxZ (), zmax);
-    }
-
-    float xdist = xmax - xmin;
-    float ydist = ymax - ymin;
-    float zdist = zmax - zmin;
-    float maxdist = fmax (xdist, fmax (ydist, zdist));
-
-    if (xdist == maxdist) {
-      splitLocation = (xmax + xmin) / 2;
-      axis = CS_XAXIS;
-    } else if (ydist == maxdist) {
-      splitLocation = (ymax + ymin) / 2;
-      axis = CS_YAXIS;
-    } else {
-      splitLocation = (zmax + zmin) / 2;
-      axis = CS_ZAXIS;
-    }
-
-    it = items.GetIterator ();
-    csArray < csStaticKDTreeObject * >left;
-    csArray < csStaticKDTreeObject * >right;
+    csArray<csStaticKDTreeObject*> left;
+    csArray<csStaticKDTreeObject*> right;
 
     while (it.HasNext ()) {
       csStaticKDTreeObject *obj = it.Next ();
 
       float min = getMin (axis, obj->box), max = getMax (axis, obj->box);
-      if (splitLocation < min)
+      if (max <= splitLocation)
         left.Push (obj);
-      else if (splitLocation > max)
+      else if (min > splitLocation)
         right.Push (obj);
       else {
         left.Push (obj);
         right.Push (obj);
       }
+    }
+
+    // Ensure we aren't infinitely recursing.
+    if (left.Length () == items.Length () ||
+        right.Length () == items.Length ())
+    {
+      debugScore (items, splitLocation, axis);
+      CS_ASSERT (false);
     }
 
     objects = NULL;

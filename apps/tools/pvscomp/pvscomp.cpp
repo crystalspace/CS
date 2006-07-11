@@ -24,6 +24,38 @@
 
 CS_IMPLEMENT_APPLICATION
 
+static void PrintTree(csStaticKDTree* node)
+{
+  if (node->IsLeafNode())
+  {
+    csArray<csStaticKDTreeObject*>& objects = node->GetObjects();
+    int num = node->GetObjectCount();
+    printf("LEAF NODE\n");
+    for (int i = 0; i < num; i++) {
+//      csPVSVisObjectWrapper *obj = (csPVSVisObjectWrapper*) 
+//        objects[i]->GetObject ();
+//      printf("  Node name: %s\n", 
+//          obj->visobj->GetMeshWrapper()->QueryObject()->GetName ());
+      const csBox3& box = objects[i]->GetBBox();
+      printf("  Bounding box: (%f,%f,%f)-(%f,%f,%f)\n",
+        box.MinX(), box.MinY(), box.MinZ(), 
+        box.MaxX(), box.MaxY(), box.MaxZ());
+    }
+  }
+  else
+  {
+    printf("INTERIOR NODE:  axis %d, split location %f\n",
+        node->GetAxis(), node->GetSplitLocation());
+    const csBox3& box = node->GetNodeBBox();
+    printf("  Bounding box: (%f,%f,%f)-(%f,%f,%f)\n",
+        box.MinX(), box.MinY(), box.MinZ(), 
+        box.MaxX(), box.MaxY(), box.MaxZ());
+    PrintTree(node->GetChild1());
+    PrintTree(node->GetChild2());
+    printf("NODE DONE\n");
+  }
+}
+
 static csStaticKDTree* MakeTestPVSTree () 
 {
   // Here are the objects in pvstest
@@ -73,6 +105,11 @@ static void CreateDummyNodeData (csStaticKDTree *node)
   }
 }
 
+static csStaticKDTreeObject* MakeKDObject (iMeshWrapper* obj)
+{
+  return new csStaticKDTreeObject (obj->GetWorldBoundingBox (), NULL);
+}
+
 class Compiler
 {
   csRef<iEngine> engine;
@@ -80,14 +117,36 @@ class Compiler
   iMeshList* meshlist;
   csStaticKDTree* pvstree;
 
+  void MakeTree ();
+
 public:
   Compiler ();
   ~Compiler ();
   bool Initialize (int argc, char** argv);
-  bool LoadWorld (const char* c);
+  bool LoadWorld (const char* path, const char* c);
+  void DoWork ();
   void PrintObjects ();
   void Save (const char* name);
 };
+
+void Compiler::MakeTree ()
+{
+  delete pvstree;
+
+  csArray<csStaticKDTreeObject*> toinsert;
+  CS_ASSERT(meshlist);
+  int count = meshlist->GetCount ();
+  for (int i = 0; i < count; i++)
+  {
+    iMeshWrapper* wrapper = meshlist->Get (i);
+    toinsert.Push (MakeKDObject (wrapper));
+  }
+
+  printf("Creating PVS tree...");
+  fflush(stdout);
+  pvstree = new csStaticKDTree (toinsert);
+  printf("OK.\n");
+}
 
 Compiler::Compiler () : engine(NULL), reg(NULL), meshlist(NULL), pvstree(NULL)
 {
@@ -124,16 +183,19 @@ bool Compiler::Initialize (int argc, char** argv)
   return true;
 }
 
-bool Compiler::LoadWorld (const char* c)
+bool Compiler::LoadWorld (const char* path, const char* c)
 {
-  csStaticKDTree* tree = MakeTestPVSTree ();
-  CreateDummyNodeData (tree);
+  csRef<iVFS> vfs = csQueryRegistry<iVFS> (reg);
+  vfs->ChDir(path);
+
   csRef<iLoader> loader = csQueryRegistry<iLoader> (reg);
   if (loader.IsValid ())
   {
     bool ret = loader->LoadMapFile (c);
     engine->PrepareMeshes ();
     meshlist = engine->GetMeshes ();
+
+    printf("%s loaded.  %d objects.\n", c, meshlist->GetCount ());
     return ret;
   }
   else
@@ -141,6 +203,12 @@ bool Compiler::LoadWorld (const char* c)
     printf("Warning:  loader plugin not loaded.\n");
     return false;
   }
+}
+
+void Compiler::DoWork ()
+{
+  MakeTree ();
+  PrintTree (pvstree);
 }
 
 void Compiler::PrintObjects ()
@@ -155,7 +223,7 @@ void Compiler::PrintObjects ()
 
 void Compiler::Save (const char* name)
 {
-  csSavePVSDataFile (reg, "/this/test.pvs", pvstree);
+  csSavePVSDataFile (reg, name, pvstree);
 }
 
 int main (int argc, char** argv)
@@ -166,14 +234,15 @@ int main (int argc, char** argv)
     printf("Couldn't initialize CS.\n");
     exit (1);
   }
-  if (!pvscomp.LoadWorld ("/lev/pvstest/world"))
+  if (!pvscomp.LoadWorld ("/lev/pvstest", "/lev/pvstest/world"))
   {
     printf("Couldn't load world file.\n");
     exit (1);
   }
 
-  pvscomp.PrintObjects ();
-//  pvscomp.Save ("/this/test.pvs");
+//  pvscomp.PrintObjects ();
+  pvscomp.DoWork ();
+  pvscomp.Save ("/this/test.pvs");
 
   return 0;
 }
