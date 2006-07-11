@@ -6,6 +6,8 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+11-Jul-2006
+	- res fixed a crash in bugplug related to empty commands.
 10-Jul-2006
 	- Jorrit fixed a fundamental problem with the engine sequence
 	  manager and timed operations. This problem would cause timed

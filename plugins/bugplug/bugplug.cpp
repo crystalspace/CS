@@ -1962,6 +1962,8 @@ int csBugPlug::GetKeyCode (const char* keystring, bool& shift, bool& alt,
 
 int csBugPlug::GetCommandCode (const char* cmdstr, csString& args)
 {
+  if ((cmdstr == 0) || (*cmdstr == 0)) return DEBUGCMD_UNKNOWN;
+
   csString cmd;
   char const* spc = strchr (cmdstr, ' ');
   if (spc)
