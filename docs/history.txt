@@ -8,6 +8,9 @@ chronological order.
 
 11-Jul-2006
 	- res fixed a crash in bugplug related to empty commands.
+	- res augmented csPathLists to have a non-const operator[].
+	- res fixed a crash bug in csPathsList when dealing with empty
+	  paths.
 10-Jul-2006
 	- Jorrit fixed a fundamental problem with the engine sequence
 	  manager and timed operations. This problem would cause timed
