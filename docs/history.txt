@@ -6,6 +6,14 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+12-Jul.2006
+        - res added a check for the -Bsymbolic linker option to configure.
+          This binds "references to global symbols to the definition within 
+          the shared library" (from man ld). If this flag is not set, it can 
+          happen that symbols in plugins get bound against symbols from other 
+          modules (including the application executable itself), causing 
+          side-effects such as violating the "memory allocation and freeing in
+          the same module" rule.
 11-Jul-2006
 	- res fixed a crash in bugplug related to empty commands.
 	- res augmented csPathLists to have a non-const operator[].

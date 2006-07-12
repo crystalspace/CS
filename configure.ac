@@ -563,6 +563,20 @@ CS_EMIT_BUILD_FLAGS([how to export all dynamic symbols],
 
 
 #------------------------------------------------------------------------------
+# Check whether the linker needs -Bsymbolic. This binds "references to global 
+# symbols to the definition within the shared library" (from man ld). If this
+# flag is not set, it can happen that symbols in plugins get bound against
+# symbols from other modules (including the application executable itself),
+# causing side-effects such as violating the "memory allocation and freeing in
+# the same module" rule.
+#------------------------------------------------------------------------------
+CS_EMIT_BUILD_FLAGS([for -Bsymbolic linker flag],
+    [cs_cv_prog_link_Bsymbolic], [CS_CREATE_TUPLE([-Wl,-Bsymbolic])],
+    [C++], [COMPILER.LFLAGS], [+])
+
+
+
+#------------------------------------------------------------------------------
 # Check if linker recognizes --kill-at which is needed to make csjava.dll
 # usable by JNI on Windows.  Without this, JNI is unable to find the exported
 # JNI glue functions in csjava.dll.
