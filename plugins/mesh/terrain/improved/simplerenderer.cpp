@@ -186,12 +186,12 @@ const csRect& rectangle, const float* data, unsigned int pitch)
     grid_width * grid_height, CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 2);
 
     rdata->ib = csRenderBuffer::CreateIndexRenderBuffer (
-    rdata->primitive_count*3, CS_BUF_STATIC, CS_BUFCOMP_UNSIGNED_SHORT, 0,
+    rdata->primitive_count*3, CS_BUF_STATIC, CS_BUFCOMP_UNSIGNED_INT, 0,
     grid_width * grid_height);
 
     // fill ib
-    csRenderBufferLock<unsigned short> ilocker(rdata->ib);
-    unsigned short* iptr = ilocker;
+    csRenderBufferLock<unsigned int> ilocker(rdata->ib);
+    unsigned int* iptr = ilocker;
 
     for (int y = 0; y < grid_height - 1; ++y)
       for (int x = 0; x < grid_width - 1; ++x)

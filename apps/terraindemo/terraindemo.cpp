@@ -18,8 +18,6 @@
 
 #include "terraindemo.h"
 
-#include <gl/gl.h>
-
 #include "plugins/engine/3d/rview.h"
 #include "plugins/engine/3d/rview.cpp"
 
@@ -33,9 +31,6 @@ TerrainDemo::TerrainDemo ()
   
   rotX = -20 * 3.1415926f/180;
   rotY = 45 * 3.1415926f/180;
-
-  r_start = csVector3 (-60, -1, -60);
-  r_end = csVector3 (140, 30, 140);
 }
 
 TerrainDemo::~TerrainDemo ()
@@ -101,21 +96,10 @@ bool TerrainDemo::Setup ()
   if (!room)
     room = engine->CreateSector("terrain");
     
-  // Attach terrain
-  /*
-  csRef<iMeshObject> terrain_mesh_object = scfQueryInterface<iMeshObject>(terrain);
-  csRef<iMeshWrapper> terrain_mesh_wrapper = engine->CreateMeshWrapper("terrain");
-  terrain_mesh_wrapper->SetMeshObject(terrain_mesh_object);
-  
-  terrain_mesh_wrapper->GetMovable()->SetSector(room);
-  */
-  
   csRef<iLight> light = engine->CreateLight ("DynLight", csVector3 (23, 1, 5),
   10, csColor (1, 0, 0), CS_LIGHT_DYNAMICTYPE_DYNAMIC);
   room->GetLights ()->Add(light);
   
-  pos = csVector3(0, 4, 0);
-
   // Now we need to position the camera in our world.
   view->GetCamera ()->SetSector (room);
   view->GetCamera ()->GetTransform ().SetOrigin (pos);
@@ -131,14 +115,10 @@ bool TerrainDemo::Setup ()
   csVector3 shift (0, -1, 0);
   collider_actor.InitializeColliders (view->GetCamera (),
   	legs, body, shift);
-  collider_actor.SetGravity (1);
-  
-  terrain = scfQueryInterface<iTerrainSystem> (
-    room->GetMeshes ()->FindByName ("Terrain")->GetMeshObject ());
-  //engine->SetCurrentDefaultRenderloop(rloop);
   
   return true;
 }
+
 void TerrainDemo::ProcessFrame ()
 {
   // First get elapsed time from the virtual clock.
@@ -187,7 +167,7 @@ void TerrainDemo::ProcessFrame ()
   }
 
   collider_actor.Move (float (elapsed_time) / 1000.0f, 1.0f,
-    	obj_move, obj_rotate);
+      obj_move, obj_rotate);
   
   if (kbd->GetKeyState('1')) r_start.x--;
   if (kbd->GetKeyState('2')) r_start.x++;
@@ -199,8 +179,6 @@ void TerrainDemo::ProcessFrame ()
   if (kbd->GetKeyState('7')) r_end.z--;
   if (kbd->GetKeyState('8')) r_end.z++;
   
-  collider_actor.Move (float (elapsed_time) / 1000.0f, 1.0f,
-      	obj_move, obj_rotate);
   // We now assign a new rotation transformation to the camera.  You
   // can think of the rotation this way: starting from the zero
   // position, you first rotate "rotY" radians on your Y axis to get
@@ -226,68 +204,12 @@ void TerrainDemo::ProcessFrame ()
   else
     g3d->SetRenderState (G3DRENDERSTATE_EDGES, false);
 
-    
   // Tell the camera to render into the frame buffer.
   view->Draw ();
 }
 
 void TerrainDemo::FinishFrame ()
 {
-  // Yes, nobody answered me on #crystalspace, so...
-  glDisable(GL_BLEND);
-  glDepthMask(GL_FALSE);
-  
-  glPointSize(6);
-
-  csVector3 vertices[3] =
-  {
-    r_start,
-    r_end,
-    csVector3(0, 30, 160)
-  };
-  
-  unsigned int indices[] = {0, 1, 2};
-  
-  scfArray<iTerrainVector3Array> isect;
-  
-  terrain->CollideSegment (vertices[2], vertices[0], false, isect);
-  terrain->CollideSegment (vertices[1], vertices[2], false, isect);
-  terrain->CollideSegment (vertices[0], vertices[1], false, isect);
-  
-  scfArray<iTerrainCollisionPairArray> tsect;
-  
-  csReversibleTransform trans;
-  
-  //terrain->CollideTriangles(vertices, 1, indices, 0, &trans, false, tsect);
-  
-  glColor3f(1, 1, 1);
-  
-  glBegin(GL_LINE_LOOP);
-  glVertex3fv (&vertices[0].x);
-  glVertex3fv (&vertices[1].x);
-  glVertex3fv (&vertices[2].x);
-  glEnd();
-  
-  glColor3f(0, 0, 1);
-  
-  glBegin(GL_POINTS);
-  for (size_t i = 0; i < isect.GetSize (); ++i)
-    glVertex3fv (&isect.Get(i).x);
-  glEnd();
-  
-  glColor3f(1, 0, 0);
-
-  for (size_t i = 0; i < tsect.GetSize (); ++i)
-  {
-    glBegin(GL_LINE_LOOP);
-    glVertex3fv (&tsect.Get(i).a2.x);
-    glVertex3fv (&tsect.Get(i).b2.x);
-    glVertex3fv (&tsect.Get(i).c2.x);
-    glEnd();
-  }
-
-  glDepthMask(GL_TRUE);
-
   // Just tell the 3D renderer that everything has been rendered.
   g3d->FinishDraw ();
   g3d->Print (0);
@@ -348,79 +270,6 @@ bool TerrainDemo::OnInitialize(int /*argc*/, char* /*argv*/ [])
   if (!RegisterQueue(GetObjectRegistry(), csevAllEvents(GetObjectRegistry())))
     return ReportError("Failed to set up event handler!");
     
-  // Let's create a terrain.
-/*
-  csRef<iTerrainRenderer> t_renderer = csLoadPlugin<iTerrainRenderer>(
-  GetObjectRegistry(),
-  "crystalspace.mesh.object.terrainimproved.simplerenderer");
-  
-  csRef<iTerrainCollider> t_collider = csLoadPlugin<iTerrainCollider>(
-  GetObjectRegistry(),
-  "crystalspace.mesh.object.terrainimproved.simplecollider");
-  
-  csRef<iTerrainDataFeeder> t_feeder = csLoadPlugin<iTerrainDataFeeder>(
-  GetObjectRegistry(),
-  "crystalspace.mesh.object.terrainimproved.simpledatafeeder");
-
-  t_feeder->SetParam("heightmap source", "/lev/terraini/heightmap.png");
-  t_feeder->SetParam("materialmap source", "/lev/terraini/material.png");
-
-  csRef<iTerrainDataFeeder> t_feeder_00 = csLoadPlugin<iTerrainDataFeeder>(
-  GetObjectRegistry(),
-  "crystalspace.mesh.object.terrainimproved.simpledatafeeder");
-
-  t_feeder_00->SetParam("heightmap source", "/lev/terraini/heightmap_00.png");
-  t_feeder_00->SetParam("materialmap source", "/lev/terraini/material_00.png");
-
-  csRef<iTerrainDataFeeder> t_feeder_01 = csLoadPlugin<iTerrainDataFeeder>(
-  GetObjectRegistry(),
-  "crystalspace.mesh.object.terrainimproved.simpledatafeeder");
-
-  t_feeder_01->SetParam("heightmap source", "/lev/terraini/heightmap_01.png");
-  t_feeder_01->SetParam("materialmap source", "/lev/terraini/material_01.png");
-
-  csRef<iTerrainDataFeeder> t_feeder_10 = csLoadPlugin<iTerrainDataFeeder>(
-  GetObjectRegistry(),
-  "crystalspace.mesh.object.terrainimproved.simpledatafeeder");
-
-  t_feeder_10->SetParam("heightmap source", "/lev/terraini/heightmap_10.png");
-  t_feeder_10->SetParam("materialmap source", "/lev/terraini/material_10.png");
-
-  csRef<iTerrainDataFeeder> t_feeder_11 = csLoadPlugin<iTerrainDataFeeder>(
-  GetObjectRegistry(),
-  "crystalspace.mesh.object.terrainimproved.simpledatafeeder");
-
-  t_feeder_11->SetParam("heightmap source", "/lev/terraini/heightmap_11.png");
-  t_feeder_11->SetParam("materialmap source", "/lev/terraini/material_11.png");
-
-  csRef<iMeshObjectType> t_mesh_type = csLoadPlugin<iMeshObjectType>(
-  GetObjectRegistry(),
-  "crystalspace.mesh.object.terrainimproved");
-  
-  csRef<iMeshObjectFactory> t_mesh_factory = t_mesh_type->NewFactory();
-  
-  csRef<iTerrainFactory> t_factory = scfQueryInterface<iTerrainFactory>(
-  t_mesh_factory);
-
-  t_factory->SetRenderer(t_renderer);
-  t_factory->SetCollider(t_collider);
-  
-  t_factory->AddCell("cell", 65, 65, 64, 64, csVector2(-60, -60),
-  csVector3(100, 100, 30), t_feeder);
-  
-  t_factory->AddCell("cell", 33, 33, 32, 32, csVector2(48, 48),
-  csVector3(50, 50, 30), t_feeder_00);
-  t_factory->AddCell("cell", 33, 33, 32, 32, csVector2(98, 48),
-  csVector3(50, 50, 30), t_feeder_10);
-  t_factory->AddCell("cell", 33, 33, 32, 32, csVector2(48, 98),
-  csVector3(50, 50, 30), t_feeder_01);
-  t_factory->AddCell("cell", 33, 33, 32, 32, csVector2(98, 98),
-  csVector3(50, 50, 30), t_feeder_11);
-
-  csRef<iMeshObject> t_mesh = t_mesh_factory->NewInstance();
-  
-  terrain = scfQueryInterface<iTerrainSystem>(t_mesh);
-*/  
   return true;
 }
 
@@ -452,45 +301,6 @@ bool TerrainDemo::LoadMap ()
   VFS->ChDir ("/lev/terraini");
   // Load the level file which is called 'world'.
     
-/*  iTextureWrapper* grass_tex = loader->LoadTexture("grass_tex",
-  "/lev/terrain/grass.png");
-  iTextureWrapper* stone_tex = loader->LoadTexture("stone_tex",
-  "/lib/std/stone4.gif");
-  iTextureWrapper* lava_tex = loader->LoadTexture("lava_tex",
-  "/lev/terraini/lava.png");
-  
-  rloop = engine->GetRenderLoopManager()->Load(
-  "/shader/std_rloop_terrainimproved.xml");
-
-  csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
-  GetObjectRegistry(), "crystalspace.shared.stringset", iStringSet);
-  
-  csRef<iShaderManager> shmgr = CS_QUERY_REGISTRY (GetObjectRegistry(),
-  iShaderManager);
-  
-  loader->LoadShader("/lev/terraini/shader_base.xml");
-  loader->LoadShader("/lev/terraini/shader_splat.xml");
-  
-  iShader* shader_base = shmgr->GetShader("terrain_improved_base");
-  iShader* shader_splat = shmgr->GetShader("terrain_improved_splatting");
-  
-  csRefArray<iMaterialWrapper> materials;
-  
-  iMaterialWrapper* material;
-  
-  (material = engine->CreateMaterial("LavaMaterial", lava_tex))->
-  GetMaterial()->SetShader(strings->Request("ambient"), shader_base);
-  materials.Push(material);
-  
-  (material = engine->CreateMaterial("GrassMaterial", grass_tex))->
-  GetMaterial()->SetShader(strings->Request("terrain splat"), shader_splat);
-  materials.Push(material);
-
-  (material = engine->CreateMaterial("StoneMaterial", stone_tex))->
-  GetMaterial()->SetShader(strings->Request("terrain splat"), shader_splat);
-  materials.Push(material);
-  
-  terrain->SetMaterialPalette(materials);*/
   if (!loader->LoadMapFile ("world"))
     ReportError("Error couldn't load level!");
 

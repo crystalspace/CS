@@ -192,16 +192,16 @@ bool csOPCODECollideSystem::Collide (
   csOPCODECollider* collider1, const csReversibleTransform* trans1,
     iTerrainSystem* terrain)
 {
-/*  unsigned int tri_count = collider1->opcMeshInt.GetNbTriangles ();
+  unsigned int tri_count = collider1->opcMeshInt.GetNbTriangles ();
   const unsigned int* tris = collider1->indexholder;
-  const Point* verts = collider1->vertholder;*/
+  const Point* verts = collider1->vertholder;
   
   scfArray<iTerrainCollisionPairArray> c_pairs;
   
-/*  if (terrain->CollideTriangles ((const csVector3*)verts, tri_count,
-    tris, collider1->radius, trans1, false, c_pairs))*/
-  if (terrain->Collide (collider1, collider1->radius, trans1, false,
-    c_pairs))
+  if (terrain->CollideTriangles ((const csVector3*)verts, tri_count,
+    tris, collider1->radius, trans1, false, c_pairs))
+  //if (terrain->Collide (collider1, collider1->radius, trans1, false,
+//    c_pairs))
   {
     for (size_t i = 0; i < c_pairs.GetSize (); ++i)
       pairs.Push (c_pairs.Get (i));

@@ -75,8 +75,8 @@
         <cell name="main">
           <grid_size x="65" y="65" />
           <material_size x="64" y="64" />
-          <position x="-60" y="-60" />
-          <size x="100" y="100" z="30" />
+          <position x="-256" y="-256" />
+          <size x="512" y="512" z="64" />
 
           <feeder>
             <plugin>crystalspace.mesh.object.terrainimproved.simpledatafeeder</plugin>
@@ -85,7 +85,7 @@
           </feeder>
         </cell>
 
-        <cell>
+<!--        <cell>
           <grid_size x="33" y="33" />
           <material_size x="32" y="32" />
           <position x="48" y="48" />
@@ -135,7 +135,7 @@
             <param name="heightmap source" value="/lev/terraini/heightmap_11.png" />
             <param name="materialmap source" value="/lev/terraini/material_11.png" />
           </feeder>
-        </cell>
+        </cell>-->
       </cells>
     </params>
   </meshfact>

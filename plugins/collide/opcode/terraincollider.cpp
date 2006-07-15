@@ -185,9 +185,9 @@ bool csTerrainCollider::CollideTriangles (iTerrainCell* cell,
       
       csCollisionPair p;
       
-      p.a1 = triv[0];
-      p.b1 = triv[1];
-      p.c1 = triv[2];
+      p.a1 = vertices[indices[i*3 + 0]];
+      p.b1 = vertices[indices[i*3 + 1]];
+      p.c1 = vertices[indices[i*3 + 2]];
     
       for (size_t i = 0; i < tris.GetSize (); ++i)
       {

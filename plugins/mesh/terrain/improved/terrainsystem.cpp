@@ -162,7 +162,7 @@ bool csTerrainSystem::CollideTriangles (const csVector3* vertices,
 
   csSphere sphere (csVector3 (0, 0, 0), radius);
   
-  sphere = trans->Other2This (sphere);
+  sphere = trans->This2Other (sphere);
   
   for (size_t i = 0; i < cells.GetSize (); ++i)
   {
@@ -194,7 +194,7 @@ bool csTerrainSystem::Collide (iCollider* collider,
 
   csSphere sphere (csVector3 (0, 0, 0), radius);
   
-  sphere = trans->Other2This (sphere);
+  sphere = trans->This2Other (sphere);
   
   for (size_t i = 0; i < cells.GetSize (); ++i)
   {
