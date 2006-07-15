@@ -538,7 +538,7 @@ struct iVFS : public virtual iBase
    * Create or add a symbolic link within the VFS 
    *  (works like unix 'ln -s' command)
    * If the link already exists, then the target will be added to the link
-   * \param Target The target that th link will point to
+   * \param Target The target that the link will point to
    * \param Link The path of the link within the VFS, if this is 0 then the 
    *  link will be created in the current directory with the same name as 
    *  the target
