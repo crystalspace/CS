@@ -188,7 +188,7 @@ public:
   // Redirect these iFireState functions to csParticleSystem
   virtual void SetParticleCount (int num)
   { csParticleSystem::SetParticleCount (num); }
-  virtual int GetParticleCount () const
+  virtual size_t GetParticleCount () const
   { return csParticleSystem::GetParticleCount (); }
 };
 

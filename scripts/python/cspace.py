@@ -92,10 +92,39 @@ class csArrayThresholdVariablePtr(csArrayThresholdVariable):
         _swig_setattr(self, csArrayThresholdVariable,self.__class__,csArrayThresholdVariable)
 _cspace.csArrayThresholdVariable_swigregister(csArrayThresholdVariablePtr)
 
-class csArrayCapacityDefault(_object):
+class csArrayThresholdVariableCapacityLinear(csArrayThresholdVariable):
     __swig_setmethods__ = {}
+    for _s in [csArrayThresholdVariable]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, csArrayThresholdVariableCapacityLinear, name, value)
+    __swig_getmethods__ = {}
+    for _s in [csArrayThresholdVariable]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, csArrayThresholdVariableCapacityLinear, name)
+    def __repr__(self):
+        return "<%s.%s; proxy of C++ csArrayCapacityLinear<csArrayThresholdVariable > instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
+    def __init__(self, *args):
+        _swig_setattr(self, csArrayThresholdVariableCapacityLinear, 'this', _cspace.new_csArrayThresholdVariableCapacityLinear(*args))
+        _swig_setattr(self, csArrayThresholdVariableCapacityLinear, 'thisown', 1)
+    def IsCapacityExcessive(*args): return _cspace.csArrayThresholdVariableCapacityLinear_IsCapacityExcessive(*args)
+    def GetCapacity(*args): return _cspace.csArrayThresholdVariableCapacityLinear_GetCapacity(*args)
+    def __del__(self, destroy=_cspace.delete_csArrayThresholdVariableCapacityLinear):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+
+
+class csArrayThresholdVariableCapacityLinearPtr(csArrayThresholdVariableCapacityLinear):
+    def __init__(self, this):
+        _swig_setattr(self, csArrayThresholdVariableCapacityLinear, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, csArrayThresholdVariableCapacityLinear, 'thisown', 0)
+        _swig_setattr(self, csArrayThresholdVariableCapacityLinear,self.__class__,csArrayThresholdVariableCapacityLinear)
+_cspace.csArrayThresholdVariableCapacityLinear_swigregister(csArrayThresholdVariableCapacityLinearPtr)
+
+class csArrayCapacityDefault(csArrayThresholdVariableCapacityLinear):
+    __swig_setmethods__ = {}
+    for _s in [csArrayThresholdVariableCapacityLinear]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, csArrayCapacityDefault, name, value)
     __swig_getmethods__ = {}
+    for _s in [csArrayThresholdVariableCapacityLinear]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, csArrayCapacityDefault, name)
     def __repr__(self):
         return "<%s.%s; proxy of C++ csArrayCapacityDefault instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
@@ -459,6 +488,42 @@ class csStringSetPtr(csStringSet):
         if not hasattr(self,"thisown"): _swig_setattr(self, csStringSet, 'thisown', 0)
         _swig_setattr(self, csStringSet,self.__class__,csStringSet)
 _cspace.csStringSet_swigregister(csStringSetPtr)
+
+class csStringIDSet(_object):
+    __swig_setmethods__ = {}
+    __setattr__ = lambda self, name, value: _swig_setattr(self, csStringIDSet, name, value)
+    __swig_getmethods__ = {}
+    __getattr__ = lambda self, name: _swig_getattr(self, csStringIDSet, name)
+    def __repr__(self):
+        return "<%s.%s; proxy of C++ csSet<csStringID > instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
+    def __init__(self, *args):
+        _swig_setattr(self, csStringIDSet, 'this', _cspace.new_csStringIDSet(*args))
+        _swig_setattr(self, csStringIDSet, 'thisown', 1)
+    def Add(*args): return _cspace.csStringIDSet_Add(*args)
+    def AddNoTest(*args): return _cspace.csStringIDSet_AddNoTest(*args)
+    def Contains(*args): return _cspace.csStringIDSet_Contains(*args)
+    def In(*args): return _cspace.csStringIDSet_In(*args)
+    def DeleteAll(*args): return _cspace.csStringIDSet_DeleteAll(*args)
+    def Empty(*args): return _cspace.csStringIDSet_Empty(*args)
+    def Delete(*args): return _cspace.csStringIDSet_Delete(*args)
+    def GetSize(*args): return _cspace.csStringIDSet_GetSize(*args)
+    def IsEmpty(*args): return _cspace.csStringIDSet_IsEmpty(*args)
+    def __len__(*args): return _cspace.csStringIDSet___len__(*args)
+    def __contains__(*args): return _cspace.csStringIDSet___contains__(*args)
+    def append(*args): return _cspace.csStringIDSet_append(*args)
+    def __delitem__(*args): return _cspace.csStringIDSet___delitem__(*args)
+    def __del__(self, destroy=_cspace.delete_csStringIDSet):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+
+
+class csStringIDSetPtr(csStringIDSet):
+    def __init__(self, this):
+        _swig_setattr(self, csStringIDSet, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, csStringIDSet, 'thisown', 0)
+        _swig_setattr(self, csStringIDSet,self.__class__,csStringIDSet)
+_cspace.csStringIDSet_swigregister(csStringIDSetPtr)
 
 class iString(iBase):
     __swig_setmethods__ = {}
@@ -2508,6 +2573,98 @@ class csShaderVariablePtr(csShaderVariable):
         _swig_setattr(self, csShaderVariable,self.__class__,csShaderVariable)
 _cspace.csShaderVariable_swigregister(csShaderVariablePtr)
 
+class csShaderVariableArrayReadOnly(iBase):
+    __swig_setmethods__ = {}
+    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, csShaderVariableArrayReadOnly, name, value)
+    __swig_getmethods__ = {}
+    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, csShaderVariableArrayReadOnly, name)
+    def __init__(self): raise RuntimeError, "No constructor defined"
+    def __repr__(self):
+        return "<%s.%s; proxy of C++ iArrayReadOnly<csShaderVariable * > instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
+    def GetSize(*args): return _cspace.csShaderVariableArrayReadOnly_GetSize(*args)
+    def Get(*args): return _cspace.csShaderVariableArrayReadOnly_Get(*args)
+    def Top(*args): return _cspace.csShaderVariableArrayReadOnly_Top(*args)
+    def Find(*args): return _cspace.csShaderVariableArrayReadOnly_Find(*args)
+    def GetIndex(*args): return _cspace.csShaderVariableArrayReadOnly_GetIndex(*args)
+    def IsEmpty(*args): return _cspace.csShaderVariableArrayReadOnly_IsEmpty(*args)
+    def GetAll(*args): return _cspace.csShaderVariableArrayReadOnly_GetAll(*args)
+    def __del__(self, destroy=_cspace.delete_csShaderVariableArrayReadOnly):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+
+
+class csShaderVariableArrayReadOnlyPtr(csShaderVariableArrayReadOnly):
+    def __init__(self, this):
+        _swig_setattr(self, csShaderVariableArrayReadOnly, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, csShaderVariableArrayReadOnly, 'thisown', 0)
+        _swig_setattr(self, csShaderVariableArrayReadOnly,self.__class__,csShaderVariableArrayReadOnly)
+_cspace.csShaderVariableArrayReadOnly_swigregister(csShaderVariableArrayReadOnlyPtr)
+
+class csShaderVariableArrayChangeElements(csShaderVariableArrayReadOnly):
+    __swig_setmethods__ = {}
+    for _s in [csShaderVariableArrayReadOnly]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, csShaderVariableArrayChangeElements, name, value)
+    __swig_getmethods__ = {}
+    for _s in [csShaderVariableArrayReadOnly]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, csShaderVariableArrayChangeElements, name)
+    def __init__(self): raise RuntimeError, "No constructor defined"
+    def __repr__(self):
+        return "<%s.%s; proxy of C++ iArrayChangeElements<csShaderVariable * > instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
+    def Get(*args): return _cspace.csShaderVariableArrayChangeElements_Get(*args)
+    def Top(*args): return _cspace.csShaderVariableArrayChangeElements_Top(*args)
+    def __del__(self, destroy=_cspace.delete_csShaderVariableArrayChangeElements):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+
+
+class csShaderVariableArrayChangeElementsPtr(csShaderVariableArrayChangeElements):
+    def __init__(self, this):
+        _swig_setattr(self, csShaderVariableArrayChangeElements, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, csShaderVariableArrayChangeElements, 'thisown', 0)
+        _swig_setattr(self, csShaderVariableArrayChangeElements,self.__class__,csShaderVariableArrayChangeElements)
+_cspace.csShaderVariableArrayChangeElements_swigregister(csShaderVariableArrayChangeElementsPtr)
+
+class csShaderVariableArray(csShaderVariableArrayChangeElements):
+    __swig_setmethods__ = {}
+    for _s in [csShaderVariableArrayChangeElements]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, csShaderVariableArray, name, value)
+    __swig_getmethods__ = {}
+    for _s in [csShaderVariableArrayChangeElements]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, csShaderVariableArray, name)
+    def __init__(self): raise RuntimeError, "No constructor defined"
+    def __repr__(self):
+        return "<%s.%s; proxy of C++ iArrayChangeAll<csShaderVariable * > instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
+    def SetSize(*args): return _cspace.csShaderVariableArray_SetSize(*args)
+    def GetExtend(*args): return _cspace.csShaderVariableArray_GetExtend(*args)
+    def Put(*args): return _cspace.csShaderVariableArray_Put(*args)
+    def Push(*args): return _cspace.csShaderVariableArray_Push(*args)
+    def PushSmart(*args): return _cspace.csShaderVariableArray_PushSmart(*args)
+    def Pop(*args): return _cspace.csShaderVariableArray_Pop(*args)
+    def Insert(*args): return _cspace.csShaderVariableArray_Insert(*args)
+    def DeleteAll(*args): return _cspace.csShaderVariableArray_DeleteAll(*args)
+    def Truncate(*args): return _cspace.csShaderVariableArray_Truncate(*args)
+    def Empty(*args): return _cspace.csShaderVariableArray_Empty(*args)
+    def DeleteIndex(*args): return _cspace.csShaderVariableArray_DeleteIndex(*args)
+    def DeleteIndexFast(*args): return _cspace.csShaderVariableArray_DeleteIndexFast(*args)
+    def Delete(*args): return _cspace.csShaderVariableArray_Delete(*args)
+    def DeleteFast(*args): return _cspace.csShaderVariableArray_DeleteFast(*args)
+    def __del__(self, destroy=_cspace.delete_csShaderVariableArray):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+
+
+class csShaderVariableArrayPtr(csShaderVariableArray):
+    def __init__(self, this):
+        _swig_setattr(self, csShaderVariableArray, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, csShaderVariableArray, 'thisown', 0)
+        _swig_setattr(self, csShaderVariableArray,self.__class__,csShaderVariableArray)
+_cspace.csShaderVariableArray_swigregister(csShaderVariableArrayPtr)
+
 
 csDefaultRunLoop = _cspace.csDefaultRunLoop
 
@@ -3655,6 +3812,30 @@ _cspace.iPath_swigregister(iPathPtr)
 
 iPath_scfGetVersion = _cspace.iPath_scfGetVersion
 
+class scfPath(iPath):
+    __swig_setmethods__ = {}
+    for _s in [iPath]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, scfPath, name, value)
+    __swig_getmethods__ = {}
+    for _s in [iPath]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, scfPath, name)
+    def __init__(self): raise RuntimeError, "No constructor defined"
+    def __repr__(self):
+        return "<%s.%s; proxy of C++ scfImplementation1<csPath,iPath > instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
+    def IncRef(*args): return _cspace.scfPath_IncRef(*args)
+    def DecRef(*args): return _cspace.scfPath_DecRef(*args)
+    def GetRefCount(*args): return _cspace.scfPath_GetRefCount(*args)
+    def QueryInterface(*args): return _cspace.scfPath_QueryInterface(*args)
+    def AddRefOwner(*args): return _cspace.scfPath_AddRefOwner(*args)
+    def RemoveRefOwner(*args): return _cspace.scfPath_RemoveRefOwner(*args)
+
+class scfPathPtr(scfPath):
+    def __init__(self, this):
+        _swig_setattr(self, scfPath, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, scfPath, 'thisown', 0)
+        _swig_setattr(self, scfPath,self.__class__,scfPath)
+_cspace.scfPath_swigregister(scfPathPtr)
+
 CS_POLYMESH_CLOSED = _cspace.CS_POLYMESH_CLOSED
 CS_POLYMESH_NOTCLOSED = _cspace.CS_POLYMESH_NOTCLOSED
 CS_POLYMESH_CONVEX = _cspace.CS_POLYMESH_CONVEX
@@ -3727,10 +3908,12 @@ _cspace.iPolygonMesh_swigregister(iPolygonMeshPtr)
 
 iPolygonMesh_scfGetVersion = _cspace.iPolygonMesh_scfGetVersion
 
-class csPath(_object):
+class csPath(scfPath):
     __swig_setmethods__ = {}
+    for _s in [scfPath]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, csPath, name, value)
     __swig_getmethods__ = {}
+    for _s in [scfPath]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, csPath, name)
     def __repr__(self):
         return "<%s.%s; proxy of C++ csPath instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
@@ -4090,6 +4273,15 @@ class iLightList(iBase):
 
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iLightList_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iLightList_scfGetVersion)
+    def __delitem__(*args): return _cspace.iLightList___delitem__(*args)
+    def __len__(*args): return _cspace.iLightList___len__(*args)
+    def append(*args): return _cspace.iLightList_append(*args)
+    def content_iterator(self):
+            for idx in xrange(len(self)):
+                    yield self.Get(idx)
+    def __iter__(self): return self.content_iterator()  
+    def __getitem__(*args): return _cspace.iLightList___getitem__(*args)
+    def __contains__(*args): return _cspace.iLightList___contains__(*args)
 
 class iLightListPtr(iLightList):
     def __init__(self, this):
@@ -4435,6 +4627,15 @@ class iSectorList(iBase):
 
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iSectorList_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iSectorList_scfGetVersion)
+    def __delitem__(*args): return _cspace.iSectorList___delitem__(*args)
+    def __len__(*args): return _cspace.iSectorList___len__(*args)
+    def append(*args): return _cspace.iSectorList_append(*args)
+    def content_iterator(self):
+            for idx in xrange(len(self)):
+                    yield self.Get(idx)
+    def __iter__(self): return self.content_iterator()  
+    def __getitem__(*args): return _cspace.iSectorList___getitem__(*args)
+    def __contains__(*args): return _cspace.iSectorList___contains__(*args)
 
 class iSectorListPtr(iSectorList):
     def __init__(self, this):
@@ -4797,6 +4998,15 @@ class iCameraPositionList(iBase):
     def RemoveAll(*args): return _cspace.iCameraPositionList_RemoveAll(*args)
     def Find(*args): return _cspace.iCameraPositionList_Find(*args)
     def FindByName(*args): return _cspace.iCameraPositionList_FindByName(*args)
+    def __delitem__(*args): return _cspace.iCameraPositionList___delitem__(*args)
+    def __len__(*args): return _cspace.iCameraPositionList___len__(*args)
+    def append(*args): return _cspace.iCameraPositionList_append(*args)
+    def content_iterator(self):
+            for idx in xrange(len(self)):
+                    yield self.Get(idx)
+    def __iter__(self): return self.content_iterator()  
+    def __getitem__(*args): return _cspace.iCameraPositionList___getitem__(*args)
+    def __contains__(*args): return _cspace.iCameraPositionList___contains__(*args)
     def __del__(self, destroy=_cspace.delete_iCameraPositionList):
         try:
             if self.thisown: destroy(self)
@@ -4905,6 +5115,15 @@ class iTextureList(iBase):
 
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iTextureList_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iTextureList_scfGetVersion)
+    def __delitem__(*args): return _cspace.iTextureList___delitem__(*args)
+    def __len__(*args): return _cspace.iTextureList___len__(*args)
+    def append(*args): return _cspace.iTextureList_append(*args)
+    def content_iterator(self):
+            for idx in xrange(len(self)):
+                    yield self.Get(idx)
+    def __iter__(self): return self.content_iterator()  
+    def __getitem__(*args): return _cspace.iTextureList___getitem__(*args)
+    def __contains__(*args): return _cspace.iTextureList___contains__(*args)
 
 class iTextureListPtr(iTextureList):
     def __init__(self, this):
@@ -4991,6 +5210,15 @@ class iMaterialList(iBase):
     def RemoveAll(*args): return _cspace.iMaterialList_RemoveAll(*args)
     def Find(*args): return _cspace.iMaterialList_Find(*args)
     def FindByName(*args): return _cspace.iMaterialList_FindByName(*args)
+    def __delitem__(*args): return _cspace.iMaterialList___delitem__(*args)
+    def __len__(*args): return _cspace.iMaterialList___len__(*args)
+    def append(*args): return _cspace.iMaterialList_append(*args)
+    def content_iterator(self):
+            for idx in xrange(len(self)):
+                    yield self.Get(idx)
+    def __iter__(self): return self.content_iterator()  
+    def __getitem__(*args): return _cspace.iMaterialList___getitem__(*args)
+    def __contains__(*args): return _cspace.iMaterialList___contains__(*args)
     def __del__(self, destroy=_cspace.delete_iMaterialList):
         try:
             if self.thisown: destroy(self)
@@ -5289,6 +5517,15 @@ class iMeshList(iBase):
     def RemoveAll(*args): return _cspace.iMeshList_RemoveAll(*args)
     def Find(*args): return _cspace.iMeshList_Find(*args)
     def FindByName(*args): return _cspace.iMeshList_FindByName(*args)
+    def __delitem__(*args): return _cspace.iMeshList___delitem__(*args)
+    def __len__(*args): return _cspace.iMeshList___len__(*args)
+    def append(*args): return _cspace.iMeshList_append(*args)
+    def content_iterator(self):
+            for idx in xrange(len(self)):
+                    yield self.Get(idx)
+    def __iter__(self): return self.content_iterator()  
+    def __getitem__(*args): return _cspace.iMeshList___getitem__(*args)
+    def __contains__(*args): return _cspace.iMeshList___contains__(*args)
     def __del__(self, destroy=_cspace.delete_iMeshList):
         try:
             if self.thisown: destroy(self)
@@ -5319,6 +5556,15 @@ class iMeshFactoryList(iBase):
     def RemoveAll(*args): return _cspace.iMeshFactoryList_RemoveAll(*args)
     def Find(*args): return _cspace.iMeshFactoryList_Find(*args)
     def FindByName(*args): return _cspace.iMeshFactoryList_FindByName(*args)
+    def __delitem__(*args): return _cspace.iMeshFactoryList___delitem__(*args)
+    def __len__(*args): return _cspace.iMeshFactoryList___len__(*args)
+    def append(*args): return _cspace.iMeshFactoryList_append(*args)
+    def content_iterator(self):
+            for idx in xrange(len(self)):
+                    yield self.Get(idx)
+    def __iter__(self): return self.content_iterator()  
+    def __getitem__(*args): return _cspace.iMeshFactoryList___getitem__(*args)
+    def __contains__(*args): return _cspace.iMeshFactoryList___contains__(*args)
     def __del__(self, destroy=_cspace.delete_iMeshFactoryList):
         try:
             if self.thisown: destroy(self)
@@ -5494,6 +5740,15 @@ class iRegionList(iBase):
     def RemoveAll(*args): return _cspace.iRegionList_RemoveAll(*args)
     def Find(*args): return _cspace.iRegionList_Find(*args)
     def FindByName(*args): return _cspace.iRegionList_FindByName(*args)
+    def __delitem__(*args): return _cspace.iRegionList___delitem__(*args)
+    def __len__(*args): return _cspace.iRegionList___len__(*args)
+    def append(*args): return _cspace.iRegionList_append(*args)
+    def content_iterator(self):
+            for idx in xrange(len(self)):
+                    yield self.Get(idx)
+    def __iter__(self): return self.content_iterator()  
+    def __getitem__(*args): return _cspace.iRegionList___getitem__(*args)
+    def __contains__(*args): return _cspace.iRegionList___contains__(*args)
     def __del__(self, destroy=_cspace.delete_iRegionList):
         try:
             if self.thisown: destroy(self)
@@ -5970,6 +6225,98 @@ class iGenMeshAnimationControlTypePtr(iGenMeshAnimationControlType):
         _swig_setattr(self, iGenMeshAnimationControlType,self.__class__,iGenMeshAnimationControlType)
 _cspace.iGenMeshAnimationControlType_swigregister(iGenMeshAnimationControlTypePtr)
 
+class csSprite2DVertexArrayReadOnly(iBase):
+    __swig_setmethods__ = {}
+    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, csSprite2DVertexArrayReadOnly, name, value)
+    __swig_getmethods__ = {}
+    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, csSprite2DVertexArrayReadOnly, name)
+    def __init__(self): raise RuntimeError, "No constructor defined"
+    def __repr__(self):
+        return "<%s.%s; proxy of C++ iArrayReadOnly<csSprite2DVertex > instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
+    def GetSize(*args): return _cspace.csSprite2DVertexArrayReadOnly_GetSize(*args)
+    def Get(*args): return _cspace.csSprite2DVertexArrayReadOnly_Get(*args)
+    def Top(*args): return _cspace.csSprite2DVertexArrayReadOnly_Top(*args)
+    def Find(*args): return _cspace.csSprite2DVertexArrayReadOnly_Find(*args)
+    def GetIndex(*args): return _cspace.csSprite2DVertexArrayReadOnly_GetIndex(*args)
+    def IsEmpty(*args): return _cspace.csSprite2DVertexArrayReadOnly_IsEmpty(*args)
+    def GetAll(*args): return _cspace.csSprite2DVertexArrayReadOnly_GetAll(*args)
+    def __del__(self, destroy=_cspace.delete_csSprite2DVertexArrayReadOnly):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+
+
+class csSprite2DVertexArrayReadOnlyPtr(csSprite2DVertexArrayReadOnly):
+    def __init__(self, this):
+        _swig_setattr(self, csSprite2DVertexArrayReadOnly, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, csSprite2DVertexArrayReadOnly, 'thisown', 0)
+        _swig_setattr(self, csSprite2DVertexArrayReadOnly,self.__class__,csSprite2DVertexArrayReadOnly)
+_cspace.csSprite2DVertexArrayReadOnly_swigregister(csSprite2DVertexArrayReadOnlyPtr)
+
+class csSprite2DVertexArrayChangeElements(csSprite2DVertexArrayReadOnly):
+    __swig_setmethods__ = {}
+    for _s in [csSprite2DVertexArrayReadOnly]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, csSprite2DVertexArrayChangeElements, name, value)
+    __swig_getmethods__ = {}
+    for _s in [csSprite2DVertexArrayReadOnly]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, csSprite2DVertexArrayChangeElements, name)
+    def __init__(self): raise RuntimeError, "No constructor defined"
+    def __repr__(self):
+        return "<%s.%s; proxy of C++ iArrayChangeElements<csSprite2DVertex > instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
+    def Get(*args): return _cspace.csSprite2DVertexArrayChangeElements_Get(*args)
+    def Top(*args): return _cspace.csSprite2DVertexArrayChangeElements_Top(*args)
+    def __del__(self, destroy=_cspace.delete_csSprite2DVertexArrayChangeElements):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+
+
+class csSprite2DVertexArrayChangeElementsPtr(csSprite2DVertexArrayChangeElements):
+    def __init__(self, this):
+        _swig_setattr(self, csSprite2DVertexArrayChangeElements, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, csSprite2DVertexArrayChangeElements, 'thisown', 0)
+        _swig_setattr(self, csSprite2DVertexArrayChangeElements,self.__class__,csSprite2DVertexArrayChangeElements)
+_cspace.csSprite2DVertexArrayChangeElements_swigregister(csSprite2DVertexArrayChangeElementsPtr)
+
+class csSprite2DVertexArrayChangeAll(csSprite2DVertexArrayChangeElements):
+    __swig_setmethods__ = {}
+    for _s in [csSprite2DVertexArrayChangeElements]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, csSprite2DVertexArrayChangeAll, name, value)
+    __swig_getmethods__ = {}
+    for _s in [csSprite2DVertexArrayChangeElements]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, csSprite2DVertexArrayChangeAll, name)
+    def __init__(self): raise RuntimeError, "No constructor defined"
+    def __repr__(self):
+        return "<%s.%s; proxy of C++ iArrayChangeAll<csSprite2DVertex > instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
+    def SetSize(*args): return _cspace.csSprite2DVertexArrayChangeAll_SetSize(*args)
+    def GetExtend(*args): return _cspace.csSprite2DVertexArrayChangeAll_GetExtend(*args)
+    def Put(*args): return _cspace.csSprite2DVertexArrayChangeAll_Put(*args)
+    def Push(*args): return _cspace.csSprite2DVertexArrayChangeAll_Push(*args)
+    def PushSmart(*args): return _cspace.csSprite2DVertexArrayChangeAll_PushSmart(*args)
+    def Pop(*args): return _cspace.csSprite2DVertexArrayChangeAll_Pop(*args)
+    def Insert(*args): return _cspace.csSprite2DVertexArrayChangeAll_Insert(*args)
+    def DeleteAll(*args): return _cspace.csSprite2DVertexArrayChangeAll_DeleteAll(*args)
+    def Truncate(*args): return _cspace.csSprite2DVertexArrayChangeAll_Truncate(*args)
+    def Empty(*args): return _cspace.csSprite2DVertexArrayChangeAll_Empty(*args)
+    def DeleteIndex(*args): return _cspace.csSprite2DVertexArrayChangeAll_DeleteIndex(*args)
+    def DeleteIndexFast(*args): return _cspace.csSprite2DVertexArrayChangeAll_DeleteIndexFast(*args)
+    def Delete(*args): return _cspace.csSprite2DVertexArrayChangeAll_Delete(*args)
+    def DeleteFast(*args): return _cspace.csSprite2DVertexArrayChangeAll_DeleteFast(*args)
+    def __del__(self, destroy=_cspace.delete_csSprite2DVertexArrayChangeAll):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+
+
+class csSprite2DVertexArrayChangeAllPtr(csSprite2DVertexArrayChangeAll):
+    def __init__(self, this):
+        _swig_setattr(self, csSprite2DVertexArrayChangeAll, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, csSprite2DVertexArrayChangeAll, 'thisown', 0)
+        _swig_setattr(self, csSprite2DVertexArrayChangeAll,self.__class__,csSprite2DVertexArrayChangeAll)
+_cspace.csSprite2DVertexArrayChangeAll_swigregister(csSprite2DVertexArrayChangeAllPtr)
+
 class csSprite2DVertex(_object):
     __swig_setmethods__ = {}
     __setattr__ = lambda self, name, value: _swig_setattr(self, csSprite2DVertex, name, value)
@@ -6009,10 +6356,12 @@ class csSprite2DVertexPtr(csSprite2DVertex):
         _swig_setattr(self, csSprite2DVertex,self.__class__,csSprite2DVertex)
 _cspace.csSprite2DVertex_swigregister(csSprite2DVertexPtr)
 
-class iColoredVertices(_object):
+class iColoredVertices(csSprite2DVertexArrayChangeAll):
     __swig_setmethods__ = {}
+    for _s in [csSprite2DVertexArrayChangeAll]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iColoredVertices, name, value)
     __swig_getmethods__ = {}
+    for _s in [csSprite2DVertexArrayChangeAll]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iColoredVertices, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -8755,6 +9104,7 @@ class iEvent(iBase):
     def RetrieveUInt8(*args): return _cspace.iEvent_RetrieveUInt8(*args)
     def RetrieveInt16(*args): return _cspace.iEvent_RetrieveInt16(*args)
     def RetrieveUInt16(*args): return _cspace.iEvent_RetrieveUInt16(*args)
+    def RetrieveInt32(*args): return _cspace.iEvent_RetrieveInt32(*args)
     def RetrieveUInt32(*args): return _cspace.iEvent_RetrieveUInt32(*args)
     def RetrieveFloat(*args): return _cspace.iEvent_RetrieveFloat(*args)
     def RetrieveDouble(*args): return _cspace.iEvent_RetrieveDouble(*args)
@@ -8765,6 +9115,7 @@ class iEvent(iBase):
     def Remove(*args): return _cspace.iEvent_Remove(*args)
     def RemoveAll(*args): return _cspace.iEvent_RemoveAll(*args)
     def GetAttributeIterator(*args): return _cspace.iEvent_GetAttributeIterator(*args)
+    def RetrieveString(*args): return _cspace.iEvent_RetrieveString(*args)
     def __del__(self, destroy=_cspace.delete_iEvent):
         try:
             if self.thisown: destroy(self)
@@ -9261,6 +9612,33 @@ class iEventQueuePtr(iEventQueue):
 _cspace.iEventQueue_swigregister(iEventQueuePtr)
 
 iEventQueue_scfGetVersion = _cspace.iEventQueue_scfGetVersion
+
+class csStrKey(_object):
+    __swig_setmethods__ = {}
+    __setattr__ = lambda self, name, value: _swig_setattr(self, csStrKey, name, value)
+    __swig_getmethods__ = {}
+    __getattr__ = lambda self, name: _swig_getattr(self, csStrKey, name)
+    def __repr__(self):
+        return "<%s.%s; proxy of C++ csStrKey instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
+    def __init__(self, *args):
+        _swig_setattr(self, csStrKey, 'this', _cspace.new_csStrKey(*args))
+        _swig_setattr(self, csStrKey, 'thisown', 1)
+    def __del__(self, destroy=_cspace.delete_csStrKey):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+
+    def assign(*args): return _cspace.csStrKey_assign(*args)
+    def GetHash(*args): return _cspace.csStrKey_GetHash(*args)
+
+class csStrKeyPtr(csStrKey):
+    def __init__(self, this):
+        _swig_setattr(self, csStrKey, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, csStrKey, 'thisown', 0)
+        _swig_setattr(self, csStrKey,self.__class__,csStrKey)
+_cspace.csStrKey_swigregister(csStrKeyPtr)
+
+csHashCompute = _cspace.csHashCompute
 
 class iEventNameRegistry(iBase):
     __swig_setmethods__ = {}
@@ -10843,10 +11221,12 @@ _cspace.iHalo_swigregister(iHaloPtr)
 
 iHalo_scfGetVersion = _cspace.iHalo_scfGetVersion
 
-class iShaderVarStack(_object):
+class iShaderVarStack(csShaderVariableArray):
     __swig_setmethods__ = {}
+    for _s in [csShaderVariableArray]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iShaderVarStack, name, value)
     __swig_getmethods__ = {}
+    for _s in [csShaderVariableArray]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iShaderVarStack, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -12920,6 +13300,7 @@ class iEngineSequenceManager(iBase):
     def FindSequenceByName(*args): return _cspace.iEngineSequenceManager_FindSequenceByName(*args)
     def RunSequenceByName(*args): return _cspace.iEngineSequenceManager_RunSequenceByName(*args)
     def FireTimedOperation(*args): return _cspace.iEngineSequenceManager_FireTimedOperation(*args)
+    def DestroyTimedOperations(*args): return _cspace.iEngineSequenceManager_DestroyTimedOperations(*args)
     def __del__(self, destroy=_cspace.delete_iEngineSequenceManager):
         try:
             if self.thisown: destroy(self)

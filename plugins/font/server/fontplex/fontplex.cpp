@@ -280,6 +280,7 @@ csPtr<iFont> csFontServerMultiplexer::LoadFont (const char *filename,
 
   csRef<csFontPlexer> newFont;
   newFont.AttachNew (new csFontPlexer (this, fontid, size, order));
+  loadedFonts.Put (fontid, newFont);
 
   // The first font that could be loaded is the "primary" font.
   iFont* primary = 0;
@@ -302,13 +303,12 @@ csPtr<iFont> csFontServerMultiplexer::LoadFont (const char *filename,
   if (primary == 0)
   {
     // Not a single font in the substitution list could be loaded?...
-    delete order;
+    // Note: order is deleted when newFont gets released.
     return 0;
   }
   else
   {
     newFont->primaryFont = primary;
-    loadedFonts.Put (fontid, newFont);
     return csPtr<iFont> (newFont);
   }
 }

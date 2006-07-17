@@ -552,9 +552,9 @@ static void * (*save_memalign_hook) (size_t __align, size_t __size,
 				     const void *);
 # endif
 static void   (*save_free_hook) (void * __ptr, const void *);
-static void*  save_arena;
 
 #if !defined(WIN32)
+static void*  save_arena;
 
 /* Magic value for the thread-specific arena pointer when
    malloc_atfork() is in use.  */
@@ -733,6 +733,8 @@ ptmalloc_init(void)
     state = *state_ptr;
     sharemem_destroy (state_ptr, sizeof (struct ptmalloc_state*));
     state->refcount++;
+    /* hack: force dlmalloc() to initialize it's (static) mparams struct */
+    mspace_mallopt (0xdeadbeef, 0x0f00);
     if(state->__malloc_initialized >= 0) return;
   }
 

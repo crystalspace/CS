@@ -57,8 +57,6 @@ enum
 };
 //@}
 
-SCF_VERSION (iParameterESM, 0, 0, 1);
-
 /**
  * This interface is a parameter resolver. The operations
  * in the engine sequence manager use instances of this class
@@ -82,8 +80,10 @@ SCF_VERSION (iParameterESM, 0, 0, 1);
  * - iSequenceWrapper
  *   
  */
-struct iParameterESM : public iBase
+struct iParameterESM : public virtual iBase
 {
+  SCF_INTERFACE (iParameterESM, 1, 0, 0);
+
   /**
    * Get the value based on userdata which is given to the
    * operations. If IsConstant() returns true then the params
@@ -101,8 +101,6 @@ struct iParameterESM : public iBase
    */
   virtual bool IsConstant () const = 0;
 };
-
-SCF_VERSION (iEngineSequenceParameters, 0, 0, 2);
 
 /**
  * An interface for passing on parameters to the engine sequence
@@ -128,8 +126,10 @@ SCF_VERSION (iEngineSequenceParameters, 0, 0, 2);
  * - iSequenceWrapper
  *   
  */
-struct iEngineSequenceParameters : public iBase
+struct iEngineSequenceParameters : public virtual iBase
 {
+  SCF_INTERFACE (iEngineSequenceParameters, 1, 0, 0);
+
   /**
    * Get the number of parameters supported.
    */
@@ -652,8 +652,6 @@ struct iSequenceTrigger : public virtual iBase
   virtual void ForceFire (bool now = false) = 0;
 };
 
-SCF_VERSION (iSequenceTimedOperation, 0, 0, 1);
-
 /**
  * A timed operation for the engine sequence manager.
  * This is basically something that needs to run over some period
@@ -671,15 +669,15 @@ SCF_VERSION (iSequenceTimedOperation, 0, 0, 1);
  * - iEngineSequenceManager::FireTimedOperation()
  *   
  */
-struct iSequenceTimedOperation : public iBase
+struct iSequenceTimedOperation : public virtual iBase
 {
+  SCF_INTERFACE (iSequenceTimedOperation, 1, 0, 0);
+
   /**
    * Do the operation. 'time' will be between 0 and 1.
    */
   virtual void Do (float time, iBase* params) = 0;
 };
-
-SCF_VERSION (iEngineSequenceManager, 0, 0, 3);
 
 /**
  * Sequence manager specifically designed for working on
@@ -692,8 +690,10 @@ SCF_VERSION (iEngineSequenceManager, 0, 0, 3);
  * - CS_QUERY_REGISTRY()
  *   
  */
-struct iEngineSequenceManager : public iBase
+struct iEngineSequenceManager : public virtual iBase
 {
+  SCF_INTERFACE (iEngineSequenceManager, 1, 0, 0);
+ 
   /**
    * Get a pointer to the underlying sequence manager that
    * is being used.
@@ -790,9 +790,19 @@ struct iEngineSequenceManager : public iBase
    * already elapsed since the beginning of the timed operation.
    * The params block is increffed for as long as is needed so you
    * can release your reference.
+   * \param sequence_id This identifier can be used to get track of
+   *   a given sequence. You can use this id to remove all operations that
+   *   have this id. Use iSequenceManager->GetUniqueID() to fetch a suitable
+   *   id here or else use the same id as the sequence has.
    */
   virtual void FireTimedOperation (csTicks delta, csTicks duration,
-  	iSequenceTimedOperation* op, iBase* params = 0) = 0;
+  	iSequenceTimedOperation* op, iBase* params = 0,
+	uint sequence_id = 0) = 0;
+
+  /**
+   * Destroy all timed operations with a given sequence id.
+   */
+  virtual void DestroyTimedOperations (uint sequence_id) = 0;
 
   //-----------------------------------------------------------------------
 };

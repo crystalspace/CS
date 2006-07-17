@@ -24,8 +24,7 @@
  * Graphical console output
  */
 
-#include "csutil/scf.h"
-
+#include "csutil/scf_interface.h"
 
 class csRect;
 struct iConsoleOutput;

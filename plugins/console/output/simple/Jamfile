@@ -1,9 +1,0 @@
-SubDir TOP plugins console output simple ;
-
-Description simpcon : "simple output console" ;
-
-Plugin simpcon
-	: [ Wildcard *.cpp *.h ]
-;
-LinkWith simpcon : crystalspace ;
-

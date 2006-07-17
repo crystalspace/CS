@@ -318,7 +318,7 @@ bool Simple::OnKeyboard(iEvent& ev)
 
 @code{OnKeyboard()} checks if the @key{ESC} key has been pressed. If so it
 uses the object registry to find the global event queue object. Using
-@code{Broadcast()} it then broadcasts the @samp{cscmdQuit} message
+@code{Broadcast()} it then broadcasts the @samp{csevQuit} message
 to all interested parties. This will cause the application to quit by
 terminating the run-loop.
 

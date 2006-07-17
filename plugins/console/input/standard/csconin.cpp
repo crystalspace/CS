@@ -31,28 +31,11 @@
 
 CS_IMPLEMENT_PLUGIN
 
-SCF_IMPLEMENT_IBASE (csConsoleInput)
-  SCF_IMPLEMENTS_INTERFACE (iConsoleInput)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iConsoleWatcher)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csConsoleInput::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csConsoleInput::eiConsoleWatcher)
-  SCF_IMPLEMENTS_INTERFACE (iConsoleWatcher)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 SCF_IMPLEMENT_FACTORY (csConsoleInput)
 
-
-csConsoleInput::csConsoleInput (iBase *iParent) : History (16, 16)
+csConsoleInput::csConsoleInput (iBase *iParent) :
+  scfImplementationType(this, iParent), History (16, 16)
 {
-  SCF_CONSTRUCT_IBASE (iParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiConsoleWatcher);
   Console = 0;
   Prompt = 0;
   strCursorPos = 0;
@@ -75,10 +58,6 @@ csConsoleInput::~csConsoleInput ()
     Console->RegisterWatcher (0);
     Console->DecRef ();
   }
-
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiConsoleWatcher);
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csConsoleInput::Initialize (iObjectRegistry *object_reg)
@@ -98,13 +77,6 @@ bool csConsoleInput::Initialize (iObjectRegistry *object_reg)
   keyLogicator = currentKbd->CreateKeyComposer ();
 
   return true;
-}
-
-void csConsoleInput::eiConsoleWatcher::ConsoleVisibilityChanged(
-  iConsoleOutput*, bool visible)
-{
-  if (visible)
-    scfParent->Refresh();
 }
 
 bool csConsoleInput::HandleEvent (iEvent &Event)
@@ -321,7 +293,7 @@ void csConsoleInput::Bind (iConsoleOutput *iCon)
   if (Console)
   {
     Console->IncRef ();
-    Console->RegisterWatcher (&scfiConsoleWatcher);
+    Console->RegisterWatcher (this);
   }
   line.Replace ("");
   Refresh ();

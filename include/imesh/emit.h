@@ -297,7 +297,7 @@ struct iEmitState : public virtual iBase
   /// Set the number of particles to use.
   virtual void SetParticleCount (int num) = 0;
   /// Get the number of particles used.
-  virtual int GetParticleCount () const = 0;
+  virtual size_t GetParticleCount () const = 0;
   /// Enable or disable lighting.
   virtual void SetLighting (bool l) = 0;
   /// See if lighting is enabled.
