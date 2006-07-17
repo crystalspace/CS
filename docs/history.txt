@@ -8,6 +8,8 @@ chronological order.
 
 17-Jul-2006
 	- res changed csSpinLock to use a non-volatile pthread_mutex_t.
+	- res applied a patch from Joerg Fischer to fix the offsets in
+	  plugins/device/joystick/windows/dinputdefs.h.
 12-Jul-2006
         - res added a check for the -Bsymbolic linker option to configure.
           This binds "references to global symbols to the definition within 
