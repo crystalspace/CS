@@ -1681,29 +1681,41 @@ csVFS::AutoConfigPlugin::~AutoConfigPlugin()
 
 }
 
-// Automatically configure the csVFS class
-bool csVFS::AutoConfigPlugin::Configure(iVFS *vfs, iObjectRegistry *object_reg)
+/*
+ * This method will attempt to auto-configure the VFS.
+ * It will mount the relevant resource directories, and map them to symbolic
+ * links within the root of the vfs.
+ */
+bool csVFS::AutoConfigPlugin::Configure(iVFS *vfs, 
+                                        iObjectRegistry *object_reg)
 {
   if (!vfs)
     return false;
 
+  // Get the command line parser plugin
   csRef<iCommandLineParser> cmdline =
     CS_QUERY_REGISTRY (object_reg, iCommandLineParser);
 
   csStringArray Directories;
   if (cmdline)
   {
+    // Try and mount the resource directory
     if (vfs->Mount("/mnt/resource", cmdline->GetResourceDir()))
 	  {
+      // Add it to the directory list
 		  Directories.Push("/mnt/resource");
 	  }
+    // Try and mount the app directory
     if (vfs->Mount("/mnt/app", cmdline->GetAppDir()))
 	  {
+      // Add it to the directory list
 		  Directories.Push("/mnt/app");
 	  }
   }
 
-  csArray<const char *,csStringArrayElementHandler>::Iterator i(Directories.GetIterator());
+  // An iterator to iterate through directories
+  csArray<const char *,csStringArrayElementHandler>::Iterator i(
+    Directories.GetIterator());
 
   csRef<iStringArray> Contents;
   csString DirectoryName;
@@ -1711,37 +1723,68 @@ bool csVFS::AutoConfigPlugin::Configure(iVFS *vfs, iObjectRegistry *object_reg)
   csString RealDirectoryName;
   csRef<iStringArray> RealPaths;
   csString SymLinkName;
+
+  // Go through each directory in the array
   while (i.HasNext())
   {
     DirectoryName = i.Next();
-	  Contents = vfs->FindFiles(DirectoryName);
-    for (size_t ctCounter = 0; ctCounter < Contents->Length(); ctCounter++)
-	  {
-       bool createdSymLink = false;
-      VirtualDirectoryName = DirectoryName;
-      VirtualDirectoryName.Append(VFS_PATH_SEPARATOR);
-      VirtualDirectoryName.Append(Contents->Get(ctCounter));
 
-      RealPaths = vfs->GetRealMountPaths(DirectoryName);
-      for (size_t rpCounter = 0; rpCounter < RealPaths->Length(); rpCounter++)
-	    {
-        RealDirectoryName = RealPaths->Get(rpCounter);
-        RealDirectoryName.Append(CS_PATH_SEPARATOR);
-        RealDirectoryName.Append(Contents->Get(ctCounter));
-        if (vfs->Mount(VirtualDirectoryName, RealDirectoryName))
-        {
-          if (!createdSymLink)
-          {
-            SymLinkName = VFS_PATH_SEPARATOR;
-            SymLinkName.Append(Contents->Get(ctCounter));
-            vfs->SymbolicLink(VirtualDirectoryName, SymLinkName);
-            createdSymLink = true;
-          }
-          // Recursively add directories (takes very long if many deep directory hierarchy)
-          //Directories.Push(VirtualDirectoryName);
-        }
-      }
-	  }
+    // Get the contents of the directory
+	  Contents = vfs->FindFiles(DirectoryName);
+
+    // Go through each file in the directory contents
+    for (size_t ctCounter = 0; ctCounter < Contents->Length(); 
+      ctCounter++)
+	  {
+       // Flag to indicate if symbolic link was created
+       bool createdSymLink = false;
+       bool isDirectory = true;
+
+       // Create the name for the virtual symbolic link
+       VirtualDirectoryName = DirectoryName;
+       VirtualDirectoryName.Append(VFS_PATH_SEPARATOR);
+       VirtualDirectoryName.Append(Contents->Get(ctCounter));
+
+       // Get the real paths mapped to the directory
+       RealPaths = vfs->GetRealMountPaths(DirectoryName);
+       for (size_t rpCounter = 0; rpCounter < RealPaths->Length(); 
+         rpCounter++)
+	     {
+         // Construct the real path name for the directory contents
+         RealDirectoryName = RealPaths->Get(rpCounter);
+         RealDirectoryName.Append(CS_PATH_SEPARATOR);
+         RealDirectoryName.Append(Contents->Get(ctCounter));
+
+         // Try and mount the directory contents
+         if (vfs->Mount(VirtualDirectoryName, RealDirectoryName))
+         {
+            struct stat stats;
+            if ((stat (RealDirectoryName, &stats) == 0) && (stats.st_mode & _S_IFDIR) == 0)
+              isDirectory = false;
+
+           // If it was successfully mounted, try create the symbolic link
+           if (!createdSymLink)
+           {
+             // Construct the symbolic link name
+             SymLinkName = VFS_PATH_SEPARATOR;
+             SymLinkName.Append(Contents->Get(ctCounter));
+             if (!isDirectory)
+             {
+               size_t period = SymLinkName.Find(".");
+               SymLinkName.Truncate(period);
+             }
+             // Create the symbolic link
+             vfs->SymbolicLink(VirtualDirectoryName, SymLinkName);
+
+             // Toggle the flag
+             createdSymLink = true;
+           }
+           // Recursively add directories (takes very long if many deep 
+           //directory hierarchy)
+           //Directories.Push(VirtualDirectoryName);
+         }
+       }
+	   }
   }
 
   return true;
