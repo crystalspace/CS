@@ -25,6 +25,8 @@ chronological order.
 	  be immediatelly documented :-)
 	- Jorrit updated the documentation about Blender (removed the
 	  mention of the obsolete old blend2cs tool).
+	- Jorrit added a reference to the new ViewMesh documentation
+	  from the overview.
 17-Jul-2006
 	- res changed csSpinLock to use a non-volatile pthread_mutex_t.
 	- res applied a patch from Joerg Fischer to fix the offsets in
