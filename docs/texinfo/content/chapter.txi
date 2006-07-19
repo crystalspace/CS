@@ -11,6 +11,7 @@
 * md32spr Tutorial:: @code{md32spr} Tutorial
 * mdl2spr:: Quake Model Converter (@code{mdl2spr})
 * 3D Sprites::
+* ViewMesh:: Previewing Models (@code{viewmesh})
 @end menu
 
 @imports{content,levbuilding.txi}
@@ -20,3 +21,4 @@
 @imports{content,md32spr.txi}
 @imports{content,mdl2spr.txi}
 @importss{content,sprites,3dsprite.txi}
+@imports{content,viewmesh.txi}

@@ -1,0 +1,53 @@
+@c -*-texinfo-*-
+@node ViewMesh, 3DSMax, Simple Map Example, Working with Engine Content
+@section Previewing Models (@code{viewmesh})
+@cindex viewmesh
+
+Viewmesh is a tool included with Crystal Space that can be used to
+preview models (mesh factories and libraries).
+
+@subheading Commandline Options
+
+@itemize @bullet
+@item @samp{-R}
+Real path from where to load the model. This option takes a path and
+then mounts it to @samp{/tmp/viewmesh}. Then it sets the current
+@sc{vfs} directory to that.
+@item @samp{-C}
+This is the current @sc{vfs} directory to use when loading the model.
+If you use this option in combination with @samp{-R} you can change
+the current directory relative to @samp{/tmp/viewmesh}.
+@item @samp{-L}
+Load a library file (for textures or materials for example). This is a
+@sc{vfs} path to the library file (possibly relative to the current
+@sc{vfs} dir as given by @samp{-R} and @samp{-C}).
+@item @samp{-Scale}
+Scale the loaded object with the given factor.
+@item @samp{-RoomSize}
+The model is loaded in a room. With this option you can change the
+size of that room. By default the size is 5.
+@end itemize
+
+And then there is an optional filename parameter. Here is an example on how
+to use viewmesh:
+
+@example
+viewmesh -R=c:\data\gamedata.zip -C=objects/actor factories/genActor
+@end example
+
+This example requires some explanation. First we use the @samp{-R} option
+to take our game data archive and mount that to @samp{/tmp/viewmesh}.
+Then we use the @samp{-C} option to go inside the @samp{objects/actor}
+directory that is inside that @sc{zip} archive. And finally we load
+the actual model that is still in a deeper directory called
+@samp{factories/genActor}. This example demonstrates how it can be useful
+to have good control over the current directory in @sc{vfs}. Usually
+with models exported from blender2crystal there will be a @samp{factories}
+and a @samp{textures} directory. So you want the current directory to be
+the parent of those so that the model can reference textures like
+@samp{textures/bla.jpg}.
+
+@subheading User Interface
+
+@@@ TODO
+

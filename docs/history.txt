@@ -6,6 +6,25 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+19-Jul-2006
+	- Jorrit simplified viewmesh a lot. It no longer attempts to do
+	  any path handling automatically. So the ':' notation is gone
+	  and it no longer attempts to automatically guess the VFS dir
+	  to use as the current directory. Instead there are two new
+	  commandline options:
+	      -R: this option takes a real path and it will mount it to
+	          /tmp/viewmesh. Then it makes that directory the current
+		  directory.
+	      -C: this option takes a VFS path and it will make that directory
+	          the current directory. If this option is used together
+		  with -R then you can change the VFS dir to be relative
+		  to the location mounted with -R.
+	  The filename itself will be used as-is.
+	- Jorrit added a documentation section for viewmesh (under the new
+	  'rule' that every new feature that is added to CS should now
+	  be immediatelly documented :-)
+	- Jorrit updated the documentation about Blender (removed the
+	  mention of the obsolete old blend2cs tool).
 17-Jul-2006
 	- res changed csSpinLock to use a non-volatile pthread_mutex_t.
 	- res applied a patch from Joerg Fischer to fix the offsets in
