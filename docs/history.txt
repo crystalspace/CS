@@ -7,6 +7,13 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 20-Jul-2006
+	- Andres added the svn:eol-style property to all text files lacking
+	  it (set to native). This is needed to have the eol set to the
+	  native version of the platform (eg \r\n on win, \n on linux).
+	  Without it eg. cross building and manual generation doesnt work
+	  properly. All people adding new text files should look that the
+	  property is set to native. (There is a mechanism called autoprops
+	  which does this for you)
 	- Jorrit added a section in the manual explaining several tricks
 	  you can use to speed up map loading and runtime performance.
 19-Jul-2006
