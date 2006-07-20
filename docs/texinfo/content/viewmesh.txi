@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node ViewMesh, 3DSMax, Simple Map Example, Working with Engine Content
+@node ViewMesh, , 3D Sprites, Working with Engine Content
 @section Previewing Models (@code{viewmesh})
 @cindex viewmesh
 

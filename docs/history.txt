@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+20-Jul-2006
+	- Jorrit added a section in the manual explaining several tricks
+	  you can use to speed up map loading and runtime performance.
 19-Jul-2006
 	- Jorrit simplified viewmesh a lot. It no longer attempts to do
 	  any path handling automatically. So the ':' notation is gone

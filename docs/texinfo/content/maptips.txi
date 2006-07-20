@@ -1,0 +1,91 @@
+@c -*-texinfo-*-
+@node Map Creation Tips, Simple Map Example, Map Creation, Working with Engine Content
+@section Some Tips for Efficient Maps
+@cindex Efficient Maps
+@cindex Map Creation
+
+@noindent
+@emph{Written by Jorrit Tyberghein,
+@email{jorrit.tyberghein@@gmail.com}.}
+
+In @ref{Map Creation} we talked about large scale optimizations on maps
+by using the right visibility culler, packing textures, combining
+objects, using the correct types of object, and lighting considerations.
+In this section we will mention a few other smaller ticks and trips that
+can be used to speed up map loading and also performance at runtime.
+
+@subheading Binary Alpha
+@cindex Binary Alpha
+
+See @ref{Alpha Textures} for a discussion on how to use binary alpha (when
+only 0% or 100% transparency is required) to improve render speed.
+
+@subheading Efficient Texture Sizes
+
+Your textures should have optimal sizes to improve loading speed.
+See @ref{Efficient Textures} for an explanation of this.
+
+@subheading Use @sc{dds} Image Format
+@cindex @sc{dds}
+
+The @sc{dds} image format loads a lot faster. See @ref{Efficient Textures}
+for more information about @sc{dds} and how to use it.
+
+@subheading Binary @sc{xml}
+@cindex Binary @sc{xml}
+
+If you convert your maps to binary @sc{xml} you can get considerable map loading
+improvements. See @ref{Binary XML} for more information on how to convert your
+maps and use this feature in general.
+
+@subheading Maximum Object Render Distance
+@cindex @samp{maxrenderdist}
+
+If you have some expensive object or a portal and you know that that object
+is either no longer visible after some distance (due to other objects blocking
+it) or else too small to be really relevant then you can use the @samp{maxrenderdist}
+tag in @sc{xml} to specify the maximum distance to the camera. If the object
+goes beyond that distance it will no longer be rendered. Here is an example:
+
+@example
+<meshobj name="complextree">
+  <params>
+    @dots{}
+  </params>
+  <maxrenderdist value="100" />
+  @dots{}
+</meshobj>
+@end example
+
+This will cause the object to disappear after 100 units. You can also use a
+variable instead of a hardcoded value (using the @samp{var} attribute). In that
+case you can control the distance at runtime.
+
+This technique is especially useful for portals.
+
+@subheading Far Plane Clipping
+@cindex Far Plane Clipping
+
+You can also do this object removal for all objects at once using far plane
+clipping. Here is an example:
+
+@example
+<world>
+  @dots{}
+  <start>
+    @dots{}
+    <farplane a="0" b="0" c="1" d="100" />
+  </start>
+  @dots{}
+</world>
+@end example
+
+This will set a plane that clips away all geometry after distance 100. Note that
+in general you probably also want to use distance fog.
+
+@subheading Static @sc{lod}
+@cindex Static @sc{lod}
+
+You can replace objects that are far away with lower detail version using static @sc{lod}.
+Check out @ref{Level of Detail} for more information about how to use this feature.
+
