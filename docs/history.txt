@@ -20,6 +20,10 @@ chronological order.
 	  This can be used to separately scale the normal texture on terrain.
 	  When not specified, the "texture scale" is used by default.
 	  The Marble material in 'terrain' level demonstrates this.
+	- iceeey updated cegui plugin to work with CEGUI 0.5.0 while
+	  retaining compatibility with older versions.
+	- iceeey added a CEGUI 0.5.0 compatible version of the 'ice' skin which
+	  ceguitest will use depending on which version of CEGUI you have.
 19-Jul-2006
 	- Jorrit simplified viewmesh a lot. It no longer attempts to do
 	  any path handling automatically. So the ':' notation is gone
