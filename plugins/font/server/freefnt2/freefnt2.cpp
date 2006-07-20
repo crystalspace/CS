@@ -30,10 +30,10 @@
 #include "iutil/comp.h"
 
 #include <ft2build.h>
-#include FT_INTERNAL_OBJECTS_H
 #include FT_FREETYPE_H
 #include FT_GLYPH_H
 #include FT_MODULE_H
+#include FT_SIZES_H
 
 #include "freefnt2.h"
 
