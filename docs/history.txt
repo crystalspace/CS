@@ -16,6 +16,10 @@ chronological order.
 	  which does this for you)
 	- Jorrit added a section in the manual explaining several tricks
 	  you can use to speed up map loading and runtime performance.
+	- iceeey added "normal scale" shadervar to splatting_scattering.
+	  This can be used to separately scale the normal texture on terrain.
+	  When not specified, the "texture scale" is used by default.
+	  The Marble material in 'terrain' level demonstrates this.
 19-Jul-2006
 	- Jorrit simplified viewmesh a lot. It no longer attempts to do
 	  any path handling automatically. So the ':' notation is gone

@@ -24,9 +24,18 @@
     <shadervar name="hg" type="vector3">0.36, 1.8, 1.6</shadervar>
     <!-- inscatter = .3 -->
     <shadervar name="inscattering term" type="vector3">0.3, 0.3, 0.3</shadervar>
+
+    <shadervar name="normal scale" type="expression">
+      <sexp>
+        (make-vector
+          (elt1 "texture scale")
+          (elt2 "texture scale")
+        )
+      </sexp>
+    </shadervar>
   </shadervars>
 
-
+<!--
   <technique priority="200"> 
     <pass>
       <mixmode><srcalphaadd/></mixmode>
@@ -64,7 +73,7 @@
       </fp>
     </pass>
   </technique>
-
+-->
   <technique priority="100"> 
     <pass>
       <mixmode><copy/></mixmode>
