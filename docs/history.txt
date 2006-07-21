@@ -6,6 +6,14 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+21-Jul-2006
+	- res fixed an assertion triggered by csBaseEventHandler that could
+	  occur when the destruction occured after 
+	  iEventQueue->RemoveAllListeners() was already called.
+	- res fixed csEventHandlerRegistry::ReleaseID(iEventHandler*) to
+	  not ignore the "refcount" of an ID (and thus prematurely releasing
+	  an ID even though not all RegisterID() calls are balanced with a
+	  ReleaseID() call).
 20-Jul-2006
 	- Andres added the svn:eol-style property to all text files lacking
 	  it (set to native). This is needed to have the eol set to the
