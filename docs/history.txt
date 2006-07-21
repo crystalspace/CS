@@ -24,6 +24,8 @@ chronological order.
 	  retaining compatibility with older versions.
 	- iceeey added a CEGUI 0.5.0 compatible version of the 'ice' skin which
 	  ceguitest will use depending on which version of CEGUI you have.
+	- res worked around a FreeType2.2.1 issue where it would return an
+	  error when rendering an empty glyph (e.g SPACE).
 19-Jul-2006
 	- Jorrit simplified viewmesh a lot. It no longer attempts to do
 	  any path handling automatically. So the ':' notation is gone
