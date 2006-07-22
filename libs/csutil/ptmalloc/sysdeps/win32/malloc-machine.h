@@ -207,6 +207,7 @@ static __inline void sharemem_destroy (void)
     }
     CloseHandle (mapping);
   }
+  sharemem_mapping = 0;
 }
 
 #include "../generic/malloc-machine.h"

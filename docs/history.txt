@@ -12,6 +12,8 @@ chronological order.
 	  on gcc3. This is my first commit by SVN, so I hope it doesn't break.
 	- res fixed the configure freetype check to not reference an internal
 	  header (doesn't work with FreeType2.2 any more).
+	- mdmkolbe applied a (modified) patch from res2k that fixes a crash
+	  caused by the interaction between ptmalloc and Cygwin.
 21-Jul-2006
 	- res fixed an assertion triggered by csBaseEventHandler that could
 	  occur when the destruction occured after 

@@ -38,4 +38,14 @@
 #pragma optimize("gty", on)
 #endif
 
+#ifdef __CYGWIN__
+/* Cygwin has funny issues with atexit() that ptmalloc seems to tickle.
+ * So within ptmalloc we use own own single-use implementation of atexit()
+ * when on Cygwin.  See cs_atexit in libs/csutil/ptmalloc_wrap.cpp.
+ */
+extern int cs_atexit(void(*func)(void));
+
+#define atexit cs_atexit
+#endif
+
 #endif // __CS_CSUTIL_DLMALLOC_SETTINGS_H__
