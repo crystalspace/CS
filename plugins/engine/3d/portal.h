@@ -277,7 +277,7 @@ public:
    */
   virtual iMeshWrapper* HitBeamPortals (const csReversibleTransform& t,
 	const csVector3& start, const csVector3& end,
-  	csVector3& isect, int* polygon_idx);
+  	csVector3& isect, int* polygon_idx, iSector** final_sector = 0);
 
   /**
    * Check if the destination sector is 0 and if so call

@@ -33,6 +33,7 @@
 #include "iutil/comp.h"
 #include "csgeom/vector3.h"
 #include "csutil/dirtyaccessarray.h"
+#include "csutil/scf_implementation.h"
 #include "ivaria/collider.h"
 #include "csgeom/transfrm.h"
 #include "CSopcodecollider.h"
@@ -47,14 +48,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(csOpcode)
 /**
  * Opcode implementation of the collision detection system.
  */
-class csOPCODECollideSystem : public iCollideSystem
+class csOPCODECollideSystem :
+  public scfImplementation2<csOPCODECollideSystem, iCollideSystem, iComponent>
 {
 
-  bool Collide (csOPCODECollider* collider1, const csReversibleTransform* trans1,
-    csTerraFormerCollider* terraformer);
+  bool Collide (csOPCODECollider* collider1,
+    const csReversibleTransform* trans1, csTerraFormerCollider* terraformer);
   
-  bool TestTriangleTerraFormer (csVector3 triangle[3], csTerraFormerCollider* c,
-    csCollisionPair* pair);
+  bool TestTriangleTerraFormer (csVector3 triangle[3],
+    csTerraFormerCollider* c, csCollisionPair* pair);
 
 public:
   Opcode::AABBTreeCollider TreeCollider;
@@ -69,8 +71,6 @@ public:
   static iObjectRegistry* rep_object_reg;
   static void OpcodeReportV (int severity, const char* message, 
     va_list args);
-
-  SCF_DECLARE_IBASE;
 
   csOPCODECollideSystem (iBase* parent);
   virtual ~csOPCODECollideSystem ();
@@ -142,15 +142,6 @@ public:
    * For CD systems that support one hit only this will always return true.
    */
   virtual bool GetOneHitOnly ();
-
-  struct Component : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csOPCODECollideSystem);
-    virtual bool Initialize (iObjectRegistry* object_reg)
-    {
-      return scfParent->Initialize (object_reg);
-    }
-  } scfiComponent;
 };
 
 }

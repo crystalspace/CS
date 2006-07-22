@@ -38,47 +38,13 @@
 
 CS_IMPLEMENT_PLUGIN
 
-SCF_IMPLEMENT_IBASE (csGenmeshSkelAnimationControlType)
-  SCF_IMPLEMENTS_INTERFACE (iGenMeshAnimationControlType)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csGenmeshSkelAnimationControlType::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 SCF_IMPLEMENT_FACTORY (csGenmeshSkelAnimationControlType)
-
-SCF_IMPLEMENT_IBASE (csGenmeshSkelAnimationControlFactory)
-  SCF_IMPLEMENTS_INTERFACE (iGenMeshSkeletonControlFactory)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csGenmeshSkelAnimationControl)
-  SCF_IMPLEMENTS_INTERFACE (iGenMeshAnimationControl)
-  SCF_IMPLEMENTS_INTERFACE (iGenMeshSkeletonControlState)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csSkelBone)
-  SCF_IMPLEMENTS_INTERFACE (iGenMeshSkeletonBone)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csSkelAnimControlRunnable)
-  SCF_IMPLEMENTS_INTERFACE (iGenMeshSkeletonScript)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csSkelBoneDefaultUpdateCallback)
-  SCF_IMPLEMENTS_INTERFACE (iGenMeshSkeletonBoneUpdateCallback)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csGenmeshSkelAnimationControlType::EventHandler)
-  SCF_IMPLEMENTS_INTERFACE (iEventHandler)
-SCF_IMPLEMENT_IBASE_END
 
 //-------------------------------------------------------------------------
 
-csSkelBone::csSkelBone (csGenmeshSkelAnimationControl *animation_control)
+csSkelBone::csSkelBone (csGenmeshSkelAnimationControl *animation_control) :
+  scfImplementationType(this)
 {
-  SCF_CONSTRUCT_IBASE (0); 
   parent = 0;
   rigid_body = 0;
   anim_control = animation_control;
@@ -90,7 +56,6 @@ csSkelBone::~csSkelBone ()
 {
   delete[] name;
   rigid_body = 0;
-  SCF_DESTRUCT_IBASE ();
 }
 
 void csSkelBone::SetMode (csBoneTransformMode mode) 
@@ -339,10 +304,11 @@ sac_frame& csSkelAnimControlScript::AddFrame (csTicks duration)
 
 //-------------------------------------------------------------------------
 
-csSkelAnimControlRunnable::csSkelAnimControlRunnable (csSkelAnimControlScript* script,
-  csGenmeshSkelAnimationControl* anim_control)
+csSkelAnimControlRunnable::csSkelAnimControlRunnable (
+  csSkelAnimControlScript* script,
+  csGenmeshSkelAnimationControl* anim_control) :
+  scfImplementationType(this)
 {
-  SCF_CONSTRUCT_IBASE (0);
   csSkelAnimControlRunnable::script = script;
   csSkelAnimControlRunnable::anim_control = anim_control;
   current_instruction = 0;
@@ -385,7 +351,6 @@ csSkelAnimControlRunnable::~csSkelAnimControlRunnable ()
 {
   release_tranform_data (positions);
   release_tranform_data (rotations);
-  SCF_DESTRUCT_IBASE ();
 }
 
 void csSkelAnimControlRunnable::release_tranform_data (TransformHash& h)
@@ -701,9 +666,10 @@ sac_frame & csSkelAnimControlRunnable::NextFrame ()
 //-------------------------------------------------------------------------
 
 csGenmeshSkelAnimationControl::csGenmeshSkelAnimationControl (
-  csGenmeshSkelAnimationControlFactory* fact, iMeshObject *mesh, iObjectRegistry* object_reg)
+  csGenmeshSkelAnimationControlFactory* fact, iMeshObject *mesh,
+  iObjectRegistry* object_reg) :
+  scfImplementationType(this)
 {
-  SCF_CONSTRUCT_IBASE (0);
   csGenmeshSkelAnimationControl::object_reg = object_reg;
   genmesh_fact_state = SCF_QUERY_INTERFACE (mesh->GetFactory (), iGeneralFactoryState);
   CS_ASSERT (genmesh_fact_state != 0);
@@ -745,7 +711,6 @@ csGenmeshSkelAnimationControl::~csGenmeshSkelAnimationControl ()
   delete[] animated_verts;
   delete[] animated_colors;
   delete[] animated_vert_norms;
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csGenmeshSkelAnimationControl::UpdateAnimation (csTicks current)
@@ -1198,9 +1163,9 @@ iGenMeshSkeletonBone *csGenmeshSkelAnimationControl::FindBone (const char *name)
 //-------------------------------------------------------------------------
 
 csGenmeshSkelAnimationControlFactory::csGenmeshSkelAnimationControlFactory (
-  csGenmeshSkelAnimationControlType* type, iObjectRegistry* object_reg)
+  csGenmeshSkelAnimationControlType* type, iObjectRegistry* object_reg) :
+  scfImplementationType(this, type)
 {
-  SCF_CONSTRUCT_IBASE (type);
   csGenmeshSkelAnimationControlFactory::type = type;
   csGenmeshSkelAnimationControlFactory::object_reg = object_reg;
   InitTokenTable (xmltokens);
@@ -1216,7 +1181,6 @@ csGenmeshSkelAnimationControlFactory::csGenmeshSkelAnimationControlFactory (
 
 csGenmeshSkelAnimationControlFactory::~csGenmeshSkelAnimationControlFactory ()
 {
-  SCF_DESTRUCT_IBASE ();
 }
 
 csPtr<iGenMeshAnimationControl> csGenmeshSkelAnimationControlFactory::
@@ -1696,35 +1660,29 @@ void csGenmeshSkelAnimationControlFactory::UnregisterAUAnimation (csGenmeshSkelA
 //-------------------------------------------------------------------------
 
 csGenmeshSkelAnimationControlType::csGenmeshSkelAnimationControlType (
-  iBase* pParent)
+  iBase* pParent) :
+  scfImplementationType(this, pParent), object_reg(0)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
-  scfiEventHandler = 0;
 }
 
 csGenmeshSkelAnimationControlType::~csGenmeshSkelAnimationControlType ()
 {
-  if (scfiEventHandler)
+  if (object_reg)
   {
     csRef<iEventQueue> q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
     if (q)
-      q->RemoveListener (scfiEventHandler);
-    scfiEventHandler->DecRef ();
+      q->RemoveListener (this);
   }
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csGenmeshSkelAnimationControlType::Initialize (iObjectRegistry* object_reg)
 {
-  csGenmeshSkelAnimationControlType::object_reg = object_reg;
+  this->object_reg = object_reg;
   PreProcess = csevPreProcess (object_reg);
-  scfiEventHandler = new EventHandler (this);
   csRef<iEventQueue> q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
   vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
   if (q != 0)
-    q->RegisterListener (scfiEventHandler, PreProcess);
+    q->RegisterListener (this, PreProcess);
   return true;
 }
 

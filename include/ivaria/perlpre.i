@@ -20,6 +20,14 @@
 
 #include <csutil/csstring.h>
 
+/****************************************
+ * Fill the following to extend list or csSet interfaces.
+ **************************************************************/
+%define LIST_OBJECT_FUNCTIONS(classname,typename)
+%enddef
+%define SET_OBJECT_FUNCTIONS(classname,typename)
+%enddef
+
 /****************************************************************************
  * Renaming operators is the first stage of wrapping them.
  * We ignore operator [] and () and unary *

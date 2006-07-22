@@ -20,6 +20,7 @@
 
 #include "csgeom/math.h"
 #include "csgfx/rgbpixel.h"
+#include "csutil/csstring.h"
 
 #include "igraphic/image.h"
 #include "iutil/objreg.h"

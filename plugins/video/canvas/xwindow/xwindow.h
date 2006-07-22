@@ -21,8 +21,10 @@
 #define __CS_XWINDOW_H__
 
 #include <stdarg.h>
+#include "csutil/csstring.h"
 #include "csutil/hash.h"
 #include "csutil/scf.h"
+#include "csutil/scf_implementation.h"
 #include "csutil/weakref.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
@@ -31,7 +33,9 @@
 #include "plugins/video/canvas/xwindowcommon/xextf86vm.h"
 #include "ivideo/graph2d.h"
 
+#ifndef XK_MISCELLANY
 #define XK_MISCELLANY 1
+#endif
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <X11/keysymdef.h>

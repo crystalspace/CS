@@ -24,28 +24,28 @@
  * ODE-specific interfaces
  */
 
-#include "csutil/scf.h"
-
-SCF_VERSION (iODEFrameUpdateCallback, 0, 0, 1);
+#include "csutil/scf_interface.h"
 
 /**
  * This class can be passed in as a callback during the physics update
  * it is only called if FrameRate is enabled.
  */
-struct iODEFrameUpdateCallback : public iBase
+struct iODEFrameUpdateCallback : public virtual iBase
 {
+  SCF_INTERFACE(iODEFrameUpdateCallback, 2, 0, 0);
+
   /// Executes the per update callback
   virtual void Execute (float stepsize) = 0;
 };
-
-SCF_VERSION (iODEDynamicState, 0, 0, 1);
 
 /**
  * This class exposes parameters specific to odedynam as an implementation
  * of iDynamics
  */
-struct iODEDynamicState : public iBase
+struct iODEDynamicState : public virtual iBase
 {
+  SCF_INTERFACE(iODEDynamicState, 2, 0, 0);
+
 
   /// Sets ODE's Error Resolution Parameter (see ode docs for details)
   virtual void SetGlobalERP (float erp) = 0;
@@ -117,8 +117,6 @@ struct iODEDynamicState : public iBase
 
 };
 
-SCF_VERSION (iODEDynamicSystemState, 0, 0, 2);
-
 struct iODEBallJoint;
 struct iODEHingeJoint;
 struct iODEHinge2Joint;
@@ -131,8 +129,10 @@ struct iODESliderJoint;
  * of iDynamics.  In most cases SystemState should not be modified directly
  * unless you want the behavior of a specific system different from others.
  */
-struct iODEDynamicSystemState : public iBase
+struct iODEDynamicSystemState : public virtual iBase
 {
+  SCF_INTERFACE(iODEDynamicSystemState, 2, 0, 0);
+
   /**
    * Sets ODE's Error Resolution Parameter (see ode docs for details)
    * Setting this in iODEDynamicState will set it for each System
@@ -319,13 +319,13 @@ enum ODEJointType
   CS_ODE_JOINT_TYPE_AMOTOR
 };
 
-SCF_VERSION (iODEJointState, 0, 0, 2);
-
 /**
 * General joint state. Here
 */
-struct iODEJointState : public iBase
+struct iODEJointState : public virtual iBase
 {
+  SCF_INTERFACE(iODEJointState, 2, 0, 0);
+
   virtual ODEJointType GetType() = 0;
 
   // Baaad interface. Are those number axes? If so, perhaps pass it as
@@ -411,8 +411,10 @@ struct iODEJointState : public iBase
 /**
  * General joint state.
  */
-struct iODEGeneralJointState : public iBase
+struct iODEGeneralJointState : public virtual iBase
 {
+  SCF_INTERFACE(iODEGeneralJointState, 2, 0, 0);
+
   /**
    * Set low stop angle or position. For rotational joints, this
    * stop must be greater than - pi to be effective.
@@ -543,10 +545,10 @@ struct iODEGeneralJointState : public iBase
 
 };
 
-SCF_VERSION (iODESliderJoint, 0, 0, 1);
-
 struct iODESliderJoint : public iODEGeneralJointState
 {
+  SCF_INTERFACE(iODESliderJoint, 2, 0, 0);
+
   ///Set the slider axis.
   virtual void SetSliderAxis (float x, float y, float z) = 0;
 
@@ -564,7 +566,6 @@ struct iODESliderJoint : public iODEGeneralJointState
   virtual float GetSliderPositionRate () = 0;
 };
 
-SCF_VERSION (iODEUniversalJoint, 0, 0, 1);
 /**
  * A universal joint is like a ball and socket joint that constrains
  * an extra degree of rotational freedom. Given axis 1 on body 1, and
@@ -574,6 +575,8 @@ SCF_VERSION (iODEUniversalJoint, 0, 0, 1);
  */
 struct iODEUniversalJoint : public iODEGeneralJointState
 {
+  SCF_INTERFACE(iODEUniversalJoint, 2, 0, 0);
+
   /// Set universal anchor.
   virtual void SetUniversalAnchor (float x, float y, float z) = 0;
 
@@ -615,8 +618,6 @@ enum ODEAMotorMode
   CS_ODE_AMOTOR_MODE_LAST
 };
 
-SCF_VERSION (iODEAMotorJoint, 0, 0, 1);
-
 /**
  * ODE AMotor joint. An angular motor (AMotor) allows the relative
  * angular velocities of two bodies to be controlled. The angular
@@ -630,6 +631,7 @@ SCF_VERSION (iODEAMotorJoint, 0, 0, 1);
  */
 struct iODEAMotorJoint : public iODEGeneralJointState
 {
+  SCF_INTERFACE(iODEAMotorJoint, 2, 0, 0);
 
   /**
    * Set the angular motor mode. The mode parameter must be one of the
@@ -721,14 +723,14 @@ struct iODEAMotorJoint : public iODEGeneralJointState
   virtual float GetAMotorAngleRate (int axis_num) = 0;
 };
 
-SCF_VERSION (iODEHinge2Joint, 0, 0, 1);
-
 /**
  * ODE hinge 2 joint. The hinge-2 joint is the same as two hinges connected 
  * in series, with different hinge axe.
  */
 struct iODEHinge2Joint : public iODEGeneralJointState
 {
+  SCF_INTERFACE(iODEHinge2Joint, 2, 0, 0);
+
   /**
    * Set the joint anchor point. The joint will try to keep this point
    * on each body together. Input specified in world coordinates.
@@ -793,13 +795,13 @@ struct iODEHinge2Joint : public iODEGeneralJointState
 
 };
 
-SCF_VERSION (iODEHingeJoint, 0, 0, 1);
-
 /**
  * ODE hinge joint (contrainted translation and 1 free rotation axis).
  */
 struct iODEHingeJoint : public iODEGeneralJointState
 {
+  SCF_INTERFACE(iODEHingeJoint, 2, 0, 0);
+
   /**
    * Set the joint anchor point. The joint will try to keep this point
    * on each body together. Input specified in world coordinates.
@@ -848,13 +850,13 @@ struct iODEHingeJoint : public iODEGeneralJointState
 
 };
 
-SCF_VERSION (iODEBallJoint, 0, 0, 1);
-
 /**
  * ODE ball and socket joint (contrainted translation and free rotation).
  */
-struct iODEBallJoint : public iBase
+struct iODEBallJoint : public virtual iBase
 {
+  SCF_INTERFACE(iODEBallJoint, 2, 0, 0);
+
   /**
    * Set the joint anchor point. The joint will try to keep this point
    * on each body together. Input specified in world coordinates.
@@ -902,7 +904,5 @@ struct iODEBallJoint : public iBase
   /// Get torque that joint applies to body 2
   virtual csVector3 GetFeedbackTorque2 () = 0;
 };
-
-
 
 #endif // __CS_IVARIA_ODE_H__

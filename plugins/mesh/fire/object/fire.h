@@ -23,6 +23,7 @@
 #include "csgeom/box.h"
 #include "csutil/cscolor.h"
 #include "csutil/refarr.h"
+#include "csutil/scf_implementation.h"
 #include "csplugincommon/particlesys/partgen.h"
 #include "imesh/fire.h"
 #include "iutil/eventh.h"
@@ -36,7 +37,8 @@ struct iSector;
 /**
  * A Fire particle system. Each x msec n particles shoot out of the fire,
  */
-class csFireMeshObject : public csParticleSystem
+class csFireMeshObject :
+  public scfImplementationExt1<csFireMeshObject, csParticleSystem, iFireState>
 {
 protected:
   enum { MAX_COLORS = 5 };
@@ -104,6 +106,7 @@ public:
    */
   void AddLight (iEngine*, iSector*);
 
+  //------------------------- iFireState implementation ----------------
   /// Set the size of the fire drops.
   void SetDropSize (float dropwidth, float dropheight)
   {
@@ -182,84 +185,18 @@ public:
   virtual void HardTransform (const csReversibleTransform& t);
   virtual bool SupportsHardTransform () const { return true; }
 
-  SCF_DECLARE_IBASE_EXT (csParticleSystem);
-
-  //------------------------- iFireState implementation ----------------
-  class FireState : public iFireState
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csFireMeshObject);
-    virtual void SetParticleCount (int num)
-    {
-      scfParent->SetParticleCount (num);
-    }
-    virtual int GetParticleCount () const
-    {
-      return (int)scfParent->GetParticleCount ();
-    }
-    virtual void SetDropSize (float dropwidth, float dropheight)
-    {
-      scfParent->SetDropSize (dropwidth, dropheight);
-    }
-    virtual void GetDropSize (float& dropwidth, float& dropheight) const
-    {
-      scfParent->GetDropSize (dropwidth, dropheight);
-    }
-    virtual void SetOrigin (const csBox3& origin)
-    {
-      scfParent->SetOrigin (origin);
-    }
-    virtual const csBox3& GetOrigin () const
-    {
-      return scfParent->GetOrigin ();
-    }
-    virtual void SetLighting (bool l)
-    {
-      scfParent->SetLighting (l);
-    }
-    virtual bool GetLighting () const
-    {
-      return scfParent->GetLighting ();
-    }
-    virtual void SetDirection (const csVector3& dir)
-    {
-      scfParent->SetDirection (dir);
-    }
-    virtual const csVector3& GetDirection () const
-    {
-      return scfParent->GetDirection ();
-    }
-    virtual void SetSwirl (float swirl)
-    {
-      scfParent->SetSwirl (swirl);
-    }
-    virtual float GetSwirl () const
-    {
-      return scfParent->GetSwirl ();
-    }
-    virtual void SetColorScale (float colscale)
-    {
-      scfParent->SetColorScale (colscale);
-    }
-    virtual float GetColorScale () const
-    {
-      return scfParent->GetColorScale ();
-    }
-    virtual void SetTotalTime (float ttime)
-    {
-      scfParent->SetTotalTime (ttime);
-    }
-    virtual float GetTotalTime () const
-    {
-      return scfParent->GetTotalTime ();
-    }
-  } scfiFireState;
-  friend class FireState;
+  // Redirect these iFireState functions to csParticleSystem
+  virtual void SetParticleCount (int num)
+  { csParticleSystem::SetParticleCount (num); }
+  virtual size_t GetParticleCount () const
+  { return csParticleSystem::GetParticleCount (); }
 };
 
 /**
  * Factory for fire.
  */
-class csFireMeshObjectFactory : public iMeshObjectFactory
+class csFireMeshObjectFactory :
+  public scfImplementation1<csFireMeshObjectFactory, iMeshObjectFactory>
 {
 private:
   iObjectRegistry* object_reg;
@@ -276,8 +213,6 @@ public:
   virtual ~csFireMeshObjectFactory ();
 
   //------------------------ iMeshObjectFactory implementation --------------
-  SCF_DECLARE_IBASE;
-
   virtual csFlags& GetFlags () { return flags; }
   virtual csPtr<iMeshObject> NewInstance ();
   virtual csPtr<iMeshObjectFactory> Clone () { return 0; }
@@ -299,14 +234,13 @@ public:
  * Fire type. This is the plugin you have to use to create instances
  * of csFireMeshObjectFactory.
  */
-class csFireMeshObjectType : public iMeshObjectType
+class csFireMeshObjectType :
+  public scfImplementation2<csFireMeshObjectType, iMeshObjectType, iComponent>
 {
 private:
   iObjectRegistry* object_reg;
 
 public:
-  SCF_DECLARE_IBASE;
-
   /// Constructor.
   csFireMeshObjectType (iBase*);
   /// Destructor.
@@ -314,13 +248,8 @@ public:
   /// Draw.
   virtual csPtr<iMeshObjectFactory> NewFactory ();
 
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csFireMeshObjectType);
-    virtual bool Initialize (iObjectRegistry* p)
-    { scfParent->object_reg = p; return true; }
-  } scfiComponent;
-  friend struct eiComponent;
+  virtual bool Initialize (iObjectRegistry* p)
+  { this->object_reg = p; return true; }
 };
 
 #endif // __CS_FIRE_H__

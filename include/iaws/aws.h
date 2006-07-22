@@ -949,7 +949,7 @@ struct iAwsComponent : public iAwsSource
   virtual csRect getInsets() = 0;
 
   /// Returns true if this window overlaps the given rect.
-  virtual bool Overlaps(csRect &r) = 0;
+  virtual bool Overlaps(const csRect &r) = 0;
 
   /// Returns the state of the hidden flag
   virtual bool isHidden() = 0;

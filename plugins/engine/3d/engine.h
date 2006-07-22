@@ -24,6 +24,7 @@
 #include "csutil/array.h"
 #include "csutil/csobject.h"
 #include "csutil/hash.h"
+#include "csutil/set.h"
 #include "csutil/nobjvec.h"
 #include "csutil/parray.h"
 #include "csutil/refarr.h"
@@ -68,11 +69,11 @@ class csPolygon3D;
 class csRegion;
 class csRenderView;
 class csSector;
-class csSectorIt;
 class csSectorList;
 class csTextureList;
 struct iClipper2D;
 struct iConfigFile;
+struct iDocumentSystem;
 struct iLight;
 struct iMaterialWrapper;
 struct iObjectRegistry;
@@ -150,6 +151,14 @@ private:
   csRefArrayObject<iCollection> collections;
 };
 
+struct csSectorPos
+{
+  iSector* sector;
+  csVector3 pos;
+  csSectorPos (iSector* sector, const csVector3& pos) :
+  	sector (sector), pos (pos) { }
+};
+
 /**
  * List of camera positions for the engine. This class implements
  * iCameraPositionList.
@@ -203,7 +212,6 @@ class csEngine : public scfImplementationExt4<csEngine,
   friend class csLight;
   friend class csLightIt;
   friend class csRenderLoop;
-  friend class csSectorIt;
   friend class csSectorList;
 
 public:
@@ -366,6 +374,8 @@ public:
   	iRegion* region = 0);
   virtual csPtr<iSectorIterator> GetNearbySectors (iSector* sector,
   	const csVector3& pos, float radius);
+  virtual csPtr<iSectorIterator> GetNearbySectors (iSector* sector,
+  	const csBox3& box);
 
   virtual void AddEngineSectorCallback (iEngineSectorCallback* cb);
   virtual void RemoveEngineSectorCallback (iEngineSectorCallback* cb);
@@ -669,15 +679,11 @@ private:
    */
   bool CheckConsistency ();
 
-  // Sector iteration functions
-  csSectorIt* AllocSectorIterator (iSector *sector, const csVector3 &pos, 
-    float radius);
-  void RecycleSectorIterator (csSectorIt* iterator);
-  void FreeSectorIteratorPool ();
-
   // Renderloop loading/creation
   csPtr<iRenderLoop> CreateDefaultRenderLoop ();
   void LoadDefaultRenderLoop (const char* fileName);
+  csRef<iShader> LoadShader (iDocumentSystem* docsys, iShaderCompiler* shcom,
+    const char* filename);
 
   /**
    * Setup for starting a Draw or DrawFunc.
@@ -689,33 +695,24 @@ private:
    */
   void ControlMeshes ();
 
-  /**
-   * Get a list of all objects in the given sphere.
-   */
+  void GetNearbySectorList (iSector* sector,
+    const csVector3& pos, float radius, csArray<csSectorPos>& list,
+    csSet<csPtrKey<iSector> >& visited_sectors);
+  void GetNearbySectorList (iSector* sector,
+    const csBox3& box, csArray<csSectorPos>& list,
+    csSet<csPtrKey<iSector> >& visited_sectors);
   void GetNearbyObjectList (iSector* sector,
     const csVector3& pos, float radius, csArray<iObject*>& list,
-    csArray<iSector*>& visited_sectors, bool crossPortals = true);
-
-  /**
-   * Get a list of all meshes in the given box.
-   */
+    csSet<csPtrKey<iSector> >& visited_sectors, bool crossPortals = true);
   void GetNearbyMeshList (iSector* sector,
     const csBox3& box, csArray<iMeshWrapper*>& list,
-    csArray<iSector*>& visited_sectors, bool crossPortals = true);
-
-  /**
-   * Get a list of all meshes in the given sphere.
-   */
+    csSet<csPtrKey<iSector> >& visited_sectors, bool crossPortals = true);
   void GetNearbyMeshList (iSector* sector,
     const csVector3& pos, float radius, csArray<iMeshWrapper*>& list,
-    csArray<iSector*>& visited_sectors, bool crossPortals = true);
-
-  /**
-   * Get a list of all meshes in the given beam.
-   */
+    csSet<csPtrKey<iSector> >& visited_sectors, bool crossPortals = true);
   void GetNearbyMeshList (iSector* sector,
     const csVector3& start, const csVector3& end, csArray<iMeshWrapper*>& list,
-    csArray<iSector*>& visited_sectors, bool crossPortals = true);
+    csSet<csPtrKey<iSector> >& visited_sectors, bool crossPortals = true);
 
   /**
    * Read configuration file (using the system driver) for all engine
@@ -879,9 +876,6 @@ private:
   /// Array of objects that want to die next frame (iMeshWrapper*).
   csSet<csPtrKey<iMeshWrapper> > wantToDieSet;
 
-  // Sector iterator pool
-  csSectorIt* sectorItPool; //TOOD: REWORK THIS! UGLY
-
   /// The list of all named render priorities.
   csStringArray renderPriorities;
   /// Sorting flags for the render priorities.
@@ -900,6 +894,7 @@ private:
 
   /// Default render loop
   csRef<iRenderLoop> defaultRenderLoop;
+  csString override_renderloop;
   /// Render loop manager
   csRenderLoopManager* renderLoopManager;
   /// The graphics loader

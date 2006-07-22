@@ -52,7 +52,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Soft3D)
       srim (srim), srit (srit), inBuffers (inBuffers), 
       buffersMask (buffersMask), floatsPerVert (floatsPerVert), pix (pix) {}
 
-    CS_FORCEINLINE
+    CS_FORCEINLINE_TEMPLATEMETHOD
     void RenderScanline (InterpolateEdgePersp& L, InterpolateEdgePersp& R, 
       int ipolStep, int ipolShift, uint32* temp, void* dest, uint len, 
       uint32 *zbuff)
@@ -119,7 +119,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Soft3D)
 
   struct SLLogic_ZFill
   {
-    CS_FORCEINLINE
+    CS_FORCEINLINE_TEMPLATEMETHOD
     void RenderScanline (InterpolateEdgePersp& L, InterpolateEdgePersp& R, 
       int ipolStep, int ipolShift, uint32* /*temp*/, void* /*dest*/, uint len, 
       uint32 *zbuff)

@@ -58,58 +58,18 @@ enum
   XMLTOKEN_SWIRL
 };
 
-SCF_IMPLEMENT_IBASE (csSnowFactoryLoader)
-  SCF_IMPLEMENTS_INTERFACE (iLoaderPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csSnowFactoryLoader::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csSnowFactorySaver)
-  SCF_IMPLEMENTS_INTERFACE (iSaverPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csSnowFactorySaver::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csSnowLoader)
-  SCF_IMPLEMENTS_INTERFACE (iLoaderPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csSnowLoader::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csSnowSaver)
-  SCF_IMPLEMENTS_INTERFACE (iSaverPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csSnowSaver::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 SCF_IMPLEMENT_FACTORY (csSnowFactoryLoader)
 SCF_IMPLEMENT_FACTORY (csSnowFactorySaver)
 SCF_IMPLEMENT_FACTORY (csSnowLoader)
 SCF_IMPLEMENT_FACTORY (csSnowSaver)
 
-
-csSnowFactoryLoader::csSnowFactoryLoader (iBase* pParent)
+csSnowFactoryLoader::csSnowFactoryLoader (iBase* pParent) :
+  scfImplementationType(this, pParent)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 csSnowFactoryLoader::~csSnowFactoryLoader ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csSnowFactoryLoader::Initialize (iObjectRegistry* object_reg)
@@ -130,16 +90,13 @@ csPtr<iBase> csSnowFactoryLoader::Parse (iDocumentNode* /*node*/,
 
 //---------------------------------------------------------------------------
 
-csSnowFactorySaver::csSnowFactorySaver (iBase* pParent)
+csSnowFactorySaver::csSnowFactorySaver (iBase* pParent) :
+  scfImplementationType(this, pParent)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 csSnowFactorySaver::~csSnowFactorySaver ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csSnowFactorySaver::Initialize (iObjectRegistry* object_reg)
@@ -158,16 +115,13 @@ bool csSnowFactorySaver::WriteDown (iBase* /*obj*/, iDocumentNode* parent,
 }
 
 //---------------------------------------------------------------------------
-csSnowLoader::csSnowLoader (iBase* pParent)
+csSnowLoader::csSnowLoader (iBase* pParent) :
+  scfImplementationType(this, pParent)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 csSnowLoader::~csSnowLoader ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csSnowLoader::Initialize (iObjectRegistry* object_reg)
@@ -308,16 +262,13 @@ csPtr<iBase> csSnowLoader::Parse (iDocumentNode* node,
 
 //---------------------------------------------------------------------------
 
-csSnowSaver::csSnowSaver (iBase* pParent)
+csSnowSaver::csSnowSaver (iBase* pParent) :
+  scfImplementationType(this, pParent)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 csSnowSaver::~csSnowSaver ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csSnowSaver::Initialize (iObjectRegistry* object_reg)
@@ -415,11 +366,11 @@ bool csSnowSaver::WriteDown (iBase* obj, iDocumentNode* parent,
     synldr->WriteBool(paramsNode, "lighting", snowstate->GetLighting(), true);
 
     //Writedown Number tag
-    int number = snowstate->GetParticleCount();
+    size_t number = snowstate->GetParticleCount();
     csRef<iDocumentNode> numberNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
     numberNode->SetValue("number");
     csRef<iDocumentNode> numberValueNode = numberNode->CreateNodeBefore(CS_NODE_TEXT, 0);
-    numberValueNode->SetValueAsInt(number);
+    numberValueNode->SetValueAsInt((int)number);
   }
 
   paramsNode=0;

@@ -19,7 +19,7 @@
 #ifndef __CS_IUTIL_EVENTHANDLERS_H__
 #define __CS_IUTIL_EVENTHANDLERS_H__
 
-#include "csutil/strset.h"
+#include "csutil/hash.h"
 
 /**\file
  * General event handler naming, name management, indexing, and instantiation interface.
@@ -57,30 +57,39 @@ struct iEventHandler;
  */
 struct iEventHandlerRegistry : public virtual iBase
 {
-  SCF_INTERFACE(iEventHandlerRegistry, 1, 1, 1);
+  SCF_INTERFACE(iEventHandlerRegistry, 1, 3, 0);
 
   /**
    * Get a csHandlerID based upon some string.
    * This should only ever be done to reference generic 
    * (non-instantiated) handler names or single-instance handlers.
    */	
-  virtual CS_CONST_METHOD csHandlerID GetGenericID (const csString &) = 0;
+  virtual CS_CONST_METHOD csHandlerID GetGenericID (const char*) = 0;
   virtual CS_CONST_METHOD csHandlerID GetGenericPreBoundID (csHandlerID) = 0;
   virtual CS_CONST_METHOD csHandlerID GetGenericPostBoundID (csHandlerID) = 0;
   /**
    * Get the csHandlerID for a specified event handler, which provides
    * its own name via the iEventHandler::GetInstanceName() method.
+   * Does not set up any mappings, implicit names, or anything else that you 
+   * need; a handler needs be registered with RegisterID() beforehand.
    */
   virtual csHandlerID GetID (iEventHandler *) = 0;
   /**
    * Get the csHandlerID for an arbitrary handler name.  Does not set
    * up any mappings, implicit names, or anything else that you need;
-   * should only be used internally by other CS libraries when you KNOW 
-   * these aren't needed.
+   * a handler needs be registered with RegisterID() beforehand.
    */
-  virtual csHandlerID GetID (csString &) = 0;
+  virtual csHandlerID GetID (const char*) = 0;
+
   /**
-   * Used when an iEventHandler is desroyed to remove our reference.
+   * Register an event handler to obtain a handler ID. 
+   * \remarks Every call must be balanced with a call to ReleaseID() to
+   *   ensure proper housekeeping. Otherwise, event handler instances may
+   *   be leaking.
+   */
+  virtual csHandlerID RegisterID (iEventHandler *) = 0;
+  /**
+   * Used when an iEventHandler is destroyed to remove our reference.
    */
   virtual void ReleaseID (csHandlerID id) = 0;
   /**
@@ -98,7 +107,8 @@ struct iEventHandlerRegistry : public virtual iBase
    * genericid is a generic instance, and instanceid is an
    * instance of genericid in particular.
    */
-  virtual CS_CONST_METHOD bool const IsInstanceOf (csHandlerID instanceid, csHandlerID genericid) = 0;
+  virtual CS_CONST_METHOD bool const IsInstanceOf (csHandlerID instanceid, 
+    csHandlerID genericid) = 0;
   /**
    * returns true if id is a handler instance (i.e., not a generic name).
    */

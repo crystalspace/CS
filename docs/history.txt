@@ -6,8 +6,505 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+21-Jul-2006
+	- res fixed an assertion triggered by csBaseEventHandler that could
+	  occur when the destruction occured after 
+	  iEventQueue->RemoveAllListeners() was already called.
+	- res fixed csEventHandlerRegistry::ReleaseID(iEventHandler*) to
+	  not ignore the "refcount" of an ID (and thus prematurely releasing
+	  an ID even though not all RegisterID() calls are balanced with a
+	  ReleaseID() call).
+	- res changed the CEGUI resource provider to use platform new (since
+	  it sometimes is freed with the platform delete).
+20-Jul-2006
+	- Andres added the svn:eol-style property to all text files lacking
+	  it (set to native). This is needed to have the eol set to the
+	  native version of the platform (eg \r\n on win, \n on linux).
+	  Without it eg. cross building and manual generation doesnt work
+	  properly. All people adding new text files should look that the
+	  property is set to native. (There is a mechanism called autoprops
+	  which does this for you)
+	- Jorrit added a section in the manual explaining several tricks
+	  you can use to speed up map loading and runtime performance.
+	- iceeey added "normal scale" shadervar to splatting_scattering.
+	  This can be used to separately scale the normal texture on terrain.
+	  When not specified, the "texture scale" is used by default.
+	  The Marble material in 'terrain' level demonstrates this.
+	- iceeey updated cegui plugin to work with CEGUI 0.5.0 while
+	  retaining compatibility with older versions.
+	- iceeey added a CEGUI 0.5.0 compatible version of the 'ice' skin which
+	  ceguitest will use depending on which version of CEGUI you have.
+	- res worked around a FreeType2.2.1 issue where it would return an
+	  error when rendering an empty glyph (e.g SPACE).
+19-Jul-2006
+	- Jorrit simplified viewmesh a lot. It no longer attempts to do
+	  any path handling automatically. So the ':' notation is gone
+	  and it no longer attempts to automatically guess the VFS dir
+	  to use as the current directory. Instead there are two new
+	  commandline options:
+	      -R: this option takes a real path and it will mount it to
+	          /tmp/viewmesh. Then it makes that directory the current
+		  directory.
+	      -C: this option takes a VFS path and it will make that directory
+	          the current directory. If this option is used together
+		  with -R then you can change the VFS dir to be relative
+		  to the location mounted with -R.
+	  The filename itself will be used as-is.
+	- Jorrit added a documentation section for viewmesh (under the new
+	  'rule' that every new feature that is added to CS should now
+	  be immediatelly documented :-)
+	- Jorrit updated the documentation about Blender (removed the
+	  mention of the obsolete old blend2cs tool).
+	- Jorrit added a reference to the new ViewMesh documentation
+	  from the overview.
+17-Jul-2006
+	- res changed csSpinLock to use a non-volatile pthread_mutex_t.
+	- res applied a patch from Joerg Fischer to fix the offsets in
+	  plugins/device/joystick/windows/dinputdefs.h.
+12-Jul-2006
+        - res added a check for the -Bsymbolic linker option to configure.
+          This binds "references to global symbols to the definition within 
+          the shared library" (from man ld). If this flag is not set, it can 
+          happen that symbols in plugins get bound against symbols from other 
+          modules (including the application executable itself), causing 
+          side-effects such as violating the "memory allocation and freeing in
+          the same module" rule.
+	- res once more tweaked the objcopy version check to also work with 
+	  X.Y.Z style versions again.
+11-Jul-2006
+	- res fixed a crash in bugplug related to empty commands.
+	- res augmented csPathLists to have a non-const operator[].
+	- res fixed a crash bug in csPathsList when dealing with empty
+	  paths.
+10-Jul-2006
+	- Jorrit fixed a fundamental problem with the engine sequence
+	  manager and timed operations. This problem would cause timed
+	  operations to remain in memory even after the sequence was
+	  destroyed. The result was crashes when unloading maps using
+	  these kinds of sequences. Fixed it by using the unique sequence_id
+	  that is already assigned to engine sequences and attaching
+	  that id to every timed operation in the engine sequence manager.
+	  When the sequence wrapper is destroyed it will then remove
+	  the timed operations.
+	- res moved the "numbered filename" logic out of bugplug/movierecorder
+	  into its own class, CS::NumberedFilenameHelper.
+	- res fixed csImageMemory::Copy() to ensure that an image buffers
+	  is available as well as converting the source image to the
+	  format of the destination image.
+	- res converted the movierecorder plugin to new SCF.
+	- res added a helper for "uberscreenshots", to create screenshots
+	  larger than the framebuffer resolution.
+	- res tweaked the uberscreenshot helper to facilitate customization.
+9-Jul-2006
+        - res disabled RTLD_GLOBAL for unix plugin loading again, since it has
+          undesireable side effects; for one, static libraries are suddenly
+          not static anymore, as e.g. symbols may be taken from other plugins.
+          Approached the original reason for adding this (DRI drivers failing
+	  to load otherwise) by a workaround in glx2d: it now manually loads 
+	  libGL.so with the RTLD_GLOBAL flag. This is sufficient to make DRI
+	  drivers happy.
+	- res fixed a crash in the GL driver db when it was closed without
+	  being opened.
+	- res fixed XK_MISCELLANY redefined warnings.
+8-Jul-2006
+	- res changed the event handler ID registration. Since the handler
+	  registry keeps a reference to registered handlers, handlers have to
+	  be unregistered properly to ensure none are leaking. Changed GetID()
+	  to not auto-register handlers; instead, RegisterID() has to be used
+	  (where each call must be balanced with a call to ReleaseID() for
+	  proper housekeeping).
+	- res fixed some errors to not cause crashes any more.
+	- res fixed apparently incorrect handling of the removal of a
+	  currently called event handler.
+7-Jul-2006
+	- res fixed the engine default shader loading to not reuse the same
+	  document, but create a new one instead. Fixes some crashing.
+6-Jul-2006
+	- res added the ability to override the default and portal shader with
+	  config file settings (instead of being purely hardcoded in the 
+	  engine).
+	- mdmkolbe converted the following plugins to the new SCF:
+	    - plugins/csparser/prshtgen.cpp (other parts of csparser remain)
+	    - plugins/console/
+	    - plugins/bugplug/
+	    - plugins/cssaver/
+	    - plugins/collide/
+	- res worked around a gcc 3.4 bug where __attribute__((always_inline))
+	  is not always supported.
+	- res augmented the CS python module building to also split debug info
+	  off.
+5-Jul-2006
+	- Fossi made a small bugfix to the sequence manager header
+	- res re-enabled the ATI "hidden NPOTS" support as it seems to be
+	  supported properly with the latest drivers.
+	- res added a gcc version of CS_FORCEINLINE.
+	- res declared the overridden operator new etc. as forced inline.
+	  This also seems to fix some issues with ptmalloc for external
+	  projects.
+	- res changed the aligned alloc functions to use ptmemalign if
+	  ptmalloc is enabled.
+4-Jul-2006
+	- res fixed an issue in ptmalloc where one of dlmalloc's internal
+	  structures would not be always initialized properly.
+	- res completely converted engseq to new SCF.
+3-Jul-2006
+	- caedes corrected an error in the swig list wrapper extensions 
+	  that would make them unusable for wrapping interfaces in cel.
+	- Philip Wyett fixed eliminated error when using 'alt-r' to start
+          recording a movie with the movie recorder plugin. Plugin was
+          starting and stopping and only recording one frame.
+	- caedes added swig wrapper helper for csSet template, it allows
+	  using len(set), set.append(id), a in set (test only), del set[id].
+	  This introduces a new %define for extending csSet in language 
+	  specific ways. Only implemented for python but other languages can
+	  implement their own extensions.
+	- caedes declared csSet<csStringID> for wrapping in cspace.i.
+	- mdmkolbe fixed a mistake in his previous commit.
+	- res fixed the binutils version detection to also work with the
+	  latest version (which reports "2.17").
+	- res added a detection for __attribute__((visibility("hidden"))) to
+	  configure (to complement the detection for default visibility).
+	- res updated the doxygen stylesheets for doxygen 1.4.7.
+2-Jul-2006
+	- caedes added wrappers so cspace Lists (like iMeshList) can be used 
+	  as python lists where applicable. Allows search by index and name by
+	  using [], also can iterate normally over their contents, and use 
+	  len(list) and list.append.
+	- caedes added dummy templates for list wrapping to the java and perl
+	  interface files.
+	- caedes fixed or silenced most warnings on generation of python
+          interfaces (tested on linux_x86, swig .24, and from .27 to .29):
+	    - removed reference to cspoint.h (deprecated).
+	    - silenced scfImplementation* warnings, now we can wrap this but
+	      should not be done in all situations, the silenced warnings can
+	      be controlled at include/ivaria/scf.i.
+	    - declared csShaderVariable and csSprite2DVertex necessary array
+	      templates.
+	    - made some workaround for the situation where swig would need
+	      directives in the middle of csutil/array.h to understand the
+	      templated class hierachy.
+	    - declare iSCF::SCF as immutable.
+29-Jun-2006
+	- res split csFixedSizeAllocator off csBlockAllocator, which only
+	  allocates blocks of fixed size. csBlockAllocator now builds upon
+	  csFixedSizeAllocator; handling of unfreed objects is now handled
+	  via a template parameter.
+	- Vincent fixed build error with gcc about extra semicolon.
+	- Marten fixed some compilation errors introdu9ced by res recent
+	  split of csBlockAllocator.
+	- mdmkolbe fixed some of the event handlers in plugins/mesh so they
+	  the listeners are only removed if they have already been added.
+27-Jun-2006
+        - Arianna fixed other warnings: size_t/int issues, mainly.
+	- res took another jab at the operator new issues:
+	    - Removed "static" again since that makes gcc complain (and wasn't
+	      very clean either).
+	    - Pragmatically implemented the platform-specific new by using
+	      platform_malloc() instead of trying to employ trickery to use the 
+	      platform's default operator new.
+	- caedes added initial interface code for the scfImplementation macros
+	  to the swig wrappers (file ivaria/scf.i).
+	- caedes made a workaround in cspace.i so python bindings can also be
+	  generated using swig 1.3.28.
+	- res renamed timemeasure.h to measuretime.h.
+	- res split the CS::MeasureTime time printing code out into a separate
+	  source file to avoid a warning in -ansi -pedantic.
+25-Jun-2006
+        - Piotr Obrzut added setting color feature for flare halo components.
+	- res made CS' own overriding operator new/delete static to avoid
+	  having them used by other object files.
+	- res added operator new overloads to call the platform-specific
+	  operator new.
+	- res fixed sprcal3d to use those new overloads.
+24-Jun-2006
+	- Peter Amstutz deleted the vos plugin from the Crystal Space tree,
+	  as it will now be maintained directly as part of the VOS tree.
+	- Peter Amstutz modified the cs-config script to search for the
+	  CS link libraries under several different possible names, so
+	  as to support finding and linking with the shared library 
+	  version of libcrystalspace.
+23-Jun-2006
+	- res fixed spinlock.h compilation for Intel Macs.
+	- res (blindly) fixed the core audio driver reinterpreting pointers 
+	  to 32bit values as strings which is problematic since quite a bit
+	  of random data may appear before the saving null terminator.
+	- res converted csconout to new SCF.
+	- res changed csconout to use RGBA instead of RGB colors for 
+	  foreground/background/shadows.
+	- caedes added floor operation to shader expressions.
+	- Jorrit fixed csQuaternion::SetMatrix() so that gmeshskelanim2
+	  again works correctly.
+	- Marten reverted jorrits change to csQuaternion as it is wrong.
+	  csQuaternion::SetMatrix was correct as it is, it must be 
+	  gmeshskelanim2 that is buggy. Please people, do not change the
+	  basic math classes unless you know the maths there.
+	- caedes fixed skeleton and gmeshskelanim2 to work again correctly
+	  with the good quaternion math.
+	- caedes added a more finished version of the ambient with additive
+	  layer (pulse is still not handled totally correctly though).
+	- caedes removed glow from parallax.xml and related files as its now
+	  handled in a more general way in ambient.
+	- caedes removed ambient2.xml and specifyambient.xml files as they 
+	  don't seem to have any useful difference with ambient.xml.
+22-Jun-2006
+        - Philip Wyett eliminated _POSIX_C_SOURCE redefinition warning in
+          python plugin on GNU Linux with Python 2.3.
+        - Philip Wyett continued changes to docs.
+	- Jorrit fixed handling of the ':' in path names with viewmesh.
+	- Jorrit fixed several problems in the genmeshanim2 plugin related
+	  to the recent convertion to new SCF. The problem is that it is
+	  unsafe to do this in a header:
+	    virtual iBla* GetBla ()
+	    {
+	      return (iBla*) bla;
+	    }
+	  When the definition of 'bla' is not known this will cause the
+	  cast to go wrong with bad results. To avoid this problem better
+	  use static_cast<iBla*> so that the compiler can catch this.
+	  The correct fix is then to not inline that method and put the
+	  implementation in the cpp file instead.
+20-Jun-2006
+	- mdmkolbe converted the following plugins to the new SCF:
+	    - plugins/mesh/lghtng/
+	    - plugins/mesh/particles/
+	    - plugins/mesh/genmesh/
+	    - plugins/mesh/haze/
+	    - plugins/mesh/terrain/
+	- mdmkolbe made a few messages more informative.
+	- mdmkolbe changed iEventHandlerRegistry so it doesn't
+	  use csStrings in the interface.
+        - Philip Wyett corrected a copy and paste error he made in documents.
+        - Philip Wyett edited Jorrits genesis for the youngsters to let
+          them know that comp.graphics.algoritms is a newsgroup.
+	- mdmkolbe tweaked the previous message change for compatibility with
+	  dialog boxes.
+	- David H. Bronke fixed an error in libs/csutil/eventhandlers.cpp
+	  where a const char* was being used as a csString.
+	- David H. Bronke committed a patch by lindquist to fix the CEGUI plugin
+	  for the latest SVN version of CEGUI.
+	- David H. Bronke added a missing #include to include/iengine/sector.h.
+	- res merged the ptmalloc branch.
+	  The main change is that an implementation of ptmalloc3 is used as 
+	  the default memory allocator throughout CS (and also external 
+	  projects).
+	  Use of ptmalloc can be disabled for the whole project by passing 
+	  --enable-ptmalloc=no to configure, or defining CS_NO_PTMALLOC in 
+	  include/csutil/win32/csconfig.h for MSVC.
+	  The platform-default memory allocation can be access by using the
+	  platform_malloc() etc. functions. CS' default allocator - ptmalloc3,
+	  or the platform's default, depending on the users choice - can be
+	  accessed by using cs_malloc() etc. All memory allocations in CS
+	  itself should use the cs_ functions.
+	  By default, malloc() etc. are overridden with the cs_malloc() etc.
+	  functions. To disable that for individual source files, define 
+	  CS_NO_MALLOC_OVERRIDE	before including cssysdef.h.
+	  Likewise, new and delete are overridden to use cs_malloc()/cs_free()
+	  by default, this can be disabled by defining CS_NO_NEW_OVERRIDE
+	  before including cssysdef.h. This is useful to interface with some
+	  3rd party libraries that take ownership of pointers passed into the
+	  library (and later attempt to free it with the default allocator).
+19-Jun-2006
+	- Philip Wyett made Quick Start more explanatory for the CS newcomers.
+	- res changed csRectRegion to use a csArray<> for rectangle storage.
+	- res fixed fallout from the csRectRegion change.
+	- mdmkolbe converted the following plugins to the new SCF:
+	    - plugins/mesh/bezier/
+	    - plugins/mesh/fountain/
+	    - plugins/mesh/skeleton/
+	    - plugins/mesh/fire/
+	    - plugins/mesh/snow/
+	    - plugins/mesh/explo/
+	    - plugins/mesh/rain/
+	    - plugins/mesh/instmesh/
+	    - plugins/mesh/spiral/
+	    - plugins/mesh/spr2d/
+	    - plugins/mesh/emit/
+	- Jorrit fixed compilation of csGradient.
+        - Philip Wyett continued docs cleanup.
+        - Philip Wyett began adding more of the bundled CS applications with
+          basic descriptions to the application overview section of the
+          documentation.
+	- res changed the configure optimization flag detection to try
+	  -march=prescott before -march=i686 on Intel Macs.
+	- res excluded the custom new enabling/disabling headers from the
+	  master headers.
+18-Jun-2006
+        - Arianna fixed some warnings: size_t/uint conversions and some
+          deprecated method.
+	- mdmkolbe converted the remainder of of apps/ to the new SCF.
+	- Eric Sunshine performed project-wide spelling corrections:
+	    conveniance --> convenience
+	    conveniant	--> convenient
+	- res fixed spr2d's SetColor() to actually do something again.
+	- res added convenience includes to disable/enable CS' 'new' and 
+	    'delete' overrides when the memtracker is enabled.
+	- res added some missing custom new re-enablings.
+	- res augmented the scfArray* classes with constructors that also take
+	  and SCF parent argument.
+	- res made an interface version iGradient of csGradient, so you can
+	  pass them across plugins.
+	- Philip Wyett changed his email address in docs. Changed 'written by'
+	  to 'originally written by' for Windows related documentation as I
+	  will no longer being working with the Windows codebase daily (as I
+	  have not done for a long time) and will be concentrating on Linux.
+	- Philip Wyett starts some maintenance work and changes to
+	  documentation.
+17-Jun-2006
+        - Piotr Obrzut fixed phystut crash on exit problem (when running
+          with bullet plugin)
+        - Piotr Obrzut fixes bullet plugin unused parameter/variable warnings
+	- mdmkolbe converted libs/csplugincommon/opengl to the new SCF.
+16-Jun-2006
+	- AndyDude fixed the MacOSX menu bug and launching in background bug.
+	- AndyDude changed the non-error CoreAudio messages to be not so 
+	  'loud'. The two CoreAudio messages that I changed were Report()'d 
+	  at very high severity levels, when it wasn't really that severe.
+	- res fixed msvcgen.jam to use the "common" directory to generate
+	  the relative path for icon resources, not the version-specific one.
+	- mdmkolbe fixed a few unused parameter warnings.
+15-Jun-2006
+	- thebolt fixed a bug in csQuaternion which caused matrix to
+	  quaternion to go wrong.
+	- Jorrit fixed a bug in genmesh GetRadius() function. This would
+	  return the correct radius but an incorrect center (i.e. center
+	  was always 0,0,0).
+	- Jorrit (with the help of Erroroman) fixed
+	  flat_ppl_attenuation.avp so that bumpmapping no longer flickers.
+	  This fixes at least light_bumpmap technique 220. Not sure
+	  about the others. The bug still appears present in case glow
+	  is used however.
+	- mdmkolbe brought the Java SWIG bindings a little closer to working.
+14-Jun-2006
+	- caedes fixed cspace.i for changes in spr2d.
+	- caedes fixed cspython.cpp for dissaparition of evenhandler.h.
+	- res fixed an apparent typo in aws2's gradient code.
+	- res changed wxtest to also include wx.rc.
+	- Jorrit did the following to csEngineTools::FindShortestDistance().
+	    - It now returns the result in a csShortestDistanceResult
+	      structure.
+	    - In addition to the squared distance it now also returns
+	      the direction to follow (starting from the source position)
+	      which would make you end up at the destination. Usually
+	      that will be equal to 'destination-source' but if there are
+	      space warping portals involved then this can be different.
+	    - Added an optional 'accurate' parameter so that the calculation
+	      of the distance between the start point and the portal is
+	      more accurate.
+	    - Cleaned up the code considerably and also optimized it
+	      slightly by using a csSet for visited sectors.
+13-Jun-2006
+	- Jorrit slightly optimized iEngine->GetNearbyMeshes() and related
+	  by using a csSet for visited sectors instead of an array.
+	- Jorrit removed the ugly sector iterator pool in the engine.
+	  Also cleaned up the other iterators that are implemented
+	  internally in engine.cpp.
+	- Jorrit removed the unused csLightIt in the engine.
+	- Jorrit implemented iEngine->GetNearbySectors().
+	- Jorrit added a new version of iEngine->GetNearbySectors() that
+	  accepts a box instead of a sphere.
+	- Jorrit changed the csBox3 version of GetNearbyMeshes() and
+	  GetNearbySectors() so that it actually tests if the portal
+	  intersects with the given box. That way it makes the routine
+	  more optimal by not traversing useless portals.
+	- Jorrit cleaned up the GetNearbyBla() code in the engine a lot.
+12-Jun-2006
+	- Jorrit fixed the handling of 'ww' and 'wv' in space warping
+	  portals. If 'ww' was specified before 'wv' then 'wv' would
+	  overwrite whatever the user specified in 'ww'. This no longer
+	  happens. If you don't specify 'ww' then 'wv' will still set
+	  'ww' equal to 'wv' but not when 'ww' is already specified.
+	- Jorrit converted iCameraSectorListener to new scf.
+	- res changed the assert-in-assert handling to print the assert using
+	  the runtime functions as opposed to CS functions again. Also
+	  debug-break on first nested assert.
+	- res updated spr2d to use new SCF.
+	- res changed configure to apply -fvisibility=hidden not only to C++
+	  but also to C sources.
+	- res changed the spr2d to use an iArray instead of a csArray for the 
+	  "colored vertices".
+	- res changed csShaderVariable::GetType() to call the accessor if a
+	  value has not yet been set.
+	- res converted iPortalCallback implementations to new SCF.
+	- res fixed fixed cleaning of separate debug info.
+11-Jun-2006
+	- mdmkolbe factored into separate files parts of
+	  plugins/video/render3d/software/pixspecifica.cpp that were
+	  causing GCC to exhaust memory and crash.
+	- mdmkolbe reduced header dependencies and fixed several warnings.
+	- res converted csjoylin to new SCF.
+	- res changed csShaderVarStack& to iShaderVarStack* in interfaces.
+	- dfryer fixed a free() in glosx2d that made ptmalloc sad.  Also
+	  fixed some OS X components with bad headers.
+	- mdmkolbe fixed a few warnings and some SWIG errors.
+10-Jun-2006
+	- res added SCF interfaces for arrays.
+	- Adam fixed a node-deletion bug in csPartialOrder, and added more
+	  unit tests to boot.
+9-Jun-2006
+	- mdmkolbe fixed the following:
+	  - several unused parameter warnings
+	  - the CS_DEPRECATED_METHOD tag on iString::Clear()
+	  - CS_PRId64 vs PRId64 in include/csutil/timemeasure.h
+	    (Use the first for csPrintf and the second for printf.)
+	- mdmkolbe fixed a suspected variable name typo.
+	- Jorrit added support for strings to iSharedVariable.
+	- Jorrit added std_rloop_standard.xml which corresponds to the
+	  standard default renderloop as created internally by the engine.
+	- Jorrit added support for conditional renderloops in a map file.
+	  You can now say something like this:
+		<renderloop variable="quality">
+		    <condition value="low">std_rloop_standard</condition>
+		    <condition value="high">std_rloop_shadowmap</condition>
+		    <default>std_rloop_diffuse</default>
+		</renderloop>
+	  It will use the shared variable 'quality' to determine which
+	  renderloop to select.
+	- Jorrit fixed the engine renderloop commandline option so
+	  that it actually works. Previously it would set a default
+	  renderloop and later on it would be overwritten again by
+	  the usual default renderloop.
+	- mdmkolbe fixed overload ambiguity error in picView.
+	- mdmkolbe removed unneeded includes from:
+	  - include/csgeom/math3d.h
+	  - include/iutil/event.h
+	  - include/csutil/comparator.h
+	  - include/csutil/sysfunc.h
+	  Files that assumed these headers included things such as csstring.h
+	  and util.h were corrected.
+	- Jorrit fixed a compile error in tinypars.cpp after the removal
+	  of several includes.
+8-Jun-2006
+	- Andres added a stupid filter to the annotation facility to filter
+	  obvious spam.
+	- Jorrit added new versions of iSector->HitBeamPortals() and
+	  iSector->HitBeam() which return their results in a
+	  csSectorHitBeamResult class instead of through their parameters.
+	  That is more friendly for python, java, perl, ...
+	- Jorrit extended iSector->HitBeamPortals() so that it also returns
+	  the last sector we entered.
+	- Jorrit fixed a bug in the new iSector->HitBeamPortals() with
+	  regards to the final_sector.
+	- Jorrit added updated ambient shader from Erroroman/caedes which
+	  adds support for glow.
+	- Jorrit added new parallaxAtt shader from Erroroman.
+	- res changed "CS_STRICT_ALIGNMENT" from being defined on all but x86
+	  processors to be only defined on Sparc (where it was originally 
+	  needed).
+	- res fixed the GL renderer to repack csRGBcolor to an RGB bytestream
+	  on platforms that need it.
+	- Rhad added more robust error handling to the ALSA sound driver.
+	  This should correct some cases where the sound device was entering
+	  a bad state and never coming out when an underbuffer condition
+	  occurred.
+	- AndyDude fixed the url to demodata.zip to be the recent one.
+7-Jun-2006
+	- mdmkolbe made "separate debug info" default to disabled by default
+	  on Cygwin.  All released binutils to date have a bug in them which
+	  corrupts the output files when using separate debug info on Cygwin.
+	  See <http://www.mail-archive.com/bug-binutils@gnu.org/msg00687.html>.
 6-Jun-2006
 	- Vincent fixed leak-guard enabled build.
+	- Eric Sunshine added missing #include <new> to csutil/radixsort.h.
 5-Jun-2006
 	- res fixed createproject.sh to not copy cs_check_host.m4 any more
 	  (since it has moved).
@@ -550,7 +1047,7 @@ chronological order.
 27-Apr-2006
 	- Jorrit did a few more fixes to csMeshOnTexture. It finally starts
 	  to work now.
-	- Jorrit added a new conveniance method: csQueryRegistryOrLoad().
+	- Jorrit added a new convenience method: csQueryRegistryOrLoad().
 	  This method will first look for an interface in the object registry.
 	  If it is not there it will try to load the plugin and register
 	  that to the object registry.
@@ -1596,7 +2093,7 @@ chronological order.
 	- res fixed gl3d to properly activate buffers from a holder bound to 
 	  the secondary color.
 	- res changed the xmlshader plugin to not have buffer mappings for
-	  the color, normal and texcoord buffers by default. While conveniant,
+	  the color, normal and texcoord buffers by default. While convenient,
 	  it could also result in subtle performance issues, e.g. when a
 	  buffer is autobound that has to be calculated relatively expensively
 	  by a buffer getter, yet is not used in the actual shader (e.g. Thing
@@ -1761,7 +2258,7 @@ chronological order.
 	  missing. Now the factory material is really optional.
 	- Jorrit added a new md2 loader for spr3d. This will help replace
 	  the model importing system.
-	- Jorrit added a new iModelLoader interface. This is a conveniance
+	- Jorrit added a new iModelLoader interface. This is a convenience
 	  interface that some loading plugins can implement. This makes it
 	  easier to create a mesh factory from a model file. Currently
 	  this is implemented by the new gmesh3ds and spr3md2 plugins.
@@ -3186,7 +3683,7 @@ chronological order.
 	  AWS2.
 27-Sep-2005
 	- Jorrit added csTransform::GetUp(), GetFront(), and GetRight().
-	  These three conveniance functions get the up, front, and right
+	  These three convenience functions get the up, front, and right
 	  vectors in 'other' space. They are very efficient.
 	- Jorrit fixed the loader so it is no longer an error if the
 	  sound loader is not present. Sounds will simply be ignored then.
@@ -3269,7 +3766,7 @@ chronological order.
 	  scfFakeInterface<If> by having scfFakeInterface<> inherit from If,
 	  to make things work again until Marten can take a look.
 	- res removed csDataStream since it overlapped with csMemFile; the
-	  conveniance functions have been moved to csFileReadHelper.
+	  convenience functions have been moved to csFileReadHelper.
 	- res moved csVideoPreferences into the simpvs app.
 	- mdmkolbe fixed some inheritance ambiguity warnings due to virtual
 	  inheritance from iBase.

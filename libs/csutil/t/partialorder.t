@@ -18,8 +18,10 @@
 
 #include "cppunit/Message.h"
 
+#include "csutil/csstring.h"
 #include "csutil/list.h"
 #include "csutil/partialorder.h"
+#include "csutil/hash.h"
 
 /**
  * Test csPartialOrder class.
@@ -31,11 +33,15 @@ public:
   void testSmokeTest();
   void testTransitive();
   void testStringSets();
+  void testDelete();
+  void testDupInserts();
 
   CPPUNIT_TEST_SUITE(csPartialOrderTest);
     CPPUNIT_TEST(testSmokeTest);
     CPPUNIT_TEST(testTransitive);
     CPPUNIT_TEST(testStringSets);
+    CPPUNIT_TEST(testDelete);
+    CPPUNIT_TEST(testDupInserts);
   CPPUNIT_TEST_SUITE_END();
 };
 
@@ -189,3 +195,82 @@ void csPartialOrderTest::testStringSets()
 	Solution.PopFront();
 }
 
+void csPartialOrderTest::testDelete()
+{
+	csPartialOrder<csString> Set;
+
+	csString one ("1");
+	csString two ("2");
+	csString three ("3");
+	csString four ("4");
+	csString five ("5");
+	csString six ("6");
+
+	Set.Add (one);
+	Set.Add (two);
+	Set.Add (three);
+	Set.Add (four);
+	Set.Add (five);
+	Set.Add (six);
+
+	CPPUNIT_ASSERT (Set.Size() == 6);
+
+	Set.Delete(one);
+	Set.Delete(two);
+	Set.Delete(three);
+
+	CPPUNIT_ASSERT (Set.Size() == 3);
+
+	Set.Add(three);
+	Set.Add(two);
+	Set.Add(one);
+
+	CPPUNIT_ASSERT (Set.Size() == 6);
+	
+	Set.Delete(six);
+	Set.Delete(five);
+	Set.Delete(four);
+	Set.Delete(three);
+	Set.Delete(two);
+	Set.Delete(one);
+
+	CPPUNIT_ASSERT (Set.Size() == 0);
+}
+
+void csPartialOrderTest::testDupInserts()
+{
+	csPartialOrder<csString> Set;
+
+	csString one ("1");
+	csString two ("2");
+	csString three ("3");
+	csString four ("4");
+	csString five ("5");
+	csString six ("6");
+
+	Set.Add (one);
+	Set.Add (two);
+	Set.Add (three);
+	Set.Add (four);
+	Set.Add (five);
+	Set.Add (six);
+
+	CPPUNIT_ASSERT_EQUAL (6, (int) Set.Size());
+
+	Set.Add (three);
+	Set.Add (three);
+
+	CPPUNIT_ASSERT_EQUAL (6, (int) Set.Size());
+
+	Set.Delete(one);
+	Set.Delete(three);
+
+	CPPUNIT_ASSERT_EQUAL (4, (int) Set.Size());
+
+	Set.Delete (two);
+	Set.Delete (four);
+	Set.Delete (five);
+	Set.Delete (six);
+
+	CPPUNIT_ASSERT_EQUAL (0, (int) Set.Size());
+}

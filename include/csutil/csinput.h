@@ -29,14 +29,12 @@
 
 #include "csextern.h"
 
-#include "csutil/array.h"
 #include "csutil/hash.h"
-#include "csutil/scf.h"
 #include "csutil/scf_implementation.h"
+#include "csutil/csstring.h"
 
 #include "iutil/csinput.h"
 #include "iutil/eventh.h"
-#include "iutil/comp.h"
 
 struct iEvent;
 struct iEventQueue;

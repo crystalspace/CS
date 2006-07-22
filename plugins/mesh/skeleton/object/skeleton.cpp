@@ -20,6 +20,7 @@
 
 #include "csgeom/math3d.h"
 #include "csutil/event.h"
+#include "csutil/eventnames.h"
 #include "csutil/util.h"
 #include "imap/services.h"
 #include "iutil/object.h"
@@ -34,66 +35,14 @@
 
 CS_IMPLEMENT_PLUGIN
 
-SCF_IMPLEMENT_IBASE (csSkeletonGraveyard)
-SCF_IMPLEMENTS_INTERFACE (iSkeletonGraveyard)
-SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
 SCF_IMPLEMENT_FACTORY (csSkeletonGraveyard)
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csSkeletonGraveyard::eiComponent)
-SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csSkeletonGraveyard::EventHandler)
-SCF_IMPLEMENTS_INTERFACE (iEventHandler)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csSkeletonBone)
-SCF_IMPLEMENTS_INTERFACE (iSkeletonBone)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csSkeletonSocket)
-SCF_IMPLEMENTS_INTERFACE (iSkeletonSocket)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csSkeletonBoneFactory)
-SCF_IMPLEMENTS_INTERFACE (iSkeletonBoneFactory)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csSkeletonScript)
-SCF_IMPLEMENTS_INTERFACE (iSkeletonScript)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csSkeleton)
-SCF_IMPLEMENTS_INTERFACE (iSkeleton)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csSkeletonSocketFactory)
-SCF_IMPLEMENTS_INTERFACE (iSkeletonSocketFactory)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csSkeletonFactory)
-SCF_IMPLEMENTS_INTERFACE (iSkeletonFactory)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csSkeletonScriptKeyFrame)
-SCF_IMPLEMENTS_INTERFACE (iSkeletonScriptKeyFrame)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csSkeletonBoneDefaultUpdateCallback)
-SCF_IMPLEMENTS_INTERFACE (iSkeletonBoneUpdateCallback)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csSkeletonBoneRagdollInfo)
-SCF_IMPLEMENTS_INTERFACE (iSkeletonBoneRagdollInfo)
-SCF_IMPLEMENT_IBASE_END
 
 //-------------------------------iSkeletonBone------------------------------------------
 
-csSkeletonBone::csSkeletonBone (csSkeleton *skeleton, csSkeletonBoneFactory *factory_bone)
+csSkeletonBone::csSkeletonBone (csSkeleton *skeleton,
+  csSkeletonBoneFactory *factory_bone) :
+  scfImplementationType(this)
 {
-  SCF_CONSTRUCT_IBASE (0); 
   parent = 0;
   csSkeletonBone::skeleton = skeleton;
   csSkeletonBone::factory_bone = factory_bone;
@@ -110,7 +59,11 @@ csSkeletonBone::csSkeletonBone (csSkeleton *skeleton, csSkeletonBoneFactory *fac
 
 csSkeletonBone::~csSkeletonBone ()
 {
-  SCF_DESTRUCT_IBASE ();
+}
+
+iSkeletonBoneFactory *csSkeletonBone::GetFactory() 
+{
+  return static_cast<iSkeletonBoneFactory*> (factory_bone);
 }
 
 void csSkeletonBone::SetParent (iSkeletonBone *par)
@@ -269,7 +222,7 @@ void csSkeletonBone::UpdateBones ()
   }
 }
 
-void csSkeletonBone::UpdateBones (csSkeletonBone* parent_bone)
+void csSkeletonBone::UpdateBones (csSkeletonBone*)
 {
   // TODO - Ragdoll
 }
@@ -277,9 +230,10 @@ void csSkeletonBone::UpdateBones (csSkeletonBone* parent_bone)
 
 //-------------------------------iSkeletonBoneFactory------------------------------------------
 
-csSkeletonBoneFactory::csSkeletonBoneFactory (csSkeletonFactory *skeleton_factory)
+csSkeletonBoneFactory::csSkeletonBoneFactory (
+  csSkeletonFactory *skeleton_factory) :
+  scfImplementationType(this)
 {
-  SCF_CONSTRUCT_IBASE (0);
   csSkeletonBoneFactory::skeleton_factory = skeleton_factory;
   parent = 0;
   skin_box.Set(-0.1f, -0.1f, -0.1f, 0.1f, 0.1f, 0.1f);
@@ -288,7 +242,6 @@ csSkeletonBoneFactory::csSkeletonBoneFactory (csSkeletonFactory *skeleton_factor
 
 csSkeletonBoneFactory::~csSkeletonBoneFactory()
 {
-  SCF_DESTRUCT_IBASE ();
 }
 
 iSkeletonBoneFactory *csSkeletonBoneFactory::FindChild (const char *name)
@@ -345,9 +298,10 @@ void csSkeletonBoneFactory::UpdateBones ()
   }
 }
 
-csSkeletonBoneRagdollInfo::csSkeletonBoneRagdollInfo (csSkeletonBoneFactory *bone_fact)
+csSkeletonBoneRagdollInfo::csSkeletonBoneRagdollInfo (
+  csSkeletonBoneFactory *bone_fact) :
+  scfImplementationType(this)
 {
-  SCF_CONSTRUCT_IBASE (0);
   geom_name = "";
   body_name = "";
   joint_name = "";
@@ -370,7 +324,6 @@ csSkeletonBoneRagdollInfo::csSkeletonBoneRagdollInfo (csSkeletonBoneFactory *bon
 
 csSkeletonBoneRagdollInfo::~csSkeletonBoneRagdollInfo ()
 {
-  SCF_DESTRUCT_IBASE ();
 }
 
 void csSkeletonBoneRagdollInfo::SetAttachToParent(bool attach)
@@ -395,9 +348,10 @@ void csSkeletonBoneRagdollInfo::SetAttachToParent(bool attach)
 
 //--------------------------iSkeletonSocket-----------------------------------
 
-csSkeletonSocket::csSkeletonSocket (csSkeleton *skeleton, csSkeletonSocketFactory *socket_factory)
+csSkeletonSocket::csSkeletonSocket (csSkeleton *skeleton,
+  csSkeletonSocketFactory *socket_factory) :
+  scfImplementationType(this)
 {
-  SCF_CONSTRUCT_IBASE (0);
   node = 0;
   transform = socket_factory->GetTransform();
   csSkeletonSocket::name = socket_factory->GetName();
@@ -406,42 +360,45 @@ csSkeletonSocket::csSkeletonSocket (csSkeleton *skeleton, csSkeletonSocketFactor
 
 csSkeletonSocket::~csSkeletonSocket () 
 {
-  SCF_DESTRUCT_IBASE ();
+}
+
+iSkeletonSocketFactory *csSkeletonSocket::GetFactory ()
+{
+  return static_cast<iSkeletonSocketFactory*> (factory);
 }
 
 //--------------------------iSkeletonSocketFactory-----------------------------------
 
-csSkeletonSocketFactory::csSkeletonSocketFactory (const char *name, iSkeletonBoneFactory *bone)
+csSkeletonSocketFactory::csSkeletonSocketFactory (const char *name,
+  iSkeletonBoneFactory *bone) :
+  scfImplementationType(this)
 {
-  SCF_CONSTRUCT_IBASE (0);
   csSkeletonSocketFactory::name = name;
   csSkeletonSocketFactory::bone = bone;
 }
 
 csSkeletonSocketFactory::~csSkeletonSocketFactory () 
 {
-  SCF_DESTRUCT_IBASE ();
 }
 
 
 //--------------------------iSkeletonScriptKeyFrame-----------------------------------
 
-csSkeletonScriptKeyFrame::csSkeletonScriptKeyFrame (const char* name)
+csSkeletonScriptKeyFrame::csSkeletonScriptKeyFrame (const char* name) :
+  scfImplementationType(this)
 {
-  SCF_CONSTRUCT_IBASE (0);
   csSkeletonScriptKeyFrame::name = name;
 }
 
 csSkeletonScriptKeyFrame::~csSkeletonScriptKeyFrame () 
 {
-  SCF_DESTRUCT_IBASE ();
 }
 
 //--------------------------iSkeletonScript-----------------------------------
 
-csSkeletonScript::csSkeletonScript (const char* name)
+csSkeletonScript::csSkeletonScript (const char* name) :
+  scfImplementationType(this)
 {
-  SCF_CONSTRUCT_IBASE (0);
   csSkeletonScript::name = name;
   time = 0;
   loop = false; //for now
@@ -451,7 +408,6 @@ csSkeletonScript::csSkeletonScript (const char* name)
 
 csSkeletonScript::~csSkeletonScript () 
 {
-  SCF_DESTRUCT_IBASE ();
 }
 
 iSkeletonScriptKeyFrame *csSkeletonScript::CreateFrame(const char* name)
@@ -464,7 +420,8 @@ iSkeletonScriptKeyFrame *csSkeletonScript::CreateFrame(const char* name)
 
 //------------------------csSkeletonRunnable-------------------------------------
 
-csSkeletonRunnable::csSkeletonRunnable (csSkeletonScript* script, csSkeleton *skeleton)
+csSkeletonRunnable::csSkeletonRunnable (csSkeletonScript* script,
+  csSkeleton *skeleton)
 {
   csSkeletonRunnable::script = script;
   csSkeletonRunnable::skeleton = skeleton;
@@ -541,7 +498,7 @@ void csSkeletonRunnable::ParseFrame(csSkeletonScriptKeyFrame *frame)
       m.position = bone_transform->pos;
       m.type = 1;
       //m.quat = csQuaternion (transform.GetT2O());
-      m.quat.SetMatrix (transform.GetT2O());
+      m.quat.SetMatrix (transform.GetO2T());
       m.final_position = transform.GetOrigin();
 
       csVector3 delta;
@@ -720,9 +677,9 @@ bone_transform_data *csSkeletonRunnable::GetBoneTransform(csSkeletonBoneFactory 
 
 //---------------------- iSkeleton ---------------------------------------
 
-csSkeleton::csSkeleton(csSkeletonFactory* fact)
+csSkeleton::csSkeleton(csSkeletonFactory* fact) :
+  scfImplementationType(this)
 {
-  SCF_CONSTRUCT_IBASE (0); 
   factory = fact;
   script_callback = 0;
   //dynamic_system = 0;
@@ -780,11 +737,15 @@ csSkeleton::csSkeleton(csSkeletonFactory* fact)
 csSkeleton::~csSkeleton ()
 {
   StopAll();
-  SCF_DESTRUCT_IBASE ();
   if (script_callback)
   {
     delete script_callback;
   }
+}
+
+iSkeletonFactory *csSkeleton::GetFactory() 
+{
+  return static_cast<iSkeletonFactory*> (factory);
 }
 
 void csSkeleton::UpdateBones ()
@@ -1142,9 +1103,9 @@ void csSkeleton::DestroyRagdoll()
 //---------------------- iSkeletonFactory ---------------------------------------
 
 csSkeletonFactory::csSkeletonFactory (csSkeletonGraveyard* graveyard, 
-                                      iObjectRegistry* object_reg)
+                                      iObjectRegistry* object_reg) :
+  scfImplementationType(this, graveyard)
 {
-  SCF_CONSTRUCT_IBASE (graveyard); 
   csSkeletonFactory::graveyard = graveyard;
   csSkeletonFactory::object_reg = object_reg;
 }
@@ -1155,12 +1116,16 @@ iSkeletonBoneFactory *csSkeletonFactory::CreateBone(const char *name)
   bone.AttachNew(new csSkeletonBoneFactory(this));
   bone->SetName(name);
   bones.Push(bone);
-  return bone; 
+  return bone;
 }
 
 csSkeletonFactory::~csSkeletonFactory ()
 {
-  SCF_DESTRUCT_IBASE ();
+}
+
+iSkeletonGraveyard *csSkeletonFactory::GetGraveyard  ()
+{
+  return static_cast<iSkeletonGraveyard*> (graveyard);
 }
 
 iSkeletonScript* csSkeletonFactory::FindScript (const char* scriptname)
@@ -1248,7 +1213,7 @@ iSkeletonSocketFactory *csSkeletonFactory::GetSocket (int i)
   return sockets[i];
 }
 
-void csSkeletonFactory::RemoveSocket (int i)
+void csSkeletonFactory::RemoveSocket (int)
 {
   //TODO
 }
@@ -1260,33 +1225,30 @@ size_t csSkeletonFactory::GetSocketsCount()
 
 //--------------------------------iSkeletonGraveyard-----------------------------------------
 
-csSkeletonGraveyard::csSkeletonGraveyard (
-  iBase* pParent)
+csSkeletonGraveyard::csSkeletonGraveyard (iBase* pParent) :
+  scfImplementationType(this, pParent), object_reg(0)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiEventHandler);
 }
 
 csSkeletonGraveyard::~csSkeletonGraveyard ()
 {
-   skeletons.DeleteAll();
-   csRef<iEventQueue> q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
-   if (q)
-      q->RemoveListener (&scfiEventHandler);
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiEventHandler);
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
-  SCF_DESTRUCT_IBASE ();
+  skeletons.DeleteAll();
+  if (object_reg)
+  {
+    csRef<iEventQueue> q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+    if (q)
+      q->RemoveListener (this);
+  }
 }
 
 bool csSkeletonGraveyard::Initialize (iObjectRegistry* object_reg)
 {
-  csSkeletonGraveyard::object_reg = object_reg;
+  this->object_reg = object_reg;
   vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
   PreProcess = csevPreProcess (object_reg);
   csRef<iEventQueue> eq (CS_QUERY_REGISTRY (object_reg, iEventQueue));
   if (eq == 0) return false;
-  eq->RegisterListener (&scfiEventHandler, PreProcess);
+  eq->RegisterListener (this, PreProcess);
 
   return true;
 }
@@ -1297,7 +1259,7 @@ iSkeletonFactory* csSkeletonGraveyard::CreateFactory(const char *name)
   fact.AttachNew(new csSkeletonFactory (this, object_reg));
   fact->SetName(name);
   factories.Push(fact);
-  return  fact;
+  return fact;
 }
 
 iSkeleton *csSkeletonGraveyard::CreateSkeleton(iSkeletonFactory *fact, const char *name)

@@ -98,7 +98,7 @@ public:
   }
   
   /// Get the negative quaternion (unary minus)
-  inline csQuaternion friend operator- (const csQuaternion& q)
+  inline friend csQuaternion operator- (const csQuaternion& q)
   {
     return csQuaternion (-q.v, -q.w);
   }

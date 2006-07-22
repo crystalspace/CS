@@ -24,7 +24,7 @@
  * Graphical console input
  */
 
-#include "csutil/scf.h"
+#include "csutil/scf_interface.h"
 
 struct iEvent;
 struct iConsoleOutput;
@@ -40,8 +40,6 @@ struct iConsoleExecCallback : public virtual iBase
   /// Execute.
   virtual void Execute (const char* cmd) = 0;
 };
-
-SCF_VERSION (iConsoleInput, 1, 0, 1);
 
 /**
  * This is a plugin that can handle keyboard input and display
@@ -60,8 +58,10 @@ SCF_VERSION (iConsoleInput, 1, 0, 1);
  * Main ways to get pointers to this interface:
  * - csQueryRegistry()
  */
-struct iConsoleInput : public iBase
+struct iConsoleInput : public virtual iBase
 {
+  SCF_INTERFACE (iConsoleInput, 2, 0, 0);
+
   /**
    * Bind to an output console.
    * \param console

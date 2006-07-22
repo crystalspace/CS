@@ -95,42 +95,46 @@
 #define CS_STRUCT_ALIGN_4BYTE_BEGIN
 #undef CS_STRUCT_ALIGN_4BYTE_END
 #define CS_STRUCT_ALIGN_4BYTE_END
-#undef CS_GNUC_PRINTF(format_idx, arg_idx)
+#undef CS_GNUC_PRINTF
 #define CS_GNUC_PRINTF(format_idx, arg_idx)
-#undef CS_GNUC_SCANF(format_idx, arg_idx)
+#undef CS_GNUC_SCANF
 #define CS_GNUC_SCANF(format_idx, arg_idx)
-#undef CS_GNUC_WPRINTF(format_idx, arg_idx)
+#undef CS_GNUC_WPRINTF
 #define CS_GNUC_WPRINTF(format_idx, arg_idx)
-#undef CS_GNUC_WSCANF(format_idx, arg_idx)
+#undef CS_GNUC_WSCANF
 #define CS_GNUC_WSCANF(format_idx, arg_idx)
-#undef CS_DECLARE_STATIC_CLASSVAR(a, b, c)
+#undef CS_DECLARE_STATIC_CLASSVAR
 #define CS_DECLARE_STATIC_CLASSVAR(a, b, c)
-#undef CS_SPECIALIZE_TEMPLATE template<>
+#undef CS_SPECIALIZE_TEMPLATE
 #define CS_SPECIALIZE_TEMPLATE template<>
 #undef CS_FORCEINLINE
 #define CS_FORCEINLINE
+#undef CS_FORCEINLINE_TEMPLATEMETHOD
+#define CS_FORCEINLINE_TEMPLATEMETHOD
 #undef CS_EXPORT_SYM
 #define CS_EXPORT_SYM
 #undef CS_IMPORT_SYM
 #define CS_IMPORT_SYM
 #undef CS_CRYSTALSPACE_EXPORT
 #define CS_CRYSTALSPACE_EXPORT
-#undef CS_LEAKGUARD_DECLARE(m)
+#undef CS_LEAKGUARD_DECLARE
 #define CS_LEAKGUARD_DECLARE(m)
 #undef CS_DEPRECATED_METHOD
 #define CS_DEPRECATED_METHOD
 #undef CS_DEPRECATED_METHOD_MSG
-#define CS_DEPRECATED_METHOD_MSG
+#define CS_DEPRECATED_METHOD_MSG(msg)
 #undef CS_DEPRECATED_TYPE
 #define CS_DEPRECATED_TYPE
 #undef CS_DEPRECATED_TYPE_MSG
-#define CS_DEPRECATED_TYPE_MSG
+#define CS_DEPRECATED_TYPE_MSG(msg)
 #undef CS_PURE_METHOD
 #define CS_PURE_METHOD
 #undef CS_CONST_METHOD
 #define CS_CONST_METHOD
 #undef CS_COMPILE_ASSERT
 #define CS_COMPILE_ASSERT(x)
+#undef CS_VISIBILITY_DEFAULT
+#define CS_VISIBILITY_DEFAULT
 
 // Compatibility macros.
 #define typename_qualifier typename
@@ -521,6 +525,7 @@ TYPEMAP_OUT_csWrapPtr
 // %typemap(default). The %extend-ing and extra code takes place after all
 // %include's are done, mentioning the header(s) it is related to.
 
+%include "iutil/array.h"
 %ignore csOrdering;
 %ignore csArrayCmp;
 %ignore csArrayElementHandler;
@@ -552,11 +557,35 @@ TYPEMAP_OUT_csWrapPtr
 %ignore csArray::operator=;
 %ignore csArray::operator[];
 %ignore csArray::Iterator;
+/* The following is a bit ugly but otherwise there is no way pass the
+   necessary directives to swig between template declarations.        */
+template <typename Threshold = csArrayThresholdVariable>
+class csArrayCapacityLinear : public Threshold {
+	public:
+	csArrayCapacityLinear ();
+	csArrayCapacityLinear (const Threshold& threshold);
+	csArrayCapacityLinear (const size_t x);
+	bool IsCapacityExcessive (size_t capacity, size_t count) const;
+	size_t GetCapacity (size_t count) const;
+};
+struct csArrayThresholdVariable {
+	public:
+	csArrayThresholdVariable (size_t in_threshold = 0);
+	size_t GetThreshold() const;
+};
+%template(csArrayThresholdVariableCapacityLinear) 
+csArrayCapacityLinear<csArrayThresholdVariable >;
+%ignore csArrayCapacityLinear;
+%ignore csArrayThresholdVariable;
 %include "csutil/array.h"
 
 %ignore scfInitialize;
+%immutable iSCF::SCF;
 %include "csutil/scf_interface.h"
 %include "csutil/scf.h"
+
+// hand made scf template wrappers
+%include "ivaria/scf.i"
 
 #ifndef CS_MINI_SWIG
 %include "iutil/dbghelp.h"
@@ -576,7 +605,15 @@ TYPEMAP_OUT_csWrapPtr
 %ignore csStringSet::GlobalIterator;
 %ignore csStringSet::GetIterator;
 %include "csutil/strset.h"
-
+%ignore csSet::GlobalIterator;
+%ignore csSet::GetIterator;
+%include "csutil/set.h"
+/* helper macro to declare csSet templated classes */
+%define SET_HELPER(typename)
+%template (typename ## Set) csSet<typename>;
+SET_OBJECT_FUNCTIONS(csSet<typename>,typename)
+%enddef
+SET_HELPER(csStringID)
 %ignore iString::SetCapacity;
 %ignore iString::GetCapacity;
 %ignore iString::SetGrowsBy;
@@ -827,7 +864,6 @@ TYPEMAP_OUT_csWrapPtr
 %include "csgeom/quaternion.h"
 
 %include "csgeom/spline.h"
-%include "csgeom/cspoint.h"
 
 %ignore csBox2::operator+ (const csBox2& box1, const csBox2& box2);
 %ignore csBox2::operator+ (const csBox2& box, const csVector2& point);
@@ -856,6 +892,11 @@ TYPEMAP_OUT_csWrapPtr
 %rename(asRGBcolor) csRGBpixel::operator csRGBcolor;
 %include "csgfx/rgbpixel.h"
 %include "csgfx/shadervar.h"
+%template(csShaderVariableArrayReadOnly) iArrayReadOnly<csShaderVariable * >;
+%template(csShaderVariableArrayChangeElements) 
+iArrayChangeElements<csShaderVariable * >;
+%template(csShaderVariableArray) iArrayChangeAll<csShaderVariable * >;
+
 #endif // CS_MINI_SWIG
 
 %ignore csGetPlatformConfig;
@@ -916,6 +957,7 @@ TYPEMAP_OUT_csWrapPtr
 %include "igeom/clip2d.h"
 %include "imesh/objmodel.h"
 %include "igeom/path.h"
+%template(scfPath) scfImplementation1<csPath,iPath >;
 %include "igeom/polymesh.h"
 %include "csgeom/path.h"
 %include "csgeom/polymesh.h"
@@ -971,8 +1013,12 @@ TYPEMAP_OUT_csWrapPtr
 %ignore iGeneralFactoryState::GetColors;
 #endif
 %include "imesh/genmesh.h"
-
+struct csSprite2DVertex;
 %ignore iSprite2DState::GetVertices;
+%template(csSprite2DVertexArrayReadOnly) iArrayReadOnly<csSprite2DVertex>;
+%template(csSprite2DVertexArrayChangeElements) 
+iArrayChangeElements<csSprite2DVertex>;
+%template(csSprite2DVertexArrayChangeAll) iArrayChangeAll<csSprite2DVertex>;
 %include "imesh/sprite2d.h"
 %include "imesh/sprite3d.h"
 %include "imesh/spritecal3d.h"
@@ -981,6 +1027,7 @@ TYPEMAP_OUT_csWrapPtr
 %feature("compactdefaultargs") HitBeamObject;
 %include "imesh/object.h"
 %include "imesh/thing.h"
+%template (csCharArrayArray) csArray<csArray<char> >;
 %include "imesh/terrain.h"
 
 %include "imesh/particles.h"
@@ -1028,13 +1075,15 @@ TYPEMAP_OUT_csWrapPtr
 %rename(AddVoidPtr) iEvent::Add(const char *, void *, size_t);
 %rename(RetrieveInt8) iEvent::Retrieve(const char *, int8 &) const;
 %rename(RetrieveInt16) iEvent::Retrieve(const char *, int16 &) const;
-%rename(RetrieveInt32) iEvent::Retrieve(const char *, int32 &, bool) const;
+%rename(RetrieveInt32) iEvent::Retrieve(const char *, int32 &) const;
 %rename(RetrieveUInt8) iEvent::Retrieve(const char *, uint8 &) const;
 %rename(RetrieveUInt16) iEvent::Retrieve(const char *, uint16 &) const;
 %rename(RetrieveUInt32) iEvent::Retrieve(const char *, uint32 &) const;
 %rename(RetrieveFloat) iEvent::Retrieve(const char *, float &) const;
 %rename(RetrieveDouble) iEvent::Retrieve(const char *, double &) const;
-%rename(RetrieveString) iEvent::Retrieve(const char *, char **) const;
+// workaround RetrieveString as following line gives problems with swig 1.3.28
+//%rename(RetrieveString) iEvent::Retrieve(const char *, const char *&) const;
+%ignore iEvent::Retrieve(const char *, const char *&) const;
 %rename(RetrieveBool) iEvent::Retrieve(const char *, bool &) const;
 %rename(RetrieveVoidPtr) iEvent::Retrieve(const char*, void**, size_t&) const;
 #pragma SWIG nowarn=312; // nested union not supported
@@ -1043,9 +1092,18 @@ TYPEMAP_OUT_csWrapPtr
 %ignore csJoystickEventHelper::GetY;
 %include "iutil/event.h"
 %include "csutil/event.h"
+%extend iEvent {
+	csEventError RetrieveString(const char *name, char *&v)
+	{
+		return self->Retrieve(name,(const char *&)v);
+	}
+}
+
 
 %include "iutil/evdefs.h"
 %include "iutil/eventq.h"
+%ignore csStrKey::operator const char*;
+%include "csutil/hash.h"
 %include "iutil/eventnames.h"
 %include "csutil/eventnames.h"
 %include "iutil/eventh.h"
@@ -1094,9 +1152,9 @@ TYPEMAP_OUT_csWrapPtr
 %include "ivideo/material.h"
 
 %include "igraphic/image.h"
-
 %immutable csImageIOFileFormatDescription::mime;
 %immutable csImageIOFileFormatDescription::subtype;
+%template (csImageIOFileFormatDescriptions) csArray<csImageIOFileFormatDescription const*>;
 %include "igraphic/imageio.h"
 
 %ignore iReporter::ReportV;
@@ -1177,10 +1235,10 @@ APPLY_FOR_EACH_INTERFACE
 %extend iSprite2DState
 {
   csSprite2DVertex* GetVertexByIndex(int index)
-  { return &(self->GetVertices()[index]); }
+  { return &self->GetVertices()->Get(index); }
 
   int GetVertexCount()
-  { return self->GetVertices().Length(); }
+  { return self->GetVertices()->GetSize(); }
 }
 
 // imesh/genmesh.h
@@ -1486,6 +1544,19 @@ uint _CS_FX_SETALPHA_INT (uint);
   csQuaternion operator - (const csQuaternion& q) { return *self - q; }
   csQuaternion operator * (const csQuaternion& q) { return *self * q; }
 }
+
+/* List Methods */
+LIST_OBJECT_FUNCTIONS(iMeshList,iMeshWrapper)
+LIST_OBJECT_FUNCTIONS(iMeshFactoryList,iMeshFactoryWrapper)
+LIST_OBJECT_FUNCTIONS(iMaterialList,iMaterialWrapper)
+LIST_OBJECT_FUNCTIONS(iRegionList,iRegion)
+LIST_OBJECT_FUNCTIONS(iLightList,iLight)
+LIST_OBJECT_FUNCTIONS(iCameraPositionList,iCameraPosition)
+LIST_OBJECT_FUNCTIONS(iSectorList,iSector)
+LIST_OBJECT_FUNCTIONS(iTextureList,iTextureWrapper)
+// Not wrapping yet:
+//LIST_OBJECT_FUNCTIONS(iCollectionList,iCollection) 
+//LIST_OBJECT_FUNCTIONS(iSharedVariableList,iSharedVariable)
 #endif // CS_MINI_SWIG
 
 /****************************************************************************

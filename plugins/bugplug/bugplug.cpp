@@ -30,6 +30,7 @@
 #include "csgeom/vector3.h"
 #include "cstool/collider.h"
 #include "cstool/csview.h"
+#include "cstool/uberscreenshot.h"
 #include "csutil/cscolor.h"
 #include "csutil/csuctransform.h"
 #include "csutil/debug.h"
@@ -150,8 +151,6 @@ csBugPlug::csBugPlug (iBase *iParent)
   debug_view.object = 0;
   debug_view.drag_point = -1;
 
-  captureFormat = 0;
-
   do_shadow_debug = false;
   delay_command = DEBUGCMD_UNKNOWN;
 }
@@ -175,7 +174,6 @@ csBugPlug::~csBugPlug ()
       q->RemoveListener (scfiEventHandler);
     scfiEventHandler->DecRef ();
   }
-  delete[] captureFormat;
 
   delete shadow;
 }
@@ -271,74 +269,10 @@ void csBugPlug::SetupPlugin ()
   ReadKeyBindings (config->GetStr ("Bugplug.Keybindings", 
     "/config/bugplug.key"));
 
-  captureFormat = csStrNew (config->GetStr ("Bugplug.Capture.FilenameFormat",
+  captureFormat.SetMask (config->GetStr ("Bugplug.Capture.FilenameFormat",
     "/this/cryst000.png"));
-  // since this string is passed to format later,
-  // replace all '%' with '%%'
-  {
-    char* newstr = new char[strlen(captureFormat)*2 + 1];
-    memset (newstr, 0, strlen(captureFormat)*2 + 1);
-
-    char* pos = captureFormat;
-    while (pos)
-    {
-      char* percent = strchr (pos, '%');
-      if (percent)
-      {
-	strncat (newstr, pos, percent-pos);
-	strcat (newstr, "%%");
-	pos = percent + 1;
-      }
-      else
-      {
-	strcat (newstr, pos);
-	pos = 0;
-      }
-    }
-    delete[] captureFormat;
-    captureFormat = newstr;
-  }
-  // scan for the rightmost string of digits
-  // and create an appropriate format string
-  {
-    captureFormatNumberMax = 1;
-    uint captureFormatNumberDigits = 0;
-
-    char* end = strrchr (captureFormat, 0);
-    if (end != captureFormat)
-    {
-      do
-      {
-	end--;
-      }
-      while ((end >= captureFormat) && (!isdigit (*end)));
-      if (end >= captureFormat)
-      {
-	do
-	{
-	  captureFormatNumberMax *= 10;
-	  captureFormatNumberDigits++; 
-	  end--;
-	}
-	while ((end >= captureFormat) && (isdigit (*end)));
-	
-	csString nameForm;
-	nameForm.Format ("%%0%uu", captureFormatNumberDigits);
-
-        csString newCapForm;
-        newCapForm.Append (captureFormat, end-captureFormat+1);
-        newCapForm.Append (nameForm);
-        newCapForm.Append (end+captureFormatNumberDigits+1);
-
-	delete[] captureFormat;
-	captureFormat = csStrNew (newCapForm);
-      }
-    }
-  }
-
   captureMIME = config->GetStr ("Bugplug.Capture.Image.MIME",
     "image/png");
-
   captureOptions = config->GetStr ("Bugplug.Capture.Image.Options");
 
   initialized = true;
@@ -552,19 +486,19 @@ void csBugPlug::MouseButtonLeft (iCamera* camera)
   iSector* sector = camera->GetSector ();
   CS_ASSERT (sector != 0);
   csVector3 origin = camera->GetTransform ().GetO2TTranslation ();
-  csVector3 isect;
+  
+  csSectorHitBeamResult hitBeamResult = sector->HitBeam (origin, end);
+  iMeshWrapper* sel = hitBeamResult.mesh;
 
-  int polyidx = -1;
-  iMeshWrapper* sel = sector->HitBeam (origin, end, isect, &polyidx);
   const char* poly_name = 0;
-  if (polyidx != -1)
+  if (hitBeamResult.polygon_idx != -1)
   {
     csRef<iThingFactoryState> tfs = scfQueryInterface<iThingFactoryState> 
       (sel->GetMeshObject ()->GetFactory());
     if (tfs)
     {
-      poly_name = tfs->GetPolygonName (polyidx);
-      Dump (tfs, polyidx);
+      poly_name = tfs->GetPolygonName (hitBeamResult.polygon_idx);
+      Dump (tfs, hitBeamResult.polygon_idx);
     }
   }
   else
@@ -572,7 +506,7 @@ void csBugPlug::MouseButtonLeft (iCamera* camera)
     poly_name = 0;
   }
 
-  csVector3 vw = isect;
+  csVector3 vw = hitBeamResult.isect;
   v = camera->GetTransform ().Other2This (vw);
   Report (CS_REPORTER_SEVERITY_NOTIFY,
     "LMB down : c:(%f,%f,%f) w:(%f,%f,%f) p:'%s'",
@@ -1265,6 +1199,17 @@ bool csBugPlug::ExecCommand (int cmd, const csString& args)
     case DEBUGCMD_LISTPLUGINS:
 	ListLoadedPlugins();
 	break;
+    case DEBUGCMD_UBERSCREENSHOT:
+        {
+          uint shotW, shotH;
+          if (args.IsEmpty() || (sscanf (args, "%u %u", &shotW, &shotH) != 2))
+          {
+            shotW = 2048;
+            shotH = 1536;
+	  }
+	  CaptureUberScreen (shotW, shotH);
+        }
+        break;
     default:
         return false;
   }
@@ -1273,24 +1218,6 @@ bool csBugPlug::ExecCommand (int cmd, const csString& args)
 
 void csBugPlug::CaptureScreen ()
 {
-  uint i = 0;
-  csString name;
-
-  bool exists = false;
-  do
-  {
-    name.Format (captureFormat, i);
-    if (exists = VFS->Exists (name)) i++;
-  }
-  while ((i < captureFormatNumberMax) && (exists));
-
-  if (i >= captureFormatNumberMax)
-  {
-    Report (CS_REPORTER_SEVERITY_NOTIFY,
-    	"Too many screenshot files in current directory");
-    return;
-  }
-
   csRef<iImage> img (csPtr<iImage> (G2D->ScreenShot ()));
   if (!img)
   {
@@ -1305,18 +1232,70 @@ void csBugPlug::CaptureScreen ()
       captureOptions));
     if (db)
     {
-      Report (CS_REPORTER_SEVERITY_NOTIFY, "Screenshot: %s", name.GetData());
+      csString name = captureFormat.FindNextFilename (VFS);
       if (!VFS->WriteFile (name, (const char*)db->GetData (),
       		db->GetSize ()))
       {
         Report (CS_REPORTER_SEVERITY_NOTIFY,
-		"There was an error while writing screen shot");
+		"There was an error while writing screen shot to %s",
+		name.GetData());
       }
+      else
+        Report (CS_REPORTER_SEVERITY_NOTIFY, "Wrote screenshot %s", name.GetData());
     }
     else
     {
       Report (CS_REPORTER_SEVERITY_NOTIFY, 
 	      "Could not encode screen shot");
+    }
+  }
+}
+
+void csBugPlug::CaptureUberScreen (uint w, uint h)
+{
+  csString descr; descr.Format ("%ux%u \xC3\xBC" "berscreenshot", w, h);
+
+  if (!catcher->camera)
+  {
+    Report (CS_REPORTER_SEVERITY_NOTIFY,
+    	"Could not take %s: no camera", descr.GetData());
+    return;
+  }
+
+  csRef<iImage> img;
+  {
+    CS::UberScreenshotMaker shotMaker (w, h, catcher->camera, Engine, G3D);
+    img = shotMaker.Shoot();
+  }
+  if (!img)
+  {
+    Report (CS_REPORTER_SEVERITY_NOTIFY,
+    	"Could not take %s", descr.GetData());
+    return;
+  }
+  csRef<iImageIO> imageio (CS_QUERY_REGISTRY (object_reg, iImageIO));
+  if (imageio)
+  {
+    csRef<iDataBuffer> db (imageio->Save (img, captureMIME, 
+      captureOptions));
+    if (db)
+    {
+      csString name = captureFormat.FindNextFilename (VFS);
+      if (!VFS->WriteFile (name, (const char*)db->GetData (),
+      		db->GetSize ()))
+      {
+        Report (CS_REPORTER_SEVERITY_NOTIFY,
+		"There was an error while writing %s to %s", descr.GetData(), 
+		name.GetData());
+      }
+      else
+	Report (CS_REPORTER_SEVERITY_NOTIFY, "Wrote %s %s", descr.GetData(), 
+	  name.GetData());
+    }
+    else
+    {
+      Report (CS_REPORTER_SEVERITY_NOTIFY, 
+	      "Could not encode %s", descr.GetData());
     }
   }
 }
@@ -1983,6 +1962,8 @@ int csBugPlug::GetKeyCode (const char* keystring, bool& shift, bool& alt,
 
 int csBugPlug::GetCommandCode (const char* cmdstr, csString& args)
 {
+  if ((cmdstr == 0) || (*cmdstr == 0)) return DEBUGCMD_UNKNOWN;
+
   csString cmd;
   char const* spc = strchr (cmdstr, ' ');
   if (spc)
@@ -2070,6 +2051,7 @@ int csBugPlug::GetCommandCode (const char* cmdstr, csString& args)
   if (!strcmp (cmd, "listplugins"))	return DEBUGCMD_LISTPLUGINS;
   if (!strcmp (cmd, "profdump"))	return DEBUGCMD_PROFDUMP;
   if (!strcmp (cmd, "profreset"))	return DEBUGCMD_PROFRESET;
+  if (!strcmp (cmd, "uberscreenshot"))	return DEBUGCMD_UBERSCREENSHOT;
 
   return DEBUGCMD_UNKNOWN;
 }

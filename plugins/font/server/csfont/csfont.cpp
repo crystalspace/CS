@@ -23,6 +23,7 @@
 #include "csutil/csuctransform.h"
 #include "csutil/csendian.h"
 #include "iutil/vfs.h"
+#include "csutil/csstring.h"
 #include "csutil/util.h"
 #include "csutil/databuf.h"
 #include "csutil/dirtyaccessarray.h"

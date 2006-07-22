@@ -29,10 +29,11 @@
 #include "iutil/plugin.h"
 #include "csutil/cscolor.h"
 #include "csutil/hash.h"
+#include "csutil/scf_implementation.h"
 
 struct iSyntaxService;
 
-class csSaver : public iSaver
+class csSaver : public scfImplementation2<csSaver, iSaver, iComponent>
 {
   iObjectRegistry* object_reg;
   csRef<iEngine> engine;
@@ -44,8 +45,6 @@ class csSaver : public iSaver
   int fileType;
 
 public:
-  SCF_DECLARE_IBASE;
-
   csSaver(iBase*);
   virtual ~csSaver();
 
@@ -90,13 +89,6 @@ public:
   virtual csRef<iString> SaveRegion(iRegion* region, int filetype);
   virtual bool SaveRegion(iRegion* region, int filetype,
     csRef<iDocumentNode>& root);
-
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csSaver);
-    virtual bool Initialize (iObjectRegistry* p)
-    { return scfParent->Initialize(p); }
-  } scfiComponent;
 };
 
 #endif // __CS_CSSAVER_H__

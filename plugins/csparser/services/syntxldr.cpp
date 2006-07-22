@@ -752,6 +752,7 @@ bool csTextSyntaxService::HandlePortalParameter (
 {
   handled = true;
   const char* value = child->GetValue ();
+  bool ww_given = false;
   csStringID id = xmltokens.Request (value);
   switch (id)
   {
@@ -765,12 +766,13 @@ bool csTextSyntaxService::HandlePortalParameter (
       break;
     case XMLTOKEN_WV:
       ParseVector (child, before);
-      after = before;
+      if (!ww_given) after = before;
       mirror = false;
       warp = true;
       break;
     case XMLTOKEN_WW:
       ParseVector (child, after);
+      ww_given = true;
       mirror = false;
       warp = true;
       break;
@@ -974,8 +976,9 @@ bool csTextSyntaxService::WriteGradientShade (iDocumentNode* node,
 }
 
 bool csTextSyntaxService::ParseGradient (iDocumentNode* node,
-					 csGradient& gradient)
+					 iGradient* gradient)
 {
+  gradient->Clear();
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
   {
@@ -994,7 +997,7 @@ bool csTextSyntaxService::ParseGradient (iDocumentNode* node,
 	  }
 	  else
 	  {
-	    gradient.AddShade (shade);
+	    gradient->AddShade (shade);
 	  }
 	}
 	break;
@@ -1007,13 +1010,12 @@ bool csTextSyntaxService::ParseGradient (iDocumentNode* node,
 }
 
 bool csTextSyntaxService::WriteGradient (iDocumentNode* node,
-					 const csGradient& gradient)
+					 iGradient* gradient)
 {
-  const csArray<csGradientShade>& shades = gradient.GetShades ();
-  csArray<csGradientShade>::ConstIterator it = shades.GetIterator ();
-  while (it.HasNext ())
+  csRef<iGradientShades> shades = gradient->GetShades ();
+  for (size_t i = 0; i < shades->GetSize(); i++)
   {
-    const csGradientShade& shade = it.Next ();
+    const csGradientShade& shade = shades->Get (i);
     csRef<iDocumentNode> child = node->CreateNodeBefore (CS_NODE_ELEMENT, 0);
     child->SetValue ("shade");
     WriteGradientShade (child, shade);
@@ -1843,6 +1845,7 @@ bool csTextSyntaxService::WriteRenderBuffer (iDocumentNode* node, iRenderBuffer*
 
 csRef<iShader> csTextSyntaxService::ParseShaderRef (iDocumentNode* node)
 {
+  // @@@ FIXME: unify with csLoader::ParseShader()?
   static const char* msgid = "crystalspace.syntax.shaderred";
 
   const char* shaderName = node->GetAttributeValue ("name");
@@ -1898,6 +1901,12 @@ csRef<iShader> csTextSyntaxService::ParseShaderRef (iDocumentNode* node)
       return 0;
     }
     csRef<iShaderCompiler> shcom = shmgr->GetCompiler (type);
+    if (!shcom.IsValid()) 
+    {
+      ReportError (msgid, shaderNode,
+        "Could not get shader compiler '%s'", type);
+      return false;
+    }
     shader = shcom->CompileShader (shaderNode);
     if (shader && (strcmp (shader->QueryObject()->GetName(), shaderName) == 0))
     {

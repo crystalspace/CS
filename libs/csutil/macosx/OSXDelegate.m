@@ -610,8 +610,8 @@ ND_PROTO(void,dispatch_event)
 {
   NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
   NSMenu* const menu = OSXMenuGenerate(self, style, config);
-  [menu setTitle:[[NSProcessInfo processInfo] processName]];
-  [NSApp setMainMenu:menu];
+  [[OSXApplication sharedApplication] setMainMenu:menu];
+  [[OSXApplication sharedApplication] setAppleMenu:[[menu itemAtIndex:0] submenu]];
   [pool release];
 }
 
@@ -723,6 +723,9 @@ ND_PROTO(void,stop_event_loop)(OSXDelegateHandle handle)
     selector:@selector(applicationDefined:)
     name:OSXAppDefinedNotification
     object:0];
+
+  [NSApp activateIgnoringOtherApps:YES];
+
   [pool release];
   return controller;
 }

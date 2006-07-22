@@ -32,7 +32,8 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "softshader_vp.h"
 
-using namespace CS::Plugins::SoftShader;
+CS_PLUGIN_NAMESPACE_BEGIN(SoftShader)
+{
 
 void csSoftShader_VP::Activate()
 {
@@ -74,3 +75,5 @@ bool csSoftShader_VP::Compile()
   return true;
 }
 
+}
+CS_PLUGIN_NAMESPACE_END(SoftShader)

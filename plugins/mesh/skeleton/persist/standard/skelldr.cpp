@@ -80,28 +80,15 @@ enum
   XMLTOKEN_RELATIVE
 };
 
-SCF_IMPLEMENT_IBASE (csSkeletonFactoryLoader)
-  SCF_IMPLEMENTS_INTERFACE (iLoaderPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csSkeletonFactoryLoader::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-
 SCF_IMPLEMENT_FACTORY (csSkeletonFactoryLoader)
 
-csSkeletonFactoryLoader::csSkeletonFactoryLoader (iBase* pParent)
+csSkeletonFactoryLoader::csSkeletonFactoryLoader (iBase* pParent) :
+  scfImplementationType(this, pParent)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 csSkeletonFactoryLoader::~csSkeletonFactoryLoader ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csSkeletonFactoryLoader::Initialize (iObjectRegistry* object_reg)
@@ -587,7 +574,7 @@ const char *csSkeletonFactoryLoader::ParseFrame (iDocumentNode* node,
 }
 
 csPtr<iBase> csSkeletonFactoryLoader::Parse (iDocumentNode* node,
-  iStreamSource*, iLoaderContext* ldr_context, iBase* /* context */)
+  iStreamSource*, iLoaderContext* /*ldr_context*/, iBase* /*context*/)
 {
   csRef<iSkeletonGraveyard> graveyard = csLoadPluginCheck<iSkeletonGraveyard> (
   	object_reg, "crystalspace.graveyard", false);

@@ -770,7 +770,7 @@ that when we have a mesh we can go back to the adversary instance without
 having to scan all adversaries one by one. To do this we basically have
 to implement the @code{iObject} interface. Objects that implement that interface
 can be attached to other objects that also implement that interface. A mesh
-(@code{iMeshWrapper}) also implements @code{iObject} so that is very conveniant
+(@code{iMeshWrapper}) also implements @code{iObject} so that is very convenient
 here. To let our @code{Adversary} class implement @code{iObject} the easiest
 way is to inherit from @code{csObject}. And this is what the class inheritence
 above actually does. The @code{scfImplementationExt1} template makes it
@@ -1028,13 +1028,12 @@ happens with the @code{Check()} function below:
 void Laser::Check ()
 @{
   // Do a beam to check if we hit an adversary.
-  csVector3 isect;
-  iMeshWrapper* mesh = lasersector->HitBeamPortals (laserstart,
-  	laserend, isect, 0);
-  if (mesh)
+  csSectorHitBeamResult rc = lasersector->HitBeamPortals (
+  	laserstart, laserend);
+  if (rc.mesh)
   @{
     csRef<Adversary> adv = CS_GET_CHILD_OBJECT (
-    	mesh->QueryObject (), Adversary);
+    	rc.mesh->QueryObject (), Adversary);
     if (adv)
     @{
       // Hit!

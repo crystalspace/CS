@@ -24,6 +24,7 @@
 #include "cstool/proctex.h"
 #include "csutil/hash.h"
 #include "csutil/event.h"
+#include "csutil/eventnames.h"
 #include "csutil/scf_implementation.h"
 #include "iengine/engine.h"
 #include "iengine/material.h"

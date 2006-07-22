@@ -91,7 +91,7 @@ void aws3DFrame::Draw (
   if (todraw == 0)
   {
     todraw = &our_todraw;
-    todraw->makeEmpty ();
+    todraw->MakeEmpty ();
     todraw->Include (frame);
   }
 
@@ -109,7 +109,7 @@ void aws3DFrame::Draw (
   csRectRegion* todraw_txt = &our_todraw_txt;
   todraw_txt->Include (frame);
   todraw_txt->Exclude (clientArea);
-  int i;
+  size_t i;
   for(i = 0; i < todraw->Count (); i++)
     todraw_txt->Include (todraw->RectAt (i));
 
@@ -615,7 +615,7 @@ void aws3DFrame::DrawTexturedBackground (
   int alpha_level,
   csRect bkg_align)
 {
-  int i;
+  size_t i;
   for (i = 0; i < todraw->Count (); ++i)
   {
     csRect r (todraw->RectAt (i));
@@ -635,7 +635,7 @@ void aws3DFrame::DrawTexturedBackground (
 
 void aws3DFrame::DrawFlatBackground (csRectRegion* todraw, int color)        
 {
-  int i;
+  size_t i;
   for (i = 0; i < todraw->Count (); ++i)
   {
     csRect r (todraw->RectAt (i));

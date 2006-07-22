@@ -32,11 +32,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(Soft3D)
   template<int Color, bool Inv>
   struct Factor_Zero
   {
-    CS_FORCEINLINE
+    CS_FORCEINLINE_TEMPLATEMETHOD
     int GetBlendFact() const 
     { return Inv ? CS_MIXMODE_FACT_ONE : CS_MIXMODE_FACT_ZERO; }
 
-    CS_FORCEINLINE
+    CS_FORCEINLINE_TEMPLATEMETHOD
     Pixel Apply (const Pixel src, const Pixel dst) const
     {
       return Inv ? ((Color == FactorColorSrc) ? src : dst) : Pixel (0);
@@ -46,11 +46,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(Soft3D)
   template<int Color, bool Inv>
   struct Factor_Src
   {
-    CS_FORCEINLINE
+    CS_FORCEINLINE_TEMPLATEMETHOD
     int GetBlendFact() const 
     { return Inv ? CS_MIXMODE_FACT_SRCCOLOR_INV : CS_MIXMODE_FACT_SRCCOLOR; }
 
-    CS_FORCEINLINE
+    CS_FORCEINLINE_TEMPLATEMETHOD
     Pixel Apply (const Pixel src, const Pixel dst)
     {
       return ((Color == FactorColorSrc) ? src : dst) * (Inv ? ~src : src);
@@ -60,11 +60,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(Soft3D)
   template<int Color, bool Inv>
   struct Factor_SrcAlpha
   {
-    CS_FORCEINLINE
+    CS_FORCEINLINE_TEMPLATEMETHOD
     int GetBlendFact() const 
     { return Inv ? CS_MIXMODE_FACT_SRCALPHA_INV : CS_MIXMODE_FACT_SRCALPHA; }
 
-    CS_FORCEINLINE
+    CS_FORCEINLINE_TEMPLATEMETHOD
     Pixel Apply (const Pixel src, const Pixel dst)
     {
       return ((Color == FactorColorSrc) ? src : dst) * (Inv ? ~src.c.a : src.c.a);
@@ -74,11 +74,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(Soft3D)
   template<int Color, bool Inv>
   struct Factor_Dst
   {
-    CS_FORCEINLINE
+    CS_FORCEINLINE_TEMPLATEMETHOD
     int GetBlendFact() const 
     { return Inv ? CS_MIXMODE_FACT_DSTCOLOR_INV : CS_MIXMODE_FACT_DSTCOLOR; }
 
-    CS_FORCEINLINE
+    CS_FORCEINLINE_TEMPLATEMETHOD
     Pixel Apply (const Pixel src, const Pixel dst)
     {
       return ((Color == FactorColorSrc) ? src : dst) * (Inv ? ~dst : dst);
@@ -88,11 +88,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(Soft3D)
   template<int Color, bool Inv>
   struct Factor_DstAlpha
   {
-    CS_FORCEINLINE
+    CS_FORCEINLINE_TEMPLATEMETHOD
     int GetBlendFact() const 
     { return Inv ? CS_MIXMODE_FACT_DSTALPHA_INV : CS_MIXMODE_FACT_DSTALPHA; }
 
-    CS_FORCEINLINE
+    CS_FORCEINLINE_TEMPLATEMETHOD
     Pixel Apply (const Pixel src, const Pixel dst)
     {
       return ((Color == FactorColorSrc) ? src : dst) * (Inv ? ~dst.c.a : dst.c.a);

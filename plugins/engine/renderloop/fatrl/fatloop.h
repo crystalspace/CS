@@ -157,7 +157,7 @@ class csFatLoopStep :
   csShaderVariableFrameHolder svHolder;
   csRef<csShaderVariable> GetFrameUniqueSV (uint framenr,
     csShaderVariableContext& shadervars, csStringID name);
-  void FillStacks (csShaderVarStack& stacks, csRenderMesh* rm, 
+  void FillStacks (iShaderVarStack* stacks, csRenderMesh* rm, 
     iMeshWrapper* mw, iMaterial* hdl, iShader* shader);
   /** @} */
 
@@ -181,7 +181,7 @@ public:
   { passes.Push (pass); return true; }
 
   virtual void Perform (iRenderView* rview, iSector* sector,
-    csShaderVarStack &stacks);
+    iShaderVarStack* stacks);
 };
 
 #endif // __CS_FATLOOP_H__

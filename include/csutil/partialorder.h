@@ -182,34 +182,35 @@ public:
     }
     // delete node's post's
     Nodes[p].post.DeleteAll();
-    // delete node p, move someone else into its place...
+    // delete node p, move the node at the end of the csArray into its place...
     Nodes.DeleteIndexFast(p);
 
+    // update NodeMap accordingly by killing the lookup for the deleted node
+    // and updating the lookup for the node that moved into its place...
+    NodeMap.Delete(node, p);
     if (Nodes.Length() > p)
     {
       // who got moved into "p"?
-      size_t retarget = NodeMap.Get(Nodes[p].self, csArrayItemNotFound);
-      CS_ASSERT (retarget != csArrayItemNotFound);
+      size_t moved = NodeMap.Get(Nodes[p].self, csArrayItemNotFound);
+      CS_ASSERT (moved != csArrayItemNotFound);
 
-      // change references to "retarget" to reference "p"
+      // change references to "moved" to reference "p"
       for (size_t iter=0 ; iter<Nodes.Length() ; iter++)
       {
 	for (size_t iter2=0 ; iter2<Nodes[iter].pre.Length() ; iter2++)
 	{
-	  if (Nodes[iter].pre[iter2] == retarget)
+	  if (Nodes[iter].pre[iter2] == moved)
 	    Nodes[iter].pre[iter2] = p;
 	}
 	for (size_t iter2=0 ; iter2<Nodes[iter].post.Length() ; iter2++)
 	{
-	  if (Nodes[iter].post[iter2] == retarget)
+	  if (Nodes[iter].post[iter2] == moved)
 	    Nodes[iter].post[iter2] = p;
 	}
       }
-    }
-
-    NodeMap.Delete(node, p);
-    if (Nodes.Length() > p)
+      NodeMap.Delete(Nodes[p].self, moved);
       NodeMap.PutUnique(Nodes[p].self, p);
+    }
 
     SanityCheck();
   }
@@ -324,6 +325,7 @@ public:
   {
     size_t i = NodeMap.Get(node, csArrayItemNotFound);
     CS_ASSERT(i != csArrayItemNotFound);
+    CS_ASSERT(i < Nodes.Length());
     Nodes[i].marked = true;
   }
   
@@ -334,6 +336,7 @@ public:
   {
     size_t i = NodeMap.Get(node, csArrayItemNotFound);
     CS_ASSERT(i != csArrayItemNotFound);
+    CS_ASSERT(i < Nodes.Length());
     return Nodes[i].marked;
   }
   
@@ -344,6 +347,7 @@ public:
   {
     size_t i = NodeMap.Get(node, csArrayItemNotFound);
     CS_ASSERT(i != csArrayItemNotFound);
+    CS_ASSERT(i < Nodes.Length());
     Nodes[i].marked = false;
   }
   
@@ -399,42 +403,58 @@ protected:
   void SanityCheck ()
   {
 #ifdef CS_DEBUG
-    CS_ASSERT (NodeMap.GetSize() == Nodes.Length());
+    CS_ASSERT_MSG ("NodeMap has different size from Node list", 
+		   NodeMap.GetSize() == Nodes.Length());
     for (size_t i1=0; i1<Nodes.Length() ; i1++)
     {
-      CS_ASSERT (NodeMap.Get(Nodes[i1].self, csArrayItemNotFound) == i1);
+      CS_ASSERT_MSG ("NodeMap names wrong location for node",
+		     NodeMap.Get(Nodes[i1].self, csArrayItemNotFound) == i1);
       for (size_t i2=0 ; i2<Nodes[i1].pre.Length() ; i2++)
       {
-	CS_ASSERT (Nodes[i1].pre[i2] >= 0);
-	CS_ASSERT (Nodes[i1].pre[i2] < Nodes.Length());
+	CS_ASSERT_MSG ("Node prefix index less than zero", 
+		       Nodes[i1].pre[i2] >= 0);
+	CS_ASSERT_MSG ("Node prefix index larger than Nodes list",
+		       Nodes[i1].pre[i2] < Nodes.Length());
 	bool reciprocal_post_exists = false;
 	for (size_t i3=0 ; i3<Nodes[Nodes[i1].pre[i2]].post.Length() ; i3++)
 	{
 	  if (Nodes[Nodes[i1].pre[i2]].post[i3] == i1)
+          {
 	    reciprocal_post_exists = true;
+            break;
+          }
 	}
-	CS_ASSERT (reciprocal_post_exists);
+	CS_ASSERT_MSG ("Node prefix does not have reciprocal postfix", 
+		       reciprocal_post_exists);
       }
       for (size_t i2=0 ; i2<Nodes[i1].post.Length() ; i2++)
       {
-	CS_ASSERT(Nodes[i1].post[i2] >= 0);
-	CS_ASSERT(Nodes[i1].post[i2] < Nodes.Length());
+	CS_ASSERT_MSG ("Node postfix index less than zero",
+		       Nodes[i1].post[i2] >= 0);
+	CS_ASSERT_MSG ("Node postfix index larger than Nodes list",
+		       Nodes[i1].post[i2] < Nodes.Length());
 	bool reciprocal_pre_exists = false;
 	for (size_t i3=0 ; i3<Nodes[Nodes[i1].post[i2]].pre.Length() ; i3++)
 	{
 	  if (Nodes[Nodes[i1].post[i2]].pre[i3] == i1)
+          {
 	    reciprocal_pre_exists = true;
+            break;
+          }
 	}
-	CS_ASSERT (reciprocal_pre_exists);
+	CS_ASSERT_MSG ("Node postfix does not have reciprocal prefix",
+		       reciprocal_pre_exists);
       }
     }
-    typename csHash<size_t,const T>::GlobalIterator iter =
-    	NodeMap.GetIterator ();
+    typename csHash<size_t,const T>::GlobalIterator iter = 
+      NodeMap.GetIterator ();
     while (iter.HasNext())
     {
-      size_t index = iter.Next();
-      CS_ASSERT (index >= 0);
-      CS_ASSERT (index < Nodes.Length());
+      size_t idx = iter.Next();
+      CS_ASSERT_MSG ("NodeMap contains a negative index",
+		     idx >= 0);
+      CS_ASSERT_MSG ("NodeMap contains an index larger than Nodes list",
+		     idx < Nodes.Length());
     }
 #endif /* CS_DEBUG */
   }

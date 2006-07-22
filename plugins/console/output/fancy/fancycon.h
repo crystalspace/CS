@@ -23,6 +23,7 @@
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "csgeom/csrect.h"
+#include "csutil/scf_implementation.h"
 
 struct iGraphics2D;
 struct iGraphics3D;
@@ -49,7 +50,9 @@ struct ConsoleDecoration
   int p2lx, p2rx, p2ty, p2by;
 };
 
-class csFancyConsole : public iConsoleOutput
+class csFancyConsole :
+  public scfImplementation3<csFancyConsole,
+    iConsoleOutput, iComponent, iEventHandler>
 {
 private:
   iObjectRegistry *object_reg;
@@ -77,7 +80,6 @@ private:
   void SetPosition(int x, int y, int width = -1, int height = -1);
 
 public:
-  SCF_DECLARE_IBASE;
   csFancyConsole (iBase *);
   virtual ~csFancyConsole ();
 
@@ -118,46 +120,26 @@ public:
   virtual bool PerformExtension (const char *command, ...);
   virtual bool PerformExtensionV (const char *iCommand, va_list);
 
-  // Implement iComponent interface.
-  struct eiComponent : public iComponent
+  CS_EVENTHANDLER_NAMES("crystalspace.console")
+  CS_CONST_METHOD virtual const csHandlerID * GenericPrec(
+    csRef<iEventHandlerRegistry> &r1, csRef<iEventNameRegistry> &r2,
+    csEventID e) const
   {
-    SCF_DECLARE_EMBEDDED_IBASE(csFancyConsole);
-    virtual bool Initialize (iObjectRegistry* p)
-    { return scfParent->Initialize(p); }
-  } scfiComponent;
-  // Implement iEventHandler interface.
-  struct EventHandler : public iEventHandler
-  {
-  private:
-    csFancyConsole* parent;
-  public:
-    SCF_DECLARE_IBASE;
-    EventHandler (csFancyConsole* parent)
-    {
-      SCF_CONSTRUCT_IBASE (0);
-      EventHandler::parent = parent;
+    if (e == csevSystemOpen (r2)) {
+      /* TODO : not thread-safe */
+      static csHandlerID precs[2] =
+      { r1->GetGenericID("crystalspace.graphics3d"), CS_HANDLERLIST_END };
+      return precs;
+    } else {
+      return 0;
     }
-    virtual ~EventHandler ()
-    {
-      SCF_DESTRUCT_IBASE ();
-    }
-    virtual bool HandleEvent (iEvent& e) { return parent->HandleEvent(e); }
-    CS_EVENTHANDLER_NAMES("crystalspace.console")
-
-    CS_CONST_METHOD virtual const csHandlerID * GenericPrec(csRef<iEventHandlerRegistry> &r1, csRef<iEventNameRegistry> &r2, csEventID e) const {
-      if (e == csevSystemOpen (r2)) {
-	/* TODO : not thread-safe */
-	static csHandlerID precs[2] = { r1->GetGenericID("crystalspace.graphics3d"), CS_HANDLERLIST_END };
-	return precs;
-      } else {
-	return 0;
-      }
-    }
-    CS_CONST_METHOD virtual const csHandlerID * GenericSucc(csRef<iEventHandlerRegistry> &, csRef<iEventNameRegistry> &, csEventID) const { return 0; }
+  }
+  CS_CONST_METHOD virtual const csHandlerID * GenericSucc(
+    csRef<iEventHandlerRegistry> &, csRef<iEventNameRegistry> &,
+    csEventID) const
+  { return 0; }
     
-    CS_EVENTHANDLER_DEFAULT_INSTANCE_CONSTRAINTS
-
-  } * scfiEventHandler;
+  CS_EVENTHANDLER_DEFAULT_INSTANCE_CONSTRAINTS
 };
 
 #endif // __CS_FANCYCON_H__

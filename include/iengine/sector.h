@@ -30,6 +30,7 @@
 
 #include "csutil/scf.h"
 #include "csutil/set.h"
+#include "csgeom/vector3.h"
 
 struct iMeshWrapper;
 struct iMeshGenerator;
@@ -137,6 +138,27 @@ struct iLightVisibleCallback : public virtual iBase
 
   /// The light is visible.
   virtual void LightVisible (iSector* sector, iLight* light) = 0;
+};
+
+/**
+ * Return structure for the iSector->HitBeam() routines.
+ */
+struct csSectorHitBeamResult
+{
+  /// The resulting mesh that we hit.
+  iMeshWrapper* mesh;
+
+  /// Intersection point in world space.
+  csVector3 isect;
+
+  /// The polygon/triangle index that was hit.
+  int polygon_idx;
+
+  /**
+   * The final sector for the end point.
+   * Only for iSector->HitBeamPortals().
+   */
+  iSector* final_sector;
 };
 
 /**
@@ -363,8 +385,9 @@ struct iSector : public virtual iBase
    * if a polygon is returned. This function returns -1 if no polygon
    * was hit or the polygon index otherwise.
    */
-  virtual iMeshWrapper* HitBeamPortals (const csVector3& start,
-  	const csVector3& end, csVector3& isect, int* polygon_idx) = 0;
+  CS_DEPRECATED_METHOD virtual iMeshWrapper* HitBeamPortals (
+  	const csVector3& start, const csVector3& end, csVector3& isect,
+	int* polygon_idx, iSector** final_sector = 0) = 0;
 
   /**
    * Follow a beam from start to end and return the first object
@@ -373,8 +396,32 @@ struct iSector : public virtual iBase
    * If polygon_idx is null then the polygon will not be filled in.
    * This function doesn't support portals.
    */
-  virtual iMeshWrapper* HitBeam (const csVector3& start, const csVector3& end,
-    csVector3& intersect, int* polygon_idx, bool accurate = false) = 0;
+  CS_DEPRECATED_METHOD virtual iMeshWrapper* HitBeam (const csVector3& start,
+  	const csVector3& end, csVector3& intersect, int* polygon_idx,
+	bool accurate = false) = 0;
+
+  /**
+   * Follow a beam from start to end and return the first polygon that
+   * is hit. This function correctly traverse portals and space warping
+   * portals. Normally the sector you call this on should be the sector
+   * containing the 'start' point. 'isect' will be the intersection point
+   * if a polygon is returned. This function returns -1 if no polygon
+   * was hit or the polygon index otherwise.
+   * \sa csSectorHitBeamResult
+   */
+  virtual csSectorHitBeamResult HitBeamPortals (const csVector3& start,
+  	const csVector3& end) = 0;
+
+  /**
+   * Follow a beam from start to end and return the first object
+   * that is hit. In case it is a thing the polygon_idx field will be
+   * filled with the indices of the polygon that was hit.
+   * If polygon_idx is null then the polygon will not be filled in.
+   * This function doesn't support portals.
+   * \sa csSectorHitBeamResult
+   */
+  virtual csSectorHitBeamResult HitBeam (const csVector3& start,
+  	const csVector3& end, bool accurate = false) = 0;
 
   /**
    * Follow a segment starting at this sector. If the segment intersects
@@ -491,7 +538,7 @@ struct iSectorIterator : public virtual iBase
 {
   SCF_INTERFACE(iSectorIterator,2,0,0);
   /// Return true if there are more elements.
-  virtual bool HasNext () = 0;
+  virtual bool HasNext () const = 0;
 
   /// Get sector from iterator. Return 0 at end.
   virtual iSector* Next () = 0;
@@ -500,7 +547,7 @@ struct iSectorIterator : public virtual iBase
    * Get last position that was used from Fetch. This can be
    * different from 'pos' because of space warping.
    */
-  virtual const csVector3& GetLastPosition () = 0;
+  virtual const csVector3& GetLastPosition () const = 0;
 
   /// Restart iterator.
   virtual void Reset () = 0;

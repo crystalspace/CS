@@ -1849,7 +1849,7 @@ const char* csBinaryDocument::Write (iString* str)
   csMemFile temp;
 
   const char* ret = Write (&temp);
-  str->Clear();
+  str->Empty();
   str->Append (temp.GetData(), temp.GetSize());
 
   return ret;

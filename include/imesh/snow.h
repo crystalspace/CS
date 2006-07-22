@@ -24,25 +24,24 @@
  * Snow particle mesh object
  */ 
 
-#include "csutil/scf.h"
+#include "csutil/scf_interface.h"
 
 /**\addtogroup meshplugins
  * @{ */
 
-class csColor;
 class csVector3;
-
-SCF_VERSION (iSnowState, 0, 0, 1);
 
 /**
  * This interface describes the API for the snow mesh object.
  */
-struct iSnowState : public iBase
+struct iSnowState : public virtual iBase
 {
+  SCF_INTERFACE(iSnowState, 2, 0, 0);
+
   /// Set the number of particles to use.
   virtual void SetParticleCount (int num) = 0;
   /// Get the number of particles used.
-  virtual int GetParticleCount () const = 0;
+  virtual size_t GetParticleCount () const = 0;
   /// Set the size of the drops.
   virtual void SetDropSize (float dropwidth, float dropheight) = 0;
   /// Get the size of the snow flakes.

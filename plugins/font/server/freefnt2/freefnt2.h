@@ -30,13 +30,8 @@
 #include "csutil/cfgacc.h"
 #include "csutil/weakref.h"
 
-namespace CS
+CS_PLUGIN_NAMESPACE_BEGIN(FreeFont2)
 {
-namespace Plugins
-{
-namespace FreeFont2
-{
-
 
 class csFreeType2Server;
 
@@ -234,8 +229,7 @@ public:
   { return emitErrors; }
 };
 
-} // namespace FreeFont2
-} // namespace Plugins
-} // namespace CS
+}
+CS_PLUGIN_NAMESPACE_END(FreeFont2)
 
 #endif // __CS_FREEFONT2_H__

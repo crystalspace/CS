@@ -66,8 +66,8 @@ Brandon Ehle (@email{azverkan@@yahoo.com})
 Brandon initiated the aborted attempt to convert Crystal Space documentation
 to LaTeX.  As part of this task, he made an initial effort to organize the
 diverse and unrelated existing documents which were maintained as plain text
-and HTML.  The attempted LaTeX conversion predates the current manual which is
-maintained in Texinfo format.
+and @sc{html}.  The attempted LaTeX conversion predates the current manual
+which is maintained in Texinfo format.
 
 @item
 Michael Ewert (@email{mewert99@@yahoo.com})
@@ -78,7 +78,7 @@ he is the author and principal maintainer.
 @item
 Desmond Fletcher (@email{desmond.fletcher@@usm.edu})
 
-Desmond updated map2cs documentation by adding new classnames and keys.
+Desmond updated @file{map2cs} documentation by adding new classnames and keys.
 
 @item
 Chris Forno (@email{jcore@@arbornet.org})
@@ -110,14 +110,14 @@ Crystal Space.
 @item
 Thomas Hieber (@email{thieber@@gmx.net})
 
-Thomas wrote thorough documentation for the very useful map2cs conversion tool
-which he authored.  For a while, he also maintained the documentation which
-details the Windows port of Crystal Space.
+Thomas wrote thorough documentation for the very useful @file{map2cs}
+conversion tool which he authored.  For a while, he also maintained the
+documentation which details the Windows port of Crystal Space.
 
 @item
 David Asbell (@email{dasbell@@yahoo.com})
 
-David contributed the binary sprite loader and saver to CS.
+David contributed the binary sprite loader and saver to @sc{cs}.
 
 @item
 David Huen (@email{smh1008@@cus.cam.ac.uk})
@@ -179,11 +179,12 @@ Siu-Hang wrote one of several tutorials for MazeD, the Crystal Space map
 editor.
 
 @item
-Philip Wyett (@email{philip.wyett@@w-tech.co.uk})
+Philip Wyett (@email{philipwyett@@blueyonder.co.uk})
 
 Philip took over from Frank O'Connor as the Windows port maintainer.
 He also wrote and maintained the instructions for building Crystal
-Space on Windows. Philip is at this time inactive as a CS developer.
+Space on Windows. Philip is after a while of inactivity is now back working
+on Crystal Space, but with concentration on the @sc{gnu} Linux port.
 
 @item
 Andreas Busch (@email{nobita@@t-online.de})
@@ -195,7 +196,8 @@ user manual and spotted and corrected a large number of typographical problems.
 @item
 Manjunath Sripadarao (@email{msripada@@evl.uic.edu})
 
-Manjunath wrote a tutorial for the @code{md32spr} conversion program, wrote for @code{md2spr} and contributed to @code{map2cs}.
+Manjunath wrote a tutorial for the @file{md32spr} conversion program,
+wrote for @file{md2spr} and contributed to @file{map2cs}.
 
 @item 
 Martin (@email{martin@@cyber-dog.freeserve.co.uk})

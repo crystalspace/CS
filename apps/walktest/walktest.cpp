@@ -956,7 +956,9 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
 
   if (!csInitializer::SetupConfigManager (object_reg, iConfigName))
   {
-    Report (CS_REPORTER_SEVERITY_ERROR, "Failed to initialize config!");
+    Report (CS_REPORTER_SEVERITY_ERROR, "Failed to initialize config!\n"
+      " (A common cause is the CRYSTAL environment variable "
+      "not being set correctly.)");
     return false;
   }
 
@@ -1098,12 +1100,22 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
   FrameHeight = Gfx2D->GetHeight ();
 
   // Find the font we'll use
+  if (!Gfx2D->GetFontServer ())
+  {
+    Report (CS_REPORTER_SEVERITY_ERROR, "No font server available");
+    return false;
+  }
   Font = Gfx2D->GetFontServer ()->LoadFont (cfg_font);
   if (!Font)
   {
     Report (CS_REPORTER_SEVERITY_NOTIFY, "Couldn't load font '%s', using standard one",
       cfg_font);
     Font = Gfx2D->GetFontServer ()->LoadFont (CSFONT_COURIER);
+  }
+  if (!Font)
+  {
+    Report (CS_REPORTER_SEVERITY_ERROR, "Could not load any font");
+    return false;
   }
 
   // Open the startup console
@@ -1477,9 +1489,10 @@ int main (int argc, char* argv[])
   // (3D, 2D, network, sound, ..., engine) and initialize them.
   if (!Sys->Initialize (argc, argv, "/config/walktest.cfg"))
   {
-    Sys->Report (CS_REPORTER_SEVERITY_ERROR, "Error initializing system!");
+    Sys->Report (CS_REPORTER_SEVERITY_ERROR,
+      "Error initializing system!");
     Cleanup();
-    exit (-1);
+    return -1;
   }
 
   // Start the 'autoexec.cfg' script and fully execute it.

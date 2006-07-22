@@ -20,27 +20,28 @@
 #define __AWSCOMP_H__
 
 #include "iaws/awsecomp.h"
+#include "scf_implementation.h"
 
-class CustomComponent : public awsEmbeddedComponent  
+class CustomComponent :
+  public scfImplementationExt0<CustomComponent, awsEmbeddedComponent>
 {
 public:
-  CustomComponent(iAws* manager);
-  ~CustomComponent();
-
-  SCF_DECLARE_IBASE;
+  CustomComponent(iAws* manager) :
+    scfImplementationType(this), awsEmbeddedComponent (manager) { }
+  virtual ~CustomComponent() { }
 
   void OnDraw(csRect clip);
   const char* Type();
   virtual bool Setup(iAws* manager, iAwsComponentNode* settings);
 };
 
-class CustomComponentFactory : public awsEmbeddedComponentFactory
+class CustomComponentFactory :
+  public scfImplementationExt0<CustomComponentFactory,
+    awsEmbeddedComponentFactory>
 {
 public:
   CustomComponentFactory(iAws *manager);
-  virtual ~CustomComponentFactory();
-
-  SCF_DECLARE_IBASE;
+  virtual ~CustomComponentFactory() { }
 
   iAwsComponent* Create();
   iAws *aws_manager;

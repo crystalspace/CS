@@ -381,7 +381,7 @@ protected:
   class CowBlockAllocator
   {
   public:
-    typedef csBlockAllocator<uint8[ValuesArrayWrapper::allocSize], 
+    typedef csFixedSizeAllocator<ValuesArrayWrapper::allocSize, 
       TempHeapAlloc> BlockAlloc;
   private:
     CS_DECLARE_STATIC_CLASSVAR_REF (allocator,
@@ -389,12 +389,13 @@ protected:
   public:
     static void* Alloc (size_t n)
     {
+      (void)n; // Pacify compiler warnings
       CS_ASSERT(n == ValuesArrayWrapper::allocSize);
-      return Allocator().AllocUninit ();
+      return Allocator().Alloc ();
     }
     static void Free (void* p)
     {
-      Allocator().Free ((uint8(*)[ValuesArrayWrapper::allocSize])p, false);
+      Allocator().Free (p);
     }
     static void CompactAllocator()
     {
@@ -517,12 +518,12 @@ class csConditionEvaluator
     typedef int IntType;
     csConditionEvaluator& evaluator;
     const csRenderMeshModes& modes;
-    const csShaderVarStack& stacks;
+    const iArrayReadOnly<csShaderVariable*>* stacks;
 
     EvalResult GetDefaultResult() const { return false; }
 
     EvaluatorShadervar (csConditionEvaluator& evaluator,
-      const csRenderMeshModes& modes, const csShaderVarStack& stacks) : 
+      const csRenderMeshModes& modes, const iShaderVarStack* stacks) : 
         evaluator (evaluator), modes (modes), stacks (stacks)
     { }
     BoolType Boolean (const CondOperand& operand);
@@ -547,7 +548,7 @@ public:
 
   /// Evaluate a condition and return the result.
   bool Evaluate (csConditionID condition, const csRenderMeshModes& modes,
-    const csShaderVarStack& stacks);
+    const iShaderVarStack* stacks);
   /**
    * Reset the evaluation cache. Prevents same conditions from being evaled 
    * twice.

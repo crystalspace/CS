@@ -675,6 +675,11 @@ rule MsvcProject
   local sources = $(4) ;
   local options = $(5) ;
   local relpath = [ Property msvcgen : relpath$(MSVC_VERSION) ] ;
+  local relpathcommon = [ Property msvcgen : relpathcommon ] ;
+  if "$(relpathcommon)" = ""
+  {
+    relpathcommon = $(relpath) ;
+  }
   local outdir = [ Property msvcgen : outdir$(MSVC_VERSION) ] ;
   local outdircommon = [ Property msvcgen : outdircommon ] ;
   if "$(outdircommon)" = ""
@@ -827,8 +832,7 @@ rule MsvcProject
       {
 	local iconrc = $(resource:S=.iconrctmp) ;
 	# RELPATH includes trailing slash (hence the "" in ConcatDirs).
-	RELPATH on $(iconrc) =
-	  [ ConcatDirs [ Property msvcgen : relpath$(MSVC_VERSION) ] "" ] ;
+	RELPATH on $(iconrc) = [ ConcatDirs $(relpathcommon) "" ] ;
 	MakeLocate $(iconrc) : $(workdircommon) ;
 	Depends $(iconrc) : $(icon) ;
         Depends $(iconrc) : $(SUBDIR)/Jamfile ;

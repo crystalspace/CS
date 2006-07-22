@@ -27,11 +27,7 @@
 #include "scan_z.h"
 #include "scanline_base.h"
 
-namespace CS
-{
-namespace Plugins
-{
-namespace SoftShader
+CS_PLUGIN_NAMESPACE_BEGIN(SoftShader)
 {
   using namespace CS::PluginCommon::SoftShader;
 
@@ -384,7 +380,8 @@ namespace SoftShader
     bool doColor;
     ScanlineProc proc;
   };
-} // namespace SoftShader
-} // namespace Plugins
-} // namespace CS
+
+}
+CS_PLUGIN_NAMESPACE_END(SoftShader)
+
 #endif // __CS_SOFTSHADER_SCANLINE_H__

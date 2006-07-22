@@ -124,19 +124,11 @@ public:
       conditionValue = true;
     }
 
-    typedef csBlockAllocator<WrappedChild> WrappedChildAlloc;
-    CS_DECLARE_STATIC_CLASSVAR_REF (childAlloc,
-      ChildAlloc, WrappedChildAlloc);
+    //typedef csFixedSizeAllocator<sizeof(WrappedChild)> WrappedChildAlloc;
+    //CS_DECLARE_STATIC_CLASSVAR_REF (childAlloc, ChildAlloc, WrappedChildAlloc);
 
-    inline void* operator new (size_t n)
-    {
-      CS_ASSERT(n == sizeof (WrappedChild));
-      return ChildAlloc().AllocUninit();
-    }
-    inline void operator delete (void* p)
-    {
-      ChildAlloc().FreeUninit (p);
-    }
+    void* operator new (size_t n);
+    void operator delete (void* p);
 #if defined(CS_EXTENSIVE_MEMDEBUG) || defined(CS_MEMORY_TRACKER)
     inline void* operator new (size_t n, void*, int)
     { return WrappedChild::operator new (n); }

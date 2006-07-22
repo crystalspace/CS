@@ -21,7 +21,7 @@
 #define __CS_MYBITARRAY_H__
 
 #include "csutil/bitarray.h"
-#include "csutil/blockallocator.h"
+#include "csutil/fixedsizeallocator.h"
 
 #include "tempheap.h"
 
@@ -31,22 +31,22 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
   {
     typedef CS::Memory::AllocatorMalloc Allocator;
     
-    typedef csBitArrayStorageType Bits2[2];
-    typedef csBlockAllocator<Bits2, Allocator> BitsAlloc2Type;
+    typedef csFixedSizeAllocator<sizeof (csBitArrayStorageType) * 2, 
+      Allocator> BitsAlloc2Type;
     CS_DECLARE_STATIC_CLASSVAR_REF (bitsAlloc2,
       BitsAlloc2, BitsAlloc2Type);
     
-    typedef csBitArrayStorageType Bits4[4];
-    typedef csBlockAllocator<Bits4, Allocator> BitsAlloc4Type;
+    typedef csFixedSizeAllocator<sizeof (csBitArrayStorageType) * 2, 
+      Allocator> BitsAlloc4Type;
     CS_DECLARE_STATIC_CLASSVAR_REF (bitsAlloc4,
       BitsAlloc4, BitsAlloc4Type);
   public:
     void* Alloc (const size_t n)
     {
-      if (n <= sizeof (Bits2))
-        return BitsAlloc2().AllocUninit();
-      else if (n <= sizeof (Bits4))
-        return BitsAlloc4().AllocUninit();
+      if (n <= sizeof (csBitArrayStorageType) * 2)
+        return BitsAlloc2().Alloc();
+      else if (n <= sizeof (csBitArrayStorageType) * 4)
+        return BitsAlloc4().Alloc();
       else
       {
         return Allocator::Alloc (n);
@@ -54,8 +54,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
     }
     void Free (void* p)
     {
-      if (BitsAlloc4().TryFree ((Bits4*)p)) return;
-      if (BitsAlloc2().TryFree ((Bits2*)p)) return;
+      if (BitsAlloc4().TryFree (p)) return;
+      if (BitsAlloc2().TryFree (p)) return;
       Allocator::Free (p);
     }
 
@@ -69,22 +69,22 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
   {
     typedef TempHeapAlloc Allocator;
     
-    typedef csBitArrayStorageType Bits2[2];
-    typedef csBlockAllocator<Bits2, Allocator> BitsAlloc2Type;
+    typedef csFixedSizeAllocator<sizeof (csBitArrayStorageType) * 2, 
+      Allocator> BitsAlloc2Type;
     CS_DECLARE_STATIC_CLASSVAR_REF (bitsAlloc2,
       BitsAlloc2, BitsAlloc2Type);
     
-    typedef csBitArrayStorageType Bits4[4];
-    typedef csBlockAllocator<Bits4, Allocator> BitsAlloc4Type;
+    typedef csFixedSizeAllocator<sizeof (csBitArrayStorageType) * 2, 
+      Allocator> BitsAlloc4Type;
     CS_DECLARE_STATIC_CLASSVAR_REF (bitsAlloc4,
       BitsAlloc4, BitsAlloc4Type);
   public:
     void* Alloc (const size_t n)
     {
-      if (n <= sizeof (Bits2))
-        return BitsAlloc2().AllocUninit();
-      else if (n <= sizeof (Bits4))
-        return BitsAlloc4().AllocUninit();
+      if (n <= sizeof (csBitArrayStorageType) * 2)
+        return BitsAlloc2().Alloc();
+      else if (n <= sizeof (csBitArrayStorageType) * 4)
+        return BitsAlloc4().Alloc();
       else
       {
         return Allocator::Alloc (n);
@@ -92,8 +92,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
     }
     void Free (void* p)
     {
-      if (BitsAlloc4().TryFree ((Bits4*)p)) return;
-      if (BitsAlloc2().TryFree ((Bits2*)p)) return;
+      if (BitsAlloc4().TryFree (p)) return;
+      if (BitsAlloc2().TryFree (p)) return;
       Allocator::Free (p);
     }
 

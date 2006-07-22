@@ -24,6 +24,7 @@
 #include "sdl2d.h"
 #include "csgeom/csrect.h"
 #include "csutil/csinput.h"
+#include "csutil/eventnames.h"
 #include "iutil/eventq.h"
 #include "iutil/objreg.h"
 #include "ivaria/reporter.h"
@@ -337,7 +338,7 @@ bool csGraphics2DSDL::Open()
   th_lock = SDL_CreateMutex();
   SDL_CreateThread(drawing_thread, (void *)this);
 #else
-  *((void **)&Memory) = screen->pixels;
+  Memory = (uint8*)screen->pixels;
 #endif
 
   switch (Depth)

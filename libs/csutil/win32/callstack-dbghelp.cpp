@@ -21,8 +21,8 @@
 #include "csutil/csstring.h"
 #include "csutil/csuctransform.h"
 #include "csutil/dirtyaccessarray.h"
+#include "csutil/measuretime.h"
 #include "csutil/sysfunc.h"
-#include "csutil/timemeasure.h"
 #include "csutil/util.h"
 #include "callstack-dbghelp.h"
 #include "csutil/win32/callstack.h"
@@ -41,7 +41,7 @@ namespace Debug
 {
 
 #ifdef CALLSTACK_PROFILE
-#define MEASURE_FUNCTION csMeasureTime measureLocal ("%s", CS_FUNCTION_NAME)
+#define MEASURE_FUNCTION CS::MeasureTime measureLocal ("%s", CS_FUNCTION_NAME)
 #define MEASURE_INTERMEDIATE measureLocal.PrintIntermediate (" %d", __LINE__)
 #else
 #define MEASURE_FUNCTION

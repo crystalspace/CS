@@ -78,6 +78,8 @@ public:
    */
   enum VariableType
   {
+    /// No value was yet set, hence the type is unknown.
+    UNKNOWN = 0,
     /// Integer
     INT = 1,
     /// Float
@@ -142,7 +144,13 @@ public:
   csShaderVariable& operator= (const csShaderVariable& copyFrom);
 
   /// Get type of data stored
-  VariableType GetType() const { return Type; }
+  VariableType GetType() 
+  { 
+    /* The accessor should be called at least once so the var has a proper
+     * type set */
+    if ((Type == UNKNOWN) && accessor) accessor->PreGetValue (this);
+    return Type; 
+  }
   /// Set type (calling this after SetValue will cause undefined behaviour)
   void SetType (VariableType t) { Type = t; }
 

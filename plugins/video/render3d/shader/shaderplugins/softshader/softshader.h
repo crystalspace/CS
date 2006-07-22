@@ -29,13 +29,8 @@
 
 #include "scanline_base.h"
 
-namespace CS
+CS_PLUGIN_NAMESPACE_BEGIN(SoftShader)
 {
-namespace Plugins
-{
-namespace SoftShader
-{
-
 
 using namespace CS::PluginCommon::SoftShader;
 
@@ -80,9 +75,8 @@ public:
   /** @} */
 };
 
-} // namespace SoftShader
-} // namespace Plugins
-} // namespace CS
+}
+CS_PLUGIN_NAMESPACE_END(SoftShader)
 
 #endif //__SOFTSHADER_H__
 

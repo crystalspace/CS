@@ -42,6 +42,9 @@
 #ifndef CS_VISIBILITY_DEFAULT
 #  define CS_VISIBILITY_DEFAULT
 #endif
+#ifndef CS_VISIBILITY_HIDDEN
+#  define CS_VISIBILITY_HIDDEN
+#endif
 #ifndef CS_EXPORT_SYM_DLL
 #  define CS_EXPORT_SYM_DLL CS_VISIBILITY_DEFAULT
 #endif
@@ -67,7 +70,31 @@
  */
 
 #ifndef CS_FORCEINLINE
-#define CS_FORCEINLINE inline
+# ifdef CS_COMPILER_GCC
+#  define CS_FORCEINLINE inline __attribute__((always_inline))
+#  if (__GNUC__ == 3) && (__GNUC_MINOR__ == 4)
+    // Work around a gcc 3.4 issue where forcing inline doesn't always work
+#   define CS_FORCEINLINE_TEMPLATEMETHOD inline
+#  endif
+# else
+#  define CS_FORCEINLINE inline
+# endif
+#endif
+#ifndef CS_FORCEINLINE_TEMPLATEMETHOD
+# define CS_FORCEINLINE_TEMPLATEMETHOD CS_FORCEINLINE
+#endif
+
+/**\def CS_NO_EXCEPTIONS
+ * This is defined when the project was compiled without support for 
+ * exceptions.
+ */
+#if defined(CS_COMPILER_MSVC) 
+  #include <exception>
+  #if !_HAS_EXCEPTIONS
+    #define CS_NO_EXCEPTIONS
+  #endif
+#elif defined(CS_COMPILER_GCC) && !defined(__EXCEPTIONS)
+  #define CS_NO_EXCEPTIONS
 #endif
 
 /**\def CS_MAXPATHLEN
@@ -121,25 +148,6 @@
 #  else
 #    define CS_TEMP_FILE "$cs$.tmp"
 #  endif
-#endif
-
-#ifdef CS_USE_CUSTOM_ISDIR
-static inline bool isdir (const char *path, struct dirent *de)
-{
-  int pathlen = strlen (path);
-  char* fullname = new char[pathlen + 2 + strlen (de->d_name)];
-  memcpy (fullname, path, pathlen + 1);
-  if ((pathlen) && (fullname[pathlen-1] != CS_PATH_SEPARATOR))
-  {
-    fullname[pathlen++] = CS_PATH_SEPARATOR;
-    fullname[pathlen] = 0;
-  }
-  strcat (&fullname [pathlen], de->d_name);
-  struct stat st;
-  stat (fullname, &st);
-  delete[] fullname;
-  return ((st.st_mode & S_IFMT) == S_IFDIR);
-}
 #endif
 
 /**\def CS_HAVE_POSIX_MMAP
@@ -573,6 +581,182 @@ Type &Class::getterFunc ()                                     \
 #  define CS_FUNCTION_NAME		"<?\?\?>"
 #endif
 
+/* Include now, if it's included later, the malloc re#definition below may
+ * interfere with that header. */
+#include <stdlib.h>
+#ifdef CS_HAVE_MALLOC_H
+#include <malloc.h>
+#endif
+#include <new>
+
+/**\name Platform-specific memory allocation
+ * If built with ptmalloc support, these functions can be used to explicitly
+ * call the platform's default malloc/free resp. operator new/operator delete
+ * implementations. Useful when interfacing with third party libraries.
+ */
+//@{
+CS_FORCEINLINE void* platform_malloc (size_t n)
+{ return malloc (n); }
+CS_FORCEINLINE void platform_free (void* p)
+{ return free (p); }
+CS_FORCEINLINE void* platform_realloc (void* p, size_t n)
+{ return realloc (p, n); }
+CS_FORCEINLINE void* platform_calloc (size_t n, size_t s)
+{ return calloc (n, s); }
+
+namespace CS
+{
+  struct AllocPlatform {};
+  extern CS_CRYSTALSPACE_EXPORT const AllocPlatform allocPlatform;
+}
+/**
+ * Platform-dependent operator new.
+ * \remarks Won't throw an exception if allocation fails.
+ */
+extern void* CS_CRYSTALSPACE_EXPORT operator new (size_t s, 
+  const CS::AllocPlatform&) throw();
+/**
+ * Platform-dependent operator new.
+ * \remarks Won't throw an exception if allocation fails.
+ */
+extern void* CS_CRYSTALSPACE_EXPORT operator new[] (size_t s, 
+  const CS::AllocPlatform&) throw();
+extern void CS_CRYSTALSPACE_EXPORT operator delete (void* p, 
+  const CS::AllocPlatform&) throw();
+extern void CS_CRYSTALSPACE_EXPORT operator delete[] (void* p, 
+  const CS::AllocPlatform&) throw();
+//@}
+
+#ifndef CS_NO_PTMALLOC
+//@{
+/**\name ptmalloc memory allocation
+ * Directly use the ptmalloc allocation functions. Usually, this is not needed -
+ * use cs_malloc() etc instead.
+ */
+extern void* CS_CRYSTALSPACE_EXPORT ptmalloc (size_t n);
+extern void CS_CRYSTALSPACE_EXPORT ptfree (void* p);
+extern void* CS_CRYSTALSPACE_EXPORT ptrealloc (void* p, size_t n);
+extern void* CS_CRYSTALSPACE_EXPORT ptcalloc (size_t n, size_t s);
+//@}
+
+/**\name Default Crystal Space memory allocation
+ * Always the same memory allocation functions as internally used by 
+ * Crystal Space.
+ */
+//@{
+CS_FORCEINLINE void* cs_malloc (size_t n)
+{ return ptmalloc (n); }
+CS_FORCEINLINE void cs_free (void* p)
+{ ptfree (p); }
+CS_FORCEINLINE void* cs_realloc (void* p, size_t n)
+{ return ptrealloc (p, n); }
+CS_FORCEINLINE void* cs_calloc (size_t n, size_t s)
+{ return ptcalloc (n, s); }
+//@}
+
+/**\name Memory allocation override
+ * By default, ptmalloc is used for memory allocations, for both C-style
+ * malloc/free as well as C++ new/delete. Use of ptmalloc can be disabled
+ * for the whole project by passing <tt>--enable-ptmalloc=no</tt> to
+ * configure or defining <tt>CS_NO_PTMALLOC</tt> in 
+ * <tt>include/csutil/win32/csconfig.h</tt> for MSVC.
+ *
+ * To disable malloc overriding for individual source files, define 
+ * <tt>CS_NO_MALLOC_OVERRIDE</tt> before including <tt>cssysdef.h</tt>.
+ *
+ * new overriding can be disabled with <tt>CS_NO_NEW_OVERRIDE</tt>, 
+ * however, this is not recommended since it may result in mismatches
+ * between new and delete calls, where one may be overridden, while the
+ * other is not. If you need to call the platform's operator new,
+ * use operator new(size_t,const CS::AllocPlatform&).
+ */
+//@{
+#ifndef CS_NO_MALLOC_OVERRIDE
+#define malloc 		cs_malloc
+#define free 	        cs_free
+#define realloc 	cs_realloc
+#define calloc 		cs_calloc
+#endif // CS_NO_MALLOC_OVERRIDE
+
+#ifndef CS_NO_NEW_OVERRIDE
+
+#if !defined(CS_MEMORY_TRACKER) && !defined(CS_MEMORY_TRACKER_IMPLEMENT) \
+  && !defined(CS_EXTENSIVE_MEMDEBUG) && !defined(CS_EXTENSIVE_MEMDEBUG_IMPLEMENT)
+
+#ifndef CS_NO_EXCEPTIONS
+CS_FORCEINLINE void* operator new (size_t s) throw (std::bad_alloc)
+{ 
+  void* p = ptmalloc (s);
+  if (!p) throw std::bad_alloc();
+  return p;
+}
+CS_FORCEINLINE void* operator new[] (size_t s) throw (std::bad_alloc)
+{ 
+  void* p = ptmalloc (s);
+  if (!p) throw std::bad_alloc();
+  return p;
+}
+#else
+CS_FORCEINLINE void* operator new (size_t s) throw ()
+{ 
+  return ptmalloc (s);
+}
+CS_FORCEINLINE void* operator new[] (size_t s) throw ()
+{ 
+  return ptmalloc (s);
+}
+#endif
+
+CS_FORCEINLINE void operator delete (void* p) throw()
+{ ptfree (p); }
+CS_FORCEINLINE void operator delete[] (void* p) throw()
+{ ptfree (p); }
+
+CS_FORCEINLINE void* operator new (size_t s, const std::nothrow_t&) throw()
+{ return ptmalloc (s); }
+CS_FORCEINLINE void* operator new[] (size_t s, const std::nothrow_t&) throw()
+{ return ptmalloc (s); }
+CS_FORCEINLINE void operator delete (void* p, const std::nothrow_t&) throw()
+{ ptfree (p); }
+CS_FORCEINLINE void operator delete[] (void* p, const std::nothrow_t&) throw()
+{ ptfree (p); }
+
+#endif /* !defined(CS_MEMORY_TRACKER) && !defined(CS_MEMORY_TRACKER_IMPLEMENT)
+  && !defined(CS_EXTENSIVE_MEMDEBUG) && !defined(CS_EXTENSIVE_MEMDEBUG_IMPLEMENT) */
+#endif // CS_NO_NEW_OVERRIDE
+
+#else // CS_NO_PTMALLOC
+CS_FORCEINLINE void* cs_malloc (size_t n)
+{ return platform_malloc (n); }
+CS_FORCEINLINE void cs_free (void* p)
+{ platform_free (p); }
+CS_FORCEINLINE void* cs_realloc (void* p, size_t n)
+{ return platform_realloc (p, n); }
+CS_FORCEINLINE void* cs_calloc (size_t n, size_t s)
+{ return platform_calloc (n, s); }
+#endif // CS_NO_PTMALLOC
+//@}
+
+#ifdef CS_USE_CUSTOM_ISDIR
+static inline bool isdir (const char *path, struct dirent *de)
+{
+  int pathlen = strlen (path);
+  char* fullname = new char[pathlen + 2 + strlen (de->d_name)];
+  memcpy (fullname, path, pathlen + 1);
+  if ((pathlen) && (fullname[pathlen-1] != CS_PATH_SEPARATOR))
+  {
+    fullname[pathlen++] = CS_PATH_SEPARATOR;
+    fullname[pathlen] = 0;
+  }
+  strcat (&fullname [pathlen], de->d_name);
+  struct stat st;
+  stat (fullname, &st);
+  delete[] fullname;
+  return ((st.st_mode & S_IFMT) == S_IFDIR);
+}
+#endif
+
+
 // The following define should only be enabled if you have defined
 // a special version of overloaded new that accepts two additional
 // parameters: a (void*) pointing to the filename and an int with the
@@ -602,6 +786,12 @@ inline void operator delete (void* p, void*, int) { operator delete (p); }
 extern void* CS_CRYSTALSPACE_EXPORT operator new[] (size_t s, 
   void* filename, int line);
 inline void operator delete[] (void* p, void*, int) { operator delete[] (p); }
+
+inline void* operator new (size_t s)
+{ return operator new (s, (void*)__FILE__, 0); }
+inline void* operator new[] (size_t s)
+{ return operator new (s, (void*)__FILE__, 0); }
+
 #define CS_EXTENSIVE_MEMDEBUG_NEW new ((void*)CS_FUNCTION_NAME, __LINE__)
 #define new CS_EXTENSIVE_MEMDEBUG_NEW
 #endif
@@ -764,7 +954,7 @@ inline void operator delete[] (void* p, void*, int) { operator delete[] (p); }
  * \todo In the future, this should be moved to csconfig.h and determined as
  * part of the configuration process.
  */
-#if !defined (CS_PROCESSOR_X86)
+#if defined (CS_PROCESSOR_SPARC)
 #  define CS_STRICT_ALIGNMENT
 #endif
 
@@ -914,9 +1104,7 @@ inline void operator delete[] (void* p, void*, int) { operator delete[] (p); }
 # define CS_NAMESPACE_PACKAGE_NAME       CS
 #endif
 
-//@{
-/**
- * Plugin namespace helpers.
+/**\name Plugin namespace helpers
  * To avoid symbol conflicts when employing static linking, it is a good
  * idea to put everything into a private namespace. The 
  * CS_PLUGIN_NAMESPACE_BEGIN and CS_PLUGIN_NAMESPACE_END macros help with 
@@ -938,13 +1126,13 @@ inline void operator delete[] (void* p, void*, int) { operator delete[] (p); }
  * \endcode
  * To refer to members of the namespace (e.g. for template specializations,
  * use CS_PLUGIN_NAMESPACE_NAME.
- */
+ * @{ */
 #define CS_PLUGIN_NAMESPACE_BEGIN(name)                                     \
   namespace CS_NAMESPACE_PACKAGE_NAME { namespace Plugin { namespace name
 #define CS_PLUGIN_NAMESPACE_END(name)                                       \
   } }
 #define CS_PLUGIN_NAMESPACE_NAME(name)                                      \
   CS_NAMESPACE_PACKAGE_NAME::Plugin::name
-//@}
+/** @} */
 
 #endif // __CS_CSSYSDEF_H__

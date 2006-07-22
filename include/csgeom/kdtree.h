@@ -165,25 +165,7 @@ public:
   void DumpNode (const char* msg);
   void DebugExit ();
 
-  struct StaticContainer
-  {
-      csBlockAllocator<csKDTree> tree_nodes;
-      csBlockAllocator<csKDTreeChild> tree_children;
-
-      StaticContainer()
-          {
-          }
-
-      ~StaticContainer()
-          {
-              tree_nodes.Empty();
-              tree_children.Empty();
-          }
-  };
-
 private:
-  static StaticContainer treealloc;
-
   csKDTree* child1;             // If child1 is not 0 then child2 will
   csKDTree* child2;             // also be not 0.
   csKDTree* parent;             // 0 if this is the root.

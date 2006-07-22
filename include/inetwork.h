@@ -22,6 +22,5 @@
  * subdirectory of the top Crystal Space include directory.
  */
 #include "cssysdef.h"
-#include "inetwork/vosa3dl.h"
 #endif /* __INETWORK_H__ */
 

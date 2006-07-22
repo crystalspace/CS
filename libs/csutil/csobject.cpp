@@ -19,6 +19,7 @@
 
 #include "cssysdef.h"
 #include "csutil/csobject.h"
+#include "csutil/util.h"
 
 #include <stdlib.h>
 #include <string.h>

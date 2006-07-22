@@ -18,6 +18,7 @@
 
 
 #include "cssysdef.h"
+#include "csutil/csstring.h"
 #include "csutil/util.h"
 #include "csutil/sysfunc.h"
 #include "csutil/win32/registrycfg.h"

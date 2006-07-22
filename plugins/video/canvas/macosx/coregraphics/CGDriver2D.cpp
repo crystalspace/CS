@@ -15,6 +15,7 @@
 #include "iutil/event.h"
 #include "iutil/eventq.h"
 #include "ivaria/reporter.h"
+#include "csutil/eventnames.h"
 #include "csver.h"
 
 #include "CGDriver2D.h"

@@ -82,26 +82,15 @@ csSndSysDriverCoreAudio::~csSndSysDriverCoreAudio()
 {
   SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
   SCF_DESTRUCT_IBASE();
-  free(convert_buffer);
+  cs_free(convert_buffer);
 }
 
 void csSndSysDriverCoreAudio::Report(int severity, const char* msg, ...)
 {
   va_list arg;
   va_start (arg, msg);
-
-  csRef<iReporter> reporter = CS_QUERY_REGISTRY(object_reg, iReporter);
-
-  if (reporter)
-  {
-    reporter->ReportV (severity,
+  csReportV (object_reg, severity,
       "crystalspace.sndsys.driver.software.coreaudio", msg, arg);
-  }
-  else
-  {
-    csPrintfV (msg, arg);
-    csPrintf ("\n");
-  }
   va_end (arg);
 }
 
@@ -112,6 +101,10 @@ bool csSndSysDriverCoreAudio::Initialize (iObjectRegistry* r)
     "Sound System: CoreAudio driver for software sound renderer initialized.");
   return true;
 }
+
+// Takes a 32-bit integer and breaks it into chars
+#define SPLIT_TO_CHARS(x)						\
+  ((x) >> 24), (((x) >> 16) & 0xff), (((x) >> 8) & 0xff), ((x) & 0xff)
 
 bool csSndSysDriverCoreAudio::Open (csSndSysRendererSoftware *renderer,
 				   csSndSysSoundFormat *requested_format)
@@ -154,7 +147,7 @@ bool csSndSysDriverCoreAudio::Open (csSndSysRendererSoftware *renderer,
 	
   convert_size = requested_format->Freq / 10;
 	
-  convert_buffer = malloc(convert_size * requested_format->Channels * requested_format->Bits/8);
+  convert_buffer = cs_malloc(convert_size * requested_format->Channels * requested_format->Bits/8);
 	
   status = AudioDeviceSetProperty(outputDeviceID, 0, 0, false,
     kAudioDevicePropertyBufferSize, propertysize, &buffersize);
@@ -163,7 +156,7 @@ bool csSndSysDriverCoreAudio::Open (csSndSysRendererSoftware *renderer,
     Report(CS_REPORTER_SEVERITY_ERROR,
 	   "Failed to set buffersize to %d bytes for CoreAudio output device. "
 	   "Return of %d.", buffersize, (int)status);
-	free(convert_buffer);
+	cs_free(convert_buffer);
     return false;
   }
   
@@ -209,8 +202,11 @@ bool csSndSysDriverCoreAudio::Open (csSndSysRendererSoftware *renderer,
   // packet since we don't have any padding in a packet here
   inStreamDesc.mBytesPerPacket = 4;
 */	
-	Report(CS_REPORTER_SEVERITY_WARNING,"Read in hardware properties of to Freq=%f Channels=%d Bits=%d FormatID=%s Flags=%x", outStreamDesc.mSampleRate,
-	   outStreamDesc.mChannelsPerFrame, outStreamDesc.mBitsPerChannel, &outStreamDesc.mFormatID, outStreamDesc.mFormatFlags );
+  Report(CS_REPORTER_SEVERITY_DEBUG,"Read in hardware properties of to "
+    "Freq=%f Channels=%d Bits=%d FormatID=%c%c%c%c Flags=%x", 
+    outStreamDesc.mSampleRate, outStreamDesc.mChannelsPerFrame, 
+    outStreamDesc.mBitsPerChannel, SPLIT_TO_CHARS (outStreamDesc.mFormatID), 
+    outStreamDesc.mFormatFlags);
   // Set up destination stream parameters
   outStreamDesc.mSampleRate = 44100.00;
   outStreamDesc.mFormatID=kAudioFormatLinearPCM;
@@ -232,8 +228,11 @@ bool csSndSysDriverCoreAudio::Open (csSndSysRendererSoftware *renderer,
   if (status != 0)
   {
     Report(CS_REPORTER_SEVERITY_ERROR,
-	   "Failed to set output stream properties to  Freq=%f Channels=%d Bits=%d FormatID=%s Flags=%x. Return of %s", outStreamDesc.mSampleRate,
-	   outStreamDesc.mChannelsPerFrame, outStreamDesc.mBitsPerChannel, &outStreamDesc.mFormatID, outStreamDesc.mFormatFlags, &status);
+      "Failed to set output stream properties to Freq=%f Channels=%d Bits=%d "
+      "FormatID=%c%c%c%c Flags=%x. Return of %c%c%c%c", 
+      outStreamDesc.mSampleRate, outStreamDesc.mChannelsPerFrame, 
+      outStreamDesc.mBitsPerChannel, SPLIT_TO_CHARS (outStreamDesc.mFormatID), 
+      outStreamDesc.mFormatFlags, SPLIT_TO_CHARS (status));
     //return false;
   }
   
@@ -242,7 +241,8 @@ bool csSndSysDriverCoreAudio::Open (csSndSysRendererSoftware *renderer,
   if (status != 0)
   {
     Report(CS_REPORTER_SEVERITY_ERROR,
-	   "Failed to create converter with error %s", &status);
+      "Failed to create converter with error %c%c%c%c",
+      SPLIT_TO_CHARS (status));
     //return false;
   }
  
@@ -266,7 +266,7 @@ void csSndSysDriverCoreAudio::Close ()
 {
   StopThread();
   AudioDeviceRemoveIOProc(outputDeviceID, StaticAudioProc);
-  free(convert_buffer);
+  cs_free(convert_buffer);
   convert_buffer = 0;
 }
 
@@ -276,7 +276,7 @@ bool csSndSysDriverCoreAudio::StartThread()
   // Since the Core Audio API is callback driven, we don't actually start a
   // thread here ourselves.  Instead we start the audio device pulling from the
   // audio procedure.  This runs in its own thread that we don't see.
-  Report(CS_REPORTER_SEVERITY_ERROR, "Getting our thread on!");
+  Report(CS_REPORTER_SEVERITY_DEBUG, "Getting our thread on!");
   status = AudioDeviceStart(outputDeviceID, StaticAudioProc);
   if (status != 0)
   {

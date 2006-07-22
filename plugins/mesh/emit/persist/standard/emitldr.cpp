@@ -75,58 +75,18 @@ enum
   XMLTOKEN_WEIGHT
 };
 
-SCF_IMPLEMENT_IBASE (csEmitFactoryLoader)
-  SCF_IMPLEMENTS_INTERFACE (iLoaderPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csEmitFactoryLoader::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csEmitFactorySaver)
-  SCF_IMPLEMENTS_INTERFACE (iSaverPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csEmitFactorySaver::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csEmitLoader)
-  SCF_IMPLEMENTS_INTERFACE (iLoaderPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csEmitLoader::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csEmitSaver)
-  SCF_IMPLEMENTS_INTERFACE (iSaverPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csEmitSaver::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 SCF_IMPLEMENT_FACTORY (csEmitFactoryLoader)
 SCF_IMPLEMENT_FACTORY (csEmitFactorySaver)
 SCF_IMPLEMENT_FACTORY (csEmitLoader)
 SCF_IMPLEMENT_FACTORY (csEmitSaver)
 
-
-csEmitFactoryLoader::csEmitFactoryLoader (iBase* pParent)
+csEmitFactoryLoader::csEmitFactoryLoader (iBase* pParent) :
+  scfImplementationType(this, pParent)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 csEmitFactoryLoader::~csEmitFactoryLoader ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csEmitFactoryLoader::Initialize (iObjectRegistry* object_reg)
@@ -147,16 +107,13 @@ csPtr<iBase> csEmitFactoryLoader::Parse (iDocumentNode* /*node*/,
 
 //---------------------------------------------------------------------------
 
-csEmitFactorySaver::csEmitFactorySaver (iBase* pParent)
+csEmitFactorySaver::csEmitFactorySaver (iBase* pParent) :
+  scfImplementationType(this, pParent)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 csEmitFactorySaver::~csEmitFactorySaver ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csEmitFactorySaver::Initialize (iObjectRegistry* object_reg)
@@ -179,16 +136,13 @@ bool csEmitFactorySaver::WriteDown (iBase* /*obj*/, iDocumentNode* parent,
 
 //---------------------------------------------------------------------------
 
-csEmitLoader::csEmitLoader (iBase* pParent)
+csEmitLoader::csEmitLoader (iBase* pParent) :
+  scfImplementationType(this, pParent)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 csEmitLoader::~csEmitLoader ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csEmitLoader::Initialize (iObjectRegistry* object_reg)
@@ -593,16 +547,13 @@ csPtr<iBase> csEmitLoader::Parse (iDocumentNode* node,
 
 //---------------------------------------------------------------------------
 
-csEmitSaver::csEmitSaver (iBase* pParent)
+csEmitSaver::csEmitSaver (iBase* pParent) :
+  scfImplementationType(this, pParent)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 csEmitSaver::~csEmitSaver ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csEmitSaver::Initialize (iObjectRegistry* object_reg)
@@ -673,11 +624,11 @@ bool csEmitSaver::WriteDown (iBase* obj, iDocumentNode* parent,
     synldr->WriteBool(paramsNode, "lighting", emitstate->GetLighting(), true);
 
     //Writedown Number tag
-    int number = emitstate->GetParticleCount();
+    size_t number = (int)emitstate->GetParticleCount();
     csRef<iDocumentNode> numberNode =
       paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
     numberNode->SetValue("number");
-    numberNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsInt(number);
+    numberNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsInt((int)number);
 
     //Writedown StartPos tag
     iEmitGen3D* startpos = emitstate->GetStartPosEmit();

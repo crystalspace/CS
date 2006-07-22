@@ -61,58 +61,18 @@ enum
   XMLTOKEN_TOTALTIME
 };
 
-SCF_IMPLEMENT_IBASE (csFireFactoryLoader)
-  SCF_IMPLEMENTS_INTERFACE (iLoaderPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csFireFactoryLoader::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csFireFactorySaver)
-  SCF_IMPLEMENTS_INTERFACE (iSaverPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csFireFactorySaver::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csFireLoader)
-  SCF_IMPLEMENTS_INTERFACE (iLoaderPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csFireLoader::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csFireSaver)
-  SCF_IMPLEMENTS_INTERFACE (iSaverPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csFireSaver::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 SCF_IMPLEMENT_FACTORY (csFireFactoryLoader)
 SCF_IMPLEMENT_FACTORY (csFireFactorySaver)
 SCF_IMPLEMENT_FACTORY (csFireLoader)
 SCF_IMPLEMENT_FACTORY (csFireSaver)
 
-
-csFireFactoryLoader::csFireFactoryLoader (iBase* pParent)
+csFireFactoryLoader::csFireFactoryLoader (iBase* pParent) :
+  scfImplementationType(this, pParent)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 csFireFactoryLoader::~csFireFactoryLoader ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csFireFactoryLoader::Initialize (iObjectRegistry* object_reg)
@@ -133,16 +93,13 @@ csPtr<iBase> csFireFactoryLoader::Parse (iDocumentNode* /*node*/,
 
 //---------------------------------------------------------------------------
 
-csFireFactorySaver::csFireFactorySaver (iBase* pParent)
+csFireFactorySaver::csFireFactorySaver (iBase* pParent) :
+  scfImplementationType(this, pParent)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 csFireFactorySaver::~csFireFactorySaver ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csFireFactorySaver::Initialize (iObjectRegistry* object_reg)
@@ -162,16 +119,13 @@ bool csFireFactorySaver::WriteDown (iBase* /*obj*/, iDocumentNode* parent,
 
 //---------------------------------------------------------------------------
 
-csFireLoader::csFireLoader (iBase* pParent)
+csFireLoader::csFireLoader (iBase* pParent) :
+  scfImplementationType(this, pParent)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 csFireLoader::~csFireLoader ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csFireLoader::Initialize (iObjectRegistry* object_reg)
@@ -330,16 +284,13 @@ csPtr<iBase> csFireLoader::Parse (iDocumentNode* node,
 //---------------------------------------------------------------------------
 
 
-csFireSaver::csFireSaver (iBase* pParent)
+csFireSaver::csFireSaver (iBase* pParent) :
+  scfImplementationType(this, pParent)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 csFireSaver::~csFireSaver ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csFireSaver::Initialize (iObjectRegistry* object_reg)
@@ -447,11 +398,11 @@ bool csFireSaver::WriteDown (iBase* obj, iDocumentNode* parent,
     synldr->WriteBool(paramsNode, "lighting", firestate->GetLighting(), true);
 
     //Writedown Number tag
-    int number = firestate->GetParticleCount();
+    size_t number = firestate->GetParticleCount();
     csRef<iDocumentNode> numberNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
     numberNode->SetValue("number");
     csRef<iDocumentNode> numberValueNode = numberNode->CreateNodeBefore(CS_NODE_TEXT, 0);
-    numberValueNode->SetValueAsInt(number);
+    numberValueNode->SetValueAsInt((int)number);
   }
 
   paramsNode=0;

@@ -537,7 +537,7 @@ bool awsComponent::HandleEvent (iEvent &Event)
 #undef UNSAVE_COMP
 }
 
-bool awsComponent::Overlaps (csRect &r)
+bool awsComponent::Overlaps (const csRect &r)
 {
   return self->Frame().Intersects (r);
 }

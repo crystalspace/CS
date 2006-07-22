@@ -209,7 +209,7 @@ void csGenericRenderStep::RenderMeshes (iRenderView* rview, iGraphics3D* g3d,
 					meshInfo* meshContexts,
                                         csRenderMesh** meshes, 
                                         size_t num,
-                                        csShaderVarStack& stacks)
+                                        iShaderVarStack* stacks)
 {
   if (num == 0) return;
   ToggleStepSettings (g3d, true);
@@ -242,7 +242,7 @@ void csGenericRenderStep::RenderMeshes (iRenderView* rview, iGraphics3D* g3d,
 
       svO2W->SetValue (mesh->object2world);
 
-      stacks.Empty ();
+      stacks->Empty ();
       shaderManager->PushVariables (stacks);
 	  if (light)
 		  light->GetSVContext()->PushVariables (stacks);
@@ -295,7 +295,7 @@ void csGenericRenderStep::RenderMeshes (iRenderView* rview, iGraphics3D* g3d,
 }
 
 void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
-  csShaderVarStack &stacks)
+  iShaderVarStack* stacks)
 {
   Perform (rview, sector, 0, stacks);
 }
@@ -323,7 +323,7 @@ void csGenericRenderStep::ToggleStepSettings (iGraphics3D* g3d,
 class ShaderTicketHelper
 {
 private:
-  csShaderVarStack& stacks;
+  iShaderVarStack* stacks;
   const csArray<csShaderVariableContext>& shadervars;
   size_t shadervars_idx;
   //csShaderVariableContext& shadervars;
@@ -339,10 +339,10 @@ private:
   }
 
 public:
-  ShaderTicketHelper (csShaderVarStack& Stacks,
+  ShaderTicketHelper (iShaderVarStack* stacks,
     const csArray<csShaderVariableContext>& sv,
     size_t sv_idx) :
-    	stacks (Stacks), 
+    	stacks (stacks), 
     	shadervars (sv),
 	shadervars_idx (sv_idx)
   {
@@ -366,7 +366,7 @@ public:
     if (mesh->variablecontext.IsValid () 
       && !mesh->variablecontext->IsEmpty())
     {
-      stacks.Empty ();
+      stacks->Empty ();
       shadervars[shadervars_idx].PushVariables (stacks);
       if (mesh->variablecontext)
         mesh->variablecontext->PushVariables (stacks);
@@ -384,7 +384,7 @@ public:
     {
       if (matShadMeshTicket == (size_t)~0)
       {
-        stacks.Empty ();
+        stacks->Empty ();
         shadervars[shadervars_idx].PushVariables (stacks);
         if (mesh->variablecontext)
           mesh->variablecontext->PushVariables (stacks);
@@ -403,7 +403,7 @@ public:
 
 void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
 				   iLight* light,
-                                   csShaderVarStack &stacks)
+                                   iShaderVarStack* stacks)
 {
   iGraphics3D* g3d = rview->GetGraphics3D();
 
@@ -542,7 +542,7 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
       if (portalTraversal)
       {
         ToggleStepSettings (g3d, false);
-        stacks.Empty ();
+        stacks->Empty ();
         mesh->portal->Draw (rview);
       }
 

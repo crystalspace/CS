@@ -1,0 +1,8 @@
+SubDir TOP plugins culling pvs ;
+
+Description pvs : "PVS Visibility System" ;
+
+Plugin pvs
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith pvs : crystalspace ;

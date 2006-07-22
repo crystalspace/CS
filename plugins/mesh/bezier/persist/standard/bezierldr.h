@@ -24,6 +24,7 @@
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "csutil/strhash.h"
+#include "csutil/scf_implementation.h"
 
 struct iEngine;
 struct iPluginManager;
@@ -48,7 +49,8 @@ public:
 /**
  * Thing loader.
  */
-class csBezierLoader : public iLoaderPlugin
+class csBezierLoader :
+  public scfImplementation2<csBezierLoader, iLoaderPlugin, iComponent>
 {
 private:
   iObjectRegistry* object_reg;
@@ -67,32 +69,23 @@ private:
 	bool isParent);
 
 public:
-  SCF_DECLARE_IBASE;
-
   /// Constructor.
-  csBezierLoader (iBase*);
+  csBezierLoader (iBase* pParent) : scfImplementationType(this, pParent) {}
   /// Destructor.
-  virtual ~csBezierLoader ();
+  virtual ~csBezierLoader () {}
 
   bool Initialize (iObjectRegistry* p);
 
   /// Parse a given node and return a new object for it.
   virtual csPtr<iBase> Parse (iDocumentNode* node,
     iStreamSource*, iLoaderContext* ldr_context, iBase* context);
-
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csBezierLoader);
-    virtual bool Initialize (iObjectRegistry* p)
-    { return scfParent->Initialize (p); }
-  } scfiComponent;
-  friend struct eiComponent;
 };
 
 /**
  * Thing saver.
  */
-class csBezierSaver : public iSaverPlugin
+class csBezierSaver :
+  public scfImplementation2<csBezierSaver, iSaverPlugin, iComponent>
 {
 private:
   iObjectRegistry* object_reg;
@@ -100,12 +93,10 @@ private:
   csRef<iSyntaxService> synldr;
 
 public:
-  SCF_DECLARE_IBASE;
-
   /// Constructor.
-  csBezierSaver (iBase*);
+  csBezierSaver (iBase* pParent) : scfImplementationType(this, pParent) {}
   /// Destructor.
-  virtual ~csBezierSaver ();
+  virtual ~csBezierSaver () {}
 
   bool Initialize (iObjectRegistry* p);
 
@@ -114,14 +105,6 @@ public:
   	iStreamSource*);
   bool WriteObject (iBase* obj, iDocumentNode* parent);
   bool WriteFactory (iBase* obj, iDocumentNode* parent);
-
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csBezierSaver);
-    virtual bool Initialize (iObjectRegistry* p)
-    { return scfParent->Initialize (p); }
-  } scfiComponent;
-  friend struct eiComponent;
 };
 
 #endif // __CS_BEZIERLDR_H__

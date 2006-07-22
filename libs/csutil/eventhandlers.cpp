@@ -43,21 +43,22 @@ csEventHandlerRegistry::~csEventHandlerRegistry()
 {
 }
 
-csHandlerID csEventHandlerRegistry::GetGenericID (const csString &name)
+csHandlerID csEventHandlerRegistry::GetGenericID (const char *name)
 {
-  CS_ASSERT (name.FindFirst(':') == (size_t)-1);
+  csString nameStr = name;
+  CS_ASSERT (nameStr.FindFirst(':') == (size_t)-1);
   csHandlerID res;
-  if (names.Contains(name)) 
+  if (names.Contains(nameStr)) 
   {
-    res = names.Request(name);
+    res = names.Request(nameStr);
   } 
   else 
   {
-    res = names.Request(name);
+    res = names.Request(nameStr);
     csString p;
-    p = name + csString(":pre");
+    p = nameStr + ":pre";
     handlerPres.PutUnique(res, names.Request((const char *)p));
-    p = name + csString(":post");
+    p = nameStr + ":post";
     handlerPosts.PutUnique(res, names.Request((const char *)p));
   }
   return res;
@@ -77,11 +78,15 @@ csHandlerID csEventHandlerRegistry::GetGenericPostBoundID (csHandlerID id)
   return handlerPosts.Get(id, CS_HANDLER_INVALID);
 }
 
-csHandlerID csEventHandlerRegistry::GetID (iEventHandler *handler)
+csHandlerID csEventHandlerRegistry::RegisterID (iEventHandler *handler)
 {
   csHandlerID res = handlerToID.Get (handler, CS_HANDLER_INVALID);
   if (res != CS_HANDLER_INVALID)
+  {
+    KnownEventHandler* knownHandler = idToHandler.GetElementPointer (res);
+    knownHandler->refcount++;
     return res;
+  }
 
   csHandlerID generic = GetGenericID (handler->GenericName());
 
@@ -97,7 +102,13 @@ csHandlerID csEventHandlerRegistry::GetID (iEventHandler *handler)
   return res;
 }
 
-csHandlerID csEventHandlerRegistry::GetID (csString &name)
+csHandlerID csEventHandlerRegistry::GetID (iEventHandler *handler)
+{
+  csHandlerID res = handlerToID.Get (handler, CS_HANDLER_INVALID);
+  return res;
+}
+
+csHandlerID csEventHandlerRegistry::GetID (const char *name)
 {
   return names.Request (name);
 }
@@ -105,21 +116,22 @@ csHandlerID csEventHandlerRegistry::GetID (csString &name)
 void csEventHandlerRegistry::ReleaseID (csHandlerID id)
 {
   CS_ASSERT (IsInstance (id));
-  iEventHandler *h = idToHandler.Get (id, 0);
-  CS_ASSERT (h);
-  handlerToID.DeleteAll (h);
-  idToHandler.DeleteAll (id);
-  instantiation.DeleteAll (id);
+  KnownEventHandler* knownHandler = idToHandler.GetElementPointer (id);
+  CS_ASSERT (knownHandler);
+  if ((--knownHandler->refcount) == 0)
+  {
+    handlerToID.DeleteAll (
+      static_cast<iEventHandler*> (knownHandler->handler));
+    idToHandler.DeleteAll (id);
+    instantiation.DeleteAll (id);
+  }
 }
 
 void csEventHandlerRegistry::ReleaseID (iEventHandler *handler)
 {
-  CS_ASSERT(handlerToID.Get (handler, CS_HANDLER_INVALID) !=
-  	CS_HANDLER_INVALID);
   csHandlerID id = handlerToID.Get (handler, CS_HANDLER_INVALID);
-  handlerToID.DeleteAll (handler);
-  idToHandler.DeleteAll (id);
-  instantiation.DeleteAll (id);
+  CS_ASSERT(id != CS_HANDLER_INVALID);
+  ReleaseID (id);
 }
 
 const char * csEventHandlerRegistry::GetString (csHandlerID id)
@@ -130,7 +142,8 @@ const char * csEventHandlerRegistry::GetString (csHandlerID id)
 iEventHandler *csEventHandlerRegistry::GetHandler (csHandlerID id)
 {
   CS_ASSERT(IsInstance(id));
-  return idToHandler.Get (id, 0);
+  const KnownEventHandler* knownHandler = idToHandler.GetElementPointer (id);
+  return knownHandler ? knownHandler->handler : 0;
 }
 
 bool const csEventHandlerRegistry::IsInstanceOf (csHandlerID instanceid,
@@ -170,9 +183,9 @@ csRef<iEventHandlerRegistry> csEventHandlerRegistry::GetRegistry (
 
 
 CS_CONST_METHOD const csHandlerID * 
-FrameSignpost_Logic3D::GenericPrec(csRef<iEventHandlerRegistry> &r1,
-				   csRef<iEventNameRegistry> &r2,
-				   csEventID e) const
+FrameSignpost_Logic3D::GenericPrec(csRef<iEventHandlerRegistry> &,
+				   csRef<iEventNameRegistry> &,
+				   csEventID) const
 {
   return 0;
 }
@@ -194,9 +207,9 @@ FrameSignpost_Logic3D::GenericSucc(csRef<iEventHandlerRegistry> &r1,
 
 
 CS_CONST_METHOD const csHandlerID * 
-FrameSignpost_3D2D::GenericPrec(csRef<iEventHandlerRegistry> &r1,
-				csRef<iEventNameRegistry> &r2,
-				csEventID e) const
+FrameSignpost_3D2D::GenericPrec(csRef<iEventHandlerRegistry> &,
+				csRef<iEventNameRegistry> &,
+				csEventID) const
 {
   return 0;
 }
@@ -218,9 +231,9 @@ FrameSignpost_3D2D::GenericSucc(csRef<iEventHandlerRegistry> &r1,
 
 
 CS_CONST_METHOD const csHandlerID * 
-FrameSignpost_2DConsole::GenericPrec(csRef<iEventHandlerRegistry> &r1,
-				   csRef<iEventNameRegistry> &r2,
-				   csEventID e) const
+FrameSignpost_2DConsole::GenericPrec(csRef<iEventHandlerRegistry> &,
+				   csRef<iEventNameRegistry> &,
+				   csEventID) const
 {
   return 0;
 }
@@ -242,9 +255,9 @@ FrameSignpost_2DConsole::GenericSucc(csRef<iEventHandlerRegistry> &r1,
 
 
 CS_CONST_METHOD const csHandlerID * 
-FrameSignpost_ConsoleDebug::GenericPrec(csRef<iEventHandlerRegistry> &r1,
-					csRef<iEventNameRegistry> &r2,
-					csEventID e) const
+FrameSignpost_ConsoleDebug::GenericPrec(csRef<iEventHandlerRegistry> &,
+					csRef<iEventNameRegistry> &,
+					csEventID) const
 {
   return 0;
 }
@@ -266,17 +279,17 @@ FrameSignpost_ConsoleDebug::GenericSucc(csRef<iEventHandlerRegistry> &r1,
 
 
 CS_CONST_METHOD const csHandlerID * 
-FrameSignpost_DebugFrame::GenericPrec(csRef<iEventHandlerRegistry> &r1,
-				      csRef<iEventNameRegistry> &r2,
-				      csEventID e) const
+FrameSignpost_DebugFrame::GenericPrec(csRef<iEventHandlerRegistry> &,
+				      csRef<iEventNameRegistry> &,
+				      csEventID) const
 {
   return 0;
 }
 
 CS_CONST_METHOD const csHandlerID * 
-FrameSignpost_DebugFrame::GenericSucc(csRef<iEventHandlerRegistry> &r1,
-				      csRef<iEventNameRegistry> &r2,
-				      csEventID e) const 
+FrameSignpost_DebugFrame::GenericSucc(csRef<iEventHandlerRegistry> &,
+				      csRef<iEventNameRegistry> &,
+				      csEventID) const 
 {
   return 0;
 }

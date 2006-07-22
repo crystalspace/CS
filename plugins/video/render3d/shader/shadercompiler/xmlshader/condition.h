@@ -20,6 +20,7 @@
 #ifndef __CS_CONDITION_H__
 #define __CS_CONDITION_H__
 
+#include "csutil/csstring.h"
 #include "csutil/strhash.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)

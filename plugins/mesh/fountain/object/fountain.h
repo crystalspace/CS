@@ -21,16 +21,10 @@
 #define __CS_FOUNTAIN_H__
 
 #include "csgeom/vector3.h"
-#include "csgeom/box.h"
-#include "csutil/cscolor.h"
-#include "csutil/refarr.h"
 #include "csutil/floatrand.h"
+#include "csutil/scf_implementation.h"
 #include "csplugincommon/particlesys/particle.h"
 #include "imesh/fountain.h"
-#include "iutil/eventh.h"
-#include "iutil/comp.h"
-
-struct iMaterialWrapper;
 
 /**
  * A Fountain particle system. Each x msec n particles shoot out of a spout,
@@ -41,7 +35,9 @@ struct iMaterialWrapper;
  * sin(elevation)*speed*fall_time + accel.y*fall_time*fall_time + spot.y
  * i.e. the world y height of the pool of the fountain.
  */
-class csFountainMeshObject : public csNewParticleSystem
+class csFountainMeshObject :
+  public scfImplementationExt1<csFountainMeshObject, csNewParticleSystem,
+    iFountainState>
 {
 protected:
   csVector3 origin;
@@ -76,6 +72,7 @@ public:
   /// Destructor.
   virtual ~csFountainMeshObject ();
 
+  //------------------------- iFountainState implementation ----------------
   /// Set the number of particles to use.
   void SetParticleCount (int num)
   {
@@ -168,94 +165,11 @@ public:
   virtual void HardTransform (const csReversibleTransform& t);
   virtual bool SupportsHardTransform () const { return true; }
 
-  SCF_DECLARE_IBASE_EXT (csNewParticleSystem);
-
-  //------------------------- iFountainState implementation ----------------
-  class FountainState : public iFountainState
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csFountainMeshObject);
-    virtual void SetParticleCount (int num)
-    {
-      scfParent->SetParticleCount (num);
-    }
-    virtual void SetDropSize (float dropwidth, float dropheight)
-    {
-      scfParent->SetDropSize (dropwidth, dropheight);
-    }
-    virtual void SetOrigin (const csVector3& origin)
-    {
-      scfParent->SetOrigin (origin);
-    }
-    virtual void SetLighting (bool l)
-    {
-      scfParent->SetLighting (l);
-    }
-    virtual void SetAcceleration (const csVector3& accel)
-    {
-      scfParent->SetAcceleration (accel);
-    }
-    virtual void SetElevation (float elev)
-    {
-      scfParent->SetElevation (elev);
-    }
-    virtual void SetAzimuth (float azi)
-    {
-      scfParent->SetAzimuth (azi);
-    }
-    virtual void SetOpening (float open)
-    {
-      scfParent->SetOpening (open);
-    }
-    virtual void SetSpeed (float spd)
-    {
-      scfParent->SetSpeed (spd);
-    }
-    virtual void SetFallTime (float ftime)
-    {
-      scfParent->SetFallTime (ftime);
-    }
-    virtual int GetParticleCount () const
-    {
-      return scfParent->GetParticleCount ();
-    }
-    virtual void GetDropSize (float& dropwidth, float& dropheight) const
-    {
-      scfParent->GetDropSize (dropwidth, dropheight);
-    }
-    virtual const csVector3& GetOrigin () const
-    {
-      return scfParent->GetOrigin ();
-    }
-    virtual bool GetLighting () const
-    {
-      return scfParent->GetLighting ();
-    }
-    virtual const csVector3& GetAcceleration () const
-    {
-      return scfParent->GetAcceleration ();
-    }
-    virtual float GetElevation () const
-    {
-      return scfParent->GetElevation ();
-    }
-    virtual float GetAzimuth () const
-    {
-      return scfParent->GetAzimuth ();
-    }
-    virtual float GetOpening () const
-    {
-      return scfParent->GetOpening ();
-    }
-    virtual float GetSpeed () const
-    {
-      return scfParent->GetSpeed ();
-    }
-    virtual float GetFallTime () const
-    {
-      return scfParent->GetFallTime ();
-    }
-  } scfiFountainState;
-  friend class FountainState;
+  // Redirect these functions to csNewParticleSystem
+  virtual void SetLighting (bool l)
+  { csNewParticleSystem::SetLighting (l); }
+  virtual bool GetLighting () const
+  { return csNewParticleSystem::GetLighting (); }
 };
 
 #endif // __CS_FOUNTAIN_H__

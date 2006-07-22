@@ -267,7 +267,7 @@ void csPagingFormer::SetHeightmapDir (const char* path, const char *type)
   sscanf(lastname.GetData(),"%d",&numy);
   numy++;
 
-  uint numx = heightmapnames->GetSize() / numy;
+  uint numx = (uint)heightmapnames->GetSize() / numy;
   countx = numx;
   county = numy;
 
@@ -297,7 +297,7 @@ void csPagingFormer::SetIntmapDir (const csStringID type,
   sscanf(lastname.GetData(),"%d",&numy);
   numy++;
 
-  uint numx = heightmapnames->GetSize() / numy;
+  uint numx = (uint)heightmapnames->GetSize() / numy;
 
   if (numx == countx && numy == county)
   {
@@ -323,7 +323,7 @@ void csPagingFormer::SetFloatmapDir (const csStringID type,
   sscanf(lastname.GetData(),"%d",&numy);
   numy++;
 
-  uint numx = heightmapnames->GetSize() / numy;
+  uint numx = (uint)heightmapnames->GetSize() / numy;
 
   if (numx == countx && numy == county)
   {
@@ -386,19 +386,17 @@ void csPagingFormer::SetOffset (csVector3 offset)
 
 
 /// Set additional integer map.
-bool csPagingFormer::SetIntegerMap (csStringID type, iImage* map,
-  int scale, int offset)
+bool csPagingFormer::SetIntegerMap (csStringID /*type*/, iImage* /*map*/,
+  int /*scale*/, int /*offset*/)
 {
-  //printf("SetIntMap\n");
   return false;
 }
 
 
 /// Set additional float map.
-bool csPagingFormer::SetFloatMap (csStringID type, iImage* map,
-  float scale, float offset)
+bool csPagingFormer::SetFloatMap (csStringID /*type*/, iImage* /*map*/,
+  float /*scale*/, float /*offset*/)
 {
-  //printf("SetFloatMap\n");
   return false;
 }
 
@@ -600,10 +598,9 @@ bool breakagex = false;
 * heights
 * Will not return any actual value, just if the map is present.
 */
-bool csPagingFormer::SampleFloat (csStringID type, float x, 
-  float z, float &value)
+bool csPagingFormer::SampleFloat (csStringID type, float /*x*/, 
+  float /*z*/, float &/*value*/)
 {
-  //printf("SampleFloat Former\n");
   return floatmapdir.Contains(type);
 }
 
@@ -612,10 +609,9 @@ bool csPagingFormer::SampleFloat (csStringID type, float x,
 * Sample csVector2 data.
 * Will return false.
 */
-bool csPagingFormer::SampleVector2 (csStringID type, float x, float z,
-  csVector2 &value)
+bool csPagingFormer::SampleVector2 (csStringID /*type*/, float /*x*/,
+  float /*z*/, csVector2 &/*value*/)
 {
-  //printf("SampleVec2 Former\n");
   return false;
 }
 
@@ -625,10 +621,9 @@ bool csPagingFormer::SampleVector2 (csStringID type, float x, float z,
 * Allowed types:
 * vertices
 */
-bool csPagingFormer::SampleVector3 (csStringID type, float x, 
-  float z, csVector3 &value)
+bool csPagingFormer::SampleVector3 (csStringID /*type*/, float /*x*/, 
+  float /*z*/, csVector3 &/*value*/)
 {
-  //printf("SampleVec3 Former\n");
   return false;
 }
 
@@ -637,10 +632,9 @@ bool csPagingFormer::SampleVector3 (csStringID type, float x,
 * Sample integer data.
 * Will not return any actual value, just if the map is present.
 */
-bool csPagingFormer::SampleInteger (csStringID type, float x, float z,
-  int &value)
+bool csPagingFormer::SampleInteger (csStringID type, float /*x*/, float /*z*/,
+  int &/*value*/)
 {
-  //printf("SampleInt Former\n");
   return intmapdir.Contains(type);
 }
 
@@ -686,12 +680,12 @@ void csPagingSampler::CachePositions ()
   positions = new csVector3[resx*resz];
 
   // buffer for all the samplers maps
-  uint num = sampler.GetSize();
+  size_t num = sampler.GetSize();
   const csVector3 **maps = new const csVector3*[num];
 
   // first get the raw data from all the samplers
   // @@@ excluded from loop below for easier profiling
-  uint k;
+  size_t k;
   //uint sumresx = 0;
   //uint sumresz = 0;
   //uint formerresx;
@@ -1026,12 +1020,12 @@ const int *csPagingSampler::SampleInteger (csStringID type)
     int *map = new int[resx*resz];
 
     // buffer for all the samplers maps
-    uint num = sampler.GetSize();
+    size_t num = sampler.GetSize();
     const int **maps = new const int*[num];
 
   // first get the raw data from all the samplers
   // @@@ excluded from loop below for easier profiling
-  uint k;
+  size_t k;
   //uint sumresx = 0;
   //uint sumresz = 0;
   //uint formerresx;
