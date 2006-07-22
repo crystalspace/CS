@@ -21,6 +21,7 @@
 
 #include "csutil/scf_implementation.h"
 #include "csutil/strhash.h"
+#include "csutil/csstring.h"
 
 #include "imap/reader.h"
 #include "imap/services.h"
