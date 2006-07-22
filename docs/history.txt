@@ -10,6 +10,8 @@ chronological order.
 	- Oktal fixed the order of some declaration qualifiers in spinlock.h;
 	  CS_FORCEINLINE must come *before* the method's return type, at least
 	  on gcc3. This is my first commit by SVN, so I hope it doesn't break.
+	- res fixed the configure freetype check to not reference an internal
+	  header (doesn't work with FreeType2.2 any more).
 21-Jul-2006
 	- res fixed an assertion triggered by csBaseEventHandler that could
 	  occur when the destruction occured after 
