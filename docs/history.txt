@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+22-Jul-2006
+	- Oktal fixed the order of some declaration qualifiers in spinlock.h;
+	  CS_FORCEINLINE must come *before* the method's return type, at least
+	  on gcc3. This is my first commit by SVN, so I hope it doesn't break.
 21-Jul-2006
 	- res fixed an assertion triggered by csBaseEventHandler that could
 	  occur when the destruction occured after 
