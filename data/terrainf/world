@@ -157,11 +157,11 @@
 
   <addon plugin="crystalspace.terraformer.simple.loader">
       <name>simple</name>
-      <heightmap>/lev/terrain/heightmap.png</heightmap>
+      <heightmap>/lev/terraini/heightmap.png</heightmap>
       <!--<heightmap>/lev/terrain/heightmap_257x257.png</heightmap>-->
       <!--<heightmap image="/lev/terrain/heightmap_2049x2049.png"/>-->
       <scale x="256" y="64" z="256" />
-      <materialmap image="/lev/terraini/material.png" />
+      <materialmap image="/lev/terraini/material_blank.png" />
   </addon>
 
     <!--
@@ -203,8 +203,8 @@
         <material>Base</material>
         <materialpalette>
           <material>Lava</material>
-          <material>Stone</material>
-          <material>Grass</material>
+<!--          <material>Stone</material>
+          <material>Grass</material>-->
         </materialpalette>
         <lodvalue name="splatting distance">200</lodvalue>
         <lodvalue name="block resolution">16</lodvalue>

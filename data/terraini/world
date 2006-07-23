@@ -73,7 +73,7 @@
 
       <cells>
         <cell name="main">
-          <grid_size x="65" y="65" />
+          <grid_size x="513" y="513" />
           <material_size x="64" y="64" />
           <position x="-256" y="-256" />
           <size x="512" y="512" z="64" />
@@ -81,7 +81,7 @@
           <feeder>
             <plugin>crystalspace.mesh.object.terrainimproved.simpledatafeeder</plugin>
             <param name="heightmap source" value="/lev/terraini/heightmap.png" />
-            <param name="materialmap source" value="/lev/terraini/material.png" />
+            <param name="materialmap source" value="/lev/terraini/material_blank.png" />
           </feeder>
         </cell>
 
@@ -153,8 +153,8 @@
         <factory>TerrainFact</factory>
         <materialpalette>
           <material>Lava</material>
-          <material>Stone</material>
-          <material>Grass</material>
+<!--          <material>Stone</material>
+          <material>Grass</material>-->
         </materialpalette>
       </params>
       <move> 
