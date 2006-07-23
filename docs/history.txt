@@ -32,6 +32,8 @@ chronological order.
 	  finely.
 	- res added the ability to specify an upper cap for program profiles 
 	  to the Cg plugin.
+	- res committed a patch from Gellule <gellule.xg@free.fr> to add
+	  csStringBase::FindLast (const char*, size_t).
 22-Jul-2006
 	- Oktal fixed the order of some declaration qualifiers in spinlock.h;
 	  CS_FORCEINLINE must come *before* the method's return type, at least

@@ -522,6 +522,15 @@ public:
   size_t FindLast (char c, size_t pos = (size_t)-1) const;
   
   /**
+   * Find the last occurrence of any of a set of characters in the string.
+   * \param c Characters to locate.
+   * \param pos Start position of reverse search.  Specify (size_t)-1 if you
+   *   want the search to begin at the very end of string.
+   * \return Last position of character, or (size_t)-1 if not found.
+   */
+  size_t FindLast (const char *c, size_t pos = (size_t)-1) const;
+
+  /**
    * Find the first occurrence of \p search in this string starting at \p pos.
    * \param search String to locate.
    * \param pos Start position of search (default 0).
