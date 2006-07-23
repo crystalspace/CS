@@ -28,7 +28,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "csutil/leakguard.h"
 
 #include <Cg/cg.h>
-/* WIN32is used in an "#if" inside <cgGL.h>, however, it is sometimes defined
+/* WIN32 is used in an "#if" inside <cgGL.h>, however, it is sometimes defined
  * without value. */
 #ifdef WIN32
 #undef WIN32
@@ -64,7 +64,7 @@ protected:
   csString debugFN;
 
   bool DefaultLoadProgram (const char* programStr, CGGLenum type, 
-    bool compiled = false, bool doLoad = true);
+    CGprofile maxProfile, bool compiled = false, bool doLoad = true);
   void DoDebugDump ();
   void WriteAdditionalDumpInfo (const char* description, const char* content);
   virtual const char* GetProgramType() = 0;

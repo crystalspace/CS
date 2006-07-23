@@ -30,6 +30,8 @@ chronological order.
 	  destination were not handled correctly.
 	- res enhanced the PS1.x to 1.4 converter to track register usage more
 	  finely.
+	- res added the ability to specify an upper cap for program profiles 
+	  to the Cg plugin.
 22-Jul-2006
 	- Oktal fixed the order of some declaration qualifiers in spinlock.h;
 	  CS_FORCEINLINE must come *before* the method's return type, at least
