@@ -14694,6 +14694,7 @@ package cspace::iEngineSequenceManager;
 *FindSequenceByName = *cspacec::iEngineSequenceManager_FindSequenceByName;
 *RunSequenceByName = *cspacec::iEngineSequenceManager_RunSequenceByName;
 *FireTimedOperation = *cspacec::iEngineSequenceManager_FireTimedOperation;
+*DestroyTimedOperations = *cspacec::iEngineSequenceManager_DestroyTimedOperations;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});

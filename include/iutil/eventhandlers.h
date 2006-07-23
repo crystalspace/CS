@@ -57,7 +57,7 @@ struct iEventHandler;
  */
 struct iEventHandlerRegistry : public virtual iBase
 {
-  SCF_INTERFACE(iEventHandlerRegistry, 1, 2, 0);
+  SCF_INTERFACE(iEventHandlerRegistry, 1, 3, 0);
 
   /**
    * Get a csHandlerID based upon some string.
@@ -70,17 +70,26 @@ struct iEventHandlerRegistry : public virtual iBase
   /**
    * Get the csHandlerID for a specified event handler, which provides
    * its own name via the iEventHandler::GetInstanceName() method.
+   * Does not set up any mappings, implicit names, or anything else that you 
+   * need; a handler needs be registered with RegisterID() beforehand.
    */
   virtual csHandlerID GetID (iEventHandler *) = 0;
   /**
    * Get the csHandlerID for an arbitrary handler name.  Does not set
    * up any mappings, implicit names, or anything else that you need;
-   * should only be used internally by other CS libraries when you KNOW 
-   * these aren't needed.
+   * a handler needs be registered with RegisterID() beforehand.
    */
   virtual csHandlerID GetID (const char*) = 0;
+
   /**
-   * Used when an iEventHandler is desroyed to remove our reference.
+   * Register an event handler to obtain a handler ID. 
+   * \remarks Every call must be balanced with a call to ReleaseID() to
+   *   ensure proper housekeeping. Otherwise, event handler instances may
+   *   be leaking.
+   */
+  virtual csHandlerID RegisterID (iEventHandler *) = 0;
+  /**
+   * Used when an iEventHandler is destroyed to remove our reference.
    */
   virtual void ReleaseID (csHandlerID id) = 0;
   /**
@@ -98,7 +107,8 @@ struct iEventHandlerRegistry : public virtual iBase
    * genericid is a generic instance, and instanceid is an
    * instance of genericid in particular.
    */
-  virtual CS_CONST_METHOD bool const IsInstanceOf (csHandlerID instanceid, csHandlerID genericid) = 0;
+  virtual CS_CONST_METHOD bool const IsInstanceOf (csHandlerID instanceid, 
+    csHandlerID genericid) = 0;
   /**
    * returns true if id is a handler instance (i.e., not a generic name).
    */

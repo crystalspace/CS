@@ -175,11 +175,17 @@ public:
   void DeleteIndex (size_t index)
   { paths.DeleteIndex (index); }
   
+  //@{
   /// Return number of contained paths.
   size_t Length () const { return paths.Length(); }
+  size_t GetSize () const { return paths.Length(); }
+  //@}
   CS_DEPRECATED_METHOD size_t GetCount () const { return Length(); }
+  //@{
   /// Retrieve the n'th path record.
   Entry const& operator [] (size_t n) const { return paths[n]; }
+  Entry& operator [] (size_t n) { return paths[n]; }
+  //@}
   
   //@{
   /**

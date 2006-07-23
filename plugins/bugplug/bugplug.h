@@ -26,6 +26,7 @@
 #include "csutil/util.h"
 #include "csutil/weakref.h"
 #include "csutil/weakrefarr.h"
+#include "cstool/numberedfilenamehelper.h"
 #include "iutil/comp.h"
 #include "iutil/csinput.h"
 #include "iutil/eventh.h"
@@ -155,6 +156,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(BugPlug)
 #define DEBUGCMD_LISTPLUGINS	1065	// List all loaded plugins
 #define DEBUGCMD_PROFDUMP	1066	// Dump profile info (CS_PROFSTART).
 #define DEBUGCMD_PROFRESET	1067	// Reset profile info (CS_PROFRESET).
+#define DEBUGCMD_UBERSCREENSHOT 1068    // Create an "uberscreenshot"
 
 // For showing of polygon meshes.
 #define BUGPLUG_POLYMESH_NO	0
@@ -302,13 +304,18 @@ private:
   const char* captureMIME;
   /// image saver options for the screenshot file
   const char* captureOptions;
-  /// format of the screenshot filename (e.g. "/tmp/cryst%03d.png")
-  char* captureFormat;
-  uint captureFormatNumberMax;
+  /// Helper for screenshot filename (e.g. "/tmp/cryst%03d.png")
+  CS::NumberedFilenameHelper captureFormat;
+  
   /**
    * Make a screenshot.
    */
   void CaptureScreen ();
+  /**
+   * Make an uberscreenshot.
+   * \sa CS::UberScreenshotMaker
+   */
+  void CaptureUberScreen (uint w, uint h);
 
   /// Current visibility culler we are monitoring.
   csWeakRef<iVisibilityCuller> visculler;

@@ -35,7 +35,6 @@ csCEGUIRenderer::csCEGUIRenderer (iBase *parent) :
   scfImplementationType (this, parent),
   obj_reg(0),
   events(0),
-  resourceProvider(0),
   scriptModule(0),
   newQuadAdded(false),
   queueing(true),
@@ -43,6 +42,7 @@ csCEGUIRenderer::csCEGUIRenderer (iBase *parent) :
   texture(0)
 {
   d_identifierString = "Crystal Space Renderer";
+  d_resourceProvider = 0;
 }
 
 // TODO add description
@@ -74,14 +74,17 @@ bool csCEGUIRenderer::Initialize (iScript* script)
   if (!g2d)
     return false;
 
-  #if (CEGUI_VERSION_MAJOR == 0) && (CEGUI_VERSION_MINOR < 5)
   if (script)
   {
+  #if (CEGUI_VERSION_MAJOR == 0) && (CEGUI_VERSION_MINOR < 5)
     scriptModule = new csCEGUIScriptModule (script, obj_reg);
     new CEGUI::System (this, scriptModule);
+  #else
+    scriptModule = new csCEGUIScriptModule (script, obj_reg);
+    new CEGUI::System (this, 0, 0, scriptModule);  
+  #endif
   }
   else
-  #endif
   {
     new CEGUI::System (this);
   }
@@ -433,9 +436,9 @@ void csCEGUIRenderer::setDisplaySize (const CEGUI::Size& sz)
   
 CEGUI::ResourceProvider* csCEGUIRenderer::createResourceProvider ()
 {
-  if (!resourceProvider) {
-    resourceProvider = new csCEGUIResourceProvider (obj_reg);
+  if (!d_resourceProvider) {
+    d_resourceProvider = new csCEGUIResourceProvider (obj_reg);
   }
 
-  return resourceProvider;
+  return d_resourceProvider;
 }

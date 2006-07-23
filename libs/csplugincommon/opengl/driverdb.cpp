@@ -481,7 +481,7 @@ void csGLDriverDatabase::Report (int severity, const char* msg, ...)
   va_end (args);
 }
 
-csGLDriverDatabase::csGLDriverDatabase ()
+csGLDriverDatabase::csGLDriverDatabase () : ogl2d (0)
 {
   ::InitTokenTable (tokens);
 }
@@ -497,8 +497,8 @@ void csGLDriverDatabase::Open (csGraphics2DGLCommon* ogl2d,
   csGLDriverDatabase::ogl2d = ogl2d;
   rulePhase = phase ? phase : "";
 
-  csRef<iConfigManager> cfgmgr = CS_QUERY_REGISTRY (ogl2d->object_reg,
-    iConfigManager);
+  csRef<iConfigManager> cfgmgr = 
+    csQueryRegistry<iConfigManager> (ogl2d->object_reg);
 
   csRef<iSyntaxService> synsrv = csQueryRegistryOrLoad<iSyntaxService> (
   	ogl2d->object_reg, "crystalspace.syntax.loader.service.text");
@@ -531,8 +531,9 @@ void csGLDriverDatabase::Open (csGraphics2DGLCommon* ogl2d,
 
 void csGLDriverDatabase::Close ()
 {
-  csRef<iConfigManager> cfgmgr = CS_QUERY_REGISTRY (ogl2d->object_reg,
-    iConfigManager);
+  if (!ogl2d) return;
+  csRef<iConfigManager> cfgmgr = 
+    csQueryRegistry<iConfigManager> (ogl2d->object_reg);
   for (size_t i = 0; i < addedConfigs.Length(); i++)
   {
     cfgmgr->RemoveDomain (addedConfigs[i]);

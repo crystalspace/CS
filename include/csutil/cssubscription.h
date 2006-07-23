@@ -255,15 +255,18 @@ private:
      * Constructor.  Establishes the csEventTree reference to this
      * iterator to ensure there can be only one.
      */
-    SubscriberIterator (csRef<iEventHandlerRegistry> &r, 
-			csEventTree *t, csEventID bevent) : 
-      handler_reg(r), record(t->fatRecord), 
-      baseevent(bevent), mode(SI_LIST), qit(*t->fatRecord->SubscriberQueue,
-      	false)
+    SubscriberIterator (iEventHandlerRegistry* r, csEventTree *t, 
+      csEventID bevent) : handler_reg(r), record(t->fatRecord), 
+        baseevent(bevent), mode(SI_LIST), qit(0)
     {
       CS_ASSERT(record->iterator == 0);
       record->iterator = this;
       record->iterating_for = t;
+      if (t->fatRecord->SubscriberQueue)
+        qit = new csList<iEventHandler *>::Iterator (
+          *t->fatRecord->SubscriberQueue);
+      else
+        GraphMode();
     }
 
     /**
@@ -274,6 +277,7 @@ private:
       CS_ASSERT(record->iterator == this);
       record->iterator = 0;
       record->iterating_for = 0;
+      delete qit;
     }
 
     /// Test if there is another available handler
@@ -282,7 +286,7 @@ private:
       switch(mode) 
       {
       case SI_LIST:
-        return qit.HasNext ();
+        return qit->HasNext ();
         
       case SI_GRAPH:
         do 
@@ -313,7 +317,7 @@ private:
       {
       case SI_LIST:
 	/* DOME : see if the current element has been deleted. */
-        return qit.Next ();
+        return qit->Next ();
         
       case SI_GRAPH:
 	/* see if the current element has been flagged for deletion. */
@@ -358,7 +362,7 @@ private:
     } mode;
     
     /* SI_LIST mode data structures */
-    csList<iEventHandler *>::Iterator qit;
+    csList<iEventHandler *>::Iterator* qit;
   };
   friend class SubscriberIterator;
   friend class csEventQueueTest;

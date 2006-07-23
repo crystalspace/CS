@@ -44,22 +44,8 @@
 
 CS_IMPLEMENT_PLUGIN
 
-SCF_IMPLEMENT_IBASE (csMovieRecorder)
-  SCF_IMPLEMENTS_INTERFACE (iMovieRecorder)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csMovieRecorder::EventHandler)
-  SCF_IMPLEMENTS_INTERFACE (iEventHandler)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csMovieRecorder::VirtualClock)
-  SCF_IMPLEMENTS_INTERFACE (iVirtualClock)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_FACTORY (csMovieRecorder)
-
-
+CS_PLUGIN_NAMESPACE_BEGIN(Movierecorder)
+{
 
 void csMovieRecorder::Report (int severity, const char* msg, ...)
 {
@@ -76,11 +62,9 @@ void csMovieRecorder::Report (int severity, const char* msg, ...)
   va_end (arg);
 }
 
-csMovieRecorder::csMovieRecorder (iBase* parent)
+csMovieRecorder::csMovieRecorder (iBase* parent) : 
+  scfImplementationType (this, parent)
 {
-  SCF_CONSTRUCT_IBASE (parent);
-  scfiEventHandler = 0;
-  scfiVirtualClock = 0;
   object_reg = 0;
   initialized = false;
   writer = 0;
@@ -94,23 +78,19 @@ csMovieRecorder::~csMovieRecorder ()
 {
   Stop();
     
-  if (scfiEventHandler)
+  if (eventHandler)
   {
     csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
     if (q)
-      q->RemoveListener (scfiEventHandler);
-    scfiEventHandler->DecRef ();
+      q->RemoveListener (eventHandler);
   }
 
-  if (scfiVirtualClock)
+  if (virtualClock)
   {
     // Put back the real virtual clock :)
-    object_reg->Unregister(scfiVirtualClock, "iVirtualClock");
+    object_reg->Unregister(virtualClock, "iVirtualClock");
     object_reg->Register(realVirtualClock, "iVirtualClock");
-    scfiVirtualClock->DecRef ();
   }
-
-  SCF_DESTRUCT_IBASE();
 }
 
 bool csMovieRecorder::Initialize (iObjectRegistry* iobject_reg)
@@ -122,9 +102,9 @@ bool csMovieRecorder::Initialize (iObjectRegistry* iobject_reg)
 
   // We need to receive keyboard events for our hotkeys, and the nothing
   // event for the actual movie recording.
-  if (!scfiEventHandler)
+  if (!eventHandler)
   {
-    scfiEventHandler = new EventHandler (this);
+    eventHandler.AttachNew (new EventHandler (this));
   }
   csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
   if (q != 0)
@@ -135,7 +115,7 @@ bool csMovieRecorder::Initialize (iObjectRegistry* iobject_reg)
 			    CS_EVENTLIST_END };
     /* DOME : This is a prime example of an application for event ordering;
        we want to capture csevKeyboardEvent early, and catch the frame event absolutely last. */
-    q->RegisterListener (scfiEventHandler, events);
+    q->RegisterListener (eventHandler, events);
   }
 
   // Unregister the normal virtual clock and register our own
@@ -145,13 +125,13 @@ bool csMovieRecorder::Initialize (iObjectRegistry* iobject_reg)
   //        loaded in initialization, but some modules might see the
   //        real VC. Additionally, this won't work at all if the app
   //        loads us after the app gets a VC reference.
-  if (!scfiVirtualClock)
+  if (!virtualClock)
   {
-    scfiVirtualClock = new VirtualClock (this);
+    virtualClock.AttachNew (new VirtualClock (this));
   }
-  realVirtualClock = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
+  realVirtualClock = csQueryRegistry<iVirtualClock> (object_reg);
   object_reg->Unregister(realVirtualClock, "iVirtualClock");
-  object_reg->Register(scfiVirtualClock, "iVirtualClock");
+  object_reg->Register(virtualClock, "iVirtualClock");
 
   return true;
 }
@@ -190,71 +170,8 @@ void csMovieRecorder::SetupPlugin()
   GetKeyCode(config->GetStr("MovieRecorder.Keys.Record", "alt-r"), keyRecord);
   GetKeyCode(config->GetStr("MovieRecorder.Keys.Pause", "alt-p"), keyPause);
 
-  // Filename formatting code ripped from Bugplug's screenshotter
-  captureFormat = csStrNew (config->GetStr ("MovieRecorder.Capture.FilenameFormat",
+  captureFormat.SetMask (config->GetStr ("MovieRecorder.Capture.FilenameFormat",
     "/tmp/crystal000.nuv"));
-  // since this string is passed to format later,
-  // replace all '%' with '%%'
-  {
-    char* newstr = new char[strlen(captureFormat)*2 + 1];
-    memset (newstr, 0, strlen(captureFormat)*2 + 1);
-
-    char* pos = captureFormat;
-    while (pos)
-    {
-      char* percent = strchr (pos, '%');
-      if (percent)
-      {
-	strncat (newstr, pos, percent-pos);
-	strcat (newstr, "%%");
-	pos = percent + 1;
-      }
-      else
-      {
-	strcat (newstr, pos);
-	pos = 0;
-      }
-    }
-    delete[] captureFormat;
-    captureFormat = newstr;
-  }
-  // scan for the rightmost string of digits
-  // and create an appropriate format string
-  {
-    captureFormatNumberMax = 1;
-    int captureFormatNumberDigits = 0;
-
-    char* end = strrchr (captureFormat, 0);
-    if (end != captureFormat)
-    {
-      do
-      {
-	end--;
-      }
-      while ((end >= captureFormat) && (!isdigit (*end)));
-      if (end >= captureFormat)
-      {
-	do
-	{
-	  captureFormatNumberMax *= 10;
-	  captureFormatNumberDigits++; 
-	  end--;
-	}
-	while ((end >= captureFormat) && (isdigit (*end)));
-	
-	csString nameForm;
-	nameForm.Format ("%%0%dd", captureFormatNumberDigits);
-
-        csString newCapForm;
-        newCapForm.Append (captureFormat, end-captureFormat+1);
-        newCapForm.Append (nameForm);
-        newCapForm.Append (end+captureFormatNumberDigits+1);
-
-	delete[] captureFormat;
-	captureFormat = csStrNew (newCapForm);
-      }
-    }
-  }
 
   initialized = true;
 }
@@ -279,7 +196,7 @@ bool csMovieRecorder::HandleEvent (iEvent &event)
 bool csMovieRecorder::EatKey (iEvent& event)
 {
   SetupPlugin();
-  bool down = csKeyEventHelper::GetEventType (&event);
+  bool down = csKeyEventHelper::GetEventType (&event) == csKeyEventTypeDown;
   csKeyModifiers m;
   csKeyEventHelper::GetModifiers (&event, m);
   bool alt = m.modifiers[csKeyModifierTypeAlt] != 0;
@@ -373,22 +290,7 @@ void csMovieRecorder::Start(void)
   if (IsRecording())
     Stop();
 
-  // Filename forming code, ripped from Bugplug's screenshotter
-  int i = 0;
-  bool exists = false;
-  do
-  {
-    cs_snprintf (movieFileName, CS_MAXPATHLEN, captureFormat, i);
-    if (exists = VFS->Exists (movieFileName)) i++;
-  }
-  while ((i < captureFormatNumberMax) && (exists));
-
-  if (i >= captureFormatNumberMax)
-  {
-    Report (CS_REPORTER_SEVERITY_NOTIFY,
-    	"Too many video recording files in current directory");
-    return;
-  }
+  movieFileName = captureFormat.FindNextFilename (VFS);
 
   // If the config specified 0x0, that means we use the current resolution unscaled
   int w = recordWidth  ? recordWidth  : G2D->GetWidth();
@@ -403,7 +305,7 @@ void csMovieRecorder::Start(void)
   if (!movieFile)
   {
     Report (CS_REPORTER_SEVERITY_WARNING,
-    	"Couldn't open file '%s' for recording", movieFileName);
+    	"Couldn't open file '%s' for recording", movieFileName.GetData());
     return;
   }
   fakeTicksPerFrame = (1000 / frameRate);
@@ -414,7 +316,8 @@ void csMovieRecorder::Start(void)
   writer = new NuppelWriter(w, h, &WriterCallback, this, frameRate,
 			    rtjQuality, useRTJpeg, useLZO, useRGB);
 
-  Report (CS_REPORTER_SEVERITY_NOTIFY, "Video recorder started - %s", movieFileName);
+  Report (CS_REPORTER_SEVERITY_NOTIFY, "Video recorder started - %s", 
+    movieFileName.GetData());
 }
 
 void csMovieRecorder::Stop(void)
@@ -423,7 +326,8 @@ void csMovieRecorder::Stop(void)
     delete writer;
     writer = 0;
     movieFile = 0;
-    Report (CS_REPORTER_SEVERITY_NOTIFY, "Video recorder stopped - %s", movieFileName);
+    Report (CS_REPORTER_SEVERITY_NOTIFY, "Video recorder stopped - %s", 
+      movieFileName.GetData());
 
     if (numFrames != 0)
     {
@@ -441,7 +345,7 @@ void csMovieRecorder::Stop(void)
 	"\n"
 	" Frame time in relation to real time: x%.4f\n"
 	" Theoretical video FPS recordable in real-time: %.2f\n",
-	movieFileName, 
+	movieFileName.GetData(), 
 	numFrames,
 	((float)totalFrameEncodeTime / 1000.0f),
 	  minFrameEncodeTime, avgFrameEncodeTime, maxFrameEncodeTime,
@@ -467,7 +371,8 @@ void csMovieRecorder::Pause(void)
   if (!IsRecording())
     return;
   paused = true;
-  Report (CS_REPORTER_SEVERITY_NOTIFY, "Video recorder paused - %s", movieFileName);
+  Report (CS_REPORTER_SEVERITY_NOTIFY, "Video recorder paused - %s", 
+    movieFileName.GetData());
 }
 
 void csMovieRecorder::UnPause(void)
@@ -476,7 +381,8 @@ void csMovieRecorder::UnPause(void)
     return;
   paused = false;
   ffakeClockTicks = fakeClockTicks;
-  Report (CS_REPORTER_SEVERITY_NOTIFY, "Video recorder unpaused - %s", movieFileName);
+  Report (CS_REPORTER_SEVERITY_NOTIFY, "Video recorder unpaused - %s", 
+    movieFileName.GetData());
 }
 
 void csMovieRecorder::WriterCallback(const void *data, long bytes, void *extra)
@@ -591,3 +497,6 @@ void csMovieRecorder::GetKeyCode (const char* keystring, struct keyBinding &key)
 }
 
 //---------------------------------------------------------------------------
+
+}
+CS_PLUGIN_NAMESPACE_END(Movierecorder)

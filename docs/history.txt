@@ -6,6 +6,127 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+22-Jul-2006
+	- Oktal fixed the order of some declaration qualifiers in spinlock.h;
+	  CS_FORCEINLINE must come *before* the method's return type, at least
+	  on gcc3. This is my first commit by SVN, so I hope it doesn't break.
+	- res fixed the configure freetype check to not reference an internal
+	  header (doesn't work with FreeType2.2 any more).
+	- mdmkolbe applied a (modified) patch from res2k that fixes a crash
+	  caused by the interaction between ptmalloc and Cygwin.
+21-Jul-2006
+	- res fixed an assertion triggered by csBaseEventHandler that could
+	  occur when the destruction occured after 
+	  iEventQueue->RemoveAllListeners() was already called.
+	- res fixed csEventHandlerRegistry::ReleaseID(iEventHandler*) to
+	  not ignore the "refcount" of an ID (and thus prematurely releasing
+	  an ID even though not all RegisterID() calls are balanced with a
+	  ReleaseID() call).
+	- res changed the CEGUI resource provider to use platform new (since
+	  it sometimes is freed with the platform delete).
+20-Jul-2006
+	- Andres added the svn:eol-style property to all text files lacking
+	  it (set to native). This is needed to have the eol set to the
+	  native version of the platform (eg \r\n on win, \n on linux).
+	  Without it eg. cross building and manual generation doesnt work
+	  properly. All people adding new text files should look that the
+	  property is set to native. (There is a mechanism called autoprops
+	  which does this for you)
+	- Jorrit added a section in the manual explaining several tricks
+	  you can use to speed up map loading and runtime performance.
+	- iceeey added "normal scale" shadervar to splatting_scattering.
+	  This can be used to separately scale the normal texture on terrain.
+	  When not specified, the "texture scale" is used by default.
+	  The Marble material in 'terrain' level demonstrates this.
+	- iceeey updated cegui plugin to work with CEGUI 0.5.0 while
+	  retaining compatibility with older versions.
+	- iceeey added a CEGUI 0.5.0 compatible version of the 'ice' skin which
+	  ceguitest will use depending on which version of CEGUI you have.
+	- res worked around a FreeType2.2.1 issue where it would return an
+	  error when rendering an empty glyph (e.g SPACE).
+19-Jul-2006
+	- Jorrit simplified viewmesh a lot. It no longer attempts to do
+	  any path handling automatically. So the ':' notation is gone
+	  and it no longer attempts to automatically guess the VFS dir
+	  to use as the current directory. Instead there are two new
+	  commandline options:
+	      -R: this option takes a real path and it will mount it to
+	          /tmp/viewmesh. Then it makes that directory the current
+		  directory.
+	      -C: this option takes a VFS path and it will make that directory
+	          the current directory. If this option is used together
+		  with -R then you can change the VFS dir to be relative
+		  to the location mounted with -R.
+	  The filename itself will be used as-is.
+	- Jorrit added a documentation section for viewmesh (under the new
+	  'rule' that every new feature that is added to CS should now
+	  be immediatelly documented :-)
+	- Jorrit updated the documentation about Blender (removed the
+	  mention of the obsolete old blend2cs tool).
+	- Jorrit added a reference to the new ViewMesh documentation
+	  from the overview.
+17-Jul-2006
+	- res changed csSpinLock to use a non-volatile pthread_mutex_t.
+	- res applied a patch from Joerg Fischer to fix the offsets in
+	  plugins/device/joystick/windows/dinputdefs.h.
+12-Jul-2006
+        - res added a check for the -Bsymbolic linker option to configure.
+          This binds "references to global symbols to the definition within 
+          the shared library" (from man ld). If this flag is not set, it can 
+          happen that symbols in plugins get bound against symbols from other 
+          modules (including the application executable itself), causing 
+          side-effects such as violating the "memory allocation and freeing in
+          the same module" rule.
+	- res once more tweaked the objcopy version check to also work with 
+	  X.Y.Z style versions again.
+11-Jul-2006
+	- res fixed a crash in bugplug related to empty commands.
+	- res augmented csPathLists to have a non-const operator[].
+	- res fixed a crash bug in csPathsList when dealing with empty
+	  paths.
+10-Jul-2006
+	- Jorrit fixed a fundamental problem with the engine sequence
+	  manager and timed operations. This problem would cause timed
+	  operations to remain in memory even after the sequence was
+	  destroyed. The result was crashes when unloading maps using
+	  these kinds of sequences. Fixed it by using the unique sequence_id
+	  that is already assigned to engine sequences and attaching
+	  that id to every timed operation in the engine sequence manager.
+	  When the sequence wrapper is destroyed it will then remove
+	  the timed operations.
+	- res moved the "numbered filename" logic out of bugplug/movierecorder
+	  into its own class, CS::NumberedFilenameHelper.
+	- res fixed csImageMemory::Copy() to ensure that an image buffers
+	  is available as well as converting the source image to the
+	  format of the destination image.
+	- res converted the movierecorder plugin to new SCF.
+	- res added a helper for "uberscreenshots", to create screenshots
+	  larger than the framebuffer resolution.
+	- res tweaked the uberscreenshot helper to facilitate customization.
+9-Jul-2006
+        - res disabled RTLD_GLOBAL for unix plugin loading again, since it has
+          undesireable side effects; for one, static libraries are suddenly
+          not static anymore, as e.g. symbols may be taken from other plugins.
+          Approached the original reason for adding this (DRI drivers failing
+	  to load otherwise) by a workaround in glx2d: it now manually loads 
+	  libGL.so with the RTLD_GLOBAL flag. This is sufficient to make DRI
+	  drivers happy.
+	- res fixed a crash in the GL driver db when it was closed without
+	  being opened.
+	- res fixed XK_MISCELLANY redefined warnings.
+8-Jul-2006
+	- res changed the event handler ID registration. Since the handler
+	  registry keeps a reference to registered handlers, handlers have to
+	  be unregistered properly to ensure none are leaking. Changed GetID()
+	  to not auto-register handlers; instead, RegisterID() has to be used
+	  (where each call must be balanced with a call to ReleaseID() for
+	  proper housekeeping).
+	- res fixed some errors to not cause crashes any more.
+	- res fixed apparently incorrect handling of the removal of a
+	  currently called event handler.
+7-Jul-2006
+	- res fixed the engine default shader loading to not reuse the same
+	  document, but create a new one instead. Fixes some crashing.
 6-Jul-2006
 	- res added the ability to override the default and portal shader with
 	  config file settings (instead of being purely hardcoded in the 

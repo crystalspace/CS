@@ -5676,6 +5676,8 @@ bool csLoader::ParseShader (iLoaderContext* ldr_context,
 			    iDocumentNode* node,
 			    iShaderManager* shaderMgr)
 {
+  // @@@ FIXME: unify with csTextSyntaxService::ParseShaderRef()?
+
   /*csRef<iShader> shader (shaderMgr->CreateShader ());
   //test if we have a childnode named file, if so load from file, else
   //use inline loading
@@ -5762,6 +5764,12 @@ bool csLoader::ParseShader (iLoaderContext* ldr_context,
     return false;
   }
   csRef<iShaderCompiler> shcom = shaderMgr->GetCompiler (type);
+  if (!shcom.IsValid()) 
+  {
+    SyntaxService->ReportError ("crystalspace.maploader", shaderNode,
+      "Could not get shader compiler '%s'", type);
+    return false;
+  }
   csRef<iShader> shader = shcom->CompileShader (shaderNode);
   if (shader)
   {

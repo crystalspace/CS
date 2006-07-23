@@ -168,3 +168,50 @@ void* ptcalloc (size_t n, size_t s)
   return ptmalloc_::ptcalloc (n, s); 
 #endif
 }
+
+#ifdef __CYGWIN__
+
+/* Cygwin has funny issues with atexit() that ptmalloc seems to tickle.
+ * So within ptmalloc we use own own single-use implementation of atexit()
+ * when on Cygwin.  Note that use of a static variable could lead to incorrect
+ * cleanup order so we use the GCC "__attribute__ ((init_priority (101))"
+ * extention to force atexitHandler to be constructed before other
+ * static vars and thus be destructed after all other static vars.
+ *
+ * !!! WARNING !!!
+ * This is fragile.  If some other part of the application tries to set a
+ * lower init_prority (lower means eariler construction and later destruction)
+ * ptmalloc could crash on application exit (typically in ptfree).
+ * The bottom line is be sure that no other static variable in
+ * the application has a numerically smaller init_priority
+ * than atexitHandler.
+ */
+
+namespace CS
+{
+  namespace ptmalloc_
+  {
+    class AtexitHandler
+    {
+      void (*func)(void);
+    public:
+      ~AtexitHandler()
+      {
+        if (func) func();
+      }
+      void Set (void(*func)(void))
+      {
+        CS_ASSERT(this->func == 0);
+        this->func = func;
+      }
+    };
+    static AtexitHandler atexitHandler __attribute__ ((init_priority (101)));
+  }
+}
+
+extern "C" int cs_atexit(void(*func)(void))
+{
+  CS::ptmalloc_::atexitHandler.Set (func);
+  return 0;
+}
+#endif
