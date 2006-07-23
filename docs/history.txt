@@ -20,6 +20,12 @@ chronological order.
 	  manager.
 	- res fixed a crash on VC due ptmalloc being shut down before some
 	  global variables were destructed.
+	- res fixed a destruction issue of xmlshader's TempString.
+	- res augmented the shader conditionaly to support "weak templates" 
+	  which don't override existing templates of the same name. 
+	  Instruction is <?TemplateWeak ...?>.
+	- res fixed xmlshader to correctly deal with sub-conditions of 
+	  conditions always being false.
 22-Jul-2006
 	- Oktal fixed the order of some declaration qualifiers in spinlock.h;
 	  CS_FORCEINLINE must come *before* the method's return type, at least

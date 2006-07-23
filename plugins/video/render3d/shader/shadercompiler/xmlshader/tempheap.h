@@ -126,7 +126,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
       }
     }
 
-    virtual void Free () { TempHeapAlloc::Free (Data); }
+    virtual ~TempStringBase() { Free (); }
+    virtual void Free () { TempHeapAlloc::Free (Data); Data = 0; }
   };
 
   /**

@@ -434,6 +434,7 @@ struct csWrappedDocumentNode::NodeProcessingState
   Template templ;
   uint templNestCount;
   csString templateName;
+  bool templWeak;
 
   bool generateActive;
   bool generateValid;
@@ -443,8 +444,8 @@ struct csWrappedDocumentNode::NodeProcessingState
   int generateEnd;
   int generateStep;
 
-  NodeProcessingState() : templActive (false), generateActive (false),
-    generateValid (false) {}
+  NodeProcessingState() : templActive (false), templWeak (false), 
+    generateActive (false), generateValid (false) {}
 };
 
 static const int syntaxErrorSeverity = CS_REPORTER_SEVERITY_WARNING;
@@ -597,6 +598,7 @@ void csWrappedDocumentNode::ProcessTemplate (ConditionEval& eval,
             }
             // Fall through
 	  case csWrappedDocumentNodeFactory::PITOKEN_TEMPLATE_NEW:
+	  case csWrappedDocumentNodeFactory::PITOKEN_TEMPLATEWEAK:
             if (!state->generateActive)
 	      state->templNestCount++;
 	    // Fall through
@@ -686,7 +688,8 @@ void csWrappedDocumentNode::ProcessTemplate (ConditionEval& eval,
   {
     if (state->templNestCount == 0)
     {
-      globalState->templates.PutUnique (state->templateName, state->templ);
+      if (!state->templWeak || !globalState->templates.Contains (state->templateName))
+        globalState->templates.PutUnique (state->templateName, state->templ);
       state->templActive = false;
     }
   }
@@ -808,6 +811,65 @@ void csWrappedDocumentNode::ParseTemplateArguments (const char* str,
   }
 }
 
+bool csWrappedDocumentNode::ProcessInstrTemplate (NodeProcessingState* state,
+                                                  iDocumentNode* node,
+                                                  const char* valStart, 
+                                                  size_t valLen, 
+                                                  size_t cmdLen, 
+                                                  const char* space, 
+                                                  bool weak)
+{
+  csString templateName;
+  Template newTempl;
+  if (space != 0)
+  {
+    templateName.Replace (space + 1, valLen - cmdLen - 1);
+    templateName.RTrim();
+  }
+  size_t templateEnd = templateName.FindFirst (' ');
+  if (templateEnd != (size_t)-1)
+  {
+    // Parse template parameter names
+    Template::Params paramNames;
+    ParseTemplateArguments (templateName.GetData() + templateEnd + 1, 
+      paramNames);
+
+    csSet<TempString<>, TempHeapAlloc> dupeCheck;
+    for (size_t i = 0; i < paramNames.Length(); i++)
+    {
+      if (dupeCheck.Contains (paramNames[i]))
+      {
+        Report (syntaxErrorSeverity, node,
+                "Duplicate template parameter '%s'", 
+	        paramNames[i].GetData());
+        return false;
+      }
+      newTempl.paramMap.Push (paramNames[i]);
+      dupeCheck.Add (paramNames[i]);
+    }
+
+    templateName.Truncate (templateEnd);
+  }
+  if (templateName.IsEmpty())
+  {
+    Report (syntaxErrorSeverity, node,
+            "'template' without name");
+    return false;
+  }
+  if (shared->pitokens.Request (templateName) != csInvalidStringID)
+  {
+    Report (syntaxErrorSeverity, node,
+            "Reserved template name '%s'", templateName.GetData());
+    return false;
+  }
+  state->templateName = templateName;
+  state->templ = newTempl;
+  state->templActive = true;
+  state->templWeak = weak;
+  state->templNestCount = 1;
+  return true;
+}
+
 template<typename ConditionEval>
 void csWrappedDocumentNode::ProcessSingleWrappedNode (
   ConditionEval& eval, NodeProcessingState* state, iDocumentNode* node)
@@ -877,9 +939,17 @@ void csWrappedDocumentNode::ProcessSingleWrappedNode (
 	      WrapperStackEntry newWrapper;
 	      ParseCondition (newWrapper, space + 1, valLen - cmdLen - 1, 
 		node);
-          
+
               const csConditionID condition = newWrapper.child->condition;
               Logic3 r = eval.Descend (condition);
+              // If the parent condition is always false, so is this
+              if ((((currentWrapper.child->condition == csCondAlwaysFalse)
+                && (currentWrapper.child->conditionValue == true))
+                  || ((currentWrapper.child->condition == csCondAlwaysTrue)
+                && (currentWrapper.child->conditionValue == false))))
+              {
+                r.state = Logic3::Lie;
+              }
               if (r.state == Logic3::Truth)
                 newWrapper.child->condition = csCondAlwaysTrue;
               else if (r.state == Logic3::Lie)
@@ -977,6 +1047,14 @@ void csWrappedDocumentNode::ProcessSingleWrappedNode (
                 eval.SwitchBranch ();
                 const csConditionID condition = newWrapper.child->condition;
                 Logic3 r = eval.Descend (condition);
+                // If the parent condition is always false, so is this
+                if ((((currentWrapper.child->condition == csCondAlwaysFalse)
+                  && (currentWrapper.child->conditionValue == true))
+                    || ((currentWrapper.child->condition == csCondAlwaysTrue)
+                  && (currentWrapper.child->conditionValue == false))))
+                {
+                  r.state = Logic3::Lie;
+                }
                 globalState->ascendStack[globalState->ascendStack.GetSize()-1]++;
                 if (r.state == Logic3::Truth)
                   newWrapper.child->condition = csCondAlwaysTrue;
@@ -1027,58 +1105,11 @@ void csWrappedDocumentNode::ProcessSingleWrappedNode (
                 "Deprecated syntax, please use 'Template'");
             }
             // Fall through
-	  case csWrappedDocumentNodeFactory::PITOKEN_TEMPLATE_NEW:
-	    {
-	      bool okay = true;
-	      csString templateName;
-	      Template newTempl;
-	      templateName.Replace (space + 1, valLen - cmdLen - 1);
-	      templateName.RTrim();
-	      size_t templateEnd = templateName.FindFirst (' ');
-	      if (okay && (templateEnd != (size_t)-1))
-	      {
-		// Parse template parameter names
-		Template::Params paramNames;
-		ParseTemplateArguments (
-		  templateName.GetData() + templateEnd + 1, paramNames);
-
-		csSet<TempString<>, TempHeapAlloc> dupeCheck;
-		for (size_t i = 0; i < paramNames.Length(); i++)
-		{
-		  if (dupeCheck.Contains (paramNames[i]))
-		  {
-		    Report (syntaxErrorSeverity, node,
-		      "Duplicate template parameter '%s'", 
-		      paramNames[i].GetData());
-		    okay = false;
-		  }
-		  newTempl.paramMap.Push (paramNames[i]);
-		  dupeCheck.Add (paramNames[i]);
-		}
-
-		templateName.Truncate (templateEnd);
-	      }
-	      if (okay && templateName.IsEmpty())
-	      {
-		Report (syntaxErrorSeverity, node,
-		  "'template' without name");
-		okay = false;
-	      }
-	      if (okay 
-		&& (shared->pitokens.Request (templateName) != csInvalidStringID))
-	      {
-		Report (syntaxErrorSeverity, node,
-		  "Reserved template name '%s'", templateName.GetData());
-		okay = false;
-	      }
-	      if (okay)
-	      {
-		state->templateName = templateName;
-		state->templ = newTempl;
-		state->templActive = true;
-		state->templNestCount = 1;
-	      }
-	    }
+          case csWrappedDocumentNodeFactory::PITOKEN_TEMPLATE_NEW:
+	  case csWrappedDocumentNodeFactory::PITOKEN_TEMPLATEWEAK:
+            ProcessInstrTemplate (state, node, valStart, valLen, cmdLen, 
+              space, 
+              tokenID == csWrappedDocumentNodeFactory::PITOKEN_TEMPLATEWEAK);
 	    break;
 	  case csWrappedDocumentNodeFactory::PITOKEN_ENDTEMPLATE:
             if (shared->plugin->do_verbose)
@@ -1530,6 +1561,7 @@ csWrappedDocumentNodeFactory::csWrappedDocumentNodeFactory (
 {
   InitTokenTable (pitokens);
   pitokens.Register ("Template", PITOKEN_TEMPLATE_NEW);
+  pitokens.Register ("TemplateWeak", PITOKEN_TEMPLATEWEAK);
   pitokens.Register ("Endtemplate", PITOKEN_ENDTEMPLATE_NEW);
   pitokens.Register ("Include", PITOKEN_INCLUDE_NEW);
   pitokens.Register ("Generate", PITOKEN_GENERATE);
