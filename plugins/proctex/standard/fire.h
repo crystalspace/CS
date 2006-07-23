@@ -24,21 +24,24 @@
 #include "csutil/strhash.h"
 #include "csutil/csstring.h"
 
-class csPtFireType : public csBaseProctexType
+class csPtFireType :
+  public scfImplementationExt0<csPtFireType, csBaseProctexType>
 {
 public:
   csPtFireType (iBase *p);
   virtual csPtr<iTextureFactory> NewFactory();
 };
 
-class csPtFireFactory : public csBaseTextureFactory
+class csPtFireFactory :
+  public scfImplementationExt0<csPtFireFactory, csBaseTextureFactory>
 {
 public:
   csPtFireFactory (iTextureType* p, iObjectRegistry* object_reg);
   virtual csPtr<iTextureWrapper> Generate ();
 };
 
-class csPtFireLoader : public csBaseProctexLoader
+class csPtFireLoader :
+  public scfImplementationExt0<csPtFireLoader, csBaseProctexLoader>
 {
   csStringHash tokens;
 #define CS_TOKEN_ITEM_FILE "plugins/proctex/standard/fire.tok"
@@ -50,7 +53,8 @@ public:
     iStreamSource*, iLoaderContext* ldr_context, iBase* context);
 };
 
-class csPtFireSaver : public csBaseProctexSaver
+class csPtFireSaver :
+  public scfImplementationExt0<csPtFireSaver, csBaseProctexSaver>
 {
 public:
   csPtFireSaver(iBase *p);

@@ -22,6 +22,7 @@
 #include "imap/reader.h"
 #include "iutil/comp.h"
 #include "csutil/strhash.h"
+#include "csutil/scf_implementation.h"
 
 struct iObjectRegistry;
 struct iLoader;
@@ -40,11 +41,10 @@ namespace SimpleFormerLoader
 template<typename Tgetter>
 class RawHeightmapReader;
 
-class csSimpleFormerLoader : public iLoaderPlugin
+class csSimpleFormerLoader :
+  public scfImplementation2<csSimpleFormerLoader, iLoaderPlugin, iComponent>
 {
 public:
-  SCF_DECLARE_IBASE;
-
   csSimpleFormerLoader (iBase*);
   virtual ~csSimpleFormerLoader ();
 
@@ -52,14 +52,6 @@ public:
 
   virtual csPtr<iBase> Parse (iDocumentNode *node,
     iStreamSource*, iLoaderContext* ldr_context, iBase* context);
-
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csSimpleFormerLoader);
-    virtual bool Initialize (iObjectRegistry* p)
-    { return scfParent->Initialize (p); }
-  } scfiComponent;
-  friend struct eiComponent;
 
   csRef<iSyntaxService> synldr;
   csRef<iDataBuffer> GetDataBuffer (iDocumentNode* child);

@@ -6,6 +6,13 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+23-Jul-2006
+	- mdmkolbe converted the following plugins to the new SCF:
+	    - plugins/csparser/
+	    - plugins/documentsystem/
+	    - plugins/proctex/standard/
+	    - plugins/terraformer/
+	    - plugins/reporter/
 22-Jul-2006
 	- Oktal fixed the order of some declaration qualifiers in spinlock.h;
 	  CS_FORCEINLINE must come *before* the method's return type, at least

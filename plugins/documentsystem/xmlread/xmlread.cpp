@@ -26,13 +26,13 @@
 #include "xriface.h"
 #include "xrpriv.h"
 
-struct csXmlReadDocWrapper : public iDocument
+struct csXmlReadDocWrapper :
+  public scfImplementation1<csXmlReadDocWrapper, iDocument>
 {
 private:
   csRef<iDocument> xmlreaddoc;
-public:
-  SCF_DECLARE_IBASE;
 
+public:
   csXmlReadDocWrapper (csRef<iDocument> doc);
   virtual ~csXmlReadDocWrapper ();
 
@@ -51,19 +51,14 @@ public:
   virtual int Changeable ();
 };
 
-SCF_IMPLEMENT_IBASE (csXmlReadDocWrapper)
-  SCF_IMPLEMENTS_INTERFACE (iDocument)
-SCF_IMPLEMENT_IBASE_END
-
-csXmlReadDocWrapper::csXmlReadDocWrapper (csRef<iDocument> doc)
+csXmlReadDocWrapper::csXmlReadDocWrapper (csRef<iDocument> doc) :
+  scfImplementationType(this)
 {
-  SCF_CONSTRUCT_IBASE (0);
   xmlreaddoc = doc;
 }
 
 csXmlReadDocWrapper::~csXmlReadDocWrapper ()
 {
-  SCF_DESTRUCT_IBASE();
 }
 
 void csXmlReadDocWrapper::Clear ()
@@ -152,13 +147,14 @@ int csXmlReadDocWrapper::Changeable ()
   return xmlreaddoc->Changeable();
 }
 
-class csXmlReadXMLPlugin : public iDocumentSystem, public iComponent
+class csXmlReadXMLPlugin :
+  public scfImplementation2<csXmlReadXMLPlugin,
+    iDocumentSystem, iComponent>
 {
 private:
   csWeakRef<csXmlReadDocumentSystem> xmlread;
-public:
-  SCF_DECLARE_IBASE;
 
+public:
   csXmlReadXMLPlugin (iBase* parent = 0);
   virtual ~csXmlReadXMLPlugin ();
 
@@ -167,19 +163,13 @@ public:
   csRef<iDocument> CreateDocument ();
 };
 
-SCF_IMPLEMENT_IBASE(csXmlReadXMLPlugin)
-  SCF_IMPLEMENTS_INTERFACE(iDocumentSystem)
-  SCF_IMPLEMENTS_INTERFACE(iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-csXmlReadXMLPlugin::csXmlReadXMLPlugin(iBase* parent)
+csXmlReadXMLPlugin::csXmlReadXMLPlugin(iBase* parent) :
+  scfImplementationType(this, parent)
 {
-  SCF_CONSTRUCT_IBASE(parent);
 }
 
 csXmlReadXMLPlugin::~csXmlReadXMLPlugin()
 {
-  SCF_DESTRUCT_IBASE();
 }
 
 bool csXmlReadXMLPlugin::Initialize (iObjectRegistry* /*objreg*/)

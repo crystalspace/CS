@@ -32,19 +32,13 @@
 
 //------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE (csXmlReadDocumentSystem)
-  SCF_IMPLEMENTS_INTERFACE (iDocumentSystem)
-SCF_IMPLEMENT_IBASE_END
-
-csXmlReadDocumentSystem::csXmlReadDocumentSystem (iBase* parent)
+csXmlReadDocumentSystem::csXmlReadDocumentSystem (iBase* parent) :
+  scfImplementationType(this), parent(parent)
 {
-  SCF_CONSTRUCT_IBASE (0);
-  csXmlReadDocumentSystem::parent = parent;
 }
 
 csXmlReadDocumentSystem::~csXmlReadDocumentSystem ()
 {
-  SCF_DESTRUCT_IBASE();
 }
 
 csRef<iDocument> csXmlReadDocumentSystem::CreateDocument ()
@@ -55,13 +49,9 @@ csRef<iDocument> csXmlReadDocumentSystem::CreateDocument ()
 
 //------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE (csXmlReadAttributeIterator)
-  SCF_IMPLEMENTS_INTERFACE (iDocumentAttributeIterator)
-SCF_IMPLEMENT_IBASE_END
-
-csXmlReadAttributeIterator::csXmlReadAttributeIterator (TrDocumentNode* parent)
+csXmlReadAttributeIterator::csXmlReadAttributeIterator (TrDocumentNode* parent) :
+  scfImplementationType(this)
 {
-  SCF_CONSTRUCT_IBASE (0);
   csXmlReadAttributeIterator::parent = parent ? parent->ToElement () : 0;
   if (csXmlReadAttributeIterator::parent == 0)
   {
@@ -79,7 +69,6 @@ csXmlReadAttributeIterator::csXmlReadAttributeIterator (TrDocumentNode* parent)
 
 csXmlReadAttributeIterator::~csXmlReadAttributeIterator()
 {
-  SCF_DESTRUCT_IBASE();
 }
 
 bool csXmlReadAttributeIterator::HasNext ()
@@ -103,15 +92,11 @@ csRef<iDocumentAttribute> csXmlReadAttributeIterator::Next ()
 
 //------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE (csXmlReadNodeIterator)
-  SCF_IMPLEMENTS_INTERFACE (iDocumentNodeIterator)
-SCF_IMPLEMENT_IBASE_END
-
 csXmlReadNodeIterator::csXmlReadNodeIterator (
 	csXmlReadDocument* doc, TrDocumentNodeChildren* parent,
-	const char* value)
+	const char* value) :
+  scfImplementationType(this)
 {
-  SCF_CONSTRUCT_IBASE (0);
   csXmlReadNodeIterator::doc = doc;
   csXmlReadNodeIterator::parent = parent;
   csXmlReadNodeIterator::value = value ? csStrNew (value) : 0;
@@ -137,7 +122,6 @@ csXmlReadNodeIterator::csXmlReadNodeIterator (
 csXmlReadNodeIterator::~csXmlReadNodeIterator ()
 {
   delete[] value;
-  SCF_DESTRUCT_IBASE();
 }
 
 bool csXmlReadNodeIterator::HasNext ()
@@ -167,32 +151,25 @@ csRef<iDocumentNode> csXmlReadNodeIterator::Next ()
 
 //------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE (csXmlReadAttribute)
-  SCF_IMPLEMENTS_INTERFACE (iDocumentAttribute)
-SCF_IMPLEMENT_IBASE_END
-
 //------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE_INCREF(csXmlReadNode)
 void csXmlReadNode::DecRef ()
 {
+  CS_ASSERT_MSG("Refcount decremented for destroyed object", 
+    scfRefCount != 0);
+  csRefTrackerAccess::TrackDecRef (scfObject, scfRefCount);
   scfRefCount--;
-  if (scfRefCount <= 0)
+  if (scfRefCount == 0)
   {
-    if (scfParent) scfParent->DecRef ();
+    scfRemoveRefOwners ();
+    if (scfParent) scfParent->DecRef();
     doc->Free (this);
   }
 }
-SCF_IMPLEMENT_IBASE_GETREFCOUNT(csXmlReadNode)
-SCF_IMPLEMENT_IBASE_REFOWNER(csXmlReadNode)
-SCF_IMPLEMENT_IBASE_REMOVE_REF_OWNERS(csXmlReadNode)
-SCF_IMPLEMENT_IBASE_QUERY(csXmlReadNode)
-  SCF_IMPLEMENTS_INTERFACE (iDocumentNode)
-SCF_IMPLEMENT_IBASE_END
 
-csXmlReadNode::csXmlReadNode (csXmlReadDocument* doc)
+csXmlReadNode::csXmlReadNode (csXmlReadDocument* doc) :
+  scfImplementationType(this)
 {
-  SCF_CONSTRUCT_IBASE (0);
   node = 0;
   node_children = 0;
   csXmlReadNode::doc = doc;	// Increase reference.
@@ -200,7 +177,6 @@ csXmlReadNode::csXmlReadNode (csXmlReadDocument* doc)
 
 csXmlReadNode::~csXmlReadNode ()
 {
-  SCF_DESTRUCT_IBASE();
 }
 
 csRef<iDocumentNode> csXmlReadNode::GetParent ()
@@ -401,13 +377,9 @@ bool csXmlReadNode::GetAttributeValueAsBool (const char* name,bool defaultvalue)
 
 //------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE (csXmlReadDocument)
-  SCF_IMPLEMENTS_INTERFACE (iDocument)
-SCF_IMPLEMENT_IBASE_END
-
-csXmlReadDocument::csXmlReadDocument (csXmlReadDocumentSystem* sys)
+csXmlReadDocument::csXmlReadDocument (csXmlReadDocumentSystem* sys) :
+  scfImplementationType(this)
 {
-  SCF_CONSTRUCT_IBASE (0);
   csXmlReadDocument::sys = sys;	// Increase ref.
   pool = 0;
   root = 0;
@@ -423,7 +395,6 @@ csXmlReadDocument::~csXmlReadDocument ()
     delete pool;
     pool = n;
   }
-  SCF_DESTRUCT_IBASE();
 }
 
 void csXmlReadDocument::Clear ()

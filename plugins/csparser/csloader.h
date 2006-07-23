@@ -32,6 +32,7 @@
 #include "csutil/array.h"
 #include "csutil/refarr.h"
 #include "csutil/scopedmutexlock.h"
+#include "csutil/scf_implementation.h"
 #include "csgeom/quaternion.h"
 #include "iutil/plugin.h"
 #include "imap/services.h"
@@ -125,7 +126,8 @@ public:
 /*
  * Context class for the threaded loader.
  */
-class ThreadedLoaderContext : public iLoaderContext
+class ThreadedLoaderContext :
+  public scfImplementation1<ThreadedLoaderContext, iLoaderContext>
 {
 private:
   iEngine* Engine;
@@ -144,8 +146,6 @@ public:
   ThreadedLoaderContext (iEngine* Engine, iRegion* region, bool curRegOnly,
     csLoader* loader, bool checkDupes);
   virtual ~ThreadedLoaderContext ();
-
-  SCF_DECLARE_IBASE;
 
   virtual iSector* FindSector (const char* name);
   virtual iMaterialWrapper* FindMaterial (const char* name);
@@ -166,7 +166,8 @@ public:
 /**
  * Status class for the threaded loader.
  */
-class csLoaderStatus : public iLoaderStatus
+class csLoaderStatus :
+  public scfImplementation1<csLoaderStatus, iLoaderStatus>
 {
 private:
   //csRef<csMutex> mutex;
@@ -177,7 +178,6 @@ public:
   csLoaderStatus ();
   virtual ~csLoaderStatus ();
 
-  SCF_DECLARE_IBASE;
   virtual bool IsReady () { return ready; }
   virtual bool IsError () { return error; }
 };

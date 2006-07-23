@@ -23,6 +23,7 @@
 #include "csutil/csmd5.h"
 #include "csutil/ref.h"
 #include "csutil/scfarray.h"
+#include "csutil/scf.h"
 #include "csgfx/memimage.h"
 #include "csgfx/shaderexp.h"
 #include "csgfx/shadervarcontext.h"
@@ -44,33 +45,20 @@
 
 CS_LEAKGUARD_IMPLEMENT (csFuncTexLoader);
 
-SCF_IMPLEMENT_IBASE(csFuncTexLoader);
-  SCF_IMPLEMENTS_INTERFACE(iLoaderPlugin);
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iComponent);
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csFuncTexLoader::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_FACTORY(csFuncTexLoader)
 
 //---------------------------------------------------------------------------
 
-csFuncTexLoader::csFuncTexLoader (iBase *p)
+csFuncTexLoader::csFuncTexLoader (iBase *p) :
+  scfImplementationType(this, p)
 {
-  SCF_CONSTRUCT_IBASE (p);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
-
   InitTokenTable (tokens);
 }
 
 csFuncTexLoader::~csFuncTexLoader()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
-  SCF_DESTRUCT_IBASE();
 }
 
 bool csFuncTexLoader::Initialize(iObjectRegistry *object_reg)
