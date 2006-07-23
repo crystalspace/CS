@@ -13,6 +13,11 @@ chronological order.
 	    - plugins/proctex/standard/
 	    - plugins/terraformer/
 	    - plugins/reporter/
+	- res added the ability to specify configuration settings via the
+	  command line. Accepted are two new switches, -cfgset=<key=value>,
+	  which adds a single setting to the configuration manager, and
+	  -cfgfile=<file>, which adds a complete file to the configuration
+	  manager.
 22-Jul-2006
 	- Oktal fixed the order of some declaration qualifiers in spinlock.h;
 	  CS_FORCEINLINE must come *before* the method's return type, at least
