@@ -118,8 +118,8 @@ void csCommandLineHelper::Help (iObjectRegistry* object_reg,
 "  -cfgfile=<file>    load a configuration file\n"
 "  -cfgset=<key=val>  specify a configuration setting\n"
 "  -plugin=<s>        load the plugin after all others\n"
-"  -verbose           be more verbose; print better diagnostic messages\n");
-"  -video=<s>         the 3D rendering driver (opengl, software, ...)\n"
+"  -verbose           be more verbose; print better diagnostic messages\n"
+"  -video=<s>         the 3D rendering driver (opengl, software, ...)\n");
 }
 
 bool csCommandLineHelper::CheckHelp (iObjectRegistry* object_reg,
