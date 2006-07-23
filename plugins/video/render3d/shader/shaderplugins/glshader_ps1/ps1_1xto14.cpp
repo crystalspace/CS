@@ -32,7 +32,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderPS1)
 #define TEXREG_BIT(regnum, bits)    ((bits) << ((regnum) * 2))
 #define TEMPREG_BIT(regnum, bits)   ((bits) << (16 + (regnum) * 2))
 
-inline int destModBits (uint destMod)
+/// For a destination write mask, return the components that are written to.
+static inline int DestModBits (uint destMod)
 {
   uint result = 0;
   if ((destMod & (CS_PS_WMASK_RED | CS_PS_WMASK_GREEN | CS_PS_WMASK_BLUE)) ||
@@ -42,19 +43,35 @@ inline int destModBits (uint destMod)
   return result;
 }
 
-inline int srcModBits (uint srcMod)
+/**
+ * For a source swizzle, return the components that are read from.
+ * Makes the assumption that only the components in \p destBits will
+ * actually be used.
+ */
+static inline int SrcModBits (uint srcMod, uint destBits = BIT_RGBA)
 {
   uint result = 0;
   const uint repMaskRGB = CS_PS_RMOD_REP_RED | CS_PS_RMOD_REP_GREEN | 
     CS_PS_RMOD_REP_BLUE;
   const uint repMask = repMaskRGB | CS_PS_RMOD_REP_ALPHA;
-  if ((srcMod & (repMaskRGB | CS_PS_RMOD_XYZ)) || ((srcMod & repMask) == 0))
+  // Simple case: no replication
+  if ((srcMod & repMask) == 0) return destBits;
+  // Replication is used.
+  if ((srcMod & (repMaskRGB | CS_PS_RMOD_XYZ)))
     result |= BIT_RGB;
-  if ((srcMod & (CS_PS_RMOD_REP_ALPHA | CS_PS_RMOD_XYW))
-  	|| ((srcMod & repMask) == 0))
+  if ((srcMod & (CS_PS_RMOD_REP_ALPHA | CS_PS_RMOD_XYW)))
     result |= BIT_ALPHA;
   return result;
 }
+
+static const uint instrFlags[CS_PS_INS_END_OF_LIST] = {
+  0, /* CS_PS_INS_INVALID */
+#define PS_INSTR(instr, args, psflags)				            \
+  psflags & CS_PS_MASKFLAGS,
+#define PS_VER_INSTR(x,y)						    \
+  0,
+#include "ps1_instr.inc"
+};
 
 const char* csPS1xTo14Converter::SetLastError (const char* fmt, ...)
 {
@@ -119,7 +136,7 @@ const char* csPS1xTo14Converter::GetTempReg (int oldReg, size_t instrIndex,
   // Determine timespan the original temp reg was used.
   size_t firstNeeded = instrIndex + 1, lastNeeded = firstNeeded;
   while ((lastNeeded < neededRegs.Length()) && 
-    (neededRegs[lastNeeded] & TEMPREG_BIT(oldReg, BIT_RGBA)))
+    (neededRegs[lastNeeded] & TEMPREG_BIT(oldReg, usedBits)))
     lastNeeded++;
 
   int checkOrder[4];
@@ -141,7 +158,7 @@ const char* csPS1xTo14Converter::GetTempReg (int oldReg, size_t instrIndex,
     
     for (size_t i = firstNeeded; i < lastNeeded; i++)
     {
-      if (neededRegs[i] & TEXREG_BIT(r, BIT_RGBA))
+      if (neededRegs[i] & TEXREG_BIT(r, usedBits))
       {
 	isFree = false;
 	break;
@@ -169,10 +186,9 @@ const char* csPS1xTo14Converter::GetTempReg (int oldReg, size_t instrIndex,
     {
       bool isFree = true;
 
-      //if (tempMapBack[r] != -1)
       if (realTempUsed[r])
       {
-	uint bits = TEMPREG_BIT(/*tempRegisterMap[*/r/*]*/, BIT_RGBA);
+	uint bits = TEMPREG_BIT(/*tempRegisterMap[*/r/*]*/, usedBits);
 	for (size_t i = firstNeeded; i < lastNeeded; i++)
 	{
 	  if (neededRegs[i] & bits)
@@ -274,10 +290,10 @@ const char* csPS1xTo14Converter::AddArithmetic (
 	  "assigned yet", GetInstructionName (instr.instruction), 
 	  instrIndex, newInstr.src_reg_num[i]);
 
-      uint srcBits = srcModBits (newInstr.src_reg_mods[i]);
+      uint srcBits = SrcModBits (newInstr.src_reg_mods[i]);
       if (srcBits == BIT_RGBA)
       {
-	srcBits = destModBits (newInstr.dest_reg_mods);
+	srcBits = DestModBits (newInstr.dest_reg_mods);
       }
       switch (srcBits)
       {
@@ -299,9 +315,18 @@ const char* csPS1xTo14Converter::AddArithmetic (
     }
   }
   
-  if (newInstr.dest_reg == CS_PS_REG_TEMP)
+  if (newInstr.dest_reg == CS_PS_REG_TEX)
   {
-    uint destBits = destModBits (newInstr.dest_reg_mods);
+    if ((err = GetTexTempReg (newInstr.dest_reg_num, instrIndex, 
+      newInstr.dest_reg_num)) != 0)
+    {
+      return err;
+    }
+    newInstr.dest_reg = CS_PS_REG_TEMP;
+  } 
+  else if (newInstr.dest_reg == CS_PS_REG_TEMP)
+  {
+    uint destBits = DestModBits (newInstr.dest_reg_mods);
     if ((err = GetTempReg (newInstr.dest_reg_num, instrIndex, destBits,
       newInstr.dest_reg_num)) != 0)
     {
@@ -358,8 +383,16 @@ const char* csPS1xTo14Converter::CollectUsage (
 
   size_t i;
   uint currentBits = 0;
-  size_t lastTempUse[2] = {(size_t)-1, (size_t)-1};
-  size_t lastTexUse[4] = {(size_t)-1, (size_t)-1, (size_t)-1, (size_t)-1};
+  size_t lastTempUse[2][2] = {
+    {(size_t)-1, (size_t)-1}, 
+    {(size_t)-1, (size_t)-1}
+  };
+  size_t lastTexUse[4][2] = {
+    {(size_t)-1, (size_t)-1}, 
+    {(size_t)-1, (size_t)-1}, 
+    {(size_t)-1, (size_t)-1}, 
+    {(size_t)-1, (size_t)-1}
+  };
 
   /* 
     @@@ DP3 and DP4 are executed in both the RGB and A pipe... 
@@ -371,18 +404,18 @@ const char* csPS1xTo14Converter::CollectUsage (
     const csPSProgramInstruction& instr = instrs->Get (i);
     int j;
 
+    uint destMods = DestModBits (instr.dest_reg_mods);
     const int dr = instr.dest_reg_num;
     uint nextBits = currentBits;
     if (instr.dest_reg == CS_PS_REG_TEMP)
     {
-      uint bit = TEMPREG_BIT (dr, destModBits (instr.dest_reg_mods));
+      uint bit = TEMPREG_BIT (dr, destMods);
       currentBits &= ~bit;
       nextBits |= bit;
     }
     else if (instr.dest_reg == CS_PS_REG_TEX)
     {
-      uint bit = TEXREG_BIT (instr.dest_reg_num, 
-	destModBits (instr.dest_reg_mods));
+      uint bit = TEXREG_BIT (instr.dest_reg_num, destMods);
       currentBits &= ~bit;
       nextBits |= bit;
     }
@@ -392,13 +425,24 @@ const char* csPS1xTo14Converter::CollectUsage (
       const int sr = instr.src_reg_num[j];
       if (instr.src_reg[j] == CS_PS_REG_TEMP)
       {
-	currentBits |= TEMPREG_BIT (sr, srcModBits (instr.src_reg_mods[j]));
-	lastTempUse[sr] = i;
+        /* If the destination has a write mask and the result directly depends
+         * on the source registers, we can treat some source components as 
+         * "not read". */
+        uint srcMods = SrcModBits (instr.src_reg_mods[j],
+          (instrFlags[instr.instruction] 
+            & CS_PS_DEST_COMP_DEPENDS_SOURCE) ? destMods : BIT_RGBA);
+	currentBits |= TEMPREG_BIT (sr, srcMods);
+        if (srcMods & BIT_RGB) lastTempUse[sr][0] = i;
+        if (srcMods & BIT_ALPHA) lastTempUse[sr][1] = i;
       }
       else if (instr.src_reg[j] == CS_PS_REG_TEX)
       {
-	currentBits |= TEXREG_BIT (sr, srcModBits (instr.src_reg_mods[j]));
-	lastTexUse[sr] = i;
+        uint srcMods = SrcModBits (instr.src_reg_mods[j],
+          (instrFlags[instr.instruction] 
+            & CS_PS_DEST_COMP_DEPENDS_SOURCE) ? destMods : BIT_RGBA);
+	currentBits |= TEXREG_BIT (sr, srcMods);
+	if (srcMods & BIT_RGB) lastTexUse[sr][0] = i;
+	if (srcMods & BIT_ALPHA) lastTexUse[sr][1] = i;
       }
       else if (instr.src_reg[j] == CS_PS_REG_NONE)
 	break;
@@ -406,12 +450,16 @@ const char* csPS1xTo14Converter::CollectUsage (
 
     if (instr.dest_reg == CS_PS_REG_TEMP)
     {
-      const uint mask = ~TEMPREG_BIT (dr, srcModBits (instr.dest_reg_mods));
       // Register is free up to the last instr it was read.
-      size_t j = i;
-      while (--j != lastTempUse[dr])
+      for (int m = 0; m < 2; m++)
       {
-	neededRegs[j] &= mask;
+        const uint bit = 1 << m;
+        if (destMods & bit)
+        {
+          const uint mask = ~TEMPREG_BIT (dr, bit);
+          size_t j = i;
+          while (--j != lastTempUse[dr][m]) neededRegs[j] &= mask;
+        }
       }
     }
 
@@ -420,23 +468,21 @@ const char* csPS1xTo14Converter::CollectUsage (
   }
 
   // Clear out those that have been written to, but are not read from.
-  int reg;
-  for (reg = 1; reg < 2; reg++)
+  for (int m = 0; m < 2; m++)
   {
-    const uint mask = ~TEMPREG_BIT (reg, BIT_RGBA);
-    size_t j = instrs->Length();
-    while (--j != lastTempUse[reg])
+    const uint bit = 1 << m;
+    int reg;
+    for (reg = 1; reg < 2; reg++)
     {
-      neededRegs[j] &= mask;
-    }
-  }				  
-  for (reg = 0; reg < 4; reg++)
-  {
-    const uint mask = ~TEXREG_BIT (reg, BIT_RGBA);
-    size_t j = instrs->Length();
-    while (--j != lastTexUse[reg])
+      const uint mask = ~TEMPREG_BIT (reg, bit);
+      size_t j = instrs->Length();
+      while (--j != lastTempUse[reg][m]) neededRegs[j] &= mask;
+    }				  
+    for (reg = 0; reg < 4; reg++)
     {
-      neededRegs[j] &= mask;
+      const uint mask = ~TEXREG_BIT (reg, bit);
+      size_t j = instrs->Length();
+      while (--j != lastTexUse[reg][m]) neededRegs[j] &= mask;
     }
   }
 

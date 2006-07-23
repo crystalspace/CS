@@ -26,6 +26,10 @@ chronological order.
 	  Instruction is <?TemplateWeak ...?>.
 	- res fixed xmlshader to correctly deal with sub-conditions of 
 	  conditions always being false.
+	- res fixed a bug in the PS1.x to 1.4 where texture registers as the
+	  destination were not handled correctly.
+	- res enhanced the PS1.x to 1.4 converter to track register usage more
+	  finely.
 22-Jul-2006
 	- Oktal fixed the order of some declaration qualifiers in spinlock.h;
 	  CS_FORCEINLINE must come *before* the method's return type, at least

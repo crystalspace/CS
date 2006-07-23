@@ -40,9 +40,10 @@ void csPixelShaderParser::RegisterInstructions ()
   PS_Instructions[CS_PS_INS_INVALID].arguments = 0;
   PS_Instructions[CS_PS_INS_INVALID].supported = false;
   PS_Instructions[CS_PS_INS_INVALID].versions = 0;
-#define PS_INSTR(instr, args, psversion)				    \
+#define PS_INSTR(instr, args, psflags)				            \
   PS_Instructions[CS_PS_INS_ ## instr].arguments = args;		    \
-  PS_Instructions[CS_PS_INS_ ## instr].versions = psversion;		    \
+  PS_Instructions[CS_PS_INS_ ## instr].versions =                           \
+    psflags & CS_PS_MASKVERSIONS;		                            \
   PS_Instructions[CS_PS_INS_ ## instr].supported = true;		    \
   instrStrings.Register (#instr, CS_PS_INS_ ## instr);
 #define PS_VER_INSTR(x,y)						    \
