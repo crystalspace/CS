@@ -169,7 +169,7 @@ void* ptcalloc (size_t n, size_t s)
 #endif
 }
 
-#ifdef __CYGWIN__
+#if defined(CS_PLATFORM_WIN32)
 
 /* Cygwin has funny issues with atexit() that ptmalloc seems to tickle.
  * So within ptmalloc we use own own single-use implementation of atexit()
@@ -177,6 +177,10 @@ void* ptcalloc (size_t n, size_t s)
  * cleanup order so we use the GCC "__attribute__ ((init_priority (101))"
  * extention to force atexitHandler to be constructed before other
  * static vars and thus be destructed after all other static vars.
+ *
+ * With the MSVC runtime (ie MSVC itself and MingW), the catch is that 
+ * atexit() functions are called before global static objects are destroyed. 
+ * So tweak the destruction order here as well.
  *
  * !!! WARNING !!!
  * This is fragile.  If some other part of the application tries to set a
@@ -186,6 +190,11 @@ void* ptcalloc (size_t n, size_t s)
  * the application has a numerically smaller init_priority
  * than atexitHandler.
  */
+
+#if defined(CS_COMPILER_MSVC)
+#pragma warning(disable:4073)
+#pragma init_seg(lib)
+#endif
 
 namespace CS
 {
@@ -205,7 +214,11 @@ namespace CS
         this->func = func;
       }
     };
-    static AtexitHandler atexitHandler __attribute__ ((init_priority (101)));
+    static AtexitHandler atexitHandler 
+#if defined(CS_COMPILER_GCC)
+      __attribute__ ((init_priority (101)))
+#endif
+    ;
   }
 }
 

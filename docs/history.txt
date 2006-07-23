@@ -18,6 +18,8 @@ chronological order.
 	  which adds a single setting to the configuration manager, and
 	  -cfgfile=<file>, which adds a complete file to the configuration
 	  manager.
+	- res fixed a crash on VC due ptmalloc being shut down before some
+	  global variables were destructed.
 22-Jul-2006
 	- Oktal fixed the order of some declaration qualifiers in spinlock.h;
 	  CS_FORCEINLINE must come *before* the method's return type, at least
