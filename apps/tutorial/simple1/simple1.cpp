@@ -261,6 +261,48 @@ void Simple::CreateRoom ()
 
   light = engine->CreateLight(0, csVector3(0, 5, -3), 10, csColor(0, 1, 0));
   ll->Add (light);
+
+  // Create a particle system
+  loader->LoadTexture ("spark", "/lib/std/sparka.dds");
+  tm = engine->GetMaterialList ()->FindByName ("spark");
+  tm->GetMaterial ()->GetTexture ()->SetAlphaType (csAlphaMode::alphaSmooth);
+
+  csRef<iMeshWrapper> partWrap = engine->CreateMeshWrapper (
+    "crystalspace.mesh.object.particles", "part", room, csVector3 (-3, 3, 0));
+  csRef<iParticleSystem> partSys = 
+    scfQueryInterface<iParticleSystem> (partWrap->GetMeshObject ());
+
+  partSys->SetParticleSize (csVector2 (0.2f, 0.2f));
+  partWrap->GetMeshObject ()->SetMaterialWrapper (tm);
+  partWrap->GetMeshObject ()->SetMixMode (CS_FX_ALPHA);
+  partWrap->SetZBufMode (CS_ZBUF_TEST);
+
+  partSys->SetSortMode (CS_PARTICLE_SORT_DOT);
+
+  csRef<iParticleBuiltinEmitterFactory> emfact = csLoadPluginCheck<iParticleBuiltinEmitterFactory> (
+    GetObjectRegistry (), "crystalspace.mesh.object.particles.emitter");
+
+  csRef<iParticleBuiltinEffectorFactory> effact = csLoadPluginCheck<iParticleBuiltinEffectorFactory> (
+    GetObjectRegistry (), "crystalspace.mesh.object.particles.effector");
+
+
+  csRef<iParticleBuiltinEmitterBox> sb = emfact->CreateBox ();
+  sb->SetBox (csOBB (csBox3 (csVector3 (0,-1,-1), csVector3 (0,1,1))));
+  sb->SetUniformVelocity (true);
+  sb->SetEmissionRate (500);
+  sb->SetInitialTTL (5,5);
+  sb->SetInitialVelocity (csVector3 (1,0,0), csVector3 (0));
+  sb->SetParticlePlacement (CS_PARTICLE_BUILTIN_VOLUME);
+  partSys->AddEmitter (sb);
+
+  csRef<iParticleBuiltinEffectorLinColor> lc = effact->CreateLinColor ();
+  lc->AddColor (csColor (1,0,0),0);
+  lc->AddColor (csColor (0,1,0),1);
+  lc->AddColor (csColor (0,0,1),2);
+  lc->AddColor (csColor (1,0,1),3);
+  lc->AddColor (csColor (1,1,0),4);
+  lc->AddColor (csColor (1,1,1),5);
+  partSys->AddEffector (lc);
 }
 
 /*-------------------------------------------------------------------------*

@@ -464,6 +464,12 @@ struct iParticleSystem : public iParticleSystemBase
 
   /// Get aux-data for a specific particle
   virtual csParticleAux* GetParticleAux (size_t index) = 0;
+
+  /**
+   * Lock the particles and take external control over them.
+   * 
+   */
+  virtual csParticleBuffer* LockForExternalControl (size_t maxParticles) = 0;
 };
 
 
@@ -658,32 +664,22 @@ struct iParticleBuiltinEffectorLinColor : public iParticleEffector
    * Add color to list of colors to interpolate between.
    * \return Index of new color
    */
-  virtual size_t AddColor (const csColor& color, float endTime) = 0;
+  virtual size_t AddColor (const csColor4& color, float endTTL) = 0;
 
   /**
    * Set the color of an already existing entry
    */
-  virtual void SetColor (size_t index, const csColor& color) = 0;
+  virtual void SetColor (size_t index, const csColor4& color) = 0;
 
   /**
    * Get color and time
    */
-  virtual void GetColor (size_t index, csColor& color, float& time) const = 0;
+  virtual void GetColor (size_t index, csColor4& color, float& endTTL) const = 0;
 
   /**
    * Get number of color entries
    */
   virtual size_t GetColorCount () const = 0;
-
-  /**
-   * Set max age (when particles will get the final color)
-   */
-  virtual void SetMaxAge (float max) = 0;
-
-  /**
-   * Get max age
-   */
-  virtual float GetMaxAge () const = 0;
 };
 
 /**

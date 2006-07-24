@@ -23,7 +23,7 @@
 CS_IMPLEMENT_APPLICATION
 
 PartConv::PartConv (iObjectRegistry* objectRegistry)
-  : objectRegistry (objectRegistry)
+  : objectRegistry (objectRegistry), unconvertedTags (false)
 {
 
 }
@@ -61,7 +61,10 @@ void PartConv::Main ()
   vfs = csQueryRegistry<iVFS> (objectRegistry);
   commandLine = csQueryRegistry<iCommandLineParser> (objectRegistry);
 
-  if (!vfs || !commandLine)
+  syntaxService = csQueryRegistryOrLoad<iSyntaxService> (objectRegistry,
+    "crystalspace.syntax.loader.service.text");
+
+  if (!vfs || !commandLine || !syntaxService)
   {
     ReportError ("Could not load required plugins!");
     return;
@@ -218,6 +221,10 @@ void PartConv::Main ()
   newdoc = 0;
   Report (CS_REPORTER_SEVERITY_NOTIFY, "Updating VFS...");
   vfs->Sync();
+
+  if (unconvertedTags)
+    Report (CS_REPORTER_SEVERITY_WARNING, "Some tags were not converted."
+    " Check the resulting particle system before using it!");
 }
 
 void PartConv::CloneNode (iDocumentNode* from, iDocumentNode* to) const
@@ -516,15 +523,14 @@ void PartConv::ConvertParticlesCommonParams (iDocumentNode* oldParams,
             emitSize.y = child2->GetContentsValueAsFloat ();
             break;
           case XMLTOKEN_SIZE:
-            emitSize.x = child2->GetAttributeValueAsFloat ("x");
-            emitSize.y = child2->GetAttributeValueAsFloat ("y");
-            emitSize.z = child2->GetAttributeValueAsFloat ("z");
+            syntaxService->ParseVector (child2, emitSize);
             break;
           case XMLTOKEN_TIME:
             duration = child2->GetContentsValueAsFloat ();
             break;
           case XMLTOKEN_FORCE:
             //TODO!
+            unconvertedTags = true;
             break;
           default:
             Report (CS_REPORTER_SEVERITY_WARNING, 
@@ -555,13 +561,12 @@ void PartConv::ConvertParticlesCommonParams (iDocumentNode* oldParams,
       break;
     case XMLTOKEN_DIFFUSION:
       //@@TODO
+      unconvertedTags = true;
       break;
     case XMLTOKEN_GRAVITY:
       {
         haveGravity = true;
-        gravity.x = child->GetAttributeValueAsFloat ("x");
-        gravity.y = child->GetAttributeValueAsFloat ("y");
-        gravity.z = child->GetAttributeValueAsFloat ("z");
+        syntaxService->ParseVector (child, gravity);
       }
       break;
     case XMLTOKEN_TTL:
@@ -572,6 +577,7 @@ void PartConv::ConvertParticlesCommonParams (iDocumentNode* oldParams,
       break;
     case XMLTOKEN_INITIAL:
       //@@ TODO!
+      unconvertedTags = true;
       break;
     case XMLTOKEN_PPS:
       emissionRate = child->GetContentsValueAsFloat ();
@@ -629,25 +635,81 @@ void PartConv::ConvertParticlesCommonParams (iDocumentNode* oldParams,
       break;
     case XMLTOKEN_DAMPENER:
       //@@TODO
+      unconvertedTags = true;
       break;
     case XMLTOKEN_COLORMETHOD:
       {
         const char *str = child->GetAttributeValue ("type");
         if (!str)
         {
-          
+          ReportError ("No color method given.");
         }
         if (!strcasecmp (str, "constant"))
         {
-          
+          csColor c (1,1,1);
+          colorGradient.Empty ();
+
+          csRef<iDocumentNodeIterator> it2 = child->GetNodes ();
+          while (it2->HasNext ())
+          {
+            csRef<iDocumentNode> child2 = it2->Next ();
+            if (child2->GetType () != CS_NODE_ELEMENT)
+              continue;
+
+            csStringID token2 = xmltokens.Request (child2->GetValue ());
+            switch (token2)
+            {
+            case XMLTOKEN_COLOR:
+              syntaxService->ParseColor (child2, c);
+              break;
+            default:
+              Report (CS_REPORTER_SEVERITY_WARNING, 
+                "Unhandled in tag: %s",child2->GetValue ());
+            }
+          }
+
+          colorGradient.Push (c);
+          haveGradient = true;
         }
         else if (!strcasecmp (str, "linear"))
         {
-          
+          csColor c;
+          colorGradient.Empty ();
+
+          csRef<iDocumentNode> gradient = 
+            child->GetNode (xmltokens.Request (XMLTOKEN_GRADIENT));
+
+          if (!gradient)
+          {
+            Report (CS_REPORTER_SEVERITY_WARNING, "No <gradient> node");
+            continue;
+          }
+
+          csRef<iDocumentNodeIterator> it2 = gradient->GetNodes ();
+          while (it2->HasNext ())
+          {
+            csRef<iDocumentNode> child2 = it2->Next ();
+            if (child2->GetType () != CS_NODE_ELEMENT)
+              continue;
+
+            csStringID token2 = xmltokens.Request (child2->GetValue ());
+            switch (token2)
+            {
+            case XMLTOKEN_COLOR:
+              syntaxService->ParseColor (child2, c);
+              colorGradient.Push (c);
+              break;
+            default:
+              Report (CS_REPORTER_SEVERITY_WARNING, 
+                "Unhandled in tag: %s",child2->GetValue ());
+            }
+          }
+
+          haveGradient = true;
         }
         else
         {
-          
+          ReportError ("Unknown color method: %s", str);
         }
       }
       break;
@@ -681,6 +743,36 @@ void PartConv::ConvertParticlesCommonParams (iDocumentNode* oldParams,
     emitNode->SetValue ("emitter");
 
     // General
+    csRef<iDocumentNode> ttlNode = emitNode->CreateNodeBefore (
+      CS_NODE_ELEMENT, 0);
+    ttlNode->SetValue ("initialttl");
+    ttlNode->SetAttributeAsFloat ("min", minTTL);
+    ttlNode->SetAttributeAsFloat ("max", minTTL+spanTTL);
+
+    csRef<iDocumentNode> massNode = emitNode->CreateNodeBefore (
+      CS_NODE_ELEMENT, 0);
+    massNode->SetValue ("mass");
+    massNode->SetAttributeAsFloat ("min", minMass);
+    massNode->SetAttributeAsFloat ("max", minMass+spanMass);
+
+    csRef<iDocumentNode> valueNode;
+
+    if (duration < FLT_MAX)
+    {
+      csRef<iDocumentNode> durationNode = emitNode->CreateNodeBefore (
+        CS_NODE_ELEMENT, 0);
+      durationNode->SetValue ("duration");
+
+      valueNode = durationNode->CreateNodeBefore (CS_NODE_TEXT, 0);
+      valueNode->SetValueAsFloat (duration);
+    }
+
+    csRef<iDocumentNode> rateNode = emitNode->CreateNodeBefore (
+      CS_NODE_ELEMENT, 0);
+    rateNode->SetValue ("emissionrate");
+
+    valueNode = rateNode->CreateNodeBefore (CS_NODE_TEXT, 0);
+    valueNode->SetValueAsFloat (emissionRate);
 
     // Type specific
     switch (emitType)
@@ -691,23 +783,11 @@ void PartConv::ConvertParticlesCommonParams (iDocumentNode* oldParams,
         csRef<iDocumentNode> boxNode = emitNode->CreateNodeBefore (
           CS_NODE_ELEMENT, 0);
         boxNode->SetValue ("box");
-        csRef<iDocumentNode> boxNode2 = boxNode->CreateNodeBefore (
-          CS_NODE_ELEMENT, 0);
-        boxNode2->SetValue ("box");
 
-        csRef<iDocumentNode> minNode = boxNode2->CreateNodeBefore (
-          CS_NODE_ELEMENT, 0);
-        minNode->SetValue ("min");
-        minNode->SetAttributeAsFloat ("x", -emitSize.x);
-        minNode->SetAttributeAsFloat ("y", -emitSize.y);
-        minNode->SetAttributeAsFloat ("z", -emitSize.z);
+        csOBB tmpObb;
+        tmpObb.SetSize (emitSize);
 
-        csRef<iDocumentNode> maxNode = boxNode2->CreateNodeBefore (
-          CS_NODE_ELEMENT, 0);
-        maxNode->SetValue ("max");
-        maxNode->SetAttributeAsFloat ("x", emitSize.x);
-        maxNode->SetAttributeAsFloat ("y", emitSize.y);
-        maxNode->SetAttributeAsFloat ("z", emitSize.z);
+        syntaxService->WriteBox (boxNode, tmpObb);
       }
       break;
     case EMIT_SPHERE:
@@ -755,13 +835,28 @@ void PartConv::ConvertParticlesCommonParams (iDocumentNode* oldParams,
     csRef<iDocumentNode> anode = forceEffectorNode->CreateNodeBefore (
       CS_NODE_ELEMENT, 0);
     anode->SetValue ("acceleration");
-    anode->SetAttributeAsFloat ("x", gravity.x);
-    anode->SetAttributeAsFloat ("y", gravity.y);
-    anode->SetAttributeAsFloat ("z", gravity.z);
+
+    syntaxService->WriteVector (anode, gravity);
   }
 
-  if (haveGradient)
+  if (haveGradient && colorGradient.GetSize () > 0)
   {
+    float maxTTL = minTTL + spanTTL;
+    float ttlStep = (maxTTL) / colorGradient.GetSize ();
+
+    csRef<iDocumentNode> lineff = newParams->CreateNodeBefore (
+      CS_NODE_ELEMENT, 0);
+    lineff->SetValue ("effector");
+    lineff->SetAttribute ("type", "lincolor");
+
+    for (size_t i = 0; i < colorGradient.GetSize (); ++i)
+    {
+      csRef<iDocumentNode> colorNode = lineff->CreateNodeBefore (
+        CS_NODE_ELEMENT, 0);
+      colorNode->SetValue ("color");
+      syntaxService->WriteColor (colorNode, colorGradient[i]);
+      colorNode->SetAttributeAsFloat ("time", maxTTL-i*ttlStep);
+    }
   }
 }
 

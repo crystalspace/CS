@@ -68,7 +68,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
 
   ParticleEffectorLinColor::ParticleEffectorLinColor ()
     : scfImplementationType (this),
-    precalcInvalid (true), maxAge (1.0f)
+    precalcInvalid (true)
   {
 
   }
@@ -91,30 +91,28 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
       csParticle& particle = particleBuffer.particleData[idx];
       csParticleAux& particleAux = particleBuffer.particleAuxData[idx];
 
-      float age = csMax(0.0f, maxAge - particle.timeToLive);
+      float ttl = particle.timeToLive;
 
       //Classify
-      size_t aSpan = precalcList.GetSize () - 1;
-
-      for (size_t i = 1; i < precalcList.GetSize (); ++i)
+      size_t aSpan;
+      for(aSpan = 0; aSpan < precalcList.GetSize (); ++aSpan)
       {
-        if (age < precalcList[i].endTime)
-        {
-          aSpan = i;
+        if (ttl < precalcList[aSpan].maxTTL)
           break;
-        }
       }
 
+      aSpan = csMin (aSpan, precalcList.GetSize ()-1);
+
       const PrecalcEntry& ei = precalcList[aSpan];
-      particleAux.color = ei.add + ei.mult * age;
+      particleAux.color = ei.add + ei.mult * ttl;
     }
   }
 
-  size_t ParticleEffectorLinColor::AddColor (const csColor& color, float endTime)
+  size_t ParticleEffectorLinColor::AddColor (const csColor4& color, float maxTTL)
   {
     ColorEntry c;
     c.color = color;
-    c.endTime = endTime;
+    c.maxTTL = maxTTL;
 
     colorList.Push (c);
 
@@ -122,7 +120,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     return colorList.GetSize () - 1;
   }
 
-  void ParticleEffectorLinColor::SetColor (size_t index, const csColor& color)
+  void ParticleEffectorLinColor::SetColor (size_t index, const csColor4& color)
   {
     if (index >= colorList.GetSize ())
       return;
@@ -140,7 +138,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     precalcList.SetSize (colorList.GetSize ());
     
     if (precalcList.GetSize () == 0)
-      return;
+        return;
 
     PrecalcEntry& e0 = precalcList[0];
     e0.add = colorList[0].color;
@@ -152,9 +150,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
       const ColorEntry& ci = colorList[i];
       const ColorEntry& cip = colorList[i-1];
 
-      ei.endTime = ci.endTime;
-      ei.mult = (ci.color - cip.color) / (ci.endTime - cip.endTime);
-      ei.add = ci.color - ei.mult * ei.endTime;
+      ei.maxTTL = ci.maxTTL;
+      ei.mult = (ci.color - cip.color) / (ci.maxTTL - cip.maxTTL);
+      ei.add = ci.color - ei.mult * ei.maxTTL;
     }
 
     precalcInvalid = false;

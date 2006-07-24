@@ -123,17 +123,17 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
 
 
     //-- iParticleBuiltinEffectorLinColor
-    virtual size_t AddColor (const csColor& color, float endTime);
+    virtual size_t AddColor (const csColor4& color, float maxTTL);
 
-    virtual void SetColor (size_t index, const csColor& color);
+    virtual void SetColor (size_t index, const csColor4& color);
 
-    virtual void GetColor (size_t index, csColor& color, float& time) const
+    virtual void GetColor (size_t index, csColor4& color, float& maxTTL) const
     {
       if (index >= colorList.GetSize ())
         return;
 
       color = colorList[index].color;
-      time = colorList[index].endTime;
+      maxTTL = colorList[index].maxTTL;
     }
 
     virtual size_t GetColorCount () const
@@ -141,36 +141,24 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
       return colorList.GetSize ();
     }
 
-    virtual void SetMaxAge (float max)
-    {
-      maxAge = max;
-    }
-
-    virtual float GetMaxAge () const
-    {
-      return maxAge;
-    }
-
   private:
     void Precalc ();
 
     struct ColorEntry
     {
-      csColor color;
-      float endTime;
+      csColor4 color;
+      float maxTTL;
     };
     csArray<ColorEntry> colorList;
 
     struct PrecalcEntry
     {
-      csColor mult;
-      csColor add;
-      float endTime;
+      csColor4 mult;
+      csColor4 add;
+      float maxTTL;
     };
     bool precalcInvalid;
     csArray<PrecalcEntry> precalcList;
-
-    float maxAge;
   };
 
 }

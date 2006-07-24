@@ -511,9 +511,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(ParticlesLoader)
           timeList.Push (t);
         }
         break;
-      case XMLTOKEN_MAXAGE:
-        maxAge = child->GetContentsValueAsFloat ();
-        break;
       default:
         synldr->ReportBadToken (child);
         return 0;
@@ -533,7 +530,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(ParticlesLoader)
       csRef<iParticleBuiltinEffectorLinColor> colorEffector = 
         factory->CreateLinColor ();
       effector = colorEffector;
-      colorEffector->SetMaxAge (maxAge);
       for (size_t i = 0; i < colorList.GetSize (); ++i)
       {
         colorEffector->AddColor (colorList[i], timeList[i]);
@@ -1080,14 +1076,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(ParticlesLoader)
     {
       effectorNode->SetAttribute ("type", "lincolor");
 
-      csRef<iDocumentNode> maxNode = effectorNode->CreateNodeBefore (
-        CS_NODE_ELEMENT, 0);
-      maxNode->SetValue ("acceleration");
-      valueNode = maxNode->CreateNodeBefore (CS_NODE_TEXT, 0);
-      valueNode->SetValueAsFloat (colorEffector->GetMaxAge ());
-
       size_t numColors = colorEffector->GetColorCount ();
-      csColor c; float t;
+      csColor4 c; float t;
       for (size_t i = 0; i < numColors; ++i)
       {
         colorEffector->GetColor (i, c, t);

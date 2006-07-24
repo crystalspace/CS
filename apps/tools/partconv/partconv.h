@@ -31,6 +31,7 @@ private:
   iObjectRegistry* objectRegistry;
   csRef<iVFS> vfs;
   csRef<iCommandLineParser> commandLine;
+  csRef<iSyntaxService> syntaxService;
 
   // Map plugin short-name to full name
   csHash<csString, csString> pluginNameHash;
@@ -46,6 +47,8 @@ private:
   };
   csStringHash particlePlugins;
   
+  bool unconvertedTags;
+
   // Helpers
   void ReportError (const char* description, ...);
   void Report (int severity, const char* description, ...);
