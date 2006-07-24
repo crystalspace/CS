@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+24-Jul-2006
+	- Jorrit documented the new -cfgfile and -cfgset commandline
+	  options and also added documentation for a few other commonly
+	  used options.
 23-Jul-2006
 	- mdmkolbe converted the following plugins to the new SCF:
 	    - plugins/csparser/
