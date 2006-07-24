@@ -855,7 +855,8 @@ void csConfigFile::ParseCommandLine (iCommandLineParser* cmdline, iVFS* vfs,
     }
   }
 
-  LoadFromBuffer (buffer, NewWins);
+  if (!buffer.IsEmpty ())
+    LoadFromBuffer (buffer, NewWins);
 
   if (!Merge)
   {

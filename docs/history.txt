@@ -10,6 +10,9 @@ chronological order.
 	- Jorrit documented the new -cfgfile and -cfgset commandline
 	  options and also added documentation for a few other commonly
 	  used options.
+	- Jorrit fixed a crash in the handling of the new -cfgfile
+	  option. If you didn't use that option then applications would
+	  crash.
 23-Jul-2006
 	- mdmkolbe converted the following plugins to the new SCF:
 	    - plugins/csparser/
