@@ -88,6 +88,17 @@ bool csGraphics2DGLX::Initialize (iObjectRegistry *object_reg)
   if (!csGraphics2DGLCommon::Initialize (object_reg))
     return false;
 
+  /* Mesa DRI drivers don't support S3TC compressed textures entirely, only
+   * upload. This behaviour is not conform to the specification for the
+   * texture compression spec, so the ext is not reported by default.
+   * However, it can nevertheless be activated by setting the 
+   * force_s3tc_enable env var to true.
+   * Do that since CS can take advantage of the upload-only support. */
+  bool mesaForceS3TCEnable = 
+    config->GetBool ("Video.OpenGL.MesaForceS3TCEnable", false);
+  if (mesaForceS3TCEnable && !getenv ("force_s3tc_enable"))
+    putenv ("force_s3tc_enable=true");
+
   csRef<iPluginManager> plugin_mgr (
   	CS_QUERY_REGISTRY (object_reg, iPluginManager));
   if ((strDriver = config->GetStr ("Video.OpenGL.Display.Driver", 0)))
@@ -158,7 +169,7 @@ bool csGraphics2DGLX::Open()
 
   xwin->SetColormap (cmap);
   xwin->SetVisualInfo (xvis);
-  xwin->SetCanvas ((iGraphics2D *)this);
+  xwin->SetCanvas (static_cast<iGraphics2D*> (this));
   if (!xwin->Open ())
   {
     Report (CS_REPORTER_SEVERITY_ERROR,

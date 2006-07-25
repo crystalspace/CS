@@ -219,23 +219,6 @@
         </ShaderManager>
       </Video>
     </config>
-    <config name="forceprecompressedDXTupload">
-      <Video>
-	<OpenGL>
-	  <ForcePrecompressedDXTUpload>yes</ForcePrecompressedDXTUpload>
-	</OpenGL>
-      </Video>
-    </config>
-    <config name="useAFP2D">
-      <Video>
-	<OpenGL>
-	  <FontCache>
-	    <UseAFP>yes</UseAFP>
-	  </FontCache>
-	  <AFPDrawPixmap>yes</AFPDrawPixmap>
-	</OpenGL>
-      </Video>
-    </config>
   </configs>
   <rules>
     <!-- rule description="Some more examples">
@@ -525,22 +508,5 @@
       </applicable>
     </rule>
     -->
-    
-    <!--
-      * 2005-12-24: DRI Intel supports DXT textures with at least Mesa 6.4.1.
-      -->
-    <rule description="Mesa DRI: Force upload of precompressed DXT textures">
-      <conditions fulfill="one">
-	<conditions fulfill="all">
-	  <!-- A renderer known to support DXT -->
-	  <regexp string="renderer" pattern="^Mesa DRI Intel" />
-	  <!-- Mesa version after which the driver supports DXT -->
-	  <comparever version="mesa" relation="ge 6.4.1" />
-	</conditions>
-      </conditions>
-      <applicable>
-	<usecfg>forceprecompressedDXTupload</usecfg>
-      </applicable>
-    </rule>
   </rules>
 </gldriverdb>

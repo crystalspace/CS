@@ -13,6 +13,7 @@ chronological order.
 	    - plugins/engine/3d/
 	    - plugins/engine/renderloop/
 	    - plugins/sequence/
+	- res reworked the "Mesa DRI DXT upload only" support.
 24-Jul-2006
 	- Jorrit documented the new -cfgfile and -cfgset commandline
 	  options and also added documentation for a few other commonly
