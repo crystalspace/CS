@@ -21,7 +21,7 @@
 #ifndef __CS_FULLSCREENQUAD_H__
 #define __CS_FULLSCREENQUAD_H__
 
-#include "csutil/scf.h"
+#include "csutil/scf_implementation.h"
 #include "csutil/csstring.h"
 #include "csutil/weakref.h"
 #include "iengine/light.h"
@@ -32,7 +32,8 @@
 #include "csplugincommon/renderstep/basesteptype.h"
 #include "csplugincommon/renderstep/basesteploader.h"
 
-class csFullScreenQuadRSType : public csBaseRenderStepType
+class csFullScreenQuadRSType :
+  public scfImplementationExt0<csFullScreenQuadRSType, csBaseRenderStepType>
 {
 public:
   csFullScreenQuadRSType (iBase* p);
@@ -40,21 +41,22 @@ public:
   virtual csPtr<iRenderStepFactory> NewFactory();
 };
 
-class csFullScreenQuadRenderStepFactory : public iRenderStepFactory
+class csFullScreenQuadRenderStepFactory :
+  public scfImplementation1<csFullScreenQuadRenderStepFactory,
+    iRenderStepFactory>
 {
 private:
   iObjectRegistry* object_reg;
 
 public:
-  SCF_DECLARE_IBASE;
-
   csFullScreenQuadRenderStepFactory (iObjectRegistry* object_reg);
   virtual ~csFullScreenQuadRenderStepFactory ();
 
   virtual csPtr<iRenderStep> Create ();
 };
 
-class csFullScreenQuadRenderStep : public iRenderStep
+class csFullScreenQuadRenderStep :
+  public scfImplementation1<csFullScreenQuadRenderStep, iRenderStep>
 {
 public:
   struct DrawSettings
@@ -80,8 +82,6 @@ private:
   //csFullscreenQuad* fullquad;
 
 public:
-  SCF_DECLARE_IBASE;
-
   csFullScreenQuadRenderStep (iObjectRegistry* object_reg);
   virtual ~csFullScreenQuadRenderStep ();
 
@@ -101,7 +101,9 @@ public:
   DrawSettings& GetOtherSettings () { return otherPasses; }
 };
 
-class csFullScreenQuadRSLoader : public csBaseRenderStepLoader
+class csFullScreenQuadRSLoader :
+  public scfImplementationExt0<csFullScreenQuadRSLoader,
+    csBaseRenderStepLoader>
 {
   csStringHash tokens;
 #define CS_TOKEN_ITEM_FILE "plugins/engine/renderloop/stdsteps/fullquad.tok"

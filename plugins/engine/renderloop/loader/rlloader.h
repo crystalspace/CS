@@ -20,7 +20,7 @@
 #ifndef __CS_RLLOADER_H__
 #define __CS_RLLOADER_H__
 
-#include "csutil/scf.h"
+#include "csutil/scf_implementation.h"
 #include "csutil/strhash.h"
 #include "csutil/csstring.h"
 #include "csutil/leakguard.h"
@@ -30,7 +30,8 @@
 
 #include "csplugincommon/renderstep/parserenderstep.h"
 
-class csRenderLoopLoader : public iComponent, public iLoaderPlugin
+class csRenderLoopLoader :
+  public scfImplementation2<csRenderLoopLoader, iComponent, iLoaderPlugin>
 {
 protected:
   iObjectRegistry* object_reg;
@@ -44,8 +45,6 @@ protected:
 
   bool ParseRenderSteps (iRenderLoop* loop, iDocumentNode* node);
 public:
-  SCF_DECLARE_IBASE;
-
   CS_LEAKGUARD_DECLARE (csRenderLoopLoader);
 
   csRenderLoopLoader (iBase *p);
