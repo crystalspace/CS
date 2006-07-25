@@ -457,6 +457,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
       return particleBuffer.particleAuxData+index;
     }
 
+    virtual csParticleBuffer* LockForExternalControl (size_t maxParticles)
+    {
+      return 0;
+    }
+
     //-- iParticleSystemBase
     virtual void SetParticleRenderOrientation (csParticleRenderOrientation o)
     {
