@@ -55,6 +55,16 @@ struct iKDTreeObjectDescriptor : public virtual iBase
 };
 
 /**
+ * The data type for user data to be attached to the KDTree.
+ * It provides no functions but makes it possible to do a direct cast
+ * for performance instead of doing an scfQueryInterface.
+ */
+struct iKDTreeUserData : public virtual iBase
+{
+  SCF_INTERFACE (iKDTreeUserData, 0, 0, 1);
+};
+
+/**
  * A callback function for visiting a KD-tree node. If this function
  * returns true the traversal will continue. Otherwise Front2Back()
  * will stop.
@@ -170,7 +180,7 @@ private:
   csKDTree* child2;             // also be not 0.
   csKDTree* parent;             // 0 if this is the root.
 
-  csRef<iBase> userobject;      // An optional user object for this node.
+  csRef<iKDTreeUserData> userobject; // An optional user object for this node.
 
   csBox3 node_bbox;             // Bbox of the node itself.
 
@@ -279,14 +289,14 @@ public:
   void Clear ();
 
   /// Get the user object attached to this node.
-  inline iBase* GetUserObject () const { return userobject; }
+  inline iKDTreeUserData* GetUserObject () const { return userobject; }
 
   /**
    * Set the user object for this node. Can be 0 to clear
    * it. The old user object will be DecRef'ed and the (optional)
    * new one will be IncRef'ed.
    */
-  void SetUserObject (iBase* userobj);
+  void SetUserObject (iKDTreeUserData* userobj);
 
   /**
    * Add an object to this kd-tree node.

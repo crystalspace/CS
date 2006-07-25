@@ -18,6 +18,7 @@ chronological order.
 	  RTLD_GLOBAL for unix plugin loading again...") since the original
 	  issue was solved in a different way. RTLD_GLOBAL is at least needed
 	  for python as well.
+	- mdmkolbe converted plugins/culling/dynavis/ to the new SCF.
 24-Jul-2006
 	- Jorrit documented the new -cfgfile and -cfgset commandline
 	  options and also added documentation for a few other commonly

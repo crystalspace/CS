@@ -70,27 +70,10 @@ SCF_IMPLEMENT_FACTORY (csDynaVis)
 
 CS_LEAKGUARD_IMPLEMENT (csVisibilityObjectWrapper);
 
-SCF_IMPLEMENT_IBASE (csDynaVis)
-  SCF_IMPLEMENTS_INTERFACE (iVisibilityCuller)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iDebugHelper)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csDynaVis::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csDynaVis::DebugHelper)
-  SCF_IMPLEMENTS_INTERFACE (iDebugHelper)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csDynaVis::eiEventHandler)
-  SCF_IMPLEMENTS_INTERFACE (iEventHandler)
-SCF_IMPLEMENT_IBASE_END
-
 //----------------------------------------------------------------------
 
-class csDynVisObjIt : public iVisibilityObjectIterator
+class csDynVisObjIt :
+  public scfImplementation1<csDynVisObjIt, iVisibilityObjectIterator>
 {
 private:
   csArray<iVisibilityObject*>* vector;
@@ -98,12 +81,10 @@ private:
   bool* vistest_objects_inuse;
 
 public:
-  SCF_DECLARE_IBASE;
-
   csDynVisObjIt (csArray<iVisibilityObject*>* vector,
-  	bool* vistest_objects_inuse)
+    bool* vistest_objects_inuse) :
+    scfImplementationType (this)
   {
-    SCF_CONSTRUCT_IBASE (0);
     csDynVisObjIt::vector = vector;
     csDynVisObjIt::vistest_objects_inuse = vistest_objects_inuse;
     if (vistest_objects_inuse) *vistest_objects_inuse = true;
@@ -116,7 +97,6 @@ public:
     // vector. Otherwise we delete the vector.
     if (vistest_objects_inuse) *vistest_objects_inuse = false;
     else delete vector;
-    SCF_DESTRUCT_IBASE();
   }
 
   virtual iVisibilityObject* Next()
@@ -143,16 +123,7 @@ public:
   }
 };
 
-SCF_IMPLEMENT_IBASE (csDynVisObjIt)
-  SCF_IMPLEMENTS_INTERFACE (iVisibilityObjectIterator)
-SCF_IMPLEMENT_IBASE_END
-
 //----------------------------------------------------------------------
-
-SCF_IMPLEMENT_IBASE (csVisibilityObjectWrapper)
-  SCF_IMPLEMENTS_INTERFACE (iObjectModelListener)
-  SCF_IMPLEMENTS_INTERFACE (iMovableListener)
-SCF_IMPLEMENT_IBASE_END
 
 void csVisibilityObjectWrapper::ObjectModelChanged (iObjectModel* /*model*/)
 {
@@ -227,15 +198,13 @@ int csDynaVis::badoccluder_thresshold = 10;
 int csDynaVis::badoccluder_maxsweepcount = 50;
 
 csDynaVis::csDynaVis (iBase *iParent) :
-	vistest_objects (256, 256),
-	visobj_wrappers (1000),
-	visobj_vector (256, 256),
-	occluder_info (128, 128),
-	update_queue (151, 59)
+  scfImplementationType (this, iParent),
+  vistest_objects (256, 256),
+  visobj_wrappers (1000),
+  visobj_vector (256, 256),
+  occluder_info (128, 128),
+  update_queue (151, 59)
 {
-  SCF_CONSTRUCT_IBASE (iParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiDebugHelper);
   object_reg = 0;
   kdtree = 0;
   tcovbuf = 0;
@@ -254,18 +223,15 @@ csDynaVis::csDynaVis (iBase *iParent) :
   cfg_view_mode = VIEWMODE_STATS;
   do_state_dump = false;
   debug_origin_z = 50;
-
-  scfiEventHandler = new eiEventHandler (this);
 }
 
 csDynaVis::~csDynaVis ()
 {
-  if (scfiEventHandler)
+  if (object_reg)
   {
     csRef<iEventQueue> q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
     if (q)
-      q->RemoveListener (scfiEventHandler);
-    scfiEventHandler->DecRef ();
+      q->RemoveListener (this);
   }
 
   while (visobj_vector.Length () > 0)
@@ -285,9 +251,6 @@ csDynaVis::~csDynaVis ()
   delete tcovbuf;
   delete model_mgr;
   delete write_queue;
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiDebugHelper);
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
-  SCF_DESTRUCT_IBASE();
 }
 
 bool csDynaVis::Initialize (iObjectRegistry *object_reg)
@@ -322,7 +285,7 @@ bool csDynaVis::Initialize (iObjectRegistry *object_reg)
     CanvasResize = csevCanvasResize(object_reg, g2d);
     csRef<iEventQueue> q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
     if (q)
-      q->RegisterListener (scfiEventHandler, CanvasResize);
+      q->RegisterListener (this, CanvasResize);
   }
 
   csConfigAccess config;
@@ -712,7 +675,7 @@ bool csDynaVis::TestNodeVisibility (csKDTree* treenode,
 #     ifdef CS_DEBUG
       if (do_state_dump)
       {
-        csRef<iString> str = tcovbuf->Debug_Dump ();
+        csRef<iString> str = tcovbuf->Dump ();
         csPrintf ("Before node test:\n%s\n", str->GetData ());
       }
 #     endif
@@ -1044,7 +1007,7 @@ void csDynaVis::UpdateCoverageBuffer (csVisibilityObjectWrapper* obj)
 # ifdef CS_DEBUG
   if (do_state_dump)
   {
-    csRef<iString> str = tcovbuf->Debug_Dump ();
+    csRef<iString> str = tcovbuf->Dump ();
     csPrintf ("%s\n", str->GetData ());
   }
 # endif
@@ -1142,7 +1105,7 @@ void csDynaVis::UpdateCoverageBufferOutline (csVisibilityObjectWrapper* obj)
       csPrintf ("  E%d: %d-%d\n", j, vt1, vt2);
     }
 
-    csRef<iString> str = tcovbuf->Debug_Dump ();
+    csRef<iString> str = tcovbuf->Dump ();
     csPrintf ("%s\n", str->GetData ());
   }
 # endif
@@ -1318,7 +1281,7 @@ void csDynaVis::TestSinglePolygonVisibility (csVisibilityObjectWrapper* obj,
 #   ifdef CS_DEBUG
     if (do_state_dump)
     {
-      csRef<iString> str = tcovbuf->Debug_Dump ();
+      csRef<iString> str = tcovbuf->Dump ();
       csPrintf ("Before single-poly test:\n%s\n", str->GetData ());
     }
 #   endif
@@ -1545,7 +1508,7 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
 #   ifdef CS_DEBUG
     if (do_state_dump)
     {
-      csRef<iString> str = tcovbuf->Debug_Dump ();
+      csRef<iString> str = tcovbuf->Dump ();
       csPrintf ("Before obj test:\n%s\n", str->GetData ());
     }
 #   endif
@@ -2695,7 +2658,7 @@ void csDynaVis::CastShadows (iFrustumView* fview)
 
 //======== Debugging =======================================================
 
-csPtr<iString> csDynaVis::Debug_UnitTest ()
+csPtr<iString> csDynaVis::UnitTest ()
 {
   csKDTree* kdtree = new csKDTree ();
   csRef<iDebugHelper> dbghelp (SCF_QUERY_INTERFACE (kdtree, iDebugHelper));
@@ -2726,12 +2689,12 @@ csPtr<iString> csDynaVis::Debug_UnitTest ()
   return 0;
 }
 
-csPtr<iString> csDynaVis::Debug_StateTest ()
+csPtr<iString> csDynaVis::StateTest ()
 {
   return 0;
 }
 
-csPtr<iString> csDynaVis::Debug_Dump ()
+csPtr<iString> csDynaVis::Dump ()
 {
   return 0;
 }
@@ -2748,7 +2711,7 @@ static color reason_colors[] =
   { 255, 128, 196 }
 };
 
-void csDynaVis::Debug_Dump (iGraphics3D* g3d)
+void csDynaVis::Dump (iGraphics3D* g3d)
 {
   if (debug_camera)
   {
@@ -2914,7 +2877,8 @@ void csDynaVis::Debug_Dump (iGraphics3D* g3d)
   }
 }
 
-class DynavisRenderObject : public iBugPlugRenderObject
+class DynavisRenderObject :
+  public scfImplementation1<DynavisRenderObject, iBugPlugRenderObject>
 {
 private:
   csDynaVis* dynavis;
@@ -2943,11 +2907,9 @@ private:
   int box_idx2;
 
 public:
-  SCF_DECLARE_IBASE;
-
-  DynavisRenderObject (csDynaVis* dynavis, iBugPlug* bugplug, int w, int h)
+  DynavisRenderObject (csDynaVis* dynavis, iBugPlug* bugplug, int w, int h) :
+    scfImplementationType (this)
   {
-    SCF_CONSTRUCT_IBASE (0);
     DynavisRenderObject::dynavis = dynavis;
     tcovbuf = new csTiledCoverageBuffer (w, h);
 
@@ -3067,7 +3029,6 @@ public:
   virtual ~DynavisRenderObject ()
   {
     delete tcovbuf;
-    SCF_DESTRUCT_IBASE();
   }
 
   void RenderOutline (const outline& ol, iBugPlug* bugplug)
@@ -3102,15 +3063,11 @@ public:
       int colred = g3d->GetDriver2D ()->FindRGB (255, 0, 0);
       g3d->GetDriver2D ()->DrawBox (5, 5, 10, 10, colred);
     }
-    tcovbuf->Debug_Dump (g3d);
+    tcovbuf->Dump (g3d);
   }
 };
 
-SCF_IMPLEMENT_IBASE (DynavisRenderObject)
-  SCF_IMPLEMENTS_INTERFACE (iBugPlugRenderObject)
-SCF_IMPLEMENT_IBASE_END
-
-bool csDynaVis::Debug_DebugCommand (const char* cmd)
+bool csDynaVis::DebugCommand (const char* cmd)
 {
   if (!strcmp (cmd, "setup_debugsector"))
   {
@@ -3442,7 +3399,7 @@ bool csDynaVis::Debug_DebugCommand (const char* cmd)
   return false;
 }
 
-csTicks csDynaVis::Debug_Benchmark (int num_iterations)
+csTicks csDynaVis::Benchmark (int num_iterations)
 {
   csTicks rc = 0;
 
