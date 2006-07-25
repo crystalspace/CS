@@ -14,6 +14,10 @@ chronological order.
 	    - plugins/engine/renderloop/
 	    - plugins/sequence/
 	- res reworked the "Mesa DRI DXT upload only" support.
+	- res unmerged the changes from r24885:24886 ("res disabled 
+	  RTLD_GLOBAL for unix plugin loading again...") since the original
+	  issue was solved in a different way. RTLD_GLOBAL is at least needed
+	  for python as well.
 24-Jul-2006
 	- Jorrit documented the new -cfgfile and -cfgset commandline
 	  options and also added documentation for a few other commonly

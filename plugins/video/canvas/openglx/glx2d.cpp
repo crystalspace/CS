@@ -33,8 +33,6 @@
 #include "iutil/objreg.h"
 #include "ivaria/reporter.h"
 
-#include <dlfcn.h>
-
 CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_FACTORY (csGraphics2DGLX)
@@ -44,7 +42,7 @@ SCF_IMPLEMENT_FACTORY (csGraphics2DGLX)
 
 // csGraphics2DGLX function
 csGraphics2DGLX::csGraphics2DGLX (iBase *iParent) :
-  scfImplementationType (this, iParent), cmap (0), hardwareaccelerated(false), libGL (0)
+  scfImplementationType (this, iParent), cmap (0), hardwareaccelerated(false)
 {
 }
 
@@ -69,21 +67,6 @@ bool csGraphics2DGLX::Initialize (iObjectRegistry *object_reg)
   dispdriver = 0;
   xvis = 0;
   hardwareaccelerated = false;
-  
-#ifdef LIBGL_NAME
-  /* HACK: Work around issue where DRI drivers fail to load.
-   * If RTLD_GLOBAL is not defined, DRI drivers may not find some symbols
-   * exported from libGL, and hence not load. Previously, RTLD_GLOBAL was
-   * set on plugin loading; however, this has a couple of wacky, undesired
-   * side effects - like symbols, supposed to be from static libraries, 
-   * being imported from other modules, causing side effects like memory
-   * allocation not being from the same module any more.
-   * To avoid using RTLD_GLOBAL for plugins, but nevertheless allow DRI 
-   * drivers to work, we hack around this by manually loading libGL with
-   * RTLD_GLOBAL. This is enough to satisfy the DRI drivers.
-   */
-  libGL = dlopen ("lib" LIBGL_NAME ".so", RTLD_LAZY | RTLD_GLOBAL);
-#endif
 
   if (!csGraphics2DGLCommon::Initialize (object_reg))
     return false;
@@ -149,7 +132,6 @@ csGraphics2DGLX::~csGraphics2DGLX ()
   // Destroy your graphic interface
   XFree ((void*)xvis);
   Close ();
-  if (libGL) dlclose (libGL);
 }
 
 bool csGraphics2DGLX::Open()
