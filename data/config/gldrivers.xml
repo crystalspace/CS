@@ -483,6 +483,11 @@
     </rule>
 
  
+    <!--
+      * 2006-06-05: ATI Radeon 9700Pro, Win32, OpenGL 2.0.5885 (Cat 6.5)
+		    Apparently NPOTS textures via glTexture2D don't get 
+		    garbled anymore.
+      -->
     <rule description="ATI: Enable hidden 2D texture NPOTS support">
       <conditions>
 	<regexp string="vendor" pattern="^ATI" />
