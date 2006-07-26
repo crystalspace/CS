@@ -19,6 +19,9 @@ chronological order.
 	  issue was solved in a different way. RTLD_GLOBAL is at least needed
 	  for python as well.
 	- mdmkolbe converted plugins/culling/dynavis/ to the new SCF.
+	- David Bronke added a patch from contingencyplan (Brian DeVries) which
+	  adds a copy constructor and an assignment operator to csVariant, which
+	  allows it to be used in a csHash, among other things.
 24-Jul-2006
 	- Jorrit documented the new -cfgfile and -cfgset commandline
 	  options and also added documentation for a few other commonly
