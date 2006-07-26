@@ -1,0 +1,8 @@
+SubDir TOP libs csplugincommon cdd ;
+
+Description cdd : "Double-description of polyhedrons library" ;
+Library cdd : 
+[ Wildcard *.c *.h ] 
+[ Wildcard [ ConcatDirs $(DOTDOT) $(DOTDOT) $(DOTDOT) include
+             csplugincommon cdd ] : *.h ]
+: shared ;
