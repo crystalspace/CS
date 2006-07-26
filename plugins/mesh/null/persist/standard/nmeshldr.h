@@ -25,6 +25,7 @@
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "csutil/strhash.h"
+#include "csutil/scf_implementation.h"
 
 struct iEngine;
 struct iReporter;
@@ -36,7 +37,8 @@ struct iNullFactoryState;
 /**
  * Null Mesh factory loader.
  */
-class csNullFactoryLoader : public iLoaderPlugin
+class csNullFactoryLoader :
+  public scfImplementation2<csNullFactoryLoader, iLoaderPlugin, iComponent>
 {
 private:
   iObjectRegistry* object_reg;
@@ -45,8 +47,6 @@ private:
   csStringHash xmltokens;
 
 public:
-  SCF_DECLARE_IBASE;
-
   /// Constructor.
   csNullFactoryLoader (iBase*);
 
@@ -61,19 +61,13 @@ public:
     iStreamSource*, iLoaderContext* ldr_context, iBase* context);
 
   bool ParseRenderBuffer(iDocumentNode *node, iNullFactoryState* state);
-
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csNullFactoryLoader);
-    virtual bool Initialize (iObjectRegistry* p)
-    { return scfParent->Initialize(p); }
-  } scfiComponent;
 };
 
 /**
  * Null Mesh factory saver.
  */
-class csNullFactorySaver : public iSaverPlugin
+class csNullFactorySaver :
+  public scfImplementation2<csNullFactorySaver, iSaverPlugin, iComponent>
 {
 private:
   iObjectRegistry* object_reg;
@@ -81,8 +75,6 @@ private:
   csRef<iSyntaxService> synldr;
 
 public:
-  SCF_DECLARE_IBASE;
-
   /// Constructor.
   csNullFactorySaver (iBase*);
 
@@ -95,19 +87,13 @@ public:
   /// Write down given object and add to iDocumentNode.
   virtual bool WriteDown (iBase *obj, iDocumentNode* parent,
   	iStreamSource*);
-
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csNullFactorySaver);
-    virtual bool Initialize (iObjectRegistry* p)
-    { return scfParent->Initialize(p); }
-  } scfiComponent;
 };
 
 /**
  * Null Mesh loader.
  */
-class csNullMeshLoader : public iLoaderPlugin
+class csNullMeshLoader :
+  public scfImplementation2<csNullMeshLoader, iLoaderPlugin, iComponent>
 {
 private:
   iObjectRegistry* object_reg;
@@ -116,8 +102,6 @@ private:
   csStringHash xmltokens;
 
 public:
-  SCF_DECLARE_IBASE;
-
   /// Constructor.
   csNullMeshLoader (iBase*);
 
@@ -130,19 +114,13 @@ public:
   /// Parse a given node and return a new object for it.
   virtual csPtr<iBase> Parse (iDocumentNode* node,
     iStreamSource*, iLoaderContext* ldr_context, iBase* context);
-
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csNullMeshLoader);
-    virtual bool Initialize (iObjectRegistry* p)
-    { return scfParent->Initialize(p); }
-  } scfiComponent;
 };
 
 /**
  * Null Mesh saver.
  */
-class csNullMeshSaver : public iSaverPlugin
+class csNullMeshSaver :
+  public scfImplementation2<csNullMeshSaver, iSaverPlugin, iComponent>
 {
 private:
   iObjectRegistry* object_reg;
@@ -150,8 +128,6 @@ private:
   csRef<iSyntaxService> synldr;
 
 public:
-  SCF_DECLARE_IBASE;
-
   /// Constructor.
   csNullMeshSaver (iBase*);
 
@@ -164,13 +140,6 @@ public:
   /// Write down given object and add to iDocumentNode.
   virtual bool WriteDown (iBase *obj, iDocumentNode* parent,
   	iStreamSource*);
-
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csNullMeshSaver);
-    virtual bool Initialize (iObjectRegistry* p)
-    { return scfParent->Initialize(p); }
-  } scfiComponent;
 };
 
 #endif // __CS_NULLMESHLDR_H__

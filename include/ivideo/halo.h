@@ -27,11 +27,9 @@
  * \addtogroup gfx3d
  * @{ */
  
-#include "csutil/scf.h"
+#include "csutil/scf_interface.h"
 
 class csVector2;
-
-SCF_VERSION (iHalo, 0, 0, 1);
 
 /**
  * iHalo: used to render halos (aka "light globes").
@@ -40,8 +38,10 @@ SCF_VERSION (iHalo, 0, 0, 1);
  * single-colored rectangle with more or less transparent portions
  * (depends on alpha map).
  */
-struct iHalo : public iBase
+struct iHalo : public virtual iBase
 {
+  SCF_INTERFACE (iHalo, 2, 0, 0);
+
   /// Query halo width
   virtual int GetWidth () = 0;
 
