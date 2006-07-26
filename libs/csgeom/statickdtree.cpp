@@ -17,6 +17,7 @@
 */
 
 #include "cssysdef.h"
+#include "csutil/array.h"
 #include "csgeom/statickdtree.h"
 
 uint32 csStaticKDTree::globalTimestamp = 0;

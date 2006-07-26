@@ -6,4 +6,4 @@ Library crystalspace_pvsdata :
 [ Wildcard [ ConcatDirs $(DOTDOT) $(DOTDOT) $(DOTDOT) include
              csplugincommon pvsdata ] : *.h ]
 : shared ;
-LibDepends crystalspace_pvsdata : crystalspace ;
+LibDepends crystalspace_pvsdata : crystalspace cdd ;
