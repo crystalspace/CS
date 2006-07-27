@@ -46,7 +46,9 @@ enum csPixelShaderInstrFlags
    * the source register components that were masked out can be disregarded as
    * they won't contribute to the result.
    */
-  CS_PS_DEST_COMP_DEPENDS_SOURCE = 16
+  CS_PS_DEST_COMP_DEPENDS_SOURCE = 16,
+  /// Instruction currently not supported
+  CS_PS_UNSUPPORTED = 32
 };
 
 #define CS_PS_MASKFLAGS     (~CS_PS_MASKVERSIONS)
