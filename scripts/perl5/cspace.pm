@@ -239,7 +239,7 @@ sub ACQUIRE {
 ############# Class : cspace::csArrayThresholdVariableCapacityLinear ##############
 
 package cspace::csArrayThresholdVariableCapacityLinear;
-@ISA = qw( cspace::csArrayThresholdVariable cspace );
+@ISA = qw( cspace cspace::csArrayThresholdVariable );
 %OWNER = ();
 %ITERATORS = ();
 sub new {
@@ -277,7 +277,7 @@ sub ACQUIRE {
 ############# Class : cspace::csArrayCapacityDefault ##############
 
 package cspace::csArrayCapacityDefault;
-@ISA = qw( cspace::csArrayThresholdVariableCapacityLinear cspace );
+@ISA = qw( cspace cspace::csArrayThresholdVariableCapacityLinear );
 %OWNER = ();
 %ITERATORS = ();
 sub new {
@@ -350,7 +350,7 @@ sub ACQUIRE {
 ############# Class : cspace::iSCF ##############
 
 package cspace::iSCF;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *SCF = *cspacec::iSCF_SCF;
@@ -398,7 +398,7 @@ sub ACQUIRE {
 ############# Class : cspace::iFactory ##############
 
 package cspace::iFactory;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *CreateInstance = *cspacec::iFactory_CreateInstance;
@@ -435,7 +435,7 @@ sub ACQUIRE {
 ############# Class : cspace::iDebugHelper ##############
 
 package cspace::iDebugHelper;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *GetSupportedTests = *cspacec::iDebugHelper_GetSupportedTests;
@@ -472,7 +472,7 @@ sub ACQUIRE {
 ############# Class : cspace::iCommandLineParser ##############
 
 package cspace::iCommandLineParser;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *Initialize = *cspacec::iCommandLineParser_Initialize;
@@ -572,7 +572,7 @@ sub ACQUIRE {
 ############# Class : cspace::csColor4 ##############
 
 package cspace::csColor4;
-@ISA = qw( cspace::csColor cspace );
+@ISA = qw( cspace cspace::csColor );
 %OWNER = ();
 %ITERATORS = ();
 *swig_alpha_get = *cspacec::csColor4_alpha_get;
@@ -744,7 +744,7 @@ sub ACQUIRE {
 ############# Class : cspace::iString ##############
 
 package cspace::iString;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *GetData = *cspacec::iString_GetData;
@@ -1127,7 +1127,7 @@ sub ACQUIRE {
 ############# Class : cspace::csXRotMatrix3 ##############
 
 package cspace::csXRotMatrix3;
-@ISA = qw( cspace::csMatrix3 cspace );
+@ISA = qw( cspace cspace::csMatrix3 );
 %OWNER = ();
 %ITERATORS = ();
 sub new {
@@ -1163,7 +1163,7 @@ sub ACQUIRE {
 ############# Class : cspace::csYRotMatrix3 ##############
 
 package cspace::csYRotMatrix3;
-@ISA = qw( cspace::csMatrix3 cspace );
+@ISA = qw( cspace cspace::csMatrix3 );
 %OWNER = ();
 %ITERATORS = ();
 sub new {
@@ -1199,7 +1199,7 @@ sub ACQUIRE {
 ############# Class : cspace::csZRotMatrix3 ##############
 
 package cspace::csZRotMatrix3;
-@ISA = qw( cspace::csMatrix3 cspace );
+@ISA = qw( cspace cspace::csMatrix3 );
 %OWNER = ();
 %ITERATORS = ();
 sub new {
@@ -1235,7 +1235,7 @@ sub ACQUIRE {
 ############# Class : cspace::csXScaleMatrix3 ##############
 
 package cspace::csXScaleMatrix3;
-@ISA = qw( cspace::csMatrix3 cspace );
+@ISA = qw( cspace cspace::csMatrix3 );
 %OWNER = ();
 %ITERATORS = ();
 sub new {
@@ -1271,7 +1271,7 @@ sub ACQUIRE {
 ############# Class : cspace::csYScaleMatrix3 ##############
 
 package cspace::csYScaleMatrix3;
-@ISA = qw( cspace::csMatrix3 cspace );
+@ISA = qw( cspace cspace::csMatrix3 );
 %OWNER = ();
 %ITERATORS = ();
 sub new {
@@ -1307,7 +1307,7 @@ sub ACQUIRE {
 ############# Class : cspace::csZScaleMatrix3 ##############
 
 package cspace::csZScaleMatrix3;
-@ISA = qw( cspace::csMatrix3 cspace );
+@ISA = qw( cspace cspace::csMatrix3 );
 %OWNER = ();
 %ITERATORS = ();
 sub new {
@@ -1395,7 +1395,7 @@ sub ACQUIRE {
 ############# Class : cspace::csReversibleTransform ##############
 
 package cspace::csReversibleTransform;
-@ISA = qw( cspace::csTransform cspace );
+@ISA = qw( cspace cspace::csTransform );
 %OWNER = ();
 %ITERATORS = ();
 sub new {
@@ -1445,7 +1445,7 @@ sub ACQUIRE {
 ############# Class : cspace::csOrthoTransform ##############
 
 package cspace::csOrthoTransform;
-@ISA = qw( cspace::csReversibleTransform cspace );
+@ISA = qw( cspace cspace::csReversibleTransform );
 %OWNER = ();
 %ITERATORS = ();
 sub new {
@@ -2162,7 +2162,7 @@ sub ACQUIRE {
 ############# Class : cspace::csVector3Array ##############
 
 package cspace::csVector3Array;
-@ISA = qw( cspace::csPoly3D cspace );
+@ISA = qw( cspace cspace::csPoly3D );
 %OWNER = ();
 %ITERATORS = ();
 sub new {
@@ -2467,7 +2467,7 @@ sub ACQUIRE {
 ############# Class : cspace::csCubicSpline ##############
 
 package cspace::csCubicSpline;
-@ISA = qw( cspace::csSpline cspace );
+@ISA = qw( cspace cspace::csSpline );
 %OWNER = ();
 %ITERATORS = ();
 sub new {
@@ -2505,7 +2505,7 @@ sub ACQUIRE {
 ############# Class : cspace::csBSpline ##############
 
 package cspace::csBSpline;
-@ISA = qw( cspace::csSpline cspace );
+@ISA = qw( cspace cspace::csSpline );
 %OWNER = ();
 %ITERATORS = ();
 sub new {
@@ -2543,7 +2543,7 @@ sub ACQUIRE {
 ############# Class : cspace::csCatmullRomSpline ##############
 
 package cspace::csCatmullRomSpline;
-@ISA = qw( cspace::csBSpline cspace );
+@ISA = qw( cspace cspace::csBSpline );
 %OWNER = ();
 %ITERATORS = ();
 sub new {
@@ -2935,7 +2935,7 @@ sub ACQUIRE {
 ############# Class : cspace::iShaderVariableAccessor ##############
 
 package cspace::iShaderVariableAccessor;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *PreGetValue = *cspacec::iShaderVariableAccessor_PreGetValue;
@@ -2966,7 +2966,7 @@ sub ACQUIRE {
 ############# Class : cspace::csShaderVariable ##############
 
 package cspace::csShaderVariable;
-@ISA = qw( cspace::csRefCount cspace );
+@ISA = qw( cspace cspace::csRefCount );
 %OWNER = ();
 %ITERATORS = ();
 *UNKNOWN = *cspacec::csShaderVariable_UNKNOWN;
@@ -3028,7 +3028,7 @@ sub ACQUIRE {
 ############# Class : cspace::csShaderVariableArrayReadOnly ##############
 
 package cspace::csShaderVariableArrayReadOnly;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *GetSize = *cspacec::csShaderVariableArrayReadOnly_GetSize;
@@ -3065,7 +3065,7 @@ sub ACQUIRE {
 ############# Class : cspace::csShaderVariableArrayChangeElements ##############
 
 package cspace::csShaderVariableArrayChangeElements;
-@ISA = qw( cspace::csShaderVariableArrayReadOnly cspace );
+@ISA = qw( cspace cspace::csShaderVariableArrayReadOnly );
 %OWNER = ();
 %ITERATORS = ();
 *Get = *cspacec::csShaderVariableArrayChangeElements_Get;
@@ -3097,7 +3097,7 @@ sub ACQUIRE {
 ############# Class : cspace::csShaderVariableArray ##############
 
 package cspace::csShaderVariableArray;
-@ISA = qw( cspace::csShaderVariableArrayChangeElements cspace );
+@ISA = qw( cspace cspace::csShaderVariableArrayChangeElements );
 %OWNER = ();
 %ITERATORS = ();
 *SetSize = *cspacec::csShaderVariableArray_SetSize;
@@ -3293,7 +3293,7 @@ sub ACQUIRE {
 ############# Class : cspace::iAwsKey ##############
 
 package cspace::iAwsKey;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *Type = *cspacec::iAwsKey_Type;
@@ -3326,7 +3326,7 @@ sub ACQUIRE {
 ############# Class : cspace::iAwsIntKey ##############
 
 package cspace::iAwsIntKey;
-@ISA = qw( cspace::iAwsKey cspace );
+@ISA = qw( cspace cspace::iAwsKey );
 %OWNER = ();
 %ITERATORS = ();
 *Value = *cspacec::iAwsIntKey_Value;
@@ -3357,7 +3357,7 @@ sub ACQUIRE {
 ############# Class : cspace::iAwsFloatKey ##############
 
 package cspace::iAwsFloatKey;
-@ISA = qw( cspace::iAwsKey cspace );
+@ISA = qw( cspace cspace::iAwsKey );
 %OWNER = ();
 %ITERATORS = ();
 *Value = *cspacec::iAwsFloatKey_Value;
@@ -3388,7 +3388,7 @@ sub ACQUIRE {
 ############# Class : cspace::iAwsStringKey ##############
 
 package cspace::iAwsStringKey;
-@ISA = qw( cspace::iAwsKey cspace );
+@ISA = qw( cspace cspace::iAwsKey );
 %OWNER = ();
 %ITERATORS = ();
 *Value = *cspacec::iAwsStringKey_Value;
@@ -3419,7 +3419,7 @@ sub ACQUIRE {
 ############# Class : cspace::iAwsRectKey ##############
 
 package cspace::iAwsRectKey;
-@ISA = qw( cspace::iAwsKey cspace );
+@ISA = qw( cspace cspace::iAwsKey );
 %OWNER = ();
 %ITERATORS = ();
 *Value = *cspacec::iAwsRectKey_Value;
@@ -3450,7 +3450,7 @@ sub ACQUIRE {
 ############# Class : cspace::iAwsRGBKey ##############
 
 package cspace::iAwsRGBKey;
-@ISA = qw( cspace::iAwsKey cspace );
+@ISA = qw( cspace cspace::iAwsKey );
 %OWNER = ();
 %ITERATORS = ();
 *Value = *cspacec::iAwsRGBKey_Value;
@@ -3481,7 +3481,7 @@ sub ACQUIRE {
 ############# Class : cspace::iAwsPointKey ##############
 
 package cspace::iAwsPointKey;
-@ISA = qw( cspace::iAwsKey cspace );
+@ISA = qw( cspace cspace::iAwsKey );
 %OWNER = ();
 %ITERATORS = ();
 *Value = *cspacec::iAwsPointKey_Value;
@@ -3512,7 +3512,7 @@ sub ACQUIRE {
 ############# Class : cspace::iAwsConnectionKey ##############
 
 package cspace::iAwsConnectionKey;
-@ISA = qw( cspace::iAwsKey cspace );
+@ISA = qw( cspace cspace::iAwsKey );
 %OWNER = ();
 %ITERATORS = ();
 *Sink = *cspacec::iAwsConnectionKey_Sink;
@@ -3545,7 +3545,7 @@ sub ACQUIRE {
 ############# Class : cspace::iAwsKeyContainer ##############
 
 package cspace::iAwsKeyContainer;
-@ISA = qw( cspace::iAwsKey cspace );
+@ISA = qw( cspace cspace::iAwsKey );
 %OWNER = ();
 %ITERATORS = ();
 *Find = *cspacec::iAwsKeyContainer_Find;
@@ -3583,7 +3583,7 @@ sub ACQUIRE {
 ############# Class : cspace::iAwsComponentNode ##############
 
 package cspace::iAwsComponentNode;
-@ISA = qw( cspace::iAwsKeyContainer cspace );
+@ISA = qw( cspace cspace::iAwsKeyContainer );
 %OWNER = ();
 %ITERATORS = ();
 *ComponentTypeName = *cspacec::iAwsComponentNode_ComponentTypeName;
@@ -3614,7 +3614,7 @@ sub ACQUIRE {
 ############# Class : cspace::iAws ##############
 
 package cspace::iAws;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *GetPrefMgr = *cspacec::iAws_GetPrefMgr;
@@ -3714,7 +3714,7 @@ sub ACQUIRE {
 ############# Class : cspace::iAwsPrefManager ##############
 
 package cspace::iAwsPrefManager;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *Setup = *cspacec::iAwsPrefManager_Setup;
@@ -3782,7 +3782,7 @@ sub ACQUIRE {
 ############# Class : cspace::iAwsSinkManager ##############
 
 package cspace::iAwsSinkManager;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *Setup = *cspacec::iAwsSinkManager_Setup;
@@ -3818,7 +3818,7 @@ sub ACQUIRE {
 ############# Class : cspace::iAwsSink ##############
 
 package cspace::iAwsSink;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *GetTriggerID = *cspacec::iAwsSink_GetTriggerID;
@@ -3852,7 +3852,7 @@ sub ACQUIRE {
 ############# Class : cspace::iAwsSource ##############
 
 package cspace::iAwsSource;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *WindowManager = *cspacec::iAwsSource_WindowManager;
@@ -3887,7 +3887,7 @@ sub ACQUIRE {
 ############# Class : cspace::iAwsSlot ##############
 
 package cspace::iAwsSlot;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *Connect = *cspacec::iAwsSlot_Connect;
@@ -3920,7 +3920,7 @@ sub ACQUIRE {
 ############# Class : cspace::iAwsLayoutManager ##############
 
 package cspace::iAwsLayoutManager;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *SetOwner = *cspacec::iAwsLayoutManager_SetOwner;
@@ -3954,7 +3954,7 @@ sub ACQUIRE {
 ############# Class : cspace::iAwsComponent ##############
 
 package cspace::iAwsComponent;
-@ISA = qw( cspace::iAwsSource cspace );
+@ISA = qw( cspace cspace::iAwsSource );
 %OWNER = ();
 %ITERATORS = ();
 *Create = *cspacec::iAwsComponent_Create;
@@ -4079,7 +4079,7 @@ sub ACQUIRE {
 ############# Class : cspace::iAwsComponentFactory ##############
 
 package cspace::iAwsComponentFactory;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *Create = *cspacec::iAwsComponentFactory_Create;
@@ -4112,7 +4112,7 @@ sub ACQUIRE {
 ############# Class : cspace::iAwsKeyFactory ##############
 
 package cspace::iAwsKeyFactory;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *Initialize = *cspacec::iAwsKeyFactory_Initialize;
@@ -4153,7 +4153,7 @@ sub ACQUIRE {
 ############# Class : cspace::iAwsConnectionNodeFactory ##############
 
 package cspace::iAwsConnectionNodeFactory;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *Initialize = *cspacec::iAwsConnectionNodeFactory_Initialize;
@@ -4228,7 +4228,7 @@ sub ACQUIRE {
 ############# Class : cspace::iClipper2D ##############
 
 package cspace::iClipper2D;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *Clip = *cspacec::iClipper2D_Clip;
@@ -4267,7 +4267,7 @@ sub ACQUIRE {
 ############# Class : cspace::iObjectModelListener ##############
 
 package cspace::iObjectModelListener;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *ObjectModelChanged = *cspacec::iObjectModelListener_ObjectModelChanged;
@@ -4299,7 +4299,7 @@ sub ACQUIRE {
 ############# Class : cspace::iObjectModel ##############
 
 package cspace::iObjectModel;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *GetShapeNumber = *cspacec::iObjectModel_GetShapeNumber;
@@ -4345,7 +4345,7 @@ sub ACQUIRE {
 ############# Class : cspace::iPath ##############
 
 package cspace::iPath;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *Length = *cspacec::iPath_Length;
@@ -4393,7 +4393,7 @@ sub ACQUIRE {
 ############# Class : cspace::scfPath ##############
 
 package cspace::scfPath;
-@ISA = qw( cspace::iPath cspace );
+@ISA = qw( cspace cspace::iPath );
 %OWNER = ();
 *IncRef = *cspacec::scfPath_IncRef;
 *DecRef = *cspacec::scfPath_DecRef;
@@ -4457,7 +4457,7 @@ sub ACQUIRE {
 ############# Class : cspace::iPolygonMesh ##############
 
 package cspace::iPolygonMesh;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *GetVertexCount = *cspacec::iPolygonMesh_GetVertexCount;
@@ -4498,7 +4498,7 @@ sub ACQUIRE {
 ############# Class : cspace::csPath ##############
 
 package cspace::csPath;
-@ISA = qw( cspace::scfPath cspace );
+@ISA = qw( cspace cspace::scfPath );
 %OWNER = ();
 %ITERATORS = ();
 sub new {
@@ -4664,7 +4664,7 @@ sub ACQUIRE {
 ############# Class : cspace::iFrustumViewUserdata ##############
 
 package cspace::iFrustumViewUserdata;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 sub DESTROY {
@@ -4741,7 +4741,7 @@ sub ACQUIRE {
 ############# Class : cspace::iFrustumView ##############
 
 package cspace::iFrustumView;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *GetFrustumContext = *cspacec::iFrustumView_GetFrustumContext;
@@ -4786,7 +4786,7 @@ sub ACQUIRE {
 ############# Class : cspace::iLightCallback ##############
 
 package cspace::iLightCallback;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *OnColorChange = *cspacec::iLightCallback_OnColorChange;
@@ -4822,7 +4822,7 @@ sub ACQUIRE {
 ############# Class : cspace::iLight ##############
 
 package cspace::iLight;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *GetLightID = *cspacec::iLight_GetLightID;
@@ -4893,7 +4893,7 @@ sub ACQUIRE {
 ############# Class : cspace::iLightList ##############
 
 package cspace::iLightList;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *GetCount = *cspacec::iLightList_GetCount;
@@ -4932,7 +4932,7 @@ sub ACQUIRE {
 ############# Class : cspace::iLightingProcessData ##############
 
 package cspace::iLightingProcessData;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *FinalizeLighting = *cspacec::iLightingProcessData_FinalizeLighting;
@@ -4963,7 +4963,7 @@ sub ACQUIRE {
 ############# Class : cspace::iLightingProcessInfo ##############
 
 package cspace::iLightingProcessInfo;
-@ISA = qw( cspace::iFrustumViewUserdata cspace );
+@ISA = qw( cspace cspace::iFrustumViewUserdata );
 %OWNER = ();
 %ITERATORS = ();
 *GetLight = *cspacec::iLightingProcessInfo_GetLight;
@@ -5000,7 +5000,7 @@ sub ACQUIRE {
 ############# Class : cspace::iLightIterator ##############
 
 package cspace::iLightIterator;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *HasNext = *cspacec::iLightIterator_HasNext;
@@ -5086,7 +5086,7 @@ sub ACQUIRE {
 ############# Class : cspace::iSectorCallback ##############
 
 package cspace::iSectorCallback;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *Traverse = *cspacec::iSectorCallback_Traverse;
@@ -5117,7 +5117,7 @@ sub ACQUIRE {
 ############# Class : cspace::iSectorMeshCallback ##############
 
 package cspace::iSectorMeshCallback;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *NewMesh = *cspacec::iSectorMeshCallback_NewMesh;
@@ -5149,7 +5149,7 @@ sub ACQUIRE {
 ############# Class : cspace::iLightVisibleCallback ##############
 
 package cspace::iLightVisibleCallback;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *LightVisible = *cspacec::iLightVisibleCallback_LightVisible;
@@ -5224,7 +5224,7 @@ sub ACQUIRE {
 ############# Class : cspace::iSector ##############
 
 package cspace::iSector;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *QueryObject = *cspacec::iSector_QueryObject;
@@ -5299,7 +5299,7 @@ sub ACQUIRE {
 ############# Class : cspace::iSectorList ##############
 
 package cspace::iSectorList;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *GetCount = *cspacec::iSectorList_GetCount;
@@ -5337,7 +5337,7 @@ sub ACQUIRE {
 ############# Class : cspace::iSectorIterator ##############
 
 package cspace::iSectorIterator;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *HasNext = *cspacec::iSectorIterator_HasNext;
@@ -5371,7 +5371,7 @@ sub ACQUIRE {
 ############# Class : cspace::iEngineFrameCallback ##############
 
 package cspace::iEngineFrameCallback;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *StartFrame = *cspacec::iEngineFrameCallback_StartFrame;
@@ -5402,7 +5402,7 @@ sub ACQUIRE {
 ############# Class : cspace::iEngineSectorCallback ##############
 
 package cspace::iEngineSectorCallback;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *NewSector = *cspacec::iEngineSectorCallback_NewSector;
@@ -5434,7 +5434,7 @@ sub ACQUIRE {
 ############# Class : cspace::iEngine ##############
 
 package cspace::iEngine;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *QueryObject = *cspacec::iEngine_QueryObject;
@@ -5567,7 +5567,7 @@ sub ACQUIRE {
 ############# Class : cspace::iCameraSectorListener ##############
 
 package cspace::iCameraSectorListener;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *NewSector = *cspacec::iCameraSectorListener_NewSector;
@@ -5598,7 +5598,7 @@ sub ACQUIRE {
 ############# Class : cspace::iCamera ##############
 
 package cspace::iCamera;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *Clone = *cspacec::iCamera_Clone;
@@ -5659,7 +5659,7 @@ sub ACQUIRE {
 ############# Class : cspace::iCameraPosition ##############
 
 package cspace::iCameraPosition;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *QueryObject = *cspacec::iCameraPosition_QueryObject;
@@ -5705,7 +5705,7 @@ sub ACQUIRE {
 ############# Class : cspace::iCameraPositionList ##############
 
 package cspace::iCameraPositionList;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *NewCameraPosition = *cspacec::iCameraPositionList_NewCameraPosition;
@@ -5743,7 +5743,7 @@ sub ACQUIRE {
 ############# Class : cspace::iTextureCallback ##############
 
 package cspace::iTextureCallback;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *UseTexture = *cspacec::iTextureCallback_UseTexture;
@@ -5774,7 +5774,7 @@ sub ACQUIRE {
 ############# Class : cspace::iTextureWrapper ##############
 
 package cspace::iTextureWrapper;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *QueryObject = *cspacec::iTextureWrapper_QueryObject;
@@ -5824,7 +5824,7 @@ sub ACQUIRE {
 ############# Class : cspace::iTextureList ##############
 
 package cspace::iTextureList;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *NewTexture = *cspacec::iTextureList_NewTexture;
@@ -5863,7 +5863,7 @@ sub ACQUIRE {
 ############# Class : cspace::iMaterialWrapper ##############
 
 package cspace::iMaterialWrapper;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *QueryObject = *cspacec::iMaterialWrapper_QueryObject;
@@ -5899,7 +5899,7 @@ sub ACQUIRE {
 ############# Class : cspace::iMaterialEngine ##############
 
 package cspace::iMaterialEngine;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *GetTextureWrapper = *cspacec::iMaterialEngine_GetTextureWrapper;
@@ -5932,7 +5932,7 @@ sub ACQUIRE {
 ############# Class : cspace::iMaterialList ##############
 
 package cspace::iMaterialList;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *NewMaterial = *cspacec::iMaterialList_NewMaterial;
@@ -5970,7 +5970,7 @@ sub ACQUIRE {
 ############# Class : cspace::iSceneNode ##############
 
 package cspace::iSceneNode;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *GetMovable = *cspacec::iSceneNode_GetMovable;
@@ -6008,7 +6008,7 @@ sub ACQUIRE {
 ############# Class : cspace::iMeshDrawCallback ##############
 
 package cspace::iMeshDrawCallback;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *BeforeDrawing = *cspacec::iMeshDrawCallback_BeforeDrawing;
@@ -6129,7 +6129,7 @@ sub ACQUIRE {
 ############# Class : cspace::iMeshWrapper ##############
 
 package cspace::iMeshWrapper;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *QueryObject = *cspacec::iMeshWrapper_QueryObject;
@@ -6210,7 +6210,7 @@ sub ACQUIRE {
 ############# Class : cspace::iMeshFactoryWrapper ##############
 
 package cspace::iMeshFactoryWrapper;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *QueryObject = *cspacec::iMeshFactoryWrapper_QueryObject;
@@ -6265,7 +6265,7 @@ sub ACQUIRE {
 ############# Class : cspace::iMeshList ##############
 
 package cspace::iMeshList;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *GetCount = *cspacec::iMeshList_GetCount;
@@ -6302,7 +6302,7 @@ sub ACQUIRE {
 ############# Class : cspace::iMeshFactoryList ##############
 
 package cspace::iMeshFactoryList;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *GetCount = *cspacec::iMeshFactoryList_GetCount;
@@ -6339,7 +6339,7 @@ sub ACQUIRE {
 ############# Class : cspace::iMeshWrapperIterator ##############
 
 package cspace::iMeshWrapperIterator;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *Next = *cspacec::iMeshWrapperIterator_Next;
@@ -6373,7 +6373,7 @@ sub ACQUIRE {
 ############# Class : cspace::iMovableListener ##############
 
 package cspace::iMovableListener;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *MovableChanged = *cspacec::iMovableListener_MovableChanged;
@@ -6406,7 +6406,7 @@ sub ACQUIRE {
 ############# Class : cspace::iMovable ##############
 
 package cspace::iMovable;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *GetSceneNode = *cspacec::iMovable_GetSceneNode;
@@ -6457,7 +6457,7 @@ sub ACQUIRE {
 ############# Class : cspace::iRegion ##############
 
 package cspace::iRegion;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *QueryObject = *cspacec::iRegion_QueryObject;
@@ -6503,7 +6503,7 @@ sub ACQUIRE {
 ############# Class : cspace::iRegionList ##############
 
 package cspace::iRegionList;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *GetCount = *cspacec::iRegionList_GetCount;
@@ -6540,7 +6540,7 @@ sub ACQUIRE {
 ############# Class : cspace::iVisibilityObjectIterator ##############
 
 package cspace::iVisibilityObjectIterator;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *HasNext = *cspacec::iVisibilityObjectIterator_HasNext;
@@ -6573,7 +6573,7 @@ sub ACQUIRE {
 ############# Class : cspace::iVisibilityCullerListener ##############
 
 package cspace::iVisibilityCullerListener;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *ObjectVisible = *cspacec::iVisibilityCullerListener_ObjectVisible;
@@ -6604,7 +6604,7 @@ sub ACQUIRE {
 ############# Class : cspace::iVisibilityCuller ##############
 
 package cspace::iVisibilityCuller;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *Setup = *cspacec::iVisibilityCuller_Setup;
@@ -6644,7 +6644,7 @@ sub ACQUIRE {
 ############# Class : cspace::iVisibilityObject ##############
 
 package cspace::iVisibilityObject;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *GetMovable = *cspacec::iVisibilityObject_GetMovable;
@@ -6678,7 +6678,7 @@ sub ACQUIRE {
 ############# Class : cspace::iPortalCallback ##############
 
 package cspace::iPortalCallback;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *Traverse = *cspacec::iPortalCallback_Traverse;
@@ -6709,7 +6709,7 @@ sub ACQUIRE {
 ############# Class : cspace::iPortal ##############
 
 package cspace::iPortal;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *SetName = *cspacec::iPortal_SetName;
@@ -6777,7 +6777,7 @@ sub ACQUIRE {
 ############# Class : cspace::iPortalContainer ##############
 
 package cspace::iPortalContainer;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *GetPortalCount = *cspacec::iPortalContainer_GetPortalCount;
@@ -6813,7 +6813,7 @@ sub ACQUIRE {
 ############# Class : cspace::iGeneralMeshCommonState ##############
 
 package cspace::iGeneralMeshCommonState;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *SetLighting = *cspacec::iGeneralMeshCommonState_SetLighting;
@@ -6858,7 +6858,7 @@ sub ACQUIRE {
 ############# Class : cspace::iGeneralMeshState ##############
 
 package cspace::iGeneralMeshState;
-@ISA = qw( cspace::iGeneralMeshCommonState cspace );
+@ISA = qw( cspace cspace::iGeneralMeshCommonState );
 %OWNER = ();
 %ITERATORS = ();
 *SetAnimationControl = *cspacec::iGeneralMeshState_SetAnimationControl;
@@ -6891,7 +6891,7 @@ sub ACQUIRE {
 ############# Class : cspace::iGeneralFactoryState ##############
 
 package cspace::iGeneralFactoryState;
-@ISA = qw( cspace::iGeneralMeshCommonState cspace );
+@ISA = qw( cspace cspace::iGeneralMeshCommonState );
 %OWNER = ();
 %ITERATORS = ();
 *SetColor = *cspacec::iGeneralFactoryState_SetColor;
@@ -6945,7 +6945,7 @@ sub ACQUIRE {
 ############# Class : cspace::iGenMeshAnimationControl ##############
 
 package cspace::iGenMeshAnimationControl;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *AnimatesVertices = *cspacec::iGenMeshAnimationControl_AnimatesVertices;
@@ -6983,7 +6983,7 @@ sub ACQUIRE {
 ############# Class : cspace::iGenMeshAnimationControlFactory ##############
 
 package cspace::iGenMeshAnimationControlFactory;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *CreateAnimationControl = *cspacec::iGenMeshAnimationControlFactory_CreateAnimationControl;
@@ -7016,7 +7016,7 @@ sub ACQUIRE {
 ############# Class : cspace::iGenMeshAnimationControlType ##############
 
 package cspace::iGenMeshAnimationControlType;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *CreateAnimationControlFactory = *cspacec::iGenMeshAnimationControlType_CreateAnimationControlFactory;
@@ -7047,7 +7047,7 @@ sub ACQUIRE {
 ############# Class : cspace::csSprite2DVertexArrayReadOnly ##############
 
 package cspace::csSprite2DVertexArrayReadOnly;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *GetSize = *cspacec::csSprite2DVertexArrayReadOnly_GetSize;
@@ -7084,7 +7084,7 @@ sub ACQUIRE {
 ############# Class : cspace::csSprite2DVertexArrayChangeElements ##############
 
 package cspace::csSprite2DVertexArrayChangeElements;
-@ISA = qw( cspace::csSprite2DVertexArrayReadOnly cspace );
+@ISA = qw( cspace cspace::csSprite2DVertexArrayReadOnly );
 %OWNER = ();
 %ITERATORS = ();
 *Get = *cspacec::csSprite2DVertexArrayChangeElements_Get;
@@ -7116,7 +7116,7 @@ sub ACQUIRE {
 ############# Class : cspace::csSprite2DVertexArrayChangeAll ##############
 
 package cspace::csSprite2DVertexArrayChangeAll;
-@ISA = qw( cspace::csSprite2DVertexArrayChangeElements cspace );
+@ISA = qw( cspace cspace::csSprite2DVertexArrayChangeElements );
 %OWNER = ();
 %ITERATORS = ();
 *SetSize = *cspacec::csSprite2DVertexArrayChangeAll_SetSize;
@@ -7207,7 +7207,7 @@ sub ACQUIRE {
 ############# Class : cspace::iColoredVertices ##############
 
 package cspace::iColoredVertices;
-@ISA = qw( cspace::csSprite2DVertexArrayChangeAll cspace );
+@ISA = qw( cspace cspace::csSprite2DVertexArrayChangeAll );
 %OWNER = ();
 %ITERATORS = ();
 sub DESTROY {
@@ -7237,7 +7237,7 @@ sub ACQUIRE {
 ############# Class : cspace::iSprite2DUVAnimationFrame ##############
 
 package cspace::iSprite2DUVAnimationFrame;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *SetName = *cspacec::iSprite2DUVAnimationFrame_SetName;
@@ -7276,7 +7276,7 @@ sub ACQUIRE {
 ############# Class : cspace::iSprite2DUVAnimation ##############
 
 package cspace::iSprite2DUVAnimation;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *SetName = *cspacec::iSprite2DUVAnimation_SetName;
@@ -7313,7 +7313,7 @@ sub ACQUIRE {
 ############# Class : cspace::iSprite2DFactoryState ##############
 
 package cspace::iSprite2DFactoryState;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *SetLighting = *cspacec::iSprite2DFactoryState_SetLighting;
@@ -7349,7 +7349,7 @@ sub ACQUIRE {
 ############# Class : cspace::iSprite2DState ##############
 
 package cspace::iSprite2DState;
-@ISA = qw( cspace::iSprite2DFactoryState cspace );
+@ISA = qw( cspace cspace::iSprite2DFactoryState );
 %OWNER = ();
 %ITERATORS = ();
 *CreateRegularVertices = *cspacec::iSprite2DState_CreateRegularVertices;
@@ -7387,7 +7387,7 @@ sub ACQUIRE {
 ############# Class : cspace::iSpriteFrame ##############
 
 package cspace::iSpriteFrame;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *SetName = *cspacec::iSpriteFrame_SetName;
@@ -7421,7 +7421,7 @@ sub ACQUIRE {
 ############# Class : cspace::iSpriteAction ##############
 
 package cspace::iSpriteAction;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *SetName = *cspacec::iSpriteAction_SetName;
@@ -7459,7 +7459,7 @@ sub ACQUIRE {
 ############# Class : cspace::iSpriteSocket ##############
 
 package cspace::iSpriteSocket;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *SetName = *cspacec::iSpriteSocket_SetName;
@@ -7495,7 +7495,7 @@ sub ACQUIRE {
 ############# Class : cspace::iSprite3DFactoryState ##############
 
 package cspace::iSprite3DFactoryState;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *AddVertices = *cspacec::iSprite3DFactoryState_AddVertices;
@@ -7567,7 +7567,7 @@ sub ACQUIRE {
 ############# Class : cspace::iSprite3DState ##############
 
 package cspace::iSprite3DState;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *SetMixMode = *cspacec::iSprite3DState_SetMixMode;
@@ -7623,7 +7623,7 @@ sub ACQUIRE {
 ############# Class : cspace::iSpriteCal3DSocket ##############
 
 package cspace::iSpriteCal3DSocket;
-@ISA = qw( cspace::iSpriteSocket cspace );
+@ISA = qw( cspace cspace::iSpriteSocket );
 %OWNER = ();
 %ITERATORS = ();
 *SetSubmeshIndex = *cspacec::iSpriteCal3DSocket_SetSubmeshIndex;
@@ -7666,7 +7666,7 @@ sub ACQUIRE {
 ############# Class : cspace::iSpriteCal3DFactoryState ##############
 
 package cspace::iSpriteCal3DFactoryState;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *Create = *cspacec::iSpriteCal3DFactoryState_Create;
@@ -7726,7 +7726,7 @@ sub ACQUIRE {
 ############# Class : cspace::iAnimTimeUpdateHandler ##############
 
 package cspace::iAnimTimeUpdateHandler;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *UpdatePosition = *cspacec::iAnimTimeUpdateHandler_UpdatePosition;
@@ -7797,7 +7797,7 @@ sub ACQUIRE {
 ############# Class : cspace::iSpriteCal3DState ##############
 
 package cspace::iSpriteCal3DState;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *C3D_ANIM_TYPE_NONE = *cspacec::iSpriteCal3DState_C3D_ANIM_TYPE_NONE;
@@ -7864,7 +7864,7 @@ sub ACQUIRE {
 ############# Class : cspace::iMeshObjectDrawCallback ##############
 
 package cspace::iMeshObjectDrawCallback;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *BeforeDrawing = *cspacec::iMeshObjectDrawCallback_BeforeDrawing;
@@ -7895,7 +7895,7 @@ sub ACQUIRE {
 ############# Class : cspace::iMeshObject ##############
 
 package cspace::iMeshObject;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *GetFactory = *cspacec::iMeshObject_GetFactory;
@@ -7948,7 +7948,7 @@ sub ACQUIRE {
 ############# Class : cspace::iMeshObjectFactory ##############
 
 package cspace::iMeshObjectFactory;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *GetFlags = *cspacec::iMeshObjectFactory_GetFlags;
@@ -7992,7 +7992,7 @@ sub ACQUIRE {
 ############# Class : cspace::iMeshObjectType ##############
 
 package cspace::iMeshObjectType;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *NewFactory = *cspacec::iMeshObjectType_NewFactory;
@@ -8065,7 +8065,7 @@ sub ACQUIRE {
 ############# Class : cspace::iPolygonHandle ##############
 
 package cspace::iPolygonHandle;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *GetThingFactoryState = *cspacec::iPolygonHandle_GetThingFactoryState;
@@ -8100,7 +8100,7 @@ sub ACQUIRE {
 ############# Class : cspace::iThingFactoryState ##############
 
 package cspace::iThingFactoryState;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *CompressVertices = *cspacec::iThingFactoryState_CompressVertices;
@@ -8175,7 +8175,7 @@ sub ACQUIRE {
 ############# Class : cspace::iThingState ##############
 
 package cspace::iThingState;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *GetVertexW = *cspacec::iThingState_GetVertexW;
@@ -8218,7 +8218,7 @@ sub ACQUIRE {
 ############# Class : cspace::iThingEnvironment ##############
 
 package cspace::iThingEnvironment;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *Clear = *cspacec::iThingEnvironment_Clear;
@@ -8307,7 +8307,7 @@ sub ACQUIRE {
 ############# Class : cspace::iTerrainObjectState ##############
 
 package cspace::iTerrainObjectState;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *SetMaterialPalette = *cspacec::iTerrainObjectState_SetMaterialPalette;
@@ -8353,7 +8353,7 @@ sub ACQUIRE {
 ############# Class : cspace::iTerrainFactoryState ##############
 
 package cspace::iTerrainFactoryState;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *SetTerraFormer = *cspacec::iTerrainFactoryState_SetTerraFormer;
@@ -8438,7 +8438,7 @@ sub ACQUIRE {
 ############# Class : cspace::iParticlesColorCallback ##############
 
 package cspace::iParticlesColorCallback;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *GetColor = *cspacec::iParticlesColorCallback_GetColor;
@@ -8469,7 +8469,7 @@ sub ACQUIRE {
 ############# Class : cspace::iParticlesStateBase ##############
 
 package cspace::iParticlesStateBase;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *SetParticlesPerSecond = *cspacec::iParticlesStateBase_SetParticlesPerSecond;
@@ -8563,7 +8563,7 @@ sub ACQUIRE {
 ############# Class : cspace::iParticlesObjectState ##############
 
 package cspace::iParticlesObjectState;
-@ISA = qw( cspace::iParticlesStateBase cspace );
+@ISA = qw( cspace cspace::iParticlesStateBase );
 %OWNER = ();
 %ITERATORS = ();
 *GetEmitPosition = *cspacec::iParticlesObjectState_GetEmitPosition;
@@ -8601,7 +8601,7 @@ sub ACQUIRE {
 ############# Class : cspace::iParticlesFactoryState ##############
 
 package cspace::iParticlesFactoryState;
-@ISA = qw( cspace::iParticlesStateBase cspace );
+@ISA = qw( cspace cspace::iParticlesStateBase );
 %OWNER = ();
 %ITERATORS = ();
 *SetMaterial = *cspacec::iParticlesFactoryState_SetMaterial;
@@ -8635,7 +8635,7 @@ sub ACQUIRE {
 ############# Class : cspace::iParticlesPhysics ##############
 
 package cspace::iParticlesPhysics;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *RegisterParticles = *cspacec::iParticlesPhysics_RegisterParticles;
@@ -8670,7 +8670,7 @@ sub ACQUIRE {
 ############# Class : cspace::iLoaderStatus ##############
 
 package cspace::iLoaderStatus;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *IsReady = *cspacec::iLoaderStatus_IsReady;
@@ -8702,7 +8702,7 @@ sub ACQUIRE {
 ############# Class : cspace::iMissingLoaderData ##############
 
 package cspace::iMissingLoaderData;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *MissingMaterial = *cspacec::iMissingLoaderData_MissingMaterial;
@@ -8739,7 +8739,7 @@ sub ACQUIRE {
 ############# Class : cspace::iLoader ##############
 
 package cspace::iLoader;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *LoadImage = *cspacec::iLoader_LoadImage;
@@ -8786,7 +8786,7 @@ sub ACQUIRE {
 ############# Class : cspace::iLoaderPlugin ##############
 
 package cspace::iLoaderPlugin;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *Parse = *cspacec::iLoaderPlugin_Parse;
@@ -8818,7 +8818,7 @@ sub ACQUIRE {
 ############# Class : cspace::iBinaryLoaderPlugin ##############
 
 package cspace::iBinaryLoaderPlugin;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *Parse = *cspacec::iBinaryLoaderPlugin_Parse;
@@ -8850,7 +8850,7 @@ sub ACQUIRE {
 ############# Class : cspace::iSaver ##############
 
 package cspace::iSaver;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *SaveMapFile = *cspacec::iSaver_SaveMapFile;
@@ -8884,7 +8884,7 @@ sub ACQUIRE {
 ############# Class : cspace::iSndSysData ##############
 
 package cspace::iSndSysData;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *GetFormat = *cspacec::iSndSysData_GetFormat;
@@ -8977,7 +8977,7 @@ sub ACQUIRE {
 ############# Class : cspace::iSndSysSoftwareFilter3D ##############
 
 package cspace::iSndSysSoftwareFilter3D;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *Apply = *cspacec::iSndSysSoftwareFilter3D_Apply;
@@ -9012,7 +9012,7 @@ sub ACQUIRE {
 ############# Class : cspace::iSndSysSoftwareOutputFilter ##############
 
 package cspace::iSndSysSoftwareOutputFilter;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *FormatNotify = *cspacec::iSndSysSoftwareOutputFilter_FormatNotify;
@@ -9044,7 +9044,7 @@ sub ACQUIRE {
 ############# Class : cspace::iSndSysListener ##############
 
 package cspace::iSndSysListener;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *SetDirection = *cspacec::iSndSysListener_SetDirection;
@@ -9083,7 +9083,7 @@ sub ACQUIRE {
 ############# Class : cspace::iSndSysLoader ##############
 
 package cspace::iSndSysLoader;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *LoadSound = *cspacec::iSndSysLoader_LoadSound;
@@ -9115,7 +9115,7 @@ sub ACQUIRE {
 ############# Class : cspace::iSndSysWrapper ##############
 
 package cspace::iSndSysWrapper;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *QueryObject = *cspacec::iSndSysWrapper_QueryObject;
@@ -9149,7 +9149,7 @@ sub ACQUIRE {
 ############# Class : cspace::iSndSysManager ##############
 
 package cspace::iSndSysManager;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *CreateSound = *cspacec::iSndSysManager_CreateSound;
@@ -9186,7 +9186,7 @@ sub ACQUIRE {
 ############# Class : cspace::iSndSysSource ##############
 
 package cspace::iSndSysSource;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *SetVolume = *cspacec::iSndSysSource_SetVolume;
@@ -9223,7 +9223,7 @@ sub ACQUIRE {
 ############# Class : cspace::iSndSysSourceSoftware ##############
 
 package cspace::iSndSysSourceSoftware;
-@ISA = qw( cspace::iSndSysSource cspace );
+@ISA = qw( cspace cspace::iSndSysSource );
 %OWNER = ();
 %ITERATORS = ();
 *MergeIntoBuffer = *cspacec::iSndSysSourceSoftware_MergeIntoBuffer;
@@ -9255,7 +9255,7 @@ sub ACQUIRE {
 ############# Class : cspace::iSndSysSourceSoftware3D ##############
 
 package cspace::iSndSysSourceSoftware3D;
-@ISA = qw( cspace::iSndSysSourceSoftware cspace );
+@ISA = qw( cspace cspace::iSndSysSourceSoftware );
 %OWNER = ();
 %ITERATORS = ();
 *SetPosition = *cspacec::iSndSysSourceSoftware3D_SetPosition;
@@ -9339,7 +9339,7 @@ sub ACQUIRE {
 ############# Class : cspace::iSndSysStream ##############
 
 package cspace::iSndSysStream;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *GetDescription = *cspacec::iSndSysStream_GetDescription;
@@ -9394,7 +9394,7 @@ sub ACQUIRE {
 ############# Class : cspace::iSndSysStreamCallback ##############
 
 package cspace::iSndSysStreamCallback;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *StreamLoopNotification = *cspacec::iSndSysStreamCallback_StreamLoopNotification;
@@ -9428,7 +9428,7 @@ sub ACQUIRE {
 ############# Class : cspace::iSndSysRenderer ##############
 
 package cspace::iSndSysRenderer;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *SetVolume = *cspacec::iSndSysRenderer_SetVolume;
@@ -9468,7 +9468,7 @@ sub ACQUIRE {
 ############# Class : cspace::iSndSysRendererCallback ##############
 
 package cspace::iSndSysRendererCallback;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *StreamAddNotification = *cspacec::iSndSysRendererCallback_StreamAddNotification;
@@ -9502,7 +9502,7 @@ sub ACQUIRE {
 ############# Class : cspace::iSndSysRendererSoftware ##############
 
 package cspace::iSndSysRendererSoftware;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *AddOutputFilter = *cspacec::iSndSysRendererSoftware_AddOutputFilter;
@@ -9534,7 +9534,7 @@ sub ACQUIRE {
 ############# Class : cspace::iSndSysSoftwareDriver ##############
 
 package cspace::iSndSysSoftwareDriver;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *Open = *cspacec::iSndSysSoftwareDriver_Open;
@@ -9569,7 +9569,7 @@ sub ACQUIRE {
 ############# Class : cspace::iComponent ##############
 
 package cspace::iComponent;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *Initialize = *cspacec::iComponent_Initialize;
@@ -9601,7 +9601,7 @@ sub ACQUIRE {
 ############# Class : cspace::iCacheManager ##############
 
 package cspace::iCacheManager;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *SetReadOnly = *cspacec::iCacheManager_SetReadOnly;
@@ -9690,7 +9690,7 @@ sub ACQUIRE {
 ############# Class : cspace::iFile ##############
 
 package cspace::iFile;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *GetName = *cspacec::iFile_GetName;
@@ -9731,7 +9731,7 @@ sub ACQUIRE {
 ############# Class : cspace::iVFS ##############
 
 package cspace::iVFS;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *ChDir = *cspacec::iVFS_ChDir;
@@ -9786,7 +9786,7 @@ sub ACQUIRE {
 ############# Class : cspace::iObjectNameChangeListener ##############
 
 package cspace::iObjectNameChangeListener;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *NameChanged = *cspacec::iObjectNameChangeListener_NameChanged;
@@ -9817,7 +9817,7 @@ sub ACQUIRE {
 ############# Class : cspace::iObject ##############
 
 package cspace::iObject;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *SetName = *cspacec::iObject_SetName;
@@ -9862,7 +9862,7 @@ sub ACQUIRE {
 ############# Class : cspace::iObjectIterator ##############
 
 package cspace::iObjectIterator;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *Next = *cspacec::iObjectIterator_Next;
@@ -9897,7 +9897,7 @@ sub ACQUIRE {
 ############# Class : cspace::iStringSet ##############
 
 package cspace::iStringSet;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *Request = *cspacec::iStringSet_Request;
@@ -9935,7 +9935,7 @@ sub ACQUIRE {
 ############# Class : cspace::iObjectRegistry ##############
 
 package cspace::iObjectRegistry;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *Clear = *cspacec::iObjectRegistry_Clear;
@@ -9970,7 +9970,7 @@ sub ACQUIRE {
 ############# Class : cspace::iObjectRegistryIterator ##############
 
 package cspace::iObjectRegistryIterator;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *Reset = *cspacec::iObjectRegistryIterator_Reset;
@@ -10004,7 +10004,7 @@ sub ACQUIRE {
 ############# Class : cspace::iVirtualClock ##############
 
 package cspace::iVirtualClock;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *Advance = *cspacec::iVirtualClock_Advance;
@@ -10040,7 +10040,7 @@ sub ACQUIRE {
 ############# Class : cspace::iEventAttributeIterator ##############
 
 package cspace::iEventAttributeIterator;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *HasNext = *cspacec::iEventAttributeIterator_HasNext;
@@ -10257,7 +10257,7 @@ sub ACQUIRE {
 ############# Class : cspace::iEvent ##############
 
 package cspace::iEvent;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *swig_Name_get = *cspacec::iEvent_Name_get;
@@ -10327,7 +10327,7 @@ sub ACQUIRE {
 ############# Class : cspace::iEventPlug ##############
 
 package cspace::iEventPlug;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *GetPotentiallyConflictingEvents = *cspacec::iEventPlug_GetPotentiallyConflictingEvents;
@@ -10360,7 +10360,7 @@ sub ACQUIRE {
 ############# Class : cspace::iEventOutlet ##############
 
 package cspace::iEventOutlet;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *CreateEvent = *cspacec::iEventOutlet_CreateEvent;
@@ -10397,7 +10397,7 @@ sub ACQUIRE {
 ############# Class : cspace::iEventCord ##############
 
 package cspace::iEventCord;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *Insert = *cspacec::iEventCord_Insert;
@@ -10685,7 +10685,7 @@ sub ACQUIRE {
 ############# Class : cspace::iEventQueue ##############
 
 package cspace::iEventQueue;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *Process = *cspacec::iEventQueue_Process;
@@ -10770,7 +10770,7 @@ sub ACQUIRE {
 ############# Class : cspace::iEventNameRegistry ##############
 
 package cspace::iEventNameRegistry;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *GetID = *cspacec::iEventNameRegistry_GetID;
@@ -10842,7 +10842,7 @@ sub ACQUIRE {
 ############# Class : cspace::iEventHandler ##############
 
 package cspace::iEventHandler;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *HandleEvent = *cspacec::iEventHandler_HandleEvent;
@@ -10880,7 +10880,7 @@ sub ACQUIRE {
 ############# Class : cspace::iPluginIterator ##############
 
 package cspace::iPluginIterator;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *HasNext = *cspacec::iPluginIterator_HasNext;
@@ -10912,7 +10912,7 @@ sub ACQUIRE {
 ############# Class : cspace::iPluginManager ##############
 
 package cspace::iPluginManager;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *LoadPlugin = *cspacec::iPluginManager_LoadPlugin;
@@ -10950,7 +10950,7 @@ sub ACQUIRE {
 ############# Class : cspace::iKeyComposer ##############
 
 package cspace::iKeyComposer;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *HandleKey = *cspacec::iKeyComposer_HandleKey;
@@ -10982,7 +10982,7 @@ sub ACQUIRE {
 ############# Class : cspace::iKeyboardDriver ##############
 
 package cspace::iKeyboardDriver;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *Reset = *cspacec::iKeyboardDriver_Reset;
@@ -11019,7 +11019,7 @@ sub ACQUIRE {
 ############# Class : cspace::iMouseDriver ##############
 
 package cspace::iMouseDriver;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *SetDoubleClickTime = *cspacec::iMouseDriver_SetDoubleClickTime;
@@ -11058,7 +11058,7 @@ sub ACQUIRE {
 ############# Class : cspace::iJoystickDriver ##############
 
 package cspace::iJoystickDriver;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *Reset = *cspacec::iJoystickDriver_Reset;
@@ -11095,7 +11095,7 @@ sub ACQUIRE {
 ############# Class : cspace::iConfigFile ##############
 
 package cspace::iConfigFile;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *GetFileName = *cspacec::iConfigFile_GetFileName;
@@ -11148,7 +11148,7 @@ sub ACQUIRE {
 ############# Class : cspace::iConfigIterator ##############
 
 package cspace::iConfigIterator;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *GetConfigFile = *cspacec::iConfigIterator_GetConfigFile;
@@ -11189,7 +11189,7 @@ sub ACQUIRE {
 ############# Class : cspace::iConfigManager ##############
 
 package cspace::iConfigManager;
-@ISA = qw( cspace::iConfigFile cspace );
+@ISA = qw( cspace cspace::iConfigFile );
 %OWNER = ();
 %ITERATORS = ();
 *PriorityMin = *cspacec::iConfigManager_PriorityMin;
@@ -11242,7 +11242,7 @@ sub ACQUIRE {
 ############# Class : cspace::iStringArray ##############
 
 package cspace::iStringArray;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *GetSize = *cspacec::iStringArray_GetSize;
@@ -11288,7 +11288,7 @@ sub ACQUIRE {
 ############# Class : cspace::iDocumentAttributeIterator ##############
 
 package cspace::iDocumentAttributeIterator;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *HasNext = *cspacec::iDocumentAttributeIterator_HasNext;
@@ -11320,7 +11320,7 @@ sub ACQUIRE {
 ############# Class : cspace::iDocumentAttribute ##############
 
 package cspace::iDocumentAttribute;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *GetName = *cspacec::iDocumentAttribute_GetName;
@@ -11359,7 +11359,7 @@ sub ACQUIRE {
 ############# Class : cspace::iDocumentNodeIterator ##############
 
 package cspace::iDocumentNodeIterator;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *HasNext = *cspacec::iDocumentNodeIterator_HasNext;
@@ -11391,7 +11391,7 @@ sub ACQUIRE {
 ############# Class : cspace::iDocumentNode ##############
 
 package cspace::iDocumentNode;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *GetType = *cspacec::iDocumentNode_GetType;
@@ -11447,7 +11447,7 @@ sub ACQUIRE {
 ############# Class : cspace::iDocument ##############
 
 package cspace::iDocument;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *Clear = *cspacec::iDocument_Clear;
@@ -11484,7 +11484,7 @@ sub ACQUIRE {
 ############# Class : cspace::iDocumentSystem ##############
 
 package cspace::iDocumentSystem;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *CreateDocument = *cspacec::iDocumentSystem_CreateDocument;
@@ -11553,7 +11553,7 @@ sub ACQUIRE {
 ############# Class : cspace::iDataBuffer ##############
 
 package cspace::iDataBuffer;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *GetSize = *cspacec::iDataBuffer_GetSize;
@@ -11741,7 +11741,7 @@ sub ACQUIRE {
 ############# Class : cspace::iOffscreenCanvasCallback ##############
 
 package cspace::iOffscreenCanvasCallback;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *FinishDraw = *cspacec::iOffscreenCanvasCallback_FinishDraw;
@@ -11773,7 +11773,7 @@ sub ACQUIRE {
 ############# Class : cspace::iGraphics2D ##############
 
 package cspace::iGraphics2D;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *Open = *cspacec::iGraphics2D_Open;
@@ -12014,7 +12014,7 @@ sub ACQUIRE {
 ############# Class : cspace::iGraphics3D ##############
 
 package cspace::iGraphics3D;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *Open = *cspacec::iGraphics3D_Open;
@@ -12094,7 +12094,7 @@ sub ACQUIRE {
 ############# Class : cspace::iNativeWindowManager ##############
 
 package cspace::iNativeWindowManager;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *Alert = *cspacec::iNativeWindowManager_Alert;
@@ -12125,7 +12125,7 @@ sub ACQUIRE {
 ############# Class : cspace::iNativeWindow ##############
 
 package cspace::iNativeWindow;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *SetTitle = *cspacec::iNativeWindow_SetTitle;
@@ -12156,7 +12156,7 @@ sub ACQUIRE {
 ############# Class : cspace::iFontDeleteNotify ##############
 
 package cspace::iFontDeleteNotify;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *BeforeDelete = *cspacec::iFontDeleteNotify_BeforeDelete;
@@ -12269,7 +12269,7 @@ sub ACQUIRE {
 ############# Class : cspace::iFont ##############
 
 package cspace::iFont;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *AddDeleteCallback = *cspacec::iFont_AddDeleteCallback;
@@ -12315,7 +12315,7 @@ sub ACQUIRE {
 ############# Class : cspace::iFontServer ##############
 
 package cspace::iFontServer;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *LoadFont = *cspacec::iFontServer_LoadFont;
@@ -12349,7 +12349,7 @@ sub ACQUIRE {
 ############# Class : cspace::iHalo ##############
 
 package cspace::iHalo;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *GetWidth = *cspacec::iHalo_GetWidth;
@@ -12385,7 +12385,7 @@ sub ACQUIRE {
 ############# Class : cspace::iShaderVarStack ##############
 
 package cspace::iShaderVarStack;
-@ISA = qw( cspace::csShaderVariableArray cspace );
+@ISA = qw( cspace cspace::csShaderVariableArray );
 %OWNER = ();
 %ITERATORS = ();
 sub DESTROY {
@@ -12415,7 +12415,7 @@ sub ACQUIRE {
 ############# Class : cspace::iShaderVariableContext ##############
 
 package cspace::iShaderVariableContext;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *AddVariable = *cspacec::iShaderVariableContext_AddVariable;
@@ -12454,7 +12454,7 @@ sub ACQUIRE {
 ############# Class : cspace::iShaderManager ##############
 
 package cspace::iShaderManager;
-@ISA = qw( cspace::iShaderVariableContext cspace );
+@ISA = qw( cspace cspace::iShaderVariableContext );
 %OWNER = ();
 %ITERATORS = ();
 *RegisterShader = *cspacec::iShaderManager_RegisterShader;
@@ -12537,7 +12537,7 @@ sub ACQUIRE {
 ############# Class : cspace::iShader ##############
 
 package cspace::iShader;
-@ISA = qw( cspace::iShaderVariableContext cspace );
+@ISA = qw( cspace cspace::iShaderVariableContext );
 %OWNER = ();
 %ITERATORS = ();
 *QueryObject = *cspacec::iShader_QueryObject;
@@ -12577,7 +12577,7 @@ sub ACQUIRE {
 ############# Class : cspace::iShaderPriorityList ##############
 
 package cspace::iShaderPriorityList;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *GetCount = *cspacec::iShaderPriorityList_GetCount;
@@ -12609,7 +12609,7 @@ sub ACQUIRE {
 ############# Class : cspace::iShaderCompiler ##############
 
 package cspace::iShaderCompiler;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *GetName = *cspacec::iShaderCompiler_GetName;
@@ -12644,7 +12644,7 @@ sub ACQUIRE {
 ############# Class : cspace::iTextureHandle ##############
 
 package cspace::iTextureHandle;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *GetFlags = *cspacec::iTextureHandle_GetFlags;
@@ -12704,7 +12704,7 @@ sub ACQUIRE {
 ############# Class : cspace::iRendererLightmap ##############
 
 package cspace::iRendererLightmap;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *GetSLMCoords = *cspacec::iRendererLightmap_GetSLMCoords;
@@ -12737,7 +12737,7 @@ sub ACQUIRE {
 ############# Class : cspace::iSuperLightmap ##############
 
 package cspace::iSuperLightmap;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *RegisterLightmap = *cspacec::iSuperLightmap_RegisterLightmap;
@@ -12770,7 +12770,7 @@ sub ACQUIRE {
 ############# Class : cspace::iTextureManager ##############
 
 package cspace::iTextureManager;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *RegisterTexture = *cspacec::iTextureManager_RegisterTexture;
@@ -12806,7 +12806,7 @@ sub ACQUIRE {
 ############# Class : cspace::iMaterial ##############
 
 package cspace::iMaterial;
-@ISA = qw( cspace::iShaderVariableContext cspace );
+@ISA = qw( cspace cspace::iShaderVariableContext );
 %OWNER = ();
 %ITERATORS = ();
 *SetShader = *cspacec::iMaterial_SetShader;
@@ -12845,7 +12845,7 @@ sub ACQUIRE {
 ############# Class : cspace::iImage ##############
 
 package cspace::iImage;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *GetImageData = *cspacec::iImage_GetImageData;
@@ -12993,7 +12993,7 @@ sub ACQUIRE {
 ############# Class : cspace::iImageIO ##############
 
 package cspace::iImageIO;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *GetDescription = *cspacec::iImageIO_GetDescription;
@@ -13028,7 +13028,7 @@ sub ACQUIRE {
 ############# Class : cspace::iReporterListener ##############
 
 package cspace::iReporterListener;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *Report = *cspacec::iReporterListener_Report;
@@ -13060,7 +13060,7 @@ sub ACQUIRE {
 ############# Class : cspace::iReporterIterator ##############
 
 package cspace::iReporterIterator;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *HasNext = *cspacec::iReporterIterator_HasNext;
@@ -13096,7 +13096,7 @@ sub ACQUIRE {
 ############# Class : cspace::iReporter ##############
 
 package cspace::iReporter;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *Report = *cspacec::iReporter_Report;
@@ -13175,7 +13175,7 @@ sub ACQUIRE {
 ############# Class : cspace::iConsoleWatcher ##############
 
 package cspace::iConsoleWatcher;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *ConsoleVisibilityChanged = *cspacec::iConsoleWatcher_ConsoleVisibilityChanged;
@@ -13206,7 +13206,7 @@ sub ACQUIRE {
 ############# Class : cspace::iConsoleOutput ##############
 
 package cspace::iConsoleOutput;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *PutText = *cspacec::iConsoleOutput_PutText;
@@ -13257,7 +13257,7 @@ sub ACQUIRE {
 ############# Class : cspace::iStandardReporterListener ##############
 
 package cspace::iStandardReporterListener;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *SetOutputConsole = *cspacec::iStandardReporterListener_SetOutputConsole;
@@ -13297,7 +13297,7 @@ sub ACQUIRE {
 ############# Class : cspace::iView ##############
 
 package cspace::iView;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *GetEngine = *cspacec::iView_GetEngine;
@@ -13432,7 +13432,7 @@ sub ACQUIRE {
 ############# Class : cspace::iCollider ##############
 
 package cspace::iCollider;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *GetColliderType = *cspacec::iCollider_GetColliderType;
@@ -13464,7 +13464,7 @@ sub ACQUIRE {
 ############# Class : cspace::iCollideSystem ##############
 
 package cspace::iCollideSystem;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *CreateCollider = *cspacec::iCollideSystem_CreateCollider;
@@ -13506,7 +13506,7 @@ sub ACQUIRE {
 ############# Class : cspace::iDynamics ##############
 
 package cspace::iDynamics;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *CreateSystem = *cspacec::iDynamics_CreateSystem;
@@ -13542,7 +13542,7 @@ sub ACQUIRE {
 ############# Class : cspace::iDynamicSystem ##############
 
 package cspace::iDynamicSystem;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *QueryObject = *cspacec::iDynamicSystem_QueryObject;
@@ -13605,7 +13605,7 @@ sub ACQUIRE {
 ############# Class : cspace::iDynamicsMoveCallback ##############
 
 package cspace::iDynamicsMoveCallback;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *Execute = *cspacec::iDynamicsMoveCallback_Execute;
@@ -13636,7 +13636,7 @@ sub ACQUIRE {
 ############# Class : cspace::iDynamicsCollisionCallback ##############
 
 package cspace::iDynamicsCollisionCallback;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *Execute = *cspacec::iDynamicsCollisionCallback_Execute;
@@ -13667,7 +13667,7 @@ sub ACQUIRE {
 ############# Class : cspace::iBodyGroup ##############
 
 package cspace::iBodyGroup;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *AddBody = *cspacec::iBodyGroup_AddBody;
@@ -13701,7 +13701,7 @@ sub ACQUIRE {
 ############# Class : cspace::iRigidBody ##############
 
 package cspace::iRigidBody;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *QueryObject = *cspacec::iRigidBody_QueryObject;
@@ -13785,7 +13785,7 @@ sub ACQUIRE {
 ############# Class : cspace::iDynamicsColliderCollisionCallback ##############
 
 package cspace::iDynamicsColliderCollisionCallback;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *Execute = *cspacec::iDynamicsColliderCollisionCallback_Execute;
@@ -13816,7 +13816,7 @@ sub ACQUIRE {
 ############# Class : cspace::iDynamicsSystemCollider ##############
 
 package cspace::iDynamicsSystemCollider;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *CreateSphereGeometry = *cspacec::iDynamicsSystemCollider_CreateSphereGeometry;
@@ -13872,7 +13872,7 @@ sub ACQUIRE {
 ############# Class : cspace::iJoint ##############
 
 package cspace::iJoint;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *Attach = *cspacec::iJoint_Attach;
@@ -13929,7 +13929,7 @@ sub ACQUIRE {
 ############# Class : cspace::iODEFrameUpdateCallback ##############
 
 package cspace::iODEFrameUpdateCallback;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *Execute = *cspacec::iODEFrameUpdateCallback_Execute;
@@ -13960,7 +13960,7 @@ sub ACQUIRE {
 ############# Class : cspace::iODEDynamicState ##############
 
 package cspace::iODEDynamicState;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *SetGlobalERP = *cspacec::iODEDynamicState_SetGlobalERP;
@@ -14015,7 +14015,7 @@ sub ACQUIRE {
 ############# Class : cspace::iODEDynamicSystemState ##############
 
 package cspace::iODEDynamicSystemState;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *SetERP = *cspacec::iODEDynamicSystemState_SetERP;
@@ -14082,7 +14082,7 @@ sub ACQUIRE {
 ############# Class : cspace::iODEJointState ##############
 
 package cspace::iODEJointState;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *GetType = *cspacec::iODEJointState_GetType;
@@ -14183,7 +14183,7 @@ sub ACQUIRE {
 ############# Class : cspace::iODEGeneralJointState ##############
 
 package cspace::iODEGeneralJointState;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *SetLoStop = *cspacec::iODEGeneralJointState_SetLoStop;
@@ -14241,7 +14241,7 @@ sub ACQUIRE {
 ############# Class : cspace::iODESliderJoint ##############
 
 package cspace::iODESliderJoint;
-@ISA = qw( cspace::iODEGeneralJointState cspace );
+@ISA = qw( cspace cspace::iODEGeneralJointState );
 %OWNER = ();
 %ITERATORS = ();
 *SetSliderAxis = *cspacec::iODESliderJoint_SetSliderAxis;
@@ -14276,7 +14276,7 @@ sub ACQUIRE {
 ############# Class : cspace::iODEUniversalJoint ##############
 
 package cspace::iODEUniversalJoint;
-@ISA = qw( cspace::iODEGeneralJointState cspace );
+@ISA = qw( cspace cspace::iODEGeneralJointState );
 %OWNER = ();
 %ITERATORS = ();
 *SetUniversalAnchor = *cspacec::iODEUniversalJoint_SetUniversalAnchor;
@@ -14314,7 +14314,7 @@ sub ACQUIRE {
 ############# Class : cspace::iODEAMotorJoint ##############
 
 package cspace::iODEAMotorJoint;
-@ISA = qw( cspace::iODEGeneralJointState cspace );
+@ISA = qw( cspace cspace::iODEGeneralJointState );
 %OWNER = ();
 %ITERATORS = ();
 *SetAMotorMode = *cspacec::iODEAMotorJoint_SetAMotorMode;
@@ -14355,7 +14355,7 @@ sub ACQUIRE {
 ############# Class : cspace::iODEHinge2Joint ##############
 
 package cspace::iODEHinge2Joint;
-@ISA = qw( cspace::iODEGeneralJointState cspace );
+@ISA = qw( cspace cspace::iODEGeneralJointState );
 %OWNER = ();
 %ITERATORS = ();
 *SetHingeAnchor = *cspacec::iODEHinge2Joint_SetHingeAnchor;
@@ -14396,7 +14396,7 @@ sub ACQUIRE {
 ############# Class : cspace::iODEHingeJoint ##############
 
 package cspace::iODEHingeJoint;
-@ISA = qw( cspace::iODEGeneralJointState cspace );
+@ISA = qw( cspace cspace::iODEGeneralJointState );
 %OWNER = ();
 %ITERATORS = ();
 *SetHingeAnchor = *cspacec::iODEHingeJoint_SetHingeAnchor;
@@ -14435,7 +14435,7 @@ sub ACQUIRE {
 ############# Class : cspace::iODEBallJoint ##############
 
 package cspace::iODEBallJoint;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *SetBallAnchor = *cspacec::iODEBallJoint_SetBallAnchor;
@@ -14476,7 +14476,7 @@ sub ACQUIRE {
 ############# Class : cspace::iParameterESM ##############
 
 package cspace::iParameterESM;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *GetValue = *cspacec::iParameterESM_GetValue;
@@ -14508,7 +14508,7 @@ sub ACQUIRE {
 ############# Class : cspace::iEngineSequenceParameters ##############
 
 package cspace::iEngineSequenceParameters;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *GetParameterCount = *cspacec::iEngineSequenceParameters_GetParameterCount;
@@ -14545,7 +14545,7 @@ sub ACQUIRE {
 ############# Class : cspace::iSequenceWrapper ##############
 
 package cspace::iSequenceWrapper;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *QueryObject = *cspacec::iSequenceWrapper_QueryObject;
@@ -14597,7 +14597,7 @@ sub ACQUIRE {
 ############# Class : cspace::iSequenceTrigger ##############
 
 package cspace::iSequenceTrigger;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *QueryObject = *cspacec::iSequenceTrigger_QueryObject;
@@ -14644,7 +14644,7 @@ sub ACQUIRE {
 ############# Class : cspace::iSequenceTimedOperation ##############
 
 package cspace::iSequenceTimedOperation;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *Do = *cspacec::iSequenceTimedOperation_Do;
@@ -14675,7 +14675,7 @@ sub ACQUIRE {
 ############# Class : cspace::iEngineSequenceManager ##############
 
 package cspace::iEngineSequenceManager;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *GetSequenceManager = *cspacec::iEngineSequenceManager_GetSequenceManager;
@@ -14723,7 +14723,7 @@ sub ACQUIRE {
 ############# Class : cspace::iMovieRecorder ##############
 
 package cspace::iMovieRecorder;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *Start = *cspacec::iMovieRecorder_Start;
@@ -14760,7 +14760,7 @@ sub ACQUIRE {
 ############# Class : cspace::iMapNode ##############
 
 package cspace::iMapNode;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *QueryObject = *cspacec::iMapNode_QueryObject;
@@ -14802,7 +14802,7 @@ sub ACQUIRE {
 ############# Class : cspace::iScriptObject ##############
 
 package cspace::iScriptObject;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *IsType = *cspacec::iScriptObject_IsType;
@@ -14849,7 +14849,7 @@ sub ACQUIRE {
 ############# Class : cspace::iScript ##############
 
 package cspace::iScript;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *Initialize = *cspacec::iScript_Initialize;
@@ -14898,7 +14898,7 @@ sub ACQUIRE {
 ############# Class : cspace::iSimpleFormerState ##############
 
 package cspace::iSimpleFormerState;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *SetHeightmap = *cspacec::iSimpleFormerState_SetHeightmap;
@@ -14934,7 +14934,7 @@ sub ACQUIRE {
 ############# Class : cspace::iTerraFormer ##############
 
 package cspace::iTerraFormer;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *GetSampler = *cspacec::iTerraFormer_GetSampler;
@@ -14971,7 +14971,7 @@ sub ACQUIRE {
 ############# Class : cspace::iTerraSampler ##############
 
 package cspace::iTerraSampler;
-@ISA = qw( cspace::iBase cspace );
+@ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
 *SampleFloat = *cspacec::iTerraSampler_SampleFloat;
@@ -15337,14 +15337,7 @@ sub ACQUIRE {
 
 package cspace;
 
-sub CS_COMPILER_NAME () { $cspacec::CS_COMPILER_NAME }
-sub CS_PLATFORM_NAME () { $cspacec::CS_PLATFORM_NAME }
-sub CS_PROCESSOR_SIZE () { $cspacec::CS_PROCESSOR_SIZE }
-sub CS_LONG_SIZE () { $cspacec::CS_LONG_SIZE }
-sub CS_PROCESSOR_NAME () { $cspacec::CS_PROCESSOR_NAME }
 sub CS_WCHAR_T_SIZE () { $cspacec::CS_WCHAR_T_SIZE }
-sub CS_PACKAGE_NAME () { $cspacec::CS_PACKAGE_NAME }
-sub CS_PACKAGE_VERSION () { $cspacec::CS_PACKAGE_VERSION }
 sub SCF_STATIC_CLASS_CONTEXT () { $cspacec::SCF_STATIC_CLASS_CONTEXT }
 sub SCF_VERBOSE_NONE () { $cspacec::SCF_VERBOSE_NONE }
 sub SCF_VERBOSE_PLUGIN_SCAN () { $cspacec::SCF_VERBOSE_PLUGIN_SCAN }

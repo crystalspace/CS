@@ -1,9 +1,9 @@
-# This file was created automatically by SWIG 1.3.27.
+# This file was created automatically by SWIG.
 # Don't modify this file, modify the SWIG interface instead.
+# This file is compatible with both classic and new-style classes.
 
 import _cspace
 
-# This file is compatible with both classic and new-style classes.
 def _swig_setattr_nondynamic(self,class_type,name,value,static=1):
     if (name == "this"):
         if isinstance(value, class_type):
@@ -36,14 +36,7 @@ except AttributeError:
 del types
 
 
-CS_COMPILER_NAME = _cspace.CS_COMPILER_NAME
-CS_PLATFORM_NAME = _cspace.CS_PLATFORM_NAME
-CS_PROCESSOR_SIZE = _cspace.CS_PROCESSOR_SIZE
-CS_LONG_SIZE = _cspace.CS_LONG_SIZE
-CS_PROCESSOR_NAME = _cspace.CS_PROCESSOR_NAME
 CS_WCHAR_T_SIZE = _cspace.CS_WCHAR_T_SIZE
-CS_PACKAGE_NAME = _cspace.CS_PACKAGE_NAME
-CS_PACKAGE_VERSION = _cspace.CS_PACKAGE_VERSION
 class csWrapPtr(_object):
     __swig_setmethods__ = {}
     __setattr__ = lambda self, name, value: _swig_setattr(self, csWrapPtr, name, value)
@@ -72,7 +65,7 @@ class csWrapPtrPtr(csWrapPtr):
     def __init__(self, this):
         _swig_setattr(self, csWrapPtr, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csWrapPtr, 'thisown', 0)
-        self.__class__ = csWrapPtr
+        _swig_setattr(self, csWrapPtr,self.__class__,csWrapPtr)
 _cspace.csWrapPtr_swigregister(csWrapPtrPtr)
 
 class csArrayThresholdVariable(_object):
@@ -96,7 +89,7 @@ class csArrayThresholdVariablePtr(csArrayThresholdVariable):
     def __init__(self, this):
         _swig_setattr(self, csArrayThresholdVariable, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csArrayThresholdVariable, 'thisown', 0)
-        self.__class__ = csArrayThresholdVariable
+        _swig_setattr(self, csArrayThresholdVariable,self.__class__,csArrayThresholdVariable)
 _cspace.csArrayThresholdVariable_swigregister(csArrayThresholdVariablePtr)
 
 class csArrayThresholdVariableCapacityLinear(csArrayThresholdVariable):
@@ -123,7 +116,7 @@ class csArrayThresholdVariableCapacityLinearPtr(csArrayThresholdVariableCapacity
     def __init__(self, this):
         _swig_setattr(self, csArrayThresholdVariableCapacityLinear, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csArrayThresholdVariableCapacityLinear, 'thisown', 0)
-        self.__class__ = csArrayThresholdVariableCapacityLinear
+        _swig_setattr(self, csArrayThresholdVariableCapacityLinear,self.__class__,csArrayThresholdVariableCapacityLinear)
 _cspace.csArrayThresholdVariableCapacityLinear_swigregister(csArrayThresholdVariableCapacityLinearPtr)
 
 class csArrayCapacityDefault(csArrayThresholdVariableCapacityLinear):
@@ -148,7 +141,7 @@ class csArrayCapacityDefaultPtr(csArrayCapacityDefault):
     def __init__(self, this):
         _swig_setattr(self, csArrayCapacityDefault, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csArrayCapacityDefault, 'thisown', 0)
-        self.__class__ = csArrayCapacityDefault
+        _swig_setattr(self, csArrayCapacityDefault,self.__class__,csArrayCapacityDefault)
 _cspace.csArrayCapacityDefault_swigregister(csArrayCapacityDefaultPtr)
 
 
@@ -179,7 +172,7 @@ class iBasePtr(iBase):
     def __init__(self, this):
         _swig_setattr(self, iBase, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iBase, 'thisown', 0)
-        self.__class__ = iBase
+        _swig_setattr(self, iBase,self.__class__,iBase)
 _cspace.iBase_swigregister(iBasePtr)
 cvar = _cspace.cvar
 csArrayItemNotFound = cvar.csArrayItemNotFound
@@ -224,7 +217,7 @@ class iSCFPtr(iSCF):
     def __init__(self, this):
         _swig_setattr(self, iSCF, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iSCF, 'thisown', 0)
-        self.__class__ = iSCF
+        _swig_setattr(self, iSCF,self.__class__,iSCF)
 _cspace.iSCF_swigregister(iSCFPtr)
 
 iSCF_scfGetVersion = _cspace.iSCF_scfGetVersion
@@ -258,7 +251,7 @@ class iFactoryPtr(iFactory):
     def __init__(self, this):
         _swig_setattr(self, iFactory, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iFactory, 'thisown', 0)
-        self.__class__ = iFactory
+        _swig_setattr(self, iFactory,self.__class__,iFactory)
 _cspace.iFactory_swigregister(iFactoryPtr)
 
 iFactory_scfGetVersion = _cspace.iFactory_scfGetVersion
@@ -306,7 +299,7 @@ class iDebugHelperPtr(iDebugHelper):
     def __init__(self, this):
         _swig_setattr(self, iDebugHelper, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iDebugHelper, 'thisown', 0)
-        self.__class__ = iDebugHelper
+        _swig_setattr(self, iDebugHelper,self.__class__,iDebugHelper)
 _cspace.iDebugHelper_swigregister(iDebugHelperPtr)
 
 scfRegisterStaticClass = _cspace.scfRegisterStaticClass
@@ -348,7 +341,7 @@ class iCommandLineParserPtr(iCommandLineParser):
     def __init__(self, this):
         _swig_setattr(self, iCommandLineParser, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iCommandLineParser, 'thisown', 0)
-        self.__class__ = iCommandLineParser
+        _swig_setattr(self, iCommandLineParser,self.__class__,iCommandLineParser)
 _cspace.iCommandLineParser_swigregister(iCommandLineParserPtr)
 
 iCommandLineParser_scfGetVersion = _cspace.iCommandLineParser_scfGetVersion
@@ -397,7 +390,7 @@ class csColorPtr(csColor):
     def __init__(self, this):
         _swig_setattr(self, csColor, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csColor, 'thisown', 0)
-        self.__class__ = csColor
+        _swig_setattr(self, csColor,self.__class__,csColor)
 _cspace.csColor_swigregister(csColorPtr)
 
 class csColor4(csColor):
@@ -432,7 +425,7 @@ class csColor4Ptr(csColor4):
     def __init__(self, this):
         _swig_setattr(self, csColor4, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csColor4, 'thisown', 0)
-        self.__class__ = csColor4
+        _swig_setattr(self, csColor4,self.__class__,csColor4)
 _cspace.csColor4_swigregister(csColor4Ptr)
 
 class csCommandLineHelper(_object):
@@ -459,7 +452,7 @@ class csCommandLineHelperPtr(csCommandLineHelper):
     def __init__(self, this):
         _swig_setattr(self, csCommandLineHelper, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csCommandLineHelper, 'thisown', 0)
-        self.__class__ = csCommandLineHelper
+        _swig_setattr(self, csCommandLineHelper,self.__class__,csCommandLineHelper)
 _cspace.csCommandLineHelper_swigregister(csCommandLineHelperPtr)
 
 csCommandLineHelper_Help = _cspace.csCommandLineHelper_Help
@@ -494,7 +487,7 @@ class csStringSetPtr(csStringSet):
     def __init__(self, this):
         _swig_setattr(self, csStringSet, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csStringSet, 'thisown', 0)
-        self.__class__ = csStringSet
+        _swig_setattr(self, csStringSet,self.__class__,csStringSet)
 _cspace.csStringSet_swigregister(csStringSetPtr)
 
 class csStringIDSet(_object):
@@ -530,7 +523,7 @@ class csStringIDSetPtr(csStringIDSet):
     def __init__(self, this):
         _swig_setattr(self, csStringIDSet, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csStringIDSet, 'thisown', 0)
-        self.__class__ = csStringIDSet
+        _swig_setattr(self, csStringIDSet,self.__class__,csStringIDSet)
 _cspace.csStringIDSet_swigregister(csStringIDSetPtr)
 
 class iString(iBase):
@@ -559,7 +552,7 @@ class iStringPtr(iString):
     def __init__(self, this):
         _swig_setattr(self, iString, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iString, 'thisown', 0)
-        self.__class__ = iString
+        _swig_setattr(self, iString,self.__class__,iString)
 _cspace.iString_swigregister(iStringPtr)
 
 iString_scfGetVersion = _cspace.iString_scfGetVersion
@@ -587,7 +580,7 @@ class csStringPtr(csString):
     def __init__(self, this):
         _swig_setattr(self, csString, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csString, 'thisown', 0)
-        self.__class__ = csString
+        _swig_setattr(self, csString,self.__class__,csString)
 _cspace.csString_swigregister(csStringPtr)
 
 class csRefCount(_object):
@@ -608,7 +601,7 @@ class csRefCountPtr(csRefCount):
     def __init__(self, this):
         _swig_setattr(self, csRefCount, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csRefCount, 'thisown', 0)
-        self.__class__ = csRefCount
+        _swig_setattr(self, csRefCount,self.__class__,csRefCount)
 _cspace.csRefCount_swigregister(csRefCountPtr)
 
 class csVector2(_object):
@@ -662,7 +655,7 @@ class csVector2Ptr(csVector2):
     def __init__(self, this):
         _swig_setattr(self, csVector2, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csVector2, 'thisown', 0)
-        self.__class__ = csVector2
+        _swig_setattr(self, csVector2,self.__class__,csVector2)
 _cspace.csVector2_swigregister(csVector2Ptr)
 
 CS_AXIS_NONE = _cspace.CS_AXIS_NONE
@@ -729,7 +722,7 @@ class csVector3Ptr(csVector3):
     def __init__(self, this):
         _swig_setattr(self, csVector3, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csVector3, 'thisown', 0)
-        self.__class__ = csVector3
+        _swig_setattr(self, csVector3,self.__class__,csVector3)
 _cspace.csVector3_swigregister(csVector3Ptr)
 
 class csMatrix2(_object):
@@ -781,7 +774,7 @@ class csMatrix2Ptr(csMatrix2):
     def __init__(self, this):
         _swig_setattr(self, csMatrix2, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csMatrix2, 'thisown', 0)
-        self.__class__ = csMatrix2
+        _swig_setattr(self, csMatrix2,self.__class__,csMatrix2)
 _cspace.csMatrix2_swigregister(csMatrix2Ptr)
 
 class csMatrix3(_object):
@@ -860,7 +853,7 @@ class csMatrix3Ptr(csMatrix3):
     def __init__(self, this):
         _swig_setattr(self, csMatrix3, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csMatrix3, 'thisown', 0)
-        self.__class__ = csMatrix3
+        _swig_setattr(self, csMatrix3,self.__class__,csMatrix3)
 _cspace.csMatrix3_swigregister(csMatrix3Ptr)
 
 class csXRotMatrix3(csMatrix3):
@@ -885,7 +878,7 @@ class csXRotMatrix3Ptr(csXRotMatrix3):
     def __init__(self, this):
         _swig_setattr(self, csXRotMatrix3, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csXRotMatrix3, 'thisown', 0)
-        self.__class__ = csXRotMatrix3
+        _swig_setattr(self, csXRotMatrix3,self.__class__,csXRotMatrix3)
 _cspace.csXRotMatrix3_swigregister(csXRotMatrix3Ptr)
 
 class csYRotMatrix3(csMatrix3):
@@ -910,7 +903,7 @@ class csYRotMatrix3Ptr(csYRotMatrix3):
     def __init__(self, this):
         _swig_setattr(self, csYRotMatrix3, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csYRotMatrix3, 'thisown', 0)
-        self.__class__ = csYRotMatrix3
+        _swig_setattr(self, csYRotMatrix3,self.__class__,csYRotMatrix3)
 _cspace.csYRotMatrix3_swigregister(csYRotMatrix3Ptr)
 
 class csZRotMatrix3(csMatrix3):
@@ -935,7 +928,7 @@ class csZRotMatrix3Ptr(csZRotMatrix3):
     def __init__(self, this):
         _swig_setattr(self, csZRotMatrix3, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csZRotMatrix3, 'thisown', 0)
-        self.__class__ = csZRotMatrix3
+        _swig_setattr(self, csZRotMatrix3,self.__class__,csZRotMatrix3)
 _cspace.csZRotMatrix3_swigregister(csZRotMatrix3Ptr)
 
 class csXScaleMatrix3(csMatrix3):
@@ -960,7 +953,7 @@ class csXScaleMatrix3Ptr(csXScaleMatrix3):
     def __init__(self, this):
         _swig_setattr(self, csXScaleMatrix3, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csXScaleMatrix3, 'thisown', 0)
-        self.__class__ = csXScaleMatrix3
+        _swig_setattr(self, csXScaleMatrix3,self.__class__,csXScaleMatrix3)
 _cspace.csXScaleMatrix3_swigregister(csXScaleMatrix3Ptr)
 
 class csYScaleMatrix3(csMatrix3):
@@ -985,7 +978,7 @@ class csYScaleMatrix3Ptr(csYScaleMatrix3):
     def __init__(self, this):
         _swig_setattr(self, csYScaleMatrix3, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csYScaleMatrix3, 'thisown', 0)
-        self.__class__ = csYScaleMatrix3
+        _swig_setattr(self, csYScaleMatrix3,self.__class__,csYScaleMatrix3)
 _cspace.csYScaleMatrix3_swigregister(csYScaleMatrix3Ptr)
 
 class csZScaleMatrix3(csMatrix3):
@@ -1010,7 +1003,7 @@ class csZScaleMatrix3Ptr(csZScaleMatrix3):
     def __init__(self, this):
         _swig_setattr(self, csZScaleMatrix3, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csZScaleMatrix3, 'thisown', 0)
-        self.__class__ = csZScaleMatrix3
+        _swig_setattr(self, csZScaleMatrix3,self.__class__,csZScaleMatrix3)
 _cspace.csZScaleMatrix3_swigregister(csZScaleMatrix3Ptr)
 
 class csTransform(_object):
@@ -1051,7 +1044,7 @@ class csTransformPtr(csTransform):
     def __init__(self, this):
         _swig_setattr(self, csTransform, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csTransform, 'thisown', 0)
-        self.__class__ = csTransform
+        _swig_setattr(self, csTransform,self.__class__,csTransform)
 _cspace.csTransform_swigregister(csTransformPtr)
 
 csTransform_GetReflect = _cspace.csTransform_GetReflect
@@ -1092,7 +1085,7 @@ class csReversibleTransformPtr(csReversibleTransform):
     def __init__(self, this):
         _swig_setattr(self, csReversibleTransform, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csReversibleTransform, 'thisown', 0)
-        self.__class__ = csReversibleTransform
+        _swig_setattr(self, csReversibleTransform,self.__class__,csReversibleTransform)
 _cspace.csReversibleTransform_swigregister(csReversibleTransformPtr)
 
 class csOrthoTransform(csReversibleTransform):
@@ -1119,7 +1112,7 @@ class csOrthoTransformPtr(csOrthoTransform):
     def __init__(self, this):
         _swig_setattr(self, csOrthoTransform, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csOrthoTransform, 'thisown', 0)
-        self.__class__ = csOrthoTransform
+        _swig_setattr(self, csOrthoTransform,self.__class__,csOrthoTransform)
 _cspace.csOrthoTransform_swigregister(csOrthoTransformPtr)
 
 class csSphere(_object):
@@ -1150,7 +1143,7 @@ class csSpherePtr(csSphere):
     def __init__(self, this):
         _swig_setattr(self, csSphere, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csSphere, 'thisown', 0)
-        self.__class__ = csSphere
+        _swig_setattr(self, csSphere,self.__class__,csSphere)
 _cspace.csSphere_swigregister(csSpherePtr)
 
 class csEllipsoid(_object):
@@ -1177,7 +1170,7 @@ class csEllipsoidPtr(csEllipsoid):
     def __init__(self, this):
         _swig_setattr(self, csEllipsoid, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csEllipsoid, 'thisown', 0)
-        self.__class__ = csEllipsoid
+        _swig_setattr(self, csEllipsoid,self.__class__,csEllipsoid)
 _cspace.csEllipsoid_swigregister(csEllipsoidPtr)
 
 CS_POLY_IN = _cspace.CS_POLY_IN
@@ -1221,7 +1214,7 @@ class csPlane2Ptr(csPlane2):
     def __init__(self, this):
         _swig_setattr(self, csPlane2, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csPlane2, 'thisown', 0)
-        self.__class__ = csPlane2
+        _swig_setattr(self, csPlane2,self.__class__,csPlane2)
 _cspace.csPlane2_swigregister(csPlane2Ptr)
 
 csPlane2_Classify = _cspace.csPlane2_Classify
@@ -1271,7 +1264,7 @@ class csPlane3Ptr(csPlane3):
     def __init__(self, this):
         _swig_setattr(self, csPlane3, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csPlane3, 'thisown', 0)
-        self.__class__ = csPlane3
+        _swig_setattr(self, csPlane3,self.__class__,csPlane3)
 _cspace.csPlane3_swigregister(csPlane3Ptr)
 
 csPlane3_Classify = _cspace.csPlane3_Classify
@@ -1312,7 +1305,7 @@ class csMath2Ptr(csMath2):
     def __init__(self, this):
         _swig_setattr(self, csMath2, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csMath2, 'thisown', 0)
-        self.__class__ = csMath2
+        _swig_setattr(self, csMath2,self.__class__,csMath2)
 _cspace.csMath2_swigregister(csMath2Ptr)
 
 csMath2_WhichSide2D = _cspace.csMath2_WhichSide2D
@@ -1365,7 +1358,7 @@ class csIntersect2Ptr(csIntersect2):
     def __init__(self, this):
         _swig_setattr(self, csIntersect2, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csIntersect2, 'thisown', 0)
-        self.__class__ = csIntersect2
+        _swig_setattr(self, csIntersect2,self.__class__,csIntersect2)
 _cspace.csIntersect2_swigregister(csIntersect2Ptr)
 
 csIntersect2_PlanePolygon = _cspace.csIntersect2_PlanePolygon
@@ -1427,7 +1420,7 @@ class csPoly2DPtr(csPoly2D):
     def __init__(self, this):
         _swig_setattr(self, csPoly2D, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csPoly2D, 'thisown', 0)
-        self.__class__ = csPoly2D
+        _swig_setattr(self, csPoly2D,self.__class__,csPoly2D)
 _cspace.csPoly2D_swigregister(csPoly2DPtr)
 
 csPoly2D_In = _cspace.csPoly2D_In
@@ -1453,7 +1446,7 @@ class csPoly2DFactoryPtr(csPoly2DFactory):
     def __init__(self, this):
         _swig_setattr(self, csPoly2DFactory, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csPoly2DFactory, 'thisown', 0)
-        self.__class__ = csPoly2DFactory
+        _swig_setattr(self, csPoly2DFactory,self.__class__,csPoly2DFactory)
 _cspace.csPoly2DFactory_swigregister(csPoly2DFactoryPtr)
 
 class csMath3(_object):
@@ -1502,7 +1495,7 @@ class csMath3Ptr(csMath3):
     def __init__(self, this):
         _swig_setattr(self, csMath3, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csMath3, 'thisown', 0)
-        self.__class__ = csMath3
+        _swig_setattr(self, csMath3,self.__class__,csMath3)
 _cspace.csMath3_swigregister(csMath3Ptr)
 
 csMath3_WhichSide3D = _cspace.csMath3_WhichSide3D
@@ -1559,7 +1552,7 @@ class csSquaredDistPtr(csSquaredDist):
     def __init__(self, this):
         _swig_setattr(self, csSquaredDist, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csSquaredDist, 'thisown', 0)
-        self.__class__ = csSquaredDist
+        _swig_setattr(self, csSquaredDist,self.__class__,csSquaredDist)
 _cspace.csSquaredDist_swigregister(csSquaredDistPtr)
 
 csSquaredDist_PointPoint = _cspace.csSquaredDist_PointPoint
@@ -1642,7 +1635,7 @@ class csIntersect3Ptr(csIntersect3):
     def __init__(self, this):
         _swig_setattr(self, csIntersect3, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csIntersect3, 'thisown', 0)
-        self.__class__ = csIntersect3
+        _swig_setattr(self, csIntersect3,self.__class__,csIntersect3)
 _cspace.csIntersect3_swigregister(csIntersect3Ptr)
 
 csIntersect3_PlanePolygon = _cspace.csIntersect3_PlanePolygon
@@ -1723,7 +1716,7 @@ class csGeomDebugHelperPtr(csGeomDebugHelper):
     def __init__(self, this):
         _swig_setattr(self, csGeomDebugHelper, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csGeomDebugHelper, 'thisown', 0)
-        self.__class__ = csGeomDebugHelper
+        _swig_setattr(self, csGeomDebugHelper,self.__class__,csGeomDebugHelper)
 _cspace.csGeomDebugHelper_swigregister(csGeomDebugHelperPtr)
 
 CS_POL_SAME_PLANE = _cspace.CS_POL_SAME_PLANE
@@ -1788,7 +1781,7 @@ class csPoly3DPtr(csPoly3D):
     def __init__(self, this):
         _swig_setattr(self, csPoly3D, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csPoly3D, 'thisown', 0)
-        self.__class__ = csPoly3D
+        _swig_setattr(self, csPoly3D,self.__class__,csPoly3D)
 _cspace.csPoly3D_swigregister(csPoly3DPtr)
 
 csPoly3D_In = _cspace.csPoly3D_In
@@ -1831,7 +1824,7 @@ class csCompressVertexPtr(csCompressVertex):
     def __init__(self, this):
         _swig_setattr(self, csCompressVertex, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csCompressVertex, 'thisown', 0)
-        self.__class__ = csCompressVertex
+        _swig_setattr(self, csCompressVertex,self.__class__,csCompressVertex)
 _cspace.csCompressVertex_swigregister(csCompressVertexPtr)
 
 class csVector3Array(csPoly3D):
@@ -1859,7 +1852,7 @@ class csVector3ArrayPtr(csVector3Array):
     def __init__(self, this):
         _swig_setattr(self, csVector3Array, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csVector3Array, 'thisown', 0)
-        self.__class__ = csVector3Array
+        _swig_setattr(self, csVector3Array,self.__class__,csVector3Array)
 _cspace.csVector3Array_swigregister(csVector3ArrayPtr)
 
 csVector3Array_CompressVertices = _cspace.csVector3Array_CompressVertices
@@ -1895,7 +1888,7 @@ class csTrianglePtr(csTriangle):
     def __init__(self, this):
         _swig_setattr(self, csTriangle, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csTriangle, 'thisown', 0)
-        self.__class__ = csTriangle
+        _swig_setattr(self, csTriangle,self.__class__,csTriangle)
 _cspace.csTriangle_swigregister(csTrianglePtr)
 
 class csRect(_object):
@@ -1958,7 +1951,7 @@ class csRectPtr(csRect):
     def __init__(self, this):
         _swig_setattr(self, csRect, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csRect, 'thisown', 0)
-        self.__class__ = csRect
+        _swig_setattr(self, csRect,self.__class__,csRect)
 _cspace.csRect_swigregister(csRectPtr)
 
 class csRectRegion(_object):
@@ -1987,7 +1980,7 @@ class csRectRegionPtr(csRectRegion):
     def __init__(self, this):
         _swig_setattr(self, csRectRegion, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csRectRegion, 'thisown', 0)
-        self.__class__ = csRectRegion
+        _swig_setattr(self, csRectRegion,self.__class__,csRectRegion)
 _cspace.csRectRegion_swigregister(csRectRegionPtr)
 
 class csQuaternion(_object):
@@ -2038,7 +2031,7 @@ class csQuaternionPtr(csQuaternion):
     def __init__(self, this):
         _swig_setattr(self, csQuaternion, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csQuaternion, 'thisown', 0)
-        self.__class__ = csQuaternion
+        _swig_setattr(self, csQuaternion,self.__class__,csQuaternion)
 _cspace.csQuaternion_swigregister(csQuaternionPtr)
 
 class csSpline(_object):
@@ -2076,7 +2069,7 @@ class csSplinePtr(csSpline):
     def __init__(self, this):
         _swig_setattr(self, csSpline, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csSpline, 'thisown', 0)
-        self.__class__ = csSpline
+        _swig_setattr(self, csSpline,self.__class__,csSpline)
 _cspace.csSpline_swigregister(csSplinePtr)
 
 class csCubicSpline(csSpline):
@@ -2103,7 +2096,7 @@ class csCubicSplinePtr(csCubicSpline):
     def __init__(self, this):
         _swig_setattr(self, csCubicSpline, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csCubicSpline, 'thisown', 0)
-        self.__class__ = csCubicSpline
+        _swig_setattr(self, csCubicSpline,self.__class__,csCubicSpline)
 _cspace.csCubicSpline_swigregister(csCubicSplinePtr)
 
 class csBSpline(csSpline):
@@ -2130,7 +2123,7 @@ class csBSplinePtr(csBSpline):
     def __init__(self, this):
         _swig_setattr(self, csBSpline, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csBSpline, 'thisown', 0)
-        self.__class__ = csBSpline
+        _swig_setattr(self, csBSpline,self.__class__,csBSpline)
 _cspace.csBSpline_swigregister(csBSplinePtr)
 
 class csCatmullRomSpline(csBSpline):
@@ -2156,7 +2149,7 @@ class csCatmullRomSplinePtr(csCatmullRomSpline):
     def __init__(self, this):
         _swig_setattr(self, csCatmullRomSpline, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csCatmullRomSpline, 'thisown', 0)
-        self.__class__ = csCatmullRomSpline
+        _swig_setattr(self, csCatmullRomSpline,self.__class__,csCatmullRomSpline)
 _cspace.csCatmullRomSpline_swigregister(csCatmullRomSplinePtr)
 
 CS_BOUNDINGBOX_MAXVALUE = _cspace.CS_BOUNDINGBOX_MAXVALUE
@@ -2232,7 +2225,7 @@ class csBox2Ptr(csBox2):
     def __init__(self, this):
         _swig_setattr(self, csBox2, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csBox2, 'thisown', 0)
-        self.__class__ = csBox2
+        _swig_setattr(self, csBox2,self.__class__,csBox2)
 _cspace.csBox2_swigregister(csBox2Ptr)
 
 CS_BOX_CORNER_xyz = _cspace.CS_BOX_CORNER_xyz
@@ -2356,7 +2349,7 @@ class csBox3Ptr(csBox3):
     def __init__(self, this):
         _swig_setattr(self, csBox3, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csBox3, 'thisown', 0)
-        self.__class__ = csBox3
+        _swig_setattr(self, csBox3,self.__class__,csBox3)
 _cspace.csBox3_swigregister(csBox3Ptr)
 
 csBox3_OtherSide = _cspace.csBox3_OtherSide
@@ -2386,7 +2379,7 @@ class csSegment2Ptr(csSegment2):
     def __init__(self, this):
         _swig_setattr(self, csSegment2, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csSegment2, 'thisown', 0)
-        self.__class__ = csSegment2
+        _swig_setattr(self, csSegment2,self.__class__,csSegment2)
 _cspace.csSegment2_swigregister(csSegment2Ptr)
 
 class csSegment3(_object):
@@ -2414,7 +2407,7 @@ class csSegment3Ptr(csSegment3):
     def __init__(self, this):
         _swig_setattr(self, csSegment3, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csSegment3, 'thisown', 0)
-        self.__class__ = csSegment3
+        _swig_setattr(self, csSegment3,self.__class__,csSegment3)
 _cspace.csSegment3_swigregister(csSegment3Ptr)
 
 class csRGBcolor(_object):
@@ -2452,7 +2445,7 @@ class csRGBcolorPtr(csRGBcolor):
     def __init__(self, this):
         _swig_setattr(self, csRGBcolor, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csRGBcolor, 'thisown', 0)
-        self.__class__ = csRGBcolor
+        _swig_setattr(self, csRGBcolor,self.__class__,csRGBcolor)
 _cspace.csRGBcolor_swigregister(csRGBcolorPtr)
 
 class csRGBpixel(_object):
@@ -2497,7 +2490,7 @@ class csRGBpixelPtr(csRGBpixel):
     def __init__(self, this):
         _swig_setattr(self, csRGBpixel, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csRGBpixel, 'thisown', 0)
-        self.__class__ = csRGBpixel
+        _swig_setattr(self, csRGBpixel,self.__class__,csRGBpixel)
 _cspace.csRGBpixel_swigregister(csRGBpixelPtr)
 
 R_COEF = _cspace.R_COEF
@@ -2527,7 +2520,7 @@ class iShaderVariableAccessorPtr(iShaderVariableAccessor):
     def __init__(self, this):
         _swig_setattr(self, iShaderVariableAccessor, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iShaderVariableAccessor, 'thisown', 0)
-        self.__class__ = iShaderVariableAccessor
+        _swig_setattr(self, iShaderVariableAccessor,self.__class__,iShaderVariableAccessor)
 _cspace.iShaderVariableAccessor_swigregister(iShaderVariableAccessorPtr)
 
 class csShaderVariable(csRefCount):
@@ -2578,7 +2571,7 @@ class csShaderVariablePtr(csShaderVariable):
     def __init__(self, this):
         _swig_setattr(self, csShaderVariable, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csShaderVariable, 'thisown', 0)
-        self.__class__ = csShaderVariable
+        _swig_setattr(self, csShaderVariable,self.__class__,csShaderVariable)
 _cspace.csShaderVariable_swigregister(csShaderVariablePtr)
 
 class csShaderVariableArrayReadOnly(iBase):
@@ -2608,7 +2601,7 @@ class csShaderVariableArrayReadOnlyPtr(csShaderVariableArrayReadOnly):
     def __init__(self, this):
         _swig_setattr(self, csShaderVariableArrayReadOnly, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csShaderVariableArrayReadOnly, 'thisown', 0)
-        self.__class__ = csShaderVariableArrayReadOnly
+        _swig_setattr(self, csShaderVariableArrayReadOnly,self.__class__,csShaderVariableArrayReadOnly)
 _cspace.csShaderVariableArrayReadOnly_swigregister(csShaderVariableArrayReadOnlyPtr)
 
 class csShaderVariableArrayChangeElements(csShaderVariableArrayReadOnly):
@@ -2633,7 +2626,7 @@ class csShaderVariableArrayChangeElementsPtr(csShaderVariableArrayChangeElements
     def __init__(self, this):
         _swig_setattr(self, csShaderVariableArrayChangeElements, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csShaderVariableArrayChangeElements, 'thisown', 0)
-        self.__class__ = csShaderVariableArrayChangeElements
+        _swig_setattr(self, csShaderVariableArrayChangeElements,self.__class__,csShaderVariableArrayChangeElements)
 _cspace.csShaderVariableArrayChangeElements_swigregister(csShaderVariableArrayChangeElementsPtr)
 
 class csShaderVariableArray(csShaderVariableArrayChangeElements):
@@ -2670,7 +2663,7 @@ class csShaderVariableArrayPtr(csShaderVariableArray):
     def __init__(self, this):
         _swig_setattr(self, csShaderVariableArray, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csShaderVariableArray, 'thisown', 0)
-        self.__class__ = csShaderVariableArray
+        _swig_setattr(self, csShaderVariableArray,self.__class__,csShaderVariableArray)
 _cspace.csShaderVariableArray_swigregister(csShaderVariableArrayPtr)
 
 
@@ -2720,7 +2713,7 @@ class csPluginRequestPtr(csPluginRequest):
     def __init__(self, this):
         _swig_setattr(self, csPluginRequest, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csPluginRequest, 'thisown', 0)
-        self.__class__ = csPluginRequest
+        _swig_setattr(self, csPluginRequest,self.__class__,csPluginRequest)
 _cspace.csPluginRequest_swigregister(csPluginRequestPtr)
 
 csGetPlatformConfigPath = _cspace.csGetPlatformConfigPath
@@ -2783,7 +2776,7 @@ class csInitializerPtr(csInitializer):
     def __init__(self, this):
         _swig_setattr(self, csInitializer, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csInitializer, 'thisown', 0)
-        self.__class__ = csInitializer
+        _swig_setattr(self, csInitializer,self.__class__,csInitializer)
 _cspace.csInitializer_swigregister(csInitializerPtr)
 
 csInitializer_CreateEnvironment = _cspace.csInitializer_CreateEnvironment
@@ -2862,7 +2855,7 @@ class csPluginRequestArrayPtr(csPluginRequestArray):
     def __init__(self, this):
         _swig_setattr(self, csPluginRequestArray, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csPluginRequestArray, 'thisown', 0)
-        self.__class__ = csPluginRequestArray
+        _swig_setattr(self, csPluginRequestArray,self.__class__,csPluginRequestArray)
 _cspace.csPluginRequestArray_swigregister(csPluginRequestArrayPtr)
 
 class iAwsKey(iBase):
@@ -2889,7 +2882,7 @@ class iAwsKeyPtr(iAwsKey):
     def __init__(self, this):
         _swig_setattr(self, iAwsKey, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iAwsKey, 'thisown', 0)
-        self.__class__ = iAwsKey
+        _swig_setattr(self, iAwsKey,self.__class__,iAwsKey)
 _cspace.iAwsKey_swigregister(iAwsKeyPtr)
 aws_debug = cvar.aws_debug
 AWSF_AlwaysEraseWindows = cvar.AWSF_AlwaysEraseWindows
@@ -2920,7 +2913,7 @@ class iAwsIntKeyPtr(iAwsIntKey):
     def __init__(self, this):
         _swig_setattr(self, iAwsIntKey, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iAwsIntKey, 'thisown', 0)
-        self.__class__ = iAwsIntKey
+        _swig_setattr(self, iAwsIntKey,self.__class__,iAwsIntKey)
 _cspace.iAwsIntKey_swigregister(iAwsIntKeyPtr)
 
 class iAwsFloatKey(iAwsKey):
@@ -2944,7 +2937,7 @@ class iAwsFloatKeyPtr(iAwsFloatKey):
     def __init__(self, this):
         _swig_setattr(self, iAwsFloatKey, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iAwsFloatKey, 'thisown', 0)
-        self.__class__ = iAwsFloatKey
+        _swig_setattr(self, iAwsFloatKey,self.__class__,iAwsFloatKey)
 _cspace.iAwsFloatKey_swigregister(iAwsFloatKeyPtr)
 
 class iAwsStringKey(iAwsKey):
@@ -2968,7 +2961,7 @@ class iAwsStringKeyPtr(iAwsStringKey):
     def __init__(self, this):
         _swig_setattr(self, iAwsStringKey, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iAwsStringKey, 'thisown', 0)
-        self.__class__ = iAwsStringKey
+        _swig_setattr(self, iAwsStringKey,self.__class__,iAwsStringKey)
 _cspace.iAwsStringKey_swigregister(iAwsStringKeyPtr)
 
 class iAwsRectKey(iAwsKey):
@@ -2992,7 +2985,7 @@ class iAwsRectKeyPtr(iAwsRectKey):
     def __init__(self, this):
         _swig_setattr(self, iAwsRectKey, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iAwsRectKey, 'thisown', 0)
-        self.__class__ = iAwsRectKey
+        _swig_setattr(self, iAwsRectKey,self.__class__,iAwsRectKey)
 _cspace.iAwsRectKey_swigregister(iAwsRectKeyPtr)
 
 class iAwsRGBKey(iAwsKey):
@@ -3016,7 +3009,7 @@ class iAwsRGBKeyPtr(iAwsRGBKey):
     def __init__(self, this):
         _swig_setattr(self, iAwsRGBKey, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iAwsRGBKey, 'thisown', 0)
-        self.__class__ = iAwsRGBKey
+        _swig_setattr(self, iAwsRGBKey,self.__class__,iAwsRGBKey)
 _cspace.iAwsRGBKey_swigregister(iAwsRGBKeyPtr)
 
 class iAwsPointKey(iAwsKey):
@@ -3040,7 +3033,7 @@ class iAwsPointKeyPtr(iAwsPointKey):
     def __init__(self, this):
         _swig_setattr(self, iAwsPointKey, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iAwsPointKey, 'thisown', 0)
-        self.__class__ = iAwsPointKey
+        _swig_setattr(self, iAwsPointKey,self.__class__,iAwsPointKey)
 _cspace.iAwsPointKey_swigregister(iAwsPointKeyPtr)
 
 class iAwsConnectionKey(iAwsKey):
@@ -3066,7 +3059,7 @@ class iAwsConnectionKeyPtr(iAwsConnectionKey):
     def __init__(self, this):
         _swig_setattr(self, iAwsConnectionKey, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iAwsConnectionKey, 'thisown', 0)
-        self.__class__ = iAwsConnectionKey
+        _swig_setattr(self, iAwsConnectionKey,self.__class__,iAwsConnectionKey)
 _cspace.iAwsConnectionKey_swigregister(iAwsConnectionKeyPtr)
 
 class iAwsKeyContainer(iAwsKey):
@@ -3097,7 +3090,7 @@ class iAwsKeyContainerPtr(iAwsKeyContainer):
     def __init__(self, this):
         _swig_setattr(self, iAwsKeyContainer, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iAwsKeyContainer, 'thisown', 0)
-        self.__class__ = iAwsKeyContainer
+        _swig_setattr(self, iAwsKeyContainer,self.__class__,iAwsKeyContainer)
 _cspace.iAwsKeyContainer_swigregister(iAwsKeyContainerPtr)
 
 class iAwsComponentNode(iAwsKeyContainer):
@@ -3121,7 +3114,7 @@ class iAwsComponentNodePtr(iAwsComponentNode):
     def __init__(self, this):
         _swig_setattr(self, iAwsComponentNode, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iAwsComponentNode, 'thisown', 0)
-        self.__class__ = iAwsComponentNode
+        _swig_setattr(self, iAwsComponentNode,self.__class__,iAwsComponentNode)
 _cspace.iAwsComponentNode_swigregister(iAwsComponentNodePtr)
 
 class iAws(iBase):
@@ -3228,7 +3221,7 @@ class iAwsPtr(iAws):
     def __init__(self, this):
         _swig_setattr(self, iAws, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iAws, 'thisown', 0)
-        self.__class__ = iAws
+        _swig_setattr(self, iAws,self.__class__,iAws)
 _cspace.iAws_swigregister(iAwsPtr)
 
 iAws_scfGetVersion = _cspace.iAws_scfGetVersion
@@ -3291,7 +3284,7 @@ class iAwsPrefManagerPtr(iAwsPrefManager):
     def __init__(self, this):
         _swig_setattr(self, iAwsPrefManager, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iAwsPrefManager, 'thisown', 0)
-        self.__class__ = iAwsPrefManager
+        _swig_setattr(self, iAwsPrefManager,self.__class__,iAwsPrefManager)
 _cspace.iAwsPrefManager_swigregister(iAwsPrefManagerPtr)
 
 class iAwsSinkManager(iBase):
@@ -3320,7 +3313,7 @@ class iAwsSinkManagerPtr(iAwsSinkManager):
     def __init__(self, this):
         _swig_setattr(self, iAwsSinkManager, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iAwsSinkManager, 'thisown', 0)
-        self.__class__ = iAwsSinkManager
+        _swig_setattr(self, iAwsSinkManager,self.__class__,iAwsSinkManager)
 _cspace.iAwsSinkManager_swigregister(iAwsSinkManagerPtr)
 
 class iAwsSink(iBase):
@@ -3347,7 +3340,7 @@ class iAwsSinkPtr(iAwsSink):
     def __init__(self, this):
         _swig_setattr(self, iAwsSink, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iAwsSink, 'thisown', 0)
-        self.__class__ = iAwsSink
+        _swig_setattr(self, iAwsSink,self.__class__,iAwsSink)
 _cspace.iAwsSink_swigregister(iAwsSinkPtr)
 
 class iAwsSource(iBase):
@@ -3375,7 +3368,7 @@ class iAwsSourcePtr(iAwsSource):
     def __init__(self, this):
         _swig_setattr(self, iAwsSource, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iAwsSource, 'thisown', 0)
-        self.__class__ = iAwsSource
+        _swig_setattr(self, iAwsSource,self.__class__,iAwsSource)
 _cspace.iAwsSource_swigregister(iAwsSourcePtr)
 
 class iAwsSlot(iBase):
@@ -3401,7 +3394,7 @@ class iAwsSlotPtr(iAwsSlot):
     def __init__(self, this):
         _swig_setattr(self, iAwsSlot, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iAwsSlot, 'thisown', 0)
-        self.__class__ = iAwsSlot
+        _swig_setattr(self, iAwsSlot,self.__class__,iAwsSlot)
 _cspace.iAwsSlot_swigregister(iAwsSlotPtr)
 
 class iAwsLayoutManager(iBase):
@@ -3428,7 +3421,7 @@ class iAwsLayoutManagerPtr(iAwsLayoutManager):
     def __init__(self, this):
         _swig_setattr(self, iAwsLayoutManager, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iAwsLayoutManager, 'thisown', 0)
-        self.__class__ = iAwsLayoutManager
+        _swig_setattr(self, iAwsLayoutManager,self.__class__,iAwsLayoutManager)
 _cspace.iAwsLayoutManager_swigregister(iAwsLayoutManagerPtr)
 
 class iAwsComponent(iAwsSource):
@@ -3546,7 +3539,7 @@ class iAwsComponentPtr(iAwsComponent):
     def __init__(self, this):
         _swig_setattr(self, iAwsComponent, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iAwsComponent, 'thisown', 0)
-        self.__class__ = iAwsComponent
+        _swig_setattr(self, iAwsComponent,self.__class__,iAwsComponent)
 _cspace.iAwsComponent_swigregister(iAwsComponentPtr)
 
 class iAwsComponentFactory(iBase):
@@ -3572,7 +3565,7 @@ class iAwsComponentFactoryPtr(iAwsComponentFactory):
     def __init__(self, this):
         _swig_setattr(self, iAwsComponentFactory, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iAwsComponentFactory, 'thisown', 0)
-        self.__class__ = iAwsComponentFactory
+        _swig_setattr(self, iAwsComponentFactory,self.__class__,iAwsComponentFactory)
 _cspace.iAwsComponentFactory_swigregister(iAwsComponentFactoryPtr)
 
 class iAwsKeyFactory(iBase):
@@ -3606,7 +3599,7 @@ class iAwsKeyFactoryPtr(iAwsKeyFactory):
     def __init__(self, this):
         _swig_setattr(self, iAwsKeyFactory, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iAwsKeyFactory, 'thisown', 0)
-        self.__class__ = iAwsKeyFactory
+        _swig_setattr(self, iAwsKeyFactory,self.__class__,iAwsKeyFactory)
 _cspace.iAwsKeyFactory_swigregister(iAwsKeyFactoryPtr)
 
 class iAwsConnectionNodeFactory(iBase):
@@ -3632,7 +3625,7 @@ class iAwsConnectionNodeFactoryPtr(iAwsConnectionNodeFactory):
     def __init__(self, this):
         _swig_setattr(self, iAwsConnectionNodeFactory, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iAwsConnectionNodeFactory, 'thisown', 0)
-        self.__class__ = iAwsConnectionNodeFactory
+        _swig_setattr(self, iAwsConnectionNodeFactory,self.__class__,iAwsConnectionNodeFactory)
 _cspace.iAwsConnectionNodeFactory_swigregister(iAwsConnectionNodeFactoryPtr)
 
 MAX_OUTPUT_VERTICES = _cspace.MAX_OUTPUT_VERTICES
@@ -3668,7 +3661,7 @@ class csVertexStatusPtr(csVertexStatus):
     def __init__(self, this):
         _swig_setattr(self, csVertexStatus, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csVertexStatus, 'thisown', 0)
-        self.__class__ = csVertexStatus
+        _swig_setattr(self, csVertexStatus,self.__class__,csVertexStatus)
 _cspace.csVertexStatus_swigregister(csVertexStatusPtr)
 
 CS_VERTEX_ORIGINAL = _cspace.CS_VERTEX_ORIGINAL
@@ -3703,7 +3696,7 @@ class iClipper2DPtr(iClipper2D):
     def __init__(self, this):
         _swig_setattr(self, iClipper2D, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iClipper2D, 'thisown', 0)
-        self.__class__ = iClipper2D
+        _swig_setattr(self, iClipper2D,self.__class__,iClipper2D)
 _cspace.iClipper2D_swigregister(iClipper2DPtr)
 
 class iObjectModelListener(iBase):
@@ -3729,7 +3722,7 @@ class iObjectModelListenerPtr(iObjectModelListener):
     def __init__(self, this):
         _swig_setattr(self, iObjectModelListener, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iObjectModelListener, 'thisown', 0)
-        self.__class__ = iObjectModelListener
+        _swig_setattr(self, iObjectModelListener,self.__class__,iObjectModelListener)
 _cspace.iObjectModelListener_swigregister(iObjectModelListenerPtr)
 
 iObjectModelListener_scfGetVersion = _cspace.iObjectModelListener_scfGetVersion
@@ -3771,7 +3764,7 @@ class iObjectModelPtr(iObjectModel):
     def __init__(self, this):
         _swig_setattr(self, iObjectModel, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iObjectModel, 'thisown', 0)
-        self.__class__ = iObjectModel
+        _swig_setattr(self, iObjectModel,self.__class__,iObjectModel)
 _cspace.iObjectModel_swigregister(iObjectModelPtr)
 
 iObjectModel_scfGetVersion = _cspace.iObjectModel_scfGetVersion
@@ -3815,7 +3808,7 @@ class iPathPtr(iPath):
     def __init__(self, this):
         _swig_setattr(self, iPath, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iPath, 'thisown', 0)
-        self.__class__ = iPath
+        _swig_setattr(self, iPath,self.__class__,iPath)
 _cspace.iPath_swigregister(iPathPtr)
 
 iPath_scfGetVersion = _cspace.iPath_scfGetVersion
@@ -3841,7 +3834,7 @@ class scfPathPtr(scfPath):
     def __init__(self, this):
         _swig_setattr(self, scfPath, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, scfPath, 'thisown', 0)
-        self.__class__ = scfPath
+        _swig_setattr(self, scfPath,self.__class__,scfPath)
 _cspace.scfPath_swigregister(scfPathPtr)
 
 CS_POLYMESH_CLOSED = _cspace.CS_POLYMESH_CLOSED
@@ -3876,7 +3869,7 @@ class csMeshedPolygonPtr(csMeshedPolygon):
     def __init__(self, this):
         _swig_setattr(self, csMeshedPolygon, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csMeshedPolygon, 'thisown', 0)
-        self.__class__ = csMeshedPolygon
+        _swig_setattr(self, csMeshedPolygon,self.__class__,csMeshedPolygon)
 _cspace.csMeshedPolygon_swigregister(csMeshedPolygonPtr)
 
 class iPolygonMesh(iBase):
@@ -3911,7 +3904,7 @@ class iPolygonMeshPtr(iPolygonMesh):
     def __init__(self, this):
         _swig_setattr(self, iPolygonMesh, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iPolygonMesh, 'thisown', 0)
-        self.__class__ = iPolygonMesh
+        _swig_setattr(self, iPolygonMesh,self.__class__,iPolygonMesh)
 _cspace.iPolygonMesh_swigregister(iPolygonMeshPtr)
 
 iPolygonMesh_scfGetVersion = _cspace.iPolygonMesh_scfGetVersion
@@ -3967,7 +3960,7 @@ class csPathPtr(csPath):
     def __init__(self, this):
         _swig_setattr(self, csPath, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csPath, 'thisown', 0)
-        self.__class__ = csPath
+        _swig_setattr(self, csPath,self.__class__,csPath)
 _cspace.csPath_swigregister(csPathPtr)
 
 class csPolygonMesh(_object):
@@ -4008,7 +4001,7 @@ class csPolygonMeshPtr(csPolygonMesh):
     def __init__(self, this):
         _swig_setattr(self, csPolygonMesh, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csPolygonMesh, 'thisown', 0)
-        self.__class__ = csPolygonMesh
+        _swig_setattr(self, csPolygonMesh,self.__class__,csPolygonMesh)
 _cspace.csPolygonMesh_swigregister(csPolygonMeshPtr)
 
 class csPolygonMeshBox(_object):
@@ -4042,7 +4035,7 @@ class csPolygonMeshBoxPtr(csPolygonMeshBox):
     def __init__(self, this):
         _swig_setattr(self, csPolygonMeshBox, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csPolygonMeshBox, 'thisown', 0)
-        self.__class__ = csPolygonMeshBox
+        _swig_setattr(self, csPolygonMeshBox,self.__class__,csPolygonMeshBox)
 _cspace.csPolygonMeshBox_swigregister(csPolygonMeshBoxPtr)
 
 class iFrustumViewUserdata(iBase):
@@ -4067,7 +4060,7 @@ class iFrustumViewUserdataPtr(iFrustumViewUserdata):
     def __init__(self, this):
         _swig_setattr(self, iFrustumViewUserdata, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iFrustumViewUserdata, 'thisown', 0)
-        self.__class__ = iFrustumViewUserdata
+        _swig_setattr(self, iFrustumViewUserdata,self.__class__,iFrustumViewUserdata)
 _cspace.iFrustumViewUserdata_swigregister(iFrustumViewUserdataPtr)
 
 iFrustumViewUserdata_scfGetVersion = _cspace.iFrustumViewUserdata_scfGetVersion
@@ -4102,7 +4095,7 @@ class csFrustumContextPtr(csFrustumContext):
     def __init__(self, this):
         _swig_setattr(self, csFrustumContext, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csFrustumContext, 'thisown', 0)
-        self.__class__ = csFrustumContext
+        _swig_setattr(self, csFrustumContext,self.__class__,csFrustumContext)
 _cspace.csFrustumContext_swigregister(csFrustumContextPtr)
 
 class iFrustumView(iBase):
@@ -4141,7 +4134,7 @@ class iFrustumViewPtr(iFrustumView):
     def __init__(self, this):
         _swig_setattr(self, iFrustumView, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iFrustumView, 'thisown', 0)
-        self.__class__ = iFrustumView
+        _swig_setattr(self, iFrustumView,self.__class__,iFrustumView)
 _cspace.iFrustumView_swigregister(iFrustumViewPtr)
 
 iFrustumView_scfGetVersion = _cspace.iFrustumView_scfGetVersion
@@ -4186,7 +4179,7 @@ class iLightCallbackPtr(iLightCallback):
     def __init__(self, this):
         _swig_setattr(self, iLightCallback, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iLightCallback, 'thisown', 0)
-        self.__class__ = iLightCallback
+        _swig_setattr(self, iLightCallback,self.__class__,iLightCallback)
 _cspace.iLightCallback_swigregister(iLightCallbackPtr)
 
 class iLight(iBase):
@@ -4251,7 +4244,7 @@ class iLightPtr(iLight):
     def __init__(self, this):
         _swig_setattr(self, iLight, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iLight, 'thisown', 0)
-        self.__class__ = iLight
+        _swig_setattr(self, iLight,self.__class__,iLight)
 _cspace.iLight_swigregister(iLightPtr)
 
 iLight_scfGetVersion = _cspace.iLight_scfGetVersion
@@ -4295,7 +4288,7 @@ class iLightListPtr(iLightList):
     def __init__(self, this):
         _swig_setattr(self, iLightList, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iLightList, 'thisown', 0)
-        self.__class__ = iLightList
+        _swig_setattr(self, iLightList,self.__class__,iLightList)
 _cspace.iLightList_swigregister(iLightListPtr)
 
 iLightList_scfGetVersion = _cspace.iLightList_scfGetVersion
@@ -4321,7 +4314,7 @@ class iLightingProcessDataPtr(iLightingProcessData):
     def __init__(self, this):
         _swig_setattr(self, iLightingProcessData, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iLightingProcessData, 'thisown', 0)
-        self.__class__ = iLightingProcessData
+        _swig_setattr(self, iLightingProcessData,self.__class__,iLightingProcessData)
 _cspace.iLightingProcessData_swigregister(iLightingProcessDataPtr)
 
 class iLightingProcessInfo(iFrustumViewUserdata):
@@ -4351,7 +4344,7 @@ class iLightingProcessInfoPtr(iLightingProcessInfo):
     def __init__(self, this):
         _swig_setattr(self, iLightingProcessInfo, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iLightingProcessInfo, 'thisown', 0)
-        self.__class__ = iLightingProcessInfo
+        _swig_setattr(self, iLightingProcessInfo,self.__class__,iLightingProcessInfo)
 _cspace.iLightingProcessInfo_swigregister(iLightingProcessInfoPtr)
 
 class iLightIterator(iBase):
@@ -4378,7 +4371,7 @@ class iLightIteratorPtr(iLightIterator):
     def __init__(self, this):
         _swig_setattr(self, iLightIterator, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iLightIterator, 'thisown', 0)
-        self.__class__ = iLightIterator
+        _swig_setattr(self, iLightIterator,self.__class__,iLightIterator)
 _cspace.iLightIterator_swigregister(iLightIteratorPtr)
 
 CS_FOG_MODE_NONE = _cspace.CS_FOG_MODE_NONE
@@ -4429,7 +4422,7 @@ class csFogPtr(csFog):
     def __init__(self, this):
         _swig_setattr(self, csFog, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csFog, 'thisown', 0)
-        self.__class__ = csFog
+        _swig_setattr(self, csFog,self.__class__,csFog)
 _cspace.csFog_swigregister(csFogPtr)
 
 class iSectorCallback(iBase):
@@ -4453,7 +4446,7 @@ class iSectorCallbackPtr(iSectorCallback):
     def __init__(self, this):
         _swig_setattr(self, iSectorCallback, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iSectorCallback, 'thisown', 0)
-        self.__class__ = iSectorCallback
+        _swig_setattr(self, iSectorCallback,self.__class__,iSectorCallback)
 _cspace.iSectorCallback_swigregister(iSectorCallbackPtr)
 
 class iSectorMeshCallback(iBase):
@@ -4478,7 +4471,7 @@ class iSectorMeshCallbackPtr(iSectorMeshCallback):
     def __init__(self, this):
         _swig_setattr(self, iSectorMeshCallback, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iSectorMeshCallback, 'thisown', 0)
-        self.__class__ = iSectorMeshCallback
+        _swig_setattr(self, iSectorMeshCallback,self.__class__,iSectorMeshCallback)
 _cspace.iSectorMeshCallback_swigregister(iSectorMeshCallbackPtr)
 
 class iLightVisibleCallback(iBase):
@@ -4502,7 +4495,7 @@ class iLightVisibleCallbackPtr(iLightVisibleCallback):
     def __init__(self, this):
         _swig_setattr(self, iLightVisibleCallback, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iLightVisibleCallback, 'thisown', 0)
-        self.__class__ = iLightVisibleCallback
+        _swig_setattr(self, iLightVisibleCallback,self.__class__,iLightVisibleCallback)
 _cspace.iLightVisibleCallback_swigregister(iLightVisibleCallbackPtr)
 
 class csSectorHitBeamResult(_object):
@@ -4537,7 +4530,7 @@ class csSectorHitBeamResultPtr(csSectorHitBeamResult):
     def __init__(self, this):
         _swig_setattr(self, csSectorHitBeamResult, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csSectorHitBeamResult, 'thisown', 0)
-        self.__class__ = csSectorHitBeamResult
+        _swig_setattr(self, csSectorHitBeamResult,self.__class__,csSectorHitBeamResult)
 _cspace.csSectorHitBeamResult_swigregister(csSectorHitBeamResultPtr)
 
 class iSector(iBase):
@@ -4606,7 +4599,7 @@ class iSectorPtr(iSector):
     def __init__(self, this):
         _swig_setattr(self, iSector, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iSector, 'thisown', 0)
-        self.__class__ = iSector
+        _swig_setattr(self, iSector,self.__class__,iSector)
 _cspace.iSector_swigregister(iSectorPtr)
 
 iSector_scfGetVersion = _cspace.iSector_scfGetVersion
@@ -4649,7 +4642,7 @@ class iSectorListPtr(iSectorList):
     def __init__(self, this):
         _swig_setattr(self, iSectorList, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iSectorList, 'thisown', 0)
-        self.__class__ = iSectorList
+        _swig_setattr(self, iSectorList,self.__class__,iSectorList)
 _cspace.iSectorList_swigregister(iSectorListPtr)
 
 iSectorList_scfGetVersion = _cspace.iSectorList_scfGetVersion
@@ -4678,7 +4671,7 @@ class iSectorIteratorPtr(iSectorIterator):
     def __init__(self, this):
         _swig_setattr(self, iSectorIterator, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iSectorIterator, 'thisown', 0)
-        self.__class__ = iSectorIterator
+        _swig_setattr(self, iSectorIterator,self.__class__,iSectorIterator)
 _cspace.iSectorIterator_swigregister(iSectorIteratorPtr)
 
 CS_ENGINE_CACHE_READ = _cspace.CS_ENGINE_CACHE_READ
@@ -4708,7 +4701,7 @@ class iEngineFrameCallbackPtr(iEngineFrameCallback):
     def __init__(self, this):
         _swig_setattr(self, iEngineFrameCallback, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iEngineFrameCallback, 'thisown', 0)
-        self.__class__ = iEngineFrameCallback
+        _swig_setattr(self, iEngineFrameCallback,self.__class__,iEngineFrameCallback)
 _cspace.iEngineFrameCallback_swigregister(iEngineFrameCallbackPtr)
 
 class iEngineSectorCallback(iBase):
@@ -4733,7 +4726,7 @@ class iEngineSectorCallbackPtr(iEngineSectorCallback):
     def __init__(self, this):
         _swig_setattr(self, iEngineSectorCallback, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iEngineSectorCallback, 'thisown', 0)
-        self.__class__ = iEngineSectorCallback
+        _swig_setattr(self, iEngineSectorCallback,self.__class__,iEngineSectorCallback)
 _cspace.iEngineSectorCallback_swigregister(iEngineSectorCallbackPtr)
 
 class iEngine(iBase):
@@ -4860,7 +4853,7 @@ class iEnginePtr(iEngine):
     def __init__(self, this):
         _swig_setattr(self, iEngine, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iEngine, 'thisown', 0)
-        self.__class__ = iEngine
+        _swig_setattr(self, iEngine,self.__class__,iEngine)
 _cspace.iEngine_swigregister(iEnginePtr)
 
 iEngine_scfGetVersion = _cspace.iEngine_scfGetVersion
@@ -4886,7 +4879,7 @@ class iCameraSectorListenerPtr(iCameraSectorListener):
     def __init__(self, this):
         _swig_setattr(self, iCameraSectorListener, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iCameraSectorListener, 'thisown', 0)
-        self.__class__ = iCameraSectorListener
+        _swig_setattr(self, iCameraSectorListener,self.__class__,iCameraSectorListener)
 _cspace.iCameraSectorListener_swigregister(iCameraSectorListenerPtr)
 
 class iCamera(iBase):
@@ -4941,7 +4934,7 @@ class iCameraPtr(iCamera):
     def __init__(self, this):
         _swig_setattr(self, iCamera, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iCamera, 'thisown', 0)
-        self.__class__ = iCamera
+        _swig_setattr(self, iCamera,self.__class__,iCamera)
 _cspace.iCamera_swigregister(iCameraPtr)
 
 iCamera_scfGetVersion = _cspace.iCamera_scfGetVersion
@@ -4983,7 +4976,7 @@ class iCameraPositionPtr(iCameraPosition):
     def __init__(self, this):
         _swig_setattr(self, iCameraPosition, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iCameraPosition, 'thisown', 0)
-        self.__class__ = iCameraPosition
+        _swig_setattr(self, iCameraPosition,self.__class__,iCameraPosition)
 _cspace.iCameraPosition_swigregister(iCameraPositionPtr)
 
 iCameraPosition_scfGetVersion = _cspace.iCameraPosition_scfGetVersion
@@ -5025,7 +5018,7 @@ class iCameraPositionListPtr(iCameraPositionList):
     def __init__(self, this):
         _swig_setattr(self, iCameraPositionList, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iCameraPositionList, 'thisown', 0)
-        self.__class__ = iCameraPositionList
+        _swig_setattr(self, iCameraPositionList,self.__class__,iCameraPositionList)
 _cspace.iCameraPositionList_swigregister(iCameraPositionListPtr)
 
 class iTextureCallback(iBase):
@@ -5049,7 +5042,7 @@ class iTextureCallbackPtr(iTextureCallback):
     def __init__(self, this):
         _swig_setattr(self, iTextureCallback, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iTextureCallback, 'thisown', 0)
-        self.__class__ = iTextureCallback
+        _swig_setattr(self, iTextureCallback,self.__class__,iTextureCallback)
 _cspace.iTextureCallback_swigregister(iTextureCallbackPtr)
 
 class iTextureWrapper(iBase):
@@ -5093,7 +5086,7 @@ class iTextureWrapperPtr(iTextureWrapper):
     def __init__(self, this):
         _swig_setattr(self, iTextureWrapper, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iTextureWrapper, 'thisown', 0)
-        self.__class__ = iTextureWrapper
+        _swig_setattr(self, iTextureWrapper,self.__class__,iTextureWrapper)
 _cspace.iTextureWrapper_swigregister(iTextureWrapperPtr)
 
 iTextureWrapper_scfGetVersion = _cspace.iTextureWrapper_scfGetVersion
@@ -5137,7 +5130,7 @@ class iTextureListPtr(iTextureList):
     def __init__(self, this):
         _swig_setattr(self, iTextureList, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iTextureList, 'thisown', 0)
-        self.__class__ = iTextureList
+        _swig_setattr(self, iTextureList,self.__class__,iTextureList)
 _cspace.iTextureList_swigregister(iTextureListPtr)
 
 iTextureList_scfGetVersion = _cspace.iTextureList_scfGetVersion
@@ -5169,7 +5162,7 @@ class iMaterialWrapperPtr(iMaterialWrapper):
     def __init__(self, this):
         _swig_setattr(self, iMaterialWrapper, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iMaterialWrapper, 'thisown', 0)
-        self.__class__ = iMaterialWrapper
+        _swig_setattr(self, iMaterialWrapper,self.__class__,iMaterialWrapper)
 _cspace.iMaterialWrapper_swigregister(iMaterialWrapperPtr)
 
 iMaterialWrapper_scfGetVersion = _cspace.iMaterialWrapper_scfGetVersion
@@ -5197,7 +5190,7 @@ class iMaterialEnginePtr(iMaterialEngine):
     def __init__(self, this):
         _swig_setattr(self, iMaterialEngine, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iMaterialEngine, 'thisown', 0)
-        self.__class__ = iMaterialEngine
+        _swig_setattr(self, iMaterialEngine,self.__class__,iMaterialEngine)
 _cspace.iMaterialEngine_swigregister(iMaterialEnginePtr)
 
 class iMaterialList(iBase):
@@ -5237,7 +5230,7 @@ class iMaterialListPtr(iMaterialList):
     def __init__(self, this):
         _swig_setattr(self, iMaterialList, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iMaterialList, 'thisown', 0)
-        self.__class__ = iMaterialList
+        _swig_setattr(self, iMaterialList,self.__class__,iMaterialList)
 _cspace.iMaterialList_swigregister(iMaterialListPtr)
 
 class iSceneNode(iBase):
@@ -5269,7 +5262,7 @@ class iSceneNodePtr(iSceneNode):
     def __init__(self, this):
         _swig_setattr(self, iSceneNode, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iSceneNode, 'thisown', 0)
-        self.__class__ = iSceneNode
+        _swig_setattr(self, iSceneNode,self.__class__,iSceneNode)
 _cspace.iSceneNode_swigregister(iSceneNodePtr)
 
 iSceneNode_scfGetVersion = _cspace.iSceneNode_scfGetVersion
@@ -5304,7 +5297,7 @@ class iMeshDrawCallbackPtr(iMeshDrawCallback):
     def __init__(self, this):
         _swig_setattr(self, iMeshDrawCallback, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iMeshDrawCallback, 'thisown', 0)
-        self.__class__ = iMeshDrawCallback
+        _swig_setattr(self, iMeshDrawCallback,self.__class__,iMeshDrawCallback)
 _cspace.iMeshDrawCallback_swigregister(iMeshDrawCallbackPtr)
 
 class csHitBeamResult(_object):
@@ -5345,7 +5338,7 @@ class csHitBeamResultPtr(csHitBeamResult):
     def __init__(self, this):
         _swig_setattr(self, csHitBeamResult, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csHitBeamResult, 'thisown', 0)
-        self.__class__ = csHitBeamResult
+        _swig_setattr(self, csHitBeamResult,self.__class__,csHitBeamResult)
 _cspace.csHitBeamResult_swigregister(csHitBeamResultPtr)
 
 class csScreenBoxResult(_object):
@@ -5377,7 +5370,7 @@ class csScreenBoxResultPtr(csScreenBoxResult):
     def __init__(self, this):
         _swig_setattr(self, csScreenBoxResult, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csScreenBoxResult, 'thisown', 0)
-        self.__class__ = csScreenBoxResult
+        _swig_setattr(self, csScreenBoxResult,self.__class__,csScreenBoxResult)
 _cspace.csScreenBoxResult_swigregister(csScreenBoxResultPtr)
 
 class iMeshWrapper(iBase):
@@ -5452,7 +5445,7 @@ class iMeshWrapperPtr(iMeshWrapper):
     def __init__(self, this):
         _swig_setattr(self, iMeshWrapper, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iMeshWrapper, 'thisown', 0)
-        self.__class__ = iMeshWrapper
+        _swig_setattr(self, iMeshWrapper,self.__class__,iMeshWrapper)
 _cspace.iMeshWrapper_swigregister(iMeshWrapperPtr)
 
 iMeshWrapper_scfGetVersion = _cspace.iMeshWrapper_scfGetVersion
@@ -5503,7 +5496,7 @@ class iMeshFactoryWrapperPtr(iMeshFactoryWrapper):
     def __init__(self, this):
         _swig_setattr(self, iMeshFactoryWrapper, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iMeshFactoryWrapper, 'thisown', 0)
-        self.__class__ = iMeshFactoryWrapper
+        _swig_setattr(self, iMeshFactoryWrapper,self.__class__,iMeshFactoryWrapper)
 _cspace.iMeshFactoryWrapper_swigregister(iMeshFactoryWrapperPtr)
 
 iMeshFactoryWrapper_scfGetVersion = _cspace.iMeshFactoryWrapper_scfGetVersion
@@ -5544,7 +5537,7 @@ class iMeshListPtr(iMeshList):
     def __init__(self, this):
         _swig_setattr(self, iMeshList, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iMeshList, 'thisown', 0)
-        self.__class__ = iMeshList
+        _swig_setattr(self, iMeshList,self.__class__,iMeshList)
 _cspace.iMeshList_swigregister(iMeshListPtr)
 
 class iMeshFactoryList(iBase):
@@ -5583,7 +5576,7 @@ class iMeshFactoryListPtr(iMeshFactoryList):
     def __init__(self, this):
         _swig_setattr(self, iMeshFactoryList, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iMeshFactoryList, 'thisown', 0)
-        self.__class__ = iMeshFactoryList
+        _swig_setattr(self, iMeshFactoryList,self.__class__,iMeshFactoryList)
 _cspace.iMeshFactoryList_swigregister(iMeshFactoryListPtr)
 
 class iMeshWrapperIterator(iBase):
@@ -5611,7 +5604,7 @@ class iMeshWrapperIteratorPtr(iMeshWrapperIterator):
     def __init__(self, this):
         _swig_setattr(self, iMeshWrapperIterator, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iMeshWrapperIterator, 'thisown', 0)
-        self.__class__ = iMeshWrapperIterator
+        _swig_setattr(self, iMeshWrapperIterator,self.__class__,iMeshWrapperIterator)
 _cspace.iMeshWrapperIterator_swigregister(iMeshWrapperIteratorPtr)
 
 iMeshWrapperIterator_scfGetVersion = _cspace.iMeshWrapperIterator_scfGetVersion
@@ -5640,7 +5633,7 @@ class iMovableListenerPtr(iMovableListener):
     def __init__(self, this):
         _swig_setattr(self, iMovableListener, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iMovableListener, 'thisown', 0)
-        self.__class__ = iMovableListener
+        _swig_setattr(self, iMovableListener,self.__class__,iMovableListener)
 _cspace.iMovableListener_swigregister(iMovableListenerPtr)
 
 iMovableListener_scfGetVersion = _cspace.iMovableListener_scfGetVersion
@@ -5687,7 +5680,7 @@ class iMovablePtr(iMovable):
     def __init__(self, this):
         _swig_setattr(self, iMovable, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iMovable, 'thisown', 0)
-        self.__class__ = iMovable
+        _swig_setattr(self, iMovable,self.__class__,iMovable)
 _cspace.iMovable_swigregister(iMovablePtr)
 
 iMovable_scfGetVersion = _cspace.iMovable_scfGetVersion
@@ -5728,7 +5721,7 @@ class iRegionPtr(iRegion):
     def __init__(self, this):
         _swig_setattr(self, iRegion, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iRegion, 'thisown', 0)
-        self.__class__ = iRegion
+        _swig_setattr(self, iRegion,self.__class__,iRegion)
 _cspace.iRegion_swigregister(iRegionPtr)
 
 class iRegionList(iBase):
@@ -5767,7 +5760,7 @@ class iRegionListPtr(iRegionList):
     def __init__(self, this):
         _swig_setattr(self, iRegionList, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iRegionList, 'thisown', 0)
-        self.__class__ = iRegionList
+        _swig_setattr(self, iRegionList,self.__class__,iRegionList)
 _cspace.iRegionList_swigregister(iRegionListPtr)
 
 class iVisibilityObjectIterator(iBase):
@@ -5793,7 +5786,7 @@ class iVisibilityObjectIteratorPtr(iVisibilityObjectIterator):
     def __init__(self, this):
         _swig_setattr(self, iVisibilityObjectIterator, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iVisibilityObjectIterator, 'thisown', 0)
-        self.__class__ = iVisibilityObjectIterator
+        _swig_setattr(self, iVisibilityObjectIterator,self.__class__,iVisibilityObjectIterator)
 _cspace.iVisibilityObjectIterator_swigregister(iVisibilityObjectIteratorPtr)
 
 class iVisibilityCullerListener(iBase):
@@ -5817,7 +5810,7 @@ class iVisibilityCullerListenerPtr(iVisibilityCullerListener):
     def __init__(self, this):
         _swig_setattr(self, iVisibilityCullerListener, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iVisibilityCullerListener, 'thisown', 0)
-        self.__class__ = iVisibilityCullerListener
+        _swig_setattr(self, iVisibilityCullerListener,self.__class__,iVisibilityCullerListener)
 _cspace.iVisibilityCullerListener_swigregister(iVisibilityCullerListenerPtr)
 
 class iVisibilityCuller(iBase):
@@ -5851,7 +5844,7 @@ class iVisibilityCullerPtr(iVisibilityCuller):
     def __init__(self, this):
         _swig_setattr(self, iVisibilityCuller, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iVisibilityCuller, 'thisown', 0)
-        self.__class__ = iVisibilityCuller
+        _swig_setattr(self, iVisibilityCuller,self.__class__,iVisibilityCuller)
 _cspace.iVisibilityCuller_swigregister(iVisibilityCullerPtr)
 
 iVisibilityCuller_scfGetVersion = _cspace.iVisibilityCuller_scfGetVersion
@@ -5882,7 +5875,7 @@ class iVisibilityObjectPtr(iVisibilityObject):
     def __init__(self, this):
         _swig_setattr(self, iVisibilityObject, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iVisibilityObject, 'thisown', 0)
-        self.__class__ = iVisibilityObject
+        _swig_setattr(self, iVisibilityObject,self.__class__,iVisibilityObject)
 _cspace.iVisibilityObject_swigregister(iVisibilityObjectPtr)
 
 CS_PORTAL_CLIPDEST = _cspace.CS_PORTAL_CLIPDEST
@@ -5915,7 +5908,7 @@ class iPortalCallbackPtr(iPortalCallback):
     def __init__(self, this):
         _swig_setattr(self, iPortalCallback, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iPortalCallback, 'thisown', 0)
-        self.__class__ = iPortalCallback
+        _swig_setattr(self, iPortalCallback,self.__class__,iPortalCallback)
 _cspace.iPortalCallback_swigregister(iPortalCallbackPtr)
 
 class iPortal(iBase):
@@ -5977,7 +5970,7 @@ class iPortalPtr(iPortal):
     def __init__(self, this):
         _swig_setattr(self, iPortal, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iPortal, 'thisown', 0)
-        self.__class__ = iPortal
+        _swig_setattr(self, iPortal,self.__class__,iPortal)
 _cspace.iPortal_swigregister(iPortalPtr)
 
 iPortal_scfGetVersion = _cspace.iPortal_scfGetVersion
@@ -6009,7 +6002,7 @@ class iPortalContainerPtr(iPortalContainer):
     def __init__(self, this):
         _swig_setattr(self, iPortalContainer, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iPortalContainer, 'thisown', 0)
-        self.__class__ = iPortalContainer
+        _swig_setattr(self, iPortalContainer,self.__class__,iPortalContainer)
 _cspace.iPortalContainer_swigregister(iPortalContainerPtr)
 
 iPortalContainer_scfGetVersion = _cspace.iPortalContainer_scfGetVersion
@@ -6049,7 +6042,7 @@ class iGeneralMeshCommonStatePtr(iGeneralMeshCommonState):
     def __init__(self, this):
         _swig_setattr(self, iGeneralMeshCommonState, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iGeneralMeshCommonState, 'thisown', 0)
-        self.__class__ = iGeneralMeshCommonState
+        _swig_setattr(self, iGeneralMeshCommonState,self.__class__,iGeneralMeshCommonState)
 _cspace.iGeneralMeshCommonState_swigregister(iGeneralMeshCommonStatePtr)
 
 class iGeneralMeshState(iGeneralMeshCommonState):
@@ -6076,7 +6069,7 @@ class iGeneralMeshStatePtr(iGeneralMeshState):
     def __init__(self, this):
         _swig_setattr(self, iGeneralMeshState, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iGeneralMeshState, 'thisown', 0)
-        self.__class__ = iGeneralMeshState
+        _swig_setattr(self, iGeneralMeshState,self.__class__,iGeneralMeshState)
 _cspace.iGeneralMeshState_swigregister(iGeneralMeshStatePtr)
 
 iGeneralMeshState_scfGetVersion = _cspace.iGeneralMeshState_scfGetVersion
@@ -6147,7 +6140,7 @@ class iGeneralFactoryStatePtr(iGeneralFactoryState):
     def __init__(self, this):
         _swig_setattr(self, iGeneralFactoryState, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iGeneralFactoryState, 'thisown', 0)
-        self.__class__ = iGeneralFactoryState
+        _swig_setattr(self, iGeneralFactoryState,self.__class__,iGeneralFactoryState)
 _cspace.iGeneralFactoryState_swigregister(iGeneralFactoryStatePtr)
 
 iGeneralFactoryState_scfGetVersion = _cspace.iGeneralFactoryState_scfGetVersion
@@ -6180,7 +6173,7 @@ class iGenMeshAnimationControlPtr(iGenMeshAnimationControl):
     def __init__(self, this):
         _swig_setattr(self, iGenMeshAnimationControl, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iGenMeshAnimationControl, 'thisown', 0)
-        self.__class__ = iGenMeshAnimationControl
+        _swig_setattr(self, iGenMeshAnimationControl,self.__class__,iGenMeshAnimationControl)
 _cspace.iGenMeshAnimationControl_swigregister(iGenMeshAnimationControlPtr)
 
 class iGenMeshAnimationControlFactory(iBase):
@@ -6206,7 +6199,7 @@ class iGenMeshAnimationControlFactoryPtr(iGenMeshAnimationControlFactory):
     def __init__(self, this):
         _swig_setattr(self, iGenMeshAnimationControlFactory, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iGenMeshAnimationControlFactory, 'thisown', 0)
-        self.__class__ = iGenMeshAnimationControlFactory
+        _swig_setattr(self, iGenMeshAnimationControlFactory,self.__class__,iGenMeshAnimationControlFactory)
 _cspace.iGenMeshAnimationControlFactory_swigregister(iGenMeshAnimationControlFactoryPtr)
 
 class iGenMeshAnimationControlType(iBase):
@@ -6230,7 +6223,7 @@ class iGenMeshAnimationControlTypePtr(iGenMeshAnimationControlType):
     def __init__(self, this):
         _swig_setattr(self, iGenMeshAnimationControlType, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iGenMeshAnimationControlType, 'thisown', 0)
-        self.__class__ = iGenMeshAnimationControlType
+        _swig_setattr(self, iGenMeshAnimationControlType,self.__class__,iGenMeshAnimationControlType)
 _cspace.iGenMeshAnimationControlType_swigregister(iGenMeshAnimationControlTypePtr)
 
 class csSprite2DVertexArrayReadOnly(iBase):
@@ -6260,7 +6253,7 @@ class csSprite2DVertexArrayReadOnlyPtr(csSprite2DVertexArrayReadOnly):
     def __init__(self, this):
         _swig_setattr(self, csSprite2DVertexArrayReadOnly, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csSprite2DVertexArrayReadOnly, 'thisown', 0)
-        self.__class__ = csSprite2DVertexArrayReadOnly
+        _swig_setattr(self, csSprite2DVertexArrayReadOnly,self.__class__,csSprite2DVertexArrayReadOnly)
 _cspace.csSprite2DVertexArrayReadOnly_swigregister(csSprite2DVertexArrayReadOnlyPtr)
 
 class csSprite2DVertexArrayChangeElements(csSprite2DVertexArrayReadOnly):
@@ -6285,7 +6278,7 @@ class csSprite2DVertexArrayChangeElementsPtr(csSprite2DVertexArrayChangeElements
     def __init__(self, this):
         _swig_setattr(self, csSprite2DVertexArrayChangeElements, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csSprite2DVertexArrayChangeElements, 'thisown', 0)
-        self.__class__ = csSprite2DVertexArrayChangeElements
+        _swig_setattr(self, csSprite2DVertexArrayChangeElements,self.__class__,csSprite2DVertexArrayChangeElements)
 _cspace.csSprite2DVertexArrayChangeElements_swigregister(csSprite2DVertexArrayChangeElementsPtr)
 
 class csSprite2DVertexArrayChangeAll(csSprite2DVertexArrayChangeElements):
@@ -6322,7 +6315,7 @@ class csSprite2DVertexArrayChangeAllPtr(csSprite2DVertexArrayChangeAll):
     def __init__(self, this):
         _swig_setattr(self, csSprite2DVertexArrayChangeAll, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csSprite2DVertexArrayChangeAll, 'thisown', 0)
-        self.__class__ = csSprite2DVertexArrayChangeAll
+        _swig_setattr(self, csSprite2DVertexArrayChangeAll,self.__class__,csSprite2DVertexArrayChangeAll)
 _cspace.csSprite2DVertexArrayChangeAll_swigregister(csSprite2DVertexArrayChangeAllPtr)
 
 class csSprite2DVertex(_object):
@@ -6361,7 +6354,7 @@ class csSprite2DVertexPtr(csSprite2DVertex):
     def __init__(self, this):
         _swig_setattr(self, csSprite2DVertex, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csSprite2DVertex, 'thisown', 0)
-        self.__class__ = csSprite2DVertex
+        _swig_setattr(self, csSprite2DVertex,self.__class__,csSprite2DVertex)
 _cspace.csSprite2DVertex_swigregister(csSprite2DVertexPtr)
 
 class iColoredVertices(csSprite2DVertexArrayChangeAll):
@@ -6384,7 +6377,7 @@ class iColoredVerticesPtr(iColoredVertices):
     def __init__(self, this):
         _swig_setattr(self, iColoredVertices, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iColoredVertices, 'thisown', 0)
-        self.__class__ = iColoredVertices
+        _swig_setattr(self, iColoredVertices,self.__class__,iColoredVertices)
 _cspace.iColoredVertices_swigregister(iColoredVerticesPtr)
 
 class iSprite2DUVAnimationFrame(iBase):
@@ -6416,7 +6409,7 @@ class iSprite2DUVAnimationFramePtr(iSprite2DUVAnimationFrame):
     def __init__(self, this):
         _swig_setattr(self, iSprite2DUVAnimationFrame, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iSprite2DUVAnimationFrame, 'thisown', 0)
-        self.__class__ = iSprite2DUVAnimationFrame
+        _swig_setattr(self, iSprite2DUVAnimationFrame,self.__class__,iSprite2DUVAnimationFrame)
 _cspace.iSprite2DUVAnimationFrame_swigregister(iSprite2DUVAnimationFramePtr)
 
 class iSprite2DUVAnimation(iBase):
@@ -6446,7 +6439,7 @@ class iSprite2DUVAnimationPtr(iSprite2DUVAnimation):
     def __init__(self, this):
         _swig_setattr(self, iSprite2DUVAnimation, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iSprite2DUVAnimation, 'thisown', 0)
-        self.__class__ = iSprite2DUVAnimation
+        _swig_setattr(self, iSprite2DUVAnimation,self.__class__,iSprite2DUVAnimation)
 _cspace.iSprite2DUVAnimation_swigregister(iSprite2DUVAnimationPtr)
 
 class iSprite2DFactoryState(iBase):
@@ -6475,7 +6468,7 @@ class iSprite2DFactoryStatePtr(iSprite2DFactoryState):
     def __init__(self, this):
         _swig_setattr(self, iSprite2DFactoryState, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iSprite2DFactoryState, 'thisown', 0)
-        self.__class__ = iSprite2DFactoryState
+        _swig_setattr(self, iSprite2DFactoryState,self.__class__,iSprite2DFactoryState)
 _cspace.iSprite2DFactoryState_swigregister(iSprite2DFactoryStatePtr)
 
 class iSprite2DState(iSprite2DFactoryState):
@@ -6507,7 +6500,7 @@ class iSprite2DStatePtr(iSprite2DState):
     def __init__(self, this):
         _swig_setattr(self, iSprite2DState, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iSprite2DState, 'thisown', 0)
-        self.__class__ = iSprite2DState
+        _swig_setattr(self, iSprite2DState,self.__class__,iSprite2DState)
 _cspace.iSprite2DState_swigregister(iSprite2DStatePtr)
 
 iSprite2DState_scfGetVersion = _cspace.iSprite2DState_scfGetVersion
@@ -6546,7 +6539,7 @@ class iSpriteFramePtr(iSpriteFrame):
     def __init__(self, this):
         _swig_setattr(self, iSpriteFrame, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iSpriteFrame, 'thisown', 0)
-        self.__class__ = iSpriteFrame
+        _swig_setattr(self, iSpriteFrame,self.__class__,iSpriteFrame)
 _cspace.iSpriteFrame_swigregister(iSpriteFramePtr)
 
 class iSpriteAction(iBase):
@@ -6577,7 +6570,7 @@ class iSpriteActionPtr(iSpriteAction):
     def __init__(self, this):
         _swig_setattr(self, iSpriteAction, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iSpriteAction, 'thisown', 0)
-        self.__class__ = iSpriteAction
+        _swig_setattr(self, iSpriteAction,self.__class__,iSpriteAction)
 _cspace.iSpriteAction_swigregister(iSpriteActionPtr)
 
 class iSpriteSocket(iBase):
@@ -6606,7 +6599,7 @@ class iSpriteSocketPtr(iSpriteSocket):
     def __init__(self, this):
         _swig_setattr(self, iSpriteSocket, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iSpriteSocket, 'thisown', 0)
-        self.__class__ = iSpriteSocket
+        _swig_setattr(self, iSpriteSocket,self.__class__,iSpriteSocket)
 _cspace.iSpriteSocket_swigregister(iSpriteSocketPtr)
 
 class iSprite3DFactoryState(iBase):
@@ -6671,7 +6664,7 @@ class iSprite3DFactoryStatePtr(iSprite3DFactoryState):
     def __init__(self, this):
         _swig_setattr(self, iSprite3DFactoryState, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iSprite3DFactoryState, 'thisown', 0)
-        self.__class__ = iSprite3DFactoryState
+        _swig_setattr(self, iSprite3DFactoryState,self.__class__,iSprite3DFactoryState)
 _cspace.iSprite3DFactoryState_swigregister(iSprite3DFactoryStatePtr)
 
 class iSprite3DState(iBase):
@@ -6721,7 +6714,7 @@ class iSprite3DStatePtr(iSprite3DState):
     def __init__(self, this):
         _swig_setattr(self, iSprite3DState, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iSprite3DState, 'thisown', 0)
-        self.__class__ = iSprite3DState
+        _swig_setattr(self, iSprite3DState,self.__class__,iSprite3DState)
 _cspace.iSprite3DState_swigregister(iSprite3DStatePtr)
 
 iSprite3DState_scfGetVersion = _cspace.iSprite3DState_scfGetVersion
@@ -6759,7 +6752,7 @@ class iSpriteCal3DSocketPtr(iSpriteCal3DSocket):
     def __init__(self, this):
         _swig_setattr(self, iSpriteCal3DSocket, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iSpriteCal3DSocket, 'thisown', 0)
-        self.__class__ = iSpriteCal3DSocket
+        _swig_setattr(self, iSpriteCal3DSocket,self.__class__,iSpriteCal3DSocket)
 _cspace.iSpriteCal3DSocket_swigregister(iSpriteCal3DSocketPtr)
 
 class iSpriteCal3DFactoryState(iBase):
@@ -6812,7 +6805,7 @@ class iSpriteCal3DFactoryStatePtr(iSpriteCal3DFactoryState):
     def __init__(self, this):
         _swig_setattr(self, iSpriteCal3DFactoryState, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iSpriteCal3DFactoryState, 'thisown', 0)
-        self.__class__ = iSpriteCal3DFactoryState
+        _swig_setattr(self, iSpriteCal3DFactoryState,self.__class__,iSpriteCal3DFactoryState)
 _cspace.iSpriteCal3DFactoryState_swigregister(iSpriteCal3DFactoryStatePtr)
 
 class iAnimTimeUpdateHandler(iBase):
@@ -6836,7 +6829,7 @@ class iAnimTimeUpdateHandlerPtr(iAnimTimeUpdateHandler):
     def __init__(self, this):
         _swig_setattr(self, iAnimTimeUpdateHandler, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iAnimTimeUpdateHandler, 'thisown', 0)
-        self.__class__ = iAnimTimeUpdateHandler
+        _swig_setattr(self, iAnimTimeUpdateHandler,self.__class__,iAnimTimeUpdateHandler)
 _cspace.iAnimTimeUpdateHandler_swigregister(iAnimTimeUpdateHandlerPtr)
 
 class csSpriteCal3DActiveAnim(_object):
@@ -6865,7 +6858,7 @@ class csSpriteCal3DActiveAnimPtr(csSpriteCal3DActiveAnim):
     def __init__(self, this):
         _swig_setattr(self, csSpriteCal3DActiveAnim, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csSpriteCal3DActiveAnim, 'thisown', 0)
-        self.__class__ = csSpriteCal3DActiveAnim
+        _swig_setattr(self, csSpriteCal3DActiveAnim,self.__class__,csSpriteCal3DActiveAnim)
 _cspace.csSpriteCal3DActiveAnim_swigregister(csSpriteCal3DActiveAnimPtr)
 
 class iSpriteCal3DState(iBase):
@@ -6926,7 +6919,7 @@ class iSpriteCal3DStatePtr(iSpriteCal3DState):
     def __init__(self, this):
         _swig_setattr(self, iSpriteCal3DState, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iSpriteCal3DState, 'thisown', 0)
-        self.__class__ = iSpriteCal3DState
+        _swig_setattr(self, iSpriteCal3DState,self.__class__,iSpriteCal3DState)
 _cspace.iSpriteCal3DState_swigregister(iSpriteCal3DStatePtr)
 
 iSpriteCal3DState_scfGetVersion = _cspace.iSpriteCal3DState_scfGetVersion
@@ -6955,7 +6948,7 @@ class iMeshObjectDrawCallbackPtr(iMeshObjectDrawCallback):
     def __init__(self, this):
         _swig_setattr(self, iMeshObjectDrawCallback, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iMeshObjectDrawCallback, 'thisown', 0)
-        self.__class__ = iMeshObjectDrawCallback
+        _swig_setattr(self, iMeshObjectDrawCallback,self.__class__,iMeshObjectDrawCallback)
 _cspace.iMeshObjectDrawCallback_swigregister(iMeshObjectDrawCallbackPtr)
 
 class iMeshObject(iBase):
@@ -7002,7 +6995,7 @@ class iMeshObjectPtr(iMeshObject):
     def __init__(self, this):
         _swig_setattr(self, iMeshObject, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iMeshObject, 'thisown', 0)
-        self.__class__ = iMeshObject
+        _swig_setattr(self, iMeshObject,self.__class__,iMeshObject)
 _cspace.iMeshObject_swigregister(iMeshObjectPtr)
 
 iMeshObject_scfGetVersion = _cspace.iMeshObject_scfGetVersion
@@ -7042,7 +7035,7 @@ class iMeshObjectFactoryPtr(iMeshObjectFactory):
     def __init__(self, this):
         _swig_setattr(self, iMeshObjectFactory, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iMeshObjectFactory, 'thisown', 0)
-        self.__class__ = iMeshObjectFactory
+        _swig_setattr(self, iMeshObjectFactory,self.__class__,iMeshObjectFactory)
 _cspace.iMeshObjectFactory_swigregister(iMeshObjectFactoryPtr)
 
 iMeshObjectFactory_scfGetVersion = _cspace.iMeshObjectFactory_scfGetVersion
@@ -7070,7 +7063,7 @@ class iMeshObjectTypePtr(iMeshObjectType):
     def __init__(self, this):
         _swig_setattr(self, iMeshObjectType, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iMeshObjectType, 'thisown', 0)
-        self.__class__ = iMeshObjectType
+        _swig_setattr(self, iMeshObjectType,self.__class__,iMeshObjectType)
 _cspace.iMeshObjectType_swigregister(iMeshObjectTypePtr)
 
 iMeshObjectType_scfGetVersion = _cspace.iMeshObjectType_scfGetVersion
@@ -7102,7 +7095,7 @@ class csPolygonRangePtr(csPolygonRange):
     def __init__(self, this):
         _swig_setattr(self, csPolygonRange, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csPolygonRange, 'thisown', 0)
-        self.__class__ = csPolygonRange
+        _swig_setattr(self, csPolygonRange,self.__class__,csPolygonRange)
 _cspace.csPolygonRange_swigregister(csPolygonRangePtr)
 
 CS_POLY_LIGHTING = _cspace.CS_POLY_LIGHTING
@@ -7137,7 +7130,7 @@ class iPolygonHandlePtr(iPolygonHandle):
     def __init__(self, this):
         _swig_setattr(self, iPolygonHandle, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iPolygonHandle, 'thisown', 0)
-        self.__class__ = iPolygonHandle
+        _swig_setattr(self, iPolygonHandle,self.__class__,iPolygonHandle)
 _cspace.iPolygonHandle_swigregister(iPolygonHandlePtr)
 
 class iThingFactoryState(iBase):
@@ -7206,7 +7199,7 @@ class iThingFactoryStatePtr(iThingFactoryState):
     def __init__(self, this):
         _swig_setattr(self, iThingFactoryState, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iThingFactoryState, 'thisown', 0)
-        self.__class__ = iThingFactoryState
+        _swig_setattr(self, iThingFactoryState,self.__class__,iThingFactoryState)
 _cspace.iThingFactoryState_swigregister(iThingFactoryStatePtr)
 
 iThingFactoryState_scfGetVersion = _cspace.iThingFactoryState_scfGetVersion
@@ -7245,7 +7238,7 @@ class iThingStatePtr(iThingState):
     def __init__(self, this):
         _swig_setattr(self, iThingState, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iThingState, 'thisown', 0)
-        self.__class__ = iThingState
+        _swig_setattr(self, iThingState,self.__class__,iThingState)
 _cspace.iThingState_swigregister(iThingStatePtr)
 
 iThingState_scfGetVersion = _cspace.iThingState_scfGetVersion
@@ -7274,7 +7267,7 @@ class iThingEnvironmentPtr(iThingEnvironment):
     def __init__(self, this):
         _swig_setattr(self, iThingEnvironment, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iThingEnvironment, 'thisown', 0)
-        self.__class__ = iThingEnvironment
+        _swig_setattr(self, iThingEnvironment,self.__class__,iThingEnvironment)
 _cspace.iThingEnvironment_swigregister(iThingEnvironmentPtr)
 
 class csCharArrayArray(_object):
@@ -7316,7 +7309,7 @@ class csCharArrayArrayPtr(csCharArrayArray):
     def __init__(self, this):
         _swig_setattr(self, csCharArrayArray, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csCharArrayArray, 'thisown', 0)
-        self.__class__ = csCharArrayArray
+        _swig_setattr(self, csCharArrayArray,self.__class__,csCharArrayArray)
 _cspace.csCharArrayArray_swigregister(csCharArrayArrayPtr)
 
 class iTerrainObjectState(iBase):
@@ -7356,7 +7349,7 @@ class iTerrainObjectStatePtr(iTerrainObjectState):
     def __init__(self, this):
         _swig_setattr(self, iTerrainObjectState, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iTerrainObjectState, 'thisown', 0)
-        self.__class__ = iTerrainObjectState
+        _swig_setattr(self, iTerrainObjectState,self.__class__,iTerrainObjectState)
 _cspace.iTerrainObjectState_swigregister(iTerrainObjectStatePtr)
 
 iTerrainObjectState_scfGetVersion = _cspace.iTerrainObjectState_scfGetVersion
@@ -7389,7 +7382,7 @@ class iTerrainFactoryStatePtr(iTerrainFactoryState):
     def __init__(self, this):
         _swig_setattr(self, iTerrainFactoryState, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iTerrainFactoryState, 'thisown', 0)
-        self.__class__ = iTerrainFactoryState
+        _swig_setattr(self, iTerrainFactoryState,self.__class__,iTerrainFactoryState)
 _cspace.iTerrainFactoryState_swigregister(iTerrainFactoryStatePtr)
 
 iTerrainFactoryState_scfGetVersion = _cspace.iTerrainFactoryState_scfGetVersion
@@ -7447,7 +7440,7 @@ class csParticlesDataPtr(csParticlesData):
     def __init__(self, this):
         _swig_setattr(self, csParticlesData, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csParticlesData, 'thisown', 0)
-        self.__class__ = csParticlesData
+        _swig_setattr(self, csParticlesData,self.__class__,csParticlesData)
 _cspace.csParticlesData_swigregister(csParticlesDataPtr)
 
 class iParticlesColorCallback(iBase):
@@ -7471,7 +7464,7 @@ class iParticlesColorCallbackPtr(iParticlesColorCallback):
     def __init__(self, this):
         _swig_setattr(self, iParticlesColorCallback, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iParticlesColorCallback, 'thisown', 0)
-        self.__class__ = iParticlesColorCallback
+        _swig_setattr(self, iParticlesColorCallback,self.__class__,iParticlesColorCallback)
 _cspace.iParticlesColorCallback_swigregister(iParticlesColorCallbackPtr)
 
 class iParticlesStateBase(iBase):
@@ -7559,7 +7552,7 @@ class iParticlesStateBasePtr(iParticlesStateBase):
     def __init__(self, this):
         _swig_setattr(self, iParticlesStateBase, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iParticlesStateBase, 'thisown', 0)
-        self.__class__ = iParticlesStateBase
+        _swig_setattr(self, iParticlesStateBase,self.__class__,iParticlesStateBase)
 _cspace.iParticlesStateBase_swigregister(iParticlesStateBasePtr)
 
 iParticlesStateBase_scfGetVersion = _cspace.iParticlesStateBase_scfGetVersion
@@ -7593,7 +7586,7 @@ class iParticlesObjectStatePtr(iParticlesObjectState):
     def __init__(self, this):
         _swig_setattr(self, iParticlesObjectState, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iParticlesObjectState, 'thisown', 0)
-        self.__class__ = iParticlesObjectState
+        _swig_setattr(self, iParticlesObjectState,self.__class__,iParticlesObjectState)
 _cspace.iParticlesObjectState_swigregister(iParticlesObjectStatePtr)
 
 iParticlesObjectState_scfGetVersion = _cspace.iParticlesObjectState_scfGetVersion
@@ -7623,7 +7616,7 @@ class iParticlesFactoryStatePtr(iParticlesFactoryState):
     def __init__(self, this):
         _swig_setattr(self, iParticlesFactoryState, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iParticlesFactoryState, 'thisown', 0)
-        self.__class__ = iParticlesFactoryState
+        _swig_setattr(self, iParticlesFactoryState,self.__class__,iParticlesFactoryState)
 _cspace.iParticlesFactoryState_swigregister(iParticlesFactoryStatePtr)
 
 iParticlesFactoryState_scfGetVersion = _cspace.iParticlesFactoryState_scfGetVersion
@@ -7654,7 +7647,7 @@ class iParticlesPhysicsPtr(iParticlesPhysics):
     def __init__(self, this):
         _swig_setattr(self, iParticlesPhysics, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iParticlesPhysics, 'thisown', 0)
-        self.__class__ = iParticlesPhysics
+        _swig_setattr(self, iParticlesPhysics,self.__class__,iParticlesPhysics)
 _cspace.iParticlesPhysics_swigregister(iParticlesPhysicsPtr)
 
 iParticlesPhysics_scfGetVersion = _cspace.iParticlesPhysics_scfGetVersion
@@ -7681,7 +7674,7 @@ class iLoaderStatusPtr(iLoaderStatus):
     def __init__(self, this):
         _swig_setattr(self, iLoaderStatus, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iLoaderStatus, 'thisown', 0)
-        self.__class__ = iLoaderStatus
+        _swig_setattr(self, iLoaderStatus,self.__class__,iLoaderStatus)
 _cspace.iLoaderStatus_swigregister(iLoaderStatusPtr)
 
 class iMissingLoaderData(iBase):
@@ -7711,7 +7704,7 @@ class iMissingLoaderDataPtr(iMissingLoaderData):
     def __init__(self, this):
         _swig_setattr(self, iMissingLoaderData, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iMissingLoaderData, 'thisown', 0)
-        self.__class__ = iMissingLoaderData
+        _swig_setattr(self, iMissingLoaderData,self.__class__,iMissingLoaderData)
 _cspace.iMissingLoaderData_swigregister(iMissingLoaderDataPtr)
 
 class iLoader(iBase):
@@ -7752,7 +7745,7 @@ class iLoaderPtr(iLoader):
     def __init__(self, this):
         _swig_setattr(self, iLoader, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iLoader, 'thisown', 0)
-        self.__class__ = iLoader
+        _swig_setattr(self, iLoader,self.__class__,iLoader)
 _cspace.iLoader_swigregister(iLoaderPtr)
 
 iLoader_scfGetVersion = _cspace.iLoader_scfGetVersion
@@ -7780,7 +7773,7 @@ class iLoaderPluginPtr(iLoaderPlugin):
     def __init__(self, this):
         _swig_setattr(self, iLoaderPlugin, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iLoaderPlugin, 'thisown', 0)
-        self.__class__ = iLoaderPlugin
+        _swig_setattr(self, iLoaderPlugin,self.__class__,iLoaderPlugin)
 _cspace.iLoaderPlugin_swigregister(iLoaderPluginPtr)
 
 iLoaderPlugin_scfGetVersion = _cspace.iLoaderPlugin_scfGetVersion
@@ -7808,7 +7801,7 @@ class iBinaryLoaderPluginPtr(iBinaryLoaderPlugin):
     def __init__(self, this):
         _swig_setattr(self, iBinaryLoaderPlugin, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iBinaryLoaderPlugin, 'thisown', 0)
-        self.__class__ = iBinaryLoaderPlugin
+        _swig_setattr(self, iBinaryLoaderPlugin,self.__class__,iBinaryLoaderPlugin)
 _cspace.iBinaryLoaderPlugin_swigregister(iBinaryLoaderPluginPtr)
 
 iBinaryLoaderPlugin_scfGetVersion = _cspace.iBinaryLoaderPlugin_scfGetVersion
@@ -7837,7 +7830,7 @@ class iSaverPtr(iSaver):
     def __init__(self, this):
         _swig_setattr(self, iSaver, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iSaver, 'thisown', 0)
-        self.__class__ = iSaver
+        _swig_setattr(self, iSaver,self.__class__,iSaver)
 _cspace.iSaver_swigregister(iSaverPtr)
 
 CS_SNDSYS_DATA_UNKNOWN_SIZE = _cspace.CS_SNDSYS_DATA_UNKNOWN_SIZE
@@ -7869,7 +7862,7 @@ class iSndSysDataPtr(iSndSysData):
     def __init__(self, this):
         _swig_setattr(self, iSndSysData, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iSndSysData, 'thisown', 0)
-        self.__class__ = iSndSysData
+        _swig_setattr(self, iSndSysData,self.__class__,iSndSysData)
 _cspace.iSndSysData_swigregister(iSndSysDataPtr)
 
 iSndSysData_scfGetVersion = _cspace.iSndSysData_scfGetVersion
@@ -7924,7 +7917,7 @@ class iSndSysSoftwareFilter3DPropertiesPtr(iSndSysSoftwareFilter3DProperties):
     def __init__(self, this):
         _swig_setattr(self, iSndSysSoftwareFilter3DProperties, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iSndSysSoftwareFilter3DProperties, 'thisown', 0)
-        self.__class__ = iSndSysSoftwareFilter3DProperties
+        _swig_setattr(self, iSndSysSoftwareFilter3DProperties,self.__class__,iSndSysSoftwareFilter3DProperties)
 _cspace.iSndSysSoftwareFilter3DProperties_swigregister(iSndSysSoftwareFilter3DPropertiesPtr)
 
 class iSndSysSoftwareFilter3D(iBase):
@@ -7953,7 +7946,7 @@ class iSndSysSoftwareFilter3DPtr(iSndSysSoftwareFilter3D):
     def __init__(self, this):
         _swig_setattr(self, iSndSysSoftwareFilter3D, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iSndSysSoftwareFilter3D, 'thisown', 0)
-        self.__class__ = iSndSysSoftwareFilter3D
+        _swig_setattr(self, iSndSysSoftwareFilter3D,self.__class__,iSndSysSoftwareFilter3D)
 _cspace.iSndSysSoftwareFilter3D_swigregister(iSndSysSoftwareFilter3DPtr)
 
 iSndSysSoftwareFilter3D_scfGetVersion = _cspace.iSndSysSoftwareFilter3D_scfGetVersion
@@ -7980,7 +7973,7 @@ class iSndSysSoftwareOutputFilterPtr(iSndSysSoftwareOutputFilter):
     def __init__(self, this):
         _swig_setattr(self, iSndSysSoftwareOutputFilter, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iSndSysSoftwareOutputFilter, 'thisown', 0)
-        self.__class__ = iSndSysSoftwareOutputFilter
+        _swig_setattr(self, iSndSysSoftwareOutputFilter,self.__class__,iSndSysSoftwareOutputFilter)
 _cspace.iSndSysSoftwareOutputFilter_swigregister(iSndSysSoftwareOutputFilterPtr)
 
 SS_FILTER_LOC_RENDEROUT = _cspace.SS_FILTER_LOC_RENDEROUT
@@ -8016,7 +8009,7 @@ class iSndSysListenerPtr(iSndSysListener):
     def __init__(self, this):
         _swig_setattr(self, iSndSysListener, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iSndSysListener, 'thisown', 0)
-        self.__class__ = iSndSysListener
+        _swig_setattr(self, iSndSysListener,self.__class__,iSndSysListener)
 _cspace.iSndSysListener_swigregister(iSndSysListenerPtr)
 
 iSndSysListener_scfGetVersion = _cspace.iSndSysListener_scfGetVersion
@@ -8044,7 +8037,7 @@ class iSndSysLoaderPtr(iSndSysLoader):
     def __init__(self, this):
         _swig_setattr(self, iSndSysLoader, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iSndSysLoader, 'thisown', 0)
-        self.__class__ = iSndSysLoader
+        _swig_setattr(self, iSndSysLoader,self.__class__,iSndSysLoader)
 _cspace.iSndSysLoader_swigregister(iSndSysLoaderPtr)
 
 iSndSysLoader_scfGetVersion = _cspace.iSndSysLoader_scfGetVersion
@@ -8074,7 +8067,7 @@ class iSndSysWrapperPtr(iSndSysWrapper):
     def __init__(self, this):
         _swig_setattr(self, iSndSysWrapper, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iSndSysWrapper, 'thisown', 0)
-        self.__class__ = iSndSysWrapper
+        _swig_setattr(self, iSndSysWrapper,self.__class__,iSndSysWrapper)
 _cspace.iSndSysWrapper_swigregister(iSndSysWrapperPtr)
 
 iSndSysWrapper_scfGetVersion = _cspace.iSndSysWrapper_scfGetVersion
@@ -8107,7 +8100,7 @@ class iSndSysManagerPtr(iSndSysManager):
     def __init__(self, this):
         _swig_setattr(self, iSndSysManager, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iSndSysManager, 'thisown', 0)
-        self.__class__ = iSndSysManager
+        _swig_setattr(self, iSndSysManager,self.__class__,iSndSysManager)
 _cspace.iSndSysManager_swigregister(iSndSysManagerPtr)
 
 iSndSysManager_scfGetVersion = _cspace.iSndSysManager_scfGetVersion
@@ -8141,7 +8134,7 @@ class iSndSysSourcePtr(iSndSysSource):
     def __init__(self, this):
         _swig_setattr(self, iSndSysSource, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iSndSysSource, 'thisown', 0)
-        self.__class__ = iSndSysSource
+        _swig_setattr(self, iSndSysSource,self.__class__,iSndSysSource)
 _cspace.iSndSysSource_swigregister(iSndSysSourcePtr)
 
 iSndSysSource_scfGetVersion = _cspace.iSndSysSource_scfGetVersion
@@ -8168,7 +8161,7 @@ class iSndSysSourceSoftwarePtr(iSndSysSourceSoftware):
     def __init__(self, this):
         _swig_setattr(self, iSndSysSourceSoftware, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iSndSysSourceSoftware, 'thisown', 0)
-        self.__class__ = iSndSysSourceSoftware
+        _swig_setattr(self, iSndSysSourceSoftware,self.__class__,iSndSysSourceSoftware)
 _cspace.iSndSysSourceSoftware_swigregister(iSndSysSourceSoftwarePtr)
 
 class iSndSysSourceSoftware3D(iSndSysSourceSoftware):
@@ -8201,7 +8194,7 @@ class iSndSysSourceSoftware3DPtr(iSndSysSourceSoftware3D):
     def __init__(self, this):
         _swig_setattr(self, iSndSysSourceSoftware3D, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iSndSysSourceSoftware3D, 'thisown', 0)
-        self.__class__ = iSndSysSourceSoftware3D
+        _swig_setattr(self, iSndSysSourceSoftware3D,self.__class__,iSndSysSourceSoftware3D)
 _cspace.iSndSysSourceSoftware3D_swigregister(iSndSysSourceSoftware3DPtr)
 
 CSSNDSYS_SAMPLE_LITTLE_ENDIAN = _cspace.CSSNDSYS_SAMPLE_LITTLE_ENDIAN
@@ -8239,7 +8232,7 @@ class csSndSysSoundFormatPtr(csSndSysSoundFormat):
     def __init__(self, this):
         _swig_setattr(self, csSndSysSoundFormat, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csSndSysSoundFormat, 'thisown', 0)
-        self.__class__ = csSndSysSoundFormat
+        _swig_setattr(self, csSndSysSoundFormat,self.__class__,csSndSysSoundFormat)
 _cspace.csSndSysSoundFormat_swigregister(csSndSysSoundFormatPtr)
 
 CS_SNDSYS_STREAM_PAUSED = _cspace.CS_SNDSYS_STREAM_PAUSED
@@ -8295,7 +8288,7 @@ class iSndSysStreamPtr(iSndSysStream):
     def __init__(self, this):
         _swig_setattr(self, iSndSysStream, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iSndSysStream, 'thisown', 0)
-        self.__class__ = iSndSysStream
+        _swig_setattr(self, iSndSysStream,self.__class__,iSndSysStream)
 _cspace.iSndSysStream_swigregister(iSndSysStreamPtr)
 CS_SNDSYS_STREAM_UNKNOWN_LENGTH = cvar.CS_SNDSYS_STREAM_UNKNOWN_LENGTH
 
@@ -8325,7 +8318,7 @@ class iSndSysStreamCallbackPtr(iSndSysStreamCallback):
     def __init__(self, this):
         _swig_setattr(self, iSndSysStreamCallback, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iSndSysStreamCallback, 'thisown', 0)
-        self.__class__ = iSndSysStreamCallback
+        _swig_setattr(self, iSndSysStreamCallback,self.__class__,iSndSysStreamCallback)
 _cspace.iSndSysStreamCallback_swigregister(iSndSysStreamCallbackPtr)
 
 CS_SNDSYS_SOURCE_STOPPED = _cspace.CS_SNDSYS_SOURCE_STOPPED
@@ -8361,7 +8354,7 @@ class iSndSysRendererPtr(iSndSysRenderer):
     def __init__(self, this):
         _swig_setattr(self, iSndSysRenderer, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iSndSysRenderer, 'thisown', 0)
-        self.__class__ = iSndSysRenderer
+        _swig_setattr(self, iSndSysRenderer,self.__class__,iSndSysRenderer)
 _cspace.iSndSysRenderer_swigregister(iSndSysRendererPtr)
 
 iSndSysRenderer_scfGetVersion = _cspace.iSndSysRenderer_scfGetVersion
@@ -8390,7 +8383,7 @@ class iSndSysRendererCallbackPtr(iSndSysRendererCallback):
     def __init__(self, this):
         _swig_setattr(self, iSndSysRendererCallback, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iSndSysRendererCallback, 'thisown', 0)
-        self.__class__ = iSndSysRendererCallback
+        _swig_setattr(self, iSndSysRendererCallback,self.__class__,iSndSysRendererCallback)
 _cspace.iSndSysRendererCallback_swigregister(iSndSysRendererCallbackPtr)
 
 class iSndSysRendererSoftware(iBase):
@@ -8415,7 +8408,7 @@ class iSndSysRendererSoftwarePtr(iSndSysRendererSoftware):
     def __init__(self, this):
         _swig_setattr(self, iSndSysRendererSoftware, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iSndSysRendererSoftware, 'thisown', 0)
-        self.__class__ = iSndSysRendererSoftware
+        _swig_setattr(self, iSndSysRendererSoftware,self.__class__,iSndSysRendererSoftware)
 _cspace.iSndSysRendererSoftware_swigregister(iSndSysRendererSoftwarePtr)
 
 class iSndSysSoftwareDriver(iBase):
@@ -8444,7 +8437,7 @@ class iSndSysSoftwareDriverPtr(iSndSysSoftwareDriver):
     def __init__(self, this):
         _swig_setattr(self, iSndSysSoftwareDriver, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iSndSysSoftwareDriver, 'thisown', 0)
-        self.__class__ = iSndSysSoftwareDriver
+        _swig_setattr(self, iSndSysSoftwareDriver,self.__class__,iSndSysSoftwareDriver)
 _cspace.iSndSysSoftwareDriver_swigregister(iSndSysSoftwareDriverPtr)
 
 iSndSysSoftwareDriver_scfGetVersion = _cspace.iSndSysSoftwareDriver_scfGetVersion
@@ -8472,7 +8465,7 @@ class iComponentPtr(iComponent):
     def __init__(self, this):
         _swig_setattr(self, iComponent, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iComponent, 'thisown', 0)
-        self.__class__ = iComponent
+        _swig_setattr(self, iComponent,self.__class__,iComponent)
 _cspace.iComponent_swigregister(iComponentPtr)
 
 iComponent_scfGetVersion = _cspace.iComponent_scfGetVersion
@@ -8509,7 +8502,7 @@ class iCacheManagerPtr(iCacheManager):
     def __init__(self, this):
         _swig_setattr(self, iCacheManager, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iCacheManager, 'thisown', 0)
-        self.__class__ = iCacheManager
+        _swig_setattr(self, iCacheManager,self.__class__,iCacheManager)
 _cspace.iCacheManager_swigregister(iCacheManagerPtr)
 
 iCacheManager_scfGetVersion = _cspace.iCacheManager_scfGetVersion
@@ -8552,7 +8545,7 @@ class csFileTimePtr(csFileTime):
     def __init__(self, this):
         _swig_setattr(self, csFileTime, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csFileTime, 'thisown', 0)
-        self.__class__ = csFileTime
+        _swig_setattr(self, csFileTime,self.__class__,csFileTime)
 _cspace.csFileTime_swigregister(csFileTimePtr)
 
 VFS_PATH_DIVIDER = _cspace.VFS_PATH_DIVIDER
@@ -8601,7 +8594,7 @@ class iFilePtr(iFile):
     def __init__(self, this):
         _swig_setattr(self, iFile, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iFile, 'thisown', 0)
-        self.__class__ = iFile
+        _swig_setattr(self, iFile,self.__class__,iFile)
 _cspace.iFile_swigregister(iFilePtr)
 
 iFile_scfGetVersion = _cspace.iFile_scfGetVersion
@@ -8652,7 +8645,7 @@ class iVFSPtr(iVFS):
     def __init__(self, this):
         _swig_setattr(self, iVFS, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iVFS, 'thisown', 0)
-        self.__class__ = iVFS
+        _swig_setattr(self, iVFS,self.__class__,iVFS)
 _cspace.iVFS_swigregister(iVFSPtr)
 
 iVFS_scfGetVersion = _cspace.iVFS_scfGetVersion
@@ -8678,7 +8671,7 @@ class iObjectNameChangeListenerPtr(iObjectNameChangeListener):
     def __init__(self, this):
         _swig_setattr(self, iObjectNameChangeListener, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iObjectNameChangeListener, 'thisown', 0)
-        self.__class__ = iObjectNameChangeListener
+        _swig_setattr(self, iObjectNameChangeListener,self.__class__,iObjectNameChangeListener)
 _cspace.iObjectNameChangeListener_swigregister(iObjectNameChangeListenerPtr)
 
 class iObject(iBase):
@@ -8717,7 +8710,7 @@ class iObjectPtr(iObject):
     def __init__(self, this):
         _swig_setattr(self, iObject, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iObject, 'thisown', 0)
-        self.__class__ = iObject
+        _swig_setattr(self, iObject,self.__class__,iObject)
 _cspace.iObject_swigregister(iObjectPtr)
 
 iObject_scfGetVersion = _cspace.iObject_scfGetVersion
@@ -8747,7 +8740,7 @@ class iObjectIteratorPtr(iObjectIterator):
     def __init__(self, this):
         _swig_setattr(self, iObjectIterator, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iObjectIterator, 'thisown', 0)
-        self.__class__ = iObjectIterator
+        _swig_setattr(self, iObjectIterator,self.__class__,iObjectIterator)
 _cspace.iObjectIterator_swigregister(iObjectIteratorPtr)
 
 class iStringSet(iBase):
@@ -8779,7 +8772,7 @@ class iStringSetPtr(iStringSet):
     def __init__(self, this):
         _swig_setattr(self, iStringSet, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iStringSet, 'thisown', 0)
-        self.__class__ = iStringSet
+        _swig_setattr(self, iStringSet,self.__class__,iStringSet)
 _cspace.iStringSet_swigregister(iStringSetPtr)
 csInvalidStringID = cvar.csInvalidStringID
 
@@ -8811,7 +8804,7 @@ class iObjectRegistryPtr(iObjectRegistry):
     def __init__(self, this):
         _swig_setattr(self, iObjectRegistry, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iObjectRegistry, 'thisown', 0)
-        self.__class__ = iObjectRegistry
+        _swig_setattr(self, iObjectRegistry,self.__class__,iObjectRegistry)
 _cspace.iObjectRegistry_swigregister(iObjectRegistryPtr)
 
 iObjectRegistry_scfGetVersion = _cspace.iObjectRegistry_scfGetVersion
@@ -8840,7 +8833,7 @@ class iObjectRegistryIteratorPtr(iObjectRegistryIterator):
     def __init__(self, this):
         _swig_setattr(self, iObjectRegistryIterator, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iObjectRegistryIterator, 'thisown', 0)
-        self.__class__ = iObjectRegistryIterator
+        _swig_setattr(self, iObjectRegistryIterator,self.__class__,iObjectRegistryIterator)
 _cspace.iObjectRegistryIterator_swigregister(iObjectRegistryIteratorPtr)
 
 
@@ -8872,7 +8865,7 @@ class iVirtualClockPtr(iVirtualClock):
     def __init__(self, this):
         _swig_setattr(self, iVirtualClock, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iVirtualClock, 'thisown', 0)
-        self.__class__ = iVirtualClock
+        _swig_setattr(self, iVirtualClock,self.__class__,iVirtualClock)
 _cspace.iVirtualClock_swigregister(iVirtualClockPtr)
 
 iVirtualClock_scfGetVersion = _cspace.iVirtualClock_scfGetVersion
@@ -8906,7 +8899,7 @@ class iEventAttributeIteratorPtr(iEventAttributeIterator):
     def __init__(self, this):
         _swig_setattr(self, iEventAttributeIterator, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iEventAttributeIterator, 'thisown', 0)
-        self.__class__ = iEventAttributeIterator
+        _swig_setattr(self, iEventAttributeIterator,self.__class__,iEventAttributeIterator)
 _cspace.iEventAttributeIterator_swigregister(iEventAttributeIteratorPtr)
 
 class csKeyEventData(_object):
@@ -8947,7 +8940,7 @@ class csKeyEventDataPtr(csKeyEventData):
     def __init__(self, this):
         _swig_setattr(self, csKeyEventData, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csKeyEventData, 'thisown', 0)
-        self.__class__ = csKeyEventData
+        _swig_setattr(self, csKeyEventData,self.__class__,csKeyEventData)
 _cspace.csKeyEventData_swigregister(csKeyEventDataPtr)
 
 class csMouseEventData(_object):
@@ -8988,7 +8981,7 @@ class csMouseEventDataPtr(csMouseEventData):
     def __init__(self, this):
         _swig_setattr(self, csMouseEventData, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csMouseEventData, 'thisown', 0)
-        self.__class__ = csMouseEventData
+        _swig_setattr(self, csMouseEventData,self.__class__,csMouseEventData)
 _cspace.csMouseEventData_swigregister(csMouseEventDataPtr)
 
 class csJoystickEventData(_object):
@@ -9029,7 +9022,7 @@ class csJoystickEventDataPtr(csJoystickEventData):
     def __init__(self, this):
         _swig_setattr(self, csJoystickEventData, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csJoystickEventData, 'thisown', 0)
-        self.__class__ = csJoystickEventData
+        _swig_setattr(self, csJoystickEventData,self.__class__,csJoystickEventData)
 _cspace.csJoystickEventData_swigregister(csJoystickEventDataPtr)
 
 class csCommandEventData(_object):
@@ -9058,7 +9051,7 @@ class csCommandEventDataPtr(csCommandEventData):
     def __init__(self, this):
         _swig_setattr(self, csCommandEventData, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csCommandEventData, 'thisown', 0)
-        self.__class__ = csCommandEventData
+        _swig_setattr(self, csCommandEventData,self.__class__,csCommandEventData)
 _cspace.csCommandEventData_swigregister(csCommandEventDataPtr)
 
 csEventErrNone = _cspace.csEventErrNone
@@ -9142,7 +9135,7 @@ class iEventPtr(iEvent):
     def __init__(self, this):
         _swig_setattr(self, iEvent, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iEvent, 'thisown', 0)
-        self.__class__ = iEvent
+        _swig_setattr(self, iEvent,self.__class__,iEvent)
 _cspace.iEvent_swigregister(iEventPtr)
 
 iEvent_scfGetVersion = _cspace.iEvent_scfGetVersion
@@ -9170,7 +9163,7 @@ class iEventPlugPtr(iEventPlug):
     def __init__(self, this):
         _swig_setattr(self, iEventPlug, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iEventPlug, 'thisown', 0)
-        self.__class__ = iEventPlug
+        _swig_setattr(self, iEventPlug,self.__class__,iEventPlug)
 _cspace.iEventPlug_swigregister(iEventPlugPtr)
 
 class iEventOutlet(iBase):
@@ -9200,7 +9193,7 @@ class iEventOutletPtr(iEventOutlet):
     def __init__(self, this):
         _swig_setattr(self, iEventOutlet, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iEventOutlet, 'thisown', 0)
-        self.__class__ = iEventOutlet
+        _swig_setattr(self, iEventOutlet,self.__class__,iEventOutlet)
 _cspace.iEventOutlet_swigregister(iEventOutletPtr)
 
 class iEventCord(iBase):
@@ -9228,7 +9221,7 @@ class iEventCordPtr(iEventCord):
     def __init__(self, this):
         _swig_setattr(self, iEventCord, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iEventCord, 'thisown', 0)
-        self.__class__ = iEventCord
+        _swig_setattr(self, iEventCord,self.__class__,iEventCord)
 _cspace.iEventCord_swigregister(iEventCordPtr)
 
 class csKeyEventHelper(_object):
@@ -9267,7 +9260,7 @@ class csKeyEventHelperPtr(csKeyEventHelper):
     def __init__(self, this):
         _swig_setattr(self, csKeyEventHelper, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csKeyEventHelper, 'thisown', 0)
-        self.__class__ = csKeyEventHelper
+        _swig_setattr(self, csKeyEventHelper,self.__class__,csKeyEventHelper)
 _cspace.csKeyEventHelper_swigregister(csKeyEventHelperPtr)
 
 csKeyEventHelper_GetRawCode = _cspace.csKeyEventHelper_GetRawCode
@@ -9330,7 +9323,7 @@ class csMouseEventHelperPtr(csMouseEventHelper):
     def __init__(self, this):
         _swig_setattr(self, csMouseEventHelper, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csMouseEventHelper, 'thisown', 0)
-        self.__class__ = csMouseEventHelper
+        _swig_setattr(self, csMouseEventHelper,self.__class__,csMouseEventHelper)
 _cspace.csMouseEventHelper_swigregister(csMouseEventHelperPtr)
 
 csMouseEventHelper_NewEvent = _cspace.csMouseEventHelper_NewEvent
@@ -9395,7 +9388,7 @@ class csJoystickEventHelperPtr(csJoystickEventHelper):
     def __init__(self, this):
         _swig_setattr(self, csJoystickEventHelper, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csJoystickEventHelper, 'thisown', 0)
-        self.__class__ = csJoystickEventHelper
+        _swig_setattr(self, csJoystickEventHelper,self.__class__,csJoystickEventHelper)
 _cspace.csJoystickEventHelper_swigregister(csJoystickEventHelperPtr)
 
 csJoystickEventHelper_NewEvent = _cspace.csJoystickEventHelper_NewEvent
@@ -9440,7 +9433,7 @@ class csInputEventHelperPtr(csInputEventHelper):
     def __init__(self, this):
         _swig_setattr(self, csInputEventHelper, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csInputEventHelper, 'thisown', 0)
-        self.__class__ = csInputEventHelper
+        _swig_setattr(self, csInputEventHelper,self.__class__,csInputEventHelper)
 _cspace.csInputEventHelper_swigregister(csInputEventHelperPtr)
 
 csInputEventHelper_GetButton = _cspace.csInputEventHelper_GetButton
@@ -9475,7 +9468,7 @@ class csCommandEventHelperPtr(csCommandEventHelper):
     def __init__(self, this):
         _swig_setattr(self, csCommandEventHelper, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csCommandEventHelper, 'thisown', 0)
-        self.__class__ = csCommandEventHelper
+        _swig_setattr(self, csCommandEventHelper,self.__class__,csCommandEventHelper)
 _cspace.csCommandEventHelper_swigregister(csCommandEventHelperPtr)
 
 csCommandEventHelper_NewEvent = _cspace.csCommandEventHelper_NewEvent
@@ -9534,7 +9527,7 @@ class csKeyModifiersPtr(csKeyModifiers):
     def __init__(self, this):
         _swig_setattr(self, csKeyModifiers, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csKeyModifiers, 'thisown', 0)
-        self.__class__ = csKeyModifiers
+        _swig_setattr(self, csKeyModifiers,self.__class__,csKeyModifiers)
 _cspace.csKeyModifiers_swigregister(csKeyModifiersPtr)
 
 CSKEY_ESC = _cspace.CSKEY_ESC
@@ -9616,7 +9609,7 @@ class iEventQueuePtr(iEventQueue):
     def __init__(self, this):
         _swig_setattr(self, iEventQueue, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iEventQueue, 'thisown', 0)
-        self.__class__ = iEventQueue
+        _swig_setattr(self, iEventQueue,self.__class__,iEventQueue)
 _cspace.iEventQueue_swigregister(iEventQueuePtr)
 
 iEventQueue_scfGetVersion = _cspace.iEventQueue_scfGetVersion
@@ -9643,7 +9636,7 @@ class csStrKeyPtr(csStrKey):
     def __init__(self, this):
         _swig_setattr(self, csStrKey, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csStrKey, 'thisown', 0)
-        self.__class__ = csStrKey
+        _swig_setattr(self, csStrKey,self.__class__,csStrKey)
 _cspace.csStrKey_swigregister(csStrKeyPtr)
 
 csHashCompute = _cspace.csHashCompute
@@ -9675,7 +9668,7 @@ class iEventNameRegistryPtr(iEventNameRegistry):
     def __init__(self, this):
         _swig_setattr(self, iEventNameRegistry, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iEventNameRegistry, 'thisown', 0)
-        self.__class__ = iEventNameRegistry
+        _swig_setattr(self, iEventNameRegistry,self.__class__,iEventNameRegistry)
 _cspace.iEventNameRegistry_swigregister(iEventNameRegistryPtr)
 
 iEventNameRegistry_scfGetVersion = _cspace.iEventNameRegistry_scfGetVersion
@@ -9708,7 +9701,7 @@ class csEventNameRegistryPtr(csEventNameRegistry):
     def __init__(self, this):
         _swig_setattr(self, csEventNameRegistry, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csEventNameRegistry, 'thisown', 0)
-        self.__class__ = csEventNameRegistry
+        _swig_setattr(self, csEventNameRegistry,self.__class__,csEventNameRegistry)
 _cspace.csEventNameRegistry_swigregister(csEventNameRegistryPtr)
 
 csEventNameRegistry_GetString = _cspace.csEventNameRegistry_GetString
@@ -9748,7 +9741,7 @@ class iEventHandlerPtr(iEventHandler):
     def __init__(self, this):
         _swig_setattr(self, iEventHandler, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iEventHandler, 'thisown', 0)
-        self.__class__ = iEventHandler
+        _swig_setattr(self, iEventHandler,self.__class__,iEventHandler)
 _cspace.iEventHandler_swigregister(iEventHandlerPtr)
 
 csevMouse = _cspace.csevMouse
@@ -9793,7 +9786,7 @@ class iPluginIteratorPtr(iPluginIterator):
     def __init__(self, this):
         _swig_setattr(self, iPluginIterator, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iPluginIterator, 'thisown', 0)
-        self.__class__ = iPluginIterator
+        _swig_setattr(self, iPluginIterator,self.__class__,iPluginIterator)
 _cspace.iPluginIterator_swigregister(iPluginIteratorPtr)
 
 class iPluginManager(iBase):
@@ -9825,7 +9818,7 @@ class iPluginManagerPtr(iPluginManager):
     def __init__(self, this):
         _swig_setattr(self, iPluginManager, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iPluginManager, 'thisown', 0)
-        self.__class__ = iPluginManager
+        _swig_setattr(self, iPluginManager,self.__class__,iPluginManager)
 _cspace.iPluginManager_swigregister(iPluginManagerPtr)
 
 iPluginManager_scfGetVersion = _cspace.iPluginManager_scfGetVersion
@@ -9858,7 +9851,7 @@ class iKeyComposerPtr(iKeyComposer):
     def __init__(self, this):
         _swig_setattr(self, iKeyComposer, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iKeyComposer, 'thisown', 0)
-        self.__class__ = iKeyComposer
+        _swig_setattr(self, iKeyComposer,self.__class__,iKeyComposer)
 _cspace.iKeyComposer_swigregister(iKeyComposerPtr)
 
 class iKeyboardDriver(iBase):
@@ -9889,7 +9882,7 @@ class iKeyboardDriverPtr(iKeyboardDriver):
     def __init__(self, this):
         _swig_setattr(self, iKeyboardDriver, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iKeyboardDriver, 'thisown', 0)
-        self.__class__ = iKeyboardDriver
+        _swig_setattr(self, iKeyboardDriver,self.__class__,iKeyboardDriver)
 _cspace.iKeyboardDriver_swigregister(iKeyboardDriverPtr)
 
 iKeyboardDriver_scfGetVersion = _cspace.iKeyboardDriver_scfGetVersion
@@ -9924,7 +9917,7 @@ class iMouseDriverPtr(iMouseDriver):
     def __init__(self, this):
         _swig_setattr(self, iMouseDriver, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iMouseDriver, 'thisown', 0)
-        self.__class__ = iMouseDriver
+        _swig_setattr(self, iMouseDriver,self.__class__,iMouseDriver)
 _cspace.iMouseDriver_swigregister(iMouseDriverPtr)
 
 iMouseDriver_scfGetVersion = _cspace.iMouseDriver_scfGetVersion
@@ -9956,7 +9949,7 @@ class iJoystickDriverPtr(iJoystickDriver):
     def __init__(self, this):
         _swig_setattr(self, iJoystickDriver, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iJoystickDriver, 'thisown', 0)
-        self.__class__ = iJoystickDriver
+        _swig_setattr(self, iJoystickDriver,self.__class__,iJoystickDriver)
 _cspace.iJoystickDriver_swigregister(iJoystickDriverPtr)
 
 class iConfigFile(iBase):
@@ -10003,7 +9996,7 @@ class iConfigFilePtr(iConfigFile):
     def __init__(self, this):
         _swig_setattr(self, iConfigFile, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iConfigFile, 'thisown', 0)
-        self.__class__ = iConfigFile
+        _swig_setattr(self, iConfigFile,self.__class__,iConfigFile)
 _cspace.iConfigFile_swigregister(iConfigFilePtr)
 
 iConfigFile_scfGetVersion = _cspace.iConfigFile_scfGetVersion
@@ -10040,7 +10033,7 @@ class iConfigIteratorPtr(iConfigIterator):
     def __init__(self, this):
         _swig_setattr(self, iConfigIterator, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iConfigIterator, 'thisown', 0)
-        self.__class__ = iConfigIterator
+        _swig_setattr(self, iConfigIterator,self.__class__,iConfigIterator)
 _cspace.iConfigIterator_swigregister(iConfigIteratorPtr)
 
 iConfigIterator_scfGetVersion = _cspace.iConfigIterator_scfGetVersion
@@ -10089,7 +10082,7 @@ class iConfigManagerPtr(iConfigManager):
     def __init__(self, this):
         _swig_setattr(self, iConfigManager, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iConfigManager, 'thisown', 0)
-        self.__class__ = iConfigManager
+        _swig_setattr(self, iConfigManager,self.__class__,iConfigManager)
 _cspace.iConfigManager_swigregister(iConfigManagerPtr)
 
 iConfigManager_scfGetVersion = _cspace.iConfigManager_scfGetVersion
@@ -10131,7 +10124,7 @@ class iStringArrayPtr(iStringArray):
     def __init__(self, this):
         _swig_setattr(self, iStringArray, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iStringArray, 'thisown', 0)
-        self.__class__ = iStringArray
+        _swig_setattr(self, iStringArray,self.__class__,iStringArray)
 _cspace.iStringArray_swigregister(iStringArrayPtr)
 
 iStringArray_scfGetVersion = _cspace.iStringArray_scfGetVersion
@@ -10167,7 +10160,7 @@ class iDocumentAttributeIteratorPtr(iDocumentAttributeIterator):
     def __init__(self, this):
         _swig_setattr(self, iDocumentAttributeIterator, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iDocumentAttributeIterator, 'thisown', 0)
-        self.__class__ = iDocumentAttributeIterator
+        _swig_setattr(self, iDocumentAttributeIterator,self.__class__,iDocumentAttributeIterator)
 _cspace.iDocumentAttributeIterator_swigregister(iDocumentAttributeIteratorPtr)
 
 class iDocumentAttribute(iBase):
@@ -10199,7 +10192,7 @@ class iDocumentAttributePtr(iDocumentAttribute):
     def __init__(self, this):
         _swig_setattr(self, iDocumentAttribute, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iDocumentAttribute, 'thisown', 0)
-        self.__class__ = iDocumentAttribute
+        _swig_setattr(self, iDocumentAttribute,self.__class__,iDocumentAttribute)
 _cspace.iDocumentAttribute_swigregister(iDocumentAttributePtr)
 
 class iDocumentNodeIterator(iBase):
@@ -10224,7 +10217,7 @@ class iDocumentNodeIteratorPtr(iDocumentNodeIterator):
     def __init__(self, this):
         _swig_setattr(self, iDocumentNodeIterator, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iDocumentNodeIterator, 'thisown', 0)
-        self.__class__ = iDocumentNodeIterator
+        _swig_setattr(self, iDocumentNodeIterator,self.__class__,iDocumentNodeIterator)
 _cspace.iDocumentNodeIterator_swigregister(iDocumentNodeIteratorPtr)
 
 class iDocumentNode(iBase):
@@ -10273,7 +10266,7 @@ class iDocumentNodePtr(iDocumentNode):
     def __init__(self, this):
         _swig_setattr(self, iDocumentNode, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iDocumentNode, 'thisown', 0)
-        self.__class__ = iDocumentNode
+        _swig_setattr(self, iDocumentNode,self.__class__,iDocumentNode)
 _cspace.iDocumentNode_swigregister(iDocumentNodePtr)
 
 class iDocument(iBase):
@@ -10304,7 +10297,7 @@ class iDocumentPtr(iDocument):
     def __init__(self, this):
         _swig_setattr(self, iDocument, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iDocument, 'thisown', 0)
-        self.__class__ = iDocument
+        _swig_setattr(self, iDocument,self.__class__,iDocument)
 _cspace.iDocument_swigregister(iDocumentPtr)
 
 iDocument_scfGetVersion = _cspace.iDocument_scfGetVersion
@@ -10332,7 +10325,7 @@ class iDocumentSystemPtr(iDocumentSystem):
     def __init__(self, this):
         _swig_setattr(self, iDocumentSystem, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iDocumentSystem, 'thisown', 0)
-        self.__class__ = iDocumentSystem
+        _swig_setattr(self, iDocumentSystem,self.__class__,iDocumentSystem)
 _cspace.iDocumentSystem_swigregister(iDocumentSystemPtr)
 
 iDocumentSystem_scfGetVersion = _cspace.iDocumentSystem_scfGetVersion
@@ -10358,7 +10351,7 @@ class csTinyDocumentSystemPtr(csTinyDocumentSystem):
     def __init__(self, this):
         _swig_setattr(self, csTinyDocumentSystem, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csTinyDocumentSystem, 'thisown', 0)
-        self.__class__ = csTinyDocumentSystem
+        _swig_setattr(self, csTinyDocumentSystem,self.__class__,csTinyDocumentSystem)
 _cspace.csTinyDocumentSystem_swigregister(csTinyDocumentSystemPtr)
 
 class iDataBuffer(iBase):
@@ -10387,7 +10380,7 @@ class iDataBufferPtr(iDataBuffer):
     def __init__(self, this):
         _swig_setattr(self, iDataBuffer, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iDataBuffer, 'thisown', 0)
-        self.__class__ = iDataBuffer
+        _swig_setattr(self, iDataBuffer,self.__class__,iDataBuffer)
 _cspace.iDataBuffer_swigregister(iDataBufferPtr)
 
 iDataBuffer_scfGetVersion = _cspace.iDataBuffer_scfGetVersion
@@ -10420,7 +10413,7 @@ class csPixelCoordPtr(csPixelCoord):
     def __init__(self, this):
         _swig_setattr(self, csPixelCoord, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csPixelCoord, 'thisown', 0)
-        self.__class__ = csPixelCoord
+        _swig_setattr(self, csPixelCoord,self.__class__,csPixelCoord)
 _cspace.csPixelCoord_swigregister(csPixelCoordPtr)
 
 class csPixelFormat(_object):
@@ -10486,7 +10479,7 @@ class csPixelFormatPtr(csPixelFormat):
     def __init__(self, this):
         _swig_setattr(self, csPixelFormat, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csPixelFormat, 'thisown', 0)
-        self.__class__ = csPixelFormat
+        _swig_setattr(self, csPixelFormat,self.__class__,csPixelFormat)
 _cspace.csPixelFormat_swigregister(csPixelFormatPtr)
 
 class csImageArea(_object):
@@ -10524,7 +10517,7 @@ class csImageAreaPtr(csImageArea):
     def __init__(self, this):
         _swig_setattr(self, csImageArea, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csImageArea, 'thisown', 0)
-        self.__class__ = csImageArea
+        _swig_setattr(self, csImageArea,self.__class__,csImageArea)
 _cspace.csImageArea_swigregister(csImageAreaPtr)
 
 class iOffscreenCanvasCallback(iBase):
@@ -10549,7 +10542,7 @@ class iOffscreenCanvasCallbackPtr(iOffscreenCanvasCallback):
     def __init__(self, this):
         _swig_setattr(self, iOffscreenCanvasCallback, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iOffscreenCanvasCallback, 'thisown', 0)
-        self.__class__ = iOffscreenCanvasCallback
+        _swig_setattr(self, iOffscreenCanvasCallback,self.__class__,iOffscreenCanvasCallback)
 _cspace.iOffscreenCanvasCallback_swigregister(iOffscreenCanvasCallbackPtr)
 
 class iGraphics2D(iBase):
@@ -10627,7 +10620,7 @@ class iGraphics2DPtr(iGraphics2D):
     def __init__(self, this):
         _swig_setattr(self, iGraphics2D, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iGraphics2D, 'thisown', 0)
-        self.__class__ = iGraphics2D
+        _swig_setattr(self, iGraphics2D,self.__class__,iGraphics2D)
 _cspace.iGraphics2D_swigregister(iGraphics2DPtr)
 
 iGraphics2D_scfGetVersion = _cspace.iGraphics2D_scfGetVersion
@@ -10738,7 +10731,7 @@ class csAlphaModePtr(csAlphaMode):
     def __init__(self, this):
         _swig_setattr(self, csAlphaMode, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csAlphaMode, 'thisown', 0)
-        self.__class__ = csAlphaMode
+        _swig_setattr(self, csAlphaMode,self.__class__,csAlphaMode)
 _cspace.csAlphaMode_swigregister(csAlphaModePtr)
 
 CS_LIGHTPARAM_POSITION = _cspace.CS_LIGHTPARAM_POSITION
@@ -10816,7 +10809,7 @@ class csGraphics3DCapsPtr(csGraphics3DCaps):
     def __init__(self, this):
         _swig_setattr(self, csGraphics3DCaps, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csGraphics3DCaps, 'thisown', 0)
-        self.__class__ = csGraphics3DCaps
+        _swig_setattr(self, csGraphics3DCaps,self.__class__,csGraphics3DCaps)
 _cspace.csGraphics3DCaps_swigregister(csGraphics3DCapsPtr)
 
 CS_MESHTYPE_TRIANGLES = _cspace.CS_MESHTYPE_TRIANGLES
@@ -10893,7 +10886,7 @@ class csSimpleRenderMeshPtr(csSimpleRenderMesh):
     def __init__(self, this):
         _swig_setattr(self, csSimpleRenderMesh, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csSimpleRenderMesh, 'thisown', 0)
-        self.__class__ = csSimpleRenderMesh
+        _swig_setattr(self, csSimpleRenderMesh,self.__class__,csSimpleRenderMesh)
 _cspace.csSimpleRenderMesh_swigregister(csSimpleRenderMeshPtr)
 
 class iGraphics3D(iBase):
@@ -10967,7 +10960,7 @@ class iGraphics3DPtr(iGraphics3D):
     def __init__(self, this):
         _swig_setattr(self, iGraphics3D, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iGraphics3D, 'thisown', 0)
-        self.__class__ = iGraphics3D
+        _swig_setattr(self, iGraphics3D,self.__class__,iGraphics3D)
 _cspace.iGraphics3D_swigregister(iGraphics3DPtr)
 
 iGraphics3D_scfGetVersion = _cspace.iGraphics3D_scfGetVersion
@@ -11008,7 +11001,7 @@ class iNativeWindowManagerPtr(iNativeWindowManager):
     def __init__(self, this):
         _swig_setattr(self, iNativeWindowManager, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iNativeWindowManager, 'thisown', 0)
-        self.__class__ = iNativeWindowManager
+        _swig_setattr(self, iNativeWindowManager,self.__class__,iNativeWindowManager)
 _cspace.iNativeWindowManager_swigregister(iNativeWindowManagerPtr)
 
 class iNativeWindow(iBase):
@@ -11032,7 +11025,7 @@ class iNativeWindowPtr(iNativeWindow):
     def __init__(self, this):
         _swig_setattr(self, iNativeWindow, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iNativeWindow, 'thisown', 0)
-        self.__class__ = iNativeWindow
+        _swig_setattr(self, iNativeWindow,self.__class__,iNativeWindow)
 _cspace.iNativeWindow_swigregister(iNativeWindowPtr)
 
 CSFONT_LARGE = _cspace.CSFONT_LARGE
@@ -11061,7 +11054,7 @@ class iFontDeleteNotifyPtr(iFontDeleteNotify):
     def __init__(self, this):
         _swig_setattr(self, iFontDeleteNotify, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iFontDeleteNotify, 'thisown', 0)
-        self.__class__ = iFontDeleteNotify
+        _swig_setattr(self, iFontDeleteNotify,self.__class__,iFontDeleteNotify)
 _cspace.iFontDeleteNotify_swigregister(iFontDeleteNotifyPtr)
 
 class csBitmapMetrics(_object):
@@ -11096,7 +11089,7 @@ class csBitmapMetricsPtr(csBitmapMetrics):
     def __init__(self, this):
         _swig_setattr(self, csBitmapMetrics, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csBitmapMetrics, 'thisown', 0)
-        self.__class__ = csBitmapMetrics
+        _swig_setattr(self, csBitmapMetrics,self.__class__,csBitmapMetrics)
 _cspace.csBitmapMetrics_swigregister(csBitmapMetricsPtr)
 
 class csGlyphMetrics(_object):
@@ -11122,7 +11115,7 @@ class csGlyphMetricsPtr(csGlyphMetrics):
     def __init__(self, this):
         _swig_setattr(self, csGlyphMetrics, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csGlyphMetrics, 'thisown', 0)
-        self.__class__ = csGlyphMetrics
+        _swig_setattr(self, csGlyphMetrics,self.__class__,csGlyphMetrics)
 _cspace.csGlyphMetrics_swigregister(csGlyphMetricsPtr)
 
 class iFont(iBase):
@@ -11162,7 +11155,7 @@ class iFontPtr(iFont):
     def __init__(self, this):
         _swig_setattr(self, iFont, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iFont, 'thisown', 0)
-        self.__class__ = iFont
+        _swig_setattr(self, iFont,self.__class__,iFont)
 _cspace.iFont_swigregister(iFontPtr)
 
 iFont_scfGetVersion = _cspace.iFont_scfGetVersion
@@ -11192,7 +11185,7 @@ class iFontServerPtr(iFontServer):
     def __init__(self, this):
         _swig_setattr(self, iFontServer, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iFontServer, 'thisown', 0)
-        self.__class__ = iFontServer
+        _swig_setattr(self, iFontServer,self.__class__,iFontServer)
 _cspace.iFontServer_swigregister(iFontServerPtr)
 
 iFontServer_scfGetVersion = _cspace.iFontServer_scfGetVersion
@@ -11224,7 +11217,7 @@ class iHaloPtr(iHalo):
     def __init__(self, this):
         _swig_setattr(self, iHalo, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iHalo, 'thisown', 0)
-        self.__class__ = iHalo
+        _swig_setattr(self, iHalo,self.__class__,iHalo)
 _cspace.iHalo_swigregister(iHaloPtr)
 
 iHalo_scfGetVersion = _cspace.iHalo_scfGetVersion
@@ -11249,7 +11242,7 @@ class iShaderVarStackPtr(iShaderVarStack):
     def __init__(self, this):
         _swig_setattr(self, iShaderVarStack, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iShaderVarStack, 'thisown', 0)
-        self.__class__ = iShaderVarStack
+        _swig_setattr(self, iShaderVarStack,self.__class__,iShaderVarStack)
 _cspace.iShaderVarStack_swigregister(iShaderVarStackPtr)
 
 class iShaderVariableContext(iBase):
@@ -11282,7 +11275,7 @@ class iShaderVariableContextPtr(iShaderVariableContext):
     def __init__(self, this):
         _swig_setattr(self, iShaderVariableContext, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iShaderVariableContext, 'thisown', 0)
-        self.__class__ = iShaderVariableContext
+        _swig_setattr(self, iShaderVariableContext,self.__class__,iShaderVariableContext)
 _cspace.iShaderVariableContext_swigregister(iShaderVariableContextPtr)
 
 csGetShaderVariableFromStack = _cspace.csGetShaderVariableFromStack
@@ -11326,7 +11319,7 @@ class iShaderManagerPtr(iShaderManager):
     def __init__(self, this):
         _swig_setattr(self, iShaderManager, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iShaderManager, 'thisown', 0)
-        self.__class__ = iShaderManager
+        _swig_setattr(self, iShaderManager,self.__class__,iShaderManager)
 _cspace.iShaderManager_swigregister(iShaderManagerPtr)
 
 iShaderManager_scfGetVersion = _cspace.iShaderManager_scfGetVersion
@@ -11357,7 +11350,7 @@ class csShaderMetadataPtr(csShaderMetadata):
     def __init__(self, this):
         _swig_setattr(self, csShaderMetadata, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csShaderMetadata, 'thisown', 0)
-        self.__class__ = csShaderMetadata
+        _swig_setattr(self, csShaderMetadata,self.__class__,csShaderMetadata)
 _cspace.csShaderMetadata_swigregister(csShaderMetadataPtr)
 
 class iShader(iShaderVariableContext):
@@ -11390,7 +11383,7 @@ class iShaderPtr(iShader):
     def __init__(self, this):
         _swig_setattr(self, iShader, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iShader, 'thisown', 0)
-        self.__class__ = iShader
+        _swig_setattr(self, iShader,self.__class__,iShader)
 _cspace.iShader_swigregister(iShaderPtr)
 
 class iShaderPriorityList(iBase):
@@ -11415,7 +11408,7 @@ class iShaderPriorityListPtr(iShaderPriorityList):
     def __init__(self, this):
         _swig_setattr(self, iShaderPriorityList, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iShaderPriorityList, 'thisown', 0)
-        self.__class__ = iShaderPriorityList
+        _swig_setattr(self, iShaderPriorityList,self.__class__,iShaderPriorityList)
 _cspace.iShaderPriorityList_swigregister(iShaderPriorityListPtr)
 
 class iShaderCompiler(iBase):
@@ -11443,7 +11436,7 @@ class iShaderCompilerPtr(iShaderCompiler):
     def __init__(self, this):
         _swig_setattr(self, iShaderCompiler, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iShaderCompiler, 'thisown', 0)
-        self.__class__ = iShaderCompiler
+        _swig_setattr(self, iShaderCompiler,self.__class__,iShaderCompiler)
 _cspace.iShaderCompiler_swigregister(iShaderCompilerPtr)
 
 class iTextureHandle(iBase):
@@ -11497,7 +11490,7 @@ class iTextureHandlePtr(iTextureHandle):
     def __init__(self, this):
         _swig_setattr(self, iTextureHandle, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iTextureHandle, 'thisown', 0)
-        self.__class__ = iTextureHandle
+        _swig_setattr(self, iTextureHandle,self.__class__,iTextureHandle)
 _cspace.iTextureHandle_swigregister(iTextureHandlePtr)
 
 iTextureHandle_scfGetVersion = _cspace.iTextureHandle_scfGetVersion
@@ -11533,7 +11526,7 @@ class iRendererLightmapPtr(iRendererLightmap):
     def __init__(self, this):
         _swig_setattr(self, iRendererLightmap, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iRendererLightmap, 'thisown', 0)
-        self.__class__ = iRendererLightmap
+        _swig_setattr(self, iRendererLightmap,self.__class__,iRendererLightmap)
 _cspace.iRendererLightmap_swigregister(iRendererLightmapPtr)
 
 class iSuperLightmap(iBase):
@@ -11559,7 +11552,7 @@ class iSuperLightmapPtr(iSuperLightmap):
     def __init__(self, this):
         _swig_setattr(self, iSuperLightmap, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iSuperLightmap, 'thisown', 0)
-        self.__class__ = iSuperLightmap
+        _swig_setattr(self, iSuperLightmap,self.__class__,iSuperLightmap)
 _cspace.iSuperLightmap_swigregister(iSuperLightmapPtr)
 
 class iTextureManager(iBase):
@@ -11589,7 +11582,7 @@ class iTextureManagerPtr(iTextureManager):
     def __init__(self, this):
         _swig_setattr(self, iTextureManager, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iTextureManager, 'thisown', 0)
-        self.__class__ = iTextureManager
+        _swig_setattr(self, iTextureManager,self.__class__,iTextureManager)
 _cspace.iTextureManager_swigregister(iTextureManagerPtr)
 
 iTextureManager_scfGetVersion = _cspace.iTextureManager_scfGetVersion
@@ -11632,7 +11625,7 @@ class iMaterialPtr(iMaterial):
     def __init__(self, this):
         _swig_setattr(self, iMaterial, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iMaterial, 'thisown', 0)
-        self.__class__ = iMaterial
+        _swig_setattr(self, iMaterial,self.__class__,iMaterial)
 _cspace.iMaterial_swigregister(iMaterialPtr)
 
 iMaterial_scfGetVersion = _cspace.iMaterial_scfGetVersion
@@ -11689,7 +11682,7 @@ class iImagePtr(iImage):
     def __init__(self, this):
         _swig_setattr(self, iImage, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iImage, 'thisown', 0)
-        self.__class__ = iImage
+        _swig_setattr(self, iImage,self.__class__,iImage)
 _cspace.iImage_swigregister(iImagePtr)
 
 iImage_scfGetVersion = _cspace.iImage_scfGetVersion
@@ -11733,7 +11726,7 @@ class csImageIOFileFormatDescriptionsPtr(csImageIOFileFormatDescriptions):
     def __init__(self, this):
         _swig_setattr(self, csImageIOFileFormatDescriptions, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csImageIOFileFormatDescriptions, 'thisown', 0)
-        self.__class__ = csImageIOFileFormatDescriptions
+        _swig_setattr(self, csImageIOFileFormatDescriptions,self.__class__,csImageIOFileFormatDescriptions)
 _cspace.csImageIOFileFormatDescriptions_swigregister(csImageIOFileFormatDescriptionsPtr)
 
 CS_IMAGEIO_LOAD = _cspace.CS_IMAGEIO_LOAD
@@ -11765,7 +11758,7 @@ class csImageIOFileFormatDescriptionPtr(csImageIOFileFormatDescription):
     def __init__(self, this):
         _swig_setattr(self, csImageIOFileFormatDescription, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csImageIOFileFormatDescription, 'thisown', 0)
-        self.__class__ = csImageIOFileFormatDescription
+        _swig_setattr(self, csImageIOFileFormatDescription,self.__class__,csImageIOFileFormatDescription)
 _cspace.csImageIOFileFormatDescription_swigregister(csImageIOFileFormatDescriptionPtr)
 
 class iImageIO(iBase):
@@ -11794,7 +11787,7 @@ class iImageIOPtr(iImageIO):
     def __init__(self, this):
         _swig_setattr(self, iImageIO, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iImageIO, 'thisown', 0)
-        self.__class__ = iImageIO
+        _swig_setattr(self, iImageIO,self.__class__,iImageIO)
 _cspace.iImageIO_swigregister(iImageIOPtr)
 
 iImageIO_scfGetVersion = _cspace.iImageIO_scfGetVersion
@@ -11827,7 +11820,7 @@ class iReporterListenerPtr(iReporterListener):
     def __init__(self, this):
         _swig_setattr(self, iReporterListener, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iReporterListener, 'thisown', 0)
-        self.__class__ = iReporterListener
+        _swig_setattr(self, iReporterListener,self.__class__,iReporterListener)
 _cspace.iReporterListener_swigregister(iReporterListenerPtr)
 
 iReporterListener_scfGetVersion = _cspace.iReporterListener_scfGetVersion
@@ -11859,7 +11852,7 @@ class iReporterIteratorPtr(iReporterIterator):
     def __init__(self, this):
         _swig_setattr(self, iReporterIterator, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iReporterIterator, 'thisown', 0)
-        self.__class__ = iReporterIterator
+        _swig_setattr(self, iReporterIterator,self.__class__,iReporterIterator)
 _cspace.iReporterIterator_swigregister(iReporterIteratorPtr)
 
 iReporterIterator_scfGetVersion = _cspace.iReporterIterator_scfGetVersion
@@ -11897,7 +11890,7 @@ class iReporterPtr(iReporter):
     def __init__(self, this):
         _swig_setattr(self, iReporter, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iReporter, 'thisown', 0)
-        self.__class__ = iReporter
+        _swig_setattr(self, iReporter,self.__class__,iReporter)
 _cspace.iReporter_swigregister(iReporterPtr)
 
 iReporter_scfGetVersion = _cspace.iReporter_scfGetVersion
@@ -11924,7 +11917,7 @@ class csReporterHelperPtr(csReporterHelper):
     def __init__(self, this):
         _swig_setattr(self, csReporterHelper, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csReporterHelper, 'thisown', 0)
-        self.__class__ = csReporterHelper
+        _swig_setattr(self, csReporterHelper,self.__class__,csReporterHelper)
 _cspace.csReporterHelper_swigregister(csReporterHelperPtr)
 
 csReporterHelper_Report = _cspace.csReporterHelper_Report
@@ -11957,7 +11950,7 @@ class iConsoleWatcherPtr(iConsoleWatcher):
     def __init__(self, this):
         _swig_setattr(self, iConsoleWatcher, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iConsoleWatcher, 'thisown', 0)
-        self.__class__ = iConsoleWatcher
+        _swig_setattr(self, iConsoleWatcher,self.__class__,iConsoleWatcher)
 _cspace.iConsoleWatcher_swigregister(iConsoleWatcherPtr)
 
 class iConsoleOutput(iBase):
@@ -12001,7 +11994,7 @@ class iConsoleOutputPtr(iConsoleOutput):
     def __init__(self, this):
         _swig_setattr(self, iConsoleOutput, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iConsoleOutput, 'thisown', 0)
-        self.__class__ = iConsoleOutput
+        _swig_setattr(self, iConsoleOutput,self.__class__,iConsoleOutput)
 _cspace.iConsoleOutput_swigregister(iConsoleOutputPtr)
 
 class iStandardReporterListener(iBase):
@@ -12035,7 +12028,7 @@ class iStandardReporterListenerPtr(iStandardReporterListener):
     def __init__(self, this):
         _swig_setattr(self, iStandardReporterListener, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iStandardReporterListener, 'thisown', 0)
-        self.__class__ = iStandardReporterListener
+        _swig_setattr(self, iStandardReporterListener,self.__class__,iStandardReporterListener)
 _cspace.iStandardReporterListener_swigregister(iStandardReporterListenerPtr)
 
 iStandardReporterListener_scfGetVersion = _cspace.iStandardReporterListener_scfGetVersion
@@ -12076,7 +12069,7 @@ class iViewPtr(iView):
     def __init__(self, this):
         _swig_setattr(self, iView, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iView, 'thisown', 0)
-        self.__class__ = iView
+        _swig_setattr(self, iView,self.__class__,iView)
 _cspace.iView_swigregister(iViewPtr)
 
 iView_scfGetVersion = _cspace.iView_scfGetVersion
@@ -12119,7 +12112,7 @@ class csCollisionPairPtr(csCollisionPair):
     def __init__(self, this):
         _swig_setattr(self, csCollisionPair, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csCollisionPair, 'thisown', 0)
-        self.__class__ = csCollisionPair
+        _swig_setattr(self, csCollisionPair,self.__class__,csCollisionPair)
 _cspace.csCollisionPair_swigregister(csCollisionPairPtr)
 
 class csIntersectingTriangle(_object):
@@ -12151,7 +12144,7 @@ class csIntersectingTrianglePtr(csIntersectingTriangle):
     def __init__(self, this):
         _swig_setattr(self, csIntersectingTriangle, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csIntersectingTriangle, 'thisown', 0)
-        self.__class__ = csIntersectingTriangle
+        _swig_setattr(self, csIntersectingTriangle,self.__class__,csIntersectingTriangle)
 _cspace.csIntersectingTriangle_swigregister(csIntersectingTrianglePtr)
 
 CS_MESH_COLLIDER = _cspace.CS_MESH_COLLIDER
@@ -12179,7 +12172,7 @@ class iColliderPtr(iCollider):
     def __init__(self, this):
         _swig_setattr(self, iCollider, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iCollider, 'thisown', 0)
-        self.__class__ = iCollider
+        _swig_setattr(self, iCollider,self.__class__,iCollider)
 _cspace.iCollider_swigregister(iColliderPtr)
 
 iCollider_scfGetVersion = _cspace.iCollider_scfGetVersion
@@ -12224,7 +12217,7 @@ class iCollideSystemPtr(iCollideSystem):
     def __init__(self, this):
         _swig_setattr(self, iCollideSystem, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iCollideSystem, 'thisown', 0)
-        self.__class__ = iCollideSystem
+        _swig_setattr(self, iCollideSystem,self.__class__,iCollideSystem)
 _cspace.iCollideSystem_swigregister(iCollideSystemPtr)
 
 iCollideSystem_scfGetVersion = _cspace.iCollideSystem_scfGetVersion
@@ -12256,7 +12249,7 @@ class iDynamicsPtr(iDynamics):
     def __init__(self, this):
         _swig_setattr(self, iDynamics, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iDynamics, 'thisown', 0)
-        self.__class__ = iDynamics
+        _swig_setattr(self, iDynamics,self.__class__,iDynamics)
 _cspace.iDynamics_swigregister(iDynamicsPtr)
 
 iDynamics_scfGetVersion = _cspace.iDynamics_scfGetVersion
@@ -12315,7 +12308,7 @@ class iDynamicSystemPtr(iDynamicSystem):
     def __init__(self, this):
         _swig_setattr(self, iDynamicSystem, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iDynamicSystem, 'thisown', 0)
-        self.__class__ = iDynamicSystem
+        _swig_setattr(self, iDynamicSystem,self.__class__,iDynamicSystem)
 _cspace.iDynamicSystem_swigregister(iDynamicSystemPtr)
 
 iDynamicSystem_scfGetVersion = _cspace.iDynamicSystem_scfGetVersion
@@ -12341,7 +12334,7 @@ class iDynamicsMoveCallbackPtr(iDynamicsMoveCallback):
     def __init__(self, this):
         _swig_setattr(self, iDynamicsMoveCallback, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iDynamicsMoveCallback, 'thisown', 0)
-        self.__class__ = iDynamicsMoveCallback
+        _swig_setattr(self, iDynamicsMoveCallback,self.__class__,iDynamicsMoveCallback)
 _cspace.iDynamicsMoveCallback_swigregister(iDynamicsMoveCallbackPtr)
 
 class iDynamicsCollisionCallback(iBase):
@@ -12365,7 +12358,7 @@ class iDynamicsCollisionCallbackPtr(iDynamicsCollisionCallback):
     def __init__(self, this):
         _swig_setattr(self, iDynamicsCollisionCallback, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iDynamicsCollisionCallback, 'thisown', 0)
-        self.__class__ = iDynamicsCollisionCallback
+        _swig_setattr(self, iDynamicsCollisionCallback,self.__class__,iDynamicsCollisionCallback)
 _cspace.iDynamicsCollisionCallback_swigregister(iDynamicsCollisionCallbackPtr)
 
 class iBodyGroup(iBase):
@@ -12393,7 +12386,7 @@ class iBodyGroupPtr(iBodyGroup):
     def __init__(self, this):
         _swig_setattr(self, iBodyGroup, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iBodyGroup, 'thisown', 0)
-        self.__class__ = iBodyGroup
+        _swig_setattr(self, iBodyGroup,self.__class__,iBodyGroup)
 _cspace.iBodyGroup_swigregister(iBodyGroupPtr)
 
 iBodyGroup_scfGetVersion = _cspace.iBodyGroup_scfGetVersion
@@ -12472,7 +12465,7 @@ class iRigidBodyPtr(iRigidBody):
     def __init__(self, this):
         _swig_setattr(self, iRigidBody, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iRigidBody, 'thisown', 0)
-        self.__class__ = iRigidBody
+        _swig_setattr(self, iRigidBody,self.__class__,iRigidBody)
 _cspace.iRigidBody_swigregister(iRigidBodyPtr)
 
 NO_GEOMETRY = _cspace.NO_GEOMETRY
@@ -12502,7 +12495,7 @@ class iDynamicsColliderCollisionCallbackPtr(iDynamicsColliderCollisionCallback):
     def __init__(self, this):
         _swig_setattr(self, iDynamicsColliderCollisionCallback, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iDynamicsColliderCollisionCallback, 'thisown', 0)
-        self.__class__ = iDynamicsColliderCollisionCallback
+        _swig_setattr(self, iDynamicsColliderCollisionCallback,self.__class__,iDynamicsColliderCollisionCallback)
 _cspace.iDynamicsColliderCollisionCallback_swigregister(iDynamicsColliderCollisionCallbackPtr)
 
 class iDynamicsSystemCollider(iBase):
@@ -12551,7 +12544,7 @@ class iDynamicsSystemColliderPtr(iDynamicsSystemCollider):
     def __init__(self, this):
         _swig_setattr(self, iDynamicsSystemCollider, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iDynamicsSystemCollider, 'thisown', 0)
-        self.__class__ = iDynamicsSystemCollider
+        _swig_setattr(self, iDynamicsSystemCollider,self.__class__,iDynamicsSystemCollider)
 _cspace.iDynamicsSystemCollider_swigregister(iDynamicsSystemColliderPtr)
 
 class iJoint(iBase):
@@ -12602,7 +12595,7 @@ class iJointPtr(iJoint):
     def __init__(self, this):
         _swig_setattr(self, iJoint, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iJoint, 'thisown', 0)
-        self.__class__ = iJoint
+        _swig_setattr(self, iJoint,self.__class__,iJoint)
 _cspace.iJoint_swigregister(iJointPtr)
 
 iJoint_scfGetVersion = _cspace.iJoint_scfGetVersion
@@ -12628,7 +12621,7 @@ class iODEFrameUpdateCallbackPtr(iODEFrameUpdateCallback):
     def __init__(self, this):
         _swig_setattr(self, iODEFrameUpdateCallback, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iODEFrameUpdateCallback, 'thisown', 0)
-        self.__class__ = iODEFrameUpdateCallback
+        _swig_setattr(self, iODEFrameUpdateCallback,self.__class__,iODEFrameUpdateCallback)
 _cspace.iODEFrameUpdateCallback_swigregister(iODEFrameUpdateCallbackPtr)
 
 class iODEDynamicState(iBase):
@@ -12677,7 +12670,7 @@ class iODEDynamicStatePtr(iODEDynamicState):
     def __init__(self, this):
         _swig_setattr(self, iODEDynamicState, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iODEDynamicState, 'thisown', 0)
-        self.__class__ = iODEDynamicState
+        _swig_setattr(self, iODEDynamicState,self.__class__,iODEDynamicState)
 _cspace.iODEDynamicState_swigregister(iODEDynamicStatePtr)
 
 iODEDynamicState_scfGetVersion = _cspace.iODEDynamicState_scfGetVersion
@@ -12740,7 +12733,7 @@ class iODEDynamicSystemStatePtr(iODEDynamicSystemState):
     def __init__(self, this):
         _swig_setattr(self, iODEDynamicSystemState, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iODEDynamicSystemState, 'thisown', 0)
-        self.__class__ = iODEDynamicSystemState
+        _swig_setattr(self, iODEDynamicSystemState,self.__class__,iODEDynamicSystemState)
 _cspace.iODEDynamicSystemState_swigregister(iODEDynamicSystemStatePtr)
 
 iODEDynamicSystemState_scfGetVersion = _cspace.iODEDynamicSystemState_scfGetVersion
@@ -12846,7 +12839,7 @@ class iODEJointStatePtr(iODEJointState):
     def __init__(self, this):
         _swig_setattr(self, iODEJointState, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iODEJointState, 'thisown', 0)
-        self.__class__ = iODEJointState
+        _swig_setattr(self, iODEJointState,self.__class__,iODEJointState)
 _cspace.iODEJointState_swigregister(iODEJointStatePtr)
 
 iODEJointState_scfGetVersion = _cspace.iODEJointState_scfGetVersion
@@ -12899,7 +12892,7 @@ class iODEGeneralJointStatePtr(iODEGeneralJointState):
     def __init__(self, this):
         _swig_setattr(self, iODEGeneralJointState, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iODEGeneralJointState, 'thisown', 0)
-        self.__class__ = iODEGeneralJointState
+        _swig_setattr(self, iODEGeneralJointState,self.__class__,iODEGeneralJointState)
 _cspace.iODEGeneralJointState_swigregister(iODEGeneralJointStatePtr)
 
 class iODESliderJoint(iODEGeneralJointState):
@@ -12928,7 +12921,7 @@ class iODESliderJointPtr(iODESliderJoint):
     def __init__(self, this):
         _swig_setattr(self, iODESliderJoint, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iODESliderJoint, 'thisown', 0)
-        self.__class__ = iODESliderJoint
+        _swig_setattr(self, iODESliderJoint,self.__class__,iODESliderJoint)
 _cspace.iODESliderJoint_swigregister(iODESliderJointPtr)
 
 iODESliderJoint_scfGetVersion = _cspace.iODESliderJoint_scfGetVersion
@@ -12962,7 +12955,7 @@ class iODEUniversalJointPtr(iODEUniversalJoint):
     def __init__(self, this):
         _swig_setattr(self, iODEUniversalJoint, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iODEUniversalJoint, 'thisown', 0)
-        self.__class__ = iODEUniversalJoint
+        _swig_setattr(self, iODEUniversalJoint,self.__class__,iODEUniversalJoint)
 _cspace.iODEUniversalJoint_swigregister(iODEUniversalJointPtr)
 
 iODEUniversalJoint_scfGetVersion = _cspace.iODEUniversalJoint_scfGetVersion
@@ -13003,7 +12996,7 @@ class iODEAMotorJointPtr(iODEAMotorJoint):
     def __init__(self, this):
         _swig_setattr(self, iODEAMotorJoint, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iODEAMotorJoint, 'thisown', 0)
-        self.__class__ = iODEAMotorJoint
+        _swig_setattr(self, iODEAMotorJoint,self.__class__,iODEAMotorJoint)
 _cspace.iODEAMotorJoint_swigregister(iODEAMotorJointPtr)
 
 iODEAMotorJoint_scfGetVersion = _cspace.iODEAMotorJoint_scfGetVersion
@@ -13039,7 +13032,7 @@ class iODEHinge2JointPtr(iODEHinge2Joint):
     def __init__(self, this):
         _swig_setattr(self, iODEHinge2Joint, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iODEHinge2Joint, 'thisown', 0)
-        self.__class__ = iODEHinge2Joint
+        _swig_setattr(self, iODEHinge2Joint,self.__class__,iODEHinge2Joint)
 _cspace.iODEHinge2Joint_swigregister(iODEHinge2JointPtr)
 
 class iODEHingeJoint(iODEGeneralJointState):
@@ -13072,7 +13065,7 @@ class iODEHingeJointPtr(iODEHingeJoint):
     def __init__(self, this):
         _swig_setattr(self, iODEHingeJoint, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iODEHingeJoint, 'thisown', 0)
-        self.__class__ = iODEHingeJoint
+        _swig_setattr(self, iODEHingeJoint,self.__class__,iODEHingeJoint)
 _cspace.iODEHingeJoint_swigregister(iODEHingeJointPtr)
 
 iODEHingeJoint_scfGetVersion = _cspace.iODEHingeJoint_scfGetVersion
@@ -13109,7 +13102,7 @@ class iODEBallJointPtr(iODEBallJoint):
     def __init__(self, this):
         _swig_setattr(self, iODEBallJoint, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iODEBallJoint, 'thisown', 0)
-        self.__class__ = iODEBallJoint
+        _swig_setattr(self, iODEBallJoint,self.__class__,iODEBallJoint)
 _cspace.iODEBallJoint_swigregister(iODEBallJointPtr)
 
 iODEBallJoint_scfGetVersion = _cspace.iODEBallJoint_scfGetVersion
@@ -13139,7 +13132,7 @@ class iParameterESMPtr(iParameterESM):
     def __init__(self, this):
         _swig_setattr(self, iParameterESM, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iParameterESM, 'thisown', 0)
-        self.__class__ = iParameterESM
+        _swig_setattr(self, iParameterESM,self.__class__,iParameterESM)
 _cspace.iParameterESM_swigregister(iParameterESMPtr)
 
 class iEngineSequenceParameters(iBase):
@@ -13169,7 +13162,7 @@ class iEngineSequenceParametersPtr(iEngineSequenceParameters):
     def __init__(self, this):
         _swig_setattr(self, iEngineSequenceParameters, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iEngineSequenceParameters, 'thisown', 0)
-        self.__class__ = iEngineSequenceParameters
+        _swig_setattr(self, iEngineSequenceParameters,self.__class__,iEngineSequenceParameters)
 _cspace.iEngineSequenceParameters_swigregister(iEngineSequenceParametersPtr)
 
 class iSequenceWrapper(iBase):
@@ -13214,7 +13207,7 @@ class iSequenceWrapperPtr(iSequenceWrapper):
     def __init__(self, this):
         _swig_setattr(self, iSequenceWrapper, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iSequenceWrapper, 'thisown', 0)
-        self.__class__ = iSequenceWrapper
+        _swig_setattr(self, iSequenceWrapper,self.__class__,iSequenceWrapper)
 _cspace.iSequenceWrapper_swigregister(iSequenceWrapperPtr)
 
 class iSequenceTrigger(iBase):
@@ -13254,7 +13247,7 @@ class iSequenceTriggerPtr(iSequenceTrigger):
     def __init__(self, this):
         _swig_setattr(self, iSequenceTrigger, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iSequenceTrigger, 'thisown', 0)
-        self.__class__ = iSequenceTrigger
+        _swig_setattr(self, iSequenceTrigger,self.__class__,iSequenceTrigger)
 _cspace.iSequenceTrigger_swigregister(iSequenceTriggerPtr)
 
 class iSequenceTimedOperation(iBase):
@@ -13278,7 +13271,7 @@ class iSequenceTimedOperationPtr(iSequenceTimedOperation):
     def __init__(self, this):
         _swig_setattr(self, iSequenceTimedOperation, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iSequenceTimedOperation, 'thisown', 0)
-        self.__class__ = iSequenceTimedOperation
+        _swig_setattr(self, iSequenceTimedOperation,self.__class__,iSequenceTimedOperation)
 _cspace.iSequenceTimedOperation_swigregister(iSequenceTimedOperationPtr)
 
 class iEngineSequenceManager(iBase):
@@ -13319,7 +13312,7 @@ class iEngineSequenceManagerPtr(iEngineSequenceManager):
     def __init__(self, this):
         _swig_setattr(self, iEngineSequenceManager, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iEngineSequenceManager, 'thisown', 0)
-        self.__class__ = iEngineSequenceManager
+        _swig_setattr(self, iEngineSequenceManager,self.__class__,iEngineSequenceManager)
 _cspace.iEngineSequenceManager_swigregister(iEngineSequenceManagerPtr)
 
 class iMovieRecorder(iBase):
@@ -13350,7 +13343,7 @@ class iMovieRecorderPtr(iMovieRecorder):
     def __init__(self, this):
         _swig_setattr(self, iMovieRecorder, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iMovieRecorder, 'thisown', 0)
-        self.__class__ = iMovieRecorder
+        _swig_setattr(self, iMovieRecorder,self.__class__,iMovieRecorder)
 _cspace.iMovieRecorder_swigregister(iMovieRecorderPtr)
 
 iMovieRecorder_scfGetVersion = _cspace.iMovieRecorder_scfGetVersion
@@ -13388,7 +13381,7 @@ class iMapNodePtr(iMapNode):
     def __init__(self, this):
         _swig_setattr(self, iMapNode, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iMapNode, 'thisown', 0)
-        self.__class__ = iMapNode
+        _swig_setattr(self, iMapNode,self.__class__,iMapNode)
 _cspace.iMapNode_swigregister(iMapNodePtr)
 
 iMapNode_scfGetVersion = _cspace.iMapNode_scfGetVersion
@@ -13432,7 +13425,7 @@ class iScriptObjectPtr(iScriptObject):
     def __init__(self, this):
         _swig_setattr(self, iScriptObject, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iScriptObject, 'thisown', 0)
-        self.__class__ = iScriptObject
+        _swig_setattr(self, iScriptObject,self.__class__,iScriptObject)
 _cspace.iScriptObject_swigregister(iScriptObjectPtr)
 
 iScriptObject_scfGetVersion = _cspace.iScriptObject_scfGetVersion
@@ -13478,7 +13471,7 @@ class iScriptPtr(iScript):
     def __init__(self, this):
         _swig_setattr(self, iScript, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iScript, 'thisown', 0)
-        self.__class__ = iScript
+        _swig_setattr(self, iScript,self.__class__,iScript)
 _cspace.iScript_swigregister(iScriptPtr)
 
 iScript_scfGetVersion = _cspace.iScript_scfGetVersion
@@ -13510,7 +13503,7 @@ class iSimpleFormerStatePtr(iSimpleFormerState):
     def __init__(self, this):
         _swig_setattr(self, iSimpleFormerState, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iSimpleFormerState, 'thisown', 0)
-        self.__class__ = iSimpleFormerState
+        _swig_setattr(self, iSimpleFormerState,self.__class__,iSimpleFormerState)
 _cspace.iSimpleFormerState_swigregister(iSimpleFormerStatePtr)
 
 iSimpleFormerState_scfGetVersion = _cspace.iSimpleFormerState_scfGetVersion
@@ -13543,7 +13536,7 @@ class iTerraFormerPtr(iTerraFormer):
     def __init__(self, this):
         _swig_setattr(self, iTerraFormer, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iTerraFormer, 'thisown', 0)
-        self.__class__ = iTerraFormer
+        _swig_setattr(self, iTerraFormer,self.__class__,iTerraFormer)
 _cspace.iTerraFormer_swigregister(iTerraFormerPtr)
 
 iTerraFormer_scfGetVersion = _cspace.iTerraFormer_scfGetVersion
@@ -13579,7 +13572,7 @@ class iTerraSamplerPtr(iTerraSampler):
     def __init__(self, this):
         _swig_setattr(self, iTerraSampler, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, iTerraSampler, 'thisown', 0)
-        self.__class__ = iTerraSampler
+        _swig_setattr(self, iTerraSampler,self.__class__,iTerraSampler)
 _cspace.iTerraSampler_swigregister(iTerraSamplerPtr)
 
 iTerraSampler_scfGetVersion = _cspace.iTerraSampler_scfGetVersion
@@ -13618,7 +13611,7 @@ class csObjectPtr(csObject):
     def __init__(self, this):
         _swig_setattr(self, csObject, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csObject, 'thisown', 0)
-        self.__class__ = csObject
+        _swig_setattr(self, csObject,self.__class__,csObject)
 _cspace.csObject_swigregister(csObjectPtr)
 
 class csColliderWrapper(_object):
@@ -13646,7 +13639,7 @@ class csColliderWrapperPtr(csColliderWrapper):
     def __init__(self, this):
         _swig_setattr(self, csColliderWrapper, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csColliderWrapper, 'thisown', 0)
-        self.__class__ = csColliderWrapper
+        _swig_setattr(self, csColliderWrapper,self.__class__,csColliderWrapper)
 _cspace.csColliderWrapper_swigregister(csColliderWrapperPtr)
 
 csColliderWrapper_GetColliderWrapper = _cspace.csColliderWrapper_GetColliderWrapper
@@ -13686,7 +13679,7 @@ class csTraceBeamResultPtr(csTraceBeamResult):
     def __init__(self, this):
         _swig_setattr(self, csTraceBeamResult, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csTraceBeamResult, 'thisown', 0)
-        self.__class__ = csTraceBeamResult
+        _swig_setattr(self, csTraceBeamResult,self.__class__,csTraceBeamResult)
 _cspace.csTraceBeamResult_swigregister(csTraceBeamResultPtr)
 
 class csColliderHelper(_object):
@@ -13719,7 +13712,7 @@ class csColliderHelperPtr(csColliderHelper):
     def __init__(self, this):
         _swig_setattr(self, csColliderHelper, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csColliderHelper, 'thisown', 0)
-        self.__class__ = csColliderHelper
+        _swig_setattr(self, csColliderHelper,self.__class__,csColliderHelper)
 _cspace.csColliderHelper_swigregister(csColliderHelperPtr)
 
 csColliderHelper_InitializeCollisionWrapper = _cspace.csColliderHelper_InitializeCollisionWrapper
@@ -13770,7 +13763,7 @@ class csColliderActorPtr(csColliderActor):
     def __init__(self, this):
         _swig_setattr(self, csColliderActor, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csColliderActor, 'thisown', 0)
-        self.__class__ = csColliderActor
+        _swig_setattr(self, csColliderActor,self.__class__,csColliderActor)
 _cspace.csColliderActor_swigregister(csColliderActorPtr)
 
 class csView(_object):
@@ -13807,7 +13800,7 @@ class csViewPtr(csView):
     def __init__(self, this):
         _swig_setattr(self, csView, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csView, 'thisown', 0)
-        self.__class__ = csView
+        _swig_setattr(self, csView,self.__class__,csView)
 _cspace.csView_swigregister(csViewPtr)
 
 
@@ -13858,7 +13851,7 @@ class csPixmapPtr(csPixmap):
     def __init__(self, this):
         _swig_setattr(self, csPixmap, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, csPixmap, 'thisown', 0)
-        self.__class__ = csPixmap
+        _swig_setattr(self, csPixmap,self.__class__,csPixmap)
 _cspace.csPixmap_swigregister(csPixmapPtr)
 
 csfxShadeVert = _cspace.csfxShadeVert
@@ -13976,7 +13969,7 @@ class _csPyEventHandlerPtr(_csPyEventHandler):
     def __init__(self, this):
         _swig_setattr(self, _csPyEventHandler, 'this', this)
         if not hasattr(self,"thisown"): _swig_setattr(self, _csPyEventHandler, 'thisown', 0)
-        self.__class__ = _csPyEventHandler
+        _swig_setattr(self, _csPyEventHandler,self.__class__,_csPyEventHandler)
 _cspace._csPyEventHandler_swigregister(_csPyEventHandlerPtr)
 
 _csPyEventHandler_StaticHandlerName = _cspace._csPyEventHandler_StaticHandlerName
@@ -14127,6 +14120,5 @@ CS_VEC_TILT_DOWN = -csVector3(-1,0,0)
 
 
 CS_POLYRANGE_LAST = csPolygonRange (-1, -1)
-
 
 
