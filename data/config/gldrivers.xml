@@ -219,6 +219,16 @@
         </ShaderManager>
       </Video>
     </config>
+    <config name="useAFP2D">
+      <Video>
+	<OpenGL>
+	  <FontCache>
+	    <UseAFP>yes</UseAFP>
+	  </FontCache>
+	  <AFPDrawPixmap>yes</AFPDrawPixmap>
+	</OpenGL>
+      </Video>
+    </config>
   </configs>
   <rules>
     <!-- rule description="Some more examples">
