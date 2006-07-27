@@ -9,6 +9,7 @@ chronological order.
 27-Jul-2006
 	- res changed an array in glshader_ps1 that is never changed from 
 	  dynamic to compile-time creation.
+	- res added some true static conditionals to xmlshader.
 25-Jul-2006
 	- mdmkolbe converted the following plugins to the new SCF:
 	    - plugins/physics/loader/

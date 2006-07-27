@@ -128,6 +128,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
 
     virtual ~TempStringBase() { Free (); }
     virtual void Free () { TempHeapAlloc::Free (Data); Data = 0; }
+
+    using csStringBase::Trim;
   };
 
   /**
