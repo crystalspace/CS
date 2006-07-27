@@ -97,6 +97,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
       csParticleAux& particleAux = particleBuffer.particleAuxData[idx];
 
       particle.position = position;
+      particle.orientation.SetIdentity ();
 
       csVector3 posOffset = GetVGen()->Get ();
 
@@ -155,6 +156,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
       csParticleAux& particleAux = particleBuffer.particleAuxData[idx];
 
       particle.position = globalPos;
+      particle.orientation.SetIdentity ();
 
       csVector3 posOffset (0.0f);
       csVector3 velVector;
@@ -239,6 +241,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
       csParticleAux& particleAux = particleBuffer.particleAuxData[idx];
 
       particle.position = position;
+      particle.orientation.SetIdentity ();
 
       //Offset along axis
       csVector3 posOffset = GetFGen ()->Get (-1, 1) * extent;
@@ -316,6 +319,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
       csParticleAux& particleAux = particleBuffer.particleAuxData[idx];
 
       particle.position = position;
+      particle.orientation.SetIdentity ();
 
       //Offset along axis
       float offsetVal = sqrtf (GetFGen ()->Get ());

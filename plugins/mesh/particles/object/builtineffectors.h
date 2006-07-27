@@ -151,6 +151,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     };
     csArray<ColorEntry> colorList;
 
+    static int ColorEntryCompare(const ColorEntry& e0, const ColorEntry& e1);
+
     struct PrecalcEntry
     {
       csColor4 mult;

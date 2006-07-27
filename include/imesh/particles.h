@@ -404,6 +404,12 @@ struct iParticleSystemBase : public virtual iBase
   /// Get common size of particles
   virtual const csVector2& GetParticleSize () const = 0;
 
+  /// Set the smallest bounding box particle system should use
+  virtual void SetMinBoundingBox (const csBox3& box) = 0;
+  
+  /// Get the smallest bounding box particle system should use
+  virtual const csBox3& GetMinBoundingBox () const = 0;
+
   /// Add an emitter to the system. The particle should increment the reference.
   virtual void AddEmitter (iParticleEmitter* emitter) = 0;
 

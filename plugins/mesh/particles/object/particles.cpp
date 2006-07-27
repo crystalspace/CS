@@ -97,6 +97,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     mesh->localMode = localMode;
     mesh->individualSize = individualSize;
     mesh->particleSize = particleSize;
+    mesh->minBB = minBB;
 
     if (deepCreation)
     {
@@ -137,6 +138,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     newFact->localMode = localMode;
     newFact->individualSize = individualSize;
     newFact->particleSize = particleSize;
+    newFact->minBB = minBB;
 
     if (deepCreation)
     {
@@ -168,6 +170,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     meshWrapper (0), mixMode (CS_FX_COPY), lastUpdateTime (0),
     currentDt (0), lastFrameNumber (0), totalParticleTime (0.0f),
     radius (1.0f), minRadius (1.0f), rawBuffer (0), particleAllocatedSize (0),
+    externalControl (false),
     particleOrientation (CS_PARTICLE_CAMERAFACE_APPROX), rotationMode (CS_PARTICLE_ROTATE_NONE), 
     integrationMode (CS_PARTICLE_INTEGRATE_LINEAR), 
     sortMode (CS_PARTICLE_SORT_NONE), commonDirection (1.0f,0,0), localMode (true), 
@@ -452,6 +455,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     newMesh->localMode = localMode;
     newMesh->individualSize = individualSize;
     newMesh->particleSize = particleSize;
+    newMesh->minBB = minBB;
 
     newMesh->emitters = emitters;
     newMesh->effectors = effectors;
@@ -542,6 +546,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
 
     float dt = currentDt/1000.0f;
     totalParticleTime += dt;
+
+    if (externalControl)
+      return;
 
     float newRadiusSq = 0;
 
@@ -643,8 +650,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
 
     if (newRadiusSq > radius)
     {
-      ShapeChanged ();
       radius = newRadiusSq;
+      ShapeChanged ();      
     }
   }
 
@@ -652,6 +659,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
   {
     bbox.SetCenter (csVector3 (0.0f));
     bbox.SetSize (csVector3 (radius*2));
+    bbox.AddBoundingBox (minBB);
   }
 
   void ParticlesMeshObject::SetObjectBoundingBox (const csBox3& bbox)
@@ -683,6 +691,24 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
       }
       break;
     }
+  }
+
+  csParticleBuffer* ParticlesMeshObject::LockForExternalControl (
+    size_t maxParticles)
+  {
+    particleBuffer.particleCount = 0;
+    particleBuffer.particleData = 0;
+    particleBuffer.particleAuxData = 0;
+
+    particleAllocatedSize = 0;
+
+    delete[] rawBuffer;
+
+    ReserveNewParticles (maxParticles);
+
+    externalControl = true; 
+
+    return &particleBuffer;
   }
 }
 CS_PLUGIN_NAMESPACE_END(Particles)

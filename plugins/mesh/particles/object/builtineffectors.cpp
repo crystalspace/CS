@@ -130,6 +130,17 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     precalcInvalid = true;
   }
 
+  int ParticleEffectorLinColor::ColorEntryCompare(
+    const ParticleEffectorLinColor::ColorEntry &e0, 
+    const ParticleEffectorLinColor::ColorEntry &e1)
+  {
+    if (e0.maxTTL < e1.maxTTL)
+      return -1;
+    else if (e0.maxTTL > e1.maxTTL)
+      return 1;
+    return 0;
+  }
+
   void ParticleEffectorLinColor::Precalc ()
   {
     if (!precalcInvalid)
@@ -140,20 +151,30 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     if (precalcList.GetSize () == 0)
         return;
 
+    csArray<ColorEntry> localList = colorList;
+    localList.Sort (ColorEntryCompare);
+
     PrecalcEntry& e0 = precalcList[0];
-    e0.add = colorList[0].color;
+    e0.add = localList[0].color;
     e0.mult.Set (0,0,0);
+    e0.maxTTL = localList[0].maxTTL;
 
     for (size_t i = 1; i < precalcList.GetSize (); ++i)
     {
       PrecalcEntry& ei = precalcList[i];
-      const ColorEntry& ci = colorList[i];
-      const ColorEntry& cip = colorList[i-1];
+      const ColorEntry& ci = localList[i];
+      const ColorEntry& cip = localList[i-1];
 
       ei.maxTTL = ci.maxTTL;
       ei.mult = (ci.color - cip.color) / (ci.maxTTL - cip.maxTTL);
       ei.add = ci.color - ei.mult * ei.maxTTL;
     }
+
+    PrecalcEntry copyLast;
+    copyLast.maxTTL = FLT_MAX;
+    copyLast.add = localList.Top ().color;
+    copyLast.mult.Set (0,0,0);
+    precalcList.Push (copyLast);
 
     precalcInvalid = false;
   }

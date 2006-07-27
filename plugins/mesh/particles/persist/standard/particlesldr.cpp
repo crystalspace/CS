@@ -201,6 +201,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(ParticlesLoader)
         baseObject->SetParticleSize (size);
       }
       break;
+    case XMLTOKEN_MINBB:
+      {
+        csBox3 bb;
+        if (!synldr->ParseBox (node, bb))
+        {
+          return false;
+        }
+        baseObject->SetMinBoundingBox (bb);
+      }
+      break;
     case XMLTOKEN_EMITTER:
       {
         csRef<iParticleEmitter> emitter = ParseEmitter (node);

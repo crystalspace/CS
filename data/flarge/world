@@ -19,8 +19,6 @@
     <plugin name="mesh">crystalspace.mesh.loader.genmesh</plugin>
     <plugin name="instFact">crystalspace.mesh.loader.factory.instmesh</plugin>
     <plugin name="inst">crystalspace.mesh.loader.instmesh</plugin>
-    <plugin name="emitFact">crystalspace.mesh.loader.factory.emit</plugin>
-    <plugin name="emit">crystalspace.mesh.loader.emit</plugin>
     <plugin name="dotsTxt">crystalspace.texture.loader.dots</plugin>
     <plugin name="fireTxt">crystalspace.texture.loader.fire</plugin>
     <plugin name="protoFact">crystalspace.mesh.loader.factory.protomesh</plugin>
@@ -140,7 +138,7 @@
       <file>/lib/stdtex/topping.png</file>
     </texture>
     <!-- Cube map specification with separate images: -->
-    <!--texture name="reflection">
+    <!-- texture name="reflection">
 	  <type>crystalspace.texture.loader.cubemap</type>
 	  <params>
 	    <north>/lib/cubemap/cubemap_fr.jpg</north>
@@ -150,7 +148,7 @@
 	    <top>/lib/cubemap/cubemap_up.jpg</top>
 	    <bottom>/lib/cubemap/cubemap_dn.jpg</bottom>
 	  </params>
-	</texture-->
+	</texture -->
     <texture name="reflection">
       <file>cube_street.dds</file>
     </texture>
@@ -7618,22 +7616,17 @@
       <smooth />
     </params>
   </meshfact>
-  <meshfact name="fountainFactory">
-    <plugin>crystalspace.mesh.loader.factory.fountain</plugin>
-    <params />
-  </meshfact>
   <meshfact name="particlesFactory">
     <plugin>particlesFact</plugin>
     <params />
   </meshfact>
+
+<!--
   <meshfact name="snowFactory">
     <plugin>crystalspace.mesh.loader.factory.snow</plugin>
     <params />
   </meshfact>
-  <meshfact name="emitFact">
-    <plugin>emitFact</plugin>
-    <params />
-  </meshfact>
+-->
 
   <meshfact name="circles">
     <plugin>meshFact</plugin>
@@ -16216,11 +16209,11 @@
                   <randomacceleration>0.6</randomacceleration>
                 </effector>
                 <effector type="lincolor">
-                  <color red="1.0" green="1.0" blue="1.0" time="0" />
-                  <color red="1.0" green="1.0" blue="0.0" time="0.05" />
-                  <color red="1.0" green="0.0" blue="0.0" time="0.2" />
+                  <color red="1.0" green="1.0" blue="1.0" time="1.0" />
+                  <color red="1.0" green="1.0" blue="0.0" time="0.95" />
+                  <color red="1.0" green="0.0" blue="0.0" time="0.8" />
                   <color red="0.6" green="0.6" blue="0.6" time="0.5" />
-                  <color red="0.1" green="0.1" blue="0.1" time="1.0" />
+                  <color red="0.1" green="0.1" blue="0.1" time="0.0" />
                 </effector>
               </params>
               <move>
@@ -23636,6 +23629,7 @@
         </p>
       </params>
     </meshobj>
+<!--
     <meshobj name="snow1">
       <plugin>crystalspace.mesh.loader.snow</plugin>
       <params>
@@ -23660,7 +23654,40 @@
       </move>
       <ztest />
       <priority>alpha</priority>
+    </meshobj> -->
+    <meshobj name="snow1">
+      <plugin>particles</plugin>
+      <params>
+        <factory>particlesFactory</factory>
+        <material>snow</material>
+        <mixmode><add /></mixmode>
+        <particlesize x="0.07" y="0.07" />
+        <emitter type="box">
+          <box>
+            <min x="-43" y="11" z="-10" />
+            <max x="-3" y="11" z="5" />
+          </box>
+          <initialvelocity x="0" y="-0.3" z="0" />
+          <uniformvelocity />
+          <initialttl min="40" max="40" />
+          <emissionrate>250</emissionrate>
+          <placement>volume</placement>
+        </emitter>
+        <effector type="force">
+          <randomacceleration>0.2</randomacceleration>
+        </effector
+        <minbb>
+            <min x="-43" y="11" z="-10" />
+            <max x="-3" y="11" z="5" />
+        </minbb>
+      </params>
+      <move>
+        <v x="0" y="0" z="0" />
+      </move>
+      <ztest />
+      <priority>alpha</priority>
     </meshobj>
+
     <meshobj name="donut_1">
       <plugin>bezier</plugin>
       <params>
@@ -29379,6 +29406,41 @@
         </p>
       </params>
       <meshobj name="portalzoom">
+        <plugin>particles</plugin>
+        <ztest />
+        <priority>alpha</priority>
+        <move>
+          <v x="34" y="-16.5" z="13.5" />
+        </move>
+        <params>
+          <factory>particlesFactory</factory>
+          <mixmode>
+            <add />
+          </mixmode>
+          <material>flare_center</material>
+          <particlesize x="0.1" y="0.1" />
+	    <emitter type="box">
+            <box>
+              <min x="0" y="-2.5" z="-2.5" />
+              <max x="0" y="2.5" z="2.5" />
+            </box>
+            <initialttl min="1" max="1" />
+            <emissionrate>40</emissionrate>
+            <initialvelocity x="-15" y="0" z="0" />
+            <uniformvelocity />
+            <placement>volume</placement>
+          </emitter>
+          <effector type="lincolor">
+            <color red="0.3" green="0.4" blue="0.5" time="-0.8" />
+            <color red="0.6" green="0.4" blue="1.0" time="0.2" />
+            <color red="0.0" green="1.0" blue="1.0" time="0.5" />
+            <color red="1.0" green="1.0" blue="1.0" time="0.8" />
+            <color red="1.0" green="1.0" blue="1.0" time="1.0" />
+          </effector>
+        </params>
+      </meshobj>
+      <!--
+      <meshobj name="portalzoom">
         <plugin>emit</plugin>
         <znone />
         <priority>alpha</priority>
@@ -29456,7 +29518,7 @@
             <scale>1</scale>
           </aging>
         </params>
-      </meshobj>
+      </meshobj> -->
     </meshobj>
     <light>
       <center x="19" y="-17" z="13.5" />

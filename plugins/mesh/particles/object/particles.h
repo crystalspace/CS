@@ -227,6 +227,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
       return particleSize;
     }
 
+    virtual void SetMinBoundingBox (const csBox3& box)
+    {
+      minBB = box;
+    }
+
+    virtual const csBox3& GetMinBoundingBox () const
+    {
+      return minBB;
+    }
+
     virtual void AddEmitter (iParticleEmitter* emitter)
     {
       emitters.PushSmart (emitter);
@@ -288,6 +298,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     bool localMode;
     bool individualSize;
     csVector2 particleSize;
+    csBox3 minBB;
 
     csRefArray<iParticleEmitter> emitters;
     csRefArray<iParticleEffector> effectors;
@@ -457,10 +468,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
       return particleBuffer.particleAuxData+index;
     }
 
-    virtual csParticleBuffer* LockForExternalControl (size_t maxParticles)
-    {
-      return 0;
-    }
+    virtual csParticleBuffer* LockForExternalControl (size_t maxParticles);
 
     //-- iParticleSystemBase
     virtual void SetParticleRenderOrientation (csParticleRenderOrientation o)
@@ -545,6 +553,18 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
       return particleSize;
     }
 
+    /// Set the smallest bounding box particle system should use
+    virtual void SetMinBoundingBox (const csBox3& box) 
+    {
+      minBB = box;
+    }
+
+    /// Get the smallest bounding box particle system should use
+    virtual const csBox3& GetMinBoundingBox () const
+    {
+      return minBB;
+    }
+
     virtual void AddEmitter (iParticleEmitter* emitter)
     {
       emitters.PushSmart (emitter);
@@ -617,6 +637,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     csParticleBuffer particleBuffer;
     uint8* rawBuffer;
     size_t particleAllocatedSize;
+    bool externalControl;
 
     //-- iParticleSystemBase
     csParticleRenderOrientation particleOrientation;
@@ -627,6 +648,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     bool localMode;
     bool individualSize;
     csVector2 particleSize;
+    csBox3 minBB;
 
     csRefArray<iParticleEmitter> emitters;
     csRefArray<iParticleEffector> effectors;
