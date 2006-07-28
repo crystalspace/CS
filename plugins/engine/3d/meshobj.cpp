@@ -592,6 +592,7 @@ csRenderMesh** csMeshWrapper::GetRenderMeshes (int& n, iRenderView* rview,
     if (imposter)
     {
       printf("drawn\n");
+      n = 1;
       return imposter;
     }
   }

@@ -8,6 +8,10 @@ chronological order.
 
 This file describes the history of the SoC imposter branch.
 
+28-Jul-2006
+	- Jorrit fixed a small bug in csMeshWrapper::GetRenderMeshes().
+	  It forgot to initialize 'n' to 1 in case an imposter was
+	  returned.
 26-Jul-2006
 	- Fossi finally got imposters to show up visually
 29-Jun-2006
