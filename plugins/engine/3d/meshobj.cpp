@@ -584,6 +584,7 @@ const csArray<iLightSectorInfluence*>& csMeshWrapper::GetRelevantLights
 csRenderMesh** csMeshWrapper::GetRenderMeshes (int& n, iRenderView* rview, 
 					       uint32 frustum_mask)
 {
+  printf("imposter: %i\n",imposter_active);
   if (imposter_active && CheckImposterRelevant (rview))
   {
     printf("trying imposter... ");
@@ -594,7 +595,7 @@ csRenderMesh** csMeshWrapper::GetRenderMeshes (int& n, iRenderView* rview,
       return imposter;
     }
   }
-  printf("failed\n");
+  printf("normal mesh\n");
 
   // Callback are traversed in reverse order so that they can safely
   // delete themselves.

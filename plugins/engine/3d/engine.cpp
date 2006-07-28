@@ -1634,7 +1634,7 @@ void csEngine::PrecacheDraw (iRegion* region)
   }
 }
 
-void csEngine::StartDraw (iCamera *c, iClipper2D* /*view*/, csRenderView &rview)
+void csEngine::StartDraw (iCamera *c, iClipper2D* view, csRenderView &rview)
 {
   rview.SetEngine (this);
   rview.SetOriginalCamera (c);
@@ -1657,14 +1657,32 @@ void csEngine::StartDraw (iCamera *c, iClipper2D* /*view*/, csRenderView &rview)
   float boty = (frameHeight - c->GetShiftY ()) * c->GetInvFOV ();
   rview.SetFrustum (leftx, rightx, topy, boty);
 
+
   //Imposter updating where needed
   csRef<iRenderView> irview = scfQueryInterface<iRenderView>(&rview);
   csWeakRefArray<csImposterProcTex>::Iterator it = 
     imposterUpdateList.GetIterator ();
+
+  // First initialize G3D with the right clipper.
+//  G3D->SetClipper (view, CS_CLIPPER_TOPLEVEL);  // We are at top-level.
+//  G3D->ResetNearPlane ();
+//  G3D->SetPerspectiveAspect (c->GetFOV ());
+//  G3D->FinishDraw();
+
   while (it.HasNext ())
   {
-    it.Next ()->Animate (irview);
+
+    iSector *s = c->GetSector ();
+    if (s) 
+    {
+      iRenderLoop* rl = s->GetRenderLoop ();
+      if (!rl) rl = defaultRenderLoop;
+      it.Next ()->Animate(&rview, rl, s);
+    }
   }
+
+//  G3D->BeginDraw (CSDRAW_3DGRAPHICS | CSDRAW_CLEARZBUFFER);
+
 }
 
 void csEngine::Draw (iCamera *c, iClipper2D *view, iMeshWrapper* mesh)

@@ -64,18 +64,59 @@ csImposterProcTex::~csImposterProcTex ()
 {
 }
 
-void csImposterProcTex::Animate (iRenderView *rview)
+void csImposterProcTex::Animate (iRenderView *rview, iRenderLoop* rl, 
+iSector *s)
 {
   printf("animating imposter\n");
   csRef<iTextureHandle> handle = tex->GetTextureHandle ();
   if (!mesh) return;
+
+//  iTextureHandle *oldContext = engine->GetContext ();
+
+  g3d->SetRenderTarget (handle);
+//  engine->SetContext (handle);
+
   csRef<iMeshWrapper> originalmesh = mesh->GetParent ();
-  int transparent = g2d->FindRGB (0,255,255,0);
-  if (mesh_on_texture->Render (originalmesh,handle,0,transparent))
+
+  g3d->BeginDraw (CSDRAW_3DGRAPHICS | engine->GetBeginDrawFlags ()
+    | CSDRAW_CLEARZBUFFER);
+  
+  g3d->GetDriver2D ()->Clear (
+    g3d->GetDriver2D ()->FindRGB (0, 255, 255, 0));
+ 
+//  rl->Draw (rview, s, originalmesh);
+  int num;
+  csRef<iMeshObject> meshobj = originalmesh->GetMeshObject ();
+  csRenderMesh** rendermeshes = meshobj->GetRenderMeshes (num, rview, 
+    originalmesh->GetMovable (), 0xf);
+
+  csRenderMesh* rendermesh = rendermeshes[0];
+  csRenderMeshModes mode (*rendermesh);
+  const csShaderVarStack sva;
+
+  //SetWorldToCamera?
+//  g3d->DrawMesh(rendermesh, mode, sva);
   {
-    printf("rendered\n");
+printf("rendered\n");
     mesh->FindImposterRectangle (rview->GetCamera ());
     mesh->SetImposterReady (true);
   }
+
+  //debuging output
+  csDebugImageWriter* diw = new csDebugImageWriter();
+  csRef<iImage> pic;
+  pic.AttachNew(g3d->GetDriver2D()->ScreenShot());
+  diw->DebugImageWrite(pic,"imposter.png");
+
+  g3d->FinishDraw ();
+
+  // switch back to the old context
+//  engine->SetContext (oldContext);
+
+  //debuging output
+  pic.AttachNew(g3d->GetDriver2D()->ScreenShot());
+  diw->DebugImageWrite(pic,"screen.png");
+
+//assert(0);
 }
 

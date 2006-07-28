@@ -1,0 +1,13 @@
+SubDir TOP plugins mesh opentree object ;
+
+
+if $(OTL.AVAILABLE) = "yes"
+{
+Description 
+opentree : "Mesh OpenTree object plugin" ;
+Plugin opentree : [ Wildcard *.cpp *.h ] ;
+LinkWith opentree : crystalspace ;
+ExternalLibs sprcal3d : OTL ;
+CompileGroups opentree : meshes ;
+}
+

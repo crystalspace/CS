@@ -1624,6 +1624,17 @@ CS_CHECK_LIB_WITH([js],
     [-D$cs_spidermonkey_platform])
 
 
+#------------------------------------------------------------------------------
+# Check for OpenTree library.
+#------------------------------------------------------------------------------
+CS_CHECK_LIB_WITH([opentree],
+    [AC_LANG_PROGRAM([[
+    #include <opentree/opentree.h>
+    ]],
+    [/*test here*/])],
+    [], [C++], [CS_EMIT_BUILD_RESULT([cs_cv_libopentree], [OTL])], [],
+    [], [], [])
+
 
 #------------------------------------------------------------------------------
 # Check if regular expressions are available.

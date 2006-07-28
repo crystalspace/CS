@@ -22,6 +22,7 @@
 #include "csutil/debug.h"
 #include "iengine/rview.h"
 #include "ivideo/graph3d.h"
+#include <csgfx/renderbuffer.h>
 
 #include "impmesh.h"
 #include "sector.h"
@@ -66,7 +67,7 @@ bool csImposterMesh::CheckIncidenceAngle (iRenderView *rview, float tolerance)
   return true;
 }
 
-void csImposterMesh::FindImposterRectangle (const iCamera* camera)
+void csImposterMesh::FindImposterRectangle (const iCamera* c)
 {
   // Called from csImposterProcTex during Anim.
   //  (Recalc of texture causes recalc of imposter poly also.)
@@ -79,13 +80,23 @@ void csImposterMesh::FindImposterRectangle (const iCamera* camera)
   //  the camera transform to rotate it around where we need it
   // Save as csPoly3d for later rendering
 
-  res = parent_mesh->GetScreenBoundingBox (camera);
+  res = parent_mesh->GetScreenBoundingBox (c);
 
-  csVector3 v1 (0,0,0);
-  csVector3 v2 (100,0,0);
-  csVector3 v3 (100,100,0);
-  csVector3 v4 (0,100,0);
-  
+csVector2 min = res.sbox.Min ();
+csVector2 max = res.sbox.Max ();
+printf("Min: %f %f\n",min[0],min[1]);
+printf("Max: %f %f\n",max[0],max[1]);
+
+
+
+  csVector3 v1 = c->InvPerspective (res.sbox.GetCorner(0), res.distance);
+  csVector3 v2 = c->InvPerspective (res.sbox.GetCorner(1), res.distance);
+  csVector3 v3 = c->InvPerspective (res.sbox.GetCorner(2), res.distance);
+  csVector3 v4 = c->InvPerspective (res.sbox.GetCorner(3), res.distance);
+
+printf("Min: %f %f %f\n",v1[0],v1[1],v1[2]);
+printf("Max: %f %f %f\n",v4[0],v4[1],v4[2]);
+
   cutout.AddVertex (v1);
   cutout.AddVertex (v2);
   cutout.AddVertex (v3);
@@ -166,5 +177,31 @@ csRenderMesh** csImposterMesh::GetRenderMesh(iRenderView *rview)
 
 //  mesh.
 
+  csRef<csRenderBuffer> indexBuffer = 
+    csRenderBuffer::CreateIndexRenderBuffer(
+    mesh_indices_count, CS_BUF_STATIC, CS_BUFCOMP_UNSIGNED_INT, 0, 3);
+  indexBuffer->CopyInto(mesh_indices.GetArray(), 4);
+
+  csRef<csRenderBuffer> vertBuffer = csRenderBuffer::CreateRenderBuffer(
+    4, CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 1);
+  vertBuffer->CopyInto(cutout.GetVertices (), 4);
+
+  csRef<csRenderBuffer> texBuffer = csRenderBuffer::CreateRenderBuffer(
+    4, CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 1);
+  texBuffer->CopyInto(mesh_texels.GetArray(), 4);
+
+  csRef<csRenderBuffer> colBuffer = csRenderBuffer::CreateRenderBuffer(
+    4, CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 1);
+  colBuffer->CopyInto(mesh_colors.GetArray(), 4);
+
+  csRef<csRenderBufferHolder> buffer = new csRenderBufferHolder();
+  buffer->SetRenderBuffer (CS_BUFFER_INDEX, indexBuffer);
+  buffer->SetRenderBuffer (CS_BUFFER_POSITION, vertBuffer);
+  buffer->SetRenderBuffer (CS_BUFFER_TEXCOORD0, texBuffer);
+  buffer->SetRenderBuffer (CS_BUFFER_COLOR, colBuffer);
+  mesh->buffers = buffer;
+  mesh->variablecontext = new csShaderVariableContext();
+
+printf("returning imposter mesh\n");
   return &mesh;
 }

@@ -46,7 +46,8 @@ public:
 
   bool GetImposterReady () { return imposter_ready; }
   void SetImposterReady (bool r) { imposter_ready = r; }
-  void Animate (iRenderView *rview);
+  void Animate (iRenderView *rview, iRenderLoop *rl, iSector *s);
+  csImposterMesh *GetParent () { return mesh; }
 };
 
 #endif // __CS_IMPPRCTX_H__

@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- opentree.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.mesh.opentree</name>
+        <implementation>csOpenTreeObjectType</implementation>
+        <description>Crystal Space OpenTree Mesh Type</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

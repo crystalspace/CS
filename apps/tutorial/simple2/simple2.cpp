@@ -297,7 +297,6 @@ void Simple::CreateSprites ()
 
   //iMeshObject* test = sprite->GetMeshObject();
   csRef<iImposter> i = scfQueryInterface<iImposter> (sprite);
-  if (!i) printf ("nix is\n");
   i->SetImposterActive(true);
   iSharedVariableList* varlist = engine->GetVariableList();
   csRef<iSharedVariable> distvar = varlist->New();

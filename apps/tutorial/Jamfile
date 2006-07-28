@@ -1,12 +1,12 @@
 SubDir TOP apps tutorial ;
 
-SubInclude TOP apps tutorial awstut ;
-SubInclude TOP apps tutorial pathtut ;
-SubInclude TOP apps tutorial phystut ;
-SubInclude TOP apps tutorial simpcd ;
+#SubInclude TOP apps tutorial awstut ;
+#SubInclude TOP apps tutorial pathtut ;
+#SubInclude TOP apps tutorial phystut ;
+#SubInclude TOP apps tutorial simpcd ;
 SubInclude TOP apps tutorial simple1 ;
 SubInclude TOP apps tutorial simple2 ;
-SubInclude TOP apps tutorial simplept ;
-SubInclude TOP apps tutorial simpmap ;
-SubInclude TOP apps tutorial simpvs ;
-SubInclude TOP apps tutorial mazing ;
+#SubInclude TOP apps tutorial simplept ;
+#SubInclude TOP apps tutorial simpmap ;
+#SubInclude TOP apps tutorial simpvs ;
+#SubInclude TOP apps tutorial mazing ;
