@@ -230,7 +230,7 @@ protected:
   void ValidateStaticIfEnd (iDocumentNode* node, 
     NodeProcessingState* state);
   void ParseTemplateArguments (const char* str, 
-    Template::Params& strings);
+    Template::Params& strings, bool omitEmpty);
   /**
    * Process a node when a static conditition is active.
    * Returns 'true' if the node was handled.
@@ -347,7 +347,7 @@ class csWrappedDocumentNodeFactory
   friend class csWrappedDocumentNodeIterator;
 
   csXMLShaderCompiler* plugin;
-  csTextNodeWrapper::Pool textNodePool;
+  csTextNodeWrapper::Pool textWrapperPool;
   csWrappedDocumentNodeIterator::Pool iterPool;
   csReplacerDocumentNodeFactory replacerFactory;
 

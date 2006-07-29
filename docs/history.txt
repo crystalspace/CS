@@ -6,6 +6,11 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+29-Jul-2006
+	- res augmented xmlshader to support template arguments with spaces.
+	- res fixed an assertion in xmlshader when using buffer mappings with 
+	  custom variable names.
+	- res fixed some assorted xmlshader issues.
 27-Jul-2006
 	- res changed an array in glshader_ps1 that is never changed from 
 	  dynamic to compile-time creation.

@@ -455,6 +455,44 @@ static bool SplitNodeValue (const char* nodeStr, TempString<>& command,
   return false;
 }
 
+static void GetNextArg (const char*& p, TempString<>& arg)
+{
+  arg.Clear();
+  if (p == 0) return;
+
+  while (isspace (*p)) p++;
+
+  if (*p == '"')
+  {
+    p++;
+    while (*p && *p != '"')
+    {
+      if (*p == '\\')
+      {
+        p++;
+        switch (*p)
+        {
+          case '"':
+            arg << '"';
+            p++;
+            break;
+          case '\\':
+            arg << '\\';
+            p++;
+            break;
+        }
+      }
+      else
+        arg << *p++;
+    }
+    p++;
+  }
+  else
+  {
+    while (*p && !isspace (*p)) arg << *p++;
+  }
+}
+
 struct WrapperStackEntry
 {
   csWrappedDocumentNode::WrappedChild* child;
@@ -637,15 +675,16 @@ bool csWrappedDocumentNode::ProcessTemplate (ConditionEval& eval,
 	    {
 	      Template* templ;
 	      if ((!state->generateActive)
-              && (state->templNestLevel == 1)
+                && (state->templNestLevel == 1)
 		&& (templ = globalState->templates.GetElementPointer (tokenStr)))
 	      {
 		Template::Params templArgs;
-		ParseTemplateArguments (args, templArgs);
+		ParseTemplateArguments (args, templArgs, false);
 		InvokeTemplate (templ, templArgs, templNodes);
 	      }
 	      else
-		templNodes.Push (node);
+                // Avoid recursion when the template is later invoked
+		if (tokenStr != state->templateName) templNodes.Push (node);
 	    }
 	    break;
 	case csWrappedDocumentNodeFactory::PITOKEN_GENERATE:
@@ -804,47 +843,17 @@ void csWrappedDocumentNode::ValidateStaticIfEnd (iDocumentNode* node,
 }
 
 void csWrappedDocumentNode::ParseTemplateArguments (const char* str, 
-						    Template::Params& strings)
+						    Template::Params& strings,
+                                                    bool omitEmpty)
 {
   if (!str) return;
 
   TempString<> currentStr;
-
   while (*str != 0)
   {
-    currentStr.Empty();
-    while ((*str != 0) && isspace (*str)) str++;
-    if (*str == '"')
-    {
-      while (*str != 0)
-      {
-	if (*str == '\\')
-	{
-	  str++;
-	  currentStr << *str;
-	  str++;
-	}
-	else if (*str == '"')
-	{
-	  str++;
-	  break;
-	}
-	else
-	{
-	  currentStr << *str;
-	  str++;
-	}
-      }
-    }
-    else
-    {
-      while ((*str != 0) && !isspace (*str)) 
-      {
-	currentStr << *str;
-	str++;
-      }
-    }
-    if (!currentStr.IsEmpty()) strings.Push (currentStr);
+    GetNextArg (str, currentStr);
+    if (!omitEmpty || !currentStr.IsEmpty())
+      strings.Push (currentStr);
   }
 }
 
@@ -936,7 +945,7 @@ bool csWrappedDocumentNode::ProcessInstrTemplate (NodeProcessingState* state,
     // Parse template parameter names
     Template::Params paramNames;
     ParseTemplateArguments (templateName.GetData() + templateEnd + 1, 
-      paramNames);
+      paramNames, true);
 
     csSet<TempString<>, TempHeapAlloc> dupeCheck;
     for (size_t i = 0; i < paramNames.Length(); i++)
@@ -978,13 +987,17 @@ bool csWrappedDocumentNode::ProcessDefine (NodeProcessingState* state,
                                            iDocumentNode* node, 
                                            const TempString<>& args)
 {
-  if (args.IsEmpty() || (args.FindFirst (' ') != (size_t)-1))
+  TempString<> param;
+  const char* p = args;
+  GetNextArg (p, param);
+  if (p) { while (*p && isspace (*p)) p++; }
+  if (param.IsEmpty() || (*p != 0))
   {
     Report (syntaxErrorSeverity, node,
-            "One paramter expected for 'Define'");
+            "One parameter expected for 'Define'");
     return false;
   }
-  globalState->defines.Add (args);
+  globalState->defines.Add (param);
   return true;
 }
 
@@ -992,13 +1005,17 @@ bool csWrappedDocumentNode::ProcessUndef (NodeProcessingState* state,
                                           iDocumentNode* node, 
                                           const TempString<>& args)
 {
-    if (args.IsEmpty() || (args.FindFirst (' ') != (size_t)-1))
+  TempString<> param;
+  const char* p = args;
+  GetNextArg (p, param);
+  if (p) { while (*p && isspace (*p)) p++; }
+  if (param.IsEmpty() || (*p != 0))
   {
     Report (syntaxErrorSeverity, node,
-            "One paramter expected for 'Undef'");
+            "One parameter expected for 'Undef'");
     return false;
   }
-  globalState->defines.Delete (args);
+  globalState->defines.Delete (param);
   return true;
 }
 
@@ -1006,16 +1023,20 @@ bool csWrappedDocumentNode::ProcessStaticIfDef (NodeProcessingState* state,
                                                 iDocumentNode* node, 
                                                 const TempString<>& args, bool invert)
 {
-  if (args.IsEmpty() || (args.FindFirst (' ') != (size_t)-1))
+  TempString<> param;
+  const char* p = args;
+  GetNextArg (p, param);
+  if (p) { while (*p && isspace (*p)) p++; }
+  if (param.IsEmpty() || (*p != 0))
   {
     Report (syntaxErrorSeverity, node,
-            "One parameter expected for 'IfDef'");
+            "One parameter expected for 'SIfDef'");
     return false;
   }
   bool lastState = 
     state->staticIfStateStack.IsEmpty() ? true : 
     state->staticIfStateStack.Top().processNodes;
-  bool defineExists = globalState->defines.Contains (args);
+  bool defineExists = globalState->defines.Contains (param);
   state->staticIfStateStack.Push (
     (invert ? !defineExists : defineExists) && lastState);
   state->staticIfNest.Push (1);
@@ -1028,6 +1049,7 @@ void csWrappedDocumentNode::ProcessSingleWrappedNode (
 {
   CS_ASSERT(globalState);
 
+  if (ProcessTemplate (eval, node, state)) return;
   if (ProcessStaticIf (state, node))
   {
     // Template invokation has precedence over dropping nodes...
@@ -1037,13 +1059,12 @@ void csWrappedDocumentNode::ProcessSingleWrappedNode (
       Template::Params params;
       if (!args.IsEmpty())
       {
-        ParseTemplateArguments (args, params);
+        ParseTemplateArguments (args, params, false);
       }
       InvokeTemplate (eval, tokenStr, node, state, params);
     }
     return;
   }
-  if (ProcessTemplate (eval, node, state)) return;
 
   WrapperStack& wrapperStack = state->wrapperStack;
   WrapperStackEntry& currentWrapper = state->currentWrapper;
@@ -1298,7 +1319,7 @@ void csWrappedDocumentNode::ProcessSingleWrappedNode (
 	      if (space != 0)
 	      {
 		TempString<> pStr (space + 1, valLen - cmdLen - 1);
-		ParseTemplateArguments (pStr, args);
+		ParseTemplateArguments (pStr, args, false);
 	      }
               if ((args.GetSize() < 3) || (args.GetSize() > 4))
               {
@@ -1409,7 +1430,7 @@ void csWrappedDocumentNode::ProcessSingleWrappedNode (
 	      if (space != 0)
 	      {
 		TempString<> pStr (space + 1, valLen - cmdLen - 1);
-		ParseTemplateArguments (pStr, params);
+		ParseTemplateArguments (pStr, params, false);
 	      }
 	      if (!InvokeTemplate (eval, tokenStr, node, state, params))
 	      {
@@ -1735,7 +1756,7 @@ void csWrappedDocumentNodeIterator::SeekNext()
     str.Append (next->GetValue ());
     csWrappedDocumentNode::AppendNodeText (walker, str);
     csTextNodeWrapper* textNode = 
-      new (parentNode->shared->textNodePool) csTextNodeWrapper (next, str);
+      new (parentNode->shared->textWrapperPool) csTextNodeWrapper (next, str);
     next.AttachNew (textNode);
   }
 }

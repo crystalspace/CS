@@ -49,8 +49,7 @@ public:
  * Wrapper around a document node, supporting conditionals.
  */
 class csReplacerDocumentNode : 
-  public scfImplementationPooled<
-    scfImplementationExt0<csReplacerDocumentNode, csDocumentNodeReadOnly> >
+  public scfImplementationExt0<csReplacerDocumentNode, csDocumentNodeReadOnly>
 {
   friend class csReplacerDocumentNodeIterator;
   friend class csReplacerDocumentAttributeIterator;
@@ -153,8 +152,6 @@ class csReplacerDocumentNodeFactory
   friend class csReplacerDocumentAttributeIterator;
   friend class csReplacerDocumentAttribute;
 
-  csReplacerDocumentNode::Pool nodePool;
-  //csReplacerDocumentAttribute::Pool attrPool;
   csReplacerDocumentNodeIterator::Pool iterPool;
   csReplacerDocumentAttributeIterator::Pool attrIterPool;
 
