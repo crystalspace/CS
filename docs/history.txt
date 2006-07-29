@@ -16,6 +16,7 @@ chronological order.
 	- res added support for the TEXCOORD instruction to the glshader_ps1
 	  PS1.x-to-1.4 converter.
 	- res fixed compiler argument parsing for the glshader_cg plugin.
+	- res updated the contained DejaVu fonts to version 2.8.
 27-Jul-2006
 	- res changed an array in glshader_ps1 that is never changed from 
 	  dynamic to compile-time creation.
