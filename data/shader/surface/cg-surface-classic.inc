@@ -18,8 +18,6 @@
 -->
 <include>
 
-<?CgUseShared primaryColor ?>
-<?CgUseShared primaryColorV2F?>
 <?CgUseShared texCoord?>
 <?CgUseShared texCoordV2F?>
 
@@ -53,7 +51,6 @@ struct SurfaceClassic
     <?else?>
       diffuse = surfaceClassicFrag.flatColor;
     <?endif?>
-    diffuse.a *= primaryColor.a;
     return diffuse;
   }
   float4 GetDiffuse (float2 offset)

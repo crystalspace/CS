@@ -3,11 +3,13 @@
 
   <?Include /shader/snippets/shaderframework-cg.inc ?>
 
-  <?Include /shader/surface/cg-surface-classic.cginc ?>
-  <?Include /shader/lighting/cg-light-classic.cginc ?>
-  <?Include /shader/fog/cg-fog-sector.cginc ?>
-  <?Include /shader/surface/cg-parallax.cginc ?>
+  <?Include /shader/surface/cg-surface-classic.inc ?>
+  <?Include /shader/lighting/cg-light-classic.inc ?>
+  <?Include /shader/fog/cg-fog-sector.inc ?>
+  <?Include /shader/surface/cg-parallax.inc ?>
 
+  <?CgUseShared primaryColor ?>
+  <?CgUseShared primaryColorV2F?>
   <?CgUseSharedCond texCoord "vars.\"tex glow\".texture" ?>
   <?CgUseSharedCond texCoordV2F "vars.\"tex glow\".texture" ?>
 
@@ -68,9 +70,10 @@
   float4 FragmentMain (VertToFrag V2F, uniform sampler2D texGlow) : COLOR
   {
     V2F.framework.SetupFrag();
-    
+
+    float mixmodeAlpha = primaryColor.a;
     float4 color = V2F.surfClassic.GetDiffuse (V2F.parallax.GetTCOffset()) * 
-      float4 (V2F.lightClassic.IllumDiffuse(), 1);
+      float4 (V2F.lightClassic.IllumDiffuse(), mixmodeAlpha);
     if (V2F.fog.HasFog())
     {
       color.rgb = lerp(color.rgb, V2F.fog.GetColor(), V2F.fog.GetIntensity());
