@@ -17,7 +17,7 @@
       <vp plugin="glfixed">
         <fixedvp>
           <texmatrix layer="0">
-            <scale type="shadervar">detail texture scale</scale>
+            <scale type="shadervar">tex detail scale</scale>
 	    <translate type="expression">
 	      <make-vector>
 		<mul>
@@ -104,7 +104,7 @@
       <vp plugin="glfixed">
         <fixedvp>
           <texmatrix layer="0">
-            <scale type="shadervar">detail texture scale</scale>
+            <scale type="shadervar">tex detail scale</scale>
 				    <translate type="expression">
 				      <make-vector>
 					<mul>

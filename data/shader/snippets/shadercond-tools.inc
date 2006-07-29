@@ -18,6 +18,9 @@
 -->
 <include>
 
+  <?SIfNDef __SHADERCOND_TOOLS_INC__ ?>
+  <?Define __SHADERCOND_TOOLS_INC__ ?>
+
   <?! Some basic utility stuff for shaders. ?>
 
   <?! "Lists" - uses templates to realize "semi-dynamic" lists to which 
@@ -40,33 +43,5 @@
     <?_List_$LIST$?>
   <?Endtemplate?>
   
-  <?! Some common lists used by shaders. ?>
-  <?CreateList Passes ?>
-  <?CreateList VariableMaps ?>
-  <?CreateList Includes ?>
-
-  
-  <?! Crude "polymorphism" realized with templates and the Cg preprocessor. 
-      
-      The shader snippets are sorted into "classes", depending on what purpose
-      they serve (fog, lighting, surface...). For a bit of abstraction, 
-      programs should not use a specific class "implementation", but the
-      abstract "base class" (e.g. Surface instead of Surface_Classic).
-      
-      To reach that end, the 'SetSnippet' command defines macros that
-      expand the "base" to the implementation.
-    ?>
-  <?Template _SetSnippetHelper CLASS TYPE MODULE?>
-    #ifdef $CLASS$_$TYPE$
-    #undef $CLASS$_$TYPE$
-    #endif
-    #define $CLASS$_$TYPE$ $CLASS$_$MODULE$
-  <?Endtemplate?>
-  <?Template SetSnippet TYPE MODULE?>
-    <?_SetSnippetHelper AppToVert $TYPE$ $MODULE$?>
-    <?_SetSnippetHelper VertToFrag $TYPE$ $MODULE$?>
-
-    <?_SetSnippetHelper Frag $TYPE$ $MODULE$?>
-  <?Endtemplate?>
-  
+  <?SEndIf?>
 </include>
