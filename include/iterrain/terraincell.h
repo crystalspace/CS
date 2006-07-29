@@ -68,6 +68,8 @@ struct iTerrainCell : public virtual iBase
   virtual int GetGridWidth () const = 0;
   virtual int GetGridHeight () const = 0;
 
+  virtual csLockedHeightData GetHeightData () = 0;
+  
   virtual csLockedHeightData LockHeightData (const csRect& rectangle) = 0;
   virtual void UnlockHeightData () = 0;
 

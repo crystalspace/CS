@@ -113,6 +113,8 @@ public:
   virtual int GetGridWidth () const;
   virtual int GetGridHeight () const;
 
+  virtual csLockedHeightData GetHeightData ();
+
   virtual csLockedHeightData LockHeightData (const csRect& rectangle);
   virtual void UnlockHeightData ();
 

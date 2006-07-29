@@ -48,9 +48,17 @@ iTerrainRenderer* renderer, iTerrainCollider* collider)
   this->parent = parent;
   
   this->name = name;
+
+  // Here we do grid width/height correction. The height map will be a
+  // square with size 2^n + 1
+
+  int maxsize = MAX(grid_width, grid_height) - 1;
+  int temp = 1;
+
+  while (temp < maxsize) temp *= 2;
   
-  this->grid_width = grid_width;
-  this->grid_height = grid_height;
+  this->grid_width = temp + 1;
+  this->grid_height = temp + 1;
   
   this->material_width = material_width;
   this->material_height = material_height;
@@ -163,6 +171,16 @@ int csTerrainCell::GetGridHeight () const
 {
   return grid_height;
 }
+
+csLockedHeightData csTerrainCell::GetHeightData ()
+{
+	csLockedHeightData data;
+	data.data = heightmap.GetArray ();
+	data.pitch = grid_width;
+
+	return data;
+}
+
 
 csLockedHeightData csTerrainCell::LockHeightData (const csRect& rectangle)
 {

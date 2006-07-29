@@ -72,20 +72,20 @@
       <collider>crystalspace.mesh.object.terrainimproved.simplecollider</collider>
 
       <cells>
-        <cell name="main">
-          <grid_size x="513" y="513" />
+<!--        <cell name="main">
+          <grid_size x="512" y="512" />
           <material_size x="64" y="64" />
           <position x="-256" y="-256" />
-          <size x="512" y="512" z="64" />
+          <size x="512" y="512" z="150" />
 
           <feeder>
             <plugin>crystalspace.mesh.object.terrainimproved.simpledatafeeder</plugin>
             <param name="heightmap source" value="/lev/terraini/heightmap.png" />
             <param name="materialmap source" value="/lev/terraini/material_blank.png" />
           </feeder>
-        </cell>
+        </cell>-->
 
-<!--        <cell>
+        <cell>
           <grid_size x="33" y="33" />
           <material_size x="32" y="32" />
           <position x="48" y="48" />
@@ -153,8 +153,8 @@
         <factory>TerrainFact</factory>
         <materialpalette>
           <material>Lava</material>
-<!--          <material>Stone</material>
-          <material>Grass</material>-->
+          <material>Stone</material>
+          <material>Grass</material>
         </materialpalette>
       </params>
       <move> 

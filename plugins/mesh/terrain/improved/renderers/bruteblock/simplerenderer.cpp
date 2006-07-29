@@ -60,8 +60,9 @@ public:
   CS_LEAKGUARD_DECLARE (csTerrBlock);
 
   csRef<iRenderBuffer> mesh_vertices;
+  csVector3 *vertex_data;
   csRef<iRenderBuffer> mesh_texcoords;
-  csRef<iRenderBuffer> mesh_heights;
+  csVector2 *texcoord_data;
   csRef<csRenderBufferHolder> bufferHolder;
 
   csVector2 center;
@@ -364,6 +365,9 @@ csTerrBlock::csTerrBlock (csSimpleTerrainRenderData* data)
   children[0] = children[1] = children[2] = children[3] = 0;
   neighbours[0] =  neighbours[1] = neighbours[2] = neighbours[3] = 0;
 
+  vertex_data = 0;
+  texcoord_data = 0;
+
   built = false;
 
   bufferHolder.AttachNew (new csRenderBufferHolder);
@@ -375,6 +379,8 @@ csTerrBlock::csTerrBlock (csSimpleTerrainRenderData* data)
 
 csTerrBlock::~csTerrBlock ()
 {
+  delete [] vertex_data;
+  delete [] texcoord_data;
 }
 
 void csTerrBlock::Detach ()
@@ -427,108 +433,33 @@ void csTerrBlock::LoadData ()
 {
   res = rdata->block_res + 1;
 
-  mesh_vertices = 
-      csRenderBuffer::CreateRenderBuffer (
-      res*res, CS_BUF_STATIC, CS_BUFCOMP_FLOAT,
-      3);
+  delete[] vertex_data;
+  vertex_data = new csVector3[res * res];
+  delete[] texcoord_data;
+  texcoord_data = new csVector2[res * res];
 
-  mesh_texcoords = 
-      csRenderBuffer::CreateRenderBuffer (res*res,
-      CS_BUF_STATIC, CS_BUFCOMP_FLOAT,
-      2);
-
-  bufferHolder->SetRenderBuffer (CS_BUFFER_POSITION, mesh_vertices);
-  bufferHolder->SetRenderBuffer (CS_BUFFER_TEXCOORD0, mesh_texcoords);
-  
   const csVector2& pos = rdata->cell->GetPosition();
   const csVector3& cell_size = rdata->cell->GetSize();
   
   csLockedHeightData data = rdata->cell->GetHeightData ();
   
-  if (!built)
-    bbox.Empty();
-  
-  {
-    csRenderBufferLock<csVector3> vertex_data(mesh_vertices);
-    
-    unsigned int index = 0;
-
-    float min_x = center.x - size.x/2;
-    float max_x = center.x + size.x/2;
-
-    float min_z = center.y - size.y/2;
-    float max_z = center.y + size.y/2;
-
-    float x_offset = (max_x - min_x) / (float)(res - 1);
-    float z_offset = (max_z - min_z) / (float)(res - 1);
-
-    float c_z = min_z;
-    
-    float min_height = 1e+20f;
-    float max_height = -1e+20f;
-    
-    for (int y = 0, grid_y = top; y < res; ++y, grid_y += step)
+  for (int y = 0; y < res; ++y)
+    for (int x = 0; x < res; ++x)
     {
-      float c_x = min_x;
-      float* row = data.data + data.pitch * grid_y;
+      unsigned int index = y * res + x;
+       
+      float x_centered = (float)x / (float)(res - 1) - 0.5f;
+      float y_centered = (float)y / (float)(res - 1) - 0.5f;
+       
+      float real_x = x_centered * size.x + center.x;
+      float real_y = y_centered * size.y + center.y;
+       
+      float height = data.data[data.pitch * (top + y * step) + (left + x * step)];
       
-      for (int x = 0, grid_x = left; x < res; ++x, grid_x += step)
-      {
-        float height = row[grid_x];
-        
-        vertex_data[index] = csVector3(c_x, height, c_z);
-        
-        if (min_height > height) min_height = height;
-        if (max_height < height) max_height = height;
-        
-        c_x += x_offset;
-        
-        ++index;
-      }
+      vertex_data[index] = csVector3(real_x, height, real_y);
       
-      c_z += z_offset;
+      texcoord_data[index] = csVector2((real_x - pos.x) / cell_size.x, (real_y - pos.y) / cell_size.y);
     }
-    
-    if (!built)
-    {
-      bbox.Set(min_x, min_height, min_z,
-               max_x, max_height, max_z);
-    }
-  }  
-  
-  {
-    csRenderBufferLock<csVector2> texcoord_data(mesh_texcoords);
-    
-    unsigned int index = 0;
-    
-    float min_u = (center.x - size.x/2 - pos.x) / cell_size.x;
-    float max_u = (center.x + size.x/2 - pos.x) / cell_size.x;
-    
-    float min_v = (center.y - size.y/2 - pos.y) / cell_size.y;
-    float max_v = (center.y + size.y/2 - pos.y) / cell_size.y;
-    
-    float u_offset = (max_u - min_u) / (float)(res - 1);
-    float v_offset = (max_v - min_v) / (float)(res - 1);
-    
-    float v = min_v;
-
-    for (int y = 0; y < res; ++y)
-    {
-      float u = min_u;
-      
-      for (int x = 0; x < res; ++x)
-      {
-        texcoord_data[index].x = u;
-        texcoord_data[index].y = v;
-      
-        u += u_offset;
-        
-        ++index;
-      }
-      
-      v += v_offset;
-    }
-  }
 }
 
 void csTerrBlock::SetupMesh ()
@@ -539,6 +470,14 @@ void csTerrBlock::SetupMesh ()
   
   LoadData ();
   
+  bbox.Empty ();
+  
+  int totres = res * res;
+  bbox.StartBoundingBox (vertex_data[0]);
+  for (int i = 1 ; i < totres ; i++)
+  {
+    bbox.AddBoundingVertexSmart (vertex_data[i]);
+  }
   built = true;
 }
 
@@ -760,6 +699,29 @@ void csTerrBlock::DrawTest (iGraphics3D* g3d,
     return;
 
   int res = rdata->block_res;
+
+  if (!mesh_vertices)
+  {
+    int num_mesh_vertices = (res+1)*(res+1);
+    mesh_vertices = 
+      csRenderBuffer::CreateRenderBuffer (
+      num_mesh_vertices, CS_BUF_STATIC, CS_BUFCOMP_FLOAT,
+      3);
+    mesh_vertices->CopyInto (vertex_data, num_mesh_vertices);
+    delete[] vertex_data;
+    vertex_data = 0;
+
+    mesh_texcoords = 
+    csRenderBuffer::CreateRenderBuffer (num_mesh_vertices,
+      CS_BUF_STATIC, CS_BUFCOMP_FLOAT,
+      2);
+    mesh_texcoords->CopyInto (texcoord_data, num_mesh_vertices);
+    delete[] texcoord_data;
+    texcoord_data = 0;
+
+    bufferHolder->SetRenderBuffer (CS_BUFFER_POSITION, mesh_vertices);
+    bufferHolder->SetRenderBuffer (CS_BUFFER_TEXCOORD0, mesh_texcoords);
+  }
 
   //csVector3 cam = rview->GetCamera ()->GetTransform ().GetOrigin ();
   csVector3 cam = transform.GetOrigin ();
