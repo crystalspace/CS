@@ -13,6 +13,8 @@ chronological order.
 	- res fixed some assorted xmlshader issues.
 	- res fixed the standard shader loading in the engine to conserve
 	  whitespaces.
+	- res added support for the TEXCOORD instruction to the glshader_ps1
+	  PS1.x-to-1.4 converter.
 27-Jul-2006
 	- res changed an array in glshader_ps1 that is never changed from 
 	  dynamic to compile-time creation.
