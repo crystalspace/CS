@@ -14,6 +14,8 @@ chronological order.
 	- Vincent added joystick support to eventtest. Needs more work for
 	  correct reporting... Also changed inputdef.cpp assert to not choke
 	  on joystick buttons Up/Down events, and print the faulty event name.
+	- res added a bit of optional debug output to peek into the inner
+	  workings of xmlshader's instruction processor.
 29-Jul-2006
 	- res augmented xmlshader to support template arguments with spaces.
 	- res fixed an assertion in xmlshader when using buffer mappings with 
