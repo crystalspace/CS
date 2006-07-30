@@ -172,7 +172,7 @@
   <?! Finally, this will write the technique with the given priority (150). ?>
   <?WriteShaderTechnique 150?>
   
-  <?! Now, basically the same, just without parallax mapping now. ?>
+  <?! Now, basically the same, just without parallax mapping. ?>
   <?Template CgProgram?>
   struct VertToFrag
   {

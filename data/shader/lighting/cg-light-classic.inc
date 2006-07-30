@@ -18,8 +18,8 @@
 -->
 <include>
 
-<?CgUseShared primaryColor ?>
-<?CgUseShared primaryColorV2F?>
+<?CgUseSharedCond primaryColor "!vars.\"tex lightmap\".texture" ?>
+<?CgUseSharedCond primaryColorV2F "!vars.\"tex lightmap\".texture"?>
 
 <?Template LightingClassic_Code?>
 #ifndef __CS_SHADER_LIGHT_CLASSIC_CG__

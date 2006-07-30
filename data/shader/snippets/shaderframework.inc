@@ -52,16 +52,20 @@
   <?CreateList ProgramMappings ?>
   <?CreateList ShaderVars ?>
   
+  <?! Write out a single pass, given the current mappings ?>
+  <?Template WriteShaderPass?>
+    <pass>
+      <?TemplateWeak WriteVertexProgram?><?Endtemplate?>
+      <?WriteVertexProgram?>
+      <?TemplateWeak WriteFragmentProgram?><?Endtemplate?>
+      <?WriteFragmentProgram?>
+      <?InsertList PassMappings?>
+    </pass>
+  <?Endtemplate?>
   <?! Write out a shader's techniques ?>
   <?Template WriteShaderTechnique PRIO?>
     <technique priority="$PRIO$">
-      <pass>
-	<?TemplateWeak WriteVertexProgram?><?Endtemplate?>
-	<?WriteVertexProgram?>
-	<?TemplateWeak WriteFragmentProgram?><?Endtemplate?>
-	<?WriteFragmentProgram?>
-	<?InsertList PassMappings?>
-      </pass>
+      <?WriteShaderPass?>
     </technique>
   <?Endtemplate?>
   

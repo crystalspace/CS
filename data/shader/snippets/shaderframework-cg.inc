@@ -98,7 +98,7 @@
   <?! Share vertex-to-fragment data, when the condition COND is true, 
       accessible by a variable CGNAME of type TYPE. ?>
   <?Template CgShareV2FCond TYPE CGNAME COND ?>
-    <?_CgShareV2F "$TYPE$" "$CGNAME$" "$COND$"?>
+    <?_CgShareV2F "$TYPE$" "$CGNAME$" $COND$?>
   <?Endtemplate?>
 
   <?! Set the vertex program function ?>
@@ -176,7 +176,7 @@
   <?! Add "named vertex-to-fragment data". ?>
   <?Template CgAddSharedV2F FEATURE TYPE CGNAME?>
     <?Template _CgUseShared_$FEATURE$ COND?>
-      <?CgShareV2F $TYPE$ $CGNAME$ "$COND$"?>
+      <?CgShareV2FCond $TYPE$ $CGNAME$ $$COND$$?>
     <?Endtemplate?>
   <?Endtemplate?>
   
@@ -195,7 +195,7 @@
   <?Endtemplate?>
   <?! Use a "feature" (see above) when condition COND is true ?>
   <?Template CgUseSharedCond FEATURE COND?>
-    <?_CgUseShared_$FEATURE$ "$COND$"?>
+    <?_CgUseShared_$FEATURE$ $"COND$?>
   <?Endtemplate?>
   
   <?SEndIf?>

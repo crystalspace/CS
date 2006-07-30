@@ -16,6 +16,9 @@ chronological order.
 	  on joystick buttons Up/Down events, and print the faulty event name.
 	- res added a bit of optional debug output to peek into the inner
 	  workings of xmlshader's instruction processor.
+	- res fixed conditional resource sharing in the Cg framework.
+	- res improved passing of params with spaces and quotes to xmlshader
+	  templates.
 29-Jul-2006
 	- res augmented xmlshader to support template arguments with spaces.
 	- res fixed an assertion in xmlshader when using buffer mappings with 
