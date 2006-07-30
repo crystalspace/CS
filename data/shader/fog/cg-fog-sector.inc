@@ -28,8 +28,6 @@ struct Vert_FogSector
   uniform float4 fogPlaneT;
   uniform float4x4 ModelView : state.matrix.modelview;
   varying float4 Position : POSITION;
-//<?if vars."fog density".float &gt; 0 ?>
-//<?endif?>
 };
 Vert_FogSector fogSectorVert;
 

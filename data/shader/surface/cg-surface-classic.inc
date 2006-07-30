@@ -18,10 +18,13 @@
 -->
 <include>
 
+<?! Shared resources we use ?>
 <?CgUseShared texCoord?>
 <?CgUseShared texCoordV2F?>
 
 <?Template SurfaceClassic_Code?>
+/* This block of code will be inserted into the Cg program pretty much like
+ * an include file, so guards are not a bad idea. */
 #ifndef __CS_SHADER_SURFACE_CLASSIC_CG__
 #define __CS_SHADER_SURFACE_CLASSIC_CG__
 
@@ -66,8 +69,10 @@ struct SurfaceClassic
 #endif // __CS_SHADER_SURFACE_CLASSIC_CG__
 <?Endtemplate?>
 
+<?! This will add the code above to the emitted Cg program(s) ?>
 <?CgAddSnippet SurfaceClassic_Code?>
 
+<?! Glue - texture, buffer and variable mappings ?>
 <?BeginGlue SurfaceClassic?>
   <?Template Pass_Surface_Classic ?>
     <?if vars."tex diffuse".texture?>

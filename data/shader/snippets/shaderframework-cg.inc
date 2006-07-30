@@ -21,11 +21,14 @@
   <?Define __SHADERFRAMEWORK_CG_INC__ ?>
   
   <?Include /shader/snippets/shaderframework.inc ?>
+
+  <?! Framework templates for Cg inshaders. ?>
   
-  <?CreateList CgAddV2F ?>
-  <?CreateList CgInitV2F_V ?>
-  <?CreateList CgInitV2F_F ?>
-  <?CreateList CgProgramPrepend?>
+  <?! Set up lists used by the framework ?>
+  <?CreateList _CgAddV2F ?>
+  <?CreateList _CgInitV2F_V ?>
+  <?CreateList _CgInitV2F_F ?>
+  <?CreateList _CgProgramPrepend?>
 
   <?Template _CgShareBuffer TYPE SVAR CGNAME SEM ?>
     <?Template _gen_pass_$CGNAME$?>
@@ -42,12 +45,16 @@
       <?ShareResource $CGNAME$ "$TYPE$ $CGNAME$ $SEM$;" _gen_pass_$CGNAME$ _gen_varmap_$CGNAME$?>
       #endif
     <?Endtemplate?>
-    <?AddToList CgProgramPrepend _prepend_buf_$CGNAME$ ?>
+    <?AddToList _CgProgramPrepend _prepend_buf_$CGNAME$ ?>
   <?Endtemplate?>
   
+  <?! Share a buffer, which is in the shader variable SVAR, with the Cg
+      variable of type TYPE being named CGNAME. ?>
   <?Template CgShareBuffer TYPE SVAR CGNAME ?>
     <?_CgShareBuffer $TYPE$ $SVAR$ $CGNAME$ "" ?>
   <?Endtemplate?>
+  <?! Share a buffer, which is in the shader variable SVAR, with the Cg
+      variable of type TYPE with semantics SEM being named CGNAME. ?>
   <?Template CgShareBufferSem TYPE SVAR CGNAME SEM ?>
     <?_CgShareBuffer $TYPE$ $SVAR$ $CGNAME$ ": $SEM$" ?>
   <?Endtemplate?>
@@ -61,7 +68,7 @@
       #endif
       <?endif?>
     <?Endtemplate?>
-    <?AddToList CgAddV2F _v2f_$CGNAME$ ?>
+    <?AddToList _CgAddV2F _v2f_$CGNAME$ ?>
     
     <?Template _v2f_$CGNAME$_init_v?>
       <?if $COND$?>
@@ -71,7 +78,7 @@
       #endif
       <?endif?>
     <?Endtemplate?>
-    <?AddToList CgInitV2F_V _v2f_$CGNAME$_init_v ?>
+    <?AddToList _CgInitV2F_V _v2f_$CGNAME$_init_v ?>
     
     <?Template _v2f_$CGNAME$_init_f?>
       <?if $COND$?>
@@ -81,30 +88,35 @@
       #endif
       <?endif?>
     <?Endtemplate?>
-    <?AddToList CgInitV2F_F _v2f_$CGNAME$_init_f ?>
+    <?AddToList _CgInitV2F_F _v2f_$CGNAME$_init_f ?>
   <?Endtemplate?>
+  <?! Share vertex-to-fragment data, accessible by a variable CGNAME of type
+      TYPE. ?>
   <?Template CgShareV2F TYPE CGNAME ?>
     <?_CgShareV2F "$TYPE$" "$CGNAME$" consts.true?>
   <?Endtemplate?>
+  <?! Share vertex-to-fragment data, when the condition COND is true, 
+      accessible by a variable CGNAME of type TYPE. ?>
   <?Template CgShareV2FCond TYPE CGNAME COND ?>
     <?_CgShareV2F "$TYPE$" "$CGNAME$" "$COND$"?>
   <?Endtemplate?>
 
+  <?! Set the vertex program function ?>
   <?Template CgSetVertexFunc FUNC ?>
     <?Template WriteVertexProgram?>
       <?Template CgProgram?>
 	struct VertToFrag_Framework 
 	{
-	  <?InsertList CgAddV2F?>
+	  <?InsertList _CgAddV2F?>
 	  
 	  void SetupVert ()
 	  {
-	    <?InsertList CgInitV2F_V?>
+	    <?InsertList _CgInitV2F_V?>
 	  }
 	  
 	  void SetupFrag ()
 	  {
-	    <?InsertList CgInitV2F_F?>
+	    <?InsertList _CgInitV2F_F?>
 	  }
 	};
 	<?CgProgram?>
@@ -115,7 +127,7 @@
 	  <?TemplateWeak CgVertexOptions?><?Endtemplate?>
 	  <?CgVertexOptions?>
 	  <program>
-	  <?InsertList CgProgramPrepend?>
+	  <?InsertList _CgProgramPrepend?>
 	  <?CgProgram?>
 	  </program>
 	  <?InsertList ProgramMappings?>
@@ -124,6 +136,7 @@
     <?Endtemplate?>
   <?Endtemplate?>
   
+  <?! Set the fragment program function ?>
   <?Template CgSetFragmentFunc FUNC ?>
     <?Template WriteFragmentProgram?>
       <fp plugin="glcg">
@@ -132,7 +145,7 @@
 	  <?TemplateWeak CgFragmentOptions?><?Endtemplate?>
 	  <?CgFragmentOptions?>
 	  <program>
-	  <?InsertList CgProgramPrepend?>
+	  <?InsertList _CgProgramPrepend?>
 	  <?CgProgram?>
 	  </program>
 	  <?InsertList ProgramMappings?>
@@ -141,37 +154,46 @@
     <?Endtemplate?>
   <?Endtemplate?>
   
+  <?! Add Cg code provided by a snippet ?>
   <?Template CgAddSnippet TEMPLATE?>
-    <?AddToList CgProgramPrepend $TEMPLATE$ ?>
+    <?AddToList _CgProgramPrepend $TEMPLATE$ ?>
   <?Endtemplate?>
-  
+
+  <?! Add a "named shared buffer" of name FEATURE. ?>
   <?Template CgAddSharedBufferSem FEATURE TYPE SVAR CGNAME SEM?>
     <?Template _CgUseShared_$FEATURE$ COND?>
       <?CgShareBufferSem "$TYPE$" "$SVAR$" $CGNAME$ $SEM$ ?>
     <?Endtemplate?>
   <?Endtemplate?>
   
+  <?! Add a "named shared buffer" of name FEATURE. ?>
   <?Template CgAddSharedBuffer FEATURE TYPE SVAR CGNAME?>
     <?Template _CgUseShared_$FEATURE$ COND?>
       <?CgShareBuffer "$TYPE$" "$SVAR$" $CGNAME$ ?>
     <?Endtemplate?>
   <?Endtemplate?>
   
+  <?! Add "named vertex-to-fragment data". ?>
   <?Template CgAddSharedV2F FEATURE TYPE CGNAME?>
     <?Template _CgUseShared_$FEATURE$ COND?>
       <?CgShareV2F $TYPE$ $CGNAME$ "$COND$"?>
     <?Endtemplate?>
   <?Endtemplate?>
   
+  <?! Some default "features" - buffers and vertex-to-fragment, named for 
+      easier use ?>
+  <?CgAddSharedBufferSem primaryColor "varying float4" "primary color" primaryColor COLOR?>
+  <?CgAddSharedV2F primaryColorV2F float4 primaryColor ?>
+  
   <?CgAddSharedBuffer texCoord "varying float2" "texture coordinate" texCoord?>
   <?CgAddSharedV2F texCoordV2F float2 texCoord?>
 
-  <?CgAddSharedBufferSem primaryColor "varying float4" "primary color" primaryColor COLOR?>
-  <?CgAddSharedV2F primaryColorV2F float4 primaryColor ?>
  
+  <?! Use a "feature" (see above) ?>
   <?Template CgUseShared FEATURE?>
     <?_CgUseShared_$FEATURE$ consts.true?>
   <?Endtemplate?>
+  <?! Use a "feature" (see above) when condition COND is true ?>
   <?Template CgUseSharedCond FEATURE COND?>
     <?_CgUseShared_$FEATURE$ "$COND$"?>
   <?Endtemplate?>

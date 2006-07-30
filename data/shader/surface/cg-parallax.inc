@@ -19,7 +19,6 @@
 <include>
 
 <?CgUseShared texCoord?>
-<?CgUseShared texCoordV2F?>
   
 <?Template Parallax_Code?>
 #ifndef __CS_SHADER_PARALLAX_CGINC__
@@ -32,25 +31,26 @@ struct Vert_Parallax
   varying float4 Position : POSITION;
   uniform float4x4 ModelViewIT : state.matrix.modelview.invtrans;
   /* @@@ FIXME Question: Undoubtedly, other components will use the 
-   * normal/tangent/binormal as well in the future. How to share that? Ie all 
-   * instances of use should use the *same* vertex attribute. */
+   * normal/tangent/binormal as well in the future. Add sharing stuff. */
   varying float3 Normal;
   varying float3 Tangent;
   varying float3 BiNormal;
+  uniform float2 tcScale;
 };
 Vert_Parallax parallaxVert;
 
 struct Frag_Parallax
 {
   uniform sampler2D heightTex;
-  uniform float2 tcScale;
 };
 Frag_Parallax parallaxFrag;
 
 struct Parallax
 {
 <?if vars."tex height".texture ?>
+  // @@@ FIXME: better yet, share the eye vector.
   float3 eyeVec;
+  float2 tcParallax;
 <?endif?>
 
   void SetupVert ()
@@ -62,14 +62,14 @@ struct Parallax
     obj2tang[2] = parallaxVert.Normal;
     float3 eyeVecObj = parallaxVert.ModelViewIT[3] - parallaxVert.Position;
     eyeVec =  mul (obj2tang, eyeVecObj);
+    tcParallax = texCoord * parallaxVert.tcScale; 
   <?endif?>
   }
   float2 GetTCOffset ()
   {
     float2 offset = float2 (0, 0);
   <?if vars."tex height".texture ?>
-    float2 tc = texCoord * parallaxFrag.tcScale;
-    offset = ComputeParallaxOffset (parallaxFrag.heightTex, tc, 
+    offset = ComputeParallaxOffset (parallaxFrag.heightTex, tcParallax, 
       normalize (eyeVec), 0.04);
   <?endif?>
     return offset;
@@ -95,7 +95,7 @@ struct Parallax
   <?Template VariableMap_Parallax ?>
     <?if vars."tex height".texture?>
       <variablemap variable="tex height scale" 
-	destination="parallaxFrag.tcScale" />
+	destination="parallaxVert.tcScale" />
     <?endif?>
   <?Endtemplate?>
   <?AddToList ProgramMappings VariableMap_Parallax?>

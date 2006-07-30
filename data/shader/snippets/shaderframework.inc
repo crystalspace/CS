@@ -19,9 +19,13 @@
 <include>
   <?SIfNDef __SHADERFRAMEWORK_INC__ ?>
   <?Define __SHADERFRAMEWORK_INC__ ?>
-  
+
+  <?! Framework templates for shaders. ?>
+
   <?Include /shader/snippets/shadercond-tools.inc ?>
   
+  <?! Glue - ie per-pass, per-technique bindings. Ensures that the glue
+      is only evaluated once. ?>
   <?Template BeginGlue component?>
     <?SIfNDef _glue_$component$?>
     <?Define _glue_$component$?>
@@ -30,6 +34,8 @@
     <?SEndIf?>
   <?Endtemplate?>
   
+  <?! Helper to share a resource NAME. Emits the statement STATEMENT and
+      adds PASS and VARIABLEMAP to the glue. ?>
   <?Template ShareResource NAME STATEMENT PASS VARIABLEMAP ?>
     $STATEMENT$
     <?SIfNDef _resshared_$NAME$?>
@@ -41,11 +47,13 @@
     <?SEndIf?>
   <?Endtemplate?>
   
+  <?! Create default lists ?>
   <?CreateList PassMappings ?>
   <?CreateList ProgramMappings ?>
   <?CreateList ShaderVars ?>
   
-  <?Template WriteShaderTechniques PRIO?>
+  <?! Write out a shader's techniques ?>
+  <?Template WriteShaderTechnique PRIO?>
     <technique priority="$PRIO$">
       <pass>
 	<?TemplateWeak WriteVertexProgram?><?Endtemplate?>
@@ -57,6 +65,7 @@
     </technique>
   <?Endtemplate?>
   
+  <?! Write out shader variables ?>
   <?Template WriteShaderVars?>
     <shadervars><?InsertList ShaderVars?></shadervars>
   <?Endtemplate?>
