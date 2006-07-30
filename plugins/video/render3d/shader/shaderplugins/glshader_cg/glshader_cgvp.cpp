@@ -43,6 +43,8 @@ CS_LEAKGUARD_IMPLEMENT (csShaderGLCGVP);
 
 bool csShaderGLCGVP::Compile ()
 {
+  if (!shaderPlug->enableVP) return false;
+
   csRef<iDataBuffer> programBuffer = GetProgramData();
   if (!programBuffer.IsValid())
     return false;
