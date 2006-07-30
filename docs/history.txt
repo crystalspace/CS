@@ -11,6 +11,9 @@ chronological order.
 	- res changed std_lighting_detail over to use Cg.
 	- res added support for "unused" buffer bindings for VPs (ununsed
 	  vertex attribs are not invalid but shouldn't be bound either).
+	- Vincent added joystick support to eventtest. Needs more work for
+	  correct reporting... Also changed inputdef.cpp assert to not choke
+	  on joystick buttons Up/Down events, and print the faulty event name.
 29-Jul-2006
 	- res augmented xmlshader to support template arguments with spaces.
 	- res fixed an assertion in xmlshader when using buffer mappings with 

@@ -443,7 +443,8 @@ csString csInputDefinition::ToString (bool distinguishMods) const
   if (deviceNumber != 0)
     str.Append(deviceNumber);
 
-  CS_ASSERT(containedName == csevKeyboardEvent(name_reg) ||
+  CS_ASSERT_MSG(name_reg->GetString (containedName),
+	    containedName == csevKeyboardEvent(name_reg) ||
 	    containedName == csevMouseButton(name_reg, deviceNumber) ||
 	    containedName == csevMouseMove(name_reg, deviceNumber) ||
 	    containedName == csevMouseDown(name_reg, deviceNumber) ||
@@ -451,7 +452,9 @@ csString csInputDefinition::ToString (bool distinguishMods) const
 	    containedName == csevMouseClick(name_reg, deviceNumber) ||
 	    containedName == csevMouseDoubleClick(name_reg, deviceNumber) ||
 	    containedName == csevJoystickButton(name_reg, deviceNumber) ||
-	    containedName == csevJoystickMove(name_reg, deviceNumber));
+	    containedName == csevJoystickMove(name_reg, deviceNumber) ||
+	    containedName == csevJoystickDown(name_reg, deviceNumber) ||
+	    containedName == csevJoystickUp(name_reg, deviceNumber));
 
   if (containedName == csevKeyboardEvent(name_reg))
   {

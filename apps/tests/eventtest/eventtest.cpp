@@ -80,6 +80,32 @@ bool EventTest::HandleEvent (iEvent &ev)
 	modifiers, str.GetData ());
     fflush (stdout);
   }
+  else if (CS_IS_JOYSTICK_EVENT (namereg, ev))
+  {
+    uint device = csJoystickEventHelper::GetNumber (&ev);
+    csKeyModifiers key_modifiers;
+    csKeyEventHelper::GetModifiers (&ev, key_modifiers);
+    uint32 modifiers = csJoystickEventHelper::GetModifiers (&ev);
+    //csJoystickEventData data;
+    //csJoystickEventHelper::GetEventData (&ev, data);
+    //...
+    // (vk) should use csJoystickHelper::GetEventData() instead,
+    //      otherwise axes value reporting is limited to the first
+    //      two axes.
+    int x = csJoystickEventHelper::GetX (&ev);
+    int y = csJoystickEventHelper::GetY (&ev);
+
+    uint but = csJoystickEventHelper::GetButton (&ev);
+    bool butstate = csJoystickEventHelper::GetButtonState (&ev);
+    uint32 butmask = csJoystickEventHelper::GetButtonMask (&ev);
+    csString str = csInputDefinition::GetOtherString (namereg,
+        ev.Name, device, but, &key_modifiers, true);
+    printf ("Joystick : but=%d(state=%d,mask=%08" PRIu32 ") "
+        "device=%d x=%d y=%d mods=%08" PRIu32 " desc='%s'\n",
+        but, butstate, butmask, device, x, y,
+        modifiers, str.GetData ());
+    fflush(stdout);
+  }
 
   csBaseEventHandler::HandleEvent(ev);
   return false;
@@ -122,6 +148,25 @@ bool EventTest::OnInitialize(int /*argc*/, char* /*argv*/ [])
     CS_REQUEST_FONTSERVER,
     CS_REQUEST_END))
     return ReportError("Failed to initialize plugins!");
+
+  // Attempt to load a joystick plugin.
+  csRef<iStringArray> joystickClasses =
+    iSCF::SCF->QueryClassList ("crystalspace.device.joystick.");
+  if (joystickClasses.IsValid())
+  {
+    csRef<iPluginManager> plugmgr = CS_QUERY_REGISTRY (object_reg,
+      iPluginManager);
+    for (size_t i = 0; i < joystickClasses->Length (); i++)
+    {
+      const char* className = joystickClasses->Get (i);
+      iBase* b = plugmgr->LoadPlugin (className);
+
+      csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
+        "crystalspace.application.joytest", "Attempt to load plugin '%s' %s",
+        className, (b != 0) ? "successful" : "failed");
+      if (b != 0) b->DecRef ();
+    }
+  }
 
   // "Warm up" the event handler so it can interact with the world
   csBaseEventHandler::Initialize(GetObjectRegistry());
