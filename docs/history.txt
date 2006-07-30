@@ -23,6 +23,12 @@ chronological order.
 	  docs.
 	- res made it possible to disable all extensions by default, by 
 	  setting "Video.OpenGL.UseExtension.ALL = false".
+	- res added a couple of configuration files to emulate certain
+	  hardware. The idea is to use these with the new "configuration file
+	  on command line" feature to easily emulate older HW, e.g. a GeForce3
+	  by running an application with '-cfgfile=/config/emulate_gf3.cfg"
+	  on the command line. Settings covered right now are basically just
+	  those for Cg.
 29-Jul-2006
 	- res augmented xmlshader to support template arguments with spaces.
 	- res fixed an assertion in xmlshader when using buffer mappings with 
