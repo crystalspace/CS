@@ -9,6 +9,8 @@ chronological order.
 30-Jul-2006
 	- res added some comments to the new shader snippets.
 	- res changed std_lighting_detail over to use Cg.
+	- res added support for "unused" buffer bindings for VPs (ununsed
+	  vertex attribs are not invalid but shouldn't be bound either).
 29-Jul-2006
 	- res augmented xmlshader to support template arguments with spaces.
 	- res fixed an assertion in xmlshader when using buffer mappings with 

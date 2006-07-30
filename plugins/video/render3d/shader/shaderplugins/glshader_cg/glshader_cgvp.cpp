@@ -82,6 +82,8 @@ csVertexAttrib csShaderGLCGVP::ResolveBufferDestination (const char* binding)
       int index = cgGetParameterResourceIndex (parameter);
       switch (base)
       {
+        case CG_UNDEFINED:
+          return CS_VATTRIB_UNUSED;
 	case CG_TEX0: 
 	case CG_TEXUNIT0:
 	case CG_TEXCOORD0:
