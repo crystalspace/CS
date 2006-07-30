@@ -120,15 +120,14 @@
     return V2F;
   }
   
-  float4 FragmentMain (VertToFrag V2F, uniform sampler2D texGlow) : COLOR
+  float4 FragmentMain (VertToFrag V2F, uniform sampler2D texDetail) : COLOR
   {
     V2F.framework.SetupFrag();
 
     float4 color = V2F.surfClassic.GetDiffuse () * 
       float4 (V2F.lightClassic.IllumDiffuse(), GetMixmodeAlpha());
     // Apply detail
-    color.rgb *= 2 * tex2D (texDetail, 
-      V2F.tcDetail + V2F.parallax.GetTCOffset()).rgb;
+    color.rgb *= 2 * tex2D (texDetail, V2F.tcDetail).rgb;
     
     if (V2F.fog.HasFog())
     {
@@ -137,7 +136,7 @@
     return color;
   }
   <?Endtemplate?>
-  <?WriteShaderTechnique 100?>
+  <?WriteShaderTechnique 250?>
 
   <?WriteShaderVars?>
 
