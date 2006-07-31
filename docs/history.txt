@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+31-Jul-2006
+	- Jorrit fixed compilation of xmlshader. It was using a wrong
+	  CS_GNUC_WPRINTF.
 30-Jul-2006
 	- res added some comments to the new shader snippets.
 	- res changed std_lighting_detail over to use Cg.
