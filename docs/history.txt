@@ -8,7 +8,7 @@ chronological order.
 
 31-Jul-2006
 	- Jorrit fixed compilation of xmlshader. It was using a wrong
-	  CS_GNUC_WPRINTF.
+	  CS_GNUC_PRINTF.
 	- Jorrit added a new function csEngineTools::FindScreenTarget().
 	  This function performs the commonly used operation of finding
 	  the object that was clicked upon with the mouse. It can work
