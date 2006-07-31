@@ -9,6 +9,13 @@ chronological order.
 31-Jul-2006
 	- Jorrit fixed compilation of xmlshader. It was using a wrong
 	  CS_GNUC_WPRINTF.
+	- Jorrit added a new function csEngineTools::FindScreenTarget().
+	  This function performs the commonly used operation of finding
+	  the object that was clicked upon with the mouse. It can work
+	  both in accurate mode (using iSector->HitBeamPortals) or
+	  faster mode (using csColliderHelper::TraceBeam).
+	- Jorrit changed WalkTest and BugPlug to use the new
+	  FindScreenTarget() function.
 30-Jul-2006
 	- res added some comments to the new shader snippets.
 	- res changed std_lighting_detail over to use Cg.
