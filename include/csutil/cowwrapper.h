@@ -19,23 +19,49 @@
 #ifndef __CS_CSUTIL_COWWRAPPER_H__
 #define __CS_CSUTIL_COWWRAPPER_H__
 
-// Hack: Work around problems caused by #defining 'new'.
-#if defined(CS_EXTENSIVE_MEMDEBUG) || defined(CS_MEMORY_TRACKER)
-# undef new
-#endif
-#include <new>
+#include "csutil/custom_new_disable.h"
 
-#include "allocator.h"
+#include "csutil/allocator.h"
 
 /**\file
+ * Copy-on-write wrapper for arbitrary types.
  */
 
 namespace CS
 {
 
+  /**
+   * Copy-on-write wrapper for arbitrary types.
+   * <pre>
+   *  _________________________________________
+   * / Instances transparently maintain a      \
+   * | reference-counted pointer to the actual |
+   * | data; if an instance is copied, merely  |
+   * | this pointer is copied.                 |
+   * |                                         |
+   * | As long as all access to the data is    |
+   * | constant, the data is shared between    |
+   * | instances. Only if non-const access is  |
+   * | requested the data is duplicated.       |
+   * |                                         |
+   * \ The wrapper itself acts like a pointer. /
+   *  -----------------------------------------
+   *         \   ^__^
+   *          \  (oo)\_______
+   *             (__)\       )\/\
+   *                 ||----w |
+   *                 ||     ||
+   * </pre>
+   *
+   * \remarks Contained types must have a proper copy constructor.
+   * \remarks Care should be taken that the data is accessed with proper 
+   *   const-ness, since only the then data can be shared. Otherwise, data
+   *   may be duplicated needlessly.
+   */
   template<typename T, class MemoryAllocator = Memory::AllocatorMalloc>
   class CowWrapper
   {
+    /// Helper class wrapping the actual data
     struct WrappedData
     {
       int refcount;
@@ -68,16 +94,24 @@ namespace CS
       return p;
     }
   public:
+    /// Copy reference to data from \p other.
     CowWrapper (const CowWrapper& other) : data (other.data) {}
+    /// Create a new wrapper and initialize with \p other.
     CowWrapper (const T& other)
     {
       data.AttachNew (NewData (other));
     }
 
+    /// Return a const reference to the contained data.
     const T& operator* () const
     {
       return data->data;
     }
+    /**
+     * Return a non-const reference to the contained data.
+     * \remarks This will copy the contained data, so only use when really
+     *   necessary.
+     */
     T& operator* ()
     {
       if (data->GetRefCount() > 1)
@@ -87,16 +121,20 @@ namespace CS
       }
       return data->data;
     }
+    /// Return a const pointer to the contained data.
     const T* operator -> () const
     { return &(operator*()); }
+    /**
+     * Return a non-const pointer to the contained data.
+     * \remarks This will copy the contained data, so only use when really
+     *   necessary.
+     */
     T* operator -> ()
     { return &(operator*()); }
   };
 
 } // namespace CS
 
-#if defined(CS_EXTENSIVE_MEMDEBUG) || defined(CS_MEMORY_TRACKER)
-# define new CS_EXTENSIVE_MEMDEBUG_NEW
-#endif
+#include "csutil/custom_new_enable.h"
 
 #endif // __CS_CSUTIL_COWWRAPPER_H__
