@@ -32,6 +32,7 @@
 #include "csutil/csstring.h"
 #include "csutil/sysfunc.h"
 #include "csutil/syspath.h"
+#include "csutil/vfsplat.h"
 #include "iutil/objreg.h"
 
 #define NEW_CONFIG_SCANNING
@@ -155,6 +156,9 @@ private:
 
   // Add a subdirectory to this node
   bool RemoveSubDirectory(VfsNode *SubDir);
+
+  // Check if the node contains a mapping to a specified path
+  bool IsMapped(const char *Path);
 
   // Allow VFS to access node internals
   csVFS *ParentVFS;
@@ -333,13 +337,15 @@ iFile* VfsNode::Open (const char *FileName, int Mode)
         FileToFind.Append(CS_PATH_SEPARATOR);
 
       FileToFind.Append(FileName);
+
+
       
       // Open the file using the correct iFileSystem plugin
       iFileSystem *fs = ParentVFS->GetPlugin(MappedPaths[i].pluginIndex);
       if (!fs)
         continue;
 
-      file = fs->Open((const char *) FileToFind, Mode);
+      file = fs->Open(FileToFind, Mode);
 
       // Found the file
       if (file)
@@ -429,10 +435,11 @@ bool VfsNode::GetRealPath(const char *FileName, csString &path) const
       iFileSystem *fs = ParentVFS->GetPlugin(MappedPaths[i].pluginIndex);
       
       if (!fs)
+      {
         continue;
-
+      }
       // Check if the file exists
-      if (fs->Exists((const char *) FileToFind) != fkDoesNotExist)
+      if (fs->Exists(FileToFind) != fkDoesNotExist)
       {
         // The real path is correct
         path = FileToFind;
@@ -659,6 +666,18 @@ bool VfsNode::GetFileSize (const char *FileName, size_t &oSize)
   return false;
 }
 
+bool VfsNode::IsMapped(const char *Path)
+{
+  for (size_t i = 0; i < MappedPaths.Length(); i++)
+  {
+    if (MappedPaths[i].name.Compare(Path))
+    {
+      return true;
+    }
+  }
+  return false;
+}
+
 // --------------------------------------------------------- VfsVector ---//
 
 // Comparison method to compare nodes
@@ -718,12 +737,65 @@ bool csVFS::Initialize (iObjectRegistry* r)
   // TODO: complete initialize
   object_reg = r;
 
-  // Autoconfiguration
+// Autoconfiguration
 #ifdef VFS_AUTOCONFIGURE
   AutoConfigPluginPtr->Configure(this, r);
 #endif
 
   // !! ADD vfs search path
+  return true;
+}
+
+bool csVFS::LoadConfigFile(const char* VirtualPath, bool Mount)
+{
+  if (!VirtualPath)
+    return false;
+
+  bool const merge = !config.IsEmpty();
+
+  // Load into the class config file
+  bool ok = config.Load(VirtualPath, this, merge, false);
+
+  if (Mount)
+  {
+    bool result = false;
+    // Create a new temp config file to mount
+    csConfigFile * tmpConfig = new csConfigFile;
+    if (tmpConfig->Load(VirtualPath, this, false, false))
+    {
+      if (MountConfigFile(tmpConfig))
+         result = true;
+    }
+    delete tmpConfig;
+    return result;
+  }
+
+  return ok;
+}
+
+bool csVFS::MountConfigFile(csConfigFile* conf)
+{
+  if (conf == 0)
+    conf = &config;
+
+  csRef<iConfigIterator> iterator (conf->Enumerate ("VFS.Mount."));
+  csStringArray realPaths;
+  while (iterator->Next())
+  {
+    csString vp = iterator->GetKey (true);
+    csString rp = iterator->GetStr ();
+
+     // Mount each entry
+    realPaths.Empty();
+    realPaths.SplitString(rp, ", ");
+    for (size_t i= 0; i < realPaths.Length(); i++)
+    {
+      if (!realPaths[i] || strlen(realPaths[i]) == 0)
+        continue;
+
+      Mount(vp, realPaths[i]);
+    }
+  }
   return true;
 }
 
@@ -967,21 +1039,23 @@ csPtr<iFile> csVFS::Open (const char *FileName, int Mode)
   csScopedMutexLock lock (mutex);
 
   csString fullPath = _ExpandPath(FileName);
-  
+    
   if (fullPath.IsEmpty())
     fullPath = "/";
 
+
   // Get the directory node
-  VfsNode *node = GetParentDirectoryNode((const char *) fullPath, true, true);
+  VfsNode *node = GetParentDirectoryNode(fullPath, true, true);
 
   if (!node)
   {
+
     // Return the results
     return csPtr<iFile> (f);
   }
 
   // Get the file pointer
-  f = node->Open((const char *) ExtractFileName((const char *) fullPath), Mode);
+  f = node->Open(ExtractFileName(fullPath), Mode);
 
   // Return the results
   return csPtr<iFile> (f);
@@ -1020,7 +1094,7 @@ csPtr<iDataBuffer> csVFS::ReadFile (const char *FileName, bool nullterm)
   buff [Size] = 0;
   if (F->Read(buff, Size) != Size)
   {
-    delete [] buff;
+   // delete [] buff;
     return csPtr<iDataBuffer> (0);
   }
 
@@ -1096,7 +1170,8 @@ bool csVFS::Mount(const char *VirtualPath, const char *RealPath,
 
   // Create the data structure
   struct MappedPathData pathData;
-  pathData.name = RealPath;
+  pathData.name = ExpandRealPath(RealPath);
+
   pathData.priority = priority;
   pathData.pluginIndex = plugin;
   pathData.symlink = false;
@@ -1111,23 +1186,28 @@ bool csVFS::Mount(const char *VirtualPath, const char *RealPath,
 	    return false;
     }
 
-    // Insert the mount into the node
-    node->MappedPaths.InsertSorted(pathData, CompareMappedPaths);
+    if (!node->IsMapped(pathData.name))
+    {
+       // Insert the mount into the node
+      node->MappedPaths.InsertSorted(pathData, CompareMappedPaths);
+    }
     return true;
   }
 
   // Real Path is a directory
-  if (isDirectory(RealPath))
+  if (isDirectory(pathData.name))
   {
-    node = GetParentDirectoryNode((const char *) tmp, true);
-
+    node = GetParentDirectoryNode(tmp, true);
     if (!node)
     {
 	    return false;
     }
 
-    // Insert the mount into the node
-    node->MappedPaths.InsertSorted(pathData, CompareMappedPaths);
+    if (!node->IsMapped(pathData.name))
+    {
+      // Insert the mount into the node
+      node->MappedPaths.InsertSorted(pathData, CompareMappedPaths);
+    }
 	  return true;
   }
 
@@ -1137,7 +1217,7 @@ bool csVFS::Mount(const char *VirtualPath, const char *RealPath,
   {
     // Start from 1 because we don't want to 
     // check the NativeFileSystem first
-    if(fsPlugins[i]->CanHandleMount(RealPath))
+    if(fsPlugins[i]->CanHandleMount(pathData.name))
     {
       node = GetParentDirectoryNode((const char *) tmp, true);
       
@@ -1148,8 +1228,11 @@ bool csVFS::Mount(const char *VirtualPath, const char *RealPath,
 
       pathData.pluginIndex = i;
 
-      // Insert the mount into the node
-      node->MappedPaths.InsertSorted(pathData, CompareMappedPaths);
+      if (!node->IsMapped(pathData.name))
+      {
+        // Insert the mount into the node
+        node->MappedPaths.InsertSorted(pathData, CompareMappedPaths);
+      }
       return true;
     }
   }
@@ -1210,7 +1293,7 @@ bool csVFS::Unmount (const char *VirtualPath, const char *RealPath)
   // Find the path within the node
   for (size_t i = 0; i < node->MappedPaths.Length(); i++)
   {
-    if (node->MappedPaths[i].name.Compare(RealPath))
+    if (node->MappedPaths[i].name.Compare(ExpandRealPath(RealPath)))
     {
        if (!node->MappedPaths.DeleteIndex(i))
          return false;
@@ -1279,7 +1362,7 @@ csRef<iStringArray> csVFS::MountRoot (const char *VirtualPath)
     }
     // Create the data structure
     struct MappedPathData pathData;
-    pathData.name = real_dir;
+    pathData.name = ExpandRealPath(real_dir);
     pathData.priority = 0;
     pathData.pluginIndex = 0;
     pathData.symlink = false;
@@ -1352,7 +1435,7 @@ bool csVFS::ChDirAuto (const char* path, const csStringArray* paths,
   csString fullPath = _ExpandPath(path);
   
   if (fullPath.IsEmpty())
-    fullPath = "/";
+    fullPath = VFS_PATH_SEPARATOR;
 
   // Check if the VFS Path exists
   if (TryChDirAuto(fullPath, filename))
@@ -1364,13 +1447,7 @@ bool csVFS::ChDirAuto (const char* path, const csStringArray* paths,
     for (size_t i = 0; i < paths->Length(); i++)
     {
       csString testpath = paths->Get(i);
-      if (testpath.GetAt(testpath.Length() - 1) != VFS_PATH_SEPARATOR 
-        && path[0] != VFS_PATH_SEPARATOR)
-      {
-        testpath.Append(VFS_PATH_SEPARATOR);
-      }
-      else if (testpath.GetAt(testpath.Length() - 1) == VFS_PATH_SEPARATOR
-        && path[0] == VFS_PATH_SEPARATOR)
+      if (testpath.GetAt(testpath.Length() - 1) == VFS_PATH_SEPARATOR)
       {
         testpath.Truncate(testpath.Length() -1);
       }
@@ -1474,20 +1551,20 @@ csPtr<iDataBuffer> csVFS::GetRealPath (const char *FileName)
   if (fullPath.IsEmpty())
     fullPath = "/";
 
-  VfsNode *node = GetDirectoryNode(fullPath);
+  VfsNode *node = GetParentDirectoryNode(fullPath, false);
 
   if (!node)
   {
-    node = GetParentDirectoryNode(fullPath, false);
-    if (!node)
-      return csPtr<iDataBuffer> (0);
+    return csPtr<iDataBuffer> (0);
   }
 
   csString path;
   
   // Try get the real path
   if (!node->GetRealPath(ExtractFileName(fullPath), path))
+  {
      return csPtr<iDataBuffer> (0);
+  }
 
   return csPtr<iDataBuffer> (new csDataBuffer (
     csStrNew ((const char *) path), path.Length() + 1));
@@ -1657,6 +1734,7 @@ VfsNode* csVFS::GetParentDirectoryNode(const char *path, bool create, bool mount
 	  tmpNode = node->FindNode((const char *) currentDir);
 	  if (!tmpNode)
 	  {
+
 	    if (!create)
 	    {
         // Node does not exist
@@ -1665,10 +1743,10 @@ VfsNode* csVFS::GetParentDirectoryNode(const char *path, bool create, bool mount
       if (mount)
       {
         csString realPath;
-        node->GetRealPath((const char *) ExtractFileName((const char *)currentDir), realPath);
-        if (!Mount((const char *) currentDir, (const char *) realPath))
+        node->GetRealPath(ExtractFileName(currentDir), realPath);
+        if (!Mount(currentDir, realPath))
           return 0;
-        tmpNode = GetDirectoryNode((const char *) currentDir);
+        tmpNode = GetDirectoryNode(currentDir);
       }
       else
       {
@@ -1711,7 +1789,7 @@ csVFS::AutoConfigPlugin::~AutoConfigPlugin()
 {
 
 }
-
+#include "csutil/strset.h"
 /*
  * This method will attempt to auto-configure the VFS.
  * It will mount the relevant resource directories, and map them to symbolic
@@ -1723,51 +1801,123 @@ bool csVFS::AutoConfigPlugin::Configure(iVFS *vfs,
   if (!vfs)
     return false;
 
+
+  /// The install directory
+  csString InstallDirectory;
+
+  /// The user directory
+  csString UserDirectory;
+
+  /// The application directory
+  csString AppDirectory;
+
+  /// The resource directory
+  csString ResourceDirectory;
+
+#ifdef NEW_CONFIG_SCANNING
+  static const char* vfsSubdirs[] = {
+    "etc/" CS_PACKAGE_NAME,
+    "etc", 
+    "",
+    0};
+
+  csPathsList configPaths;
+  const char* crystalconfig = getenv("CRYSTAL_CONFIG");
+  if (crystalconfig)
+    configPaths.AddUniqueExpanded (crystalconfig);
+
+  csPathsList* basedirs = 
+    csInstallationPathsHelper::GetPlatformInstallationPaths();
+  configPaths.AddUniqueExpanded (*basedirs * csPathsList  (vfsSubdirs));
+  delete basedirs;
+  
+  configPaths.AddUniqueExpanded (".");
+
+#ifdef CS_CONFIGDIR
+  configPaths.AddUniqueExpanded (CS_CONFIGDIR);
+#endif
+  configPaths = csPathsUtilities::LocateFile (configPaths, "vfs.cfg", true);
+
+  if (configPaths.Length() > 0)
+  {
+    InstallDirectory = configPaths[0].path;
+  }
+#else
+  InstallDirectory = csGetConfigPath();
+#endif
+
+  csStringArray Directories;
+
+  // Try and mount the user directory
+  if (vfs->Mount("/mnt/user", csGetPlatformConfigPath("", false)))
+	{
+    // Add it to the directory list
+		Directories.Push("/mnt/user");
+	}
+
+
   // Get the command line parser plugin
   csRef<iCommandLineParser> cmdline =
     CS_QUERY_REGISTRY (object_reg, iCommandLineParser);
-
-  csStringArray Directories;
   if (cmdline)
   {
-    // Try and mount the user directory
-    if (vfs->Mount("/mnt/user", csGetPlatformConfigPath("", false)))
-	  {
-      // Add it to the directory list
-		  Directories.Push("/mnt/user");
-	  }
+    ResourceDirectory = cmdline->GetResourceDir();
+    ((csVFS*)vfs)->ResourceDirectory = ResourceDirectory;
+    AppDirectory = cmdline->GetAppDir();
+    ((csVFS*)vfs)->AppDirectory = AppDirectory;
+  
     // Try and mount the resource directory
-    if (vfs->Mount("/mnt/resource", cmdline->GetResourceDir()))
+    if (vfs->Mount("/mnt/resource", ResourceDirectory))
 	  {
       // Add it to the directory list
 		  Directories.Push("/mnt/resource");
 	  }
     // Try and mount the app directory
-    if (vfs->Mount("/mnt/app", cmdline->GetAppDir()))
+    if (vfs->Mount("/mnt/app", AppDirectory))
 	  {
       // Add it to the directory list
 		  Directories.Push("/mnt/app");
 	  }
-
-    // Try and mount the install directory
-    csPathsList* installdirs = csInstallationPathsHelper::GetPlatformInstallationPaths();
-
-    bool mounted = false;
-    for (size_t i = 0; i < installdirs->Length(); i++)
-    {
-      csPathsList::Entry const& installPath = (*installdirs)[i];
-      if (vfs->Mount("/mnt/install", installPath.path))
-	    {
-        mounted = true;
-	    }
-    }
-
-    if (mounted)
-	  {
-      // Add it to the directory list
-		  //Directories.Push("/mnt/install");
-	  }
   }
+
+#ifdef NEW_CONFIG_SCANNING
+  bool mountedInstall = false;
+  for (size_t i = 0; i < configPaths.Length(); i++)
+  {
+    if (vfs->Mount("/mnt/install", configPaths[i].path))
+    {
+      if (!mountedInstall)
+      {
+      		//Directories.Push("/mnt/install");
+          mountedInstall = true;
+      }
+    }
+  }
+#else
+  if (vfs->Mount("/mnt/install", csGetConfigPath()))
+	{
+    // Add it to the directory list
+		// Directories.Push("/mnt/install");
+	}
+#endif
+
+  bool result = false;
+  result = vfs->LoadConfigFile("/mnt/resource/vfs.cfg", false);
+  if (result && InstallDirectory.Empty())
+    InstallDirectory = ResourceDirectory;
+  result = vfs->LoadConfigFile("/mnt/app/vfs.cfg", false);
+  if (result && InstallDirectory.Empty())
+    InstallDirectory = ResourceDirectory;
+
+  vfs->LoadConfigFile("/mnt/install/vfs.cfg", false);
+
+  ((csVFS*)vfs)->InstallDirectory = InstallDirectory;
+  
+  ((csVFS*)vfs)->MountConfigFile();
+
+ // return true;
+
+  csStringArray mountedRealPaths;
 
   // An iterator to iterate through directories
   csArray<const char *,csStringArrayElementHandler>::Iterator i(
@@ -1811,6 +1961,11 @@ bool csVFS::AutoConfigPlugin::Configure(iVFS *vfs,
          RealDirectoryName.Append(CS_PATH_SEPARATOR);
          RealDirectoryName.Append(Contents->Get(ctCounter));
 
+         if (mountedRealPaths.Contains(RealDirectoryName) != csArrayItemNotFound)
+           continue;
+
+         mountedRealPaths.PushSmart(RealDirectoryName);
+
          // Try and mount the directory contents
          if (vfs->Mount(VirtualDirectoryName, RealDirectoryName))
          {
@@ -1844,6 +1999,142 @@ bool csVFS::AutoConfigPlugin::Configure(iVFS *vfs,
   }
 
   return true;
+}
+
+csString csVFS::ExpandRealPath(char const *Path)
+{
+  csString result = _ExpandRealPath(Path);
+  if (result.GetAt(result.Length() - 1) == CS_PATH_SEPARATOR)
+    result.Truncate(result.Length() - 1);
+  return result;
+}
+
+// Expand a Path
+csString csVFS::_ExpandRealPath(char const *Path)
+{
+  csString dst;
+  char *src_start = csStrNew(Path);
+  char *src = src_start;
+  while (*src != '\0')
+  {
+    // Is this a variable reference?
+    if (*src == '$')
+    {
+      // Parse the name of variable
+      src++;
+      char *var = src;
+      char one_letter_varname [2];
+      if (*src == '(' || *src == '{')
+      {
+        // Parse until the end of variable, skipping pairs of '(' and ')'
+        int level = 1;
+        src++; var++;
+        while (level > 0 && *src != '\0')
+        {
+          if (*src == '(' || *src == '{')
+	        {
+            level++;
+	        }
+          else if (*src == ')' || *src == '}')
+	        {
+            level--;
+	        }
+	        if (level > 0)
+	          src++; // don't skip over the last parenthesis
+        } /* endwhile */
+        // Replace closing parenthesis with \0
+        *src++ = '\0';
+      }
+      else
+      {
+        var = one_letter_varname;
+        var [0] = *src++;
+        var [1] = 0;
+      }
+
+      char *alternative = strchr (var, ':');
+      if (alternative)
+        *alternative++ = '\0';
+      else
+        alternative = strchr (var, '\0');
+
+      const char *value = GetValue (var);
+      if (!value)
+      {
+        if (*alternative)
+        {
+          dst << _ExpandRealPath(alternative);
+        }
+      }
+      else
+      {
+	// @@@ FIXME: protect against circular references
+        dst << _ExpandRealPath(value);
+        if (strcmp(InstallDirectory, value) == 0 || strcmp(ResourceDirectory, value) == 0 || strcmp(AppDirectory, value) == 0)
+          dst << CS_PATH_SEPARATOR;
+      }
+    } /* endif */
+    else
+      dst << *src++;
+  } /* endif */
+  delete[] src_start;
+
+  return dst;
+}
+
+const char * csVFS::GetValue(const char *VarName)
+{
+  // Look in environment first
+  const char *value = getenv (VarName);
+  if (value)
+    return value;
+
+  iConfigFile *Config = &config;
+
+  // Now look in "VFS.Unix" section, for example
+  csString Keyname;
+  Keyname << "VFS." CS_PLATFORM_NAME "." << VarName;
+  value = Config->GetStr (Keyname, 0);
+  if (value)
+    return value;
+
+  // Now look in "VFS.Alias" section for alias section name
+  const char *alias = Config->GetStr ("VFS.Alias." CS_PLATFORM_NAME, 0);
+  // If there is one, look into that section too
+  if (alias)
+  {
+    Keyname.Clear();
+    Keyname << alias << '.' << VarName;
+    value = Config->GetStr (Keyname, 0);
+  }
+  if (value)
+    return value;
+
+  // Handle predefined variables here so that user
+  // can override them in config file or environment
+
+  // check for OS-specific predefined variables
+  value = csCheckPlatformVFSVar(VarName);
+  if (value)
+    return value;
+
+  static char path_separator [] = {VFS_PATH_SEPARATOR, 0};
+  if (strcmp (VarName, path_separator) == 0)	// Path separator variable?
+  {
+    static char path_sep [] = {CS_PATH_SEPARATOR, 0};
+    return path_sep;
+  }
+
+  if (strcmp (VarName, "*") == 0) // Resource directory?
+    return ResourceDirectory;
+   
+  if (strcmp (VarName, "^") == 0) // Application or Cocoa wrapper directory?
+    return AppDirectory;
+       
+  if (strcmp (VarName, "@") == 0) // Installation directory?
+    return InstallDirectory;
+
+  return 0;
 }
 
 } CS_PLUGIN_NAMESPACE_END(vfs)

@@ -130,6 +130,9 @@ iFile* csNativeFileSystem::Open(const char * FileName, int mode)
   else
         file = new csPhysicalFile(FileName, "rb");
 
+  if (file->GetStatus() != VFS_STATUS_OK)
+    return 0;
+
 	return file;
 }
 

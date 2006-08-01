@@ -24,6 +24,7 @@
 #include "csutil/refarr.h"
 #include "csutil/parray.h"
 #include "csutil/scf_implementation.h"
+#include "csutil/csstring.h"
 #include "csutil/cfgfile.h"
 #include "csutil/scopedmutexlock.h"
 #include "iutil/vfs.h"
@@ -48,6 +49,7 @@ class VfsAutoConfig
 
     // Configure the file system
     virtual bool Configure(iVFS *vfs, iObjectRegistry *object_reg) = 0;
+
 };
 
 inline VfsAutoConfig::~VfsAutoConfig() { }
@@ -183,6 +185,9 @@ public:
   /// Return a filesystem plugin
   virtual iFileSystem* GetPlugin(size_t index) const;
 
+  /// Load a VFS configuration File
+  bool LoadConfigFile(char const* VirtualPath, bool Mount = true);
+
 protected:
 
   /// Mutex to make VFS thread-safe.
@@ -209,6 +214,21 @@ protected:
   /// A counter for ChDirAuto
   int auto_name_counter;
 
+  /// The initialization file
+  csConfigFile config;
+
+  /// The install directory
+  csString InstallDirectory;
+
+  /// The user directory
+  csString UserDirectory;
+
+  /// The application directory
+  csString AppDirectory;
+
+  /// The resource directory
+  csString ResourceDirectory;
+
   /// Get the directory node
   VfsNode* GetDirectoryNode(const char *path);
 
@@ -221,11 +241,23 @@ protected:
   // Check if the path is a valid real directory
   bool isDirectory(const char *path);
 
-  // Expand Path
+  // Expand a Virtual Path
   csString _ExpandPath (const char *Path) const;
+
+  // Expand a Real Path
+  csString ExpandRealPath(char const *Path);
+
+  // Expand a Real Path
+  csString _ExpandRealPath(char const *Path);
 
   // Try change directory
   bool TryChDirAuto(const char *Path, const char *FileName);
+
+  // Scan the config file and mount paths
+  bool MountConfigFile(csConfigFile* conf = 0);
+
+  // Get the value of a variable
+  const char *GetValue(const char *VarName);
 
   friend class VfsNode;
 
@@ -242,6 +274,8 @@ protected:
 
     // Configure the file system
     virtual bool Configure(iVFS *vfs, iObjectRegistry *object_reg);
+
+    friend class csVFS;
   };
 
 };

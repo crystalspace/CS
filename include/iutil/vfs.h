@@ -572,6 +572,15 @@ struct iVFS : public virtual iBase
    * /return The iFileSystem plugin
    */
   virtual iFileSystem* GetPlugin(size_t index) const = 0;
+
+  /**
+   * Load a VFS configuration File.
+   * /param VirtualPath The path to the file on the VFS.
+   * /param Mount Must the file contents be parsed and the relevant 
+   *        directories mounted.
+   * \return True if the loading succeeded, else false.
+   */
+  virtual bool LoadConfigFile(char const* VirtualPath, bool Mount = true) = 0;
 };
 /** @} */
 
