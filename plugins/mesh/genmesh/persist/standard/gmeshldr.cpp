@@ -873,7 +873,6 @@ bool csGeneralFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent,
         csRef<iDocumentNode> indexBufferNode = 
           submeshNode->CreateNodeBefore (CS_NODE_ELEMENT, 0);
         indexBufferNode->SetValue ("indexbuffer");
-        indexBufferNode->SetAttribute ("indices", "yes");
         synldr->WriteRenderBuffer (indexBufferNode, 
           gfact->GetSubMeshIndices (s));
       }

@@ -20,6 +20,10 @@ chronological order.
 	- res added submesh saving to the genmesh saver.
 	- res started work on genmeshify, a tool to convert Things in world
 	  files to genmeshes.
+	- res fixed genmesh's index buffer creation for submeshes.
+	- res fixed genmesh's submesh class to properly copy itself.
+	- res fixed cssynldr to correctly mark index buffers when writing
+	  render buffers.
 31-Jul-2006
 	- Jorrit fixed compilation of xmlshader. It was using a wrong
 	  CS_GNUC_PRINTF.

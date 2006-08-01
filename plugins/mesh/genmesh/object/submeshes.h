@@ -48,6 +48,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
     {
       delete[] name;
     }
+    SubMesh (const SubMesh& other) : index_buffer (other.index_buffer),
+      material (other.material), rmHolder (), 
+      bufferHolder (other.bufferHolder), MixMode (other.MixMode)
+    {
+      name = csStrNew (other.name);
+    }
     const char* GetName() const { return name; }
     void SetName (const char* newName)
     {
