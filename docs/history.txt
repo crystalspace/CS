@@ -11,6 +11,10 @@ chronological order.
 	  the element after incrementation.
 	- res added a post-increment operator to csRenderBufferLock, allowing
 	  to iterate over render buffers pointer-style.
+	- res changed the genmesh submesh support somewhat: now takes a render
+	  buffer with indices instead of a pointer to a triangle array. Also
+	  added some management methods - submeshes can be given a name,
+	  enumerated, and selectively deleted.
 31-Jul-2006
 	- Jorrit fixed compilation of xmlshader. It was using a wrong
 	  CS_GNUC_PRINTF.
