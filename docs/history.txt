@@ -6,6 +6,11 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+01-Aug-2006
+	- res changed the csRenderBufferLock pre-increment operator to return
+	  the element after incrementation.
+	- res added a post-increment operator to csRenderBufferLock, allowing
+	  to iterate over render buffers pointer-style.
 31-Jul-2006
 	- Jorrit fixed compilation of xmlshader. It was using a wrong
 	  CS_GNUC_PRINTF.

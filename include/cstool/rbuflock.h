@@ -128,11 +128,21 @@ public:
     return Get (currElement);
   }
 
-  /// Set current element to the next.
-  void operator++ ()
+  /// Set current element to the next, pre-increment version.
+  T* operator++ ()
   {
     currElement++;
     CS_ASSERT(currElement<elements);
+    return Lock() + currElement;
+  }
+
+  /// Set current element to the next, post-increment version.
+  T* operator++ (int)
+  {
+    CS_ASSERT(currElement<elements);
+    T* p = Lock() + currElement;
+    currElement++;
+    return p;
   }
 
   /// Retrieve an item in the render buffer.
