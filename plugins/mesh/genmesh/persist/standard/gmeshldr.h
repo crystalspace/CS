@@ -33,6 +33,9 @@ struct iSyntaxService;
 struct iGeneralFactoryState;
 struct iGeneralMeshState;
 
+CS_PLUGIN_NAMESPACE_BEGIN(GenMeshLoader)
+{
+
 /**
  * General Mesh factory loader.
  */
@@ -44,7 +47,11 @@ private:
   iObjectRegistry* object_reg;
   csRef<iReporter> reporter;
   csRef<iSyntaxService> synldr;
+
   csStringHash xmltokens;
+#define CS_TOKEN_ITEM_FILE "plugins/mesh/genmesh/persist/standard/gmeshldr.tok"
+#include "cstool/tokenlist.h"
+#undef CS_TOKEN_ITEM_FILE 
 
 public:
   /// Constructor.
@@ -105,7 +112,11 @@ private:
   iObjectRegistry* object_reg;
   csRef<iReporter> reporter;
   csRef<iSyntaxService> synldr;
+
   csStringHash xmltokens;
+#define CS_TOKEN_ITEM_FILE "plugins/mesh/genmesh/persist/standard/gmeshldr.tok"
+#include "cstool/tokenlist.h"
+#undef CS_TOKEN_ITEM_FILE 
 
 public:
   /// Constructor.
@@ -154,6 +165,9 @@ public:
   virtual bool WriteDown (iBase *obj, iDocumentNode* parent,
   	iStreamSource*);
 };
+
+}
+CS_PLUGIN_NAMESPACE_END(GenMeshLoader)
 
 #endif // __CS_GMESHLDR_H__
 

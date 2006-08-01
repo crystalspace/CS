@@ -15,6 +15,9 @@ chronological order.
 	  buffer with indices instead of a pointer to a triangle array. Also
 	  added some management methods - submeshes can be given a name,
 	  enumerated, and selectively deleted.
+	- res updated the genmesh loader to support index buffer specification
+	  for genmeshes.
+	- res added submesh saving to the genmesh saver.
 31-Jul-2006
 	- Jorrit fixed compilation of xmlshader. It was using a wrong
 	  CS_GNUC_PRINTF.
