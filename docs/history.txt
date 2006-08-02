@@ -8,6 +8,7 @@ chronological order.
 
 2-Aug-2006
 	- res added operatir+= to csRenderBufferLock<>.
+	- res fixed a stupid typo in the gmeshldr index buffer check.
 1-Aug-2006
 	- res changed the csRenderBufferLock pre-increment operator to return
 	  the element after incrementation.

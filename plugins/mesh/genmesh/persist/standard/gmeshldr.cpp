@@ -163,7 +163,7 @@ bool csGeneralFactoryLoader::ParseSubMesh(iDocumentNode *node,
           style = New;
           indexbuffer = synldr->ParseRenderBuffer (child);
           if (!indexbuffer.IsValid()) return false;
-          if (indexbuffer->IsIndexBuffer())
+          if (!indexbuffer->IsIndexBuffer())
           {
             synldr->ReportError (
               "crystalspace.genmeshloader.parse.buffertype",
@@ -1049,7 +1049,7 @@ bool csGeneralMeshLoader::ParseSubMesh(iDocumentNode *node,
           style = New;
           indexbuffer = synldr->ParseRenderBuffer (child);
           if (!indexbuffer.IsValid()) return false;
-          if (indexbuffer->IsIndexBuffer())
+          if (!indexbuffer->IsIndexBuffer())
           {
             synldr->ReportError (
               "crystalspace.genmeshloader.parse.buffertype",
