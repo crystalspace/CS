@@ -56,11 +56,12 @@ namespace genmeshify
     bool ProcessPlugins (iDocumentNode* from, iDocumentNode* to);
     bool ProcessSector (iDocumentNode* from, iDocumentNode* to);
     bool ProcessMeshfactOrObj (iDocumentNode* from, iDocumentNode* to,
-      iDocumentNode* factoryInsertBefore, bool factory);
+      iDocumentNode* sectorNode, bool factory);
     bool ConvertMeshfactOrObj (const char* name, iDocumentNode* from, 
-      iDocumentNode* to, iDocumentNode* factoryInsertBefore, bool factory);
+      iDocumentNode* to, iDocumentNode* sectorNode, bool factory);
 
     bool PreloadTexturesMaterials (iDocumentNode* from);
+    bool PreloadSectors (iDocumentNode* from);
   public:
     Processor (App* app, const char* filename);
     ~Processor ();

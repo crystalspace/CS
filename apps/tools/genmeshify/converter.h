@@ -28,6 +28,7 @@ namespace genmeshify
   {
     App* app;
     csRef<iLoaderContext> context;
+    csRef<iRegion> region;
 
     csRef<iLoaderPlugin> thingFactLoader;
     csRef<iLoaderPlugin> thingObjLoader;
@@ -48,12 +49,13 @@ namespace genmeshify
     };
 
     bool CopyThingToGM (iThingFactoryState* from, iGeneralFactoryState* to);
+    bool ExtractPortals (iMeshWrapper* mesh, iDocumentNode* to);
   public:
-    Converter (App* app, iLoaderContext* context);
+    Converter (App* app, iLoaderContext* context, iRegion* region);
   
     bool ConvertMeshFact (iDocumentNode* from, iDocumentNode* to);
     bool ConvertMeshObj (const char* name, iDocumentNode* from, 
-      iDocumentNode* to, iDocumentNode* factoryInsertBefore);
+      iDocumentNode* to, iDocumentNode* sectorNode);
   };
 }
 

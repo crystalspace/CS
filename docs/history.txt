@@ -25,6 +25,7 @@ chronological order.
 	- res changed the csRenderBufferLock<> ++ and += operators to only 
 	  check whether the returned element is in range when it's really 
 	  used.
+	- res added portal support to genmeshify.
 1-Aug-2006
 	- res changed the csRenderBufferLock pre-increment operator to return
 	  the element after incrementation.

@@ -72,6 +72,10 @@ namespace genmeshify
     synsrv = csQueryRegistry<iSyntaxService> (objectRegistry);
     if (!synsrv) return Report ("No iSyntaxService!");
 
+    saver = csQueryRegistryOrLoad<iSaver> (objectRegistry,
+      "crystalspace.level.saver");
+    if (!saver) return Report ("No iSaver!");
+    
     vfs = csQueryRegistry<iVFS> (objectRegistry);
     if (!vfs) return Report ("No iVFS!");
 

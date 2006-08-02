@@ -47,6 +47,7 @@ namespace genmeshify
     csRef<iPluginManager> pluginManager;
     csRef<iVFS> vfs;
     csRef<iSyntaxService> synsrv;
+    csRef<iSaver> saver;
     iObjectRegistry *objectRegistry;
   };
 }

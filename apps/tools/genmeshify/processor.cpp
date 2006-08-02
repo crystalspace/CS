@@ -33,7 +33,7 @@ namespace genmeshify
     region = app->engine->CreateRegion (
       csString().Format ("__genmeshify_region_%d__", n++));
     loaderContext = app->engine->CreateLoaderContext (region, false);
-    converter = new Converter (app, loaderContext);
+    converter = new Converter (app, loaderContext, region);
   }
 
   Processor::~Processor ()
@@ -161,6 +161,7 @@ namespace genmeshify
   bool Processor::ProcessWorld (iDocumentNode* from, iDocumentNode* to)
   {
     PreloadTexturesMaterials (from);
+    PreloadSectors (from);
 
     to->SetValue (from->GetValue ());
     csRef<iDocumentNodeIterator> it = from->GetNodes ();
@@ -229,6 +230,7 @@ namespace genmeshify
   bool Processor::ProcessSector (iDocumentNode* from, iDocumentNode* to)
   {
     to->SetValue (from->GetValue ());
+
     csRef<iDocumentNodeIterator> it = from->GetNodes ();
     while (it->HasNext ())
     {
@@ -256,7 +258,7 @@ namespace genmeshify
   }
 
   bool Processor::ProcessMeshfactOrObj (iDocumentNode* from, iDocumentNode* to,
-                                        iDocumentNode* factoryInsertBefore,
+                                        iDocumentNode* sectorNode,
                                         bool factory)
   {
     do
@@ -292,7 +294,7 @@ namespace genmeshify
           else if (strcmp (child->GetValue (), "params") == 0)
           {
             if (!ConvertMeshfactOrObj (from->GetAttributeValue ("name"),
-              from, to, factoryInsertBefore, factory)) 
+              from, to, sectorNode, factory)) 
               return false;
           }
           else
@@ -312,13 +314,13 @@ namespace genmeshify
 
   bool Processor::ConvertMeshfactOrObj (const char* name, iDocumentNode* from, 
                                         iDocumentNode* to,
-                                        iDocumentNode* factoryInsertBefore, 
+                                        iDocumentNode* sectorNode, 
                                         bool factory)
   {
     if (factory)
       return converter->ConvertMeshFact (from, to);
     else
-      return converter->ConvertMeshObj (name, from, to, factoryInsertBefore);
+      return converter->ConvertMeshObj (name, from, to, sectorNode);
   }
 
   bool Processor::PreloadTexturesMaterials (iDocumentNode* from)
@@ -353,5 +355,22 @@ namespace genmeshify
     }
 
     return app->loader->LoadMap (to, false, region, false);
+  }
+
+  bool Processor::PreloadSectors (iDocumentNode* from)
+  {
+    // Needed so portals are written out properly
+    csRef<iDocumentNodeIterator> sectorIt = from->GetNodes ("sector");
+    while (sectorIt->HasNext ())
+    {
+      csRef<iDocumentNode> child = sectorIt->Next();
+      const char* name = child->GetAttributeValue ("name");
+      if (name)
+      {
+        iSector* sector = app->engine->CreateSector (name); 
+        region->QueryObject()->ObjAdd (sector->QueryObject());
+      }
+    }
+    return true;
   }
 }

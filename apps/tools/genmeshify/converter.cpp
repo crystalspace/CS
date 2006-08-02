@@ -24,8 +24,8 @@
 
 namespace genmeshify
 {
-  Converter::Converter (App* app, iLoaderContext* context) : app (app), 
-    context (context)
+  Converter::Converter (App* app, iLoaderContext* context, iRegion* region) : 
+    app (app), context (context), region (region)
   {
     gmfactSaver = csLoadPluginCheck<iSaverPlugin> (app->objectRegistry,
       "crystalspace.mesh.saver.factory.genmesh", true);
@@ -52,7 +52,7 @@ namespace genmeshify
 
   bool Converter::ConvertMeshObj (const char* name,
                                   iDocumentNode* from, iDocumentNode* to,
-                                  iDocumentNode* factoryInsertBefore)
+                                  iDocumentNode* sectorNode)
   {
     if (!thingObjLoader.IsValid()) return false;
 
@@ -60,6 +60,7 @@ namespace genmeshify
     if (!paramsNode) return false;
 
     csRef<iMeshWrapper> meshWrap = app->engine->CreateMeshWrapper (name);
+    region->QueryObject ()->ObjAdd (meshWrap->QueryObject());
 
     csRef<iBase> obj = thingObjLoader->Parse (paramsNode, 0, context, meshWrap);
     if (!obj) return false;
@@ -69,14 +70,7 @@ namespace genmeshify
       app->Report ("Loaded mesh object does not implement iMeshObject");
       return false;
     }
-
-    csRef<iThingFactoryState> thingfact = 
-      scfQueryInterface<iThingFactoryState> (mobj->GetFactory ());
-    if (!thingfact)
-    {
-      app->Report ("Loaded mesh object does not supply an iThingFactoryState");
-      return false;
-    }
+    meshWrap->SetMeshObject (mobj);
 
     // Check for a hard transform
     {
@@ -100,8 +94,16 @@ namespace genmeshify
 	    return false;
           tr.SetOrigin (v);
 	}
-        mobj->GetFactory ()->HardTransform (tr);
+        meshWrap->HardTransform (tr);
       }
+    }
+
+    csRef<iThingFactoryState> thingfact = 
+      scfQueryInterface<iThingFactoryState> (mobj->GetFactory ());
+    if (!thingfact)
+    {
+      app->Report ("Loaded mesh object does not supply an iThingFactoryState");
+      return false;
     }
 
     csString factoryName;
@@ -117,6 +119,7 @@ namespace genmeshify
       app->Report ("Could not create genmesh factory");
       return false;
     }
+    region->QueryObject ()->ObjAdd (mfw->QueryObject());
     csRef<iMeshObjectFactory> mof = mfw->GetMeshObjectFactory();
     csRef<iGeneralFactoryState> gmfact = 
       scfQueryInterface<iGeneralFactoryState> (mof);
@@ -129,8 +132,8 @@ namespace genmeshify
 
     {
       csRef<iDocumentNode> factoryNode = 
-        factoryInsertBefore->GetParent()->CreateNodeBefore (CS_NODE_ELEMENT,
-          factoryInsertBefore);
+        sectorNode->GetParent()->CreateNodeBefore (CS_NODE_ELEMENT,
+          sectorNode);
       factoryNode->SetValue ("meshfact");
       factoryNode->SetAttribute ("name", factoryName);
 
@@ -148,6 +151,8 @@ namespace genmeshify
     if (!gmObj.IsValid()) return false;
     gmObj->SetMixMode (mobj->GetMixMode ());
     if (!gmSaver->WriteDown (gmObj, to, 0)) return false;
+
+    if (!ExtractPortals (meshWrap, sectorNode)) return false;
 
     return true;
   }
@@ -250,6 +255,35 @@ namespace genmeshify
       }
     }
     
+    return true;
+  }
+
+  bool Converter::ExtractPortals (iMeshWrapper* mesh, iDocumentNode* to)
+  {
+    csRef<iDocumentNode> portalsNode;
+
+    iSceneNode* sceneNode = mesh->QuerySceneNode ();
+    csRef<iSceneNodeArray> nodeChildren = sceneNode->GetChildrenArray ();
+    for (size_t c = 0; c < nodeChildren->GetSize(); c++)
+    {
+      iSceneNode* childNode = nodeChildren->Get (c);
+      iMeshWrapper* childMesh = childNode->QueryMesh ();
+      if (!childMesh) continue;
+      iPortalContainer* portals = childMesh->GetPortalContainer ();
+      if (!portals) continue;
+
+      for (int p = 0; p < portals->GetPortalCount(); p++)
+      {
+        iPortal* portal = portals->GetPortal (p);
+        if (!portalsNode.IsValid())
+        {
+          portalsNode = to->CreateNodeBefore (CS_NODE_ELEMENT, 0);
+          portalsNode->SetValue ("portals");
+        }
+        if (!app->saver->SavePortal (portal, portalsNode)) return false;
+      }
+    }
+
     return true;
   }
 }
