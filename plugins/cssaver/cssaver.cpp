@@ -768,7 +768,7 @@ bool csSaver::SaveSectorMeshes(iMeshList* meshList,
     if (portal) 
     {
       for (int i=0; i<portal->GetPortalCount(); i++)
-        if (!SavePortals(portal->GetPortal(i), parent)) continue;
+        if (!SavePortal (portal->GetPortal(i), parent)) continue;
 
       continue;
     }
@@ -885,7 +885,7 @@ bool csSaver::SaveSectorMeshes(const csRefArray<iSceneNode>& meshList,
     if (portal) 
     {
       for (int i=0; i<portal->GetPortalCount(); i++)
-        if (!SavePortals(portal->GetPortal(i), parent)) continue;
+        if (!SavePortal (portal->GetPortal(i), parent)) continue;
 
       continue;
     }
@@ -983,7 +983,7 @@ bool csSaver::SaveSectorMeshes(const csRefArray<iSceneNode>& meshList,
   return true;
 }
 
-bool csSaver::SavePortals(iPortal *portal, iDocumentNode *parent)
+bool csSaver::SavePortal (iPortal *portal, iDocumentNode *parent)
 {
   portal->CompleteSector(0);
 

@@ -17,6 +17,8 @@ chronological order.
 	  (if not all) of the current usage does not unlock a buffer in the
 	  middle of some operations.
 	- Jorrit fixed compilation of genmesh on gcc.
+	- res changed the saver plugin to also expose the portal saving 
+	  method.
 1-Aug-2006
 	- res changed the csRenderBufferLock pre-increment operator to return
 	  the element after incrementation.
