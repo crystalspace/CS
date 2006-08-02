@@ -132,17 +132,22 @@ public:
   T* operator++ ()
   {
     currElement++;
-    CS_ASSERT(currElement<elements);
-    return Lock() + currElement;
+    return Get (currElement);
   }
 
   /// Set current element to the next, post-increment version.
   T* operator++ (int)
   {
-    CS_ASSERT(currElement<elements);
-    T* p = Lock() + currElement;
+    T* p = Get (currElement);
     currElement++;
     return p;
+  }
+
+  /// Add a value to the current element index.
+  T* operator+= (int n)
+  {
+    currElement += n;
+    return Lock() + currElement;
   }
 
   /// Retrieve an item in the render buffer.

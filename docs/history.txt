@@ -6,7 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
-01-Aug-2006
+2-Aug-2006
+	- res added operatir+= to csRenderBufferLock<>.
+1-Aug-2006
 	- res changed the csRenderBufferLock pre-increment operator to return
 	  the element after incrementation.
 	- res added a post-increment operator to csRenderBufferLock, allowing
