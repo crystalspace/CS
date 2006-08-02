@@ -55,7 +55,51 @@ class csRenderBufferLock
 #endif
   /// Index of current element
   size_t currElement;
-  
+
+  typedef csRenderBufferLock<T, TbufferKeeper> LockType;
+  /**
+   * Helper class used when returning values from operators such as
+   * ++ or +=. The idea is that these operators should return a pointer
+   * to the element, yet should check accesses for validity in debug mode.
+   * However, it is quite common to increment the element pointer beyond
+   * the last element in loops, but not use it. Checking the element number
+   * for validity may throw a false alarm in this cases. Hence this class
+   * to allow for "delayed" checking.
+   */
+  struct PointerProxy
+  {
+  #ifdef CS_DEBUG
+    const LockType& parent;
+    size_t elemNum;
+  #else
+    T* p;
+  #endif
+
+    PointerProxy (const LockType& parent, size_t elemNum) 
+  #ifdef CS_DEBUG
+      : parent (parent), elemNum (elemNum)
+  #else
+      p (&parent.Get (elemNum))
+  #endif
+    { }
+    T& operator*()
+    {
+  #ifdef CS_DEBUG
+      return parent.Get (elemNum);
+  #else
+      return *p;
+  #endif
+    }
+    const T& operator*() const
+    {
+  #ifdef CS_DEBUG
+      return parent.Get (elemNum);
+  #else
+      return *p;
+  #endif
+    }
+  };
+
   csRenderBufferLock() {}
   // Copying the locking stuff is somewhat nasty so ... prevent it
   csRenderBufferLock (const csRenderBufferLock& other) {}
@@ -94,7 +138,7 @@ public:
    * Lock the renderbuffer. Returns a pointer to the contained data.
    * \remarks Watch the stride of the buffer.
    */
-  T* Lock ()
+  T* Lock () const
   {
     return lockBuf;
   }
@@ -103,47 +147,47 @@ public:
    * Retrieve a pointer to the contained data.
    * \remarks Watch the stride of the buffer.
    **/
-  operator T* ()
+  operator T* () const
   {
     return Lock();
   }
 
   /// Get current element.
-  T& operator*()
+  T& operator*() const
   {
     return Get (currElement);
   }
 
   /// Set current element to the next, pre-increment version.
-  T* operator++ ()  
+  PointerProxy operator++ ()  
   {
     currElement++;
-    return &Get (currElement);
+    return PointerProxy (*this, currElement);
   }
 
   /// Set current element to the next, post-increment version.
-  T* operator++ (int)
+  PointerProxy operator++ (int)
   {
-    T* p = &Get (currElement);
+    size_t n = currElement;
     currElement++;
-    return p;
+    return PointerProxy (*this, n);
   }
 
   /// Add a value to the current element index.
-  T* operator+= (int n)
+  PointerProxy operator+= (int n)
   {
     currElement += n;
-    return &Get (currElement);
+    return PointerProxy (*this, currElement);
   }
 
   /// Retrieve an item in the render buffer.
-  T& operator [] (size_t n)
+  T& operator [] (size_t n) const
   {
     return Get (n);
   }
 
   /// Retrieve an item in the render buffer.
-  T& Get (size_t n)
+  T& Get (size_t n) const
   {
     CS_ASSERT (n < elements);
     return *((T*)((uint8*)Lock() + n * bufStride));
