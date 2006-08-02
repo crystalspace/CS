@@ -60,7 +60,6 @@ package cspace;
 *__eq__ = *cspacec::__eq__;
 *__ne__ = *cspacec::__ne__;
 *__gt__ = *cspacec::__gt__;
-*__lt__ = *cspacec::__lt__;
 *csDefaultRunLoop = *cspacec::csDefaultRunLoop;
 *csPlatformStartup = *cspacec::csPlatformStartup;
 *csPlatformShutdown = *cspacec::csPlatformShutdown;
@@ -73,6 +72,7 @@ package cspace;
 *csGetUsername = *cspacec::csGetUsername;
 *csGetPlatformConfigPath = *cspacec::csGetPlatformConfigPath;
 *csQueryRegistryTag = *cspacec::csQueryRegistryTag;
+*csHashCompute = *cspacec::csHashCompute;
 *csevMouse = *cspacec::csevMouse;
 *csevMouseOp = *cspacec::csevMouseOp;
 *csevJoystick = *cspacec::csevJoystick;
@@ -236,10 +236,48 @@ sub ACQUIRE {
 }
 
 
+############# Class : cspace::csArrayThresholdVariableCapacityLinear ##############
+
+package cspace::csArrayThresholdVariableCapacityLinear;
+@ISA = qw( cspace cspace::csArrayThresholdVariable );
+%OWNER = ();
+%ITERATORS = ();
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_csArrayThresholdVariableCapacityLinear(@_);
+    bless $self, $pkg if defined($self);
+}
+
+*IsCapacityExcessive = *cspacec::csArrayThresholdVariableCapacityLinear_IsCapacityExcessive;
+*GetCapacity = *cspacec::csArrayThresholdVariableCapacityLinear_GetCapacity;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_csArrayThresholdVariableCapacityLinear($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
 ############# Class : cspace::csArrayCapacityDefault ##############
 
 package cspace::csArrayCapacityDefault;
-@ISA = qw( cspace );
+@ISA = qw( cspace cspace::csArrayThresholdVariableCapacityLinear );
 %OWNER = ();
 %ITERATORS = ();
 sub new {
@@ -449,6 +487,7 @@ package cspace::iCommandLineParser;
 *GetResourceDir = *cspacec::iCommandLineParser_GetResourceDir;
 *GetAppDir = *cspacec::iCommandLineParser_GetAppDir;
 *GetAppPath = *cspacec::iCommandLineParser_GetAppPath;
+*GetOptionName = *cspacec::iCommandLineParser_GetOptionName;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -644,6 +683,51 @@ sub DESTROY {
 *Clear = *cspacec::csStringSet_Clear;
 *GetSize = *cspacec::csStringSet_GetSize;
 *IsEmpty = *cspacec::csStringSet_IsEmpty;
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::csStringIDSet ##############
+
+package cspace::csStringIDSet;
+@ISA = qw( cspace );
+%OWNER = ();
+%ITERATORS = ();
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_csStringIDSet(@_);
+    bless $self, $pkg if defined($self);
+}
+
+*Add = *cspacec::csStringIDSet_Add;
+*AddNoTest = *cspacec::csStringIDSet_AddNoTest;
+*Contains = *cspacec::csStringIDSet_Contains;
+*In = *cspacec::csStringIDSet_In;
+*DeleteAll = *cspacec::csStringIDSet_DeleteAll;
+*Empty = *cspacec::csStringIDSet_Empty;
+*Delete = *cspacec::csStringIDSet_Delete;
+*GetSize = *cspacec::csStringIDSet_GetSize;
+*IsEmpty = *cspacec::csStringIDSet_IsEmpty;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_csStringIDSet($self);
+        delete $OWNER{$self};
+    }
+}
+
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -2939,6 +3023,119 @@ sub ACQUIRE {
 }
 
 
+############# Class : cspace::csShaderVariableArrayReadOnly ##############
+
+package cspace::csShaderVariableArrayReadOnly;
+@ISA = qw( cspace cspace::iBase );
+%OWNER = ();
+%ITERATORS = ();
+*GetSize = *cspacec::csShaderVariableArrayReadOnly_GetSize;
+*Get = *cspacec::csShaderVariableArrayReadOnly_Get;
+*Top = *cspacec::csShaderVariableArrayReadOnly_Top;
+*Find = *cspacec::csShaderVariableArrayReadOnly_Find;
+*GetIndex = *cspacec::csShaderVariableArrayReadOnly_GetIndex;
+*IsEmpty = *cspacec::csShaderVariableArrayReadOnly_IsEmpty;
+*GetAll = *cspacec::csShaderVariableArrayReadOnly_GetAll;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_csShaderVariableArrayReadOnly($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::csShaderVariableArrayChangeElements ##############
+
+package cspace::csShaderVariableArrayChangeElements;
+@ISA = qw( cspace cspace::csShaderVariableArrayReadOnly );
+%OWNER = ();
+%ITERATORS = ();
+*Get = *cspacec::csShaderVariableArrayChangeElements_Get;
+*Top = *cspacec::csShaderVariableArrayChangeElements_Top;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_csShaderVariableArrayChangeElements($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::csShaderVariableArray ##############
+
+package cspace::csShaderVariableArray;
+@ISA = qw( cspace cspace::csShaderVariableArrayChangeElements );
+%OWNER = ();
+%ITERATORS = ();
+*SetSize = *cspacec::csShaderVariableArray_SetSize;
+*GetExtend = *cspacec::csShaderVariableArray_GetExtend;
+*Put = *cspacec::csShaderVariableArray_Put;
+*Push = *cspacec::csShaderVariableArray_Push;
+*PushSmart = *cspacec::csShaderVariableArray_PushSmart;
+*Pop = *cspacec::csShaderVariableArray_Pop;
+*Insert = *cspacec::csShaderVariableArray_Insert;
+*DeleteAll = *cspacec::csShaderVariableArray_DeleteAll;
+*Truncate = *cspacec::csShaderVariableArray_Truncate;
+*Empty = *cspacec::csShaderVariableArray_Empty;
+*DeleteIndex = *cspacec::csShaderVariableArray_DeleteIndex;
+*DeleteIndexFast = *cspacec::csShaderVariableArray_DeleteIndexFast;
+*Delete = *cspacec::csShaderVariableArray_Delete;
+*DeleteFast = *cspacec::csShaderVariableArray_DeleteFast;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_csShaderVariableArray($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
 ############# Class : cspace::csPluginRequest ##############
 
 package cspace::csPluginRequest;
@@ -4191,6 +4388,30 @@ sub ACQUIRE {
 }
 
 
+############# Class : cspace::scfPath ##############
+
+package cspace::scfPath;
+@ISA = qw( cspace cspace::iPath );
+%OWNER = ();
+*IncRef = *cspacec::scfPath_IncRef;
+*DecRef = *cspacec::scfPath_DecRef;
+*GetRefCount = *cspacec::scfPath_GetRefCount;
+*QueryInterface = *cspacec::scfPath_QueryInterface;
+*AddRefOwner = *cspacec::scfPath_AddRefOwner;
+*RemoveRefOwner = *cspacec::scfPath_RemoveRefOwner;
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
 ############# Class : cspace::csMeshedPolygon ##############
 
 package cspace::csMeshedPolygon;
@@ -4275,7 +4496,7 @@ sub ACQUIRE {
 ############# Class : cspace::csPath ##############
 
 package cspace::csPath;
-@ISA = qw( cspace );
+@ISA = qw( cspace cspace::scfPath );
 %OWNER = ();
 %ITERATORS = ();
 sub new {
@@ -6821,6 +7042,119 @@ sub ACQUIRE {
 }
 
 
+############# Class : cspace::csSprite2DVertexArrayReadOnly ##############
+
+package cspace::csSprite2DVertexArrayReadOnly;
+@ISA = qw( cspace cspace::iBase );
+%OWNER = ();
+%ITERATORS = ();
+*GetSize = *cspacec::csSprite2DVertexArrayReadOnly_GetSize;
+*Get = *cspacec::csSprite2DVertexArrayReadOnly_Get;
+*Top = *cspacec::csSprite2DVertexArrayReadOnly_Top;
+*Find = *cspacec::csSprite2DVertexArrayReadOnly_Find;
+*GetIndex = *cspacec::csSprite2DVertexArrayReadOnly_GetIndex;
+*IsEmpty = *cspacec::csSprite2DVertexArrayReadOnly_IsEmpty;
+*GetAll = *cspacec::csSprite2DVertexArrayReadOnly_GetAll;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_csSprite2DVertexArrayReadOnly($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::csSprite2DVertexArrayChangeElements ##############
+
+package cspace::csSprite2DVertexArrayChangeElements;
+@ISA = qw( cspace cspace::csSprite2DVertexArrayReadOnly );
+%OWNER = ();
+%ITERATORS = ();
+*Get = *cspacec::csSprite2DVertexArrayChangeElements_Get;
+*Top = *cspacec::csSprite2DVertexArrayChangeElements_Top;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_csSprite2DVertexArrayChangeElements($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::csSprite2DVertexArrayChangeAll ##############
+
+package cspace::csSprite2DVertexArrayChangeAll;
+@ISA = qw( cspace cspace::csSprite2DVertexArrayChangeElements );
+%OWNER = ();
+%ITERATORS = ();
+*SetSize = *cspacec::csSprite2DVertexArrayChangeAll_SetSize;
+*GetExtend = *cspacec::csSprite2DVertexArrayChangeAll_GetExtend;
+*Put = *cspacec::csSprite2DVertexArrayChangeAll_Put;
+*Push = *cspacec::csSprite2DVertexArrayChangeAll_Push;
+*PushSmart = *cspacec::csSprite2DVertexArrayChangeAll_PushSmart;
+*Pop = *cspacec::csSprite2DVertexArrayChangeAll_Pop;
+*Insert = *cspacec::csSprite2DVertexArrayChangeAll_Insert;
+*DeleteAll = *cspacec::csSprite2DVertexArrayChangeAll_DeleteAll;
+*Truncate = *cspacec::csSprite2DVertexArrayChangeAll_Truncate;
+*Empty = *cspacec::csSprite2DVertexArrayChangeAll_Empty;
+*DeleteIndex = *cspacec::csSprite2DVertexArrayChangeAll_DeleteIndex;
+*DeleteIndexFast = *cspacec::csSprite2DVertexArrayChangeAll_DeleteIndexFast;
+*Delete = *cspacec::csSprite2DVertexArrayChangeAll_Delete;
+*DeleteFast = *cspacec::csSprite2DVertexArrayChangeAll_DeleteFast;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_csSprite2DVertexArrayChangeAll($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
 ############# Class : cspace::csSprite2DVertex ##############
 
 package cspace::csSprite2DVertex;
@@ -6871,7 +7205,7 @@ sub ACQUIRE {
 ############# Class : cspace::iColoredVertices ##############
 
 package cspace::iColoredVertices;
-@ISA = qw( cspace );
+@ISA = qw( cspace cspace::csSprite2DVertexArrayChangeAll );
 %OWNER = ();
 %ITERATORS = ();
 sub DESTROY {
@@ -9945,6 +10279,7 @@ package cspace::iEvent;
 *RetrieveUInt8 = *cspacec::iEvent_RetrieveUInt8;
 *RetrieveInt16 = *cspacec::iEvent_RetrieveInt16;
 *RetrieveUInt16 = *cspacec::iEvent_RetrieveUInt16;
+*RetrieveInt32 = *cspacec::iEvent_RetrieveInt32;
 *RetrieveUInt32 = *cspacec::iEvent_RetrieveUInt32;
 *RetrieveFloat = *cspacec::iEvent_RetrieveFloat;
 *RetrieveDouble = *cspacec::iEvent_RetrieveDouble;
@@ -9955,6 +10290,7 @@ package cspace::iEvent;
 *Remove = *cspacec::iEvent_Remove;
 *RemoveAll = *cspacec::iEvent_RemoveAll;
 *GetAttributeIterator = *cspacec::iEvent_GetAttributeIterator;
+*RetrieveString = *cspacec::iEvent_RetrieveString;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -10378,6 +10714,44 @@ sub DESTROY {
 }
 
 *scfGetVersion = *cspacec::iEventQueue_scfGetVersion;
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::csStrKey ##############
+
+package cspace::csStrKey;
+@ISA = qw( cspace );
+%OWNER = ();
+%ITERATORS = ();
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_csStrKey(@_);
+    bless $self, $pkg if defined($self);
+}
+
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_csStrKey($self);
+        delete $OWNER{$self};
+    }
+}
+
+*__copy__ = *cspacec::csStrKey___copy__;
+*GetHash = *cspacec::csStrKey_GetHash;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -12009,7 +12383,7 @@ sub ACQUIRE {
 ############# Class : cspace::iShaderVarStack ##############
 
 package cspace::iShaderVarStack;
-@ISA = qw( cspace );
+@ISA = qw( cspace cspace::csShaderVariableArray );
 %OWNER = ();
 %ITERATORS = ();
 sub DESTROY {
@@ -14319,6 +14693,7 @@ package cspace::iEngineSequenceManager;
 *FindSequenceByName = *cspacec::iEngineSequenceManager_FindSequenceByName;
 *RunSequenceByName = *cspacec::iEngineSequenceManager_RunSequenceByName;
 *FireTimedOperation = *cspacec::iEngineSequenceManager_FireTimedOperation;
+*DestroyTimedOperations = *cspacec::iEngineSequenceManager_DestroyTimedOperations;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});

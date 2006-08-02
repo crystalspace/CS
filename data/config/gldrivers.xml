@@ -219,13 +219,6 @@
         </ShaderManager>
       </Video>
     </config>
-    <config name="forceprecompressedDXTupload">
-      <Video>
-	<OpenGL>
-	  <ForcePrecompressedDXTUpload>yes</ForcePrecompressedDXTUpload>
-	</OpenGL>
-      </Video>
-    </config>
     <config name="useAFP2D">
       <Video>
 	<OpenGL>
@@ -484,19 +477,23 @@
 
  
     <!--
+      * 2006-06-05: ATI Radeon 9700Pro, Win32, OpenGL 2.0.5885 (Cat 6.5)
+		    Apparently NPOTS textures via glTexture2D don't get 
+		    garbled anymore.
+      -->
     <rule description="ATI: Enable hidden 2D texture NPOTS support">
       <conditions>
 	<regexp string="vendor" pattern="^ATI" />
 	<conditions fulfill="one">
-	  <regexp string="renderer" pattern="^R\(ADEON\|adeon\) 9\(5\|6\|7\|8\).." />
-	  <regexp string="renderer" pattern="^R\(ADEON\|adeon\) X..." />
+	  <regexp string="renderer" pattern="^R\(ADEON\|adeon\) 9\(5\|6\|7\|8\).*" />
+	  <regexp string="renderer" pattern="^R\(ADEON\|adeon\) X.*" />
 	</conditions>
+	<comparever version="gl" relation="ge 2.0.5885" />
       </conditions>
       <applicable>
 	<usecfg>hiddenNPOTS</usecfg>
       </applicable>
     </rule>
-    -->
     
     <rule description="Software GL tweaks">
       <conditions fulfill="one">
@@ -521,22 +518,5 @@
       </applicable>
     </rule>
     -->
-    
-    <!--
-      * 2005-12-24: DRI Intel supports DXT textures with at least Mesa 6.4.1.
-      -->
-    <rule description="Mesa DRI: Force upload of precompressed DXT textures">
-      <conditions fulfill="one">
-	<conditions fulfill="all">
-	  <!-- A renderer known to support DXT -->
-	  <regexp string="renderer" pattern="^Mesa DRI Intel" />
-	  <!-- Mesa version after which the driver supports DXT -->
-	  <comparever version="mesa" relation="ge 6.4.1" />
-	</conditions>
-      </conditions>
-      <applicable>
-	<usecfg>forceprecompressedDXTupload</usecfg>
-      </applicable>
-    </rule>
   </rules>
 </gldriverdb>

@@ -331,6 +331,19 @@ bool csInitializer::SetupConfigManager (
     }
   }
 
+  // Handle command line config settings
+  {
+    csRef<iCommandLineParser> cmdline = 
+      csQueryRegistry<iCommandLineParser> (r);
+    if (cmdline.IsValid())
+    {
+      csRef<csConfigFile> cmdlineConfig;
+      cmdlineConfig.AttachNew (new csConfigFile);
+      cmdlineConfig->ParseCommandLine (cmdline, VFS);
+      Config->AddDomain (cmdlineConfig, iConfigManager::ConfigPriorityCmdLine);
+    }
+  }
+
   config_done = true;
   return true;
 }

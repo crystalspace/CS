@@ -35,25 +35,24 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 CS_PLUGIN_NAMESPACE_BEGIN(GLShaderPS1)
 {
 
+const csPixelShaderParser::PS_InstructionData 
+  csPixelShaderParser::PS_Instructions[CS_PS_INS_END_OF_LIST] = {
+  {0, 0, false}, /* CS_PS_INS_INVALID */
+#define PS_INSTR(instr, args, psflags)				            \
+  {(psflags) & CS_PS_MASKVERSIONS, args, !((psflags) & CS_PS_UNSUPPORTED)},
+#define PS_VER_INSTR(x,y)						    \
+  {CS_PS_ALLVERSIONS, 0, true},
+#include "ps1_instr.inc"
+};
+
 void csPixelShaderParser::RegisterInstructions ()
 {
-  PS_Instructions[CS_PS_INS_INVALID].arguments = 0;
-  PS_Instructions[CS_PS_INS_INVALID].supported = false;
-  PS_Instructions[CS_PS_INS_INVALID].versions = 0;
-#define PS_INSTR(instr, args, psversion)				    \
-  PS_Instructions[CS_PS_INS_ ## instr].arguments = args;		    \
-  PS_Instructions[CS_PS_INS_ ## instr].versions = psversion;		    \
-  PS_Instructions[CS_PS_INS_ ## instr].supported = true;		    \
+#define PS_INSTR(instr, args, psflags)				            \
   instrStrings.Register (#instr, CS_PS_INS_ ## instr);
 #define PS_VER_INSTR(x,y)						    \
-  PS_Instructions[CS_PS_INS_PS_ ## x ## _ ## y].arguments = 0;		    \
-  PS_Instructions[CS_PS_INS_PS_ ## x ## _ ## y].versions = CS_PS_ALLVERSIONS;\
-  PS_Instructions[CS_PS_INS_PS_ ## x ## _ ## y].supported = true;	    \
   instrStrings.Register ("PS_" #x "_" #y, CS_PS_INS_PS_ ## x ## _ ## y);    \
   instrStrings.Register ("PS." #x "." #y, CS_PS_INS_PS_ ## x ## _ ## y);   
 #include "ps1_instr.inc"
-
-  PS_Instructions[CS_PS_INS_BEM].supported = false;
 }
 
 void csPixelShaderParser::Report (int severity, const char* msg, ...)

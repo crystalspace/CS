@@ -129,10 +129,10 @@ public:
  * Manager responsible for allocation and management of VBO buffers
  * and buffer slots
  */
-class csGLVBOBufferManager : public iBase
+class csGLVBOBufferManager :
+  public scfImplementation0<csGLVBOBufferManager>
 {
 public:
-  SCF_DECLARE_IBASE;
   CS_LEAKGUARD_DECLARE (csGLVBOBufferManager);
   csGLVBOBufferManager (csGLExtensionManager *ext, csGLStateCache *state, 
     iObjectRegistry* p);

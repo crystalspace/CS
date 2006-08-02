@@ -24,21 +24,24 @@
 #include "csutil/strhash.h"
 #include "csutil/csstring.h"
 
-class csPtDotsType : public csBaseProctexType
+class csPtDotsType :
+  public scfImplementationExt0<csPtDotsType, csBaseProctexType>
 {
 public:
   csPtDotsType (iBase *p);
   virtual csPtr<iTextureFactory> NewFactory();
 };
 
-class csPtDotsFactory : public csBaseTextureFactory
+class csPtDotsFactory :
+  public scfImplementationExt0<csPtDotsFactory, csBaseTextureFactory>
 {
 public:
   csPtDotsFactory (iTextureType* p, iObjectRegistry* object_reg);
   virtual csPtr<iTextureWrapper> Generate ();
 };
 
-class csPtDotsLoader : public csBaseProctexLoader
+class csPtDotsLoader :
+  public scfImplementationExt0<csPtDotsLoader, csBaseProctexLoader>
 {
   csStringHash tokens;
 //#define CS_TOKEN_ITEM_FILE "plugins/proctex/standard/dots.tok"
@@ -50,7 +53,8 @@ public:
     iStreamSource*, iLoaderContext* ldr_context, iBase* context);
 };
 
-class csPtDotsSaver : public csBaseProctexSaver
+class csPtDotsSaver :
+  public scfImplementationExt0<csPtDotsSaver, csBaseProctexSaver>
 {
 public:
   csPtDotsSaver(iBase *p);

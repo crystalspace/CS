@@ -71,12 +71,14 @@ class ConditionTree
     }
     ~Node ()
     {
+      if (branches[0]) branches[0]->~Node();
       owner->nodeAlloc.Free (branches[0]);
+      if (branches[1]) branches[1]->~Node();
       owner->nodeAlloc.Free (branches[1]);
     }
   };
 
-  csBlockAllocator<Node, TempHeapAlloc> nodeAlloc;
+  csFixedSizeAllocator<sizeof (Node), TempHeapAlloc> nodeAlloc;
   Node* root;
   int currentBranch;
   typedef csArray<Node*, csArrayElementHandler<Node*>, TempHeapAlloc> 
@@ -102,7 +104,7 @@ class ConditionTree
 public:
   ConditionTree (csConditionEvaluator& evaluator) : nodeAlloc (256), evaluator (evaluator)
   {
-    root = (Node*)nodeAlloc.AllocUninit();
+    root = (Node*)nodeAlloc.Alloc();
     new (root) Node (0, this);
     currentBranch = 0;
     NodeStackEntry newPair;
@@ -111,6 +113,7 @@ public:
   }
   ~ConditionTree ()
   {
+    root->~Node();
     nodeAlloc.Free (root);
   }
 
@@ -211,7 +214,7 @@ void ConditionTree::RecursiveAdd (csConditionID condition, Node* node,
         }
         for (int b = 0; b < 2; b++)
         {
-          Node* nn = (Node*)nodeAlloc.AllocUninit();
+          Node* nn = (Node*)nodeAlloc.Alloc();
           new (nn) Node (node, this);
           if (hasContainer)
           {
@@ -344,11 +347,22 @@ bool ConditionTree::HasContainingCondition (Node* node,
 
 //---------------------------------------------------------------------------
 
-CS_LEAKGUARD_IMPLEMENT(csWrappedDocumentNode);
+typedef csFixedSizeAllocator<sizeof (csWrappedDocumentNode::WrappedChild)> 
+  WrappedChildAlloc;
+CS_IMPLEMENT_STATIC_VAR (ChildAlloc, WrappedChildAlloc, (256));
 
-CS_IMPLEMENT_STATIC_CLASSVAR_REF(csWrappedDocumentNode::WrappedChild, 
-  childAlloc, ChildAlloc, 
-  csWrappedDocumentNode::WrappedChild::WrappedChildAlloc, (256));
+void* csWrappedDocumentNode::WrappedChild::operator new (size_t n)
+{
+  return ChildAlloc()->Alloc (n);
+}
+void csWrappedDocumentNode::WrappedChild::operator delete (void* p)
+{
+  ChildAlloc()->Free (p);
+}
+
+//---------------------------------------------------------------------------
+
+CS_LEAKGUARD_IMPLEMENT(csWrappedDocumentNode);
 
 template<typename ConditionEval>
 csWrappedDocumentNode::csWrappedDocumentNode (ConditionEval& eval,
@@ -380,7 +394,7 @@ static const ReplacedEntity entities[] = {
   {0, 0}
 };
 
-static const char* ReplaceEntities (const char* str, csString& scratch)
+static const char* ReplaceEntities (const char* str, TempString<>& scratch)
 {
   const ReplacedEntity* entity = entities;
   while (entity->entity != 0)
@@ -403,34 +417,126 @@ static const char* ReplaceEntities (const char* str, csString& scratch)
   return str;
 }
 
+static bool SplitNodeValue (const char* nodeStr, TempString<>& command, 
+                            TempString<>& args)
+{
+  TempString<> replaceScratch;
+  const char* nodeValue = ReplaceEntities (nodeStr, replaceScratch);
+  if ((nodeValue != 0) && (*nodeValue == '?') && 
+    (*(nodeValue + strlen (nodeValue) - 1) == '?'))
+  {
+    const char* valStart = nodeValue + 1;
+
+    while (*valStart == ' ') valStart++;
+    CS_ASSERT (*valStart != 0);
+    size_t valLen = strlen (valStart) - 1;
+    if (valLen != 0)
+    {
+      while (*(valStart + valLen - 1) == ' ') valLen--;
+      const char* space = strchr (valStart, ' ');
+      /* The rightmost spaces were skipped and don't interest us
+         any more. */
+      if (space >= valStart + valLen) space = 0;
+      size_t cmdLen;
+      if (space != 0)
+      {
+        cmdLen = space - valStart;
+      }
+      else
+      {
+        cmdLen = valLen;
+      }
+      command.Replace (valStart, cmdLen);
+      args.Replace (valStart + cmdLen, valLen - cmdLen);
+      args.LTrim();
+      return true;
+    }
+  }
+  return false;
+}
+
+static void GetNextArg (const char*& p, TempString<>& arg)
+{
+  arg.Clear();
+  if (p == 0) return;
+
+  while (isspace (*p)) p++;
+
+  if (*p == '"')
+  {
+    p++;
+    while (*p && *p != '"')
+    {
+      if (*p == '\\')
+      {
+        p++;
+        switch (*p)
+        {
+          case '"':
+            arg << '"';
+            p++;
+            break;
+          case '\\':
+            arg << '\\';
+            p++;
+            break;
+        }
+      }
+      else
+        arg << *p++;
+    }
+    p++;
+  }
+  else
+  {
+    while (*p && !isspace (*p)) arg << *p++;
+  }
+}
+
 struct WrapperStackEntry
 {
   csWrappedDocumentNode::WrappedChild* child;
 
   WrapperStackEntry () : child (0) {}
 };
+typedef csArray<WrapperStackEntry, csArrayElementHandler<WrapperStackEntry>,
+  TempHeapAlloc> WrapperStack;
 
 struct csWrappedDocumentNode::NodeProcessingState
 {
-  csArray<WrapperStackEntry> wrapperStack;
+  WrapperStack wrapperStack;
   WrapperStackEntry currentWrapper;
   csRef<iDocumentNodeIterator> iter;
 
   bool templActive;
   Template templ;
-  uint templNestCount;
-  csString templateName;
+  uint templNestLevel;
+  TempString<> templateName;
+  bool templWeak;
 
   bool generateActive;
   bool generateValid;
-  uint generateNestCount;
-  csString generateVar;
+  uint generateNestLevel;
+  TempString<> generateVar;
   int generateStart;
   int generateEnd;
   int generateStep;
 
-  NodeProcessingState() : templActive (false), generateActive (false),
-    generateValid (false) {}
+  struct StaticIfState
+  {
+    bool processNodes;
+    bool elseBranch;
+
+    StaticIfState(bool processNodes) : processNodes (processNodes), 
+      elseBranch (false) {}
+  };
+  csArray<StaticIfState, csArrayElementHandler<StaticIfState>,
+    TempHeapAlloc> staticIfStateStack;
+  csArray<uint, csArrayElementHandler<uint>, 
+    TempHeapAlloc> staticIfNest;
+
+  NodeProcessingState() : templActive (false), templWeak (false), 
+    generateActive (false), generateValid (false) {}
 };
 
 static const int syntaxErrorSeverity = CS_REPORTER_SEVERITY_WARNING;
@@ -445,7 +551,7 @@ void csWrappedDocumentNode::ParseCondition (WrapperStackEntry& newWrapper,
     condLen, newWrapper.child->condition);
   if (result)
   {
-    csString condStr;
+    TempString<> condStr;
     condStr.Append (cond, condLen);
     Report (syntaxErrorSeverity, node,
       "Error parsing condition '%s': %s", condStr.GetData(),
@@ -469,7 +575,7 @@ void csWrappedDocumentNode::CreateElseWrapper (NodeProcessingState* state,
 
 template<typename ConditionEval>
 void csWrappedDocumentNode::ProcessInclude (ConditionEval& eval, 
-                                            const csString& filename,
+                                            const TempString<>& filename,
 					    NodeProcessingState* state, 
 					    iDocumentNode* node)
 {
@@ -519,108 +625,85 @@ void csWrappedDocumentNode::ProcessInclude (ConditionEval& eval,
 }
 
 template<typename ConditionEval>
-void csWrappedDocumentNode::ProcessTemplate (ConditionEval& eval, 
+bool csWrappedDocumentNode::ProcessTemplate (ConditionEval& eval, 
                                              iDocumentNode* templNode, 
 					     NodeProcessingState* state)
 {
+  if (!(state->templActive || state->generateActive))
+    return false;
+
   Template::Nodes& templNodes = state->templ.nodes;
   csRef<iDocumentNode> node = templNode;
   if (node->GetType() == CS_NODE_UNKNOWN)
   {
-    csString replaceScratch;
-    const char* nodeValue = ReplaceEntities (node->GetValue(),
-      replaceScratch);
-    if ((nodeValue != 0) && (*nodeValue == '?') && 
-      (*(nodeValue + strlen (nodeValue) - 1) == '?'))
+    TempString<> tokenStr, args; 
+    if (SplitNodeValue (node->GetValue(), tokenStr, args))
     {
-      const char* valStart = nodeValue + 1;
-
-      while (*valStart == ' ') valStart++;
-      CS_ASSERT (*valStart != 0);
-      size_t valLen = strlen (valStart) - 1;
-      if (valLen != 0)
+      csStringID tokenID = shared->pitokens.Request (tokenStr);
+      switch (tokenID)
       {
-	while (*(valStart + valLen - 1) == ' ') valLen--;
-	const char* space = strchr (valStart, ' ');
-	/* The rightmost spaces were skipped and don't interest us
-	    any more. */
-	if (space >= valStart + valLen) space = 0;
-	size_t cmdLen;
-	if (space != 0)
-	{
-	  cmdLen = space - valStart;
-	}
-	else
-	{
-	  cmdLen = valLen;
-	}
-	csString tokenStr; tokenStr.Replace (valStart, cmdLen);
-	csStringID tokenID = shared->pitokens.Request (tokenStr);
-	switch (tokenID)
-	{
-	  case csWrappedDocumentNodeFactory::PITOKEN_ENDTEMPLATE:
-            if (shared->plugin->do_verbose)
-            {
-              Report (CS_REPORTER_SEVERITY_WARNING, node,
-                "Deprecated syntax, please use 'Endtemplate'");
-            }
-            // Fall through
-	  case csWrappedDocumentNodeFactory::PITOKEN_ENDTEMPLATE_NEW:
-            if (!state->generateActive)
-            {
-	      state->templNestCount--;
-	      if (state->templNestCount != 0)
+        case csWrappedDocumentNodeFactory::PITOKEN_ENDTEMPLATE:
+          if (shared->plugin->do_verbose)
+          {
+            Report (CS_REPORTER_SEVERITY_WARNING, node,
+              "Deprecated syntax, please use 'Endtemplate'");
+          }
+          // Fall through
+	case csWrappedDocumentNodeFactory::PITOKEN_ENDTEMPLATE_NEW:
+          if (!state->generateActive)
+          {
+	      state->templNestLevel--;
+	      if (state->templNestLevel != 0)
 	        templNodes.Push (node);
-            }
-            else
-              templNodes.Push (node);
+          }
+          else
+            templNodes.Push (node);
 	    break;
-	  case csWrappedDocumentNodeFactory::PITOKEN_TEMPLATE:
-            if (shared->plugin->do_verbose)
-            {
-              Report (CS_REPORTER_SEVERITY_WARNING, node,
-                "Deprecated syntax, please use 'Template'");
-            }
-            // Fall through
-	  case csWrappedDocumentNodeFactory::PITOKEN_TEMPLATE_NEW:
-            if (!state->generateActive)
-	      state->templNestCount++;
+	case csWrappedDocumentNodeFactory::PITOKEN_TEMPLATE:
+          if (shared->plugin->do_verbose)
+          {
+            Report (CS_REPORTER_SEVERITY_WARNING, node,
+              "Deprecated syntax, please use 'Template'");
+          }
+          // Fall through
+	case csWrappedDocumentNodeFactory::PITOKEN_TEMPLATE_NEW:
+	case csWrappedDocumentNodeFactory::PITOKEN_TEMPLATEWEAK:
+          if (!state->generateActive)
+	      state->templNestLevel++;
 	    // Fall through
-	  default:
+	default:
 	    {
 	      Template* templ;
 	      if ((!state->generateActive)
-                && (state->templNestCount == 1)
+                && (state->templNestLevel == 1)
 		&& (templ = globalState->templates.GetElementPointer (tokenStr)))
 	      {
 		Template::Params templArgs;
-		csString pStr (valStart + cmdLen, valLen - cmdLen);
-		pStr.Trim();
-		ParseTemplateArguments (pStr, templArgs);
+		ParseTemplateArguments (args, templArgs, false);
 		InvokeTemplate (templ, templArgs, templNodes);
 	      }
 	      else
-		templNodes.Push (node);
+                // Avoid recursion when the template is later invoked
+		if (tokenStr != state->templateName) templNodes.Push (node);
 	    }
 	    break;
-	  case csWrappedDocumentNodeFactory::PITOKEN_GENERATE:
-            if (state->generateActive)
-	      state->generateNestCount++;
+	case csWrappedDocumentNodeFactory::PITOKEN_GENERATE:
+          if (state->generateActive)
+	      state->generateNestLevel++;
 	    templNodes.Push (node);
-            break;
-          case csWrappedDocumentNodeFactory::PITOKEN_ENDGENERATE:
+          break;
+        case csWrappedDocumentNodeFactory::PITOKEN_ENDGENERATE:
+          {
+            if (state->generateActive)
             {
-              if (state->generateActive)
-              {
-	        state->generateNestCount--;
-	        if (state->generateNestCount != 0)
+	        state->generateNestLevel--;
+	        if (state->generateNestLevel != 0)
 	          templNodes.Push (node);
-              }
-              else
-                templNodes.Push (node);
             }
-            break;
-	}
+            else
+              templNodes.Push (node);
+          }
+          break;
       }
     }
   }
@@ -629,7 +712,7 @@ void csWrappedDocumentNode::ProcessTemplate (ConditionEval& eval,
 
   if (state->generateActive)
   {
-    if (state->generateNestCount == 0)
+    if (state->generateNestLevel == 0)
     {
       state->generateActive = false;
       int start = state->generateStart;
@@ -654,7 +737,7 @@ void csWrappedDocumentNode::ProcessTemplate (ConditionEval& eval,
 
           Template::Nodes templatedNodes;
           Template::Params params;
-          csString s; s << v;
+          TempString<> s; s << v;
           params.Push (s);
           InvokeTemplate (&generateTempl, params, templatedNodes);
           size_t i;
@@ -670,12 +753,14 @@ void csWrappedDocumentNode::ProcessTemplate (ConditionEval& eval,
   }
   else
   {
-    if (state->templNestCount == 0)
+    if (state->templNestLevel == 0)
     {
-      globalState->templates.PutUnique (state->templateName, state->templ);
+      if (!state->templWeak || !globalState->templates.Contains (state->templateName))
+        globalState->templates.PutUnique (state->templateName, state->templ);
       state->templActive = false;
     }
   }
+  return true;
 }
 
 bool csWrappedDocumentNode::InvokeTemplate (Template* templ,
@@ -724,15 +809,13 @@ bool csWrappedDocumentNode::InvokeTemplate (ConditionEval& eval,
   {
     ProcessSingleWrappedNode (eval, state, nodes[i]);
   }
-  ValidateTemplateEnd (node, state);
-  ValidateGenerateEnd (node, state);
   return true;
 }
 
 void csWrappedDocumentNode::ValidateTemplateEnd (iDocumentNode* node, 
 						 NodeProcessingState* state)
 {
-  if ((state->templActive) && (state->templNestCount != 0))
+  if ((state->templActive) && (state->templNestLevel != 0))
   {
     Report (syntaxErrorSeverity, node,
       "'Template' without 'Endtemplate'");
@@ -742,56 +825,222 @@ void csWrappedDocumentNode::ValidateTemplateEnd (iDocumentNode* node,
 void csWrappedDocumentNode::ValidateGenerateEnd (iDocumentNode* node, 
 						 NodeProcessingState* state)
 {
-  if ((state->generateActive) && (state->generateNestCount != 0))
+  if ((state->generateActive) && (state->generateNestLevel != 0))
   {
     Report (syntaxErrorSeverity, node,
       "'Generate' without 'Endgenerate'");
   }
 }
 
+void csWrappedDocumentNode::ValidateStaticIfEnd (iDocumentNode* node, 
+						 NodeProcessingState* state)
+{
+  if (!state->staticIfStateStack.IsEmpty())
+  {
+    Report (syntaxErrorSeverity, node,
+      "'SIfDef' without 'SEndIf'");
+  }
+}
+
 void csWrappedDocumentNode::ParseTemplateArguments (const char* str, 
-						    Template::Params& strings)
+						    Template::Params& strings,
+                                                    bool omitEmpty)
 {
   if (!str) return;
 
-  csString currentStr;
-
+  TempString<> currentStr;
   while (*str != 0)
   {
-    currentStr.Empty();
-    while ((*str != 0) && isspace (*str)) str++;
-    if (*str == '"')
-    {
-      while (*str != 0)
-      {
-	if (*str == '\\')
-	{
-	  str++;
-	  currentStr << *str;
-	  str++;
-	}
-	else if (*str == '"')
-	{
-	  str++;
-	  break;
-	}
-	else
-	{
-	  currentStr << *str;
-	  str++;
-	}
-      }
-    }
-    else
-    {
-      while ((*str != 0) && !isspace (*str)) 
-      {
-	currentStr << *str;
-	str++;
-      }
-    }
-    if (!currentStr.IsEmpty()) strings.Push (currentStr);
+    GetNextArg (str, currentStr);
+    if (!omitEmpty || !currentStr.IsEmpty())
+      strings.Push (currentStr);
   }
+}
+
+bool csWrappedDocumentNode::ProcessStaticIf (NodeProcessingState* state, 
+                                             iDocumentNode* node)
+{
+  if (state->staticIfStateStack.IsEmpty()) return false;
+
+  if (node->GetType() == CS_NODE_UNKNOWN)
+  {
+    TempString<> tokenStr, args; 
+    if (SplitNodeValue (node->GetValue(), tokenStr, args))
+    {
+      csStringID tokenID = shared->pitokens.Request (tokenStr);
+      switch (tokenID)
+      {
+        case csWrappedDocumentNodeFactory::PITOKEN_STATIC_IFDEF:
+        case csWrappedDocumentNodeFactory::PITOKEN_STATIC_IFNDEF:
+          ProcessStaticIfDef (state, node, args,
+            tokenID == csWrappedDocumentNodeFactory::PITOKEN_STATIC_IFNDEF);
+          return true;
+        case csWrappedDocumentNodeFactory::PITOKEN_STATIC_ELSE:
+          {
+            NodeProcessingState::StaticIfState ifState = 
+              state->staticIfStateStack.Pop();
+            if (ifState.elseBranch)
+            {
+              Report (syntaxErrorSeverity, node,
+                "Multiple 'SElse's in 'SIfDef'");
+              ifState.processNodes = false;
+            }
+            else
+            {
+              bool lastState = 
+                state->staticIfStateStack.IsEmpty() ? true : 
+                state->staticIfStateStack.Top().processNodes;
+              ifState.processNodes = !ifState.processNodes && lastState;
+              ifState.elseBranch = true;
+            }
+            state->staticIfStateStack.Push (ifState);
+            return true;
+          }
+        case csWrappedDocumentNodeFactory::PITOKEN_STATIC_ELSIFDEF:
+        case csWrappedDocumentNodeFactory::PITOKEN_STATIC_ELSIFNDEF:
+          {
+            NodeProcessingState::StaticIfState ifState = 
+              state->staticIfStateStack.Pop();
+            if (ifState.elseBranch)
+            {
+              Report (syntaxErrorSeverity, node,
+                "Multiple 'SElse's in 'SIfDef'");
+              ifState.processNodes = false;
+            }
+            else
+            {
+              bool lastState = 
+                state->staticIfStateStack.IsEmpty() ? true : 
+                state->staticIfStateStack.Top().processNodes;
+              ifState.processNodes = !ifState.processNodes && lastState;
+              ifState.elseBranch = true;
+            }
+            ProcessStaticIfDef (state, node, args,
+              tokenID == csWrappedDocumentNodeFactory::PITOKEN_STATIC_ELSIFNDEF);
+            state->staticIfNest.Pop();
+            state->staticIfNest.Top()++;
+          }
+          return true;
+        case csWrappedDocumentNodeFactory::PITOKEN_STATIC_ENDIF:
+          {
+            uint nest = state->staticIfNest.Pop ();
+            while (nest-- > 0) state->staticIfStateStack.Pop();
+            return true;
+          }
+      }
+    }
+  }
+  return !state->staticIfStateStack.Top().processNodes;
+}
+
+bool csWrappedDocumentNode::ProcessInstrTemplate (NodeProcessingState* state,
+                                                  iDocumentNode* node, 
+                                                  const TempString<>& args, bool weak)
+{
+  TempString<> templateName (args);
+  Template newTempl;
+  size_t templateEnd = templateName.FindFirst (' ');
+  if (templateEnd != (size_t)-1)
+  {
+    // Parse template parameter names
+    Template::Params paramNames;
+    ParseTemplateArguments (templateName.GetData() + templateEnd + 1, 
+      paramNames, true);
+
+    csSet<TempString<>, TempHeapAlloc> dupeCheck;
+    for (size_t i = 0; i < paramNames.Length(); i++)
+    {
+      if (dupeCheck.Contains (paramNames[i]))
+      {
+        Report (syntaxErrorSeverity, node,
+                "Duplicate template parameter '%s'", 
+	        paramNames[i].GetData());
+        return false;
+      }
+      newTempl.paramMap.Push (paramNames[i]);
+      dupeCheck.Add (paramNames[i]);
+    }
+
+    templateName.Truncate (templateEnd);
+  }
+  if (templateName.IsEmpty())
+  {
+    Report (syntaxErrorSeverity, node,
+            "'template' without name");
+    return false;
+  }
+  if (shared->pitokens.Request (templateName) != csInvalidStringID)
+  {
+    Report (syntaxErrorSeverity, node,
+            "Reserved template name '%s'", templateName.GetData());
+    return false;
+  }
+  state->templateName = templateName;
+  state->templ = newTempl;
+  state->templActive = true;
+  state->templWeak = weak;
+  state->templNestLevel = 1;
+  return true;
+}
+
+bool csWrappedDocumentNode::ProcessDefine (NodeProcessingState* state, 
+                                           iDocumentNode* node, 
+                                           const TempString<>& args)
+{
+  TempString<> param;
+  const char* p = args;
+  GetNextArg (p, param);
+  if (p) { while (*p && isspace (*p)) p++; }
+  if (param.IsEmpty() || (*p != 0))
+  {
+    Report (syntaxErrorSeverity, node,
+            "One parameter expected for 'Define'");
+    return false;
+  }
+  globalState->defines.Add (param);
+  return true;
+}
+
+bool csWrappedDocumentNode::ProcessUndef (NodeProcessingState* state, 
+                                          iDocumentNode* node, 
+                                          const TempString<>& args)
+{
+  TempString<> param;
+  const char* p = args;
+  GetNextArg (p, param);
+  if (p) { while (*p && isspace (*p)) p++; }
+  if (param.IsEmpty() || (*p != 0))
+  {
+    Report (syntaxErrorSeverity, node,
+            "One parameter expected for 'Undef'");
+    return false;
+  }
+  globalState->defines.Delete (param);
+  return true;
+}
+
+bool csWrappedDocumentNode::ProcessStaticIfDef (NodeProcessingState* state, 
+                                                iDocumentNode* node, 
+                                                const TempString<>& args, bool invert)
+{
+  TempString<> param;
+  const char* p = args;
+  GetNextArg (p, param);
+  if (p) { while (*p && isspace (*p)) p++; }
+  if (param.IsEmpty() || (*p != 0))
+  {
+    Report (syntaxErrorSeverity, node,
+            "One parameter expected for 'SIfDef'");
+    return false;
+  }
+  bool lastState = 
+    state->staticIfStateStack.IsEmpty() ? true : 
+    state->staticIfStateStack.Top().processNodes;
+  bool defineExists = globalState->defines.Contains (param);
+  state->staticIfStateStack.Push (
+    (invert ? !defineExists : defineExists) && lastState);
+  state->staticIfNest.Push (1);
+  return true;
 }
 
 template<typename ConditionEval>
@@ -800,18 +1049,29 @@ void csWrappedDocumentNode::ProcessSingleWrappedNode (
 {
   CS_ASSERT(globalState);
 
-  if (state->templActive || state->generateActive)
+  if (ProcessTemplate (eval, node, state)) return;
+  if (ProcessStaticIf (state, node))
   {
-    ProcessTemplate (eval, node, state);
+    // Template invokation has precedence over dropping nodes...
+    TempString<> tokenStr, args; 
+    if (SplitNodeValue (node->GetValue(), tokenStr, args))
+    {
+      Template::Params params;
+      if (!args.IsEmpty())
+      {
+        ParseTemplateArguments (args, params, false);
+      }
+      InvokeTemplate (eval, tokenStr, node, state, params);
+    }
     return;
   }
 
-  csArray<WrapperStackEntry>& wrapperStack = state->wrapperStack;
+  WrapperStack& wrapperStack = state->wrapperStack;
   WrapperStackEntry& currentWrapper = state->currentWrapper;
   bool handled = false;
   if (node->GetType() == CS_NODE_UNKNOWN)
   {
-    csString replaceScratch;
+    TempString<> replaceScratch;
     const char* nodeValue = ReplaceEntities (node->GetValue(),
       replaceScratch);
     if ((nodeValue != 0) && (*nodeValue == '?') && 
@@ -854,7 +1114,7 @@ void csWrappedDocumentNode::ProcessSingleWrappedNode (
 	  cmdLen = valLen;
 	}
 
-	csString tokenStr; tokenStr.Replace (valStart, cmdLen);
+	TempString<> tokenStr; tokenStr.Replace (valStart, cmdLen);
 	csStringID tokenID = shared->pitokens.Request (tokenStr);
 	switch (tokenID)
 	{
@@ -863,9 +1123,17 @@ void csWrappedDocumentNode::ProcessSingleWrappedNode (
 	      WrapperStackEntry newWrapper;
 	      ParseCondition (newWrapper, space + 1, valLen - cmdLen - 1, 
 		node);
-          
+
               const csConditionID condition = newWrapper.child->condition;
               Logic3 r = eval.Descend (condition);
+              // If the parent condition is always false, so is this
+              if ((((currentWrapper.child->condition == csCondAlwaysFalse)
+                && (currentWrapper.child->conditionValue == true))
+                  || ((currentWrapper.child->condition == csCondAlwaysTrue)
+                && (currentWrapper.child->conditionValue == false))))
+              {
+                r.state = Logic3::Lie;
+              }
               if (r.state == Logic3::Truth)
                 newWrapper.child->condition = csCondAlwaysTrue;
               else if (r.state == Logic3::Lie)
@@ -963,6 +1231,14 @@ void csWrappedDocumentNode::ProcessSingleWrappedNode (
                 eval.SwitchBranch ();
                 const csConditionID condition = newWrapper.child->condition;
                 Logic3 r = eval.Descend (condition);
+                // If the parent condition is always false, so is this
+                if ((((currentWrapper.child->condition == csCondAlwaysFalse)
+                  && (currentWrapper.child->conditionValue == true))
+                    || ((currentWrapper.child->condition == csCondAlwaysTrue)
+                  && (currentWrapper.child->conditionValue == false))))
+                {
+                  r.state = Logic3::Lie;
+                }
                 globalState->ascendStack[globalState->ascendStack.GetSize()-1]++;
                 if (r.state == Logic3::Truth)
                   newWrapper.child->condition = csCondAlwaysTrue;
@@ -985,7 +1261,7 @@ void csWrappedDocumentNode::ProcessSingleWrappedNode (
 	  case csWrappedDocumentNodeFactory::PITOKEN_INCLUDE_NEW:
 	    {
 	      bool okay = true;
-	      csString filename;
+	      TempString<> filename;
 	      const char* space = strchr (valStart, ' ');
 	      /* The rightmost spaces were skipped and don't interest us
 	       * any more. */
@@ -1013,58 +1289,14 @@ void csWrappedDocumentNode::ProcessSingleWrappedNode (
                 "Deprecated syntax, please use 'Template'");
             }
             // Fall through
-	  case csWrappedDocumentNodeFactory::PITOKEN_TEMPLATE_NEW:
-	    {
-	      bool okay = true;
-	      csString templateName;
-	      Template newTempl;
-	      templateName.Replace (space + 1, valLen - cmdLen - 1);
-	      templateName.RTrim();
-	      size_t templateEnd = templateName.FindFirst (' ');
-	      if (okay && (templateEnd != (size_t)-1))
-	      {
-		// Parse template parameter names
-		Template::Params paramNames;
-		ParseTemplateArguments (
-		  templateName.GetData() + templateEnd + 1, paramNames);
-
-		csSet<TempString<>, TempHeapAlloc> dupeCheck;
-		for (size_t i = 0; i < paramNames.Length(); i++)
-		{
-		  if (dupeCheck.Contains (paramNames[i]))
-		  {
-		    Report (syntaxErrorSeverity, node,
-		      "Duplicate template parameter '%s'", 
-		      paramNames[i].GetData());
-		    okay = false;
-		  }
-		  newTempl.paramMap.Push (paramNames[i]);
-		  dupeCheck.Add (paramNames[i]);
-		}
-
-		templateName.Truncate (templateEnd);
-	      }
-	      if (okay && templateName.IsEmpty())
-	      {
-		Report (syntaxErrorSeverity, node,
-		  "'template' without name");
-		okay = false;
-	      }
-	      if (okay 
-		&& (shared->pitokens.Request (templateName) != csInvalidStringID))
-	      {
-		Report (syntaxErrorSeverity, node,
-		  "Reserved template name '%s'", templateName.GetData());
-		okay = false;
-	      }
-	      if (okay)
-	      {
-		state->templateName = templateName;
-		state->templ = newTempl;
-		state->templActive = true;
-		state->templNestCount = 1;
-	      }
-	    }
+          case csWrappedDocumentNodeFactory::PITOKEN_TEMPLATE_NEW:
+	  case csWrappedDocumentNodeFactory::PITOKEN_TEMPLATEWEAK:
+            {
+              TempString<> args (valStart + cmdLen, valLen - cmdLen);
+              args.LTrim();
+              ProcessInstrTemplate (state, node, args, 
+                tokenID == csWrappedDocumentNodeFactory::PITOKEN_TEMPLATEWEAK);
+            }
 	    break;
 	  case csWrappedDocumentNodeFactory::PITOKEN_ENDTEMPLATE:
             if (shared->plugin->do_verbose)
@@ -1077,6 +1309,7 @@ void csWrappedDocumentNode::ProcessSingleWrappedNode (
 	    {
 	      Report (syntaxErrorSeverity, node,
 		"'Endtemplate' without 'Template'");
+              // ProcessTemplate() would've handled it otherwise
 	    }
 	    break;
           case csWrappedDocumentNodeFactory::PITOKEN_GENERATE:
@@ -1085,8 +1318,8 @@ void csWrappedDocumentNode::ProcessSingleWrappedNode (
               Template::Params args;
 	      if (space != 0)
 	      {
-		csString pStr (space + 1, valLen - cmdLen - 1);
-		ParseTemplateArguments (pStr, args);
+		TempString<> pStr (space + 1, valLen - cmdLen - 1);
+		ParseTemplateArguments (pStr, args, false);
 	      }
               if ((args.GetSize() < 3) || (args.GetSize() > 4))
               {
@@ -1131,7 +1364,7 @@ void csWrappedDocumentNode::ProcessSingleWrappedNode (
                 if (okay)
                 {
                   state->generateActive = true;
-		  state->generateNestCount = 1;
+		  state->generateNestLevel = 1;
                   if (((start > end) && (step >= 0))
                     || (end >= start) && (step <= 0))
                   {
@@ -1155,15 +1388,49 @@ void csWrappedDocumentNode::ProcessSingleWrappedNode (
 	    {
 	      Report (syntaxErrorSeverity, node,
 		"'Endgenerate' without 'Generate'");
+              // ProcessTemplate() would've handled it otherwise
 	    }
 	    break;
+	  case csWrappedDocumentNodeFactory::PITOKEN_DEFINE:
+            {
+              TempString<> args (valStart + cmdLen, valLen - cmdLen);
+              args.LTrim();
+              ProcessDefine (state, node, args);
+            }
+	    break;
+	  case csWrappedDocumentNodeFactory::PITOKEN_UNDEF:
+            {
+              TempString<> args (valStart + cmdLen, valLen - cmdLen);
+              args.LTrim();
+              ProcessUndef (state, node, args);
+            }
+	    break;
+	  case csWrappedDocumentNodeFactory::PITOKEN_STATIC_IFDEF:
+	  case csWrappedDocumentNodeFactory::PITOKEN_STATIC_IFNDEF:
+            {
+              TempString<> args (valStart + cmdLen, valLen - cmdLen);
+              args.LTrim();
+              ProcessStaticIfDef (state, node, args,
+                tokenID == csWrappedDocumentNodeFactory::PITOKEN_STATIC_IFNDEF);
+            }
+            break;
+          case csWrappedDocumentNodeFactory::PITOKEN_STATIC_ELSIFDEF:
+          case csWrappedDocumentNodeFactory::PITOKEN_STATIC_ELSIFNDEF:
+          case csWrappedDocumentNodeFactory::PITOKEN_STATIC_ELSE:
+          case csWrappedDocumentNodeFactory::PITOKEN_STATIC_ENDIF:
+            {
+	      Report (syntaxErrorSeverity, node,
+		"'%s' without 'SIfDef'", shared->pitokens.Request (tokenID));
+              // ProcessStaticIf() would've handled it otherwise
+            }
+            break;
 	  default:
 	    {
 	      Template::Params params;
 	      if (space != 0)
 	      {
-		csString pStr (space + 1, valLen - cmdLen - 1);
-		ParseTemplateArguments (pStr, params);
+		TempString<> pStr (space + 1, valLen - cmdLen - 1);
+		ParseTemplateArguments (pStr, params, false);
 	      }
 	      if (!InvokeTemplate (eval, tokenStr, node, state, params))
 	      {
@@ -1206,6 +1473,7 @@ void csWrappedDocumentNode::ProcessWrappedNode (ConditionEval& eval,
     }
     ValidateTemplateEnd (wrappedNode, state);
     ValidateGenerateEnd (wrappedNode, state);
+    ValidateStaticIfEnd (wrappedNode, state);
   }
 }
 
@@ -1488,7 +1756,7 @@ void csWrappedDocumentNodeIterator::SeekNext()
     str.Append (next->GetValue ());
     csWrappedDocumentNode::AppendNodeText (walker, str);
     csTextNodeWrapper* textNode = 
-      new (parentNode->shared->textNodePool) csTextNodeWrapper (next, str);
+      new (parentNode->shared->textWrapperPool) csTextNodeWrapper (next, str);
     next.AttachNew (textNode);
   }
 }
@@ -1516,10 +1784,19 @@ csWrappedDocumentNodeFactory::csWrappedDocumentNodeFactory (
 {
   InitTokenTable (pitokens);
   pitokens.Register ("Template", PITOKEN_TEMPLATE_NEW);
+  pitokens.Register ("TemplateWeak", PITOKEN_TEMPLATEWEAK);
   pitokens.Register ("Endtemplate", PITOKEN_ENDTEMPLATE_NEW);
   pitokens.Register ("Include", PITOKEN_INCLUDE_NEW);
   pitokens.Register ("Generate", PITOKEN_GENERATE);
   pitokens.Register ("Endgenerate", PITOKEN_ENDGENERATE);
+  pitokens.Register ("Define", PITOKEN_DEFINE);
+  pitokens.Register ("Undef", PITOKEN_UNDEF);
+  pitokens.Register ("SIfDef", PITOKEN_STATIC_IFDEF);
+  pitokens.Register ("SIfNDef", PITOKEN_STATIC_IFNDEF);
+  pitokens.Register ("SElsIfDef", PITOKEN_STATIC_ELSIFDEF);
+  pitokens.Register ("SElsIfNDef", PITOKEN_STATIC_ELSIFNDEF);
+  pitokens.Register ("SElse", PITOKEN_STATIC_ELSE);
+  pitokens.Register ("SEndIf", PITOKEN_STATIC_ENDIF);
 }
 
 void csWrappedDocumentNodeFactory::DumpCondition (size_t id, 

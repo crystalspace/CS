@@ -146,7 +146,8 @@ bool csShaderGLCGFP::Compile ()
   }
   else
   {
-    return DefaultLoadProgram (programStr, CG_GL_FRAGMENT);
+    return DefaultLoadProgram (programStr, CG_GL_FRAGMENT, 
+      shaderPlug->maxProfileFragment);
   }
 
   return true;

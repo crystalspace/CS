@@ -66,7 +66,8 @@ private:
     uint versions;
     int arguments;
     bool supported;
-  } PS_Instructions[CS_PS_INS_END_OF_LIST];
+  };
+  static const PS_InstructionData PS_Instructions[];
 
   csPixelShaderVersion version;
   csString version_string;

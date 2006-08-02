@@ -138,7 +138,7 @@ struct iHazeFactoryState : public virtual iBase
   virtual const csVector3& GetDirectional() const = 0;
 
   /// Get the number of layers of hulls.
-  virtual int GetLayerCount() const = 0;
+  virtual size_t GetLayerCount() const = 0;
   /// add a new layer - increasing the layer count
   virtual void AddLayer(iHazeHull *hull, float scale) = 0;
   /// Set the convex hull to be used as layer. Increfs the hull.

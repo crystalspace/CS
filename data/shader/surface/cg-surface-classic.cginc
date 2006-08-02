@@ -17,135 +17,74 @@
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 -->
 <include>
+
+<?CgUseShared primaryColor ?>
+<?CgUseShared primaryColorV2F?>
+<?CgUseShared texCoord?>
+<?CgUseShared texCoordV2F?>
+
+<?Template SurfaceClassic_Code?>
 #ifndef __CS_SHADER_SURFACE_CLASSIC_CG__
 #define __CS_SHADER_SURFACE_CLASSIC_CG__
 
-<?! Include some other used code.
-    Why this include and no Cg #include? One reason is that Cg knows nothing
-    about VFS, while with a custom include VFS paths are no problem. But more
-    importantly, files included like this are parsed by the shader conditional
-    code, so shader conditionals can be used here. ?>
-<?Include /shader/snippets/cg-i-surface.cginc ?>
-<?Include /shader/surface/cg-parallax.cginc ?>
-
-struct AppToVert_Surface_Classic
+/*struct Vert_SurfaceClassic
 {
-  void _dummy_struct_non_empty() {}
-<?ifSurfaceNormalsNeeded?>
-  varying float3 normal;
-<?endif?>
-<?if vars."tex diffuse".texture ?>
-  varying float2 texCoord;
-<?endif?>
 };
+Vert_SurfaceClassic surfaceClassicVert;*/
 
-AppToVert_Surface_Classic surfaceClassicA2V;
-
-struct VertToFrag_Surface_Classic
+struct Frag_SurfaceClassic
 {
-<?ifSurfaceNormalsNeeded?>
-  float3 normal;
-<?endif?>
-<?if vars."tex diffuse".texture ?>
-  float2 texCoord;
-<?endif?>
-  VertToFrag_Parallax parallax;
-
-  void Setup ()
-  {
-  <?ifSurfaceNormalsNeeded?>
-    normal = surfaceClassicA2V.normal;
-  <?endif?>
-  <?if vars."tex diffuse".texture ?>
-    texCoord = surfaceClassicA2V.texCoord;
-  <?endif?>
-    parallax.Setup ();
-  }
-};
-
-struct AppToFrag_Surface_Classic
-{
-<?if vars."tex diffuse".texture ?>
   uniform sampler2D texture;
-<?else?>
-  uniform float4 flatcolor;
-<?endif?>
-<?if vars."tex glow".texture ?>
-  uniform sampler2D texGlow;
-<?endif?>
-  AppToFrag_Parallax parallax;
+  uniform float4 flatColor;
 };
+Frag_SurfaceClassic surfaceClassicFrag;
 
-AppToFrag_Surface_Classic surfaceClassicA2F;
-
-struct Frag_Surface_Classic : iSurface
+struct SurfaceClassic
 {
-<?ifSurfaceNormalsNeeded?>
-  float3 normal;
-<?endif?>
-<?if vars."tex diffuse".texture || vars."tex glow".texture ?>
-  float2 tc;
-  float2 tcOffs;
-  Frag_Parallax parallax;
-<?endif?>
-
-  void Setup (VertToFrag_Surface_Classic V2F)
+  void SetupVert ()
   {
-  <?ifSurfaceNormalsNeeded?>
-    normal = V2F.normal;
-  <?endif?>
-  <?if vars."tex diffuse".texture || vars."tex glow".texture ?>
-    tc = V2F.texCoord;
-    tcOffs = parallax.GetTCOffset (V2F.parallax, tc);
-  <?endif?>
   }
-  
+
   float4 GetDiffuse ()
   {
-    float4 result;
-  <?if vars."tex diffuse".texture ?>
-    result = tex2D (surfaceClassicA2F.texture, tc + tcOffs);
-  <?else?>
-    result = surfaceClassicA2F.flatcolor;
-  <?endif?>
-    return result;
+    float4 diffuse;
+    <?if vars."tex diffuse".texture?>
+      diffuse = tex2D (surfaceClassicFrag.texture, texCoord);
+    <?else?>
+      diffuse = surfaceClassicFrag.flatColor;
+    <?endif?>
+    diffuse.a *= primaryColor.a;
+    return diffuse;
   }
-  
-  float3 GetNormal ()
+  float4 GetDiffuse (float2 offset)
   {
-  <?ifSurfaceNormalsNeeded?>
-    return normal;
-  <?else?>
-    return float3 (0, 0, 0);
-  <?endif?>
-  }
-
-  float3 GetSpecularColor ()
-  {
-    return float3 (1, 1, 1);
-  }
-  
-  float GetSpecularExponent ()
-  {
-    return 32.0;
-  }
-  
-  float3 GetEmissive ()
-  {
-  <?if vars."tex glow".texture ?>
-    return tex2D (surfaceClassicA2F.texGlow, tc + tcOffs);
-  <?else?>
-    return float3 (0, 0, 0);
-  <?endif?>
-  }
-  
-  float2 GetTexCoordOffset ()
-  {
-    return tcOffs;
+    <?if vars."tex diffuse".texture?>
+      return tex2D (surfaceClassicFrag.texture, texCoord + offset);
+    <?else?>
+      return surfaceClassicFrag.flatColor;
+    <?endif?>
   }
 };
 
-<?SetSnippet Surface Surface_Classic?>
-
 #endif // __CS_SHADER_SURFACE_CLASSIC_CG__
+<?Endtemplate?>
+
+<?CgAddSnippet SurfaceClassic_Code?>
+
+<?BeginGlue SurfaceClassic?>
+  <?Template Pass_Surface_Classic ?>
+    <?if vars."tex diffuse".texture?>
+      <texture name="tex diffuse" destination="surfaceClassicFrag.texture" />
+    <?endif?>
+  <?Endtemplate?>
+  <?AddToList PassMappings Pass_Surface_Classic ?>
+  
+  <?Template VariableMap_Surface ?>
+    <?if !vars."tex diffuse".texture?>
+      <variablemap variable="mat flatcolor" 
+	destination="surfaceClassicFrag.flatColor" />
+    <?endif?>
+  <?Endtemplate?>
+  <?AddToList ProgramMappings VariableMap_Surface ?>
+<?EndGlue?>
 </include>

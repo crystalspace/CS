@@ -30,12 +30,14 @@
 #include "iutil/object.h"
 #include "csutil/csstring.h"
 #include "csutil/databuf.h"
+#include "csutil/scf_implementation.h"
 #include "igraphic/imageio.h"
 #include "iutil/objreg.h"
 #include "iutil/vfs.h"
 #include "iutil/cache.h"
 
-struct PrsHeightMapData : public iGenerateImageFunction
+struct PrsHeightMapData :
+  public scfImplementation1<PrsHeightMapData, iGenerateImageFunction>
 {
   csRef<iImage> im;
   int iw, ih;	// Image width and height.
@@ -44,25 +46,14 @@ struct PrsHeightMapData : public iGenerateImageFunction
   float hscale, hshift;
   bool slope;
   bool flipx, flipy;
-  SCF_DECLARE_IBASE;
 
-  PrsHeightMapData (bool s) : slope (s)
-  {
-    flipx=false; flipy=false;
-    SCF_CONSTRUCT_IBASE (0);
-  }
-  virtual ~PrsHeightMapData ()
-  {
-    SCF_DESTRUCT_IBASE();
-  }
+  PrsHeightMapData (bool s) :
+    scfImplementationType(this), slope (s), flipx(false), flipy(false) { }
+  virtual ~PrsHeightMapData () { }
   float GetHeight (float dx, float dy);
   float GetSlope (float dx, float dy);
   virtual float GetValue (float dx, float dy);
 };
-
-SCF_IMPLEMENT_IBASE (PrsHeightMapData)
-  SCF_IMPLEMENTS_INTERFACE (iGenerateImageFunction)
-SCF_IMPLEMENT_IBASE_END
 
 float PrsHeightMapData::GetSlope (float x, float y)
 {

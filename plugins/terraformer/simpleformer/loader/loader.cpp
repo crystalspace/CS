@@ -21,6 +21,7 @@
 #include "csutil/csendian.h"
 #include "csutil/csstring.h"
 #include "csutil/dirtyaccessarray.h"
+#include "csutil/scf.h"
 
 #include "iengine/engine.h"
 #include "iengine/mesh.h"
@@ -45,27 +46,15 @@ CS_IMPLEMENT_PLUGIN
 
 using namespace CS::Plugins::SimpleFormerLoader;
 
-SCF_IMPLEMENT_IBASE (csSimpleFormerLoader)
-  SCF_IMPLEMENTS_INTERFACE (iLoaderPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csSimpleFormerLoader::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 SCF_IMPLEMENT_FACTORY (csSimpleFormerLoader)
 
-csSimpleFormerLoader::csSimpleFormerLoader (iBase* parent)
+csSimpleFormerLoader::csSimpleFormerLoader (iBase* parent) :
+  scfImplementationType(this, parent)
 {
-  SCF_CONSTRUCT_IBASE (parent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
 }
 
 csSimpleFormerLoader::~csSimpleFormerLoader ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csSimpleFormerLoader::Initialize (iObjectRegistry* object_reg)

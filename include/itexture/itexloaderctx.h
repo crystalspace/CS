@@ -28,18 +28,18 @@
  * \addtogroup loadsave
  * @{ */
  
-#include "csutil/scf.h"
+#include "csutil/scf_interface.h"
 
 struct iImage;
-
-SCF_VERSION (iTextureLoaderContext, 0, 0, 2);
 
 /**
  * Interface passed to a texture loader, holding some common texture 
  * properties.
  */
-struct iTextureLoaderContext : public iBase
+struct iTextureLoaderContext : public virtual iBase
 {
+  SCF_INTERFACE(iTextureLoaderContext, 2, 0, 0);
+
   /// Have any flags been specified?
   virtual bool HasFlags () = 0;
   /// Get the specified flags

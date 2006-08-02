@@ -32,15 +32,11 @@
 #include "ivaria/reporter.h"
 #include "itexture/itexloaderctx.h"
 #include "csutil/csstring.h"
+#include "csutil/scf.h"
 
 #include "ptanimimg.h"
 
 // Plugin stuff
-
-SCF_IMPLEMENT_IBASE(csAnimateProctexLoader);
-  SCF_IMPLEMENTS_INTERFACE(iLoaderPlugin);
-  SCF_IMPLEMENTS_INTERFACE(iComponent);
-SCF_IMPLEMENT_IBASE_END
 
 CS_IMPLEMENT_PLUGIN
 
@@ -49,14 +45,13 @@ SCF_IMPLEMENT_FACTORY(csAnimateProctexLoader)
 
 //----------------------------------------------------------------------------
 
-csAnimateProctexLoader::csAnimateProctexLoader (iBase *p)
+csAnimateProctexLoader::csAnimateProctexLoader (iBase *p) :
+  scfImplementationType(this, p)
 {
-  SCF_CONSTRUCT_IBASE (p);
 }
 
 csAnimateProctexLoader::~csAnimateProctexLoader ()
 {
-  SCF_DESTRUCT_IBASE();
 }
 
 bool csAnimateProctexLoader::Initialize(iObjectRegistry *object_reg)

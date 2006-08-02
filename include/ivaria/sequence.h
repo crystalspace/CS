@@ -57,8 +57,6 @@ struct iSequenceOperation : public virtual iBase
   virtual void CleanupSequences () = 0;
 };
 
-SCF_VERSION (iSequenceCondition, 0, 1, 0);
-
 /**
  * A sequence condition. This is also a callback to the application.
  * This condition returns true on success.
@@ -70,8 +68,10 @@ SCF_VERSION (iSequenceCondition, 0, 1, 0);
  * - iSequence
  *   
  */
-struct iSequenceCondition : public iBase
+struct iSequenceCondition : public virtual iBase
 {
+  SCF_INTERFACE (iSequenceCondition, 1, 0, 0);
+
   /**
    * Do the condition. The dt parameter is the difference between
    * the time the sequence manager is at now and the time this condition
@@ -97,8 +97,6 @@ struct csSequenceOp
 };
 
 
-SCF_VERSION (iSequence, 0, 0, 2);
-
 /**
  * A sequence of operations tagged with relative time information.
  * All operations added to this sequence will be executed relative to the
@@ -112,8 +110,10 @@ SCF_VERSION (iSequence, 0, 0, 2);
  * - iSequenceManager
  *   
  */
-struct iSequence : public iBase
+struct iSequence : public virtual iBase
 {
+  SCF_INTERFACE (iSequence, 1, 0, 0);
+
   /**
    * Ugly but necessary for sequence to self-modify
    */
@@ -161,8 +161,6 @@ struct iSequence : public iBase
   virtual bool IsEmpty () = 0;
 };
 
-SCF_VERSION (iSequenceManager, 0, 1, 0);
-
 /**
  * The sequence manager. The sequence manager is a plugin that will perform
  * sequences of operations depending on elapsed time. It is mostly useful
@@ -178,8 +176,10 @@ SCF_VERSION (iSequenceManager, 0, 1, 0);
  * - iEngineSequenceManager
  *   
  */
-struct iSequenceManager : public iBase
+struct iSequenceManager : public virtual iBase
 {
+  SCF_INTERFACE (iSequenceManager, 1, 0, 0);
+
   /**
    * Clear all sequence operations currently in memory (this will
    * call DecRef() on them).

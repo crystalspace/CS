@@ -27,7 +27,7 @@
  * \addtogroup engine3d_vis
  * @{ */
  
-#include "csutil/scf.h"
+#include "csutil/scf_interface.h"
 
 struct iDocumentNode;
 struct iFrustumView;
@@ -43,13 +43,12 @@ class csPlane3;
 class csSphere;
 class csVector3;
 
-SCF_VERSION (iVisibilityObjectIterator, 0, 1, 0);
-
 /**
  * Iterator to iterate over some visibility objects.
  */
-struct iVisibilityObjectIterator : public iBase
+struct iVisibilityObjectIterator : public virtual iBase
 {
+  SCF_INTERFACE (iVisibilityObjectIterator, 2, 0, 0);
   /// Are there more elements?
   virtual bool HasNext () const = 0;
 
@@ -82,8 +81,6 @@ struct iVisibilityCullerListener : public virtual iBase
     iMeshWrapper *mesh, uint32 frustum_mask) = 0;
 };
 
-SCF_VERSION (iVisibilityCuller, 0, 7, 0);
-
 /**
  * This interface represents a visibility culling system.
  * To use it you first register visibility objects (which are all the
@@ -103,6 +100,8 @@ SCF_VERSION (iVisibilityCuller, 0, 7, 0);
  */
 struct iVisibilityCuller : public virtual iBase
 {
+  SCF_INTERFACE (iVisibilityCuller, 2, 0, 0);
+
   /**
    * Setup all data for this visibility culler. This needs
    * to be called before the culler is used for the first time.

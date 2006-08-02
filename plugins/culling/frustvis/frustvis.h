@@ -24,7 +24,7 @@
 #include "iutil/dbghelp.h"
 #include "csutil/array.h"
 #include "csutil/parray.h"
-#include "csutil/scf.h"
+#include "csutil/scf_implementation.h"
 #include "csutil/hash.h"
 #include "csutil/set.h"
 #include "csutil/weakref.h"
@@ -49,8 +49,9 @@ struct FrustTest_Front2BackData;
 /**
  * This object is a wrapper for an iVisibilityObject from the engine.
  */
-class csFrustVisObjectWrapper : public iObjectModelListener,
-	public iMovableListener
+class csFrustVisObjectWrapper :
+  public scfImplementation2<csFrustVisObjectWrapper,
+    iObjectModelListener, iMovableListener>
 {
 public:
   csFrustumVis* frustvis;
@@ -63,17 +64,9 @@ public:
   csRef<iMeshWrapper> mesh;
   csRef<iShadowCaster> caster;
 
-  csFrustVisObjectWrapper (csFrustumVis* frustvis)
-  {
-    SCF_CONSTRUCT_IBASE (0);
-    csFrustVisObjectWrapper::frustvis = frustvis;
-  }
-  virtual ~csFrustVisObjectWrapper ()
-  {
-    SCF_DESTRUCT_IBASE();
-  }
-
-  SCF_DECLARE_IBASE;
+  csFrustVisObjectWrapper (csFrustumVis* frustvis) :
+    scfImplementationType(this), frustvis(frustvis) { }
+  virtual ~csFrustVisObjectWrapper () { }
 
   /// The object model has changed.
   virtual void ObjectModelChanged (iObjectModel* model);
@@ -86,7 +79,9 @@ public:
 /**
  * A simple frustum based visisibility culling system.
  */
-class csFrustumVis : public iVisibilityCuller
+class csFrustumVis :
+  public scfImplementation3<csFrustumVis,
+    iVisibilityCuller, iEventHandler, iComponent>
 {
 public:
   // List of objects to iterate over (after VisTest()).
@@ -125,8 +120,6 @@ private:
 	uint32 cur_timestamp, uint32 frustum_mask);
 
 public:
-  SCF_DECLARE_IBASE;
-
   csFrustumVis (iBase *iParent);
   virtual ~csFrustumVis ();
   virtual bool Initialize (iObjectRegistry *object_reg);
@@ -180,34 +173,8 @@ public:
 
   bool HandleEvent (iEvent& ev);
 
-  struct eiEventHandler : public iEventHandler
-  {
-    csWeakRef<csFrustumVis> parent;
-    SCF_DECLARE_IBASE;
-    eiEventHandler (csFrustumVis* parent)
-    {
-      SCF_CONSTRUCT_IBASE (0);
-      eiEventHandler::parent = parent;
-    }
-    virtual ~eiEventHandler ()
-    {
-      SCF_DESTRUCT_IBASE ();
-    }
-    virtual bool HandleEvent (iEvent& ev)
-    {
-      if (parent) return parent->HandleEvent (ev);
-      else return false;
-    }
-    CS_EVENTHANDLER_NAMES("crystalspace.frustvis")
-    CS_EVENTHANDLER_NIL_CONSTRAINTS
-  } * scfiEventHandler;
-
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csFrustumVis);
-    virtual bool Initialize (iObjectRegistry* p)
-    { return scfParent->Initialize (p); }
-  } scfiComponent;
+  CS_EVENTHANDLER_NAMES("crystalspace.frustvis")
+  CS_EVENTHANDLER_NIL_CONSTRAINTS
 };
 
 #endif // __CS_FRUSTVIS_H__

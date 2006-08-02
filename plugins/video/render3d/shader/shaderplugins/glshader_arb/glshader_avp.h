@@ -26,10 +26,12 @@
 #include "ivideo/shader/shader.h"
 #include "csutil/strhash.h"
 #include "csutil/leakguard.h"
+#include "csutil/scf_implementation.h"
 
 #include "glshader_arb.h"
 
-class csShaderGLAVP : public csShaderProgram
+class csShaderGLAVP :
+  public scfImplementationExt0<csShaderGLAVP, csShaderProgram>
 {
 private:
   csGLShader_ARB* shaderPlug;
@@ -41,12 +43,10 @@ private:
 
   void Report (int severity, const char* msg, ...);
 public:
-  SCF_DECLARE_IBASE_EXT (csShaderProgram);
-
   CS_LEAKGUARD_DECLARE (csShaderGLAVP);
 
   csShaderGLAVP(csGLShader_ARB* shaderPlug) : 
-    csShaderProgram (shaderPlug->object_reg)
+    scfImplementationType (this, shaderPlug->object_reg)
   {
     validProgram = true;
     this->shaderPlug = shaderPlug;

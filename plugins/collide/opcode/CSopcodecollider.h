@@ -34,6 +34,7 @@
 #include "csgeom/matrix3.h"
 #include "csgeom/vector3.h"
 #include "csgeom/box.h"
+#include "csutil/scf_implementation.h"
 #include "ivaria/collider.h"
 #include "Opcode.h"
 
@@ -50,7 +51,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csOpcode)
 {
 
 /// Low level collision detection using Opcode library.
-class csOPCODECollider : public iCollider
+class csOPCODECollider :
+  public scfImplementation1<csOPCODECollider, iCollider>
 {
 public:
   /// The internal model object.
@@ -96,8 +98,6 @@ public:
   static bool GetFirstHit ();
   static int Report (csOPCODECollider **id1, csOPCODECollider **id2);
   float GetRadius () {return radius;};
-
-  SCF_DECLARE_IBASE;
 };
 
 }

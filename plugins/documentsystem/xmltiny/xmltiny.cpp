@@ -24,13 +24,13 @@
 #include "csutil/scf.h"
 #include "csutil/xmltiny.h"
 
-struct csTinyDocWrapper : public iDocument
+struct csTinyDocWrapper :
+  public scfImplementation1<csTinyDocWrapper, iDocument>
 {
 private:
   csRef<iDocument> tinydoc;
-public:
-  SCF_DECLARE_IBASE;
 
+public:
   csTinyDocWrapper (csRef<iDocument> doc);
   virtual ~csTinyDocWrapper ();
 
@@ -48,19 +48,14 @@ public:
   virtual int Changeable ();
 };
 
-SCF_IMPLEMENT_IBASE (csTinyDocWrapper)
-  SCF_IMPLEMENTS_INTERFACE (iDocument)
-SCF_IMPLEMENT_IBASE_END
-
-csTinyDocWrapper::csTinyDocWrapper (csRef<iDocument> doc)
+csTinyDocWrapper::csTinyDocWrapper (csRef<iDocument> doc) :
+  scfImplementationType(this)
 {
-  SCF_CONSTRUCT_IBASE (0);
   tinydoc = doc;
 }
 
 csTinyDocWrapper::~csTinyDocWrapper ()
 {
-  SCF_DESTRUCT_IBASE();
 }
 
 void csTinyDocWrapper::Clear ()
@@ -131,19 +126,16 @@ int csTinyDocWrapper::Changeable ()
   return tinydoc->Changeable();
 }
 
-class csTinyXMLPlugin : public csTinyDocumentSystem, public iComponent
+class csTinyXMLPlugin :
+  public scfImplementationExt1<csTinyXMLPlugin, csTinyDocumentSystem,
+    iComponent>
 {
 public:
-  SCF_DECLARE_IBASE_EXT(csTinyDocumentSystem);
-
-  csTinyXMLPlugin (iBase* parent) : csTinyDocumentSystem (parent) {}
+  csTinyXMLPlugin (iBase* parent) :
+    scfImplementationType(this, parent) {}
 
   virtual bool Initialize (iObjectRegistry* objreg);
 };
-
-SCF_IMPLEMENT_IBASE_EXT(csTinyXMLPlugin)
-  SCF_IMPLEMENTS_INTERFACE(iComponent)
-SCF_IMPLEMENT_IBASE_EXT_END
 
 bool csTinyXMLPlugin::Initialize (iObjectRegistry* /*objreg*/)
 {
@@ -153,5 +145,3 @@ bool csTinyXMLPlugin::Initialize (iObjectRegistry* /*objreg*/)
 CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_FACTORY (csTinyXMLPlugin)
-
-

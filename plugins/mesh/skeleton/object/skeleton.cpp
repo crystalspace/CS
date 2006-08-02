@@ -1116,7 +1116,7 @@ iSkeletonBoneFactory *csSkeletonFactory::CreateBone(const char *name)
   bone.AttachNew(new csSkeletonBoneFactory(this));
   bone->SetName(name);
   bones.Push(bone);
-  return bone; 
+  return bone;
 }
 
 csSkeletonFactory::~csSkeletonFactory ()
@@ -1226,21 +1226,24 @@ size_t csSkeletonFactory::GetSocketsCount()
 //--------------------------------iSkeletonGraveyard-----------------------------------------
 
 csSkeletonGraveyard::csSkeletonGraveyard (iBase* pParent) :
-  scfImplementationType(this, pParent)
+  scfImplementationType(this, pParent), object_reg(0)
 {
 }
 
 csSkeletonGraveyard::~csSkeletonGraveyard ()
 {
-   skeletons.DeleteAll();
-   csRef<iEventQueue> q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
-   if (q)
+  skeletons.DeleteAll();
+  if (object_reg)
+  {
+    csRef<iEventQueue> q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+    if (q)
       q->RemoveListener (this);
+  }
 }
 
 bool csSkeletonGraveyard::Initialize (iObjectRegistry* object_reg)
 {
-  csSkeletonGraveyard::object_reg = object_reg;
+  this->object_reg = object_reg;
   vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
   PreProcess = csevPreProcess (object_reg);
   csRef<iEventQueue> eq (CS_QUERY_REGISTRY (object_reg, iEventQueue));

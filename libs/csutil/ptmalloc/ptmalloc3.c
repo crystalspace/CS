@@ -552,9 +552,9 @@ static void * (*save_memalign_hook) (size_t __align, size_t __size,
 				     const void *);
 # endif
 static void   (*save_free_hook) (void * __ptr, const void *);
-static void*  save_arena;
 
 #if !defined(WIN32)
+static void*  save_arena;
 
 /* Magic value for the thread-specific arena pointer when
    malloc_atfork() is in use.  */
@@ -704,6 +704,7 @@ static void ptmalloc_finis (void)
   if (state->refcount > 0) return;
   CALL_MUNMAP(state, sizeof (struct ptmalloc_state));
   sharemem_destroy ();
+  state = 0;
 }
 
 #if !(USE_STARTER & 2)
@@ -734,6 +735,8 @@ ptmalloc_init(void)
     state = *state_ptr;
     sharemem_close (state_ptr, sizeof (struct ptmalloc_state*));
     state->refcount++;
+    /* hack: force dlmalloc() to initialize it's (static) mparams struct */
+    mspace_mallopt (0xdeadbeef, 0x0f00);
     if(state->__malloc_initialized >= 0) return;
   }
 
@@ -837,6 +840,14 @@ public_mALLOc(size_t bytes)
 #ifdef libc_hidden_def
 libc_hidden_def(public_mALLOc)
 #endif
+
+/* NOTE ABOUT CYGWIN
+ * ptmalloc and Cygwin's atexit() don't play nice together.
+ * We have a workaround but it is fragile and may cause crashes on exit
+ * to occur in ptfree() due to static var cleanup orders.
+ * See note in libs/csutil/ptmalloc_wrap.cpp for how to avoid these crashes.
+ * See also cs_atexit() in libs/csutil/dlmalloc-settings.h.
+ */
 
 void
 public_fREe(void* mem)

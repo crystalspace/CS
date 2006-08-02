@@ -149,9 +149,8 @@ bool csCommandLineParser::GetBoolOption(const char *iName, bool defaultValue)
 {
   bool result = defaultValue;
 
-  CS_ALLOC_STACK_ARRAY (char, negName, strlen(iName)+3);
-  strcpy (negName, "no");
-  strcpy (negName+2, iName);
+  csString negName;
+  negName << "no" << iName;
   size_t idx;
   for (idx = Options.Length (); idx > 0; idx--)
   {
@@ -184,4 +183,10 @@ const char* csCommandLineParser::GetAppDir ()
 const char* csCommandLineParser::GetAppPath ()
 {
   return appPath;
+}
+
+const char* csCommandLineParser::GetOptionName (size_t iIndex) const
+{
+  if (iIndex >= Options.GetSize()) return 0;
+  return Options[iIndex]->Name;
 }

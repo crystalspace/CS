@@ -20,6 +20,7 @@
 #define __CS_XRIFACE_H__
 
 #include "iutil/document.h"
+#include "csutil/scf_implementation.h"
 
 struct csXmlReadNode;
 class TrDocumentNode;
@@ -27,17 +28,15 @@ class TrDocumentNode;
 /**
  * This is an SCF compatible wrapper for the TinyXml parser in csutil.
  */
-class csXmlReadDocumentSystem : public iDocumentSystem
+class csXmlReadDocumentSystem :
+  public scfImplementation1<csXmlReadDocumentSystem, iDocumentSystem>
 {
   csRef<iBase> parent;
 public:
   csXmlReadDocumentSystem (iBase* parent);
   virtual ~csXmlReadDocumentSystem ();
 
-  SCF_DECLARE_IBASE;
-
   virtual csRef<iDocument> CreateDocument ();
 };
 
 #endif // __CS_XRIFACE_H__
-

@@ -624,11 +624,11 @@ bool csEmitSaver::WriteDown (iBase* obj, iDocumentNode* parent,
     synldr->WriteBool(paramsNode, "lighting", emitstate->GetLighting(), true);
 
     //Writedown Number tag
-    int number = emitstate->GetParticleCount();
+    size_t number = (int)emitstate->GetParticleCount();
     csRef<iDocumentNode> numberNode =
       paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
     numberNode->SetValue("number");
-    numberNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsInt(number);
+    numberNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsInt((int)number);
 
     //Writedown StartPos tag
     iEmitGen3D* startpos = emitstate->GetStartPosEmit();

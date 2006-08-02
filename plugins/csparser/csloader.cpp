@@ -93,19 +93,14 @@
 
 //---------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE (csLoaderStatus)
-  SCF_IMPLEMENTS_INTERFACE (iLoaderStatus)
-SCF_IMPLEMENT_IBASE_END
-
-csLoaderStatus::csLoaderStatus ()
+csLoaderStatus::csLoaderStatus () :
+  scfImplementationType(this)
 {
-  SCF_CONSTRUCT_IBASE (0);
   //mutex = csMutex::Create (true);
 }
 
 csLoaderStatus::~csLoaderStatus ()
 {
-  SCF_DESTRUCT_IBASE ();
 }
 
 //---------------------------------------------------------------------------
@@ -325,15 +320,11 @@ iTextureWrapper* StdLoaderContext::FindNamedTexture (const char* name,
 
 //---------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE(ThreadedLoaderContext);
-  SCF_IMPLEMENTS_INTERFACE(iLoaderContext);
-SCF_IMPLEMENT_IBASE_END
-
 ThreadedLoaderContext::ThreadedLoaderContext (iEngine* /*Engine*/,
 	iRegion* region, bool curRegOnly, csLoader* loader,
-	bool checkDupes)
+	bool checkDupes) :
+  scfImplementationType(this)
 {
-  SCF_CONSTRUCT_IBASE (0);
   ThreadedLoaderContext::region = region;
   ThreadedLoaderContext::curRegOnly = curRegOnly;
   ThreadedLoaderContext::loader = loader;
@@ -342,7 +333,6 @@ ThreadedLoaderContext::ThreadedLoaderContext (iEngine* /*Engine*/,
 
 ThreadedLoaderContext::~ThreadedLoaderContext ()
 {
-  SCF_DESTRUCT_IBASE ();
 }
 
 iSector* ThreadedLoaderContext::FindSector (const char* name)
@@ -1744,7 +1734,8 @@ bool csLoader::LoadLodControl (iLODControl* lodctrl, iDocumentNode* node)
 //--------------------------------------------------------------------
 
 // Private class implementing iPolygonMesh for a general triangle mesh.
-class PolygonMeshMesh : public iPolygonMesh
+class PolygonMeshMesh :
+  public scfImplementation1<PolygonMeshMesh, iPolygonMesh>
 {
 private:
   csVector3* vertices;
@@ -1755,9 +1746,9 @@ private:
   csFlags flags;
 
 public:
-  PolygonMeshMesh (int num_verts, int num_tris)
+  PolygonMeshMesh (int num_verts, int num_tris) :
+    scfImplementationType(this)
   {
-    SCF_CONSTRUCT_IBASE (0);
     PolygonMeshMesh::num_verts = num_verts;
     PolygonMeshMesh::num_tris = num_tris;
     vertices = new csVector3[num_verts];
@@ -1777,10 +1768,7 @@ public:
     delete[] vertices;
     delete[] polygons;
     delete[] vertex_indices;
-    SCF_DESTRUCT_IBASE();
   }
-
-  SCF_DECLARE_IBASE;
 
   virtual int GetVertexCount () { return num_verts; }
   virtual csVector3* GetVertices () { return vertices; }
@@ -1793,10 +1781,6 @@ public:
   virtual csFlags& GetFlags () { return flags; }
   virtual uint32 GetChangeNumber () const { return 0; }
 };
-
-SCF_IMPLEMENT_IBASE (PolygonMeshMesh)
-  SCF_IMPLEMENTS_INTERFACE (iPolygonMesh)
-SCF_IMPLEMENT_IBASE_END
 
 bool csLoader::ParsePolyMeshChildBox (iDocumentNode* child,
 	csRef<iPolygonMesh>& polymesh)
@@ -5676,6 +5660,8 @@ bool csLoader::ParseShader (iLoaderContext* ldr_context,
 			    iDocumentNode* node,
 			    iShaderManager* shaderMgr)
 {
+  // @@@ FIXME: unify with csTextSyntaxService::ParseShaderRef()?
+
   /*csRef<iShader> shader (shaderMgr->CreateShader ());
   //test if we have a childnode named file, if so load from file, else
   //use inline loading
@@ -5762,6 +5748,12 @@ bool csLoader::ParseShader (iLoaderContext* ldr_context,
     return false;
   }
   csRef<iShaderCompiler> shcom = shaderMgr->GetCompiler (type);
+  if (!shcom.IsValid()) 
+  {
+    SyntaxService->ReportError ("crystalspace.maploader", shaderNode,
+      "Could not get shader compiler '%s'", type);
+    return false;
+  }
   csRef<iShader> shader = shcom->CompileShader (shaderNode);
   if (shader)
   {

@@ -22,8 +22,9 @@
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "iutil/dbghelp.h"
-#include "csutil/scf.h"
+#include "csutil/scf_implementation.h"
 #include "csgeom/plane3.h"
+#include "csgeom/kdtree.h"
 #include "iengine/viscull.h"
 #include "dmodel.h"
 
@@ -49,7 +50,8 @@ enum csVisReason
  * culling from previous frame. It is used both for regular objects
  * as for kdtree nodes.
  */
-class csVisibilityObjectHistory : public iBase
+class csVisibilityObjectHistory :
+  public scfImplementation1<csVisibilityObjectHistory, iKDTreeUserData>
 {
 public:
   csVisReason reason;	// Reason object is visible/invisible.
@@ -78,11 +80,9 @@ public:
   bool has_vpt_point;
   csVector3 vpt_point;
 
-  SCF_DECLARE_IBASE;
-
-  csVisibilityObjectHistory ()
+  csVisibilityObjectHistory () :
+    scfImplementationType (this)
   {
-    SCF_CONSTRUCT_IBASE (0);
     vis_cnt = 0;
     no_writequeue_vis_cnt = 0;
     history_frame_cnt = 0;
@@ -93,7 +93,6 @@ public:
 
   virtual ~csVisibilityObjectHistory()
   {
-    SCF_DESTRUCT_IBASE();
   }
 };
 

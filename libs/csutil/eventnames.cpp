@@ -40,8 +40,9 @@ csEventNameRegistry::~csEventNameRegistry()
 {
 }
 
-csEventID csEventNameRegistry::GetID (const csString &name)
+csEventID csEventNameRegistry::GetID (const char* name_)
 {
+  csString name (name_);
 #ifdef ADB_DEBUG
   std::cerr << "csEventNameRegistry <" 
 	    << std::hex << ((unsigned long) this) << std::dec
@@ -52,10 +53,12 @@ csEventID csEventNameRegistry::GetID (const csString &name)
   csEventID result;
   if (names.Contains(name))
   {
+    // queries already registered id
     result = names.Request(name);
   }
   else
   {
+    // generated new id
     result = names.Request(name);
     if (name.FindLast('.') != (size_t)-1)
     { 

@@ -5,18 +5,22 @@
 
 @menu
 * Map Creation:: How to Create Optimal Maps for Crystal Space
+* Map Creation Tips:: Some Tips for Efficient Maps
 * Simple Map Example::
 * Blender:: Making Levels and Models in Blender
 * 3DSMax:: Making Levels and Models in 3DSMax
 * md32spr Tutorial:: @code{md32spr} Tutorial
 * mdl2spr:: Quake Model Converter (@code{mdl2spr})
 * 3D Sprites::
+* ViewMesh:: Previewing Models (@code{viewmesh})
 @end menu
 
 @imports{content,levbuilding.txi}
+@imports{content,maptips.txi}
 @imports{content,simpmap.txi}
 @imports{content,blender.txi}
 @imports{content,3dsmax.txi}
 @imports{content,md32spr.txi}
 @imports{content,mdl2spr.txi}
 @importss{content,sprites,3dsprite.txi}
+@imports{content,viewmesh.txi}

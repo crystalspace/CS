@@ -563,6 +563,20 @@ CS_EMIT_BUILD_FLAGS([how to export all dynamic symbols],
 
 
 #------------------------------------------------------------------------------
+# Check whether the linker needs -Bsymbolic. This binds "references to global 
+# symbols to the definition within the shared library" (from man ld). If this
+# flag is not set, it can happen that symbols in plugins get bound against
+# symbols from other modules (including the application executable itself),
+# causing side-effects such as violating the "memory allocation and freeing in
+# the same module" rule.
+#------------------------------------------------------------------------------
+CS_EMIT_BUILD_FLAGS([for -Bsymbolic linker flag],
+    [cs_cv_prog_link_Bsymbolic], [CS_CREATE_TUPLE([-Wl,-Bsymbolic])],
+    [C++], [COMPILER.LFLAGS], [+])
+
+
+
+#------------------------------------------------------------------------------
 # Check if linker recognizes --kill-at which is needed to make csjava.dll
 # usable by JNI on Windows.  Without this, JNI is unable to find the exported
 # JNI glue functions in csjava.dll.
@@ -683,6 +697,13 @@ CS_SYMBOL_QUALIFIER([how to declare default visibility],
 AS_IF([test $cs_cv_prog_cxx_declare_visible_def != no],
     [CS_HEADER_PROPERTY([CS_VISIBILITY_DEFAULT],
 	[$cs_cv_prog_cxx_declare_visible_def])])
+
+CS_SYMBOL_QUALIFIER([how to declare hidden visibility],
+    [cs_cv_prog_cxx_declare_visible_hidden],
+    [__attribute__((visibility("hidden")))], [], [C++])
+AS_IF([test $cs_cv_prog_cxx_declare_visible_hidden != no],
+    [CS_HEADER_PROPERTY([CS_VISIBILITY_HIDDEN],
+	[$cs_cv_prog_cxx_declare_visible_hidden])])
 
 
 
@@ -826,7 +847,7 @@ CS_CHECK_OPTIMIZE_FLAGS
 #------------------------------------------------------------------------------
 binutils_recent=no
 AS_IF([test -n "$OBJCOPY"],
-    [CS_CHECK_PROG_VERSION([binutils], [$OBJCOPY -V], [2.16.0], [9.9.9|.9.9],
+    [CS_CHECK_PROG_VERSION([binutils], [$OBJCOPY -V], [2.16], [9.9|.9|.9|.9],
         [binutils_recent=yes])])
 
 AC_MSG_CHECKING([whether to split debug information])
@@ -1319,7 +1340,6 @@ AS_IF([test $cs_cv_libfreetype2 = yes],
 	[cs_cv_freetype2_recent],
 	[AC_LANG_PROGRAM(
 	    [[#include <ft2build.h>
-	    #include FT_INTERNAL_OBJECTS_H
 	    #include FT_FREETYPE_H
 	    #include FT_GLYPH_H
 	    #include FT_MODULE_H]], [return

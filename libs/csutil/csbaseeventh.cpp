@@ -43,7 +43,7 @@ csBaseEventHandler::csBaseEventHandler() :
 void csBaseEventHandler::Initialize (iObjectRegistry *r)
 {
   object_registry = r;
-  self = csEventHandlerRegistry::GetID (r, eventh);
+  self = csEventHandlerRegistry::RegisterID (r, eventh);
   FrameEvent = csevFrame (r);
   PreProcess = csevPreProcess (r);
   Process = csevProcess (r);
@@ -53,10 +53,10 @@ void csBaseEventHandler::Initialize (iObjectRegistry *r)
 
 csBaseEventHandler::~csBaseEventHandler()
 {
-  if (queue)
-    queue->RemoveListener (eventh);
   if (object_registry)
     csEventHandlerRegistry::ReleaseID (object_registry, eventh);
+  if (queue)
+    queue->RemoveListener (eventh);
   eventh->parent = 0;
 }
 

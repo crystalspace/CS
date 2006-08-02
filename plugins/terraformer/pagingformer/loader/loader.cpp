@@ -21,6 +21,7 @@
 #include "csutil/csstring.h"
 #include "csutil/csendian.h"
 #include "csutil/dirtyaccessarray.h"
+#include "csutil/scf.h"
 
 #include "iengine/engine.h"
 #include "iengine/mesh.h"
@@ -45,27 +46,15 @@ CS_IMPLEMENT_PLUGIN
 namespace cspluginPagingFormerLoader
 {
 
-SCF_IMPLEMENT_IBASE (csPagingFormerLoader)
-  SCF_IMPLEMENTS_INTERFACE (iLoaderPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csPagingFormerLoader::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 SCF_IMPLEMENT_FACTORY (csPagingFormerLoader)
 
-csPagingFormerLoader::csPagingFormerLoader (iBase* parent)
+csPagingFormerLoader::csPagingFormerLoader (iBase* parent) :
+  scfImplementationType(this, parent)
 {
-  SCF_CONSTRUCT_IBASE (parent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
 }
 
 csPagingFormerLoader::~csPagingFormerLoader ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csPagingFormerLoader::Initialize (iObjectRegistry* object_reg)

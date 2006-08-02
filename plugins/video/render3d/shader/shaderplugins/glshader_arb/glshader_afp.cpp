@@ -37,9 +37,6 @@
 
 CS_LEAKGUARD_IMPLEMENT (csShaderGLAFP);
 
-SCF_IMPLEMENT_IBASE_EXT(csShaderGLAFP)
-SCF_IMPLEMENT_IBASE_EXT_END
-
 void csShaderGLAFP::Report (int severity, const char* msg, ...)
 {
   va_list args;

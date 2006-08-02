@@ -53,58 +53,19 @@ enum
   XMLTOKEN_RENDERBUFFER
 };
 
-SCF_IMPLEMENT_IBASE (csNullFactoryLoader)
-  SCF_IMPLEMENTS_INTERFACE (iLoaderPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csNullFactoryLoader::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csNullFactorySaver)
-  SCF_IMPLEMENTS_INTERFACE (iSaverPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csNullFactorySaver::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csNullMeshLoader)
-  SCF_IMPLEMENTS_INTERFACE (iLoaderPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csNullMeshLoader::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csNullMeshSaver)
-  SCF_IMPLEMENTS_INTERFACE (iSaverPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csNullMeshSaver::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 SCF_IMPLEMENT_FACTORY (csNullFactoryLoader)
 SCF_IMPLEMENT_FACTORY (csNullFactorySaver)
 SCF_IMPLEMENT_FACTORY (csNullMeshLoader)
 SCF_IMPLEMENT_FACTORY (csNullMeshSaver)
 
 
-csNullFactoryLoader::csNullFactoryLoader (iBase* pParent)
+csNullFactoryLoader::csNullFactoryLoader (iBase* pParent) :
+  scfImplementationType (this, pParent)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 csNullFactoryLoader::~csNullFactoryLoader ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csNullFactoryLoader::Initialize (iObjectRegistry* object_reg)
@@ -305,16 +266,13 @@ csPtr<iBase> csNullFactoryLoader::Parse (iDocumentNode* node,
 }
 //---------------------------------------------------------------------------
 
-csNullFactorySaver::csNullFactorySaver (iBase* pParent)
+csNullFactorySaver::csNullFactorySaver (iBase* pParent) :
+  scfImplementationType (this, pParent)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 csNullFactorySaver::~csNullFactorySaver ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csNullFactorySaver::Initialize (iObjectRegistry* object_reg)
@@ -359,16 +317,13 @@ bool csNullFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent,
 
 //---------------------------------------------------------------------------
 
-csNullMeshLoader::csNullMeshLoader (iBase* pParent)
+csNullMeshLoader::csNullMeshLoader (iBase* pParent) :
+  scfImplementationType (this, pParent)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 csNullMeshLoader::~csNullMeshLoader ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csNullMeshLoader::Initialize (iObjectRegistry* object_reg)
@@ -453,16 +408,13 @@ csPtr<iBase> csNullMeshLoader::Parse (iDocumentNode* node,
 
 //---------------------------------------------------------------------------
 
-csNullMeshSaver::csNullMeshSaver (iBase* pParent)
+csNullMeshSaver::csNullMeshSaver (iBase* pParent) :
+  scfImplementationType (this, pParent)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 csNullMeshSaver::~csNullMeshSaver ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csNullMeshSaver::Initialize (iObjectRegistry* object_reg)

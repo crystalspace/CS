@@ -20,7 +20,7 @@
 #ifndef __CS_PTANIMIMG_H__
 #define __CS_PTANIMIMG_H__
 
-#include "csutil/scf.h"
+#include "csutil/scf_implementation.h"
 #include "iutil/comp.h"
 #include "iutil/plugin.h"
 #include "imap/reader.h"
@@ -31,15 +31,16 @@
 
 class csProcTexture;
 
-class csAnimateProctexLoader : public iLoaderPlugin, public iComponent  
+class csAnimateProctexLoader :
+  public scfImplementation2<csAnimateProctexLoader,
+    iLoaderPlugin, iComponent>
 {
 protected:
   iObjectRegistry* object_reg;
 
   void Report (int severity, iDocumentNode* node, const char* msg, ...);
-public:
-  SCF_DECLARE_IBASE;
 
+public:
   csAnimateProctexLoader (iBase *p);
   virtual ~csAnimateProctexLoader ();
 
@@ -51,4 +52,3 @@ public:
 };  
 
 #endif
-
