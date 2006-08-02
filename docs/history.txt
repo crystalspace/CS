@@ -19,6 +19,8 @@ chronological order.
 	- Jorrit fixed compilation of genmesh on gcc.
 	- res changed the saver plugin to also expose the portal saving 
 	  method.
+	- res changed iSceneNode to also return the children in an SCF array
+	  (keep in mind, references to csArray<>s in interfaces are not safe).
 1-Aug-2006
 	- res changed the csRenderBufferLock pre-increment operator to return
 	  the element after incrementation.
