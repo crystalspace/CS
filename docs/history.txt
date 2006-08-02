@@ -21,6 +21,7 @@ chronological order.
 	  method.
 	- res changed iSceneNode to also return the children in an SCF array
 	  (keep in mind, references to csArray<>s in interfaces are not safe).
+	- res fixed an instance of a stack-based SCF object in thingldr.
 1-Aug-2006
 	- res changed the csRenderBufferLock pre-increment operator to return
 	  the element after incrementation.
