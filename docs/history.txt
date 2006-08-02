@@ -11,6 +11,11 @@ chronological order.
 	- res fixed a stupid typo in the gmeshldr index buffer check.
 	- res added proper object model support to genmeshes when submeshes
 	  are used.
+	- res changed csRenderBufferLock<> to lock/unlock on construction/
+	  destruction, as opposed to checking for being locked and locking on 
+	  demand on every access. This is somewhat less overhead, and most
+	  (if not all) of the current usage does not unlock a buffer in the
+	  middle of some operations.
 1-Aug-2006
 	- res changed the csRenderBufferLock pre-increment operator to return
 	  the element after incrementation.

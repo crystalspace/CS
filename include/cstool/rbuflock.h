@@ -29,6 +29,10 @@
 
 /**
  * Helper class for convenient locking/unlocking of an iRenderBuffer.
+ *
+ * The buffer is locked upon construction of the csRenderBufferLock<> object
+ * and unlocked on destruction.
+ *
  * The contents can be accessed either directly, array-style or iterator-style 
  * in a typed way.
  * \remarks The TbufferKeeper template argument can be used to have the
@@ -41,8 +45,6 @@ class csRenderBufferLock
 {
   /// Buffer that is being locked
   TbufferKeeper buffer;
-  /// State of locking (type and whether this buffer is locked)
-  uint lockState;
   /// Buffer data
   T* lockBuf;
   /// Distance between two elements
@@ -54,33 +56,34 @@ class csRenderBufferLock
   /// Index of current element
   size_t currElement;
   
-  enum { LockedFlag = 0x10000, LockTypeMask = 0xffff };
-  inline bool IsLocked() { return (lockState & LockedFlag) != 0; }
-  inline void SetLocked (bool b) 
-  { lockState = b ? (lockState | LockedFlag) : (lockState & ~LockedFlag); }
-  inline csRenderBufferLockType LockType() 
-  { return (csRenderBufferLockType)(lockState & LockTypeMask); }
-  
   csRenderBufferLock() {}
   // Copying the locking stuff is somewhat nasty so ... prevent it
   csRenderBufferLock (const csRenderBufferLock& other) {}
+
+  /// Unlock the renderbuffer.
+  void Unlock ()
+  {
+    if (buffer) buffer->Release();
+  }
 public:
   /**
-   * Construct the helper.
+   * Construct the helper. Locks the buffer.
    */
   csRenderBufferLock (iRenderBuffer* buf, 
     csRenderBufferLockType lock = CS_BUF_LOCK_NORMAL) : buffer(buf),
-    lockState(lock), lockBuf(0), 
-    bufStride(buf ? buf->GetElementDistance() : 0),
+    lockBuf(0), bufStride(buf ? buf->GetElementDistance() : 0),
     currElement(0)
   {
 #ifdef CS_DEBUG
     elements = buf ? buf->GetElementCount() : 0;
 #endif
+    CS_ASSERT (buffer != 0);
+    lockBuf = 
+      buffer ? ((T*)((uint8*)buffer->Lock (lock))) : (T*)-1;
   }
   
   /**
-   * Destruct the helper. Automatically unlocks the buffer if it was locked.
+   * Destruct the helper. Unlocks the buffer.
    */
   ~csRenderBufferLock()
   {
@@ -93,24 +96,7 @@ public:
    */
   T* Lock ()
   {
-    CS_ASSERT (buffer != 0);
-    if (!IsLocked())
-    {
-      lockBuf = 
-	buffer ? ((T*)((uint8*)buffer->Lock (LockType()))) : (T*)-1;
-      SetLocked (true);
-    }
     return lockBuf;
-  }
-  
-  /// Unlock the renderbuffer.
-  void Unlock ()
-  {
-    if (IsLocked ())
-    {
-      if (buffer) buffer->Release();
-      SetLocked (false);
-    }
   }
   
   /**
@@ -129,16 +115,16 @@ public:
   }
 
   /// Set current element to the next, pre-increment version.
-  T* operator++ ()
+  T* operator++ ()  
   {
     currElement++;
-    return Get (currElement);
+    return &Get (currElement);
   }
 
   /// Set current element to the next, post-increment version.
   T* operator++ (int)
   {
-    T* p = Get (currElement);
+    T* p = &Get (currElement);
     currElement++;
     return p;
   }
@@ -147,7 +133,7 @@ public:
   T* operator+= (int n)
   {
     currElement += n;
-    return Lock() + currElement;
+    return &Get (currElement);
   }
 
   /// Retrieve an item in the render buffer.
