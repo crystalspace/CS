@@ -34,6 +34,7 @@
 #include "csutil/memfile.h"
 #include "csutil/scfstr.h"
 #include "csutil/sysfunc.h"
+#include "cstool/rbuflock.h"
 
 #include "iengine/camera.h"
 #include "iengine/engine.h"
@@ -67,6 +68,24 @@ CS_IMPLEMENT_PLUGIN
 
 CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
 {
+
+  class WrapObjectModel :
+    public scfImplementationExt0<WrapObjectModel, csObjectModel>
+  {
+    csRef<iObjectModel> wrapObjectModel;
+  public:
+    WrapObjectModel (iObjectModel* wrapObjectModel) :
+      scfImplementationType (this), wrapObjectModel (wrapObjectModel)
+    {
+    }
+
+    void GetObjectBoundingBox (csBox3& bbox)
+    { wrapObjectModel->GetObjectBoundingBox (bbox); }
+    void GetRadius (float& rad, csVector3& cent)
+    { wrapObjectModel->GetRadius (rad, cent); }
+    void SetObjectBoundingBox (const csBox3& bbox)
+    { wrapObjectModel->SetObjectBoundingBox (bbox); }
+  };
 
 CS_LEAKGUARD_IMPLEMENT (csGenmeshMeshObject);
 CS_LEAKGUARD_IMPLEMENT (csGenmeshMeshObjectFactory);
@@ -128,9 +147,24 @@ csGenmeshMeshObject::~csGenmeshMeshObject ()
   ClearPseudoDynLights ();
 }
 
+void csGenmeshMeshObject::SetObjectModelSubMeshes ()
+{
+  if (objectModel.IsValid()) return;
+  WrapObjectModel* newObjModel = 
+    new WrapObjectModel (factory->GetObjectModel ());
+  csRef<iPolygonMesh> polygonMesh;
+  polygonMesh.AttachNew (new SubMeshesPolyMesh (factory, *subMeshes));
+  newObjModel->SetPolygonMeshBase (polygonMesh);
+  newObjModel->SetPolygonMeshColldet (polygonMesh);
+  newObjModel->SetPolygonMeshViscull (polygonMesh);
+  newObjModel->SetPolygonMeshShadows (polygonMesh);
+  objectModel.AttachNew (newObjModel);
+}
+
 void csGenmeshMeshObject::ClearSubMeshes ()
 {
   delete subMeshes; subMeshes = 0;
+  objectModel.Invalidate();
 }
 
 void csGenmeshMeshObject::AddSubMesh (unsigned int *triangles,
@@ -152,6 +186,7 @@ void csGenmeshMeshObject::AddSubMesh (unsigned int *triangles,
 
   if (subMeshes == 0) subMeshes = new SubMeshesContainer;
   subMeshes->AddSubMesh (index_buffer, material, 0, mixmode);
+  SetObjectModelSubMeshes ();
 }
 
 void csGenmeshMeshObject::CopySubMeshesFromFactory()
@@ -1134,18 +1169,45 @@ bool csGenmeshMeshObject::HitBeamOutline (const csVector3& start,
   // will be a bit faster than its more accurate cousin (below).
 
   csSegment3 seg (start, end);
-  int i, max = factory->GetTriangleCount();
-  csTriangle *tr = factory->GetTriangles();
-  csVector3 *vrt = factory->GetVertices ();
-  for (i = 0 ; i < max ; i++)
+  const SubMeshesContainer& sm = 
+    subMeshes ? *subMeshes : factory->GetSubMeshes ();
+  const csVector3 *vrt = factory->GetVertices ();
+  if (sm.GetSize() == 0)
   {
-    if (csIntersect3::SegmentTriangle (seg, vrt[tr[i].a], vrt[tr[i].b],
-        vrt[tr[i].c], isect))
+    int i, max = factory->GetTriangleCount();
+    csTriangle *tr = factory->GetTriangles();
+    for (i = 0 ; i < max ; i++)
     {
-      if (pr) *pr = csQsqrt (csSquaredDist::PointPoint (start, isect) /
-        csSquaredDist::PointPoint (start, end));
+      if (csIntersect3::SegmentTriangle (seg, vrt[tr[i].a], vrt[tr[i].b],
+          vrt[tr[i].c], isect))
+      {
+        if (pr) *pr = csQsqrt (csSquaredDist::PointPoint (start, isect) /
+          csSquaredDist::PointPoint (start, end));
 
-      return true;
+        return true;
+      }
+    }
+  }
+  else
+  {
+    for (size_t s = 0; s < sm.GetSize(); s++)
+    {
+      iRenderBuffer* indexBuffer = sm.GetSubMeshIndices (s);
+      csRenderBufferLock<uint, iRenderBuffer*> indices (indexBuffer);
+      size_t n = indexBuffer->GetElementCount();
+      while (n > 0)
+      {
+        if (csIntersect3::SegmentTriangle (seg, 
+          vrt[indices.Get (0)], vrt[indices.Get (1)], vrt[indices.Get (2)], 
+          isect))
+        {
+          if (pr) *pr = csQsqrt (csSquaredDist::PointPoint (start, isect) /
+            csSquaredDist::PointPoint (start, end));
+          return true;
+        }
+        n -= 3;
+        indices += 3;
+      }
     }
   }
   return false;
@@ -1162,42 +1224,74 @@ bool csGenmeshMeshObject::HitBeamObject (const csVector3& start,
   // Usage is optional.
 
   csSegment3 seg (start, end);
-  int i, max = factory->GetTriangleCount();
   float tot_dist = csSquaredDist::PointPoint (start, end);
   float dist, temp;
   float itot_dist = 1 / tot_dist;
   dist = temp = tot_dist;
-  csVector3 *vrt = factory->GetVertices (), tmp;
-  csTriangle *tr = factory->GetTriangles();
-  for (i = 0 ; i < max ; i++)
+  const SubMeshesContainer& sm = 
+    subMeshes ? *subMeshes : factory->GetSubMeshes ();
+  const csVector3 *vrt = factory->GetVertices ();
+  csVector3 tmp;
+  if (sm.GetSize() == 0)
   {
-    if (csIntersect3::SegmentTriangle (seg, vrt[tr[i].a], vrt[tr[i].b],
-        vrt[tr[i].c], tmp))
+    int i, max = factory->GetTriangleCount();
+    csTriangle *tr = factory->GetTriangles();
+    for (i = 0 ; i < max ; i++)
     {
-      temp = csSquaredDist::PointPoint (start, tmp);
-      if (temp < dist)
+      if (csIntersect3::SegmentTriangle (seg, vrt[tr[i].a], vrt[tr[i].b],
+          vrt[tr[i].c], tmp))
       {
-        isect = tmp;
-	dist = temp;
-	if (polygon_idx) *polygon_idx = i;
+        temp = csSquaredDist::PointPoint (start, tmp);
+        if (temp < dist)
+        {
+          isect = tmp;
+	  dist = temp;
+	  if (polygon_idx) *polygon_idx = i;
+        }
       }
     }
-  }
-  if (pr) *pr = csQsqrt (dist * itot_dist);
-  if (dist >= tot_dist)
-    return false;
+    if (pr) *pr = csQsqrt (dist * itot_dist);
+    if (dist >= tot_dist)
+      return false;
 
-  if (material)
-  {
-    // @@@ Submeshes not yet supported!
-    //const csPDelArray<csGenmeshSubMesh>& sm = subMeshes.Length () == 0
-    	//? factory->GetSubMeshes ()
-	//: subMeshes;
-    //if (sm.Length () == 0)
-    //{
+    if (material)
+    {
       *material = csGenmeshMeshObject::material;
       if (!*material) *material = factory->GetMaterialWrapper ();
-    //}
+    }
+  }
+  else
+  {
+    iMaterialWrapper* mat;
+    for (size_t s = 0; s < sm.GetSize(); s++)
+    {
+      iRenderBuffer* indexBuffer = sm.GetSubMeshIndices (s);
+      csRenderBufferLock<uint, iRenderBuffer*> indices (indexBuffer);
+      size_t n = indexBuffer->GetElementCount();
+      while (n > 0)
+      {
+        if (csIntersect3::SegmentTriangle (seg, 
+          vrt[indices.Get (0)], vrt[indices.Get (1)], vrt[indices.Get (2)], 
+          tmp))
+        {
+          temp = csSquaredDist::PointPoint (start, tmp);
+          if (temp < dist)
+          {
+            isect = tmp;
+	    dist = temp;
+	    //if (polygon_idx) *polygon_idx = i; // @@@ Uh, how to handle?
+            mat = sm.GetSubMeshMaterial (s);
+          }
+        }
+        n -= 3;
+        indices += 3;
+      }
+    }
+    if (pr) *pr = csQsqrt (dist * itot_dist);
+    if (dist >= tot_dist)
+      return false;
+
+    if (material) *material = mat;
   }
 
   return true;
@@ -1205,7 +1299,7 @@ bool csGenmeshMeshObject::HitBeamObject (const csVector3& start,
 
 iObjectModel* csGenmeshMeshObject::GetObjectModel ()
 {
-  return factory->GetObjectModel ();
+  return objectModel ? objectModel : factory->GetObjectModel ();
 }
 
 void csGenmeshMeshObject::PreGetShaderVariableValue (csShaderVariable* var)
@@ -1374,12 +1468,7 @@ csGenmeshMeshObjectFactory::csGenmeshMeshObjectFactory (
 
   csGenmeshMeshObjectFactory::object_reg = object_reg;
 
-  polygonMesh.AttachNew (new PolyMesh);
-  polygonMesh->SetFactory (this);
-  SetPolygonMeshBase (polygonMesh);
-  SetPolygonMeshColldet (polygonMesh);
-  SetPolygonMeshViscull (polygonMesh);
-  SetPolygonMeshShadows (polygonMesh);
+  SetPolyMeshStandard ();
 
   logparent = 0;
   genmesh_type = pParent;
@@ -1437,6 +1526,7 @@ csGenmeshMeshObjectFactory::~csGenmeshMeshObjectFactory ()
 void csGenmeshMeshObjectFactory::ClearSubMeshes ()
 {
   subMeshes.ClearSubMeshes ();
+  SetPolyMeshStandard();
 }
 
 void csGenmeshMeshObjectFactory::AddSubMesh (unsigned int *triangles,
@@ -1456,6 +1546,7 @@ void csGenmeshMeshObjectFactory::AddSubMesh (unsigned int *triangles,
   }
   index_buffer->Release ();
   subMeshes.AddSubMesh (index_buffer, material, 0, mixmode);
+  if (polyMeshType != Submeshes) SetPolyMeshSubmeshes();
 }
 
 void csGenmeshMeshObjectFactory::SetAnimationControlFactory (
@@ -1568,6 +1659,28 @@ void csGenmeshMeshObjectFactory::Compress ()
     }
     delete[] vt;
   }
+}
+
+void csGenmeshMeshObjectFactory::SetPolyMeshStandard ()
+{
+  PolyMesh* polyMesh = new PolyMesh;
+  polyMesh->SetFactory (this);
+  polygonMesh.AttachNew (polyMesh);
+  SetPolygonMeshBase (polygonMesh);
+  SetPolygonMeshColldet (polygonMesh);
+  SetPolygonMeshViscull (polygonMesh);
+  SetPolygonMeshShadows (polygonMesh);
+  polyMeshType = Standard;
+}
+
+void csGenmeshMeshObjectFactory::SetPolyMeshSubmeshes ()
+{
+  polygonMesh.AttachNew (new SubMeshesPolyMesh (this, subMeshes));
+  SetPolygonMeshBase (polygonMesh);
+  SetPolygonMeshColldet (polygonMesh);
+  SetPolygonMeshViscull (polygonMesh);
+  SetPolygonMeshShadows (polygonMesh);
+  polyMeshType = Submeshes;
 }
 
 void csGenmeshMeshObjectFactory::PreGetShaderVariableValue (

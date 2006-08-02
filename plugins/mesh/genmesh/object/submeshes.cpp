@@ -19,7 +19,10 @@
 
 #include "cssysdef.h"
 
+#include "cstool/rbuflock.h"
+
 #include "submeshes.h"
+#include "genmesh.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
 {
@@ -48,6 +51,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
     subMeshes.InsertSorted (subMesh, SubmeshSubmeshCompare);
     /* @@@ FIXME: Prolly do some error checking, like sanity of
      * indices */
+    changeNum++;
     return true;
   }
 
@@ -64,5 +68,88 @@ CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
     return subMeshes.FindSortedKey (
       csArrayCmp<SubMesh, const char*> (name, &SubmeshStringCompare));
   }
+
+  //-------------------------------------------------------------------------
+
+  void SubMeshesPolyMesh::CacheTriangles ()
+  {
+    if (triChangeNum == subMeshes.GetChangeNum()) return;
+
+    triangleCache.Empty();
+    for (size_t s = 0; s < subMeshes.GetSubMeshCount(); s++)
+    {
+      iRenderBuffer* buffer = subMeshes.GetSubMeshIndices (s);
+      size_t offs = triangleCache.GetSize();
+      size_t bufferTris = buffer->GetElementCount() / 3;
+      triangleCache.SetSize (offs + bufferTris);
+      void* tris = buffer->Lock (CS_BUF_LOCK_READ);
+      memcpy (triangleCache.GetArray() + offs, tris, 
+        bufferTris * sizeof (csTriangle));
+      buffer->Release();
+    }
+    triangleCache.ShrinkBestFit();
+
+    triChangeNum = subMeshes.GetChangeNum();
+  }
+  void SubMeshesPolyMesh::CachePolygons ()
+  {
+    if (polyChangeNum == subMeshes.GetChangeNum()) return;
+
+    CacheTriangles ();
+
+    polygonCache.Empty();
+    for (size_t s = 0; s < subMeshes.GetSubMeshCount(); s++)
+    {
+      iRenderBuffer* buffer = subMeshes.GetSubMeshIndices (s);
+      size_t bufferTris = buffer->GetElementCount() / 3;
+      csRenderBufferLock<uint, iRenderBuffer*> indices (buffer);
+      for (size_t t = 0; t < bufferTris; t++)
+      {
+        csMeshedPolygon poly;
+        poly.num_vertices = 3;
+        poly.vertices = (int*)(indices.Get (t*3));
+        polygonCache.Push (poly);
+      }
+    }
+    polygonCache.ShrinkBestFit();
+
+    polyChangeNum = subMeshes.GetChangeNum();
+  }
+
+  int SubMeshesPolyMesh::GetVertexCount ()
+  {
+    if (!factory) return 0;
+    return factory->GetVertexCount ();
+  }
+  csVector3* SubMeshesPolyMesh::GetVertices ()
+  {
+    if (!factory) return 0;
+    return factory->GetVertices ();
+  }
+  int SubMeshesPolyMesh::GetPolygonCount ()
+  {
+    if (!factory) return 0;
+    CachePolygons ();
+    return (int)polygonCache.GetSize ();
+  }
+  csMeshedPolygon* SubMeshesPolyMesh::GetPolygons ()
+  {
+    if (!factory) return 0;
+    CachePolygons ();
+    return polygonCache.GetArray ();
+  }
+  int SubMeshesPolyMesh::GetTriangleCount ()
+  {
+    if (!factory) return 0;
+    CacheTriangles ();
+    return (int)triangleCache.GetSize ();
+  }
+  csTriangle* SubMeshesPolyMesh::GetTriangles ()
+  {
+    if (!factory) return 0;
+    CacheTriangles ();
+    return triangleCache.GetArray ();
+  }
+
 }
 CS_PLUGIN_NAMESPACE_END(Genmesh)

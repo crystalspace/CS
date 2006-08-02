@@ -20,11 +20,17 @@
 #ifndef __CS_SUBMESHES_H__
 #define __CS_SUBMESHES_H__
 
+#include "csgeom/tri.h"
 #include "cstool/rendermeshholder.h"
+#include "csutil/dirtyaccessarray.h"
+#include "csutil/flags.h"
 #include "csutil/ref.h"
+#include "csutil/scf_implementation.h"
 #include "csutil/util.h"
+#include "csutil/weakref.h"
 
 #include "iengine/material.h"
+#include "igeom/polymesh.h"
 #include "ivideo/rndbuf.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
@@ -65,14 +71,17 @@ CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
   class SubMeshesContainer
   {
     csArray<SubMesh> subMeshes;
+    uint changeNum;
   public:
+    SubMeshesContainer() : changeNum (0) { }
+
     void ClearSubMeshes ()
-    { subMeshes.DeleteAll(); }
+    { subMeshes.DeleteAll(); changeNum++; }
     bool AddSubMesh (iRenderBuffer* indices, iMaterialWrapper *material, 
       const char* name, uint mixmode = (uint)~0);
     size_t FindSubMesh (const char* name) const;
     void DeleteSubMesh (size_t index)
-    { subMeshes.DeleteIndex (index); }
+    { subMeshes.DeleteIndex (index); changeNum++; }
     size_t GetSubMeshCount () const
     { return subMeshes.GetSize(); }
     iRenderBuffer* GetSubMeshIndices (size_t index) const
@@ -88,8 +97,46 @@ CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
     { return subMeshes.GetSize(); }
     SubMesh& operator[](size_t index)
     { return subMeshes[index]; }
+    uint GetChangeNum () const
+    { return changeNum; }
   };
-  
+
+  class csGenmeshMeshObjectFactory;
+
+  struct SubMeshesPolyMesh : 
+    public scfImplementation1<SubMeshesPolyMesh, iPolygonMesh>
+  {
+  private:
+    csWeakRef<csGenmeshMeshObjectFactory> factory;
+    csFlags flags;
+    const SubMeshesContainer& subMeshes;
+    csDirtyAccessArray<csTriangle> triangleCache;
+    csDirtyAccessArray<csMeshedPolygon> polygonCache;
+    uint triChangeNum, polyChangeNum;
+
+    void CacheTriangles ();
+    void CachePolygons ();
+  public:
+    SubMeshesPolyMesh (csGenmeshMeshObjectFactory* Factory,
+      const SubMeshesContainer& subMeshes) : 
+      scfImplementationType (this), factory (Factory), subMeshes (subMeshes),
+      triChangeNum (~0), polyChangeNum (~0)
+    {
+      flags.Set (CS_POLYMESH_TRIANGLEMESH);
+    }
+
+    virtual int GetVertexCount ();
+    virtual csVector3* GetVertices ();
+    virtual int GetPolygonCount ();
+    virtual csMeshedPolygon* GetPolygons ();
+    virtual int GetTriangleCount ();
+    virtual csTriangle* GetTriangles ();
+    virtual void Lock () { }
+    virtual void Unlock () { }
+    
+    virtual csFlags& GetFlags () { return flags;  }
+    virtual uint32 GetChangeNumber() const { return subMeshes.GetChangeNum(); }
+  };
 }
 CS_PLUGIN_NAMESPACE_END(Genmesh)
 

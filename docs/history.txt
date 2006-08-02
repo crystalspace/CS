@@ -7,8 +7,10 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 2-Aug-2006
-	- res added operatir+= to csRenderBufferLock<>.
+	- res added operator+= to csRenderBufferLock<>.
 	- res fixed a stupid typo in the gmeshldr index buffer check.
+	- res added proper object model support to genmeshes when submeshes
+	  are used.
 1-Aug-2006
 	- res changed the csRenderBufferLock pre-increment operator to return
 	  the element after incrementation.

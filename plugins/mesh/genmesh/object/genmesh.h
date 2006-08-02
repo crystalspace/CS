@@ -20,6 +20,7 @@
 #define __CS_GENMESH_H__
 
 #include "cstool/objmodel.h"
+#include "csgeom/box.h"
 #include "csgeom/transfrm.h"
 #include "csgeom/vector3.h"
 #include "csgeom/vector4.h"
@@ -145,6 +146,9 @@ private:
   int num_lit_mesh_colors;	// Should be equal to factory number.
   csColor4* static_mesh_colors;
 
+  csRef<iObjectModel> objectModel;
+  void SetObjectModelSubMeshes ();
+
   /**
    * Global sector wide dynamic ambient version.
    */
@@ -246,6 +250,7 @@ public:
     const char* name, uint mixmode)
   {
     if (subMeshes == 0) subMeshes = new SubMeshesContainer;
+    SetObjectModelSubMeshes ();
     return subMeshes->AddSubMesh (indices, material, name, mixmode);
   }
   size_t FindSubMesh (const char* name) const
@@ -607,11 +612,13 @@ public:
   virtual void AddSubMesh (unsigned int *triangles, int tricount, 
     iMaterialWrapper *material)
   {
+    if (polyMeshType != Submeshes) SetPolyMeshSubmeshes();
     AddSubMesh (triangles, tricount, material, (uint)~0);
   }
   bool AddSubMesh (iRenderBuffer* indices, iMaterialWrapper *material, 
     const char* name, uint mixmode)
   {
+    if (polyMeshType != Submeshes) SetPolyMeshSubmeshes();
     return subMeshes.AddSubMesh (indices, material, name, mixmode);
   }
   size_t FindSubMesh (const char* name) const
@@ -765,10 +772,13 @@ public:
     {
     }
   };
-  csRef<PolyMesh> polygonMesh;
+  csRef<iPolygonMesh> polygonMesh;
   friend struct PolyMesh;
+  enum { Standard, Submeshes } polyMeshType;
 
-  virtual iObjectModel* GetObjectModel () { return this/*&scfiObjectModel*/; }
+  void SetPolyMeshStandard ();
+  void SetPolyMeshSubmeshes ();
+  virtual iObjectModel* GetObjectModel () { return this; }
 
   /// Genmesh factory shader variable accessor
   class ShaderVariableAccessor : 
