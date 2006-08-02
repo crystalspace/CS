@@ -1299,7 +1299,7 @@ bool csGenmeshMeshObject::HitBeamObject (const csVector3& start,
 
 iObjectModel* csGenmeshMeshObject::GetObjectModel ()
 {
-  return objectModel ? objectModel : factory->GetObjectModel ();
+  return objectModel ? (iObjectModel*)objectModel : factory->GetObjectModel ();
 }
 
 void csGenmeshMeshObject::PreGetShaderVariableValue (csShaderVariable* var)
