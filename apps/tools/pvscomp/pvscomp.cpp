@@ -21,6 +21,7 @@
 #include "csgeom/statickdtree.h"
 #include "iengine/mesh.h"
 #include "iutil/object.h"
+#include "pvscomp.h"
 
 CS_IMPLEMENT_APPLICATION
 
@@ -110,25 +111,6 @@ static csStaticKDTreeObject* MakeKDObject (iMeshWrapper* obj)
   return new csStaticKDTreeObject (obj->GetWorldBoundingBox (), NULL);
 }
 
-class Compiler
-{
-  csRef<iEngine> engine;
-  iObjectRegistry* reg;
-  iMeshList* meshlist;
-  csStaticKDTree* pvstree;
-
-  void MakeTree ();
-
-public:
-  Compiler ();
-  ~Compiler ();
-  bool Initialize (int argc, char** argv);
-  bool LoadWorld (const char* path, const char* c);
-  void DoWork ();
-  void PrintObjects ();
-  void Save (const char* name);
-};
-
 void Compiler::MakeTree ()
 {
   delete pvstree;
@@ -208,6 +190,8 @@ bool Compiler::LoadWorld (const char* path, const char* c)
 void Compiler::DoWork ()
 {
   MakeTree ();
+  ConstructPVS (pvstree);
+  PropogatePVS (pvstree);
   PrintTree (pvstree);
 }
 
