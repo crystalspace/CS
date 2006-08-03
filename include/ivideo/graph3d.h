@@ -154,6 +154,10 @@ enum csZBufMode
  */
 enum csVertexAttrib
 {
+  /**
+   * An attribute is valid, but unused by a shader program and can be 
+   * discarded */
+  CS_VATTRIB_UNUSED	      = -2,
   /// Invalid attribute
   CS_VATTRIB_INVALID	      = -1,
   /// Position vertex attribute

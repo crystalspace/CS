@@ -20,6 +20,7 @@
 #define __CS_GENMESH_H__
 
 #include "cstool/objmodel.h"
+#include "csgeom/box.h"
 #include "csgeom/transfrm.h"
 #include "csgeom/vector3.h"
 #include "csgeom/vector4.h"
@@ -48,6 +49,8 @@
 #include "ivideo/graph3d.h"
 #include "ivideo/rendermesh.h"
 #include "ivideo/rndbuf.h"
+
+#include "submeshes.h"
 
 class csBSPTree;
 class csColor;
@@ -85,18 +88,7 @@ public:
   }
 };
 
-struct csGenmeshSubMesh
-{
-  csRef<iRenderBuffer> index_buffer;
-  csRef<iMaterialWrapper> material;
-  csRenderMeshHolder rmHolder;
-  csRef<csRenderBufferHolder> bufferHolder;
-  int tricount;
-
-  // Override mixmode from parent.
-  bool override_mixmode;
-  uint MixMode;
-};
+#include "csutil/win32/msvc_deprecated_warn_off.h"
 
 /**
  * Genmesh version of mesh object.
@@ -128,7 +120,7 @@ private:
   csRef<iRenderBuffer> color_buffer;
   iMovable* lighting_movable;
 
-  csPDelArray<csGenmeshSubMesh> subMeshes;
+  SubMeshesContainer* subMeshes;
   csDirtyAccessArray<csRenderMesh*> renderMeshes;
 
   csUserRenderBufferManager userBuffers;
@@ -153,6 +145,9 @@ private:
   csColor4* lit_mesh_colors;
   int num_lit_mesh_colors;	// Should be equal to factory number.
   csColor4* static_mesh_colors;
+
+  csRef<iObjectModel> objectModel;
+  void SetObjectModelSubMeshes ();
 
   /**
    * Global sector wide dynamic ambient version.
@@ -219,10 +214,6 @@ public:
   /// Destructor.
   virtual ~csGenmeshMeshObject ();
 
-  void ClearSubMeshes ();
-  void AddSubMesh (unsigned int *triangles,
-    int tricount, iMaterialWrapper *material, bool do_mixmode, uint mixmode);
-
   /**\name iMeshObject implementation
    * @{ */
   void SetMixMode (uint mode)
@@ -246,16 +237,51 @@ public:
   bool IsShadowCasting () const { return do_shadows; }
   void SetShadowReceiving (bool m) { do_shadow_rec = m; }
   bool IsShadowReceiving () const { return do_shadow_rec; }
+
+  void ClearSubMeshes ();
+  void AddSubMesh (unsigned int *triangles,
+    int tricount, iMaterialWrapper *material, uint mixmode);
   void AddSubMesh (unsigned int *triangles, int tricount, 
     iMaterialWrapper *material)
   {
-    AddSubMesh (triangles, tricount, material, false, CS_FX_COPY);
+    AddSubMesh (triangles, tricount, material, (uint)~0);
   }
-  void AddSubMesh (unsigned int *triangles, int tricount, iMaterialWrapper *material,
-    uint mixmode)
+  bool AddSubMesh (iRenderBuffer* indices, iMaterialWrapper *material, 
+    const char* name, uint mixmode)
   {
-    AddSubMesh (triangles, tricount, material, true, mixmode);
+    if (subMeshes == 0) subMeshes = new SubMeshesContainer;
+    SetObjectModelSubMeshes ();
+    return subMeshes->AddSubMesh (indices, material, name, mixmode);
   }
+  size_t FindSubMesh (const char* name) const
+  {
+    return subMeshes ? subMeshes->FindSubMesh (name) : csArrayItemNotFound;
+  }
+  void DeleteSubMesh (size_t index)
+  {
+    if (subMeshes) subMeshes->DeleteSubMesh (index);
+  }
+  size_t GetSubMeshCount () const
+  {
+    return subMeshes ? subMeshes->GetSubMeshCount () : 0;
+  }
+  iRenderBuffer* GetSubMeshIndices (size_t index) const
+  {
+    return subMeshes ? subMeshes->GetSubMeshIndices (index) : 0;
+  }
+  iMaterialWrapper* GetSubMeshMaterial (size_t index) const
+  {
+    return subMeshes ? subMeshes->GetSubMeshMaterial (index) : 0;
+  }
+  const char* GetSubMeshName (size_t index) const
+  {
+    return subMeshes ? subMeshes->GetSubMeshName (index) : 0;
+  }
+  uint GetSubMeshMixmode (size_t index) const
+  {
+    return subMeshes ? subMeshes->GetSubMeshMixmode (index) : (uint)~0;
+  }
+  void CopySubMeshesFromFactory();
   /** @} */
 
   iVirtualClock* vc;
@@ -441,7 +467,7 @@ private:
   csUserRenderBufferManager userBuffers;
   csArray<csStringID> user_buffer_names;
 
-  csPDelArray<csGenmeshSubMesh> subMeshes;
+  SubMeshesContainer subMeshes;
 
   uint default_mixmode;
   bool default_lighting;
@@ -492,7 +518,7 @@ public:
 
   iEngine* engine;
 
-  const csPDelArray<csGenmeshSubMesh>& GetSubMeshes () const
+  SubMeshesContainer& GetSubMeshes ()
   {
     return subMeshes;
   }
@@ -582,16 +608,46 @@ public:
 
   void ClearSubMeshes ();
   void AddSubMesh (unsigned int *triangles,
-    int tricount, iMaterialWrapper *material, bool do_mixmode, uint mixmode);
+    int tricount, iMaterialWrapper *material, uint mixmode);
   virtual void AddSubMesh (unsigned int *triangles, int tricount, 
     iMaterialWrapper *material)
   {
-    AddSubMesh (triangles, tricount, material, false, CS_FX_COPY);
+    if (polyMeshType != Submeshes) SetPolyMeshSubmeshes();
+    AddSubMesh (triangles, tricount, material, (uint)~0);
   }
-  virtual void AddSubMesh (unsigned int *triangles, int tricount, 
-    iMaterialWrapper *material, uint mixmode)
+  bool AddSubMesh (iRenderBuffer* indices, iMaterialWrapper *material, 
+    const char* name, uint mixmode)
   {
-    AddSubMesh (triangles, tricount, material, true, mixmode);
+    if (polyMeshType != Submeshes) SetPolyMeshSubmeshes();
+    return subMeshes.AddSubMesh (indices, material, name, mixmode);
+  }
+  size_t FindSubMesh (const char* name) const
+  {
+    return subMeshes.FindSubMesh (name);
+  }
+  void DeleteSubMesh (size_t index)
+  {
+    subMeshes.DeleteSubMesh (index);
+  }
+  size_t GetSubMeshCount () const
+  {
+    return subMeshes.GetSubMeshCount ();
+  }
+  iRenderBuffer* GetSubMeshIndices (size_t index) const
+  {
+    return subMeshes.GetSubMeshIndices (index);
+  }
+  iMaterialWrapper* GetSubMeshMaterial (size_t index) const
+  {
+    return subMeshes.GetSubMeshMaterial (index);
+  }
+  const char* GetSubMeshName (size_t index) const
+  {
+    return subMeshes.GetSubMeshName (index);
+  }
+  uint GetSubMeshMixmode (size_t index) const
+  {
+    return subMeshes.GetSubMeshMixmode (index);
   }
 
   const csBox3& GetObjectBoundingBox ();
@@ -716,10 +772,13 @@ public:
     {
     }
   };
-  csRef<PolyMesh> polygonMesh;
+  csRef<iPolygonMesh> polygonMesh;
   friend struct PolyMesh;
+  enum { Standard, Submeshes } polyMeshType;
 
-  virtual iObjectModel* GetObjectModel () { return this/*&scfiObjectModel*/; }
+  void SetPolyMeshStandard ();
+  void SetPolyMeshSubmeshes ();
+  virtual iObjectModel* GetObjectModel () { return this; }
 
   /// Genmesh factory shader variable accessor
   class ShaderVariableAccessor : 
@@ -773,6 +832,8 @@ public:
 
   void PreGetBuffer (csRenderBufferHolder* holder, csRenderBufferName buffer);
 };
+
+#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 /**
  * Genmesh type. This is the plugin you have to use to create instances

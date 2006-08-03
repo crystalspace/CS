@@ -51,7 +51,7 @@ class csEllipsoid;
  */
 struct iGeneralMeshCommonState : public virtual iBase
 {
-  SCF_INTERFACE (iGeneralMeshCommonState, 1, 0, 0);
+  SCF_INTERFACE (iGeneralMeshCommonState, 1, 0, 1);
   
   /// Set lighting.
   virtual void SetLighting (bool l) = 0;
@@ -84,6 +84,8 @@ struct iGeneralMeshCommonState : public virtual iBase
   /// Is shadow receiving enabled?
   virtual bool IsShadowReceiving () const = 0;
 
+  /**\name SubMesh handling
+   * @{ */
   /**
    * Remove all submeshes added to this object
    */
@@ -97,10 +99,12 @@ struct iGeneralMeshCommonState : public virtual iBase
    * triangles is an array of indices into the factory triangle list
    * tricount is the number of triangles in "triangles"
    * material is a material to assign to the mesh
-   * Note! Submeshes added to an instance of a genmesh will override
+   * Note! SubMeshes added to an instance of a genmesh will override
    * the submeshes from the factory (i.e. the submeshes of the factory will
    * be completely ignored as soon as the instance has submeshes).
    */
+  CS_DEPRECATED_METHOD_MSG("Use AddSubMesh(iRenderBuffer*, iMaterialWrapper*, "
+    "const char*, uint) instead")
   virtual void AddSubMesh (unsigned int *triangles,
     int tricount,
     iMaterialWrapper *material) = 0;
@@ -113,15 +117,20 @@ struct iGeneralMeshCommonState : public virtual iBase
    * triangles is an array of indices into the factory triangle list
    * tricount is the number of triangles in "triangles"
    * material is a material to assign to the mesh
-   * Note! Submeshes added to an instance of a genmesh will override
+   * Note! SubMeshes added to an instance of a genmesh will override
    * the submeshes from the factory (i.e. the submeshes of the factory will
    * be completely ignored as soon as the instance has submeshes).
    * This version overrides the parent mixmode.
    */
+  CS_DEPRECATED_METHOD_MSG("Use AddSubMesh(iRenderBuffer*, iMaterialWrapper*, "
+    "const char*, uint) instead")
   virtual void AddSubMesh (unsigned int *triangles,
     int tricount,
     iMaterialWrapper *material, uint mixmode) = 0;
+  /** @} */
 
+  /**\name Custom render buffers
+   * @{ */
   /**
    * Adds an independently named render buffer.
    */
@@ -146,6 +155,57 @@ struct iGeneralMeshCommonState : public virtual iBase
    * Get the name of an independent render buffer by index
    */
   virtual csRef<iString> GetRenderBufferName (int index) const = 0;
+  /** @} */
+
+  /**\name SubMesh handling
+   * @{ */
+
+  /**
+   * Add a submesh to this object. A submesh is a subset of the mesh triangles
+   * rendered with a certain material. When a mesh has one or more submeshes,
+   * only submeshes are drawn and not original geometry. That means submeshes
+   * should cover all original triangles to avoid holes in the mesh.
+   * \remarks SubMeshes added to an instance of a genmesh will override
+   * the submeshes from the factory (i.e. the submeshes of the factory will
+   * be completely ignored as soon as the instance has submeshes).
+   * \param indices Render buffer with the triangle index data for the submesh.
+   * \param material Material to assign to the submesh.
+   * \param name (Optional) Name to identify the submesh.
+   * \param mixmode (Optional) Mixmode to override the mesh's mixmode.
+   * \return Whether the submesh was added successfully. 
+   * \remarks This will change the indices of other submeshes.
+   */
+  virtual bool AddSubMesh (iRenderBuffer* indices, iMaterialWrapper *material, 
+    const char* name, uint mixmode = (uint)~0) = 0;
+
+  /**
+   * Find the index of a submesh. The index can be used with DeleteSubMesh()
+   * and the GetSubMesh...() methods. Returns csArrayItemNotFound if the
+   * submesh was not found.
+   */
+  virtual size_t FindSubMesh (const char* name) const = 0;
+  
+  /**
+   * Delete a submesh.
+   * \remarks This will change the indices of other submeshes.
+   */
+  virtual void DeleteSubMesh (size_t index) = 0;
+  
+  /// Get the number of submeshes
+  virtual size_t GetSubMeshCount () const = 0;
+  
+  /// Get the index render buffer of a submesh
+  virtual iRenderBuffer* GetSubMeshIndices (size_t index) const = 0;
+
+  /// Get the material of a submesh
+  virtual iMaterialWrapper* GetSubMeshMaterial (size_t index) const = 0;
+  
+  /// Get the name of a submesh (or 0 if none was given)
+  virtual const char* GetSubMeshName (size_t index) const = 0;
+  
+  /// Get the mixmode of a submesh (or (uint)~0 if none was specified)
+  virtual uint GetSubMeshMixmode (size_t index) const = 0;
+  /** @} */
 };
 
 /**
@@ -164,7 +224,7 @@ struct iGeneralMeshCommonState : public virtual iBase
  */
 struct iGeneralMeshState : public virtual iGeneralMeshCommonState
 {
-  SCF_INTERFACE (iGeneralMeshState, 1, 0, 0);
+  SCF_INTERFACE (iGeneralMeshState, 1, 0, 1);
   
   /**
    * Set the animation control to use for this mesh object.
@@ -176,6 +236,15 @@ struct iGeneralMeshState : public virtual iGeneralMeshCommonState
    * Get the current animation control for this object.
    */
   virtual iGenMeshAnimationControl* GetAnimationControl () const = 0;
+  
+  /**\name SubMesh handling
+   * @{ */
+  /**
+   * Copies all submeshes from the factory to the mesh object. Useful when
+   * the submeshes for one individual mesh object should be manipulated.
+   */
+  virtual void CopySubMeshesFromFactory() = 0; 
+  /** @} */
 };
 
 /**

@@ -6823,12 +6823,19 @@ package cspace::iGeneralMeshCommonState;
 *SetShadowReceiving = *cspacec::iGeneralMeshCommonState_SetShadowReceiving;
 *IsShadowReceiving = *cspacec::iGeneralMeshCommonState_IsShadowReceiving;
 *ClearSubMeshes = *cspacec::iGeneralMeshCommonState_ClearSubMeshes;
-*AddSubMesh = *cspacec::iGeneralMeshCommonState_AddSubMesh;
 *AddRenderBuffer = *cspacec::iGeneralMeshCommonState_AddRenderBuffer;
 *RemoveRenderBuffer = *cspacec::iGeneralMeshCommonState_RemoveRenderBuffer;
 *GetRenderBufferCount = *cspacec::iGeneralMeshCommonState_GetRenderBufferCount;
 *GetRenderBuffer = *cspacec::iGeneralMeshCommonState_GetRenderBuffer;
 *GetRenderBufferName = *cspacec::iGeneralMeshCommonState_GetRenderBufferName;
+*AddSubMesh = *cspacec::iGeneralMeshCommonState_AddSubMesh;
+*FindSubMesh = *cspacec::iGeneralMeshCommonState_FindSubMesh;
+*DeleteSubMesh = *cspacec::iGeneralMeshCommonState_DeleteSubMesh;
+*GetSubMeshCount = *cspacec::iGeneralMeshCommonState_GetSubMeshCount;
+*GetSubMeshIndices = *cspacec::iGeneralMeshCommonState_GetSubMeshIndices;
+*GetSubMeshMaterial = *cspacec::iGeneralMeshCommonState_GetSubMeshMaterial;
+*GetSubMeshName = *cspacec::iGeneralMeshCommonState_GetSubMeshName;
+*GetSubMeshMixmode = *cspacec::iGeneralMeshCommonState_GetSubMeshMixmode;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -6861,6 +6868,7 @@ package cspace::iGeneralMeshState;
 %ITERATORS = ();
 *SetAnimationControl = *cspacec::iGeneralMeshState_SetAnimationControl;
 *GetAnimationControl = *cspacec::iGeneralMeshState_GetAnimationControl;
+*CopySubMeshesFromFactory = *cspacec::iGeneralMeshState_CopySubMeshesFromFactory;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -15669,6 +15677,7 @@ sub CS_VATTRIB_SPECIFIC_FIRST () { $cspacec::CS_VATTRIB_SPECIFIC_FIRST }
 sub CS_VATTRIB_SPECIFIC_LAST () { $cspacec::CS_VATTRIB_SPECIFIC_LAST }
 sub CS_VATTRIB_GENERIC_FIRST () { $cspacec::CS_VATTRIB_GENERIC_FIRST }
 sub CS_VATTRIB_GENERIC_LAST () { $cspacec::CS_VATTRIB_GENERIC_LAST }
+sub CS_VATTRIB_UNUSED () { $cspacec::CS_VATTRIB_UNUSED }
 sub CS_VATTRIB_INVALID () { $cspacec::CS_VATTRIB_INVALID }
 sub CS_VATTRIB_POSITION () { $cspacec::CS_VATTRIB_POSITION }
 sub CS_VATTRIB_WEIGHT () { $cspacec::CS_VATTRIB_WEIGHT }

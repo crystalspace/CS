@@ -31,7 +31,7 @@ def getTemplateK (template, kind):
   return getTemplate (template + "_" + kind);
 
 def extensionUrl (ext):
-  urlPrefix = "http://oss.sgi.com/projects/ogl-sample/registry/";
+  urlPrefix = "http://www.opengl.org/registry/specs/";
   if ext.startswith("GL_"):
     ext = ext[3:];
     extsplit = ext.split ("_", 1);

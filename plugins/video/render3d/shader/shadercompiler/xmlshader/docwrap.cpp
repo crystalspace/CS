@@ -680,6 +680,8 @@ bool csWrappedDocumentNode::ProcessTemplate (ConditionEval& eval,
 	      {
 		Template::Params templArgs;
 		ParseTemplateArguments (args, templArgs, false);
+                shared->DebugProcessing ("Invoking template %s\n", 
+                  tokenStr.GetData());
 		InvokeTemplate (templ, templArgs, templNodes);
 	      }
 	      else
@@ -739,6 +741,7 @@ bool csWrappedDocumentNode::ProcessTemplate (ConditionEval& eval,
           Template::Params params;
           TempString<> s; s << v;
           params.Push (s);
+          shared->DebugProcessing ("Starting generation\n");
           InvokeTemplate (&generateTempl, params, templatedNodes);
           size_t i;
           for (i = 0; i < templatedNodes.Length(); i++)
@@ -774,6 +777,8 @@ bool csWrappedDocumentNode::InvokeTemplate (Template* templ,
     Substitutions paramSubst;
     for (size_t i = 0; i < csMin (params.Length(), templ->paramMap.Length()); i++)
     {
+      shared->DebugProcessing (" %s -> %s\n", templ->paramMap[i].GetData(), 
+        params[i].GetData());
       paramSubst.Put (templ->paramMap[i], params[i]);
     }
     newSubst.AttachNew (new Substitutions (paramSubst));
@@ -796,6 +801,7 @@ bool csWrappedDocumentNode::InvokeTemplate (ConditionEval& eval,
 					    NodeProcessingState* state, 
 					    const Template::Params& params)
 {
+  shared->DebugProcessing ("Invoking template %s\n", name);
   Template* templNodes = 
     globalState->templates.GetElementPointer (name);
 
@@ -1809,6 +1815,16 @@ void csWrappedDocumentNodeFactory::DumpCondition (size_t id,
     currentOut->Append (condStr, condLen);
     currentOut->Append ("'\n");
   }
+}
+
+void csWrappedDocumentNodeFactory::DebugProcessing (const char* format, ...)
+{
+  if (!plugin->debugInstrProcessing) return;
+
+  va_list args;
+  va_start (args, format);
+  csPrintfV (format, args);
+  va_end (args);
 }
 
 struct EvalCondTree

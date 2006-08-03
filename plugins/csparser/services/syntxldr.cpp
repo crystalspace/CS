@@ -1803,6 +1803,9 @@ bool csTextSyntaxService::WriteRenderBuffer (iDocumentNode* node, iRenderBuffer*
     return false;
   }
 
+  if (buffer->IsIndexBuffer())
+    node->SetAttribute ("indices", "yes");
+
   return true;
 }
 

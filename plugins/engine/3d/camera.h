@@ -376,7 +376,7 @@ public:
   virtual iCamera* Clone () const
   {
     csCamera* nc = new csCamera (*this);
-    return (iCamera*)nc;
+    return static_cast<iCamera*> (nc);
   }
   virtual void OnlyPortals (bool hop)
   {
@@ -397,8 +397,8 @@ public:
   }
   virtual iSceneNode* QuerySceneNode () { return this; }
 
-  //--------------------- iSceneNode implementation ----------------------//
-
+  /**\name iSceneNode implementation
+   * @{ */
   virtual iMovable* GetMovable () const { return 0; }
   virtual void SetParent (iSceneNode* /*parent*/) { }
   virtual iSceneNode* GetParent () const { return 0; }
@@ -409,7 +409,13 @@ public:
   virtual iMeshWrapper* QueryMesh () { return 0; }
   virtual iLight* QueryLight () { return 0; }
   virtual iCamera* QueryCamera () { return this; }
-
+  virtual csPtr<iSceneNodeArray> GetChildrenArray () const
+  {
+    return csPtr<iSceneNodeArray> (
+      new scfArrayWrapConst<iSceneNodeArray, csRefArray<iSceneNode> > (
+      movable.GetChildren ()));
+  }
+  /** @} */
 };
 
 #include "csutil/win32/msvc_deprecated_warn_on.h"

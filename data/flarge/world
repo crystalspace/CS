@@ -237,6 +237,8 @@
 	    <shader type="standard">std_lighting_detail</shader>
 	    <shadervar name="tex detail" type="texture">mosaic-detail</shadervar>
 	    <shadervar name="tex detail scale" type="vector2">10,10</shadervar>
+	    <shadervar name="tex height" type="texture">mosaic-detail</shadervar>
+	    <shadervar name="tex height scale" type="vector2">10,10</shadervar>
         </material>
         <material name="oldmetal">
             <texture>oldmetal.gif</texture>
@@ -284,6 +286,7 @@
         </material>
         <material name="green_color">
             <color red="0" green="1" blue="0" />
+	    <shadervar name="tex glow" type="texture">spark</shadervar>
         </material>
         <material name="seagull">
             <texture>seagull</texture>

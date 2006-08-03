@@ -49,33 +49,8 @@
 
 CS_IMPLEMENT_PLUGIN
 
-enum
+CS_PLUGIN_NAMESPACE_BEGIN(GenMeshLoader)
 {
-  XMLTOKEN_BOX = 1,
-  XMLTOKEN_SPHERE,
-  XMLTOKEN_LIGHTING,
-  XMLTOKEN_COLOR,
-  XMLTOKEN_DEFAULTCOLOR,
-  XMLTOKEN_MATERIAL,
-  XMLTOKEN_FACTORY,
-  XMLTOKEN_MIXMODE,
-  XMLTOKEN_MANUALCOLORS,
-  XMLTOKEN_NUMTRI,
-  XMLTOKEN_NUMVT,
-  XMLTOKEN_V,
-  XMLTOKEN_T,
-  XMLTOKEN_N,
-  XMLTOKEN_RENDERBUFFER,
-  XMLTOKEN_COLORS,
-  XMLTOKEN_AUTONORMALS,
-  XMLTOKEN_NORMALNOCOMPRESS,
-  XMLTOKEN_NOSHADOWS,
-  XMLTOKEN_LOCALSHADOWS,
-  XMLTOKEN_BACK2FRONT,
-  XMLTOKEN_ANIMCONTROL,
-  XMLTOKEN_SUBMESH,
-  XMLTOKEN_COMPRESS
-};
 
 SCF_IMPLEMENT_FACTORY (csGeneralFactoryLoader)
 SCF_IMPLEMENT_FACTORY (csGeneralFactorySaver)
@@ -97,31 +72,11 @@ bool csGeneralFactoryLoader::Initialize (iObjectRegistry* object_reg)
   reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
   synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
 
-  xmltokens.Register ("box", XMLTOKEN_BOX);
-  xmltokens.Register ("sphere", XMLTOKEN_SPHERE);
-  xmltokens.Register ("material", XMLTOKEN_MATERIAL);
-  xmltokens.Register ("factory", XMLTOKEN_FACTORY);
-  xmltokens.Register ("numtri", XMLTOKEN_NUMTRI);
-  xmltokens.Register ("numvt", XMLTOKEN_NUMVT);
-  xmltokens.Register ("v", XMLTOKEN_V);
-  xmltokens.Register ("t", XMLTOKEN_T);
-  xmltokens.Register ("color", XMLTOKEN_COLOR);
-  xmltokens.Register ("autonormals", XMLTOKEN_AUTONORMALS);
-  xmltokens.Register ("normalnocompress", XMLTOKEN_NORMALNOCOMPRESS);
-  xmltokens.Register ("n", XMLTOKEN_N);
-  xmltokens.Register ("renderbuffer", XMLTOKEN_RENDERBUFFER);
-  xmltokens.Register ("back2front", XMLTOKEN_BACK2FRONT);
-  xmltokens.Register ("animcontrol", XMLTOKEN_ANIMCONTROL);
-  xmltokens.Register ("submesh", XMLTOKEN_SUBMESH);
-
-  xmltokens.Register ("mixmode", XMLTOKEN_MIXMODE);
-  xmltokens.Register ("manualcolors", XMLTOKEN_MANUALCOLORS);
-  xmltokens.Register ("defaultcolor", XMLTOKEN_DEFAULTCOLOR);
-  xmltokens.Register ("lighting", XMLTOKEN_LIGHTING);
-  xmltokens.Register ("noshadows", XMLTOKEN_NOSHADOWS);
-  xmltokens.Register ("localshadows", XMLTOKEN_LOCALSHADOWS);
+  InitTokenTable (xmltokens);
   return true;
 }
+
+#include "csutil/win32/msvc_deprecated_warn_off.h"
 
 bool csGeneralFactoryLoader::ParseSubMesh(iDocumentNode *node,
                                        iGeneralMeshCommonState* state, 
@@ -136,10 +91,12 @@ bool csGeneralFactoryLoader::ParseSubMesh(iDocumentNode *node,
     return false;
   }
 
+  enum { Dunno, Old, New } style = Dunno;
   csDirtyAccessArray<unsigned int> triangles;
   csRef<iMaterialWrapper> material;
   bool do_mixmode = false;
   uint mixmode = CS_FX_COPY;
+  csRef<iRenderBuffer> indexbuffer;
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
@@ -152,15 +109,26 @@ bool csGeneralFactoryLoader::ParseSubMesh(iDocumentNode *node,
     {
     case XMLTOKEN_T:
       {
-        int tri = child->GetContentsValueAsInt ();
-        if (tri > factstate->GetTriangleCount ())
+        if (style == New)
         {
           synldr->ReportError (
-            "crystalspace.genmeshloader.parse.invalidindex",
-            child, "Invalid triangle index in genmesh submesh!");
+            "crystalspace.genmeshloader.parse.submeshstylemix",
+            child, "Can't mix old-style and new-style submesh index syntax");
           return false;
         }
-        triangles.Push (tri);
+        else
+        {
+          style = Old;
+          int tri = child->GetContentsValueAsInt ();
+          if (tri > factstate->GetTriangleCount ())
+          {
+            synldr->ReportError (
+              "crystalspace.genmeshloader.parse.invalidindex",
+              child, "Invalid triangle index in genmesh submesh!");
+            return false;
+          }
+          triangles.Push (tri);
+        }
         break;
       }
     case XMLTOKEN_MIXMODE:
@@ -181,6 +149,30 @@ bool csGeneralFactoryLoader::ParseSubMesh(iDocumentNode *node,
         }
         break;
       }
+    case XMLTOKEN_INDEXBUFFER:
+      {
+        if (style == Old)
+        {
+          synldr->ReportError (
+            "crystalspace.genmeshloader.parse.submeshstylemix",
+            child, "Can't mix old-style and new-style submesh index syntax");
+          return false;
+        }
+        else
+        {
+          style = New;
+          indexbuffer = synldr->ParseRenderBuffer (child);
+          if (!indexbuffer.IsValid()) return false;
+          if (!indexbuffer->IsIndexBuffer())
+          {
+            synldr->ReportError (
+              "crystalspace.genmeshloader.parse.buffertype",
+              child, "Buffer is not an index buffer");
+            return false;
+          }
+        }
+        break;
+      }
     default:
       synldr->ReportBadToken (child);
     }
@@ -194,15 +186,25 @@ bool csGeneralFactoryLoader::ParseSubMesh(iDocumentNode *node,
     return false;
   }
 
-  if (do_mixmode)
-    state->AddSubMesh (triangles.GetArray (), (int)triangles.Length (),
-    	material, mixmode);
-  else
-    state->AddSubMesh (triangles.GetArray (), (int)triangles.Length (),
-    	material);
+  if (style == Old)
+  {
+    if (do_mixmode)
+      state->AddSubMesh (triangles.GetArray (), (int)triangles.Length (),
+    	  material, mixmode);
+    else
+      state->AddSubMesh (triangles.GetArray (), (int)triangles.Length (),
+    	  material);
+  }
+  else if (style == New)
+  {
+    state->AddSubMesh (indexbuffer, material, node->GetAttributeValue ("name"),
+      do_mixmode ? mixmode : (uint)~0);
+  }
 
   return true;
 }
+
+#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 bool csGeneralFactoryLoader::ParseRenderBuffer(iDocumentNode *node,
 	iGeneralFactoryState* state)
@@ -837,6 +839,45 @@ bool csGeneralFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent,
 
     //TBD: Writedown box tag
 
+    // Write submeshes
+    if (gfact->GetSubMeshCount() > 0)
+    {
+      size_t smc = gfact->GetSubMeshCount();
+      for (size_t s = 0; s < smc; s++)
+      {
+        csRef<iDocumentNode> submeshNode = 
+          paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+        submeshNode->SetValue("submesh");
+
+        const char* submeshName = gfact->GetSubMeshName (s);
+        if (submeshName != 0)
+          submeshNode->SetAttribute ("name", submeshName);
+
+        csRef<iDocumentNode> materialNode = 
+          submeshNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+        materialNode->SetValue("material");
+        csRef<iDocumentNode> materialNameNode = 
+          materialNode->CreateNodeBefore(CS_NODE_TEXT, 0);
+        materialNameNode->SetValue (
+          gfact->GetSubMeshMaterial (s)->QueryObject()->GetName());
+
+        uint mixmode = gfact->GetSubMeshMixmode (s);
+        if (mixmode != (uint)~0)
+        {
+          csRef<iDocumentNode> submeshNode = 
+            submeshNode->CreateNodeBefore (CS_NODE_ELEMENT, 0);
+          mixmodeNode->SetValue ("mixmode");
+          synldr->WriteMixmode (mixmodeNode, mixmode, true);
+        }
+
+        csRef<iDocumentNode> indexBufferNode = 
+          submeshNode->CreateNodeBefore (CS_NODE_ELEMENT, 0);
+        indexBufferNode->SetValue ("indexbuffer");
+        synldr->WriteRenderBuffer (indexBufferNode, 
+          gfact->GetSubMeshIndices (s));
+      }
+    }
+
     // Write render buffers
     int rbufCount = gfact->GetRenderBufferCount ();
     for (i = 0; i < rbufCount; ++i)
@@ -870,17 +911,7 @@ bool csGeneralMeshLoader::Initialize (iObjectRegistry* object_reg)
   reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
   synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
 
-  xmltokens.Register ("material", XMLTOKEN_MATERIAL);
-  xmltokens.Register ("factory", XMLTOKEN_FACTORY);
-  xmltokens.Register ("mixmode", XMLTOKEN_MIXMODE);
-  xmltokens.Register ("manualcolors", XMLTOKEN_MANUALCOLORS);
-  xmltokens.Register ("color", XMLTOKEN_COLOR);
-  xmltokens.Register ("lighting", XMLTOKEN_LIGHTING);
-  xmltokens.Register ("noshadows", XMLTOKEN_NOSHADOWS);
-  xmltokens.Register ("localshadows", XMLTOKEN_LOCALSHADOWS);
-  xmltokens.Register ("renderbuffer", XMLTOKEN_RENDERBUFFER);
-  xmltokens.Register ("submesh", XMLTOKEN_SUBMESH);
-  xmltokens.Register ("t", XMLTOKEN_T);
+  InitTokenTable (xmltokens);
   return true;
 }
 
@@ -931,6 +962,8 @@ bool csGeneralMeshLoader::ParseRenderBuffer(iDocumentNode *node,
   return true;
 }
 
+#include "csutil/win32/msvc_deprecated_warn_off.h"
+
 bool csGeneralMeshLoader::ParseSubMesh(iDocumentNode *node,
                                        iGeneralMeshCommonState* state, 
                                        iGeneralFactoryState* factstate,
@@ -944,10 +977,12 @@ bool csGeneralMeshLoader::ParseSubMesh(iDocumentNode *node,
     return false;
   }
 
+  enum { Dunno, Old, New } style = Dunno;
   csDirtyAccessArray<unsigned int> triangles;
   csRef<iMaterialWrapper> material;
   bool do_mixmode = false;
   uint mixmode = CS_FX_COPY;
+  csRef<iRenderBuffer> indexbuffer;
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
@@ -960,15 +995,26 @@ bool csGeneralMeshLoader::ParseSubMesh(iDocumentNode *node,
     {
     case XMLTOKEN_T:
       {
-        int tri = child->GetContentsValueAsInt ();
-        if (tri > factstate->GetTriangleCount ())
+        if (style == New)
         {
           synldr->ReportError (
-            "crystalspace.genmeshloader.parse.invalidindex",
-            child, "Invalid triangle index in genmesh submesh!");
+            "crystalspace.genmeshloader.parse.submeshstylemix",
+            child, "Can't mix old-style and new-style submesh index syntax");
           return false;
         }
-        triangles.Push (tri);
+        else
+        {
+          style = Old;
+          int tri = child->GetContentsValueAsInt ();
+          if (tri > factstate->GetTriangleCount ())
+          {
+            synldr->ReportError (
+              "crystalspace.genmeshloader.parse.invalidindex",
+              child, "Invalid triangle index in genmesh submesh!");
+            return false;
+          }
+          triangles.Push (tri);
+        }
         break;
       }
     case XMLTOKEN_MIXMODE:
@@ -989,6 +1035,30 @@ bool csGeneralMeshLoader::ParseSubMesh(iDocumentNode *node,
         }
         break;
       }
+    case XMLTOKEN_INDEXBUFFER:
+      {
+        if (style == Old)
+        {
+          synldr->ReportError (
+            "crystalspace.genmeshloader.parse.submeshstylemix",
+            child, "Can't mix old-style and new-style submesh index syntax");
+          return false;
+        }
+        else
+        {
+          style = New;
+          indexbuffer = synldr->ParseRenderBuffer (child);
+          if (!indexbuffer.IsValid()) return false;
+          if (!indexbuffer->IsIndexBuffer())
+          {
+            synldr->ReportError (
+              "crystalspace.genmeshloader.parse.buffertype",
+              child, "Buffer is not an index buffer");
+            return false;
+          }
+        }
+        break;
+      }
     default:
       synldr->ReportBadToken (child);
     }
@@ -1002,15 +1072,25 @@ bool csGeneralMeshLoader::ParseSubMesh(iDocumentNode *node,
     return false;
   }
 
-  if (do_mixmode)
-    state->AddSubMesh (triangles.GetArray (), (int)triangles.Length (),
-    	material, mixmode);
-  else
-    state->AddSubMesh (triangles.GetArray (), (int)triangles.Length (),
-    	material);
+  if (style == Old)
+  {
+    if (do_mixmode)
+      state->AddSubMesh (triangles.GetArray (), (int)triangles.Length (),
+    	  material, mixmode);
+    else
+      state->AddSubMesh (triangles.GetArray (), (int)triangles.Length (),
+    	  material);
+  }
+  else if (style == New)
+  {
+    state->AddSubMesh (indexbuffer, material, node->GetAttributeValue ("name"),
+      do_mixmode ? mixmode : (uint)~0);
+  }
 
   return true;
 }
+
+#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 #define CHECK_MESH(m) \
   if (!m) { \
@@ -1247,6 +1327,62 @@ bool csGeneralMeshSaver::WriteDown (iBase* obj, iDocumentNode* parent,
       paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
     mixmodeNode->SetValue("mixmode");
     synldr->WriteMixmode(mixmodeNode, mixmode, true);
+
+    // Write submeshes
+    if (gmesh->GetSubMeshCount() > 0)
+    {
+      size_t smc = gmesh->GetSubMeshCount();
+      for (size_t s = 0; s < smc; s++)
+      {
+        csRef<iDocumentNode> submeshNode = 
+          paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+        submeshNode->SetValue("submesh");
+
+        const char* submeshName = gmesh->GetSubMeshName (s);
+        if (submeshName != 0)
+          submeshNode->SetAttribute ("name", submeshName);
+
+        csRef<iDocumentNode> materialNode = 
+          submeshNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+        materialNode->SetValue("material");
+        csRef<iDocumentNode> materialNameNode = 
+          materialNode->CreateNodeBefore(CS_NODE_TEXT, 0);
+        materialNameNode->SetValue (
+          gmesh->GetSubMeshMaterial (s)->QueryObject()->GetName());
+
+        uint mixmode = gmesh->GetSubMeshMixmode (s);
+        if (mixmode != (uint)~0)
+        {
+          csRef<iDocumentNode> submeshNode = 
+            submeshNode->CreateNodeBefore (CS_NODE_ELEMENT, 0);
+          mixmodeNode->SetValue ("mixmode");
+          synldr->WriteMixmode (mixmodeNode, mixmode, true);
+        }
+
+        csRef<iDocumentNode> indexBufferNode = 
+          submeshNode->CreateNodeBefore (CS_NODE_ELEMENT, 0);
+        indexBufferNode->SetValue ("indexbuffer");
+        indexBufferNode->SetAttribute ("indices", "yes");
+        synldr->WriteRenderBuffer (indexBufferNode, 
+          gmesh->GetSubMeshIndices (s));
+      }
+    }
+
+    // Write render buffers
+    int rbufCount = gmesh->GetRenderBufferCount ();
+    for (int i = 0; i < rbufCount; ++i)
+    {
+      csRef<iDocumentNode> rbufNode = 
+        paramsNode->CreateNodeBefore (CS_NODE_ELEMENT, 0);
+      rbufNode->SetValue ("renderbuffer");
+      csRef<iString> name = gmesh->GetRenderBufferName (i);
+      rbufNode->SetAttribute ("name", name->GetData ());
+      csRef<iRenderBuffer> buffer = gmesh->GetRenderBuffer (i);
+      synldr->WriteRenderBuffer (rbufNode, buffer);
+    }
   }
   return true;
 }
+
+}
+CS_PLUGIN_NAMESPACE_END(GenMeshLoader)
