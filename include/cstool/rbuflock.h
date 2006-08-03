@@ -79,7 +79,7 @@ class csRenderBufferLock
   #ifdef CS_DEBUG
       : parent (parent), elemNum (elemNum)
   #else
-      p (&parent.Get (elemNum))
+      : p (&parent.Get (elemNum))
   #endif
     { }
     T& operator*()
