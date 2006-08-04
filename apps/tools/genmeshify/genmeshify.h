@@ -48,6 +48,7 @@ namespace genmeshify
     csRef<iVFS> vfs;
     csRef<iSyntaxService> synsrv;
     csRef<iSaver> saver;
+    csRef<iStringSet> strings;
     iObjectRegistry *objectRegistry;
   };
 }

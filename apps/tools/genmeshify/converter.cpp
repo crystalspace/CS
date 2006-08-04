@@ -38,6 +38,8 @@ namespace genmeshify
       thingObjLoader = csLoadPluginCheck<iLoaderPlugin> (app->objectRegistry,
         "crystalspace.mesh.loader.thing", true);
     }
+
+    idTexLightmap = app->strings->Request ("tex lightmap");
   }
 
   bool Converter::ConvertMeshFact (iDocumentNode* from, iDocumentNode* to)
@@ -50,16 +52,18 @@ namespace genmeshify
     return false;
   }
 
-  bool Converter::ConvertMeshObj (const char* name,
+  bool Converter::ConvertMeshObj (iSector* sector,
+                                  const char* meshName, 
                                   iDocumentNode* from, iDocumentNode* to,
-                                  iDocumentNode* sectorNode)
+                                  iDocumentNode* sectorNode,
+                                  iDocumentNode* textures)
   {
     if (!thingObjLoader.IsValid()) return false;
 
     csRef<iDocumentNode> paramsNode = from->GetNode ("params");
     if (!paramsNode) return false;
 
-    csRef<iMeshWrapper> meshWrap = app->engine->CreateMeshWrapper (name);
+    csRef<iMeshWrapper> meshWrap = app->engine->CreateMeshWrapper (meshName);
     region->QueryObject ()->ObjAdd (meshWrap->QueryObject());
 
     csRef<iBase> obj = thingObjLoader->Parse (paramsNode, 0, context, meshWrap);
@@ -71,6 +75,13 @@ namespace genmeshify
       return false;
     }
     meshWrap->SetMeshObject (mobj);
+    mobj->SetMeshWrapper (meshWrap);
+    csRef<iThingState> thingobj = scfQueryInterface<iThingState> (obj);
+    if (!thingobj)
+    {
+      app->Report ("Loaded mesh object does not implement iThingState");
+      return false;
+    }
 
     // Check for a hard transform
     {
@@ -97,7 +108,11 @@ namespace genmeshify
         meshWrap->HardTransform (tr);
       }
     }
+    meshWrap->GetMovable()->SetSector (sector);
+    iLightingInfo* linfo = meshWrap->GetLightingInfo ();
+    if (linfo) linfo->ReadFromCache (app->engine->GetCacheManager());
 
+    // @@@ FIXME: properly share factories, if possible
     csRef<iThingFactoryState> thingfact = 
       scfQueryInterface<iThingFactoryState> (mobj->GetFactory ());
     if (!thingfact)
@@ -106,11 +121,10 @@ namespace genmeshify
       return false;
     }
 
+    csString uniqueName;
+    uniqueName.Format ("%s_%s", sector->QueryObject()->GetName(), meshName);
     csString factoryName;
-    if (name)
-      factoryName.Format ("factory_%s_%x", name, rng.Get((uint32)~0));
-    else
-      factoryName.Format ("factory_%x", rng.Get((uint32)~0));
+    factoryName.Format ("factory_%s", uniqueName.GetData());
 
     csRef<iMeshFactoryWrapper> mfw = app->engine->CreateMeshFactory (
       "crystalspace.mesh.object.genmesh", factoryName);
@@ -128,7 +142,11 @@ namespace genmeshify
       app->Report ("Factory does not implement iGeneralFactoryState");
       return false;
     }
-    if (!CopyThingToGM (thingfact, gmfact)) return false;
+    LMLayout lmLayout;
+    if (!CopyThingToGM (thingfact, gmfact, uniqueName, lmLayout)) return false;
+
+    if (!ExtractLightmaps (lmLayout, thingobj, textures)) 
+      return false;
 
     {
       csRef<iDocumentNode> factoryNode = 
@@ -147,9 +165,36 @@ namespace genmeshify
 
       if (!gmfactSaver->WriteDown (gmfact, factoryNode, 0)) return false;
     }
-    csRef<iMeshObject> gmObj = mof->NewInstance ();
-    if (!gmObj.IsValid()) return false;
-    gmObj->SetMixMode (mobj->GetMixMode ());
+    csRef<iMeshObject> newObj = mof->NewInstance ();
+    if (!newObj.IsValid()) return false;
+    newObj->SetMixMode (mobj->GetMixMode ());
+    csRef<iGeneralMeshState> gmObj = 
+      scfQueryInterface<iGeneralMeshState> (newObj);
+
+    // Add lightmap SVs
+    for (size_t i = 0; i < lmLayout.subMeshes.GetSize(); i++)
+    {
+      const LMLayout::SubMesh& layoutSM = lmLayout.subMeshes[i];
+      csRef<iTextureWrapper> dummyTex = 
+        app->engine->FindTexture (lmLayout.slmNames[layoutSM.slm], region);
+      if (!dummyTex.IsValid())
+      {
+        dummyTex = app->engine->CreateBlackTexture (
+          lmLayout.slmNames[layoutSM.slm], 1, 1, 0, 0);
+        region->Add (dummyTex->QueryObject());
+      }
+
+      iGeneralMeshSubMesh* submesh = 
+        gmObj->FindSubMesh (layoutSM.name);
+      if (!submesh) continue;
+      csRef<iShaderVariableContext> svc = 
+        scfQueryInterface<iShaderVariableContext> (submesh);
+      csRef<csShaderVariable> sv;
+      sv.AttachNew (new csShaderVariable (idTexLightmap));
+      sv->SetValue (dummyTex);
+      svc->AddVariable (sv);
+    }
+
     if (!gmSaver->WriteDown (gmObj, to, 0)) return false;
 
     if (!ExtractPortals (meshWrap, sectorNode)) return false;
@@ -157,16 +202,60 @@ namespace genmeshify
     return true;
   }
 
-  bool Converter::CopyThingToGM (iThingFactoryState* from, 
-                                 iGeneralFactoryState* to)
+  struct PolyHashKey
   {
-    typedef csHash<csArray<Poly>, csPtrKey<iMaterialWrapper> > MatPolyHash;
-    // Step 1: collect all polygons, sorted by materials
+    iMaterialWrapper* material;
+    size_t slm;
+
+    uint GetHash () const { return (uintptr_t)material ^ (uint)slm; }
+    inline friend bool operator < (const PolyHashKey& r1, const PolyHashKey& r2)
+    { 
+      if (r1.material < r2.material) return true;
+      return r1.slm < r2.slm;
+    }
+  };
+
+  bool Converter::CopyThingToGM (iThingFactoryState* from, 
+                                 iGeneralFactoryState* to,
+                                 const char* name, 
+                                 LMLayout& layout)
+  {
+    typedef csHash<csArray<Poly>, PolyHashKey> MatPolyHash;
+
+    int polycount = from->GetPolygonCount();
+
+    csDirtyAccessArray<float> lmCoords;
+    // Step 1: layout lightmaps
+    for (int p = 0; p < polycount; p++)
+    {
+      size_t lmcOffs = lmCoords.GetSize();
+      lmCoords.SetSize (lmcOffs + 2*from->GetPolygonVertexCount (p));
+
+      LMLayout::Lightmap lm;
+      lm.hasLM = from->GetLightmapLayout (p, lm.slm,
+        lm.rectOnSLM, lmCoords.GetArray() + lmcOffs);
+      layout.polyLightmaps.Push (lm);
+
+      if (lm.hasLM)
+      {
+        LMLayout::Dim& dim = layout.slmDimensions.GetExtend (lm.slm);
+        dim.GrowTo (lm.rectOnSLM.xmax, lm.rectOnSLM.ymax);
+      }
+    }
+    // Generate super LM names
+    for (size_t s = 0; s < layout.slmDimensions.GetSize(); s++)
+    {
+      csString lightmapName;
+      lightmapName.Format ("lightmap_%s_%zu", name, s);
+      layout.slmNames.Push (lightmapName);
+    }
+
+    // Step 2: collect all polygons, sorted by materials + superlightmap
     MatPolyHash polies;
     const csVector3* vertices = from->GetVertices();
     const csVector3* normals = from->GetNormals();
 
-    int polycount = from->GetPolygonCount();
+    float* lmcoordPtr = lmCoords.GetArray();
     for (int p = 0; p < polycount; p++)
     {
       int vc = from->GetPolygonVertexCount (p);
@@ -176,8 +265,10 @@ namespace genmeshify
       from->GetPolygonTextureMapping (p, texM, texV);
       csTransform object2texture (texM, texV);
       csVector3 polynormal (-from->GetPolygonObjectPlane (p).Normal());
+      const LMLayout::Lightmap& lm = layout.polyLightmaps[p];
       
       Poly newPoly;
+      newPoly.orgIndex = p;
       for (int v = 0; v < vc; v++)
       {
         int vt = vtIndex[v];
@@ -186,30 +277,40 @@ namespace genmeshify
         newVertex.normal = normals ? normals[vt] : polynormal;
         csVector3 t = object2texture.Other2This (newVertex.pos);
         newVertex.tc.Set (t.x, t.y);
+        if (lm.hasLM)
+        {
+          newVertex.tclm.x = *lmcoordPtr++;
+          newVertex.tclm.y = *lmcoordPtr++;
+        }
+        else
+          newVertex.tclm.Set (0, 0);
         newPoly.vertices.Push (newVertex);
       }
       iMaterialWrapper* polyMat = from->GetPolygonMaterial (p);
-      csArray<Poly>* matPolies = polies.GetElementPointer (polyMat);
+      PolyHashKey key;
+      key.material = polyMat;
+      key.slm = layout.polyLightmaps[p].hasLM ? layout.polyLightmaps[p].slm 
+        : csArrayItemNotFound;
+      csArray<Poly>* matPolies = polies.GetElementPointer (key);
       if (matPolies == 0)
       {
         csArray<Poly> newArray;
         newArray.Push (newPoly);
-        polies.Put (polyMat, newArray);
+        polies.Put (key, newArray);
       }
       else
         matPolies->Push (newPoly);
     }
 
-    // Step 2: layout lightmaps
-
     // Step 3: create GM submeshes
     {
       size_t vertexTotal = 0;
+      csDirtyAccessArray<csVector2> tclm;
       MatPolyHash::GlobalIterator it = polies.GetIterator ();
       while (it.HasNext())
       {
-        csPtrKey<iMaterialWrapper> mat;
-        const csArray<Poly>& polies = it.Next (mat);
+        PolyHashKey key;
+        const csArray<Poly>& polies = it.Next (key);
 
         size_t numVerts = 0;
         size_t numTris = 0;
@@ -222,9 +323,11 @@ namespace genmeshify
         vertexTotal += numVerts;
 
         to->SetVertexCount ((int)vertexTotal);
+        tclm.SetSize (vertexTotal);
         csVector3* vertPtr = to->GetVertices() + vertexNum;
         csVector3* normPtr = to->GetNormals() + vertexNum;
         csVector2* tcPtr = to->GetTexels() + vertexNum;
+        csVector2* tclmPtr = tclm.GetArray() + vertexNum;
 
         csRef<iRenderBuffer> indexBuffer = 
           csRenderBuffer::CreateIndexRenderBuffer (numTris * 3, 
@@ -241,6 +344,7 @@ namespace genmeshify
               *vertPtr++ = verts[v].pos;
               *normPtr++ = verts[v].normal;
               *tcPtr++ = verts[v].tc;
+              *tclmPtr++ = verts[v].tclm;
               if (v >= 2)
               {
                 *index++ = (uint)vertex0;
@@ -251,8 +355,23 @@ namespace genmeshify
             }
           }
         }
-        to->AddSubMesh (indexBuffer, mat, 0);
+        csString submeshName;
+        if (key.slm != csArrayItemNotFound)
+        {
+          submeshName.Format ("%s_%zu", 
+            key.material->QueryObject()->GetName(), key.slm);
+          LMLayout::SubMesh layoutSM;
+          layoutSM.name = submeshName;
+          layoutSM.slm = key.slm;
+          layout.subMeshes.Push (layoutSM);
+        }
+        iGeneralMeshSubMesh* submesh = 
+          to->AddSubMesh (indexBuffer, key.material, submeshName);
       }
+      csRef<csRenderBuffer> tclmBuffer = csRenderBuffer::CreateRenderBuffer (
+        tclm.GetSize(), CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 2);
+      tclmBuffer->CopyInto (tclm.GetArray(), tclm.GetSize());
+      to->AddRenderBuffer ("texture coordinate lightmap", tclmBuffer);
     }
     
     return true;
@@ -284,6 +403,69 @@ namespace genmeshify
       }
     }
 
+    return true;
+  }
+
+  bool Converter::ExtractLightmaps (const LMLayout& layout, 
+                                    iThingState* object, 
+                                    iDocumentNode* textures)
+  {
+    csRefArray<csImageMemory> slmImages;
+    for (size_t i = 0; i < layout.slmDimensions.GetSize(); i++)
+    {
+      const LMLayout::Dim& dim = layout.slmDimensions[i];
+      csRef<csImageMemory> newImg;
+      newImg.AttachNew (new csImageMemory (dim.w, dim.h));
+      slmImages.Push (newImg);
+    }
+    for (size_t p = 0; p < layout.polyLightmaps.GetSize(); p++)
+    {
+      const LMLayout::Lightmap& lm = layout.polyLightmaps[p];
+      if (!lm.hasLM) continue;
+      csRef<iImage> lightmap = object->GetPolygonLightmap (int (p));
+      if (!lightmap) continue;
+      slmImages[lm.slm]->Copy (lightmap, lm.rectOnSLM.xmin, lm.rectOnSLM.ymin,
+        lm.rectOnSLM.Width(), lm.rectOnSLM.Height());
+    }
+    for (size_t s = 0; s < slmImages.GetSize(); s++)
+    {
+      const char* lightmapName = layout.slmNames[s];
+      csString fn;
+      fn.Format ("lightmaps/%s.png", lightmapName);
+
+      csRef<iDataBuffer> buf = app->imageIO->Save (slmImages[s], "image/png");
+      if (!buf.IsValid())
+      {
+        app->Report ("Error saving lightmap to PNG");
+        return false;
+      }
+      if (!app->vfs->WriteFile (fn, buf->GetData(), buf->GetSize()))
+      {
+        app->Report ("Error writing to file %s", fn.GetData());
+        return false;
+      }
+
+      csRef<iDocumentNode> textureNode = 
+        textures->CreateNodeBefore (CS_NODE_ELEMENT, 0);
+      textureNode->SetValue ("texture");
+      textureNode->SetAttribute ("name", lightmapName);
+
+      csRef<iDocumentNode> textureFileNode = 
+        textureNode->CreateNodeBefore (CS_NODE_ELEMENT, 0);
+      textureFileNode->SetValue ("file");
+
+      csRef<iDocumentNode> textureFileContent = 
+        textureFileNode->CreateNodeBefore (CS_NODE_TEXT, 0);
+      textureFileContent->SetValue (fn);
+
+      csRef<iDocumentNode> textureClassNode = 
+        textureNode->CreateNodeBefore (CS_NODE_ELEMENT, 0);
+      textureClassNode->SetValue ("class");
+
+      csRef<iDocumentNode> textureClassContent = 
+        textureClassNode->CreateNodeBefore (CS_NODE_TEXT, 0);
+      textureClassContent->SetValue ("lightmap");
+    }
     return true;
   }
 }

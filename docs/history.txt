@@ -40,6 +40,7 @@ chronological order.
 	- res added methods to query lightmap-related data from Thing meshes.
 	- res moved the lightmap-on-superlightmap texture coordinate 
 	  computation from the renderer(s) to the Thing plugin.
+	- res added support for static lightmaps to genmeshify.
 3-Aug-2006
 	- Jorrit fixed a small problem which caused CS not to compile
 	  in optimize mode.

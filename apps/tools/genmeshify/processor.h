@@ -40,6 +40,8 @@ namespace genmeshify
     csRef<iRegion> region;
     csRef<iLoaderContext> loaderContext;
 
+    csRef<iDocumentNode> texturesNode;
+
     csHash<csString, csString> plugins;
     const char* GetPluginClassID (const char* name) const
     {
@@ -55,10 +57,11 @@ namespace genmeshify
     bool ProcessWorld (iDocumentNode* from, iDocumentNode* to);
     bool ProcessPlugins (iDocumentNode* from, iDocumentNode* to);
     bool ProcessSector (iDocumentNode* from, iDocumentNode* to);
-    bool ProcessMeshfactOrObj (iDocumentNode* from, iDocumentNode* to,
-      iDocumentNode* sectorNode, bool factory);
-    bool ConvertMeshfactOrObj (const char* name, iDocumentNode* from, 
+    bool ProcessMeshfactOrObj (iSector* sector, iDocumentNode* from, 
       iDocumentNode* to, iDocumentNode* sectorNode, bool factory);
+    bool ConvertMeshfactOrObj (iSector* sector, const char* meshName, 
+      iDocumentNode* from, iDocumentNode* to, iDocumentNode* sectorNode,
+      bool factory);
 
     bool PreloadTexturesMaterials (iDocumentNode* from);
     bool PreloadSectors (iDocumentNode* from);

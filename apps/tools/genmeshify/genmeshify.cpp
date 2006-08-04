@@ -79,6 +79,10 @@ namespace genmeshify
     vfs = csQueryRegistry<iVFS> (objectRegistry);
     if (!vfs) return Report ("No iVFS!");
 
+    strings = csQueryRegistryTagInterface<iStringSet> (
+      objectRegistry, "crystalspace.shared.stringset");
+    if (!strings) return Report ("No shared string set!");
+
     // Open the systems
     if (!csInitializer::OpenApplication (objectRegistry))
       return Report ("Error opening system!");

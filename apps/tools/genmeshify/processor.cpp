@@ -39,6 +39,7 @@ namespace genmeshify
   Processor::~Processor ()
   {
     app->engine->RemoveObject (region);
+    region->DeleteAll();
     delete converter;
   }
 
@@ -161,6 +162,11 @@ namespace genmeshify
   bool Processor::ProcessWorld (iDocumentNode* from, iDocumentNode* to)
   {
     PreloadTexturesMaterials (from);
+    if (!texturesNode.IsValid())
+    {
+      texturesNode = to->CreateNodeBefore (CS_NODE_ELEMENT, 0);
+      texturesNode->SetValue ("textures");
+    }
     PreloadSectors (from);
 
     to->SetValue (from->GetValue ());
@@ -184,7 +190,7 @@ namespace genmeshify
             {
               csRef<iDocumentNode> child_clone = to->CreateNodeBefore (
     	          child->GetType (), 0);
-              if (!ProcessMeshfactOrObj (child, child_clone, 0, true)) return false;
+              if (!ProcessMeshfactOrObj (0, child, child_clone, 0, true)) return false;
               continue;
             }
           case XMLTOKEN_SECTOR:
@@ -192,6 +198,14 @@ namespace genmeshify
               csRef<iDocumentNode> child_clone = to->CreateNodeBefore (
     	          child->GetType (), 0);
               if (!ProcessSector (child, child_clone)) return false;
+              continue;
+            }
+          case XMLTOKEN_TEXTURES:
+            {
+              csRef<iDocumentNode> child_clone = to->CreateNodeBefore (
+    	          child->GetType (), 0);
+              CloneNode (child, child_clone);
+              texturesNode = child_clone;
               continue;
             }
         }
@@ -231,6 +245,14 @@ namespace genmeshify
   {
     to->SetValue (from->GetValue ());
 
+    const char* name = from->GetAttributeValue ("name");
+    iSector* sector = app->engine->FindSector (name);
+    if (!sector)
+    {
+      sector = app->engine->CreateSector (0); 
+      region->QueryObject()->ObjAdd (sector->QueryObject());
+    }
+
     csRef<iDocumentNodeIterator> it = from->GetNodes ();
     while (it->HasNext ())
     {
@@ -244,7 +266,8 @@ namespace genmeshify
             {
               csRef<iDocumentNode> child_clone = to->CreateNodeBefore (
     	          child->GetType (), 0);
-              if (!ProcessMeshfactOrObj (child, child_clone, to, false)) return false;
+              if (!ProcessMeshfactOrObj (sector, child, child_clone, to, 
+                false)) return false;
               continue;
             }
         }
@@ -257,7 +280,9 @@ namespace genmeshify
     return true;
   }
 
-  bool Processor::ProcessMeshfactOrObj (iDocumentNode* from, iDocumentNode* to,
+  bool Processor::ProcessMeshfactOrObj (iSector* sector, 
+                                        iDocumentNode* from, 
+                                        iDocumentNode* to, 
                                         iDocumentNode* sectorNode,
                                         bool factory)
   {
@@ -293,7 +318,13 @@ namespace genmeshify
             ; // <hardmove> must be filtered; the converter will handle it
           else if (strcmp (child->GetValue (), "params") == 0)
           {
-            if (!ConvertMeshfactOrObj (from->GetAttributeValue ("name"),
+            csString meshName (from->GetAttributeValue ("name"));
+            if (meshName.IsEmpty())
+            {
+              static int meshNum = 0;
+              meshName.Format ("unnamedmesh%d", meshNum++);
+            }
+            if (!ConvertMeshfactOrObj (sector, meshName,
               from, to, sectorNode, factory)) 
               return false;
           }
@@ -312,15 +343,18 @@ namespace genmeshify
     return true;
   }
 
-  bool Processor::ConvertMeshfactOrObj (const char* name, iDocumentNode* from, 
+  bool Processor::ConvertMeshfactOrObj (iSector* sector, 
+                                        const char* meshName, 
+                                        iDocumentNode* from, 
                                         iDocumentNode* to,
-                                        iDocumentNode* sectorNode, 
+                                        iDocumentNode* sectorNode,
                                         bool factory)
   {
     if (factory)
       return converter->ConvertMeshFact (from, to);
     else
-      return converter->ConvertMeshObj (name, from, to, sectorNode);
+      return converter->ConvertMeshObj (sector, meshName, from, to, 
+        sectorNode, texturesNode);
   }
 
   bool Processor::PreloadTexturesMaterials (iDocumentNode* from)
@@ -341,9 +375,9 @@ namespace genmeshify
         csStringID token = xmltokens.Request(child->GetValue());
         switch (token)
         {
-          case XMLTOKEN_PLUGINS:
           case XMLTOKEN_TEXTURES:
           case XMLTOKEN_MATERIALS:
+          case XMLTOKEN_PLUGINS:
             {
               csRef<iDocumentNode> child_clone = 
                 to->CreateNodeBefore (child->GetType(), 0);

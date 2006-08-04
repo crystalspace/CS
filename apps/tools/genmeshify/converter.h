@@ -27,6 +27,7 @@ namespace genmeshify
   class Converter
   {
     App* app;
+    csStringID idTexLightmap;
     csRef<iLoaderContext> context;
     csRef<iRegion> region;
 
@@ -42,20 +43,54 @@ namespace genmeshify
       csVector3 pos;
       csVector3 normal;
       csVector2 tc;
+      csVector2 tclm;
     };
     struct Poly
     {
       csArray<PolyVertex> vertices;
+      int orgIndex;
+    };
+    struct LMLayout
+    {
+      struct Dim
+      { 
+        int w, h; 
+        Dim() : w(0), h(0) {}
+        void GrowTo (int newW, int newH)
+        { 
+          w = csMax (csFindNearestPowerOf2 (newW), w); 
+          h = csMax (csFindNearestPowerOf2 (newH), h); 
+        }
+      };
+      csArray<Dim> slmDimensions;
+      csStringArray slmNames;
+      struct Lightmap
+      {
+        bool hasLM;
+        size_t slm;
+        csRect rectOnSLM;
+      };
+      csArray<Lightmap> polyLightmaps;
+      struct SubMesh
+      {
+        csString name;
+        size_t slm;
+      };
+      csArray<SubMesh> subMeshes;
     };
 
-    bool CopyThingToGM (iThingFactoryState* from, iGeneralFactoryState* to);
+    bool CopyThingToGM (iThingFactoryState* from, iGeneralFactoryState* to,
+      const char* name, LMLayout& layout);
     bool ExtractPortals (iMeshWrapper* mesh, iDocumentNode* to);
+    bool ExtractLightmaps (const LMLayout& layout, iThingState* object, 
+      iDocumentNode* textures);
   public:
     Converter (App* app, iLoaderContext* context, iRegion* region);
   
     bool ConvertMeshFact (iDocumentNode* from, iDocumentNode* to);
-    bool ConvertMeshObj (const char* name, iDocumentNode* from, 
-      iDocumentNode* to, iDocumentNode* sectorNode);
+    bool ConvertMeshObj (iSector* sector, const char* meshName, 
+      iDocumentNode* from, iDocumentNode* to, iDocumentNode* sectorNode,
+      iDocumentNode* textures);
   };
 }
 
