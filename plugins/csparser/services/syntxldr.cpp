@@ -89,6 +89,9 @@ bool csTextSyntaxService::Initialize (iObjectRegistry* object_reg)
 
   InitTokenTable (xmltokens);
 
+  strings = csQueryRegistryTagInterface<iStringSet> (
+    object_reg, "crystalspace.shared.stringset");
+
   return true;
 }
 
@@ -990,6 +993,11 @@ bool csTextSyntaxService::WriteGradient (iDocumentNode* node,
 bool csTextSyntaxService::ParseShaderVar (iDocumentNode* node,
 					  csShaderVariable& var)
 {
+  const char *name = node->GetAttributeValue("name");
+  if (name != 0)
+  {
+    var.SetName (strings->Request (name));
+  }
   const char *type = node->GetAttributeValue("type");
   if (!type)
   {
@@ -1152,9 +1160,8 @@ csRef<iShaderVariableAccessor> csTextSyntaxService::ParseShaderVarExpr (
 bool csTextSyntaxService::WriteShaderVar (iDocumentNode* node,
 					  csShaderVariable& var)
 {
-  csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
-    object_reg, "crystalspace.shared.stringset", iStringSet);
-  node->SetAttribute ("name", strings->Request (var.GetName ()));
+  const char* name = strings->Request (var.GetName ());
+  if (name != 0) node->SetAttribute ("name", name);
   switch (var.GetType ())
   {
     case csShaderVariable::INT:

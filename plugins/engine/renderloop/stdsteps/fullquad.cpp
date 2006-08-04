@@ -164,22 +164,21 @@ bool csFullScreenQuadRSLoader::ParseStep (iDocumentNode* node,
 	break;
       case XMLTOKEN_SHADERVAR:
 	{
-	  const char* varname = child->GetAttributeValue ("name");
-	  if (!varname)
-	  {
-	    synldr->Report ("crystalspace.renderloop.step.fullscreenquad",
-	      CS_REPORTER_SEVERITY_WARNING, child,
-	      "<shadervar> without name");
-	    return false;
-	  }
 	  if (!settings.svContext.IsValid())
 	    settings.svContext.AttachNew (new csShaderVariableContext ());
 
 	  csRef<csShaderVariable> var;
-	  var.AttachNew (new csShaderVariable (strings->Request (varname)));
+	  var.AttachNew (new csShaderVariable);
 
 	  if (!synldr->ParseShaderVar (child, *var))
 	  {
+	    return false;
+	  }
+	  if (var->GetName() == csInvalidStringID)
+	  {
+	    synldr->Report ("crystalspace.renderloop.step.fullscreenquad",
+	      CS_REPORTER_SEVERITY_WARNING, child,
+	      "<shadervar> without name");
 	    return false;
 	  }
 	  settings.svContext->AddVariable (var);

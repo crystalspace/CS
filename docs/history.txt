@@ -17,6 +17,8 @@ chronological order.
 	  SCF class. This way the simple iShaderVariableContext implementation
 	  can be reused by other SCF classes without having to resort to
 	  manual forwarding.
+	- res changed iSyntaxService->ParseShaderVar() to also parse the 
+	  shader variable name.
 3-Aug-2006
 	- Jorrit fixed a small problem which caused CS not to compile
 	  in optimize mode.
