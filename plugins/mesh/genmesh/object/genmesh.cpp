@@ -1091,7 +1091,7 @@ csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (
 
     for (size_t i = 0; i<sm.GetSize (); ++i)
     {
-      SubMesh& subMesh = sm[i];
+      SubMesh& subMesh = *(sm[i]);
       iMaterialWrapper* mater = subMesh.material;
       if (!mater) mater = factory->GetMaterialWrapper ();
       if (!mater)
@@ -1118,7 +1118,11 @@ csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (
       meshPtr->material = mater;
       CS_ASSERT (mater != 0);
       meshPtr->worldspace_origin = wo;
-      meshPtr->variablecontext = svcontext;
+      csRef<MergedSVContext> mergedSVContext;
+      mergedSVContext.AttachNew (
+        new (factory->genmesh_type->mergedSVContextPool) MergedSVContext (
+        static_cast<iShaderVariableContext*> (&subMesh), svcontext));
+      meshPtr->variablecontext = mergedSVContext;
       meshPtr->object2world = o2wt;
 
       subMesh.bufferHolder->SetAccessor (renderBufferAccessor, 
@@ -1169,7 +1173,7 @@ bool csGenmeshMeshObject::HitBeamOutline (const csVector3& start,
   // will be a bit faster than its more accurate cousin (below).
 
   csSegment3 seg (start, end);
-  const SubMeshesContainer& sm = 
+  SubMeshesContainer& sm = 
     subMeshes ? *subMeshes : factory->GetSubMeshes ();
   const csVector3 *vrt = factory->GetVertices ();
   if (sm.GetSize() == 0)
@@ -1192,7 +1196,7 @@ bool csGenmeshMeshObject::HitBeamOutline (const csVector3& start,
   {
     for (size_t s = 0; s < sm.GetSize(); s++)
     {
-      iRenderBuffer* indexBuffer = sm.GetSubMeshIndices (s);
+      iRenderBuffer* indexBuffer = sm[s]->GetIndices();
       csRenderBufferLock<uint, iRenderBuffer*> indices (indexBuffer);
       size_t n = indexBuffer->GetElementCount();
       while (n > 0)
@@ -1228,7 +1232,7 @@ bool csGenmeshMeshObject::HitBeamObject (const csVector3& start,
   float dist, temp;
   float itot_dist = 1 / tot_dist;
   dist = temp = tot_dist;
-  const SubMeshesContainer& sm = 
+  SubMeshesContainer& sm = 
     subMeshes ? *subMeshes : factory->GetSubMeshes ();
   const csVector3 *vrt = factory->GetVertices ();
   csVector3 tmp;
@@ -1265,7 +1269,7 @@ bool csGenmeshMeshObject::HitBeamObject (const csVector3& start,
     iMaterialWrapper* mat;
     for (size_t s = 0; s < sm.GetSize(); s++)
     {
-      iRenderBuffer* indexBuffer = sm.GetSubMeshIndices (s);
+      iRenderBuffer* indexBuffer = sm[s]->index_buffer;
       csRenderBufferLock<uint, iRenderBuffer*> indices (indexBuffer);
       size_t n = indexBuffer->GetElementCount();
       while (n > 0)
@@ -1280,7 +1284,7 @@ bool csGenmeshMeshObject::HitBeamObject (const csVector3& start,
             isect = tmp;
 	    dist = temp;
 	    //if (polygon_idx) *polygon_idx = i; // @@@ Uh, how to handle?
-            mat = sm.GetSubMeshMaterial (s);
+            mat = sm[s]->material;
           }
         }
         n -= 3;
@@ -1460,8 +1464,8 @@ iMeshObjectFactory* csGenmeshMeshObject::GetFactory () const
 //----------------------------------------------------------------------
 
 csGenmeshMeshObjectFactory::csGenmeshMeshObjectFactory (
-  iMeshObjectType *pParent, iObjectRegistry* object_reg) : 
-  scfImplementationType (this, (iBase*)pParent)
+  csGenmeshMeshObjectType* pParent, iObjectRegistry* object_reg) : 
+  scfImplementationType (this, static_cast<iBase*> (pParent))
 {
   shaderVariableAccessor.AttachNew (new ShaderVariableAccessor (this));
   renderBufferAccessor.AttachNew (new RenderBufferAccessor (this));
@@ -2003,6 +2007,11 @@ void csGenmeshMeshObjectFactory::HardTransform (
 
   initialized = false;
   ShapeChanged ();
+}
+
+iMeshObjectType* csGenmeshMeshObjectFactory::GetMeshObjectType () const
+{
+  return static_cast<iMeshObjectType*> (genmesh_type);
 }
 
 csPtr<iMeshObject> csGenmeshMeshObjectFactory::NewInstance ()

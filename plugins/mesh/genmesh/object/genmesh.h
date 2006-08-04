@@ -35,6 +35,7 @@
 #include "csutil/leakguard.h"
 #include "csutil/refarr.h"
 #include "csutil/parray.h"
+#include "csutil/pooledscfclass.h"
 #include "csutil/weakref.h"
 #include "iengine/light.h"
 #include "iengine/lightmgr.h"
@@ -86,6 +87,44 @@ public:
   {
     delete[] shadowmap;
   }
+};
+
+class MergedSVContext : 
+  public scfImplementationPooled<scfImplementation1<MergedSVContext,
+                                                    iShaderVariableContext> >
+{
+  // context1 has precedence
+  iShaderVariableContext* context1;
+  iShaderVariableContext* context2;
+public:
+  MergedSVContext (iShaderVariableContext* context1, 
+    iShaderVariableContext* context2) : scfPooledImplementationType (this),
+    context1 (context1), context2 (context2)
+  { }
+
+  void AddVariable (csShaderVariable *variable)
+  { }
+  csShaderVariable* GetVariable (csStringID name) const
+  { 
+    csShaderVariable* sv = context1->GetVariable (name); 
+    if (sv == 0)
+      sv = context2->GetVariable (name);
+    return sv;
+  }
+  const csRefArray<csShaderVariable>& GetShaderVariables () const
+  { 
+    return context1->GetShaderVariables();
+  }
+  void PushVariables (iShaderVarStack* stacks) const
+  { 
+    context2->PushVariables (stacks);
+    context1->PushVariables (stacks);
+  }
+
+  bool IsEmpty () const { return context1->IsEmpty() && context2->IsEmpty(); }
+
+  void ReplaceVariable (csShaderVariable *variable) { }
+  void Clear () { }
 };
 
 #include "csutil/win32/msvc_deprecated_warn_off.h"
@@ -246,40 +285,28 @@ public:
   {
     AddSubMesh (triangles, tricount, material, (uint)~0);
   }
-  bool AddSubMesh (iRenderBuffer* indices, iMaterialWrapper *material, 
-    const char* name, uint mixmode)
+  iGeneralMeshSubMesh* AddSubMesh (iRenderBuffer* indices, 
+    iMaterialWrapper *material, const char* name, uint mixmode)
   {
     if (subMeshes == 0) subMeshes = new SubMeshesContainer;
     SetObjectModelSubMeshes ();
     return subMeshes->AddSubMesh (indices, material, name, mixmode);
   }
-  size_t FindSubMesh (const char* name) const
+  iGeneralMeshSubMesh* FindSubMesh (const char* name) const
   {
-    return subMeshes ? subMeshes->FindSubMesh (name) : csArrayItemNotFound;
+    return subMeshes ? subMeshes->FindSubMesh (name) : 0;
   }
-  void DeleteSubMesh (size_t index)
+  void DeleteSubMesh (iGeneralMeshSubMesh* mesh)
   {
-    if (subMeshes) subMeshes->DeleteSubMesh (index);
+    if (subMeshes) subMeshes->DeleteSubMesh (mesh);
   }
   size_t GetSubMeshCount () const
   {
     return subMeshes ? subMeshes->GetSubMeshCount () : 0;
   }
-  iRenderBuffer* GetSubMeshIndices (size_t index) const
+  iGeneralMeshSubMesh* GetSubMesh (size_t index) const
   {
-    return subMeshes ? subMeshes->GetSubMeshIndices (index) : 0;
-  }
-  iMaterialWrapper* GetSubMeshMaterial (size_t index) const
-  {
-    return subMeshes ? subMeshes->GetSubMeshMaterial (index) : 0;
-  }
-  const char* GetSubMeshName (size_t index) const
-  {
-    return subMeshes ? subMeshes->GetSubMeshName (index) : 0;
-  }
-  uint GetSubMeshMixmode (size_t index) const
-  {
-    return subMeshes ? subMeshes->GetSubMeshMixmode (index) : (uint)~0;
+    return subMeshes ? subMeshes->GetSubMesh (index) : 0;
   }
   void CopySubMeshesFromFactory();
   /** @} */
@@ -512,7 +539,7 @@ public:
 
   iObjectRegistry* object_reg;
   iMeshFactoryWrapper* logparent;
-  iMeshObjectType* genmesh_type;
+  csRef<csGenmeshMeshObjectType> genmesh_type;
   csRef<iLightManager> light_mgr;
   csFlags flags;
 
@@ -524,7 +551,7 @@ public:
   }
 
   /// Constructor.
-  csGenmeshMeshObjectFactory (iMeshObjectType *pParent,
+  csGenmeshMeshObjectFactory (csGenmeshMeshObjectType* pParent,
   	iObjectRegistry* object_reg);
 
   /// Destructor.
@@ -615,39 +642,27 @@ public:
     if (polyMeshType != Submeshes) SetPolyMeshSubmeshes();
     AddSubMesh (triangles, tricount, material, (uint)~0);
   }
-  bool AddSubMesh (iRenderBuffer* indices, iMaterialWrapper *material, 
-    const char* name, uint mixmode)
+  iGeneralMeshSubMesh* AddSubMesh (iRenderBuffer* indices, 
+    iMaterialWrapper *material, const char* name, uint mixmode)
   {
     if (polyMeshType != Submeshes) SetPolyMeshSubmeshes();
     return subMeshes.AddSubMesh (indices, material, name, mixmode);
   }
-  size_t FindSubMesh (const char* name) const
+  iGeneralMeshSubMesh* FindSubMesh (const char* name) const
   {
     return subMeshes.FindSubMesh (name);
   }
-  void DeleteSubMesh (size_t index)
+  void DeleteSubMesh (iGeneralMeshSubMesh* mesh)
   {
-    subMeshes.DeleteSubMesh (index);
+    subMeshes.DeleteSubMesh (mesh);
   }
   size_t GetSubMeshCount () const
   {
     return subMeshes.GetSubMeshCount ();
   }
-  iRenderBuffer* GetSubMeshIndices (size_t index) const
+  iGeneralMeshSubMesh* GetSubMesh (size_t index) const
   {
-    return subMeshes.GetSubMeshIndices (index);
-  }
-  iMaterialWrapper* GetSubMeshMaterial (size_t index) const
-  {
-    return subMeshes.GetSubMeshMaterial (index);
-  }
-  const char* GetSubMeshName (size_t index) const
-  {
-    return subMeshes.GetSubMeshName (index);
-  }
-  uint GetSubMeshMixmode (size_t index) const
-  {
-    return subMeshes.GetSubMeshMixmode (index);
+    return subMeshes.GetSubMesh (index);
   }
 
   const csBox3& GetObjectBoundingBox ();
@@ -738,7 +753,7 @@ public:
   }
   virtual iMeshFactoryWrapper* GetMeshFactoryWrapper () const
   { return logparent; }
-  virtual iMeshObjectType* GetMeshObjectType () const { return genmesh_type; }
+  virtual iMeshObjectType* GetMeshObjectType () const; 
 
   //------------------ iPolygonMesh interface implementation ----------------//
   struct PolyMesh : public scfImplementation1<PolyMesh, iPolygonMesh>
@@ -847,6 +862,7 @@ class csGenmeshMeshObjectType :
 public:
   iObjectRegistry* object_reg;
   bool do_verbose;
+  MergedSVContext::Pool mergedSVContextPool;
 
   /// Constructor.
   csGenmeshMeshObjectType (iBase*);

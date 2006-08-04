@@ -21,21 +21,30 @@
 #define __CS_SUBMESHES_H__
 
 #include "csgeom/tri.h"
+#include "csgfx/shadervarcontext.h"
 #include "cstool/rendermeshholder.h"
 #include "csutil/dirtyaccessarray.h"
 #include "csutil/flags.h"
 #include "csutil/ref.h"
+#include "csutil/refarr.h"
 #include "csutil/scf_implementation.h"
 #include "csutil/util.h"
 #include "csutil/weakref.h"
 
 #include "iengine/material.h"
 #include "igeom/polymesh.h"
+#include "imesh/genmesh.h"
 #include "ivideo/rndbuf.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
 {
-  struct SubMesh
+  class csGenmeshMeshObject;
+
+  class SubMesh : 
+    public scfImplementation2<SubMesh, 
+                              iGeneralMeshSubMesh, 
+                              scfFakeInterface<iShaderVariableContext> >,
+    public CS::ShaderVariableContextImpl
   {
   protected:
     const char* name;
@@ -48,15 +57,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
     // Override mixmode from parent.
     uint MixMode;
 
-    SubMesh () : name (0)
+    SubMesh () : scfImplementationType (this), name (0)
     { }
     ~SubMesh()
     {
       delete[] name;
     }
-    SubMesh (const SubMesh& other) : index_buffer (other.index_buffer),
-      material (other.material), rmHolder (), 
-      bufferHolder (other.bufferHolder), MixMode (other.MixMode)
+    SubMesh (const SubMesh& other) : scfImplementationType (this), 
+      index_buffer (other.index_buffer), material (other.material), 
+      rmHolder (), bufferHolder (other.bufferHolder), 
+      MixMode (other.MixMode)
     {
       name = csStrNew (other.name);
     }
@@ -66,36 +76,36 @@ CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
       delete[] name;
       name = csStrNew (newName);
     }
+
+    iRenderBuffer* GetIndices () const
+    { return index_buffer; }
+    iMaterialWrapper* GetMaterial () const
+    { return material; }
+    virtual uint GetMixmode () const
+    { return MixMode; }
   };
 
   class SubMeshesContainer
   {
-    csArray<SubMesh> subMeshes;
+    csRefArray<SubMesh> subMeshes;
     uint changeNum;
   public:
     SubMeshesContainer() : changeNum (0) { }
 
     void ClearSubMeshes ()
     { subMeshes.DeleteAll(); changeNum++; }
-    bool AddSubMesh (iRenderBuffer* indices, iMaterialWrapper *material, 
-      const char* name, uint mixmode = (uint)~0);
-    size_t FindSubMesh (const char* name) const;
-    void DeleteSubMesh (size_t index)
-    { subMeshes.DeleteIndex (index); changeNum++; }
+    iGeneralMeshSubMesh* AddSubMesh (iRenderBuffer* indices, 
+      iMaterialWrapper *material, const char* name, uint mixmode = (uint)~0);
+    SubMesh* FindSubMesh (const char* name) const;
+    void DeleteSubMesh (iGeneralMeshSubMesh* mesh);
     size_t GetSubMeshCount () const
     { return subMeshes.GetSize(); }
-    iRenderBuffer* GetSubMeshIndices (size_t index) const
-    { return (index < subMeshes.GetSize()) ? subMeshes[index].index_buffer : 0; }
-    iMaterialWrapper* GetSubMeshMaterial (size_t index) const
-    { return (index < subMeshes.GetSize()) ? subMeshes[index].material : 0; }
-    const char* GetSubMeshName (size_t index) const
-    { return (index < subMeshes.GetSize()) ? subMeshes[index].GetName() : 0; }
-    uint GetSubMeshMixmode (size_t index) const
-    { return (index < subMeshes.GetSize()) ? subMeshes[index].MixMode : (uint)~0; }
+    SubMesh* GetSubMesh (size_t index) const
+    { return subMeshes[index]; }
 
     size_t GetSize() const
     { return subMeshes.GetSize(); }
-    SubMesh& operator[](size_t index)
+    SubMesh* operator[](size_t index)
     { return subMeshes[index]; }
     uint GetChangeNum () const
     { return changeNum; }

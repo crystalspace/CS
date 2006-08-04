@@ -44,6 +44,23 @@ class csVector2;
 class csVector3;
 class csEllipsoid;
 
+struct iGeneralMeshSubMesh : public virtual iBase
+{
+  SCF_INTERFACE (iGeneralMeshSubMesh, 1, 0, 0);
+  
+  /// Get the index render buffer
+  virtual iRenderBuffer* GetIndices () const = 0;
+
+  /// Get the material
+  virtual iMaterialWrapper* GetMaterial () const = 0;
+  
+  /// Get the name (or 0 if none was given)
+  virtual const char* GetName () const = 0;
+  
+  /// Get the mixmode (or (uint)~0 if none was specified)
+  virtual uint GetMixmode () const = 0;
+};
+
 /**
  * The common interface between genmesh meshes and factories.
  * This interface is usually not used alone. Generally one
@@ -51,7 +68,7 @@ class csEllipsoid;
  */
 struct iGeneralMeshCommonState : public virtual iBase
 {
-  SCF_INTERFACE (iGeneralMeshCommonState, 1, 0, 1);
+  SCF_INTERFACE (iGeneralMeshCommonState, 1, 1, 0);
   
   /// Set lighting.
   virtual void SetLighting (bool l) = 0;
@@ -102,6 +119,8 @@ struct iGeneralMeshCommonState : public virtual iBase
    * Note! SubMeshes added to an instance of a genmesh will override
    * the submeshes from the factory (i.e. the submeshes of the factory will
    * be completely ignored as soon as the instance has submeshes).
+   * \deprecated Use AddSubMesh(iRenderBuffer*, iMaterialWrapper*, const char*, 
+   *   uint) instead
    */
   CS_DEPRECATED_METHOD_MSG("Use AddSubMesh(iRenderBuffer*, iMaterialWrapper*, "
     "const char*, uint) instead")
@@ -121,6 +140,8 @@ struct iGeneralMeshCommonState : public virtual iBase
    * the submeshes from the factory (i.e. the submeshes of the factory will
    * be completely ignored as soon as the instance has submeshes).
    * This version overrides the parent mixmode.
+   * \deprecated Use AddSubMesh(iRenderBuffer*, iMaterialWrapper*, const char*, 
+   *   uint) instead
    */
   CS_DEPRECATED_METHOD_MSG("Use AddSubMesh(iRenderBuffer*, iMaterialWrapper*, "
     "const char*, uint) instead")
@@ -172,39 +193,29 @@ struct iGeneralMeshCommonState : public virtual iBase
    * \param material Material to assign to the submesh.
    * \param name (Optional) Name to identify the submesh.
    * \param mixmode (Optional) Mixmode to override the mesh's mixmode.
-   * \return Whether the submesh was added successfully. 
+   * \return The added submesh, if successful.
    * \remarks This will change the indices of other submeshes.
    */
-  virtual bool AddSubMesh (iRenderBuffer* indices, iMaterialWrapper *material, 
-    const char* name, uint mixmode = (uint)~0) = 0;
+  virtual iGeneralMeshSubMesh* AddSubMesh (iRenderBuffer* indices, 
+    iMaterialWrapper *material, const char* name, uint mixmode = (uint)~0) = 0;
 
   /**
    * Find the index of a submesh. The index can be used with DeleteSubMesh()
    * and the GetSubMesh...() methods. Returns csArrayItemNotFound if the
    * submesh was not found.
    */
-  virtual size_t FindSubMesh (const char* name) const = 0;
+  virtual iGeneralMeshSubMesh* FindSubMesh (const char* name) const = 0;
   
   /**
    * Delete a submesh.
-   * \remarks This will change the indices of other submeshes.
    */
-  virtual void DeleteSubMesh (size_t index) = 0;
+  virtual void DeleteSubMesh (iGeneralMeshSubMesh* mesh) = 0;
   
   /// Get the number of submeshes
   virtual size_t GetSubMeshCount () const = 0;
-  
-  /// Get the index render buffer of a submesh
-  virtual iRenderBuffer* GetSubMeshIndices (size_t index) const = 0;
 
-  /// Get the material of a submesh
-  virtual iMaterialWrapper* GetSubMeshMaterial (size_t index) const = 0;
-  
-  /// Get the name of a submesh (or 0 if none was given)
-  virtual const char* GetSubMeshName (size_t index) const = 0;
-  
-  /// Get the mixmode of a submesh (or (uint)~0 if none was specified)
-  virtual uint GetSubMeshMixmode (size_t index) const = 0;
+  /// Get a specific submesh
+  virtual iGeneralMeshSubMesh* GetSubMesh (size_t index) const = 0;
   /** @} */
 };
 

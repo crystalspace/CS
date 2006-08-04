@@ -19,6 +19,9 @@ chronological order.
 	  manual forwarding.
 	- res changed iSyntaxService->ParseShaderVar() to also parse the 
 	  shader variable name.
+	- res changed the genmesh submeshes to be accessed via an interface.
+	- res added some initial support for per-submesh shader vars to
+	  genmesh.
 3-Aug-2006
 	- Jorrit fixed a small problem which caused CS not to compile
 	  in optimize mode.
