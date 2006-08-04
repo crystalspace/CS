@@ -24,6 +24,10 @@ chronological order.
 	  genmesh.
 	- res tweaked the Cg shader framework to shuffle the primaryColor from
 	  vertex to fragment programs with COLOR semantics.
+	- Jorrit added an option to stdrep so that you can now specify
+	  'silent' mode in a config file too ('Reporter.Silent').
+	- Jorrit fixed stdrep so that the reading 'Reporter.AppendFile'
+	  actually works now.
 3-Aug-2006
 	- Jorrit fixed a small problem which caused CS not to compile
 	  in optimize mode.
