@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+4-Aug-2006
+	- res fixed the default csRenderBufferLock<> storage to 
+	  iRenderBuffer*: it seems to be the rule rather than the exception
+	  that a render buffer is valid while a lock is instantiated.
 3-Aug-2006
 	- Jorrit fixed a small problem which caused CS not to compile
 	  in optimize mode.

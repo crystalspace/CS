@@ -36,11 +36,11 @@
  * The contents can be accessed either directly, array-style or iterator-style 
  * in a typed way.
  * \remarks The TbufferKeeper template argument can be used to have the
- *  lock store the buffer in a simple iRenderBuffer* (instead a csRef<>)
- *  to avoid an IncRef() and DecRef() if it is known that the buffer will
- *  not be destroyed as long as the lock exists.
+ *  lock store the buffer in a csRef<iRenderBuffer> (instead a iRenderBuffer*)
+ *  in case there is a risk that the buffer gets destroyed while thelock 
+ *  exists.
  */
-template <class T, class TbufferKeeper = csRef<iRenderBuffer> >
+template <class T, class TbufferKeeper = iRenderBuffer*>
 class csRenderBufferLock
 {
   /// Buffer that is being locked
