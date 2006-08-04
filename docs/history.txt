@@ -22,6 +22,8 @@ chronological order.
 	- res changed the genmesh submeshes to be accessed via an interface.
 	- res added some initial support for per-submesh shader vars to
 	  genmesh.
+	- res tweaked the Cg shader framework to shuffle the primaryColor from
+	  vertex to fragment programs with COLOR semantics.
 3-Aug-2006
 	- Jorrit fixed a small problem which caused CS not to compile
 	  in optimize mode.
