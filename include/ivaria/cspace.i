@@ -257,6 +257,7 @@
   INTERFACE_APPLY(iReporterIterator)
   INTERFACE_APPLY(iReporterListener)
   INTERFACE_APPLY(iSceneNode)
+  INTERFACE_APPLY(iSceneNodeArray)
   INTERFACE_APPLY(iSCF)
   INTERFACE_APPLY(iScript)
   INTERFACE_APPLY(iScriptObject)

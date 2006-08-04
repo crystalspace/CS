@@ -28,6 +28,9 @@ chronological order.
 	  'silent' mode in a config file too ('Reporter.Silent').
 	- Jorrit fixed stdrep so that the reading 'Reporter.AppendFile'
 	  actually works now.
+        - Jorrit fixed compilation of the python plugin (not linking,
+          that's still broken due to -Wl,Symbolic flag) so that it compiles
+          again.
 3-Aug-2006
 	- Jorrit fixed a small problem which caused CS not to compile
 	  in optimize mode.
