@@ -601,10 +601,14 @@ void csThingStatic::DistributePolyLMs (
 
       sp->polygon_data.useLightmap = true;
       float lmu1, lmv1, lmu2, lmv2;
-      thing_type->G3D->GetTextureManager ()->GetLightmapRendererCoords (
-        slm->width, slm->height,
-        r.xmin, r.ymin, r.xmax, r.ymax,
-        lmu1, lmv1, lmu2, lmv2);
+      float islmW = 1.0f / (float)slm->width;
+      float islmH = 1.0f / (float)slm->height;
+      // Those offsets seem to result in a look similar to the software
+      // renderer... but not perfect yet.
+      lmu1 = ((float)r.xmin + 0.5f) * islmW;
+      lmv1 = ((float)r.ymin + 0.5f) * islmH;
+      lmu2 = ((float)r.xmax - 1.0f) * islmW;
+      lmv2 = ((float)r.ymax - 1.0f) * islmH;
       sp->polygon_data.tmapping->SetCoordsOnSuperLM (
         lmu1, lmv1, lmu2, lmv2);
     }
@@ -1515,6 +1519,79 @@ bool csThingStatic::PointOnPolygon (int polygon_idx, const csVector3& v)
 {
   return static_polygons[GetRealIndex (polygon_idx)]->PointOnPolygon (v);
 }
+
+bool csThingStatic::GetLightmapLayout (int polygon_idx, size_t& slm, 
+                                       csRect& slmSubRect, float* slmCoord)
+{
+  PrepareLMLayout ();
+  /* The layouted polys are in a structure primarily intended for rendering,
+   * not to quickly access a specific polygon. Linear search time. */
+  for (size_t litPoly = 0; litPoly < litPolys.GetSize(); litPoly++)
+  {
+    const csStaticLitPolyGroup& polyGroup = *(litPolys[litPoly]);
+    for (size_t p = 0; p < polyGroup.polys.GetSize(); p++)
+    {
+      if (polyGroup.polys[p] == polygon_idx)
+      {
+        slm = superLMs.Find (polyGroup.staticSLM);
+        slmSubRect = polyGroup.lmRects[p];
+
+        const csPolygonRenderData* static_data = 
+          &static_polygons[polygon_idx]->polygon_data;
+        // Compute TCs (lifted from the poly renderer)
+        csMatrix3 t_m;
+        csVector3 t_v;
+        t_m = static_data->tmapping->GetO2T ();
+        t_v = static_data->tmapping->GetO2TTranslation ();
+        csTransform object2texture (t_m, t_v);
+
+        csTransform tex2lm;
+        struct csPolyLMCoords
+        {
+          float u1, v1, u2, v2;
+        };
+
+        csPolyLMCoords lmc;
+        static_data->tmapping->GetCoordsOnSuperLM (lmc.u1, lmc.v1,
+          lmc.u2, lmc.v2);
+
+        float lm_low_u = 0.0f, lm_low_v = 0.0f;
+        float lm_high_u = 1.0f, lm_high_v = 1.0f;
+        static_data->tmapping->GetTextureBox (
+          lm_low_u, lm_low_v, lm_high_u, lm_high_v);
+
+        float lm_scale_u = ((lmc.u2 - lmc.u1) / (lm_high_u - lm_low_u));
+        float lm_scale_v = ((lmc.v2 - lmc.v1) / (lm_high_v - lm_low_v));
+
+        tex2lm.SetO2T (
+          csMatrix3 (lm_scale_u, 0, 0,
+          0, lm_scale_v, 0,
+          0, 0, 1));
+        tex2lm.SetO2TTranslation (
+          csVector3 (
+          (lm_scale_u != 0.0f) ? (lm_low_u - lmc.u1 / lm_scale_u) : 0,
+          (lm_scale_v != 0.0f) ? (lm_low_v - lmc.v1 / lm_scale_v) : 0,
+          0));
+
+        csVector3* obj_verts = *(static_data->p_obj_verts);
+        int j, vc = static_data->num_vertices;
+        for (j = 0; j < vc; j++)
+        {
+          int vidx = static_data->vertices[j];
+          const csVector3& vertex = obj_verts[vidx];
+          csVector3 t = object2texture.Other2This (vertex);
+          csVector3 l = tex2lm.Other2This (t);
+          *slmCoord++ = l.x;
+          *slmCoord++ = l.y;
+        }
+        
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
 //----------------------------------------------------------------------------
 
 csThingStatic::LightmapTexAccessor::LightmapTexAccessor (csThing* instance, 
@@ -2668,6 +2745,30 @@ void csThing::UpdateDirtyLMs ()
   }
 
   SetLmDirty (false);
+}
+
+csPtr<iImage> csThing::GetPolygonLightmap (int polygon_idx)
+{
+  if ((polygon_idx < 0) 
+    || ((size_t)polygon_idx >= polygons.GetSize())) return 0;
+  csPolyTexture* polytex = polygons[polygon_idx].GetPolyTexture();
+  if (!polytex) return 0;
+  csLightMap* lm = polytex->GetLightMap();
+  if (!lm) return 0;
+
+  csRGBcolor* rgbPtr = lm->GetStaticMap ();
+  if (!rgbPtr) return 0;
+  size_t numPixels = lm->GetWidth() * lm->GetHeight();
+  csRGBpixel* rgbaData = new csRGBpixel[numPixels];
+  {
+    csRGBpixel* rgbaPtr = rgbaData;
+    while (numPixels-- > 0)
+    {
+      *rgbaPtr++ = *rgbPtr++;
+    }
+  }
+  return csPtr<iImage> (new csImageMemory (lm->GetWidth(), lm->GetHeight(), 
+    rgbaData, true));
 }
 
 //---------------------------------------------------------------------------
