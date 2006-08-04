@@ -10,6 +10,13 @@ chronological order.
 	- res fixed the default csRenderBufferLock<> storage to 
 	  iRenderBuffer*: it seems to be the rule rather than the exception
 	  that a render buffer is valid while a lock is instantiated.
+	- res split up csShaderVariableContext into 
+	  CS::ShaderVariableContextImpl, which contains an 
+	  iShaderVariableContext implementation but no SCF goop, and
+	  csShaderVariableContext on top of that, which continues to be a full
+	  SCF class. This way the simple iShaderVariableContext implementation
+	  can be reused by other SCF classes without having to resort to
+	  manual forwarding.
 3-Aug-2006
 	- Jorrit fixed a small problem which caused CS not to compile
 	  in optimize mode.

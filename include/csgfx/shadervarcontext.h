@@ -31,30 +31,47 @@
  * Simple implementation for iShaderVariableContext.
  */
 
+namespace CS
+{
+  /**
+   * Simple implementation for iShaderVariableContext.
+   * Can be inherited from for use in SCF classes. For an example,
+   * see csShaderVariableContext.
+   */
+  class CS_CRYSTALSPACE_EXPORT ShaderVariableContextImpl :
+    public iShaderVariableContext
+  {
+  protected:
+    csRefArray<csShaderVariable> variables;
+
+  public:
+    virtual ~ShaderVariableContextImpl();
+
+    const csRefArray<csShaderVariable>& GetShaderVariables () const
+    { return variables; }
+    virtual void AddVariable (csShaderVariable *variable);
+    virtual csShaderVariable* GetVariable (csStringID name) const;
+    virtual void PushVariables (iShaderVarStack* stacks) const;
+    virtual bool IsEmpty() const { return variables.Length() == 0; }  
+    virtual void ReplaceVariable (csShaderVariable *variable);
+    virtual void Clear () { variables.Empty(); }
+  };
+}
+
 /**
- * Simple implementation for iShaderVariableContext.
+ * Complete SCF class implementing iShaderVariableContext.
  */
 class CS_CRYSTALSPACE_EXPORT csShaderVariableContext :
-  public scfImplementation1<csShaderVariableContext, iShaderVariableContext>
+  public scfImplementation1<csShaderVariableContext, 
+			     scfFakeInterface<iShaderVariableContext> >,
+  public CS::ShaderVariableContextImpl
 {
-private:
-  csRefArray<csShaderVariable> variables;
-
 public:
   CS_LEAKGUARD_DECLARE (csShaderVariableContext);
 
   csShaderVariableContext ();
   csShaderVariableContext (const csShaderVariableContext& other);
   virtual ~csShaderVariableContext ();
-
-  const csRefArray<csShaderVariable>& GetShaderVariables () const
-  { return variables; }
-  virtual void AddVariable (csShaderVariable *variable);
-  virtual csShaderVariable* GetVariable (csStringID name) const;
-  virtual void PushVariables (iShaderVarStack* stacks) const;
-  virtual bool IsEmpty() const { return variables.Length() == 0; }  
-  virtual void ReplaceVariable (csShaderVariable *variable);
-  virtual void Clear () { variables.Empty(); }
 };
 
 #endif // __CS_CSGFX_SHADERVARCONTEXT_H__
