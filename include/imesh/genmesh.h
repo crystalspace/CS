@@ -68,7 +68,7 @@ struct iGeneralMeshSubMesh : public virtual iBase
  */
 struct iGeneralMeshCommonState : public virtual iBase
 {
-  SCF_INTERFACE (iGeneralMeshCommonState, 1, 1, 0);
+  SCF_INTERFACE (iGeneralMeshCommonState, 1, 2, 0);
   
   /// Set lighting.
   virtual void SetLighting (bool l) = 0;
@@ -101,55 +101,6 @@ struct iGeneralMeshCommonState : public virtual iBase
   /// Is shadow receiving enabled?
   virtual bool IsShadowReceiving () const = 0;
 
-  /**\name SubMesh handling
-   * @{ */
-  /**
-   * Remove all submeshes added to this object
-   */
-  virtual void ClearSubMeshes () = 0;
-
-  /**
-   * Add a submesh to this object. A submesh is a subset of the mesh triangles
-   * rendered with a certain material. When a mesh has one or more submeshes,
-   * only submeshes are drawn and not original geometry. That means submeshes
-   * should cover all original triangles to avoid holes in the mesh.
-   * triangles is an array of indices into the factory triangle list
-   * tricount is the number of triangles in "triangles"
-   * material is a material to assign to the mesh
-   * Note! SubMeshes added to an instance of a genmesh will override
-   * the submeshes from the factory (i.e. the submeshes of the factory will
-   * be completely ignored as soon as the instance has submeshes).
-   * \deprecated Use AddSubMesh(iRenderBuffer*, iMaterialWrapper*, const char*, 
-   *   uint) instead
-   */
-  CS_DEPRECATED_METHOD_MSG("Use AddSubMesh(iRenderBuffer*, iMaterialWrapper*, "
-    "const char*, uint) instead")
-  virtual void AddSubMesh (unsigned int *triangles,
-    int tricount,
-    iMaterialWrapper *material) = 0;
-
-  /**
-   * Add a submesh to this object. A submesh is a subset of the mesh triangles
-   * rendered with a certain material. When a mesh has one or more submeshes,
-   * only submeshes are drawn and not original geometry. That means submeshes
-   * should cover all original triangles to avoid holes in the mesh.
-   * triangles is an array of indices into the factory triangle list
-   * tricount is the number of triangles in "triangles"
-   * material is a material to assign to the mesh
-   * Note! SubMeshes added to an instance of a genmesh will override
-   * the submeshes from the factory (i.e. the submeshes of the factory will
-   * be completely ignored as soon as the instance has submeshes).
-   * This version overrides the parent mixmode.
-   * \deprecated Use AddSubMesh(iRenderBuffer*, iMaterialWrapper*, const char*, 
-   *   uint) instead
-   */
-  CS_DEPRECATED_METHOD_MSG("Use AddSubMesh(iRenderBuffer*, iMaterialWrapper*, "
-    "const char*, uint) instead")
-  virtual void AddSubMesh (unsigned int *triangles,
-    int tricount,
-    iMaterialWrapper *material, uint mixmode) = 0;
-  /** @} */
-
   /**\name Custom render buffers
    * @{ */
   /**
@@ -177,46 +128,6 @@ struct iGeneralMeshCommonState : public virtual iBase
    */
   virtual csRef<iString> GetRenderBufferName (int index) const = 0;
   /** @} */
-
-  /**\name SubMesh handling
-   * @{ */
-
-  /**
-   * Add a submesh to this object. A submesh is a subset of the mesh triangles
-   * rendered with a certain material. When a mesh has one or more submeshes,
-   * only submeshes are drawn and not original geometry. That means submeshes
-   * should cover all original triangles to avoid holes in the mesh.
-   * \remarks SubMeshes added to an instance of a genmesh will override
-   * the submeshes from the factory (i.e. the submeshes of the factory will
-   * be completely ignored as soon as the instance has submeshes).
-   * \param indices Render buffer with the triangle index data for the submesh.
-   * \param material Material to assign to the submesh.
-   * \param name (Optional) Name to identify the submesh.
-   * \param mixmode (Optional) Mixmode to override the mesh's mixmode.
-   * \return The added submesh, if successful.
-   * \remarks This will change the indices of other submeshes.
-   */
-  virtual iGeneralMeshSubMesh* AddSubMesh (iRenderBuffer* indices, 
-    iMaterialWrapper *material, const char* name, uint mixmode = (uint)~0) = 0;
-
-  /**
-   * Find the index of a submesh. The index can be used with DeleteSubMesh()
-   * and the GetSubMesh...() methods. Returns csArrayItemNotFound if the
-   * submesh was not found.
-   */
-  virtual iGeneralMeshSubMesh* FindSubMesh (const char* name) const = 0;
-  
-  /**
-   * Delete a submesh.
-   */
-  virtual void DeleteSubMesh (iGeneralMeshSubMesh* mesh) = 0;
-  
-  /// Get the number of submeshes
-  virtual size_t GetSubMeshCount () const = 0;
-
-  /// Get a specific submesh
-  virtual iGeneralMeshSubMesh* GetSubMesh (size_t index) const = 0;
-  /** @} */
 };
 
 /**
@@ -235,7 +146,7 @@ struct iGeneralMeshCommonState : public virtual iBase
  */
 struct iGeneralMeshState : public virtual iGeneralMeshCommonState
 {
-  SCF_INTERFACE (iGeneralMeshState, 1, 0, 1);
+  SCF_INTERFACE (iGeneralMeshState, 1, 1, 0);
   
   /**
    * Set the animation control to use for this mesh object.
@@ -251,10 +162,15 @@ struct iGeneralMeshState : public virtual iGeneralMeshCommonState
   /**\name SubMesh handling
    * @{ */
   /**
-   * Copies all submeshes from the factory to the mesh object. Useful when
-   * the submeshes for one individual mesh object should be manipulated.
+   * Find the index of a submesh. The index can be used with DeleteSubMesh()
+   * and the GetSubMesh...() methods. Returns 0 if the submesh was not found.
+   *
+   * The returned interface can be used for limited per-object variation of
+   * the submeshes as defined in the factory. Currently the following aspects
+   * can be overridden:
+   *  - Shader variables (by querying the iShaderVariableContext interface)
    */
-  virtual void CopySubMeshesFromFactory() = 0; 
+  virtual iGeneralMeshSubMesh* FindSubMesh (const char* name) const = 0;
   /** @} */
 };
 
@@ -282,7 +198,7 @@ struct iGeneralMeshState : public virtual iGeneralMeshCommonState
  */
 struct iGeneralFactoryState : public virtual iGeneralMeshCommonState
 {
-  SCF_INTERFACE (iGeneralFactoryState, 1, 0, 0);
+  SCF_INTERFACE (iGeneralFactoryState, 1, 1, 0);
   
   /// Set the color to use. Will be added to the lighting values.
   virtual void SetColor (const csColor& col) = 0;
@@ -437,6 +353,48 @@ struct iGeneralFactoryState : public virtual iGeneralMeshCommonState
    */
   virtual iGenMeshAnimationControlFactory* GetAnimationControlFactory ()
   	const = 0;
+  
+  /**\name SubMesh handling
+   * @{ */
+  /**
+   * Remove all submeshes added to this object
+   */
+  virtual void ClearSubMeshes () = 0;
+  /**
+   * Add a submesh to this object. A submesh is a subset of the mesh triangles
+   * rendered with a certain material. When a mesh has one or more submeshes,
+   * only submeshes are drawn and not original geometry. That means submeshes
+   * should cover all original triangles to avoid holes in the mesh.
+   * \remarks SubMeshes added to an instance of a genmesh will override
+   * the submeshes from the factory (i.e. the submeshes of the factory will
+   * be completely ignored as soon as the instance has submeshes).
+   * \param indices Render buffer with the triangle index data for the submesh.
+   * \param material Material to assign to the submesh.
+   * \param name (Optional) Name to identify the submesh.
+   * \param mixmode (Optional) Mixmode to override the mesh's mixmode.
+   * \return The added submesh, if successful.
+   * \remarks This will change the indices of other submeshes.
+   */
+  virtual iGeneralMeshSubMesh* AddSubMesh (iRenderBuffer* indices, 
+    iMaterialWrapper *material, const char* name, uint mixmode = (uint)~0) = 0;
+
+  /**
+   * Find the index of a submesh. The index can be used with DeleteSubMesh()
+   * and the GetSubMesh...() methods. Returns 0 if the submesh was not found.
+   */
+  virtual iGeneralMeshSubMesh* FindSubMesh (const char* name) const = 0;
+  
+  /**
+   * Delete a submesh.
+   */
+  virtual void DeleteSubMesh (iGeneralMeshSubMesh* mesh) = 0;
+  
+  /// Get the number of submeshes
+  virtual size_t GetSubMeshCount () const = 0;
+
+  /// Get a specific submesh
+  virtual iGeneralMeshSubMesh* GetSubMesh (size_t index) const = 0;
+  /** @} */
 };
 
 /**

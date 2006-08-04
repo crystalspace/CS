@@ -45,11 +45,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
     subMesh->material = material;
     subMesh->MixMode = mixmode;
     subMesh->index_buffer = indices;
-    subMesh->SetName (name);
-
-    subMesh->bufferHolder.AttachNew (new csRenderBufferHolder);
-    subMesh->bufferHolder->SetRenderBuffer(CS_BUFFER_INDEX,
-      indices);
+    subMesh->name = name;
 
     subMeshes.InsertSorted (subMesh, SubmeshSubmeshCompare);
     /* @@@ FIXME: Prolly do some error checking, like sanity of
@@ -81,6 +77,51 @@ CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
       csArrayCmp<SubMesh*, SubMesh*> (subMesh, &SubmeshSubmeshCompare));
     if (idx == csArrayItemNotFound) return;
     subMeshes.DeleteIndex (idx);
+  }
+
+  //-------------------------------------------------------------------------
+
+  csRenderBufferHolder* SubMeshProxy::GetBufferHolder()
+  {
+    if (!bufferHolder.IsValid())
+    {
+      bufferHolder.AttachNew (new csRenderBufferHolder);
+      bufferHolder->SetRenderBuffer(CS_BUFFER_INDEX, GetIndices ());
+    }
+    return bufferHolder;
+  }
+
+  //-------------------------------------------------------------------------
+
+  static int SubmeshProxySubmeshProxyCompare (SubMeshProxy* const& A, 
+                                              SubMeshProxy* const& B)
+  {
+    const char* a = A->GetName();
+    const char* b = B->GetName();
+    if (a == 0) return (b == 0) ? 0 : 1;
+    if (b == 0) return -1;
+    return strcmp (a, b);
+  }
+
+  void SubMeshProxiesContainer::AddSubMesh (SubMeshProxy* subMesh)
+  {
+    subMeshes.InsertSorted (subMesh, SubmeshProxySubmeshProxyCompare);
+  }
+
+  static int SubmeshProxyStringCompare (SubMeshProxy* const& A, const char* const& b)
+  {
+    const char* a = A->GetName();
+    if (a == 0) return (b == 0) ? 0 : 1;
+    if (b == 0) return -1;
+    return strcmp (a, b);
+  }
+
+  SubMeshProxy* SubMeshProxiesContainer::FindSubMesh (const char* name) const
+  {
+    size_t idx = subMeshes.FindSortedKey (
+      csArrayCmp<SubMeshProxy*, const char*> (name, &SubmeshProxyStringCompare));
+    if (idx == csArrayItemNotFound) return 0;
+    return subMeshes[idx];
   }
 
   //-------------------------------------------------------------------------

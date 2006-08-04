@@ -23,12 +23,14 @@
 #include "csgeom/quaternion.h"
 #include "csgeom/transfrm.h"
 #include "csgeom/tri.h"
+#include "csgfx/renderbuffer.h"
 #include "csutil/csendian.h"
 #include "csutil/csstring.h"
 #include "csutil/scanstr.h"
 #include "csutil/sysfunc.h"
 #include "csutil/memfile.h"
 #include "csutil/cscolor.h"
+#include "cstool/rbuflock.h"
 
 #include "iengine/engine.h"
 #include "iengine/material.h"
@@ -61,7 +63,8 @@
 
 CS_IMPLEMENT_PLUGIN
 
-using namespace CS::Plugins::Genmesh3DS;
+CS_PLUGIN_NAMESPACE_BEGIN(Genmesh3DS)
+{
 
 /**
  * Reports errors
@@ -382,9 +385,22 @@ csPtr<iBase> csGenmesh3DSFactoryLoader::Parse (iDataBuffer* buf,
   if (materials_and_tris.Length () > 1)
     for (j = 0 ; j < materials_and_tris.Length () ; j++)
     {
-      gmstate->AddSubMesh (materials_and_tris[j].tris.GetArray (),
-      	int (materials_and_tris[j].tris.Length ()),
-	materials_and_tris[j].material);
+      csRef<iRenderBuffer> indexBuffer = csRenderBuffer::CreateIndexRenderBuffer (
+        materials_and_tris[j].tris.GetSize(), CS_BUF_STATIC, 
+        CS_BUFCOMP_UNSIGNED_INT, 0, gmstate->GetVertexCount() - 1);
+      {
+        csRenderBufferLock<uint> indices (indexBuffer);
+        csTriangle* tris = gmstate->GetTriangles();
+        for (size_t i = 0; i < materials_and_tris[j].tris.GetSize(); i++)
+        {
+          uint tri = materials_and_tris[j].tris[i];
+          *indices++ = tris[tri].a;
+          *indices++ = tris[tri].b;
+          *indices++ = tris[tri].c;
+        }
+      }
+      gmstate->AddSubMesh (indexBuffer,
+	materials_and_tris[j].material, 0);
     }
   materials_and_tris.Empty ();
 
@@ -432,3 +448,5 @@ iMeshFactoryWrapper* csGenmesh3DSFactoryLoader::Load (const char* factname,
   return Load (factname, filename, dbuf);
 }
 
+}
+CS_PLUGIN_NAMESPACE_END(Genmesh3DS)

@@ -31,6 +31,12 @@ chronological order.
         - Jorrit fixed compilation of the python plugin (not linking,
           that's still broken due to -Wl,Symbolic flag) so that it compiles
           again.
+	- res changed the way genmesh submeshes work. Now, meshobjects can't
+	  contain completely custom submeshes; however, certain aspects of the
+	  submesh as defined in the factory can be overridden (right now only
+	  shader variables, but in the future probably at least materials and 
+	  mixmodes as well). Basically, you can't have different sets of 
+	  triangles in the mesh object.
 3-Aug-2006
 	- Jorrit fixed a small problem which caused CS not to compile
 	  in optimize mode.

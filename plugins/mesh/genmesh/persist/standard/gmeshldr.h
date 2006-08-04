@@ -64,8 +64,8 @@ public:
   virtual bool Initialize (iObjectRegistry *object_reg);
 
   /// Parse a submesh node
-  bool ParseSubMesh (iDocumentNode *node, iGeneralMeshCommonState* state, 
-    iGeneralFactoryState* factstate, iLoaderContext* ldr_context);
+  bool ParseSubMesh (iDocumentNode *node, iGeneralFactoryState* factstate, 
+    iLoaderContext* ldr_context);
 
   /// Parse a given node and return a new object for it.
   virtual csPtr<iBase> Parse (iDocumentNode* node,
@@ -135,8 +135,8 @@ public:
   bool ParseRenderBuffer (iDocumentNode *node, iGeneralMeshState* state, 
     iGeneralFactoryState* factstate);
   /// Parse a submesh node
-  bool ParseSubMesh (iDocumentNode *node, iGeneralMeshCommonState* state, 
-    iGeneralFactoryState* factstate, iLoaderContext* ldr_context);
+  bool ParseSubMesh (iDocumentNode *node, iGeneralMeshState* state, 
+    iLoaderContext* ldr_context);
 };
 
 /**

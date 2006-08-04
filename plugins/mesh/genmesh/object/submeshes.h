@@ -46,36 +46,23 @@ CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
                               scfFakeInterface<iShaderVariableContext> >,
     public CS::ShaderVariableContextImpl
   {
-  protected:
-    const char* name;
   public:
+    const char* name;
     csRef<iRenderBuffer> index_buffer;
     csRef<iMaterialWrapper> material;
-    csRenderMeshHolder rmHolder;
-    csRef<csRenderBufferHolder> bufferHolder;
+    //csRenderMeshHolder rmHolder;
+    //csRef<csRenderBufferHolder> bufferHolder;
 
     // Override mixmode from parent.
     uint MixMode;
 
     SubMesh () : scfImplementationType (this), name (0)
     { }
-    ~SubMesh()
-    {
-      delete[] name;
-    }
     SubMesh (const SubMesh& other) : scfImplementationType (this), 
-      index_buffer (other.index_buffer), material (other.material), 
-      rmHolder (), bufferHolder (other.bufferHolder), 
-      MixMode (other.MixMode)
-    {
-      name = csStrNew (other.name);
-    }
+      name (other.name), index_buffer (other.index_buffer), 
+      material (other.material), MixMode (other.MixMode)
+    { }
     const char* GetName() const { return name; }
-    void SetName (const char* newName)
-    {
-      delete[] name;
-      name = csStrNew (newName);
-    }
 
     iRenderBuffer* GetIndices () const
     { return index_buffer; }
@@ -105,10 +92,101 @@ CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
 
     size_t GetSize() const
     { return subMeshes.GetSize(); }
-    SubMesh* operator[](size_t index)
+    SubMesh* operator[](size_t index) const
     { return subMeshes[index]; }
     uint GetChangeNum () const
     { return changeNum; }
+  };
+
+  /**
+   * SubMesh proxy - can return data from either the parent (real) SubMesh or
+   * local override values.
+   */
+  class SubMeshProxy : 
+    public scfImplementation2<SubMeshProxy, 
+                              iGeneralMeshSubMesh, 
+                              scfFakeInterface<iShaderVariableContext> >,
+    public CS::ShaderVariableContextImpl
+  {
+  protected:
+    enum
+    {
+      bitMaterial = 0,
+      bitMixMode
+    };
+    csRef<iMaterialWrapper> material;
+    // Override mixmode from parent.
+    uint MixMode;
+    csFlags overrideFlags;
+    csRef<csRenderBufferHolder> bufferHolder;
+
+    void SetOverrideFlag (uint bit, bool flag) 
+    { overrideFlags.SetBool (1 << bit, flag); }
+    bool GetOverrideFlag (uint bit) const 
+    { return overrideFlags.Check (1 << bit); }
+  public:
+    csWeakRef<SubMesh> parentSubMesh;
+    csRenderMeshHolder rmHolder;
+
+    SubMeshProxy () : scfImplementationType (this), overrideFlags (0)
+    { }
+    ~SubMeshProxy ()
+    { }
+
+    csRenderBufferHolder* GetBufferHolder();
+
+    const char* GetName() const 
+    { 
+      if (parentSubMesh) return parentSubMesh->GetName();
+      return 0;
+    }
+    iRenderBuffer* GetIndices () const
+    { 
+      if (parentSubMesh) return parentSubMesh->GetIndices();
+      return 0;
+    }
+    iMaterialWrapper* GetMaterial () const
+    { 
+      if (GetOverrideFlag (bitMaterial)) return material; 
+      return parentSubMesh->GetMaterial ();
+    }
+    virtual uint GetMixmode () const
+    { 
+      if (GetOverrideFlag (bitMixMode)) return MixMode; 
+      return parentSubMesh->GetMixmode ();
+    }
+
+    virtual csShaderVariable* GetVariable (csStringID name) const
+    {
+      csShaderVariable* var = 
+        CS::ShaderVariableContextImpl::GetVariable (name);
+      if (var == 0) var = parentSubMesh->GetVariable (name);
+      return var;
+    }
+    virtual void PushVariables (iShaderVarStack* stacks) const
+    {
+      parentSubMesh->PushVariables (stacks);
+      CS::ShaderVariableContextImpl::PushVariables (stacks);
+    }
+    virtual bool IsEmpty() const 
+    { 
+      return parentSubMesh->IsEmpty() 
+        && CS::ShaderVariableContextImpl::IsEmpty ();
+    }  
+  };
+
+  class SubMeshProxiesContainer
+  {
+    csRefArray<SubMeshProxy> subMeshes;
+  public:
+    void AddSubMesh (SubMeshProxy* subMesh);
+    SubMeshProxy* FindSubMesh (const char* name) const;
+    void Empty() { subMeshes.Empty(); }
+
+    size_t GetSize() const
+    { return subMeshes.GetSize(); }
+    SubMeshProxy* operator[](size_t index)
+    { return subMeshes[index]; }
   };
 
   class csGenmeshMeshObjectFactory;
