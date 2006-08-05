@@ -20,6 +20,9 @@ chronological order.
 	- res made genmeshify better support libraries.
 	- res made genmeshify support Things created from factories.
 	- mdmkolbe removed an outdated 'friend' declaration.
+	- Vincent fixed joystick button string construction in inputdef.cpp,
+	  which seem to need more work for parsing them correctly (mouseButton
+	  vs. joystickButton)...
 4-Aug-2006
 	- res fixed the default csRenderBufferLock<> storage to 
 	  iRenderBuffer*: it seems to be the rule rather than the exception

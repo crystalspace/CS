@@ -500,6 +500,17 @@ csString csInputDefinition::ToString (bool distinguishMods) const
   }
   else if (containedName == csevJoystickButton(name_reg, deviceNumber))
   {
+    // @@@ (vk) this is never triggered ?
+    str.Append ("JoystickButton");
+    str.Append (joystickButton);
+  }
+  else if (containedName == csevJoystickDown(name_reg, deviceNumber))
+  {
+    str.Append ("JoystickButton");
+    str.Append (joystickButton);
+  }
+  else if (containedName == csevJoystickUp(name_reg, deviceNumber))
+  {
     str.Append ("JoystickButton");
     str.Append (joystickButton);
   }
@@ -622,7 +633,9 @@ csString csInputDefinition::GetOtherString (iEventNameRegistry* reg,
   csInputDefinition def (reg, CSMASK_ALLMODIFIERS);
   def.containedName = name;
   def.deviceNumber = device;
-  def.mouseButton = num;
+  // (vk) for now we don't know if it's mouse or joystick button, so init both
+  //  @@@ maybe it would be better to have only one 'Button' variable ?
+  def.mouseButton = def.joystickButton = num;
   if (mods) def.modifiers = *mods;
   return def.ToString (distinguishModifiers);
 }
