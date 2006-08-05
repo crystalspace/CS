@@ -16,6 +16,9 @@ chronological order.
 	- res made cssaver correctly write portal flags, warping and mirror 
 	  portals.
 	- res fixed a flipped condition in the genmesh saver.
+	- res made genmeshify's command line help a bit better.
+	- res made genmeshify better support libraries.
+	- res made genmeshify support Things created from factories.
 4-Aug-2006
 	- res fixed the default csRenderBufferLock<> storage to 
 	  iRenderBuffer*: it seems to be the rule rather than the exception

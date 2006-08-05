@@ -63,7 +63,7 @@ namespace genmeshify
       iDocumentNode* from, iDocumentNode* to, iDocumentNode* sectorNode,
       bool factory);
 
-    bool PreloadTexturesMaterials (iDocumentNode* from);
+    bool PreloadTexturesMaterialsLibs (iDocumentNode* from);
     bool PreloadSectors (iDocumentNode* from);
   public:
     Processor (App* app, const char* filename);

@@ -1523,7 +1523,7 @@ bool csThingStatic::PointOnPolygon (int polygon_idx, const csVector3& v)
 bool csThingStatic::GetLightmapLayout (int polygon_idx, size_t& slm, 
                                        csRect& slmSubRect, float* slmCoord)
 {
-  PrepareLMLayout ();
+  Prepare (0);
   /* The layouted polys are in a structure primarily intended for rendering,
    * not to quickly access a specific polygon. Linear search time. */
   for (size_t litPoly = 0; litPoly < litPolys.GetSize(); litPoly++)

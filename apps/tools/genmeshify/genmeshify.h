@@ -26,6 +26,7 @@ namespace genmeshify
 {
   class App : public csRefCount
   {
+    void CommandLineHelp();
   public:
     App (iObjectRegistry *objectRegistry);
     ~App ();

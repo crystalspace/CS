@@ -42,14 +42,78 @@ namespace genmeshify
     idTexLightmap = app->strings->Request ("tex lightmap");
   }
 
-  bool Converter::ConvertMeshFact (iDocumentNode* from, iDocumentNode* to)
+  bool Converter::ConvertMeshFact (const char* factoryName, 
+                                   iDocumentNode* from, iDocumentNode* to)
   {
     if (!thingFactLoader.IsValid()) return false;
 
     csRef<iDocumentNode> paramsNode = from->GetNode ("params");
     if (!paramsNode) return false;
 
-    return false;
+    csRef<iBase> obj = thingFactLoader->Parse (paramsNode, 0, context, 0);
+    if (!obj) return false;
+    csRef<iMeshObjectFactory> mfact = 
+      scfQueryInterface<iMeshObjectFactory> (obj);
+    if (!mfact)
+    {
+      app->Report ("Loaded mesh object factory does not implement "
+        "iMeshObjectFactory");
+      return false;
+    }
+    csRef<iThingFactoryState> thingfact = 
+      scfQueryInterface<iThingFactoryState> (mfact);
+    if (!thingfact)
+    {
+      app->Report ("Loaded mesh object factory does not implement "
+        "iThingFactoryState");
+      return false;
+    }
+    {
+      csRef<iMeshFactoryWrapper> thingmfw = app->engine->CreateMeshFactory (
+        factoryName);
+      thingmfw->SetMeshObjectFactory (mfact);
+      region->QueryObject ()->ObjAdd (thingmfw->QueryObject());
+    }
+
+    csRef<iMeshFactoryWrapper> mfw = app->engine->CreateMeshFactory (
+      "crystalspace.mesh.object.genmesh", 0);
+    if (!mfw)
+    {
+      app->Report ("Could not create genmesh factory");
+      return false;
+    }
+    region->QueryObject ()->ObjAdd (mfw->QueryObject());
+    csRef<iMeshObjectFactory> mof = mfw->GetMeshObjectFactory();
+    csRef<iGeneralFactoryState> gmfact = 
+      scfQueryInterface<iGeneralFactoryState> (mof);
+    if (!gmfact)
+    {
+      app->Report ("Factory does not implement iGeneralFactoryState");
+      return false;
+    }
+    LMLayout lmLayout;
+    if (!CopyThingToGM (thingfact, gmfact, factoryName, lmLayout)) return false;
+
+    {
+      csRef<iDocumentNode> factoryNode = to;
+      factoryNode->SetAttribute ("name", factoryName);
+
+      csRef<iDocumentNode> pluginNode = 
+        factoryNode->CreateNodeBefore (CS_NODE_ELEMENT, 0);
+      pluginNode->SetValue ("plugin");
+
+      csRef<iDocumentNode> pluginIdNode = 
+        pluginNode->CreateNodeBefore (CS_NODE_TEXT, 0);
+      pluginIdNode->SetValue ("crystalspace.mesh.loader.factory.genmesh");
+
+      if (!gmfactSaver->WriteDown (gmfact, factoryNode, 0)) return false;
+    }
+    GMFactory gmf;
+    gmf.fact = mof;
+    gmf.lmLayout = lmLayout;
+    convertedFactories.Put (factoryName, gmf);
+
+    return true;
   }
 
   bool Converter::ConvertMeshObj (iSector* sector,
@@ -83,11 +147,13 @@ namespace genmeshify
       return false;
     }
 
+    bool hasHardTF = false;
     // Check for a hard transform
     {
       csRef<iDocumentNode> hardTFnode = from->GetNode ("hardmove");
       if (hardTFnode.IsValid())
       {
+        hasHardTF = true;
         csReversibleTransform tr;
 	csRef<iDocumentNode> matrix_node = hardTFnode->GetNode ("matrix");
 	if (matrix_node)
@@ -123,64 +189,92 @@ namespace genmeshify
 
     csString uniqueName;
     uniqueName.Format ("%s_%s", sector->QueryObject()->GetName(), meshName);
-    csString factoryName;
-    factoryName.Format ("factory_%s", uniqueName.GetData());
 
-    csRef<iMeshFactoryWrapper> mfw = app->engine->CreateMeshFactory (
-      "crystalspace.mesh.object.genmesh", factoryName);
-    if (!mfw)
-    {
-      app->Report ("Could not create genmesh factory");
-      return false;
-    }
-    region->QueryObject ()->ObjAdd (mfw->QueryObject());
-    csRef<iMeshObjectFactory> mof = mfw->GetMeshObjectFactory();
-    csRef<iGeneralFactoryState> gmfact = 
-      scfQueryInterface<iGeneralFactoryState> (mof);
-    if (!gmfact)
-    {
-      app->Report ("Factory does not implement iGeneralFactoryState");
-      return false;
-    }
+    csRef<iMeshObjectFactory> mof;
     LMLayout lmLayout;
-    if (!CopyThingToGM (thingfact, gmfact, uniqueName, lmLayout)) return false;
-
-    if (!ExtractLightmaps (lmLayout, thingobj, textures)) 
-      return false;
-
+    csStringArray slmNames;
+    const char* factoryName = 0;
+    const GMFactory* gmf = 0;
     {
-      csRef<iDocumentNode> factoryNode = 
-        sectorNode->GetParent()->CreateNodeBefore (CS_NODE_ELEMENT,
-          sectorNode);
-      factoryNode->SetValue ("meshfact");
-      factoryNode->SetAttribute ("name", factoryName);
+      csRef<iDocumentNode> factoryNode = paramsNode->GetNode ("factory");
+      if (factoryNode.IsValid()) factoryName = factoryNode->GetContentsValue ();
+      if (factoryName) gmf = convertedFactories.GetElementPointer (factoryName);
+    }
+    if (!gmf || hasHardTF)
+    {
+      csString factoryName;
+      factoryName.Format ("factory_%s", uniqueName.GetData());
 
-      csRef<iDocumentNode> pluginNode = 
-        factoryNode->CreateNodeBefore (CS_NODE_ELEMENT, 0);
-      pluginNode->SetValue ("plugin");
+      csRef<iMeshFactoryWrapper> mfw = app->engine->CreateMeshFactory (
+        "crystalspace.mesh.object.genmesh", factoryName);
+      if (!mfw)
+      {
+        app->Report ("Could not create genmesh factory");
+        return false;
+      }
+      region->QueryObject ()->ObjAdd (mfw->QueryObject());
+      mof = mfw->GetMeshObjectFactory();
+      csRef<iGeneralFactoryState> gmfact = 
+        scfQueryInterface<iGeneralFactoryState> (mof);
+      if (!gmfact)
+      {
+        app->Report ("Factory does not implement iGeneralFactoryState");
+        return false;
+      }
+      if (!CopyThingToGM (thingfact, gmfact, uniqueName, lmLayout)) return false;
 
-      csRef<iDocumentNode> pluginIdNode = 
-        pluginNode->CreateNodeBefore (CS_NODE_TEXT, 0);
-      pluginIdNode->SetValue ("crystalspace.mesh.loader.factory.genmesh");
+      if (!ExtractLightmaps (uniqueName, lmLayout, thingobj, textures, 
+        slmNames)) 
+        return false;
 
-      if (!gmfactSaver->WriteDown (gmfact, factoryNode, 0)) return false;
+      {
+        csRef<iDocumentNode> factoryNode = 
+          sectorNode->GetParent()->CreateNodeBefore (CS_NODE_ELEMENT,
+            sectorNode);
+        factoryNode->SetValue ("meshfact");
+        factoryNode->SetAttribute ("name", factoryName);
+
+        csRef<iDocumentNode> pluginNode = 
+          factoryNode->CreateNodeBefore (CS_NODE_ELEMENT, 0);
+        pluginNode->SetValue ("plugin");
+
+        csRef<iDocumentNode> pluginIdNode = 
+          pluginNode->CreateNodeBefore (CS_NODE_TEXT, 0);
+        pluginIdNode->SetValue ("crystalspace.mesh.loader.factory.genmesh");
+
+        if (!gmfactSaver->WriteDown (gmfact, factoryNode, 0)) return false;
+      }
+    }
+    else
+    {
+      mof = gmf->fact;
+      lmLayout = gmf->lmLayout;
+      if (!ExtractLightmaps (uniqueName, lmLayout, thingobj, textures, 
+        slmNames)) 
+        return false;
     }
     csRef<iMeshObject> newObj = mof->NewInstance ();
     if (!newObj.IsValid()) return false;
     newObj->SetMixMode (mobj->GetMixMode ());
     csRef<iGeneralMeshState> gmObj = 
       scfQueryInterface<iGeneralMeshState> (newObj);
+    gmObj->SetShadowReceiving (false);
+    /* Bit of a trick to make unlit polys work: if no lightmap is attached,
+     * vertex lighting will be used. For this case set a manual color of
+     * 1,1,1 to get fullbright. */
+    gmObj->SetManualColors (true);
+    newObj->SetColor (csColor (1, 1, 1));
 
     // Add lightmap SVs
     for (size_t i = 0; i < lmLayout.subMeshes.GetSize(); i++)
     {
       const LMLayout::SubMesh& layoutSM = lmLayout.subMeshes[i];
       csRef<iTextureWrapper> dummyTex = 
-        app->engine->FindTexture (lmLayout.slmNames[layoutSM.slm], region);
+        app->engine->FindTexture (slmNames[layoutSM.slm], region);
       if (!dummyTex.IsValid())
       {
         dummyTex = app->engine->CreateBlackTexture (
-          lmLayout.slmNames[layoutSM.slm], 1, 1, 0, 0);
+          slmNames[layoutSM.slm], 1, 1, 0, 0);
         region->Add (dummyTex->QueryObject());
       }
 
@@ -195,7 +289,24 @@ namespace genmeshify
       svc->AddVariable (sv);
     }
 
+    csRef<iDocumentNode> plugin_clone = to->CreateNodeBefore (
+  	CS_NODE_ELEMENT, 0);
+    plugin_clone->SetValue ("plugin");
+    csRef<iDocumentNode> plugin_contents = plugin_clone->CreateNodeBefore (
+      CS_NODE_TEXT, 0);
+    plugin_contents->SetValue ("crystalspace.mesh.loader.genmesh");
+
+    /* Small hack: the GM factory may nameless, but the GM saver needs it 
+     * named to write a proper <factory> tag. Hence, give it a name...
+     */
+    csRef<iObject> mfwObject = mof->GetMeshFactoryWrapper()->QueryObject();
+    bool factoryNameHack = mfwObject->GetName() == 0;
+    if (factoryNameHack) mfwObject->SetName (factoryName);
+    // ...while the GM is saved...
     if (!gmSaver->WriteDown (gmObj, to, 0)) return false;
+    /* ...and set it to 0 afterwards (we don't want a Thing object from the 
+     * source file to pick it up). */
+    if (factoryNameHack) mfwObject->SetName (0);
 
     if (!ExtractPortals (meshWrap, sectorNode)) return false;
 
@@ -242,13 +353,6 @@ namespace genmeshify
         dim.GrowTo (lm.rectOnSLM.xmax, lm.rectOnSLM.ymax);
       }
     }
-    // Generate super LM names
-    for (size_t s = 0; s < layout.slmDimensions.GetSize(); s++)
-    {
-      csString lightmapName;
-      lightmapName.Format ("lightmap_%s_%zu", name, s);
-      layout.slmNames.Push (lightmapName);
-    }
 
     // Step 2: collect all polygons, sorted by materials + superlightmap
     MatPolyHash polies;
@@ -283,7 +387,10 @@ namespace genmeshify
           newVertex.tclm.y = *lmcoordPtr++;
         }
         else
+        {
           newVertex.tclm.Set (0, 0);
+          lmcoordPtr += 2;
+        }
         newPoly.vertices.Push (newVertex);
       }
       iMaterialWrapper* polyMat = from->GetPolygonMaterial (p);
@@ -406,9 +513,11 @@ namespace genmeshify
     return true;
   }
 
-  bool Converter::ExtractLightmaps (const LMLayout& layout, 
+  bool Converter::ExtractLightmaps (const char* meshName, 
+                                    const LMLayout& layout, 
                                     iThingState* object, 
-                                    iDocumentNode* textures)
+                                    iDocumentNode* textures, 
+                                    csStringArray& slmNames)
   {
     csRefArray<csImageMemory> slmImages;
     for (size_t i = 0; i < layout.slmDimensions.GetSize(); i++)
@@ -429,9 +538,13 @@ namespace genmeshify
     }
     for (size_t s = 0; s < slmImages.GetSize(); s++)
     {
-      const char* lightmapName = layout.slmNames[s];
+      // Generate super LM name
+      csString lightmapName;
+      lightmapName.Format ("lightmap_%s_%zu", meshName, s);
+      slmNames.Push (lightmapName);
+
       csString fn;
-      fn.Format ("lightmaps/%s.png", lightmapName);
+      fn.Format ("lightmaps/%s.png", lightmapName.GetData());
 
       csRef<iDataBuffer> buf = app->imageIO->Save (slmImages[s], "image/png");
       if (!buf.IsValid())

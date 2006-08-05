@@ -54,7 +54,7 @@ namespace genmeshify
     // Check for commandline help.
     if (csCommandLineHelper::CheckHelp (objectRegistry))
     {
-      csCommandLineHelper::Help (objectRegistry);
+      CommandLineHelp();
       return true;
     }
 
@@ -119,7 +119,10 @@ namespace genmeshify
         if (map_idx > 0)
           break;
         else
-          return Report ("Please specify a level (either zip or VFS dir)!");
+        {
+          CommandLineHelp();
+          return false;
+        }
       }
 
       map_idx++;
@@ -129,6 +132,15 @@ namespace genmeshify
       //scene->AddFile (val);
     }
     return true;
+  }
+
+  void App::CommandLineHelp()
+  {
+    csPrintf ("Syntax:\n");
+    csPrintf ("  genmeshify [Map] [Map] ...\n");
+    csPrintf ("\n");
+    csPrintf ("'Map' can be the name of a level or a VFS directory with "
+      "\"world\" file.\n");
   }
 
 }

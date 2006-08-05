@@ -38,9 +38,9 @@ namespace genmeshify
 
   Processor::~Processor ()
   {
+    delete converter;
     app->engine->RemoveObject (region);
     region->DeleteAll();
-    delete converter;
   }
 
   bool Processor::Process ()
@@ -161,12 +161,7 @@ namespace genmeshify
 
   bool Processor::ProcessWorld (iDocumentNode* from, iDocumentNode* to)
   {
-    PreloadTexturesMaterials (from);
-    if (!texturesNode.IsValid())
-    {
-      texturesNode = to->CreateNodeBefore (CS_NODE_ELEMENT, 0);
-      texturesNode->SetValue ("textures");
-    }
+    PreloadTexturesMaterialsLibs (from);
     PreloadSectors (from);
 
     to->SetValue (from->GetValue ());
@@ -195,6 +190,11 @@ namespace genmeshify
             }
           case XMLTOKEN_SECTOR:
             {
+              if (!texturesNode.IsValid())
+              {
+                texturesNode = to->CreateNodeBefore (CS_NODE_ELEMENT, 0);
+                texturesNode->SetValue ("textures");
+              }
               csRef<iDocumentNode> child_clone = to->CreateNodeBefore (
     	          child->GetType (), 0);
               if (!ProcessSector (child, child_clone)) return false;
@@ -299,12 +299,6 @@ namespace genmeshify
       // Yep, thing.
       to->SetValue (from->GetValue ());
       CloneAttributes (from, to);
-      csRef<iDocumentNode> plugin_clone = to->CreateNodeBefore (
-    	pluginNode->GetType (), 0);
-      plugin_clone->SetValue ("plugin");
-      csRef<iDocumentNode> plugin_contents = plugin_clone->CreateNodeBefore (
-        CS_NODE_TEXT, 0);
-      plugin_contents->SetValue ("crystalspace.mesh.loader.genmesh");
 
       csRef<iDocumentNodeIterator> it = from->GetNodes ();
       while (it->HasNext ())
@@ -351,13 +345,13 @@ namespace genmeshify
                                         bool factory)
   {
     if (factory)
-      return converter->ConvertMeshFact (from, to);
+      return converter->ConvertMeshFact (meshName, from, to);
     else
       return converter->ConvertMeshObj (sector, meshName, from, to, 
         sectorNode, texturesNode);
   }
 
-  bool Processor::PreloadTexturesMaterials (iDocumentNode* from)
+  bool Processor::PreloadTexturesMaterialsLibs (iDocumentNode* from)
   {
     csRef<iDocument> newDoc = app->docSystem->CreateDocument ();
     csRef<iDocumentNode> newRoot = newDoc->CreateRoot();
@@ -378,6 +372,7 @@ namespace genmeshify
           case XMLTOKEN_TEXTURES:
           case XMLTOKEN_MATERIALS:
           case XMLTOKEN_PLUGINS:
+          case XMLTOKEN_LIBRARY:
             {
               csRef<iDocumentNode> child_clone = 
                 to->CreateNodeBefore (child->GetType(), 0);

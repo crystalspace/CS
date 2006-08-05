@@ -63,7 +63,6 @@ namespace genmeshify
         }
       };
       csArray<Dim> slmDimensions;
-      csStringArray slmNames;
       struct Lightmap
       {
         bool hasLM;
@@ -79,15 +78,24 @@ namespace genmeshify
       csArray<SubMesh> subMeshes;
     };
 
+    struct GMFactory
+    {
+      csRef<iMeshObjectFactory> fact;
+      LMLayout lmLayout;
+    };
+    csHash<GMFactory, csString> convertedFactories;
+
     bool CopyThingToGM (iThingFactoryState* from, iGeneralFactoryState* to,
       const char* name, LMLayout& layout);
     bool ExtractPortals (iMeshWrapper* mesh, iDocumentNode* to);
-    bool ExtractLightmaps (const LMLayout& layout, iThingState* object, 
-      iDocumentNode* textures);
+    bool ExtractLightmaps (const char* meshName, 
+      const LMLayout& layout, iThingState* object, 
+      iDocumentNode* textures, csStringArray& slmNames);
   public:
     Converter (App* app, iLoaderContext* context, iRegion* region);
   
-    bool ConvertMeshFact (iDocumentNode* from, iDocumentNode* to);
+    bool ConvertMeshFact (const char* factoryName, 
+      iDocumentNode* from, iDocumentNode* to);
     bool ConvertMeshObj (iSector* sector, const char* meshName, 
       iDocumentNode* from, iDocumentNode* to, iDocumentNode* sectorNode,
       iDocumentNode* textures);
