@@ -19,6 +19,7 @@ chronological order.
 	- res made genmeshify's command line help a bit better.
 	- res made genmeshify better support libraries.
 	- res made genmeshify support Things created from factories.
+	- mdmkolbe removed an outdated 'friend' declaration.
 4-Aug-2006
 	- res fixed the default csRenderBufferLock<> storage to 
 	  iRenderBuffer*: it seems to be the rule rather than the exception
