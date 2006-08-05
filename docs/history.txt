@@ -11,6 +11,7 @@ chronological order.
 	- res added the iSelfDestruct interface to the csSaverFile, 
 	  csLibraryReference and csAddonReference so they can be removed from
 	  regions.
+	- res made cssynldr's WriteMixmode() output a bit nicer.
 4-Aug-2006
 	- res fixed the default csRenderBufferLock<> storage to 
 	  iRenderBuffer*: it seems to be the rule rather than the exception
