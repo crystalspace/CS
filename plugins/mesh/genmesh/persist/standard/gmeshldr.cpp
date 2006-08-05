@@ -1217,7 +1217,7 @@ bool csGeneralMeshSaver::WriteDown (iBase* obj, iDocumentNode* parent,
       paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0)->SetValue("noshadows");
 
     //Writedown LocalShadows tag
-    if (!gmesh->IsShadowReceiving())
+    if (gmesh->IsShadowReceiving())
       paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0)
         ->SetValue("localshadows");
 
