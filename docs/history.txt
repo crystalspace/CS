@@ -8,6 +8,9 @@ chronological order.
 
 5-Aug-2005
 	- mdmkolbe removed a redundant check of do_infinite in walktest.
+	- res added the iSelfDestruct interface to the csSaverFile, 
+	  csLibraryReference and csAddonReference so they can be removed from
+	  regions.
 4-Aug-2006
 	- res fixed the default csRenderBufferLock<> storage to 
 	  iRenderBuffer*: it seems to be the rule rather than the exception
