@@ -12,6 +12,9 @@ chronological order.
 	  csLibraryReference and csAddonReference so they can be removed from
 	  regions.
 	- res made cssynldr's WriteMixmode() output a bit nicer.
+	- res made <move> tags written by cssaver's less redundant.
+	- res made cssaver correctly write portal flags, warping and mirror 
+	  portals.
 4-Aug-2006
 	- res fixed the default csRenderBufferLock<> storage to 
 	  iRenderBuffer*: it seems to be the rule rather than the exception
