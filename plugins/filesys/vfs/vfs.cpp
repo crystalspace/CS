@@ -63,6 +63,22 @@ static csString ExtractFileName(const char *FullPath)
   return strFileName;
 }
 
+static csString ExtractParentName(const char *path)
+{
+  csString strPath = path;
+  csString strFileName;
+
+    // Remove trailing slash
+  if (strPath.GetAt(strPath.Length() - 1) == CS_PATH_SEPARATOR)
+    strPath.Truncate(strPath.Length() - 1);
+
+  size_t newlen = strPath.FindLast(CS_PATH_SEPARATOR);
+
+
+  strPath.SubString(strFileName, 0, newlen);
+  return strFileName;
+}
+
 // ----------------------------------------------------------- VfsNode ---//
 
 // Structure to hold data about VfsNode paths
@@ -337,8 +353,6 @@ iFile* VfsNode::Open (const char *FileName, int Mode)
         FileToFind.Append(CS_PATH_SEPARATOR);
 
       FileToFind.Append(FileName);
-
-
       
       // Open the file using the correct iFileSystem plugin
       iFileSystem *fs = ParentVFS->GetPlugin(MappedPaths[i].pluginIndex);
@@ -813,7 +827,7 @@ bool csVFS::ChDir (const char *Path)
     fullPath = "/";
 
   // See if path exists
-  VfsNode *newCwd = GetDirectoryNode((const char *) fullPath);
+  VfsNode *newCwd = GetDirectoryNode(fullPath);
   
   // Assign new Cwd
   if (newCwd)
@@ -1043,19 +1057,37 @@ csPtr<iFile> csVFS::Open (const char *FileName, int Mode)
   if (fullPath.IsEmpty())
     fullPath = "/";
 
-
-  // Get the directory node
-  VfsNode *node = GetParentDirectoryNode(fullPath, true, true);
+  // Get the closest parent directory node
+  VfsNode *node = GetClosestDirectoryNode(fullPath);
 
   if (!node)
   {
-
     // Return the results
     return csPtr<iFile> (f);
   }
 
+  csString newPath; 
+  fullPath.SubString(newPath, strlen(node->GetName()) + 1);
+
+  static char vfs_separator [] = {VFS_PATH_SEPARATOR, 0};
+  static char cs_separator [] = {CS_PATH_SEPARATOR, 0};
+  newPath.ReplaceAll(vfs_separator, cs_separator);
+
   // Get the file pointer
-  f = node->Open(ExtractFileName(fullPath), Mode);
+  f = node->Open(newPath, Mode);
+
+  // Check if a physical directory was created
+  if (!newPath.Compare(ExtractFileName(fullPath)))
+  {
+    csString RealPath;
+
+    // Mount the created directory
+    if (node->GetRealPath(newPath, RealPath))
+    {
+      node = GetParentDirectoryNode(fullPath, true, false);
+      Mount(node->GetName(), ExtractParentName(RealPath));
+    }
+  }
 
   // Return the results
   return csPtr<iFile> (f);
@@ -1179,7 +1211,7 @@ bool csVFS::Mount(const char *VirtualPath, const char *RealPath,
   // Check if a plugin index was given
   if (plugin != 0)
   {
-    node = GetParentDirectoryNode((const char *) tmp, true);
+    node = GetParentDirectoryNode(tmp, true);
 
     if (!node)
     {
@@ -1219,7 +1251,7 @@ bool csVFS::Mount(const char *VirtualPath, const char *RealPath,
     // check the NativeFileSystem first
     if(fsPlugins[i]->CanHandleMount(pathData.name))
     {
-      node = GetParentDirectoryNode((const char *) tmp, true);
+      node = GetParentDirectoryNode(tmp, true);
       
       if (!node)
       {
@@ -1257,7 +1289,7 @@ bool csVFS::Unmount (const char *VirtualPath, const char *RealPath)
     fullPath = "/";
 
   // Get the appropriate node
-  VfsNode *node = GetDirectoryNode((const char *) fullPath);
+  VfsNode *node = GetDirectoryNode(fullPath);
 
   // Node does not exists
   if (!node)
@@ -1354,7 +1386,7 @@ csRef<iStringArray> csVFS::MountRoot (const char *VirtualPath)
 
     vfs_dir.Append("/tmp");
 
-    node = GetParentDirectoryNode((const char *) vfs_dir, true);
+    node = GetParentDirectoryNode(vfs_dir, true);
 
     if (!node)
     {
@@ -1455,7 +1487,7 @@ bool csVFS::ChDirAuto (const char* path, const csStringArray* paths,
       testpath.Append(fullPath);
 
       // Test if the path exists
-      if (TryChDirAuto((const char *) testpath, filename))
+      if (TryChDirAuto(testpath, filename))
         return true;
     }
   }
@@ -1567,7 +1599,7 @@ csPtr<iDataBuffer> csVFS::GetRealPath (const char *FileName)
   }
 
   return csPtr<iDataBuffer> (new csDataBuffer (
-    csStrNew ((const char *) path), path.Length() + 1));
+    csStrNew (path), path.Length() + 1));
 }
 
 // Get virtual mount paths
@@ -1649,13 +1681,13 @@ bool csVFS::SymbolicLink(const char *Target, const char *Link, int priority)
       tmp.Truncate(tmp.Length() - 1);
 
 	  tmp.Append("/tmp");
-	  node = GetParentDirectoryNode((const char *) tmp, true);
+	  node = GetParentDirectoryNode(tmp, true);
     if (!node)
       return false;
   }
 
   struct MappedPathData mp;
-  mp.name = _ExpandPath((const char*) Target);
+  mp.name = _ExpandPath(Target);
   mp.pluginIndex = 0;
   mp.priority = priority;
   mp.symlink = true;
@@ -1677,7 +1709,72 @@ VfsNode* csVFS::GetDirectoryNode(const char *Path)
 
   strPath.Append("/tmp");
 
-  return GetParentDirectoryNode((const char *) strPath, false);
+  return GetParentDirectoryNode(strPath, false);
+}
+
+// Get a node corresponding to a parent directory
+VfsNode* csVFS::GetClosestDirectoryNode(const char *path)
+{
+  if (strlen(path) == 0)
+	  return 0;
+
+  if (strlen(path) == 1 && path[0] == '/')
+    return RootNode;
+
+  csString strPath = path;
+
+  // Remove trailing slash
+  if (strPath.GetAt(strPath.Length() - 1) == VFS_PATH_SEPARATOR)
+    strPath.Truncate(strPath.Length() - 1);
+
+  csStringArray directories;
+  directories.SplitString(strPath, "/");
+
+  VfsNode * node;
+  VfsNode * tmpNode;
+  size_t counter = 0;
+  csString currentDir;
+
+  // Absolute Path
+  if (path[0] == VFS_PATH_SEPARATOR)
+  {
+    node = RootNode;
+	  counter = 1;
+	  currentDir = "";
+  }
+  // Relative Path
+  else
+  {
+    node = CwdNode;
+	  if (strcmp(node->GetName(), "/") != 0)
+    {
+	    currentDir = node->GetName();
+    }
+    else
+    {
+      node = RootNode;
+	    currentDir = "";
+    }
+  }
+
+  bool exists = true;
+  while(exists && counter < directories.Length() - 1)
+  {
+    currentDir.Append(VFS_PATH_SEPARATOR);
+	  currentDir.Append(directories[counter]);
+
+    // Try find the node
+	  tmpNode = node->FindNode(currentDir);
+	  if (!tmpNode)
+	  {
+      exists = false;
+      continue;
+	  }
+	  node = tmpNode;
+	  counter++;
+  }
+
+  return node;
 }
 
 // Get a node corresponding to a parent directory
@@ -1696,7 +1793,7 @@ VfsNode* csVFS::GetParentDirectoryNode(const char *path, bool create, bool mount
     strPath.Truncate(strPath.Length() - 1);
 
   csStringArray directories;
-  directories.SplitString((const char *) strPath, "/");
+  directories.SplitString(strPath, "/");
 
   VfsNode * node;
   VfsNode * tmpNode;
@@ -1731,7 +1828,7 @@ VfsNode* csVFS::GetParentDirectoryNode(const char *path, bool create, bool mount
 	  currentDir.Append(directories[counter]);
 
     // Try find the node
-	  tmpNode = node->FindNode((const char *) currentDir);
+	  tmpNode = node->FindNode(currentDir);
 	  if (!tmpNode)
 	  {
 
@@ -1751,7 +1848,7 @@ VfsNode* csVFS::GetParentDirectoryNode(const char *path, bool create, bool mount
       else
       {
         // Create the node
-        tmpNode = new VfsNode((const char *)currentDir, this, node);
+        tmpNode = new VfsNode(currentDir, this, node);
       }
 	  }
 	  node = tmpNode;
@@ -1800,7 +1897,6 @@ bool csVFS::AutoConfigPlugin::Configure(iVFS *vfs,
 {
   if (!vfs)
     return false;
-
 
   /// The install directory
   csString InstallDirectory;

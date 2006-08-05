@@ -238,6 +238,9 @@ protected:
   VfsNode* GetParentDirectoryNode(const char *path, 
     bool create = false, bool mount = false);
 
+  /// Get the last closest existing ancestor directory node of the path
+  VfsNode* csVFS::GetClosestDirectoryNode(const char *path);
+
   // Check if the path is a valid real directory
   bool isDirectory(const char *path);
 

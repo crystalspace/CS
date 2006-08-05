@@ -175,6 +175,10 @@ public:
 
   // Sync
   virtual bool Sync ();
+
+//private:
+  // Create a directory on the physical file system
+  bool MakeDirectory(const char *DirName);
 };
 
 // Minimal time (msec) that an unused archive will be kept unclosed

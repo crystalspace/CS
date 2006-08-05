@@ -121,19 +121,91 @@ csNativeFileSystem::~csNativeFileSystem()
 
 iFile* csNativeFileSystem::Open(const char * FileName, int mode)
 {
-  csPhysicalFile* file;
+  csPhysicalFile* file = 0;
 
-  if ((mode & VFS_FILE_MODE) == VFS_FILE_WRITE)
-        file = new csPhysicalFile(FileName, "wb");
+  if ((mode & VFS_FILE_MODE) == VFS_FILE_READ)
+  {
+     file = new csPhysicalFile(FileName, "rb");
+  }
+  else if ((mode & VFS_FILE_MODE) == VFS_FILE_WRITE)
+  {
+      file = new csPhysicalFile(FileName, "wb");
+      if (file->GetStatus() != VFS_STATUS_OK)
+      {
+        delete file;
+        if (MakeDirectory(ExtractParentName(FileName)))
+        {
+          file = new csPhysicalFile(FileName, "wb");
+        }
+      }
+  }
   else if ((mode & VFS_FILE_MODE) == VFS_FILE_APPEND)
-        file = new csPhysicalFile(FileName, "ab");
-  else
-        file = new csPhysicalFile(FileName, "rb");
+  {
+      file = new csPhysicalFile(FileName, "ab");
+      if (file->GetStatus() != VFS_STATUS_OK)
+      {
+        delete file;
+        if (MakeDirectory(ExtractParentName(FileName)))
+        {
+          file = new csPhysicalFile(FileName, "ab");
+        }
+      }
+  }
 
-  if (file->GetStatus() != VFS_STATUS_OK)
+  if (!file)
     return 0;
 
+  if (file->GetStatus() != VFS_STATUS_OK)
+  {
+    delete file;
+    return 0;
+  }
+
+
 	return file;
+}
+
+bool csNativeFileSystem::MakeDirectory(const char *DirName)
+{
+  if (!DirName)
+    return false;
+
+  csString NewDirectory;
+  csStringArray DirectoryTree;
+  int result = 0;
+
+  // Split the path into individual directories
+  static char path_separator [] = {CS_PATH_SEPARATOR, 0};
+  DirectoryTree.SplitString(DirName, path_separator);
+
+  if (DirectoryTree.Length() == 0)
+    return false;
+
+  // Check if the path start with the separator
+  if (DirName[0] != CS_PATH_SEPARATOR)
+  {
+    NewDirectory.Append(DirectoryTree[0]);
+  }
+
+  // Go through all the directories
+  for (size_t i = 1; i < DirectoryTree.Length(); i++)
+  {
+    // Make sure it is not null
+    if (!DirectoryTree[i])
+        continue;
+
+    // Add the path separator
+    NewDirectory.Append(CS_PATH_SEPARATOR);
+
+    // Add the directory name
+    NewDirectory.Append(DirectoryTree[i]);
+
+    // Try and create the directory
+    result = CS_MKDIR(NewDirectory);
+  }
+
+  // Return the result
+  return (result == 0);
 }
 
 bool csNativeFileSystem::Delete(const char * FileName)
