@@ -11,6 +11,13 @@ chronological order.
 	  csArray. This may lead to compile errors in user code. In most
 	  cases the solution to these is to change "GlobalIterator" to
 	  "ConstGlobalIterator".
+	- Vincent made the following changes:
+	    - Changed csInputDefinition::InitializeFromEvent() to get/set
+	      changed axis number for both mouse and joystick. It will use the
+	      first axis found that changed...
+	    - Fixed csJoystickEventHelper::GetButtonState().
+	    - Changed eventtest to get csInputDefinition constructed from
+	      event, and to only print changed joystick axis value (not x/y).
 5-Aug-2005
 	- mdmkolbe removed a redundant check of do_infinite in walktest.
 	- res added the iSelfDestruct interface to the csSaverFile, 

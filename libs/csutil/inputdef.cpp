@@ -246,6 +246,23 @@ void csInputDefinition::InitializeFromEvent (iEvent *ev)
     else if (CS_IS_MOUSE_MOVE_EVENT(name_reg, *ev, deviceNumber))
     {
       containedName = csevMouseMove(name_reg, deviceNumber);
+      csMouseEventData data;
+      csMouseEventHelper::GetEventData (ev, data);
+      bool axesState[data.numAxes];
+      uint32 axesChanged;
+      // (vk) shouldn't that value be provided in the csMouseEventData struct ?
+      ev->Retrieve ("mAxesChanged", axesChanged);
+      uint currentAxis;
+      for (currentAxis = 0; currentAxis < data.numAxes; currentAxis++)
+      {
+        axesState[currentAxis] = axesChanged & (1 << currentAxis);
+        if (axesState[currentAxis])
+        {
+          mouseAxis = currentAxis;
+          // @@@ (vk) only consider one axis for now...
+          continue;
+        }
+      }
     }
   }
   else if (CS_IS_JOYSTICK_EVENT(name_reg, *ev))
@@ -262,6 +279,20 @@ void csInputDefinition::InitializeFromEvent (iEvent *ev)
     else if (CS_IS_JOYSTICK_MOVE_EVENT(name_reg, *ev, deviceNumber))
     {
       containedName = csevJoystickMove(name_reg, deviceNumber);
+      csJoystickEventData data;
+      csJoystickEventHelper::GetEventData (ev, data);
+      bool axesState[data.numAxes];
+      uint currentAxis;
+      for (currentAxis = 0; currentAxis < data.numAxes; currentAxis++)
+      {
+        axesState[currentAxis] = data.axesChanged & (1 << currentAxis);
+        if (axesState[currentAxis])
+        {
+          joystickAxis = currentAxis;
+          // @@@ (vk) only consider one axis for now...
+          continue;
+        }
+      }
     }
   }
 }
