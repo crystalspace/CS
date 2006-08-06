@@ -77,8 +77,6 @@ csGenmeshMeshObject::csGenmeshMeshObject (csGenmeshMeshObjectFactory* factory) :
 	pseudoDynInfo (29, 32),
 	affecting_lights (29, 32)
 {
-  shaderVariableAccessor.AttachNew (new ShaderVariableAccessor (this));
-  renderBufferAccessor.AttachNew (new RenderBufferAccessor (this));
   csGenmeshMeshObject::factory = factory;
   vc = factory->vc;
   logparent = 0;
@@ -551,7 +549,7 @@ void csGenmeshMeshObject::SetupShaderVariableContext ()
     else
     {
       sv = svcontext->GetVariableAdd (userBuf);
-      sv->SetAccessor (factory->shaderVariableAccessor);
+      sv->SetAccessor (factory);
     }
   }
   // Set up meshs user buffers...
@@ -570,10 +568,10 @@ void csGenmeshMeshObject::SetupShaderVariableContext ()
     else
     {
       sv = svcontext->GetVariableAdd (userBuf);
-      sv->SetAccessor (shaderVariableAccessor);
+      sv->SetAccessor (this);
     }
   }
-  bufferHolder->SetAccessor (renderBufferAccessor, bufferMask);
+  bufferHolder->SetAccessor (this, bufferMask);
 }
   
 void csGenmeshMeshObject::SetupObject ()
@@ -1017,7 +1015,7 @@ csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (
         sizeof (unsigned int)*num_sorted_mesh_triangles*3);
 
       bufferHolder->SetRenderBuffer(CS_BUFFER_INDEX, sorted_index_buffer);
-      bufferHolder->SetAccessor (renderBufferAccessor, 
+      bufferHolder->SetAccessor (this, 
 	bufferHolder->GetAccessorMask() 
 	& (~CS_BUFFER_MAKE_MASKABLE (CS_BUFFER_INDEX)));
 
@@ -1084,7 +1082,7 @@ csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (
       meshPtr->variablecontext = mergedSVContext;
       meshPtr->object2world = o2wt;
 
-      smBufferHolder->SetAccessor (renderBufferAccessor, 
+      smBufferHolder->SetAccessor (this,
         bufferHolder->GetAccessorMask() 
         & (~CS_BUFFER_MAKE_MASKABLE (CS_BUFFER_INDEX)));
 
@@ -1267,7 +1265,7 @@ iObjectModel* csGenmeshMeshObject::GetObjectModel ()
   return factory->GetObjectModel ();
 }
 
-void csGenmeshMeshObject::PreGetShaderVariableValue (csShaderVariable* var)
+void csGenmeshMeshObject::PreGetValue (csShaderVariable* var)
 {
   iRenderBuffer *a = userBuffers.GetRenderBuffer (var->GetName());
   if (a != 0)
@@ -1434,9 +1432,6 @@ csGenmeshMeshObjectFactory::csGenmeshMeshObjectFactory (
   csGenmeshMeshObjectType* pParent, iObjectRegistry* object_reg) : 
   scfImplementationType (this, static_cast<iBase*> (pParent))
 {
-  shaderVariableAccessor.AttachNew (new ShaderVariableAccessor (this));
-  renderBufferAccessor.AttachNew (new RenderBufferAccessor (this));
-
   csGenmeshMeshObjectFactory::object_reg = object_reg;
 
   SetPolyMeshStandard ();
@@ -1664,7 +1659,7 @@ void csGenmeshMeshObjectFactory::SetPolyMeshSubmeshes ()
   polyMeshType = Submeshes;
 }
 
-void csGenmeshMeshObjectFactory::PreGetShaderVariableValue (
+void csGenmeshMeshObjectFactory::PreGetValue (
   csShaderVariable* var)
 {
   iRenderBuffer *a = userBuffers.GetRenderBuffer (var->GetName());

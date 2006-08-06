@@ -734,10 +734,8 @@ public:
  * Animation is done with frames.
  */
 class csSprite3DMeshObject : 
-  public scfImplementation3<csSprite3DMeshObject,
-			    iMeshObject,
-			    iSprite3DState,
-			    iLODControl>
+  public scfImplementation4<csSprite3DMeshObject,
+    iMeshObject, iSprite3DState, iLODControl, iRenderBufferAccessor>
 {
 private:
   /// Set the size of internally used tables
@@ -1483,32 +1481,8 @@ public:
 
   /**\name iRenderBufferAccessor implementation
    * @{ */
-  class eiRenderBufferAccessor : 
-    public scfImplementation1<eiRenderBufferAccessor, iRenderBufferAccessor>
-  {
-  private:
-    csSprite3DMeshObject* parent;
-
-  public:
-    eiRenderBufferAccessor (csSprite3DMeshObject* p) : 
-      scfImplementationType (this)
-    {
-      parent = p;
-    }
-    virtual ~eiRenderBufferAccessor ()
-    {
-    }
-    virtual void PreGetBuffer (csRenderBufferHolder* holder,
-    	csRenderBufferName buffer)
-    {
-      parent->PreGetBuffer (holder, buffer);
-    }
-  };
-  friend class eiRenderBufferAccessor;
-  /** @} */
-  csRef<eiRenderBufferAccessor> scfiRenderBufferAccessor;
-
   void PreGetBuffer (csRenderBufferHolder* holder, csRenderBufferName buffer);
+  /** @} */
 };
 
 /**

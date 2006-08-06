@@ -23,6 +23,7 @@ chronological order.
 	- Vincent fixed joystick button string construction in inputdef.cpp,
 	  which seem to need more work for parsing them correctly (mouseButton
 	  vs. joystickButton)...
+	- mdmkolbe eliminated a few embedded classes in genmesh and spr3d.
 4-Aug-2006
 	- res fixed the default csRenderBufferLock<> storage to 
 	  iRenderBuffer*: it seems to be the rule rather than the exception
