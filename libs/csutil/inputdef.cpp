@@ -248,14 +248,14 @@ void csInputDefinition::InitializeFromEvent (iEvent *ev)
       containedName = csevMouseMove(name_reg, deviceNumber);
       csMouseEventData data;
       csMouseEventHelper::GetEventData (ev, data);
-      bool axesState[data.numAxes];
+      CS_ALLOC_STACK_ARRAY(bool, axesState, data.numAxes);
       uint32 axesChanged;
       // (vk) shouldn't that value be provided in the csMouseEventData struct ?
       ev->Retrieve ("mAxesChanged", axesChanged);
       uint currentAxis;
       for (currentAxis = 0; currentAxis < data.numAxes; currentAxis++)
       {
-        axesState[currentAxis] = axesChanged & (1 << currentAxis);
+        axesState[currentAxis] = (axesChanged & (1 << currentAxis)) != 0;
         if (axesState[currentAxis])
         {
           mouseAxis = currentAxis;
@@ -281,11 +281,11 @@ void csInputDefinition::InitializeFromEvent (iEvent *ev)
       containedName = csevJoystickMove(name_reg, deviceNumber);
       csJoystickEventData data;
       csJoystickEventHelper::GetEventData (ev, data);
-      bool axesState[data.numAxes];
+      CS_ALLOC_STACK_ARRAY(bool, axesState, data.numAxes);
       uint currentAxis;
       for (currentAxis = 0; currentAxis < data.numAxes; currentAxis++)
       {
-        axesState[currentAxis] = data.axesChanged & (1 << currentAxis);
+        axesState[currentAxis] = (data.axesChanged & (1 << currentAxis)) != 0;
         if (axesState[currentAxis])
         {
           joystickAxis = currentAxis;
