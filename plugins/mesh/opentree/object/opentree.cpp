@@ -36,6 +36,32 @@ CS_IMPLEMENT_PLUGIN
 CS_PLUGIN_NAMESPACE_BEGIN(OpenTree)
 {
 
+
+  class VertexHelper : public opentree::otVertices
+  {
+  public:
+    VertexHelper::VertexHelper() {};
+    VertexHelper::~VertexHelper() {};
+    void add(int index, float x, float y, float z, float nx, float ny,
+      float nz, float r, float g, float b, float a, float u, float v)
+    { printf ("Vertex add\n"); } 
+
+/*
+  csVector3* csverts = treefactstate->GetVertices();
+  csVector3* csnorms = treefactstate->GetNormals();
+  csVector2* csuvs = treefactstate->GetTexels();
+     csverts[i].x = vertices[i].x;
+     csverts[i].y = vertices[i].y;
+     csverts[i].z = vertices[i].z;
+     csnorms[i].x = vertices[i].nx;
+     csnorms[i].y = vertices[i].ny;
+     csnorms[i].z = vertices[i].nz;
+     csuvs[i].x = vertices[i].u;
+     csuvs[i].y = vertices[i].v;
+*/
+
+  };
+
 //---------------------------------------------------------------------------
 
 /*
@@ -98,7 +124,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(OpenTree)
   delete [] vertices;
 
   vertexCount = leaf.getVerticesCount();
-  vertices = new opentree::Vertex[vertexCount];
+  vertices = new otVertexHelper();
   leaf.getVertices(vertices);
 
   leaffactstate->SetVertexCount(vertexCount);
@@ -277,13 +303,11 @@ bool csOpenTreeObject::HitBeamObject (const csVector3& start,
 
 iObjectModel* csOpenTreeObject::GetObjectModel ()
 {
-  printf("getObjectModel\n");
   return factory->GetObjectModel ();
 }
 
 bool csOpenTreeObject::SetMaterialWrapper (iMaterialWrapper* mat)
 {
-  printf("setMatWrapper\n");
   material = mat;
   return true;
 }
@@ -330,53 +354,12 @@ csOpenTreeObjectFactory::csOpenTreeObjectFactory (iMeshObjectType* pParent,
 
   tree->useQuadLeaves(); //TriangleLeaves();
 
-/*
   int vertexCount = 0;
   tree->getVerticesCount(0, &vertexCount);
-  opentree::VertexList vertices = new opentree::VertexList ();
-  tree->getVertices(0, vertices, vertexCount);
+  opentree::otVertices* vertices = new VertexHelper ();
+  tree->getVertices(0, *vertices);
 
   treefactstate->SetVertexCount(vertexCount);
-  csVector3* csverts = treefactstate->GetVertices();
-  csVector3* csnorms = treefactstate->GetNormals();
-  csVector2* csuvs = treefactstate->GetTexels();
-  for (int i=0; i<vertexCount; i++)
-  {
-     csverts[i].x = vertices[i].x;
-     csverts[i].y = vertices[i].y;
-     csverts[i].z = vertices[i].z;
-     csnorms[i].x = vertices[i].nx;
-     csnorms[i].y = vertices[i].ny;
-     csnorms[i].z = vertices[i].nz;
-     csuvs[i].x = vertices[i].u;
-     csuvs[i].y = vertices[i].v;
-  }
-
-  delete [] vertices;
-
-  vertexCount = leaf.getVerticesCount();
-  vertices = new opentree::Vertex[vertexCount];
-  leaf.getVertices(vertices);
-
-  leaffactstate->SetVertexCount(vertexCount);
-  csVector3* csleafverts = leaffactstate->GetVertices();
-  csVector3* csleafnorms = leaffactstate->GetNormals();
-  csVector2* csleafuvs = leaffactstate->GetTexels();
-  for (int i=0; i<vertexCount; i++)
-  {
-     csleafverts[i].x = vertices[i].x;
-     csleafverts[i].y = vertices[i].y;
-     csleafverts[i].z = vertices[i].z;
-     csleafnorms[i].x = vertices[i].nx;
-     csleafnorms[i].y = vertices[i].ny;
-     csleafnorms[i].z = vertices[i].nz;
-     csleafuvs[i].x = vertices[i].u;
-     csleafuvs[i].y = vertices[i].v;
-  }
-
-  delete [] vertices;
-
-*/
 
   //delete ottree;
   delete gen;
@@ -388,7 +371,6 @@ csOpenTreeObjectFactory::~csOpenTreeObjectFactory ()
 
 csPtr<iMeshObject> csOpenTreeObjectFactory::NewInstance ()
 {
-  printf("newInst\n");
   csRef<csOpenTreeObject> cm;
   cm.AttachNew (new csOpenTreeObject (this));
 
@@ -403,13 +385,30 @@ void csOpenTreeObjectFactory::SetObjectBoundingBox (const csBox3&)
 
 void csOpenTreeObjectFactory::GetObjectBoundingBox (csBox3& bbox)
 {
-  printf("getBB\n");
   treefact->GetMeshObjectFactory()->GetObjectModel()->GetObjectBoundingBox(bbox);
 }
 
 void csOpenTreeObjectFactory::GetRadius (float&, csVector3&)
 {
   printf("getRadius\n");
+}
+
+bool csOpenTreeObjectFactory::SetParam (csStringID, float)
+{
+  printf("SetParam float\n");
+  return false;
+}
+
+bool csOpenTreeObjectFactory::SetParam (csStringID, int)
+{
+  printf("SetParam int\n");
+  return false;
+}
+
+bool csOpenTreeObjectFactory::SetParam (csStringID, csString)
+{
+  printf("SetParam string\n");
+  return false;
 }
 
 //----------------------------------------------------------------------

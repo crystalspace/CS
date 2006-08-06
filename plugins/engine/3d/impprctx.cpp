@@ -73,18 +73,17 @@ iSector *s)
 
 //  iTextureHandle *oldContext = engine->GetContext ();
 
-  g3d->SetRenderTarget (handle);
+//  g3d->SetRenderTarget (handle);
 //  engine->SetContext (handle);
 
   csRef<iMeshWrapper> originalmesh = mesh->GetParent ();
 
-  g3d->BeginDraw (CSDRAW_3DGRAPHICS | engine->GetBeginDrawFlags ()
-    | CSDRAW_CLEARZBUFFER);
+//  g3d->BeginDraw (CSDRAW_3DGRAPHICS | engine->GetBeginDrawFlags ()
+//    | CSDRAW_CLEARZBUFFER);
   
-  g3d->GetDriver2D ()->Clear (
-    g3d->GetDriver2D ()->FindRGB (0, 255, 255, 0));
+//  g3d->GetDriver2D ()->Clear (
+//    g3d->GetDriver2D ()->FindRGB (0, 255, 255, 0));
  
-//  rl->Draw (rview, s, originalmesh);
   int num;
   csRef<iMeshObject> meshobj = originalmesh->GetMeshObject ();
   csRenderMesh** rendermeshes = meshobj->GetRenderMeshes (num, rview, 
@@ -96,26 +95,26 @@ iSector *s)
 
   //SetWorldToCamera?
 //  g3d->DrawMesh(rendermesh, mode, sva);
-  {
 printf("rendered\n");
-    mesh->FindImposterRectangle (rview->GetCamera ());
-    mesh->SetImposterReady (true);
-  }
+  mesh->FindImposterRectangle (rview->GetCamera ());
+  mesh->SetImposterReady (true);
 
+/*
   //debuging output
-  csDebugImageWriter* diw = new csDebugImageWriter();
+  csRef<csDebugImageWriter> diw = new csDebugImageWriter();
   csRef<iImage> pic;
   pic.AttachNew(g3d->GetDriver2D()->ScreenShot());
   diw->DebugImageWrite(pic,"imposter.png");
+*/
 
-  g3d->FinishDraw ();
+//  g3d->FinishDraw ();
 
   // switch back to the old context
 //  engine->SetContext (oldContext);
 
   //debuging output
-  pic.AttachNew(g3d->GetDriver2D()->ScreenShot());
-  diw->DebugImageWrite(pic,"screen.png");
+//  pic.AttachNew(g3d->GetDriver2D()->ScreenShot());
+//  diw->DebugImageWrite(pic,"screen.png");
 
 //assert(0);
 }

@@ -48,6 +48,7 @@ public:
   void SetImposterReady (bool r) { imposter_ready = r; }
   void Animate (iRenderView *rview, iRenderLoop *rl, iSector *s);
   csImposterMesh *GetParent () { return mesh; }
+  iTextureWrapper *GetTexture () { return tex; }
 };
 
 #endif // __CS_IMPPRCTX_H__

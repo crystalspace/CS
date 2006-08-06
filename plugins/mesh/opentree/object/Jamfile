@@ -7,7 +7,7 @@ Description
 opentree : "Mesh OpenTree object plugin" ;
 Plugin opentree : [ Wildcard *.cpp *.h ] ;
 LinkWith opentree : crystalspace ;
-ExternalLibs sprcal3d : OTL ;
+ExternalLibs opentree : OTL ;
 CompileGroups opentree : meshes ;
 }
 

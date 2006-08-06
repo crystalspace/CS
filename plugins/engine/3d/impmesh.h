@@ -46,6 +46,7 @@ private:
   float    incidence_dist;   // Angle of incidence to camera last time rendered
   csScreenBoxResult res;
   csRenderMeshHolder rmHolder;
+  iEngine *engine;
 
 public:
   csImposterMesh (csEngine* engine, csMeshWrapper *parent);

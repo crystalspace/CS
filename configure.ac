@@ -1,4 +1,5 @@
-# configure.ac                                                 -*- Autoconf -*-
+# configure.ac                                                 -*- 
+Autoconf -*-
 #==============================================================================
 # Copyright (C)2003-2006 by Eric Sunshine <sunshine@sunshineco.com>
 #
@@ -1632,8 +1633,7 @@ CS_CHECK_LIB_WITH([opentree],
     #include <opentree/opentree.h>
     ]],
     [/*test here*/])],
-    [], [C++], [CS_EMIT_BUILD_RESULT([cs_cv_libopentree], [OTL])], [],
-    [], [], [])
+    [], [C++], [CS_EMIT_BUILD_RESULT([cs_cv_libopentree], [OTL])])
 
 
 #------------------------------------------------------------------------------

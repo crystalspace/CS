@@ -31,10 +31,12 @@
 #include "ivideo/graph3d.h"
 #include "csutil/flags.h"
 #include "csutil/cscolor.h"
-#include <imesh/genmesh.h>
+#include "imesh/genmesh.h"
 
 #include "imesh/object.h"
 #include "imesh/opentree.h"
+
+#include <opentree/opentree.h>
 
 CS_PLUGIN_NAMESPACE_BEGIN(OpenTree)
 {
@@ -148,6 +150,8 @@ private:
   csFlags flags;
   csRef<iMeshObjectType> proto_type;
 
+  opentree::TreeData treedata;
+
   //use genmesh internally for now
   csRef<iMeshFactoryWrapper> treefact;
   csRef<iGeneralFactoryState> treefactstate;
@@ -163,6 +167,13 @@ public:
 
   /// Destructor.
   virtual ~csOpenTreeObjectFactory ();
+
+  /**\name iOpenTreeFactoryState implementation
+   * @{ */
+  bool SetParam(csStringID, float);
+  bool SetParam(csStringID, int);
+  bool SetParam(csStringID, csString);
+  /** @} */
 
   /**\name iMeshObjectFactory implementation
    * @{ */
