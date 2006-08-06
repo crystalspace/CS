@@ -91,6 +91,9 @@ namespace genmeshify
     bool ExtractLightmaps (const char* meshName, 
       const LMLayout& layout, iThingState* object, 
       iDocumentNode* textures, csStringArray& slmNames);
+
+    bool WritePolyMeshes (iObjectModel* objmodel, iDocumentNode* to);
+    bool WritePolyMesh (iPolygonMesh* polyMesh, iDocumentNode* to);
   public:
     Converter (App* app, iLoaderContext* context, iRegion* region);
   

@@ -20,6 +20,7 @@ chronological order.
 	      event, and to only print changed joystick axis value (not x/y).
 	- res changed genmesh to preserve user-set poly meshes when switching
 	  between "standard"/"submesh" poly meshes.
+	- res added writing of of polymeshes to genmeshify.
 5-Aug-2005
 	- mdmkolbe removed a redundant check of do_infinite in walktest.
 	- res added the iSelfDestruct interface to the csSaverFile, 
