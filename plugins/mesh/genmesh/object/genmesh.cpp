@@ -1644,23 +1644,33 @@ void csGenmeshMeshObjectFactory::Compress ()
 
 void csGenmeshMeshObjectFactory::SetPolyMeshStandard ()
 {
+  csRef<iPolygonMesh> polyMeshBase = GetPolygonMeshBase ();
   PolyMesh* polyMesh = new PolyMesh;
   polyMesh->SetFactory (this);
   polygonMesh.AttachNew (polyMesh);
   SetPolygonMeshBase (polygonMesh);
-  SetPolygonMeshColldet (polygonMesh);
-  SetPolygonMeshViscull (polygonMesh);
-  SetPolygonMeshShadows (polygonMesh);
+  // Poly meshes may have been set by the user; preserve those
+  if (GetPolygonMeshColldet() == polyMeshBase)
+    SetPolygonMeshColldet (polygonMesh);
+  if (GetPolygonMeshViscull() == polyMeshBase)
+    SetPolygonMeshViscull (polygonMesh);
+  if (GetPolygonMeshShadows() == polyMeshBase)
+    SetPolygonMeshShadows (polygonMesh);
   polyMeshType = Standard;
 }
 
 void csGenmeshMeshObjectFactory::SetPolyMeshSubmeshes ()
 {
+  csRef<iPolygonMesh> polyMeshBase = GetPolygonMeshBase ();
   polygonMesh.AttachNew (new SubMeshesPolyMesh (this, subMeshes));
   SetPolygonMeshBase (polygonMesh);
-  SetPolygonMeshColldet (polygonMesh);
-  SetPolygonMeshViscull (polygonMesh);
-  SetPolygonMeshShadows (polygonMesh);
+  // Poly meshes may have been set by the user; preserve those
+  if (GetPolygonMeshColldet() == polyMeshBase)
+    SetPolygonMeshColldet (polygonMesh);
+  if (GetPolygonMeshViscull() == polyMeshBase)
+    SetPolygonMeshViscull (polygonMesh);
+  if (GetPolygonMeshShadows() == polyMeshBase)
+    SetPolygonMeshShadows (polygonMesh);
   polyMeshType = Submeshes;
 }
 
