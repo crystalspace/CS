@@ -40,7 +40,7 @@ public:
   typedef csHash<bool, T, Allocator> HashType;
 
 private:
-  typedef typename_qualifier HashType::GlobalIterator ParentIter;
+  typedef typename_qualifier HashType::ConstGlobalIterator ParentIter;
   HashType map;
 
 public:

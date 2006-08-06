@@ -6,6 +6,11 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+6-Aug-2005
+	- Anders separated csHash iterators into const and non-const, like 
+	  csArray. This may lead to compile errors in user code. In most
+	  cases the solution to these is to change "GlobalIterator" to
+	  "ConstGlobalIterator".
 5-Aug-2005
 	- mdmkolbe removed a redundant check of do_infinite in walktest.
 	- res added the iSelfDestruct interface to the csSaverFile, 
