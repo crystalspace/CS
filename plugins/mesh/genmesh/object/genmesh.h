@@ -132,9 +132,12 @@ public:
 /**
  * Genmesh version of mesh object.
  */
-class csGenmeshMeshObject : public scfImplementation7<csGenmeshMeshObject, 
-  iMeshObject, iLightingInfo, iShadowCaster, iShadowReceiver,
-  iGeneralMeshState, iRenderBufferAccessor, iShaderVariableAccessor>
+class csGenmeshMeshObject : public scfImplementation5<csGenmeshMeshObject, 
+						      iMeshObject,
+						      iLightingInfo,
+						      iShadowCaster,
+						      iShadowReceiver,
+						      iGeneralMeshState>
 {
 private:
   csRenderMeshHolder rmHolder;
@@ -369,19 +372,60 @@ public:
   virtual void PositionChild (iMeshObject* /*child*/, csTicks /*current_time*/) { }
   /** @} */
 
+  class RenderBufferAccessor : 
+    public scfImplementation1<RenderBufferAccessor, iRenderBufferAccessor>
+  {
+  public:
+    CS_LEAKGUARD_DECLARE (eiRenderBufferAccessor);
+    csWeakRef<csGenmeshMeshObject> parent;
+    virtual ~RenderBufferAccessor () { }
+    RenderBufferAccessor (csGenmeshMeshObject* parent)
+    	: scfImplementationType (this)
+    {
+      this->parent = parent;
+    }
+    virtual void PreGetBuffer (csRenderBufferHolder* holder,
+    	csRenderBufferName buffer)
+    {
+      if (parent) parent->PreGetBuffer (holder, buffer);
+    }
+  };
+  csRef<RenderBufferAccessor> renderBufferAccessor;
+  friend class eiRenderBufferAccessor;
+
   void PreGetBuffer (csRenderBufferHolder* holder, csRenderBufferName buffer);
 
   //------------------ iShaderVariableAccessor implementation ------------
-  virtual void PreGetValue (csShaderVariable* variable);
+  class ShaderVariableAccessor : 
+    public scfImplementation1<ShaderVariableAccessor, iShaderVariableAccessor>
+  {
+  public:
+    csWeakRef<csGenmeshMeshObject> parent;
+    virtual ~ShaderVariableAccessor () { }
+    ShaderVariableAccessor (csGenmeshMeshObject* parent)
+    	: scfImplementationType (this)
+    {
+      this->parent = parent;
+    }
+    virtual void PreGetValue (csShaderVariable* variable)
+    {
+      if (parent) parent->PreGetShaderVariableValue (variable);
+    }
+  };
+  csRef<ShaderVariableAccessor> shaderVariableAccessor;
+  friend class eiShaderVariableAccessor;
+
+  void PreGetShaderVariableValue (csShaderVariable* variable);
 };
 
 /**
  * Factory for general meshes.
  */
 class csGenmeshMeshObjectFactory : 
-  public scfImplementationExt4<csGenmeshMeshObjectFactory, csObjectModel,
-    iMeshObjectFactory, iGeneralFactoryState, iShaderVariableAccessor,
-    iRenderBufferAccessor>
+  public scfImplementationExt2<csGenmeshMeshObjectFactory,
+                               csObjectModel,
+                               iMeshObjectFactory,
+                               iGeneralFactoryState>
 {
 private:
   csRef<iMaterialWrapper> material;
@@ -715,9 +759,55 @@ public:
   virtual iObjectModel* GetObjectModel () { return this; }
 
   /// Genmesh factory shader variable accessor
-  virtual void PreGetValue (csShaderVariable* variable);
+  class ShaderVariableAccessor : 
+    public scfImplementation1<ShaderVariableAccessor, iShaderVariableAccessor>
+  {
+  public:
+    //SCF_DECLARE_EMBEDDED_IBASE (csGenmeshMeshObjectFactory);
+    csWeakRef<csGenmeshMeshObjectFactory> parent;
+    virtual ~ShaderVariableAccessor ()
+    {
+    }
+    ShaderVariableAccessor (csGenmeshMeshObjectFactory* parent) :
+      scfImplementationType (this)
+    {
+      this->parent = parent;
+    }
+    virtual void PreGetValue (csShaderVariable* variable)
+    {
+      //scfParent->PreGetShaderVariableValue (variable);
+      if (parent) parent->PreGetShaderVariableValue (variable);
+    }
+  };
+  csRef<ShaderVariableAccessor> shaderVariableAccessor;
+  friend class ShaderVariableAccessor;
+
+  void PreGetShaderVariableValue (csShaderVariable* variable);
 
   /// Genmesh factory render buffer accessor
+  class RenderBufferAccessor : 
+    public scfImplementation1<RenderBufferAccessor, iRenderBufferAccessor>
+  {
+  public:
+    CS_LEAKGUARD_DECLARE (eiRenderBufferAccessor);
+    csWeakRef<csGenmeshMeshObjectFactory> parent;
+    virtual ~RenderBufferAccessor ()
+    {
+    }
+    RenderBufferAccessor (csGenmeshMeshObjectFactory* parent) :
+      scfImplementationType (this)
+    {
+      this->parent = parent;
+    }
+    virtual void PreGetBuffer (csRenderBufferHolder* holder,
+    	csRenderBufferName buffer)
+    {
+      parent->PreGetBuffer (holder, buffer);
+    }
+  };
+  csRef<RenderBufferAccessor> renderBufferAccessor;
+  friend class RenderBufferAccessor;
+
   void PreGetBuffer (csRenderBufferHolder* holder, csRenderBufferName buffer);
 };
 

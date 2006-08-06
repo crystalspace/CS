@@ -759,6 +759,7 @@ csSprite3DMeshObject::csSprite3DMeshObject () : scfImplementationType (this)
   single_step = false;
   frame_increment = 1;
   bufferHolder.AttachNew (new csRenderBufferHolder);
+  scfiRenderBufferAccessor.AttachNew (new eiRenderBufferAccessor(this));
   svcontext.AttachNew (new csShaderVariableContext);
 }
 
@@ -1036,7 +1037,7 @@ void csSprite3DMeshObject::SetupObject ()
   if (!initialized)
   {
     initialized = true;
-    bufferHolder->SetAccessor (this, (uint32)CS_BUFFER_ALL_MASK);
+    bufferHolder->SetAccessor (scfiRenderBufferAccessor, (uint32)CS_BUFFER_ALL_MASK);
     InitSprite ();
   }
 }
