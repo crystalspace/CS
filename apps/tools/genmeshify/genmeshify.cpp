@@ -109,6 +109,18 @@ namespace genmeshify
     csRef<iCommandLineParser> cmdline = csQueryRegistry<iCommandLineParser>
       (objectRegistry);
 
+    csStringArray preload;
+    size_t preloadIndex = 0;
+    const char* preloadName = cmdline->GetOption ("preload", preloadIndex++);
+    while (preloadName != 0)
+    {
+      preload.Push (preloadName);
+      preloadName = cmdline->GetOption ("preload", preloadIndex++);
+    }
+    if (!Processor::Preload (this, preload)) return false;
+
+    bool shallow = cmdline->GetBoolOption ("shallow");
+
     int cmd_idx = 0;
     int map_idx = 0;
     while (true)
@@ -126,21 +138,44 @@ namespace genmeshify
       }
 
       map_idx++;
-
-      Processor processor (this, val);
-      if (!processor.Process ()) return false;
-      //scene->AddFile (val);
+      csStringArray files;
+      Processor processor (this);
+      files.Push (val);
+      while (files.GetSize() > 0)
+      {
+        bool ret;
+        if (shallow)
+        {
+          csStringArray dummy;
+          ret = processor.Process (files[0], dummy);
+        }
+        else
+          ret = processor.Process (files[0], files);
+        if (!ret) return false;
+        files.DeleteIndex (0);
+      }
     }
+
     return true;
   }
 
   void App::CommandLineHelp()
   {
     csPrintf ("Syntax:\n");
-    csPrintf ("  genmeshify [Map] [Map] ...\n");
+    csPrintf ("  genmeshify {-preload=Map} {-preload=Map} ... {-shallow} "
+      "[Map] [Map] ...\n");
     csPrintf ("\n");
-    csPrintf ("'Map' can be the name of a level or a VFS directory with "
-      "\"world\" file.\n");
+    csPrintf ("'Map' can be the name of a level, a VFS directory with "
+      "a \"world\" file,.\n");
+    csPrintf ("or the name of a filename of a world or library.\n");
+    csPrintf ("\n");
+    csPrintf ("One or more of the above can also be preloaded before the "
+      "actual conversion\n");
+    csPrintf ("(useful to e.g. preload libraries with textures used by the "
+      "map).\n");
+    csPrintf ("\n");
+    csPrintf ("\"-shallow\" disables conversion of nested referenced "
+      "libraries.\n");
   }
 
 }

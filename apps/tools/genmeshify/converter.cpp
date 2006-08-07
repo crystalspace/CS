@@ -227,6 +227,7 @@ namespace genmeshify
         slmNames)) 
         return false;
 
+      if (!mobj->GetFactory()->GetMeshFactoryWrapper())
       {
         csRef<iDocumentNode> factoryNode = 
           sectorNode->GetParent()->CreateNodeBefore (CS_NODE_ELEMENT,
@@ -296,17 +297,17 @@ namespace genmeshify
       CS_NODE_TEXT, 0);
     plugin_contents->SetValue ("crystalspace.mesh.loader.genmesh");
 
-    /* Small hack: the GM factory may nameless, but the GM saver needs it 
-     * named to write a proper <factory> tag. Hence, give it a name...
+    /* Small hack: make sure the GM factory's name is correct, so the GM 
+     * saver can write a proper <factory> tag.
      */
     csRef<iObject> mfwObject = mof->GetMeshFactoryWrapper()->QueryObject();
-    bool factoryNameHack = mfwObject->GetName() == 0;
-    if (factoryNameHack) mfwObject->SetName (factoryName);
+    csString oldFactoryName = mfwObject->GetName();
+    if (factoryName != 0) mfwObject->SetName (factoryName);
     // ...while the GM is saved...
     if (!gmSaver->WriteDown (gmObj, to, 0)) return false;
     /* ...and set it to 0 afterwards (we don't want a Thing object from the 
      * source file to pick it up). */
-    if (factoryNameHack) mfwObject->SetName (0);
+    mfwObject->SetName (oldFactoryName);
 
     if (!WritePolyMeshes (newObj->GetObjectModel(), to)) return false;
 

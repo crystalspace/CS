@@ -34,7 +34,6 @@ namespace genmeshify
 #undef CS_TOKEN_ITEM_FILE 
 
     App* app;
-    csString filename;
     Converter* converter;
 
     csRef<iRegion> region;
@@ -50,11 +49,15 @@ namespace genmeshify
       return name;
     }
 
+    static csRef<iFile> OpenPath (App* app, const char* path, 
+                                  csString& fileNameToOpen);
+
     /// Clone a node and children.
     void CloneNode (iDocumentNode* from, iDocumentNode* to);
     /// Clone attributes.
     void CloneAttributes (iDocumentNode* from, iDocumentNode* to);
-    bool ProcessWorld (iDocumentNode* from, iDocumentNode* to);
+    bool ProcessWorld (iDocumentNode* from, iDocumentNode* to,
+      csStringArray& librariesList);
     bool ProcessPlugins (iDocumentNode* from, iDocumentNode* to);
     bool ProcessSector (iDocumentNode* from, iDocumentNode* to);
     bool ProcessMeshfactOrObj (iSector* sector, iDocumentNode* from, 
@@ -66,11 +69,13 @@ namespace genmeshify
     bool PreloadTexturesMaterialsLibs (iDocumentNode* from);
     bool PreloadSectors (iDocumentNode* from);
   public:
-    Processor (App* app, const char* filename);
+    Processor (App* app);
     ~Processor ();
 
-    bool Process ();
+    static bool Preload (App* app, const csStringArray& paths);
+    bool Process (const char* filename, csStringArray& librariesList);
   };
 }
 
 #endif // __PROCESSOR_H__
+  
