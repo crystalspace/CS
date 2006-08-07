@@ -8,6 +8,11 @@ chronological order.
 
 7-Aug-2005
 	- res added ability to convert referenced libraries to genmeshify.
+	- Jorrit fixed a bug in the skeleton loader. It would return a
+	  reference to a factory (as a csPtr) without doing an IncRef.
+	  That would cause crashes at exit.
+	- Jorrit also made the event handler in the skeleton graveyard
+	  embedded to try to fix a leak there.
 6-Aug-2005
 	- Anders separated csHash iterators into const and non-const, like 
 	  csArray. This may lead to compile errors in user code. In most
