@@ -1667,11 +1667,10 @@ void csEngine::StartDraw (iCamera *c, iClipper2D* view, csRenderView &rview)
 //  G3D->SetClipper (view, CS_CLIPPER_TOPLEVEL);  // We are at top-level.
 //  G3D->ResetNearPlane ();
 //  G3D->SetPerspectiveAspect (c->GetFOV ());
-//  G3D->FinishDraw();
+  G3D->FinishDraw();
 
   while (it.HasNext ())
   {
-
     iSector *s = c->GetSector ();
     if (s) 
     {
@@ -1681,7 +1680,7 @@ void csEngine::StartDraw (iCamera *c, iClipper2D* view, csRenderView &rview)
     }
   }
 
-//  G3D->BeginDraw (CSDRAW_3DGRAPHICS | CSDRAW_CLEARZBUFFER);
+  G3D->BeginDraw (CSDRAW_3DGRAPHICS | CSDRAW_CLEARZBUFFER);
 
 }
 

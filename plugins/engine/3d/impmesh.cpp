@@ -106,17 +106,17 @@ printf("Min: %f %f %f\n",v1[0],v1[1],v1[2]);
 printf("Max: %f %f %f\n",v4[0],v4[1],v4[2]);
 
 */
-
   csVector3 v1 = c->InvPerspective (csVector2(0,0), 3);
   csVector3 v2 = c->InvPerspective (csVector2(100,0), 3);
   csVector3 v3 = c->InvPerspective (csVector2(100,100), 3);
   csVector3 v4 = c->InvPerspective (csVector2(0,100), 3);
 
+/*
 v1 = c->GetTransform ().This2Other (v1);
 v2 = c->GetTransform ().This2Other (v2);
 v3 = c->GetTransform ().This2Other (v3);
 v4 = c->GetTransform ().This2Other (v4);
-
+*/
 printf("Min: %f %f %f\n",v1[0],v1[1],v1[2]);
 printf("Max: %f %f %f\n",v2[0],v2[1],v2[2]);
 printf("Max: %f %f %f\n",v3[0],v3[1],v3[2]);
@@ -126,6 +126,13 @@ printf("Max: %f %f %f\n",v4[0],v4[1],v4[2]);
   cutout.AddVertex (v2);
   cutout.AddVertex (v3);
   cutout.AddVertex (v4);
+
+/*
+  cutout.AddVertex (csVector3(0,0,0));
+  cutout.AddVertex (csVector3(1000,0,0));
+  cutout.AddVertex (csVector3(1000,10,0));
+  cutout.AddVertex (csVector3(0,1000,0));
+*/
 }
 
 
@@ -176,6 +183,11 @@ if (tm == 0) printf ("Uuups\n");
     mesh_indices.Put (i, i);
   }
 
+  mesh->indexstart = 0;
+  mesh->indexend = mesh_indices_count - 1;
+
+  mesh->object2world = csReversibleTransform ();
+
   mesh_texels.Push (csVector2 (0,0));
   mesh_texels.Push (csVector2 (1,0));
   mesh_texels.Push (csVector2 (1,1));
@@ -195,15 +207,15 @@ if (tm == 0) printf ("Uuups\n");
   indexBuffer->CopyInto(mesh_indices.GetArray(), 4);
 
   csRef<csRenderBuffer> vertBuffer = csRenderBuffer::CreateRenderBuffer(
-    4, CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 1);
+    4, CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 3);
   vertBuffer->CopyInto(cutout.GetVertices (), 4);
 
   csRef<csRenderBuffer> texBuffer = csRenderBuffer::CreateRenderBuffer(
-    4, CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 1);
+    4, CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 2);
   texBuffer->CopyInto(mesh_texels.GetArray(), 4);
 
   csRef<csRenderBuffer> colBuffer = csRenderBuffer::CreateRenderBuffer(
-    4, CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 1);
+    4, CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 4);
   colBuffer->CopyInto(mesh_colors.GetArray(), 4);
 
   csRef<csRenderBufferHolder> buffer = new csRenderBufferHolder();

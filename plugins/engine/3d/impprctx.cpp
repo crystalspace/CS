@@ -71,10 +71,7 @@ iSector *s)
   csRef<iTextureHandle> handle = tex->GetTextureHandle ();
   if (!mesh) return;
 
-//  iTextureHandle *oldContext = engine->GetContext ();
-
   g3d->SetRenderTarget (handle);
-//  engine->SetContext (handle);
 
   csRef<iMeshWrapper> originalmesh = mesh->GetParent ();
 
@@ -108,9 +105,6 @@ printf("rendered\n");
 */
 
   g3d->FinishDraw ();
-
-  // switch back to the old context
-//  engine->SetContext (oldContext);
 
   //debuging output
 //  pic.AttachNew(g3d->GetDriver2D()->ScreenShot());
