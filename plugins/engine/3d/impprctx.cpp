@@ -73,16 +73,16 @@ iSector *s)
 
 //  iTextureHandle *oldContext = engine->GetContext ();
 
-//  g3d->SetRenderTarget (handle);
+  g3d->SetRenderTarget (handle);
 //  engine->SetContext (handle);
 
   csRef<iMeshWrapper> originalmesh = mesh->GetParent ();
 
-//  g3d->BeginDraw (CSDRAW_3DGRAPHICS | engine->GetBeginDrawFlags ()
-//    | CSDRAW_CLEARZBUFFER);
+  g3d->BeginDraw (CSDRAW_3DGRAPHICS | engine->GetBeginDrawFlags ()
+    | CSDRAW_CLEARZBUFFER);
   
-//  g3d->GetDriver2D ()->Clear (
-//    g3d->GetDriver2D ()->FindRGB (0, 255, 255, 0));
+  g3d->GetDriver2D ()->Clear (
+    g3d->GetDriver2D ()->FindRGB (0, 255, 255, 0));
  
   int num;
   csRef<iMeshObject> meshobj = originalmesh->GetMeshObject ();
@@ -107,7 +107,7 @@ printf("rendered\n");
   diw->DebugImageWrite(pic,"imposter.png");
 */
 
-//  g3d->FinishDraw ();
+  g3d->FinishDraw ();
 
   // switch back to the old context
 //  engine->SetContext (oldContext);
