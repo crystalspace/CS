@@ -14,6 +14,7 @@ chronological order.
 	- Jorrit fixed a problem in csEngineTools::FindScreenTarget(). If
 	  the maximum distance was very large it wouldn't work very well
 	  due to inaccuracy problems.
+	- caedes moved all swig interface files to include/bindings.
 7-Aug-2005
 	- res added ability to convert referenced libraries to genmeshify.
 	- Jorrit fixed a bug in the skeleton loader. It would return a

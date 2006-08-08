@@ -18,7 +18,7 @@
 
 /*
   Python specific stuff for SWIG interface in pre-include phase.
-  See include/ivaria/cspace.i
+  See include/bindings/cspace.i
 */
 
 #ifdef SWIGPYTHON

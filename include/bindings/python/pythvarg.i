@@ -19,7 +19,7 @@
 /*
   Python specific stuff for SWIG interface in post-include phase
   dealing with variable argument lists. You know, the ... stuff.
-  See include/ivaria/cspace.i
+  See include/bindings/cspace.i
 */
 
 #ifdef SWIGPYTHON

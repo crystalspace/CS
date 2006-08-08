@@ -18,7 +18,7 @@
 
 /*
   Python specific stuff for SWIG interface in post-include phase.
-  See include/ivaria/cspace.i
+  See include/bindings/cspace.i
 */
 
 #ifdef SWIGPYTHON
@@ -271,6 +271,6 @@ PyObject* csWrapTypedObject(void* objectptr, const char *typetag,
 
 %}
 
-%include "ivaria/pythvarg.i"
+%include "bindings/python/pythvarg.i"
 
 #endif // SWIGPYTHON
