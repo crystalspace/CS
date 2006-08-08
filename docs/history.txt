@@ -6,6 +6,8 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+9-Aug-2005
+	- caedes fixed a problem that would make the python tutorials fail.
 8-Aug-2005
 	- res re-added support for triangle-based submeshes in genmesh objects 
 	  in order to provide backwards compatibility.
