@@ -35,8 +35,6 @@
 #include "csutil/vfsplat.h"
 #include "iutil/objreg.h"
 
-#define NEW_CONFIG_SCANNING
-
 CS_IMPLEMENT_PLUGIN
 
 /*********************************************
@@ -424,7 +422,6 @@ bool VfsNode::GetRealPath(const char *FileName, csString &path) const
   }
 
   csString FileToFind;
-
   for (size_t i = 0; i < MappedPaths.Length(); i++)
   {
     if (MappedPaths[i].symlink)
@@ -1583,19 +1580,29 @@ csPtr<iDataBuffer> csVFS::GetRealPath (const char *FileName)
   if (fullPath.IsEmpty())
     fullPath = "/";
 
-  VfsNode *node = GetParentDirectoryNode(fullPath, false);
-
-  if (!node)
-  {
-    return csPtr<iDataBuffer> (0);
-  }
+  VfsNode *node = GetDirectoryNode(fullPath);
 
   csString path;
-  
-  // Try get the real path
-  if (!node->GetRealPath(ExtractFileName(fullPath), path))
+  if (!node)
   {
-     return csPtr<iDataBuffer> (0);
+    node = GetParentDirectoryNode(fullPath, false);
+    if (!node)
+    {
+      return csPtr<iDataBuffer> (0);
+    }
+  
+    // Try get the real path
+    if (!node->GetRealPath(ExtractFileName(fullPath), path))
+    {
+      return csPtr<iDataBuffer> (0);
+    }
+  }
+  else
+  {
+    if (node->MappedPaths.IsEmpty())
+      return csPtr<iDataBuffer> (0);
+
+    path = node->MappedPaths[0].name;
   }
 
   return csPtr<iDataBuffer> (new csDataBuffer (
@@ -1910,7 +1917,6 @@ bool csVFS::AutoConfigPlugin::Configure(iVFS *vfs,
   /// The resource directory
   csString ResourceDirectory;
 
-#ifdef NEW_CONFIG_SCANNING
   static const char* vfsSubdirs[] = {
     "etc/" CS_PACKAGE_NAME,
     "etc", 
@@ -1929,18 +1935,8 @@ bool csVFS::AutoConfigPlugin::Configure(iVFS *vfs,
   
   configPaths.AddUniqueExpanded (".");
 
-#ifdef CS_CONFIGDIR
-  configPaths.AddUniqueExpanded (CS_CONFIGDIR);
-#endif
-  configPaths = csPathsUtilities::LocateFile (configPaths, "vfs.cfg", true);
-
-  if (configPaths.Length() > 0)
-  {
-    InstallDirectory = configPaths[0].path;
-  }
-#else
   InstallDirectory = csGetConfigPath();
-#endif
+  configPaths.AddUniqueExpanded (InstallDirectory);
 
   csStringArray Directories;
 
@@ -1948,7 +1944,7 @@ bool csVFS::AutoConfigPlugin::Configure(iVFS *vfs,
   if (vfs->Mount("/mnt/user", csGetPlatformConfigPath("", false)))
 	{
     // Add it to the directory list
-		Directories.Push("/mnt/user");
+		//Directories.Push("/mnt/user");
 	}
 
 
@@ -1976,7 +1972,6 @@ bool csVFS::AutoConfigPlugin::Configure(iVFS *vfs,
 	  }
   }
 
-#ifdef NEW_CONFIG_SCANNING
   bool mountedInstall = false;
   for (size_t i = 0; i < configPaths.Length(); i++)
   {
@@ -1989,29 +1984,12 @@ bool csVFS::AutoConfigPlugin::Configure(iVFS *vfs,
       }
     }
   }
-#else
-  if (vfs->Mount("/mnt/install", csGetConfigPath()))
-	{
-    // Add it to the directory list
-		// Directories.Push("/mnt/install");
-	}
-#endif
 
-  bool result = false;
-  result = vfs->LoadConfigFile("/mnt/resource/vfs.cfg", false);
-  if (result && InstallDirectory.Empty())
-    InstallDirectory = ResourceDirectory;
-  result = vfs->LoadConfigFile("/mnt/app/vfs.cfg", false);
-  if (result && InstallDirectory.Empty())
-    InstallDirectory = ResourceDirectory;
-
-  vfs->LoadConfigFile("/mnt/install/vfs.cfg", false);
+  vfs->LoadConfigFile("/mnt/install/data/config/vfs.cfg", false);
 
   ((csVFS*)vfs)->InstallDirectory = InstallDirectory;
   
   ((csVFS*)vfs)->MountConfigFile();
-
- // return true;
 
   csStringArray mountedRealPaths;
 

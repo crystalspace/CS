@@ -138,6 +138,9 @@ static bool DemoEventHandler (iEvent& ev)
 static void TestDemoFile (const char* zip, iVFS* myVFS, csStringArray& demos)
 {
   csRef<iDataBuffer> realpath_db (myVFS->GetRealPath (zip));
+  if (!realpath_db.IsValid())
+    return;
+
   char* realpath = (char*)(realpath_db->GetData ());
   char* testpath = new char [strlen (realpath)+3];
   strcpy (testpath, realpath);
@@ -326,10 +329,12 @@ bool Demo::Initialize (int argc, const char* const argv[],
     // However we scan for possible data files and present them to the
     // user.
     csRef<iStringArray> zips = myVFS->FindFiles ("/this/*");
+
+    myVFS->ChDir("/this/");
     size_t i;
     for (i = 0 ; i < zips->Length () ; i++)
     {
-      const char* zip = zips->Get (i);
+      const char* zip = (const char* ) zips->Get (i);
       TestDemoFile (zip, myVFS, demos);
     }
     myVFS->Mount ("/tmp/csdemo_datadir", "$@data$/");

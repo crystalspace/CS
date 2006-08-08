@@ -320,9 +320,13 @@ public:
   // Sync
   virtual bool Sync ();
 
-private:
+///private:
   // Return the archive that contains a file
   VfsArchive *FindFile(const char *FileName) const;
+
+  csString ExtractArchiveName(const char *path) const;
+
+  csString ExtractArchiveFileName(const char *path) const;
 };
 
 } CS_PLUGIN_NAMESPACE_END(vfs)

@@ -411,25 +411,25 @@ csArchiveFileSystem::~csArchiveFileSystem()
 csArchiveFileSystem::VfsArchive * csArchiveFileSystem::FindFile(
   const char *FileName) const
 {
-  csString archiveName = ExtractParentName(FileName);
+  csString archiveName = ExtractArchiveName(FileName);
 
-  size_t idx = ArchiveCache->FindKey ((const char *) archiveName);
+  size_t idx = ArchiveCache->FindKey (archiveName);
   // archive not in cache?
   if (idx == csArrayItemNotFound)
   {
      // does file rpath exist?
-     if (access ((const char *) archiveName, F_OK) != 0)
+     if (access (archiveName, F_OK) != 0)
        return 0;
 
      idx = ArchiveCache->Length ();
-     ArchiveCache->Push (new VfsArchive ((const char *) archiveName));
+     ArchiveCache->Push (new VfsArchive (archiveName));
   }
 
   VfsArchive *a = ArchiveCache->Get (idx);
 
   a->UpdateTime ();
 
-  if (a->FileExists ((const char *) ExtractFileName(FileName), 0))
+  if (a->FileExists (ExtractArchiveFileName(FileName), 0))
   {
     ArchiveCache->CheckUp ();
     return a;
@@ -441,10 +441,10 @@ csArchiveFileSystem::VfsArchive * csArchiveFileSystem::FindFile(
 
 iFile* csArchiveFileSystem::Open(const char * FileName, int mode)
 {
-  csString strPath = ExtractParentName(FileName);
+  csString strPath = ExtractArchiveName(FileName);
 
   // rpath is an archive
-  size_t idx = ArchiveCache->FindKey((const char *)strPath);
+  size_t idx = ArchiveCache->FindKey(strPath);
   
   // archive not in cache?
   if (idx == csArrayItemNotFound)
@@ -452,16 +452,15 @@ iFile* csArchiveFileSystem::Open(const char * FileName, int mode)
     if ((mode & VFS_FILE_MODE) != VFS_FILE_WRITE)
 	  {
         // does file rpath exist?
-	     if (access ((const char *) strPath, F_OK) != 0)
+	     if (access (strPath, F_OK) != 0)
             return 0;
 	  }
 
     idx = ArchiveCache->Length ();
-    ArchiveCache->Push (new VfsArchive ((const char *) strPath));
+    ArchiveCache->Push (new VfsArchive (strPath));
   }
 
-  csFile *f = new csArchiveFile(mode, (const char *) 
-    ExtractFileName(FileName), ArchiveCache->Get(idx));
+  csFile *f = new csArchiveFile(mode, ExtractArchiveFileName(FileName), ArchiveCache->Get(idx));
   if (f->GetStatus () != VFS_STATUS_OK)
   {
     delete f;
@@ -476,11 +475,11 @@ bool csArchiveFileSystem::Delete(const char * FileName)
 {
   csString strPath = FileName;
 
-  VfsArchive *a = FindFile((const char *) strPath);
+  VfsArchive *a = FindFile(strPath);
 
   if (a)
   {
-    return a->DeleteFile((const char *) ExtractFileName(FileName));
+    return a->DeleteFile(ExtractArchiveFileName(FileName));
   }
 
   return false;
@@ -515,7 +514,7 @@ void csArchiveFileSystem::GetFilenames(const char *Path, const char *Mask,
 {
   csString strPath = Path;
 
-  size_t idx = ArchiveCache->FindKey((const char *) strPath);
+  size_t idx = ArchiveCache->FindKey(strPath);
   
   // archive not in cache?
   if (idx == (size_t)-1)
@@ -525,7 +524,7 @@ void csArchiveFileSystem::GetFilenames(const char *Path, const char *Mask,
       return;
 
     idx = ArchiveCache->Length ();
-    ArchiveCache->Push (new VfsArchive ((const char *) strPath));
+    ArchiveCache->Push (new VfsArchive (strPath));
   }
 
   VfsArchive *a = ArchiveCache->Get (idx);
@@ -556,13 +555,12 @@ bool csArchiveFileSystem::GetFileTime (const char *FileName,
                                        csFileTime &oTime) const
 {
   csString strPath = FileName;
-  VfsArchive *a = FindFile((const char *) strPath);
+  VfsArchive *a = FindFile(strPath);
  
   if (!a)
     return false;
 
-  void *e = a->FindName ((const char *) ExtractFileName((const char *) 
-    strPath));
+  void *e = a->FindName (ExtractArchiveFileName(strPath));
   if (!e)
       return false;
     
@@ -578,14 +576,13 @@ bool csArchiveFileSystem::SetFileTime (const char *FileName,
 {
   csString strPath = FileName;
 
-  VfsArchive *a = FindFile((const char *) strPath);
+  VfsArchive *a = FindFile(strPath);
  
   if (!a)
     return false;
 
   
-  void *e = a->FindName ((const char *) 
-    ExtractFileName((const char *) strPath));
+  void *e = a->FindName (ExtractArchiveFileName(strPath));
   if (!e)
       return false;
     
@@ -599,14 +596,13 @@ bool csArchiveFileSystem::SetFileTime (const char *FileName,
 bool csArchiveFileSystem::GetFileSize (const char *FileName, size_t &oSize)
 {
   csString strPath = FileName;
-  VfsArchive *a = FindFile((const char *) strPath);
+  VfsArchive *a = FindFile(strPath);
  
   if (!a)
     return false;
 
   
-  void *e = a->FindName ((const char *) 
-    ExtractFileName((const char *) strPath));
+  void *e = a->FindName (ExtractArchiveFileName(strPath));
   if (!e)
       return false;
     
@@ -621,6 +617,32 @@ bool csArchiveFileSystem::Sync ()
 {
   ArchiveCache->FlushAll ();
   return true;
+}
+
+csString csArchiveFileSystem::ExtractArchiveName(const char *path) const
+{
+  csString result = path;
+
+  static char path_sep [] = {CS_PATH_SEPARATOR, 0};
+
+  size_t period = result.Find(".");
+  size_t end = result.Find(path_sep, period);
+
+  result.Truncate(end);
+
+  return result;
+}
+
+csString csArchiveFileSystem::ExtractArchiveFileName(const char *path) const
+{
+  csString result = path;
+
+  static char path_sep [] = {CS_PATH_SEPARATOR, 0};
+
+  size_t period = result.Find(".");
+  size_t end = result.Find(path_sep, period);
+
+  return result.Slice(end + 1);
 }
 
 // ------------------------------------------------ VfsArchive------------ //
