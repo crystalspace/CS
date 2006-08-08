@@ -11,6 +11,9 @@ chronological order.
 	  in order to provide backwards compatibility.
 	- Jorrit renamed the type class in the old gmeshanim so that it no
 	  longer conflicts with the new gmeshanim in static builds.
+	- Jorrit fixed a problem in csEngineTools::FindScreenTarget(). If
+	  the maximum distance was very large it wouldn't work very well
+	  due to inaccuracy problems.
 7-Aug-2005
 	- res added ability to convert referenced libraries to genmeshify.
 	- Jorrit fixed a bug in the skeleton loader. It would return a
