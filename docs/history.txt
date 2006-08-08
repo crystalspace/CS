@@ -9,6 +9,8 @@ chronological order.
 8-Aug-2005
 	- res re-added support for triangle-based submeshes in genmesh objects 
 	  in order to provide backwards compatibility.
+	- Jorrit renamed the type class in the old gmeshanim so that it no
+	  longer conflicts with the new gmeshanim in static builds.
 7-Aug-2005
 	- res added ability to convert referenced libraries to genmeshify.
 	- Jorrit fixed a bug in the skeleton loader. It would return a
