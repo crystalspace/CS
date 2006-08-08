@@ -163,6 +163,15 @@ private:
   mutable SubMeshProxiesContainer subMeshes;
   mutable uint factorySubMeshesChangeNum;
   void UpdateSubMeshProxies () const;
+  struct LegacySubmesh
+  {
+    csRef<iRenderBuffer> indexbuffer;
+    csRef<iMaterialWrapper> material;
+    uint mixmode;
+    csRenderMeshHolder rmHolder;
+    csRef<csRenderBufferHolder> bufferHolder;
+  };
+  csArray<LegacySubmesh> legacySubmeshes;
 
   csUserRenderBufferManager userBuffers;
   csArray<csStringID> user_buffer_names;
@@ -276,6 +285,13 @@ public:
   void SetShadowReceiving (bool m) { do_shadow_rec = m; }
   bool IsShadowReceiving () const { return do_shadow_rec; }
   iGeneralMeshSubMesh* FindSubMesh (const char* name) const; 
+  void AddSubMesh (unsigned int *triangles, int tricount, 
+    iMaterialWrapper *material, uint mixmode);
+  void AddSubMesh (unsigned int *triangles, int tricount, 
+    iMaterialWrapper *material)
+  {
+    AddSubMesh (triangles, tricount, material, (uint)~0);
+  }
   /** @} */
 
   iVirtualClock* vc;

@@ -50,8 +50,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
     const char* name;
     csRef<iRenderBuffer> index_buffer;
     csRef<iMaterialWrapper> material;
-    //csRenderMeshHolder rmHolder;
-    //csRef<csRenderBufferHolder> bufferHolder;
 
     // Override mixmode from parent.
     uint MixMode;

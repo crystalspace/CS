@@ -128,6 +128,33 @@ csGenmeshMeshObject::~csGenmeshMeshObject ()
   ClearPseudoDynLights ();
 }
 
+void csGenmeshMeshObject::AddSubMesh (unsigned int *triangles,
+                                      int tricount,
+                                      iMaterialWrapper *material,
+				      uint mixmode)
+{
+  csRef<iRenderBuffer> index_buffer = 
+    csRenderBuffer::CreateIndexRenderBuffer (tricount*3,
+    CS_BUF_STATIC, CS_BUFCOMP_UNSIGNED_INT, 0, factory->GetVertexCount() - 1);
+  csTriangle *triangleData =
+    (csTriangle*)index_buffer->Lock(CS_BUF_LOCK_NORMAL);
+
+  for (int i=0; i<tricount; ++i)
+  {
+    triangleData[i] = factory->GetTriangles ()[triangles[i]];
+  }
+  index_buffer->Release ();
+
+  LegacySubmesh lms;
+  lms.indexbuffer = index_buffer;
+  lms.material = material;
+  lms.mixmode = mixmode;
+  lms.bufferHolder.AttachNew (new csRenderBufferHolder);
+  lms.bufferHolder->SetRenderBuffer (CS_BUFFER_INDEX,
+    index_buffer);
+  legacySubmeshes.Push (lms);
+}
+
 const csVector3* csGenmeshMeshObject::AnimControlGetVertices ()
 {
   return anim_ctrl->UpdateVertices (vc->GetCurrentTicks (),
@@ -968,7 +995,7 @@ csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (
   UpdateSubMeshProxies ();
   SubMeshProxiesContainer& sm = subMeshes;
 
-  if (sm.GetSize () == 0)
+  if ((sm.GetSize () == 0) && (legacySubmeshes.GetSize() == 0))
   {
     renderMeshes.SetLength (1);
 
@@ -1040,6 +1067,64 @@ csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (
     meshPtr->object2world = o2wt;
 
     renderMeshes[0] = meshPtr;
+  }
+  else if (legacySubmeshes.GetSize() != 0)
+  {
+    renderMeshes.SetLength (legacySubmeshes.GetSize ());
+
+    for (size_t i = 0; i<legacySubmeshes.GetSize (); ++i)
+    {
+      LegacySubmesh& subMesh = legacySubmeshes[i];
+      iMaterialWrapper* mater = subMesh.material;
+      if (!mater) mater = factory->GetMaterialWrapper ();
+      if (!mater)
+      {
+        csPrintf ("INTERNAL ERROR: mesh used without material!\n");
+        return 0;
+      }
+
+      if (mater->IsVisitRequired ()) mater->Visit ();
+
+      bool rmCreated;
+      csRenderMesh*& meshPtr = subMesh.rmHolder.GetUnusedMesh (rmCreated,
+        rview->GetCurrentFrameNumber ());
+
+      iRenderBuffer* index_buffer = subMesh.indexbuffer;
+      csRenderBufferHolder* smBufferHolder = subMesh.bufferHolder;
+
+      uint smMixMode = subMesh.mixmode;
+      meshPtr->mixmode = (smMixMode != (uint)~0) ? smMixMode : MixMode;
+      meshPtr->clip_portal = clip_portal;
+      meshPtr->clip_plane = clip_plane;
+      meshPtr->clip_z_plane = clip_z_plane;
+      meshPtr->do_mirror = camera->IsMirrored ();
+      meshPtr->meshtype = CS_MESHTYPE_TRIANGLES;
+      meshPtr->indexstart = 0;
+      meshPtr->indexend = (uint)index_buffer->GetElementCount();
+      meshPtr->material = mater;
+      CS_ASSERT (mater != 0);
+      meshPtr->worldspace_origin = wo;
+      meshPtr->variablecontext = svcontext;
+      meshPtr->object2world = o2wt;
+
+      smBufferHolder->SetAccessor (renderBufferAccessor, 
+        bufferHolder->GetAccessorMask() 
+        & (~CS_BUFFER_MAKE_MASKABLE (CS_BUFFER_INDEX)));
+
+      for (size_t b=0; b<CS_BUFFER_COUNT; ++b)
+      {
+        if (b != CS_BUFFER_INDEX)
+        {
+          smBufferHolder->SetRenderBuffer ((csRenderBufferName)b, 
+            bufferHolder->GetRenderBuffer ((csRenderBufferName)b));
+        }
+      }
+
+      meshPtr->buffers = smBufferHolder;
+      meshPtr->geometryInstance = (void*)factory;
+
+      renderMeshes[i] = meshPtr;
+    }
   }
   else
   {
