@@ -7,6 +7,14 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 9-Aug-2005
+	- Jorrit extended parallaxAtt with a technique at priority 130.
+	  This technique is exactly the same as priority 150 but it
+	  doesn't handle attenuation correctly. This is useful on
+	  intel graphics hardware where the 150 technique is not working
+	  properly.
+	- Jorrit added a new 'crappyintelgraphics' config to gldrivers.xml.
+	  This config will add a 'crappy_intel_graphics' tag so that
+	  the technique 150 of parallaxAtt can disable itself.
 	- caedes fixed a problem that would make the python tutorials fail.
 8-Aug-2005
 	- res re-added support for triangle-based submeshes in genmesh objects 
