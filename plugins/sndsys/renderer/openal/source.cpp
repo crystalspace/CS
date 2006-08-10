@@ -19,11 +19,17 @@
 #include "AL/al.h"
 
 #include "source.h"
+#include "listener.h"
+#include "renderer.h"
 
 #include "isndsys/ss_stream.h"
 #include "ivaria/reporter.h"
 
-SndSysSourceOpenAL2D::SndSysSourceOpenAL2D (csRef<iSndSysStream> stream, iSndSysRendererOpenAL *renderer) :
+/*
+ * 2D Sound source
+ */
+
+SndSysSourceOpenAL2D::SndSysSourceOpenAL2D (csRef<iSndSysStream> stream, csSndSysRendererOpenAL *renderer) :
   scfImplementationType(this),
   m_Gain (1.0), m_Stream (stream), m_Renderer (renderer), m_Update (true),
   m_CurrentBuffer (s_NumberOfBuffers-1), m_EmptyBuffer (0)
@@ -31,8 +37,8 @@ SndSysSourceOpenAL2D::SndSysSourceOpenAL2D (csRef<iSndSysStream> stream, iSndSys
   // Get an OpenAL source
   alGenSources( 1, &m_Source );
 
-  // Get the OpenAL buffers
-  // TODO: Make the number of buffers configurable.
+  // Allocate and get the OpenAL buffers
+  m_Buffers = new ALuint[s_NumberOfBuffers];
   alGenBuffers( s_NumberOfBuffers, m_Buffers );
 
   // Set some initial settings
@@ -63,7 +69,7 @@ SndSysSourceOpenAL2D::SndSysSourceOpenAL2D (csRef<iSndSysStream> stream, iSndSys
   m_Stream->InitializeSourcePositionMarker (&m_PositionMarker);
 
   // Perform an initial update
-  PerformUpdate();
+  //PerformUpdate();
 }
 
 SndSysSourceOpenAL2D::~SndSysSourceOpenAL2D ()
@@ -71,12 +77,45 @@ SndSysSourceOpenAL2D::~SndSysSourceOpenAL2D ()
   // Release out OpenAL resources
   alDeleteBuffers( s_NumberOfBuffers, m_Buffers );
   alDeleteSources( 1, &m_Source );
+
+  // Release the allocated buffers
+  delete[] m_Buffers;
 }
 
 /*
  * iSndSysSourceOpenAL interface
  */
-void SndSysSourceOpenAL2D::PerformUpdate ()
+
+/*
+ * iSndSysSource interface
+ */
+
+void SndSysSourceOpenAL2D::SetVolume (float volume)
+{
+  m_Gain = volume;
+  m_Update = true;
+}
+
+float SndSysSourceOpenAL2D::GetVolume ()
+{
+  return m_Gain;
+}
+
+csRef<iSndSysStream> SndSysSourceOpenAL2D::GetStream()
+{
+  return m_Stream;
+}
+
+iSndSysSource *SndSysSourceOpenAL2D::GetPtr()
+{
+  return this;
+}
+
+/*
+ * SndSysSourceOpenAL2D impementation
+ */
+
+void SndSysSourceOpenAL2D::PerformUpdate ( bool ExternalUpdates )
 {
   // Have we finished processing any buffers?
   ALint processedBuffers = 0;
@@ -138,40 +177,22 @@ void SndSysSourceOpenAL2D::PerformUpdate ()
     alSourcef (m_Source, AL_GAIN, m_Gain);
     m_Update = false;
   }
+
+  // Has anything external changed?
+  if (ExternalUpdates) {
+  }
 }
 
-/*
- * iSndSysSource interface
- */
-void SndSysSourceOpenAL2D::SetVolume (float volume)
-{
-  m_Gain = volume;
-  m_Update = true;
+void SndSysSourceOpenAL2D::Configure( csConfigAccess config ) {
+  s_NumberOfBuffers = config->GetInt("SndSys.OpenALBuffers", 4);
 }
+size_t SndSysSourceOpenAL2D::s_NumberOfBuffers = 4;
 
-float SndSysSourceOpenAL2D::GetVolume ()
-{
-  return m_Gain;
-}
-
-csRef<iSndSysStream> SndSysSourceOpenAL2D::GetStream()
-{
-  return m_Stream;
-}
-
-iSndSysSource *SndSysSourceOpenAL2D::GetPtr()
-{
-  return this;
-}
-
-/*
- * SndSysSourceOpenAL2D impementation
- */
 bool SndSysSourceOpenAL2D::FillBuffer (ALuint buffer) {
   // Advance the stream a bit
   m_Stream->AdvancePosition (16384);
 
-  // Get som data from the stream
+  // Get some data from the stream
   void *data1, *data2;
   size_t length1, length2;
   m_Stream->GetDataPointers (&m_PositionMarker, 16384, &data1, &length1, &data2, &length2);
@@ -210,4 +231,95 @@ bool SndSysSourceOpenAL2D::FillBuffer (ALuint buffer) {
     }
   }
   return true;
+}
+
+
+
+/*
+ * 3D Sound source
+ */
+
+SndSysSourceOpenAL3D::SndSysSourceOpenAL3D (csRef<iSndSysStream> stream, csSndSysRendererOpenAL *renderer) :
+  scfImplementationType(this, stream, renderer),
+  m_MinDistance (1), m_MaxDistance (65536), m_Update (true)
+{
+  // Setup initial parameters
+  m_Position.Set( 0, 0, 0 );
+
+  // Set the rolloff factor:
+  // TODO: Propagate changes
+  alSourcef (GetSource(), AL_ROLLOFF_FACTOR, renderer->GetListener()->GetRollOffFactor());
+}
+
+SndSysSourceOpenAL3D::~SndSysSourceOpenAL3D ()
+{
+}
+
+/*
+ * iSndSysSourceOpenAL interface
+ */
+
+void SndSysSourceOpenAL3D::SetPosition (csVector3 pos)
+{
+  m_Position.Set (pos);
+  m_Update = true;
+}
+
+csVector3 SndSysSourceOpenAL3D::GetPosition ()
+{
+  return m_Position;
+}
+
+void SndSysSourceOpenAL3D::SetMinimumDistance (float distance)
+{
+  if (distance < 0) {
+    distance = 0;
+  }
+
+  m_MinDistance = distance;
+  m_Update = true;
+}
+
+void SndSysSourceOpenAL3D::SetMaximumDistance (float distance)
+{
+  if (distance < 0) {
+    distance = 0;
+  }
+
+  m_MaxDistance = distance;
+  m_Update = true;
+}
+
+float SndSysSourceOpenAL3D::GetMinimumDistance ()
+{
+  return m_MinDistance;
+}
+
+float SndSysSourceOpenAL3D::GetMaximumDistance ()
+{
+  return m_MaxDistance;
+}
+
+/*
+ * SndSysSourceOpenAL3D impementation
+ */
+
+void SndSysSourceOpenAL3D::PerformUpdate ( bool ExternalUpdates )
+{
+  // Let SndSysSourceOpenAL2D tak care of buffers at it's attributes:
+  SndSysSourceOpenAL2D::PerformUpdate (ExternalUpdates);
+
+  // Do we need to update attributes?
+  if (m_Update)
+  {
+    alSourcef (GetSource(), AL_REFERENCE_DISTANCE, m_MinDistance);
+    alSourcef (GetSource(), AL_MAX_DISTANCE, m_MaxDistance);
+    alSource3f (GetSource(), AL_POSITION, m_Position[0], m_Position[1], m_Position[2]);
+    m_Update = false;
+  }
+
+  // Has anything external changed?
+  if (ExternalUpdates) {
+    alSourcef (GetSource(), AL_ROLLOFF_FACTOR, GetRenderer()->GetListener()->GetRollOffFactor());
+  }
 }

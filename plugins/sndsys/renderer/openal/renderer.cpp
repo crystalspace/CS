@@ -123,6 +123,9 @@ bool csSndSysRendererOpenAL::Initialize (iObjectRegistry *obj_reg)
     }
   }
 
+  // Configure sound sources
+  SndSysSourceOpenAL2D::Configure( m_Config );
+
   // Register for event callbacks.
   csRef<iEventQueue> q (CS_QUERY_REGISTRY(m_ObjectRegistry, iEventQueue));
   evSystemOpen = csevSystemOpen(m_ObjectRegistry);
@@ -188,14 +191,17 @@ csPtr<iSndSysStream> csSndSysRendererOpenAL::CreateStream(iSndSysData* data,
   // Add it the our list of streams:
   m_Streams.Push (stream);
 
-  // TODO: Callback notification
+  // Notify any callbacks
+  size_t iMax = m_Callback.GetSize();
+  for (size_t i=0;i<iMax;i++)
+    m_Callback[i]->StreamAddNotification (stream);
 
   return stream;
 }
 
 csPtr<iSndSysSource> csSndSysRendererOpenAL::CreateSource(iSndSysStream* stream)
 {
-  iSndSysSourceOpenAL *source = 0;
+  SndSysSourceOpenAL2D *source = 0;
 
   // Get a lock on the context
   ScopedRendererLock lock (*this);
@@ -204,13 +210,15 @@ csPtr<iSndSysSource> csSndSysRendererOpenAL::CreateSource(iSndSysStream* stream)
   if (stream->Get3dMode() == CS_SND3D_DISABLE)
     source = new SndSysSourceOpenAL2D( stream, this );
   else
-    // TODO: Create a proper 3D source
-    source = new SndSysSourceOpenAL2D( stream, this );
+    source = new SndSysSourceOpenAL3D( stream, this );
 
   // Add it the our list of sources:
   m_Sources.Push (source);
 
-  // TODO: Callback notification
+  // Notify any callbacks
+  size_t iMax = m_Callback.GetSize();
+  for (size_t i=0;i<iMax;i++)
+    m_Callback[i]->SourceAddNotification (dynamic_cast<iSndSysSource*>(source));
 
   return scfQueryInterface<iSndSysSource>( source );
 }
@@ -220,7 +228,10 @@ bool csSndSysRendererOpenAL::RemoveStream(iSndSysStream* stream)
   // I have got to be overlooking something here.
    m_Streams.Delete (stream);
 
-  // TODO: Callback notification
+  // Notify any callbacks
+  size_t iMax = m_Callback.GetSize();
+  for (size_t i=0;i<iMax;i++)
+    m_Callback[i]->StreamRemoveNotification (stream);
 
   return true;
 }
@@ -231,9 +242,12 @@ bool csSndSysRendererOpenAL::RemoveSource(iSndSysSource* source)
   ScopedRendererLock lock (*this);
 
   // I have got to be overlooking something here.
-  m_Sources.Delete (dynamic_cast<iSndSysSourceOpenAL*> (source));
+  m_Sources.Delete (dynamic_cast<SndSysSourceOpenAL2D*> (source));
 
-  // TODO: Callback notification
+  // Notify any callbacks
+  size_t iMax = m_Callback.GetSize();
+  for (size_t i=0;i<iMax;i++)
+    m_Callback[i]->SourceRemoveNotification (source);
 
   return true;
 }
@@ -245,12 +259,15 @@ csRef<iSndSysListener> csSndSysRendererOpenAL::GetListener ()
 
 bool csSndSysRendererOpenAL::RegisterCallback(iSndSysRendererCallback *pCallback)
 {
-  // TODO: Callback notification
+  // Add the callback to the callback list
+  m_Callback.Push( pCallback );
+  return true;
 }
 
 bool csSndSysRendererOpenAL::UnregisterCallback(iSndSysRendererCallback *pCallback)
 {
-  // TODO: Callback notification
+  // Attempt to remove the callback from the callback list
+  return m_Callback.Delete( pCallback );
 }
 
 /*
@@ -285,8 +302,7 @@ void csSndSysRendererOpenAL::Report(int severity, const char* msg, ...)
 
   // Send notification to the reporter
   va_start (arg, msg);
-  csReportV (m_ObjectRegistry, severity,
-    "crystalspace.sndsys.renderer.openal", msg, arg);
+  csReportV (m_ObjectRegistry, severity, "crystalspace.sndsys.renderer.openal", msg, arg);
   va_end (arg);
 }
 
@@ -301,12 +317,12 @@ void csSndSysRendererOpenAL::Update()
   //alcProcessContext (m_Context);
 
   // Update the listeners state.
-  m_Listener->Update();
+  bool ExternalUpdates = m_Listener->Update();
 
   // Update the sources
   size_t iMax = m_Sources.GetSize();
   for (size_t i=0;i<iMax;i++)
-    m_Sources[i]->PerformUpdate();
+    m_Sources[i]->PerformUpdate( ExternalUpdates );
 
   // Check for any errors
   ALCenum err = alcGetError (m_Device);

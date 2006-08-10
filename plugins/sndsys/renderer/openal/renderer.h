@@ -19,6 +19,8 @@
 #ifndef SNDSYS_RENDERER_OPENAL_RENDERER_H
 #define SNDSYS_RENDERER_OPENAL_RENDERER_H
 
+#include "AL/alc.h"
+
 #include "cssysdef.h"
 
 #include "csutil/cfgacc.h"
@@ -99,7 +101,7 @@ public:
   /** Requests the use of the renderers OpenAL context.
    *
    * @note Should only be used internally by the OpenAL renderer.
-   * @note Should be matched by a call to ReleaseContext.
+   * @note Should be matched by a call to Release.
    */
   virtual bool LockWait();
 
@@ -139,7 +141,7 @@ private:
   /// Array of attached streams
   csRefArray<iSndSysStream> m_Streams;
   /// Array of attached sources
-  csRefArray<iSndSysSourceOpenAL> m_Sources;
+  csRefArray<SndSysSourceOpenAL2D> m_Sources;
   /// Array of attached callbacks
   csRefArray<iSndSysRendererCallback> m_Callback;
 

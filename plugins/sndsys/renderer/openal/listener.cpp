@@ -22,9 +22,9 @@
 
 SndSysListenerOpenAL::SndSysListenerOpenAL () :
   scfImplementationType(this),
-  Front (csVector3 (0, 0, -1)), Top (csVector3 (0, 1, 0)),
-  Position (csVector3 (0, 0, 0)), Distance (1.0), RollOff (-1.0),
-  Volume (1.0), update (true)
+  m_Front (csVector3 (0, 0, -1)), m_Top (csVector3 (0, 1, 0)),
+  m_Position (csVector3 (0, 0, 0)), m_Distance (1.0), m_RollOff (1.0),
+  m_Volume (1.0), m_Update (true), m_ExternalUpdate (true)
 {
   alListener3f( AL_VELOCITY, 0, 0, 0 );
   Update ();
@@ -39,70 +39,78 @@ SndSysListenerOpenAL::~SndSysListenerOpenAL ()
   */
 void SndSysListenerOpenAL::SetDirection (const csVector3 &Front, const csVector3 &Top)
 {
-  this->Front = Front; this->Top = Top;
-  update = true;
+  m_Front = Front;
+  m_Top = Top;
+  m_Update = true;
 }
 
 void SndSysListenerOpenAL::SetPosition (const csVector3 &pos)
 {
-  Position = pos;
-  update = true;
+  m_Position = pos;
+  m_Update = true;
 }
 
 void SndSysListenerOpenAL::SetDistanceFactor (float factor)
 {
-  Distance = factor;
-  update = true;
+  m_Distance = factor;
+  m_ExternalUpdate = true;
 }
 
 void SndSysListenerOpenAL::SetRollOffFactor (float factor)
 {
-  RollOff = factor;
-  update = true;
+  m_RollOff = factor;
+  m_ExternalUpdate = true;
 }
 
 void SndSysListenerOpenAL::GetDirection (csVector3 &Front, csVector3 &Top)
 {
-  Front = this->Front; Top = this->Top;
+  Front = m_Front;
+  Top = m_Top;
 }
 
 const csVector3 &SndSysListenerOpenAL::GetPosition ()
 {
-  return this->Position;
+  return m_Position;
 }
 
 float SndSysListenerOpenAL::GetDistanceFactor ()
 {
-  return this->Distance;
+  return m_Distance;
 }
 
 float SndSysListenerOpenAL::GetRollOffFactor ()
 {
-  return this->RollOff;
+  return m_RollOff;
 }
 
 /*
-  * SndSysListenerOpenAL implementation
-  */
-float SndSysListenerOpenAL::SetVolume (float vol)
+ * SndSysListenerOpenAL implementation
+ */
+void SndSysListenerOpenAL::SetVolume (float vol)
 {
-  Volume = vol;
-  update = true;
+  m_Volume = vol;
+  m_Update = true;
 }
 
 float SndSysListenerOpenAL::GetVolume ()
 {
-  return Volume;
+  return m_Volume;
 }
 
-void SndSysListenerOpenAL::Update ()
+bool SndSysListenerOpenAL::Update ()
 {
-  if (update == true)
+  if (m_Update == true)
   {
-    update = false;
-    alListener3f (AL_POSITION, Position.x, Position.y, Position.z);
-    alListenerf (AL_GAIN, Volume);
-    float orientation[] = { Front.x, Front.y, Front.z, Top.x, Top.y, Top.z };
+    m_Update = false;
+    alListener3f (AL_POSITION, m_Position.x, m_Position.y, m_Position.z);
+    alListenerf (AL_GAIN, m_Volume);
+    float orientation[] = { m_Front.x, m_Front.y, m_Front.z, m_Top.x, m_Top.y, m_Top.z };
     alListenerfv (AL_ORIENTATION, orientation);
   }
+  if (m_ExternalUpdate == true)
+  {
+    m_ExternalUpdate = false;
+    return true;
+  }
+  return false;
 }

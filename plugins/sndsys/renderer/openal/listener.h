@@ -60,18 +60,32 @@ public:
    */
 public:
   /// Set the listener volume
-  float SetVolume (float vol);
+  void SetVolume (float vol);
   /// Get the listener volume
   float GetVolume ();
-  /// Perform any pending updates
-  void Update ();
+  /**
+   * Perform any pending updates
+   * @return true if some changes need to be propagates, false otherwise.
+   */
+  bool Update ();
 
 private:
-  csVector3 Front, Top;
-  csVector3 Position;
-  float Distance, RollOff;
-  float Volume;
-  bool update;
+  /// Direction vectors
+  csVector3 m_Front, m_Top;
+  /// Position of the listener
+  csVector3 m_Position;
+  /// Current distance and rolloff factoes
+  float m_Distance, m_RollOff;
+  /// Current volume setting
+  float m_Volume;
+  /// Flag indicating that updates are pending.
+  bool m_Update;
+  /// Flag indicating that updates are pending that need propagation.
+  bool m_ExternalUpdate;
+
+  /// The renderer this listener is attached to
+  //iSndSysRendererOpenAL *m_Renderer;
+
 };
 
 #endif // #ifndef SNDSYS_RENDERER_OPENAL_LISTENER_H

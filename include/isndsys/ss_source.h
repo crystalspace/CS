@@ -110,19 +110,6 @@ struct iSndSysSourceOpenAL : public virtual iBase
 {
   /// SCF2006 - See http://www.crystalspace3d.org/cseps/csep-0010.html
   SCF_INTERFACE(iSndSysSourceOpenAL,1,0,0);
-
-  /**
-   * Function to update the source, ie. perform any pending operations, and
-   * possibly refill any pending buffers.
-   *
-   * @note Should only be called from the OpenAL renderer.
-   * @note It is expected that the renderer has set the correct OpenAL context
-   *       before calling the method.
-   * @note DO NOT attempt to lock the renderer in this function, this has
-   *       already been done for you.
-   */
-  virtual void PerformUpdate() = 0;
-
 };
 
 /**

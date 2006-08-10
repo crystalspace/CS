@@ -21,13 +21,14 @@
 
 #include "cssysdef.h"
 
+#include "csutil/cfgacc.h"
 #include "csutil/scf_implementation.h"
 
 #include "AL/al.h"
 
 #include "isndsys/ss_source.h"
 
-class iSndSysRendererOpenAL;
+class csSndSysRendererOpenAL;
 
 class SndSysSourceOpenAL2D :
   public scfImplementation2<SndSysSourceOpenAL2D,
@@ -35,21 +36,12 @@ class SndSysSourceOpenAL2D :
                             iSndSysSourceOpenAL >
 {
 public:
-  SndSysSourceOpenAL2D (csRef<iSndSysStream> stream, iSndSysRendererOpenAL *renderer);
+  SndSysSourceOpenAL2D (csRef<iSndSysStream> stream, csSndSysRendererOpenAL *renderer);
   virtual ~SndSysSourceOpenAL2D ();
 
   /*
    * iSndSysSourceOpenAL interface
    */
-  /**
-   * Function to update the source, ie. perform any pending operations, and
-   * possibly refill any pending buffers.
-   *
-   * @note Should only be called from the OpenAL renderer.
-   * @note It is expected that the renderer has set the correct OpenAL context
-   *       before calling the method.
-   */
-  virtual void PerformUpdate ();
 
   /*
    * iSndSysSource interface
@@ -69,23 +61,47 @@ public:
   /*
    * SndSysSourceOpenAL2D impementation
    */
+public:
+  /**
+   * Function to update the source, ie. perform any pending operations, and
+   * possibly refill any pending buffers.
+   *
+   * @param ExternalUpdates Set if there are external updates that the source
+   *                        must know about. 
+   * @note Should only be called from the OpenAL renderer.
+   * @note It is expected that the renderer has set the correct OpenAL context
+   *       before calling the method.
+   */
+  virtual void PerformUpdate ( bool ExternalUpdates );
+
+  /**
+   * Function to configure user settings
+   */
+  static void Configure( csConfigAccess config );
+
+protected:
+  /// Retrieve the OpenAL source identifier for this source
+  inline ALuint GetSource() { return m_Source; };
+  /// Retrieve the OpenAL source identifier for this source
+  inline csSndSysRendererOpenAL *GetRenderer() { return m_Renderer; };
+
 private:
   /// Current gain (aka. volume) of the source
   float m_Gain;
   /// The stream attached to this source
   csRef<iSndSysStream> m_Stream;
   /// The renderer this source is attached to
-  iSndSysRendererOpenAL *m_Renderer;
+  csSndSysRendererOpenAL *m_Renderer;
   /// Do we need to tell OpenAL about changes to this source
   bool m_Update;
 
   /// The number of OpenAL buffers to maintain.
-  static const size_t s_NumberOfBuffers = 4;
+  static size_t s_NumberOfBuffers;
 
   /// The OpenAL source
   ALuint m_Source;
   /// The OpenAL buffers
-  ALuint m_Buffers[s_NumberOfBuffers];
+  ALuint *m_Buffers;
   /// The index of the last empty buffer, ie. the currently playing one.
   size_t m_CurrentBuffer;
   /// The index of the first empty buffer.
@@ -107,51 +123,26 @@ private:
 
 
 class SndSysSourceOpenAL3D :
-  public scfImplementation3<SndSysSourceOpenAL3D,
-                            iSndSysSource,
-                            iSndSysSourceOpenAL,
-                            iSndSysSource3D >
+  public scfImplementationExt1<SndSysSourceOpenAL3D,
+                               SndSysSourceOpenAL2D,
+                               iSndSysSource3D >
 {
 public:
-  SndSysSourceOpenAL3D (csRef<iSndSysStream> stream, iSndSysRendererOpenAL *renderer);
+  SndSysSourceOpenAL3D (csRef<iSndSysStream> stream, csSndSysRendererOpenAL *renderer);
   virtual ~SndSysSourceOpenAL3D ();
 
   /*
    * iSndSysSourceOpenAL interface
    */
-  /**
-   * Function to update the source, ie. perform any pending operations, and
-   * possibly refill any pending buffers.
-   *
-   * @note Should only be called from the OpenAL renderer.
-   * @note It is expected that the renderer has set the correct OpenAL context
-   *       before calling the method.
-   */
-  virtual void PerformUpdate () = 0;
-
-  /*
-   * iSndSysSource interface
-   */
-public:
-  /// Set volume (range 0.0 = silence 1.0 = as provided 2.0 = twice as loud)
-  virtual void SetVolume (float volume) = 0;
-  /// Get volume (range 0.0 = silence 1.0 = as provided 2.0 = twice as loud)
-  virtual float GetVolume () = 0;
-
-  /// Retrieve the iSoundStream attached to this source
-  virtual csRef<iSndSysStream> GetStream() = 0;
-
-  /// Retrieve a direct pointer to this object
-  virtual iSndSysSource *GetPtr();
 
   /*
    * iSndSysSource3D interface
    */
 public:
   /// set position of this source
-  virtual void SetPosition(csVector3 pos) = 0;
+  virtual void SetPosition(csVector3 pos);
   /// get position of this source
-  virtual csVector3 GetPosition() = 0;
+  virtual csVector3 GetPosition();
 
   /**
    * Set the greatest distance from a sound at which the sound plays at full
@@ -161,26 +152,50 @@ public:
    * When a listener is further than this distance, the amplitude follows the
    * formula V = (volume * ((distance/minimum_distance) ^ rolloff_factor))
    */
-  virtual void SetMinimumDistance (float distance) = 0;
+  virtual void SetMinimumDistance (float distance);
 
   /**
    * Set the greatest distance from a sound at which the sound can be heard.
    * If the distance to a listener is above this threshold, it will not be
    * mixed into the output buffer at all.  This saves a tiny bit of processing.
    */
-  virtual void SetMaximumDistance (float distance) = 0;
+  virtual void SetMaximumDistance (float distance);
 
   /**
    * Retrieve the maximum distance for which a sound is heard at full volume.
    * See SetMaximumDistance and SetMinimumDistance for distance notes.
    */
-  virtual float GetMinimumDistance () = 0;
+  virtual float GetMinimumDistance ();
 
   /**
    * Retrieve the maximum distance for which a sound can be heard.  See
    * SetMaximumDistance and SetMinimumDistance for distance notes.
    */
-  virtual float GetMaximumDistance () = 0;
+  virtual float GetMaximumDistance ();
+
+  /*
+   * SndSysSourceOpenAL3D impementation
+   */
+public:
+  /**
+   * Function to update the source, ie. perform any pending operations, and
+   * possibly refill any pending buffers.
+   *
+   * @param ExternalUpdates Set if there are external updates that the source
+   *                        must know about. 
+   * @note Should only be called from the OpenAL renderer.
+   * @note It is expected that the renderer has set the correct OpenAL context
+   *       before calling the method.
+   */
+  virtual void PerformUpdate ( bool ExternalUpdates );
+
+private:
+  /// Current position of the source
+  csVector3 m_Position;
+  /// Current minimum and maximum distances for the source
+  float m_MinDistance, m_MaxDistance;
+  /// Do we need to tell OpenAL about changes to this source
+  bool m_Update;
 };
 
 #endif // #ifndef SNDSYS_RENDERER_OPENAL_SOURCE_H
