@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<params>
+  <name>std_rloop_fattest</name>
+  <steps>
+    <step plugin="crystalspace.renderloop.step.fatloop">
+      <pass>
+	<shadertype>ambient</shadertype>
+	<maxlights>0</maxlights>
+	<basepass />
+	<maxpasses>1</maxpasses>
+	<defaultshader name="ambient" file="ambient.xml" />
+	<zoffset>yes</zoffset>
+      </pass>
+      <pass>
+	<shadertype>diffuse_bump</shadertype>
+	<defaultshader name="light_bumpmap" file="light_bumpmap2.xml" />
+	<maxpasses>1</maxpasses>
+      </pass>
+      <pass>
+	<shadertype>diffuse</shadertype>
+	<defaultshader name="light" file="light2.xml" />
+      </pass>
+    </step>
+  </steps>
+</params>

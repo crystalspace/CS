@@ -1,0 +1,60 @@
+<shader compiler="xmlshader" name="light">
+  <technique priority="200" lights="1">
+    <pass>
+      <writemask r="false" g="false" b="false" a="true" />
+      <mixmode><copy /></mixmode>
+      <zmode><ztest /></zmode>
+      <vp plugin="glarb" file="/shader/flat_ppl_attenuation2.avp" />
+      <texture destination="unit 0" name="light 0 attenuationtex" />
+      <texture destination="unit 1" name="light 0 attenuationtex" />
+      <fp plugin="glfixed">
+        <fixedfp>
+          <layer>
+            <alphasource num="0" source="texture" modifier="alpha" />
+            <alphaoperation operation="replace" />
+          </layer>
+          <layer>
+            <alphasource num="0" source="texture" modifier="alpha" />
+            <alphasource num="1" source="previous layer" modifier="alpha" />
+            <alphaoperation operation="modulate" scale="2" />
+          </layer>
+        </fixedfp>
+      </fp>
+    </pass>
+    <pass>
+      <mixmode>
+        <destalphaadd />
+      </mixmode>
+      <zmode><ztest /></zmode>
+      <buffer source="normal" destination="normal" />
+      <vp plugin="glarb" file="/shader/flat_ppl_diffuse.avp" />
+      <texture destination="unit 0" name="standardtex normalization map" />
+      <texture destination="unit 1" name="standardtex normalization map" />
+      <texture destination="unit 2" name="tex diffuse" />
+      <texture destination="unit 3" name="tex diffuse" />
+      <fp plugin="glfixed">
+        <fixedfp>
+          <layer>
+            <colorsource num="0" source="texture" modifier="color" />
+            <coloroperation operation="replace" />
+          </layer>
+          <layer>
+            <colorsource num="0" source="previous layer" modifier="color" />
+            <colorsource num="1" source="texture" modifier="color" />
+            <coloroperation operation="dot3" />
+          </layer>
+          <layer>
+            <colorsource num="0" source="previous layer" modifier="color" />
+            <colorsource num="1" source="texture" modifier="color" />
+            <coloroperation operation="modulate" />
+          </layer>
+          <layer>
+            <colorsource num="0" source="previous layer" modifier="color" />
+            <colorsource num="1" source="primary color" modifier="color" />
+            <coloroperation operation="modulate" />
+          </layer>
+        </fixedfp>
+      </fp>
+    </pass>
+  </technique>
+</shader>
