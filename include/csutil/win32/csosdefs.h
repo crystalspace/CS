@@ -345,7 +345,8 @@ static inline longlong strtoll(char const* s, char** sN, int base)
 #endif
 
 #define CS_PROVIDES_EXPAND_PATH 1
-inline void csPlatformExpandPath(const char* path, char* buffer, int nbuf) {}
+inline void csPlatformExpandPath(const char* /*path*/, char* /*buffer*/,
+  int /*nbuf*/) {}
 
 // Although CS_COMPILER_GCC has opendir(), readdir(), etc., we prefer the CS
 // versions of these functions.
