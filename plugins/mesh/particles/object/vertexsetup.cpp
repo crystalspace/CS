@@ -341,12 +341,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
   class BaseVertexSetup : public iVertexSetup
   {
   public:
-    CS_FORCEINLINE
+    CS_FORCEINLINE_TEMPLATEMETHOD
     BaseVertexSetup (const ParticleDirT& pd, const ParticleSizeT& ps)
       : partDir (pd), partSize (ps)
     {}
 
-    CS_FORCEINLINE
+    CS_FORCEINLINE_TEMPLATEMETHOD
     virtual void Init (const csReversibleTransform& o2c, const csVector3& commonDir,
       const csVector2& particleSize)
     {
@@ -354,7 +354,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
       partSize.Init (particleSize);
     }
 
-    CS_FORCEINLINE
+    CS_FORCEINLINE_TEMPLATEMETHOD
     void Update (const csParticle& particle, const csParticleAux& aux)
     {
       partDir.Update (particle);
@@ -372,12 +372,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
   class UnrotatedVertexSetup : public BaseVertexSetup<ParticleDirT, ParticleSizeT>
   {
   public:
-    CS_FORCEINLINE
+    CS_FORCEINLINE_TEMPLATEMETHOD
     UnrotatedVertexSetup (const ParticleDirT& pd, const ParticleSizeT& ps)
       : BaseVertexSetup<ParticleDirT, ParticleSizeT> (pd, ps)
     {}
 
-    CS_FORCEINLINE
+    CS_FORCEINLINE_TEMPLATEMETHOD
     void SetupVertices (const csParticleBuffer particleBuffer,
       csVector3* vertexBuffer)
     {
@@ -408,12 +408,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
   class RotatedVertexSetup : public BaseVertexSetup<ParticleDirT, ParticleSizeT>
   {
   public:
-    CS_FORCEINLINE
+    CS_FORCEINLINE_TEMPLATEMETHOD
     RotatedVertexSetup (const ParticleDirT& pd, const ParticleSizeT& ps)
       : BaseVertexSetup<ParticleDirT, ParticleSizeT> (pd, ps)
     {}
 
-    CS_FORCEINLINE
+    CS_FORCEINLINE_TEMPLATEMETHOD
     void SetupVertices (const csParticleBuffer particleBuffer,
       csVector3* vertexBuffer)
     {
