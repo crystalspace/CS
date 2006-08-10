@@ -534,6 +534,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ParticlesLoader)
       effector = forceEffector;
       forceEffector->SetAcceleration (acceleration);
       forceEffector->SetForce (force);
+      forceEffector->SetRandomAcceleration (randomAcc);
     }
     else if (!strcasecmp (effectorType, "lincolor"))
     {

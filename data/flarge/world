@@ -23675,7 +23675,7 @@
         </emitter>
         <effector type="force">
           <randomacceleration>0.2</randomacceleration>
-        </effector
+        </effector>
         <minbb>
             <min x="-43" y="11" z="-10" />
             <max x="-3" y="11" z="5" />
