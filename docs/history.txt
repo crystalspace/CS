@@ -16,6 +16,7 @@ chronological order.
 	  This config will add a 'crappy_intel_graphics' tag so that
 	  the technique 150 of parallaxAtt can disable itself.
 	- caedes fixed a problem that would make the python tutorials fail.
+	- mdmkolbe cleaned up miscellaneous warnings.
 8-Aug-2005
 	- res re-added support for triangle-based submeshes in genmesh objects 
 	  in order to provide backwards compatibility.
