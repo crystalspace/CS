@@ -104,13 +104,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
       for (size_t i = 0; i < emitters.GetSize (); ++i)
       {
         csRef<iParticleEmitter> copy = emitters[i]->Clone ();
-        mesh->emitters.Push (copy);
+        if (copy)
+          mesh->emitters.Push (copy);
       }
 
       for (size_t i = 0; i < effectors.GetSize (); ++i)
       {
         csRef<iParticleEffector> copy = effectors[i]->Clone ();
-        mesh->effectors.Push (copy);
+        if (copy)
+          mesh->effectors.Push (copy);
       }
     }
     else
@@ -145,13 +147,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
       for (size_t i = 0; i < emitters.GetSize (); ++i)
       {
         csRef<iParticleEmitter> copy = emitters[i]->Clone ();
-        newFact->emitters.Push (copy);
+        if (copy)
+          newFact->emitters.Push (copy);
       }
 
       for (size_t i = 0; i < effectors.GetSize (); ++i)
       {
         csRef<iParticleEffector> copy = effectors[i]->Clone ();
-        newFact->effectors.Push (copy);
+        if (copy)
+          newFact->effectors.Push (copy);
       }
     }
     else
@@ -563,10 +567,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
       {
         //retire particle
         particleBuffer.particleAuxData[currentParticleIdx] = 
-          particleBuffer.particleAuxData[particleBuffer.particleCount];
+          particleBuffer.particleAuxData[--particleBuffer.particleCount];
 
         currentParticle = 
-          particleBuffer.particleData[--particleBuffer.particleCount];
+          particleBuffer.particleData[particleBuffer.particleCount];
         continue;
       }
 
