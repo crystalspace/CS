@@ -201,12 +201,8 @@ public:
  * This class manages all components which comprise a 3D world including
  * sectors, polygons, curves, mesh objects, etc.
  */
-class csEngine : public scfImplementationExt4<csEngine,
-                                              csObject,
-                                              iEngine,
-                                              iComponent,
-                                              iPluginConfig,
-                                              iDebugHelper>
+class csEngine : public scfImplementationExt5<csEngine, csObject,
+  iEngine, iComponent, iPluginConfig, iDebugHelper, iEventHandler>
 {
   // friends
   friend class csLight;
@@ -572,28 +568,11 @@ public:
   virtual bool SetOption (int id, csVariant* value);
   virtual bool GetOption (int id, csVariant* value);
 
+  // -- iEventHandler
   bool HandleEvent (iEvent &Event);
 
-  // -- iEventHandler
-  struct eiEventHandler : public scfImplementation1<
-  	eiEventHandler,iEventHandler>
-  {
-    csWeakRef<csEngine> parent;
-    eiEventHandler (csEngine* parent) : scfImplementationType (this)
-    {
-      eiEventHandler::parent = parent;
-    }
-    virtual ~eiEventHandler ()
-    {
-    }
-    virtual bool HandleEvent (iEvent& ev)
-    {
-      if (parent) return parent->HandleEvent (ev);
-      else return false;
-    }
-    CS_EVENTHANDLER_NAMES("crystalspace.engine.3d")
-    CS_EVENTHANDLER_NIL_CONSTRAINTS
-  } * scfiEventHandler;
+  CS_EVENTHANDLER_NAMES("crystalspace.engine.3d")
+  CS_EVENTHANDLER_NIL_CONSTRAINTS
 
   // -- iDebugHelper
   
@@ -996,6 +975,7 @@ private:
   CS_DECLARE_SYSTEM_EVENT_SHORTCUTS;
   csEventID CanvasResize;
   csEventID CanvasClose;
+  csRef<iEventHandler> weakEventHandler;
 };
 
 #endif // __CS_ENGINE_H__

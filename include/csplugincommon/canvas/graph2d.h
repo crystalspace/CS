@@ -60,13 +60,9 @@ class csFontCache;
  * slow since they are too general.
  */
 class CS_CRYSTALSPACE_EXPORT csGraphics2D : 
-  public scfImplementation6<csGraphics2D, 
-			    iGraphics2D,
-			    iComponent,
-			    iNativeWindow,
-			    iNativeWindowManager,
-			    iPluginConfig,
-			    iDebugHelper>
+  public scfImplementation7<csGraphics2D, 
+    iGraphics2D, iComponent, iNativeWindow, iNativeWindowManager,
+    iPluginConfig, iDebugHelper, iEventHandler>
 {
 public:
   /// The configuration file.
@@ -149,6 +145,8 @@ protected:
   void CreateDefaultFontCache ();
 
   csString name;
+  csRef<iEventHandler> weakEventHandler;
+
 private:
   /// Find a color in palette mode.
   int FindRGBPalette (int r, int g, int b);
@@ -392,17 +390,8 @@ public:
                                csRGBcolor fg = csRGBcolor(255,255,255),
                                csRGBcolor bg = csRGBcolor(0,0,0));
 
-  struct EventHandler : public scfImplementation1<EventHandler, iEventHandler>
-  {
-  private:
-    csGraphics2D* parent;
-  public:
-    EventHandler (csGraphics2D* parent) : scfImplementationType (this), 
-      parent(parent) {}
-    virtual bool HandleEvent (iEvent& e) { return parent->HandleEvent(e); }
-    CS_EVENTHANDLER_NAMES("crystalspace.graphics2d.common")
-    CS_EVENTHANDLER_NIL_CONSTRAINTS
-  } * scfiEventHandler;
+  CS_EVENTHANDLER_NAMES("crystalspace.graphics2d.common")
+  CS_EVENTHANDLER_NIL_CONSTRAINTS
 
 protected:
   /**

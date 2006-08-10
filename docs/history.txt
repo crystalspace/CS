@@ -17,6 +17,11 @@ chronological order.
 	  the technique 150 of parallaxAtt can disable itself.
 	- caedes fixed a problem that would make the python tutorials fail.
 	- mdmkolbe cleaned up miscellaneous warnings.
+	- mdmkolbe added RegisterWeakListener and RemoveWeakListener to
+	  handle registration and removal of event handlers that should
+	  be proxied through a weak reference.
+	- mdmkolbe converted libs/csplugincommon/canvas/graph2d.cpp and
+	  plugins/engine/3d/engine.cpp to use RegisterWeakListener.
 8-Aug-2005
 	- res re-added support for triangle-based submeshes in genmesh objects 
 	  in order to provide backwards compatibility.

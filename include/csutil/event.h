@@ -24,6 +24,7 @@
 
 #include "csextern.h"
 #include "iutil/event.h"
+#include "iutil/eventhandlers.h"
 
 /**\file
  * Event system related helpers
@@ -236,6 +237,28 @@ public:
 };
 
 /** @} */
+
+struct iEventQueue;
+struct iObjectRegistry;
+
+/**
+ * Helper function for registering an event handler using a weak reference.
+ * Use RemoveWeakListener() to remove an event handler registered with this
+ * function.
+ */
+csHandlerID RegisterWeakListener (iEventQueue *q, iEventHandler *listener,
+  csRef<iEventHandler> &handler);
+csHandlerID RegisterWeakListener (iEventQueue *q, iEventHandler *listener,
+  const csEventID &ename, csRef<iEventHandler> &handler);
+csHandlerID RegisterWeakListener (iEventQueue *q, iEventHandler *listener,
+  const csEventID ename[], csRef<iEventHandler> &handler);
+
+/**
+ * Helper function for removing an event handler that was registered with
+ * RegisterWeakListener().
+ */
+void RemoveWeakListener (iEventQueue *q, iObjectRegistry *r,
+  csRef<iEventHandler> &handler);
  
 /** @} */
 
