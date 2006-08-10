@@ -40,7 +40,7 @@
  */
 struct iCommandLineParser : public virtual iBase
 {
-  SCF_INTERFACE(iCommandLineParser, 2,0,0);
+  SCF_INTERFACE(iCommandLineParser, 2,0,1);
   /**
    * Initialize for the given command line.  Options from command line are
    * added to any options already present --- i.e. those added via AddName()
@@ -97,6 +97,9 @@ struct iCommandLineParser : public virtual iBase
    * Returns the full path to the application executable.
    */
   virtual const char* GetAppPath () = 0;
+
+  /// Query the name of the Nth command line option
+  virtual const char* GetOptionName (size_t iIndex) const = 0;
 };
 
 /** @} */

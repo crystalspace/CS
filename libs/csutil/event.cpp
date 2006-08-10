@@ -346,7 +346,7 @@ uint csJoystickEventHelper::GetButton (const iEvent *event)
 bool csJoystickEventHelper::GetButtonState(const iEvent *event)
 {
   bool res = false;
-  event->Retrieve("jsButton", res);
+  event->Retrieve("jsButtonState", res);
   return res;
 }
 
@@ -483,3 +483,65 @@ bool csCommandEventHelper::GetEventData (const iEvent* event,
   return true;
 }
 
+//---------------------------------------------------------------------------
+
+class csWeakEventHandler :
+  public scfImplementation1<csWeakEventHandler, iEventHandler>
+{
+private:
+  csWeakRef<iEventHandler> parent;
+
+public:
+  csWeakEventHandler (iEventHandler *parent) :
+    scfImplementationType (this), parent(parent) { }
+
+  bool HandleEvent (iEvent &e)
+  { return parent->HandleEvent(e); }
+  const char * GenericName() const
+  { return parent->GenericName(); }
+  csHandlerID GenericID (csRef<iEventHandlerRegistry> &r) const
+  { return parent->GenericID(r); }
+  const csHandlerID * GenericPrec (
+    csRef<iEventHandlerRegistry> &hr, csRef<iEventNameRegistry> &nr,
+    csEventID id) const
+  { return parent->GenericPrec(hr, nr, id); }
+  const csHandlerID * GenericSucc (
+    csRef<iEventHandlerRegistry> &hr, csRef<iEventNameRegistry> &nr,
+    csEventID id) const
+  { return parent->GenericSucc(hr, nr, id); }
+  const csHandlerID * InstancePrec (
+    csRef<iEventHandlerRegistry> &hr, csRef<iEventNameRegistry> &nr,
+    csEventID id) const
+  { return parent->InstancePrec(hr, nr, id); }
+  const csHandlerID * InstanceSucc (
+    csRef<iEventHandlerRegistry> &hr, csRef<iEventNameRegistry> &nr,
+    csEventID id) const
+  { return parent->InstanceSucc(hr, nr, id); }
+};
+
+csHandlerID RegisterWeakListener (iEventQueue *q, iEventHandler *listener,
+  csRef<iEventHandler> &handler)
+{
+  handler.AttachNew (new csWeakEventHandler (listener));
+  return q->RegisterListener (handler);
+}
+
+csHandlerID RegisterWeakListener (iEventQueue *q, iEventHandler *listener,
+  const csEventID &ename, csRef<iEventHandler> &handler)
+{
+  handler.AttachNew (new csWeakEventHandler (listener));
+  return q->RegisterListener (handler, ename);
+}
+
+csHandlerID RegisterWeakListener (iEventQueue *q, iEventHandler *listener,
+  const csEventID ename[], csRef<iEventHandler> &handler)
+{
+  handler.AttachNew (new csWeakEventHandler (listener));
+  return q->RegisterListener (handler, ename);
+}
+
+void RemoveWeakListener (iEventQueue *q, iObjectRegistry *r,
+  csRef<iEventHandler> &handler)
+{
+  q->RemoveListener(handler);
+}

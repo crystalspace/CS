@@ -223,15 +223,6 @@ public:
     int height);
 
   virtual void GetMaxTextureSize (int& w, int& h, int& aspect);
-
-  /**
-   * Retrieve the coordinates of a lightmap in the its superlightmap, in a
-   * system the renderer uses internally. Calculate lightmap U/Vs within this
-   * bounds when they are intended to be passed to the renderer.
-   */
-  virtual void GetLightmapRendererCoords (int slmWidth, int slmHeight,
-    int lm_x1, int lm_y1, int lm_x2, int lm_y2,
-    float& lm_u1, float& lm_v1, float &lm_u2, float& lm_v2);
 };
 
 }

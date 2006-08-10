@@ -213,7 +213,7 @@ protected: // 'protected' allows access by test-suite.
   };
   /**
    * Destroys all living objects and releases all memory allocated by the pool.
-   * \param diposer Object with a Dispose(void* p) method which is called prior
+   * \param disposer Object with a Dispose(void* p) method which is called prior
    *  to freeing the actual memory.
    */
   template<typename Disposer>

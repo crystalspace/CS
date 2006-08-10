@@ -6,6 +6,262 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+9-Aug-2005
+	- Jorrit extended parallaxAtt with a technique at priority 130.
+	  This technique is exactly the same as priority 150 but it
+	  doesn't handle attenuation correctly. This is useful on
+	  intel graphics hardware where the 150 technique is not working
+	  properly.
+	- Jorrit added a new 'crappyintelgraphics' config to gldrivers.xml.
+	  This config will add a 'crappy_intel_graphics' tag so that
+	  the technique 150 of parallaxAtt can disable itself.
+	- caedes fixed a problem that would make the python tutorials fail.
+	- mdmkolbe cleaned up miscellaneous warnings.
+	- mdmkolbe added RegisterWeakListener and RemoveWeakListener to
+	  handle registration and removal of event handlers that should
+	  be proxied through a weak reference.
+	- mdmkolbe converted libs/csplugincommon/canvas/graph2d.cpp and
+	  plugins/engine/3d/engine.cpp to use RegisterWeakListener.
+8-Aug-2005
+	- res re-added support for triangle-based submeshes in genmesh objects 
+	  in order to provide backwards compatibility.
+	- Jorrit renamed the type class in the old gmeshanim so that it no
+	  longer conflicts with the new gmeshanim in static builds.
+	- Jorrit fixed a problem in csEngineTools::FindScreenTarget(). If
+	  the maximum distance was very large it wouldn't work very well
+	  due to inaccuracy problems.
+	- caedes moved all swig interface files to include/bindings.
+7-Aug-2005
+	- res added ability to convert referenced libraries to genmeshify.
+	- Jorrit fixed a bug in the skeleton loader. It would return a
+	  reference to a factory (as a csPtr) without doing an IncRef.
+	  That would cause crashes at exit.
+	- Jorrit also made the event handler in the skeleton graveyard
+	  embedded to try to fix a leak there.
+6-Aug-2005
+	- Anders separated csHash iterators into const and non-const, like 
+	  csArray. This may lead to compile errors in user code. In most
+	  cases the solution to these is to change "GlobalIterator" to
+	  "ConstGlobalIterator".
+	- Vincent made the following changes:
+	    - Changed csInputDefinition::InitializeFromEvent() to get/set
+	      changed axis number for both mouse and joystick. It will use the
+	      first axis found that changed...
+	    - Fixed csJoystickEventHelper::GetButtonState().
+	    - Changed eventtest to get csInputDefinition constructed from
+	      event, and to only print changed joystick axis value (not x/y).
+	- res changed genmesh to preserve user-set poly meshes when switching
+	  between "standard"/"submesh" poly meshes.
+	- res added writing of of polymeshes to genmeshify.
+5-Aug-2005
+	- mdmkolbe removed a redundant check of do_infinite in walktest.
+	- res added the iSelfDestruct interface to the csSaverFile, 
+	  csLibraryReference and csAddonReference so they can be removed from
+	  regions.
+	- res made cssynldr's WriteMixmode() output a bit nicer.
+	- res made <move> tags written by cssaver's less redundant.
+	- res made cssaver correctly write portal flags, warping and mirror 
+	  portals.
+	- res fixed a flipped condition in the genmesh saver.
+	- res made genmeshify's command line help a bit better.
+	- res made genmeshify better support libraries.
+	- res made genmeshify support Things created from factories.
+	- mdmkolbe removed an outdated 'friend' declaration.
+	- Vincent fixed joystick button string construction in inputdef.cpp,
+	  which seem to need more work for parsing them correctly (mouseButton
+	  vs. joystickButton)...
+	- mdmkolbe eliminated a few embedded classes in genmesh and spr3d.
+	- mdmkolbe reverted his change to genmesh and spr3d because there
+	  was some weak referencing going on that he failed to notice
+	  before that made the change incorrect.
+4-Aug-2006
+	- res fixed the default csRenderBufferLock<> storage to 
+	  iRenderBuffer*: it seems to be the rule rather than the exception
+	  that a render buffer is valid while a lock is instantiated.
+	- res split up csShaderVariableContext into 
+	  CS::ShaderVariableContextImpl, which contains an 
+	  iShaderVariableContext implementation but no SCF goop, and
+	  csShaderVariableContext on top of that, which continues to be a full
+	  SCF class. This way the simple iShaderVariableContext implementation
+	  can be reused by other SCF classes without having to resort to
+	  manual forwarding.
+	- res changed iSyntaxService->ParseShaderVar() to also parse the 
+	  shader variable name.
+	- res changed the genmesh submeshes to be accessed via an interface.
+	- res added some initial support for per-submesh shader vars to
+	  genmesh.
+	- res tweaked the Cg shader framework to shuffle the primaryColor from
+	  vertex to fragment programs with COLOR semantics.
+	- Jorrit added an option to stdrep so that you can now specify
+	  'silent' mode in a config file too ('Reporter.Silent').
+	- Jorrit fixed stdrep so that the reading 'Reporter.AppendFile'
+	  actually works now.
+        - Jorrit fixed compilation of the python plugin (not linking,
+          that's still broken due to -Wl,Symbolic flag) so that it compiles
+          again.
+	- res changed the way genmesh submeshes work. Now, meshobjects can't
+	  contain completely custom submeshes; however, certain aspects of the
+	  submesh as defined in the factory can be overridden (right now only
+	  shader variables, but in the future probably at least materials and 
+	  mixmodes as well). Basically, you can't have different sets of 
+	  triangles in the mesh object.
+	- res added methods to query lightmap-related data from Thing meshes.
+	- res moved the lightmap-on-superlightmap texture coordinate 
+	  computation from the renderer(s) to the Thing plugin.
+	- res added support for static lightmaps to genmeshify.
+3-Aug-2006
+	- Jorrit fixed a small problem which caused CS not to compile
+	  in optimize mode.
+2-Aug-2006
+	- res added operator+= to csRenderBufferLock<>.
+	- res fixed a stupid typo in the gmeshldr index buffer check.
+	- res added proper object model support to genmeshes when submeshes
+	  are used.
+	- res changed csRenderBufferLock<> to lock/unlock on construction/
+	  destruction, as opposed to checking for being locked and locking on 
+	  demand on every access. This is somewhat less overhead, and most
+	  (if not all) of the current usage does not unlock a buffer in the
+	  middle of some operations.
+	- Jorrit fixed compilation of genmesh on gcc.
+	- res changed the saver plugin to also expose the portal saving 
+	  method.
+	- res changed iSceneNode to also return the children in an SCF array
+	  (keep in mind, references to csArray<>s in interfaces are not safe).
+	- res fixed an instance of a stack-based SCF object in thingldr.
+	- res changed the csRenderBufferLock<> ++ and += operators to only 
+	  check whether the returned element is in range when it's really 
+	  used.
+	- res added portal support to genmeshify.
+1-Aug-2006
+	- res changed the csRenderBufferLock pre-increment operator to return
+	  the element after incrementation.
+	- res added a post-increment operator to csRenderBufferLock, allowing
+	  to iterate over render buffers pointer-style.
+	- res changed the genmesh submesh support somewhat: now takes a render
+	  buffer with indices instead of a pointer to a triangle array. Also
+	  added some management methods - submeshes can be given a name,
+	  enumerated, and selectively deleted.
+	- res updated the genmesh loader to support index buffer specification
+	  for genmeshes.
+	- res added submesh saving to the genmesh saver.
+	- res started work on genmeshify, a tool to convert Things in world
+	  files to genmeshes.
+	- res fixed genmesh's index buffer creation for submeshes.
+	- res fixed genmesh's submesh class to properly copy itself.
+	- res fixed cssynldr to correctly mark index buffers when writing
+	  render buffers.
+31-Jul-2006
+	- Jorrit fixed compilation of xmlshader. It was using a wrong
+	  CS_GNUC_PRINTF.
+	- Jorrit added a new function csEngineTools::FindScreenTarget().
+	  This function performs the commonly used operation of finding
+	  the object that was clicked upon with the mouse. It can work
+	  both in accurate mode (using iSector->HitBeamPortals) or
+	  faster mode (using csColliderHelper::TraceBeam).
+	- Jorrit changed WalkTest and BugPlug to use the new
+	  FindScreenTarget() function.
+30-Jul-2006
+	- res added some comments to the new shader snippets.
+	- res changed std_lighting_detail over to use Cg.
+	- res added support for "unused" buffer bindings for VPs (ununsed
+	  vertex attribs are not invalid but shouldn't be bound either).
+	- Vincent added joystick support to eventtest. Needs more work for
+	  correct reporting... Also changed inputdef.cpp assert to not choke
+	  on joystick buttons Up/Down events, and print the faulty event name.
+	- res added a bit of optional debug output to peek into the inner
+	  workings of xmlshader's instruction processor.
+	- res fixed conditional resource sharing in the Cg framework.
+	- res improved passing of params with spaces and quotes to xmlshader
+	  templates.
+	- res updated the extension registry URL in the extension manager 
+	  docs.
+	- res made it possible to disable all extensions by default, by 
+	  setting "Video.OpenGL.UseExtension.ALL = false".
+	- res added a couple of configuration files to emulate certain
+	  hardware. The idea is to use these with the new "configuration file
+	  on command line" feature to easily emulate older HW, e.g. a GeForce3
+	  by running an application with "-cfgfile=/config/emulate_gf3.cfg"
+	  on the command line. Settings covered right now are basically just
+	  those for Cg.
+	- res added the ability to explicitly disable VP or FP support to the
+	  Cg shader plugin.
+29-Jul-2006
+	- res augmented xmlshader to support template arguments with spaces.
+	- res fixed an assertion in xmlshader when using buffer mappings with 
+	  custom variable names.
+	- res fixed some assorted xmlshader issues.
+	- res fixed the standard shader loading in the engine to conserve
+	  whitespaces.
+	- res added support for the TEXCOORD instruction to the glshader_ps1
+	  PS1.x-to-1.4 converter.
+	- res fixed compiler argument parsing for the glshader_cg plugin.
+	- res updated the contained DejaVu fonts to version 2.8.
+	- res started work to improve the shader snippets.
+27-Jul-2006
+	- res changed an array in glshader_ps1 that is never changed from 
+	  dynamic to compile-time creation.
+	- res added some true static conditionals to xmlshader.
+	- caedes changed the scattering shaders so they keep their nice 
+	  previous defaults while preserving xotic's changes.
+25-Jul-2006
+	- mdmkolbe converted the following plugins to the new SCF:
+	    - plugins/physics/loader/
+	    - plugins/culling/frustvis/
+	    - plugins/engine/3d/
+	    - plugins/engine/renderloop/
+	    - plugins/sequence/
+	- res reworked the "Mesa DRI DXT upload only" support.
+	- res unmerged the changes from r24885:24886 ("res disabled 
+	  RTLD_GLOBAL for unix plugin loading again...") since the original
+	  issue was solved in a different way. RTLD_GLOBAL is at least needed
+	  for python as well.
+	- mdmkolbe converted plugins/culling/dynavis/ to the new SCF.
+	- David Bronke added a patch from contingencyplan (Brian DeVries) which
+	  adds a copy constructor and an assignment operator to csVariant, which
+	  allows it to be used in a csHash, among other things.
+24-Jul-2006
+	- Jorrit documented the new -cfgfile and -cfgset commandline
+	  options and also added documentation for a few other commonly
+	  used options.
+	- Jorrit fixed a crash in the handling of the new -cfgfile
+	  option. If you didn't use that option then applications would
+	  crash.
+23-Jul-2006
+	- mdmkolbe converted the following plugins to the new SCF:
+	    - plugins/csparser/
+	    - plugins/documentsystem/
+	    - plugins/proctex/standard/
+	    - plugins/terraformer/
+	    - plugins/reporter/
+	- res added the ability to specify configuration settings via the
+	  command line. Accepted are two new switches, -cfgset=<key=value>,
+	  which adds a single setting to the configuration manager, and
+	  -cfgfile=<file>, which adds a complete file to the configuration
+	  manager.
+	- res fixed a crash on VC due ptmalloc being shut down before some
+	  global variables were destructed.
+	- res fixed a destruction issue of xmlshader's TempString.
+	- res augmented the shader conditionaly to support "weak templates" 
+	  which don't override existing templates of the same name. 
+	  Instruction is <?TemplateWeak ...?>.
+	- res fixed xmlshader to correctly deal with sub-conditions of 
+	  conditions always being false.
+	- res fixed a bug in the PS1.x to 1.4 where texture registers as the
+	  destination were not handled correctly.
+	- res enhanced the PS1.x to 1.4 converter to track register usage more
+	  finely.
+	- res added the ability to specify an upper cap for program profiles 
+	  to the Cg plugin.
+	- res committed a patch from Gellule <gellule.xg@free.fr> to add
+	  csStringBase::FindLast (const char*, size_t).
+22-Jul-2006
+	- Oktal fixed the order of some declaration qualifiers in spinlock.h;
+	  CS_FORCEINLINE must come *before* the method's return type, at least
+	  on gcc3. This is my first commit by SVN, so I hope it doesn't break.
+	- res fixed the configure freetype check to not reference an internal
+	  header (doesn't work with FreeType2.2 any more).
+	- mdmkolbe applied a (modified) patch from res2k that fixes a crash
+	  caused by the interaction between ptmalloc and Cygwin.
 21-Jul-2006
 	- res fixed an assertion triggered by csBaseEventHandler that could
 	  occur when the destruction occured after 

@@ -337,7 +337,7 @@ bool csXMLShaderTech::LoadPass (iDocumentNode *node, shaderPass *pass,
     if (mapping->GetType () != CS_NODE_ELEMENT) continue;
     
     const char* dest = mapping->GetAttributeValue ("destination");
-    csVertexAttrib attrib = CS_VATTRIB_0;
+    csVertexAttrib attrib = CS_VATTRIB_INVALID;
     bool found = false;
     int i;
     for(i=0;i<16;i++)
@@ -409,14 +409,9 @@ bool csXMLShaderTech::LoadPass (iDocumentNode *node, shaderPass *pass,
 	}
 	else
 	{
-	  csVertexAttrib attr = 
-	    resolveVP ? resolveVP->ResolveBufferDestination (dest) : 
+	  attrib = resolveVP ? resolveVP->ResolveBufferDestination (dest) : 
 	    CS_VATTRIB_INVALID;
-	  if (attr != CS_VATTRIB_INVALID)
-	  {
-	    attrib = attr;
-	    found = true;
-	  }
+          found = (attrib > CS_VATTRIB_INVALID);
 	}
       }
     }
@@ -465,6 +460,7 @@ bool csXMLShaderTech::LoadPass (iDocumentNode *node, shaderPass *pass,
 	{
 	  pass->custommapping_attrib.Push (attrib);
 	  pass->custommapping_buffer.Push (sourceName);
+          pass->custommapping_id.Push (csInvalidStringID);
 	  /* Those buffers are mapped by default to some specific vattribs; 
 	   * since they are now to be mapped to some generic vattrib,
 	   * turn off the default map. */
@@ -475,9 +471,12 @@ bool csXMLShaderTech::LoadPass (iDocumentNode *node, shaderPass *pass,
     }
     else
     {
-      parent->compiler->Report (CS_REPORTER_SEVERITY_WARNING,
-	"Shader '%s', pass %d: invalid buffer destination '%s'",
-	parent->GetName (), GetPassNumber (pass), dest);
+      if (attrib == CS_VATTRIB_INVALID)
+      {
+        parent->compiler->Report (CS_REPORTER_SEVERITY_WARNING,
+	  "Shader '%s', pass %d: invalid buffer destination '%s'",
+	  parent->GetName (), GetPassNumber (pass), dest);
+      }
     }
   }
 
@@ -525,8 +524,7 @@ bool csXMLShaderCompiler::LoadSVBlock (iDocumentNode *node,
   while (it->HasNext ())
   {
     csRef<iDocumentNode> var = it->Next ();
-    svVar.AttachNew (new csShaderVariable (
-      strings->Request(var->GetAttributeValue ("name"))));
+    svVar.AttachNew (new csShaderVariable);
 
     if (synldr->ParseShaderVar (var, *svVar))
       context->AddVariable(svVar);

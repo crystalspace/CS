@@ -687,8 +687,8 @@ public:
 
   virtual void SelfDestruct ();
 
-  //--------------------- iSceneNode implementation ----------------------//
-
+  /**\name iSceneNode implementation
+   * @{ */
   virtual void SetParent (iSceneNode* parent);
   virtual iSceneNode* GetParent () const
   {
@@ -704,6 +704,13 @@ public:
   virtual iMeshWrapper* QueryMesh () { return this; }
   virtual iLight* QueryLight () { return 0; }
   virtual iCamera* QueryCamera () { return 0; }
+  virtual csPtr<iSceneNodeArray> GetChildrenArray () const
+  {
+    return csPtr<iSceneNodeArray> (
+      new scfArrayWrapConst<iSceneNodeArray, csRefArray<iSceneNode> > (
+      movable.GetChildren ()));
+  }
+  /** @} */
 
   //--------------------- iMeshWrapper implementation --------------------//
 

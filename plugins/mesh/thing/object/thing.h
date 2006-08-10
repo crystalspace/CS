@@ -530,6 +530,8 @@ public:
 
   virtual bool AddPolygonRenderBuffer (int polygon_idx, const char* name,
     iRenderBuffer* buffer);
+  virtual bool GetLightmapLayout (int polygon_idx, size_t& slm, 
+    csRect& slmSubRect, float* slmCoord);
 
   //-------------------- iMeshObjectFactory interface implementation ----------
 
@@ -984,6 +986,7 @@ public:
   /// Prepare.
   virtual void Prepare ()
   { PrepareForUse (); }
+  virtual csPtr<iImage> GetPolygonLightmap (int polygon_idx);
   /** @} */
 
   //-------------------- iMeshObject interface implementation ----------

@@ -65,6 +65,27 @@ private:
 public:
   csVariant () { type = CSVAR_LONG; memset (&v, 0, sizeof (v)); }
   ~csVariant () { Clear(); }
+
+  /// Copy constructor - only IncRef's the String, should our type be a string
+  csVariant (const csVariant& var)
+  {
+    memset (&v, 0, sizeof (v));
+    
+    type = var.type;
+    v = var.v;
+    if ((type == CSVAR_STRING) && (v.s != 0)) v.s->IncRef(); 
+  }
+
+  /// Assignment operator. As with the copy-ctor, only IncRef's the string
+  const csVariant& operator = (const csVariant& var)
+  {
+    Clear ();
+    type = var.type;
+    v = var.v;
+    if ((type == CSVAR_STRING) && (v.s != 0)) v.s->IncRef ();
+    return var;
+  }
+  
   /// Assign a long
   void SetLong (long l)
   {

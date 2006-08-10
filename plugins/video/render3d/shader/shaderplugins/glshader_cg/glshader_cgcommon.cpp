@@ -334,7 +334,7 @@ void csShaderGLCGCommon::ResetState()
 }
 
 bool csShaderGLCGCommon::DefaultLoadProgram (const char* programStr, 
-  CGGLenum type, bool compiled, bool doLoad)
+  CGGLenum type, CGprofile maxProfile, bool compiled, bool doLoad)
 {
   if (!programStr || !*programStr) return false;
 
@@ -347,6 +347,9 @@ bool csShaderGLCGCommon::DefaultLoadProgram (const char* programStr,
 
   if(profile == CG_PROFILE_UNKNOWN)
     profile = cgGLGetLatestProfile (type);
+
+  if (maxProfile != CG_PROFILE_UNKNOWN)
+    profile = csMin (profile, maxProfile);
 
   if (shaderPlug->doVerbose)
   {

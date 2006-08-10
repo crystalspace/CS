@@ -1567,7 +1567,7 @@ void csGLGraphics3D::DrawInstancesUseShader (
   {
     size_t values_cnt = modes.instances_binds.GetSize ();
     //loop through all instances
-    csHash<csInstance*>::GlobalIterator it = modes.instances.GetIterator ();
+    csHash<csInstance*>::ConstGlobalIterator it = modes.instances.GetIterator ();
     
     while (it.HasNext ())
     {
@@ -1618,7 +1618,7 @@ void csGLGraphics3D::DrawInstancesNoShader (
 
   //FIXME: it works only for for very specyfic setup
   //loop through all instances
-  csHash<csInstance*>::GlobalIterator it = modes.instances.GetIterator ();
+  csHash<csInstance*>::ConstGlobalIterator it = modes.instances.GetIterator ();
   while (it.HasNext ())
   {
     //loop through all parameters
@@ -3234,16 +3234,10 @@ bool csGLGraphics3D::PerformExtension (char const* command, ...)
   return rc;
 }
 
-SCF_IMPLEMENT_IBASE (csOpenGLHalo)
-  SCF_IMPLEMENTS_INTERFACE (iHalo)
-SCF_IMPLEMENT_IBASE_END
-
-csOpenGLHalo::csOpenGLHalo (float iR, float iG, float iB, unsigned char *iAlpha,
-  int iWidth, int iHeight, csGLGraphics3D* iG3D)
-  : R(iR), G(iG), B(iB)
+csOpenGLHalo::csOpenGLHalo (float iR, float iG, float iB,
+  unsigned char *iAlpha, int iWidth, int iHeight, csGLGraphics3D* iG3D) :
+  scfImplementationType(this), R(iR), G(iG), B(iB)
 {
-  SCF_CONSTRUCT_IBASE (0);
-
   // Initialization  
   R = iR; G = iG; B = iB;
   // OpenGL can only use 2^n sized textures
@@ -3302,7 +3296,6 @@ csOpenGLHalo::~csOpenGLHalo ()
 {
   DeleteTexture();
   G3D->DecRef ();
-  SCF_DESTRUCT_IBASE();
 }
 
 void csOpenGLHalo::DeleteTexture ()

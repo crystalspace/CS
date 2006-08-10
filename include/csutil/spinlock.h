@@ -200,11 +200,11 @@ namespace CS
     { Init(); }
     ~SpinLock() { Destroy(); }
   
-    bool CS_FORCEINLINE LockWait()
+    CS_FORCEINLINE bool LockWait()
     { return DoLockWait(); }
-    bool CS_FORCEINLINE LockTry()
+    CS_FORCEINLINE bool LockTry()
     { return DoLockTry(); }
-    void CS_FORCEINLINE Release()
+    CS_FORCEINLINE void Release()
     { DoRelease(); }
   };
 } // namespace CS

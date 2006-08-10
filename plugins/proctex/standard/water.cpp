@@ -26,6 +26,7 @@
 #include "itexture/itexloaderctx.h"
 #include "ivideo/txtmgr.h"
 #include "ivideo/texture.h"
+#include "csutil/scf.h"
 
 #include "prwater.h"
 #include "stdproctex.h"
@@ -37,7 +38,8 @@ SCF_IMPLEMENT_FACTORY(csPtWaterSaver)
 
 #define CLASSID_WATERTYPE "crystalspace.texture.type.water"
 
-csPtWaterType::csPtWaterType (iBase* p) : csBaseProctexType(p)
+csPtWaterType::csPtWaterType (iBase* p) :
+  scfImplementationType(this, p)
 {
 }
 
@@ -51,7 +53,7 @@ csPtr<iTextureFactory> csPtWaterType::NewFactory()
 // 'Water' PT factory
 
 csPtWaterFactory::csPtWaterFactory (iTextureType* p, iObjectRegistry* object_reg) : 
-    csBaseTextureFactory (p, object_reg)
+  scfImplementationType(this, p, object_reg)
 {
 }
 
@@ -72,7 +74,8 @@ csPtr<iTextureWrapper> csPtWaterFactory::Generate ()
 //---------------------------------------------------------------------------
 // 'Water' loader.
 
-csPtWaterLoader::csPtWaterLoader(iBase *p) : csBaseProctexLoader(p)
+csPtWaterLoader::csPtWaterLoader(iBase *p) :
+  scfImplementationType(this, p)
 {
 //  init_token_table (tokens);
 }
@@ -124,7 +127,8 @@ csPtr<iBase> csPtWaterLoader::Parse (iDocumentNode* /*node*/,
 //---------------------------------------------------------------------------
 // 'Water' saver.
 
-csPtWaterSaver::csPtWaterSaver (iBase* p) : csBaseProctexSaver(p)
+csPtWaterSaver::csPtWaterSaver (iBase* p) :
+  scfImplementationType(this, p)
 {
 }
 

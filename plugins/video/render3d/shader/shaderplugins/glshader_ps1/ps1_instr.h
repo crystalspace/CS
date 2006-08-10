@@ -34,8 +34,24 @@ enum csPixelShaderVersion
   CS_PS_1_4 = 8
 };
 
-#define CS_PS_ALLVERSIONS (CS_PS_1_1 | CS_PS_1_2 | CS_PS_1_3 | CS_PS_1_4)
-#define CS_PS_OLDVERSIONS (CS_PS_1_1 | CS_PS_1_2 | CS_PS_1_3)
+#define CS_PS_ALLVERSIONS  (CS_PS_1_1 | CS_PS_1_2 | CS_PS_1_3 | CS_PS_1_4)
+#define CS_PS_OLDVERSIONS  (CS_PS_1_1 | CS_PS_1_2 | CS_PS_1_3)
+#define CS_PS_MASKVERSIONS (CS_PS_1_1 | CS_PS_1_2 | CS_PS_1_3 | CS_PS_1_4)
+
+enum csPixelShaderInstrFlags
+{
+  /**
+   * The components of the destination register directly depend on the source
+   * register. That means, if a write mask is applied to the destination,
+   * the source register components that were masked out can be disregarded as
+   * they won't contribute to the result.
+   */
+  CS_PS_DEST_COMP_DEPENDS_SOURCE = 16,
+  /// Instruction currently not supported
+  CS_PS_UNSUPPORTED = 32
+};
+
+#define CS_PS_MASKFLAGS     (~CS_PS_MASKVERSIONS)
 
 enum csPixelShaderInstruction
 {

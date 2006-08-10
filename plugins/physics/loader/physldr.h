@@ -23,6 +23,7 @@
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "csutil/strhash.h"
+#include "csutil/scf_implementation.h"
 
 struct iObjectRegistry;
 struct iReporter;
@@ -33,11 +34,10 @@ struct iDynamicSystem;
 struct iRigidBody;
 struct iJoint;
 
-class csPhysicsLoader : public iLoaderPlugin
+class csPhysicsLoader :
+  public scfImplementation2<csPhysicsLoader, iLoaderPlugin, iComponent>
 {
 public:
-  SCF_DECLARE_IBASE;
-
   csPhysicsLoader (iBase*);
   virtual ~csPhysicsLoader ();
 
@@ -76,16 +76,7 @@ public:
   virtual bool ParseConstraint (iDocumentNode *node,
   	bool &, bool &, bool &, csVector3 &, csVector3 &);
 
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csPhysicsLoader);
-    virtual bool Initialize (iObjectRegistry* p)
-    { return scfParent->Initialize (p); }
-  } scfiComponent;
-  friend struct eiComponent;
-
 private:
-
   iObjectRegistry* object_reg;
   csRef<iReporter> reporter;
   csRef<iSyntaxService> synldr;

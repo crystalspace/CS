@@ -27,19 +27,9 @@
 
 //---------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE (csWriteQueue)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iDebugHelper)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csWriteQueue::DebugHelper)
-  SCF_IMPLEMENTS_INTERFACE(iDebugHelper)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-csWriteQueue::csWriteQueue ()
+csWriteQueue::csWriteQueue () :
+  scfImplementationType (this)
 {
-  SCF_CONSTRUCT_IBASE (0);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiDebugHelper);
-
   free_elements = 0;
   queue_min = 0;
   queue_max = 0;
@@ -56,8 +46,6 @@ csWriteQueue::~csWriteQueue ()
     delete free_elements;
     free_elements = el;
   }
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiDebugHelper);
-  SCF_DESTRUCT_IBASE ();
 }
 
 void csWriteQueue::Initialize ()
@@ -183,7 +171,7 @@ void* csWriteQueue::Fetch (const csBox2& /*box*/, float depth, float& out_depth)
   return 0;
 }
 
-csPtr<iString> csWriteQueue::Debug_UnitTest ()
+csPtr<iString> csWriteQueue::UnitTest ()
 {
   scfString* rc = new scfString ();
 

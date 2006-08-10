@@ -792,12 +792,13 @@ bool csThingLoader::ParsePoly3d (
     bool do_warp = false;
     bool do_mirror = false;
     int msv = -1;
-    scfString destSectorName;
+    csRef<scfString> destSectorName;
+    destSectorName.AttachNew (new scfString);
 
     bool autoresolve = false;
     if (ParsePortal (portal_node, ldr_context,
 	      flags, do_mirror, do_warp, msv,
-	      m_w, v_w_before, v_w_after, &destSectorName, autoresolve))
+	      m_w, v_w_before, v_w_after, destSectorName, autoresolve))
     {
       iSector* destSector;
       // If autoresolve is true we clear the sector since we want the callback
@@ -805,7 +806,7 @@ bool csThingLoader::ParsePoly3d (
       if (autoresolve)
         destSector = 0;
       else
-        destSector = ldr_context->FindSector (destSectorName.GetData ());
+        destSector = ldr_context->FindSector (destSectorName->GetData ());
       int cnt = thing_fact_state->GetPolygonVertexCount (CS_POLYINDEX_LAST);
       csVector3* portal_verts = new csVector3[cnt];
       int i;
@@ -818,7 +819,7 @@ bool csThingLoader::ParsePoly3d (
         portal_pri = mesh->GetRenderPriority ();
       csString pc_name;
       pc_name.Format ("__portals_%d_%s__", portal_pri,
-      	destSectorName.GetData ());
+      	destSectorName->GetData ());
 
       iPortal* portal;
       csRef<iMeshWrapper> portal_mesh = engine->CreatePortal (
@@ -837,7 +838,7 @@ bool csThingLoader::ParsePoly3d (
       {
 	csRef<MissingSectorCallback> mscb;
         mscb.AttachNew (new MissingSectorCallback (
-	    	ldr_context, destSectorName.GetData (), autoresolve));
+	    	ldr_context, destSectorName->GetData (), autoresolve));
 	portal->SetMissingSectorCallback (mscb);
       }
 

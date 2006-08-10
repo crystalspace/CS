@@ -56,6 +56,7 @@ protected:
   csStringHash xmltokens;
 #define CS_TOKEN_ITEM_FILE "plugins/csparser/services/syntxldr.tok"
 #include "cstool/tokenlist.h"
+  csRef<iStringSet> strings;
 
   void ReportV (const char* msgid, int severity, 
 	iDocumentNode* errornode, const char* msg, va_list arg);

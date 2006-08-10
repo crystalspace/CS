@@ -43,6 +43,8 @@ CS_LEAKGUARD_IMPLEMENT (csShaderGLCGVP);
 
 bool csShaderGLCGVP::Compile ()
 {
+  if (!shaderPlug->enableVP) return false;
+
   csRef<iDataBuffer> programBuffer = GetProgramData();
   if (!programBuffer.IsValid())
     return false;
@@ -63,7 +65,8 @@ bool csShaderGLCGVP::Compile ()
   if (progProf < CG_PROFILE_ARBVP1)
     cg_profile = "arbvp1";
   
-  if (!DefaultLoadProgram (programStr, CG_GL_VERTEX, false, true))
+  if (!DefaultLoadProgram (programStr, CG_GL_VERTEX, 
+      shaderPlug->maxProfileVertex, false, true))
     return false;
 
   return true;
@@ -81,6 +84,8 @@ csVertexAttrib csShaderGLCGVP::ResolveBufferDestination (const char* binding)
       int index = cgGetParameterResourceIndex (parameter);
       switch (base)
       {
+        case CG_UNDEFINED:
+          return CS_VATTRIB_UNUSED;
 	case CG_TEX0: 
 	case CG_TEXUNIT0:
 	case CG_TEXCOORD0:

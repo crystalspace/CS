@@ -22,7 +22,7 @@
 #ifndef __CS_SHADOWMAP_H__
 #define __CS_SHADOWMAP_H__
 
-#include "csutil/scf.h"
+#include "csutil/scf_implementation.h"
 #include "csutil/csstring.h"
 #include "csutil/weakref.h"
 #include "iengine/light.h"
@@ -41,7 +41,8 @@
 #include <iutil/virtclk.h>
 #include <iengine/viscull.h>
 
-class csShadowmapRSType : public csBaseRenderStepType
+class csShadowmapRSType :
+  public scfImplementationExt0<csShadowmapRSType, csBaseRenderStepType>
 {
 public:
   csShadowmapRSType (iBase* p);
@@ -49,14 +50,13 @@ public:
   virtual csPtr<iRenderStepFactory> NewFactory();
 };
 
-class csShadowmapRenderStepFactory : public iRenderStepFactory
+class csShadowmapRenderStepFactory :
+  public scfImplementation1<csShadowmapRenderStepFactory, iRenderStepFactory>
 {
 private:
   iObjectRegistry* object_reg;
 
 public:
-  SCF_DECLARE_IBASE;
-
   csShadowmapRenderStepFactory (iObjectRegistry* object_reg);
   virtual ~csShadowmapRenderStepFactory ();
 
@@ -65,11 +65,9 @@ public:
 
 //-----------------------------------------------
 
-class csShadowmapRenderStep;
-
 class csShadowmapRenderStep : 
-	public iRenderStep, 
-	public iLightIterRenderStep
+  public scfImplementation3<csShadowmapRenderStep,
+    iRenderStep, iLightIterRenderStep, iVisibilityCullerListener>
 {
 public:
   struct DrawSettings
@@ -80,11 +78,11 @@ public:
     csAlphaMode alphaMode;
     csRef<csShaderVariableContext> svContext;
   };
-	csRef<iGraphics3D> g3d;
-	iTextureHandle *context;
-	csRefArray<iTextureHandle> depth_textures;
-	csStringID depth_cubemap_name;
-	csRef<iTextureHandle> depth_cubemap;
+  csRef<iGraphics3D> g3d;
+  iTextureHandle *context;
+  csRefArray<iTextureHandle> depth_textures;
+  csStringID depth_cubemap_name;
+  csRef<iTextureHandle> depth_cubemap;
 
 private:
   csRefArray<iLightRenderStep> steps;
@@ -103,9 +101,8 @@ private:
 
   csArray<iMeshWrapper*> lightMeshes;
   csRenderMeshList *mesh_list;
-public:
-  SCF_DECLARE_IBASE;
 
+public:
   csShadowmapRenderStep (iObjectRegistry* object_reg);
   virtual ~csShadowmapRenderStep ();
 
@@ -116,22 +113,12 @@ public:
   void SetDefaultShader (iShader* shader)
   { defShader = shader; }
 
-
-  struct R2TVisCallback : public iVisibilityCullerListener
-  {
-    csShadowmapRenderStep* parent;
-
-	SCF_DECLARE_IBASE;
-	R2TVisCallback ();
-	virtual ~R2TVisCallback ();
-
-	virtual void ObjectVisible (iVisibilityObject *visobject, 
-		iMeshWrapper *mesh, uint32 frustum_mask);
-  } r2tVisCallback;
-  friend struct R2TVisCallback;
+  virtual void ObjectVisible (iVisibilityObject *visobject, 
+    iMeshWrapper *mesh, uint32 frustum_mask);
 };
 
-class csShadowmapRSLoader : public csBaseRenderStepLoader
+class csShadowmapRSLoader :
+  public scfImplementationExt0<csShadowmapRSLoader, csBaseRenderStepLoader>
 {
   csRenderStepParser rsp;
   csStringHash tokens;

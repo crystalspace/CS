@@ -29,6 +29,7 @@
 #include "csutil/csstring.h"
 #include "csutil/hash.h"
 #include "csutil/weakref.h"
+#include "csutil/scf_implementation.h"
 #include "cstool/cspixmap.h"
 #include "csgeom/vector2.h"
 
@@ -45,7 +46,9 @@ struct iImageIO;
  * optionally set transparency and foregound and background colors for
  * monochrome cursor systems
  */
-class csCursor : public iCursor
+class csCursor :
+  public scfImplementation3<csCursor,
+    iCursor, iComponent, iEventHandler>
 {
 private:
   /// Internal structure for use in the cursors hash list
@@ -96,8 +99,6 @@ protected:
   bool HandleEvent (iEvent &);
 
 public:
-  SCF_DECLARE_IBASE;
-
   /// Constructor
   csCursor (iBase *);
   /// Destructor
@@ -152,25 +153,8 @@ public:
   /// Switches from the current cursor to the specified cursor
   virtual bool SwitchCursor (const char *);
 
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csCursor);
-    virtual bool Initialize (iObjectRegistry* r)
-    {
-      return scfParent->Initialize(r);
-    }
-  } scfiComponent;
-  friend struct eiComponent;
-
-  struct eiEventHandler : public iEventHandler
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csCursor);
-    virtual bool HandleEvent (iEvent &ev) 
-    { return scfParent->HandleEvent (ev); }
-    CS_EVENTHANDLER_NAMES("crystalspace.graphics.cursor")
-    CS_EVENTHANDLER_NIL_CONSTRAINTS
-  } scfiEventHandler;
-  friend struct eiEventHandler;
+  CS_EVENTHANDLER_NAMES("crystalspace.graphics.cursor")
+  CS_EVENTHANDLER_NIL_CONSTRAINTS
 };
 
 #endif // __CS_VIDEO_CURSOR_H__

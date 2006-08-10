@@ -20,7 +20,7 @@
 #ifndef __CS_LOADTEX_H__
 #define __CS_LOADTEX_H__
 
-#include "csutil/scf.h"
+#include "csutil/scf_implementation.h"
 #include "igraphic/image.h"
 #include "itexture/itexloaderctx.h"
 #include "iutil/comp.h"
@@ -32,7 +32,8 @@
 #define PLUGIN_TEXTURELOADER_TEX3D    "crystalspace.texture.loader.tex3d"
 
 /// Default texture loader context
-class TextureLoaderContext : public iTextureLoaderContext
+class TextureLoaderContext :
+  public scfImplementation1<TextureLoaderContext, iTextureLoaderContext>
 {
   bool has_flags;
   int flags;
@@ -42,9 +43,8 @@ class TextureLoaderContext : public iTextureLoaderContext
   int width, height;
   const char* texname;
   csString texClass;
-public:
-  SCF_DECLARE_IBASE;
 
+public:
   TextureLoaderContext (const char* texname);
   virtual ~TextureLoaderContext ();
 
@@ -67,13 +67,13 @@ public:
 };
 
 /// Base texture loader pseudo-plugin
-class csBaseTextureLoader : public iLoaderPlugin, public iComponent  
+class csBaseTextureLoader :
+  public scfImplementation2<csBaseTextureLoader, iLoaderPlugin, iComponent>
 {
 protected:
   iObjectRegistry* object_reg;
-public:
-  SCF_DECLARE_IBASE;
 
+public:
   csBaseTextureLoader (iBase *p);
   virtual ~csBaseTextureLoader ();
 
@@ -85,7 +85,8 @@ public:
 };  
 
 /// Image texture loader pseudo-plugin
-class csImageTextureLoader : public csBaseTextureLoader
+class csImageTextureLoader :
+  public scfImplementationExt0<csImageTextureLoader, csBaseTextureLoader>
 {
 public:
   csImageTextureLoader (iBase *p);
@@ -96,7 +97,8 @@ public:
 };
 
 /// Checkerboard texture loader pseudo-plugin
-class csCheckerTextureLoader : public csBaseTextureLoader
+class csCheckerTextureLoader :
+  public scfImplementationExt0<csCheckerTextureLoader, csBaseTextureLoader>
 {
 public:
   csCheckerTextureLoader (iBase *p);
@@ -107,7 +109,8 @@ public:
 };
 
 /// Cubemap texture loader pseudo-plugin
-class csCubemapTextureLoader : public csBaseTextureLoader
+class csCubemapTextureLoader :
+  public scfImplementationExt0<csCubemapTextureLoader, csBaseTextureLoader>
 {
   csStringHash xmltokens;
 #define CS_TOKEN_ITEM_FILE "plugins/csparser/cubemaploader.tok"
@@ -122,7 +125,8 @@ public:
 };
 
 /// 3D texture loader pseudo-plugin
-class csTexture3DLoader : public csBaseTextureLoader
+class csTexture3DLoader :
+  public scfImplementationExt0<csTexture3DLoader, csBaseTextureLoader>
 {
   csStringHash xmltokens;
 #define CS_TOKEN_ITEM_FILE "plugins/csparser/tex3dloader.tok"

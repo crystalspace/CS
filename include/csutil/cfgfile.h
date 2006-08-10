@@ -31,6 +31,7 @@
 
 class csConfigNode;
 class csConfigIterator;
+struct iCommandLineParser;
 
 /**
  * Configuration file which implements the iConfigFile SCF interface.
@@ -66,10 +67,10 @@ public:
 
   /**
    * Load a configuration file.
-   * <p>
+   * 
    * If the file resides in a real filesystem, rather than a VFS filesystem,
    * then pass 0 for the VFS argument.
-   * <p>
+   * 
    * You can set the Merge flag to merge the newly loaded configuration
    * information into the existing information.  If you do so, nothing will
    * happen if the named file doesn't exist.  The NewWins flag determines
@@ -145,6 +146,16 @@ public:
   /// return the final comment at the end of the configuration file
   virtual const char *GetEOFComment() const;
 
+  /**
+   * Parse the command line for configuration options.
+   * Recognized are the <tt>-cfgset</tt> parameters, which sets a single 
+   * setting, and <tt>-cfgfile</tt>, which reads settings from the specified file.
+   *
+   * The meanings of the \p vfs, \p Merge and \p NewWins arguments are the 
+   * same as for Load().
+   */
+  virtual void ParseCommandLine (iCommandLineParser* cmdline, iVFS* vfs,
+    bool Merge = false, bool NewWins = true);
 private:
   friend class csConfigIterator;
 
@@ -182,7 +193,7 @@ private:
    * will not delete it. This function will set the dirty flag if any
    * options have been added or modified.
    */
-  virtual void LoadFromBuffer(char *Filedata, bool overwrite);
+  virtual void LoadFromBuffer(const char *Filedata, bool overwrite);
   // return a pointer to the named node or the first node of a subsection.
   csConfigNode *FindNode(const char *Name, bool isSubsection = false) const;
   // create a new node in the list

@@ -28,7 +28,11 @@
 #include "csutil/array.h"
 #include "csgeom/vector3.h"
 
+class csVector2;
 struct iSector;
+struct iCamera;
+struct iMeshWrapper;
+struct iCollideSystem;
 
 /**
  * Result structure for csEngineTools::FindShortestDistance().
@@ -51,6 +55,31 @@ struct csShortestDistanceResult
 };
 
 /**
+ * This structure is returned by csEngineTools::FindScreenTarget().
+ */
+struct csScreenTargetResult
+{
+  /**
+   * The mesh that was hit or 0 if nothing was hit.
+   */
+  iMeshWrapper* mesh;
+
+  /**
+   * The intersection point (in world space) on the mesh where we hit.
+   * If no mesh was hit this will be set to the end point of the
+   * beam that was used for testing.
+   */
+  csVector3 isect;
+
+  /**
+   * If the accurate method of testing was used (not using collider
+   * system) then (depending on type of mesh) this might contain
+   * a polygon index that was hit. If not then this will be -1.
+   */
+  int polygon_idx;
+};
+
+/**
  * This is a class with static helper functions for working on engine
  * data.
  */
@@ -69,26 +98,26 @@ public:
   /**
    * Given two positions in the world, try to find the shortest distance (using
    * portals if needed) between them and return the final squared distance.
-   * <p>
+   *
    * Note! This function will ignore all portals if the source and destination
    * sectors are the same. Even if there might be a possible shorter path
    * between the two positions using some space warping portal. An exception
    * to this is if the distance is greater then the max distance. In that
    * case this function will attempt to try out portals in the current sector
    * to see if there is a shorter path anyway.
-   * <p>
+   *
    * Note that this routine will ignore visibility. It will simply calculate
    * the distance between the two points through some portal path. However,
    * this function will check if the portal is oriented towards the source
    * point (i.e it doesn't ignore visibility with regards to backface culling).
-   * <p>
+   *
    * Note that this function (by default) only considers the center point
    * of a portal for calculating the distance. This might skew results with
    * very big portals. Set the 'accurate' parameter to true if you don't
    * want this.
-   * <p>
+   *
    * This function will correctly account for space warping portals.
-   * <p>
+   *
    * \param source is the source position to start from.
    * \param sourceSector is the sector for that position.
    * \param dest is the destination position to start from.
@@ -108,6 +137,22 @@ public:
   	const csVector3& source, iSector* sourceSector,
   	const csVector3& dest, iSector* destSector,
   	float maxradius, bool accurate = false);
+
+  /**
+   * Given a screen space coordinate (with (0,0) being top-left
+   * corner of screen) this will try to find the closest mesh there.
+   * \param pos is the screen coordinate position.
+   * \param maxdist is the maximum distance to check.
+   * \param camera is the camera.
+   * \param cdsys if 0 then this function will use
+   * iSector->HitBeamPortals() which is more accurate. Otherwise this
+   * function will use csColliderHelper::TraceBeam() which is faster
+   * but less accurate since it depends on collider information.
+   * \return an instance of csScreenTargetResult with the mesh that
+   * was possibly hit and an intersection point.
+   */
+  static csScreenTargetResult FindScreenTarget (const csVector2& pos,
+      float maxdist, iCamera* camera, iCollideSystem* cdsys = 0);
 };
 
 #endif // __CS_ENGINETOOLS_H__
