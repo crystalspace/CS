@@ -5233,6 +5233,31 @@ class iMaterialListPtr(iMaterialList):
         _swig_setattr(self, iMaterialList,self.__class__,iMaterialList)
 _cspace.iMaterialList_swigregister(iMaterialListPtr)
 
+class iSceneNodeArray(_object):
+    __swig_setmethods__ = {}
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iSceneNodeArray, name, value)
+    __swig_getmethods__ = {}
+    __getattr__ = lambda self, name: _swig_getattr(self, iSceneNodeArray, name)
+    def __init__(self): raise RuntimeError, "No constructor defined"
+    def __repr__(self):
+        return "<%s.%s; proxy of C++ iSceneNodeArray instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
+    def __del__(self, destroy=_cspace.delete_iSceneNodeArray):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+
+    __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iSceneNodeArray_scfGetVersion
+    if _newclass:scfGetVersion = staticmethod(_cspace.iSceneNodeArray_scfGetVersion)
+
+class iSceneNodeArrayPtr(iSceneNodeArray):
+    def __init__(self, this):
+        _swig_setattr(self, iSceneNodeArray, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, iSceneNodeArray, 'thisown', 0)
+        _swig_setattr(self, iSceneNodeArray,self.__class__,iSceneNodeArray)
+_cspace.iSceneNodeArray_swigregister(iSceneNodeArrayPtr)
+
+iSceneNodeArray_scfGetVersion = _cspace.iSceneNodeArray_scfGetVersion
+
 class iSceneNode(iBase):
     __swig_setmethods__ = {}
     for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
@@ -5250,6 +5275,7 @@ class iSceneNode(iBase):
     def SetParent(*args): return _cspace.iSceneNode_SetParent(*args)
     def GetParent(*args): return _cspace.iSceneNode_GetParent(*args)
     def GetChildren(*args): return _cspace.iSceneNode_GetChildren(*args)
+    def GetChildrenArray(*args): return _cspace.iSceneNode_GetChildrenArray(*args)
     def __del__(self, destroy=_cspace.delete_iSceneNode):
         try:
             if self.thisown: destroy(self)
@@ -6007,6 +6033,33 @@ _cspace.iPortalContainer_swigregister(iPortalContainerPtr)
 
 iPortalContainer_scfGetVersion = _cspace.iPortalContainer_scfGetVersion
 
+class iGeneralMeshSubMesh(iBase):
+    __swig_setmethods__ = {}
+    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iGeneralMeshSubMesh, name, value)
+    __swig_getmethods__ = {}
+    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, iGeneralMeshSubMesh, name)
+    def __init__(self): raise RuntimeError, "No constructor defined"
+    def __repr__(self):
+        return "<%s.%s; proxy of C++ iGeneralMeshSubMesh instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
+    def GetIndices(*args): return _cspace.iGeneralMeshSubMesh_GetIndices(*args)
+    def GetMaterial(*args): return _cspace.iGeneralMeshSubMesh_GetMaterial(*args)
+    def GetName(*args): return _cspace.iGeneralMeshSubMesh_GetName(*args)
+    def GetMixmode(*args): return _cspace.iGeneralMeshSubMesh_GetMixmode(*args)
+    def __del__(self, destroy=_cspace.delete_iGeneralMeshSubMesh):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+
+
+class iGeneralMeshSubMeshPtr(iGeneralMeshSubMesh):
+    def __init__(self, this):
+        _swig_setattr(self, iGeneralMeshSubMesh, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, iGeneralMeshSubMesh, 'thisown', 0)
+        _swig_setattr(self, iGeneralMeshSubMesh,self.__class__,iGeneralMeshSubMesh)
+_cspace.iGeneralMeshSubMesh_swigregister(iGeneralMeshSubMeshPtr)
+
 class iGeneralMeshCommonState(iBase):
     __swig_setmethods__ = {}
     for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
@@ -6025,20 +6078,11 @@ class iGeneralMeshCommonState(iBase):
     def IsShadowCasting(*args): return _cspace.iGeneralMeshCommonState_IsShadowCasting(*args)
     def SetShadowReceiving(*args): return _cspace.iGeneralMeshCommonState_SetShadowReceiving(*args)
     def IsShadowReceiving(*args): return _cspace.iGeneralMeshCommonState_IsShadowReceiving(*args)
-    def ClearSubMeshes(*args): return _cspace.iGeneralMeshCommonState_ClearSubMeshes(*args)
     def AddRenderBuffer(*args): return _cspace.iGeneralMeshCommonState_AddRenderBuffer(*args)
     def RemoveRenderBuffer(*args): return _cspace.iGeneralMeshCommonState_RemoveRenderBuffer(*args)
     def GetRenderBufferCount(*args): return _cspace.iGeneralMeshCommonState_GetRenderBufferCount(*args)
     def GetRenderBuffer(*args): return _cspace.iGeneralMeshCommonState_GetRenderBuffer(*args)
     def GetRenderBufferName(*args): return _cspace.iGeneralMeshCommonState_GetRenderBufferName(*args)
-    def AddSubMesh(*args): return _cspace.iGeneralMeshCommonState_AddSubMesh(*args)
-    def FindSubMesh(*args): return _cspace.iGeneralMeshCommonState_FindSubMesh(*args)
-    def DeleteSubMesh(*args): return _cspace.iGeneralMeshCommonState_DeleteSubMesh(*args)
-    def GetSubMeshCount(*args): return _cspace.iGeneralMeshCommonState_GetSubMeshCount(*args)
-    def GetSubMeshIndices(*args): return _cspace.iGeneralMeshCommonState_GetSubMeshIndices(*args)
-    def GetSubMeshMaterial(*args): return _cspace.iGeneralMeshCommonState_GetSubMeshMaterial(*args)
-    def GetSubMeshName(*args): return _cspace.iGeneralMeshCommonState_GetSubMeshName(*args)
-    def GetSubMeshMixmode(*args): return _cspace.iGeneralMeshCommonState_GetSubMeshMixmode(*args)
     def __del__(self, destroy=_cspace.delete_iGeneralMeshCommonState):
         try:
             if self.thisown: destroy(self)
@@ -6064,7 +6108,8 @@ class iGeneralMeshState(iGeneralMeshCommonState):
         return "<%s.%s; proxy of C++ iGeneralMeshState instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
     def SetAnimationControl(*args): return _cspace.iGeneralMeshState_SetAnimationControl(*args)
     def GetAnimationControl(*args): return _cspace.iGeneralMeshState_GetAnimationControl(*args)
-    def CopySubMeshesFromFactory(*args): return _cspace.iGeneralMeshState_CopySubMeshesFromFactory(*args)
+    def FindSubMesh(*args): return _cspace.iGeneralMeshState_FindSubMesh(*args)
+    def AddSubMesh(*args): return _cspace.iGeneralMeshState_AddSubMesh(*args)
     def __del__(self, destroy=_cspace.delete_iGeneralMeshState):
         try:
             if self.thisown: destroy(self)
@@ -6131,6 +6176,12 @@ class iGeneralFactoryState(iGeneralMeshCommonState):
     def IsBack2Front(*args): return _cspace.iGeneralFactoryState_IsBack2Front(*args)
     def SetAnimationControlFactory(*args): return _cspace.iGeneralFactoryState_SetAnimationControlFactory(*args)
     def GetAnimationControlFactory(*args): return _cspace.iGeneralFactoryState_GetAnimationControlFactory(*args)
+    def ClearSubMeshes(*args): return _cspace.iGeneralFactoryState_ClearSubMeshes(*args)
+    def AddSubMesh(*args): return _cspace.iGeneralFactoryState_AddSubMesh(*args)
+    def FindSubMesh(*args): return _cspace.iGeneralFactoryState_FindSubMesh(*args)
+    def DeleteSubMesh(*args): return _cspace.iGeneralFactoryState_DeleteSubMesh(*args)
+    def GetSubMeshCount(*args): return _cspace.iGeneralFactoryState_GetSubMeshCount(*args)
+    def GetSubMesh(*args): return _cspace.iGeneralFactoryState_GetSubMesh(*args)
     def __del__(self, destroy=_cspace.delete_iGeneralFactoryState):
         try:
             if self.thisown: destroy(self)
@@ -7195,6 +7246,7 @@ class iThingFactoryState(iBase):
     def GetCosinusFactor(*args): return _cspace.iThingFactoryState_GetCosinusFactor(*args)
     def SetCosinusFactor(*args): return _cspace.iThingFactoryState_SetCosinusFactor(*args)
     def AddPolygonRenderBuffer(*args): return _cspace.iThingFactoryState_AddPolygonRenderBuffer(*args)
+    def GetLightmapLayout(*args): return _cspace.iThingFactoryState_GetLightmapLayout(*args)
     def __del__(self, destroy=_cspace.delete_iThingFactoryState):
         try:
             if self.thisown: destroy(self)
@@ -7234,6 +7286,7 @@ class iThingState(iBase):
     def GetMixMode(*args): return _cspace.iThingState_GetMixMode(*args)
     def CreatePolygonHandle(*args): return _cspace.iThingState_CreatePolygonHandle(*args)
     def GetPolygonWorldPlane(*args): return _cspace.iThingState_GetPolygonWorldPlane(*args)
+    def GetPolygonLightmap(*args): return _cspace.iThingState_GetPolygonLightmap(*args)
     def __del__(self, destroy=_cspace.delete_iThingState):
         try:
             if self.thisown: destroy(self)
@@ -7828,6 +7881,7 @@ class iSaver(iBase):
     def SaveAllRegions(*args): return _cspace.iSaver_SaveAllRegions(*args)
     def SaveRegionFile(*args): return _cspace.iSaver_SaveRegionFile(*args)
     def SaveRegion(*args): return _cspace.iSaver_SaveRegion(*args)
+    def SavePortal(*args): return _cspace.iSaver_SavePortal(*args)
     def __del__(self, destroy=_cspace.delete_iSaver):
         try:
             if self.thisown: destroy(self)
@@ -9487,6 +9541,8 @@ csCommandEventHelper_GetInfo = _cspace.csCommandEventHelper_GetInfo
 
 csCommandEventHelper_GetEventData = _cspace.csCommandEventHelper_GetEventData
 
+
+RemoveWeakListener = _cspace.RemoveWeakListener
 csKeyEventTypeUp = _cspace.csKeyEventTypeUp
 csKeyEventTypeDown = _cspace.csKeyEventTypeDown
 csMouseEventTypeMove = _cspace.csMouseEventTypeMove
@@ -9537,6 +9593,8 @@ class csKeyModifiersPtr(csKeyModifiers):
         if not hasattr(self,"thisown"): _swig_setattr(self, csKeyModifiers, 'thisown', 0)
         _swig_setattr(self, csKeyModifiers,self.__class__,csKeyModifiers)
 _cspace.csKeyModifiers_swigregister(csKeyModifiersPtr)
+
+RegisterWeakListener = _cspace.RegisterWeakListener
 
 CSKEY_ESC = _cspace.CSKEY_ESC
 CSKEY_ENTER = _cspace.CSKEY_ENTER
@@ -11578,7 +11636,6 @@ class iTextureManager(iBase):
     def GetTextureFormat(*args): return _cspace.iTextureManager_GetTextureFormat(*args)
     def CreateSuperLightmap(*args): return _cspace.iTextureManager_CreateSuperLightmap(*args)
     def GetMaxTextureSize(*args): return _cspace.iTextureManager_GetMaxTextureSize(*args)
-    def GetLightmapRendererCoords(*args): return _cspace.iTextureManager_GetLightmapRendererCoords(*args)
     def __del__(self, destroy=_cspace.delete_iTextureManager):
         try:
             if self.thisown: destroy(self)
@@ -13986,7 +14043,7 @@ _csPyEventHandler_StaticHandlerName = _cspace._csPyEventHandler_StaticHandlerNam
 _csPyEventHandler_StaticID = _cspace._csPyEventHandler_StaticID
 
 def csevCommandLineHelp(reg):
-  csEventNameRegistry.GetID(reg, csString("crystalspace.application.commandlinehelp"))
+  csEventNameRegistry.GetID(reg, "crystalspace.application.commandlinehelp")
   
 CS_EVENTLIST_END = csInvalidStringID
 
@@ -14047,7 +14104,7 @@ csReport = csReporterHelper.Report
 
 def CS_REQUEST_PLUGIN (name, intf):
   return (name, intf.__name__, cvar.iSCF_SCF.GetInterfaceID(intf.__name__),
-    eval('%s_scfGetVersion()' % intf.__name__, locals(), globals()))
+    intf.scfGetVersion())
 
 def CS_REQUEST_VFS ():
   return CS_REQUEST_PLUGIN("crystalspace.kernel.vfs", iVFS)

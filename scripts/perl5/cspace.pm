@@ -72,6 +72,8 @@ package cspace;
 *csGetUsername = *cspacec::csGetUsername;
 *csGetPlatformConfigPath = *cspacec::csGetPlatformConfigPath;
 *csQueryRegistryTag = *cspacec::csQueryRegistryTag;
+*RegisterWeakListener = *cspacec::RegisterWeakListener;
+*RemoveWeakListener = *cspacec::RemoveWeakListener;
 *csHashCompute = *cspacec::csHashCompute;
 *csevMouse = *cspacec::csevMouse;
 *csevMouseOp = *cspacec::csevMouseOp;
@@ -5967,6 +5969,37 @@ sub ACQUIRE {
 }
 
 
+############# Class : cspace::iSceneNodeArray ##############
+
+package cspace::iSceneNodeArray;
+@ISA = qw( cspace );
+%OWNER = ();
+%ITERATORS = ();
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iSceneNodeArray($self);
+        delete $OWNER{$self};
+    }
+}
+
+*scfGetVersion = *cspacec::iSceneNodeArray_scfGetVersion;
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
 ############# Class : cspace::iSceneNode ##############
 
 package cspace::iSceneNode;
@@ -5980,6 +6013,7 @@ package cspace::iSceneNode;
 *SetParent = *cspacec::iSceneNode_SetParent;
 *GetParent = *cspacec::iSceneNode_GetParent;
 *GetChildren = *cspacec::iSceneNode_GetChildren;
+*GetChildrenArray = *cspacec::iSceneNode_GetChildrenArray;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -6810,6 +6844,40 @@ sub ACQUIRE {
 }
 
 
+############# Class : cspace::iGeneralMeshSubMesh ##############
+
+package cspace::iGeneralMeshSubMesh;
+@ISA = qw( cspace cspace::iBase );
+%OWNER = ();
+%ITERATORS = ();
+*GetIndices = *cspacec::iGeneralMeshSubMesh_GetIndices;
+*GetMaterial = *cspacec::iGeneralMeshSubMesh_GetMaterial;
+*GetName = *cspacec::iGeneralMeshSubMesh_GetName;
+*GetMixmode = *cspacec::iGeneralMeshSubMesh_GetMixmode;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iGeneralMeshSubMesh($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
 ############# Class : cspace::iGeneralMeshCommonState ##############
 
 package cspace::iGeneralMeshCommonState;
@@ -6824,20 +6892,11 @@ package cspace::iGeneralMeshCommonState;
 *IsShadowCasting = *cspacec::iGeneralMeshCommonState_IsShadowCasting;
 *SetShadowReceiving = *cspacec::iGeneralMeshCommonState_SetShadowReceiving;
 *IsShadowReceiving = *cspacec::iGeneralMeshCommonState_IsShadowReceiving;
-*ClearSubMeshes = *cspacec::iGeneralMeshCommonState_ClearSubMeshes;
 *AddRenderBuffer = *cspacec::iGeneralMeshCommonState_AddRenderBuffer;
 *RemoveRenderBuffer = *cspacec::iGeneralMeshCommonState_RemoveRenderBuffer;
 *GetRenderBufferCount = *cspacec::iGeneralMeshCommonState_GetRenderBufferCount;
 *GetRenderBuffer = *cspacec::iGeneralMeshCommonState_GetRenderBuffer;
 *GetRenderBufferName = *cspacec::iGeneralMeshCommonState_GetRenderBufferName;
-*AddSubMesh = *cspacec::iGeneralMeshCommonState_AddSubMesh;
-*FindSubMesh = *cspacec::iGeneralMeshCommonState_FindSubMesh;
-*DeleteSubMesh = *cspacec::iGeneralMeshCommonState_DeleteSubMesh;
-*GetSubMeshCount = *cspacec::iGeneralMeshCommonState_GetSubMeshCount;
-*GetSubMeshIndices = *cspacec::iGeneralMeshCommonState_GetSubMeshIndices;
-*GetSubMeshMaterial = *cspacec::iGeneralMeshCommonState_GetSubMeshMaterial;
-*GetSubMeshName = *cspacec::iGeneralMeshCommonState_GetSubMeshName;
-*GetSubMeshMixmode = *cspacec::iGeneralMeshCommonState_GetSubMeshMixmode;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -6870,7 +6929,8 @@ package cspace::iGeneralMeshState;
 %ITERATORS = ();
 *SetAnimationControl = *cspacec::iGeneralMeshState_SetAnimationControl;
 *GetAnimationControl = *cspacec::iGeneralMeshState_GetAnimationControl;
-*CopySubMeshesFromFactory = *cspacec::iGeneralMeshState_CopySubMeshesFromFactory;
+*FindSubMesh = *cspacec::iGeneralMeshState_FindSubMesh;
+*AddSubMesh = *cspacec::iGeneralMeshState_AddSubMesh;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -6920,6 +6980,12 @@ package cspace::iGeneralFactoryState;
 *IsBack2Front = *cspacec::iGeneralFactoryState_IsBack2Front;
 *SetAnimationControlFactory = *cspacec::iGeneralFactoryState_SetAnimationControlFactory;
 *GetAnimationControlFactory = *cspacec::iGeneralFactoryState_GetAnimationControlFactory;
+*ClearSubMeshes = *cspacec::iGeneralFactoryState_ClearSubMeshes;
+*AddSubMesh = *cspacec::iGeneralFactoryState_AddSubMesh;
+*FindSubMesh = *cspacec::iGeneralFactoryState_FindSubMesh;
+*DeleteSubMesh = *cspacec::iGeneralFactoryState_DeleteSubMesh;
+*GetSubMeshCount = *cspacec::iGeneralFactoryState_GetSubMeshCount;
+*GetSubMesh = *cspacec::iGeneralFactoryState_GetSubMesh;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -8155,6 +8221,7 @@ package cspace::iThingFactoryState;
 *GetCosinusFactor = *cspacec::iThingFactoryState_GetCosinusFactor;
 *SetCosinusFactor = *cspacec::iThingFactoryState_SetCosinusFactor;
 *AddPolygonRenderBuffer = *cspacec::iThingFactoryState_AddPolygonRenderBuffer;
+*GetLightmapLayout = *cspacec::iThingFactoryState_GetLightmapLayout;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -8198,6 +8265,7 @@ package cspace::iThingState;
 *GetMixMode = *cspacec::iThingState_GetMixMode;
 *CreatePolygonHandle = *cspacec::iThingState_CreatePolygonHandle;
 *GetPolygonWorldPlane = *cspacec::iThingState_GetPolygonWorldPlane;
+*GetPolygonLightmap = *cspacec::iThingState_GetPolygonLightmap;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -8865,6 +8933,7 @@ package cspace::iSaver;
 *SaveAllRegions = *cspacec::iSaver_SaveAllRegions;
 *SaveRegionFile = *cspacec::iSaver_SaveRegionFile;
 *SaveRegion = *cspacec::iSaver_SaveRegion;
+*SavePortal = *cspacec::iSaver_SavePortal;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -12785,7 +12854,6 @@ package cspace::iTextureManager;
 *GetTextureFormat = *cspacec::iTextureManager_GetTextureFormat;
 *CreateSuperLightmap = *cspacec::iTextureManager_CreateSuperLightmap;
 *GetMaxTextureSize = *cspacec::iTextureManager_GetMaxTextureSize;
-*GetLightmapRendererCoords = *cspacec::iTextureManager_GetLightmapRendererCoords;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
