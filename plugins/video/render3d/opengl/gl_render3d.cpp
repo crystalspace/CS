@@ -26,7 +26,7 @@
 #include "csgeom/polyclip.h"
 #include "csgeom/transfrm.h"
 #include "csgeom/vector4.h"
-#include "csgfx/memimage.h"
+#include "csgfx/imagememory.h"
 #include "csgfx/renderbuffer.h"
 #include "csplugincommon/opengl/glextmanager.h"
 #include "csplugincommon/opengl/glhelper.h"

@@ -24,7 +24,7 @@
 #include "csgeom/pmtools.h"
 #include "csgeom/subrec.h"
 #include "csgeom/transfrm.h"
-#include "csgfx/memimage.h"
+#include "csgfx/imagememory.h"
 #include "csgfx/shadervar.h"
 #include "csutil/array.h"
 #include "csutil/blockallocator.h"

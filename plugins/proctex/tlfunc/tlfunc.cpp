@@ -24,7 +24,7 @@
 #include "csutil/ref.h"
 #include "csutil/scfarray.h"
 #include "csutil/scf.h"
-#include "csgfx/memimage.h"
+#include "csgfx/imagememory.h"
 #include "csgfx/shaderexp.h"
 #include "csgfx/shadervarcontext.h"
 

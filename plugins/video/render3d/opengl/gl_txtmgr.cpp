@@ -26,7 +26,7 @@
 #include "csgfx/bakekeycolor.h"
 #include "csgfx/imagecubemapmaker.h"
 #include "csgfx/imagemanipulate.h"
-#include "csgfx/memimage.h"
+#include "csgfx/imagememory.h"
 #include "csgfx/packrgb.h"
 #include "csgfx/xorpat.h"
 #include "cstool/debugimagewriter.h"

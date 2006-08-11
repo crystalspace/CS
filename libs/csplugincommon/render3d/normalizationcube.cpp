@@ -20,7 +20,7 @@
 #include "cssysdef.h"
 
 #include "csgfx/imagecubemapmaker.h"
-#include "csgfx/memimage.h"
+#include "csgfx/imagememory.h"
 
 #include "csplugincommon/render3d/normalizationcube.h"
 

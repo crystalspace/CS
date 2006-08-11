@@ -20,7 +20,7 @@
 #include "cssysdef.h"
 #include <math.h>
 
-#include "csgfx/memimage.h"
+#include "csgfx/imagememory.h"
 #include "cstool/proctex.h"
 #include "csutil/hash.h"
 #include "csutil/event.h"

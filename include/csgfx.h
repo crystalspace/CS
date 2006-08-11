@@ -31,7 +31,7 @@
 #include "csgfx/imagevolumemaker.h"
 #include "csgfx/inv_cmap.h"
 #include "csgfx/lightsvcache.h"
-#include "csgfx/memimage.h"
+#include "csgfx/imagememory.h"
 #include "csgfx/normalmaptools.h"
 #include "csgfx/packrgb.h"
 #include "csgfx/quantize.h"

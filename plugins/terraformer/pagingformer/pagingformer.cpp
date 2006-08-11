@@ -35,7 +35,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 //@@@ debugging
 #include "cstool/debugimagewriter.h"
-#include "csgfx/memimage.h"
+#include "csgfx/imagememory.h"
 
 #include "pagingformer.h"
 

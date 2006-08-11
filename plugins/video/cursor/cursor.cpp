@@ -24,7 +24,7 @@
 #include "csutil/stringarray.h"
 #include "csutil/event.h"
 #include "csutil/eventnames.h"
-#include "csgfx/memimage.h"
+#include "csgfx/imagememory.h"
 #include "iutil/objreg.h"
 #include "iutil/eventq.h"
 #include "iutil/evdefs.h"

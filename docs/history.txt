@@ -14,6 +14,9 @@ chronological order.
 	  RemoveWeakListener conversion of csGraphics2D.  Reported by vknecht.
 	- res added the ability to query lightmaps for PD lights to Thing.
 	- res fixed the proctex event handler to properly work across modules.
+	- res renamed csgfx/memimage.h to csgfx/imagememory.h; this better
+	  reflects the name of the class defined withing and is in line with
+	  the other image-related image*.h headers.
 10-Aug-2006
 	- caedes changed CS_REQUEST_PLUGIN wrapper in pythpost.i so it works
 	  also with interfaces provided by other python modules.
