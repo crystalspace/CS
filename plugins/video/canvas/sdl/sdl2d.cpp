@@ -387,7 +387,9 @@ bool csGraphics2DSDL::Open()
   if (q != 0)
   {
     csEventID events[] = { PreProcess, PostProcess, CS_EVENTLIST_END };
-    q->RegisterListener (scfiEventHandler, events);
+    // csGraphics2D::Initialize already setup weakEventHandler using
+    // RegisterWeakListener so we use plain RegisterListener here.
+    q->RegisterListener (weakEventHandler, events);
     if (!EventOutlet.IsValid())
       EventOutlet = q->CreateEventOutlet (this);
   }

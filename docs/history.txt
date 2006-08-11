@@ -10,6 +10,8 @@ chronological order.
 	- mdmkolbe fixed some minor warnings.
 	- mdmkolbe tweaked the signature of RemoveWeakListener.
 	- mdmkolbe mass converted to RegisterWeakListener.
+	- mdmkolbe fixed compilation problems in x2d and sdl2d due to the
+	  RemoveWeakListener conversion of csGraphics2D.  Reported by vknecht.
 10-Aug-2006
 	- caedes changed CS_REQUEST_PLUGIN wrapper in pythpost.i so it works
 	  also with interfaces provided by other python modules.
