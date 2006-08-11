@@ -67,15 +67,15 @@ public:
 
   virtual bool HandleEvent (iEvent& event);
 
-  CS_EVENTHANDLER_NAMES("crystalspace.proxtex")
+  CS_EVENTHANDLER_NAMES("crystalspace.proctex")
   CS_EVENTHANDLER_NIL_CONSTRAINTS
 
 public:
-  void PushTexture (csProcTexture* txt)
+  virtual void PushTexture (csProcTexture* txt)
   {
     textures.Add (txt);
   }
-  void PopTexture (csProcTexture* txt)
+  virtual void PopTexture (csProcTexture* txt)
   {
     textures.Delete (txt);
   }
