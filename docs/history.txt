@@ -6,10 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
-10-Aug-2005
+10-Aug-2006
 	- caedes changed CS_REQUEST_PLUGIN wrapper in pythpost.i so it works
 	  also with interfaces provided by other python modules.
-9-Aug-2005
+9-Aug-2006
 	- Jorrit extended parallaxAtt with a technique at priority 130.
 	  This technique is exactly the same as priority 150 but it
 	  doesn't handle attenuation correctly. This is useful on
@@ -25,7 +25,7 @@ chronological order.
 	  be proxied through a weak reference.
 	- mdmkolbe converted libs/csplugincommon/canvas/graph2d.cpp and
 	  plugins/engine/3d/engine.cpp to use RegisterWeakListener.
-8-Aug-2005
+8-Aug-2006
 	- res re-added support for triangle-based submeshes in genmesh objects 
 	  in order to provide backwards compatibility.
 	- Jorrit renamed the type class in the old gmeshanim so that it no
@@ -34,14 +34,14 @@ chronological order.
 	  the maximum distance was very large it wouldn't work very well
 	  due to inaccuracy problems.
 	- caedes moved all swig interface files to include/bindings.
-7-Aug-2005
+7-Aug-2006
 	- res added ability to convert referenced libraries to genmeshify.
 	- Jorrit fixed a bug in the skeleton loader. It would return a
 	  reference to a factory (as a csPtr) without doing an IncRef.
 	  That would cause crashes at exit.
 	- Jorrit also made the event handler in the skeleton graveyard
 	  embedded to try to fix a leak there.
-6-Aug-2005
+6-Aug-2006
 	- Anders separated csHash iterators into const and non-const, like 
 	  csArray. This may lead to compile errors in user code. In most
 	  cases the solution to these is to change "GlobalIterator" to
@@ -56,7 +56,7 @@ chronological order.
 	- res changed genmesh to preserve user-set poly meshes when switching
 	  between "standard"/"submesh" poly meshes.
 	- res added writing of of polymeshes to genmeshify.
-5-Aug-2005
+5-Aug-2006
 	- mdmkolbe removed a redundant check of do_infinite in walktest.
 	- res added the iSelfDestruct interface to the csSaverFile, 
 	  csLibraryReference and csAddonReference so they can be removed from
