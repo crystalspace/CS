@@ -51,7 +51,7 @@ csCursor::csCursor (iBase *parent) :
 
 csCursor::~csCursor ()
 {
-  if (eventq) eventq->RemoveListener (this);
+  if (eventq) RemoveWeakListener (eventq, weakEventHandler);
   RemoveAllCursors ();
 }
 
@@ -68,7 +68,7 @@ bool csCursor::Initialize (iObjectRegistry *objreg)
   if (!eventq) return false;
   csEventID events[3] = { csevPostProcess(reg), csevMouseEvent(reg), 
 			  CS_EVENTLIST_END };
-  eventq->RegisterListener (this, events);
+  RegisterWeakListener (eventq, this, events, weakEventHandler);
 
   return true;
 }

@@ -167,7 +167,7 @@ csFrustumVis::~csFrustumVis ()
   {
     csRef<iEventQueue> q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
     if (q)
-      q->RemoveListener (this);
+      RemoveWeakListener (q, weakEventHandler);
   }
 
   while (visobj_vector.Length () > 0)
@@ -226,7 +226,7 @@ bool csFrustumVis::Initialize (iObjectRegistry *object_reg)
     CanvasResize = csevCanvasResize(object_reg, g2d);
     csRef<iEventQueue> q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
     if (q)
-      q->RegisterListener (this, CanvasResize);
+      RegisterWeakListener (q, this, CanvasResize, weakEventHandler);
   }
 
   return true;

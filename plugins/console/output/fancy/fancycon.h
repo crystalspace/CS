@@ -61,6 +61,7 @@ private:
   csRef<iGraphics2D> G2D;
   csRef<iGraphics3D> G3D;
   csRef<iImageIO> ImageLoader;
+  csRef<iEventHandler> weakEventHandler;
   ConsoleDecoration deco;
   csRect outersize, bordersize, p2size;
   bool border_computed;

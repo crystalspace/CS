@@ -542,7 +542,7 @@ csEngine::~csEngine ()
   {
     csRef<iEventQueue> q (CS_QUERY_REGISTRY (objectRegistry, iEventQueue));
     if (q != 0)
-      RemoveWeakListener (q, objectRegistry, weakEventHandler);
+      RemoveWeakListener (q, weakEventHandler);
   }
 
   DeleteAll ();

@@ -1667,11 +1667,11 @@ csGenmeshSkelAnimationControlTypeOld::csGenmeshSkelAnimationControlTypeOld (
 
 csGenmeshSkelAnimationControlTypeOld::~csGenmeshSkelAnimationControlTypeOld ()
 {
-  if (object_reg)
+  if (weakEventHandler)
   {
     csRef<iEventQueue> q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
     if (q)
-      q->RemoveListener (this);
+      RemoveWeakListener (q, weakEventHandler);
   }
 }
 
@@ -1682,7 +1682,7 @@ bool csGenmeshSkelAnimationControlTypeOld::Initialize (iObjectRegistry* object_r
   csRef<iEventQueue> q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
   vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
   if (q != 0)
-    q->RegisterListener (this, PreProcess);
+    RegisterWeakListener (q, this, PreProcess, weakEventHandler);
   return true;
 }
 

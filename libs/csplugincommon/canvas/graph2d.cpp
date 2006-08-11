@@ -72,7 +72,7 @@ csGraphics2D::~csGraphics2D ()
   {
     csRef<iEventQueue> q (CS_QUERY_REGISTRY(object_reg, iEventQueue));
     if (q != 0)
-      RemoveWeakListener (q, object_reg, weakEventHandler);
+      RemoveWeakListener (q, weakEventHandler);
   }
   Close ();
   delete [] Palette;

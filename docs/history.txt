@@ -8,6 +8,8 @@ chronological order.
 
 11-Aug-2006
 	- mdmkolbe fixed some minor warnings.
+	- mdmkolbe tweaked the signature of RemoveWeakListener.
+	- mdmkolbe mass converted to RegisterWeakListener.
 10-Aug-2006
 	- caedes changed CS_REQUEST_PLUGIN wrapper in pythpost.i so it works
 	  also with interfaces provided by other python modules.

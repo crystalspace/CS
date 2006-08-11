@@ -147,6 +147,7 @@ class csSequenceManager :
 private:
   iObjectRegistry *object_reg;
   csRef<iVirtualClock> vc;
+  csRef<iEventHandler> weakEventHandler;
 
   // The sequence manager uses one big sequence to keep all queued
   // sequence operations. New sequences will be merged with this one.

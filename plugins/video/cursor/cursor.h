@@ -67,6 +67,7 @@ private:
 
   iObjectRegistry* reg;
   csWeakRef<iEventQueue> eventq;
+  csRef<iEventHandler> weakEventHandler;
   csWeakRef<iGraphics3D> g3d;
   iTextureManager* txtmgr;
   csRef<iImageIO> io;
