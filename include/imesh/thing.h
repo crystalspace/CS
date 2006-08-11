@@ -791,6 +791,9 @@ struct iThingState : public virtual iBase
    * @{ */
   /// Get the lightmap for a specific polygon.
   virtual csPtr<iImage> GetPolygonLightmap (int polygon_idx) = 0;
+  /// Query for pseudo-static lightmaps.
+  virtual bool GetPolygonPDLight (int polygon_idx, size_t pdlight_index, 
+    csRef<iImage>& map, iLight*& light) = 0;
   /** @} */
 };
 

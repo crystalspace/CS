@@ -24,7 +24,6 @@
 #include "csgeom/polypool.h"
 #include "csgeom/sphere.h"
 #include "csgeom/subrec.h"
-#include "csgfx/memimage.h"
 #include "csgfx/shadervarcontext.h"
 #include "csqint.h"
 #include "csqsqrt.h"
@@ -2769,6 +2768,32 @@ csPtr<iImage> csThing::GetPolygonLightmap (int polygon_idx)
   }
   return csPtr<iImage> (new csImageMemory (lm->GetWidth(), lm->GetHeight(), 
     rgbaData, true));
+}
+
+bool csThing::GetPolygonPDLight (int polygon_idx, size_t pdlight_index, 
+                                 csRef<iImage>& map, iLight*& light)
+{
+  if ((polygon_idx < 0) 
+    || ((size_t)polygon_idx >= polygons.GetSize())) return false;
+  csPolyTexture* polytex = polygons[polygon_idx].GetPolyTexture();
+  if (!polytex) return false;
+  csLightMap* lm = polytex->GetLightMap();
+  if (!lm) return false;
+
+  csShadowMap* smap = lm->GetShadowMap (pdlight_index);
+  if (!smap) return false;
+
+  // Create grayscale image from PD shadow map.
+  light = smap->Light;
+  size_t smapSize = smap->map->GetSize();
+  uint8* pdData = new uint8[smapSize];
+  memcpy (pdData, smap->map->GetData(), smapSize);
+  csRGBpixel* pal = new csRGBpixel[256];
+  for (int i = 0; i < 256; i++) pal[i].Set (i, i, i);
+  map.AttachNew (new csImageMemory (lm->GetWidth(), lm->GetHeight(), 
+    pdData, true, CS_IMGFMT_PALETTED8, pal));
+
+  return true;
 }
 
 //---------------------------------------------------------------------------

@@ -987,6 +987,8 @@ public:
   virtual void Prepare ()
   { PrepareForUse (); }
   virtual csPtr<iImage> GetPolygonLightmap (int polygon_idx);
+  virtual bool GetPolygonPDLight (int polygon_idx, size_t pdlight_index, 
+    csRef<iImage>& map, iLight*& light);
   /** @} */
 
   //-------------------- iMeshObject interface implementation ----------
