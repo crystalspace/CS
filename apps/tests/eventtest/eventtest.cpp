@@ -110,7 +110,7 @@ bool EventTest::HandleEvent (iEvent &ev)
       size_t pos = str.Find ("Axis");
       str.SubString (desc, pos + 4, (size_t)-1);
       uint axisnum = atoi(desc.GetData ());
-      printf ("Joystick MOVE: device=%d axis=%d value=%d "
+      printf ("Joystick MOVE: device=%d axis=%" PRId32 " value=%d "
           "mods=%08" PRIu32 " desc='%s'\n",
           device, axisnum, data.axes[axisnum], modifiers, str.GetData ());
     }

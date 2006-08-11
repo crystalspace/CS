@@ -704,7 +704,7 @@ namespace genmeshify
       if (!WritePolyMesh (key, polymeshNode)) return false;
 
       static const char* const meaningKeys[] = {"colldet", "shadows", "viscull" };
-      for (int i = 0; i < sizeof (meaningKeys)/sizeof (meaningKeys[0]); i++)
+      for (size_t i = 0; i < sizeof (meaningKeys)/sizeof (meaningKeys[0]); i++)
       {
         if (meaning.Check (1 << i))
         {
