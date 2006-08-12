@@ -20,6 +20,7 @@ chronological order.
 	  submeshes are requested.
 	- res csODECollider::CreateMeshGeometry() to use the polymesh 
 	  triangles directly instead of csPolygonMeshTools::Triangulate().
+	- Jorrit fixed compilation of the DDS image loader.
 11-Aug-2006
 	- mdmkolbe fixed some minor warnings.
 	- mdmkolbe tweaked the signature of RemoveWeakListener.
