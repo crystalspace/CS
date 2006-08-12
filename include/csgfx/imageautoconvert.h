@@ -63,7 +63,7 @@ namespace CS
     /// Provide access to the image.
     operator iImage*() const { return theImage; }
   };
-};
+}
 
 /** @} */
 
