@@ -813,6 +813,9 @@ public:
 
   csWeakRefArray<csImposterProcTex> imposterUpdateList;
 
+  /// Default shader to attach to all materials
+  csRef<iShader> defaultShader;
+
 private:
 
   // -- PRIVATE MEMBERS
@@ -925,9 +928,6 @@ private:
     
   /// Flag set when window requires resizing.
   bool resize;
-
-  /// Default shader to attach to all materials
-  csRef<iShader> defaultShader;
 
   /// 'Saveable' flag
   bool worldSaveable;

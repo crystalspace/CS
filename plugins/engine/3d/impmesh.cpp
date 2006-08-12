@@ -38,6 +38,12 @@ csImposterMesh::csImposterMesh (csEngine* engine, csMeshWrapper *parent)
   ready	= false;
   incidence_dist = 0;
   csImposterMesh::engine = engine;
+
+  //Add four to initialise array because of bug in csPoly3D
+  cutout.AddVertex(csVector3());
+  cutout.AddVertex(csVector3());
+  cutout.AddVertex(csVector3());
+  cutout.AddVertex(csVector3());
 }
 
 float csImposterMesh::CalcIncidenceAngleDist (iRenderView *rview)
@@ -84,55 +90,37 @@ void csImposterMesh::FindImposterRectangle (const iCamera* c)
 
   res = parent_mesh->GetScreenBoundingBox (c);
 
-/*
-
-csVector2 min = res.sbox.Min ();
-csVector2 max = res.sbox.Max ();
-printf("Min: %f %f\n",min[0],min[1]);
-printf("Max: %f %f\n",max[0],max[1]);
-
   csVector3 v1 = c->InvPerspective (res.sbox.GetCorner(0), res.distance);
   csVector3 v2 = c->InvPerspective (res.sbox.GetCorner(1), res.distance);
-  csVector3 v3 = c->InvPerspective (res.sbox.GetCorner(2), res.distance);
-  csVector3 v4 = c->InvPerspective (res.sbox.GetCorner(3), res.distance);
+  csVector3 v3 = c->InvPerspective (res.sbox.GetCorner(3), res.distance);
+  csVector3 v4 = c->InvPerspective (res.sbox.GetCorner(2), res.distance);
 
-printf("Min: %f %f %f\n",v1[0],v1[1],v1[2]);
-printf("Max: %f %f %f\n",v4[0],v4[1],v4[2]);
-
-v1 = c->GetTransform ().This2Other (v1);
-v4 = c->GetTransform ().This2Other (v4);
-
-printf("Min: %f %f %f\n",v1[0],v1[1],v1[2]);
-printf("Max: %f %f %f\n",v4[0],v4[1],v4[2]);
-
-*/
-  csVector3 v1 = c->InvPerspective (csVector2(0,0), 3);
-  csVector3 v2 = c->InvPerspective (csVector2(100,0), 3);
-  csVector3 v3 = c->InvPerspective (csVector2(100,100), 3);
-  csVector3 v4 = c->InvPerspective (csVector2(0,100), 3);
-
-/*
 v1 = c->GetTransform ().This2Other (v1);
 v2 = c->GetTransform ().This2Other (v2);
 v3 = c->GetTransform ().This2Other (v3);
 v4 = c->GetTransform ().This2Other (v4);
-*/
+
+/*
+  csVector3 v1 = c->InvPerspective (csVector2(0,0), 3);
+  csVector3 v2 = c->InvPerspective (csVector2(0,200), 3);
+  csVector3 v3 = c->InvPerspective (csVector2(200,200), 3);
+  csVector3 v4 = c->InvPerspective (csVector2(200,0), 3);
+
+v1 = c->GetTransform ().This2Other (v1);
+v2 = c->GetTransform ().This2Other (v2);
+v3 = c->GetTransform ().This2Other (v3);
+v4 = c->GetTransform ().This2Other (v4);
+
 printf("Min: %f %f %f\n",v1[0],v1[1],v1[2]);
 printf("Max: %f %f %f\n",v2[0],v2[1],v2[2]);
 printf("Max: %f %f %f\n",v3[0],v3[1],v3[2]);
 printf("Max: %f %f %f\n",v4[0],v4[1],v4[2]);
-
-  cutout.AddVertex (v1);
-  cutout.AddVertex (v2);
-  cutout.AddVertex (v3);
-  cutout.AddVertex (v4);
-
-/*
-  cutout.AddVertex (csVector3(0,0,0));
-  cutout.AddVertex (csVector3(1000,0,0));
-  cutout.AddVertex (csVector3(1000,10,0));
-  cutout.AddVertex (csVector3(0,1000,0));
 */
+
+  cutout[0] = v1;
+  cutout[1] = v2;
+  cutout[2] = v3;
+  cutout[3] = v4;
 }
 
 
@@ -155,20 +143,22 @@ csRenderMesh** csImposterMesh::GetRenderMesh(iRenderView *rview)
 
   if (rmCreated)
   {
+    printf("impostermesh init\n");
     mesh_init = true;
-    mesh->meshtype = CS_MESHTYPE_QUADS;
-    mesh->mixmode = CS_FX_COPY;
-    mesh->z_buf_mode = CS_ZBUF_FILL;
+    mesh->meshtype = CS_MESHTYPE_TRIANGLES;
+    mesh->mixmode = CS_FX_ALPHA;
+    mesh->z_buf_mode = CS_ZBUF_TEST;
   }
   mesh_indices_count = 0;
   GetMeshVertices ()->Empty ();
   GetMeshTexels ()->Empty ();
   GetMeshColors ()->Empty ();
 
-  iMaterialWrapper* tm = engine->GetMaterialList ()->FindByName ("stone");
-//  iMaterialWrapper* tm = engine->CreateMaterial ("test", tex->GetTexture ());
+//  iMaterialWrapper* tm = engine->GetMaterialList ()->FindByName ("stone");
+  iMaterialWrapper* tm = engine->CreateMaterial ("test", tex->GetTexture ());
   
 if (tm == 0) printf ("Uuups\n");
+  tm->Visit();
   mesh->material = tm;
 
 
@@ -176,15 +166,16 @@ if (tm == 0) printf ("Uuups\n");
   csDirtyAccessArray<csVector2>& mesh_texels = *GetMeshTexels ();
   csDirtyAccessArray<csVector4>& mesh_colors = *GetMeshColors ();
   
-  mesh_indices_count += 4;
-  size_t i;
-  for (i = mesh_indices.Length () ; i < mesh_indices_count ; i++)
-  {
-    mesh_indices.Put (i, i);
-  }
+  mesh_indices.Put (0, 0);
+  mesh_indices.Put (1, 1);
+  mesh_indices.Put (2, 2);
+  mesh_indices.Put (3, 2);
+  mesh_indices.Put (4, 3);
+  mesh_indices.Put (5, 0);
+  mesh_indices_count += 6;
 
   mesh->indexstart = 0;
-  mesh->indexend = mesh_indices_count - 1;
+  mesh->indexend = mesh_indices_count;
 
   mesh->object2world = csReversibleTransform ();
 
@@ -199,12 +190,10 @@ if (tm == 0) printf ("Uuups\n");
   mesh_colors.Push (c);
   mesh_colors.Push (c);
 
-//  mesh.
-
   csRef<csRenderBuffer> indexBuffer = 
     csRenderBuffer::CreateIndexRenderBuffer(
     mesh_indices_count, CS_BUF_STATIC, CS_BUFCOMP_UNSIGNED_INT, 0, 3);
-  indexBuffer->CopyInto(mesh_indices.GetArray(), 4);
+  indexBuffer->CopyInto(mesh_indices.GetArray(), mesh_indices_count);
 
   csRef<csRenderBuffer> vertBuffer = csRenderBuffer::CreateRenderBuffer(
     4, CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 3);
@@ -226,6 +215,5 @@ if (tm == 0) printf ("Uuups\n");
   mesh->buffers = buffer;
   mesh->variablecontext = new csShaderVariableContext();
 
-printf("returning imposter mesh\n");
   return &mesh;
 }

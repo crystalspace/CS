@@ -1,5 +1,5 @@
 Crystal Space detailed change log.
-http://www.crystalspace3d.org/ 
+http://www.crystalspace3d.org/
 
 The overall history is in reverse (descending) chronological order, so that
 each new day's entries apears before the previous day's entries.  The
@@ -8,6 +8,9 @@ chronological order.
 
 This file describes the history of the SoC imposter branch.
 
+12-Aug-2006
+	- Fossi fixed imposter mesh rendering to work
+	- Fossi improved imposter texture to show something at least
 06-Aug-2006
 	- Fossi made some minor changes
 28-Jul-2006
