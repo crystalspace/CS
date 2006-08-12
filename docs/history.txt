@@ -23,6 +23,7 @@ chronological order.
 	- Jorrit fixed compilation of the DDS image loader.
 	- Jorrit fixed compilation of walktest.
 	- Vincent fixed compilation of a few apps with GCC (GNU/Linux).
+	- res fixed some more XK_MISCELLANY warnings.
 11-Aug-2006
 	- mdmkolbe fixed some minor warnings.
 	- mdmkolbe tweaked the signature of RemoveWeakListener.
