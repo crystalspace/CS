@@ -136,6 +136,12 @@ public:
   bool ReadFromCache (iCacheManager* /*cache_mgr*/) { return true; }
   bool WriteToCache (iCacheManager* /*cache_mgr*/) { return true; }
   /** @} */
+
+  virtual void UseTexture (iTextureWrapper*)
+  { 
+    if (!PrepareAnim ()) return;
+    Animate (0);
+  }
 };
 
 }

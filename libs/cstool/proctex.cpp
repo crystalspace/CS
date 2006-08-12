@@ -174,9 +174,7 @@ struct csProcTexCallback :
 
 void csProcTexCallback::UseTexture (iTextureWrapper*)
 {
-  if (!pt->PrepareAnim ()) return;
-  pt->visible = true;
-  ((csProcTexEventHandler*)(iEventHandler*)(pt->proceh))->PushTexture (pt);
+  pt->UseTexture ();
 }
 iProcTexture* csProcTexCallback::GetProcTexture() const
 {
@@ -253,6 +251,13 @@ void csProcTexture::SetAlwaysAnimate (bool enable)
   {
     ((csProcTexEventHandler*)(iEventHandler*)proceh)->PushTexture (this);
   }
+}
+
+void csProcTexture::UseTexture ()
+{
+  if (!PrepareAnim ()) return;
+  visible = true;
+  ((csProcTexEventHandler*)(iEventHandler*)(proceh))->PushTexture (this);
 }
 
 //-----------------------------------------------------------------------------

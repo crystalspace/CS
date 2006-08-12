@@ -211,9 +211,8 @@ void ProctexPDLight::PDMap::ComputeValueBounds (const csRect& area)
   if (!image) return;
 
   const int width = image->GetWidth();
-  const int height = image->GetHeight();
-  csRGBpixel* map = (csRGBpixel*)image->GetImageData () +
-    area.ymin * width + area.xmax;
+  csRGBpixel* map = ((csRGBpixel*)image->GetImageData()) +
+    area.ymin * width + area.xmin;
   int mapPitch = width - area.Width ();
   for (int y = area.ymin; y < area.ymax; y++)
   {
@@ -395,7 +394,7 @@ void ProctexPDLight::Animate (csTicks /*current_time*/)
       LightmapScratch& scratch = GetScratch();
       scratch.SetSize (lightmapSize);
       {
-        csRGBpixel* basePtr = (csRGBpixel*)baseMap->GetImageData() +
+        csRGBpixel* basePtr = ((csRGBpixel*)baseMap->GetImageData()) +
           totalAffectedAreas.ymin * mat_w + totalAffectedAreas.xmin;
         int lines = totalAffectedAreas.Height();
         csRGBpixel* scratchPtr = scratch.GetArray();
@@ -422,8 +421,8 @@ void ProctexPDLight::Animate (csTicks /*current_time*/)
         const csColor& lightColor = light.light->GetColor ();
 
         int mapW = light.map.nonNullArea.Width();
-        const csRGBpixel* mapPtr = (csRGBpixel*)light.map->GetImageData() +
-          light.map.nonNullArea.ymin * mapW +
+        const csRGBpixel* mapPtr = ((csRGBpixel*)light.map->GetImageData()) +
+          light.map.nonNullArea.ymin * mat_w +
           light.map.nonNullArea.xmin;
         int lines = light.map.nonNullArea.Height();
         int mapPitch = mat_w - mapW;
@@ -431,7 +430,7 @@ void ProctexPDLight::Animate (csTicks /*current_time*/)
         csRGBpixel* scratchPtr = scratch.GetArray() + 
           (light.map.nonNullArea.ymin - totalAffectedAreas.ymin) * scratchW +
            light.map.nonNullArea.xmin - totalAffectedAreas.xmin;
-        int scratchPitch = scratchW - light.map.nonNullArea.Width();
+        int scratchPitch = scratchW - mapW;
 
         csRGBcolor mapMax = light.map.maxValue;
         mapMax.red = int (mapMax.red * lightColor.red);
