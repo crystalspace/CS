@@ -7287,6 +7287,7 @@ class iThingState(iBase):
     def CreatePolygonHandle(*args): return _cspace.iThingState_CreatePolygonHandle(*args)
     def GetPolygonWorldPlane(*args): return _cspace.iThingState_GetPolygonWorldPlane(*args)
     def GetPolygonLightmap(*args): return _cspace.iThingState_GetPolygonLightmap(*args)
+    def GetPolygonPDLight(*args): return _cspace.iThingState_GetPolygonPDLight(*args)
     def __del__(self, destroy=_cspace.delete_iThingState):
         try:
             if self.thisown: destroy(self)

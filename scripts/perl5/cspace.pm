@@ -8266,6 +8266,7 @@ package cspace::iThingState;
 *CreatePolygonHandle = *cspacec::iThingState_CreatePolygonHandle;
 *GetPolygonWorldPlane = *cspacec::iThingState_GetPolygonWorldPlane;
 *GetPolygonLightmap = *cspacec::iThingState_GetPolygonLightmap;
+*GetPolygonPDLight = *cspacec::iThingState_GetPolygonPDLight;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
