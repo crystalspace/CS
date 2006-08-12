@@ -21,6 +21,7 @@
 #define __DDS_DDSLOADER_H__
 
 #include "csutil/scf.h"
+#include "csgfx/imagememory.h"
 #include "csutil/parasiticdatabuffer.h"
 #include "csutil/refarr.h"
 #include "iutil/comp.h"
