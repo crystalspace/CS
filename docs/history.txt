@@ -18,6 +18,8 @@ chronological order.
 	  xmax/ymax).
 	- res fixed a crash when polygons from a polygonmesh of a genmesh with
 	  submeshes are requested.
+	- res csODECollider::CreateMeshGeometry() to use the polymesh 
+	  triangles directly instead of csPolygonMeshTools::Triangulate().
 11-Aug-2006
 	- mdmkolbe fixed some minor warnings.
 	- mdmkolbe tweaked the signature of RemoveWeakListener.
