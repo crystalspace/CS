@@ -24,6 +24,9 @@ chronological order.
 	- Jorrit fixed compilation of walktest.
 	- Vincent fixed compilation of a few apps with GCC (GNU/Linux).
 	- res fixed some more XK_MISCELLANY warnings.
+	- res changed the way the TinyXML classes are wrapped: instead of 
+	  defining a set of macros to change their classnames put them into
+	  the CS namespace instead. 
 11-Aug-2006
 	- mdmkolbe fixed some minor warnings.
 	- mdmkolbe tweaked the signature of RemoveWeakListener.

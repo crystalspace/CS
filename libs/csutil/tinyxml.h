@@ -41,8 +41,10 @@ distribution.
 #include "csutil/strset.h"
 #include "csutil/blockallocator.h"
 
-#include "tinywrap.h"
 #include "tinystr.h"
+
+namespace CS
+{
 
 class TiDocument;
 class TiDocumentNodeChildren;
@@ -799,5 +801,7 @@ private:
   TiXmlString errorDesc;
   TiXmlString value;
 };
+
+} // namespace CS
 
 #endif
