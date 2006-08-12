@@ -394,7 +394,7 @@ namespace genmeshify
             if (meshName.IsEmpty())
             {
               static int meshNum = 0;
-              meshName.Format ("unnamedmesh%d", meshNum++);
+              meshName.Format ("_genmeshify_unnamedmesh%d", meshNum++);
             }
             if (!ConvertMeshfactOrObj (sector, meshName,
               from, to, sectorNode, factory)) 
@@ -502,18 +502,33 @@ namespace genmeshify
 
   bool Processor::PreloadSectors (iDocumentNode* from)
   {
+    csRef<iDocument> newDoc = app->docSystem->CreateDocument ();
+    csRef<iDocumentNode> newRoot = newDoc->CreateRoot();
+
+    csRef<iDocumentNode> to = newRoot->CreateNodeBefore (from->GetType(), 0);
+    to->SetValue (from->GetValue());
+    CloneAttributes (from, to);
+
     // Needed so portals are written out properly
     csRef<iDocumentNodeIterator> sectorIt = from->GetNodes ("sector");
     while (sectorIt->HasNext ())
     {
       csRef<iDocumentNode> child = sectorIt->Next();
-      const char* name = child->GetAttributeValue ("name");
-      if (name)
+      csRef<iDocumentNode> child_clone = 
+        to->CreateNodeBefore (child->GetType(), 0);
+      child_clone->SetValue (child->GetValue ());
+      CloneAttributes (child, child_clone);
+
+      csRef<iDocumentNodeIterator> lightIt = child->GetNodes ("light");
+      while (lightIt->HasNext())
       {
-        iSector* sector = app->engine->CreateSector (name); 
-        region->QueryObject()->ObjAdd (sector->QueryObject());
+        csRef<iDocumentNode> light = lightIt->Next();
+        csRef<iDocumentNode> light_clone = 
+          child_clone->CreateNodeBefore (light->GetType(), 0);
+        CloneNode (light, light_clone);
       }
     }
-    return true;
+
+    return app->loader->LoadMap (to, false, region, false);
   }
 }

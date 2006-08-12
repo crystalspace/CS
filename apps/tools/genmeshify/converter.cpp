@@ -227,7 +227,7 @@ namespace genmeshify
         slmNames)) 
         return false;
 
-      if (!mobj->GetFactory()->GetMeshFactoryWrapper())
+      if (!mobj->GetFactory()->GetMeshFactoryWrapper() || hasHardTF)
       {
         csRef<iDocumentNode> factoryNode = 
           sectorNode->GetParent()->CreateNodeBefore (CS_NODE_ELEMENT,
@@ -302,7 +302,7 @@ namespace genmeshify
      */
     csRef<iObject> mfwObject = mof->GetMeshFactoryWrapper()->QueryObject();
     csString oldFactoryName = mfwObject->GetName();
-    if (factoryName != 0) mfwObject->SetName (factoryName);
+    if ((factoryName != 0) && !hasHardTF) mfwObject->SetName (factoryName);
     // ...while the GM is saved...
     if (!gmSaver->WriteDown (gmObj, to, 0)) return false;
     /* ...and set it to 0 afterwards (we don't want a Thing object from the 
@@ -602,7 +602,9 @@ namespace genmeshify
                                     iDocumentNode* textures, 
                                     csStringArray& slmNames)
   {
+    typedef csHash<csRef<csImageMemory>, csPtrKey<iLight> > PDLightHash;
     csRefArray<csImageMemory> slmImages;
+    csArray<PDLightHash> slmPDImages;
     for (size_t i = 0; i < layout.slmDimensions.GetSize(); i++)
     {
       const LMLayout::Dim& dim = layout.slmDimensions[i];
@@ -618,6 +620,24 @@ namespace genmeshify
       if (!lightmap) continue;
       slmImages[lm.slm]->Copy (lightmap, lm.rectOnSLM.xmin, lm.rectOnSLM.ymin,
         lm.rectOnSLM.Width(), lm.rectOnSLM.Height());
+
+      size_t n = 0;
+      csRef<iImage> pdMap; iLight* pdLight;
+      while (object->GetPolygonPDLight (int (p), n++, pdMap, pdLight))
+      {
+        PDLightHash& pdLights = slmPDImages.GetExtend (lm.slm);
+        csRef<csImageMemory> pdSLM;
+        if (!pdLights.Contains (pdLight))
+        {
+          const LMLayout::Dim& dim = layout.slmDimensions[lm.slm];
+          pdSLM.AttachNew (new csImageMemory (dim.w, dim.h));
+          pdLights.Put (pdLight, pdSLM);
+        }
+        else
+          pdSLM = pdLights.Get (pdLight, 0);
+        pdSLM->Copy (pdMap, lm.rectOnSLM.xmin, lm.rectOnSLM.ymin,
+          lm.rectOnSLM.Width(), lm.rectOnSLM.Height());
+      }
     }
     for (size_t s = 0; s < slmImages.GetSize(); s++)
     {
@@ -661,6 +681,62 @@ namespace genmeshify
       csRef<iDocumentNode> textureClassContent = 
         textureClassNode->CreateNodeBefore (CS_NODE_TEXT, 0);
       textureClassContent->SetValue ("lightmap");
+
+      csRef<iDocumentNode> pdlightParamsNode;
+
+      if (slmPDImages.GetSize() > s)
+      {
+        PDLightHash::GlobalIterator pdIter = slmPDImages[s].GetIterator ();
+        while (pdIter.HasNext())
+        {
+          csPtrKey<iLight> pdLight;
+          const csRef<csImageMemory>& pdMap = pdIter.Next (pdLight);
+          csString lightIDHex;
+          {
+            const char* lightId = pdLight->GetLightID ();
+            for (int i = 0; i < 16; i++)
+              lightIDHex.AppendFmt ("%02" PRIx8, uint8 (lightId[i]));
+          }
+          csString fn;
+          fn.Format ("lightmaps/%s_pd_%s.png", lightmapName.GetData(),
+            lightIDHex.GetData());
+
+          csRef<iDataBuffer> buf = app->imageIO->Save (pdMap, "image/png");
+          if (!buf.IsValid())
+          {
+            app->Report ("Error saving PD lightmap to PNG");
+            return false;
+          }
+          if (!app->vfs->WriteFile (fn, buf->GetData(), buf->GetSize()))
+          {
+            app->Report ("Error writing to file %s", fn.GetData());
+            return false;
+          }
+
+          if (!pdlightParamsNode.IsValid())
+          {
+            csRef<iDocumentNode> typeNode = 
+              textureNode->CreateNodeBefore (CS_NODE_ELEMENT, textureFileNode);
+            typeNode->SetValue ("type");
+            csRef<iDocumentNode> typeContent = 
+              typeNode->CreateNodeBefore (CS_NODE_TEXT, 0);
+            typeContent->SetValue ("crystalspace.texture.loader.pdlight");
+
+            pdlightParamsNode = 
+              textureNode->CreateNodeBefore (CS_NODE_ELEMENT, 0);
+            pdlightParamsNode->SetValue ("params");
+          }
+
+          csRef<iDocumentNode> mapNode = 
+            pdlightParamsNode->CreateNodeBefore (CS_NODE_ELEMENT, 0);
+          mapNode->SetValue ("map");
+          mapNode->SetAttribute ("lightid", lightIDHex);
+
+          csRef<iDocumentNode> mapContents = 
+            mapNode->CreateNodeBefore (CS_NODE_TEXT, 0);
+          mapContents->SetValue (fn);
+        }
+      }
     }
     return true;
   }

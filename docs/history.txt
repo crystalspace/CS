@@ -10,6 +10,9 @@ chronological order.
 	- res changed ptpdlight to not just update the light map the next
 	  frame after it's initially needed.
 	- res fixed some flaws in ptpdlight.
+	- res fixed genmeshify to always write a new factory for 
+	  hardtransformed meshes.
+	- res added PD light support to genmeshify.
 11-Aug-2006
 	- mdmkolbe fixed some minor warnings.
 	- mdmkolbe tweaked the signature of RemoveWeakListener.
