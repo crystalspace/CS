@@ -16,6 +16,8 @@ chronological order.
 	- res fixed csRect::Extend() to truly ensure that the given point is
 	  inside the rectangle (it didn't adhere to csRect's exclusivity of 
 	  xmax/ymax).
+	- res fixed a crash when polygons from a polygonmesh of a genmesh with
+	  submeshes are requested.
 11-Aug-2006
 	- mdmkolbe fixed some minor warnings.
 	- mdmkolbe tweaked the signature of RemoveWeakListener.
