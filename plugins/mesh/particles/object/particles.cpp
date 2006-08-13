@@ -694,6 +694,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
         holder->SetRenderBuffer (CS_BUFFER_TEXCOORD0, tcBuffer);
       }
       break;
+    default:
+      break;
     }
   }
 

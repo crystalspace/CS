@@ -642,8 +642,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     //-- iParticleSystemBase
     csParticleRenderOrientation particleOrientation;
     csParticleRotationMode rotationMode;
-    csParticleSortMode sortMode;
     csParticleIntegrationMode integrationMode;
+    csParticleSortMode sortMode;
     csVector3 commonDirection;
     bool localMode;
     bool individualSize;

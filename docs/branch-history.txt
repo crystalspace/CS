@@ -1,6 +1,8 @@
 Crystal Space detailed change log for newparticles branch.
 
 
+13-Aug-2006
+        - res fixed a number of gcc warnings.
 6-Jun-2006
 	- Marten wrote the particle system saver components.
 	- Marten integrated trunk revisions 24417:24471 to

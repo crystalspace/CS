@@ -29,7 +29,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
   // General random number generators
   CS_IMPLEMENT_STATIC_VAR(GetVGen, csRandomVectorGen,);
   CS_IMPLEMENT_STATIC_VAR(GetFGen, csRandomFloatGen,);
-  CS_IMPLEMENT_STATIC_VAR(GetIGen, csRandomGen,);  
+  //CS_IMPLEMENT_STATIC_VAR(GetIGen, csRandomGen,);  
 
   /**
    * Small helper-function to calculate x^(1/3) using Newton iteration.

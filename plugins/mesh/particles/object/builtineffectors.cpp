@@ -55,7 +55,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     for (size_t idx = 0; idx < particleBuffer.particleCount; ++idx)
     {
       csParticle& particle = particleBuffer.particleData[idx];
-      csParticleAux& particleAux = particleBuffer.particleAuxData[idx];
+      //csParticleAux& particleAux = particleBuffer.particleAuxData[idx];
 
       csVector3 a = acceleration;
 

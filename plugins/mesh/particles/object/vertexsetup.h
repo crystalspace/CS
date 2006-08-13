@@ -31,6 +31,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
 {
   struct iVertexSetup
   {
+    virtual ~iVertexSetup() {}
     virtual void Init (const csReversibleTransform& o2c, const csVector3& commonDir,
       const csVector2& particleSize) = 0;
 
