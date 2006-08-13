@@ -8,6 +8,9 @@ chronological order.
 
 13-Aug-2006
 	- res added CS_REQUEST_PLUGIN_TAG.
+	- res made genmeshify use the document plexer plugin.
+	- res made genmeshify properly handle the <settings> tag (fixes
+	  conversion of maps with custom lightmap cell sizes).
 12-Aug-2006
 	- res changed ptpdlight to not just update the light map the next
 	  frame after it's initially needed.

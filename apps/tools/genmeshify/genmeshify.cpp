@@ -43,6 +43,10 @@ namespace genmeshify
 
     // Get plugins
     if (!csInitializer::RequestPlugins (objectRegistry,
+            CS_REQUEST_PLUGIN("crystalspace.documentsystem.multiplexer", 
+              iDocumentSystem),
+            CS_REQUEST_PLUGIN_TAG("crystalspace.documentsystem.tinyxml", 
+              iDocumentSystem, "iDocumentSystem.1"),
             CS_REQUEST_ENGINE,
             CS_REQUEST_IMAGELOADER,
             CS_REQUEST_LEVELLOADER,
@@ -88,7 +92,12 @@ namespace genmeshify
       return Report ("Error opening system!");
 
     // For now, force the use of TinyXML to be able to write
-    docSystem.AttachNew (new csTinyDocumentSystem);
+    docSystem = csQueryRegistry<iDocumentSystem> (objectRegistry);
+    if (!vfs) 
+    {
+      Report ("No iDocumentSystem!");
+      return false;
+    }
 
     return true;
   }
