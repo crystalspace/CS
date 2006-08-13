@@ -1,0 +1,178 @@
+@c -*-texinfo-*-
+@node MeshObject Particles, , MeshObject Haze, MeshObject
+@subsection Particles Mesh Object
+@cindex MeshObject
+@cindex Particles Particle System
+@cindex @code{iMeshObject}
+@cindex @code{iMeshObjectFactory}
+@cindex @code{iMeshObjectType}
+@cindex @code{iParticleSystemBase}
+@cindex @code{iParticleSystemFactory}
+@cindex @code{iParticleSystem}
+@cindex @code{iParticleEmitter}
+@cindex @code{iParticleEffector}
+
+@emph{Written by Marten Svanfeldt,
+@email{developer@@svanfeldt.com}.}
+
+Particles is a general particle rendering and simple simulation plugin. It
+also contains a few simpler built-in implementations of particle emitters
+and effectors.
+
+@subsubheading Basic Structure
+
+The following @sc{scf} class names are used (for @code{csLoadPlugin}):
+
+@itemize @bullet
+@item
+Type plugin: @samp{crystalspace.mesh.object.particles}
+@item
+Loader plugin: @samp{crystalspace.mesh.loader.particles}
+@item
+Factory loader plugin: @samp{crystalspace.mesh.loader.factory.particles}
+@end itemize
+
+Objects in this plugin implement the following @sc{scf} interfaces (get
+with @code{scfQueryInterface}):
+
+@itemize @bullet
+@item
+@emph{MeshObject}
+@itemize @bullet
+@item
+Implements @samp{iMeshObject}
+@item
+Implements @samp{iParticleSystem}
+@end itemize
+@item
+@emph{MeshObjectFactory}
+@itemize @bullet
+@item
+Implements @samp{iMeshObjectFactory}
+@item
+Implements @samp{iParticleSystemFactory}
+@end itemize
+@item
+@emph{MeshObjectFactory}
+@itemize @bullet
+@item
+Implements @samp{iMeshObjectType}
+@end itemize
+@end itemize
+
+@subsubheading Factory State Interface
+
+Use the @samp{iParticleSystemFactory} @sc{scf} interface to access settings for
+a particle system factory.  The definition of this interface can be found in
+@file{CS/include/imesh/particles.h} and that is also the include file you need
+to include in your applications to use this plugin.  Using this interface you
+can access the material, default particle billboard setup, rotation mode, 
+emitters, effectors and various other configuration parameters for a 
+particle system factory.
+
+Notice that once a particle system have been created from a factory, changing
+the factory won't change the instance. So in the case of particle systems
+the factory should be viewed as a template rather than a "parent".
+
+@subsubheading Object State Interface
+
+Use the @samp{iParticleSystem} @sc{scf} interface to access settings for
+a particle system.  The definition of this interface can be found in
+@file{CS/include/imesh/particles.h} and that is also the include file you need
+to include in your applications to use this plugin.  Using this interface you
+can access the material, default particle billboard setup, rotation mode, 
+emitters, effectors and various other configuration parameters for a 
+particle system.
+
+@anchor{Particles Factory and Object Loader}
+@subsubheading Factory and Object Loader
+
+The factory and object loader in much recognize the same set of keywords.
+
+@table @code
+@item <renderorientation>orientation</renderorientation>
+Set how the particle billboards are oriented in relation to the world and the
+camera. @xref{Particles billboard setup,,Particle billboard setup}.
+@item <rotationmode>rotation</rotationmode>
+Set how rotation of the particles affect the visual output. Valid values are
+@samp{none}, @samp{texcoord} and @samp{vertex}. Default is no effect 
+(@samp{none}).
+@item <sortmode>sort</sortmode>
+Control the particle front-to-back sorting mode. Valid values are
+@samp{none}, @samp{distance} and @samp{dot}.
+@item <integrationmode>integration</integrationmode>
+Velocity to position integration mode. Valid values are
+@samp{none}, @samp{linear} and @samp{both}. Default is @samp{linear}.
+@item <commondirection x="" y="" z="" />
+Set common direction. Common direction is used as a reference direction for
+billboard setup for a few particle billboard orientations.
+@item <localmode>yes/no</localmode>
+Set if particle system should be in local or global mode. In local mode the
+positions of emitters and particles are relative to the particles mesh, while
+in global mode they are world space.
+@item <individualsize>yes/no</individualsize>
+Determin if particle rendering should use the individual size associated with 
+each particle, or if the global <particlesize> property should be used.
+@item <particlesize x="" y="" />
+Set global particle size.
+@item <minbb>@dots{}</minbb>
+Set the minimum bounding box of the particles mesh. The particle system is only
+rendered when the bounding box is deemed visible (within frustum), and therefor
+it can sometimes be required to have a bigger bounding box than the current
+distribution of the particles.
+@item <emitter type="">@dots{}</emitter>
+Add a built-in emitter to the particles system.
+@item <effector type="">@dots{}</effector>
+Add a built-in effector to the particles system.
+@end table
+
+
+@subsubheading Factory Loader
+
+Also see the general documentation for keywords recognized both by factory and 
+object. 
+@xref{Particles Factory and Object Loader, , Factory and Object Loader}.
+
+@table @code
+@item <deepcreation>yes/no</deepcreation>
+Enable or disable deep-copy on creation of particle systems.
+@item <material>materialName</material>
+Set the default material for particle system factory.
+@item <mixmode>mixmode</mixmode>
+Set the default mixmode for particle system factory.
+@end table
+
+@subsubheading Object Loader
+
+Also see the general documentation for keywords recognized both by factory and 
+object. 
+@xref{Particles Factory and Object Loader, , Factory and Object Loader}.
+
+@table @code
+@item <factory>factoryName</factory>
+Set the factory to use when creating the particle system.
+@item <material>materialName</material>
+Set the material for particle system.
+@item <mixmode>mixmode</mixmode>
+Set the mixmode for particle system.
+@end table
+
+@subsubheading Operation of particles
+The particle system have three basic parts
+
+@itemize @bullet
+@item Particle update loop
+@item Particle billboard setup
+@item Handling of emitters and effectors
+@end itemize
+
+
+
+@subsubheading Particle update loop
+
+@anchor{Particles billboard setup}
+@subsubheading Particle billboard setup
+
+@subsubheading Emitters
+
+@subsubheading Effectors
