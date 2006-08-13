@@ -540,8 +540,7 @@ csHandlerID RegisterWeakListener (iEventQueue *q, iEventHandler *listener,
   return q->RegisterListener (handler, ename);
 }
 
-void RemoveWeakListener (iEventQueue *q, iObjectRegistry *r,
-  csRef<iEventHandler> &handler)
+void RemoveWeakListener (iEventQueue *q, csRef<iEventHandler> &handler)
 {
   q->RemoveListener(handler);
 }

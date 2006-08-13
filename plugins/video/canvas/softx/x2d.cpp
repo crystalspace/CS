@@ -125,7 +125,9 @@ bool csGraphics2DXLib::Initialize (iObjectRegistry *object_reg)
   if (q != 0)
   {
     // Tell event queue to call us on broadcast messages
-    q->RegisterListener (scfiEventHandler, csevCommandLineHelp(object_reg));
+    // csGraphics2D::Initialize already setup weakEventHandler using
+    // RegisterWeakListener so we use plain RegisterListener here.
+    q->RegisterListener (weakEventHandler, csevCommandLineHelp(object_reg));
     // Create the event outlet
     EventOutlet = q->CreateEventOutlet (this);
   }

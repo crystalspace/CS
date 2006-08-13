@@ -86,7 +86,7 @@ namespace CS
 	    || ABS (px - OutP [0].x) > EPSILON
 	    || ABS (py - OutP [0].y) > EPSILON))
 	{
-	  CS_ASSERT (OutV >= 0 && OutV < MAX_OUTPUT_VERTICES);
+	  CS_ASSERT (OutV < MAX_OUTPUT_VERTICES);
 	  OutP [OutV].x = px;
 	  OutP [OutV].y = py;
 	  statOut.Copy (OutV, vert - 1);
@@ -119,7 +119,7 @@ namespace CS
 	    || ABS (tx - OutP [0].x) > EPSILON
 	    || ABS (ty - OutP [0].y) > EPSILON))
 	  {
-	    CS_ASSERT (OutV >= 0 && OutV < MAX_OUTPUT_VERTICES);
+	    CS_ASSERT (OutV < MAX_OUTPUT_VERTICES);
 	    OutP [OutV].x = tx;
 	    OutP [OutV].y = ty;
 	    /*

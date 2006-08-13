@@ -22,7 +22,7 @@
 #include "csgeom/math.h"
 #include "csgeom/polyclip.h"
 #include "csgeom/sphere.h"
-#include "csgfx/memimage.h"
+#include "csgfx/imagememory.h"
 #include "csqint.h"
 #include "csutil/cfgacc.h"
 #include "csutil/databuf.h"
@@ -542,7 +542,7 @@ csEngine::~csEngine ()
   {
     csRef<iEventQueue> q (CS_QUERY_REGISTRY (objectRegistry, iEventQueue));
     if (q != 0)
-      RemoveWeakListener (q, objectRegistry, weakEventHandler);
+      RemoveWeakListener (q, weakEventHandler);
   }
 
   DeleteAll ();

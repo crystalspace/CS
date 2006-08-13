@@ -257,8 +257,7 @@ csHandlerID RegisterWeakListener (iEventQueue *q, iEventHandler *listener,
  * Helper function for removing an event handler that was registered with
  * RegisterWeakListener().
  */
-void RemoveWeakListener (iEventQueue *q, iObjectRegistry *r,
-  csRef<iEventHandler> &handler);
+void RemoveWeakListener (iEventQueue *q, csRef<iEventHandler> &handler);
  
 /** @} */
 

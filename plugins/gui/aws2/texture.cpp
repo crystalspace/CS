@@ -28,7 +28,7 @@
 #include "ivideo/texture.h"
 #include "ivideo/txtmgr.h"
 #include "iutil/databuff.h"
-#include "csgfx/memimage.h"
+#include "csgfx/imagememory.h"
 
 
 #define CHECK(objname, check) \

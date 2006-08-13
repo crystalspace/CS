@@ -427,6 +427,7 @@ class csGenmeshAnimationControlType :
 {
 private:
   iObjectRegistry* object_reg;
+  csRef<iEventHandler> weakEventHandler;
 
 public:
   /// Constructor.

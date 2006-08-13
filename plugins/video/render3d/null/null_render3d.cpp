@@ -20,7 +20,7 @@
 #include "csqint.h"
 
 #include "csgeom/plane3.h"
-#include "csgfx/memimage.h"
+#include "csgfx/imagememory.h"
 #include "cstool/initapp.h"
 #include "csutil/event.h"
 #include "csutil/scfstrset.h"

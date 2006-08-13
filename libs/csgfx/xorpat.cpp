@@ -19,7 +19,7 @@
 
 #include "cssysdef.h"
 #include "igraphic/image.h"
-#include "csgfx/memimage.h"
+#include "csgfx/imagememory.h"
 #include "csgfx/rgbpixel.h"
 #include "csqint.h"
 #include "csgfx/xorpat.h"

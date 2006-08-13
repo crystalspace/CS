@@ -19,7 +19,6 @@
 #ifndef __CS_TGAIMAGE_H__
 #define __CS_TGAIMAGE_H__
 
-#include "csgfx/memimage.h"
 #include "igraphic/imageio.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"

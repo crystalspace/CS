@@ -20,7 +20,7 @@
 #include "soft_txt.h"
 #include "csgfx/bakekeycolor.h"
 #include "csgfx/imagemanipulate.h"
-#include "csgfx/memimage.h"
+#include "csgfx/imagememory.h"
 #include "csgfx/packrgb.h"
 #include "csgfx/xorpat.h"
 #include "iutil/cfgfile.h"

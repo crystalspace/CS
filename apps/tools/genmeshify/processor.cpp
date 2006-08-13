@@ -228,7 +228,7 @@ namespace genmeshify
   bool Processor::ProcessWorld (iDocumentNode* from, iDocumentNode* to,
                                 csStringArray& librariesList)
   {
-    PreloadTexturesMaterialsLibs (from);
+    PreloadDependencies (from);
     PreloadSectors (from);
 
     to->SetValue (from->GetValue ());
@@ -298,24 +298,40 @@ namespace genmeshify
 
   bool Processor::ProcessPlugins (iDocumentNode* from, iDocumentNode* to)
   {
-    csRef<iDocumentNodeIterator> pluginIt = from->GetNodes ("plugin");
-    while (pluginIt->HasNext ())
+    to->SetValue (from->GetValue());
+    CloneAttributes (from, to);
+
+    csRef<iDocumentNodeIterator> it = from->GetNodes ();
+    while (it->HasNext ())
     {
-      csRef<iDocumentNode> pluginNode = pluginIt->Next ();
-      csString shortcut (pluginNode->GetAttributeValue ("name"));
-      if (shortcut.IsEmpty()) continue;
+      bool doClone = true;
+      csRef<iDocumentNode> node = it->Next ();
+      if ((node->GetType() == CS_NODE_ELEMENT)
+        && (strcmp (node->GetValue(), "plugin") == 0))
+      {
+        csString shortcut (node->GetAttributeValue ("name"));
+        if (shortcut.IsEmpty()) continue;
 
-      csRef<iDocumentNode> idNode = pluginNode->GetNode ("id");
-      csString id;
-      if (idNode.IsValid())
-        id = idNode->GetContentsValue();
-      else
-        id = pluginNode->GetContentsValue();
+        csRef<iDocumentNode> idNode = node->GetNode ("id");
+        csString id;
+        if (idNode.IsValid())
+          id = idNode->GetContentsValue();
+        else
+          id = node->GetContentsValue();
 
-      plugins.PutUnique (shortcut, id);
+        plugins.PutUnique (shortcut, id);
+
+        doClone = ((id != "crystalspace.mesh.loader.thing")
+          && (id != "crystalspace.mesh.loader.factory.thing"));
+      }
+      if (doClone)
+      {
+        csRef<iDocumentNode> child_clone = to->CreateNodeBefore (
+    	    node->GetType (), 0);
+        CloneNode (node, child_clone);
+      }
     }
 
-    CloneNode (from, to);
     return true;
   }
 
@@ -394,7 +410,7 @@ namespace genmeshify
             if (meshName.IsEmpty())
             {
               static int meshNum = 0;
-              meshName.Format ("unnamedmesh%d", meshNum++);
+              meshName.Format ("_genmeshify_unnamedmesh%d", meshNum++);
             }
             if (!ConvertMeshfactOrObj (sector, meshName,
               from, to, sectorNode, factory)) 
@@ -465,7 +481,7 @@ namespace genmeshify
         sectorNode, texturesNode);
   }
 
-  bool Processor::PreloadTexturesMaterialsLibs (iDocumentNode* from)
+  bool Processor::PreloadDependencies (iDocumentNode* from)
   {
     csRef<iDocument> newDoc = app->docSystem->CreateDocument ();
     csRef<iDocumentNode> newRoot = newDoc->CreateRoot();
@@ -487,6 +503,7 @@ namespace genmeshify
           case XMLTOKEN_MATERIALS:
           case XMLTOKEN_PLUGINS:
           case XMLTOKEN_LIBRARY:
+          case XMLTOKEN_SETTINGS:
             {
               csRef<iDocumentNode> child_clone = 
                 to->CreateNodeBefore (child->GetType(), 0);
@@ -502,18 +519,33 @@ namespace genmeshify
 
   bool Processor::PreloadSectors (iDocumentNode* from)
   {
+    csRef<iDocument> newDoc = app->docSystem->CreateDocument ();
+    csRef<iDocumentNode> newRoot = newDoc->CreateRoot();
+
+    csRef<iDocumentNode> to = newRoot->CreateNodeBefore (from->GetType(), 0);
+    to->SetValue (from->GetValue());
+    CloneAttributes (from, to);
+
     // Needed so portals are written out properly
     csRef<iDocumentNodeIterator> sectorIt = from->GetNodes ("sector");
     while (sectorIt->HasNext ())
     {
       csRef<iDocumentNode> child = sectorIt->Next();
-      const char* name = child->GetAttributeValue ("name");
-      if (name)
+      csRef<iDocumentNode> child_clone = 
+        to->CreateNodeBefore (child->GetType(), 0);
+      child_clone->SetValue (child->GetValue ());
+      CloneAttributes (child, child_clone);
+
+      csRef<iDocumentNodeIterator> lightIt = child->GetNodes ("light");
+      while (lightIt->HasNext())
       {
-        iSector* sector = app->engine->CreateSector (name); 
-        region->QueryObject()->ObjAdd (sector->QueryObject());
+        csRef<iDocumentNode> light = lightIt->Next();
+        csRef<iDocumentNode> light_clone = 
+          child_clone->CreateNodeBefore (light->GetType(), 0);
+        CloneNode (light, light_clone);
       }
     }
-    return true;
+
+    return app->loader->LoadMap (to, false, region, false);
   }
 }

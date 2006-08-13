@@ -18,7 +18,7 @@
 
 #include "cssysdef.h"
 
-#include "csgfx/memimage.h"
+#include "csgfx/imagememory.h"
 #include "iengine/texture.h"
 #include "imap/loader.h"
 #include "iutil/objreg.h"

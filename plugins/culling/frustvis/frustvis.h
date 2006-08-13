@@ -91,6 +91,7 @@ public:
 private:
   iObjectRegistry *object_reg;
   csEventID CanvasResize;
+  csRef<iEventHandler> weakEventHandler;
   csKDTree* kdtree;
   // Ever growing box of all objects that were ever in the tree.
   // This puts an upper limit of all boxes in the kdtree itself because

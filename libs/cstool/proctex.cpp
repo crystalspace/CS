@@ -20,7 +20,7 @@
 #include "cssysdef.h"
 #include <math.h>
 
-#include "csgfx/memimage.h"
+#include "csgfx/imagememory.h"
 #include "cstool/proctex.h"
 #include "csutil/hash.h"
 #include "csutil/event.h"
@@ -67,15 +67,15 @@ public:
 
   virtual bool HandleEvent (iEvent& event);
 
-  CS_EVENTHANDLER_NAMES("crystalspace.proxtex")
+  CS_EVENTHANDLER_NAMES("crystalspace.proctex")
   CS_EVENTHANDLER_NIL_CONSTRAINTS
 
 public:
-  void PushTexture (csProcTexture* txt)
+  virtual void PushTexture (csProcTexture* txt)
   {
     textures.Add (txt);
   }
-  void PopTexture (csProcTexture* txt)
+  virtual void PopTexture (csProcTexture* txt)
   {
     textures.Delete (txt);
   }
@@ -174,9 +174,7 @@ struct csProcTexCallback :
 
 void csProcTexCallback::UseTexture (iTextureWrapper*)
 {
-  if (!pt->PrepareAnim ()) return;
-  pt->visible = true;
-  ((csProcTexEventHandler*)(iEventHandler*)(pt->proceh))->PushTexture (pt);
+  pt->UseTexture ();
 }
 iProcTexture* csProcTexCallback::GetProcTexture() const
 {
@@ -253,6 +251,13 @@ void csProcTexture::SetAlwaysAnimate (bool enable)
   {
     ((csProcTexEventHandler*)(iEventHandler*)proceh)->PushTexture (this);
   }
+}
+
+void csProcTexture::UseTexture ()
+{
+  if (!PrepareAnim ()) return;
+  visible = true;
+  ((csProcTexEventHandler*)(iEventHandler*)(proceh))->PushTexture (this);
 }
 
 //-----------------------------------------------------------------------------

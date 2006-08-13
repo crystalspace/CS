@@ -66,7 +66,11 @@ namespace genmeshify
       iDocumentNode* from, iDocumentNode* to, iDocumentNode* sectorNode,
       bool factory);
 
-    bool PreloadTexturesMaterialsLibs (iDocumentNode* from);
+    /**
+     * Load stuff that the loaded mesh factories may depend on: 
+     * textures, materials, libraries, and settings.
+     */
+    bool PreloadDependencies (iDocumentNode* from);
     bool PreloadSectors (iDocumentNode* from);
   public:
     Processor (App* app);
