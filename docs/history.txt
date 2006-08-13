@@ -6,6 +6,8 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+13-Aug-2006
+	- res added CS_REQUEST_PLUGIN_TAG.
 12-Aug-2006
 	- res changed ptpdlight to not just update the light map the next
 	  frame after it's initially needed.
