@@ -27,6 +27,7 @@ SndSysListenerOpenAL::SndSysListenerOpenAL () :
   m_Volume (1.0), m_Update (true), m_ExternalUpdate (true)
 {
   alListener3f( AL_VELOCITY, 0, 0, 0 );
+  alDistanceModel( AL_EXPONENT_DISTANCE_CLAMPED );
   Update ();
 }
 

@@ -241,13 +241,18 @@ bool SndSysSourceOpenAL2D::FillBuffer (ALuint buffer) {
 
 SndSysSourceOpenAL3D::SndSysSourceOpenAL3D (csRef<iSndSysStream> stream, csSndSysRendererOpenAL *renderer) :
   scfImplementationType(this, stream, renderer),
-  m_MinDistance (1), m_MaxDistance (65536), m_Update (true)
+  m_MinDistance (1), m_MaxDistance (65536), m_InnerAngle (360), m_OuterAngle (360), m_OuterGain (0), m_Update (true)
 {
   // Setup initial parameters
   m_Position.Set( 0, 0, 0 );
 
+  // Setup stream parameters
+  if (stream->Get3dMode() == CS_SND3D_ABSOLUTE)
+    alSourcei (GetSource(), AL_SOURCE_RELATIVE, AL_FALSE);
+  else
+    alSourcei (GetSource(), AL_SOURCE_RELATIVE, AL_TRUE);
+
   // Set the rolloff factor:
-  // TODO: Propagate changes
   alSourcef (GetSource(), AL_ROLLOFF_FACTOR, renderer->GetListener()->GetRollOffFactor());
 }
 
@@ -301,12 +306,87 @@ float SndSysSourceOpenAL3D::GetMaximumDistance ()
 }
 
 /*
+ * iSndSysSource3DDirectionalSimple interface
+ */
+
+void SndSysSourceOpenAL3D::SetDirection (csVector3 dir)
+{
+  m_Direction = dir;
+  m_Update = true;
+}
+
+csVector3 SndSysSourceOpenAL3D::GetDirection ()
+{
+  return m_Direction;
+}
+
+void SndSysSourceOpenAL3D::SetDirectionalRadiation (float rad)
+{
+  if( rad == 0 ) {
+    // OpenAL uses the direction vector to specify an omni directional source.
+    m_Direction = csVector3( 0, 0, 0 );
+    m_InnerAngle = 360;
+    m_OuterAngle = 360;
+  } else {
+    m_InnerAngle = 0;
+    // Note: OpenAL uses angles, not halfangles, hence I multiply by 360, not 180.
+    m_OuterAngle = rad*360/PI;
+  }
+  m_OuterGain = 0;
+  m_Update = true;
+}
+
+float SndSysSourceOpenAL3D::GetDirectionalRadiation ()
+{
+  // Note: OpenAL uses angles, not halfangles, hence I divide by 360, not 180.
+  return m_OuterAngle*PI/360;
+}
+
+/*
+ * iSndSysSource3DDirectional interface
+ */
+void SndSysSourceOpenAL3D::SetDirectionalRadiationInnerCone(float rad)
+{
+  // Note: OpenAL uses angles, not halfangles, hence I multiply by 360, not 180.
+  m_InnerAngle = rad*360/PI;
+  m_Update = true;
+}
+
+void SndSysSourceOpenAL3D::SetDirectionalRadiationOuterCone(float rad)
+{
+  // Note: OpenAL uses angles, not halfangles, hence I multiply by 360, not 180.
+  m_OuterAngle = rad*360/PI;
+  m_Update = true;
+}
+
+void SndSysSourceOpenAL3D::SetDirectionalRadiationOuterGain(float gain)
+{
+  m_OuterGain = gain;
+  m_Update = true;
+}
+
+float SndSysSourceOpenAL3D::GetDirectionalRadiationInnerCone()
+{
+  return m_InnerAngle*PI/360;
+}
+
+float SndSysSourceOpenAL3D::GetDirectionalRadiationOuterCone()
+{
+  return m_OuterAngle*PI/360;
+}
+
+float SndSysSourceOpenAL3D::GetDirectionalRadiationOuterGain()
+{
+  return m_OuterGain;
+}
+
+/*
  * SndSysSourceOpenAL3D impementation
  */
 
 void SndSysSourceOpenAL3D::PerformUpdate ( bool ExternalUpdates )
 {
-  // Let SndSysSourceOpenAL2D tak care of buffers at it's attributes:
+  // Let SndSysSourceOpenAL2D tak care of buffers and it's attributes:
   SndSysSourceOpenAL2D::PerformUpdate (ExternalUpdates);
 
   // Do we need to update attributes?
@@ -315,6 +395,10 @@ void SndSysSourceOpenAL3D::PerformUpdate ( bool ExternalUpdates )
     alSourcef (GetSource(), AL_REFERENCE_DISTANCE, m_MinDistance);
     alSourcef (GetSource(), AL_MAX_DISTANCE, m_MaxDistance);
     alSource3f (GetSource(), AL_POSITION, m_Position[0], m_Position[1], m_Position[2]);
+    alSource3f (GetSource(), AL_DIRECTION, m_Direction[0], m_Direction[1], m_Direction[2]);
+    alSourcef (GetSource(), AL_CONE_INNER_ANGLE, m_InnerAngle);
+    alSourcef (GetSource(), AL_CONE_OUTER_ANGLE, m_OuterAngle);
+    alSourcef (GetSource(), AL_CONE_OUTER_GAIN, m_OuterGain);
     m_Update = false;
   }
 

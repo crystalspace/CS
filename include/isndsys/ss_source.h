@@ -169,9 +169,9 @@ struct iSndSysSource3DDirectionalSimple : public virtual iBase
   /// SCF2006 - See http://www.crystalspace3d.org/cseps/csep-0010.html
   SCF_INTERFACE(iSndSysSource3DDirectionalSimple,2,0,0);
 
-  /// set position of this source
+  /// set direction of this source
   virtual void SetDirection(csVector3 dir) = 0;
-  /// get position of this source
+  /// get direction of this source
   virtual csVector3 GetDirection() = 0;
 
   /**
@@ -186,6 +186,64 @@ struct iSndSysSource3DDirectionalSimple : public virtual iBase
 
   /// Retrieves the current directional radiation 
   virtual float GetDirectionalRadiation() = 0;
+
+};
+
+/**
+ * \todo Document me!
+ */
+struct iSndSysSource3DDirectional : public virtual iBase
+{
+  /// SCF2006 - See http://www.crystalspace3d.org/cseps/csep-0010.html
+  SCF_INTERFACE(iSndSysSource3DDirectional,2,0,0);
+
+  /**
+   * set direction of this source
+   * Set this to (0, 0, 0) for a omni-directional sound.
+   */
+  virtual void SetDirection(csVector3 dir) = 0;
+  /// get direction of this source
+  virtual csVector3 GetDirection() = 0;
+
+  /**
+   * The directional radiation applies to sound that are oriented in a
+   * particular direction.
+   *
+   * Directional sounds have two cones, with the apexs at the sound source,
+   * termed the inner cone and the outer cone. When the listener is with the
+   * inner cone, the sound is played at a normal volume. Outside the outer cone
+   * the sound is played at the outer gaim times normal volume. Between the
+   * inner and outer cones, the volume is interpolated.
+   *
+   * This value is expressed in radians and describes the half-angle of the
+   * inner cone.
+   *
+   * @note Unlike iSndSysSource3DDirectionalSimple setting the to 0.0f will not
+   *       make an omni directional source
+   */
+  virtual void SetDirectionalRadiationInnerCone(float rad) = 0;
+
+  /**
+   * This value is expressed in radians and describes the half-angle of the
+   * outer cone.
+   *
+   * @see SetDirectionalRadiationInnerCone(float rad)
+   */
+  virtual void SetDirectionalRadiationOuterCone(float rad) = 0;
+
+  /**
+   * This value describes the gain outside of the outer cone.
+   *
+   * @see SetDirectionalRadiationInnerCone(float rad)
+   */
+  virtual void SetDirectionalRadiationOuterGain(float gain) = 0;
+
+  /// Retrieves the current half-angle of the inner cone
+  virtual float GetDirectionalRadiationInnerCone() = 0;
+  /// Retrieves the current half-angle of the outer cone
+  virtual float GetDirectionalRadiationOuterCone() = 0;
+  /// Retrieves the current gain/volume outside the outer cone
+  virtual float GetDirectionalRadiationOuterGain() = 0;
 
 };
 /** @} */

@@ -123,17 +123,15 @@ private:
 
 
 class SndSysSourceOpenAL3D :
-  public scfImplementationExt1<SndSysSourceOpenAL3D,
+  public scfImplementationExt3<SndSysSourceOpenAL3D,
                                SndSysSourceOpenAL2D,
-                               iSndSysSource3D >
+                               iSndSysSource3D,
+                               iSndSysSource3DDirectionalSimple,
+                               iSndSysSource3DDirectional >
 {
 public:
   SndSysSourceOpenAL3D (csRef<iSndSysStream> stream, csSndSysRendererOpenAL *renderer);
   virtual ~SndSysSourceOpenAL3D ();
-
-  /*
-   * iSndSysSourceOpenAL interface
-   */
 
   /*
    * iSndSysSource3D interface
@@ -174,6 +172,72 @@ public:
   virtual float GetMaximumDistance ();
 
   /*
+   * iSndSysSource3DDirectionalSimple interface
+   */
+public:
+  /// set direction of this source
+  virtual void SetDirection (csVector3 dir);
+  /// get direction of this source
+  virtual csVector3 GetDirection ();
+
+  /**
+   * The directional radiation applies to sound that are oriented in a
+   * particular direction.
+   * This value is expressed in radians and describes the half-angle of a
+   * cone spreading from the position of the source and opening
+   * in the direction of the source.
+   * Set this value to 0.0f for an omni-directional sound. 
+   */
+  virtual void SetDirectionalRadiation (float rad);
+
+  /// Retrieves the current directional radiation 
+  virtual float GetDirectionalRadiation ();
+
+  /*
+   * iSndSysSource3DDirectional interface
+   */
+public:
+  /**
+   * The directional radiation applies to sound that are oriented in a
+   * particular direction.
+   *
+   * Directional sounds have two cones, with the apexs at the sound source,
+   * termed the inner cone and the outer cone. When the listener is with the
+   * inner cone, the sound is played at a normal volume. Outside the outer cone
+   * the sound is played at the outer gaim times normal volume. Between the
+   * inner and outer cones, the volume is interpolated.
+   *
+   * This value is expressed in radians and describes the half-angle of the
+   * inner cone.
+   *
+   * @note Unlike iSndSysSource3DDirectionalSimple setting the to 0.0f will not
+   *       make an omni directional source
+   */
+  virtual void SetDirectionalRadiationInnerCone(float rad);
+
+  /**
+   * This value is expressed in radians and describes the half-angle of the
+   * outer cone.
+   *
+   * @see SetDirectionalRadiationInnerCone(float rad)
+   */
+  virtual void SetDirectionalRadiationOuterCone(float rad);
+
+  /**
+   * This value describes the gain outside of the outer cone.
+   *
+   * @see SetDirectionalRadiationInnerCone(float rad)
+   */
+  virtual void SetDirectionalRadiationOuterGain(float gain);
+
+  /// Retrieves the current half-angle of the inner cone
+  virtual float GetDirectionalRadiationInnerCone();
+  /// Retrieves the current half-angle of the outer cone
+  virtual float GetDirectionalRadiationOuterCone();
+  /// Retrieves the current gain/volume outside the outer cone
+  virtual float GetDirectionalRadiationOuterGain();
+
+  /*
    * SndSysSourceOpenAL3D impementation
    */
 public:
@@ -194,6 +258,12 @@ private:
   csVector3 m_Position;
   /// Current minimum and maximum distances for the source
   float m_MinDistance, m_MaxDistance;
+  /// Current orientation of the source
+  csVector3 m_Direction;
+  /// Current angles of the sound cones
+  float m_InnerAngle,  m_OuterAngle;
+  /// Current gain outside the outer cone.
+  float m_OuterGain;
   /// Do we need to tell OpenAL about changes to this source
   bool m_Update;
 };

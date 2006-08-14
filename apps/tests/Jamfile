@@ -13,3 +13,4 @@ SubInclude TOP apps tests unittest ;
 SubInclude TOP apps tests csbench ;
 SubInclude TOP apps tests wxtest ;
 SubInclude TOP apps tests sndtest ;
+SubInclude TOP apps tests asndtest ;
