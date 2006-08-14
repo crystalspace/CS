@@ -2796,6 +2796,16 @@ bool csThing::GetPolygonPDLight (int polygon_idx, size_t pdlight_index,
   return true;
 }
 
+iMaterialWrapper* csThing::GetReplacedMaterial (iMaterialWrapper* oldMat)
+{
+  for (size_t i = 0; i < replace_materials.GetSize(); i++)
+  {
+    if (replace_materials[i].old_mat == oldMat) 
+      return replace_materials[i].new_mat;
+  }
+  return 0;
+}
+
 //---------------------------------------------------------------------------
 
 iMeshObjectFactory *csThing::GetFactory () const

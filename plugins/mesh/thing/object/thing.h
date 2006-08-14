@@ -989,6 +989,7 @@ public:
   virtual csPtr<iImage> GetPolygonLightmap (int polygon_idx);
   virtual bool GetPolygonPDLight (int polygon_idx, size_t pdlight_index, 
     csRef<iImage>& map, iLight*& light);
+  iMaterialWrapper* GetReplacedMaterial (iMaterialWrapper* oldMat);
   /** @} */
 
   //-------------------- iMeshObject interface implementation ----------

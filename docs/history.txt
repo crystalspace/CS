@@ -16,6 +16,8 @@ chronological order.
 	  name" and "create material from texture with name" features.
 	- res added the ability to override submesh materials in the mesh
 	  object to genmesh.
+	- res added a method to query material replacements from a Thing 
+	  object.
 13-Aug-2006
 	- res added CS_REQUEST_PLUGIN_TAG.
 	- res made genmeshify use the document plexer plugin.
