@@ -230,7 +230,8 @@ void csGenmeshMeshObject::UpdateSubMeshProxies () const
         if (!proxy.IsValid())
           proxy.AttachNew (new SubMeshProxy);
         proxy->parentSubMesh = sm[i];
-        newSubMeshes.AddSubMesh (proxy);
+        // Exploit fact that factory SMs are sorted already
+        newSubMeshes.Push (proxy);
       }
       subMeshes = newSubMeshes;
     }
@@ -1133,7 +1134,7 @@ csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (
     for (size_t i = 0; i<sm.GetSize (); ++i)
     {
       SubMeshProxy& subMesh = *(sm[i]);
-      iMaterialWrapper* mater = subMesh.GetMaterial();
+      iMaterialWrapper* mater = subMesh.SubMeshProxy::GetMaterial();
       if (!mater) mater = factory->GetMaterialWrapper ();
       if (!mater)
       {
@@ -1147,10 +1148,10 @@ csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (
       csRenderMesh*& meshPtr = subMesh.rmHolder.GetUnusedMesh (rmCreated,
         rview->GetCurrentFrameNumber ());
 
-      iRenderBuffer* index_buffer = subMesh.GetIndices();
-      csRenderBufferHolder* smBufferHolder = subMesh.GetBufferHolder();
+      iRenderBuffer* index_buffer = subMesh.SubMeshProxy::GetIndices();
+      csRenderBufferHolder* smBufferHolder = subMesh.SubMeshProxy::GetBufferHolder();
 
-      uint smMixMode = subMesh.GetMixmode();
+      uint smMixMode = subMesh.SubMeshProxy::GetMixmode();
       meshPtr->mixmode = (smMixMode != (uint)~0) ? smMixMode : MixMode;
       meshPtr->clip_portal = clip_portal;
       meshPtr->clip_plane = clip_plane;

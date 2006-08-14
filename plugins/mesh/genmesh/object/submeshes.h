@@ -68,6 +68,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
     { return material; }
     virtual uint GetMixmode () const
     { return MixMode; }
+    void SetMaterial (iMaterialWrapper* material)
+    { this->material = material; }
   };
 
   class SubMeshesContainer
@@ -153,6 +155,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
       if (GetOverrideFlag (bitMixMode)) return MixMode; 
       return parentSubMesh->GetMixmode ();
     }
+    void SetMaterial (iMaterialWrapper* material)
+    { 
+      SetOverrideFlag (bitMaterial, material != 0);
+      this->material = material; 
+    }
 
     virtual csShaderVariable* GetVariable (csStringID name) const
     {
@@ -180,6 +187,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
     void AddSubMesh (SubMeshProxy* subMesh);
     SubMeshProxy* FindSubMesh (const char* name) const;
     void Empty() { subMeshes.Empty(); }
+    void Push (SubMeshProxy* subMesh)
+    { subMeshes.Push (subMesh); }
 
     size_t GetSize() const
     { return subMeshes.GetSize(); }
