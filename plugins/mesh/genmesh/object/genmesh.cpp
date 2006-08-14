@@ -1832,12 +1832,35 @@ void csGenmeshMeshObjectFactory::PreGetBuffer (csRenderBufferHolder* holder,
           CS_BUFCOMP_FLOAT, 3);
       mesh_tangents_dirty_flag = false;
 
+      size_t triNum;
+      const csTriangle* tris;
+      csDirtyAccessArray<csTriangle> triangleScratch;
+      if (subMeshes.GetSize() == 0)
+      {
+        triNum = mesh_triangles.Length ();
+        tris = mesh_triangles.GetArray ();
+      }
+      else
+      {
+        for (size_t i = 0; i < subMeshes.GetSize(); i++)
+        {
+          size_t scratchPos = triangleScratch.GetSize();
+          iRenderBuffer* indexBuffer = subMeshes[i]->SubMesh::GetIndices();
+          size_t indexTris = indexBuffer->GetElementCount() / 3;
+          triangleScratch.SetLength (scratchPos + indexTris);
+          csRenderBufferLock<uint8> indexLock (indexBuffer);
+          memcpy (triangleScratch.GetArray() + scratchPos,
+            indexLock.Lock(), indexTris * sizeof (csTriangle));
+        }
+        triNum = triangleScratch.Length ();
+        tris = triangleScratch.GetArray ();
+      }
       csVector3* tangentData = new csVector3[mesh_vertices.Length () * 2];
       csVector3* bitangentData = tangentData + mesh_vertices.Length ();
-      csNormalMappingTools::CalculateTangents (mesh_triangles.Length (), 
-        mesh_triangles.GetArray (), mesh_vertices.Length (),
-	mesh_vertices.GetArray (), mesh_normals.GetArray (), 
-        mesh_texels.GetArray (), tangentData, bitangentData);
+      csNormalMappingTools::CalculateTangents (triNum, tris, 
+        mesh_vertices.Length (), mesh_vertices.GetArray (), 
+        mesh_normals.GetArray (), mesh_texels.GetArray (), 
+        tangentData, bitangentData);
 
       tangent_buffer->CopyInto (tangentData, mesh_vertices.Length ());
       binormal_buffer->CopyInto (bitangentData, mesh_vertices.Length ());
