@@ -6,6 +6,14 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+14-Aug-2006
+	- res changed the way libraries are handled by genmeshify: instead
+	  of collecting them first and converting them after the main file
+	  was converted they're now converted as encountered, as this seems
+	  more robust.
+	- res re-used the standard loader context from genmeshify to better
+	  deal with "sloppy" maps that rely on the "try to load texture with
+	  name" and "create material from texture with name" features.
 13-Aug-2006
 	- res added CS_REQUEST_PLUGIN_TAG.
 	- res made genmeshify use the document plexer plugin.

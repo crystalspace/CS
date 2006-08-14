@@ -36,6 +36,7 @@ namespace genmeshify
 
     // Report an error/warning, always returns false
     bool Report (const char* msg, ...);
+    void Report (int severity, const char* msg, ...);
 
     // Parse the commandline and process any files specified
     bool ProcessFiles ();
