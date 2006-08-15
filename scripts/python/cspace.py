@@ -6047,6 +6047,7 @@ class iGeneralMeshSubMesh(iBase):
     def GetMaterial(*args): return _cspace.iGeneralMeshSubMesh_GetMaterial(*args)
     def GetName(*args): return _cspace.iGeneralMeshSubMesh_GetName(*args)
     def GetMixmode(*args): return _cspace.iGeneralMeshSubMesh_GetMixmode(*args)
+    def SetMaterial(*args): return _cspace.iGeneralMeshSubMesh_SetMaterial(*args)
     def __del__(self, destroy=_cspace.delete_iGeneralMeshSubMesh):
         try:
             if self.thisown: destroy(self)
@@ -7288,6 +7289,7 @@ class iThingState(iBase):
     def GetPolygonWorldPlane(*args): return _cspace.iThingState_GetPolygonWorldPlane(*args)
     def GetPolygonLightmap(*args): return _cspace.iThingState_GetPolygonLightmap(*args)
     def GetPolygonPDLight(*args): return _cspace.iThingState_GetPolygonPDLight(*args)
+    def GetReplacedMaterial(*args): return _cspace.iThingState_GetReplacedMaterial(*args)
     def __del__(self, destroy=_cspace.delete_iThingState):
         try:
             if self.thisown: destroy(self)

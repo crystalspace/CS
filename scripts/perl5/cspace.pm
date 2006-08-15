@@ -6854,6 +6854,7 @@ package cspace::iGeneralMeshSubMesh;
 *GetMaterial = *cspacec::iGeneralMeshSubMesh_GetMaterial;
 *GetName = *cspacec::iGeneralMeshSubMesh_GetName;
 *GetMixmode = *cspacec::iGeneralMeshSubMesh_GetMixmode;
+*SetMaterial = *cspacec::iGeneralMeshSubMesh_SetMaterial;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -8267,6 +8268,7 @@ package cspace::iThingState;
 *GetPolygonWorldPlane = *cspacec::iThingState_GetPolygonWorldPlane;
 *GetPolygonLightmap = *cspacec::iThingState_GetPolygonLightmap;
 *GetPolygonPDLight = *cspacec::iThingState_GetPolygonPDLight;
+*GetReplacedMaterial = *cspacec::iThingState_GetReplacedMaterial;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
