@@ -1,0 +1,128 @@
+<h3> Lights</h3>
+<p>The converter supports:</p>
+<ul>
+  <li>ambient light</li>
+  <li>positional lights</li>
+</ul>
+<p>You can set the <b>ambient light</b> for your sector adding properties to the 
+  max level. Clicking on File&gt;File Properties. Select the Custom Tab, enter 
+  this data:</p>
+<p>Name: red / Type: Text / Value: &lt;enter the value from 0 to 1&gt;<br>
+  Name: green / Type: Text / Value: &lt;enter the value from 0 to 1&gt;<br>
+  Name: blue / Type: Text / Value: &lt;enter the value from 0 to 1&gt;</p>
+<p>If you do not specify these values, the engine will use it's default of red=0.2 
+  green=0.2 blue=0.2</p>
+<p>To add <b>positional lights</b> you should add 'Omni' lights. There are the 
+  only ones supported by the exporter. To place a new light click on Create-&gt;Lights-&gt;Omni.<br>
+</p>
+<p>To have the same effect in PlaneShift and in 3DSMax you should define your 
+  omni light with these parameters:<br>
+  Under "General Parameters" you should have "Diffuse" and "Specular" checked, 
+  "Ambient Only" UNchecked.</p>
+<p><b>Color:</b><br>
+  Colors can be defined in the RBG or HSV sections of the light.</p>
+<p><b>Multiplier:</b><br>
+  Mutiplier is supported. Normal light intensity in PlaneShift can go from 0 to 
+  1, if multiplier is used then it can go beyond 1.</p>
+<p></p>
+<p><b>Range:</b><br>
+  The maximum range of the light is defined by the value of "Far Attenuation 
+  End" in Attenuation menu. This is considered also if you no attenuation 
+  is used (see below).</p>
+<p><b>Attenuation:</b><br>
+  "Near Attenuation" IS NEVER used, the exporter simply ignore the setting.<br>
+  If in section "Far Attenuation" the checkbox "Use" 
+  is NOT checked, then the light will be defined in PlaneShift with parameter 
+  "No Attenuation", so light will be costant up to the maximum radius.<br>
+  If you want attenuation to be used, then check the "Far Attenuation" box, and insert the radius value in "End" field. Leave Start at "0".
+  
+</p>
+<p><b>Dynamic Lights:</b><br>
+  Lights can have a dynamically changing color. If this is the case, read the 
+  <a href="#export_light">"Export Lights"</a> chapter or more info on how to define hue changes.</p>
+<p><b>Lightmap cell size:</b><br>
+  Every illuminated object has a lightmap associated. A pixel in the lightmap 
+  is created for every cellsize x cellsize pixels of texture size.<br>
+  Example: Using a size of 32, 1 pixel in the lightmap will be created every 32x32 
+  pixel in the texture.<br>
+  Bigger cellsize means that less lumels are created to describe the illumination 
+  of an illuminated polygon this means less used ram but less defined shadows.</p>
+<p>You can set the Lightmap cell size value with this procedure:</p>
+<ul>
+  <li> 
+    <p> Clicking on File&gt;File Properties. Select the Custom Tab</p>
+  </li>
+  <li> 
+    <p>Enter this data:</p>
+    <p>Name: lightmapsize<br>
+      Type: Text<br>
+      Value: &lt;enter the size, e.g. 16 or 32&gt;</p>
+  </li>
+  <li>
+    <p>Click on Add.</p>
+  </li>
+</ul>
+<p>If this entry is not specified the engine will use CS default (that is 16).</p>
+<p><b>Auto On/Off based on Threshold:<br>
+  </b>Lights can be turned automatically on or off based on the value of another 
+  light (controller). This is used to turn on house/street lights at night and 
+  turn them off at sunrise. To enable this feature you must abide to these constraints:<br>
+  - the light that will turn on/off must <b>not</b> be dynamic, it should have 
+  a fixed light color during the day/night cycle.<br>
+  - the controller light must be named 'crystal' and should be dynamic. This light 
+  will be affected by other factors like rain. So depending on its intensity value 
+  will control the on/off of other lights.<br>
+  - there must be only one controller light for each sector.<br>
+  - All lights that should turn on/off must have these parameters set in the Custom 
+  Properties tab:</p>
+<p>TURNONOFF_R=0.2<br>
+  TURNONOFF_G=0.2<br>
+  TURNONOFF_B=0.2<br>
+  TURNONOFF_FADE=1000</p>
+<p>for RGB range is from 0 to 1, fade is expressed in msecs.</p>
+<p>In the example above lights will turn off when the 'crystal' light is &gt;0.2 
+  and will turn on when the 'crystal' light is &lt;0.2</p>
+<p>Lights with same RGB threshold values are packed in one event for the game, 
+  so performances will be better if you give lights same threshold values.</p>
+<p><b>Lightning:</b> The engine now support a brief sequence that simulates a 
+  lightning, this sequence will be triggered randomly by the server in all the 
+  sectors with the lightining property set. To enable it :</p>
+<ul>
+  <li> 
+    <p> Click on File&gt;File Properties. Select the Custom Tab</p>
+  </li>
+  <li> 
+    <p>Enter this data:</p>
+    <p>Name: lightning<br>
+      Type: Text<br>
+      Value: yes</p>
+  </li>
+  <li> Click on Add.</li>
+</ul>
+<p> </p><h2><a name="export_light">Export Lights</a></h2>
+<p>This command allows you to export the light information that will be used by 
+  PS engine to render lights at different times in the day. </p>
+<p>Select PlaneShift-&gt;Export Lights.</p>
+<p>Please note that:</p>
+<ul>
+  <li>You must set the total frame number to 24 (from 0 to 23) or to 48 (from 
+    0 to 47)</li>
+  <li>Every frame represents a certain time of the day: 1 frame for each hour 
+    starting from 0:00 am (midnight)</li>
+  <li>You can add an OmniLight called "ambient" that represent the ambient 
+    light. This light will not be exported as a normal light, the coordinates 
+    it has are not relevant.</li>
+  <li>The lights will be exported to a separate xml file, but those MUST be the 
+    same ones present when you exported the level.</li>
+</ul>
+<p>The first 24 frames are used to get the light colors when the sun shines and 
+  no rain is present. The frames from 25 to 48 are used to get the light colors 
+  when the is heavily raining so the sun will be obscured by clouds and rain. 
+  The engine uses those extreme values to find the good ones when it's raining 
+  at 20%, 50%, etc...</p>
+<p>If you set the animation length to be 24 frames, then shining sun condition 
+  and heavy rain condition will have the same light color values.</p>
+
+<p align=right>Next: <a href="sectors.htm">Sectors and Portals</a></p>
+
+</body></html>

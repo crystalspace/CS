@@ -1,0 +1,3 @@
+SubDir TOP data shader snippets ;
+
+InstallData [ Wildcard *.cginc *.cscg *.inc ] : data shader snippets ;

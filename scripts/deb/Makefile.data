@@ -1,0 +1,59 @@
+BUILDDIR=$(HOME)/local/debian/crystal
+#DATE=$(shell date '+%Y%m%d')
+DATE=$(shell head -1 core/debian/changelog | sed 's/.*(.*-\(.*\)-.*).*/\1/')
+VERSION=$(shell head -1 data/debian/changelog | sed 's/.*(\(.*\)-.*-.*).*/\1/')
+TAG=R0_96_001
+MINOR=2
+SITE=ftp://sunsite.dk/projects/crystal/
+LEVELS=cs097/levels/demodata.zip \
+
+
+#	cs097/levels/dmburg.zip \
+#	cs097/levels/testperf1.zip \
+#	cs097/levels/testperf2.zip \
+#	cs097/levels/testperf3.zip \
+	
+
+default: start wget debcopy debbuild
+
+start:
+	@echo "Building Crystalspace-data-$(VERSION) $(DATE)"
+
+# To get file form ftp site
+wget: $(BUILDDIR)/crystalspace-data-$(VERSION)-$(DATE)/data $(BUILDDIR)/wget-stamp
+$(BUILDDIR)/wget-stamp: $(LEVELS)
+	echo "Wgetting files Done"
+	#touch $(BUILDDIR)/wget-stamp
+
+%.zip:
+	@cd $(BUILDDIR)/crystalspace-data-$(VERSION)-$(DATE)/data; wget -nc -nd -nH $(SITE)/$@
+	-cp ../../../homepage/img/$(shell basename $@ '.zip' ).jpg $(BUILDDIR)/crystalspace-data-$(VERSION)-$(DATE)/data
+
+%.avi:
+	@cd $(BUILDDIR)/crystalspace-data-$(VERSION)-$(DATE)/data; wget -nc -nd -nH $(SITE)/$@
+
+debcopy:
+	cd data ; find debian | grep -v CVS | cpio -pdumvB $(BUILDDIR)/crystalspace-data-$(VERSION)-$(DATE)/
+
+debclean:
+	cd $(BUILDDIR)/crystalspace-data-$(VERSION)-$(DATE); fakeroot debian/rules clean
+	
+debconfigure:
+	cd $(BUILDDIR)/crystalspace-data-$(VERSION)-$(DATE); fakeroot debian/rules configure
+
+debbinary:
+	cd $(BUILDDIR)/crystalspace-data-$(VERSION)-$(DATE);dch -v $(VERSION)-$(MINOR) Autobuild ; fakeroot debian/rules binary
+
+debbuild:
+	cd $(BUILDDIR)/crystalspace-data-$(VERSION)-$(DATE); debuild
+
+$(BUILDDIR):
+	-mkdir -p $(BUILDDIR)
+
+$(BUILDDIR)/crystalspace-data-$(VERSION)-$(DATE)/data: $(BUILDDIR)/crystalspace-data-$(VERSION)-$(DATE)
+	-mkdir $(BUILDDIR)/crystalspace-data-$(VERSION)-$(DATE)/data
+
+$(BUILDDIR)/crystalspace-data-$(VERSION)-$(DATE): $(BUILDDIR)
+	-mkdir $(BUILDDIR)/crystalspace-data-$(VERSION)-$(DATE)
+clean:
+	rm -f $(BUILDDIR)/*-stamp

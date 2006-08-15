@@ -1,0 +1,24 @@
+# !/bin/sh
+CURDIR=$1
+
+rm -f $CURDIR/debian/crystalspace.menu
+
+for videotype in software opengl
+do
+
+cat >> $CURDIR/debian/crystalspace.menu <<-FIN
+?package(crystalspace):needs="X11" \\
+  section="Games/Arcade/CrystalSpace" \\
+  hints="Demos,$videotype" \\
+  title="Walktest flarge $videotype" \\
+  command="/usr/bin/walktest -relight -video=$videotype" \\
+  icon="/usr/share/pixmaps/flarge.xpm"
+?package(crystalspace):needs="X11" \\
+  section="Games/Arcade/CrystalSpace" \\
+  hints="Demos,$videotype" \\
+  title="Walktest partsys $videotype" \\
+  command="/usr/bin/walktest -relight -video=$videotype partsys" \\
+  icon="/usr/share/pixmaps/partsys.xpm"
+FIN
+
+done

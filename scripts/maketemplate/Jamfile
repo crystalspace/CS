@@ -1,0 +1,5 @@
+SubDir TOP scripts maketemplate ;
+
+InstallData [ Wildcard *.template README ] : build maketemplate ;
+Depends install_data :
+  [ InstallProgram [ Wildcard *.sh ] : $(appdatadir) build maketemplate ] ;

@@ -1,0 +1,107 @@
+<div class="wikitext">
+  <h1>Introduction to sectors and portals.</h1>
+  <p><br/>
+    Let's say your level consists of a city full of building objects and an interior 
+    of a tavern and there are 1000 objects altogether in your level. The engine 
+    has to dig through 1000 objects to decide what to render. But if you are inside 
+    the tavern, probably 950 of those objects representing the exterior will NEVER 
+    be visible. This is where sectors are a big win. <br/>
+    <br/>
+    Sectors are a way of hinting to the engine what is potentially visible and 
+    not. You can visualize the sector as a container of objects. In the example 
+    above let's say we create two sectors, one for the interior of the tavern 
+    and another for the rest of the city.<br/>
+    <br/>
+    Thus if you are indoors in the tavern 'sector', the engine is only rendering 
+    50 objects and not 1000. But if you are outside, it is rendering 950 instead 
+    of 1000, which is not that much of a help. This is why CS (and most other 
+    3d engines) can render indoor scenes much faster than outdoor scenes. Indoor 
+    scenes can be heavily sectorized. You can imagine if the tavern in our example 
+    is 2 stories tall, we could make indoor rendering even faster by splitting 
+    apart the &quot;tavern&quot; sector into &quot;tavern floor 1&quot; and &quot;tavern 
+    floort 2&quot; sectors, with perhaps 20 objects and 30 objects respectively. 
+    This would make rendering in those areas even faster.<br/>
+    <br/>
+    But what if you are inside the tavern and look out a window, or look out an 
+    open door? If the engine is only considering the &quot;tavern floor 1&quot; 
+    sector, you won't be able to see the outdoors through the window. <br/>
+    <br/>
+    This is where &quot;portals&quot; come in. A portal is a polygon in a sector 
+    that triggers the engine to render another sector besides just the one you 
+    are in. So when you model the window of the tavern, you will create also another 
+    invisible object that fits the window, and you flag it as a &quot;portal to 
+    outdoor sector&quot;. When the renderer renders the 20 objects in &quot;tavern 
+    floor 1&quot; sometimes that window will be visible, depending on which direction 
+    you are looking, and if the renderer sees that it is rendering a portal polygon, 
+    it adds the sector the portal points to (&quot;outdoor&quot; in this example) 
+    to the queue of sectors to render. This means in our case it will render the 
+    20 objects, then render the 950 objects. Thus, if you are indoors and you 
+    cannot see the window/portal, it will render much faster than if you turn 
+    just a little bit and can see even a fraction of the window. When the window 
+    shows and activates the portal even a little bit, the 950 outdoor objects 
+    must be considered and not just the 20 &quot;tavern floor 1&quot; objects. 
+    CS handles this fairly efficiently, but it is still significant overhead. 
+    The solution to this is to split the city outside in more sectors, so that 
+    the portals to other sectors are not visible and the engine has to consider 
+    less objects.<br/>
+    <br/>
+    In our example, you would also need a portal the other direction too, if you 
+    want people to be able to stand outside the tavern and look in through the 
+    window. Portals are not bi-directional. This mean you have to create another 
+    portal object of the same shape of the first one that from the outside looks 
+    into the tavern. Looking in a tavern window isn't going to slow down your 
+    render very much though, because it only changes your total rendered object 
+    count from 950 to 970. <br/>
+    <br/>
+    Where handling portals gets complex is that portals can be recursive. Imagine 
+    standing outside the tavern, looking in the window, and seeing all the way 
+    through the tavern to a window on the opposite wall, which shows the outdoors 
+    of the city again. This takes your render count from 950 to 970 to 1920, because 
+    now the outdoor sector is being considered twice. Smart level design can and 
+    should keep these to a minimum.<br/>
+    <br/>
+    Actually this isn't as inefficient as it sounds, because when a sector is 
+    added to the queue of sectors to render, it is visibility clipped to the shape 
+    of the portal before true visibility culling is done. The &quot;cone&quot; 
+    of what you can see through a window is obviously much smaller than the entire 
+    city, and clipping off objects outside the window view is a pretty fast calculation. 
+    This is why small portals like windows are faster than big portals like doors 
+    or walls. <br/>
+    <br/>
+    Hopefully this helps explain why it is good to divide up things into sectors, 
+    but only in certain cases.</p>
+  <p>Notes to add :<br>
+    - everytime you have a bunch of geometry behind one portal and that portal 
+    is not in the camera view, you save a lot of calculations<br>
+    - the flarge level made by CS people is 1 sector per room :)<br>
+    - that's an extreme, but it works well.<br>
+    - those must be in the exact same position<br>
+    - just facing opposite directions.<br>
+    - they should face the player.</p>
+  <p><br>
+    A simple rule: the IDEAL (most efficient) portal is a portal that:<br>
+    a) arrives in the sector at the BOUNDARY of all mesh objects in that sector.<br>
+    b) leaves in the sector at the boundary too.<br>
+    a) is more important than b).<br>
+    <br>
+    I manually added &lt;clip/&gt; and &lt;zfill/&gt; to ALL portals I found in 
+    the two sector version<br>
+    and this helps remove a lot (not all) of the render errors. However, it slows 
+    down the<br>
+    level too. Especially &lt;clip/&gt; can be expensive so it would be nice to 
+    try to set<br>
+    &lt;clip/&gt; only when REALLY needed.</p>
+  <p>When is &lt;clip/&gt; needed? &lt;clip/&gt; is needed when you have a portal 
+    that<br>
+    ARRIVES in the middle of a sector. i.e. if you have a portal that arrives 
+    in the sector<br>
+    and there is NO geometry at all behind the portal plane then &lt;clip/&gt; 
+    is <br>
+    not needed and shouldn't be set for performance reasons.</p>
+  <p>&lt;zfill/&gt; is needed when you have a portal that STARTS in the middle 
+    of a <br>
+    sector.<br>
+    Performance of &lt;zfill/&gt; is not that bad.</p>
+  <p><a href="sectors.htm">Back to Portals and sectors</a></p>
+  </div>
+

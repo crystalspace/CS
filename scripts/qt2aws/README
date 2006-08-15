@@ -1,0 +1,4 @@
+qt2aws.xsl and qt3aws.xsl are style-sheets for converting TrollTech's Qt
+(http://www.trolltech.com/products/qt/) GUI description files into AWS
+description files. Thus, you can create your windows and dialogs in Qt
+Designer, and then convert them to AWS format.

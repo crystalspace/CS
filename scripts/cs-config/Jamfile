@@ -1,0 +1,185 @@
+#============================================================================
+# Rules for creating cs-config compile help script
+#============================================================================
+
+SubDir TOP scripts cs-config ;
+
+rule csConfigGen
+{
+  LOCATE on cs-config.temppre cs-config.temppost = $(SUBDIR) ;
+  Depends $(<) : Jamconfig cs-config.temppre cs-config.temppost 
+  		 [ ConcatDirs $(TOP) scripts cs-config Jamfile ] ;
+
+  local l d e s liblist libdep libdepstr libstrings libaddstrings ;
+  
+  for l in $(INSTALLEDLIBS) $(INSTALLEDLIBS_OPTIONAL)
+  {
+    libaddstrings += "    $(l)) \
+	addlib \"-l$(l)\" 	\
+	;;			\
+" ;
+    libdep = ;
+    for d in $($(l)_depends)
+    {
+      libdep += -l$(d) ;
+    }
+    for e in $($(l).EXTERNALLIBS)
+    {
+      libdep += $($(e).LFLAGS) ;
+    }
+    libdepstr = "" ;
+    for s in $(libdep)
+    {
+      libdepstr = "$(libdepstr) $(s)" ;
+    }
+    libstrings += "       -l$(l)) DEPS=\"$(libdepstr)\" ;;\
+" ;
+  }
+
+  # Hack to produce a makevars output similar to the 'make' build system.
+  switch $(TARGET.OS)
+  {
+  case WIN32 :
+    MAKEVARS = makevar.win32 ;
+  case MACOS_X :
+    MAKEVARS = makevar.macosx ;
+  case * :
+    MAKEVARS = makevar.unix ;
+  }
+  MAKEVARS = $(MAKEVARS:R=$(SUBDIR)) ;
+  Depends $(<) : $(MAKEVARS) ;
+
+  liblist on $(<) = [ Sort $(INSTALLEDLIBS) ] ;
+  liblist_opt on $(<) = [ Sort $(INSTALLEDLIBS_OPTIONAL) ] ;
+  libstrings on $(<) = $(libstrings) ;
+  libaddstrings on $(<) = $(libaddstrings) ;
+
+  csConfigGen1 $(<) : $(>) ;
+}
+
+actions csConfigGen1
+{
+  cat $(SUBDIR)/cs-config.temppre > $(<)
+
+  cat >> $(<) << __END__
+# From autoconf:
+# The user is always right.
+if test "\${PATH_SEPARATOR+set}" != set; then
+  echo "#! /bin/sh" >conf\$\$.sh
+  echo  "exit 0"   >>conf\$\$.sh
+  chmod +x conf\$\$.sh
+  if (PATH="/nonexistent;."; conf$$.sh) >/dev/null 2>&1; then
+    PATH_SEPARATOR=';'
+  else
+    PATH_SEPARATOR=:
+  fi
+  rm -f conf\$\$.sh
+fi
+
+CRYSTAL="\${CRYSTAL-$(prefix)\$PATH_SEPARATOR.}"
+my_IFS=\$IFS; IFS=\$PATH_SEPARATOR
+for p in \$CRYSTAL
+do
+  prefix="\${p}"
+  exec_prefix="\${prefix}"
+  makeout="$(LOCATE.OBJECTS)"
+  version="$(PACKAGE_VERSION)"
+  longversion="$(PACKAGE_STRING)"
+  newincdir=""
+  # try to determine if we're in a source or installed CS version
+  if test "x\$includedir_main" = "x"
+  then
+    if [ -r \${prefix}/include/$(PACKAGE_NAME)/cssysdef.h ] ; then
+      newincdir="\${prefix}/include/$(PACKAGE_NAME)"
+      includedir_main=\$newincdir
+    elif [ -r \${prefix}/include/cssysdef.h ] ; then
+      newincdir="\${prefix}/include"
+      includedir_main=\$newincdir
+    fi
+  fi
+  if test "x\$includedir_config" = "x"
+  then
+    if [ -r \${prefix}/include/$(PACKAGE_NAME)/csconfig.h ] ; then
+      newincdir="\${prefix}/include/$(PACKAGE_NAME)"
+      includedir_config=\$newincdir
+    elif [ -r \${prefix}/include/csconfig.h ] ; then
+      newincdir="\${prefix}/include"
+      includedir_config=\$newincdir
+    fi
+  fi
+  if test -n "\$newincdir"
+  then
+    if test "x\$includedir" = "x"
+    then
+      includedir="\$newincdir"
+    else
+      includedir="\$includedir\$PATH_SEPARATOR\$newincdir"
+    fi
+  fi
+done
+IFS=\$my_IFS
+if test "x\$includedir" = "x"
+then
+  includedir="$(appincdir)"
+fi
+syslibs=" $(LINKLIBS) "
+common_cflags=" $(COMPILER.CFLAGS.MANDATORY) "
+common_cxxflags=" $(COMPILER.CFLAGS.MANDATORY) $(COMPILER.C++FLAGS.MANDATORY) "
+staticdeps="$(STATICPLUGINS.DEPENDENCIES)"
+
+makevars()
+{
+cat << "__EOF__"
+__END__
+
+  cat $(MAKEVARS) >> $(<)
+
+  echo "__EOF__" >> $(<) 
+  echo "}" >> $(<)
+
+  cat >> $(<) << __END__
+# dependencies of CS
+depends()
+{
+    case \$1 in
+ $(libstrings)
+	*)
+	    CEXFILE=`echo "\$1.cex" | sed -e "s/\-l//"`
+	    findcexfile "\$CEXFILE"
+	    if test -r "\$CEXFILE"; then
+		DEPS=\`/bin/sh \$CEXFILE --deps\`
+	    else
+		DEPS=''
+	    fi
+	    ;;                                        	    
+    esac
+}
+
+checklibname()
+{
+    case \$1 in
+ $(libaddstrings)
+    *)
+	findcexfile "\$1"
+	if test -z "\$CEXFILE"; then
+	    echo "Unknown library: \$1; consult --help for library list" 1>&2
+	    exit 1
+	fi
+	
+	addexlib "\$CEXFILE"
+        ;;
+    esac
+}
+
+liblist="\
+ $(liblist)
+"
+liblist_opt="\
+ $(liblist_opt)
+"
+__END__
+
+  cat $(SUBDIR)/cs-config.temppost >> $(<)
+}
+
+ShellScript cs-config : csConfigGen ;

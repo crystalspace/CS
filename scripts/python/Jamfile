@@ -1,0 +1,29 @@
+SubDir TOP scripts python ;
+
+PYTHON_DATAFILES = [ Wildcard *.py ] ;
+
+# cspace.py is the responsibility of cscript/cspython/Jamfile. glextgen.py is a
+# private tool, not meaningful to the end-user.
+PYTHON_DATAFILES = [ Filter $(PYTHON_DATAFILES) : cspace.py glextgen.py ] ;
+
+if $(PYTHON_DATAFILES)
+{
+  InstallData $(PYTHON_DATAFILES) : bindings python ;
+}
+
+# This is quite ugly. Normally, we avoid altering the source directory at all
+# costs (except upon explicit request) since it might be read-only or
+# shared. Unfortunately, however, if a user has the PYTHONPATH environment
+# variable pointed at the source tree and uses the cspython plugin or pythmod
+# extension or simply runs any of these scripts, then Python will excrete evil
+# .pyc (and possibly .pyo) files within this directory. We would like to clean
+# up these files despite the fact that it breaks our rule against altering the
+# source tree. We make an exception in this case because Clean actions are
+# allowed to fail without breaking the build, so the user is not negatively
+# impacted even if removal of the .pyc and .pyo files fails for some reason.
+PYTHON_TRASH = [ Wildcard *.pyc *.pyo ] ;
+if $(PYTHON_TRASH)
+{
+  SEARCH on $(PYTHON_TRASH) = $(SEARCH_SOURCE) ;
+  Clean distclean : $(PYTHON_TRASH) ;
+}

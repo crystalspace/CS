@@ -1,0 +1,5 @@
+This utility can be used within 3DSMax to convert 3DSMax worlds to Crystal
+Space map format. For instructions, see the user manual in the `exporterguide'
+subdirectory:
+
+exporterguide/index.htm

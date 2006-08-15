@@ -1,0 +1,25 @@
+
+    <texture name="skytext">
+      <file>/lib/stdtex/andrew_marble4.jpg</file>
+    </texture>
+    <texture name="andrew_marble4.jpg">
+      <file>/lib/stdtex/andrew_marble4.jpg</file>
+    </texture>
+    <texture name="blobbyDOT3.png">
+      <file>/lib/stdtex/blobbyDOT3.png</file>
+    </texture>
+    <texture name="stone4.gif">
+      <file>/lib/std/stone4.gif</file>
+    </texture>
+    <texture name="stone2DOT3.png">
+      <file>/lev/terrain/stone2DOT3.png</file>
+    </texture>
+    <texture name="grass.png">
+      <file>/lev/terrain/grass.png</file>
+    </texture>
+    <texture name="grassDOT3.png">
+      <file>/lev/terrain/grassDOT3.png</file>
+    </texture>
+    <texture name="materialmap_base.png">
+      <file>/lev/terrain/materialmap_base.png</file>
+    </texture>

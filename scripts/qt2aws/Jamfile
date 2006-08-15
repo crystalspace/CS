@@ -1,0 +1,3 @@
+SubDir TOP scripts qt2aws ;
+
+InstallData [ Wildcard *.xsl README ] : conversion qt2aws ;

@@ -1,0 +1,39 @@
+
+
+<h2>Export Sprite</h2>
+<p>Select PlaneShift-&gt;Export Sprite.</p>
+ we have 2 ways to export our chars
+ an old one and a new one
+ the old one just takes a number of mseconds and use this info to switch from one frame to the other
+ so it renders the first frame, then wait 100 msec, then second frame, then 100 msec...etcc
+ the problem of that method is that the number of frames in the animation makes the difference on the speed of the char
+ also if a char has short legs or long legs if doesn't make difference
+ so we have the new method to fix that.
+<br><br>
+ the new method calculates the displacements of the feet of the char.
+<p> "vertex on foot" is one vertex that moves with the character.
+
+those vertexes will be used to calculate displacement from one frame to
+the other, so it can be one random vertex of the foot. We choosed the
+outermost one to the back of the foot.
+ so you provide 2 vertexes, one for each feet
+ and it calculates the real movement of the vertex
+ the "displacement" of the vertex
+ based on that it moves the char in game.
+first foot on air is "foot 1"
+
+ "frame with foot 2 on the ground" is the first frame where the second foot touches the ground
+ from that point on, the displacement is calculated on vertex 2 and not on vertex 1</p>
+ <br>
+ 
+ <h3>Notes :</h3>
+ 
+ Please note that this guide is in fact a bit outdated as now CrystalSpace use the Cal3d library for character animation , so here are some link to help u with character import
+ 
+<br>The <a href="http://cal3d.sourceforge.net/index.html" target="_new">cal3d site</a> itself
+<br>The cal3d <a href="http://cal3d.sourceforge.net/modeling/tutorial.html" target="_new">modeling tutorial</a>
+<br>A collection of free <a href="http://www.e-motek.com/stockmoves/" target="_new">motion capture</a> files from <a href="http://www.e-motek.com/">e-motek</a> to help u getting realistic character movement
+<br><a href="http://www.e-motek.com/entertainment/stockmoves/tutorials.html" target="_new">Here</a> are the tutorials you should follow to get those file used propertly
+<br>If you want some really detailled info about crystalspace and cal3d i sugest you the pdf you can find on <a href="http://graphics.cs.lth.se/theses/projects/crystalcharacter/page_project.html" target="_new">this site</a>
+
+</body></html>

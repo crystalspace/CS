@@ -1,0 +1,24 @@
+
+    <material name="skytext">
+      <texture>skytext</texture>
+    </material>
+    <material name="ScatterSky">
+      <color red="0" green="0" blue="0" /> 
+      <shader type="ambient">sky_scattering</shader>
+    </material>
+    <material name="Base">
+      <texture>materialmap_base.png</texture>
+      <shader type="ambient">splatting_scattering_base</shader>
+    </material>
+    <material name="Marble">
+      <texture>andrew_marble4.jpg</texture>
+      <shader type="diffuse">splatting_scattering</shader>
+    </material>
+    <material name="Stone">
+      <texture>stone4.gif</texture>
+      <shader type="diffuse">splatting_scattering</shader>
+    </material>
+    <material name="Grass">
+      <texture>grass.png</texture>
+      <shader type="diffuse">splatting_scattering</shader>
+    </material>

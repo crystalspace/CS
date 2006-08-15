@@ -1,0 +1,4 @@
+  <shaders>
+    <shader><file>/shader/terrain_fixed_base.xml</file></shader>
+    <shader><file>/shader/terrain_fixed_splatting.xml</file></shader>
+  </shaders>

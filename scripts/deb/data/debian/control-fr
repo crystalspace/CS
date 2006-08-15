@@ -1,0 +1,19 @@
+Source: crystalspace-data
+Section: games
+Priority: optional
+Maintainer: Christian Bayle <bayle@aist.enst.fr>
+Build-Depends-Indep: debhelper (>> 3.0.0),imagemagick
+Standards-Version: 3.5.2
+
+Package: crystalspace-data
+Architecture: all
+Depends: crystalspace, crystalspace-demos
+Description: Multiplatform 3D Game SDK datas and menus for Demos
+ Crystal Space is an free 3D game toolkit. It can be used for a variety
+ of 3D visualization tasks. Many people will probably be interested in using
+ Crystal Space as the basis of a 3D game, for which it is well suited.
+Description-fr: Kit de développement 3D Multi-Plateformes (Données)
+ Crystal Space est un kit de jeu 3D libre. Il peut etre utilisé pour
+ beaucoup de taches de visualisation 3D. Beaucoup de programmeurs seront sans
+ doute interéssés pour l'utiliser comme base d'un jeu 3D, pour lequel il
+ convient bien.
