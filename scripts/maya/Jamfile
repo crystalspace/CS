@@ -1,3 +1,0 @@
-SubDir TOP scripts maya ;
-
-InstallData [ Wildcard *.mel README ] : conversion maya ;
