@@ -1659,27 +1659,27 @@ void csEngine::StartDraw (iCamera *c, iClipper2D* view, csRenderView &rview)
 
 
   //Imposter updating where needed
-  csRef<iRenderView> irview = scfQueryInterface<iRenderView>(&rview);
+  imposterUpdateList.Compact();
   csWeakRefArray<csImposterProcTex>::Iterator it = 
     imposterUpdateList.GetIterator ();
 
-  // First initialize G3D with the right clipper.
-//  G3D->SetClipper (view, CS_CLIPPER_TOPLEVEL);  // We are at top-level.
-//  G3D->ResetNearPlane ();
-//  G3D->SetPerspectiveAspect (c->GetFOV ());
+  //@@@ need to finish user's begindraw since they don't nest correctly
   G3D->FinishDraw();
 
-  while (it.HasNext ())
+  //update if camera is in a sector
+  iSector *s = c->GetSector ();
+  if (s)
   {
-    iSector *s = c->GetSector ();
-    if (s) 
+    while (it.HasNext ())
     {
-      iRenderLoop* rl = s->GetRenderLoop ();
-      if (!rl) rl = defaultRenderLoop;
-      it.Next ()->Animate(&rview, rl, s);
+      it.Next ()->Animate(&rview, s);
     }
   }
 
+  //all updates done, empty list for next frame
+  imposterUpdateList.Empty();
+
+  //@@@ resume user's begindraw (add old flags?)
   G3D->BeginDraw (CSDRAW_3DGRAPHICS | CSDRAW_CLEARZBUFFER);
 
 }

@@ -1,5 +1,6 @@
 /*
   Copyright (C) 2002 by Keith Fulton and Jorrit Tyberghein
+  Rewritten during Sommer of Code 2006 by Christoph "Fossi" Mewes
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -44,9 +45,21 @@ private:
   csPoly3D cutout;           // Rect for cardboard cutout version
   bool     ready;            // Whether texture must be redrawn
   float    incidence_dist;   // Angle of incidence to camera last time rendered
+
+  //screen bounding box helper
   csScreenBoxResult res;
+
+  //rendermeshholder for this mesh
   csRenderMeshHolder rmHolder;
-  iEngine *engine;
+
+  //current height and width of the billboard
+  float height, width;
+
+  //direction the imposter is facing in world coordinates
+  csVector3 imposterDir;
+
+  //convenience shortcut
+  csEngine *engine;
 
 public:
   csImposterMesh (csEngine* engine, csMeshWrapper *parent);
@@ -54,10 +67,12 @@ public:
   float CalcIncidenceAngleDist (iRenderView *rview);
   bool CheckIncidenceAngle (iRenderView *rview,float tolerance);
   void FindImposterRectangle (const iCamera *camera);
+
+  //returns the imposter billboard
   csRenderMesh** GetRenderMesh (iRenderView *rview);
 
   bool GetImposterReady () { return ready; }
-  void SetImposterReady (bool r) { ready=r; }
+  void SetImposterReady (bool r);
 
   void SetIncidenceDist (float d) { incidence_dist=d; }
   float GetIncidenceDist () { return incidence_dist;  }

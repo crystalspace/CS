@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2002 by Keith Fulton and Jorrit Tyberghein
+    Rewritten during Sommer of Code 2006 by Christoph "Fossi" Mewes
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -31,14 +32,26 @@ class csImposterMesh;
 class csImposterProcTex : public scfImplementation0<csImposterProcTex>
 {
 private:
-  csEngine* engine;
-  iRenderView* View;
+  //parent billboard
   csImposterMesh *mesh;
+
+  //r2t texture
+  iTextureWrapper *tex;
+
+  //flag if this imposter was rendered to texture and can be used
   bool imposter_ready;
-  csMeshOnTexture* mesh_on_texture;
+
+  //imposter texture size
+  int w, h;
+
+  //cached csStringID values
+  csStringID stringid_standard;
+  csStringID stringid_light_ambient;
+
+  //convenience shortcuts
+  csEngine* engine;
   csRef<iGraphics3D> g3d;
   csRef<iGraphics2D> g2d;
-  iTextureWrapper *tex;
 
 public:
   csImposterProcTex (csEngine* engine, csImposterMesh *parent);
@@ -46,7 +59,7 @@ public:
 
   bool GetImposterReady () { return imposter_ready; }
   void SetImposterReady (bool r) { imposter_ready = r; }
-  void Animate (iRenderView *rview, iRenderLoop *rl, iSector *s);
+  void Animate (iRenderView *rview, iSector *s);
   csImposterMesh *GetParent () { return mesh; }
   iTextureWrapper *GetTexture () { return tex; }
 };

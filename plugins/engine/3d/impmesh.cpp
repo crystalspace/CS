@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2002 by Keith Fulton and Jorrit Tyberghein
+    Rewritten during Sommer of Code 2006 by Christoph "Fossi" Mewes
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -48,32 +49,62 @@ csImposterMesh::csImposterMesh (csEngine* engine, csMeshWrapper *parent)
 
 float csImposterMesh::CalcIncidenceAngleDist (iRenderView *rview)
 {
-  // Jorrit, not sure about this correctness but it compiles at least. -Keith
-
   // Calculate angle of incidence vs. the camera
   iCamera* camera = rview->GetCamera ();
-  csReversibleTransform obj = (parent_mesh->GetCsMovable()).csMovable::GetTransform ();
+  csReversibleTransform obj = 
+    (parent_mesh->GetCsMovable()).csMovable::GetTransform ();
   csReversibleTransform cam = camera->GetTransform ();
   csReversibleTransform seg = obj / cam;  // Matrix Math Magic!
   csVector3 straight(0,0,1);
-  csVector3 pt = seg * straight;
+  csVector3 pt = (seg * straight).Unit ();
   return csSquaredDist::PointPoint (straight, pt);
 }
 
 bool csImposterMesh::CheckIncidenceAngle (iRenderView *rview, float tolerance)
 {
+/*
   float const dist2 = CalcIncidenceAngleDist(rview);
   float diff = dist2 - incidence_dist;
   if (diff < 0) diff = -diff;
+printf("dist2 %f diff: %f tolerance: %f\n", dist2, diff, tolerance);
+*/
+
+  iCamera* cam = rview->GetCamera ();
+  csVector3 camp = cam->GetTransform ().GetOrigin ();
+  csVector3 objp =
+    parent_mesh->GetMovable ()->GetFullPosition ();
+
+  csVector3 cameraDir = camp - objp; //@@@ use real imposter center
+  cameraDir = cameraDir.Unit ();
+
+//printf("objp x y z: %f %f %f\n", camp.x, camp.y, camp.z);
+//printf("camp x y z: %f %f %f\n", objp.x, objp.y, objp.z);
+//printf("camd x y z: %f %f %f\n", cameraDir.x, cameraDir.y, cameraDir.z);
+
+  float diff = imposterDir * cameraDir;
+
+//printf("diff: %f\n",diff);
 
   // If not ok, mark for redraw of imposter
-  if (diff > tolerance)
+  if (diff < tolerance)
   {
     SetImposterReady (false);
     return false;
   }
   return true;
 }
+
+void csImposterMesh::SetImposterReady (bool r)
+{
+  ready=r;
+  if (!ready)
+  {
+printf("request imposter update...");
+    engine->imposterUpdateList.Push(
+      csWeakRef<csImposterProcTex>(tex));
+  }
+}
+
 
 void csImposterMesh::FindImposterRectangle (const iCamera* c)
 {
@@ -90,37 +121,38 @@ void csImposterMesh::FindImposterRectangle (const iCamera* c)
 
   res = parent_mesh->GetScreenBoundingBox (c);
 
+  height = (res.sbox.GetCorner(1) - res.sbox.GetCorner(0)).y;
+  width = (res.sbox.GetCorner(2) - res.sbox.GetCorner(0)).x;
+
   csVector3 v1 = c->InvPerspective (res.sbox.GetCorner(0), res.distance);
   csVector3 v2 = c->InvPerspective (res.sbox.GetCorner(1), res.distance);
   csVector3 v3 = c->InvPerspective (res.sbox.GetCorner(3), res.distance);
   csVector3 v4 = c->InvPerspective (res.sbox.GetCorner(2), res.distance);
-
-v1 = c->GetTransform ().This2Other (v1);
-v2 = c->GetTransform ().This2Other (v2);
-v3 = c->GetTransform ().This2Other (v3);
-v4 = c->GetTransform ().This2Other (v4);
-
-/*
-  csVector3 v1 = c->InvPerspective (csVector2(0,0), 3);
-  csVector3 v2 = c->InvPerspective (csVector2(0,200), 3);
-  csVector3 v3 = c->InvPerspective (csVector2(200,200), 3);
-  csVector3 v4 = c->InvPerspective (csVector2(200,0), 3);
-
-v1 = c->GetTransform ().This2Other (v1);
-v2 = c->GetTransform ().This2Other (v2);
-v3 = c->GetTransform ().This2Other (v3);
-v4 = c->GetTransform ().This2Other (v4);
-
-printf("Min: %f %f %f\n",v1[0],v1[1],v1[2]);
-printf("Max: %f %f %f\n",v2[0],v2[1],v2[2]);
-printf("Max: %f %f %f\n",v3[0],v3[1],v3[2]);
-printf("Max: %f %f %f\n",v4[0],v4[1],v4[2]);
-*/
+  
+  v1 = c->GetTransform ().This2Other (v1);
+  v2 = c->GetTransform ().This2Other (v2);
+  v3 = c->GetTransform ().This2Other (v3);
+  v4 = c->GetTransform ().This2Other (v4);
 
   cutout[0] = v1;
   cutout[1] = v2;
   cutout[2] = v3;
   cutout[3] = v4;
+
+  //calculating imposter facing and save for angle checking
+  csVector3 camp = c->GetTransform ().GetOrigin ();
+  csVector3 objp = 
+//v1 + 0,5 * (v2-v1) + 0,5 * (v3-v1); //@@@ invp cheaper?
+    parent_mesh->GetMovable ()->GetFullPosition ();
+
+//printf("camp x y z: %f %f %f\n", objp.x, objp.y, objp.z);
+//printf("objp x y z: %f %f %f\n", camp.x, camp.y, camp.z);
+
+  imposterDir = camp - objp; //@@@ use real imposter center
+  imposterDir = imposterDir.Unit ();
+//printf("impd x y z: %f %f %f\n", imposterDir.x, imposterDir.y, imposterDir.z);
+
+//  incidence_dist = CalcIncidenceAngleDist (iRenderView *rview);
 }
 
 
@@ -154,11 +186,10 @@ csRenderMesh** csImposterMesh::GetRenderMesh(iRenderView *rview)
   GetMeshTexels ()->Empty ();
   GetMeshColors ()->Empty ();
 
-//  iMaterialWrapper* tm = engine->GetMaterialList ()->FindByName ("stone");
   iMaterialWrapper* tm = engine->CreateMaterial ("test", tex->GetTexture ());
   
 if (tm == 0) printf ("Uuups\n");
-  tm->Visit();
+  tm->Visit();  //@@@needed?
   mesh->material = tm;
 
 
@@ -179,10 +210,22 @@ if (tm == 0) printf ("Uuups\n");
 
   mesh->object2world = csReversibleTransform ();
 
-  mesh_texels.Push (csVector2 (0,0));
-  mesh_texels.Push (csVector2 (1,0));
-  mesh_texels.Push (csVector2 (1,1));
-  mesh_texels.Push (csVector2 (0,1));
+  float x = 1;
+  float y = 1;
+
+  // correct textels for imposter heigth/width ratio
+  // since r2t texture is square, but billboard might not
+  if (height > width)
+  {
+    x -= (1 - width/height)/2;
+  } else {
+    y -= (1 - height/width)/2;
+  }
+
+  mesh_texels.Push (csVector2 (1-x,y));  //0 1
+  mesh_texels.Push (csVector2 (1-x,1-y));  //0 0
+  mesh_texels.Push (csVector2 (x,1-y));  //1 0
+  mesh_texels.Push (csVector2 (x,y));    //1 1
 
   csVector4 c (1, 1, 1, 1.0);
   mesh_colors.Push (c);

@@ -218,11 +218,11 @@ bool Simple::SetupModules()
   engine->Prepare ();
 
   // these are used store the current orientation of the camera
-  rotY = rotX = 0;
+  rotY = .7 ;rotX = .7;
 
   // Now we need to position the camera in our world.
   view->GetCamera ()->SetSector (room);
-  view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 5, -3));
+  view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0,0,0));
 
   return true;
 }
@@ -245,21 +245,30 @@ void Simple::CreateRoom ()
   csRef<iMeshWrapper> walls (engine->CreateSectorWallsMesh (room, "walls"));
   csRef<iThingFactoryState> walls_state = 
     scfQueryInterface<iThingFactoryState> (walls->GetMeshObject ()->GetFactory());
-  walls_state->AddInsideBox (csVector3 (-5, 0, -5), csVector3 (5, 20, 5));
+  walls_state->AddInsideBox (csVector3 (-5, -5, -5), csVector3 (5, 5, 5));
   walls_state->SetPolygonMaterial (CS_POLYRANGE_LAST, tm);
   walls_state->SetPolygonTextureMapping (CS_POLYRANGE_LAST, 3);
+
+  csRef<iImposter> i = scfQueryInterface<iImposter> (walls);
+//  i->SetImposterActive(true);
+  iSharedVariableList* varlist = engine->GetVariableList();
+  csRef<iSharedVariable> distvar = varlist->New();
+  distvar->Set(1.0f);
+  varlist->Add(distvar);
+  i->SetMinDistance(distvar);
+  i->SetRotationTolerance(distvar);
 
   // Now we need light to see something.
   csRef<iLight> light;
   iLightList* ll = room->GetLights ();
 
-  light = engine->CreateLight(0, csVector3(-3, 5, 0), 10, csColor(1, 0, 0));
+  light = engine->CreateLight(0, csVector3(-3, 3, 0), 10, csColor(1, 0, 0));
   ll->Add (light);
 
-  light = engine->CreateLight(0, csVector3(3, 5,  0), 10, csColor(0, 0, 1));
+  light = engine->CreateLight(0, csVector3(3, 3,  0), 10, csColor(0, 0, 1));
   ll->Add (light);
 
-  light = engine->CreateLight(0, csVector3(0, 5, -3), 10, csColor(0, 1, 0));
+  light = engine->CreateLight(0, csVector3(0, 3, -3), 10, csColor(0, 1, 0));
   ll->Add (light);
 }
 
@@ -280,7 +289,7 @@ void Simple::CreateSprites ()
   // Create the sprite and add it to the engine.
   csRef<iMeshWrapper> sprite (engine->CreateMeshWrapper (
     imeshfact, "MySprite", room,
-    csVector3 (-3, 5, 3)));
+    csVector3 (1, 1, 1)));
   csMatrix3 m; m.Identity ();
   sprite->GetMovable ()->SetTransform (m);
   sprite->GetMovable ()->UpdateMove ();
@@ -298,12 +307,17 @@ void Simple::CreateSprites ()
   //iMeshObject* test = sprite->GetMeshObject();
   csRef<iImposter> i = scfQueryInterface<iImposter> (sprite);
   i->SetImposterActive(true);
+
   iSharedVariableList* varlist = engine->GetVariableList();
   csRef<iSharedVariable> distvar = varlist->New();
-  distvar->Set(0.0f);
+  distvar->Set(1.0f);
   varlist->Add(distvar);
   i->SetMinDistance(distvar);
-  i->SetRotationTolerance(distvar);
+
+  csRef<iSharedVariable> rotvar = varlist->New();
+  rotvar->Set(0.99f);
+  i->SetRotationTolerance(rotvar);
+
   printf("done...\n");
 }
 

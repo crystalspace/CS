@@ -584,19 +584,22 @@ const csArray<iLightSectorInfluence*>& csMeshWrapper::GetRelevantLights
 csRenderMesh** csMeshWrapper::GetRenderMeshes (int& n, iRenderView* rview, 
 					       uint32 frustum_mask)
 {
-  printf("imposter: %i\n",imposter_active);
+  //printf("imposter active: %i\n",imposter_active);
+  if (imposter_active)
+    //printf("imposter releva: %i\n",CheckImposterRelevant (rview));
+
   if (imposter_active && CheckImposterRelevant (rview))
   {
-    printf("trying imposter... ");
+    //printf("trying imposter... ");
     csRenderMesh** imposter = GetImposter (rview);
     if (imposter)
     {
-      printf("drawn\n");
+      //printf("drawn\n");
       n = 1;
       return imposter;
     }
   }
-  printf("normal mesh\n");
+  //printf("normal mesh\n");
 
   // Callback are traversed in reverse order so that they can safely
   // delete themselves.
@@ -872,7 +875,8 @@ csRenderMesh** csMeshWrapper::GetImposter (iRenderView *rview)
   if (!imposter_mesh->CheckIncidenceAngle (rview,
 	imposter_rotation_tolerance->Get ()))
   {
-    printf("too much movement\n");
+
+    //printf(" (too much movement) ");
 //    return 0;
   }
 
