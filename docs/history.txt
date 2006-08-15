@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+15-Aug-2006
+	- res committed a patch from Timothy Whitfield <whitfieldts@gmail.com>
+	  to add csBaseEventHandler::UnregisterQueue ().
 14-Aug-2006
 	- res changed the way libraries are handled by genmeshify: instead
 	  of collecting them first and converting them after the main file
