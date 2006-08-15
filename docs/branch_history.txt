@@ -10,6 +10,7 @@ This file describes the history of the SoC imposter branch.
 
 15-Aug-2006
 	- Fossi commited working version
+	- Fossi removes accidentially commited testlevel cache
 12-Aug-2006
 	- Fossi fixed imposter mesh rendering to work
 	- Fossi improved imposter texture to show something at least
