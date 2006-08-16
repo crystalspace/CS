@@ -21,6 +21,39 @@
 #include "plugins/engine/3d/rview.h"
 #include "plugins/engine/3d/rview.cpp"
 
+csRef<iJobQueue> job_queue;
+
+class SomeJob : public scfImplementation1<SomeJob, iJob>
+{
+public:
+  SomeJob()
+    : scfImplementationType (this)
+  {
+  }
+  
+  virtual void Run()
+  {
+    // do some heavy computations
+    while (1)
+    {
+      volatile float f = 0;
+
+      for (int i = 0; i < 10000; ++i)
+      {
+        f *= 2;
+        f += 4;
+        f = sqrt(f);
+        f *= 33;
+        f /= 23;
+      }
+      
+      printf("heya! f = %g\n", f);
+    }
+  }
+};
+
+csRef<SomeJob> job;
+
 CS_IMPLEMENT_APPLICATION
 
 //-----------------------------------------------------------------------------
@@ -93,14 +126,26 @@ bool TerrainDemo::Setup ()
     room = engine->GetSectors ()->FindByName ("room");
     pos = csVector3 (0, 0, 0);
   }
-  if (!room)
-    room = engine->CreateSector("terrain");
+  
+  //if (!room)
+  room = engine->CreateSector("terrain");
+  
+  csRef<iMeshObject> terrain_mesh_object = scfQueryInterface<iMeshObject>(terrain);
+  csRef<iMeshWrapper> terrain_mesh_wrapper = engine->CreateMeshWrapper("terrain");
+  terrain_mesh_wrapper->SetMeshObject(terrain_mesh_object);
+
+  terrain_mesh_wrapper->GetMovable()->SetSector(room);
     
   pos = csVector3 (0, 70, 0);
   
   // Now we need to position the camera in our world.
   view->GetCamera ()->SetSector (room);
   view->GetCamera ()->GetTransform ().SetOrigin (pos);
+  
+  engine->SetClearScreen(true);
+  engine->SetClearZBuf(true);
+  
+  engine->SetCurrentDefaultRenderloop(rloop);
   
   csPlane3 fp(0, 0, -1, 500);
   view->GetCamera ()->SetFarPlane(&fp);
@@ -299,9 +344,113 @@ bool TerrainDemo::LoadMap ()
   VFS->ChDir ("/lev/terraini");
   // Load the level file which is called 'world'.
     
-  if (!loader->LoadMapFile ("world"))
-    ReportError("Error couldn't load level!");
+  //if (!loader->LoadMapFile ("world"))
+    //ReportError("Error couldn't load level!");
 
+  csRef<iTerrainRenderer> t_renderer = csLoadPlugin<iTerrainRenderer>(
+      GetObjectRegistry(),
+      "crystalspace.mesh.object.terrainimproved.simplerenderer");
+
+  csRef<iTerrainCollider> t_collider = csLoadPlugin<iTerrainCollider>(
+      GetObjectRegistry(),
+      "crystalspace.mesh.object.terrainimproved.simplecollider");
+
+  csRef<iMeshObjectType> t_mesh_type = csLoadPlugin<iMeshObjectType>(
+      GetObjectRegistry(),
+      "crystalspace.mesh.object.terrainimproved");
+
+  csRef<iMeshObjectFactory> t_mesh_factory = t_mesh_type->NewFactory();
+
+  csRef<iTerrainFactory> t_factory = scfQueryInterface<iTerrainFactory>(
+      t_mesh_factory);
+
+  t_factory->SetRenderer(t_renderer);
+  t_factory->SetCollider(t_collider);
+  
+  int size = 5;
+  float width = 2000;
+  float height = 2000;
+  float z = 1200;
+  
+  const char* heightmap_array[2][2] =
+  {
+      { "/lev/terraini/heightmap_00.png", "/lev/terraini/heightmap_01.png" } ,
+      { "/lev/terraini/heightmap_10.png", "/lev/terraini/heightmap_11.png" } ,
+  };
+
+  const char* materialmap_array[2][2] =
+  {
+    { "/lev/terraini/material_00.png", "/lev/terraini/material_01.png" } ,
+    { "/lev/terraini/material_10.png", "/lev/terraini/material_11.png" } ,
+  };
+
+  for (int y = -size; y <= size; ++y)
+    for (int x = -size; x <= size; ++x)
+    {
+      csRef<iTerrainDataFeeder> t_feeder = csLoadPlugin<iTerrainDataFeeder>(
+      GetObjectRegistry(),
+      "crystalspace.mesh.object.terrainimproved.simpledatafeeder");
+
+      t_feeder->SetParam("heightmap source", heightmap_array[x & 1][y & 1]);
+      t_feeder->SetParam("materialmap source", materialmap_array[x & 1][y & 1]);
+
+      t_factory->AddCell("cell", 33, 33, 32, 32, csVector2(x * width,  y * height),
+          csVector3(width, height, z), t_feeder);
+    }
+    
+  csRef<iMeshObject> t_mesh = t_mesh_factory->NewInstance();
+
+  terrain = scfQueryInterface<iTerrainSystem>(t_mesh);
+
+  iTextureWrapper* grass_tex = loader->LoadTexture("grass_tex",
+      "/lev/terrain/grass.png");
+  iTextureWrapper* stone_tex = loader->LoadTexture("stone_tex",
+      "/lib/std/stone4.gif");
+  iTextureWrapper* lava_tex = loader->LoadTexture("lava_tex",
+      "/lev/terraini/lava.png");
+
+  rloop = engine->GetRenderLoopManager()->Load(
+      "/shader/std_rloop_terrainimproved.xml");
+
+  csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
+      GetObjectRegistry(), "crystalspace.shared.stringset", iStringSet);
+
+  csRef<iShaderManager> shmgr = CS_QUERY_REGISTRY (GetObjectRegistry(),
+      iShaderManager);
+
+  loader->LoadShader("/lev/terraini/shader_base.xml");
+  loader->LoadShader("/lev/terraini/shader_splat.xml");
+
+  iShader* shader_base = shmgr->GetShader("terrain_improved_base");
+  iShader* shader_splat = shmgr->GetShader("terrain_improved_splatting");
+
+  csRefArray<iMaterialWrapper> materials;
+
+  iMaterialWrapper* material;
+
+  (material = engine->CreateMaterial("LavaMaterial", lava_tex))->
+      GetMaterial()->SetShader(strings->Request("ambient"), shader_base);
+  materials.Push(material);
+
+  (material = engine->CreateMaterial("StoneMaterial", stone_tex))->
+      GetMaterial()->SetShader(strings->Request("terrain splat"), shader_splat);
+  materials.Push(material);
+
+  (material = engine->CreateMaterial("GrassMaterial", grass_tex))->
+      GetMaterial()->SetShader(strings->Request("terrain splat"), shader_splat);
+  materials.Push(material);
+
+  terrain->SetMaterialPalette(materials);
+  
+  job_queue = CS_QUERY_REGISTRY (GetObjectRegistry(),
+      iJobQueue);
+      
+  if (!job_queue) job_queue.AttachNew(new csThreadJobQueue);
+      
+  job.AttachNew(new SomeJob());
+      
+  job_queue->Enqueue(job);
+  
   return true;
 }
 

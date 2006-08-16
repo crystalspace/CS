@@ -21,11 +21,27 @@
 
 #include "csutil/scf.h"
 
+/**
+ * This is a base class for per-cell renderer-specific properties.
+ * The classes which hold the render-related data that is to be
+ * customized by user should implement this interface.
+ */
 struct iTerrainCellRenderProperties : public virtual iBase
 {
   SCF_INTERFACE (iTerrainCellRenderProperties, 1, 0, 0);
 
+  /**
+   * Get visibility flag (if it is not set, the cell does not get rendered)
+   * 
+   * \return visibility flag
+   */
   virtual bool GetVisible () const = 0;
+  
+  /**
+   * Set visibility flag
+   * 
+   * \param value - new flag value
+   */
   virtual void SetVisible (bool value) = 0;
 };
 

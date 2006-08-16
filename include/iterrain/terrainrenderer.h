@@ -32,19 +32,74 @@ struct iMaterialWrapper;
 class csRect;
 struct csRenderMesh;
 
+/// Provides an interface for custom rendering
 struct iTerrainRenderer : public virtual iBase
 {
   SCF_INTERFACE (iTerrainRenderer, 1, 0, 0);
 
+  /**
+   * Create an object that implements iTerrainCellCollisionProperties
+   * This object will be stored in the cell. This function gets invoked
+   * at cells creation.
+   *
+   * \return properties object
+   */
   virtual csPtr<iTerrainCellRenderProperties> CreateProperties () = 0;
+
+  /**
+   * Render the visible cells
+   *
+   * \param n - output value, that will contain the size of the resulting
+   * mesh array
+   * \param rview - view that was used for rendering
+   * \param movable - the terrain object
+   * \param frustum_mask - frustum mask
+   * \param cells - array with visible cells
+   * \param cell_count - number of visible cells
+   *
+   * \return array of render meshes
+   */
   virtual csRenderMesh** GetRenderMeshes (int& n, iRenderView* rview,
                                    iMovable* movable, uint32 frustum_mask,
                                    iTerrainCell** cells, int cell_count) = 0;
 
+  
+  /**
+   * Indicates that the material palette has been changed, and that the
+   * renderer should update its internal structures to reflect the changes.
+   *
+   * \param material_palette - new material palette
+   */
   virtual void OnMaterialPaletteUpdate (const csRefArray<iMaterialWrapper>&
                                         material_palette) = 0;
+
+  /**
+   * Indicates that the cell height data has been changed (while unlocking
+   * the cell height data - either by a feeder or by a user-provided
+   * functions), and that the renderer should update its internal structures
+   * to reflect the changes.
+   *
+   * \param cell - cell with the changed data
+   * \param rectangle - rectangle that was updated
+   * \param data - height data
+   * \param pitch - data pitch
+   */
   virtual void OnHeightUpdate (iTerrainCell* cell, const csRect& rectangle,
                                const float* data, unsigned int pitch) = 0;
+
+  /**
+   * Indicates that the cell's material mask has been changed (while
+   * unlocking the cell material map data - either by a feeder or by a user-
+   * provided functions - or while setting the new mask with the respective
+   * functions), and that the renderer should update its internal structures
+   * to reflect the changes.
+   *
+   * \param cell - cell with the changed data
+   * \param material - material index
+   * \param rectangle - rectangle that was updated
+   * \param data - height data
+   * \param pitch - data pitch
+   */
   virtual void OnMaterialMaskUpdate (iTerrainCell* cell, unsigned int material,
                                const csRect& rectangle, const unsigned char*
                                data, unsigned int pitch) = 0;

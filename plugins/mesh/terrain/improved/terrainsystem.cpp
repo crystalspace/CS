@@ -74,6 +74,11 @@ iTerrainCell* csTerrainSystem::GetCell (const char* name)
   {
     if (!strcmp (cells[i]->GetName (), name))
     {
+      if (cells[i]->GetLoadState () != csTerrainCell::Loaded)
+      {
+        cells[i]->Load ();
+      }
+
       return cells[i];
     }
   }
@@ -93,6 +98,11 @@ iTerrainCell* csTerrainSystem::GetCell (const csVector2& pos)
         cell_pos.y <= pos.y + EPSILON &&
         cell_pos.y + cell_size.y >= pos.y - EPSILON)
     {
+      if (cells[i]->GetLoadState () != csTerrainCell::Loaded)
+      {
+        cells[i]->Load ();
+      }
+
       return cells[i];
     }
   }

@@ -23,13 +23,34 @@
 
 struct iTerrainCell;
 
+/// Provides an interface for reading cell data
 struct iTerrainDataFeeder : public virtual iBase
 {
   SCF_INTERFACE (iTerrainDataFeeder, 1, 0, 0);
 
+  /**
+   * Start cell data preloading (in case of threaded/async loading). This is
+   * triggered by TerrainSystem::PreLoadCells, which is either called by user
+   * or called automatically while rendering terrain.
+   *
+   * \param cell - cell to start preloading for
+   */
   virtual void PreLoad (iTerrainCell* cell) = 0;
+  
+  /**
+   * Load cell data. After the completion of this call the cell should have
+   * all necessary information.
+   *
+   * \param cell - cell to load
+   */
   virtual void Load (iTerrainCell* cell) = 0;
   
+  /**
+   * Set feeder-dependent parameter
+   *
+   * \param param - parameter name
+   * \param value - parameter value
+   */
   virtual void SetParam(const char* param, const char* value) = 0;
 };
 

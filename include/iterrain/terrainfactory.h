@@ -30,12 +30,39 @@ struct iTerrainSystem;
 class csVector2;
 class csVector3;
 
+/// Provides an interface for creating terrain system
 struct iTerrainFactory : public virtual iBase
 {
   SCF_INTERFACE (iTerrainFactory, 1, 0, 0);
 
+  /**
+   * Set desired renderer (there is a single renderer for the whole terrain)
+   *
+   * \param renderer - new renderer
+   */
   virtual void SetRenderer (iTerrainRenderer* renderer) = 0;
+  
+  /**
+   * Set desired collider (there is a single collider for the whole terrain)
+   *
+   * \param collider - new collider
+   */
   virtual void SetCollider (iTerrainCollider* collider) = 0;
+  
+  /**
+   * Add cell to the terrain
+   *
+   * \param name - optional cell name
+   * \param grid_width - grid width. It will be changed to match the grid
+   * width requirements. See iTerrainCell::GetGridWidth
+   * \param grid_height - grid height. It will be changed to match the grid
+   * height requirements. See iTerrainCell::GetGridHeight
+   * \param material_width - material map width
+   * \param material_height - material map height
+   * \param position - cell object-space position
+   * \param size - cell object-space size and height scale
+   * \param feeder - feeder that would be attached to the cell
+   */
   virtual void AddCell (const char* name, int grid_width, int grid_height,
                         int material_width, int material_height,
                         const csVector2& position, const csVector3& size,

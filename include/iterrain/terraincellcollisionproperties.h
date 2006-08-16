@@ -21,11 +21,28 @@
 
 #include "csutil/scf.h"
 
+/**
+ * This is a base class for per-cell collider-specific properties.
+ * The classes which hold the collision-related data that is to be
+ * customized by user should implement this interface.
+ */
 struct iTerrainCellCollisionProperties : public virtual iBase
 {
   SCF_INTERFACE (iTerrainCellCollisionProperties, 1, 0, 0);
 
+  /**
+   * Get collideable flag (if it is not set, the cell does not collide with
+   * anything).
+   * 
+   * \return collideable flag
+   */
   virtual bool GetCollideable () const = 0;
+  
+  /**
+   * Set collideable flag
+   * 
+   * \param value - new flag value
+   */
   virtual void SetCollideable (bool value) = 0;
 };
 

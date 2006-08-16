@@ -25,11 +25,13 @@
 class csVector3;
 struct csCollisionPair;
 
+/// Class for an array of csVector3. Used for communication with plugins.
 struct iTerrainVector3Array : public iArrayChangeAll<csVector3>
 {
   SCF_IARRAYCHANGEALL_INTERFACE(iTerrainVector3Array);
 };
 
+/// Class for an array of csCollisionPair. Used for communication with plugins.
 struct iTerrainCollisionPairArray : public iArrayChangeAll<csCollisionPair>
 {
   SCF_IARRAYCHANGEALL_INTERFACE(iTerrainCollisionPairArray);
