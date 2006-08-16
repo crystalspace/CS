@@ -20,7 +20,7 @@
 #include "cssysdef.h"
 
 #include "csgfx/bakekeycolor.h"
-#include "csgfx/memimage.h"
+#include "csgfx/imagememory.h"
 #include "csgfx/packrgb.h"
 
 #include "gl_render3d.h"

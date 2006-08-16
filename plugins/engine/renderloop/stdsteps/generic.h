@@ -21,7 +21,7 @@
 #ifndef __CS_GENERIC_H__
 #define __CS_GENERIC_H__
 
-#include "csutil/scf.h"
+#include "csutil/scf_implementation.h"
 #include "csutil/csstring.h"
 #include "csutil/weakref.h"
 #include "csutil/dirtyaccessarray.h"
@@ -39,7 +39,8 @@
 #include "csplugincommon/renderstep/basesteptype.h"
 #include "csplugincommon/renderstep/basesteploader.h"
 
-class csGenericRSType : public csBaseRenderStepType
+class csGenericRSType :
+  public scfImplementationExt0<csGenericRSType, csBaseRenderStepType>
 {
 public:
   csGenericRSType (iBase* p);
@@ -47,7 +48,8 @@ public:
   virtual csPtr<iRenderStepFactory> NewFactory();
 };
 
-class csGenericRSLoader : public csBaseRenderStepLoader
+class csGenericRSLoader :
+  public scfImplementationExt0<csGenericRSLoader, csBaseRenderStepLoader>
 {
   csStringHash tokens;
 #define CS_TOKEN_ITEM_FILE "plugins/engine/renderloop/stdsteps/generic.tok"
@@ -61,14 +63,13 @@ public:
     iBase* context);
 };
 
-class csGenericRenderStepFactory : public iRenderStepFactory
+class csGenericRenderStepFactory :
+  public scfImplementation1<csGenericRenderStepFactory, iRenderStepFactory>
 {
 private:
   iObjectRegistry* object_reg;
 
 public:
-  SCF_DECLARE_IBASE;
-
   csGenericRenderStepFactory (iObjectRegistry* object_reg);
   virtual ~csGenericRenderStepFactory ();
 
@@ -83,9 +84,9 @@ struct meshInfo
   float radius;		// Radius of the bounding sphere of this object.
 };
 
-class csGenericRenderStep : public iRenderStep, 
-			    public iGenericRenderStep,
-			    public iLightRenderStep
+class csGenericRenderStep :
+  public scfImplementation3<csGenericRenderStep,
+    iRenderStep, iGenericRenderStep, iLightRenderStep>
 {
 private:
   csStringID shadertype;
@@ -121,9 +122,8 @@ private:
   static csStringID string_object2world;
   static csStringID light_0_type;
   static csStringID light_ambient;
-public:
-  SCF_DECLARE_IBASE;
 
+public:
   csGenericRenderStep (iObjectRegistry* object_reg);
   virtual ~csGenericRenderStep ();
 
@@ -159,6 +159,5 @@ public:
   /// Enables/disables z offset and z mode as needed
   inline void ToggleStepSettings (iGraphics3D* g3d, bool settings);
 };
-
 
 #endif

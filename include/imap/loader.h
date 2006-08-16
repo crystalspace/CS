@@ -25,7 +25,7 @@
  */
 /**\addtogroup loadsave
  * @{ */
-#include "csutil/scf.h"
+#include "csutil/scf_interface.h"
 
 #include "igraphic/image.h"
 #include "ivideo/txtmgr.h"
@@ -47,13 +47,13 @@ struct iSndSysData;
 struct iSndSysWrapper;
 struct iSndSysStream;
 
-SCF_VERSION (iLoaderStatus, 0, 1, 0);
-
 /**
  * An object to query about the status of the threaded loader.
  */
-struct iLoaderStatus : public iBase
+struct iLoaderStatus : public virtual iBase
 {
+  SCF_INTERFACE (iLoaderStatus, 1, 0, 0);
+
   /// Check if the loader is ready.
   virtual bool IsReady () = 0;
   /// Check if there was an error during loading.

@@ -25,7 +25,7 @@
  */
 
 #include "csextern.h"
-#include "csgfx/memimage.h"
+#include "csgfx/imagememory.h"
 #include "csutil/ref.h"
 #include "csutil/scf_interface.h"
 #include "csutil/scf_implementation.h"

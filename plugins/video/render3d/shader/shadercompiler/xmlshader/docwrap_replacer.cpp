@@ -1,6 +1,6 @@
 /*
-  Copyright (C) 2005 by Frank Richter
-	    (C) 2005 by Jorrit Tyberghein
+  Copyright (C) 2005-2006 by Frank Richter
+	    (C) 2005-2006 by Jorrit Tyberghein
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -29,6 +29,7 @@
 #include "iutil/document.h"
 
 #include "docwrap_replacer.h"
+#include "tempheap.h"
 
 //---------------------------------------------------------------------------
 
@@ -37,7 +38,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
 
 csReplacerDocumentNode::csReplacerDocumentNode (iDocumentNode* wrappedNode,
   csReplacerDocumentNode* parent, csReplacerDocumentNodeFactory* shared, 
-  Substitutions* subst) : scfPooledImplementationType (this), 
+  Substitutions* subst) : scfImplementationType (this), 
   wrappedNode (wrappedNode), parent (parent), shared (shared), subst (subst)
 {
   shared->Substitute (wrappedNode->GetValue(), value, *this->subst);
@@ -197,18 +198,14 @@ csReplacerDocumentNodeFactory::csReplacerDocumentNodeFactory ()
 {
 }
 
-#include "csutil/custom_new_disable.h"
-
 csRef<iDocumentNode> csReplacerDocumentNodeFactory::CreateWrapper (
   iDocumentNode* wrappedNode, csReplacerDocumentNode* parent, 
   Substitutions* subst)
 {
   csReplacerDocumentNode* newNode = 
-    new (nodePool) csReplacerDocumentNode (wrappedNode, parent, this, subst);
+    new csReplacerDocumentNode (wrappedNode, parent, this, subst);
   return csPtr<iDocumentNode> (newNode);
 }
-
-#include "csutil/custom_new_enable.h"
 
 void csReplacerDocumentNodeFactory::Substitute (const char* in, 
 						csString& out, 
@@ -223,14 +220,44 @@ void csReplacerDocumentNodeFactory::Substitute (const char* in,
     if (*p == '$')
     {
       p++;
+      bool quote = false;
+      if (*p == '"') { quote = true; p++; }
       const char* varStart = p;
       while ((*p != '$') && (*p != 0)) p++;
       const char* varEnd = p;
-      csString varName (varStart, varEnd-varStart);
+      TempString<> varName (varStart, varEnd-varStart);
       if (varName.IsEmpty())
 	out << '$';
       else
-	out << subst.Get (varName, ""); // @@@ FIXME: Error reporting
+      {
+        // @@@ FIXME: Error reporting?
+        TempString<> substStr = subst.Get (varName, ""); 
+        if (quote)
+        {
+          /* The inserted string will be quoted in the fashion needed by
+           * the processing instructions parser */
+          TempString<> newSubst;
+          newSubst << '"';
+          for (size_t i = 0; i < substStr.Length(); i++)
+          {
+            char c = substStr[i];
+            switch (c)
+            {
+              case '"':
+                newSubst << "\\\"";
+                break;
+              case '\\':
+                newSubst << "\\\\";
+                break;
+              default:
+                newSubst << c;
+            }
+          }
+          newSubst << '"';
+          substStr = newSubst;
+        }
+	out << substStr;
+      }
       if (*p == 0) break;
     }
     else

@@ -1081,13 +1081,12 @@ bool csODECollider::CreateMeshGeometry (iMeshWrapper *mesh)
   if (p->GetVertexCount () == 0 || p->GetTriangleCount () == 0)
     return false;
 
-  csTriangle *c_triangle;
-  int tr_num;
+  csTriangle *c_triangle = p->GetTriangles();
+  int tr_num = p->GetTriangleCount();
   // Slight problem here is that we need to keep vertices and indices around
   // since ODE only uses the pointers. I am not sure if ODE cleans them up
   // on exit or not. If not, we need some way to keep track of all mesh colliders
   // and clean them up on destruct.
-  csPolygonMeshTools::Triangulate(p, c_triangle, tr_num);
   float *vertices = new float[p->GetVertexCount()*3];
   int *indeces = new int[tr_num*3];
   csVector3 *c_vertex = p->GetVertices();

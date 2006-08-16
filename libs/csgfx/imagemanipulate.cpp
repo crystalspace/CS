@@ -20,7 +20,7 @@
 #include "cssysdef.h"
 #include "csqint.h"
 #include "csutil/refarr.h"
-#include "csgfx/memimage.h"
+#include "csgfx/imagememory.h"
 
 #include "csgfx/imagemanipulate.h"
 

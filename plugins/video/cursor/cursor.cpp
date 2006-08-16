@@ -24,7 +24,7 @@
 #include "csutil/stringarray.h"
 #include "csutil/event.h"
 #include "csutil/eventnames.h"
-#include "csgfx/memimage.h"
+#include "csgfx/imagememory.h"
 #include "iutil/objreg.h"
 #include "iutil/eventq.h"
 #include "iutil/evdefs.h"
@@ -40,38 +40,19 @@ CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_FACTORY (csCursor)
 
-SCF_IMPLEMENT_IBASE (csCursor)
-  SCF_IMPLEMENTS_INTERFACE (iCursor)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iEventHandler)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csCursor::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csCursor::eiEventHandler)
-  SCF_IMPLEMENTS_INTERFACE (iEventHandler)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 // String to define our SCF name - only used when reporting 
 static const char * const CURSOR_SCF_NAME = "crystalspace.graphic.cursor";
 
 csCursor::csCursor (iBase *parent) :
+  scfImplementationType(this, parent),
   reg(0), isActive(false), useOS(false), checkedOSsupport(false)
 {
-  SCF_CONSTRUCT_IBASE (parent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiEventHandler);
 }
 
 csCursor::~csCursor ()
 {
-  if (eventq) eventq->RemoveListener (&scfiEventHandler);
+  if (eventq) RemoveWeakListener (eventq, weakEventHandler);
   RemoveAllCursors ();
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiEventHandler);
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csCursor::Initialize (iObjectRegistry *objreg)
@@ -87,7 +68,7 @@ bool csCursor::Initialize (iObjectRegistry *objreg)
   if (!eventq) return false;
   csEventID events[3] = { csevPostProcess(reg), csevMouseEvent(reg), 
 			  CS_EVENTLIST_END };
-  eventq->RegisterListener (&scfiEventHandler, events);
+  RegisterWeakListener (eventq, this, events, weakEventHandler);
 
   return true;
 }

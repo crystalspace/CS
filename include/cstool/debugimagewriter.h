@@ -34,6 +34,7 @@
 /**
  * Helper class allowing in debug builds for to quickly dump an iImage 
  * object onto disk for visual inspection.
+ * \note Only works in debug builds.
  */
 class CS_CRYSTALSPACE_EXPORT csDebugImageWriter
 {

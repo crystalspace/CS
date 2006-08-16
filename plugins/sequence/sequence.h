@@ -19,7 +19,7 @@
 #ifndef __CS_SEQUENCE_H__
 #define __CS_SEQUENCE_H__
 
-#include "csutil/scf.h"
+#include "csutil/scf_implementation.h"
 #include "csutil/util.h"
 #include "csutil/weakref.h"
 #include "csutil/refarr.h"
@@ -32,8 +32,7 @@
 struct iObjectRegistry;
 struct iVirtualClock;
 
-
-class csSequence : public iSequence
+class csSequence : public scfImplementation1<csSequence, iSequence>
 {
 private:
   iSequenceManager* seqmgr;
@@ -45,38 +44,30 @@ public:
   //=====
   // Standard operation.
   //=====
-  class StandardOperation : public iSequenceOperation
+  class StandardOperation :
+    public scfImplementation1<StandardOperation, iSequenceOperation>
   {
   protected:
     iSequenceManager* seqmgr;
-    virtual ~StandardOperation () { }
   public:
-    SCF_DECLARE_IBASE;
-    StandardOperation (iSequenceManager* sm) : seqmgr (sm)
-    {
-      SCF_CONSTRUCT_IBASE (0);
-    }
-    virtual void CleanupSequences ()
-    {
-      SCF_DESTRUCT_IBASE();
-    }
+    StandardOperation (iSequenceManager* sm) :
+      scfImplementationType(this), seqmgr (sm) { }
+    virtual ~StandardOperation () { }
+    virtual void CleanupSequences () { }
   };
 
   //=====
   // An operation to run a sequence.
   //=====
-  class RunSequenceOp : public StandardOperation
+  class RunSequenceOp :
+    public scfImplementationExt0<RunSequenceOp, StandardOperation>
   {
   private:
     csWeakRef<iSequence> sequence;
-  protected:
-    virtual ~RunSequenceOp () { }
   public:
     RunSequenceOp (iSequenceManager* sm, iSequence* seq) :
-    	StandardOperation (sm)
-    {
-      sequence = seq;
-    }
+      scfImplementationType(this, sm), sequence(seq) { }
+    virtual ~RunSequenceOp () { }
     virtual void Do (csTicks dt, iBase* params);
     virtual void CleanupSequences () { sequence = 0; }
   };
@@ -84,22 +75,23 @@ public:
   //=====
   // An operation for a condition.
   //=====
-  class RunCondition : public StandardOperation
+  class RunCondition :
+    public scfImplementationExt0<RunCondition, StandardOperation>
   {
   private:
     csRef<iSequenceCondition> condition;
     csWeakRef<iSequence> trueSequence;
     csWeakRef<iSequence> falseSequence;
-  protected:
-    virtual ~RunCondition () { }
   public:
     RunCondition (iSequenceManager* sm, iSequenceCondition* cond,
-    	iSequence* trueSeq, iSequence* falseSeq) : StandardOperation (sm)
+      iSequence* trueSeq, iSequence* falseSeq) :
+      scfImplementationType(this, sm)
     {
       trueSequence = trueSeq;
       falseSequence = falseSeq;
       condition = cond;
     }
+    virtual ~RunCondition () { }
     virtual void Do (csTicks dt, iBase* params);
     virtual void CleanupSequences () { trueSequence = 0; falseSequence = 0; }
   };
@@ -107,27 +99,25 @@ public:
   //=====
   // An operation for a loop.
   //=====
-  class RunLoop : public StandardOperation
+  class RunLoop :
+    public scfImplementationExt0<RunLoop, StandardOperation>
   {
   private:
     csRef<iSequenceCondition> condition;
     csWeakRef<iSequence> sequence;
-  protected:
-    virtual ~RunLoop () { }
   public:
     RunLoop (iSequenceManager* sm, iSequenceCondition* cond, iSequence* seq) :
-    	StandardOperation (sm)
+      scfImplementationType(this, sm)
     {
       sequence = seq;
       condition = cond;
     }
+    virtual ~RunLoop () { }
     virtual void Do (csTicks dt, iBase* params);
     virtual void CleanupSequences () { sequence = 0; }
   };
 
 public:
-  SCF_DECLARE_IBASE;
-
   csSequence (iSequenceManager* seqmgr);
   virtual ~csSequence ();
 
@@ -150,11 +140,14 @@ public:
   void CleanupSequences ();
 };
 
-class csSequenceManager : public iSequenceManager
+class csSequenceManager :
+  public scfImplementation3<csSequenceManager,
+    iSequenceManager, iComponent, iEventHandler>
 {
 private:
   iObjectRegistry *object_reg;
   csRef<iVirtualClock> vc;
+  csRef<iEventHandler> weakEventHandler;
 
   // The sequence manager uses one big sequence to keep all queued
   // sequence operations. New sequences will be merged with this one.
@@ -181,8 +174,6 @@ private:
   uint sequence_id;
 
 public:
-  SCF_DECLARE_IBASE;
-
   csSequenceManager (iBase *iParent);
   virtual ~csSequenceManager ();
   virtual bool Initialize (iObjectRegistry *object_reg);
@@ -204,32 +195,8 @@ public:
   virtual void DestroySequenceOperations (uint sequence_id);
   virtual uint GetUniqueID () { sequence_id++; return sequence_id; }
 
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csSequenceManager);
-    virtual bool Initialize (iObjectRegistry* p)
-    { return scfParent->Initialize (p); }
-  } scfiComponent;
-
-  struct EventHandler : public iEventHandler
-  {
-  private:
-    csSequenceManager* parent;
-  public:
-    SCF_DECLARE_IBASE;
-    EventHandler (csSequenceManager* parent)
-    {
-      SCF_CONSTRUCT_IBASE (0);
-      EventHandler::parent = parent;
-    }
-    virtual ~EventHandler ()
-    {
-      SCF_DESTRUCT_IBASE();
-    }
-    virtual bool HandleEvent (iEvent& e) { return parent->HandleEvent (e); }
-    CS_EVENTHANDLER_NAMES("crystalspace.sequence")
-    CS_EVENTHANDLER_NIL_CONSTRAINTS
-  } * scfiEventHandler;
+  CS_EVENTHANDLER_NAMES("crystalspace.sequence")
+  CS_EVENTHANDLER_NIL_CONSTRAINTS
 
   CS_DECLARE_EVENT_SHORTCUTS;
 };

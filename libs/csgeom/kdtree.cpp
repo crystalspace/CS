@@ -161,7 +161,7 @@ csKDTree::~csKDTree ()
   Clear ();
 }
 
-void csKDTree::SetUserObject (iBase* userobj)
+void csKDTree::SetUserObject (iKDTreeUserData* userobj)
 {
   userobject = userobj;
 }

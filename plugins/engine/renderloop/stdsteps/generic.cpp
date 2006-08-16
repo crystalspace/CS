@@ -50,7 +50,8 @@ SCF_IMPLEMENT_FACTORY(csGenericRSLoader)
 
 //---------------------------------------------------------------------------
 
-csGenericRSType::csGenericRSType (iBase* p) : csBaseRenderStepType (p)
+csGenericRSType::csGenericRSType (iBase* p) :
+  scfImplementationType (this, p)
 {
 }
 
@@ -62,7 +63,8 @@ csPtr<iRenderStepFactory> csGenericRSType::NewFactory()
 
 //---------------------------------------------------------------------------
 
-csGenericRSLoader::csGenericRSLoader (iBase* p) : csBaseRenderStepLoader (p)
+csGenericRSLoader::csGenericRSLoader (iBase* p) :
+  scfImplementationType (this, p)
 {
   InitTokenTable (tokens);
 }
@@ -130,20 +132,15 @@ csPtr<iBase> csGenericRSLoader::Parse (iDocumentNode* node,
 
 //---------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE(csGenericRenderStepFactory);
-  SCF_IMPLEMENTS_INTERFACE(iRenderStepFactory);
-SCF_IMPLEMENT_IBASE_END
-
 csGenericRenderStepFactory::csGenericRenderStepFactory (
-  iObjectRegistry* object_reg)
+  iObjectRegistry* object_reg) :
+  scfImplementationType (this)
 {
-  SCF_CONSTRUCT_IBASE(0);
   csGenericRenderStepFactory::object_reg = object_reg;
 }
 
 csGenericRenderStepFactory::~csGenericRenderStepFactory ()
 {
-  SCF_DESTRUCT_IBASE();
 }
 
 csPtr<iRenderStep> csGenericRenderStepFactory::Create ()
@@ -164,17 +161,10 @@ csStringID csGenericRenderStep::string_object2world;
 csStringID csGenericRenderStep::light_0_type;
 csStringID csGenericRenderStep::light_ambient;
 
-SCF_IMPLEMENT_IBASE(csGenericRenderStep)
-  SCF_IMPLEMENTS_INTERFACE(iRenderStep)
-  SCF_IMPLEMENTS_INTERFACE(iGenericRenderStep)
-  SCF_IMPLEMENTS_INTERFACE(iLightRenderStep)
-SCF_IMPLEMENT_IBASE_END
-
 csGenericRenderStep::csGenericRenderStep (
-  iObjectRegistry* object_reg)
+  iObjectRegistry* object_reg) :
+  scfImplementationType (this)
 {
-  SCF_CONSTRUCT_IBASE(0);
-
   objreg = object_reg;
 
   strings = CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg, 
@@ -201,7 +191,6 @@ csGenericRenderStep::csGenericRenderStep (
 
 csGenericRenderStep::~csGenericRenderStep ()
 {
-  SCF_DESTRUCT_IBASE();
 }
 
 void csGenericRenderStep::RenderMeshes (iRenderView* rview, iGraphics3D* g3d,

@@ -452,11 +452,6 @@ public:
    * POTS.) 
    */
   bool enableNonPowerOfTwo2DTextures;
-  /**
-   * Whether to upload DXT-precompressed textures even if the S3TC ext is not
-   * present (some DRI drivers support that).
-   */
-  bool forcePrecompressedDXTUpload;
 
   csStringID nameDiffuseTexture;
 
@@ -514,10 +509,6 @@ public:
 
   /// Dump all SLMs to image files.
   void DumpSuperLightmaps (iVFS* VFS, iImageIO* iio, const char* dir);
-
-  virtual void GetLightmapRendererCoords (int slmWidth, int slmHeight,
-    int lm_x1, int lm_y1, int lm_x2, int lm_y2,
-    float& lm_u1, float& lm_v1, float &lm_u2, float& lm_v2);
 };
 
 #endif // __CS_GL_TXTMGR_H__

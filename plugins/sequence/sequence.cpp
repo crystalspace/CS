@@ -21,7 +21,6 @@
 #include "csutil/sysfunc.h"
 #include "csutil/event.h"
 #include "sequence.h"
-#include "csutil/scf.h"
 #include "iutil/objreg.h"
 #include "iutil/event.h"
 #include "iutil/eventq.h"
@@ -32,20 +31,15 @@
 
 CS_IMPLEMENT_PLUGIN
 
-SCF_IMPLEMENT_IBASE (csSequence)
-  SCF_IMPLEMENTS_INTERFACE (iSequence)
-SCF_IMPLEMENT_IBASE_END
-
-csSequence::csSequence (iSequenceManager* seqmgr) : first (0), last (0)
+csSequence::csSequence (iSequenceManager* seqmgr) :
+  scfImplementationType(this), first (0), last (0)
 {
-  SCF_CONSTRUCT_IBASE (0);
   csSequence::seqmgr = seqmgr;
 }
 
 csSequence::~csSequence ()
 {
   Clear ();
-  SCF_DESTRUCT_IBASE();
 }
 
 void csSequence::Clear ()
@@ -179,26 +173,9 @@ void csSequence::RunLoop::Do (csTicks dt, iBase* params)
 
 SCF_IMPLEMENT_FACTORY (csSequenceManager)
 
-
-SCF_IMPLEMENT_IBASE (csSequenceManager)
-  SCF_IMPLEMENTS_INTERFACE (iSequenceManager)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csSequenceManager::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csSequenceManager::EventHandler)
-  SCF_IMPLEMENTS_INTERFACE (iEventHandler)
-SCF_IMPLEMENT_IBASE_END
-
 csSequenceManager::csSequenceManager (iBase *iParent) :
-	weakref_alloc (100)
+  scfImplementationType(this, iParent), weakref_alloc (100)
 {
-  SCF_CONSTRUCT_IBASE (iParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-  scfiEventHandler = 0;
   object_reg = 0;
   main_sequence = new csSequence (this);
   previous_time_valid = false;
@@ -209,17 +186,14 @@ csSequenceManager::csSequenceManager (iBase *iParent) :
 
 csSequenceManager::~csSequenceManager ()
 {
-  if (scfiEventHandler)
+  if (object_reg)
   {
     csRef<iEventQueue> q (CS_QUERY_REGISTRY(object_reg, iEventQueue));
     if (q != 0)
-      q->RemoveListener (scfiEventHandler);
-    scfiEventHandler->DecRef ();
+      RemoveWeakListener (q, weakEventHandler);
   }
   Clear ();
   main_sequence->DecRef ();
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE();
 }
 
 bool csSequenceManager::Initialize (iObjectRegistry *r)
@@ -227,11 +201,9 @@ bool csSequenceManager::Initialize (iObjectRegistry *r)
   object_reg = r;
   vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
   CS_INITIALIZE_EVENT_SHORTCUTS (object_reg);
-  if (!scfiEventHandler)
-    scfiEventHandler = new EventHandler (this);
   csRef<iEventQueue> q (CS_QUERY_REGISTRY(object_reg, iEventQueue));
   if (q != 0)
-    q->RegisterListener (scfiEventHandler, FinalProcess);
+    RegisterWeakListener (q, this, FinalProcess, weakEventHandler);
   return true;
 }
 
@@ -385,8 +357,3 @@ void csSequenceManager::DestroySequenceOperations (uint sequence_id)
     op = op_next;
   }
 }
-
-SCF_IMPLEMENT_IBASE (csSequence::StandardOperation)
-  SCF_IMPLEMENTS_INTERFACE (iSequenceOperation)
-SCF_IMPLEMENT_IBASE_END
-

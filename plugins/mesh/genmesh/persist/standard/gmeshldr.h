@@ -33,6 +33,9 @@ struct iSyntaxService;
 struct iGeneralFactoryState;
 struct iGeneralMeshState;
 
+CS_PLUGIN_NAMESPACE_BEGIN(GenMeshLoader)
+{
+
 /**
  * General Mesh factory loader.
  */
@@ -44,7 +47,11 @@ private:
   iObjectRegistry* object_reg;
   csRef<iReporter> reporter;
   csRef<iSyntaxService> synldr;
+
   csStringHash xmltokens;
+#define CS_TOKEN_ITEM_FILE "plugins/mesh/genmesh/persist/standard/gmeshldr.tok"
+#include "cstool/tokenlist.h"
+#undef CS_TOKEN_ITEM_FILE 
 
 public:
   /// Constructor.
@@ -57,8 +64,8 @@ public:
   virtual bool Initialize (iObjectRegistry *object_reg);
 
   /// Parse a submesh node
-  bool ParseSubMesh (iDocumentNode *node, iGeneralMeshCommonState* state, 
-    iGeneralFactoryState* factstate, iLoaderContext* ldr_context);
+  bool ParseSubMesh (iDocumentNode *node, iGeneralFactoryState* factstate, 
+    iLoaderContext* ldr_context);
 
   /// Parse a given node and return a new object for it.
   virtual csPtr<iBase> Parse (iDocumentNode* node,
@@ -105,8 +112,14 @@ private:
   iObjectRegistry* object_reg;
   csRef<iReporter> reporter;
   csRef<iSyntaxService> synldr;
-  csStringHash xmltokens;
 
+  csStringHash xmltokens;
+#define CS_TOKEN_ITEM_FILE "plugins/mesh/genmesh/persist/standard/gmeshldr.tok"
+#include "cstool/tokenlist.h"
+#undef CS_TOKEN_ITEM_FILE 
+
+  bool ParseLegacySubMesh (iDocumentNode *node, iGeneralMeshState* state, 
+    iLoaderContext* ldr_context);
 public:
   /// Constructor.
   csGeneralMeshLoader (iBase*);
@@ -124,8 +137,8 @@ public:
   bool ParseRenderBuffer (iDocumentNode *node, iGeneralMeshState* state, 
     iGeneralFactoryState* factstate);
   /// Parse a submesh node
-  bool ParseSubMesh (iDocumentNode *node, iGeneralMeshCommonState* state, 
-    iGeneralFactoryState* factstate, iLoaderContext* ldr_context);
+  bool ParseSubMesh (iDocumentNode *node, iGeneralMeshState* state, 
+    iLoaderContext* ldr_context);
 };
 
 /**
@@ -154,6 +167,9 @@ public:
   virtual bool WriteDown (iBase *obj, iDocumentNode* parent,
   	iStreamSource*);
 };
+
+}
+CS_PLUGIN_NAMESPACE_END(GenMeshLoader)
 
 #endif // __CS_GMESHLDR_H__
 

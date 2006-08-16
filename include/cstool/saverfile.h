@@ -28,13 +28,17 @@
 #include "csutil/csobject.h"
 #include "csutil/scf_implementation.h"
 #include "imap/saverfile.h"
+#include "iutil/selfdestruct.h"
 
 /**
  * An object containing information about where to save a file.
  * Parent this iObject to engine objects.
  */
 class CS_CRYSTALSPACE_EXPORT csSaverFile : 
-  public scfImplementationExt1<csSaverFile, csObject, iSaverFile>
+  public scfImplementationExt2<csSaverFile, 
+                               csObject, 
+                               iSaverFile,
+                               iSelfDestruct>
 {
   const char* file;
   int filetype;
@@ -50,6 +54,8 @@ public:
   virtual const char* GetFile () const;
   
   virtual int GetFileType () const;
+
+  void SelfDestruct () {}
 };
 
 #endif // __CS_SAVERFILE_H__

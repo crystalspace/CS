@@ -2,13 +2,9 @@ SubDir TOP plugins video canvas openglx ;
 
 if $(GLX.AVAILABLE) = "yes"
 {
-  Description glx2d : "GL/X 2D driver" ;
-  Plugin glx2d : [ Wildcard *.cpp *.h ] ;
-  LinkWith glx2d : crystalspace_opengl crystalspace ;
-  ExternalLibs glx2d : GLX ;
-  if $(GL.LIBNAME)
-  {
-    CFlags glx2d : [ FDefines "LIBGL_NAME=\"\\\"$(GL.LIBNAME)\\\"\"" ] ;
-  }
-  CompileGroups glx2d : canvases openglcanvas ;
+Description glx2d : "GL/X 2D driver" ;
+Plugin glx2d : [ Wildcard *.cpp *.h ] ;
+LinkWith glx2d : crystalspace_opengl crystalspace ;
+ExternalLibs glx2d : GLX ;
+CompileGroups glx2d : canvases openglcanvas ;
 }

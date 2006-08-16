@@ -50,9 +50,6 @@ class csGraphics2DGLX : public scfImplementationExt1<csGraphics2DGLX ,
   Colormap cmap;
   GLXContext active_GLContext;
   bool hardwareaccelerated;
-  
-  // Handle to loaded libGL.so (see remark in Initialize())
-  void* libGL;
 
   // we are using a specific displaydriver
   csRef<iOpenGLDisp> dispdriver;

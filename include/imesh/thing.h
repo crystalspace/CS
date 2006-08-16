@@ -20,6 +20,7 @@
 #define __CS_IMESH_THING_H__
 
 #include "csutil/scf.h"
+#include "igraphic/image.h"
 
 /**\file
  * Thing mesh interfaces
@@ -201,7 +202,7 @@ struct iPolygonHandle : public virtual iBase
  */
 struct iThingFactoryState : public virtual iBase
 {
-  SCF_INTERFACE(iThingFactoryState, 2, 0, 0);
+  SCF_INTERFACE(iThingFactoryState, 2, 0, 1);
 
   /**
    * Compress the vertex table so that all nearly identical vertices
@@ -658,6 +659,21 @@ struct iThingFactoryState : public virtual iBase
 
   virtual bool AddPolygonRenderBuffer (int polygon_idx, const char* name,
     iRenderBuffer* buffer) = 0;
+    
+  /**\name Lightmap query
+   * @{ */
+  /**
+   * Query the lightmap layout of a polygon.
+   * \param polygon_idx Index of the polygon to query.
+   * \param slm Returns on which superlightmap the lightmap is.
+   * \param slmSubRect Returns the rectangle of the lightmap on the 
+   *    superlightmap.
+   * \param slmCoord The coordinates of the lightmap on the superlightmap.
+   * \return 'True' if the polygon has a lightmap, 'false' otherwise.
+   */
+  virtual bool GetLightmapLayout (int polygon_idx, size_t& slm, 
+    csRect& slmSubRect, float* slmCoord) = 0;
+  /** @} */
 };
 
 /**
@@ -677,7 +693,7 @@ struct iThingFactoryState : public virtual iBase
  */
 struct iThingState : public virtual iBase
 {
-  SCF_INTERFACE (iThingState, 1, 0, 0);
+  SCF_INTERFACE (iThingState, 1, 0, 2);
 
   /// Get the given vertex coordinates in world space
   virtual const csVector3 &GetVertexW (int idx) const = 0;
@@ -770,6 +786,20 @@ struct iThingState : public virtual iBase
    * supported here!
    */
   virtual const csPlane3& GetPolygonWorldPlane (int polygon_idx) = 0;
+  
+  /**\name Lightmap query
+   * @{ */
+  /// Get the lightmap for a specific polygon.
+  virtual csPtr<iImage> GetPolygonLightmap (int polygon_idx) = 0;
+  /// Query for pseudo-static lightmaps.
+  virtual bool GetPolygonPDLight (int polygon_idx, size_t pdlight_index, 
+    csRef<iImage>& map, iLight*& light) = 0;
+  /** @} */
+
+  /**
+   * Return the material \p oldMat was replaced with (or 0 if it wasn't).
+   */
+  virtual iMaterialWrapper* GetReplacedMaterial (iMaterialWrapper* oldMat) = 0;
 };
 
 /**

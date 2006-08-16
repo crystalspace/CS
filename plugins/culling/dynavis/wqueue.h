@@ -22,7 +22,7 @@
 #include "csgeom/vector2.h"
 #include "csgeom/math2d.h"
 #include "iutil/dbghelp.h"
-#include "csutil/scf.h"
+#include "csutil/scf_interface.h"
 
 // @@@ Hack(s) to avoid problems with static linking
 #ifdef DYNAVIS_DEBUG
@@ -44,7 +44,8 @@ struct csWriteQueueElement
  * A Write Queue for delaying execution of writes in the coverage
  * buffer.
  */
-class csWriteQueue : public iBase
+class csWriteQueue :
+  public scfImplementation1<csWriteQueue, iDebugHelper>
 {
 private:
   // A single linked list of free elements in the queue.
@@ -64,8 +65,6 @@ public:
   csWriteQueue ();
   /// Destroy the write queue.
   virtual ~csWriteQueue ();
-
-  SCF_DECLARE_IBASE;
 
   /// Initialize the write queue to empty.
   void Initialize ();
@@ -100,40 +99,14 @@ public:
   bool IsPointAffected (const csVector2& p, float depth);
 
   // Debugging functions.
-  csPtr<iString> Debug_UnitTest ();
+  csPtr<iString> UnitTest ();
 
-  struct DebugHelper : public iDebugHelper
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csWriteQueue);
-    virtual int GetSupportedTests () const
-    {
-      return CS_DBGHELP_UNITTEST;
-    }
-    virtual csPtr<iString> UnitTest ()
-    {
-      return scfParent->Debug_UnitTest ();
-    }
-    virtual csPtr<iString> StateTest ()
-    {
-      return 0;
-    }
-    virtual csTicks Benchmark (int)
-    {
-      return 0;
-    }
-    virtual csPtr<iString> Dump ()
-    {
-      return 0;
-    }
-    virtual void Dump (iGraphics3D*)
-    {
-    }
-    virtual bool DebugCommand (const char*)
-    {
-      return false;
-    }
-  } scfiDebugHelper;
+  virtual int GetSupportedTests () const { return CS_DBGHELP_UNITTEST; }
+  virtual csPtr<iString> StateTest () { return 0; }
+  virtual csTicks Benchmark (int) { return 0; }
+  virtual csPtr<iString> Dump () { return 0; }
+  virtual void Dump (iGraphics3D*) { }
+  virtual bool DebugCommand (const char*) { return false; }
 };
 
 #endif // __CS_WRITEQUEUE_H__
-

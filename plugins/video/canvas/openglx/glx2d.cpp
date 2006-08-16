@@ -33,8 +33,6 @@
 #include "iutil/objreg.h"
 #include "ivaria/reporter.h"
 
-#include <dlfcn.h>
-
 CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_FACTORY (csGraphics2DGLX)
@@ -44,7 +42,7 @@ SCF_IMPLEMENT_FACTORY (csGraphics2DGLX)
 
 // csGraphics2DGLX function
 csGraphics2DGLX::csGraphics2DGLX (iBase *iParent) :
-  scfImplementationType (this, iParent), cmap (0), hardwareaccelerated(false), libGL (0)
+  scfImplementationType (this, iParent), cmap (0), hardwareaccelerated(false)
 {
 }
 
@@ -69,24 +67,20 @@ bool csGraphics2DGLX::Initialize (iObjectRegistry *object_reg)
   dispdriver = 0;
   xvis = 0;
   hardwareaccelerated = false;
-  
-#ifdef LIBGL_NAME
-  /* HACK: Work around issue where DRI drivers fail to load.
-   * If RTLD_GLOBAL is not defined, DRI drivers may not find some symbols
-   * exported from libGL, and hence not load. Previously, RTLD_GLOBAL was
-   * set on plugin loading; however, this has a couple of wacky, undesired
-   * side effects - like symbols, supposed to be from static libraries, 
-   * being imported from other modules, causing side effects like memory
-   * allocation not being from the same module any more.
-   * To avoid using RTLD_GLOBAL for plugins, but nevertheless allow DRI 
-   * drivers to work, we hack around this by manually loading libGL with
-   * RTLD_GLOBAL. This is enough to satisfy the DRI drivers.
-   */
-  libGL = dlopen ("lib" LIBGL_NAME ".so", RTLD_LAZY | RTLD_GLOBAL);
-#endif
 
   if (!csGraphics2DGLCommon::Initialize (object_reg))
     return false;
+
+  /* Mesa DRI drivers don't support S3TC compressed textures entirely, only
+   * upload. This behaviour is not conform to the specification for the
+   * texture compression spec, so the ext is not reported by default.
+   * However, it can nevertheless be activated by setting the 
+   * force_s3tc_enable env var to true.
+   * Do that since CS can take advantage of the upload-only support. */
+  bool mesaForceS3TCEnable = 
+    config->GetBool ("Video.OpenGL.MesaForceS3TCEnable", false);
+  if (mesaForceS3TCEnable && !getenv ("force_s3tc_enable"))
+    putenv ("force_s3tc_enable=true");
 
   csRef<iPluginManager> plugin_mgr (
   	CS_QUERY_REGISTRY (object_reg, iPluginManager));
@@ -138,7 +132,6 @@ csGraphics2DGLX::~csGraphics2DGLX ()
   // Destroy your graphic interface
   XFree ((void*)xvis);
   Close ();
-  if (libGL) dlclose (libGL);
 }
 
 bool csGraphics2DGLX::Open()
@@ -158,7 +151,7 @@ bool csGraphics2DGLX::Open()
 
   xwin->SetColormap (cmap);
   xwin->SetVisualInfo (xvis);
-  xwin->SetCanvas ((iGraphics2D *)this);
+  xwin->SetCanvas (static_cast<iGraphics2D*> (this));
   if (!xwin->Open ())
   {
     Report (CS_REPORTER_SEVERITY_ERROR,

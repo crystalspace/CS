@@ -175,6 +175,17 @@ csShadowMap *csLightMap::FindShadowMap (iLight *light)
   return 0;
 }
 
+csShadowMap *csLightMap::GetShadowMap (size_t n)
+{
+  csShadowMap *smap = first_smap;
+  while (smap && (n-- > 0))
+  {
+    smap = smap->next;
+  }
+
+  return smap;
+}
+
 void csLightMap::SetSize (int w, int h)
 {
   lwidth = csLightMap::CalcLightMapWidth (w);

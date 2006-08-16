@@ -22,6 +22,7 @@
 #include "imap/reader.h"
 #include "iutil/comp.h"
 #include "csutil/strhash.h"
+#include "csutil/scf_implementation.h"
 
 struct iObjectRegistry;
 struct iLoader;
@@ -35,11 +36,10 @@ namespace cspluginPagingFormerLoader
 template<typename Tgetter>
 class RawHeightmapReader;
 
-class csPagingFormerLoader : public iLoaderPlugin
+class csPagingFormerLoader :
+  public scfImplementation2<csPagingFormerLoader, iLoaderPlugin, iComponent>
 {
 public:
-  SCF_DECLARE_IBASE;
-
   csPagingFormerLoader (iBase*);
   virtual ~csPagingFormerLoader ();
 
@@ -47,14 +47,6 @@ public:
 
   virtual csPtr<iBase> Parse (iDocumentNode *node,
     iStreamSource*, iLoaderContext* ldr_context, iBase* context);
-
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csPagingFormerLoader);
-    virtual bool Initialize (iObjectRegistry* p)
-    { return scfParent->Initialize (p); }
-  } scfiComponent;
-  friend struct eiComponent;
 
   csRef<iSyntaxService> synldr;
   csRef<iDataBuffer> GetDataBuffer (iDocumentNode* child);

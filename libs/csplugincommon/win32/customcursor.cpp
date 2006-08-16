@@ -19,7 +19,7 @@
 
 #include "cssysdef.h"
 
-#include "csgfx/memimage.h"
+#include "csgfx/imagememory.h"
 #include "igraphic/image.h"
 
 #include "csplugincommon/win32/customcursor.h"

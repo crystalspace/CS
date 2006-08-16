@@ -29,26 +29,15 @@
 CS_LEAKGUARD_IMPLEMENT (csMaterial);
 CS_LEAKGUARD_IMPLEMENT (csMaterialWrapper);
 
-SCF_IMPLEMENT_IBASE(csMaterial)
-  SCF_IMPLEMENTS_INTERFACE(iMaterial)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iMaterialEngine)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csMaterial::MaterialEngine)
-  SCF_IMPLEMENTS_INTERFACE(iMaterialEngine)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 csStringID csMaterial::nameDiffuseParam;
 csStringID csMaterial::nameAmbientParam;
 csStringID csMaterial::nameReflectParam;
 csStringID csMaterial::nameFlatColorParam;
 csStringID csMaterial::nameDiffuseTexture;
 
-csMaterial::csMaterial (csEngine* engine)
+csMaterial::csMaterial (csEngine* engine) :
+  scfImplementationType(this)
 {
-  SCF_CONSTRUCT_IBASE (0);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMaterialEngine);
-
   csMaterial::engine = engine;
 
 
@@ -73,11 +62,9 @@ csMaterial::csMaterial (csEngine* engine)
 }
 
 csMaterial::csMaterial (csEngine* engine,
-			iTextureWrapper *w)
+			iTextureWrapper *w) :
+  scfImplementationType(this)
 {
-  SCF_CONSTRUCT_IBASE (0);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMaterialEngine);
-
   csMaterial::engine = engine;
 
   nameDiffuseParam = engine->globalStringSet->Request (
@@ -101,8 +88,6 @@ csMaterial::csMaterial (csEngine* engine,
 
 csMaterial::~csMaterial ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiMaterialEngine);
-  SCF_DESTRUCT_IBASE ();
 }
 
 csShaderVariable* csMaterial::GetVar (csStringID name, bool create)

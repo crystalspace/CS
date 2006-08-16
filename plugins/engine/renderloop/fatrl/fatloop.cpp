@@ -27,7 +27,7 @@
 #include "csgeom/poly3d.h"
 #include "csgeom/polyclip.h"
 #include "csgeom/sphere.h"
-#include "csgfx/memimage.h"
+#include "csgfx/imagememory.h"
 #include "csutil/bitarray.h"
 #include "csutil/cscolor.h"
 #include "csutil/flags.h"

@@ -22,7 +22,7 @@
 #include "csgfx/bakekeycolor.h"
 #include "csgfx/imagemanipulate.h"
 #include "csgfx/imagevolumemaker.h"
-#include "csgfx/memimage.h"
+#include "csgfx/imagememory.h"
 #include "csgfx/xorpat.h"
 
 CS_LEAKGUARD_IMPLEMENT (csImageVolumeMaker);

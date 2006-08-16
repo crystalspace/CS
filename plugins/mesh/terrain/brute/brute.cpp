@@ -27,7 +27,7 @@
 #include "csgeom/trimesh.h"
 #include "csgeom/trimeshlod.h"
 #include "csgeom/vector3.h"
-#include "csgfx/memimage.h"
+#include "csgfx/imagememory.h"
 #include "csgfx/renderbuffer.h"
 #include "csgfx/shadervarcontext.h"
 #include "csutil/csendian.h"

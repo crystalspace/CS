@@ -39,7 +39,7 @@
 #include "csutil/flags.h"
 #include "csutil/formatter.h"
 #include "csutil/parray.h"
-#include "csutil/scf.h"
+#include "csutil/scf_implementation.h"
 #include "csutil/scfstrset.h"
 #include "csutil/weakref.h"
 #include "csutil/weakrefarr.h"
@@ -144,7 +144,7 @@ public:
 #endif
 
 class csGLGraphics3D;
-class csOpenGLHalo : public iHalo
+class csOpenGLHalo : public scfImplementation1<csOpenGLHalo, iHalo>
 {
   /// The halo color
   float R, G, B;
@@ -160,8 +160,6 @@ class csOpenGLHalo : public iHalo
   csGLGraphics3D* G3D;
 
 public:
-  SCF_DECLARE_IBASE;
-
   csOpenGLHalo (float iR, float iG, float iB, unsigned char *iAlpha,
     int iWidth, int iHeight, csGLGraphics3D* iG3D);
 
@@ -193,7 +191,6 @@ private:
   friend class csGLRendererLightmap;
   friend class csGLTextureHandle;
   friend class csGLTextureManager;
-  friend class eiShaderRenderInterface;
 
   iObjectRegistry* object_reg;
   csRef<iGraphics2D> G2D;

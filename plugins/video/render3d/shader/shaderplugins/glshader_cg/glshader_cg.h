@@ -65,6 +65,10 @@ public:
   char* dumpDir;
   bool doVerbose;
 
+  bool enableVP, enableFP;
+  CGprofile maxProfileVertex;
+  CGprofile maxProfileFragment;
+
   csGLShader_CG (iBase *parent);
   virtual ~csGLShader_CG ();
 
@@ -87,6 +91,10 @@ public:
   void SplitArgsString (const char* str, ArgumentArray& args);
   void GetProfileCompilerArgs (const char* type, CGprofile profile, 
     ArgumentArray& args);
+  static bool ProfileNeedsRouting (CGprofile profile)
+  {
+    return (profile >= CG_PROFILE_PS_1_1) && (profile <= CG_PROFILE_PS_1_3);
+  }
 };
 
 }

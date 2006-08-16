@@ -201,6 +201,9 @@ public:
   int GetWidth () const { return lwidth; }
   ///
   int GetHeight () const { return lheight; }
+
+  /// Get n-th shadow map
+  csShadowMap* GetShadowMap (size_t n);
 };
 
 }

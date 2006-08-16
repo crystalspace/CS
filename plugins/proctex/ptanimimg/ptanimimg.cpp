@@ -32,31 +32,29 @@
 #include "ivaria/reporter.h"
 #include "itexture/itexloaderctx.h"
 #include "csutil/csstring.h"
+#include "csutil/scf.h"
 
 #include "ptanimimg.h"
 
 // Plugin stuff
 
-SCF_IMPLEMENT_IBASE(csAnimateProctexLoader);
-  SCF_IMPLEMENTS_INTERFACE(iLoaderPlugin);
-  SCF_IMPLEMENTS_INTERFACE(iComponent);
-SCF_IMPLEMENT_IBASE_END
-
 CS_IMPLEMENT_PLUGIN
+
+CS_PLUGIN_NAMESPACE_BEGIN(PTAnimImg)
+{
 
 SCF_IMPLEMENT_FACTORY(csAnimateProctexLoader)
 
 
 //----------------------------------------------------------------------------
 
-csAnimateProctexLoader::csAnimateProctexLoader (iBase *p)
+csAnimateProctexLoader::csAnimateProctexLoader (iBase *p) :
+  scfImplementationType(this, p)
 {
-  SCF_CONSTRUCT_IBASE (p);
 }
 
 csAnimateProctexLoader::~csAnimateProctexLoader ()
 {
-  SCF_DESTRUCT_IBASE();
 }
 
 bool csAnimateProctexLoader::Initialize(iObjectRegistry *object_reg)
@@ -126,8 +124,8 @@ csPtr<iBase> csAnimateProctexLoader::Parse (iDocumentNode* node,
     if (!G3D) return 0;
     csRef<iTextureManager> tm = G3D->GetTextureManager();
     if (!tm) return 0;
-    csRef<iTextureHandle> TexHandle (tm->RegisterTexture (ctx->GetImage(), 
-      ctx->HasFlags() ? ctx->GetFlags() : CS_TEXTURE_3D));
+    int texFlags = (ctx && ctx->HasFlags()) ? ctx->GetFlags() : CS_TEXTURE_3D;
+    csRef<iTextureHandle> TexHandle (tm->RegisterTexture (img, texFlags));
     if (!TexHandle) return 0;
 
     pt->GetTextureWrapper()->SetTextureHandle (TexHandle);
@@ -167,3 +165,6 @@ void csAnimateProctexLoader::Report (int severity, iDocumentNode* node,
   va_end (arg);
 }
 
+
+}
+CS_PLUGIN_NAMESPACE_END(PTAnimImg)

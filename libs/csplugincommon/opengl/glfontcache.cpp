@@ -28,7 +28,7 @@
 #endif
 
 #include "csutil/csuctransform.h"
-#include "csgfx/memimage.h"
+#include "csgfx/imagememory.h"
 #include "iutil/databuff.h"
 #include "ivideo/fontserv.h"
 

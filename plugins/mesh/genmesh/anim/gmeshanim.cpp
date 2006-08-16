@@ -19,6 +19,7 @@
 #include "cssysdef.h"
 #include "csgeom/math3d.h"
 #include "csutil/util.h"
+#include "csutil/event.h"
 #include "iutil/document.h"
 #include "iutil/eventq.h"
 #include "iutil/objreg.h"
@@ -931,11 +932,11 @@ csGenmeshAnimationControlType::csGenmeshAnimationControlType (
 
 csGenmeshAnimationControlType::~csGenmeshAnimationControlType ()
 {
-  if (object_reg)
+  if (weakEventHandler)
   {
     csRef<iEventQueue> q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
     if (q)
-      q->RemoveListener (this);
+      RemoveWeakListener (q, weakEventHandler);
   }
 }
 
@@ -948,7 +949,7 @@ bool csGenmeshAnimationControlType::Initialize (iObjectRegistry* object_reg)
   // \todo It looks like @csGenmeshAnimationControlType doesn't actually handle any events.  So why does it register an event listener?
   if (q != 0) {
     csEventID events[] = { Frame, PreProcess, CS_EVENTLIST_END };
-    q->RegisterListener (this, events);
+    RegisterWeakListener (q, this, events, weakEventHandler);
   }
   return true;
 }

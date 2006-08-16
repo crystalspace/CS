@@ -257,14 +257,9 @@ iTextureWrapper* csLoader::LoadTexture (const char *name,
 
 //----------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE(TextureLoaderContext);
-  SCF_IMPLEMENTS_INTERFACE(iTextureLoaderContext);
-SCF_IMPLEMENT_IBASE_END
-
-TextureLoaderContext::TextureLoaderContext (const char* texname)
+TextureLoaderContext::TextureLoaderContext (const char* texname) :
+  scfImplementationType(this)
 {
-  SCF_CONSTRUCT_IBASE (0);
-
   has_flags = false;
   flags = CS_TEXTURE_3D;
 
@@ -279,7 +274,6 @@ TextureLoaderContext::TextureLoaderContext (const char* texname)
 
 TextureLoaderContext::~TextureLoaderContext ()
 {
-  SCF_DESTRUCT_IBASE();
 }
 
 void TextureLoaderContext::SetFlags (int Flags)
@@ -347,19 +341,13 @@ const char* TextureLoaderContext::GetClass ()
 
 //----------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE(csBaseTextureLoader);
-  SCF_IMPLEMENTS_INTERFACE(iLoaderPlugin);
-  SCF_IMPLEMENTS_INTERFACE(iComponent);
-SCF_IMPLEMENT_IBASE_END
-
-csBaseTextureLoader::csBaseTextureLoader (iBase *p)
+csBaseTextureLoader::csBaseTextureLoader (iBase *p) :
+  scfImplementationType(this, p)
 {
-  SCF_CONSTRUCT_IBASE (p);
 }
 
 csBaseTextureLoader::~csBaseTextureLoader ()
 {
-  SCF_DESTRUCT_IBASE();
 }
 
 bool csBaseTextureLoader::Initialize(iObjectRegistry *object_reg)
@@ -373,7 +361,7 @@ bool csBaseTextureLoader::Initialize(iObjectRegistry *object_reg)
 SCF_IMPLEMENT_FACTORY(csImageTextureLoader)
 
 csImageTextureLoader::csImageTextureLoader (iBase *p) : 
-  csBaseTextureLoader(p)
+  scfImplementationType(this, p)
 {
 }
 
@@ -413,7 +401,7 @@ csPtr<iBase> csImageTextureLoader::Parse (iDocumentNode* /*node*/,
 SCF_IMPLEMENT_FACTORY(csCheckerTextureLoader)
 
 csCheckerTextureLoader::csCheckerTextureLoader (iBase *p) : 
-  csBaseTextureLoader(p)
+  scfImplementationType(this, p)
 {
 }
 
@@ -486,7 +474,7 @@ csPtr<iBase> csCheckerTextureLoader::Parse (iDocumentNode* node,
 SCF_IMPLEMENT_FACTORY(csCubemapTextureLoader)
 
 csCubemapTextureLoader::csCubemapTextureLoader (iBase *p) : 
-  csBaseTextureLoader(p)
+  scfImplementationType(this, p)
 {
   InitTokenTable (xmltokens);
 }
@@ -627,7 +615,8 @@ csPtr<iBase> csCubemapTextureLoader::Parse (iDocumentNode* node,
 
 SCF_IMPLEMENT_FACTORY(csTexture3DLoader)
 
-csTexture3DLoader::csTexture3DLoader (iBase *p) : csBaseTextureLoader(p)
+csTexture3DLoader::csTexture3DLoader (iBase *p) :
+  scfImplementationType(this, p)
 {
   InitTokenTable (xmltokens);
 }

@@ -3,6 +3,7 @@ SubDir TOP apps tools ;
 SubInclude TOP apps tools csfgen ;
 SubInclude TOP apps tools cslight ;
 SubInclude TOP apps tools docconv ;
+SubInclude TOP apps tools genmeshify ;
 SubInclude TOP apps tools heightmapgen ;
 SubInclude TOP apps tools levtool ;
 SubInclude TOP apps tools lighter2 ;

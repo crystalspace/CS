@@ -26,7 +26,7 @@
 #include "csgfx/bakekeycolor.h"
 #include "csgfx/imagecubemapmaker.h"
 #include "csgfx/imagemanipulate.h"
-#include "csgfx/memimage.h"
+#include "csgfx/imagememory.h"
 #include "csgfx/packrgb.h"
 #include "csgfx/xorpat.h"
 #include "cstool/debugimagewriter.h"
@@ -543,8 +543,7 @@ GLenum csGLTextureHandle::DetermineTargetFormat (GLenum defFormat,
 
   if (rawFormat)
   {
-    if ((G3D->ext->CS_GL_EXT_texture_compression_s3tc 
-      || txtmgr->forcePrecompressedDXTUpload)
+    if (G3D->ext->CS_GL_EXT_texture_compression_s3tc 
       && allowCompress)
     {
       if (strcmp (rawFormat, "dxt1") == 0)
@@ -1118,8 +1117,6 @@ void csGLTextureManager::read_config (iConfigFile *config)
     ("Video.OpenGL.DisableRECTTextureCompression", false);
   enableNonPowerOfTwo2DTextures = config->GetBool
     ("Video.OpenGL.EnableNonPowerOfTwo2DTextures", false);
-  forcePrecompressedDXTUpload = config->GetBool
-    ("Video.OpenGL.EnableNonPowerOfTwo2DTextures", false);
   
   const char* filterModeStr = config->GetStr (
     "Video.OpenGL.TextureFilter", "trilinear");
@@ -1376,22 +1373,6 @@ void csGLTextureManager::DumpSuperLightmaps (iVFS* VFS, iImageIO* iio,
   }
 }
   
-void csGLTextureManager::GetLightmapRendererCoords (int slmWidth, int slmHeight,
-						    int lm_x1, int lm_y1, 
-						    int lm_x2, int lm_y2,
-						    float& lm_u1, float& lm_v1, 
-						    float &lm_u2, float& lm_v2)
-{
-  float islmW = 1.0f / (float)slmWidth;
-  float islmH = 1.0f / (float)slmHeight;
-  // Those offsets seem to result in a look similar to the software
-  // renderer... but not perfect yet.
-  lm_u1 = ((float)lm_x1 + 0.5f) * islmW;
-  lm_v1 = ((float)lm_y1 + 0.5f) * islmH;
-  lm_u2 = ((float)lm_x2 - 1.0f) * islmW;
-  lm_v2 = ((float)lm_y2 - 1.0f) * islmH;
-}
-
 //---------------------------------------------------------------------------
 
 void csGLRendererLightmap::DecRef ()

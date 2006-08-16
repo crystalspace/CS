@@ -23,7 +23,7 @@
  * Custom mouse cursors interface
  */
 
-#include "csutil/scf.h"
+#include "csutil/scf_interface.h"
 
 #include "csgfx/rgbpixel.h"
 #include "csgeom/vector2.h"
@@ -38,8 +38,6 @@ struct iImage;
 /// The custom cursor name used when a mouse button is pressed
 #define CSCURSOR_MouseDown "MouseDown"
 
-SCF_VERSION (iCursor, 0, 1, 0);
-
 /**
  * This interface is used to access the custom cursor plugin, which
  * handles processing for displaying pixmaps as cursors. Any number
@@ -49,9 +47,10 @@ SCF_VERSION (iCursor, 0, 1, 0);
  * A default implementation of the iCursor interface is provided by
  * the 'crystalspace.graphic.cursor' plugin.
  */
-struct iCursor : public iBase
+struct iCursor : public virtual iBase
 {
-  
+  SCF_INTERFACE (iCursor, 2, 0, 0);
+
   /**
    * Must be called before custom cursors will be displayed.  If you want to
    * use software emulation mode on all platforms, set the ForceEmulation

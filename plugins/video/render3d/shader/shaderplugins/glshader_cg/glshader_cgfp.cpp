@@ -84,6 +84,8 @@ void csShaderGLCGFP::ResetState()
 
 bool csShaderGLCGFP::Compile ()
 {
+  if (!shaderPlug->enableFP) return false;
+
   csRef<iDataBuffer> programBuffer = GetProgramData();
   if (!programBuffer.IsValid())
     return false;
@@ -146,7 +148,8 @@ bool csShaderGLCGFP::Compile ()
   }
   else
   {
-    return DefaultLoadProgram (programStr, CG_GL_FRAGMENT);
+    return DefaultLoadProgram (programStr, CG_GL_FRAGMENT, 
+      shaderPlug->maxProfileFragment);
   }
 
   return true;

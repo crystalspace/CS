@@ -46,8 +46,8 @@ SCF_IMPLEMENT_FACTORY(csFullScreenQuadRSLoader)
 
 //---------------------------------------------------------------------------
 
-csFullScreenQuadRSType::csFullScreenQuadRSType (iBase* p)
-	: csBaseRenderStepType (p)
+csFullScreenQuadRSType::csFullScreenQuadRSType (iBase* p) :
+  scfImplementationType (this, p)
 {
 }
 
@@ -59,8 +59,8 @@ csPtr<iRenderStepFactory> csFullScreenQuadRSType::NewFactory()
 
 //---------------------------------------------------------------------------
 
-csFullScreenQuadRSLoader::csFullScreenQuadRSLoader (iBase* p)
-	: csBaseRenderStepLoader (p)
+csFullScreenQuadRSLoader::csFullScreenQuadRSLoader (iBase* p) :
+  scfImplementationType (this, p)
 {
   InitTokenTable (tokens);
 }
@@ -164,22 +164,21 @@ bool csFullScreenQuadRSLoader::ParseStep (iDocumentNode* node,
 	break;
       case XMLTOKEN_SHADERVAR:
 	{
-	  const char* varname = child->GetAttributeValue ("name");
-	  if (!varname)
-	  {
-	    synldr->Report ("crystalspace.renderloop.step.fullscreenquad",
-	      CS_REPORTER_SEVERITY_WARNING, child,
-	      "<shadervar> without name");
-	    return false;
-	  }
 	  if (!settings.svContext.IsValid())
 	    settings.svContext.AttachNew (new csShaderVariableContext ());
 
 	  csRef<csShaderVariable> var;
-	  var.AttachNew (new csShaderVariable (strings->Request (varname)));
+	  var.AttachNew (new csShaderVariable);
 
 	  if (!synldr->ParseShaderVar (child, *var))
 	  {
+	    return false;
+	  }
+	  if (var->GetName() == csInvalidStringID)
+	  {
+	    synldr->Report ("crystalspace.renderloop.step.fullscreenquad",
+	      CS_REPORTER_SEVERITY_WARNING, child,
+	      "<shadervar> without name");
 	    return false;
 	  }
 	  settings.svContext->AddVariable (var);
@@ -201,20 +200,15 @@ bool csFullScreenQuadRSLoader::ParseStep (iDocumentNode* node,
 
 //---------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE(csFullScreenQuadRenderStepFactory);
-  SCF_IMPLEMENTS_INTERFACE(iRenderStepFactory);
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 csFullScreenQuadRenderStepFactory::csFullScreenQuadRenderStepFactory (
-  iObjectRegistry* object_reg)
+  iObjectRegistry* object_reg) :
+  scfImplementationType (this)
 {
-  SCF_CONSTRUCT_IBASE(0);
   csFullScreenQuadRenderStepFactory::object_reg = object_reg;
 }
 
 csFullScreenQuadRenderStepFactory::~csFullScreenQuadRenderStepFactory ()
 {
-  SCF_DESTRUCT_IBASE();
 }
 
 csPtr<iRenderStep> csFullScreenQuadRenderStepFactory::Create ()
@@ -225,15 +219,10 @@ csPtr<iRenderStep> csFullScreenQuadRenderStepFactory::Create ()
 
 //---------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE(csFullScreenQuadRenderStep);
-  SCF_IMPLEMENTS_INTERFACE(iRenderStep);
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 csFullScreenQuadRenderStep::csFullScreenQuadRenderStep (
-  iObjectRegistry* object_reg)
+  iObjectRegistry* object_reg) :
+  scfImplementationType (this)
 {
-  SCF_CONSTRUCT_IBASE(0);
-
   csRef<iGraphics3D> g3d = 
     CS_QUERY_REGISTRY (object_reg, iGraphics3D);
   csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg, 
@@ -258,7 +247,6 @@ csFullScreenQuadRenderStep::csFullScreenQuadRenderStep (
 
 csFullScreenQuadRenderStep::~csFullScreenQuadRenderStep ()
 {
-  SCF_DESTRUCT_IBASE();
 }
 
 void csFullScreenQuadRenderStep::Perform (iRenderView* rview, iSector* /*sector*/,

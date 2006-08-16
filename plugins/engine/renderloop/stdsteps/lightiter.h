@@ -21,7 +21,7 @@
 #ifndef __CS_LIGHTITER_H__
 #define __CS_LIGHTITER_H__
 
-#include "csutil/scf.h"
+#include "csutil/scf_implementation.h"
 #include "csutil/csstring.h"
 #include "csutil/weakref.h"
 #include "csutil/leakguard.h"
@@ -34,7 +34,8 @@
 #include "csplugincommon/renderstep/basesteploader.h"
 #include "csplugincommon/renderstep/parserenderstep.h"
 
-class csLightIterRSType : public csBaseRenderStepType
+class csLightIterRSType :
+  public scfImplementationExt0<csLightIterRSType, csBaseRenderStepType>
 {
 public:
   CS_LEAKGUARD_DECLARE (csLightIterRSType);
@@ -44,7 +45,8 @@ public:
   virtual csPtr<iRenderStepFactory> NewFactory();
 };
 
-class csLightIterRSLoader : public csBaseRenderStepLoader
+class csLightIterRSLoader :
+  public scfImplementationExt0<csLightIterRSLoader, csBaseRenderStepLoader>
 {
 private:
   csRenderStepParser rsp;
@@ -65,7 +67,8 @@ public:
     iBase* context);
 };
 
-class csLightIterRenderStepFactory : public iRenderStepFactory
+class csLightIterRenderStepFactory :
+  public scfImplementation1<csLightIterRenderStepFactory, iRenderStepFactory>
 {
 private:
   iObjectRegistry* object_reg;
@@ -73,17 +76,15 @@ private:
 public:
   CS_LEAKGUARD_DECLARE (csLightIterRenderStepFactory);
 
-  SCF_DECLARE_IBASE;
-
   csLightIterRenderStepFactory (iObjectRegistry* object_reg);
   virtual ~csLightIterRenderStepFactory ();
 
   virtual csPtr<iRenderStep> Create ();
 };
 
-class csLightIterRenderStep : public iRenderStep, 
-			      public iLightIterRenderStep,
-			      public iRenderStepContainer
+class csLightIterRenderStep :
+  public scfImplementation3<csLightIterRenderStep,
+    iRenderStep, iLightIterRenderStep, iRenderStepContainer>
 {
 private:
   csRefArray<iLightRenderStep> steps;
@@ -106,8 +107,9 @@ private:
   csRef<iShaderManager> shadermgr;
   bool initialized;
 
-  class LightSVAccessor : public iLightCallback,
-			  public iShaderVariableAccessor
+  class LightSVAccessor :
+    public scfImplementation2<LightSVAccessor,
+      iLightCallback, iShaderVariableAccessor>
   {
   private:
     iLight* light;
@@ -117,9 +119,9 @@ private:
     int attnType;
 
     bool needUpdate;
+
   public:
     CS_LEAKGUARD_DECLARE (LightSVAccessor);
-    SCF_DECLARE_IBASE;
 
     LightSVAccessor (iLight* light, csLightIterRenderStep* parent);
     virtual ~LightSVAccessor ();
@@ -142,8 +144,6 @@ private:
 
 public:
   csWeakRef<iGraphics3D> g3d;
-
-  SCF_DECLARE_IBASE;
 
   csLightIterRenderStep (iObjectRegistry* object_reg);
   virtual ~csLightIterRenderStep ();

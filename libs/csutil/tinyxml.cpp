@@ -27,6 +27,9 @@ distribution.
 #include "tinyxml.h"
 #include "csutil/scfstr.h"
 
+namespace CS
+{
+
 const char* const TiXmlBase::errorString[ TIXML_ERROR_STRING_COUNT ] =
 {
   "No error",
@@ -811,3 +814,4 @@ size_t TiDocumentAttributeSet::FindExact (const char * reg_name) const
   return (size_t)-1;
 }
 
+} // namespace CS
