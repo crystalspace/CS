@@ -68,8 +68,8 @@
   <meshfact name="TerrainFact">
     <plugin>terrainFact</plugin>
     <params>
-      <renderer>crystalspace.mesh.object.terrainimproved.simplerenderer</renderer>
-      <collider>crystalspace.mesh.object.terrainimproved.simplecollider</collider>
+      <renderer>crystalspace.mesh.object.terrainimproved.bruteblockrenderer</renderer>
+      <collider>crystalspace.mesh.object.terrainimproved.collider</collider>
 
       <cells>
 <!--        <cell name="main">
