@@ -1,4 +1,0 @@
-cbuffer on
-coordload
-perftest 1000
-quit
