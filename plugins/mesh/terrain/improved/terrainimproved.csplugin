@@ -4,6 +4,11 @@
   <scf>
     <classes>
       <class>
+        <name>crystalspace.mesh.object.terrainimproved.bruteblockrenderer</name>
+        <implementation>csTerrainBruteBlockRenderer</implementation>
+        <description>Bruteblock terrain renderer</description>
+      </class>
+      <class>
         <name>crystalspace.mesh.object.terrainimproved.simplerenderer</name>
         <implementation>csTerrainSimpleRenderer</implementation>
         <description>Simple terrain renderer</description>

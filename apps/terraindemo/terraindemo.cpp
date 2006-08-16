@@ -349,11 +349,11 @@ bool TerrainDemo::LoadMap ()
 
   csRef<iTerrainRenderer> t_renderer = csLoadPlugin<iTerrainRenderer>(
       GetObjectRegistry(),
-      "crystalspace.mesh.object.terrainimproved.simplerenderer");
+      "crystalspace.mesh.object.terrainimproved.bruteblockrenderer");
 
   csRef<iTerrainCollider> t_collider = csLoadPlugin<iTerrainCollider>(
       GetObjectRegistry(),
-      "crystalspace.mesh.object.terrainimproved.simplecollider");
+      "crystalspace.mesh.object.terrainimproved.collider");
 
   csRef<iMeshObjectType> t_mesh_type = csLoadPlugin<iMeshObjectType>(
       GetObjectRegistry(),

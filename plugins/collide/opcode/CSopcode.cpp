@@ -200,7 +200,8 @@ bool csOPCODECollideSystem::Collide (
   
   if (terrain->CollideTriangles ((const csVector3*)verts, tri_count,
     tris, collider1->radius, trans1, false, c_pairs))
-  //if (terrain->Collide (collider1, collider1->radius, trans1, false,
+// Change to use OPCODE-powered collision
+//  if (terrain->Collide (collider1, collider1->radius, trans1, false,
 //    c_pairs))
   {
     for (size_t i = 0; i < c_pairs.GetSize (); ++i)
