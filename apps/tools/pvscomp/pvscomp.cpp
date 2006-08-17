@@ -16,14 +16,44 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#include "cssysdef.h"
 #include "csplugincommon/pvsdata/pvsdata.h"
 #include "cstool/initapp.h"
 #include "csgeom/statickdtree.h"
 #include "iengine/mesh.h"
 #include "iutil/object.h"
+#include "iengine/mesh.h"
+#include "csutil/array.h"
+#include "csutil/csstring.h"
+#include "csgeom/box.h"
 #include "pvscomp.h"
 
 CS_IMPLEMENT_APPLICATION
+
+
+// Prints csPVSNodeData of node.
+static void PrintNodeData (csStaticKDTree* node);
+// Prints tree in its csPVSNodeData form.
+static void PrintTree(csStaticKDTree* node);
+// Makes a debug PVS tree.
+static csStaticKDTree* MakeTestPVSTree ();
+// Creates csPVSNodeData with no PVS information.
+static void CreateDummyNodeData (csStaticKDTree *node);
+// Makes a KD object from an iMeshWrapper
+static csStaticKDTreeObject* MakeKDObject (iMeshWrapper* obj);
+// Given a node gets the PVSArray.
+static PVSArray& GetPVS (csStaticKDTree* node);
+
+static void PrintNodeData (csStaticKDTree* node)
+{
+  csPVSNodeData* data = (csPVSNodeData*) node->GetNodeData ();
+  printf("Num total:  %d  Num registered:  %d\n", 
+      data->numTotal, data->numRegistered);
+  for (int i = 0; i < data->numTotal; i++)
+  {
+    printf("String: %s\n", (const char*) data->pvsnames[i]);
+  }
+}
 
 static void PrintTree(csStaticKDTree* node)
 {
@@ -32,6 +62,7 @@ static void PrintTree(csStaticKDTree* node)
     csArray<csStaticKDTreeObject*>& objects = node->GetObjects();
     int num = node->GetObjectCount();
     printf("LEAF NODE\n");
+    PrintNodeData (node);
     for (int i = 0; i < num; i++) {
 //      csPVSVisObjectWrapper *obj = (csPVSVisObjectWrapper*) 
 //        objects[i]->GetObject ();
@@ -48,6 +79,7 @@ static void PrintTree(csStaticKDTree* node)
     printf("INTERIOR NODE:  axis %d, split location %f\n",
         node->GetAxis(), node->GetSplitLocation());
     const csBox3& box = node->GetNodeBBox();
+    PrintNodeData (node);
     printf("  Bounding box: (%f,%f,%f)-(%f,%f,%f)\n",
         box.MinX(), box.MinY(), box.MinZ(), 
         box.MaxX(), box.MaxY(), box.MaxZ());
@@ -108,13 +140,11 @@ static void CreateDummyNodeData (csStaticKDTree *node)
 
 static csStaticKDTreeObject* MakeKDObject (iMeshWrapper* obj)
 {
-  return new csStaticKDTreeObject (obj->GetWorldBoundingBox (), NULL);
+  return new csStaticKDTreeObject (obj->GetWorldBoundingBox (), obj);
 }
 
 void Compiler::MakeTree ()
 {
-  delete pvstree;
-
   csArray<csStaticKDTreeObject*> toinsert;
   CS_ASSERT(meshlist);
   int count = meshlist->GetCount ();
@@ -130,12 +160,158 @@ void Compiler::MakeTree ()
   printf("OK.\n");
 }
 
+static PVSArray& GetPVS (csStaticKDTree* node)
+{
+  return *((PVSArray*) node->GetNodeData ());
+}
+
+
+void Compiler::InitializePVSArrays (csStaticKDTree* node)
+{
+  if (node->IsLeafNode ())
+  {
+    PVSArray* array = new PVSArray ();
+    node->SetNodeData (array);
+  }
+  else
+  {
+    InitializePVSArrays (node->GetChild1 ());
+    InitializePVSArrays (node->GetChild2 ());
+  }
+}
+
+void Compiler::ConvertTree (csStaticKDTree* node)
+{
+  PVSArray* array = (PVSArray*) node->GetNodeData ();
+  csString* strings = new csString[array->Length ()];
+  for (unsigned int i = 0; i < array->Length (); i++)
+    strings[i] = (*array)[i];
+  node->SetNodeData (new csPVSNodeData (strings, array->Length ()));
+  delete array;
+
+  if (!node->IsLeafNode ())
+  {
+    ConvertTree (node->GetChild1 ());
+    ConvertTree (node->GetChild2 ());
+  }
+}
+
+void Compiler::FreeTreeData (csStaticKDTree* node)
+{
+  csPVSNodeData* nodedata = (csPVSNodeData*) node->GetNodeData ();
+  delete nodedata;
+  if (!node->IsLeafNode ())
+  {
+    FreeTreeData (node->GetChild1 ());
+    FreeTreeData (node->GetChild2 ());
+  }
+}
+
+
+void Compiler::ConstructPVS(csStaticKDTree* node)
+{
+  if (node->IsLeafNode ())
+  {
+    // Just add willy-nilly to the list (TODO:  remove)
+    csArray<csStaticKDTreeObject*>& objects = node->GetObjects ();
+    int length = objects.Length ();
+    for (int i = 0; i < length; i++)
+    {
+      iMeshWrapper* wrapper = (iMeshWrapper*) (objects[i]->GetObject ());
+      const char* name = wrapper->QueryObject ()->GetName ();
+      csString csname = name;
+      GetPVS (node).Push (csname);
+    }
+
+    ConstructPVSForRegion (node->GetNodeBBox (), GetPVS (node));
+  }
+  else
+  {
+    ConstructPVS (node->GetChild1 ());
+    ConstructPVS (node->GetChild2 ());
+  }
+}
+
+void Compiler::ConstructPVSForRegion(const csBox3& region, 
+    PVSArray& pvs)
+{
+  csArray<Polygon*> regionFaces;
+  Polygon::Fill (region, regionFaces);
+
+  // for every face of the region
+  for (int i = 0; i < 6; i++)
+  {
+    ConstructPVSForFace(regionFaces[i], pvs);
+    delete regionFaces[i];
+  }
+}
+
+void Compiler::ConstructPVSForFace(const Polygon* p, PVSArray& pvs)
+{
+  OcclusionTree* poly = ConstructOT (p, pvstree, new OcclusionTree ());
+
+  poly->MakeSizeSet ();
+  poly->CollectPVS (pvs);
+  delete poly;
+}
+
+OcclusionTree* Compiler::ConstructOT(const Polygon* p,
+    csStaticKDTree* node, OcclusionTree* polyhedron)
+{
+  if (node->IsLeafNode ())
+  {
+    // Find all polygons in this leaf.
+    csArray<csStaticKDTreeObject*>& objects = node->GetObjects ();
+    csArray<Polygon*> polygons;
+    int length = objects.Length ();
+    for (int i = 0; i < length; i++)  // For every object in the node
+    {
+      iMeshWrapper* wrapper = (iMeshWrapper*) (objects[i]->GetObject ());
+      Polygon::Fill (wrapper, polygons);
+      int jmax = polygons.Length ();
+      // Add polyhedrons to the occlusion tree
+      for (int j = 0; j < jmax; j++)
+      {
+//        if (polyhedron)
+        polyhedron->Union (p, polygons[j], 
+            wrapper->QueryObject ()->GetName ());
+//        else
+//          polyhedron = OcclusionTree::Construct (p, polygons[j],
+//              wrapper->QueryObject ()->GetName ());
+
+        delete polygons[j];
+      }
+      polygons.Empty ();
+    }
+
+    return polyhedron;
+  }
+  else  // Interior node.
+  {
+    csVector3& point = p->vertices[p->index[0]];
+    if (point[node->GetAxis ()] <= node->GetSplitLocation ())
+    {
+      return ConstructOT (p, node->GetChild2 (), polyhedron);
+    }
+    else
+    {
+      return ConstructOT (p, node->GetChild1 (), polyhedron);
+    }
+  }
+}
+
+void Compiler::PropogatePVS(csStaticKDTree* node)
+{
+}
+
+
 Compiler::Compiler () : engine(NULL), reg(NULL), meshlist(NULL), pvstree(NULL)
 {
 }
 
 Compiler::~Compiler ()
 {
+  FreeTreeData (pvstree);
   delete pvstree;
 }
 
@@ -153,8 +329,6 @@ bool Compiler::Initialize (int argc, char** argv)
       CS_REQUEST_REPORTERLISTENER,
       CS_REQUEST_END))
     return false;
-
-//  csBaseEventHandler::Initialize (reg);
 
   engine = csQueryRegistry<iEngine> (reg);
   if (!engine.IsValid())
@@ -190,8 +364,10 @@ bool Compiler::LoadWorld (const char* path, const char* c)
 void Compiler::DoWork ()
 {
   MakeTree ();
+  InitializePVSArrays (pvstree);
   ConstructPVS (pvstree);
   PropogatePVS (pvstree);
+  ConvertTree (pvstree);
   PrintTree (pvstree);
 }
 

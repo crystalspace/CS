@@ -17,10 +17,15 @@
 */
 
 #include "cssysdef.h"
+/*#include "iutil/object.h"
+#include "igeom/polymesh.h"
+#include "iengine/mesh.h"
+#include "imesh/object.h"
+#include "imesh/objmodel.h"
 #include "csutil/array.h"
 #include "csutil/csstring.h"
 #include "csgeom/vector3.h"
-#include "csgeom/box.h"
+#include "csgeom/box.h" */
 #include "pvscomp.h"
 
 extern "C"
@@ -31,102 +36,9 @@ extern "C"
 #include "csplugincommon/cdd/cdd.h"
 };
 
-static Polygon* CreateFace (const csVector3& a, const csVector3& b, 
-    const csVector3& c, const csVector3& d)
-{
-  Polygon* p = new Polygon ();
-  p->numVertices = 4;
+static dd_PolyhedraPtr MakeDDPoly(const csArray<Plucker>& planes);
 
-  p->vertices = new csVector3[4];
-  p->vertices[0] = a;
-  p->vertices[1] = b;
-  p->vertices[2] = c;
-  p->vertices[3] = d;
-
-  p->index = new int[4];
-  p->index[0] = 0;
-  p->index[1] = 1;
-  p->index[2] = 2;
-  p->index[3] = 3;
-
-  return p;
-}
-
-static void FreeFace (Polygon* p)
-{
-  if (p->freeData)
-  {
-    delete[] p->vertices;
-    delete[] p->index;
-  }
-  delete p;
-}
-
-static void FillWithFaces (const csBox3& region, csArray<Polygon*> tofill)
-{
-  // TODO:  debug!!
-  tofill.Push (CreateFace (region.GetCorner (0), region.GetCorner (4),
-                           region.GetCorner (5), region.GetCorner (1)));
-  tofill.Push (CreateFace (region.GetCorner (2), region.GetCorner (6),
-                           region.GetCorner (7), region.GetCorner (3)));
-  tofill.Push (CreateFace (region.GetCorner (0), region.GetCorner (1),
-                           region.GetCorner (3), region.GetCorner (2)));
-  tofill.Push (CreateFace (region.GetCorner (4), region.GetCorner (6),
-                           region.GetCorner (7), region.GetCorner (5)));
-  tofill.Push (CreateFace (region.GetCorner (1), region.GetCorner (5),
-                           region.GetCorner (7), region.GetCorner (3)));
-  tofill.Push (CreateFace (region.GetCorner (0), region.GetCorner (2),
-                           region.GetCorner (6), region.GetCorner (4)));
-}
-
-static PVSArray& GetPVS (csStaticKDTree* node)
-{
-  return *((PVSArray*) node->GetNodeData ());
-}
-
-void Compiler::ConstructPVS(csStaticKDTree* node)
-{
-  if (node->IsLeafNode ())
-  {
-    ConstructPVSForRegion (node->GetNodeBBox (), GetPVS (node));
-  }
-  else
-  {
-    ConstructPVS (node->GetChild1 ());
-    ConstructPVS (node->GetChild2 ());
-  }
-}
-
-void Compiler::ConstructPVSForRegion(const csBox3& region, 
-    PVSArray& pvs)
-{
-  csArray<Polygon*> regionFaces;
-  FillWithFaces (region, regionFaces);
-
-  // for every face of the region
-  for (int i = 0; i < 6; i++)
-    ConstructPVSForFace(regionFaces[i], pvs);
-}
-
-void Compiler::ConstructPVSForFace(const Polygon* p, PVSArray& pvs)
-{
-/*  PolyhedronTree* tree;
-    // for every polygon, front-to-back
-    Polygon* target;
-    const char* targetName;
-    PolyhedronTree* addtree = PolyhedronTree::Construct (sourceFace, target,
-        targetName);
-    tree->Union (addtree);
-  tree->MakeSizeSet ();
-  tree->CollectPVS (pvsoftree); */
-}
-
-void Compiler::PropogatePVS(csStaticKDTree* node)
-{
-}
-
-
-dd_PolyhedraPtr MakeDDPoly(const csArray<PluckerPlane>& planes)
+static dd_PolyhedraPtr MakeDDPoly(const csArray<Plucker>& planes)
 {
   // A row of the matrix will look like 0 H1 H2 H3 H4 H5 H6.
   // cdd needs matrix to look like b | -A where Ax >= b, but our hyperplanes
@@ -137,7 +49,7 @@ dd_PolyhedraPtr MakeDDPoly(const csArray<PluckerPlane>& planes)
 
   for (int i = 0; i < matrix->rowsize; i++)
   {
-    const PluckerPlane& plane = planes.Get (i);
+    const Plucker& plane = planes.Get (i);
     matrix->matrix[i][0][0] = 0;
     matrix->matrix[i][1][0] = plane[0];
     matrix->matrix[i][2][0] = plane[1];
@@ -154,46 +66,51 @@ dd_PolyhedraPtr MakeDDPoly(const csArray<PluckerPlane>& planes)
   return poly;
 }
 
-/*class Hyperplane 
+void ExtremalPluckerPoints (const Polygon* source, const Polygon* occluder,
+    csArray<Plucker>& fill)
 {
-private:
-  float coeff[6];
-
-public:
-  float operator[] (int index) const
+  for (int i = 0; i < source->numVertices; i++)
   {
-    return coeff[index];
+    for (int j = 0; j < occluder->numVertices; j++)
+    {
+      const csVector3& vertex1 = source->vertices[source->index[i]];
+      const csVector3& vertex2 = occluder->vertices[occluder->index[j]];
+      fill.Push (Plucker (vertex1, vertex2));
+    }
   }
-  float& operator[] (int index) 
+}
+
+void PluckerPlanes (const Polygon* source, const Polygon* occluder,
+    csArray<Plucker>& fill)
+{
+  for (int i = 0; i < source->numVertices; i++)
   {
-    return coeff[index];
+    const csVector3& vertex1 = source->vertices[source->index[i]];
+    const csVector3& vertex2 = 
+      source->vertices[source->index[(i + 1) % source->numVertices]];
+    fill.Push (Plucker (vertex1, vertex2).Dual ());
   }
-}; */
+}
 
-
-/*  dd_MatrixType* matrix = new dd_MatrixType ();
-  matrix->rowsize = planes.Length ();
-  matrix->colsize = 7;
-
-  matrix->matrix = new mytype*[matrix->rowsize];
+void VertexRepresentation (const csArray<Plucker>& planes,
+    csArray<Plucker>& fill)
+{
+  dd_PolyhedraPtr cddrep = MakeDDPoly (planes);
+  dd_MatrixPtr matrix = dd_CopyGenerators (cddrep);
+  dd_FreePolyhedra (cddrep);
   for (int i = 0; i < matrix->rowsize; i++)
   {
-    const Hyperplane& plane = planes.Get (i);
-    matrix->matrix[i] = new mytype[7];
-    matrix->matrix[i][0][0] = 0;
-    matrix->matrix[i][1][0] = plane[0];
-    matrix->matrix[i][2][0] = plane[1];
-    matrix->matrix[i][3][0] = plane[2];
-    matrix->matrix[i][4][0] = plane[3];
-    matrix->matrix[i][5][0] = plane[4];
-    matrix->matrix[i][6][0] = plane[5];
+    if (matrix->matrix[i][0][0] == 1)
+    {
+      // This is a vertex
+      fill.Push (Plucker(matrix->matrix[i][1][0], matrix->matrix[i][2][0], 
+            matrix->matrix[i][3][0], matrix->matrix[i][4][0], 
+            matrix->matrix[i][5][0], matrix->matrix[i][6][0]));
+    }
   }
+  dd_FreeMatrix (matrix);
+}
 
-  // Set the rest of the data
-  set_initialize (& (matrix->linset), planes.Length ());
-  matrix->representation = dd_Inequality;
-  matrix->objective = dd_LPnone;
-  matrix->numbtype = dd_Real;
-  dd_InitializeArow (7, & (matrix->rowvec)); */
-
-
+void CapPlanes (const csArray<Plucker>& vertices, csArray<Plucker>& fill)
+{
+}
