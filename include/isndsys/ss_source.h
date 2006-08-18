@@ -41,7 +41,9 @@ struct iSndSysStream;
 #endif
 
 /**
- * \todo Document me!
+ * A sound source is the origin of a sound in Crystal Space. It is the object
+ * through which a sound is played. Just like a speaker, only it isn't in
+ * space.
  */
 struct iSndSysSource : public virtual iBase
 {
@@ -60,8 +62,8 @@ struct iSndSysSource : public virtual iBase
   virtual iSndSysSource *GetPtr() = 0;
 };
 
-/** 
- * \todo Document me!
+/**
+ * Sound source extensions for the software renderer.
  */
 struct iSndSysSourceSoftware : public virtual iBase
 {
@@ -104,7 +106,7 @@ struct iSndSysSourceSoftware : public virtual iBase
 /**
  * Interface for OpenAL sound sources
  *
- * @note Should only be used internally by the OpenAL renderer.
+ * @note May be extended later.
  */
 struct iSndSysSourceOpenAL : public virtual iBase
 {
@@ -113,7 +115,9 @@ struct iSndSysSourceOpenAL : public virtual iBase
 };
 
 /**
- * \todo Document me!
+ * Extension to the iSndSysSource interface, allowing sources to be positioned
+ * in space. 3D sound sources are attunated according to the formula:
+ * V = (volume / ((distance/minimum_distance) ^ rolloff_factor))
  */
 struct iSndSysSource3D : public virtual iBase
 {
@@ -162,7 +166,13 @@ struct iSndSysSource3D : public virtual iBase
 };
 
 /**
- * \todo Document me!
+ * Extension to the iSndSysSource3D interface, allowing simple directional
+ * orientation of sound sources. The concept is a cone with it's apex at the
+ * source and extendning in a given direction, with a given half-angle. Within
+ * this cone the source is audible. Outside the cone, it is not.
+ *
+ * @todo The interface should probably be phased out and the software renderer
+ *       updated to use iSndSysSource3DDirectional.
  */
 struct iSndSysSource3DDirectionalSimple : public virtual iBase
 {
@@ -190,7 +200,13 @@ struct iSndSysSource3DDirectionalSimple : public virtual iBase
 };
 
 /**
- * \todo Document me!
+ * Extension to the iSndSysSource3D interface, allowing directional orientation
+ * of sound sources. The concept is a set of two cones with apices at the
+ * source, called the inner and outer cones. The inner cone should be contained
+ * completely within the outer cone. Within the inner cone the source will be
+ * at full volume (attunated according to distance). Outside the outer cone the
+ * source's volume will be multiplied by the outer gain. Between the two cones
+ * the volume will be interpolated between the two extremes.
  */
 struct iSndSysSource3DDirectional : public virtual iBase
 {
@@ -206,18 +222,10 @@ struct iSndSysSource3DDirectional : public virtual iBase
   virtual csVector3 GetDirection() = 0;
 
   /**
-   * The directional radiation applies to sound that are oriented in a
-   * particular direction.
-   *
-   * Directional sounds have two cones, with the apexs at the sound source,
-   * termed the inner cone and the outer cone. When the listener is with the
-   * inner cone, the sound is played at a normal volume. Outside the outer cone
-   * the sound is played at the outer gaim times normal volume. Between the
-   * inner and outer cones, the volume is interpolated.
-   *
    * This value is expressed in radians and describes the half-angle of the
    * inner cone.
    *
+   * @see iSndSysSource3DDirectional
    * @note Unlike iSndSysSource3DDirectionalSimple setting the to 0.0f will not
    *       make an omni directional source
    */
@@ -227,14 +235,16 @@ struct iSndSysSource3DDirectional : public virtual iBase
    * This value is expressed in radians and describes the half-angle of the
    * outer cone.
    *
-   * @see SetDirectionalRadiationInnerCone(float rad)
+   * @see iSndSysSource3DDirectional
+   * @note Unlike iSndSysSource3DDirectionalSimple setting the to 0.0f will not
+   *       make an omni directional source
    */
   virtual void SetDirectionalRadiationOuterCone(float rad) = 0;
 
   /**
    * This value describes the gain outside of the outer cone.
    *
-   * @see SetDirectionalRadiationInnerCone(float rad)
+   * @see iSndSysSource3DDirectional
    */
   virtual void SetDirectionalRadiationOuterGain(float gain) = 0;
 

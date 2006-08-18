@@ -157,7 +157,8 @@ void SndSysSourceOpenAL2D::PerformUpdate ( bool ExternalUpdates )
   }
 
   // Match the playing state of the stream
-  // TODO: Optimise by registering for callbacks.
+  // We check this every time, as the openal source may have gone through all
+  // the attached buffers and set paused, while we still want it to play. 
   int currentState;
   alGetSourcei (m_Source, AL_SOURCE_STATE, &currentState);
   if (m_Stream->GetPauseState() == CS_SNDSYS_STREAM_PAUSED)

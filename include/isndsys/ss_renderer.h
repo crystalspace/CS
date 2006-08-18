@@ -46,7 +46,11 @@ struct iSndSysRendererCallback;
 
 
 /**
- * \todo Document me!
+ * The sound renderer is the core interface for the sound system. It maintains
+ * any global state associated with the sound system. It is also the interface
+ * through which instances of sound steams, sources and the listener can be
+ * retrieved or created.
+ *
  * \todo
  *   Should Sound Streams get processing time even if no Sound Sources are 
  *   attached?
@@ -88,12 +92,13 @@ struct iSndSysRenderer : public virtual iBase
   virtual bool UnregisterCallback(iSndSysRendererCallback *pCallback) = 0;
 };
 
-/// Sound System renderer interface for callback notification
-//
-//  A component wishing to receive notification of Sound Renderer events
-//  should implement this interface, and call iSndSysRenderer::RegisterCallback()
-//  to register with the renderer.
-//
+
+/** Sound System renderer interface for callback notification
+ *
+ * A component wishing to receive notification of Sound Renderer events
+ * should implement this interface, and call iSndSysRenderer::RegisterCallback()
+ * to register with the renderer.
+ */
 struct iSndSysRendererCallback : public virtual iBase
 {
   /// SCF2006 - See http://www.crystalspace3d.org/cseps/csep-0010.html
@@ -111,7 +116,6 @@ struct iSndSysRendererCallback : public virtual iBase
   /// Called whenever a source is removed to the system
   virtual void SourceRemoveNotification(iSndSysSource *pSource) = 0;
 };
-
 
 
 /// Software renderer specific interface extensions
@@ -138,6 +142,7 @@ struct iSndSysRendererSoftware : public virtual iBase
 };
 
 
+/// OpenAL renderer specific interface extensions
 struct iSndSysRendererOpenAL : public virtual iBase
 {
   /// SCF2006 - See http://www.crystalspace3d.org/cseps/csep-0010.html

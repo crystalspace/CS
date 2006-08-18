@@ -226,7 +226,7 @@ csPtr<iSndSysSource> csSndSysRendererOpenAL::CreateSource(iSndSysStream* stream)
 bool csSndSysRendererOpenAL::RemoveStream(iSndSysStream* stream)
 {
   // I have got to be overlooking something here.
-   m_Streams.Delete (stream);
+  m_Streams.Delete (stream);
 
   // Notify any callbacks
   size_t iMax = m_Callback.GetSize();
@@ -394,10 +394,27 @@ void csSndSysRendererOpenAL::Close()
 
   Report (CS_REPORTER_SEVERITY_DEBUG, "Closing OpenAL sound system");
 
+  // Remove sources and streams
+  while (m_Sources.GetSize()) {
+    csRef<SndSysSourceOpenAL2D> source;
+    source = m_Sources.Pop();
+
+    size_t iMax = m_Callback.GetSize();
+    for (size_t i=0;i<iMax;i++)
+      m_Callback[i]->SourceRemoveNotification (source);
+  }
+
+  while (m_Streams.GetSize()) {
+    csRef<iSndSysStream> stream;
+    stream = m_Streams.Pop();
+
+    size_t iMax = m_Callback.GetSize();
+    for (size_t i=0;i<iMax;i++)
+      m_Callback[i]->StreamRemoveNotification (stream);
+  }
+
   // Do we have a context?
   if (m_Context != 0) {
-    // TODO: Remove sources and streams
-
     // Finally, destroy the context.
     Report (CS_REPORTER_SEVERITY_DEBUG, "Destroying context");
     alcDestroyContext (m_Context);
