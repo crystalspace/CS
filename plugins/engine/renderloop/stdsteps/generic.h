@@ -84,6 +84,8 @@ struct meshInfo
   float radius;		// Radius of the bounding sphere of this object.
 };
 
+struct ShaderVarPusher;
+
 class csGenericRenderStep :
   public scfImplementation3<csGenericRenderStep,
     iRenderStep, iGenericRenderStep, iLightRenderStep>
@@ -114,11 +116,6 @@ private:
   csArray<csStringID> disableDefaultTypes;
 
   static csStringID fogplane_name;
-  static csStringID fogdensity_name;
-  static csStringID fogcolor_name;
-  static csStringID fogstart_name;
-  static csStringID fogend_name;
-  static csStringID fogmode_name;
   static csStringID string_object2world;
   static csStringID light_0_type;
   static csStringID light_ambient;
@@ -152,7 +149,7 @@ public:
   virtual void RemoveDisableDefaultTriggerType (const char* type);
 
   inline void RenderMeshes (iRenderView* rview,
-  	iGraphics3D* g3d, iShader* shader, iLight *light, 
+  	iGraphics3D* g3d, const ShaderVarPusher& Pusher,
 	size_t ticket, meshInfo* meshContext,
 	csRenderMesh** meshes, size_t num, iShaderVarStack* stacks);
 

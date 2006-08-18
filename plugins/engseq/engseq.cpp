@@ -175,14 +175,12 @@ public:
   {
     if (sectorpar)
       sector = SCF_QUERY_INTERFACE (sectorpar->GetValue (params), iSector);
-    csFog* fog = sector->GetFog ();
+    const csFog& fog = sector->GetFog ();
 
     FadeFogInfo* fi = new FadeFogInfo ();
-    fi->start_col.red = fog->red;
-    fi->start_col.green = fog->green;
-    fi->start_col.blue = fog->blue;
-    fi->start_density = fog->density;
+    fi->start_col = fog.color;
     fi->end_col = end_col;
+    fi->start_density = fog.density;
     fi->end_density = end_density;
     fi->sector = sector;
     eseqmgr->FireTimedOperation (dt, duration, fi, 0, sequence_id);

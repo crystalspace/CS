@@ -104,10 +104,12 @@ private:
  * A sector is a container for objects. It is one of
  * the base classes for the portal engine.
  */
-class csSector : public scfImplementationExt2<csSector, 
+class csSector : public scfImplementationExt3<csSector, 
                                               csObject,
                                               iSector,
-					      iSelfDestruct>
+					      iSelfDestruct,
+                                              scfFakeInterface<iShaderVariableContext> >,
+                 public CS::ShaderVariableContextImpl
 {
   // Friends
   friend class csEngine;
@@ -128,13 +130,14 @@ public:
    */
   void SetSingleMesh (iMeshWrapper* mesh) { single_mesh = mesh; }
 
-  //-- iSector 
-  
+  /**\name iSector 
+   * @{ */
   virtual iObject *QueryObject ()
   { return this; }
+  /** @} */
 
-  // -- Mesh handling
-
+  /**\name Mesh handling
+   * @{ */
   virtual iMeshList* GetMeshes ()
   { return &meshes; }
 
@@ -150,9 +153,10 @@ public:
 
   virtual void AddSectorMeshCallback (iSectorMeshCallback* cb);
   virtual void RemoveSectorMeshCallback (iSectorMeshCallback* cb);
+  /** @} */
 
-  // -- Drawing related
-  
+  /**\name Drawing related
+   * @{ */
   virtual void Draw (iRenderView* rview);
 
   virtual void PrepareDraw (iRenderView* rview);
@@ -168,29 +172,38 @@ public:
   { renderloop = rl; }
   virtual iRenderLoop* GetRenderLoop ()
   { return renderloop; }
+  /** @} */
 
-  // -- Fog handling
-
+  /**\name Fog handling
+   * @{ */
   virtual bool HasFog () const
-  { return fog.enabled; }
+  { return fog.mode != CS_FOG_MODE_NONE; }
   
-  virtual csFog *GetFog () const
-  { return &fog; }
+  virtual const csFog& GetFog () const
+  { return fog; }
   
   virtual void SetFog (float density, const csColor& color)
   {
-    fog.enabled = true;
+    fog.mode = CS_FOG_MODE_CRYSTALSPACE;
     fog.density = density;
-    fog.red = color.red;
-    fog.green = color.green;
-    fog.blue = color.blue;
+    fog.color = color;
+    UpdateFogSVs ();
   }
- 
+  virtual void SetFog (const csFog& fog)
+  { 
+    this->fog = fog; 
+    UpdateFogSVs ();
+  }
+
   virtual void DisableFog ()
-  { fog.enabled = false; }
+  { 
+    fog.mode = CS_FOG_MODE_NONE; 
+    UpdateFogSVs ();
+  }
+  /** @} */
 
-  // -- Light handling
-
+  /**\name Light handling
+   * @{ */
   virtual iLightList* GetLights ()
   { return &lights; }
 
@@ -207,9 +220,10 @@ public:
 
   virtual uint GetDynamicAmbientVersion () const
   { return dynamicAmbientLightVersion; }
+  /** @} */
 
-  // -- Visculling
-
+  /**\name Visculling
+   * @{ */
   virtual void CalculateSectorBBox (csBox3& bbox,
     bool do_meshes) const;
 
@@ -235,9 +249,10 @@ public:
 
   virtual iSector* FollowSegment (csReversibleTransform& t,
     csVector3& new_position, bool& mirror, bool only_portals = false);
+  /** @} */
 
-  // -- Various  
-
+  /**\name Callbacks
+   * @{ */
   virtual void SetSectorCallback (iSectorCallback* cb)
   { sectorCallbackList.Push (cb); }
 
@@ -249,7 +264,10 @@ public:
 
   virtual iSectorCallback* GetSectorCallback (int idx) const
   { return sectorCallbackList.Get (idx); }
+  /** @} */
 
+  /**\name Lighting
+   * @{ */
   virtual void SetLightCulling (bool enable);
   virtual bool IsLightCullingEnabled () const { return use_lightculling; }
   virtual void AddLightVisibleCallback (iLightVisibleCallback* cb);
@@ -271,7 +289,10 @@ public:
   void AddLSI (csLightSectorInfluence* inf);
   void RemoveLSI (csLightSectorInfluence* inf);
   const csLightSectorInfluences& GetLSI () const { return influences; }
+  /** @} */
 
+  /**\name Mesh generators
+   * @{ */
   iMeshGenerator* CreateMeshGenerator (const char* name);
   size_t GetMeshGeneratorCount () const
   {
@@ -284,11 +305,15 @@ public:
   iMeshGenerator* GetMeshGeneratorByName (const char* name);
   void RemoveMeshGenerator (size_t idx);
   void RemoveMeshGenerators ();
+  /** @} */
 
-  //--------------------- iSelfDestruct implementation -------------------//
-
+  /**\name iSelfDestruct implementation
+   * @{ */
   virtual void SelfDestruct ();
+  /** @} */
 
+  virtual iShaderVariableContext* GetSVContext()
+  { return static_cast<iShaderVariableContext*> (this); }
 private:
   // -- PRIVATE METHODS
 
@@ -380,6 +405,10 @@ private:
   void FireNewMesh (iMeshWrapper* mesh);
   void FireRemoveMesh (iMeshWrapper* mesh);
 
+  /// Update shader vars with fog information
+  void UpdateFogSVs ();
+
+  void SetupSVNames();
 private:
   // PRIVATE MEMBERS
 
@@ -440,7 +469,7 @@ private:
   iRenderLoop* renderloop;
 
   /// Fog information.
-  mutable csFog fog;
+  csFog fog;
 
   /// List of light/sector influences.
   csLightSectorInfluences influences;
@@ -491,6 +520,24 @@ private:
    * not all meshes.
    */
   iMeshWrapper* single_mesh;
+
+  /// Shader variable names
+  struct SVNamesHolder
+  {
+    CS::ShaderVarName dynamicAmbient;
+    CS::ShaderVarName fogColor;
+    CS::ShaderVarName fogMode;
+    CS::ShaderVarName fogStart;
+    CS::ShaderVarName fogEnd;
+    CS::ShaderVarName fogDensity;
+  };
+  CS_DECLARE_STATIC_CLASSVAR_REF(svNames, SVNames, SVNamesHolder);
+  csRef<csShaderVariable> svDynamicAmbient;
+  csRef<csShaderVariable> svFogColor;
+  csRef<csShaderVariable> svFogMode;
+  csRef<csShaderVariable> svFogStart;
+  csRef<csShaderVariable> svFogEnd;
+  csRef<csShaderVariable> svFogDensity;
 };
 
 #include "csutil/win32/msvc_deprecated_warn_on.h"

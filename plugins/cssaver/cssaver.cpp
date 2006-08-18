@@ -706,12 +706,28 @@ bool csSaver::SaveSectors(iDocumentNode *parent)
 
     if (sector->HasFog ())
     {
-      csFog* fog = sector->GetFog ();
+      const csFog& fog = sector->GetFog ();
       csRef<iDocumentNode> fogNode = CreateNode (sectorNode, "fog");
-      fogNode->SetAttributeAsFloat ("red", fog->red);
-      fogNode->SetAttributeAsFloat ("green", fog->green);
-      fogNode->SetAttributeAsFloat ("blue", fog->blue);
-      fogNode->SetAttributeAsFloat ("density", fog->density);
+      fogNode->SetAttributeAsFloat ("red", fog.color.red);
+      fogNode->SetAttributeAsFloat ("green", fog.color.green);
+      fogNode->SetAttributeAsFloat ("blue", fog.color.blue);
+      switch (fog.mode)
+      {
+        case CS_FOG_MODE_EXP:
+        case CS_FOG_MODE_EXP2:
+          fogNode->SetAttribute ("mode", 
+            fog.mode == CS_FOG_MODE_EXP ? "exp" : "exp2");
+        case CS_FOG_MODE_CRYSTALSPACE:
+          fogNode->SetAttributeAsFloat ("density", fog.density);
+          break;
+        case CS_FOG_MODE_LINEAR:
+          fogNode->SetAttribute ("mode", "linear");
+          fogNode->SetAttributeAsFloat ("start", fog.start);
+          fogNode->SetAttributeAsFloat ("end", fog.end);
+          break;
+        default:
+          CS_ASSERT(false);
+      }
     }
     
     if (!SaveKeys (sectorNode, sector->QueryObject ())) return false;

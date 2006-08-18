@@ -13,6 +13,9 @@ chronological order.
 	  depth.
 	- res removed the legacy diffuse/ambient/reflection options from
 	  iMaterial.
+	- res made sectors be shader variable contexts as well. Fog and 
+	  dynamic ambient SVs are now provided by the sector itself. Also 
+	  streamlined csFog.
 15-Aug-2006
 	- res committed a patch from Timothy Whitfield <whitfieldts@gmail.com>
 	  to add csBaseEventHandler::UnregisterQueue ().

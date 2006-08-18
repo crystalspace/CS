@@ -21,6 +21,7 @@
 
 // For builtin shader consts:
 #include "iengine/light.h"
+#include "iengine/sector.h"
 #include "imap/services.h"
 #include "iutil/plugin.h"
 #include "iutil/vfs.h"
