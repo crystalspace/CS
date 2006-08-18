@@ -8,6 +8,9 @@ chronological order.
 
 18-Aug-2006
         - res worked around some issues with wx in wxtest.
+	- Jorrit augmented the iDynamicsCollisionCallback with a position
+	  of collision, the normal of the collision and the penetration
+	  depth.
 15-Aug-2006
 	- res committed a patch from Timothy Whitfield <whitfieldts@gmail.com>
 	  to add csBaseEventHandler::UnregisterQueue ().
