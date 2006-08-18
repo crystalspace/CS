@@ -162,7 +162,7 @@
 #endif
 
 #ifdef SWIGPERL5
-%include "ivaria/perl1st.i"
+%include "bindings/perl/perl1st.i"
 #endif
 
 %{
@@ -257,6 +257,7 @@
   INTERFACE_APPLY(iReporterIterator)
   INTERFACE_APPLY(iReporterListener)
   INTERFACE_APPLY(iSceneNode)
+  INTERFACE_APPLY(iSceneNodeArray)
   INTERFACE_APPLY(iSCF)
   INTERFACE_APPLY(iScript)
   INTERFACE_APPLY(iScriptObject)
@@ -474,15 +475,15 @@
 #define TYPEMAP_OUTARG_ARRAY_PTR_CNT(a,b,c)
 
 #if defined(SWIGPYTHON)
-  %include "ivaria/pythpre.i"
+  %include "bindings/python/pythpre.i"
 #elif defined(SWIGPERL5)
-  %include "ivaria/perlpre.i"
+  %include "bindings/perl/perlpre.i"
 #elif defined(SWIGRUBY)
-  %include "ivaria/rubypre.i"
+  %include "bindings/ruby/rubypre.i"
 #elif defined(SWIGTCL8)
-  %include "ivaria/tclpre.i"
+  %include "bindings/tcl/tclpre.i"
 #elif defined(SWIGJAVA)
-  %include "ivaria/javapre.i"
+  %include "bindings/java/javapre.i"
 #endif
 
 // Handle arrays as input arguments.
@@ -585,7 +586,7 @@ csArrayCapacityLinear<csArrayThresholdVariable >;
 %include "csutil/scf.h"
 
 // hand made scf template wrappers
-%include "ivaria/scf.i"
+%include "bindings/scf.i"
 
 #ifndef CS_MINI_SWIG
 %include "iutil/dbghelp.h"
@@ -1650,13 +1651,13 @@ csWrapPtr CS_GET_FIRST_NAMED_CHILD_OBJECT (iObject *obj, const char *iface,
 %}
 
 #if defined(SWIGPYTHON)
-  %include "ivaria/pythpost.i"
+  %include "bindings/python/pythpost.i"
 #elif defined(SWIGPERL5)
-  %include "ivaria/perlpost.i"
+  %include "bindings/perl/perlpost.i"
 #elif defined(SWIGRUBY)
-  %include "ivaria/rubypost.i"
+  %include "bindings/ruby/rubypost.i"
 #elif defined(SWIGTCL8)
-  %include "ivaria/tclpost.i"
+  %include "bindings/tcl/tclpost.i"
 #elif defined(SWIGJAVA)
-  %include "ivaria/javapost.i"
+  %include "bindings/java/javapost.i"
 #endif

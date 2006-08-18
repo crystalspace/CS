@@ -246,6 +246,23 @@ void csInputDefinition::InitializeFromEvent (iEvent *ev)
     else if (CS_IS_MOUSE_MOVE_EVENT(name_reg, *ev, deviceNumber))
     {
       containedName = csevMouseMove(name_reg, deviceNumber);
+      csMouseEventData data;
+      csMouseEventHelper::GetEventData (ev, data);
+      CS_ALLOC_STACK_ARRAY(bool, axesState, data.numAxes);
+      uint32 axesChanged;
+      // (vk) shouldn't that value be provided in the csMouseEventData struct ?
+      ev->Retrieve ("mAxesChanged", axesChanged);
+      uint currentAxis;
+      for (currentAxis = 0; currentAxis < data.numAxes; currentAxis++)
+      {
+        axesState[currentAxis] = (axesChanged & (1 << currentAxis)) != 0;
+        if (axesState[currentAxis])
+        {
+          mouseAxis = currentAxis;
+          // @@@ (vk) only consider one axis for now...
+          continue;
+        }
+      }
     }
   }
   else if (CS_IS_JOYSTICK_EVENT(name_reg, *ev))
@@ -262,6 +279,20 @@ void csInputDefinition::InitializeFromEvent (iEvent *ev)
     else if (CS_IS_JOYSTICK_MOVE_EVENT(name_reg, *ev, deviceNumber))
     {
       containedName = csevJoystickMove(name_reg, deviceNumber);
+      csJoystickEventData data;
+      csJoystickEventHelper::GetEventData (ev, data);
+      CS_ALLOC_STACK_ARRAY(bool, axesState, data.numAxes);
+      uint currentAxis;
+      for (currentAxis = 0; currentAxis < data.numAxes; currentAxis++)
+      {
+        axesState[currentAxis] = (data.axesChanged & (1 << currentAxis)) != 0;
+        if (axesState[currentAxis])
+        {
+          joystickAxis = currentAxis;
+          // @@@ (vk) only consider one axis for now...
+          continue;
+        }
+      }
     }
   }
 }
@@ -500,6 +531,17 @@ csString csInputDefinition::ToString (bool distinguishMods) const
   }
   else if (containedName == csevJoystickButton(name_reg, deviceNumber))
   {
+    // @@@ (vk) this is never triggered ?
+    str.Append ("JoystickButton");
+    str.Append (joystickButton);
+  }
+  else if (containedName == csevJoystickDown(name_reg, deviceNumber))
+  {
+    str.Append ("JoystickButton");
+    str.Append (joystickButton);
+  }
+  else if (containedName == csevJoystickUp(name_reg, deviceNumber))
+  {
     str.Append ("JoystickButton");
     str.Append (joystickButton);
   }
@@ -622,7 +664,9 @@ csString csInputDefinition::GetOtherString (iEventNameRegistry* reg,
   csInputDefinition def (reg, CSMASK_ALLMODIFIERS);
   def.containedName = name;
   def.deviceNumber = device;
-  def.mouseButton = num;
+  // (vk) for now we don't know if it's mouse or joystick button, so init both
+  //  @@@ maybe it would be better to have only one 'Button' variable ?
+  def.mouseButton = def.joystickButton = num;
   if (mods) def.modifiers = *mods;
   return def.ToString (distinguishModifiers);
 }

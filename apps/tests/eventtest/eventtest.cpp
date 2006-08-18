@@ -61,13 +61,17 @@ bool EventTest::HandleEvent (iEvent &ev)
     csKeyModifiers key_modifiers;
     csKeyEventHelper::GetModifiers (&ev, key_modifiers);
     uint32 modifiers = csMouseEventHelper::GetModifiers (&ev);
+
+    csMouseEventData data;
+    csMouseEventHelper::GetEventData (&ev, data);
     int x = csMouseEventHelper::GetX (&ev);
     int y = csMouseEventHelper::GetY (&ev);
     uint but = csMouseEventHelper::GetButton (&ev);
     bool butstate = csMouseEventHelper::GetButtonState (&ev);
     uint32 butmask = csMouseEventHelper::GetButtonMask (&ev);
-    csString str = csInputDefinition::GetOtherString (namereg,
-      	ev.Name, device, but, &key_modifiers, true);
+
+    csInputDefinition def (namereg, &ev, modifiers, true); //do we want cooked?
+    csString str = def.ToString ();
     printf ("Mouse %s: but=%d(state=%d,mask=%08" PRIu32 ") "
         "device=%d x=%d y=%d mods=%08" PRIu32 " desc='%s'\n",
 	type == csMouseEventTypeMove ? "MOVE" :
@@ -86,24 +90,30 @@ bool EventTest::HandleEvent (iEvent &ev)
     csKeyModifiers key_modifiers;
     csKeyEventHelper::GetModifiers (&ev, key_modifiers);
     uint32 modifiers = csJoystickEventHelper::GetModifiers (&ev);
-    //csJoystickEventData data;
-    //csJoystickEventHelper::GetEventData (&ev, data);
-    //...
-    // (vk) should use csJoystickHelper::GetEventData() instead,
-    //      otherwise axes value reporting is limited to the first
-    //      two axes.
-    int x = csJoystickEventHelper::GetX (&ev);
-    int y = csJoystickEventHelper::GetY (&ev);
-
-    uint but = csJoystickEventHelper::GetButton (&ev);
-    bool butstate = csJoystickEventHelper::GetButtonState (&ev);
-    uint32 butmask = csJoystickEventHelper::GetButtonMask (&ev);
-    csString str = csInputDefinition::GetOtherString (namereg,
-        ev.Name, device, but, &key_modifiers, true);
-    printf ("Joystick : but=%d(state=%d,mask=%08" PRIu32 ") "
-        "device=%d x=%d y=%d mods=%08" PRIu32 " desc='%s'\n",
-        but, butstate, butmask, device, x, y,
-        modifiers, str.GetData ());
+    csJoystickEventData data;
+    csJoystickEventHelper::GetEventData (&ev, data);
+    csInputDefinition def (namereg, &ev, modifiers, true);
+    csString str = def.ToString (false);
+    csString desc ("");
+    if (CS_IS_JOYSTICK_BUTTON_EVENT (namereg, ev, device))
+    {
+      uint but = csJoystickEventHelper::GetButton (&ev);
+      bool butstate = csJoystickEventHelper::GetButtonState (&ev);
+      uint32 butmask = csJoystickEventHelper::GetButtonMask (&ev);
+      printf ("Joystick %s: device=%d but=%d(state=%d,mask=%08" PRIu32 ") "
+          "mods=%08" PRIu32 " desc='%s'\n",
+          butstate ? "DO" : "UP", device, but, butstate, butmask,
+          modifiers, str.GetData ());
+    }
+    else if (CS_IS_JOYSTICK_MOVE_EVENT (namereg, ev, device))
+    {
+      size_t pos = str.Find ("Axis");
+      str.SubString (desc, pos + 4, (size_t)-1);
+      uint axisnum = atoi(desc.GetData ());
+      printf ("Joystick MOVE: device=%d axis=%" PRId32 " value=%d "
+          "mods=%08" PRIu32 " desc='%s'\n",
+          device, axisnum, data.axes[axisnum], modifiers, str.GetData ());
+    }
     fflush(stdout);
   }
 

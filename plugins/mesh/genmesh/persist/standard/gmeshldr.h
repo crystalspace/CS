@@ -64,8 +64,8 @@ public:
   virtual bool Initialize (iObjectRegistry *object_reg);
 
   /// Parse a submesh node
-  bool ParseSubMesh (iDocumentNode *node, iGeneralMeshCommonState* state, 
-    iGeneralFactoryState* factstate, iLoaderContext* ldr_context);
+  bool ParseSubMesh (iDocumentNode *node, iGeneralFactoryState* factstate, 
+    iLoaderContext* ldr_context);
 
   /// Parse a given node and return a new object for it.
   virtual csPtr<iBase> Parse (iDocumentNode* node,
@@ -118,6 +118,8 @@ private:
 #include "cstool/tokenlist.h"
 #undef CS_TOKEN_ITEM_FILE 
 
+  bool ParseLegacySubMesh (iDocumentNode *node, iGeneralMeshState* state, 
+    iLoaderContext* ldr_context);
 public:
   /// Constructor.
   csGeneralMeshLoader (iBase*);
@@ -135,8 +137,8 @@ public:
   bool ParseRenderBuffer (iDocumentNode *node, iGeneralMeshState* state, 
     iGeneralFactoryState* factstate);
   /// Parse a submesh node
-  bool ParseSubMesh (iDocumentNode *node, iGeneralMeshCommonState* state, 
-    iGeneralFactoryState* factstate, iLoaderContext* ldr_context);
+  bool ParseSubMesh (iDocumentNode *node, iGeneralMeshState* state, 
+    iLoaderContext* ldr_context);
 };
 
 /**

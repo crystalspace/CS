@@ -6,14 +6,14 @@
   </variables>
 
   <plugins>
-    <plugin name="thingFact">crystalspace.mesh.loader.factory.thing</plugin>
-    <plugin name="thing">crystalspace.mesh.loader.thing</plugin>
+<!--    <plugin name="thingFact">crystalspace.mesh.loader.factory.thing</plugin>
+    <plugin name="thing">crystalspace.mesh.loader.thing</plugin>-->
     <plugin name="genmeshFactory">crystalspace.mesh.loader.factory.genmesh</plugin>
     <plugin name="genmesh">crystalspace.mesh.loader.genmesh</plugin>
     <plugin name="terrainFact">crystalspace.mesh.loader.factory.terrain</plugin>
     <plugin name="terrain">crystalspace.mesh.loader.terrain</plugin>
-    <plugin name="foliageFact">crystalspace.mesh.loader.factory.foliage</plugin>
-    <plugin name="foliage">crystalspace.mesh.loader.foliage</plugin>
+<!--    <plugin name="foliageFact">crystalspace.mesh.loader.factory.foliage</plugin>
+    <plugin name="foliage">crystalspace.mesh.loader.foliage</plugin>-->
     <!--
     <plugin name="instFact">crystalspace.mesh.loader.factory.instmesh</plugin>
     <plugin name="inst">crystalspace.mesh.loader.instmesh</plugin>
@@ -54,6 +54,9 @@
         <texture name="sky_back">
             <file>skybox_b.jpg</file>
         </texture>
+        <texture name="lava.png">
+          <file>/lev/terraini/lava.png</file>
+        </texture>
   </textures>
 
   <shaders>
@@ -67,6 +70,10 @@
     </material>
     <material name="Base">
       <texture>materialmap_base.png</texture>
+      <shader type="ambient">terrain_fixed_base</shader>
+    </material>
+    <material name="Lava">
+      <texture>lava.png</texture>
       <shader type="ambient">terrain_fixed_base</shader>
     </material>
     <material name="Marble">
@@ -126,6 +133,7 @@
   </addon>
     
   <settings>
+    <clearscreen>yes</clearscreen>
     <clearzbuf>yes</clearzbuf>
     <lightmapcellsize>16</lightmapcellsize>
     <renderloop>std_rloop_terrainfixed</renderloop>
@@ -138,21 +146,22 @@
     <up x="0" y="1" z="0" />
   </start>
 
-  <meshfact name="skydome">
+<!--  <meshfact name="skydome">
     <plugin>genmeshFactory</plugin>
     <params>
       <sphere rimvertices="6" reversed="true">
 	<radius x="1000" y="1000" z="1000" />
       </sphere>
     </params>
-  </meshfact>
+  </meshfact>-->
 
   <addon plugin="crystalspace.terraformer.simple.loader">
       <name>simple</name>
-      <heightmap>/lev/terrain/heightmap_257x257.png</heightmap>
+      <heightmap>/lev/terraini/heightmap.png</heightmap>
+      <!--<heightmap>/lev/terrain/heightmap_257x257.png</heightmap>-->
       <!--<heightmap image="/lev/terrain/heightmap_2049x2049.png"/>-->
-      <scale x="256" y="32" z="256" />
-      <materialmap image="/lev/terrain/materialmap.png" />
+      <scale x="256" y="64" z="256" />
+      <materialmap image="/lev/terraini/material_blank.png" />
   </addon>
 
     <!--
@@ -193,9 +202,9 @@
         <factory>TerrainFact</factory>
         <material>Base</material>
         <materialpalette>
-          <material>Grass</material>
-          <material>Marble</material>
-          <material>Stone</material>
+          <material>Lava</material>
+<!--          <material>Stone</material>
+          <material>Grass</material>-->
         </materialpalette>
         <lodvalue name="splatting distance">200</lodvalue>
         <lodvalue name="block resolution">16</lodvalue>
@@ -211,7 +220,7 @@
       <priority>wall</priority>
     </meshobj>
 
-        <meshobj name="clouds">
+<!--        <meshobj name="clouds">
             <plugin>genmesh</plugin>
             <params>
                 <factory>skydome</factory>
@@ -390,7 +399,7 @@
         </geometry>
 	-->
 	<!--<densityscale mindist="26" maxdist="30" maxfactor="0" />-->
-	<alphascale mindist="22" maxdist="30" />
+	<!--<alphascale mindist="22" maxdist="30" />
 	<samplebox>
 	    <min x="-256" y="-200" z="-256" />
 	    <max x="256" y="200" z="256" />

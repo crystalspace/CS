@@ -1194,43 +1194,40 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
       return false;
     }
 
-    if (do_infinite)
-    {
-      iSector* room;
-      // Create the initial (non-random) part of the maze.
-      infinite_maze = new InfiniteMaze ();
-      room = infinite_maze->create_six_room (Engine, 0, 0, 0)->sector;
-      infinite_maze->create_six_room (Engine, 0, 0, 1);
-      infinite_maze->create_six_room (Engine, 0, 0, 2);
-      infinite_maze->create_six_room (Engine, 1, 0, 2);
-      infinite_maze->create_six_room (Engine, 0, 1, 2);
-      infinite_maze->create_six_room (Engine, 1, 1, 2);
-      infinite_maze->create_six_room (Engine, 0, 0, 3);
-      infinite_maze->create_six_room (Engine, 0, 0, 4);
-      infinite_maze->create_six_room (Engine, -1, 0, 4);
-      infinite_maze->create_six_room (Engine, -2, 0, 4);
-      infinite_maze->create_six_room (Engine, 0, -1, 3);
-      infinite_maze->create_six_room (Engine, 0, -2, 3);
-      infinite_maze->create_six_room (Engine, 0, 1, 3);
-      infinite_maze->create_six_room (Engine, 0, 2, 3);
-      infinite_maze->connect_infinite (0, 0, 0, 0, 0, 1);
-      infinite_maze->connect_infinite (0, 0, 1, 0, 0, 2);
-      infinite_maze->connect_infinite (0, 0, 2, 0, 0, 3);
-      infinite_maze->connect_infinite (0, 0, 2, 1, 0, 2);
-      infinite_maze->connect_infinite (0, 0, 2, 0, 1, 2);
-      infinite_maze->connect_infinite (1, 1, 2, 0, 1, 2);
-      infinite_maze->connect_infinite (1, 1, 2, 1, 0, 2);
-      infinite_maze->connect_infinite (0, 0, 3, 0, 0, 4);
-      infinite_maze->connect_infinite (-1, 0, 4, 0, 0, 4);
-      infinite_maze->connect_infinite (-2, 0, 4, -1, 0, 4);
-      infinite_maze->connect_infinite (0, 0, 3, 0, -1, 3);
-      infinite_maze->connect_infinite (0, -1, 3, 0, -2, 3);
-      infinite_maze->connect_infinite (0, 0, 3, 0, 1, 3);
-      infinite_maze->connect_infinite (0, 1, 3, 0, 2, 3);
-      infinite_maze->create_loose_portal (-2, 0, 4, -2, 1, 4);
-      view->GetCamera ()->SetSector(room);
-      printf ("Done creation of infinite maze!\n"); fflush (stdout);
-    }
+    iSector* room;
+    // Create the initial (non-random) part of the maze.
+    infinite_maze = new InfiniteMaze ();
+    room = infinite_maze->create_six_room (Engine, 0, 0, 0)->sector;
+    infinite_maze->create_six_room (Engine, 0, 0, 1);
+    infinite_maze->create_six_room (Engine, 0, 0, 2);
+    infinite_maze->create_six_room (Engine, 1, 0, 2);
+    infinite_maze->create_six_room (Engine, 0, 1, 2);
+    infinite_maze->create_six_room (Engine, 1, 1, 2);
+    infinite_maze->create_six_room (Engine, 0, 0, 3);
+    infinite_maze->create_six_room (Engine, 0, 0, 4);
+    infinite_maze->create_six_room (Engine, -1, 0, 4);
+    infinite_maze->create_six_room (Engine, -2, 0, 4);
+    infinite_maze->create_six_room (Engine, 0, -1, 3);
+    infinite_maze->create_six_room (Engine, 0, -2, 3);
+    infinite_maze->create_six_room (Engine, 0, 1, 3);
+    infinite_maze->create_six_room (Engine, 0, 2, 3);
+    infinite_maze->connect_infinite (0, 0, 0, 0, 0, 1);
+    infinite_maze->connect_infinite (0, 0, 1, 0, 0, 2);
+    infinite_maze->connect_infinite (0, 0, 2, 0, 0, 3);
+    infinite_maze->connect_infinite (0, 0, 2, 1, 0, 2);
+    infinite_maze->connect_infinite (0, 0, 2, 0, 1, 2);
+    infinite_maze->connect_infinite (1, 1, 2, 0, 1, 2);
+    infinite_maze->connect_infinite (1, 1, 2, 1, 0, 2);
+    infinite_maze->connect_infinite (0, 0, 3, 0, 0, 4);
+    infinite_maze->connect_infinite (-1, 0, 4, 0, 0, 4);
+    infinite_maze->connect_infinite (-2, 0, 4, -1, 0, 4);
+    infinite_maze->connect_infinite (0, 0, 3, 0, -1, 3);
+    infinite_maze->connect_infinite (0, -1, 3, 0, -2, 3);
+    infinite_maze->connect_infinite (0, 0, 3, 0, 1, 3);
+    infinite_maze->connect_infinite (0, 1, 3, 0, 2, 3);
+    infinite_maze->create_loose_portal (-2, 0, 4, -2, 1, 4);
+    view->GetCamera ()->SetSector(room);
+    printf ("Done creation of infinite maze!\n"); fflush (stdout);
 
     // Prepare the engine. This will calculate all lighting and
     // prepare the lightmaps for the 3D rasterizer.

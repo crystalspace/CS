@@ -184,13 +184,18 @@ csScreenTargetResult csEngineTools::FindScreenTarget (const csVector2& pos,
       float maxdist, iCamera* camera, iCollideSystem* cdsys)
 {
   csVector2 p (pos.x, camera->GetShiftY () * 2 - pos.y);
-  csVector3 v = camera->InvPerspective (p, maxdist);
+  csVector3 v = camera->InvPerspective (p, 1.0f);
   csVector3 end = camera->GetTransform ().This2Other (v);
   iSector* sector = camera->GetSector ();
   CS_ASSERT (sector != 0);
   csVector3 origin = camera->GetTransform ().GetO2TTranslation ();
+
+  // Now move the end until it is at the right distance.
+  csVector3 rel = (end-origin).Unit ();
+  end = origin + rel * maxdist;
   // Slightly move the origin for safety.
-  origin = origin + (end-origin) * 0.01f;
+  origin = origin + rel * 0.03f;
+
   csScreenTargetResult result;
   if (cdsys == 0)
   {

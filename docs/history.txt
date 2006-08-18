@@ -6,6 +6,179 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+18-Aug-2006
+        - res worked around some issues with wx in wxtest.
+	- Jorrit augmented the iDynamicsCollisionCallback with a position
+	  of collision, the normal of the collision and the penetration
+	  depth.
+15-Aug-2006
+	- res committed a patch from Timothy Whitfield <whitfieldts@gmail.com>
+	  to add csBaseEventHandler::UnregisterQueue ().
+14-Aug-2006
+	- res changed the way libraries are handled by genmeshify: instead
+	  of collecting them first and converting them after the main file
+	  was converted they're now converted as encountered, as this seems
+	  more robust.
+	- res re-used the standard loader context from genmeshify to better
+	  deal with "sloppy" maps that rely on the "try to load texture with
+	  name" and "create material from texture with name" features.
+	- res added the ability to override submesh materials in the mesh
+	  object to genmesh.
+	- res added a method to query material replacements from a Thing 
+	  object.
+	- res added support for material replacements to genmeshify.
+	- res fixed tangent + bitangent generation for genmeshes with 
+	  submeshes.
+13-Aug-2006
+	- res added CS_REQUEST_PLUGIN_TAG.
+	- res made genmeshify use the document plexer plugin.
+	- res made genmeshify properly handle the <settings> tag (fixes
+	  conversion of maps with custom lightmap cell sizes).
+12-Aug-2006
+	- res changed ptpdlight to not just update the light map the next
+	  frame after it's initially needed.
+	- res fixed some flaws in ptpdlight.
+	- res fixed genmeshify to always write a new factory for 
+	  hardtransformed meshes.
+	- res added PD light support to genmeshify.
+	- res fixed csRect::Extend() to truly ensure that the given point is
+	  inside the rectangle (it didn't adhere to csRect's exclusivity of 
+	  xmax/ymax).
+	- res fixed a crash when polygons from a polygonmesh of a genmesh with
+	  submeshes are requested.
+	- res csODECollider::CreateMeshGeometry() to use the polymesh 
+	  triangles directly instead of csPolygonMeshTools::Triangulate().
+	- Jorrit fixed compilation of the DDS image loader.
+	- Jorrit fixed compilation of walktest.
+	- Vincent fixed compilation of a few apps with GCC (GNU/Linux).
+	- res fixed some more XK_MISCELLANY warnings.
+	- res changed the way the TinyXML classes are wrapped: instead of 
+	  defining a set of macros to change their classnames put them into
+	  the CS namespace instead. 
+11-Aug-2006
+	- mdmkolbe fixed some minor warnings.
+	- mdmkolbe tweaked the signature of RemoveWeakListener.
+	- mdmkolbe mass converted to RegisterWeakListener.
+	- mdmkolbe fixed compilation problems in x2d and sdl2d due to the
+	  RemoveWeakListener conversion of csGraphics2D.  Reported by vknecht.
+	- res added the ability to query lightmaps for PD lights to Thing.
+	- res fixed the proctex event handler to properly work across modules.
+	- res renamed csgfx/memimage.h to csgfx/imagememory.h; this better
+	  reflects the name of the class defined withing and is in line with
+	  the other image-related image*.h headers.
+	- res added a plugin namespace to the ptanimimg sources.
+	- res fixed a potential crasher in ptanimimg.
+	- res added a texture plugin for lightmaps that are affected by PD
+	  lights.
+10-Aug-2006
+	- caedes changed CS_REQUEST_PLUGIN wrapper in pythpost.i so it works
+	  also with interfaces provided by other python modules.
+9-Aug-2006
+	- Jorrit extended parallaxAtt with a technique at priority 130.
+	  This technique is exactly the same as priority 150 but it
+	  doesn't handle attenuation correctly. This is useful on
+	  intel graphics hardware where the 150 technique is not working
+	  properly.
+	- Jorrit added a new 'crappyintelgraphics' config to gldrivers.xml.
+	  This config will add a 'crappy_intel_graphics' tag so that
+	  the technique 150 of parallaxAtt can disable itself.
+	- caedes fixed a problem that would make the python tutorials fail.
+	- mdmkolbe cleaned up miscellaneous warnings.
+	- mdmkolbe added RegisterWeakListener and RemoveWeakListener to
+	  handle registration and removal of event handlers that should
+	  be proxied through a weak reference.
+	- mdmkolbe converted libs/csplugincommon/canvas/graph2d.cpp and
+	  plugins/engine/3d/engine.cpp to use RegisterWeakListener.
+8-Aug-2006
+	- res re-added support for triangle-based submeshes in genmesh objects 
+	  in order to provide backwards compatibility.
+	- Jorrit renamed the type class in the old gmeshanim so that it no
+	  longer conflicts with the new gmeshanim in static builds.
+	- Jorrit fixed a problem in csEngineTools::FindScreenTarget(). If
+	  the maximum distance was very large it wouldn't work very well
+	  due to inaccuracy problems.
+	- caedes moved all swig interface files to include/bindings.
+7-Aug-2006
+	- res added ability to convert referenced libraries to genmeshify.
+	- Jorrit fixed a bug in the skeleton loader. It would return a
+	  reference to a factory (as a csPtr) without doing an IncRef.
+	  That would cause crashes at exit.
+	- Jorrit also made the event handler in the skeleton graveyard
+	  embedded to try to fix a leak there.
+6-Aug-2006
+	- Anders separated csHash iterators into const and non-const, like 
+	  csArray. This may lead to compile errors in user code. In most
+	  cases the solution to these is to change "GlobalIterator" to
+	  "ConstGlobalIterator".
+	- Vincent made the following changes:
+	    - Changed csInputDefinition::InitializeFromEvent() to get/set
+	      changed axis number for both mouse and joystick. It will use the
+	      first axis found that changed...
+	    - Fixed csJoystickEventHelper::GetButtonState().
+	    - Changed eventtest to get csInputDefinition constructed from
+	      event, and to only print changed joystick axis value (not x/y).
+	- res changed genmesh to preserve user-set poly meshes when switching
+	  between "standard"/"submesh" poly meshes.
+	- res added writing of of polymeshes to genmeshify.
+5-Aug-2006
+	- mdmkolbe removed a redundant check of do_infinite in walktest.
+	- res added the iSelfDestruct interface to the csSaverFile, 
+	  csLibraryReference and csAddonReference so they can be removed from
+	  regions.
+	- res made cssynldr's WriteMixmode() output a bit nicer.
+	- res made <move> tags written by cssaver's less redundant.
+	- res made cssaver correctly write portal flags, warping and mirror 
+	  portals.
+	- res fixed a flipped condition in the genmesh saver.
+	- res made genmeshify's command line help a bit better.
+	- res made genmeshify better support libraries.
+	- res made genmeshify support Things created from factories.
+	- mdmkolbe removed an outdated 'friend' declaration.
+	- Vincent fixed joystick button string construction in inputdef.cpp,
+	  which seem to need more work for parsing them correctly (mouseButton
+	  vs. joystickButton)...
+	- mdmkolbe eliminated a few embedded classes in genmesh and spr3d.
+	- mdmkolbe reverted his change to genmesh and spr3d because there
+	  was some weak referencing going on that he failed to notice
+	  before that made the change incorrect.
+4-Aug-2006
+	- res fixed the default csRenderBufferLock<> storage to 
+	  iRenderBuffer*: it seems to be the rule rather than the exception
+	  that a render buffer is valid while a lock is instantiated.
+	- res split up csShaderVariableContext into 
+	  CS::ShaderVariableContextImpl, which contains an 
+	  iShaderVariableContext implementation but no SCF goop, and
+	  csShaderVariableContext on top of that, which continues to be a full
+	  SCF class. This way the simple iShaderVariableContext implementation
+	  can be reused by other SCF classes without having to resort to
+	  manual forwarding.
+	- res changed iSyntaxService->ParseShaderVar() to also parse the 
+	  shader variable name.
+	- res changed the genmesh submeshes to be accessed via an interface.
+	- res added some initial support for per-submesh shader vars to
+	  genmesh.
+	- res tweaked the Cg shader framework to shuffle the primaryColor from
+	  vertex to fragment programs with COLOR semantics.
+	- Jorrit added an option to stdrep so that you can now specify
+	  'silent' mode in a config file too ('Reporter.Silent').
+	- Jorrit fixed stdrep so that the reading 'Reporter.AppendFile'
+	  actually works now.
+        - Jorrit fixed compilation of the python plugin (not linking,
+          that's still broken due to -Wl,Symbolic flag) so that it compiles
+          again.
+	- res changed the way genmesh submeshes work. Now, meshobjects can't
+	  contain completely custom submeshes; however, certain aspects of the
+	  submesh as defined in the factory can be overridden (right now only
+	  shader variables, but in the future probably at least materials and 
+	  mixmodes as well). Basically, you can't have different sets of 
+	  triangles in the mesh object.
+	- res added methods to query lightmap-related data from Thing meshes.
+	- res moved the lightmap-on-superlightmap texture coordinate 
+	  computation from the renderer(s) to the Thing plugin.
+	- res added support for static lightmaps to genmeshify.
+3-Aug-2006
+	- Jorrit fixed a small problem which caused CS not to compile
+	  in optimize mode.
 2-Aug-2006
 	- res added operator+= to csRenderBufferLock<>.
 	- res fixed a stupid typo in the gmeshldr index buffer check.

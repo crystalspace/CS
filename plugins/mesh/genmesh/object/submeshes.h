@@ -21,84 +21,179 @@
 #define __CS_SUBMESHES_H__
 
 #include "csgeom/tri.h"
+#include "csgfx/shadervarcontext.h"
 #include "cstool/rendermeshholder.h"
 #include "csutil/dirtyaccessarray.h"
 #include "csutil/flags.h"
 #include "csutil/ref.h"
+#include "csutil/refarr.h"
 #include "csutil/scf_implementation.h"
 #include "csutil/util.h"
 #include "csutil/weakref.h"
 
 #include "iengine/material.h"
 #include "igeom/polymesh.h"
+#include "imesh/genmesh.h"
 #include "ivideo/rndbuf.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
 {
-  struct SubMesh
+  class csGenmeshMeshObject;
+
+  class SubMesh : 
+    public scfImplementation2<SubMesh, 
+                              iGeneralMeshSubMesh, 
+                              scfFakeInterface<iShaderVariableContext> >,
+    public CS::ShaderVariableContextImpl
   {
-  protected:
-    const char* name;
   public:
+    const char* name;
     csRef<iRenderBuffer> index_buffer;
     csRef<iMaterialWrapper> material;
-    csRenderMeshHolder rmHolder;
-    csRef<csRenderBufferHolder> bufferHolder;
 
     // Override mixmode from parent.
     uint MixMode;
 
-    SubMesh () : name (0)
+    SubMesh () : scfImplementationType (this), name (0)
     { }
-    ~SubMesh()
-    {
-      delete[] name;
-    }
-    SubMesh (const SubMesh& other) : index_buffer (other.index_buffer),
-      material (other.material), rmHolder (), 
-      bufferHolder (other.bufferHolder), MixMode (other.MixMode)
-    {
-      name = csStrNew (other.name);
-    }
+    SubMesh (const SubMesh& other) : scfImplementationType (this), 
+      name (other.name), index_buffer (other.index_buffer), 
+      material (other.material), MixMode (other.MixMode)
+    { }
     const char* GetName() const { return name; }
-    void SetName (const char* newName)
-    {
-      delete[] name;
-      name = csStrNew (newName);
-    }
+
+    iRenderBuffer* GetIndices () const
+    { return index_buffer; }
+    iMaterialWrapper* GetMaterial () const
+    { return material; }
+    virtual uint GetMixmode () const
+    { return MixMode; }
+    void SetMaterial (iMaterialWrapper* material)
+    { this->material = material; }
   };
 
   class SubMeshesContainer
   {
-    csArray<SubMesh> subMeshes;
+    csRefArray<SubMesh> subMeshes;
     uint changeNum;
   public:
     SubMeshesContainer() : changeNum (0) { }
 
     void ClearSubMeshes ()
     { subMeshes.DeleteAll(); changeNum++; }
-    bool AddSubMesh (iRenderBuffer* indices, iMaterialWrapper *material, 
-      const char* name, uint mixmode = (uint)~0);
-    size_t FindSubMesh (const char* name) const;
-    void DeleteSubMesh (size_t index)
-    { subMeshes.DeleteIndex (index); changeNum++; }
+    iGeneralMeshSubMesh* AddSubMesh (iRenderBuffer* indices, 
+      iMaterialWrapper *material, const char* name, uint mixmode = (uint)~0);
+    SubMesh* FindSubMesh (const char* name) const;
+    void DeleteSubMesh (iGeneralMeshSubMesh* mesh);
     size_t GetSubMeshCount () const
     { return subMeshes.GetSize(); }
-    iRenderBuffer* GetSubMeshIndices (size_t index) const
-    { return (index < subMeshes.GetSize()) ? subMeshes[index].index_buffer : 0; }
-    iMaterialWrapper* GetSubMeshMaterial (size_t index) const
-    { return (index < subMeshes.GetSize()) ? subMeshes[index].material : 0; }
-    const char* GetSubMeshName (size_t index) const
-    { return (index < subMeshes.GetSize()) ? subMeshes[index].GetName() : 0; }
-    uint GetSubMeshMixmode (size_t index) const
-    { return (index < subMeshes.GetSize()) ? subMeshes[index].MixMode : (uint)~0; }
+    SubMesh* GetSubMesh (size_t index) const
+    { return subMeshes[index]; }
 
     size_t GetSize() const
     { return subMeshes.GetSize(); }
-    SubMesh& operator[](size_t index)
+    SubMesh* operator[](size_t index) const
     { return subMeshes[index]; }
     uint GetChangeNum () const
     { return changeNum; }
+  };
+
+  /**
+   * SubMesh proxy - can return data from either the parent (real) SubMesh or
+   * local override values.
+   */
+  class SubMeshProxy : 
+    public scfImplementation2<SubMeshProxy, 
+                              iGeneralMeshSubMesh, 
+                              scfFakeInterface<iShaderVariableContext> >,
+    public CS::ShaderVariableContextImpl
+  {
+  protected:
+    enum
+    {
+      bitMaterial = 0,
+      bitMixMode
+    };
+    csRef<iMaterialWrapper> material;
+    // Override mixmode from parent.
+    uint MixMode;
+    csFlags overrideFlags;
+    csRef<csRenderBufferHolder> bufferHolder;
+
+    void SetOverrideFlag (uint bit, bool flag) 
+    { overrideFlags.SetBool (1 << bit, flag); }
+    bool GetOverrideFlag (uint bit) const 
+    { return overrideFlags.Check (1 << bit); }
+  public:
+    csWeakRef<SubMesh> parentSubMesh;
+    csRenderMeshHolder rmHolder;
+
+    SubMeshProxy () : scfImplementationType (this), overrideFlags (0)
+    { }
+    ~SubMeshProxy ()
+    { }
+
+    csRenderBufferHolder* GetBufferHolder();
+
+    const char* GetName() const 
+    { 
+      if (parentSubMesh) return parentSubMesh->GetName();
+      return 0;
+    }
+    iRenderBuffer* GetIndices () const
+    { 
+      if (parentSubMesh) return parentSubMesh->GetIndices();
+      return 0;
+    }
+    iMaterialWrapper* GetMaterial () const
+    { 
+      if (GetOverrideFlag (bitMaterial)) return material; 
+      return parentSubMesh->GetMaterial ();
+    }
+    virtual uint GetMixmode () const
+    { 
+      if (GetOverrideFlag (bitMixMode)) return MixMode; 
+      return parentSubMesh->GetMixmode ();
+    }
+    void SetMaterial (iMaterialWrapper* material)
+    { 
+      SetOverrideFlag (bitMaterial, material != 0);
+      this->material = material; 
+    }
+
+    virtual csShaderVariable* GetVariable (csStringID name) const
+    {
+      csShaderVariable* var = 
+        CS::ShaderVariableContextImpl::GetVariable (name);
+      if (var == 0) var = parentSubMesh->GetVariable (name);
+      return var;
+    }
+    virtual void PushVariables (iShaderVarStack* stacks) const
+    {
+      parentSubMesh->PushVariables (stacks);
+      CS::ShaderVariableContextImpl::PushVariables (stacks);
+    }
+    virtual bool IsEmpty() const 
+    { 
+      return parentSubMesh->IsEmpty() 
+        && CS::ShaderVariableContextImpl::IsEmpty ();
+    }  
+  };
+
+  class SubMeshProxiesContainer
+  {
+    csRefArray<SubMeshProxy> subMeshes;
+  public:
+    void AddSubMesh (SubMeshProxy* subMesh);
+    SubMeshProxy* FindSubMesh (const char* name) const;
+    void Empty() { subMeshes.Empty(); }
+    void Push (SubMeshProxy* subMesh)
+    { subMeshes.Push (subMesh); }
+
+    size_t GetSize() const
+    { return subMeshes.GetSize(); }
+    SubMeshProxy* operator[](size_t index)
+    { return subMeshes[index]; }
   };
 
   class csGenmeshMeshObjectFactory;

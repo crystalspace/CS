@@ -89,6 +89,9 @@ bool csTextSyntaxService::Initialize (iObjectRegistry* object_reg)
 
   InitTokenTable (xmltokens);
 
+  strings = csQueryRegistryTagInterface<iStringSet> (
+    object_reg, "crystalspace.shared.stringset");
+
   return true;
 }
 
@@ -631,34 +634,43 @@ static const char* BlendFactorToString (uint factor)
 bool csTextSyntaxService::WriteMixmode (iDocumentNode* node, uint mixmode,
 					bool /*allowFxMesh*/)
 {
+  uint defaultModeAlphaTest = CS_MIXMODE_ALPHATEST_AUTO;
   if ((mixmode & CS_MIXMODE_TYPE_MASK) == CS_MIXMODE_TYPE_AUTO)
     node->CreateNodeBefore(CS_NODE_ELEMENT)->SetValue ("copy");
   else if ((mixmode & CS_MIXMODE_TYPE_MASK) == CS_MIXMODE_TYPE_MESH)
     node->CreateNodeBefore(CS_NODE_ELEMENT)->SetValue ("mesh");
   else
   {
-    // mixmode type is "blendop"
+    // Handle default mixmodes
     switch (mixmode & CS_FX_MASK_MIXMODE)
     {
       case CS_FX_TRANSPARENT:
         node->CreateNodeBefore(CS_NODE_ELEMENT)->SetValue ("transparent");
+        defaultModeAlphaTest = mixmode & CS_MIXMODE_ALPHATEST_MASK;
+        break;
       case CS_FX_MULTIPLY: 
         node->CreateNodeBefore(CS_NODE_ELEMENT)->SetValue ("multiply");
+        defaultModeAlphaTest = mixmode & CS_MIXMODE_ALPHATEST_MASK;
         break;
       case CS_FX_MULTIPLY2: 
         node->CreateNodeBefore(CS_NODE_ELEMENT)->SetValue ("multipy2");
+        defaultModeAlphaTest = mixmode & CS_MIXMODE_ALPHATEST_MASK;
         break;
       case CS_FX_ADD: 
         node->CreateNodeBefore(CS_NODE_ELEMENT)->SetValue ("add");
+        defaultModeAlphaTest = mixmode & CS_MIXMODE_ALPHATEST_MASK;
         break;
       case CS_FX_DESTALPHAADD:
         node->CreateNodeBefore(CS_NODE_ELEMENT)->SetValue ("destalphaadd");
+        defaultModeAlphaTest = mixmode & CS_MIXMODE_ALPHATEST_MASK;
         break;
       case CS_FX_SRCALPHAADD:
         node->CreateNodeBefore(CS_NODE_ELEMENT)->SetValue ("destalphaadd");
+        defaultModeAlphaTest = mixmode & CS_MIXMODE_ALPHATEST_MASK;
         break;
       case CS_FX_PREMULTALPHA:
         node->CreateNodeBefore(CS_NODE_ELEMENT)->SetValue ("premultalpha");
+        defaultModeAlphaTest = mixmode & CS_MIXMODE_ALPHATEST_MASK;
         break;
       case CS_FX_ALPHA:
         {
@@ -667,6 +679,7 @@ bool csTextSyntaxService::WriteMixmode (iDocumentNode* node, uint mixmode,
           alpha->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat (
             (float) ((mixmode & CS_FX_MASK_ALPHA) / 255.0f));
         }
+        defaultModeAlphaTest = mixmode & CS_MIXMODE_ALPHATEST_MASK;
         break;
       default:
         {
@@ -677,21 +690,30 @@ bool csTextSyntaxService::WriteMixmode (iDocumentNode* node, uint mixmode,
           blendOp->SetAttribute ("dst", 
             BlendFactorToString (CS_MIXMODE_BLENDOP_DST (mixmode)));
         }
-    }        
+    }
   }
 
   // Write out alphatest flag
-  if ((mixmode & CS_MIXMODE_ALPHATEST_MASK) == CS_MIXMODE_ALPHATEST_ENABLE)
+  if ((mixmode & CS_MIXMODE_ALPHATEST_MASK) != defaultModeAlphaTest)
   {
-    csRef<iDocumentNode> alphatest = node->CreateNodeBefore(CS_NODE_ELEMENT);
-    alphatest->SetValue ("alphatest");
-    alphatest->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValue ("enable");
-  }
-  else if ((mixmode & CS_MIXMODE_ALPHATEST_MASK) == CS_MIXMODE_ALPHATEST_DISABLE)
-  {
-    csRef<iDocumentNode> alphatest = node->CreateNodeBefore(CS_NODE_ELEMENT);
-    alphatest->SetValue ("alphatest");
-    alphatest->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValue ("disable");
+    if ((mixmode & CS_MIXMODE_ALPHATEST_MASK) == CS_MIXMODE_ALPHATEST_ENABLE)
+    {
+      csRef<iDocumentNode> alphatest = node->CreateNodeBefore(CS_NODE_ELEMENT);
+      alphatest->SetValue ("alphatest");
+      alphatest->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValue ("enable");
+    }
+    else if ((mixmode & CS_MIXMODE_ALPHATEST_MASK) == CS_MIXMODE_ALPHATEST_DISABLE)
+    {
+      csRef<iDocumentNode> alphatest = node->CreateNodeBefore(CS_NODE_ELEMENT);
+      alphatest->SetValue ("alphatest");
+      alphatest->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValue ("disable");
+    }
+    else if ((mixmode & CS_MIXMODE_ALPHATEST_MASK) == CS_MIXMODE_ALPHATEST_AUTO)
+    {
+      csRef<iDocumentNode> alphatest = node->CreateNodeBefore(CS_NODE_ELEMENT);
+      alphatest->SetValue ("alphatest");
+      alphatest->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValue ("auto");
+    }
   }
 
   // Write out alpha value, but only if not written above
@@ -990,6 +1012,11 @@ bool csTextSyntaxService::WriteGradient (iDocumentNode* node,
 bool csTextSyntaxService::ParseShaderVar (iDocumentNode* node,
 					  csShaderVariable& var)
 {
+  const char *name = node->GetAttributeValue("name");
+  if (name != 0)
+  {
+    var.SetName (strings->Request (name));
+  }
   const char *type = node->GetAttributeValue("type");
   if (!type)
   {
@@ -1152,9 +1179,8 @@ csRef<iShaderVariableAccessor> csTextSyntaxService::ParseShaderVarExpr (
 bool csTextSyntaxService::WriteShaderVar (iDocumentNode* node,
 					  csShaderVariable& var)
 {
-  csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
-    object_reg, "crystalspace.shared.stringset", iStringSet);
-  node->SetAttribute ("name", strings->Request (var.GetName ()));
+  const char* name = strings->Request (var.GetName ());
+  if (name != 0) node->SetAttribute ("name", name);
   switch (var.GetType ())
   {
     case csShaderVariable::INT:

@@ -313,8 +313,12 @@ void csODEDynamics::NearCallback (void *data, dGeomID o1, dGeomID o2)
     int a = dCollide (o1, o2, 1, &(contact[0].geom), sizeof (dContact));
     if (a > 0)
     {
-      c1->Collision (c2);
-      c2->Collision (c1);
+      csVector3 pos (contact[0].geom.pos[0], contact[0].geom.pos[1],
+	  contact[0].geom.pos[2]);
+      csVector3 normal (contact[0].geom.normal[0], contact[0].geom.normal[1],
+	  contact[0].geom.normal[2]);
+      c1->Collision (c2, pos, normal, contact[0].geom.depth);
+      c2->Collision (c1, pos, -normal, contact[0].geom.depth);
     }
   }
 
@@ -326,18 +330,25 @@ void csODEDynamics::NearCallback (void *data, dGeomID o1, dGeomID o2)
   int a = dCollide (o1, o2, 512, &(contact[0].geom), sizeof (dContact));
   if (a > 0)
   {
+    csVector3 pos (contact[0].geom.pos[0], contact[0].geom.pos[1],
+	  contact[0].geom.pos[2]);
+    csVector3 normal (contact[0].geom.normal[0], contact[0].geom.normal[1],
+	  contact[0].geom.normal[2]);
+    float depth = contact[0].geom.depth;
     /* there is only 1 actual body per set */
     if (b1)
     {
-      b1->Collision ((b2) ? &b2->scfiRigidBody : 0);
+      b1->Collision ((b2) ? &b2->scfiRigidBody : 0, pos, normal, depth);
       if (!b2)
-        ((GeomData *)dGeomGetData (o2))->collider->Collision (&b1->scfiRigidBody);
+        ((GeomData *)dGeomGetData (o2))->collider->Collision (
+		&b1->scfiRigidBody, pos, -normal, depth);
     }
     if (b2)
     {
-      b2->Collision ((b1) ? &b1->scfiRigidBody : 0);
+      b2->Collision ((b1) ? &b1->scfiRigidBody : 0, pos, -normal, depth);
       if (!b1)
-        ((GeomData *)dGeomGetData (o1))->collider->Collision (&b2->scfiRigidBody);
+        ((GeomData *)dGeomGetData (o1))->collider->Collision (
+		&b2->scfiRigidBody, pos, normal, depth);
     }
 
     for( int i=0; i<a; i++ )
@@ -974,12 +985,14 @@ bool csODECollider::IsStatic ()
   return is_static;
 }
 
-void csODECollider::Collision (csODECollider* other)
+void csODECollider::Collision (csODECollider* other,
+    const csVector3& pos, const csVector3& normal, float depth)
 {
   if (coll_cb) coll_cb->Execute (this, other);
 }
 
-void csODECollider::Collision (iRigidBody* other)
+void csODECollider::Collision (iRigidBody* other,
+    const csVector3& pos, const csVector3& normal, float depth)
 {
   if (coll_cb) coll_cb->Execute (this, other);
 }
@@ -1081,13 +1094,12 @@ bool csODECollider::CreateMeshGeometry (iMeshWrapper *mesh)
   if (p->GetVertexCount () == 0 || p->GetTriangleCount () == 0)
     return false;
 
-  csTriangle *c_triangle;
-  int tr_num;
+  csTriangle *c_triangle = p->GetTriangles();
+  int tr_num = p->GetTriangleCount();
   // Slight problem here is that we need to keep vertices and indices around
   // since ODE only uses the pointers. I am not sure if ODE cleans them up
   // on exit or not. If not, we need some way to keep track of all mesh colliders
   // and clean them up on destruct.
-  csPolygonMeshTools::Triangulate(p, c_triangle, tr_num);
   float *vertices = new float[p->GetVertexCount()*3];
   int *indeces = new int[tr_num*3];
   csVector3 *c_vertex = p->GetVertices();
@@ -1838,9 +1850,11 @@ void csODERigidBody::SetCollisionCallback (iDynamicsCollisionCallback* cb)
   coll_cb = cb;
 }
 
-void csODERigidBody::Collision (iRigidBody *other)
+void csODERigidBody::Collision (iRigidBody *other,
+    const csVector3& pos, const csVector3& normal, float depth)
 {
-  if (coll_cb) coll_cb->Execute (&scfiRigidBody, other);
+  if (coll_cb) coll_cb->Execute (&scfiRigidBody, other,
+      pos, normal, depth);
 }
 
 void csODERigidBody::Update ()

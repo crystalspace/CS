@@ -26,47 +26,102 @@
 
 CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
 {
-  static int SubmeshSubmeshCompare (const SubMesh& A, const SubMesh& B)
+  static int SubmeshSubmeshCompare (SubMesh* const& A, 
+                                    SubMesh* const& B)
   {
-    const char* a = A.GetName();
-    const char* b = B.GetName();
+    const char* a = A->GetName();
+    const char* b = B->GetName();
     if (a == 0) return (b == 0) ? 0 : 1;
     if (b == 0) return -1;
     return strcmp (a, b);
   }
 
-  bool SubMeshesContainer::AddSubMesh (iRenderBuffer* indices, 
-    iMaterialWrapper *material, const char* name, uint mixmode)
+  iGeneralMeshSubMesh* SubMeshesContainer::AddSubMesh (
+    iRenderBuffer* indices, iMaterialWrapper *material, const char* name, 
+    uint mixmode)
   {
-    SubMesh subMesh;
-    subMesh.material = material;
-    subMesh.MixMode = mixmode;
-    subMesh.index_buffer = indices;
-    subMesh.SetName (name);
-
-    subMesh.bufferHolder.AttachNew (new csRenderBufferHolder);
-    subMesh.bufferHolder->SetRenderBuffer(CS_BUFFER_INDEX,
-      indices);
+    csRef<SubMesh> subMesh;
+    subMesh.AttachNew (new SubMesh ());
+    subMesh->material = material;
+    subMesh->MixMode = mixmode;
+    subMesh->index_buffer = indices;
+    subMesh->name = name;
 
     subMeshes.InsertSorted (subMesh, SubmeshSubmeshCompare);
     /* @@@ FIXME: Prolly do some error checking, like sanity of
      * indices */
     changeNum++;
-    return true;
+    return subMesh;
   }
 
-  static int SubmeshStringCompare (const SubMesh& A, const char* const& b)
+  static int SubmeshStringCompare (SubMesh* const& A, const char* const& b)
   {
-    const char* a = A.GetName();
+    const char* a = A->GetName();
     if (a == 0) return (b == 0) ? 0 : 1;
     if (b == 0) return -1;
     return strcmp (a, b);
   }
 
-  size_t SubMeshesContainer::FindSubMesh (const char* name) const
+  SubMesh* SubMeshesContainer::FindSubMesh (const char* name) const
   {
-    return subMeshes.FindSortedKey (
-      csArrayCmp<SubMesh, const char*> (name, &SubmeshStringCompare));
+    size_t idx = subMeshes.FindSortedKey (
+      csArrayCmp<SubMesh*, const char*> (name, &SubmeshStringCompare));
+    if (idx == csArrayItemNotFound) return 0;
+    return subMeshes[idx];
+  }
+
+  void SubMeshesContainer::DeleteSubMesh (iGeneralMeshSubMesh* mesh)
+  {
+    SubMesh* subMesh = static_cast<SubMesh*> (mesh);
+    size_t idx = subMeshes.FindSortedKey (
+      csArrayCmp<SubMesh*, SubMesh*> (subMesh, &SubmeshSubmeshCompare));
+    if (idx == csArrayItemNotFound) return;
+    subMeshes.DeleteIndex (idx);
+  }
+
+  //-------------------------------------------------------------------------
+
+  csRenderBufferHolder* SubMeshProxy::GetBufferHolder()
+  {
+    if (!bufferHolder.IsValid())
+    {
+      bufferHolder.AttachNew (new csRenderBufferHolder);
+      bufferHolder->SetRenderBuffer(CS_BUFFER_INDEX, GetIndices ());
+    }
+    return bufferHolder;
+  }
+
+  //-------------------------------------------------------------------------
+
+  static int SubmeshProxySubmeshProxyCompare (SubMeshProxy* const& A, 
+                                              SubMeshProxy* const& B)
+  {
+    const char* a = A->GetName();
+    const char* b = B->GetName();
+    if (a == 0) return (b == 0) ? 0 : 1;
+    if (b == 0) return -1;
+    return strcmp (a, b);
+  }
+
+  void SubMeshProxiesContainer::AddSubMesh (SubMeshProxy* subMesh)
+  {
+    subMeshes.InsertSorted (subMesh, SubmeshProxySubmeshProxyCompare);
+  }
+
+  static int SubmeshProxyStringCompare (SubMeshProxy* const& A, const char* const& b)
+  {
+    const char* a = A->GetName();
+    if (a == 0) return (b == 0) ? 0 : 1;
+    if (b == 0) return -1;
+    return strcmp (a, b);
+  }
+
+  SubMeshProxy* SubMeshProxiesContainer::FindSubMesh (const char* name) const
+  {
+    size_t idx = subMeshes.FindSortedKey (
+      csArrayCmp<SubMeshProxy*, const char*> (name, &SubmeshProxyStringCompare));
+    if (idx == csArrayItemNotFound) return 0;
+    return subMeshes[idx];
   }
 
   //-------------------------------------------------------------------------
@@ -78,7 +133,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
     triangleCache.Empty();
     for (size_t s = 0; s < subMeshes.GetSubMeshCount(); s++)
     {
-      iRenderBuffer* buffer = subMeshes.GetSubMeshIndices (s);
+      SubMesh* subMesh = subMeshes.GetSubMesh (s);
+      iRenderBuffer* buffer = subMesh->GetIndices();
       size_t offs = triangleCache.GetSize();
       size_t bufferTris = buffer->GetElementCount() / 3;
       triangleCache.SetSize (offs + bufferTris);
@@ -100,14 +156,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
     polygonCache.Empty();
     for (size_t s = 0; s < subMeshes.GetSubMeshCount(); s++)
     {
-      iRenderBuffer* buffer = subMeshes.GetSubMeshIndices (s);
-      size_t bufferTris = buffer->GetElementCount() / 3;
-      csRenderBufferLock<uint, iRenderBuffer*> indices (buffer);
+      SubMesh* subMesh = subMeshes.GetSubMesh (s);
+      iRenderBuffer* buffer = subMesh->GetIndices();
+      size_t bufferTris = triangleCache.GetSize();
       for (size_t t = 0; t < bufferTris; t++)
       {
         csMeshedPolygon poly;
         poly.num_vertices = 3;
-        poly.vertices = (int*)(indices.Get (t*3));
+        poly.vertices = (int*)(&triangleCache[t]);
         polygonCache.Push (poly);
       }
     }

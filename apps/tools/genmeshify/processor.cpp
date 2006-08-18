@@ -21,49 +21,115 @@
 
 #include "processor.h"
 #include "genmeshify.h"
+#include "stdloadercontext.h"
 
 namespace genmeshify
 {
-  Processor::Processor (App* app, const char* filename) : app (app),
-    filename (filename), converter (0)
+  Processor::Processor (App* app) : app (app), converter (0)
   {
     InitTokenTable (xmltokens);
 
     static int n = 0;
     region = app->engine->CreateRegion (
       csString().Format ("__genmeshify_region_%d__", n++));
-    loaderContext = app->engine->CreateLoaderContext (region, false);
+    loaderContext.AttachNew (new StdLoaderContext (app, app->engine, region));
     converter = new Converter (app, loaderContext, region);
   }
 
   Processor::~Processor ()
   {
-    app->engine->RemoveObject (region);
     delete converter;
+    app->engine->RemoveObject (region);
+    region->DeleteAll();
   }
 
-  bool Processor::Process ()
+  csRef<iFile> Processor::OpenPath (App* app, const char* path, 
+                                    csString& fileNameToOpen)
   {
-    //Change path
+    csString filename (path);
     csStringArray paths;
     paths.Push ("/lev/");
-    if (!app->vfs->ChDirAuto (filename, &paths, 0, "world"))
+
+    //Change path
+    bool dirSet = false;
+    size_t slashPos = filename.FindLast ('/');
+    if (slashPos != (size_t)-1)
     {
-      app->Report ("Error setting directory '%s'!", filename.GetData());
-      return false;
+      csString dir, base;
+      filename.SubString (dir, 0, slashPos);
+      filename.SubString (base, slashPos + 1);
+      fileNameToOpen = base;
+      dirSet = app->vfs->ChDirAuto (dir, &paths, 0, base);
+    }
+    if (!dirSet)
+    {
+      fileNameToOpen = "world";
+      dirSet = app->vfs->ChDirAuto (filename, &paths, 0, "world");
+    }
+    if (!dirSet)
+    {
+      app->Report ("Error opening '%s'!", filename.GetData());
+      return 0;
     }
 
     // Load it
-    csRef<iFile> buf = app->vfs->Open ("world", VFS_FILE_READ);
+    csRef<iFile> buf = app->vfs->Open (fileNameToOpen, VFS_FILE_READ);
     if (!buf) 
     {
       app->Report ("Error opening file 'world' for reading!");
-      return false;
+      return 0;
     }
-    csRef<iDataBuffer> data = buf->GetAllData ();
-    if (!app->vfs->WriteFile ("world~", data->GetData(), data->GetSize()))
+    return buf;
+  }
+
+  bool Processor::Preload (App* app, const csStringArray& paths)
+  {
+    for (size_t i = 0; i < paths.GetSize(); i++)
     {
-      app->Report ("Error writing backup file 'world~'!");
+      csVfsDirectoryChanger dirChange (app->vfs);
+      dirChange.PushDir();
+
+      csString backupFile;
+      csRef<iFile> buf = OpenPath (app, paths[i], backupFile);
+      if (!buf.IsValid()) return false;
+
+      csRef<iDocument> doc = app->docSystem->CreateDocument ();
+      const char* error = doc->Parse (buf, true);
+      if (error != 0)
+      {
+        app->Report ("Document system error for %s: %s", paths[i], error);
+        return false;
+      }
+      csRef<iDocumentNode> root = doc->GetRoot();
+      csRef<iDocumentNode> worldNode = root->GetNode ("world");
+      if (worldNode.IsValid())
+      {
+        if (!app->loader->LoadMap (worldNode, false)) return false;
+      }
+      else
+      {
+        iBase* result;
+        if (!app->loader->Load (root, result)) return false;
+        if (result) result->DecRef();
+      }
+    }
+    return true;
+  }
+
+  bool Processor::Process (const char* filename, bool shallow, bool nested)
+  {
+    csVfsDirectoryChanger dirChange (app->vfs);
+    dirChange.PushDir();
+
+    csString fileNameToOpen;
+    csString backupFile;
+    csRef<iFile> buf = OpenPath (app, filename, fileNameToOpen);
+    if (!buf.IsValid()) return false;
+    backupFile = fileNameToOpen + "~";
+    csRef<iDataBuffer> data = buf->GetAllData ();
+    if (!app->vfs->WriteFile (backupFile, data->GetData(), data->GetSize()))
+    {
+      app->Report ("Error writing backup file '%s'!", backupFile.GetData());
       return false;
     }
 
@@ -94,7 +160,7 @@ namespace genmeshify
         if (child->Equals (contents))
         {
           // Handle world/library
-          if (!ProcessWorld (contents, child_clone)) return false;
+          if (!ProcessWorld (contents, child_clone, shallow, nested)) return false;
         }
         else
         {
@@ -118,10 +184,11 @@ namespace genmeshify
       return false;
     }
 
-    buf = app->vfs->Open ("world", VFS_FILE_WRITE);
+    buf = app->vfs->Open (fileNameToOpen, VFS_FILE_WRITE);
     if (!buf) 
     {
-      app->Report ("Error opening file 'world' for writing!");
+      app->Report ("Error opening file '%s' for writing!", 
+        fileNameToOpen.GetData());
       return false;
     }
     error = newDoc->Write (buf);
@@ -158,9 +225,10 @@ namespace genmeshify
     }
   }
 
-  bool Processor::ProcessWorld (iDocumentNode* from, iDocumentNode* to)
+  bool Processor::ProcessWorld (iDocumentNode* from, iDocumentNode* to, 
+                                bool shallow, bool nested)
   {
-    PreloadTexturesMaterials (from);
+    PreloadDependencies (from, shallow);
     PreloadSectors (from);
 
     to->SetValue (from->GetValue ());
@@ -184,14 +252,41 @@ namespace genmeshify
             {
               csRef<iDocumentNode> child_clone = to->CreateNodeBefore (
     	          child->GetType (), 0);
-              if (!ProcessMeshfactOrObj (child, child_clone, 0, true)) return false;
+              if (!ProcessMeshfactOrObj (0, child, child_clone, 0, true)) return false;
               continue;
             }
           case XMLTOKEN_SECTOR:
             {
+              if (!texturesNode.IsValid() && !nested)
+              {
+                texturesNode = to->CreateNodeBefore (CS_NODE_ELEMENT, 0);
+                texturesNode->SetValue ("textures");
+              }
               csRef<iDocumentNode> child_clone = to->CreateNodeBefore (
     	          child->GetType (), 0);
               if (!ProcessSector (child, child_clone)) return false;
+              continue;
+            }
+          case XMLTOKEN_TEXTURES:
+            {
+              csRef<iDocumentNode> child_clone = to->CreateNodeBefore (
+    	          child->GetType (), 0);
+              CloneNode (child, child_clone);
+              if (!nested) texturesNode = child_clone;
+              continue;
+            }
+          case XMLTOKEN_LIBRARY:
+            {
+              csRef<iDocumentNode> child_clone = to->CreateNodeBefore (
+    	          child->GetType (), 0);
+              CloneNode (child, child_clone);
+              if (!shallow)
+              {
+                csRef<iDataBuffer> fullPath = app->vfs->ExpandPath (
+                  child->GetContentsValue ());
+                if (fullPath.IsValid())
+                  if (!Process (fullPath->GetData(), shallow, true)) return false;
+              }
               continue;
             }
         }
@@ -206,30 +301,54 @@ namespace genmeshify
 
   bool Processor::ProcessPlugins (iDocumentNode* from, iDocumentNode* to)
   {
-    csRef<iDocumentNodeIterator> pluginIt = from->GetNodes ("plugin");
-    while (pluginIt->HasNext ())
+    to->SetValue (from->GetValue());
+    CloneAttributes (from, to);
+
+    csRef<iDocumentNodeIterator> it = from->GetNodes ();
+    while (it->HasNext ())
     {
-      csRef<iDocumentNode> pluginNode = pluginIt->Next ();
-      csString shortcut (pluginNode->GetAttributeValue ("name"));
-      if (shortcut.IsEmpty()) continue;
+      bool doClone = true;
+      csRef<iDocumentNode> node = it->Next ();
+      if ((node->GetType() == CS_NODE_ELEMENT)
+        && (strcmp (node->GetValue(), "plugin") == 0))
+      {
+        csString shortcut (node->GetAttributeValue ("name"));
+        if (shortcut.IsEmpty()) continue;
 
-      csRef<iDocumentNode> idNode = pluginNode->GetNode ("id");
-      csString id;
-      if (idNode.IsValid())
-        id = idNode->GetContentsValue();
-      else
-        id = pluginNode->GetContentsValue();
+        csRef<iDocumentNode> idNode = node->GetNode ("id");
+        csString id;
+        if (idNode.IsValid())
+          id = idNode->GetContentsValue();
+        else
+          id = node->GetContentsValue();
 
-      plugins.PutUnique (shortcut, id);
+        plugins.PutUnique (shortcut, id);
+
+        doClone = ((id != "crystalspace.mesh.loader.thing")
+          && (id != "crystalspace.mesh.loader.factory.thing"));
+      }
+      if (doClone)
+      {
+        csRef<iDocumentNode> child_clone = to->CreateNodeBefore (
+    	    node->GetType (), 0);
+        CloneNode (node, child_clone);
+      }
     }
 
-    CloneNode (from, to);
     return true;
   }
 
   bool Processor::ProcessSector (iDocumentNode* from, iDocumentNode* to)
   {
     to->SetValue (from->GetValue ());
+
+    const char* name = from->GetAttributeValue ("name");
+    iSector* sector = app->engine->FindSector (name);
+    if (!sector)
+    {
+      sector = app->engine->CreateSector (0); 
+      region->QueryObject()->ObjAdd (sector->QueryObject());
+    }
 
     csRef<iDocumentNodeIterator> it = from->GetNodes ();
     while (it->HasNext ())
@@ -244,7 +363,8 @@ namespace genmeshify
             {
               csRef<iDocumentNode> child_clone = to->CreateNodeBefore (
     	          child->GetType (), 0);
-              if (!ProcessMeshfactOrObj (child, child_clone, to, false)) return false;
+              if (!ProcessMeshfactOrObj (sector, child, child_clone, to, 
+                false)) return false;
               continue;
             }
         }
@@ -257,7 +377,9 @@ namespace genmeshify
     return true;
   }
 
-  bool Processor::ProcessMeshfactOrObj (iDocumentNode* from, iDocumentNode* to,
+  bool Processor::ProcessMeshfactOrObj (iSector* sector, 
+                                        iDocumentNode* from, 
+                                        iDocumentNode* to, 
                                         iDocumentNode* sectorNode,
                                         bool factory)
   {
@@ -274,12 +396,6 @@ namespace genmeshify
       // Yep, thing.
       to->SetValue (from->GetValue ());
       CloneAttributes (from, to);
-      csRef<iDocumentNode> plugin_clone = to->CreateNodeBefore (
-    	pluginNode->GetType (), 0);
-      plugin_clone->SetValue ("plugin");
-      csRef<iDocumentNode> plugin_contents = plugin_clone->CreateNodeBefore (
-        CS_NODE_TEXT, 0);
-      plugin_contents->SetValue ("crystalspace.mesh.loader.genmesh");
 
       csRef<iDocumentNodeIterator> it = from->GetNodes ();
       while (it->HasNext ())
@@ -293,9 +409,22 @@ namespace genmeshify
             ; // <hardmove> must be filtered; the converter will handle it
           else if (strcmp (child->GetValue (), "params") == 0)
           {
-            if (!ConvertMeshfactOrObj (from->GetAttributeValue ("name"),
+            csString meshName (from->GetAttributeValue ("name"));
+            if (meshName.IsEmpty())
+            {
+              static int meshNum = 0;
+              meshName.Format ("_genmeshify_unnamedmesh%d", meshNum++);
+            }
+            if (!ConvertMeshfactOrObj (sector, meshName,
               from, to, sectorNode, factory)) 
               return false;
+          }
+          else if (strcmp (child->GetValue (), "meshobj") == 0)
+          {
+            csRef<iDocumentNode> child_clone = to->CreateNodeBefore (
+	            child->GetType (), 0);
+            if (!ProcessMeshfactOrObj (sector, child, child_clone, sectorNode, 
+              false)) return false;
           }
           else
           {
@@ -308,22 +437,54 @@ namespace genmeshify
       return true;
     }
     while (0);
-    CloneNode (from, to);
+
+    csRef<iDocumentNodeIterator> it = from->GetNodes ();
+    while (it->HasNext ())
+    {
+      csRef<iDocumentNode> child = it->Next ();
+      if (child->GetType() == CS_NODE_ELEMENT)
+      {
+        if (strcmp (child->GetValue (), "meshobj") == 0)
+        {
+          csRef<iDocumentNode> child_clone = to->CreateNodeBefore (
+	          child->GetType (), 0);
+          if (!ProcessMeshfactOrObj (sector, child, child_clone, sectorNode, 
+            false)) return false;
+        }
+        else
+        {
+          csRef<iDocumentNode> child_clone = to->CreateNodeBefore (
+	          child->GetType (), 0);
+          CloneNode (child, child_clone);
+        }
+      }
+      else
+      {
+        csRef<iDocumentNode> child_clone = to->CreateNodeBefore (
+	          child->GetType (), 0);
+        CloneNode (child, child_clone);
+      }
+    }
+    to->SetValue (from->GetValue ());
+    CloneAttributes (from, to);
     return true;
   }
 
-  bool Processor::ConvertMeshfactOrObj (const char* name, iDocumentNode* from, 
+  bool Processor::ConvertMeshfactOrObj (iSector* sector, 
+                                        const char* meshName, 
+                                        iDocumentNode* from, 
                                         iDocumentNode* to,
-                                        iDocumentNode* sectorNode, 
+                                        iDocumentNode* sectorNode,
                                         bool factory)
   {
     if (factory)
-      return converter->ConvertMeshFact (from, to);
+      return converter->ConvertMeshFact (meshName, from, to);
     else
-      return converter->ConvertMeshObj (name, from, to, sectorNode);
+      return converter->ConvertMeshObj (sector, meshName, from, to, 
+        sectorNode, texturesNode);
   }
 
-  bool Processor::PreloadTexturesMaterials (iDocumentNode* from)
+  bool Processor::PreloadDependencies (iDocumentNode* from, bool shallow)
   {
     csRef<iDocument> newDoc = app->docSystem->CreateDocument ();
     csRef<iDocumentNode> newRoot = newDoc->CreateRoot();
@@ -341,9 +502,12 @@ namespace genmeshify
         csStringID token = xmltokens.Request(child->GetValue());
         switch (token)
         {
-          case XMLTOKEN_PLUGINS:
+          case XMLTOKEN_LIBRARY:
+            if (!shallow) break;
           case XMLTOKEN_TEXTURES:
           case XMLTOKEN_MATERIALS:
+          case XMLTOKEN_PLUGINS:
+          case XMLTOKEN_SETTINGS:
             {
               csRef<iDocumentNode> child_clone = 
                 to->CreateNodeBefore (child->GetType(), 0);
@@ -359,18 +523,33 @@ namespace genmeshify
 
   bool Processor::PreloadSectors (iDocumentNode* from)
   {
+    csRef<iDocument> newDoc = app->docSystem->CreateDocument ();
+    csRef<iDocumentNode> newRoot = newDoc->CreateRoot();
+
+    csRef<iDocumentNode> to = newRoot->CreateNodeBefore (from->GetType(), 0);
+    to->SetValue (from->GetValue());
+    CloneAttributes (from, to);
+
     // Needed so portals are written out properly
     csRef<iDocumentNodeIterator> sectorIt = from->GetNodes ("sector");
     while (sectorIt->HasNext ())
     {
       csRef<iDocumentNode> child = sectorIt->Next();
-      const char* name = child->GetAttributeValue ("name");
-      if (name)
+      csRef<iDocumentNode> child_clone = 
+        to->CreateNodeBefore (child->GetType(), 0);
+      child_clone->SetValue (child->GetValue ());
+      CloneAttributes (child, child_clone);
+
+      csRef<iDocumentNodeIterator> lightIt = child->GetNodes ("light");
+      while (lightIt->HasNext())
       {
-        iSector* sector = app->engine->CreateSector (name); 
-        region->QueryObject()->ObjAdd (sector->QueryObject());
+        csRef<iDocumentNode> light = lightIt->Next();
+        csRef<iDocumentNode> light_clone = 
+          child_clone->CreateNodeBefore (light->GetType(), 0);
+        CloneNode (light, light_clone);
       }
     }
-    return true;
+
+    return app->loader->LoadMap (to, false, region, false);
   }
 }

@@ -59,12 +59,12 @@
     <?_CgShareBuffer $TYPE$ $SVAR$ $CGNAME$ ": $SEM$" ?>
   <?Endtemplate?>
   
-  <?Template _CgShareV2F TYPE CGNAME COND?>
+  <?Template _CgShareV2F TYPE CGNAME COND SEM?>
     <?Template _v2f_$CGNAME$?>
       <?if $COND$?>
       #ifndef _resshared_cgv2f_$CGNAME$
       #define _resshared_cgv2f_$CGNAME$
-      $TYPE$ local_$CGNAME$;
+      $TYPE$ local_$CGNAME$ $SEM$;
       #endif
       <?endif?>
     <?Endtemplate?>
@@ -95,10 +95,16 @@
   <?Template CgShareV2F TYPE CGNAME ?>
     <?_CgShareV2F "$TYPE$" "$CGNAME$" consts.true?>
   <?Endtemplate?>
+  <?Template CgShareV2FSem TYPE CGNAME SEM?>
+    <?_CgShareV2F "$TYPE$" "$CGNAME$" consts.true ": $SEM$"?>
+  <?Endtemplate?>
   <?! Share vertex-to-fragment data, when the condition COND is true, 
       accessible by a variable CGNAME of type TYPE. ?>
   <?Template CgShareV2FCond TYPE CGNAME COND ?>
     <?_CgShareV2F "$TYPE$" "$CGNAME$" $COND$?>
+  <?Endtemplate?>
+  <?Template CgShareV2FCondSem TYPE CGNAME COND SEM ?>
+    <?_CgShareV2F "$TYPE$" "$CGNAME$" $COND$ ": $SEM$"?>
   <?Endtemplate?>
 
   <?! Set the vertex program function ?>
@@ -179,11 +185,16 @@
       <?CgShareV2FCond $TYPE$ $CGNAME$ $$COND$$?>
     <?Endtemplate?>
   <?Endtemplate?>
+  <?Template CgAddSharedV2FSem FEATURE TYPE CGNAME SEM?>
+    <?Template _CgUseShared_$FEATURE$ COND?>
+      <?CgShareV2FCondSem $TYPE$ $CGNAME$ $$COND$$ $SEM$?>
+    <?Endtemplate?>
+  <?Endtemplate?>
   
   <?! Some default "features" - buffers and vertex-to-fragment, named for 
       easier use ?>
   <?CgAddSharedBufferSem primaryColor "varying float4" "primary color" primaryColor COLOR?>
-  <?CgAddSharedV2F primaryColorV2F float4 primaryColor ?>
+  <?CgAddSharedV2FSem primaryColorV2F float4 primaryColor COLOR?>
   
   <?CgAddSharedBuffer texCoord "varying float2" "texture coordinate" texCoord?>
   <?CgAddSharedV2F texCoordV2F float2 texCoord?>

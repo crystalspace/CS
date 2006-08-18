@@ -21,7 +21,7 @@
 #include "iengine/camera.h"
 #include "csgeom/math.h"
 #include "csgfx/imagemanipulate.h"
-#include "csgfx/memimage.h"
+#include "csgfx/imagememory.h"
 #include "cstool/csview.h"
 
 #include "cstool/uberscreenshot.h"

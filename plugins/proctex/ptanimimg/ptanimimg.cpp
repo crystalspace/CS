@@ -40,6 +40,9 @@
 
 CS_IMPLEMENT_PLUGIN
 
+CS_PLUGIN_NAMESPACE_BEGIN(PTAnimImg)
+{
+
 SCF_IMPLEMENT_FACTORY(csAnimateProctexLoader)
 
 
@@ -121,8 +124,8 @@ csPtr<iBase> csAnimateProctexLoader::Parse (iDocumentNode* node,
     if (!G3D) return 0;
     csRef<iTextureManager> tm = G3D->GetTextureManager();
     if (!tm) return 0;
-    csRef<iTextureHandle> TexHandle (tm->RegisterTexture (ctx->GetImage(), 
-      ctx->HasFlags() ? ctx->GetFlags() : CS_TEXTURE_3D));
+    int texFlags = (ctx && ctx->HasFlags()) ? ctx->GetFlags() : CS_TEXTURE_3D;
+    csRef<iTextureHandle> TexHandle (tm->RegisterTexture (img, texFlags));
     if (!TexHandle) return 0;
 
     pt->GetTextureWrapper()->SetTextureHandle (TexHandle);
@@ -162,3 +165,6 @@ void csAnimateProctexLoader::Report (int severity, iDocumentNode* node,
   va_end (arg);
 }
 
+
+}
+CS_PLUGIN_NAMESPACE_END(PTAnimImg)

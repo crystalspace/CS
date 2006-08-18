@@ -685,11 +685,19 @@ bool csSaver::SaveMeshFactories(iMeshFactoryList* factList,
     if (parentfact)
     {
       csReversibleTransform rt = meshfactwrap->GetTransform ();
-      csRef<iDocumentNode> move = CreateNode (factNode, "move");
+      csRef<iDocumentNode> move;
       csMatrix3 t2o = rt.GetT2O ();
       csVector3 t2ot = rt.GetT2OTranslation ();
-      synldr->WriteMatrix (CreateNode (move, "matrix"), t2o);
-      synldr->WriteVector (CreateNode (move, "v"), t2ot);
+      if (!t2o.IsIdentity()) 
+      {
+        move = CreateNode (factNode, "move");
+        synldr->WriteMatrix (CreateNode (move, "matrix"), t2o);
+      }
+      if (!t2ot.IsZero()) 
+      {
+        if (!move.IsValid()) move = CreateNode (factNode, "move");
+        synldr->WriteVector (CreateNode (move, "v"), t2ot);
+      }
 
       // LBD: LOD level
     }
@@ -1013,6 +1021,68 @@ bool csSaver::SavePortal (iPortal *portal, iDocumentNode *parent)
     const char* name = sector->QueryObject()->GetName();
     if (name && *name)
       sectorNode->CreateNodeBefore(CS_NODE_TEXT)->SetValue(name);
+  }
+
+  csRef<iDocumentNode> newNode;
+  const csFlags& portalFlags = portal->GetFlags();
+  if (portalFlags.Check (CS_PORTAL_CLIPDEST))
+  {
+    CreateNode (portalNode, "clip");
+  }
+  if (portalFlags.Check (CS_PORTAL_CLIPSTRADDLING))
+  {
+    CreateNode (portalNode, "clipstraddling");
+  }
+  if (portalFlags.Check (CS_PORTAL_ZFILL))
+  {
+    CreateNode (portalNode, "zfill");
+  }
+  if (portalFlags.Check (CS_PORTAL_STATICDEST))
+  {
+    CreateNode (portalNode, "static");
+  }
+  if (portalFlags.Check (CS_PORTAL_FLOAT))
+  {
+    CreateNode (portalNode, "float");
+  }
+  if (portalFlags.Check (CS_PORTAL_COLLDET))
+  {
+    CreateNode (portalNode, "colldet");
+  }
+  if (portalFlags.Check (CS_PORTAL_VISCULL))
+  {
+    CreateNode (portalNode, "viscull");
+  }
+  if (portalFlags.Check (CS_PORTAL_WARP))
+  {
+    if (portalFlags.Check (CS_PORTAL_MIRROR))
+    {
+      CreateNode (portalNode, "mirror");
+    }
+    else
+    {
+      /* csPortal does:
+       *  warp_obj = 
+       *    csTransform (m_w.GetInverse (), v_w_after - m_w * v_w_before);
+       * We need to get m_w, v_w_after and v_w_before back from the warp TF.
+       */
+      const csReversibleTransform& warp = portal->GetWarp();
+      // reverse of other2thise -> this2other
+      const csMatrix3& m_w = warp.GetT2O();
+      // This...
+      const csVector3 v_w_before (0, 0, 0);
+      // ...makes v_w_after simple to obtain
+      const csVector3& v_w_after = warp.GetO2TTranslation();
+
+      newNode = CreateNode (portalNode, "matrix");
+      synldr->WriteMatrix (newNode, m_w);
+
+      newNode = CreateNode (portalNode, "wv");
+      synldr->WriteVector (newNode, v_w_before);
+
+      newNode = CreateNode (portalNode, "ww");
+      synldr->WriteVector (newNode, v_w_after);
+    }
   }
 
   return true;

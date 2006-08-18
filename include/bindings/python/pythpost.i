@@ -18,7 +18,7 @@
 
 /*
   Python specific stuff for SWIG interface in post-include phase.
-  See include/ivaria/cspace.i
+  See include/bindings/cspace.i
 */
 
 #ifdef SWIGPYTHON
@@ -53,7 +53,7 @@
 %pythoncode %{
   def CS_REQUEST_PLUGIN (name, intf):
     return (name, intf.__name__, cvar.iSCF_SCF.GetInterfaceID(intf.__name__),
-      eval('%s_scfGetVersion()' % intf.__name__, locals(), globals()))
+      intf.scfGetVersion())
 
   def CS_REQUEST_VFS ():
     return CS_REQUEST_PLUGIN("crystalspace.kernel.vfs", iVFS)
@@ -271,6 +271,6 @@ PyObject* csWrapTypedObject(void* objectptr, const char *typetag,
 
 %}
 
-%include "ivaria/pythvarg.i"
+%include "bindings/python/pythvarg.i"
 
 #endif // SWIGPYTHON

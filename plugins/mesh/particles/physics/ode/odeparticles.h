@@ -41,6 +41,7 @@ class csODEParticlePhysics :
   csRef<iDynamics> dyn;
   csRef<iVirtualClock> clock;
   csRef<iODEDynamicState> odestate;
+  csRef<iEventHandler> weakEventHandler;
 
   struct SortableBody
   {

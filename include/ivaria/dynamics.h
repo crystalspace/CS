@@ -290,7 +290,7 @@ struct iDynamicsMoveCallback : public virtual iBase
   virtual void Execute (csOrthoTransform& t) = 0;
 };
 
-SCF_VERSION (iDynamicsCollisionCallback, 0, 0, 1);
+SCF_VERSION (iDynamicsCollisionCallback, 0, 0, 2);
 
 /**
  * This is the interface for attaching a collider callback to the body
@@ -304,7 +304,14 @@ SCF_VERSION (iDynamicsCollisionCallback, 0, 0, 1);
  */
 struct iDynamicsCollisionCallback : public iBase
 {
-  virtual void Execute (iRigidBody *thisbody, iRigidBody *otherbody) = 0;
+  /**
+   * A collision occured.
+   * \param pos is the position on which the collision occured.
+   * \param normal is the collision normal.
+   * \param depth is the penetration depth.
+   */
+  virtual void Execute (iRigidBody *thisbody, iRigidBody *otherbody,
+      const csVector3& pos, const csVector3& normal, float depth) = 0;
 };
 
 SCF_VERSION (iBodyGroup, 0, 0, 1);
@@ -596,8 +603,14 @@ struct iRigidBody : public virtual iBase
    */
   virtual void SetCollisionCallback (iDynamicsCollisionCallback* cb) = 0;
 
-  /// If there's a collision callback with this body, execute it
-  virtual void Collision (iRigidBody *other) = 0;
+  /**
+   * If there's a collision callback with this body, execute it
+   * \param pos is the position on which the collision occured.
+   * \param normal is the collision normal.
+   * \param depth is the penetration depth.
+   */
+  virtual void Collision (iRigidBody *other, const csVector3& pos,
+      const csVector3& normal, float depth) = 0;
 
   /// Update transforms for mesh and/or bone
   virtual void Update () = 0;

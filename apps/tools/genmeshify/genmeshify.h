@@ -26,6 +26,7 @@ namespace genmeshify
 {
   class App : public csRefCount
   {
+    void CommandLineHelp();
   public:
     App (iObjectRegistry *objectRegistry);
     ~App ();
@@ -35,6 +36,7 @@ namespace genmeshify
 
     // Report an error/warning, always returns false
     bool Report (const char* msg, ...);
+    void Report (int severity, const char* msg, ...);
 
     // Parse the commandline and process any files specified
     bool ProcessFiles ();
@@ -48,6 +50,7 @@ namespace genmeshify
     csRef<iVFS> vfs;
     csRef<iSyntaxService> synsrv;
     csRef<iSaver> saver;
+    csRef<iStringSet> strings;
     iObjectRegistry *objectRegistry;
   };
 }

@@ -78,6 +78,12 @@ csShaderManager::~csShaderManager()
 {
   //clear all shaders
   shaders.DeleteAll ();
+  if (weakEventHandler)
+  {
+    csRef<iEventQueue> q = CS_QUERY_REGISTRY (objectreg, iEventQueue);
+    if (q)
+      RemoveWeakListener (q, weakEventHandler);
+  }
 }
 
 void csShaderManager::Report (int severity, const char* msg, ...)
@@ -115,7 +121,7 @@ bool csShaderManager::Initialize(iObjectRegistry *objreg)
   {
     csEventID events[] = { PreProcess, SystemOpen, SystemClose, 
 			    CS_EVENTLIST_END };
-    q->RegisterListener (this, events);
+    RegisterWeakListener (q, this, events, weakEventHandler);
   }
 
   csRef<iPluginManager> plugin_mgr = CS_QUERY_REGISTRY  (objectreg,

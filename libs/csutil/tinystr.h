@@ -22,7 +22,6 @@ must not be misrepresented as being the original software.
 distribution.
 */
 
-#include "tinywrap.h"
 #include "tinyxml.h"
 
 
@@ -34,6 +33,9 @@ distribution.
 #endif
 
 #include <assert.h>
+
+namespace CS
+{
 
 /*
  TiXmlString is an emulation of the std::string template.
@@ -201,6 +203,8 @@ protected :
   void append (char single);
 
 } ;
+
+} // namespace CS
 
 #endif	// TIXML_STRING_INCLUDED
 

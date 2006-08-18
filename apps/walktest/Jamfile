@@ -30,6 +30,9 @@ WALKALL.PLUGINLIST =
   csparser
   cssynldr
   dynavis
+  particles
+  particlesldr
+  partphys_simple
   emit
   emitldr
   engine

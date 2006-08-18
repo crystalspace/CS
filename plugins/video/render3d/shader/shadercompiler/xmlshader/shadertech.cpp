@@ -524,8 +524,7 @@ bool csXMLShaderCompiler::LoadSVBlock (iDocumentNode *node,
   while (it->HasNext ())
   {
     csRef<iDocumentNode> var = it->Next ();
-    svVar.AttachNew (new csShaderVariable (
-      strings->Request(var->GetAttributeValue ("name"))));
+    svVar.AttachNew (new csShaderVariable);
 
     if (synldr->ParseShaderVar (var, *svVar))
       context->AddVariable(svVar);

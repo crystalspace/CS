@@ -34,11 +34,12 @@ namespace genmeshify
 #undef CS_TOKEN_ITEM_FILE 
 
     App* app;
-    csString filename;
     Converter* converter;
 
     csRef<iRegion> region;
     csRef<iLoaderContext> loaderContext;
+
+    csRef<iDocumentNode> texturesNode;
 
     csHash<csString, csString> plugins;
     const char* GetPluginClassID (const char* name) const
@@ -48,25 +49,35 @@ namespace genmeshify
       return name;
     }
 
+    static csRef<iFile> OpenPath (App* app, const char* path, 
+                                  csString& fileNameToOpen);
+
     /// Clone a node and children.
     void CloneNode (iDocumentNode* from, iDocumentNode* to);
     /// Clone attributes.
     void CloneAttributes (iDocumentNode* from, iDocumentNode* to);
-    bool ProcessWorld (iDocumentNode* from, iDocumentNode* to);
+    bool ProcessWorld (iDocumentNode* from, iDocumentNode* to, 
+      bool shallow, bool nested);
     bool ProcessPlugins (iDocumentNode* from, iDocumentNode* to);
     bool ProcessSector (iDocumentNode* from, iDocumentNode* to);
-    bool ProcessMeshfactOrObj (iDocumentNode* from, iDocumentNode* to,
-      iDocumentNode* sectorNode, bool factory);
-    bool ConvertMeshfactOrObj (const char* name, iDocumentNode* from, 
+    bool ProcessMeshfactOrObj (iSector* sector, iDocumentNode* from, 
       iDocumentNode* to, iDocumentNode* sectorNode, bool factory);
+    bool ConvertMeshfactOrObj (iSector* sector, const char* meshName, 
+      iDocumentNode* from, iDocumentNode* to, iDocumentNode* sectorNode,
+      bool factory);
 
-    bool PreloadTexturesMaterials (iDocumentNode* from);
+    /**
+     * Load stuff that the loaded mesh factories may depend on: 
+     * textures, materials, settings and libs (if shallow == true).
+     */
+    bool PreloadDependencies (iDocumentNode* from, bool shallow);
     bool PreloadSectors (iDocumentNode* from);
   public:
-    Processor (App* app, const char* filename);
+    Processor (App* app);
     ~Processor ();
 
-    bool Process ();
+    static bool Preload (App* app, const csStringArray& paths);
+    bool Process (const char* filename, bool shallow, bool nested = false);
   };
 }
 

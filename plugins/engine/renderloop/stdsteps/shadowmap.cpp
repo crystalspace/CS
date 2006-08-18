@@ -51,7 +51,7 @@
 #include "igraphic/image.h"
 #include "ivideo/txtmgr.h"
 #include <iutil/object.h>
-#include "csgfx/memimage.h"
+#include "csgfx/imagememory.h"
 
 #include "shadowmap.h"
 

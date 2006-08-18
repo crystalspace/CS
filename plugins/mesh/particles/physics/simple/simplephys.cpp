@@ -43,6 +43,12 @@ csParticlesPhysicsSimple::csParticlesPhysicsSimple (iBase *p) :
 
 csParticlesPhysicsSimple::~csParticlesPhysicsSimple ()
 {
+  if (weakEventHandler)
+  {
+    csRef<iEventQueue> q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+    if (q)
+      RemoveWeakListener (q, weakEventHandler);
+  }
 }
 
 bool csParticlesPhysicsSimple::Initialize (iObjectRegistry* reg)
@@ -52,7 +58,7 @@ bool csParticlesPhysicsSimple::Initialize (iObjectRegistry* reg)
   PreProcess = csevPreProcess (object_reg);
   csRef<iEventQueue> eq (CS_QUERY_REGISTRY (object_reg, iEventQueue));
   if (eq == 0) return false;
-  eq->RegisterListener (this, PreProcess);
+  RegisterWeakListener (eq, this, PreProcess, weakEventHandler);
 
   vclock = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
   leftover_time = 0;

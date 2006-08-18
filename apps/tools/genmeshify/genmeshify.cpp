@@ -43,6 +43,10 @@ namespace genmeshify
 
     // Get plugins
     if (!csInitializer::RequestPlugins (objectRegistry,
+            CS_REQUEST_PLUGIN("crystalspace.documentsystem.multiplexer", 
+              iDocumentSystem),
+            CS_REQUEST_PLUGIN_TAG("crystalspace.documentsystem.tinyxml", 
+              iDocumentSystem, "iDocumentSystem.1"),
             CS_REQUEST_ENGINE,
             CS_REQUEST_IMAGELOADER,
             CS_REQUEST_LEVELLOADER,
@@ -54,7 +58,7 @@ namespace genmeshify
     // Check for commandline help.
     if (csCommandLineHelper::CheckHelp (objectRegistry))
     {
-      csCommandLineHelper::Help (objectRegistry);
+      CommandLineHelp();
       return true;
     }
 
@@ -79,12 +83,21 @@ namespace genmeshify
     vfs = csQueryRegistry<iVFS> (objectRegistry);
     if (!vfs) return Report ("No iVFS!");
 
+    strings = csQueryRegistryTagInterface<iStringSet> (
+      objectRegistry, "crystalspace.shared.stringset");
+    if (!strings) return Report ("No shared string set!");
+
     // Open the systems
     if (!csInitializer::OpenApplication (objectRegistry))
       return Report ("Error opening system!");
 
     // For now, force the use of TinyXML to be able to write
-    docSystem.AttachNew (new csTinyDocumentSystem);
+    docSystem = csQueryRegistry<iDocumentSystem> (objectRegistry);
+    if (!vfs) 
+    {
+      Report ("No iDocumentSystem!");
+      return false;
+    }
 
     return true;
   }
@@ -99,11 +112,32 @@ namespace genmeshify
     return false;
   }
 
+  void App::Report (int severity, const char* msg, ...)
+  {
+    va_list arg;
+    va_start (arg, msg);
+    csReportV (objectRegistry, severity, 
+        "crystalspace.application.genmeshify", msg, arg);
+    va_end (arg);
+  }
+
   bool App::ProcessFiles ()
   {
     //Parse cmd-line
     csRef<iCommandLineParser> cmdline = csQueryRegistry<iCommandLineParser>
       (objectRegistry);
+
+    csStringArray preload;
+    size_t preloadIndex = 0;
+    const char* preloadName = cmdline->GetOption ("preload", preloadIndex++);
+    while (preloadName != 0)
+    {
+      preload.Push (preloadName);
+      preloadName = cmdline->GetOption ("preload", preloadIndex++);
+    }
+    if (!Processor::Preload (this, preload)) return false;
+
+    bool shallow = cmdline->GetBoolOption ("shallow");
 
     int cmd_idx = 0;
     int map_idx = 0;
@@ -115,16 +149,37 @@ namespace genmeshify
         if (map_idx > 0)
           break;
         else
-          return Report ("Please specify a level (either zip or VFS dir)!");
+        {
+          CommandLineHelp();
+          return false;
+        }
       }
 
       map_idx++;
-
-      Processor processor (this, val);
-      if (!processor.Process ()) return false;
-      //scene->AddFile (val);
+      Processor processor (this);
+      if (!processor.Process (val, shallow)) return false;
     }
+
     return true;
+  }
+
+  void App::CommandLineHelp()
+  {
+    csPrintf ("Syntax:\n");
+    csPrintf ("  genmeshify {-preload=Map} {-preload=Map} ... {-shallow} "
+      "[Map] [Map] ...\n");
+    csPrintf ("\n");
+    csPrintf ("'Map' can be the name of a level, a VFS directory with "
+      "a \"world\" file,.\n");
+    csPrintf ("or the name of a filename of a world or library.\n");
+    csPrintf ("\n");
+    csPrintf ("One or more of the above can also be preloaded before the "
+      "actual conversion\n");
+    csPrintf ("(useful to e.g. preload libraries with textures used by the "
+      "map).\n");
+    csPrintf ("\n");
+    csPrintf ("\"-shallow\" disables conversion of nested referenced "
+      "libraries.\n");
   }
 
 }

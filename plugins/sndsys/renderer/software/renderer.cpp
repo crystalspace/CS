@@ -88,6 +88,12 @@ csSndSysRendererSoftware::csSndSysRendererSoftware(iBase* pParent) :
 csSndSysRendererSoftware::~csSndSysRendererSoftware()
 {
   RecordEvent(SSEL_DEBUG, "Sound system destructing.");
+  if (weakEventHandler)
+  {
+    csRef<iEventQueue> q = CS_QUERY_REGISTRY (m_pObjectRegistry, iEventQueue);
+    if (q)
+      RemoveWeakListener (q, weakEventHandler);
+  }
 
   delete[] m_pSampleBuffer;
   delete m_pSoundCompressor;
@@ -328,7 +334,7 @@ bool csSndSysRendererSoftware::Initialize (iObjectRegistry *obj_reg)
   evFrame = csevFrame(m_pObjectRegistry);
   if (q != 0) {
     csEventID subEvents[] = { evSystemOpen, evSystemClose, evFrame, CS_EVENTLIST_END };
-    q->RegisterListener(this, subEvents);
+    RegisterWeakListener(q, this, subEvents, weakEventHandler);
   }
 
   return true;
