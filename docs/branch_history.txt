@@ -11,6 +11,7 @@ This file describes the history of the SoC imposter branch.
 19-Aug-2006
 	- Fossi made various optimizations
 	- Fossi updated opentree mesh and testlevel
+	- Fossi added plugin and regenerated msvc files
 15-Aug-2006
 	- Fossi commited working version
 	- Fossi removes accidentially commited testlevel cache

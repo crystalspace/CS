@@ -1,8 +1,12 @@
 SubDir TOP plugins mesh opentree persist standard ;
 
+if $(OTL.AVAILABLE) = "yes"
+{
 Description opentreeldr : "OpenTree loader" ;
 Plugin opentreeldr : [ Wildcard *.cpp *.h ] ;
 Includes opentreeldr.h : $(TOP)/plugins/mesh/opentree/opentree_factory.tok ;
 Includes opentreeldr.h : $(SUBDIR)/opentree_meshobject.tok ;
 LinkWith opentreeldr : crystalspace ;
 CompileGroups opentreeldr : meshes ;
+}
+
