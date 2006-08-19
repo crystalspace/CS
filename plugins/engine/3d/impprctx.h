@@ -44,6 +44,9 @@ private:
   //imposter texture size
   int w, h;
 
+  //clipper for r2t
+  iClipper2D *clip;
+
   //cached csStringID values
   csStringID stringid_standard;
   csStringID stringid_light_ambient;

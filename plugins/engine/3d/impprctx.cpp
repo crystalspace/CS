@@ -56,13 +56,8 @@ csImposterProcTex::csImposterProcTex  (csEngine* engine,
 
   //initialize shortcuts
   g3d = engine->G3D;
-  g2d = csQueryRegistry<iGraphics2D>(engine->objectRegistry);
+  g2d = g3d->GetDriver2D ();
   
-  //@@@ remove?
-  engine->imposterUpdateList.Push(
-    csWeakRef<csImposterProcTex>(this));
-
-  //@@@ replace proctex initialize!
   csRef<iImage> thisImage = new csImageMemory (w, h,
     CS_IMGFMT_ALPHA && CS_IMGFMT_TRUECOLOR );
   tex = engine->GetTextureList ()->NewTexture (thisImage);
@@ -72,35 +67,38 @@ csImposterProcTex::csImposterProcTex  (csEngine* engine,
   csRef<iStringSet> stringSet = engine->globalStringSet;
   stringid_standard = stringSet->Request("standard");
   stringid_light_ambient = stringSet->Request("light ambient");
+
+  clip = new csBoxClipper (0, 0, w, h);
 }
 
 csImposterProcTex::~csImposterProcTex ()
 {
+  delete clip;
 }
 
 void csImposterProcTex::Animate (iRenderView *rview, iSector *s)
 {
-  printf("updating imposter... ");
-  csRef<iTextureHandle> handle = tex->GetTextureHandle ();
+  //printf("updating imposter... ");
   if (!mesh) return;
 
+  csRef<iTextureHandle> handle = tex->GetTextureHandle ();
   g3d->SetRenderTarget (handle);
 
-  csRef<iMeshWrapper> originalmesh = mesh->GetParent ();
+  csRef<iMeshWrapper> originalmesh = mesh->parent_mesh;
 
   g3d->BeginDraw (CSDRAW_3DGRAPHICS | engine->GetBeginDrawFlags ()
     | CSDRAW_CLEARZBUFFER);
   
-  g3d->GetDriver2D ()->Clear (
-    g3d->GetDriver2D ()->FindRGB (0, 0, 0, 0));
+  g2d->Clear (g2d->FindRGB (0, 0, 0, 0));
  
-  int num;
   csRef<iMeshObject> meshobj = originalmesh->GetMeshObject ();
 
+  //Calculate camera position for imposter rendering
   iMovable* movable = originalmesh->GetMovable ();
   csVector3 mesh_pos = movable->GetFullPosition ();
 
   iCamera* cam = rview->GetCamera ();
+  mesh->FindImposterRectangle (cam);
 
   const csOrthoTransform camt = cam->GetTransform ();
   int persx, persy;
@@ -108,49 +106,50 @@ void csImposterProcTex::Animate (iRenderView *rview, iSector *s)
   int oldFOV = cam->GetFOV ();
 
   const csVector3& cam_pos = cam->GetTransform ().GetOrigin ();
-  cam->GetTransform ().LookAt(mesh_pos-cam_pos, csVector3(0,1,0));
+  csVector3 camdir = mesh_pos-cam_pos;
 
-//@@@ ask imposter
-csScreenBoxResult res = originalmesh->GetScreenBoundingBox (cam);
-float width = (res.sbox.GetCorner(2) - res.sbox.GetCorner(0)).x;
-float height = (res.sbox.GetCorner(1) - res.sbox.GetCorner(0)).y;
+  cam->GetTransform ().LookAt (camdir, csVector3 (0,1,0));
 
-  csVector3 camdir = cam_pos-mesh_pos;
-
-  float maxratio = csMax(
-    width/engine->frameWidth,
-    height/engine->frameHeight);
+  float maxratio = csMax (
+    mesh->width/engine->frameWidth,
+    mesh->height/engine->frameHeight);
   
-  csVector3 new_cam_pos = mesh_pos + maxratio * camdir;
+  csVector3 new_cam_pos = mesh_pos - maxratio * camdir;
   cam->GetTransform ().SetOrigin (new_cam_pos);
 
-//printf("maxratio: %f\n", maxratio);
-//printf("camdir: %f\n", camdir.Norm());
-//printf("newpos: %f\n", new_cam_pos.Norm());
+  //Setup rendering
+  g3d->SetPerspectiveCenter (w/2, w/2);
+  g3d->SetClipper (clip, CS_CLIPPER_TOPLEVEL);
+  cam->SetFOV (w, h);
+  g3d->SetPerspectiveAspect (cam->GetFOV ());
+  g3d->SetWorldToCamera (cam->GetTransform ().GetInverse ());
 
-
+  int num;
   csRenderMesh** rendermeshes = meshobj->GetRenderMeshes (num, rview, 
     originalmesh->GetMovable (), ~0);
 
+  if (num != 1)
+  {
+	  engine->Warn("Only one Rendermesh supported by imposters!");
+  }
+
+  //@@@ Add support for no/multiple rendermeshes
   csRenderMesh* rendermesh = rendermeshes[0];
   csRenderMeshModes mode (*rendermesh);
   csShaderVarStack sva;
-
-  g3d->SetPerspectiveCenter (w/2, w/2);
-  cam->SetFOV (w, h);
-  iClipper2D* clip = new csBoxClipper (0, 0, w, h);
-  g3d->SetClipper (clip, CS_CLIPPER_TOPLEVEL);
-  g3d->SetPerspectiveAspect (cam->GetFOV ());
-
-  g3d->SetWorldToCamera (cam->GetTransform ().GetInverse ());
 
   iMaterial* hdl = rendermesh->material->GetMaterial ();
   iShader* meshShader = hdl->GetShader (stringid_standard);
 
   if (meshShader == 0)
   {
-  // printf("No 'standard' Shader!\n");
-   meshShader = engine->defaultShader;
+    static bool defaultshaderused = 0;
+    if (!defaultshaderused)
+	{
+      defaultshaderused = 1;
+      engine->Warn("No 'standard' Shader! Using default.");
+	}
+    meshShader = engine->defaultShader;
   }
 
   csShaderVariableContext svc;
@@ -160,7 +159,7 @@ float height = (res.sbox.GetCorner(1) - res.sbox.GetCorner(0)).y;
   sv = svc.GetVariableAdd(stringid_light_ambient);
   csColor ambient;
   engine->GetAmbientLight (ambient);
-  sv->SetValue (ambient + s->GetDynamicAmbientLight());
+  if (s) sv->SetValue (ambient + s->GetDynamicAmbientLight());
   svc.PushVariables (sva);
 
   if (rendermesh->variablecontext)
@@ -180,15 +179,12 @@ float height = (res.sbox.GetCorner(1) - res.sbox.GetCorner(0)).y;
     meshShader->DeactivatePass (shaderTicket);
   }
 
-//printf("rendered ");
-
   //restore old camera values
   g3d->SetPerspectiveCenter (persx, persy);
   cam->SetFOV (oldFOV, engine->frameHeight);
   cam->SetTransform (camt);
 
   //printf("updating mesh... ");
-  mesh->FindImposterRectangle (cam);
   mesh->SetImposterReady (true);
 
 /*
@@ -203,6 +199,6 @@ float height = (res.sbox.GetCorner(1) - res.sbox.GetCorner(0)).y;
 */
 
   g3d->FinishDraw ();
-  printf("done\n");
+  //printf("done\n");
 }
 

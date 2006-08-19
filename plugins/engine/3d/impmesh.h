@@ -52,8 +52,14 @@ private:
   //rendermeshholder for this mesh
   csRenderMeshHolder rmHolder;
 
+  //flag that indices have been updated
+  bool dirty;
+
   //current height and width of the billboard
   float height, width;
+
+  //imposter material
+  iMaterialWrapper *impostermat;
 
   //direction the imposter is facing in world coordinates
   csVector3 imposterDir;
@@ -61,23 +67,25 @@ private:
   //convenience shortcut
   csEngine *engine;
 
+  void FindImposterRectangle (const iCamera *camera);
+  void SetImposterReady (bool r);
+
+  friend class csImposterProcTex;
+
 public:
   csImposterMesh (csEngine* engine, csMeshWrapper *parent);
+  ~csImposterMesh ();
 
   float CalcIncidenceAngleDist (iRenderView *rview);
   bool CheckIncidenceAngle (iRenderView *rview,float tolerance);
-  void FindImposterRectangle (const iCamera *camera);
 
   //returns the imposter billboard
   csRenderMesh** GetRenderMesh (iRenderView *rview);
 
   bool GetImposterReady () { return ready; }
-  void SetImposterReady (bool r);
 
   void SetIncidenceDist (float d) { incidence_dist=d; }
   float GetIncidenceDist () { return incidence_dist;  }
-
-  csMeshWrapper *GetParent () { return parent_mesh; }
 };
 
 #endif // __CS_IMPMESH_H__

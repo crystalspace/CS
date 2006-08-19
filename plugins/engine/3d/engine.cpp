@@ -1667,13 +1667,9 @@ void csEngine::StartDraw (iCamera *c, iClipper2D* view, csRenderView &rview)
   G3D->FinishDraw();
 
   //update if camera is in a sector
-  iSector *s = c->GetSector ();
-  if (s)
+  while (it.HasNext ())
   {
-    while (it.HasNext ())
-    {
-      it.Next ()->Animate(&rview, s);
-    }
+    it.Next ()->Animate(&rview, c->GetSector ());
   }
 
   //all updates done, empty list for next frame

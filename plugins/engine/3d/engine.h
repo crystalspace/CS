@@ -58,6 +58,8 @@
 #include "plugins/engine/3d/renderloop.h"
 #include "plugins/engine/3d/rview.h"
 #include "plugins/engine/3d/sharevar.h"
+#include "include\csutil\weakrefarr.h"
+#include "plugins/engine/3d/impprctx.h"
 
 class csCamera;
 class csEngine;
@@ -657,6 +659,11 @@ public:
   {
     return renderLoopManager;
   }
+
+  /**
+   * @@@ comment me
+   */
+  csWeakRefArray<csImposterProcTex> ImposterList;
 
 private:
   // -- PRIVATE METHODS
