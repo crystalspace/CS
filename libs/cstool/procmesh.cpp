@@ -32,9 +32,6 @@
 #include "iengine/mesh.h"
 #include "iengine/camera.h"
 
-#include "igraphic/image.h"
-#include "cstool/debugimagewriter.h"
-
 csMeshOnTexture::csMeshOnTexture (iObjectRegistry* object_reg)
 {
   engine = csQueryRegistry<iEngine> (object_reg);
@@ -130,18 +127,6 @@ bool csMeshOnTexture::Render (iMeshWrapper* mesh, iTextureHandle* handle,
                              color
   );
   view->Draw (mesh);
-
-    iGraphics2D* g2d = g3d->GetDriver2D ();
-    csRef<iImage> shot = csPtr<iImage> (g2d->ScreenShot ());
-    if (shot)
-    {
-        csString filename;
-        filename = "/tmp/";
-        filename += rand();
-        filename += ".png";
-        csDebugImageWriter a;
-        a.DebugImageWrite(shot, filename);
-    }
 
   g3d->FinishDraw ();
 

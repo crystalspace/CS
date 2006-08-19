@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<!-- opentreeldr.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.mesh.loader.factory.opentree</name>
+        <implementation>csOpenTreeFactoryLoader</implementation>
+        <description>Crystal Space OpenTree Factory Loader</description>
+      </class>
+      <class>
+        <name>crystalspace.mesh.loader.opentree</name>
+        <implementation>csOpenTreeMeshLoader</implementation>
+        <description>Crystal Space OpenTree Mesh Loader</description>
+      </class>
+      <!--class>
+        <name>crystalspace.mesh.saver.factory.protomesh</name>
+        <implementation>csProtoFactorySaver</implementation>
+        <description>Crystal Space Proto Mesh Factory Saver</description>
+      </class>
+      <class>
+        <name>crystalspace.mesh.saver.protomesh</name>
+        <implementation>csProtoMeshSaver</implementation>
+        <description>Crystal Space Proto Mesh Mesh Saver</description>
+      </class-->
+    </classes>
+  </scf>
+</plugin>

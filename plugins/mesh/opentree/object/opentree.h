@@ -150,6 +150,10 @@ private:
   csFlags flags;
   csRef<iMeshObjectType> proto_type;
 
+  //flag if mesh was generated
+  bool generated;
+
+  //data for this tree
   opentree::TreeData treedata;
 
   //use genmesh internally for now
@@ -157,6 +161,55 @@ private:
   csRef<iGeneralFactoryState> treefactstate;
   csRef<iMeshFactoryWrapper> leaffact;
   csRef<iGeneralFactoryState> leaffactstate;
+
+#if 0
+#define CS_TOKEN_ITEM_FILE \
+  "plugins/mesh/opentree/opentree_factory.tok"
+#include "cstool/tokenlist.h"
+#undef CS_TOKEN_ITEM_FILE
+#endif
+
+  //cached csStringIDs
+  csStringID string_ratiopower;
+  csStringID string_lobedepth;
+  csStringID string_basesize;
+  csStringID string_attractionup;
+  csStringID string_leafscalex;
+  csStringID string_scale;
+  csStringID string_scalev;
+  csStringID string_ratio;
+  csStringID string_leafquality;
+  csStringID string_flare;
+  csStringID string_leafscale;
+  csStringID string_leafbend;
+  csStringID string_leafdistrib;
+  csStringID string_prunewidth;
+  csStringID string_prunewidthpeak;
+  csStringID string_pruneratio;
+  csStringID string_prunepowerhigh;
+  csStringID string_prunepowerlow;
+  csStringID string_leaves;
+  csStringID string_shape;
+  csStringID string_lobes;
+  csStringID string_levels;
+  csStringID string_levelnumber;
+  csStringID string_basesplits;
+  csStringID string_branchdist;
+  csStringID string_downangle;
+  csStringID string_downanglev;
+  csStringID string_rotate;
+  csStringID string_rotatev;
+  csStringID string_length;
+  csStringID string_lengthv;
+  csStringID string_taper;
+  csStringID string_segsplits;
+  csStringID string_splitangle;
+  csStringID string_splitanglev;
+  csStringID string_curve;
+  csStringID string_curveback;
+  csStringID string_curvev;
+  csStringID string_branches;
+  csStringID string_curveres;
 
   friend class csOpenTreeObject;
 
@@ -170,9 +223,10 @@ public:
 
   /**\name iOpenTreeFactoryState implementation
    * @{ */
-  bool SetParam(csStringID, float);
-  bool SetParam(csStringID, int);
-  bool SetParam(csStringID, csString);
+  bool SetParam (char, csStringID, float);
+  bool SetParam (char, csStringID, int);
+  bool SetParam (char, csStringID, const char*);
+  void GenerateTree ();
   /** @} */
 
   /**\name iMeshObjectFactory implementation

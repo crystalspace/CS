@@ -14,6 +14,8 @@
     <plugin name="terrain">crystalspace.mesh.loader.terrain</plugin>
     <plugin name="spr3d">crystalspace.mesh.loader.sprite.3d</plugin>
     <plugin name="spr3dFact">crystalspace.mesh.loader.factory.sprite.3d</plugin>
+    <plugin name="opentree">crystalspace.mesh.loader.opentree</plugin>
+    <plugin name="opentreeFact">crystalspace.mesh.loader.factory.opentree</plugin>
 </plugins>
 
   <textures>
@@ -143,6 +145,11 @@
     <paramsfile>/lib/std/sprite3</paramsfile>
   </meshfact>
 
+  <meshfact name="treeFact">
+    <plugin>opentreeFact</plugin>
+    <paramsfile>/lev/terraini/quaking_aspen.xml</paramsfile>
+  </meshfact>
+
   <meshfact name="skydome">
     <plugin>genmeshFactory</plugin>
     <params>
@@ -189,6 +196,19 @@
         <v x="1" y="13" z="1" />
      </move>
      <imposter active="yes" range="Std Thing Range" tolerance="Std Thing Angle"/>
+   </meshobj>
+
+  <meshobj name="tree1">
+     <plugin>opentree</plugin>
+     <params>
+        <factory>treeFact</factory>
+        <material>Grass</material>
+     </params>
+     <move>
+        <v x="-1" y="13" z="-1" />
+     </move>
+     <zuse />
+     <!--imposter active="yes" range="Std Thing Range" tolerance="Std Thing Angle"/-->
    </meshobj>
 
     <meshobj name="Terrain">

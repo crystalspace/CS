@@ -39,28 +39,44 @@ CS_PLUGIN_NAMESPACE_BEGIN(OpenTree)
 
   class VertexHelper : public opentree::otVertices
   {
+  private:
+    csVector3* csverts;
+    csVector3* csnorms;
+    csVector2* csuvs;
+    csColor4* cscolors;
   public:
-    VertexHelper::VertexHelper() {};
+    VertexHelper::VertexHelper(iGeneralFactoryState *factstate)
+    {
+      csverts = factstate->GetVertices();
+      csnorms = factstate->GetNormals();
+      csuvs = factstate->GetTexels();
+      cscolors = factstate->GetColors();
+    };
     VertexHelper::~VertexHelper() {};
+
     void add(int index, float x, float y, float z, float nx, float ny,
       float nz, float r, float g, float b, float a, float u, float v)
-    { printf ("Vertex add\n"); } 
-
-/*
-  csVector3* csverts = treefactstate->GetVertices();
-  csVector3* csnorms = treefactstate->GetNormals();
-  csVector2* csuvs = treefactstate->GetTexels();
-     csverts[i].x = vertices[i].x;
-     csverts[i].y = vertices[i].y;
-     csverts[i].z = vertices[i].z;
-     csnorms[i].x = vertices[i].nx;
-     csnorms[i].y = vertices[i].ny;
-     csnorms[i].z = vertices[i].nz;
-     csuvs[i].x = vertices[i].u;
-     csuvs[i].y = vertices[i].v;
-*/
-
+    {
+       csverts[index].x = x;
+       csverts[index].y = y;
+       csverts[index].z = z;
+       csnorms[index].x = nx;
+       csnorms[index].y = ny;
+       csnorms[index].z = nz;
+       csuvs[index].x = u;
+       csuvs[index].y = v;
+       cscolors[index].Set(r, g, b, a);
+    };
   };
+
+
+
+
+
+
+
+
+
 
 //---------------------------------------------------------------------------
 
@@ -253,14 +269,27 @@ opentree::otTree* genTree(const char* file)
 }
 
 */
+//---------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
 
 csOpenTreeObject::csOpenTreeObject
   (csOpenTreeObjectFactory* factory) : scfImplementationType (this)
 {
+printf("constructor!\n");
   csOpenTreeObject::factory = factory;
   logparent = 0;
   material = 0;
-  MixMode = 0;
+//  MixMode = 0;
 
   csRef<iEngine> engine;
   engine = csQueryRegistry<iEngine>(factory->object_reg);
@@ -280,10 +309,9 @@ iMeshObjectFactory* csOpenTreeObject::GetFactory () const
 }
 
 csRenderMesh** csOpenTreeObject::GetRenderMeshes (int &n, iRenderView* 
-  rview, iMovable* movable, uint32 frustum_mask)
+  rview, iMovable* mov, uint32 frustum)
 {
-  printf("getRenderMeshes\n");
-  return 0;
+  return treemesh->GetMeshObject ()->GetRenderMeshes(n, rview, mov, frustum);
 }
 
 bool csOpenTreeObject::HitBeamOutline (const csVector3& start, 
@@ -308,8 +336,10 @@ iObjectModel* csOpenTreeObject::GetObjectModel ()
 
 bool csOpenTreeObject::SetMaterialWrapper (iMaterialWrapper* mat)
 {
+  //@@@
   material = mat;
-  return true;
+
+  return treemesh->GetMeshObject ()->SetMaterialWrapper(mat);
 }
 
 //----------------------------------------------------------------------
@@ -319,9 +349,9 @@ csOpenTreeObjectFactory::csOpenTreeObjectFactory (iMeshObjectType* pParent,
 {
   object_reg = obj_reg;
 
-  csRef<iEngine> engine;
-  engine = csQueryRegistry<iEngine>(object_reg);
+  csRef<iEngine> engine = csQueryRegistry<iEngine> (object_reg);
 
+  //@@@ fix names
   treefact = 
     engine->CreateMeshFactory ("crystalspace.mesh.object.genmesh", "fixme1357");
 
@@ -332,37 +362,54 @@ csOpenTreeObjectFactory::csOpenTreeObjectFactory (iMeshObjectType* pParent,
     engine->CreateMeshFactory ("crystalspace.mesh.object.genmesh", "fixme2468");
 
   leaffactstate = 
-    SCF_QUERY_INTERFACE (leaffact->GetMeshObjectFactory (), iGeneralFactoryState);
+    scfQueryInterface<iGeneralFactoryState> (leaffact->GetMeshObjectFactory ());
 
+  generated = false;
 
+  csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
+    object_reg, "crystalspace.shared.stringset", iStringSet);
 
-  opentree::TreeData params;
-  params.leafQuality = 0.1f;
+  string_ratiopower = strings->Request("RatioPower");
+  string_lobedepth = strings->Request("LobeDepth");
+  string_basesize = strings->Request("BaseSize");
+  string_attractionup = strings->Request("AttractionUp");
+  string_leafscalex = strings->Request("LeafScaleX");
+  string_scale = strings->Request("Scale");
+  string_scalev = strings->Request("ScaleV");
+  string_ratio = strings->Request("Ratio");
+  string_leafquality = strings->Request("LeafQuality");
+  string_flare = strings->Request("Flare");
+  string_leafscale = strings->Request("LeafScale");
+  string_leafbend = strings->Request("LeafBend");
+  string_leafdistrib = strings->Request("LeafDistrib");
+  string_prunewidth = strings->Request("PruneWidth");
+  string_prunewidthpeak = strings->Request("PruneWidthPeak");
+  string_pruneratio = strings->Request("PruneRatio");
+  string_prunepowerhigh = strings->Request("PrunePowerHigh");
+  string_prunepowerlow = strings->Request("PrunePowerLow");
+  string_leaves = strings->Request("Leaves");
+  string_shape = strings->Request("Shape");
+  string_lobes = strings->Request("Lobes");
+  string_levels = strings->Request("Levels");
+  string_levelnumber = strings->Request("LevelNumber");
+  string_basesplits = strings->Request("BaseSplits");
+  string_branchdist = strings->Request("BranchDist");
+  string_downangle = strings->Request("DownAngle");
+  string_downanglev = strings->Request("DownAngleV");
+  string_rotate = strings->Request("Rotate");
+  string_rotatev = strings->Request("RotateV");
+  string_length = strings->Request("Length");
+  string_lengthv = strings->Request("LengthV");
+  string_taper = strings->Request("Taper");
+  string_segsplits = strings->Request("SegSplits");
+  string_splitangle = strings->Request("SplitAngle");
+  string_splitanglev = strings->Request("SplitAngleV");
+  string_curve = strings->Request("Curve");
+  string_curveback = strings->Request("CurveBack");
+  string_curvev = strings->Request("CurveV");
+  string_branches = strings->Request("Branches");
+  string_curveres = strings->Request("CurveRes");
 
-  opentree::iWeber* gen = opentree::newWeber();
-  gen->setParams(params);
-
-  opentree::otTree* ottree = gen->generate();
-
-  opentree::MesherTree* tree = new opentree::MesherTree(ottree);
-
-  for (unsigned int i = 0; i < 4; i++)
-  {
-    tree->setCurveRes(i,6);
-    tree->setCircleRes(i,7);
-  }
-
-  tree->useQuadLeaves(); //TriangleLeaves();
-
-  int vertexCount = 0;
-  tree->getVerticesCount(0, &vertexCount);
-  opentree::otVertices* vertices = new VertexHelper ();
-  tree->getVertices(0, *vertices);
-
-  treefactstate->SetVertexCount(vertexCount);
-
-  //delete ottree;
-  delete gen;
 }
 
 csOpenTreeObjectFactory::~csOpenTreeObjectFactory ()
@@ -371,6 +418,9 @@ csOpenTreeObjectFactory::~csOpenTreeObjectFactory ()
 
 csPtr<iMeshObject> csOpenTreeObjectFactory::NewInstance ()
 {
+  printf("new Instance\n");
+  if (!generated) GenerateTree();
+
   csRef<csOpenTreeObject> cm;
   cm.AttachNew (new csOpenTreeObject (this));
 
@@ -393,22 +443,159 @@ void csOpenTreeObjectFactory::GetRadius (float&, csVector3&)
   printf("getRadius\n");
 }
 
-bool csOpenTreeObjectFactory::SetParam (csStringID, float)
+bool csOpenTreeObjectFactory::SetParam (char level, 
+  csStringID name, float value)
 {
-  printf("SetParam float\n");
-  return false;
+  if (level == -1) {
+
+  if (name == string_ratiopower) { treedata.ratioPower = value; } else
+  if (name == string_lobedepth) { treedata.lobeDepth = value; } else
+  if (name == string_basesize) { treedata.baseSize = value; } else
+  if (name == string_attractionup) { treedata.attractionUp = value; } else
+  if (name == string_leafscalex) { treedata.leafScaleX = value; } else
+  if (name == string_scale) { treedata.scale = value; } else
+  if (name == string_scalev) { treedata.scaleV = value; } else
+  if (name == string_ratio) { treedata.ratio = value; } else
+  if (name == string_leafquality) { treedata.leafQuality = value; } else
+  if (name == string_flare) { treedata.flare = value; } else
+  if (name == string_leafscale) { treedata.leafScale = value; } else
+  if (name == string_leafbend) { treedata.leafBend = value; } else
+  if (name == string_prunewidth) { treedata.pruneWidth = value; } else
+  if (name == string_prunewidthpeak) { treedata.pruneWidthPeak = value; } else
+  if (name == string_prunepowerlow) { treedata.prunePowerLow = value; } else
+  if (name == string_prunepowerhigh) { treedata.prunePowerHigh = value; } else
+  if (name == string_pruneratio) { treedata.pruneRatio = value; } else
+  {
+     printf("Wrong Parameter!\n");
+     return false;
+  }
+
+  } else {
+
+    opentree::Level *treelevel = &treedata.level[(int)level];
+
+    if (name == string_scale)
+    { 
+      if (level != 0) return false;
+      treedata.trunk.scale = value; 
+    } else 
+    if (name == string_scalev)
+    { 
+      if (level != 0) return false;
+      treedata.trunk.scaleV = value; 
+    } else 
+    if (name == string_basesplits)
+    { 
+      if (level != 0) return false;
+      treedata.trunk.baseSplits = value; 
+    } else 
+    if (name == string_branchdist)
+    { 
+      if (level != 0) return false;
+      treedata.trunk.dist = value; 
+      treedata.level[0].branchDist = value; 
+    } else 
+    if (name == string_downangle) { treelevel->downAngle = value; } else
+    if (name == string_downanglev) { treelevel->downAngleV = value; } else
+    if (name == string_rotate) { treelevel->rotate = value; } else
+    if (name == string_rotatev) { treelevel->rotateV = value; } else
+    if (name == string_length) { treelevel->length = value; } else
+    if (name == string_lengthv) { treelevel->lengthV = value; } else
+    if (name == string_taper) { treelevel->taper = value; } else
+    if (name == string_segsplits) { treelevel->segSplits = value; } else
+    if (name == string_splitangle) { treelevel->splitAngle = value; } else
+    if (name == string_splitanglev) { treelevel->splitAngleV = value; } else
+    if (name == string_curve) { treelevel->curve = value; } else
+    if (name == string_curveback) { treelevel->curveBack = value; } else
+    if (name == string_curvev) { treelevel->curveV = value; } else
+    {
+     printf("Wrong Parameter!\n");
+     return false;
+    }
+  }
+
+  return true;
 }
 
-bool csOpenTreeObjectFactory::SetParam (csStringID, int)
+bool csOpenTreeObjectFactory::SetParam (char level,
+  csStringID name, int value)
 {
-  printf("SetParam int\n");
-  return false;
+  if (level == -1) {
+
+    if (name == string_shape) { treedata.shape = value; } else
+    if (name == string_levels) { treedata.levels = value; } else
+    if (name == string_lobes) { treedata.lobes = value; } else
+    if (name == string_leaves) { treedata.leaves = value; } else
+    if (name == string_leafdistrib) { treedata.leafShapeRatio = value; } else
+    {
+      printf("Wrong Parameter!\n");
+      return false;
+    }
+
+  } else {
+
+    opentree::Level *treelevel = &treedata.level[(int)level];
+
+    if (name == string_levelnumber) { treelevel->levelNumber = value; } else
+    if (name == string_branches) { treelevel->branches = value; } else
+    if (name == string_curveres) { treelevel->curveRes = value; } else
+    {
+      printf("Wrong Parameter!\n");
+      return false;
+    }
+  }
+
+  return true;
 }
 
-bool csOpenTreeObjectFactory::SetParam (csStringID, csString)
+bool csOpenTreeObjectFactory::SetParam (char, csStringID, const char*)
 {
-  printf("SetParam string\n");
-  return false;
+  return false;  //no supported parameters
+}
+
+void csOpenTreeObjectFactory::GenerateTree ()
+{
+  printf("generating Tree... ");
+
+  //@@@ ?
+  treedata.leafQuality = 0.6f;
+
+  opentree::iWeber* gen = opentree::newWeber();
+  gen->setParams(treedata);
+
+  opentree::otTree* ottree = gen->generate();
+
+  opentree::MesherTree* tree = new opentree::MesherTree(ottree);
+
+  for (unsigned int i = 0; i < 4; i++)
+  {
+    tree->setCurveRes(i,6);
+    tree->setCircleRes(i,7);
+  }
+
+  tree->useQuadLeaves(); //TriangleLeaves();
+
+  int vertexCount = 0;
+  tree->getVerticesCount(0, &vertexCount);
+printf("Tree vertex count: %i ", vertexCount);
+
+  treefactstate->SetVertexCount(vertexCount);
+  opentree::otVertices* vertices = new VertexHelper (treefactstate);
+  tree->getVertices(0, *vertices);
+  delete vertices;
+
+  tree->getLeavesVerticesCount(&vertexCount);
+printf("leaf vertex count: %i ", vertexCount);
+  leaffactstate->SetVertexCount(vertexCount);
+  vertices = new VertexHelper (leaffactstate);
+  tree->getLeavesVertices(*vertices);
+  delete vertices;
+
+  delete ottree;
+  delete gen;
+
+  generated = true;
+  printf("done\n");
 }
 
 //----------------------------------------------------------------------
