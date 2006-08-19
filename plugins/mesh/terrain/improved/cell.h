@@ -100,6 +100,8 @@ public:
 
   // ------------ iTerrainCell implementation ------------
 
+  virtual iTerrainSystem* GetTerrain();
+
   virtual const char* GetName () const;
   virtual iTerrainCellRenderProperties* GetRenderProperties () const;
   virtual iTerrainCellCollisionProperties* GetCollisionProperties () const;

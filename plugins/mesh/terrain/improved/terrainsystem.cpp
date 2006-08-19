@@ -131,7 +131,7 @@ bool csTerrainSystem::CollideSegment (const csVector3& start, const csVector3&
 
   size_t size = points.GetSize ();
 
-  for (size_t i = 0; i < cells.GetSize(); ++i)
+  for (size_t i = 0; i < cells.GetSize (); ++i)
   {
     csSegment3 seg(start, end);
     csBox3 box = cells[i]->GetBBox ();
@@ -140,7 +140,7 @@ bool csTerrainSystem::CollideSegment (const csVector3& start, const csVector3&
 
     if (csIntersect3::BoxSegment (box, seg, isect) >= 0)
     {
-      seg.SetStart( seg.End ());
+      seg.SetStart (seg.End ());
       seg.SetEnd (isect);
       
       if (csIntersect3::BoxSegment (box, seg, isect) >= 0)
@@ -256,7 +256,8 @@ void csTerrainSystem::PreLoadCells (iRenderView* rview, iMovable* movable)
   
   rview->SetupClipPlanes (c2ot, planes, frustum_mask);
   
-  /// Here I should not just multiply by vview_distance, because it scales the frustum in N times, and N has nothing to do with distance :)
+  /// Here I should not just multiply by vview_distance, because it scales the
+  /// frustum in N times, and N has nothing to do with distance :)
   /// Left for now, because, well, I'm not sure of the desired behavior
 
 #pragma message(PR_WARNING("vview_distance hack, frustum is enlarged too much"))
@@ -266,7 +267,7 @@ void csTerrainSystem::PreLoadCells (iRenderView* rview, iMovable* movable)
     planes[pi].DD *= vview_distance;
   }
   
-  for (size_t i = 0; i < cells.GetSize(); ++i)
+  for (size_t i = 0; i < cells.GetSize (); ++i)
   {
     uint32 out_mask;
     
@@ -401,21 +402,21 @@ bool csTerrainSystem::HitBeamOutline (const csVector3& start,
     {
 #pragma message(PR_WARNING("hrm... this is ugly."))
       int gr = 0;
-      float gr_max = fabsf(end.x - start.x);
+      float gr_max = fabsf (end.x - start.x);
 
-      if (fabsf(end.y - start.y) > gr_max)
+      if (fabsf (end.y - start.y) > gr_max)
       {
         gr = 1;
-        gr_max = fabsf(end.y - start.y);
+        gr_max = fabsf (end.y - start.y);
       }
 
-      if (fabsf(end.z - start.z) > gr_max)
+      if (fabsf (end.z - start.z) > gr_max)
       {
         gr = 2;
-        gr_max = fabsf(end.y - start.y);
+        gr_max = fabsf (end.y - start.y);
       }
 
-      *pr = fabsf(collision_result.Get (0)[gr] - start[gr]) / gr_max;
+      *pr = fabsf (collision_result.Get (0)[gr] - start[gr]) / gr_max;
     }
 
     return true;

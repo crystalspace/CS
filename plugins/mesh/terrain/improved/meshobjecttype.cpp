@@ -38,7 +38,7 @@ csTerrainMeshObjectType::~csTerrainMeshObjectType ()
 csPtr<iMeshObjectFactory> csTerrainMeshObjectType::NewFactory ()
 {
   csRef<csTerrainFactory> factory;
-  factory.AttachNew(new csTerrainFactory (this));
+  factory.AttachNew (new csTerrainFactory (this));
   
   csRef<iMeshObjectFactory> ifact (
   scfQueryInterface<iMeshObjectFactory> (factory));

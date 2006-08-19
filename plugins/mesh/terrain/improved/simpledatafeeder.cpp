@@ -55,13 +55,10 @@ csTerrainSimpleDataFeeder::~csTerrainSimpleDataFeeder ()
 
 void csTerrainSimpleDataFeeder::PreLoad (iTerrainCell* cell)
 {
-  printf("preload!\n");
 }
 
 void csTerrainSimpleDataFeeder::Load (iTerrainCell* cell)
 {
-  printf("load!\n");
-
   int width = cell->GetGridWidth ();
   int height = cell->GetGridHeight ();
 
@@ -77,15 +74,22 @@ void csTerrainSimpleDataFeeder::Load (iTerrainCell* cell)
     map = csImageManipulate::Rescale (map, width, height);
   }
   
+  const unsigned char* imagedata = (const unsigned char*)map->GetImageData ();
+
   for (int y = 0; y < height; ++y)
+  {
+    float* dest_data = data.data;
+
     for (int x = 0; x < width; ++x)
     {
       float xd = float(x - width/2) / width;
       float yd = float(y - height/2) / height;
 
-      data.data[y * data.pitch + x] = ((unsigned char*)map->GetImageData ())
-      [y * map->GetWidth () + x] / 255.0f * cell->GetSize().z;
+      *dest_data++ = *imagedata++ / 255.0f * cell->GetSize().z;
     }
+    
+    data.data += data.pitch;
+  }
 
   cell->UnlockHeightData ();
   
@@ -102,12 +106,18 @@ void csTerrainSimpleDataFeeder::Load (iTerrainCell* cell)
 
   csLockedMaterialMap mdata = cell->LockMaterialMap (csRect (0, 0, mwidth,
     mheight));
-  
+
+  const unsigned char* materialmap = (const unsigned char*)material->
+    GetImageData ();
+    
   for (int y = 0; y < mheight; ++y)
-    memcpy(mdata.data + mdata.pitch * y, (const unsigned char*)material->
-      GetImageData() + mwidth * y, mwidth);
-   
-  cell->UnlockMaterialMap();
+  {
+    memcpy (mdata.data, materialmap, mwidth);
+    mdata.data += mdata.pitch;
+    materialmap += mwidth;
+  } 
+  
+  cell->UnlockMaterialMap ();
 }
 
 bool csTerrainSimpleDataFeeder::Initialize (iObjectRegistry* object_reg)
@@ -118,11 +128,11 @@ bool csTerrainSimpleDataFeeder::Initialize (iObjectRegistry* object_reg)
 
 void csTerrainSimpleDataFeeder::SetParam(const char* param, const char* value)
 {
-  if (!strcmp(param, "heightmap source"))
+  if (!strcmp (param, "heightmap source"))
   {
     heightmap_source = value;
   }
-  else if (!strcmp(param, "materialmap source"))
+  else if (!strcmp (param, "materialmap source"))
   {
     mmap_source = value;
   }

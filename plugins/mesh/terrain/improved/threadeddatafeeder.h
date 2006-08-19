@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_TERRAIN_SIMPLEDATAFEEDER_H__
-#define __CS_TERRAIN_SIMPLEDATAFEEDER_H__
+#ifndef __CS_TERRAIN_THREADEDDATAFEEDER_H__
+#define __CS_TERRAIN_THREADEDDATAFEEDER_H__
 
 #include "csutil/scf_implementation.h"
 
@@ -26,30 +26,51 @@
 #include "csutil/csstring.h"
 #include "iutil/comp.h"
 
+#include "simpledatafeeder.h"
+
 CS_PLUGIN_NAMESPACE_BEGIN(ImprovedTerrain)
 {
 
-class csTerrainSimpleDataFeeder :
-  public scfImplementation2<csTerrainSimpleDataFeeder,
-                            iTerrainDataFeeder,
-                            iComponent>
+struct csTerrainFeederData
 {
-protected:
-  iObjectRegistry* object_reg;
-
   csString heightmap_source, mmap_source;
 
-public:
-  csTerrainSimpleDataFeeder (iBase* parent);
+  float* height_data;
+  unsigned int height_width, height_height;
 
-  virtual ~csTerrainSimpleDataFeeder ();
+  csArray<unsigned char*> material_data;
+  unsigned int material_width, material_height;
+
+  csTerrainFeederData()
+  {
+    height_data = 0;
+  }
+  
+  ~csTerrainFeederData()
+  {
+    delete[] height_data;
+
+    for (size_t i = 0; i < material_data.GetSize (); ++i)
+      delete[] material_data[i];
+  }
+};
+
+class csTerrainThreadedDataFeeder : public csTerrainSimpleDataFeeder
+{
+  csRef<iJobQueue> job_queue;
+  csRef<iJob> job;
+
+  csTerrainFeederData feed_data;
+
+public:
+  csTerrainThreadedDataFeeder (iBase* parent);
+
+  virtual ~csTerrainThreadedDataFeeder ();
 
   // ------------ iTerrainDataFeeder implementation ------------
 
   virtual void PreLoad (iTerrainCell* cell);
   virtual void Load (iTerrainCell* cell);
-
-  virtual void SetParam(const char* param, const char* value);
   
   // ------------ iComponent implementation ------------
   virtual bool Initialize (iObjectRegistry* object_reg);
@@ -58,4 +79,4 @@ public:
 }
 CS_PLUGIN_NAMESPACE_END(ImprovedTerrain)
 
-#endif // __CS_TERRAIN_SIMPLEDATAFEEDER_H__
+#endif // __CS_TERRAIN_THREADEDDATAFEEDER_H__

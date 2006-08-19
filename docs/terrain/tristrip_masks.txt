@@ -1,0 +1,62 @@
+Here I'm going to write a few considerations about 'Adaptive Streaming and
+Rendering of Large Terrains using Strip Masks' paper.
+
+This paper is about two things - rendering large terrains and retrieving
+them from the storage (disk).
+
+- Rendering
+
+Rendering is more-or-less CLOD one. Several 'strip masks' (index buffers
+filled with tristrips that cover a part of terrain) are constructed - as far
+as I can tell without the implementation, it it the same as in bruteblock
+algorithm, except the gap filling detail (more on that later).
+
+Then, some sort of error computation occurs (it does not take into account real
+data - as in Thatcher Ulrich's paper, computation of screen-space error - it
+is a heuristic based on distance to block and it's height), and the resulting
+values are used to select appropriate LOD. The proper LOD is selected via a
+provided polygon budget that is distributed among blocks - so, as far as I've
+got it, the computed LOD heuristic values does not serve directly as a LOD
+selecting value (as in bruteblock algorithm, the original CLOD one and many
+others), but just as a share of the triangles in the total budget. It is a fair
+idea, though, perhaps this selection of algorithm was influenced by the variety
+of platforms (PDA's and PC) that are very different concerning computation power.
+
+As for gaps that are showing between blocks, the authors took neither the
+solution from CLOD paper (separate stripes between blocks), nor the bruteblock
+one (compute precise closing geometry). There is a big plane beneath the terrain,
+and textures are projected on it to fill the gap (that is usually of the color
+which was used to clear backbuffer) with some more sensible colors. To me it is
+a hack (as are stripes of different kinds), because it's hard to do proper
+lighting (except for lightmap-based one), stencil shadows will behave poorly
+(in case of extruding the volumes not too far, the plane will not be touched by
+the volumes and there will be unshadowed space where the gap is, and in case of
+extruding the volumes far enough we get unneeded fillrate wasting), making
+shadow maps work seems nearly impossible for me (except for some cruel hacks),
+and even making a simple dark circle (a fake shadow) underneath objects will
+be hard enough to make right. And I'm sure that there are more things that will
+fail.
+
+Then, authors use display lists to explore frame coherency and make the
+geometry that was already rendered in the previous frame reside in GPU (or at
+least making it probable). That is again very questionable from my point of
+view (I wonder, what do they do on mobile platforms, DLs have been removed from
+OGL ES...), for many reasons. And they have neither geomorphing nor a usual
+vision of what geomorphing is ("Nevertheless, we tested a geomorphing like
+solution which consists in rendering each intermediate level when switching
+from level k to level k+l, with |l|>1."). Though, perhaps I'm wrong - and I do
+not have the implementation so I can get the paper wrong.
+
+So, to summarize rendering - it is another CLOD variations with some things
+that I like more than I dislike (polygon budget thing), and some things that
+I certainly disapprove of.
+
+- Streaming
+
+The streaming scheme is as follows: ensure that there is a complete square
+of blocks around the viewpoint most of the time. This does not cause any
+additional loading if the user rotates around, but causes longer load times.
+Apart from that, the system is traditional (and the 'adaptive' thing refers to
+the use of memory budget - that is, there is a limit on memory, and the cells
+are removed from memory if this limit is reached and some other cell needs to
+be rendered - pretty traditional as well).

@@ -28,7 +28,7 @@
 #include "csgeom/csrect.h"
 
 #include "csgfx/imagebase.h"
-#include "csgfx/memimage.h"
+#include "csgfx/imagememory.h"
 #include "csgfx/imagemanipulate.h"
 
 #include "debug.h"
@@ -81,6 +81,11 @@ iTerrainRenderer* renderer, iTerrainCollider* collider)
 
 csTerrainCell::~csTerrainCell ()
 {
+}
+
+iTerrainSystem* csTerrainCell::GetTerrain()
+{
+  return parent;
 }
 
 csTerrainCell::LoadState csTerrainCell::GetLoadState () const
@@ -181,7 +186,6 @@ csLockedHeightData csTerrainCell::GetHeightData ()
 	return data;
 }
 
-
 csLockedHeightData csTerrainCell::LockHeightData (const csRect& rectangle)
 {
   locked_height_rect = rectangle;
@@ -231,7 +235,7 @@ csLockedMaterialMap csTerrainCell::LockMaterialMap (const csRect& rectangle)
   mm_rect = rectangle;
 
   data.data = materialmap.GetArray ();
-  data.pitch = rectangle.Width();
+  data.pitch = rectangle.Width ();
 
   return data;
 }
@@ -273,7 +277,7 @@ void csTerrainCell::SetMaterialMask (unsigned int material, iImage* image)
     image = rescaled_image;
   }
 
-  renderer->OnMaterialMaskUpdate(this, material,
+  renderer->OnMaterialMaskUpdate (this, material,
   csRect(0, 0, image->GetWidth (), image->GetHeight ()),
   (const unsigned char*)image->GetImageData (), image->GetWidth ());
 }
@@ -281,9 +285,9 @@ void csTerrainCell::SetMaterialMask (unsigned int material, iImage* image)
 void csTerrainCell::SetMaterialMask (unsigned int material,
 const unsigned char* data, unsigned int width, unsigned int height)
 {
-	csImageMemory image(width, height, (void*)data, false, CS_IMGFMT_PALETTED8);
+  csImageMemory image(width, height, (void*)data, false, CS_IMGFMT_PALETTED8);
 	
-	SetMaterialMask(material, &image);
+  SetMaterialMask (material, &image);
 }
 
 bool csTerrainCell::CollideSegment (const csVector3& start, const csVector3&
@@ -352,7 +356,7 @@ float csTerrainCell::GetHeight (const csVector2& pos) const
   int x1, y1, x2, y2;
   float xfrac, yfrac;
 
-  LerpHelper(pos, x1, x2, xfrac, y1, y2, yfrac);
+  LerpHelper (pos, x1, x2, xfrac, y1, y2, yfrac);
 
   float h1 = Lerp (GetHeight (x1, y1), GetHeight (x2, y1), xfrac);
   float h2 = Lerp (GetHeight (x1, y2), GetHeight (x2, y2), xfrac);

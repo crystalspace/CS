@@ -168,8 +168,8 @@ const csRect& rectangle, const float* data, unsigned int pitch)
   int grid_width = cell->GetGridWidth ();
   int grid_height = cell->GetGridHeight ();
   
-  int mm_width = cell->GetMaterialMapWidth();
-  int mm_height = cell->GetMaterialMapHeight();
+  int mm_width = cell->GetMaterialMapWidth ();
+  int mm_height = cell->GetMaterialMapHeight ();
 
   if (!rdata)
   {
@@ -193,17 +193,19 @@ const csRect& rectangle, const float* data, unsigned int pitch)
     csRenderBufferLock<unsigned int> ilocker(rdata->ib);
     unsigned int* iptr = ilocker;
 
+    int y_mul_grid_width_plus_x = 0;
+
     for (int y = 0; y < grid_height - 1; ++y)
-      for (int x = 0; x < grid_width - 1; ++x)
+      for (int x = 0; x < grid_width - 1; ++x, ++y_mul_grid_width_plus_x)
       {
         // tl - tr
         //  | / |
         // bl - br
 
-        int tl = y * grid_width + x;
-        int tr = y * grid_width + x + 1;
-        int bl = (y + 1) * grid_width + x;
-        int br = (y + 1) * grid_width + x + 1;
+        int tl = y_mul_grid_width_plus_x;
+        int tr = y_mul_grid_width_plus_x + 1;
+        int bl = y_mul_grid_width_plus_x + grid_width;
+        int br = y_mul_grid_width_plus_x + grid_width + 1;
 
         *iptr++ = tl;
         *iptr++ = bl;
@@ -245,13 +247,17 @@ const csRect& rectangle, const float* data, unsigned int pitch)
   float scale_x = cell->GetSize ().x / (grid_width - 1);
   float scale_y = cell->GetSize ().y / (grid_height - 1);
 
-   for (int y = rectangle.ymin; y < rectangle.ymax; ++y)
-     for (int x = rectangle.xmin; x < rectangle.xmax; ++x)
-     {
-       *vptr++ = x * scale_x + offset_x;
-       *vptr++ = data[y * pitch + x];
-       *vptr++ = y * scale_y + offset_y;
-     }
+  for (int y = rectangle.ymin; y < rectangle.ymax; ++y)
+  {
+    const float* row = data + y * pitch + rectangle.xmin;
+
+    for (int x = rectangle.xmin; x < rectangle.xmax; ++x)
+    {
+      *vptr++ = x * scale_x + offset_x;
+      *vptr++ = *row++;
+      *vptr++ = y * scale_y + offset_y;
+    }
+  }
 }
 
 void csTerrainSimpleRenderer::OnMaterialMaskUpdate (iTerrainCell* cell,
@@ -295,7 +301,7 @@ unsigned int pitch)
     image.AttachNew (new csImageMemory (cell->GetMaterialMapWidth (),
     cell->GetMaterialMapHeight (), CS_IMGFMT_TRUECOLOR));
 
-    rdata->alpha_map[material] = g3d->GetTextureManager()->RegisterTexture
+    rdata->alpha_map[material] = g3d->GetTextureManager ()->RegisterTexture
     (image, CS_TEXTURE_2D | CS_TEXTURE_3D | CS_TEXTURE_CLAMP);
     
     csRef<csShaderVariable> var;
@@ -308,12 +314,18 @@ unsigned int pitch)
   csDirtyAccessArray<csRGBpixel> image_data;
   image_data.SetSize (rectangle.Width () * rectangle.Height ());
   
+  csRGBpixel* dst_data = image_data.GetArray ();
+
   for (int y = 0; y < rectangle.Width (); ++y)
-    for (int x = 0; x < rectangle.Height (); ++x)
-      image_data[y * rectangle.Width () + x].Set (
-      data[y * pitch + x], data[y * pitch + x],
-      data[y * pitch + x], data[y * pitch + x]);
-      
+  {
+    const unsigned char* src_data = data + y * pitch;
+
+    for (int x = 0; x < rectangle.Height (); ++x, ++src_data)
+    {
+      (*dst_data++).Set (*src_data, *src_data, *src_data, *src_data);
+    }
+  }
+
   rdata->alpha_map[material]->Blit (rectangle.xmin, rectangle.ymin,
   rectangle.Width (), rectangle.Height (), (unsigned char*)
   image_data.GetArray (), iTextureHandle::RGBA8888);

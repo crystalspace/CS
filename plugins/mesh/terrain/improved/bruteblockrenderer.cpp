@@ -155,47 +155,6 @@ static void FillEdge (bool halfres, int res, uint16* indices, int &indexcount,
     indices[indexcount++] = offs + (x+1) * add;
   }
 }
-/*static void FillEdge (bool halfres, int res, uint16* indices, int &indexcount,
-               int offs, int xadd, int zadd)
-{
-  int x;
-  // This triangulation scheme could probably be better.
-  for (x=0; x<res; x+=2)
-  {
-    // 
-    // a   c   e   g   i
-    //   b   d   f   h
-    if (x>0)
-    {
-      indices[indexcount++] = offs+x*xadd+zadd;
-      indices[indexcount++] = offs+x*xadd;
-    }
-    else
-    {
-      indices[indexcount++] = offs+x*xadd;
-      indices[indexcount++] = offs+x*xadd;
-      indices[indexcount++] = offs+x*xadd;
-    }
-
-    indices[indexcount++] = offs+(x+1)*xadd+zadd;
-    if (!halfres)
-      indices[indexcount++] = offs+(x+1)*xadd;
-    else
-      indices[indexcount++] = offs+x*xadd;
-
-    if (x<res-2)
-    {
-      indices[indexcount++] = offs+(x+2)*xadd+zadd;
-      indices[indexcount++] = offs+(x+2)*xadd;
-    }
-    else
-    {
-      indices[indexcount++] = offs+(x+2)*xadd;
-      indices[indexcount++] = offs+(x+2)*xadd;
-      indices[indexcount++] = offs+(x+2)*xadd;
-    }
-  }
-}*/
 
 struct csBruteBlockTerrainRenderData: public csRefCount
 {
@@ -239,12 +198,6 @@ struct csBruteBlockTerrainRenderData: public csRefCount
     block_minsize = 32;
     
     lod_lcoeff = 16;
-
-//    <variable name="LodM" value="-0.00666667" />
-//    <variable name="LodA" value="1.33333" />
-//        <lodvalue name="splatting distance">200</lodvalue>
-//        <lodvalue name="block split distance">8</lodvalue>
-//        <lodvalue name="cd resolution">256</lodvalue>
   }
 
   void SetupObject(iGraphics3D* g3d)
@@ -272,18 +225,6 @@ struct csBruteBlockTerrainRenderData: public csRefCount
   
               numindices[idx] = 0;
               int x, z;
-/*              for (z=1; z<(block_res-1); z++)
-              {
-                indices[numindices[idx]++] = 1+z*(block_res+1);
-                indices[numindices[idx]++] = 1+z*(block_res+1);
-                for (x=1; x<(block_res); x++)
-                { 
-                  indices[numindices[idx]++] = x+(z+0)*(block_res+1);
-                  indices[numindices[idx]++] = x+(z+1)*(block_res+1);
-                }
-                indices[numindices[idx]++] = x-1+(z+1)*(block_res+1);
-                indices[numindices[idx]++] = x-1+(z+1)*(block_res+1);
-              }*/
               for (z=0; z<block_res; z++)
               {
                   for (x=0; x<block_res; x++)
@@ -297,22 +238,6 @@ struct csBruteBlockTerrainRenderData: public csRefCount
                       indices[numindices[idx]++] = x+1+(z+1)*(block_res+1);
                   }
               }
-  
-              /*FillEdge (t==1,
-                block_res, indices, numindices[idx], 
-                0, 1, (block_res+1));
-  
-              FillEdge (r==1,
-                block_res, indices, numindices[idx],
-                block_res, (block_res+1), -1);
-
-              FillEdge (l==1,
-                block_res, indices, numindices[idx], 
-               block_res*(block_res+1), -(block_res+1), 1);
-
-              FillEdge (b==1, 
-                block_res, indices, numindices[idx],
-                block_res*(block_res+1)+block_res, -1, -(block_res+1));*/
                 
               FillEdge (t==1,
                   block_res, indices, numindices[idx], 
@@ -440,19 +365,17 @@ void csTerrBlock::LoadData ()
   bufferHolder->SetRenderBuffer (CS_BUFFER_POSITION, mesh_vertices);
   bufferHolder->SetRenderBuffer (CS_BUFFER_TEXCOORD0, mesh_texcoords);
   
-  const csVector2& pos = rdata->cell->GetPosition();
-  const csVector3& cell_size = rdata->cell->GetSize();
+  const csVector2& pos = rdata->cell->GetPosition ();
+  const csVector3& cell_size = rdata->cell->GetSize ();
   
   csLockedHeightData data = rdata->cell->GetHeightData ();
   
   if (!built)
-    bbox.Empty();
+    bbox.Empty ();
   
   {
     csRenderBufferLock<csVector3> vertex_data(mesh_vertices);
     
-    unsigned int index = 0;
-
     float min_x = center.x - size.x/2;
     float max_x = center.x + size.x/2;
 
@@ -470,20 +393,18 @@ void csTerrBlock::LoadData ()
     for (int y = 0, grid_y = top; y < res; ++y, grid_y += step)
     {
       float c_x = min_x;
-      float* row = data.data + data.pitch * grid_y;
+      float* row = data.data + data.pitch * grid_y + left;
       
-      for (int x = 0, grid_x = left; x < res; ++x, grid_x += step)
+      for (int x = 0; x < res; ++x, row += step)
       {
-        float height = row[grid_x];
+        float height = *row;
         
-        vertex_data[index] = csVector3(c_x, height, c_z);
+        *vertex_data++ = csVector3(c_x, height, c_z);
         
         if (min_height > height) min_height = height;
         if (max_height < height) max_height = height;
         
         c_x += x_offset;
-        
-        ++index;
       }
       
       c_z += z_offset;
@@ -491,15 +412,13 @@ void csTerrBlock::LoadData ()
     
     if (!built)
     {
-      bbox.Set(min_x, min_height, min_z,
+      bbox.Set (min_x, min_height, min_z,
                max_x, max_height, max_z);
     }
   }  
   
   {
     csRenderBufferLock<csVector2> texcoord_data(mesh_texcoords);
-    
-    unsigned int index = 0;
     
     float min_u = (center.x - size.x/2 - pos.x) / cell_size.x;
     float max_u = (center.x + size.x/2 - pos.x) / cell_size.x;
@@ -518,12 +437,11 @@ void csTerrBlock::LoadData ()
       
       for (int x = 0; x < res; ++x)
       {
-        texcoord_data[index].x = u;
-        texcoord_data[index].y = v;
+        (*texcoord_data).x = u;
+        (*texcoord_data).y = v;
+        ++texcoord_data;
       
         u += u_offset;
-        
-        ++index;
       }
       
       v += v_offset;
@@ -716,11 +634,9 @@ void csTerrBlock::CalcLOD ()
   if (cam.SquaredNorm ()<maxradius*maxradius &&
       size > terr->block_minsize)*/
   
-  float size = MAX(this->size.x, this->size.y);
+  float size = MAX (this->size.x, this->size.y);
       
   float splitdist = size*rdata->lod_lcoeff / float (res);
-  
-  if (GetAsyncKeyState(VK_F2) >= 0) return;
   
   if (cambox.SquaredOriginDist()<splitdist*splitdist &&
     step > 1)
@@ -773,6 +689,7 @@ void csTerrBlock::DrawTest (iGraphics3D* g3d,
       bbox, clip_portal, clip_plane, clip_z_plane))
     return;
 
+  // left & top sides are covered with additional trianles
   int idx = ((!neighbours[0] || neighbours[0]->step>step)?1:0)+
             (((!neighbours[1] || neighbours[1]->step>step)?1:0)<<1)+
             (((neighbours[2] && neighbours[2]->step>step)?1:0)<<2)+
@@ -905,8 +822,8 @@ const csRect& rectangle, const float* data, unsigned int pitch)
   int grid_width = cell->GetGridWidth ();
   int grid_height = cell->GetGridHeight ();
   
-  int mm_width = cell->GetMaterialMapWidth();
-  int mm_height = cell->GetMaterialMapHeight();
+  int mm_width = cell->GetMaterialMapWidth ();
+  int mm_height = cell->GetMaterialMapHeight ();
 
   if (!rdata)
   {
@@ -914,7 +831,7 @@ const csRect& rectangle, const float* data, unsigned int pitch)
 
     cell->SetRenderData (rdata);
 
-    rdata->SetupObject(g3d);
+    rdata->SetupObject (g3d);
   }
 }
 
@@ -931,7 +848,7 @@ unsigned int pitch)
 
     cell->SetRenderData (rdata);
 
-    rdata->SetupObject(g3d);
+    rdata->SetupObject (g3d);
   }
 
   if (rdata->sv_context.GetSize () <= material)
@@ -961,7 +878,7 @@ unsigned int pitch)
     image.AttachNew (new csImageMemory (cell->GetMaterialMapWidth (),
     cell->GetMaterialMapHeight (), CS_IMGFMT_TRUECOLOR));
 
-    rdata->alpha_map[material] = g3d->GetTextureManager()->RegisterTexture
+    rdata->alpha_map[material] = g3d->GetTextureManager ()->RegisterTexture
     (image, CS_TEXTURE_2D | CS_TEXTURE_3D | CS_TEXTURE_CLAMP);
     
     csRef<csShaderVariable> var;
@@ -974,11 +891,17 @@ unsigned int pitch)
   csDirtyAccessArray<csRGBpixel> image_data;
   image_data.SetSize (rectangle.Width () * rectangle.Height ());
   
+  csRGBpixel* dst_data = image_data.GetArray ();
+
   for (int y = 0; y < rectangle.Width (); ++y)
-    for (int x = 0; x < rectangle.Height (); ++x)
-      image_data[y * rectangle.Width () + x].Set (
-      data[y * pitch + x], data[y * pitch + x],
-      data[y * pitch + x], data[y * pitch + x]);
+  {
+    const unsigned char* src_data = data + y * pitch;
+
+    for (int x = 0; x < rectangle.Height (); ++x, ++src_data)
+    {
+      (*dst_data++).Set (*src_data, *src_data, *src_data, *src_data);
+    }
+  }
       
   rdata->alpha_map[material]->Blit (rectangle.xmin, rectangle.ymin,
   rectangle.Width (), rectangle.Height (), (unsigned char*)

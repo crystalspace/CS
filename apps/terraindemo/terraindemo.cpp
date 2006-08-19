@@ -21,39 +21,6 @@
 #include "plugins/engine/3d/rview.h"
 #include "plugins/engine/3d/rview.cpp"
 
-csRef<iJobQueue> job_queue;
-
-class SomeJob : public scfImplementation1<SomeJob, iJob>
-{
-public:
-  SomeJob()
-    : scfImplementationType (this)
-  {
-  }
-  
-  virtual void Run()
-  {
-    // do some heavy computations
-    while (1)
-    {
-      volatile float f = 0;
-
-      for (int i = 0; i < 10000; ++i)
-      {
-        f *= 2;
-        f += 4;
-        f = sqrt(f);
-        f *= 33;
-        f /= 23;
-      }
-      
-      printf("heya! f = %g\n", f);
-    }
-  }
-};
-
-csRef<SomeJob> job;
-
 CS_IMPLEMENT_APPLICATION
 
 //-----------------------------------------------------------------------------
@@ -127,14 +94,14 @@ bool TerrainDemo::Setup ()
     pos = csVector3 (0, 0, 0);
   }
   
-  //if (!room)
-  room = engine->CreateSector("terrain");
+  if (!room)
+    room = engine->CreateSector("terrain");
   
   csRef<iMeshObject> terrain_mesh_object = scfQueryInterface<iMeshObject>(terrain);
   csRef<iMeshWrapper> terrain_mesh_wrapper = engine->CreateMeshWrapper("terrain");
   terrain_mesh_wrapper->SetMeshObject(terrain_mesh_object);
 
-  terrain_mesh_wrapper->GetMovable()->SetSector(room);
+  //terrain_mesh_wrapper->GetMovable()->SetSector(room);
     
   pos = csVector3 (0, 70, 0);
   
@@ -344,8 +311,8 @@ bool TerrainDemo::LoadMap ()
   VFS->ChDir ("/lev/terraini");
   // Load the level file which is called 'world'.
     
-  //if (!loader->LoadMapFile ("world"))
-    //ReportError("Error couldn't load level!");
+  if (!loader->LoadMapFile ("world"))
+    ReportError("Error couldn't load level!");
 
   csRef<iTerrainRenderer> t_renderer = csLoadPlugin<iTerrainRenderer>(
       GetObjectRegistry(),
@@ -389,12 +356,12 @@ bool TerrainDemo::LoadMap ()
     {
       csRef<iTerrainDataFeeder> t_feeder = csLoadPlugin<iTerrainDataFeeder>(
       GetObjectRegistry(),
-      "crystalspace.mesh.object.terrainimproved.simpledatafeeder");
+      "crystalspace.mesh.object.terrainimproved.threadeddatafeeder");
 
       t_feeder->SetParam("heightmap source", heightmap_array[x & 1][y & 1]);
       t_feeder->SetParam("materialmap source", materialmap_array[x & 1][y & 1]);
 
-      t_factory->AddCell("cell", 33, 33, 32, 32, csVector2(x * width,  y * height),
+      t_factory->AddCell("cell", 513, 512, 512, 512, csVector2(x * width,  y * height),
           csVector3(width, height, z), t_feeder);
     }
     
@@ -441,15 +408,6 @@ bool TerrainDemo::LoadMap ()
   materials.Push(material);
 
   terrain->SetMaterialPalette(materials);
-  
-  job_queue = CS_QUERY_REGISTRY (GetObjectRegistry(),
-      iJobQueue);
-      
-  if (!job_queue) job_queue.AttachNew(new csThreadJobQueue);
-      
-  job.AttachNew(new SomeJob());
-      
-  job_queue->Enqueue(job);
   
   return true;
 }

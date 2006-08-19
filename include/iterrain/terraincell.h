@@ -31,6 +31,7 @@ struct iTerrainCellCollisionProperties;
 struct iImage;
 
 struct iCollider;
+struct iTerrainSystem;
 
 class csVector2;
 class csVector3;
@@ -80,6 +81,13 @@ struct csLockedMaterialMap
 struct iTerrainCell : public virtual iBase
 {
   SCF_INTERFACE (iTerrainCell, 1, 0, 0);
+
+  /**
+   * Get the terrain to which the cell belongs
+   *
+   * \return terrain object
+   */
+  virtual iTerrainSystem* GetTerrain() = 0;
 
   /**
    * Get cell name. It is specified at creation time and may be 0.
