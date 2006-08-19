@@ -79,7 +79,7 @@
           <size x="512" y="512" z="150" />
 
           <feeder>
-            <plugin>crystalspace.mesh.object.terrainimproved.simpledatafeeder</plugin>
+            <plugin>crystalspace.mesh.object.terrainimproved.threadeddatafeeder</plugin>
             <param name="heightmap source" value="/lev/terraini/heightmap.png" />
             <param name="materialmap source" value="/lev/terraini/material_blank.png" />
           </feeder>
@@ -92,7 +92,7 @@
           <size x="50" y="50" z="30" />
 
           <feeder>
-            <plugin>crystalspace.mesh.object.terrainimproved.simpledatafeeder</plugin>
+            <plugin>crystalspace.mesh.object.terrainimproved.threadeddatafeeder</plugin>
             <param name="heightmap source" value="/lev/terraini/heightmap_00.png" />
             <param name="materialmap source" value="/lev/terraini/material_00.png" />
           </feeder>
@@ -105,7 +105,7 @@
           <size x="50" y="50" z="30" />
 
           <feeder>
-            <plugin>crystalspace.mesh.object.terrainimproved.simpledatafeeder</plugin>
+            <plugin>crystalspace.mesh.object.terrainimproved.threadeddatafeeder</plugin>
             <param name="heightmap source" value="/lev/terraini/heightmap_01.png" />
             <param name="materialmap source" value="/lev/terraini/material_01.png" />
           </feeder>
@@ -118,7 +118,7 @@
           <size x="50" y="50" z="30" />
 
           <feeder>
-            <plugin>crystalspace.mesh.object.terrainimproved.simpledatafeeder</plugin>
+            <plugin>crystalspace.mesh.object.terrainimproved.threadeddatafeeder</plugin>
             <param name="heightmap source" value="/lev/terraini/heightmap_10.png" />
             <param name="materialmap source" value="/lev/terraini/material_10.png" />
           </feeder>
@@ -131,11 +131,11 @@
           <size x="50" y="50" z="30" />
 
           <feeder>
-            <plugin>crystalspace.mesh.object.terrainimproved.simpledatafeeder</plugin>
+            <plugin>crystalspace.mesh.object.terrainimproved.threadeddatafeeder</plugin>
             <param name="heightmap source" value="/lev/terraini/heightmap_11.png" />
             <param name="materialmap source" value="/lev/terraini/material_11.png" />
           </feeder>
-        </cell>-->
+        </cell>
       </cells>
     </params>
   </meshfact>
