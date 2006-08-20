@@ -173,7 +173,7 @@ struct csBruteBlockTerrainRenderData: public csRefCount
 
   unsigned int primitive_count;
 
-  int block_res, block_minsize;
+  int block_res;
   float lod_lcoeff;
 
   csRef<iRenderBuffer> mesh_indices[16];
@@ -191,13 +191,11 @@ struct csBruteBlockTerrainRenderData: public csRefCount
 
     initialized = false;
 
-//        <lodvalue name="block resolution">16</lodvalue>
-    block_res = 16;
-
-//        <lodvalue name="minimum block size">32</lodvalue>
-    block_minsize = 32;
+    block_res = ((csTerrainBruteBlockCellRenderProperties*)
+      cell->GetRenderProperties ())->GetBlockResolution ();
     
-    lod_lcoeff = 16;
+    lod_lcoeff = ((csTerrainBruteBlockCellRenderProperties*)
+      cell->GetRenderProperties ())->GetLODLCoeff ();
   }
 
   void SetupObject(iGraphics3D* g3d)
@@ -732,6 +730,8 @@ csTerrainBruteBlockCellRenderProperties::
   : scfImplementationType (this, parent)
 {
   visible = true;
+  block_res = 16;
+  lod_lcoeff = 16;
 }
 
 csTerrainBruteBlockCellRenderProperties::
@@ -747,6 +747,17 @@ bool csTerrainBruteBlockCellRenderProperties::GetVisible() const
 void csTerrainBruteBlockCellRenderProperties::SetVisible(bool value)
 {
   visible = value;
+}
+
+void csTerrainBruteBlockCellRenderProperties::SetParam (const char* name,
+  const char* value)
+{
+  if (!strcmp (name, "visible"))
+    visible = !strcmp(value, "true");
+  else if (!strcmp (name, "block resolution"))
+    block_res = atoi (value);
+  else if (!strcmp (name, "lod lcoeff"))
+    lod_lcoeff = (float)atof (value);
 }
 
 csTerrainBruteBlockRenderer::csTerrainBruteBlockRenderer (iBase* parent)

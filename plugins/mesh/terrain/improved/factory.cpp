@@ -121,7 +121,7 @@ void csTerrainFactory::SetCollider (iTerrainCollider* collider)
   terrain->SetCollider (collider);
 }
 
-void csTerrainFactory::AddCell(const char* name, int grid_width,
+iTerrainCell* csTerrainFactory::AddCell(const char* name, int grid_width,
 int grid_height, int material_width, int material_height,
 const csVector2& position, const csVector3& size, iTerrainDataFeeder* feeder)
 {
@@ -136,6 +136,8 @@ const csVector2& position, const csVector3& size, iTerrainDataFeeder* feeder)
   collision_properties, renderer, collider));
                                      
   terrain->AddCell (cell);
+
+  return cell;
 }
 
 }

@@ -45,6 +45,8 @@ public:
 
   virtual bool GetCollideable () const;
   virtual void SetCollideable (bool value);
+  
+  virtual void SetParam (const char* name, const char* value);
 };
 
 class csTerrainCollider :

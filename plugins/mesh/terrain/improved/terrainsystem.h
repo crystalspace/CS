@@ -92,6 +92,9 @@ public:
 
   virtual iTerrainCell* GetCell (const char* name);
   virtual iTerrainCell* GetCell (const csVector2& pos);
+  
+  virtual iTerrainCell* GetCellNL (const char* name);
+  virtual iTerrainCell* GetCellNL (const csVector2& pos);
 
   virtual const csRefArray<iMaterialWrapper>& GetMaterialPalette () const;
   virtual void SetMaterialPalette (const csRefArray<iMaterialWrapper>& array);

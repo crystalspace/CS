@@ -82,6 +82,40 @@ struct iTerrainCell : public virtual iBase
 {
   SCF_INTERFACE (iTerrainCell, 1, 0, 0);
 
+  /// Enumeration that specifies current cell state
+  enum LoadState
+  {
+    NotLoaded,    /**< cell is not loaded in memory, do not do any operations
+                       with it directly */
+    PreLoaded,    /**< cell is in preload state, do not do any operations with 
+                       it directly */
+    Loaded        ///< cell is loaded, you can use it as you like
+  };
+
+  /**
+   * Get cell's current loading state.
+   *
+   * \return cell's current loading state
+   */
+  virtual LoadState GetLoadState () const = 0;
+
+  /**
+   * Set cell's current loading state.
+   *
+   * If the cell's current state is equal to the passed state, nothing happens.
+   * If the cell was not loaded (NotLoaded state), then it is put into the
+   * passed state (either preloading or loading is started)
+   * If the cell was loaded, then it is unloaded in case of NotLoaded state.
+   * Passing PreLoaded state has no effect.
+   * If the cell was being preloaded, then it is loaded in case of Loaded state.
+   * Passing NotLoaded state has no effect (note, that if you want to stop
+   * preloading, you'll have to finish it (SetLoadState (Loaded)) and then
+   * unload the cell (SetLoadState (NotLoaded)).)
+   *
+   * \param state - cell's new loading state
+   */
+  virtual void SetLoadState (LoadState state) = 0;
+
   /**
    * Get the terrain to which the cell belongs
    *

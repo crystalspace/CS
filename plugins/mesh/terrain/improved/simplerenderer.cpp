@@ -83,6 +83,13 @@ void csTerrainSimpleCellRenderProperties::SetVisible(bool value)
   visible = value;
 }
 
+void csTerrainSimpleCellRenderProperties::SetParam (const char* name,
+  const char* value)
+{
+  if (!strcmp (name, "visible"))
+    visible = !strcmp(value, "true");
+}
+
 csTerrainSimpleRenderer::csTerrainSimpleRenderer (iBase* parent)
   : scfImplementationType (this, parent)
 {

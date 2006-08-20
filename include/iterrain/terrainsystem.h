@@ -57,6 +57,16 @@ struct iTerrainSystem : public virtual iBase
   virtual iTerrainCell* GetCell (const char* name) = 0;
 
   /**
+   * Query a cell by name
+   *
+   * \return pointer to the cell with the given name, or NULL, if none found
+   *
+   * \rem this will NOT perform cell loading, so the returned cell is not
+   * guaranteed to be in a loaded state
+   */
+  virtual iTerrainCell* GetCellNL (const char* name) = 0;
+
+  /**
    * Query a cell by position
    *
    * \return pointer to the first cell which intersects with the vertical ray
@@ -66,6 +76,17 @@ struct iTerrainSystem : public virtual iBase
    * completely loaded
    */
   virtual iTerrainCell* GetCell (const csVector2& pos) = 0;
+
+  /**
+   * Query a cell by position
+   *
+   * \return pointer to the first cell which intersects with the vertical ray
+   * of given position, or NULL if none found
+   *
+   * \rem this will NOT perform cell loading, so the returned cell is not
+   * guaranteed to be in a loaded state
+   */
+  virtual iTerrainCell* GetCellNL (const csVector2& pos) = 0;
 
   /**
    * Get material palette. The material map indices index this array.
@@ -96,6 +117,9 @@ struct iTerrainSystem : public virtual iBase
    *
    * \rem this will perform cell loading for the cells that potentially
    * collide with the segment
+   *
+   * \rem this will not perform collision for cells that have Collideable
+   * property set to false
    */
   virtual bool CollideSegment (const csVector3& start, const csVector3& end,
                            bool oneHit, iTerrainVector3Array& points) = 0;
@@ -118,6 +142,9 @@ struct iTerrainSystem : public virtual iBase
    *
    * \rem this will perform cell loading for the cells that potentially
    * collide with the triangle set
+   *
+   * \rem this will not perform collision for cells that have Collideable
+   * property set to false
    */
   virtual bool CollideTriangles (const csVector3* vertices,
                        unsigned int tri_count,
@@ -141,6 +168,9 @@ struct iTerrainSystem : public virtual iBase
    *
    * \rem this will perform cell loading for the cells that potentially
    * collide with the collider
+   *
+   * \rem this will not perform collision for cells that have Collideable
+   * property set to false
    */
   virtual bool Collide (iCollider* collider, float radius,
                        const csReversibleTransform* trans, bool oneHit,
@@ -186,6 +216,9 @@ struct iTerrainSystem : public virtual iBase
    *
    * \param rview - real view
    * \param movable - terrain object
+   *
+   * \rem this will not perform preloading for cells that have Visible
+   * property set to false
    */
   virtual void PreLoadCells (iRenderView* rview, iMovable* movable) = 0;
   

@@ -34,16 +34,20 @@ struct iTerrainDataFeeder : public virtual iBase
    * or called automatically while rendering terrain.
    *
    * \param cell - cell to start preloading for
+   *
+   * \return preloading success flag
    */
-  virtual void PreLoad (iTerrainCell* cell) = 0;
+  virtual bool PreLoad (iTerrainCell* cell) = 0;
   
   /**
    * Load cell data. After the completion of this call the cell should have
    * all necessary information.
    *
    * \param cell - cell to load
+   *
+   * \return loading success flag
    */
-  virtual void Load (iTerrainCell* cell) = 0;
+  virtual bool Load (iTerrainCell* cell) = 0;
   
   /**
    * Set feeder-dependent parameter

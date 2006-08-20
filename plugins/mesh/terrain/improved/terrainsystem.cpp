@@ -70,15 +70,34 @@ void csTerrainSystem::AddCell (csTerrainCell* cell)
 
 iTerrainCell* csTerrainSystem::GetCell (const char* name)
 {
+  iTerrainCell* cell = GetCellNL (name);
+
+  if (cell && cell->GetLoadState () != csTerrainCell::Loaded)
+  {
+    cell->SetLoadState (csTerrainCell::Loaded);
+  }
+
+  return cell;
+}
+
+iTerrainCell* csTerrainSystem::GetCell (const csVector2& pos)
+{
+  iTerrainCell* cell = GetCellNL (pos);
+
+  if (cell && cell->GetLoadState () != csTerrainCell::Loaded)
+  {
+    cell->SetLoadState (csTerrainCell::Loaded);
+  }
+
+  return cell;
+}
+
+iTerrainCell* csTerrainSystem::GetCellNL (const char* name)
+{
   for (size_t i = 0; i < cells.GetSize (); ++i)
   {
     if (!strcmp (cells[i]->GetName (), name))
     {
-      if (cells[i]->GetLoadState () != csTerrainCell::Loaded)
-      {
-        cells[i]->Load ();
-      }
-
       return cells[i];
     }
   }
@@ -86,7 +105,7 @@ iTerrainCell* csTerrainSystem::GetCell (const char* name)
   return NULL;
 }
 
-iTerrainCell* csTerrainSystem::GetCell (const csVector2& pos)
+iTerrainCell* csTerrainSystem::GetCellNL (const csVector2& pos)
 {
   for (size_t i = 0; i < cells.GetSize (); ++i)
   {
@@ -98,11 +117,6 @@ iTerrainCell* csTerrainSystem::GetCell (const csVector2& pos)
         cell_pos.y <= pos.y + EPSILON &&
         cell_pos.y + cell_size.y >= pos.y - EPSILON)
     {
-      if (cells[i]->GetLoadState () != csTerrainCell::Loaded)
-      {
-        cells[i]->Load ();
-      }
-
       return cells[i];
     }
   }
@@ -133,6 +147,8 @@ bool csTerrainSystem::CollideSegment (const csVector3& start, const csVector3&
 
   for (size_t i = 0; i < cells.GetSize (); ++i)
   {
+    if (!cells[i]->GetCollisionProperties ()->GetCollideable ()) continue;
+
     csSegment3 seg(start, end);
     csBox3 box = cells[i]->GetBBox ();
 
@@ -148,7 +164,7 @@ bool csTerrainSystem::CollideSegment (const csVector3& start, const csVector3&
       
       if (cells[i]->GetLoadState () != csTerrainCell::Loaded)
       {
-        cells[i]->Load ();
+        cells[i]->SetLoadState (csTerrainCell::Loaded);
       }
 
       if (cells[i]->CollideSegment (seg.End (), seg.Start (), oneHit, points)
@@ -176,13 +192,15 @@ bool csTerrainSystem::CollideTriangles (const csVector3* vertices,
   
   for (size_t i = 0; i < cells.GetSize (); ++i)
   {
+    if (!cells[i]->GetCollisionProperties ()->GetCollideable ()) continue;
+
     csBox3 box = cells[i]->GetBBox ();
 
     if (csIntersect3::BoxSphere (box, sphere.GetCenter (), sphere.GetRadius ()))
     {
       if (cells[i]->GetLoadState () != csTerrainCell::Loaded)
       {
-        cells[i]->Load ();
+        cells[i]->SetLoadState (csTerrainCell::Loaded);
       }
 
       if (cells[i]->CollideTriangles (vertices, tri_count, indices, radius,
@@ -208,13 +226,15 @@ bool csTerrainSystem::Collide (iCollider* collider,
   
   for (size_t i = 0; i < cells.GetSize (); ++i)
   {
+    if (!cells[i]->GetCollisionProperties ()->GetCollideable ()) continue;
+
     csBox3 box = cells[i]->GetBBox ();
 
     if (csIntersect3::BoxSphere (box, sphere.GetCenter (), sphere.GetRadius ()))
     {
       if (cells[i]->GetLoadState () != csTerrainCell::Loaded)
       {
-        cells[i]->Load ();
+        cells[i]->SetLoadState (csTerrainCell::Loaded);
       }
 
       if (cells[i]->Collide (collider, radius, trans, oneHit, pairs) &&
@@ -269,6 +289,8 @@ void csTerrainSystem::PreLoadCells (iRenderView* rview, iMovable* movable)
   
   for (size_t i = 0; i < cells.GetSize (); ++i)
   {
+    if (!cells[i]->GetRenderProperties ()->GetVisible ()) continue;
+
     uint32 out_mask;
     
     csBox3 box = cells[i]->GetBBox ();
@@ -276,7 +298,7 @@ void csTerrainSystem::PreLoadCells (iRenderView* rview, iMovable* movable)
     if (csIntersect3::BoxFrustum (box, planes, frustum_mask, out_mask) &&
         cells[i]->GetLoadState () == csTerrainCell::NotLoaded)
     {
-      cells[i]->PreLoad ();
+      cells[i]->SetLoadState (csTerrainCell::PreLoaded);
     }
   }
 }
@@ -342,6 +364,8 @@ csRenderMesh** csTerrainSystem::GetRenderMeshes (int& num, iRenderView* rview,
   
   for (size_t i = 0; i < cells.GetSize (); ++i)
   {
+    if (!cells[i]->GetRenderProperties ()->GetVisible ()) continue;
+
     uint32 out_mask;
     
     csBox3 box = cells[i]->GetBBox ();
@@ -350,7 +374,7 @@ csRenderMesh** csTerrainSystem::GetRenderMeshes (int& num, iRenderView* rview,
     {
       if (cells[i]->GetLoadState () != csTerrainCell::Loaded)
       {
-        cells[i]->Load ();
+        cells[i]->SetLoadState (csTerrainCell::Loaded);
       }
       
       needed_cells.Push (cells[i]);

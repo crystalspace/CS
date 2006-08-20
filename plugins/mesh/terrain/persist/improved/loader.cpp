@@ -41,6 +41,8 @@
 #include "iterrain/terraincell.h"
 #include "iterrain/terraindatafeeder.h"
 #include "iterrain/terrainfactory.h"
+#include "iterrain/terraincellrenderproperties.h"
+#include "iterrain/terraincellcollisionproperties.h"
 
 #include "loader.h"
 
@@ -59,10 +61,21 @@ enum
   XMLTOKEN_FEEDER,
   XMLTOKEN_PLUGIN,
   XMLTOKEN_PARAM,
+  XMLTOKEN_RENDERPROPERTIES,
+  XMLTOKEN_COLLISIONPROPERTIES,
   
   XMLTOKEN_FACTORY,
   XMLTOKEN_MATERIALPALETTE,
   XMLTOKEN_MATERIAL,
+};
+
+namespace
+{
+  struct ParamValuePair
+  {
+    const char* name;
+	const char* value;
+  };
 };
 
 SCF_IMPLEMENT_FACTORY (csTerrainFactoryLoader)
@@ -94,6 +107,8 @@ bool csTerrainFactoryLoader::Initialize (iObjectRegistry* objreg)
   xmltokens.Register ("feeder", XMLTOKEN_FEEDER);
   xmltokens.Register ("plugin", XMLTOKEN_PLUGIN);
   xmltokens.Register ("param", XMLTOKEN_PARAM);
+  xmltokens.Register ("render_properties", XMLTOKEN_RENDERPROPERTIES);
+  xmltokens.Register ("collision_properties", XMLTOKEN_COLLISIONPROPERTIES);
   
   return true;
 }
@@ -117,6 +132,8 @@ csPtr<iBase> csTerrainFactoryLoader::Parse (iDocumentNode* node,
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   
+  csArray<ParamValuePair> render_properties, collision_properties;
+
   while (it->HasNext())
   {
     csRef<iDocumentNode> child = it->Next ();
@@ -179,6 +196,9 @@ csPtr<iBase> csTerrainFactoryLoader::Parse (iDocumentNode* node,
               csVector2 position;
               csVector3 size;
               csRef<iTerrainDataFeeder> feeder;
+
+              render_properties.SetSize (0);
+              collision_properties.SetSize (0);
               
               if (!cell_name) cell_name = "";
               
@@ -260,15 +280,94 @@ csPtr<iBase> csTerrainFactoryLoader::Parse (iDocumentNode* node,
                     
                     break;
                   }
+                  case XMLTOKEN_RENDERPROPERTIES:
+                  {
+                    csRef<iDocumentNodeIterator> it = child->GetNodes ();
+        
+                    while (it->HasNext())
+                    {
+                      csRef<iDocumentNode> child = it->Next ();
+                      if (child->GetType () != CS_NODE_ELEMENT) continue;
+                      const char* value = child->GetValue ();
+                      csStringID id = xmltokens.Request (value);
+                      switch (id)
+                      {
+                        case XMLTOKEN_PARAM:
+                        {
+						  ParamValuePair p = {
+						    child->GetAttributeValue ("name"),
+							child->GetAttributeValue ("value") };
+
+                          render_properties.Push (p);
+
+                          break;
+                        }
+                        default:
+                          synldr->ReportError (
+                            "crystalspace.terrain.factory.loader",
+                            child, "Unknown token!");
+                      }
+                    }
+                    
+                    break;
+                  }
+                  case XMLTOKEN_COLLISIONPROPERTIES:
+                  {
+                    csRef<iDocumentNodeIterator> it = child->GetNodes ();
+        
+                    while (it->HasNext())
+                    {
+                      csRef<iDocumentNode> child = it->Next ();
+                      if (child->GetType () != CS_NODE_ELEMENT) continue;
+                      const char* value = child->GetValue ();
+                      csStringID id = xmltokens.Request (value);
+                      switch (id)
+                      {
+                        case XMLTOKEN_PARAM:
+                        {
+						  ParamValuePair p = {
+                            child->GetAttributeValue ("name"),
+							child->GetAttributeValue ("value") };
+
+                          collision_properties.Push (p);
+
+                          break;
+                        }
+                        default:
+                          synldr->ReportError (
+                            "crystalspace.terrain.factory.loader",
+                            child, "Unknown token!");
+                      }
+                    }
+                    
+                    break;
+                  }
                   default:
                     synldr->ReportError ("crystalspace.terrain.factory.loader",
                       child, "Unknown token!");
                 }
               }
 
-              factory->AddCell(cell_name, grid_width, grid_height,
-                material_width, material_height, position, size, feeder);
-                
+              iTerrainCell* cell = factory->AddCell(cell_name, grid_width,
+                grid_height, material_width, material_height, position, size,
+                feeder);
+
+              iTerrainCellRenderProperties* render_p =
+                cell->GetRenderProperties ();
+
+              if (render_p)
+                for (size_t i = 0; i < render_properties.GetSize (); ++i)
+                  render_p->SetParam (render_properties[i].name,
+                                      render_properties[i].value);
+
+              iTerrainCellCollisionProperties* collision_p =
+                cell->GetCollisionProperties ();
+              
+              if (collision_p)
+                for (size_t i = 0; i < collision_properties.GetSize (); ++i)
+                  collision_p->SetParam (collision_properties[i].name,
+                                         collision_properties[i].value);
+
               break;
             }
             default:

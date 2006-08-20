@@ -60,7 +60,15 @@ public:
   {
     this->cell = cell;
     this->feed_data = data;
-	this->object_reg = object_reg;
+    this->object_reg = object_reg;
+	
+	static int counter = 0;
+	++counter;
+
+	if (counter > 100)
+	{
+		counter = 0;
+	}
   }
   
   virtual void Run()
@@ -68,10 +76,14 @@ public:
     int width = cell->GetGridWidth ();
     int height = cell->GetGridHeight ();
 
+	printf("loading from: %s, %s\n", feed_data->heightmap_source.GetData(), feed_data->mmap_source.GetData());
+
     csRef<iLoader> loader = csQueryRegistry<iLoader> (object_reg);
   
     csRef<iImage> map = loader->LoadImage (feed_data->heightmap_source,
       CS_IMGFMT_PALETTED8);
+
+    if (!map) return;
  
     if (map->GetWidth () != width || map->GetHeight () != height)
     {
@@ -103,6 +115,8 @@ public:
     csRef<iImage> material = loader->LoadImage (feed_data->mmap_source,
       CS_IMGFMT_PALETTED8);
     
+    if (!material) return;
+
     if (material->GetWidth () != cell->GetMaterialMapWidth () ||
       material->GetHeight () != cell->GetMaterialMapHeight ())
       material = csImageManipulate::Rescale (material,
@@ -118,13 +132,13 @@ public:
 
     feed_data->material_data.SetSize (mcount);
 
-    const unsigned char* materialmap = (const unsigned char*)
-      material->GetImageData ();
-
     CS_ASSERT (mcount < 255);
 
     for (unsigned char i = 0; i < mcount; ++i)
     {
+      const unsigned char* materialmap = (const unsigned char*)
+	    material->GetImageData ();
+
       unsigned char* m_data =
         (feed_data->material_data[i] = new unsigned char[mwidth * mheight]);
 
@@ -136,6 +150,8 @@ public:
         }
       }
     }
+
+    feed_data->result = true;
   }
 };
 
@@ -150,13 +166,18 @@ csTerrainThreadedDataFeeder::~csTerrainThreadedDataFeeder ()
     job_queue->Unqueue (job);
 }
 
-void csTerrainThreadedDataFeeder::PreLoad (iTerrainCell* cell)
+bool csTerrainThreadedDataFeeder::PreLoad (iTerrainCell* cell)
 {
+  feed_data.heightmap_source = heightmap_source;
+  feed_data.mmap_source = mmap_source;
+
   job.AttachNew (new csTerrainFeedJob(cell, &feed_data, object_reg));
   job_queue->Enqueue (job);
+
+  return true;
 }
 
-void csTerrainThreadedDataFeeder::Load (iTerrainCell* cell)
+bool csTerrainThreadedDataFeeder::Load (iTerrainCell* cell)
 {
   if (job)
   {
@@ -168,6 +189,8 @@ void csTerrainThreadedDataFeeder::Load (iTerrainCell* cell)
     // of OpenGL issues (context access from the main thread
     // only)
     job_queue->PullAndRun (job);
+
+    if (!feed_data.result) return false;
     
     csLockedHeightData data = cell->LockHeightData (
       csRect(0, 0, feed_data.height_width, feed_data.height_height));
@@ -186,8 +209,10 @@ void csTerrainThreadedDataFeeder::Load (iTerrainCell* cell)
     for (unsigned int m = 0; m < feed_data.material_data.GetSize (); ++m)
       cell->SetMaterialMask (m, feed_data.material_data[m],
         feed_data.material_width, feed_data.material_height);
+
+    return true;
   }
-  else csTerrainSimpleDataFeeder::Load (cell);
+  else return csTerrainSimpleDataFeeder::Load (cell);
 }
 
 bool csTerrainThreadedDataFeeder::Initialize (iObjectRegistry* object_reg)

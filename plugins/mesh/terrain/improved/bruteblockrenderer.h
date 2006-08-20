@@ -43,6 +43,8 @@ class csTerrainBruteBlockCellRenderProperties :
 {
 private:
   bool visible;
+  int block_res;
+  float lod_lcoeff;
 
 public:
   csTerrainBruteBlockCellRenderProperties (iBase* parent);
@@ -51,6 +53,14 @@ public:
 
   virtual bool GetVisible () const;
   virtual void SetVisible (bool value);
+
+  int GetBlockResolution() const {return block_res;}
+  void SetBlockResolution(int value) {block_res = value;}
+  
+  float GetLODLCoeff() const {return lod_lcoeff;}
+  void SetLODLCoeff(float value) {lod_lcoeff = value;}
+
+  virtual void SetParam (const char* name, const char* value);
 };
 
 class csTerrainBruteBlockRenderer :

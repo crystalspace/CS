@@ -94,8 +94,8 @@ bool TerrainDemo::Setup ()
     pos = csVector3 (0, 0, 0);
   }
   
-  if (!room)
-    room = engine->CreateSector("terrain");
+  //if (!room)
+    //room = engine->CreateSector("terrain");
   
   csRef<iMeshObject> terrain_mesh_object = scfQueryInterface<iMeshObject>(terrain);
   csRef<iMeshWrapper> terrain_mesh_wrapper = engine->CreateMeshWrapper("terrain");

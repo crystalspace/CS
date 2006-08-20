@@ -93,29 +93,70 @@ csTerrainCell::LoadState csTerrainCell::GetLoadState () const
   return state;
 }
 
-void csTerrainCell::PreLoad ()
+void csTerrainCell::SetLoadState(LoadState state)
 {
-  heightmap.SetSize (grid_width * grid_height, 0);
+  switch (this->state)
+  {
+    case NotLoaded:
+    {
+      switch (state)
+      {
+        case NotLoaded: break;
+        case PreLoaded:
+        {
+          heightmap.SetSize (grid_width * grid_height, 0);
 
-  feeder->PreLoad (this);
+          this->state = feeder->PreLoad (this) ? PreLoaded : NotLoaded;
 
-  state = PreLoaded;
-}
+          break;
+        }
+        case Loaded:
+        {
+          heightmap.SetSize (grid_width * grid_height);
 
-void csTerrainCell::Load ()
-{
-  heightmap.SetSize (grid_width * grid_height);
+          this->state = feeder->Load (this) ? Loaded : NotLoaded;
 
-  feeder->Load (this);
+          break;
+        }
+      }
 
-  state = Loaded;
-}
+      break;
+    }
+    case PreLoaded:
+    {
+      switch (state)
+      {
+        case NotLoaded: break;
+        case PreLoaded: break;
+        case Loaded:
+        {
+          this->state = feeder->Load (this) ? Loaded : NotLoaded;
 
-void csTerrainCell::Unload ()
-{
-  heightmap.DeleteAll ();
+          break;
+        }
+      }
 
-  state = NotLoaded;
+      break;
+    }
+    case Loaded:
+    {
+      switch (state)
+      {
+        case NotLoaded:
+        {
+          heightmap.DeleteAll ();
+
+          this->state = NotLoaded;
+
+          break;
+        }
+        case PreLoaded: break;
+        case Loaded: break;
+      }
+
+      break;
+    }
+  }
 }
 
 csBox3 csTerrainCell::GetBBox () const

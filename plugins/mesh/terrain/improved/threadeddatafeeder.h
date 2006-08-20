@@ -41,7 +41,9 @@ struct csTerrainFeederData
   csArray<unsigned char*> material_data;
   unsigned int material_width, material_height;
 
-  csTerrainFeederData()
+  bool result;
+
+  csTerrainFeederData(): result(false)
   {
     height_data = 0;
   }
@@ -69,8 +71,8 @@ public:
 
   // ------------ iTerrainDataFeeder implementation ------------
 
-  virtual void PreLoad (iTerrainCell* cell);
-  virtual void Load (iTerrainCell* cell);
+  virtual bool PreLoad (iTerrainCell* cell);
+  virtual bool Load (iTerrainCell* cell);
   
   // ------------ iComponent implementation ------------
   virtual bool Initialize (iObjectRegistry* object_reg);

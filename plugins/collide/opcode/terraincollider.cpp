@@ -63,6 +63,13 @@ void csTerrainCellCollisionProperties::SetCollideable (bool value)
   collideable = value;
 }
 
+void csTerrainCellCollisionProperties::SetParam (const char* name,
+  const char* value)
+{
+  if (!strcmp (name, "collideable"))
+    collideable = !strcmp (value, "true");
+}
+
 csTerrainCollider::csTerrainCollider (iBase* parent)
   : scfImplementationType (this, parent)
 {

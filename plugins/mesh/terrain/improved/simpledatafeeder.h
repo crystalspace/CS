@@ -46,8 +46,8 @@ public:
 
   // ------------ iTerrainDataFeeder implementation ------------
 
-  virtual void PreLoad (iTerrainCell* cell);
-  virtual void Load (iTerrainCell* cell);
+  virtual bool PreLoad (iTerrainCell* cell);
+  virtual bool Load (iTerrainCell* cell);
 
   virtual void SetParam(const char* param, const char* value);
   

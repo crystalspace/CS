@@ -26,6 +26,7 @@ struct iTerrainCollider;
 struct iTerrainDataFeeder;
 
 struct iTerrainSystem;
+struct iTerrainCell;
 
 class csVector2;
 class csVector3;
@@ -62,11 +63,13 @@ struct iTerrainFactory : public virtual iBase
    * \param position - cell object-space position
    * \param size - cell object-space size and height scale
    * \param feeder - feeder that would be attached to the cell
+   *
+   * \return added cell
    */
-  virtual void AddCell (const char* name, int grid_width, int grid_height,
-                        int material_width, int material_height,
-                        const csVector2& position, const csVector3& size,
-                        iTerrainDataFeeder* feeder) = 0;
+  virtual iTerrainCell* AddCell (const char* name, int grid_width,
+                        int grid_height, int material_width,
+                        int material_height, const csVector2& position,
+                        const csVector3& size, iTerrainDataFeeder* feeder) = 0;
 };
 
 #endif // __CS_ITERRAIN_TERRAINFACTORY_H__

@@ -53,11 +53,12 @@ csTerrainSimpleDataFeeder::~csTerrainSimpleDataFeeder ()
 {
 }
 
-void csTerrainSimpleDataFeeder::PreLoad (iTerrainCell* cell)
+bool csTerrainSimpleDataFeeder::PreLoad (iTerrainCell* cell)
 {
+  return true;
 }
 
-void csTerrainSimpleDataFeeder::Load (iTerrainCell* cell)
+bool csTerrainSimpleDataFeeder::Load (iTerrainCell* cell)
 {
   int width = cell->GetGridWidth ();
   int height = cell->GetGridHeight ();
@@ -68,6 +69,8 @@ void csTerrainSimpleDataFeeder::Load (iTerrainCell* cell)
   
   csRef<iImage> map = loader->LoadImage (heightmap_source,
   CS_IMGFMT_PALETTED8);
+
+  if (!map) return false;
 
   if (map->GetWidth () != width || map->GetHeight () != height)
   {
@@ -95,6 +98,8 @@ void csTerrainSimpleDataFeeder::Load (iTerrainCell* cell)
   
   csRef<iImage> material = loader->LoadImage (mmap_source,
     CS_IMGFMT_PALETTED8);
+
+  if (!material) return false;
   
   if (material->GetWidth () != cell->GetMaterialMapWidth () ||
     material->GetHeight () != cell->GetMaterialMapHeight ())
@@ -118,6 +123,8 @@ void csTerrainSimpleDataFeeder::Load (iTerrainCell* cell)
   } 
   
   cell->UnlockMaterialMap ();
+
+  return true;
 }
 
 bool csTerrainSimpleDataFeeder::Initialize (iObjectRegistry* object_reg)

@@ -44,9 +44,6 @@ class csTerrainCell :
   public scfImplementation1<csTerrainCell,
                             iTerrainCell>
 {
-public:
-  enum LoadState {NotLoaded, PreLoaded, Loaded};
-
 private:
   iTerrainSystem* parent;
   
@@ -90,17 +87,14 @@ public:
 
   iTerrainDataFeeder* GetDataFeeder () const;
 
-  LoadState GetLoadState () const;
-
-  void PreLoad ();
-  void Load ();
-  void Unload ();
-
   csBox3 GetBBox () const;
 
   // ------------ iTerrainCell implementation ------------
 
   virtual iTerrainSystem* GetTerrain();
+
+  virtual LoadState GetLoadState () const;
+  virtual void SetLoadState(LoadState state);
 
   virtual const char* GetName () const;
   virtual iTerrainCellRenderProperties* GetRenderProperties () const;

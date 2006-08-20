@@ -51,6 +51,8 @@ public:
 
   virtual bool GetVisible () const;
   virtual void SetVisible (bool value);
+
+  virtual void SetParam (const char* name, const char* value);
 };
 
 class csTerrainSimpleRenderer :

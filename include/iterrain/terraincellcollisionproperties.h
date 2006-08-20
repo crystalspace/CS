@@ -44,6 +44,14 @@ struct iTerrainCellCollisionProperties : public virtual iBase
    * \param value - new flag value
    */
   virtual void SetCollideable (bool value) = 0;
+
+  /**
+   * Set named parameter
+   *
+   * \param param - parameter name
+   * \param value - parameter value
+   */
+  virtual void SetParam(const char* param, const char* value) = 0;
 };
 
 #endif // __CS_ITERRAIN_TERRAINCELLCOLLISIONPROPERTIES_H__

@@ -83,10 +83,10 @@ public:
 
   virtual void SetRenderer (iTerrainRenderer* renderer);
   virtual void SetCollider (iTerrainCollider* collider);
-  virtual void AddCell (const char* name, int grid_width, int grid_height,
-                        int material_width, int material_height,
-                        const csVector2& position, const csVector3& size,
-                        iTerrainDataFeeder* feeder);
+  virtual iTerrainCell* AddCell (const char* name, int grid_width,
+                        int grid_height, int material_width,
+                        int material_height, const csVector2& position,
+                        const csVector3& size, iTerrainDataFeeder* feeder);
 };
 
 }
