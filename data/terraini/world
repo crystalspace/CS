@@ -91,6 +91,10 @@
           <position x="48" y="48" />
           <size x="50" y="50" z="30" />
 
+          <render_properties>
+            <param name="block resolution" value="4" />
+          </render_properties>
+
           <feeder>
             <plugin>crystalspace.mesh.object.terrainimproved.threadeddatafeeder</plugin>
             <param name="heightmap source" value="/lev/terraini/heightmap_00.png" />
@@ -103,6 +107,10 @@
           <material_size x="32" y="32" />
           <position x="48" y="98" />
           <size x="50" y="50" z="30" />
+
+          <render_properties>
+            <param name="block resolution" value="4" />
+          </render_properties>
 
           <feeder>
             <plugin>crystalspace.mesh.object.terrainimproved.threadeddatafeeder</plugin>
@@ -117,6 +125,10 @@
           <position x="98" y="48" />
           <size x="50" y="50" z="30" />
 
+          <render_properties>
+            <param name="block resolution" value="4" />
+          </render_properties>
+
           <feeder>
             <plugin>crystalspace.mesh.object.terrainimproved.threadeddatafeeder</plugin>
             <param name="heightmap source" value="/lev/terraini/heightmap_10.png" />
@@ -129,6 +141,10 @@
           <material_size x="32" y="32" />
           <position x="98" y="98" />
           <size x="50" y="50" z="30" />
+
+          <render_properties>
+            <param name="block resolution" value="4" />
+          </render_properties>
 
           <feeder>
             <plugin>crystalspace.mesh.object.terrainimproved.threadeddatafeeder</plugin>
