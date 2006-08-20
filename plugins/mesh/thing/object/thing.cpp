@@ -2677,17 +2677,6 @@ void csThing::ClearLMs ()
 void csThing::UpdateDirtyLMs ()
 {
   csColor amb (0, 0, 0);
-  if (cached_movable)
-  {
-    // First check if dynamic ambient has changed.
-    iSector* s = cached_movable->GetSectors ()->Get (0);
-    amb += s->GetDynamicAmbientLight ();
-    if (dynamic_ambient_version != s->GetDynamicAmbientVersion ())
-    {
-      dynamic_ambient_version = s->GetDynamicAmbientVersion ();
-      MarkLightmapsDirty ();
-    }
-  }
 
   if (!IsLmDirty()) return;
 

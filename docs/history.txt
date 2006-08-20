@@ -9,6 +9,8 @@ chronological order.
 20-Aug-2006
 	- res added texture crossbar support to glshader_fixed.
 	- res fixed an initialization bug in engseq.
+	- res moved the dynamic ambient application in case of lightmapping
+	  from code to shaders.
 18-Aug-2006
         - res worked around some issues with wx in wxtest.
 	- Jorrit augmented the iDynamicsCollisionCallback with a position
