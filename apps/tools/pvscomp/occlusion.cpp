@@ -21,8 +21,20 @@
 #include "csutil/array.h"
 #include "pvscomp.h"
 
+#define PLANE_THICKNESS 0.0001
+
+// Unions array and the set containing objectName.
 static void PVSSetAdd (PVSArray* array, const csString& objectName);
+// Pushes all the elements of source onto dest.
 static void PushArray (csArray<Plucker>& dest, const csArray<Plucker>& source);
+// Returns <0 if poly lies in negative halfspace, >0 if poly lies in positive
+// halfspace, 0 if poly lies on both.
+static int Test (csArray<Plucker>& vertices, const Plucker& plane);
+// Same as above but tests for 2D polygons and planes.
+static int Test (const Polygon* p, const csVector3& normal, float planeD);
+// Returns the face that is in front (<0 if lhs, >0 if rhs).
+static int FaceTest (const Polygon* lhs, const Polygon* rhs,
+    const Polygon* source);
 
 static void PVSSetAdd (PVSArray* array, const csString& objectName)
 {
@@ -46,56 +58,46 @@ static void PushArray (csArray<Plucker>& dest, const csArray<Plucker>& source)
   }
 }
 
-//////////////////////////////////////////////////////////////////////////////
-
-// A 5D polyhedra that represents a set of lines that intersect a source
-// polygon and an occluder polygon.
-class BlockerPolyhedron
+static int Test (csArray<Plucker>& vertices, const Plucker& plane)
 {
-public:
-  csString objectName;
-  Polygon* sourcePoly;
-  Polygon* blockerPoly;
-
-  // Vertex representation
-  csArray<Plucker> vertices;
-  // Plane representation
-  csArray<Plucker> planes;
-
-  // Construct a blocker polyhedron.
-  BlockerPolyhedron (const Polygon* source, const Polygon* occluder, 
-      const char* objectName);
-  // Push the necessary occlusion tree hyperplanes onto fill.
-  void AddOTPlanes (const csArray<Plucker>& splitPlanes,
-      csArray<Plucker>& fill);
-  // Returns <0 if poly lies in negative halfspace, >0 if poly lies in positive
-  // halfspace, 0 if poly lies on both.
-  int Test (const Plucker& plane);
-};
-
-BlockerPolyhedron::BlockerPolyhedron (const Polygon* source, 
-    const Polygon* occluder, const char* objectName)
-{
-  ExtremalPluckerPoints (source, occluder, vertices);
-  PluckerPlanes (source, occluder, planes);
-}
-
-void BlockerPolyhedron::AddOTPlanes (const csArray<Plucker>& splitPlanes,
-      csArray<Plucker>& fill)
-{
-  PushArray (fill, splitPlanes);
-  PushArray (fill, planes);
-  CapPlanes (vertices, fill);
-}
-
-int BlockerPolyhedron::Test (const Plucker& plane)
-{
-  // TODO:  should this use a thickness value?
-  
   int value = 0;
   for (unsigned int i = 0; i < vertices.Length (); i++)
   {
     float distance = plane.Distance (vertices[i]);
+    if (value == 0)
+    {
+      // First iteration or all previous vertices have been on the plane
+      if (distance > PLANE_THICKNESS)
+        value = 1;
+      else if (distance < -PLANE_THICKNESS)
+        value = 0;
+    }
+    else if (value == 1)  
+    {
+      // All previous vertices were in positive halfspace
+      if (distance < -PLANE_THICKNESS)
+        return 0;
+    }
+    else if (value == -1)
+    {
+      // All previous vertices were in negative halfspace
+      if (distance > PLANE_THICKNESS)
+        return 0;
+    }
+  }
+
+  // Polyhedron should not be located on just one plane!
+  CS_ASSERT (value != 0);
+
+  return value;
+}
+
+static int Test (const Polygon* p, const csVector3& normal, float planeD)
+{
+  int value = 0;
+  for (int i = 0; i < p->numVertices; i++)
+  {
+    float distance = p->vertices[p->index[i]] * normal - planeD;
     if (value == 0)
     {
       // First iteration or all previous vertices have been on the plane
@@ -118,10 +120,54 @@ int BlockerPolyhedron::Test (const Plucker& plane)
     }
   }
 
-  // Polyhedron should not be located on just one plane!
-  CS_ASSERT (value != 0);
-
   return value;
+}
+
+static int FaceTest (const Polygon* lhs, const Polygon* rhs, 
+    const Polygon* source)
+{
+  // First see if either polygon lies in the positive or negative halfspace
+  // defined by the other polygon.
+  csVector3 normal;
+  float distance;
+  int otherTest, sourceTest;
+
+  // LHS defines the plane
+  normal.Cross (
+      (lhs->vertices[lhs->index[1]] - lhs->vertices[lhs->index[0]]),
+      (lhs->vertices[lhs->index[2]] - lhs->vertices[lhs->index[0]]));
+  normal.Normalize ();
+  distance = normal * lhs->vertices[lhs->index[0]];
+  sourceTest = Test (source, normal, distance);
+  otherTest = Test (rhs, normal, distance);
+  if (sourceTest != 0 && otherTest != 0)
+  {
+    if (otherTest > 0 && sourceTest > 0)
+    {
+      // RHS and source are on same side, RHS in front
+      return 1;
+    }
+    else
+    {
+      return -1;
+    }
+  }
+
+  // The above test was inconclusive, so use the distances from the center
+  // of the source polygon to the centers of the occluders to determine.
+
+  // TODO:  does this really work?
+  
+  float lhsdistance = (lhs->FindCenter () - source->FindCenter ()).Norm ();
+  float rhsdistance = (rhs->FindCenter () - source->FindCenter ()).Norm ();
+  if (lhsdistance < rhsdistance)
+  {
+    return -1;
+  }
+  else
+  {
+    return 1;
+  }
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -146,6 +192,58 @@ struct OcclusionTreeLeaf
 
 //////////////////////////////////////////////////////////////////////////////
 
+// A 5D polyhedra that represents a set of lines that intersect a source
+// polygon and an occluder polygon.
+// OR
+// Represents a set of rays that passes through a source polygon and an IN
+// node's volume.
+class BlockerPolyhedron
+{
+public:
+  csString objectName;
+  Polygon* sourcePoly;
+  Polygon* blockerPoly;
+
+  // Vertex representation
+  csArray<Plucker> vertices;
+  // Plane representation
+  csArray<Plucker> planes;
+
+  // Default constructor
+  BlockerPolyhedron () {}
+  // Construct a blocker polyhedron from an occluder polygon.
+  BlockerPolyhedron (const Polygon* source, const Polygon* occluder, 
+      const char* objectName);
+};
+
+BlockerPolyhedron::BlockerPolyhedron (const Polygon* source, 
+    const Polygon* occluder, const char* objectName)
+{
+  ExtremalPluckerPoints (source, occluder, vertices);
+  PluckerPlanes (source, occluder, planes);
+}
+
+//////////////////////////////////////////////////////////////////////////////
+
+BlockerPolyhedron* OcclusionTree::ConstructBlockerForNode ()
+{
+  CS_ASSERT (leafNode);
+  CS_ASSERT (leafNode->type == IN_NODE);
+
+  BlockerPolyhedron* blocker = new BlockerPolyhedron ();
+  blocker->objectName = leafNode->objectName;
+  blocker->sourcePoly = NULL;
+  blocker->blockerPoly = leafNode->poly;
+  PushArray (blocker->vertices, leafNode->fragment);
+
+  for (OcclusionTree* current = this; current; current = current->parent)
+  {
+    blocker->planes.Push (current->splitPlane);
+  }
+
+  return blocker;
+}
+
 OcclusionTree::OcclusionTree (int type, const char* objectName, 
     Polygon* p)
 {
@@ -156,71 +254,182 @@ OcclusionTree::OcclusionTree (int type, const char* objectName,
   leafNode->poly = p;
   posChild = NULL;
   negChild = NULL;
+  parent = NULL;
 }
 
 OcclusionTree::OcclusionTree (const Plucker& split)
 {
   splitPlane = split;
+  leafNode = NULL;
+  parent = NULL;
+}
+
+OcclusionTree* OcclusionTree::ConstructOutNode ()
+{
+  return new OcclusionTree (OUT_NODE, NULL, NULL);
+}
+
+OcclusionTree* OcclusionTree::ConstructInNode (BlockerPolyhedron* poly,
+    const csArray<Plucker>& splitPlanes)
+{
+  csArray<Plucker> planes;
+  OcclusionTree* inNode = new OcclusionTree (IN_NODE, poly->objectName,
+      poly->blockerPoly);
+
+  // First find the new vertex representation.
+  if (splitPlanes.IsEmpty ())
+  {
+    // There is no need to recalculate Vertex form.
+    PushArray (inNode->leafNode->fragment, poly->planes);
+  }
+  else
+  {
+    // Since there were split planes the polygon enumeration algorithm must
+    // be run.
+
+    // Make sure planes contains every hyperplane defining the polyhedron.
+    // and then fill the fragment with the vertex representation.
+    PushArray (planes, splitPlanes);
+    PushArray (planes, poly->planes);
+    CapPlanes (poly->vertices, planes);
+    VertexRepresentation (planes, inNode->leafNode->fragment);
+  }
+
+  // If fragment comes up empty, this is not an in node.
+  if (inNode->leafNode->fragment.IsEmpty ())
+  {
+    delete inNode;
+    return NULL;
+  }
+  else
+  {
+    return inNode;
+  }
+
 }
 
 void OcclusionTree::ReplaceWithElementaryOT (
-    const csArray<Plucker>& splitPlanes, BlockerPolyhedron* poly)
+    const csArray<Plucker>& otplanes, OcclusionTree* inLeaf)
 {
-  OcclusionTree* currentPoly = NULL;
+  delete leafNode;
 
-  csArray<Plucker> planes;
-  poly->AddOTPlanes (splitPlanes, planes);
-
-  for (unsigned int i = 0; i < planes.Length (); i++)
+  if (otplanes.Length () > 0)
   {
-    if (currentPoly == NULL)
+    OcclusionTree* currentPoly = NULL;
+   
+    for (unsigned int i = 0; i < otplanes.Length (); i++)
     {
-      // First time through loop
-      currentPoly = this;
-    }
-    else
-    {
-      // Next plane goes to positive halfspace
-      currentPoly->negChild = new OcclusionTree (planes[i]);
-      currentPoly = currentPoly->negChild;
+      if (currentPoly == NULL)
+      {
+        // First time through loop
+        currentPoly = this;
+        splitPlane = otplanes[i];
+      }
+      else
+      {
+        // Next plane goes to positive halfspace
+        currentPoly->negChild = new OcclusionTree (otplanes[i]);
+        currentPoly = currentPoly->negChild;
+        currentPoly->negChild->parent = currentPoly;
+      }
+
+      // In leaf goes to negative halfspace
+      currentPoly->posChild = new OcclusionTree (OUT_NODE, NULL, NULL);
+      currentPoly->posChild->parent = currentPoly;
     }
 
-    // In leaf goes to negative halfspace
-    currentPoly->posChild = new OcclusionTree (OUT_NODE, NULL, NULL);
+    // Last plane node has a leaf child with an in node
+    currentPoly->negChild = inLeaf;
+    inLeaf->parent = currentPoly;
   }
-
-  // Last plane node has a leaf child with an in node
-  currentPoly->negChild = new OcclusionTree (IN_NODE, poly->objectName, 
-      poly->blockerPoly);
-  VertexRepresentation (planes, currentPoly->negChild->leafNode->fragment);
+  else
+  {
+    // The current node must be replaced with the IN node.
+    leafNode = inLeaf->leafNode;  // Steal replacement's soul!
+    inLeaf->leafNode = NULL;
+    delete inLeaf;
+  }
 }
 
-void OcclusionTree::Union (BlockerPolyhedron* polyhedron,
+void OcclusionTree::InUnion (BlockerPolyhedron* blocker,
     csArray<Plucker> splitPlanes)
 {
   if (leafNode)
   {
     if (leafNode->type == OUT_NODE)
     {
-      delete leafNode;
-
-      //
-//      ReplaceNode (polyhedron);
-    }
-    else  // In node
-    {
-//      if (FaceTest (leafNode->poly, polyhedron->blockerPoly) < 0)
-//      {
-        // leafNode's polygon is behind our current occluder.  Merge.
-//        OcclusionTreeLeaf* leaf = leafNode;
- //       ReplaceNode (polyhedron);
-//        ReplaceOutNodes ();
-//      }
+      OcclusionTree* replacement = ConstructInNode (blocker, splitPlanes);
+      if (replacement)
+      {
+        // TODO:  just inserting the IN node should be enough, right?
+        ReplaceWithElementaryOT (csArray<Plucker> (), replacement);
+      }
     }
   }
   else  // Interior node
   {
-    int test = polyhedron->Test (splitPlane);
+    int test = Test (leafNode->fragment, splitPlane);
+    if (test > 0)
+    {
+      // poly in front
+      posChild->Union (blocker, splitPlanes);
+    }
+    else if (test < 0)
+    {
+      // poly in back
+      negChild->Union (blocker, splitPlanes);
+    }
+    else
+    {
+      // poly is on both sides of splitPlane
+      splitPlanes.Push (splitPlane);
+      posChild->Union (blocker, splitPlanes);
+      splitPlanes[splitPlanes.Length () - 1].Negate ();
+      negChild->Union (blocker, splitPlanes);
+    }
+  }
+}
+
+void OcclusionTree::Union (BlockerPolyhedron* polyhedron,
+    csArray<Plucker> splitPlanes)
+{
+  // TODO:  do we need splitplanes in e-OT as well?
+  // TODO:  can we look at e-OT's planes and the distances from the
+  //        polyhedron to determine if they still bound it?
+
+  if (leafNode)
+  {
+    if (leafNode->type == OUT_NODE)
+    {
+      OcclusionTree* inLeaf = ConstructInNode (polyhedron, splitPlanes);
+      if (inLeaf)
+      {
+        ReplaceWithElementaryOT (polyhedron->planes, inLeaf);
+      }
+    }
+    else  // In node
+    {
+      // TODO:  I don't think we care about what polygon defines this node
+      // as an IN NODE.  We might be able to completely skip the IN node, or
+      // possibly make one node with two IN node children.
+      if (FaceTest (leafNode->poly, polyhedron->blockerPoly, 
+            polyhedron->sourcePoly) < 0)
+      {
+        // leafNode's polygon is behind our current occluder.
+
+        OcclusionTree* inLeaf = ConstructInNode (polyhedron, splitPlanes);
+        if (inLeaf)
+        {
+          BlockerPolyhedron* old = ConstructBlockerForNode ();
+          ReplaceWithElementaryOT (polyhedron->planes, inLeaf);
+          InUnion (old, csArray<Plucker> ());
+        }
+      }
+    }
+  }
+  else  // Interior node
+  {
+    int test = Test (polyhedron->vertices, splitPlane);
     if (test > 0)
     {
       // poly in front
@@ -233,7 +442,7 @@ void OcclusionTree::Union (BlockerPolyhedron* polyhedron,
     }
     else
     {
-      // poly is in both sides of splitPlane
+      // poly is on both sides of splitPlane
       splitPlanes.Push (splitPlane);
       posChild->Union (polyhedron, splitPlanes);
       splitPlanes[splitPlanes.Length () - 1].Negate ();

@@ -43,6 +43,7 @@ struct Polygon
   Polygon (struct iPolygonMesh* mesh, int polygonIndex);
   ~Polygon ();
   void Print () const;
+  csVector3 FindCenter () const;
 
   static void Fill (iMeshWrapper* wrapper, csArray<Polygon*>& array);
   static void Fill (const struct csBox3& region, csArray<Polygon*>& fill);
@@ -134,15 +135,27 @@ class OcclusionTree
   struct OcclusionTreeLeaf* leafNode;
   OcclusionTree* posChild;
   OcclusionTree* negChild;
+  OcclusionTree* parent;
 
-  // Construct a leaf node
+  // Constructs a blocker polyhedron representing lines that pass through the
+  // space of this node.
+  class BlockerPolyhedron* ConstructBlockerForNode ();
+  // Construct a leaf node.
   OcclusionTree (int type, const char* objectName, Polygon* p);
-  // Construct an interior node
+  // Construct an interior node.
   OcclusionTree (const Plucker& split);
+  // Construct an IN node, may return NULL if blocker polyhedron is empty.
+  OcclusionTree* ConstructInNode (struct BlockerPolyhedron* poly,
+    const csArray<Plucker>& splitPlanes);
+  // Constructs an OUT node.
+  OcclusionTree* ConstructOutNode ();
   // Construct an elementary polyhedron and replace current node with it.
-  void ReplaceWithElementaryOT (const csArray<Plucker>& splitPlanes,
-      struct BlockerPolyhedron* poly);
-  // Unions a BlockerPolyhedron
+  void ReplaceWithElementaryOT (const csArray<Plucker>& otplanes,
+      OcclusionTree* inLeaf);
+  // Unions a BlockerPolyhedron that was originally an IN node.
+  void OcclusionTree::InUnion (BlockerPolyhedron* blocker,
+      csArray<Plucker> splitPlanes);
+  // Unions a BlockerPolyhedron.
   void Union (struct BlockerPolyhedron* polyhedron, 
       csArray<Plucker> splitPlanes);
 

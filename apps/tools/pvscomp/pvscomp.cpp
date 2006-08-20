@@ -272,14 +272,11 @@ OcclusionTree* Compiler::ConstructOT(const Polygon* p,
       // Add polyhedrons to the occlusion tree
       for (int j = 0; j < jmax; j++)
       {
-//        if (polyhedron)
         polyhedron->Union (p, polygons[j], 
             wrapper->QueryObject ()->GetName ());
-//        else
-//          polyhedron = OcclusionTree::Construct (p, polygons[j],
-//              wrapper->QueryObject ()->GetName ());
 
-        delete polygons[j];
+        // TODO:  this should be deleted with occlusion tree I guess?
+//        delete polygons[j];
       }
       polygons.Empty ();
     }

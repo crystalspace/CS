@@ -55,6 +55,15 @@ Polygon::Polygon (iPolygonMesh* mesh, int polygonIndex)
   freeData = false;
 }
 
+Polygon::~Polygon()
+{
+  if (freeData)
+  {
+    delete[] vertices;
+    delete[] index;
+  }
+}
+
 void Polygon::Print () const
 {
   printf ("Num vertices: %d\n", numVertices);
@@ -66,13 +75,15 @@ void Polygon::Print () const
   }
 }
 
-Polygon::~Polygon()
+csVector3 Polygon::FindCenter () const
 {
-  if (freeData)
+  csVector3 center;
+  for (int i = 0; i < numVertices; i++)
   {
-    delete[] vertices;
-    delete[] index;
+    center += vertices[index[i]];
   }
+  center = center / numVertices;
+  return center;
 }
 
 void Polygon::Fill (iMeshWrapper* wrapper, csArray<Polygon*>& fill)
