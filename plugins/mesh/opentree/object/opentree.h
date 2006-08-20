@@ -254,6 +254,7 @@ public:
   void GetObjectBoundingBox (csBox3& bbox);
   void SetObjectBoundingBox (const csBox3& b);
   void GetRadius (float& radius, csVector3& center);
+  virtual iPolygonMesh* GetPolygonMeshColldet () { return 0; }
   virtual iTerraFormer* GetTerraFormerColldet () { return 0; }
   virtual iObjectModel* GetObjectModel () { return this; }
 };

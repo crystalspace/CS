@@ -891,7 +891,6 @@ void csMeshWrapper::SetImposterActive (bool flag)
   {
     printf("setting imposter active\n");
     imposter_mesh = new csImposterMesh (engine, this);
-    imposter_mesh->SetImposterReady (false);
   }
 }
 

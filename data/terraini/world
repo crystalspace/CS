@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" ?> 
+<?xml version="1.0" encoding="utf-8" ?>
 <world>
   <variables>
     <variable name="LodM" value="-0.00666667" />
@@ -55,10 +55,13 @@
         <texture name="spark">
             <file>/lib/std/spark.png</file>
         </texture>
+	    <texture name='bark.png'>
+		   <file>bark.png</file>
+		 </texture>
   </textures>
 
   <variables>
-     <variable name="Std Thing Angle" value="0.54321" />
+     <variable name="Std Thing Angle" value="0.90" />
      <variable name="Std Thing Range" value="2" />
   </variables>
 
@@ -69,7 +72,7 @@
 
   <materials>
     <material name="ScatterSky">
-      <color red="0" green="0" blue="0" /> 
+      <color red="0" green="0" blue="0" />
     </material>
     <material name="Base">
       <texture>materialmap_base.png</texture>
@@ -120,13 +123,18 @@
         <material name="spark">
             <texture>spark</texture>
         </material>
+    <material name='materialbark'>
+      <texture>bark.png</texture>
+    </material>
   </materials>
+
+  <!--library>monster_mesh</library-->
 
   <addon>
     <plugin>crystalspace.renderloop.loop.loader</plugin>
     <paramsfile>/shader/std_rloop_terrainfixed.xml</paramsfile>
   </addon>
-    
+
   <settings>
     <clearzbuf>yes</clearzbuf>
     <lightmapcellsize>16</lightmapcellsize>
@@ -147,7 +155,11 @@
 
   <meshfact name="treeFact">
     <plugin>opentreeFact</plugin>
-    <paramsfile>/lev/terraini/quaking_aspen.xml</paramsfile>
+	  <paramsfile>/lev/terraini/weeping_willow.xml</paramsfile>
+	  <!--paramsfile>/lev/terraini/ca_black_oak.xml</paramsfile-->
+	  <!--paramsfile>/lev/terraini/brancaldra.xml</paramsfile-->
+	  <!--paramsfile>/lev/terraini/black_tupelo.xml</paramsfile-->
+	  <!--paramsfile>/lev/terraini/quaking_aspen.xml</paramsfile-->
   </meshfact>
 
   <meshfact name="skydome">
@@ -180,36 +192,53 @@
   </meshfact>
 
   <sector name="room">
-     <light name="sun">
-       <center x="-50000" y="86030" z="0" />
-       <color red="0.85903" green="0.80995" blue="0.70420" />
-       <radius>1000000</radius>
-     </light>
+	  <light name="sun">
+		  <center x="-50000" y="86030" z="0" />
+		  <color red="0.85903" green="0.80995" blue="0.70420" />
+		  <radius>1000000</radius>
+	  </light>
 
-  <meshobj name="box1">
+	  <light name="test">
+		  <center x="0" y="50" z="0" />
+		  <color red="0.85903" green="0.80995" blue="0.70420" />
+		  <radius>3</radius>
+	  </light>
+
+	  <!--meshobj name="box1">
      <plugin>spr3d</plugin>
      <params>
         <factory>spriteFact</factory>
         <action>default</action>
      </params>
      <move>
-        <v x="1" y="13" z="1" />
+        <v x="0" y="30" z="0" />
      </move>
      <imposter active="yes" range="Std Thing Range" tolerance="Std Thing Angle"/>
-   </meshobj>
+   </meshobj-->
 
   <meshobj name="tree1">
      <plugin>opentree</plugin>
      <params>
         <factory>treeFact</factory>
-        <material>Grass</material>
+        <material>bark.png</material>
      </params>
      <move>
-        <v x="-1" y="13" z="-1" />
+        <v x="0" y="13" z="1" />
      </move>
-     <zuse />
      <!--imposter active="yes" range="Std Thing Range" tolerance="Std Thing Angle"/-->
    </meshobj>
+
+  <!--meshobj name="monster1">
+     <plugin>genmesh</plugin>
+     <params>
+        <factory>evil_monster_fact</factory>
+     </params>
+     <move>
+        <v x="1" y="13" z="-1" />
+     </move-->
+     <!--imposter active="yes" range="Std Thing Range" tolerance="Std Thing Angle"/-->
+   <!--/meshobj-->
+
 
     <meshobj name="Terrain">
       <plugin>terrain</plugin>
@@ -229,8 +258,8 @@
         <staticlighting>yes</staticlighting>
         <castshadows>yes</castshadows>
       </params>
-      <move> 
-        <v x="0" y="0" z="0" /> 
+      <move>
+        <v x="0" y="0" z="0" />
       </move>
       <priority>wall</priority>
     </meshobj>

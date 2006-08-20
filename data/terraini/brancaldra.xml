@@ -1,0 +1,92 @@
+<?xml version="1.0"?>
+<params>
+<opentree>
+    <species name="brancaldra">
+        <LeafStemLen>0.5</LeafStemLen>
+        <BaseSize>0.3</BaseSize>
+        <PrunePowerHigh>0.5</PrunePowerHigh>
+        <Scale>10.0</Scale>
+        <LeafQuality>1.0</LeafQuality>
+        <ScaleV>0.0</ScaleV>
+        <Smooth>0.5</Smooth>
+        <Levels>2</Levels>
+        <Flare>0.4</Flare>
+        <LeafScale>0.2</LeafScale>
+        <RatioPower>1.0</RatioPower>
+        <PruneWidthPeak>0.5</PruneWidthPeak>
+        <LeafBend>0.3</LeafBend>
+        <PruneRatio>0.0</PruneRatio>
+        <PruneWidth>0.5</PruneWidth>
+        <AttractionUp>0.0</AttractionUp>
+        <LeafScaleX>0.5</LeafScaleX>
+        <Lobes>5</Lobes>
+        <LobeDepth>.2</LobeDepth>
+        <Ratio>0.1</Ratio>
+        <PrunePowerLow>0.5</PrunePowerLow>
+        <Shape>7</Shape>
+        <Leaves>0</Leaves>
+        <LeafDistrib>4</LeafDistrib>
+        <LeafShape>0</LeafShape>
+        <level level="0">
+            <Taper>0.5</Taper>
+            <Length>1.0</Length>
+            <LengthV>0.0</LengthV>
+            <Scale>.75</Scale>
+            <ScaleV>0.0</ScaleV>
+            <CurveRes>8</CurveRes>
+            <Curve>0.0</Curve>
+            <CurveV>20.0</CurveV>
+            <CurveBack>0.0</CurveBack>
+            <BaseSplits>0</BaseSplits>
+            <SegSplits>0.0</SegSplits>
+            <SplitAngle>0.0</SplitAngle>
+            <SplitAngleV>0.0</SplitAngleV>
+            <DownAngle>0.0</DownAngle>
+            <DownAngleV>0.0</DownAngleV>
+            <Branches>1</Branches>
+            <Rotate>0.0</Rotate>
+            <RotateV>0.0</RotateV>
+        </level>
+        <level level="1">
+            <Taper>1.0</Taper>
+            <Length>0.75</Length>
+            <LengthV>.1</LengthV>
+            <CurveRes>6</CurveRes>
+            <Curve>20.0</Curve>
+            <CurveV>5.0</CurveV>
+            <CurveBack>-50.0</CurveBack>
+            <SegSplits>0.2</SegSplits>
+            <SplitAngle>50.0</SplitAngle>
+            <SplitAngleV>20.0</SplitAngleV>
+            <DownAngle>50.0</DownAngle>
+            <DownAngleV>20.0</DownAngleV>
+            <Branches>12</Branches>
+            <Rotate>120.0</Rotate>
+            <RotateV>50.0</RotateV>
+        </level>
+        <level level="2">
+            <Taper>1.0</Taper>
+            <Length>0.75</Length>
+            <LengthV>.1</LengthV>
+            <CurveRes>6</CurveRes>
+            <Curve>20.0</Curve>
+            <CurveV>5.0</CurveV>
+            <CurveBack>-50.0</CurveBack>
+            <SegSplits>0.2</SegSplits>
+            <SplitAngle>50.0</SplitAngle>
+            <SplitAngleV>20.0</SplitAngleV>
+            <DownAngle>50.0</DownAngle>
+            <DownAngleV>20.0</DownAngleV>
+            <Branches>12</Branches>
+            <Rotate>120.0</Rotate>
+            <RotateV>50.0</RotateV>
+        </level>
+        <level level="3">
+            <RotateV>0.0</RotateV>
+            <DownAngle>30.0</DownAngle>
+            <DownAngleV>0.0</DownAngleV>
+            <Rotate>120.0</Rotate>
+        </level>
+    </species>
+</opentree>
+</params>

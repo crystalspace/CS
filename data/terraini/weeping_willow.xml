@@ -1,0 +1,107 @@
+<?xml version="1.0"?>
+<params>
+<opentree>
+    <species name="weeping_willow">
+        <LobeDepth>0.03</LobeDepth>
+        <LeafStemLen>0.5</LeafStemLen>
+        <BaseSize>0.05</BaseSize>
+        <PrunePowerHigh>0.5</PrunePowerHigh>
+        <Scale>15.0</Scale>
+        <LeafQuality>1.0</LeafQuality>
+        <ScaleV>5.0</ScaleV>
+        <Smooth>0.5</Smooth>
+        <Levels>4</Levels>
+        <Flare>0.75</Flare>
+        <LeafScale>0.12</LeafScale>
+        <RatioPower>2.0</RatioPower>
+        <PruneWidthPeak>0.6</PruneWidthPeak>
+        <LeafBend>0.3</LeafBend>
+        <PruneRatio>1.0</PruneRatio>
+        <PruneWidth>0.4</PruneWidth>
+        <AttractionUp>-2.0</AttractionUp>
+        <LeafScaleX>0.2</LeafScaleX>
+        <Lobes>9</Lobes>
+        <Ratio>0.03</Ratio>
+        <PrunePowerLow>0.0010</PrunePowerLow>
+        <Shape>3</Shape>
+        <Leaves>10</Leaves>
+        <LeafDistrib>3</LeafDistrib>
+        <LeafShape>disc2</LeafShape>
+        <level level="0">
+            <SegSplits>0.1</SegSplits>
+            <BaseSplits>2</BaseSplits>
+            <Curve>0.0</Curve>
+            <CurveV>120.0</CurveV>
+            <Scale>1.0</Scale>
+            <ScaleV>0.0</ScaleV>
+            <RotateV>0.0</RotateV>
+            <CurveBack>20.0</CurveBack>
+            <LengthV>0.0</LengthV>
+            <DownAngleV>0.0</DownAngleV>
+            <SplitAngle>3.0</SplitAngle>
+            <Taper>1.0</Taper>
+            <CurveRes>8</CurveRes>
+            <DownAngle>0.0</DownAngle>
+            <SplitAngleV>0.0</SplitAngleV>
+            <BranchDist>0.0</BranchDist>
+            <Length>0.8</Length>
+            <Branches>1</Branches>
+            <Rotate>0.0</Rotate>
+        </level>
+        <level level="1">
+            <CurveRes>16</CurveRes>
+            <SegSplits>0.2</SegSplits>
+            <Taper>1.0</Taper>
+            <Curve>40.0</Curve>
+            <DownAngle>20.0</DownAngle>
+            <SplitAngleV>10.0</SplitAngleV>
+            <CurveV>90.0</CurveV>
+            <RotateV>30.0</RotateV>
+            <BranchDist>1.0</BranchDist>
+            <Length>0.5</Length>
+            <CurveBack>80.0</CurveBack>
+            <Branches>25</Branches>
+            <DownAngleV>10.0</DownAngleV>
+            <LengthV>0.1</LengthV>
+            <Rotate>-120.0</Rotate>
+            <SplitAngle>30.0</SplitAngle>
+        </level>
+        <level level="2">
+            <CurveRes>12</CurveRes>
+            <SegSplits>0.2</SegSplits>
+            <Taper>1.0</Taper>
+            <Curve>0.0</Curve>
+            <DownAngle>30.0</DownAngle>
+            <SplitAngleV>20.0</SplitAngleV>
+            <CurveV>0.0</CurveV>
+            <RotateV>30.0</RotateV>
+            <BranchDist>1.0</BranchDist>
+            <Length>1.5</Length>
+            <CurveBack>0.0</CurveBack>
+            <Branches>10</Branches>
+            <DownAngleV>10.0</DownAngleV>
+            <LengthV>0.0</LengthV>
+            <Rotate>-120.0</Rotate>
+            <SplitAngle>45.0</SplitAngle>
+        </level>
+        <level level="3">
+            <CurveRes>1</CurveRes>
+            <SegSplits>0.0</SegSplits>
+            <Taper>1.0</Taper>
+            <Curve>0.0</Curve>
+            <DownAngle>20.0</DownAngle>
+            <SplitAngleV>0.0</SplitAngleV>
+            <CurveV>0.0</CurveV>
+            <RotateV>0.0</RotateV>
+            <BranchDist>1.0</BranchDist>
+            <Length>0.1</Length>
+            <CurveBack>0.0</CurveBack>
+            <Branches>150</Branches>
+            <DownAngleV>10.0</DownAngleV>
+            <LengthV>0.0</LengthV>
+            <Rotate>140.0</Rotate>
+            <SplitAngle>0.0</SplitAngle>
+        </level>
+    </species>
+</opentree>
+</params>
