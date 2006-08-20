@@ -51,6 +51,16 @@
     <paramsfile>/shader/std_rloop_terrainimproved.xml</paramsfile>
   </addon>
     
+  <addon>
+    <plugin>crystalspace.terraformer.simple.loader</plugin>
+    <params>
+      <name>simple</name>
+      <heightmap>/lev/terrain/heightmap.png</heightmap>
+      <scale x="256" y="30" z="256" />
+      <materialmap image="/lev/terrain/materialmap.png" />
+    </params>
+  </addon>
+
   <settings>
     <clearscreen>yes</clearscreen>
     <clearzbuf>yes</clearzbuf>
@@ -72,18 +82,20 @@
       <collider>crystalspace.mesh.object.terrainimproved.collider</collider>
 
       <cells>
-<!--        <cell name="main">
+        <cell name="main">
           <grid_size x="512" y="512" />
           <material_size x="64" y="64" />
-          <position x="-256" y="-256" />
+          <position x="150" y="150" />
           <size x="512" y="512" z="150" />
+          <material_persistent />
 
           <feeder>
-            <plugin>crystalspace.mesh.object.terrainimproved.threadeddatafeeder</plugin>
-            <param name="heightmap source" value="/lev/terraini/heightmap.png" />
-            <param name="materialmap source" value="/lev/terraini/material_blank.png" />
+            <plugin>crystalspace.mesh.object.terrainimproved.terraformerdatafeeder</plugin>
+            <param name="terraformer" value="simple" />
+            <param name="sampleregion min" value="-256 -256" />
+            <param name="sampleregion max" value="256 256" />
           </feeder>
-        </cell>-->
+        </cell>
 
         <cell>
           <grid_size x="33" y="33" />
