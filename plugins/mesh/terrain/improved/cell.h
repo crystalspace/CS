@@ -50,6 +50,7 @@ private:
   csString name;
   int grid_width, grid_height;
   int material_width, material_height;
+  bool material_persistent;
   csVector2 position;
   csVector3 size;
   csRef<iTerrainDataFeeder> feeder;
@@ -77,6 +78,7 @@ private:
 public:
   csTerrainCell (iTerrainSystem* parent, const char* name, int grid_width,
                  int grid_height, int material_width, int material_height,
+                 bool material_persistent,
                  const csVector2& position, const csVector3& size,
                  iTerrainDataFeeder* feeder,
                  iTerrainCellRenderProperties* render_properties,
@@ -119,6 +121,7 @@ public:
 
   virtual int GetMaterialMapWidth () const;
   virtual int GetMaterialMapHeight () const;
+  virtual bool GetMaterialPersistent() const;
   virtual csLockedMaterialMap LockMaterialMap (const csRect& rectangle);
   virtual void UnlockMaterialMap ();
 

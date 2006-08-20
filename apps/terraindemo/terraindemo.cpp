@@ -359,10 +359,11 @@ bool TerrainDemo::LoadMap ()
       "crystalspace.mesh.object.terrainimproved.threadeddatafeeder");
 
       t_feeder->SetParam("heightmap source", heightmap_array[x & 1][y & 1]);
-      t_feeder->SetParam("materialmap source", materialmap_array[x & 1][y & 1]);
+      t_feeder->SetParam("materialmap source", materialmap_array[x & 1]
+	    [y & 1]);
 
-      t_factory->AddCell("cell", 513, 512, 512, 512, csVector2(x * width,  y * height),
-          csVector3(width, height, z), t_feeder);
+      t_factory->AddCell("cell", 513, 512, 512, 512, false, csVector2(x *
+		  width,  y * height), csVector3(width, height, z), t_feeder);
     }
     
   csRef<iMeshObject> t_mesh = t_mesh_factory->NewInstance();

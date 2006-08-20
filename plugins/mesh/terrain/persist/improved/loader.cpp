@@ -63,6 +63,7 @@ enum
   XMLTOKEN_PARAM,
   XMLTOKEN_RENDERPROPERTIES,
   XMLTOKEN_COLLISIONPROPERTIES,
+  XMLTOKEN_MATERIALPERSISTENT,
   
   XMLTOKEN_FACTORY,
   XMLTOKEN_MATERIALPALETTE,
@@ -109,6 +110,7 @@ bool csTerrainFactoryLoader::Initialize (iObjectRegistry* objreg)
   xmltokens.Register ("param", XMLTOKEN_PARAM);
   xmltokens.Register ("render_properties", XMLTOKEN_RENDERPROPERTIES);
   xmltokens.Register ("collision_properties", XMLTOKEN_COLLISIONPROPERTIES);
+  xmltokens.Register ("material_persistent", XMLTOKEN_MATERIALPERSISTENT);
   
   return true;
 }
@@ -193,6 +195,7 @@ csPtr<iBase> csTerrainFactoryLoader::Parse (iDocumentNode* node,
               const char* cell_name = child->GetAttributeValue ("name");
               int grid_width = 0, grid_height = 0, material_width = 0;
               int material_height = 0;
+              bool material_persistent = false;
               csVector2 position;
               csVector3 size;
               csRef<iTerrainDataFeeder> feeder;
@@ -222,6 +225,11 @@ csPtr<iBase> csTerrainFactoryLoader::Parse (iDocumentNode* node,
                   {
                     material_width = child->GetAttributeValueAsInt ("x");
                     material_height = child->GetAttributeValueAsInt ("y");
+                    break;
+                  }
+                  case XMLTOKEN_MATERIALPERSISTENT:
+                  {
+                    material_persistent = true;
                     break;
                   }
                   case XMLTOKEN_POSITION:
@@ -349,8 +357,8 @@ csPtr<iBase> csTerrainFactoryLoader::Parse (iDocumentNode* node,
               }
 
               iTerrainCell* cell = factory->AddCell(cell_name, grid_width,
-                grid_height, material_width, material_height, position, size,
-                feeder);
+                grid_height, material_width, material_height,
+                material_persistent, position, size, feeder);
 
               iTerrainCellRenderProperties* render_p =
                 cell->GetRenderProperties ();

@@ -241,10 +241,19 @@ struct iTerrainCell : public virtual iBase
   virtual int GetMaterialMapHeight () const = 0;
 
   /**
+   * Get material persistent flag. If it is true, material data is stored in
+   * the cell (that makes updating material data faster and makes material data
+   * lock read/write, but it means larger memory overhead)
+   */
+  virtual bool GetMaterialPersistent() const = 0;
+
+  /**
    * Lock an area of material map (practically write-only, reading the
    * values will not produce sensible values if you did not just write
    * them - that is, the returned block memory is a read-write one, but
    * it is a temporary block of memory filled with garbage).
+   * Note, that if you created cell with 'material_persistent' flag, the
+   * lock is read/write.
    *
    * If you want to lock the whole cell, use the rectangle
    * csRect(0, 0, material map width, material map height).

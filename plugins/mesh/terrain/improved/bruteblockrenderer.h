@@ -55,7 +55,11 @@ public:
   virtual void SetVisible (bool value);
 
   int GetBlockResolution() const {return block_res;}
-  void SetBlockResolution(int value) {block_res = value;}
+  void SetBlockResolution(int value)
+  {
+    block_res = csLog2 (value);
+    block_res = (int) ((float)pow (2.0f, block_res));
+  }
   
   float GetLODLCoeff() const {return lod_lcoeff;}
   void SetLODLCoeff(float value) {lod_lcoeff = value;}

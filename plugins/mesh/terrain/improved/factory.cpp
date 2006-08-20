@@ -123,6 +123,7 @@ void csTerrainFactory::SetCollider (iTerrainCollider* collider)
 
 iTerrainCell* csTerrainFactory::AddCell(const char* name, int grid_width,
 int grid_height, int material_width, int material_height,
+bool material_persistent,
 const csVector2& position, const csVector3& size, iTerrainDataFeeder* feeder)
 {
   csRef<iTerrainCellRenderProperties> render_properties =
@@ -132,8 +133,8 @@ const csVector2& position, const csVector3& size, iTerrainDataFeeder* feeder)
   
   csRef<csTerrainCell> cell;
   cell.AttachNew (new csTerrainCell(terrain, name, grid_width, grid_height,
-  material_width, material_height, position, size, feeder, render_properties,
-  collision_properties, renderer, collider));
+  material_width, material_height, material_persistent, position, size, feeder,
+  render_properties, collision_properties, renderer, collider));
                                      
   terrain->AddCell (cell);
 

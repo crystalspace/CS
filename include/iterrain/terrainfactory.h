@@ -60,6 +60,9 @@ struct iTerrainFactory : public virtual iBase
    * height requirements. See iTerrainCell::GetGridHeight
    * \param material_width - material map width
    * \param material_height - material map height
+   * \param material_persistent - true if you want to store material data
+   * (that makes updating material data faster and makes material data lock
+   * read/write, but it means larger memory overhead)
    * \param position - cell object-space position
    * \param size - cell object-space size and height scale
    * \param feeder - feeder that would be attached to the cell
@@ -68,7 +71,8 @@ struct iTerrainFactory : public virtual iBase
    */
   virtual iTerrainCell* AddCell (const char* name, int grid_width,
                         int grid_height, int material_width,
-                        int material_height, const csVector2& position,
+                        int material_height, bool material_persistent,
+                        const csVector2& position,
                         const csVector3& size, iTerrainDataFeeder* feeder) = 0;
 };
 

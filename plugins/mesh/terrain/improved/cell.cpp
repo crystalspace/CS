@@ -39,6 +39,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ImprovedTerrain)
 csTerrainCell::csTerrainCell (iTerrainSystem* parent, const char* name,
 int grid_width,
 int grid_height, int material_width, int material_height,
+bool material_persistent,
 const csVector2& position, const csVector3& size, iTerrainDataFeeder* feeder,
 iTerrainCellRenderProperties* render_properties,
 iTerrainCellCollisionProperties* collision_properties,
@@ -62,6 +63,8 @@ iTerrainRenderer* renderer, iTerrainCollider* collider)
   
   this->material_width = material_width;
   this->material_height = material_height;
+
+  this->material_persistent = material_persistent;
   
   this->position = position;
   this->size = size;
@@ -106,6 +109,9 @@ void csTerrainCell::SetLoadState(LoadState state)
         {
           heightmap.SetSize (grid_width * grid_height, 0);
 
+          if (material_persistent)
+            materialmap.SetSize (material_width * material_height, 0);
+
           this->state = feeder->PreLoad (this) ? PreLoaded : NotLoaded;
 
           break;
@@ -113,6 +119,9 @@ void csTerrainCell::SetLoadState(LoadState state)
         case Loaded:
         {
           heightmap.SetSize (grid_width * grid_height);
+
+          if (material_persistent)
+            materialmap.SetSize (material_width * material_height, 0);
 
           this->state = feeder->Load (this) ? Loaded : NotLoaded;
 
@@ -145,6 +154,7 @@ void csTerrainCell::SetLoadState(LoadState state)
         case NotLoaded:
         {
           heightmap.DeleteAll ();
+          materialmap.DeleteAll ();
 
           this->state = NotLoaded;
 
@@ -220,11 +230,11 @@ int csTerrainCell::GetGridHeight () const
 
 csLockedHeightData csTerrainCell::GetHeightData ()
 {
-	csLockedHeightData data;
-	data.data = heightmap.GetArray ();
-	data.pitch = grid_width;
+  csLockedHeightData data;
+  data.data = heightmap.GetArray ();
+  data.pitch = grid_width;
 
-	return data;
+  return data;
 }
 
 csLockedHeightData csTerrainCell::LockHeightData (const csRect& rectangle)
@@ -268,15 +278,30 @@ int csTerrainCell::GetMaterialMapHeight () const
   return material_height;
 }
 
+bool csTerrainCell::GetMaterialPersistent() const
+{
+  return material_persistent;
+}
+
 csLockedMaterialMap csTerrainCell::LockMaterialMap (const csRect& rectangle)
 {
   csLockedMaterialMap data;
   
-  materialmap.SetSize (rectangle.Width () * rectangle.Height ());
-  mm_rect = rectangle;
+  if (!material_persistent)
+  {
+    materialmap.SetSize (rectangle.Width () * rectangle.Height ());
 
-  data.data = materialmap.GetArray ();
-  data.pitch = rectangle.Width ();
+    data.data = materialmap.GetArray ();
+    data.pitch = rectangle.Width ();
+  }
+  else
+  {
+    data.data = materialmap.GetArray () + rectangle.ymin * material_width +
+      rectangle.xmin;
+    data.pitch = material_width;
+  }
+
+  mm_rect = rectangle;
 
   return data;
 }
@@ -301,7 +326,7 @@ void csTerrainCell::UnlockMaterialMap ()
       mm_rect.Width ());
   }
 
-  materialmap.Empty ();
+  if (!material_persistent) materialmap.DeleteAll ();
 }
 
 void csTerrainCell::SetMaterialMask (unsigned int material, iImage* image)
