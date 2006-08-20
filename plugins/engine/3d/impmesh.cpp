@@ -38,13 +38,9 @@ csImposterMesh::csImposterMesh (csEngine* engine, csMeshWrapper *parent)
   parent_mesh = parent;
 
   tex = new csImposterProcTex (engine, this);
-  //@@@ material name
   impostermat = engine->CreateMaterial ("Imposter", tex->GetTexture ());
 
-  ready	= false;
-  incidence_dist = 0;
-
-  //Add four to initialise array because of bug in csPoly3D
+  //@@@ Add four to initialise array because of bug in csPoly3D
   cutout.AddVertex(csVector3());
   cutout.AddVertex(csVector3());
   cutout.AddVertex(csVector3());
@@ -52,48 +48,34 @@ csImposterMesh::csImposterMesh (csEngine* engine, csMeshWrapper *parent)
 
   SetImposterReady(false);
   dirty = false;
+  incidence_dist = 361;
 }
 
 csImposterMesh::~csImposterMesh ()
 {
-  delete impostermat;
   delete tex;
 }
 
-float csImposterMesh::CalcIncidenceAngleDist (iRenderView *rview)
+float csImposterMesh::CalcIncidenceAngleDist (iCamera *cam)
 {
   // Calculate angle of incidence vs. the camera
-  iCamera* camera = rview->GetCamera ();
-  csReversibleTransform obj = 
+  csReversibleTransform objt = 
     (parent_mesh->GetCsMovable()).csMovable::GetTransform ();
-  csReversibleTransform cam = camera->GetTransform ();
-  csReversibleTransform seg = obj / cam;  // Matrix Math Magic!
+  csReversibleTransform camt = cam->GetTransform ();
+  csReversibleTransform seg = objt / camt;  // Matrix Math Magic!
   csVector3 straight(0,0,1);
-  csVector3 pt = (seg * straight).Unit ();
+  csVector3 pt = seg * straight;
   return csSquaredDist::PointPoint (straight, pt);
 }
 
 bool csImposterMesh::CheckIncidenceAngle (iRenderView *rview, float tolerance)
 {
-/*
-  float const dist2 = CalcIncidenceAngleDist(rview);
-  float diff = dist2 - incidence_dist;
+  float const curdist = CalcIncidenceAngleDist(rview->GetCamera ());
+  float diff = curdist - incidence_dist;
   if (diff < 0) diff = -diff;
-printf("dist2 %f diff: %f tolerance: %f\n", dist2, diff, tolerance);
-*/
-
-  iCamera* cam = rview->GetCamera ();
-  csVector3 camp = cam->GetTransform ().GetOrigin ();
-  csVector3 objp =
-    parent_mesh->GetMovable ()->GetFullPosition ();
-
-  csVector3 cameraDir = camp - objp; //@@@ use real imposter center
-  cameraDir = cameraDir.Unit ();
-
-  float diff = imposterDir * cameraDir;
 
   // If not ok, mark for redraw of imposter
-  if (diff < tolerance)
+  if (diff > tolerance)
   {
     SetImposterReady (false);
     return false;
@@ -106,57 +88,66 @@ void csImposterMesh::SetImposterReady (bool r)
   ready=r;
   if (!ready)
   {
-//printf("request imposter update...");
+//printf("request imposter update...\n");
     engine->imposterUpdateList.Push(
       csWeakRef<csImposterProcTex>(tex));
   }
 }
 
 
-void csImposterMesh::FindImposterRectangle (const iCamera* c)
+void csImposterMesh::FindImposterRectangle (iCamera* c)
 {
   // Called from csImposterProcTex during Anim.
   //  (Recalc of texture causes recalc of imposter poly also.)
 
-  // Get screen bounding box, modified to also return depth of
-  //  point of max width or height in the box.
-  // Project screen bounding box, at the returned depth to
-  //  the camera transform to rotate it around where we need it
-  // Save as csPoly3d for later rendering
+  // Save camera orientation
+  const csOrthoTransform oldt = c->GetTransform ();
 
+  // Look at mesh
+  csVector3 meshcenter = parent_mesh->GetWorldBoundingBox ().GetCenter ();
+  csVector3 campos = c->GetTransform ().GetOrigin ();
+
+  c->GetTransform ().LookAt (meshcenter - campos,
+     c->GetTransform ().GetT2O ().Col2 ());
+
+  // Get screen bounding box
   res = parent_mesh->GetScreenBoundingBox (c);
 
+  //calculate height and width of the imposter on screen
   height = (res.sbox.GetCorner(1) - res.sbox.GetCorner(0)).y;
   width = (res.sbox.GetCorner(2) - res.sbox.GetCorner(0)).x;
 
-  csVector3 v1 = c->InvPerspective (res.sbox.GetCorner(0), res.distance);
-  csVector3 v2 = c->InvPerspective (res.sbox.GetCorner(1), res.distance);
-  csVector3 v3 = c->InvPerspective (res.sbox.GetCorner(3), res.distance);
-  csVector3 v4 = c->InvPerspective (res.sbox.GetCorner(2), res.distance);
+  // Project screen bounding box, at the returned depth to
+  //  the camera transform to rotate it around where we need it
+  float middle = (res.cbox.MinZ () + res.cbox.MaxZ ()) / 2;
+
+  csVector3 v1 = c->InvPerspective (res.sbox.GetCorner(0), middle);
+  csVector3 v2 = c->InvPerspective (res.sbox.GetCorner(1), middle);
+  csVector3 v3 = c->InvPerspective (res.sbox.GetCorner(3), middle);
+  csVector3 v4 = c->InvPerspective (res.sbox.GetCorner(2), middle);
   
+  //@@@ put these into w2o and save transform
   v1 = c->GetTransform ().This2Other (v1);
   v2 = c->GetTransform ().This2Other (v2);
   v3 = c->GetTransform ().This2Other (v3);
   v4 = c->GetTransform ().This2Other (v4);
 
+  // Save as csPoly3d for later rendering
   cutout[0] = v1;
   cutout[1] = v2;
   cutout[2] = v3;
   cutout[3] = v4;
 
-  //calculating imposter facing and save for angle checking
-  csVector3 camp = c->GetTransform ().GetOrigin ();
-  csVector3 objp = 
-//v1 + 0,5 * (v2-v1) + 0,5 * (v3-v1); //@@@ invp cheaper?
-    parent_mesh->GetMovable ()->GetFullPosition ();
+  // Revert camera changes
+  c->SetTransform (oldt);
 
-  imposterDir = camp - objp; //@@@ use real imposter center
-  imposterDir = imposterDir.Unit ();
+  // save current facing for angle checking
+  incidence_dist = CalcIncidenceAngleDist (c);
 
-//  incidence_dist = CalcIncidenceAngleDist (iRenderView *rview);
   dirty = true;
 }
 
+//static arrays that keep the imposterdata
 CS_IMPLEMENT_STATIC_VAR (GetMeshIndices, csDirtyAccessArray<uint>, ());
 CS_IMPLEMENT_STATIC_VAR (GetMeshVertices, csDirtyAccessArray<csVector3>, ());
 CS_IMPLEMENT_STATIC_VAR (GetMeshTexels, csDirtyAccessArray<csVector2>, ());
@@ -164,6 +155,7 @@ CS_IMPLEMENT_STATIC_VAR (GetMeshColors, csDirtyAccessArray<csVector4>, ());
 
 csRenderMesh** csImposterMesh::GetRenderMesh(iRenderView *rview)
 {
+  //Get an unused mesh
   bool rmCreated;
   csRenderMesh*& mesh = rmHolder.GetUnusedMesh (rmCreated,
     rview->GetCurrentFrameNumber ());
@@ -176,9 +168,13 @@ csRenderMesh** csImposterMesh::GetRenderMesh(iRenderView *rview)
   {
     //Initialize mesh
     mesh->meshtype = CS_MESHTYPE_TRIANGLES;
+    mesh->flipCulling = false;
+    mesh->supports_pseudoinstancing = false;
+    mesh->do_mirror = rview->GetCamera ()->IsMirrored ();
+    mesh->object2world = csReversibleTransform ();
+    mesh->worldspace_origin = csVector3(0,0,0);
     mesh->mixmode = CS_FX_ALPHA;
     mesh->z_buf_mode = CS_ZBUF_TEST;
-    mesh->object2world = csReversibleTransform ();
     mesh->material = impostermat;
 
     mesh_indices.Push (0);

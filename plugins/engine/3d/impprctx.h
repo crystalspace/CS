@@ -62,7 +62,7 @@ public:
 
   bool GetImposterReady () { return imposter_ready; }
   void SetImposterReady (bool r) { imposter_ready = r; }
-  void Animate (iRenderView *rview, iSector *s);
+  void Update (iRenderView *rview, iSector *s);
   csImposterMesh *GetParent () { return mesh; }
   iTextureWrapper *GetTexture () { return tex; }
 };

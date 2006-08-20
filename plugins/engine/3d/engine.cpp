@@ -1659,21 +1659,21 @@ void csEngine::StartDraw (iCamera *c, iClipper2D* view, csRenderView &rview)
 
 
   //Imposter updating where needed
-  imposterUpdateList.Compact();
+  imposterUpdateList.Compact ();
   csWeakRefArray<csImposterProcTex>::Iterator it = 
     imposterUpdateList.GetIterator ();
 
   //@@@ need to finish user's begindraw since they don't nest correctly
-  G3D->FinishDraw();
+  G3D->FinishDraw ();
 
   //update if camera is in a sector
   while (it.HasNext ())
   {
-    it.Next ()->Animate(&rview, c->GetSector ());
+    it.Next ()->Update (&rview, c->GetSector ());
   }
 
   //all updates done, empty list for next frame
-  imposterUpdateList.Empty();
+  imposterUpdateList.Empty ();
 
   //@@@ resume user's begindraw (add old flags?)
   G3D->BeginDraw (CSDRAW_3DGRAPHICS | CSDRAW_CLEARZBUFFER);

@@ -11,6 +11,8 @@ This file describes the history of the SoC imposter branch.
 20-Aug-2006
 	- Fossi got the opentree mesh to show
 	- Fossi completed the first opentree plugin version
+	- Fossi made various small improvements to the imposters and improved
+	  the inline documentation
 19-Aug-2006
 	- Fossi made various optimizations
 	- Fossi updated opentree mesh and testlevel

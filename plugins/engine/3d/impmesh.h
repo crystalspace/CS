@@ -67,7 +67,8 @@ private:
   //convenience shortcut
   csEngine *engine;
 
-  void FindImposterRectangle (const iCamera *camera);
+  float CalcIncidenceAngleDist (iCamera *camera);
+  void FindImposterRectangle (iCamera *camera);
   void SetImposterReady (bool r);
 
   friend class csImposterProcTex;
@@ -76,8 +77,7 @@ public:
   csImposterMesh (csEngine* engine, csMeshWrapper *parent);
   ~csImposterMesh ();
 
-  float CalcIncidenceAngleDist (iRenderView *rview);
-  bool CheckIncidenceAngle (iRenderView *rview,float tolerance);
+  bool CheckIncidenceAngle (iRenderView *rview, float tolerance);
 
   //returns the imposter billboard
   csRenderMesh** GetRenderMesh (iRenderView *rview);
