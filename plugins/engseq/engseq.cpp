@@ -530,7 +530,7 @@ public:
   OpFadeAmbientLight (iParameterESM* sectorpar, const csColor& color,
   	csTicks duration, iEngineSequenceManager* eseqmgr,
 	uint sequence_id) :
-    end_col (end_col), duration (duration), eseqmgr (eseqmgr),
+    end_col (color), duration (duration), eseqmgr (eseqmgr),
     sequence_id (sequence_id)
   {
     sector = SCF_QUERY_INTERFACE (sectorpar->GetValue (), iSector);
