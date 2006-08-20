@@ -39,6 +39,7 @@ public:
 
   bool enable;
   bool enableCombine;
+  bool enableCrossbar;
   GLint texUnits;
 
   csLightShaderVarCache lsvCache;
