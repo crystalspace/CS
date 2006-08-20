@@ -61,6 +61,8 @@ private:
   //use genmesh internally for now
   csRef<iMeshWrapper> treemesh;
   csRef<iGeneralMeshState> treemeshstate;
+  csRef<iMeshWrapper> leafmesh;
+  csRef<iGeneralMeshState> leafmeshstate;
 
 public:
   /// Constructor.
@@ -68,6 +70,12 @@ public:
 
   /// Destructor.
   virtual ~csOpenTreeObject ();
+
+  /**\name iOpenTreeState implementation
+   * @{ */
+  virtual bool SetMaterialWrapper (char level, iMaterialWrapper* mat);
+  virtual iMaterialWrapper* GetMaterialWrapper (char level);
+  /** @} */
 
   /**\name iMeshObject implementation
    * @{ */

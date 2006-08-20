@@ -383,7 +383,8 @@ csPtr<iBase> csOpenTreeMeshLoader::Parse (iDocumentNode* node,
             return 0;
           }
           CHECK_MESH (mesh);
-          mesh->SetMaterialWrapper (mat);
+          char level = (char)child->GetAttributeValueAsInt ("level");
+          meshstate->SetMaterialWrapper (level, mat);
         }
 	break;
       case XMLTOKEN_MIXMODE:

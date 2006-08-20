@@ -88,6 +88,16 @@ struct iOpenTreeFactoryState : public virtual iBase
 struct iOpenTreeState : public virtual iBase
 {
   SCF_INTERFACE (iOpenTreeState, 0, 0, 1);
+
+  /**
+   *  Set the material for the given level
+   */
+  virtual bool SetMaterialWrapper (char level, iMaterialWrapper* mat) = 0;
+
+  /**
+   *  Get the material for the given level
+   */
+  virtual iMaterialWrapper* GetMaterialWrapper (char level) = 0;
 };
 
 /** @} */

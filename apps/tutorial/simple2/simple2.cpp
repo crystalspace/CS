@@ -315,7 +315,7 @@ void Simple::CreateSprites ()
   i->SetMinDistance(distvar);
 
   csRef<iSharedVariable> rotvar = varlist->New();
-  rotvar->Set(0.99f);
+  rotvar->Set(0.90f);
   i->SetRotationTolerance(rotvar);
 
   printf("done...\n");

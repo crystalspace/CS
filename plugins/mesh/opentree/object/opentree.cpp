@@ -110,6 +110,11 @@ csOpenTreeObject::csOpenTreeObject
   treemesh->GetMeshObject ()->SetMeshWrapper (treemesh);
   treemeshstate = scfQueryInterface<iGeneralMeshState> 
     (treemesh->GetMeshObject ());
+
+  leafmesh = factory->leaffact->CreateMeshWrapper ();
+  leafmesh->GetMeshObject ()->SetMeshWrapper (leafmesh);
+//  treemeshstate = scfQueryInterface<iGeneralMeshState> 
+//    (treemesh->GetMeshObject ());
 }
 
 csOpenTreeObject::~csOpenTreeObject ()
@@ -124,7 +129,17 @@ iMeshObjectFactory* csOpenTreeObject::GetFactory () const
 csRenderMesh** csOpenTreeObject::GetRenderMeshes (int &n, iRenderView* 
   rview, iMovable* mov, uint32 frustum)
 {
-  return treemesh->GetMeshObject ()->GetRenderMeshes(n, rview, mov, frustum);
+  csRenderMesh** tree = 
+    treemesh->GetMeshObject ()->GetRenderMeshes(n, rview, mov, frustum);
+  csRenderMesh** leaves = 
+    leafmesh->GetMeshObject ()->GetRenderMeshes(n, rview, mov, frustum);
+  n = 2;
+
+  csRenderMesh** meshes = new csRenderMesh*[2];
+  meshes[0] = *tree;
+  meshes[1] = *leaves;
+
+  return meshes;
 }
 
 bool csOpenTreeObject::HitBeamOutline (const csVector3& start, 
@@ -147,12 +162,27 @@ iObjectModel* csOpenTreeObject::GetObjectModel ()
   return factory->GetObjectModel ();
 }
 
+bool csOpenTreeObject::SetMaterialWrapper (char level, iMaterialWrapper* mat)
+{
+  if (level == 5) leafmesh->GetMeshObject ()->SetMaterialWrapper(mat);
+  else treemesh->GetMeshObject ()->SetMaterialWrapper(mat);
+
+  return true;
+}
+
+iMaterialWrapper* csOpenTreeObject::GetMaterialWrapper (char level)
+{
+  //@@@
+  return material;
+}
+
 bool csOpenTreeObject::SetMaterialWrapper (iMaterialWrapper* mat)
 {
   //@@@
   material = mat;
-
-  return treemesh->GetMeshObject ()->SetMaterialWrapper(mat);
+  treemesh->GetMeshObject ()->SetMaterialWrapper(mat);
+  leafmesh->GetMeshObject ()->SetMaterialWrapper(mat);
+  return true;
 }
 
 //----------------------------------------------------------------------
@@ -222,6 +252,55 @@ csOpenTreeObjectFactory::csOpenTreeObjectFactory (iMeshObjectType* pParent,
   string_curvev = strings->Request("CurveV");
   string_branches = strings->Request("Branches");
   string_curveres = strings->Request("CurveRes");
+
+  treedata.trunk.scale = 0;
+  treedata.trunk.scaleV = 0;
+  treedata.trunk.baseSplits = 0;
+  treedata.trunk.dist = 0;
+
+  for (int i = 0; i < 5; i++)
+  {
+    treedata.level[i].levelNumber = 0;
+    treedata.level[i].downAngle = 0;
+    treedata.level[i].downAngleV = 0;
+    treedata.level[i].rotate = 0;
+    treedata.level[i].rotateV = 0;
+    treedata.level[i].branches = 0;
+    treedata.level[i].branchDist = 0;
+    treedata.level[i].length = 0;
+    treedata.level[i].lengthV = 0;
+    treedata.level[i].taper = 0;
+    treedata.level[i].segSplits = 0;
+    treedata.level[i].splitAngle = 0;
+    treedata.level[i].splitAngleV = 0;
+    treedata.level[i].curveRes = 0;
+    treedata.level[i].curve = 0;
+    treedata.level[i].curveBack = 0;
+    treedata.level[i].curveV = 0;
+  }
+
+  treedata.shape = 0;
+  treedata.baseSize = 0;
+  treedata.scale = 0;
+  treedata.scaleV = 0;
+  treedata.levels = 0;
+  treedata.ratio = 0;
+  treedata.ratioPower = 0;
+  treedata.lobes = 0;
+  treedata.lobeDepth = 0;
+  treedata.flare = 0;
+  treedata.leaves = 0;
+  treedata.leafScale = 0;
+  treedata.leafScaleX = 0;
+  treedata.leafQuality = 0;
+  treedata.leafShapeRatio = 0;
+  treedata.leafBend = 0;
+  treedata.attractionUp = 0;
+  treedata.pruneRatio = 0;
+  treedata.prunePowerLow = 0;
+  treedata.prunePowerHigh = 0;
+  treedata.pruneWidth = 0;
+  treedata.pruneWidthPeak = 0;
 }
 
 csOpenTreeObjectFactory::~csOpenTreeObjectFactory ()
@@ -387,46 +466,53 @@ void csOpenTreeObjectFactory::GenerateTree ()
   tree->useQuadLeaves(); //TriangleLeaves();
 
   int vertexCount = 0;
-  int sumCount = 0;
   tree->getVerticesCount(0, &vertexCount);
-  sumCount += vertexCount;
   tree->getVerticesCount(1, &vertexCount);
-  sumCount += vertexCount;
   tree->getVerticesCount(2, &vertexCount);
-  sumCount += vertexCount;
-printf("Tree vertex count: %i ", sumCount);
+printf("Tree vertex count: %i ", vertexCount);
 
-  treefactstate->SetVertexCount(sumCount);
+  treefactstate->SetVertexCount(vertexCount);
   opentree::otVertices* vertices = new VertexHelper (treefactstate);
   tree->getVertices(0, *vertices);
   tree->getVertices(1, *vertices);
   tree->getVertices(2, *vertices);
   delete vertices;
 
+  int triangleCount = 0;
   int trunk_triangleCount = 0;
   int branch_triangleCount = 0;
   int subbranch_triangleCount = 0;
   tree->getIndicesCount(0, &trunk_triangleCount);
   tree->getIndicesCount(1, &branch_triangleCount);
-  tree->getIndicesCount(2, &subbranch_triangleCount);
-  sumCount = trunk_triangleCount + branch_triangleCount + subbranch_triangleCount;
-printf("Tree index count: %i ", sumCount);
+  //tree->getIndicesCount(2, &subbranch_triangleCount);
+  triangleCount = trunk_triangleCount + branch_triangleCount;// + subbranch_triangleCount
+printf("Tree index count: %i ", triangleCount);
 
-  treefactstate->SetTriangleCount(sumCount);
+  treefactstate->SetTriangleCount(triangleCount);
   opentree::otTriangles* indizes = new IndexHelper (treefactstate);
   tree->getIndices(0, *indizes, 0);
   tree->getIndices(1, *indizes, trunk_triangleCount);
-  tree->getIndices(2, *indizes, branch_triangleCount);
+  //tree->getIndices(2, *indizes, branch_triangleCount);
   printf("added indexes: %i\n", indizes->getCount());
 
-  /*
+
+  vertexCount = 0;
   tree->getLeavesVerticesCount(&vertexCount);
 printf("leaf vertex count: %i ", vertexCount);
   leaffactstate->SetVertexCount(vertexCount);
+
   vertices = new VertexHelper (leaffactstate);
   tree->getLeavesVertices(*vertices);
   delete vertices;
-  */
+
+  triangleCount = 0;
+  tree->getLeavesIndicesCount(&triangleCount);
+printf("leaf index count: %i ", triangleCount);
+
+  leaffactstate->SetTriangleCount(triangleCount);
+  indizes = new IndexHelper (leaffactstate);
+  tree->getLeavesIndices(*indizes, 0);
+  printf("added indexes: %i\n", indizes->getCount());
 
   delete ottree;
   delete gen;
