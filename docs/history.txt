@@ -8,6 +8,9 @@ chronological order.
 
 21-Aug-2006
 	- caedes added SCF_IMPLEMENT_FACTORY to movierecorder plugin.
+	- res added a helper to iterate over triangles from an index buffer
+	  (also supporting e.g. strips and quads).
+	- res changed the software renderer to use aforementioned helper.
 20-Aug-2006
 	- res added texture crossbar support to glshader_fixed.
 	- res fixed an initialization bug in engseq.

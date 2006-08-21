@@ -73,7 +73,7 @@ struct iTriangleDrawer
     const csCoreRenderMesh* mesh, 
     const iScanlineRenderer::RenderInfoMesh& scanRenderInfoMesh,
     const csRenderMeshType meshtype, uint8* tri, const uint8* triEnd,
-    csRenderBufferComponentType compType) = 0;
+    size_t stride, csRenderBufferComponentType compType) = 0;
 };
 
 struct iPixTypeSpecifica
