@@ -24,10 +24,12 @@ SndSysListenerOpenAL::SndSysListenerOpenAL () :
   scfImplementationType(this),
   m_Front (csVector3 (0, 0, -1)), m_Top (csVector3 (0, 1, 0)),
   m_Position (csVector3 (0, 0, 0)), m_Distance (1.0), m_RollOff (1.0),
-  m_Volume (1.0), m_Update (true), m_ExternalUpdate (true)
+  m_Volume (1.0), m_DopplerFactor (1.0), m_SpeedOfSound(343.3),
+  m_Velocity (csVector3 (0, 0, 0)),m_Update (true), m_ExternalUpdate (true)
 {
   alListener3f( AL_VELOCITY, 0, 0, 0 );
   alDistanceModel( AL_EXPONENT_DISTANCE_CLAMPED );
+
   Update ();
 }
 
@@ -36,8 +38,8 @@ SndSysListenerOpenAL::~SndSysListenerOpenAL ()
 }
 
 /*
-  * iSndSysListener interface
-  */
+ * iSndSysListener interface
+ */
 void SndSysListenerOpenAL::SetDirection (const csVector3 &Front, const csVector3 &Top)
 {
   m_Front = Front;
@@ -85,6 +87,43 @@ float SndSysListenerOpenAL::GetRollOffFactor ()
 }
 
 /*
+ * iSndSysListenerDoppler interface
+ */
+
+void SndSysListenerOpenAL::SetVelocity (const csVector3 &Velocity)
+{
+  m_Velocity = Velocity;
+  m_Update = true;
+}
+
+void SndSysListenerOpenAL::SetDopplerFactor (const float DopplerFactor)
+{
+  m_DopplerFactor = DopplerFactor;
+  m_Update = true;
+}
+
+void SndSysListenerOpenAL::SetSpeedOfSound (const float SpeedOfSound)
+{
+  m_SpeedOfSound = SpeedOfSound;
+  m_Update = true;
+}
+
+const csVector3 &SndSysListenerOpenAL::GetVelocity ()
+{
+  return m_Velocity;
+}
+
+float SndSysListenerOpenAL::GetDopplerFactor ()
+{
+  return m_DopplerFactor;
+}
+
+float SndSysListenerOpenAL::GetSpeedOfSound ()
+{
+  return m_SpeedOfSound;
+}
+
+/*
  * SndSysListenerOpenAL implementation
  */
 void SndSysListenerOpenAL::SetVolume (float vol)
@@ -105,8 +144,11 @@ bool SndSysListenerOpenAL::Update ()
     m_Update = false;
     alListener3f (AL_POSITION, m_Position.x, m_Position.y, m_Position.z);
     alListenerf (AL_GAIN, m_Volume);
-    float orientation[] = { m_Front.x, m_Front.y, m_Front.z, m_Top.x, m_Top.y, m_Top.z };
+    float orientation[] = { -m_Front.x, -m_Front.y, -m_Front.z, m_Top.x, m_Top.y, m_Top.z };
     alListenerfv (AL_ORIENTATION, orientation);
+    alListener3f (AL_VELOCITY, m_Velocity.x, m_Velocity.y, m_Velocity.z);
+    alDopplerFactor (m_DopplerFactor);
+    alDopplerVelocity (m_SpeedOfSound);
   }
   if (m_ExternalUpdate == true)
   {

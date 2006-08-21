@@ -256,6 +256,30 @@ struct iSndSysSource3DDirectional : public virtual iBase
   virtual float GetDirectionalRadiationOuterGain() = 0;
 
 };
+
+/**
+ * Extension to the iSndSysSource3D interface, allowing Doppler shift effects.
+ * The Doppler effect that causes sound sources the change in pitch as their
+ * relative velocities change. As an example the siren of an ambulance will
+ * increase in pitch as it approaches you, and decrease once it has passed you.
+ *
+ * The pitch of a source is multiplied by the value
+ *   doppler_factor * (speed_of_sound - listener_velocity) / (speed_of_sound + source_velocity)
+ * Where the two velocities are the projections of the source and listener
+ * velocities, onto the vector between them.
+ */
+struct iSndSysSource3DDoppler : public virtual iBase
+{
+  /// SCF2006 - See http://www.crystalspace3d.org/cseps/csep-0010.html
+  SCF_INTERFACE (iSndSysSource3DDoppler,2,0,0);
+
+  /// Set velocity (speed) of the source
+  virtual void SetVelocity (const csVector3 &Velocity) = 0;
+
+  /// Get velocity (speed) of the source
+  virtual const csVector3 &GetVelocity () = 0;
+};
+
 /** @} */
 
 #endif // __CS_SNDSYS_ISNDSYS_SOURCE_H__

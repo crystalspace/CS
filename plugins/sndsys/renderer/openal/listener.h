@@ -27,7 +27,9 @@
 #include "isndsys/ss_listener.h"
 
 class SndSysListenerOpenAL : 
-  public scfImplementation1<SndSysListenerOpenAL, iSndSysListener>
+  public scfImplementation2<SndSysListenerOpenAL,
+                            iSndSysListener,
+                            iSndSysListenerDoppler>
 {
 public:
   SndSysListenerOpenAL();
@@ -56,6 +58,24 @@ public:
   virtual float GetRollOffFactor ();
 
   /*
+   * iSndSysListenerDoppler interface
+   */
+public:
+  /// Set velocity (speed) of the listener
+  virtual void SetVelocity (const csVector3 &Velocity);
+  /// Set the Doppler factor
+  virtual void SetDopplerFactor (const float DopplerFactor);
+  /// Set the speed of sound
+  virtual void SetSpeedOfSound (const float SpeedOfSound);
+
+  /// Get velocity (speed) of th elistener
+  virtual const csVector3 &GetVelocity ();
+  /// Get the Doppler factor
+  virtual float GetDopplerFactor ();
+  /// Get the speed of sound
+  virtual float GetSpeedOfSound ();
+
+  /*
    * SndSysListenerOpenAL implementation
    */
 public:
@@ -78,6 +98,12 @@ private:
   float m_Distance, m_RollOff;
   /// Current volume setting
   float m_Volume;
+  /// Velocity of the listener
+  csVector3 m_Velocity;
+  /// The global doppler factor
+  float m_DopplerFactor;
+  /// The speed of sound
+  float m_SpeedOfSound;
   /// Flag indicating that updates are pending.
   bool m_Update;
   /// Flag indicating that updates are pending that need propagation.

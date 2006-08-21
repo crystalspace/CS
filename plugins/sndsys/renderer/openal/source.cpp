@@ -246,6 +246,8 @@ SndSysSourceOpenAL3D::SndSysSourceOpenAL3D (csRef<iSndSysStream> stream, csSndSy
 {
   // Setup initial parameters
   m_Position.Set( 0, 0, 0 );
+  m_Direction.Set( 0, 0, 0 );
+  m_Velocity.Set( 0, 0, 0 );
 
   // Setup stream parameters
   if (stream->Get3dMode() == CS_SND3D_ABSOLUTE)
@@ -382,6 +384,21 @@ float SndSysSourceOpenAL3D::GetDirectionalRadiationOuterGain()
 }
 
 /*
+ * iSndSysSource3DDoppler interface
+ */
+
+void SndSysSourceOpenAL3D::SetVelocity (const csVector3 &Velocity)
+{
+  m_Velocity = Velocity;
+  m_Update = true;
+}
+
+const csVector3 &SndSysSourceOpenAL3D::GetVelocity ()
+{
+  return m_Velocity;
+}
+
+/*
  * SndSysSourceOpenAL3D impementation
  */
 
@@ -400,6 +417,7 @@ void SndSysSourceOpenAL3D::PerformUpdate ( bool ExternalUpdates )
     alSourcef (GetSource(), AL_CONE_INNER_ANGLE, m_InnerAngle);
     alSourcef (GetSource(), AL_CONE_OUTER_ANGLE, m_OuterAngle);
     alSourcef (GetSource(), AL_CONE_OUTER_GAIN, m_OuterGain);
+    alSource3f (GetSource(), AL_VELOCITY, m_Velocity[0], m_Velocity[1], m_Velocity[2]);
     m_Update = false;
   }
 

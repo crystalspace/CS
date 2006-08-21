@@ -172,6 +172,23 @@ void ASndTest::CreateWorld ()
   spstate = scfQueryInterface<iSprite3DState> (sprite->GetMeshObject());
   spstate->SetAction ("default");
 
+  // Create a doppler source
+  sndsource = sndrenderer->CreateSource (sndstream);
+  movingsound = scfQueryInterface<iSndSysSource3D> (sndsource);
+  sndsource->SetVolume( 1.0 );
+  movingsound->SetMinimumDistance( 8 );
+  movingsound->SetPosition( csVector3 (-10, 5, 10) );
+  movingsounddoppler = scfQueryInterface<iSndSysSource3DDoppler> (sndsource);
+  movingsoundsprite = engine->CreateMeshWrapper (imeshfact, "Sound6Sprite", world, csVector3 (-10, 5, 10));
+  spstate = scfQueryInterface<iSprite3DState> (movingsoundsprite->GetMeshObject());
+  spstate->SetAction ("default");
+  movingsoundstep = 0;
+  listenerdoppler = scfQueryInterface<iSndSysListenerDoppler> (sndrenderer->GetListener ());
+  // 10 Units = 1 meter
+  listenerdoppler->SetSpeedOfSound( 3433 );
+  // Amplify Doppler effect by 100
+  listenerdoppler->SetDopplerFactor( 100 );
+
   engine->Prepare ();
 }
 
@@ -184,18 +201,23 @@ void ASndTest::ProcessFrame ()
   float speed = (elapsed_time / 1000.0) * (0.03 * 20);
 
   iCamera* c = view->GetCamera();
-  // left and right cause the camera to rotate on the global Y
-  // axis; page up and page down cause the camera to rotate on the
-  // _camera's_ X axis (more on this in a second) and up and down
-  // arrows cause the camera to go forwards and backwards.
+  // left and right cause the camera to rotate on the global Y axis and up and
+  // down arrows cause the camera to go forwards and backwards.
+  bool moving = false;
   if (kbd->GetKeyState (CSKEY_RIGHT))
     rotYaw += speed;
   if (kbd->GetKeyState (CSKEY_LEFT))
     rotYaw -= speed;
   if (kbd->GetKeyState (CSKEY_UP))
+  {
     c->Move (CS_VEC_FORWARD * 4 * speed);
+    moving = true;
+  }
   if (kbd->GetKeyState (CSKEY_DOWN))
+  {
     c->Move (CS_VEC_BACKWARD * 4 * speed);
+    moving = true;
+  }
 
   // We now assign a new rotation transformation to the camera.  You
   // can think of the rotation this way: starting from the zero
@@ -208,8 +230,25 @@ void ASndTest::ProcessFrame ()
   csMatrix3 rot = csYRotMatrix3 (rotYaw);
   csOrthoTransform ot (rot, c->GetTransform().GetOrigin ());
   c->SetTransform (ot);
-  sndrenderer->GetListener ()->SetPosition (c->GetTransform().GetOrigin ());
-  sndrenderer->GetListener ()->SetDirection (rot.Col2(), rot.Col3());
+  sndrenderer->GetListener ()->SetPosition (ot.GetOrigin ());
+  sndrenderer->GetListener ()->SetDirection (rot.Row3(), rot.Row2());
+  if (moving)
+  {
+    listenerdoppler->SetVelocity (rot.Row3() * 4);
+  }
+  else
+  {
+    listenerdoppler->SetVelocity (csVector3(0,0,0));
+  }
+
+  // Move and update the doppler source.
+  movingsoundstep += speed;
+  movingsoundposition = csVector3 (10*sin(movingsoundstep) - 20, 5, 10);
+  csVector3 movingsoundvelocity = csVector3 (10*cos(movingsoundstep), 0, 0);
+  movingsound->SetPosition (movingsoundposition);
+  movingsounddoppler->SetVelocity (movingsoundvelocity);
+  movingsoundsprite->GetMovable ()->GetTransform ().SetOrigin (movingsoundposition);
+  movingsoundsprite->GetMovable ()->UpdateMove ();
 
   // Tell 3D driver we're going to display 3D things.
   if (!g3d->BeginDraw(

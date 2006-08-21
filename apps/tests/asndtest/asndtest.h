@@ -49,6 +49,14 @@ private:
   void ProcessFrame ();
   void FinishFrame ();
 
+  csRef<iSndSysSource3D> movingsound;
+  csRef<iSndSysSource3DDoppler> movingsounddoppler;
+  csRef<iMeshWrapper> movingsoundsprite;
+  float movingsoundstep;
+  csVector3 movingsoundposition;
+
+  csRef<iSndSysListenerDoppler> listenerdoppler;
+
 public:
   ASndTest ();
   ~ASndTest ();

@@ -123,11 +123,12 @@ private:
 
 
 class SndSysSourceOpenAL3D :
-  public scfImplementationExt3<SndSysSourceOpenAL3D,
+  public scfImplementationExt4<SndSysSourceOpenAL3D,
                                SndSysSourceOpenAL2D,
                                iSndSysSource3D,
                                iSndSysSource3DDirectionalSimple,
-                               iSndSysSource3DDirectional >
+                               iSndSysSource3DDirectional,
+                               iSndSysSource3DDoppler >
 {
 public:
   SndSysSourceOpenAL3D (csRef<iSndSysStream> stream, csSndSysRendererOpenAL *renderer);
@@ -238,6 +239,16 @@ public:
   virtual float GetDirectionalRadiationOuterGain();
 
   /*
+   * iSndSysSource3DDoppler interface
+   */
+public:
+  /// Set velocity (speed) of the source
+  virtual void SetVelocity (const csVector3 &Velocity);
+
+  /// Get velocity (speed) of the source
+  virtual const csVector3 &GetVelocity ();
+
+  /*
    * SndSysSourceOpenAL3D impementation
    */
 public:
@@ -264,6 +275,8 @@ private:
   float m_InnerAngle,  m_OuterAngle;
   /// Current gain outside the outer cone.
   float m_OuterGain;
+  /// Current velocity of the source
+  csVector3 m_Velocity;
   /// Do we need to tell OpenAL about changes to this source
   bool m_Update;
 };
