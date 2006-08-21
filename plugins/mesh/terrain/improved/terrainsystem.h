@@ -90,6 +90,8 @@ class csTerrainSystem :
 
   scfArray<iTerrainVector3Array> collision_result;
 
+  unsigned int max_loaded_cells;
+
   // lighting
   csSet<csPtrKey<iLight> > affecting_lights;
   unsigned int colorVersion;
@@ -146,6 +148,10 @@ public:
   virtual csVector3 GetBinormal (const csVector2& pos);
   virtual csVector3 GetNormal (const csVector2& pos);
   
+  virtual unsigned int GetMaxLoadedCells () const;
+  virtual void SetMaxLoadedCells (unsigned int value);
+  virtual void UnloadLRUCells ();
+
   // ------------ iMeshObject implementation ------------
 
   virtual iMeshObjectFactory* GetFactory () const;

@@ -76,8 +76,6 @@ public:
     int width = cell->GetGridWidth ();
     int height = cell->GetGridHeight ();
 
-	printf("loading from: %s, %s\n", feed_data->heightmap_source.GetData(), feed_data->mmap_source.GetData());
-
     csRef<iLoader> loader = csQueryRegistry<iLoader> (object_reg);
   
     csRef<iImage> map = loader->LoadImage (feed_data->heightmap_source,

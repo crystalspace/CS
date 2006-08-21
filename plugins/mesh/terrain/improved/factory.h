@@ -88,6 +88,7 @@ public:
                         int material_height, bool material_persistent,
                         const csVector2& position,
                         const csVector3& size, iTerrainDataFeeder* feeder);
+  virtual void SetMaxLoadedCells (unsigned int value);
 };
 
 }

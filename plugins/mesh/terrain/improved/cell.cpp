@@ -100,6 +100,8 @@ csTerrainCell::LoadState csTerrainCell::GetLoadState () const
 
 void csTerrainCell::SetLoadState(LoadState state)
 {
+  Touch();
+
   switch (this->state)
   {
     case NotLoaded:
@@ -127,6 +129,9 @@ void csTerrainCell::SetLoadState(LoadState state)
 
           this->state = feeder->Load (this) ? Loaded : NotLoaded;
 
+          if (this->state == Loaded)
+            parent->UnloadLRUCells();
+
           break;
         }
       }
@@ -143,6 +148,9 @@ void csTerrainCell::SetLoadState(LoadState state)
         {
           this->state = feeder->Load (this) ? Loaded : NotLoaded;
 
+          if (this->state == Loaded)
+            parent->UnloadLRUCells();
+
           break;
         }
       }
@@ -157,7 +165,12 @@ void csTerrainCell::SetLoadState(LoadState state)
         {
           heightmap.DeleteAll ();
           materialmap.DeleteAll ();
+          staticLights.DeleteAll ();
+          staticColors.DeleteAll ();
 
+          render_data = 0;
+          collision_data = 0;
+  
           this->state = NotLoaded;
 
           break;
@@ -207,6 +220,7 @@ csRefCount* csTerrainCell::GetRenderData () const
 
 void csTerrainCell::SetRenderData (csRefCount* data)
 {
+  Touch();
   render_data = data;
 }
 
@@ -232,6 +246,8 @@ int csTerrainCell::GetGridHeight () const
 
 csLockedHeightData csTerrainCell::GetHeightData ()
 {
+  Touch();
+
   csLockedHeightData data;
   data.data = heightmap.GetArray ();
   data.pitch = grid_width;
@@ -241,6 +257,8 @@ csLockedHeightData csTerrainCell::GetHeightData ()
 
 csLockedHeightData csTerrainCell::LockHeightData (const csRect& rectangle)
 {
+  Touch();
+
   locked_height_rect = rectangle;
 
   locked_height_data.data = heightmap.GetArray () + rectangle.ymin *
@@ -252,6 +270,8 @@ csLockedHeightData csTerrainCell::LockHeightData (const csRect& rectangle)
 
 void csTerrainCell::UnlockHeightData ()
 {
+  Touch();
+
   renderer->OnHeightUpdate (this, locked_height_rect, heightmap.GetArray (),
     grid_width);
   
@@ -287,6 +307,8 @@ bool csTerrainCell::GetMaterialPersistent() const
 
 csLockedMaterialMap csTerrainCell::LockMaterialMap (const csRect& rectangle)
 {
+  Touch();
+
   csLockedMaterialMap data;
   
   if (!material_persistent)
@@ -310,6 +332,8 @@ csLockedMaterialMap csTerrainCell::LockMaterialMap (const csRect& rectangle)
 
 void csTerrainCell::UnlockMaterialMap ()
 {
+  Touch();
+
   csDirtyAccessArray<unsigned char> alpha;
   alpha.SetSize (mm_rect.Width () * mm_rect.Height ());
   
@@ -333,6 +357,8 @@ void csTerrainCell::UnlockMaterialMap ()
 
 void csTerrainCell::SetMaterialMask (unsigned int material, iImage* image)
 {
+  Touch();
+
   if (image->GetFormat () != CS_IMGFMT_PALETTED8) return;
   
   csRef<iImage> rescaled_image;
@@ -353,6 +379,8 @@ void csTerrainCell::SetMaterialMask (unsigned int material, iImage* image)
 void csTerrainCell::SetMaterialMask (unsigned int material,
 const unsigned char* data, unsigned int width, unsigned int height)
 {
+  Touch();
+
   csImageMemory image(width, height, (void*)data, false, CS_IMGFMT_PALETTED8);
 	
   SetMaterialMask (material, &image);
@@ -362,6 +390,8 @@ bool csTerrainCell::CollideSegment (const csVector3& start, const csVector3&
 end, bool oneHit, iTerrainVector3Array& points)
 {
   if (!collider || !collision_properties->GetCollideable ()) return false;
+
+  Touch();
 
   return collider->CollideSegment (this, start, end, oneHit, points);
 }
@@ -373,6 +403,8 @@ bool csTerrainCell::CollideTriangles (const csVector3* vertices,
                        bool oneHit, iTerrainCollisionPairArray& pairs)
 {
   if (!collider || !collision_properties->GetCollideable ()) return false;
+
+  Touch();
 
   return collider->CollideTriangles (this, vertices, tri_count, indices,
                                      radius, trans, oneHit, pairs);
@@ -510,6 +542,8 @@ csVector3 csTerrainCell::GetNormal (const csVector2& pos) const
 void csTerrainCell::UpdateColors (iMovable* movable, unsigned int colorVersion,
   const csColor& baseColor)
 {
+  Touch();
+
   if (colorVersion == last_colorVersion) return;
 
   if (last_colorVersion == 0)

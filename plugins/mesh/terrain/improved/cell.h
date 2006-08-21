@@ -81,6 +81,8 @@ private:
   void LerpHelper (const csVector2& pos, int& x1, int& x2, float& xfrac,
                                     int& y1, int& y2, float& yfrac) const;
 
+  clock_t lru;
+
 public:
   csTerrainCell (iTerrainSystem* parent, const char* name, int grid_width,
                  int grid_height, int material_width, int material_height,
@@ -165,6 +167,10 @@ public:
     csColor& baseColor);
 
   csColor ambient;
+
+  // unloading
+  clock_t GetLRU () const {return lru;}
+  void Touch () {lru = clock();}
 };
 
 }

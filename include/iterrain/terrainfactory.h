@@ -74,6 +74,13 @@ struct iTerrainFactory : public virtual iBase
                         int material_height, bool material_persistent,
                         const csVector2& position,
                         const csVector3& size, iTerrainDataFeeder* feeder) = 0;
+  
+  /**
+   * Set maximum number of loaded cells. See iTerrainSystem::SetMaxLoadedCells
+   *
+   * \param value - maximum number of loaded cells
+   */
+  virtual void SetMaxLoadedCells (unsigned int value) = 0;
 };
 
 #endif // __CS_ITERRAIN_TERRAINFACTORY_H__

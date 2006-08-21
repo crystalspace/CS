@@ -141,5 +141,10 @@ const csVector2& position, const csVector3& size, iTerrainDataFeeder* feeder)
   return cell;
 }
 
+void csTerrainFactory::SetMaxLoadedCells (unsigned int value)
+{
+  terrain->SetMaxLoadedCells (value);
+}
+
 }
 CS_PLUGIN_NAMESPACE_END(ImprovedTerrain)

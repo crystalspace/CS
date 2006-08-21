@@ -57,6 +57,8 @@ csTerrainSystem::csTerrainSystem (iMeshObjectFactory* factory)
 
   colorVersion = 0;
   dynamic_ambient_version = 0;
+
+  max_loaded_cells = (unsigned int)-1;
 }
 
 csTerrainSystem::~csTerrainSystem ()
@@ -345,6 +347,45 @@ csVector3 csTerrainSystem::GetNormal (const csVector2& pos)
   else return csVector3(0, 0, 0);
 }
 
+unsigned int csTerrainSystem::GetMaxLoadedCells () const
+{
+  return max_loaded_cells;
+}
+
+void csTerrainSystem::SetMaxLoadedCells (unsigned int value)
+{
+  max_loaded_cells = value;
+}
+
+void csTerrainSystem::UnloadLRUCells ()
+{
+  // count loaded cells
+  unsigned int count = 0;
+
+  for (size_t i = 0; i < cells.Length (); ++i)
+    if (cells[i]->GetLoadState () == iTerrainCell::Loaded)
+      ++count;
+
+  if (count <= max_loaded_cells) return;
+
+  unsigned int to_delete = count - max_loaded_cells;
+
+  for (unsigned int i = 0; i < to_delete; ++i)
+  {
+    csTerrainCell* min_cell = 0;
+
+    for (size_t i = 0; i < cells.Length (); ++i)
+      if (cells[i]->GetLoadState () == iTerrainCell::Loaded)
+        if (!min_cell || cells[i]->GetLRU() < min_cell->GetLRU())
+          min_cell = cells[i];
+    
+    // something went wrong
+    if (!min_cell) return;
+
+    min_cell->SetLoadState (iTerrainCell::NotLoaded);
+  }
+}
+
 iMeshObjectFactory* csTerrainSystem::GetFactory () const
 {
   return factory;
@@ -391,6 +432,8 @@ csRenderMesh** csTerrainSystem::GetRenderMeshes (int& num, iRenderView* rview,
       }
       
       cells[i]->UpdateColors (movable, colorVersion, baseColor);
+
+      cells[i]->Touch ();
 
       needed_cells.Push (cells[i]);
     }
@@ -586,7 +629,7 @@ void csTerrainSystem::InitializeDefault (bool clear)
 
   if (clear)
   {
-    csColor amb(0.5f, 0.5f, 0.5f);
+    csColor amb(1, 1, 1);
     
     for (size_t i = 0 ; i < cells.Length(); ++i)
     {

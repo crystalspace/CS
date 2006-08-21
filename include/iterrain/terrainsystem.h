@@ -270,6 +270,27 @@ struct iTerrainSystem : public virtual iBase
    * normal value
    */
   virtual csVector3 GetNormal (const csVector2& pos) = 0;
+
+  /**
+   * Get maximum number of loaded cells
+   *
+   * \return maximum number of loaded cells
+   */
+  virtual unsigned int GetMaxLoadedCells () const = 0;
+
+  /**
+   * Set maximum number of loaded cells. If the number of loaded cells becomes
+   * greater than this value (in the process of cell loading), the cell with
+   * least recent usage is unloaded.
+   *
+   * \param value - maximum number of loaded cells
+   */
+  virtual void SetMaxLoadedCells (unsigned int value) = 0;
+
+  /**
+   * Unload LRU cells to satisfy the requirement of max loaded cell count
+   */
+  virtual void UnloadLRUCells () = 0;
 };
 
 #endif // __CS_ITERRAIN_TERRAINSYSTEM_H__

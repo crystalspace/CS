@@ -64,6 +64,7 @@ enum
   XMLTOKEN_RENDERPROPERTIES,
   XMLTOKEN_COLLISIONPROPERTIES,
   XMLTOKEN_MATERIALPERSISTENT,
+  XMLTOKEN_MAXLOADEDCELLS,
   
   XMLTOKEN_FACTORY,
   XMLTOKEN_MATERIALPALETTE,
@@ -111,6 +112,7 @@ bool csTerrainFactoryLoader::Initialize (iObjectRegistry* objreg)
   xmltokens.Register ("render_properties", XMLTOKEN_RENDERPROPERTIES);
   xmltokens.Register ("collision_properties", XMLTOKEN_COLLISIONPROPERTIES);
   xmltokens.Register ("material_persistent", XMLTOKEN_MATERIALPERSISTENT);
+  xmltokens.Register ("max_loaded_cells", XMLTOKEN_MAXLOADEDCELLS);
   
   return true;
 }
@@ -384,6 +386,11 @@ csPtr<iBase> csTerrainFactoryLoader::Parse (iDocumentNode* node,
           }
         }
         
+        break;
+      }
+      case XMLTOKEN_MAXLOADEDCELLS:
+      {
+        factory->SetMaxLoadedCells (child->GetAttributeValueAsInt ("value"));
         break;
       }
       default:

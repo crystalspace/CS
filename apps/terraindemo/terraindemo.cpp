@@ -95,13 +95,13 @@ bool TerrainDemo::Setup ()
   }
   
   //if (!room)
-    //room = engine->CreateSector("terrain");
+/*    room = engine->CreateSector("terrain");
   
   csRef<iMeshObject> terrain_mesh_object = scfQueryInterface<iMeshObject>(terrain);
   csRef<iMeshWrapper> terrain_mesh_wrapper = engine->CreateMeshWrapper("terrain");
   terrain_mesh_wrapper->SetMeshObject(terrain_mesh_object);
 
-  //terrain_mesh_wrapper->GetMovable()->SetSector(room);
+  terrain_mesh_wrapper->GetMovable()->SetSector(room);*/
     
 //  pos = csVector3 (0, 70, 0);
   
@@ -200,10 +200,10 @@ void TerrainDemo::ProcessFrame ()
   rotX += obj_rotate.x * speed;
   rotY += obj_rotate.y * speed;
   
-//  csMatrix3 rot = csXRotMatrix3 (rotX) * csYRotMatrix3 (rotY);
-//  csOrthoTransform ot (rot, c->GetTransform().GetOrigin ());
-//  c->SetTransform (ot);
-//  c->Move(obj_move);
+/*  csMatrix3 rot = csXRotMatrix3 (rotX) * csYRotMatrix3 (rotY);
+  csOrthoTransform ot (rot, c->GetTransform().GetOrigin ());
+  c->SetTransform (ot);
+  c->Move(obj_move);*/
   
   // Tell 3D driver we're going to display 3D things.
   if (!g3d->BeginDraw (engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS))
@@ -376,6 +376,8 @@ bool TerrainDemo::LoadMap ()
       "/lib/std/stone4.gif");
   iTextureWrapper* lava_tex = loader->LoadTexture("lava_tex",
       "/lev/terraini/lava.png");
+  iTextureWrapper* mat_tex = loader->LoadTexture("mat_tex",
+      "/lev/terraini/material.png");
 
   rloop = engine->GetRenderLoopManager()->Load(
       "/shader/std_rloop_terrainimproved.xml");
@@ -388,9 +390,11 @@ bool TerrainDemo::LoadMap ()
 
   loader->LoadShader("/lev/terraini/shader_base.xml");
   loader->LoadShader("/lev/terraini/shader_splat.xml");
+  loader->LoadShader("/lev/terraini/shader_light.xml");
 
   iShader* shader_base = shmgr->GetShader("terrain_improved_base");
   iShader* shader_splat = shmgr->GetShader("terrain_improved_splatting");
+  iShader* shader_light = shmgr->GetShader("terrain_improved_lighting");
 
   csRefArray<iMaterialWrapper> materials;
 
@@ -406,6 +410,10 @@ bool TerrainDemo::LoadMap ()
 
   (material = engine->CreateMaterial("GrassMaterial", grass_tex))->
       GetMaterial()->SetShader(strings->Request("terrain splat"), shader_splat);
+  materials.Push(material);
+
+  (material = engine->CreateMaterial("LightMaterial", mat_tex))->
+      GetMaterial()->SetShader(strings->Request("terrain light"), shader_light);
   materials.Push(material);
 
   terrain->SetMaterialPalette(materials);
