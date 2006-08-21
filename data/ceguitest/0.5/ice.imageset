@@ -170,6 +170,15 @@
 <Image Name="TabPaneLowerLeft" XPos="10" YPos="20" Width="10" Height="10" />
 <Image Name="TabPaneLower" XPos="20" YPos="20" Width="10" Height="10" />
 <Image Name="TabPaneLowerRight" XPos="30" YPos="20" Width="10" Height="10" />
+<Image Name="TooltipTopLeft" XPos="48" YPos="200" Width="4" Height="4" />
+<Image Name="TooltipTopRight" XPos="72" YPos="200" Width="5" Height="4" />
+<Image Name="TooltipBottomLeft" XPos="48" YPos="224" Width="4" Height="5" />
+<Image Name="TooltipBottomRight" XPos="72" YPos="224" Width="5" Height="5" />
+<Image Name="TooltipLeftEdge" XPos="48" YPos="211" Width="4" Height="6" />
+<Image Name="TooltipRightEdge" XPos="72" YPos="211" Width="5" Height="6" />
+<Image Name="TooltipTopEdge" XPos="59" YPos="200" Width="6" Height="4" />
+<Image Name="TooltipBottomEdge" XPos="59" YPos="224" Width="6" Height="5" />
+<Image Name="TooltipMiddle" XPos="59" YPos="211" Width="6" Height="6" />
 <Image Name="TextSelectionBrush" XPos="138" YPos="107" Width="6" Height="12" />
 <Image Name="TitlebarLeft" XPos="105" YPos="184" Width="13" Height="38" />
 <Image Name="TitlebarMiddle" XPos="130" YPos="187" Width="25" Height="16" />

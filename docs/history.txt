@@ -14,6 +14,7 @@ chronological order.
 	- Jorrit fixed the bullet plugin so that it compiles again.
 	- caedes added pythmod.jam file with a rule for building python
 	  modules for crystalspace and made cspython use it.
+	- caedes added tooltip skin to the ice cegui theme (only for 0.5+).
 20-Aug-2006
 	- res added texture crossbar support to glshader_fixed.
 	- res fixed an initialization bug in engseq.
