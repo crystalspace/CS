@@ -120,7 +120,7 @@ class csFatLoopStep :
     struct FogInfo
     {
       float density;
-      csVector3 color;
+      csColor color;
       csVector4 plane;
     };
     FogInfo fog;

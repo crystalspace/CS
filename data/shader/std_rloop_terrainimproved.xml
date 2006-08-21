@@ -14,6 +14,12 @@
           <zoffset>no</zoffset>
           <zuse />
         </step>
+        <!-- draws terrain lighting -->
+        <step plugin="crystalspace.renderloop.step.generic">
+          <shadertype>terrain light</shadertype>
+          <zoffset>no</zoffset>
+          <zuse />
+        </step>
         <!-- draws geometry -->
         <step plugin="crystalspace.renderloop.step.generic">
           <shadertype>standard</shadertype>
@@ -22,6 +28,7 @@
           <defaultshader name="std_lighting" />
           <nodefaulttrigger>ambient</nodefaulttrigger>
           <nodefaulttrigger>terrain splat</nodefaulttrigger>
+          <nodefaulttrigger>terrain light</nodefaulttrigger>
           <portaltraversal/>
         </step>
   </steps>

@@ -134,7 +134,8 @@
      * value, and apply mixmode alpha.
      */
     float4 color = V2F.surfClassic.GetDiffuse (V2F.parallax.GetTCOffset()) * 
-      float4 (V2F.lightClassic.IllumDiffuse(), GetMixmodeAlpha());
+      float4 (V2F.lightClassic.IllumAmbient()+V2F.lightClassic.IllumDiffuse(), 
+	GetMixmodeAlpha());
     /// If we have fog, apply it.
     if (V2F.fog.HasFog())
     {
@@ -209,7 +210,8 @@
     V2F.framework.SetupFrag();
 
     float4 color = V2F.surfClassic.GetDiffuse () * 
-      float4 (V2F.lightClassic.IllumDiffuse(), GetMixmodeAlpha());
+      float4 (V2F.lightClassic.IllumAmbient()+V2F.lightClassic.IllumDiffuse(), 
+	GetMixmodeAlpha());
     if (V2F.fog.HasFog())
     {
       color.rgb = lerp(color.rgb, V2F.fog.GetColor(), V2F.fog.GetIntensity());
