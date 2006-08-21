@@ -366,11 +366,12 @@ CS_LEAKGUARD_IMPLEMENT(csWrappedDocumentNode);
 
 template<typename ConditionEval>
 csWrappedDocumentNode::csWrappedDocumentNode (ConditionEval& eval,
+                                              csWrappedDocumentNode* parent,
                                               iDocumentNode* wrapped_node,
 					      iConditionResolver* res,
 					      csWrappedDocumentNodeFactory* shared_fact, 
 					      GlobalProcessingState* global_state)
-  : scfImplementationType (this), wrappedNode (wrapped_node), 
+  : scfImplementationType (this), wrappedNode (wrapped_node), parent (parent),
     resolver (res), objreg (shared_fact->plugin->objectreg), 
     shared (shared_fact), globalState (global_state)
 {
@@ -1457,8 +1458,8 @@ void csWrappedDocumentNode::ProcessSingleWrappedNode (
         && (currentWrapper.child->conditionValue == false))))
   {
     WrappedChild* newWrapper = new WrappedChild;
-    newWrapper->childNode.AttachNew (new csWrappedDocumentNode (eval, node,
-      resolver, shared, globalState));
+    newWrapper->childNode.AttachNew (new csWrappedDocumentNode (eval, this, 
+      node, resolver, shared, globalState));
     currentWrapper.child->childrenWrappers.Push (newWrapper);
   }
 }
@@ -1840,9 +1841,9 @@ struct EvalCondTree
 };
 
 csWrappedDocumentNode* csWrappedDocumentNodeFactory::CreateWrapper (
-  iDocumentNode* wrappedNode, iConditionResolver* resolver,
-  csConditionEvaluator& evaluator, const csRefArray<iDocumentNode>& extraNodes,
-  csString* dumpOut)
+  iDocumentNode* wrappedNode, iConditionResolver* resolver, 
+  csConditionEvaluator& evaluator, 
+  const csRefArray<iDocumentNode>& extraNodes, csString* dumpOut)
 {
   currentOut = dumpOut;
 
@@ -1853,12 +1854,14 @@ csWrappedDocumentNode* csWrappedDocumentNodeFactory::CreateWrapper (
     {
       csRef<csWrappedDocumentNode::GlobalProcessingState> globalState;
       globalState.AttachNew (csWrappedDocumentNode::GlobalProcessingState::Create ());
-      delete new csWrappedDocumentNode (eval, extraNodes[i], resolver, this, 
-        globalState);
+      /* "extra nodes" here just contribute to the conditions in the condition
+       * tree, so they're parsed, but not retained. */
+      delete new csWrappedDocumentNode (eval, 0, extraNodes[i], resolver, 
+        this, globalState);
     }
     csRef<csWrappedDocumentNode::GlobalProcessingState> globalState;
     globalState.AttachNew (csWrappedDocumentNode::GlobalProcessingState::Create ());
-    node = new csWrappedDocumentNode (eval, wrappedNode, resolver, this, 
+    node = new csWrappedDocumentNode (eval, 0, wrappedNode, resolver, this,
       globalState);
     eval.condTree.ToResolver (resolver);
     CS_ASSERT(globalState->GetRefCount() == 1);
@@ -1905,7 +1908,7 @@ csWrappedDocumentNode* csWrappedDocumentNodeFactory::CreateWrapperStatic (
     csRef<csWrappedDocumentNode::GlobalProcessingState> globalState;
     globalState.AttachNew (csWrappedDocumentNode::GlobalProcessingState::Create ());
     EvalStatic eval (resolver);
-    node = new csWrappedDocumentNode (eval, wrappedNode, resolver, this, 
+    node = new csWrappedDocumentNode (eval, 0, wrappedNode, resolver, this, 
       globalState);
     CS_ASSERT(globalState->GetRefCount() == 1);
   }
