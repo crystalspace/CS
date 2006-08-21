@@ -1,0 +1,312 @@
+<!-- This file was generated from data/cornell.blend with blend2cs 0.2.4 -->
+<!-- http://projects.blender.org/projects/blend2cs -->
+<world>
+  <plugins>
+    <plugin name="thing">
+      <id>crystalspace.mesh.loader.thing</id>
+      <defaults>
+        <staticshape/>
+        <staticpos/>
+      </defaults>
+    </plugin>
+    <plugin name="null">crystalspace.mesh.loader.null</plugin>
+    <plugin name="genmesh">
+      <id>crystalspace.mesh.loader.genmesh</id>
+      <defaults>
+        <staticshape/>
+        <staticpos/>
+      </defaults>
+    </plugin>
+    <plugin name="sprite3d">crystalspace.mesh.loader.sprite.3d</plugin>
+    <plugin name="thingfact">
+      <id>crystalspace.mesh.loader.factory.thing</id>
+      <defaults>
+        <staticshape/>
+      </defaults>
+    </plugin>
+    <plugin name="genmeshfact">
+      <id>crystalspace.mesh.loader.factory.genmesh</id>
+      <defaults>
+        <staticshape/>
+      </defaults>
+    </plugin>
+    <plugin name="terrain">crystalspace.mesh.loader.terrain</plugin>
+    <plugin name="terrainfact">crystalspace.mesh.loader.factory.terrain</plugin>
+  </plugins>
+  <materials>
+    <material name="white"> <color red="1" green="1" blue="1" /> </material>
+    <material name="green"> <color red="0" green="1" blue="0" /> </material>
+    <material name="red"> <color red="1" green="0" blue="0" /> </material>
+  </materials>
+  <settings>
+    <clearzbuf>yes</clearzbuf>
+    <clearscreen>yes</clearscreen>
+  </settings>
+  <start name="Camera">
+    <sector>Scene</sector>
+    <position x="2.78" y="2.73" z="-8"/>
+  </start>
+  <meshfact name="Cube.006">
+    <plugin>genmeshfact</plugin>
+    <params>
+      <material>no</material>
+      <numvt>20</numvt>
+      <v x="-1.0873" y="-1.03523" z="1.79828" u="0" v="0"/>
+      <v x="-1.5773" y="-1.03523" z="0.198284" u="0" v="1"/>
+      <v x="0.00269604" y="-1.03523" z="-0.291716" u="1" v="1"/>
+      <v x="0.492695" y="-1.03523" z="1.29828" u="1" v="0"/>
+      <v x="0.00269538" y="2.26477" z="-0.291716" u="0" v="0"/>
+      <v x="-1.5773" y="2.26477" z="0.198284" u="0" v="1"/>
+      <v x="-1.0873" y="2.26477" z="1.79828" u="1" v="1"/>
+      <v x="0.492696" y="2.26477" z="1.29828" u="1" v="0"/>
+      <v x="0.00269604" y="-1.03523" z="-0.291716" u="0" v="0"/>
+      <v x="0.00269538" y="2.26477" z="-0.291716" u="0" v="1"/>
+      <v x="0.492696" y="2.26477" z="1.29828" u="1" v="1"/>
+      <v x="-1.5773" y="-1.03523" z="0.198284" u="0" v="0"/>
+      <v x="0.00269538" y="2.26477" z="-0.291716" u="1" v="1"/>
+      <v x="0.00269604" y="-1.03523" z="-0.291716" u="1" v="0"/>
+      <v x="-1.0873" y="2.26477" z="1.79828" u="0" v="1"/>
+      <v x="-1.5773" y="2.26477" z="0.198284" u="1" v="1"/>
+      <v x="-1.5773" y="-1.03523" z="0.198284" u="1" v="0"/>
+      <v x="-1.0873" y="2.26477" z="1.79828" u="0" v="0"/>
+      <v x="-1.0873" y="-1.03523" z="1.79828" u="0" v="1"/>
+      <v x="0.492695" y="-1.03523" z="1.29828" u="1" v="1"/>
+      <numtri>12</numtri>
+      <t v1="0" v2="1" v3="2"/>
+      <t v1="2" v2="3" v3="0"/>
+      <t v1="4" v2="5" v3="6"/>
+      <t v1="6" v2="7" v3="4"/>
+      <t v1="8" v2="9" v3="10"/>
+      <t v1="10" v2="3" v3="8"/>
+      <t v1="11" v2="5" v3="12"/>
+      <t v1="12" v2="13" v3="11"/>
+      <t v1="0" v2="14" v3="15"/>
+      <t v1="15" v2="16" v3="0"/>
+      <t v1="17" v2="18" v3="19"/>
+      <t v1="19" v2="7" v3="17"/>
+      <autonormals/>
+      <localshadows/>
+    </params>
+  </meshfact>
+  <meshfact name="Cube.005">
+    <plugin>genmeshfact</plugin>
+    <params>
+      <material>no</material>
+      <numvt>20</numvt>
+      <v x="-1.04" y="-0.825" z="0.565" u="0" v="0"/>
+      <v x="-0.56" y="-0.825" z="-1.035" u="0" v="1"/>
+      <v x="1.04" y="-0.825" z="-0.545" u="1" v="1"/>
+      <v x="0.54" y="-0.825" z="1.035" u="1" v="0"/>
+      <v x="1.04" y="0.825" z="-0.545001" u="0" v="0"/>
+      <v x="-0.56" y="0.825" z="-1.035" u="0" v="1"/>
+      <v x="-1.04" y="0.825" z="0.565" u="1" v="1"/>
+      <v x="0.54" y="0.825" z="1.035" u="1" v="0"/>
+      <v x="1.04" y="-0.825" z="-0.545" u="0" v="0"/>
+      <v x="1.04" y="0.825" z="-0.545001" u="0" v="1"/>
+      <v x="0.54" y="0.825" z="1.035" u="1" v="1"/>
+      <v x="-0.56" y="-0.825" z="-1.035" u="0" v="0"/>
+      <v x="1.04" y="0.825" z="-0.545001" u="1" v="1"/>
+      <v x="1.04" y="-0.825" z="-0.545" u="1" v="0"/>
+      <v x="-1.04" y="0.825" z="0.565" u="0" v="1"/>
+      <v x="-0.56" y="0.825" z="-1.035" u="1" v="1"/>
+      <v x="-0.56" y="-0.825" z="-1.035" u="1" v="0"/>
+      <v x="-1.04" y="0.825" z="0.565" u="0" v="0"/>
+      <v x="-1.04" y="-0.825" z="0.565" u="0" v="1"/>
+      <v x="0.54" y="-0.825" z="1.035" u="1" v="1"/>
+      <numtri>12</numtri>
+      <t v1="0" v2="1" v3="2"/>
+      <t v1="2" v2="3" v3="0"/>
+      <t v1="4" v2="5" v3="6"/>
+      <t v1="6" v2="7" v3="4"/>
+      <t v1="8" v2="9" v3="10"/>
+      <t v1="10" v2="3" v3="8"/>
+      <t v1="11" v2="5" v3="12"/>
+      <t v1="12" v2="13" v3="11"/>
+      <t v1="0" v2="14" v3="15"/>
+      <t v1="15" v2="16" v3="0"/>
+      <t v1="17" v2="18" v3="19"/>
+      <t v1="19" v2="7" v3="17"/>
+      <autonormals/>
+      <localshadows/>
+    </params>
+  </meshfact>
+  <meshfact name="Cube.004">
+    <plugin>genmeshfact</plugin>
+    <params>
+      <material>no</material>
+      <numvt>4</numvt>
+      <v x="2.764" y="0" z="-2.796" u="0" v="0"/>
+      <v x="-2.764" y="0" z="-2.796" u="0" v="1"/>
+      <v x="-2.764" y="0" z="2.796" u="1" v="1"/>
+      <v x="2.732" y="0" z="2.796" u="1" v="0"/>
+      <numtri>2</numtri>
+      <t v1="0" v2="1" v3="2"/>
+      <t v1="2" v2="3" v3="0"/>
+      <autonormals/>
+      <localshadows/>
+    </params>
+  </meshfact>
+  <meshfact name="Cube.003">
+    <plugin>genmeshfact</plugin>
+    <params>
+      <material>no</material>
+      <numvt>4</numvt>
+      <v x="4.76837e-007" y="-2.744" z="2.796" u="0" v="0"/>
+      <v x="7.15256e-007" y="-2.744" z="-2.796" u="0" v="1"/>
+      <v x="-7.15256e-007" y="2.744" z="-2.796" u="1" v="1"/>
+      <v x="-4.76837e-007" y="2.744" z="2.796" u="1" v="0"/>
+      <numtri>2</numtri>
+      <t v1="0" v2="1" v3="2"/>
+      <t v1="2" v2="3" v3="0"/>
+      <autonormals/>
+      <localshadows/>
+    </params>
+  </meshfact>
+  <meshfact name="Cube.002">
+    <plugin>genmeshfact</plugin>
+    <params>
+      <material>no</material>
+      <numvt>4</numvt>
+      <v x="2.748" y="-2.744" z="9.53674e-007" u="0" v="0"/>
+      <v x="-2.748" y="-2.744" z="4.76837e-007" u="0" v="1"/>
+      <v x="-2.748" y="2.744" z="-4.76837e-007" u="1" v="1"/>
+      <v x="2.748" y="2.744" z="-9.53674e-007" u="1" v="0"/>
+      <numtri>2</numtri>
+      <t v1="0" v2="1" v3="2"/>
+      <t v1="2" v2="3" v3="0"/>
+      <autonormals/>
+      <localshadows/>
+    </params>
+  </meshfact>
+  <meshfact name="Cube.001">
+    <plugin>genmeshfact</plugin>
+    <params>
+      <material>no</material>
+      <numvt>4</numvt>
+      <v x="0.0160007" y="-2.744" z="-2.796" u="0" v="0"/>
+      <v x="-0.0160012" y="-2.744" z="2.796" u="0" v="1"/>
+      <v x="-0.0159993" y="2.744" z="2.796" u="1" v="1"/>
+      <v x="0.0159984" y="2.744" z="-2.796" u="1" v="0"/>
+      <numtri>2</numtri>
+      <t v1="0" v2="1" v3="2"/>
+      <t v1="2" v2="3" v3="0"/>
+      <autonormals/>
+      <localshadows/>
+    </params>
+  </meshfact>
+  <meshfact name="Cube">
+    <plugin>genmeshfact</plugin>
+    <params>
+      <material>no</material>
+      <numvt>4</numvt>
+      <v x="-2.764" y="0" z="2.796" u="0" v="0"/>
+      <v x="-2.764" y="0" z="-2.796" u="0" v="1"/>
+      <v x="2.764" y="0" z="-2.796" u="1" v="1"/>
+      <v x="2.732" y="0" z="2.796" u="1" v="0"/>
+      <numtri>2</numtri>
+      <t v1="0" v2="1" v3="2"/>
+      <t v1="2" v2="3" v3="0"/>
+      <autonormals/>
+      <localshadows/>
+    </params>
+  </meshfact>
+  <sector name="Scene">
+    <meshobj name="back">
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>Cube.002</factory>
+        <material>white</material>
+      </params>
+      <zuse/>
+      <move>
+        <v x="2.748" y="2.744" z="5.592"/>
+      </move>
+    </meshobj>
+    <meshobj name="ceiling">
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>Cube</factory>
+        <material>white</material>
+      </params>
+      <zuse/>
+      <move>
+        <v x="2.764" y="5.488" z="2.796"/>
+      </move>
+    </meshobj>
+    <meshobj name="floor">
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>Cube.004</factory>
+        <material>white</material>
+      </params>
+      <zuse/>
+      <move>
+        <v x="2.764" y="0" z="2.796"/>
+      </move>
+    </meshobj>
+    <light name="Lamp">
+      <center x="3.43" y="5.4" z="2.27"/>
+      <color red="1" green="1" blue="1"/>
+      <radius>20</radius>
+    </light>
+    <light name="Lamp.001">
+      <center x="3.43" y="5.4" z="3.32"/>
+      <color red="1" green="1" blue="1"/>
+      <radius>20</radius>
+    </light>
+    <light name="Lamp.002">
+      <center x="2.13" y="5.4" z="3.32"/>
+      <color red="1" green="1" blue="1"/>
+      <radius>20</radius>
+    </light>
+    <light name="Lamp.003">
+      <center x="2.13" y="5.4" z="2.27"/>
+      <color red="1" green="1" blue="1"/>
+      <radius>20</radius>
+    </light>
+    <meshobj name="left">
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>Cube.003</factory>
+        <material>red</material>
+      </params>
+      <zuse/>
+      <move>
+        <v x="0" y="2.744" z="2.796"/>
+      </move>
+    </meshobj>
+    <meshobj name="right">
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>Cube.001</factory>
+        <material>green</material>
+      </params>
+      <zuse/>
+      <move>
+        <v x="5.512" y="2.744" z="2.796"/>
+      </move>
+    </meshobj>
+    <meshobj name="shortblock">
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>Cube.005</factory>
+        <material>white</material>
+      </params>
+      <zuse/>
+      <move>
+        <v x="1.86" y="0.825" z="1.685"/>
+      </move>
+    </meshobj>
+    <meshobj name="tallblock">
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>Cube.006</factory>
+        <material>white</material>
+      </params>
+      <zuse/>
+      <move>
+        <v x="4.2273" y="1.03523" z="2.76172"/>
+      </move>
+    </meshobj>
+  </sector>
+</world>

@@ -1,0 +1,386 @@
+
+window "Form1"
+{
+  Style: wfsNormal
+  Options: wfoTitle
+  Frame: (0,0) - (150,332)
+  Title: "ViewMesh"
+  component "TabWidget" is "Notebook"
+  {
+    Frame: (0,0) - (150,320)
+    component "GeneralTab" is "Notebook Page"
+    {
+      Caption: "Main"
+      component "TextCamMode" is "Label"
+      {
+        Frame: (10,200) - (141,221)
+        Caption: "Camera Modes:"
+      }
+      component "RadioNormal" is "Radio Button"
+      {
+        Frame: (10,220) - (120,240)
+        Caption: "Normal Movement"
+        connect 
+        {
+          signalRadButtonClicked -> General::CameraMode
+        }
+      }
+      component "RadioOrigin" is "Radio Button"
+      {
+        Frame: (10,240) - (120,260)
+        Caption: "Look to Origin"
+        connect 
+        {
+          signalRadButtonClicked -> General::CameraMode
+        }
+      }
+      component "RadioRotate" is "Radio Button"
+      {
+        Frame: (10,260) - (120,280)
+        Caption: "Rotate"
+        connect 
+        {
+          signalRadButtonClicked -> General::CameraMode
+        }
+      }
+      component "LoadButton" is "Command Button"
+      {
+        Frame: (10,10) - (71,31)
+        Caption: "Load"
+        connect 
+        {
+          signalCmdButtonClicked -> General::LoadButton
+        }
+      }
+      component "SaveButton" is "Command Button"
+      {
+        Frame: (70,10) - (131,31)
+        Caption: "Save XML"
+        connect 
+        {
+          signalCmdButtonClicked -> General::SaveButton
+        }
+      }
+      component "SaveBinaryButton" is "Command Button"
+      {
+        Frame: (70,30) - (131,51)
+        Caption: "Save Binary"
+        connect 
+        {
+          signalCmdButtonClicked -> General::SaveBinaryButton
+        }
+      }
+      component "LoadLib" is "Command Button"
+      {
+        Frame: (10,30) - (71,51)
+        Caption: "Load Lib"
+        connect 
+        {
+          signalCmdButtonClicked -> General::LoadLibButton
+        }
+      }
+      component "TextScale" is "Label"
+      {
+        Frame: (80,80) - (120,101)
+        Caption: "Scale"
+      }
+      component "InputScale" is "Text Box"
+      {
+        Frame: (10,80) - (70,102)
+        connect 
+        {
+          signalTextBoxLostFocus -> General::ScaleSprite
+        }
+      }
+    }
+    component "AnimTab" is "Notebook Page"
+    {
+      Caption: "Ani"
+      component "ReversAnim" is "Command Button"
+      {
+        Frame: (10,250) - (70,271)
+        Caption: "Revers"
+        connect 
+        {
+          signalCmdButtonClicked -> Anim::ReversAnimation
+        }
+      }
+      component "StopAnim" is "Command Button"
+      {
+        Frame: (70,250) - (130,271)
+        Caption: "Stop"
+        connect 
+        {
+          signalCmdButtonClicked -> Anim::StopAnimation
+        }
+      }
+      component "SlowerAnim" is "Command Button"
+      {
+        Frame: (70,230) - (130,251)
+        Caption: "Slower"
+        connect 
+        {
+          signalCmdButtonClicked -> Anim::SlowerAnimation
+        }
+      }
+      component "AddAnim" is "Command Button"
+      {
+        Frame: (70,180) - (130,201)
+        Caption: "Add"
+        connect 
+        {
+          signalCmdButtonClicked -> Anim::AddAnimation
+        }
+      }
+      component "FasterAnim" is "Command Button"
+      {
+        Frame: (10,230) - (70,251)
+        Caption: "Faster"
+        connect 
+        {
+          signalCmdButtonClicked -> Anim::FasterAnimation
+        }
+      }
+      component "SetAnim" is "Command Button"
+      {
+        Frame: (10,180) - (70,201)
+        Caption: "Set"
+        connect 
+        {
+          signalCmdButtonClicked -> Anim::SetAnimation
+        }
+      }
+      component "ClearAnim" is "Command Button"
+      {
+        Frame: (10,200) - (70,221)
+        Caption: "Remove"
+        connect 
+        {
+          signalCmdButtonClicked -> Anim::RemoveAnimation
+        }
+      }
+      component "ClearAnim" is "Command Button"
+      {
+        Frame: (70,200) - (130,221)
+        Caption: "Clear"
+        connect 
+        {
+          signalCmdButtonClicked -> Anim::ClearAnimation
+        }
+      }
+      component "AnimList" is "List Box"
+      {
+        Type: lbtList
+        Highlight: "/aws/lbhi.png"
+        Columns: 1
+        DefaultSortCol: 0
+        Column0Width: 120
+        Column0Caption: "Column 0"
+        Frame: (10,20) - (130,170)
+        connect 
+        {
+          signalListBoxSelectionChanged -> Anim::SelAnimation
+        }
+      }
+    }
+    component "SocketTab" is "Notebook Page"
+    {
+      Caption: "Sck"
+      component "SocketList" is "List Box"
+      {
+        Type: lbtList
+        Highlight: "/aws/lbhi.png"
+        Columns: 1
+        DefaultSortCol: 0
+        Column0Width: 120
+        Column0Caption: "Column 0"
+        Frame: (10,20) - (130,120)
+        connect 
+        {
+          signalListBoxSelectionChanged -> Socket::SelSocket
+        }
+      }
+      component "InputName" is "Text Box"
+      {
+        Frame: (10,130) - (100,150)
+      }
+      component "NameButton" is "Command Button"
+      {
+        Frame: (100,130) - (131,150)
+        Caption: "OK"
+        connect 
+        {
+          signalCmdButtonClicked -> Socket::RenameSocket
+        }
+      }
+      component "DelSocketButton" is "Command Button"
+      {
+        Frame: (70,160) - (130,180)
+        Caption: "Del"
+        connect 
+        {
+          signalCmdButtonClicked -> Socket::DelSocket
+        }
+      }
+      component "AddSocketButton" is "Command Button"
+      {
+        Frame: (9,160) - (69,180)
+        Caption: "Add"
+        connect 
+        {
+          signalCmdButtonClicked -> Socket::AddSocket
+        }
+      }
+      component "TextMesh" is "Label"
+      {
+        Frame: (10,180) - (40,200)
+        Caption: "Mesh"
+      }
+      component "TextSubMesh" is "Label"
+      {
+        Frame: (50,180) - (90,200)
+        Caption: "Sub"
+      }
+      component "TextTriangle" is "Label"
+      {
+        Frame: (90,180) - (130,200)
+        Caption: "Tria"
+      }
+      component "InputMesh" is "Text Box"
+      {
+        Frame: (10,200) - (50,220)
+        connect 
+        {
+          signalTextBoxLostFocus -> Socket::SetMesh
+        }
+      }
+      component "InputSubMesh" is "Text Box"
+      {
+        Frame: (50,200) - (90,220)
+        connect 
+        {
+          signalTextBoxLostFocus -> Socket::SetSubMesh
+        }
+      }
+      component "InputTriangle" is "Text Box"
+      {
+        Frame: (90,200) - (130,220)
+        connect 
+        {
+          signalTextBoxLostFocus -> Socket::SetTriangle
+        }
+      }
+      component "TextRotX" is "Label"
+      {
+        Frame: (10,220) - (50,240)
+        Caption: "RotX"
+      }
+      component "TextRotY" is "Label"
+      {
+        Frame: (50,220) - (90,240)
+        Caption: "RotY"
+      }
+      component "TextRotZ" is "Label"
+      {
+        Frame: (90,220) - (130,240)
+        Caption: "RotZ"
+      }
+      component "InputRotX" is "Text Box"
+      {
+        Frame: (10,240) - (50,260)
+        connect 
+        {
+          signalTextBoxLostFocus -> Socket::SetRotX
+        }
+      }
+      component "InputRotY" is "Text Box"
+      {
+        Frame: (50,240) - (90,260)
+        connect 
+        {
+          signalTextBoxLostFocus -> Socket::SetRotY
+        }
+      }
+      component "InputRotZ" is "Text Box"
+      {
+        Frame: (90,240) - (130,260)
+        connect 
+        {
+          signalTextBoxLostFocus -> Socket::SetRotZ
+        }
+      }
+      component "DetachButton" is "Command Button"
+      {
+        Frame: (10,260) - (70,280)
+        Caption: "Detach"
+        connect 
+        {
+          signalCmdButtonClicked -> Socket::DetachButton
+        }
+      }
+      component "AttachButton" is "Command Button"
+      {
+        Frame: (70,260) - (130,280)
+        Caption: "Attach"
+        connect 
+        {
+          signalCmdButtonClicked -> Socket::AttachButton
+        }
+      }
+    }
+    component "MorphTab" is "Notebook Page"
+    {
+      Caption: "Morph"
+      component "MorphList" is "List Box"
+      {
+        Type: lbtList
+        Highlight: "/aws/lbhi.png"
+        Columns: 1
+        DefaultSortCol: 0
+        Column0Width: 120
+        Column0Caption: "Column 0"
+        Frame: (10,10) - (130,140)
+        connect 
+        {
+          signalListBoxSelectionChanged -> Morph::SelMorph
+        }
+      }
+      component "TextWeigth" is "Label"
+      {
+        Frame: (10,150) - (50,171)
+        Caption: "Weight"
+      }
+      component "TextDelay" is "Label"
+      {
+        Frame: (70,150) - (130,171)
+        Caption: "Delay"
+      }
+      component "InputWeight" is "Text Box"
+      {
+        Frame: (10,170) - (70,192)
+      }
+      component "InputDelay" is "Text Box"
+      {
+        Frame: (70,170) - (130,192)
+      }
+      component "BlendButton" is "Command Button"
+      {
+        Frame: (10,200) - (70,221)
+        Caption: "Blend"
+        connect 
+        {
+          signalCmdButtonClicked -> Morph::BlendButton
+        }
+      }
+      component "ClearButton" is "Command Button"
+      {
+        Frame: (70,200) - (130,221)
+        Caption: "Clear"
+        connect 
+        {
+          signalCmdButtonClicked -> Morph::ClearButton
+        }
+      }
+    }
+  }
+}

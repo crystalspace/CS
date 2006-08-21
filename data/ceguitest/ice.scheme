@@ -1,0 +1,43 @@
+<?xml version="1.0" ?>
+<GUIScheme Name="ice">
+	<Imageset Name="ice" Filename="ice.imageset" />
+	<LookNFeel Filename="ice.looknfeel" />
+	<WindowSet Filename="CEGUIFalagardBase" />
+	<FalagardMapping WindowType="ice/AlternateProgressBar" TargetType="Falagard/ProgressBar" LookNFeel="ice/AltProgressBar" />
+	<FalagardMapping WindowType="ice/Button" TargetType="Falagard/Button" LookNFeel="ice/Button" />
+	<FalagardMapping WindowType="ice/Checkbox" TargetType="Falagard/Checkbox" LookNFeel="ice/Checkbox" />
+	<FalagardMapping WindowType="ice/ComboDropList" TargetType="Falagard/ComboDropList" LookNFeel="ice/ComboDropList" />
+	<FalagardMapping WindowType="ice/ComboEditbox" TargetType="Falagard/Editbox" LookNFeel="ice/ComboEditbox" />
+	<FalagardMapping WindowType="ice/Combobox" TargetType="Falagard/Combobox" LookNFeel="ice/Combobox" />
+	<FalagardMapping WindowType="ice/Editbox" TargetType="Falagard/Editbox" LookNFeel="ice/Editbox" />
+	<FalagardMapping WindowType="ice/FrameWindow" TargetType="Falagard/FrameWindow" LookNFeel="ice/FrameWindow" />
+	<FalagardMapping WindowType="ice/HorizontalScrollbar" TargetType="Falagard/Scrollbar" LookNFeel="ice/HorizontalScrollbar" />
+	<FalagardMapping WindowType="ice/HorizontalScrollbarThumb" TargetType="Falagard/Thumb" LookNFeel="ice/HorizontalScrollbarThumb" />
+	<FalagardMapping WindowType="ice/LargeVerticalScrollbar" TargetType="Falagard/Scrollbar" LookNFeel="ice/LargeVerticalScrollbar" />
+	<FalagardMapping WindowType="ice/LargeVerticalScrollbarThumb" TargetType="Falagard/Thumb" LookNFeel="ice/LargeVerticalScrollbarThumb" />
+	<FalagardMapping WindowType="ice/ListHeader" TargetType="Falagard/ListHeader" LookNFeel="ice/ListHeader" />
+	<FalagardMapping WindowType="ice/ListHeaderSegment" TargetType="Falagard/ListHeaderSegment" LookNFeel="ice/ListHeaderSegment" />
+	<FalagardMapping WindowType="ice/Listbox" TargetType="Falagard/Listbox" LookNFeel="ice/Listbox" />
+	<FalagardMapping WindowType="ice/Menubar" TargetType="Falagard/Menubar" LookNFeel="ice/PopupMenu" />
+	<FalagardMapping WindowType="ice/MenuItem" TargetType="Falagard/MenuItem" LookNFeel="ice/MenuItem" />
+	<FalagardMapping WindowType="ice/MultiColumnList" TargetType="Falagard/MultiColumnList" LookNFeel="ice/MultiColumnList" />
+	<FalagardMapping WindowType="ice/MultiLineEditbox" TargetType="Falagard/MultiLineEditbox" LookNFeel="ice/MultiLineEditbox" />
+	<FalagardMapping WindowType="ice/PopupMenu" TargetType="Falagard/PopupMenu" LookNFeel="ice/PopupMenu" />
+	<FalagardMapping WindowType="ice/ProgressBar" TargetType="Falagard/ProgressBar" LookNFeel="ice/ProgressBar" />
+	<FalagardMapping WindowType="ice/RadioButton" TargetType="Falagard/RadioButton" LookNFeel="ice/RadioButton" />
+	<FalagardMapping WindowType="ice/ScrollablePane" TargetType="Falagard/ScrollablePane" LookNFeel="ice/ScrollablePane" />
+	<FalagardMapping WindowType="ice/Slider" TargetType="Falagard/Slider" LookNFeel="ice/Slider" />
+	<FalagardMapping WindowType="ice/SliderThumb" TargetType="Falagard/Thumb" LookNFeel="ice/SliderThumb" />
+	<FalagardMapping WindowType="ice/Spinner" TargetType="Falagard/Spinner" LookNFeel="ice/Spinner" />
+	<FalagardMapping WindowType="ice/StaticImage" TargetType="Falagard/StaticImage" LookNFeel="ice/StaticImage" />
+	<FalagardMapping WindowType="ice/StaticText" TargetType="Falagard/StaticText" LookNFeel="ice/StaticText" />
+	<FalagardMapping WindowType="ice/SystemButton" TargetType="Falagard/SystemButton" LookNFeel="ice/Button" />
+	<FalagardMapping WindowType="ice/TabButton" TargetType="Falagard/TabButton" LookNFeel="ice/TabButton" />
+	<FalagardMapping WindowType="ice/TabControl" TargetType="Falagard/TabControl" LookNFeel="ice/TabControl" />
+	<FalagardMapping WindowType="ice/TabPane" TargetType="Falagard/TabPane" LookNFeel="ice/TabPane" />
+	<FalagardMapping WindowType="ice/Titlebar" TargetType="Falagard/Titlebar" LookNFeel="ice/Titlebar" />
+	<FalagardMapping WindowType="ice/Tooltip" TargetType="Falagard/Tooltip" LookNFeel="ice/Tooltip" />
+	<FalagardMapping WindowType="ice/VerticalScrollbar" TargetType="Falagard/Scrollbar" LookNFeel="ice/VerticalScrollbar" />
+	<FalagardMapping WindowType="ice/VerticalScrollbarThumb" TargetType="Falagard/Thumb" LookNFeel="ice/VerticalScrollbarThumb" />
+	<FalagardMapping WindowType="ice/VUMeter" TargetType="Falagard/ProgressBar" LookNFeel="ice/VUMeter" />
+</GUIScheme>

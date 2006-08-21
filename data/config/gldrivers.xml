@@ -1,0 +1,534 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<!--
+    How the GL driver database works:
+    
+    First, a set of configurations is specified in the <configs> section.
+    Each configuration has an associated name.
+    
+    Then, some rules are declared in the <rules> section. Rules consist of
+    severeral <conditions>, which can be:
+    - <regexp>: Match one of the GL strings against a regular expression.
+    - <comparever>: Compare the a version against a prefined value.
+    - <negate>: True if the contained rule(s) are false.
+    - <conditions>: True if the contained rule(s) are true.
+    <conditions> as well as <negate> are containers for conditions; by 
+    default, they are true if all contained conditions are true. This 
+    behaviour can be changed by specifying the 'fulfill="one"' attribute. 
+    (You can also specify 'fulfill="all"', but that's just like the default.)
+    
+    If the <conditions> section evaluates to 'true', all the configurations 
+    from the <configs> section specified in the <applicable> sections (in 
+    <usecfg>...</usecfg> tags) are added to the global config tree; otherwise, 
+    the configurations specified in <notapplicable> are added.
+    
+    The rules are evaluated in the order they appear in the database.
+  -->
+<gldriverdb>
+  <configs>
+    <config name="brokenstencil">
+      <Video>
+	<OpenGL>
+	  <BrokenStencil>true</BrokenStencil>
+	</OpenGL>
+      </Video>
+    </config>
+    <config name="novbo">
+      <Video>
+	<OpenGL>
+	  <UseExtension>
+	    <GL_ARB_vertex_buffer_object>no</GL_ARB_vertex_buffer_object>
+	  </UseExtension>
+	</OpenGL>
+      </Video>
+    </config>
+    <config name="noavp">
+      <Video>
+	<OpenGL>
+	  <UseExtension>
+	    <GL_ARB_vertex_program>no</GL_ARB_vertex_program>
+	  </UseExtension>
+	</OpenGL>
+      </Video>
+    </config>
+    <config name="noaps">
+      <Video>
+	<OpenGL>
+	  <UseExtension>
+	    <GL_ARB_point_sprite>no</GL_ARB_point_sprite>
+	  </UseExtension>
+	</OpenGL>
+      </Video>
+    </config>
+    <config name="3dfxhacks">
+      <Video>
+	<OpenGL>
+	  <UseExtension>
+	    <GL_ARB_multitexture>no</GL_ARB_multitexture>
+	  </UseExtension>
+	  <Win32>
+	    <DisableConsoleWindow>yes</DisableConsoleWindow>
+	  </Win32>
+	</OpenGL>
+      </Video>
+    </config>
+    <config name="nofilter">
+      <Video>
+	<OpenGL>
+	  <TextureFilter>none</TextureFilter>
+	</OpenGL>
+      </Video>
+    </config>
+    <config name="nostencil">
+      <Video>
+	<OpenGL>
+	  <Caps>
+	    <Stencil>no</Stencil>
+	  </Caps>
+	</OpenGL>
+      </Video>
+    </config>
+    <config name="crappyintelgraphics">
+      <Video>
+	<ShaderManager>
+	  <Tags>
+	    <crappy_intel_graphics>
+	      <Presence>forbidden</Presence>
+	    </crappy_intel_graphics>
+	  </Tags>
+	</ShaderManager>
+      </Video>
+    </config>
+    <config name="noinvertedfog">
+      <Video>
+	<ShaderManager>
+	  <Tags>
+	    <inverted_fog>
+	      <Presence>forbidden</Presence>
+	    </inverted_fog>
+	  </Tags>
+	</ShaderManager>
+      </Video>
+    </config>
+    <config name="pixelformatbroken">
+      <Video>
+	<OpenGL>
+	  <UseExtension>
+	    <WGL_ARB_pixel_format>no</WGL_ARB_pixel_format>
+	  </UseExtension>
+	</OpenGL>
+      </Video>
+    </config>
+    <config name="cutdownTUs">
+      <Video>
+	<OpenGL>
+	  <Shader>
+	    <Fixed>
+	      <MaxTextureUnits>1</MaxTextureUnits>
+	    </Fixed>
+	  </Shader>
+	</OpenGL>
+      </Video>
+    </config>
+    <config name="disableMT">
+      <Video>
+	<OpenGL>
+	  <UseExtension>
+	    <GL_ARB_multitexture>no</GL_ARB_multitexture>
+	  </UseExtension>
+	</OpenGL>
+      </Video>
+    </config>
+    <config name="disableMTtext">
+      <Video>
+	<OpenGL>
+	  <FontCache>
+	    <UseMultiTexturing>no</UseMultiTexturing>
+	  </FontCache>
+	</OpenGL>
+      </Video>
+    </config>
+    <config name="disableIntensityBlendText">
+      <Video>
+	<OpenGL>
+	  <FontCache>
+	    <UseIntensityBlend>no</UseIntensityBlend>
+	  </FontCache>
+	</OpenGL>
+      </Video>
+    </config>
+    <config name="enableIntensityBlendText">
+      <Video>
+	<OpenGL>
+	  <FontCache>
+	    <UseIntensityBlend>yes</UseIntensityBlend>
+	  </FontCache>
+	</OpenGL>
+      </Video>
+    </config>
+    <config name="nolinearfog">
+      <Video>
+	<ShaderManager>
+	  <Tags>
+	    <linear_fog>
+	      <Presence>forbidden</Presence>
+	    </linear_fog>
+	  </Tags>
+	</ShaderManager>
+      </Video>
+    </config>
+    <config name="disableTC">
+      <Video>
+	<OpenGL>
+	  <UseExtension>
+	    <GL_ARB_texture_compression>no</GL_ARB_texture_compression>
+	  </UseExtension>
+	</OpenGL>
+      </Video>
+    </config>
+    <config name="disableMipmapGeneration">
+      <Video>
+	<OpenGL>
+	  <UseExtension>
+	    <GL_SGIS_generate_mipmap>no</GL_SGIS_generate_mipmap>
+	  </UseExtension>
+	</OpenGL>
+      </Video>
+    </config>
+    <config name="noCompressionForRECTTextures">
+      <Video>
+	<OpenGL>
+	  <DisableRECTTextureCompression>yes</DisableRECTTextureCompression>
+	</OpenGL>
+      </Video>
+    </config>
+    <config name="disableRECTTextures">
+      <Video>
+	<OpenGL>
+	  <UseExtension>
+	    <GL_ARB_texture_rectangle>no</GL_ARB_texture_rectangle>
+	    <GL_EXT_texture_rectangle>no</GL_EXT_texture_rectangle>
+	    <GL_NV_texture_rectangle>no</GL_NV_texture_rectangle>
+	  </UseExtension>
+	</OpenGL>
+      </Video>
+    </config>
+    <config name="hiddenNPOTS">
+      <Video>
+	<OpenGL>
+	  <EnableNonPowerOfTwo2DTextures>yes</EnableNonPowerOfTwo2DTextures>
+	</OpenGL>
+      </Video>
+    </config>
+    <config name="nodetail">
+      <Video>
+        <ShaderManager>
+          <Tags>
+            <detail_texture>
+              <Presence>forbidden</Presence>
+            </detail_texture>
+          </Tags>
+        </ShaderManager>
+      </Video>
+    </config>
+    <config name="useAFP2D">
+      <Video>
+	<OpenGL>
+	  <FontCache>
+	    <UseAFP>yes</UseAFP>
+	  </FontCache>
+	  <AFPDrawPixmap>yes</AFPDrawPixmap>
+	</OpenGL>
+      </Video>
+    </config>
+  </configs>
+  <rules>
+    <!-- rule description="Some more examples">
+      <conditions>
+	<comparever version="gl" relation="ge 1.1" />
+	<comparever version="win32_driver" relation="lt 6.34" />
+      </conditions>
+      <applicable>
+      </applicable>
+      <notapplicable>
+      </notapplicable>
+    </rule -->
+    
+    <rule description="Broken stencil support">
+      <conditions fulfill="all">
+	<regexp string="platform" pattern="Unix" />
+	<regexp string="renderer" pattern="Rage *128" />
+	<regexp string="glversion" pattern="1.2" />
+      </conditions>
+      <applicable>
+	<usecfg>brokenstencil</usecfg>
+      </applicable>
+    </rule>
+
+    <!--
+      * 2005-11-22: Jorrit reports despicable performance with 64bit ATI
+		    drivers and also states other sources would attribute a
+		    generally poor performance to ATI Linux drivers.
+		    @@@ Whether only certain version(s) are affected is unknown.
+      -->
+    <rule description="Disable VBO for GNU/Linux ATI drivers">
+      <conditions fulfill="all">
+	<regexp string="platform" pattern="Unix" />
+	<regexp string="vendor" pattern="^ATI" />
+      </conditions>
+      <applicable>
+	<usecfg>novbo</usecfg>
+      </applicable>
+    </rule>
+
+    <!-- 
+      * 2005-11-22: VBO reported to give slowdown for at least 
+		    GF4Go/Forceware 75.90
+      * 2005-11-22: VBO reported to give speed up for at least 
+		    GF5/Forceware 81.85
+      * 2005-11-22: VBO reported to give speed up for at least 
+		    GF5/Forceware 78.01
+      * 2005-11-22: VBO reported to give speed up for at least 
+		    GF5/Linux Forceware 76.67 
+		    (version string "2.0.0 NVIDIA 76.67")
+      * 2005-12-19: Reported: GF4 slowdown for 77.72, speedup for 81.95
+      -->
+    <rule description="NVIDIA: Slow VBO">
+      <conditions>
+	<regexp string="vendor" pattern="NVIDIA" />
+	<conditions fulfill="one">
+	  <comparever version="win32_driver" relation="lt 6.14.10.7801" />
+	  <conditions fulfill="all">
+	    <regexp string="platform" pattern="Unix" />
+	    <comparever version="gl" relation="lt 2.0.0 NVIDIA 76.67" />
+	    <!-- Note: comparever is dumb, it just compares numbers, nothing
+		 in between. 
+		 E.g. "2.0.0 ATI 78.90" would make the comparison above, true,
+		 too. -->
+	  </conditions>
+	</conditions>
+      </conditions>
+      <applicable>
+	<usecfg>novbo</usecfg>
+      </applicable>
+    </rule>
+
+    
+    <!-- 
+      * 2005-12-21: Point sprites are fixed with at least Catalyst 5.13.
+      -->
+    <rule description="Work around broken ATI point sprites">
+      <conditions fulfill="all">
+	<!-- Point sprite activation messes up all other geometry -->
+	<regexp string="vendor" pattern="^ATI" />
+	<regexp string="platform" pattern="Win32" />
+	<comparever version="win32_driver" relation="lt 6.14.10.5525" />
+      </conditions>
+      <applicable>
+	<usecfg>noaps</usecfg>
+      </applicable>
+    </rule>
+
+    <!-- 
+      * 2006-02-04: Jorrit found point sprites to be miniscule on driver 
+		    version X4.3.0-8.19.10
+      -->
+    <rule description="Broken ATI point sprites (ATI)">
+      <conditions fulfill="all">
+	<regexp string="vendor" pattern="^ATI" />
+	<regexp string="platform" pattern="Unix" />
+      </conditions>
+      <applicable>
+	<usecfg>noaps</usecfg>
+      </applicable>
+    </rule>
+    
+    <!-- 
+      * 2006-02-20: vknecht and dingobloo found point sprites to be miniscule.
+      -->
+    <rule description="Broken ATI point sprites (NV)">
+      <conditions fulfill="one">
+	<regexp string="renderer" pattern="GeForce 6600" />
+	<regexp string="renderer" pattern="GeForce 7800" />
+      </conditions>
+      <applicable>
+	<usecfg>noaps</usecfg>
+      </applicable>
+    </rule>
+    
+    
+    <rule description="Work around 3dfx Voodoo shortcomings">
+      <conditions>
+	<regexp string="vendor" pattern="^3dfx" />
+      </conditions>
+      <applicable>
+	<usecfg>3dfxhacks</usecfg>
+      </applicable>
+    </rule>
+    
+    <rule description="GeForce FX 5xxx: Broken 'Inverted fog'">
+      <conditions>
+	<regexp string="renderer" pattern="GeForce FX 5..." />
+	<!-- @@@ Add some version check ? -->
+      </conditions>
+      <applicable>
+	<usecfg>noinvertedfog</usecfg>
+      </applicable>
+    </rule>
+    
+    <rule description="NVidia: borked WGL_ARB_pixel_format" phase="preinit">
+      <!-- 
+        'phase="preinit"' means this rule is only considered during 
+	"pre-initialization". On Win32 this is the time a pixel format is 
+	picked.
+      -->
+      <conditions fulfill="all">
+	<regexp	string="win32_driver" pattern="^nv" />
+	<comparever version="win32_driver" relation="le 6.13.10.2846" />
+      </conditions>
+      <applicable>
+	<usecfg>pixelformatbroken</usecfg>
+      </applicable>
+    </rule>
+    
+    <rule description="Intel: Extreme Buggy Graphics">
+      <conditions>
+	<regexp string="vendor" pattern="^Intel" />
+	<!-- @@@ Check if we really need to be that cruel and shoot down all
+	     Intel gfx hardware. -->
+	<regexp string="platform" pattern="Win32" />
+      </conditions>
+      <applicable>
+	<usecfg>nolinearfog</usecfg>
+	<usecfg>enableIntensityBlendText</usecfg>
+	<usecfg>disableMipmapGeneration</usecfg>
+	<usecfg>crappyintelgraphics</usecfg>
+      </applicable>
+    </rule>
+    
+    <rule description="ATI: Can't handle GL_BLEND texenv for GL_INTENSITY textures">
+      <conditions>
+	<regexp string="vendor" pattern="^ATI" />
+	<regexp string="platform" pattern="Win32" />
+      </conditions>
+      <applicable>
+	<usecfg>disableIntensityBlendText</usecfg>
+	<!-- NB: this is the default in video.cfg actually. But to ensure the
+	     setting it's made here, too -->
+      </applicable>
+    </rule>
+    
+    <rule description="Mesa DRI Radeon: No proper texture compression support">
+      <conditions>
+	<regexp string="renderer" pattern="^Mesa DRI Radeon 2002" />
+      </conditions>
+      <applicable>
+	<usecfg>disableTC</usecfg>
+      </applicable>
+    </rule>
+    
+    <rule description="ATI: Can't handle compressed formats for RECT textures">
+      <conditions>
+	<regexp string="vendor" pattern="^ATI" />
+      </conditions>
+      <applicable>
+	<usecfg>noCompressionForRECTTextures</usecfg>
+      </applicable>
+    </rule>
+    
+    <rule description="ATI: RECT texture extension support apparently sucks">
+      <conditions>
+	<regexp string="vendor" pattern="^ATI" />
+      </conditions>
+      <applicable>
+	<usecfg>disableRECTTextures</usecfg>
+      </applicable>
+    </rule>
+
+    <rule description="GeForce: RECT texture extension support apparently sucks">
+      <conditions fulfill="one">
+	<regexp	string="renderer" pattern="GeForce.*MX" />
+	<regexp	string="renderer" pattern="GeForce.*Go" />
+      </conditions>
+      <applicable>
+	<usecfg>disableRECTTextures</usecfg>
+      </applicable>
+    </rule>
+
+    <rule description="SiS: Text drawing only seems to work using the worst method">
+      <conditions>
+	<regexp string="vendor" pattern="^SiS" />
+      </conditions>
+      <applicable>
+	<usecfg>disableMTtext</usecfg>
+      </applicable>
+    </rule>
+
+    <!--
+      * 2005-12-29: ATI Radeon 9700Pro, Win32, driver 6.14.10.5525 (Cat 5.13)
+		    "walktest terrainf" exhibits garbled text and CS logo;
+		    curiously fixed by not using a multitexturing setup but
+		    an AFP while drawing.
+      * 2005-12-30: Jorrit reports problems with MOBILITY RADEON X700 Generic,
+		    1.3.5461 (X4.3.0-8.19.10) on Linux
+      * 2006-01-03: Vasily Rudnikov reports corruption and subsequent fix
+		    by this tweak with a Radeon 9600, Win32, 
+		    driver 6.14.10.4517 (Cat 4.8)
+      -->
+    <rule description="ATI: Use AFP for some 2D drawing">
+      <conditions fulfill="all">
+	<regexp string="vendor" pattern="^ATI" />
+	<conditions fulfill="one">
+	  <comparever version="win32_driver" relation="ge 6.14.10.4517" />
+	  <regexp string="platform" pattern="Unix" />
+	</conditions>
+      </conditions>
+      <applicable>
+	<usecfg>useAFP2D</usecfg>
+      </applicable>
+    </rule>
+
+ 
+    <!--
+      * 2006-06-05: ATI Radeon 9700Pro, Win32, OpenGL 2.0.5885 (Cat 6.5)
+		    Apparently NPOTS textures via glTexture2D don't get 
+		    garbled anymore.
+      -->
+    <rule description="ATI: Enable hidden 2D texture NPOTS support">
+      <conditions>
+	<regexp string="vendor" pattern="^ATI" />
+	<conditions fulfill="one">
+	  <regexp string="renderer" pattern="^R\(ADEON\|adeon\) 9\(5\|6\|7\|8\).*" />
+	  <regexp string="renderer" pattern="^R\(ADEON\|adeon\) X.*" />
+	</conditions>
+	<comparever version="gl" relation="ge 2.0.5885" />
+      </conditions>
+      <applicable>
+	<usecfg>hiddenNPOTS</usecfg>
+      </applicable>
+    </rule>
+    
+    <rule description="Software GL tweaks">
+      <conditions fulfill="one">
+	<regexp string="renderer" pattern="Mesa GLX Indirect" />
+	<regexp string="renderer" pattern="GDI Generic" />
+      </conditions>
+      <applicable>
+        <usecfg>nofilter</usecfg>
+        <usecfg>nostencil</usecfg>
+        <usecfg>nodetail</usecfg>
+      </applicable>
+    </rule>
+    
+    <!--
+    <rule description="GeForce MX/Go class HW">
+      <conditions fulfill="one">
+	<regexp	string="renderer" pattern="GeForce.*MX" />
+	<regexp	string="renderer" pattern="GeForce.*Go" />
+      </conditions>
+      <applicable>
+	<usecfg>noavp</usecfg>
+      </applicable>
+    </rule>
+    -->
+  </rules>
+</gldriverdb>

@@ -1,0 +1,46 @@
+skin "Windows"
+{
+  HighlightColor: 		200,200,200
+  ShadowColor:    		90,90,90
+  FillColor:      		180,180,180
+  WindowBackgroundColor:      255, 255, 255
+  ActiveTitleBarColor1:        0,0,128
+  ActiveTitleBarColor2:        200,200,255
+  TextDisabledColor:	128,128,0
+  TitleBarTextColor:    255,255,255
+  TextForeColor:		0,0,0
+  TextBackColor:        255,255,255
+  ButtonTextColor:		0,0,192
+  ChartBarColor:		255,0,0
+  OverlayTextureAlpha:	128
+  TitleBarHeight:       16
+  ScrollBarHeight:	16
+  ScrollBarWidth:	      16
+  WindowMin:		"/aws/minimize.png"
+  WindowZoom:		"/aws/zoom.png"
+  WindowClose:		"/aws/close.png"
+  WindowMinAt:		(50, 8) - (50-12, 6+12)
+  WindowZoomAt:		(38, 8) - (38-12, 6+12)
+  WindowCloseAt:	(19, 8) - (19-12, 6+12)
+  CheckBoxUp:		"/aws/chkup.png"
+  CheckBoxDn:		"/aws/chkdn.png"
+  CheckBoxOn:		"/aws/chkon.png"
+  CheckBoxOff:		"/aws/chkoff.png"
+  RadioButtonUp:	"/aws/radup.png"
+  RadioButtonDn:	"/aws/raddn.png"
+  RadioButtonOn:	"/aws/radon.png"
+  RadioButtonOff:	"/aws/radoff.png"
+  TreeCollapsed:	"/aws/treecol.png"
+  TreeExpanded:		"/aws/treeexp.png"
+  TreeCollapsed:	"/aws/treecol.png"
+  TreeVertLine:		"/aws/treevl.png"
+  TreeHorzLine:		"/aws/treehl.png"
+  TreeChkUnmarked:	"/aws/treechke.png"
+  TreeChkMarked:	"/aws/treechkf.png"
+  TreeGrpUnmarked:	"/aws/treegrpe.png"
+  TreeGrpMarked:	"/aws/treegrpf.png"
+  ScrollBarUp:		"/aws/sbup.png"
+  ScrollBarDn:		"/aws/sbdn.png"
+  ScrollBarRt:		"/aws/sbrt.png"
+  ScrollBarLt:		"/aws/sblt.png"
+}

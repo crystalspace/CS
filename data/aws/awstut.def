@@ -1,0 +1,110 @@
+skin "Normal Windows"
+{
+  Texture: 		"/aws/texture.png"
+  HighlightColor: 	230,230,230
+  ShadowColor:    	60,60,60
+  FillColor:      	200,200,200
+  TextDisabledColor:	128,128,0
+  TextForeColor:	0,0,0
+  TextBackColor:        255,255,255
+  ButtonTextColor:	0,0,192
+  OverlayTextureAlpha:	128
+  ScrollBarHeight:	16
+  ScrollBarWidth:	16
+  WindowMin:		"/aws/minimize.png"
+  WindowZoom:		"/aws/zoom.png"
+  WindowClose:		"/aws/close.png"
+  WindowMinAt:		(46, 6) - (46-11, 6+10)
+  WindowZoomAt:		(34, 6) - (34-11, 6+10)
+  WindowCloseAt:	(19, 6) - (19-11, 6+10)
+  CheckBoxUp:		"/aws/chkup.png"
+  CheckBoxDn:		"/aws/chkdn.png"
+  CheckBoxOn:		"/aws/chkon.png"
+  CheckBoxOff:		"/aws/chkoff.png"
+  RadioButtonUp:	"/aws/radup.png"
+  RadioButtonDn:	"/aws/raddn.png"
+  RadioButtonOn:	"/aws/radon.png"
+  RadioButtonOff:	"/aws/radoff.png"
+  TreeCollapsed:	"/aws/treecol.png"
+  TreeExpanded:		"/aws/treeexp.png"
+  TreeCollapsed:	"/aws/treecol.png"
+  TreeVertLine:		"/aws/treevl.png"
+  TreeHorzLine:		"/aws/treehl.png"
+  TreeChkUnmarked:	"/aws/treechke.png"
+  TreeChkMarked:	"/aws/treechkf.png"
+  TreeGrpUnmarked:	"/aws/treegrpe.png"
+  TreeGrpMarked:	"/aws/treegrpf.png"
+  ScrollBarUp:		"/aws/sbup.png"
+  ScrollBarDn:		"/aws/sbdn.png"
+  ScrollBarRt:		"/aws/sbrt.png"
+  ScrollBarLt:		"/aws/sblt.png"
+}
+
+window "LoginWindow"
+{
+  Frame: (100,200)-(415,325)
+  Style: wfsNormal
+  Options: wfoBeveledBorder
+
+  component "TestLabel" is "Label"
+  {
+    Frame: (20, 5) - (250, 20)
+    Align: lblAlignCenter
+    Caption: "Login to AWSTEST"
+  }
+
+  component "User" is "Label"
+  {
+    Frame: (10, 50) - (75, 70)
+    Align: lblAlignRight
+    Caption: "Username:"
+  }
+
+  component "Pass" is "Label"
+  {
+    Frame: (10, 75) - (75, 95)
+    Align: lblAlignRight
+    Caption: "Password:"
+  }
+
+  component "UserName" is "Text Box"
+  {
+    Frame: (80, 50) - (250, 70)
+    Style: tbfsNormal
+    Text: "Newuser"
+    Disallow: "0123456789 "
+
+    connect 
+    {
+      signalTextBoxLostFocus -> testButtonSink::SetUserName
+    }
+  }
+
+  component "Password" is "Text Box"
+  {
+    Frame: (80, 75) - (250, 95)
+    Style: tbfsNormal
+    Masked: Yes
+    MaskChar: "*"
+	
+    connect 
+    {
+      signalTextBoxLostFocus -> testButtonSink::SetPassword
+    }
+  }
+
+  component "Login" is "Command Button"
+  {
+    Frame: (252, 75) - (295, 95)
+    Style: bfsNormal
+    Caption: "Login"
+
+    connect 
+    {
+      signalCmdButtonClicked -> testButtonSink::Login
+    }
+  }
+
+}
+
+

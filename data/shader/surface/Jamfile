@@ -1,0 +1,3 @@
+SubDir TOP data shader surface ;
+
+InstallData [ Wildcard *.cginc *.cscg *.inc ] : data shader surface ;

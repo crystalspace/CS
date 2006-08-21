@@ -1,0 +1,173 @@
+skin "Normal Windows"
+{
+  Texture: 		"/aws/texture.png"
+  HighlightColor: 		230,230,230
+  ShadowColor:    		60,60,60
+  FillColor:      		200,200,200
+  TextDisabledColor:	128,128,0
+  TextForeColor:		0,0,0
+  TextBackColor:        255,255,255
+  ButtonTextColor:		0,0,192
+  ChartBarColor:		255,0,0
+  OverlayTextureAlpha:	128
+  ScrollBarHeight:	16
+  ScrollBarWidth:	16
+  WindowMin:		"/aws/minimize.png"
+  WindowZoom:		"/aws/zoom.png"
+  WindowClose:		"/aws/close.png"
+  WindowMinAt:		(46, 6) - (46-11, 6+10)
+  WindowZoomAt:		(34, 6) - (34-11, 6+10)
+  WindowCloseAt:	(19, 6) - (19-11, 6+10)
+  CheckBoxUp:		"/aws/chkup.png"
+  CheckBoxDn:		"/aws/chkdn.png"
+  CheckBoxOn:		"/aws/chkon.png"
+  CheckBoxOff:		"/aws/chkoff.png"
+  RadioButtonUp:	"/aws/radup.png"
+  RadioButtonDn:	"/aws/raddn.png"
+  RadioButtonOn:	"/aws/radon.png"
+  RadioButtonOff:	"/aws/radoff.png"
+  TreeCollapsed:	"/aws/treecol.png"
+  TreeExpanded:		"/aws/treeexp.png"
+  TreeCollapsed:	"/aws/treecol.png"
+  TreeVertLine:		"/aws/treevl.png"
+  TreeHorzLine:		"/aws/treehl.png"
+  TreeChkUnmarked:	"/aws/treechke.png"
+  TreeChkMarked:	"/aws/treechkf.png"
+  TreeGrpUnmarked:	"/aws/treegrpe.png"
+  TreeGrpMarked:	"/aws/treegrpf.png"
+  ScrollBarUp:		"/aws/sbup.png"
+  ScrollBarDn:		"/aws/sbdn.png"
+  ScrollBarRt:		"/aws/sbrt.png"
+  ScrollBarLt:		"/aws/sblt.png"
+}
+
+window "Another"
+{
+  Frame: (100,100)-(600,440)
+  Style: wfsNormal
+  Title: "A window with lots of stuff"
+
+component "Color 1" is "Image View"
+{
+  Frame: (20, 200)-(50,250)
+  Color: 120, 178, 35
+}
+
+component "Color 2" is "Image View"
+{
+  Frame: (70, 200)-(100,250)
+  Color: 120, 178, 35
+}
+
+component "Color 3" is "Image View"
+{
+  Frame: (120, 200)-(150,250)
+  Color: 120, 178, 35
+}
+
+component "Color 4" is "Image View"
+{
+  Frame: (170, 200)-(200,250)
+  Color: 120, 178, 35
+}
+
+component "Color 5" is "Image View"
+{
+  Frame: (220, 200)-(250,250)
+  Color: 120, 178, 35
+}
+
+component "Color 6" is "Image View"
+{
+  Frame: (270, 200)-(300,250)
+  Color: 120, 178, 35
+}
+
+
+
+component "Bar" is "Control Bar"
+{
+
+  Frame: (10,10)-(350,100)
+  HorizontalGap: 2
+  VerticalGap: 5
+  Alignment: gcbAlignCenter
+  Vertical: True
+
+
+  component "Red" is "Command Button"
+  {
+    Frame: (20, 30) - (90, 50)
+    Style: bfsNormal
+    Caption: "Red"
+    Toggle: Yes    
+
+    connect 
+    {
+      signalCmdButtonClicked -> testButtonSink::RedClicked
+    }
+  }
+
+  component "HideWindow" is "Command Button"
+  {
+    Frame: (100, 30) - (170, 50)
+    Style: bfsNormal
+    Caption: "Hide window"
+
+    connect 
+    {
+      signalCmdButtonClicked -> awsStandardSink::HideWindow
+    }
+  }
+
+   component "Male" is "Radio Button"
+  {
+    Frame: (170, 30) - (300, 50)
+    Caption: "Male"
+  }
+
+  component "Sample" is "Bar Chart"
+  {
+   Frame: (320, 110) - (450, 200)
+   Style: lbfsSunken
+   Options: bcoVerticalChart
+
+
+   connect 
+    {
+     signalComponentCreated -> testButtonSink::FillBarChart
+    }
+  }
+
+
+  component "Users" is "List Box"
+  {
+    Frame: (350, 210) - (385, 350)
+    Style: lbfsSunken
+    Highlight: "/aws/lbhi.png"
+    Columns: 3
+    DefaultSortCOl: 0
+    Column0Width: 90
+    Column0Caption: "Class"
+    Column1Width: 70
+    Column1Caption: "Status"
+    Column2Width: 100
+    Column2Caption: "Name"
+    Column2Align: lbAlignCenter
+
+    connect 
+    {
+     signalComponentCreated -> testButtonSink::FillListBox
+    }
+  }
+}
+
+
+
+
+connect
+{
+  signalComponentCreated -> testButtonSink::ShowPallete
+}
+ 
+}

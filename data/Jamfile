@@ -1,0 +1,37 @@
+SubDir TOP data ;
+
+InstallData
+  awsdef.zip
+  fancycon.zip
+  standard.zip
+  startme.zip
+  stdtex.zip
+  teapot.zip
+  ttf-dejavu.zip
+  ttf-vera.zip
+  unifont.zip 
+  : data ;
+
+maps =
+  isomap
+  parallaxtest
+  particles
+  partsys
+  r3dtest
+  stenciltest
+  terrain
+  terrainf ;
+for map in $(maps)
+{
+  local files =
+    [ Wildcard $(map) : *.lib *.jpg *.png *.map *.tga *.dds *.spr world ] ;
+  InstallData $(files) : data maps $(map) ;
+}
+
+SubInclude TOP data aws ;
+SubInclude TOP data ceguitest ;
+SubInclude TOP data config ;
+SubInclude TOP data cube ;
+SubInclude TOP data flarge ;
+SubInclude TOP data shader ;
+SubInclude TOP data varia ;

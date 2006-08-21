@@ -1,0 +1,3 @@
+SubDir TOP data shader fog ;
+
+InstallData [ Wildcard *.cginc *.cscg *.inc ] : data shader fog ;

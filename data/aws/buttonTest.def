@@ -1,0 +1,432 @@
+skin "Normal Windows"
+{
+  Texture: 		"/aws/texture.png"
+  HighlightColor: 		230,230,230
+  ShadowColor:    		60,60,60
+  FillColor:      		200,200,200
+  TextDisabledColor:	128,128,0
+  TextForeColor:		0,0,0
+  TextBackColor:        255,255,255
+  ButtonTextColor:		0,0,192
+  ChartBarColor:		255,0,0
+  OverlayTextureAlpha:	128
+  ScrollBarHeight:	16
+  ScrollBarWidth:	16
+  WindowMin:		"/aws/minimize.png"
+  WindowZoom:		"/aws/zoom.png"
+  WindowClose:		"/aws/close.png"
+  WindowMinAt:		(46, 6) - (46-11, 6+10)
+  WindowZoomAt:		(34, 6) - (34-11, 6+10)
+  WindowCloseAt:	(19, 6) - (19-11, 6+10)
+  CheckBoxUp:		"/aws/chkup.png"
+  CheckBoxDn:		"/aws/chkdn.png"
+  CheckBoxOn:		"/aws/chkon.png"
+  CheckBoxOff:		"/aws/chkoff.png"
+  RadioButtonUp:	"/aws/radup.png"
+  RadioButtonDn:	"/aws/raddn.png"
+  RadioButtonOn:	"/aws/radon.png"
+  RadioButtonOff:	"/aws/radoff.png"
+  TreeCollapsed:	"/aws/treecol.png"
+  TreeExpanded:		"/aws/treeexp.png"
+  TreeCollapsed:	"/aws/treecol.png"
+  TreeVertLine:		"/aws/treevl.png"
+  TreeHorzLine:		"/aws/treehl.png"
+  TreeChkUnmarked:	"/aws/treechke.png"
+  TreeChkMarked:	"/aws/treechkf.png"
+  TreeGrpUnmarked:	"/aws/treegrpe.png"
+  TreeGrpMarked:	"/aws/treegrpf.png"
+  ScrollBarUp:		"/aws/sbup.png"
+  ScrollBarDn:		"/aws/sbdn.png"
+  ScrollBarRt:		"/aws/sbrt.png"
+  ScrollBarLt:		"/aws/sblt.png"
+}
+
+window "Another"
+{
+  Frame: (100,100)-(600,440)
+  Style: wfsNormal
+  Title: "A window with lots of stuff"
+
+  component "Red" is "Command Button"
+  {
+    Frame: (20, 30) - (90, 50)
+    Style: bfsNormal
+    Caption: "Normal"
+
+    connect 
+    {
+      signalCmdButtonClicked -> testButtonSink::RedClicked
+    }
+  }
+
+  component "Green" is "Command Button"
+  {
+    Frame: (20, 60) - (90, 80)
+    Style: bfsToolbar
+    Caption: "Toolbar"
+	
+    connect 
+    {
+      signalCmdButtonClicked -> testButtonSink::GreenClicked
+    }
+  }
+
+  component "Blue" is "Command Button"
+  {
+    Frame: (20, 90) - (90, 110)
+    Style: bfsNormal
+    Toggle: Yes
+    Caption: "Normal-Toggle"
+
+    connect 
+    {
+     signalCmdButtonClicked -> testButtonSink::BlueClicked
+    }
+  }
+
+  component "HideWindow" is "Command Button"
+  {
+    Frame: (100, 30) - (170, 50)
+    Style: bfsToolbar
+    Toggle: Yes
+    Caption: "Toolbar-Toggle"
+
+    connect 
+    {
+      signalCmdButtonClicked -> awsStandardSink::HideWindow
+    }
+  }
+
+  component "Male" is "Radio Button"
+  {
+    Frame: (100, 60) - (170, 70)
+    Caption: "Male"
+  }
+
+  component "Female" is "Radio Button"
+  {
+    Frame: (100, 70) - (170, 81)
+    Caption: "Female"
+    Align: rbAlignRight
+  }
+
+  component "HDWACC" is "Check Box"
+  {
+    Frame: (100, 90) - (300, 100)
+    Caption: "Use hardware acceleration"
+  }
+
+  component "Connection" is "Group Frame"
+  {
+    Frame: (100, 110) - (300, 200)
+    Caption: "Connection Type"
+
+    component "Modem" is "Radio Button"
+    {
+      Frame: (10, 30) - (70, 40)
+      Caption: "Modem"
+    }
+
+    component "DSL" is "Radio Button"
+    {
+      Frame: (10, 41) - (70, 51)
+      Caption: "DSL"
+    }
+
+    component "Cable" is "Radio Button"
+    {
+      Frame: (10, 51) - (70, 61)
+      Caption: "Cable"
+    }
+
+    component "T1" is "Radio Button"
+    {
+      Frame: (10, 61) - (70, 71)
+      Caption: "T1"
+    }
+
+    component "LAN" is "Radio Button"
+    {
+      Frame: (10, 71) - (70, 81)
+      Caption: "LAN"
+    }
+
+  }
+
+  component "Sample" is "Bar Chart"
+  {
+   Frame: (320, 110) - (450, 200)
+   Style: lbfsSunken
+   Options: bcoVerticalChart
+
+
+   connect 
+    {
+     signalComponentCreated -> testButtonSink::FillBarChart
+    }
+  }
+
+  component "Users" is "List Box"
+  {
+    Frame: (100, 210) - (385, 300)
+    Style: lbfsSunken
+    Highlight: "/aws/lbhi.png"
+    Columns: 3
+    DefaultSortCOl: 0
+    Column0Width: 90
+    Column0Caption: "Class"
+    Column1Width: 70
+    Column1Caption: "Status"
+    Column2Width: 100
+    Column2Caption: "Name"
+    Column2Align: lbAlignCenter
+
+    connect 
+    {
+     signalComponentCreated -> testButtonSink::FillListBox
+    }
+  }
+  
+}
+
+window "Engine View"
+{
+  Frame: (10, 10) - (138, 138)
+  Style: wfsNormal
+  
+  component "Engine View" is "Engine View"
+  {
+    Frame: (0,0) - (138, 138)
+  }
+}
+
+window "Layout Test 2"
+{
+  Style: wfsNormal
+  Options: wfoGrip+wfoTitle+wfoClose+wfoMin+wfoZoom+wfoControl
+  Frame: (0,0) - (460,252)
+  Title: "Form1"
+  Layout: "GridBag"
+  component "PushButton3" is "Command Button"
+  {
+    Anchor: gbcCenter
+    Caption: "PushButton3"
+  }
+  component "PushButton4" is "Command Button"
+  {
+    Anchor: gbcCenter
+	GridWidth: 0
+    Fill: gbcHorizontal
+    Caption: "PushButton4"
+  }
+  component "PushButton5" is "Command Button"
+  {
+    Anchor: gbcCenter
+    Fill: gbcNone
+    Caption: "PushButton5"
+  }
+  component "PushButton1" is "Command Button"
+  {
+    Anchor: gbcCenter
+    Fill: gbcHorizontal
+    Caption: "PushButton1"
+  }
+  component "PushButton2" is "Command Button"
+  {
+    Anchor: gbcCenter
+    GridWidth: 0
+    Fill: gbcBoth
+    Caption: "PushButton2"
+  }
+}
+
+
+window "Layout Test"
+{
+  Frame:  (100,10)-(400,320)
+  Style:  wfsNormal
+  Title:  "Layout Test Window"
+  Layout: "GridBag"
+
+  component "Button1" is "Window"
+  {
+    Anchor: gbcEast
+	Fill:   gbcNone
+	GridHeight: 1
+	GridWidth:  1
+	WeightX: 1
+	WeightY: 0
+    Style: wfsNormal
+  }
+
+  component "Button2" is "Command Button"
+  {
+    Caption: "Button 2"
+    Anchor: gbcCenter
+	Fill:   gbcNone
+	GridHeight: 1
+	GridWidth:  1
+	WeightX: 1
+	WeightY: 0
+  }
+
+  component "Button3" is "Command Button"
+  {
+    Caption: "Button 3"
+    Anchor: gbcWest
+	Fill:   gbcNone
+	GridHeight: 1
+	GridWidth:  0
+	WeightX: 1
+	WeightY: 0
+  }
+
+  component "Group1" is "Group Frame"
+  {    
+    Anchor: gbcCenter
+	Fill:   gbcBoth
+	GridHeight: 1
+	GridWidth:  0
+	WeightX: 1
+	WeightY: 1
+
+	Layout: "Border"
+	HorizontalGap: 5
+	VerticalGap: 5
+
+	component "North" is "Window"
+	{
+		Caption: "Child Window"
+		Anchor:  blNorth
+		Style: wfsNormal
+	
+	}
+	
+	component "South" is "Command Button"
+	{
+		Caption: "South"
+		Anchor:  blSouth
+	
+	}
+
+	component "East" is "Command Button"
+	{
+		Caption: "East"
+		Anchor:  blEast
+	
+	}
+
+	component "West" is "Command Button"
+	{
+		Caption: "West"
+		Anchor:  blWest
+	
+	}
+
+	component "Center" is "Command Button"
+	{
+		Caption: "Center"
+		Anchor:  blCenter
+	
+	}
+  }
+ 
+
+  component "Users" is "List Box"
+  {
+    Style: lbfsSunken
+    Highlight: "/aws/lbhi.png"
+    Columns: 3
+    DefaultSortCOl: 0
+    Column0Width: 90
+    Column0Caption: "Class"
+    Column1Width: 70
+    Column1Caption: "Status"
+    Column2Width: 100
+    Column2Caption: "Name"
+    Column2Align: lbAlignCenter
+
+    Anchor: gbcCenter
+	Fill:   gbcBoth
+	GridHeight: 1
+	GridWidth:  0
+	WeightX: 1
+	WeightY: 2
+
+
+    connect 
+    {
+     signalComponentCreated -> testButtonSink::FillListBox
+    }
+  }
+}
+
+window "Form1"
+{
+  Style: wfsNormal
+  Options: wfoGrip+wfoTitle+wfoClose+wfoMin+wfoZoom+wfoControl
+  Frame: (0,0) - (460,252)
+  Title: "Form1"
+
+  component "Notebook" is "Notebook"
+  {
+    Style: nbfsBump
+    Frame: (40,40) - (200,200)
+    Location: nbTop
+
+    component "Tab1" is "Notebook Page"
+    {
+       Caption: "Tab1"
+
+       component "RB" is "Command Button"
+       {
+         Frame: (30,30) - (90,60)
+         Caption: "Test1"
+         Toggle: 1
+       }
+    }
+
+   component "Tab2" is "Notebook Page"
+   {
+       Caption: "Window2"
+
+       component "RB" is "Command Button"
+       {
+         Frame: (30,30) - (90,60)
+         Caption: "Test2"
+         Toggle: 1
+       }
+    }
+
+   component "Tab3" is "Notebook Page"
+   {
+       Caption: "Win3"
+   }
+
+   component "Tab4" is "Notebook Page"
+   {
+       Caption: "Window4"
+
+       component "RB" is "Command Button"
+       {
+         Frame: (30,30) - (90,60)
+         Caption: "Test3"
+         Toggle: 1
+       }
+   }
+
+   component "Tab5" is "Notebook Page"
+   {
+       Caption: "Window5"
+
+       component "RB" is "Command Button"
+       {
+         Frame: (30,30) - (90,60)
+         Caption: "Test4"
+         Toggle: 1
+       }
+   }
+
+
+  }
+}

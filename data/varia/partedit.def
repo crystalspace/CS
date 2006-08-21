@@ -1,0 +1,7309 @@
+skin "Normal Windows"
+{
+  Texture: 		"/aws/texture.png"
+  HighlightColor: 	230,230,230
+  ShadowColor:    	60,60,60
+  FillColor:      	200,200,200
+  TextDisabledColor:	128,128,0
+  TextForeColor:	0,0,0
+  TextBackColor:        255,255,255
+  ButtonTextColor:	0,0,192
+  ChartBarColor:	255,0,0
+  ActiveTitleBarColor1: 0,0,128
+  ActiveTitleBarColor2: 200,200,255
+  OverlayTextureAlpha:	128
+  ScrollBarHeight:	16
+  ScrollBarWidth:	16
+  WindowMin:		"/aws/minimize.png"
+  WindowZoom:		"/aws/zoom.png"
+  WindowClose:		"/aws/close.png"
+  WindowMinAt:		(50, 5) - (50-14, 5+14)
+  WindowZoomAt:		(36, 5) - (36-14, 5+14)
+  WindowCloseAt:	(19, 5) - (19-14, 5+14)
+  CheckBoxUp:		"/aws/chkup.png"
+  CheckBoxDn:		"/aws/chkdn.png"
+  CheckBoxOn:		"/aws/chkon.png"
+  CheckBoxOff:		"/aws/chkoff.png"
+  RadioButtonUp:	"/aws/radup.png"
+  RadioButtonDn:	"/aws/raddn.png"
+  RadioButtonOn:	"/aws/radon.png"
+  RadioButtonOff:	"/aws/radoff.png"
+  TreeCollapsed:	"/aws/treecol.png"
+  TreeExpanded:		"/aws/treeexp.png"
+  TreeCollapsed:	"/aws/treecol.png"
+  TreeVertLine:		"/aws/treevl.png"
+  TreeHorzLine:		"/aws/treehl.png"
+  TreeChkUnmarked:	"/aws/treechke.png"
+  TreeChkMarked:	"/aws/treechkf.png"
+  TreeGrpUnmarked:	"/aws/treegrpe.png"
+  TreeGrpMarked:	"/aws/treegrpf.png"
+  ScrollBarUp:		"/aws/sbup.png"
+  ScrollBarDn:		"/aws/sbdn.png"
+  ScrollBarRt:		"/aws/sbrt.png"
+  ScrollBarLt:		"/aws/sblt.png"
+}
+
+window "SectionSelection"
+{
+  Frame: (0,0) - (150,125)
+  Style: wfsNormal
+  Options: wfoGrip+wfoNoDrag
+
+  connect
+  {
+    signalComponentCreated -> parteditSink::RegisterSectionSelection
+  }
+	
+  component "SectionList" is "List Box"
+  {
+    Frame: (0,0) - (138,108)
+    Highlight: "/aws/lbhi.png"
+    Columns: 1
+    DefaultSortCOl: 0
+    Column0Width: 190
+    Column0Caption: "Sections"
+
+    connect
+    {
+      signalComponentCreated -> parteditSink::FillSectionList
+      signalListBoxStateChanged -> parteditSink::SectionListSelectionChanged
+    }
+  }	
+}
+
+window "LoadSaveNotAvailable"
+{
+  Frame: (350,0) - (700,75)
+  Style: wfsNormal
+  Options: wfoTitle
+  Title: "Load/Save Particle System State"
+	
+  connect
+  {
+    signalComponentCreated -> parteditSink::RegisterLoadSaveSelection
+  }
+  
+  component "LoadSaveNALabel1" is "Label"
+  {
+    Frame: (0,0) - (338,12)
+    Caption: "The Load/Save Menu is not yet available."
+  }
+  component "LoadSaveNALabel2" is "Label"
+  {
+    Frame: (0,14) - (338,26)
+    Caption: "If you are running in debug mode, the save state of the"
+  }
+  component "LoadSaveNALabel3" is "Label"
+  {
+    Frame: (0,28) - (338,40)
+    Caption: "current system has been dumped to the console."
+  }
+}
+
+window "AgingNotAvailable"
+{
+  Frame: (350,0) - (650,45)
+  Style: wfsNormal
+  Options: wfoTitle
+  Title: "Aging Moments"
+	
+  connect
+  {
+    signalComponentCreated -> parteditSink::RegisterAgingMoments
+  }
+  
+  component "AgingNALabel1" is "Label"
+  {
+    Frame: (0,0) - (288,12)
+    Caption: "The Aging Moments Menu is not yet available."
+  }
+}
+
+window "GraphicSelection"
+{
+  Frame: (0,125) - (150,470)
+  Style: wfsNormal
+  Options: wfoTitle
+  Title: "Graphics Selection"
+	
+  connect
+  {
+    signalComponentCreated -> parteditSink::RegisterGraphicSelection
+  }
+  
+  component "GraphicFilterLabel" is "Label"
+  {
+    Frame: (0,0) - (138,12)
+    Caption: "Filename Filter:"
+  }
+	
+  component "GraphicFilter" is "Text Box"
+  {
+    Frame: (0,14) - (138,26)
+    Style: tbfsNormal
+
+    connect 
+    {
+      signalComponentCreated -> parteditSink::RegisterGraphicFilter
+      signalTextBoxLostFocus-> parteditSink::SetGraphicFilter
+    }
+  }
+	
+  component "GraphicFileSelection" is "List Box"
+  {
+    Frame: (0,28) - (138,333)
+    Style: lbfsSunken
+    Highlight: "/aws/lbhi.png"
+    Columns: 1
+    DefaultSortCOl: 0
+    Column0Width: 240
+    Column0Caption: "Filename"
+
+    connect
+    {
+      signalComponentCreated -> parteditSink::RegisterGraphicFileList
+      signalListBoxSelectionChanged -> parteditSink::GraphicFileSelected
+    }
+  }	
+}
+
+
+window "EmitterState"
+{
+  Frame: (0,125) - (200,388)
+  Style: wfsNormal
+  Options: wfoTitle
+  Title: "Emitter State Options"
+	
+  connect
+  {
+    signalComponentCreated -> parteditSink::RegisterEmitterState
+  }
+  
+  component "PartCtLabel" is "Label"
+  {
+    Frame: (0,0) - (120,12)
+    Caption: "Particle Count:"
+  }
+	
+  component "ParticleCount" is "Text Box"
+  {
+    Frame: (122,0) - (188,12)
+    Style: tbfsNormal
+
+    connect 
+    {
+      signalComponentCreated -> parteditSink::RegisterParticleCount
+      signalTextBoxLostFocus-> parteditSink::SetParticleCount
+    }
+  }
+
+  component "PartTmLabel" is "Label"
+  {
+    Frame: (0,16) - (120,28)
+    Caption: "Max Particle Age:"
+  }
+	
+  component "ParticleMaxAge" is "Text Box"
+  {
+    Frame: (122,16) - (188,28)
+    Style: tbfsNormal
+
+    connect 
+    {
+      signalComponentCreated -> parteditSink::RegisterParticleMaxAge
+      signalTextBoxLostFocus-> parteditSink::SetParticleMaxAge
+    }
+  }
+
+  component "Lighting" is "Check Box"
+  {
+    Frame: (0,30) - (75,42)
+    Align: cbAlignLeft
+    Caption: "Lighting"
+
+    connect
+    {
+      signalComponentCreated -> parteditSink::RegisterLighting
+      signalCheckBoxClicked-> parteditSink::SetLighting
+    }
+  }
+  
+  component "AlphaBlend" is "Check Box"
+  {
+    Frame: (80,30) - (195,42)
+    Align: cbAlignLeft
+    Caption: "Transparency"
+
+    connect
+    {
+      signalComponentCreated -> parteditSink::RegisterAlphaBlend
+      signalCheckBoxClicked-> parteditSink::SetAlphaBlend
+    }
+  }
+  
+  component "ParticleTypeGroup" is "Group Frame"
+  {
+	Frame: (0,44) - (188,132)
+	Style: wfsNormal
+
+	component "ParticleRects" is "Radio Button"
+	{
+		Frame: (0,0) - (185,12)
+		Caption: "Use Rectangular Particles"
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterRectParticlesRadio
+			signalRadButtonClicked -> parteditSink::SetParticleType
+		}
+	}
+	
+	component "LabelRectWidth" is "Label"
+	{
+		Frame: (10,12) - (60,24)
+		Caption: "Width"
+	}
+	
+	component "ParticleRectWidth" is "Text Box"
+	{
+		Frame: (61,12) - (174,24)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterRectParticlesWidth
+			signalTextBoxLostFocus -> parteditSink::SetRectangularWidth
+		}
+	}
+
+	component "LabelRectHeight" is "Label"
+	{
+		Frame: (10,24) - (60,36)
+		Caption: "Height"
+	}
+
+	component "ParticleRectHeight" is "Text Box"
+	{
+		Frame: (61,24) - (174,36)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterRectParticlesHeight
+			signalTextBoxLostFocus -> parteditSink::SetRectangularHeight
+		}
+	}
+
+	
+	component "ParticleRegular" is "Radio Button"
+	{
+		Frame: (0,38) - (178,50)
+		Caption: "Use Regular Particles"
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterRegParticlesRadio
+			signalRadButtonClicked -> parteditSink::SetParticleType
+		}
+	}
+
+	component "LabelRegNumber" is "Label"
+	{
+		Frame: (10,50) - (60,62)
+		Caption: "Number"
+	}
+	
+	component "ParticleRegNumber" is "Text Box"
+	{
+		Frame: (61,50) - (174,62)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterRegParticlesNumber
+			signalTextBoxLostFocus -> parteditSink::SetRegularNumber
+		}
+	}
+
+	component "LabelRegRadius" is "Label"
+	{
+		Frame: (10,62) - (60,74)
+		Caption: "Radius"
+	}
+
+	component "ParticleRegRadius" is "Text Box"
+	{
+		Frame: (61,62) - (174,74)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterRegParticlesRadius
+			signalTextBoxLostFocus -> parteditSink::SetRegularRadius
+		}
+	}
+  }
+
+  component "BoundingBoxGroup" is "Group Frame"
+  {
+	Frame: (0,134) - (188,233)
+	Style: wfsNormal
+
+	component "UseBoundingBox" is "Check Box"
+	{
+		Frame: (0,0) - (185,12)
+		Align: cbAlignLeft
+		Caption: "Use Container Box"
+
+		connect
+		{
+		signalComponentCreated -> parteditSink::RegisterUseBoundingBox
+		signalCheckBoxClicked-> parteditSink::SetUseBoundingBox
+		}
+
+	}
+
+	component "LabelBoundingMin" is "Label"
+	{
+		Frame: (10,12) - (40,24)
+		Caption: "Min"
+	} 
+
+	component "LabelBoundingMinX" is "Label"
+	{
+		Frame: (41,12) - (56,24)
+		Caption: "X"
+	} 
+
+	component "BoundingMinX" is "Text Box"
+	{
+		Frame: (57,12) - (127,24)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterBBoxMinX
+			signalTextBoxLostFocus -> parteditSink::SetBBoxMinX
+		}
+	}
+
+	component "LabelBoundingMinY" is "Label"
+	{
+		Frame: (41,24) - (56,36)
+		Caption: "Y"
+	} 
+
+	component "BoundingMinY" is "Text Box"
+	{
+		Frame: (57,24) - (127,36)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterBBoxMinY
+			signalTextBoxLostFocus -> parteditSink::SetBBoxMinY
+		}
+	}
+
+	component "LabelBoundingMinZ" is "Label"
+	{
+		Frame: (41,36) - (56,48)
+		Caption: "Z"
+	} 
+	  
+	component "BoundingMinZ" is "Text Box"
+	{
+		Frame: (57,36) - (127,48)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterBBoxMinZ
+			signalTextBoxLostFocus -> parteditSink::SetBBoxMinZ
+		}
+	}
+	  
+
+
+	component "LabelBoundingMax" is "Label"
+	{
+		Frame: (10,50) - (40,62)
+		Caption: "Max"
+	} 
+
+	component "LabelBoundingMaxX" is "Label"
+	{
+		Frame: (41,50) - (56,62)
+		Caption: "X"
+	} 
+
+	component "BoundingMaxX" is "Text Box"
+	{
+		Frame: (57,50) - (127,62)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterBBoxMaxX
+			signalTextBoxLostFocus -> parteditSink::SetBBoxMaxX
+		}
+	}
+
+	component "LabelBoundingMaxY" is "Label"
+	{
+		Frame: (41,62) - (56,74)
+		Caption: "Y"
+	} 
+
+	component "BoundingMaxY" is "Text Box"
+	{
+		Frame: (57,62) - (127,74)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterBBoxMaxY
+			signalTextBoxLostFocus -> parteditSink::SetBBoxMaxY
+		}
+	}
+
+	component "LabelBoundingMaxZ" is "Label"
+	{
+		Frame: (41,74) - (56,86)
+		Caption: "Z"
+	} 
+	  
+	component "BoundingMaxZ" is "Text Box"
+	{
+		Frame: (57,74) - (127,86)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterBBoxMaxZ
+			signalTextBoxLostFocus -> parteditSink::SetBBoxMaxZ
+		}
+	}
+
+  }	
+
+}
+
+
+window "FreeScroll"
+{
+	Frame: (151,0) - (311,80)
+	Style: wfsNormal
+	Options: wfoTitle
+	Title: "Scroll Pad"
+	
+    connect
+    {
+      signalComponentCreated -> parteditSink::RegisterFSWindow
+    }
+	
+	component "FSLabel" is "Label"
+	{
+		Frame: (2,2) - (158,14)
+		Caption: ""
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFSLabel
+		}
+	}
+	
+	component "FSTextBox" is "Text Box"
+	{
+		Frame: (2,16) - (158,28)
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFSTextBox
+			signalTextBoxLostFocus -> parteditSink::SetFSTextBox
+		}
+	}
+	
+	component "FSScrollBar" is "Scroll Bar"
+	{
+		Frame: (2,30) - (158,45)
+		Orientation: sboHorizontal
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFSScrollBar
+			signalScrollBarChanged -> parteditSink::SetFSScrollBar
+		}
+	}
+
+}
+
+
+window "InitialPosition"
+{
+  Frame: (0,220) - (638,478)
+  Style: wfsNormal
+  Options: wfoTitle
+  Title: "Initial Position Options"
+	
+  connect
+  {
+    signalComponentCreated -> parteditSink::RegisterInitialPosition
+  }
+  
+  component "IPFixedGroup" is "Group Frame"
+  {
+	Frame: (0,0) - (77,230)
+	Style: wfsNormal
+	Caption: "Fixed"
+	
+	component "IPF_PositionLabel" is "Label"
+	{
+		Frame: (0,14) - (75,26)
+		Caption: "Position"
+	}
+	component "IPF_PXLabel" is "Label"
+	{
+		Frame: (0,28) - (15,40)
+		Caption: "X"
+	}
+	component "IPF_PXInput" is "Text Box"
+	{
+		Frame: (17,28) - (75,40)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIPFPX
+			signalTextBoxLostFocus -> parteditSink::SetIPFPositionX
+		}
+	}
+
+	component "IPF_PYLabel" is "Label"
+	{
+		Frame: (0,40) - (15,52)
+		Caption: "Y"
+	}
+	component "IPF_PYInput" is "Text Box"
+	{
+		Frame: (17,40) - (75,52)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIPFPY
+			signalTextBoxLostFocus -> parteditSink::SetIPFPositionY
+		}
+	}
+
+	component "IPF_PZLabel" is "Label"
+	{
+		Frame: (0,52) - (15,64)
+		Caption: "Z"
+	}
+	component "IPF_PZInput" is "Text Box"
+	{
+		Frame: (17,52) - (75,64)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIPFPZ
+			signalTextBoxLostFocus -> parteditSink::SetIPFPositionZ
+		}
+	}
+
+
+	component "IPF_WeightLabel" is "Label"
+	{
+		Frame: (0,210) - (15,222)
+		Caption: "Wt"
+	}
+	component "IPF_WeightInput" is "Text Box"
+	{
+		Frame: (17,210) - (75,222)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIPFWeight
+			signalTextBoxLostFocus -> parteditSink::SetIPFWeight
+		}
+	}
+
+
+  
+  }
+  
+  component "IPLineGroup" is "Group Frame"
+  {
+	Frame: (79,0) - (156,230)
+	Style: wfsNormal
+	Caption: "Line"
+  
+	component "IPL_StartLabel" is "Label"
+	{
+		Frame: (0,14) - (75,26)
+		Caption: "Start"
+	}
+	component "IPL_SXLabel" is "Label"
+	{
+		Frame: (0,28) - (15,40)
+		Caption: "X"
+	}
+	component "IPL_SXInput" is "Text Box"
+	{
+		Frame: (17,28) - (75,40)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIPLSX
+			signalTextBoxLostFocus -> parteditSink::SetIPLStartX
+		}
+	}
+
+	component "IPL_SYLabel" is "Label"
+	{
+		Frame: (0,40) - (15,52)
+		Caption: "Y"
+	}
+	component "IPL_SYInput" is "Text Box"
+	{
+		Frame: (17,40) - (75,52)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIPLSY
+			signalTextBoxLostFocus -> parteditSink::SetIPLStartY
+		}
+	}
+
+	component "IPL_SZLabel" is "Label"
+	{
+		Frame: (0,52) - (15,64)
+		Caption: "Z"
+	}
+	component "IPL_SZInput" is "Text Box"
+	{
+		Frame: (17,52) - (75,64)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIPLSZ
+			signalTextBoxLostFocus -> parteditSink::SetIPLStartZ
+		}
+	}
+
+
+
+	component "IPL_EndLabel" is "Label"
+	{
+		Frame: (0,64) - (75,76)
+		Caption: "End"
+	}
+	component "IPL_EXLabel" is "Label"
+	{
+		Frame: (0,78) - (15,90)
+		Caption: "X"
+	}
+	component "IPL_EXInput" is "Text Box"
+	{
+		Frame: (17,78) - (75,90)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIPLEX
+			signalTextBoxLostFocus -> parteditSink::SetIPLEndX
+		}
+	}
+
+	component "IPL_EYLabel" is "Label"
+	{
+		Frame: (0,90) - (15,102)
+		Caption: "Y"
+	}
+	component "IPL_EYInput" is "Text Box"
+	{
+		Frame: (17,90) - (75,102)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIPLEY
+			signalTextBoxLostFocus -> parteditSink::SetIPLEndY
+		}
+	}
+
+	component "IPL_EZLabel" is "Label"
+	{
+		Frame: (0,102) - (15,114)
+		Caption: "Z"
+	}
+	component "IPL_EZInput" is "Text Box"
+	{
+		Frame: (17,102) - (75,114)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIPLEZ
+			signalTextBoxLostFocus -> parteditSink::SetIPLEndZ
+		}
+	}
+
+
+
+
+
+
+	component "IPL_WeightLabel" is "Label"
+	{
+		Frame: (0,210) - (15,222)
+		Caption: "Wt"
+	}
+	component "IPL_WeightInput" is "Text Box"
+	{
+		Frame: (17,210) - (75,222)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIPLWeight
+			signalTextBoxLostFocus -> parteditSink::SetIPLWeight
+		}
+	}
+  
+  
+  }
+
+  component "IPBoxGroup" is "Group Frame"
+  {
+	Frame: (158,0) - (235,230)
+	Style: wfsNormal
+	Caption: "Box"
+
+	component "IPB_MinLabel" is "Label"
+	{
+		Frame: (0,14) - (75,26)
+		Caption: "Min"
+	}
+	component "IPB_MXLabel" is "Label"
+	{
+		Frame: (0,28) - (15,40)
+		Caption: "X"
+	}
+	component "IPB_MXInput" is "Text Box"
+	{
+		Frame: (17,28) - (75,40)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIPBMX
+			signalTextBoxLostFocus -> parteditSink::SetIPBMinX
+		}
+	}
+
+	component "IPB_MYLabel" is "Label"
+	{
+		Frame: (0,40) - (15,52)
+		Caption: "Y"
+	}
+	component "IPB_MYInput" is "Text Box"
+	{
+		Frame: (17,40) - (75,52)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIPBMY
+			signalTextBoxLostFocus -> parteditSink::SetIPBMinY
+		}
+	}
+
+	component "IPB_MZLabel" is "Label"
+	{
+		Frame: (0,52) - (15,64)
+		Caption: "Z"
+	}
+	component "IPB_MZInput" is "Text Box"
+	{
+		Frame: (17,52) - (75,64)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIPBMZ
+			signalTextBoxLostFocus -> parteditSink::SetIPBMinZ
+		}
+	}
+
+
+
+	component "IPB_MaxLabel" is "Label"
+	{
+		Frame: (0,64) - (75,76)
+		Caption: "Max"
+	}
+	component "IPB_XXLabel" is "Label"
+	{
+		Frame: (0,78) - (15,90)
+		Caption: "X"
+	}
+	component "IPB_XXInput" is "Text Box"
+	{
+		Frame: (17,78) - (75,90)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIPBXX
+			signalTextBoxLostFocus -> parteditSink::SetIPBMaxX
+		}
+	}
+
+	component "IPB_XYLabel" is "Label"
+	{
+		Frame: (0,90) - (15,102)
+		Caption: "Y"
+	}
+	component "IPB_XYInput" is "Text Box"
+	{
+		Frame: (17,90) - (75,102)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIPBXY
+			signalTextBoxLostFocus -> parteditSink::SetIPBMaxY
+		}
+	}
+
+	component "IPB_XZLabel" is "Label"
+	{
+		Frame: (0,102) - (15,114)
+		Caption: "Z"
+	}
+	component "IPB_XZInput" is "Text Box"
+	{
+		Frame: (17,102) - (75,114)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIPBXZ
+			signalTextBoxLostFocus -> parteditSink::SetIPBMaxZ
+		}
+	}
+
+
+
+
+
+
+	component "IPB_WeightLabel" is "Label"
+	{
+		Frame: (0,210) - (15,222)
+		Caption: "Wt"
+	}
+	component "IPB_WeightInput" is "Text Box"
+	{
+		Frame: (17,210) - (75,222)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIPBWeight
+			signalTextBoxLostFocus -> parteditSink::SetIPBWeight
+		}
+	}
+
+  
+  }
+
+  component "IPSphereGroup" is "Group Frame"
+  {
+	Frame: (237,0) - (314,230)
+	Style: wfsNormal
+	Caption: "Sphere"
+
+	component "IPS_CenterLabel" is "Label"
+	{
+		Frame: (0,14) - (75,26)
+		Caption: "Center"
+	}
+	component "IPS_CXLabel" is "Label"
+	{
+		Frame: (0,28) - (15,40)
+		Caption: "X"
+	}
+	component "IPS_CXInput" is "Text Box"
+	{
+		Frame: (17,28) - (75,40)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIPSCX
+			signalTextBoxLostFocus -> parteditSink::SetIPSCenterX
+		}
+	}
+
+	component "IPS_CYLabel" is "Label"
+	{
+		Frame: (0,40) - (15,52)
+		Caption: "Y"
+	}
+	component "IPS_CYInput" is "Text Box"
+	{
+		Frame: (17,40) - (75,52)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIPSCY
+			signalTextBoxLostFocus -> parteditSink::SetIPSCenterY
+		}
+	}
+
+	component "IPS_CZLabel" is "Label"
+	{
+		Frame: (0,52) - (15,64)
+		Caption: "Z"
+	}
+	component "IPS_CZInput" is "Text Box"
+	{
+		Frame: (17,52) - (75,64)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIPSCZ
+			signalTextBoxLostFocus -> parteditSink::SetIPSCenterZ
+		}
+	}
+
+
+
+	component "IPS_MinLabel" is "Label"
+	{
+		Frame: (0,64) - (75,76)
+		Caption: "Min"
+	}
+	component "IPS_MinInput" is "Text Box"
+	{
+		Frame: (17,78) - (75,90)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIPSMin
+			signalTextBoxLostFocus -> parteditSink::SetIPSMin
+		}
+	}
+
+	component "IPS_MaxLabel" is "Label"
+	{
+		Frame: (0,92) - (75,104)
+		Caption: "Max"
+	}
+	component "IPS_MaxInput" is "Text Box"
+	{
+		Frame: (17,106) - (75,118)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIPSMax
+			signalTextBoxLostFocus -> parteditSink::SetIPSMax
+		}
+	}
+
+
+
+
+
+
+
+
+	component "IPS_WeightLabel" is "Label"
+	{
+		Frame: (0,210) - (15,222)
+		Caption: "Wt"
+	}
+	component "IPS_WeightInput" is "Text Box"
+	{
+		Frame: (17,210) - (75,222)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIPSWeight
+			signalTextBoxLostFocus -> parteditSink::SetIPSWeight
+		}
+	}
+
+  
+  }
+  
+  component "IPConeGroup" is "Group Frame"
+  {
+	Frame: (316,0) - (393,230)
+	Style: wfsNormal
+	Caption: "Cone"
+
+	component "IPCN_OriginLabel" is "Label"
+	{
+		Frame: (0,14) - (75,26)
+		Caption: "Origin"
+	}
+	component "IPCN_OXLabel" is "Label"
+	{
+		Frame: (0,28) - (15,40)
+		Caption: "X"
+	}
+	component "IPCN_OXInput" is "Text Box"
+	{
+		Frame: (17,28) - (75,40)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIPCNOX
+			signalTextBoxLostFocus -> parteditSink::SetIPCNOriginX
+		}
+	}
+
+	component "IPCN_OYLabel" is "Label"
+	{
+		Frame: (0,40) - (15,52)
+		Caption: "Y"
+	}
+	component "IPCN_OYInput" is "Text Box"
+	{
+		Frame: (17,40) - (75,52)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIPCNOY
+			signalTextBoxLostFocus -> parteditSink::SetIPCNOriginY
+		}
+	}
+
+	component "IPCN_OZLabel" is "Label"
+	{
+		Frame: (0,52) - (15,64)
+		Caption: "Z"
+	}
+	component "IPCN_OZInput" is "Text Box"
+	{
+		Frame: (17,52) - (75,64)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIPCNOZ
+			signalTextBoxLostFocus -> parteditSink::SetIPCNOriginZ
+		}
+	}
+
+
+
+	component "IPCN_ElevationLabel" is "Label"
+	{
+		Frame: (0,64) - (75,76)
+		Caption: "Elevation"
+	}
+	component "IPCN_ElevInput" is "Text Box"
+	{
+		Frame: (17,78) - (75,90)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIPCNElev
+			signalTextBoxLostFocus -> parteditSink::SetIPCNElev
+		}
+	}
+
+	component "IPCN_AzimuthLabel" is "Label"
+	{
+		Frame: (0,92) - (75,104)
+		Caption: "Azimuth"
+	}
+	component "IPCN_AzimInput" is "Text Box"
+	{
+		Frame: (17,106) - (75,118)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIPCNAzim
+			signalTextBoxLostFocus -> parteditSink::SetIPCNAzim
+		}
+	}
+
+	component "IPCN_ApertureLabel" is "Label"
+	{
+		Frame: (0,120) - (75,132)
+		Caption: "Aperture"
+	}
+	component "IPCN_AperInput" is "Text Box"
+	{
+		Frame: (17,134) - (75,146)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIPCNAper
+			signalTextBoxLostFocus -> parteditSink::SetIPCNAper
+		}
+	}
+
+	component "IPCN_MinLabel" is "Label"
+	{
+		Frame: (0,148) - (75,160)
+		Caption: "Min"
+	}
+	component "IPCN_MinInput" is "Text Box"
+	{
+		Frame: (17,162) - (75,174)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIPCNMin
+			signalTextBoxLostFocus -> parteditSink::SetIPCNMin
+		}
+	}
+
+	component "IPCN_MaxLabel" is "Label"
+	{
+		Frame: (0,176) - (75,188)
+		Caption: "Max"
+	}
+	component "IPCN_MaxInput" is "Text Box"
+	{
+		Frame: (17,190) - (75,202)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIPCNMax
+			signalTextBoxLostFocus -> parteditSink::SetIPCNMax
+		}
+	}
+	
+	
+	
+	
+
+
+
+
+
+
+	component "IPCN_WeightLabel" is "Label"
+	{
+		Frame: (0,210) - (15,222)
+		Caption: "Wt"
+	}
+	component "IPCN_WeightInput" is "Text Box"
+	{
+		Frame: (17,210) - (75,222)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIPCNWeight
+			signalTextBoxLostFocus -> parteditSink::SetIPCNWeight
+		}
+	}
+
+  
+  }
+  
+  component "IPCylinderGroup" is "Group Frame"
+  {
+	Frame: (395,0) - (472,230)
+	Style: wfsNormal
+	Caption: "Cylinder"
+  
+	component "IPCY_StartLabel" is "Label"
+	{
+		Frame: (0,14) - (75,26)
+		Caption: "Start"
+	}
+	component "IPCY_SXLabel" is "Label"
+	{
+		Frame: (0,28) - (15,40)
+		Caption: "X"
+	}
+	component "IPCY_SXInput" is "Text Box"
+	{
+		Frame: (17,28) - (75,40)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIPCYSX
+			signalTextBoxLostFocus -> parteditSink::SetIPCYStartX
+		}
+	}
+
+	component "IPCY_SYLabel" is "Label"
+	{
+		Frame: (0,40) - (15,52)
+		Caption: "Y"
+	}
+	component "IPCY_SYInput" is "Text Box"
+	{
+		Frame: (17,40) - (75,52)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIPCYSY
+			signalTextBoxLostFocus -> parteditSink::SetIPCYStartY
+		}
+	}
+
+	component "IPCY_SZLabel" is "Label"
+	{
+		Frame: (0,52) - (15,64)
+		Caption: "Z"
+	}
+	component "IPCY_SZInput" is "Text Box"
+	{
+		Frame: (17,52) - (75,64)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIPCYSZ
+			signalTextBoxLostFocus -> parteditSink::SetIPCYStartZ
+		}
+	}
+
+
+
+	component "IPCY_EndLabel" is "Label"
+	{
+		Frame: (0,64) - (75,76)
+		Caption: "End"
+	}
+	component "IPCY_EXLabel" is "Label"
+	{
+		Frame: (0,78) - (15,90)
+		Caption: "X"
+	}
+	component "IPCY_EXInput" is "Text Box"
+	{
+		Frame: (17,78) - (75,90)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIPCYEX
+			signalTextBoxLostFocus -> parteditSink::SetIPCYEndX
+		}
+	}
+
+	component "IPCY_EYLabel" is "Label"
+	{
+		Frame: (0,90) - (15,102)
+		Caption: "Y"
+	}
+	component "IPCY_EYInput" is "Text Box"
+	{
+		Frame: (17,90) - (75,102)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIPCYEY
+			signalTextBoxLostFocus -> parteditSink::SetIPCYEndY
+		}
+	}
+
+	component "IPCY_EZLabel" is "Label"
+	{
+		Frame: (0,102) - (15,114)
+		Caption: "Z"
+	}
+	component "IPCY_EZInput" is "Text Box"
+	{
+		Frame: (17,102) - (75,114)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIPCYEZ
+			signalTextBoxLostFocus -> parteditSink::SetIPCYEndZ
+		}
+	}
+
+
+	component "IPCY_MinLabel" is "Label"
+	{
+		Frame: (0,116) - (75,128)
+		Caption: "Min"
+	}
+	component "IPCY_MinInput" is "Text Box"
+	{
+		Frame: (17,130) - (75,142)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIPCYMin
+			signalTextBoxLostFocus -> parteditSink::SetIPCYMin
+		}
+	}
+
+	component "IPCY_MaxLabel" is "Label"
+	{
+		Frame: (0,144) - (75,156)
+		Caption: "Max"
+	}
+	component "IPCY_MaxInput" is "Text Box"
+	{
+		Frame: (17,158) - (75,170)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIPCYMax
+			signalTextBoxLostFocus -> parteditSink::SetIPCYMax
+		}
+	}
+
+
+
+
+
+	component "IPCY_WeightLabel" is "Label"
+	{
+		Frame: (0,210) - (15,222)
+		Caption: "Wt"
+	}
+	component "IPCY_WeightInput" is "Text Box"
+	{
+		Frame: (17,210) - (75,222)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIPCYWeight
+			signalTextBoxLostFocus -> parteditSink::SetIPCYWeight
+		}
+	}
+  
+  
+  }
+  
+  component "IPSphereTangentGroup" is "Group Frame"
+  {
+	Frame: (474,0) - (551,230)
+	Style: wfsNormal
+	Caption: "SphereT"
+  
+	component "IPST_CenterLabel" is "Label"
+	{
+		Frame: (0,14) - (75,26)
+		Caption: "Center"
+	}
+	component "IPST_CXLabel" is "Label"
+	{
+		Frame: (0,28) - (15,40)
+		Caption: "X"
+	}
+	component "IPST_CXInput" is "Text Box"
+	{
+		Frame: (17,28) - (75,40)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIPSTCX
+			signalTextBoxLostFocus -> parteditSink::SetIPSTCenterX
+		}
+	}
+
+	component "IPST_CYLabel" is "Label"
+	{
+		Frame: (0,40) - (15,52)
+		Caption: "Y"
+	}
+	component "IPST_CYInput" is "Text Box"
+	{
+		Frame: (17,40) - (75,52)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIPSTCY
+			signalTextBoxLostFocus -> parteditSink::SetIPSTCenterY
+		}
+	}
+
+	component "IPST_CZLabel" is "Label"
+	{
+		Frame: (0,52) - (15,64)
+		Caption: "Z"
+	}
+	component "IPST_CZInput" is "Text Box"
+	{
+		Frame: (17,52) - (75,64)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIPSTCZ
+			signalTextBoxLostFocus -> parteditSink::SetIPSTCenterZ
+		}
+	}
+
+
+
+	component "IPST_MinLabel" is "Label"
+	{
+		Frame: (0,64) - (75,76)
+		Caption: "Min"
+	}
+	component "IPST_MinInput" is "Text Box"
+	{
+		Frame: (17,78) - (75,90)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIPSTMin
+			signalTextBoxLostFocus -> parteditSink::SetIPSTMin
+		}
+	}
+
+	component "IPST_MaxLabel" is "Label"
+	{
+		Frame: (0,92) - (75,104)
+		Caption: "Max"
+	}
+	component "IPST_MaxInput" is "Text Box"
+	{
+		Frame: (17,106) - (75,118)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIPSTMax
+			signalTextBoxLostFocus -> parteditSink::SetIPSTMax
+		}
+	}
+
+
+
+
+
+
+
+
+	component "IPST_WeightLabel" is "Label"
+	{
+		Frame: (0,210) - (15,222)
+		Caption: "Wt"
+	}
+	component "IPST_WeightInput" is "Text Box"
+	{
+		Frame: (17,210) - (75,222)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIPSTWeight
+			signalTextBoxLostFocus -> parteditSink::SetIPSTWeight
+		}
+	}
+  
+  
+  }
+  
+  component "IPCylinderTangentGroup" is "Group Frame"
+  {
+	Frame: (553,0) - (630,230)
+	Style: wfsNormal
+	Caption: "CylinderT"
+  
+	component "IPCYT_StartLabel" is "Label"
+	{
+		Frame: (0,14) - (75,26)
+		Caption: "Start"
+	}
+	component "IPCYT_SXLabel" is "Label"
+	{
+		Frame: (0,28) - (15,40)
+		Caption: "X"
+	}
+	component "IPCYT_SXInput" is "Text Box"
+	{
+		Frame: (17,28) - (75,40)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIPCYTSX
+			signalTextBoxLostFocus -> parteditSink::SetIPCYTStartX
+		}
+	}
+
+	component "IPCYT_SYLabel" is "Label"
+	{
+		Frame: (0,40) - (15,52)
+		Caption: "Y"
+	}
+	component "IPCYT_SYInput" is "Text Box"
+	{
+		Frame: (17,40) - (75,52)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIPCYTSY
+			signalTextBoxLostFocus -> parteditSink::SetIPCYTStartY
+		}
+	}
+
+	component "IPCYT_SZLabel" is "Label"
+	{
+		Frame: (0,52) - (15,64)
+		Caption: "Z"
+	}
+	component "IPCYT_SZInput" is "Text Box"
+	{
+		Frame: (17,52) - (75,64)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIPCYTSZ
+			signalTextBoxLostFocus -> parteditSink::SetIPCYTStartZ
+		}
+	}
+
+
+
+	component "IPCYT_EndLabel" is "Label"
+	{
+		Frame: (0,64) - (75,76)
+		Caption: "End"
+	}
+	component "IPCYT_EXLabel" is "Label"
+	{
+		Frame: (0,78) - (15,90)
+		Caption: "X"
+	}
+	component "IPCYT_EXInput" is "Text Box"
+	{
+		Frame: (17,78) - (75,90)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIPCYTEX
+			signalTextBoxLostFocus -> parteditSink::SetIPCYTEndX
+		}
+	}
+
+	component "IPCYT_EYLabel" is "Label"
+	{
+		Frame: (0,90) - (15,102)
+		Caption: "Y"
+	}
+	component "IPCYT_EYInput" is "Text Box"
+	{
+		Frame: (17,90) - (75,102)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIPCYTEY
+			signalTextBoxLostFocus -> parteditSink::SetIPCYTEndY
+		}
+	}
+
+	component "IPCYT_EZLabel" is "Label"
+	{
+		Frame: (0,102) - (15,114)
+		Caption: "Z"
+	}
+	component "IPCYT_EZInput" is "Text Box"
+	{
+		Frame: (17,102) - (75,114)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIPCYTEZ
+			signalTextBoxLostFocus -> parteditSink::SetIPCYTEndZ
+		}
+	}
+
+
+	component "IPCYT_MinLabel" is "Label"
+	{
+		Frame: (0,116) - (75,128)
+		Caption: "Min"
+	}
+	component "IPCYT_MinInput" is "Text Box"
+	{
+		Frame: (17,130) - (75,142)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIPCYTMin
+			signalTextBoxLostFocus -> parteditSink::SetIPCYTMin
+		}
+	}
+
+	component "IPCYT_MaxLabel" is "Label"
+	{
+		Frame: (0,144) - (75,156)
+		Caption: "Max"
+	}
+	component "IPCYT_MaxInput" is "Text Box"
+	{
+		Frame: (17,158) - (75,170)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIPCYTMax
+			signalTextBoxLostFocus -> parteditSink::SetIPCYTMax
+		}
+	}
+
+
+
+
+
+	component "IPCYT_WeightLabel" is "Label"
+	{
+		Frame: (0,210) - (15,222)
+		Caption: "Wt"
+	}
+	component "IPCYT_WeightInput" is "Text Box"
+	{
+		Frame: (17,210) - (75,222)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIPCYTWeight
+			signalTextBoxLostFocus -> parteditSink::SetIPCYTWeight
+		}
+	}
+  
+  
+  }
+} 
+
+
+
+
+window "InitialSpeed"
+{
+  Frame: (0,220) - (638,478)
+  Style: wfsNormal
+  Options: wfoTitle
+  Title: "Initial Speed Options"
+	
+  connect
+  {
+    signalComponentCreated -> parteditSink::RegisterInitialSpeed
+  }
+  
+  component "ISFixedGroup" is "Group Frame"
+  {
+	Frame: (0,0) - (77,230)
+	Style: wfsNormal
+	Caption: "Fixed"
+	
+	component "ISF_PositionLabel" is "Label"
+	{
+		Frame: (0,14) - (75,26)
+		Caption: "Position"
+	}
+	component "ISF_PXLabel" is "Label"
+	{
+		Frame: (0,28) - (15,40)
+		Caption: "X"
+	}
+	component "ISF_PXInput" is "Text Box"
+	{
+		Frame: (17,28) - (75,40)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterISFPX
+			signalTextBoxLostFocus -> parteditSink::SetISFPositionX
+		}
+	}
+
+	component "ISF_PYLabel" is "Label"
+	{
+		Frame: (0,40) - (15,52)
+		Caption: "Y"
+	}
+	component "ISF_PYInput" is "Text Box"
+	{
+		Frame: (17,40) - (75,52)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterISFPY
+			signalTextBoxLostFocus -> parteditSink::SetISFPositionY
+		}
+	}
+
+	component "ISF_PZLabel" is "Label"
+	{
+		Frame: (0,52) - (15,64)
+		Caption: "Z"
+	}
+	component "ISF_PZInput" is "Text Box"
+	{
+		Frame: (17,52) - (75,64)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterISFPZ
+			signalTextBoxLostFocus -> parteditSink::SetISFPositionZ
+		}
+	}
+
+
+	component "ISF_WeightLabel" is "Label"
+	{
+		Frame: (0,210) - (15,222)
+		Caption: "Wt"
+	}
+	component "ISF_WeightInput" is "Text Box"
+	{
+		Frame: (17,210) - (75,222)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterISFWeight
+			signalTextBoxLostFocus -> parteditSink::SetISFWeight
+		}
+	}
+
+
+  
+  }
+  
+  component "ISLineGroup" is "Group Frame"
+  {
+	Frame: (79,0) - (156,230)
+	Style: wfsNormal
+	Caption: "Line"
+  
+	component "ISL_StartLabel" is "Label"
+	{
+		Frame: (0,14) - (75,26)
+		Caption: "Start"
+	}
+	component "ISL_SXLabel" is "Label"
+	{
+		Frame: (0,28) - (15,40)
+		Caption: "X"
+	}
+	component "ISL_SXInput" is "Text Box"
+	{
+		Frame: (17,28) - (75,40)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterISLSX
+			signalTextBoxLostFocus -> parteditSink::SetISLStartX
+		}
+	}
+
+	component "ISL_SYLabel" is "Label"
+	{
+		Frame: (0,40) - (15,52)
+		Caption: "Y"
+	}
+	component "ISL_SYInput" is "Text Box"
+	{
+		Frame: (17,40) - (75,52)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterISLSY
+			signalTextBoxLostFocus -> parteditSink::SetISLStartY
+		}
+	}
+
+	component "ISL_SZLabel" is "Label"
+	{
+		Frame: (0,52) - (15,64)
+		Caption: "Z"
+	}
+	component "ISL_SZInput" is "Text Box"
+	{
+		Frame: (17,52) - (75,64)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterISLSZ
+			signalTextBoxLostFocus -> parteditSink::SetISLStartZ
+		}
+	}
+
+
+
+	component "ISL_EndLabel" is "Label"
+	{
+		Frame: (0,64) - (75,76)
+		Caption: "End"
+	}
+	component "ISL_EXLabel" is "Label"
+	{
+		Frame: (0,78) - (15,90)
+		Caption: "X"
+	}
+	component "ISL_EXInput" is "Text Box"
+	{
+		Frame: (17,78) - (75,90)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterISLEX
+			signalTextBoxLostFocus -> parteditSink::SetISLEndX
+		}
+	}
+
+	component "ISL_EYLabel" is "Label"
+	{
+		Frame: (0,90) - (15,102)
+		Caption: "Y"
+	}
+	component "ISL_EYInput" is "Text Box"
+	{
+		Frame: (17,90) - (75,102)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterISLEY
+			signalTextBoxLostFocus -> parteditSink::SetISLEndY
+		}
+	}
+
+	component "ISL_EZLabel" is "Label"
+	{
+		Frame: (0,102) - (15,114)
+		Caption: "Z"
+	}
+	component "ISL_EZInput" is "Text Box"
+	{
+		Frame: (17,102) - (75,114)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterISLEZ
+			signalTextBoxLostFocus -> parteditSink::SetISLEndZ
+		}
+	}
+
+
+
+
+
+
+	component "ISL_WeightLabel" is "Label"
+	{
+		Frame: (0,210) - (15,222)
+		Caption: "Wt"
+	}
+	component "ISL_WeightInput" is "Text Box"
+	{
+		Frame: (17,210) - (75,222)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterISLWeight
+			signalTextBoxLostFocus -> parteditSink::SetISLWeight
+		}
+	}
+  
+  
+  }
+
+  component "ISBoxGroup" is "Group Frame"
+  {
+	Frame: (158,0) - (235,230)
+	Style: wfsNormal
+	Caption: "Box"
+
+	component "ISB_MinLabel" is "Label"
+	{
+		Frame: (0,14) - (75,26)
+		Caption: "Min"
+	}
+	component "ISB_MXLabel" is "Label"
+	{
+		Frame: (0,28) - (15,40)
+		Caption: "X"
+	}
+	component "ISB_MXInput" is "Text Box"
+	{
+		Frame: (17,28) - (75,40)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterISBMX
+			signalTextBoxLostFocus -> parteditSink::SetISBMinX
+		}
+	}
+
+	component "ISB_MYLabel" is "Label"
+	{
+		Frame: (0,40) - (15,52)
+		Caption: "Y"
+	}
+	component "ISB_MYInput" is "Text Box"
+	{
+		Frame: (17,40) - (75,52)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterISBMY
+			signalTextBoxLostFocus -> parteditSink::SetISBMinY
+		}
+	}
+
+	component "ISB_MZLabel" is "Label"
+	{
+		Frame: (0,52) - (15,64)
+		Caption: "Z"
+	}
+	component "ISB_MZInput" is "Text Box"
+	{
+		Frame: (17,52) - (75,64)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterISBMZ
+			signalTextBoxLostFocus -> parteditSink::SetISBMinZ
+		}
+	}
+
+
+
+	component "ISB_MaxLabel" is "Label"
+	{
+		Frame: (0,64) - (75,76)
+		Caption: "Max"
+	}
+	component "ISB_XXLabel" is "Label"
+	{
+		Frame: (0,78) - (15,90)
+		Caption: "X"
+	}
+	component "ISB_XXInput" is "Text Box"
+	{
+		Frame: (17,78) - (75,90)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterISBXX
+			signalTextBoxLostFocus -> parteditSink::SetISBMaxX
+		}
+	}
+
+	component "ISB_XYLabel" is "Label"
+	{
+		Frame: (0,90) - (15,102)
+		Caption: "Y"
+	}
+	component "ISB_XYInput" is "Text Box"
+	{
+		Frame: (17,90) - (75,102)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterISBXY
+			signalTextBoxLostFocus -> parteditSink::SetISBMaxY
+		}
+	}
+
+	component "ISB_XZLabel" is "Label"
+	{
+		Frame: (0,102) - (15,114)
+		Caption: "Z"
+	}
+	component "ISB_XZInput" is "Text Box"
+	{
+		Frame: (17,102) - (75,114)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterISBXZ
+			signalTextBoxLostFocus -> parteditSink::SetISBMaxZ
+		}
+	}
+
+
+
+
+
+
+	component "ISB_WeightLabel" is "Label"
+	{
+		Frame: (0,210) - (15,222)
+		Caption: "Wt"
+	}
+	component "ISB_WeightInput" is "Text Box"
+	{
+		Frame: (17,210) - (75,222)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterISBWeight
+			signalTextBoxLostFocus -> parteditSink::SetISBWeight
+		}
+	}
+
+  
+  }
+
+  component "ISSphereGroup" is "Group Frame"
+  {
+	Frame: (237,0) - (314,230)
+	Style: wfsNormal
+	Caption: "Sphere"
+
+	component "ISS_CenterLabel" is "Label"
+	{
+		Frame: (0,14) - (75,26)
+		Caption: "Center"
+	}
+	component "ISS_CXLabel" is "Label"
+	{
+		Frame: (0,28) - (15,40)
+		Caption: "X"
+	}
+	component "ISS_CXInput" is "Text Box"
+	{
+		Frame: (17,28) - (75,40)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterISSCX
+			signalTextBoxLostFocus -> parteditSink::SetISSCenterX
+		}
+	}
+
+	component "ISS_CYLabel" is "Label"
+	{
+		Frame: (0,40) - (15,52)
+		Caption: "Y"
+	}
+	component "ISS_CYInput" is "Text Box"
+	{
+		Frame: (17,40) - (75,52)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterISSCY
+			signalTextBoxLostFocus -> parteditSink::SetISSCenterY
+		}
+	}
+
+	component "ISS_CZLabel" is "Label"
+	{
+		Frame: (0,52) - (15,64)
+		Caption: "Z"
+	}
+	component "ISS_CZInput" is "Text Box"
+	{
+		Frame: (17,52) - (75,64)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterISSCZ
+			signalTextBoxLostFocus -> parteditSink::SetISSCenterZ
+		}
+	}
+
+
+
+	component "ISS_MinLabel" is "Label"
+	{
+		Frame: (0,64) - (75,76)
+		Caption: "Min"
+	}
+	component "ISS_MinInput" is "Text Box"
+	{
+		Frame: (17,78) - (75,90)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterISSMin
+			signalTextBoxLostFocus -> parteditSink::SetISSMin
+		}
+	}
+
+	component "ISS_MaxLabel" is "Label"
+	{
+		Frame: (0,92) - (75,104)
+		Caption: "Max"
+	}
+	component "ISS_MaxInput" is "Text Box"
+	{
+		Frame: (17,106) - (75,118)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterISSMax
+			signalTextBoxLostFocus -> parteditSink::SetISSMax
+		}
+	}
+
+
+
+
+
+
+
+
+	component "ISS_WeightLabel" is "Label"
+	{
+		Frame: (0,210) - (15,222)
+		Caption: "Wt"
+	}
+	component "ISS_WeightInput" is "Text Box"
+	{
+		Frame: (17,210) - (75,222)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterISSWeight
+			signalTextBoxLostFocus -> parteditSink::SetISSWeight
+		}
+	}
+
+  
+  }
+  
+  component "ISConeGroup" is "Group Frame"
+  {
+	Frame: (316,0) - (393,230)
+	Style: wfsNormal
+	Caption: "Cone"
+
+	component "ISCN_OriginLabel" is "Label"
+	{
+		Frame: (0,14) - (75,26)
+		Caption: "Origin"
+	}
+	component "ISCN_OXLabel" is "Label"
+	{
+		Frame: (0,28) - (15,40)
+		Caption: "X"
+	}
+	component "ISCN_OXInput" is "Text Box"
+	{
+		Frame: (17,28) - (75,40)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegISCNOX
+			signalTextBoxLostFocus -> parteditSink::SetISCNOriginX
+		}
+	}
+
+	component "ISCN_OYLabel" is "Label"
+	{
+		Frame: (0,40) - (15,52)
+		Caption: "Y"
+	}
+	component "ISCN_OYInput" is "Text Box"
+	{
+		Frame: (17,40) - (75,52)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterISCNOY
+			signalTextBoxLostFocus -> parteditSink::SetISCNOriginY
+		}
+	}
+
+	component "ISCN_OZLabel" is "Label"
+	{
+		Frame: (0,52) - (15,64)
+		Caption: "Z"
+	}
+	component "ISCN_OZInput" is "Text Box"
+	{
+		Frame: (17,52) - (75,64)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterISCNOZ
+			signalTextBoxLostFocus -> parteditSink::SetISCNOriginZ
+		}
+	}
+
+
+
+	component "ISCN_ElevationLabel" is "Label"
+	{
+		Frame: (0,64) - (75,76)
+		Caption: "Elevation"
+	}
+	component "ISCN_ElevInput" is "Text Box"
+	{
+		Frame: (17,78) - (75,90)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterISCNElev
+			signalTextBoxLostFocus -> parteditSink::SetISCNElev
+		}
+	}
+
+	component "ISCN_AzimuthLabel" is "Label"
+	{
+		Frame: (0,92) - (75,104)
+		Caption: "Azimuth"
+	}
+	component "ISCN_AzimInput" is "Text Box"
+	{
+		Frame: (17,106) - (75,118)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterISCNAzim
+			signalTextBoxLostFocus -> parteditSink::SetISCNAzim
+		}
+	}
+
+	component "ISCN_ApertureLabel" is "Label"
+	{
+		Frame: (0,120) - (75,132)
+		Caption: "Aperture"
+	}
+	component "ISCN_AperInput" is "Text Box"
+	{
+		Frame: (17,134) - (75,146)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterISCNAper
+			signalTextBoxLostFocus -> parteditSink::SetISCNAper
+		}
+	}
+
+	component "ISCN_MinLabel" is "Label"
+	{
+		Frame: (0,148) - (75,160)
+		Caption: "Min"
+	}
+	component "ISCN_MinInput" is "Text Box"
+	{
+		Frame: (17,162) - (75,174)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterISCNMin
+			signalTextBoxLostFocus -> parteditSink::SetISCNMin
+		}
+	}
+
+	component "ISCN_MaxLabel" is "Label"
+	{
+		Frame: (0,176) - (75,188)
+		Caption: "Max"
+	}
+	component "ISCN_MaxInput" is "Text Box"
+	{
+		Frame: (17,190) - (75,202)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterISCNMax
+			signalTextBoxLostFocus -> parteditSink::SetISCNMax
+		}
+	}
+	
+	
+	
+	
+
+
+
+
+
+
+	component "ISCN_WeightLabel" is "Label"
+	{
+		Frame: (0,210) - (15,222)
+		Caption: "Wt"
+	}
+	component "ISCN_WeightInput" is "Text Box"
+	{
+		Frame: (17,210) - (75,222)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterISCNWeight
+			signalTextBoxLostFocus -> parteditSink::SetISCNWeight
+		}
+	}
+
+  
+  }
+  
+  component "ISCylinderGroup" is "Group Frame"
+  {
+	Frame: (395,0) - (472,230)
+	Style: wfsNormal
+	Caption: "Cylinder"
+  
+	component "ISCY_StartLabel" is "Label"
+	{
+		Frame: (0,14) - (75,26)
+		Caption: "Start"
+	}
+	component "ISCY_SXLabel" is "Label"
+	{
+		Frame: (0,28) - (15,40)
+		Caption: "X"
+	}
+	component "ISCY_SXInput" is "Text Box"
+	{
+		Frame: (17,28) - (75,40)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterISCYSX
+			signalTextBoxLostFocus -> parteditSink::SetISCYStartX
+		}
+	}
+
+	component "ISCY_SYLabel" is "Label"
+	{
+		Frame: (0,40) - (15,52)
+		Caption: "Y"
+	}
+	component "ISCY_SYInput" is "Text Box"
+	{
+		Frame: (17,40) - (75,52)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterISCYSY
+			signalTextBoxLostFocus -> parteditSink::SetISCYStartY
+		}
+	}
+
+	component "ISCY_SZLabel" is "Label"
+	{
+		Frame: (0,52) - (15,64)
+		Caption: "Z"
+	}
+	component "ISCY_SZInput" is "Text Box"
+	{
+		Frame: (17,52) - (75,64)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterISCYSZ
+			signalTextBoxLostFocus -> parteditSink::SetISCYStartZ
+		}
+	}
+
+
+
+	component "ISCY_EndLabel" is "Label"
+	{
+		Frame: (0,64) - (75,76)
+		Caption: "End"
+	}
+	component "ISCY_EXLabel" is "Label"
+	{
+		Frame: (0,78) - (15,90)
+		Caption: "X"
+	}
+	component "ISCY_EXInput" is "Text Box"
+	{
+		Frame: (17,78) - (75,90)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterISCYEX
+			signalTextBoxLostFocus -> parteditSink::SetISCYEndX
+		}
+	}
+
+	component "ISCY_EYLabel" is "Label"
+	{
+		Frame: (0,90) - (15,102)
+		Caption: "Y"
+	}
+	component "ISCY_EYInput" is "Text Box"
+	{
+		Frame: (17,90) - (75,102)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterISCYEY
+			signalTextBoxLostFocus -> parteditSink::SetISCYEndY
+		}
+	}
+
+	component "ISCY_EZLabel" is "Label"
+	{
+		Frame: (0,102) - (15,114)
+		Caption: "Z"
+	}
+	component "ISCY_EZInput" is "Text Box"
+	{
+		Frame: (17,102) - (75,114)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterISCYEZ
+			signalTextBoxLostFocus -> parteditSink::SetISCYEndZ
+		}
+	}
+
+
+	component "ISCY_MinLabel" is "Label"
+	{
+		Frame: (0,116) - (75,128)
+		Caption: "Min"
+	}
+	component "ISCY_MinInput" is "Text Box"
+	{
+		Frame: (17,130) - (75,142)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterISCYMin
+			signalTextBoxLostFocus -> parteditSink::SetISCYMin
+		}
+	}
+
+	component "ISCY_MaxLabel" is "Label"
+	{
+		Frame: (0,144) - (75,156)
+		Caption: "Max"
+	}
+	component "ISCY_MaxInput" is "Text Box"
+	{
+		Frame: (17,158) - (75,170)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterISCYMax
+			signalTextBoxLostFocus -> parteditSink::SetISCYMax
+		}
+	}
+
+
+
+
+
+	component "ISCY_WeightLabel" is "Label"
+	{
+		Frame: (0,210) - (15,222)
+		Caption: "Wt"
+	}
+	component "ISCY_WeightInput" is "Text Box"
+	{
+		Frame: (17,210) - (75,222)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterISCYWeight
+			signalTextBoxLostFocus -> parteditSink::SetISCYWeight
+		}
+	}
+  
+  
+  }
+  
+  component "ISSphereTangentGroup" is "Group Frame"
+  {
+	Frame: (474,0) - (551,230)
+	Style: wfsNormal
+	Caption: "SphereT"
+  
+	component "ISST_CenterLabel" is "Label"
+	{
+		Frame: (0,14) - (75,26)
+		Caption: "Center"
+	}
+	component "ISST_CXLabel" is "Label"
+	{
+		Frame: (0,28) - (15,40)
+		Caption: "X"
+	}
+	component "ISST_CXInput" is "Text Box"
+	{
+		Frame: (17,28) - (75,40)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterISSTCX
+			signalTextBoxLostFocus -> parteditSink::SetISSTCenterX
+		}
+	}
+
+	component "ISST_CYLabel" is "Label"
+	{
+		Frame: (0,40) - (15,52)
+		Caption: "Y"
+	}
+	component "ISST_CYInput" is "Text Box"
+	{
+		Frame: (17,40) - (75,52)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterISSTCY
+			signalTextBoxLostFocus -> parteditSink::SetISSTCenterY
+		}
+	}
+
+	component "ISST_CZLabel" is "Label"
+	{
+		Frame: (0,52) - (15,64)
+		Caption: "Z"
+	}
+	component "ISST_CZInput" is "Text Box"
+	{
+		Frame: (17,52) - (75,64)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterISSTCZ
+			signalTextBoxLostFocus -> parteditSink::SetISSTCenterZ
+		}
+	}
+
+
+
+	component "ISST_MinLabel" is "Label"
+	{
+		Frame: (0,64) - (75,76)
+		Caption: "Min"
+	}
+	component "ISST_MinInput" is "Text Box"
+	{
+		Frame: (17,78) - (75,90)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterISSTMin
+			signalTextBoxLostFocus -> parteditSink::SetISSTMin
+		}
+	}
+
+	component "ISST_MaxLabel" is "Label"
+	{
+		Frame: (0,92) - (75,104)
+		Caption: "Max"
+	}
+	component "ISST_MaxInput" is "Text Box"
+	{
+		Frame: (17,106) - (75,118)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterISSTMax
+			signalTextBoxLostFocus -> parteditSink::SetISSTMax
+		}
+	}
+
+
+
+
+
+
+
+
+	component "ISST_WeightLabel" is "Label"
+	{
+		Frame: (0,210) - (15,222)
+		Caption: "Wt"
+	}
+	component "ISST_WeightInput" is "Text Box"
+	{
+		Frame: (17,210) - (75,222)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterISSTWeight
+			signalTextBoxLostFocus -> parteditSink::SetISSTWeight
+		}
+	}
+  
+  
+  }
+  
+  component "ISCylinderTangentGroup" is "Group Frame"
+  {
+	Frame: (553,0) - (630,230)
+	Style: wfsNormal
+	Caption: "CylinderT"
+  
+	component "ISCYT_StartLabel" is "Label"
+	{
+		Frame: (0,14) - (75,26)
+		Caption: "Start"
+	}
+	component "ISCYT_SXLabel" is "Label"
+	{
+		Frame: (0,28) - (15,40)
+		Caption: "X"
+	}
+	component "ISCYT_SXInput" is "Text Box"
+	{
+		Frame: (17,28) - (75,40)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterISCYTSX
+			signalTextBoxLostFocus -> parteditSink::SetISCYTStartX
+		}
+	}
+
+	component "ISCYT_SYLabel" is "Label"
+	{
+		Frame: (0,40) - (15,52)
+		Caption: "Y"
+	}
+	component "ISCYT_SYInput" is "Text Box"
+	{
+		Frame: (17,40) - (75,52)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterISCYTSY
+			signalTextBoxLostFocus -> parteditSink::SetISCYTStartY
+		}
+	}
+
+	component "ISCYT_SZLabel" is "Label"
+	{
+		Frame: (0,52) - (15,64)
+		Caption: "Z"
+	}
+	component "ISCYT_SZInput" is "Text Box"
+	{
+		Frame: (17,52) - (75,64)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterISCYTSZ
+			signalTextBoxLostFocus -> parteditSink::SetISCYTStartZ
+		}
+	}
+
+
+
+	component "ISCYT_EndLabel" is "Label"
+	{
+		Frame: (0,64) - (75,76)
+		Caption: "End"
+	}
+	component "ISCYT_EXLabel" is "Label"
+	{
+		Frame: (0,78) - (15,90)
+		Caption: "X"
+	}
+	component "ISCYT_EXInput" is "Text Box"
+	{
+		Frame: (17,78) - (75,90)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterISCYTEX
+			signalTextBoxLostFocus -> parteditSink::SetISCYTEndX
+		}
+	}
+
+	component "ISCYT_EYLabel" is "Label"
+	{
+		Frame: (0,90) - (15,102)
+		Caption: "Y"
+	}
+	component "ISCYT_EYInput" is "Text Box"
+	{
+		Frame: (17,90) - (75,102)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterISCYTEY
+			signalTextBoxLostFocus -> parteditSink::SetISCYTEndY
+		}
+	}
+
+	component "ISCYT_EZLabel" is "Label"
+	{
+		Frame: (0,102) - (15,114)
+		Caption: "Z"
+	}
+	component "ISCYT_EZInput" is "Text Box"
+	{
+		Frame: (17,102) - (75,114)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterISCYTEZ
+			signalTextBoxLostFocus -> parteditSink::SetISCYTEndZ
+		}
+	}
+
+
+	component "ISCYT_MinLabel" is "Label"
+	{
+		Frame: (0,116) - (75,128)
+		Caption: "Min"
+	}
+	component "ISCYT_MinInput" is "Text Box"
+	{
+		Frame: (17,130) - (75,142)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterISCYTMin
+			signalTextBoxLostFocus -> parteditSink::SetISCYTMin
+		}
+	}
+
+	component "ISCYT_MaxLabel" is "Label"
+	{
+		Frame: (0,144) - (75,156)
+		Caption: "Max"
+	}
+	component "ISCYT_MaxInput" is "Text Box"
+	{
+		Frame: (17,158) - (75,170)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterISCYTMax
+			signalTextBoxLostFocus -> parteditSink::SetISCYTMax
+		}
+	}
+
+
+
+
+
+	component "ISCYT_WeightLabel" is "Label"
+	{
+		Frame: (0,210) - (15,222)
+		Caption: "Wt"
+	}
+	component "ISCYT_WeightInput" is "Text Box"
+	{
+		Frame: (17,210) - (75,222)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterISCYTWeight
+			signalTextBoxLostFocus -> parteditSink::SetISCYTWeight
+		}
+	}
+  
+  
+  }
+} 
+
+
+
+
+
+
+window "InitialAcceleration"
+{
+  Frame: (0,220) - (638,478)
+  Style: wfsNormal
+  Options: wfoTitle
+  Title: "Initial Acceleration Options"
+	
+  connect
+  {
+    signalComponentCreated -> parteditSink::RegisterInitialAcceleration
+  }
+  
+  component "IAFixedGroup" is "Group Frame"
+  {
+	Frame: (0,0) - (77,230)
+	Style: wfsNormal
+	Caption: "Fixed"
+	
+	component "IAF_PositionLabel" is "Label"
+	{
+		Frame: (0,14) - (75,26)
+		Caption: "Position"
+	}
+	component "IAF_PXLabel" is "Label"
+	{
+		Frame: (0,28) - (15,40)
+		Caption: "X"
+	}
+	component "IAF_PXInput" is "Text Box"
+	{
+		Frame: (17,28) - (75,40)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIAFPX
+			signalTextBoxLostFocus -> parteditSink::SetIAFPositionX
+		}
+	}
+
+	component "IAF_PYLabel" is "Label"
+	{
+		Frame: (0,40) - (15,52)
+		Caption: "Y"
+	}
+	component "IAF_PYInput" is "Text Box"
+	{
+		Frame: (17,40) - (75,52)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIAFPY
+			signalTextBoxLostFocus -> parteditSink::SetIAFPositionY
+		}
+	}
+
+	component "IAF_PZLabel" is "Label"
+	{
+		Frame: (0,52) - (15,64)
+		Caption: "Z"
+	}
+	component "IAF_PZInput" is "Text Box"
+	{
+		Frame: (17,52) - (75,64)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIAFPZ
+			signalTextBoxLostFocus -> parteditSink::SetIAFPositionZ
+		}
+	}
+
+
+	component "IAF_WeightLabel" is "Label"
+	{
+		Frame: (0,210) - (15,222)
+		Caption: "Wt"
+	}
+	component "IAF_WeightInput" is "Text Box"
+	{
+		Frame: (17,210) - (75,222)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIAFWeight
+			signalTextBoxLostFocus -> parteditSink::SetIAFWeight
+		}
+	}
+
+
+  
+  }
+  
+  component "IALineGroup" is "Group Frame"
+  {
+	Frame: (79,0) - (156,230)
+	Style: wfsNormal
+	Caption: "Line"
+  
+	component "IAL_StartLabel" is "Label"
+	{
+		Frame: (0,14) - (75,26)
+		Caption: "Start"
+	}
+	component "IAL_SXLabel" is "Label"
+	{
+		Frame: (0,28) - (15,40)
+		Caption: "X"
+	}
+	component "IAL_SXInput" is "Text Box"
+	{
+		Frame: (17,28) - (75,40)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIALSX
+			signalTextBoxLostFocus -> parteditSink::SetIALStartX
+		}
+	}
+
+	component "IAL_SYLabel" is "Label"
+	{
+		Frame: (0,40) - (15,52)
+		Caption: "Y"
+	}
+	component "IAL_SYInput" is "Text Box"
+	{
+		Frame: (17,40) - (75,52)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIALSY
+			signalTextBoxLostFocus -> parteditSink::SetIALStartY
+		}
+	}
+
+	component "IAL_SZLabel" is "Label"
+	{
+		Frame: (0,52) - (15,64)
+		Caption: "Z"
+	}
+	component "IAL_SZInput" is "Text Box"
+	{
+		Frame: (17,52) - (75,64)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIALSZ
+			signalTextBoxLostFocus -> parteditSink::SetIALStartZ
+		}
+	}
+
+
+
+	component "IAL_EndLabel" is "Label"
+	{
+		Frame: (0,64) - (75,76)
+		Caption: "End"
+	}
+	component "IAL_EXLabel" is "Label"
+	{
+		Frame: (0,78) - (15,90)
+		Caption: "X"
+	}
+	component "IAL_EXInput" is "Text Box"
+	{
+		Frame: (17,78) - (75,90)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIALEX
+			signalTextBoxLostFocus -> parteditSink::SetIALEndX
+		}
+	}
+
+	component "IAL_EYLabel" is "Label"
+	{
+		Frame: (0,90) - (15,102)
+		Caption: "Y"
+	}
+	component "IAL_EYInput" is "Text Box"
+	{
+		Frame: (17,90) - (75,102)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIALEY
+			signalTextBoxLostFocus -> parteditSink::SetIALEndY
+		}
+	}
+
+	component "IAL_EZLabel" is "Label"
+	{
+		Frame: (0,102) - (15,114)
+		Caption: "Z"
+	}
+	component "IAL_EZInput" is "Text Box"
+	{
+		Frame: (17,102) - (75,114)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIALEZ
+			signalTextBoxLostFocus -> parteditSink::SetIALEndZ
+		}
+	}
+
+
+
+
+
+
+	component "IAL_WeightLabel" is "Label"
+	{
+		Frame: (0,210) - (15,222)
+		Caption: "Wt"
+	}
+	component "IAL_WeightInput" is "Text Box"
+	{
+		Frame: (17,210) - (75,222)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIALWeight
+			signalTextBoxLostFocus -> parteditSink::SetIALWeight
+		}
+	}
+  
+  
+  }
+
+  component "IABoxGroup" is "Group Frame"
+  {
+	Frame: (158,0) - (235,230)
+	Style: wfsNormal
+	Caption: "Box"
+
+	component "IAB_MinLabel" is "Label"
+	{
+		Frame: (0,14) - (75,26)
+		Caption: "Min"
+	}
+	component "IAB_MXLabel" is "Label"
+	{
+		Frame: (0,28) - (15,40)
+		Caption: "X"
+	}
+	component "IAB_MXInput" is "Text Box"
+	{
+		Frame: (17,28) - (75,40)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIABMX
+			signalTextBoxLostFocus -> parteditSink::SetIABMinX
+		}
+	}
+
+	component "IAB_MYLabel" is "Label"
+	{
+		Frame: (0,40) - (15,52)
+		Caption: "Y"
+	}
+	component "IAB_MYInput" is "Text Box"
+	{
+		Frame: (17,40) - (75,52)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIABMY
+			signalTextBoxLostFocus -> parteditSink::SetIABMinY
+		}
+	}
+
+	component "IAB_MZLabel" is "Label"
+	{
+		Frame: (0,52) - (15,64)
+		Caption: "Z"
+	}
+	component "IAB_MZInput" is "Text Box"
+	{
+		Frame: (17,52) - (75,64)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIABMZ
+			signalTextBoxLostFocus -> parteditSink::SetIABMinZ
+		}
+	}
+
+
+
+	component "IAB_MaxLabel" is "Label"
+	{
+		Frame: (0,64) - (75,76)
+		Caption: "Max"
+	}
+	component "IAB_XXLabel" is "Label"
+	{
+		Frame: (0,78) - (15,90)
+		Caption: "X"
+	}
+	component "IAB_XXInput" is "Text Box"
+	{
+		Frame: (17,78) - (75,90)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIABXX
+			signalTextBoxLostFocus -> parteditSink::SetIABMaxX
+		}
+	}
+
+	component "IAB_XYLabel" is "Label"
+	{
+		Frame: (0,90) - (15,102)
+		Caption: "Y"
+	}
+	component "IAB_XYInput" is "Text Box"
+	{
+		Frame: (17,90) - (75,102)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIABXY
+			signalTextBoxLostFocus -> parteditSink::SetIABMaxY
+		}
+	}
+
+	component "IAB_XZLabel" is "Label"
+	{
+		Frame: (0,102) - (15,114)
+		Caption: "Z"
+	}
+	component "IAB_XZInput" is "Text Box"
+	{
+		Frame: (17,102) - (75,114)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIABXZ
+			signalTextBoxLostFocus -> parteditSink::SetIABMaxZ
+		}
+	}
+
+
+
+
+
+
+	component "IAB_WeightLabel" is "Label"
+	{
+		Frame: (0,210) - (15,222)
+		Caption: "Wt"
+	}
+	component "IAB_WeightInput" is "Text Box"
+	{
+		Frame: (17,210) - (75,222)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIABWeight
+			signalTextBoxLostFocus -> parteditSink::SetIABWeight
+		}
+	}
+
+  
+  }
+
+  component "IASphereGroup" is "Group Frame"
+  {
+	Frame: (237,0) - (314,230)
+	Style: wfsNormal
+	Caption: "Sphere"
+
+	component "IAS_CenterLabel" is "Label"
+	{
+		Frame: (0,14) - (75,26)
+		Caption: "Center"
+	}
+	component "IAS_CXLabel" is "Label"
+	{
+		Frame: (0,28) - (15,40)
+		Caption: "X"
+	}
+	component "IAS_CXInput" is "Text Box"
+	{
+		Frame: (17,28) - (75,40)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIASCX
+			signalTextBoxLostFocus -> parteditSink::SetIASCenterX
+		}
+	}
+
+	component "IAS_CYLabel" is "Label"
+	{
+		Frame: (0,40) - (15,52)
+		Caption: "Y"
+	}
+	component "IAS_CYInput" is "Text Box"
+	{
+		Frame: (17,40) - (75,52)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIASCY
+			signalTextBoxLostFocus -> parteditSink::SetIASCenterY
+		}
+	}
+
+	component "IAS_CZLabel" is "Label"
+	{
+		Frame: (0,52) - (15,64)
+		Caption: "Z"
+	}
+	component "IAS_CZInput" is "Text Box"
+	{
+		Frame: (17,52) - (75,64)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIASCZ
+			signalTextBoxLostFocus -> parteditSink::SetIASCenterZ
+		}
+	}
+
+
+
+	component "IAS_MinLabel" is "Label"
+	{
+		Frame: (0,64) - (75,76)
+		Caption: "Min"
+	}
+	component "IAS_MinInput" is "Text Box"
+	{
+		Frame: (17,78) - (75,90)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIASMin
+			signalTextBoxLostFocus -> parteditSink::SetIASMin
+		}
+	}
+
+	component "IAS_MaxLabel" is "Label"
+	{
+		Frame: (0,92) - (75,104)
+		Caption: "Max"
+	}
+	component "IAS_MaxInput" is "Text Box"
+	{
+		Frame: (17,106) - (75,118)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIASMax
+			signalTextBoxLostFocus -> parteditSink::SetIASMax
+		}
+	}
+
+
+
+
+
+
+
+
+	component "IAS_WeightLabel" is "Label"
+	{
+		Frame: (0,210) - (15,222)
+		Caption: "Wt"
+	}
+	component "IAS_WeightInput" is "Text Box"
+	{
+		Frame: (17,210) - (75,222)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIASWeight
+			signalTextBoxLostFocus -> parteditSink::SetIASWeight
+		}
+	}
+
+  
+  }
+  
+  component "IAConeGroup" is "Group Frame"
+  {
+	Frame: (316,0) - (393,230)
+	Style: wfsNormal
+	Caption: "Cone"
+
+	component "IACN_OriginLabel" is "Label"
+	{
+		Frame: (0,14) - (75,26)
+		Caption: "Origin"
+	}
+	component "IACN_OXLabel" is "Label"
+	{
+		Frame: (0,28) - (15,40)
+		Caption: "X"
+	}
+	component "IACN_OXInput" is "Text Box"
+	{
+		Frame: (17,28) - (75,40)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIACNOX
+			signalTextBoxLostFocus -> parteditSink::SetIACNOriginX
+		}
+	}
+
+	component "IACN_OYLabel" is "Label"
+	{
+		Frame: (0,40) - (15,52)
+		Caption: "Y"
+	}
+	component "IACN_OYInput" is "Text Box"
+	{
+		Frame: (17,40) - (75,52)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIACNOY
+			signalTextBoxLostFocus -> parteditSink::SetIACNOriginY
+		}
+	}
+
+	component "IACN_OZLabel" is "Label"
+	{
+		Frame: (0,52) - (15,64)
+		Caption: "Z"
+	}
+	component "IACN_OZInput" is "Text Box"
+	{
+		Frame: (17,52) - (75,64)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIACNOZ
+			signalTextBoxLostFocus -> parteditSink::SetIACNOriginZ
+		}
+	}
+
+
+
+	component "IACN_ElevationLabel" is "Label"
+	{
+		Frame: (0,64) - (75,76)
+		Caption: "Elevation"
+	}
+	component "IACN_ElevInput" is "Text Box"
+	{
+		Frame: (17,78) - (75,90)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIACNElev
+			signalTextBoxLostFocus -> parteditSink::SetIACNElev
+		}
+	}
+
+	component "IACN_AzimuthLabel" is "Label"
+	{
+		Frame: (0,92) - (75,104)
+		Caption: "Azimuth"
+	}
+	component "IACN_AzimInput" is "Text Box"
+	{
+		Frame: (17,106) - (75,118)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIACNAzim
+			signalTextBoxLostFocus -> parteditSink::SetIACNAzim
+		}
+	}
+
+	component "IACN_ApertureLabel" is "Label"
+	{
+		Frame: (0,120) - (75,132)
+		Caption: "Aperture"
+	}
+	component "IACN_AperInput" is "Text Box"
+	{
+		Frame: (17,134) - (75,146)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIACNAper
+			signalTextBoxLostFocus -> parteditSink::SetIACNAper
+		}
+	}
+
+	component "IACN_MinLabel" is "Label"
+	{
+		Frame: (0,148) - (75,160)
+		Caption: "Min"
+	}
+	component "IACN_MinInput" is "Text Box"
+	{
+		Frame: (17,162) - (75,174)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIACNMin
+			signalTextBoxLostFocus -> parteditSink::SetIACNMin
+		}
+	}
+
+	component "IACN_MaxLabel" is "Label"
+	{
+		Frame: (0,176) - (75,188)
+		Caption: "Max"
+	}
+	component "IACN_MaxInput" is "Text Box"
+	{
+		Frame: (17,190) - (75,202)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIACNMax
+			signalTextBoxLostFocus -> parteditSink::SetIACNMax
+		}
+	}
+	
+	
+	
+	
+
+
+
+
+
+
+	component "IACN_WeightLabel" is "Label"
+	{
+		Frame: (0,210) - (15,222)
+		Caption: "Wt"
+	}
+	component "IACN_WeightInput" is "Text Box"
+	{
+		Frame: (17,210) - (75,222)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIACNWeight
+			signalTextBoxLostFocus -> parteditSink::SetIACNWeight
+		}
+	}
+
+  
+  }
+  
+  component "IACylinderGroup" is "Group Frame"
+  {
+	Frame: (395,0) - (472,230)
+	Style: wfsNormal
+	Caption: "Cylinder"
+  
+	component "IACY_StartLabel" is "Label"
+	{
+		Frame: (0,14) - (75,26)
+		Caption: "Start"
+	}
+	component "IACY_SXLabel" is "Label"
+	{
+		Frame: (0,28) - (15,40)
+		Caption: "X"
+	}
+	component "IACY_SXInput" is "Text Box"
+	{
+		Frame: (17,28) - (75,40)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIACYSX
+			signalTextBoxLostFocus -> parteditSink::SetIACYStartX
+		}
+	}
+
+	component "IACY_SYLabel" is "Label"
+	{
+		Frame: (0,40) - (15,52)
+		Caption: "Y"
+	}
+	component "IACY_SYInput" is "Text Box"
+	{
+		Frame: (17,40) - (75,52)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIACYSY
+			signalTextBoxLostFocus -> parteditSink::SetIACYStartY
+		}
+	}
+
+	component "IACY_SZLabel" is "Label"
+	{
+		Frame: (0,52) - (15,64)
+		Caption: "Z"
+	}
+	component "IACY_SZInput" is "Text Box"
+	{
+		Frame: (17,52) - (75,64)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIACYSZ
+			signalTextBoxLostFocus -> parteditSink::SetIACYStartZ
+		}
+	}
+
+
+
+	component "IACY_EndLabel" is "Label"
+	{
+		Frame: (0,64) - (75,76)
+		Caption: "End"
+	}
+	component "IACY_EXLabel" is "Label"
+	{
+		Frame: (0,78) - (15,90)
+		Caption: "X"
+	}
+	component "IACY_EXInput" is "Text Box"
+	{
+		Frame: (17,78) - (75,90)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIACYEX
+			signalTextBoxLostFocus -> parteditSink::SetIACYEndX
+		}
+	}
+
+	component "IACY_EYLabel" is "Label"
+	{
+		Frame: (0,90) - (15,102)
+		Caption: "Y"
+	}
+	component "IACY_EYInput" is "Text Box"
+	{
+		Frame: (17,90) - (75,102)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIACYEY
+			signalTextBoxLostFocus -> parteditSink::SetIACYEndY
+		}
+	}
+
+	component "IACY_EZLabel" is "Label"
+	{
+		Frame: (0,102) - (15,114)
+		Caption: "Z"
+	}
+	component "IACY_EZInput" is "Text Box"
+	{
+		Frame: (17,102) - (75,114)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIACYEZ
+			signalTextBoxLostFocus -> parteditSink::SetIACYEndZ
+		}
+	}
+
+
+	component "IACY_MinLabel" is "Label"
+	{
+		Frame: (0,116) - (75,128)
+		Caption: "Min"
+	}
+	component "IACY_MinInput" is "Text Box"
+	{
+		Frame: (17,130) - (75,142)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIACYMin
+			signalTextBoxLostFocus -> parteditSink::SetIACYMin
+		}
+	}
+
+	component "IACY_MaxLabel" is "Label"
+	{
+		Frame: (0,144) - (75,156)
+		Caption: "Max"
+	}
+	component "IACY_MaxInput" is "Text Box"
+	{
+		Frame: (17,158) - (75,170)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIACYMax
+			signalTextBoxLostFocus -> parteditSink::SetIACYMax
+		}
+	}
+
+
+
+
+
+	component "IACY_WeightLabel" is "Label"
+	{
+		Frame: (0,210) - (15,222)
+		Caption: "Wt"
+	}
+	component "IACY_WeightInput" is "Text Box"
+	{
+		Frame: (17,210) - (75,222)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIACYWeight
+			signalTextBoxLostFocus -> parteditSink::SetIACYWeight
+		}
+	}
+  
+  
+  }
+  
+  component "IASphereTangentGroup" is "Group Frame"
+  {
+	Frame: (474,0) - (551,230)
+	Style: wfsNormal
+	Caption: "SphereT"
+  
+	component "IAST_CenterLabel" is "Label"
+	{
+		Frame: (0,14) - (75,26)
+		Caption: "Center"
+	}
+	component "IAST_CXLabel" is "Label"
+	{
+		Frame: (0,28) - (15,40)
+		Caption: "X"
+	}
+	component "IAST_CXInput" is "Text Box"
+	{
+		Frame: (17,28) - (75,40)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIASTCX
+			signalTextBoxLostFocus -> parteditSink::SetIASTCenterX
+		}
+	}
+
+	component "IAST_CYLabel" is "Label"
+	{
+		Frame: (0,40) - (15,52)
+		Caption: "Y"
+	}
+	component "IAST_CYInput" is "Text Box"
+	{
+		Frame: (17,40) - (75,52)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIASTCY
+			signalTextBoxLostFocus -> parteditSink::SetIASTCenterY
+		}
+	}
+
+	component "IAST_CZLabel" is "Label"
+	{
+		Frame: (0,52) - (15,64)
+		Caption: "Z"
+	}
+	component "IAST_CZInput" is "Text Box"
+	{
+		Frame: (17,52) - (75,64)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIASTCZ
+			signalTextBoxLostFocus -> parteditSink::SetIASTCenterZ
+		}
+	}
+
+
+
+	component "IAST_MinLabel" is "Label"
+	{
+		Frame: (0,64) - (75,76)
+		Caption: "Min"
+	}
+	component "IAST_MinInput" is "Text Box"
+	{
+		Frame: (17,78) - (75,90)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIASTMin
+			signalTextBoxLostFocus -> parteditSink::SetIASTMin
+		}
+	}
+
+	component "IAST_MaxLabel" is "Label"
+	{
+		Frame: (0,92) - (75,104)
+		Caption: "Max"
+	}
+	component "IAST_MaxInput" is "Text Box"
+	{
+		Frame: (17,106) - (75,118)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIASTMax
+			signalTextBoxLostFocus -> parteditSink::SetIASTMax
+		}
+	}
+
+
+
+
+
+
+
+
+	component "IAST_WeightLabel" is "Label"
+	{
+		Frame: (0,210) - (15,222)
+		Caption: "Wt"
+	}
+	component "IAST_WeightInput" is "Text Box"
+	{
+		Frame: (17,210) - (75,222)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIASTWeight
+			signalTextBoxLostFocus -> parteditSink::SetIASTWeight
+		}
+	}
+  
+  
+  }
+  
+  component "IACylinderTangentGroup" is "Group Frame"
+  {
+	Frame: (553,0) - (630,230)
+	Style: wfsNormal
+	Caption: "CylinderT"
+  
+	component "IACYT_StartLabel" is "Label"
+	{
+		Frame: (0,14) - (75,26)
+		Caption: "Start"
+	}
+	component "IACYT_SXLabel" is "Label"
+	{
+		Frame: (0,28) - (15,40)
+		Caption: "X"
+	}
+	component "IACYT_SXInput" is "Text Box"
+	{
+		Frame: (17,28) - (75,40)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIACYTSX
+			signalTextBoxLostFocus -> parteditSink::SetIACYTStartX
+		}
+	}
+
+	component "IACYT_SYLabel" is "Label"
+	{
+		Frame: (0,40) - (15,52)
+		Caption: "Y"
+	}
+	component "IACYT_SYInput" is "Text Box"
+	{
+		Frame: (17,40) - (75,52)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIACYTSY
+			signalTextBoxLostFocus -> parteditSink::SetIACYTStartY
+		}
+	}
+
+	component "IACYT_SZLabel" is "Label"
+	{
+		Frame: (0,52) - (15,64)
+		Caption: "Z"
+	}
+	component "IACYT_SZInput" is "Text Box"
+	{
+		Frame: (17,52) - (75,64)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIACYTSZ
+			signalTextBoxLostFocus -> parteditSink::SetIACYTStartZ
+		}
+	}
+
+
+
+	component "IACYT_EndLabel" is "Label"
+	{
+		Frame: (0,64) - (75,76)
+		Caption: "End"
+	}
+	component "IACYT_EXLabel" is "Label"
+	{
+		Frame: (0,78) - (15,90)
+		Caption: "X"
+	}
+	component "IACYT_EXInput" is "Text Box"
+	{
+		Frame: (17,78) - (75,90)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIACYTEX
+			signalTextBoxLostFocus -> parteditSink::SetIACYTEndX
+		}
+	}
+
+	component "IACYT_EYLabel" is "Label"
+	{
+		Frame: (0,90) - (15,102)
+		Caption: "Y"
+	}
+	component "IACYT_EYInput" is "Text Box"
+	{
+		Frame: (17,90) - (75,102)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIACYTEY
+			signalTextBoxLostFocus -> parteditSink::SetIACYTEndY
+		}
+	}
+
+	component "IACYT_EZLabel" is "Label"
+	{
+		Frame: (0,102) - (15,114)
+		Caption: "Z"
+	}
+	component "IACYT_EZInput" is "Text Box"
+	{
+		Frame: (17,102) - (75,114)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIACYTEZ
+			signalTextBoxLostFocus -> parteditSink::SetIACYTEndZ
+		}
+	}
+
+
+	component "IACYT_MinLabel" is "Label"
+	{
+		Frame: (0,116) - (75,128)
+		Caption: "Min"
+	}
+	component "IACYT_MinInput" is "Text Box"
+	{
+		Frame: (17,130) - (75,142)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIACYTMin
+			signalTextBoxLostFocus -> parteditSink::SetIACYTMin
+		}
+	}
+
+	component "IACYT_MaxLabel" is "Label"
+	{
+		Frame: (0,144) - (75,156)
+		Caption: "Max"
+	}
+	component "IACYT_MaxInput" is "Text Box"
+	{
+		Frame: (17,158) - (75,170)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIACYTMax
+			signalTextBoxLostFocus -> parteditSink::SetIACYTMax
+		}
+	}
+
+
+
+
+
+	component "IACYT_WeightLabel" is "Label"
+	{
+		Frame: (0,210) - (15,222)
+		Caption: "Wt"
+	}
+	component "IACYT_WeightInput" is "Text Box"
+	{
+		Frame: (17,210) - (75,222)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterIACYTWeight
+			signalTextBoxLostFocus -> parteditSink::SetIACYTWeight
+		}
+	}
+  
+  
+  }
+} 
+
+
+
+
+
+
+window "FieldSpeed"
+{
+  Frame: (0,200) - (638,478)
+  Style: wfsNormal
+  Options: wfoTitle
+  Title: "Field Speed Options"
+	
+  connect
+  {
+    signalComponentCreated -> parteditSink::RegisterFieldSpeed
+  }
+
+  component "FSActive" is "Check Box"
+  {
+    Frame: (0,232) - (88,244)
+    Caption: "Active"
+    
+    connect
+    {
+		signalComponentCreated -> parteditSink::RegisterFSActive
+		signalCheckBoxClicked -> parteditSink::SetFSActive
+	}
+  }
+
+  
+  component "FSFixedGroup" is "Group Frame"
+  {
+	Frame: (0,0) - (77,230)
+	Style: wfsNormal
+	Caption: "Fixed"
+	
+	component "FSF_PositionLabel" is "Label"
+	{
+		Frame: (0,14) - (75,26)
+		Caption: "Position"
+	}
+	component "FSF_PXLabel" is "Label"
+	{
+		Frame: (0,28) - (15,40)
+		Caption: "X"
+	}
+	component "FSF_PXInput" is "Text Box"
+	{
+		Frame: (17,28) - (75,40)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFSFPX
+			signalTextBoxLostFocus -> parteditSink::SetFSFPositionX
+		}
+	}
+
+	component "FSF_PYLabel" is "Label"
+	{
+		Frame: (0,40) - (15,52)
+		Caption: "Y"
+	}
+	component "FSF_PYInput" is "Text Box"
+	{
+		Frame: (17,40) - (75,52)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFSFPY
+			signalTextBoxLostFocus -> parteditSink::SetFSFPositionY
+		}
+	}
+
+	component "FSF_PZLabel" is "Label"
+	{
+		Frame: (0,52) - (15,64)
+		Caption: "Z"
+	}
+	component "FSF_PZInput" is "Text Box"
+	{
+		Frame: (17,52) - (75,64)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFSFPZ
+			signalTextBoxLostFocus -> parteditSink::SetFSFPositionZ
+		}
+	}
+
+
+	component "FSF_WeightLabel" is "Label"
+	{
+		Frame: (0,210) - (15,222)
+		Caption: "Wt"
+	}
+	component "FSF_WeightInput" is "Text Box"
+	{
+		Frame: (17,210) - (75,222)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFSFWeight
+			signalTextBoxLostFocus -> parteditSink::SetFSFWeight
+		}
+	}
+
+
+  
+  }
+  
+  component "FSLineGroup" is "Group Frame"
+  {
+	Frame: (79,0) - (156,230)
+	Style: wfsNormal
+	Caption: "Line"
+  
+	component "FSL_StartLabel" is "Label"
+	{
+		Frame: (0,14) - (75,26)
+		Caption: "Start"
+	}
+	component "FSL_SXLabel" is "Label"
+	{
+		Frame: (0,28) - (15,40)
+		Caption: "X"
+	}
+	component "FSL_SXInput" is "Text Box"
+	{
+		Frame: (17,28) - (75,40)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFSLSX
+			signalTextBoxLostFocus -> parteditSink::SetFSLStartX
+		}
+	}
+
+	component "FSL_SYLabel" is "Label"
+	{
+		Frame: (0,40) - (15,52)
+		Caption: "Y"
+	}
+	component "FSL_SYInput" is "Text Box"
+	{
+		Frame: (17,40) - (75,52)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFSLSY
+			signalTextBoxLostFocus -> parteditSink::SetFSLStartY
+		}
+	}
+
+	component "FSL_SZLabel" is "Label"
+	{
+		Frame: (0,52) - (15,64)
+		Caption: "Z"
+	}
+	component "FSL_SZInput" is "Text Box"
+	{
+		Frame: (17,52) - (75,64)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFSLSZ
+			signalTextBoxLostFocus -> parteditSink::SetFSLStartZ
+		}
+	}
+
+
+
+	component "FSL_EndLabel" is "Label"
+	{
+		Frame: (0,64) - (75,76)
+		Caption: "End"
+	}
+	component "FSL_EXLabel" is "Label"
+	{
+		Frame: (0,78) - (15,90)
+		Caption: "X"
+	}
+	component "FSL_EXInput" is "Text Box"
+	{
+		Frame: (17,78) - (75,90)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFSLEX
+			signalTextBoxLostFocus -> parteditSink::SetFSLEndX
+		}
+	}
+
+	component "FSL_EYLabel" is "Label"
+	{
+		Frame: (0,90) - (15,102)
+		Caption: "Y"
+	}
+	component "FSL_EYInput" is "Text Box"
+	{
+		Frame: (17,90) - (75,102)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegFSLEY
+			signalTextBoxLostFocus -> parteditSink::SetFSLEndY
+		}
+	}
+
+	component "FSL_EZLabel" is "Label"
+	{
+		Frame: (0,102) - (15,114)
+		Caption: "Z"
+	}
+	component "FSL_EZInput" is "Text Box"
+	{
+		Frame: (17,102) - (75,114)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegFSLEZ
+			signalTextBoxLostFocus -> parteditSink::SetFSLEndZ
+		}
+	}
+
+
+
+
+
+
+	component "FSL_WeightLabel" is "Label"
+	{
+		Frame: (0,210) - (15,222)
+		Caption: "Wt"
+	}
+	component "FSL_WeightInput" is "Text Box"
+	{
+		Frame: (17,210) - (75,222)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFSLWeight
+			signalTextBoxLostFocus -> parteditSink::SetFSLWeight
+		}
+	}
+  
+  
+  }
+
+  component "FSBoxGroup" is "Group Frame"
+  {
+	Frame: (158,0) - (235,230)
+	Style: wfsNormal
+	Caption: "Box"
+
+	component "FSB_MinLabel" is "Label"
+	{
+		Frame: (0,14) - (75,26)
+		Caption: "Min"
+	}
+	component "FSB_MXLabel" is "Label"
+	{
+		Frame: (0,28) - (15,40)
+		Caption: "X"
+	}
+	component "FSB_MXInput" is "Text Box"
+	{
+		Frame: (17,28) - (75,40)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFSBMX
+			signalTextBoxLostFocus -> parteditSink::SetFSBMinX
+		}
+	}
+
+	component "FSB_MYLabel" is "Label"
+	{
+		Frame: (0,40) - (15,52)
+		Caption: "Y"
+	}
+	component "FSB_MYInput" is "Text Box"
+	{
+		Frame: (17,40) - (75,52)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFSBMY
+			signalTextBoxLostFocus -> parteditSink::SetFSBMinY
+		}
+	}
+
+	component "FSB_MZLabel" is "Label"
+	{
+		Frame: (0,52) - (15,64)
+		Caption: "Z"
+	}
+	component "FSB_MZInput" is "Text Box"
+	{
+		Frame: (17,52) - (75,64)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFSBMZ
+			signalTextBoxLostFocus -> parteditSink::SetFSBMinZ
+		}
+	}
+
+
+
+	component "FSB_MaxLabel" is "Label"
+	{
+		Frame: (0,64) - (75,76)
+		Caption: "Max"
+	}
+	component "FSB_XXLabel" is "Label"
+	{
+		Frame: (0,78) - (15,90)
+		Caption: "X"
+	}
+	component "FSB_XXInput" is "Text Box"
+	{
+		Frame: (17,78) - (75,90)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFSBXX
+			signalTextBoxLostFocus -> parteditSink::SetFSBMaxX
+		}
+	}
+
+	component "FSB_XYLabel" is "Label"
+	{
+		Frame: (0,90) - (15,102)
+		Caption: "Y"
+	}
+	component "FSB_XYInput" is "Text Box"
+	{
+		Frame: (17,90) - (75,102)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFSBXY
+			signalTextBoxLostFocus -> parteditSink::SetFSBMaxY
+		}
+	}
+
+	component "FSB_XZLabel" is "Label"
+	{
+		Frame: (0,102) - (15,114)
+		Caption: "Z"
+	}
+	component "FSB_XZInput" is "Text Box"
+	{
+		Frame: (17,102) - (75,114)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFSBXZ
+			signalTextBoxLostFocus -> parteditSink::SetFSBMaxZ
+		}
+	}
+
+
+
+
+
+
+	component "FSB_WeightLabel" is "Label"
+	{
+		Frame: (0,210) - (15,222)
+		Caption: "Wt"
+	}
+	component "FSB_WeightInput" is "Text Box"
+	{
+		Frame: (17,210) - (75,222)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFSBWeight
+			signalTextBoxLostFocus -> parteditSink::SetFSBWeight
+		}
+	}
+
+  
+  }
+
+  component "FSSphereGroup" is "Group Frame"
+  {
+	Frame: (237,0) - (314,230)
+	Style: wfsNormal
+	Caption: "Sphere"
+
+	component "FSS_CenterLabel" is "Label"
+	{
+		Frame: (0,14) - (75,26)
+		Caption: "Center"
+	}
+	component "FSS_CXLabel" is "Label"
+	{
+		Frame: (0,28) - (15,40)
+		Caption: "X"
+	}
+	component "FSS_CXInput" is "Text Box"
+	{
+		Frame: (17,28) - (75,40)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegFSSCX
+			signalTextBoxLostFocus -> parteditSink::SetFSSCenterX
+		}
+	}
+
+	component "FSS_CYLabel" is "Label"
+	{
+		Frame: (0,40) - (15,52)
+		Caption: "Y"
+	}
+	component "FSS_CYInput" is "Text Box"
+	{
+		Frame: (17,40) - (75,52)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFSSCY
+			signalTextBoxLostFocus -> parteditSink::SetFSSCenterY
+		}
+	}
+
+	component "FSS_CZLabel" is "Label"
+	{
+		Frame: (0,52) - (15,64)
+		Caption: "Z"
+	}
+	component "FSS_CZInput" is "Text Box"
+	{
+		Frame: (17,52) - (75,64)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFSSCZ
+			signalTextBoxLostFocus -> parteditSink::SetFSSCenterZ
+		}
+	}
+
+
+
+	component "FSS_MinLabel" is "Label"
+	{
+		Frame: (0,64) - (75,76)
+		Caption: "Min"
+	}
+	component "FSS_MinInput" is "Text Box"
+	{
+		Frame: (17,78) - (75,90)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFSSMin
+			signalTextBoxLostFocus -> parteditSink::SetFSSMin
+		}
+	}
+
+	component "FSS_MaxLabel" is "Label"
+	{
+		Frame: (0,92) - (75,104)
+		Caption: "Max"
+	}
+	component "FSS_MaxInput" is "Text Box"
+	{
+		Frame: (17,106) - (75,118)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFSSMax
+			signalTextBoxLostFocus -> parteditSink::SetFSSMax
+		}
+	}
+
+
+
+
+
+
+
+
+	component "FSS_WeightLabel" is "Label"
+	{
+		Frame: (0,210) - (15,222)
+		Caption: "Wt"
+	}
+	component "FSS_WeightInput" is "Text Box"
+	{
+		Frame: (17,210) - (75,222)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFSSWeight
+			signalTextBoxLostFocus -> parteditSink::SetFSSWeight
+		}
+	}
+
+  
+  }
+  
+  component "FSConeGroup" is "Group Frame"
+  {
+	Frame: (316,0) - (393,230)
+	Style: wfsNormal
+	Caption: "Cone"
+
+	component "FSCN_OriginLabel" is "Label"
+	{
+		Frame: (0,14) - (75,26)
+		Caption: "Origin"
+	}
+	component "FSCN_OXLabel" is "Label"
+	{
+		Frame: (0,28) - (15,40)
+		Caption: "X"
+	}
+	component "FSCN_OXInput" is "Text Box"
+	{
+		Frame: (17,28) - (75,40)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFSCNOX
+			signalTextBoxLostFocus -> parteditSink::SetFSCNOriginX
+		}
+	}
+
+	component "FSCN_OYLabel" is "Label"
+	{
+		Frame: (0,40) - (15,52)
+		Caption: "Y"
+	}
+	component "FSCN_OYInput" is "Text Box"
+	{
+		Frame: (17,40) - (75,52)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFSCNOY
+			signalTextBoxLostFocus -> parteditSink::SetFSCNOriginY
+		}
+	}
+
+	component "FSCN_OZLabel" is "Label"
+	{
+		Frame: (0,52) - (15,64)
+		Caption: "Z"
+	}
+	component "FSCN_OZInput" is "Text Box"
+	{
+		Frame: (17,52) - (75,64)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFSCNOZ
+			signalTextBoxLostFocus -> parteditSink::SetFSCNOriginZ
+		}
+	}
+
+
+
+	component "FSCN_ElevationLabel" is "Label"
+	{
+		Frame: (0,64) - (75,76)
+		Caption: "Elevation"
+	}
+	component "FSCN_ElevInput" is "Text Box"
+	{
+		Frame: (17,78) - (75,90)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFSCNElev
+			signalTextBoxLostFocus -> parteditSink::SetFSCNElev
+		}
+	}
+
+	component "FSCN_AzimuthLabel" is "Label"
+	{
+		Frame: (0,92) - (75,104)
+		Caption: "Azimuth"
+	}
+	component "FSCN_AzimInput" is "Text Box"
+	{
+		Frame: (17,106) - (75,118)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFSCNAzim
+			signalTextBoxLostFocus -> parteditSink::SetFSCNAzim
+		}
+	}
+
+	component "FSCN_ApertureLabel" is "Label"
+	{
+		Frame: (0,120) - (75,132)
+		Caption: "Aperture"
+	}
+	component "FSCN_AperInput" is "Text Box"
+	{
+		Frame: (17,134) - (75,146)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFSCNAper
+			signalTextBoxLostFocus -> parteditSink::SetFSCNAper
+		}
+	}
+
+	component "FSCN_MinLabel" is "Label"
+	{
+		Frame: (0,148) - (75,160)
+		Caption: "Min"
+	}
+	component "FSCN_MinInput" is "Text Box"
+	{
+		Frame: (17,162) - (75,174)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFSCNMin
+			signalTextBoxLostFocus -> parteditSink::SetFSCNMin
+		}
+	}
+
+	component "FSCN_MaxLabel" is "Label"
+	{
+		Frame: (0,176) - (75,188)
+		Caption: "Max"
+	}
+	component "FSCN_MaxInput" is "Text Box"
+	{
+		Frame: (17,190) - (75,202)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFSCNMax
+			signalTextBoxLostFocus -> parteditSink::SetFSCNMax
+		}
+	}
+	
+	
+	
+	
+
+
+
+
+
+
+	component "FSCN_WeightLabel" is "Label"
+	{
+		Frame: (0,210) - (15,222)
+		Caption: "Wt"
+	}
+	component "FSCN_WeightInput" is "Text Box"
+	{
+		Frame: (17,210) - (75,222)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFSCNWeight
+			signalTextBoxLostFocus -> parteditSink::SetFSCNWeight
+		}
+	}
+
+  
+  }
+  
+  component "FSCylinderGroup" is "Group Frame"
+  {
+	Frame: (395,0) - (472,230)
+	Style: wfsNormal
+	Caption: "Cylinder"
+  
+	component "FSCY_StartLabel" is "Label"
+	{
+		Frame: (0,14) - (75,26)
+		Caption: "Start"
+	}
+	component "FSCY_SXLabel" is "Label"
+	{
+		Frame: (0,28) - (15,40)
+		Caption: "X"
+	}
+	component "FSCY_SXInput" is "Text Box"
+	{
+		Frame: (17,28) - (75,40)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFSCYSX
+			signalTextBoxLostFocus -> parteditSink::SetFSCYStartX
+		}
+	}
+
+	component "FSCY_SYLabel" is "Label"
+	{
+		Frame: (0,40) - (15,52)
+		Caption: "Y"
+	}
+	component "FSCY_SYInput" is "Text Box"
+	{
+		Frame: (17,40) - (75,52)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFSCYSY
+			signalTextBoxLostFocus -> parteditSink::SetFSCYStartY
+		}
+	}
+
+	component "FSCY_SZLabel" is "Label"
+	{
+		Frame: (0,52) - (15,64)
+		Caption: "Z"
+	}
+	component "FSCY_SZInput" is "Text Box"
+	{
+		Frame: (17,52) - (75,64)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFSCYSZ
+			signalTextBoxLostFocus -> parteditSink::SetFSCYStartZ
+		}
+	}
+
+
+
+	component "FSCY_EndLabel" is "Label"
+	{
+		Frame: (0,64) - (75,76)
+		Caption: "End"
+	}
+	component "FSCY_EXLabel" is "Label"
+	{
+		Frame: (0,78) - (15,90)
+		Caption: "X"
+	}
+	component "FSCY_EXInput" is "Text Box"
+	{
+		Frame: (17,78) - (75,90)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFSCYEX
+			signalTextBoxLostFocus -> parteditSink::SetFSCYEndX
+		}
+	}
+
+	component "FSCY_EYLabel" is "Label"
+	{
+		Frame: (0,90) - (15,102)
+		Caption: "Y"
+	}
+	component "FSCY_EYInput" is "Text Box"
+	{
+		Frame: (17,90) - (75,102)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFSCYEY
+			signalTextBoxLostFocus -> parteditSink::SetFSCYEndY
+		}
+	}
+
+	component "FSCY_EZLabel" is "Label"
+	{
+		Frame: (0,102) - (15,114)
+		Caption: "Z"
+	}
+	component "FSCY_EZInput" is "Text Box"
+	{
+		Frame: (17,102) - (75,114)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFSCYEZ
+			signalTextBoxLostFocus -> parteditSink::SetFSCYEndZ
+		}
+	}
+
+
+	component "FSCY_MinLabel" is "Label"
+	{
+		Frame: (0,116) - (75,128)
+		Caption: "Min"
+	}
+	component "FSCY_MinInput" is "Text Box"
+	{
+		Frame: (17,130) - (75,142)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFSCYMin
+			signalTextBoxLostFocus -> parteditSink::SetFSCYMin
+		}
+	}
+
+	component "FSCY_MaxLabel" is "Label"
+	{
+		Frame: (0,144) - (75,156)
+		Caption: "Max"
+	}
+	component "FSCY_MaxInput" is "Text Box"
+	{
+		Frame: (17,158) - (75,170)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFSCYMax
+			signalTextBoxLostFocus -> parteditSink::SetFSCYMax
+		}
+	}
+
+
+
+
+
+	component "FSCY_WeightLabel" is "Label"
+	{
+		Frame: (0,210) - (15,222)
+		Caption: "Wt"
+	}
+	component "FSCY_WeightInput" is "Text Box"
+	{
+		Frame: (17,210) - (75,222)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFSCYWeight
+			signalTextBoxLostFocus -> parteditSink::SetFSCYWeight
+		}
+	}
+  
+  
+  }
+  
+  component "FSSphereTangentGroup" is "Group Frame"
+  {
+	Frame: (474,0) - (551,230)
+	Style: wfsNormal
+	Caption: "SphereT"
+  
+	component "FSST_CenterLabel" is "Label"
+	{
+		Frame: (0,14) - (75,26)
+		Caption: "Center"
+	}
+	component "FSST_CXLabel" is "Label"
+	{
+		Frame: (0,28) - (15,40)
+		Caption: "X"
+	}
+	component "FSST_CXInput" is "Text Box"
+	{
+		Frame: (17,28) - (75,40)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFSSTCX
+			signalTextBoxLostFocus -> parteditSink::SetFSSTCenterX
+		}
+	}
+
+	component "FSST_CYLabel" is "Label"
+	{
+		Frame: (0,40) - (15,52)
+		Caption: "Y"
+	}
+	component "FSST_CYInput" is "Text Box"
+	{
+		Frame: (17,40) - (75,52)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFSSTCY
+			signalTextBoxLostFocus -> parteditSink::SetFSSTCenterY
+		}
+	}
+
+	component "FSST_CZLabel" is "Label"
+	{
+		Frame: (0,52) - (15,64)
+		Caption: "Z"
+	}
+	component "FSST_CZInput" is "Text Box"
+	{
+		Frame: (17,52) - (75,64)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFSSTCZ
+			signalTextBoxLostFocus -> parteditSink::SetFSSTCenterZ
+		}
+	}
+
+
+
+	component "FSST_MinLabel" is "Label"
+	{
+		Frame: (0,64) - (75,76)
+		Caption: "Min"
+	}
+	component "FSST_MinInput" is "Text Box"
+	{
+		Frame: (17,78) - (75,90)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFSSTMin
+			signalTextBoxLostFocus -> parteditSink::SetFSSTMin
+		}
+	}
+
+	component "FSST_MaxLabel" is "Label"
+	{
+		Frame: (0,92) - (75,104)
+		Caption: "Max"
+	}
+	component "FSST_MaxInput" is "Text Box"
+	{
+		Frame: (17,106) - (75,118)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFSSTMax
+			signalTextBoxLostFocus -> parteditSink::SetFSSTMax
+		}
+	}
+
+
+
+
+
+
+
+
+	component "FSST_WeightLabel" is "Label"
+	{
+		Frame: (0,210) - (15,222)
+		Caption: "Wt"
+	}
+	component "FSST_WeightInput" is "Text Box"
+	{
+		Frame: (17,210) - (75,222)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFSSTWeight
+			signalTextBoxLostFocus -> parteditSink::SetFSSTWeight
+		}
+	}
+  
+  
+  }
+  
+  component "FSCylinderTangentGroup" is "Group Frame"
+  {
+	Frame: (553,0) - (630,230)
+	Style: wfsNormal
+	Caption: "CylinderT"
+  
+	component "FSCYT_StartLabel" is "Label"
+	{
+		Frame: (0,14) - (75,26)
+		Caption: "Start"
+	}
+	component "FSCYT_SXLabel" is "Label"
+	{
+		Frame: (0,28) - (15,40)
+		Caption: "X"
+	}
+	component "FSCYT_SXInput" is "Text Box"
+	{
+		Frame: (17,28) - (75,40)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFSCYTSX
+			signalTextBoxLostFocus -> parteditSink::SetFSCYTStartX
+		}
+	}
+
+	component "FSCYT_SYLabel" is "Label"
+	{
+		Frame: (0,40) - (15,52)
+		Caption: "Y"
+	}
+	component "FSCYT_SYInput" is "Text Box"
+	{
+		Frame: (17,40) - (75,52)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFSCYTSY
+			signalTextBoxLostFocus -> parteditSink::SetFSCYTStartY
+		}
+	}
+
+	component "FSCYT_SZLabel" is "Label"
+	{
+		Frame: (0,52) - (15,64)
+		Caption: "Z"
+	}
+	component "FSCYT_SZInput" is "Text Box"
+	{
+		Frame: (17,52) - (75,64)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFSCYTSZ
+			signalTextBoxLostFocus -> parteditSink::SetFSCYTStartZ
+		}
+	}
+
+
+
+	component "FSCYT_EndLabel" is "Label"
+	{
+		Frame: (0,64) - (75,76)
+		Caption: "End"
+	}
+	component "FSCYT_EXLabel" is "Label"
+	{
+		Frame: (0,78) - (15,90)
+		Caption: "X"
+	}
+	component "FSCYT_EXInput" is "Text Box"
+	{
+		Frame: (17,78) - (75,90)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFSCYTEX
+			signalTextBoxLostFocus -> parteditSink::SetFSCYTEndX
+		}
+	}
+
+	component "FSCYT_EYLabel" is "Label"
+	{
+		Frame: (0,90) - (15,102)
+		Caption: "Y"
+	}
+	component "FSCYT_EYInput" is "Text Box"
+	{
+		Frame: (17,90) - (75,102)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFSCYTEY
+			signalTextBoxLostFocus -> parteditSink::SetFSCYTEndY
+		}
+	}
+
+	component "FSCYT_EZLabel" is "Label"
+	{
+		Frame: (0,102) - (15,114)
+		Caption: "Z"
+	}
+	component "FSCYT_EZInput" is "Text Box"
+	{
+		Frame: (17,102) - (75,114)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFSCYTEZ
+			signalTextBoxLostFocus -> parteditSink::SetFSCYTEndZ
+		}
+	}
+
+
+	component "FSCYT_MinLabel" is "Label"
+	{
+		Frame: (0,116) - (75,128)
+		Caption: "Min"
+	}
+	component "FSCYT_MinInput" is "Text Box"
+	{
+		Frame: (17,130) - (75,142)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFSCYTMin
+			signalTextBoxLostFocus -> parteditSink::SetFSCYTMin
+		}
+	}
+
+	component "FSCYT_MaxLabel" is "Label"
+	{
+		Frame: (0,144) - (75,156)
+		Caption: "Max"
+	}
+	component "FSCYT_MaxInput" is "Text Box"
+	{
+		Frame: (17,158) - (75,170)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFSCYTMax
+			signalTextBoxLostFocus -> parteditSink::SetFSCYTMax
+		}
+	}
+
+
+
+
+
+	component "FSCYT_WeightLabel" is "Label"
+	{
+		Frame: (0,210) - (15,222)
+		Caption: "Wt"
+	}
+	component "FSCYT_WeightInput" is "Text Box"
+	{
+		Frame: (17,210) - (75,222)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFSCYTWeight
+			signalTextBoxLostFocus -> parteditSink::SetFSCYTWeight
+		}
+	}
+  
+  
+  }
+} 
+
+
+
+
+
+
+
+window "FieldAccel"
+{
+  Frame: (0,200) - (638,478)
+  Style: wfsNormal
+  Options: wfoTitle
+  Title: "Field Acceleration Options"
+	
+  connect
+  {
+    signalComponentCreated -> parteditSink::RegisterFieldAccel
+  }
+  
+  
+  component "FAActive" is "Check Box"
+  {
+    Frame: (0,232) - (88,244)
+    Caption: "Active"
+    
+    connect
+    {
+		signalComponentCreated -> parteditSink::RegisterFAActive
+		signalCheckBoxClicked -> parteditSink::SetFAActive
+	}
+  }
+  
+  
+  component "FAFixedGroup" is "Group Frame"
+  {
+	Frame: (0,0) - (77,230)
+	Style: wfsNormal
+	Caption: "Fixed"
+	
+	component "FAF_PositionLabel" is "Label"
+	{
+		Frame: (0,14) - (75,26)
+		Caption: "Position"
+	}
+	component "FAF_PXLabel" is "Label"
+	{
+		Frame: (0,28) - (15,40)
+		Caption: "X"
+	}
+	component "FAF_PXInput" is "Text Box"
+	{
+		Frame: (17,28) - (75,40)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFAFPX
+			signalTextBoxLostFocus -> parteditSink::SetFAFPositionX
+		}
+	}
+
+	component "FAF_PYLabel" is "Label"
+	{
+		Frame: (0,40) - (15,52)
+		Caption: "Y"
+	}
+	component "FAF_PYInput" is "Text Box"
+	{
+		Frame: (17,40) - (75,52)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFAFPY
+			signalTextBoxLostFocus -> parteditSink::SetFAFPositionY
+		}
+	}
+
+	component "FAF_PZLabel" is "Label"
+	{
+		Frame: (0,52) - (15,64)
+		Caption: "Z"
+	}
+	component "FAF_PZInput" is "Text Box"
+	{
+		Frame: (17,52) - (75,64)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFAFPZ
+			signalTextBoxLostFocus -> parteditSink::SetFAFPositionZ
+		}
+	}
+
+
+	component "FAF_WeightLabel" is "Label"
+	{
+		Frame: (0,210) - (15,222)
+		Caption: "Wt"
+	}
+	component "FAF_WeightInput" is "Text Box"
+	{
+		Frame: (17,210) - (75,222)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFAFWeight
+			signalTextBoxLostFocus -> parteditSink::SetFAFWeight
+		}
+	}
+
+
+  
+  }
+  
+  component "FALineGroup" is "Group Frame"
+  {
+	Frame: (79,0) - (156,230)
+	Style: wfsNormal
+	Caption: "Line"
+  
+	component "FAL_StartLabel" is "Label"
+	{
+		Frame: (0,14) - (75,26)
+		Caption: "Start"
+	}
+	component "FAL_SXLabel" is "Label"
+	{
+		Frame: (0,28) - (15,40)
+		Caption: "X"
+	}
+	component "FAL_SXInput" is "Text Box"
+	{
+		Frame: (17,28) - (75,40)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFALSX
+			signalTextBoxLostFocus -> parteditSink::SetFALStartX
+		}
+	}
+
+	component "FAL_SYLabel" is "Label"
+	{
+		Frame: (0,40) - (15,52)
+		Caption: "Y"
+	}
+	component "FAL_SYInput" is "Text Box"
+	{
+		Frame: (17,40) - (75,52)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFALSY
+			signalTextBoxLostFocus -> parteditSink::SetFALStartY
+		}
+	}
+
+	component "FAL_SZLabel" is "Label"
+	{
+		Frame: (0,52) - (15,64)
+		Caption: "Z"
+	}
+	component "FAL_SZInput" is "Text Box"
+	{
+		Frame: (17,52) - (75,64)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFALSZ
+			signalTextBoxLostFocus -> parteditSink::SetFALStartZ
+		}
+	}
+
+
+
+	component "FAL_EndLabel" is "Label"
+	{
+		Frame: (0,64) - (75,76)
+		Caption: "End"
+	}
+	component "FAL_EXLabel" is "Label"
+	{
+		Frame: (0,78) - (15,90)
+		Caption: "X"
+	}
+	component "FAL_EXInput" is "Text Box"
+	{
+		Frame: (17,78) - (75,90)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFALEX
+			signalTextBoxLostFocus -> parteditSink::SetFALEndX
+		}
+	}
+
+	component "FAL_EYLabel" is "Label"
+	{
+		Frame: (0,90) - (15,102)
+		Caption: "Y"
+	}
+	component "FAL_EYInput" is "Text Box"
+	{
+		Frame: (17,90) - (75,102)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegFALEY
+			signalTextBoxLostFocus -> parteditSink::SetFALEndY
+		}
+	}
+
+	component "FAL_EZLabel" is "Label"
+	{
+		Frame: (0,102) - (15,114)
+		Caption: "Z"
+	}
+	component "FAL_EZInput" is "Text Box"
+	{
+		Frame: (17,102) - (75,114)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegFALEZ
+			signalTextBoxLostFocus -> parteditSink::SetFALEndZ
+		}
+	}
+
+
+
+
+
+
+	component "FAL_WeightLabel" is "Label"
+	{
+		Frame: (0,210) - (15,222)
+		Caption: "Wt"
+	}
+	component "FAL_WeightInput" is "Text Box"
+	{
+		Frame: (17,210) - (75,222)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFALWeight
+			signalTextBoxLostFocus -> parteditSink::SetFALWeight
+		}
+	}
+  
+  
+  }
+
+  component "FABoxGroup" is "Group Frame"
+  {
+	Frame: (158,0) - (235,230)
+	Style: wfsNormal
+	Caption: "Box"
+
+	component "FAB_MinLabel" is "Label"
+	{
+		Frame: (0,14) - (75,26)
+		Caption: "Min"
+	}
+	component "FAB_MXLabel" is "Label"
+	{
+		Frame: (0,28) - (15,40)
+		Caption: "X"
+	}
+	component "FAB_MXInput" is "Text Box"
+	{
+		Frame: (17,28) - (75,40)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFABMX
+			signalTextBoxLostFocus -> parteditSink::SetFABMinX
+		}
+	}
+
+	component "FAB_MYLabel" is "Label"
+	{
+		Frame: (0,40) - (15,52)
+		Caption: "Y"
+	}
+	component "FAB_MYInput" is "Text Box"
+	{
+		Frame: (17,40) - (75,52)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFABMY
+			signalTextBoxLostFocus -> parteditSink::SetFABMinY
+		}
+	}
+
+	component "FAB_MZLabel" is "Label"
+	{
+		Frame: (0,52) - (15,64)
+		Caption: "Z"
+	}
+	component "FAB_MZInput" is "Text Box"
+	{
+		Frame: (17,52) - (75,64)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFABMZ
+			signalTextBoxLostFocus -> parteditSink::SetFABMinZ
+		}
+	}
+
+
+
+	component "FAB_MaxLabel" is "Label"
+	{
+		Frame: (0,64) - (75,76)
+		Caption: "Max"
+	}
+	component "FAB_XXLabel" is "Label"
+	{
+		Frame: (0,78) - (15,90)
+		Caption: "X"
+	}
+	component "FAB_XXInput" is "Text Box"
+	{
+		Frame: (17,78) - (75,90)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFABXX
+			signalTextBoxLostFocus -> parteditSink::SetFABMaxX
+		}
+	}
+
+	component "FAB_XYLabel" is "Label"
+	{
+		Frame: (0,90) - (15,102)
+		Caption: "Y"
+	}
+	component "FAB_XYInput" is "Text Box"
+	{
+		Frame: (17,90) - (75,102)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFABXY
+			signalTextBoxLostFocus -> parteditSink::SetFABMaxY
+		}
+	}
+
+	component "FAB_XZLabel" is "Label"
+	{
+		Frame: (0,102) - (15,114)
+		Caption: "Z"
+	}
+	component "FAB_XZInput" is "Text Box"
+	{
+		Frame: (17,102) - (75,114)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFABXZ
+			signalTextBoxLostFocus -> parteditSink::SetFABMaxZ
+		}
+	}
+
+
+
+
+
+
+	component "FAB_WeightLabel" is "Label"
+	{
+		Frame: (0,210) - (15,222)
+		Caption: "Wt"
+	}
+	component "FAB_WeightInput" is "Text Box"
+	{
+		Frame: (17,210) - (75,222)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFABWeight
+			signalTextBoxLostFocus -> parteditSink::SetFABWeight
+		}
+	}
+
+  
+  }
+
+  component "FASphereGroup" is "Group Frame"
+  {
+	Frame: (237,0) - (314,230)
+	Style: wfsNormal
+	Caption: "Sphere"
+
+	component "FAS_CenterLabel" is "Label"
+	{
+		Frame: (0,14) - (75,26)
+		Caption: "Center"
+	}
+	component "FAS_CXLabel" is "Label"
+	{
+		Frame: (0,28) - (15,40)
+		Caption: "X"
+	}
+	component "FAS_CXInput" is "Text Box"
+	{
+		Frame: (17,28) - (75,40)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegFASCX
+			signalTextBoxLostFocus -> parteditSink::SetFASCenterX
+		}
+	}
+
+	component "FAS_CYLabel" is "Label"
+	{
+		Frame: (0,40) - (15,52)
+		Caption: "Y"
+	}
+	component "FAS_CYInput" is "Text Box"
+	{
+		Frame: (17,40) - (75,52)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFASCY
+			signalTextBoxLostFocus -> parteditSink::SetFASCenterY
+		}
+	}
+
+	component "FAS_CZLabel" is "Label"
+	{
+		Frame: (0,52) - (15,64)
+		Caption: "Z"
+	}
+	component "FAS_CZInput" is "Text Box"
+	{
+		Frame: (17,52) - (75,64)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFASCZ
+			signalTextBoxLostFocus -> parteditSink::SetFASCenterZ
+		}
+	}
+
+
+
+	component "FAS_MinLabel" is "Label"
+	{
+		Frame: (0,64) - (75,76)
+		Caption: "Min"
+	}
+	component "FAS_MinInput" is "Text Box"
+	{
+		Frame: (17,78) - (75,90)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFASMin
+			signalTextBoxLostFocus -> parteditSink::SetFASMin
+		}
+	}
+
+	component "FAS_MaxLabel" is "Label"
+	{
+		Frame: (0,92) - (75,104)
+		Caption: "Max"
+	}
+	component "FAS_MaxInput" is "Text Box"
+	{
+		Frame: (17,106) - (75,118)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFASMax
+			signalTextBoxLostFocus -> parteditSink::SetFASMax
+		}
+	}
+
+
+
+
+
+
+
+
+	component "FAS_WeightLabel" is "Label"
+	{
+		Frame: (0,210) - (15,222)
+		Caption: "Wt"
+	}
+	component "FAS_WeightInput" is "Text Box"
+	{
+		Frame: (17,210) - (75,222)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFASWeight
+			signalTextBoxLostFocus -> parteditSink::SetFASWeight
+		}
+	}
+
+  
+  }
+  
+  component "FAConeGroup" is "Group Frame"
+  {
+	Frame: (316,0) - (393,230)
+	Style: wfsNormal
+	Caption: "Cone"
+
+	component "FACN_OriginLabel" is "Label"
+	{
+		Frame: (0,14) - (75,26)
+		Caption: "Origin"
+	}
+	component "FACN_OXLabel" is "Label"
+	{
+		Frame: (0,28) - (15,40)
+		Caption: "X"
+	}
+	component "FACN_OXInput" is "Text Box"
+	{
+		Frame: (17,28) - (75,40)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFACNOX
+			signalTextBoxLostFocus -> parteditSink::SetFACNOriginX
+		}
+	}
+
+	component "FACN_OYLabel" is "Label"
+	{
+		Frame: (0,40) - (15,52)
+		Caption: "Y"
+	}
+	component "FACN_OYInput" is "Text Box"
+	{
+		Frame: (17,40) - (75,52)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFACNOY
+			signalTextBoxLostFocus -> parteditSink::SetFACNOriginY
+		}
+	}
+
+	component "FACN_OZLabel" is "Label"
+	{
+		Frame: (0,52) - (15,64)
+		Caption: "Z"
+	}
+	component "FACN_OZInput" is "Text Box"
+	{
+		Frame: (17,52) - (75,64)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFACNOZ
+			signalTextBoxLostFocus -> parteditSink::SetFACNOriginZ
+		}
+	}
+
+
+
+	component "FACN_ElevationLabel" is "Label"
+	{
+		Frame: (0,64) - (75,76)
+		Caption: "Elevation"
+	}
+	component "FACN_ElevInput" is "Text Box"
+	{
+		Frame: (17,78) - (75,90)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFACNElev
+			signalTextBoxLostFocus -> parteditSink::SetFACNElev
+		}
+	}
+
+	component "FACN_AzimuthLabel" is "Label"
+	{
+		Frame: (0,92) - (75,104)
+		Caption: "Azimuth"
+	}
+	component "FACN_AzimInput" is "Text Box"
+	{
+		Frame: (17,106) - (75,118)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFACNAzim
+			signalTextBoxLostFocus -> parteditSink::SetFACNAzim
+		}
+	}
+
+	component "FACN_ApertureLabel" is "Label"
+	{
+		Frame: (0,120) - (75,132)
+		Caption: "Aperture"
+	}
+	component "FACN_AperInput" is "Text Box"
+	{
+		Frame: (17,134) - (75,146)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFACNAper
+			signalTextBoxLostFocus -> parteditSink::SetFACNAper
+		}
+	}
+
+	component "FACN_MinLabel" is "Label"
+	{
+		Frame: (0,148) - (75,160)
+		Caption: "Min"
+	}
+	component "FACN_MinInput" is "Text Box"
+	{
+		Frame: (17,162) - (75,174)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFACNMin
+			signalTextBoxLostFocus -> parteditSink::SetFACNMin
+		}
+	}
+
+	component "FACN_MaxLabel" is "Label"
+	{
+		Frame: (0,176) - (75,188)
+		Caption: "Max"
+	}
+	component "FACN_MaxInput" is "Text Box"
+	{
+		Frame: (17,190) - (75,202)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFACNMax
+			signalTextBoxLostFocus -> parteditSink::SetFACNMax
+		}
+	}
+	
+	
+	
+	
+
+
+
+
+
+
+	component "FACN_WeightLabel" is "Label"
+	{
+		Frame: (0,210) - (15,222)
+		Caption: "Wt"
+	}
+	component "FACN_WeightInput" is "Text Box"
+	{
+		Frame: (17,210) - (75,222)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFACNWeight
+			signalTextBoxLostFocus -> parteditSink::SetFACNWeight
+		}
+	}
+
+  
+  }
+  
+  component "FACylinderGroup" is "Group Frame"
+  {
+	Frame: (395,0) - (472,230)
+	Style: wfsNormal
+	Caption: "Cylinder"
+  
+	component "FACY_StartLabel" is "Label"
+	{
+		Frame: (0,14) - (75,26)
+		Caption: "Start"
+	}
+	component "FACY_SXLabel" is "Label"
+	{
+		Frame: (0,28) - (15,40)
+		Caption: "X"
+	}
+	component "FACY_SXInput" is "Text Box"
+	{
+		Frame: (17,28) - (75,40)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFACYSX
+			signalTextBoxLostFocus -> parteditSink::SetFACYStartX
+		}
+	}
+
+	component "FACY_SYLabel" is "Label"
+	{
+		Frame: (0,40) - (15,52)
+		Caption: "Y"
+	}
+	component "FACY_SYInput" is "Text Box"
+	{
+		Frame: (17,40) - (75,52)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFACYSY
+			signalTextBoxLostFocus -> parteditSink::SetFACYStartY
+		}
+	}
+
+	component "FACY_SZLabel" is "Label"
+	{
+		Frame: (0,52) - (15,64)
+		Caption: "Z"
+	}
+	component "FACY_SZInput" is "Text Box"
+	{
+		Frame: (17,52) - (75,64)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFACYSZ
+			signalTextBoxLostFocus -> parteditSink::SetFACYStartZ
+		}
+	}
+
+
+
+	component "FACY_EndLabel" is "Label"
+	{
+		Frame: (0,64) - (75,76)
+		Caption: "End"
+	}
+	component "FACY_EXLabel" is "Label"
+	{
+		Frame: (0,78) - (15,90)
+		Caption: "X"
+	}
+	component "FACY_EXInput" is "Text Box"
+	{
+		Frame: (17,78) - (75,90)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFACYEX
+			signalTextBoxLostFocus -> parteditSink::SetFACYEndX
+		}
+	}
+
+	component "FACY_EYLabel" is "Label"
+	{
+		Frame: (0,90) - (15,102)
+		Caption: "Y"
+	}
+	component "FACY_EYInput" is "Text Box"
+	{
+		Frame: (17,90) - (75,102)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFACYEY
+			signalTextBoxLostFocus -> parteditSink::SetFACYEndY
+		}
+	}
+
+	component "FACY_EZLabel" is "Label"
+	{
+		Frame: (0,102) - (15,114)
+		Caption: "Z"
+	}
+	component "FACY_EZInput" is "Text Box"
+	{
+		Frame: (17,102) - (75,114)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFACYEZ
+			signalTextBoxLostFocus -> parteditSink::SetFACYEndZ
+		}
+	}
+
+
+	component "FACY_MinLabel" is "Label"
+	{
+		Frame: (0,116) - (75,128)
+		Caption: "Min"
+	}
+	component "FACY_MinInput" is "Text Box"
+	{
+		Frame: (17,130) - (75,142)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFACYMin
+			signalTextBoxLostFocus -> parteditSink::SetFACYMin
+		}
+	}
+
+	component "FACY_MaxLabel" is "Label"
+	{
+		Frame: (0,144) - (75,156)
+		Caption: "Max"
+	}
+	component "FACY_MaxInput" is "Text Box"
+	{
+		Frame: (17,158) - (75,170)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFACYMax
+			signalTextBoxLostFocus -> parteditSink::SetFACYMax
+		}
+	}
+
+
+
+
+
+	component "FACY_WeightLabel" is "Label"
+	{
+		Frame: (0,210) - (15,222)
+		Caption: "Wt"
+	}
+	component "FACY_WeightInput" is "Text Box"
+	{
+		Frame: (17,210) - (75,222)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFACYWeight
+			signalTextBoxLostFocus -> parteditSink::SetFACYWeight
+		}
+	}
+  
+  
+  }
+  
+  component "FASphereTangentGroup" is "Group Frame"
+  {
+	Frame: (474,0) - (551,230)
+	Style: wfsNormal
+	Caption: "SphereT"
+  
+	component "FAST_CenterLabel" is "Label"
+	{
+		Frame: (0,14) - (75,26)
+		Caption: "Center"
+	}
+	component "FAST_CXLabel" is "Label"
+	{
+		Frame: (0,28) - (15,40)
+		Caption: "X"
+	}
+	component "FAST_CXInput" is "Text Box"
+	{
+		Frame: (17,28) - (75,40)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFASTCX
+			signalTextBoxLostFocus -> parteditSink::SetFASTCenterX
+		}
+	}
+
+	component "FAST_CYLabel" is "Label"
+	{
+		Frame: (0,40) - (15,52)
+		Caption: "Y"
+	}
+	component "FAST_CYInput" is "Text Box"
+	{
+		Frame: (17,40) - (75,52)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFASTCY
+			signalTextBoxLostFocus -> parteditSink::SetFASTCenterY
+		}
+	}
+
+	component "FAST_CZLabel" is "Label"
+	{
+		Frame: (0,52) - (15,64)
+		Caption: "Z"
+	}
+	component "FAST_CZInput" is "Text Box"
+	{
+		Frame: (17,52) - (75,64)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFASTCZ
+			signalTextBoxLostFocus -> parteditSink::SetFASTCenterZ
+		}
+	}
+
+
+
+	component "FAST_MinLabel" is "Label"
+	{
+		Frame: (0,64) - (75,76)
+		Caption: "Min"
+	}
+	component "FAST_MinInput" is "Text Box"
+	{
+		Frame: (17,78) - (75,90)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFASTMin
+			signalTextBoxLostFocus -> parteditSink::SetFASTMin
+		}
+	}
+
+	component "FAST_MaxLabel" is "Label"
+	{
+		Frame: (0,92) - (75,104)
+		Caption: "Max"
+	}
+	component "FAST_MaxInput" is "Text Box"
+	{
+		Frame: (17,106) - (75,118)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFASTMax
+			signalTextBoxLostFocus -> parteditSink::SetFASTMax
+		}
+	}
+
+
+
+
+
+
+
+
+	component "FAST_WeightLabel" is "Label"
+	{
+		Frame: (0,210) - (15,222)
+		Caption: "Wt"
+	}
+	component "FAST_WeightInput" is "Text Box"
+	{
+		Frame: (17,210) - (75,222)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFASTWeight
+			signalTextBoxLostFocus -> parteditSink::SetFASTWeight
+		}
+	}
+  
+  
+  }
+  
+  component "FACylinderTangentGroup" is "Group Frame"
+  {
+	Frame: (553,0) - (630,230)
+	Style: wfsNormal
+	Caption: "CylinderT"
+  
+	component "FACYT_StartLabel" is "Label"
+	{
+		Frame: (0,14) - (75,26)
+		Caption: "Start"
+	}
+	component "FACYT_SXLabel" is "Label"
+	{
+		Frame: (0,28) - (15,40)
+		Caption: "X"
+	}
+	component "FACYT_SXInput" is "Text Box"
+	{
+		Frame: (17,28) - (75,40)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFACYTSX
+			signalTextBoxLostFocus -> parteditSink::SetFACYTStartX
+		}
+	}
+
+	component "FACYT_SYLabel" is "Label"
+	{
+		Frame: (0,40) - (15,52)
+		Caption: "Y"
+	}
+	component "FACYT_SYInput" is "Text Box"
+	{
+		Frame: (17,40) - (75,52)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFACYTSY
+			signalTextBoxLostFocus -> parteditSink::SetFACYTStartY
+		}
+	}
+
+	component "FACYT_SZLabel" is "Label"
+	{
+		Frame: (0,52) - (15,64)
+		Caption: "Z"
+	}
+	component "FACYT_SZInput" is "Text Box"
+	{
+		Frame: (17,52) - (75,64)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFACYTSZ
+			signalTextBoxLostFocus -> parteditSink::SetFACYTStartZ
+		}
+	}
+
+
+
+	component "FACYT_EndLabel" is "Label"
+	{
+		Frame: (0,64) - (75,76)
+		Caption: "End"
+	}
+	component "FACYT_EXLabel" is "Label"
+	{
+		Frame: (0,78) - (15,90)
+		Caption: "X"
+	}
+	component "FACYT_EXInput" is "Text Box"
+	{
+		Frame: (17,78) - (75,90)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFACYTEX
+			signalTextBoxLostFocus -> parteditSink::SetFACYTEndX
+		}
+	}
+
+	component "FACYT_EYLabel" is "Label"
+	{
+		Frame: (0,90) - (15,102)
+		Caption: "Y"
+	}
+	component "FACYT_EYInput" is "Text Box"
+	{
+		Frame: (17,90) - (75,102)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFACYTEY
+			signalTextBoxLostFocus -> parteditSink::SetFACYTEndY
+		}
+	}
+
+	component "FACYT_EZLabel" is "Label"
+	{
+		Frame: (0,102) - (15,114)
+		Caption: "Z"
+	}
+	component "FACYT_EZInput" is "Text Box"
+	{
+		Frame: (17,102) - (75,114)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFACYTEZ
+			signalTextBoxLostFocus -> parteditSink::SetFACYTEndZ
+		}
+	}
+
+
+	component "FACYT_MinLabel" is "Label"
+	{
+		Frame: (0,116) - (75,128)
+		Caption: "Min"
+	}
+	component "FACYT_MinInput" is "Text Box"
+	{
+		Frame: (17,130) - (75,142)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFACYTMin
+			signalTextBoxLostFocus -> parteditSink::SetFACYTMin
+		}
+	}
+
+	component "FACYT_MaxLabel" is "Label"
+	{
+		Frame: (0,144) - (75,156)
+		Caption: "Max"
+	}
+	component "FACYT_MaxInput" is "Text Box"
+	{
+		Frame: (17,158) - (75,170)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFACYTMax
+			signalTextBoxLostFocus -> parteditSink::SetFACYTMax
+		}
+	}
+
+
+
+
+
+	component "FACYT_WeightLabel" is "Label"
+	{
+		Frame: (0,210) - (15,222)
+		Caption: "Wt"
+	}
+	component "FACYT_WeightInput" is "Text Box"
+	{
+		Frame: (17,210) - (75,222)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterFACYTWeight
+			signalTextBoxLostFocus -> parteditSink::SetFACYTWeight
+		}
+	}
+  
+  
+  }
+} 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+window "Attractor"
+{
+  Frame: (0,200) - (638,478)
+  Style: wfsNormal
+  Options: wfoTitle
+  Title: "Attractor Options"
+	
+  connect
+  {
+    signalComponentCreated -> parteditSink::RegisterAttractor
+  }
+  
+  component "AtForceLabel" is "Label"
+  {
+	Frame: (0,232) - (78,244)
+	Caption: "Force"
+  }
+  
+  component "AtForce" is "Text Box"
+  {
+    Frame: (80,232) - (138,244)
+    
+    connect
+    {
+		signalComponentCreated -> parteditSink::RegisterATForce
+		signalTextBoxLostFocus -> parteditSink::SetATForce
+	}
+  }
+		
+  
+  component "ATFixedGroup" is "Group Frame"
+  {
+	Frame: (0,0) - (77,230)
+	Style: wfsNormal
+	Caption: "Fixed"
+	
+	component "ATF_PositionLabel" is "Label"
+	{
+		Frame: (0,14) - (75,26)
+		Caption: "Position"
+	}
+	component "ATF_PXLabel" is "Label"
+	{
+		Frame: (0,28) - (15,40)
+		Caption: "X"
+	}
+	component "ATF_PXInput" is "Text Box"
+	{
+		Frame: (17,28) - (75,40)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterATFPX
+			signalTextBoxLostFocus -> parteditSink::SetATFPositionX
+		}
+	}
+
+	component "ATF_PYLabel" is "Label"
+	{
+		Frame: (0,40) - (15,52)
+		Caption: "Y"
+	}
+	component "ATF_PYInput" is "Text Box"
+	{
+		Frame: (17,40) - (75,52)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterATFPY
+			signalTextBoxLostFocus -> parteditSink::SetATFPositionY
+		}
+	}
+
+	component "ATF_PZLabel" is "Label"
+	{
+		Frame: (0,52) - (15,64)
+		Caption: "Z"
+	}
+	component "ATF_PZInput" is "Text Box"
+	{
+		Frame: (17,52) - (75,64)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterATFPZ
+			signalTextBoxLostFocus -> parteditSink::SetATFPositionZ
+		}
+	}
+
+
+	component "ATF_WeightLabel" is "Label"
+	{
+		Frame: (0,210) - (15,222)
+		Caption: "Wt"
+	}
+	component "ATF_WeightInput" is "Text Box"
+	{
+		Frame: (17,210) - (75,222)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterATFWeight
+			signalTextBoxLostFocus -> parteditSink::SetATFWeight
+		}
+	}
+
+
+  
+  }
+  
+  component "ATLineGroup" is "Group Frame"
+  {
+	Frame: (79,0) - (156,230)
+	Style: wfsNormal
+	Caption: "Line"
+  
+	component "ATL_StartLabel" is "Label"
+	{
+		Frame: (0,14) - (75,26)
+		Caption: "Start"
+	}
+	component "ATL_SXLabel" is "Label"
+	{
+		Frame: (0,28) - (15,40)
+		Caption: "X"
+	}
+	component "ATL_SXInput" is "Text Box"
+	{
+		Frame: (17,28) - (75,40)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterATLSX
+			signalTextBoxLostFocus -> parteditSink::SetATLStartX
+		}
+	}
+
+	component "ATL_SYLabel" is "Label"
+	{
+		Frame: (0,40) - (15,52)
+		Caption: "Y"
+	}
+	component "ATL_SYInput" is "Text Box"
+	{
+		Frame: (17,40) - (75,52)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterATLSY
+			signalTextBoxLostFocus -> parteditSink::SetATLStartY
+		}
+	}
+
+	component "ATL_SZLabel" is "Label"
+	{
+		Frame: (0,52) - (15,64)
+		Caption: "Z"
+	}
+	component "ATL_SZInput" is "Text Box"
+	{
+		Frame: (17,52) - (75,64)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterATLSZ
+			signalTextBoxLostFocus -> parteditSink::SetATLStartZ
+		}
+	}
+
+
+
+	component "ATL_EndLabel" is "Label"
+	{
+		Frame: (0,64) - (75,76)
+		Caption: "End"
+	}
+	component "ATL_EXLabel" is "Label"
+	{
+		Frame: (0,78) - (15,90)
+		Caption: "X"
+	}
+	component "ATL_EXInput" is "Text Box"
+	{
+		Frame: (17,78) - (75,90)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterATLEX
+			signalTextBoxLostFocus -> parteditSink::SetATLEndX
+		}
+	}
+
+	component "ATL_EYLabel" is "Label"
+	{
+		Frame: (0,90) - (15,102)
+		Caption: "Y"
+	}
+	component "ATL_EYInput" is "Text Box"
+	{
+		Frame: (17,90) - (75,102)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterATLEY
+			signalTextBoxLostFocus -> parteditSink::SetATLEndY
+		}
+	}
+
+	component "ATL_EZLabel" is "Label"
+	{
+		Frame: (0,102) - (15,114)
+		Caption: "Z"
+	}
+	component "ATL_EZInput" is "Text Box"
+	{
+		Frame: (17,102) - (75,114)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterATLEZ
+			signalTextBoxLostFocus -> parteditSink::SetATLEndZ
+		}
+	}
+
+
+
+
+
+
+	component "ATL_WeightLabel" is "Label"
+	{
+		Frame: (0,210) - (15,222)
+		Caption: "Wt"
+	}
+	component "ATL_WeightInput" is "Text Box"
+	{
+		Frame: (17,210) - (75,222)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterATLWeight
+			signalTextBoxLostFocus -> parteditSink::SetATLWeight
+		}
+	}
+  
+  
+
+  
+  }
+
+  component "ATBoxGroup" is "Group Frame"
+  {
+	Frame: (158,0) - (235,230)
+	Style: wfsNormal
+	Caption: "Box"
+
+	component "ATB_MinLabel" is "Label"
+	{
+		Frame: (0,14) - (75,26)
+		Caption: "Min"
+	}
+	component "ATB_MXLabel" is "Label"
+	{
+		Frame: (0,28) - (15,40)
+		Caption: "X"
+	}
+	component "ATB_MXInput" is "Text Box"
+	{
+		Frame: (17,28) - (75,40)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterATBMX
+			signalTextBoxLostFocus -> parteditSink::SetATBMinX
+		}
+	}
+
+	component "ATB_MYLabel" is "Label"
+	{
+		Frame: (0,40) - (15,52)
+		Caption: "Y"
+	}
+	component "ATB_MYInput" is "Text Box"
+	{
+		Frame: (17,40) - (75,52)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterATBMY
+			signalTextBoxLostFocus -> parteditSink::SetATBMinY
+		}
+	}
+
+	component "ATB_MZLabel" is "Label"
+	{
+		Frame: (0,52) - (15,64)
+		Caption: "Z"
+	}
+	component "ATB_MZInput" is "Text Box"
+	{
+		Frame: (17,52) - (75,64)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterATBMZ
+			signalTextBoxLostFocus -> parteditSink::SetATBMinZ
+		}
+	}
+
+
+
+	component "ATB_MaxLabel" is "Label"
+	{
+		Frame: (0,64) - (75,76)
+		Caption: "Max"
+	}
+	component "ATB_XXLabel" is "Label"
+	{
+		Frame: (0,78) - (15,90)
+		Caption: "X"
+	}
+	component "ATB_XXInput" is "Text Box"
+	{
+		Frame: (17,78) - (75,90)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterATBXX
+			signalTextBoxLostFocus -> parteditSink::SetATBMaxX
+		}
+	}
+
+	component "ATB_XYLabel" is "Label"
+	{
+		Frame: (0,90) - (15,102)
+		Caption: "Y"
+	}
+	component "ATB_XYInput" is "Text Box"
+	{
+		Frame: (17,90) - (75,102)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterATBXY
+			signalTextBoxLostFocus -> parteditSink::SetATBMaxY
+		}
+	}
+
+	component "ATB_XZLabel" is "Label"
+	{
+		Frame: (0,102) - (15,114)
+		Caption: "Z"
+	}
+	component "ATB_XZInput" is "Text Box"
+	{
+		Frame: (17,102) - (75,114)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterATBXZ
+			signalTextBoxLostFocus -> parteditSink::SetATBMaxZ
+		}
+	}
+
+
+
+
+
+
+	component "ATB_WeightLabel" is "Label"
+	{
+		Frame: (0,210) - (15,222)
+		Caption: "Wt"
+	}
+	component "ATB_WeightInput" is "Text Box"
+	{
+		Frame: (17,210) - (75,222)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterATBWeight
+			signalTextBoxLostFocus -> parteditSink::SetATBWeight
+		}
+	}
+
+  
+  }
+
+  component "ATSphereGroup" is "Group Frame"
+  {
+	Frame: (237,0) - (314,230)
+	Style: wfsNormal
+	Caption: "Sphere"
+
+	component "ATS_CenterLabel" is "Label"
+	{
+		Frame: (0,14) - (75,26)
+		Caption: "Center"
+	}
+	component "ATS_CXLabel" is "Label"
+	{
+		Frame: (0,28) - (15,40)
+		Caption: "X"
+	}
+	component "ATS_CXInput" is "Text Box"
+	{
+		Frame: (17,28) - (75,40)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterATSCX
+			signalTextBoxLostFocus -> parteditSink::SetATSCenterX
+		}
+	}
+
+	component "ATS_CYLabel" is "Label"
+	{
+		Frame: (0,40) - (15,52)
+		Caption: "Y"
+	}
+	component "ATS_CYInput" is "Text Box"
+	{
+		Frame: (17,40) - (75,52)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterATSCY
+			signalTextBoxLostFocus -> parteditSink::SetATSCenterY
+		}
+	}
+
+	component "ATS_CZLabel" is "Label"
+	{
+		Frame: (0,52) - (15,64)
+		Caption: "Z"
+	}
+	component "ATS_CZInput" is "Text Box"
+	{
+		Frame: (17,52) - (75,64)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterATSCZ
+			signalTextBoxLostFocus -> parteditSink::SetATSCenterZ
+		}
+	}
+
+
+
+	component "ATS_MinLabel" is "Label"
+	{
+		Frame: (0,64) - (75,76)
+		Caption: "Min"
+	}
+	component "ATS_MinInput" is "Text Box"
+	{
+		Frame: (17,78) - (75,90)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterATSMin
+			signalTextBoxLostFocus -> parteditSink::SetATSMin
+		}
+	}
+
+	component "ATS_MaxLabel" is "Label"
+	{
+		Frame: (0,92) - (75,104)
+		Caption: "Max"
+	}
+	component "ATS_MaxInput" is "Text Box"
+	{
+		Frame: (17,106) - (75,118)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterATSMax
+			signalTextBoxLostFocus -> parteditSink::SetATSMax
+		}
+	}
+
+
+
+
+
+
+
+
+	component "ATS_WeightLabel" is "Label"
+	{
+		Frame: (0,210) - (15,222)
+		Caption: "Wt"
+	}
+	component "ATS_WeightInput" is "Text Box"
+	{
+		Frame: (17,210) - (75,222)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterATSWeight
+			signalTextBoxLostFocus -> parteditSink::SetATSWeight
+		}
+	}
+
+  
+  }
+  
+  component "ATConeGroup" is "Group Frame"
+  {
+	Frame: (316,0) - (393,230)
+	Style: wfsNormal
+	Caption: "Cone"
+
+	component "ATCN_OriginLabel" is "Label"
+	{
+		Frame: (0,14) - (75,26)
+		Caption: "Origin"
+	}
+	component "ATCN_OXLabel" is "Label"
+	{
+		Frame: (0,28) - (15,40)
+		Caption: "X"
+	}
+	component "ATCN_OXInput" is "Text Box"
+	{
+		Frame: (17,28) - (75,40)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterATCNOX
+			signalTextBoxLostFocus -> parteditSink::SetATCNOriginX
+		}
+	}
+
+	component "ATCN_OYLabel" is "Label"
+	{
+		Frame: (0,40) - (15,52)
+		Caption: "Y"
+	}
+	component "ATCN_OYInput" is "Text Box"
+	{
+		Frame: (17,40) - (75,52)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterATCNOY
+			signalTextBoxLostFocus -> parteditSink::SetATCNOriginY
+		}
+	}
+
+	component "ATCN_OZLabel" is "Label"
+	{
+		Frame: (0,52) - (15,64)
+		Caption: "Z"
+	}
+	component "ATCN_OZInput" is "Text Box"
+	{
+		Frame: (17,52) - (75,64)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterATCNOZ
+			signalTextBoxLostFocus -> parteditSink::SetATCNOriginZ
+		}
+	}
+
+
+
+	component "ATCN_ElevationLabel" is "Label"
+	{
+		Frame: (0,64) - (75,76)
+		Caption: "Elevation"
+	}
+	component "ATCN_ElevInput" is "Text Box"
+	{
+		Frame: (17,78) - (75,90)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterATCNElev
+			signalTextBoxLostFocus -> parteditSink::SetATCNElev
+		}
+	}
+
+	component "ATCN_AzimuthLabel" is "Label"
+	{
+		Frame: (0,92) - (75,104)
+		Caption: "Azimuth"
+	}
+	component "ATCN_AzimInput" is "Text Box"
+	{
+		Frame: (17,106) - (75,118)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterATCNAzim
+			signalTextBoxLostFocus -> parteditSink::SetATCNAzim
+		}
+	}
+
+	component "ATCN_ApertureLabel" is "Label"
+	{
+		Frame: (0,120) - (75,132)
+		Caption: "Aperture"
+	}
+	component "ATCN_AperInput" is "Text Box"
+	{
+		Frame: (17,134) - (75,146)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterATCNAper
+			signalTextBoxLostFocus -> parteditSink::SetATCNAper
+		}
+	}
+
+	component "ATCN_MinLabel" is "Label"
+	{
+		Frame: (0,148) - (75,160)
+		Caption: "Min"
+	}
+	component "ATCN_MinInput" is "Text Box"
+	{
+		Frame: (17,162) - (75,174)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterATCNMin
+			signalTextBoxLostFocus -> parteditSink::SetATCNMin
+		}
+	}
+
+	component "ATCN_MaxLabel" is "Label"
+	{
+		Frame: (0,176) - (75,188)
+		Caption: "Max"
+	}
+	component "ATCN_MaxInput" is "Text Box"
+	{
+		Frame: (17,190) - (75,202)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterATCNMax
+			signalTextBoxLostFocus -> parteditSink::SetATCNMax
+		}
+	}
+	
+	
+	
+	
+
+
+
+
+
+
+	component "ATCN_WeightLabel" is "Label"
+	{
+		Frame: (0,210) - (15,222)
+		Caption: "Wt"
+	}
+	component "ATCN_WeightInput" is "Text Box"
+	{
+		Frame: (17,210) - (75,222)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterATCNWeight
+			signalTextBoxLostFocus -> parteditSink::SetATCNWeight
+		}
+	}
+
+  
+  }
+  
+  component "ATCylinderGroup" is "Group Frame"
+  {
+	Frame: (395,0) - (472,230)
+	Style: wfsNormal
+	Caption: "Cylinder"
+  
+	component "ATCY_StartLabel" is "Label"
+	{
+		Frame: (0,14) - (75,26)
+		Caption: "Start"
+	}
+	component "ATCY_SXLabel" is "Label"
+	{
+		Frame: (0,28) - (15,40)
+		Caption: "X"
+	}
+	component "ATCY_SXInput" is "Text Box"
+	{
+		Frame: (17,28) - (75,40)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterATCYSX
+			signalTextBoxLostFocus -> parteditSink::SetATCYStartX
+		}
+	}
+
+	component "ATCY_SYLabel" is "Label"
+	{
+		Frame: (0,40) - (15,52)
+		Caption: "Y"
+	}
+	component "ATCY_SYInput" is "Text Box"
+	{
+		Frame: (17,40) - (75,52)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterATCYSY
+			signalTextBoxLostFocus -> parteditSink::SetATCYStartY
+		}
+	}
+
+	component "ATCY_SZLabel" is "Label"
+	{
+		Frame: (0,52) - (15,64)
+		Caption: "Z"
+	}
+	component "ATCY_SZInput" is "Text Box"
+	{
+		Frame: (17,52) - (75,64)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterATCYSZ
+			signalTextBoxLostFocus -> parteditSink::SetATCYStartZ
+		}
+	}
+
+
+
+	component "ATCY_EndLabel" is "Label"
+	{
+		Frame: (0,64) - (75,76)
+		Caption: "End"
+	}
+	component "ATCY_EXLabel" is "Label"
+	{
+		Frame: (0,78) - (15,90)
+		Caption: "X"
+	}
+	component "ATCY_EXInput" is "Text Box"
+	{
+		Frame: (17,78) - (75,90)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegATCYEX
+			signalTextBoxLostFocus -> parteditSink::SetATCYEndX
+		}
+	}
+
+	component "ATCY_EYLabel" is "Label"
+	{
+		Frame: (0,90) - (15,102)
+		Caption: "Y"
+	}
+	component "ATCY_EYInput" is "Text Box"
+	{
+		Frame: (17,90) - (75,102)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterATCYEY
+			signalTextBoxLostFocus -> parteditSink::SetATCYEndY
+		}
+	}
+
+	component "ATCY_EZLabel" is "Label"
+	{
+		Frame: (0,102) - (15,114)
+		Caption: "Z"
+	}
+	component "ATCY_EZInput" is "Text Box"
+	{
+		Frame: (17,102) - (75,114)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterATCYEZ
+			signalTextBoxLostFocus -> parteditSink::SetATCYEndZ
+		}
+	}
+
+
+	component "ATCY_MinLabel" is "Label"
+	{
+		Frame: (0,116) - (75,128)
+		Caption: "Min"
+	}
+	component "ATCY_MinInput" is "Text Box"
+	{
+		Frame: (17,130) - (75,142)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterATCYMin
+			signalTextBoxLostFocus -> parteditSink::SetATCYMin
+		}
+	}
+
+	component "ATCY_MaxLabel" is "Label"
+	{
+		Frame: (0,144) - (75,156)
+		Caption: "Max"
+	}
+	component "ATCY_MaxInput" is "Text Box"
+	{
+		Frame: (17,158) - (75,170)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterATCYMax
+			signalTextBoxLostFocus -> parteditSink::SetATCYMax
+		}
+	}
+
+
+
+
+
+	component "ATCY_WeightLabel" is "Label"
+	{
+		Frame: (0,210) - (15,222)
+		Caption: "Wt"
+	}
+	component "ATCY_WeightInput" is "Text Box"
+	{
+		Frame: (17,210) - (75,222)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterATCYWeight
+			signalTextBoxLostFocus -> parteditSink::SetATCYWeight
+		}
+	}
+  
+  
+  }
+  
+  component "ATSphereTangentGroup" is "Group Frame"
+  {
+	Frame: (474,0) - (551,230)
+	Style: wfsNormal
+	Caption: "SphereT"
+  
+	component "ATST_CenterLabel" is "Label"
+	{
+		Frame: (0,14) - (75,26)
+		Caption: "Center"
+	}
+	component "ATST_CXLabel" is "Label"
+	{
+		Frame: (0,28) - (15,40)
+		Caption: "X"
+	}
+	component "ATST_CXInput" is "Text Box"
+	{
+		Frame: (17,28) - (75,40)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegATSTCX
+			signalTextBoxLostFocus -> parteditSink::SetATSTCenterX
+		}
+	}
+
+	component "ATST_CYLabel" is "Label"
+	{
+		Frame: (0,40) - (15,52)
+		Caption: "Y"
+	}
+	component "ATST_CYInput" is "Text Box"
+	{
+		Frame: (17,40) - (75,52)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterATSTCY
+			signalTextBoxLostFocus -> parteditSink::SetATSTCenterY
+		}
+	}
+
+	component "ATST_CZLabel" is "Label"
+	{
+		Frame: (0,52) - (15,64)
+		Caption: "Z"
+	}
+	component "ATST_CZInput" is "Text Box"
+	{
+		Frame: (17,52) - (75,64)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterATSTCZ
+			signalTextBoxLostFocus -> parteditSink::SetATSTCenterZ
+		}
+	}
+
+
+
+	component "ATST_MinLabel" is "Label"
+	{
+		Frame: (0,64) - (75,76)
+		Caption: "Min"
+	}
+	component "ATST_MinInput" is "Text Box"
+	{
+		Frame: (17,78) - (75,90)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterATSTMin
+			signalTextBoxLostFocus -> parteditSink::SetATSTMin
+		}
+	}
+
+	component "ATST_MaxLabel" is "Label"
+	{
+		Frame: (0,92) - (75,104)
+		Caption: "Max"
+	}
+	component "ATST_MaxInput" is "Text Box"
+	{
+		Frame: (17,106) - (75,118)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterATSTMax
+			signalTextBoxLostFocus -> parteditSink::SetATSTMax
+		}
+	}
+
+
+
+
+
+
+
+
+	component "ATST_WeightLabel" is "Label"
+	{
+		Frame: (0,210) - (15,222)
+		Caption: "Wt"
+	}
+	component "ATST_WeightInput" is "Text Box"
+	{
+		Frame: (17,210) - (75,222)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterATSTWeight
+			signalTextBoxLostFocus -> parteditSink::SetATSTWeight
+		}
+	}
+  
+  
+  }
+  
+  component "ATCylinderTangentGroup" is "Group Frame"
+  {
+	Frame: (553,0) - (630,230)
+	Style: wfsNormal
+	Caption: "CylinderT"
+  
+	component "ATCYT_StartLabel" is "Label"
+	{
+		Frame: (0,14) - (75,26)
+		Caption: "Start"
+	}
+	component "ATCYT_SXLabel" is "Label"
+	{
+		Frame: (0,28) - (15,40)
+		Caption: "X"
+	}
+	component "ATCYT_SXInput" is "Text Box"
+	{
+		Frame: (17,28) - (75,40)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterATCYTSX
+			signalTextBoxLostFocus -> parteditSink::SetATCYTStartX
+		}
+	}
+
+	component "ATCYT_SYLabel" is "Label"
+	{
+		Frame: (0,40) - (15,52)
+		Caption: "Y"
+	}
+	component "ATCYT_SYInput" is "Text Box"
+	{
+		Frame: (17,40) - (75,52)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterATCYTSY
+			signalTextBoxLostFocus -> parteditSink::SetATCYTStartY
+		}
+	}
+
+	component "ATCYT_SZLabel" is "Label"
+	{
+		Frame: (0,52) - (15,64)
+		Caption: "Z"
+	}
+	component "ATCYT_SZInput" is "Text Box"
+	{
+		Frame: (17,52) - (75,64)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterATCYTSZ
+			signalTextBoxLostFocus -> parteditSink::SetATCYTStartZ
+		}
+	}
+
+
+
+	component "ATCYT_EndLabel" is "Label"
+	{
+		Frame: (0,64) - (75,76)
+		Caption: "End"
+	}
+	component "ATCYT_EXLabel" is "Label"
+	{
+		Frame: (0,78) - (15,90)
+		Caption: "X"
+	}
+	component "ATCYT_EXInput" is "Text Box"
+	{
+		Frame: (17,78) - (75,90)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterATCYTEX
+			signalTextBoxLostFocus -> parteditSink::SetATCYTEndX
+		}
+	}
+
+	component "ATCYT_EYLabel" is "Label"
+	{
+		Frame: (0,90) - (15,102)
+		Caption: "Y"
+	}
+	component "ATCYT_EYInput" is "Text Box"
+	{
+		Frame: (17,90) - (75,102)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterATCYTEY
+			signalTextBoxLostFocus -> parteditSink::SetATCYTEndY
+		}
+	}
+
+	component "ATCYT_EZLabel" is "Label"
+	{
+		Frame: (0,102) - (15,114)
+		Caption: "Z"
+	}
+	component "ATCYT_EZInput" is "Text Box"
+	{
+		Frame: (17,102) - (75,114)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterATCYTEZ
+			signalTextBoxLostFocus -> parteditSink::SetATCYTEndZ
+		}
+	}
+
+
+	component "ATCYT_MinLabel" is "Label"
+	{
+		Frame: (0,116) - (75,128)
+		Caption: "Min"
+	}
+	component "ATCYT_MinInput" is "Text Box"
+	{
+		Frame: (17,130) - (75,142)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterATCYTMin
+			signalTextBoxLostFocus -> parteditSink::SetATCYTMin
+		}
+	}
+
+	component "ATCYT_MaxLabel" is "Label"
+	{
+		Frame: (0,144) - (75,156)
+		Caption: "Max"
+	}
+	component "ATCYT_MaxInput" is "Text Box"
+	{
+		Frame: (17,158) - (75,170)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterATCYTMax
+			signalTextBoxLostFocus -> parteditSink::SetATCYTMax
+		}
+	}
+
+
+
+
+
+	component "ATCYT_WeightLabel" is "Label"
+	{
+		Frame: (0,210) - (15,222)
+		Caption: "Wt"
+	}
+	component "ATCYT_WeightInput" is "Text Box"
+	{
+		Frame: (17,210) - (75,222)
+		
+		connect
+		{
+			signalComponentCreated -> parteditSink::RegisterATCYTWeight
+			signalTextBoxLostFocus -> parteditSink::SetATCYTWeight
+		}
+	}
+  
+  
+  }
+
+
+}
+

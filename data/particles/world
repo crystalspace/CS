@@ -1,0 +1,322 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<world>
+  <plugins>
+    <plugin name="thingFact">crystalspace.mesh.loader.factory.thing</plugin>
+    <plugin name="thing">crystalspace.mesh.loader.thing</plugin>
+    <plugin name="genmeshFactory">crystalspace.mesh.loader.factory.genmesh</plugin>
+    <plugin name="genmesh">crystalspace.mesh.loader.genmesh</plugin>
+  </plugins>
+
+  <textures>
+	<texture name="brick">
+		<file>/lib/stdtex/oldbrick.jpg</file>
+    </texture>
+	<texture name="dot">
+		<file>dot.png</file>
+	</texture>
+  </textures>
+
+  <shaders>
+    <shader><file>/shader/ambient.xml</file></shader>
+    <shader><file>/shader/light.xml</file></shader>
+	<shader><file>/shader/particle_basic.xml</file></shader>
+  </shaders>
+
+  <materials>
+	  <material name="walls">
+		<texture>brick</texture>
+	    <shader type="ambient">ambient</shader>
+		<shader type="diffuse">light</shader>
+	  </material>
+	  <material name="particle">
+	    <texture>dot</texture>
+		<shader type="particles">particle_basic</shader>
+	  </material>
+  </materials>
+
+  <addon>
+    <plugin>crystalspace.renderloop.loop.loader</plugin>
+    <params>
+      <name>myLoop</name>
+      <steps>
+        <!-- ambient lighting -->
+        <step plugin="crystalspace.renderloop.step.generic">
+          <shadertype>ambient</shadertype>
+          <zoffset>yes</zoffset>
+	  <portaltraversal />
+          <zuse />
+        </step>
+        <step plugin="crystalspace.renderloop.step.lightiter">
+          <steps>
+	        <step plugin="crystalspace.renderloop.step.generic">
+	          <shadertype>diffuse</shadertype>
+	          <zoffset>no</zoffset>
+	          <ztest />
+	        </step>
+	  </steps>
+        </step>
+        <step plugin="crystalspace.renderloop.step.generic">
+          <shadertype>particles</shadertype>
+          <zoffset>no</zoffset>
+          <zuse />
+        </step>
+      </steps>
+    </params>
+  </addon>
+    
+  <settings>
+    <clearzbuf>yes</clearzbuf>
+    <lightmapcellsize>16</lightmapcellsize>
+    <renderloop>myLoop</renderloop>
+  </settings>
+
+  <start>
+    <sector>room</sector>
+    <position x="0" y="5" z="0" />
+    <forward x="0" y="0" z="1" />
+    <up x="0" y="1" z="0" />
+  </start>
+
+  <meshfact name="f">
+    <plugin>genmeshFactory</plugin>
+    <params>
+      <numtri>2</numtri>
+      <numvt>4</numvt>
+      <v x="-10" y="10" z="10" u="1.000" v="0.000" />
+      <v x="10" y="10" z="10" u="0.000" v="0.000" />
+      <v x="-10" y="0" z="10" u="1.000" v="1.000" />
+      <v x="10" y="0" z="10" u="0.000" v="1.000" />
+      <t v1="0" v2="1" v3="2" />
+      <t v1="3" v2="2" v3="1" />
+      <autonormals />
+    </params>
+  </meshfact>
+  <meshfact name="b">
+    <plugin>genmeshFactory</plugin>
+    <params>
+      <numtri>2</numtri>
+      <numvt>4</numvt>
+      <v x="10" y="0" z="-10" u="1.000" v="1.000" />
+      <v x="10" y="10" z="-10" u="1.000" v="0.000" />
+      <v x="-10" y="0" z="-10" u="0.000" v="1.000" />
+      <v x="-10" y="10" z="-10" u="0.000" v="0.000" />
+      <t v1="0" v2="1" v3="2" />
+      <t v1="3" v2="2" v3="1" />
+      <autonormals />
+    </params>
+  </meshfact>
+  <meshfact name="d">
+    <plugin>genmeshFactory</plugin>
+    <params>
+      <numtri>2</numtri>
+      <numvt>4</numvt>
+      <v x="10" y="0" z="10" u="1.000" v="1.000" />
+      <v x="10" y="0" z="-10" u="1.000" v="0.000" />
+      <v x="-10" y="0" z="10" u="0.000" v="1.000" />
+      <v x="-10" y="0" z="-10" u="0.000" v="0.000" />
+      <t v1="0" v2="1" v3="2" />
+      <t v1="3" v2="2" v3="1" />
+      <autonormals />
+    </params>
+  </meshfact>
+  <meshfact name="l">
+    <plugin>genmeshFactory</plugin>
+    <params>
+      <numtri>2</numtri>
+      <numvt>4</numvt>
+      <v x="10" y="10" z="10" u="1.000" v="0.000" />
+      <v x="10" y="10" z="-10" u="0.000" v="0.000" />
+      <v x="10" y="0" z="10" u="1.000" v="1.000" />
+      <v x="10" y="0" z="-10" u="0.000" v="1.000" />
+      <t v1="0" v2="1" v3="2" />
+      <t v1="3" v2="2" v3="1" />
+      <autonormals />
+    </params>
+  </meshfact>
+  <meshfact name="u">
+    <plugin>genmeshFactory</plugin>
+    <params>
+      <numtri>2</numtri>
+      <numvt>4</numvt>
+      <v x="-10" y="10" z="10" u="1.000" v="1.000" />
+      <v x="-10" y="10" z="-10" u="1.000" v="0.000" />
+      <v x="10" y="10" z="10" u="0.000" v="1.000" />
+      <v x="10" y="10" z="-10" u="0.000" v="0.000" />
+      <t v1="0" v2="1" v3="2" />
+      <t v1="3" v2="2" v3="1" />
+      <autonormals />
+    </params>
+  </meshfact>
+  <meshfact name="r">
+    <plugin>genmeshFactory</plugin>
+    <params>
+      <numtri>2</numtri>
+      <numvt>4</numvt>
+      <v x="-10" y="0" z="10" u="0.000" v="1.000" />
+      <v x="-10" y="0" z="-10" u="1.000" v="1.000" />
+      <v x="-10" y="10" z="10" u="0.000" v="0.000" />
+      <v x="-10" y="10" z="-10" u="1.000" v="0.000" />
+      <t v1="0" v2="1" v3="2" />
+      <t v1="3" v2="2" v3="1" />
+      <autonormals />
+    </params>
+  </meshfact>
+	<meshfact name="fountainFACT">
+	  <plugin>crystalspace.mesh.loader.factory.particles</plugin>
+	    <params>
+		  <emitter type="sphere">
+			<time>300</time>
+			<innerradius>0.01</innerradius>
+			<outerradius>0.03</outerradius>
+		    <force type="linear">
+			  <direction x="0.5" y="1" z="0"/>
+  			  <amount>10</amount>
+			  <range>3.0</range>
+			  <falloff>linear</falloff>
+		    </force>
+		  </emitter>
+		  <dampener>0.1</dampener>
+		  <mass>5</mass>
+		  <massvariation>2.5</massvariation>
+		  <pps>50</pps>
+		  <initial>0</initial>
+		  <gravity x="0" y="-1" z="0"/>
+		  <diffusion>0.1</diffusion>
+		  <radius>0.1</radius>
+		  <ttl>5</ttl>
+		  <zsort>yes</zsort>
+		  <timevariation>0.5</timevariation>
+		  <colormethod type="linear">
+  		    <gradient>
+			  <color red="0" green="0" blue="1"/>
+			  <color red="0" green="0.5" blue="1"/>
+			  <color red="1" green="1" blue="1"/>
+		    </gradient>
+	      </colormethod>
+	  </params>
+	</meshfact>
+	<meshfact name="fireFACT">
+	  <plugin>crystalspace.mesh.loader.factory.particles</plugin>
+	    <params>
+		  <emitter type="sphere">
+			<time>300</time>
+			<innerradius>0.1</innerradius>
+			<outerradius>0.3</outerradius>
+		    <force type="linear">
+			  <direction x="0" y="1" z="0"/>
+			  <amount>20</amount>
+			  <range>1.0</range>
+			  <falloff>linear</falloff>
+		    </force>
+		  </emitter>
+		  <dampener>3.0</dampener>
+		  <mass>1</mass>
+		  <pps>300</pps>
+		  <initial>0</initial>
+		  <gravity x="0" y="-1.0" z="0"/>
+		  <diffusion>1.0</diffusion>
+		  <radius>0.3</radius>
+		  <ttl>1</ttl>
+		  <zsort>yes</zsort>
+		  <timevariation>0.5</timevariation>
+		  <colormethod type="linear">
+		    <gradient>
+			  <color red="1.00" green="0.35" blue="0.00" alpha="0" />
+   			  <color red="1.00" green="0.32" blue="0.00" alpha=".1" />
+			  <color red="1.00" green="0.22" blue="0.00" alpha=".3" />
+			  <color red="0.80" green="0.12" blue="0.00" alpha=".8" />
+			  <color red="0.60" green="0.00" blue="0.00" alpha=".9" />
+			  <color red="0.40" green="0.00" blue="0.00" alpha=".97" />
+			  <color red="0.20" green="0.00" blue="0.00" alpha="1" />
+			  <color red="0.00" green="0.00" blue="0.00" alpha="1" />
+			  <color red="0.00" green="0.00" blue="0.00" alpha="1" />
+		    </gradient>
+		</colormethod>
+	  </params>
+	</meshfact>
+
+  <sector name="room">
+    <light name="sun">
+	  <center x="5" y="5" z="5" />
+      <radius>0</radius>
+      <color red="1" green="1" blue="1" />
+      <influenceradius>30</influenceradius>
+      <attenuation>realistic</attenuation>
+    </light>
+
+    <meshobj name="u">
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>u</factory>
+	<material>walls</material>
+      </params>
+      <priority>wall</priority>
+    </meshobj>
+    <meshobj name="d">
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>d</factory>
+	<material>walls</material>
+      </params>
+      <priority>wall</priority>
+    </meshobj>
+    <meshobj name="l">
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>l</factory>
+	<material>walls</material>
+      </params>
+      <priority>wall</priority>
+    </meshobj>
+    <meshobj name="r">
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>r</factory>
+	<material>walls</material>
+      </params>
+      <priority>wall</priority>
+    </meshobj>
+    <meshobj name="f">
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>f</factory>
+	<material>walls</material>
+      </params>
+      <priority>wall</priority>
+    </meshobj>
+    <meshobj name="b">
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>b</factory>
+	<material>walls</material>
+      </params>
+      <priority>wall</priority>
+    </meshobj>
+	<meshobj name="fountain">
+	  <plugin>crystalspace.mesh.loader.particles</plugin>
+	  <params>
+		<factory>fountainFACT</factory>
+		<material>particle</material>
+	  </params>
+	  <move>
+		<v x="-2.5" y="1" z="5"/>
+	  </move>
+      <priority>alpha</priority>
+      <ztest/>
+	</meshobj>
+	<meshobj name="fire">
+		<plugin>crystalspace.mesh.loader.particles</plugin>
+		<params>
+			<factory>fireFACT</factory>
+			<material>particle</material>
+		</params>
+		<move>
+			<v x="0" y="1" z="7"/>
+		</move>
+      <priority>alpha</priority>
+      <ztest/>
+	</meshobj>
+  </sector>
+
+</world>
+

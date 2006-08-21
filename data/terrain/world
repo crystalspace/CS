@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<world>
+  <plugins>
+    <plugin name="thingFact">crystalspace.mesh.loader.factory.thing</plugin>
+    <plugin name="thing">crystalspace.mesh.loader.thing</plugin>
+    <plugin name="genmeshFactory">crystalspace.mesh.loader.factory.genmesh</plugin>
+    <plugin name="genmesh">crystalspace.mesh.loader.genmesh</plugin>
+    <plugin name="terrainFact">crystalspace.mesh.loader.factory.terrain</plugin>
+    <plugin name="terrain">crystalspace.mesh.loader.terrain</plugin>
+  </plugins>
+
+  <textures>
+    <texture name="andrew_marble4.jpg">
+      <file>/lib/stdtex/andrew_marble4.jpg</file>
+    </texture>
+    <texture name="blobbyDOT3.png">
+      <file>/lib/stdtex/blobbyDOT3.png</file>
+      <class>normalmap</class>
+    </texture>
+    <texture name="stone4.gif">
+      <file>/lib/std/stone4.gif</file>
+    </texture>
+    <texture name="stone2DOT3.png">
+      <file>/lib/stdtex/stone2DOT3.png</file>
+      <class>normalmap</class>
+    </texture>
+    <texture name="grass.png">
+      <file>/lev/terrain/grass.png</file>
+    </texture>
+    <texture name="grassDOT3.png">
+      <file>/lev/terrain/grassDOT3.png</file>
+      <class>normalmap</class>
+    </texture>
+    <texture name="basemap">
+      <file>/lev/terrain/materialmap_base.png</file>
+    </texture>
+    <texture name="base_normalmap">
+      <file>/lev/terrain/normalmap.png</file>
+      <class>normalmap</class>
+    </texture>
+  </textures>
+
+  <shaders>
+    <shader><file>/shader/sky_scattering.xml</file></shader>
+    <shader><file>/shader/splatting_base.xml</file></shader>
+    <shader><file>/shader/splatting_scattering_base.xml</file></shader>
+    <shader><file>/shader/splatting_bump.xml</file></shader>
+    <shader><file>/shader/splatting_scattering.xml</file></shader>
+  </shaders>
+
+  <materials>
+    <material name="ScatterSky">
+      <color red="0" green="0" blue="0" /> 
+
+      <shadervar type='vector3' name="sky base color">0.0,0.1,0.2</shadervar>
+      <shadervar type='vector3' name="sky sun-glow color">0.9,0.3,0.01</shadervar>
+      <shadervar type='float' name="sky sun size">0.004</shadervar>
+
+      <shader type="ambient">sky_scattering</shader>
+    </material>
+    <material name="Base">
+      <texture>basemap</texture>
+      <shadervar name="tex normal" type="texture">base_normalmap</shadervar>
+
+      <shadervar type='vector4' name="scatter sun color">0.90,0.10,0.10,0.01</shadervar>
+      <shadervar type='vector3' name="scatter color">0.06,0.05,0.04</shadervar>
+      <shadervar type='vector3' name="scatter ground glow">0.04,0.03,0.01</shadervar>
+      <shadervar type='vector3' name="scatter world color">0.7,0.3,0.30</shadervar>
+
+      <shader type="ambient">splatting_scattering_base</shader>
+    </material>
+    <material name="Marble">
+      <texture>andrew_marble4.jpg</texture>
+      <shadervar name="tex normal" type="texture">blobbyDOT3.png</shadervar>
+      <shadervar name="texture scale" type="vector2">16,16</shadervar>
+      <shadervar name="normal scale" type="vector2">64,64</shadervar>
+      <!-- <shader type="diffuse">splatting_bump</shader> -->
+      <shader type="terrain splat">splatting_scattering</shader>
+    </material>
+    <material name="Stone">
+      <texture>stone4.gif</texture>
+      <shadervar name="tex normal" type="texture">stone2DOT3.png</shadervar>
+      <shadervar name="texture scale" type="vector2">64,64</shadervar>
+      <!-- <shader type="diffuse">splatting_bump</shader> -->
+      <shader type="terrain splat">splatting_scattering</shader>
+    </material>
+    <material name="Grass">
+      <texture>grass.png</texture>
+      <shadervar name="tex normal" type="texture">grassDOT3.png</shadervar>
+      <shadervar name="texture scale" type="vector2">16,16</shadervar>
+      <!-- <shader type="diffuse">splatting_bump</shader> -->
+      <shader type="terrain splat">splatting_scattering</shader>
+    </material>
+  </materials>
+
+  <addon>
+  	<plugin>crystalspace.renderloop.loop.loader</plugin>
+	<paramsfile>/shader/std_rloop_terrain.xml</paramsfile>
+  </addon>
+
+  <settings>
+    <clearzbuf>yes</clearzbuf>
+    <lightmapcellsize>16</lightmapcellsize>
+    <renderloop>std_rloop_terrain</renderloop>
+  </settings>
+
+  <start>
+    <sector>room</sector>
+    <position x="0" y="30" z="0" />
+    <forward x="0" y="0" z="1" />
+    <up x="0" y="1" z="0" />
+  </start>
+
+  <meshfact name="skydome">
+    <plugin>genmeshFactory</plugin>
+    <params>
+      <sphere rimvertices="64" reversed="true">
+	<radius x="500000" y="500000" z="500000" />
+      </sphere>
+    </params>
+  </meshfact>
+
+  <addon>
+    <plugin>crystalspace.terraformer.simple.loader</plugin>
+    <params>
+      <name>simple</name>
+      <!--heightmap>/lev/terrain/heightmap_257x257.png</heightmap-->
+      <heightmap>/lev/terrain/heightmap.png</heightmap>
+      <!--<heightmap image="/lev/terrain/heightmap_2049x2049.png"/>-->
+      <scale x="256" y="30" z="256" />
+      <materialmap image="/lev/terrain/materialmap.png" />
+    </params>
+  </addon>
+
+  <meshfact name="TerrainFact">
+    <plugin>terrainFact</plugin>
+    <params>
+      <plugin>crystalspace.mesh.object.terrain.bruteblock</plugin>
+      <terraformer>simple</terraformer>
+      <sampleregion>
+        <min x="-256" y="-256" />
+        <max x="256" y="256" />
+      </sampleregion>
+    </params>
+  </meshfact>
+
+  <sector name="room">
+    <light name="sun">
+      <center x="500000" y="866030" z="0" />
+      <radius>0</radius>
+      <color red="0.85903" green="0.80995" blue="0.70420" />
+      <influenceradius>10000000</influenceradius>
+      <attenuation>realistic</attenuation>
+    </light>
+
+    <meshobj name="sky">
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>skydome</factory>
+        <material>ScatterSky</material>
+        <color red="0" green="0" blue="0" />
+      </params>
+      <zfill />
+      <priority>sky</priority>
+      <camera />
+      <polymesh> <colldet/> </polymesh>
+    </meshobj>
+
+    <meshobj name="Terrain">
+      <plugin>terrain</plugin>
+      <params>
+        <factory>TerrainFact</factory>
+        <material>Base</material>
+	<materialpalette>
+	  <material>Grass</material>
+	  <material>Marble</material>
+	  <material>Stone</material>
+	</materialpalette>
+        <lodvalue name="splatting distance">200</lodvalue>
+        <lodvalue name="block resolution">16</lodvalue>
+        <lodvalue name="block split distance">8</lodvalue>
+        <lodvalue name="minimum block size">32</lodvalue>
+      </params>
+      <move> 
+        <v x="0" y="0" z="0" /> 
+      </move>
+    </meshobj>
+
+  </sector>
+    <sequences>
+        <sequence name="moveLight">
+	    <movelight light="sun" duration="5000"
+	      x="5000000" y="0" z="-6000000" />
+	    <delay time="5000" />
+	    <movelight light="sun" duration="5000"
+	      x="-5000000" y="0" z="6000000" />
+	    <delay time="5000" />
+	    <enable trigger="moveLight" />
+        </sequence>
+    </sequences>
+    <triggers>
+        <trigger name="moveLight">
+            <sectorvis sector="room" />
+            <fire delay="0" sequence="moveLight" />
+	</trigger>
+    </triggers>
+</world>
