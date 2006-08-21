@@ -6,6 +6,8 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+21-Aug-2006
+	- caedes added SCF_IMPLEMENT_FACTORY to movierecorder plugin.
 20-Aug-2006
 	- res added texture crossbar support to glshader_fixed.
 	- res fixed an initialization bug in engseq.
