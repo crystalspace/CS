@@ -364,6 +364,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ParticlesLoader)
         {
           return false;
         }
+        extent.Normalize ();
         break;
       case XMLTOKEN_CONEANGLE:
         coneAngle = child->GetContentsValueAsFloat ();

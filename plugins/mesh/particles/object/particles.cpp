@@ -556,7 +556,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
 
     float newRadiusSq = 0;
 
-    // Retire old particles, at same time recompute new radius
+    // Retire old particles
     size_t currentParticleIdx = 0;
     while (currentParticleIdx < particleBuffer.particleCount)
     {

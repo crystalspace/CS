@@ -166,13 +166,59 @@ The particle system have three basic parts
 @item Handling of emitters and effectors
 @end itemize
 
-
+Apart from this the particles plugin also contains some management code to keep
+everything together and interface the rest of CrystalSpace, as well as loading
+and saving from/to files.
 
 @subsubheading Particle update loop
+The main part of work related to particle creation and movement is done in the
+particle update loop. The update loop is called once per frame for every visible
+particle system.
+
+The steps of the update loop are:
+@enumerate
+@item Retirement of old particles. Particles time-to-live is decreased by current
+elapsed time, and those with zero or negative time-to-live are removed.
+@item Emission of new particles. The emitters are polled one at a time to emit
+their particles into the system.
+@item Apply physical (or non-physical) effects to particles. The effectors are
+ran one after another to apply their effect to the particles.
+@item Position and orientation integration. Depending on the integration setting
+no integration or integration of position or position and rotation is done.
+@end enumerate
 
 @anchor{Particles billboard setup}
 @subsubheading Particle billboard setup
+The second big part of particles plugin is the particle billboard setup. In 
+computations each particle is "point-like" however for rendering you have to
+give it an extent. 
+
+The particles plugin provides rendering in form of rectangular (quadratile) 
+areas of settable size and orientation relative to the camera.
+
+@table @samp
+@item camface
+The particle billboards always face the camera location, so the camea to particle
+vector is used as normal. The camera up vector is used as up-vector for the
+billboards.
+@item camface approx
+The billboards are aligned with the camera plane, and camera up and right
+vectors are used as billboard vectors. This is the default mode and the mode
+most other particle systems in Crystal Space have.
+@item common
+Use common up direction} as up vector for particle and as @samp{camface}
+face the camera properly. This makes the particles look like fixed around one
+axis.
+@item common approx
+Approximative version of @samp{common} mode. Common up direction is used
+as billboard up direction and camera forward vector as plane normal. This mode
+is equal to old @samp{Rain} particle system.
+@item velocity
+@item self
+@item self forward
+@end table
 
 @subsubheading Emitters
 
 @subsubheading Effectors
+ 
