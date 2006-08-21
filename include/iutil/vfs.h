@@ -581,6 +581,12 @@ struct iVFS : public virtual iBase
    * \return True if the loading succeeded, else false.
    */
   virtual bool LoadConfigFile(char const* VirtualPath, bool Mount = true) = 0;
+
+  /**
+   * Clean the VFS, removing all symbolic links and unmounting all directories.
+   * The VFS will be left in a state with only the root directory.
+   */
+  virtual bool Clean() = 0;
 };
 /** @} */
 

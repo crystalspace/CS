@@ -188,6 +188,9 @@ public:
   /// Load a VFS configuration File
   bool LoadConfigFile(char const* VirtualPath, bool Mount = true);
 
+  // Clean the VFS
+  bool Clean();
+
 protected:
 
   /// Mutex to make VFS thread-safe.
