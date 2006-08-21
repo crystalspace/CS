@@ -55,7 +55,6 @@ private:
   csFlags flags;
   csRef<iMeshObjectDrawCallback> vis_cb;
   iMeshWrapper* logparent;
-  csRef<iMaterialWrapper> material;
   csRef<csOpenTreeObjectFactory> factory;
 
   //use genmesh internally for now
@@ -131,7 +130,7 @@ public:
   virtual bool GetColor (csColor& col) const { return false; }
   virtual bool SetMaterialWrapper (iMaterialWrapper* mat);
   virtual iMaterialWrapper* GetMaterialWrapper () const
-  { return material; }
+  { return 0; }
   virtual void InvalidateMaterialHandles ()
   {
     // We visit our material all the time so this is not needed here.
@@ -157,6 +156,8 @@ private:
   iMeshFactoryWrapper* logparent;
   csFlags flags;
   csRef<iMeshObjectType> proto_type;
+
+  iMaterialWrapper **material;
 
   //flag if mesh was generated
   bool generated;
@@ -231,6 +232,8 @@ public:
 
   /**\name iOpenTreeFactoryState implementation
    * @{ */
+  bool SetMaterialWrapper (char level, iMaterialWrapper* mat);
+  iMaterialWrapper* GetMaterialWrapper (char level);
   bool SetParam (char, csStringID, float);
   bool SetParam (char, csStringID, int);
   bool SetParam (char, csStringID, const char*);

@@ -8,6 +8,9 @@ chronological order.
 
 This file describes the history of the SoC imposter branch.
 
+21-Aug-2006
+	- Fossi changed some details and improved update detection
+	- Final SoC version
 20-Aug-2006
 	- Fossi got the opentree mesh to show
 	- Fossi completed the first opentree plugin version

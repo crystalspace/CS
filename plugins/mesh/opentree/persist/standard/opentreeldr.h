@@ -47,6 +47,7 @@ class csOpenTreeFactoryLoader :
 private:
   iObjectRegistry* object_reg;
   csRef<iSyntaxService> synldr;
+  csRef<iVFS> vfs;
 
   csStringHash xmltokens;
 #define CS_TOKEN_ITEM_FILE \
@@ -54,6 +55,7 @@ private:
 #include "cstool/tokenlist.h"
 #undef CS_TOKEN_ITEM_FILE
 
+  bool ParseWeberFile (iDocumentNode* node, iOpenTreeFactoryState* fact);
   bool ParseSpecies (iDocumentNode* node, iOpenTreeFactoryState* fact);
   bool ParseLevel (iDocumentNode* node, iOpenTreeFactoryState* fact);
 

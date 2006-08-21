@@ -100,7 +100,6 @@ csOpenTreeObject::csOpenTreeObject
 {
   csOpenTreeObject::factory = factory;
   logparent = 0;
-  material = 0;
   MixMode = 0;
 
   csRef<iEngine> engine;
@@ -172,14 +171,11 @@ bool csOpenTreeObject::SetMaterialWrapper (char level, iMaterialWrapper* mat)
 
 iMaterialWrapper* csOpenTreeObject::GetMaterialWrapper (char level)
 {
-  //@@@
-  return material;
+  return 0;
 }
 
 bool csOpenTreeObject::SetMaterialWrapper (iMaterialWrapper* mat)
 {
-  //@@@
-  material = mat;
   treemesh->GetMeshObject ()->SetMaterialWrapper(mat);
   leafmesh->GetMeshObject ()->SetMaterialWrapper(mat);
   return true;
@@ -208,6 +204,8 @@ csOpenTreeObjectFactory::csOpenTreeObjectFactory (iMeshObjectType* pParent,
     scfQueryInterface<iGeneralFactoryState> (leaffact->GetMeshObjectFactory ());
 
   generated = false;
+
+  material = new iMaterialWrapper*[6];
 
   csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
     object_reg, "crystalspace.shared.stringset", iStringSet);
@@ -313,6 +311,9 @@ csPtr<iMeshObject> csOpenTreeObjectFactory::NewInstance ()
 
   csRef<csOpenTreeObject> cm;
   cm.AttachNew (new csOpenTreeObject (this));
+  csRef<iOpenTreeState> state = scfQueryInterface<iOpenTreeState> (cm);
+  state->SetMaterialWrapper(0, material[0]);
+  state->SetMaterialWrapper(5, material[5]);
 
   csRef<iMeshObject> im = scfQueryInterface<iMeshObject> (cm);
   return csPtr<iMeshObject> (im);
@@ -519,6 +520,17 @@ printf("leaf index count: %i ", triangleCount);
 
   generated = true;
   printf("done\n");
+}
+
+bool csOpenTreeObjectFactory::SetMaterialWrapper (char level, iMaterialWrapper* mat)
+{
+  material[level] = mat;
+  return true;
+}
+
+iMaterialWrapper* csOpenTreeObjectFactory::GetMaterialWrapper (char level)
+{
+  return material[level];
 }
 
 //----------------------------------------------------------------------

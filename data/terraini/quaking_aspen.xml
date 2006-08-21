@@ -1,5 +1,4 @@
 <?xml version="1.0"?>
-<params>
 <opentree>
     <species name="quaking_aspen">
         <LobeDepth>0.07</LobeDepth>
@@ -92,4 +91,3 @@
         </level>
     </species>
 </opentree>
-</params>

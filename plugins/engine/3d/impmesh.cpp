@@ -62,10 +62,19 @@ float csImposterMesh::CalcIncidenceAngleDist (iCamera *cam)
   csReversibleTransform objt = 
     (parent_mesh->GetCsMovable()).csMovable::GetTransform ();
   csReversibleTransform camt = cam->GetTransform ();
-  csReversibleTransform seg = objt / camt;  // Matrix Math Magic!
-  csVector3 straight(0,0,1);
-  csVector3 pt = seg * straight;
-  return csSquaredDist::PointPoint (straight, pt);
+  //csReversibleTransform seg = objt / camt;  // Matrix Math Magic!
+  csVector3 m2c = (objt.GetOrigin () - camt.GetOrigin ()).Unit ();
+  csVector3 objf = objt.GetT2O().Col3();
+  csVector3 camf = camt.GetT2O().Col3();
+  float anglecam = acosf ( camf * m2c );
+  float angleobj = acosf ( objf * m2c );
+  float angle = fabsf(anglecam) + fabsf(angleobj);
+
+  //printf("angle: %f %f %f\n",angleobj,anglecam, angle);
+  //csVector3 pt = seg * straight;
+  //csVector3 pt = (objforward * camforward).Unit();
+  //return csSquaredDist::PointPoint (straight, pt);
+  return angle;
 }
 
 bool csImposterMesh::CheckIncidenceAngle (iRenderView *rview, float tolerance)
@@ -73,10 +82,12 @@ bool csImposterMesh::CheckIncidenceAngle (iRenderView *rview, float tolerance)
   float const curdist = CalcIncidenceAngleDist(rview->GetCamera ());
   float diff = curdist - incidence_dist;
   if (diff < 0) diff = -diff;
+  //printf("diff: %f %f %f\n",diff ,incidence_dist, curdist);
 
   // If not ok, mark for redraw of imposter
   if (diff > tolerance)
   {
+    //printf("redraw\n!");
     SetImposterReady (false);
     return false;
   }

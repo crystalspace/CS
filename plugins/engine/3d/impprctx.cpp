@@ -50,7 +50,7 @@ csImposterProcTex::csImposterProcTex  (csEngine* engine,
   mesh = parent;
 
   //@@@ make dynamic
-  w = h = 512;
+  w = h = 256;
 
   int texFlags = CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS;
 
@@ -62,6 +62,7 @@ csImposterProcTex::csImposterProcTex  (csEngine* engine,
     CS_IMGFMT_ALPHA && CS_IMGFMT_TRUECOLOR );
   tex = engine->GetTextureList ()->NewTexture (thisImage);
   tex->SetFlags (tex->GetFlags() | texFlags);
+  tex->Register(g3d->GetTextureManager());
   thisImage = 0;
 
   csRef<iStringSet> stringSet = engine->globalStringSet;

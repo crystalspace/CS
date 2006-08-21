@@ -1,5 +1,4 @@
 <?xml version="1.0"?>
-<params>
 <opentree>
     <species name="brancaldra">
         <LeafStemLen>0.5</LeafStemLen>
@@ -89,4 +88,3 @@
         </level>
     </species>
 </opentree>
-</params>

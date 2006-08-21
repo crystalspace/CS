@@ -1,5 +1,4 @@
 <?xml version="1.0"?>
-<params>
 <opentree>
     <species name="black_tupelo">
         <RatioPower>1.3</RatioPower>
@@ -86,4 +85,3 @@
         </level>
     </species>
 </opentree>
-</params>

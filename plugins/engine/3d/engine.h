@@ -58,7 +58,6 @@
 #include "plugins/engine/3d/renderloop.h"
 #include "plugins/engine/3d/rview.h"
 #include "plugins/engine/3d/sharevar.h"
-#include "include\csutil\weakrefarr.h"
 #include "plugins/engine/3d/impprctx.h"
 
 class csCamera;

@@ -25,6 +25,7 @@
 #include "csutil/cscolor.h"
 #include "csutil/scanstr.h"
 #include "csutil/sysfunc.h"
+#include "csutil/xmltiny.h"
 #include "iengine/engine.h"
 #include "iengine/material.h"
 #include "iengine/mesh.h"
@@ -41,6 +42,7 @@
 #include "ivaria/reporter.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/rndbuf.h"
+#include "iutil/vfs.h"
 
 #include "opentreeldr.h"
 
@@ -66,6 +68,7 @@ bool csOpenTreeFactoryLoader::Initialize (iObjectRegistry* object_reg)
 {
   csOpenTreeFactoryLoader::object_reg = object_reg;
   synldr = csQueryRegistry<iSyntaxService> (object_reg);
+  vfs = csQueryRegistry<iVFS> (object_reg);
 
   InitTokenTable (xmltokens);
   return true;
@@ -120,16 +123,16 @@ bool csOpenTreeFactoryLoader::ParseLevel (iDocumentNode* node,
         {
           fact->SetParam (level, param, child->GetContentsValueAsFloat ());
         }
-	break;  
+	    break;  
       case XMLTOKEN_BRANCHES:
       case XMLTOKEN_CURVERES:
         {
           fact->SetParam (level, param ,child->GetContentsValueAsInt ());
         }
-	break;  
+	    break;  
       default:
-	synldr->ReportBadToken (child);
-	return 0;
+	      synldr->ReportBadToken (child);
+	      return false;
     }  
   }
 
@@ -177,7 +180,7 @@ bool csOpenTreeFactoryLoader::ParseSpecies (iDocumentNode* node,
         {
           fact->SetParam (-1, param ,child->GetContentsValueAsFloat ());
         }
-	break;
+	    break;
       case XMLTOKEN_LEAVES:
       case XMLTOKEN_SHAPE:
       case XMLTOKEN_LOBES:
@@ -186,7 +189,7 @@ bool csOpenTreeFactoryLoader::ParseSpecies (iDocumentNode* node,
         {
           fact->SetParam (-1, param ,child->GetContentsValueAsInt ());
         }
-	break;
+	    break;
       case XMLTOKEN_LEVEL:
         {
           if (!ParseLevel(child, fact))
@@ -198,8 +201,40 @@ bool csOpenTreeFactoryLoader::ParseSpecies (iDocumentNode* node,
       case XMLTOKEN_SMOOTH:
         break;
       default:
-	synldr->ReportBadToken (child);
-	return 0;
+	      synldr->ReportBadToken (child);
+	      return false;
+    }
+  }
+
+  return true;
+}
+
+
+bool csOpenTreeFactoryLoader::ParseWeberFile (iDocumentNode* node, 
+  iOpenTreeFactoryState* fact)
+{
+  csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
+    object_reg, "crystalspace.shared.stringset", iStringSet);
+
+  csRef<iDocumentNodeIterator> it = node->GetNodes ();
+  while (it->HasNext ())
+  {
+    csRef<iDocumentNode> child = it->Next ();
+    if (child->GetType () != CS_NODE_ELEMENT) continue;
+    const char* value = child->GetValue ();
+    csStringID id = xmltokens.Request (value);
+    
+    switch (id)
+    {
+      case XMLTOKEN_SPECIES:
+        {
+          if (!ParseSpecies(child, fact))
+            return false;
+        }
+	    break;
+      default:
+	      synldr->ReportBadToken (child);
+	      return false;
     }
   }
 
@@ -208,7 +243,7 @@ bool csOpenTreeFactoryLoader::ParseSpecies (iDocumentNode* node,
 
 csPtr<iBase> csOpenTreeFactoryLoader::Parse (iDocumentNode* node,
                                           iStreamSource*, 
-                                          iLoaderContext* /*ldr_context*/, 
+                                          iLoaderContext* ldr_context, 
                                           iBase* /* context */)
 {
   csRef<iPluginManager> plugin_mgr = 
@@ -233,10 +268,6 @@ csPtr<iBase> csOpenTreeFactoryLoader::Parse (iDocumentNode* node,
   fact = type->NewFactory ();
   state = scfQueryInterface<iOpenTreeFactoryState> (fact);
 
-
-  //check for wrapping opentree tag
-  csRef<iDocumentNode> opentreenode = 0;
-
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
   {
@@ -245,55 +276,59 @@ csPtr<iBase> csOpenTreeFactoryLoader::Parse (iDocumentNode* node,
     const char* value = child->GetValue ();
     csStringID id = xmltokens.Request (value);
 
-    if (id == XMLTOKEN_OPENTREE)
-    {
-      if (opentreenode != 0)
-      {
-        synldr->ReportError (
-                "crystalspace.opentreefactoryloader.parse.opentree",
-                node, "Parameterfile doesn't start with opentree tag");
-        return 0;
-      }
-      else opentreenode = child;
-    } 
-    else
-    {
-      synldr->ReportError (
-                "crystalspace.opentreefactoryloader.parse.opentree",
-                node, "Parameterfile doesn't start with opentree tag, ignored ");
-    }
-  }
-
-  if (opentreenode == 0)
-  {
-    synldr->ReportError (
-                "crystalspace.opentreefactoryloader.parse.opentree",
-                node, "no opentree tag found in file");
-    return 0;
-  }
-
-  it = opentreenode->GetNodes ();
-  while (it->HasNext ())
-  {
-    csRef<iDocumentNode> child = it->Next ();
-    if (child->GetType () != CS_NODE_ELEMENT) continue;
-    const char* value = child->GetValue ();
-    csStringID id = xmltokens.Request (value);
-    
     switch (id)
     {
-      case XMLTOKEN_SPECIES:
-        {
-          if (!ParseSpecies(child, state))
+      case XMLTOKEN_MATERIAL:
+	      {
+          const char* matname = child->GetContentsValue ();
+          iMaterialWrapper* mat = ldr_context->FindMaterial (matname);
+          if (!mat)
+          {
+            synldr->ReportError (
+                "crystalspace.opentreeloader.parse.unknownmaterial",
+                child, "Couldn't find material '%s'!", matname);
             return 0;
+          }
+          char level = (char)child->GetAttributeValueAsInt ("level");
+          state->SetMaterialWrapper (level, mat);
         }
-	break;
+	    break;
+      case XMLTOKEN_WEBERFILE:
+	      {
+          const char *fname = child->GetContentsValue ();
+          csRef<iFile> buf = vfs->Open (fname, VFS_FILE_READ);
+          if (!buf)
+          {
+            synldr->ReportError (
+              "crystalspace.maploader.parse.loadingfile",
+              child, "Error opening file '%s'!", child->GetContentsValue ());
+            return false;
+          }
+          csRef<iDocument> doc;
+          csRef<iDocumentSystem> docsys (csQueryRegistry<iDocumentSystem> (object_reg));
+          if (!docsys) docsys = csPtr<iDocumentSystem> (new csTinyDocumentSystem ());
+          doc = docsys->CreateDocument ();
+          const char* error = doc->Parse (buf, true);
+          if (error != 0) return 0;
+          if (doc)
+          {
+            csRef<iDocumentNode> otnode = doc->GetRoot ()->GetNode ("opentree");
+            if (!otnode)
+            {
+              synldr->ReportError (
+	              "crystalspace.maploader.parse.map",
+    	              child, "File is not valid opentree xml!");
+              return 0;
+            }
+            if (!ParseWeberFile(otnode, state)) return 0;
+          }
+        }
+	    break;
       default:
-	synldr->ReportBadToken (child);
-	return 0;
+        synldr->ReportBadToken (child);
+	    return 0;
     }
   }
-
   state->GenerateTree();
 
   return csPtr<iBase> (fact);
@@ -343,11 +378,11 @@ csPtr<iBase> csOpenTreeMeshLoader::Parse (iDocumentNode* node,
     switch (id)
     {
       case XMLTOKEN_COLOR:
-	{
-	}
-	break;
+	      {
+	      }
+	    break;
       case XMLTOKEN_FACTORY:
-	{
+	      {
           const char* factname = child->GetContentsValue ();
           iMeshFactoryWrapper* fact = ldr_context->FindMeshFactory (factname);
           if (!fact)
@@ -364,15 +399,15 @@ csPtr<iBase> csOpenTreeMeshLoader::Parse (iDocumentNode* node,
           {
             synldr->ReportError (
                 "crystalspace.opentreeloader.parse.badfactory",
-                child, "Factory '%s' doesn't appear to be a protomesh factory!",
+                child, "Factory '%s' doesn't appear to be an opentree factory!",
                 factname);
             return 0;
           }
 	
         }
-	break;
+	    break;
       case XMLTOKEN_MATERIAL:
-	{
+	    {
           const char* matname = child->GetContentsValue ();
           iMaterialWrapper* mat = ldr_context->FindMaterial (matname);
           if (!mat)
@@ -386,14 +421,14 @@ csPtr<iBase> csOpenTreeMeshLoader::Parse (iDocumentNode* node,
           char level = (char)child->GetAttributeValueAsInt ("level");
           meshstate->SetMaterialWrapper (level, mat);
         }
-	break;
+	    break;
       case XMLTOKEN_MIXMODE:
         {
-	}
-	break;
+	      }
+	    break;
       default:
         synldr->ReportBadToken (child);
-	return 0;
+	    return 0;
     }
   }
 

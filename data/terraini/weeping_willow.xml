@@ -1,5 +1,4 @@
 <?xml version="1.0"?>
-<params>
 <opentree>
     <species name="weeping_willow">
         <LobeDepth>0.03</LobeDepth>
@@ -104,4 +103,3 @@
         </level>
     </species>
 </opentree>
-</params>
