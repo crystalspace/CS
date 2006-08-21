@@ -17,11 +17,15 @@
     <texture name="grass.png">
       <file>/lev/terrain/grass.png</file>
     </texture>
+    <texture name="light.png">
+      <file>/lev/terraini/material.png</file>
+    </texture>
   </textures>
 
   <shaders>
     <shader><file>/lev/terraini/shader_base.xml</file></shader>
     <shader><file>/lev/terraini/shader_splat.xml</file></shader>
+    <shader><file>/lev/terraini/shader_light.xml</file></shader>
   </shaders>
 
   <materials>
@@ -36,6 +40,10 @@
     <material name="Stone">
       <texture>stone4.gif</texture>
       <shader type="terrain splat">terrain_improved_splatting</shader>
+    </material>
+    <material name="Light">
+      <texture>light.png</texture>
+      <shader type="terrain light">terrain_improved_lighting</shader>
     </material>
   </materials>
 
@@ -70,7 +78,7 @@
 
   <start>
     <sector>room</sector>
-    <position x="0" y="30" z="0" />
+    <position x="100" y="50" z="100" />
     <forward x="0" y="0" z="1" />
     <up x="0" y="1" z="0" />
   </start>
@@ -82,7 +90,7 @@
       <collider>crystalspace.mesh.object.terrainimproved.collider</collider>
 
       <cells>
-        <cell name="main">
+<!--        <cell name="main">
           <grid_size x="512" y="512" />
           <material_size x="64" y="64" />
           <position x="150" y="150" />
@@ -95,7 +103,7 @@
             <param name="sampleregion min" value="-256 -256" />
             <param name="sampleregion max" value="256 256" />
           </feeder>
-        </cell>
+        </cell>-->
 
         <cell>
           <grid_size x="33" y="33" />
@@ -183,6 +191,7 @@
           <material>Lava</material>
           <material>Stone</material>
           <material>Grass</material>
+          <material>Light</material>
         </materialpalette>
       </params>
       <move> 
