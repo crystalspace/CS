@@ -89,6 +89,8 @@
       <renderer>crystalspace.mesh.object.terrainimproved.bruteblockrenderer</renderer>
       <collider>crystalspace.mesh.object.terrainimproved.collider</collider>
 
+      <max_loaded_cells value="20" />
+
       <cells>
 <!--        <cell name="main">
           <grid_size x="512" y="512" />
