@@ -58,6 +58,9 @@ struct csSimpleTerrainRenderData: public csRefCount
   csArray<csRef<csShaderVariableContext> > sv_context;
   
   csArray<csRef<iTextureHandle> > alpha_map;
+  
+  csRef<csShaderVariableContext> light_context;
+  csRef<iTextureHandle> light_map;
 
   unsigned int primitive_count;
 };
@@ -140,7 +143,8 @@ csRenderMesh** csTerrainSimpleRenderer::GetRenderMeshes (int& n,
     
       mesh->do_mirror = do_mirroring;
     
-      mesh->variablecontext = rdata->sv_context[j];
+      mesh->variablecontext = j < material_palette.GetSize () - 1 ?
+        rdata->sv_context[j] : rdata->light_context;
     
       mesh->object2world = o2wt;
       mesh->worldspace_origin = wo;
@@ -203,6 +207,7 @@ const csRect& rectangle, const float* data, unsigned int pitch)
     int y_mul_grid_width_plus_x = 0;
 
     for (int y = 0; y < grid_height - 1; ++y)
+	{
       for (int x = 0; x < grid_width - 1; ++x, ++y_mul_grid_width_plus_x)
       {
         // tl - tr
@@ -223,6 +228,8 @@ const csRect& rectangle, const float* data, unsigned int pitch)
         *iptr++ = br;
       }
 
+      ++y_mul_grid_width_plus_x;
+    }
     rdata->ib->Release ();
 
     // fill tex coords
@@ -289,12 +296,6 @@ unsigned int pitch)
   if (!rdata->sv_context[material])
   {
     rdata->sv_context[material].AttachNew (new csShaderVariableContext);
-   
-    csRef<csShaderVariable> var;
-    var.AttachNew (new csShaderVariable(strings->Request ("splat base pass")));
-    var->SetType (csShaderVariable::INT);
-    var->SetValue (material == 0);
-    rdata->sv_context[material]->AddVariable (var);
   }
     
   if (rdata->alpha_map.GetSize () <= material)
@@ -336,6 +337,54 @@ unsigned int pitch)
   rdata->alpha_map[material]->Blit (rectangle.xmin, rectangle.ymin,
   rectangle.Width (), rectangle.Height (), (unsigned char*)
   image_data.GetArray (), iTextureHandle::RGBA8888);
+}
+
+void csTerrainSimpleRenderer::OnColorUpdate (iTerrainCell* cell, const
+  csColor* data, unsigned int res)
+{
+  csRef<csSimpleTerrainRenderData> rdata = (csSimpleTerrainRenderData*)
+    cell->GetRenderData ();
+
+  if (!rdata)
+  {
+    rdata.AttachNew (new csSimpleTerrainRenderData);
+    cell->SetRenderData (rdata);
+  }
+
+  if (!rdata->light_map)
+  {
+    csRef<iImage> image;
+    image.AttachNew (new csImageMemory (res, res, CS_IMGFMT_TRUECOLOR));
+
+    rdata->light_map = g3d->GetTextureManager ()->RegisterTexture
+      (image, CS_TEXTURE_2D | CS_TEXTURE_3D | CS_TEXTURE_CLAMP);
+
+    rdata->light_context.AttachNew (new csShaderVariableContext);
+
+    csRef<csShaderVariable> var;
+    var.AttachNew (new csShaderVariable(strings->Request ("light map")));
+    var->SetType (csShaderVariable::TEXTURE);
+    var->SetValue (rdata->light_map);
+    rdata->light_context->AddVariable (var);
+  }
+  
+  csDirtyAccessArray<csRGBpixel> image_data;
+  image_data.SetSize (res * res);
+
+  const csColor* src_data = data;
+  csRGBpixel* dst_data = image_data.GetArray ();
+
+  for (int y = 0; y < res; ++y)
+  {
+    for (int x = 0; x < res; ++x, ++src_data)
+    {
+      (*dst_data++).Set (src_data->red * 255, src_data->green * 255,
+        src_data->blue * 255, 255);
+    }
+  }
+
+  rdata->light_map->Blit (0, 0, res, res, (unsigned char*)
+      image_data.GetArray (), iTextureHandle::RGBA8888);
 }
 
 bool csTerrainSimpleRenderer::Initialize (iObjectRegistry* object_reg)

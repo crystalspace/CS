@@ -102,6 +102,8 @@ public:
   virtual void OnMaterialMaskUpdate (iTerrainCell* cell, unsigned int material,
                                const csRect& rectangle, const unsigned char*
                                data, unsigned int pitch);
+  virtual void OnColorUpdate (iTerrainCell* cell, const csColor* data,
+                               unsigned int res);
   
   // ------------ iComponent implementation ------------
   virtual bool Initialize (iObjectRegistry* object_reg);

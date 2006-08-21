@@ -103,7 +103,7 @@ bool TerrainDemo::Setup ()
 
   //terrain_mesh_wrapper->GetMovable()->SetSector(room);
     
-  pos = csVector3 (0, 70, 0);
+//  pos = csVector3 (0, 70, 0);
   
   // Now we need to position the camera in our world.
   view->GetCamera ()->SetSector (room);
@@ -176,8 +176,8 @@ void TerrainDemo::ProcessFrame ()
       obj_move = CS_VEC_BACKWARD * 3.0f;
   }
 
-//  collider_actor.Move (float (elapsed_time) / 1000.0f, 1.0f,
-//      obj_move, obj_rotate);
+  collider_actor.Move (float (elapsed_time) / 1000.0f, 1.0f,
+      obj_move, obj_rotate);
   
   if (kbd->GetKeyState('1')) r_start.x--;
   if (kbd->GetKeyState('2')) r_start.x++;
@@ -200,10 +200,10 @@ void TerrainDemo::ProcessFrame ()
   rotX += obj_rotate.x * speed;
   rotY += obj_rotate.y * speed;
   
-  csMatrix3 rot = csXRotMatrix3 (rotX) * csYRotMatrix3 (rotY);
-  csOrthoTransform ot (rot, c->GetTransform().GetOrigin ());
-  c->SetTransform (ot);
-  c->Move(obj_move);
+//  csMatrix3 rot = csXRotMatrix3 (rotX) * csYRotMatrix3 (rotY);
+//  csOrthoTransform ot (rot, c->GetTransform().GetOrigin ());
+//  c->SetTransform (ot);
+//  c->Move(obj_move);
   
   // Tell 3D driver we're going to display 3D things.
   if (!g3d->BeginDraw (engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS))

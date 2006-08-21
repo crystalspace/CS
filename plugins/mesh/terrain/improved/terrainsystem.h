@@ -43,15 +43,29 @@
 
 #include "ivaria/collider.h"
 
+#include "iengine/shadcast.h"
+#include "imesh/lighting.h"
+#include "iengine/lightmgr.h"
+
+#include "csutil/set.h"
+#include "csutil/list.h"
+
+#include "iutil/comp.h"
+
+#include "iengine/engine.h"
+
 CS_PLUGIN_NAMESPACE_BEGIN(ImprovedTerrain)
 {
 
 class csTerrainSystem :
-  public scfImplementationExt3<csTerrainSystem,
+  public scfImplementationExt5<csTerrainSystem,
                             csObjectModel,
                             iTerrainSystem,
                             iMeshObject,
-                            iCollider>
+                            iCollider,
+//                            iShadowReceiver,
+                            iLightingInfo,
+                            iComponent>
 {
   csRef<iMeshObjectFactory> factory;
 
@@ -76,8 +90,16 @@ class csTerrainSystem :
 
   scfArray<iTerrainVector3Array> collision_result;
 
+  // lighting
+  csSet<csPtrKey<iLight> > affecting_lights;
+  unsigned int colorVersion;
+  unsigned int dynamic_ambient_version;
+  csRef<iLightManager> light_mgr;
+  csRef<iEngine> engine;
+
   void ComputeBBox();
 
+  void UpdateColors (iMovable* movable, csColor& baseColor);
 public:
   csTerrainSystem (iMeshObjectFactory* factory = 0);
 
@@ -184,6 +206,24 @@ public:
   
   // ------------ iCollider implementation ------------
   virtual csColliderType GetColliderType ();
+  
+  // ------------ iShadowReceiver implementation ------
+  virtual void CastShadows (iMovable* movable, iFrustumView* fview);
+  
+  // ------------ iLightingInfo implementation --------
+  virtual void InitializeDefault (bool clear);
+
+  virtual bool ReadFromCache (iCacheManager* cache_mgr);
+  virtual bool WriteToCache (iCacheManager* cache_mgr);
+
+  virtual void PrepareLighting ();
+
+  virtual void LightChanged (iLight* light);
+  virtual void LightDisconnect (iLight* light);
+  virtual void DisconnectAllLights ();
+  
+  // ------------ iComponent implementation ------------
+  virtual bool Initialize (iObjectRegistry* object_reg);
 };
 
 }

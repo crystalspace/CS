@@ -80,6 +80,8 @@ iTerrainRenderer* renderer, iTerrainCollider* collider)
   state = NotLoaded;
 
   render_data = NULL;
+
+  last_colorVersion = 0;
 }
 
 csTerrainCell::~csTerrainCell ()
@@ -503,6 +505,50 @@ csVector3 csTerrainCell::GetNormal (const csVector2& pos) const
   csVector3 n2 = Lerp (GetNormal (x1, y2), GetNormal (x2, y2), xfrac);
 
   return Lerp (n1, n2, yfrac).Unit ();
+}
+
+void csTerrainCell::UpdateColors (iMovable* movable, unsigned int colorVersion,
+  const csColor& baseColor)
+{
+  if (colorVersion == last_colorVersion) return;
+
+  if (last_colorVersion == 0)
+  {
+    staticLights.SetLength (lmres * lmres);
+
+    for (size_t i = 0; i < staticLights.Length (); ++i)
+      staticLights[i] = ambient;
+  }
+
+  last_colorVersion = colorVersion;
+
+  staticColors.SetLength (staticLights.Length ());
+  
+  for (size_t i = 0; i < staticLights.Length(); i++)
+  {
+    staticColors[i] = staticLights[i] + baseColor;
+  }
+
+  /*csHash<csShadowArray*, csPtrKey<iLight> >::GlobalIterator pdlIt =
+	pseudoDynInfo.GetIterator ();
+  while (pdlIt.HasNext ())
+  {
+    csPtrKey<iLight> light;
+    csShadowArray* shadowArr = pdlIt.Next (light);
+    float* intensities = shadowArr->shadowmap;
+    const csColor& lightcol = light->GetColor ();
+
+    if (lightcol.red > EPSILON || lightcol.green > EPSILON
+        || lightcol.blue > EPSILON)
+    {
+      for (i = 0; i < staticLights.Length(); i++)
+      {
+        staticColors[i] += lightcol * intensities[i];
+      }
+    }
+  }*/
+
+  if (renderer) renderer->OnColorUpdate (this, staticColors.GetArray (), lmres);
 }
 
 }

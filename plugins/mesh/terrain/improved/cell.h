@@ -30,6 +30,7 @@
 
 #include "csgeom/vector2.h"
 #include "csgeom/box.h"
+#include "csutil/cscolor.h"
 
 #include "csutil/csstring.h"
 #include "csutil/dirtyaccessarray.h"
@@ -44,6 +45,7 @@ class csTerrainCell :
   public scfImplementation1<csTerrainCell,
                             iTerrainCell>
 {
+  enum {lmres = 32};
 private:
   iTerrainSystem* parent;
   
@@ -59,6 +61,10 @@ private:
   
   csDirtyAccessArray<unsigned char> materialmap;
   csDirtyAccessArray<float> heightmap;
+  
+  csDirtyAccessArray<csColor> staticLights;
+  csDirtyAccessArray<csColor> staticColors;
+  unsigned int last_colorVersion, dynamic_ambient_version;
   
   csRect mm_rect;
 
@@ -153,6 +159,12 @@ public:
 
   virtual csVector3 GetNormal (int x, int y) const;
   virtual csVector3 GetNormal (const csVector2& pos) const;
+
+  // lighting
+  void UpdateColors (iMovable* movable, unsigned int colorVersion, const
+    csColor& baseColor);
+
+  csColor ambient;
 };
 
 }

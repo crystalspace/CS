@@ -171,6 +171,9 @@ struct csBruteBlockTerrainRenderData: public csRefCount
   
   csArray<csRef<iTextureHandle> > alpha_map;
 
+  csRef<csShaderVariableContext> light_context;
+  csRef<iTextureHandle> light_map;
+
   unsigned int primitive_count;
 
   int block_res;
@@ -715,7 +718,8 @@ void csTerrBlock::DrawTest (iGraphics3D* g3d,
     mesh->indexstart = 0;
     mesh->indexend = rdata->numindices[idx];
     mesh->material = rdata->material_palette->Get (j);
-    mesh->variablecontext = rdata->sv_context[j];
+    mesh->variablecontext = j < rdata->material_palette->GetSize () - 1 ?
+      rdata->sv_context[j] : rdata->light_context;
 
     mesh->object2world = o2wt;
     mesh->worldspace_origin = wo;
@@ -870,12 +874,6 @@ unsigned int pitch)
   if (!rdata->sv_context[material])
   {
     rdata->sv_context[material].AttachNew (new csShaderVariableContext);
-   
-    csRef<csShaderVariable> var;
-    var.AttachNew (new csShaderVariable(strings->Request ("splat base pass")));
-    var->SetType (csShaderVariable::INT);
-    var->SetValue (material == 0);
-    rdata->sv_context[material]->AddVariable (var);
   }
     
   if (rdata->alpha_map.GetSize () <= material)
@@ -917,6 +915,57 @@ unsigned int pitch)
   rdata->alpha_map[material]->Blit (rectangle.xmin, rectangle.ymin,
   rectangle.Width (), rectangle.Height (), (unsigned char*)
   image_data.GetArray (), iTextureHandle::RGBA8888);
+}
+
+void csTerrainBruteBlockRenderer::OnColorUpdate (iTerrainCell* cell, const
+  csColor* data, unsigned int res)
+{
+  csRef<csBruteBlockTerrainRenderData> rdata =
+    (csBruteBlockTerrainRenderData*)cell->GetRenderData ();
+
+  if (!rdata)
+  {
+    rdata.AttachNew (new csBruteBlockTerrainRenderData(cell));
+
+    cell->SetRenderData (rdata);
+
+    rdata->SetupObject (g3d);
+  }
+
+  if (!rdata->light_map)
+  {
+    csRef<iImage> image;
+    image.AttachNew (new csImageMemory (res, res, CS_IMGFMT_TRUECOLOR));
+
+    rdata->light_map = g3d->GetTextureManager ()->RegisterTexture
+      (image, CS_TEXTURE_2D | CS_TEXTURE_3D | CS_TEXTURE_CLAMP);
+
+    rdata->light_context.AttachNew (new csShaderVariableContext);
+
+    csRef<csShaderVariable> var;
+    var.AttachNew (new csShaderVariable(strings->Request ("light map")));
+    var->SetType (csShaderVariable::TEXTURE);
+    var->SetValue (rdata->light_map);
+    rdata->light_context->AddVariable (var);
+  }
+  
+  csDirtyAccessArray<csRGBpixel> image_data;
+  image_data.SetSize (res * res);
+
+  const csColor* src_data = data;
+  csRGBpixel* dst_data = image_data.GetArray ();
+
+  for (int y = 0; y < res; ++y)
+  {
+    for (int x = 0; x < res; ++x, ++src_data)
+    {
+      (*dst_data++).Set (src_data->red * 255, src_data->green * 255,
+        src_data->blue * 255, 255);
+    }
+  }
+
+  rdata->light_map->Blit (0, 0, res, res, (unsigned char*)
+      image_data.GetArray (), iTextureHandle::RGBA8888);
 }
 
 bool csTerrainBruteBlockRenderer::Initialize (iObjectRegistry* object_reg)

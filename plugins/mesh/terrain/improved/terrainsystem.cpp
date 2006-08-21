@@ -35,8 +35,15 @@
 
 #include "debug.h"
 
+#include "iengine/sector.h"
+#include "iengine/light.h"
+
+#include "iutil/objreg.h"
+
 CS_PLUGIN_NAMESPACE_BEGIN(ImprovedTerrain)
 {
+
+static bool staticlighting = true;
 
 csTerrainSystem::csTerrainSystem (iMeshObjectFactory* factory)
   : scfImplementationType (this)
@@ -47,6 +54,9 @@ csTerrainSystem::csTerrainSystem (iMeshObjectFactory* factory)
   auto_preload = true;
 
   bbox_valid = false;
+
+  colorVersion = 0;
+  dynamic_ambient_version = 0;
 }
 
 csTerrainSystem::~csTerrainSystem ()
@@ -353,6 +363,9 @@ csPtr<iMeshObject> csTerrainSystem::Clone ()
 csRenderMesh** csTerrainSystem::GetRenderMeshes (int& num, iRenderView* rview, 
     iMovable* movable, uint32 frustum_mask)
 {
+  csColor baseColor;
+
+  UpdateColors (movable, baseColor);
   needed_cells.SetSize (0);
   
   csOrthoTransform c2ot = rview->GetCamera ()->GetTransform ();
@@ -377,6 +390,8 @@ csRenderMesh** csTerrainSystem::GetRenderMeshes (int& num, iRenderView* rview,
         cells[i]->SetLoadState (csTerrainCell::Loaded);
       }
       
+      cells[i]->UpdateColors (movable, colorVersion, baseColor);
+
       needed_cells.Push (cells[i]);
     }
   }
@@ -547,6 +562,90 @@ void csTerrainSystem::GetRadius (float& radius, csVector3& center)
 csColliderType csTerrainSystem::GetColliderType ()
 {
   return CS_TERRAIN_COLLIDER;
+}
+
+void csTerrainSystem::UpdateColors (iMovable* movable, csColor& baseColor)
+{
+  // First check if dynamic ambient has changed.
+  iSector* s = movable->GetSectors ()->Get (0);
+  baseColor = s->GetDynamicAmbientLight ();
+  if (dynamic_ambient_version != s->GetDynamicAmbientVersion ())
+  {
+    dynamic_ambient_version = s->GetDynamicAmbientVersion ();
+    colorVersion++;
+  }
+}
+
+void csTerrainSystem::CastShadows (iMovable* movable, iFrustumView* fview)
+{
+}
+  
+void csTerrainSystem::InitializeDefault (bool clear)
+{
+  if (!staticlighting) return;
+
+  if (clear)
+  {
+    csColor amb(0.5f, 0.5f, 0.5f);
+    
+    for (size_t i = 0 ; i < cells.Length(); ++i)
+    {
+      cells[i]->ambient = amb;
+    }
+  }
+  colorVersion++;
+}
+
+bool csTerrainSystem::ReadFromCache (iCacheManager* cache_mgr)
+{
+  return false;
+}
+
+bool csTerrainSystem::WriteToCache (iCacheManager* cache_mgr)
+{
+  return false;
+}
+
+void csTerrainSystem::PrepareLighting ()
+{
+  if (!staticlighting && light_mgr)
+  {
+    const csArray<iLightSectorInfluence*>& relevant_lights = light_mgr
+      ->GetRelevantLights (logparent, -1, false);
+    for (size_t i = 0; i < relevant_lights.Length(); i++)
+      affecting_lights.Add (relevant_lights[i]->GetLight ());
+  }
+}
+
+void csTerrainSystem::LightChanged (iLight*)
+{
+  colorVersion++;
+}
+
+void csTerrainSystem::LightDisconnect (iLight* light)
+{
+  affecting_lights.Delete (light);
+  colorVersion++;
+}
+
+void csTerrainSystem::DisconnectAllLights ()
+{
+  csSet<csPtrKey<iLight> >::GlobalIterator it = affecting_lights.
+      	GetIterator ();
+  while (it.HasNext ())
+  {
+    iLight* l = (iLight*)it.Next ();
+    l->RemoveAffectedLightingInfo ((iLightingInfo*)this);
+  }
+  affecting_lights.Empty ();
+  colorVersion++;
+}
+
+bool csTerrainSystem::Initialize (iObjectRegistry* object_reg)
+{
+  light_mgr = csQueryRegistry<iLightManager> (object_reg);
+  engine = csQueryRegistry<iEngine> (object_reg);
+  return true;
 }
 
 }

@@ -30,6 +30,7 @@ struct iTerrainCell;
 struct iMaterialWrapper;
 
 class csRect;
+class csColor;
 struct csRenderMesh;
 
 /// Provides an interface for custom rendering
@@ -103,6 +104,18 @@ struct iTerrainRenderer : public virtual iBase
   virtual void OnMaterialMaskUpdate (iTerrainCell* cell, unsigned int material,
                                const csRect& rectangle, const unsigned char*
                                data, unsigned int pitch) = 0;
+  
+  /**
+   * Indicates that the cell color data has been changed (while computing
+   * terrain lighting), and that the renderer should update its internal
+   * structures to reflect the changes.
+   *
+   * \param cell - cell with the changed data
+   * \param data - color data
+   * \param res - color data resolution
+   */
+  virtual void OnColorUpdate (iTerrainCell* cell, const csColor* data,
+                               unsigned int res) = 0;
 };
 
 #endif // __CS_ITERRAIN_TERRAINRENDERER_H__
