@@ -206,7 +206,7 @@ The billboards are aligned with the camera plane, and camera up and right
 vectors are used as billboard vectors. This is the default mode and the mode
 most other particle systems in Crystal Space have.
 @item common
-Use common up direction} as up vector for particle and as @samp{camface}
+Use common up direction as up vector for particle and as @samp{camface}
 face the camera properly. This makes the particles look like fixed around one
 axis.
 @item common approx
@@ -214,11 +214,135 @@ Approximative version of @samp{common} mode. Common up direction is used
 as billboard up direction and camera forward vector as plane normal. This mode
 is equal to old @samp{Rain} particle system.
 @item velocity
+Almost the same as @samp{common} mode, but instead of using a common direction
+the particle linear velocity is used as up direction.
 @item self
+Orients particle billboard according to the coordinate base defined by the
+quaternion in the particle (it's internal orientation). Setup is such that
+xy-plane is the billboard plane and positive z-axis normal.
 @item self forward
+Same as @samp{self} mode, however particles are always facing camera. It is
+equivalent to two-sided particles.
 @end table
 
 @subsubheading Emitters
+Emitters are the entities responsible for emitting new particles into the
+particle system. Without any emitters there won't be any particles and nothing
+to see.
+
+In principle an emitter is any class implementing the interface 
+@samp{iParticleEmitter}, so you can implement your own emitters, however for
+convenience there are a few built in emitter types. These can be accessed via
+the @samp{crystalspace.mesh.object.particles.emitter} plugin class and interface
+@samp{iiParticleBuiltinEmitterFactory} interface.
+The built in emitters are also loadable via the normal particle loader using
+@code{<emitter type="..">} tags. The available types are:
+@itemize @bullet
+@item @samp{sphere}
+@item @samp{box}
+@item @samp{cylinder}
+@item @samp{cone}
+@end itemize
+
+Many of the options are same for several of the emitter types, so below is a
+description of all available options for the built in emitters and which type
+of emitters they apply to.
+
+@multitable @columnfractions .33 .33 .33
+@item Keyword @tab Applies to @tab Description
+@item @code{<enabled>yes/no</enabled>}
+@tab @samp{all}
+@tab Should the emitter emit particles at all.
+
+@item @code{<starttime>time</starttime>}
+@tab @samp{all}
+@tab Start time of emitter relative to first time particle gets into view.
+
+@item @code{<duration>time</duration>}
+@tab @samp{all}
+@tab Duration for which the emitter should be active.
+
+@item @code{<emissionrate>rate</emissionrate>}	
+@tab @samp{all}
+@tab Emission rate in particles per second.
+
+@item @code{<initialttl min="" max="" />}
+@tab @samp{all}
+@tab Initial TTL of the particles will be assigned randomly between min and max
+values.
+
+@item @code{<mass min="" max="" />}
+@tab @samp{all}
+@tab Initial mass of the particles will be assigned randomly between min and max
+values.
+
+@item @code{<position x="" y="" z="" />}
+@tab @samp{all}
+@tab Emittor center position
+
+@item @code{<placement>place</placement>}
+@tab @samp{all}
+@tab Particle placement relative to emitter. Valid values @samp{center}, 
+@samp{volume}, @samp{surface}. Default is @samp{center}.
+
+@item @code{<uniformvelocity>yes/no</uniformvelocity>}
+@tab @samp{all}
+@tab Sets if all particles should have the same uniform velocity vector or if
+only the magnitude should be used and direction should be emitter-specific.
+
+@item @code{<initialvelocity x="" y="" z=""/>}
+@tab @samp{all}
+@tab Set initial velocity vector.
+
+@item @code{<radius>rad</radius>}
+@tab @samp{sphere}, @samp{cylinder}
+@tab Radius of emitting sphere/cylinder
+
+@item @code{<extent x="" y="" z="" />}
+@tab @samp{cylinder}, @samp{cone}
+@tab Extent vector defining the cone or cyliner
+
+@item @code{<coneangle>angle</coneangle>}
+@tab @samp{cone}
+@tab Cone opening angle in radians
+
+@item @code{<box>..</box>}
+@tab @samp{box}
+@tab Box emitter extents
+@end multitable
 
 @subsubheading Effectors
- 
+Just as emitters emit particles into the particle system, effectors put different
+kinds of effects on those who are already there, be it physical or non-physical
+effects.
+
+
+In principle an emitter is any class implementing the interface 
+@samp{iParticleEeffector}, so you can implement your own effectors, however for
+convenience there are a few built in effector types. These can be accessed via
+the @samp{crystalspace.mesh.object.particles.effector} plugin class and interface
+@samp{iiParticleBuiltinEffectorFactory} interface.
+The built in effectors are also loadable via the normal particle loader using
+@code{<effector type="..">} tags. The available types are:
+@itemize @bullet
+@item @samp{force}
+@item @samp{lincolor}
+@end itemize
+
+@samp{Force} effector loader recognize following keywords:
+@table @code
+@item <acceleration x="" y="" z="" />
+Add a constant acceleration to particles. Useful for example for gravity.
+@item <force x="" y="" z="" />
+Add a constant force to particles.
+@item <randomacceleration>mag</randomacceleration>
+Add a random acceleration with given magnitude.
+@end table
+
+@samp{Lincolor} effector sets the color of particles based on their remaning
+TTL. It takes a fixed number of "keypoints" and then interpolates between them.
+@samp{Lincolor} effector loader recognize following keywords:
+@table @code
+@item <color red="" green="" blue="" time="">
+Set a keypoint color at given time.
+@end table
