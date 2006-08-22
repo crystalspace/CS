@@ -32,7 +32,7 @@ float4 main (vertex2fragment IN,
 	float spec = pow(max(dot(half, normBumpNormal), 0), 32);
 	//spec *= bumpNormal.a;
 	float4 outCol = lightcolor*bump.xxxx;
-	float4 AttnCol = tex2D(TexAttn, IN.Attenuation.xy)*tex2D(TexAttn, IN.Attenuation.zw);
+	float4 AttnCol = 2*tex2D(TexAttn, IN.Attenuation.xy)*tex2D(TexAttn, IN.Attenuation.zw);
 	float4 result = saturate((AttnCol*(outCol*diffuseCol + lightcolor*specular*spec)));
 	return result;
 }

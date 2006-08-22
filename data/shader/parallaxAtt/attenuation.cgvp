@@ -2,7 +2,6 @@
 <profile>arbvp1</profile> 
 <compilerargs>-posinv</compilerargs>
 <variablemap variable="light 0 position" destination="LightPos" />
-<variablemap variable="light 0 diffuse" destination="LightColor" />
 <variablemap variable="light 0 attenuation" destination="Attenuation" />
 
 <program>
@@ -10,18 +9,12 @@
 
 struct app2vertex {
 	float4 Position : POSITION;
-	float3 Normal : NORMAL;
-	float2 TexCoord : TEXCOORD0;
-	float3 Tangent : TEXCOORD1;
-	float3 BiNormal : TEXCOORD2;
 };
 
 struct vertex2fragment { 
 	float4 Position : POSITION;
-	float2 TexCoord : TEXCOORD0;
-	float3 oLightDir : TEXCOORD1;
-	float3 oEyeVec : TEXCOORD2;
-	float4 Attenuation : TEXCOORD3;
+	float2 Attenuation1 : TEXCOORD0;
+	float2 Attenuation2 : TEXCOORD1;
 };
 
 vertex2fragment main (app2vertex IN,
@@ -29,10 +22,8 @@ vertex2fragment main (app2vertex IN,
 	  /* The matrices are bound with the state.matrix.... semantics.
 	     For more info see the Cg and ARB_vertex_program docs.
 	     */
-	uniform float4x4 ModelViewIT : state.matrix.modelview.invtrans,
 	uniform float4x4 ModelViewProj : state.matrix.mvp,
 	uniform float4 LightPos,
-	uniform float3 LightColor,
 	uniform float4 Attenuation)
 {
 	vertex2fragment OUT;
@@ -40,24 +31,10 @@ vertex2fragment main (app2vertex IN,
 	float4 objLight = mul(ModelViewI, LightPos);
 	objLight.xyz -= IN.Position.xyz;
 	
-	float3x3 obj2tang;
-	obj2tang[0] = IN.Tangent;
-	obj2tang[1] = IN.BiNormal;
-	obj2tang[2] = IN.Normal;
-	
-	float3 tangLight = mul (obj2tang, objLight.xyz);
-	
-	
-	float3 eyeVec = ModelViewIT[3] - IN.Position;
-	float3 tangEyeVec = mul (obj2tang, eyeVec);
-	
-	
 	OUT.Position = mul (ModelViewProj, IN.Position);
-	OUT.TexCoord = IN.TexCoord;
-	OUT.oLightDir = normalize(tangLight.xyz);
-	OUT.oEyeVec = normalize(tangEyeVec.xyz);
-	OUT.Attenuation = -objLight*Attenuation.y*0.8 + 0.5; 
-	OUT.Attenuation.w = 0.5;
+	OUT.Attenuation1.xy = -objLight.xy*Attenuation.y*0.8 + 0.5; 
+	OUT.Attenuation2.x = -objLight.z*Attenuation.y*0.8 + 0.5; 
+	OUT.Attenuation2.y = 0.5;
 
 	return OUT;
 }

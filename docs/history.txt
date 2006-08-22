@@ -18,6 +18,12 @@ chronological order.
 	  systems on maps using diffuse renderloop since apparently
 	  the particle systems report a wrong bounding sphere but the
 	  bounding box is correct.
+	- Jorrit and Hristo did several changes to the parallaxAtt and
+	  specular changes to get attenuation right. This makes levels
+	  darker but it fixes flickering and provides the correct
+	  attenuation results now. Also the priority 130 technique
+	  has been replaced with a two-pass technique that does proper
+	  attenuation.
 21-Aug-2006
 	- caedes added SCF_IMPLEMENT_FACTORY to movierecorder plugin.
 	- res added a helper to iterate over triangles from an index buffer

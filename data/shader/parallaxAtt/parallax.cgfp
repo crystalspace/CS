@@ -18,8 +18,8 @@ float4 main (vertex2fragment IN,
 			uniform float4 specular,
 			uniform sampler2D TexNormal,
 			uniform sampler2D TexDiffuse,
-			uniform sampler2D TexHeight,
-			uniform sampler2D TexAttn) : COLOR
+			uniform sampler2D TexHeight
+			) : COLOR
 {
 	float3 normEye = IN.EyeVec.xyz;
 	float3 normLight = IN.LightDir.xyz;
@@ -47,10 +47,9 @@ float4 main (vertex2fragment IN,
 	<?else?>
 		float4 result = saturate(outCol*diffuseCol);
 	<?endif?>
-	float4 AttnCol = 2*tex2D(TexAttn, IN.Attenuation.xy)*tex2D(TexAttn, IN.Attenuation.zw);
 	  /* 	return AttnCol*(result + glowCol);
 	     */
-	return AttnCol*result;
+	return result;
 }
 
 </program>

@@ -3,7 +3,6 @@
 <compilerargs>-posinv</compilerargs>
 <variablemap variable="light 0 position" destination="LightPos" />
 <variablemap variable="light 0 diffuse" destination="LightColor" />
-<variablemap variable="light 0 attenuation" destination="Attenuation" />
 
 <program>
 <![CDATA[
@@ -21,7 +20,6 @@ struct vertex2fragment {
 	float2 TexCoord : TEXCOORD0;
 	float3 oLightDir : TEXCOORD1;
 	float3 oEyeVec : TEXCOORD2;
-	float4 Attenuation : TEXCOORD3;
 };
 
 vertex2fragment main (app2vertex IN,
@@ -32,8 +30,7 @@ vertex2fragment main (app2vertex IN,
 	uniform float4x4 ModelViewIT : state.matrix.modelview.invtrans,
 	uniform float4x4 ModelViewProj : state.matrix.mvp,
 	uniform float4 LightPos,
-	uniform float3 LightColor,
-	uniform float4 Attenuation)
+	uniform float3 LightColor)
 {
 	vertex2fragment OUT;
 	
@@ -56,8 +53,6 @@ vertex2fragment main (app2vertex IN,
 	OUT.TexCoord = IN.TexCoord;
 	OUT.oLightDir = normalize(tangLight.xyz);
 	OUT.oEyeVec = normalize(tangEyeVec.xyz);
-	OUT.Attenuation = -objLight*Attenuation.y*0.8 + 0.5; 
-	OUT.Attenuation.w = 0.5;
 
 	return OUT;
 }
