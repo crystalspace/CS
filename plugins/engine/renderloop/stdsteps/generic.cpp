@@ -410,15 +410,38 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
     // useful.
     if (light)
     {
-      csVector3 obj_center;
-      m->GetMeshObject ()->GetObjectModel ()->GetRadius (
-      	sameShaderMeshInfo[i].radius, obj_center);
+      iObjectModel* objmodel = m->GetMeshObject ()->GetObjectModel ();
       iMovable* mov = m->GetMovable ();
+#if USE_BOX
       if (mov->IsFullTransformIdentity ())
-        sameShaderMeshInfo[i].wor_center = obj_center;
+      {
+	objmodel->GetObjectBoundingBox (sameShaderMeshInfo[i].wor_bbox);
+      }
       else
-        sameShaderMeshInfo[i].wor_center = mov->GetFullTransform ().
-		This2Other (obj_center);
+      {
+	csReversibleTransform trans = mov->GetFullTransform ();
+	csBox3 obj_bbox;
+	objmodel->GetObjectBoundingBox (obj_bbox);
+	sameShaderMeshInfo[i].wor_bbox.StartBoundingBox (
+	    trans.This2Other (obj_bbox.GetCorner (0)));
+	size_t j;
+	for (j = 1 ; j < 8 ; j++)
+	  sameShaderMeshInfo[i].wor_bbox.AddBoundingVertexSmart (
+	      trans.This2Other (obj_bbox.GetCorner (j)));
+      }
+#else
+      csVector3 obj_center;
+      objmodel->GetRadius (sameShaderMeshInfo[i].radius, obj_center);
+      if (mov->IsFullTransformIdentity ())
+      {
+        sameShaderMeshInfo[i].wor_center = obj_center;
+      }
+      else
+      {
+	csReversibleTransform trans = mov->GetFullTransform ();
+        sameShaderMeshInfo[i].wor_center = trans.This2Other (obj_center);
+      }
+#endif
     }
   }
  
@@ -485,10 +508,17 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
     if (light)
     {
       // @@@ TODO: Better test for DIRECTIONAL and SPOTLIGHT
+#if USE_BOX
+      bool isect = csIntersect3::BoxSphere (sameShaderMeshInfo[n].wor_bbox,
+	    light_center, cutoff_distance * cutoff_distance);
+      if (!isect)
+	continue;
+#else
       float dist = sqrt (csSquaredDist::PointPoint (
 	sameShaderMeshInfo[n].wor_center, //mesh->worldspace_origin,
       	light_center));
       if (dist-sameShaderMeshInfo[n].radius > cutoff_distance) continue;
+#endif
     }
     pusher.mesh = mesh;
 

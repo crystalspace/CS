@@ -25,6 +25,7 @@
 #include "csutil/csstring.h"
 #include "csutil/weakref.h"
 #include "csutil/dirtyaccessarray.h"
+#include "csgeom/box.h"
 #include "iengine/light.h"
 #include "iengine/renderloop.h"
 #include "iengine/viscull.h"
@@ -76,12 +77,18 @@ public:
   virtual csPtr<iRenderStep> Create ();
 };
 
+#define USE_BOX 1
+
 struct meshInfo
 {
   iShaderVariableContext* svc;
-  bool noclip;	// From iMeshWrapper CS_ENTITY_NOCLIP.
+  bool noclip;		// From iMeshWrapper CS_ENTITY_NOCLIP.
+#if USE_BOX
+  csBox3 wor_bbox;	// Bounding box in world space.
+#else
   csVector3 wor_center;	// Center of the bounding sphere of this object.
   float radius;		// Radius of the bounding sphere of this object.
+#endif
 };
 
 struct ShaderVarPusher;

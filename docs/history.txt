@@ -10,6 +10,14 @@ chronological order.
 	- Jorrit fixed a bug with the new genmesh submesh system.
 	  HitBeamObject() and HitBeamOutline() were broken because they
 	  tested on the first triangle all the time.
+	- Jorrit changed the standard renderloop object/light culler to
+	  use bounding box instead of bounding radius (for the meshes).
+	  While that is slightly slower to calculate it gives a much
+	  more accurate test and thus a big speedup at runtime for the
+	  lighting calculations. This also fixes visibility of particle
+	  systems on maps using diffuse renderloop since apparently
+	  the particle systems report a wrong bounding sphere but the
+	  bounding box is correct.
 21-Aug-2006
 	- caedes added SCF_IMPLEMENT_FACTORY to movierecorder plugin.
 	- res added a helper to iterate over triangles from an index buffer
