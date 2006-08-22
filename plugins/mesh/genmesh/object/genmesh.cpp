@@ -1245,10 +1245,12 @@ bool csGenmeshMeshObject::HitBeamOutline (const csVector3& start,
       iRenderBuffer* indexBuffer = sm[s]->GetIndices();
       csRenderBufferLock<uint, iRenderBuffer*> indices (indexBuffer);
       size_t n = indexBuffer->GetElementCount();
+      size_t idx = 0;
       while (n > 0)
       {
         if (csIntersect3::SegmentTriangle (seg, 
-          vrt[indices.Get (0)], vrt[indices.Get (1)], vrt[indices.Get (2)], 
+          vrt[indices.Get (idx)], vrt[indices.Get (idx+1)],
+	  vrt[indices.Get (idx+2)], 
           isect))
         {
           if (pr) *pr = csQsqrt (csSquaredDist::PointPoint (start, isect) /
@@ -1256,7 +1258,7 @@ bool csGenmeshMeshObject::HitBeamOutline (const csVector3& start,
           return true;
         }
         n -= 3;
-        indices += 3;
+        idx += 3;
       }
     }
   }
@@ -1319,10 +1321,12 @@ bool csGenmeshMeshObject::HitBeamObject (const csVector3& start,
       iRenderBuffer* indexBuffer = sm[s]->GetIndices();
       csRenderBufferLock<uint> indices (indexBuffer);
       size_t n = indexBuffer->GetElementCount();
+      size_t idx = 0;
       while (n > 0)
       {
         if (csIntersect3::SegmentTriangle (seg, 
-          vrt[indices.Get (0)], vrt[indices.Get (1)], vrt[indices.Get (2)], 
+          vrt[indices.Get (idx)], vrt[indices.Get (idx+1)],
+	  vrt[indices.Get (idx+2)], 
           tmp))
         {
           temp = csSquaredDist::PointPoint (start, tmp);
@@ -1335,7 +1339,7 @@ bool csGenmeshMeshObject::HitBeamObject (const csVector3& start,
           }
         }
         n -= 3;
-        indices += 3;
+        idx += 3;
       }
     }
     if (pr) *pr = csQsqrt (dist * itot_dist);

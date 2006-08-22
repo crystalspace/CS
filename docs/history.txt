@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+22-Aug-2006
+	- Jorrit fixed a bug with the new genmesh submesh system.
+	  HitBeamObject() and HitBeamOutline() were broken because they
+	  tested on the first triangle all the time.
 21-Aug-2006
 	- caedes added SCF_IMPLEMENT_FACTORY to movierecorder plugin.
 	- res added a helper to iterate over triangles from an index buffer
