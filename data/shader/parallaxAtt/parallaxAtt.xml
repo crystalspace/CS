@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <shader type="xmlshader" name="parallaxAtt">
   <technique priority="150">
-    <tag>crappy_intel_graphics</tag>
     <!--?include /shader/snippets/projection-pass.inc ?-->
     <pass>
       <mixmode>
@@ -24,8 +23,8 @@
     </pass>
   </technique>
   <technique priority="130">
-	  <!-- This technique is only meant to solve a bug on intel graphics
-	       where the normal CG program isn't behaving well -->
+    <!-- This is a two pass technique if there are not sufficient
+         texture units to do technique 150 -->
 	  <!--?include /shader/snippets/projection-pass.inc ?-->
 	  <pass>
 		  <writemask r="false" g="false" b="false" a="true" />

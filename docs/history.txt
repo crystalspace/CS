@@ -48,6 +48,11 @@ chronological order.
 	      </triangles>
 	  This loads faster and is also a lot smaller (note: even better
 	  would be the streaming loader).
+	- Jorrit and Hristo worked a bit further on parallaxAtt. Technique
+	  150 is now more correct and actually works on intel graphics now.
+	  So that means that the intel graphics specific rule to forbid 150
+	  can now be removed. Technique 130 is kept because it can work
+	  on cards with only 4 texture units.
 22-Aug-2006
 	- Jorrit fixed a bug with the new genmesh submesh system.
 	  HitBeamObject() and HitBeamOutline() were broken because they
