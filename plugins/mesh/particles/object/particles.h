@@ -637,6 +637,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
 
     //-- iObjectModel
     float radius, minRadius;
+    csBox3 objectBB;
 
     //-- iParticleSystem
     csParticleBuffer particleBuffer;

@@ -428,6 +428,8 @@ bool csTextSyntaxService::WriteBox (iDocumentNode* node, const csOBB& b)
 
   if (!WriteMatrix (matrixNode, b.GetMatrix ()))
     return false;
+
+  return true;
 }
 
 bool csTextSyntaxService::ParseVector (iDocumentNode* node, csVector3 &v)
