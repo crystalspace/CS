@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <shader type="xmlshader" name="parallaxAtt">
   <technique priority="150">
-    <tag>crappy_intel_graphics</tag>
     <!--?include /shader/snippets/projection-pass.inc ?-->
     <pass>
       <mixmode>
@@ -24,29 +23,53 @@
     </pass>
   </technique>
   <technique priority="130">
-    <!-- This technique is only meant to solve a bug on intel graphics
-         where the normal CG program isn't behaving well -->
-    <!--?include /shader/snippets/projection-pass.inc ?-->
-    <pass>
-      <mixmode>
-        <srcalphaadd />
-      </mixmode>
-      <buffer source="normal" destination="normal" />
-      <buffer source="tangent" destination="texture coordinate 1" />
-      <buffer source="binormal" destination="texture coordinate 2" />
-      <buffer source="texture coordinate 0" destination="texture coordinate 0" />
-      <vp plugin="glcg" file="/shader/parallaxAtt/parallaxAtt.cgvp" />
-      <texture destination="TexNormal" name="tex normal" />
-      <texture destination="TexDiffuse" name="tex diffuse" />
-      <texture destination="TexHeight" name="tex height" />
-	  <texture destination="TexAttn" name="light 0 attenuationtex" />
-	  <fp plugin="glcg">
-	    <cgfp>
-	      <?Include /shader/parallaxAtt/parallaxAtt_workaround.cgfp ?>
-	    </cgfp>
-	  </fp>
-    </pass>
+    <!-- This is a two pass technique if there are not sufficient
+         texture units to do technique 150 -->
+	  <!--?include /shader/snippets/projection-pass.inc ?-->
+	  <pass>
+		  <writemask r="false" g="false" b="false" a="true" />
+		  <mixmode>
+			  <copy />
+		  </mixmode>
+		  <buffer source="texture coordinate 0" destination="texture coordinate 0" />
+		  <buffer source="texture coordinate 1" destination="texture coordinate 1" />
+		  <vp plugin="glcg" file="/shader/parallaxAtt/attenuation.cgvp" />
+		  <texture destination="unit 0" name="light 0 attenuationtex" />
+		  <texture destination="unit 1" name="light 0 attenuationtex" />
+		  <fp plugin="glfixed">
+			  <fixedfp>
+				  <layer>
+					  <alphasource num="0" source="texture" modifier="alpha" />
+					  <alphaoperation operation="replace" />
+				  </layer>
+				  <layer>
+					  <alphasource num="0" source="texture" modifier="alpha" />
+					  <alphasource num="1" source="previous layer" modifier="alpha" />
+					  <alphaoperation operation="modulate" scale="2"/>
+				  </layer>
+			  </fixedfp>
+		  </fp>
+	  </pass>
+	  <pass>
+		  <mixmode>
+			  <destalphaadd />
+		  </mixmode>
+		  <buffer source="normal" destination="normal" />
+		  <buffer source="tangent" destination="texture coordinate 1" />
+		  <buffer source="binormal" destination="texture coordinate 2" />
+		  <buffer source="texture coordinate 0" destination="texture coordinate 0" />
+		  <vp plugin="glcg" file="/shader/parallaxAtt/parallax.cgvp" />
+		  <texture destination="TexNormal" name="tex normal" />
+		  <texture destination="TexDiffuse" name="tex diffuse" />
+		  <texture destination="TexHeight" name="tex height" />
+		  <fp plugin="glcg">
+			  <cgfp>
+				  <?Include /shader/parallaxAtt/parallax.cgfp ?>
+			  </cgfp>
+		  </fp>
+	  </pass>
   </technique>
+
   <technique priority="100">
     <pass>
       <mixmode>

@@ -244,6 +244,11 @@ public:
     Prepare ();
     bbox = object_bbox;
   }
+  virtual const csBox3& GetObjectBoundingBox ()
+  {
+    Prepare ();
+    return object_bbox;
+  }
   virtual void SetObjectBoundingBox (const csBox3& bbox)
   {
     object_bbox = bbox;

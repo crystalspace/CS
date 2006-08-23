@@ -284,7 +284,8 @@ public:
 
   void SetMoveCallback (iDynamicsMoveCallback* cb);
   void SetCollisionCallback (iDynamicsCollisionCallback* cb);
-  void Collision (iRigidBody *other);
+  void Collision (iRigidBody *other, const csVector3& pos,
+      const csVector3& normal, float depth);
   csRef<iDynamicsSystemCollider> GetCollider (unsigned int index);
   int GetColliderCount ();
 

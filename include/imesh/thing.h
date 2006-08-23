@@ -693,7 +693,7 @@ struct iThingFactoryState : public virtual iBase
  */
 struct iThingState : public virtual iBase
 {
-  SCF_INTERFACE (iThingState, 1, 0, 1);
+  SCF_INTERFACE (iThingState, 1, 0, 2);
 
   /// Get the given vertex coordinates in world space
   virtual const csVector3 &GetVertexW (int idx) const = 0;
@@ -795,6 +795,11 @@ struct iThingState : public virtual iBase
   virtual bool GetPolygonPDLight (int polygon_idx, size_t pdlight_index, 
     csRef<iImage>& map, iLight*& light) = 0;
   /** @} */
+
+  /**
+   * Return the material \p oldMat was replaced with (or 0 if it wasn't).
+   */
+  virtual iMaterialWrapper* GetReplacedMaterial (iMaterialWrapper* oldMat) = 0;
 };
 
 /**

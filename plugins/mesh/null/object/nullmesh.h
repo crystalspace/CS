@@ -58,6 +58,7 @@ public:
   virtual ~csNullmeshMeshObject ();
 
   void GetObjectBoundingBox (csBox3& bbox);
+  const csBox3& GetObjectBoundingBox ();
   void SetObjectBoundingBox (const csBox3& bbox);
   void GetRadius (float& rad, csVector3& cent);
 
@@ -114,6 +115,10 @@ public:
     virtual void GetObjectBoundingBox (csBox3& bbox)
     {
       scfParent->GetObjectBoundingBox (bbox);
+    }
+    virtual const csBox3& GetObjectBoundingBox ()
+    {
+      return scfParent->GetObjectBoundingBox ();
     }
     virtual void SetObjectBoundingBox (const csBox3& bbox)
     {

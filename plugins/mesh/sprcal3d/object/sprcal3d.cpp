@@ -857,6 +857,12 @@ void csSpriteCal3DMeshObject::GetObjectBoundingBox (csBox3& bbox)
   bbox = object_bbox;
 }
 
+const csBox3& csSpriteCal3DMeshObject::GetObjectBoundingBox ()
+{
+  RecalcBoundingBox (object_bbox);
+  return object_bbox;
+}
+
 void csSpriteCal3DMeshObject::SetObjectBoundingBox (const csBox3& bbox)
 {
   object_bbox = bbox;
@@ -883,6 +889,12 @@ void csSpriteCal3DMeshObjectFactory::GetObjectBoundingBox (csBox3& bbox)
   {
     bbox.AddBoundingVertexSmart(p[i].x, p[i].y, p[i].z);
   }
+}
+
+const csBox3& csSpriteCal3DMeshObjectFactory::GetObjectBoundingBox ()
+{
+  obj_bbox = GetObjectBoundingBox ();
+  return obj_bbox;
 }
 
 void csSpriteCal3DMeshObjectFactory::SetObjectBoundingBox (const csBox3&)

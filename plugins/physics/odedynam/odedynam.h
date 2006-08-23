@@ -652,8 +652,10 @@ public:
   bool GetCylinderGeometry (float& length, float& radius); 
 
   void SetCollisionCallback (iDynamicsColliderCollisionCallback* cb);
-  void Collision (csODECollider* other);
-  void Collision (iRigidBody* other);
+  void Collision (csODECollider* other, const csVector3& pos,
+      const csVector3& normal, float depth);
+  void Collision (iRigidBody* other, const csVector3& pos,
+      const csVector3& normal, float depth);
   void SetFriction (float friction) {surfacedata[0] = friction;};
   void SetSoftness (float softness) {surfacedata[2] = softness;};
   void SetElasticity (float elasticity) {surfacedata[1] = elasticity;};
@@ -851,8 +853,9 @@ public:
     { scfParent->SetMoveCallback (cb); }
     void SetCollisionCallback (iDynamicsCollisionCallback* cb)
     { scfParent->SetCollisionCallback (cb); }
-    void Collision (iRigidBody *other)
-    { scfParent->Collision (other); }
+    void Collision (iRigidBody *other, const csVector3& pos,
+	const csVector3& normal, float depth)
+    { scfParent->Collision (other, pos, normal, depth); }
     void Update ()
     { scfParent->Update (); }
     csRef<iDynamicsSystemCollider> GetCollider (unsigned int index)
@@ -952,7 +955,8 @@ public:
   void SetMoveCallback (iDynamicsMoveCallback* cb);
   void SetCollisionCallback (iDynamicsCollisionCallback* cb);
 
-  void Collision (iRigidBody *other);
+  void Collision (iRigidBody *other, const csVector3& pos,
+      const csVector3& normal, float depth);
   void Update ();
 
   csRef<iDynamicsSystemCollider> GetCollider (unsigned int index);

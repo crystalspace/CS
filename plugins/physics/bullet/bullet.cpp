@@ -553,7 +553,8 @@ void csBulletRigidBody::SetMoveCallback (iDynamicsMoveCallback* cb)
 void csBulletRigidBody::SetCollisionCallback (iDynamicsCollisionCallback*)
 {
 }
-void csBulletRigidBody::Collision (iRigidBody *)
+void csBulletRigidBody::Collision (iRigidBody *, const csVector3&,
+      const csVector3&, float)
 {
 }
 csRef<iDynamicsSystemCollider> csBulletRigidBody::GetCollider (unsigned int)

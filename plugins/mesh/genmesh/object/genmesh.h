@@ -278,6 +278,7 @@ public:
   void SetManualColors (bool m) { do_manual_colors = m; }
   bool IsManualColors () const { return do_manual_colors; }
   void GetObjectBoundingBox (csBox3& bbox);
+  const csBox3& GetObjectBoundingBox ();
   void SetObjectBoundingBox (const csBox3& bbox);
   void GetRadius (float& rad, csVector3& cent);
   void SetShadowCasting (bool m) { do_shadows = m; }
@@ -644,7 +645,6 @@ public:
     return subMeshes.GetSubMesh (index);
   }
 
-  const csBox3& GetObjectBoundingBox ();
   void SetObjectBoundingBox (const csBox3& bbox);
   float GetRadius ();
 
@@ -654,6 +654,7 @@ public:
   {
     bbox = GetObjectBoundingBox ();
   }
+  virtual const csBox3& GetObjectBoundingBox ();
   virtual void GetRadius (float& rad, csVector3& cent)
   {
     rad = GetRadius ();

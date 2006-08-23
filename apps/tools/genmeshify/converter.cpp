@@ -191,6 +191,7 @@ namespace genmeshify
     uniqueName.Format ("%s_%s", sector->QueryObject()->GetName(), meshName);
 
     csRef<iMeshObjectFactory> mof;
+    csRef<iGeneralFactoryState> gmfact;
     LMLayout lmLayout;
     csStringArray slmNames;
     const char* factoryName = 0;
@@ -214,8 +215,7 @@ namespace genmeshify
       }
       region->QueryObject ()->ObjAdd (mfw->QueryObject());
       mof = mfw->GetMeshObjectFactory();
-      csRef<iGeneralFactoryState> gmfact = 
-        scfQueryInterface<iGeneralFactoryState> (mof);
+      gmfact = scfQueryInterface<iGeneralFactoryState> (mof);
       if (!gmfact)
       {
         app->Report ("Factory does not implement iGeneralFactoryState");
@@ -249,6 +249,7 @@ namespace genmeshify
     else
     {
       mof = gmf->fact;
+      gmfact = scfQueryInterface<iGeneralFactoryState> (mof);
       lmLayout = gmf->lmLayout;
       if (!ExtractLightmaps (uniqueName, lmLayout, thingobj, textures, 
         slmNames)) 
@@ -288,6 +289,19 @@ namespace genmeshify
       sv.AttachNew (new csShaderVariable (idTexLightmap));
       sv->SetValue (dummyTex);
       svc->AddVariable (sv);
+    }
+    // Replace materials
+    for (size_t i = 0; i < gmfact->GetSubMeshCount(); i++)
+    {
+      iGeneralMeshSubMesh* factSM = gmfact->GetSubMesh (i);
+      iMaterialWrapper* newMat = 
+        thingobj->GetReplacedMaterial (factSM->GetMaterial());
+      if (newMat != 0)
+      {
+        iGeneralMeshSubMesh* objSM = 
+          gmObj->FindSubMesh (factSM->GetName ());
+        objSM->SetMaterial (newMat);
+      }
     }
 
     csRef<iDocumentNode> plugin_clone = to->CreateNodeBefore (
@@ -494,6 +508,7 @@ namespace genmeshify
 
     // Step 3: create GM submeshes
     {
+      size_t submeshNum = 0;
       size_t vertexTotal = 0;
       csDirtyAccessArray<csVector2> tclm;
       MatPolyHash::GlobalIterator it = polies.GetIterator ();
@@ -555,8 +570,11 @@ namespace genmeshify
           layoutSM.slm = key.slm;
           layout.subMeshes.Push (layoutSM);
         }
+        else
+          submeshName.Format ("%zu", submeshNum);
         iGeneralMeshSubMesh* submesh = 
           to->AddSubMesh (indexBuffer, key.material, submeshName);
+        submeshNum++;
       }
       csRef<csRenderBuffer> tclmBuffer = csRenderBuffer::CreateRenderBuffer (
         tclm.GetSize(), CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 2);

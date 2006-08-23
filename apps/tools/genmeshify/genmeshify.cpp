@@ -112,6 +112,15 @@ namespace genmeshify
     return false;
   }
 
+  void App::Report (int severity, const char* msg, ...)
+  {
+    va_list arg;
+    va_start (arg, msg);
+    csReportV (objectRegistry, severity, 
+        "crystalspace.application.genmeshify", msg, arg);
+    va_end (arg);
+  }
+
   bool App::ProcessFiles ()
   {
     //Parse cmd-line
@@ -147,22 +156,8 @@ namespace genmeshify
       }
 
       map_idx++;
-      csStringArray files;
       Processor processor (this);
-      files.Push (val);
-      while (files.GetSize() > 0)
-      {
-        bool ret;
-        if (shallow)
-        {
-          csStringArray dummy;
-          ret = processor.Process (files[0], dummy);
-        }
-        else
-          ret = processor.Process (files[0], files);
-        if (!ret) return false;
-        files.DeleteIndex (0);
-      }
+      if (!processor.Process (val, shallow)) return false;
     }
 
     return true;

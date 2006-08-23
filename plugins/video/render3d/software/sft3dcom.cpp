@@ -1129,18 +1129,17 @@ void csSoftwareGraphics3DCommon::DrawMesh (const csCoreRenderMesh* mesh,
   if ((meshtype >= CS_MESHTYPE_TRIANGLES) 
     && (meshtype <= CS_MESHTYPE_TRIANGLEFAN))
   {
-    const csRenderBufferComponentType compType =
-      indexbuf->GetComponentType();
-    size_t indexSize = csRenderBufferComponentSizes[compType];
-    uint8* tri = indices + mesh->indexstart*indexSize;
-    const uint8* triEnd = indices + mesh->indexend*indexSize;
+    size_t stride = indexbuf->GetElementDistance();
+    uint8* tri = indices + mesh->indexstart*stride;
+    const uint8* triEnd = indices + mesh->indexend*stride;
 
     const uint triDrawIndex = 
       CS_MIXMODE_BLENDOP_SRC(usedModes.mixmode)*CS_MIXMODE_FACT_COUNT
       + CS_MIXMODE_BLENDOP_DST(usedModes.mixmode);
 
     triDraw[triDrawIndex]->DrawMesh (activebuffers, rangeStart, rangeEnd, mesh, 
-      renderInfoMesh, meshtype, tri, triEnd, compType);
+      renderInfoMesh, meshtype, tri, triEnd, stride, 
+      indexbuf->GetComponentType());
   }
 }
 

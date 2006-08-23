@@ -18,7 +18,7 @@
 */
 
 #include "cssysdef.h"
-#include "csgfx/memimage.h"
+#include "csgfx/imagememory.h"
 #include "csutil/util.h"
 
 #include "ddssaver.h"

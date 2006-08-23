@@ -21,6 +21,7 @@
 
 #include "processor.h"
 #include "genmeshify.h"
+#include "stdloadercontext.h"
 
 namespace genmeshify
 {
@@ -31,7 +32,7 @@ namespace genmeshify
     static int n = 0;
     region = app->engine->CreateRegion (
       csString().Format ("__genmeshify_region_%d__", n++));
-    loaderContext = app->engine->CreateLoaderContext (region, false);
+    loaderContext.AttachNew (new StdLoaderContext (app, app->engine, region));
     converter = new Converter (app, loaderContext, region);
   }
 
@@ -115,7 +116,7 @@ namespace genmeshify
     return true;
   }
 
-  bool Processor::Process (const char* filename, csStringArray& librariesList)
+  bool Processor::Process (const char* filename, bool shallow, bool nested)
   {
     csVfsDirectoryChanger dirChange (app->vfs);
     dirChange.PushDir();
@@ -159,8 +160,7 @@ namespace genmeshify
         if (child->Equals (contents))
         {
           // Handle world/library
-          if (!ProcessWorld (contents, child_clone,
-            librariesList)) return false;
+          if (!ProcessWorld (contents, child_clone, shallow, nested)) return false;
         }
         else
         {
@@ -225,10 +225,10 @@ namespace genmeshify
     }
   }
 
-  bool Processor::ProcessWorld (iDocumentNode* from, iDocumentNode* to,
-                                csStringArray& librariesList)
+  bool Processor::ProcessWorld (iDocumentNode* from, iDocumentNode* to, 
+                                bool shallow, bool nested)
   {
-    PreloadDependencies (from);
+    PreloadDependencies (from, shallow);
     PreloadSectors (from);
 
     to->SetValue (from->GetValue ());
@@ -257,7 +257,7 @@ namespace genmeshify
             }
           case XMLTOKEN_SECTOR:
             {
-              if (!texturesNode.IsValid())
+              if (!texturesNode.IsValid() && !nested)
               {
                 texturesNode = to->CreateNodeBefore (CS_NODE_ELEMENT, 0);
                 texturesNode->SetValue ("textures");
@@ -272,7 +272,7 @@ namespace genmeshify
               csRef<iDocumentNode> child_clone = to->CreateNodeBefore (
     	          child->GetType (), 0);
               CloneNode (child, child_clone);
-              texturesNode = child_clone;
+              if (!nested) texturesNode = child_clone;
               continue;
             }
           case XMLTOKEN_LIBRARY:
@@ -280,10 +280,13 @@ namespace genmeshify
               csRef<iDocumentNode> child_clone = to->CreateNodeBefore (
     	          child->GetType (), 0);
               CloneNode (child, child_clone);
-              csRef<iDataBuffer> fullPath = app->vfs->ExpandPath (
-                child->GetContentsValue ());
-              if (fullPath.IsValid())
-                librariesList.Push (fullPath->GetData());
+              if (!shallow)
+              {
+                csRef<iDataBuffer> fullPath = app->vfs->ExpandPath (
+                  child->GetContentsValue ());
+                if (fullPath.IsValid())
+                  if (!Process (fullPath->GetData(), shallow, true)) return false;
+              }
               continue;
             }
         }
@@ -481,7 +484,7 @@ namespace genmeshify
         sectorNode, texturesNode);
   }
 
-  bool Processor::PreloadDependencies (iDocumentNode* from)
+  bool Processor::PreloadDependencies (iDocumentNode* from, bool shallow)
   {
     csRef<iDocument> newDoc = app->docSystem->CreateDocument ();
     csRef<iDocumentNode> newRoot = newDoc->CreateRoot();
@@ -499,10 +502,11 @@ namespace genmeshify
         csStringID token = xmltokens.Request(child->GetValue());
         switch (token)
         {
+          case XMLTOKEN_LIBRARY:
+            if (!shallow) break;
           case XMLTOKEN_TEXTURES:
           case XMLTOKEN_MATERIALS:
           case XMLTOKEN_PLUGINS:
-          case XMLTOKEN_LIBRARY:
           case XMLTOKEN_SETTINGS:
             {
               csRef<iDocumentNode> child_clone = 

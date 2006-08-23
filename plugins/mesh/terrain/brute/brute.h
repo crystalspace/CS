@@ -429,6 +429,7 @@ public:
   int CollisionDetect (iMovable *m, csTransform *p);
 
   void GetObjectBoundingBox (csBox3& bbox);
+  const csBox3& GetObjectBoundingBox ();
   void SetObjectBoundingBox (const csBox3& bbox);
   void GetRadius (float& rad, csVector3& cent);
 
@@ -581,6 +582,7 @@ private:
   iMeshObjectType* brute_type;
 
   csFlags flags;
+  csBox3 obj_bbox;
 
 public:
   CS_LEAKGUARD_DECLARE (csTerrainFactory);
@@ -629,6 +631,7 @@ public:
    * @{ */
   iTerraFormer* GetTerraFormerColldet () { return terraformer; }
   void GetObjectBoundingBox (csBox3& /*bbox*/) { }
+  const csBox3& GetObjectBoundingBox () { return obj_bbox; }
   void SetObjectBoundingBox (const csBox3& /*bbox*/) { }
   void GetRadius (float& /*rad*/, csVector3& /*cent*/) { }
   /** @} */

@@ -56,8 +56,8 @@ namespace genmeshify
     void CloneNode (iDocumentNode* from, iDocumentNode* to);
     /// Clone attributes.
     void CloneAttributes (iDocumentNode* from, iDocumentNode* to);
-    bool ProcessWorld (iDocumentNode* from, iDocumentNode* to,
-      csStringArray& librariesList);
+    bool ProcessWorld (iDocumentNode* from, iDocumentNode* to, 
+      bool shallow, bool nested);
     bool ProcessPlugins (iDocumentNode* from, iDocumentNode* to);
     bool ProcessSector (iDocumentNode* from, iDocumentNode* to);
     bool ProcessMeshfactOrObj (iSector* sector, iDocumentNode* from, 
@@ -68,16 +68,16 @@ namespace genmeshify
 
     /**
      * Load stuff that the loaded mesh factories may depend on: 
-     * textures, materials, libraries, and settings.
+     * textures, materials, settings and libs (if shallow == true).
      */
-    bool PreloadDependencies (iDocumentNode* from);
+    bool PreloadDependencies (iDocumentNode* from, bool shallow);
     bool PreloadSectors (iDocumentNode* from);
   public:
     Processor (App* app);
     ~Processor ();
 
     static bool Preload (App* app, const csStringArray& paths);
-    bool Process (const char* filename, csStringArray& librariesList);
+    bool Process (const char* filename, bool shallow, bool nested = false);
   };
 }
 

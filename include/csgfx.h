@@ -44,6 +44,7 @@
 #include "csgfx/shadervarblockalloc.h"
 #include "csgfx/shadervarcontext.h"
 #include "csgfx/shadervarframeholder.h"
+#include "csgfx/trianglestream.h"
 #include "csgfx/vertexlight.h"
 #include "csgfx/vertexlistwalker.h"
 #include "csgfx/xorpat.h"

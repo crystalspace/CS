@@ -381,7 +381,7 @@ public:
    * Get the bounding box in object space for this polygon set.
    * This is calculated based on the oriented bounding box.
    */
-  void GetBoundingBox (csBox3& box);
+  const csBox3& GetBoundingBox ();
 
   /**
    * Set the bounding box in object space for this polygon set.
@@ -562,7 +562,11 @@ public:
   //-------------------- iObjectModel implementation --------------------------
   virtual void GetObjectBoundingBox (csBox3& bbox)
   {
-    GetBoundingBox (bbox);
+    bbox = GetBoundingBox ();
+  }
+  virtual const csBox3& GetObjectBoundingBox ()
+  {
+    return GetBoundingBox ();
   }
   virtual void SetObjectBoundingBox (const csBox3& bbox)
   {
@@ -989,6 +993,7 @@ public:
   virtual csPtr<iImage> GetPolygonLightmap (int polygon_idx);
   virtual bool GetPolygonPDLight (int polygon_idx, size_t pdlight_index, 
     csRef<iImage>& map, iLight*& light);
+  iMaterialWrapper* GetReplacedMaterial (iMaterialWrapper* oldMat);
   /** @} */
 
   //-------------------- iMeshObject interface implementation ----------

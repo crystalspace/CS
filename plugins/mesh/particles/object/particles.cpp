@@ -659,11 +659,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     }
   }
 
-  void ParticlesMeshObject::GetObjectBoundingBox (csBox3& bbox)
+  const csBox3&  ParticlesMeshObject::GetObjectBoundingBox ()
   {
+    csBox3 bbox;
     bbox.SetCenter (csVector3 (0.0f));
     bbox.SetSize (csVector3 (radius*2));
     bbox.AddBoundingBox (minBB);
+    return bbox;
   }
 
   void ParticlesMeshObject::SetObjectBoundingBox (const csBox3& bbox)

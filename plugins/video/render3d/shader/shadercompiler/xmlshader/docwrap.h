@@ -264,6 +264,7 @@ protected:
 
   template<typename ConditionEval>
   csWrappedDocumentNode (ConditionEval& eval,
+    csWrappedDocumentNode* parent,
     iDocumentNode* wrappedNode,
     iConditionResolver* resolver,
     csWrappedDocumentNodeFactory* shared, 
@@ -279,7 +280,7 @@ public:
   virtual const char* GetValue ();
 
   virtual csRef<iDocumentNode> GetParent ()
-  { return (iDocumentNode*)parent; }
+  { return static_cast<iDocumentNode*> (parent); }
   virtual csRef<iDocumentNodeIterator> GetNodes ();
   virtual csRef<iDocumentNodeIterator> GetNodes (const char* value);
   virtual csRef<iDocumentNode> GetNode (const char* value);

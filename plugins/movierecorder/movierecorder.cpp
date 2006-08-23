@@ -46,6 +46,7 @@ CS_IMPLEMENT_PLUGIN
 
 CS_PLUGIN_NAMESPACE_BEGIN(Movierecorder)
 {
+SCF_IMPLEMENT_FACTORY (csMovieRecorder)
 
 void csMovieRecorder::Report (int severity, const char* msg, ...)
 {

@@ -3027,6 +3027,44 @@ sub ACQUIRE {
 }
 
 
+############# Class : cspace::ShaderVarName ##############
+
+package cspace::ShaderVarName;
+@ISA = qw( cspace );
+%OWNER = ();
+%ITERATORS = ();
+*swig_name_get = *cspacec::ShaderVarName_name_get;
+*swig_name_set = *cspacec::ShaderVarName_name_set;
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_ShaderVarName(@_);
+    bless $self, $pkg if defined($self);
+}
+
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_ShaderVarName($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
 ############# Class : cspace::csShaderVariableArrayReadOnly ##############
 
 package cspace::csShaderVariableArrayReadOnly;
@@ -5039,16 +5077,10 @@ package cspace::csFog;
 @ISA = qw( cspace );
 %OWNER = ();
 %ITERATORS = ();
-*swig_enabled_get = *cspacec::csFog_enabled_get;
-*swig_enabled_set = *cspacec::csFog_enabled_set;
 *swig_density_get = *cspacec::csFog_density_get;
 *swig_density_set = *cspacec::csFog_density_set;
-*swig_red_get = *cspacec::csFog_red_get;
-*swig_red_set = *cspacec::csFog_red_set;
-*swig_green_get = *cspacec::csFog_green_get;
-*swig_green_set = *cspacec::csFog_green_set;
-*swig_blue_get = *cspacec::csFog_blue_get;
-*swig_blue_set = *cspacec::csFog_blue_set;
+*swig_color_get = *cspacec::csFog_color_get;
+*swig_color_set = *cspacec::csFog_color_set;
 *swig_start_get = *cspacec::csFog_start_get;
 *swig_start_set = *cspacec::csFog_start_set;
 *swig_end_get = *cspacec::csFog_end_get;
@@ -5273,6 +5305,7 @@ package cspace::iSector;
 *IsLightCullingEnabled = *cspacec::iSector_IsLightCullingEnabled;
 *AddLightVisibleCallback = *cspacec::iSector_AddLightVisibleCallback;
 *RemoveLightVisibleCallback = *cspacec::iSector_RemoveLightVisibleCallback;
+*GetSVContext = *cspacec::iSector_GetSVContext;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -6854,6 +6887,7 @@ package cspace::iGeneralMeshSubMesh;
 *GetMaterial = *cspacec::iGeneralMeshSubMesh_GetMaterial;
 *GetName = *cspacec::iGeneralMeshSubMesh_GetName;
 *GetMixmode = *cspacec::iGeneralMeshSubMesh_GetMixmode;
+*SetMaterial = *cspacec::iGeneralMeshSubMesh_SetMaterial;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -8267,6 +8301,7 @@ package cspace::iThingState;
 *GetPolygonWorldPlane = *cspacec::iThingState_GetPolygonWorldPlane;
 *GetPolygonLightmap = *cspacec::iThingState_GetPolygonLightmap;
 *GetPolygonPDLight = *cspacec::iThingState_GetPolygonPDLight;
+*GetReplacedMaterial = *cspacec::iThingState_GetReplacedMaterial;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -12892,8 +12927,6 @@ package cspace::iMaterial;
 *GetTexture = *cspacec::iMaterial_GetTexture;
 *GetFlatColor = *cspacec::iMaterial_GetFlatColor;
 *SetFlatColor = *cspacec::iMaterial_SetFlatColor;
-*GetReflection = *cspacec::iMaterial_GetReflection;
-*SetReflection = *cspacec::iMaterial_SetReflection;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -15530,6 +15563,7 @@ sub CS_FOG_MODE_NONE () { $cspacec::CS_FOG_MODE_NONE }
 sub CS_FOG_MODE_LINEAR () { $cspacec::CS_FOG_MODE_LINEAR }
 sub CS_FOG_MODE_EXP () { $cspacec::CS_FOG_MODE_EXP }
 sub CS_FOG_MODE_EXP2 () { $cspacec::CS_FOG_MODE_EXP2 }
+sub CS_FOG_MODE_CRYSTALSPACE () { $cspacec::CS_FOG_MODE_CRYSTALSPACE }
 sub CS_ENGINE_CACHE_READ () { $cspacec::CS_ENGINE_CACHE_READ }
 sub CS_ENGINE_CACHE_WRITE () { $cspacec::CS_ENGINE_CACHE_WRITE }
 sub CS_ENGINE_CACHE_NOUPDATE () { $cspacec::CS_ENGINE_CACHE_NOUPDATE }
@@ -15875,12 +15909,6 @@ sub CS_TEXTURE_NOFILTER () { $cspacec::CS_TEXTURE_NOFILTER }
 sub CS_TEXTURE_NPOTS () { $cspacec::CS_TEXTURE_NPOTS }
 sub CS_TEXTURE_SCALE_UP () { $cspacec::CS_TEXTURE_SCALE_UP }
 sub CS_TEXTURE_SCALE_DOWN () { $cspacec::CS_TEXTURE_SCALE_DOWN }
-sub CS_DEFMAT_DIFFUSE () { $cspacec::CS_DEFMAT_DIFFUSE }
-sub CS_DEFMAT_AMBIENT () { $cspacec::CS_DEFMAT_AMBIENT }
-sub CS_DEFMAT_REFLECTION () { $cspacec::CS_DEFMAT_REFLECTION }
-sub CS_MATERIAL_VARNAME_DIFFUSE () { $cspacec::CS_MATERIAL_VARNAME_DIFFUSE }
-sub CS_MATERIAL_VARNAME_AMBIENT () { $cspacec::CS_MATERIAL_VARNAME_AMBIENT }
-sub CS_MATERIAL_VARNAME_REFLECTION () { $cspacec::CS_MATERIAL_VARNAME_REFLECTION }
 sub CS_MATERIAL_VARNAME_FLATCOLOR () { $cspacec::CS_MATERIAL_VARNAME_FLATCOLOR }
 sub CS_MATERIAL_TEXTURE_DIFFUSE () { $cspacec::CS_MATERIAL_TEXTURE_DIFFUSE }
 sub CS_IMGFMT_MASK () { $cspacec::CS_IMGFMT_MASK }

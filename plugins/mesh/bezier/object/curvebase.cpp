@@ -696,8 +696,7 @@ void csCurve::CalcUVBuffers ()
 
 void csCurve::GetCameraBoundingBox (const csTransform &obj2cam, csBox3 &cbox)
 {
-  csBox3 box;
-  GetObjectBoundingBox (box);
+  const csBox3& box = GetObjectBoundingBox ();
   cbox.StartBoundingBox (obj2cam * box.GetCorner (0));
   cbox.AddBoundingVertexSmart (obj2cam * box.GetCorner (1));
   cbox.AddBoundingVertexSmart (obj2cam * box.GetCorner (2));
@@ -863,7 +862,7 @@ csCurveTesselated *csBezierCurve::Tesselate (int res)
   return previous_tesselation;
 }
 
-void csBezierCurve::GetObjectBoundingBox (csBox3 &bbox)
+const csBox3& csBezierCurve::GetObjectBoundingBox ()
 {
   // @@@ This algo uses the control points to compute
   // the bounding box. Is this right?
@@ -877,7 +876,7 @@ void csBezierCurve::GetObjectBoundingBox (csBox3 &bbox)
       for (j = 0; j < 3; j++) object_bbox.AddBoundingVertex (points[i][j]);
   }
 
-  bbox = object_bbox;
+  return object_bbox;
 }
 
 csBezierCurve::csBezierCurve (csBezierMeshObjectType* thing_type)

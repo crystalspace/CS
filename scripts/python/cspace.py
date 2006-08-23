@@ -2582,6 +2582,32 @@ class csShaderVariablePtr(csShaderVariable):
         self.__class__ = csShaderVariable
 _cspace.csShaderVariable_swigregister(csShaderVariablePtr)
 
+class ShaderVarName(_object):
+    __swig_setmethods__ = {}
+    __setattr__ = lambda self, name, value: _swig_setattr(self, ShaderVarName, name, value)
+    __swig_getmethods__ = {}
+    __getattr__ = lambda self, name: _swig_getattr(self, ShaderVarName, name)
+    def __repr__(self):
+        return "<%s.%s; proxy of C++ CS::ShaderVarName instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
+    __swig_setmethods__["name"] = _cspace.ShaderVarName_name_set
+    __swig_getmethods__["name"] = _cspace.ShaderVarName_name_get
+    if _newclass:name = property(_cspace.ShaderVarName_name_get, _cspace.ShaderVarName_name_set)
+    def __init__(self, *args):
+        _swig_setattr(self, ShaderVarName, 'this', _cspace.new_ShaderVarName(*args))
+        _swig_setattr(self, ShaderVarName, 'thisown', 1)
+    def __del__(self, destroy=_cspace.delete_ShaderVarName):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+
+
+class ShaderVarNamePtr(ShaderVarName):
+    def __init__(self, this):
+        _swig_setattr(self, ShaderVarName, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, ShaderVarName, 'thisown', 0)
+        _swig_setattr(self, ShaderVarName,self.__class__,ShaderVarName)
+_cspace.ShaderVarName_swigregister(ShaderVarNamePtr)
+
 class csShaderVariableArrayReadOnly(iBase):
     __swig_setmethods__ = {}
     for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
@@ -4386,6 +4412,7 @@ CS_FOG_MODE_NONE = _cspace.CS_FOG_MODE_NONE
 CS_FOG_MODE_LINEAR = _cspace.CS_FOG_MODE_LINEAR
 CS_FOG_MODE_EXP = _cspace.CS_FOG_MODE_EXP
 CS_FOG_MODE_EXP2 = _cspace.CS_FOG_MODE_EXP2
+CS_FOG_MODE_CRYSTALSPACE = _cspace.CS_FOG_MODE_CRYSTALSPACE
 class csFog(_object):
     __swig_setmethods__ = {}
     __setattr__ = lambda self, name, value: _swig_setattr(self, csFog, name, value)
@@ -4393,21 +4420,12 @@ class csFog(_object):
     __getattr__ = lambda self, name: _swig_getattr(self, csFog, name)
     def __repr__(self):
         return "<%s.%s; proxy of C++ csFog instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
-    __swig_setmethods__["enabled"] = _cspace.csFog_enabled_set
-    __swig_getmethods__["enabled"] = _cspace.csFog_enabled_get
-    if _newclass:enabled = property(_cspace.csFog_enabled_get, _cspace.csFog_enabled_set)
     __swig_setmethods__["density"] = _cspace.csFog_density_set
     __swig_getmethods__["density"] = _cspace.csFog_density_get
     if _newclass:density = property(_cspace.csFog_density_get, _cspace.csFog_density_set)
-    __swig_setmethods__["red"] = _cspace.csFog_red_set
-    __swig_getmethods__["red"] = _cspace.csFog_red_get
-    if _newclass:red = property(_cspace.csFog_red_get, _cspace.csFog_red_set)
-    __swig_setmethods__["green"] = _cspace.csFog_green_set
-    __swig_getmethods__["green"] = _cspace.csFog_green_get
-    if _newclass:green = property(_cspace.csFog_green_get, _cspace.csFog_green_set)
-    __swig_setmethods__["blue"] = _cspace.csFog_blue_set
-    __swig_getmethods__["blue"] = _cspace.csFog_blue_get
-    if _newclass:blue = property(_cspace.csFog_blue_get, _cspace.csFog_blue_set)
+    __swig_setmethods__["color"] = _cspace.csFog_color_set
+    __swig_getmethods__["color"] = _cspace.csFog_color_get
+    if _newclass:color = property(_cspace.csFog_color_get, _cspace.csFog_color_set)
     __swig_setmethods__["start"] = _cspace.csFog_start_set
     __swig_getmethods__["start"] = _cspace.csFog_start_get
     if _newclass:start = property(_cspace.csFog_start_get, _cspace.csFog_start_set)
@@ -4595,6 +4613,7 @@ class iSector(iBase):
     def IsLightCullingEnabled(*args): return _cspace.iSector_IsLightCullingEnabled(*args)
     def AddLightVisibleCallback(*args): return _cspace.iSector_AddLightVisibleCallback(*args)
     def RemoveLightVisibleCallback(*args): return _cspace.iSector_RemoveLightVisibleCallback(*args)
+    def GetSVContext(*args): return _cspace.iSector_GetSVContext(*args)
     def __del__(self, destroy=_cspace.delete_iSector):
         try:
             if self.thisown: destroy(self)
@@ -6055,6 +6074,7 @@ class iGeneralMeshSubMesh(iBase):
     def GetMaterial(*args): return _cspace.iGeneralMeshSubMesh_GetMaterial(*args)
     def GetName(*args): return _cspace.iGeneralMeshSubMesh_GetName(*args)
     def GetMixmode(*args): return _cspace.iGeneralMeshSubMesh_GetMixmode(*args)
+    def SetMaterial(*args): return _cspace.iGeneralMeshSubMesh_SetMaterial(*args)
     def __del__(self, destroy=_cspace.delete_iGeneralMeshSubMesh):
         try:
             if self.thisown: destroy(self)
@@ -7296,6 +7316,7 @@ class iThingState(iBase):
     def GetPolygonWorldPlane(*args): return _cspace.iThingState_GetPolygonWorldPlane(*args)
     def GetPolygonLightmap(*args): return _cspace.iThingState_GetPolygonLightmap(*args)
     def GetPolygonPDLight(*args): return _cspace.iThingState_GetPolygonPDLight(*args)
+    def GetReplacedMaterial(*args): return _cspace.iThingState_GetReplacedMaterial(*args)
     def __del__(self, destroy=_cspace.delete_iThingState):
         try:
             if self.thisown: destroy(self)
@@ -11931,12 +11952,6 @@ _cspace.iTextureManager_swigregister(iTextureManagerPtr)
 
 iTextureManager_scfGetVersion = _cspace.iTextureManager_scfGetVersion
 
-CS_DEFMAT_DIFFUSE = _cspace.CS_DEFMAT_DIFFUSE
-CS_DEFMAT_AMBIENT = _cspace.CS_DEFMAT_AMBIENT
-CS_DEFMAT_REFLECTION = _cspace.CS_DEFMAT_REFLECTION
-CS_MATERIAL_VARNAME_DIFFUSE = _cspace.CS_MATERIAL_VARNAME_DIFFUSE
-CS_MATERIAL_VARNAME_AMBIENT = _cspace.CS_MATERIAL_VARNAME_AMBIENT
-CS_MATERIAL_VARNAME_REFLECTION = _cspace.CS_MATERIAL_VARNAME_REFLECTION
 CS_MATERIAL_VARNAME_FLATCOLOR = _cspace.CS_MATERIAL_VARNAME_FLATCOLOR
 CS_MATERIAL_TEXTURE_DIFFUSE = _cspace.CS_MATERIAL_TEXTURE_DIFFUSE
 class iMaterial(iShaderVariableContext):
@@ -11955,8 +11970,6 @@ class iMaterial(iShaderVariableContext):
     def GetTexture(*args): return _cspace.iMaterial_GetTexture(*args)
     def GetFlatColor(*args): return _cspace.iMaterial_GetFlatColor(*args)
     def SetFlatColor(*args): return _cspace.iMaterial_SetFlatColor(*args)
-    def GetReflection(*args): return _cspace.iMaterial_GetReflection(*args)
-    def SetReflection(*args): return _cspace.iMaterial_SetReflection(*args)
     def __del__(self, destroy=_cspace.delete_iMaterial):
         try:
             if self.thisown: destroy(self)

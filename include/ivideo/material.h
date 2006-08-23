@@ -32,19 +32,6 @@
 #include "ivideo/shader/shader.h"
 
 
-/// Default material `diffuse' parameter
-#define CS_DEFMAT_DIFFUSE 0.7f
-/// Default material `ambient' parameter
-#define CS_DEFMAT_AMBIENT 0.0f
-/// Default material `reflection' parameter
-#define CS_DEFMAT_REFLECTION  0.0f
-
-/// Name string for the material "diffuse" shader var
-#define CS_MATERIAL_VARNAME_DIFFUSE		"mat diffuse"
-/// Name string for the material "ambient" shader var
-#define CS_MATERIAL_VARNAME_AMBIENT		"mat ambient"
-/// Name string for the material "reflection" shader var
-#define CS_MATERIAL_VARNAME_REFLECTION		"mat reflection"
 /// Name string for the material "flat color" shader var
 #define CS_MATERIAL_VARNAME_FLATCOLOR		"mat flatcolor"
 /// Name string for the material "diffuse" texture
@@ -67,9 +54,9 @@ struct csRGBpixel;
  * Main users of this interface:
  * - 3D renderer implementations (iGraphics3D).
  */
-struct iMaterial : public iShaderVariableContext
+struct iMaterial : public virtual iShaderVariableContext
 {
-  SCF_INTERFACE (iMaterial, 2, 0, 0);
+  SCF_INTERFACE (iMaterial, 2, 1, 0);
 
   /**
    * Associate a shader with a shader type
@@ -87,7 +74,7 @@ struct iMaterial : public iShaderVariableContext
   virtual const csHash<csRef<iShader>, csStringID>& GetShaders() const =0;
 
   /**
-   * Get the base texture from the material.
+   * Get the base ("tex diffuse") texture from the material.
    */
   virtual iTextureHandle *GetTexture () = 0;
 
@@ -101,26 +88,15 @@ struct iMaterial : public iShaderVariableContext
    * will return the mean texture color.
    * \deprecated Use the shader variable system instead.
    */
+  CS_DEPRECATED_METHOD_MSG("Use the shader variable system instead")
   virtual void GetFlatColor (csRGBpixel &oColor,
     bool useTextureMean = true) = 0;
   /**
    * Set the flat shading color.
    * \deprecated Use the shader variable system instead.
    */
+  CS_DEPRECATED_METHOD_MSG("Use the shader variable system instead")
   virtual void SetFlatColor (const csRGBcolor& col) = 0;
-
-  /**
-   * Get light reflection parameters for this material.
-   * \deprecated Use the shader variable system instead.
-   */
-  virtual void GetReflection (
-    float &oDiffuse, float &oAmbient, float &oReflection) = 0;
-  /**
-   * Set the reflection parameters.
-   * \deprecated Use the shader variable system instead.
-   */
-  virtual void SetReflection (float oDiffuse, float oAmbient,
-    float oReflection) = 0;
 };
 
 /** @} */

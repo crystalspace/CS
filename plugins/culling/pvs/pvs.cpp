@@ -272,12 +272,11 @@ void csPVSVis::CalculateVisObjBBox (iVisibilityObject* visobj, csBox3& bbox)
   iMovable* movable = visobj->GetMovable ();
   if (movable->IsFullTransformIdentity ())
   {
-    visobj->GetObjectModel ()->GetObjectBoundingBox (bbox);
+    bbox = visobj->GetObjectModel ()->GetObjectBoundingBox ();
   }
   else
   {
-    csBox3 box;
-    visobj->GetObjectModel ()->GetObjectBoundingBox (box);
+    const csBox3& box = visobj->GetObjectModel ()->GetObjectBoundingBox ();
     csReversibleTransform trans = movable->GetFullTransform ();
     bbox.StartBoundingBox (trans.This2Other (box.GetCorner (0)));
     bbox.AddBoundingVertexSmart (trans.This2Other (box.GetCorner (1)));

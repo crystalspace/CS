@@ -967,15 +967,12 @@ void csThingStatic::SetBoundingBox (const csBox3 &box)
   ShapeChanged ();
 }
 
-void csThingStatic::GetBoundingBox (csBox3 &box)
+const csBox3& csThingStatic::GetBoundingBox ()
 {
   int i;
 
   if (IsObjBboxValid())
-  {
-    box = obj_bbox;
-    return ;
-  }
+    return obj_bbox;
 
   SetObjBboxValid (true);
 
@@ -983,8 +980,7 @@ void csThingStatic::GetBoundingBox (csBox3 &box)
   {
     obj_bbox.Set (0, 0, 0, 0, 0, 0);
     obj_radius = 0.0f;
-    box = obj_bbox;
-    return ;
+    return obj_bbox;
   }
 
   obj_bbox.StartBoundingBox (obj_verts[0]);
@@ -993,13 +989,12 @@ void csThingStatic::GetBoundingBox (csBox3 &box)
 
   obj_radius = csQsqrt (csSquaredDist::PointPoint (
         obj_bbox.Max (), obj_bbox.Min ())) * 0.5f;
-  box = obj_bbox;
+  return obj_bbox;
 }
 
 void csThingStatic::GetRadius (float &rad, csVector3 &cent)
 {
-  csBox3 b;
-  GetBoundingBox (b);
+  const csBox3& b = GetBoundingBox ();
   rad = obj_radius;
   cent = b.GetCenter ();
 }
@@ -1669,9 +1664,6 @@ csThing::~csThing ()
 
 csString csThing::GenerateCacheName ()
 {
-  csBox3 b;
-  static_data->GetBoundingBox (b);
-
   csMemFile mf;
   int32 l;
   l = csLittleEndian::Convert ((int32)static_data->num_vertices);
@@ -2106,7 +2098,7 @@ void csThing::GetBoundingBox (iMovable *movable, csBox3 &box)
   if (wor_bbox_movablenr != movable->GetUpdateNumber ())
   {
     // First make sure obj_bbox is valid.
-    static_data->GetBoundingBox (box);
+    box = static_data->GetBoundingBox ();
     wor_bbox_movablenr = movable->GetUpdateNumber ();
     csBox3& obj_bbox = static_data->obj_bbox;
 
@@ -2508,8 +2500,7 @@ csRenderMesh **csThing::GetRenderMeshes (int &num, iRenderView* rview,
   cached_movable = movable;
   WorUpdate ();
 
-  csBox3 b;
-  static_data->GetBoundingBox (b);
+  const csBox3& b = static_data->GetBoundingBox ();
 
   csSphere sphere;
   sphere.SetCenter (b.GetCenter ());
@@ -2677,17 +2668,6 @@ void csThing::ClearLMs ()
 void csThing::UpdateDirtyLMs ()
 {
   csColor amb (0, 0, 0);
-  if (cached_movable)
-  {
-    // First check if dynamic ambient has changed.
-    iSector* s = cached_movable->GetSectors ()->Get (0);
-    amb += s->GetDynamicAmbientLight ();
-    if (dynamic_ambient_version != s->GetDynamicAmbientVersion ())
-    {
-      dynamic_ambient_version = s->GetDynamicAmbientVersion ();
-      MarkLightmapsDirty ();
-    }
-  }
 
   if (!IsLmDirty()) return;
 
@@ -2794,6 +2774,16 @@ bool csThing::GetPolygonPDLight (int polygon_idx, size_t pdlight_index,
     pdData, true, CS_IMGFMT_PALETTED8, pal));
 
   return true;
+}
+
+iMaterialWrapper* csThing::GetReplacedMaterial (iMaterialWrapper* oldMat)
+{
+  for (size_t i = 0; i < replace_materials.GetSize(); i++)
+  {
+    if (replace_materials[i].old_mat == oldMat) 
+      return replace_materials[i].new_mat;
+  }
+  return 0;
 }
 
 //---------------------------------------------------------------------------

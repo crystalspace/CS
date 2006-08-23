@@ -445,7 +445,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
 
 
     //-- iObjectModel
-    virtual void GetObjectBoundingBox (csBox3& bbox);
+    virtual const csBox3& GetObjectBoundingBox ();
+
+    virtual void GetObjectBoundingBox (csBox3& bbox)
+    {
+      bbox = GetObjectBoundingBox ();
+    }
 
     virtual void SetObjectBoundingBox (const csBox3& bbox);
 

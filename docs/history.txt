@@ -6,6 +6,118 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+23-Aug-2006
+	- Jorrit deprecated iObjectModel->GetObjectBoundingBox(csBox3).
+	  Instead there is now iObjectModel->GetObjectBoundingBox() which
+	  returns a reference to the box. This is more optimal and it is
+	  better to use a return value anyway.
+	- Jorrit changed standard diffuse renderloop so that it now culls
+	  objects in object space (for lights). So the light center is
+	  transformed into object space and then the object bounding
+	  box is tested. This is faster (no need to transform the object
+	  bounding box to world space) and also more accurate as we
+	  are essentially testing against the OBB instead of the AABB (so
+	  this should in some cases speed up lighting at runtime).
+	- Jorrit added a new syntax for loading vertices and triangles
+	  from genmesh. You can now say instead of:
+	      <v x="1" y="2" z="2" u="3" v="4" nx="5" ny="7" nz="8"
+	       red="9" green="10" blue="11" alpha="12" />
+	      <v x="1" y="2" z="2" u="3" v="4" nx="5" ny="7" nz="8"
+	       red="9" green="10" blue="11" alpha="12" />
+	      <v x="1" y="2" z="2" u="3" v="4" nx="5" ny="7" nz="8"
+	       red="9" green="10" blue="11" alpha="12" />
+	      ...
+	  the following:
+	      <vertices format="vunc">
+	      1 2 3 4 5 6 7 8 9 10 11 12
+	      1 2 3 4 5 6 7 8 9 10 11 12
+	      1 2 3 4 5 6 7 8 9 10 11 12
+	      ...
+	      </vertices>
+	  Similar for triangles:
+	      <t v1="1" v2="2" v3="3"/>
+	      <t v1="1" v2="2" v3="3"/>
+	      <t v1="1" v2="2" v3="3"/>
+	      ...
+	  becomes:
+	      <triangles>
+	      1 2 3
+	      1 2 3
+	      1 2 3
+	      ...
+	      </triangles>
+	  This loads faster and is also a lot smaller (note: even better
+	  would be the streaming loader).
+	- Jorrit and Hristo worked a bit further on parallaxAtt. Technique
+	  150 is now more correct and actually works on intel graphics now.
+	  So that means that the intel graphics specific rule to forbid 150
+	  can now be removed. Technique 130 is kept because it can work
+	  on cards with only 4 texture units.
+	- Jorrit fixed stencil2 plugin to compile again after latest
+	  changes to GetObjectBoundingBox().
+	- Hristo did some additional fixes on the specular shader.
+22-Aug-2006
+	- Jorrit fixed a bug with the new genmesh submesh system.
+	  HitBeamObject() and HitBeamOutline() were broken because they
+	  tested on the first triangle all the time.
+	- Jorrit changed the standard renderloop object/light culler to
+	  use bounding box instead of bounding radius (for the meshes).
+	  While that is slightly slower to calculate it gives a much
+	  more accurate test and thus a big speedup at runtime for the
+	  lighting calculations. This also fixes visibility of particle
+	  systems on maps using diffuse renderloop since apparently
+	  the particle systems report a wrong bounding sphere but the
+	  bounding box is correct.
+	- Jorrit and Hristo did several changes to the parallaxAtt and
+	  specular changes to get attenuation right. This makes levels
+	  darker but it fixes flickering and provides the correct
+	  attenuation results now. Also the priority 130 technique
+	  has been replaced with a two-pass technique that does proper
+	  attenuation.
+21-Aug-2006
+	- caedes added SCF_IMPLEMENT_FACTORY to movierecorder plugin.
+	- res added a helper to iterate over triangles from an index buffer
+	  (also supporting e.g. strips and quads).
+	- res changed the software renderer to use aforementioned helper.
+	- Jorrit fixed the bullet plugin so that it compiles again.
+	- caedes added pythmod.jam file with a rule for building python
+	  modules for crystalspace and made cspython use it.
+	- caedes added tooltip skin to the ice cegui theme (only for 0.5+).
+	- res made the xmlshader wrapper document properly keep track of node
+	  parents.
+20-Aug-2006
+	- res added texture crossbar support to glshader_fixed.
+	- res fixed an initialization bug in engseq.
+	- res moved the dynamic ambient application in case of lightmapping
+	  from code to shaders.
+18-Aug-2006
+        - res worked around some issues with wx in wxtest.
+	- Jorrit augmented the iDynamicsCollisionCallback with a position
+	  of collision, the normal of the collision and the penetration
+	  depth.
+	- res removed the legacy diffuse/ambient/reflection options from
+	  iMaterial.
+	- res made sectors be shader variable contexts as well. Fog and 
+	  dynamic ambient SVs are now provided by the sector itself. Also 
+	  streamlined csFog.
+15-Aug-2006
+	- res committed a patch from Timothy Whitfield <whitfieldts@gmail.com>
+	  to add csBaseEventHandler::UnregisterQueue ().
+14-Aug-2006
+	- res changed the way libraries are handled by genmeshify: instead
+	  of collecting them first and converting them after the main file
+	  was converted they're now converted as encountered, as this seems
+	  more robust.
+	- res re-used the standard loader context from genmeshify to better
+	  deal with "sloppy" maps that rely on the "try to load texture with
+	  name" and "create material from texture with name" features.
+	- res added the ability to override submesh materials in the mesh
+	  object to genmesh.
+	- res added a method to query material replacements from a Thing 
+	  object.
+	- res added support for material replacements to genmeshify.
+	- res fixed tangent + bitangent generation for genmeshes with 
+	  submeshes.
 13-Aug-2006
 	- res added CS_REQUEST_PLUGIN_TAG.
 	- res made genmeshify use the document plexer plugin.
