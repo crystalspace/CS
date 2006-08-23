@@ -53,6 +53,8 @@ chronological order.
 	  So that means that the intel graphics specific rule to forbid 150
 	  can now be removed. Technique 130 is kept because it can work
 	  on cards with only 4 texture units.
+	- Jorrit fixed stencil2 plugin to compile again after latest
+	  changes to GetObjectBoundingBox().
 22-Aug-2006
 	- Jorrit fixed a bug with the new genmesh submesh system.
 	  HitBeamObject() and HitBeamOutline() were broken because they
