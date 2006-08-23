@@ -84,7 +84,8 @@ struct meshInfo
   iShaderVariableContext* svc;
   bool noclip;		// From iMeshWrapper CS_ENTITY_NOCLIP.
 #if USE_BOX
-  csBox3 wor_bbox;	// Bounding box in world space.
+  iObjectModel* obj_model;
+  iMovable* movable;
 #else
   csVector3 wor_center;	// Center of the bounding sphere of this object.
   float radius;		// Radius of the bounding sphere of this object.

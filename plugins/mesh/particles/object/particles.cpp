@@ -620,6 +620,13 @@ void csParticlesObject::GetObjectBoundingBox (csBox3& bbox)
   	csVector3 (radius, radius, radius));
 }
 
+const csBox3& csParticlesObject::GetObjectBoundingBox ()
+{
+  obj_bbox.Set (csVector3 (-radius, -radius, -radius),
+  	csVector3 (radius, radius, radius));
+  return obj_bbox;
+}
+
 void csParticlesObject::SetObjectBoundingBox (const csBox3&)
 {
   // @@@ TODO

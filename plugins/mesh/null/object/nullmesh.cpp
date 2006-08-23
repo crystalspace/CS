@@ -115,6 +115,11 @@ void csNullmeshMeshObject::GetObjectBoundingBox (csBox3& bbox)
   bbox = box;
 }
 
+const csBox3& csNullmeshMeshObject::GetObjectBoundingBox ()
+{
+  return box;
+}
+
 void csNullmeshMeshObject::SetObjectBoundingBox (const csBox3& bbox)
 {
   box = bbox;

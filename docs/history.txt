@@ -6,6 +6,48 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+23-Aug-2006
+	- Jorrit deprecated iObjectModel->GetObjectBoundingBox(csBox3).
+	  Instead there is now iObjectModel->GetObjectBoundingBox() which
+	  returns a reference to the box. This is more optimal and it is
+	  better to use a return value anyway.
+	- Jorrit changed standard diffuse renderloop so that it now culls
+	  objects in object space (for lights). So the light center is
+	  transformed into object space and then the object bounding
+	  box is tested. This is faster (no need to transform the object
+	  bounding box to world space) and also more accurate as we
+	  are essentially testing against the OBB instead of the AABB (so
+	  this should in some cases speed up lighting at runtime).
+	- Jorrit added a new syntax for loading vertices and triangles
+	  from genmesh. You can now say instead of:
+	      <v x="1" y="2" z="2" u="3" v="4" nx="5" ny="7" nz="8"
+	       red="9" green="10" blue="11" alpha="12" />
+	      <v x="1" y="2" z="2" u="3" v="4" nx="5" ny="7" nz="8"
+	       red="9" green="10" blue="11" alpha="12" />
+	      <v x="1" y="2" z="2" u="3" v="4" nx="5" ny="7" nz="8"
+	       red="9" green="10" blue="11" alpha="12" />
+	      ...
+	  the following:
+	      <vertices format="vunc">
+	      1 2 3 4 5 6 7 8 9 10 11 12
+	      1 2 3 4 5 6 7 8 9 10 11 12
+	      1 2 3 4 5 6 7 8 9 10 11 12
+	      ...
+	      </vertices>
+	  Similar for triangles:
+	      <t v1="1" v2="2" v3="3"/>
+	      <t v1="1" v2="2" v3="3"/>
+	      <t v1="1" v2="2" v3="3"/>
+	      ...
+	  becomes:
+	      <triangles>
+	      1 2 3
+	      1 2 3
+	      1 2 3
+	      ...
+	      </triangles>
+	  This loads faster and is also a lot smaller (note: even better
+	  would be the streaming loader).
 22-Aug-2006
 	- Jorrit fixed a bug with the new genmesh submesh system.
 	  HitBeamObject() and HitBeamOutline() were broken because they

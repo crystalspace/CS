@@ -349,6 +349,13 @@ void csSprite2DMeshObject::GetObjectBoundingBox (csBox3& bbox)
   bbox.Set (-radius, radius);
 }
 
+const csBox3& csSprite2DMeshObject::GetObjectBoundingBox ()
+{
+  SetupObject ();
+  obj_bbox.Set (-radius, radius);
+  return obj_bbox;
+}
+
 void csSprite2DMeshObject::SetObjectBoundingBox (const csBox3&)
 {
   // @@@ TODO

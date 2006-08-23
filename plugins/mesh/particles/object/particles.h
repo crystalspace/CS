@@ -466,6 +466,7 @@ private:
   csRandomGen rng;
   csVector3 emitter;
   float radius;
+  csBox3 obj_bbox;
 
   csFlags flags;
 
@@ -533,6 +534,7 @@ public:
   void InvalidateMaterialHandles () {}
 
   void GetObjectBoundingBox (csBox3& bbox);
+  const csBox3& GetObjectBoundingBox ();
   void SetObjectBoundingBox (const csBox3& bbox);
   void GetRadius (float& rad, csVector3& c);
   iTerraFormer* GetTerraFormerColldet () { return 0; }

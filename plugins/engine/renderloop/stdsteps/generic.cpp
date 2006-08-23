@@ -215,7 +215,8 @@ struct ShaderVarPusher
 };
 
 void csGenericRenderStep::RenderMeshes (iRenderView* rview, iGraphics3D* g3d,
-                                        const ShaderVarPusher& Pusher, size_t ticket,
+                                        const ShaderVarPusher& Pusher,
+					size_t ticket,
 					meshInfo* meshContexts,
                                         csRenderMesh** meshes, 
                                         size_t num,
@@ -413,22 +414,8 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
       iObjectModel* objmodel = m->GetMeshObject ()->GetObjectModel ();
       iMovable* mov = m->GetMovable ();
 #if USE_BOX
-      if (mov->IsFullTransformIdentity ())
-      {
-	objmodel->GetObjectBoundingBox (sameShaderMeshInfo[i].wor_bbox);
-      }
-      else
-      {
-	csReversibleTransform trans = mov->GetFullTransform ();
-	csBox3 obj_bbox;
-	objmodel->GetObjectBoundingBox (obj_bbox);
-	sameShaderMeshInfo[i].wor_bbox.StartBoundingBox (
-	    trans.This2Other (obj_bbox.GetCorner (0)));
-	size_t j;
-	for (j = 1 ; j < 8 ; j++)
-	  sameShaderMeshInfo[i].wor_bbox.AddBoundingVertexSmart (
-	      trans.This2Other (obj_bbox.GetCorner (j)));
-      }
+      sameShaderMeshInfo[i].obj_model = objmodel;
+      sameShaderMeshInfo[i].movable = mov;
 #else
       csVector3 obj_center;
       objmodel->GetRadius (sameShaderMeshInfo[i].radius, obj_center);
@@ -509,8 +496,24 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
     {
       // @@@ TODO: Better test for DIRECTIONAL and SPOTLIGHT
 #if USE_BOX
-      bool isect = csIntersect3::BoxSphere (sameShaderMeshInfo[n].wor_bbox,
+      // We transform the light center to object space and then
+      // we test if the transformed light affects the bounding box.
+      iMovable* mov = sameShaderMeshInfo[n].movable;
+      iObjectModel* obj_model = sameShaderMeshInfo[n].obj_model;
+      const csBox3& obj_bbox = obj_model->GetObjectBoundingBox ();
+      bool isect;
+      if (mov->IsFullTransformIdentity ())
+      {
+        isect = csIntersect3::BoxSphere (obj_bbox,
 	    light_center, cutoff_distance * cutoff_distance);
+      }
+      else
+      {
+        csReversibleTransform trans = mov->GetFullTransform ();
+        csVector3 obj_light_center = trans.Other2This (light_center);
+        isect = csIntersect3::BoxSphere (obj_bbox,
+	    obj_light_center, cutoff_distance * cutoff_distance);
+      }
       if (!isect)
 	continue;
 #else
