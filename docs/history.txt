@@ -10,7 +10,9 @@ chronological order.
 	- Jorrit fixed a serious bug in the generic renderloop code
 	  with regards to light culling. This bug could cause flickering
 	  and other bad artifacts.
-	- Marten integrated newparticles branch revisions 24389-25212 into trunk
+	- Marten integrated newparticles branch revisions 24389-25212 into 
+	  trunk.
+	- Marten added a note to apimod100 for new particles.
 23-Aug-2006
 	- Jorrit deprecated iObjectModel->GetObjectBoundingBox(csBox3).
 	  Instead there is now iObjectModel->GetObjectBoundingBox() which

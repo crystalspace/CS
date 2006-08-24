@@ -29,6 +29,7 @@ Crystal Space.
 * Api100 Reference Count Automation:: Reference Count Automation
 * Api100 64-Bit Portability Changes:: 64-Bit Portability Changes
 * Api100 aws Changes:: @sc{aws} Changes
+* Api100 Particle system changes:: Particle system changes
 * Api100 Changes for Mesh Object Writers:: Changes for Mesh Object Writers
 * Api100 Changes for hierarchical objects:: Changes for hierarchical objects
 * Api100 Model Importing:: Model Importing
@@ -2066,7 +2067,7 @@ methods will result in compilation errors. Alternately, defining
 supports such deprecation warnings. (Presently, only modern version of the
 @sc{gnu} compiler are so configured.)
 
-@node Api100 aws Changes, Api100 Changes for Mesh Object Writers, Api100 64-Bit Portability Changes, Release Notes 100
+@node Api100 aws Changes, Api100 Particle system changes, Api100 64-Bit Portability Changes, Release Notes 100
 @subsection @sc{aws} Changes
 
 The trigger system in @sc{aws} has changed. The trigger callback function
@@ -2079,7 +2080,22 @@ static void TriggerFunc (unsigned long, intptr_t, iAwsSource*);
 This extra parameter is the id of the given trigger name as returned by the
 standard string set (@samp{crystalspace.shared.stringset}).
 
-@node Api100 Changes for Mesh Object Writers, Api100 Changes for hierarchical objects, Api100 aws Changes, Release Notes 100
+@node Api100 Particle system changes, Api100 Changes for Mesh Object Writers, Api100 aws Changes, Release Notes 100
+@subsection Particle system changes
+
+The @sc{particles} mesh object have been rewritten.
+
+@code{iParticlesStateBase}, @code{iParticlesObjectState}, 
+@code{iParticlesFactoryState} and @code{iParticlesPhysics} have been removed
+in favour of the new @code{iParticleSystemBase}, @code{iParticleSystemFactory}
+and @code{iParticleSystem}. 
+Particle emission is controlled via instances of @code{iParticleEmitter},
+physical effects controlled via @code{iParticleEffector}.
+
+The full documentation for the new particle systems can be found at 
+@xref{MeshObject Particles}
+
+@node Api100 Changes for Mesh Object Writers, Api100 Changes for hierarchical objects, Api100 Particle system changes, Release Notes 100
 @subsection Changes for Mesh Object Writers
 
 @code{iMeshObject::SetLogicalParent()} has been renamed to
