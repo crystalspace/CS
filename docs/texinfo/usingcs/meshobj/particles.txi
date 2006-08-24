@@ -198,7 +198,7 @@ areas of settable size and orientation relative to the camera.
 
 @table @samp
 @item camface
-The particle billboards always face the camera location, so the camea to particle
+The particle billboards always face the camera location, so the camera to particle
 vector is used as normal. The camera up vector is used as up-vector for the
 billboards.
 @item camface approx
@@ -300,7 +300,7 @@ only the magnitude should be used and direction should be emitter-specific.
 
 @item @code{<extent x="" y="" z="" />}
 @tab @samp{cylinder}, @samp{cone}
-@tab Extent vector defining the cone or cyliner
+@tab Extent vector defining the cone or cylinder
 
 @item @code{<coneangle>angle</coneangle>}
 @tab @samp{cone}
