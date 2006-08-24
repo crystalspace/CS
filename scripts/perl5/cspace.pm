@@ -2691,6 +2691,7 @@ package cspace::csBox3;
 *AddBoundingVertexSmart = *cspacec::csBox3_AddBoundingVertexSmart;
 *AddBoundingVertexTest = *cspacec::csBox3_AddBoundingVertexTest;
 *AddBoundingVertexSmartTest = *cspacec::csBox3_AddBoundingVertexSmartTest;
+*AddBoundingBox = *cspacec::csBox3_AddBoundingBox;
 sub new {
     my $pkg = shift;
     my $self = cspacec::new_csBox3(@_);
@@ -8499,27 +8500,29 @@ sub ACQUIRE {
 }
 
 
-############# Class : cspace::csParticlesData ##############
+############# Class : cspace::csParticle ##############
 
-package cspace::csParticlesData;
+package cspace::csParticle;
 @ISA = qw( cspace );
 %OWNER = ();
 %ITERATORS = ();
-*swig_position_get = *cspacec::csParticlesData_position_get;
-*swig_position_set = *cspacec::csParticlesData_position_set;
-*swig_color_get = *cspacec::csParticlesData_color_get;
-*swig_color_set = *cspacec::csParticlesData_color_set;
-*swig_velocity_get = *cspacec::csParticlesData_velocity_get;
-*swig_velocity_set = *cspacec::csParticlesData_velocity_set;
-*swig_mass_get = *cspacec::csParticlesData_mass_get;
-*swig_mass_set = *cspacec::csParticlesData_mass_set;
-*swig_time_to_live_get = *cspacec::csParticlesData_time_to_live_get;
-*swig_time_to_live_set = *cspacec::csParticlesData_time_to_live_set;
-*swig_sort_get = *cspacec::csParticlesData_sort_get;
-*swig_sort_set = *cspacec::csParticlesData_sort_set;
+*swig_position_get = *cspacec::csParticle_position_get;
+*swig_position_set = *cspacec::csParticle_position_set;
+*swig_mass_get = *cspacec::csParticle_mass_get;
+*swig_mass_set = *cspacec::csParticle_mass_set;
+*swig_orientation_get = *cspacec::csParticle_orientation_get;
+*swig_orientation_set = *cspacec::csParticle_orientation_set;
+*swig_linearVelocity_get = *cspacec::csParticle_linearVelocity_get;
+*swig_linearVelocity_set = *cspacec::csParticle_linearVelocity_set;
+*swig_timeToLive_get = *cspacec::csParticle_timeToLive_get;
+*swig_timeToLive_set = *cspacec::csParticle_timeToLive_set;
+*swig_angularVelocity_get = *cspacec::csParticle_angularVelocity_get;
+*swig_angularVelocity_set = *cspacec::csParticle_angularVelocity_set;
+*swig_pad_get = *cspacec::csParticle_pad_get;
+*swig_pad_set = *cspacec::csParticle_pad_set;
 sub new {
     my $pkg = shift;
-    my $self = cspacec::new_csParticlesData(@_);
+    my $self = cspacec::new_csParticle(@_);
     bless $self, $pkg if defined($self);
 }
 
@@ -8529,7 +8532,7 @@ sub DESTROY {
     return unless defined $self;
     delete $ITERATORS{$self};
     if (exists $OWNER{$self}) {
-        cspacec::delete_csParticlesData($self);
+        cspacec::delete_csParticle($self);
         delete $OWNER{$self};
     }
 }
@@ -8547,20 +8550,118 @@ sub ACQUIRE {
 }
 
 
-############# Class : cspace::iParticlesColorCallback ##############
+############# Class : cspace::csParticleAux ##############
 
-package cspace::iParticlesColorCallback;
+package cspace::csParticleAux;
+@ISA = qw( cspace );
+%OWNER = ();
+%ITERATORS = ();
+*swig_color_get = *cspacec::csParticleAux_color_get;
+*swig_color_set = *cspacec::csParticleAux_color_set;
+*swig_particleSize_get = *cspacec::csParticleAux_particleSize_get;
+*swig_particleSize_set = *cspacec::csParticleAux_particleSize_set;
+*swig_pad_get = *cspacec::csParticleAux_pad_get;
+*swig_pad_set = *cspacec::csParticleAux_pad_set;
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_csParticleAux(@_);
+    bless $self, $pkg if defined($self);
+}
+
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_csParticleAux($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::csParticleBuffer ##############
+
+package cspace::csParticleBuffer;
+@ISA = qw( cspace );
+%OWNER = ();
+%ITERATORS = ();
+*swig_particleData_get = *cspacec::csParticleBuffer_particleData_get;
+*swig_particleData_set = *cspacec::csParticleBuffer_particleData_set;
+*swig_particleAuxData_get = *cspacec::csParticleBuffer_particleAuxData_get;
+*swig_particleAuxData_set = *cspacec::csParticleBuffer_particleAuxData_set;
+*swig_particleCount_get = *cspacec::csParticleBuffer_particleCount_get;
+*swig_particleCount_set = *cspacec::csParticleBuffer_particleCount_set;
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_csParticleBuffer(@_);
+    bless $self, $pkg if defined($self);
+}
+
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_csParticleBuffer($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iParticleEmitter ##############
+
+package cspace::iParticleEmitter;
 @ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
-*GetColor = *cspacec::iParticlesColorCallback_GetColor;
+*SetEnabled = *cspacec::iParticleEmitter_SetEnabled;
+*GetEnabled = *cspacec::iParticleEmitter_GetEnabled;
+*SetStartTime = *cspacec::iParticleEmitter_SetStartTime;
+*GetStartTime = *cspacec::iParticleEmitter_GetStartTime;
+*SetDuration = *cspacec::iParticleEmitter_SetDuration;
+*GetDuration = *cspacec::iParticleEmitter_GetDuration;
+*SetEmissionRate = *cspacec::iParticleEmitter_SetEmissionRate;
+*GetEmissionRate = *cspacec::iParticleEmitter_GetEmissionRate;
+*SetInitialTTL = *cspacec::iParticleEmitter_SetInitialTTL;
+*GetInitialTTL = *cspacec::iParticleEmitter_GetInitialTTL;
+*SetInitialMass = *cspacec::iParticleEmitter_SetInitialMass;
+*GetInitialMass = *cspacec::iParticleEmitter_GetInitialMass;
+*Clone = *cspacec::iParticleEmitter_Clone;
+*ParticlesToEmit = *cspacec::iParticleEmitter_ParticlesToEmit;
+*EmitParticles = *cspacec::iParticleEmitter_EmitParticles;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
     return unless defined $self;
     delete $ITERATORS{$self};
     if (exists $OWNER{$self}) {
-        cspacec::delete_iParticlesColorCallback($self);
+        cspacec::delete_iParticleEmitter($self);
         delete $OWNER{$self};
     }
 }
@@ -8578,87 +8679,25 @@ sub ACQUIRE {
 }
 
 
-############# Class : cspace::iParticlesStateBase ##############
+############# Class : cspace::iParticleEffector ##############
 
-package cspace::iParticlesStateBase;
+package cspace::iParticleEffector;
 @ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
-*SetParticlesPerSecond = *cspacec::iParticlesStateBase_SetParticlesPerSecond;
-*GetParticlesPerSecond = *cspacec::iParticlesStateBase_GetParticlesPerSecond;
-*SetInitialParticleCount = *cspacec::iParticlesStateBase_SetInitialParticleCount;
-*GetInitialParticleCount = *cspacec::iParticlesStateBase_GetInitialParticleCount;
-*SetPointEmitType = *cspacec::iParticlesStateBase_SetPointEmitType;
-*SetSphereEmitType = *cspacec::iParticlesStateBase_SetSphereEmitType;
-*SetPlaneEmitType = *cspacec::iParticlesStateBase_SetPlaneEmitType;
-*SetBoxEmitType = *cspacec::iParticlesStateBase_SetBoxEmitType;
-*SetCylinderEmitType = *cspacec::iParticlesStateBase_SetCylinderEmitType;
-*GetSphereEmitInnerRadius = *cspacec::iParticlesStateBase_GetSphereEmitInnerRadius;
-*GetSphereEmitOuterRadius = *cspacec::iParticlesStateBase_GetSphereEmitOuterRadius;
-*GetEmitXSize = *cspacec::iParticlesStateBase_GetEmitXSize;
-*GetEmitYSize = *cspacec::iParticlesStateBase_GetEmitYSize;
-*GetEmitZSize = *cspacec::iParticlesStateBase_GetEmitZSize;
-*GetEmitType = *cspacec::iParticlesStateBase_GetEmitType;
-*SetRadialForceType = *cspacec::iParticlesStateBase_SetRadialForceType;
-*SetLinearForceType = *cspacec::iParticlesStateBase_SetLinearForceType;
-*SetConeForceType = *cspacec::iParticlesStateBase_SetConeForceType;
-*GetForceType = *cspacec::iParticlesStateBase_GetForceType;
-*GetForceRange = *cspacec::iParticlesStateBase_GetForceRange;
-*GetFalloffType = *cspacec::iParticlesStateBase_GetFalloffType;
-*GetForceDirection = *cspacec::iParticlesStateBase_GetForceDirection;
-*GetForceDirectionVariation = *cspacec::iParticlesStateBase_GetForceDirectionVariation;
-*GetForceConeRadius = *cspacec::iParticlesStateBase_GetForceConeRadius;
-*SetForce = *cspacec::iParticlesStateBase_SetForce;
-*GetForce = *cspacec::iParticlesStateBase_GetForce;
-*SetDiffusion = *cspacec::iParticlesStateBase_SetDiffusion;
-*GetDiffusion = *cspacec::iParticlesStateBase_GetDiffusion;
-*SetGravity = *cspacec::iParticlesStateBase_SetGravity;
-*GetGravity = *cspacec::iParticlesStateBase_GetGravity;
-*SetEmitTime = *cspacec::iParticlesStateBase_SetEmitTime;
-*GetEmitTime = *cspacec::iParticlesStateBase_GetEmitTime;
-*SetTimeToLive = *cspacec::iParticlesStateBase_SetTimeToLive;
-*GetTimeToLive = *cspacec::iParticlesStateBase_GetTimeToLive;
-*SetTimeVariation = *cspacec::iParticlesStateBase_SetTimeVariation;
-*GetTimeVariation = *cspacec::iParticlesStateBase_GetTimeVariation;
-*SetConstantColorMethod = *cspacec::iParticlesStateBase_SetConstantColorMethod;
-*SetLinearColorMethod = *cspacec::iParticlesStateBase_SetLinearColorMethod;
-*SetLoopingColorMethod = *cspacec::iParticlesStateBase_SetLoopingColorMethod;
-*SetHeatColorMethod = *cspacec::iParticlesStateBase_SetHeatColorMethod;
-*SetColorCallback = *cspacec::iParticlesStateBase_SetColorCallback;
-*GetColorCallback = *cspacec::iParticlesStateBase_GetColorCallback;
-*AddColor = *cspacec::iParticlesStateBase_AddColor;
-*ClearColors = *cspacec::iParticlesStateBase_ClearColors;
-*GetParticleColorMethod = *cspacec::iParticlesStateBase_GetParticleColorMethod;
-*GetConstantColor = *cspacec::iParticlesStateBase_GetConstantColor;
-*GetGradient = *cspacec::iParticlesStateBase_GetGradient;
-*GetColorLoopTime = *cspacec::iParticlesStateBase_GetColorLoopTime;
-*GetBaseHeat = *cspacec::iParticlesStateBase_GetBaseHeat;
-*SetParticleRadius = *cspacec::iParticlesStateBase_SetParticleRadius;
-*GetParticleRadius = *cspacec::iParticlesStateBase_GetParticleRadius;
-*SetDampener = *cspacec::iParticlesStateBase_SetDampener;
-*GetDampener = *cspacec::iParticlesStateBase_GetDampener;
-*SetMass = *cspacec::iParticlesStateBase_SetMass;
-*SetMassVariation = *cspacec::iParticlesStateBase_SetMassVariation;
-*GetMass = *cspacec::iParticlesStateBase_GetMass;
-*GetMassVariation = *cspacec::iParticlesStateBase_GetMassVariation;
-*SetTransformMode = *cspacec::iParticlesStateBase_SetTransformMode;
-*GetTransformMode = *cspacec::iParticlesStateBase_GetTransformMode;
-*SetMixMode = *cspacec::iParticlesStateBase_SetMixMode;
-*GetMixMode = *cspacec::iParticlesStateBase_GetMixMode;
-*EnableZSort = *cspacec::iParticlesStateBase_EnableZSort;
-*IsZSortEnabled = *cspacec::iParticlesStateBase_IsZSortEnabled;
+*Clone = *cspacec::iParticleEffector_Clone;
+*EffectParticles = *cspacec::iParticleEffector_EffectParticles;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
     return unless defined $self;
     delete $ITERATORS{$self};
     if (exists $OWNER{$self}) {
-        cspacec::delete_iParticlesStateBase($self);
+        cspacec::delete_iParticleEffector($self);
         delete $OWNER{$self};
     }
 }
 
-*scfGetVersion = *cspacec::iParticlesStateBase_scfGetVersion;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -8672,100 +8711,421 @@ sub ACQUIRE {
 }
 
 
-############# Class : cspace::iParticlesObjectState ##############
+############# Class : cspace::iParticleSystemBase ##############
 
-package cspace::iParticlesObjectState;
-@ISA = qw( cspace cspace::iParticlesStateBase );
-%OWNER = ();
-%ITERATORS = ();
-*GetEmitPosition = *cspacec::iParticlesObjectState_GetEmitPosition;
-*GetRotation = *cspacec::iParticlesObjectState_GetRotation;
-*GetObjectToCamera = *cspacec::iParticlesObjectState_GetObjectToCamera;
-*ChangePhysicsPlugin = *cspacec::iParticlesObjectState_ChangePhysicsPlugin;
-*Start = *cspacec::iParticlesObjectState_Start;
-*Stop = *cspacec::iParticlesObjectState_Stop;
-*IsRunning = *cspacec::iParticlesObjectState_IsRunning;
-sub DESTROY {
-    return unless $_[0]->isa('HASH');
-    my $self = tied(%{$_[0]});
-    return unless defined $self;
-    delete $ITERATORS{$self};
-    if (exists $OWNER{$self}) {
-        cspacec::delete_iParticlesObjectState($self);
-        delete $OWNER{$self};
-    }
-}
-
-*scfGetVersion = *cspacec::iParticlesObjectState_scfGetVersion;
-sub DISOWN {
-    my $self = shift;
-    my $ptr = tied(%$self);
-    delete $OWNER{$ptr};
-}
-
-sub ACQUIRE {
-    my $self = shift;
-    my $ptr = tied(%$self);
-    $OWNER{$ptr} = 1;
-}
-
-
-############# Class : cspace::iParticlesFactoryState ##############
-
-package cspace::iParticlesFactoryState;
-@ISA = qw( cspace cspace::iParticlesStateBase );
-%OWNER = ();
-%ITERATORS = ();
-*SetMaterial = *cspacec::iParticlesFactoryState_SetMaterial;
-*SetAutoStart = *cspacec::iParticlesFactoryState_SetAutoStart;
-*SetPhysicsPlugin = *cspacec::iParticlesFactoryState_SetPhysicsPlugin;
-sub DESTROY {
-    return unless $_[0]->isa('HASH');
-    my $self = tied(%{$_[0]});
-    return unless defined $self;
-    delete $ITERATORS{$self};
-    if (exists $OWNER{$self}) {
-        cspacec::delete_iParticlesFactoryState($self);
-        delete $OWNER{$self};
-    }
-}
-
-*scfGetVersion = *cspacec::iParticlesFactoryState_scfGetVersion;
-sub DISOWN {
-    my $self = shift;
-    my $ptr = tied(%$self);
-    delete $OWNER{$ptr};
-}
-
-sub ACQUIRE {
-    my $self = shift;
-    my $ptr = tied(%$self);
-    $OWNER{$ptr} = 1;
-}
-
-
-############# Class : cspace::iParticlesPhysics ##############
-
-package cspace::iParticlesPhysics;
+package cspace::iParticleSystemBase;
 @ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
-*RegisterParticles = *cspacec::iParticlesPhysics_RegisterParticles;
-*RemoveParticles = *cspacec::iParticlesPhysics_RemoveParticles;
-*Start = *cspacec::iParticlesPhysics_Start;
-*Stop = *cspacec::iParticlesPhysics_Stop;
+*SetParticleRenderOrientation = *cspacec::iParticleSystemBase_SetParticleRenderOrientation;
+*GetParticleRenderOrientation = *cspacec::iParticleSystemBase_GetParticleRenderOrientation;
+*SetRotationMode = *cspacec::iParticleSystemBase_SetRotationMode;
+*GetRotationMode = *cspacec::iParticleSystemBase_GetRotationMode;
+*SetSortMode = *cspacec::iParticleSystemBase_SetSortMode;
+*GetSortMode = *cspacec::iParticleSystemBase_GetSortMode;
+*SetIntegrationMode = *cspacec::iParticleSystemBase_SetIntegrationMode;
+*GetIntegrationMode = *cspacec::iParticleSystemBase_GetIntegrationMode;
+*SetCommonDirection = *cspacec::iParticleSystemBase_SetCommonDirection;
+*GetCommonDirection = *cspacec::iParticleSystemBase_GetCommonDirection;
+*SetLocalMode = *cspacec::iParticleSystemBase_SetLocalMode;
+*GetLocalMode = *cspacec::iParticleSystemBase_GetLocalMode;
+*SetUseIndividualSize = *cspacec::iParticleSystemBase_SetUseIndividualSize;
+*GetUseIndividualSize = *cspacec::iParticleSystemBase_GetUseIndividualSize;
+*SetParticleSize = *cspacec::iParticleSystemBase_SetParticleSize;
+*GetParticleSize = *cspacec::iParticleSystemBase_GetParticleSize;
+*SetMinBoundingBox = *cspacec::iParticleSystemBase_SetMinBoundingBox;
+*GetMinBoundingBox = *cspacec::iParticleSystemBase_GetMinBoundingBox;
+*AddEmitter = *cspacec::iParticleSystemBase_AddEmitter;
+*GetEmitter = *cspacec::iParticleSystemBase_GetEmitter;
+*RemoveEmitter = *cspacec::iParticleSystemBase_RemoveEmitter;
+*GetEmitterCount = *cspacec::iParticleSystemBase_GetEmitterCount;
+*AddEffector = *cspacec::iParticleSystemBase_AddEffector;
+*GetEffector = *cspacec::iParticleSystemBase_GetEffector;
+*RemoveEffector = *cspacec::iParticleSystemBase_RemoveEffector;
+*GetEffectorCount = *cspacec::iParticleSystemBase_GetEffectorCount;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
     return unless defined $self;
     delete $ITERATORS{$self};
     if (exists $OWNER{$self}) {
-        cspacec::delete_iParticlesPhysics($self);
+        cspacec::delete_iParticleSystemBase($self);
         delete $OWNER{$self};
     }
 }
 
-*scfGetVersion = *cspacec::iParticlesPhysics_scfGetVersion;
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iParticleSystemFactory ##############
+
+package cspace::iParticleSystemFactory;
+@ISA = qw( cspace cspace::iParticleSystemBase );
+%OWNER = ();
+%ITERATORS = ();
+*SetDeepCreation = *cspacec::iParticleSystemFactory_SetDeepCreation;
+*GetDeepCreation = *cspacec::iParticleSystemFactory_GetDeepCreation;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iParticleSystemFactory($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iParticleSystem ##############
+
+package cspace::iParticleSystem;
+@ISA = qw( cspace cspace::iParticleSystemBase );
+%OWNER = ();
+%ITERATORS = ();
+*GetParticleCount = *cspacec::iParticleSystem_GetParticleCount;
+*GetParticle = *cspacec::iParticleSystem_GetParticle;
+*GetParticleAux = *cspacec::iParticleSystem_GetParticleAux;
+*LockForExternalControl = *cspacec::iParticleSystem_LockForExternalControl;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iParticleSystem($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iParticleBuiltinEmitterBase ##############
+
+package cspace::iParticleBuiltinEmitterBase;
+@ISA = qw( cspace cspace::iParticleEmitter );
+%OWNER = ();
+%ITERATORS = ();
+*SetPosition = *cspacec::iParticleBuiltinEmitterBase_SetPosition;
+*GetPosition = *cspacec::iParticleBuiltinEmitterBase_GetPosition;
+*SetParticlePlacement = *cspacec::iParticleBuiltinEmitterBase_SetParticlePlacement;
+*GetParticlePlacement = *cspacec::iParticleBuiltinEmitterBase_GetParticlePlacement;
+*SetUniformVelocity = *cspacec::iParticleBuiltinEmitterBase_SetUniformVelocity;
+*GetUniformVelocity = *cspacec::iParticleBuiltinEmitterBase_GetUniformVelocity;
+*SetInitialVelocity = *cspacec::iParticleBuiltinEmitterBase_SetInitialVelocity;
+*GetInitialVelocity = *cspacec::iParticleBuiltinEmitterBase_GetInitialVelocity;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iParticleBuiltinEmitterBase($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iParticleBuiltinEmitterSphere ##############
+
+package cspace::iParticleBuiltinEmitterSphere;
+@ISA = qw( cspace cspace::iParticleBuiltinEmitterBase );
+%OWNER = ();
+%ITERATORS = ();
+*SetRadius = *cspacec::iParticleBuiltinEmitterSphere_SetRadius;
+*GetRadius = *cspacec::iParticleBuiltinEmitterSphere_GetRadius;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iParticleBuiltinEmitterSphere($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iParticleBuiltinEmitterCone ##############
+
+package cspace::iParticleBuiltinEmitterCone;
+@ISA = qw( cspace cspace::iParticleBuiltinEmitterBase );
+%OWNER = ();
+%ITERATORS = ();
+*SetExtent = *cspacec::iParticleBuiltinEmitterCone_SetExtent;
+*GetExtent = *cspacec::iParticleBuiltinEmitterCone_GetExtent;
+*SetConeAngle = *cspacec::iParticleBuiltinEmitterCone_SetConeAngle;
+*GetConeAngle = *cspacec::iParticleBuiltinEmitterCone_GetConeAngle;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iParticleBuiltinEmitterCone($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iParticleBuiltinEmitterBox ##############
+
+package cspace::iParticleBuiltinEmitterBox;
+@ISA = qw( cspace cspace::iParticleBuiltinEmitterBase );
+%OWNER = ();
+%ITERATORS = ();
+*SetBox = *cspacec::iParticleBuiltinEmitterBox_SetBox;
+*GetBox = *cspacec::iParticleBuiltinEmitterBox_GetBox;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iParticleBuiltinEmitterBox($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iParticleBuiltinEmitterCylinder ##############
+
+package cspace::iParticleBuiltinEmitterCylinder;
+@ISA = qw( cspace cspace::iParticleBuiltinEmitterBase );
+%OWNER = ();
+%ITERATORS = ();
+*SetRadius = *cspacec::iParticleBuiltinEmitterCylinder_SetRadius;
+*GetRadius = *cspacec::iParticleBuiltinEmitterCylinder_GetRadius;
+*SetExtent = *cspacec::iParticleBuiltinEmitterCylinder_SetExtent;
+*GetExtent = *cspacec::iParticleBuiltinEmitterCylinder_GetExtent;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iParticleBuiltinEmitterCylinder($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iParticleBuiltinEmitterFactory ##############
+
+package cspace::iParticleBuiltinEmitterFactory;
+@ISA = qw( cspace cspace::iBase );
+%OWNER = ();
+%ITERATORS = ();
+*CreateSphere = *cspacec::iParticleBuiltinEmitterFactory_CreateSphere;
+*CreateCone = *cspacec::iParticleBuiltinEmitterFactory_CreateCone;
+*CreateBox = *cspacec::iParticleBuiltinEmitterFactory_CreateBox;
+*CreateCylinder = *cspacec::iParticleBuiltinEmitterFactory_CreateCylinder;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iParticleBuiltinEmitterFactory($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iParticleBuiltinEffectorForce ##############
+
+package cspace::iParticleBuiltinEffectorForce;
+@ISA = qw( cspace cspace::iParticleEffector );
+%OWNER = ();
+%ITERATORS = ();
+*SetAcceleration = *cspacec::iParticleBuiltinEffectorForce_SetAcceleration;
+*GetAcceleration = *cspacec::iParticleBuiltinEffectorForce_GetAcceleration;
+*SetForce = *cspacec::iParticleBuiltinEffectorForce_SetForce;
+*GetForce = *cspacec::iParticleBuiltinEffectorForce_GetForce;
+*SetRandomAcceleration = *cspacec::iParticleBuiltinEffectorForce_SetRandomAcceleration;
+*GetRandomAcceleration = *cspacec::iParticleBuiltinEffectorForce_GetRandomAcceleration;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iParticleBuiltinEffectorForce($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iParticleBuiltinEffectorLinColor ##############
+
+package cspace::iParticleBuiltinEffectorLinColor;
+@ISA = qw( cspace cspace::iParticleEffector );
+%OWNER = ();
+%ITERATORS = ();
+*AddColor = *cspacec::iParticleBuiltinEffectorLinColor_AddColor;
+*SetColor = *cspacec::iParticleBuiltinEffectorLinColor_SetColor;
+*GetColor = *cspacec::iParticleBuiltinEffectorLinColor_GetColor;
+*GetColorCount = *cspacec::iParticleBuiltinEffectorLinColor_GetColorCount;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iParticleBuiltinEffectorLinColor($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iParticleBuiltinEffectorFactory ##############
+
+package cspace::iParticleBuiltinEffectorFactory;
+@ISA = qw( cspace cspace::iBase );
+%OWNER = ();
+%ITERATORS = ();
+*CreateForce = *cspacec::iParticleBuiltinEffectorFactory_CreateForce;
+*CreateLinColor = *cspacec::iParticleBuiltinEffectorFactory_CreateLinColor;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iParticleBuiltinEffectorFactory($self);
+        delete $OWNER{$self};
+    }
+}
+
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -15610,21 +15970,25 @@ sub CS_POLYINDEX_LAST () { $cspacec::CS_POLYINDEX_LAST }
 sub CS_THING_NOCOMPRESS () { $cspacec::CS_THING_NOCOMPRESS }
 sub CS_THING_MOVE_NEVER () { $cspacec::CS_THING_MOVE_NEVER }
 sub CS_THING_MOVE_OCCASIONAL () { $cspacec::CS_THING_MOVE_OCCASIONAL }
-sub CS_PART_FALLOFF_CONSTANT () { $cspacec::CS_PART_FALLOFF_CONSTANT }
-sub CS_PART_FALLOFF_LINEAR () { $cspacec::CS_PART_FALLOFF_LINEAR }
-sub CS_PART_FALLOFF_PARABOLIC () { $cspacec::CS_PART_FALLOFF_PARABOLIC }
-sub CS_PART_COLOR_CONSTANT () { $cspacec::CS_PART_COLOR_CONSTANT }
-sub CS_PART_COLOR_LINEAR () { $cspacec::CS_PART_COLOR_LINEAR }
-sub CS_PART_COLOR_LOOPING () { $cspacec::CS_PART_COLOR_LOOPING }
-sub CS_PART_COLOR_HEAT () { $cspacec::CS_PART_COLOR_HEAT }
-sub CS_PART_COLOR_CALLBACK () { $cspacec::CS_PART_COLOR_CALLBACK }
-sub CS_PART_EMIT_SPHERE () { $cspacec::CS_PART_EMIT_SPHERE }
-sub CS_PART_EMIT_PLANE () { $cspacec::CS_PART_EMIT_PLANE }
-sub CS_PART_EMIT_BOX () { $cspacec::CS_PART_EMIT_BOX }
-sub CS_PART_EMIT_CYLINDER () { $cspacec::CS_PART_EMIT_CYLINDER }
-sub CS_PART_FORCE_RADIAL () { $cspacec::CS_PART_FORCE_RADIAL }
-sub CS_PART_FORCE_LINEAR () { $cspacec::CS_PART_FORCE_LINEAR }
-sub CS_PART_FORCE_CONE () { $cspacec::CS_PART_FORCE_CONE }
+sub CS_PARTICLE_SORT_NONE () { $cspacec::CS_PARTICLE_SORT_NONE }
+sub CS_PARTICLE_SORT_DISTANCE () { $cspacec::CS_PARTICLE_SORT_DISTANCE }
+sub CS_PARTICLE_SORT_DOT () { $cspacec::CS_PARTICLE_SORT_DOT }
+sub CS_PARTICLE_CAMERAFACE () { $cspacec::CS_PARTICLE_CAMERAFACE }
+sub CS_PARTICLE_CAMERAFACE_APPROX () { $cspacec::CS_PARTICLE_CAMERAFACE_APPROX }
+sub CS_PARTICLE_ORIENT_COMMON () { $cspacec::CS_PARTICLE_ORIENT_COMMON }
+sub CS_PARTICLE_ORIENT_COMMON_APPROX () { $cspacec::CS_PARTICLE_ORIENT_COMMON_APPROX }
+sub CS_PARTICLE_ORIENT_VELOCITY () { $cspacec::CS_PARTICLE_ORIENT_VELOCITY }
+sub CS_PARTICLE_ORIENT_SELF () { $cspacec::CS_PARTICLE_ORIENT_SELF }
+sub CS_PARTICLE_ORIENT_SELF_FORWARD () { $cspacec::CS_PARTICLE_ORIENT_SELF_FORWARD }
+sub CS_PARTICLE_ROTATE_NONE () { $cspacec::CS_PARTICLE_ROTATE_NONE }
+sub CS_PARTICLE_ROTATE_TEXCOORD () { $cspacec::CS_PARTICLE_ROTATE_TEXCOORD }
+sub CS_PARTICLE_ROTATE_VERTICES () { $cspacec::CS_PARTICLE_ROTATE_VERTICES }
+sub CS_PARTICLE_INTEGRATE_NONE () { $cspacec::CS_PARTICLE_INTEGRATE_NONE }
+sub CS_PARTICLE_INTEGRATE_LINEAR () { $cspacec::CS_PARTICLE_INTEGRATE_LINEAR }
+sub CS_PARTICLE_INTEGRATE_BOTH () { $cspacec::CS_PARTICLE_INTEGRATE_BOTH }
+sub CS_PARTICLE_BUILTIN_CENTER () { $cspacec::CS_PARTICLE_BUILTIN_CENTER }
+sub CS_PARTICLE_BUILTIN_VOLUME () { $cspacec::CS_PARTICLE_BUILTIN_VOLUME }
+sub CS_PARTICLE_BUILTIN_SURFACE () { $cspacec::CS_PARTICLE_BUILTIN_SURFACE }
 sub CS_SNDSYS_DATA_UNKNOWN_SIZE () { $cspacec::CS_SNDSYS_DATA_UNKNOWN_SIZE }
 sub SS_FILTER_LOC_RENDEROUT () { $cspacec::SS_FILTER_LOC_RENDEROUT }
 sub SS_FILTER_LOC_SOURCEOUT () { $cspacec::SS_FILTER_LOC_SOURCEOUT }
