@@ -31,6 +31,7 @@
 #include "cstypes.h"	// for bool
 
 #include "csgeom/csrect.h"
+#include "csgeom/math.h"
 #include "csgeom/vector2.h"
 #include "csgeom/vector3.h"
 #include "csgeom/segment.h"
@@ -911,6 +912,20 @@ public:
   inline bool AddBoundingVertexSmartTest (const csVector3& v)
   {
     return AddBoundingVertexSmartTest (v.x, v.y, v.z);
+  }
+
+  /**
+   * Add another bounding box into this one, combining the two of them
+   */
+  inline void AddBoundingBox (const csBox3& box)
+  {
+    minbox.x = csMin(minbox.x, box.minbox.x);
+    minbox.y = csMin(minbox.y, box.minbox.y);
+    minbox.z = csMin(minbox.z, box.minbox.z);
+
+    maxbox.x = csMax(maxbox.x, box.maxbox.x);
+    maxbox.y = csMax(maxbox.y, box.maxbox.y);
+    maxbox.z = csMax(maxbox.z, box.maxbox.z);
   }
 
   /// Initialize this box to empty.
