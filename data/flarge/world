@@ -138,7 +138,7 @@
       <file>/lib/stdtex/topping.png</file>
     </texture>
     <!-- Cube map specification with separate images: -->
-    <!-- texture name="reflection">
+    <!--texture name="reflection">
 	  <type>crystalspace.texture.loader.cubemap</type>
 	  <params>
 	    <north>/lib/cubemap/cubemap_fr.jpg</north>
@@ -148,7 +148,7 @@
 	    <top>/lib/cubemap/cubemap_up.jpg</top>
 	    <bottom>/lib/cubemap/cubemap_dn.jpg</bottom>
 	  </params>
-	</texture -->
+	</texture-->
     <texture name="reflection">
       <file>cube_street.dds</file>
     </texture>
@@ -200,7 +200,7 @@
       <texture>mosholes.gif</texture>
       <shader type="standard">std_lighting_detail</shader>
       <shadervar name="tex detail" type="texture">mosaic-detail</shadervar>
-      <shadervar name="detail texture scale" type="vector2">10,10</shadervar>
+      <shadervar name="tex detail scale" type="vector2">10,10</shadervar>
     </material>
     <material name="robot">
       <texture>oldmetal.gif</texture>
@@ -209,7 +209,7 @@
       <texture>oldmetal.gif</texture>
       <shader type="standard">std_lighting_detail_add</shader>
       <shadervar name="tex detail" type="texture">spark</shadervar>
-      <shadervar name="detail texture scale" type="vector2">20,20</shadervar>
+      <shadervar name="tex detail scale" type="vector2">20,20</shadervar>
     </material>
     <material name="raindrop">
       <texture>raindrop</texture>
@@ -221,14 +221,14 @@
       <texture>bricks.gif</texture>
       <shader type="standard">std_lighting_detail_alpha_scroll</shader>
       <shadervar name="tex detail" type="texture">spark</shadervar>
-      <shadervar name="detail texture scale" type="vector2">10,10</shadervar>
-      <shadervar name="detail texture color" type="vector4">1,1,1,0.25</shadervar>
+      <shadervar name="tex detail scale" type="vector2">10,10</shadervar>
+      <shadervar name="tex detail color" type="vector4">1,1,1,0.25</shadervar>
     </material>
     <material name="bricks2">
       <texture>bricks.gif</texture>
       <shader type="standard">std_lighting_detail_alpha</shader>
       <shadervar name="tex detail" type="texture">spark</shadervar>
-      <shadervar name="detail texture scale" type="expression">
+      <shadervar name="tex detail scale" type="expression">
         <make-vector>
           <add>
             <atom type="num">6</atom>
@@ -242,13 +242,15 @@
           <atom type="num">10</atom>
         </make-vector>
       </shadervar>
-      <shadervar name="detail texture color" type="vector4">1,1,1,0.25</shadervar>
+      <shadervar name="tex detail color" type="vector4">1,1,1,0.25</shadervar>
     </material>
     <material name="mosaic">
       <texture>mosaic.gif</texture>
       <shader type="standard">std_lighting_detail</shader>
       <shadervar name="tex detail" type="texture">mosaic-detail</shadervar>
-      <shadervar name="detail texture scale" type="vector2">10,10</shadervar>
+      <shadervar name="tex detail scale" type="vector2">10,10</shadervar>
+      <shadervar name="tex height" type="texture">mosaic-detail</shadervar>
+      <shadervar name="tex height scale" type="vector2">10,10</shadervar>
     </material>
     <material name="oldmetal">
       <texture>oldmetal.gif</texture>
@@ -296,6 +298,7 @@
     </material>
     <material name="green_color">
       <color red="0" green="1" blue="0" />
+      <shadervar name="tex glow" type="texture">spark</shadervar>
     </material>
     <material name="seagull">
       <texture>seagull</texture>
@@ -363,7 +366,7 @@
 
   <settings>
     <renderloop variable="renderloop">
-        <condition value="diffuse">std_rloop_diffuse</condition>
+      <condition value="diffuse">std_rloop_diffuse</condition>
     </renderloop>
   </settings>
 
@@ -7621,7 +7624,7 @@
     <params />
   </meshfact>
 
-<!--
+  <!--
   <meshfact name="snowFactory">
     <plugin>crystalspace.mesh.loader.factory.snow</plugin>
     <params />
@@ -15848,7 +15851,7 @@
           <coneangle>0.2</coneangle>
           <initialvelocity x="0" y="1" z="0" />
         </emitter>
-	      <effector type="force">
+        <effector type="force">
           <acceleration x="0" y="-0.1" z="0" />
         </effector>
       </params>
@@ -16091,29 +16094,29 @@
                 <v x="0" y="0" z="0" />
               </move>
             </meshobj> -->
-          <meshobj name="laser">
-            <plugin>particles</plugin>
-            <params>
-              <factory>particlesFactory</factory>
-              <material>spark</material>
-              <particlesize x="0.05" y="0.05" />
-              <localmode />
-              <mixmode>
-                <add />
-              </mixmode>
-              <emitter type="cone">
-                <enabled/>
-                <initialttl min="1.5" max="1.5" />
-                <emissionrate>66</emissionrate>
-                <position x="0" y="0" z="0" />
-                <placement>center</placement>
-                <extent x="0" y="-1" z="0" />
-                <coneangle>0.3</coneangle>
-                <initialvelocity x="0" y="1" z="0" />
-              </emitter>
-              <effector type="force">
-                <acceleration x="0" y="-0.1" z="0" />
-              </effector>
+            <meshobj name="laser">
+              <plugin>particles</plugin>
+              <params>
+                <factory>particlesFactory</factory>
+                <material>spark</material>
+                <particlesize x="0.05" y="0.05" />
+                <localmode />
+                <mixmode>
+                  <add />
+                </mixmode>
+                <emitter type="cone">
+                  <enabled/>
+                  <initialttl min="1.5" max="1.5" />
+                  <emissionrate>66</emissionrate>
+                  <position x="0" y="0" z="0" />
+                  <placement>center</placement>
+                  <extent x="0" y="-1" z="0" />
+                  <coneangle>0.3</coneangle>
+                  <initialvelocity x="0" y="1" z="0" />
+                </emitter>
+                <effector type="force">
+                  <acceleration x="0" y="-0.1" z="0" />
+                </effector>
               </params>
               <move>
                 <v x="0" y="0" z="0" />
@@ -16188,7 +16191,7 @@
                 <localmode />
                 <particlesize x="0.02" y="0.04" />
                 <commondirection x="0" y="1" z="0" />
-               <!-- <renderorientation>common approx</renderorientation> -->
+                <!-- <renderorientation>common approx</renderorientation> -->
                 <mixmode>
                   <add />
                 </mixmode>
@@ -23629,7 +23632,7 @@
         </p>
       </params>
     </meshobj>
-<!--
+    <!--
     <meshobj name="snow1">
       <plugin>crystalspace.mesh.loader.snow</plugin>
       <params>
@@ -23660,7 +23663,9 @@
       <params>
         <factory>particlesFactory</factory>
         <material>snow</material>
-        <mixmode><add /></mixmode>
+        <mixmode>
+          <add />
+        </mixmode>
         <particlesize x="0.07" y="0.07" />
         <emitter type="box">
           <box>
@@ -23677,8 +23682,8 @@
           <randomacceleration>0.2</randomacceleration>
         </effector>
         <minbb>
-            <min x="-43" y="11" z="-10" />
-            <max x="-3" y="11" z="5" />
+          <min x="-43" y="11" z="-10" />
+          <max x="-3" y="11" z="5" />
         </minbb>
       </params>
       <move>
@@ -29419,7 +29424,7 @@
           </mixmode>
           <material>flare_center</material>
           <particlesize x="0.1" y="0.1" />
-	    <emitter type="box">
+          <emitter type="box">
             <box>
               <min x="0" y="-2.5" z="-2.5" />
               <max x="0" y="2.5" z="2.5" />
