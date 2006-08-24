@@ -246,6 +246,7 @@ void csGenericRenderStep::RenderMeshes (iRenderView* rview, iGraphics3D* g3d,
     size_t j;
     for (j = 0; j < num; j++)
     {
+      if (!meshContexts[j].render) continue;
       csRenderMesh* mesh = meshes[j];
       iShaderVariableContext* meshContext = meshContexts[j].svc;
       if (meshContext->IsEmpty())
@@ -407,6 +408,7 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
     iMeshWrapper* m = imeshes_scratch[i];
     sameShaderMeshInfo[i].svc = m->GetSVContext();
     sameShaderMeshInfo[i].noclip = m->GetFlags ().Check (CS_ENTITY_NOCLIP);
+    sameShaderMeshInfo[i].render = true;
     // Only get this information if we have a light. Otherwise it is not
     // useful.
     if (light)
@@ -515,12 +517,13 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
 	    obj_light_center, cutoff_distance * cutoff_distance);
       }
       if (!isect)
-	continue;
+	sameShaderMeshInfo[n].render = false;
 #else
       float dist = sqrt (csSquaredDist::PointPoint (
 	sameShaderMeshInfo[n].wor_center, //mesh->worldspace_origin,
       	light_center));
-      if (dist-sameShaderMeshInfo[n].radius > cutoff_distance) continue;
+      if (dist-sameShaderMeshInfo[n].radius > cutoff_distance)
+	sameShaderMeshInfo[n].render = false;
 #endif
     }
     pusher.mesh = mesh;
@@ -615,9 +618,9 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
   if (numSSM != 0)
   {
     // @@@ Need error reporter
+    pusher.shader = shader;
     if (shader != 0)
     {
-      pusher.shader = shader;
       g3d->SetWorldToCamera (camt.GetInverse ());
       RenderMeshes (rview, g3d, pusher, currentTicket,
       	sameShaderMeshInfo + lastidx,

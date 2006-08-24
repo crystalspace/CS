@@ -83,6 +83,7 @@ struct meshInfo
 {
   iShaderVariableContext* svc;
   bool noclip;		// From iMeshWrapper CS_ENTITY_NOCLIP.
+  bool render;		// Set to true if this should be rendered.
 #if USE_BOX
   iObjectModel* obj_model;
   iMovable* movable;
