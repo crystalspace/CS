@@ -6,6 +6,12 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+25-Aug-2006
+	- res changed the logic used by glshader_cg to determine whether 
+	  routing is used or not. Instead of using routing all the time when
+	  ARB_f_p is not available or disabled, non-routing profiles are
+	  preferred, if these are available. Routing can be preferred by
+	  choosing a maximum fragment program profile that is ps1_x.
 24-Aug-2006
 	- Jorrit fixed a serious bug in the generic renderloop code
 	  with regards to light culling. This bug could cause flickering
