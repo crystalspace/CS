@@ -1,4 +1,4 @@
 @c -*-texinfo-*-
-@set UPDATED 23 October 2005
-@set EDITION 99.1.39
+@set UPDATED 26 August 2006
+@set EDITION 99.1.40
 @set VERSION 99.1

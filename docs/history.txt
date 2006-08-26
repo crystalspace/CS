@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+26-Aug-2006
+	- Vincent fixed apps/tools/Jamfile so that 'partconv' gets built. Also
+	  made a few fixes to the particle mesh object manual page.
 25-Aug-2006
 	- res changed the logic used by glshader_cg to determine whether 
 	  routing is used or not. Instead of using routing all the time when

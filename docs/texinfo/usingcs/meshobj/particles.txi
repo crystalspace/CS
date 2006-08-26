@@ -117,9 +117,9 @@ each particle, or if the global <particlesize> property should be used.
 Set global particle size.
 @item <minbb>@dots{}</minbb>
 Set the minimum bounding box of the particles mesh. The particle system is only
-rendered when the bounding box is deemed visible (within frustum), and therefor
-it can sometimes be required to have a bigger bounding box than the current
-distribution of the particles.
+rendered when the bounding box is deemed visible (within frustum), and
+therefore it can sometimes be required to have a bigger bounding box than the
+current distribution of the particles.
 @item <emitter type="">@dots{}</emitter>
 Add a built-in emitter to the particles system.
 @item <effector type="">@dots{}</effector>
@@ -167,7 +167,7 @@ The particle system have three basic parts
 @end itemize
 
 Apart from this the particles plugin also contains some management code to keep
-everything together and interface the rest of CrystalSpace, as well as loading
+everything together and interface the rest of Crystal Space, as well as loading
 and saving from/to files.
 
 @subsubheading Particle update loop
@@ -177,8 +177,8 @@ particle system.
 
 The steps of the update loop are:
 @enumerate
-@item Retirement of old particles. Particles time-to-live is decreased by current
-elapsed time, and those with zero or negative time-to-live are removed.
+@item Retirement of old particles. Particles time-to-live is decreased by
+current elapsed time, and those with zero or negative time-to-live are removed.
 @item Emission of new particles. The emitters are polled one at a time to emit
 their particles into the system.
 @item Apply physical (or non-physical) effects to particles. The effectors are
@@ -198,9 +198,9 @@ areas of settable size and orientation relative to the camera.
 
 @table @samp
 @item camface
-The particle billboards always face the camera location, so the camera to particle
-vector is used as normal. The camera up vector is used as up-vector for the
-billboards.
+The particle billboards always face the camera location, so the camera to
+particle vector is used as normal. The camera up vector is used as up-vector
+for the billboards.
 @item camface approx
 The billboards are aligned with the camera plane, and camera up and right
 vectors are used as billboard vectors. This is the default mode and the mode
@@ -234,7 +234,7 @@ In principle an emitter is any class implementing the interface
 @samp{iParticleEmitter}, so you can implement your own emitters, however for
 convenience there are a few built in emitter types. These can be accessed via
 the @samp{crystalspace.mesh.object.particles.emitter} plugin class and interface
-@samp{iiParticleBuiltinEmitterFactory} interface.
+@samp{iParticleBuiltinEmitterFactory} interface.
 The built in emitters are also loadable via the normal particle loader using
 @code{<emitter type="..">} tags. The available types are:
 @itemize @bullet
@@ -278,7 +278,7 @@ values.
 
 @item @code{<position x="" y="" z="" />}
 @tab @samp{all}
-@tab Emittor center position
+@tab Emitter center position.
 
 @item @code{<placement>place</placement>}
 @tab @samp{all}
@@ -312,16 +312,16 @@ only the magnitude should be used and direction should be emitter-specific.
 @end multitable
 
 @subsubheading Effectors
-Just as emitters emit particles into the particle system, effectors put different
-kinds of effects on those who are already there, be it physical or non-physical
-effects.
+Just as emitters emit particles into the particle system, effectors put
+different kinds of effects on those who are already there, be it physical or
+non-physical effects.
 
 
 In principle an emitter is any class implementing the interface 
-@samp{iParticleEeffector}, so you can implement your own effectors, however for
+@samp{iParticleEffector}, so you can implement your own effectors, however for
 convenience there are a few built in effector types. These can be accessed via
-the @samp{crystalspace.mesh.object.particles.effector} plugin class and interface
-@samp{iiParticleBuiltinEffectorFactory} interface.
+the @samp{crystalspace.mesh.object.particles.effector} plugin class and
+@samp{iParticleBuiltinEffectorFactory} interface.
 The built in effectors are also loadable via the normal particle loader using
 @code{<effector type="..">} tags. The available types are:
 @itemize @bullet
@@ -346,3 +346,4 @@ TTL. It takes a fixed number of "keypoints" and then interpolates between them.
 @item <color red="" green="" blue="" time="">
 Set a keypoint color at given time.
 @end table
+
