@@ -121,12 +121,11 @@ public:
 // polyenum.cpp
 void ExtremalPluckerPoints (const Polygon* source, const Polygon* occluder,
     csArray<Plucker>& fill);
-void PluckerPlanes (const Polygon* source, const Polygon* occluder,
-    csArray<Plucker>& fill);
+void PluckerPlanes (const Polygon* source, csArray<Plucker>& fill);
 void VertexRepresentation (const csArray<Plucker>& planes,
     csArray<Plucker>& fill);
-// void GetEdges ();
 void CapPlanes (const csArray<Plucker>& vertices, csArray<Plucker>& fill);
+float CalculateSize (const csArray<Plucker>& vertices);
 
 // Represents all scene events from a source polygon.
 class OcclusionTree
@@ -145,7 +144,7 @@ class OcclusionTree
   // Construct an interior node.
   OcclusionTree (const Plucker& split);
   // Construct an IN node, may return NULL if blocker polyhedron is empty.
-  OcclusionTree* ConstructInNode (struct BlockerPolyhedron* poly,
+  OcclusionTree* ConstructInNode (const struct BlockerPolyhedron* poly,
     const csArray<Plucker>& splitPlanes);
   // Constructs an OUT node.
   OcclusionTree* ConstructOutNode ();
@@ -174,6 +173,11 @@ public:
   // Add all objects that are visible to PVS array, making sure to not add any
   // duplicates (i.e. treat array as a set).
   void CollectPVS (PVSArray& pvs) const;
+  // Prints out the tree.
+  void PrintTree () const;
+  // Return the first polygon for ray, that goes from begin to end and onwards,
+  // hits.
+  Polygon* RayInside (const csVector3& begin, const csVector3& end);
 };
 
 // pvscomp.cpp

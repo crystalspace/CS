@@ -214,13 +214,27 @@ public:
   // Construct a blocker polyhedron from an occluder polygon.
   BlockerPolyhedron (const Polygon* source, const Polygon* occluder, 
       const char* objectName);
+  // Prints the vertices of the polyhedron.
+  void PrintVertices ();
 };
 
 BlockerPolyhedron::BlockerPolyhedron (const Polygon* source, 
     const Polygon* occluder, const char* objectName)
 {
   ExtremalPluckerPoints (source, occluder, vertices);
-  PluckerPlanes (source, occluder, planes);
+  PluckerPlanes (source, planes);
+  PluckerPlanes (occluder, planes);
+}
+
+void BlockerPolyhedron::PrintVertices ()
+{
+  printf("Polyhedral vertices (%d total):\n", vertices.Length ());
+  for (unsigned int i = 0; i < vertices.Length (); i++)
+  {
+    Plucker& v = vertices[i];
+    printf("  Vertex: (%f,%f,%f,%f,%f,%f)\n", v[0], 
+        v[1], v[2], v[3], v[4], v[5]);
+  }
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -269,7 +283,7 @@ OcclusionTree* OcclusionTree::ConstructOutNode ()
   return new OcclusionTree (OUT_NODE, NULL, NULL);
 }
 
-OcclusionTree* OcclusionTree::ConstructInNode (BlockerPolyhedron* poly,
+OcclusionTree* OcclusionTree::ConstructInNode (const BlockerPolyhedron* poly,
     const csArray<Plucker>& splitPlanes)
 {
   csArray<Plucker> planes;
@@ -280,7 +294,7 @@ OcclusionTree* OcclusionTree::ConstructInNode (BlockerPolyhedron* poly,
   if (splitPlanes.IsEmpty ())
   {
     // There is no need to recalculate Vertex form.
-    PushArray (inNode->leafNode->fragment, poly->planes);
+    PushArray (inNode->leafNode->fragment, poly->vertices);
   }
   else
   {
@@ -305,13 +319,13 @@ OcclusionTree* OcclusionTree::ConstructInNode (BlockerPolyhedron* poly,
   {
     return inNode;
   }
-
 }
 
 void OcclusionTree::ReplaceWithElementaryOT (
     const csArray<Plucker>& otplanes, OcclusionTree* inLeaf)
 {
   delete leafNode;
+  leafNode = NULL;
 
   if (otplanes.Length () > 0)
   {
@@ -329,8 +343,8 @@ void OcclusionTree::ReplaceWithElementaryOT (
       {
         // Next plane goes to positive halfspace
         currentPoly->negChild = new OcclusionTree (otplanes[i]);
-        currentPoly = currentPoly->negChild;
         currentPoly->negChild->parent = currentPoly;
+        currentPoly = currentPoly->negChild;
       }
 
       // In leaf goes to negative halfspace
@@ -401,6 +415,7 @@ void OcclusionTree::Union (BlockerPolyhedron* polyhedron,
   {
     if (leafNode->type == OUT_NODE)
     {
+      printf ("Arrived at OUT node.\n");
       OcclusionTree* inLeaf = ConstructInNode (polyhedron, splitPlanes);
       if (inLeaf)
       {
@@ -409,12 +424,15 @@ void OcclusionTree::Union (BlockerPolyhedron* polyhedron,
     }
     else  // In node
     {
+      printf ("Arrived at IN node.\n");
+
       // TODO:  I don't think we care about what polygon defines this node
       // as an IN NODE.  We might be able to completely skip the IN node, or
       // possibly make one node with two IN node children.
       if (FaceTest (leafNode->poly, polyhedron->blockerPoly, 
             polyhedron->sourcePoly) < 0)
       {
+        printf ("Special merge.\n");
         // leafNode's polygon is behind our current occluder.
 
         OcclusionTree* inLeaf = ConstructInNode (polyhedron, splitPlanes);
@@ -432,16 +450,20 @@ void OcclusionTree::Union (BlockerPolyhedron* polyhedron,
     int test = Test (polyhedron->vertices, splitPlane);
     if (test > 0)
     {
+      printf ("Polyhedron lies on positive side.\n");
       // poly in front
       posChild->Union (polyhedron, splitPlanes);
     }
     else if (test < 0)
     {
+      printf ("Polyhedron lies on negative side.\n");
       // poly in back
       negChild->Union (polyhedron, splitPlanes);
     }
     else
     {
+      printf ("Polyhedron lies on both sides.\n");
+
       // poly is on both sides of splitPlane
       splitPlanes.Push (splitPlane);
       posChild->Union (polyhedron, splitPlanes);
@@ -512,4 +534,49 @@ void OcclusionTree::CollectPVS (PVSArray& pvs) const
     posChild->CollectPVS (pvs);
     posChild->CollectPVS (pvs);
   }
+}
+
+void OcclusionTree::PrintTree () const
+{
+  if (leafNode)
+  {
+    if (leafNode->type == OUT_NODE)
+    {
+      printf("OUT node.\n");
+    }
+    else
+    {
+      printf("IN node.\n");
+      printf("Polyhedral fragments:\n");
+      for (unsigned int i = 0; i < leafNode->fragment.Length (); i++)
+      {
+        Plucker& v = leafNode->fragment[i];
+        printf("  Vertex: (%f,%f,%f,%f,%f,%f)\n", v[0], 
+            v[1], v[2], v[3], v[4], v[5]);
+      }
+    }
+  }
+  else
+  {
+    printf("Split plane: (%f,%f,%f,%f,%f,%f)\n", splitPlane[0], splitPlane[1],
+        splitPlane[2], splitPlane[3], splitPlane[4], splitPlane[5]);
+    posChild->PrintTree ();
+    negChild->PrintTree ();
+  }
+}
+
+void TestUnionTree ()
+{
+  Polygon p1 (csVector3 (0, 0, 0), csVector3 (1, 0, 0), csVector3 (1, 1, 0),
+      csVector3 (0, 1, 0));
+  Polygon p2 (csVector3 (0, 0, 1), csVector3 (0, 1, 1), csVector3 (1, 1, 0),
+      csVector3 (1, 0, 1));
+  Polygon p3 (csVector3 (.5, 0, .5), csVector3 (.5, 1, .5), 
+      csVector3 (1.5, 1, .5), csVector3 (1.5, 0, .5));
+  BlockerPolyhedron (&p1, &p3, "").PrintVertices ();
+  OcclusionTree* test = new OcclusionTree ();
+  test->Union (&p1, &p2, "number 1");
+  test->Union (&p1, &p3, "number 2");
+  test->PrintTree ();
+  delete test;
 }

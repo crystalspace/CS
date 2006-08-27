@@ -80,8 +80,7 @@ void ExtremalPluckerPoints (const Polygon* source, const Polygon* occluder,
   }
 }
 
-void PluckerPlanes (const Polygon* source, const Polygon* occluder,
-    csArray<Plucker>& fill)
+void PluckerPlanes (const Polygon* source, csArray<Plucker>& fill)
 {
   for (int i = 0; i < source->numVertices; i++)
   {

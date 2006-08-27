@@ -25,8 +25,6 @@
 #include "csgeom/vector3.h"
 #include "csgeom/box.h"
 #include "pvscomp.h"
-//#include "iutil/object.h"
-//#include "csutil/csstring.h"
 
 Polygon::Polygon (const csVector3& a, const csVector3& b, const csVector3& c,
     const csVector3& d)

@@ -383,8 +383,11 @@ void Compiler::Save (const char* name)
   csSavePVSDataFile (reg, name, pvstree);
 }
 
+void TestUnionTree ();
 int main (int argc, char** argv)
 {
+  TestUnionTree ();
+#if 0
   Compiler pvscomp;
   if (!pvscomp.Initialize (argc, argv))
   {
@@ -402,4 +405,5 @@ int main (int argc, char** argv)
   pvscomp.Save ("/this/test.pvs");
 
   return 0;
+#endif
 }
