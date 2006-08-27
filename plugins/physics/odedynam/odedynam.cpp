@@ -811,7 +811,8 @@ bool csODEDynamicSystem::AttachColliderBox (const csVector3 &size,
 }
 
 bool csODEDynamicSystem::AttachColliderSphere (float radius,
-                                               const csVector3 &offset, float friction, float elasticity, float softness)
+                                               const csVector3 &offset, float friction, 
+                                               float elasticity, float softness)
 {
   if (radius > 0) //otherwise ODE will treat radius as a 'bad argument'
   {
@@ -1008,7 +1009,7 @@ void csODECollider::ClearContents ()
 
 void csODECollider::MassCorrection ()
 {
-  if (density > 0 && dGeomGetBody (transformID))
+  if (density > 0 && dGeomGetBody (transformID) && geomID)
   {
     dMass m, om;
     dMassSetZero (&m);
