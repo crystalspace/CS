@@ -12,6 +12,11 @@ chronological order.
 	  but they are still internally interpolated to 512 pixels.
 	- Marten fixed csRefArray so that operator[] and Get (..) works
 	  as intended and don't cause refcounting errors. Bug 1487132.
+	- Marten fixed his last commit to work on gcc too. One caveat with
+	  current approach is that you cannot assign directly from a 
+	  csRefArray::operator[] to a new csRef, you need to construct it
+	  (provide an explicit construction). No inefficiency, just some extra
+	  syntax.
 26-Aug-2006
 	- Vincent fixed apps/tools/Jamfile so that 'partconv' gets built. Also
 	  made a few fixes to the particle mesh object manual page.

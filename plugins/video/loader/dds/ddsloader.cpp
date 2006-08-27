@@ -387,7 +387,7 @@ csRef<iImage> csDDSImageFile::GetMipmap (uint num)
   if (num > mipmaps.Length())
     return 0;
 
-  return mipmaps[num-1];
+  return csRef<iImage> (mipmaps[num-1]);
 }
 
 uint csDDSImageFile::HasSubImages() const 
@@ -402,7 +402,7 @@ csRef<iImage> csDDSImageFile::GetSubImage (uint num)
   if (num > subImages.Length())
     return 0;
 
-  return subImages[num-1];
+  return csRef<iImage> (subImages[num-1]);
 }
 
 static const char* RawTypeString (csDDSRawDataType type)

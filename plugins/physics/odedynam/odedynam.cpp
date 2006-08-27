@@ -844,7 +844,7 @@ csRef<iDynamicsSystemCollider> csODEDynamicSystem::GetCollider (
 	unsigned int index)
 {
   if (index < colliders.GetSize ())
-    return colliders[index];
+    return csRef<iDynamicsSystemCollider> (colliders[index]);
   else return 0;
 }
 csRef<iDynamicsSystemCollider> csODEDynamicSystem::CreateCollider ()
@@ -1873,7 +1873,7 @@ void csODERigidBody::Update ()
 csRef<iDynamicsSystemCollider> csODERigidBody::GetCollider (unsigned int index)
 {
   if (index < colliders.GetSize ())
-    return colliders[index];
+    return csRef<iDynamicsSystemCollider> (colliders[index]);
   else return 0;
 }
 //-----------------------csStrictODEJoint-------------------------------------

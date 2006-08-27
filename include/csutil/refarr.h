@@ -90,6 +90,11 @@ template <class T, class Allocator = CS::Memory::AllocatorMalloc>
 class csRefArray : public csArray<T*, csRefArrayElementHandler<T*>, Allocator>
 {
 public:
+  typedef csRefArray<T, Allocator> ThisType;
+  typedef T ValueType;
+  typedef Allocator AllocatorType;
+  typedef csArray<T*, csRefArrayElementHandler<T*>, Allocator> BaseType;
+
   /**
    * Initialize object to hold initially 'ilimit' elements, and increase
    * storage by 'ithreshold' each time the upper bound is exceeded.
@@ -103,7 +108,7 @@ public:
   csPtr<T> Pop ()
   {
     CS_ASSERT (this->Length () > 0);
-    csRef<T> ret = this->Get (this->Length () - 1); // see *1*
+    csRef<T> ret (this->Get (this->Length () - 1)); // see *1*
     SetLength (this->Length () - 1);
     return csPtr<T> (ret);
   }
@@ -129,38 +134,44 @@ public:
 
     RefProxy& operator= (const RefProxy& other)
     {
-      ownerArray.Put (position, other.ownerArray.csArray::Get (other.position));
+      ownerArray.Put (position, other.ownerArray.BaseType::Get (other.position));
       return *this;
     }
 
     /// Object accessor (const version)
     operator const T* () const
     {
-      return ownerArray.csArray::Get (position);
+      return ownerArray.BaseType::Get (position);
     }
   
     /// Object accessor (non-const version)
     operator T* () const
     {
-      return ownerArray.csArray::Get (position);
+      return ownerArray.BaseType::Get (position);
     }
 
     /// Dereference underlying object.
     T* operator -> () const
     { 
-      return ownerArray.csArray::Get (position); 
+      return ownerArray.BaseType::Get (position); 
     }
 
     /// Dereference underlying object.
     T& operator* () const
     { 
-      return *ownerArray.csArray::Get (position); 
+      return *ownerArray.BaseType::Get (position); 
     }
 
-    /// Comparison
-    bool operator!= (const T* const other) const
+    /// Comparison (inequality)
+    bool operator!= (T* other) const
     {
-      return ownerArray.csArray::Get (position) != other;
+      return ownerArray.BaseType::Get (position) != other;
+    }
+
+    /// Comparison (equality)
+    bool operator== (T* other) const
+    {
+      return ownerArray.BaseType::Get (position) == other;
     }
 
   private:
@@ -173,13 +184,13 @@ public:
   /// Get an element (non-const)
   RefProxy operator [] (size_t n)
   {
-    return Get (n);
+    return this->Get (n);
   }
 
   /// Get an element (const)
   T* const operator [] (size_t n) const
   {
-    return csArray::Get (n);
+    return BaseType::Get (n);
   }
 
   /// Get an element (non-const)
@@ -190,9 +201,9 @@ public:
   }
 
   /// Get an element (const)
-  T* const& Get (size_t n) const
+  T* const Get (size_t n) const
   {
-    return csArray::Get (n);
+    return BaseType::Get (n);
   }
 
   /**
@@ -201,8 +212,8 @@ public:
    */
   RefProxy GetExtend (size_t n)
   {
-    if (n >= GetSize ())
-      SetSize (n+1);
+    if (n >= this->GetSize ())
+      this->SetSize (n+1);
     return RefProxy (*this, n);
   }
 };
