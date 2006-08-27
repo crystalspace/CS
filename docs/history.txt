@@ -10,6 +10,8 @@ chronological order.
 	- Fossi fixed the longstanding brute bug that kept materialmaps with
 	  a size bigger than 512 pixels from working. Now these should work,
 	  but they are still internally interpolated to 512 pixels.
+	- Marten fixed csRefArray so that operator[] and Get (..) works
+	  as intended and don't cause refcounting errors. Bug 1487132.
 26-Aug-2006
 	- Vincent fixed apps/tools/Jamfile so that 'partconv' gets built. Also
 	  made a few fixes to the particle mesh object manual page.

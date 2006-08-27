@@ -1,6 +1,7 @@
 /*
   Crystal Space Smart Pointers
   Copyright (C) 2002 by Jorrit Tyberghein and Matthias Braun
+                2006 by Marten Svanfeldt
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -25,9 +26,11 @@
  */
 
 //-----------------------------------------------------------------------------
-// Note *1*: The explicit "this->" is needed by modern compilers (such as gcc
-// 3.4.x) which distinguish between dependent and non-dependent names in
-// templates.  See: http://gcc.gnu.org/onlinedocs/gcc/Name-lookup.html
+// Note *1*: The explicit "this->" is needed by modern compilers (all standard
+// compilant ones, such as gcc after version 3.4.x and MSVC after 7.1) 
+// which distinguish between dependent and non-dependent names in
+// templates.  See: http://gcc.gnu.org/onlinedocs/gcc/Name-lookup.html or
+// section 14.6 of ISO C++ standard (ISO 14882-1998)
 //-----------------------------------------------------------------------------
 
 #include "csutil/array.h"
@@ -82,11 +85,6 @@ public:
 
 /**
  * An array of smart pointers.
- * \warning Get(), GetExtend() and operator[] are unsafe for element
- *   manipulations, as they will return references to pointers and not
- *   proper csRef<> objects - assigning a pointer will circumvent reference
- *   counting and cause unexpected problems. Use Put() to manipulate elements
- *   of the array.
  */
 template <class T, class Allocator = CS::Memory::AllocatorMalloc>
 class csRefArray : public csArray<T*, csRefArrayElementHandler<T*>, Allocator>
@@ -108,6 +106,104 @@ public:
     csRef<T> ret = this->Get (this->Length () - 1); // see *1*
     SetLength (this->Length () - 1);
     return csPtr<T> (ret);
+  }
+
+  /**
+   * Internal proxy-class for access to elements (via operator[] etc)
+   */
+  class RefProxy
+  {
+  public:
+    /// Constructor
+    RefProxy (csRefArray& array, size_t pos)
+      : ownerArray (array), position (pos)
+    {
+    }
+
+    /// Assignment operators
+    RefProxy& operator= (T* value)
+    {
+      ownerArray.Put (position, value);
+      return *this;
+    }
+
+    RefProxy& operator= (const RefProxy& other)
+    {
+      ownerArray.Put (position, other.ownerArray.csArray::Get (other.position));
+      return *this;
+    }
+
+    /// Object accessor (const version)
+    operator const T* () const
+    {
+      return ownerArray.csArray::Get (position);
+    }
+  
+    /// Object accessor (non-const version)
+    operator T* () const
+    {
+      return ownerArray.csArray::Get (position);
+    }
+
+    /// Dereference underlying object.
+    T* operator -> () const
+    { 
+      return ownerArray.csArray::Get (position); 
+    }
+
+    /// Dereference underlying object.
+    T& operator* () const
+    { 
+      return *ownerArray.csArray::Get (position); 
+    }
+
+    /// Comparison
+    bool operator!= (const T* const other) const
+    {
+      return ownerArray.csArray::Get (position) != other;
+    }
+
+  private:
+    csRefArray& ownerArray;
+    size_t position;
+  };
+
+  // Hide the csArray copies of these and provide our own
+
+  /// Get an element (non-const)
+  RefProxy operator [] (size_t n)
+  {
+    return Get (n);
+  }
+
+  /// Get an element (const)
+  T* const operator [] (size_t n) const
+  {
+    return csArray::Get (n);
+  }
+
+  /// Get an element (non-const)
+  RefProxy Get (size_t n)
+  {
+    CS_ASSERT(n < this->GetSize ());
+    return RefProxy (*this, n); 
+  }
+
+  /// Get an element (const)
+  T* const& Get (size_t n) const
+  {
+    return csArray::Get (n);
+  }
+
+  /**
+   * Get an item from the array. If the number of elements in this array is too
+   * small the array will be automatically extended.
+   */
+  RefProxy GetExtend (size_t n)
+  {
+    if (n >= GetSize ())
+      SetSize (n+1);
+    return RefProxy (*this, n);
   }
 };
 
