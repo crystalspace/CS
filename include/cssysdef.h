@@ -505,10 +505,12 @@ Type *Class::var = 0;                                          	\
 void Class::getterFunc ## _kill ()               	        \
 {                                                              	\
   delete getterFunc ();                                 	\
+  var = 0;							\
 }                                                              	\
 void Class::getterFunc ## _kill_array ()         	        \
 {                                                              	\
   delete [] getterFunc ();                              	\
+  var = 0;							\
 }                                                              	\
 Type* Class::getterFunc ()                                     	\
 {                                                              	\
@@ -540,10 +542,12 @@ Type *Class::var = 0;                                          \
 void Class::getterFunc ## _kill ()                             \
 {                                                              \
   delete &getterFunc ();                                       \
+  var = 0;						       \
 }                                                              \
   void Class::getterFunc ## _kill_array ()                     \
 {                                                              \
   delete [] &getterFunc ();                                    \
+  var = 0;						       \
 }                                                              \
 Type &Class::getterFunc ()                                     \
 {                                                              \

@@ -21,6 +21,10 @@ chronological order.
 	- Jorrit removed the commented Saver section from
 	  particlesldr.csplugin since even stuff inside XML comments is
 	  considered for static linking (uses a simple sed expression).
+	- res2k fixed a problem with static compilation and cleanup
+	  of static variables (using CS_IMPLEMENT_STATIC_VAR_EXT and
+	  related). The problem manifested itself if you use
+	  DestroyApplication() and then after that initialize CS again.
 27-Aug-2006
 	- Fossi fixed the longstanding brute bug that kept materialmaps with
 	  a size bigger than 512 pixels from working. Now these should work,
