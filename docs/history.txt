@@ -9,6 +9,8 @@ chronological order.
 28-Aug-2006
         - Piotr added additional geom existence check in odedynam.
 	- mdmkolbe added event-order constraints for standard console.
+	- Marten reverted his csRefArray fix from yesterday as it introduced
+	  more problems than it solved.
 27-Aug-2006
 	- Fossi fixed the longstanding brute bug that kept materialmaps with
 	  a size bigger than 512 pixels from working. Now these should work,
