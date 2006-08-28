@@ -11,6 +11,8 @@ chronological order.
 	- mdmkolbe added event-order constraints for standard console.
 	- Marten reverted his csRefArray fix from yesterday as it introduced
 	  more problems than it solved.
+	- Jorrit fixed 'walkall' target so that it no longer attempts to
+	  compile partphys_simple.
 27-Aug-2006
 	- Fossi fixed the longstanding brute bug that kept materialmaps with
 	  a size bigger than 512 pixels from working. Now these should work,
