@@ -16,6 +16,8 @@ chronological order.
 	- Jorrit added missing SCF_IMPLEMENT_FACTORY for the saver classes
 	  in the particlesldr plugin. Without these it is impossible to
 	  static link.
+	- Jorrit removed it again since it doesn't seem to solve the problem
+	  for some reason.
 27-Aug-2006
 	- Fossi fixed the longstanding brute bug that kept materialmaps with
 	  a size bigger than 512 pixels from working. Now these should work,
