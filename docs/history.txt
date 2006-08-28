@@ -18,6 +18,9 @@ chronological order.
 	  static link.
 	- Jorrit removed it again since it doesn't seem to solve the problem
 	  for some reason.
+	- Jorrit removed the commented Saver section from
+	  particlesldr.csplugin since even stuff inside XML comments is
+	  considered for static linking (uses a simple sed expression).
 27-Aug-2006
 	- Fossi fixed the longstanding brute bug that kept materialmaps with
 	  a size bigger than 512 pixels from working. Now these should work,
