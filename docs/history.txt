@@ -14,6 +14,8 @@ chronological order.
 	- res added some missing includes to trianglestream.h.
 	- res worked around mixmode alpha not working in std_lighting on newer
 	  NV hardware.
+	- res added an option to link libgcc and libstdc++ statically to
+	  configure.
 28-Aug-2006
         - Piotr added additional geom existence check in odedynam.
 	- mdmkolbe added event-order constraints for standard console.

@@ -169,6 +169,28 @@ CS_EMIT_BUILD_PROPERTY([PTHREAD.ATFORK.AVAILABLE], [$cs_cv_sys_pthread_atfork])
 
 
 #------------------------------------------------------------------------------
+# Determine whether to link base g++ libraries statically
+#------------------------------------------------------------------------------
+AC_MSG_CHECKING([whether to link base g++ libraries statically])
+AC_ARG_ENABLE([static-baselibs], [AC_HELP_STRING([--enable-static-baselibs],
+    [Link statically againts libgcc and libstdc++. Use with caution; enabling 
+    this option may cause issues when dynamically linking against other C++
+    modules. (default NO)])],
+    [], [enable_static_baselibs=no])
+AC_MSG_RESULT([$enable_static_baselibs])
+AS_IF([test $enable_static_baselibs = yes],
+    [CS_EMIT_BUILD_FLAGS([for -static-libgcc],
+        [cs_cv_prog_link_static_libgcc], [CS_CREATE_TUPLE([-static-libgcc])],
+        [C], [COMPILER.LFLAGS], [+])
+    libstdcxx=`$CXX -print-file-name=libstdc++.a`
+    CS_EMIT_BUILD_FLAGS([for static libstdc++],
+        [cs_cv_prog_link_static_libstdcxx],
+        CS_CREATE_TUPLE([$libstdcxx]),
+        [C++], [COMPILER.LFLAGS], [+])])
+
+
+
+#------------------------------------------------------------------------------
 # Check if RTLD_NOW dlopen() flag is available; some installations (OpenBSD,
 # for example) provide only RTLD_LAZY.
 #------------------------------------------------------------------------------
