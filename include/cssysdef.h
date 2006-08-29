@@ -617,17 +617,17 @@ namespace CS
  * Platform-dependent operator new.
  * \remarks Won't throw an exception if allocation fails.
  */
-extern void* CS_CRYSTALSPACE_EXPORT operator new (size_t s, 
+extern CS_CRYSTALSPACE_EXPORT void* operator new (size_t s, 
   const CS::AllocPlatform&) throw();
 /**
  * Platform-dependent operator new.
  * \remarks Won't throw an exception if allocation fails.
  */
-extern void* CS_CRYSTALSPACE_EXPORT operator new[] (size_t s, 
+extern CS_CRYSTALSPACE_EXPORT void* operator new[] (size_t s, 
   const CS::AllocPlatform&) throw();
-extern void CS_CRYSTALSPACE_EXPORT operator delete (void* p, 
+extern CS_CRYSTALSPACE_EXPORT void operator delete (void* p, 
   const CS::AllocPlatform&) throw();
-extern void CS_CRYSTALSPACE_EXPORT operator delete[] (void* p, 
+extern CS_CRYSTALSPACE_EXPORT void operator delete[] (void* p, 
   const CS::AllocPlatform&) throw();
 //@}
 
@@ -637,10 +637,10 @@ extern void CS_CRYSTALSPACE_EXPORT operator delete[] (void* p,
  * Directly use the ptmalloc allocation functions. Usually, this is not needed -
  * use cs_malloc() etc instead.
  */
-extern void* CS_CRYSTALSPACE_EXPORT ptmalloc (size_t n);
-extern void CS_CRYSTALSPACE_EXPORT ptfree (void* p);
-extern void* CS_CRYSTALSPACE_EXPORT ptrealloc (void* p, size_t n);
-extern void* CS_CRYSTALSPACE_EXPORT ptcalloc (size_t n, size_t s);
+extern CS_CRYSTALSPACE_EXPORT void* ptmalloc (size_t n);
+extern CS_CRYSTALSPACE_EXPORT void ptfree (void* p);
+extern CS_CRYSTALSPACE_EXPORT void* ptrealloc (void* p, size_t n);
+extern CS_CRYSTALSPACE_EXPORT void* ptcalloc (size_t n, size_t s);
 //@}
 
 /**\name Default Crystal Space memory allocation

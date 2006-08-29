@@ -24,6 +24,7 @@ chronological order.
 	  sysprefix-based paths when needed.
 	- res added support for response files when shared libs are enabled.
 	  They're used if supported by the linker.
+	- res fixed some gcc warnings when compiling for shared libraries.
 28-Aug-2006
         - Piotr added additional geom existence check in odedynam.
 	- mdmkolbe added event-order constraints for standard console.
