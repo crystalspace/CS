@@ -11,6 +11,7 @@ chronological order.
 	  flexible. Though not pluggable, that'd be at least easier than
 	  before.
 	- res added portal near plane clipping to the software renderer.
+	- res added some missing includes to trianglestream.h.
 28-Aug-2006
         - Piotr added additional geom existence check in odedynam.
 	- mdmkolbe added event-order constraints for standard console.
