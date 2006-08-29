@@ -6,6 +6,11 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+29-Aug-2006
+	- res changed the software renderer vertex processing to make it more
+	  flexible. Though not pluggable, that'd be at least easier than
+	  before.
+	- res added portal near plane clipping to the software renderer.
 28-Aug-2006
         - Piotr added additional geom existence check in odedynam.
 	- mdmkolbe added event-order constraints for standard console.
