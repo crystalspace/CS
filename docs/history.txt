@@ -22,6 +22,8 @@ chronological order.
 	  then the Python linker flags cause e.g. /usr/lib to be scanned and
 	  libraries errorneously taken from there. Instead, only add 
 	  sysprefix-based paths when needed.
+	- res added support for response files when shared libs are enabled.
+	  They're used if supported by the linker.
 28-Aug-2006
         - Piotr added additional geom existence check in odedynam.
 	- mdmkolbe added event-order constraints for standard console.

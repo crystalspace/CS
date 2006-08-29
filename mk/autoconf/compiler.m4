@@ -97,4 +97,12 @@ AC_DEFUN([CS_PROG_LINK],[
     CS_CHECK_BUILD([if -soname is accepted], [cs_cv_prog_link_soname], [],
 	[CS_CREATE_TUPLE([-Wl,-soname,foobar])], [C++],
 	[CS_EMIT_BUILD_PROPERTY([PLUGIN.LFLAGS.USE_SONAME], [yes])])
+	
+    # Check if binutils support response files
+    rm -f conftest.resp
+    echo "" > conftest.resp
+    CS_CHECK_BUILD([if response files are accepted], [cs_cv_prog_link_respfile], [],
+	[-Wl,@conftest.resp], [C++],
+	[CS_EMIT_BUILD_PROPERTY([LINKER.RESPONSEFILES], [yes])])
+    rm -f conftest.resp
 ])
