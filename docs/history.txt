@@ -16,6 +16,12 @@ chronological order.
 	  NV hardware.
 	- res added an option to link libgcc and libstdc++ statically to
 	  configure.
+	- res tweaked the Python detection such that the $sysprefix/lib path
+	  is not always added as a library search path. This may cause issues
+	  when the user manually specifies paths for some libraries, since
+	  then the Python linker flags cause e.g. /usr/lib to be scanned and
+	  libraries errorneously taken from there. Instead, only add 
+	  sysprefix-based paths when needed.
 28-Aug-2006
         - Piotr added additional geom existence check in odedynam.
 	- mdmkolbe added event-order constraints for standard console.
