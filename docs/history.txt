@@ -12,6 +12,8 @@ chronological order.
 	  before.
 	- res added portal near plane clipping to the software renderer.
 	- res added some missing includes to trianglestream.h.
+	- res worked around mixmode alpha not working in std_lighting on newer
+	  NV hardware.
 28-Aug-2006
         - Piotr added additional geom existence check in odedynam.
 	- mdmkolbe added event-order constraints for standard console.
