@@ -1,0 +1,10 @@
+Crystal Space detailed change log for 1.0 release branch.
+http://www.crystalspace3d.org/
+
+The overall history is in reverse (descending) chronological order, so that
+each new day's entries apears before the previous day's entries.  The
+individual changes for each given day, however, are in normal (ascending)
+chronological order.
+
+30-Aug-2006
+	- Marten created the V1.0 release branch from trunk revision 25248.

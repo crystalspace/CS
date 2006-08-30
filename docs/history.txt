@@ -30,7 +30,7 @@ chronological order.
 	  They're used if supported by the linker.
 	- res fixed some gcc warnings when compiling for shared libraries.
 28-Aug-2006
-        - Piotr added additional geom existence check in odedynam.
+	- Piotr added additional geom existence check in odedynam.
 	- mdmkolbe added event-order constraints for standard console.
 	- Marten reverted his csRefArray fix from yesterday as it introduced
 	  more problems than it solved.
