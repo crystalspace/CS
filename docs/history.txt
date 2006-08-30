@@ -13,6 +13,7 @@ chronological order.
 	- res fixed a number of compile warnings and soft3d compilation
 	  in optimize mode.
 	- res added support for the --as-needed linker flag.
+	- Erroroman fixed missing shader bump_attn.cgvp in r3dsmtest
 29-Aug-2006
 	- res changed the software renderer vertex processing to make it more
 	  flexible. Though not pluggable, that'd be at least easier than
