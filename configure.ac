@@ -626,16 +626,6 @@ CS_EMIT_BUILD_FLAGS([if missing symbols can be reported as warnings],
 
 
 #------------------------------------------------------------------------------
-# Check if linker recognizes "--as-needed" which only links dynamic libs that
-# are really honestly needed.
-#------------------------------------------------------------------------------
-#CS_EMIT_BUILD_FLAGS([if --as-needed is supported], 
-#    [cs_cv_prog_link_as_needed], [CS_CREATE_TUPLE([],[-Wl,--as-needed])], 
-#    [C++], [COMPILER.LFLAGS], [+])
-
-
-
-#------------------------------------------------------------------------------
 # Check if C++ function inlining can be enabled and disabled. Apparently, with
 # some versions of GNU build tools on Windows, the Crystal Space Python plugin
 # fails to link and emits the error message "Error: 0-bit reloc in dll". In
