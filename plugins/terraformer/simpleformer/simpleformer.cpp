@@ -886,7 +886,7 @@ const int *csSimpleSampler::SampleInteger (csStringID type)
           for (uint b = 0; b < resx; b++)
           {
             int from =
-              (int)(a*stepz) * terraFormer->intmaps[i].width + b*stepx;
+              (int)(a*stepz) * terraFormer->intmaps[i].width + int (b*stepx);
             map[to] = original[from];
             to ++;
           }

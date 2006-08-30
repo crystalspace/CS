@@ -254,7 +254,7 @@ const char* csLightMap::ReadFromCache (
   csThing* parent = poly->GetParent ();
 
   SetSize (w, h);
-  long lm_size = lwidth * lheight;
+  size_t lm_size = lwidth * lheight;
 
   strcpy (pswanted.header, LMMAGIC);
   if (poly)
