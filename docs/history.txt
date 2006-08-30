@@ -10,6 +10,8 @@ chronological order.
 	- Marten fixed csIntersect3::TriangleTriangle to return a correct
 	  intersection line even for coplanar case. Also rewrote it a bit
 	  for clarity.
+	- res fixed a number of compile warnings and soft3d compilation
+	  in optimize mode.
 29-Aug-2006
 	- res changed the software renderer vertex processing to make it more
 	  flexible. Though not pluggable, that'd be at least easier than
