@@ -19,17 +19,11 @@
 #ifndef __CEGUITEST_H__
 #define __CEGUITEST_H__
 
-#include <crystalspace.h>
+#include "crystalspace.h"
 
-// hack: work around problems caused by #defining 'new'
-#if defined(CS_EXTENSIVE_MEMDEBUG) || defined(CS_MEMORY_TRACKER)
-# undef new
-#endif
-#include <new>
+#include "csutil/custom_new_disable.h"
 #include <CEGUI.h>
-#if defined(CS_EXTENSIVE_MEMDEBUG) || defined(CS_MEMORY_TRACKER)
-# define new CS_EXTENSIVE_MEMDEBUG_NEW
-#endif
+#include "csutil/custom_new_enable.h"
 
 #include "ivaria/icegui.h"
 
@@ -59,6 +53,9 @@ private:
 public:
   CEGUITest();
   ~CEGUITest();
+
+  // Handle exit button clicked event
+  bool OnExitButtonClicked (const CEGUI::EventArgs& e);
 
   void OnExit();
   bool OnInitialize(int argc, char* argv[]);

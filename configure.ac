@@ -164,6 +164,30 @@ CS_EMIT_BUILD_RESULT([cs_cv_sys_pthread], [PTHREAD])
 AS_IF([test $cs_cv_sys_pthread_mutex_recursive != no],
     [CS_HEADER_PROPERTY([CS_PTHREAD_MUTEX_RECURSIVE],
 	[$cs_cv_sys_pthread_mutex_recursive])])
+CS_CHECK_PTHREAD_ATFORK([cs_cv_sys_pthread_atfork])
+CS_EMIT_BUILD_PROPERTY([PTHREAD.ATFORK.AVAILABLE], [$cs_cv_sys_pthread_atfork])
+
+
+
+#------------------------------------------------------------------------------
+# Determine whether to link base g++ libraries statically
+#------------------------------------------------------------------------------
+AC_MSG_CHECKING([whether to link base g++ libraries statically])
+AC_ARG_ENABLE([static-baselibs], [AC_HELP_STRING([--enable-static-baselibs],
+    [Link statically againts libgcc and libstdc++. Use with caution; enabling 
+    this option may cause issues when dynamically linking against other C++
+    modules. (default NO)])],
+    [], [enable_static_baselibs=no])
+AC_MSG_RESULT([$enable_static_baselibs])
+AS_IF([test $enable_static_baselibs = yes],
+    [CS_EMIT_BUILD_FLAGS([for -static-libgcc],
+        [cs_cv_prog_link_static_libgcc], [CS_CREATE_TUPLE([-static-libgcc])],
+        [C], [COMPILER.LFLAGS], [+])
+    libstdcxx=`$CXX -print-file-name=libstdc++.a`
+    CS_EMIT_BUILD_FLAGS([for static libstdc++],
+        [cs_cv_prog_link_static_libstdcxx],
+        CS_CREATE_TUPLE([$libstdcxx]),
+        [C++], [COMPILER.LFLAGS], [+])])
 
 
 
@@ -352,7 +376,20 @@ AS_IF([test "$with_java" != no && test -n "$JAVAC" && test -n "$JAVA"],
     [CS_JAVA_FLAGS([cs_java], [$JAVAC])
     CS_CHECK_BUILD([if Java2 SDK is usable], [cs_cv_java],
 	[AC_LANG_PROGRAM(
-	    [[#include <jni.h>
+	    [[
+	    #if defined(__GNUC__)
+	        typedef long long __int64; /*For gcc on Windows */
+	    #endif
+
+	    /* fix for 'jlong' on x86_64 */
+	    #if defined(__x86_64)
+	    #ifdef _LP64 /* 64-bit Solaris */
+	    #undef _LP64
+	    #endif
+	    #endif
+
+	    #include <jni.h>
+
 	    JNIEXPORT void JNICALL f(JNIEnv *env, jobject obj);]])],
 	[CS_CREATE_TUPLE() \
         CS_CREATE_TUPLE([$cs_java_cflags],[$cs_java_lflags],[$cs_java_libs])],
@@ -549,6 +586,20 @@ CS_EMIT_BUILD_FLAGS([how to export all dynamic symbols],
 
 
 #------------------------------------------------------------------------------
+# Check whether the linker needs -Bsymbolic. This binds "references to global 
+# symbols to the definition within the shared library" (from man ld). If this
+# flag is not set, it can happen that symbols in plugins get bound against
+# symbols from other modules (including the application executable itself),
+# causing side-effects such as violating the "memory allocation and freeing in
+# the same module" rule.
+#------------------------------------------------------------------------------
+CS_EMIT_BUILD_FLAGS([for -Bsymbolic linker flag],
+    [cs_cv_prog_link_Bsymbolic], [CS_CREATE_TUPLE([-Wl,-Bsymbolic])],
+    [C++], [COMPILER.LFLAGS], [+])
+
+
+
+#------------------------------------------------------------------------------
 # Check if linker recognizes --kill-at which is needed to make csjava.dll
 # usable by JNI on Windows.  Without this, JNI is unable to find the exported
 # JNI glue functions in csjava.dll.
@@ -657,19 +708,25 @@ AS_IF([test $cs_cv_prog_cxx_visibility_inlines_hidden_buggy != yes],
 # in code.
 #------------------------------------------------------------------------------
 CS_CHECK_BUILD_FLAGS([for symbol visibility flag],
-    [cs_cv_prog_cxx_visibility_hidden],
-    [CS_CREATE_TUPLE([-fvisibility=hidden])], [C++])
+    [cs_cv_prog_cc_visibility_hidden],
+    [CS_CREATE_TUPLE([-fvisibility=hidden])])
+AS_IF([test -n "$cs_cv_prog_cc_visibility_hidden"],
+    [CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS], 
+	[$cs_cv_prog_cc_visibility_hidden], [+])])
 
 CS_SYMBOL_QUALIFIER([how to declare default visibility],
     [cs_cv_prog_cxx_declare_visible_def],
     [__attribute__((visibility("default")))], [], [C++])
-
-AS_IF([test $cs_cv_prog_cxx_declare_visible_def != no && \
-    test -n "$cs_cv_prog_cxx_visibility_hidden"],
-    [CS_EMIT_BUILD_PROPERTY([COMPILER.C++FLAGS], 
-	[$cs_cv_prog_cxx_visibility_hidden], [+])
-    CS_HEADER_PROPERTY([CS_VISIBILITY_DEFAULT],
+AS_IF([test $cs_cv_prog_cxx_declare_visible_def != no],
+    [CS_HEADER_PROPERTY([CS_VISIBILITY_DEFAULT],
 	[$cs_cv_prog_cxx_declare_visible_def])])
+
+CS_SYMBOL_QUALIFIER([how to declare hidden visibility],
+    [cs_cv_prog_cxx_declare_visible_hidden],
+    [__attribute__((visibility("hidden")))], [], [C++])
+AS_IF([test $cs_cv_prog_cxx_declare_visible_hidden != no],
+    [CS_HEADER_PROPERTY([CS_VISIBILITY_HIDDEN],
+	[$cs_cv_prog_cxx_declare_visible_hidden])])
 
 
 
@@ -742,8 +799,11 @@ AS_IF([test $enable_cpu_specific_optimizations != no],
 	AS_IF([test $host_vendor = apple],
 	    [# Work around issue on intel macs, where "-fpmath=sse" is on by
 	     # default, but this breaks compilation when combined with 
-	     # the "-march=i586" selected below. So the "minimum" optimization
-	     # on x86 Apples is -march=i686.
+	     # the "-march=i586" selected below. Furthermore, -march=i686 was
+	     # reported to not work, but -march=prescott so, so try to use 
+	     # that as the "minimum" optimization on x86 Apples, followed by
+	     # -march=i686.
+	    CS_CHECK_CODE_GEN_FLAG([[*[3-9]86]], [-march=prescott])
 	    CS_CHECK_CODE_GEN_FLAG([[*[3-9]86]], [-march=i686])])
 	CS_CHECK_CODE_GEN_FLAG([x86_64], [-march=k8])
 	CS_CHECK_CODE_GEN_FLAG([x86_64], [-mtune=k8])
@@ -810,16 +870,21 @@ CS_CHECK_OPTIMIZE_FLAGS
 #------------------------------------------------------------------------------
 binutils_recent=no
 AS_IF([test -n "$OBJCOPY"],
-    [CS_CHECK_PROG_VERSION([binutils], [$OBJCOPY -V], [2.16.0], [9.9.9|.9.9],
-	[binutils_recent=yes])])
+    [CS_CHECK_PROG_VERSION([binutils], [$OBJCOPY -V], [2.16], [9.9|.9|.9|.9],
+        [binutils_recent=yes])])
 
-AC_ARG_WITH([separate-debug-info], [AC_HELP_STRING([--with-separate-debug-info],
-    [split debug information into separate files. (default YES if 
-    binutils >= 2.16 detected, otherwise default NO)])])
-AS_IF([test -z "$with_separate_debug_info"], 
-    [with_separate_debug_info=$binutils_recent])
+AC_MSG_CHECKING([whether to split debug information])
+AC_ARG_ENABLE([separate-debug-info], 
+    [AC_HELP_STRING([--enable-separate-debug-info],
+        [split debug information into separate files. (default YES if 
+        binutils >= 2.16 detected and not on Cygwin, otherwise default NO)])])
+AS_IF([test -z "$enable_separate_debug_info"], 
+    AS_IF([test -z `uname | grep -i CYGWIN`],
+        [enable_separate_debug_info=$binutils_recent],
+        [enable_separate_debug_info=no]))
+AC_MSG_RESULT([$enable_separate_debug_info])
 
-CS_EMIT_BUILD_PROPERTY([LINK.DEBUG.INFO.SEPARATE], [$with_separate_debug_info])
+CS_EMIT_BUILD_PROPERTY([LINK.DEBUG.INFO.SEPARATE], [$enable_separate_debug_info])
 
 CS_EMIT_BUILD_FLAGS([how to enable debug mode debugging symbols],
     [cs_cv_prog_cxx_debug_symbols_extra],
@@ -828,13 +893,17 @@ CS_EMIT_BUILD_FLAGS([how to enable debug mode debugging symbols],
     [CS_EMIT_BUILD_PROPERTY([COMPILER.LFLAGS.debug],
 	[$cs_cv_prog_cxx_debug_symbols_extra], [+])])
 	
-AC_ARG_WITH([optimize-debug-info], [AC_HELP_STRING([--with-optimize-debug-info],
-    [whether to enable debug information even in optimize builds. 
-    (default YES if separate debug information is enabled, 
-    otherwise default NO)])])
-AS_IF([test -z "$with_optimize_debug_info"], 
-    [with_optimize_debug_info=$with_separate_debug_info])
-AS_IF([test "$with_optimize_debug_info" != no],
+AC_MSG_CHECKING([whether to enable debug information in optimize mode])
+AC_ARG_ENABLE([optimize-mode-debug-info], 
+    [AC_HELP_STRING([--enable-optimize-mode-debug-info],
+        [whether to enable debug information even in optimize builds. 
+        (default YES if separate debug information is enabled, 
+        otherwise default NO)])],
+    [enable_optimize_mode_debug_info=$enableval])
+AS_IF([test -z "$enable_optimize_mode_debug_info"], 
+    [enable_optimize_mode_debug_info=$enable_separate_debug_info])
+AC_MSG_RESULT([$enable_optimize_mode_debug_info])
+AS_IF([test "$enable_optimize_mode_debug_info" != "no"],
     [CS_EMIT_BUILD_FLAGS([how to enable optimize mode debugging symbols],
 	[cs_cv_prog_cxx_debug_symbols_normal],
 	[CS_CREATE_TUPLE([-g2]) CS_CREATE_TUPLE([-g])],
@@ -1294,7 +1363,6 @@ AS_IF([test $cs_cv_libfreetype2 = yes],
 	[cs_cv_freetype2_recent],
 	[AC_LANG_PROGRAM(
 	    [[#include <ft2build.h>
-	    #include FT_INTERNAL_OBJECTS_H
 	    #include FT_FREETYPE_H
 	    #include FT_GLYPH_H
 	    #include FT_MODULE_H]], [return
@@ -1372,35 +1440,6 @@ AS_IF([test $cs_cv_libsdl = yes],
 	    [SDL_EnableKeyRepeat(0,0)])],
 	[], [], [CS_EMIT_BUILD_RESULT([cs_cv_libsdl], [SDL])], [], [],
 	[$cs_cv_libsdl_cflags], [$cs_cv_libsdl_lflags], [$cs_cv_libsdl_libs])])
-
-
-
-#------------------------------------------------------------------------------
-# Check for VOS.
-#------------------------------------------------------------------------------
-CS_CHECK_LIB_WITH([metaobject_a3dl],
-    [AC_LANG_PROGRAM(
-	[[#include <vos/metaobjects/a3dl/object3d.hh>]],
-	[A3DL::Object3D o(0); o.setPosition(0,0,0);])],
-    [], [C++], [], [], [], [], 
-    [-lboost_thread -lvutil -lvip -lvos], 
-    [libmetaobject_a3dl])
-
-AS_IF([test $cs_cv_libmetaobject_a3dl = yes],
-    [CS_CHECK_LIB_WITH([metaobject_misc],
-	[AC_LANG_PROGRAM(
-	    [[#include <vos/metaobjects/misc/metadata.hh>]],
-	    [VOS::Metadata m(0); m.setCreationTime(0);])],
-	[], [C++], [], [],
-	[$cs_cv_libmetaobject_a3dl_cflags],
-	[$cs_cv_libmetaobject_a3dl_lflags],
-	[$cs_cv_libmetaobject_a3dl_libs -lircclient],
-	[libmetaobject_misc])],
-    [cs_cv_libmetaobject_misc=no])
-
-AS_IF([test $cs_cv_libmetaobject_misc = yes],
-    [CS_EMIT_BUILD_RESULT([cs_cv_libmetaobject_misc], [VOS])])
-
 
 
 #------------------------------------------------------------------------------
@@ -1696,6 +1735,18 @@ CS_CHECK_BUILD([for _aligned_malloc], [cs_cv__aligned_malloc],
 	[_aligned_malloc(0, 0);])],
     [], [],
     [CS_HEADER_PROPERTY([CS_HAVE__ALIGNED_MALLOC])])
+
+
+
+#------------------------------------------------------------------------------
+# Check whether malloc.h can be included without a warning.
+#------------------------------------------------------------------------------
+CS_CHECK_BUILD([if <malloc.h> can be included], [cs_cv_malloc_h_includeable],
+    [AC_LANG_PROGRAM(
+        [[#include <malloc.h>]])],
+    [], [C++], 
+    [CS_HEADER_PROPERTY([CS_HAVE_MALLOC_H])], [],
+    [$cs_cv_prog_cxx_enable_warnings $cs_cv_prog_cxx_enable_errors])
 
 
 
@@ -2232,6 +2283,21 @@ AS_IF([test $cs_build_mode = debug],
 	*) cs_debug_libbfd=no ;;
     esac],
     [cs_debug_libbfd=no])
+
+
+
+#------------------------------------------------------------------------------
+# Determine whether ptmalloc should be disabled.
+#------------------------------------------------------------------------------
+AC_MSG_CHECKING([whether to enable ptmalloc])
+AC_ARG_ENABLE([ptmalloc],
+    [AC_HELP_STRING([--enable-ptmalloc],
+	[enable the built-in ptmalloc which provides fast memory allocations,
+	but may cause problems in rare cases. (default YES)])],
+    [], [enable_ptmalloc=yes])
+AC_MSG_RESULT([$enable_ptmalloc])
+AS_IF([test $enable_ptmalloc != yes],
+    [CS_HEADER_PROPERTY([CS_NO_PTMALLOC])])
 
 
 

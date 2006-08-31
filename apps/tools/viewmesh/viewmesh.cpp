@@ -251,7 +251,9 @@ void ViewMesh::Help ()
   csPrintf ("  -L=<file>          Load a library file (for textures/materials)\n");
   csPrintf ("  -Scale=<ratio>     Scale the Object\n");
   csPrintf ("  -RoomSize=<units>  Radius and height (4*) of the room (default 5)\n");
-  csPrintf ("  <file>             Load the specified mesh object (meshfact or library)\n");
+  csPrintf ("  -R=<realpath>      Real path from where to load the model\n");
+  csPrintf ("  -C=<vfsdir>        Current VFS directory\n");
+  csPrintf ("  <file>             Load the specified mesh object from the VFS path (meshfact or library)\n");
 }
 
 void ViewMesh::HandleCommandLine()
@@ -273,19 +275,27 @@ void ViewMesh::HandleCommandLine()
   const char* texturename = cmdline->GetName (2);
   const char* scaleTxt = cmdline->GetOption("Scale");
   const char* roomSize = cmdline->GetOption("RoomSize");
+  const char* realPath = cmdline->GetOption("R");
+  const char* vfsDir = cmdline->GetOption("C");
+
+  if (realPath)
+  {
+    vfs->Mount ("/tmp/viewmesh", realPath);
+    vfs->ChDir ("/tmp/viewmesh");
+  }
+  if (vfsDir)
+  {
+    vfs->ChDir (vfsDir);
+  }
 
   if (texturefilename && texturename)
   {
-    csString file(texturefilename);
-    size_t split = file.FindLast('/');
-    LoadTexture(file, file.Slice(split+1, file.Length()-split-1), texturename);
+    LoadTexture(texturefilename, texturename);
   }
 
   if (meshfilename)
   {
-    csString file(meshfilename);
-    size_t split = file.FindLast('/');    
-    LoadSprite(file, file.Slice(split+1, file.Length()-split-1));
+    LoadSprite(meshfilename);
   }
 
   if (roomSize) roomsize = atof(roomSize);
@@ -299,10 +309,8 @@ void ViewMesh::HandleCommandLine()
 
 }
 
-void ViewMesh::LoadTexture(const char* path, const char* file, const char* name)
+void ViewMesh::LoadTexture(const char* file, const char* name)
 {
-  if (path) ParseDir(path);
-
   if (file && name)
   {
     iTextureWrapper* txt = loader->LoadTexture (name, file);
@@ -315,9 +323,8 @@ void ViewMesh::LoadTexture(const char* path, const char* file, const char* name)
   }
 }
 
-void ViewMesh::LoadLibrary(const char* path, const char* file)
+void ViewMesh::LoadLibrary(const char* file)
 {
-  if (path) ParseDir(path);
   loader->LoadLibraryFile(file);
 }
 
@@ -523,10 +530,8 @@ void ViewMesh::CreateGui ()
   StdDlgUpdateLists(valuePath->GetData());
 }
 
-void ViewMesh::LoadSprite (const char* path, const char* filename)
+void ViewMesh::LoadSprite (const char* filename)
 {
-  if (path) ParseDir(path);
-
   if (spritewrapper)
   {
     if (sprite)
@@ -577,6 +582,8 @@ void ViewMesh::LoadSprite (const char* path, const char* filename)
   }
 
   iBase* result;
+  printf ("Loading model '%s' from vfs dir '%s'\n",
+		  filename, vfs->GetCwd ()); fflush (stdout);
   iRegion* region = engine->CreateRegion ("viewmesh_region");
   bool rc = loader->Load (filename, result, region, false, true);
 
@@ -649,10 +656,8 @@ void ViewMesh::LoadSprite (const char* path, const char* filename)
   UpdateMorphList ();
 }
 
-void ViewMesh::SaveSprite (const char* path, const char* filename, bool binary)
+void ViewMesh::SaveSprite (const char* filename, bool binary)
 {
-  ParseDir(path);
-
   csRef<iDocumentSystem> xml(new csTinyDocumentSystem());
   csRef<iDocument> doc = xml->CreateDocument();
   csRef<iDocumentNode> root = doc->CreateRoot();
@@ -733,7 +738,7 @@ void ViewMesh::SaveSprite (const char* path, const char* filename, bool binary)
   vfs->WriteFile(filename, str.GetData(), str.Length());
 }
 
-void ViewMesh::AttachMesh (const char* path, const char* file)
+void ViewMesh::AttachMesh (const char* file)
 {
   if (selectedSocket)
   {
@@ -753,8 +758,6 @@ void ViewMesh::AttachMesh (const char* path, const char* file)
       selectedCal3dSocket->SetMeshWrapper( 0 );    
     }
   }
-
-  ParseDir(path);
 
   iBase* result;
   iRegion* region = engine->CreateRegion ("viewmesh_region");
@@ -1547,53 +1550,6 @@ void ViewMesh::ClearButton (unsigned long, intptr_t awst, iAwsSource* /*s*/)
 }
 //---------------------------------------------------------------------------
 
-bool ViewMesh::ParseDir(const char* filename)
-{
-  const char* colon = strchr (filename, ':');
-  csString path;
-  CS_ALLOC_STACK_ARRAY(char, fn, strlen(filename) + 1);
-  if (colon)
-  {
-    int pathlen = colon-filename;
-    strcpy (fn, colon+1);
-    path.Append (filename, pathlen);
-    if (!vfs->ChDirAuto (path, 0, 0, colon+1))
-    {
-      ReportError ("Couldn't find '%s' in '%s'!", colon+1, path.GetData());
-      return false;
-    }
-    // If there is a path after the colon we skip every entry in that
-    // path until we end up with only the filename.
-    char* slash = strpbrk (fn, "/\\");
-    while (slash)
-    {
-      char rs = *slash;
-      *slash = 0;
-      if (!vfs->ChDir (fn))
-        return false;
-      *slash = rs;
-      strcpy (fn, slash+1);
-      slash = strpbrk (fn, "/\\");
-    }
-    return true;
-  }
-  else
-  {
-    // grab the directory.
-    path = filename;
-    size_t slashPos = path.FindLast ('/');
-    if (slashPos != (size_t)-1)
-    {
-      path.Truncate (slashPos);
-    }
-    else
-      path = "/";
-    if (!vfs->ChDir (path))
-      return false;
-    return true;
-  }
-}
-
 void ViewMesh::StdDlgUpdateLists(const char* filename)
 {
   iAwsComponent* dirlist = stddlg->FindChild("DirList");
@@ -1653,6 +1609,7 @@ void ViewMesh::StdDlgOkButton (unsigned long, intptr_t awst, iAwsSource* /*s*/)
   iAwsComponent* inputpath = tut->stddlg->FindChild("InputPath");
   if (inputpath) inputpath->GetProperty("Text",(intptr_t*)&path);
   if (!path || !path->GetData()) return;
+  tut->vfs->ChDir (path->GetData ());
 
   iAwsComponent* inputfile = tut->stddlg->FindChild("InputFile");
   if (inputfile) inputfile->GetProperty("Text",(intptr_t*)&file);
@@ -1661,19 +1618,19 @@ void ViewMesh::StdDlgOkButton (unsigned long, intptr_t awst, iAwsSource* /*s*/)
   switch (tut->stddlgPurpose)
   {
   case save:
-    tut->SaveSprite(*path, *file, false);
+    tut->SaveSprite(*file, false);
     break;
   case savebinary:
-    tut->SaveSprite(*path, *file, true);
+    tut->SaveSprite(*file, true);
     break;
   case load:
-    tut->LoadSprite(*path, *file);
+    tut->LoadSprite(*file);
     break;
   case loadlib:
-    tut->LoadLibrary(*path, *file);
+    tut->LoadLibrary(*file);
     break;
   case attach:
-    tut->AttachMesh(*path, *file);
+    tut->AttachMesh(*file);
     break;
   }
 }
@@ -1742,8 +1699,7 @@ void ViewMesh::StdDlgDirSelect (unsigned long, intptr_t awst, iAwsSource* /*s*/)
   }
 
   if (!newpath->GetData()) newpath->Append("/");
-
-  tut->ParseDir(newpath->GetData());
+  tut->vfs->ChDir (newpath->GetData ());
 
   iAwsComponent* InputPath = tut->stddlg->FindChild("InputPath");
   if (InputPath) InputPath->SetProperty("Text", (intptr_t)(iString*)newpath);
