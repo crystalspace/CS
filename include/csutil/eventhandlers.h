@@ -24,12 +24,15 @@
 #include "csextern.h"
 #include "iutil/eventnames.h"
 #include "iutil/eventhandlers.h"
-#include "iutil/objreg.h"
 #include "iutil/eventh.h"
+#include "csutil/csstring.h"
+#include "csutil/eventnames.h"
 #include "csutil/scf_implementation.h"
 #include "csutil/hash.h"
 #include "csutil/strset.h"
-#include "csutil/scf.h"
+#include "csutil/ref.h"
+
+struct iObjectRegistry;
 
 /**\file
  * Event handler naming, name management, indexing, and instantiation
@@ -310,7 +313,7 @@ class FrameSignpost_DebugFrame
 CS_EVENTHANDLER_NAMES(x)						\
 CS_EVENTHANDLER_DEFAULT_INSTANCE_CONSTRAINTS				\
 CS_CONST_METHOD virtual const csHandlerID * GenericPrec			\
-(csRef<iEventHandlerRegistry> &r1, csRef<iEventNameRegistry> &r2,	\
+(csRef<iEventHandlerRegistry> &, csRef<iEventNameRegistry> &,		\
  csEventID) const {							\
   return 0;								\
 }									\
@@ -485,8 +488,8 @@ CS_CONST_METHOD virtual const csHandlerID * GenericPrec			\
   return precConstraint;						\
 }									\
 CS_CONST_METHOD virtual const csHandlerID * GenericSucc			\
-(csRef<iEventHandlerRegistry> &r1, csRef<iEventNameRegistry> &r2,	\
- csEventID event) const {						\
+(csRef<iEventHandlerRegistry> &, csRef<iEventNameRegistry> &,		\
+ csEventID) const {							\
   return 0;								\
 }
 

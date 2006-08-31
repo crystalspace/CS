@@ -463,7 +463,7 @@ void csMemoryPen::DrawLine (uint x1, uint y1, uint x2, uint y2)
 /** 
 * Draws a single point. 
 */
-void csMemoryPen::DrawPoint (uint x1, uint y2)
+void csMemoryPen::DrawPoint (uint x1, uint y1)
 {
 	uint8 op = PEN_OP_DRAWPOINT;
 	

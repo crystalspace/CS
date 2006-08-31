@@ -19,6 +19,7 @@
 #include "cssysdef.h"
 
 #include "csutil/csendian.h"
+#include "csutil/csstring.h"
 #include "csutil/dirtyaccessarray.h"
 
 #include "iengine/engine.h"

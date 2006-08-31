@@ -287,7 +287,7 @@ csLightIterRenderStep::GetLightAccessor (iLight* light)
 }
 
 void csLightIterRenderStep::Perform (iRenderView* rview, iSector* sector,
-  csShaderVarStack &stacks)
+  iShaderVarStack* stacks)
 {
   Init ();
 

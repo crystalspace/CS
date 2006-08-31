@@ -103,7 +103,8 @@ void csFireMeshObject::SetupObject ()
     for (i=0 ; i < (int)number ; i++)
     {
       AppendRectSprite (drop_width, drop_height, mat, lighted_particles);
-      GetParticle (i)->SetMixMode (MixMode);
+      csRef<iMeshObject> meshobj = scfQueryInterface<iMeshObject> (GetParticle (i));
+      meshobj->SetMixMode (MixMode);
       RestartParticle (i, (total_time / float(number)) * float(number-i));
       bbox.AddBoundingVertexSmart (part_pos[i]);
     }
@@ -194,7 +195,8 @@ void csFireMeshObject::MoveAndAge (int i, float delta_t)
 
   /// colouring fraction
   csColor col = age * precalc_mul[k] + precalc_add[k];
-  GetParticle (i)->SetColor (col);
+  csRef<iMeshObject> meshobj = scfQueryInterface<iMeshObject> (GetParticle (i));
+  meshobj->SetColor (col);
 }
 
 

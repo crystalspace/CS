@@ -19,7 +19,8 @@
 #ifndef __CS_IUTIL_EVENTNAMES_H__
 #define __CS_IUTIL_EVENTNAMES_H__
 
-#include "csutil/strset.h"
+#include "iutil/strset.h"
+class csString;
 
 /**\file
  * General event name resolver interface
@@ -28,7 +29,7 @@
  * \addtogroup event_handling
  * @{ */
  
-#include "csutil/scf.h"
+#include "csutil/scf_interface.h"
 
 /**
  * A csEventID is a handle for a string representing an event's hierarchical

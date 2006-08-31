@@ -331,7 +331,7 @@ void csSoftwareTextureManager::UnregisterTexture (
 }
 
 csPtr<iSuperLightmap> csSoftwareTextureManager::CreateSuperLightmap (
-  int width, int height)
+  int /*width*/, int /*height*/)
 {
   return 0;
 }

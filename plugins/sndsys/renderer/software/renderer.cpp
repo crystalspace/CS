@@ -22,6 +22,7 @@
 
 #include "csutil/sysfunc.h"
 #include "csutil/event.h"
+#include "csutil/eventnames.h"
 #include "csutil/csendian.h"
 
 #include "iutil/plugin.h"
@@ -817,7 +818,7 @@ size_t csSndSysRendererSoftware::FillDriverBuffer(void *buf1, size_t buf1_frames
   if ((m_pSampleBuffer==0) || (needed_frames > m_SampleBufferFrames))
   {
     RecordEvent(SSEL_DEBUG, "Sample buffer too small. Have [%u frames] Need [%u frames]. Allocating.", m_SampleBufferFrames, needed_frames);
-
+	//asm ("int $3");
     delete[] m_pSampleBuffer;
     m_pSampleBuffer=new csSoundSample[needed_frames * m_PlaybackFormat.Channels];
     m_SampleBufferFrames = needed_frames;

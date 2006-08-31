@@ -756,7 +756,7 @@ bool csXMLShaderTech::DeactivatePass ()
 
 bool csXMLShaderTech::SetupPass (const csRenderMesh *mesh, 
 			         csRenderMeshModes& modes,
-			         const csShaderVarStack &stacks)
+			         const iShaderVarStack* stacks)
 {
   if(currentPass>=passesCount)
     return false;
@@ -776,7 +776,7 @@ bool csXMLShaderTech::SetupPass (const csRenderMesh *mesh,
       last_buffers[i] = modes.buffers->GetRenderBuffer (
 	thispass->custommapping_buffer[i]);
     }
-    else if (thispass->custommapping_id[i] < (csStringID)stacks.Length ())
+    else if (thispass->custommapping_id[i] < (csStringID)stacks->GetSize ())
     {
       csShaderVariable* var = 0;
       var = csGetShaderVariableFromStack (stacks, thispass->custommapping_id[i]);
@@ -797,7 +797,7 @@ bool csXMLShaderTech::SetupPass (const csRenderMesh *mesh,
   int j;
   for (j = 0; j < thispass->textureCount; j++)
   {
-    if (thispass->textureID[j] < (csStringID)stacks.Length ())
+    if (thispass->textureID[j] < (csStringID)stacks->GetSize ())
     {
       csShaderVariable* var = 0;
       var = csGetShaderVariableFromStack (stacks, thispass->textureID[j]);
@@ -827,7 +827,7 @@ bool csXMLShaderTech::SetupPass (const csRenderMesh *mesh,
     iTextureHandle* tex = 0;
     if (thispass->alphaMode.autoModeTexture != csInvalidStringID)
     {
-      if (thispass->alphaMode.autoModeTexture < (csStringID)stacks.Length ())
+      if (thispass->alphaMode.autoModeTexture < (csStringID)stacks->GetSize ())
       {
         csShaderVariable* var = 0;
         var = csGetShaderVariableFromStack (stacks, thispass->alphaMode.autoModeTexture);

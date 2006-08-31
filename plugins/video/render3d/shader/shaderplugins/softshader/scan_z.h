@@ -20,11 +20,7 @@
 #ifndef __CS_SOFTSHADER_SCAN_Z_H__
 #define __CS_SOFTSHADER_SCAN_Z_H__
 
-namespace CS
-{
-namespace Plugins
-{
-namespace SoftShader
+CS_PLUGIN_NAMESPACE_BEGIN(SoftShader)
 {
 
   using namespace CS::PluginCommon::SoftShader;
@@ -103,7 +99,8 @@ namespace SoftShader
     void Update () { }
     void Advance () { zBuff++; }
   };
-} // namespace SoftShader
-} // namespace Plugins
-} // namespace CS
+
+}
+CS_PLUGIN_NAMESPACE_END(SoftShader)
+
 #endif // __CS_SOFTSHADER_SCAN_Z_H__

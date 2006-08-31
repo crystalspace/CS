@@ -24,6 +24,7 @@ distribution.
 
 #include "cssysdef.h"
 #include "tinyxml.h"
+#include "csutil/csstring.h"
 #include <ctype.h>
 
 // Note tha "PutString" hardcodes the same list. This

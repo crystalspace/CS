@@ -29,6 +29,7 @@
 #include "csutil/dirtyaccessarray.h"
 #include "csutil/flags.h"
 #include "csutil/scf.h"
+#include "csutil/scfarray.h"
 #include "csutil/xmltiny.h"
 
 #include "iengine/camera.h"
@@ -451,7 +452,7 @@ bool csStencil2ShadowStep::Initialize (iObjectRegistry* objreg)
 }
 
 void csStencil2ShadowStep::Perform (iRenderView* /*rview*/, iSector* /*sector*/,
-                                    csShaderVarStack& /*stacks*/)
+                                    iShaderVarStack* /*stacks*/)
 {
   /// TODO: Report error (no light)
   return;
@@ -638,9 +639,9 @@ void csStencil2ShadowStep::DrawShadow(
 
   cache_entry->UpdateBuffers();
 
-  static csShaderVarStack stacks; // @@@ use STATIC macros
+  csRef<iShaderVarStack> stacks;
+  stacks.AttachNew (new scfArray<iShaderVarStack>);
 
-  stacks.Empty ();
   shmgr->PushVariables (stacks);
   g3d->SetWorldToCamera (camera->GetTransform ().GetInverse ());
   shader->SetupPass (shaderTicket, &rmesh, rmesh, stacks);
@@ -665,7 +666,7 @@ void csStencil2ShadowStep::DrawShadow(
 }
 
 void csStencil2ShadowStep::Perform (iRenderView* rview, iSector* sector,
-                                    iLight* light, csShaderVarStack &stacks)
+                                    iLight* light, iShaderVarStack* stacks)
 {
   iShader* shadow;
   if (!enableShadows || ((shadow = type->GetShadow ()) == 0))

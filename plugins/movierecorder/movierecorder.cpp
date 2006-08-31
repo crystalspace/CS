@@ -37,6 +37,7 @@
 #include "igraphic/image.h"
 
 #include "csutil/event.h"
+#include "csutil/csstring.h"
 #include "csgfx/imagemanipulate.h"
 
 #include "movierecorder.h"

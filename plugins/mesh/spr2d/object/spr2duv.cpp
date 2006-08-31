@@ -20,30 +20,21 @@
 #include "spr2duv.h"
 #include "csutil/util.h"
 
-SCF_IMPLEMENT_IBASE (csSprite2DUVAnimationFrame)
-  SCF_IMPLEMENTS_INTERFACE (iSprite2DUVAnimationFrame)
-SCF_IMPLEMENT_IBASE_END
-
-csSprite2DUVAnimationFrame::csSprite2DUVAnimationFrame (iBase* pParent)
+CS_PLUGIN_NAMESPACE_BEGIN(Spr2D)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  duration = 0;
-  name = 0;
+
+csSprite2DUVAnimationFrame::csSprite2DUVAnimationFrame (iBase* pParent) :
+  scfImplementationType (this, pParent), duration (0)
+{
 }
 
 csSprite2DUVAnimationFrame::~csSprite2DUVAnimationFrame ()
 {
-  delete [] name;
-  SCF_DESTRUCT_IBASE ();
 }
 
 void csSprite2DUVAnimationFrame::SetName (const char *name)
 {
-  if (name)
-  {
-    delete [] this->name;
-    this->name = csStrNew (name);
-  }
+  this->name = name;
 }
 
 const char *csSprite2DUVAnimationFrame::GetName () const
@@ -101,29 +92,18 @@ void csSprite2DUVAnimationFrame::SetDuration (int duration)
 }
 
 // ------------------- csSprite2DUVAnimation ---------
-SCF_IMPLEMENT_IBASE (csSprite2DUVAnimation)
-  SCF_IMPLEMENTS_INTERFACE (iSprite2DUVAnimation)
-SCF_IMPLEMENT_IBASE_END
-
-csSprite2DUVAnimation::csSprite2DUVAnimation (iBase* pParent)
+csSprite2DUVAnimation::csSprite2DUVAnimation (iBase* pParent) :
+  scfImplementationType (this, pParent)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  name = 0;
 }
 
 csSprite2DUVAnimation::~csSprite2DUVAnimation ()
 {
-  delete [] name;
-  SCF_DESTRUCT_IBASE ();
 }
 
 void csSprite2DUVAnimation::SetName (const char *name)
 {
-  if (name)
-  {
-    delete [] this->name;
-    this->name = csStrNew (name);
-  }
+  this->name = name;
 }
 
 const char *csSprite2DUVAnimation::GetName () const
@@ -138,13 +118,16 @@ int csSprite2DUVAnimation::GetFrameCount ()
 
 iSprite2DUVAnimationFrame *csSprite2DUVAnimation::GetFrame (int idx)
 {
-  return (iSprite2DUVAnimationFrame *)vFrames.Get (idx);
+  return static_cast<iSprite2DUVAnimationFrame *> (vFrames.Get (idx));
 }
 
 iSprite2DUVAnimationFrame *csSprite2DUVAnimation::GetFrame (const char *name)
 {
-  int idx = (int)vFrames.FindKey (vFrames.KeyCmp(name));
-  return (iSprite2DUVAnimationFrame *)(idx != -1 ? vFrames.Get (idx) : 0);
+  size_t idx = vFrames.FindKey (vFrames.KeyCmp(name));
+  if (idx != csArrayItemNotFound)
+    return static_cast<iSprite2DUVAnimationFrame *>(vFrames.Get (idx));
+  else
+    return 0;
 }
 
 iSprite2DUVAnimationFrame *csSprite2DUVAnimation::CreateFrame (int idx)
@@ -154,7 +137,7 @@ iSprite2DUVAnimationFrame *csSprite2DUVAnimation::CreateFrame (int idx)
     vFrames.Push (p);
   else
     vFrames.Insert (MAX (0, idx), p);
-  return (iSprite2DUVAnimationFrame *)p;
+  return static_cast<iSprite2DUVAnimationFrame *> (p);
 }
 
 void csSprite2DUVAnimation::MoveFrame (int frame, int idx)
@@ -170,8 +153,9 @@ void csSprite2DUVAnimation::MoveFrame (int frame, int idx)
 
 void csSprite2DUVAnimation::RemoveFrame (int idx)
 {
-  delete (iSprite2DUVAnimationFrame *)vFrames.Get (idx);
+  delete vFrames.Get (idx);
   vFrames.DeleteIndex (idx);
 }
 
-
+}
+CS_PLUGIN_NAMESPACE_END(Spr2D)

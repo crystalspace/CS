@@ -29,21 +29,23 @@
 #include "wx/wx.h"
 #endif
 
-#include "csutil/csuctransform.h"
-#include "csutil/sysfunc.h"
-#include "csutil/scf.h"
-#include "csutil/csinput.h"
-#include "csgeom/csrect.h"
 #include "csutil/cfgacc.h"
-#include "iutil/plugin.h"
-#include "iutil/eventh.h"
-#include "iutil/comp.h"
-#include "ivideo/texture.h"
+#include "csutil/csinput.h"
+#include "csutil/csuctransform.h"
+#include "csutil/eventnames.h"
+#include "csutil/scf.h"
+#include "csutil/sysfunc.h"
+#include "csgeom/csrect.h"
+
 #include "iengine/texture.h"
 #include "iutil/cfgfile.h"
+#include "iutil/comp.h"
+#include "iutil/eventh.h"
 #include "iutil/eventq.h"
 #include "iutil/objreg.h"
+#include "iutil/plugin.h"
 #include "ivaria/reporter.h"
+#include "ivideo/texture.h"
 
 #ifdef WIN32
 #include "csutil/win32/win32.h"

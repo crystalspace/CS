@@ -24,6 +24,7 @@
 #include "csgeom/csrect.h"
 #include "csutil/cfgacc.h"
 #include "csutil/event.h"
+#include "csutil/eventnames.h"
 #include "iutil/plugin.h"
 #include "iutil/cfgmgr.h"
 #include "iutil/cmdline.h"

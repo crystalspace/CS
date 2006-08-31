@@ -1,5 +1,3 @@
-#ifndef __CS_LINUX_JOYSTICK__
-#define __CS_LINUX_JOYSTICK__
 /*
     Copyright (C) 2002 by Norman Kramer
 
@@ -18,18 +16,29 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "csutil/scf.h"
+#ifndef __CS_LINUX_JOYSTICK__
+#define __CS_LINUX_JOYSTICK__
+
 #include "iutil/event.h"
 #include "iutil/eventh.h"
 #include "iutil/eventq.h"
 #include "iutil/comp.h"
 #include "csutil/cfgacc.h"
+#include "csutil/scf.h"
+#include "csutil/scf_implementation.h"
+
+CS_PLUGIN_NAMESPACE_BEGIN(JoyLin)
+{
 
 /**
  * This plugin puts joystick events in the CS eventqueue.
  * Joystick data is gathered via the GNU/Linux joystick api.
  */
-class csLinuxJoystick : public iComponent
+class csLinuxJoystick : 
+  public scfImplementation3<csLinuxJoystick,
+                            iComponent,
+                            iEventPlug,
+                            iEventHandler>
 {
 private:
   struct joydata
@@ -60,32 +69,21 @@ private:
   csEventID PreProcess;
 
  public:
-  SCF_DECLARE_IBASE;
-
   csLinuxJoystick (iBase *parent);
   virtual ~csLinuxJoystick ();
 
   virtual bool Initialize (iObjectRegistry *oreg);
   virtual bool HandleEvent (iEvent &Event);
 
-  struct eiEventPlug : public iEventPlug
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csLinuxJoystick);
-    virtual unsigned GetPotentiallyConflictingEvents ()
-    { return CSEVTYPE_Joystick; }
-    virtual unsigned QueryEventPriority (unsigned) { return 110; }
-  } scfiEventPlug;
-  friend struct eiEventPlug;
+  virtual unsigned GetPotentiallyConflictingEvents ()
+  { return CSEVTYPE_Joystick; }
+  virtual unsigned QueryEventPriority (unsigned) { return 110; }
 
-  struct eiEventHandler : public iEventHandler
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csLinuxJoystick);
-    virtual bool HandleEvent (iEvent &Event)
-    { return scfParent->HandleEvent (Event); }
-    CS_EVENTHANDLER_NAMES("crystalspace.device.joystick")
-    CS_EVENTHANDLER_NIL_CONSTRAINTS
-  } scfiEventHandler;
-  friend struct eiEventHandler;
+  CS_EVENTHANDLER_NAMES("crystalspace.device.joystick")
+  CS_EVENTHANDLER_NIL_CONSTRAINTS
 };
+
+}
+CS_PLUGIN_NAMESPACE_END(JoyLin)
 
 #endif // __CS_LINUX_JOYSTICK__

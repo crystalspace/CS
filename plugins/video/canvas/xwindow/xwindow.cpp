@@ -26,6 +26,7 @@
 #include "csgeom/csrect.h"
 #include "csutil/callstack.h"
 #include "csutil/cfgacc.h"
+#include "csutil/eventnames.h"
 #include "csutil/scf.h"
 #include "iutil/plugin.h"
 #include "iutil/cfgmgr.h"

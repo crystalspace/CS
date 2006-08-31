@@ -27,8 +27,9 @@
 
 #include "csutil/scf.h"
 
-#include "csgfx/shadervar.h"
+#include "iutil/array.h"
 
+#include "csgfx/shadervar.h"
 #include "csutil/array.h"
 #include "csutil/refarr.h"
 #include "csutil/set.h"
@@ -45,12 +46,19 @@ struct iShader;
 struct iShaderCompiler;
 struct iShaderManager;
 
+//@{
 /**
  * A "shader variable stack".
  * Stores a list of shader variables, indexed by it's name.
  */
 typedef csArray<csShaderVariable*> csShaderVarStack;
+struct iShaderVarStack : public iArrayChangeAll<csShaderVariable*>
+{
+  SCF_IARRAYCHANGEALL_INTERFACE (iShaderVarStack);
+};
+//@}
 
+//@{
 /**
  * Helper function to retrieve a single value from a shader variable stack.
  */
@@ -64,6 +72,18 @@ static inline csShaderVariable* csGetShaderVariableFromStack
   }
   return 0;
 }
+static inline csShaderVariable* csGetShaderVariableFromStack 
+  (const iShaderVarStack* stack, const csStringID &name)
+{
+  if ((name != csInvalidStringID) &&
+      (name < (csStringID)stack->GetSize ()))
+  {
+    return static_cast<const iArrayReadOnly<csShaderVariable*>*> (stack)
+      ->Get (name);
+  }
+  return 0;
+}
+//@}
 
 /**
  * This is a baseclass for all interfaces which provides shadervariables
@@ -71,7 +91,7 @@ static inline csShaderVariable* csGetShaderVariableFromStack
  */
 struct iShaderVariableContext : public virtual iBase
 {
-  SCF_INTERFACE(iShaderVariableContext, 2, 0, 0);
+  SCF_INTERFACE(iShaderVariableContext, 2, 1, 0);
 
   /**
    * Add a variable to this context
@@ -105,7 +125,7 @@ struct iShaderVariableContext : public virtual iBase
    * Push the variables of this context onto the variable stacks
    * supplied in the "stacks" argument
    */
-  virtual void PushVariables (csShaderVarStack &stacks) const = 0;
+  virtual void PushVariables (iShaderVarStack* stacks) const = 0;
 
   /// Determine whether this SV context contains any variables at all.
   virtual bool IsEmpty () const = 0;
@@ -149,7 +169,7 @@ enum csShaderTagPresence
  */
 struct iShaderManager : public virtual iShaderVariableContext
 {
-  SCF_INTERFACE (iShaderManager, 1, 0, 0);
+  SCF_INTERFACE (iShaderManager, 1, 1, 0);
   /**
    * Register a shader to the shadermanager.
    * Compiler should register all shaders
@@ -168,7 +188,7 @@ struct iShaderManager : public virtual iShaderVariableContext
   virtual iShaderCompiler* GetCompiler(const char* name) = 0;
 
   /// Get the shadervariablestack used to handle shadervariables on rendering
-  virtual csShaderVarStack& GetShaderVariableStack () = 0;
+  virtual iShaderVarStack* GetShaderVariableStack () = 0;
 
   /**
    * Set a technique tag's options.
@@ -236,7 +256,7 @@ struct csShaderMetadata
  */
 struct iShader : public virtual iShaderVariableContext
 {
-  SCF_INTERFACE(iShader, 3, 0, 0);
+  SCF_INTERFACE(iShader, 3, 1, 0);
 
   /// Query the object.
   virtual iObject* QueryObject () = 0;
@@ -258,7 +278,7 @@ struct iShader : public virtual iShaderVariableContext
    * by the "ticket".
    */
   virtual size_t GetTicket (const csRenderMeshModes& modes,
-    const csShaderVarStack& stacks) = 0;
+    const iShaderVarStack* stacks) = 0;
 
   /// Get number of passes this shader have
   virtual size_t GetNumberOfPasses (size_t ticket) = 0;
@@ -269,7 +289,7 @@ struct iShader : public virtual iShaderVariableContext
   /// Setup a pass
   virtual bool SetupPass (size_t ticket, const csRenderMesh *mesh,
     csRenderMeshModes& modes,
-    const csShaderVarStack& stacks) = 0;
+    const iShaderVarStack* stacks) = 0;
 
   /**
    * Tear down current state, and prepare for a new mesh 
