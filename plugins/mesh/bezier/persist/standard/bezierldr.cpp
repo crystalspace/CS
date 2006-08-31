@@ -75,43 +75,12 @@ enum
   XMLTOKEN_VVEC
 };
 
-SCF_IMPLEMENT_IBASE (csBezierLoader)
-  SCF_IMPLEMENTS_INTERFACE (iLoaderPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csBezierLoader::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csBezierSaver)
-  SCF_IMPLEMENTS_INTERFACE (iSaverPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csBezierSaver::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 SCF_IMPLEMENT_FACTORY (csBezierLoader)
 SCF_IMPLEMENT_FACTORY (csBezierSaver)
-
 
 #define MAXLINE 200 /* max number of chars per line... */
 
 //---------------------------------------------------------------------------
-
-csBezierLoader::csBezierLoader (iBase* pParent)
-{
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-}
-
-csBezierLoader::~csBezierLoader ()
-{
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE ();
-}
 
 bool csBezierLoader::Initialize (iObjectRegistry* object_reg)
 {
@@ -388,18 +357,6 @@ csPtr<iBase> csBezierLoader::Parse (iDocumentNode* node,
 }
 
 //---------------------------------------------------------------------------
-
-csBezierSaver::csBezierSaver (iBase* pParent)
-{
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-}
-
-csBezierSaver::~csBezierSaver ()
-{
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE ();
-}
 
 bool csBezierSaver::Initialize (iObjectRegistry* object_reg)
 {

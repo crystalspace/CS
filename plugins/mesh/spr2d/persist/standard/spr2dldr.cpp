@@ -59,58 +59,18 @@ enum
   XMLTOKEN_ANIMATE
 };
 
-SCF_IMPLEMENT_IBASE (csSprite2DFactoryLoader)
-  SCF_IMPLEMENTS_INTERFACE (iLoaderPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csSprite2DFactoryLoader::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csSprite2DFactorySaver)
-  SCF_IMPLEMENTS_INTERFACE (iSaverPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csSprite2DFactorySaver::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csSprite2DLoader)
-  SCF_IMPLEMENTS_INTERFACE (iLoaderPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csSprite2DLoader::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csSprite2DSaver)
-  SCF_IMPLEMENTS_INTERFACE (iSaverPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csSprite2DSaver::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 SCF_IMPLEMENT_FACTORY (csSprite2DFactoryLoader)
 SCF_IMPLEMENT_FACTORY (csSprite2DFactorySaver)
 SCF_IMPLEMENT_FACTORY (csSprite2DLoader)
 SCF_IMPLEMENT_FACTORY (csSprite2DSaver)
 
-
-csSprite2DFactoryLoader::csSprite2DFactoryLoader (iBase* pParent)
+csSprite2DFactoryLoader::csSprite2DFactoryLoader (iBase* pParent) :
+  scfImplementationType(this, pParent)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 csSprite2DFactoryLoader::~csSprite2DFactoryLoader ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csSprite2DFactoryLoader::Initialize (iObjectRegistry* object_reg)
@@ -268,16 +228,13 @@ csPtr<iBase> csSprite2DFactoryLoader::Parse (iDocumentNode* node,
 }
 
 //---------------------------------------------------------------------------
-csSprite2DFactorySaver::csSprite2DFactorySaver (iBase* pParent)
+csSprite2DFactorySaver::csSprite2DFactorySaver (iBase* pParent) :
+  scfImplementationType(this, pParent)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 csSprite2DFactorySaver::~csSprite2DFactorySaver ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csSprite2DFactorySaver::Initialize (iObjectRegistry* object_reg)
@@ -356,16 +313,13 @@ bool csSprite2DFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent,
 }
 //---------------------------------------------------------------------------
 
-csSprite2DLoader::csSprite2DLoader (iBase* pParent)
+csSprite2DLoader::csSprite2DLoader (iBase* pParent) :
+  scfImplementationType(this, pParent)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 csSprite2DLoader::~csSprite2DLoader ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csSprite2DLoader::Initialize (iObjectRegistry* object_reg)
@@ -544,16 +498,13 @@ csPtr<iBase> csSprite2DLoader::Parse (iDocumentNode* node,
 
 //---------------------------------------------------------------------------
 
-csSprite2DSaver::csSprite2DSaver (iBase* pParent)
+csSprite2DSaver::csSprite2DSaver (iBase* pParent) :
+  scfImplementationType(this, pParent)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 csSprite2DSaver::~csSprite2DSaver ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csSprite2DSaver::Initialize (iObjectRegistry* object_reg)

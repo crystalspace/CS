@@ -23,6 +23,7 @@
 #include "csgeom/box.h"
 #include "csutil/cscolor.h"
 #include "csutil/refarr.h"
+#include "csutil/scf_implementation.h"
 #include "csplugincommon/particlesys/partgen.h"
 #include "imesh/snow.h"
 #include "iutil/eventh.h"
@@ -34,7 +35,9 @@ struct iMaterialWrapper;
  * A snow particle system. Particles start falling down.
  * the snow swirls around a bit, otherwise much like rain.
  */
-class csSnowMeshObject : public csParticleSystem
+class csSnowMeshObject :
+  public scfImplementationExt1<csSnowMeshObject, csParticleSystem,
+    iSnowState>
 {
 protected:
   csBox3 rainbox;
@@ -66,6 +69,7 @@ public:
   /// Destructor.
   virtual ~csSnowMeshObject ();
 
+  //------------------------- iSnowState implementation ----------------
   /// Set the size of the drops.
   void SetDropSize (float dropwidth, float dropheight)
   {
@@ -124,56 +128,18 @@ public:
   virtual void HardTransform (const csReversibleTransform& t);
   virtual bool SupportsHardTransform () const { return false; }
 
-  SCF_DECLARE_IBASE_EXT (csParticleSystem);
-
-  //------------------------- iSnowState implementation ----------------
-  class SnowState : public iSnowState
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csSnowMeshObject);
-    virtual void SetParticleCount (int num)
-    {
-      scfParent->SetParticleCount (num);
-    }
-    virtual void SetDropSize (float dropwidth, float dropheight)
-    {
-      scfParent->SetDropSize (dropwidth, dropheight);
-    }
-    virtual void SetBox (const csVector3& minbox, const csVector3& maxbox)
-    {
-      scfParent->SetBox (minbox, maxbox);
-    }
-    virtual void SetLighting (bool l)
-    {
-      scfParent->SetLighting (l);
-    }
-    virtual void SetFallSpeed (const csVector3& fspeed)
-    {
-      scfParent->SetFallSpeed (fspeed);
-    }
-    virtual void SetSwirl (float sw)
-    {
-      scfParent->SetSwirl (sw);
-    }
-    virtual int GetParticleCount () const
-    { return (int)scfParent->GetParticleCount (); }
-    virtual void GetDropSize (float& dropwidth, float& dropheight) const
-    { scfParent->GetDropSize (dropwidth, dropheight); }
-    virtual void GetBox (csVector3& minbox, csVector3& maxbox) const
-    { scfParent->GetBox (minbox, maxbox); }
-    virtual bool GetLighting () const
-    { return scfParent->GetLighting (); }
-    virtual const csVector3& GetFallSpeed () const
-    { return scfParent->GetFallSpeed (); }
-    virtual float GetSwirl () const
-    { return scfParent->GetSwirl (); }
-  } scfiSnowState;
-  friend class SnowState;
+  // Redirect these functions to csParticleSystem
+  virtual void SetParticleCount (int num)
+  { csParticleSystem::SetParticleCount (num); }
+  virtual int GetParticleCount () const
+  { return csParticleSystem::GetParticleCount (); }
 };
 
 /**
  * Factory for snow.
  */
-class csSnowMeshObjectFactory : public iMeshObjectFactory
+class csSnowMeshObjectFactory :
+  public scfImplementation1<csSnowMeshObjectFactory, iMeshObjectFactory>
 {
 private:
   iObjectRegistry* object_reg;
@@ -184,14 +150,12 @@ private:
 public:
   /// Constructor.
   csSnowMeshObjectFactory (iMeshObjectType* pParent,
-  	iObjectRegistry* object_reg);
+    iObjectRegistry* object_reg);
 
   /// Destructor.
   virtual ~csSnowMeshObjectFactory ();
 
   //------------------------ iMeshObjectFactory implementation --------------
-  SCF_DECLARE_IBASE;
-
   virtual csFlags& GetFlags () { return flags; }
   virtual csPtr<iMeshObject> NewInstance ();
   virtual csPtr<iMeshObjectFactory> Clone () { return 0; }
@@ -213,14 +177,14 @@ public:
  * Snow type. This is the plugin you have to use to create instances
  * of csSnowMeshObjectFactory.
  */
-class csSnowMeshObjectType : public iMeshObjectType
+class csSnowMeshObjectType :
+  public scfImplementation2<csSnowMeshObjectType,
+    iMeshObjectType, iComponent>
 {
 private:
   iObjectRegistry* object_reg;
 
 public:
-  SCF_DECLARE_IBASE;
-
   /// Constructor.
   csSnowMeshObjectType (iBase*);
   /// Destructor.
@@ -229,13 +193,8 @@ public:
   /// Draw.
   virtual csPtr<iMeshObjectFactory> NewFactory ();
 
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csSnowMeshObjectType);
-    virtual bool Initialize (iObjectRegistry* p)
-    { scfParent->object_reg = p; return true; }
-  } scfiComponent;
-  friend struct eiComponent;
+  virtual bool Initialize (iObjectRegistry* p)
+  { this->object_reg = p; return true; }
 };
 
 #endif // __CS_SNOW_H__

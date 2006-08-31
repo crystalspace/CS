@@ -6,10 +6,91 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+19-Jun-2006
+	- Philip Wyett made Quick Start more explanatory for the CS newcomers.
+	- res changed csRectRegion to use a csArray<> for rectangle storage.
+	- res fixed fallout from the csRectRegion change.
+	- mdmkolbe converted the following plugins to the new SCF:
+	    - plugins/mesh/bezier/
+	    - plugins/mesh/fountain/
+	    - plugins/mesh/skeleton/
+	    - plugins/mesh/fire/
+	    - plugins/mesh/snow/
+	    - plugins/mesh/explo/
+	    - plugins/mesh/rain/
+	    - plugins/mesh/instmesh/
+	    - plugins/mesh/spiral/
+	    - plugins/mesh/spr2d/
+	    - plugins/mesh/emit/
+	- Jorrit fixed compilation of csGradient.
+        - Philip Wyett continued docs cleanup.
+        - Philip Wyett began adding more of the bundled CS applications with
+          basic descriptions to the application overview section of the
+          documentation.
+18-Jun-2006
+        - Arianna fixed some warnings: size_t/uint conversions and some
+          deprecated method.
+	- mdmkolbe converted the remainder of of apps/ to the new SCF.
+	- Eric Sunshine performed project-wide spelling corrections:
+	    conveniance --> convenience
+	    conveniant	--> convenient
+	- res fixed spr2d's SetColor() to actually do something again.
+	- res added convenience includes to disable/enable CS' 'new' and 
+	    'delete' overrides when the memtracker is enabled.
+	- res added some missing custom new re-enablings.
+	- res augmented the scfArray* classes with constructors that also take
+	  and SCF parent argument.
+	- res made an interface version iGradient of csGradient, so you can
+	  pass them across plugins.
+	- Philip Wyett changed his email address in docs. Changed 'written by'
+	  to 'originally written by' for Windows related documentation as I
+	  will no longer being working with the Windows codebase daily (as I
+	  have not done for a long time) and will be concentrating on Linux.
+	- Philip Wyett starts some maintenance work and changes to
+	  documentation.
+17-Jun-2006
+        - Piotr Obrzut fixed phystut crash on exit problem (when running
+          with bullet plugin)
+        - Piotr Obrzut fixes bullet plugin unused parameter/variable warnings
+	- mdmkolbe converted libs/csplugincommon/opengl to the new SCF.
+16-Jun-2006
+	- AndyDude fixed the MacOSX menu bug and launching in background bug.
+	- AndyDude changed the non-error CoreAudio messages to be not so 
+	  'loud'. The two CoreAudio messages that I changed were Report()'d 
+	  at very high severity levels, when it wasn't really that severe.
+	- res fixed msvcgen.jam to use the "common" directory to generate
+	  the relative path for icon resources, not the version-specific one.
+	- mdmkolbe fixed a few unused parameter warnings.
+15-Jun-2006
+	- thebolt fixed a bug in csQuaternion which caused matrix to
+	  quaternion to go wrong.
+	- Jorrit fixed a bug in genmesh GetRadius() function. This would
+	  return the correct radius but an incorrect center (i.e. center
+	  was always 0,0,0).
+	- Jorrit (with the help of Erroroman) fixed
+	  flat_ppl_attenuation.avp so that bumpmapping no longer flickers.
+	  This fixes at least light_bumpmap technique 220. Not sure
+	  about the others. The bug still appears present in case glow
+	  is used however.
+	- mdmkolbe brought the Java SWIG bindings a little closer to working.
 14-Jun-2006
 	- caedes fixed cspace.i for changes in spr2d.
 	- caedes fixed cspython.cpp for dissaparition of evenhandler.h.
 	- res fixed an apparent typo in aws2's gradient code.
+	- res changed wxtest to also include wx.rc.
+	- Jorrit did the following to csEngineTools::FindShortestDistance().
+	    - It now returns the result in a csShortestDistanceResult
+	      structure.
+	    - In addition to the squared distance it now also returns
+	      the direction to follow (starting from the source position)
+	      which would make you end up at the destination. Usually
+	      that will be equal to 'destination-source' but if there are
+	      space warping portals involved then this can be different.
+	    - Added an optional 'accurate' parameter so that the calculation
+	      of the distance between the start point and the portal is
+	      more accurate.
+	    - Cleaned up the code considerably and also optimized it
+	      slightly by using a csSet for visited sectors.
 13-Jun-2006
 	- Jorrit slightly optimized iEngine->GetNearbyMeshes() and related
 	  by using a csSet for visited sectors instead of an array.
@@ -665,7 +746,7 @@ chronological order.
 27-Apr-2006
 	- Jorrit did a few more fixes to csMeshOnTexture. It finally starts
 	  to work now.
-	- Jorrit added a new conveniance method: csQueryRegistryOrLoad().
+	- Jorrit added a new convenience method: csQueryRegistryOrLoad().
 	  This method will first look for an interface in the object registry.
 	  If it is not there it will try to load the plugin and register
 	  that to the object registry.
@@ -1711,7 +1792,7 @@ chronological order.
 	- res fixed gl3d to properly activate buffers from a holder bound to 
 	  the secondary color.
 	- res changed the xmlshader plugin to not have buffer mappings for
-	  the color, normal and texcoord buffers by default. While conveniant,
+	  the color, normal and texcoord buffers by default. While convenient,
 	  it could also result in subtle performance issues, e.g. when a
 	  buffer is autobound that has to be calculated relatively expensively
 	  by a buffer getter, yet is not used in the actual shader (e.g. Thing
@@ -1876,7 +1957,7 @@ chronological order.
 	  missing. Now the factory material is really optional.
 	- Jorrit added a new md2 loader for spr3d. This will help replace
 	  the model importing system.
-	- Jorrit added a new iModelLoader interface. This is a conveniance
+	- Jorrit added a new iModelLoader interface. This is a convenience
 	  interface that some loading plugins can implement. This makes it
 	  easier to create a mesh factory from a model file. Currently
 	  this is implemented by the new gmesh3ds and spr3md2 plugins.
@@ -3301,7 +3382,7 @@ chronological order.
 	  AWS2.
 27-Sep-2005
 	- Jorrit added csTransform::GetUp(), GetFront(), and GetRight().
-	  These three conveniance functions get the up, front, and right
+	  These three convenience functions get the up, front, and right
 	  vectors in 'other' space. They are very efficient.
 	- Jorrit fixed the loader so it is no longer an error if the
 	  sound loader is not present. Sounds will simply be ignored then.
@@ -3384,7 +3465,7 @@ chronological order.
 	  scfFakeInterface<If> by having scfFakeInterface<> inherit from If,
 	  to make things work again until Marten can take a look.
 	- res removed csDataStream since it overlapped with csMemFile; the
-	  conveniance functions have been moved to csFileReadHelper.
+	  convenience functions have been moved to csFileReadHelper.
 	- res moved csVideoPreferences into the simpvs app.
 	- mdmkolbe fixed some inheritance ambiguity warnings due to virtual
 	  inheritance from iBase.

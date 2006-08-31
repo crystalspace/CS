@@ -155,7 +155,8 @@ csPtr<iBase> csPtFireLoader::Parse (iDocumentNode* node,
 	  {
 	    if (!synldr) return 0;
 
-	    csGradient grad;
+	    csRef<iGradient> grad;
+            grad.AttachNew (new csGradient);
 	    if (!synldr->ParseGradient (child, grad))
 	    {
 	      return 0;

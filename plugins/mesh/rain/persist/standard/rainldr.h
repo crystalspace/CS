@@ -26,23 +26,22 @@
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "csutil/strhash.h"
+#include "csutil/scf_implementation.h"
 
-struct iEngine;
-struct iPluginManager;
 struct iObjectRegistry;
 struct iReporter;
 
 /**
  * Rain factory loader.
  */
-class csRainFactoryLoader : public iLoaderPlugin
+class csRainFactoryLoader :
+  public scfImplementation2<csRainFactoryLoader,
+    iLoaderPlugin, iComponent>
 {
 private:
   iObjectRegistry* object_reg;
 
 public:
-  SCF_DECLARE_IBASE;
-
   /// Constructor.
   csRainFactoryLoader (iBase*);
 
@@ -54,27 +53,19 @@ public:
   /// Parse a given node and return a new object for it.
   virtual csPtr<iBase> Parse (iDocumentNode* node,
     iStreamSource*, iLoaderContext* ldr_context, iBase* context);
-
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csRainFactoryLoader);
-    virtual bool Initialize (iObjectRegistry* p)
-    { return scfParent->Initialize (p); }
-  } scfiComponent;
-  friend struct eiComponent;
 };
 
 /**
  * Rain factory saver.
  */
-class csRainFactorySaver : public iSaverPlugin
+class csRainFactorySaver :
+  public scfImplementation2<csRainFactorySaver,
+    iSaverPlugin, iComponent>
 {
 private:
   iObjectRegistry* object_reg;
 
 public:
-  SCF_DECLARE_IBASE;
-
   /// Constructor.
   csRainFactorySaver (iBase*);
 
@@ -86,21 +77,15 @@ public:
   /// Write down given object and add to iDocumentNode.
   virtual bool WriteDown (iBase *obj, iDocumentNode* parent,
   	iStreamSource*);
-
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csRainFactorySaver);
-    virtual bool Initialize (iObjectRegistry* p)
-    { return scfParent->Initialize (p); }
-  } scfiComponent;
-  friend struct eiComponent;
 };
 
 
 /**
  * Rain loader.
  */
-class csRainLoader : public iLoaderPlugin
+class csRainLoader :
+  public scfImplementation2<csRainLoader,
+    iLoaderPlugin, iComponent>
 {
 private:
   iObjectRegistry* object_reg;
@@ -109,8 +94,6 @@ private:
   csStringHash xmltokens;
 
 public:
-  SCF_DECLARE_IBASE;
-
   /// Constructor.
   csRainLoader (iBase*);
 
@@ -122,28 +105,20 @@ public:
   /// Parse a given node and return a new object for it.
   virtual csPtr<iBase> Parse (iDocumentNode* node,
     iStreamSource*, iLoaderContext* ldr_context, iBase* context);
-
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csRainLoader);
-    virtual bool Initialize (iObjectRegistry* p)
-    { return scfParent->Initialize (p); }
-  } scfiComponent;
-  friend struct eiComponent;
 };
 
 /**
  * Rain saver.
  */
-class csRainSaver : public iSaverPlugin
+class csRainSaver :
+  public scfImplementation2<csRainSaver,
+    iSaverPlugin, iComponent>
 {
 private:
   iObjectRegistry* object_reg;
   csRef<iSyntaxService> synldr;
 
 public:
-  SCF_DECLARE_IBASE;
-
   /// Constructor.
   csRainSaver (iBase*);
 
@@ -155,14 +130,6 @@ public:
   /// Write down given object and add to iDocumentNode.
   virtual bool WriteDown (iBase *obj, iDocumentNode* parent,
   	iStreamSource*);
-
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csRainSaver);
-    virtual bool Initialize (iObjectRegistry* p)
-    { return scfParent->Initialize (p); }
-  } scfiComponent;
-  friend struct eiComponent;
 };
 
 #endif // __CS_RAINLDR_H__

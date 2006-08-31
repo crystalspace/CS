@@ -32,19 +32,11 @@
 
 CS_IMPLEMENT_PLUGIN
 
-SCF_IMPLEMENT_IBASE_EXT (csRainMeshObject)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iRainState)
-SCF_IMPLEMENT_IBASE_EXT_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csRainMeshObject::RainState)
-  SCF_IMPLEMENTS_INTERFACE (iRainState)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-csRainMeshObject::csRainMeshObject (iEngine *engine, iMeshObjectFactory *fact)
-  : csNewParticleSystem (engine, fact,
+csRainMeshObject::csRainMeshObject (iEngine *engine,
+  iMeshObjectFactory *fact) :
+  scfImplementationType(this, engine, fact,
     CS_PARTICLE_SCALE | CS_PARTICLE_AXIS | CS_PARTICLE_ALIGN_Y)
 {
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiRainState);
   MixMode = CS_FX_ADD;
   Axis = csVector3 (0, 1, 0);
   Speed = csVector3 (0, -1, 0);
@@ -53,7 +45,6 @@ csRainMeshObject::csRainMeshObject (iEngine *engine, iMeshObjectFactory *fact)
 
 csRainMeshObject::~csRainMeshObject ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiRainState);
 }
 
 void csRainMeshObject::Spread (int first, int limit)

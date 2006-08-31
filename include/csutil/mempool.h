@@ -27,11 +27,7 @@
 #include "csextern.h"
 #include "csutil/array.h"
 
-// Hack: Work around problems caused by #defining 'new'.
-#if defined(CS_EXTENSIVE_MEMDEBUG) || defined(CS_MEMORY_TRACKER)
-# undef new
-#endif
-#include <new>
+#include "csutil/custom_new_disable.h"
 
 /**\addtogroup util_containers
  * @{ */
@@ -147,5 +143,7 @@ inline void operator delete(void* /*n*/, csMemoryPool* /*p*/) { }
 /** @} */
 
 /** @} */
+
+#include "csutil/custom_new_enable.h"
 
 #endif //  __CS_CSUTIL_MEMPOOL_H__

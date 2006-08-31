@@ -203,7 +203,7 @@ bool CEGUITest::Application()
   return true;
 }
 
-bool CEGUITest::OnExitButtonClicked (const CEGUI::EventArgs& e)
+bool CEGUITest::OnExitButtonClicked (const CEGUI::EventArgs&)
 {
   csRef<iEventQueue> q =
     CS_QUERY_REGISTRY(GetObjectRegistry(), iEventQueue);

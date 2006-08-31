@@ -24,16 +24,15 @@
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "csutil/strhash.h"
+#include "csutil/scf_implementation.h"
 
-struct iEngine;
 struct iReporter;
-struct iPluginManager;
 struct iObjectRegistry;
 struct iSyntaxService;
-struct iGeneralFactoryState;
-struct iGeneralMeshState;
 
-class csSkeletonFactoryLoader : public iLoaderPlugin
+class csSkeletonFactoryLoader :
+  public scfImplementation2<csSkeletonFactoryLoader,
+    iLoaderPlugin, iComponent>
 {
 private:
   iObjectRegistry* object_reg;
@@ -42,10 +41,7 @@ private:
   csStringHash xmltokens;
 
 public:
-  SCF_DECLARE_IBASE;
-
   csSkeletonFactoryLoader (iBase*);
-
   virtual ~csSkeletonFactoryLoader ();
 
   virtual bool Initialize (iObjectRegistry *object_reg);
@@ -59,13 +55,6 @@ public:
   const char *ParseScript (iDocumentNode* node, iSkeletonFactory *skel_fact);
   const char *ParseFrame (iDocumentNode* node, iSkeletonFactory *skel_fact, 
     iSkeletonScript *script);
-
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csSkeletonFactoryLoader);
-    virtual bool Initialize (iObjectRegistry* p)
-    { return scfParent->Initialize(p); }
-  } scfiComponent;
 };
 
 #endif // __CS_GMESHLDR_H__

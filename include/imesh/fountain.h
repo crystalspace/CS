@@ -24,21 +24,20 @@
  * Fountain mesh object
  */ 
 
-#include "csutil/scf.h"
+#include "csutil/scf_interface.h"
 
 /**\addtogroup meshplugins
  * @{ */
 
-class csColor;
 class csVector3;
-
-SCF_VERSION (iFountainState, 0, 0, 1);
 
 /**
  * This interface describes the API for the fountain mesh object.
  */
-struct iFountainState : public iBase
+struct iFountainState : public virtual iBase
 {
+  SCF_INTERFACE(iFountainState, 2, 0, 0);
+
   /// Set the number of particles to use.
   virtual void SetParticleCount (int num) = 0;
   /// Get the number of particles used.

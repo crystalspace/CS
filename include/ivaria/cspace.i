@@ -983,6 +983,7 @@ TYPEMAP_OUT_csWrapPtr
 %feature("compactdefaultargs") HitBeamObject;
 %include "imesh/object.h"
 %include "imesh/thing.h"
+%template (csCharArrayArray) csArray<csArray<char> >;
 %include "imesh/terrain.h"
 
 %include "imesh/particles.h"
@@ -1099,6 +1100,7 @@ TYPEMAP_OUT_csWrapPtr
 
 %immutable csImageIOFileFormatDescription::mime;
 %immutable csImageIOFileFormatDescription::subtype;
+%template (csImageIOFileFormatDescriptions) csArray<csImageIOFileFormatDescription const*>;
 %include "igraphic/imageio.h"
 
 %ignore iReporter::ReportV;
