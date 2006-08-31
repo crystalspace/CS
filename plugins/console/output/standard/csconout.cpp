@@ -43,29 +43,17 @@
 
 CS_IMPLEMENT_PLUGIN
 
-SCF_IMPLEMENT_IBASE(csConsoleOutput)
-  SCF_IMPLEMENTS_INTERFACE(iConsoleOutput)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csConsoleOutput::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csConsoleOutput::EventHandler)
-  SCF_IMPLEMENTS_INTERFACE (iEventHandler)
-SCF_IMPLEMENT_IBASE_END
+CS_PLUGIN_NAMESPACE_BEGIN(ConOut)
+{
 
 SCF_IMPLEMENT_FACTORY (csConsoleOutput)
 
 
-csConsoleOutput::csConsoleOutput (iBase *base)
+csConsoleOutput::csConsoleOutput (iBase *base) : 
+  scfImplementationType (this, base)
 {
-  SCF_CONSTRUCT_IBASE (base);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-  scfiEventHandler = 0;
   fg_rgb.Set (255, 255, 255);	// Foreground defaults to white
-  bg_rgb.Set (0, 0, 0);		// Background defaults to black
+  bg_rgb.Set (0, 0, 0, 192);	// Background defaults to black, slightly transparent
   shadow_rgb.Set (32, 32, 32);	// Shadow defaults to darkgray
   transparent = false;		// Default to no transparency
   do_snap = true;		// Default to snapping
@@ -90,22 +78,19 @@ csConsoleOutput::csConsoleOutput (iBase *base)
 
 csConsoleOutput::~csConsoleOutput ()
 {
-  if (scfiEventHandler)
+  if (eventHandler)
   {
-    csRef<iEventQueue> q (CS_QUERY_REGISTRY(object_reg, iEventQueue));
+    csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (object_reg));
     if (q != 0)
-      q->RemoveListener (scfiEventHandler);
-    scfiEventHandler->DecRef ();
+      q->RemoveListener (eventHandler);
   }
   delete buffer;
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csConsoleOutput::Initialize (iObjectRegistry *object_reg)
 {
   csConsoleOutput::object_reg = object_reg;
-  G3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+  G3D = csQueryRegistry<iGraphics3D> (object_reg);
   if (!G3D) return false;
   G2D = G3D->GetDriver2D ();
 
@@ -138,14 +123,9 @@ bool csConsoleOutput::Initialize (iObjectRegistry *object_reg)
   else
   {
     fw = fh = 20;
-    csRef<iReporter> r = CS_QUERY_REGISTRY (object_reg, iReporter);
-    if (r)
-	r->Report(CS_REPORTER_SEVERITY_WARNING,
-	    "crystalspace.console.output.standard",
-	    "csConsoleOutput: Unable to locate iFontServer");
-    else
-	csPrintf("Warning ID: crystalspace.console.output.standard\n"
-	    "Description: csConsoleOutput: Unable to locate iFontServer\n");
+    csReport (object_reg, CS_REPORTER_SEVERITY_WARNING,
+      "crystalspace.console.output.standard",
+      "csConsoleOutput: Unable to locate iFontServer");
   }
   // Create the backbuffer (4096 lines max)
   buffer = new csConsoleBuffer (4096, (size.Height() / (fh + 2)));
@@ -154,13 +134,13 @@ bool csConsoleOutput::Initialize (iObjectRegistry *object_reg)
 
   // We want to see broadcast events
   CS_INITIALIZE_SYSTEM_EVENT_SHORTCUTS (object_reg);
-  if (!scfiEventHandler)
-    scfiEventHandler = new EventHandler (this);
-  csRef<iEventQueue> q (CS_QUERY_REGISTRY(object_reg, iEventQueue));
-  if (q != 0)
+  if (!eventHandler)
+    eventHandler.AttachNew (new EventHandler (this));
+  csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (object_reg));
+  if (q.IsValid())
   {
     csEventID events[3] = { SystemOpen, SystemClose, CS_EVENTLIST_END };
-    q->RegisterListener (scfiEventHandler, events);
+    q->RegisterListener (eventHandler, events);
   }
   return true;
 }
@@ -433,9 +413,10 @@ void csConsoleOutput::Draw2D (csRect *area)
 
 void csConsoleOutput::CacheColors ()
 {
-  fg = G2D->FindRGB (fg_rgb.red, fg_rgb.green, fg_rgb.blue);
-  bg = G2D->FindRGB (bg_rgb.red, bg_rgb.green, bg_rgb.blue);
-  shadow = G2D->FindRGB (shadow_rgb.red, shadow_rgb.green, shadow_rgb.blue);
+  fg = G2D->FindRGB (fg_rgb.red, fg_rgb.green, fg_rgb.blue, fg_rgb.alpha);
+  bg = G2D->FindRGB (bg_rgb.red, bg_rgb.green, bg_rgb.blue, bg_rgb.alpha);
+  shadow = G2D->FindRGB (shadow_rgb.red, shadow_rgb.green, shadow_rgb.blue, 
+    shadow_rgb.alpha);
 }
 
 void
@@ -692,3 +673,6 @@ bool csConsoleOutput::HandleEvent (iEvent &Event)
   }
   return false;
 }
+
+}
+CS_PLUGIN_NAMESPACE_END(ConOut)

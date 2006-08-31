@@ -55,7 +55,7 @@ public:
 
   virtual ~SetModelAnimTask()
     {
-      free(action);
+      cs_free(action);
     }
 
   virtual void doTask()

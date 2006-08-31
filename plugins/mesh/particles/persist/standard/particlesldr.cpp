@@ -38,22 +38,11 @@
 
 CS_IMPLEMENT_PLUGIN
 
-SCF_IMPLEMENT_IBASE (csParticlesFactoryLoader)
-  SCF_IMPLEMENTS_INTERFACE (iLoaderPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csParticlesFactoryLoader::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 SCF_IMPLEMENT_FACTORY (csParticlesFactoryLoader)
 
-csParticlesFactoryLoader::csParticlesFactoryLoader (iBase* parent)
+csParticlesFactoryLoader::csParticlesFactoryLoader (iBase* parent) :
+  scfImplementationType(this, parent)
 {
-  SCF_CONSTRUCT_IBASE (parent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
-
   InitTokenTable (xmltokens);
 }
 
@@ -621,21 +610,11 @@ bool csParticlesFactoryLoader::ParseGradient (iDocumentNode *node,
   return true;
 }
 
-SCF_IMPLEMENT_IBASE (csParticlesFactorySaver)
-  SCF_IMPLEMENTS_INTERFACE (iSaverPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csParticlesFactorySaver::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 SCF_IMPLEMENT_FACTORY (csParticlesFactorySaver)
 
-csParticlesFactorySaver::csParticlesFactorySaver (iBase* parent)
+csParticlesFactorySaver::csParticlesFactorySaver (iBase* parent) :
+  scfImplementationType(this, parent)
 {
-  SCF_CONSTRUCT_IBASE (parent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
 }
 
 csParticlesFactorySaver::~csParticlesFactorySaver ()
@@ -902,22 +881,11 @@ bool csParticlesFactorySaver::WriteColorMethode (iParticlesFactoryState* /*state
   return true;
 }
 
-SCF_IMPLEMENT_IBASE (csParticlesObjectLoader)
-  SCF_IMPLEMENTS_INTERFACE (iLoaderPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csParticlesObjectLoader::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 SCF_IMPLEMENT_FACTORY (csParticlesObjectLoader)
 
-csParticlesObjectLoader::csParticlesObjectLoader (iBase* parent)
+csParticlesObjectLoader::csParticlesObjectLoader (iBase* parent) :
+  scfImplementationType(this, parent)
 {
-  SCF_CONSTRUCT_IBASE (parent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
-
   InitTokenTable (xmltokens);
 }
 
@@ -1503,21 +1471,11 @@ bool csParticlesObjectLoader::ParseGradient (iDocumentNode *node,
   return true;
 }
 
-SCF_IMPLEMENT_IBASE (csParticlesObjectSaver)
-  SCF_IMPLEMENTS_INTERFACE (iSaverPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csParticlesObjectSaver::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 SCF_IMPLEMENT_FACTORY (csParticlesObjectSaver)
 
-csParticlesObjectSaver::csParticlesObjectSaver (iBase* parent)
+csParticlesObjectSaver::csParticlesObjectSaver (iBase* parent) :
+  scfImplementationType(this, parent)
 {
-  SCF_CONSTRUCT_IBASE (parent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
 }
 
 csParticlesObjectSaver::~csParticlesObjectSaver ()

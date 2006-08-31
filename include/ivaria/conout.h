@@ -48,20 +48,18 @@ enum
   csConInsertCursor
 };
 
-SCF_VERSION (iConsoleWatcher, 0, 0, 1);
-
 /**
  * This interface is implemented by objects interested in knowing when the
  * console's visibility status has changed.
  */
-struct iConsoleWatcher : public iBase
+struct iConsoleWatcher : public virtual iBase
 {
+  SCF_INTERFACE (iConsoleWatcher, 1, 0, 0);
+
   /// Called when the watched console's visibility status changes.
   virtual void ConsoleVisibilityChanged(iConsoleOutput*, bool visible) = 0;
 };
 
-
-SCF_VERSION (iConsoleOutput, 2, 1, 0);
 
 /**
  * This is the Crystal Space Console interface.  It is an output only system.
@@ -79,8 +77,10 @@ SCF_VERSION (iConsoleOutput, 2, 1, 0);
  * - iConsoleInput
  * - iStandardReporterListener
  */
-struct iConsoleOutput : public iBase
+struct iConsoleOutput : public virtual iBase
 {
+  SCF_INTERFACE (iConsoleOutput, 3, 0, 0);
+ 
   /**
    * Put some text to the console. Console acts like a simple
    * TTY and should interpret basical symbols like '@\n' and '@\b'.

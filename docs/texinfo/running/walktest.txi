@@ -82,8 +82,8 @@ directory is loaded.
 
 If there is no initial @file{/} character, @file{/lev/} is stuck on the front.
 If there is no map specified at all, @file{/lev/flarge} is assumed, so the
-default map is @file{/lev/flarge/world}.  (This is almost true---the default
-path is specified in @file{/data/config/walktest.cfg}).
+default map is @file{/lev/flarge/world}.  (This is almost true @dots{} the
+default path is specified in @file{/data/config/walktest.cfg}).
 
 Many of these command line options are of specialised or limited use.
 
@@ -92,7 +92,8 @@ Win32-specific options:
 
 @table @code
 @item -[no]console
-Create a debug console (default = yes) (@@@@@@ Note to Frank, depends on release/debug mingw/msvc?)
+Create a debug console (default = yes) (@@@@@@ Note to Frank, depends on
+release/debug mingw/msvc?)
 @end table
 
 @noindent
@@ -317,7 +318,7 @@ simulating 15/16-bit display mode on a 8-bit display
 @item s_fog r,g,b,density
 If no arguments are given this command will show the fog settings for the
 current sector.  Otherwise you can set the fog level for this sector.  Syntax
-is `s_fog r,g,b,density'.
+is @samp{s_fog r,g,b,density}.
 
 @item snd_play name
 Play named sound as @file{name.wav} as an ephemeral sound.
@@ -679,8 +680,8 @@ serious degradation on frame rate, but can be fun to play with.
 Create dynamic light of specified colour at current location.
 Defaults are radius=6, colour =white.  If no parameters are
 given the light will also move up and down slightly and randomly change colour.
-The rgb components should be floating point numbers in the range 0.0 to 1.0,
-but this is not checked.
+The @sc{rgb} components should be floating point numbers in the range 0.0
+to 1.0, but this is not checked.
 
 @item dellight [@key{Shift-1}]
 Delete most recently added dynamic light.

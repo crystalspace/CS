@@ -142,7 +142,7 @@ public :
     if (size)
     {
       allocated = size;
-      cstring = (char*)malloc (size);
+      cstring = (char*)cs_malloc (size);
       cstring [0] = 0;
     }
   }
@@ -180,7 +180,7 @@ protected :
   void empty_it ()
   {
     if (cstring)
-      free (cstring);
+      cs_free (cstring);
     cstring = 0;
     clength = 0;
     allocated = 0;

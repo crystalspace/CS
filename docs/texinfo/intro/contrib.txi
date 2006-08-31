@@ -819,11 +819,35 @@ Markus fixed a bug in the (now defunct) @file{unixconf.sh} script.
 @item
 Marten Svanfeldt (@email{developer@@svanfeldt.com})
 
-Marten added support for vertex-programs to the old OpenGL renderer.  He was
-also one of the initiators to the new advanced OpenGL renderer and wrote large
-part of the interface. He has written parts of the renderer itself and the
-shader system. Marten also worked on the new @sc{scf} system in Crystal Space
+Marten now as a Crystal Space Project Administrator has done far more work and
+helped the project in so many ways, they are too numerous to completely
+detail here.
+
+@itemize @bullet
+@item
+Marten added support for vertex-programs to the old OpenGL renderer.
+
+@item
+Marten was one of the initiators of the new advanced OpenGL renderer and
+wrote large part of the interface.  He has written parts of the renderer
+itself and the shader system.
+
+@item
+Marten also worked on the new @sc{scf} system in Crystal Space
 and he is the main author of the new lightmap system.
+
+@item
+Marten has performed Crystal Space wide changes and additions that have
+enhanced the codebase considerably.
+
+@item
+Marten is a leading Crystal Space developer with the Microsoft @sc{msvc}
+toolset and has been at the forefront of adding support for the latest
+versions and maintaining compatibility with the Crystal Space codebase.
+
+@item
+Recently Marten has been working on a new particles system for Crystal Space.
+@end itemize
 
 @item
 Martin Geisse (@email{mgeisse@@gmx.net})

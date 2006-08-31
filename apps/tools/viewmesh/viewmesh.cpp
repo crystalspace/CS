@@ -284,7 +284,9 @@ void ViewMesh::HandleCommandLine()
   if (meshfilename)
   {
     csString file(meshfilename);
-    size_t split = file.FindLast('/');    
+    size_t split = file.FindLast(':');    
+    if (split == csArrayItemNotFound)
+      split = file.FindLast('/');    
     LoadSprite(file, file.Slice(split+1, file.Length()-split-1));
   }
 
@@ -526,7 +528,6 @@ void ViewMesh::CreateGui ()
 void ViewMesh::LoadSprite (const char* path, const char* filename)
 {
   if (path) ParseDir(path);
-
   if (spritewrapper)
   {
     if (sprite)
@@ -577,6 +578,8 @@ void ViewMesh::LoadSprite (const char* path, const char* filename)
   }
 
   iBase* result;
+  printf ("Loading model '%s' from vfs dir '%s'\n",
+		  filename, vfs->GetCwd ()); fflush (stdout);
   iRegion* region = engine->CreateRegion ("viewmesh_region");
   bool rc = loader->Load (filename, result, region, false, true);
 

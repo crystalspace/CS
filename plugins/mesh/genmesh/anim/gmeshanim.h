@@ -28,6 +28,7 @@
 #include "csutil/strhash.h"
 #include "csutil/stringarray.h"
 #include "csutil/eventnames.h"
+#include "csutil/scf_implementation.h"
 #include "imesh/genmesh.h"
 #include "imesh/gmeshanim.h"
 #include "iutil/comp.h"
@@ -276,8 +277,8 @@ public:
  * Genmesh animation control.
  */
 class csGenmeshAnimationControl :
-	public iGenMeshAnimationControl,
-	public iGenMeshAnimationControlState
+  public scfImplementation2<csGenmeshAnimationControl,
+    iGenMeshAnimationControl, iGenMeshAnimationControlState>
 {
 private:
   csGenmeshAnimationControlFactory* factory;
@@ -321,8 +322,6 @@ public:
   /// Destructor.
   virtual ~csGenmeshAnimationControl ();
 
-  SCF_DECLARE_IBASE;
-
   // --- For iGenMeshAnimationControl --------------------------------
   virtual bool AnimatesVertices () const { return animates_vertices; }
   virtual bool AnimatesTexels () const { return animates_texels; }
@@ -346,7 +345,9 @@ public:
 /**
  * Genmesh animation control factory.
  */
-class csGenmeshAnimationControlFactory : public iGenMeshAnimationControlFactory
+class csGenmeshAnimationControlFactory :
+  public scfImplementation1<csGenmeshAnimationControlFactory,
+    iGenMeshAnimationControlFactory>
 {
 private:
   csGenmeshAnimationControlType* type;
@@ -412,8 +413,6 @@ public:
     return groups_colors;
   }
 
-  SCF_DECLARE_IBASE;
-
   // --- For iGenMeshAnimationControlFactory -------------------------
   virtual const char* Load (iDocumentNode* node);
   virtual const char* Save (iDocumentNode* parent);
@@ -422,7 +421,9 @@ public:
 /**
  * Genmesh animation control type.
  */
-class csGenmeshAnimationControlType : public iGenMeshAnimationControlType
+class csGenmeshAnimationControlType :
+  public scfImplementation3<csGenmeshAnimationControlType,
+    iGenMeshAnimationControlType, iComponent, iEventHandler>
 {
 private:
   iObjectRegistry* object_reg;
@@ -440,39 +441,8 @@ public:
   virtual csPtr<iGenMeshAnimationControlFactory> CreateAnimationControlFactory
   	();
 
-  SCF_DECLARE_IBASE;
-
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csGenmeshAnimationControlType);
-    virtual bool Initialize (iObjectRegistry* object_reg)
-    {
-      return scfParent->Initialize (object_reg);
-    }
-  } scfiComponent;
-
-  class EventHandler : public iEventHandler
-  {
-  private:
-    csGenmeshAnimationControlType* parent;
-  public:
-    EventHandler (csGenmeshAnimationControlType* parent)
-    {
-      SCF_CONSTRUCT_IBASE (0);
-      EventHandler::parent = parent;
-    }
-    virtual ~EventHandler ()
-    {
-      SCF_DESTRUCT_IBASE();
-    }
-    SCF_DECLARE_IBASE;
-    virtual bool HandleEvent (iEvent& ev)
-    {
-      return parent->HandleEvent (ev);
-    }
-    CS_EVENTHANDLER_NAMES("crystalspace.mesh.genmesh.anim")
-    CS_EVENTHANDLER_NIL_CONSTRAINTS
-  } *scfiEventHandler;
+  CS_EVENTHANDLER_NAMES("crystalspace.mesh.genmesh.anim")
+  CS_EVENTHANDLER_NIL_CONSTRAINTS
 
   csEventID Frame;
   csEventID PreProcess;

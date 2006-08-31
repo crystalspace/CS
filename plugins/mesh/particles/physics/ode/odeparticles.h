@@ -21,6 +21,7 @@
 
 #include "csgeom/vector3.h"
 #include "csutil/randomgen.h"
+#include "csutil/scf_implementation.h"
 #include "iutil/comp.h"
 #include "ivaria/dynamics.h"
 #include "ivaria/ode.h"
@@ -31,7 +32,9 @@
 
 struct iVirtualClock;
 
-class csODEParticlePhysics : public iParticlesPhysics
+class csODEParticlePhysics :
+  public scfImplementation4<csODEParticlePhysics,
+    iParticlesPhysics, iComponent, iODEFrameUpdateCallback, iEventHandler>
 {
   iObjectRegistry* objreg;
 
@@ -80,41 +83,19 @@ class csODEParticlePhysics : public iParticlesPhysics
     return (sort < 0.0f) ? -1 : ((sort > 0.0f) ? 1 : 0);
   }
 public:
-  SCF_DECLARE_IBASE;
-
   csODEParticlePhysics (iBase *p);
   virtual ~csODEParticlePhysics ();
 
   bool Initialize (iObjectRegistry* reg);
 
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csODEParticlePhysics);
-    bool Initialize (iObjectRegistry* reg)
-    { return scfParent->Initialize (reg); }
-  } scfiComponent;
-
   /// Passes particle parameters to physics just before step function
   void Execute (float stepsize);
-
-  struct eiODEFrameUpdateCallback : public iODEFrameUpdateCallback
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csODEParticlePhysics);
-    void Execute (float stepsize)
-    { scfParent->Execute (stepsize); }
-  } scfiODEFrameUpdateCallback;
 
   /// Passes the results of the physics back to particles and updates them
   bool HandleEvent (iEvent &event);
 
-  struct eiEventHandler : public iEventHandler 
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csODEParticlePhysics);
-    bool HandleEvent (iEvent &event)
-    { return scfParent->HandleEvent (event); }
-    CS_EVENTHANDLER_NAMES("crystalspace.particles.physics.ode")
-    CS_EVENTHANDLER_NIL_CONSTRAINTS
-  } scfiEventHandler;
+  CS_EVENTHANDLER_NAMES("crystalspace.particles.physics.ode")
+  CS_EVENTHANDLER_NIL_CONSTRAINTS
 
   const csArray<csParticlesData> *RegisterParticles (
   	iParticlesObjectState *particles);

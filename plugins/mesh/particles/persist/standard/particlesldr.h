@@ -26,13 +26,16 @@
 #include "iutil/comp.h"
 #include "iutil/vfs.h"
 #include "csutil/strhash.h"
+#include "csutil/scf_implementation.h"
 
 struct iObjectRegistry;
 
 /**
  * Particle factory loader.
  */
-class csParticlesFactoryLoader : public iLoaderPlugin
+class csParticlesFactoryLoader :
+  public scfImplementation2<csParticlesFactoryLoader,
+    iLoaderPlugin, iComponent>
 {
 private:
   iObjectRegistry* object_reg;
@@ -44,8 +47,6 @@ private:
 #include "cstool/tokenlist.h"
 
 public:
-  SCF_DECLARE_IBASE;
-
   /// Constructor
   csParticlesFactoryLoader (iBase*);
   /// Destructor
@@ -78,27 +79,20 @@ public:
 
   /// Parse the color gradient block
   bool ParseGradient (iDocumentNode *node, iParticlesFactoryState *state);
-
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csParticlesFactoryLoader);
-    virtual bool Initialize (iObjectRegistry *p)
-    { return scfParent->Initialize (p); }
-  } scfiComponent;
 };
 
 /**
  * Particle factory saver.
  */
-class csParticlesFactorySaver : public iSaverPlugin
+class csParticlesFactorySaver :
+  public scfImplementation2<csParticlesFactorySaver,
+    iSaverPlugin, iComponent>
 {
 private:
   iObjectRegistry* object_reg;
   csRef<iSyntaxService> synldr;
 
 public:
-  SCF_DECLARE_IBASE;
-
   /// Constructor
   csParticlesFactorySaver (iBase*);
 
@@ -119,19 +113,14 @@ public:
   /// Write down colormethode block.
   virtual bool WriteColorMethode (iParticlesFactoryState *obj,
   	iDocumentNode* parent);
-
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csParticlesFactorySaver);
-    virtual bool Initialize (iObjectRegistry* p)
-    { return scfParent->Initialize (p); }
-  } scfiComponent;
 };
 
 /**
  * Particles loader.
  */
-class csParticlesObjectLoader : public iLoaderPlugin
+class csParticlesObjectLoader :
+  public scfImplementation2<csParticlesObjectLoader,
+    iLoaderPlugin, iComponent>
 {
 private:
   iObjectRegistry* object_reg;
@@ -143,8 +132,6 @@ private:
 #include "cstool/tokenlist.h"
 
 public:
-  SCF_DECLARE_IBASE;
-
   /// Constructor
   csParticlesObjectLoader (iBase*);
 
@@ -179,27 +166,20 @@ public:
 
   /// Parse the color gradient block
   bool ParseGradient (iDocumentNode *node, iParticlesObjectState *state);
-
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csParticlesObjectLoader);
-    virtual bool Initialize (iObjectRegistry* p)
-    { return scfParent->Initialize (p); }
-  } scfiComponent;
 };
 
 /**
  * Particles saver.
  */
-class csParticlesObjectSaver : public iSaverPlugin
+class csParticlesObjectSaver :
+  public scfImplementation2<csParticlesObjectSaver,
+    iSaverPlugin, iComponent>
 {
 private:
   iObjectRegistry* object_reg;
   csRef<iSyntaxService> synldr;
 
 public:
-  SCF_DECLARE_IBASE;
-
   /// Constructor
   csParticlesObjectSaver (iBase*);
 
@@ -218,13 +198,6 @@ public:
 
   /// Write constant color block
   bool WriteColorMethode (iParticlesObjectState *state, iDocumentNode *node);
-
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csParticlesObjectSaver);
-    virtual bool Initialize (iObjectRegistry* p)
-    { return scfParent->Initialize (p); }
-  } scfiComponent;
 };
 
 #endif // __CS_PARTICLESLDR_H__

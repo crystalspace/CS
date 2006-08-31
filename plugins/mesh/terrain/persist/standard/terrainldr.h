@@ -23,6 +23,7 @@
 #include "imap/writer.h"
 #include "iutil/comp.h"
 #include "csutil/strhash.h"
+#include "csutil/scf_implementation.h"
 
 struct iObjectRegistry;
 struct iSyntaxService;
@@ -31,7 +32,9 @@ struct iVFS;
 /**
  *
  */
-class csTerrainFactoryLoader : public iLoaderPlugin
+class csTerrainFactoryLoader :
+  public scfImplementation2<csTerrainFactoryLoader,
+    iLoaderPlugin, iComponent>
 {
 private:
   iObjectRegistry* object_reg;
@@ -40,8 +43,6 @@ private:
   csStringHash xmltokens;
 
 public:
-  SCF_DECLARE_IBASE;
-
   /// Constructor
   csTerrainFactoryLoader (iBase*);
   /// Destructor
@@ -54,27 +55,20 @@ public:
   csPtr<iBase> Parse (iDocumentNode *node,
     iStreamSource*, iLoaderContext *ldr_context,
     iBase* context);	
-
-  struct eiComponent : public iComponent
-  { 
-    SCF_DECLARE_EMBEDDED_IBASE (csTerrainFactoryLoader);
-    virtual bool Initialize (iObjectRegistry *p)
-    { return scfParent->Initialize (p); }
-  } scfiComponent;
 };
 
 /**
  *
  */
-class csTerrainFactorySaver : public iSaverPlugin
+class csTerrainFactorySaver :
+  public scfImplementation2<csTerrainFactorySaver,
+    iSaverPlugin, iComponent>
 {
 private:
   iObjectRegistry* object_reg;
   csRef<iSyntaxService> synldr;
 
 public:
-  SCF_DECLARE_IBASE;
-
   /// Constructor
   csTerrainFactorySaver (iBase*);
 
@@ -87,20 +81,14 @@ public:
   /// Write down given object and add to iDocumentNode.
   virtual bool WriteDown (iBase *obj, iDocumentNode* parent,
   	iStreamSource*);
-
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csTerrainFactorySaver);
-    virtual bool Initialize (iObjectRegistry* p)
-    { return scfParent->Initialize (p); }
-  } scfiComponent;
-
 };
 
 /**
  *
  */
-class csTerrainObjectLoader : public iLoaderPlugin
+class csTerrainObjectLoader :
+  public scfImplementation2<csTerrainObjectLoader,
+    iLoaderPlugin, iComponent>
 {
 private:
   iObjectRegistry* object_reg;
@@ -111,8 +99,6 @@ private:
   bool ParseMaterialPalette (iDocumentNode* node, iLoaderContext *ldr_context,
   	csArray<iMaterialWrapper*>& palette);
 public:
-  SCF_DECLARE_IBASE;
-
   /// Constructor
   csTerrainObjectLoader (iBase*);
 
@@ -126,27 +112,20 @@ public:
   csPtr<iBase> Parse (iDocumentNode* node,
     iStreamSource*, iLoaderContext* ldr_context,
     iBase *context);
-
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csTerrainObjectLoader);
-    virtual bool Initialize (iObjectRegistry* p)
-    { return scfParent->Initialize (p); }
-  } scfiComponent;
 };
 
 /**
  *
  */
-class csTerrainObjectSaver : public iSaverPlugin
+class csTerrainObjectSaver :
+  public scfImplementation2<csTerrainObjectSaver,
+    iSaverPlugin, iComponent>
 {
 private:
   iObjectRegistry* object_reg;
   csRef<iSyntaxService> synldr;
 
 public:
-  SCF_DECLARE_IBASE;
-
   /// Constructor
   csTerrainObjectSaver (iBase*);
 
@@ -159,13 +138,6 @@ public:
   /// Write down given object and add to iDocumentNode.
   virtual bool WriteDown (iBase *obj, iDocumentNode* parent,
   	iStreamSource*);
-
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csTerrainObjectSaver);
-    virtual bool Initialize (iObjectRegistry* p)
-    { return scfParent->Initialize (p); }
-  } scfiComponent;
 };
 
 #endif // __CS_CHUNKLDR_H

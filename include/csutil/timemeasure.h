@@ -43,7 +43,7 @@ namespace CS
    * \code
    * void Foo (int x)
    * {
-   *   csMeasureTime measureFoo ("Foo (%d) time", x);
+   *   CS::MeasureTime measureFoo ("Foo (%d) time", x);
    *   
    *   // ...
    * }

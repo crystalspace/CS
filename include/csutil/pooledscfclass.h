@@ -30,11 +30,7 @@
 
 #include "csutil/scf.h"
 
-// hack: work around problems caused by #defining 'new'
-#if defined(CS_EXTENSIVE_MEMDEBUG) || defined(CS_MEMORY_TRACKER)
-# undef new
-#endif
-#include <new>
+#include "csutil/custom_new_disable.h"
 
 /**
  * Derive an SCF implementation from this class to have it pooled.
@@ -121,20 +117,18 @@ public:
     }
     else
     {
-      newEntry = (PoolEntry*)malloc (sizeof (PoolEntry) + n);
+      newEntry = (PoolEntry*)malloc (n);
     #ifdef CS_MEMORY_TRACKER
       if (p.mti == 0)
       {
-        p.mti = mtiRegisterAlloc (sizeof (PoolEntry) + n, 
-          typeid (Pool).name());
+        p.mti = mtiRegisterAlloc (n, typeid (Pool).name());
       }
       else
-        mtiUpdateAmount (p.mti, 1, int (sizeof (PoolEntry) + n));
+        mtiUpdateAmount (p.mti, 1, (int)n);
     #endif
     }
     p.allocedEntries++;
-    scfClassType* newInst = 
-      (scfClassType*)((uint8*)newEntry + sizeof (PoolEntry));
+    scfClassType* newInst = (scfClassType*)(newEntry);
     /* A bit nasty: set scfPool member of the (still unconstructed!) 
      * instance... */
     ((scfPooledImplementationType*)newInst)->scfPool = &p;
@@ -146,8 +140,7 @@ public:
   inline void operator delete (void* instance, Pool& p) 
   {
     typedef typename Pool::Entry PoolEntry;
-    // Go from instance to pool entry pointer
-    PoolEntry* entry = (PoolEntry*)((uint8*)instance - sizeof (PoolEntry));
+    PoolEntry* entry = (PoolEntry*)(instance);
     entry->next = p.pool;
     p.pool = entry;
     p.allocedEntries--;
@@ -165,7 +158,6 @@ public:
   {
     if (this->scfRefCount == 1)
     {
-      //this->operator delete (this->scfObject, *scfPool);
       delete this->scfObject;
       return;
     }
@@ -197,5 +189,7 @@ public:
 };
 
 /** @} */
+
+#include "csutil/custom_new_enable.h"
 
 #endif // __CS_UTIL_POOLEDSCFCLASS_H__

@@ -27,8 +27,8 @@ extern CS_CRYSTALSPACE_EXPORT int cs_vsnprintf (char *, size_t, const char *,
     CS_GNUC_PRINTF (3, 0);
 /**
  * Portable implementation of asprintf().
- * \remark Like asprintf(), the string was allocated with malloc() and needs to
- *  be freed with free().
+ * \remark Like asprintf(), the string was allocated with cs_malloc() and needs to
+ *  be cs_freed with cs_free().
  * \sa \ref FormatterNotes
  */
 extern CS_CRYSTALSPACE_EXPORT int cs_asprintf (char **, const char *, ...)

@@ -19,7 +19,7 @@
 #ifndef __CS_IMESH_LGHTNG_H__
 #define __CS_IMESH_LGHTNG_H__
 
-#include "csutil/scf.h"
+#include "csutil/scf_interface.h"
 
 /**\file
  * Lightning mesh object
@@ -28,15 +28,13 @@
 /**\addtogroup meshplugins
  * @{ */
 
-struct iMaterialWrapper;
-
 class csVector3;
 
-SCF_VERSION (iLightningFactoryState, 0, 0, 1);
-
 /// \todo Document me!
-struct iLightningFactoryState : public iBase
+struct iLightningFactoryState : public virtual iBase
 {
+  SCF_INTERFACE(iLightningFactoryState, 2, 0, 0);
+
   /// Set the point of origin, the center of the texture.
   virtual void SetOrigin (const csVector3& pos) = 0;
   /// Get the point of origin
@@ -72,14 +70,12 @@ struct iLightningFactoryState : public iBase
   virtual void SetBandWidth (float value) = 0;
 };
 
-SCF_VERSION (iLightningState, 0, 0, 1);
-
 ///
 struct iLightningState : public iLightningFactoryState
 {
+  SCF_INTERFACE(iLightningState, 2, 0, 0);
 };
 
 /** @} */
 
 #endif // __CS_IMESH_LGHTNG_H__
-

@@ -504,7 +504,7 @@ Global.System.Plugins.iBugPlug = crystalspace.utilities.bugplug
 This will make sure that the BugPlug plugin runs in either you or any 
 Crystal Space application (dependent on the config domain you chose). 
 BugPlug shows @sc{fps} (among other things) and is otherwise not harmful.  You
-can also use BugPlug to make screenshots (press @kbd{ctrl-d} followed by
-@kbd{f12}).
+can also use BugPlug to make screenshots (press @kbd{Ctrl-d} followed by
+@kbd{F12}).
 
 @end itemize
