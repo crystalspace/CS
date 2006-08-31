@@ -20,7 +20,7 @@
 #define __DEMOOP_H__
 
 #include <stdarg.h>
-#include "csutil/scf_implementation.h"
+#include "csutil/scf.h"
 #include "csgeom/math2d.h"
 #include "csgeom/math3d.h"
 #include "csgeom/path.h"
@@ -37,13 +37,14 @@ struct iMeshWrapper;
 /**
  * The superclass of all sequence operations.
  */
-class StandardOp : public scfImplementation1<StandardOp, iSequenceOperation>
+class StandardOp : public iSequenceOperation
 {
 public:
-  StandardOp () : scfImplementationType(this) { }
+  SCF_DECLARE_IBASE;
+  StandardOp () { SCF_CONSTRUCT_IBASE (0); }
   virtual void CleanupSequences () { }
-  virtual void Do (csTicks dt, iBase* params) = 0;
-  virtual ~StandardOp () { }
+protected:
+  virtual ~StandardOp () { SCF_DESTRUCT_IBASE(); }
 };
 
 /**

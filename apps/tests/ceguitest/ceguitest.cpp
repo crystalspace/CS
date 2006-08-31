@@ -18,11 +18,9 @@
 
 #include "ceguitest.h"
 
-#include "csutil/custom_new_disable.h"
-#include <CEGUI.h>
-#include <CEGUIWindowManager.h>
-#include <CEGUILogger.h>
-#include "csutil/custom_new_enable.h"
+#include "CEGUI.h"
+#include "CEGUIWindowManager.h" 
+#include "CEGUILogger.h"
 
 
 CS_IMPLEMENT_APPLICATION
@@ -167,38 +165,18 @@ bool CEGUITest::Application()
   // Set the logging level
   cegui->GetLoggerPtr ()->setLoggingLevel(CEGUI::Informative);
 
-#if (CEGUI_VERSION_MAJOR == 0) && (CEGUI_VERSION_MINOR >= 5)
-  // Use the 0.5 version of the skin
-  vfs->ChDir ("/ceguitest/0.5/");
-#else
-  // Use the old version of the skin
   vfs->ChDir ("/ceguitest/");
-#endif
 
   // Load the ice skin (which uses Falagard skinning system)
   cegui->GetSchemeManagerPtr ()->loadScheme("ice.scheme");
 
   cegui->GetSystemPtr ()->setDefaultMouseCursor("ice", "MouseArrow");
-
-#if (CEGUI_VERSION_MAJOR == 0) && (CEGUI_VERSION_MINOR >= 5)
-  CEGUI::Font* font = cegui->GetFontManagerPtr ()->createFont("FreeType",
-    "Vera", "/fonts/ttf/Vera.ttf");
-  font->setProperty("PointSize", "10");
-  font->load();
-#else
-  cegui->GetFontManagerPtr ()->createFont("Vera", "/fonts/ttf/Vera.ttf", 10,
+  cegui->GetFontManagerPtr ()->createFont("Vera", "/fonts/ttf/Vera.ttf", 10, 
     CEGUI::Default);
-#endif
-
   CEGUI::WindowManager* winMgr = cegui->GetWindowManagerPtr ();
 
   // Load layout and set as root
   cegui->GetSystemPtr ()->setGUISheet(winMgr->loadWindowLayout("ice.layout"));
-
-  // Subscribe to the clicked event for the exit button
-  CEGUI::Window* btn = winMgr->getWindow("Demo7/Window1/Quit");
-  btn->subscribeEvent(CEGUI::PushButton::EventClicked,
-    CEGUI::Event::Subscriber(&CEGUITest::OnExitButtonClicked, this));
 
   // First disable the lighting cache. Our app is simple enough
   // not to need this.
@@ -217,14 +195,6 @@ bool CEGUITest::Application()
 
   Run();
 
-  return true;
-}
-
-bool CEGUITest::OnExitButtonClicked (const CEGUI::EventArgs&)
-{
-  csRef<iEventQueue> q =
-    CS_QUERY_REGISTRY(GetObjectRegistry(), iEventQueue);
-  if (q.IsValid()) q->GetEventOutlet()->Broadcast(csevQuit(GetObjectRegistry()));
   return true;
 }
 

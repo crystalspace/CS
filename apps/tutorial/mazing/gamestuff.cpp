@@ -496,12 +496,13 @@ void Laser::Handle (csTicks ticks)
 void Laser::Check ()
 {
   // Do a beam to check if we hit an adversary.
-  csSectorHitBeamResult rc = lasersector->HitBeamPortals (
-  	laserstart, laserend);
-  if (rc.mesh)
+  csVector3 isect;
+  iMeshWrapper* mesh = lasersector->HitBeamPortals (laserstart,
+  	laserend, isect, 0);
+  if (mesh)
   {
     csRef<Adversary> adv = CS_GET_CHILD_OBJECT (
-    	rc.mesh->QueryObject (), Adversary);
+    	mesh->QueryObject (), Adversary);
     if (adv)
     {
       // Hit!
@@ -590,36 +591,27 @@ bool Game::CreateFactories ()
   explosion_factory = engine->CreateMeshFactory (
   	"crystalspace.mesh.object.particles", "explosion");
   if (!explosion_factory) return false;
-
-  csRef<iParticleSystemFactory> pbase = scfQueryInterface<
-  	iParticleSystemFactory> (explosion_factory->GetMeshObjectFactory ());
+  csRef<iParticlesFactoryState> pstate = scfQueryInterface<
+  	iParticlesFactoryState> (explosion_factory->GetMeshObjectFactory ());
 
   if (!loader->LoadTexture ("explosion_texture", "/lib/std/spark.png"))
     return app->ReportError ("Error loading 'spark' texture!");
   iMaterialWrapper* explosion_material = engine->GetMaterialList ()
   	->FindByName ("explosion_texture");
-  
-  explosion_factory->GetMeshObjectFactory ()->SetMaterialWrapper (explosion_material);
-  explosion_factory->GetMeshObjectFactory ()->SetMixMode (CS_FX_ADD);
-
-  pbase->SetParticleSize (csVector2 (0.2f, 0.2f));
-  pbase->SetParticleRenderOrientation (CS_PARTICLE_CAMERAFACE_APPROX);
-//  pbase->SetDeepCreation (true);
-
-  csRef<iParticleBuiltinEmitterFactory> emitter_factory = 
-    csLoadPluginCheck<iParticleBuiltinEmitterFactory> (app->GetObjectRegistry (),
-    "crystalspace.mesh.object.particles.emitter");
-  
-  csRef<iParticleBuiltinEmitterSphere> emitter = emitter_factory->CreateSphere ();
-  emitter->SetRadius (0);
-  emitter->SetParticlePlacement (CS_PARTICLE_BUILTIN_CENTER);
-  emitter->SetDuration (EXPLOSION_EMITTIME / 1000.0f);
-  emitter->SetInitialTTL (EXPLOSION_PARTTIMELOW / 1000.0f, EXPLOSION_PARTTIMEHIGH / 1000.0f);
-  emitter->SetUniformVelocity (false);
-  emitter->SetInitialVelocity (csVector3 (3.0f,0,0), csVector3 (0.0f));
-  emitter->SetEmissionRate (50);
-
-  pbase->AddEmitter (emitter);
+  pstate->SetMaterial (explosion_material);
+  pstate->SetParticleRadius (0.2f);
+  pstate->SetParticlesPerSecond (50);
+  pstate->SetInitialParticleCount (10);
+  pstate->SetPointEmitType ();
+  pstate->SetRadialForceType (2.0, CS_PART_FALLOFF_LINEAR);
+  pstate->SetForce (6.0);
+  pstate->SetDiffusion (1.0);
+  pstate->SetEmitTime (float (EXPLOSION_EMITTIME) / 1000.0);
+  pstate->SetTimeToLive (float (EXPLOSION_PARTTIME) / 1000.0);
+  pstate->SetTimeVariation (float (EXPLOSION_PARTVARTIME) / 1000.0f);
+  pstate->SetConstantColorMethod (csColor4 (1.0f, 0.8f, 0.5f));
+  pstate->SetMixMode (CS_FX_ADD);
+  pstate->EnableZSort (false);
 
   return true;
 }

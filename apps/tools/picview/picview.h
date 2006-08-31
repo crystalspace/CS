@@ -57,7 +57,7 @@ class PicView : public csApplicationFramework, public csBaseEventHandler
   ~PicView ();
 
   /** Allows us to load the next image in progression. */
-  void LoadNextImage (bool rewind, int step);
+  void LoadNextImage (size_t idx, int step);
   
   /** Turns scaling on and off. */
   void FlipScale() { scale^=true; }

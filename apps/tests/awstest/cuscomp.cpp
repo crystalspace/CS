@@ -25,6 +25,26 @@
 #include "iaws/aws.h"
 #include "ivideo/graph2d.h"
 
+
+SCF_IMPLEMENT_IBASE (CustomComponent)
+  SCF_IMPLEMENTS_INTERFACE (iAwsComponent)
+SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_IBASE (CustomComponentFactory)
+  SCF_IMPLEMENTS_INTERFACE (iAwsComponentFactory)
+SCF_IMPLEMENT_IBASE_END
+
+CustomComponent::CustomComponent (iAws *manager) :
+  awsEmbeddedComponent (manager)
+{
+  SCF_CONSTRUCT_IBASE (0);
+}
+
+CustomComponent::~CustomComponent ()
+{
+  SCF_DESTRUCT_IBASE ();
+}
+
 bool CustomComponent::Setup(iAws *manager, iAwsComponentNode *settings)
 {
   // first thing is to let the base class setup
@@ -73,11 +93,16 @@ void CustomComponent::OnDraw (csRect /*clip*/)
 
 /*-------------------------- Custom Component Factory ------------------------------- */
 
-CustomComponentFactory::CustomComponentFactory (iAws* manager) :
-  scfImplementationType(this), awsEmbeddedComponentFactory (manager)
+CustomComponentFactory::CustomComponentFactory (iAws* manager) : awsEmbeddedComponentFactory (manager)
 {
+  SCF_CONSTRUCT_IBASE(0);
   Register ("Demo Component");
   aws_manager = manager;
+}
+
+CustomComponentFactory::~CustomComponentFactory ()
+{
+  SCF_DESTRUCT_IBASE();
 }
 
 iAwsComponent* CustomComponentFactory::Create ()

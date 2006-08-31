@@ -29,7 +29,6 @@
 #include "csver.h"
 #include "command.h"
 #include "csutil/scanstr.h"
-#include "csutil/eventnames.h"
 #include "walktest.h"
 #include "csqint.h"
 #include "ivideo/graph3d.h"

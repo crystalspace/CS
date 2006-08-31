@@ -1200,7 +1200,7 @@ const char *PartEditSink::GetGraphicFile()
 
 void PartEditSink::SetGraphicFile(const char *filestr)
 {
-  GraphicSelectionData.currentfilepath->Empty();
+  GraphicSelectionData.currentfilepath->Clear();
   GraphicSelectionData.currentfilepath->Append(GraphicSelectionData.currentdirectory);
   GraphicSelectionData.currentfilepath->Append(filestr);
 }
@@ -1301,7 +1301,7 @@ void PartEditSink::AwsGraphicFileSelected(unsigned long, intptr_t /*sk*/, iAwsSo
   else
   {
     // Else set current selected file
-    asink->GraphicSelectionData.currentfilepath->Empty();
+    asink->GraphicSelectionData.currentfilepath->Clear();
     asink->GraphicSelectionData.currentfilepath->Append(asink->GraphicSelectionData.currentdirectory);
     asink->GraphicSelectionData.currentfilepath->Append(filename->GetData());
   }

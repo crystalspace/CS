@@ -23,6 +23,8 @@
 
 using namespace CS;
 
+static unsigned int buildDepth = 0;
+
 namespace lighter
 {
 

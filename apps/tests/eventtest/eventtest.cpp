@@ -46,11 +46,10 @@ bool EventTest::HandleEvent (iEvent &ev)
     uint32 type = csKeyEventHelper::GetEventType (&ev);
     csString str = csInputDefinition::GetKeyString (namereg, key,
     	&key_modifiers, true);
-    printf ("Key %s: raw=%" PRId32 "(%c) "
-        "cooked=%" PRId32 "(%c) rep=%d mods=%08" PRIu32 " desc='%s'\n",
+    printf ("Key %s: raw=%d(%c) cooked=%d(%c) rep=%d mods=%08u desc='%s'\n",
     	type == csKeyEventTypeUp ? "UP" : "DO",
-	key, (key >= 32 && key < 128) ? (char)key : '-',
-	cooked, (cooked >= 32 && cooked < 128) ? (char)cooked : '-',
+	key, (key >= 32 && key < 128) ? key : '-',
+	cooked, (cooked >= 32 && cooked < 128) ? cooked : '-',
 	autorep, modifiers, str.GetData ());
     fflush (stdout);
   }
@@ -61,19 +60,14 @@ bool EventTest::HandleEvent (iEvent &ev)
     csKeyModifiers key_modifiers;
     csKeyEventHelper::GetModifiers (&ev, key_modifiers);
     uint32 modifiers = csMouseEventHelper::GetModifiers (&ev);
-
-    csMouseEventData data;
-    csMouseEventHelper::GetEventData (&ev, data);
     int x = csMouseEventHelper::GetX (&ev);
     int y = csMouseEventHelper::GetY (&ev);
     uint but = csMouseEventHelper::GetButton (&ev);
     bool butstate = csMouseEventHelper::GetButtonState (&ev);
     uint32 butmask = csMouseEventHelper::GetButtonMask (&ev);
-
-    csInputDefinition def (namereg, &ev, modifiers, true); //do we want cooked?
-    csString str = def.ToString ();
-    printf ("Mouse %s: but=%d(state=%d,mask=%08" PRIu32 ") "
-        "device=%d x=%d y=%d mods=%08" PRIu32 " desc='%s'\n",
+    csString str = csInputDefinition::GetOtherString (namereg,
+      	ev.Name, device, but, &key_modifiers, true);
+    printf ("Mouse %s: but=%d(state=%d,mask=%08u) device=%d x=%d y=%d mods=%08u desc='%s'\n",
 	type == csMouseEventTypeMove ? "MOVE" :
     	type == csMouseEventTypeUp ? "UP" :
 	type == csMouseEventTypeDown ? "DO" :
@@ -83,38 +77,6 @@ bool EventTest::HandleEvent (iEvent &ev)
 	but, butstate, butmask, device, x, y,
 	modifiers, str.GetData ());
     fflush (stdout);
-  }
-  else if (CS_IS_JOYSTICK_EVENT (namereg, ev))
-  {
-    uint device = csJoystickEventHelper::GetNumber (&ev);
-    csKeyModifiers key_modifiers;
-    csKeyEventHelper::GetModifiers (&ev, key_modifiers);
-    uint32 modifiers = csJoystickEventHelper::GetModifiers (&ev);
-    csJoystickEventData data;
-    csJoystickEventHelper::GetEventData (&ev, data);
-    csInputDefinition def (namereg, &ev, modifiers, true);
-    csString str = def.ToString (false);
-    csString desc ("");
-    if (CS_IS_JOYSTICK_BUTTON_EVENT (namereg, ev, device))
-    {
-      uint but = csJoystickEventHelper::GetButton (&ev);
-      bool butstate = csJoystickEventHelper::GetButtonState (&ev);
-      uint32 butmask = csJoystickEventHelper::GetButtonMask (&ev);
-      printf ("Joystick %s: device=%d but=%d(state=%d,mask=%08" PRIu32 ") "
-          "mods=%08" PRIu32 " desc='%s'\n",
-          butstate ? "DO" : "UP", device, but, butstate, butmask,
-          modifiers, str.GetData ());
-    }
-    else if (CS_IS_JOYSTICK_MOVE_EVENT (namereg, ev, device))
-    {
-      size_t pos = str.Find ("Axis");
-      str.SubString (desc, pos + 4, (size_t)-1);
-      uint axisnum = atoi(desc.GetData ());
-      printf ("Joystick MOVE: device=%d axis=%" PRId32 " value=%d "
-          "mods=%08" PRIu32 " desc='%s'\n",
-          device, axisnum, data.axes[axisnum], modifiers, str.GetData ());
-    }
-    fflush(stdout);
   }
 
   csBaseEventHandler::HandleEvent(ev);
@@ -158,25 +120,6 @@ bool EventTest::OnInitialize(int /*argc*/, char* /*argv*/ [])
     CS_REQUEST_FONTSERVER,
     CS_REQUEST_END))
     return ReportError("Failed to initialize plugins!");
-
-  // Attempt to load a joystick plugin.
-  csRef<iStringArray> joystickClasses =
-    iSCF::SCF->QueryClassList ("crystalspace.device.joystick.");
-  if (joystickClasses.IsValid())
-  {
-    csRef<iPluginManager> plugmgr = CS_QUERY_REGISTRY (object_reg,
-      iPluginManager);
-    for (size_t i = 0; i < joystickClasses->Length (); i++)
-    {
-      const char* className = joystickClasses->Get (i);
-      iBase* b = plugmgr->LoadPlugin (className);
-
-      csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
-        "crystalspace.application.joytest", "Attempt to load plugin '%s' %s",
-        className, (b != 0) ? "successful" : "failed");
-      if (b != 0) b->DecRef ();
-    }
-  }
 
   // "Warm up" the event handler so it can interact with the world
   csBaseEventHandler::Initialize(GetObjectRegistry());

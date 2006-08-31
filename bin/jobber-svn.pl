@@ -312,7 +312,7 @@ my @jobber_archivers = ($ARCHIVER_BZIP2, $ARCHIVER_GZIP, $ARCHIVER_ZIP);
 my %jobber_properties = ();
 
 # SVN binary name
-my $jobber_svn_command = '/home/crystal/CS/bin/svnwrapper';
+my $jobber_svn_command = './svnwrapper';
 
 my $CONFIG_FILE = undef;
 my $TESTING = undef;
@@ -849,6 +849,7 @@ sub time_now {
 # publishing packages.
 #------------------------------------------------------------------------------
 sub run {
+    $jobber_svn_command = getcwd . "/$jobber_svn_command";
     print 'BEGIN: ', time_now(), "\n";
     my $convdir = conversion_dir();
     create_transient($convdir);

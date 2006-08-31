@@ -41,6 +41,14 @@
 #include "demoseq.h"
 #include "demoop.h"
 
+//-----------------------------------------------------------------------------
+
+SCF_IMPLEMENT_IBASE (StandardOp)
+  SCF_IMPLEMENTS_INTERFACE (iSequenceOperation)
+SCF_IMPLEMENT_IBASE_END
+
+//-----------------------------------------------------------------------------
+
 void FadeOp::Do (csTicks dt, iBase*)
 {
   DemoSequenceManager::demoseq->SetupFade (start_fade,

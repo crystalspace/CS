@@ -683,7 +683,7 @@ void BuildSprite(iSector * sector, iObjectIterator* it, csVector3 position)
 
 
 
-void BuildObject(iSector * sector,
+void BuildObject(iObjectRegistry* object_reg, iSector * sector,
 	iObjectIterator* it, iEngine* Engine,
 	csVector3 position, iGraphics3D* MyG3D, iLoader* loader,
 	iObjectRegistry* objReg)
@@ -718,7 +718,7 @@ void WalkTest::ParseKeyNodes(iObject* src)
     }
     csRef<iObjectIterator> it2 (node_obj->GetIterator());
 
-    BuildObject(sector, it2, Engine, node->GetPosition(), myG3D,
+    BuildObject(object_reg, sector,it2, Engine, node->GetPosition(), myG3D,
 		LevelLoader, object_reg);
   }
 }
@@ -1213,11 +1213,11 @@ bool CommandHandler (const char *cmd, const char *arg)
   {
     csVector3 where = Sys->view->GetCamera ()->GetTransform ().This2Other (
     	3.0f*CS_VEC_FORWARD);
-    csSectorHitBeamResult rc = Sys->view->GetCamera ()->GetSector ()
-    	->HitBeamPortals (
-	    Sys->view->GetCamera ()->GetTransform ().GetOrigin (), where);
-    int pidx = rc.polygon_idx;
-    iMeshWrapper* mesh = rc.mesh;
+    int pidx;
+    csVector3 isect;
+    iMeshWrapper* mesh = 
+      Sys->view->GetCamera ()->GetSector ()->HitBeamPortals (
+      Sys->view->GetCamera ()->GetTransform ().GetOrigin (), where, isect, &pidx);
 
     if (mesh && pidx != -1)
     {
@@ -1462,12 +1462,12 @@ bool CommandHandler (const char *cmd, const char *arg)
   }
   else if (!csStrCaseCmp (cmd, "s_fog"))
   {
+    csFog* f = Sys->view->GetCamera ()->GetSector ()->GetFog ();
     if (!arg)
     {
-      const csFog& f = Sys->view->GetCamera ()->GetSector ()->GetFog ();
       Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
       	"Fog in current sector (%f,%f,%f) density=%f",
-      	f.color.red, f.color.green, f.color.blue, f.density);
+      	f->red, f->green, f->blue, f->density);
     }
     else
     {
@@ -1478,13 +1478,11 @@ bool CommandHandler (const char *cmd, const char *arg)
 		"Expected r,g,b,density. Got something else!");
         return false;
       }
-      csFog f;
-      f.density = dens;
-      f.color.red = r;
-      f.color.green = g;
-      f.color.blue = b;
-      f.mode = CS_FOG_MODE_CRYSTALSPACE;
-      Sys->view->GetCamera ()->GetSector ()->SetFog (f);
+      f->enabled = true;
+      f->density = dens;
+      f->red = r;
+      f->green = g;
+      f->blue = b;
     }
   }
   else if (!csStrCaseCmp (cmd, "portal"))

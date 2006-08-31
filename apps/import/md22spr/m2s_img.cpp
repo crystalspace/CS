@@ -20,6 +20,10 @@
 #include "cssysdef.h"
 #include "m2s_img.h"
 
+SCF_IMPLEMENT_IBASE (SkinImage)
+  SCF_IMPLEMENTS_INTERFACE (iImage)
+SCF_IMPLEMENT_IBASE_END
+
 const void *SkinImage::GetImageData () { return Image; }
 int SkinImage::GetWidth () const { return Width; }
 int SkinImage::GetHeight () const { return Height; }
@@ -27,9 +31,9 @@ int SkinImage::GetFormat () const { return CS_IMGFMT_PALETTED8; }
 const csRGBpixel *SkinImage::GetPalette () { return Palette; }
 
 SkinImage::SkinImage(void* Data, const void* Pal, int w, int h) :
-  scfImplementationType(this),
   Image(Data), Width(w), Height(h), Size(w * h)
 {
+  SCF_CONSTRUCT_IBASE(0);
   const unsigned char* src = (const unsigned char*)Pal;
   csRGBpixel* dst = Palette;
   int i;

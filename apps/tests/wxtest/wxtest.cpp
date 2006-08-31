@@ -17,11 +17,10 @@
 */
 
 #define CS_IMPLEMENT_PLATFORM_APPLICATION
-/* This is needed due the WX headers using free() inline, but the opposing
- * malloc() is in the WX libs. */
-#define CS_NO_MALLOC_OVERRIDE
 
 #include "cssysdef.h"
+
+#include <wx/wx.h>
 
 #include "csutil/sysfunc.h"
 #include "csutil/event.h"
@@ -60,10 +59,6 @@
 #include "ivaria/stdrep.h"
 #include "csutil/cmdhelp.h"
 #include "csutil/event.h"
-
-/* Fun fact: should occur after csutil/event.h, otherwise, gcc may report
- * missing csMouseEventHelper symbols. */
-#include <wx/wx.h>
 
 CS_IMPLEMENT_APPLICATION
 
@@ -472,7 +467,7 @@ IMPLEMENT_APP(MyApp)
 {
 #if defined(wxUSE_UNICODE) && wxUSE_UNICODE
   char** csargv;
-  csargv = (char**)cs_malloc(sizeof(char*) * argc);
+  csargv = (char**)malloc(sizeof(char*) * argc);
   for(int i = 0; i < argc; i++) 
   {
     csargv[i] = strdup (wxString(argv[i]).mb_str().data());

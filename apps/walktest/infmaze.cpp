@@ -19,7 +19,6 @@
 #include "cssysdef.h"
 
 #include "cstool/collider.h"
-#include "csutil/csstring.h"
 #include "csutil/flags.h"
 #include "csutil/sparse3d.h"
 #include "iengine/light.h"
@@ -226,6 +225,21 @@ void InfiniteMaze::connect_infinite (int x1, int y1, int z1, int x2, int y2,
   s1->walls_fact_state->RemovePolygon(po1);
   s2->walls_fact_state->RemovePolygon(po2);
   delete[] vertices;
+}
+
+SCF_IMPLEMENT_IBASE (InfPortalCS)
+  SCF_IMPLEMENTS_INTERFACE (iPortalCallback)
+SCF_IMPLEMENT_IBASE_END
+
+InfPortalCS::InfPortalCS ()
+{
+  SCF_CONSTRUCT_IBASE (0);
+  lviews = 0;
+}
+
+InfPortalCS::~InfPortalCS ()
+{
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool InfPortalCS::Traverse (iPortal* portal, iBase* context)

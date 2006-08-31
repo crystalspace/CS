@@ -22,17 +22,17 @@
 
 #include "csgfx/imagebase.h"
 #include "csgfx/rgbpixel.h"
-#include "csutil/scf_implementation.h"
 
-class SkinImage : public scfImplementationExt0<SkinImage, csImageBase>
+class SkinImage : public csImageBase
 {
 protected:
   void* Image;
   csRGBpixel Palette[256];
   int Width, Height, Size;
 public:
+  SCF_DECLARE_IBASE;
   SkinImage(void* Data, const void* Pal, int w, int h);
-  virtual ~SkinImage () { }
+  virtual ~SkinImage () { SCF_DESTRUCT_IBASE(); }
   virtual const void *GetImageData ();
   virtual int GetWidth () const;
   virtual int GetHeight () const;
@@ -41,3 +41,4 @@ public:
 };
 
 #endif // __M2S_IMG_H__
+

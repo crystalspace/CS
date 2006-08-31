@@ -25,7 +25,7 @@
 #include "csgfx/bakekeycolor.h"
 #include "csgfx/imagemanipulate.h"
 #include "csgfx/imagetools.h"
-#include "csgfx/imagememory.h"
+#include "csgfx/memimage.h"
 #include "csqsqrt.h"
 #include "cstool/initapp.h"
 #include "csutil/cfgfile.h"

@@ -75,7 +75,7 @@ bool AppMazing::OnKeyboard(iEvent& ev)
   return false;
 }
 
-bool AppMazing::OnInitialize(int /*argc*/, char* /*argv*/[])
+bool AppMazing::OnInitialize(int argc, char* argv[])
 {
   iObjectRegistry* r = GetObjectRegistry();
 

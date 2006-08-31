@@ -325,6 +325,7 @@ namespace lighter
 
     genFact->SetVertexCount ((int)vertexData.vertexArray.GetSize ());
 
+    csTriangle *tris = genFact->GetTriangles ();
     csVector3 *verts = genFact->GetVertices ();
     csVector2 *textureUV = genFact->GetTexels ();
     csRef<csRenderBuffer> lightmapBuffer = csRenderBuffer::CreateRenderBuffer (

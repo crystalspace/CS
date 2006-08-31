@@ -8,6 +8,8 @@ chronological order.
 
 This file describes the history of the SoC imposter branch.
 
+31-Aug-2006
+	- Fossi reverts broken merge
 21-Aug-2006
 	- Fossi changed some details and improved update detection
 	- Final SoC version

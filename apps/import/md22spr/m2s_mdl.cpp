@@ -28,7 +28,6 @@
 #include "m2s_pal.h"
 #include "m2s_img.h"
 #include "csutil/csendian.h"
-#include "csutil/csstring.h"
 #include "csutil/sysfunc.h"
 #include "iutil/databuff.h"
 #include "igraphic/imageio.h"

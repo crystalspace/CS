@@ -122,7 +122,7 @@ csRef < iDocumentNode > MD32spr::CreateValueNodeAsFloat(csRef <
 MD3Model::MD3Model(iObjectRegistry * object_reg)
 {
   MD3Model::object_reg = object_reg;
-  animInfo = (AnimInfo *) cs_malloc(sizeof(AnimInfo) * (int) NUM_ELEMENTS);
+  animInfo = (AnimInfo *) malloc(sizeof(AnimInfo) * (int) NUM_ELEMENTS);
   for (int i = 0; i < NUM_ACTIONS; i++) {
     animInfo[i].action = (Actions) i;
     animInfo[i].startFrame = -1;
@@ -232,8 +232,8 @@ void MD32spr::Main()
     scaleFactor = atof(cmdline->GetOption("scale"));
   }
 
-  fileName = (char *) cs_malloc(sizeof(char) * name.Length() + 1);
-  dirName = (char *) cs_malloc(sizeof(char) * name.Length() + 1);
+  fileName = (char *) malloc(sizeof(char) * name.Length() + 1);
+  dirName = (char *) malloc(sizeof(char) * name.Length() + 1);
 
   /*
      splitpath(name.GetData(), dirName, name.Length(), fileName, name.Length());
@@ -393,7 +393,7 @@ bool MD3Model::ReadHeader(char **buf)
 {
   char *bufPtr = *buf;
   /* The header is 108 bytes long... */
-  header = (md3Header *) cs_malloc(sizeof(md3Header));
+  header = (md3Header *) malloc(sizeof(md3Header));
   memcpy(header, bufPtr, sizeof(md3Header));
   //csPrintf("%c%c%c%c\n", header->ID[0], header->ID[1], 
   // header->ID[2], header->ID[3]);
@@ -475,17 +475,17 @@ bool MD3Model::LoadMD3()
    *
    */
   /*
-     bones = (md3Bone*)cs_malloc(sizeof(md3Bone) * header->numFrames);
+     bones = (md3Bone*)malloc(sizeof(md3Bone) * header->numFrames);
      memcpy(bones, bufPtr, sizeof(md3Bone) * header->numFrames);
    */
   tags =
-    (md3Tag *) cs_malloc(sizeof(md3Tag) * header->numFrames *
+    (md3Tag *) malloc(sizeof(md3Tag) * header->numFrames *
 		      header->numTags);
 
   memcpy(tags, (bufPtr + header->tagStart),
 	 sizeof(md3Tag) * header->numFrames * header->numTags);
 
-  meshes = (md3Mesh *) cs_malloc(sizeof(md3Mesh) * header->numMeshes);
+  meshes = (md3Mesh *) malloc(sizeof(md3Mesh) * header->numMeshes);
 
   size_t memOffset =
     header->tagStart +
@@ -493,33 +493,33 @@ bool MD3Model::LoadMD3()
   size_t dynOffset = memOffset;
 
   for (i = 0; i < header->numMeshes; i++) {
-    meshes[i].meshHeader = (md3MeshHeader *) cs_malloc(sizeof(md3MeshHeader));
+    meshes[i].meshHeader = (md3MeshHeader *) malloc(sizeof(md3MeshHeader));
     memcpy(meshes[i].meshHeader, (bufPtr + dynOffset),
 	   sizeof(md3MeshHeader));
     dynOffset += meshes[i].meshHeader->headerSize;
 
     meshes[i].skins =
-      (md3Skin *) cs_malloc(sizeof(md3Skin) * meshes[i].meshHeader->numSkins);
+      (md3Skin *) malloc(sizeof(md3Skin) * meshes[i].meshHeader->numSkins);
     memcpy(meshes[i].skins, (bufPtr + dynOffset),
 	   sizeof(md3Skin) * meshes[i].meshHeader->numSkins);
     dynOffset += sizeof(md3Skin) * meshes[i].meshHeader->numSkins;
 
     meshes[i].triangles =
-      (md3Triangle *) cs_malloc(sizeof(md3Triangle) *
+      (md3Triangle *) malloc(sizeof(md3Triangle) *
 			     meshes[i].meshHeader->numTriangles);
     memcpy(meshes[i].triangles,
 	   (bufPtr + memOffset + meshes[i].meshHeader->triangleStart),
 	   sizeof(md3Triangle) * meshes[i].meshHeader->numTriangles);
 
     meshes[i].texCoords =
-      (md3TexCoord *) cs_malloc(sizeof(md3TexCoord) *
+      (md3TexCoord *) malloc(sizeof(md3TexCoord) *
 			     meshes[i].meshHeader->numVertices);
     memcpy(meshes[i].texCoords,
 	   (bufPtr + memOffset + meshes[i].meshHeader->texCoordStart),
 	   sizeof(md3TexCoord) * meshes[i].meshHeader->numVertices);
 
     meshes[i].vertices =
-      (md3Vertices *) cs_malloc(sizeof(md3Vertices) *
+      (md3Vertices *) malloc(sizeof(md3Vertices) *
 			     meshes[i].meshHeader->numVertices *
 			     meshes[i].meshHeader->numMeshFrames);
     memcpy(meshes[i].vertices,
@@ -582,7 +582,7 @@ bool MD32spr::LoadAnimation(char *animFile)
   csRef < iDataBuffer > buf(vfs->ReadFile(animFile));
   DataBuffer dataBuf(**buf, fileSz);
   lineLen = dataBuf.GetMaxLineLength();
-  line = (char *) cs_malloc(sizeof(char) * lineLen);
+  line = (char *) malloc(sizeof(char) * lineLen);
   char junk[4], name[15];
   while (!dataBuf.eof()) {
     dataBuf.GetLine(line);

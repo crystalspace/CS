@@ -37,15 +37,15 @@ public:
 		switch(info->GetIntArg(0))
 		{
 			case PVE_FIRST:
-				picview->LoadNextImage (true, 1);
+				picview->LoadNextImage (1, -1);
 			break;
 			
 			case PVE_PREV:
-				picview->LoadNextImage (false, -1);
+				picview->LoadNextImage (0, -1);
 			break;
 			
 			case PVE_NEXT:
-				picview->LoadNextImage (false, 1);
+				picview->LoadNextImage (0, 1);
 			break;
 			
 			case PVE_QUIT:
@@ -54,7 +54,7 @@ public:
 			
 			case PVE_SCALE:
 				picview->FlipScale();
-				picview->LoadNextImage (false, 0);
+				picview->LoadNextImage (0, 0);
 			break;							
 		}	
 	}	
@@ -71,10 +71,9 @@ CS_IMPLEMENT_APPLICATION
 
 PicView::PicView ()
 {
-  SetApplicationName ("CrystalSpace.PicView");
+  SetApplicationName ("PicView");
   pic = 0;
   scale = false;
-  cur_idx=0;
 }
 
 PicView::~PicView ()
@@ -215,11 +214,11 @@ void PicView::CreateGui ()
 
   picview_events = aws->CreateScriptObject("picView", new onPicViewEvent(this));
   
-  picview_events->SetProp("cmdFirst", (int32)PVE_FIRST);
-  picview_events->SetProp("cmdPrev", (int32)PVE_PREV);
-  picview_events->SetProp("cmdNext", (int32)PVE_NEXT);
-  picview_events->SetProp("cmdQuit", (int32)PVE_QUIT);
-  picview_events->SetProp("cmdScale", (int32)PVE_SCALE);  
+  picview_events->SetProp("cmdFirst", PVE_FIRST);
+  picview_events->SetProp("cmdPrev", PVE_PREV);
+  picview_events->SetProp("cmdNext", PVE_NEXT);
+  picview_events->SetProp("cmdQuit", PVE_QUIT);
+  picview_events->SetProp("cmdScale", PVE_SCALE);  
 
   // Load the normal skin.
   if (aws->Load ("/varia/picview.skin.js")==false)
@@ -238,28 +237,27 @@ void PicView::CreateGui ()
   }
 }
 
-void PicView::LoadNextImage (bool rewind, int step)
+void PicView::LoadNextImage (size_t idx, int step)
 {
-  if (rewind) cur_idx = 0; //files->Length ();
   size_t startIdx = cur_idx;
   csRef<iImage> ifile;
   iTextureManager* txtmgr = g3d->GetTextureManager();
 
+  if (idx) cur_idx = idx;
   do
   {
     if ((step < 0) && ((size_t)-step > cur_idx))
       cur_idx = files->Length ()-1;
     else
       cur_idx += step;
-      
     if ((size_t)cur_idx >= files->Length ()) cur_idx = 0;
 
     csRef<iDataBuffer> buf (vfs->ReadFile (files->Get (cur_idx), false));
-    if (!buf) continue;
+    if (!buf) return;
   		
     ifile = imgloader->Load (buf, txtmgr->GetTextureFormat ());
-  }  while (!ifile.IsValid() && (cur_idx != startIdx));
-  
+  }
+  while (!ifile.IsValid() && (cur_idx != startIdx));
   if (!ifile) 
   {
 	  picview_events->Exec("nmp.Show()");

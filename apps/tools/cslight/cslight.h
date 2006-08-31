@@ -21,7 +21,6 @@
 
 #include <stdarg.h>
 #include "ivaria/pmeter.h"
-#include "csutil/scf_implementation.h"
 
 struct iEngine;
 struct iLoader;
@@ -36,8 +35,7 @@ struct iEvent;
 /**
  * Combined graphical and text progress meter.
  */
-class csCsLightProgressMeter :
-  public scfImplementation1<csCsLightProgressMeter, iProgressMeter>
+class csCsLightProgressMeter : public iProgressMeter
 {
 private:
   int granularity;
@@ -51,7 +49,9 @@ public:
   /// Constructs a new progress meter.
   csCsLightProgressMeter (int total = 100);
   /// Destroys the progress meter.
-  virtual ~csCsLightProgressMeter () { }
+  virtual ~csCsLightProgressMeter ();
+
+  SCF_DECLARE_IBASE;
 
   /**
    * Set the tick scale.  Valid values are 1-100, inclusive.  Default is 2.  A
