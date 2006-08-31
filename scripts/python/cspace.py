@@ -696,6 +696,7 @@ class csVector3(_object):
     def Normalize(*args): return _cspace.csVector3_Normalize(*args)
     def IsZero(*args): return _cspace.csVector3_IsZero(*args)
     def UnitAxisClamped(*args): return _cspace.csVector3_UnitAxisClamped(*args)
+    def DominantAxis(*args): return _cspace.csVector3_DominantAxis(*args)
     def __add__(*args): return _cspace.csVector3___add__(*args)
     def __sub__(*args): return _cspace.csVector3___sub__(*args)
     def __mul__(*args): return _cspace.csVector3___mul__(*args)

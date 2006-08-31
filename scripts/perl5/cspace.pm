@@ -947,6 +947,7 @@ sub new {
 *Normalize = *cspacec::csVector3_Normalize;
 *IsZero = *cspacec::csVector3_IsZero;
 *UnitAxisClamped = *cspacec::csVector3_UnitAxisClamped;
+*DominantAxis = *cspacec::csVector3_DominantAxis;
 *__add__ = *cspacec::csVector3___add__;
 *__subtr__ = *cspacec::csVector3___subtr__;
 *__mult__ = *cspacec::csVector3___mult__;
