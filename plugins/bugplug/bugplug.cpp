@@ -734,12 +734,11 @@ bool csBugPlug::ExecCommand (int cmd, const csString& args)
       break;
     case DEBUGCMD_DUMPENG:
       if (Engine)
-	{
+      {
         Report (CS_REPORTER_SEVERITY_NOTIFY,
 		"Dumping entire engine contents to debug.txt.");
-	  Dump (Engine);
-	  Report (CS_REPORTER_SEVERITY_DEBUG, "");
-	}
+	Dump (Engine);
+      }
       break;
     case DEBUGCMD_DUMPSEC:
       Report (CS_REPORTER_SEVERITY_NOTIFY, "Not implemented yet.");
@@ -751,13 +750,13 @@ bool csBugPlug::ExecCommand (int cmd, const csString& args)
       break;
     case DEBUGCMD_EDGES:
       ToggleG3DState (G3DRENDERSTATE_EDGES, "edge drawing");
-	{
-	  if (Engine && (Engine->GetBeginDrawFlags () & CSDRAW_CLEARSCREEN))
-	    break;
-	  bool v;
-	  v = (G3D->GetRenderState (G3DRENDERSTATE_EDGES) != 0);
-	  if (v && !do_clear) do_clear = true;
-	}
+      {
+	if (Engine && (Engine->GetBeginDrawFlags () & CSDRAW_CLEARSCREEN))
+	  break;
+	bool v;
+	v = (G3D->GetRenderState (G3DRENDERSTATE_EDGES) != 0);
+	if (v && !do_clear) do_clear = true;
+      }
       break;
     case DEBUGCMD_TEXTURE:
       ToggleG3DState (G3DRENDERSTATE_TEXTUREMAPPINGENABLE, "texture mapping");

@@ -191,7 +191,10 @@ public:
    */
   inline csVector3 Rotate (const csVector3& src) const
   {
-    return 2.0f * (src * (w*w - 0.5f) + w*(v%src) + v*(v*src));
+    csQuaternion p (src, 0);
+    csQuaternion q = *this * p;
+    q *= GetConjugate ();
+    return q.v;
   }
 
   /**

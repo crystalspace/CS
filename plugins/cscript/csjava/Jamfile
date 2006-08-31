@@ -19,6 +19,21 @@ if $(JAVA.AVAILABLE) = "yes" && $(ANT) && $(JAVA) && $(JAVAC) && $(CMD.SWIG) &&
       JAVACMD=`echo "$(JAVA)" | $(SED) 's,^\\([A-Za-z]\\):,/\\1,'`
       export JAVACMD" ;
   }
+
+  # The `ant' shell script chokes under Cygwin if JAVA_HOME is not set.
+  # Grab a default value from either JAVACMD or $(JAVA).
+  if $(TARGET.OS) = WIN32
+  {
+    CSJAVA.ANT_PREPARE += "
+      if [ -z \"$JAVA_HOME\" ]; then
+        if [ -n \"$JAVACMD\" ]; then
+          JAVA_HOME=`dirname "$JAVACMD" | $(SED) 's,/bin,,'`
+        else
+          JAVA_HOME=`dirname "$(JAVA)" | $(SED) 's,/bin,,'`
+        fi
+        export JAVA_HOME
+      fi" ;
+  }
   
   if ! $(CSJAVA.MODULE.PREFIX) && ! $(CSJAVA.MODULE.SUFFIX)
   {

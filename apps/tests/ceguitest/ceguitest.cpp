@@ -178,6 +178,11 @@ bool CEGUITest::Application()
   // Load layout and set as root
   cegui->GetSystemPtr ()->setGUISheet(winMgr->loadWindowLayout("ice.layout"));
 
+  // Subscribe to the clicked event for the exit button
+  CEGUI::Window* btn = winMgr->getWindow("Demo7/Window1/Quit");
+  btn->subscribeEvent(CEGUI::PushButton::EventClicked,
+    CEGUI::Event::Subscriber(&CEGUITest::OnExitButtonClicked, this));
+
   // First disable the lighting cache. Our app is simple enough
   // not to need this.
   engine->SetLightingCacheMode (0);
@@ -195,6 +200,14 @@ bool CEGUITest::Application()
 
   Run();
 
+  return true;
+}
+
+bool CEGUITest::OnExitButtonClicked (const CEGUI::EventArgs& e)
+{
+  csRef<iEventQueue> q =
+    CS_QUERY_REGISTRY(GetObjectRegistry(), iEventQueue);
+  if (q.IsValid()) q->GetEventOutlet()->Broadcast(csevQuit(GetObjectRegistry()));
   return true;
 }
 

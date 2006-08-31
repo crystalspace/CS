@@ -244,7 +244,7 @@ Crystal Space Jam-based build system.  If you change a @file{Jamfile} and then
 change the code so that it depends on this change, ports for other platforms 
 will probably break.  This may be unavoidable to some extent, but try to 
 minimize the breakage.  For example, devise a @file{configure} check for the
-feature andwrap the dependent code in an @code{#ifdef} for a definition emitted
+feature and wrap the dependent code in an @code{#ifdef} for a definition emitted
 when the feature was detected, or at least for operating systems that 
 @emph{do} support the change.   This will allow other systems to continue to 
 work without your change.  After committing your change to the @sc{svn} 

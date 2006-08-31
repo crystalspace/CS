@@ -138,10 +138,14 @@ csWin32CustomCursors::CachedCursor csWin32CustomCursors::CreateCursor(
 {
   cswinWindowsVersion ver;
   cswinIsWinNT (&ver);
-  // Use alpha cursor when we can (Win2K+) and the image actually possesses
-  // alpha data
+  HDC DC = GetDC (0);
+  int colorDepth = GetDeviceCaps (DC, BITSPIXEL);
+  ReleaseDC (0, DC);
+  // Use alpha cursor when we can (Win2K+), the image actually possesses
+  // alpha data, and if we have more than 24bpp color depth
   bool doAlpha = (ver >= cswinWin2K)
-    && (image->GetFormat() & CS_IMGFMT_ALPHA);
+    && (image->GetFormat() & CS_IMGFMT_ALPHA)
+    && (colorDepth >= 24);
   // Only use a paletted cursor when we're on NT4.0 or the source image
   // has a palette, but we won't use alpha for it.
   bool doPaletted = (ver == cswinWinNT) 

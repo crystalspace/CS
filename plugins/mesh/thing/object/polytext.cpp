@@ -503,7 +503,7 @@ void csPolyTexture::ShineDynLightMap (csLightPatch *lp,
   invww = 1.0f / (float)ww;
   invhh = 1.0f / (float)hh;
 
-  csRGBpixel* map = finalLM.GetArray();
+  csRGBcolor* map = finalLM.GetArray();
   iLight *light = lp->GetLight ();
 
   int i;
@@ -676,7 +676,7 @@ b:
       float dv1x = float (csLightMap::lightcell_size) * invww;
 
       int uv = sy * new_lw + xR;
-      csRGBpixel* map_uv = map + uv;
+      csRGBcolor* map_uv = map + uv;
 
       // We have to calculate v2 = vv + m_t2w * v1 every time in the
       // loop below. However, v1.z is 0 and v1.y never changes so we
@@ -725,7 +725,7 @@ b:
       }
 
 void csPolyTexture::ShineDynLightMapHorizCosfact (
-	int du, csRGBpixel* map_uv,
+	int du, csRGBcolor* map_uv,
 	csVector3& v2,
 	float dv2x_x, float dv2x_y, float dv2x_z,
 	iLight* light, const csColor& color, float infradius_sq,
@@ -890,7 +890,7 @@ void csPolyTexture::ShineDynLightMapHorizCosfact (
 }
 
 void csPolyTexture::ShineDynLightMapHoriz (
-	int du, csRGBpixel* map_uv,
+	int du, csRGBcolor* map_uv,
 	csVector3& v2,
 	float dv2x_x, float dv2x_y, float dv2x_z,
 	iLight* light, const csColor& color, float infradius_sq,
@@ -1072,12 +1072,18 @@ void csPolyTexture::UpdateFromShadowBitmap (
       bool created = false;
       if (!smap)
       {
-        smap = lm->NewShadowMap (light, tmapping->GetLitWidth (),
-		tmapping->GetLitHeight ());
+        smap = lm->NewShadowMap (light);
 	created = true;
       }
 
-      unsigned char *shadowmap = smap->array;
+      if (!smap->map.IsValid())
+      {
+        int lw = csLightMap::CalcLightMapWidth (tmapping->GetLitWidth ());
+        int lh = csLightMap::CalcLightMapHeight (tmapping->GetLitHeight ());
+        smap->map.AttachNew (new csDataBuffer (lw * lh));
+        memset (smap->map->GetData(), 0, lw*lh);
+      }
+      unsigned char *shadowmap = smap->map->GetUint8();
       bool relevant = shadow_bitmap->UpdateShadowMap (
         shadowmap,
         csLightMap::lightcell_shift,
@@ -1108,11 +1114,9 @@ void csPolyTexture::UpdateFromShadowBitmap (
   }
   else
   {
-    csRGBpixel *lightmap = lm->GetStaticMap ();
+    csRGBcolor *lightmap = lm->GetStaticMap ();
     if (!lightmap)
     {
-      lm->ReAlloc ();
-      lightmap = lm->GetStaticMap ();
       csColor ambient;
       polygon->GetParent ()->GetStaticData ()
       	->thing_type->engine->GetAmbientLight (ambient);
@@ -1120,6 +1124,7 @@ void csPolyTexture::UpdateFromShadowBitmap (
           int(ambient.red * 255.0f),
           int(ambient.green * 255.0f),
           int(ambient.blue * 255.0f));
+      lightmap = lm->GetStaticMap ();
     }
     shadow_bitmap->UpdateLightMap (
         lightmap,
@@ -1460,7 +1465,7 @@ float csShadowBitmap::GetLighting (int lm_u, int lm_v)
 
 
 void csShadowBitmap::UpdateLightMap (
-  csRGBpixel *lightmap,
+  csRGBcolor *lightmap,
   int lightcell_shift,
   float shf_u,
   float shf_v,
@@ -1630,7 +1635,7 @@ void csShadowBitmap::UpdateLightMap (
       float scale = cosinus * light->GetBrightnessAtDistance (d) * lightness;
 
       int l;
-      csRGBpixel &lumel = lightmap[uv];
+      csRGBcolor &lumel = lightmap[uv];
       l = lumel.red + csQround (light_r * scale);
 //    if (l<20) l = 20;
       lumel.red = l < 255 ? l : 255;

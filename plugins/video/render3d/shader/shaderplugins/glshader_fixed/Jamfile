@@ -6,6 +6,8 @@ if $(GL.AVAILABLE) = "yes"
   Plugin glshader_fixed : [ Wildcard *.cpp *.h ] ;
   Includes glshader_ffp.h : $(SUBDIR)/glshader_ffp.tok ;
   Includes glshader_fvp.h : $(SUBDIR)/glshader_fvp.tok ;
+  MsvcExtraFile glshader_fixed : $(SUBDIR)/glshader_ffp.tok ;
+  MsvcExtraFile glshader_fixed : $(SUBDIR)/glshader_fvp.tok ;
   LinkWith glshader_fixed : crystalspace ;
   ExternalLibs glshader_fixed : GL ;
   CompileGroups glshader_fixed : shaders renderers renderall openglrenderer ;

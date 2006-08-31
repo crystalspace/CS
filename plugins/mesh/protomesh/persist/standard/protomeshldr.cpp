@@ -416,7 +416,7 @@ bool csProtoMeshSaver::WriteDown (iBase* obj, iDocumentNode* parent,
     csRef<iDocumentNode> colorNode = 
       paramsNode->CreateNodeBefore (CS_NODE_ELEMENT, 0);
     colorNode->SetValue ("color");
-    synldr->WriteColor (colorNode, &col);
+    synldr->WriteColor (colorNode, col);
 
     // Writedown Material tag
     iMaterialWrapper* mat = mesh->GetMaterialWrapper ();

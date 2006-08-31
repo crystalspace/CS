@@ -290,13 +290,13 @@ bool csLightningFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent,
     csVector3 direct = light->GetDirectional();
     csRef<iDocumentNode> directNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
     directNode->SetValue("directional");
-    synldr->WriteVector(directNode, &direct);
+    synldr->WriteVector(directNode, direct);
 
     //Writedown Origin tag
     csVector3 orig = light->GetOrigin();
     csRef<iDocumentNode> origNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
     origNode->SetValue("origin");
-    synldr->WriteVector(origNode, &orig);
+    synldr->WriteVector(origNode, orig);
 
     //Writedown Vibration tag
     float vibr = light->GetVibration();

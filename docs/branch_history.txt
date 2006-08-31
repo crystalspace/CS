@@ -10,6 +10,7 @@ This file describes the history of the SoC imposter branch.
 
 31-Aug-2006
 	- Fossi reverts broken merge
+	- Fossi successively merges 24379:HEAD from trunk
 21-Aug-2006
 	- Fossi changed some details and improved update detection
 	- Final SoC version

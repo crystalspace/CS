@@ -119,7 +119,7 @@ bool csMeshOnTexture::Render (iMeshWrapper* mesh, iTextureHandle* handle,
   UpdateView (w, h);
 
   // Draw the engine view.
-  g3d->BeginDraw (CSDRAW_3DGRAPHICS | engine->GetBeginDrawFlags () 
+  g3d->BeginDraw (CSDRAW_3DGRAPHICS
     | CSDRAW_CLEARZBUFFER | (persistent ? 0 : CSDRAW_CLEARSCREEN));
   g3d->GetDriver2D()->Clear (
                              color == -1 ?
