@@ -517,7 +517,7 @@ void csImageMemory::ApplyKeyColor ()
   }
 }
 
-bool csImageMemory::Copy (iImage* simage, int x, int y,
+bool csImageMemory::Copy (iImage* simage_, int x, int y,
                           int width, int height )
 {
   if (width<0) return false;
@@ -525,8 +525,15 @@ bool csImageMemory::Copy (iImage* simage, int x, int y,
   if (x+width>GetWidth()) return false;
   if (y+height>GetHeight()) return false;
 
-  if (simage->GetWidth()<width) return false;
-  if (simage->GetHeight()<height) return false;
+  if (simage_->GetWidth()<width) return false;
+  if (simage_->GetHeight()<height) return false;
+
+  csRef<iImage> simage;
+  if (simage_->GetFormat() != Format)
+    simage.AttachNew (new csImageMemory (simage_, Format));
+  else
+    simage = simage_;
+  EnsureImage();
 
   int i;
   if (Alpha)

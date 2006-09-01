@@ -75,7 +75,8 @@ class CS_CRYSTALSPACE_EXPORT csEventNameRegistry :
 
   /**\name iEventNameRegistry implementation
    * @{ */
-  CS_CONST_METHOD csEventID GetID (const csString &name);
+  CS_CONST_METHOD csEventID GetID (const char* name);
+
   CS_CONST_METHOD const char * GetString (const csEventID id);
   static CS_CONST_METHOD const char * GetString (iObjectRegistry *object_reg, 
 						 csEventID id);
@@ -93,7 +94,7 @@ class CS_CRYSTALSPACE_EXPORT csEventNameRegistry :
   static csRef<iEventNameRegistry> GetRegistry(iObjectRegistry *object_reg);
 
   static inline csEventID GetID (iEventNameRegistry *name_reg,
-				 const csString & name) 
+				 const char* name) 
   {
     if (name_reg != 0)
       return name_reg->GetID (name);
@@ -101,7 +102,7 @@ class CS_CRYSTALSPACE_EXPORT csEventNameRegistry :
       return CS_EVENT_INVALID;
   }
   static inline csEventID GetID (iObjectRegistry *object_reg, 
-				 const csString & name)
+				 const char* name)
   {
     csRef<iEventNameRegistry> nameRegistry = 
       csQueryRegistry<iEventNameRegistry> (object_reg);

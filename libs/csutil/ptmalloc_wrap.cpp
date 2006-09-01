@@ -29,7 +29,6 @@ namespace CS
       extern void* ptmalloc (size_t n);
       extern void ptfree (void* p);
       extern void* ptrealloc (void* p, size_t n);
-      extern void* ptmemalign (size_t a, size_t n);
       extern void* ptcalloc (size_t n, size_t s);
     }
   }
@@ -150,10 +149,6 @@ void* ptrealloc (void* P, size_t n)
 #else
   return ptmalloc_::ptrealloc (P, n); 
 #endif
-}
-void* ptmemalign (size_t a, size_t n)
-{ 
-  return ptmalloc_::ptmemalign (a, n); 
 }
 void* ptcalloc (size_t n, size_t s)
 { 

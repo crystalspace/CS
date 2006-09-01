@@ -549,7 +549,7 @@ private:
   csRefArray<csSkeletonSocket> sockets;
   csArray<size_t> parent_bones;
 
-  iSkeletonScriptCallback *script_callback;
+  csRef<iSkeletonScriptCallback> script_callback;
 
   csRefArray<iSkeletonUpdateCallback> update_callbacks;
 

@@ -645,6 +645,7 @@ bool csEngine::HandleEvent (iEvent &Event)
   {
     globalStringSet = CS_QUERY_REGISTRY_TAG_INTERFACE (
       objectRegistry, "crystalspace.shared.stringset", iStringSet);
+    csConfigAccess cfg (objectRegistry, "/config/engine.cfg");
 
     maxAspectRatio = 4096;
     shaderManager = csQueryRegistryOrLoad<iShaderManager> (objectRegistry,
@@ -666,38 +667,21 @@ bool csEngine::HandleEvent (iEvent &Event)
 	CS_QUERY_REGISTRY(objectRegistry, iDocumentSystem));
       if (!docsys.IsValid())
 	docsys.AttachNew (new csTinyDocumentSystem ());
-      csRef<iDocument> shaderDoc = docsys->CreateDocument ();
 
-      VFS->PushDir();
-      VFS->ChDir ("/shader/");
-      char const* shaderPath = "std_lighting.xml";
-      csRef<iFile> shaderFile = VFS->Open (shaderPath, VFS_FILE_READ);
-      if (shaderFile.IsValid())
-      {
-	shaderDoc->Parse (shaderFile, true);
-	defaultShader = shcom->CompileShader (shaderDoc->GetRoot ()->
-	  GetNode ("shader"));
-	shaderManager->RegisterShader (defaultShader);
-      }
-      else
+      const char* shaderPath;
+      shaderPath = cfg->GetStr ("Engine.Shader.Default", 
+        "/shader/std_lighting.xml");
+      defaultShader = LoadShader (docsys, shcom, shaderPath);
+      if (!defaultShader.IsValid())
 	Warn ("Shader %s not available", shaderPath);
 
-      shaderDoc = docsys->CreateDocument ();
-      shaderPath = "std_lighting_portal.xml";
-      shaderFile = VFS->Open (shaderPath, VFS_FILE_READ);
-      if (shaderFile.IsValid())
-      {
-	shaderDoc->Parse (shaderFile, true);
-	csRef<iShader> portal_shader = shcom->CompileShader (
-	  shaderDoc->GetRoot ()->GetNode ("shader"));
-	shaderManager->RegisterShader (portal_shader);
-      }
-      else
+      shaderPath = cfg->GetStr ("Engine.Shader.Portal", 
+        "/shader/std_lighting_portal.xml");
+      csRef<iShader> portal_shader = LoadShader (docsys, shcom, shaderPath);
+      if (!portal_shader.IsValid())
 	Warn ("Shader %s not available", shaderPath);
-      VFS->PopDir();
     }
 
-    csConfigAccess cfg (objectRegistry, "/config/engine.cfg");
     // Now, try to load the user-specified default render loop.
     const char* configLoop = cfg->GetStr ("Engine.RenderLoop.Default", 0);
     if (!override_renderloop.IsEmpty ())
@@ -1558,6 +1542,38 @@ void csEngine::LoadDefaultRenderLoop (const char* fileName)
   csRef<iRenderLoop> newDefault = renderLoopManager->Load (fileName);
   if (newDefault != 0)
     defaultRenderLoop = newDefault;
+}
+
+csRef<iShader> csEngine::LoadShader (iDocumentSystem* docsys,
+                                     iShaderCompiler* shcom,
+                                     const char* filename)
+{
+  csRef<iDocument> shaderDoc = docsys->CreateDocument ();
+  csRef<iShader> shader;
+  csString shaderFn (filename);
+  csString shaderDir;
+
+  size_t slash = shaderFn.FindLast ('/');
+  if (slash == (size_t)-1)
+    shaderDir = "/shader/";
+  else
+  {
+    shaderDir = shaderFn.Slice (0, slash + 1);
+    shaderFn.DeleteAt (0, slash + 1);
+  }
+
+  VFS->PushDir();
+  VFS->ChDir (shaderDir);
+  csRef<iFile> shaderFile = VFS->Open (shaderFn, VFS_FILE_READ);
+  if (shaderFile.IsValid())
+  {
+    shaderDoc->Parse (shaderFile, true);
+    shader = shcom->CompileShader (shaderDoc->GetRoot ()->
+      GetNode ("shader"));
+    if (shader.IsValid()) shaderManager->RegisterShader (shader);
+  }
+  VFS->PopDir();
+  return shader;
 }
 
 void csEngine::AddHalo (iCamera* camera, csLight *Light)

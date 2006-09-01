@@ -1808,6 +1808,7 @@ bool csTextSyntaxService::WriteRenderBuffer (iDocumentNode* node, iRenderBuffer*
 
 csRef<iShader> csTextSyntaxService::ParseShaderRef (iDocumentNode* node)
 {
+  // @@@ FIXME: unify with csLoader::ParseShader()?
   static const char* msgid = "crystalspace.syntax.shaderred";
 
   const char* shaderName = node->GetAttributeValue ("name");
@@ -1863,6 +1864,12 @@ csRef<iShader> csTextSyntaxService::ParseShaderRef (iDocumentNode* node)
       return 0;
     }
     csRef<iShaderCompiler> shcom = shmgr->GetCompiler (type);
+    if (!shcom.IsValid()) 
+    {
+      ReportError (msgid, shaderNode,
+        "Could not get shader compiler '%s'", type);
+      return false;
+    }
     shader = shcom->CompileShader (shaderNode);
     if (shader && (strcmp (shader->QueryObject()->GetName(), shaderName) == 0))
     {

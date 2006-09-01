@@ -43,15 +43,6 @@ CS_IMPLEMENT_PLUGIN
 CS_PLUGIN_NAMESPACE_BEGIN(csOpcode)
 {
 
-SCF_IMPLEMENT_IBASE (csOPCODECollideSystem)
-  SCF_IMPLEMENTS_INTERFACE (iCollideSystem)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csOPCODECollideSystem::Component)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 SCF_IMPLEMENT_FACTORY (csOPCODECollideSystem)
 
 using namespace Opcode;
@@ -86,10 +77,9 @@ void csOPCODECollideSystem::OpcodeReportV (int severity, const char* message,
     severity, "crystalspace.collisiondetection.opcode", message, args);
 }
 
-csOPCODECollideSystem::csOPCODECollideSystem (iBase *pParent)
+csOPCODECollideSystem::csOPCODECollideSystem (iBase *pParent) :
+  scfImplementationType(this, pParent)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
   TreeCollider.SetFirstContact (false);
   TreeCollider.SetFullBoxBoxTest (false);
   TreeCollider.SetFullPrimBoxTest (false);
@@ -101,8 +91,6 @@ csOPCODECollideSystem::csOPCODECollideSystem (iBase *pParent)
 
 csOPCODECollideSystem::~csOPCODECollideSystem ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
-  SCF_DESTRUCT_IBASE ();
   rep_object_reg = 0;
 }
 

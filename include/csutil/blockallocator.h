@@ -1,6 +1,7 @@
 /*
   Crystal Space Generic Object Block Allocator
-  Copyright (C)2005 by Eric sunshine <sunshine@sunshineco.com>
+  Copyright (C) 2005 by Eric Sunshine <sunshine@sunshineco.com>
+	    (C) 2006 by Frank Richter
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -16,22 +17,92 @@
   License along with this library; if not, write to the Free
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
-#ifndef __CSUTIL_BLOCK_ALLOCATOR_H__
-#define __CSUTIL_BLOCK_ALLOCATOR_H__
+#ifndef __CSUTIL_BLOCKALLOCATOR_H__
+#define __CSUTIL_BLOCKALLOCATOR_H__
 
 /**\file
  * Generic Memory Block Allocator
  */
 
-#include "csextern.h"
-#include "csutil/array.h"
-#include "csutil/bitarray.h"
-#include "csutil/sysfunc.h"
+#include "csutil/fixedsizeallocator.h"
 
 #include "csutil/custom_new_disable.h"
 
 /**\addtogroup util_memory
  * @{ */
+
+/**
+ * Block allocator disposal mixin that just destructs an instance.
+ */
+template<typename T>
+class csBlockAllocatorDisposeDelete
+{
+public:
+  /**
+   * Construct with a given block allocator.
+   */
+  template<typename BA>
+  csBlockAllocatorDisposeDelete (const BA&, bool legit)
+  { (void)legit; }
+  /// Destructs the object.
+  void Dispose (void* p) 
+  {
+    ((T*)p)->~T();
+  }
+};
+
+/**
+ * Block allocator disposal mixin that destructs, unless upon final cleanup,
+ * where a warning is emitted stating that objects leaked.
+ */
+template<typename T>
+class csBlockAllocatorDisposeLeaky
+{
+  bool doWarn;
+#ifdef CS_DEBUG
+  const char* parentClass;
+  const void* parent;
+  size_t count;
+#endif
+public:
+#ifdef CS_DEBUG
+  /**
+   * Construct with a given block allocator.
+   * \a legit is a flag that indicates whether a disposal is done on user 
+   * request(true) or due an automatic cleanup(false). In the latter case,
+   * objects are not destructed and a warning is emitted.
+   * \a ba is used for some informational output.
+   */
+  template<typename BA>
+  csBlockAllocatorDisposeLeaky (const BA& ba, bool legit) :
+    doWarn (!legit), parentClass (typeid(BA).name()), parent (&ba),
+    count (0)
+  { 
+  }
+#else
+  template<typename BA>
+  csBlockAllocatorDisposeLeaky (const BA&, bool legit) : doWarn (!legit)
+  { }
+#endif
+  ~csBlockAllocatorDisposeLeaky()
+  {
+#ifdef CS_DEBUG
+    if ((count > 0) && doWarn)
+    {
+      csPrintfErr("%s %p leaked %zu objects.\n", parentClass, (void*)this, 
+        count);
+    }
+#endif
+  }
+  /// Destructs the object, unless in auto-cleanup.
+  void Dispose (void* p) 
+  {
+    if (!doWarn) ((T*)p)->~T();
+#ifdef CS_DEBUG
+    count++;
+#endif
+  }
+};
 
 /**
  * This class implements a memory allocator which can efficiently allocate
@@ -41,11 +112,11 @@
  * any specific allocator can be used for just one type of object (the type for
  * which the template is instantiated).
  * \remarks The objects are properly constructed and destructed.
- * <p>
+ *
  * \remarks Assumes that the class \c T with which the template is instantiated
  *   has a default (zero-argument) constructor. Alloc() uses this constructor
  *   to initialize each vended object.
- * <p>
+ *
  * \remarks Defining the macro CS_BLOCKALLOC_DEBUG will cause freed objects to
  *   be overwritten with '0xfb' bytes. This can be useful to track use of
  *   already freed objects, as they can be more easily recognized (as some
@@ -53,186 +124,26 @@
  * \sa csArray
  * \sa csMemoryPool
  */
-template <class T, class Allocator = CS::Memory::AllocatorMalloc>
-class csBlockAllocator
+template <class T,
+  class Allocator = CS::Memory::AllocatorMalloc, 
+  class ObjectDispose = csBlockAllocatorDisposeDelete<T> >
+class csBlockAllocator : public csFixedSizeAllocator<sizeof (T), Allocator>
 {
 public:
   typedef csBlockAllocator<T, Allocator> ThisType;
   typedef T ValueType;
   typedef Allocator AllocatorType;
 
-protected: // 'protected' allows access by test-suite.
-  struct FreeNode
-  {
-    FreeNode* next;
-  };
-
-  struct BlockKey
-  {
-    uint8 const* addr;
-    size_t blocksize;
-    BlockKey(uint8 const* p, size_t n) : addr(p), blocksize(n) {}
-  };
-
-  struct BlocksWrapper : public Allocator
-  {
-    csArray<uint8*> b;
-  };
-  /// List of allocated blocks; sorted by address.
-  BlocksWrapper blocks;
-  /// Number of elements per block.
-  size_t size;
-  /// Element size; >= sizeof(void*).
-  size_t elsize;
-  /// Size in bytes per block.
-  size_t blocksize;
-  /// Head of the chain of free nodes.
-  FreeNode* freenode;
-  /// Warn about nodes not explicitly freed.
-  bool pedantic;
-  /** 
-   * Flag to ignore calls to Compact() and Free() if they're called recursively
-   * while disposing the entire allocation set. Recursive calls to Alloc() will
-   * signal an assertion failure.
-   */
-  bool insideDisposeAll;
-
-  /**
-   * Comparison function for FindBlock() which does a "fuzzy" search given an
-   * arbitrary address.  It checks if the address falls somewhere within a
-   * block rather than checking if the address exactly matches the start of the
-   * block (which is the only information recorded in blocks[] array).
-   */
-  static int FuzzyCmp(uint8* const& block, BlockKey const& k)
-  {
-    return (block + k.blocksize <= k.addr ? -1 : (block > k.addr ? 1 : 0));
-  }
-
-  /**
-   * Find the memory block which contains the given memory.
-   */
-  size_t FindBlock(void const* m) const
-  {
-    return blocks.b.FindSortedKey(
-      csArrayCmp<uint8*,BlockKey>(BlockKey((uint8*)m, blocksize), FuzzyCmp));
-  }
-
-  /**
-   * Allocate a block and initialize its free-node chain.
-   * \return The returned address is both the reference to the overall block,
-   *   and the address of the first free node in the chain.
-   */
-  uint8* AllocBlock()
-  {
-    uint8* block = (uint8*)blocks.Alloc (blocksize);
-
-    // Build the free-node chain (all nodes are free in the new block).
-    FreeNode* nextfree = 0;
-    uint8* node = block + (size - 1) * elsize;
-    for ( ; node >= block; node -= elsize)
-    {
-      FreeNode* slot = (FreeNode*)node;
-      slot->next = nextfree;
-      nextfree = slot;
-    }
-    CS_ASSERT((uint8*)nextfree == block);
-    return block;
-  }
-
-  /**
-   * Dispose of a block.
-   */
-  void FreeBlock(uint8* p)
-  {
-    blocks.Free (p);
-  }
-
-  /**
-   * Destroy an object, optionally warning if pedanticism is desired.
-   */
-  void DestroyObject (T* p, bool warn, bool invokeDtor = true) const
-  {
-    if (invokeDtor) p->~T();
-    if (warn)
-    {
-#ifdef CS_DEBUG
-      csPrintfErr("NOTIFY: csBlockAllocator(%p) destroying potentially leaked "
-                  "object at %p.\n", (void*)this, (void*)p);
-#endif
-    }
-#ifdef CS_BLOCKALLOC_DEBUG
-    memset (p, 0xfb, elsize);
-#endif
-  }
-
-  /**
-   * Get a usage mask showing all used (1's) and free (0's) nodes in
-   * the entire allocator.
-   */
-  csBitArray GetAllocationMap() const
-  {
-    csBitArray mask(size * blocks.b.GetSize());
-    mask.FlipAllBits();
-    for (FreeNode* p = freenode; p != 0; p = p->next)
-    {
-      size_t const n = FindBlock(p);
-      CS_ASSERT(n != csArrayItemNotFound);
-      size_t const slot = ((uint8*)p - blocks.b[n]) / elsize; // Slot in block.
-      mask.ClearBit(n * size + slot);
-    }
-    return mask;
-  }
-
-  /**
-   * Destroys all living objects and releases all memory allocated by the pool.
-   * \param warn_unfreed If true, in debug mode warn about objects not
-   *   explicitly released via Free().
-   */
-  void DisposeAll(bool warn_unfreed)
-  {
-    insideDisposeAll = true;
-    csBitArray const mask(GetAllocationMap());
-    size_t node = 0;
-    for (size_t b = 0, bN = blocks.b.GetSize(); b < bN; b++)
-    {
-      for (uint8 *p = blocks.b[b], *pN = p + blocksize; p < pN; p += elsize)
-          if (mask.IsBitSet(node++))
-            DestroyObject((T*)p, warn_unfreed);
-      FreeBlock(blocks.b[b]);
-    }
-    blocks.b.DeleteAll();
-    freenode = 0;
-    insideDisposeAll = false;
-  }
-
-  /// Find and allocate a block
-  void* AllocCommon ()
-  {
-    if (insideDisposeAll)
-    {
-      csPrintfErr("ERROR: csBlockAllocator(%p) tried to allocate memory "
-	"while inside DisposeAll()", (void*)this);
-      CS_ASSERT(false);
-    }
-
-    if (freenode == 0)
-    {
-      uint8* p = AllocBlock();
-      blocks.b.InsertSorted(p);
-      freenode = (FreeNode*)p;
-    }
-    void* const node = freenode;
-    freenode = freenode->next;
-    return node;
-  }
-  csBlockAllocator (csBlockAllocator const&);  // Illegal; unimplemented.
-  void operator= (csBlockAllocator const&); 	// Illegal; unimplemented.
+protected:
+  typedef csFixedSizeAllocator<sizeof (T), Allocator> superclass;
+private:
+  void* Alloc (size_t /*n*/) { return 0; }                       // Illegal
+  void* Alloc (void* /*p*/, size_t /*newSize*/) { return 0; }   // Illegal
+  void SetMemTrackerInfo (const char* /*info*/) { }             // Illegal
 public:
   /**
    * Construct a new block allocator.
    * \param nelem Number of elements to store in each allocation unit.
-   * \param warn_unfreed If true, in debug mode warn about objects not
-   *   explicitly released via Free().
    * \remarks Bigger values for \c nelem will improve allocation performance,
    *   but at the cost of having some potential waste if you do not add
    *   \c nelem elements to each pool.  For instance, if \c nelem is 50 but you
@@ -249,16 +160,8 @@ public:
    *   true in order to receive diagnostics about objects which you have
    *   forgotten to release explicitly via manual invocation of Free().
    */
-  csBlockAllocator(size_t nelem = 32, bool warn_unfreed = false) :
-    size(nelem), elsize(sizeof(T)), freenode(0), pedantic(warn_unfreed),
-    insideDisposeAll(false)
+  csBlockAllocator(size_t nelem = 32) : superclass (nelem)
   {
-#ifdef CS_MEMORY_TRACKER
-    blocks.SetMemTrackerInfo (typeid(*this).name());
-#endif
-    if (elsize < sizeof (FreeNode))
-      elsize = sizeof (FreeNode);
-    blocksize = elsize * size;
   }
 
   /**
@@ -266,7 +169,8 @@ public:
    */
   ~csBlockAllocator()
   {
-    DisposeAll(pedantic);
+    ObjectDispose dispose (*this, false);
+    DisposeAll (dispose);
   }
 
   /**
@@ -276,52 +180,8 @@ public:
    */
   void Empty()
   {
-    DisposeAll(false);
-  }
-
-  /**
-   * Compact the block allocator so that all blocks that are completely unused
-   * are removed. The blocks that still contain elements are not touched.
-   */
-  void Compact()
-  {
-    if (insideDisposeAll) return;
-
-    bool compacted = false;
-    csBitArray mask(GetAllocationMap());
-    for (size_t b = blocks.b.GetSize(); b-- > 0; )
-    {
-      size_t const node = b * size;
-      if (!mask.AreSomeBitsSet(node, size))
-      {
-        FreeBlock(blocks.b[b]);
-        blocks.b.DeleteIndex(b);
-        mask.Delete(node, size);
-        compacted = true;
-      }
-    }
-
-    // If blocks were deleted, then free-node chain broke, so rebuild it.
-    if (compacted)
-    {
-      FreeNode* nextfree = 0;
-      size_t const bN = blocks.b.GetSize();
-      size_t node = bN * size;
-      for (size_t b = bN; b-- > 0; )
-      {
-        uint8* const p0 = blocks.b[b];
-        for (uint8* p = p0 + (size - 1) * elsize; p >= p0; p -= elsize)
-        {
-          if (!mask.IsBitSet(--node))
-          {
-            FreeNode* slot = (FreeNode*)p;
-            slot->next = nextfree;
-            nextfree = slot;
-          }
-        }
-      }
-      freenode = nextfree;
-    }
+    ObjectDispose dispose (*this, true);
+    DisposeAll (dispose);
   }
 
   /**
@@ -330,74 +190,32 @@ public:
    */
   T* Alloc ()
   {
-    return new (AllocCommon()) T;
-  }
-
-  /**
-   * Allocate a new object. 
-   * Only the allocated memory is returned, no construction (as done by 
-   * Alloc()) is done. This is mostly useful for custom \c new implementations.
-   * \remarks Since by default all still-allocated objects are properly 
-   *   destructed upon destruction of the allocator, you should never leave an 
-   *   allocated object unconstructed!
-   */
-  void* AllocUninit ()
-  {
-    return AllocCommon();
+    return new (superclass::Alloc()) T;
   }
 
   /**
    * Deallocate an object. It is safe to provide a null pointer.
    * \param p Pointer to deallocate.
-   * \param invokeDtor If true, the destructor of \a T is invoked. If false, 
-   *   the memory is only freed. This is mostly useful for custom 
-   *   \c delete implementations.
    */
-  void Free (T* p, bool invokeDtor = true)
+  void Free (T* p)
   {
-    if (p != 0 && !insideDisposeAll)
-    {
-      CS_ASSERT(FindBlock(p) != csArrayItemNotFound);
-      DestroyObject (p, false, invokeDtor);
-      FreeNode* f = (FreeNode*)p;
-      f->next = freenode;
-      freenode = f;
-    }
-  }
-  /**
-   * Deallocate an object. It is safe to provide a null pointer.
-   * \param p Pointer to deallocate.
-   * \remarks Intended as a counterpart to AllocUninit().
-   * \remarks Does not invoke the destructor for p, so before freeing an 
-   *  object, make sure it is properly destructed.
-   */
-  void FreeUninit (void* p)
-  {
-    Free ((T*)p, false);
+    ObjectDispose dispose (*this, true);
+    superclass::Free (dispose, p);
   }
   /**
    * Try to delete an object. Usage is the same as Free(), the difference
    * being that \c false is returned if the deallocation failed (the reason
    * is most likely that the memory was not allocated by the allocator).
    */
-  bool TryFree (T* p, bool invokeDtor = true)
+  bool TryFree (T* p)
   {
-    if (p != 0 && !insideDisposeAll)
-    {
-      if (FindBlock(p) == csArrayItemNotFound) return false;
-      DestroyObject(p, false, invokeDtor);
-      FreeNode* f = (FreeNode*)p;
-      f->next = freenode;
-      freenode = f;
-    }
-    return true;
+    ObjectDispose dispose (*this, true);
+    return superclass::TryFree (dispose, p);
   }
-  /// Query number of elements per block.
-  size_t GetBlockElements() const { return size; }
 };
 
 /** @} */
 
 #include "csutil/custom_new_enable.h"
 
-#endif // __CSUTIL_BLOCK_ALLOCATOR_H__
+#endif // __CSUTIL_BLOCKALLOCATOR_H__

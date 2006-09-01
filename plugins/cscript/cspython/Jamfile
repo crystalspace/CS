@@ -88,6 +88,7 @@ if $(PYTHON.AVAILABLE) = "yes"
   #--------
   local desc = "pure Python module" ;
   local pythmod = _cspace ;
+  local pythmodclean ;
 
   if [ Property build : projgen ]
   {
@@ -127,6 +128,16 @@ if $(PYTHON.AVAILABLE) = "yes"
     MakeLocate $(pythmod) : $(LOCATE.TARGETS) ;
     Depends $(pythmod) : $(pythmodobj) ;
     LinkPlugin $(pythmod) : $(pythmodobj) ;
+    
+    if $(LINK.DEBUG.INFO.SEPARATE) = "yes"
+    {
+      local debugfile = [ SplitDebugInfo $(pythmod) ] ;
+      pythmodclean += $(debugfile) ;
+      NoCare $(debugfile) ;
+      Depends install_plugin : [ DoInstall $(debugfile) : 
+				  $(appdatadir) bindings python : 
+				  $(INSTALL_DATA) ] ;
+    }
   }
 
   rule InstallPythmod
@@ -138,7 +149,7 @@ if $(PYTHON.AVAILABLE) = "yes"
 
   Always pythmodclean ;
   NotFile pythmodclean ;
-  Clean pythmodclean : $(pythmod) $(pythmodobj) ;
+  Clean pythmodclean : $(pythmod) $(pythmodobj) $(pythmodclean) ;
   Depends clean : pythmodclean ;
 
 

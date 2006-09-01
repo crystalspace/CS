@@ -95,21 +95,18 @@ struct SliceAllocator
 {
   static const size_t valueSetsPerSlice = 32;
   static const size_t sliceSize = valueSetsPerSlice * sizeof (ValueSet);
-  typedef uint8 SliceType[sliceSize];
 
-  typedef csBlockAllocator<SliceType, TempHeapAlloc> BlockAlloc;
+  typedef csFixedSizeAllocator<sliceSize, TempHeapAlloc> BlockAlloc;
   CS_DECLARE_STATIC_CLASSVAR_REF (sliceAlloc, SliceAlloc, 
     BlockAlloc);
 
   static inline uint8* Alloc (size_t blocksize) 
   {
-    (void)blocksize; // Pacify compiler warnings
-    CS_ASSERT(blocksize == sliceSize);
-    return (uint8*)SliceAlloc().AllocUninit();
+    return (uint8*)SliceAlloc().Alloc (blocksize);
   }
   static inline void Free (uint8* p)
   {
-    SliceAlloc().Free ((SliceType*)p);
+    SliceAlloc().Free (p);
   }
   static void CompactAllocator()
   {

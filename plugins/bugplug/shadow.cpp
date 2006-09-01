@@ -28,19 +28,9 @@
 #include "ivideo/graph3d.h"
 #include "ivideo/graph2d.h"
 
-SCF_IMPLEMENT_IBASE (csShadow)
-  SCF_IMPLEMENTS_INTERFACE (iMeshObject)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iObjectModel)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csShadow::ObjectModel)
-  SCF_IMPLEMENTS_INTERFACE (iObjectModel)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-csShadow::csShadow ()
+csShadow::csShadow () :
+  scfImplementationType(this)
 {
-  SCF_CONSTRUCT_IBASE (0);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObjectModel);
   wrap = 0;
   do_bbox = true;
   do_rad = true;
@@ -50,8 +40,6 @@ csShadow::csShadow ()
 csShadow::~csShadow ()
 {
   CS_ASSERT (wrap == 0);
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiObjectModel);
-  SCF_DESTRUCT_IBASE ();
 }
 
 csRenderMesh** csShadow::GetRenderMeshes (int& n, iRenderView* rview,

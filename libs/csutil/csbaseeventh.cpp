@@ -43,7 +43,7 @@ csBaseEventHandler::csBaseEventHandler() :
 void csBaseEventHandler::Initialize (iObjectRegistry *r)
 {
   object_registry = r;
-  self = csEventHandlerRegistry::GetID (r, eventh);
+  self = csEventHandlerRegistry::RegisterID (r, eventh);
   FrameEvent = csevFrame (r);
   PreProcess = csevPreProcess (r);
   Process = csevProcess (r);
