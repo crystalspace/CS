@@ -1320,7 +1320,7 @@ bool csGenmeshMeshObject::HitBeamObject (const csVector3& start,
   }
   else
   {
-    iMaterialWrapper* mat;
+    iMaterialWrapper* mat = 0;
     for (size_t s = 0; s < sm.GetSize(); s++)
     {
       iRenderBuffer* indexBuffer = sm[s]->GetIndices();

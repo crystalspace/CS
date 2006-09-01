@@ -468,7 +468,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ParticlesLoader)
 
     csRef<iParticleEffector> effector;
     csVector3 force (0.0f), acceleration (0.0f);
-    float randomAcc (0.0f), maxAge (1.0f);
+    float randomAcc (0.0f);
     csArray<float> timeList;
     csArray<csColor> colorList;
 

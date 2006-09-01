@@ -71,9 +71,9 @@ public:
     dst++;
   }
 public:
-  VertexOutputPersp () : 
+  VertexOutputPersp () 
 #ifdef CS_DEBUG
-    out(0)
+    : out(0)
 #endif
     {}
 

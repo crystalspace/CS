@@ -1382,8 +1382,6 @@ void csTerrainObject::InitializeDefault (bool clear)
 
 char* csTerrainObject::GenerateCacheName ()
 {
-  const csBox3& b = GetObjectBoundingBox ();
-
   csMemFile mf;
   mf.Write ("bruteblock", 8);
   uint32 l;
