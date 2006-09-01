@@ -6,7 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
-31-Aug-2005
+2-Sep-2006
+	- Marten fixed [ticket:7], invalid alpha modifier in shader 
+	  light.xml technique 150.
+31-Aug-2006
 	- Marten updated version numbers on trunk to reflect the fact that
 	  the 1.0 branch have been created.
 30-Aug-2006
