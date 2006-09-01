@@ -62,11 +62,29 @@ namespace CS
     csRef<iView> shotView;
     
     /**
+     * Draw the view, set up to cover the current tile.
+     */
+    virtual bool DrawTile3D (uint tileLeft, uint tileTop,
+      uint tileRight, uint tileBottom);
+    /**
+     * Take and crop the actual screenshot.
+     */
+    virtual csRef<iImage> TakeScreenshot (uint tileLeft, uint tileTop,
+      uint tileRight, uint tileBottom);
+    /**
      * Shoot the image for a single tile. The area of the tile on the
      * ubershot is given by the parameters.
+     *
+     * Any custom implementations should call DrawTile3D(), do any custom
+     * drawing, and finally call TakeScreenshot().
      */
     virtual csRef<iImage> ShootTile (uint tileLeft, uint tileTop,
-      uint tileRight, uint tileBottom);
+      uint tileRight, uint tileBottom)
+    {
+      if (!DrawTile3D (tileLeft, tileTop, tileRight, tileBottom))
+        return 0;
+      return TakeScreenshot (tileLeft, tileTop, tileRight, tileBottom);
+    }
   
     /**
      * Post-process the final image (e.g. add watermark). By default does

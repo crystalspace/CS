@@ -1,5 +1,18 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <shader compiler="xmlshader" name="std_lighting_detail">
+
+  <!-- See also std_lighting.xml -->
+  <!--?Include /shader/snippets/cg-base.inc ?>
+  
+  <?Include /shader/lighting/cg-light-classic.inc ?>
+  <?Include /shader/surface/cg-surface-classic.inc ?>
+  <?Include /shader/surface/cg-surface-detail.inc ?>
+  <?Include /shader/fog/cg-sectorfog.inc ?>
+  
+  <technique priority="300">
+    <?Include /shader/snippets/std_lighting-pass.inc ?>
+  </technique-->
+
   <technique priority="200">
     <tag>detail_texture</tag>
     <pass>
@@ -16,7 +29,7 @@
       <vp plugin="glfixed">
         <fixedvp>
           <texmatrix layer="detail">
-            <scale type="shadervar">detail texture scale</scale>
+            <scale type="shadervar">tex detail scale</scale>
           </texmatrix>
         </fixedvp>
       </vp>
@@ -109,7 +122,7 @@
       <vp plugin="glfixed">
         <fixedvp>
           <texmatrix layer="0">
-            <scale type="shadervar">detail texture scale</scale>
+            <scale type="shadervar">tex detail scale</scale>
           </texmatrix>
         </fixedvp>
       </vp>
@@ -152,7 +165,7 @@
       <vp plugin="glfixed">
         <fixedvp>
           <texmatrix layer="0">
-            <scale type="shadervar">detail texture scale</scale>
+            <scale type="shadervar">tex detail scale</scale>
           </texmatrix>
         </fixedvp>
       </vp>

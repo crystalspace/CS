@@ -20,7 +20,7 @@
 #define __CS_IVARIA_REPORTER_H__
 
 #include "csutil/ansicommand.h"
-#include "csutil/scf.h"
+#include "csutil/scf_interface.h"
 #include "csutil/sysfunc.h"
 #include "csutil/util.h"
 #include "iutil/objreg.h"
@@ -94,8 +94,6 @@ struct iReporterListener : public virtual iBase
   	const char* description) = 0;
 };
 
-SCF_VERSION (iReporterIterator, 0, 0, 1);
-
 /**
  * An iterator to iterate over all messages in the reporter.
  * 
@@ -103,8 +101,10 @@ SCF_VERSION (iReporterIterator, 0, 0, 1);
  * - iReporter::GetMessageIterator()
  *   
  */
-struct iReporterIterator : public iBase
+struct iReporterIterator : public virtual iBase
 {
+  SCF_INTERFACE(iReporterIterator, 2, 0, 0);
+
   /// Are there more elements?
   virtual bool HasNext () = 0;
   /**
@@ -129,8 +129,6 @@ struct iReporterIterator : public iBase
   virtual const char* GetMessageDescription () const = 0;
 };
 
-SCF_VERSION (iReporter, 0, 1, 0);
-
 /**
  * This is the interface for the error/message reporter plugin.
  * Note. This plugin does not actually print out or display
@@ -151,8 +149,10 @@ SCF_VERSION (iReporter, 0, 1, 0);
  * - csReporterHelper
  *   
  */
-struct iReporter : public iBase
+struct iReporter : public virtual iBase
 {
+  SCF_INTERFACE(iReporter, 2, 0, 0);
+
   /**
    * Report something. The given message ID should be formed like:
    * 'crystalspace.{source}.{type}.{detail}'. Example:

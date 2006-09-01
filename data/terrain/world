@@ -73,6 +73,7 @@
       <texture>andrew_marble4.jpg</texture>
       <shadervar name="tex normal" type="texture">blobbyDOT3.png</shadervar>
       <shadervar name="texture scale" type="vector2">16,16</shadervar>
+      <shadervar name="normal scale" type="vector2">64,64</shadervar>
       <!-- <shader type="diffuse">splatting_bump</shader> -->
       <shader type="terrain splat">splatting_scattering</shader>
     </material>

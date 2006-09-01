@@ -214,7 +214,8 @@ todo
 @cindex @file{viewmesh}
 @cindex Applications, @file{viewmesh}
 @item viewmesh
-todo
+This tool can help preview Crystal Space models and libraries.
+@xref{ViewMesh}.
 
 @cindex @file{vsh}
 @cindex Applications, @file{vsh}

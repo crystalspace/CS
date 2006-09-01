@@ -24,21 +24,24 @@
 #include "csutil/strhash.h"
 #include "csutil/csstring.h"
 
-class csPtSkyType : public csBaseProctexType
+class csPtSkyType :
+  public scfImplementationExt0<csPtSkyType, csBaseProctexType>
 {
 public:
   csPtSkyType (iBase *p);
   virtual csPtr<iTextureFactory> NewFactory();
 };
 
-class csPtSkyFactory : public csBaseTextureFactory
+class csPtSkyFactory :
+  public scfImplementationExt0<csPtSkyFactory, csBaseTextureFactory>
 {
 public:
   csPtSkyFactory (iTextureType* p, iObjectRegistry* object_reg);
   virtual csPtr<iTextureWrapper> Generate ();
 };
 
-class csPtSkyLoader : public csBaseProctexLoader
+class csPtSkyLoader :
+  public scfImplementationExt0<csPtSkyLoader, csBaseProctexLoader>
 {
   csStringHash tokens;
 //#define CS_TOKEN_ITEM_FILE "plugins/proctex/standard/sky.tok"
@@ -50,7 +53,8 @@ public:
     iStreamSource*, iLoaderContext* ldr_context, iBase* context);
 };
 
-class csPtSkySaver : public csBaseProctexSaver
+class csPtSkySaver :
+  public scfImplementationExt0<csPtSkySaver, csBaseProctexSaver>
 {
 public:
   csPtSkySaver(iBase *p);

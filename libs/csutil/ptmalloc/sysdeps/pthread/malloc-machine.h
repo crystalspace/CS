@@ -161,7 +161,7 @@ static inline void sharemem_close (void* p, size_t bytes)
   munmap (p, bytes);
 }
 
-static inline void sharemem_destroy ()
+static inline void sharemem_destroy (void)
 {
   char buf[64];
   

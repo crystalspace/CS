@@ -126,12 +126,7 @@ AC_DEFUN([CS_CHECK_OPENGL],
 	CS_CREATE_TUPLE([],[],[-lgl]) \
 	$cs_mesa_gl], [],
 	[CS_EMIT_BUILD_RESULT([cs_cv_libgl], [GL])], [], [],
-	[$cs_gl_plat_cflags], [$cs_gl_plat_lflags], [$cs_gl_plat_libs])
-    # Extract the GL library name
-    AS_IF([test "x$cs_cv_libgl" = "xyes"],
-        [gl_plat_libs_trimmed=CS_TRIM([$cs_gl_plat_libs])
-        libgl_name=`echo $cs_cv_libgl_libs | sed "s/$gl_plat_libs_trimmed//" | sed 's/-l//'`
-        CS_EMIT_BUILD_PROPERTY([GL.LIBNAME], [$libgl_name])])])
+	[$cs_gl_plat_cflags], [$cs_gl_plat_lflags], [$cs_gl_plat_libs])])
 
 
 #------------------------------------------------------------------------------

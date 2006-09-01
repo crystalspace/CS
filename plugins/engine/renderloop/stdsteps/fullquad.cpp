@@ -46,8 +46,8 @@ SCF_IMPLEMENT_FACTORY(csFullScreenQuadRSLoader)
 
 //---------------------------------------------------------------------------
 
-csFullScreenQuadRSType::csFullScreenQuadRSType (iBase* p)
-	: csBaseRenderStepType (p)
+csFullScreenQuadRSType::csFullScreenQuadRSType (iBase* p) :
+  scfImplementationType (this, p)
 {
 }
 
@@ -59,8 +59,8 @@ csPtr<iRenderStepFactory> csFullScreenQuadRSType::NewFactory()
 
 //---------------------------------------------------------------------------
 
-csFullScreenQuadRSLoader::csFullScreenQuadRSLoader (iBase* p)
-	: csBaseRenderStepLoader (p)
+csFullScreenQuadRSLoader::csFullScreenQuadRSLoader (iBase* p) :
+  scfImplementationType (this, p)
 {
   InitTokenTable (tokens);
 }
@@ -201,20 +201,15 @@ bool csFullScreenQuadRSLoader::ParseStep (iDocumentNode* node,
 
 //---------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE(csFullScreenQuadRenderStepFactory);
-  SCF_IMPLEMENTS_INTERFACE(iRenderStepFactory);
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 csFullScreenQuadRenderStepFactory::csFullScreenQuadRenderStepFactory (
-  iObjectRegistry* object_reg)
+  iObjectRegistry* object_reg) :
+  scfImplementationType (this)
 {
-  SCF_CONSTRUCT_IBASE(0);
   csFullScreenQuadRenderStepFactory::object_reg = object_reg;
 }
 
 csFullScreenQuadRenderStepFactory::~csFullScreenQuadRenderStepFactory ()
 {
-  SCF_DESTRUCT_IBASE();
 }
 
 csPtr<iRenderStep> csFullScreenQuadRenderStepFactory::Create ()
@@ -225,15 +220,10 @@ csPtr<iRenderStep> csFullScreenQuadRenderStepFactory::Create ()
 
 //---------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE(csFullScreenQuadRenderStep);
-  SCF_IMPLEMENTS_INTERFACE(iRenderStep);
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 csFullScreenQuadRenderStep::csFullScreenQuadRenderStep (
-  iObjectRegistry* object_reg)
+  iObjectRegistry* object_reg) :
+  scfImplementationType (this)
 {
-  SCF_CONSTRUCT_IBASE(0);
-
   csRef<iGraphics3D> g3d = 
     CS_QUERY_REGISTRY (object_reg, iGraphics3D);
   csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg, 
@@ -258,7 +248,6 @@ csFullScreenQuadRenderStep::csFullScreenQuadRenderStep (
 
 csFullScreenQuadRenderStep::~csFullScreenQuadRenderStep ()
 {
-  SCF_DESTRUCT_IBASE();
 }
 
 void csFullScreenQuadRenderStep::Perform (iRenderView* rview, iSector* /*sector*/,

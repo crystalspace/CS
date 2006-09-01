@@ -60,20 +60,10 @@
 
 CS_IMPLEMENT_PLUGIN
 
-SCF_IMPLEMENT_IBASE (csStencil2ShadowStep)
-SCF_IMPLEMENTS_INTERFACE (iRenderStep)
-SCF_IMPLEMENTS_INTERFACE (iLightRenderStep)
-SCF_IMPLEMENTS_INTERFACE (iRenderStepContainer)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csStencil2ShadowCacheEntry)
-SCF_IMPLEMENTS_INTERFACE (iObjectModelListener)
-SCF_IMPLEMENT_IBASE_END
-
 csStencil2ShadowCacheEntry::csStencil2ShadowCacheEntry (
-  csStencil2ShadowStep* parent, iMeshWrapper* mesh)
+  csStencil2ShadowStep* parent, iMeshWrapper* mesh) :
+  scfImplementationType (this)
 {
-  SCF_CONSTRUCT_IBASE (0);
   shadow_vertex_buffer = 0;
   shadow_normal_buffer = 0;
   active_index_buffer = 0;
@@ -100,7 +90,6 @@ csStencil2ShadowCacheEntry::csStencil2ShadowCacheEntry (
 csStencil2ShadowCacheEntry::~csStencil2ShadowCacheEntry ()
 {
   delete closedMesh;
-  SCF_DESTRUCT_IBASE();
 }
 
 void csStencil2ShadowCacheEntry::UpdateRenderBuffers(
@@ -408,17 +397,14 @@ bool csStencil2ShadowCacheEntry::GetShadow(
 
 
 csStencil2ShadowStep::csStencil2ShadowStep (csStencil2ShadowType* type) :  
-shadowDrawVisCallback ()
+  scfImplementationType (this)
 {
-  SCF_CONSTRUCT_IBASE (0);
   csStencil2ShadowStep::type = type;
-  shadowDrawVisCallback.parent = this;
   enableShadows = false;
 }
 
 csStencil2ShadowStep::~csStencil2ShadowStep ()
 {
-  SCF_DESTRUCT_IBASE();
 }
 
 void csStencil2ShadowStep::Report (int severity, const char* msg, ...)
@@ -682,7 +668,7 @@ void csStencil2ShadowStep::Perform (iRenderView* rview, iSector* sector,
   csSphere lightSphere (light_pos, light->GetCutoffDistance ());
   csRef<iVisibilityCuller> culler = sector->GetVisibilityCuller ();
   shadowMeshes.Truncate (0);
-  culler->VisTest (lightSphere, &shadowDrawVisCallback);
+  culler->VisTest (lightSphere, this);
   size_t numShadowMeshes;
   if ((numShadowMeshes = shadowMeshes.Length ()) > 0)
   {
@@ -816,43 +802,24 @@ size_t csStencil2ShadowStep::GetStepCount () const
   return steps.Length();
 }
 
-SCF_IMPLEMENT_IBASE(csStencil2ShadowStep::ShadowDrawVisCallback)
-SCF_IMPLEMENTS_INTERFACE(iVisibilityCullerListener)
-SCF_IMPLEMENT_IBASE_END
-
-csStencil2ShadowStep::ShadowDrawVisCallback::ShadowDrawVisCallback ()
-{
-  SCF_CONSTRUCT_IBASE(0);
-}
-
-csStencil2ShadowStep::ShadowDrawVisCallback::~ShadowDrawVisCallback ()
-{
-  SCF_DESTRUCT_IBASE();
-}
-
-void csStencil2ShadowStep::ShadowDrawVisCallback::ObjectVisible (
+void csStencil2ShadowStep::ObjectVisible (
   iVisibilityObject* /*visobject*/, iMeshWrapper *mesh, uint32 /*frustum_mask*/)
 {
-  parent->shadowMeshes.Push (mesh);
+  shadowMeshes.Push (mesh);
 }
 
 //---------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE (csStencil2ShadowFactory);
-SCF_IMPLEMENTS_INTERFACE (iRenderStepFactory);
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 csStencil2ShadowFactory::csStencil2ShadowFactory (iObjectRegistry* object_reg,
-                                                  csStencil2ShadowType* type)
+  csStencil2ShadowType* type) :
+  scfImplementationType (this)
 {
-  SCF_CONSTRUCT_IBASE (0);
   csStencil2ShadowFactory::object_reg = object_reg;
   csStencil2ShadowFactory::type = type;
 }
 
 csStencil2ShadowFactory::~csStencil2ShadowFactory ()
 {
-  SCF_DESTRUCT_IBASE();
 }
 
 csPtr<iRenderStep> csStencil2ShadowFactory::Create ()
@@ -866,7 +833,8 @@ csPtr<iRenderStep> csStencil2ShadowFactory::Create ()
 
 SCF_IMPLEMENT_FACTORY(csStencil2ShadowType)
 
-csStencil2ShadowType::csStencil2ShadowType (iBase *p) : csBaseRenderStepType (p)
+csStencil2ShadowType::csStencil2ShadowType (iBase *p) :
+  scfImplementationType (this, p)
 {
   shadowLoaded = false;
 }
@@ -934,8 +902,8 @@ iShader* csStencil2ShadowType::GetShadow ()
 
 SCF_IMPLEMENT_FACTORY(csStencil2ShadowLoader)
 
-csStencil2ShadowLoader::csStencil2ShadowLoader (iBase *p) 
-: csBaseRenderStepLoader (p)
+csStencil2ShadowLoader::csStencil2ShadowLoader (iBase *p) :
+  scfImplementationType (this, p)
 {
   InitTokenTable (tokens);
 }

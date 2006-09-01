@@ -38,7 +38,9 @@ struct iTextureManager;
 /**
  * A material class.
  */
-class csMaterial : public iMaterial
+class csMaterial :
+  public scfImplementation3<csMaterial, iMaterial, iMaterialEngine,
+    scfFakeInterface<iShaderVariableContext> >
 {
 private:
   friend class csEngine;
@@ -146,32 +148,6 @@ public:
    */
   void Visit ();
   bool IsVisitRequired () const;
-
-  SCF_DECLARE_IBASE;
-
-  /// iMaterialEngine implementation
-  struct MaterialEngine : public iMaterialEngine
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csMaterial);
-    virtual iTextureWrapper *GetTextureWrapper ()
-    {
-      return scfParent->GetTextureWrapper ();
-    }
-    virtual iTextureWrapper* GetTextureWrapper (csStringID name)
-    {
-      return scfParent->GetTextureWrapper (name);
-    }
-    virtual void Visit ()
-    {
-      scfParent->Visit ();
-    }
-    virtual bool IsVisitRequired () const
-    {
-      return scfParent->IsVisitRequired ();
-    }
-  } scfiMaterialEngine;
-  friend struct MaterialEngine;
-
 
   /**\name iShaderVariableContext implementation
    * @{ */

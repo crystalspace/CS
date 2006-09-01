@@ -37,7 +37,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
 
 csReplacerDocumentNode::csReplacerDocumentNode (iDocumentNode* wrappedNode,
   csReplacerDocumentNode* parent, csReplacerDocumentNodeFactory* shared, 
-  Substitutions* subst) : scfPooledImplementationType (this), 
+  Substitutions* subst) : scfImplementationType (this), 
   wrappedNode (wrappedNode), parent (parent), shared (shared), subst (subst)
 {
   shared->Substitute (wrappedNode->GetValue(), value, *this->subst);
@@ -197,18 +197,14 @@ csReplacerDocumentNodeFactory::csReplacerDocumentNodeFactory ()
 {
 }
 
-#include "csutil/custom_new_disable.h"
-
 csRef<iDocumentNode> csReplacerDocumentNodeFactory::CreateWrapper (
   iDocumentNode* wrappedNode, csReplacerDocumentNode* parent, 
   Substitutions* subst)
 {
   csReplacerDocumentNode* newNode = 
-    new (nodePool) csReplacerDocumentNode (wrappedNode, parent, this, subst);
+    new csReplacerDocumentNode (wrappedNode, parent, this, subst);
   return csPtr<iDocumentNode> (newNode);
 }
-
-#include "csutil/custom_new_enable.h"
 
 void csReplacerDocumentNodeFactory::Substitute (const char* in, 
 						csString& out, 

@@ -24,21 +24,24 @@
 #include "csutil/strhash.h"
 #include "csutil/csstring.h"
 
-class csPtWaterType : public csBaseProctexType
+class csPtWaterType :
+  public scfImplementationExt0<csPtWaterType, csBaseProctexType>
 {
 public:
   csPtWaterType (iBase *p);
   virtual csPtr<iTextureFactory> NewFactory();
 };
 
-class csPtWaterFactory : public csBaseTextureFactory
+class csPtWaterFactory :
+  public scfImplementationExt0<csPtWaterFactory, csBaseTextureFactory>
 {
 public:
   csPtWaterFactory (iTextureType* p, iObjectRegistry* object_reg);
   virtual csPtr<iTextureWrapper> Generate ();
 };
 
-class csPtWaterLoader : public csBaseProctexLoader
+class csPtWaterLoader :
+  public scfImplementationExt0<csPtWaterLoader, csBaseProctexLoader>
 {
   csStringHash tokens;
 //#define CS_TOKEN_ITEM_FILE "plugins/proctex/standard/water.tok"
@@ -50,7 +53,8 @@ public:
     iStreamSource*, iLoaderContext* ldr_context, iBase* context);
 };
 
-class csPtWaterSaver : public csBaseProctexSaver
+class csPtWaterSaver :
+  public scfImplementationExt0<csPtWaterSaver, csBaseProctexSaver>
 {
 public:
   csPtWaterSaver(iBase *p);

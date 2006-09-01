@@ -26,7 +26,7 @@
  * \addtogroup gfx3d
  * @{ */
  
-#include "csutil/scf.h"
+#include "csutil/scf_interface.h"
 #include "csutil/strset.h"
 
 #include "ivideo/shader/shader.h"
@@ -53,8 +53,6 @@
 struct iTextureHandle;
 struct csRGBpixel;
 
-SCF_VERSION (iMaterial, 0, 1, 0);
-
 /**
  * This class represents a material as seen from the engine
  * view. Because it is also a shader variable context it can be used directly 
@@ -71,6 +69,8 @@ SCF_VERSION (iMaterial, 0, 1, 0);
  */
 struct iMaterial : public iShaderVariableContext
 {
+  SCF_INTERFACE (iMaterial, 2, 0, 0);
+
   /**
    * Associate a shader with a shader type
    */

@@ -328,6 +328,7 @@ class iCommandLineParser(iBase):
     def GetResourceDir(*args): return _cspace.iCommandLineParser_GetResourceDir(*args)
     def GetAppDir(*args): return _cspace.iCommandLineParser_GetAppDir(*args)
     def GetAppPath(*args): return _cspace.iCommandLineParser_GetAppPath(*args)
+    def GetOptionName(*args): return _cspace.iCommandLineParser_GetOptionName(*args)
     def __del__(self, destroy=_cspace.delete_iCommandLineParser):
         try:
             if self.thisown: destroy(self)
@@ -13300,6 +13301,7 @@ class iEngineSequenceManager(iBase):
     def FindSequenceByName(*args): return _cspace.iEngineSequenceManager_FindSequenceByName(*args)
     def RunSequenceByName(*args): return _cspace.iEngineSequenceManager_RunSequenceByName(*args)
     def FireTimedOperation(*args): return _cspace.iEngineSequenceManager_FireTimedOperation(*args)
+    def DestroyTimedOperations(*args): return _cspace.iEngineSequenceManager_DestroyTimedOperations(*args)
     def __del__(self, destroy=_cspace.delete_iEngineSequenceManager):
         try:
             if self.thisown: destroy(self)

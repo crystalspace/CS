@@ -25,6 +25,7 @@
 #include "csutil/snprintf.h"
 #include "csutil/sysfunc.h"
 #include "csutil/util.h"
+#include "iutil/cmdline.h"
 #include "iutil/vfs.h"
 #include <ctype.h>
 
@@ -694,40 +695,32 @@ bool csConfigFile::LoadNow(const char *fName, iVFS *vfs, bool overwrite)
   return true;
 }
 
-void csConfigFile::LoadFromBuffer(char *Filedata, bool overwrite)
+void csConfigFile::LoadFromBuffer(const char *Filedata, bool overwrite)
 {
-  csString CurrentComment;
-  char* s = 0;
+  csString CurrentComment, currentLineBuf, key, value;
+  const char* s = 0;
   int SkipCount = 0;
   bool LastLine = false;
   int  Line;
   for (Line = 1; !LastLine; Line++, Filedata = s + SkipCount)
   {
-    s = Filedata + strcspn(Filedata, "\n\r");
+    s = Filedata + strcspn (Filedata, "\n\r");
     LastLine = (*s == 0);
     // Advance past LF, CR, or CRLF.
     SkipCount = (!LastLine && *s == '\r' && *(s+1) == '\n' ? 2 : 1);
-    *s = 0;
 
-    // Filedata is now a null-terminated string containing the current line
-    // skip initial whitespace
-    while (isspace(*Filedata)) Filedata++;
-    // delete whitespace at end of line
-    if (Filedata != s) {
-      char* t = s;
-      while (isspace(*(t-1))) t--;
-      *t = 0;
-    }
+    currentLineBuf.Replace (Filedata, s - Filedata);
+    currentLineBuf.Trim ();
 
     // check if this is a comment or a blank line
-    if (*Filedata == '\0' || *Filedata == ';')
-      CurrentComment << Filedata << '\n';
+    if (currentLineBuf.IsEmpty() || currentLineBuf.GetAt (0) == ';')
+      CurrentComment << currentLineBuf << '\n';
     else
     {
       // this is a key. Find equal sign
-      char *t = strchr(Filedata, '=');
+      size_t eqPos = currentLineBuf.FindFirst ('=');
       // if no equal sign, this is an invalid line
-      if (!t)
+      if (eqPos == (size_t)-1)
       {
         csFPrintf(stderr, "Missing `=' on line %d of %s\n", Line,
 	  (Filename ? Filename : "configuration data"));
@@ -735,7 +728,7 @@ void csConfigFile::LoadFromBuffer(char *Filedata, bool overwrite)
         continue;
       }
       // check for missing key name
-      if (t == Filedata)
+      if (eqPos == 0)
       {
         csFPrintf(stderr, "Missing key name (before `=') on line %d of %s\n",
 	  Line, (Filename ? Filename : "configuration data"));
@@ -743,22 +736,21 @@ void csConfigFile::LoadFromBuffer(char *Filedata, bool overwrite)
         continue;
       }
       // delete whitespace before equal sign
-      char *u = t;
-      while (isspace(*(u-1))) u--;
-      *u = 0;
+      key.Replace (currentLineBuf, eqPos);
+      key.RTrim();
       // check if node already exists and create node
-      csConfigNode *Node = FindNode(Filedata);
+      csConfigNode *Node = FindNode (key);
       if (Node && !overwrite)
       {
         CurrentComment.Clear();
         continue;
       }
-      if (!Node) Node = CreateNode(Filedata);
+      if (!Node) Node = CreateNode (key);
       // skip whitespace after equal sign
-      Filedata = t+1;
-      while (isspace(*Filedata)) Filedata++;
+      value.Replace (currentLineBuf.GetData() + eqPos + 1);
+      value.LTrim();
       // extract key value
-      Node->SetStr(Filedata);
+      Node->SetStr (value);
       // apply comment
       if (!CurrentComment.IsEmpty())
       {
@@ -817,4 +809,59 @@ void csConfigFile::SetEOFComment(const char *text)
 const char *csConfigFile::GetEOFComment() const
 {
   return EOFComment;
+}
+
+void csConfigFile::ParseCommandLine (iCommandLineParser* cmdline, iVFS* vfs,
+                                     bool Merge, bool NewWins)
+{
+  // We want these changes even if the new config file does not exist:
+  if (!Merge)
+  {
+    Clear();
+    SetFileName ("<command line>", 0);
+    Dirty = true;
+  }
+
+  csString buffer;
+  size_t index = 0, cfgsetNum = 0, cfgfileNum = 0;
+  const char* option;
+  while ((option = cmdline->GetOptionName (index)) != 0)
+  {
+    index++;
+    if (strcmp (option, "cfgset") == 0)
+    {
+      const char* setting = cmdline->GetOption ("cfgset", cfgsetNum++);
+      buffer << setting << '\n';
+    }
+    else if (strcmp (option, "cfgfile") == 0)
+    {
+      const char* fName = cmdline->GetOption ("cfgfile", cfgfileNum++);
+      csRef<iDataBuffer> Filedata;
+      if (vfs)
+      {
+        Filedata = vfs->ReadFile(fName);
+      }
+      else
+      {
+        csRef<iFile> file;
+        file.AttachNew (new csPhysicalFile (fName, "rb"));
+        Filedata = file->GetAllData (true);
+      }
+      if (Filedata.IsValid())
+      {
+        buffer.Append (Filedata->GetData(), Filedata->GetSize());
+        buffer << '\n';
+      }
+    }
+  }
+
+  if (!buffer.IsEmpty ())
+    LoadFromBuffer (buffer, NewWins);
+
+  if (!Merge)
+  {
+    // the file has successfully replaced the old configuration. Now the
+    // configuration is in sync with the file, so clear the dirty flag.
+    Dirty = false;
+  }
 }

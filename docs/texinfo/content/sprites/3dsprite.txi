@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node 3D Sprites, , mdl2spr, Working with Engine Content
+@node 3D Sprites, ViewMesh, mdl2spr, Working with Engine Content
 @section 3D Sprites
 @cindex 3D Sprites
 

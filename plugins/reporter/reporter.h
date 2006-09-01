@@ -21,7 +21,7 @@
 
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
-#include "csutil/scf.h"
+#include "csutil/scf_implementation.h"
 #include "csutil/parray.h"
 #include "csutil/refarr.h"
 #include "csutil/scopedmutexlock.h"
@@ -44,7 +44,8 @@ struct csReporterMessage
  * Reporter plugin. This plugin supports the notion of error and
  * general message reporting.
  */
-class csReporter : public iReporter
+class csReporter :
+  public scfImplementation2<csReporter, iReporter, iComponent>
 {
 private:
   csRef<csMutex> mutex;
@@ -53,8 +54,6 @@ private:
   csRefArray<iReporterListener> listeners;
 
 public:
-  SCF_DECLARE_IBASE;
-
   csReporter (iBase *iParent);
   virtual ~csReporter ();
   virtual bool Initialize (iObjectRegistry *object_reg);
@@ -69,13 +68,6 @@ public:
   virtual void AddReporterListener (iReporterListener* listener);
   virtual void RemoveReporterListener (iReporterListener* listener);
   virtual bool FindReporterListener (iReporterListener* listener);
-
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csReporter);
-    virtual bool Initialize (iObjectRegistry* p)
-    { return scfParent->Initialize (p); }
-  } scfiComponent;
 };
 
 #endif // __CS_REPORTER_H__

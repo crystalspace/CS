@@ -74,7 +74,7 @@ size_t csPathsList::AddUnique (const char* path1, bool scanRecursive,
   size_t i;
   for (i = 0; i < paths.Length(); i++)
   {
-    if (csPathsUtilities::PathsIdentical (path, paths[i].path))
+    if (csPathsUtilities::PathsIdentical (path, paths[i].path.GetDataSafe()))
     {
       if (overrideRecursive)
       {

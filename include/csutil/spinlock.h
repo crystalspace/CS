@@ -41,16 +41,15 @@ namespace CS
   #endif
   #if defined (CS_PROCESSOR_X86) && defined (CS_COMPILER_GCC)
     volatile ThreadID threadid;
-    typedef uint Lock;
+    volatile uint l;
   #elif defined(CS_PLATFORM_WIN32)
     volatile ThreadID threadid;
-    typedef LONG Lock;
+    volatile LONG l;
   #else
-    typedef pthread_mutex_t Lock;
+    pthread_mutex_t l;
   #endif
     
     volatile uint c;
-    volatile Lock l;
     
     static const int spinsPerYield = 63;
     
@@ -201,11 +200,11 @@ namespace CS
     { Init(); }
     ~SpinLock() { Destroy(); }
   
-    bool CS_FORCEINLINE LockWait()
+    CS_FORCEINLINE bool LockWait()
     { return DoLockWait(); }
-    bool CS_FORCEINLINE LockTry()
+    CS_FORCEINLINE bool LockTry()
     { return DoLockTry(); }
-    void CS_FORCEINLINE Release()
+    CS_FORCEINLINE void Release()
     { DoRelease(); }
   };
 } // namespace CS

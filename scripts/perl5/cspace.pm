@@ -487,6 +487,7 @@ package cspace::iCommandLineParser;
 *GetResourceDir = *cspacec::iCommandLineParser_GetResourceDir;
 *GetAppDir = *cspacec::iCommandLineParser_GetAppDir;
 *GetAppPath = *cspacec::iCommandLineParser_GetAppPath;
+*GetOptionName = *cspacec::iCommandLineParser_GetOptionName;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -14694,6 +14695,7 @@ package cspace::iEngineSequenceManager;
 *FindSequenceByName = *cspacec::iEngineSequenceManager_FindSequenceByName;
 *RunSequenceByName = *cspacec::iEngineSequenceManager_RunSequenceByName;
 *FireTimedOperation = *cspacec::iEngineSequenceManager_FireTimedOperation;
+*DestroyTimedOperations = *cspacec::iEngineSequenceManager_DestroyTimedOperations;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});

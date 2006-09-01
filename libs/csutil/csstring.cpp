@@ -401,6 +401,25 @@ size_t csStringBase::FindLast (char c, size_t pos) const
   return (size_t)-1;
 }
 
+size_t csStringBase::FindLast (const char *c, size_t pos) const
+{
+  char const* p = GetData();
+  if (pos == (size_t)-1)
+    pos = Size - 1;
+
+  if (pos > Size || p == 0 || c == 0 )
+    return (size_t)-1;
+
+  char const* tmp;
+  char const* tmpC;
+  for (tmp = p + pos; tmp >= p; tmp--)
+    for (tmpC = c; tmpC < c + strlen(c); tmpC++)
+      if (*tmp == *tmpC)
+        return tmp - p;
+
+  return (size_t)-1;
+}
+
 size_t csStringBase::Find (const char* str, size_t pos) const
 {
   char const* p = GetData();

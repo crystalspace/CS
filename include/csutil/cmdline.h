@@ -125,6 +125,8 @@ public:
    * Returns the full path to the application executable.
    */
   virtual const char* GetAppPath ();
+
+  virtual const char* GetOptionName (size_t iIndex) const;
 };
 
 #endif // __CS_CMDLINE_H__

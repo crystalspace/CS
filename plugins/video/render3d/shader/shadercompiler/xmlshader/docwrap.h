@@ -195,6 +195,7 @@ protected:
 
     csHash<Template, TempString<>, TempHeapAlloc> templates;
     csArray<int, csArrayElementHandler<int>, TempHeapAlloc> ascendStack;
+    csSet<TempString<>, TempHeapAlloc> defines;
   };
   csRef<GlobalProcessingState> globalState;
 
@@ -204,10 +205,14 @@ protected:
   void CreateElseWrapper (NodeProcessingState* state, 
     WrapperStackEntry& elseWrapper);
   template<typename ConditionEval>
-  void ProcessInclude (ConditionEval& eval, const csString& filename, 
+  void ProcessInclude (ConditionEval& eval, const TempString<>& filename, 
     NodeProcessingState* state, iDocumentNode* node);
+  /**
+   * Process a node when a Template or Generate is active.
+   * Returns 'true' if the node was handled.
+   */
   template<typename ConditionEval>
-  void ProcessTemplate (ConditionEval& eval, iDocumentNode* templNode, 
+  bool ProcessTemplate (ConditionEval& eval, iDocumentNode* templNode, 
     NodeProcessingState* state);
   bool InvokeTemplate (Template* templ, const Template::Params& params,
     Template::Nodes& templatedNodes);
@@ -215,12 +220,35 @@ protected:
   bool InvokeTemplate (ConditionEval& eval, const char* name, 
     iDocumentNode* node, NodeProcessingState* state, 
     const Template::Params& params);
+  /// Validate that a 'Template' was properly matched by an 'Endtemplate'
   void ValidateTemplateEnd (iDocumentNode* node, 
     NodeProcessingState* state);
+  /// Validate that a 'Generate' was properly matched by an 'Endgenerate'
   void ValidateGenerateEnd (iDocumentNode* node, 
     NodeProcessingState* state);
+  /// Validate that an 'SIfDef' was properly matched by an 'SEndIf'
+  void ValidateStaticIfEnd (iDocumentNode* node, 
+    NodeProcessingState* state);
   void ParseTemplateArguments (const char* str, 
-    Template::Params& strings);
+    Template::Params& strings, bool omitEmpty);
+  /**
+   * Process a node when a static conditition is active.
+   * Returns 'true' if the node was handled.
+   */
+  bool ProcessStaticIf (NodeProcessingState* state, iDocumentNode* node);
+
+  /// Process a "Template" or "TemplateWeak" instruction
+  bool ProcessInstrTemplate (NodeProcessingState* state, iDocumentNode* node, 
+    const TempString<>& args, bool weak);
+  /// Process a "Define" instruction
+  bool ProcessDefine (NodeProcessingState* state, iDocumentNode* node, 
+    const TempString<>& args);
+  /// Process an "Undef" instruction
+  bool ProcessUndef (NodeProcessingState* state, iDocumentNode* node, 
+    const TempString<>& args);
+  /// Process a static "IfDef"/"IfNDef" instruction
+  bool ProcessStaticIfDef (NodeProcessingState* state, iDocumentNode* node, 
+    const TempString<>& args, bool invert);
 
   template<typename ConditionEval>
   void ProcessSingleWrappedNode (ConditionEval& eval, 
@@ -319,7 +347,7 @@ class csWrappedDocumentNodeFactory
   friend class csWrappedDocumentNodeIterator;
 
   csXMLShaderCompiler* plugin;
-  csTextNodeWrapper::Pool textNodePool;
+  csTextNodeWrapper::Pool textWrapperPool;
   csWrappedDocumentNodeIterator::Pool iterPool;
   csReplacerDocumentNodeFactory replacerFactory;
 
@@ -333,10 +361,19 @@ class csWrappedDocumentNodeFactory
   enum
   {
     PITOKEN_TEMPLATE_NEW = 0xfeeb1e,
+    PITOKEN_TEMPLATEWEAK,
     PITOKEN_ENDTEMPLATE_NEW,
     PITOKEN_INCLUDE_NEW,
     PITOKEN_GENERATE,
-    PITOKEN_ENDGENERATE
+    PITOKEN_ENDGENERATE,
+    PITOKEN_DEFINE,
+    PITOKEN_UNDEF,
+    PITOKEN_STATIC_IFDEF,
+    PITOKEN_STATIC_IFNDEF,
+    PITOKEN_STATIC_ELSIFDEF,
+    PITOKEN_STATIC_ELSIFNDEF,
+    PITOKEN_STATIC_ELSE,
+    PITOKEN_STATIC_ENDIF
   };
 
   csString* currentOut;

@@ -50,7 +50,7 @@ void csCEGUIResourceProvider::loadRawDataContainer (const CEGUI::String& filenam
   }
   else
   {
-    uint8* data = new uint8[buffer->GetSize ()];
+    uint8* data = new (CS::allocPlatform) uint8[buffer->GetSize ()];
     memcpy (data, buffer->GetUint8 (), sizeof(uint8) * buffer->GetSize ());
     output.setData(data);
     output.setSize(buffer->GetSize ());
@@ -61,7 +61,7 @@ void csCEGUIResourceProvider::unloadRawDataContainer (CEGUI::RawDataContainer& d
 {
   if (data.getDataPtr())
   {
-    delete[] data.getDataPtr();
+    operator delete (data.getDataPtr(), CS::allocPlatform);
     data.setData(0);
     data.setSize(0);
   }

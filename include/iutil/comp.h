@@ -29,8 +29,6 @@ struct iObjectRegistry;
  * \addtogroup scf
  * @{ */
 
-//SCF_VERSION (iComponent, 0, 0, 1);
-
 /**
  * This interface describes a generic component in Crystal Space.
  *
@@ -46,6 +44,7 @@ struct iObjectRegistry;
 struct iComponent : public virtual iBase
 {
   SCF_INTERFACE(iComponent,2,0,0);
+
   /**
    * Initialize the component. This is automatically called by system driver
    * at startup so that plugin can do basic initialization stuff, register
