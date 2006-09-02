@@ -9,6 +9,9 @@ chronological order.
 2-Sep-2006
 	- Marten fixed [ticket:7], invalid alpha modifier in shader 
 	  light.xml technique 150.
+	- Marten rewrote the OpenGL pixel format picker to enumerate 
+	  all the values in strictly decreasing order. This should solve
+	  ticket:1.
 31-Aug-2006
 	- Marten updated version numbers on trunk to reflect the fact that
 	  the 1.0 branch have been created.
