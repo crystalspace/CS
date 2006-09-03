@@ -19,7 +19,7 @@
 #ifndef __CS_JNG_H__
 #define __CS_JNG_H__
 
-#include "csgfx/memimage.h"
+#include "csgfx/imagememory.h"
 #include "igraphic/imageio.h"
 #include "igraphic/animimg.h"
 #include "iutil/eventh.h"

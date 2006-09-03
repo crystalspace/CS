@@ -758,9 +758,15 @@ void csPortalContainer::DrawOnePortal (
     // @@@ Hackish...
     csShaderVariableContext varContext;
     const csRefArray<csShaderVariable>& globVars = shader_man->GetShaderVariables ();
-    for (uint i = 0; i < globVars.Length (); i++)
+    for (size_t i = 0; i < globVars.Length (); i++)
     {
       varContext.AddVariable (globVars[i]);
+    }
+    const csRefArray<csShaderVariable>& sectorVars =
+      rview->GetThisSector()->GetSVContext()->GetShaderVariables();
+    for (size_t i = 0; i < sectorVars.Length (); i++)
+    {
+      varContext.AddVariable (sectorVars[i]);
     }
     csVector4 fogPlane;
     iPortal *lastPortal = rview->GetLastPortal();
@@ -776,13 +782,6 @@ void csPortalContainer::DrawOnePortal (
       fogPlane = csVector4(0.0,0.0,1.0,0.0);
     }
     varContext.GetVariableAdd (fogplane_name)->SetValue (fogPlane);
-
-    iSector *sector = rview->GetThisSector();
-    varContext.GetVariableAdd (fogdensity_name)->SetValue (sector->GetFog()->density);
-    varContext.GetVariableAdd (fogcolor_name)->SetValue (csVector3 (sector->GetFog()->red,
-      sector->GetFog()->green,
-      sector->GetFog()->blue));
-
 
     mesh.dynDomain = &varContext;
     // @@@ Could be used for z-fill and stuff, while we're at it?

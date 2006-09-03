@@ -457,6 +457,22 @@ public:
   }
 };
 
+namespace CS
+{
+  /// Helper class to obtain an ID for a shader variable.
+  struct ShaderVarName
+  {
+    csStringID name;
+    
+    ShaderVarName() : name (csInvalidStringID) {}
+    ShaderVarName (iStringSet* strings, const char* name) 
+    { this->name = strings->Request (name); }
+    
+    operator csStringID () const { return name; }
+  };
+  
+} // namespace CS
+
 /** @} */
 
 #endif

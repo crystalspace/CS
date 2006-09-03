@@ -25,6 +25,7 @@
 #include "csutil/csstring.h"
 #include "csutil/weakref.h"
 #include "csutil/dirtyaccessarray.h"
+#include "csgeom/box.h"
 #include "iengine/light.h"
 #include "iengine/renderloop.h"
 #include "iengine/viscull.h"
@@ -76,13 +77,23 @@ public:
   virtual csPtr<iRenderStep> Create ();
 };
 
+#define USE_BOX 1
+
 struct meshInfo
 {
   iShaderVariableContext* svc;
-  bool noclip;	// From iMeshWrapper CS_ENTITY_NOCLIP.
+  bool noclip;		// From iMeshWrapper CS_ENTITY_NOCLIP.
+  bool render;		// Set to true if this should be rendered.
+#if USE_BOX
+  iObjectModel* obj_model;
+  iMovable* movable;
+#else
   csVector3 wor_center;	// Center of the bounding sphere of this object.
   float radius;		// Radius of the bounding sphere of this object.
+#endif
 };
+
+struct ShaderVarPusher;
 
 class csGenericRenderStep :
   public scfImplementation3<csGenericRenderStep,
@@ -114,11 +125,6 @@ private:
   csArray<csStringID> disableDefaultTypes;
 
   static csStringID fogplane_name;
-  static csStringID fogdensity_name;
-  static csStringID fogcolor_name;
-  static csStringID fogstart_name;
-  static csStringID fogend_name;
-  static csStringID fogmode_name;
   static csStringID string_object2world;
   static csStringID light_0_type;
   static csStringID light_ambient;
@@ -152,7 +158,7 @@ public:
   virtual void RemoveDisableDefaultTriggerType (const char* type);
 
   inline void RenderMeshes (iRenderView* rview,
-  	iGraphics3D* g3d, iShader* shader, iLight *light, 
+  	iGraphics3D* g3d, const ShaderVarPusher& Pusher,
 	size_t ticket, meshInfo* meshContext,
 	csRenderMesh** meshes, size_t num, iShaderVarStack* stacks);
 

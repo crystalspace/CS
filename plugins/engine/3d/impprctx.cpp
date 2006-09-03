@@ -18,7 +18,7 @@
 */
 
 #include "cssysdef.h"
-#include "csgfx/memimage.h"
+#include "csgfx/imagememory.h"
 #include "cstool/csview.h"
 #include "csgeom/polyclip.h"
 #include "csgeom/math.h"

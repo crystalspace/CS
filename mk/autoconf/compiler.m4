@@ -41,6 +41,11 @@
 #       respects the LDFLAGS environment variable.  Finally, checks if linker
 #	recognizes -shared and sets PLUGIN.LFLAGS; and checks if linker
 #	recognizes -soname and sets PLUGIN.LFLAGS.USE_SONAME to "yes".
+#       Also, it is checked whether the linker supports the --as-needed
+#       command line option, and if so, it is employed. As some libraries
+#       reportedly don't support that feature, you can put 
+#       $cs_cv_prog_link_no_as_needed and $cs_cv_prog_link_as_needed around
+#       the linker flags to disable this feature for a particular library.
 #-----------------------------------------------------------------------------
 AC_DEFUN([CS_PROG_CC],[
     CFLAGS="$CFLAGS" # Filter undesired flags
@@ -97,4 +102,20 @@ AC_DEFUN([CS_PROG_LINK],[
     CS_CHECK_BUILD([if -soname is accepted], [cs_cv_prog_link_soname], [],
 	[CS_CREATE_TUPLE([-Wl,-soname,foobar])], [C++],
 	[CS_EMIT_BUILD_PROPERTY([PLUGIN.LFLAGS.USE_SONAME], [yes])])
+	
+    # Check if binutils support response files
+    rm -f conftest.resp
+    echo "" > conftest.resp
+    CS_CHECK_BUILD([if response files are accepted], [cs_cv_prog_link_respfile], [],
+	[-Wl,@conftest.resp], [C++],
+	[CS_EMIT_BUILD_PROPERTY([LINKER.RESPONSEFILES], [yes])])
+    rm -f conftest.resp
+    
+    # Check if linker supports --as-needed.
+    CS_EMIT_BUILD_FLAGS([if --as-needed is supported], 
+        [cs_cv_prog_link_as_needed], [CS_CREATE_TUPLE([-Wl,--as-needed])], [C++],
+	[CMD.LINK], [+])
+    CS_CHECK_BUILD_FLAGS([if --no-as-needed is supported], 
+        [cs_cv_prog_link_no_as_needed], [CS_CREATE_TUPLE([-Wl,--no-as-needed])], 
+        [C++])])
 ])

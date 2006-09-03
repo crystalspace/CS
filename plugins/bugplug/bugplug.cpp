@@ -28,9 +28,11 @@
 #include "csgeom/tri.h"
 #include "csgeom/vector2.h"
 #include "csgeom/vector3.h"
+#include "csgeom/math3d.h"
 #include "cstool/collider.h"
 #include "cstool/csview.h"
 #include "cstool/uberscreenshot.h"
+#include "cstool/enginetools.h"
 #include "csutil/cscolor.h"
 #include "csutil/csuctransform.h"
 #include "csutil/debug.h"
@@ -442,30 +444,16 @@ void csBugPlug::ToggleG3DState (G3D_RENDERSTATEOPTION op, const char* name)
 
 void csBugPlug::MouseButtonRight (iCamera* camera)
 {
-  csVector3 v;
-  // Setup perspective vertex, invert mouse Y axis.
-  csVector2 p (mouse_x, camera->GetShiftY() * 2 - mouse_y);
-
-  v = camera->InvPerspective (p, 100);
-  csVector3 end = camera->GetTransform ().This2Other (v);
-
-  iSector* sector = camera->GetSector ();
-  CS_ASSERT (sector != 0);
-  csVector3 origin = camera->GetTransform ().GetO2TTranslation ();
-  csVector3 isect;
-
-  csRef<iCollideSystem> cdsys = CS_QUERY_REGISTRY (object_reg, iCollideSystem);
-  csIntersectingTriangle closest_tri;
-  iMeshWrapper* sel;
-  float sqdist = csColliderHelper::TraceBeam (cdsys, sector,
-	origin, end, true,
-	closest_tri, isect, &sel);
-
-  if (sqdist >= 0 && sel)
+  csRef<iCollideSystem> cdsys = csQueryRegistry<iCollideSystem> (object_reg);
+  csScreenTargetResult result = csEngineTools::FindScreenTarget (
+      csVector2 (mouse_x, mouse_y), 100.0f, camera, cdsys);
+  if (result.mesh)
   {
+    float sqdist = csSquaredDist::PointPoint (
+	camera->GetTransform ().GetOrigin (), result.isect);
     Report (CS_REPORTER_SEVERITY_NOTIFY,
     	"Hit a mesh '%s' at distance %g!",
-	sel->QueryObject ()->GetName (), csQsqrt (sqdist));
+	result.mesh->QueryObject ()->GetName (), csQsqrt (sqdist));
   }
   else
   {
@@ -476,29 +464,19 @@ void csBugPlug::MouseButtonRight (iCamera* camera)
 
 void csBugPlug::MouseButtonLeft (iCamera* camera)
 {
-  csVector3 v;
-  // Setup perspective vertex, invert mouse Y axis.
-  csVector2 p (mouse_x, camera->GetShiftY() * 2 - mouse_y);
-
-  v = camera->InvPerspective (p, 100);
-  csVector3 end = camera->GetTransform ().This2Other (v);
-
-  iSector* sector = camera->GetSector ();
-  CS_ASSERT (sector != 0);
-  csVector3 origin = camera->GetTransform ().GetO2TTranslation ();
-  
-  csSectorHitBeamResult hitBeamResult = sector->HitBeam (origin, end);
-  iMeshWrapper* sel = hitBeamResult.mesh;
+  csScreenTargetResult result = csEngineTools::FindScreenTarget (
+      csVector2 (mouse_x, mouse_y), 100.0f, camera);
+  iMeshWrapper* sel = result.mesh;
 
   const char* poly_name = 0;
-  if (hitBeamResult.polygon_idx != -1)
+  if (result.polygon_idx != -1)
   {
     csRef<iThingFactoryState> tfs = scfQueryInterface<iThingFactoryState> 
       (sel->GetMeshObject ()->GetFactory());
     if (tfs)
     {
-      poly_name = tfs->GetPolygonName (hitBeamResult.polygon_idx);
-      Dump (tfs, hitBeamResult.polygon_idx);
+      poly_name = tfs->GetPolygonName (result.polygon_idx);
+      Dump (tfs, result.polygon_idx);
     }
   }
   else
@@ -506,8 +484,8 @@ void csBugPlug::MouseButtonLeft (iCamera* camera)
     poly_name = 0;
   }
 
-  csVector3 vw = hitBeamResult.isect;
-  v = camera->GetTransform ().Other2This (vw);
+  csVector3 vw = result.isect;
+  csVector3 v = camera->GetTransform ().Other2This (vw);
   Report (CS_REPORTER_SEVERITY_NOTIFY,
     "LMB down : c:(%f,%f,%f) w:(%f,%f,%f) p:'%s'",
     v.x, v.y, v.z, vw.x, vw.y, vw.z, poly_name ? poly_name : "<none>");
@@ -1612,9 +1590,8 @@ bool csBugPlug::HandleFrame (iEvent& /*event*/)
       if (do_bbox)
       {
         int bbox_color = G3D->GetDriver2D ()->FindRGB (0, 255, 255);
-        csBox3 bbox;
-        selected_meshes[k]->GetMeshObject ()->GetObjectModel ()->
-    	  GetObjectBoundingBox (bbox);
+        const csBox3& bbox = selected_meshes[k]->GetMeshObject ()
+	  ->GetObjectModel ()->GetObjectBoundingBox ();
         csVector3 vxyz = tr_o2c * bbox.GetCorner (CS_BOX_CORNER_xyz);
         csVector3 vXyz = tr_o2c * bbox.GetCorner (CS_BOX_CORNER_Xyz);
         csVector3 vxYz = tr_o2c * bbox.GetCorner (CS_BOX_CORNER_xYz);
@@ -2248,8 +2225,7 @@ void csBugPlug::Dump (int indent, iMeshWrapper* mesh)
       Report (CS_REPORTER_SEVERITY_DEBUG, "%*s        Plugin '%s'",
   	  indent, "",
           fact->QueryDescription () ? fact->QueryDescription () : "0");
-    csBox3 bbox;
-    obj->GetObjectModel ()->GetObjectBoundingBox (bbox);
+    const csBox3& bbox = obj->GetObjectModel ()->GetObjectBoundingBox ();
     Report (CS_REPORTER_SEVERITY_DEBUG, "%*s        Object bounding box:",
       indent, "");
     Dump (indent+8, bbox);

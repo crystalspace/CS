@@ -20,7 +20,7 @@
 #include "soft_txt.h"
 #include "csgfx/bakekeycolor.h"
 #include "csgfx/imagemanipulate.h"
-#include "csgfx/memimage.h"
+#include "csgfx/imagememory.h"
 #include "csgfx/packrgb.h"
 #include "csgfx/xorpat.h"
 #include "iutil/cfgfile.h"
@@ -340,15 +340,6 @@ void csSoftwareTextureManager::GetMaxTextureSize (int& w, int& h, int& aspect)
 {
   w = h = 2048;
   aspect = 32768;
-}
-
-void csSoftwareTextureManager::GetLightmapRendererCoords (
-  int /*slmWidth*/, int /*slmHeight*/, int lm_x1, int lm_y1, int /*lm_x2*/,
-  int /*lm_y2*/, float& lm_u1, float& lm_v1, float &lm_u2, float& lm_v2)
-{
-  lm_u1 = lm_x1;
-  lm_v1 = lm_y1;
-  lm_u2 = lm_v2 = 0.0f;
 }
 
 }

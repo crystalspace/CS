@@ -336,8 +336,8 @@ void csRadixSorter::Sort (float* array, size_t size)
   if(!array || size == 0)
     return;
 
-  //Reserve space
-  if(size != currentSize)
+  //Reserve space, 
+  if(size != currentSize || true) //@@DISABLE temporal coherency for now, bugs in it
     ranksValid = false;
 
   Resize(size);

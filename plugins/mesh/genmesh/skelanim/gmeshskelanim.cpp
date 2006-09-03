@@ -38,7 +38,7 @@
 
 CS_IMPLEMENT_PLUGIN
 
-SCF_IMPLEMENT_FACTORY (csGenmeshSkelAnimationControlType)
+SCF_IMPLEMENT_FACTORY (csGenmeshSkelAnimationControlTypeOld)
 
 //-------------------------------------------------------------------------
 
@@ -865,7 +865,7 @@ void csGenmeshSkelAnimationControl::TransformVerticesToBones (const csVector3* v
     {
       csSkelBone *p = static_cast<csSkelBone*> (f_bones[i]->GetParent ());
       size_t parent_index = f_bones.Find (p);
-      csRef<csSkelBone> child = bones[i];
+      csRef<csSkelBone> child (bones[i]);
       bones[parent_index]->AddBone (child);
       child->SetParent (bones[parent_index]);
     }
@@ -904,7 +904,7 @@ void csGenmeshSkelAnimationControl::TransformVerticesToBones (const csVector3* v
         for (size_t j = 0 ; j < vtgr.Length () ; j++)
         {
           sac_bone_data & g_data = vtgr[j];
-          csRef<csSkelBone> bone = bones[vtgr[j].idx];
+          csRef<csSkelBone> bone (bones[vtgr[j].idx]);
           sac_vertex_data & v_data = bone->GetVertexData ()[g_data.v_idx];
           csReversibleTransform& transform = bone->GetFullTransform ();
           v_data.pos = transform.Other2This (verts[i]);
@@ -927,7 +927,7 @@ void csGenmeshSkelAnimationControl::UpdateBones ()
 
   for (i = 0 ; i < parent_bones.Length () ; i++)
   {
-    csRef<csSkelBone> parent_bone = bones[parent_bones[i]];
+    csRef<csSkelBone> parent_bone (bones[parent_bones[i]]);
     switch (parent_bone->GetMode ())
     {
       case BM_NONE:
@@ -975,7 +975,7 @@ void csGenmeshSkelAnimationControl::UpdateAnimatedVertices (csTicks current,
           for (size_t j = 0 ; j < vtgr.Length () ; j++)
           {
             sac_bone_data & g_data = vtgr[j];
-            csRef<csSkelBone> bone = bones[g_data.idx];
+            csRef<csSkelBone> bone (bones[g_data.idx]);
             sac_vertex_data & v_data = bone->GetVertexData ()[g_data.v_idx];
             csReversibleTransform& transform = bone->GetFullTransform ();
             total_weight += v_data.weight;
@@ -1163,7 +1163,7 @@ iGenMeshSkeletonBone *csGenmeshSkelAnimationControl::FindBone (const char *name)
 //-------------------------------------------------------------------------
 
 csGenmeshSkelAnimationControlFactory::csGenmeshSkelAnimationControlFactory (
-  csGenmeshSkelAnimationControlType* type, iObjectRegistry* object_reg) :
+  csGenmeshSkelAnimationControlTypeOld* type, iObjectRegistry* object_reg) :
   scfImplementationType(this, type)
 {
   csGenmeshSkelAnimationControlFactory::type = type;
@@ -1659,34 +1659,34 @@ void csGenmeshSkelAnimationControlFactory::UnregisterAUAnimation (csGenmeshSkelA
 
 //-------------------------------------------------------------------------
 
-csGenmeshSkelAnimationControlType::csGenmeshSkelAnimationControlType (
+csGenmeshSkelAnimationControlTypeOld::csGenmeshSkelAnimationControlTypeOld (
   iBase* pParent) :
   scfImplementationType(this, pParent), object_reg(0)
 {
 }
 
-csGenmeshSkelAnimationControlType::~csGenmeshSkelAnimationControlType ()
+csGenmeshSkelAnimationControlTypeOld::~csGenmeshSkelAnimationControlTypeOld ()
 {
-  if (object_reg)
+  if (weakEventHandler)
   {
     csRef<iEventQueue> q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
     if (q)
-      q->RemoveListener (this);
+      RemoveWeakListener (q, weakEventHandler);
   }
 }
 
-bool csGenmeshSkelAnimationControlType::Initialize (iObjectRegistry* object_reg)
+bool csGenmeshSkelAnimationControlTypeOld::Initialize (iObjectRegistry* object_reg)
 {
   this->object_reg = object_reg;
   PreProcess = csevPreProcess (object_reg);
   csRef<iEventQueue> q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
   vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
   if (q != 0)
-    q->RegisterListener (this, PreProcess);
+    RegisterWeakListener (q, this, PreProcess, weakEventHandler);
   return true;
 }
 
-csPtr<iGenMeshAnimationControlFactory> csGenmeshSkelAnimationControlType::
+csPtr<iGenMeshAnimationControlFactory> csGenmeshSkelAnimationControlTypeOld::
   CreateAnimationControlFactory ()
 {
   csGenmeshSkelAnimationControlFactory* ctrl = new csGenmeshSkelAnimationControlFactory
@@ -1694,7 +1694,7 @@ csPtr<iGenMeshAnimationControlFactory> csGenmeshSkelAnimationControlType::
   return csPtr<iGenMeshAnimationControlFactory> (ctrl);
 }
 
-bool csGenmeshSkelAnimationControlType::HandleEvent (iEvent& ev)
+bool csGenmeshSkelAnimationControlTypeOld::HandleEvent (iEvent& ev)
 {
   if (ev.Name == PreProcess)
   {

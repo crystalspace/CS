@@ -29,12 +29,16 @@
 #include "csutil/csstring.h"
 #include "csutil/scf_implementation.h"
 #include "imap/saverref.h"
+#include "iutil/selfdestruct.h"
 
 /**
  * An object representing a reference to a library.
  */
 class CS_CRYSTALSPACE_EXPORT csLibraryReference :
-  public scfImplementationExt1<csLibraryReference, csObject, iLibraryReference>
+  public scfImplementationExt2<csLibraryReference, 
+                               csObject, 
+                               iLibraryReference,
+                               iSelfDestruct>
 {
   csString file;
   csString path;
@@ -54,13 +58,18 @@ public:
   virtual bool GetCheckDupes () const;
 
   virtual iObject *QueryObject () { return (csObject*)this; }
+
+  void SelfDestruct () {}
 };
 
 /**
  * An object representing an addon.
  */
 class CS_CRYSTALSPACE_EXPORT csAddonReference :
-  public scfImplementationExt1<csAddonReference, csObject, iAddonReference>
+  public scfImplementationExt2<csAddonReference, 
+                               csObject, 
+                               iAddonReference,
+                               iSelfDestruct>
 {
   csString plugin;
   csString paramsfile;
@@ -80,6 +89,8 @@ public:
   virtual iBase* GetAddonObject () const;
 
   virtual iObject *QueryObject () { return (csObject*)this; }
+
+  void SelfDestruct () {}
 };
 
 #endif // __CS_SAVERREF_H__

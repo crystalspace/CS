@@ -167,7 +167,7 @@ csFrustumVis::~csFrustumVis ()
   {
     csRef<iEventQueue> q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
     if (q)
-      q->RemoveListener (this);
+      RemoveWeakListener (q, weakEventHandler);
   }
 
   while (visobj_vector.Length () > 0)
@@ -226,7 +226,7 @@ bool csFrustumVis::Initialize (iObjectRegistry *object_reg)
     CanvasResize = csevCanvasResize(object_reg, g2d);
     csRef<iEventQueue> q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
     if (q)
-      q->RegisterListener (this, CanvasResize);
+      RegisterWeakListener (q, this, CanvasResize, weakEventHandler);
   }
 
   return true;
@@ -241,12 +241,11 @@ void csFrustumVis::CalculateVisObjBBox (iVisibilityObject* visobj, csBox3& bbox)
   iMovable* movable = visobj->GetMovable ();
   if (movable->IsFullTransformIdentity ())
   {
-    visobj->GetObjectModel ()->GetObjectBoundingBox (bbox);
+    bbox = visobj->GetObjectModel ()->GetObjectBoundingBox ();
   }
   else
   {
-    csBox3 box;
-    visobj->GetObjectModel ()->GetObjectBoundingBox (box);
+    const csBox3& box = visobj->GetObjectModel ()->GetObjectBoundingBox ();
     csReversibleTransform trans = movable->GetFullTransform ();
     bbox.StartBoundingBox (trans.This2Other (box.GetCorner (0)));
     bbox.AddBoundingVertexSmart (trans.This2Other (box.GetCorner (1)));

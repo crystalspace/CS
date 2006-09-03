@@ -59,6 +59,7 @@ private:
   csRef<iVirtualClock> vc;
   csRef<iTextureManager> txtmgr;
   csRef<iStringSet> strings;
+  csRef<iEventHandler> weakEventHandler;
 
   bool do_verbose;
 

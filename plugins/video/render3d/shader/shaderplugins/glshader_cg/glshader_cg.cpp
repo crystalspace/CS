@@ -178,6 +178,54 @@ csPtr<iShaderProgram> csGLShader_CG::CreateProgram(const char* type)
     return 0;
 }
 
+static CGprofile ProfileRouted (CGprofile profile)
+{
+  switch (profile)
+  {
+    case CG_PROFILE_FP20:
+      return CG_PROFILE_PS_1_1;
+    default:
+      return profile;
+  }
+}
+
+static CGprofile ProfileUnrouted (CGprofile profile)
+{
+  switch (profile)
+  {
+    case CG_PROFILE_PS_1_1:
+      return CG_PROFILE_FP20;
+    case CG_PROFILE_PS_1_2:
+    case CG_PROFILE_PS_1_3:
+      return CG_PROFILE_FP30;
+    default:
+      return profile;
+  }
+}
+
+/// Assign a number to a Cg profile so DX and GL profiles can be compared.
+static int GetProfileLevel (CGprofile profile)
+{
+  switch (profile)
+  {
+    case CG_PROFILE_FP20:
+    case CG_PROFILE_PS_1_1:
+      return 0x101;
+    case CG_PROFILE_PS_1_2:
+      return 0x102;
+    case CG_PROFILE_PS_1_3:
+      return 0x103;
+    case CG_PROFILE_ARBFP1:
+      return 0x200;
+    case CG_PROFILE_FP30:
+      return 0x20a;
+    case CG_PROFILE_FP40:
+      return 0x300;
+    default:
+      return 0;
+  }
+}
+
 bool csGLShader_CG::Open()
 {
   if (isOpen) return true;
@@ -203,129 +251,165 @@ bool csGLShader_CG::Open()
     return false;
   }
 
-  if (config->KeyExists ("Video.OpenGL.Shader.Cg.MaxProfile.Vertex"))
+  enableVP = config->GetBool ("Video.OpenGL.Shader.Cg.Enable.Vertex", true);
+  enableFP = config->GetBool ("Video.OpenGL.Shader.Cg.Enable.Fragment", true);
+
+  if (enableVP)
   {
-    const char* profileStr = 
-      config->GetStr ("Video.OpenGL.Shader.Cg.MaxProfile.Vertex");
-    CGprofile profile = cgGetProfile (profileStr);
-    if (profile == CG_PROFILE_UNKNOWN)
+    if (config->KeyExists ("Video.OpenGL.Shader.Cg.MaxProfile.Vertex"))
     {
-      if (doVerbose)
-        Report (CS_REPORTER_SEVERITY_WARNING,
-            "Unknown maximum vertex program profile '%s'", profileStr);
+      const char* profileStr = 
+        config->GetStr ("Video.OpenGL.Shader.Cg.MaxProfile.Vertex");
+      CGprofile profile = cgGetProfile (profileStr);
+      if (profile == CG_PROFILE_UNKNOWN)
+      {
+        if (doVerbose)
+          Report (CS_REPORTER_SEVERITY_WARNING,
+              "Unknown maximum vertex program profile '%s'", profileStr);
+      }
+      else
+      {
+        maxProfileVertex = profile;
+        if (doVerbose)
+          Report (CS_REPORTER_SEVERITY_NOTIFY,
+            "Maximum vertex program profile: %s", profileStr);
+      }
     }
     else
-    {
-      maxProfileVertex = profile;
-      if (doVerbose)
-        Report (CS_REPORTER_SEVERITY_NOTIFY,
-          "Maximum vertex program profile: %s", profileStr);
-    }
+      maxProfileVertex = CG_PROFILE_UNKNOWN;
   }
   else
-    maxProfileVertex = CG_PROFILE_UNKNOWN;
-  if (config->KeyExists ("Video.OpenGL.Shader.Cg.MaxProfile.Fragment"))
   {
-    const char* profileStr = 
-      config->GetStr ("Video.OpenGL.Shader.Cg.MaxProfile.Fragment");
-    CGprofile profile = cgGetProfile (profileStr);
-    if (profile == CG_PROFILE_UNKNOWN)
+    if (doVerbose)
+      Report (CS_REPORTER_SEVERITY_NOTIFY,
+          "Vertex program support disabled by user");
+  }
+
+  if (enableFP)
+  {
+    if (config->KeyExists ("Video.OpenGL.Shader.Cg.MaxProfile.Fragment"))
     {
-      if (doVerbose)
-        Report (CS_REPORTER_SEVERITY_WARNING,
-            "Unknown maximum fragment program profile '%s'", profileStr);
+      const char* profileStr = 
+        config->GetStr ("Video.OpenGL.Shader.Cg.MaxProfile.Fragment");
+      CGprofile profile = cgGetProfile (profileStr);
+      if (profile == CG_PROFILE_UNKNOWN)
+      {
+        if (doVerbose)
+          Report (CS_REPORTER_SEVERITY_WARNING,
+              "Unknown maximum fragment program profile '%s'", profileStr);
+      }
+      else
+      {
+        maxProfileFragment = profile;
+        if (doVerbose)
+          Report (CS_REPORTER_SEVERITY_NOTIFY,
+            "Maximum fragment program profile: %s", profileStr);
+      }
     }
     else
-    {
-      maxProfileFragment = profile;
-      if (doVerbose)
-        Report (CS_REPORTER_SEVERITY_NOTIFY,
-          "Maximum fragment program profile: %s", profileStr);
-    }
+      maxProfileFragment = CG_PROFILE_UNKNOWN;
   }
   else
-    maxProfileFragment = CG_PROFILE_UNKNOWN;
+  {
+    if (doVerbose)
+      Report (CS_REPORTER_SEVERITY_NOTIFY,
+          "Fragment program support disabled by user");
+  }
 
   debugDump = config->GetBool ("Video.OpenGL.Shader.Cg.DebugDump", false);
   if (debugDump)
     dumpDir = csStrNew (config->GetStr ("Video.OpenGL.Shader.Cg.DebugDumpDir",
     "/tmp/cgdump/"));
-
-  psProfile = CG_PROFILE_UNKNOWN;
-  // Check which FP profile to use...
-  ext->InitGL_ARB_fragment_program ();
-  if (ext->CS_GL_ARB_fragment_program)
+ 
+  // Determining what profile to use:
+  //  Start off with the highest supported profile.
+  psProfile = cgGLGetLatestProfile (CG_GL_FRAGMENT);
+  //  Cap at the maximum profile
+  if ((maxProfileFragment != CG_PROFILE_UNKNOWN) 
+    && (GetProfileLevel (psProfile) > GetProfileLevel (maxProfileFragment)))
   {
-    // if AFP is supported, higher profiles are prolly supported as well
-    psProfile = cgGLGetLatestProfile (CG_GL_FRAGMENT);
-  }
-  else
-  {
-    // Non-AFP is always routed through the PS1 plugin
-    ext->InitGL_ATI_fragment_shader ();
-    ext->InitGL_NV_texture_shader ();
-    ext->InitGL_NV_texture_shader2 ();
-    if (ext->CS_GL_ATI_fragment_shader)
+    if (!ProfileNeedsRouting (maxProfileFragment))
     {
-      psProfile = CG_PROFILE_PS_1_3;
-    }
-    else if (ext->CS_GL_NV_texture_shader && ext->CS_GL_NV_texture_shader2)
-    {
-      // @@@ Is that logic correct?
-      ext->InitGL_NV_register_combiners2 ();
-      if (ext->CS_GL_NV_register_combiners2)
-      {
-        ext->InitGL_NV_texture_shader3 ();
-        if (ext->CS_GL_NV_texture_shader3)
-        {
-          psProfile = CG_PROFILE_PS_1_3;
-        }
-        else
-        {
-          psProfile = CG_PROFILE_PS_1_2;
-        }
-      }
+      //  maxProfileFragment is GL profile.
+      //  maxProfileFragment supported natively?
+      if (cgGLIsProfileSupported (maxProfileFragment))
+        psProfile = maxProfileFragment;
+      //  maxProfileFragment supported by routing?
+      else if (IsRoutedProfileSupported (ProfileRouted (maxProfileFragment)))
+        psProfile = ProfileRouted (maxProfileFragment);
       else
-      {
-        psProfile = CG_PROFILE_PS_1_1;
-      }
+        //  Can't support max profile.
+        psProfile = CG_PROFILE_UNKNOWN;
     }
-  }
-
-  if (psProfile != CG_PROFILE_UNKNOWN)
-  {
-    // Cap profile
-    if (maxProfileFragment != CG_PROFILE_UNKNOWN)
-      psProfile = csMin (psProfile, maxProfileFragment);
-
-    // Load PS1 plugin, if requested and/or needed
-    bool route = ProfileNeedsRouting (psProfile);
-    if (doVerbose)
-      Report (CS_REPORTER_SEVERITY_NOTIFY,
-        "Routing Cg fragment programs to Pixel Shader plugin %s", 
-        route ? "ON" : "OFF");
-    if (route)
+    else 
     {
-      psplg = csLoadPluginCheck<iShaderProgramPlugin> (object_reg,
-        "crystalspace.graphics3d.shader.glps1", false);
-      if(!psplg)
-      {
-        if (doVerbose)
-          Report (CS_REPORTER_SEVERITY_WARNING,
-              "Could not find crystalspace.graphics3d.shader.glps1. Cg to PS "
-              "routing unavailable.");
-      }
+      //  maxProfileFragment is DX profile.
+      //  maxProfileFragment supported via routing?
+      if (IsRoutedProfileSupported (maxProfileFragment))
+        psProfile = maxProfileFragment;
+      //  GL equivalent of maxProfileFragment supported?
+      else if (cgGLIsProfileSupported (ProfileUnrouted (maxProfileFragment)))
+        psProfile = ProfileUnrouted (maxProfileFragment);
+      else
+        //  Can't support max profile.
+        psProfile = CG_PROFILE_UNKNOWN;
     }
   }
-  else
+
+  // Check if the requested profile needs routing.
+  bool doRoute = ProfileNeedsRouting (psProfile);
+
+  if (enableFP)
   {
-    if (doVerbose)
-      Report (CS_REPORTER_SEVERITY_WARNING,
-        "Cg fragment programs unavailable due lack of hardware support.");
+    if (psProfile != CG_PROFILE_UNKNOWN)
+    {
+      // Load PS1 plugin, if requested and/or needed
+      if (doVerbose)
+        Report (CS_REPORTER_SEVERITY_NOTIFY,
+          "Routing Cg fragment programs to Pixel Shader plugin %s", 
+          doRoute ? "ON" : "OFF");
+      if (doRoute)
+      {
+        psplg = csLoadPluginCheck<iShaderProgramPlugin> (object_reg,
+          "crystalspace.graphics3d.shader.glps1", false);
+        if(!psplg)
+        {
+          if (doVerbose)
+            Report (CS_REPORTER_SEVERITY_WARNING,
+                "Could not find crystalspace.graphics3d.shader.glps1. Cg to PS "
+                "routing unavailable.");
+          psProfile = cgGLGetLatestProfile (CG_GL_FRAGMENT);
+        }
+      }
+    }
+    else
+    {
+      if (doVerbose)
+        Report (CS_REPORTER_SEVERITY_WARNING,
+          "Cg fragment programs unavailable due lack of hardware support.");
+      enableFP = false;
+    }
   }
 
   isOpen = true;
   return true;
+}
+
+bool csGLShader_CG::IsRoutedProfileSupported (CGprofile profile)
+{
+  ext->InitGL_ATI_fragment_shader();
+  ext->InitGL_NV_texture_shader();
+  ext->InitGL_NV_texture_shader3();
+  switch (profile)
+  {
+    case CG_PROFILE_PS_1_1:
+      return ext->CS_GL_ATI_fragment_shader || ext->CS_GL_NV_texture_shader;
+    case CG_PROFILE_PS_1_2:
+    case CG_PROFILE_PS_1_3:
+      return ext->CS_GL_ATI_fragment_shader || ext->CS_GL_NV_texture_shader3;
+    default:
+      return false;
+  }
 }
 
 ////////////////////////////////////////////////////////////////////

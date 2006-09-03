@@ -141,13 +141,13 @@ private:
 
   void ModelInFrustum(csVector3 &light_pos, float shadow_length,
     csPlane3* frustum_planes, 
-    uint32& frustum_mask, csBox3 &model_bounding_box,
+    uint32& frustum_mask, const csBox3 &model_bounding_box,
     bool & front_cap_in_frustum, 
     bool & extrusion_in_frustum,
     bool & back_cap_in_frustum);
 
   int CalculateShadowMethod(iRenderView *rview, csVector3 &light_pos,
-    const csReversibleTransform &t, csBox3 &model_bounding_box);
+    const csReversibleTransform &t, const csBox3 &model_bounding_box);
 
   void DrawShadow(iRenderView *rview, int method,
     csStencil2ShadowCacheEntry * cache_entry, 

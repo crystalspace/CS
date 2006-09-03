@@ -35,33 +35,34 @@
 struct iTextureWrapper;
 struct iTextureManager;
 
+#include "csutil/win32/msvc_deprecated_warn_off.h"
+
 /**
  * A material class.
  */
 class csMaterial :
-  public scfImplementation3<csMaterial, iMaterial, iMaterialEngine,
-    scfFakeInterface<iShaderVariableContext> >
+  public scfImplementation3<csMaterial, 
+                            iMaterial, 
+                            iMaterialEngine,
+                            scfFakeInterface<iShaderVariableContext> >,
+  public CS::ShaderVariableContextImpl
 {
 private:
   friend class csEngine;
-
-  /// flat shading color
-  csRGBcolor flat_color;
 
   /// Shader associated with material
   csHash<csRef<iShader>, csStringID> shaders;
   csEngine* engine;
   csShaderVariable* GetVar (csStringID name, bool create = false);
 
+  struct SVNamesHolder
+  {
+    CS::ShaderVarName flatcolor;
+    CS::ShaderVarName diffuseTex;
+  };
+  CS_DECLARE_STATIC_CLASSVAR_REF(svNames, SVNames, SVNamesHolder);
 
-  static csStringID nameDiffuseParam;
-  static csStringID nameAmbientParam;
-  static csStringID nameReflectParam;
-  static csStringID nameFlatColorParam;
-  static csStringID nameDiffuseTexture;
-
-  csShaderVariableContext svcontext;
-
+  void SetupSVNames();
 public:
   CS_LEAKGUARD_DECLARE (csMaterial);
 
@@ -80,28 +81,10 @@ public:
    */
   virtual ~csMaterial ();
 
-  /// Get the flat shading color
-  csRGBcolor& GetFlatColor ();
-
-  /// Get diffuse reflection constant for the material
-  float GetDiffuse ();
-  /// Set diffuse reflection constant for the material
-  void SetDiffuse (float val);
-
-  /// Get ambient lighting for the material
-  float GetAmbient ();
-  /// Set ambient lighting for the material
-  void SetAmbient (float val);
-
-  /// Get reflection of the material
-  float GetReflection ();
-  /// Set reflection of the material
-  void SetReflection (float val);
-
   /// Get the base diffuse texture (if none 0 is returned)
   iTextureWrapper* GetTextureWrapper ()
   {
-    return GetTextureWrapper (nameDiffuseTexture);
+    return GetTextureWrapper (SVNames().diffuseTex);
   }
 
   /// Set the base diffuse texture (pass 0 to set no texture)
@@ -135,12 +118,6 @@ public:
   virtual void GetFlatColor (csRGBpixel &oColor, bool useTextureMean = true);
   /// Set the flat shading color
   virtual void SetFlatColor (const csRGBcolor& col);
-  /// Get reflection values (diffuse, ambient, reflection).
-  virtual void GetReflection (float &oDiffuse, float &oAmbient,
-    float &oReflection);
-  /// Set reflection values (diffuse, ambient, reflection).
-  virtual void SetReflection (float oDiffuse, float oAmbient,
-    float oReflection);
   /** @} */
 
   /**
@@ -148,36 +125,9 @@ public:
    */
   void Visit ();
   bool IsVisitRequired () const;
-
-  /**\name iShaderVariableContext implementation
-   * @{ */
-  /// Add a variable to this context
-  void AddVariable (csShaderVariable *variable)
-  { svcontext.AddVariable (variable); }
-
-  /// Get a named variable from this context
-  csShaderVariable* GetVariable (csStringID name) const
-  { return svcontext.GetVariable (name); }
-
-  /// Get Array of all ShaderVariables
-  const csRefArray<csShaderVariable>& GetShaderVariables () const
-  { return svcontext.GetShaderVariables (); }
-
-  /**
-  * Push the variables of this context onto the variable stacks
-  * supplied in the "stacks" argument
-  */
-  void PushVariables (iShaderVarStack* stacks) const
-  { svcontext.PushVariables (stacks); }
-
-  bool IsEmpty () const 
-  { return svcontext.IsEmpty(); }
-  
-  void ReplaceVariable (csShaderVariable *variable)
-  { svcontext.ReplaceVariable (variable); }
-  void Clear () { svcontext.Clear(); }
-  /** @} */
 };
+
+#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 /**
  * csMaterialWrapper represents a texture and its link

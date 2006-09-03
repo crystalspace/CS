@@ -45,7 +45,7 @@ private:
   void Copy(csStringHash const&);
 
 public:
-  typedef HashType::GlobalIterator GlobalIterator;
+  typedef HashType::ConstGlobalIterator GlobalIterator;
 
 public:
   /// Constructor.

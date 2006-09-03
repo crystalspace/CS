@@ -187,6 +187,11 @@ public:
    * \see iEventQueue::RegisterListener()
    */
   bool RegisterQueue (iEventQueue* queue, csEventID names[]);
+  /**
+   * Unregister the event handler with the event queue that it
+   * is currently registered with.
+   */
+  void UnregisterQueue ();
 
 protected:
   /**

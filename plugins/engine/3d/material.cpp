@@ -29,61 +29,37 @@
 CS_LEAKGUARD_IMPLEMENT (csMaterial);
 CS_LEAKGUARD_IMPLEMENT (csMaterialWrapper);
 
-csStringID csMaterial::nameDiffuseParam;
-csStringID csMaterial::nameAmbientParam;
-csStringID csMaterial::nameReflectParam;
-csStringID csMaterial::nameFlatColorParam;
-csStringID csMaterial::nameDiffuseTexture;
+CS_IMPLEMENT_STATIC_CLASSVAR_REF(csMaterial, svNames, SVNames, 
+                                 csMaterial::SVNamesHolder, ())
+
+void csMaterial::SetupSVNames()
+{
+  if (SVNames().diffuseTex == csInvalidStringID)
+  {
+    SVNames().diffuseTex = CS::ShaderVarName (engine->globalStringSet,
+      CS_MATERIAL_TEXTURE_DIFFUSE);
+    SVNames().flatcolor = CS::ShaderVarName (engine->globalStringSet,
+      CS_MATERIAL_VARNAME_FLATCOLOR);
+  }
+}
 
 csMaterial::csMaterial (csEngine* engine) :
-  scfImplementationType(this)
+  scfImplementationType(this), engine (engine)
 {
-  csMaterial::engine = engine;
-
-
-  nameDiffuseParam = engine->globalStringSet->Request (
-  	CS_MATERIAL_VARNAME_DIFFUSE);
-  nameAmbientParam = engine->globalStringSet->Request (
-  	CS_MATERIAL_VARNAME_AMBIENT);
-  nameReflectParam = engine->globalStringSet->Request (
-  	CS_MATERIAL_VARNAME_REFLECTION);
-  nameFlatColorParam = engine->globalStringSet->Request (
-  	CS_MATERIAL_VARNAME_FLATCOLOR);
-  nameDiffuseTexture = engine->globalStringSet->Request (
-  	CS_MATERIAL_TEXTURE_DIFFUSE);
+  SetupSVNames();
 
   SetTextureWrapper (0);
-  // @@@ This will force the shader vars to be created...
-  // @@@ So you can't globally override them
   SetFlatColor (csRGBcolor (255, 255, 255));
-  SetDiffuse (CS_DEFMAT_DIFFUSE);
-  SetAmbient (CS_DEFMAT_AMBIENT);
-  SetReflection (CS_DEFMAT_REFLECTION);
 }
 
 csMaterial::csMaterial (csEngine* engine,
 			iTextureWrapper *w) :
-  scfImplementationType(this)
+  scfImplementationType(this), engine (engine)
 {
-  csMaterial::engine = engine;
-
-  nameDiffuseParam = engine->globalStringSet->Request (
-  	CS_MATERIAL_VARNAME_DIFFUSE);
-  nameAmbientParam = engine->globalStringSet->Request (
-  	CS_MATERIAL_VARNAME_AMBIENT);
-  nameReflectParam = engine->globalStringSet->Request (
-  	CS_MATERIAL_VARNAME_REFLECTION);
-  nameFlatColorParam = engine->globalStringSet->Request (
-  	CS_MATERIAL_VARNAME_FLATCOLOR);
-  nameDiffuseTexture = engine->globalStringSet->Request (
-  	CS_MATERIAL_TEXTURE_DIFFUSE);
-
+  SetupSVNames();
 
   SetTextureWrapper (w);
   SetFlatColor (csRGBcolor (255, 255, 255));
-  SetDiffuse (CS_DEFMAT_DIFFUSE);
-  SetAmbient (CS_DEFMAT_AMBIENT);
-  SetReflection (CS_DEFMAT_REFLECTION);
 }
 
 csMaterial::~csMaterial ()
@@ -92,18 +68,20 @@ csMaterial::~csMaterial ()
 
 csShaderVariable* csMaterial::GetVar (csStringID name, bool create)
 {
-  csRef<csShaderVariable> var = GetVariable (name);
+  csRef<csShaderVariable> var = 
+    CS::ShaderVariableContextImpl::GetVariable (name);
   if ((var == 0) && create)
   {
     var.AttachNew (new csShaderVariable (name));
-    AddVariable (var);
+    CS::ShaderVariableContextImpl::AddVariable (var);
   }
   return var;
 }
 
-csRGBcolor& csMaterial::GetFlatColor ()
-{ 
-  csShaderVariable* var = GetVar (nameFlatColorParam);
+void csMaterial::GetFlatColor (csRGBpixel &oColor, bool /*useTextureMean*/)
+{
+  csRGBcolor flat_color;
+  csShaderVariable* var = GetVar (SVNames().flatcolor);
   if (var == 0) 
   {
     flat_color.Set (255, 255, 255);
@@ -115,89 +93,20 @@ csRGBcolor& csMaterial::GetFlatColor ()
     flat_color.Set (csQint (v.x * 255.99f), csQint (v.y * 255.99f), 
       csQint (v.z * 255.99f));
   }
-  return flat_color;
-}
-  
-void csMaterial::GetFlatColor (csRGBpixel &oColor, bool /*useTextureMean*/)
-{
-  oColor = GetFlatColor ();
-}
-
-float csMaterial::GetDiffuse ()
-{ 
-  csShaderVariable* var = GetVar (nameDiffuseParam);
-  if (var == 0) return CS_DEFMAT_DIFFUSE;
-  float f;
-  var->GetValue (f);
-  return f; 
-}
-
-void csMaterial::SetDiffuse (float val) 
-{ 
-  csShaderVariable* var = GetVar (nameDiffuseParam, true);
-  var->SetValue (val);
-}
-
-float csMaterial::GetAmbient ()
-{ 
-  csShaderVariable* var = GetVar (nameAmbientParam);
-  if (var == 0) return CS_DEFMAT_AMBIENT;
-  float f;
-  var->GetValue (f);
-  return f; 
-}
-
-void csMaterial::SetAmbient (float val) 
-{ 
-  csShaderVariable* var = GetVar (nameAmbientParam, true);
-  var->SetValue (val);
-}
-
-float csMaterial::GetReflection ()
-{ 
-  csShaderVariable* var = GetVar (nameReflectParam);
-  if (var == 0) return CS_DEFMAT_REFLECTION;
-  float f;
-  var->GetValue (f);
-  return f; 
-}
-
-void csMaterial::SetReflection (float val) 
-{ 
-  csShaderVariable* var = GetVar (nameReflectParam, true);
-  var->SetValue (val);
+  oColor = flat_color;
 }
 
 void csMaterial::SetFlatColor (const csRGBcolor& col)
 { 
-  csShaderVariable* var = GetVar (nameFlatColorParam, true);
+  csShaderVariable* var = GetVar (SVNames().flatcolor, true);
   csVector3 v (((float)col.red) / 255.0f, ((float)col.green) / 255.0f, 
     ((float)col.blue) / 255.0f);
   var->SetValue (v);
 }
 
-void csMaterial::GetReflection (
-  float &oDiffuse,
-  float &oAmbient,
-  float &oReflection)
-{
-  oDiffuse = GetDiffuse ();
-  oAmbient = GetAmbient ();
-  oReflection = GetReflection ();
-}
-
-void csMaterial::SetReflection (float oDiffuse, float oAmbient,
-  float oReflection)
-{
-  SetDiffuse (oDiffuse);
-  SetDiffuse (oAmbient);
-  SetReflection (oReflection);
-}
-
-
 void csMaterial::SetTextureWrapper (iTextureWrapper *tex)
 {
-  SetTextureWrapper (nameDiffuseTexture, tex);
+  SetTextureWrapper (SVNames().diffuseTex, tex);
 }
 
 
@@ -229,7 +138,7 @@ iShader* csMaterial::GetShader(csStringID type)
 iTextureHandle *csMaterial::GetTexture ()
 {
   iTextureWrapper* tex;
-  GetVar (nameDiffuseTexture)->GetValue (tex);
+  GetVar (SVNames().diffuseTex)->GetValue (tex);
   if (tex) return tex->GetTextureHandle ();
   else return 0;
 }

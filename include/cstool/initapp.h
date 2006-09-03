@@ -61,8 +61,15 @@ struct iVerbosityManager;
  * Utility macros to select what plugins you want to have loaded.
  * @{ */
 /// Request a plugin.
-#define CS_REQUEST_PLUGIN(Name,Interface) Name, scfInterfaceTraits<Interface>::GetName(), \
-  scfInterfaceTraits<Interface>::GetID(), scfInterfaceTraits<Interface>::GetVersion()
+#define CS_REQUEST_PLUGIN(Name,Interface)                                   \
+  Name, scfInterfaceTraits<Interface>::GetName(),                           \
+  scfInterfaceTraits<Interface>::GetID(),                                   \
+  scfInterfaceTraits<Interface>::GetVersion()
+/// Request a plugin, but with a custom tag.
+#define CS_REQUEST_PLUGIN_TAG(Name,Interface,Tag)                           \
+  Name ":" Tag , scfInterfaceTraits<Interface>::GetName(),                  \
+  scfInterfaceTraits<Interface>::GetID(),                                   \
+  scfInterfaceTraits<Interface>::GetVersion()
 
 // !!! NOTE !!!
 // When editing this list, you *must* ensure that initapp.h #include the

@@ -263,7 +263,7 @@ on this exporter at:
 @uref{http://cal3d.sourceforge.net/modeling/tutorial.html}
 
 @strong{A5}: There is a tool to convert map files (from tools like
-Q3Radiant, Hammer, or Quark) to @sc{cs}. You can find this tool at:
+Q3Radiant, Hammer, or QuArK) to @sc{cs}. You can find this tool at:
 
 @noindent
 @uref{http://www-poleia.lip6.fr/~degris/converter/}

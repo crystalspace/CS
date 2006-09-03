@@ -47,7 +47,7 @@
 
 class csGenmeshSkelAnimationControl;
 class csGenmeshSkelAnimationControlFactory;
-class csGenmeshSkelAnimationControlType;
+class csGenmeshSkelAnimationControlTypeOld;
 class csSkelAnimControlRunnable;
 struct iEvent;
 
@@ -591,7 +591,7 @@ class csGenmeshSkelAnimationControlFactory :
     iGenMeshSkeletonControlFactory>
 {
 private:
-  csGenmeshSkelAnimationControlType* type;
+  csGenmeshSkelAnimationControlTypeOld* type;
   iObjectRegistry* object_reg;
 
   csStringArray autorun_scripts;
@@ -636,7 +636,7 @@ public:
   void RegisterAUAnimation(csGenmeshSkelAnimationControl *anim);
   void UnregisterAUAnimation(csGenmeshSkelAnimationControl *anim);
   /// Constructor.
-  csGenmeshSkelAnimationControlFactory (csGenmeshSkelAnimationControlType* type,
+  csGenmeshSkelAnimationControlFactory (csGenmeshSkelAnimationControlTypeOld* type,
     iObjectRegistry* object_reg);
   /// Destructor.
   virtual ~csGenmeshSkelAnimationControlFactory ();
@@ -644,7 +644,7 @@ public:
   virtual csPtr<iGenMeshAnimationControl> CreateAnimationControl (
   	iMeshObject *mesh);
 
-  csGenmeshSkelAnimationControlType* GetType () { return type; }
+  csGenmeshSkelAnimationControlTypeOld* GetType () { return type; }
   csSkelAnimControlScript* FindScript (const char* scriptname) const;
   csSkelBone* FindBone (const char* bonename) const;
   size_t FindBoneIndex (const char* bonename) const;
@@ -677,13 +677,14 @@ public:
 /**
  * Genmesh animation control type.
  */
-class csGenmeshSkelAnimationControlType :
-  public scfImplementation3<csGenmeshSkelAnimationControlType,
+class csGenmeshSkelAnimationControlTypeOld :
+  public scfImplementation3<csGenmeshSkelAnimationControlTypeOld,
     iGenMeshAnimationControlType, iComponent, iEventHandler>
 {
 private:
   iObjectRegistry* object_reg;
   csRef<iVirtualClock> vc;
+  csRef<iEventHandler> weakEventHandler;
   csArray<csGenmeshSkelAnimationControl*> always_update_animations;
 
   void UpdateAUAnimations(csTicks current_ticks)
@@ -708,9 +709,9 @@ public:
   }
 
   /// Constructor.
-  csGenmeshSkelAnimationControlType (iBase*);
+  csGenmeshSkelAnimationControlTypeOld (iBase*);
   /// Destructor.
-  virtual ~csGenmeshSkelAnimationControlType ();
+  virtual ~csGenmeshSkelAnimationControlTypeOld ();
   /// Initialize.
   bool Initialize (iObjectRegistry* object_reg);
   /// Event handler.

@@ -24,7 +24,7 @@
 #include "csgeom/pmtools.h"
 #include "csgeom/subrec.h"
 #include "csgeom/transfrm.h"
-#include "csgfx/memimage.h"
+#include "csgfx/imagememory.h"
 #include "csgfx/shadervar.h"
 #include "csutil/array.h"
 #include "csutil/blockallocator.h"
@@ -381,7 +381,7 @@ public:
    * Get the bounding box in object space for this polygon set.
    * This is calculated based on the oriented bounding box.
    */
-  void GetBoundingBox (csBox3& box);
+  const csBox3& GetBoundingBox ();
 
   /**
    * Set the bounding box in object space for this polygon set.
@@ -530,6 +530,8 @@ public:
 
   virtual bool AddPolygonRenderBuffer (int polygon_idx, const char* name,
     iRenderBuffer* buffer);
+  virtual bool GetLightmapLayout (int polygon_idx, size_t& slm, 
+    csRect& slmSubRect, float* slmCoord);
 
   //-------------------- iMeshObjectFactory interface implementation ----------
 
@@ -560,7 +562,11 @@ public:
   //-------------------- iObjectModel implementation --------------------------
   virtual void GetObjectBoundingBox (csBox3& bbox)
   {
-    GetBoundingBox (bbox);
+    bbox = GetBoundingBox ();
+  }
+  virtual const csBox3& GetObjectBoundingBox ()
+  {
+    return GetBoundingBox ();
   }
   virtual void SetObjectBoundingBox (const csBox3& bbox)
   {
@@ -984,6 +990,10 @@ public:
   /// Prepare.
   virtual void Prepare ()
   { PrepareForUse (); }
+  virtual csPtr<iImage> GetPolygonLightmap (int polygon_idx);
+  virtual bool GetPolygonPDLight (int polygon_idx, size_t pdlight_index, 
+    csRef<iImage>& map, iLight*& light);
+  iMaterialWrapper* GetReplacedMaterial (iMaterialWrapper* oldMat);
   /** @} */
 
   //-------------------- iMeshObject interface implementation ----------

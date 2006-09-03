@@ -24,7 +24,6 @@
 #include "csgeom/polypool.h"
 #include "csgeom/sphere.h"
 #include "csgeom/subrec.h"
-#include "csgfx/memimage.h"
 #include "csgfx/shadervarcontext.h"
 #include "csqint.h"
 #include "csqsqrt.h"
@@ -601,10 +600,14 @@ void csThingStatic::DistributePolyLMs (
 
       sp->polygon_data.useLightmap = true;
       float lmu1, lmv1, lmu2, lmv2;
-      thing_type->G3D->GetTextureManager ()->GetLightmapRendererCoords (
-        slm->width, slm->height,
-        r.xmin, r.ymin, r.xmax, r.ymax,
-        lmu1, lmv1, lmu2, lmv2);
+      float islmW = 1.0f / (float)slm->width;
+      float islmH = 1.0f / (float)slm->height;
+      // Those offsets seem to result in a look similar to the software
+      // renderer... but not perfect yet.
+      lmu1 = ((float)r.xmin + 0.5f) * islmW;
+      lmv1 = ((float)r.ymin + 0.5f) * islmH;
+      lmu2 = ((float)r.xmax - 1.0f) * islmW;
+      lmv2 = ((float)r.ymax - 1.0f) * islmH;
       sp->polygon_data.tmapping->SetCoordsOnSuperLM (
         lmu1, lmv1, lmu2, lmv2);
     }
@@ -964,15 +967,12 @@ void csThingStatic::SetBoundingBox (const csBox3 &box)
   ShapeChanged ();
 }
 
-void csThingStatic::GetBoundingBox (csBox3 &box)
+const csBox3& csThingStatic::GetBoundingBox ()
 {
   int i;
 
   if (IsObjBboxValid())
-  {
-    box = obj_bbox;
-    return ;
-  }
+    return obj_bbox;
 
   SetObjBboxValid (true);
 
@@ -980,8 +980,7 @@ void csThingStatic::GetBoundingBox (csBox3 &box)
   {
     obj_bbox.Set (0, 0, 0, 0, 0, 0);
     obj_radius = 0.0f;
-    box = obj_bbox;
-    return ;
+    return obj_bbox;
   }
 
   obj_bbox.StartBoundingBox (obj_verts[0]);
@@ -990,13 +989,12 @@ void csThingStatic::GetBoundingBox (csBox3 &box)
 
   obj_radius = csQsqrt (csSquaredDist::PointPoint (
         obj_bbox.Max (), obj_bbox.Min ())) * 0.5f;
-  box = obj_bbox;
+  return obj_bbox;
 }
 
 void csThingStatic::GetRadius (float &rad, csVector3 &cent)
 {
-  csBox3 b;
-  GetBoundingBox (b);
+  const csBox3& b = GetBoundingBox ();
   rad = obj_radius;
   cent = b.GetCenter ();
 }
@@ -1515,6 +1513,79 @@ bool csThingStatic::PointOnPolygon (int polygon_idx, const csVector3& v)
 {
   return static_polygons[GetRealIndex (polygon_idx)]->PointOnPolygon (v);
 }
+
+bool csThingStatic::GetLightmapLayout (int polygon_idx, size_t& slm, 
+                                       csRect& slmSubRect, float* slmCoord)
+{
+  Prepare (0);
+  /* The layouted polys are in a structure primarily intended for rendering,
+   * not to quickly access a specific polygon. Linear search time. */
+  for (size_t litPoly = 0; litPoly < litPolys.GetSize(); litPoly++)
+  {
+    const csStaticLitPolyGroup& polyGroup = *(litPolys[litPoly]);
+    for (size_t p = 0; p < polyGroup.polys.GetSize(); p++)
+    {
+      if (polyGroup.polys[p] == polygon_idx)
+      {
+        slm = superLMs.Find (polyGroup.staticSLM);
+        slmSubRect = polyGroup.lmRects[p];
+
+        const csPolygonRenderData* static_data = 
+          &static_polygons[polygon_idx]->polygon_data;
+        // Compute TCs (lifted from the poly renderer)
+        csMatrix3 t_m;
+        csVector3 t_v;
+        t_m = static_data->tmapping->GetO2T ();
+        t_v = static_data->tmapping->GetO2TTranslation ();
+        csTransform object2texture (t_m, t_v);
+
+        csTransform tex2lm;
+        struct csPolyLMCoords
+        {
+          float u1, v1, u2, v2;
+        };
+
+        csPolyLMCoords lmc;
+        static_data->tmapping->GetCoordsOnSuperLM (lmc.u1, lmc.v1,
+          lmc.u2, lmc.v2);
+
+        float lm_low_u = 0.0f, lm_low_v = 0.0f;
+        float lm_high_u = 1.0f, lm_high_v = 1.0f;
+        static_data->tmapping->GetTextureBox (
+          lm_low_u, lm_low_v, lm_high_u, lm_high_v);
+
+        float lm_scale_u = ((lmc.u2 - lmc.u1) / (lm_high_u - lm_low_u));
+        float lm_scale_v = ((lmc.v2 - lmc.v1) / (lm_high_v - lm_low_v));
+
+        tex2lm.SetO2T (
+          csMatrix3 (lm_scale_u, 0, 0,
+          0, lm_scale_v, 0,
+          0, 0, 1));
+        tex2lm.SetO2TTranslation (
+          csVector3 (
+          (lm_scale_u != 0.0f) ? (lm_low_u - lmc.u1 / lm_scale_u) : 0,
+          (lm_scale_v != 0.0f) ? (lm_low_v - lmc.v1 / lm_scale_v) : 0,
+          0));
+
+        csVector3* obj_verts = *(static_data->p_obj_verts);
+        int j, vc = static_data->num_vertices;
+        for (j = 0; j < vc; j++)
+        {
+          int vidx = static_data->vertices[j];
+          const csVector3& vertex = obj_verts[vidx];
+          csVector3 t = object2texture.Other2This (vertex);
+          csVector3 l = tex2lm.Other2This (t);
+          *slmCoord++ = l.x;
+          *slmCoord++ = l.y;
+        }
+        
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
 //----------------------------------------------------------------------------
 
 csThingStatic::LightmapTexAccessor::LightmapTexAccessor (csThing* instance, 
@@ -1593,9 +1664,6 @@ csThing::~csThing ()
 
 csString csThing::GenerateCacheName ()
 {
-  csBox3 b;
-  static_data->GetBoundingBox (b);
-
   csMemFile mf;
   int32 l;
   l = csLittleEndian::Convert ((int32)static_data->num_vertices);
@@ -2030,7 +2098,7 @@ void csThing::GetBoundingBox (iMovable *movable, csBox3 &box)
   if (wor_bbox_movablenr != movable->GetUpdateNumber ())
   {
     // First make sure obj_bbox is valid.
-    static_data->GetBoundingBox (box);
+    box = static_data->GetBoundingBox ();
     wor_bbox_movablenr = movable->GetUpdateNumber ();
     csBox3& obj_bbox = static_data->obj_bbox;
 
@@ -2432,8 +2500,7 @@ csRenderMesh **csThing::GetRenderMeshes (int &num, iRenderView* rview,
   cached_movable = movable;
   WorUpdate ();
 
-  csBox3 b;
-  static_data->GetBoundingBox (b);
+  const csBox3& b = static_data->GetBoundingBox ();
 
   csSphere sphere;
   sphere.SetCenter (b.GetCenter ());
@@ -2601,17 +2668,6 @@ void csThing::ClearLMs ()
 void csThing::UpdateDirtyLMs ()
 {
   csColor amb (0, 0, 0);
-  if (cached_movable)
-  {
-    // First check if dynamic ambient has changed.
-    iSector* s = cached_movable->GetSectors ()->Get (0);
-    amb += s->GetDynamicAmbientLight ();
-    if (dynamic_ambient_version != s->GetDynamicAmbientVersion ())
-    {
-      dynamic_ambient_version = s->GetDynamicAmbientVersion ();
-      MarkLightmapsDirty ();
-    }
-  }
 
   if (!IsLmDirty()) return;
 
@@ -2668,6 +2724,66 @@ void csThing::UpdateDirtyLMs ()
   }
 
   SetLmDirty (false);
+}
+
+csPtr<iImage> csThing::GetPolygonLightmap (int polygon_idx)
+{
+  if ((polygon_idx < 0) 
+    || ((size_t)polygon_idx >= polygons.GetSize())) return 0;
+  csPolyTexture* polytex = polygons[polygon_idx].GetPolyTexture();
+  if (!polytex) return 0;
+  csLightMap* lm = polytex->GetLightMap();
+  if (!lm) return 0;
+
+  csRGBcolor* rgbPtr = lm->GetStaticMap ();
+  if (!rgbPtr) return 0;
+  size_t numPixels = lm->GetWidth() * lm->GetHeight();
+  csRGBpixel* rgbaData = new csRGBpixel[numPixels];
+  {
+    csRGBpixel* rgbaPtr = rgbaData;
+    while (numPixels-- > 0)
+    {
+      *rgbaPtr++ = *rgbPtr++;
+    }
+  }
+  return csPtr<iImage> (new csImageMemory (lm->GetWidth(), lm->GetHeight(), 
+    rgbaData, true));
+}
+
+bool csThing::GetPolygonPDLight (int polygon_idx, size_t pdlight_index, 
+                                 csRef<iImage>& map, iLight*& light)
+{
+  if ((polygon_idx < 0) 
+    || ((size_t)polygon_idx >= polygons.GetSize())) return false;
+  csPolyTexture* polytex = polygons[polygon_idx].GetPolyTexture();
+  if (!polytex) return false;
+  csLightMap* lm = polytex->GetLightMap();
+  if (!lm) return false;
+
+  csShadowMap* smap = lm->GetShadowMap (pdlight_index);
+  if (!smap) return false;
+
+  // Create grayscale image from PD shadow map.
+  light = smap->Light;
+  size_t smapSize = smap->map->GetSize();
+  uint8* pdData = new uint8[smapSize];
+  memcpy (pdData, smap->map->GetData(), smapSize);
+  csRGBpixel* pal = new csRGBpixel[256];
+  for (int i = 0; i < 256; i++) pal[i].Set (i, i, i);
+  map.AttachNew (new csImageMemory (lm->GetWidth(), lm->GetHeight(), 
+    pdData, true, CS_IMGFMT_PALETTED8, pal));
+
+  return true;
+}
+
+iMaterialWrapper* csThing::GetReplacedMaterial (iMaterialWrapper* oldMat)
+{
+  for (size_t i = 0; i < replace_materials.GetSize(); i++)
+  {
+    if (replace_materials[i].old_mat == oldMat) 
+      return replace_materials[i].new_mat;
+  }
+  return 0;
 }
 
 //---------------------------------------------------------------------------

@@ -19,17 +19,17 @@
 #ifndef __CS_LIGHT_H__
 #define __CS_LIGHT_H__
 
-#include "csutil/scf_implementation.h"
 #include "csgeom/transfrm.h"
 #include "cstool/objmodel.h"
-#include "csutil/scf_implementation.h"
-#include "csutil/csobject.h"
 #include "csutil/cscolor.h"
-#include "csutil/weakref.h"
+#include "csutil/csobject.h"
 #include "csutil/flags.h"
-#include "csutil/nobjvec.h"
 #include "csutil/hash.h"
+#include "csutil/nobjvec.h"
 #include "csutil/refarr.h"
+#include "csutil/scf_implementation.h"
+#include "csutil/scfarray.h"
+#include "csutil/weakref.h"
 #include "iutil/selfdestruct.h"
 #include "plugins/engine/3d/lview.h"
 #include "plugins/engine/3d/halo.h"
@@ -68,6 +68,10 @@ public:
   {
     bbox = box;
   }
+  virtual const csBox3& GetObjectBoundingBox ()
+  {
+    return box;
+  }
   virtual void SetObjectBoundingBox (const csBox3& bbox)
   {
     box = bbox;
@@ -103,6 +107,8 @@ public:
 };
 
 typedef csSet<csRef<csLightSectorInfluence> > csLightSectorInfluences;
+
+#include "csutil/win32/msvc_deprecated_warn_off.h"
 
 /**
  * Superclass of all positional lights.
@@ -570,8 +576,8 @@ public:
   virtual iObjectModel* GetObjectModel () { return object_model; }
   virtual csFlags& GetCullerFlags () { return culler_flags; }
 
-  //--------------------- iSceneNode implementation ----------------------//
-
+  /**\name iSceneNode implementation
+   * @{ */
   virtual void SetParent (iSceneNode* parent)
   {
     csSceneNode::SetParent ((iSceneNode*)this, parent, &movable);
@@ -587,9 +593,16 @@ public:
   {
     return movable.GetChildren ();
   }
+  virtual csPtr<iSceneNodeArray> GetChildrenArray () const
+  {
+    return csPtr<iSceneNodeArray> (
+      new scfArrayWrapConst<iSceneNodeArray, csRefArray<iSceneNode> > (
+      movable.GetChildren ()));
+  }
   virtual iMeshWrapper* QueryMesh () { return 0; }
   virtual iLight* QueryLight () { return this; }
   virtual iCamera* QueryCamera () { return 0; }
+  /** @} */
 
   //--------------------- iSelfDestruct implementation -------------------//
 
@@ -615,6 +628,8 @@ public:
   }
 
 };
+
+#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 /**
  * List of lights for a sector. This class implements iLightList.

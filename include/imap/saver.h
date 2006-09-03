@@ -35,8 +35,10 @@ struct iRegion;
  */ 
 struct iSaver : public virtual iBase
 {
-  SCF_INTERFACE (iSaver, 2, 0, 0);
+  SCF_INTERFACE (iSaver, 2, 0, 1);
 
+  /**\name Whole world saving
+   * @{ */
   /// Save the current engine contents to the filename.
   virtual bool SaveMapFile(const char *filename) = 0;
   /// Return the current engine contents as a string.
@@ -57,9 +59,21 @@ struct iSaver : public virtual iBase
   /// Return the region contents as a string.
   virtual csRef<iString> SaveRegion(iRegion* region, int filetype) = 0;
   
-  /// Save region to DocumentNode
+  /// Save region to the document node.
   virtual bool SaveRegion(iRegion* region, int filetype,
     csRef<iDocumentNode>& root) = 0;
+  /** @} */
+  
+  /**\name Fine-grained saving
+   * @{ */
+  /**
+   * Save a portal to the given document node.
+   * Will create a '<tt>portal</tt>' node below \p parent.
+   */
+  virtual bool SavePortal (iPortal *portal, iDocumentNode *parent) = 0;
+
+  // TODO: Add more, as needed
+  /** @} */
 };
 
 #endif // __CS_IMAP_SAVER_H__

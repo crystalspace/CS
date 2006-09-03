@@ -27,7 +27,7 @@
 #include "csgeom/trimesh.h"
 #include "csgeom/trimeshlod.h"
 #include "csgeom/vector3.h"
-#include "csgfx/memimage.h"
+#include "csgfx/imagememory.h"
 #include "csgfx/renderbuffer.h"
 #include "csgfx/shadervarcontext.h"
 #include "csutil/csendian.h"
@@ -1382,9 +1382,6 @@ void csTerrainObject::InitializeDefault (bool clear)
 
 char* csTerrainObject::GenerateCacheName ()
 {
-  csBox3 b;
-  GetObjectBoundingBox (b);
-
   csMemFile mf;
   mf.Write ("bruteblock", 8);
   uint32 l;
@@ -2388,6 +2385,12 @@ void csTerrainObject::GetObjectBoundingBox (csBox3& bbox)
   bbox = global_bbox;
 }
 
+const csBox3& csTerrainObject::GetObjectBoundingBox ()
+{
+  SetupObject ();
+  return global_bbox;
+}
+
 void csTerrainObject::SetObjectBoundingBox (const csBox3& bbox)
 {
   global_bbox = bbox;
@@ -2396,8 +2399,7 @@ void csTerrainObject::SetObjectBoundingBox (const csBox3& bbox)
 
 void csTerrainObject::GetRadius (float& rad, csVector3& cent)
 {
-  csBox3 bbox;
-  GetObjectBoundingBox (bbox);
+  const csBox3& bbox = GetObjectBoundingBox ();
   cent = bbox.GetCenter ();
   rad = csQsqrt (csSquaredDist::PointPoint (bbox.Max (), bbox.Min ()));
 }

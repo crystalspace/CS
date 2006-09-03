@@ -22,7 +22,7 @@
 #include "csgeom/math.h"
 #include "csgeom/polyclip.h"
 #include "csgeom/sphere.h"
-#include "csgfx/memimage.h"
+#include "csgfx/imagememory.h"
 #include "csqint.h"
 #include "csutil/cfgacc.h"
 #include "csutil/databuf.h"
@@ -529,23 +529,20 @@ csEngine::csEngine (iBase *iParent) :
   clearZBuf (false), defaultClearZBuf (false), 
   clearScreen (false),  defaultClearScreen (false), 
   defaultMaxLightmapWidth (256), defaultMaxLightmapHeight (256),
-  currentRenderContext (0)
+  currentRenderContext (0), weakEventHandler(0)
 {
   DG_TYPE (this, "csEngine");
-
-  scfiEventHandler = new eiEventHandler (this);
 
   ClearRenderPriorities ();
 }
 
 csEngine::~csEngine ()
 {
-  if (scfiEventHandler)
+  if (weakEventHandler != 0)
   {
     csRef<iEventQueue> q (CS_QUERY_REGISTRY (objectRegistry, iEventQueue));
     if (q != 0)
-      q->RemoveListener (scfiEventHandler);
-    scfiEventHandler->DecRef ();
+      RemoveWeakListener (q, weakEventHandler);
   }
 
   DeleteAll ();
@@ -620,7 +617,7 @@ bool csEngine::Initialize (iObjectRegistry *objectRegistry)
     // discard canvas events if there is no canvas, by truncating the array
     if (!G2D) events[2] = CS_EVENTLIST_END;
 
-    q->RegisterListener (scfiEventHandler, events);
+    RegisterWeakListener (q, this, events, weakEventHandler);
   }
 
   csConfigAccess cfg (objectRegistry, "/config/engine.cfg");

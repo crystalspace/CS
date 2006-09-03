@@ -191,7 +191,6 @@ private:
   friend class csGLRendererLightmap;
   friend class csGLTextureHandle;
   friend class csGLTextureManager;
-  friend class eiShaderRenderInterface;
 
   iObjectRegistry* object_reg;
   csRef<iGraphics2D> G2D;

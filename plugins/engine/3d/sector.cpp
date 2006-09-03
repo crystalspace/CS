@@ -121,7 +121,6 @@ csSector::csSector (csEngine *engine) :
   scfImplementationType (this), engine (engine)
 {
   DG_TYPE (this, "csSector");
-  fog.enabled = false;
   drawBusy = 0;
   dynamicAmbientLightColor.Set (0,0,0);
   dynamicAmbientLightVersion = (uint)~0;
@@ -132,6 +131,22 @@ csSector::csSector (csEngine *engine) :
   renderloop = 0;
   use_lightculling = false;
   single_mesh = 0;
+
+  SetupSVNames();
+  svDynamicAmbient.AttachNew (new csShaderVariable (SVNames().dynamicAmbient));
+  svDynamicAmbient->SetValue (dynamicAmbientLightColor);
+  AddVariable (svDynamicAmbient);
+  svFogColor.AttachNew (new csShaderVariable (SVNames().fogColor));
+  AddVariable (svFogColor);
+  svFogMode.AttachNew (new csShaderVariable (SVNames().fogMode));
+  AddVariable (svFogMode);
+  svFogStart.AttachNew (new csShaderVariable (SVNames().fogStart));
+  AddVariable (svFogStart);
+  svFogEnd.AttachNew (new csShaderVariable (SVNames().fogEnd));
+  AddVariable (svFogEnd);
+  svFogDensity.AttachNew (new csShaderVariable (SVNames().fogDensity));
+  AddVariable (svFogDensity);
+  UpdateFogSVs();
 }
 
 csSector::~csSector ()
@@ -1050,6 +1065,7 @@ void csSector::SetDynamicAmbientLight (const csColor& color)
 {
   dynamicAmbientLightColor = color;
   dynamicAmbientLightVersion++;
+  svDynamicAmbient->SetValue (dynamicAmbientLightColor);
 }
 
 void csSector::CalculateSectorBBox (csBox3 &bbox, bool do_meshes) const
@@ -1128,6 +1144,37 @@ void csSector::RegisterPortalMesh (iMeshWrapper* mesh)
 void csSector::UnregisterPortalMesh (iMeshWrapper* mesh)
 {
   portalMeshes.Delete (mesh);
+}
+
+CS_IMPLEMENT_STATIC_CLASSVAR_REF(csSector, svNames, SVNames,
+                                 csSector::SVNamesHolder, ());
+
+void csSector::UpdateFogSVs ()
+{
+  svFogColor->SetValue (fog.color);
+  svFogMode->SetValue (int (fog.mode));
+  svFogStart->SetValue (fog.start);
+  svFogEnd->SetValue (fog.end);
+  svFogDensity->SetValue (fog.density);
+}
+
+void csSector::SetupSVNames()
+{
+  if (SVNames().dynamicAmbient == csInvalidStringID)
+  {
+    SVNames().dynamicAmbient = CS::ShaderVarName (engine->globalStringSet,
+      "dynamic ambient");
+    SVNames().fogColor = CS::ShaderVarName (engine->globalStringSet,
+      "fog color");
+    SVNames().fogMode = CS::ShaderVarName (engine->globalStringSet,
+      "fog mode");
+    SVNames().fogStart = CS::ShaderVarName (engine->globalStringSet,
+      "fog start");
+    SVNames().fogEnd = CS::ShaderVarName (engine->globalStringSet,
+      "fog end");
+    SVNames().fogDensity = CS::ShaderVarName (engine->globalStringSet,
+      "fog density");
+  }
 }
 
 //---------------------------------------------------------------------------

@@ -665,7 +665,7 @@ void csInstmeshMeshObject::AppendShadows (iMovable* movable,
 }
 void csInstmeshMeshObject::SetupShaderParams ()
 {
-  csHash<csRef<iShader>, csStringID>::GlobalIterator it = 
+  csHash<csRef<iShader>, csStringID>::ConstGlobalIterator it = 
     material->GetMaterial ()->GetShaders ().GetIterator ();
   while (it.HasNext ())
   {

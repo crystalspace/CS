@@ -688,8 +688,8 @@ public:
 };
 
 class csSkeletonGraveyard :
-  public scfImplementation3<csSkeletonGraveyard,
-    iSkeletonGraveyard, iComponent, iEventHandler>
+  public scfImplementation2<csSkeletonGraveyard,
+    iSkeletonGraveyard, iComponent>
 {
 private:
   iObjectRegistry* object_reg;
@@ -709,8 +709,25 @@ public:
   virtual iSkeletonFactory *FindFactory(const char * /*name*/) { return 0; }
   virtual iSkeleton *CreateSkeleton(iSkeletonFactory *fact, const char *name);
 
-  CS_EVENTHANDLER_NAMES("crystalspace.skeleton.graveyard")
-  CS_EVENTHANDLER_NIL_CONSTRAINTS
+  class csSkelEventHandler : public scfImplementation1<csSkelEventHandler,
+  	iEventHandler>
+  {
+  private:
+    csSkeletonGraveyard* parent;
+
+  public:
+    csSkelEventHandler (csSkeletonGraveyard* parent)
+      : scfImplementationType (this), parent (parent) { }
+    virtual ~csSkelEventHandler () { }
+    virtual bool HandleEvent (iEvent& ev)
+    {
+      return parent->HandleEvent (ev);
+    }
+
+    CS_EVENTHANDLER_NAMES("crystalspace.skeleton.graveyard")
+    CS_EVENTHANDLER_NIL_CONSTRAINTS
+  };
+  csRef<csSkelEventHandler> evhandler;
 };
 
 #endif // __CS_SKELETON_H__

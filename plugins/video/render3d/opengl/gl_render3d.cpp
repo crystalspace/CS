@@ -26,7 +26,7 @@
 #include "csgeom/polyclip.h"
 #include "csgeom/transfrm.h"
 #include "csgeom/vector4.h"
-#include "csgfx/memimage.h"
+#include "csgfx/imagememory.h"
 #include "csgfx/renderbuffer.h"
 #include "csplugincommon/opengl/glextmanager.h"
 #include "csplugincommon/opengl/glhelper.h"
@@ -1567,7 +1567,7 @@ void csGLGraphics3D::DrawInstancesUseShader (
   {
     size_t values_cnt = modes.instances_binds.GetSize ();
     //loop through all instances
-    csHash<csInstance*>::GlobalIterator it = modes.instances.GetIterator ();
+    csHash<csInstance*>::ConstGlobalIterator it = modes.instances.GetIterator ();
     
     while (it.HasNext ())
     {
@@ -1618,7 +1618,7 @@ void csGLGraphics3D::DrawInstancesNoShader (
 
   //FIXME: it works only for for very specyfic setup
   //loop through all instances
-  csHash<csInstance*>::GlobalIterator it = modes.instances.GetIterator ();
+  csHash<csInstance*>::ConstGlobalIterator it = modes.instances.GetIterator ();
   while (it.HasNext ())
   {
     //loop through all parameters

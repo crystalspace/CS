@@ -21,6 +21,7 @@
 #include "csgeom/math3d.h"
 #include "csgeom/transfrm.h"
 #include "cstool/enginetools.h"
+#include "cstool/collider.h"
 #include "csutil/flags.h"
 #include "csutil/set.h"
 
@@ -29,6 +30,7 @@
 #include "iengine/portal.h"
 #include "iengine/portalcontainer.h"
 #include "iengine/sector.h"
+#include "iengine/camera.h"
 
 static bool TestPortalSphere (iPortal* portal, float radius,
 	const csVector3& pos, csSet<csPtrKey<iSector> >& visited_sectors)
@@ -176,6 +178,50 @@ csShortestDistanceResult csEngineTools::FindShortestDistance (
   rc.sqdistance = FindShortestDistance (source, sourceSector, dest,
   	destSector, maxradius, visited_sectors, rc.direction, accurate);
   return rc;
+}
+
+csScreenTargetResult csEngineTools::FindScreenTarget (const csVector2& pos,
+      float maxdist, iCamera* camera, iCollideSystem* cdsys)
+{
+  csVector2 p (pos.x, camera->GetShiftY () * 2 - pos.y);
+  csVector3 v = camera->InvPerspective (p, 1.0f);
+  csVector3 end = camera->GetTransform ().This2Other (v);
+  iSector* sector = camera->GetSector ();
+  CS_ASSERT (sector != 0);
+  csVector3 origin = camera->GetTransform ().GetO2TTranslation ();
+
+  // Now move the end until it is at the right distance.
+  csVector3 rel = (end-origin).Unit ();
+  end = origin + rel * maxdist;
+  // Slightly move the origin for safety.
+  origin = origin + rel * 0.03f;
+
+  csScreenTargetResult result;
+  if (cdsys == 0)
+  {
+    csSectorHitBeamResult hr = sector->HitBeamPortals (origin, end);
+    result.mesh = hr.mesh;
+    if (hr.mesh == 0)
+    {
+      result.isect = end;
+      result.polygon_idx = -1;
+    }
+    else
+    {
+      result.isect = hr.isect;
+      result.polygon_idx = hr.polygon_idx;
+    }
+  }
+  else
+  {
+    csTraceBeamResult tr = csColliderHelper::TraceBeam (cdsys,
+	sector, origin, end, true);
+    result.mesh = tr.closest_mesh;
+    if (tr.closest_mesh == 0) result.isect = end;
+    else result.isect = tr.closest_isect;
+    result.polygon_idx = -1;
+  }
+  return result;
 }
 
 //----------------------------------------------------------------------

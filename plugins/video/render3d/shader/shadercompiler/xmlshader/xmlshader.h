@@ -78,6 +78,7 @@ public:
   bool doDumpConds;
   /// XML Token and management
   csStringHash xmltokens;
+  bool debugInstrProcessing;
 
   //Standard vars
   iObjectRegistry* objectreg;

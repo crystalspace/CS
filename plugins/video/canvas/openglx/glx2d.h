@@ -29,7 +29,9 @@
 
 #include "iogldisp.h"
 
+#ifndef XK_MISCELLANY
 #define XK_MISCELLANY 1
+#endif
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <X11/Xatom.h>

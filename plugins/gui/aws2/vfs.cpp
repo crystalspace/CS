@@ -22,13 +22,9 @@
 #include "vfs.h"
 #include "manager.h"
 
-#include "igraphic/image.h"
-#include "igraphic/imageio.h"
 #include "iutil/vfs.h"
-#include "ivideo/txtmgr.h"
 #include "iutil/databuff.h"
 #include "iutil/stringarray.h"
-#include "csgfx/memimage.h"
 
 
 #define CHECK(objname, check) \

@@ -118,7 +118,7 @@ public:
   void AttachCollider (iDynamicsSystemCollider* collider);
   csRef<iDynamicsSystemCollider> CreateCollider ();
   csRef<iDynamicsSystemCollider> GetCollider (unsigned int index) 
-  {return colliders[index];}
+  {return csRef<iDynamicsSystemCollider> (colliders[index]);}
   int GetColliderCount () 
   {return (int) colliders.GetSize ();}
 
@@ -284,7 +284,8 @@ public:
 
   void SetMoveCallback (iDynamicsMoveCallback* cb);
   void SetCollisionCallback (iDynamicsCollisionCallback* cb);
-  void Collision (iRigidBody *other);
+  void Collision (iRigidBody *other, const csVector3& pos,
+      const csVector3& normal, float depth);
   csRef<iDynamicsSystemCollider> GetCollider (unsigned int index);
   int GetColliderCount ();
 

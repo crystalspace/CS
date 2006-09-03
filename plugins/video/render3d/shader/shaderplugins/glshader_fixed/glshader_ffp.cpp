@@ -64,6 +64,18 @@ void csGLShaderFFP::Report (int severity, const char* msg, ...)
   va_end (args);
 }
 
+void csGLShaderFFP::Report (int severity, iDocumentNode* node, 
+                            const char* msg, ...)
+{
+  va_list args;
+  va_start (args, msg);
+  csString s;
+  s.FormatV (msg, args);
+  va_end (args);
+  synsrv->Report ("crystalspace.graphics3d.shader.fixed.fp", severity, node, 
+    "%s", s.GetData());
+}
+
 void csGLShaderFFP::BuildTokenHash()
 {
   InitTokenTable (tokens);
@@ -103,6 +115,20 @@ bool csGLShaderFFP::Load (iShaderDestinationResolver*, iDocumentNode* node)
   csRef<iDocumentNode> mtexnode = node->GetNode("fixedfp");
   if(mtexnode)
   {
+    {
+      size_t idx = 0;
+      csRef<iDocumentNodeIterator> layerIt = mtexnode->GetNodes ("layer");
+      while(layerIt->HasNext())
+      {
+        csRef<iDocumentNode> child = layerIt->Next();
+        if(child->GetType() != CS_NODE_ELEMENT) continue;
+	const char* name = child->GetAttributeValue ("name");
+	if (name != 0)
+	  layerNames.Put (name, (int)idx);
+        idx++;
+      }
+    }
+
     csRef<iDocumentNodeIterator> it = mtexnode->GetNodes();
     while(it->HasNext())
     {
@@ -115,12 +141,9 @@ bool csGLShaderFFP::Load (iShaderDestinationResolver*, iDocumentNode* node)
         case XMLTOKEN_LAYER:
           {
             mtexlayer ml;
-	    const char* name = child->GetAttributeValue ("name");
             if (!LoadLayer(&ml, child))
               return false;
-            size_t idx = texlayers.Push (ml);
-	    if (name != 0)
-	      layerNames.Put (name, (int)idx);
+            texlayers.Push (ml);
           }
           break;
 	case XMLTOKEN_FOG:
@@ -166,6 +189,20 @@ bool csGLShaderFFP::Load (iShaderDestinationResolver*, iDocumentNode* node)
   return true;
 }
 
+int csGLShaderFFP::GetCrossbarSource (const char* str)
+{
+  if (strncmp (str, "texture ", 8) != 0) return 0;
+
+  const char* layer = str + 8;
+  int layerNum = layerNames.Get (layer, -1);
+  if (layerNum == -1)
+  {
+    char dummy;
+    if (sscanf (layer, "%d%c", &layerNum, &dummy) != 1) return 0;
+  }
+  return GL_TEXTURE0 + layerNum;
+}
+
 bool csGLShaderFFP::LoadLayer (mtexlayer* layer, iDocumentNode* node)
 {
   if(layer == 0 || node == 0)
@@ -190,15 +227,15 @@ bool csGLShaderFFP::LoadLayer (mtexlayer* layer, iDocumentNode* node)
           if (str)
           {
             int i = tokens.Request(str);
-            if(i == GL_PRIMARY_COLOR_ARB||i == GL_TEXTURE
-	    	||i == GL_CONSTANT_ARB||i==GL_PREVIOUS_ARB)
+            if(i == GL_PRIMARY_COLOR_ARB || i == GL_TEXTURE
+	      || i == GL_CONSTANT_ARB || i==GL_PREVIOUS_ARB
+              || ((i = GetCrossbarSource (str)) != 0))
             {
               layer->color.source[num] = i;
             }
             else
             {
-              synsrv->Report ("crystalspace.graphics3d.shader.fixed",
-                CS_REPORTER_SEVERITY_WARNING,
+              Report (CS_REPORTER_SEVERITY_WARNING,
                 child, "Invalid color source: %s", str);
             }
           }
@@ -214,8 +251,7 @@ bool csGLShaderFFP::LoadLayer (mtexlayer* layer, iDocumentNode* node)
             }
             else
             {
-              synsrv->Report ("crystalspace.graphics3d.shader.fixed",
-                CS_REPORTER_SEVERITY_WARNING,
+              Report (CS_REPORTER_SEVERITY_WARNING,
                 child, "Invalid color modifier: %s", str);
             }
           }
@@ -228,36 +264,69 @@ bool csGLShaderFFP::LoadLayer (mtexlayer* layer, iDocumentNode* node)
           if(num < 0 || num >= 3 )
             continue;
 
-          int i = tokens.Request(child->GetAttributeValue("source"));
+          const char* str = child->GetAttributeValue("source");
+          int i = tokens.Request (str);
           if(i == GL_PRIMARY_COLOR_ARB||i == GL_TEXTURE
-	  	||i == GL_CONSTANT_ARB||i==GL_PREVIOUS_ARB)
+  	    || i == GL_CONSTANT_ARB || i==GL_PREVIOUS_ARB
+            || ((i = GetCrossbarSource (str)) != 0))
+          {
             layer->alpha.source[num] = i;
+          }
+          else
+          {
+            Report (CS_REPORTER_SEVERITY_WARNING,
+              child, "Invalid alpha source: %s", str);
+          }
 
-          int m = tokens.Request(child->GetAttributeValue("modifier"));
+          str = child->GetAttributeValue("modifier");
+          int m = tokens.Request (str);
           if(m == GL_SRC_ALPHA||m == GL_ONE_MINUS_SRC_ALPHA)
+          {
             layer->alpha.mod[num] = m;
+          }
+          else
+          {
+            Report (CS_REPORTER_SEVERITY_WARNING,
+              child, "Invalid alpha modifier: %s", str);
+          }
         }
         break;
       case XMLTOKEN_COLOROPERATION:
         {
-          int o = tokens.Request(child->GetAttributeValue("operation"));
+          const char* str = child->GetAttributeValue("operation");
+          int o = tokens.Request (str);
           if(o == GL_REPLACE|| o == GL_MODULATE||o == GL_ADD
-	  	||o == GL_ADD_SIGNED_ARB|| o == GL_INTERPOLATE_ARB
-		||o == GL_SUBTRACT_ARB||o == GL_DOT3_RGB_ARB
-		||o == GL_DOT3_RGBA_ARB)
+	    ||o == GL_ADD_SIGNED_ARB|| o == GL_INTERPOLATE_ARB
+	    ||o == GL_SUBTRACT_ARB||o == GL_DOT3_RGB_ARB
+	    ||o == GL_DOT3_RGBA_ARB)
+          {
             layer->color.op = o;
+          }
+          else
+          {
+            Report (CS_REPORTER_SEVERITY_WARNING,
+              child, "Invalid color operation: %s", str);
+          }
           if(child->GetAttribute("scale") != 0)
             layer->color.scale = child->GetAttributeValueAsFloat ("scale");
         }
         break;
       case XMLTOKEN_ALPHAOPERATION:
         {
-          int o = tokens.Request(child->GetAttributeValue("operation"));
+          const char* str = child->GetAttributeValue("operation");
+          int o = tokens.Request (str);
           if(o == GL_REPLACE|| o == GL_MODULATE||o == GL_ADD
-	  	||o == GL_ADD_SIGNED_ARB|| o == GL_INTERPOLATE_ARB
-		||o == GL_SUBTRACT_ARB||o == GL_DOT3_RGB_ARB
-		||o == GL_DOT3_RGBA_ARB)
+	    ||o == GL_ADD_SIGNED_ARB|| o == GL_INTERPOLATE_ARB
+	    ||o == GL_SUBTRACT_ARB||o == GL_DOT3_RGB_ARB
+	    ||o == GL_DOT3_RGBA_ARB)
+          {
 	    layer->alpha.op = o;
+          }
+          else
+          {
+            Report (CS_REPORTER_SEVERITY_WARNING,
+              child, "Invalid alpha operation: %s", str);
+          }
           if(child->GetAttribute("scale") != 0)
 	    layer->alpha.scale = child->GetAttributeValueAsFloat ("scale");
         }
@@ -286,8 +355,7 @@ bool csGLShaderFFP::ParseFog (iDocumentNode* node, FogInfo& fog)
 	  const char* type = child->GetContentsValue ();
 	  if (type == 0)
 	  {
-	    synsrv->Report ("crystalspace.graphics3d.shader.glfixed",
-	      CS_REPORTER_SEVERITY_WARNING,
+	    Report (CS_REPORTER_SEVERITY_WARNING,
 	      child,
 	      "Node has no contents");
 	    return false;
@@ -455,6 +523,22 @@ void csGLShaderFFP::CompactLayers()
     newlayers.Push (nextlayer);
     layerMap[p] = (int)(p - layerOfs);
     texlayers = newlayers;
+    for (size_t l = 0; l < texlayers.GetSize(); l++)
+    {
+      mtexlayer& layer = texlayers[l];
+      for (int i = 0; i < GetUsedLayersCount (layer.color.op); i++)
+      {
+        if ((layer.color.source[i] >= GL_TEXTURE0) 
+          && (layer.color.source[i] <= GL_TEXTURE31))
+          layer.color.source[i] = GL_TEXTURE0 + layerMap[layer.color.source[i] - GL_TEXTURE0];
+      }
+      for (int i = 0; i < GetUsedLayersCount (layer.alpha.op); i++)
+      {
+        if ((layer.alpha.source[i] >= GL_TEXTURE0) 
+          && (layer.alpha.source[i] <= GL_TEXTURE31))
+          layer.alpha.source[i] = GL_TEXTURE0 + layerMap[layer.alpha.source[i] - GL_TEXTURE0];
+      }
+    }
 
     csHash<int, csStrKey>::GlobalIterator layerNameIt 
       = layerNames.GetIterator();
@@ -483,28 +567,48 @@ bool csGLShaderFFP::TryMergeTexFuncs (mtexlayer::TexFunc& newTF,
 				      const mtexlayer::TexFunc& tf1, 
 				      const mtexlayer::TexFunc& tf2)
 {
+  // TF2 is just a replace with TF1: merge to TF1
   if ((tf2.op == GL_REPLACE) 
     && (tf2.source[0] == GL_PREVIOUS_ARB))
   {
     newTF = tf1;
     return true;
   }
+  /* TF1 is a simple replace, and TF2 uses "previous layer" somewhere:
+   * insert TF1 where "previous layer" is used. */
   else if ((tf1.op == GL_REPLACE) 
     && (fabsf (tf1.scale - 1.0f) < EPSILON))
   {
-    int prevLayIdx = -1;
+    int prevLayIdx = 0;
     for (int i = 0; i < GetUsedLayersCount (tf2.op); i++)
     {
       if (tf2.source[i] == GL_PREVIOUS_ARB)
       {
-	prevLayIdx = i;
+	prevLayIdx |= 1 << i;
 	break;
       }
     }
-    if (prevLayIdx != -1)
+    if (prevLayIdx != 0)
     {
       newTF = tf2;
-      newTF.source[prevLayIdx] = tf1.source[0];
+      for (int i = 0; i < 2; i++)
+      {
+        if (prevLayIdx && (1 << i))
+          newTF.source[i] = tf1.source[0];
+      }
+      return true;
+    }
+  }
+  /* If "previous layer" is not referenced in TF2, "merge" to just TF2. */
+  {
+    bool usePrevious;
+    for (int i = 0; i < GetUsedLayersCount (tf2.op); i++)
+    {
+      if (tf2.source[i] == GL_PREVIOUS_ARB) usePrevious = true;
+    }
+    if (!usePrevious)
+    {
+      newTF = tf2;
       return true;
     }
   }
@@ -543,6 +647,20 @@ bool csGLShaderFFP::Compile ()
         (layer.alpha.op == GL_DOT3_RGBA_ARB)) && 
         !(hasDOT3))
       return false;
+    for (int i = 0; i < GetUsedLayersCount (layer.color.op); i++)
+    {
+      if ((layer.color.source[i] >= GL_TEXTURE0) 
+        && (layer.color.source[i] <= GL_TEXTURE31)
+        && !shaderPlug->enableCrossbar)
+        return false;
+    }
+    for (int i = 0; i < GetUsedLayersCount (layer.alpha.op); i++)
+    {
+      if ((layer.alpha.source[i] >= GL_TEXTURE0) 
+        && (layer.alpha.source[i] <= GL_TEXTURE31)
+        && !shaderPlug->enableCrossbar)
+        return false;
+    }
   }
 
   if (colorSum && !ext->CS_GL_EXT_secondary_color)

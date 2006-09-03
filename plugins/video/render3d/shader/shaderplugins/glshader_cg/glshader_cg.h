@@ -65,6 +65,7 @@ public:
   char* dumpDir;
   bool doVerbose;
 
+  bool enableVP, enableFP;
   CGprofile maxProfileVertex;
   CGprofile maxProfileFragment;
 
@@ -94,6 +95,7 @@ public:
   {
     return (profile >= CG_PROFILE_PS_1_1) && (profile <= CG_PROFILE_PS_1_3);
   }
+  bool IsRoutedProfileSupported (CGprofile profile);
 };
 
 }

@@ -56,24 +56,31 @@ CS_PLUGIN_NAMESPACE_BEGIN(Soft3D)
 
 // Forward declaration
 class csSoftwareGraphics3DCommon;
+class VerticesLTN;
 
-#define VATTR_SPEC(x)           (CS_VATTRIB_ ## x - CS_VATTRIB_SPECIFIC_FIRST)
-#define VATTR_GEN(x)							      \
-  ((CS_VATTRIB_ ## x - CS_VATTRIB_GENERIC_FIRST) + CS_VATTRIB_SPECIFIC_LAST + 1)
+struct iVertexTransform
+{
+  virtual ~iVertexTransform () {}
 
-static const size_t activeBufferCount = CS_VATTRIB_SPECIFIC_LAST - 
-  CS_VATTRIB_SPECIFIC_FIRST + 1;
-static const size_t activeTextureCount = 4;
+  virtual void SetNearPlane (const csPlane3& near_plane) = 0;
+  virtual void DisableNearPlane () = 0;
+
+  virtual void TransformVertices (const csReversibleTransform& object2world,
+    const csReversibleTransform& world2cam, iRenderBuffer* inIndices,
+    csRenderMeshType meshType, const VerticesLTN& inBuffers,
+    size_t inIndexStart, size_t inIndexEnd,
+    csTriangle*& outTriangles, size_t& outTrianglesCount,
+    VerticesLTN& outBuffers, size_t& rangeStart, size_t& rangeEnd) = 0;
+};
 
 struct iTriangleDrawer
 {
   virtual ~iTriangleDrawer() {}
-  virtual void DrawMesh (iRenderBuffer* activebuffers[], 
+  virtual void DrawMesh (const VerticesLTN& buffers, 
     size_t rangeStart, size_t rangeEnd, 
     const csCoreRenderMesh* mesh, 
     const iScanlineRenderer::RenderInfoMesh& scanRenderInfoMesh,
-    const csRenderMeshType meshtype, uint8* tri, const uint8* triEnd,
-    csRenderBufferComponentType compType) = 0;
+    csTriangle* triangles, size_t triangleCount) = 0;
 };
 
 struct iPixTypeSpecifica
@@ -212,7 +219,7 @@ protected:
 
   iRenderBuffer* activebuffers[activeBufferCount];
   csSoftwareTextureHandle* activeSoftTex[activeTextureCount]; 
-  csRef<iRenderBuffer> translatedVerts;
+  iVertexTransform* vertexTransform;
   csRef<csRenderBuffer> processedColors[2];
   bool processedColorsFlag[2];
   /// The perspective corrected vertices.
@@ -412,10 +419,15 @@ public:
   {
     do_near_plane = true;
     near_plane = pl;
+    vertexTransform->SetNearPlane (pl);
   }
 
   /// Reset near clip plane (i.e. disable it).
-  virtual void ResetNearPlane () { do_near_plane = false; }
+  virtual void ResetNearPlane () 
+  { 
+    do_near_plane = false; 
+    vertexTransform->DisableNearPlane ();
+  }
 
   /// Get near clip plane.
   virtual const csPlane3& GetNearPlane () const { return near_plane; }
@@ -613,37 +625,6 @@ public:
 
   /// Controls shadow drawing
   virtual void SetShadowState (int /*state*/)
-  {
-  }
-
-  /// Get maximum number of simultaneous vertex lights supported
-  virtual int GetMaxLights () const
-  {
-    return 0;
-  }
-
-  /// Sets a parameter for light i
-  virtual void SetLightParameter (int /*i*/, int /*param*/, csVector3 /*value*/)
-  {
-  }
-
-  /// Enables light i
-  virtual void EnableLight (int /*i*/)
-  {
-  }
-
-  /// Disables light i
-  virtual void DisableLight (int /*i*/)
-  {
-  }
-
-  /// Enable vertex lighting
-  virtual void EnablePVL ()
-  {
-  }
-
-  /// Disable vertex lighting
-  virtual void DisablePVL ()
   {
   }
 

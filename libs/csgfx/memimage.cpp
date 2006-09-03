@@ -20,7 +20,7 @@
 #include "cssysdef.h"
 #include "csgfx/imagemanipulate.h"
 #include "csgfx/quantize.h"
-#include "csgfx/memimage.h"
+#include "csgfx/imagememory.h"
 #include "csgfx/rgbpixel.h"
 #include "csutil/debug.h"
 #include "csutil/util.h"

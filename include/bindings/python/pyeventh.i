@@ -91,7 +91,7 @@
 %pythoncode %{
 
   def csevCommandLineHelp(reg):
-    csEventNameRegistry.GetID(reg, csString("crystalspace.application.commandlinehelp"))
+    csEventNameRegistry.GetID(reg, "crystalspace.application.commandlinehelp")
     
   CS_EVENTLIST_END = csInvalidStringID
   

@@ -19,11 +19,11 @@
 #ifndef __CS_GIFIMAGE_H__
 #define __CS_GIFIMAGE_H__
 
-#include "csgfx/memimage.h"
 #include "igraphic/imageio.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "iutil/databuff.h"
+#include "csgfx/imagememory.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(GIFImageIO)
 {

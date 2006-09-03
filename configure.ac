@@ -13,7 +13,7 @@ AC_PREREQ([2.56])
 # cs_version_number
 #	Keep this value synchronized with CS/include/csver.h.
 #------------------------------------------------------------------------------
-m4_define([cs_version_number], [0.99])
+m4_define([cs_version_number], [1.1])
 
 
 
@@ -166,6 +166,28 @@ AS_IF([test $cs_cv_sys_pthread_mutex_recursive != no],
 	[$cs_cv_sys_pthread_mutex_recursive])])
 CS_CHECK_PTHREAD_ATFORK([cs_cv_sys_pthread_atfork])
 CS_EMIT_BUILD_PROPERTY([PTHREAD.ATFORK.AVAILABLE], [$cs_cv_sys_pthread_atfork])
+
+
+
+#------------------------------------------------------------------------------
+# Determine whether to link base g++ libraries statically
+#------------------------------------------------------------------------------
+AC_MSG_CHECKING([whether to link base g++ libraries statically])
+AC_ARG_ENABLE([static-baselibs], [AC_HELP_STRING([--enable-static-baselibs],
+    [Link statically againts libgcc and libstdc++. Use with caution; enabling 
+    this option may cause issues when dynamically linking against other C++
+    modules. (default NO)])],
+    [], [enable_static_baselibs=no])
+AC_MSG_RESULT([$enable_static_baselibs])
+AS_IF([test $enable_static_baselibs = yes],
+    [CS_EMIT_BUILD_FLAGS([for -static-libgcc],
+        [cs_cv_prog_link_static_libgcc], [CS_CREATE_TUPLE([-static-libgcc])],
+        [C], [COMPILER.LFLAGS], [+])
+    libstdcxx=`$CXX -print-file-name=libstdc++.a`
+    CS_EMIT_BUILD_FLAGS([for static libstdc++],
+        [cs_cv_prog_link_static_libstdcxx],
+        CS_CREATE_TUPLE([$libstdcxx]),
+        [C++], [COMPILER.LFLAGS], [+])])
 
 
 
@@ -601,16 +623,6 @@ CS_EMIT_BUILD_FLAGS([if missing symbols can be reported as warnings],
     [cs_cv_prog_link_warn_unresolved_symbols], 
     [CS_CREATE_TUPLE([],[-Wl,--warn-unresolved-symbols])], 
     [C++], [COMPILER.LFLAGS], [+])
-
-
-
-#------------------------------------------------------------------------------
-# Check if linker recognizes "--as-needed" which only links dynamic libs that
-# are really honestly needed.
-#------------------------------------------------------------------------------
-#CS_EMIT_BUILD_FLAGS([if --as-needed is supported], 
-#    [cs_cv_prog_link_as_needed], [CS_CREATE_TUPLE([],[-Wl,--as-needed])], 
-#    [C++], [COMPILER.LFLAGS], [+])
 
 
 
