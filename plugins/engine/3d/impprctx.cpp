@@ -28,6 +28,7 @@
 #include "iengine/rview.h"
 #include "iengine/sector.h"
 #include "iutil/objreg.h"
+#include "iutil/plugin.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/texture.h"
@@ -41,7 +42,7 @@
 
 //@@@ debugging
 #include "cstool/debugimagewriter.h"
-#include "csgfx/memimage.h"
+#include "csgfx/imagememory.h"
 
 
 csImposterProcTex::csImposterProcTex  (csEngine* engine,  
@@ -57,6 +58,9 @@ csImposterProcTex::csImposterProcTex  (csEngine* engine,
   //initialize shortcuts
   g3d = engine->G3D;
   g2d = g3d->GetDriver2D ();
+  shadermanager = csQueryRegistryOrLoad<iShaderManager>
+    (engine->objectRegistry, "crystalspace.graphics3d.shadermanager");
+
   
   csRef<iImage> thisImage = new csImageMemory (w, h,
     CS_IMGFMT_ALPHA && CS_IMGFMT_TRUECOLOR );
@@ -139,7 +143,7 @@ void csImposterProcTex::Update (iRenderView *rview, iSector *s)
   {
     csRenderMesh* rendermesh = rendermeshes[i];
     csRenderMeshModes mode (*rendermesh);
-    csShaderVarStack sva;
+    iShaderVarStack *sva = shadermanager->GetShaderVariableStack();
 
     iMaterial* hdl = rendermesh->material->GetMaterial ();
     iShader* meshShader = hdl->GetShader (stringid_standard);
@@ -155,15 +159,15 @@ void csImposterProcTex::Update (iRenderView *rview, iSector *s)
       meshShader = engine->defaultShader;
     }
 
-    csShaderVariableContext svc;
+    iShaderVariableContext *svc = new csShaderVariableContext();
 
     //add ambient shadervariable
     csRef<csShaderVariable> sv;
-    sv = svc.GetVariableAdd(stringid_light_ambient);
+    sv = svc->GetVariableAdd(stringid_light_ambient);
     csColor ambient;
     engine->GetAmbientLight (ambient);
     if (s) sv->SetValue (ambient + s->GetDynamicAmbientLight());
-    svc.PushVariables (sva);
+    svc->PushVariables (sva);
 
     if (rendermesh->variablecontext)
       rendermesh->variablecontext->PushVariables (sva);

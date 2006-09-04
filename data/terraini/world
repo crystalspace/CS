@@ -133,17 +133,17 @@
 		</material>
   </materials>
 
+	<addon>
+		<plugin>crystalspace.renderloop.loop.loader</plugin>
+		<paramsfile>/shader/std_rloop_terrainfixed.xml</paramsfile>
+	</addon>
+
 	<settings>
 		<clearzbuf>yes</clearzbuf>
 		<lightmapcellsize>16</lightmapcellsize>
 		<renderloop>std_rloop_terrainfixed</renderloop>
 	</settings>
 
-	<addon>
-		<plugin>crystalspace.renderloop.loop.loader</plugin>
-		<paramsfile>/shader/std_rloop_terrainfixed.xml</paramsfile>
-	</addon>
-	
 	<library>grass.lib</library>
 	<library>rock.lib</library>
 	<library>bush2.lib</library>
@@ -225,6 +225,7 @@
 			  <v x="-6" y="12" z="1" />
 		  </move>
 		  <imposter active="yes" range="Std Thing Range" tolerance="Std Thing Angle"/>
+		  <ztest/>
 	  </meshobj>
 
 	  <meshobj name="ftree1">
@@ -236,6 +237,7 @@
 			  <v x="-7" y="12" z="1" />
 		  </move>
 		  <imposter active="yes" range="Std Thing Range" tolerance="Std Thing Angle"/>
+		  <ztest/>
 	  </meshobj>
 
 	  <meshobj name="ftree1">
@@ -247,6 +249,7 @@
 			  <v x="-8" y="12" z="1" />
 		  </move>
 		  <imposter active="yes" range="Std Thing Range" tolerance="Std Thing Angle"/>
+		  <ztest/>
 	  </meshobj>
 
 	  <meshobj name="ftree1">
@@ -258,6 +261,7 @@
 			  <v x="-7" y="12" z="0" />
 		  </move>
 		  <imposter active="yes" range="Std Thing Range" tolerance="Std Thing Angle"/>
+		  <ztest/>
 	  </meshobj>
 
 	  <meshobj name="ftree1">
@@ -269,6 +273,7 @@
 			  <v x="-7" y="12" z="2" />
 		  </move>
 		  <imposter active="yes" range="Std Thing Range" tolerance="Std Thing Angle"/>
+		  <ztest/>
 	  </meshobj>
 
 	  <meshobj name="ftree1">
@@ -280,6 +285,7 @@
 			  <v x="-8" y="12" z="4" />
 		  </move>
 		  <imposter active="yes" range="Std Thing Range" tolerance="Std Thing Angle"/>
+		  <ztest/>
 	  </meshobj>
 
 	  <meshobj name="ftree1">
@@ -291,6 +297,7 @@
 			  <v x="-6" y="12" z="5" />
 		  </move>
 		  <imposter active="yes" range="Std Thing Range" tolerance="Std Thing Angle"/>
+		  <ztest/>
 	  </meshobj>
 
 	  <meshobj name="ftree1">
@@ -302,6 +309,7 @@
 			  <v x="-8" y="12" z="3" />
 		  </move>
 		  <imposter active="yes" range="Std Thing Range" tolerance="Std Thing Angle"/>
+		  <ztest/>
 	  </meshobj>
 
 	  <meshobj name="ftree1">
@@ -313,6 +321,7 @@
 			  <v x="0" y="12" z="3" />
 		  </move>
 		  <imposter active="yes" range="Std Thing Range" tolerance="Std Thing Angle"/>
+		  <ztest/>
 	  </meshobj>
 
 	  <meshobj name="ftree1">
@@ -324,6 +333,7 @@
 			  <v x="1" y="12" z="-10" />
 		  </move>
 		  <imposter active="yes" range="Std Thing Range" tolerance="Std Thing Angle"/>
+		  <ztest/>
 	  </meshobj>
 
 	  <meshobj name="Terrain">

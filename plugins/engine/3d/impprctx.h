@@ -52,9 +52,10 @@ private:
   csStringID stringid_light_ambient;
 
   //convenience shortcuts
-  csEngine* engine;
+  csEngine *engine;
   csRef<iGraphics3D> g3d;
   csRef<iGraphics2D> g2d;
+  csRef<iShaderManager> shadermanager;
 
 public:
   csImposterProcTex (csEngine* engine, csImposterMesh *parent);

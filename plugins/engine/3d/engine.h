@@ -32,6 +32,7 @@
 #include "csutil/scf_implementation.h"
 #include "csutil/stringarray.h"
 #include "csutil/weakref.h"
+#include "csutil/weakrefarr.h"
 #include "csutil/eventnames.h"
 #include "iengine/campos.h"
 #include "iengine/collectn.h"
@@ -786,6 +787,14 @@ public:
    */
   int lightAmbientBlue;
 
+  /// List of imposters that need to be rendered to texture
+  // \todo add OO-like handling routines instead
+  csWeakRefArray<csImposterProcTex> imposterUpdateList;
+
+  /// Default shader to attach to all materials
+  // \todo move back to private and make accessible
+  csRef<iShader> defaultShader;
+
 private:
 
   // -- PRIVATE MEMBERS
@@ -896,9 +905,6 @@ private:
     
   /// Flag set when window requires resizing.
   bool resize;
-
-  /// Default shader to attach to all materials
-  csRef<iShader> defaultShader;
 
   /// 'Saveable' flag
   bool worldSaveable;
