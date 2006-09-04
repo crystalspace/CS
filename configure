@@ -4586,7 +4586,7 @@ fi
 
     if test "$enable_as_needed" != "no"; then
 
-	if test "cs_cv_binutils_2_17" = "yes"; then
+	if test "$cs_cv_binutils_2_17" = "yes"; then
   echo "$as_me:$LINENO: checking if --as-needed is supported" >&5
 echo $ECHO_N "checking if --as-needed is supported... $ECHO_C" >&6
 if test "${cs_cv_prog_link_as_needed_ok+set}" = set; then
