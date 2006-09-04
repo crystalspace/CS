@@ -31,6 +31,7 @@
 
 #include <opentree/mesher/treemesher.h>
 #include <opentree/mesher/leafmesher.h>
+#include <opentree/mesher/bbcsimple.h>
 
 #include <opentree/weber/weber.h>
 
@@ -42,18 +43,21 @@ CS_PLUGIN_NAMESPACE_BEGIN(OpenTree)
   class IndexHelper : public opentree::otTriangles
   {
   private:
+    uint c;
     csTriangle* csindizes;
   public:
-    IndexHelper::IndexHelper(iGeneralFactoryState *factstate)
+    IndexHelper::IndexHelper(iGeneralFactoryState *factstate, uint c)
     {
       csindizes = factstate->GetTriangles();
+      IndexHelper::c = c;
     };
     IndexHelper::~IndexHelper() {};
 
     void addTriangle(int v1, int v2, int v3)
     {
       //OTL face clock is the other way around
-      int cnt = getCount();
+      uint cnt = getCount();
+      assert (cnt < c);
       csindizes[cnt].a = v3;
       csindizes[cnt].b = v2;
       csindizes[cnt].c = v1;
@@ -63,23 +67,26 @@ CS_PLUGIN_NAMESPACE_BEGIN(OpenTree)
   class VertexHelper : public opentree::otVertices
   {
   private:
+    uint c;
     csVector3* csverts;
     csVector3* csnorms;
     csVector2* csuvs;
     csColor4* cscolors;
   public:
-    VertexHelper::VertexHelper(iGeneralFactoryState *factstate)
+    VertexHelper::VertexHelper(iGeneralFactoryState *factstate, uint c)
     {
       csverts = factstate->GetVertices();
       csnorms = factstate->GetNormals();
       csuvs = factstate->GetTexels();
       cscolors = factstate->GetColors();
+      VertexHelper::c = c;
     };
     VertexHelper::~VertexHelper() {};
 
     void add(int index, float x, float y, float z, float nx, float ny,
       float nz, float r, float g, float b, float a, float u, float v)
     {
+      assert((uint)index < c);
       //OTL coordinate system is z up, y forwards
       csverts[index].x = x;
       csverts[index].y = z;
@@ -89,7 +96,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(OpenTree)
       csnorms[index].z = ny;
       csuvs[index].x = u;
       csuvs[index].y = v;
-      cscolors[index].Set(1, 1, 1, 0);
+      cscolors[index].Set(r, g, b, a);
     };
   };
 
@@ -462,6 +469,7 @@ void csOpenTreeObjectFactory::GenerateTree ()
   opentree::otTree* ottree = gen->generate();
 
   opentree::MesherTree* tree = new opentree::MesherTree(ottree);
+  opentree::BBCSimple bbc(ottree, 4);
 
   for (unsigned int i = 0; i < 4; i++)
   {
@@ -476,9 +484,10 @@ void csOpenTreeObjectFactory::GenerateTree ()
   tree->getVerticesCount(1, &vertexCount);
   tree->getVerticesCount(2, &vertexCount);
 printf("Tree vertex count: %i ", vertexCount);
-
   treefactstate->SetVertexCount(vertexCount);
-  opentree::otVertices* vertices = new VertexHelper (treefactstate);
+
+  opentree::otVertices* vertices = 
+    new VertexHelper (treefactstate, vertexCount);
   tree->getVertices(0, *vertices);
   tree->getVertices(1, *vertices);
   tree->getVertices(2, *vertices);
@@ -490,35 +499,44 @@ printf("Tree vertex count: %i ", vertexCount);
   int subbranch_triangleCount = 0;
   tree->getIndicesCount(0, &trunk_triangleCount);
   tree->getIndicesCount(1, &branch_triangleCount);
-  //tree->getIndicesCount(2, &subbranch_triangleCount);
-  triangleCount = trunk_triangleCount + branch_triangleCount;// + subbranch_triangleCount
+//  tree->getIndicesCount(2, &subbranch_triangleCount);
+  triangleCount = trunk_triangleCount + branch_triangleCount;// + subbranch_triangleCount;
 printf("Tree index count: %i ", triangleCount);
-
   treefactstate->SetTriangleCount(triangleCount);
-  opentree::otTriangles* indizes = new IndexHelper (treefactstate);
+
+  opentree::otTriangles* indizes =
+    new IndexHelper (treefactstate, triangleCount);
   tree->getIndices(0, *indizes, 0);
   tree->getIndices(1, *indizes, trunk_triangleCount);
   //tree->getIndices(2, *indizes, branch_triangleCount);
   printf("added indexes: %i\n", indizes->getCount());
 
 
+
   vertexCount = 0;
-  tree->getLeavesVerticesCount(&vertexCount);
+  vertexCount += bbc.getVertexCount();
+  //tree->getLeavesVerticesCount(&vertexCount);
 printf("leaf vertex count: %i ", vertexCount);
   leaffactstate->SetVertexCount(vertexCount);
 
-  vertices = new VertexHelper (leaffactstate);
-  tree->getLeavesVertices(*vertices);
+  vertices = new VertexHelper (leaffactstate, vertexCount);
+  bbc.getVertices(*vertices);
+  //tree->getLeavesVertices(*vertices);
   delete vertices;
+  printf("added indexes: %i\n", vertices->getCount());
+
 
   triangleCount = 0;
-  tree->getLeavesIndicesCount(&triangleCount);
+  triangleCount += bbc.getIndexCount();
+  //tree->getLeavesIndicesCount(&triangleCount);
 printf("leaf index count: %i ", triangleCount);
-
   leaffactstate->SetTriangleCount(triangleCount);
-  indizes = new IndexHelper (leaffactstate);
-  tree->getLeavesIndices(*indizes, 0);
+
+  indizes = new IndexHelper (leaffactstate, triangleCount);
+  bbc.getIndices(*indizes, 0);  
+  //tree->getLeavesIndices(*indizes, 0);
   printf("added indexes: %i\n", indizes->getCount());
+
 
   delete ottree;
   delete gen;

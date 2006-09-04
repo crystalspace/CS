@@ -12,6 +12,7 @@ This file describes the history of the SoC imposter branch.
 	- Fossi finished merging and fixed imposters to work
 	- Fossi updated configure and msvc project files
 	- Fossi fixed opentree plugin after the merge
+	- Fossi made opentree plugin use experimental billbordclouds
 31-Aug-2006
 	- Fossi reverts broken merge
 	- Fossi successively merges 24379:HEAD from trunk
