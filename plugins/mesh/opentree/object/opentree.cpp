@@ -329,6 +329,11 @@ void csOpenTreeObjectFactory::GetObjectBoundingBox (csBox3& bbox)
   treefact->GetMeshObjectFactory()->GetObjectModel()->GetObjectBoundingBox(bbox);
 }
 
+const csBox3& csOpenTreeObjectFactory::GetObjectBoundingBox ()
+{
+  return treefact->GetMeshObjectFactory()->GetObjectModel()->GetObjectBoundingBox();
+}
+
 void csOpenTreeObjectFactory::GetRadius (float&, csVector3&)
 {
   printf("getRadius\n");
