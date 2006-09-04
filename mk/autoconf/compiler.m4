@@ -112,10 +112,20 @@ AC_DEFUN([CS_PROG_LINK],[
     rm -f conftest.resp
     
     # Check if linker supports --as-needed.
-    CS_EMIT_BUILD_FLAGS([if --as-needed is supported], 
-        [cs_cv_prog_link_as_needed], [CS_CREATE_TUPLE([-Wl,--as-needed])], [C++],
-	[CMD.LINK], [+])
-    CS_CHECK_BUILD_FLAGS([if --no-as-needed is supported], 
-        [cs_cv_prog_link_no_as_needed], [CS_CREATE_TUPLE([-Wl,--no-as-needed])], 
-        [C++])])
+    AC_ARG_ENABLE([as-needed], 
+	[AC_HELP_STRING([--enable-as-needed],
+	    [Utilize --as-needed linker flag, if supported by linker and if
+	    the used binutils version is recent enough to support it properly
+	    (default NO)])])
+    AS_IF([test -z "$enable_as_needed"], 
+	[enable_as_needed=no])
+    AS_IF([test "$enable_as_needed" != "no"],
+	[AC_REQUIRE([CS_CHECK_BINUTILS_2_17])
+	AS_IF([test "cs_cv_binutils_2_17" = "yes"],
+	    [CS_EMIT_BUILD_FLAGS([if --as-needed is supported], 
+		[cs_cv_prog_link_as_needed], [CS_CREATE_TUPLE([-Wl,--as-needed])], [C++],
+		[CMD.LINK], [+])
+	    CS_CHECK_BUILD_FLAGS([if --no-as-needed is supported], 
+		[cs_cv_prog_link_no_as_needed], [CS_CREATE_TUPLE([-Wl,--no-as-needed])], 
+		[C++])])])
 ])

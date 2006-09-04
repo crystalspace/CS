@@ -857,19 +857,16 @@ CS_CHECK_OPTIMIZE_FLAGS
 #------------------------------------------------------------------------------
 # Check for compiler debug flags.
 #------------------------------------------------------------------------------
-binutils_recent=no
-AS_IF([test -n "$OBJCOPY"],
-    [CS_CHECK_PROG_VERSION([binutils], [$OBJCOPY -V], [2.16], [9.9|.9|.9|.9],
-        [binutils_recent=yes])])
+CS_CHECK_BINUTILS_2_17
 
 AC_MSG_CHECKING([whether to split debug information])
 AC_ARG_ENABLE([separate-debug-info], 
     [AC_HELP_STRING([--enable-separate-debug-info],
         [split debug information into separate files. (default YES if 
-        binutils >= 2.16 detected and not on Cygwin, otherwise default NO)])])
+        binutils >= 2.17 detected and not on Cygwin, otherwise default NO)])])
 AS_IF([test -z "$enable_separate_debug_info"], 
     AS_IF([test -z `uname | grep -i CYGWIN`],
-        [enable_separate_debug_info=$binutils_recent],
+        [enable_separate_debug_info=$cs_cv_binutils_2_17],
         [enable_separate_debug_info=no]))
 AC_MSG_RESULT([$enable_separate_debug_info])
 

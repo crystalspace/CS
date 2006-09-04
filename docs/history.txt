@@ -9,6 +9,10 @@ chronological order.
 4-Sep-2006
         - res changed the configure program version check to support checking
           the same program with different version numbers.
+	- res separated the configure binutils recency check into it's own
+	  macro.
+	- res changed the --as-needed check to (a) only use --as-needed for
+	  newer binutils versions (b) disable it by default.
 2-Sep-2006
 	- Marten fixed [ticket:7], invalid alpha modifier in shader 
 	  light.xml technique 150.
