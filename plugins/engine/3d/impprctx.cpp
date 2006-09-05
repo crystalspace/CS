@@ -74,6 +74,8 @@ csImposterProcTex::csImposterProcTex  (csEngine* engine,
   stringid_light_ambient = stringSet->Request("light ambient");
 
   clip = new csBoxClipper (0, 0, w, h);
+
+  updating = false;
 }
 
 csImposterProcTex::~csImposterProcTex ()
@@ -81,7 +83,18 @@ csImposterProcTex::~csImposterProcTex ()
   delete clip;
 }
 
-void csImposterProcTex::Update (iRenderView *rview, iSector *s)
+void csImposterProcTex::Update ()
+{
+  if (!updating) //not updating already
+  {
+printf("requesting update!\n");
+    engine->imposterUpdateList.Push (csWeakRef<csImposterProcTex> (this));
+    updating = true;
+  }
+}
+
+
+void csImposterProcTex::RenderToTexture (iRenderView *rview, iSector *s)
 {
   if (!mesh) return;
 
@@ -113,8 +126,17 @@ void csImposterProcTex::Update (iRenderView *rview, iSector *s)
   const csVector3& cam_pos = cam->GetTransform ().GetOrigin ();
   csVector3 camdir = mesh_pos-cam_pos;
 
+  csOrthoTransform transform = cam->GetTransform();;
+
+  csVector3 col3 = transform.GetT2O ().Col3 ();
+//printf("transform col3: %f %f %f\n", col3.x, col3.y, col3.z);
+
   //look at the mesh
   cam->GetTransform ().LookAt (camdir, cam->GetTransform ().GetT2O ().Col2 ());
+
+  col3 = transform.GetT2O ().Col3 ();
+//printf("transform col3: %f %f %f\n", col3.x, col3.y, col3.z);
+
 
   //the distance to the mesh has the same ratio as
   //the billbordsize to the screen.
@@ -125,6 +147,10 @@ void csImposterProcTex::Update (iRenderView *rview, iSector *s)
   
   csVector3 new_cam_pos = mesh_pos - maxratio * camdir;
   cam->GetTransform ().SetOrigin (new_cam_pos);
+
+//printf("maxr: %f\n", maxratio);
+//printf("camdir: %f %f %f\n", camdir.x, camdir.y, camdir.z);
+//printf("newpos: %f %f %f\n", new_cam_pos.x, new_cam_pos.y, new_cam_pos.z);
 
   //Setup rendering
   g3d->SetPerspectiveCenter (w/2, w/2);
@@ -143,7 +169,7 @@ void csImposterProcTex::Update (iRenderView *rview, iSector *s)
   {
     csRenderMesh* rendermesh = rendermeshes[i];
     csRenderMeshModes mode (*rendermesh);
-    iShaderVarStack *sva = shadermanager->GetShaderVariableStack();
+    iShaderVarStack *sva = shadermanager->GetShaderVariableStack ();
 
     iMaterial* hdl = rendermesh->material->GetMaterial ();
     iShader* meshShader = hdl->GetShader (stringid_standard);
@@ -192,8 +218,8 @@ void csImposterProcTex::Update (iRenderView *rview, iSector *s)
   cam->SetFOV (oldFOV, engine->frameHeight);
   cam->SetTransform (oldt);
 
-  mesh->SetImposterReady (true);
-
   g3d->FinishDraw ();
+  mesh->SetImposterReady (true);
+  updating = false;
 }
 

@@ -1451,7 +1451,7 @@ void csEngine::StartDraw (iCamera *c, iClipper2D* view, csRenderView &rview)
   //update if camera is in a sector
   while (it.HasNext ())
   {
-    it.Next ()->Update (&rview, c->GetSector ());
+    it.Next ()->RenderToTexture (&rview, c->GetSector ());
   }
 
   //all updates done, empty list for next frame

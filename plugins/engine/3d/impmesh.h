@@ -44,7 +44,10 @@ private:
   csImposterProcTex *tex;    // Texture which is drawn on rect
   csPoly3D cutout;           // Rect for cardboard cutout version
   bool     ready;            // Whether texture must be redrawn
-  float    incidence_dist;   // Angle of incidence to camera last time rendered
+
+  //saved values for update checking
+  float anglecamera;
+  float angleobject;
 
   //screen bounding box helper
   csScreenBoxResult res;
@@ -67,7 +70,9 @@ private:
   //convenience shortcut
   csEngine *engine;
 
-  float CalcIncidenceAngleDist (iCamera *camera);
+  void csImposterMesh::UpdateValues (iCamera *cam,
+    float &camangle, float &objangle);
+
   void FindImposterRectangle (iCamera *camera);
   void SetImposterReady (bool r);
 
@@ -77,15 +82,12 @@ public:
   csImposterMesh (csEngine* engine, csMeshWrapper *parent);
   ~csImposterMesh ();
 
-  bool CheckIncidenceAngle (iRenderView *rview, float tolerance);
+  bool CheckUpdateNeeded (iRenderView *rview, float tolerance);
 
   //returns the imposter billboard
   csRenderMesh** GetRenderMesh (iRenderView *rview);
 
-  bool GetImposterReady () { return ready; }
-
-  void SetIncidenceDist (float d) { incidence_dist=d; }
-  float GetIncidenceDist () { return incidence_dist;  }
+  bool GetImposterReady ();
 };
 
 #endif // __CS_IMPMESH_H__

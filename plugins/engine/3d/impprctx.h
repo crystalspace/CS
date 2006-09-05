@@ -24,7 +24,6 @@
 #include "csgeom/vector3.h"
 #include "iengine/engine.h"
 #include "iengine/rview.h"
-#include "cstool/procmesh.h"
 
 class csEngine;
 class csImposterMesh;
@@ -38,8 +37,8 @@ private:
   //r2t texture
   iTextureWrapper *tex;
 
-  //flag if this imposter was rendered to texture and can be used
-  bool imposter_ready;
+  //flag if this imposter is currently in queue to be rendered to texture
+  bool updating;
 
   //imposter texture size
   int w, h;
@@ -57,13 +56,15 @@ private:
   csRef<iGraphics2D> g2d;
   csRef<iShaderManager> shadermanager;
 
+  void SetImposterReady (bool r);
+
 public:
   csImposterProcTex (csEngine* engine, csImposterMesh *parent);
   ~csImposterProcTex ();
 
-  bool GetImposterReady () { return imposter_ready; }
-  void SetImposterReady (bool r) { imposter_ready = r; }
-  void Update (iRenderView *rview, iSector *s);
+  bool GetImposterReady () { return !updating; }
+  void RenderToTexture (iRenderView *rview, iSector *s);
+  void Update ();
   csImposterMesh *GetParent () { return mesh; }
   iTextureWrapper *GetTexture () { return tex; }
 };

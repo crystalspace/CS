@@ -41,14 +41,15 @@ csImposterMesh::csImposterMesh (csEngine* engine, csMeshWrapper *parent)
   impostermat = engine->CreateMaterial ("Imposter", tex->GetTexture ());
 
   //@@@ Add four to initialise array because of bug in csPoly3D
-  cutout.AddVertex(csVector3());
-  cutout.AddVertex(csVector3());
-  cutout.AddVertex(csVector3());
-  cutout.AddVertex(csVector3());
+  cutout.AddVertex (csVector3 ());
+  cutout.AddVertex (csVector3 ());
+  cutout.AddVertex (csVector3 ());
+  cutout.AddVertex (csVector3 ());
 
   SetImposterReady(false);
-  dirty = false;
-  incidence_dist = 361;
+  dirty = true;
+  anglecamera = PI;
+  angleobject = PI;
 }
 
 csImposterMesh::~csImposterMesh ()
@@ -56,38 +57,40 @@ csImposterMesh::~csImposterMesh ()
   delete tex;
 }
 
-float csImposterMesh::CalcIncidenceAngleDist (iCamera *cam)
+void csImposterMesh::UpdateValues (iCamera *cam,
+  float &camangle, float &objangle)
 {
-  // Calculate angle of incidence vs. the camera
   csReversibleTransform objt = 
-    (parent_mesh->GetCsMovable()).csMovable::GetTransform ();
+    (parent_mesh->GetCsMovable ()).csMovable::GetTransform ();
   csReversibleTransform camt = cam->GetTransform ();
-  //csReversibleTransform seg = objt / camt;  // Matrix Math Magic!
-  csVector3 m2c = (objt.GetOrigin () - camt.GetOrigin ()).Unit ();
-  csVector3 objf = objt.GetT2O().Col3();
-  csVector3 camf = camt.GetT2O().Col3();
-  float anglecam = acosf ( camf * m2c );
-  float angleobj = acosf ( objf * m2c );
-  float angle = fabsf(anglecam) + fabsf(angleobj);
 
-  //printf("angle: %f %f %f\n",angleobj,anglecam, angle);
-  //csVector3 pt = seg * straight;
-  //csVector3 pt = (objforward * camforward).Unit();
-  //return csSquaredDist::PointPoint (straight, pt);
-  return angle;
+  csVector3 m2c = (
+    parent_mesh->GetWorldBoundingBox ().GetCenter ()
+    - camt.GetOrigin ()
+  ).Unit ();
+
+  csVector3 objf = objt.GetT2O ().Col3 ();
+  csVector3 camf = camt.GetT2O ().Col3 ();
+
+  camangle = acosf (camf * m2c);
+  objangle = acosf (objf * m2c);
 }
 
-bool csImposterMesh::CheckIncidenceAngle (iRenderView *rview, float tolerance)
+bool csImposterMesh::CheckUpdateNeeded (iRenderView *rview, float tolerance)
 {
-  float const curdist = CalcIncidenceAngleDist(rview->GetCamera ());
-  float diff = curdist - incidence_dist;
-  if (diff < 0) diff = -diff;
-  //printf("diff: %f %f %f\n",diff ,incidence_dist, curdist);
+  float curangle_cam;
+  float curangle_obj;
+
+  UpdateValues (rview->GetCamera (), curangle_cam, curangle_obj);
+
+  float camdiff = fabsf (curangle_cam - anglecamera);
+  float objdiff = fabsf (curangle_obj - angleobject);
+
+  float diff = camdiff + objdiff;
 
   // If not ok, mark for redraw of imposter
   if (diff > tolerance)
   {
-    //printf("redraw\n!");
     SetImposterReady (false);
     return false;
   }
@@ -96,13 +99,15 @@ bool csImposterMesh::CheckIncidenceAngle (iRenderView *rview, float tolerance)
 
 void csImposterMesh::SetImposterReady (bool r)
 {
-  ready=r;
-  if (!ready)
-  {
-//printf("request imposter update...\n");
-    engine->imposterUpdateList.Push(
-      csWeakRef<csImposterProcTex>(tex));
-  }
+printf("setting ready: %i\n", ready);
+  ready = r;
+  if (!ready) tex->Update ();
+}
+
+bool csImposterMesh::GetImposterReady ()
+{
+  if (!ready) tex->Update ();
+  return tex->GetImposterReady();
 }
 
 
@@ -125,17 +130,17 @@ void csImposterMesh::FindImposterRectangle (iCamera* c)
   res = parent_mesh->GetScreenBoundingBox (c);
 
   //calculate height and width of the imposter on screen
-  height = (res.sbox.GetCorner(1) - res.sbox.GetCorner(0)).y;
-  width = (res.sbox.GetCorner(2) - res.sbox.GetCorner(0)).x;
+  height = (res.sbox.GetCorner (1) - res.sbox.GetCorner (0)).y;
+  width = (res.sbox.GetCorner (2) - res.sbox.GetCorner (0)).x;
 
   // Project screen bounding box, at the returned depth to
   //  the camera transform to rotate it around where we need it
   float middle = (res.cbox.MinZ () + res.cbox.MaxZ ()) / 2;
 
-  csVector3 v1 = c->InvPerspective (res.sbox.GetCorner(0), middle);
-  csVector3 v2 = c->InvPerspective (res.sbox.GetCorner(1), middle);
-  csVector3 v3 = c->InvPerspective (res.sbox.GetCorner(3), middle);
-  csVector3 v4 = c->InvPerspective (res.sbox.GetCorner(2), middle);
+  csVector3 v1 = c->InvPerspective (res.sbox.GetCorner (0), middle);
+  csVector3 v2 = c->InvPerspective (res.sbox.GetCorner (1), middle);
+  csVector3 v3 = c->InvPerspective (res.sbox.GetCorner (3), middle);
+  csVector3 v4 = c->InvPerspective (res.sbox.GetCorner (2), middle);
   
   //@@@ put these into w2o and save transform
   v1 = c->GetTransform ().This2Other (v1);
@@ -153,7 +158,7 @@ void csImposterMesh::FindImposterRectangle (iCamera* c)
   c->SetTransform (oldt);
 
   // save current facing for angle checking
-  incidence_dist = CalcIncidenceAngleDist (c);
+  UpdateValues (c, anglecamera, angleobject);
 
   dirty = true;
 }
@@ -183,7 +188,7 @@ csRenderMesh** csImposterMesh::GetRenderMesh(iRenderView *rview)
     mesh->supports_pseudoinstancing = false;
     mesh->do_mirror = rview->GetCamera ()->IsMirrored ();
     mesh->object2world = csReversibleTransform ();
-    mesh->worldspace_origin = csVector3(0,0,0);
+    mesh->worldspace_origin = csVector3 (0,0,0);
     mesh->mixmode = CS_FX_ALPHA;
     mesh->z_buf_mode = CS_ZBUF_TEST;
     mesh->material = impostermat;
@@ -201,7 +206,7 @@ csRenderMesh** csImposterMesh::GetRenderMesh(iRenderView *rview)
     csRef<csRenderBuffer> indexBuffer = 
       csRenderBuffer::CreateIndexRenderBuffer(
       6, CS_BUF_STATIC, CS_BUFCOMP_UNSIGNED_INT, 0, 3);
-    indexBuffer->CopyInto(mesh_indices.GetArray(), 6);
+    indexBuffer->CopyInto (mesh_indices.GetArray(), 6);
 
     GetMeshColors ()->Empty ();
 
@@ -213,7 +218,7 @@ csRenderMesh** csImposterMesh::GetRenderMesh(iRenderView *rview)
 
     csRef<csRenderBuffer> colBuffer = csRenderBuffer::CreateRenderBuffer(
       4, CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 4);
-    colBuffer->CopyInto(mesh_colors.GetArray(), 4);
+    colBuffer->CopyInto (mesh_colors.GetArray(), 4);
 
     csRef<csRenderBufferHolder> buffer = new csRenderBufferHolder();
     buffer->SetRenderBuffer (CS_BUFFER_INDEX, indexBuffer);
@@ -247,14 +252,16 @@ csRenderMesh** csImposterMesh::GetRenderMesh(iRenderView *rview)
 
     csRef<csRenderBuffer> vertBuffer = csRenderBuffer::CreateRenderBuffer(
       4, CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 3);
-    vertBuffer->CopyInto(cutout.GetVertices (), 4);
+    vertBuffer->CopyInto (cutout.GetVertices (), 4);
 
     csRef<csRenderBuffer> texBuffer = csRenderBuffer::CreateRenderBuffer(
       4, CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 2);
-    texBuffer->CopyInto(mesh_texels.GetArray(), 4);
+    texBuffer->CopyInto (mesh_texels.GetArray(), 4);
 
     mesh->buffers->SetRenderBuffer (CS_BUFFER_POSITION, vertBuffer);
     mesh->buffers->SetRenderBuffer (CS_BUFFER_TEXCOORD0, texBuffer);
+
+    dirty = false;
   }
 
   return &mesh;

@@ -872,11 +872,11 @@ csRenderMesh** csMeshWrapper::GetImposter (iRenderView *rview)
   }
 
   // Check for too much camera movement since last imposter render
-  if (!imposter_mesh->CheckIncidenceAngle (rview,
+  if (!imposter_mesh->CheckUpdateNeeded (rview,
 	imposter_rotation_tolerance->Get ()))
   {
 
-    //printf(" (too much movement) ");
+    printf(" (needs update) ");
 //    return 0;
   }
 
