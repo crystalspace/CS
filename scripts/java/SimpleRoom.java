@@ -81,6 +81,8 @@ class EventHandler extends csJEventHandler
     protected csView view;
     protected iKeyboardDriver kbd;
     protected iVirtualClock vc;
+    protected long evPreProcess;
+    protected long evFinalProcess;
 
     public EventHandler (csView v)
     {
@@ -89,6 +91,8 @@ class EventHandler extends csJEventHandler
 	vc = r.vc;
         kbd = r.kbd;
         view = v;
+        evPreProcess = CS.csevPreProcess (CS.getTheObjectRegistry());
+        evFinalProcess = CS.csevFinalProcess (CS.getTheObjectRegistry());
     }
 
     protected void SetupFrame ()
@@ -97,17 +101,17 @@ class EventHandler extends csJEventHandler
         long current_time = vc.GetCurrentTicks();
         // Now rotate the camera according to keyboard state
         float speed = (float) ((elapsed_time / 1000.) * (0.03 * 20));
-        if (kbd.GetKeyState(CSKEY_RIGHT))
+        if (kbd.GetKeyState(CS.CSKEY_RIGHT))
             view.GetCamera().GetTransform().RotateThis(CS.CS_VEC_ROT_RIGHT, speed);
-        if (kbd.GetKeyState(CSKEY_LEFT))
+        if (kbd.GetKeyState(CS.CSKEY_LEFT))
             view.GetCamera().GetTransform().RotateThis(CS.CS_VEC_ROT_LEFT, speed);
-        if (kbd.GetKeyState(CSKEY_PGUP))
+        if (kbd.GetKeyState(CS.CSKEY_PGUP))
             view.GetCamera().GetTransform().RotateThis(CS.CS_VEC_TILT_UP, speed);
-        if (kbd.GetKeyState(CSKEY_PGDN))
+        if (kbd.GetKeyState(CS.CSKEY_PGDN))
             view.GetCamera().GetTransform().RotateThis(CS.CS_VEC_TILT_DOWN, speed);
-        if (kbd.GetKeyState(CSKEY_UP))
+        if (kbd.GetKeyState(CS.CSKEY_UP))
             view.GetCamera().Move(CS.CS_VEC_FORWARD.multiply(4 * speed), true);
-        if (kbd.GetKeyState(CSKEY_DOWN))
+        if (kbd.GetKeyState(CS.CSKEY_DOWN))
             view.GetCamera().Move(CS.CS_VEC_BACKWARD.multiply(4 * speed), true);
 
 	// Move our object.
@@ -118,7 +122,7 @@ class EventHandler extends csJEventHandler
 	movable.UpdateMove();
 
         // Tell 3D driver we're going to display 3D things.
-        myG3D.BeginDraw(CSDRAW_3DGRAPHICS);
+        myG3D.BeginDraw(CS.CSDRAW_3DGRAPHICS);
         view.Draw();
     }
 
@@ -130,24 +134,23 @@ class EventHandler extends csJEventHandler
 
     public boolean HandleEvent (iEvent ev)
     {
-        if (ev.getType() == csevKeyboard &&
-	    (csKeyEventHelper.GetEventType(ev) == csKeyEventTypeDown) &&
-            (csKeyEventHelper.GetCookedCode(ev) == CSKEY_ESC))
+        if (CS.CS_IS_KEYBOARD_EVENT (CS.getTheObjectRegistry(), ev) &&
+	    (csKeyEventHelper.GetEventType(ev) == CS.csKeyEventTypeDown) &&
+            (csKeyEventHelper.GetCookedCode(ev) == CS.CSKEY_ESC))
         {
             // escape key to quit
-            iEventQueue q = (iEventQueue) CS_QUERY_REGISTRY(
-	    	getTheObjectRegistry(), iEventQueue.class);
+            iEventQueue q = (iEventQueue) CS.CS_QUERY_REGISTRY(
+	    	CS.getTheObjectRegistry(), iEventQueue.class);
             if (q != null)
             {
-                q.GetEventOutlet().Broadcast(cscmdQuit);
+                q.GetEventOutlet().Broadcast(CS.csevQuit(
+                  CS.getTheObjectRegistry()));
                 return true;
             }
         }
-        if (ev.getType() == csevBroadcast
-		&& csCommandEventHelper.GetCode(ev) == cscmdProcess)
+        else if (ev.getName() == evPreProcess)
             SetupFrame();
-        if (ev.getType() == csevBroadcast
-		&& csCommandEventHelper.GetCode(ev) == cscmdFinalProcess)
+        else if (ev.getName() == evFinalProcess)
             FinishFrame();
         return true;
     }
@@ -188,7 +191,8 @@ class SimpleRoom extends CS
 	iMaterialWrapper material = engine.GetMaterialList().FindByName(matname);
 	
         System.out.println("creating walls");
-	iThingFactoryState fact = thingstate.GetFactory();
+	iThingFactoryState fact = (iThingFactoryState) SCF_QUERY_INTERFACE(
+          walls.GetFactory(), iThingFactoryState.class);
 	fact.AddInsideBox (
 	      new csVector3(-5,0,-5),
 	      new csVector3(5,20,5));
@@ -254,7 +258,6 @@ class SimpleRoom extends CS
 	    System.out.println("Application opened");
 
 	    System.out.println("Creating the room...");
-	    int mask = (CSMASK_FrameProcess|CSMASK_Input|CSMASK_Broadcast);
 	    CreateRoom();
 
 	    System.out.println("Creating the objects...");
@@ -262,8 +265,9 @@ class SimpleRoom extends CS
 
 	    System.out.println("Setting up event handlers...");
 	    EventHandler eventHandler = new EventHandler(view);
-	    result = csInitializer._SetupEventHandler(object_reg,
-	    	eventHandler, mask);
+	    long events[] = {CS.csevPreProcess (CS.getTheObjectRegistry()), 0};
+	    result = csInitializer.SetupEventHandler(object_reg,
+	    	(iEventHandler)eventHandler, events);
 	    System.out.println("Event handler added");
 
 	    System.out.println("Starting the main runloop...");
