@@ -18,10 +18,6 @@
 
 #include "cssysdef.h"
 
-#include "awstest_config.h"
-
-#ifndef TEST_AWS2
-
 #include "csutil/sysfunc.h"
 #include "csutil/cscolor.h"
 #include "csutil/csevent.h"
@@ -431,5 +427,3 @@ awsTest::Report (int severity, const char* msg, ...)
   }
   va_end (arg);
 }
-
-#endif // end only compile if NOT testing aws2.

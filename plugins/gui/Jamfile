@@ -1,5 +1,4 @@
 SubDir TOP plugins gui ;
 
 SubInclude TOP plugins gui aws ;
-SubInclude TOP plugins gui aws2 ;
 SubInclude TOP plugins gui cegui ;

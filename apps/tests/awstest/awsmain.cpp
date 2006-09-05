@@ -6,13 +6,8 @@
 #include "csutil/cfgfile.h"
 #include "ivaria/reporter.h"
 
-#ifdef TEST_AWS2
- #include "iaws/aws2.h"
- #include "awstest2.h"
-#else
- #include "iaws/aws.h"
- #include "awstest.h"
-#endif
+#include "iaws/aws.h"
+#include "awstest.h"
 
 #include <stdio.h>
 
