@@ -163,9 +163,9 @@ struct iEventHandler : public virtual iBase
  * a class of event handlers abstractly without having any of them loaded.
  */
 #define CS_EVENTHANDLER_NAMES(x)					\
-  CS_CONST_METHOD const static char * StaticHandlerName()		\
+  CS_CONST_METHOD static const char * StaticHandlerName()		\
   { return (x); }							\
-  CS_CONST_METHOD const static csHandlerID StaticID(csRef<iEventHandlerRegistry> &reg) \
+  CS_CONST_METHOD static const csHandlerID StaticID(csRef<iEventHandlerRegistry> &reg) \
   {return reg->GetGenericID(StaticHandlerName()); }			\
   CS_CONST_METHOD virtual const char * GenericName() const		\
   { return StaticHandlerName(); }					\

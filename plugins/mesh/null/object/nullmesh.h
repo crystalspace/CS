@@ -34,25 +34,59 @@
 struct iMaterialWrapper;
 struct iObjectRegistry;
 
+class csNullmeshMeshObjectType;
+
+class csNullmeshMeshFactory : public scfImplementation2<csNullmeshMeshFactory,
+                                                        iMeshObjectFactory,
+                                                        iNullFactoryState>
+{
+public:
+  csNullmeshMeshFactory (csNullmeshMeshObjectType* type);
+  
+  void SetRadius (float radius);
+  float GetRadius () const { return radius; }
+  void SetBoundingBox (const csBox3& box);
+  void GetBoundingBox (csBox3& box)
+  {
+    box = csNullmeshMeshFactory::box;
+  }
+
+  virtual csFlags& GetFlags () { return factory_flags; }
+  virtual csPtr<iMeshObject> NewInstance ();
+  virtual csPtr<iMeshObjectFactory> Clone () { return 0; }
+  virtual void HardTransform (const csReversibleTransform&) {}
+  virtual bool SupportsHardTransform () const { return false; }
+  virtual void SetMeshFactoryWrapper (iMeshFactoryWrapper* lp)
+  { logparent_factory = lp; }
+  virtual iMeshFactoryWrapper* GetMeshFactoryWrapper () const
+  { return logparent_factory; }
+  virtual iMeshObjectType* GetMeshObjectType () const
+  { return nullmesh_type; }
+  virtual iObjectModel* GetObjectModel () { return 0; }
+  virtual bool SetMaterialWrapper (iMaterialWrapper*) { return false; }
+  virtual iMaterialWrapper* GetMaterialWrapper () const { return 0; }
+  virtual void SetMixMode (uint) { }
+  virtual uint GetMixMode () const { return 0; }
+  
+private:
+  iMeshFactoryWrapper* logparent_factory;
+  iMeshObjectType* nullmesh_type;
+  float radius;
+  csBox3 box;
+  csFlags factory_flags;
+};
+
 /**
  * Nullmesh version of mesh object.
  */
-class csNullmeshMeshObject : public iMeshObject
+class csNullmeshMeshObject : public scfImplementationExt2<csNullmeshMeshObject,
+                                                          csObjectModel,
+                                                          iMeshObject,
+                                                          iNullMeshState>
 {
-private:
-  iMeshObjectFactory* factory;
-  iMeshWrapper* logparent;
-  iMeshFactoryWrapper* logparent_factory;
-  iMeshObjectType* nullmesh_type;
-  iMeshObjectDrawCallback* vis_cb;
-  float radius;
-  csBox3 box;
-  csFlags object_flags;
-  csFlags factory_flags;
-
 public:
   /// Constructor.
-  csNullmeshMeshObject (csNullmeshMeshObject* factory, iMeshObjectType* parent);
+  csNullmeshMeshObject (csNullmeshMeshFactory* factory, iMeshObjectType* parent);
 
   /// Destructor.
   virtual ~csNullmeshMeshObject ();
@@ -71,8 +105,6 @@ public:
   }
 
   //----------------------- iMeshObject implementation ------------------------
-  SCF_DECLARE_IBASE;
-
   virtual iMeshObjectFactory* GetFactory () const
   {
     return (iMeshObjectFactory*)factory;
@@ -96,8 +128,8 @@ public:
   virtual bool HitBeamOutline (const csVector3& start, const csVector3& end,
     csVector3& isect, float *pr);
   virtual bool HitBeamObject (const csVector3& start, const csVector3& end,
-  	csVector3& isect, float* pr, int* polygon_idx = 0,
-	iMaterialWrapper** material = 0);
+    csVector3& isect, float* pr, int* polygon_idx = 0,
+    iMaterialWrapper** material = 0);
   virtual void SetMeshWrapper (iMeshWrapper* lp) { logparent = lp; }
   virtual iMeshWrapper* GetMeshWrapper () const { return logparent; }
 
@@ -107,32 +139,7 @@ public:
     num = 0;
     return 0;
   }
-
-  //------------------------- iObjectModel implementation ----------------
-  class ObjectModel : public csObjectModel
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csNullmeshMeshObject);
-    virtual void GetObjectBoundingBox (csBox3& bbox)
-    {
-      scfParent->GetObjectBoundingBox (bbox);
-    }
-    virtual const csBox3& GetObjectBoundingBox ()
-    {
-      return scfParent->GetObjectBoundingBox ();
-    }
-    virtual void SetObjectBoundingBox (const csBox3& bbox)
-    {
-      scfParent->SetObjectBoundingBox (bbox);
-    }
-    virtual void GetRadius (float& rad, csVector3& cent)
-    {
-      scfParent->GetRadius (rad, cent);
-    }
-    virtual iTerraFormer* GetTerraFormerColldet () { return 0; }
-  } scfiObjectModel;
-  friend class ObjectModel;
-
-  virtual iObjectModel* GetObjectModel () { return &scfiObjectModel; }
+  virtual iObjectModel* GetObjectModel () { return this; }
   virtual bool SetColor (const csColor&) { return false; }
   virtual bool GetColor (csColor&) const { return false; }
   virtual bool SetMaterialWrapper (iMaterialWrapper*) { return false; }
@@ -141,92 +148,34 @@ public:
   virtual uint GetMixMode () const { return CS_FX_COPY; }
   virtual void InvalidateMaterialHandles () { }
   /**
-   * see imesh/object.h for specification. The default implementation
-   * does nothing.
-   */
+  * see imesh/object.h for specification. The default implementation
+  * does nothing.
+  */
   virtual void PositionChild (iMeshObject* /*child*/, csTicks /*current_time*/) { }
 
-  //------------------------- iNullMeshState implementation ----------------
-  class NullMeshState : public iNullMeshState
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csNullmeshMeshObject);
-    virtual void SetRadius (float radius)
-    {
-      scfParent->SetRadius (radius);
-    }
-    virtual float GetRadius () const
-    {
-      return scfParent->GetRadius ();
-    }
-    virtual void SetBoundingBox (const csBox3& box)
-    {
-      scfParent->SetBoundingBox (box);
-    }
-    virtual void GetBoundingBox (csBox3& box)
-    {
-      scfParent->GetBoundingBox (box);
-    }
-  } scfiNullMeshState;
-  friend class NullMeshState;
 
-  //---------------------- iGeneralMeshFactoryState implementation ------------
-  class NullFactoryState : public iNullFactoryState
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csNullmeshMeshObject);
-    virtual void SetRadius (float radius)
-    {
-      scfParent->SetRadius (radius);
-    }
-    virtual float GetRadius () const
-    {
-      return scfParent->GetRadius ();
-    }
-    virtual void SetBoundingBox (const csBox3& box)
-    {
-      scfParent->SetBoundingBox (box);
-    }
-    virtual void GetBoundingBox (csBox3& box)
-    {
-      scfParent->GetBoundingBox (box);
-    }
-  } scfiNullFactoryState;
-  friend class NullFactoryState;
-
-  //---------------- iMeshObjectFactory interface implementation --------------
-  struct MeshObjectFactory : public iMeshObjectFactory
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csNullmeshMeshObject);
-
-    virtual csFlags& GetFlags () { return scfParent->factory_flags; }
-    virtual csPtr<iMeshObject> NewInstance ();
-    virtual csPtr<iMeshObjectFactory> Clone () { return 0; }
-    virtual void HardTransform (const csReversibleTransform&) {}
-    virtual bool SupportsHardTransform () const { return false; }
-    virtual void SetMeshFactoryWrapper (iMeshFactoryWrapper* lp)
-    { scfParent->logparent_factory = lp; }
-    virtual iMeshFactoryWrapper* GetMeshFactoryWrapper () const
-    { return scfParent->logparent_factory; }
-    virtual iMeshObjectType* GetMeshObjectType () const
-    { return scfParent->nullmesh_type; }
-    virtual iObjectModel* GetObjectModel () { return 0; }
-    virtual bool SetMaterialWrapper (iMaterialWrapper*) { return false; }
-    virtual iMaterialWrapper* GetMaterialWrapper () const { return 0; }
-    virtual void SetMixMode (uint) { }
-    virtual uint GetMixMode () const { return 0; }
-  } scfiMeshObjectFactory;
-  friend struct MeshObjectFactory;
+private:
+  iMeshObjectFactory* factory;
+  iMeshObjectType* nullmesh_type;
+  iMeshWrapper* logparent;
+  iMeshObjectDrawCallback* vis_cb;
+  float radius;
+  csBox3 box;
+  csFlags object_flags;
 };
+
 
 /**
  * Genmesh type. This is the plugin you have to use to create instances
  * of csNullmeshMeshObjectFactory.
  */
-class csNullmeshMeshObjectType : public iMeshObjectType
+class csNullmeshMeshObjectType : 
+  public scfImplementation2<csNullmeshMeshObjectType,
+                            iMeshObjectType,
+                            iComponent>
 {
 public:
   iObjectRegistry* object_reg;
-
-  SCF_DECLARE_IBASE;
 
   /// Constructor.
   csNullmeshMeshObjectType (iBase*);
@@ -235,20 +184,11 @@ public:
   /// Draw.
   virtual csPtr<iMeshObjectFactory> NewFactory ();
   /// Initialize.
-  bool Initialize (iObjectRegistry* object_reg)
+  virtual bool Initialize (iObjectRegistry* object_reg)
   {
     csNullmeshMeshObjectType::object_reg = object_reg;
     return true;
   }
-
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csNullmeshMeshObjectType);
-    virtual bool Initialize (iObjectRegistry* object_reg)
-    {
-      return scfParent->Initialize (object_reg);
-    }
-  } scfiComponent;
 };
 
 #endif // __CS_NULLMESH_H__

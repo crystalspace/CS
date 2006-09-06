@@ -706,12 +706,19 @@ AS_IF([test $cs_cv_prog_cxx_visibility_inlines_hidden_buggy != yes],
 # Check how to set default symbol visibility, and how to override the setting
 # in code.
 #------------------------------------------------------------------------------
-CS_CHECK_BUILD_FLAGS([for symbol visibility flag],
+CS_CHECK_BUILD_FLAGS([for "hidden" symbol visibility flag],
     [cs_cv_prog_cc_visibility_hidden],
     [CS_CREATE_TUPLE([-fvisibility=hidden])])
 AS_IF([test -n "$cs_cv_prog_cc_visibility_hidden"],
     [CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS], 
 	[$cs_cv_prog_cc_visibility_hidden], [+])])
+	
+CS_CHECK_BUILD_FLAGS([for "default" symbol visibility flag],
+    [cs_cv_prog_cc_visibility_default],
+    [CS_CREATE_TUPLE([-fvisibility=default])])
+AS_IF([test -n "$cs_cv_prog_cc_visibility_default"],
+    [CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS.VISIBILITY_DEFAULT], 
+	[$cs_cv_prog_cc_visibility_default])])
 
 CS_SYMBOL_QUALIFIER([how to declare default visibility],
     [cs_cv_prog_cxx_declare_visible_def],
@@ -867,19 +874,16 @@ CS_CHECK_OPTIMIZE_FLAGS
 #------------------------------------------------------------------------------
 # Check for compiler debug flags.
 #------------------------------------------------------------------------------
-binutils_recent=no
-AS_IF([test -n "$OBJCOPY"],
-    [CS_CHECK_PROG_VERSION([binutils], [$OBJCOPY -V], [2.16], [9.9|.9|.9|.9],
-        [binutils_recent=yes])])
+CS_CHECK_BINUTILS_2_17
 
 AC_MSG_CHECKING([whether to split debug information])
 AC_ARG_ENABLE([separate-debug-info], 
     [AC_HELP_STRING([--enable-separate-debug-info],
         [split debug information into separate files. (default YES if 
-        binutils >= 2.16 detected and not on Cygwin, otherwise default NO)])])
+        binutils >= 2.17 detected and not on Cygwin, otherwise default NO)])])
 AS_IF([test -z "$enable_separate_debug_info"], 
     AS_IF([test -z `uname | grep -i CYGWIN`],
-        [enable_separate_debug_info=$binutils_recent],
+        [enable_separate_debug_info=$cs_cv_binutils_2_17],
         [enable_separate_debug_info=no]))
 AC_MSG_RESULT([$enable_separate_debug_info])
 
