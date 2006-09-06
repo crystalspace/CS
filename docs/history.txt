@@ -6,6 +6,13 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+6-Sep-2006
+	- Jorrit fixed a bug in csGraphics2DOpenGL::SetMouseCursor().
+	  It would assert (in debug mode) or crash (in release mode) in
+	  case the iWin32Assistant was gone already. Instead of that it
+	  now just does a test and returns false in case the assistant
+	  is gone. That way stuff can reset the mouse cursor during
+	  destruction of Crystal Space.
 5-Sep-2006
         - res fixed the Java bindings to build again.
 4-Sep-2006
