@@ -13,6 +13,11 @@ chronological order.
 	  now just does a test and returns false in case the assistant
 	  is gone. That way stuff can reset the mouse cursor during
 	  destruction of Crystal Space.
+        - res fixed an issue with the Java bindings where symbols didn't get
+          exported properly from the JNI glue shared library due being hidden
+          by -fvisibility=hidden. Worked around that by also specifying 
+          -fvisibility=default when compiling the JNI glue, causing the
+          symbols to get exported correctly again.
 5-Sep-2006
         - res fixed the Java bindings to build again.
 4-Sep-2006
