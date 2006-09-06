@@ -192,7 +192,7 @@ class SimpleRoom extends CS
 	
         System.out.println("creating walls");
 	iThingFactoryState fact = (iThingFactoryState) SCF_QUERY_INTERFACE(
-          walls.GetFactory(), iThingFactoryState.class);
+          walls.GetMeshObject().GetFactory(), iThingFactoryState.class);
 	fact.AddInsideBox (
 	      new csVector3(-5,0,-5),
 	      new csVector3(5,20,5));
@@ -256,6 +256,11 @@ class SimpleRoom extends CS
 	    result = csInitializer.OpenApplication(object_reg);
 
 	    System.out.println("Application opened");
+	
+            iGraphics3D myG3D = (iGraphics3D) CS_QUERY_REGISTRY(
+		getTheObjectRegistry(), iGraphics3D.class);
+	    iNativeWindow window = myG3D.GetDriver2D().GetNativeWindow();
+	    window.SetTitle ("Crystal Space Java Application");
 
 	    System.out.println("Creating the room...");
 	    CreateRoom();
@@ -265,7 +270,12 @@ class SimpleRoom extends CS
 
 	    System.out.println("Setting up event handlers...");
 	    EventHandler eventHandler = new EventHandler(view);
-	    long events[] = {CS.csevPreProcess (CS.getTheObjectRegistry()), 0};
+	    long events[] = {
+	      CS.csevPreProcess (CS.getTheObjectRegistry()),
+	      CS.csevFinalProcess (CS.getTheObjectRegistry()),
+	      CS.csevKeyboardEvent (CS.getTheObjectRegistry()), 
+	      -1 /* CS.CS_EVENTLIST_END */
+	    };
 	    result = csInitializer.SetupEventHandler(object_reg,
 	    	(iEventHandler)eventHandler, events);
 	    System.out.println("Event handler added");
