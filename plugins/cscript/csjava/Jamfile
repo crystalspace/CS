@@ -96,7 +96,8 @@ if $(JAVA.AVAILABLE) = "yes" && $(ANT) && $(JAVA) && $(JAVAC) && $(CMD.SWIG) &&
   LinkWith javamod : crystalspace ;
   ExternalLibs javamod : JAVA ;
   CFlags javamod : $(COMPILER.CFLAGS.VISIBILITY_DEFAULT) $(PLUGIN.CFLAGS) 
-    $(COMPILER.C++FLAGS.EXCEPTIONS.ENABLE) ;
+    $(COMPILER.C++FLAGS.EXCEPTIONS.ENABLE) 
+    $(COMPILER.C++FLAGS.STRICTALIASING.DISABLE) ;
   LFlags javamod : $(PLUGIN.LFLAGS) $(LINKLIBS) $(CSJAVA.LFLAGS) ;
   Depends csjava : $(javamod) ;
   MakeLocate $(javamod) : $(LOCATE.TARGETS) ;
