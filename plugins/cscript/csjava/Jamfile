@@ -70,7 +70,7 @@ if $(JAVA.AVAILABLE) = "yes" && $(ANT) && $(JAVA) && $(JAVAC) && $(CMD.SWIG) &&
   Swig $(common) :
     [ DoSourceGrist cspace.i ] :
     java :
-    -c++ -java -package org.crystalspace3d :
+    -c++ -java -cpperraswarn -package org.crystalspace3d :
     [ ConcatDirs $(TOP) include ]
     [ ConcatDirs $(BUILDTOP) include ] :
     [ ConcatDirs $(TOP) include bindings ] :

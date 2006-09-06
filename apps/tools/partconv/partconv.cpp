@@ -427,13 +427,13 @@ void PartConv::ConvertParticlesFactoryParams (iDocumentNode* paramsNode,
     CS_NODE_ELEMENT, 0);
   newParams->SetValue ("params");
 
-  // Remove old
-  factNode->RemoveNode (paramsNode);
-
   // Handle any specific stuff (none atm ;)
 
   // Handle the common things
   ConvertParticlesCommonParams (paramsNode, newParams);
+
+  // Remove old
+  factNode->RemoveNode (paramsNode);
 }
 
 void PartConv::ConvertParticlesObjectParams (iDocumentNode* paramsNode,
@@ -444,8 +444,7 @@ void PartConv::ConvertParticlesObjectParams (iDocumentNode* paramsNode,
     CS_NODE_ELEMENT, 0);
   newParams->SetValue ("params");
 
-  // Remove old
-  objNode->RemoveNode (paramsNode);
+  
 
   // Handle specific stuff
   csRef<iDocumentNode> factNode = objNode->GetNode ("factory");
@@ -460,6 +459,9 @@ void PartConv::ConvertParticlesObjectParams (iDocumentNode* paramsNode,
 
   // Handle common things
   ConvertParticlesCommonParams (paramsNode, newParams);
+
+  // Remove old
+  objNode->RemoveNode (paramsNode);
 }
 
 void PartConv::ConvertParticlesCommonParams (iDocumentNode* oldParams, 
@@ -524,6 +526,8 @@ void PartConv::ConvertParticlesCommonParams (iDocumentNode* oldParams,
             break;
           case XMLTOKEN_SIZE:
             syntaxService->ParseVector (child2, emitSize);
+            if (emitSize.SquaredNorm () == 0)
+              emitSize.x = child2->GetContentsValueAsFloat ();
             break;
           case XMLTOKEN_TIME:
             duration = child2->GetContentsValueAsFloat ();
@@ -588,6 +592,7 @@ void PartConv::ConvertParticlesCommonParams (iDocumentNode* oldParams,
 
         csRef<iDocumentNode> sizeNode = newParams->CreateNodeBefore (
           CS_NODE_ELEMENT, 0);
+        sizeNode->SetValue ("particlesize");
         sizeNode->SetAttributeAsFloat ("x", radius);
         sizeNode->SetAttributeAsFloat ("y", radius);
       }

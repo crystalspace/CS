@@ -22,6 +22,10 @@ chronological order.
 	  fixes some issues in release builds.
 	- res fixed some errors having crept into SimpleRoom.java when it was
 	  updated to work with latest CS.
+	- Marten made a small SWIG-tweak to shut up an error from newer 
+	  SWIG versions.
+	- Marten made partconv not crash.
+	- Marten converted nullmesh to new SCF syntax.
 5-Sep-2006
         - res fixed the Java bindings to build again.
 4-Sep-2006
