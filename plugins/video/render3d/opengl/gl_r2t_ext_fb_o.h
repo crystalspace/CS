@@ -27,12 +27,13 @@ class csGLRender2TextureEXTfbo : public csGLRender2TextureFramebuf
   bool enableFBO;
   GLuint framebuffer, depthRB, stencilRB;
   int fb_w, fb_h;
+  iTextureHandle* txthandle;
 
   void FreeBuffers();
 public:
   csGLRender2TextureEXTfbo (csGLGraphics3D* G3D) 
     : csGLRender2TextureFramebuf (G3D), enableFBO(true), framebuffer (0),
-      depthRB(0), stencilRB(0) { }
+      depthRB(0), stencilRB(0), txthandle(0) { }
   virtual ~csGLRender2TextureEXTfbo();
 
   virtual void SetRenderTarget (iTextureHandle* handle, bool persistent,
