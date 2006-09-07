@@ -28,8 +28,10 @@ class csGLRender2TextureEXTfbo : public csGLRender2TextureFramebuf
   GLuint framebuffer, depthRB, stencilRB;
   int fb_w, fb_h;
   iTextureHandle* txthandle;
+  csString fboMsg;
 
   void FreeBuffers();
+  const char* FBStatusStr (GLenum status);
 public:
   csGLRender2TextureEXTfbo (csGLGraphics3D* G3D) 
     : csGLRender2TextureFramebuf (G3D), enableFBO(true), framebuffer (0),
