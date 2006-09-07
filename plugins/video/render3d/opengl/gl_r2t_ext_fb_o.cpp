@@ -151,7 +151,10 @@ void csGLRender2TextureEXTfbo::SetRenderTarget (iTextureHandle* handle,
     }
   }
   if (enableFBO)
+  {
+    G3D->ext->glBindFramebufferEXT (GL_FRAMEBUFFER_EXT, framebuffer);
     csGLRender2TextureFramebuf::SetRenderTarget (handle, false, subtexture);
+  }
   else
   {
     csGLRender2TextureFramebuf::SetRenderTarget (handle, persistent, subtexture);
