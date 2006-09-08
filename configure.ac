@@ -1043,8 +1043,8 @@ AS_IF([test "$no_x" != yes],
 #------------------------------------------------------------------------------
 # Check for OpenGL and companions.  Also check if GLX extensions are supported
 # and define the (backward) header property CSGL_EXT_STATIC_ASSERTION if they
-# are _not_ supported. Finally, check if the type GLhandleARB is exported by
-# the GL headers. It is starting to show up in very modern headers, but is
+# are _not_ supported. Finally, check if the some GL types are exported by
+# the GL headers. Some are starting to show up in very modern headers, but are
 # absent from most.
 #
 # IMPLEMENTATION NOTES
@@ -1053,14 +1053,17 @@ AS_IF([test "$no_x" != yes],
 # libraries may depend on it (notably Cg).
 #------------------------------------------------------------------------------
 CS_CHECK_OPENGL
-AS_IF([test $cs_cv_libgl = yes],
-    [# Check for GLhandleARB.
-    CS_CHECK_BUILD([for GLhandleARB], [cs_cv_libgl_glhandlearb],
+AC_DEFUN([CS_CHECK_OPENGL_TYPE],
+    [CS_CHECK_BUILD([for $1], [cs_cv_libgl_$1],
 	[AC_LANG_PROGRAM(
 	    [CS_GL_INCLUDE([CS_OPENGL_PATH],[GL],[gl.h])],
-	    [GLhandleARB x; (void)x;])],
-	[], [],	[CS_HEADER_PROPERTY([CS_HAVE_GLHANDLEARB_T])], [], [],
+		[$1 x; (void)x;])],
+	[], [], [$2], [], [],
 	[$cs_cv_libgl_cflags], [$cs_cv_libgl_lflags], [$cs_cv_libgl_libs])])
+AS_IF([test $cs_cv_libgl = yes],
+    [CS_CHECK_OPENGL_TYPE([GLhandleARB], [CS_HEADER_PROPERTY([CS_HAVE_GLHANDLEARB_T])])
+    CS_CHECK_OPENGL_TYPE([GLcharARB], [CS_HEADER_PROPERTY([CS_HAVE_GLCHARARB_T])]) 
+    CS_CHECK_OPENGL_TYPE([GLchar], [CS_HEADER_PROPERTY([CS_HAVE_GLCHAR_T])])])
 CS_CHECK_GLU
 CS_CHECK_GLX
 # Check for GLX extensions.  Define CSGL_EXT_STATIC_ASSERTION if _not_

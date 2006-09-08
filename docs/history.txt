@@ -6,6 +6,13 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+8-Sep-2006
+        - res added tests for some more GL types.
+	- caedes updated cspace.i for the new particles.
+	- res added some more GL extensions and missing GL versions up to 2.1
+	  to the extension manager.
+	- res fixed the glshader_fixed plugin to depend on GL 1.4 for texture
+	  crossbar support and not 1.3.
 6-Sep-2006
 	- Jorrit fixed a bug in csGraphics2DOpenGL::SetMouseCursor().
 	  It would assert (in debug mode) or crash (in release mode) in
