@@ -158,9 +158,19 @@ if $(JAVA.AVAILABLE) = "yes" && $(ANT) && $(JAVA) && $(JAVAC) && $(CMD.SWIG) &&
     SystemInstallPlugin $(1) : $(2) ;
   }
   InstallJavamod $(javamod) : bindings java ;
+  local cleantarget ;
+  if $(LINK.DEBUG.INFO.SEPARATE) = "yes"
+  {
+    local debugfile = [ SplitDebugInfo $(javamod) ] ;
+    cleantarget += $(debugfile) ;
+    NoCare $(debugfile) ;
+    Depends install_plugin : [ DoInstall $(debugfile) :
+                                $(appdatadir) bindings java :
+                                $(INSTALL_DATA) ] ;
+  }
 
   Always csjavaclean ;
   NotFile csjavaclean ;
-  Clean csjavaclean : $(javamod) $(javamodobj) ;
+  Clean csjavaclean : $(javamod) $(javamodobj) $(cleantarget) ;
   Depends clean : csjavaclean ;
 }

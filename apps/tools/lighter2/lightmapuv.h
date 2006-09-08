@@ -30,6 +30,7 @@ namespace lighter
   class LightmapUVLayouter 
   {
   public:
+    virtual ~LightmapUVLayouter() {}
     virtual bool LayoutUVOnPrimitives (RadPrimitiveArray &prims, 
       RadObjectVertexData& vertexData,
       LightmapPtrDelArray& lightmaps) = 0;
