@@ -7,7 +7,7 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 8-Sep-2006
-        - res added tests for some more GL types.
+	- res added tests for some more GL types.
 	- caedes updated cspace.i for the new particles.
 	- res added some more GL extensions and missing GL versions up to 2.1
 	  to the extension manager.
@@ -27,11 +27,11 @@ chronological order.
 	  now just does a test and returns false in case the assistant
 	  is gone. That way stuff can reset the mouse cursor during
 	  destruction of Crystal Space.
-        - res fixed an issue with the Java bindings where symbols didn't get
-          exported properly from the JNI glue shared library due being hidden
-          by -fvisibility=hidden. Worked around that by also specifying 
-          -fvisibility=default when compiling the JNI glue, causing the
-          symbols to get exported correctly again.
+	- res fixed an issue with the Java bindings where symbols didn't get
+	  exported properly from the JNI glue shared library due being hidden
+	  by -fvisibility=hidden. Worked around that by also specifying 
+	  -fvisibility=default when compiling the JNI glue, causing the
+	  symbols to get exported correctly again.
 	- res disabled strict aliasing when compiling the Java JNI glue. This
 	  fixes some issues in release builds.
 	- res fixed some errors having crept into SimpleRoom.java when it was
@@ -43,8 +43,8 @@ chronological order.
 5-Sep-2006
         - res fixed the Java bindings to build again.
 4-Sep-2006
-        - res changed the configure program version check to support checking
-          the same program with different version numbers.
+	- res changed the configure program version check to support checking
+	  the same program with different version numbers.
 	- res separated the configure binutils recency check into it's own
 	  macro.
 	- res changed the --as-needed check to (a) only use --as-needed for
