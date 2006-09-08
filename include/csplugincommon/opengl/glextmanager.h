@@ -139,9 +139,6 @@ typedef unsigned int GLhandleARB;
 #ifndef CS_HAVE_GLCHAR_T
 typedef GLcharARB GLchar;
 #endif
-#ifndef CS_HAVE_GLHANDLE_T
-typedef GLhandleARB GLhandle;
-#endif
 
 #include "iutil/cmdline.h"
 #include "iutil/objreg.h"
@@ -773,6 +770,980 @@ typedef GLvoid (csAPIENTRY* csGLCOMPRESSEDTEXSUBIMAGE3D) (GLenum target, GLint l
 typedef GLvoid (csAPIENTRY* csGLCOMPRESSEDTEXSUBIMAGE2D) (GLenum target, GLint level, GLint xoffset, GLint yoffset, GLsizei width, GLsizei height, GLenum format, GLsizei imageSize, const GLvoid* data);
 typedef GLvoid (csAPIENTRY* csGLCOMPRESSEDTEXSUBIMAGE1D) (GLenum target, GLint level, GLint xoffset, GLsizei width, GLenum format, GLsizei imageSize, const GLvoid* data);
 typedef GLvoid (csAPIENTRY* csGLGETCOMPRESSEDTEXIMAGE) (GLenum target, GLint level, GLvoid* img);
+
+/** @} */
+/**\name GL_version_1_4 constants
+ * This is not a real OpenGL extension. The OpenGL canvases will 'initialize'
+ * this extension when the appropriate GL version was detected. 
+ * @{ */
+#ifndef GL_GENERATE_MIPMAP
+#define GL_GENERATE_MIPMAP                                            33169
+#endif
+
+#ifndef GL_DEPTH_COMPONENT16
+#define GL_DEPTH_COMPONENT16                                          33189
+#endif
+
+#ifndef GL_DEPTH_COMPONENT24
+#define GL_DEPTH_COMPONENT24                                          33190
+#endif
+
+#ifndef GL_DEPTH_COMPONENT32
+#define GL_DEPTH_COMPONENT32                                          33191
+#endif
+
+#ifndef GL_TEXTURE_DEPTH_SIZE
+#define GL_TEXTURE_DEPTH_SIZE                                         34890
+#endif
+
+#ifndef GL_DEPTH_TEXTURE_MODE
+#define GL_DEPTH_TEXTURE_MODE                                         34891
+#endif
+
+#ifndef GL_TEXTURE_COMPARE_MODE
+#define GL_TEXTURE_COMPARE_MODE                                       34892
+#endif
+
+#ifndef GL_TEXTURE_COMPARE_FUNC
+#define GL_TEXTURE_COMPARE_FUNC                                       34893
+#endif
+
+#ifndef GL_COMPARE_R_TO_TEXTURE
+#define GL_COMPARE_R_TO_TEXTURE                                       34894
+#endif
+
+#ifndef GL_FOG_COORDINATE_SOURCE
+#define GL_FOG_COORDINATE_SOURCE                                      33872
+#endif
+
+#ifndef GL_FOG_COORDINATE
+#define GL_FOG_COORDINATE                                             33873
+#endif
+
+#ifndef GL_FRAGMENT_DEPTH
+#define GL_FRAGMENT_DEPTH                                             33874
+#endif
+
+#ifndef GL_CURRENT_FOG_COORDINATE
+#define GL_CURRENT_FOG_COORDINATE                                     33875
+#endif
+
+#ifndef GL_FOG_COORDINATE_ARRAY_TYPE
+#define GL_FOG_COORDINATE_ARRAY_TYPE                                  33876
+#endif
+
+#ifndef GL_FOG_COORDINATE_ARRAY_STRIDE
+#define GL_FOG_COORDINATE_ARRAY_STRIDE                                33877
+#endif
+
+#ifndef GL_FOG_COORDINATE_ARRAY_POINTER
+#define GL_FOG_COORDINATE_ARRAY_POINTER                               33878
+#endif
+
+#ifndef GL_FOG_COORDINATE_ARRAY
+#define GL_FOG_COORDINATE_ARRAY                                       33879
+#endif
+
+#ifndef GL_POINT_SIZE_MIN
+#define GL_POINT_SIZE_MIN                                             33062
+#endif
+
+#ifndef GL_POINT_SIZE_MAX
+#define GL_POINT_SIZE_MAX                                             33063
+#endif
+
+#ifndef GL_POINT_FADE_THRESHOLD_SIZE
+#define GL_POINT_FADE_THRESHOLD_SIZE                                  33064
+#endif
+
+#ifndef GL_POINT_DISTANCE_ATTENUATION
+#define GL_POINT_DISTANCE_ATTENUATION                                 33065
+#endif
+
+#ifndef GL_COLOR_SUM
+#define GL_COLOR_SUM                                                  33880
+#endif
+
+#ifndef GL_CURRENT_SECONDARY_COLOR
+#define GL_CURRENT_SECONDARY_COLOR                                    33881
+#endif
+
+#ifndef GL_SECONDARY_COLOR_ARRAY_SIZE
+#define GL_SECONDARY_COLOR_ARRAY_SIZE                                 33882
+#endif
+
+#ifndef GL_SECONDARY_COLOR_ARRAY_TYPE
+#define GL_SECONDARY_COLOR_ARRAY_TYPE                                 33883
+#endif
+
+#ifndef GL_SECONDARY_COLOR_ARRAY_STRIDE
+#define GL_SECONDARY_COLOR_ARRAY_STRIDE                               33884
+#endif
+
+#ifndef GL_SECONDARY_COLOR_ARRAY_POINTER
+#define GL_SECONDARY_COLOR_ARRAY_POINTER                              33885
+#endif
+
+#ifndef GL_SECONDARY_COLOR_ARRAY
+#define GL_SECONDARY_COLOR_ARRAY                                      33886
+#endif
+
+#ifndef GL_BLEND_DST_RGB
+#define GL_BLEND_DST_RGB                                             0x80C8
+#endif
+
+#ifndef GL_BLEND_SRC_RGB
+#define GL_BLEND_SRC_RGB                                             0x80C9
+#endif
+
+#ifndef GL_BLEND_DST_ALPHA
+#define GL_BLEND_DST_ALPHA                                           0x80CA
+#endif
+
+#ifndef GL_BLEND_SRC_ALPHA
+#define GL_BLEND_SRC_ALPHA                                           0x80CB
+#endif
+
+#ifndef GL_INCR_WRAP
+#define GL_INCR_WRAP                                                  34055
+#endif
+
+#ifndef GL_DECR_WRAP
+#define GL_DECR_WRAP                                                  34056
+#endif
+
+#ifndef GL_TEXTURE_FILTER_CONTROL
+#define GL_TEXTURE_FILTER_CONTROL                                     34048
+#endif
+
+#ifndef GL_TEXTURE_LOD_BIAS
+#define GL_TEXTURE_LOD_BIAS                                           34049
+#endif
+
+#ifndef GL_MAX_TEXTURE_LOD_BIAS
+#define GL_MAX_TEXTURE_LOD_BIAS                                       34045
+#endif
+
+#ifndef GL_MIRRORED_REPEAT
+#define GL_MIRRORED_REPEAT                                            33648
+#endif
+
+
+/** @} */
+
+/**\name GL_version_1_4 functions
+ * This is not a real OpenGL extension. The OpenGL canvases will 'initialize'
+ * this extension when the appropriate GL version was detected. 
+ * @{ */
+typedef GLvoid (csAPIENTRY* csGLFOGCOORDF) (GLfloat coord);
+typedef GLvoid (csAPIENTRY* csGLFOGCOORDD) (GLdouble coord);
+typedef GLvoid (csAPIENTRY* csGLFOGCOORDFV) (GLfloat coord);
+typedef GLvoid (csAPIENTRY* csGLFOGCOORDDV) (GLdouble coord);
+typedef GLvoid (csAPIENTRY* csGLFOGCOORDPOINTER) (GLenum type, GLsizei stride, GLvoid* pointer);
+typedef GLvoid (csAPIENTRY* csGLMULTIDRAWARRAYS) (GLenum mode, GLint* first, GLsizei* count, GLsizei primcount);
+typedef GLvoid (csAPIENTRY* csGLMULTIDRAWELEMENTS) (GLenum mode, GLsizei* count, GLenum type, const GLvoid* indices, GLsizei primcount);
+typedef GLvoid (csAPIENTRY* csGLPOINTPARAMETERF) (GLenum pname, GLfloat param);
+typedef GLvoid (csAPIENTRY* csGLPOINTPARAMETERFV) (GLenum pname, GLfloat* params);
+typedef GLvoid (csAPIENTRY* csGLSECONDARYCOLOR3B) (GLbyte components);
+typedef GLvoid (csAPIENTRY* csGLSECONDARYCOLOR3S) (GLshort components);
+typedef GLvoid (csAPIENTRY* csGLSECONDARYCOLOR3I) (GLint components);
+typedef GLvoid (csAPIENTRY* csGLSECONDARYCOLOR3F) (GLfloat components);
+typedef GLvoid (csAPIENTRY* csGLSECONDARYCOLOR3D) (GLdouble components);
+typedef GLvoid (csAPIENTRY* csGLSECONDARYCOLOR3UB) (GLubyte components);
+typedef GLvoid (csAPIENTRY* csGLSECONDARYCOLOR3US) (GLushort components);
+typedef GLvoid (csAPIENTRY* csGLSECONDARYCOLOR3UI) (GLuint components);
+typedef GLvoid (csAPIENTRY* csGLSECONDARYCOLOR3BV) (GLbyte components);
+typedef GLvoid (csAPIENTRY* csGLSECONDARYCOLOR3SV) (GLshort components);
+typedef GLvoid (csAPIENTRY* csGLSECONDARYCOLOR3IV) (GLint components);
+typedef GLvoid (csAPIENTRY* csGLSECONDARYCOLOR3FV) (GLfloat components);
+typedef GLvoid (csAPIENTRY* csGLSECONDARYCOLOR3DV) (GLdouble components);
+typedef GLvoid (csAPIENTRY* csGLSECONDARYCOLOR3UBV) (GLubyte components);
+typedef GLvoid (csAPIENTRY* csGLSECONDARYCOLOR3USV) (GLushort components);
+typedef GLvoid (csAPIENTRY* csGLSECONDARYCOLOR3UIV) (GLuint components);
+typedef GLvoid (csAPIENTRY* csGLSECONDARYCOLORPOINTER) (GLint size, GLenum type, GLsizei stride, GLvoid* pointer);
+typedef GLvoid (csAPIENTRY* csGLBLENDFUNCSEPARATE) (GLenum sFactorRGB, GLenum dFactorRGB, GLenum sFactorAlpha, GLenum dFactorAlpha);
+typedef GLvoid (csAPIENTRY* csGLWINDOWPOS2D) (GLdouble x, GLdouble y);
+typedef GLvoid (csAPIENTRY* csGLWINDOWPOS2F) (GLfloat x, GLfloat y);
+typedef GLvoid (csAPIENTRY* csGLWINDOWPOS2I) (GLint x, GLint y);
+typedef GLvoid (csAPIENTRY* csGLWINDOWPOS2S) (GLshort x, GLshort y);
+typedef GLvoid (csAPIENTRY* csGLWINDOWPOS2DV) (const GLdouble* p);
+typedef GLvoid (csAPIENTRY* csGLWINDOWPOS2FV) (const GLfloat* p);
+typedef GLvoid (csAPIENTRY* csGLWINDOWPOS2IV) (const GLint* p);
+typedef GLvoid (csAPIENTRY* csGLWINDOWPOS2SV) (const GLshort* p);
+typedef GLvoid (csAPIENTRY* csGLWINDOWPOS3D) (GLdouble x, GLdouble y, GLdouble z);
+typedef GLvoid (csAPIENTRY* csGLWINDOWPOS3F) (GLfloat x, GLfloat y, GLfloat z);
+typedef GLvoid (csAPIENTRY* csGLWINDOWPOS3I) (GLint x, GLint y, GLint z);
+typedef GLvoid (csAPIENTRY* csGLWINDOWPOS3S) (GLshort x, GLshort y, GLshort z);
+typedef GLvoid (csAPIENTRY* csGLWINDOWPOS3DV) (const GLdouble* p);
+typedef GLvoid (csAPIENTRY* csGLWINDOWPOS3FV) (const GLfloat* p);
+typedef GLvoid (csAPIENTRY* csGLWINDOWPOS3IV) (const GLint* p);
+typedef GLvoid (csAPIENTRY* csGLWINDOWPOS3SV) (const GLshort* p);
+
+/** @} */
+/**\name GL_version_1_5 constants
+ * This is not a real OpenGL extension. The OpenGL canvases will 'initialize'
+ * this extension when the appropriate GL version was detected. 
+ * @{ */
+#ifndef GL_ARRAY_BUFFER
+#define GL_ARRAY_BUFFER                                               34962
+#endif
+
+#ifndef GL_ELEMENT_ARRAY_BUFFER
+#define GL_ELEMENT_ARRAY_BUFFER                                       34963
+#endif
+
+#ifndef GL_ARRAY_BUFFER_BINDING
+#define GL_ARRAY_BUFFER_BINDING                                       34964
+#endif
+
+#ifndef GL_ELEMENT_ARRAY_BUFFER_BINDING
+#define GL_ELEMENT_ARRAY_BUFFER_BINDING                               34965
+#endif
+
+#ifndef GL_VERTEX_ARRAY_BUFFER_BINDING
+#define GL_VERTEX_ARRAY_BUFFER_BINDING                                34966
+#endif
+
+#ifndef GL_NORMAL_ARRAY_BUFFER_BINDING
+#define GL_NORMAL_ARRAY_BUFFER_BINDING                                34967
+#endif
+
+#ifndef GL_COLOR_ARRAY_BUFFER_BINDING
+#define GL_COLOR_ARRAY_BUFFER_BINDING                                 34968
+#endif
+
+#ifndef GL_INDEX_ARRAY_BUFFER_BINDING
+#define GL_INDEX_ARRAY_BUFFER_BINDING                                 34969
+#endif
+
+#ifndef GL_TEXTURE_COORD_ARRAY_BUFFER_BINDING
+#define GL_TEXTURE_COORD_ARRAY_BUFFER_BINDING                         34970
+#endif
+
+#ifndef GL_EDGE_FLAG_ARRAY_BUFFER_BINDING
+#define GL_EDGE_FLAG_ARRAY_BUFFER_BINDING                             34971
+#endif
+
+#ifndef GL_SECONDARY_COLOR_ARRAY_BUFFER_BINDING
+#define GL_SECONDARY_COLOR_ARRAY_BUFFER_BINDING                       34972
+#endif
+
+#ifndef GL_FOG_COORDINATE_ARRAY_BUFFER_BINDING
+#define GL_FOG_COORDINATE_ARRAY_BUFFER_BINDING                        34973
+#endif
+
+#ifndef GL_WEIGHT_ARRAY_BUFFER_BINDING
+#define GL_WEIGHT_ARRAY_BUFFER_BINDING                                34974
+#endif
+
+#ifndef GL_VERTEX_ATTRIB_ARRAY_BUFFER_BINDING
+#define GL_VERTEX_ATTRIB_ARRAY_BUFFER_BINDING                         34975
+#endif
+
+#ifndef GL_STREAM_DRAW
+#define GL_STREAM_DRAW                                                35040
+#endif
+
+#ifndef GL_STREAM_READ
+#define GL_STREAM_READ                                                35041
+#endif
+
+#ifndef GL_STREAM_COPY
+#define GL_STREAM_COPY                                                35042
+#endif
+
+#ifndef GL_STATIC_DRAW
+#define GL_STATIC_DRAW                                                35044
+#endif
+
+#ifndef GL_STATIC_READ
+#define GL_STATIC_READ                                                35045
+#endif
+
+#ifndef GL_STATIC_COPY
+#define GL_STATIC_COPY                                                35046
+#endif
+
+#ifndef GL_DYNAMIC_DRAW
+#define GL_DYNAMIC_DRAW                                               35048
+#endif
+
+#ifndef GL_DYNAMIC_READ
+#define GL_DYNAMIC_READ                                               35049
+#endif
+
+#ifndef GL_DYNAMIC_COPY
+#define GL_DYNAMIC_COPY                                               35050
+#endif
+
+#ifndef GL_READ_ONLY
+#define GL_READ_ONLY                                                  35000
+#endif
+
+#ifndef GL_WRITE_ONLY
+#define GL_WRITE_ONLY                                                 35001
+#endif
+
+#ifndef GL_READ_WRITE
+#define GL_READ_WRITE                                                 35002
+#endif
+
+#ifndef GL_BUFFER_SIZE
+#define GL_BUFFER_SIZE                                                34660
+#endif
+
+#ifndef GL_BUFFER_USAGE
+#define GL_BUFFER_USAGE                                               34661
+#endif
+
+#ifndef GL_BUFFER_ACCESS
+#define GL_BUFFER_ACCESS                                              35003
+#endif
+
+#ifndef GL_BUFFER_MAPPED
+#define GL_BUFFER_MAPPED                                              35004
+#endif
+
+#ifndef GL_BUFFER_MAP_POINTER
+#define GL_BUFFER_MAP_POINTER                                         35005
+#endif
+
+#ifndef GL_SAMPLES_PASSED
+#define GL_SAMPLES_PASSED                                            0x8914
+#endif
+
+#ifndef GL_QUERY_COUNTER_BITS
+#define GL_QUERY_COUNTER_BITS                                        0x8864
+#endif
+
+#ifndef GL_CURRENT_QUERY
+#define GL_CURRENT_QUERY                                             0x8865
+#endif
+
+#ifndef GL_QUERY_RESULT
+#define GL_QUERY_RESULT                                              0x8866
+#endif
+
+#ifndef GL_QUERY_RESULT_AVAILABLE
+#define GL_QUERY_RESULT_AVAILABLE                                    0x8867
+#endif
+
+#ifndef GL_FOG_COORD_SOURCE
+#define GL_FOG_COORD_SOURCE                                          GL_FOG_COORDINATE_SOURCE
+#endif
+
+#ifndef GL_FOG_COORD
+#define GL_FOG_COORD                                                 GL_FOG_COORDINATE
+#endif
+
+#ifndef GL_CURRENT_FOG_COORD
+#define GL_CURRENT_FOG_COORD                                         GL_CURRENT_FOG_COORDINATE
+#endif
+
+#ifndef GL_FOG_COORD_ARRAY_TYPE
+#define GL_FOG_COORD_ARRAY_TYPE                                      GL_FOG_COORDINATE_ARRAY_TYPE
+#endif
+
+#ifndef GL_FOG_COORD_ARRAY_STRIDE
+#define GL_FOG_COORD_ARRAY_STRIDE                                    GL_FOG_COORDINATE_ARRAY_STRIDE
+#endif
+
+#ifndef GL_FOG_COORD_ARRAY_POINTER
+#define GL_FOG_COORD_ARRAY_POINTER                                   GL_FOG_COORDINATE_ARRAY_POINTER
+#endif
+
+#ifndef GL_FOG_COORD_ARRAY
+#define GL_FOG_COORD_ARRAY                                           GL_FOG_COORDINATE_ARRAY
+#endif
+
+#ifndef GL_FOG_COORD_ARRAY_BUFFER_BINDING
+#define GL_FOG_COORD_ARRAY_BUFFER_BINDING                            GL_FOG_COORDINATE_ARRAY_BUFFER_BINDING_ARB
+#endif
+
+#ifndef GL_SRC0_RGB
+#define GL_SRC0_RGB                                                  GL_SOURCE0_RGB
+#endif
+
+#ifndef GL_SRC1_RGB
+#define GL_SRC1_RGB                                                  GL_SOURCE1_RGB
+#endif
+
+#ifndef GL_SRC2_RGB
+#define GL_SRC2_RGB                                                  GL_SOURCE2_RGB
+#endif
+
+#ifndef GL_SRC0_ALPHA
+#define GL_SRC0_ALPHA                                                GL_SOURCE0_ALPHA
+#endif
+
+#ifndef GL_SRC1_ALPHA
+#define GL_SRC1_ALPHA                                                GL_SOURCE1_ALPHA
+#endif
+
+#ifndef GL_SRC2_ALPHA
+#define GL_SRC2_ALPHA                                                GL_SOURCE2_ALPHA
+#endif
+
+
+/** @} */
+
+/**\name GL_version_1_5 functions
+ * This is not a real OpenGL extension. The OpenGL canvases will 'initialize'
+ * this extension when the appropriate GL version was detected. 
+ * @{ */
+typedef GLvoid (csAPIENTRY* csGLBINDBUFFER) (GLenum target, GLuint buffer);
+typedef GLvoid (csAPIENTRY* csGLDELETEBUFFERS) (GLsizei n, const GLuint* buffers);
+typedef GLvoid (csAPIENTRY* csGLGENBUFFERS) (GLsizei n, GLuint* buffers);
+typedef GLvoid (csAPIENTRY* csGLBUFFERDATA) (GLenum target, GLsizei size, const GLvoid* data, GLenum usage);
+typedef GLvoid (csAPIENTRY* csGLBUFFERSUBDATA) (GLenum target, GLsizei offset, GLsizei size, const GLvoid* data);
+typedef GLvoid* (csAPIENTRY* csGLMAPBUFFER) (GLenum target, GLenum access);
+typedef GLboolean (csAPIENTRY* csGLUNMAPBUFFER) (GLenum target);
+typedef GLboolean (csAPIENTRY* csGLISBUFFER) (GLuint buffer);
+typedef GLvoid (csAPIENTRY* csGLGETBUFFERSUBDATA) (GLenum target, GLsizei offset, GLsizei size, GLvoid* data);
+typedef GLvoid (csAPIENTRY* csGLGETBUFFERPOINTERV) (GLenum target, GLenum pname, GLvoid** params);
+typedef GLvoid (csAPIENTRY* csGLGETBUFFERPARAMETERIV) (GLenum target, GLenum pname, GLint* params);
+typedef GLvoid (csAPIENTRY* csGLGENQUERIES) (GLsizei n, GLuint* ids);
+typedef GLvoid (csAPIENTRY* csGLDELETEQUERIES) (GLsizei n, GLuint* ids);
+typedef GLboolean (csAPIENTRY* csGLISQUERY) (GLuint id);
+typedef GLvoid (csAPIENTRY* csGLBEGINQUERY) (GLenum target, GLuint id);
+typedef GLvoid (csAPIENTRY* csGLENDQUERY) (GLenum target);
+typedef GLvoid (csAPIENTRY* csGLGETQUERYIV) (GLenum target, GLenum pname, GLint* params);
+typedef GLvoid (csAPIENTRY* csGLGETQUERYOBJECTIV) (GLuint id, GLenum pname, GLint* params);
+typedef GLvoid (csAPIENTRY* csGLGETQUERYOBJECTUIV) (GLuint id, GLenum pname, GLuint* params);
+
+/** @} */
+/**\name GL_version_2_0 constants
+ * This is not a real OpenGL extension. The OpenGL canvases will 'initialize'
+ * this extension when the appropriate GL version was detected. 
+ * @{ */
+#ifndef GL_PROGRAM_OBJECT
+#define GL_PROGRAM_OBJECT                                            0x8B40
+#endif
+
+#ifndef GL_OBJECT_TYPE
+#define GL_OBJECT_TYPE                                               0x8B4E
+#endif
+
+#ifndef GL_OBJECT_SUBTYPE
+#define GL_OBJECT_SUBTYPE                                            0x8B4F
+#endif
+
+#ifndef GL_OBJECT_DELETE_STATUS
+#define GL_OBJECT_DELETE_STATUS                                      0x8B80
+#endif
+
+#ifndef GL_OBJECT_COMPILE_STATUS
+#define GL_OBJECT_COMPILE_STATUS                                     0x8B81
+#endif
+
+#ifndef GL_OBJECT_LINK_STATUS
+#define GL_OBJECT_LINK_STATUS                                        0x8B82
+#endif
+
+#ifndef GL_OBJECT_VALIDATE_STATUS
+#define GL_OBJECT_VALIDATE_STATUS                                    0x8B83
+#endif
+
+#ifndef GL_OBJECT_INFO_LOG_LENGTH
+#define GL_OBJECT_INFO_LOG_LENGTH                                    0x8B84
+#endif
+
+#ifndef GL_OBJECT_ATTACHED_OBJECTS
+#define GL_OBJECT_ATTACHED_OBJECTS                                   0x8B85
+#endif
+
+#ifndef GL_OBJECT_ACTIVE_UNIFORMS
+#define GL_OBJECT_ACTIVE_UNIFORMS                                    0x8B86
+#endif
+
+#ifndef GL_OBJECT_ACTIVE_UNIFORMS_MAX_LENGTH
+#define GL_OBJECT_ACTIVE_UNIFORMS_MAX_LENGTH                         0x8B87
+#endif
+
+#ifndef GL_OBJECT_SHADER_SOURCE_LENGTH
+#define GL_OBJECT_SHADER_SOURCE_LENGTH                               0x8B88
+#endif
+
+#ifndef GL_SHADER_OBJECT
+#define GL_SHADER_OBJECT                                             0x8B48
+#endif
+
+#ifndef GL_FLOAT_VEC2
+#define GL_FLOAT_VEC2                                                0x8B50
+#endif
+
+#ifndef GL_FLOAT_VEC3
+#define GL_FLOAT_VEC3                                                0x8B51
+#endif
+
+#ifndef GL_FLOAT_VEC4
+#define GL_FLOAT_VEC4                                                0x8B52
+#endif
+
+#ifndef GL_INT_VEC2
+#define GL_INT_VEC2                                                  0x8B53
+#endif
+
+#ifndef GL_INT_VEC3
+#define GL_INT_VEC3                                                  0x8B54
+#endif
+
+#ifndef GL_INT_VEC4
+#define GL_INT_VEC4                                                  0x8B55
+#endif
+
+#ifndef GL_BOOL
+#define GL_BOOL                                                      0x8B56
+#endif
+
+#ifndef GL_BOOL_VEC2
+#define GL_BOOL_VEC2                                                 0x8B57
+#endif
+
+#ifndef GL_BOOL_VEC3
+#define GL_BOOL_VEC3                                                 0x8B58
+#endif
+
+#ifndef GL_BOOL_VEC4
+#define GL_BOOL_VEC4                                                 0x8B59
+#endif
+
+#ifndef GL_FLOAT_MAT2
+#define GL_FLOAT_MAT2                                                0x8B5A
+#endif
+
+#ifndef GL_FLOAT_MAT3
+#define GL_FLOAT_MAT3                                                0x8B5B
+#endif
+
+#ifndef GL_FLOAT_MAT4
+#define GL_FLOAT_MAT4                                                0x8B5C
+#endif
+
+#ifndef GL_FRAGMENT_SHADER
+#define GL_FRAGMENT_SHADER                                           0x8B30
+#endif
+
+#ifndef GL_MAX_FRAGMENT_UNIFORM_COMPONENTS
+#define GL_MAX_FRAGMENT_UNIFORM_COMPONENTS                           0x8B49
+#endif
+
+#ifndef GL_MAX_TEXTURE_COORDS
+#define GL_MAX_TEXTURE_COORDS                                        0x8871
+#endif
+
+#ifndef GL_MAX_TEXTURE_IMAGE_UNITS
+#define GL_MAX_TEXTURE_IMAGE_UNITS                                   0x8872
+#endif
+
+#ifndef GL_OBJECT_TYPE
+#define GL_OBJECT_TYPE                                               0x8B4E
+#endif
+
+#ifndef GL_OBJECT_SUBTYPE
+#define GL_OBJECT_SUBTYPE                                            0x8B4F
+#endif
+
+#ifndef GL_SHADER_OBJECT
+#define GL_SHADER_OBJECT                                             0x8B48
+#endif
+
+#ifndef GL_VERTEX_SHADER
+#define GL_VERTEX_SHADER                                             0x8B31
+#endif
+
+#ifndef GL_MAX_VERTEX_UNIFORM_COMPONENTS
+#define GL_MAX_VERTEX_UNIFORM_COMPONENTS                             0x8B4A
+#endif
+
+#ifndef GL_MAX_VARYING_FLOATS
+#define GL_MAX_VARYING_FLOATS                                        0x8B4B
+#endif
+
+#ifndef GL_MAX_VERTEX_ATTRIBS
+#define GL_MAX_VERTEX_ATTRIBS                                        0x8869
+#endif
+
+#ifndef GL_MAX_TEXTURE_IMAGE_UNITS
+#define GL_MAX_TEXTURE_IMAGE_UNITS                                   0x8872
+#endif
+
+#ifndef GL_MAX_VERTEX_TEXTURE_IMAGE_UNITS
+#define GL_MAX_VERTEX_TEXTURE_IMAGE_UNITS                            0x884C
+#endif
+
+#ifndef GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS
+#define GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS                          0x884D
+#endif
+
+#ifndef GL_MAX_TEXTURE_COORDS
+#define GL_MAX_TEXTURE_COORDS                                        0x8871
+#endif
+
+#ifndef GL_VERTEX_PROGRAM_POINT_SIZE
+#define GL_VERTEX_PROGRAM_POINT_SIZE                                 0x8642
+#endif
+
+#ifndef GL_VERTEX_PROGRAM_TWO_SIDE
+#define GL_VERTEX_PROGRAM_TWO_SIDE                                   0x8643
+#endif
+
+#ifndef GL_OBJECT_TYPE
+#define GL_OBJECT_TYPE                                               0x8B4E
+#endif
+
+#ifndef GL_OBJECT_SUBTYPE
+#define GL_OBJECT_SUBTYPE                                            0x8B4F
+#endif
+
+#ifndef GL_OBJECT_ACTIVE_ATTRIBUTES
+#define GL_OBJECT_ACTIVE_ATTRIBUTES                                  0x8B89
+#endif
+
+#ifndef GL_OBJECT_ACTIVE_ATTRIBUTE_MAX_LENGTH
+#define GL_OBJECT_ACTIVE_ATTRIBUTE_MAX_LENGTH                        0x8B8A
+#endif
+
+#ifndef GL_SHADER_OBJECT
+#define GL_SHADER_OBJECT                                             0x8B48
+#endif
+
+#ifndef GL_VERTEX_ATTRIB_ARRAY_ENABLED
+#define GL_VERTEX_ATTRIB_ARRAY_ENABLED                               0x8622
+#endif
+
+#ifndef GL_VERTEX_ATTRIB_ARRAY_SIZE
+#define GL_VERTEX_ATTRIB_ARRAY_SIZE                                  0x8623
+#endif
+
+#ifndef GL_VERTEX_ATTRIB_ARRAY_STRIDE
+#define GL_VERTEX_ATTRIB_ARRAY_STRIDE                                0x8624
+#endif
+
+#ifndef GL_VERTEX_ATTRIB_ARRAY_TYPE
+#define GL_VERTEX_ATTRIB_ARRAY_TYPE                                  0x8625
+#endif
+
+#ifndef GL_VERTEX_ATTRIB_ARRAY_NORMALIZED
+#define GL_VERTEX_ATTRIB_ARRAY_NORMALIZED                            0x886A
+#endif
+
+#ifndef GL_CURRENT_VERTEX_ATTRIB
+#define GL_CURRENT_VERTEX_ATTRIB                                     0x8626
+#endif
+
+#ifndef GL_VERTEX_ATTRIB_ARRAY_POINTER
+#define GL_VERTEX_ATTRIB_ARRAY_POINTER                               0x8645
+#endif
+
+#ifndef GL_FLOAT_VEC2
+#define GL_FLOAT_VEC2                                                0x8B50
+#endif
+
+#ifndef GL_FLOAT_VEC3
+#define GL_FLOAT_VEC3                                                0x8B51
+#endif
+
+#ifndef GL_FLOAT_VEC4
+#define GL_FLOAT_VEC4                                                0x8B52
+#endif
+
+#ifndef GL_FLOAT_MAT2
+#define GL_FLOAT_MAT2                                                0x8B5A
+#endif
+
+#ifndef GL_FLOAT_MAT3
+#define GL_FLOAT_MAT3                                                0x8B5B
+#endif
+
+#ifndef GL_FLOAT_MAT4
+#define GL_FLOAT_MAT4                                                0x8B5C
+#endif
+
+#ifndef GL_MAX_DRAW_BUFFERS
+#define GL_MAX_DRAW_BUFFERS                                          0x8824
+#endif
+
+#ifndef GL_DRAW_BUFFER0
+#define GL_DRAW_BUFFER0                                              0x8825
+#endif
+
+#ifndef GL_DRAW_BUFFER1
+#define GL_DRAW_BUFFER1                                              0x8826
+#endif
+
+#ifndef GL_DRAW_BUFFER2
+#define GL_DRAW_BUFFER2                                              0x8827
+#endif
+
+#ifndef GL_DRAW_BUFFER3
+#define GL_DRAW_BUFFER3                                              0x8828
+#endif
+
+#ifndef GL_DRAW_BUFFER4
+#define GL_DRAW_BUFFER4                                              0x8829
+#endif
+
+#ifndef GL_DRAW_BUFFER5
+#define GL_DRAW_BUFFER5                                              0x882A
+#endif
+
+#ifndef GL_DRAW_BUFFER6
+#define GL_DRAW_BUFFER6                                              0x882B
+#endif
+
+#ifndef GL_DRAW_BUFFER7
+#define GL_DRAW_BUFFER7                                              0x882C
+#endif
+
+#ifndef GL_DRAW_BUFFER8
+#define GL_DRAW_BUFFER8                                              0x882D
+#endif
+
+#ifndef GL_DRAW_BUFFER9
+#define GL_DRAW_BUFFER9                                              0x882E
+#endif
+
+#ifndef GL_DRAW_BUFFER10
+#define GL_DRAW_BUFFER10                                             0x882F
+#endif
+
+#ifndef GL_DRAW_BUFFER11
+#define GL_DRAW_BUFFER11                                             0x8830
+#endif
+
+#ifndef GL_DRAW_BUFFER12
+#define GL_DRAW_BUFFER12                                             0x8831
+#endif
+
+#ifndef GL_DRAW_BUFFER13
+#define GL_DRAW_BUFFER13                                             0x8832
+#endif
+
+#ifndef GL_DRAW_BUFFER14
+#define GL_DRAW_BUFFER14                                             0x8833
+#endif
+
+#ifndef GL_DRAW_BUFFER15
+#define GL_DRAW_BUFFER15                                             0x8834
+#endif
+
+#ifndef GL_POINT_SPRITE
+#define GL_POINT_SPRITE                                              0x8861
+#endif
+
+#ifndef GL_COORD_REPLACE
+#define GL_COORD_REPLACE                                             0x8862
+#endif
+
+#ifndef GL_POINT_SPRITE_COORD_ORIGIN
+#define GL_POINT_SPRITE_COORD_ORIGIN                                 0x8CA0
+#endif
+
+#ifndef GL_LOWER_LEFT
+#define GL_LOWER_LEFT                                                0x8CA1
+#endif
+
+#ifndef GL_UPPER_LEFT
+#define GL_UPPER_LEFT                                                0x8CA2
+#endif
+
+#ifndef GL_BLEND_EQUATION_RGB
+#define GL_BLEND_EQUATION_RGB                                        BLEND_EQUATION
+#endif
+
+#ifndef GL_BLEND_EQUATION_ALPHA
+#define GL_BLEND_EQUATION_ALPHA                                      0x883D
+#endif
+
+#ifndef GL_STENCIL_BACK_REF
+#define GL_STENCIL_BACK_REF                                          0x8CA3
+#endif
+
+#ifndef GL_STENCIL_BACK_VALUE_MASK
+#define GL_STENCIL_BACK_VALUE_MASK                                   0x8CA4
+#endif
+
+#ifndef GL_STENCIL_BACK_WRITEMASK
+#define GL_STENCIL_BACK_WRITEMASK                                    0x8CA5
+#endif
+
+
+/** @} */
+
+/**\name GL_version_2_0 functions
+ * This is not a real OpenGL extension. The OpenGL canvases will 'initialize'
+ * this extension when the appropriate GL version was detected. 
+ * @{ */
+typedef GLvoid (csAPIENTRY* csGLDELETESHADER) (GLuint obj);
+typedef GLuint (csAPIENTRY* csGLGETHANDLE) (GLenum pname);
+typedef GLvoid (csAPIENTRY* csGLDETACHSHADER) (GLuint containerObj, GLuint attachedObj);
+typedef GLuint (csAPIENTRY* csGLCREATESHADER) (GLenum shaderType);
+typedef GLvoid (csAPIENTRY* csGLSHADERSOURCE) (GLuint shaderObj, GLsizei count, const GLchar** string, const GLint* length);
+typedef GLvoid (csAPIENTRY* csGLCOMPILESHADER) (GLuint shaderObj);
+typedef GLuint (csAPIENTRY* csGLCREATEPROGRAMOBJECT) ();
+typedef GLvoid (csAPIENTRY* csGLATTACHSHADER) (GLuint containerObj, GLuint Obj);
+typedef GLvoid (csAPIENTRY* csGLLINKPROGRAM) (GLuint programObj);
+typedef GLvoid (csAPIENTRY* csGLUSEPROGRAM) (GLuint programObj);
+typedef GLvoid (csAPIENTRY* csGLDELETEPROGRAM) (GLuint programObj);
+typedef GLvoid (csAPIENTRY* csGLVALIDATEPROGRAM) (GLuint programObj);
+typedef GLvoid (csAPIENTRY* csGLUNIFORM1F) (GLint location, GLfloat v0);
+typedef GLvoid (csAPIENTRY* csGLUNIFORM2F) (GLint location, GLfloat v0, GLfloat v1);
+typedef GLvoid (csAPIENTRY* csGLUNIFORM3F) (GLint location, GLfloat v0, GLfloat v1, GLfloat v2);
+typedef GLvoid (csAPIENTRY* csGLUNIFORM4F) (GLint location, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3);
+typedef GLvoid (csAPIENTRY* csGLUNIFORM1I) (GLint location, GLint v0);
+typedef GLvoid (csAPIENTRY* csGLUNIFORM2I) (GLint location, GLint v0, GLint v1);
+typedef GLvoid (csAPIENTRY* csGLUNIFORM3I) (GLint location, GLint v0, GLint v1, GLint v2);
+typedef GLvoid (csAPIENTRY* csGLUNIFORM4I) (GLint location, GLint v0, GLint v1, GLint v2, GLint v3);
+typedef GLvoid (csAPIENTRY* csGLUNIFORM1FV) (GLint location, GLsizei count, GLfloat* value);
+typedef GLvoid (csAPIENTRY* csGLUNIFORM2FV) (GLint location, GLsizei count, GLfloat* value);
+typedef GLvoid (csAPIENTRY* csGLUNIFORM3FV) (GLint location, GLsizei count, GLfloat* value);
+typedef GLvoid (csAPIENTRY* csGLUNIFORM4FV) (GLint location, GLsizei count, GLfloat* value);
+typedef GLvoid (csAPIENTRY* csGLUNIFORM1IV) (GLint location, GLsizei count, GLint* value);
+typedef GLvoid (csAPIENTRY* csGLUNIFORM2IV) (GLint location, GLsizei count, GLint* value);
+typedef GLvoid (csAPIENTRY* csGLUNIFORM3IV) (GLint location, GLsizei count, GLint* value);
+typedef GLvoid (csAPIENTRY* csGLUNIFORM4IV) (GLint location, GLsizei count, GLint* value);
+typedef GLvoid (csAPIENTRY* csGLUNIFORMMATRIX2FV) (GLint location, GLsizei count, GLboolean transpose, GLfloat* value);
+typedef GLvoid (csAPIENTRY* csGLUNIFORMMATRIX3FV) (GLint location, GLsizei count, GLboolean transpose, GLfloat* value);
+typedef GLvoid (csAPIENTRY* csGLUNIFORMMATRIX4FV) (GLint location, GLsizei count, GLboolean transpose, GLfloat* value);
+typedef GLvoid (csAPIENTRY* csGLGETOBJECTPARAMETERFV) (GLuint obj, GLenum pname, GLfloat* params);
+typedef GLvoid (csAPIENTRY* csGLGETOBJECTPARAMETERIV) (GLuint obj, GLenum pname, GLint* params);
+typedef GLvoid (csAPIENTRY* csGLGETINFOLOG) (GLuint obj, GLsizei maxLength, GLsizei* length, GLchar* infoLog);
+typedef GLvoid (csAPIENTRY* csGLGETATTACHEDOBJECTS) (GLuint containerObj, GLsizei maxCount, GLsizei* count, GLuint* obj);
+typedef GLint (csAPIENTRY* csGLGETUNIFORMLOCATION) (GLuint programObj, const GLchar* name);
+typedef GLvoid (csAPIENTRY* csGLGETACTIVEUNIFORM) (GLuint programObj, GLuint index, GLsizei maxLength, GLsizei* length, GLint* size, GLenum* type, GLchar* name);
+typedef GLint (csAPIENTRY* csGLGETUNIFORMFV) (GLuint programObj, GLint location, GLfloat* params);
+typedef GLint (csAPIENTRY* csGLGETUNIFORMIV) (GLuint programObj, GLint location, GLint* params);
+typedef GLvoid (csAPIENTRY* csGLGETSHADERSOURCE) (GLuint obj, GLsizei maxLength, GLsizei* length, GLchar* source);
+typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB1S) (GLuint index, GLshort x);
+typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB1F) (GLuint index, GLfloat x);
+typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB1D) (GLuint index, GLdouble x);
+typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB2S) (GLuint index, GLshort x, GLshort y);
+typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB2F) (GLuint index, GLfloat x, GLfloat y);
+typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB2D) (GLuint index, GLdouble x, GLdouble y);
+typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB3S) (GLuint index, GLshort x, GLshort y, GLshort z);
+typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB3F) (GLuint index, GLfloat x, GLfloat y, GLfloat z);
+typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB3D) (GLuint index, GLdouble x, GLdouble y, GLdouble z);
+typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB4S) (GLuint index, GLshort x, GLshort y, GLshort z, GLshort w);
+typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB4F) (GLuint index, GLfloat x, GLfloat y, GLfloat z, GLfloat w);
+typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB4D) (GLuint index, GLdouble x, GLdouble y, GLdouble z, GLdouble w);
+typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB4NUB) (GLuint index, GLubyte x, GLubyte y, GLubyte z, GLubyte w);
+typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB1SV) (GLuint index, const GLshort* v);
+typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB1FV) (GLuint index, const GLfloat* v);
+typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB1DV) (GLuint index, const GLdouble* v);
+typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB2SV) (GLuint index, const GLshort* v);
+typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB2FV) (GLuint index, const GLfloat* v);
+typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB2DV) (GLuint index, const GLdouble* v);
+typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB3SV) (GLuint index, const GLshort* v);
+typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB3FV) (GLuint index, const GLfloat* v);
+typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB3DV) (GLuint index, const GLdouble* v);
+typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB4BV) (GLuint index, const GLbyte* v);
+typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB4SV) (GLuint index, const GLshort* v);
+typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB4IV) (GLuint index, const GLint* v);
+typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB4UBV) (GLuint index, const GLubyte* v);
+typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB4USV) (GLuint index, const GLushort* v);
+typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB4UIV) (GLuint index, const GLuint* v);
+typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB4FV) (GLuint index, const GLfloat* v);
+typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB4DV) (GLuint index, const GLdouble* v);
+typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB4NBV) (GLuint index, const GLbyte* v);
+typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB4NSV) (GLuint index, const GLshort* v);
+typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB4NIV) (GLuint index, const GLint* v);
+typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB4NUBV) (GLuint index, const GLubyte* v);
+typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB4NUSV) (GLuint index, const GLushort* v);
+typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB4NUIV) (GLuint index, const GLuint* v);
+typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIBPOINTER) (GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const GLvoid* pointer);
+typedef GLvoid (csAPIENTRY* csGLENABLEVERTEXATTRIBARRAY) (GLuint index);
+typedef GLvoid (csAPIENTRY* csGLDISABLEVERTEXATTRIBARRAY) (GLuint index);
+typedef GLvoid (csAPIENTRY* csGLBINDATTRIBLOCATION) (GLuint programObj, GLuint index, const GLchar* name);
+typedef GLvoid (csAPIENTRY* csGLGETACTIVEATTRIB) (GLuint programObj, GLuint index, GLsizei maxLength, GLsizei* length, GLint* size, GLenum* type, GLchar* name);
+typedef GLint (csAPIENTRY* csGLGETATTRIBLOCATION) (GLuint programObj, const GLchar* name);
+typedef GLvoid (csAPIENTRY* csGLGETVERTEXATTRIBPOINTERV) (GLuint index, GLenum pname, GLvoid** pointer);
+typedef GLvoid (csAPIENTRY* csGLBLENDEQUATIONSEPARATE) (GLenum modeRGB, GLenum modeAlpha);
+typedef GLvoid (csAPIENTRY* csGLSTENCILFUNCSEPARATE) (GLenum face, GLenum func, GLint ref, GLuint mask);
+typedef GLvoid (csAPIENTRY* csGLSTENCILOPSEPARATE) (GLenum face, GLenum sfail, GLenum dpfail, GLenum dppass);
+
+/** @} */
+/**\name GL_version_2_1 constants
+ * This is not a real OpenGL extension. The OpenGL canvases will 'initialize'
+ * this extension when the appropriate GL version was detected. 
+ * @{ */
+#ifndef GL_PIXEL_PACK_BUFFER
+#define GL_PIXEL_PACK_BUFFER                                         0x88EB
+#endif
+
+#ifndef GL_PIXEL_UNPACK_BUFFER
+#define GL_PIXEL_UNPACK_BUFFER                                       0x88EC
+#endif
+
+#ifndef GL_PIXEL_PACK_BUFFER_BINDING
+#define GL_PIXEL_PACK_BUFFER_BINDING                                 0x88ED
+#endif
+
+#ifndef GL_PIXEL_UNPACK_BUFFER_BINDING
+#define GL_PIXEL_UNPACK_BUFFER_BINDING                               0x88EF
+#endif
+
+#ifndef GL_SRGB
+#define GL_SRGB                                                      0x8C40
+#endif
+
+#ifndef GL_SRGB8
+#define GL_SRGB8                                                     0x8C41
+#endif
+
+#ifndef GL_SRGB_ALPHA
+#define GL_SRGB_ALPHA                                                0x8C42
+#endif
+
+#ifndef GL_SRGB8_ALPHA8
+#define GL_SRGB8_ALPHA8                                              0x8C43
+#endif
+
+#ifndef GL_SLUMINANCE_ALPHA
+#define GL_SLUMINANCE_ALPHA                                          0x8C44
+#endif
+
+#ifndef GL_SLUMINANCE8_ALPHA8
+#define GL_SLUMINANCE8_ALPHA8                                        0x8C45
+#endif
+
+#ifndef GL_SLUMINANCE
+#define GL_SLUMINANCE                                                0x8C46
+#endif
+
+#ifndef GL_SLUMINANCE8
+#define GL_SLUMINANCE8                                               0x8C47
+#endif
+
+#ifndef GL_COMPRESSED_SRGB
+#define GL_COMPRESSED_SRGB                                           0x8C48
+#endif
+
+#ifndef GL_COMPRESSED_SRGB_ALPHA
+#define GL_COMPRESSED_SRGB_ALPHA                                     0x8C49
+#endif
+
+#ifndef GL_COMPRESSED_SLUMINANCE
+#define GL_COMPRESSED_SLUMINANCE                                     0x8C4A
+#endif
+
+#ifndef GL_COMPRESSED_SLUMINANCE_ALPHA
+#define GL_COMPRESSED_SLUMINANCE_ALPHA                               0x8C4B
+#endif
+
+
+/** @} */
+
+/**\name GL_version_2_1 functions
+ * This is not a real OpenGL extension. The OpenGL canvases will 'initialize'
+ * this extension when the appropriate GL version was detected. 
+ * @{ */
+typedef GLvoid (csAPIENTRY* csGLUNIFORMMATRIX2X3FV) (GLint location, GLsizei count, GLboolean transpose, GLfloat* value);
+typedef GLvoid (csAPIENTRY* csGLUNIFORMMATRIX3X2FV) (GLint location, GLsizei count, GLboolean transpose, GLfloat* value);
+typedef GLvoid (csAPIENTRY* csGLUNIFORMMATRIX2X4FV) (GLint location, GLsizei count, GLboolean transpose, GLfloat* value);
+typedef GLvoid (csAPIENTRY* csGLUNIFORMMATRIX4X2FV) (GLint location, GLsizei count, GLboolean transpose, GLfloat* value);
+typedef GLvoid (csAPIENTRY* csGLUNIFORMMATRIX3X4FV) (GLint location, GLsizei count, GLboolean transpose, GLfloat* value);
+typedef GLvoid (csAPIENTRY* csGLUNIFORMMATRIX4X3FV) (GLint location, GLsizei count, GLboolean transpose, GLfloat* value);
 
 /** @} */
 /**\name GL_ARB_imaging constants
@@ -2817,10 +3788,10 @@ typedef GLvoid (csAPIENTRY* csGLGETCONVOLUTIONPARAMETERFVEXT) (GLenum target, GL
 /**\name GL_EXT_fog_coord functions
  * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/EXT/fog_coord.txt">http://www.opengl.org/registry/specs/EXT/fog_coord.txt</a>.
  * @{ */
-typedef GLvoid (csAPIENTRY* csGLFOGCOORDFEXFLOAT) (GLfloat coord);
-typedef GLvoid (csAPIENTRY* csGLFOGCOORDDEXDOUBLE) (GLdouble coord);
-typedef GLvoid (csAPIENTRY* csGLFOGCOORDFVEXFLOAT) (GLfloat coord);
-typedef GLvoid (csAPIENTRY* csGLFOGCOORDDVEXDOUBLE) (GLdouble coord);
+typedef GLvoid (csAPIENTRY* csGLFOGCOORDFEXT) (GLfloat coord);
+typedef GLvoid (csAPIENTRY* csGLFOGCOORDDEXT) (GLdouble coord);
+typedef GLvoid (csAPIENTRY* csGLFOGCOORDFVEXT) (GLfloat coord);
+typedef GLvoid (csAPIENTRY* csGLFOGCOORDDVEXT) (GLdouble coord);
 typedef GLvoid (csAPIENTRY* csGLFOGCOORDPOINTEREXT) (GLenum type, GLsizei stride, GLvoid* pointer);
 
 /** @} */
@@ -9766,6 +10737,219 @@ typedef GLvoid (csAPIENTRY* csGLSTRINGMARKERGREMEDY) (GLsizei len, const GLvoid*
  * @{ */
 
 /** @} */
+/**\name GL_ARB_occlusion_query constants
+ * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/ARB/occlusion_query.txt">http://www.opengl.org/registry/specs/ARB/occlusion_query.txt</a>.
+ * @{ */
+#ifndef GL_SAMPLES_PASSED_ARB
+#define GL_SAMPLES_PASSED_ARB                                        0x8914
+#endif
+
+#ifndef GL_QUERY_COUNTER_BITS_ARB
+#define GL_QUERY_COUNTER_BITS_ARB                                    0x8864
+#endif
+
+#ifndef GL_CURRENT_QUERY_ARB
+#define GL_CURRENT_QUERY_ARB                                         0x8865
+#endif
+
+#ifndef GL_QUERY_RESULT_ARB
+#define GL_QUERY_RESULT_ARB                                          0x8866
+#endif
+
+#ifndef GL_QUERY_RESULT_AVAILABLE_ARB
+#define GL_QUERY_RESULT_AVAILABLE_ARB                                0x8867
+#endif
+
+
+/** @} */
+
+/**\name GL_ARB_occlusion_query functions
+ * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/ARB/occlusion_query.txt">http://www.opengl.org/registry/specs/ARB/occlusion_query.txt</a>.
+ * @{ */
+typedef GLvoid (csAPIENTRY* csGLGENQUERIESARB) (GLsizei n, GLuint* ids);
+typedef GLvoid (csAPIENTRY* csGLDELETEQUERIESARB) (GLsizei n, GLuint* ids);
+typedef GLboolean (csAPIENTRY* csGLISQUERYARB) (GLuint id);
+typedef GLvoid (csAPIENTRY* csGLBEGINQUERYARB) (GLenum target, GLuint id);
+typedef GLvoid (csAPIENTRY* csGLENDQUERYARB) (GLenum target);
+typedef GLvoid (csAPIENTRY* csGLGETQUERYIVARB) (GLenum target, GLenum pname, GLint* params);
+typedef GLvoid (csAPIENTRY* csGLGETQUERYOBJECTIVARB) (GLuint id, GLenum pname, GLint* params);
+typedef GLvoid (csAPIENTRY* csGLGETQUERYOBJECTUIVARB) (GLuint id, GLenum pname, GLuint* params);
+
+/** @} */
+/**\name GL_ARB_draw_buffers constants
+ * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/ARB/draw_buffers.txt">http://www.opengl.org/registry/specs/ARB/draw_buffers.txt</a>.
+ * @{ */
+#ifndef GL_MAX_DRAW_BUFFERS_ARB
+#define GL_MAX_DRAW_BUFFERS_ARB                                      0x8824
+#endif
+
+#ifndef GL_DRAW_BUFFER0_ARB
+#define GL_DRAW_BUFFER0_ARB                                          0x8825
+#endif
+
+#ifndef GL_DRAW_BUFFER1_ARB
+#define GL_DRAW_BUFFER1_ARB                                          0x8826
+#endif
+
+#ifndef GL_DRAW_BUFFER2_ARB
+#define GL_DRAW_BUFFER2_ARB                                          0x8827
+#endif
+
+#ifndef GL_DRAW_BUFFER3_ARB
+#define GL_DRAW_BUFFER3_ARB                                          0x8828
+#endif
+
+#ifndef GL_DRAW_BUFFER4_ARB
+#define GL_DRAW_BUFFER4_ARB                                          0x8829
+#endif
+
+#ifndef GL_DRAW_BUFFER5_ARB
+#define GL_DRAW_BUFFER5_ARB                                          0x882A
+#endif
+
+#ifndef GL_DRAW_BUFFER6_ARB
+#define GL_DRAW_BUFFER6_ARB                                          0x882B
+#endif
+
+#ifndef GL_DRAW_BUFFER7_ARB
+#define GL_DRAW_BUFFER7_ARB                                          0x882C
+#endif
+
+#ifndef GL_DRAW_BUFFER8_ARB
+#define GL_DRAW_BUFFER8_ARB                                          0x882D
+#endif
+
+#ifndef GL_DRAW_BUFFER9_ARB
+#define GL_DRAW_BUFFER9_ARB                                          0x882E
+#endif
+
+#ifndef GL_DRAW_BUFFER10_ARB
+#define GL_DRAW_BUFFER10_ARB                                         0x882F
+#endif
+
+#ifndef GL_DRAW_BUFFER11_ARB
+#define GL_DRAW_BUFFER11_ARB                                         0x8830
+#endif
+
+#ifndef GL_DRAW_BUFFER12_ARB
+#define GL_DRAW_BUFFER12_ARB                                         0x8831
+#endif
+
+#ifndef GL_DRAW_BUFFER13_ARB
+#define GL_DRAW_BUFFER13_ARB                                         0x8832
+#endif
+
+#ifndef GL_DRAW_BUFFER14_ARB
+#define GL_DRAW_BUFFER14_ARB                                         0x8833
+#endif
+
+#ifndef GL_DRAW_BUFFER15_ARB
+#define GL_DRAW_BUFFER15_ARB                                         0x8834
+#endif
+
+
+/** @} */
+
+/**\name GL_ARB_draw_buffers functions
+ * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/ARB/draw_buffers.txt">http://www.opengl.org/registry/specs/ARB/draw_buffers.txt</a>.
+ * @{ */
+
+/** @} */
+/**\name GL_EXT_blend_equation_separate constants
+ * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/EXT/blend_equation_separate.txt">http://www.opengl.org/registry/specs/EXT/blend_equation_separate.txt</a>.
+ * @{ */
+#ifndef GL_BLEND_EQUATION_RGB_EXT
+#define GL_BLEND_EQUATION_RGB_EXT                                    BLEND_EQUATION
+#endif
+
+#ifndef GL_BLEND_EQUATION_ALPHA_EXT
+#define GL_BLEND_EQUATION_ALPHA_EXT                                  0x883D
+#endif
+
+
+/** @} */
+
+/**\name GL_EXT_blend_equation_separate functions
+ * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/EXT/blend_equation_separate.txt">http://www.opengl.org/registry/specs/EXT/blend_equation_separate.txt</a>.
+ * @{ */
+typedef GLvoid (csAPIENTRY* csGLBLENDEQUATIONSEPARATEEXT) (GLenum modeRGB, GLenum modeAlpha);
+
+/** @} */
+/**\name GL_EXT_texture_sRGB constants
+ * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/EXT/texture_sRGB.txt">http://www.opengl.org/registry/specs/EXT/texture_sRGB.txt</a>.
+ * @{ */
+#ifndef GL_SRGB_EXT
+#define GL_SRGB_EXT                                                  0x8C40
+#endif
+
+#ifndef GL_SRGB8_EXT
+#define GL_SRGB8_EXT                                                 0x8C41
+#endif
+
+#ifndef GL_SRGB_ALPHA_EXT
+#define GL_SRGB_ALPHA_EXT                                            0x8C42
+#endif
+
+#ifndef GL_SRGB8_ALPHA8_EXT
+#define GL_SRGB8_ALPHA8_EXT                                          0x8C43
+#endif
+
+#ifndef GL_SLUMINANCE_ALPHA_EXT
+#define GL_SLUMINANCE_ALPHA_EXT                                      0x8C44
+#endif
+
+#ifndef GL_SLUMINANCE8_ALPHA8_EXT
+#define GL_SLUMINANCE8_ALPHA8_EXT                                    0x8C45
+#endif
+
+#ifndef GL_SLUMINANCE_EXT
+#define GL_SLUMINANCE_EXT                                            0x8C46
+#endif
+
+#ifndef GL_SLUMINANCE8_EXT
+#define GL_SLUMINANCE8_EXT                                           0x8C47
+#endif
+
+#ifndef GL_COMPRESSED_SRGB_EXT
+#define GL_COMPRESSED_SRGB_EXT                                       0x8C48
+#endif
+
+#ifndef GL_COMPRESSED_SRGB_ALPHA_EXT
+#define GL_COMPRESSED_SRGB_ALPHA_EXT                                 0x8C49
+#endif
+
+#ifndef GL_COMPRESSED_SLUMINANCE_EXT
+#define GL_COMPRESSED_SLUMINANCE_EXT                                 0x8C4A
+#endif
+
+#ifndef GL_COMPRESSED_SLUMINANCE_ALPHA_EXT
+#define GL_COMPRESSED_SLUMINANCE_ALPHA_EXT                           0x8C4B
+#endif
+
+#ifndef GL_COMPRESSED_SRGB_S3TC_DXT1_EXT
+#define GL_COMPRESSED_SRGB_S3TC_DXT1_EXT                             0x8C4C
+#endif
+
+#ifndef GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT1_EXT
+#define GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT1_EXT                       0x8C4D
+#endif
+
+#ifndef GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT3_EXT
+#define GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT3_EXT                       0x8C4E
+#endif
+
+#ifndef GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT
+#define GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT                       0x8C4F
+#endif
+
+
+/** @} */
+
+/**\name GL_EXT_texture_sRGB functions
+ * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/EXT/texture_sRGB.txt">http://www.opengl.org/registry/specs/EXT/texture_sRGB.txt</a>.
+ * @{ */
+
+/** @} */
 
 
 // end of definitions
@@ -10067,6 +11251,800 @@ public:
   #ifndef GLGETCOMPRESSEDTEXIMAGE_DECL
   #define GLGETCOMPRESSEDTEXIMAGE_DECL
   csGLGETCOMPRESSEDTEXIMAGE glGetCompressedTexImage;
+  #endif
+
+
+  /** @} */
+  /**\name GL_version_1_4 functions
+   * This is not a real OpenGL extension. The OpenGL canvases will 'initialize'
+   * this extension when teh appropriate GL version was detected. 
+   * @{ */
+  #ifndef GLFOGCOORDF_DECL
+  #define GLFOGCOORDF_DECL
+  csGLFOGCOORDF glFogCoordf;
+  #endif
+
+  #ifndef GLFOGCOORDD_DECL
+  #define GLFOGCOORDD_DECL
+  csGLFOGCOORDD glFogCoordd;
+  #endif
+
+  #ifndef GLFOGCOORDFV_DECL
+  #define GLFOGCOORDFV_DECL
+  csGLFOGCOORDFV glFogCoordfv;
+  #endif
+
+  #ifndef GLFOGCOORDDV_DECL
+  #define GLFOGCOORDDV_DECL
+  csGLFOGCOORDDV glFogCoorddv;
+  #endif
+
+  #ifndef GLFOGCOORDPOINTER_DECL
+  #define GLFOGCOORDPOINTER_DECL
+  csGLFOGCOORDPOINTER glFogCoordPointer;
+  #endif
+
+  #ifndef GLMULTIDRAWARRAYS_DECL
+  #define GLMULTIDRAWARRAYS_DECL
+  csGLMULTIDRAWARRAYS glMultiDrawArrays;
+  #endif
+
+  #ifndef GLMULTIDRAWELEMENTS_DECL
+  #define GLMULTIDRAWELEMENTS_DECL
+  csGLMULTIDRAWELEMENTS glMultiDrawElements;
+  #endif
+
+  #ifndef GLPOINTPARAMETERF_DECL
+  #define GLPOINTPARAMETERF_DECL
+  csGLPOINTPARAMETERF glPointParameterf;
+  #endif
+
+  #ifndef GLPOINTPARAMETERFV_DECL
+  #define GLPOINTPARAMETERFV_DECL
+  csGLPOINTPARAMETERFV glPointParameterfv;
+  #endif
+
+  #ifndef GLSECONDARYCOLOR3B_DECL
+  #define GLSECONDARYCOLOR3B_DECL
+  csGLSECONDARYCOLOR3B glSecondaryColor3b;
+  #endif
+
+  #ifndef GLSECONDARYCOLOR3S_DECL
+  #define GLSECONDARYCOLOR3S_DECL
+  csGLSECONDARYCOLOR3S glSecondaryColor3s;
+  #endif
+
+  #ifndef GLSECONDARYCOLOR3I_DECL
+  #define GLSECONDARYCOLOR3I_DECL
+  csGLSECONDARYCOLOR3I glSecondaryColor3i;
+  #endif
+
+  #ifndef GLSECONDARYCOLOR3F_DECL
+  #define GLSECONDARYCOLOR3F_DECL
+  csGLSECONDARYCOLOR3F glSecondaryColor3f;
+  #endif
+
+  #ifndef GLSECONDARYCOLOR3D_DECL
+  #define GLSECONDARYCOLOR3D_DECL
+  csGLSECONDARYCOLOR3D glSecondaryColor3d;
+  #endif
+
+  #ifndef GLSECONDARYCOLOR3UB_DECL
+  #define GLSECONDARYCOLOR3UB_DECL
+  csGLSECONDARYCOLOR3UB glSecondaryColor3ub;
+  #endif
+
+  #ifndef GLSECONDARYCOLOR3US_DECL
+  #define GLSECONDARYCOLOR3US_DECL
+  csGLSECONDARYCOLOR3US glSecondaryColor3us;
+  #endif
+
+  #ifndef GLSECONDARYCOLOR3UI_DECL
+  #define GLSECONDARYCOLOR3UI_DECL
+  csGLSECONDARYCOLOR3UI glSecondaryColor3ui;
+  #endif
+
+  #ifndef GLSECONDARYCOLOR3BV_DECL
+  #define GLSECONDARYCOLOR3BV_DECL
+  csGLSECONDARYCOLOR3BV glSecondaryColor3bv;
+  #endif
+
+  #ifndef GLSECONDARYCOLOR3SV_DECL
+  #define GLSECONDARYCOLOR3SV_DECL
+  csGLSECONDARYCOLOR3SV glSecondaryColor3sv;
+  #endif
+
+  #ifndef GLSECONDARYCOLOR3IV_DECL
+  #define GLSECONDARYCOLOR3IV_DECL
+  csGLSECONDARYCOLOR3IV glSecondaryColor3iv;
+  #endif
+
+  #ifndef GLSECONDARYCOLOR3FV_DECL
+  #define GLSECONDARYCOLOR3FV_DECL
+  csGLSECONDARYCOLOR3FV glSecondaryColor3fv;
+  #endif
+
+  #ifndef GLSECONDARYCOLOR3DV_DECL
+  #define GLSECONDARYCOLOR3DV_DECL
+  csGLSECONDARYCOLOR3DV glSecondaryColor3dv;
+  #endif
+
+  #ifndef GLSECONDARYCOLOR3UBV_DECL
+  #define GLSECONDARYCOLOR3UBV_DECL
+  csGLSECONDARYCOLOR3UBV glSecondaryColor3ubv;
+  #endif
+
+  #ifndef GLSECONDARYCOLOR3USV_DECL
+  #define GLSECONDARYCOLOR3USV_DECL
+  csGLSECONDARYCOLOR3USV glSecondaryColor3usv;
+  #endif
+
+  #ifndef GLSECONDARYCOLOR3UIV_DECL
+  #define GLSECONDARYCOLOR3UIV_DECL
+  csGLSECONDARYCOLOR3UIV glSecondaryColor3uiv;
+  #endif
+
+  #ifndef GLSECONDARYCOLORPOINTER_DECL
+  #define GLSECONDARYCOLORPOINTER_DECL
+  csGLSECONDARYCOLORPOINTER glSecondaryColorPointer;
+  #endif
+
+  #ifndef GLBLENDFUNCSEPARATE_DECL
+  #define GLBLENDFUNCSEPARATE_DECL
+  csGLBLENDFUNCSEPARATE glBlendFuncSeparate;
+  #endif
+
+  #ifndef GLWINDOWPOS2D_DECL
+  #define GLWINDOWPOS2D_DECL
+  csGLWINDOWPOS2D glWindowPos2d;
+  #endif
+
+  #ifndef GLWINDOWPOS2F_DECL
+  #define GLWINDOWPOS2F_DECL
+  csGLWINDOWPOS2F glWindowPos2f;
+  #endif
+
+  #ifndef GLWINDOWPOS2I_DECL
+  #define GLWINDOWPOS2I_DECL
+  csGLWINDOWPOS2I glWindowPos2i;
+  #endif
+
+  #ifndef GLWINDOWPOS2S_DECL
+  #define GLWINDOWPOS2S_DECL
+  csGLWINDOWPOS2S glWindowPos2s;
+  #endif
+
+  #ifndef GLWINDOWPOS2DV_DECL
+  #define GLWINDOWPOS2DV_DECL
+  csGLWINDOWPOS2DV glWindowPos2dv;
+  #endif
+
+  #ifndef GLWINDOWPOS2FV_DECL
+  #define GLWINDOWPOS2FV_DECL
+  csGLWINDOWPOS2FV glWindowPos2fv;
+  #endif
+
+  #ifndef GLWINDOWPOS2IV_DECL
+  #define GLWINDOWPOS2IV_DECL
+  csGLWINDOWPOS2IV glWindowPos2iv;
+  #endif
+
+  #ifndef GLWINDOWPOS2SV_DECL
+  #define GLWINDOWPOS2SV_DECL
+  csGLWINDOWPOS2SV glWindowPos2sv;
+  #endif
+
+  #ifndef GLWINDOWPOS3D_DECL
+  #define GLWINDOWPOS3D_DECL
+  csGLWINDOWPOS3D glWindowPos3d;
+  #endif
+
+  #ifndef GLWINDOWPOS3F_DECL
+  #define GLWINDOWPOS3F_DECL
+  csGLWINDOWPOS3F glWindowPos3f;
+  #endif
+
+  #ifndef GLWINDOWPOS3I_DECL
+  #define GLWINDOWPOS3I_DECL
+  csGLWINDOWPOS3I glWindowPos3i;
+  #endif
+
+  #ifndef GLWINDOWPOS3S_DECL
+  #define GLWINDOWPOS3S_DECL
+  csGLWINDOWPOS3S glWindowPos3s;
+  #endif
+
+  #ifndef GLWINDOWPOS3DV_DECL
+  #define GLWINDOWPOS3DV_DECL
+  csGLWINDOWPOS3DV glWindowPos3dv;
+  #endif
+
+  #ifndef GLWINDOWPOS3FV_DECL
+  #define GLWINDOWPOS3FV_DECL
+  csGLWINDOWPOS3FV glWindowPos3fv;
+  #endif
+
+  #ifndef GLWINDOWPOS3IV_DECL
+  #define GLWINDOWPOS3IV_DECL
+  csGLWINDOWPOS3IV glWindowPos3iv;
+  #endif
+
+  #ifndef GLWINDOWPOS3SV_DECL
+  #define GLWINDOWPOS3SV_DECL
+  csGLWINDOWPOS3SV glWindowPos3sv;
+  #endif
+
+
+  /** @} */
+  /**\name GL_version_1_5 functions
+   * This is not a real OpenGL extension. The OpenGL canvases will 'initialize'
+   * this extension when teh appropriate GL version was detected. 
+   * @{ */
+  #ifndef GLBINDBUFFER_DECL
+  #define GLBINDBUFFER_DECL
+  csGLBINDBUFFER glBindBuffer;
+  #endif
+
+  #ifndef GLDELETEBUFFERS_DECL
+  #define GLDELETEBUFFERS_DECL
+  csGLDELETEBUFFERS glDeleteBuffers;
+  #endif
+
+  #ifndef GLGENBUFFERS_DECL
+  #define GLGENBUFFERS_DECL
+  csGLGENBUFFERS glGenBuffers;
+  #endif
+
+  #ifndef GLBUFFERDATA_DECL
+  #define GLBUFFERDATA_DECL
+  csGLBUFFERDATA glBufferData;
+  #endif
+
+  #ifndef GLBUFFERSUBDATA_DECL
+  #define GLBUFFERSUBDATA_DECL
+  csGLBUFFERSUBDATA glBufferSubData;
+  #endif
+
+  #ifndef GLMAPBUFFER_DECL
+  #define GLMAPBUFFER_DECL
+  csGLMAPBUFFER glMapBuffer;
+  #endif
+
+  #ifndef GLUNMAPBUFFER_DECL
+  #define GLUNMAPBUFFER_DECL
+  csGLUNMAPBUFFER glUnmapBuffer;
+  #endif
+
+  #ifndef GLISBUFFER_DECL
+  #define GLISBUFFER_DECL
+  csGLISBUFFER glIsBuffer;
+  #endif
+
+  #ifndef GLGETBUFFERSUBDATA_DECL
+  #define GLGETBUFFERSUBDATA_DECL
+  csGLGETBUFFERSUBDATA glGetBufferSubData;
+  #endif
+
+  #ifndef GLGETBUFFERPOINTERV_DECL
+  #define GLGETBUFFERPOINTERV_DECL
+  csGLGETBUFFERPOINTERV glGetBufferPointerv;
+  #endif
+
+  #ifndef GLGETBUFFERPARAMETERIV_DECL
+  #define GLGETBUFFERPARAMETERIV_DECL
+  csGLGETBUFFERPARAMETERIV glGetBufferParameteriv;
+  #endif
+
+  #ifndef GLGENQUERIES_DECL
+  #define GLGENQUERIES_DECL
+  csGLGENQUERIES glGenQueries;
+  #endif
+
+  #ifndef GLDELETEQUERIES_DECL
+  #define GLDELETEQUERIES_DECL
+  csGLDELETEQUERIES glDeleteQueries;
+  #endif
+
+  #ifndef GLISQUERY_DECL
+  #define GLISQUERY_DECL
+  csGLISQUERY glIsQuery;
+  #endif
+
+  #ifndef GLBEGINQUERY_DECL
+  #define GLBEGINQUERY_DECL
+  csGLBEGINQUERY glBeginQuery;
+  #endif
+
+  #ifndef GLENDQUERY_DECL
+  #define GLENDQUERY_DECL
+  csGLENDQUERY glEndQuery;
+  #endif
+
+  #ifndef GLGETQUERYIV_DECL
+  #define GLGETQUERYIV_DECL
+  csGLGETQUERYIV glGetQueryiv;
+  #endif
+
+  #ifndef GLGETQUERYOBJECTIV_DECL
+  #define GLGETQUERYOBJECTIV_DECL
+  csGLGETQUERYOBJECTIV glGetQueryObjectiv;
+  #endif
+
+  #ifndef GLGETQUERYOBJECTUIV_DECL
+  #define GLGETQUERYOBJECTUIV_DECL
+  csGLGETQUERYOBJECTUIV glGetQueryObjectuiv;
+  #endif
+
+
+  /** @} */
+  /**\name GL_version_2_0 functions
+   * This is not a real OpenGL extension. The OpenGL canvases will 'initialize'
+   * this extension when teh appropriate GL version was detected. 
+   * @{ */
+  #ifndef GLDELETESHADER_DECL
+  #define GLDELETESHADER_DECL
+  csGLDELETESHADER glDeleteShader;
+  #endif
+
+  #ifndef GLGETHANDLE_DECL
+  #define GLGETHANDLE_DECL
+  csGLGETHANDLE glGetHandle;
+  #endif
+
+  #ifndef GLDETACHSHADER_DECL
+  #define GLDETACHSHADER_DECL
+  csGLDETACHSHADER glDetachShader;
+  #endif
+
+  #ifndef GLCREATESHADER_DECL
+  #define GLCREATESHADER_DECL
+  csGLCREATESHADER glCreateShader;
+  #endif
+
+  #ifndef GLSHADERSOURCE_DECL
+  #define GLSHADERSOURCE_DECL
+  csGLSHADERSOURCE glShaderSource;
+  #endif
+
+  #ifndef GLCOMPILESHADER_DECL
+  #define GLCOMPILESHADER_DECL
+  csGLCOMPILESHADER glCompileShader;
+  #endif
+
+  #ifndef GLCREATEPROGRAMOBJECT_DECL
+  #define GLCREATEPROGRAMOBJECT_DECL
+  csGLCREATEPROGRAMOBJECT glCreateProgramObject;
+  #endif
+
+  #ifndef GLATTACHSHADER_DECL
+  #define GLATTACHSHADER_DECL
+  csGLATTACHSHADER glAttachShader;
+  #endif
+
+  #ifndef GLLINKPROGRAM_DECL
+  #define GLLINKPROGRAM_DECL
+  csGLLINKPROGRAM glLinkProgram;
+  #endif
+
+  #ifndef GLUSEPROGRAM_DECL
+  #define GLUSEPROGRAM_DECL
+  csGLUSEPROGRAM glUseProgram;
+  #endif
+
+  #ifndef GLDELETEPROGRAM_DECL
+  #define GLDELETEPROGRAM_DECL
+  csGLDELETEPROGRAM glDeleteProgram;
+  #endif
+
+  #ifndef GLVALIDATEPROGRAM_DECL
+  #define GLVALIDATEPROGRAM_DECL
+  csGLVALIDATEPROGRAM glValidateProgram;
+  #endif
+
+  #ifndef GLUNIFORM1F_DECL
+  #define GLUNIFORM1F_DECL
+  csGLUNIFORM1F glUniform1f;
+  #endif
+
+  #ifndef GLUNIFORM2F_DECL
+  #define GLUNIFORM2F_DECL
+  csGLUNIFORM2F glUniform2f;
+  #endif
+
+  #ifndef GLUNIFORM3F_DECL
+  #define GLUNIFORM3F_DECL
+  csGLUNIFORM3F glUniform3f;
+  #endif
+
+  #ifndef GLUNIFORM4F_DECL
+  #define GLUNIFORM4F_DECL
+  csGLUNIFORM4F glUniform4f;
+  #endif
+
+  #ifndef GLUNIFORM1I_DECL
+  #define GLUNIFORM1I_DECL
+  csGLUNIFORM1I glUniform1i;
+  #endif
+
+  #ifndef GLUNIFORM2I_DECL
+  #define GLUNIFORM2I_DECL
+  csGLUNIFORM2I glUniform2i;
+  #endif
+
+  #ifndef GLUNIFORM3I_DECL
+  #define GLUNIFORM3I_DECL
+  csGLUNIFORM3I glUniform3i;
+  #endif
+
+  #ifndef GLUNIFORM4I_DECL
+  #define GLUNIFORM4I_DECL
+  csGLUNIFORM4I glUniform4i;
+  #endif
+
+  #ifndef GLUNIFORM1FV_DECL
+  #define GLUNIFORM1FV_DECL
+  csGLUNIFORM1FV glUniform1fv;
+  #endif
+
+  #ifndef GLUNIFORM2FV_DECL
+  #define GLUNIFORM2FV_DECL
+  csGLUNIFORM2FV glUniform2fv;
+  #endif
+
+  #ifndef GLUNIFORM3FV_DECL
+  #define GLUNIFORM3FV_DECL
+  csGLUNIFORM3FV glUniform3fv;
+  #endif
+
+  #ifndef GLUNIFORM4FV_DECL
+  #define GLUNIFORM4FV_DECL
+  csGLUNIFORM4FV glUniform4fv;
+  #endif
+
+  #ifndef GLUNIFORM1IV_DECL
+  #define GLUNIFORM1IV_DECL
+  csGLUNIFORM1IV glUniform1iv;
+  #endif
+
+  #ifndef GLUNIFORM2IV_DECL
+  #define GLUNIFORM2IV_DECL
+  csGLUNIFORM2IV glUniform2iv;
+  #endif
+
+  #ifndef GLUNIFORM3IV_DECL
+  #define GLUNIFORM3IV_DECL
+  csGLUNIFORM3IV glUniform3iv;
+  #endif
+
+  #ifndef GLUNIFORM4IV_DECL
+  #define GLUNIFORM4IV_DECL
+  csGLUNIFORM4IV glUniform4iv;
+  #endif
+
+  #ifndef GLUNIFORMMATRIX2FV_DECL
+  #define GLUNIFORMMATRIX2FV_DECL
+  csGLUNIFORMMATRIX2FV glUniformMatrix2fv;
+  #endif
+
+  #ifndef GLUNIFORMMATRIX3FV_DECL
+  #define GLUNIFORMMATRIX3FV_DECL
+  csGLUNIFORMMATRIX3FV glUniformMatrix3fv;
+  #endif
+
+  #ifndef GLUNIFORMMATRIX4FV_DECL
+  #define GLUNIFORMMATRIX4FV_DECL
+  csGLUNIFORMMATRIX4FV glUniformMatrix4fv;
+  #endif
+
+  #ifndef GLGETOBJECTPARAMETERFV_DECL
+  #define GLGETOBJECTPARAMETERFV_DECL
+  csGLGETOBJECTPARAMETERFV glGetObjectParameterfv;
+  #endif
+
+  #ifndef GLGETOBJECTPARAMETERIV_DECL
+  #define GLGETOBJECTPARAMETERIV_DECL
+  csGLGETOBJECTPARAMETERIV glGetObjectParameteriv;
+  #endif
+
+  #ifndef GLGETINFOLOG_DECL
+  #define GLGETINFOLOG_DECL
+  csGLGETINFOLOG glGetInfoLog;
+  #endif
+
+  #ifndef GLGETATTACHEDOBJECTS_DECL
+  #define GLGETATTACHEDOBJECTS_DECL
+  csGLGETATTACHEDOBJECTS glGetAttachedObjects;
+  #endif
+
+  #ifndef GLGETUNIFORMLOCATION_DECL
+  #define GLGETUNIFORMLOCATION_DECL
+  csGLGETUNIFORMLOCATION glGetUniformLocation;
+  #endif
+
+  #ifndef GLGETACTIVEUNIFORM_DECL
+  #define GLGETACTIVEUNIFORM_DECL
+  csGLGETACTIVEUNIFORM glGetActiveUniform;
+  #endif
+
+  #ifndef GLGETUNIFORMFV_DECL
+  #define GLGETUNIFORMFV_DECL
+  csGLGETUNIFORMFV glGetUniformfv;
+  #endif
+
+  #ifndef GLGETUNIFORMIV_DECL
+  #define GLGETUNIFORMIV_DECL
+  csGLGETUNIFORMIV glGetUniformiv;
+  #endif
+
+  #ifndef GLGETSHADERSOURCE_DECL
+  #define GLGETSHADERSOURCE_DECL
+  csGLGETSHADERSOURCE glGetShaderSource;
+  #endif
+
+  #ifndef GLVERTEXATTRIB1S_DECL
+  #define GLVERTEXATTRIB1S_DECL
+  csGLVERTEXATTRIB1S glVertexAttrib1s;
+  #endif
+
+  #ifndef GLVERTEXATTRIB1F_DECL
+  #define GLVERTEXATTRIB1F_DECL
+  csGLVERTEXATTRIB1F glVertexAttrib1f;
+  #endif
+
+  #ifndef GLVERTEXATTRIB1D_DECL
+  #define GLVERTEXATTRIB1D_DECL
+  csGLVERTEXATTRIB1D glVertexAttrib1d;
+  #endif
+
+  #ifndef GLVERTEXATTRIB2S_DECL
+  #define GLVERTEXATTRIB2S_DECL
+  csGLVERTEXATTRIB2S glVertexAttrib2s;
+  #endif
+
+  #ifndef GLVERTEXATTRIB2F_DECL
+  #define GLVERTEXATTRIB2F_DECL
+  csGLVERTEXATTRIB2F glVertexAttrib2f;
+  #endif
+
+  #ifndef GLVERTEXATTRIB2D_DECL
+  #define GLVERTEXATTRIB2D_DECL
+  csGLVERTEXATTRIB2D glVertexAttrib2d;
+  #endif
+
+  #ifndef GLVERTEXATTRIB3S_DECL
+  #define GLVERTEXATTRIB3S_DECL
+  csGLVERTEXATTRIB3S glVertexAttrib3s;
+  #endif
+
+  #ifndef GLVERTEXATTRIB3F_DECL
+  #define GLVERTEXATTRIB3F_DECL
+  csGLVERTEXATTRIB3F glVertexAttrib3f;
+  #endif
+
+  #ifndef GLVERTEXATTRIB3D_DECL
+  #define GLVERTEXATTRIB3D_DECL
+  csGLVERTEXATTRIB3D glVertexAttrib3d;
+  #endif
+
+  #ifndef GLVERTEXATTRIB4S_DECL
+  #define GLVERTEXATTRIB4S_DECL
+  csGLVERTEXATTRIB4S glVertexAttrib4s;
+  #endif
+
+  #ifndef GLVERTEXATTRIB4F_DECL
+  #define GLVERTEXATTRIB4F_DECL
+  csGLVERTEXATTRIB4F glVertexAttrib4f;
+  #endif
+
+  #ifndef GLVERTEXATTRIB4D_DECL
+  #define GLVERTEXATTRIB4D_DECL
+  csGLVERTEXATTRIB4D glVertexAttrib4d;
+  #endif
+
+  #ifndef GLVERTEXATTRIB4NUB_DECL
+  #define GLVERTEXATTRIB4NUB_DECL
+  csGLVERTEXATTRIB4NUB glVertexAttrib4Nub;
+  #endif
+
+  #ifndef GLVERTEXATTRIB1SV_DECL
+  #define GLVERTEXATTRIB1SV_DECL
+  csGLVERTEXATTRIB1SV glVertexAttrib1sv;
+  #endif
+
+  #ifndef GLVERTEXATTRIB1FV_DECL
+  #define GLVERTEXATTRIB1FV_DECL
+  csGLVERTEXATTRIB1FV glVertexAttrib1fv;
+  #endif
+
+  #ifndef GLVERTEXATTRIB1DV_DECL
+  #define GLVERTEXATTRIB1DV_DECL
+  csGLVERTEXATTRIB1DV glVertexAttrib1dv;
+  #endif
+
+  #ifndef GLVERTEXATTRIB2SV_DECL
+  #define GLVERTEXATTRIB2SV_DECL
+  csGLVERTEXATTRIB2SV glVertexAttrib2sv;
+  #endif
+
+  #ifndef GLVERTEXATTRIB2FV_DECL
+  #define GLVERTEXATTRIB2FV_DECL
+  csGLVERTEXATTRIB2FV glVertexAttrib2fv;
+  #endif
+
+  #ifndef GLVERTEXATTRIB2DV_DECL
+  #define GLVERTEXATTRIB2DV_DECL
+  csGLVERTEXATTRIB2DV glVertexAttrib2dv;
+  #endif
+
+  #ifndef GLVERTEXATTRIB3SV_DECL
+  #define GLVERTEXATTRIB3SV_DECL
+  csGLVERTEXATTRIB3SV glVertexAttrib3sv;
+  #endif
+
+  #ifndef GLVERTEXATTRIB3FV_DECL
+  #define GLVERTEXATTRIB3FV_DECL
+  csGLVERTEXATTRIB3FV glVertexAttrib3fv;
+  #endif
+
+  #ifndef GLVERTEXATTRIB3DV_DECL
+  #define GLVERTEXATTRIB3DV_DECL
+  csGLVERTEXATTRIB3DV glVertexAttrib3dv;
+  #endif
+
+  #ifndef GLVERTEXATTRIB4BV_DECL
+  #define GLVERTEXATTRIB4BV_DECL
+  csGLVERTEXATTRIB4BV glVertexAttrib4bv;
+  #endif
+
+  #ifndef GLVERTEXATTRIB4SV_DECL
+  #define GLVERTEXATTRIB4SV_DECL
+  csGLVERTEXATTRIB4SV glVertexAttrib4sv;
+  #endif
+
+  #ifndef GLVERTEXATTRIB4IV_DECL
+  #define GLVERTEXATTRIB4IV_DECL
+  csGLVERTEXATTRIB4IV glVertexAttrib4iv;
+  #endif
+
+  #ifndef GLVERTEXATTRIB4UBV_DECL
+  #define GLVERTEXATTRIB4UBV_DECL
+  csGLVERTEXATTRIB4UBV glVertexAttrib4ubv;
+  #endif
+
+  #ifndef GLVERTEXATTRIB4USV_DECL
+  #define GLVERTEXATTRIB4USV_DECL
+  csGLVERTEXATTRIB4USV glVertexAttrib4usv;
+  #endif
+
+  #ifndef GLVERTEXATTRIB4UIV_DECL
+  #define GLVERTEXATTRIB4UIV_DECL
+  csGLVERTEXATTRIB4UIV glVertexAttrib4uiv;
+  #endif
+
+  #ifndef GLVERTEXATTRIB4FV_DECL
+  #define GLVERTEXATTRIB4FV_DECL
+  csGLVERTEXATTRIB4FV glVertexAttrib4fv;
+  #endif
+
+  #ifndef GLVERTEXATTRIB4DV_DECL
+  #define GLVERTEXATTRIB4DV_DECL
+  csGLVERTEXATTRIB4DV glVertexAttrib4dv;
+  #endif
+
+  #ifndef GLVERTEXATTRIB4NBV_DECL
+  #define GLVERTEXATTRIB4NBV_DECL
+  csGLVERTEXATTRIB4NBV glVertexAttrib4Nbv;
+  #endif
+
+  #ifndef GLVERTEXATTRIB4NSV_DECL
+  #define GLVERTEXATTRIB4NSV_DECL
+  csGLVERTEXATTRIB4NSV glVertexAttrib4Nsv;
+  #endif
+
+  #ifndef GLVERTEXATTRIB4NIV_DECL
+  #define GLVERTEXATTRIB4NIV_DECL
+  csGLVERTEXATTRIB4NIV glVertexAttrib4Niv;
+  #endif
+
+  #ifndef GLVERTEXATTRIB4NUBV_DECL
+  #define GLVERTEXATTRIB4NUBV_DECL
+  csGLVERTEXATTRIB4NUBV glVertexAttrib4Nubv;
+  #endif
+
+  #ifndef GLVERTEXATTRIB4NUSV_DECL
+  #define GLVERTEXATTRIB4NUSV_DECL
+  csGLVERTEXATTRIB4NUSV glVertexAttrib4Nusv;
+  #endif
+
+  #ifndef GLVERTEXATTRIB4NUIV_DECL
+  #define GLVERTEXATTRIB4NUIV_DECL
+  csGLVERTEXATTRIB4NUIV glVertexAttrib4Nuiv;
+  #endif
+
+  #ifndef GLVERTEXATTRIBPOINTER_DECL
+  #define GLVERTEXATTRIBPOINTER_DECL
+  csGLVERTEXATTRIBPOINTER glVertexAttribPointer;
+  #endif
+
+  #ifndef GLENABLEVERTEXATTRIBARRAY_DECL
+  #define GLENABLEVERTEXATTRIBARRAY_DECL
+  csGLENABLEVERTEXATTRIBARRAY glEnableVertexAttribArray;
+  #endif
+
+  #ifndef GLDISABLEVERTEXATTRIBARRAY_DECL
+  #define GLDISABLEVERTEXATTRIBARRAY_DECL
+  csGLDISABLEVERTEXATTRIBARRAY glDisableVertexAttribArray;
+  #endif
+
+  #ifndef GLBINDATTRIBLOCATION_DECL
+  #define GLBINDATTRIBLOCATION_DECL
+  csGLBINDATTRIBLOCATION glBindAttribLocation;
+  #endif
+
+  #ifndef GLGETACTIVEATTRIB_DECL
+  #define GLGETACTIVEATTRIB_DECL
+  csGLGETACTIVEATTRIB glGetActiveAttrib;
+  #endif
+
+  #ifndef GLGETATTRIBLOCATION_DECL
+  #define GLGETATTRIBLOCATION_DECL
+  csGLGETATTRIBLOCATION glGetAttribLocation;
+  #endif
+
+  #ifndef GLGETVERTEXATTRIBPOINTERV_DECL
+  #define GLGETVERTEXATTRIBPOINTERV_DECL
+  csGLGETVERTEXATTRIBPOINTERV glGetVertexAttribPointerv;
+  #endif
+
+  #ifndef GLBLENDEQUATIONSEPARATE_DECL
+  #define GLBLENDEQUATIONSEPARATE_DECL
+  csGLBLENDEQUATIONSEPARATE glBlendEquationSeparate;
+  #endif
+
+  #ifndef GLSTENCILFUNCSEPARATE_DECL
+  #define GLSTENCILFUNCSEPARATE_DECL
+  csGLSTENCILFUNCSEPARATE glStencilFuncSeparate;
+  #endif
+
+  #ifndef GLSTENCILOPSEPARATE_DECL
+  #define GLSTENCILOPSEPARATE_DECL
+  csGLSTENCILOPSEPARATE glStencilOpSeparate;
+  #endif
+
+
+  /** @} */
+  /**\name GL_version_2_1 functions
+   * This is not a real OpenGL extension. The OpenGL canvases will 'initialize'
+   * this extension when teh appropriate GL version was detected. 
+   * @{ */
+  #ifndef GLUNIFORMMATRIX2X3FV_DECL
+  #define GLUNIFORMMATRIX2X3FV_DECL
+  csGLUNIFORMMATRIX2X3FV glUniformMatrix2x3fv;
+  #endif
+
+  #ifndef GLUNIFORMMATRIX3X2FV_DECL
+  #define GLUNIFORMMATRIX3X2FV_DECL
+  csGLUNIFORMMATRIX3X2FV glUniformMatrix3x2fv;
+  #endif
+
+  #ifndef GLUNIFORMMATRIX2X4FV_DECL
+  #define GLUNIFORMMATRIX2X4FV_DECL
+  csGLUNIFORMMATRIX2X4FV glUniformMatrix2x4fv;
+  #endif
+
+  #ifndef GLUNIFORMMATRIX4X2FV_DECL
+  #define GLUNIFORMMATRIX4X2FV_DECL
+  csGLUNIFORMMATRIX4X2FV glUniformMatrix4x2fv;
+  #endif
+
+  #ifndef GLUNIFORMMATRIX3X4FV_DECL
+  #define GLUNIFORMMATRIX3X4FV_DECL
+  csGLUNIFORMMATRIX3X4FV glUniformMatrix3x4fv;
+  #endif
+
+  #ifndef GLUNIFORMMATRIX4X3FV_DECL
+  #define GLUNIFORMMATRIX4X3FV_DECL
+  csGLUNIFORMMATRIX4X3FV glUniformMatrix4x3fv;
   #endif
 
 
@@ -11225,24 +13203,24 @@ public:
   /**\name GL_EXT_fog_coord functions
    * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/EXT/fog_coord.txt">http://www.opengl.org/registry/specs/EXT/fog_coord.txt</a>.
    * @{ */
-  #ifndef GLFOGCOORDFEXFLOAT_DECL
-  #define GLFOGCOORDFEXFLOAT_DECL
-  csGLFOGCOORDFEXFLOAT glFogCoordfEXfloat;
+  #ifndef GLFOGCOORDFEXT_DECL
+  #define GLFOGCOORDFEXT_DECL
+  csGLFOGCOORDFEXT glFogCoordfEXT;
   #endif
 
-  #ifndef GLFOGCOORDDEXDOUBLE_DECL
-  #define GLFOGCOORDDEXDOUBLE_DECL
-  csGLFOGCOORDDEXDOUBLE glFogCoorddEXdouble;
+  #ifndef GLFOGCOORDDEXT_DECL
+  #define GLFOGCOORDDEXT_DECL
+  csGLFOGCOORDDEXT glFogCoorddEXT;
   #endif
 
-  #ifndef GLFOGCOORDFVEXFLOAT_DECL
-  #define GLFOGCOORDFVEXFLOAT_DECL
-  csGLFOGCOORDFVEXFLOAT glFogCoordfvEXfloat;
+  #ifndef GLFOGCOORDFVEXT_DECL
+  #define GLFOGCOORDFVEXT_DECL
+  csGLFOGCOORDFVEXT glFogCoordfvEXT;
   #endif
 
-  #ifndef GLFOGCOORDDVEXDOUBLE_DECL
-  #define GLFOGCOORDDVEXDOUBLE_DECL
-  csGLFOGCOORDDVEXDOUBLE glFogCoorddvEXdouble;
+  #ifndef GLFOGCOORDDVEXT_DECL
+  #define GLFOGCOORDDVEXT_DECL
+  csGLFOGCOORDDVEXT glFogCoorddvEXT;
   #endif
 
   #ifndef GLFOGCOORDPOINTEREXT_DECL
@@ -14642,6 +16620,71 @@ public:
    * @{ */
 
   /** @} */
+  /**\name GL_ARB_occlusion_query functions
+   * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/ARB/occlusion_query.txt">http://www.opengl.org/registry/specs/ARB/occlusion_query.txt</a>.
+   * @{ */
+  #ifndef GLGENQUERIESARB_DECL
+  #define GLGENQUERIESARB_DECL
+  csGLGENQUERIESARB glGenQueriesARB;
+  #endif
+
+  #ifndef GLDELETEQUERIESARB_DECL
+  #define GLDELETEQUERIESARB_DECL
+  csGLDELETEQUERIESARB glDeleteQueriesARB;
+  #endif
+
+  #ifndef GLISQUERYARB_DECL
+  #define GLISQUERYARB_DECL
+  csGLISQUERYARB glIsQueryARB;
+  #endif
+
+  #ifndef GLBEGINQUERYARB_DECL
+  #define GLBEGINQUERYARB_DECL
+  csGLBEGINQUERYARB glBeginQueryARB;
+  #endif
+
+  #ifndef GLENDQUERYARB_DECL
+  #define GLENDQUERYARB_DECL
+  csGLENDQUERYARB glEndQueryARB;
+  #endif
+
+  #ifndef GLGETQUERYIVARB_DECL
+  #define GLGETQUERYIVARB_DECL
+  csGLGETQUERYIVARB glGetQueryivARB;
+  #endif
+
+  #ifndef GLGETQUERYOBJECTIVARB_DECL
+  #define GLGETQUERYOBJECTIVARB_DECL
+  csGLGETQUERYOBJECTIVARB glGetQueryObjectivARB;
+  #endif
+
+  #ifndef GLGETQUERYOBJECTUIVARB_DECL
+  #define GLGETQUERYOBJECTUIVARB_DECL
+  csGLGETQUERYOBJECTUIVARB glGetQueryObjectuivARB;
+  #endif
+
+
+  /** @} */
+  /**\name GL_ARB_draw_buffers functions
+   * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/ARB/draw_buffers.txt">http://www.opengl.org/registry/specs/ARB/draw_buffers.txt</a>.
+   * @{ */
+
+  /** @} */
+  /**\name GL_EXT_blend_equation_separate functions
+   * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/EXT/blend_equation_separate.txt">http://www.opengl.org/registry/specs/EXT/blend_equation_separate.txt</a>.
+   * @{ */
+  #ifndef GLBLENDEQUATIONSEPARATEEXT_DECL
+  #define GLBLENDEQUATIONSEPARATEEXT_DECL
+  csGLBLENDEQUATIONSEPARATEEXT glBlendEquationSeparateEXT;
+  #endif
+
+
+  /** @} */
+  /**\name GL_EXT_texture_sRGB functions
+   * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/EXT/texture_sRGB.txt">http://www.opengl.org/registry/specs/EXT/texture_sRGB.txt</a>.
+   * @{ */
+
+  /** @} */
 
 // end of functions
 };
@@ -14654,6 +16697,14 @@ public:
   bool CS_GL_version_1_2;
   /** Whether the corresponding GL version is supported. */
   bool CS_GL_version_1_3;
+  /** Whether the corresponding GL version is supported. */
+  bool CS_GL_version_1_4;
+  /** Whether the corresponding GL version is supported. */
+  bool CS_GL_version_1_5;
+  /** Whether the corresponding GL version is supported. */
+  bool CS_GL_version_2_0;
+  /** Whether the corresponding GL version is supported. */
+  bool CS_GL_version_2_1;
   /** Whether the <a href="http://www.opengl.org/registry/specs/ARB/imaging.txt">GL_ARB_imaging</a> extension was found. 
    * Set by csGLExtensionManager::InitGL_ARB_imaging(). */
   bool CS_GL_ARB_imaging;
@@ -15134,10 +17185,26 @@ public:
   /** Whether the <a href="http://www.opengl.org/registry/specs/EXT/texture_rectangle.txt">GL_EXT_texture_rectangle</a> extension was found. 
    * Set by csGLExtensionManager::InitGL_EXT_texture_rectangle(). */
   bool CS_GL_EXT_texture_rectangle;
+  /** Whether the <a href="http://www.opengl.org/registry/specs/ARB/occlusion_query.txt">GL_ARB_occlusion_query</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_ARB_occlusion_query(). */
+  bool CS_GL_ARB_occlusion_query;
+  /** Whether the <a href="http://www.opengl.org/registry/specs/ARB/draw_buffers.txt">GL_ARB_draw_buffers</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_ARB_draw_buffers(). */
+  bool CS_GL_ARB_draw_buffers;
+  /** Whether the <a href="http://www.opengl.org/registry/specs/EXT/blend_equation_separate.txt">GL_EXT_blend_equation_separate</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_EXT_blend_equation_separate(). */
+  bool CS_GL_EXT_blend_equation_separate;
+  /** Whether the <a href="http://www.opengl.org/registry/specs/EXT/texture_sRGB.txt">GL_EXT_texture_sRGB</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_EXT_texture_sRGB(). */
+  bool CS_GL_EXT_texture_sRGB;
 
 protected:
   bool tested_CS_GL_version_1_2;
   bool tested_CS_GL_version_1_3;
+  bool tested_CS_GL_version_1_4;
+  bool tested_CS_GL_version_1_5;
+  bool tested_CS_GL_version_2_0;
+  bool tested_CS_GL_version_2_1;
   bool tested_CS_GL_ARB_imaging;
   bool tested_CS_GL_ARB_multitexture;
   bool tested_CS_GL_ARB_transpose_matrix;
@@ -15298,6 +17365,10 @@ protected:
   bool tested_CS_GL_EXT_pixel_buffer_object;
   bool tested_CS_GL_GREMEDY_string_marker;
   bool tested_CS_GL_EXT_texture_rectangle;
+  bool tested_CS_GL_ARB_occlusion_query;
+  bool tested_CS_GL_ARB_draw_buffers;
+  bool tested_CS_GL_EXT_blend_equation_separate;
+  bool tested_CS_GL_EXT_texture_sRGB;
 
 };
 
@@ -15442,7 +17513,12 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_version_1_3 = true;
     const char* ext = "GL_version_1_3";
-
+    InitGL_version_1_2();
+    if (!CS_GL_version_1_2)
+    {
+      Report (msgDependencyNotFound, "GL", ext, "GL_version_1_2");
+      return;
+    }
     char cfgkey[26 + 14 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -15502,6 +17578,292 @@ public:
       EXTMGR_FUNC_INIT(glGetCompressedTexImage, GLGETCOMPRESSEDTEXIMAGE);
 
       EXTMGR_REPORT_INIT_RESULT("GL", GL_version_1_3)
+    }
+    else
+    {
+      Report (msgExtNotFound, "GL", ext);
+    }
+  }
+  
+  /**\internal Initialize GL_version_1_4 pseudo-extension. */
+  void InitGL_version_1_4 ()
+  {
+    if (tested_CS_GL_version_1_4) return;
+    if (!extstrGL) return;
+    tested_CS_GL_version_1_4 = true;
+    const char* ext = "GL_version_1_4";
+    InitGL_version_1_3();
+    if (!CS_GL_version_1_3)
+    {
+      Report (msgDependencyNotFound, "GL", ext, "GL_version_1_3");
+      return;
+    }
+    char cfgkey[26 + 14 + 1];
+    sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
+    
+    CS_GL_version_1_4 = true;
+
+    bool allclear, funcTest;
+    (void)funcTest; // shut up "variable unused" warnings
+    bool init = CS_GL_version_1_4;
+    allclear = true;
+    if (init)	// Don't check the functions if ext isn't reported anyway
+    {
+      EXTMGR_FUNC_INIT(glFogCoordf, GLFOGCOORDF);
+      EXTMGR_FUNC_INIT(glFogCoordd, GLFOGCOORDD);
+      EXTMGR_FUNC_INIT(glFogCoordfv, GLFOGCOORDFV);
+      EXTMGR_FUNC_INIT(glFogCoorddv, GLFOGCOORDDV);
+      EXTMGR_FUNC_INIT(glFogCoordPointer, GLFOGCOORDPOINTER);
+      EXTMGR_FUNC_INIT(glMultiDrawArrays, GLMULTIDRAWARRAYS);
+      EXTMGR_FUNC_INIT(glMultiDrawElements, GLMULTIDRAWELEMENTS);
+      EXTMGR_FUNC_INIT(glPointParameterf, GLPOINTPARAMETERF);
+      EXTMGR_FUNC_INIT(glPointParameterfv, GLPOINTPARAMETERFV);
+      EXTMGR_FUNC_INIT(glSecondaryColor3b, GLSECONDARYCOLOR3B);
+      EXTMGR_FUNC_INIT(glSecondaryColor3s, GLSECONDARYCOLOR3S);
+      EXTMGR_FUNC_INIT(glSecondaryColor3i, GLSECONDARYCOLOR3I);
+      EXTMGR_FUNC_INIT(glSecondaryColor3f, GLSECONDARYCOLOR3F);
+      EXTMGR_FUNC_INIT(glSecondaryColor3d, GLSECONDARYCOLOR3D);
+      EXTMGR_FUNC_INIT(glSecondaryColor3ub, GLSECONDARYCOLOR3UB);
+      EXTMGR_FUNC_INIT(glSecondaryColor3us, GLSECONDARYCOLOR3US);
+      EXTMGR_FUNC_INIT(glSecondaryColor3ui, GLSECONDARYCOLOR3UI);
+      EXTMGR_FUNC_INIT(glSecondaryColor3bv, GLSECONDARYCOLOR3BV);
+      EXTMGR_FUNC_INIT(glSecondaryColor3sv, GLSECONDARYCOLOR3SV);
+      EXTMGR_FUNC_INIT(glSecondaryColor3iv, GLSECONDARYCOLOR3IV);
+      EXTMGR_FUNC_INIT(glSecondaryColor3fv, GLSECONDARYCOLOR3FV);
+      EXTMGR_FUNC_INIT(glSecondaryColor3dv, GLSECONDARYCOLOR3DV);
+      EXTMGR_FUNC_INIT(glSecondaryColor3ubv, GLSECONDARYCOLOR3UBV);
+      EXTMGR_FUNC_INIT(glSecondaryColor3usv, GLSECONDARYCOLOR3USV);
+      EXTMGR_FUNC_INIT(glSecondaryColor3uiv, GLSECONDARYCOLOR3UIV);
+      EXTMGR_FUNC_INIT(glSecondaryColorPointer, GLSECONDARYCOLORPOINTER);
+      EXTMGR_FUNC_INIT(glBlendFuncSeparate, GLBLENDFUNCSEPARATE);
+      EXTMGR_FUNC_INIT(glWindowPos2d, GLWINDOWPOS2D);
+      EXTMGR_FUNC_INIT(glWindowPos2f, GLWINDOWPOS2F);
+      EXTMGR_FUNC_INIT(glWindowPos2i, GLWINDOWPOS2I);
+      EXTMGR_FUNC_INIT(glWindowPos2s, GLWINDOWPOS2S);
+      EXTMGR_FUNC_INIT(glWindowPos2dv, GLWINDOWPOS2DV);
+      EXTMGR_FUNC_INIT(glWindowPos2fv, GLWINDOWPOS2FV);
+      EXTMGR_FUNC_INIT(glWindowPos2iv, GLWINDOWPOS2IV);
+      EXTMGR_FUNC_INIT(glWindowPos2sv, GLWINDOWPOS2SV);
+      EXTMGR_FUNC_INIT(glWindowPos3d, GLWINDOWPOS3D);
+      EXTMGR_FUNC_INIT(glWindowPos3f, GLWINDOWPOS3F);
+      EXTMGR_FUNC_INIT(glWindowPos3i, GLWINDOWPOS3I);
+      EXTMGR_FUNC_INIT(glWindowPos3s, GLWINDOWPOS3S);
+      EXTMGR_FUNC_INIT(glWindowPos3dv, GLWINDOWPOS3DV);
+      EXTMGR_FUNC_INIT(glWindowPos3fv, GLWINDOWPOS3FV);
+      EXTMGR_FUNC_INIT(glWindowPos3iv, GLWINDOWPOS3IV);
+      EXTMGR_FUNC_INIT(glWindowPos3sv, GLWINDOWPOS3SV);
+
+      EXTMGR_REPORT_INIT_RESULT("GL", GL_version_1_4)
+    }
+    else
+    {
+      Report (msgExtNotFound, "GL", ext);
+    }
+  }
+  
+  /**\internal Initialize GL_version_1_5 pseudo-extension. */
+  void InitGL_version_1_5 ()
+  {
+    if (tested_CS_GL_version_1_5) return;
+    if (!extstrGL) return;
+    tested_CS_GL_version_1_5 = true;
+    const char* ext = "GL_version_1_5";
+    InitGL_version_1_4();
+    if (!CS_GL_version_1_4)
+    {
+      Report (msgDependencyNotFound, "GL", ext, "GL_version_1_4");
+      return;
+    }
+    char cfgkey[26 + 14 + 1];
+    sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
+    
+    CS_GL_version_1_5 = true;
+
+    bool allclear, funcTest;
+    (void)funcTest; // shut up "variable unused" warnings
+    bool init = CS_GL_version_1_5;
+    allclear = true;
+    if (init)	// Don't check the functions if ext isn't reported anyway
+    {
+      EXTMGR_FUNC_INIT(glBindBuffer, GLBINDBUFFER);
+      EXTMGR_FUNC_INIT(glDeleteBuffers, GLDELETEBUFFERS);
+      EXTMGR_FUNC_INIT(glGenBuffers, GLGENBUFFERS);
+      EXTMGR_FUNC_INIT(glBufferData, GLBUFFERDATA);
+      EXTMGR_FUNC_INIT(glBufferSubData, GLBUFFERSUBDATA);
+      EXTMGR_FUNC_INIT(glMapBuffer, GLMAPBUFFER);
+      EXTMGR_FUNC_INIT(glUnmapBuffer, GLUNMAPBUFFER);
+      EXTMGR_FUNC_INIT(glIsBuffer, GLISBUFFER);
+      EXTMGR_FUNC_INIT(glGetBufferSubData, GLGETBUFFERSUBDATA);
+      EXTMGR_FUNC_INIT(glGetBufferPointerv, GLGETBUFFERPOINTERV);
+      EXTMGR_FUNC_INIT(glGetBufferParameteriv, GLGETBUFFERPARAMETERIV);
+      EXTMGR_FUNC_INIT(glGenQueries, GLGENQUERIES);
+      EXTMGR_FUNC_INIT(glDeleteQueries, GLDELETEQUERIES);
+      EXTMGR_FUNC_INIT(glIsQuery, GLISQUERY);
+      EXTMGR_FUNC_INIT(glBeginQuery, GLBEGINQUERY);
+      EXTMGR_FUNC_INIT(glEndQuery, GLENDQUERY);
+      EXTMGR_FUNC_INIT(glGetQueryiv, GLGETQUERYIV);
+      EXTMGR_FUNC_INIT(glGetQueryObjectiv, GLGETQUERYOBJECTIV);
+      EXTMGR_FUNC_INIT(glGetQueryObjectuiv, GLGETQUERYOBJECTUIV);
+
+      EXTMGR_REPORT_INIT_RESULT("GL", GL_version_1_5)
+    }
+    else
+    {
+      Report (msgExtNotFound, "GL", ext);
+    }
+  }
+  
+  /**\internal Initialize GL_version_2_0 pseudo-extension. */
+  void InitGL_version_2_0 ()
+  {
+    if (tested_CS_GL_version_2_0) return;
+    if (!extstrGL) return;
+    tested_CS_GL_version_2_0 = true;
+    const char* ext = "GL_version_2_0";
+    InitGL_version_1_5();
+    if (!CS_GL_version_1_5)
+    {
+      Report (msgDependencyNotFound, "GL", ext, "GL_version_1_5");
+      return;
+    }
+    char cfgkey[26 + 14 + 1];
+    sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
+    
+    CS_GL_version_2_0 = true;
+
+    bool allclear, funcTest;
+    (void)funcTest; // shut up "variable unused" warnings
+    bool init = CS_GL_version_2_0;
+    allclear = true;
+    if (init)	// Don't check the functions if ext isn't reported anyway
+    {
+      EXTMGR_FUNC_INIT(glDeleteShader, GLDELETESHADER);
+      EXTMGR_FUNC_INIT(glGetHandle, GLGETHANDLE);
+      EXTMGR_FUNC_INIT(glDetachShader, GLDETACHSHADER);
+      EXTMGR_FUNC_INIT(glCreateShader, GLCREATESHADER);
+      EXTMGR_FUNC_INIT(glShaderSource, GLSHADERSOURCE);
+      EXTMGR_FUNC_INIT(glCompileShader, GLCOMPILESHADER);
+      EXTMGR_FUNC_INIT(glCreateProgramObject, GLCREATEPROGRAMOBJECT);
+      EXTMGR_FUNC_INIT(glAttachShader, GLATTACHSHADER);
+      EXTMGR_FUNC_INIT(glLinkProgram, GLLINKPROGRAM);
+      EXTMGR_FUNC_INIT(glUseProgram, GLUSEPROGRAM);
+      EXTMGR_FUNC_INIT(glDeleteProgram, GLDELETEPROGRAM);
+      EXTMGR_FUNC_INIT(glValidateProgram, GLVALIDATEPROGRAM);
+      EXTMGR_FUNC_INIT(glUniform1f, GLUNIFORM1F);
+      EXTMGR_FUNC_INIT(glUniform2f, GLUNIFORM2F);
+      EXTMGR_FUNC_INIT(glUniform3f, GLUNIFORM3F);
+      EXTMGR_FUNC_INIT(glUniform4f, GLUNIFORM4F);
+      EXTMGR_FUNC_INIT(glUniform1i, GLUNIFORM1I);
+      EXTMGR_FUNC_INIT(glUniform2i, GLUNIFORM2I);
+      EXTMGR_FUNC_INIT(glUniform3i, GLUNIFORM3I);
+      EXTMGR_FUNC_INIT(glUniform4i, GLUNIFORM4I);
+      EXTMGR_FUNC_INIT(glUniform1fv, GLUNIFORM1FV);
+      EXTMGR_FUNC_INIT(glUniform2fv, GLUNIFORM2FV);
+      EXTMGR_FUNC_INIT(glUniform3fv, GLUNIFORM3FV);
+      EXTMGR_FUNC_INIT(glUniform4fv, GLUNIFORM4FV);
+      EXTMGR_FUNC_INIT(glUniform1iv, GLUNIFORM1IV);
+      EXTMGR_FUNC_INIT(glUniform2iv, GLUNIFORM2IV);
+      EXTMGR_FUNC_INIT(glUniform3iv, GLUNIFORM3IV);
+      EXTMGR_FUNC_INIT(glUniform4iv, GLUNIFORM4IV);
+      EXTMGR_FUNC_INIT(glUniformMatrix2fv, GLUNIFORMMATRIX2FV);
+      EXTMGR_FUNC_INIT(glUniformMatrix3fv, GLUNIFORMMATRIX3FV);
+      EXTMGR_FUNC_INIT(glUniformMatrix4fv, GLUNIFORMMATRIX4FV);
+      EXTMGR_FUNC_INIT(glGetObjectParameterfv, GLGETOBJECTPARAMETERFV);
+      EXTMGR_FUNC_INIT(glGetObjectParameteriv, GLGETOBJECTPARAMETERIV);
+      EXTMGR_FUNC_INIT(glGetInfoLog, GLGETINFOLOG);
+      EXTMGR_FUNC_INIT(glGetAttachedObjects, GLGETATTACHEDOBJECTS);
+      EXTMGR_FUNC_INIT(glGetUniformLocation, GLGETUNIFORMLOCATION);
+      EXTMGR_FUNC_INIT(glGetActiveUniform, GLGETACTIVEUNIFORM);
+      EXTMGR_FUNC_INIT(glGetUniformfv, GLGETUNIFORMFV);
+      EXTMGR_FUNC_INIT(glGetUniformiv, GLGETUNIFORMIV);
+      EXTMGR_FUNC_INIT(glGetShaderSource, GLGETSHADERSOURCE);
+      EXTMGR_FUNC_INIT(glVertexAttrib1s, GLVERTEXATTRIB1S);
+      EXTMGR_FUNC_INIT(glVertexAttrib1f, GLVERTEXATTRIB1F);
+      EXTMGR_FUNC_INIT(glVertexAttrib1d, GLVERTEXATTRIB1D);
+      EXTMGR_FUNC_INIT(glVertexAttrib2s, GLVERTEXATTRIB2S);
+      EXTMGR_FUNC_INIT(glVertexAttrib2f, GLVERTEXATTRIB2F);
+      EXTMGR_FUNC_INIT(glVertexAttrib2d, GLVERTEXATTRIB2D);
+      EXTMGR_FUNC_INIT(glVertexAttrib3s, GLVERTEXATTRIB3S);
+      EXTMGR_FUNC_INIT(glVertexAttrib3f, GLVERTEXATTRIB3F);
+      EXTMGR_FUNC_INIT(glVertexAttrib3d, GLVERTEXATTRIB3D);
+      EXTMGR_FUNC_INIT(glVertexAttrib4s, GLVERTEXATTRIB4S);
+      EXTMGR_FUNC_INIT(glVertexAttrib4f, GLVERTEXATTRIB4F);
+      EXTMGR_FUNC_INIT(glVertexAttrib4d, GLVERTEXATTRIB4D);
+      EXTMGR_FUNC_INIT(glVertexAttrib4Nub, GLVERTEXATTRIB4NUB);
+      EXTMGR_FUNC_INIT(glVertexAttrib1sv, GLVERTEXATTRIB1SV);
+      EXTMGR_FUNC_INIT(glVertexAttrib1fv, GLVERTEXATTRIB1FV);
+      EXTMGR_FUNC_INIT(glVertexAttrib1dv, GLVERTEXATTRIB1DV);
+      EXTMGR_FUNC_INIT(glVertexAttrib2sv, GLVERTEXATTRIB2SV);
+      EXTMGR_FUNC_INIT(glVertexAttrib2fv, GLVERTEXATTRIB2FV);
+      EXTMGR_FUNC_INIT(glVertexAttrib2dv, GLVERTEXATTRIB2DV);
+      EXTMGR_FUNC_INIT(glVertexAttrib3sv, GLVERTEXATTRIB3SV);
+      EXTMGR_FUNC_INIT(glVertexAttrib3fv, GLVERTEXATTRIB3FV);
+      EXTMGR_FUNC_INIT(glVertexAttrib3dv, GLVERTEXATTRIB3DV);
+      EXTMGR_FUNC_INIT(glVertexAttrib4bv, GLVERTEXATTRIB4BV);
+      EXTMGR_FUNC_INIT(glVertexAttrib4sv, GLVERTEXATTRIB4SV);
+      EXTMGR_FUNC_INIT(glVertexAttrib4iv, GLVERTEXATTRIB4IV);
+      EXTMGR_FUNC_INIT(glVertexAttrib4ubv, GLVERTEXATTRIB4UBV);
+      EXTMGR_FUNC_INIT(glVertexAttrib4usv, GLVERTEXATTRIB4USV);
+      EXTMGR_FUNC_INIT(glVertexAttrib4uiv, GLVERTEXATTRIB4UIV);
+      EXTMGR_FUNC_INIT(glVertexAttrib4fv, GLVERTEXATTRIB4FV);
+      EXTMGR_FUNC_INIT(glVertexAttrib4dv, GLVERTEXATTRIB4DV);
+      EXTMGR_FUNC_INIT(glVertexAttrib4Nbv, GLVERTEXATTRIB4NBV);
+      EXTMGR_FUNC_INIT(glVertexAttrib4Nsv, GLVERTEXATTRIB4NSV);
+      EXTMGR_FUNC_INIT(glVertexAttrib4Niv, GLVERTEXATTRIB4NIV);
+      EXTMGR_FUNC_INIT(glVertexAttrib4Nubv, GLVERTEXATTRIB4NUBV);
+      EXTMGR_FUNC_INIT(glVertexAttrib4Nusv, GLVERTEXATTRIB4NUSV);
+      EXTMGR_FUNC_INIT(glVertexAttrib4Nuiv, GLVERTEXATTRIB4NUIV);
+      EXTMGR_FUNC_INIT(glVertexAttribPointer, GLVERTEXATTRIBPOINTER);
+      EXTMGR_FUNC_INIT(glEnableVertexAttribArray, GLENABLEVERTEXATTRIBARRAY);
+      EXTMGR_FUNC_INIT(glDisableVertexAttribArray, GLDISABLEVERTEXATTRIBARRAY);
+      EXTMGR_FUNC_INIT(glBindAttribLocation, GLBINDATTRIBLOCATION);
+      EXTMGR_FUNC_INIT(glGetActiveAttrib, GLGETACTIVEATTRIB);
+      EXTMGR_FUNC_INIT(glGetAttribLocation, GLGETATTRIBLOCATION);
+      EXTMGR_FUNC_INIT(glGetVertexAttribPointerv, GLGETVERTEXATTRIBPOINTERV);
+      EXTMGR_FUNC_INIT(glBlendEquationSeparate, GLBLENDEQUATIONSEPARATE);
+      EXTMGR_FUNC_INIT(glStencilFuncSeparate, GLSTENCILFUNCSEPARATE);
+      EXTMGR_FUNC_INIT(glStencilOpSeparate, GLSTENCILOPSEPARATE);
+
+      EXTMGR_REPORT_INIT_RESULT("GL", GL_version_2_0)
+    }
+    else
+    {
+      Report (msgExtNotFound, "GL", ext);
+    }
+  }
+  
+  /**\internal Initialize GL_version_2_1 pseudo-extension. */
+  void InitGL_version_2_1 ()
+  {
+    if (tested_CS_GL_version_2_1) return;
+    if (!extstrGL) return;
+    tested_CS_GL_version_2_1 = true;
+    const char* ext = "GL_version_2_1";
+    InitGL_version_2_0();
+    if (!CS_GL_version_2_0)
+    {
+      Report (msgDependencyNotFound, "GL", ext, "GL_version_2_0");
+      return;
+    }
+    char cfgkey[26 + 14 + 1];
+    sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
+    
+    CS_GL_version_2_1 = true;
+
+    bool allclear, funcTest;
+    (void)funcTest; // shut up "variable unused" warnings
+    bool init = CS_GL_version_2_1;
+    allclear = true;
+    if (init)	// Don't check the functions if ext isn't reported anyway
+    {
+      EXTMGR_FUNC_INIT(glUniformMatrix2x3fv, GLUNIFORMMATRIX2X3FV);
+      EXTMGR_FUNC_INIT(glUniformMatrix3x2fv, GLUNIFORMMATRIX3X2FV);
+      EXTMGR_FUNC_INIT(glUniformMatrix2x4fv, GLUNIFORMMATRIX2X4FV);
+      EXTMGR_FUNC_INIT(glUniformMatrix4x2fv, GLUNIFORMMATRIX4X2FV);
+      EXTMGR_FUNC_INIT(glUniformMatrix3x4fv, GLUNIFORMMATRIX3X4FV);
+      EXTMGR_FUNC_INIT(glUniformMatrix4x3fv, GLUNIFORMMATRIX4X3FV);
+
+      EXTMGR_REPORT_INIT_RESULT("GL", GL_version_2_1)
     }
     else
     {
@@ -16688,10 +19050,10 @@ public:
     allclear = true;
     if (init)	// Don't check the functions if ext isn't reported anyway
     {
-      EXTMGR_FUNC_INIT(glFogCoordfEXfloat, GLFOGCOORDFEXFLOAT);
-      EXTMGR_FUNC_INIT(glFogCoorddEXdouble, GLFOGCOORDDEXDOUBLE);
-      EXTMGR_FUNC_INIT(glFogCoordfvEXfloat, GLFOGCOORDFVEXFLOAT);
-      EXTMGR_FUNC_INIT(glFogCoorddvEXdouble, GLFOGCOORDDVEXDOUBLE);
+      EXTMGR_FUNC_INIT(glFogCoordfEXT, GLFOGCOORDFEXT);
+      EXTMGR_FUNC_INIT(glFogCoorddEXT, GLFOGCOORDDEXT);
+      EXTMGR_FUNC_INIT(glFogCoordfvEXT, GLFOGCOORDFVEXT);
+      EXTMGR_FUNC_INIT(glFogCoorddvEXT, GLFOGCOORDDVEXT);
       EXTMGR_FUNC_INIT(glFogCoordPointerEXT, GLFOGCOORDPOINTEREXT);
 
       EXTMGR_REPORT_INIT_RESULT("GL", GL_EXT_fog_coord)
@@ -21028,6 +23390,131 @@ public:
     {
 
       EXTMGR_REPORT_INIT_RESULT("GL", GL_EXT_texture_rectangle)
+    }
+    else
+    {
+      Report (msgExtNotFound, "GL", ext);
+    }
+  }
+  
+  /** Initialize <a href="http://www.opengl.org/registry/specs/ARB/occlusion_query.txt">GL_ARB_occlusion_query</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_ARB_occlusion_query. */
+  void InitGL_ARB_occlusion_query ()
+  {
+    if (tested_CS_GL_ARB_occlusion_query) return;
+    if (!extstrGL) return;
+    tested_CS_GL_ARB_occlusion_query = true;
+    const char* ext = "GL_ARB_occlusion_query";
+
+    char cfgkey[26 + 22 + 1];
+    sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
+    
+    CS_GL_ARB_occlusion_query = (strstr (extstrGL, ext) != 0);
+
+    bool allclear, funcTest;
+    (void)funcTest; // shut up "variable unused" warnings
+    bool init = CS_GL_ARB_occlusion_query;
+    allclear = true;
+    if (init)	// Don't check the functions if ext isn't reported anyway
+    {
+      EXTMGR_FUNC_INIT(glGenQueriesARB, GLGENQUERIESARB);
+      EXTMGR_FUNC_INIT(glDeleteQueriesARB, GLDELETEQUERIESARB);
+      EXTMGR_FUNC_INIT(glIsQueryARB, GLISQUERYARB);
+      EXTMGR_FUNC_INIT(glBeginQueryARB, GLBEGINQUERYARB);
+      EXTMGR_FUNC_INIT(glEndQueryARB, GLENDQUERYARB);
+      EXTMGR_FUNC_INIT(glGetQueryivARB, GLGETQUERYIVARB);
+      EXTMGR_FUNC_INIT(glGetQueryObjectivARB, GLGETQUERYOBJECTIVARB);
+      EXTMGR_FUNC_INIT(glGetQueryObjectuivARB, GLGETQUERYOBJECTUIVARB);
+
+      EXTMGR_REPORT_INIT_RESULT("GL", GL_ARB_occlusion_query)
+    }
+    else
+    {
+      Report (msgExtNotFound, "GL", ext);
+    }
+  }
+  
+  /** Initialize <a href="http://www.opengl.org/registry/specs/ARB/draw_buffers.txt">GL_ARB_draw_buffers</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_ARB_draw_buffers. */
+  void InitGL_ARB_draw_buffers ()
+  {
+    if (tested_CS_GL_ARB_draw_buffers) return;
+    if (!extstrGL) return;
+    tested_CS_GL_ARB_draw_buffers = true;
+    const char* ext = "GL_ARB_draw_buffers";
+
+    char cfgkey[26 + 19 + 1];
+    sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
+    
+    CS_GL_ARB_draw_buffers = (strstr (extstrGL, ext) != 0);
+
+    bool allclear, funcTest;
+    (void)funcTest; // shut up "variable unused" warnings
+    bool init = CS_GL_ARB_draw_buffers;
+    allclear = true;
+    if (init)	// Don't check the functions if ext isn't reported anyway
+    {
+
+      EXTMGR_REPORT_INIT_RESULT("GL", GL_ARB_draw_buffers)
+    }
+    else
+    {
+      Report (msgExtNotFound, "GL", ext);
+    }
+  }
+  
+  /** Initialize <a href="http://www.opengl.org/registry/specs/EXT/blend_equation_separate.txt">GL_EXT_blend_equation_separate</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_EXT_blend_equation_separate. */
+  void InitGL_EXT_blend_equation_separate ()
+  {
+    if (tested_CS_GL_EXT_blend_equation_separate) return;
+    if (!extstrGL) return;
+    tested_CS_GL_EXT_blend_equation_separate = true;
+    const char* ext = "GL_EXT_blend_equation_separate";
+
+    char cfgkey[26 + 30 + 1];
+    sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
+    
+    CS_GL_EXT_blend_equation_separate = (strstr (extstrGL, ext) != 0);
+
+    bool allclear, funcTest;
+    (void)funcTest; // shut up "variable unused" warnings
+    bool init = CS_GL_EXT_blend_equation_separate;
+    allclear = true;
+    if (init)	// Don't check the functions if ext isn't reported anyway
+    {
+      EXTMGR_FUNC_INIT(glBlendEquationSeparateEXT, GLBLENDEQUATIONSEPARATEEXT);
+
+      EXTMGR_REPORT_INIT_RESULT("GL", GL_EXT_blend_equation_separate)
+    }
+    else
+    {
+      Report (msgExtNotFound, "GL", ext);
+    }
+  }
+  
+  /** Initialize <a href="http://www.opengl.org/registry/specs/EXT/texture_sRGB.txt">GL_EXT_texture_sRGB</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_EXT_texture_sRGB. */
+  void InitGL_EXT_texture_sRGB ()
+  {
+    if (tested_CS_GL_EXT_texture_sRGB) return;
+    if (!extstrGL) return;
+    tested_CS_GL_EXT_texture_sRGB = true;
+    const char* ext = "GL_EXT_texture_sRGB";
+
+    char cfgkey[26 + 19 + 1];
+    sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
+    
+    CS_GL_EXT_texture_sRGB = (strstr (extstrGL, ext) != 0);
+
+    bool allclear, funcTest;
+    (void)funcTest; // shut up "variable unused" warnings
+    bool init = CS_GL_EXT_texture_sRGB;
+    allclear = true;
+    if (init)	// Don't check the functions if ext isn't reported anyway
+    {
+
+      EXTMGR_REPORT_INIT_RESULT("GL", GL_EXT_texture_sRGB)
     }
     else
     {
