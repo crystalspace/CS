@@ -129,9 +129,18 @@ typedef unsigned char GLubyte;
 /*
   Appear in the ARB_shader_objects ext spec.
  */
+#ifndef CS_HAVE_GLCHARARB_T
 typedef char GLcharARB;
+#endif
 #ifndef CS_HAVE_GLHANDLEARB_T
 typedef unsigned int GLhandleARB;
+#endif
+/* Identifiers after promotion to core */
+#ifndef CS_HAVE_GLCHAR_T
+typedef GLcharARB GLchar;
+#endif
+#ifndef CS_HAVE_GLHANDLE_T
+typedef GLhandleARB GLhandle;
 #endif
 
 #include "iutil/cmdline.h"
