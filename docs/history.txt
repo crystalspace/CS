@@ -18,6 +18,7 @@ chronological order.
 	- res fixed a couple of gcc 4.1 optimize warnings.
 	- res fixed _cspace.so.dbg being tried to be split off before 
 	  _cspace.so is built when installing. Fixes trac #11.
+	- res added debug info splitting for the CS JNI library.
 6-Sep-2006
 	- Jorrit fixed a bug in csGraphics2DOpenGL::SetMouseCursor().
 	  It would assert (in debug mode) or crash (in release mode) in
