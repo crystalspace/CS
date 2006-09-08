@@ -8,6 +8,7 @@ chronological order.
 
 8-Sep-2006
         - res added tests for some more GL types.
+	- caedes updated cspace.i for the new particles.
 6-Sep-2006
 	- Jorrit fixed a bug in csGraphics2DOpenGL::SetMouseCursor().
 	  It would assert (in debug mode) or crash (in release mode) in
