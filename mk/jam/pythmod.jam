@@ -74,6 +74,7 @@ rule PythMod
     MakeLocate $(target) : $(LOCATE.TARGETS) ;
     Depends $(target) : $(objects) ;
     LinkPlugin $(target) : $(objects) ;
+    InstallPythMod $(target) : bindings python ;
     if $(LINK.DEBUG.INFO.SEPARATE) = "yes"
     {
       local debugfile = [ SplitDebugInfo $(target) ] ;
@@ -84,7 +85,6 @@ rule PythMod
                                   $(INSTALL_DATA) ] ;
     }
   }
-  InstallPythMod $(target) : bindings python ;
 
   Always $(<)clean ;
   NotFile $(<)clean ;

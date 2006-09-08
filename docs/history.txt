@@ -16,6 +16,8 @@ chronological order.
 	- res put the FBO stencil support into preprocessor conditionals (and
 	  also noted the current state of stencil attachment support).
 	- res fixed a couple of gcc 4.1 optimize warnings.
+	- res fixed _cspace.so.dbg being tried to be split off before 
+	  _cspace.so is built when installing. Fixes trac #11.
 6-Sep-2006
 	- Jorrit fixed a bug in csGraphics2DOpenGL::SetMouseCursor().
 	  It would assert (in debug mode) or crash (in release mode) in
