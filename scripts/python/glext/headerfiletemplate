@@ -135,9 +135,6 @@ typedef unsigned int GLhandleARB;
 #ifndef CS_HAVE_GLCHAR_T
 typedef GLcharARB GLchar;
 #endif
-#ifndef CS_HAVE_GLHANDLE_T
-typedef GLhandleARB GLhandle;
-#endif
 
 #include "iutil/cmdline.h"
 #include "iutil/objreg.h"
