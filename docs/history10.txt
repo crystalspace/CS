@@ -6,6 +6,8 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+08-Sep-2006
+        - res merged trunk r25300:25305 into 1.0.
 06-Sep-2006
 	- Marten merged revisions 25269 - 25293 into V1.0 branch.
 05-Sep-2006
