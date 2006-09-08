@@ -25,6 +25,14 @@
 #include "gl_txtmgr.h"
 #include "gl_r2t_ext_fb_o.h"
 
+/* Stencil attachment status:
+ * ATI Catalyst 6.8 (2006-09-08): reports "incomplete - dimensions"
+ * NV: supposedly does not support separate stencil attachment, but packed
+ *  depth/stencil attachments (EXT_packed_depth_stencil or so)
+ *  (ATI doesn't, hence you can't use stencil buffers+FBO there...)
+ */
+//#define FBO_WITH_STENCIL
+
 csGLRender2TextureEXTfbo::~csGLRender2TextureEXTfbo()
 {
   FreeBuffers();
@@ -119,21 +127,28 @@ void csGLRender2TextureEXTfbo::SetRenderTarget (iTextureHandle* handle,
 
           G3D->ext->glGenFramebuffersEXT (1, &framebuffer);
           G3D->ext->glBindFramebufferEXT (GL_FRAMEBUFFER_EXT, framebuffer);
+
           G3D->ext->glGenRenderbuffersEXT (1, &depthRB);
-          G3D->ext->glGenRenderbuffersEXT (1, &stencilRB);
-
           G3D->ext->glBindRenderbufferEXT (GL_RENDERBUFFER_EXT, depthRB);
-	  // FIXME: Storage shouldn't really be hardcoded
+	  /* FIXME: Generic format sufficient? Or better pick some sized 
+           *  format based on the current depth buffer depth or so? 
+           *  Might also need a loop or so to test different formats until
+           *  the framebuffer validates. */
           G3D->ext->glRenderbufferStorageEXT (GL_RENDERBUFFER_EXT, 
-            GL_DEPTH_COMPONENT24_ARB, txt_w, txt_h);
+            GL_DEPTH_COMPONENT, txt_w, txt_h);
 
-	  // FIXME: Stencil support
-	  // FIXME: Storage shouldn't really be hardcoded
-          /*G3D->ext->glBindRenderbufferEXT (GL_RENDERBUFFER_EXT, stencilRB);
+#ifdef FBO_WITH_STENCIL
+          G3D->ext->glGenRenderbuffersEXT (1, &stencilRB);
+          G3D->ext->glBindRenderbufferEXT (GL_RENDERBUFFER_EXT, stencilRB);
+	  /* FIXME: Generic format sufficient? Or better pick some sized 
+           * format based on the current stencil buffer depth or so?
+           *  Might also need a loop or so to test different formats until
+           *  the framebuffer validates. */
           G3D->ext->glRenderbufferStorageEXT (GL_RENDERBUFFER_EXT, 
-          GL_STENCIL_INDEX8_EXT, txt_w, txt_h);*/
+            GL_STENCIL_INDEX_EXT, txt_w, txt_h);
+#endif
 
-          //G3D->ext->glBindRenderbufferEXT (GL_RENDERBUFFER_EXT, 0);
+          G3D->ext->glBindRenderbufferEXT (GL_RENDERBUFFER_EXT, 0);
           fb_w = txt_w; fb_h = txt_h;
         }
         //glReadBuffer (GL_NONE);
@@ -146,11 +161,12 @@ void csGLRender2TextureEXTfbo::SetRenderTarget (iTextureHandle* handle,
 
         // initialize depth renderbuffer
 	// FIXME: is that binding really needed?
-        G3D->ext->glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, depthRB);
         G3D->ext->glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, 
           GL_DEPTH_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, depthRB);
-        //G3D->ext->glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, 
-        //GL_STENCIL_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, stencilRB);
+#ifdef FBO_WITH_STENCIL
+        G3D->ext->glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, 
+          GL_STENCIL_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, stencilRB);
+#endif
 
         GLenum fbStatus = G3D->ext->glCheckFramebufferStatusEXT (
           GL_FRAMEBUFFER_EXT);

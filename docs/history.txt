@@ -13,6 +13,8 @@ chronological order.
 	  to the extension manager.
 	- res fixed the glshader_fixed plugin to depend on GL 1.4 for texture
 	  crossbar support and not 1.3.
+	- res put the FBO stencil support into preprocessor conditionals (and
+	  also noted the current state of stencil attachment support).
 6-Sep-2006
 	- Jorrit fixed a bug in csGraphics2DOpenGL::SetMouseCursor().
 	  It would assert (in debug mode) or crash (in release mode) in
