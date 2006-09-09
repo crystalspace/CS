@@ -8967,6 +8967,7 @@ sub DESTROY {
     }
 }
 
+*scfGetVersion = *cspacec::iParticleEmitter_scfGetVersion;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -9000,6 +9001,7 @@ sub DESTROY {
     }
 }
 
+*scfGetVersion = *cspacec::iParticleEffector_scfGetVersion;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -9057,6 +9059,7 @@ sub DESTROY {
     }
 }
 
+*scfGetVersion = *cspacec::iParticleSystemBase_scfGetVersion;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -9090,6 +9093,7 @@ sub DESTROY {
     }
 }
 
+*scfGetVersion = *cspacec::iParticleSystemFactory_scfGetVersion;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -9125,6 +9129,7 @@ sub DESTROY {
     }
 }
 
+*scfGetVersion = *cspacec::iParticleSystem_scfGetVersion;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -9164,6 +9169,7 @@ sub DESTROY {
     }
 }
 
+*scfGetVersion = *cspacec::iParticleBuiltinEmitterBase_scfGetVersion;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -9197,6 +9203,7 @@ sub DESTROY {
     }
 }
 
+*scfGetVersion = *cspacec::iParticleBuiltinEmitterSphere_scfGetVersion;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -9232,6 +9239,7 @@ sub DESTROY {
     }
 }
 
+*scfGetVersion = *cspacec::iParticleBuiltinEmitterCone_scfGetVersion;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -9265,6 +9273,7 @@ sub DESTROY {
     }
 }
 
+*scfGetVersion = *cspacec::iParticleBuiltinEmitterBox_scfGetVersion;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -9300,6 +9309,7 @@ sub DESTROY {
     }
 }
 
+*scfGetVersion = *cspacec::iParticleBuiltinEmitterCylinder_scfGetVersion;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -9335,6 +9345,7 @@ sub DESTROY {
     }
 }
 
+*scfGetVersion = *cspacec::iParticleBuiltinEmitterFactory_scfGetVersion;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -9372,6 +9383,7 @@ sub DESTROY {
     }
 }
 
+*scfGetVersion = *cspacec::iParticleBuiltinEffectorForce_scfGetVersion;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -9407,6 +9419,7 @@ sub DESTROY {
     }
 }
 
+*scfGetVersion = *cspacec::iParticleBuiltinEffectorLinColor_scfGetVersion;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -9440,6 +9453,7 @@ sub DESTROY {
     }
 }
 
+*scfGetVersion = *cspacec::iParticleBuiltinEffectorFactory_scfGetVersion;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);

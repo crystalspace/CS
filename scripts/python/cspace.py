@@ -6362,7 +6362,11 @@ class iParticleEmitter(iBase):
     def EmitParticles(*args): return _cspace.iParticleEmitter_EmitParticles(*args)
     __swig_destroy__ = _cspace.delete_iParticleEmitter
     __del__ = lambda self : None;
+    __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iParticleEmitter_scfGetVersion
+    if _newclass:scfGetVersion = staticmethod(_cspace.iParticleEmitter_scfGetVersion)
 _cspace.iParticleEmitter_swigregister(iParticleEmitter)
+
+iParticleEmitter_scfGetVersion = _cspace.iParticleEmitter_scfGetVersion
 
 class iParticleEffector(iBase):
     __swig_setmethods__ = {}
@@ -6380,7 +6384,11 @@ class iParticleEffector(iBase):
     def EffectParticles(*args): return _cspace.iParticleEffector_EffectParticles(*args)
     __swig_destroy__ = _cspace.delete_iParticleEffector
     __del__ = lambda self : None;
+    __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iParticleEffector_scfGetVersion
+    if _newclass:scfGetVersion = staticmethod(_cspace.iParticleEffector_scfGetVersion)
 _cspace.iParticleEffector_swigregister(iParticleEffector)
+
+iParticleEffector_scfGetVersion = _cspace.iParticleEffector_scfGetVersion
 
 class iParticleSystemBase(iBase):
     __swig_setmethods__ = {}
@@ -6422,7 +6430,11 @@ class iParticleSystemBase(iBase):
     def GetEffectorCount(*args): return _cspace.iParticleSystemBase_GetEffectorCount(*args)
     __swig_destroy__ = _cspace.delete_iParticleSystemBase
     __del__ = lambda self : None;
+    __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iParticleSystemBase_scfGetVersion
+    if _newclass:scfGetVersion = staticmethod(_cspace.iParticleSystemBase_scfGetVersion)
 _cspace.iParticleSystemBase_swigregister(iParticleSystemBase)
+
+iParticleSystemBase_scfGetVersion = _cspace.iParticleSystemBase_scfGetVersion
 
 class iParticleSystemFactory(iParticleSystemBase):
     __swig_setmethods__ = {}
@@ -6440,7 +6452,11 @@ class iParticleSystemFactory(iParticleSystemBase):
     def GetDeepCreation(*args): return _cspace.iParticleSystemFactory_GetDeepCreation(*args)
     __swig_destroy__ = _cspace.delete_iParticleSystemFactory
     __del__ = lambda self : None;
+    __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iParticleSystemFactory_scfGetVersion
+    if _newclass:scfGetVersion = staticmethod(_cspace.iParticleSystemFactory_scfGetVersion)
 _cspace.iParticleSystemFactory_swigregister(iParticleSystemFactory)
+
+iParticleSystemFactory_scfGetVersion = _cspace.iParticleSystemFactory_scfGetVersion
 
 class iParticleSystem(iParticleSystemBase):
     __swig_setmethods__ = {}
@@ -6460,7 +6476,11 @@ class iParticleSystem(iParticleSystemBase):
     def LockForExternalControl(*args): return _cspace.iParticleSystem_LockForExternalControl(*args)
     __swig_destroy__ = _cspace.delete_iParticleSystem
     __del__ = lambda self : None;
+    __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iParticleSystem_scfGetVersion
+    if _newclass:scfGetVersion = staticmethod(_cspace.iParticleSystem_scfGetVersion)
 _cspace.iParticleSystem_swigregister(iParticleSystem)
+
+iParticleSystem_scfGetVersion = _cspace.iParticleSystem_scfGetVersion
 
 CS_PARTICLE_BUILTIN_CENTER = _cspace.CS_PARTICLE_BUILTIN_CENTER
 CS_PARTICLE_BUILTIN_VOLUME = _cspace.CS_PARTICLE_BUILTIN_VOLUME
@@ -6487,7 +6507,11 @@ class iParticleBuiltinEmitterBase(iParticleEmitter):
     def GetInitialVelocity(*args): return _cspace.iParticleBuiltinEmitterBase_GetInitialVelocity(*args)
     __swig_destroy__ = _cspace.delete_iParticleBuiltinEmitterBase
     __del__ = lambda self : None;
+    __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iParticleBuiltinEmitterBase_scfGetVersion
+    if _newclass:scfGetVersion = staticmethod(_cspace.iParticleBuiltinEmitterBase_scfGetVersion)
 _cspace.iParticleBuiltinEmitterBase_swigregister(iParticleBuiltinEmitterBase)
+
+iParticleBuiltinEmitterBase_scfGetVersion = _cspace.iParticleBuiltinEmitterBase_scfGetVersion
 
 class iParticleBuiltinEmitterSphere(iParticleBuiltinEmitterBase):
     __swig_setmethods__ = {}
@@ -6505,7 +6529,11 @@ class iParticleBuiltinEmitterSphere(iParticleBuiltinEmitterBase):
     def GetRadius(*args): return _cspace.iParticleBuiltinEmitterSphere_GetRadius(*args)
     __swig_destroy__ = _cspace.delete_iParticleBuiltinEmitterSphere
     __del__ = lambda self : None;
+    __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iParticleBuiltinEmitterSphere_scfGetVersion
+    if _newclass:scfGetVersion = staticmethod(_cspace.iParticleBuiltinEmitterSphere_scfGetVersion)
 _cspace.iParticleBuiltinEmitterSphere_swigregister(iParticleBuiltinEmitterSphere)
+
+iParticleBuiltinEmitterSphere_scfGetVersion = _cspace.iParticleBuiltinEmitterSphere_scfGetVersion
 
 class iParticleBuiltinEmitterCone(iParticleBuiltinEmitterBase):
     __swig_setmethods__ = {}
@@ -6525,7 +6553,11 @@ class iParticleBuiltinEmitterCone(iParticleBuiltinEmitterBase):
     def GetConeAngle(*args): return _cspace.iParticleBuiltinEmitterCone_GetConeAngle(*args)
     __swig_destroy__ = _cspace.delete_iParticleBuiltinEmitterCone
     __del__ = lambda self : None;
+    __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iParticleBuiltinEmitterCone_scfGetVersion
+    if _newclass:scfGetVersion = staticmethod(_cspace.iParticleBuiltinEmitterCone_scfGetVersion)
 _cspace.iParticleBuiltinEmitterCone_swigregister(iParticleBuiltinEmitterCone)
+
+iParticleBuiltinEmitterCone_scfGetVersion = _cspace.iParticleBuiltinEmitterCone_scfGetVersion
 
 class iParticleBuiltinEmitterBox(iParticleBuiltinEmitterBase):
     __swig_setmethods__ = {}
@@ -6543,7 +6575,11 @@ class iParticleBuiltinEmitterBox(iParticleBuiltinEmitterBase):
     def GetBox(*args): return _cspace.iParticleBuiltinEmitterBox_GetBox(*args)
     __swig_destroy__ = _cspace.delete_iParticleBuiltinEmitterBox
     __del__ = lambda self : None;
+    __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iParticleBuiltinEmitterBox_scfGetVersion
+    if _newclass:scfGetVersion = staticmethod(_cspace.iParticleBuiltinEmitterBox_scfGetVersion)
 _cspace.iParticleBuiltinEmitterBox_swigregister(iParticleBuiltinEmitterBox)
+
+iParticleBuiltinEmitterBox_scfGetVersion = _cspace.iParticleBuiltinEmitterBox_scfGetVersion
 
 class iParticleBuiltinEmitterCylinder(iParticleBuiltinEmitterBase):
     __swig_setmethods__ = {}
@@ -6563,7 +6599,11 @@ class iParticleBuiltinEmitterCylinder(iParticleBuiltinEmitterBase):
     def GetExtent(*args): return _cspace.iParticleBuiltinEmitterCylinder_GetExtent(*args)
     __swig_destroy__ = _cspace.delete_iParticleBuiltinEmitterCylinder
     __del__ = lambda self : None;
+    __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iParticleBuiltinEmitterCylinder_scfGetVersion
+    if _newclass:scfGetVersion = staticmethod(_cspace.iParticleBuiltinEmitterCylinder_scfGetVersion)
 _cspace.iParticleBuiltinEmitterCylinder_swigregister(iParticleBuiltinEmitterCylinder)
+
+iParticleBuiltinEmitterCylinder_scfGetVersion = _cspace.iParticleBuiltinEmitterCylinder_scfGetVersion
 
 class iParticleBuiltinEmitterFactory(iBase):
     __swig_setmethods__ = {}
@@ -6583,7 +6623,11 @@ class iParticleBuiltinEmitterFactory(iBase):
     def CreateCylinder(*args): return _cspace.iParticleBuiltinEmitterFactory_CreateCylinder(*args)
     __swig_destroy__ = _cspace.delete_iParticleBuiltinEmitterFactory
     __del__ = lambda self : None;
+    __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iParticleBuiltinEmitterFactory_scfGetVersion
+    if _newclass:scfGetVersion = staticmethod(_cspace.iParticleBuiltinEmitterFactory_scfGetVersion)
 _cspace.iParticleBuiltinEmitterFactory_swigregister(iParticleBuiltinEmitterFactory)
+
+iParticleBuiltinEmitterFactory_scfGetVersion = _cspace.iParticleBuiltinEmitterFactory_scfGetVersion
 
 class iParticleBuiltinEffectorForce(iParticleEffector):
     __swig_setmethods__ = {}
@@ -6605,7 +6649,11 @@ class iParticleBuiltinEffectorForce(iParticleEffector):
     def GetRandomAcceleration(*args): return _cspace.iParticleBuiltinEffectorForce_GetRandomAcceleration(*args)
     __swig_destroy__ = _cspace.delete_iParticleBuiltinEffectorForce
     __del__ = lambda self : None;
+    __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iParticleBuiltinEffectorForce_scfGetVersion
+    if _newclass:scfGetVersion = staticmethod(_cspace.iParticleBuiltinEffectorForce_scfGetVersion)
 _cspace.iParticleBuiltinEffectorForce_swigregister(iParticleBuiltinEffectorForce)
+
+iParticleBuiltinEffectorForce_scfGetVersion = _cspace.iParticleBuiltinEffectorForce_scfGetVersion
 
 class iParticleBuiltinEffectorLinColor(iParticleEffector):
     __swig_setmethods__ = {}
@@ -6625,7 +6673,11 @@ class iParticleBuiltinEffectorLinColor(iParticleEffector):
     def GetColorCount(*args): return _cspace.iParticleBuiltinEffectorLinColor_GetColorCount(*args)
     __swig_destroy__ = _cspace.delete_iParticleBuiltinEffectorLinColor
     __del__ = lambda self : None;
+    __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iParticleBuiltinEffectorLinColor_scfGetVersion
+    if _newclass:scfGetVersion = staticmethod(_cspace.iParticleBuiltinEffectorLinColor_scfGetVersion)
 _cspace.iParticleBuiltinEffectorLinColor_swigregister(iParticleBuiltinEffectorLinColor)
+
+iParticleBuiltinEffectorLinColor_scfGetVersion = _cspace.iParticleBuiltinEffectorLinColor_scfGetVersion
 
 class iParticleBuiltinEffectorFactory(iBase):
     __swig_setmethods__ = {}
@@ -6643,7 +6695,11 @@ class iParticleBuiltinEffectorFactory(iBase):
     def CreateLinColor(*args): return _cspace.iParticleBuiltinEffectorFactory_CreateLinColor(*args)
     __swig_destroy__ = _cspace.delete_iParticleBuiltinEffectorFactory
     __del__ = lambda self : None;
+    __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iParticleBuiltinEffectorFactory_scfGetVersion
+    if _newclass:scfGetVersion = staticmethod(_cspace.iParticleBuiltinEffectorFactory_scfGetVersion)
 _cspace.iParticleBuiltinEffectorFactory_swigregister(iParticleBuiltinEffectorFactory)
+
+iParticleBuiltinEffectorFactory_scfGetVersion = _cspace.iParticleBuiltinEffectorFactory_scfGetVersion
 
 class iLoaderStatus(iBase):
     __swig_setmethods__ = {}
