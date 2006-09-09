@@ -106,10 +106,9 @@ Velocity to position integration mode. Valid values are
 @item <commondirection x="" y="" z="" />
 Set common direction. Common direction is used as a reference direction for
 billboard setup for a few particle billboard orientations.
-@item <localmode>yes/no</localmode>
-Set if particle system should be in local or global mode. In local mode the
-positions of emitters and particles are relative to the particles mesh, while
-in global mode they are world space.
+@item <transformmode>tmode</transformmode>
+Set the transform mode of the particle system and thereby the coordinate systems
+used. Valid values are @samp{local}, @samp{localemitter}, @samp{world}.
 @item <individualsize>yes/no</individualsize>
 Determin if particle rendering should use the individual size associated with 
 each particle, or if the global <particlesize> property should be used.

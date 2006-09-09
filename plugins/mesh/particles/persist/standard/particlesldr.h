@@ -118,6 +118,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(ParticlesLoader)
     bool WriteIntegration (iDocumentNode* paramsNode, 
       csParticleIntegrationMode integ);
 
+    bool WriteTransform (iDocumentNode* paramsNode,
+      csParticleTransformMode mode);
+
     bool WriteEmitter (iDocumentNode* paramsNode,
       iParticleEmitter* emitter);
 
