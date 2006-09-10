@@ -5,13 +5,12 @@ if $(CEGUI.AVAILABLE) = "yes"
   Description viewmesh : "mesh viewing utility" ;
   Application viewmesh : [ Wildcard *.cpp *.h ] ;
   LinkWith viewmesh : crystalspace ;
-  CFlags viewmesh : $(COMPILER.C++FLAGS.STRICTALIASING.DISABLE) ;
   CFlags viewmesh : $(COMPILER.C++FLAGS.EXCEPTIONS.ENABLE) ;
   MsvcCFlags viewmesh : "/D CS_HAVE_CAL3D" ;
   ExternalLibs viewmesh : CEGUI ;
   if $(CAL3D.AVAILABLE) = yes
   {
     CFlags viewmesh : [ FDefines CS_HAVE_CAL3D ] ;
-    ExternalLibs viewmesh : CEGUI CAL3D ;
+    ExternalLibs viewmesh : CAL3D ;
   }
 }
