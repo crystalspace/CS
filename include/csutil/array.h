@@ -1151,7 +1151,7 @@ public:
     { currentelem = r.currentelem; array = r.array; return *this; }
 
     /** Returns true if the next Next() call will return an element */
-    bool HasNext()
+    bool HasNext() const
     { return currentelem < array.Length(); }
 
     /** Returns the next element in the array. */
@@ -1185,7 +1185,7 @@ public:
     { currentelem = r.currentelem; array = r.array; return *this; }
 
     /** Returns true if the next Next() call will return an element */
-    bool HasNext()
+    bool HasNext() const
     { return currentelem < array.Length(); }
 
     /** Returns the next element in the array. */

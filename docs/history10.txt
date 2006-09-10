@@ -6,6 +6,8 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+10-Sep-2006
+        - res merged trunk r25315 into 1.0.
 08-Sep-2006
         - res merged trunk r25300:25305 into 1.0.
         - res merged trunk r25308:25311 into 1.0.

@@ -17,6 +17,9 @@ chronological order.
 	- res fixed _cspace.so.dbg being tried to be split off before 
 	  _cspace.so is built when installing. Fixes trac #11.
 	- res added debug info splitting for the CS JNI library.
+	- David Bronke fixed some warnings about unused variables and member
+	  initialization order, and added const keyword to
+	  csArray::Iterator::HasNext() and csArray::ConstIterator::HasNext().
 6-Sep-2006
 	- Jorrit fixed a bug in csGraphics2DOpenGL::SetMouseCursor().
 	  It would assert (in debug mode) or crash (in release mode) in
@@ -38,7 +41,7 @@ chronological order.
 	- Marten made partconv not crash.
 	- Marten converted nullmesh to new SCF syntax.
 5-Sep-2006
-        - res fixed the Java bindings to build again.
+	- res fixed the Java bindings to build again.
 4-Sep-2006
         - res changed the configure program version check to support checking
           the same program with different version numbers.
