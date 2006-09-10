@@ -6243,6 +6243,9 @@ CS_PARTICLE_ROTATE_VERTICES = _cspace.CS_PARTICLE_ROTATE_VERTICES
 CS_PARTICLE_INTEGRATE_NONE = _cspace.CS_PARTICLE_INTEGRATE_NONE
 CS_PARTICLE_INTEGRATE_LINEAR = _cspace.CS_PARTICLE_INTEGRATE_LINEAR
 CS_PARTICLE_INTEGRATE_BOTH = _cspace.CS_PARTICLE_INTEGRATE_BOTH
+CS_PARTICLE_LOCAL_MODE = _cspace.CS_PARTICLE_LOCAL_MODE
+CS_PARTICLE_LOCAL_EMITTER = _cspace.CS_PARTICLE_LOCAL_EMITTER
+CS_PARTICLE_WORLD_MODE = _cspace.CS_PARTICLE_WORLD_MODE
 class csParticle(_object):
     __swig_setmethods__ = {}
     __setattr__ = lambda self, name, value: _swig_setattr(self, csParticle, name, value)
@@ -6412,8 +6415,8 @@ class iParticleSystemBase(iBase):
     def GetIntegrationMode(*args): return _cspace.iParticleSystemBase_GetIntegrationMode(*args)
     def SetCommonDirection(*args): return _cspace.iParticleSystemBase_SetCommonDirection(*args)
     def GetCommonDirection(*args): return _cspace.iParticleSystemBase_GetCommonDirection(*args)
-    def SetLocalMode(*args): return _cspace.iParticleSystemBase_SetLocalMode(*args)
-    def GetLocalMode(*args): return _cspace.iParticleSystemBase_GetLocalMode(*args)
+    def SetTransformMode(*args): return _cspace.iParticleSystemBase_SetTransformMode(*args)
+    def GetTransformMode(*args): return _cspace.iParticleSystemBase_GetTransformMode(*args)
     def SetUseIndividualSize(*args): return _cspace.iParticleSystemBase_SetUseIndividualSize(*args)
     def GetUseIndividualSize(*args): return _cspace.iParticleSystemBase_GetUseIndividualSize(*args)
     def SetParticleSize(*args): return _cspace.iParticleSystemBase_SetParticleSize(*args)

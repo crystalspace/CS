@@ -9032,8 +9032,8 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetIntegrationMode = *cspacec::iParticleSystemBase_GetIntegrationMode;
 *SetCommonDirection = *cspacec::iParticleSystemBase_SetCommonDirection;
 *GetCommonDirection = *cspacec::iParticleSystemBase_GetCommonDirection;
-*SetLocalMode = *cspacec::iParticleSystemBase_SetLocalMode;
-*GetLocalMode = *cspacec::iParticleSystemBase_GetLocalMode;
+*SetTransformMode = *cspacec::iParticleSystemBase_SetTransformMode;
+*GetTransformMode = *cspacec::iParticleSystemBase_GetTransformMode;
 *SetUseIndividualSize = *cspacec::iParticleSystemBase_SetUseIndividualSize;
 *GetUseIndividualSize = *cspacec::iParticleSystemBase_GetUseIndividualSize;
 *SetParticleSize = *cspacec::iParticleSystemBase_SetParticleSize;
@@ -16477,6 +16477,9 @@ sub CS_PARTICLE_ROTATE_VERTICES () { $cspacec::CS_PARTICLE_ROTATE_VERTICES }
 sub CS_PARTICLE_INTEGRATE_NONE () { $cspacec::CS_PARTICLE_INTEGRATE_NONE }
 sub CS_PARTICLE_INTEGRATE_LINEAR () { $cspacec::CS_PARTICLE_INTEGRATE_LINEAR }
 sub CS_PARTICLE_INTEGRATE_BOTH () { $cspacec::CS_PARTICLE_INTEGRATE_BOTH }
+sub CS_PARTICLE_LOCAL_MODE () { $cspacec::CS_PARTICLE_LOCAL_MODE }
+sub CS_PARTICLE_LOCAL_EMITTER () { $cspacec::CS_PARTICLE_LOCAL_EMITTER }
+sub CS_PARTICLE_WORLD_MODE () { $cspacec::CS_PARTICLE_WORLD_MODE }
 sub CS_PARTICLE_BUILTIN_CENTER () { $cspacec::CS_PARTICLE_BUILTIN_CENTER }
 sub CS_PARTICLE_BUILTIN_VOLUME () { $cspacec::CS_PARTICLE_BUILTIN_VOLUME }
 sub CS_PARTICLE_BUILTIN_SURFACE () { $cspacec::CS_PARTICLE_BUILTIN_SURFACE }
