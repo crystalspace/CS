@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+11-Sep-2006
+	- Marten fixed (hopefully) the script building (with Swig) on both 
+	  older swigs and for jobber.
 10-Sep-2006
 	- PK changed ViewMesh to use CEGUI instead of AWS.
 	- PK fixed a bug in csHash::Delete (const K& key, const T &value).

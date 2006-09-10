@@ -36,7 +36,7 @@ if $(PYTHON.AVAILABLE) = "yes"
       Swig $(common) $(cspacepy) :
         [ DoSourceGrist cspace.i ] :
         python :
-	-c++ -shadow -cpperraswarn :
+	-c++ -shadow :
 	[ ConcatDirs $(TOP) include ]
 	[ ConcatDirs $(BUILDTOP) include ] :
 	[ ConcatDirs $(TOP) include bindings ] :
