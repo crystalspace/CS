@@ -554,7 +554,7 @@ public:
     {
       const size_t idx = i - 1;
       if ((csComparator<K, K>::Compare (values[idx].key, key) == 0) && 
-	(values[idx].value == value))
+	  (csComparator<T, T>::Compare (values[idx].value, value) == 0 ))
       {
         values.DeleteIndexFast (idx);
         ret = true;
