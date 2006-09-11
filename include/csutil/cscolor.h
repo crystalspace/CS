@@ -232,19 +232,4 @@ inline csColor operator+ (const csColor& s1, const csColor& s2)
 inline csColor operator- (const csColor& s1, const csColor& s2)
 { csColor c (s1); c -= s2; return c; }
 
-/// Multiply a color by a scalar value.
-inline csColor4 operator* (const csColor4& s, float f)
-{ csColor4 c (s); c *= f; return c; }
-
-/// Multiply a scalar value by a color.
-inline csColor4 operator* (float f, const csColor4& s)
-{ csColor4 c (s); c *= f; return c; }
-
-/// Add two colors.
-inline csColor4 operator+ (const csColor4& s1, const csColor4& s2)
-{ csColor4 c (s1); c += s2; return c; }
-/// Subtract two colors.
-inline csColor4 operator- (const csColor4& s1, const csColor4& s2)
-{ csColor4 c (s1); c -= s2; return c; }
-
 #endif // __CS_CSCOLOR_H__

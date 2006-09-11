@@ -13,6 +13,8 @@ chronological order.
 	  initialize start time to -1 which caused particles to fail on
 	  particle systems with very small duration.
 	- Jorrit added some missing operators for csColor4.
+	- Jorrit removed the operators again as they break compilation of CS
+	  in some cases.
 10-Sep-2006
 	- PK changed ViewMesh to use CEGUI instead of AWS.
 	- PK fixed a bug in csHash::Delete (const K& key, const T &value).
