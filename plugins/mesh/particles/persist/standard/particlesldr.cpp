@@ -282,7 +282,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ParticlesLoader)
     float radius = 1.0f, coneAngle = PI/4;
     csVector3 position (0.0f), extent (0.0f), initialVelocity (0.0f);
     bool enabled = true;
-    float startTime = -1.0f, duration = FLT_MAX, emissionRate = 0.0f, 
+    float startTime = 0.0f, duration = FLT_MAX, emissionRate = 0.0f, 
       minTTL = FLT_MAX, maxTTL = FLT_MAX, minMass = 1.0f, maxMass = 1.0f;
     csOBB box;
     csParticleBuiltinEmitterPlacement placement = CS_PARTICLE_BUILTIN_CENTER;
