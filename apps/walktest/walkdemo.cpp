@@ -37,6 +37,7 @@
 #include "imesh/objmodel.h"
 #include "igeom/polymesh.h"
 #include "imap/loader.h"
+#include "imesh/particles.h"
 #include "imesh/explode.h"
 #include "imesh/fire.h"
 #include "imesh/fountain.h"
@@ -276,6 +277,56 @@ void add_particles_explosion (iSector* sector, iEngine* engine,
     return;
   }
 
+#if 0
+  csRef<iMeshFactoryWrapper> mfw = Sys->view->GetEngine ()->
+    CreateMeshFactory ("crystalspace.mesh.object.particles", "explosion");
+  if (!mfw) return;
+
+  csRef<iMeshWrapper> exp (
+  	Sys->view->GetEngine ()->CreateMeshWrapper (mfw, "custom explosion",
+	sector, center));
+
+  exp->SetZBufMode(CS_ZBUF_TEST);
+  exp->SetRenderPriority (engine->GetAlphaRenderPriority ());
+
+  csRef<iParticleSystem> partstate =
+  	scfQueryInterface<iParticleSystem> (exp->GetMeshObject ());
+  exp->GetMeshObject()->SetMaterialWrapper (mat);
+  //partstate->SetMixMode (CS_FX_SETALPHA (0.50));
+  exp->GetMeshObject()->SetColor (csColor (1, 1, 0));
+
+  csRef<iParticleBuiltinEmitterFactory> emit_factory = 
+      csLoadPluginCheck<iParticleBuiltinEmitterFactory> (
+        Sys->object_reg, "crystalspace.mesh.object.particles.emitter", false);
+  csRef<iParticleBuiltinEffectorFactory> eff_factory = 
+      csLoadPluginCheck<iParticleBuiltinEffectorFactory> (
+        Sys->object_reg, "crystalspace.mesh.object.particles.effector", false);
+
+  csRef<iParticleBuiltinEmitterSphere> sphereemit = emit_factory->
+    CreateSphere ();
+  sphereemit->SetRadius (0.1);
+  sphereemit->SetParticlePlacement (CS_PARTICLE_BUILTIN_CENTER);
+  sphereemit->SetPosition (csVector3 (0, 0, 0));
+  sphereemit->SetInitialVelocity (csVector3 (1, 0, 0), csVector3 (3, 3, 3));
+  sphereemit->SetUniformVelocity (false);
+  sphereemit->SetDuration (0.1f);
+  sphereemit->SetEmissionRate (1000.0f);
+  sphereemit->SetInitialTTL (1.0f, 1.0f);
+
+  csRef<iParticleBuiltinEffectorLinColor> lincol = eff_factory->
+    CreateLinColor ();
+  lincol->AddColor (csColor4 (1,1,1,1), 0.5f);
+  lincol->AddColor (csColor4 (1,1,1,0), 0.0f);
+
+  partstate->SetParticleSize (csVector2 (0.15f, 0.15f));
+  partstate->SetRotationMode (CS_PARTICLE_ROTATE_VERTICES);
+  partstate->SetIntegrationMode (CS_PARTICLE_INTEGRATE_BOTH);
+
+  partstate->AddEmitter (sphereemit);
+  partstate->AddEffector (lincol);
+  Sys->Engine->DelayedRemoveObject (1100, exp);
+  Sys->Engine->DelayedRemoveObject (1101, mfw);
+#else
   csRef<iMeshFactoryWrapper> mfw (Sys->view->GetEngine ()->
     CreateMeshFactory ("crystalspace.mesh.object.explosion", "explosion"));
   if (!mfw) return;
@@ -308,6 +359,7 @@ void add_particles_explosion (iSector* sector, iEngine* engine,
   expstate->SetSpreadSpeed (2.0f);
   expstate->SetSpreadAcceleration (2.0f);
   expstate->SetFadeSprites (500);
+#endif
 
   exp->PlaceMesh ();
 }

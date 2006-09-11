@@ -21,6 +21,9 @@ chronological order.
 	  be removed through the normal iEngine->RemoveObject()) and a delay.
 	  This new system is more general then the old iEngine->WantToDie()
 	  method that is called by some particle systems.
+	- Jorrit added a commented out version of the explosion in walktest
+	  using the new particle system. Doesn't yet work 100% (fading is
+	  broken).
 10-Sep-2006
 	- PK changed ViewMesh to use CEGUI instead of AWS.
 	- PK fixed a bug in csHash::Delete (const K& key, const T &value).
