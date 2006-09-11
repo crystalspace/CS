@@ -12,6 +12,7 @@ chronological order.
 	- Jorrit fixed a bug in particles and particlesldr. It would
 	  initialize start time to -1 which caused particles to fail on
 	  particle systems with very small duration.
+	- Jorrit added some missing operators for csColor4.
 10-Sep-2006
 	- PK changed ViewMesh to use CEGUI instead of AWS.
 	- PK fixed a bug in csHash::Delete (const K& key, const T &value).
