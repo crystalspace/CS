@@ -277,7 +277,7 @@ void add_particles_explosion (iSector* sector, iEngine* engine,
     return;
   }
 
-#if 0
+#if 1
   csRef<iMeshFactoryWrapper> mfw = Sys->view->GetEngine ()->
     CreateMeshFactory ("crystalspace.mesh.object.particles", "explosion");
   if (!mfw) return;
@@ -287,11 +287,14 @@ void add_particles_explosion (iSector* sector, iEngine* engine,
 	sector, center));
 
   exp->SetZBufMode(CS_ZBUF_TEST);
+  exp->GetMeshObject ()->SetMixMode (CS_FX_ALPHA);
+  
   exp->SetRenderPriority (engine->GetAlphaRenderPriority ());
 
   csRef<iParticleSystem> partstate =
   	scfQueryInterface<iParticleSystem> (exp->GetMeshObject ());
   exp->GetMeshObject()->SetMaterialWrapper (mat);
+  
   //partstate->SetMixMode (CS_FX_SETALPHA (0.50));
   exp->GetMeshObject()->SetColor (csColor (1, 1, 0));
 

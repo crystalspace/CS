@@ -117,6 +117,22 @@ inline csColor operator* (const csColor& v1, const csColor& v2)
 		  v1.blue * v2.blue);
 }
 
+
+/// Multiply a color by a scalar value.
+inline csColor operator* (const csColor& s, float f)
+{ csColor c (s); c *= f; return c; }
+
+/// Multiply a scalar value by a color.
+inline csColor operator* (float f, const csColor& s)
+{ csColor c (s); c *= f; return c; }
+
+/// Add two colors.
+inline csColor operator+ (const csColor& s1, const csColor& s2)
+{ csColor c (s1); c += s2; return c; }
+/// Subtract two colors.
+inline csColor operator- (const csColor& s1, const csColor& s2)
+{ csColor c (s1); c -= s2; return c; }
+
 /**
  * A class used to represent a color in RGBA space.
  */
@@ -217,19 +233,32 @@ public:
   }
 };
 
+
+/// Divide a color by a scalar.
+inline csColor4 operator/ (const csColor4& v, float f)
+{ f = 1.0f/f; return csColor4(v.red*f, v.green*f, v.blue*f); }
+/// Multiply two colors.
+inline csColor4 operator* (const csColor4& v1, const csColor4& v2)
+{
+  return csColor4 (v1.red * v2.red,
+    v1.green * v2.green,
+    v1.blue * v2.blue);
+}
+
+
 /// Multiply a color by a scalar value.
-inline csColor operator* (const csColor& s, float f)
-{ csColor c (s); c *= f; return c; }
+inline csColor4 operator* (const csColor4& s, float f)
+{ csColor4 c (s); c *= f; return c; }
 
 /// Multiply a scalar value by a color.
-inline csColor operator* (float f, const csColor& s)
-{ csColor c (s); c *= f; return c; }
+inline csColor4 operator* (float f, const csColor4& s)
+{ csColor4 c (s); c *= f; return c; }
 
 /// Add two colors.
-inline csColor operator+ (const csColor& s1, const csColor& s2)
-{ csColor c (s1); c += s2; return c; }
+inline csColor4 operator+ (const csColor4& s1, const csColor4& s2)
+{ csColor4 c (s1); c += s2; return c; }
 /// Subtract two colors.
-inline csColor operator- (const csColor& s1, const csColor& s2)
-{ csColor c (s1); c -= s2; return c; }
+inline csColor4 operator- (const csColor4& s1, const csColor4& s2)
+{ csColor4 c (s1); c -= s2; return c; }
 
 #endif // __CS_CSCOLOR_H__

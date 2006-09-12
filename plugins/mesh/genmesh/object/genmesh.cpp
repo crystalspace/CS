@@ -886,7 +886,7 @@ void csGenmeshMeshObject::UpdateLighting (
     lighting_dirty = false;
     mesh_colors_dirty_flag = true;
 
-    csColor col;
+    csColor4 col;
     if (factory->engine)
     {
       factory->engine->GetAmbientLight (col);

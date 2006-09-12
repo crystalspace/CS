@@ -9,6 +9,7 @@ chronological order.
 12-Sep-2006
 	- Jorrit fixed a bug with iSector->HitBeamPortals(). It was
 	  broken and failed to detect the correct destination sector.
+	- Marten fixed csColor4 for operators + - * and /.
 11-Sep-2006
 	- Marten fixed (hopefully) the script building (with Swig) on both 
 	  older swigs and for jobber.

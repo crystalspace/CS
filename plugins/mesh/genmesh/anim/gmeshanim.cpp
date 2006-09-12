@@ -278,7 +278,7 @@ bool csAnimControlRunnable::Do (csTicks current, bool& stop)
 	  ac_color_execution m;
 	  m.final = current + inst.color.duration;
 	  m.group = groups[inst.color.group_id];
-	  csColor4 current_col = m.group->GetColor ();
+	  csColor current_col = m.group->GetColor ();
 	  m.final_color.Set (inst.color.red, inst.color.green,
 	  	inst.color.blue);
 	  if (inst.color.duration == 0)
