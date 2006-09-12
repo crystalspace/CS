@@ -10,6 +10,7 @@ chronological order.
 	- Jorrit fixed a bug with iSector->HitBeamPortals(). It was
 	  broken and failed to detect the correct destination sector.
 	- Marten fixed csColor4 for operators + - * and /.
+	- Jorrit changed walktest to use new particles for explosion.
 11-Sep-2006
 	- Marten fixed (hopefully) the script building (with Swig) on both 
 	  older swigs and for jobber.

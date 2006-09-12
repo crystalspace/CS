@@ -294,8 +294,7 @@ void add_particles_explosion (iSector* sector, iEngine* engine,
   csRef<iParticleSystem> partstate =
   	scfQueryInterface<iParticleSystem> (exp->GetMeshObject ());
   exp->GetMeshObject()->SetMaterialWrapper (mat);
-  
-  //partstate->SetMixMode (CS_FX_SETALPHA (0.50));
+  exp->GetMeshObject()->SetMixMode (CS_FX_ALPHA);
   exp->GetMeshObject()->SetColor (csColor (1, 1, 0));
 
   csRef<iParticleBuiltinEmitterFactory> emit_factory = 
@@ -318,7 +317,7 @@ void add_particles_explosion (iSector* sector, iEngine* engine,
 
   csRef<iParticleBuiltinEffectorLinColor> lincol = eff_factory->
     CreateLinColor ();
-  lincol->AddColor (csColor4 (1,1,1,1), 0.5f);
+  lincol->AddColor (csColor4 (1,1,1,1), 1.0f);
   lincol->AddColor (csColor4 (1,1,1,0), 0.0f);
 
   partstate->SetParticleSize (csVector2 (0.15f, 0.15f));
