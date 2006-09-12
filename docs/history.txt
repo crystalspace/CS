@@ -11,6 +11,7 @@ chronological order.
 	  broken and failed to detect the correct destination sector.
 	- Marten fixed csColor4 for operators + - * and /.
 	- Jorrit changed walktest to use new particles for explosion.
+	- PK extended the ice-skin for tabbuttons.
 11-Sep-2006
 	- Marten fixed (hopefully) the script building (with Swig) on both 
 	  older swigs and for jobber.
