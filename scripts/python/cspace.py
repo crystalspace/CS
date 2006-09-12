@@ -4101,6 +4101,8 @@ class iEngine(iBase):
     def GetCollections(*args): return _cspace.iEngine_GetCollections(*args)
     def FindCollection(*args): return _cspace.iEngine_FindCollection(*args)
     def RemoveObject(*args): return _cspace.iEngine_RemoveObject(*args)
+    def DelayedRemoveObject(*args): return _cspace.iEngine_DelayedRemoveObject(*args)
+    def RemoveDelayedRemoves(*args): return _cspace.iEngine_RemoveDelayedRemoves(*args)
     def DeleteAll(*args): return _cspace.iEngine_DeleteAll(*args)
     def ResetWorldSpecificSettings(*args): return _cspace.iEngine_ResetWorldSpecificSettings(*args)
     __swig_destroy__ = _cspace.delete_iEngine
