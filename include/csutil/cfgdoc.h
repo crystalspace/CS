@@ -36,7 +36,7 @@ class csConfigDocumentIterator;
  * iConfigFile implementation for configurations stored in documents.
  * \todo Write support
  */
-class CS_CRYSTALSPACE_EXPORT csConfigDocument : 
+class CS_CRYSTALSPACE_EXPORT csConfigDocument :
   public scfImplementation1<csConfigDocument,iConfigFile>
 {
   friend class csConfigDocumentIterator;
@@ -71,16 +71,16 @@ class CS_CRYSTALSPACE_EXPORT csConfigDocument :
 
   void ParseDocument (iDocument* doc, bool Merge = false,
     bool NewWins = true);
-  void ParseNode (const char* parent, iDocumentNode* node, 
+  void ParseNode (const char* parent, iDocumentNode* node,
     bool NewWins = true);
 public:
-  
+
   csConfigDocument ();
   csConfigDocument (const char *Filename, iVFS* = 0);
   csConfigDocument (iDocument* doc);
   csConfigDocument (iDocumentNode* node);
   virtual ~csConfigDocument();
-  
+
   virtual const char* GetFileName () const;
 
   virtual iVFS* GetVFS () const;
@@ -106,12 +106,14 @@ public:
   virtual float GetFloat (const char *Key, float Def = 0.0) const;
   virtual const char *GetStr (const char *Key, const char *Def = "") const;
   virtual bool GetBool (const char *Key, bool Def = false) const;
+  virtual csPtr<iStringArray> GetTuple(const char *Key) const;
   virtual const char *GetComment (const char *Key) const;
 
   virtual void SetStr (const char *Key, const char *Val);
   virtual void SetInt (const char *Key, int Value);
   virtual void SetFloat (const char *Key, float Value);
   virtual void SetBool (const char *Key, bool Value);
+  virtual void SetTuple (const char *Key, csRef<iStringArray> Value);
   virtual bool SetComment (const char *Key, const char *Text);
   virtual void DeleteKey (const char *Key);
   virtual const char *GetEOFComment () const;

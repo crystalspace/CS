@@ -119,6 +119,8 @@ struct iConfigFile : public virtual iBase
    * value (Def parameter) will be used if the key was not found.
    */
   virtual bool GetBool (const char *Key, bool Def = false) const = 0;
+  /// Get a tuple set from the configuration.
+  virtual csPtr<iStringArray> GetTuple(const char *Key) const = 0;
   /// Get the comment of the given key, or 0 if no comment exists.
   virtual const char *GetComment (const char *Key) const = 0;
 
@@ -130,6 +132,8 @@ struct iConfigFile : public virtual iBase
   virtual void SetFloat (const char *Key, float Value) = 0;
   /// Set a boolean value.
   virtual void SetBool (const char *Key, bool Value) = 0;
+  /// Set a tuple value.
+  virtual void SetTuple (const char *Key, csRef<iStringArray> Value) = 0;
   /**
    * Set the comment for given key.  In addition to an actual comment, you can
    * use "" for Text to place an empty comment line before this key, or 0 to

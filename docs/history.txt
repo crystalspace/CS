@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+14-Sep-2006
+        - Genjix added iConfigFile GetTuple() and SetTuple(), for storing
+          and getting a list of variable objects in config files.
 12-Sep-2006
 	- Jorrit fixed a bug with iSector->HitBeamPortals(). It was
 	  broken and failed to detect the correct destination sector.
@@ -13,7 +16,7 @@ chronological order.
 	- Jorrit changed walktest to use new particles for explosion.
 	- PK extended the ice-skin for tabbuttons.
 11-Sep-2006
-	- Marten fixed (hopefully) the script building (with Swig) on both 
+	- Marten fixed (hopefully) the script building (with Swig) on both
 	  older swigs and for jobber.
 	- Jorrit fixed a bug in particles and particlesldr. It would
 	  initialize start time to -1 which caused particles to fail on
@@ -47,7 +50,7 @@ chronological order.
 	- res put the FBO stencil support into preprocessor conditionals (and
 	  also noted the current state of stencil attachment support).
 	- res fixed a couple of gcc 4.1 optimize warnings.
-	- res fixed _cspace.so.dbg being tried to be split off before 
+	- res fixed _cspace.so.dbg being tried to be split off before
 	  _cspace.so is built when installing. Fixes trac #11.
 	- res added debug info splitting for the CS JNI library.
 	- res changed ptpdlight to #include <limits.h> as per SFbug:1546141.
@@ -63,14 +66,14 @@ chronological order.
 	  destruction of Crystal Space.
 	- res fixed an issue with the Java bindings where symbols didn't get
 	  exported properly from the JNI glue shared library due being hidden
-	  by -fvisibility=hidden. Worked around that by also specifying 
+	  by -fvisibility=hidden. Worked around that by also specifying
 	  -fvisibility=default when compiling the JNI glue, causing the
 	  symbols to get exported correctly again.
 	- res disabled strict aliasing when compiling the Java JNI glue. This
 	  fixes some issues in release builds.
 	- res fixed some errors having crept into SimpleRoom.java when it was
 	  updated to work with latest CS.
-	- Marten made a small SWIG-tweak to shut up an error from newer 
+	- Marten made a small SWIG-tweak to shut up an error from newer
 	  SWIG versions.
 	- Marten made partconv not crash.
 	- Marten converted nullmesh to new SCF syntax.
@@ -84,9 +87,9 @@ chronological order.
 	- res changed the --as-needed check to (a) only use --as-needed for
 	  newer binutils versions (b) disable it by default.
 2-Sep-2006
-	- Marten fixed [ticket:7], invalid alpha modifier in shader 
+	- Marten fixed [ticket:7], invalid alpha modifier in shader
 	  light.xml technique 150.
-	- Marten rewrote the OpenGL pixel format picker to enumerate 
+	- Marten rewrote the OpenGL pixel format picker to enumerate
 	  all the values in strictly decreasing order. This should solve
 	  ticket:1.
 31-Aug-2006
@@ -114,7 +117,7 @@ chronological order.
 	  is not always added as a library search path. This may cause issues
 	  when the user manually specifies paths for some libraries, since
 	  then the Python linker flags cause e.g. /usr/lib to be scanned and
-	  libraries errorneously taken from there. Instead, only add 
+	  libraries errorneously taken from there. Instead, only add
 	  sysprefix-based paths when needed.
 	- res added support for response files when shared libs are enabled.
 	  They're used if supported by the linker.
@@ -145,7 +148,7 @@ chronological order.
 	- Marten fixed csRefArray so that operator[] and Get (..) works
 	  as intended and don't cause refcounting errors. Bug 1487132.
 	- Marten fixed his last commit to work on gcc too. One caveat with
-	  current approach is that you cannot assign directly from a 
+	  current approach is that you cannot assign directly from a
 	  csRefArray::operator[] to a new csRef, you need to construct it
 	  (provide an explicit construction). No inefficiency, just some extra
 	  syntax.
