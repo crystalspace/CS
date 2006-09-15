@@ -474,6 +474,11 @@ struct iGenMeshAnimationControl : public virtual iBase
   virtual bool AnimatesColors () const = 0;
 
   /**
+   * General update method
+   */
+  virtual void Update (csTicks current) = 0;
+
+  /**
    * Given the factory vertex data, return the animated data.
    * If this control doesn't animate vertices then it will return the
    * source array unchanged.
