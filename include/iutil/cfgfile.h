@@ -26,9 +26,9 @@
  * @{ */
 #include "csutil/scf_interface.h"
 #include "csutil/ref.h"
+
 struct iConfigIterator;
 struct iVFS;
-
 
 /**
  * Configuration file interface.
@@ -133,7 +133,7 @@ struct iConfigFile : public virtual iBase
   /// Set a boolean value.
   virtual void SetBool (const char *Key, bool Value) = 0;
   /// Set a tuple value.
-  virtual void SetTuple (const char *Key, csRef<iStringArray> Value) = 0;
+  virtual void SetTuple (const char *Key, iStringArray* Value) = 0;
   /**
    * Set the comment for given key.  In addition to an actual comment, you can
    * use "" for Text to place an empty comment line before this key, or 0 to

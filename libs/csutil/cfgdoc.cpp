@@ -19,18 +19,18 @@
 
 #include "cssysdef.h"
 #include "iutil/vfs.h"
+#include "csutil/cfgdoc.h"
 #include "csutil/physfile.h"
 #include "csutil/util.h"
 #include "csutil/scf.h"
 #include "csutil/scf_implementation.h"
 #include "csutil/xmltiny.h"
-#include "csutil/cfgdoc.h"
 
 class csConfigDocumentIterator : public scfImplementation1<
 	csConfigDocumentIterator, iConfigIterator>
 {
   csRef<csConfigDocument> doc;
-  csHash<csConfigDocument::KeyInfo, csStrKey>::GlobalIterator* iterator;
+  csHash<csConfigDocument::KeyInfo, csString>::GlobalIterator* iterator;
   char* subsection;
   size_t subsectionLen;
   const csConfigDocument::KeyInfo* currentKey;
@@ -62,7 +62,7 @@ csConfigDocumentIterator::csConfigDocumentIterator (csConfigDocument* d,
   subsection = csStrNew (Subsection);
   subsectionLen = subsection ? strlen (subsection) : 0;
   iterator = new csHash<csConfigDocument::KeyInfo,
-    csStrKey>::GlobalIterator (doc->keys.GetIterator ());
+    csString>::GlobalIterator (doc->keys.GetIterator ());
 }
 
 csConfigDocumentIterator::~csConfigDocumentIterator()
@@ -84,7 +84,7 @@ const char* csConfigDocumentIterator::GetSubsection () const
 void csConfigDocumentIterator::Rewind ()
 {
   currentKey = 0;
-  currentKeyName = csStrKey (0);
+  currentKeyName = 0;
   iterator->Reset();
 }
 
@@ -400,7 +400,7 @@ void csConfigDocument::SetBool (const char * /*Key*/, bool /*Value*/)
 {
 }
 
-void csConfigDocument::SetTuple (const char * /*Key*/, csRef<iStringArray> /*Value*/)
+void csConfigDocument::SetTuple (const char * /*Key*/, iStringArray* /*Value*/)
 {
 }
 

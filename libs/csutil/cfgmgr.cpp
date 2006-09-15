@@ -479,7 +479,7 @@ void csConfigManager::SetBool (const char *Key, bool Value)
   ClearKeyAboveDynamic(Key);
 }
 
-void csConfigManager::SetTuple (const char *Key, csRef<iStringArray> Value)
+void csConfigManager::SetTuple (const char *Key, iStringArray* Value)
 {
   DynamicDomain->Cfg->SetTuple(Key, Value);
   ClearKeyAboveDynamic(Key);

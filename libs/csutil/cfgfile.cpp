@@ -52,7 +52,7 @@ public:
   void SetInt(int);
   void SetFloat(float);
   void SetBool(bool);
-  void SetTuple (csRef<iStringArray> Value);
+  void SetTuple (iStringArray* Value);
   void SetComment(const char*);
   // get data
   const char *GetStr() const;
@@ -153,7 +153,7 @@ void csConfigNode::SetBool(bool b)
   SetStr(b ? "true" : "false");
 }
 
-void csConfigNode::SetTuple (csRef<iStringArray> Value)
+void csConfigNode::SetTuple (iStringArray* Value)
 {
   // this should output a string like
   // abc, def, ghi
@@ -208,7 +208,7 @@ csPtr<iStringArray> csConfigNode::GetTuple() const
 
   char *sinp = Data;
   char *comp;
-  int len;
+  size_t len;
   bool finished = false;
 
   while (!finished)
@@ -705,7 +705,7 @@ void csConfigFile::SetBool (const char *Key, bool Value)
   }
 }
 
-void csConfigFile::SetTuple (const char *Key, csRef<iStringArray> Value)
+void csConfigFile::SetTuple (const char *Key, iStringArray* Value)
 {
   csConfigNode *Node = FindNode(Key);
   bool const Create = !Node;

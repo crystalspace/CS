@@ -67,7 +67,7 @@ class CS_CRYSTALSPACE_EXPORT csConfigDocument :
       delete[] originalKey;
     }
   };
-  csHash<KeyInfo, csStrKey> keys;
+  csHash<KeyInfo, csString> keys;
 
   void ParseDocument (iDocument* doc, bool Merge = false,
     bool NewWins = true);
@@ -113,7 +113,7 @@ public:
   virtual void SetInt (const char *Key, int Value);
   virtual void SetFloat (const char *Key, float Value);
   virtual void SetBool (const char *Key, bool Value);
-  virtual void SetTuple (const char *Key, csRef<iStringArray> Value);
+  virtual void SetTuple (const char *Key, iStringArray* Value);
   virtual bool SetComment (const char *Key, const char *Text);
   virtual void DeleteKey (const char *Key);
   virtual const char *GetEOFComment () const;
