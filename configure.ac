@@ -27,6 +27,7 @@ CS_PACKAGEINFO([Crystal Space],
 AC_CONFIG_SRCDIR([libs/Jamfile])
 AC_CONFIG_AUX_DIR([mk/autoconf])
 AC_CANONICAL_HOST
+CS_CHECK_MNO_CYGWIN
 
 
 
@@ -702,7 +703,7 @@ CS_CHECK_BUILD_FLAGS([for "hidden" symbol visibility flag],
 AS_IF([test -n "$cs_cv_prog_cc_visibility_hidden"],
     [CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS], 
 	[$cs_cv_prog_cc_visibility_hidden], [+])])
-	
+
 CS_CHECK_BUILD_FLAGS([for "default" symbol visibility flag],
     [cs_cv_prog_cc_visibility_default],
     [CS_CREATE_TUPLE([-fvisibility=default])])

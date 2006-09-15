@@ -33,7 +33,9 @@ AC_DEFUN([CS_CHECK_COMMON_TOOLS_LINK],
     CS_CHECK_TOOLS([DLLTOOL], [dlltool])
     CS_EMIT_BUILD_PROPERTY([CMD.DLLTOOL], [$DLLTOOL])
     
-    CS_CHECK_TOOLS([DLLWRAP], [dllwrap])
+    AS_IF([test "$cs_mno_cygwin" = "yes"],
+      [CS_CHECK_TOOLS([DLLWRAP], [dllwrap --mno-cygwin])],
+      [CS_CHECK_TOOLS([DLLWRAP], [dllwrap])])
     CS_EMIT_BUILD_PROPERTY([CMD.DLLWRAP], [$DLLWRAP])
     
     CS_CHECK_TOOLS([WINDRES], [windres])
