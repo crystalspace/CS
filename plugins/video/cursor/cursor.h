@@ -71,7 +71,7 @@ private:
   csWeakRef<iGraphics3D> g3d;
   iTextureManager* txtmgr;
   csRef<iImageIO> io;
-  csHash<CursorInfo *, csStrKey> cursors;
+  csHash<CursorInfo *, csString> cursors;
   
   /// The currently selected cursor
   csString current;

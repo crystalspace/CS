@@ -87,7 +87,9 @@ const bool aws_debug = false;  // set to true to turn on debugging printf()'s
 #define AWS_VOIDP_IS_ERROR
 #endif
 #ifdef AWS_DEPRECATE_VOIDP
-#define AWS_VOIDP_IS_WARNING CS_DEPRECATED_METHOD
+#define AWS_VOIDP_IS_WARNING \
+CS_DEPRECATED_METHOD_MSG("For proper 64-bit platform support, use the intptr_t \
+version")
 #else
 #define AWS_VOIDP_IS_WARNING
 #endif

@@ -547,7 +547,7 @@ class csSectorList : public scfImplementation1<csSectorList, iSectorList>
 {
 private:
   csRefArrayObject<iSector> list;
-  csHash<iSector*,csStrKey> sectors_hash;
+  csHash<iSector*, csString> sectors_hash;
 
   class NameChangeListener : public scfImplementation1<NameChangeListener,
   	iObjectNameChangeListener>

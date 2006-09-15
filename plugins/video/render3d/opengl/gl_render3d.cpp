@@ -3413,7 +3413,7 @@ iHalo *csGLGraphics3D::CreateHalo (float iR, float iG, float iB,
 
 void csGLGraphics3D::RemoveHalo (csOpenGLHalo* halo)
 {
-  halos.DeleteFast (halo);
+  halos.Delete (halo);
 }
 
 float csGLGraphics3D::GetZBuffValue (int x, int y)

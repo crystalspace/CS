@@ -23,7 +23,6 @@
 
 #include "csutil/archive.h"
 #include "csutil/csendian.h"
-#include "csutil/csstring.h"
 #include "csutil/set.h"
 #include "csutil/snprintf.h"
 #include "csutil/sysfunc.h"
@@ -142,7 +141,7 @@ void csArchive::ReadDirectory ()
 
   // First, make a list of all possible directory components.
   csString filename, slice;
-  csSet<csStrKey> dset;
+  csSet<csString> dset;
   for (size_t i = 0, n = dir.Length(); i < n; i++)
   {
     ArchiveEntry const* e = dir.Get (i);
@@ -158,13 +157,13 @@ void csArchive::ReadDirectory ()
       {
 	filename.SubString (slice, 0, ++sep);
         if (!dset.In (slice.GetData()))
-          dset.AddNoTest (csStrKey (slice)); 
+          dset.AddNoTest (slice); 
       }
     }
   }
 
   // Now, iterate over `dset' and create fake directory components.
-  csSet<csStrKey>::GlobalIterator it = dset.GetIterator();
+  csSet<csString>::GlobalIterator it = dset.GetIterator();
   while (it.HasNext())
   {
     csString dname (it.Next());

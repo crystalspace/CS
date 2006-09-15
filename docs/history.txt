@@ -27,6 +27,9 @@ chronological order.
 	- res changed CS_DEPRECATED_TYPE to be useable on MSVC as well.
 	- res fixed the doxygen settings to correctly handle the 
 	  CS_DEPRECATED_..._MSG macros.
+	- res marked some types and methods that were deprecated as per the
+	  API docs with the deprecation macros. Also changed some instances
+	  to use the _MSG variant. Lastly, fixed some deprecation warnings.
 14-Sep-2006
         - Genjix added iConfigFile GetTuple() and SetTuple(), for storing
           and getting a list of variable objects in config files.
