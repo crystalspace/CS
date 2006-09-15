@@ -223,7 +223,7 @@ public:
   /// Set a boolean value.
   virtual void SetBool (const char *Key, bool Value);
   /// Set a tuple value.
-  virtual void SetTuple (const char *Key, csRef<iStringArray> Value);
+  virtual void SetTuple (const char *Key, iStringArray* Value);
   /**
    * Set the comment for given key.  In addition to an actual comment, you can
    * use "" for Text to place an empty comment line before this key, or 0 to

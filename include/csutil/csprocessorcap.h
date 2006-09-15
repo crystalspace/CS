@@ -27,23 +27,17 @@
 
 /**
  * This class is used to identify capabilities in the processor such as 
- * support for MMX and SSE.
+ * support for MMX and SSE
  */
-class csProcessorCapability
+class CS_CRYSTALSPACE_EXPORT csProcessorCapability
 {
 public:
 
   /**
-   * Constructor. 
+   * Constructor. Does nothing
    */
   csProcessorCapability () 
   {
-#ifdef CS_PROCESSOR_X86
-    CheckX86Processor ();
-#else
-    mmxSupported = false;
-    sseSupported = false;
-#endif
   }
 
   /**
@@ -53,35 +47,75 @@ public:
   {
   }
 
-  /// Returns whether MMX is supported.
-  inline bool HasMMX () { return mmxSupported; }
-  /// Returns whether SSE is supported.
-  inline bool HasSSE () { return sseSupported; }
-  /// Returns the processor's vendor name (e.g. GenuineIntel or AuthenticAMD)
-  inline const char* GetVendorName () { return processorName; }
+  /**
+   * Initialize the internal data. Query the processor and see what we get
+   */
+  static inline void Initialize ()
+  {
+    if (isInitialized)
+      return;
+
+#ifdef CS_PROCESSOR_X86
+    CheckX86Processor ();
+#else
+    mmxSupported = false;
+    sseSupported = false;
+    processorName[0] = 0;
+#endif
+  }
+
+  static inline bool HasMMX ()
+  {
+    Initialize ();
+
+    return mmxSupported;
+  }
+
+  static inline bool HasSSE ()
+  {
+    Initialize ();
+
+    return sseSupported;
+  }
+
+  static inline const char* GetProcessorName ()
+  {
+    Initialize ();
+
+    return processorName;
+  }
 
 private:
+
+  /// Have we been initialized yet
+  static bool isInitialized;
+
   /// Is mmx supported
-  bool mmxSupported;
+  static bool mmxSupported;
+
   /// Is SSE supported
-  bool sseSupported;
+  static bool sseSupported;
+
+  /// Is 3dNow! supported
+  static bool AMD3dnowSupported;
+  
   /// The name of the processor
-  char processorName[16];
+  static char processorName[16];
 
 #if defined(CS_PROCESSOR_X86) && (CS_PROCESSOR_SIZE == 32)
   /**
-   * Check for x86 features. This function is written twice due to different
-   * syntax for inline assembly on MSVC and GCC
-   */
-  inline void CheckX86Processor ()
+  * Check for x86 features. This function is written twice due to different
+  * syntax for inline assembly on MSVC and GCC
+  */
+  static inline void CheckX86Processor ()
   {
     int32 capFlags = 0;
     int CPUnum;
     int maxEax = 0;
-    char* procName = processorName;
+    const char* procName = processorName;
 
     bool have_cpuid;
-   
+
     #if defined(CS_COMPILER_MSVC)
     __asm
     {
@@ -204,7 +238,7 @@ end_detect:
     //AMD3dnowSupported = capFlags & (1<<31);
   }
 #else //CS_PROCESSOR_X86
-  inline void CheckX86Processor() {}
+  static inline void CheckX86Processor() {}
 #endif //CS_PROCESSOR_X86
 };
 
