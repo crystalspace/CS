@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+15-Sep-2006
+	- Jorrit fixed viewmesh so that it starts at the current dir instead
+	  of an internal CEGUI directory.
 14-Sep-2006
         - Genjix added iConfigFile GetTuple() and SetTuple(), for storing
           and getting a list of variable objects in config files.

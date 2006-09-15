@@ -635,6 +635,7 @@ void ViewMesh::CreateGui()
 
   // ------------------------------------------------------------------------
 
+  vfs->ChDir ("/this/");
   btn = winMgr->getWindow("StdDlg/Path");
   btn->setProperty("Text", vfs->GetCwd());
   StdDlgUpdateLists(vfs->GetCwd());
