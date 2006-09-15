@@ -32,6 +32,7 @@ chronological order.
 	  to use the _MSG variant. Lastly, fixed some deprecation warnings.
 	- res removed some unneeded members from csGraphics3DCaps.
 	- res noted some compiler versions on the requirements manual page.
+	- res updated the docs for the new cs-win32libs version.
 14-Sep-2006
         - Genjix added iConfigFile GetTuple() and SetTuple(), for storing
           and getting a list of variable objects in config files.
