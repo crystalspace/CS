@@ -50,13 +50,10 @@ csNullGraphics3D::csNullGraphics3D (iBase *iParent) :
   scfiEventHandler = 0;
   txtmgr = 0;
 
-  Caps.CanClip = false;
   Caps.minTexHeight = 2;
   Caps.minTexWidth = 2;
   Caps.maxTexHeight = 1024;
   Caps.maxTexWidth = 1024;
-  Caps.MaxAspectRatio = 32768;
-  Caps.NeedsPO2Maps = false;
   Caps.SupportsPointSprites = false;
   Caps.DestinationAlpha = false;
   Caps.StencilShadows = false;

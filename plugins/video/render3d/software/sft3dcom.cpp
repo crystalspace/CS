@@ -83,13 +83,10 @@ csSoftwareGraphics3DCommon::csSoftwareGraphics3DCommon (iBase* parent) :
   z_buffer = 0;
   line_table = 0;
 
-  Caps.CanClip = true;
   Caps.minTexHeight = 2;
   Caps.minTexWidth = 2;
   Caps.maxTexHeight = 1024;
   Caps.maxTexWidth = 1024;
-  Caps.MaxAspectRatio = 32768;
-  Caps.NeedsPO2Maps = true;
   Caps.SupportsPointSprites = false;
   Caps.DestinationAlpha = false;
   Caps.StencilShadows = false;
