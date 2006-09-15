@@ -91,14 +91,12 @@ bool csVProcStandardProgram::UpdateSkinnedVertices (csRenderMeshModes& modes,
   iRenderBuffer *bones_indices_buf = GetBuffer (bones_indices_buff_name, modes, stacks);
   if (!bones_indices_buf)
   {
-    printf("shit1\n");
     return false;
   }
 
   iRenderBuffer *bones_weights_buf = GetBuffer (bones_weights_buff_name, modes, stacks);
   if (!bones_weights_buf)
   {
-    printf("shit2\n");
     return false;
   }
 
@@ -332,7 +330,7 @@ void csVProcStandardProgram::SetupState (const csRenderMesh* mesh,
                                          csRenderMeshModes& modes,
                                          const iShaderVarStack* Stacks)
 {
-  bool skin_verts_updated = false;//FIXME - time related detection if vertices are not already updated
+  bool skin_verts_updated = false;// @@@ FIXME - time related detection if vertices are not already updated
   if (doVertexSkinning)
   {
     skin_verts_updated = UpdateSkinnedVertices (modes, Stacks);
