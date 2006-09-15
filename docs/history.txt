@@ -9,6 +9,22 @@ chronological order.
 15-Sep-2006
 	- Jorrit fixed viewmesh so that it starts at the current dir instead
 	  of an internal CEGUI directory.
+	- Erroroman did the following:
+	  - added Update() function to genmesh animation interface. It is a 
+	    general update function that is not related to updating render 
+	    buffer data.
+	  - updating bones mapping in gmeshskelanim2 is now in Update method.
+	  - changted gmeshskelanim2 bones mapping data
+	    - the buffer "bone data" that represents bone mapping is
+	      replaced with 2 new render buffers:
+	      "bones indices" - contains the indices of bones for the vertex.
+	      "bones weights" - contains the weights of every bones.
+	  - adopted vproc_std to access bones and handle skinned vertices.
+	  - added new shaders for animating genmeshes - character2.xml and
+	    character_bump2.xml.The new shaders provides 4 bones per vertex
+	    mapping and software animation using vproc_std. The old shaders 
+	    will be removed after improving of the new ones.
+
 14-Sep-2006
         - Genjix added iConfigFile GetTuple() and SetTuple(), for storing
           and getting a list of variable objects in config files.
