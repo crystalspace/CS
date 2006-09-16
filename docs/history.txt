@@ -12,6 +12,7 @@ chronological order.
 	- res fixed shared library creation for cygwin with -mno-cygwin using
 	  the solution from Peter Amstutz stated in trac #132.
 	- Erroroman fixed a bit the new animation shaders.
+	- PK upgraded the ice skin to work with CEGUI 5.0RC2.
 15-Sep-2006
 	- Jorrit fixed viewmesh so that it starts at the current dir instead
 	  of an internal CEGUI directory.
