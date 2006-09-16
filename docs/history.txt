@@ -9,6 +9,8 @@ chronological order.
 16-Sep-2006
 	- res declared the weak event listener functions as exported and put
 	  them into the CS namespace.
+	- res fixed shared library creation for cygwin with -mno-cygwin using
+	  the solution from Peter Amstutz stated in trac #132.
 15-Sep-2006
 	- Jorrit fixed viewmesh so that it starts at the current dir instead
 	  of an internal CEGUI directory.
