@@ -11,6 +11,7 @@ chronological order.
 	  them into the CS namespace.
 	- res fixed shared library creation for cygwin with -mno-cygwin using
 	  the solution from Peter Amstutz stated in trac #132.
+	- Erroroman fixed a bit the new animation shaders.
 15-Sep-2006
 	- Jorrit fixed viewmesh so that it starts at the current dir instead
 	  of an internal CEGUI directory.
@@ -23,7 +24,7 @@ chronological order.
 	    - the buffer "bone data" that represents bone mapping is
 	      replaced with 2 new render buffers:
 	      "bones indices" - contains the indices of bones for the vertex.
-	      "bones weights" - contains the weights of every bones.
+	      "bones weights" - contains the weights of every bone.
 	  - adopted vproc_std to access bones and handle skinned vertices.
 	  - added new shaders for animating genmeshes - character2.xml and
 	    character_bump2.xml.The new shaders provides 4 bones per vertex

@@ -73,7 +73,7 @@ vertex2fragment main (app2vertex IN,
 	OUT.oEyeVec = mul(mat, eye);
 	OUT.Position = mul (ModelViewProj, position);
 	OUT.TexCoord = IN.TexCoord;
-	OUT.Attenuation = objLight*Attenuation.y*0.8 + 0.5;
+	OUT.Attenuation = -objLight*Attenuation.y*0.8 + 0.5;
 	OUT.Attenuation.w = 0.5;
 	return OUT;
 }

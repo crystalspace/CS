@@ -24,9 +24,7 @@
       <mixmode><copy /></mixmode>
 	  <buffer source="texture coordinate 0" destination="texture coordinate 0" />
 	  <buffer source="generic 0" destination="position" />
-	<vp plugin="glfixed">
-	  <fixedvp/>
-	</vp>
+	  <vp plugin="glarb" file="/shader/ambient.avp" />
 	<vproc plugin="vproc_std">
 	  <vproc_std>
 	    <skinned_position buffer="generic 0" />
