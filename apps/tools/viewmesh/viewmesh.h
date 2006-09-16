@@ -165,6 +165,7 @@ private:
   bool StdDlgCancleButton (const CEGUI::EventArgs& e);
   bool StdDlgFileSelect (const CEGUI::EventArgs& e);
   bool StdDlgDirSelect (const CEGUI::EventArgs& e);
+  bool StdDlgDirChange (const CEGUI::EventArgs& e);
 
   CS_EVENTHANDLER_NAMES ("crystalspace.viewmesh")
   CS_EVENTHANDLER_NIL_CONSTRAINTS

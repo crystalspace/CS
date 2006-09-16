@@ -633,6 +633,10 @@ void ViewMesh::CreateGui()
   btn->subscribeEvent(CEGUI::Listbox::EventSelectionChanged,
     CEGUI::Event::Subscriber(&ViewMesh::StdDlgDirSelect, this));
 
+  btn = winMgr->getWindow("StdDlg/Path");
+  btn->subscribeEvent(CEGUI::Editbox::EventTextAccepted,
+    CEGUI::Event::Subscriber(&ViewMesh::StdDlgDirChange, this));
+
   // ------------------------------------------------------------------------
 
   vfs->ChDir ("/this/");
@@ -1832,6 +1836,23 @@ bool ViewMesh::StdDlgDirSelect (const CEGUI::EventArgs& e)
 
   inputpath->setProperty("Text", newpath.GetData());
   StdDlgUpdateLists(newpath.GetData());
+  return true;
+}
+
+bool ViewMesh::StdDlgDirChange (const CEGUI::EventArgs& e)
+{
+  CEGUI::WindowManager* winMgr = cegui->GetWindowManagerPtr ();
+
+  CEGUI::Window* inputpath = winMgr->getWindow("StdDlg/Path");
+  CEGUI::String path = inputpath->getProperty("Text");
+  if (path.empty()) return false;
+
+  csPrintf("cd %s\n",path.c_str());
+
+  vfs->ChDir (path.c_str ());
+
+  inputpath->setProperty("Text", path.c_str());
+  StdDlgUpdateLists(path.c_str());
   return true;
 }
 
