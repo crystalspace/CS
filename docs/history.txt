@@ -9,6 +9,7 @@ chronological order.
 17-Sep-2006
 	- res fixed a bug in the software renderer vertex transformer that
 	  caused the output vertex buffers to be underfilled.
+	- res updated a gldrivers tweak to include certain NV Quadro chips.
 16-Sep-2006
 	- res declared the weak event listener functions as exported and put
 	  them into the CS namespace.

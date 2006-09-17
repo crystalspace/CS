@@ -432,10 +432,14 @@
       </applicable>
     </rule>
 
+    <!-- 
+      * 2006-09-17: Quadro NVS up to 285 are GF2 derivates
+      -->
     <rule description="GeForce: RECT texture extension support apparently sucks">
       <conditions fulfill="one">
 	<regexp	string="renderer" pattern="GeForce.*MX" />
 	<regexp	string="renderer" pattern="GeForce.*Go" />
+	<regexp	string="renderer" pattern="Quadro.*NVS.*\(50\|1..\|2..\).*" />
       </conditions>
       <applicable>
 	<usecfg>disableRECTTextures</usecfg>
