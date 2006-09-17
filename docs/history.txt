@@ -14,6 +14,8 @@ chronological order.
 	- Marten augmented SCF docs with some info about inheritance of 
 	  interfaces and implementations.
 	- PK changed SimpVS to use CEGUI instead of AWS.
+	- res added an overview of the shader system to the manual (based off
+	  his conference talk).
 16-Sep-2006
 	- res declared the weak event listener functions as exported and put
 	  them into the CS namespace.
