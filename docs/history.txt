@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+17-Sep-2006
+	- res fixed a bug in the software renderer vertex transformer that
+	  caused the output vertex buffers to be underfilled.
 16-Sep-2006
 	- res declared the weak event listener functions as exported and put
 	  them into the CS namespace.
