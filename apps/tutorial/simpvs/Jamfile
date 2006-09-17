@@ -5,6 +5,6 @@ if $(CEGUI.AVAILABLE) = "yes"
   Description simpvs : "tutorial, video selector" ;
   Application simpvs : [ Wildcard *.cpp *.h ] : noinstall ;
   LinkWith simpvs : crystalspace ;
-  CFlags viewmesh : $(COMPILER.C++FLAGS.EXCEPTIONS.ENABLE) ;
-  ExternalLibs viewmesh : CEGUI ;
+  CFlags simpvs : $(COMPILER.C++FLAGS.EXCEPTIONS.ENABLE) ;
+  ExternalLibs simpvs : CEGUI ;
 }
