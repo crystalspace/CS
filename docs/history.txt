@@ -16,6 +16,8 @@ chronological order.
 	- PK changed SimpVS to use CEGUI instead of AWS.
 	- res added an overview of the shader system to the manual (based off
 	  his conference talk).
+	- res added support for GL_ARB_texture_non_power_of_two to gl3d
+	  (although untested).
 16-Sep-2006
 	- res declared the weak event listener functions as exported and put
 	  them into the CS namespace.

@@ -786,12 +786,16 @@ bool csGLGraphics3D::Open ()
   ext->InitGL_ARB_point_parameters ();
   ext->InitGL_ARB_point_sprite ();
   ext->InitGL_EXT_framebuffer_object ();
-  ext->InitGL_ARB_texture_rectangle ();
-  if (!ext->CS_GL_ARB_texture_rectangle)
+  ext->InitGL_ARB_texture_non_power_of_two ();
+  if (!ext->CS_GL_ARB_texture_non_power_of_two)
   {
-    ext->InitGL_EXT_texture_rectangle();
-    if (!ext->CS_GL_EXT_texture_rectangle)
-      ext->InitGL_NV_texture_rectangle();
+    ext->InitGL_ARB_texture_rectangle ();
+    if (!ext->CS_GL_ARB_texture_rectangle)
+    {
+      ext->InitGL_EXT_texture_rectangle();
+      if (!ext->CS_GL_EXT_texture_rectangle)
+        ext->InitGL_NV_texture_rectangle();
+    }
   }
   ext->InitGL_ARB_vertex_program (); // needed for vertex attrib code
   ext->InitGL_ARB_fragment_program (); // needed for AFP DrawPixmap() workaround
