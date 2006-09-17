@@ -13,6 +13,7 @@ chronological order.
 	- res updated a gldrivers tweak to include GF2 GTS chips.
 	- Marten augmented SCF docs with some info about inheritance of 
 	  interfaces and implementations.
+	- PK changed SimpVS to use CEGUI instead of AWS.
 16-Sep-2006
 	- res declared the weak event listener functions as exported and put
 	  them into the CS namespace.
