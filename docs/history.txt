@@ -17,6 +17,9 @@ chronological order.
 	- Jorrit fixed a misplaced 'break' in ParseMixMode() of the syntax
 	  services plugin. This would cause MESH mixmode to be interpreted
 	  as ALPHATEST instead.
+	- caedes fixed some warnings on cspace.i generation:
+	  - instantiated iArrayReadOnly<iSceneNode*> using %template.
+	  - %ignore ShaderVarName from csgfx/shadervar.h.
 17-Sep-2006
 	- res fixed a bug in the software renderer vertex transformer that
 	  caused the output vertex buffers to be underfilled.
