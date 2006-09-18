@@ -603,8 +603,8 @@ bool csTextSyntaxService::ParseMixmode (iDocumentNode* node, uint &mixmode,
 	if (allowFxMesh)
 	{
 	  MIXMODE_EXCLUSIVE mixmode = CS_MIXMODE_TYPE_MESH; 
-	  break;
 	}
+	break;
       case XMLTOKEN_ALPHATEST:
         {
           mixmodeSpecified = true;
