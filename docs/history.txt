@@ -7,6 +7,10 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 18-Sep-2006
+	- Jorrit made csComparatorString safe with regards to null strings.
+	  This is now needed since a recent fix in csHash is using this
+	  comparator to compare keys and keys can sometimes be 0 (empty
+	  string).
 	- caedes changed cegui plugin name to cscegui.
 17-Sep-2006
 	- res fixed a bug in the software renderer vertex transformer that
