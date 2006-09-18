@@ -7,11 +7,13 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 18-Sep-2006
+	- caedes changed cegui plugin name to cscegui.
 	- Jorrit made csComparatorString safe with regards to null strings.
 	  This is now needed since a recent fix in csHash is using this
 	  comparator to compare keys and keys can sometimes be 0 (empty
 	  string).
-	- caedes changed cegui plugin name to cscegui.
+	- Jorrit fixed another bug in csString::GetHash(). This function
+	  would also crash if the string was empty (i.e. null pointer).
 17-Sep-2006
 	- res fixed a bug in the software renderer vertex transformer that
 	  caused the output vertex buffers to be underfilled.
