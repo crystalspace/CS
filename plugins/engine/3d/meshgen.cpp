@@ -829,6 +829,7 @@ void csMeshGenerator::AllocateMeshes (int cidx, csMGCell& cell,
             geometries[p.geom_type]->MoveMesh (cidx, mesh, p.lod,
               p.instance_id, p.position, rotation_matrices[p.rotation]);
 
+/*
   csRef<iImposter> imposter = SCF_QUERY_INTERFACE (mesh, iImposter);
     imposter->SetImposterActive (true);
   iSharedVariable *var = engine->GetVariableList()->FindByName 
@@ -837,7 +838,7 @@ void csMeshGenerator::AllocateMeshes (int cidx, csMGCell& cell,
   var = engine->GetVariableList()->FindByName
     ("Std Thing Angle");
   imposter->SetRotationTolerance (var);
-
+*/
           }
         }
       }
@@ -857,7 +858,7 @@ void csMeshGenerator::AllocateMeshes (int cidx, csMGCell& cell,
             p.last_mixmode = ~0;
             geometries[p.geom_type]->MoveMesh (cidx, mesh, p.lod, p.instance_id,
               p.position, rotation_matrices[p.rotation]);
-
+/*
 printf("case 2\n");
   csRef<iImposter> imposter = SCF_QUERY_INTERFACE (mesh, iImposter);
     imposter->SetImposterActive (true);
@@ -867,7 +868,7 @@ printf("case 2\n");
   var = engine->GetVariableList()->FindByName
     ("Std Thing Angle");
   imposter->SetRotationTolerance (var);
-
+*/
           }
         }
       }

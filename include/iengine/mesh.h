@@ -374,7 +374,8 @@ struct iMeshWrapper : public virtual iBase
    * grid structures.
    * \deprecated Use HitBeamBBox() with csHitBeamResult instead.
    */
-  CS_DEPRECATED_METHOD virtual int HitBeamBBox (const csVector3& start,
+  CS_DEPRECATED_METHOD_MSG("Use HitBeamBBox() with csHitBeamResult instead.")
+  virtual int HitBeamBBox (const csVector3& start,
   	const csVector3& end, csVector3& isect, float* pr) = 0;
 
   /**
@@ -382,7 +383,8 @@ struct iMeshWrapper : public virtual iBase
    * Outline check.
    * \deprecated Use HitBeamOutline() with csHitBeamResult instead.
    */
-  CS_DEPRECATED_METHOD virtual bool HitBeamOutline (const csVector3& start,
+  CS_DEPRECATED_METHOD_MSG("Use HitBeamOutline() with csHitBeamResult instead.")
+  virtual bool HitBeamOutline (const csVector3& start,
   	const csVector3& end, csVector3& isect, float* pr) = 0;
 
   /**
@@ -391,7 +393,8 @@ struct iMeshWrapper : public virtual iBase
    * is more accurate than HitBeamOutline.
    * \deprecated Use HitBeamObject() with csHitBeamResult instead.
    */
-  CS_DEPRECATED_METHOD virtual bool HitBeamObject (const csVector3& start,
+  CS_DEPRECATED_METHOD_MSG("Use HitBeamObject() with csHitBeamResult instead.")
+  virtual bool HitBeamObject (const csVector3& start,
   	const csVector3& end, csVector3& isect, float* pr,
 	int* polygon_idx = 0) = 0;
 
@@ -400,7 +403,8 @@ struct iMeshWrapper : public virtual iBase
    * Return the collision point in world space coordinates.
    * \deprecated Use HitBeamObject() with csHitBeamResult instead.
    */
-  CS_DEPRECATED_METHOD virtual bool HitBeam (const csVector3& start,
+  CS_DEPRECATED_METHOD_MSG("Use HitBeamObject() with csHitBeamResult instead.")
+  virtual bool HitBeam (const csVector3& start,
   	const csVector3& end, csVector3& isect, float* pr,
 	iMaterialWrapper** material = 0) = 0;
 

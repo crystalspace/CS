@@ -166,6 +166,7 @@ private:
   static void StdDlgCancleButton (unsigned long, intptr_t awst, iAwsSource *s);
   static void StdDlgFileSelect (unsigned long, intptr_t awst, iAwsSource *s);
   static void StdDlgDirSelect (unsigned long, intptr_t awst, iAwsSource *s);
+  bool StdDlgDirChange (const CEGUI::EventArgs& e);
 
   CS_EVENTHANDLER_NAMES ("crystalspace.viewmesh")
   CS_EVENTHANDLER_NIL_CONSTRAINTS

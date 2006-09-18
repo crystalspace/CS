@@ -83,10 +83,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(OpenTree)
     };
     VertexHelper::~VertexHelper() {};
 
-    void add(int index, float x, float y, float z, float nx, float ny,
+    void add(uint index, float x, float y, float z, float nx, float ny,
       float nz, float r, float g, float b, float a, float u, float v)
     {
-      assert((uint)index < c);
+      assert(index < c);
       //OTL coordinate system is z up, y forwards
       csverts[index].x = x;
       csverts[index].y = z;
@@ -487,7 +487,7 @@ printf("Tree vertex count: %i ", vertexCount);
   treefactstate->SetVertexCount(vertexCount);
 
   opentree::otVertices* vertices = 
-    new VertexHelper (treefactstate, vertexCount);
+  new VertexHelper (treefactstate, vertexCount);
   tree->getVertices(0, *vertices);
   tree->getVertices(1, *vertices);
   tree->getVertices(2, *vertices);

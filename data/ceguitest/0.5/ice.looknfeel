@@ -3092,7 +3092,8 @@
     <WidgetLook name="ice/TabButton">
 		<PropertyDefinition name="NormalTextColour" initialValue="FFFFFFFF" redrawOnWrite="true" />
         <PropertyDefinition name="HoverTextColour" initialValue="FFFFFFFF" redrawOnWrite="true" />
-        <PropertyDefinition name="PushedTextColour" initialValue="FFFFFFFF" redrawOnWrite="true" />
+        <PropertyDefinition name="PushedTextColour" initialValue="FF000000" redrawOnWrite="true" />
+        <PropertyDefinition name="SelectedTextColour" initialValue="FF000010" redrawOnWrite="true" />
         <PropertyDefinition name="DisabledTextColour" initialValue="FF7F7F7F" redrawOnWrite="true" />
         <ImagerySection name="label">
             <TextComponent>
@@ -3125,7 +3126,7 @@
                 <Image type="Background" imageset="ice" image="TabButtonMiddleNormal" />
             </FrameComponent>
         </ImagerySection>
-        <ImagerySection name="selected">
+        <ImagerySection name="top_selected">
             <FrameComponent>
                 <Area>
                     <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
@@ -3134,14 +3135,27 @@
                     <Dim type="Height" ><UnifiedDim scale="1" type="Height" /></Dim>
                 </Area>
                 <Image type="TopLeftCorner" imageset="ice" image="TabButtonUpperLeftSelected" />
-                <Image type="TopRightCorner" imageset="ice" image="TabButtonUpperRightSelected" />
-                <Image type="BottomLeftCorner" imageset="ice" image="TabButtonLowerLeftSelected" />
-                <Image type="BottomRightCorner" imageset="ice" image="TabButtonLowerRightSelected" />
-                <Image type="LeftEdge" imageset="ice" image="TabButtonLeftSelected" />
-                <Image type="RightEdge" imageset="ice" image="TabButtonRightSelected" />
                 <Image type="TopEdge" imageset="ice" image="TabButtonUpperSelected" />
-                <Image type="BottomEdge" imageset="ice" image="TabButtonLowerSelected" />
+                <Image type="TopRightCorner" imageset="ice" image="TabButtonUpperRightSelected" />
+                <Image type="LeftEdge" imageset="ice" image="TabButtonLeftSelected" />
                 <Image type="Background" imageset="ice" image="TabButtonMiddleSelected" />
+                <Image type="RightEdge" imageset="ice" image="TabButtonRightSelected" />
+            </FrameComponent>
+        </ImagerySection>
+        <ImagerySection name="bot_selected">
+            <FrameComponent>
+                <Area>
+                    <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
+                    <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
+                    <Dim type="Width" ><UnifiedDim scale="1" type="Width" /></Dim>
+                    <Dim type="Height" ><UnifiedDim scale="1" type="Height" /></Dim>
+                </Area>
+                <Image type="LeftEdge" imageset="ice" image="TabButtonLeftSelected" />
+                <Image type="Background" imageset="ice" image="TabButtonMiddleSelected" />
+                <Image type="RightEdge" imageset="ice" image="TabButtonRightSelected" />
+                <Image type="BottomLeftCorner" imageset="ice" image="TabButtonLowerLeftSelected" />
+                <Image type="BottomEdge" imageset="ice" image="TabButtonLowerSelected" />
+                <Image type="BottomRightCorner" imageset="ice" image="TabButtonLowerRightSelected" />
             </FrameComponent>
         </ImagerySection>
         <StateImagery name="Normal">
@@ -3160,47 +3174,106 @@
                 </Section>
             </Layer>
         </StateImagery>
-        <StateImagery name="Selected">
+        <StateImagery name="TopSelected">
             <Layer>
-                <Section section="selected" />
+                <Section section="top_selected" />
                 <Section section="label">
-                    <ColourProperty name="PushedTextColour" />
+                    <ColourProperty name="SelectedTextColour" />
+                </Section>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="BottomSelected">
+            <Layer>
+                <Section section="bot_selected" />
+                <Section section="label">
+                    <ColourProperty name="SelectedTextColour" />
                 </Section>
             </Layer>
         </StateImagery>
         <StateImagery name="Disabled">
             <Layer>
-                <Section section="normal">
-                    <Colours topLeft="FF7F7F7F" topRight="FF7F7F7F" bottomLeft="FF7F7F7F" bottomRight="FF7F7F7F" />
-                </Section>
+                <Section section="normal" />
                 <Section section="label">
                     <ColourProperty name="DisabledTextColour" />
                 </Section>
             </Layer>
         </StateImagery>
     </WidgetLook>
-    
+
+
     <!--
     ***************************************************
-        ice/TabPane
+        ice/TabContentPane
     ***************************************************
     -->
-    <WidgetLook name="ice/TabPane">
+    <WidgetLook name="ice/TabContentPane">
+        <PropertyDefinition name="EnableTop" initialValue="0" redrawOnWrite="true" layoutOnwrite="true" />
+        <PropertyDefinition name="EnableBottom" initialValue="0" redrawOnWrite="true" layoutOnwrite="true" />
         <ImagerySection name="normal">
             <FrameComponent>
                 <Area>
                     <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
                     <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
                     <Dim type="Width" ><UnifiedDim scale="1" type="Width" /></Dim>
-                    <Dim type="Height" ><UnifiedDim scale="1" type="Height" /></Dim>
+                    <Dim type="BottomEdge" >
+                        <ImageDim imageset="ice" image="TabContentPaneUpperLeft" dimension="Height">
+                            <DimOperator op="Multiply">
+                                <PropertyDim name="EnableTop" />
+                            </DimOperator>
+                        </ImageDim>
+                    </Dim>
                 </Area>
-                <Image type="BottomLeftCorner" imageset="ice" image="TabPaneLowerLeft" />
-                <Image type="BottomRightCorner" imageset="ice" image="TabPaneLowerRight" />
-                <Image type="LeftEdge" imageset="ice" image="TabPaneLeft" />
-                <Image type="RightEdge" imageset="ice" image="TabPaneRight" />
-                <Image type="TopEdge" imageset="ice" image="TabControlButtonPaneFiller" />
-                <Image type="BottomEdge" imageset="ice" image="TabPaneLower" />
-                <Image type="Background" imageset="ice" image="TabPaneMiddle" />
+                <Image type="TopLeftCorner" imageset="ice" image="TabContentPaneUpperLeft" />
+                <Image type="TopEdge" imageset="ice" image="TabContentPaneTop" />
+                <Image type="TopRightCorner" imageset="ice" image="TabContentPaneUpperRight" />
+            </FrameComponent>
+            <FrameComponent>
+                <Area>
+                    <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
+                    <Dim type="TopEdge" >
+                        <ImageDim imageset="ice" image="TabContentPaneUpperLeft" dimension="Height">
+                            <DimOperator op="Multiply">
+                                <PropertyDim name="EnableTop" />
+                            </DimOperator>
+                        </ImageDim>
+                    </Dim>
+                    <Dim type="Width" ><UnifiedDim scale="1" type="Width" /></Dim>
+                    <Dim type="BottomEdge" >
+                        <UnifiedDim scale="1" type="Height">
+                            <DimOperator op="Subtract">
+                                <ImageDim imageset="ice" image="TabContentPaneLowerLeft" dimension="Height">
+                                    <DimOperator op="Multiply">
+                                        <PropertyDim name="EnableBottom" />
+                                    </DimOperator>
+                                </ImageDim>
+                            </DimOperator>
+                        </UnifiedDim>
+                    </Dim>
+                </Area>
+                <Image type="LeftEdge" imageset="ice" image="TabContentPaneLeft" />
+                <Image type="Background" imageset="ice" image="TabContentPaneMiddle" />
+                <Image type="RightEdge" imageset="ice" image="TabContentPaneRight" />
+            </FrameComponent>
+            <FrameComponent>
+                <Area>
+                    <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
+                    <Dim type="TopEdge" >
+                        <UnifiedDim scale="1" type="Height">
+                            <DimOperator op="Subtract">
+                                <ImageDim imageset="ice" image="TabContentPaneLowerLeft" dimension="Height">
+                                    <DimOperator op="Multiply">
+                                        <PropertyDim name="EnableBottom" />
+                                    </DimOperator>
+                                </ImageDim>
+                            </DimOperator>
+                        </UnifiedDim>
+                    </Dim>
+                    <Dim type="Width" ><UnifiedDim scale="1" type="Width" /></Dim>
+                    <Dim type="BottomEdge" ><UnifiedDim scale="1" type="Height" /></Dim>
+                </Area>
+                <Image type="BottomLeftCorner" imageset="ice" image="TabContentPaneLowerLeft" />
+                <Image type="BottomEdge" imageset="ice" image="TabContentPaneLower" />
+                <Image type="BottomRightCorner" imageset="ice" image="TabContentPaneLowerRight" />
             </FrameComponent>
         </ImagerySection>
         <StateImagery name="Enabled">
@@ -3216,7 +3289,91 @@
             </Layer>
         </StateImagery>
     </WidgetLook>
-    
+
+
+    <!--
+    ***************************************************
+        ice/TabButtonPane
+    ***************************************************
+    -->
+    <WidgetLook name="ice/TabButtonPane">
+        <PropertyDefinition name="EnableTop" initialValue="1" redrawOnWrite="true" layoutOnwrite="true" />
+        <PropertyDefinition name="EnableBottom" initialValue="1" redrawOnWrite="true" layoutOnwrite="true" />
+        <ImagerySection name="normal">
+            <FrameComponent>
+                <Area>
+                    <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
+                    <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
+                    <Dim type="Width" ><UnifiedDim scale="1" type="Width" /></Dim>
+                    <Dim type="BottomEdge" >
+                        <ImageDim imageset="ice" image="TabHorizontalTopFiller" dimension="Height">
+                            <DimOperator op="Multiply">
+                                <PropertyDim name="EnableTop" />
+                            </DimOperator>
+                        </ImageDim>
+                    </Dim>
+                </Area>
+                <Image type="TopEdge" imageset="ice" image="TabHorizontalTopFiller" />
+            </FrameComponent>
+            <FrameComponent>
+                <Area>
+                    <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
+                    <Dim type="TopEdge" >
+                        <ImageDim imageset="ice" image="TabHorizontalTopFiller" dimension="Height">
+                            <DimOperator op="Multiply">
+                                <PropertyDim name="EnableTop" />
+                            </DimOperator>
+                        </ImageDim>
+                    </Dim>
+                    <Dim type="Width" ><UnifiedDim scale="1" type="Width" /></Dim>
+                    <Dim type="BottomEdge" >
+                        <UnifiedDim scale="1" type="Height">
+                            <DimOperator op="Subtract">
+                                <ImageDim imageset="ice" image="TabHorizontalBottomFiller" dimension="Height">
+                                    <DimOperator op="Multiply">
+                                        <PropertyDim name="EnableBottom" />
+                                    </DimOperator>
+                                </ImageDim>
+                            </DimOperator>
+                        </UnifiedDim>
+                    </Dim>
+                </Area>
+            </FrameComponent>
+            <FrameComponent>
+                <Area>
+                    <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
+                    <Dim type="TopEdge" >
+                        <UnifiedDim scale="1" type="Height">
+                            <DimOperator op="Subtract">
+                                <ImageDim imageset="ice" image="TabHorizontalBottomFiller" dimension="Height">
+                                    <DimOperator op="Multiply">
+                                        <PropertyDim name="EnableBottom" />
+                                    </DimOperator>
+                                </ImageDim>
+                            </DimOperator>
+                        </UnifiedDim>
+                    </Dim>
+                    <Dim type="Width" ><UnifiedDim scale="1" type="Width" /></Dim>
+                    <Dim type="BottomEdge" ><UnifiedDim scale="1" type="Height" /></Dim>
+                </Area>
+                <Image type="BottomEdge" imageset="ice" image="TabHorizontalBottomFiller" />
+            </FrameComponent>
+        </ImagerySection>
+        <StateImagery name="Enabled">
+            <Layer>
+                <Section section="normal" />
+            </Layer>
+        </StateImagery>
+        <StateImagery name="Disabled">
+            <Layer>
+                <Section section="normal">
+                    <Colours topLeft="FF7F7F7F" topRight="FF7F7F7F" bottomLeft="FF7F7F7F" bottomRight="FF7F7F7F" />
+                </Section>
+            </Layer>
+        </StateImagery>
+    </WidgetLook>
+
+
     <!--
     ***************************************************
         ice/TabControl
@@ -3224,21 +3381,130 @@
     -->
     <WidgetLook name="ice/TabControl">
         <Property name="TabButtonType" value="ice/TabButton" />
-        <Child  type="ice/TabPane" nameSuffix="__auto_TabPane__">
+        <Property name="TabTextPadding" value="{0,4}" />
+        <Child  type="ice/TabContentPane" nameSuffix="__auto_TabPane__">
             <Area>
-                <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
-                <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
-                <Dim type="Width" ><UnifiedDim scale="1" type="Width" /></Dim>
-                <Dim type="Height" ><UnifiedDim scale="1" type="Height" /></Dim>
+                <Dim type="LeftEdge"><AbsoluteDim value="0" /></Dim>
+                <Dim type="RightEdge"><UnifiedDim scale="1" type="Width" /></Dim>
+                <Dim type="TopEdge">
+                    <PropertyDim widget="__auto_TabPane__" name="EnableBottom">
+                        <DimOperator op="Multiply">
+                            <PropertyDim name="TabHeight" type="Height" />
+                        </DimOperator>
+                    </PropertyDim>
+                </Dim>
+                <Dim type="Height">
+                    <UnifiedDim scale="1" type="Height">
+                        <DimOperator op="Subtract">
+                            <PropertyDim name="TabHeight" type="Height" />
+                        </DimOperator>
+                    </UnifiedDim>
+                </Dim>
             </Area>
         </Child>
-        <Child  type="DefaultWindow" nameSuffix="__auto_TabPane__Buttons">
+        <Child  type="ice/TabButtonPane" nameSuffix="__auto_TabPane__Buttons">
             <Area>
-                <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
-                <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
-                <Dim type="Width" ><UnifiedDim scale="1" type="Width" /></Dim>
-                <Dim type="Height" ><UnifiedDim scale="1" type="Height" /></Dim>
+                <Dim type="LeftEdge"><AbsoluteDim value="0" /></Dim>
+                <Dim type="RightEdge"><UnifiedDim scale="1" type="Width" /></Dim>
+                <Dim type="TopEdge">
+                    <PropertyDim widget="__auto_TabPane__Buttons" name="EnableTop">
+                        <DimOperator op="Multiply">
+                            <UnifiedDim scale="1" type="Height">
+                                <DimOperator op="Subtract">
+                                    <PropertyDim name="TabHeight" type="Height" />
+                                </DimOperator>
+                            </UnifiedDim>
+                        </DimOperator>
+                    </PropertyDim>
+                </Dim>
+                <Dim type="Height"><PropertyDim name="TabHeight" type="Height" /></Dim>
             </Area>
+        </Child>
+        <Child type="ice/SystemButton" nameSuffix="__auto_TabPane__ScrollLeft">
+            <Area>
+                <Dim type="LeftEdge"><AbsoluteDim value="6" /></Dim>
+                <Dim type="TopEdge">
+                    <WidgetDim widget="__auto_TabPane__" dimension="TopEdge">
+                        <DimOperator op="Add">
+                            <AbsoluteDim value="4">
+                                <DimOperator op="Add">
+                                    <PropertyDim widget="__auto_TabPane__Buttons" name="EnableTop">
+                                        <DimOperator op="Multiply">
+                                            <WidgetDim widget="__auto_TabPane__" dimension="Height">
+                                                <DimOperator op="Subtract">
+                                                    <ImageDim imageset="ice" image="TabButtonScrollLeftNormal" dimension="Width">
+                                                        <DimOperator op="Add">
+                                                            <AbsoluteDim value="6" />
+                                                        </DimOperator>
+                                                    </ImageDim>
+                                                </DimOperator>
+                                            </WidgetDim>
+                                        </DimOperator>
+                                    </PropertyDim>
+                                </DimOperator>
+                            </AbsoluteDim>
+                        </DimOperator>
+                    </WidgetDim>
+                </Dim>
+                <Dim type="Width">
+                    <ImageDim imageset="ice" image="TabButtonScrollLeftNormal" dimension="Width" />
+                </Dim>
+                <Dim type="Height">
+                    <ImageDim imageset="ice" image="TabButtonScrollLeftNormal" dimension="Height" />
+                </Dim>
+            </Area>
+            <Property name="AlwaysOnTop" value="True" />
+            <Property name="NormalImage" value="set:ice image:TabButtonScrollLeftNormal" />
+            <Property name="HoverImage" value="set:ice image:TabButtonScrollLeftHover" />
+            <Property name="PushedImage" value="set:ice image:TabButtonScrollLeftHover" />
+        </Child>
+        <Child type="ice/SystemButton" nameSuffix="__auto_TabPane__ScrollRight">
+            <Area>
+                <Dim type="LeftEdge">
+                    <UnifiedDim scale="1" type="Width">
+                        <DimOperator op="Subtract">
+                            <ImageDim imageset="ice" image="TabButtonScrollLeftNormal" dimension="Width">
+                                <DimOperator op="Add">
+                                    <AbsoluteDim value="6" />
+                                </DimOperator>
+                            </ImageDim>
+                        </DimOperator>
+                    </UnifiedDim>
+                </Dim>
+                <Dim type="TopEdge">
+                    <WidgetDim widget="__auto_TabPane__" dimension="TopEdge">
+                        <DimOperator op="Add">
+                            <AbsoluteDim value="4">
+                                <DimOperator op="Add">
+                                    <PropertyDim widget="__auto_TabPane__Buttons" name="EnableTop">
+                                        <DimOperator op="Multiply">
+                                            <WidgetDim widget="__auto_TabPane__" dimension="Height">
+                                                <DimOperator op="Subtract">
+                                                    <ImageDim imageset="ice" image="TabButtonScrollLeftNormal" dimension="Width">
+                                                        <DimOperator op="Add">
+                                                            <AbsoluteDim value="6" />
+                                                        </DimOperator>
+                                                    </ImageDim>
+                                                </DimOperator>
+                                            </WidgetDim>
+                                        </DimOperator>
+                                    </PropertyDim>
+                                </DimOperator>
+                            </AbsoluteDim>
+                        </DimOperator>
+                    </WidgetDim>
+                </Dim>
+                <Dim type="Width">
+                    <ImageDim imageset="ice" image="TabButtonScrollLeftNormal" dimension="Width" />
+                </Dim>
+                <Dim type="Height"><AbsoluteDim value="0" />
+                    <ImageDim imageset="ice" image="TabButtonScrollLeftNormal" dimension="Height" />
+                </Dim>
+            </Area>
+            <Property name="AlwaysOnTop" value="True" />
+            <Property name="NormalImage" value="set:ice image:TabButtonScrollRightNormal" />
+            <Property name="HoverImage" value="set:ice image:TabButtonScrollRightHover" />
+            <Property name="PushedImage" value="set:ice image:TabButtonScrollRightHover" />
         </Child>
         <StateImagery name="Enabled" />
         <StateImagery name="Disabled" />

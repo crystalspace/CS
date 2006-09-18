@@ -152,12 +152,11 @@
 	<meshfact name="treeFact">
 		<plugin>opentreeFact</plugin>
 		<params>
-	<weberfile>/lev/terraini/ca_black_oak.xml</weberfile>
+	<!--weberfile>/lev/terraini/ca_black_oak.xml</weberfile-->
 	<!--weberfile>/lev/terraini/brancaldra.xml</weberfile-->
 	<!--weberfile>/lev/terraini/black_tupelo.xml</weberfile-->
-	<!--weberfile>/lev/terraini/quaking_aspen.xml</weberfile-->
-asdf			
-<!--weberfile>/lev/terraini/weeping_willow.xml</weberfile-->
+	<weberfile>/lev/terraini/quaking_aspen.xml</weberfile>
+			<!--weberfile>/lev/terraini/weeping_willow.xml</weberfile-->
 			<material level="0">bark</material>
 			<material level="5">leaf</material>
 		</params>
@@ -217,7 +216,7 @@ asdf
 		  <imposter active="yes" range="Std Thing Range" tolerance="Std Thing Angle"/>
 	  </meshobj>
 
-	  <meshobj name="ftree1">
+	  <!--meshobj name="ftree1">
 		  <plugin>genmesh</plugin>
 		  <params>
 			  <factory>treebark_bare</factory>
@@ -335,7 +334,7 @@ asdf
 		  </move>
 		  <imposter active="yes" range="Std Thing Range" tolerance="Std Thing Angle"/>
 		  <ztest/>
-	  </meshobj>
+	  </meshobj-->
 
 	  <meshobj name="Terrain">
       <plugin>terrain</plugin>
@@ -472,18 +471,18 @@ asdf
         </meshobj>
         <key name="cmd_AnimateSky" value="clouds,y,.005" />
 
-	  <!--meshgen name="grass">
+	  <meshgen name="grass">
 		  <geometry>
 			  <factory maxdist="50" name="bush2" />
 			  <radius>1</radius>
-			  <density>0.02</density>
+			  <density>0.1</density>
 			  <materialfactor material="Grass" factor=".5" />
 			  <defaultmaterialfactor>.1</defaultmaterialfactor>
 		  </geometry>
 		  <geometry>
-			  <factory maxdist="50" name="tree" />
+			  <factory maxdist="50" name="treebark_bare" />
 			  <radius>1</radius>
-			  <density>0.02</density>
+			  <density>0.1</density>
 			  <materialfactor material="Grass" factor=".5" />
 			  <defaultmaterialfactor>.1</defaultmaterialfactor>
 		  </geometry>
@@ -494,9 +493,9 @@ asdf
 			  <materialfactor material="Grass" factor="1" />
 			  <defaultmaterialfactor>.05</defaultmaterialfactor>
 		  </geometry>
-		  <geometry>
+		  <!--geometry>
 			  <factory maxdist="10" name="Grass" />
-			  <factory maxdist="30" name="GrassLow" />
+			  <factory maxdist="20" name="GrassLow" />
 			  <radius>1</radius>
 			  <density>0.4</density>
 			  <materialfactor material="Grass" factor="1" />
@@ -525,13 +524,13 @@ asdf
 			  <defaultmaterialfactor>.3</defaultmaterialfactor>
 		  </geometry-->
 			<!--<densityscale mindist="26" maxdist="30" maxfactor="0" />-->
-			<!--alphascale mindist="22" maxdist="30" />
+			<!--alphascale mindist="22" maxdist="30" /-->
 		  <samplebox>
 			  <min x="-256" y="-200" z="-256" />
 			  <max x="256" y="200" z="256" />
 		  </samplebox>
 		  <meshobj>Terrain</meshobj>
-	  </meshgen-->
+	  </meshgen>
 
 	  <!-- Uncomment for ...fog: -->
     <!--fog red=".3" green=".27" blue=".27" density="0.002" /-->

@@ -1,5 +1,4 @@
-# configure.ac                                                 -*- 
-Autoconf -*-
+# configure.ac                                                 -*- Autoconf -*-
 #==============================================================================
 # Copyright (C)2003-2006 by Eric Sunshine <sunshine@sunshineco.com>
 #
@@ -23,11 +22,12 @@ m4_define([cs_version_number], [1.1])
 AC_INIT([crystalspace], [cs_version_number],
         [crystal-main@lists.sourceforge.net])
 CS_PACKAGEINFO([Crystal Space],
-    [Copyright (C)1998-2005 Jorrit Tyberghein and others],
+    [Copyright (C)1998-2006 Jorrit Tyberghein and others],
     [http://www.crystalspace3d.org/])
 AC_CONFIG_SRCDIR([libs/Jamfile])
 AC_CONFIG_AUX_DIR([mk/autoconf])
 AC_CANONICAL_HOST
+CS_CHECK_MNO_CYGWIN
 
 
 
@@ -697,12 +697,19 @@ AS_IF([test $cs_cv_prog_cxx_visibility_inlines_hidden_buggy != yes],
 # Check how to set default symbol visibility, and how to override the setting
 # in code.
 #------------------------------------------------------------------------------
-CS_CHECK_BUILD_FLAGS([for symbol visibility flag],
+CS_CHECK_BUILD_FLAGS([for "hidden" symbol visibility flag],
     [cs_cv_prog_cc_visibility_hidden],
     [CS_CREATE_TUPLE([-fvisibility=hidden])])
 AS_IF([test -n "$cs_cv_prog_cc_visibility_hidden"],
     [CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS], 
 	[$cs_cv_prog_cc_visibility_hidden], [+])])
+
+CS_CHECK_BUILD_FLAGS([for "default" symbol visibility flag],
+    [cs_cv_prog_cc_visibility_default],
+    [CS_CREATE_TUPLE([-fvisibility=default])])
+AS_IF([test -n "$cs_cv_prog_cc_visibility_default"],
+    [CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS.VISIBILITY_DEFAULT], 
+	[$cs_cv_prog_cc_visibility_default])])
 
 CS_SYMBOL_QUALIFIER([how to declare default visibility],
     [cs_cv_prog_cxx_declare_visible_def],
@@ -858,19 +865,16 @@ CS_CHECK_OPTIMIZE_FLAGS
 #------------------------------------------------------------------------------
 # Check for compiler debug flags.
 #------------------------------------------------------------------------------
-binutils_recent=no
-AS_IF([test -n "$OBJCOPY"],
-    [CS_CHECK_PROG_VERSION([binutils], [$OBJCOPY -V], [2.16], [9.9|.9|.9|.9],
-        [binutils_recent=yes])])
+CS_CHECK_BINUTILS_2_17
 
 AC_MSG_CHECKING([whether to split debug information])
 AC_ARG_ENABLE([separate-debug-info], 
     [AC_HELP_STRING([--enable-separate-debug-info],
         [split debug information into separate files. (default YES if 
-        binutils >= 2.16 detected and not on Cygwin, otherwise default NO)])])
+        binutils >= 2.17 detected and not on Cygwin, otherwise default NO)])])
 AS_IF([test -z "$enable_separate_debug_info"], 
     AS_IF([test -z `uname | grep -i CYGWIN`],
-        [enable_separate_debug_info=$binutils_recent],
+        [enable_separate_debug_info=$cs_cv_binutils_2_17],
         [enable_separate_debug_info=no]))
 AC_MSG_RESULT([$enable_separate_debug_info])
 
@@ -1030,8 +1034,8 @@ AS_IF([test "$no_x" != yes],
 #------------------------------------------------------------------------------
 # Check for OpenGL and companions.  Also check if GLX extensions are supported
 # and define the (backward) header property CSGL_EXT_STATIC_ASSERTION if they
-# are _not_ supported. Finally, check if the type GLhandleARB is exported by
-# the GL headers. It is starting to show up in very modern headers, but is
+# are _not_ supported. Finally, check if the some GL types are exported by
+# the GL headers. Some are starting to show up in very modern headers, but are
 # absent from most.
 #
 # IMPLEMENTATION NOTES
@@ -1040,14 +1044,17 @@ AS_IF([test "$no_x" != yes],
 # libraries may depend on it (notably Cg).
 #------------------------------------------------------------------------------
 CS_CHECK_OPENGL
-AS_IF([test $cs_cv_libgl = yes],
-    [# Check for GLhandleARB.
-    CS_CHECK_BUILD([for GLhandleARB], [cs_cv_libgl_glhandlearb],
+AC_DEFUN([CS_CHECK_OPENGL_TYPE],
+    [CS_CHECK_BUILD([for $1], [cs_cv_libgl_$1],
 	[AC_LANG_PROGRAM(
 	    [CS_GL_INCLUDE([CS_OPENGL_PATH],[GL],[gl.h])],
-	    [GLhandleARB x; (void)x;])],
-	[], [],	[CS_HEADER_PROPERTY([CS_HAVE_GLHANDLEARB_T])], [], [],
+		[$1 x; (void)x;])],
+	[], [], [$2], [], [],
 	[$cs_cv_libgl_cflags], [$cs_cv_libgl_lflags], [$cs_cv_libgl_libs])])
+AS_IF([test $cs_cv_libgl = yes],
+    [CS_CHECK_OPENGL_TYPE([GLhandleARB], [CS_HEADER_PROPERTY([CS_HAVE_GLHANDLEARB_T])])
+    CS_CHECK_OPENGL_TYPE([GLcharARB], [CS_HEADER_PROPERTY([CS_HAVE_GLCHARARB_T])]) 
+    CS_CHECK_OPENGL_TYPE([GLchar], [CS_HEADER_PROPERTY([CS_HAVE_GLCHAR_T])])])
 CS_CHECK_GLU
 CS_CHECK_GLX
 # Check for GLX extensions.  Define CSGL_EXT_STATIC_ASSERTION if _not_
@@ -1653,16 +1660,6 @@ CS_CHECK_LIB_WITH([js],
     [], [], [CS_EMIT_BUILD_RESULT([cs_cv_libjs], [JS])], [], 
     [-D$cs_spidermonkey_platform])
 
-
-#------------------------------------------------------------------------------
-# Check for OpenTree library.
-#------------------------------------------------------------------------------
-CS_CHECK_LIB_WITH([opentree],
-    [AC_LANG_PROGRAM([[
-    #include <opentree/opentree.h>
-    ]],
-    [/*test here*/])],
-    [], [C++], [CS_EMIT_BUILD_RESULT([cs_cv_libopentree], [OTL])])
 
 
 #------------------------------------------------------------------------------

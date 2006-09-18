@@ -72,7 +72,7 @@ csGraphics2D::~csGraphics2D ()
   {
     csRef<iEventQueue> q (CS_QUERY_REGISTRY(object_reg, iEventQueue));
     if (q != 0)
-      RemoveWeakListener (q, weakEventHandler);
+      CS::RemoveWeakListener (q, weakEventHandler);
   }
   Close ();
   delete [] Palette;
@@ -131,7 +131,7 @@ bool csGraphics2D::Initialize (iObjectRegistry* r)
     csEventID events[3] = { csevSystemOpen (object_reg), 
 			    csevSystemClose (object_reg), 
 			    CS_EVENTLIST_END };
-    RegisterWeakListener (q, this, events, weakEventHandler);
+    CS::RegisterWeakListener (q, this, events, weakEventHandler);
   }
   return true;
 }

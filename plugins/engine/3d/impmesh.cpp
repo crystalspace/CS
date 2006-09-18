@@ -190,6 +190,7 @@ csRenderMesh** csImposterMesh::GetRenderMesh(iRenderView *rview)
     mesh->object2world = csReversibleTransform ();
     mesh->worldspace_origin = csVector3 (0,0,0);
     mesh->mixmode = CS_FX_ALPHA;
+    mesh->alphaType = csAlphaMode::alphaBinary;
     mesh->z_buf_mode = CS_ZBUF_TEST;
     mesh->material = impostermat;
 

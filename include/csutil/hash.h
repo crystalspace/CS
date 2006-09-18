@@ -207,12 +207,15 @@ public:
   }
 };
 
+#include "csutil/win32/msvc_deprecated_warn_off.h"
+
 /**
  * This is a simple helper class to make a copy of a const char*.
  * This can be used to have a hash that makes copies of the keys.
  * \deprecated csString can also be used for hash keys.
  */
-class csStrKey
+class CS_DEPRECATED_TYPE_MSG("csString can also be used for hash keys") 
+  csStrKey
 {
 private:
   char* str;
@@ -236,6 +239,8 @@ public:
  */
 CS_SPECIALIZE_TEMPLATE
 class csComparator<csStrKey, csStrKey> : public csComparatorString<csStrKey> {};
+
+#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 /**
  * A generic hash table class,
@@ -406,7 +411,8 @@ public:
    * Add an element to the hash table, overwriting if the key already exists.
    * \deprecated Use PutUnique() instead.
    */
-  CS_DEPRECATED_METHOD void PutFirst (const K& key, const T &value)
+  CS_DEPRECATED_METHOD_MSG("Use PutUnique() instead.")
+  void PutFirst (const K& key, const T &value)
   {
     PutUnique(key, value);
   }
@@ -554,7 +560,7 @@ public:
     {
       const size_t idx = i - 1;
       if ((csComparator<K, K>::Compare (values[idx].key, key) == 0) && 
-	(values[idx].value == value))
+	  (csComparator<T, T>::Compare (values[idx].value, value) == 0 ))
       {
         values.DeleteIndexFast (idx);
         ret = true;

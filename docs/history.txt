@@ -6,10 +6,152 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+18-Sep-2006
+	- caedes changed cegui plugin name to cscegui.
+	- Jorrit made csComparatorString safe with regards to null strings.
+	  This is now needed since a recent fix in csHash is using this
+	  comparator to compare keys and keys can sometimes be 0 (empty
+	  string).
+	- Jorrit fixed another bug in csString::GetHash(). This function
+	  would also crash if the string was empty (i.e. null pointer).
+	- Jorrit fixed a misplaced 'break' in ParseMixMode() of the syntax
+	  services plugin. This would cause MESH mixmode to be interpreted
+	  as ALPHATEST instead.
+	- caedes fixed some warnings on cspace.i generation:
+	  - instantiated iArrayReadOnly<iSceneNode*> using %template.
+	  - %ignore ShaderVarName from csgfx/shadervar.h.
+17-Sep-2006
+	- res fixed a bug in the software renderer vertex transformer that
+	  caused the output vertex buffers to be underfilled.
+	- res updated a gldrivers tweak to include certain NV Quadro chips.
+	- res updated a gldrivers tweak to include GF2 GTS chips.
+	- Marten augmented SCF docs with some info about inheritance of 
+	  interfaces and implementations.
+	- PK changed SimpVS to use CEGUI instead of AWS.
+	- res added an overview of the shader system to the manual (based off
+	  his conference talk).
+	- res added support for GL_ARB_texture_non_power_of_two to gl3d
+	  (although untested).
+16-Sep-2006
+	- res declared the weak event listener functions as exported and put
+	  them into the CS namespace.
+	- res fixed shared library creation for cygwin with -mno-cygwin using
+	  the solution from Peter Amstutz stated in trac #132.
+	- Erroroman fixed a bit the new animation shaders.
+	- PK upgraded the ice skin to work with CEGUI 5.0RC2.
+	- PK improved the viewmesh standard dialog a little.
+15-Sep-2006
+	- Jorrit fixed viewmesh so that it starts at the current dir instead
+	  of an internal CEGUI directory.
+	- Erroroman did the following:
+	  - added Update() function to genmesh animation interface. It is a 
+	    general update function that is not related to updating render 
+	    buffer data.
+	  - updating bones mapping in gmeshskelanim2 is now in Update method.
+	  - changted gmeshskelanim2 bones mapping data
+	    - the buffer "bone data" that represents bone mapping is
+	      replaced with 2 new render buffers:
+	      "bones indices" - contains the indices of bones for the vertex.
+	      "bones weights" - contains the weights of every bone.
+	  - adopted vproc_std to access bones and handle skinned vertices.
+	  - added new shaders for animating genmeshes - character2.xml and
+	    character_bump2.xml.The new shaders provides 4 bones per vertex
+	    mapping and software animation using vproc_std. The old shaders 
+	    will be removed after improving of the new ones.
+	- res changed CS_DEPRECATED_TYPE to be useable on MSVC as well.
+	- res fixed the doxygen settings to correctly handle the 
+	  CS_DEPRECATED_..._MSG macros.
+	- res marked some types and methods that were deprecated as per the
+	  API docs with the deprecation macros. Also changed some instances
+	  to use the _MSG variant. Lastly, fixed some deprecation warnings.
+	- res removed some unneeded members from csGraphics3DCaps.
+	- res noted some compiler versions on the requirements manual page.
+	- res updated the docs for the new cs-win32libs version.
+	- res added -mno-cygwin support to configure.
+14-Sep-2006
+        - Genjix added iConfigFile GetTuple() and SetTuple(), for storing
+          and getting a list of variable objects in config files.
+12-Sep-2006
+	- Jorrit fixed a bug with iSector->HitBeamPortals(). It was
+	  broken and failed to detect the correct destination sector.
+	- Marten fixed csColor4 for operators + - * and /.
+	- Jorrit changed walktest to use new particles for explosion.
+	- PK extended the ice-skin for tabbuttons.
+11-Sep-2006
+	- Marten fixed (hopefully) the script building (with Swig) on both
+	  older swigs and for jobber.
+	- Jorrit fixed a bug in particles and particlesldr. It would
+	  initialize start time to -1 which caused particles to fail on
+	  particle systems with very small duration.
+	- Jorrit added some missing operators for csColor4.
+	- Jorrit removed the operators again as they break compilation of CS
+	  in some cases.
+	- Jorrit added a new system in the CS engine so that objects can have
+	  themselves removed after a specific interval. Call
+	  iEngine->DelayedRemoveObject() with an object (any object that can
+	  be removed through the normal iEngine->RemoveObject()) and a delay.
+	  This new system is more general then the old iEngine->WantToDie()
+	  method that is called by some particle systems.
+	- Jorrit added a commented out version of the explosion in walktest
+	  using the new particle system. Doesn't yet work 100% (fading is
+	  broken).
+10-Sep-2006
+	- PK changed ViewMesh to use CEGUI instead of AWS.
+	- PK fixed a bug in csHash::Delete (const K& key, const T &value).
+9-Sep-2006
+	- Marten changed particles to have a transform-mode instead of just
+	  a boolean localmode. This makes it possible to have world-space
+	  particles with local space emitter.
+8-Sep-2006
+	- res added tests for some more GL types.
+	- caedes updated cspace.i for the new particles.
+	- res added some more GL extensions and missing GL versions up to 2.1
+	  to the extension manager.
+	- res fixed the glshader_fixed plugin to depend on GL 1.4 for texture
+	  crossbar support and not 1.3.
+	- res put the FBO stencil support into preprocessor conditionals (and
+	  also noted the current state of stencil attachment support).
+	- res fixed a couple of gcc 4.1 optimize warnings.
+	- res fixed _cspace.so.dbg being tried to be split off before
+	  _cspace.so is built when installing. Fixes trac #11.
+	- res added debug info splitting for the CS JNI library.
+	- res changed ptpdlight to #include <limits.h> as per SFbug:1546141.
+	- David Bronke fixed some warnings about unused variables and member
+	  initialization order, and added const keyword to
+	  csArray::Iterator::HasNext() and csArray::ConstIterator::HasNext().
+6-Sep-2006
+	- Jorrit fixed a bug in csGraphics2DOpenGL::SetMouseCursor().
+	  It would assert (in debug mode) or crash (in release mode) in
+	  case the iWin32Assistant was gone already. Instead of that it
+	  now just does a test and returns false in case the assistant
+	  is gone. That way stuff can reset the mouse cursor during
+	  destruction of Crystal Space.
+	- res fixed an issue with the Java bindings where symbols didn't get
+	  exported properly from the JNI glue shared library due being hidden
+	  by -fvisibility=hidden. Worked around that by also specifying
+	  -fvisibility=default when compiling the JNI glue, causing the
+	  symbols to get exported correctly again.
+	- res disabled strict aliasing when compiling the Java JNI glue. This
+	  fixes some issues in release builds.
+	- res fixed some errors having crept into SimpleRoom.java when it was
+	  updated to work with latest CS.
+	- Marten made a small SWIG-tweak to shut up an error from newer
+	  SWIG versions.
+	- Marten made partconv not crash.
+	- Marten converted nullmesh to new SCF syntax.
+5-Sep-2006
+	- res fixed the Java bindings to build again.
+4-Sep-2006
+	- res changed the configure program version check to support checking
+	  the same program with different version numbers.
+	- res separated the configure binutils recency check into it's own
+	  macro.
+	- res changed the --as-needed check to (a) only use --as-needed for
+	  newer binutils versions (b) disable it by default.
 2-Sep-2006
-	- Marten fixed [ticket:7], invalid alpha modifier in shader 
+	- Marten fixed [ticket:7], invalid alpha modifier in shader
 	  light.xml technique 150.
-	- Marten rewrote the OpenGL pixel format picker to enumerate 
+	- Marten rewrote the OpenGL pixel format picker to enumerate
 	  all the values in strictly decreasing order. This should solve
 	  ticket:1.
 31-Aug-2006
@@ -37,7 +179,7 @@ chronological order.
 	  is not always added as a library search path. This may cause issues
 	  when the user manually specifies paths for some libraries, since
 	  then the Python linker flags cause e.g. /usr/lib to be scanned and
-	  libraries errorneously taken from there. Instead, only add 
+	  libraries errorneously taken from there. Instead, only add
 	  sysprefix-based paths when needed.
 	- res added support for response files when shared libs are enabled.
 	  They're used if supported by the linker.
@@ -68,7 +210,7 @@ chronological order.
 	- Marten fixed csRefArray so that operator[] and Get (..) works
 	  as intended and don't cause refcounting errors. Bug 1487132.
 	- Marten fixed his last commit to work on gcc too. One caveat with
-	  current approach is that you cannot assign directly from a 
+	  current approach is that you cannot assign directly from a
 	  csRefArray::operator[] to a new csRef, you need to construct it
 	  (provide an explicit construction). No inefficiency, just some extra
 	  syntax.

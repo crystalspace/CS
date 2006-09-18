@@ -188,7 +188,7 @@ class csMaterialList : public scfImplementation1<csMaterialList,
 {
 private:
   csRefArrayObject<iMaterialWrapper> list;
-  csHash<iMaterialWrapper*,csStrKey> mat_hash;
+  csHash<iMaterialWrapper*, csString> mat_hash;
 
   class NameChangeListener : public scfImplementation1<NameChangeListener,
   	iObjectNameChangeListener>

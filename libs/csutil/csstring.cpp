@@ -626,5 +626,5 @@ csStringBase& csStringBase::PadCenter (size_t iNewSize, char iChar)
 
 uint csStringBase::GetHash() const
 {
-  return csHashCompute (GetData());
+  return csHashCompute (GetDataSafe());
 }

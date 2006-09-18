@@ -8,6 +8,8 @@ chronological order.
 
 This file describes the history of the SoC imposter branch.
 
+18-Sep-2006
+	- Fossi merged 25271:25382 from trunk
 05-Sep-2006
 	- Fossi finished merging and fixed imposters to work
 	- Fossi updated configure and msvc project files

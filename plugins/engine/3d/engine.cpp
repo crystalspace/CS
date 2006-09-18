@@ -542,7 +542,7 @@ csEngine::~csEngine ()
   {
     csRef<iEventQueue> q (CS_QUERY_REGISTRY (objectRegistry, iEventQueue));
     if (q != 0)
-      RemoveWeakListener (q, weakEventHandler);
+      CS::RemoveWeakListener (q, weakEventHandler);
   }
 
   DeleteAll ();
@@ -617,7 +617,7 @@ bool csEngine::Initialize (iObjectRegistry *objectRegistry)
     // discard canvas events if there is no canvas, by truncating the array
     if (!G2D) events[2] = CS_EVENTLIST_END;
 
-    RegisterWeakListener (q, this, events, weakEventHandler);
+    CS::RegisterWeakListener (q, this, events, weakEventHandler);
   }
 
   csConfigAccess cfg (objectRegistry, "/config/engine.cfg");
@@ -768,6 +768,8 @@ void csEngine::DeleteAll ()
   nextframePending = 0;
   halos.DeleteAll ();
   collections.RemoveAll ();
+  wantToDieSet.Empty ();
+  RemoveDelayedRemoves (false);
 
   GetMeshes ()->RemoveAll ();
   meshFactories.RemoveAll ();
@@ -1685,6 +1687,16 @@ void csEngine::ControlMeshes ()
     GetMeshes ()->Remove (mesh);
   }
   wantToDieSet.Empty ();
+
+  // Delete all objects that should be removed given the current
+  // time.
+  csTicks current = virtualClock->GetCurrentTicks ();
+  while (delayedRemoves.Length () > 0
+      && delayedRemoves.Top ().time_to_delete <= current)
+  {
+    csDelayedRemoveObject ro = delayedRemoves.Pop ();
+    RemoveObject (ro.object);
+  }
 }
 
 char* csEngine::SplitRegionName (const char* name, iRegion*& region,
@@ -3278,6 +3290,39 @@ csPtr<iMeshWrapper> csEngine::CreateMeshWrapper (
   }
 
   return CreateMeshWrapper (mo, name, sector, pos);
+}
+
+static int CompareDelayedRemoveObject (csDelayedRemoveObject const& r1,
+	csDelayedRemoveObject const& r2)
+{
+  // Reverse sort!
+  if (r1.time_to_delete < r2.time_to_delete) return 1;
+  else if (r2.time_to_delete < r1.time_to_delete) return -1;
+  else return 0;
+}
+
+void csEngine::DelayedRemoveObject (csTicks delay, iBase *object)
+{
+  csDelayedRemoveObject ro;
+  ro.object = object;
+  ro.time_to_delete = virtualClock->GetCurrentTicks () + delay;
+  delayedRemoves.InsertSorted (ro, CompareDelayedRemoveObject);
+}
+
+void csEngine::RemoveDelayedRemoves (bool remove)
+{
+  if (remove)
+  {
+    while (delayedRemoves.Length () > 0)
+    {
+      csDelayedRemoveObject ro = delayedRemoves.Pop ();
+      RemoveObject (ro.object);
+    }
+  }
+  else
+  {
+    delayedRemoves.DeleteAll ();
+  }
 }
 
 bool csEngine::RemoveObject (iBase *object)

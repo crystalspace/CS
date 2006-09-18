@@ -639,7 +639,7 @@ class csLightList : public scfImplementation1<csLightList,
 {
 private:
   csRefArrayObject<iLight> list;
-  csHash<iLight*,csStrKey> lights_hash;
+  csHash<iLight*, csString> lights_hash;
 
   class NameChangeListener : public scfImplementation1<NameChangeListener,
   	iObjectNameChangeListener>

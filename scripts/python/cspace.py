@@ -6240,6 +6240,7 @@ class iGenMeshAnimationControl(iBase):
     def AnimatesTexels(*args): return _cspace.iGenMeshAnimationControl_AnimatesTexels(*args)
     def AnimatesNormals(*args): return _cspace.iGenMeshAnimationControl_AnimatesNormals(*args)
     def AnimatesColors(*args): return _cspace.iGenMeshAnimationControl_AnimatesColors(*args)
+    def Update(*args): return _cspace.iGenMeshAnimationControl_Update(*args)
     def UpdateVertices(*args): return _cspace.iGenMeshAnimationControl_UpdateVertices(*args)
     def UpdateTexels(*args): return _cspace.iGenMeshAnimationControl_UpdateTexels(*args)
     def UpdateNormals(*args): return _cspace.iGenMeshAnimationControl_UpdateNormals(*args)
@@ -11126,9 +11127,6 @@ class csGraphics3DCaps(_object):
     __getattr__ = lambda self, name: _swig_getattr(self, csGraphics3DCaps, name)
     def __repr__(self):
         return "<%s.%s; proxy of C++ csGraphics3DCaps instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
-    __swig_setmethods__["CanClip"] = _cspace.csGraphics3DCaps_CanClip_set
-    __swig_getmethods__["CanClip"] = _cspace.csGraphics3DCaps_CanClip_get
-    if _newclass:CanClip = property(_cspace.csGraphics3DCaps_CanClip_get, _cspace.csGraphics3DCaps_CanClip_set)
     __swig_setmethods__["minTexHeight"] = _cspace.csGraphics3DCaps_minTexHeight_set
     __swig_getmethods__["minTexHeight"] = _cspace.csGraphics3DCaps_minTexHeight_get
     if _newclass:minTexHeight = property(_cspace.csGraphics3DCaps_minTexHeight_get, _cspace.csGraphics3DCaps_minTexHeight_set)
@@ -11141,12 +11139,6 @@ class csGraphics3DCaps(_object):
     __swig_setmethods__["maxTexWidth"] = _cspace.csGraphics3DCaps_maxTexWidth_set
     __swig_getmethods__["maxTexWidth"] = _cspace.csGraphics3DCaps_maxTexWidth_get
     if _newclass:maxTexWidth = property(_cspace.csGraphics3DCaps_maxTexWidth_get, _cspace.csGraphics3DCaps_maxTexWidth_set)
-    __swig_setmethods__["NeedsPO2Maps"] = _cspace.csGraphics3DCaps_NeedsPO2Maps_set
-    __swig_getmethods__["NeedsPO2Maps"] = _cspace.csGraphics3DCaps_NeedsPO2Maps_get
-    if _newclass:NeedsPO2Maps = property(_cspace.csGraphics3DCaps_NeedsPO2Maps_get, _cspace.csGraphics3DCaps_NeedsPO2Maps_set)
-    __swig_setmethods__["MaxAspectRatio"] = _cspace.csGraphics3DCaps_MaxAspectRatio_set
-    __swig_getmethods__["MaxAspectRatio"] = _cspace.csGraphics3DCaps_MaxAspectRatio_get
-    if _newclass:MaxAspectRatio = property(_cspace.csGraphics3DCaps_MaxAspectRatio_get, _cspace.csGraphics3DCaps_MaxAspectRatio_set)
     __swig_setmethods__["SupportsPointSprites"] = _cspace.csGraphics3DCaps_SupportsPointSprites_set
     __swig_getmethods__["SupportsPointSprites"] = _cspace.csGraphics3DCaps_SupportsPointSprites_get
     if _newclass:SupportsPointSprites = property(_cspace.csGraphics3DCaps_SupportsPointSprites_get, _cspace.csGraphics3DCaps_SupportsPointSprites_set)

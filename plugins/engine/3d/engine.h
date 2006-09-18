@@ -160,6 +160,12 @@ struct csSectorPos
   	sector (sector), pos (pos) { }
 };
 
+struct csDelayedRemoveObject
+{
+  csRef<iBase> object;
+  csTicks time_to_delete;
+};
+
 /**
  * List of camera positions for the engine. This class implements
  * iCameraPositionList.
@@ -558,6 +564,8 @@ public:
   	iRegion* region = 0);
 
   virtual bool RemoveObject (iBase* object);
+  virtual void DelayedRemoveObject (csTicks delay, iBase *object);
+  virtual void RemoveDelayedRemoves (bool remove = false);
 
   virtual void DeleteAll ();
 
@@ -863,6 +871,9 @@ private:
 
   /// Array of objects that want to die next frame (iMeshWrapper*).
   csSet<csPtrKey<iMeshWrapper> > wantToDieSet;
+
+  /// An array of objects to remove at a specific time.
+  csArray<csDelayedRemoveObject> delayedRemoves;
 
   /// The list of all named render priorities.
   csStringArray renderPriorities;
