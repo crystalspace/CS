@@ -49052,7 +49052,7 @@ if test -z "$with_pycegui"; then
 fi
 
 
-if test -n "$PYTHON" && test -n "SWIG"; then
+if test -n "$PYTHON" && test -n "$SWIG"; then
 
 
   if test "$with_pycegui" != no && test $cs_cv_libCEGUI = yes; then
@@ -49420,7 +49420,7 @@ fi
 
 	echo "$as_me:$LINENO: checking if cegui.py was generated with same swig version = $cs_prog_swig_is_version" >&5
 echo $ECHO_N "checking if cegui.py was generated with same swig version = $cs_prog_swig_is_version... $ECHO_C" >&6
-if test "${cs_cv_prog_cegui_py_was_generated_with_same_swig_version_SWIGVER_ok_annotated+set}" = set; then
+if test "${cs_cv_prog_cegui_py_was_generated_with_same_swig_version_PYCEGUI_EXPECTED_SWIG_VERSION_ok_annotated+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   cs_prog_cegui_py_was_generated_with_same_swig_is_version=
@@ -49459,40 +49459,40 @@ cs_prog_cegui_py_was_generated_with_same_swig_min_ver_1=`echo $cs_prog_cegui_py_
 cs_prog_cegui_py_was_generated_with_same_swig_min_ver_2=`echo $cs_prog_cegui_py_was_generated_with_same_swig_min_version${cs_prog_cegui_py_was_generated_with_same_swig_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\2/'`
 cs_prog_cegui_py_was_generated_with_same_swig_min_ver_3=`echo $cs_prog_cegui_py_was_generated_with_same_swig_min_version${cs_prog_cegui_py_was_generated_with_same_swig_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\3/'`
 
-cs_cv_prog_cegui_py_was_generated_with_same_swig_version_SWIGVER_ok=''
-test -z "$cs_cv_prog_cegui_py_was_generated_with_same_swig_version_SWIGVER_ok" \
+cs_cv_prog_cegui_py_was_generated_with_same_swig_version_PYCEGUI_EXPECTED_SWIG_VERSION_ok=''
+test -z "$cs_cv_prog_cegui_py_was_generated_with_same_swig_version_PYCEGUI_EXPECTED_SWIG_VERSION_ok" \
   && { expr "$cs_prog_cegui_py_was_generated_with_same_swig_is_ver_1" "=" "$cs_prog_cegui_py_was_generated_with_same_swig_min_ver_1" >/dev/null \
-    || cs_cv_prog_cegui_py_was_generated_with_same_swig_version_SWIGVER_ok=no ; }
-test -z "$cs_cv_prog_cegui_py_was_generated_with_same_swig_version_SWIGVER_ok" \
+    || cs_cv_prog_cegui_py_was_generated_with_same_swig_version_PYCEGUI_EXPECTED_SWIG_VERSION_ok=no ; }
+test -z "$cs_cv_prog_cegui_py_was_generated_with_same_swig_version_PYCEGUI_EXPECTED_SWIG_VERSION_ok" \
   && { expr "$cs_prog_cegui_py_was_generated_with_same_swig_min_ver_1" "=" "$cs_prog_cegui_py_was_generated_with_same_swig_is_ver_1" >/dev/null \
-    || cs_cv_prog_cegui_py_was_generated_with_same_swig_version_SWIGVER_ok=yes ; }
-test -z "$cs_cv_prog_cegui_py_was_generated_with_same_swig_version_SWIGVER_ok" \
+    || cs_cv_prog_cegui_py_was_generated_with_same_swig_version_PYCEGUI_EXPECTED_SWIG_VERSION_ok=yes ; }
+test -z "$cs_cv_prog_cegui_py_was_generated_with_same_swig_version_PYCEGUI_EXPECTED_SWIG_VERSION_ok" \
   && { expr "$cs_prog_cegui_py_was_generated_with_same_swig_is_ver_2" "=" "$cs_prog_cegui_py_was_generated_with_same_swig_min_ver_2" >/dev/null \
-    || cs_cv_prog_cegui_py_was_generated_with_same_swig_version_SWIGVER_ok=no ; }
-test -z "$cs_cv_prog_cegui_py_was_generated_with_same_swig_version_SWIGVER_ok" \
+    || cs_cv_prog_cegui_py_was_generated_with_same_swig_version_PYCEGUI_EXPECTED_SWIG_VERSION_ok=no ; }
+test -z "$cs_cv_prog_cegui_py_was_generated_with_same_swig_version_PYCEGUI_EXPECTED_SWIG_VERSION_ok" \
   && { expr "$cs_prog_cegui_py_was_generated_with_same_swig_min_ver_2" "=" "$cs_prog_cegui_py_was_generated_with_same_swig_is_ver_2" >/dev/null \
-    || cs_cv_prog_cegui_py_was_generated_with_same_swig_version_SWIGVER_ok=yes ; }
-test -z "$cs_cv_prog_cegui_py_was_generated_with_same_swig_version_SWIGVER_ok" \
+    || cs_cv_prog_cegui_py_was_generated_with_same_swig_version_PYCEGUI_EXPECTED_SWIG_VERSION_ok=yes ; }
+test -z "$cs_cv_prog_cegui_py_was_generated_with_same_swig_version_PYCEGUI_EXPECTED_SWIG_VERSION_ok" \
   && { expr "$cs_prog_cegui_py_was_generated_with_same_swig_is_ver_3" "=" "$cs_prog_cegui_py_was_generated_with_same_swig_min_ver_3" >/dev/null \
-    || cs_cv_prog_cegui_py_was_generated_with_same_swig_version_SWIGVER_ok=no ; }
-test -z "$cs_cv_prog_cegui_py_was_generated_with_same_swig_version_SWIGVER_ok" \
+    || cs_cv_prog_cegui_py_was_generated_with_same_swig_version_PYCEGUI_EXPECTED_SWIG_VERSION_ok=no ; }
+test -z "$cs_cv_prog_cegui_py_was_generated_with_same_swig_version_PYCEGUI_EXPECTED_SWIG_VERSION_ok" \
   && { expr "$cs_prog_cegui_py_was_generated_with_same_swig_min_ver_3" "=" "$cs_prog_cegui_py_was_generated_with_same_swig_is_ver_3" >/dev/null \
-    || cs_cv_prog_cegui_py_was_generated_with_same_swig_version_SWIGVER_ok=yes ; }
+    || cs_cv_prog_cegui_py_was_generated_with_same_swig_version_PYCEGUI_EXPECTED_SWIG_VERSION_ok=yes ; }
 
-if test -z "$cs_cv_prog_cegui_py_was_generated_with_same_swig_version_SWIGVER_ok"; then
-  cs_cv_prog_cegui_py_was_generated_with_same_swig_version_SWIGVER_ok=yes
+if test -z "$cs_cv_prog_cegui_py_was_generated_with_same_swig_version_PYCEGUI_EXPECTED_SWIG_VERSION_ok"; then
+  cs_cv_prog_cegui_py_was_generated_with_same_swig_version_PYCEGUI_EXPECTED_SWIG_VERSION_ok=yes
 fi
 
-cs_cv_prog_cegui_py_was_generated_with_same_swig_version_SWIGVER_ok_annotated="$cs_cv_prog_cegui_py_was_generated_with_same_swig_version_SWIGVER_ok"
+cs_cv_prog_cegui_py_was_generated_with_same_swig_version_PYCEGUI_EXPECTED_SWIG_VERSION_ok_annotated="$cs_cv_prog_cegui_py_was_generated_with_same_swig_version_PYCEGUI_EXPECTED_SWIG_VERSION_ok"
 if test -n "$cs_prog_cegui_py_was_generated_with_same_swig_is_version"; then
-  cs_cv_prog_cegui_py_was_generated_with_same_swig_version_SWIGVER_ok_annotated="$cs_cv_prog_cegui_py_was_generated_with_same_swig_version_SWIGVER_ok_annotated (version $cs_prog_cegui_py_was_generated_with_same_swig_is_version)"
+  cs_cv_prog_cegui_py_was_generated_with_same_swig_version_PYCEGUI_EXPECTED_SWIG_VERSION_ok_annotated="$cs_cv_prog_cegui_py_was_generated_with_same_swig_version_PYCEGUI_EXPECTED_SWIG_VERSION_ok_annotated (version $cs_prog_cegui_py_was_generated_with_same_swig_is_version)"
 fi
 
 
 fi
-echo "$as_me:$LINENO: result: $cs_cv_prog_cegui_py_was_generated_with_same_swig_version_SWIGVER_ok_annotated" >&5
-echo "${ECHO_T}$cs_cv_prog_cegui_py_was_generated_with_same_swig_version_SWIGVER_ok_annotated" >&6
-if test "$cs_cv_prog_cegui_py_was_generated_with_same_swig_version_SWIGVER_ok" = yes; then
+echo "$as_me:$LINENO: result: $cs_cv_prog_cegui_py_was_generated_with_same_swig_version_PYCEGUI_EXPECTED_SWIG_VERSION_ok_annotated" >&5
+echo "${ECHO_T}$cs_cv_prog_cegui_py_was_generated_with_same_swig_version_PYCEGUI_EXPECTED_SWIG_VERSION_ok_annotated" >&6
+if test "$cs_cv_prog_cegui_py_was_generated_with_same_swig_version_PYCEGUI_EXPECTED_SWIG_VERSION_ok" = yes; then
   PYCEGUI_I_DIR=`dirname "$PYCEGUI_I_FILE"`
 		 cs_build_prop_val="yes"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
@@ -49527,7 +49527,7 @@ fi
  # AS_IF ["$with_pycegui" != no && test $cs_cv_libCEGUI = yes]
 
 fi
- # AS_IF([test -n "$PYTHON" && test -n "SWIG"],[
+ # AS_IF([test -n "$PYTHON" && test -n "$SWIG"],[
 
 #------------------------------------------------------------------------------
 # Check if GNU/Linux joystick API is present.

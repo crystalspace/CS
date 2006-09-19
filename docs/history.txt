@@ -11,6 +11,8 @@ chronological order.
 	  allows to use cs and cegui python bindings together (jam target is
 	  pyceguimod). Also added a pyceguitest.py test script at 
 	  scripts/python.
+	- caedes fixed an error in the configure test for pycegui (was testing
+	  SWIG instead of $SWIG) and also made style a bit better.
 18-Sep-2006
 	- caedes changed cegui plugin name to cscegui.
 	- Jorrit made csComparatorString safe with regards to null strings.
