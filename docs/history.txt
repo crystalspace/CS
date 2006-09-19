@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+9-Sep-2006
+	- Marten changed particles to have a transform-mode instead of just
+	  a boolean localmode. This makes it possible to have world-space
+	  particles with local space emitter.
 8-Sep-2006
         - res added tests for some more GL types.
 	- caedes updated cspace.i for the new particles.

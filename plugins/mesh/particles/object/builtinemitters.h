@@ -256,7 +256,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     virtual csPtr<iParticleEmitter> Clone () const;
 
     virtual void EmitParticles (iParticleSystemBase* system,
-      const csParticleBuffer& particleBuffer, float dt, float totalTime);
+      const csParticleBuffer& particleBuffer, float dt, float totalTime,
+      const csReversibleTransform* const emitterToParticle);
 
     //-- iParticleBuiltinEmitterSphere
     virtual void SetRadius (float radius) 
@@ -284,7 +285,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     virtual csPtr<iParticleEmitter> Clone () const;
 
     virtual void EmitParticles (iParticleSystemBase* system,
-      const csParticleBuffer& particleBuffer, float dt, float totalTime);
+      const csParticleBuffer& particleBuffer, float dt, float totalTime,
+      const csReversibleTransform* const emitterToParticle);
 
 
     //-- iParticleBuiltinEmitterBox
@@ -313,7 +315,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     virtual csPtr<iParticleEmitter> Clone () const;
 
     virtual void EmitParticles (iParticleSystemBase* system,
-      const csParticleBuffer& particleBuffer, float dt, float totalTime);
+      const csParticleBuffer& particleBuffer, float dt, float totalTime,
+      const csReversibleTransform* const emitterToParticle);
 
     //-- iParticleBuiltinEmitterCylinder
     virtual void SetRadius (float radius)
@@ -350,7 +353,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     virtual csPtr<iParticleEmitter> Clone () const;
 
     virtual void EmitParticles (iParticleSystemBase* system,
-      const csParticleBuffer& particleBuffer, float dt, float totalTime);
+      const csParticleBuffer& particleBuffer, float dt, float totalTime,
+      const csReversibleTransform* const emitterToParticle);
 
     //-- iParticleBuiltinEmitterCone
     virtual void SetExtent (const csVector3& extent);
