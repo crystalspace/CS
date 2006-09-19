@@ -1522,7 +1522,51 @@ AS_IF([test $cs_cv_libCEGUI = yes],
 	[$cs_cv_libCEGUI_lflags],
 	[$cs_cv_libCEGUI_libs])])
 
+#------------------------------------------------------------------------------
+# Check if cegui.i is available, cegui.py compatible and cegui new enough
+#------------------------------------------------------------------------------
+m4_define([pycegui_paths_default],
+	  [/usr/local/include/CEGUI/bindings /usr/include/CEGUI/bindings /sw/include/CEGUI/bindings /opt/local/include/CEGUI/bindings /opt/include/CEGUI/bindings])
+pyceguitest="
+import os.path
+try:
+	import cegui
+	pyfile=getattr(cegui,'__'+'file__')
+	print pyfile.replace('.pyc','.py')
+except:
+	pass
+"
+AC_ARG_WITH([pycegui], [AC_HELP_STRING([--with-pycegui],
+    [use pycegui scripting interface (default YES)])])
+AS_IF([test -z "$with_pycegui"], [with_pycegui=yes])
 
+AS_IF([test -n "$PYTHON" && test -n "SWIG"],[
+
+  AS_IF([test "$with_pycegui" != no && test $cs_cv_libCEGUI = yes], [
+
+    CS_CHECK_BUILD([if CEGUI is bleeding edge], [cs_cv_CEGUI_bleeding],
+      [AC_LANG_PROGRAM(
+	[[#include <CEGUIWindow.h>]],
+	[CEGUI::Window *w=new CEGUI::Window("","");w->getXPosition();])],
+      [], [C++],[
+      AS_IF([test "$with_pycegui" != yes],
+          [PYCEGUI_I_FILE="$with_pycegui/package/cegui.i"
+           PYCEGUI_PY_FILE="$with_pycegui/src/cegui.py"],
+          [AC_PATH_PROGS([PYCEGUI_I_FILE],[cegui.i],[],[pycegui_paths_default])
+	   PYCEGUI_PY_FILE=`$PYTHON -c "$pyceguitest"`])
+      m4_define([SWIGVER],[$cs_prog_swig_is_version])
+      AS_IF([test -f "$PYCEGUI_PY_FILE" && test -f "$PYCEGUI_I_FILE"],[
+	CS_CHECK_PROG_VERSION([cegui.py was generated with same swig],
+		[sed -n -e '1p' "$PYCEGUI_PY_FILE"],
+		[SWIGVER],[9.9|.9],
+		[PYCEGUI_I_DIR=`dirname "$PYCEGUI_I_FILE"`
+		 CS_EMIT_BUILD_PROPERTY([PYCEGUI.SWIGOK], [yes])
+		 CS_EMIT_BUILD_PROPERTY([PYCEGUI.SWIGFLAGS], [-I$PYCEGUI_I_DIR])
+		],[],[=])
+      ]) # AS_IF
+    ],[],[],[$cs_cv_libCEGUI_cflags],[$cs_cv_libCEGUI_lflags],[$cs_cv_libCEGUI_libs])
+  ],[]) # AS_IF ["$with_pycegui" != no && test $cs_cv_libCEGUI = yes]
+],[]) # AS_IF([test -n "$PYTHON" && test -n "SWIG"],[
 
 #------------------------------------------------------------------------------
 # Check if GNU/Linux joystick API is present.

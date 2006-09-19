@@ -6,6 +6,11 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+19-Sep-2006
+	- caedes added cscript/pycscegui, an additional python module that
+	  allows to use cs and cegui python bindings together (jam target is
+	  pyceguimod). Also added a pyceguitest.py test script at 
+	  scripts/python.
 18-Sep-2006
 	- caedes changed cegui plugin name to cscegui.
 	- Jorrit made csComparatorString safe with regards to null strings.
