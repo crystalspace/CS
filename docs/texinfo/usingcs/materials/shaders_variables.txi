@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Shader Variables, , Shader System Overview, Shaders
+@node Shader Variables, Shader Conditions and Processing Instructions Reference, Shader System Overview, Shaders
 @subsubsection Shader Variables
 @cindex Shader
 @cindex @code{iShader}

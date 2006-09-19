@@ -12,7 +12,9 @@ work closely together.
 @menu
 * Shader System Overview::
 * Shader Variables::
+* Shader Conditions and Processing Instructions Reference::
 @end menu
 
 @importss{usingcs,materials,shaders_overview.txi}
 @importss{usingcs,materials,shaders_variables.txi}
+@importss{usingcs,materials,shaders_cpiref.txi}
