@@ -32,8 +32,6 @@
 #include "csutil/plugmgr.h"
 #include "csutil/virtclk.h"
 #include "csutil/xmltiny.h"
-#include "iaws/awscnvs.h"
-#include "iaws/awsecomp.h"
 #include "iengine/camera.h"
 #include "iengine/engine.h"
 #include "iengine/light.h"
@@ -47,6 +45,7 @@
 #include "imesh/sprite3d.h"
 #include "imesh/spritecal3d.h"
 #include "imesh/thing.h"
+#include "ivaria/icegui.h"
 
 struct vmAnimCallback;
 
@@ -62,17 +61,16 @@ class ViewMesh : public csApplicationFramework, public csBaseEventHandler
   csRef<iVirtualClock> vc;
   csRef<iVFS> vfs;
   csRef<iView> view;
+  csRef<iCEGUI> cegui;
   iSector* room;
   int x,y;
 
-  csRef<iAws> aws;
-  iAwsPrefManager* awsprefs;
-  csRef<iAwsCanvas> awsCanvas;
-  iAwsComponent* form;
-  iAwsComponent* stddlg;
+  CEGUI::Window* form;
+  CEGUI::Window* stddlg;
   enum { load, loadlib, save, savebinary, attach } stddlgPurpose;
 
   enum { movenormal, moveorigin, rotateorigin } camMode;
+
   float rotX, rotY;
   float roomsize, scale;
   float move_sprite_speed;
@@ -91,7 +89,6 @@ class ViewMesh : public csApplicationFramework, public csBaseEventHandler
   vmAnimCallback* callback;
 
   bool OnKeyboard (iEvent&);
-  bool HandleEvent (iEvent &);
 
   void ProcessFrame ();
   void FinishFrame ();
@@ -114,39 +111,41 @@ class ViewMesh : public csApplicationFramework, public csBaseEventHandler
   void UpdateSocket ();
 
   //SETTING
-  static void CameraMode (unsigned long, intptr_t awst, iAwsSource *s);
-  static void LoadButton (unsigned long, intptr_t awst, iAwsSource *s);
-  static void LoadLibButton (unsigned long, intptr_t awst, iAwsSource *s);
-  static void SaveButton (unsigned long, intptr_t awst, iAwsSource *s);
-  static void SaveBinaryButton (unsigned long, intptr_t awst, iAwsSource *s);
-  static void SetScaleSprite (unsigned long, intptr_t awst, iAwsSource *s);
+  bool CameraModeRotate (const CEGUI::EventArgs& e);
+  bool CameraModeMoveOrigin (const CEGUI::EventArgs& e);
+  bool CameraModeMoveNormal (const CEGUI::EventArgs& e);
+  bool LoadButton (const CEGUI::EventArgs& e);
+  bool LoadLibButton (const CEGUI::EventArgs& e);
+  bool SaveButton (const CEGUI::EventArgs& e);
+  bool SaveBinaryButton (const CEGUI::EventArgs& e);
+  bool SetScaleSprite (const CEGUI::EventArgs& e);
   //ANIMATION
-  static void ReversAnimation (unsigned long, intptr_t awstut, iAwsSource *source);
-  static void StopAnimation (unsigned long, intptr_t awstut, iAwsSource *source);
-  static void SlowerAnimation (unsigned long, intptr_t awstut, iAwsSource *source);
-  static void AddAnimation (unsigned long, intptr_t awstut, iAwsSource *source);
-  static void FasterAnimation (unsigned long, intptr_t awstut, iAwsSource *source);
-  static void SetAnimation (unsigned long, intptr_t awstut, iAwsSource *source);
-  static void RemoveAnimation (unsigned long, intptr_t awstut, iAwsSource *source);
-  static void ClearAnimation (unsigned long, intptr_t awstut, iAwsSource *source);
-  static void SelAnimation (unsigned long, intptr_t awstut, iAwsSource *source);
+  bool ReversAnimation (const CEGUI::EventArgs& e);
+  bool StopAnimation (const CEGUI::EventArgs& e);
+  bool SlowerAnimation (const CEGUI::EventArgs& e);
+  bool AddAnimation (const CEGUI::EventArgs& e);
+  bool FasterAnimation (const CEGUI::EventArgs& e);
+  bool SetAnimation (const CEGUI::EventArgs& e);
+  bool RemoveAnimation (const CEGUI::EventArgs& e);
+  bool ClearAnimation (const CEGUI::EventArgs& e);
+  bool SelAnimation (const CEGUI::EventArgs& e);
   //SOCKET
-  static void SetMesh (unsigned long, intptr_t awstut, iAwsSource *source);
-  static void SetSubMesh (unsigned long, intptr_t awstut, iAwsSource *source);
-  static void SetTriangle (unsigned long, intptr_t awstut, iAwsSource *source);
-  static void SetRotX (unsigned long, intptr_t awstut, iAwsSource *source);
-  static void SetRotY (unsigned long, intptr_t awstut, iAwsSource *source);
-  static void SetRotZ (unsigned long, intptr_t awstut, iAwsSource *source);
-  static void AttachButton (unsigned long, intptr_t awst, iAwsSource *s);
-  static void DetachButton (unsigned long, intptr_t awst, iAwsSource *s);
-  static void AddSocket (unsigned long, intptr_t awst, iAwsSource *s);
-  static void DelSocket (unsigned long, intptr_t awst, iAwsSource *s);
-  static void SelSocket (unsigned long, intptr_t awst, iAwsSource *s);
-  static void RenameSocket (unsigned long, intptr_t awst, iAwsSource *s);
+  bool SetMesh (const CEGUI::EventArgs& e);
+  bool SetSubMesh (const CEGUI::EventArgs& e);
+  bool SetTriangle (const CEGUI::EventArgs& e);
+  bool SetRotX (const CEGUI::EventArgs& e);
+  bool SetRotY (const CEGUI::EventArgs& e);
+  bool SetRotZ (const CEGUI::EventArgs& e);
+  bool AttachButton (const CEGUI::EventArgs& e);
+  bool DetachButton (const CEGUI::EventArgs& e);
+  bool AddSocket (const CEGUI::EventArgs& e);
+  bool DelSocket (const CEGUI::EventArgs& e);
+  bool SelSocket (const CEGUI::EventArgs& e);
+  bool RenameSocket (const CEGUI::EventArgs& e);
   //MORPH
-  static void SelMorph (unsigned long, intptr_t awst, iAwsSource *s);
-  static void BlendButton (unsigned long, intptr_t awst, iAwsSource *s);
-  static void ClearButton (unsigned long, intptr_t awst, iAwsSource *s);
+  bool SelMorph (const CEGUI::EventArgs& e);
+  bool BlendButton (const CEGUI::EventArgs& e);
+  bool ClearButton (const CEGUI::EventArgs& e);
 
  public:
 
@@ -162,10 +161,11 @@ private:
 
   void StdDlgUpdateLists(const char* filename);
 
-  static void StdDlgOkButton (unsigned long, intptr_t awst, iAwsSource *s);
-  static void StdDlgCancleButton (unsigned long, intptr_t awst, iAwsSource *s);
-  static void StdDlgFileSelect (unsigned long, intptr_t awst, iAwsSource *s);
-  static void StdDlgDirSelect (unsigned long, intptr_t awst, iAwsSource *s);
+  bool StdDlgOkButton (const CEGUI::EventArgs& e);
+  bool StdDlgCancleButton (const CEGUI::EventArgs& e);
+  bool StdDlgFileSelect (const CEGUI::EventArgs& e);
+  bool StdDlgDirSelect (const CEGUI::EventArgs& e);
+  bool StdDlgDirChange (const CEGUI::EventArgs& e);
 
   CS_EVENTHANDLER_NAMES ("crystalspace.viewmesh")
   CS_EVENTHANDLER_NIL_CONSTRAINTS
