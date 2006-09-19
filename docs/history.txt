@@ -7,9 +7,10 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 19-Sep-2006
+        - Genjix documented a little csIntersect3 behaviour.
 	- caedes added cscript/pycscegui, an additional python module that
 	  allows to use cs and cegui python bindings together (jam target is
-	  pyceguimod). Also added a pyceguitest.py test script at 
+	  pyceguimod). Also added a pyceguitest.py test script at
 	  scripts/python.
 	- caedes fixed an error in the configure test for pycegui (was testing
 	  SWIG instead of $SWIG) and also made style a bit better.
@@ -32,7 +33,7 @@ chronological order.
 	  caused the output vertex buffers to be underfilled.
 	- res updated a gldrivers tweak to include certain NV Quadro chips.
 	- res updated a gldrivers tweak to include GF2 GTS chips.
-	- Marten augmented SCF docs with some info about inheritance of 
+	- Marten augmented SCF docs with some info about inheritance of
 	  interfaces and implementations.
 	- PK changed SimpVS to use CEGUI instead of AWS.
 	- res added an overview of the shader system to the manual (based off
@@ -51,8 +52,8 @@ chronological order.
 	- Jorrit fixed viewmesh so that it starts at the current dir instead
 	  of an internal CEGUI directory.
 	- Erroroman did the following:
-	  - added Update() function to genmesh animation interface. It is a 
-	    general update function that is not related to updating render 
+	  - added Update() function to genmesh animation interface. It is a
+	    general update function that is not related to updating render
 	    buffer data.
 	  - updating bones mapping in gmeshskelanim2 is now in Update method.
 	  - changted gmeshskelanim2 bones mapping data
@@ -63,10 +64,10 @@ chronological order.
 	  - adopted vproc_std to access bones and handle skinned vertices.
 	  - added new shaders for animating genmeshes - character2.xml and
 	    character_bump2.xml.The new shaders provides 4 bones per vertex
-	    mapping and software animation using vproc_std. The old shaders 
+	    mapping and software animation using vproc_std. The old shaders
 	    will be removed after improving of the new ones.
 	- res changed CS_DEPRECATED_TYPE to be useable on MSVC as well.
-	- res fixed the doxygen settings to correctly handle the 
+	- res fixed the doxygen settings to correctly handle the
 	  CS_DEPRECATED_..._MSG macros.
 	- res marked some types and methods that were deprecated as per the
 	  API docs with the deprecation macros. Also changed some instances
