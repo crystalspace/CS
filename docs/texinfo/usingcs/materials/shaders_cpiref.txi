@@ -6,7 +6,7 @@
 
 Shader conditions and processing instructions are specified via @sc{xml} 
 processing instructions, that is @code{<?...?>}.  Some instructions only
-consists of a single instruction, others consist of a pair and enclose a
+consist of a single instruction, others consist of a pair and enclose a
 block of @sc{xml}.  All tags opened in such a block must be properly closed
 according to the node hierarchy, and all closing tags must be matched by
 an opening tag inside such a block.
@@ -82,8 +82,8 @@ Syntax for generation:
 <?Endgenerate?>
 @end example
 
-@samp{Generate} instructions let internally run a counter, starting at 
-@samp{Start}, adding @samp{Step} on each iteration, until the counter
+@samp{Generate} instructions let internally run an integer counter, starting 
+at @samp{Start}, adding @samp{Step} on each iteration, until the counter
 is greater (for a positive @samp{Step}) respectively smaller (for a 
 negative @samp{Step}) than @samp{End}. Each iteration replicates the
 contents block.
