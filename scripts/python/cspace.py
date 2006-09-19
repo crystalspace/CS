@@ -2206,26 +2206,6 @@ class csShaderVariable(csRefCount):
     def SetArrayElement(*args): return _cspace.csShaderVariable_SetArrayElement(*args)
 _cspace.csShaderVariable_swigregister(csShaderVariable)
 
-class ShaderVarName(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, ShaderVarName, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, ShaderVarName, name)
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ CS::ShaderVarName instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
-    __swig_setmethods__["name"] = _cspace.ShaderVarName_name_set
-    __swig_getmethods__["name"] = _cspace.ShaderVarName_name_get
-    if _newclass:name = property(_cspace.ShaderVarName_name_get, _cspace.ShaderVarName_name_set)
-    def __init__(self, *args):
-        this = _cspace.new_ShaderVarName(*args)
-        try: self.this.append(this)
-        except: self.this = this
-    __swig_destroy__ = _cspace.delete_ShaderVarName
-    __del__ = lambda self : None;
-_cspace.ShaderVarName_swigregister(ShaderVarName)
-
 class csShaderVariableArrayReadOnly(iBase):
     __swig_setmethods__ = {}
     for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
@@ -4418,10 +4398,35 @@ class iMaterialList(iBase):
     __del__ = lambda self : None;
 _cspace.iMaterialList_swigregister(iMaterialList)
 
-class iSceneNodeArray(_object):
+class iSceneNodeArrayReadOnly(iBase):
     __swig_setmethods__ = {}
+    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iSceneNodeArrayReadOnly, name, value)
+    __swig_getmethods__ = {}
+    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, iSceneNodeArrayReadOnly, name)
+    def __init__(self): raise AttributeError, "No constructor defined"
+    def __repr__(self):
+        try: strthis = "at 0x%x" %( self.this, ) 
+        except: strthis = "" 
+        return "<%s.%s; proxy of C++ iArrayReadOnly<iSceneNode * > instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    def GetSize(*args): return _cspace.iSceneNodeArrayReadOnly_GetSize(*args)
+    def Get(*args): return _cspace.iSceneNodeArrayReadOnly_Get(*args)
+    def Top(*args): return _cspace.iSceneNodeArrayReadOnly_Top(*args)
+    def Find(*args): return _cspace.iSceneNodeArrayReadOnly_Find(*args)
+    def GetIndex(*args): return _cspace.iSceneNodeArrayReadOnly_GetIndex(*args)
+    def IsEmpty(*args): return _cspace.iSceneNodeArrayReadOnly_IsEmpty(*args)
+    def GetAll(*args): return _cspace.iSceneNodeArrayReadOnly_GetAll(*args)
+    __swig_destroy__ = _cspace.delete_iSceneNodeArrayReadOnly
+    __del__ = lambda self : None;
+_cspace.iSceneNodeArrayReadOnly_swigregister(iSceneNodeArrayReadOnly)
+
+class iSceneNodeArray(iSceneNodeArrayReadOnly):
+    __swig_setmethods__ = {}
+    for _s in [iSceneNodeArrayReadOnly]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iSceneNodeArray, name, value)
     __swig_getmethods__ = {}
+    for _s in [iSceneNodeArrayReadOnly]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iSceneNodeArray, name)
     def __init__(self): raise AttributeError, "No constructor defined"
     def __repr__(self):

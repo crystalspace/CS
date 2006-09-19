@@ -3182,45 +3182,6 @@ sub ACQUIRE {
 }
 
 
-############# Class : cspace::ShaderVarName ##############
-
-package cspace::ShaderVarName;
-use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
-@ISA = qw( cspace );
-%OWNER = ();
-%ITERATORS = ();
-*swig_name_get = *cspacec::ShaderVarName_name_get;
-*swig_name_set = *cspacec::ShaderVarName_name_set;
-sub new {
-    my $pkg = shift;
-    my $self = cspacec::new_ShaderVarName(@_);
-    bless $self, $pkg if defined($self);
-}
-
-sub DESTROY {
-    return unless $_[0]->isa('HASH');
-    my $self = tied(%{$_[0]});
-    return unless defined $self;
-    delete $ITERATORS{$self};
-    if (exists $OWNER{$self}) {
-        cspacec::delete_ShaderVarName($self);
-        delete $OWNER{$self};
-    }
-}
-
-sub DISOWN {
-    my $self = shift;
-    my $ptr = tied(%$self);
-    delete $OWNER{$ptr};
-}
-
-sub ACQUIRE {
-    my $self = shift;
-    my $ptr = tied(%$self);
-    $OWNER{$ptr} = 1;
-}
-
-
 ############# Class : cspace::csShaderVariableArrayReadOnly ##############
 
 package cspace::csShaderVariableArrayReadOnly;
@@ -6236,11 +6197,49 @@ sub ACQUIRE {
 }
 
 
+############# Class : cspace::iSceneNodeArrayReadOnly ##############
+
+package cspace::iSceneNodeArrayReadOnly;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::iBase cspace );
+%OWNER = ();
+%ITERATORS = ();
+*GetSize = *cspacec::iSceneNodeArrayReadOnly_GetSize;
+*Get = *cspacec::iSceneNodeArrayReadOnly_Get;
+*Top = *cspacec::iSceneNodeArrayReadOnly_Top;
+*Find = *cspacec::iSceneNodeArrayReadOnly_Find;
+*GetIndex = *cspacec::iSceneNodeArrayReadOnly_GetIndex;
+*IsEmpty = *cspacec::iSceneNodeArrayReadOnly_IsEmpty;
+*GetAll = *cspacec::iSceneNodeArrayReadOnly_GetAll;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iSceneNodeArrayReadOnly($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
 ############# Class : cspace::iSceneNodeArray ##############
 
 package cspace::iSceneNodeArray;
 use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
-@ISA = qw( cspace );
+@ISA = qw( cspace::iSceneNodeArrayReadOnly cspace );
 %OWNER = ();
 %ITERATORS = ();
 sub DESTROY {
