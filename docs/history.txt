@@ -15,6 +15,9 @@ chronological order.
         - Genjix documented a little csIntersect3 behaviour.
 18-Sep-2006
 	- caedes changed cegui plugin name to cscegui.
+	- Jorrit fixed a misplaced 'break' in ParseMixMode() of the syntax
+	  services plugin. This would cause MESH mixmode to be interpreted
+	  as ALPHATEST instead.
 17-Sep-2006
 	- PK changed SimpVS to use CEGUI instead of AWS.
 	- res fixed a bug in the software renderer vertex transformer that
