@@ -675,6 +675,13 @@ CS_FORCEINLINE void* cs_calloc (size_t n, size_t s)
  * use operator new(size_t,const CS::AllocPlatform&).
  */
 //@{
+
+/**
+ * Until bug #146 (intrusive overriding of new and delete causing 
+ * incompatibility with external projects) have been solved, this is disabled
+ */
+#define CS_NO_NEW_OVERRIDE
+
 #ifndef CS_NO_MALLOC_OVERRIDE
 #define malloc 		cs_malloc
 #define free 	        cs_free
