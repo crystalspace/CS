@@ -22,6 +22,7 @@ chronological order.
 	  to use the _MSG variant. Lastly, fixed some deprecation warnings.
 	- res removed some unneeded members from csGraphics3DCaps.
 	- res noted some compiler versions on the requirements manual page.
+	- res updated the docs for the new cs-win32libs version.
 12-Sep-2006
 	- PK extended the ice-skin for tabbuttons.
 10-Sep-2006
