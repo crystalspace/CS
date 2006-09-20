@@ -171,14 +171,14 @@ public:
     // delete all posts pointing to node
     for (size_t iter=0 ; iter<Nodes[p].pre.Length() ; iter++) 
     {
-      Nodes[Nodes[p].pre[iter]].post.DeleteFast(p);
+      Nodes[Nodes[p].pre[iter]].post.Delete(p);
     }
     // delete node's pre's
     Nodes[p].pre.DeleteAll();
     // delete all pres pointing to node
     for (size_t iter=0 ; iter<Nodes[p].post.Length() ; iter++) 
     {
-      Nodes[Nodes[p].post[iter]].pre.DeleteFast(p);
+      Nodes[Nodes[p].post[iter]].pre.Delete(p);
     }
     // delete node's post's
     Nodes[p].post.DeleteAll();

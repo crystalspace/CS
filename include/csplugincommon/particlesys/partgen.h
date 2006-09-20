@@ -53,6 +53,8 @@ struct iObjectRegistry;
 struct iEngine;
 struct iMeshWrapper;
 
+#include "csutil/win32/msvc_deprecated_warn_off.h"
+
 /**
  * This class represents a particle system. It is a set of iParticles.
  * Subclasses of this class may be of more interest to users.
@@ -421,6 +423,8 @@ public:
   void SetAccel (int idx, const csVector3& acl)
   { part_accel[idx] = acl; }
 };
+
+#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 /** @} */
 

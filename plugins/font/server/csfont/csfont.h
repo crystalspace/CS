@@ -212,7 +212,7 @@ private:
 
   // A list of csDefaultFont pointers.
   //csRefArray<csDefaultFont> fonts;
-  csHash<csDefaultFont*, csStrKey> fonts;
+  csHash<csDefaultFont*, csString> fonts;
   bool emitErrors;
 
   /// read a font file from vfs

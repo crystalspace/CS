@@ -1498,7 +1498,7 @@ bool csGenmeshMeshObject::RemoveRenderBuffer (const char *name)
   csStringID bufID = factory->GetStrings()->Request (name);
   if (userBuffers.RemoveRenderBuffer (bufID))
   {
-    user_buffer_names.DeleteFast (bufID);
+    user_buffer_names.Delete (bufID);
     return true;
   }
   return false;
@@ -2033,7 +2033,7 @@ bool csGenmeshMeshObjectFactory::RemoveRenderBuffer (const char *name)
   csStringID bufID = strings->Request (name);
   if (userBuffers.RemoveRenderBuffer (bufID))
   {
-    user_buffer_names.DeleteFast (bufID);
+    user_buffer_names.Delete (bufID);
     return true;
   }
   return false;

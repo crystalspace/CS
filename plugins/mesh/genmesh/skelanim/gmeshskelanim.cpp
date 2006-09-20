@@ -1127,7 +1127,7 @@ void csGenmeshSkelAnimationControl::Stop (const char* scriptname)
 
 void csGenmeshSkelAnimationControl::Stop (iGenMeshSkeletonScript *script)
 {
-  running_scripts.DeleteFast ( (csSkelAnimControlRunnable *)script);
+  running_scripts.Delete ( (csSkelAnimControlRunnable *)script);
 }
 
 size_t csGenmeshSkelAnimationControl::GetScriptsCount ()

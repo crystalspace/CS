@@ -14,6 +14,12 @@ chronological order.
 15-Sep-2006
 	- Jorrit fixed viewmesh so that it starts at the current dir instead
 	  of an internal CEGUI directory.
+	- res changed CS_DEPRECATED_TYPE to be useable on MSVC as well.
+	- res fixed the doxygen settings to correctly handle the 
+	  CS_DEPRECATED_..._MSG macros.
+	- res marked some types and methods that were deprecated as per the
+	  API docs with the deprecation macros. Also changed some instances
+	  to use the _MSG variant. Lastly, fixed some deprecation warnings.
 12-Sep-2006
 	- PK extended the ice-skin for tabbuttons.
 10-Sep-2006

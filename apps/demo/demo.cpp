@@ -533,8 +533,8 @@ void Demo::SetupFrame ()
     csNamedPath* np = seqmgr->GetSelectedPath (map_selpath, start, total);
     if (np)
     {
-      float r = np->GetTimeValue (map_selpoint);
-      np->Calculate (r);
+      float r = np->GetTime (map_selpoint);
+      np->CalculateAtTime (r);
       debug_time = csTicks (start + total * r);
     }
     else
@@ -547,8 +547,8 @@ void Demo::SetupFrame ()
     csNamedPath* np = seqmgr->GetSelectedPath (map_selpath);
     if (np)
     {
-      float r = np->GetTimeValue (map_selpoint);
-      np->Calculate (r);
+      float r = np->GetTime (map_selpoint);
+      np->CalculateAtTime (r);
       csVector3 pos, up, forward;
       np->GetInterpolatedPosition (pos);
       np->GetInterpolatedUp (up);
@@ -649,7 +649,7 @@ void Demo::DrawEditInfo ()
     	fwd.x, fwd.y, fwd.z); hh += fh;
     GfxWrite (ww, hh, col_black, col_white, "U(%.2g,%.2g,%.2g)",
     	up.x, up.y, up.z); hh += fh;
-    float t = np->GetTimeValue (map_selpoint);
+    float t = np->GetTime (map_selpoint);
     csTicks tms = csTicks (t*total);
     GfxWrite (ww, hh, col_black, col_white, "tot time %d ms", total); hh += fh;
     GfxWrite (ww, hh, col_black, col_white, "rel time %d ms", tms); hh += fh;
@@ -659,7 +659,7 @@ void Demo::DrawEditInfo ()
       csVector3 v1;
       np->GetPositionVector (map_selpoint-1, v1);
       float d = csQsqrt (csSquaredDist::PointPoint (v, v1));
-      float t1 = np->GetTimeValue (map_selpoint-1);
+      float t1 = np->GetTime (map_selpoint-1);
       float dr = t-t1;
       float speed = (float) fabs (dr) / d;
       csTicks tms1 = csTicks (t1*total);
@@ -674,7 +674,7 @@ void Demo::DrawEditInfo ()
     {
       csVector3 v1;
       np->GetPositionVector (map_selpoint+1, v1);
-      float t1 = np->GetTimeValue (map_selpoint+1);
+      float t1 = np->GetTime (map_selpoint+1);
       float dr = t1-t;
       float d = csQsqrt (csSquaredDist::PointPoint (v, v1));
       float speed = (float) fabs (dr) / d;
@@ -823,7 +823,7 @@ bool Demo::DemoHandleEvent (iEvent &Event)
         case '=':
 	  // Make the forward vector look along the path. i.e. let it look
 	  // to an average direction as specified by next and previous point.
-	  if (map_selpoint <= 0 || map_selpoint >= np->GetPointCount ()-1)
+          if (map_selpoint <= 0 || map_selpoint >= np->Length ()-1)
 	  {
 	    ShowMessage ("The '=' operation can't work on this point!\n");
 	  }
@@ -874,7 +874,7 @@ bool Demo::DemoHandleEvent (iEvent &Event)
         case '+':
 	  // Make the forward vector look along the path. i.e. let it look
 	  // to the next point in the path if there is one.
-	  if (map_selpoint >= np->GetPointCount ()-1)
+	  if (map_selpoint >= np->Length ()-1)
 	  {
             csVector3 v1, v2;
 	    np->GetPositionVector (map_selpoint-1, v1);
@@ -1007,9 +1007,9 @@ bool Demo::DemoHandleEvent (iEvent &Event)
 	    csRef<iFile> fp (myVFS->Open (buf, VFS_FILE_WRITE));
 	    if (fp)
 	    {
-	      int i, num = np->GetPointCount ();
+	      int i, num = np->Length ();
 	      FileWrite (fp, "    NUM (%d)\n", num);
-	      const float* t = np->GetTimeValues ();
+	      const float* t = np->GetTimes ();
 	      FileWrite (fp, "    TIMES (%g", t[0]);
 	      for (i = 1 ; i < num ; i++)
 	        FileWrite (fp, ",%g", t[i]);
@@ -1049,7 +1049,7 @@ bool Demo::DemoHandleEvent (iEvent &Event)
 	  {
 	    np->InsertPoint (map_selpoint);
 	    map_selpoint++;
-	    if (map_selpoint == np->GetPointCount ()-1)
+	    if (map_selpoint == np->Length ()-1)
 	    {
 	      csVector3 v;
 	      np->GetPositionVector (map_selpoint-1, v);
@@ -1082,18 +1082,18 @@ bool Demo::DemoHandleEvent (iEvent &Event)
 	  if (np)
 	  {
 	    np->RemovePoint (map_selpoint);
-	    if (map_selpoint >= np->GetPointCount ())
+	    if (map_selpoint >= np->Length ())
 	      map_selpoint--;
 	  }
 	  break;
 	case ',':
 	  if (np)
 	  {
-	    if (map_selpoint > 0 && map_selpoint < np->GetPointCount ()-1)
+	    if (map_selpoint > 0 && map_selpoint < np->Length ()-1)
 	    {
-	      float t = np->GetTimeValue (map_selpoint);
-	      float t1 = np->GetTimeValue (map_selpoint-1);
-	      float t2 = np->GetTimeValue (map_selpoint+1);
+	      float t = np->GetTime (map_selpoint);
+	      float t1 = np->GetTime (map_selpoint-1);
+	      float t2 = np->GetTime (map_selpoint+1);
 	      float dt = (t2-t1);
 	      if (shift) dt /= 5.;
 	      else if (ctrl) dt /= 500.;
@@ -1107,33 +1107,33 @@ bool Demo::DemoHandleEvent (iEvent &Event)
 	case '.':
 	  if (np)
 	  {
-	    if (map_selpoint > 0 && map_selpoint < np->GetPointCount ()-1)
+	    if (map_selpoint > 0 && map_selpoint < np->Length ()-1)
 	    {
-	      float t = np->GetTimeValue (map_selpoint);
-	      float t1 = np->GetTimeValue (map_selpoint-1);
-	      float t2 = np->GetTimeValue (map_selpoint+1);
+	      float t = np->GetTime (map_selpoint);
+	      float t1 = np->GetTime (map_selpoint-1);
+	      float t2 = np->GetTime (map_selpoint+1);
 	      float dt = (t2-t1);
 	      if (shift) dt /= 5.;
 	      else if (ctrl) dt /= 500.;
 	      else dt /= 50.;
 	      t += dt;
 	      if (t > t2) t = t2;
-	      np->SetTimeValue (map_selpoint, t);
+	      np->SetTime (map_selpoint, t);
 	    }
 	  }
 	  break;
 	case '/':
-	  if (np && map_selpoint > 0 && map_selpoint < np->GetPointCount ()-1)
+	  if (np && map_selpoint > 0 && map_selpoint < np->Length ()-1)
 	  {
-	    float t1 = np->GetTimeValue (map_selpoint - 1);
-	    float t2 = np->GetTimeValue (map_selpoint + 1);
-	    np->SetTimeValue (map_selpoint, (t1+t2) / 2.0f);
+	    float t1 = np->GetTime (map_selpoint - 1);
+	    float t2 = np->GetTime (map_selpoint + 1);
+	    np->SetTime (map_selpoint, (t1+t2) / 2.0f);
 	  }
 	  break;
 	case '?':
 	  if (np)
 	  {
-	    int num = np->GetPointCount ();
+	    int num = np->Length ();
 	    const float* xv, * yv, * zv;
 	    xv = np->GetDimensionValues (0);
 	    yv = np->GetDimensionValues (1);
@@ -1164,14 +1164,14 @@ bool Demo::DemoHandleEvent (iEvent &Event)
 	      list[i] = tot / totlen;
 	      v0 = v1;
 	    }
-	    np->SetTimeValues (list);
+	    np->SetTimes (list);
 	  }
 	  break;
         case '>':
 	  if (np)
 	  {
             map_selpoint++;
-	    if (map_selpoint >= np->GetPointCount ())
+	    if (map_selpoint >= np->Length ())
 	      map_selpoint = 0;
 	  }
 	  break;
@@ -1180,7 +1180,7 @@ bool Demo::DemoHandleEvent (iEvent &Event)
 	  {
             map_selpoint--;
 	    if (map_selpoint < 0)
-	      map_selpoint = np->GetPointCount ()-1;
+	      map_selpoint = np->Length ()-1;
 	  }
 	  break;
         case 'c':
@@ -1220,8 +1220,8 @@ bool Demo::DemoHandleEvent (iEvent &Event)
 	  np = seqmgr->GetSelectedPath (map_selpath);
 	  if (np)
 	  {
-	    if (map_selpoint >= np->GetPointCount ())
-	      map_selpoint = np->GetPointCount ()-1;
+	    if (map_selpoint >= np->Length ())
+	      map_selpoint = np->Length ()-1;
 	  }
 	  break;
         case ']':
@@ -1229,8 +1229,8 @@ bool Demo::DemoHandleEvent (iEvent &Event)
 	  np = seqmgr->GetSelectedPath (map_selpath);
 	  if (np)
 	  {
-	    if (map_selpoint >= np->GetPointCount ())
-	      map_selpoint = np->GetPointCount ()-1;
+	    if (map_selpoint >= np->Length ())
+	      map_selpoint = np->Length ()-1;
 	  }
 	  break;
       }
