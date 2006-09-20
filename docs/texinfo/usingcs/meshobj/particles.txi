@@ -12,7 +12,7 @@
 @cindex @code{iParticleEmitter}
 @cindex @code{iParticleEffector}
 
-@emph{Written by Marten Svanfeldt,
+@emph{Written by M@aa{}rten Svanfeldt,
 @email{developer@@svanfeldt.com}.}
 
 Particles is a general particle rendering and simple simulation plugin. It

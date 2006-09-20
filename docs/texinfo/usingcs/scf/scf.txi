@@ -15,6 +15,10 @@ General Public License (@sc{lgpl}).  @xref{Licenses}.}
 @emph{Documentation revised significantly by Eric Sunshine,
 @email{sunshine@@sunshineco.com}.  Last updated September 24, 2003.}
 
+@noindent
+@emph{@sc{SCF} implementation revised by M@aa{}rten Svanfeldt and Michael Adams
+2005-2006}
+
 This library is intended for separating C++ class implementations from programs
 that use them.  This is achieved by separating class implementations into a
 separate module in the form of shared libraries, which are also called
@@ -41,6 +45,7 @@ The @sc{scf} implementation is resides within the @file{CS/libs/csutil} module.
 * SCF Explained:: How it Works
 * SCF Using:: Using @sc{scf}
 * SCF Multiple Interfaces:: Classes Implementing Multiple Interfaces
+* SCF Interface and implementation inheritance:: Interface and implementation inheritance
 * SCF Versions:: Interface Versions
 * SCF Client:: Client Side
 * SCF Meta Info:: Plugin Meta-Information
@@ -271,7 +276,7 @@ public:
 SCF_IMPLEMENT_FACTORY(Test)
 @end example
 
-@node SCF Multiple Interfaces, SCF Versions, SCF Using, SCF
+@node SCF Multiple Interfaces, SCF Interface and implementation inheritance, SCF Using, SCF
 @subsubsection Classes Implementing Multiple Interfaces
 
 Sometimes we will want one object to implement several interfaces.  For
@@ -292,7 +297,78 @@ This is an example of a class implementing three interfaces. You need
 to give the implementation of all functions from those three interfaces
 in @samp{MyGraphics3D}.
 
-@node SCF Versions, SCF Client, SCF Multiple Interfaces, SCF
+@node SCF Interface and implementation inheritance, SCF Versions, SCF Multiple Interfaces, SCF
+@subsubsection Interface and implementation inheritance
+
+From time to time there might be a need or want for using normal inheritance
+together with @sc{scf}. In practice there are two times you want to do this;
+interface deriving from another interface to add methods and deriving from an
+implementation class to add new interfaces.
+
+In the first case where you want an interface to extend another, the declaration
+of the interfaces is straight forward using normal C++ inheritance. However, to
+make the implementation class aware of the base interfaces it should also expose
+you need to use the @code{scfFakeInterface<>} template class in the parameter
+to @code{scfImplementationN<>}.
+
+Example:
+
+@example
+// Abstract interface file (itest2.h)
+struct iTestBase : public virtual iBase
+@{
+  SCF_INTERFACE (iTestBase, 1, 0, 0);
+  @dots{}
+  virtual void SomeFunction () = 0;
+@};
+
+struct iTest2 : public iTestBase
+@{
+  SCF_INTERFACE (iTest2, 1, 0, 0);
+  @dots{}
+  virtual void NewFunction () = 0;
+@};
+
+// Concrete implementation header (test2.h)
+class Test2 : public scfImplementation2<Test2, 
+                                        scfFakeInterface<iTestBase>,
+                                        iTest2>
+@{
+  @dots{}
+@};
+
+@end example
+
+The other situation is when you want to take an already existing implementation
+class, derive from it and add one or more new interfaces. Using only normal C++
+inheritance and @code{scfImplementationN<>} like above is the right way to go if
+the base class does not implement any @sc{scf} interfaces, if they do you need
+to use the extra functionality that the template @code{scfImplementationExtN<>}.
+
+@code{scfImplementationExtN<>} have same template parameters as 
+@code{scfImplementationN<>} with one difference, the second parameter is the base
+class to use. 
+
+Example: Lets extend Test2 from above with one more interface
+
+@example
+struct iNewIf : public virtual iBase
+@{
+  SCF_INTERFACE (iNewIf, 1, 0, 0);
+  virtual void PrintMe () = 0;
+@}
+
+class NewTest2 : public scfImplementationExt1<NewTest2, Test2, iNewIf>
+@{
+  @dots{}
+  void PrintMe ();
+@}
+
+@end example
+
+
+
+@node SCF Versions, SCF Client, SCF Interface and implementation inheritance, SCF
 @subsubsection Interface Versions
 
 Unlike @sc{com}, @sc{scf} supports interface versions.  That is, a shared class
