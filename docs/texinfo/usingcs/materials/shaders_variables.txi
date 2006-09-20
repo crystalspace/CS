@@ -1,0 +1,139 @@
+@c -*-texinfo-*-
+@node Shader Variables, Shader Conditions and Processing Instructions Reference, Shader System Overview, Shaders
+@subsubsection Shader Variables
+@cindex Shader
+@cindex @code{iShader}
+
+@cindex Shader variables
+
+Shaders need to use shader variables to be able to access the resources they 
+need to do what they have to do.  This includes things like the texture, the 
+ambient color, the light transformation, and more.  Each shader uses a number
+of variables usually provided by the material, while also a number of 
+variables are automatically supplied by the engine and other components.  This
+section commonly used variables of both kinds.
+
+@subheading Variables from Materials
+
+These variables are usually provided by materials.  It is also possible to 
+add custom variables that you can then use in your own materials with your 
+own shaders.  Variable names can be arbitrary, however, if you want to add
+a parameter to allow customization of a shader, you should first look into
+this list whether there might be a name that is already used for the purpose
+you desire.  If you use custom names, it's a good idea to try to somewhat 
+stick to the same conventions as used here.
+
+@table @samp
+@item tex diffuse
+diffuse texture
+@item tex normal
+normal map texture
+@item tex height
+height map texture for parallax shading
+@end table
+
+@subheading Variables from the Crystal Space Components
+
+These variables are defined by various components and are mostly useful when
+writing custom shaders.
+
+@subsubheading Utility textures
+
+@table @samp
+@item standardtex normalization map
+Normalization cube map.
+@item standardtex white
+1x1 white texture. Mostly useful as a ``dummy'' texture.
+@end table
+
+@subsubheading Buffers
+
+@table @samp
+@item vertices
+Render buffer with mesh vertices.
+@item texture coordinates
+Render buffer with texture coordinates. 
+@item colors
+Render buffer with per-vertex colors.
+@end table
+
+@subsubheading Transforms
+
+@table @samp
+@item world2camera transform
+@item object2world transform
+@end table
+
+@subsubheading Lighting
+
+@samp{N} denotes the light number.  The first light is light number @code{0}.
+The upper limit for the value of @samp{N} depends on the shader as well as the
+render loop.
+
+@table @samp
+@item light ambient
+Ambient lighting color.
+@item light N position
+Light position in camera space.
+@item light N position world
+Light position in world space.
+@item light N transform
+Light transformation in camera space.  Mostly relevant as some lights might be
+rotated.
+@item light N transform world
+Light transformation in world space.
+@item light N diffuse
+Light diffuse color.
+@item light N specular
+Light specular color.
+@item light N attenuation
+Light attenuation coefficients.
+@item light N attenuationtex
+Light attenuation texture.
+@item light N type
+Light type, one of the @code{csLightType} enumerants.
+@item light N inner falloff
+Inner falloff for spotlights as the cosine of the angle.
+@item light N outer falloff
+Outer falloff for spotlights as the cosine of the angle.
+@end table
+
+@subsubheading Terrain related
+
+@table @samp
+@item texture lod distance
+@item splat alpha map
+@end table
+
+@subsubheading Miscelleanous
+
+@table @samp
+@item mat flatcolor
+Flat color of the material.  To be used if no diffuse texture was specified.
+@item standard time
+Current ticks in seconds.  Useful for animations.
+@item tex lightmap
+Lightmap texture.  Present if a mesh uses lightmap lighting.
+@item texture coordinates lightmap
+Buffer with lightmap texture coordinates.  Present if a mesh uses lightmap 
+lighting.
+@item point radius
+Radius when point sprites are rendered.
+@item point scale
+Scale when point sprites are rendered.
+@end table
+
+@subsubheading Fog
+
+Crystal Space provides some shader ``snippets'' to deal with fog, it's 
+recommended to use these to add fog support to some shader.
+
+@table @samp
+@item fogplane
+@item fog density
+@item fog color
+@item fog start
+@item fog end
+@item fog mode
+@item standardtex fog
+@end table
