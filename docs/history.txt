@@ -38,6 +38,21 @@ chronological order.
 	- res added -mno-cygwin support to configure.
 12-Sep-2006
 	- PK extended the ice-skin for tabbuttons.
+	- Marten fixed csColor4 for operators + - * and /.
+	- Jorrit changed walktest to use new particles for explosion.
+11-Sep-2006
+	- Jorrit fixed a bug in particles and particlesldr. It would
+	  initialize start time to -1 which caused particles to fail on
+	  particle systems with very small duration.
+	- Jorrit added a commented out version of the explosion in walktest
+	  using the new particle system. Doesn't yet work 100% (fading is
+	  broken).
+	- Jorrit added a new system in the CS engine so that objects can have
+	  themselves removed after a specific interval. Call
+	  iEngine->DelayedRemoveObject() with an object (any object that can
+	  be removed through the normal iEngine->RemoveObject()) and a delay.
+	  This new system is more general then the old iEngine->WantToDie()
+	  method that is called by some particle systems.
 10-Sep-2006
 	- PK changed ViewMesh to use CEGUI instead of AWS.
 	- PK fixed a bug in csHash::Delete (const K& key, const T &value).

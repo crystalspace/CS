@@ -22,6 +22,7 @@ chronological order.
 	- res merged r25367 into 1.0.
 	- Marten merged r25404, r25407 into 1.0.
 	- Marten merged r25409 into 1.0.
+	- res merged r25324, r25327, r25328, r25330:r25333 into 1.0.
 10-Sep-2006
         - res merged trunk r25315 into 1.0.
 08-Sep-2006
