@@ -17,6 +17,7 @@ chronological order.
 	- res merged r25352 into 1.0.
 	- res merged r25353 into 1.0.
 	- res merged r25356 into 1.0.
+	- res merged r25357, r25361 into 1.0.
 10-Sep-2006
         - res merged trunk r25315 into 1.0.
 08-Sep-2006

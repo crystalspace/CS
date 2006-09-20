@@ -11,6 +11,8 @@ chronological order.
 16-Sep-2006
 	- PK upgraded the ice skin to work with CEGUI 5.0RC2.
 	- PK improved the viewmesh standard dialog a little.
+	- res fixed shared library creation for cygwin with -mno-cygwin using
+	  the solution from Peter Amstutz stated in trac #132.
 15-Sep-2006
 	- Jorrit fixed viewmesh so that it starts at the current dir instead
 	  of an internal CEGUI directory.
@@ -23,6 +25,7 @@ chronological order.
 	- res removed some unneeded members from csGraphics3DCaps.
 	- res noted some compiler versions on the requirements manual page.
 	- res updated the docs for the new cs-win32libs version.
+	- res added -mno-cygwin support to configure.
 12-Sep-2006
 	- PK extended the ice-skin for tabbuttons.
 10-Sep-2006
