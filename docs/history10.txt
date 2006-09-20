@@ -11,6 +11,7 @@ chronological order.
         - res merged trunk r25318:25320, r25334, r25339, r25363:25365 into
           1.0.
 	- res also removed AWS2 docs.
+	- res merged trunk r25371, r25375, r25395 into 1.0.
 10-Sep-2006
         - res merged trunk r25315 into 1.0.
 08-Sep-2006

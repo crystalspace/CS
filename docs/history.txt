@@ -6,6 +6,8 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+17-Sep-2006
+	- PK changed SimpVS to use CEGUI instead of AWS.
 16-Sep-2006
 	- PK upgraded the ice skin to work with CEGUI 5.0RC2.
 	- PK improved the viewmesh standard dialog a little.
