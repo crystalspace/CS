@@ -902,6 +902,7 @@ SET_HELPER(csStringID)
 
 %rename(asRGBcolor) csRGBpixel::operator csRGBcolor;
 %include "csgfx/rgbpixel.h"
+%ignore ShaderVarName;
 %include "csgfx/shadervar.h"
 %template(csShaderVariableArrayReadOnly) iArrayReadOnly<csShaderVariable * >;
 %template(csShaderVariableArrayChangeElements) 
@@ -986,6 +987,7 @@ iArrayChangeElements<csShaderVariable * >;
 %include "iengine/campos.h"
 %include "iengine/texture.h"
 %include "iengine/material.h"
+%template(iSceneNodeArrayReadOnly) iArrayReadOnly<iSceneNode * >;
 %include "iengine/scenenode.h"
 
 // Swig 1.3.24 doesn't handle pointer default args well unless we tell it
