@@ -6,7 +6,6 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
-
 20-Sep-2006
 	- Marten disabled the global overrides of operator new and operator
 	  delete due to the interoperability problems it causes.
@@ -40,6 +39,8 @@ chronological order.
 	- PK extended the ice-skin for tabbuttons.
 	- Marten fixed csColor4 for operators + - * and /.
 	- Jorrit changed walktest to use new particles for explosion.
+	- Jorrit fixed a bug with iSector->HitBeamPortals(). It was
+	  broken and failed to detect the correct destination sector.
 11-Sep-2006
 	- Jorrit fixed a bug in particles and particlesldr. It would
 	  initialize start time to -1 which caused particles to fail on
