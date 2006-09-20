@@ -174,8 +174,6 @@
 // list. Please keep the list sorted alphabetically.
 #ifndef CS_MINI_SWIG
 %define APPLY_FOR_EACH_INTERFACE
-  INTERFACE_APPLY(iAws)
-  INTERFACE_APPLY(iAwsKey)
   INTERFACE_APPLY(iBase)
   INTERFACE_APPLY(iBinaryLoaderPlugin)
   INTERFACE_APPLY(iBodyGroup)
@@ -965,7 +963,6 @@ iArrayChangeElements<csShaderVariable * >;
 %template(csPluginRequestArray) csArray<csPluginRequest>;
 
 #ifndef CS_MINI_SWIG
-%include "iaws/aws.h"
 
 %include "igeom/clip2d.h"
 %include "imesh/objmodel.h"
@@ -1271,13 +1268,6 @@ APPLY_FOR_EACH_INTERFACE
 
   csColor *GetColorByIndex(int index)
   { return &(self->GetColors()[index]); }
-}
-
-// iaws/aws.h
-%extend iAws
-{
-  bool SetupCanvas (iGraphics2D *g2d=0, iGraphics3D *g3d=0)
-  { return self->SetupCanvas(0, g2d, g3d); }
 }
 
 // iutil/csinput.h

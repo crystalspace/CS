@@ -160,7 +160,6 @@ CS_MASTER_HEADERS =
       csgfx
       csplugincommon
       cstool
-      iaws
       iengine
       igeom
       igraphic

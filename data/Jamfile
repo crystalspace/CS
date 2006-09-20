@@ -1,7 +1,6 @@
 SubDir TOP data ;
 
 InstallData
-  awsdef.zip
   fancycon.zip
   standard.zip
   startme.zip
@@ -28,7 +27,6 @@ for map in $(maps)
   InstallData $(files) : data maps $(map) ;
 }
 
-SubInclude TOP data aws ;
 SubInclude TOP data ceguitest ;
 SubInclude TOP data config ;
 SubInclude TOP data cube ;

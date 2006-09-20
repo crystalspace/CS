@@ -1,3 +1,0 @@
-SubDir TOP data aws ;
-
-InstallData [ Wildcard *.def ] : data aws ;
