@@ -20,6 +20,7 @@ chronological order.
 	- res marked some types and methods that were deprecated as per the
 	  API docs with the deprecation macros. Also changed some instances
 	  to use the _MSG variant. Lastly, fixed some deprecation warnings.
+	- res removed some unneeded members from csGraphics3DCaps.
 12-Sep-2006
 	- PK extended the ice-skin for tabbuttons.
 10-Sep-2006
