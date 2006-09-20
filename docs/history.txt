@@ -17,6 +17,8 @@ chronological order.
 	- PK changed SimpVS to use CEGUI instead of AWS.
 	- res fixed a bug in the software renderer vertex transformer that
 	  caused the output vertex buffers to be underfilled.
+	- res updated a gldrivers tweak to include certain NV Quadro chips.
+	- res updated a gldrivers tweak to include GF2 GTS chips.
 16-Sep-2006
 	- PK upgraded the ice skin to work with CEGUI 5.0RC2.
 	- PK improved the viewmesh standard dialog a little.
