@@ -936,7 +936,7 @@ csGenmeshAnimationControlType::~csGenmeshAnimationControlType ()
   {
     csRef<iEventQueue> q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
     if (q)
-      RemoveWeakListener (q, weakEventHandler);
+      CS::RemoveWeakListener (q, weakEventHandler);
   }
 }
 
@@ -949,7 +949,7 @@ bool csGenmeshAnimationControlType::Initialize (iObjectRegistry* object_reg)
   // \todo It looks like @csGenmeshAnimationControlType doesn't actually handle any events.  So why does it register an event listener?
   if (q != 0) {
     csEventID events[] = { Frame, PreProcess, CS_EVENTLIST_END };
-    RegisterWeakListener (q, this, events, weakEventHandler);
+    CS::RegisterWeakListener (q, this, events, weakEventHandler);
   }
   return true;
 }

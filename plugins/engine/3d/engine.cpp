@@ -542,7 +542,7 @@ csEngine::~csEngine ()
   {
     csRef<iEventQueue> q (CS_QUERY_REGISTRY (objectRegistry, iEventQueue));
     if (q != 0)
-      RemoveWeakListener (q, weakEventHandler);
+      CS::RemoveWeakListener (q, weakEventHandler);
   }
 
   DeleteAll ();
@@ -617,7 +617,7 @@ bool csEngine::Initialize (iObjectRegistry *objectRegistry)
     // discard canvas events if there is no canvas, by truncating the array
     if (!G2D) events[2] = CS_EVENTLIST_END;
 
-    RegisterWeakListener (q, this, events, weakEventHandler);
+    CS::RegisterWeakListener (q, this, events, weakEventHandler);
   }
 
   csConfigAccess cfg (objectRegistry, "/config/engine.cfg");
