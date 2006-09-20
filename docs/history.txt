@@ -10,6 +10,7 @@ chronological order.
 	- Marten disabled the global overrides of operator new and operator
 	  delete due to the interoperability problems it causes.
 	- Marten fixed unit tests to compile and run, trac #85.
+	- Marten fixed circular ref problem in particles, trac #143.
 19-Sep-2006
         - Genjix documented a little csIntersect3 behaviour.
 	- caedes added cscript/pycscegui, an additional python module that
