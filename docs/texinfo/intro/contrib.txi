@@ -817,7 +817,7 @@ Markus Korth (@email{mkorth@@military.de})
 Markus fixed a bug in the (now defunct) @file{unixconf.sh} script.
 
 @item
-Marten Svanfeldt (@email{developer@@svanfeldt.com})
+M@aa{}rten Svanfeldt (@email{developer@@svanfeldt.com})
 
 Marten now as a Crystal Space Project Administrator has done far more work and
 helped the project in so many ways, they are too numerous to completely
