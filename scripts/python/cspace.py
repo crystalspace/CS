@@ -1,4 +1,4 @@
-# This file was created automatically by SWIG 1.3.28.
+# This file was created automatically by SWIG 1.3.29.
 # Don't modify this file, modify the SWIG interface instead.
 # This file is compatible with both classic and new-style classes.
 
@@ -27,6 +27,11 @@ def _swig_getattr(self,class_type,name):
     if method: return method(self)
     raise AttributeError,name
 
+def _swig_repr(self):
+    try: strthis = "proxy of " + self.this.__repr__()
+    except: strthis = ""
+    return "<%s.%s; %s >" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+
 import types
 try:
     _object = types.ObjectType
@@ -43,10 +48,7 @@ class csWrapPtr(_object):
     __setattr__ = lambda self, name, value: _swig_setattr(self, csWrapPtr, name, value)
     __swig_getmethods__ = {}
     __getattr__ = lambda self, name: _swig_getattr(self, csWrapPtr, name)
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ csWrapPtr instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     __swig_setmethods__["Ref"] = _cspace.csWrapPtr_Ref_set
     __swig_getmethods__["Ref"] = _cspace.csWrapPtr_Ref_get
     if _newclass:Ref = property(_cspace.csWrapPtr_Ref_get, _cspace.csWrapPtr_Ref_set)
@@ -55,31 +57,30 @@ class csWrapPtr(_object):
     __swig_setmethods__["Version"] = _cspace.csWrapPtr_Version_set
     __swig_getmethods__["Version"] = _cspace.csWrapPtr_Version_get
     if _newclass:Version = property(_cspace.csWrapPtr_Version_get, _cspace.csWrapPtr_Version_set)
-    def __init__(self, *args):
+    def __init__(self, *args): 
         this = _cspace.new_csWrapPtr(*args)
         try: self.this.append(this)
         except: self.this = this
     __swig_destroy__ = _cspace.delete_csWrapPtr
     __del__ = lambda self : None;
-_cspace.csWrapPtr_swigregister(csWrapPtr)
+csWrapPtr_swigregister = _cspace.csWrapPtr_swigregister
+csWrapPtr_swigregister(csWrapPtr)
 
 class csArrayThresholdVariable(_object):
     __swig_setmethods__ = {}
     __setattr__ = lambda self, name, value: _swig_setattr(self, csArrayThresholdVariable, name, value)
     __swig_getmethods__ = {}
     __getattr__ = lambda self, name: _swig_getattr(self, csArrayThresholdVariable, name)
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ csArrayThresholdVariable instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
-    def __init__(self, *args):
+    __repr__ = _swig_repr
+    def __init__(self, *args): 
         this = _cspace.new_csArrayThresholdVariable(*args)
         try: self.this.append(this)
         except: self.this = this
     def GetThreshold(*args): return _cspace.csArrayThresholdVariable_GetThreshold(*args)
     __swig_destroy__ = _cspace.delete_csArrayThresholdVariable
     __del__ = lambda self : None;
-_cspace.csArrayThresholdVariable_swigregister(csArrayThresholdVariable)
+csArrayThresholdVariable_swigregister = _cspace.csArrayThresholdVariable_swigregister
+csArrayThresholdVariable_swigregister(csArrayThresholdVariable)
 
 class csArrayThresholdVariableCapacityLinear(csArrayThresholdVariable):
     __swig_setmethods__ = {}
@@ -88,11 +89,8 @@ class csArrayThresholdVariableCapacityLinear(csArrayThresholdVariable):
     __swig_getmethods__ = {}
     for _s in [csArrayThresholdVariable]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, csArrayThresholdVariableCapacityLinear, name)
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ csArrayCapacityLinear<csArrayThresholdVariable > instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
-    def __init__(self, *args):
+    __repr__ = _swig_repr
+    def __init__(self, *args): 
         this = _cspace.new_csArrayThresholdVariableCapacityLinear(*args)
         try: self.this.append(this)
         except: self.this = this
@@ -100,7 +98,8 @@ class csArrayThresholdVariableCapacityLinear(csArrayThresholdVariable):
     def GetCapacity(*args): return _cspace.csArrayThresholdVariableCapacityLinear_GetCapacity(*args)
     __swig_destroy__ = _cspace.delete_csArrayThresholdVariableCapacityLinear
     __del__ = lambda self : None;
-_cspace.csArrayThresholdVariableCapacityLinear_swigregister(csArrayThresholdVariableCapacityLinear)
+csArrayThresholdVariableCapacityLinear_swigregister = _cspace.csArrayThresholdVariableCapacityLinear_swigregister
+csArrayThresholdVariableCapacityLinear_swigregister(csArrayThresholdVariableCapacityLinear)
 
 class csArrayCapacityDefault(csArrayThresholdVariableCapacityLinear):
     __swig_setmethods__ = {}
@@ -109,18 +108,15 @@ class csArrayCapacityDefault(csArrayThresholdVariableCapacityLinear):
     __swig_getmethods__ = {}
     for _s in [csArrayThresholdVariableCapacityLinear]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, csArrayCapacityDefault, name)
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ csArrayCapacityDefault instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
-    def __init__(self, *args):
+    __repr__ = _swig_repr
+    def __init__(self, *args): 
         this = _cspace.new_csArrayCapacityDefault(*args)
         try: self.this.append(this)
         except: self.this = this
     __swig_destroy__ = _cspace.delete_csArrayCapacityDefault
     __del__ = lambda self : None;
-_cspace.csArrayCapacityDefault_swigregister(csArrayCapacityDefault)
-
+csArrayCapacityDefault_swigregister = _cspace.csArrayCapacityDefault_swigregister
+csArrayCapacityDefault_swigregister(csArrayCapacityDefault)
 
 scfCompatibleVersion = _cspace.scfCompatibleVersion
 class iBase(_object):
@@ -129,10 +125,7 @@ class iBase(_object):
     __swig_getmethods__ = {}
     __getattr__ = lambda self, name: _swig_getattr(self, iBase, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iBase instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def IncRef(*args): return _cspace.iBase_IncRef(*args)
     def DecRef(*args): return _cspace.iBase_DecRef(*args)
     def GetRefCount(*args): return _cspace.iBase_GetRefCount(*args)
@@ -141,10 +134,10 @@ class iBase(_object):
     def RemoveRefOwner(*args): return _cspace.iBase_RemoveRefOwner(*args)
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iBase_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iBase_scfGetVersion)
-_cspace.iBase_swigregister(iBase)
+iBase_swigregister = _cspace.iBase_swigregister
+iBase_swigregister(iBase)
 cvar = _cspace.cvar
 csArrayItemNotFound = cvar.csArrayItemNotFound
-
 iBase_scfGetVersion = _cspace.iBase_scfGetVersion
 
 class iSCF(iBase):
@@ -155,10 +148,7 @@ class iSCF(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iSCF, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iSCF instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     __swig_getmethods__["SCF"] = _cspace.iSCF_SCF_get
     if _newclass:SCF = property(_cspace.iSCF_SCF_get)
     def RegisterClasses(*args): return _cspace.iSCF_RegisterClasses(*args)
@@ -181,8 +171,8 @@ class iSCF(iBase):
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iSCF_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iSCF_scfGetVersion)
-_cspace.iSCF_swigregister(iSCF)
-
+iSCF_swigregister = _cspace.iSCF_swigregister
+iSCF_swigregister(iSCF)
 iSCF_scfGetVersion = _cspace.iSCF_scfGetVersion
 
 SCF_STATIC_CLASS_CONTEXT = _cspace.SCF_STATIC_CLASS_CONTEXT
@@ -194,10 +184,7 @@ class iFactory(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iFactory, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iFactory instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def CreateInstance(*args): return _cspace.iFactory_CreateInstance(*args)
     def TryUnload(*args): return _cspace.iFactory_TryUnload(*args)
     def QueryDescription(*args): return _cspace.iFactory_QueryDescription(*args)
@@ -208,8 +195,8 @@ class iFactory(iBase):
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iFactory_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iFactory_scfGetVersion)
-_cspace.iFactory_swigregister(iFactory)
-
+iFactory_swigregister = _cspace.iFactory_swigregister
+iFactory_swigregister(iFactory)
 iFactory_scfGetVersion = _cspace.iFactory_scfGetVersion
 
 SCF_VERBOSE_NONE = _cspace.SCF_VERBOSE_NONE
@@ -218,9 +205,7 @@ SCF_VERBOSE_PLUGIN_LOAD = _cspace.SCF_VERBOSE_PLUGIN_LOAD
 SCF_VERBOSE_PLUGIN_REGISTER = _cspace.SCF_VERBOSE_PLUGIN_REGISTER
 SCF_VERBOSE_CLASS_REGISTER = _cspace.SCF_VERBOSE_CLASS_REGISTER
 SCF_VERBOSE_ALL = _cspace.SCF_VERBOSE_ALL
-
 scfRegisterStaticClasses = _cspace.scfRegisterStaticClasses
-
 scfRegisterStaticFactoryFunc = _cspace.scfRegisterStaticFactoryFunc
 CS_DBGHELP_UNITTEST = _cspace.CS_DBGHELP_UNITTEST
 CS_DBGHELP_BENCHMARK = _cspace.CS_DBGHELP_BENCHMARK
@@ -235,10 +220,7 @@ class iDebugHelper(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iDebugHelper, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iDebugHelper instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def GetSupportedTests(*args): return _cspace.iDebugHelper_GetSupportedTests(*args)
     def UnitTest(*args): return _cspace.iDebugHelper_UnitTest(*args)
     def StateTest(*args): return _cspace.iDebugHelper_StateTest(*args)
@@ -249,10 +231,9 @@ class iDebugHelper(iBase):
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iDebugHelper_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iDebugHelper_scfGetVersion)
-_cspace.iDebugHelper_swigregister(iDebugHelper)
-
+iDebugHelper_swigregister = _cspace.iDebugHelper_swigregister
+iDebugHelper_swigregister(iDebugHelper)
 scfRegisterStaticClass = _cspace.scfRegisterStaticClass
-
 iDebugHelper_scfGetVersion = _cspace.iDebugHelper_scfGetVersion
 
 class iCommandLineParser(iBase):
@@ -263,10 +244,7 @@ class iCommandLineParser(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iCommandLineParser, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iCommandLineParser instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def Initialize(*args): return _cspace.iCommandLineParser_Initialize(*args)
     def Reset(*args): return _cspace.iCommandLineParser_Reset(*args)
     def GetOption(*args): return _cspace.iCommandLineParser_GetOption(*args)
@@ -284,8 +262,8 @@ class iCommandLineParser(iBase):
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iCommandLineParser_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iCommandLineParser_scfGetVersion)
-_cspace.iCommandLineParser_swigregister(iCommandLineParser)
-
+iCommandLineParser_swigregister = _cspace.iCommandLineParser_swigregister
+iCommandLineParser_swigregister(iCommandLineParser)
 iCommandLineParser_scfGetVersion = _cspace.iCommandLineParser_scfGetVersion
 
 class csColor(_object):
@@ -293,10 +271,7 @@ class csColor(_object):
     __setattr__ = lambda self, name, value: _swig_setattr(self, csColor, name, value)
     __swig_getmethods__ = {}
     __getattr__ = lambda self, name: _swig_getattr(self, csColor, name)
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ csColor instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     __swig_setmethods__["red"] = _cspace.csColor_red_set
     __swig_getmethods__["red"] = _cspace.csColor_red_get
     if _newclass:red = property(_cspace.csColor_red_get, _cspace.csColor_red_set)
@@ -306,7 +281,7 @@ class csColor(_object):
     __swig_setmethods__["blue"] = _cspace.csColor_blue_set
     __swig_getmethods__["blue"] = _cspace.csColor_blue_get
     if _newclass:blue = property(_cspace.csColor_blue_get, _cspace.csColor_blue_set)
-    def __init__(self, *args):
+    def __init__(self, *args): 
         this = _cspace.new_csColor(*args)
         try: self.this.append(this)
         except: self.this = this
@@ -327,7 +302,8 @@ class csColor(_object):
     def __rmul__(*args): return _cspace.csColor___rmul__(*args)
     __swig_destroy__ = _cspace.delete_csColor
     __del__ = lambda self : None;
-_cspace.csColor_swigregister(csColor)
+csColor_swigregister = _cspace.csColor_swigregister
+csColor_swigregister(csColor)
 
 class csColor4(csColor):
     __swig_setmethods__ = {}
@@ -336,14 +312,11 @@ class csColor4(csColor):
     __swig_getmethods__ = {}
     for _s in [csColor]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, csColor4, name)
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ csColor4 instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     __swig_setmethods__["alpha"] = _cspace.csColor4_alpha_set
     __swig_getmethods__["alpha"] = _cspace.csColor4_alpha_get
     if _newclass:alpha = property(_cspace.csColor4_alpha_get, _cspace.csColor4_alpha_set)
-    def __init__(self, *args):
+    def __init__(self, *args): 
         this = _cspace.new_csColor4(*args)
         try: self.this.append(this)
         except: self.this = this
@@ -356,31 +329,28 @@ class csColor4(csColor):
     def __ne__(*args): return _cspace.csColor4___ne__(*args)
     __swig_destroy__ = _cspace.delete_csColor4
     __del__ = lambda self : None;
-_cspace.csColor4_swigregister(csColor4)
+csColor4_swigregister = _cspace.csColor4_swigregister
+csColor4_swigregister(csColor4)
 
 class csCommandLineHelper(_object):
     __swig_setmethods__ = {}
     __setattr__ = lambda self, name, value: _swig_setattr(self, csCommandLineHelper, name, value)
     __swig_getmethods__ = {}
     __getattr__ = lambda self, name: _swig_getattr(self, csCommandLineHelper, name)
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ csCommandLineHelper instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     __swig_getmethods__["Help"] = lambda x: _cspace.csCommandLineHelper_Help
     if _newclass:Help = staticmethod(_cspace.csCommandLineHelper_Help)
     __swig_getmethods__["CheckHelp"] = lambda x: _cspace.csCommandLineHelper_CheckHelp
     if _newclass:CheckHelp = staticmethod(_cspace.csCommandLineHelper_CheckHelp)
-    def __init__(self, *args):
+    def __init__(self, *args): 
         this = _cspace.new_csCommandLineHelper(*args)
         try: self.this.append(this)
         except: self.this = this
     __swig_destroy__ = _cspace.delete_csCommandLineHelper
     __del__ = lambda self : None;
-_cspace.csCommandLineHelper_swigregister(csCommandLineHelper)
-
+csCommandLineHelper_swigregister = _cspace.csCommandLineHelper_swigregister
+csCommandLineHelper_swigregister(csCommandLineHelper)
 csCommandLineHelper_Help = _cspace.csCommandLineHelper_Help
-
 csCommandLineHelper_CheckHelp = _cspace.csCommandLineHelper_CheckHelp
 
 class csStringSet(_object):
@@ -388,11 +358,8 @@ class csStringSet(_object):
     __setattr__ = lambda self, name, value: _swig_setattr(self, csStringSet, name, value)
     __swig_getmethods__ = {}
     __getattr__ = lambda self, name: _swig_getattr(self, csStringSet, name)
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ csStringSet instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
-    def __init__(self, *args):
+    __repr__ = _swig_repr
+    def __init__(self, *args): 
         this = _cspace.new_csStringSet(*args)
         try: self.this.append(this)
         except: self.this = this
@@ -406,18 +373,16 @@ class csStringSet(_object):
     def Clear(*args): return _cspace.csStringSet_Clear(*args)
     def GetSize(*args): return _cspace.csStringSet_GetSize(*args)
     def IsEmpty(*args): return _cspace.csStringSet_IsEmpty(*args)
-_cspace.csStringSet_swigregister(csStringSet)
+csStringSet_swigregister = _cspace.csStringSet_swigregister
+csStringSet_swigregister(csStringSet)
 
 class csStringIDSet(_object):
     __swig_setmethods__ = {}
     __setattr__ = lambda self, name, value: _swig_setattr(self, csStringIDSet, name, value)
     __swig_getmethods__ = {}
     __getattr__ = lambda self, name: _swig_getattr(self, csStringIDSet, name)
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ csSet<csStringID > instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
-    def __init__(self, *args):
+    __repr__ = _swig_repr
+    def __init__(self, *args): 
         this = _cspace.new_csStringIDSet(*args)
         try: self.this.append(this)
         except: self.this = this
@@ -436,7 +401,8 @@ class csStringIDSet(_object):
     def __delitem__(*args): return _cspace.csStringIDSet___delitem__(*args)
     __swig_destroy__ = _cspace.delete_csStringIDSet
     __del__ = lambda self : None;
-_cspace.csStringIDSet_swigregister(csStringIDSet)
+csStringIDSet_swigregister = _cspace.csStringIDSet_swigregister
+csStringIDSet_swigregister(csStringIDSet)
 
 class iString(iBase):
     __swig_setmethods__ = {}
@@ -446,10 +412,7 @@ class iString(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iString, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iString instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def GetData(*args): return _cspace.iString_GetData(*args)
     def __ne__(*args): return _cspace.iString___ne__(*args)
     __swig_destroy__ = _cspace.delete_iString
@@ -458,8 +421,8 @@ class iString(iBase):
     if _newclass:scfGetVersion = staticmethod(_cspace.iString_scfGetVersion)
     def __getitem__(*args): return _cspace.iString___getitem__(*args)
     def __setitem__(*args): return _cspace.iString___setitem__(*args)
-_cspace.iString_swigregister(iString)
-
+iString_swigregister = _cspace.iString_swigregister
+iString_swigregister(iString)
 iString_scfGetVersion = _cspace.iString_scfGetVersion
 
 class csString(_object):
@@ -467,11 +430,8 @@ class csString(_object):
     __setattr__ = lambda self, name, value: _swig_setattr(self, csString, name, value)
     __swig_getmethods__ = {}
     __getattr__ = lambda self, name: _swig_getattr(self, csString, name)
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ csString instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
-    def __init__(self, *args):
+    __repr__ = _swig_repr
+    def __init__(self, *args): 
         this = _cspace.new_csString(*args)
         try: self.this.append(this)
         except: self.this = this
@@ -480,42 +440,38 @@ class csString(_object):
     def __delitem__(*args): return _cspace.csString___delitem__(*args)
     __swig_destroy__ = _cspace.delete_csString
     __del__ = lambda self : None;
-_cspace.csString_swigregister(csString)
+csString_swigregister = _cspace.csString_swigregister
+csString_swigregister(csString)
 
 class csRefCount(_object):
     __swig_setmethods__ = {}
     __setattr__ = lambda self, name, value: _swig_setattr(self, csRefCount, name, value)
     __swig_getmethods__ = {}
     __getattr__ = lambda self, name: _swig_getattr(self, csRefCount, name)
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ csRefCount instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
-    def __init__(self, *args):
+    __repr__ = _swig_repr
+    def __init__(self, *args): 
         this = _cspace.new_csRefCount(*args)
         try: self.this.append(this)
         except: self.this = this
     def IncRef(*args): return _cspace.csRefCount_IncRef(*args)
     def DecRef(*args): return _cspace.csRefCount_DecRef(*args)
     def GetRefCount(*args): return _cspace.csRefCount_GetRefCount(*args)
-_cspace.csRefCount_swigregister(csRefCount)
+csRefCount_swigregister = _cspace.csRefCount_swigregister
+csRefCount_swigregister(csRefCount)
 
 class csVector2(_object):
     __swig_setmethods__ = {}
     __setattr__ = lambda self, name, value: _swig_setattr(self, csVector2, name, value)
     __swig_getmethods__ = {}
     __getattr__ = lambda self, name: _swig_getattr(self, csVector2, name)
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ csVector2 instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     __swig_setmethods__["x"] = _cspace.csVector2_x_set
     __swig_getmethods__["x"] = _cspace.csVector2_x_get
     if _newclass:x = property(_cspace.csVector2_x_get, _cspace.csVector2_x_set)
     __swig_setmethods__["y"] = _cspace.csVector2_y_set
     __swig_getmethods__["y"] = _cspace.csVector2_y_get
     if _newclass:y = property(_cspace.csVector2_y_get, _cspace.csVector2_y_set)
-    def __init__(self, *args):
+    def __init__(self, *args): 
         this = _cspace.new_csVector2(*args)
         try: self.this.append(this)
         except: self.this = this
@@ -546,7 +502,8 @@ class csVector2(_object):
     def __setitem__(*args): return _cspace.csVector2___setitem__(*args)
     __swig_destroy__ = _cspace.delete_csVector2
     __del__ = lambda self : None;
-_cspace.csVector2_swigregister(csVector2)
+csVector2_swigregister = _cspace.csVector2_swigregister
+csVector2_swigregister(csVector2)
 
 CS_AXIS_NONE = _cspace.CS_AXIS_NONE
 CS_AXIS_X = _cspace.CS_AXIS_X
@@ -558,10 +515,7 @@ class csVector3(_object):
     __setattr__ = lambda self, name, value: _swig_setattr(self, csVector3, name, value)
     __swig_getmethods__ = {}
     __getattr__ = lambda self, name: _swig_getattr(self, csVector3, name)
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ csVector3 instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     __swig_setmethods__["x"] = _cspace.csVector3_x_set
     __swig_getmethods__["x"] = _cspace.csVector3_x_get
     if _newclass:x = property(_cspace.csVector3_x_get, _cspace.csVector3_x_set)
@@ -571,7 +525,7 @@ class csVector3(_object):
     __swig_setmethods__["z"] = _cspace.csVector3_z_set
     __swig_getmethods__["z"] = _cspace.csVector3_z_get
     if _newclass:z = property(_cspace.csVector3_z_get, _cspace.csVector3_z_set)
-    def __init__(self, *args):
+    def __init__(self, *args): 
         this = _cspace.new_csVector3(*args)
         try: self.this.append(this)
         except: self.this = this
@@ -608,17 +562,15 @@ class csVector3(_object):
     def __nonzero__(*args): return _cspace.csVector3___nonzero__(*args)
     __swig_destroy__ = _cspace.delete_csVector3
     __del__ = lambda self : None;
-_cspace.csVector3_swigregister(csVector3)
+csVector3_swigregister = _cspace.csVector3_swigregister
+csVector3_swigregister(csVector3)
 
 class csMatrix2(_object):
     __swig_setmethods__ = {}
     __setattr__ = lambda self, name, value: _swig_setattr(self, csMatrix2, name, value)
     __swig_getmethods__ = {}
     __getattr__ = lambda self, name: _swig_getattr(self, csMatrix2, name)
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ csMatrix2 instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     __swig_setmethods__["m11"] = _cspace.csMatrix2_m11_set
     __swig_getmethods__["m11"] = _cspace.csMatrix2_m11_get
     if _newclass:m11 = property(_cspace.csMatrix2_m11_get, _cspace.csMatrix2_m11_set)
@@ -631,7 +583,7 @@ class csMatrix2(_object):
     __swig_setmethods__["m22"] = _cspace.csMatrix2_m22_set
     __swig_getmethods__["m22"] = _cspace.csMatrix2_m22_get
     if _newclass:m22 = property(_cspace.csMatrix2_m22_get, _cspace.csMatrix2_m22_set)
-    def __init__(self, *args):
+    def __init__(self, *args): 
         this = _cspace.new_csMatrix2(*args)
         try: self.this.append(this)
         except: self.this = this
@@ -654,17 +606,15 @@ class csMatrix2(_object):
     def Identity(*args): return _cspace.csMatrix2_Identity(*args)
     __swig_destroy__ = _cspace.delete_csMatrix2
     __del__ = lambda self : None;
-_cspace.csMatrix2_swigregister(csMatrix2)
+csMatrix2_swigregister = _cspace.csMatrix2_swigregister
+csMatrix2_swigregister(csMatrix2)
 
 class csMatrix3(_object):
     __swig_setmethods__ = {}
     __setattr__ = lambda self, name, value: _swig_setattr(self, csMatrix3, name, value)
     __swig_getmethods__ = {}
     __getattr__ = lambda self, name: _swig_getattr(self, csMatrix3, name)
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ csMatrix3 instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     __swig_setmethods__["m11"] = _cspace.csMatrix3_m11_set
     __swig_getmethods__["m11"] = _cspace.csMatrix3_m11_get
     if _newclass:m11 = property(_cspace.csMatrix3_m11_get, _cspace.csMatrix3_m11_set)
@@ -692,7 +642,7 @@ class csMatrix3(_object):
     __swig_setmethods__["m33"] = _cspace.csMatrix3_m33_set
     __swig_getmethods__["m33"] = _cspace.csMatrix3_m33_get
     if _newclass:m33 = property(_cspace.csMatrix3_m33_get, _cspace.csMatrix3_m33_set)
-    def __init__(self, *args):
+    def __init__(self, *args): 
         this = _cspace.new_csMatrix3(*args)
         try: self.this.append(this)
         except: self.this = this
@@ -727,7 +677,8 @@ class csMatrix3(_object):
     def __rmul__(*args): return _cspace.csMatrix3___rmul__(*args)
     __swig_destroy__ = _cspace.delete_csMatrix3
     __del__ = lambda self : None;
-_cspace.csMatrix3_swigregister(csMatrix3)
+csMatrix3_swigregister = _cspace.csMatrix3_swigregister
+csMatrix3_swigregister(csMatrix3)
 
 class csXRotMatrix3(csMatrix3):
     __swig_setmethods__ = {}
@@ -736,17 +687,15 @@ class csXRotMatrix3(csMatrix3):
     __swig_getmethods__ = {}
     for _s in [csMatrix3]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, csXRotMatrix3, name)
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ csXRotMatrix3 instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
-    def __init__(self, *args):
+    __repr__ = _swig_repr
+    def __init__(self, *args): 
         this = _cspace.new_csXRotMatrix3(*args)
         try: self.this.append(this)
         except: self.this = this
     __swig_destroy__ = _cspace.delete_csXRotMatrix3
     __del__ = lambda self : None;
-_cspace.csXRotMatrix3_swigregister(csXRotMatrix3)
+csXRotMatrix3_swigregister = _cspace.csXRotMatrix3_swigregister
+csXRotMatrix3_swigregister(csXRotMatrix3)
 
 class csYRotMatrix3(csMatrix3):
     __swig_setmethods__ = {}
@@ -755,17 +704,15 @@ class csYRotMatrix3(csMatrix3):
     __swig_getmethods__ = {}
     for _s in [csMatrix3]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, csYRotMatrix3, name)
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ csYRotMatrix3 instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
-    def __init__(self, *args):
+    __repr__ = _swig_repr
+    def __init__(self, *args): 
         this = _cspace.new_csYRotMatrix3(*args)
         try: self.this.append(this)
         except: self.this = this
     __swig_destroy__ = _cspace.delete_csYRotMatrix3
     __del__ = lambda self : None;
-_cspace.csYRotMatrix3_swigregister(csYRotMatrix3)
+csYRotMatrix3_swigregister = _cspace.csYRotMatrix3_swigregister
+csYRotMatrix3_swigregister(csYRotMatrix3)
 
 class csZRotMatrix3(csMatrix3):
     __swig_setmethods__ = {}
@@ -774,17 +721,15 @@ class csZRotMatrix3(csMatrix3):
     __swig_getmethods__ = {}
     for _s in [csMatrix3]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, csZRotMatrix3, name)
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ csZRotMatrix3 instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
-    def __init__(self, *args):
+    __repr__ = _swig_repr
+    def __init__(self, *args): 
         this = _cspace.new_csZRotMatrix3(*args)
         try: self.this.append(this)
         except: self.this = this
     __swig_destroy__ = _cspace.delete_csZRotMatrix3
     __del__ = lambda self : None;
-_cspace.csZRotMatrix3_swigregister(csZRotMatrix3)
+csZRotMatrix3_swigregister = _cspace.csZRotMatrix3_swigregister
+csZRotMatrix3_swigregister(csZRotMatrix3)
 
 class csXScaleMatrix3(csMatrix3):
     __swig_setmethods__ = {}
@@ -793,17 +738,15 @@ class csXScaleMatrix3(csMatrix3):
     __swig_getmethods__ = {}
     for _s in [csMatrix3]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, csXScaleMatrix3, name)
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ csXScaleMatrix3 instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
-    def __init__(self, *args):
+    __repr__ = _swig_repr
+    def __init__(self, *args): 
         this = _cspace.new_csXScaleMatrix3(*args)
         try: self.this.append(this)
         except: self.this = this
     __swig_destroy__ = _cspace.delete_csXScaleMatrix3
     __del__ = lambda self : None;
-_cspace.csXScaleMatrix3_swigregister(csXScaleMatrix3)
+csXScaleMatrix3_swigregister = _cspace.csXScaleMatrix3_swigregister
+csXScaleMatrix3_swigregister(csXScaleMatrix3)
 
 class csYScaleMatrix3(csMatrix3):
     __swig_setmethods__ = {}
@@ -812,17 +755,15 @@ class csYScaleMatrix3(csMatrix3):
     __swig_getmethods__ = {}
     for _s in [csMatrix3]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, csYScaleMatrix3, name)
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ csYScaleMatrix3 instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
-    def __init__(self, *args):
+    __repr__ = _swig_repr
+    def __init__(self, *args): 
         this = _cspace.new_csYScaleMatrix3(*args)
         try: self.this.append(this)
         except: self.this = this
     __swig_destroy__ = _cspace.delete_csYScaleMatrix3
     __del__ = lambda self : None;
-_cspace.csYScaleMatrix3_swigregister(csYScaleMatrix3)
+csYScaleMatrix3_swigregister = _cspace.csYScaleMatrix3_swigregister
+csYScaleMatrix3_swigregister(csYScaleMatrix3)
 
 class csZScaleMatrix3(csMatrix3):
     __swig_setmethods__ = {}
@@ -831,30 +772,25 @@ class csZScaleMatrix3(csMatrix3):
     __swig_getmethods__ = {}
     for _s in [csMatrix3]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, csZScaleMatrix3, name)
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ csZScaleMatrix3 instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
-    def __init__(self, *args):
+    __repr__ = _swig_repr
+    def __init__(self, *args): 
         this = _cspace.new_csZScaleMatrix3(*args)
         try: self.this.append(this)
         except: self.this = this
     __swig_destroy__ = _cspace.delete_csZScaleMatrix3
     __del__ = lambda self : None;
-_cspace.csZScaleMatrix3_swigregister(csZScaleMatrix3)
+csZScaleMatrix3_swigregister = _cspace.csZScaleMatrix3_swigregister
+csZScaleMatrix3_swigregister(csZScaleMatrix3)
 
 class csTransform(_object):
     __swig_setmethods__ = {}
     __setattr__ = lambda self, name, value: _swig_setattr(self, csTransform, name, value)
     __swig_getmethods__ = {}
     __getattr__ = lambda self, name: _swig_getattr(self, csTransform, name)
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ csTransform instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     __swig_destroy__ = _cspace.delete_csTransform
     __del__ = lambda self : None;
-    def __init__(self, *args):
+    def __init__(self, *args): 
         this = _cspace.new_csTransform(*args)
         try: self.this.append(this)
         except: self.this = this
@@ -876,8 +812,8 @@ class csTransform(_object):
     def GetRight(*args): return _cspace.csTransform_GetRight(*args)
     def __mul__(*args): return _cspace.csTransform___mul__(*args)
     def __rmul__(*args): return _cspace.csTransform___rmul__(*args)
-_cspace.csTransform_swigregister(csTransform)
-
+csTransform_swigregister = _cspace.csTransform_swigregister
+csTransform_swigregister(csTransform)
 csTransform_GetReflect = _cspace.csTransform_GetReflect
 
 class csReversibleTransform(csTransform):
@@ -887,11 +823,8 @@ class csReversibleTransform(csTransform):
     __swig_getmethods__ = {}
     for _s in [csTransform]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, csReversibleTransform, name)
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ csReversibleTransform instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
-    def __init__(self, *args):
+    __repr__ = _swig_repr
+    def __init__(self, *args): 
         this = _cspace.new_csReversibleTransform(*args)
         try: self.this.append(this)
         except: self.this = this
@@ -911,7 +844,8 @@ class csReversibleTransform(csTransform):
     def __div__(*args): return _cspace.csReversibleTransform___div__(*args)
     __swig_destroy__ = _cspace.delete_csReversibleTransform
     __del__ = lambda self : None;
-_cspace.csReversibleTransform_swigregister(csReversibleTransform)
+csReversibleTransform_swigregister = _cspace.csReversibleTransform_swigregister
+csReversibleTransform_swigregister(csReversibleTransform)
 
 class csOrthoTransform(csReversibleTransform):
     __swig_setmethods__ = {}
@@ -920,11 +854,8 @@ class csOrthoTransform(csReversibleTransform):
     __swig_getmethods__ = {}
     for _s in [csReversibleTransform]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, csOrthoTransform, name)
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ csOrthoTransform instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
-    def __init__(self, *args):
+    __repr__ = _swig_repr
+    def __init__(self, *args): 
         this = _cspace.new_csOrthoTransform(*args)
         try: self.this.append(this)
         except: self.this = this
@@ -932,18 +863,16 @@ class csOrthoTransform(csReversibleTransform):
     def SetT2O(*args): return _cspace.csOrthoTransform_SetT2O(*args)
     __swig_destroy__ = _cspace.delete_csOrthoTransform
     __del__ = lambda self : None;
-_cspace.csOrthoTransform_swigregister(csOrthoTransform)
+csOrthoTransform_swigregister = _cspace.csOrthoTransform_swigregister
+csOrthoTransform_swigregister(csOrthoTransform)
 
 class csSphere(_object):
     __swig_setmethods__ = {}
     __setattr__ = lambda self, name, value: _swig_setattr(self, csSphere, name, value)
     __swig_getmethods__ = {}
     __getattr__ = lambda self, name: _swig_getattr(self, csSphere, name)
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ csSphere instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
-    def __init__(self, *args):
+    __repr__ = _swig_repr
+    def __init__(self, *args): 
         this = _cspace.new_csSphere(*args)
         try: self.this.append(this)
         except: self.this = this
@@ -957,18 +886,16 @@ class csSphere(_object):
     def __div__(*args): return _cspace.csSphere___div__(*args)
     __swig_destroy__ = _cspace.delete_csSphere
     __del__ = lambda self : None;
-_cspace.csSphere_swigregister(csSphere)
+csSphere_swigregister = _cspace.csSphere_swigregister
+csSphere_swigregister(csSphere)
 
 class csEllipsoid(_object):
     __swig_setmethods__ = {}
     __setattr__ = lambda self, name, value: _swig_setattr(self, csEllipsoid, name, value)
     __swig_getmethods__ = {}
     __getattr__ = lambda self, name: _swig_getattr(self, csEllipsoid, name)
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ csEllipsoid instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
-    def __init__(self, *args):
+    __repr__ = _swig_repr
+    def __init__(self, *args): 
         this = _cspace.new_csEllipsoid(*args)
         try: self.this.append(this)
         except: self.this = this
@@ -978,7 +905,8 @@ class csEllipsoid(_object):
     def SetRadius(*args): return _cspace.csEllipsoid_SetRadius(*args)
     __swig_destroy__ = _cspace.delete_csEllipsoid
     __del__ = lambda self : None;
-_cspace.csEllipsoid_swigregister(csEllipsoid)
+csEllipsoid_swigregister = _cspace.csEllipsoid_swigregister
+csEllipsoid_swigregister(csEllipsoid)
 
 CS_POLY_IN = _cspace.CS_POLY_IN
 CS_POLY_ON = _cspace.CS_POLY_ON
@@ -988,17 +916,14 @@ class csPlane2(_object):
     __setattr__ = lambda self, name, value: _swig_setattr(self, csPlane2, name, value)
     __swig_getmethods__ = {}
     __getattr__ = lambda self, name: _swig_getattr(self, csPlane2, name)
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ csPlane2 instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     __swig_setmethods__["norm"] = _cspace.csPlane2_norm_set
     __swig_getmethods__["norm"] = _cspace.csPlane2_norm_get
     if _newclass:norm = property(_cspace.csPlane2_norm_get, _cspace.csPlane2_norm_set)
     __swig_setmethods__["CC"] = _cspace.csPlane2_CC_set
     __swig_getmethods__["CC"] = _cspace.csPlane2_CC_get
     if _newclass:CC = property(_cspace.csPlane2_CC_get, _cspace.csPlane2_CC_set)
-    def __init__(self, *args):
+    def __init__(self, *args): 
         this = _cspace.new_csPlane2(*args)
         try: self.this.append(this)
         except: self.this = this
@@ -1016,8 +941,8 @@ class csPlane2(_object):
     def Normalize(*args): return _cspace.csPlane2_Normalize(*args)
     __swig_destroy__ = _cspace.delete_csPlane2
     __del__ = lambda self : None;
-_cspace.csPlane2_swigregister(csPlane2)
-
+csPlane2_swigregister = _cspace.csPlane2_swigregister
+csPlane2_swigregister(csPlane2)
 csPlane2_Classify = _cspace.csPlane2_Classify
 
 class csPlane3(_object):
@@ -1025,17 +950,14 @@ class csPlane3(_object):
     __setattr__ = lambda self, name, value: _swig_setattr(self, csPlane3, name, value)
     __swig_getmethods__ = {}
     __getattr__ = lambda self, name: _swig_getattr(self, csPlane3, name)
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ csPlane3 instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     __swig_setmethods__["norm"] = _cspace.csPlane3_norm_set
     __swig_getmethods__["norm"] = _cspace.csPlane3_norm_get
     if _newclass:norm = property(_cspace.csPlane3_norm_get, _cspace.csPlane3_norm_set)
     __swig_setmethods__["DD"] = _cspace.csPlane3_DD_set
     __swig_getmethods__["DD"] = _cspace.csPlane3_DD_get
     if _newclass:DD = property(_cspace.csPlane3_DD_get, _cspace.csPlane3_DD_set)
-    def __init__(self, *args):
+    def __init__(self, *args): 
         this = _cspace.new_csPlane3(*args)
         try: self.this.append(this)
         except: self.this = this
@@ -1060,8 +982,8 @@ class csPlane3(_object):
     def __div__(*args): return _cspace.csPlane3___div__(*args)
     __swig_destroy__ = _cspace.delete_csPlane3
     __del__ = lambda self : None;
-_cspace.csPlane3_swigregister(csPlane3)
-
+csPlane3_swigregister = _cspace.csPlane3_swigregister
+csPlane3_swigregister(csPlane3)
 csPlane3_Classify = _cspace.csPlane3_Classify
 
 class csMath2(_object):
@@ -1069,10 +991,7 @@ class csMath2(_object):
     __setattr__ = lambda self, name, value: _swig_setattr(self, csMath2, name, value)
     __swig_getmethods__ = {}
     __getattr__ = lambda self, name: _swig_getattr(self, csMath2, name)
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ csMath2 instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     __swig_getmethods__["WhichSide2D"] = lambda x: _cspace.csMath2_WhichSide2D
     if _newclass:WhichSide2D = staticmethod(_cspace.csMath2_WhichSide2D)
     __swig_getmethods__["InPoly2D"] = lambda x: _cspace.csMath2_InPoly2D
@@ -1089,28 +1008,21 @@ class csMath2(_object):
     if _newclass:PlanesEqual = staticmethod(_cspace.csMath2_PlanesEqual)
     __swig_getmethods__["PlanesClose"] = lambda x: _cspace.csMath2_PlanesClose
     if _newclass:PlanesClose = staticmethod(_cspace.csMath2_PlanesClose)
-    def __init__(self, *args):
+    def __init__(self, *args): 
         this = _cspace.new_csMath2(*args)
         try: self.this.append(this)
         except: self.this = this
     __swig_destroy__ = _cspace.delete_csMath2
     __del__ = lambda self : None;
-_cspace.csMath2_swigregister(csMath2)
-
+csMath2_swigregister = _cspace.csMath2_swigregister
+csMath2_swigregister(csMath2)
 csMath2_WhichSide2D = _cspace.csMath2_WhichSide2D
-
 csMath2_InPoly2D = _cspace.csMath2_InPoly2D
-
 csMath2_Area2 = _cspace.csMath2_Area2
-
 csMath2_Right = _cspace.csMath2_Right
-
 csMath2_Left = _cspace.csMath2_Left
-
 csMath2_Visible = _cspace.csMath2_Visible
-
 csMath2_PlanesEqual = _cspace.csMath2_PlanesEqual
-
 csMath2_PlanesClose = _cspace.csMath2_PlanesClose
 
 class csIntersect2(_object):
@@ -1118,10 +1030,7 @@ class csIntersect2(_object):
     __setattr__ = lambda self, name, value: _swig_setattr(self, csIntersect2, name, value)
     __swig_getmethods__ = {}
     __getattr__ = lambda self, name: _swig_getattr(self, csIntersect2, name)
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ csIntersect2 instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     __swig_getmethods__["PlanePolygon"] = lambda x: _cspace.csIntersect2_PlanePolygon
     if _newclass:PlanePolygon = staticmethod(_cspace.csIntersect2_PlanePolygon)
     __swig_getmethods__["SegmentSegment"] = lambda x: _cspace.csIntersect2_SegmentSegment
@@ -1136,26 +1045,20 @@ class csIntersect2(_object):
     if _newclass:SegmentPlaneNoTest = staticmethod(_cspace.csIntersect2_SegmentPlaneNoTest)
     __swig_getmethods__["PlanePlane"] = lambda x: _cspace.csIntersect2_PlanePlane
     if _newclass:PlanePlane = staticmethod(_cspace.csIntersect2_PlanePlane)
-    def __init__(self, *args):
+    def __init__(self, *args): 
         this = _cspace.new_csIntersect2(*args)
         try: self.this.append(this)
         except: self.this = this
     __swig_destroy__ = _cspace.delete_csIntersect2
     __del__ = lambda self : None;
-_cspace.csIntersect2_swigregister(csIntersect2)
-
+csIntersect2_swigregister = _cspace.csIntersect2_swigregister
+csIntersect2_swigregister(csIntersect2)
 csIntersect2_PlanePolygon = _cspace.csIntersect2_PlanePolygon
-
 csIntersect2_SegmentSegment = _cspace.csIntersect2_SegmentSegment
-
 csIntersect2_SegmentLine = _cspace.csIntersect2_SegmentLine
-
 csIntersect2_LineLine = _cspace.csIntersect2_LineLine
-
 csIntersect2_SegmentPlane = _cspace.csIntersect2_SegmentPlane
-
 csIntersect2_SegmentPlaneNoTest = _cspace.csIntersect2_SegmentPlaneNoTest
-
 csIntersect2_PlanePlane = _cspace.csIntersect2_PlanePlane
 
 class csPoly2D(_object):
@@ -1163,11 +1066,8 @@ class csPoly2D(_object):
     __setattr__ = lambda self, name, value: _swig_setattr(self, csPoly2D, name, value)
     __swig_getmethods__ = {}
     __getattr__ = lambda self, name: _swig_getattr(self, csPoly2D, name)
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ csPoly2D instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
-    def __init__(self, *args):
+    __repr__ = _swig_repr
+    def __init__(self, *args): 
         this = _cspace.new_csPoly2D(*args)
         try: self.this.append(this)
         except: self.this = this
@@ -1198,8 +1098,8 @@ class csPoly2D(_object):
       for i in range(2):
         own_v[i] = v[i]
 
-_cspace.csPoly2D_swigregister(csPoly2D)
-
+csPoly2D_swigregister = _cspace.csPoly2D_swigregister
+csPoly2D_swigregister(csPoly2D)
 csPoly2D_In = _cspace.csPoly2D_In
 
 class csPoly2DFactory(_object):
@@ -1207,28 +1107,23 @@ class csPoly2DFactory(_object):
     __setattr__ = lambda self, name, value: _swig_setattr(self, csPoly2DFactory, name, value)
     __swig_getmethods__ = {}
     __getattr__ = lambda self, name: _swig_getattr(self, csPoly2DFactory, name)
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ csPoly2DFactory instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     __swig_destroy__ = _cspace.delete_csPoly2DFactory
     __del__ = lambda self : None;
     def Create(*args): return _cspace.csPoly2DFactory_Create(*args)
-    def __init__(self, *args):
+    def __init__(self, *args): 
         this = _cspace.new_csPoly2DFactory(*args)
         try: self.this.append(this)
         except: self.this = this
-_cspace.csPoly2DFactory_swigregister(csPoly2DFactory)
+csPoly2DFactory_swigregister = _cspace.csPoly2DFactory_swigregister
+csPoly2DFactory_swigregister(csPoly2DFactory)
 
 class csMath3(_object):
     __swig_setmethods__ = {}
     __setattr__ = lambda self, name, value: _swig_setattr(self, csMath3, name, value)
     __swig_getmethods__ = {}
     __getattr__ = lambda self, name: _swig_getattr(self, csMath3, name)
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ csMath3 instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     __swig_getmethods__["WhichSide3D"] = lambda x: _cspace.csMath3_WhichSide3D
     if _newclass:WhichSide3D = staticmethod(_cspace.csMath3_WhichSide3D)
     __swig_getmethods__["Visible"] = lambda x: _cspace.csMath3_Visible
@@ -1255,38 +1150,26 @@ class csMath3(_object):
     if _newclass:FindObserverSides = staticmethod(_cspace.csMath3_FindObserverSides)
     __swig_getmethods__["SpherePosition"] = lambda x: _cspace.csMath3_SpherePosition
     if _newclass:SpherePosition = staticmethod(_cspace.csMath3_SpherePosition)
-    def __init__(self, *args):
+    def __init__(self, *args): 
         this = _cspace.new_csMath3(*args)
         try: self.this.append(this)
         except: self.this = this
     __swig_destroy__ = _cspace.delete_csMath3
     __del__ = lambda self : None;
-_cspace.csMath3_swigregister(csMath3)
-
+csMath3_swigregister = _cspace.csMath3_swigregister
+csMath3_swigregister(csMath3)
 csMath3_WhichSide3D = _cspace.csMath3_WhichSide3D
-
 csMath3_Visible = _cspace.csMath3_Visible
-
 csMath3_Between = _cspace.csMath3_Between
-
 csMath3_SetMinMax = _cspace.csMath3_SetMinMax
-
 csMath3_DoubleArea3 = _cspace.csMath3_DoubleArea3
-
 csMath3_Direction3 = _cspace.csMath3_Direction3
-
 csMath3_CalcNormal = _cspace.csMath3_CalcNormal
-
 csMath3_CalcPlane = _cspace.csMath3_CalcPlane
-
 csMath3_PlanesEqual = _cspace.csMath3_PlanesEqual
-
 csMath3_PlanesClose = _cspace.csMath3_PlanesClose
-
 csMath3_OuterPlanes = _cspace.csMath3_OuterPlanes
-
 csMath3_FindObserverSides = _cspace.csMath3_FindObserverSides
-
 csMath3_SpherePosition = _cspace.csMath3_SpherePosition
 
 class csSquaredDist(_object):
@@ -1294,10 +1177,7 @@ class csSquaredDist(_object):
     __setattr__ = lambda self, name, value: _swig_setattr(self, csSquaredDist, name, value)
     __swig_getmethods__ = {}
     __getattr__ = lambda self, name: _swig_getattr(self, csSquaredDist, name)
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ csSquaredDist instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     __swig_getmethods__["PointPoint"] = lambda x: _cspace.csSquaredDist_PointPoint
     if _newclass:PointPoint = staticmethod(_cspace.csSquaredDist_PointPoint)
     __swig_getmethods__["PointLine"] = lambda x: _cspace.csSquaredDist_PointLine
@@ -1306,20 +1186,17 @@ class csSquaredDist(_object):
     if _newclass:PointPlane = staticmethod(_cspace.csSquaredDist_PointPlane)
     __swig_getmethods__["PointPoly"] = lambda x: _cspace.csSquaredDist_PointPoly
     if _newclass:PointPoly = staticmethod(_cspace.csSquaredDist_PointPoly)
-    def __init__(self, *args):
+    def __init__(self, *args): 
         this = _cspace.new_csSquaredDist(*args)
         try: self.this.append(this)
         except: self.this = this
     __swig_destroy__ = _cspace.delete_csSquaredDist
     __del__ = lambda self : None;
-_cspace.csSquaredDist_swigregister(csSquaredDist)
-
+csSquaredDist_swigregister = _cspace.csSquaredDist_swigregister
+csSquaredDist_swigregister(csSquaredDist)
 csSquaredDist_PointPoint = _cspace.csSquaredDist_PointPoint
-
 csSquaredDist_PointLine = _cspace.csSquaredDist_PointLine
-
 csSquaredDist_PointPlane = _cspace.csSquaredDist_PointPlane
-
 csSquaredDist_PointPoly = _cspace.csSquaredDist_PointPoly
 
 class csIntersect3(_object):
@@ -1327,10 +1204,7 @@ class csIntersect3(_object):
     __setattr__ = lambda self, name, value: _swig_setattr(self, csIntersect3, name, value)
     __swig_getmethods__ = {}
     __getattr__ = lambda self, name: _swig_getattr(self, csIntersect3, name)
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ csIntersect3 instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     __swig_getmethods__["PlanePolygon"] = lambda x: _cspace.csIntersect3_PlanePolygon
     if _newclass:PlanePolygon = staticmethod(_cspace.csIntersect3_PlanePolygon)
     __swig_getmethods__["SegmentFrustum"] = lambda x: _cspace.csIntersect3_SegmentFrustum
@@ -1383,64 +1257,39 @@ class csIntersect3(_object):
     if _newclass:FrustumFrustum = staticmethod(_cspace.csIntersect3_FrustumFrustum)
     __swig_getmethods__["TriangleTriangle"] = lambda x: _cspace.csIntersect3_TriangleTriangle
     if _newclass:TriangleTriangle = staticmethod(_cspace.csIntersect3_TriangleTriangle)
-    def __init__(self, *args):
+    def __init__(self, *args): 
         this = _cspace.new_csIntersect3(*args)
         try: self.this.append(this)
         except: self.this = this
     __swig_destroy__ = _cspace.delete_csIntersect3
     __del__ = lambda self : None;
-_cspace.csIntersect3_swigregister(csIntersect3)
-
+csIntersect3_swigregister = _cspace.csIntersect3_swigregister
+csIntersect3_swigregister(csIntersect3)
 csIntersect3_PlanePolygon = _cspace.csIntersect3_PlanePolygon
-
 csIntersect3_SegmentFrustum = _cspace.csIntersect3_SegmentFrustum
-
 csIntersect3_SegmentTriangle = _cspace.csIntersect3_SegmentTriangle
-
 csIntersect3_SegmentPolygon = _cspace.csIntersect3_SegmentPolygon
-
 csIntersect3_SegmentPlanes = _cspace.csIntersect3_SegmentPlanes
-
 csIntersect3_SegmentPlane = _cspace.csIntersect3_SegmentPlane
-
 csIntersect3_ThreePlanes = _cspace.csIntersect3_ThreePlanes
-
 csIntersect3_PlaneXPlane = _cspace.csIntersect3_PlaneXPlane
-
 csIntersect3_PlaneYPlane = _cspace.csIntersect3_PlaneYPlane
-
 csIntersect3_PlaneZPlane = _cspace.csIntersect3_PlaneZPlane
-
 csIntersect3_PlaneAxisPlane = _cspace.csIntersect3_PlaneAxisPlane
-
 csIntersect3_SegmentZ0Plane = _cspace.csIntersect3_SegmentZ0Plane
-
 csIntersect3_SegmentXPlane = _cspace.csIntersect3_SegmentXPlane
-
 csIntersect3_SegmentYPlane = _cspace.csIntersect3_SegmentYPlane
-
 csIntersect3_SegmentZPlane = _cspace.csIntersect3_SegmentZPlane
-
 csIntersect3_SegmentAxisPlane = _cspace.csIntersect3_SegmentAxisPlane
-
 csIntersect3_SegmentXFrustum = _cspace.csIntersect3_SegmentXFrustum
-
 csIntersect3_SegmentYFrustum = _cspace.csIntersect3_SegmentYFrustum
-
 csIntersect3_BoxSegment = _cspace.csIntersect3_BoxSegment
-
 csIntersect3_BoxFrustum = _cspace.csIntersect3_BoxFrustum
-
 csIntersect3_BoxSphere = _cspace.csIntersect3_BoxSphere
-
 csIntersect3_BoxPlane = _cspace.csIntersect3_BoxPlane
-
 csIntersect3_BoxTriangle = _cspace.csIntersect3_BoxTriangle
-
 csIntersect3_BoxBox = _cspace.csIntersect3_BoxBox
-
 csIntersect3_FrustumFrustum = _cspace.csIntersect3_FrustumFrustum
-
 csIntersect3_TriangleTriangle = _cspace.csIntersect3_TriangleTriangle
 
 class csGeomDebugHelper(_object):
@@ -1448,11 +1297,8 @@ class csGeomDebugHelper(_object):
     __setattr__ = lambda self, name, value: _swig_setattr(self, csGeomDebugHelper, name, value)
     __swig_getmethods__ = {}
     __getattr__ = lambda self, name: _swig_getattr(self, csGeomDebugHelper, name)
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ csGeomDebugHelper instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
-    def __init__(self, *args):
+    __repr__ = _swig_repr
+    def __init__(self, *args): 
         this = _cspace.new_csGeomDebugHelper(*args)
         try: self.this.append(this)
         except: self.this = this
@@ -1464,7 +1310,8 @@ class csGeomDebugHelper(_object):
     def Benchmark(*args): return _cspace.csGeomDebugHelper_Benchmark(*args)
     def Dump(*args): return _cspace.csGeomDebugHelper_Dump(*args)
     def DebugCommand(*args): return _cspace.csGeomDebugHelper_DebugCommand(*args)
-_cspace.csGeomDebugHelper_swigregister(csGeomDebugHelper)
+csGeomDebugHelper_swigregister = _cspace.csGeomDebugHelper_swigregister
+csGeomDebugHelper_swigregister(csGeomDebugHelper)
 
 CS_POL_SAME_PLANE = _cspace.CS_POL_SAME_PLANE
 CS_POL_FRONT = _cspace.CS_POL_FRONT
@@ -1475,11 +1322,8 @@ class csPoly3D(_object):
     __setattr__ = lambda self, name, value: _swig_setattr(self, csPoly3D, name, value)
     __swig_getmethods__ = {}
     __getattr__ = lambda self, name: _swig_getattr(self, csPoly3D, name)
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ csPoly3D instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
-    def __init__(self, *args):
+    __repr__ = _swig_repr
+    def __init__(self, *args): 
         this = _cspace.new_csPoly3D(*args)
         try: self.this.append(this)
         except: self.this = this
@@ -1523,8 +1367,8 @@ class csPoly3D(_object):
       for i in range(3):
         own_v[i] = v[i]
 
-_cspace.csPoly3D_swigregister(csPoly3D)
-
+csPoly3D_swigregister = _cspace.csPoly3D_swigregister
+csPoly3D_swigregister(csPoly3D)
 csPoly3D_In = _cspace.csPoly3D_In
 
 class csCompressVertex(_object):
@@ -1532,10 +1376,7 @@ class csCompressVertex(_object):
     __setattr__ = lambda self, name, value: _swig_setattr(self, csCompressVertex, name, value)
     __swig_getmethods__ = {}
     __getattr__ = lambda self, name: _swig_getattr(self, csCompressVertex, name)
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ csCompressVertex instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     __swig_setmethods__["orig_idx"] = _cspace.csCompressVertex_orig_idx_set
     __swig_getmethods__["orig_idx"] = _cspace.csCompressVertex_orig_idx_get
     if _newclass:orig_idx = property(_cspace.csCompressVertex_orig_idx_get, _cspace.csCompressVertex_orig_idx_set)
@@ -1554,13 +1395,14 @@ class csCompressVertex(_object):
     __swig_setmethods__["used"] = _cspace.csCompressVertex_used_set
     __swig_getmethods__["used"] = _cspace.csCompressVertex_used_get
     if _newclass:used = property(_cspace.csCompressVertex_used_get, _cspace.csCompressVertex_used_set)
-    def __init__(self, *args):
+    def __init__(self, *args): 
         this = _cspace.new_csCompressVertex(*args)
         try: self.this.append(this)
         except: self.this = this
     __swig_destroy__ = _cspace.delete_csCompressVertex
     __del__ = lambda self : None;
-_cspace.csCompressVertex_swigregister(csCompressVertex)
+csCompressVertex_swigregister = _cspace.csCompressVertex_swigregister
+csCompressVertex_swigregister(csCompressVertex)
 
 class csVector3Array(csPoly3D):
     __swig_setmethods__ = {}
@@ -1569,11 +1411,8 @@ class csVector3Array(csPoly3D):
     __swig_getmethods__ = {}
     for _s in [csPoly3D]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, csVector3Array, name)
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ csVector3Array instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
-    def __init__(self, *args):
+    __repr__ = _swig_repr
+    def __init__(self, *args): 
         this = _cspace.new_csVector3Array(*args)
         try: self.this.append(this)
         except: self.this = this
@@ -1582,8 +1421,8 @@ class csVector3Array(csPoly3D):
     if _newclass:CompressVertices = staticmethod(_cspace.csVector3Array_CompressVertices)
     __swig_destroy__ = _cspace.delete_csVector3Array
     __del__ = lambda self : None;
-_cspace.csVector3Array_swigregister(csVector3Array)
-
+csVector3Array_swigregister = _cspace.csVector3Array_swigregister
+csVector3Array_swigregister(csVector3Array)
 csVector3Array_CompressVertices = _cspace.csVector3Array_CompressVertices
 
 class csTriangle(_object):
@@ -1591,10 +1430,7 @@ class csTriangle(_object):
     __setattr__ = lambda self, name, value: _swig_setattr(self, csTriangle, name, value)
     __swig_getmethods__ = {}
     __getattr__ = lambda self, name: _swig_getattr(self, csTriangle, name)
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ csTriangle instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     __swig_setmethods__["a"] = _cspace.csTriangle_a_set
     __swig_getmethods__["a"] = _cspace.csTriangle_a_get
     if _newclass:a = property(_cspace.csTriangle_a_get, _cspace.csTriangle_a_set)
@@ -1604,7 +1440,7 @@ class csTriangle(_object):
     __swig_setmethods__["c"] = _cspace.csTriangle_c_set
     __swig_getmethods__["c"] = _cspace.csTriangle_c_get
     if _newclass:c = property(_cspace.csTriangle_c_get, _cspace.csTriangle_c_set)
-    def __init__(self, *args):
+    def __init__(self, *args): 
         this = _cspace.new_csTriangle(*args)
         try: self.this.append(this)
         except: self.this = this
@@ -1612,17 +1448,15 @@ class csTriangle(_object):
     def Set(*args): return _cspace.csTriangle_Set(*args)
     __swig_destroy__ = _cspace.delete_csTriangle
     __del__ = lambda self : None;
-_cspace.csTriangle_swigregister(csTriangle)
+csTriangle_swigregister = _cspace.csTriangle_swigregister
+csTriangle_swigregister(csTriangle)
 
 class csRect(_object):
     __swig_setmethods__ = {}
     __setattr__ = lambda self, name, value: _swig_setattr(self, csRect, name, value)
     __swig_getmethods__ = {}
     __getattr__ = lambda self, name: _swig_getattr(self, csRect, name)
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ csRect instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     __swig_setmethods__["xmin"] = _cspace.csRect_xmin_set
     __swig_getmethods__["xmin"] = _cspace.csRect_xmin_get
     if _newclass:xmin = property(_cspace.csRect_xmin_get, _cspace.csRect_xmin_set)
@@ -1635,7 +1469,7 @@ class csRect(_object):
     __swig_setmethods__["ymax"] = _cspace.csRect_ymax_set
     __swig_getmethods__["ymax"] = _cspace.csRect_ymax_get
     if _newclass:ymax = property(_cspace.csRect_ymax_get, _cspace.csRect_ymax_set)
-    def __init__(self, *args):
+    def __init__(self, *args): 
         this = _cspace.new_csRect(*args)
         try: self.this.append(this)
         except: self.this = this
@@ -1669,18 +1503,16 @@ class csRect(_object):
     def ClipLineGeneral(*args): return _cspace.csRect_ClipLineGeneral(*args)
     def ClipLine(*args): return _cspace.csRect_ClipLine(*args)
     def ClipLineSafe(*args): return _cspace.csRect_ClipLineSafe(*args)
-_cspace.csRect_swigregister(csRect)
+csRect_swigregister = _cspace.csRect_swigregister
+csRect_swigregister(csRect)
 
 class csRectRegion(_object):
     __swig_setmethods__ = {}
     __setattr__ = lambda self, name, value: _swig_setattr(self, csRectRegion, name, value)
     __swig_getmethods__ = {}
     __getattr__ = lambda self, name: _swig_getattr(self, csRectRegion, name)
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ csRectRegion instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
-    def __init__(self, *args):
+    __repr__ = _swig_repr
+    def __init__(self, *args): 
         this = _cspace.new_csRectRegion(*args)
         try: self.this.append(this)
         except: self.this = this
@@ -1692,18 +1524,16 @@ class csRectRegion(_object):
     def Count(*args): return _cspace.csRectRegion_Count(*args)
     def RectAt(*args): return _cspace.csRectRegion_RectAt(*args)
     def MakeEmpty(*args): return _cspace.csRectRegion_MakeEmpty(*args)
-_cspace.csRectRegion_swigregister(csRectRegion)
+csRectRegion_swigregister = _cspace.csRectRegion_swigregister
+csRectRegion_swigregister(csRectRegion)
 
 class csQuaternion(_object):
     __swig_setmethods__ = {}
     __setattr__ = lambda self, name, value: _swig_setattr(self, csQuaternion, name, value)
     __swig_getmethods__ = {}
     __getattr__ = lambda self, name: _swig_getattr(self, csQuaternion, name)
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ csQuaternion instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
-    def __init__(self, *args):
+    __repr__ = _swig_repr
+    def __init__(self, *args): 
         this = _cspace.new_csQuaternion(*args)
         try: self.this.append(this)
         except: self.this = this
@@ -1737,7 +1567,8 @@ class csQuaternion(_object):
     def __mul__(*args): return _cspace.csQuaternion___mul__(*args)
     __swig_destroy__ = _cspace.delete_csQuaternion
     __del__ = lambda self : None;
-_cspace.csQuaternion_swigregister(csQuaternion)
+csQuaternion_swigregister = _cspace.csQuaternion_swigregister
+csQuaternion_swigregister(csQuaternion)
 
 class csSpline(_object):
     __swig_setmethods__ = {}
@@ -1745,10 +1576,7 @@ class csSpline(_object):
     __swig_getmethods__ = {}
     __getattr__ = lambda self, name: _swig_getattr(self, csSpline, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ csSpline instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     __swig_destroy__ = _cspace.delete_csSpline
     __del__ = lambda self : None;
     def GetDimensionCount(*args): return _cspace.csSpline_GetDimensionCount(*args)
@@ -1768,7 +1596,8 @@ class csSpline(_object):
     def Calculate(*args): return _cspace.csSpline_Calculate(*args)
     def GetCurrentIndex(*args): return _cspace.csSpline_GetCurrentIndex(*args)
     def GetInterpolatedDimension(*args): return _cspace.csSpline_GetInterpolatedDimension(*args)
-_cspace.csSpline_swigregister(csSpline)
+csSpline_swigregister = _cspace.csSpline_swigregister
+csSpline_swigregister(csSpline)
 
 class csCubicSpline(csSpline):
     __swig_setmethods__ = {}
@@ -1777,11 +1606,8 @@ class csCubicSpline(csSpline):
     __swig_getmethods__ = {}
     for _s in [csSpline]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, csCubicSpline, name)
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ csCubicSpline instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
-    def __init__(self, *args):
+    __repr__ = _swig_repr
+    def __init__(self, *args): 
         this = _cspace.new_csCubicSpline(*args)
         try: self.this.append(this)
         except: self.this = this
@@ -1789,7 +1615,8 @@ class csCubicSpline(csSpline):
     __del__ = lambda self : None;
     def Calculate(*args): return _cspace.csCubicSpline_Calculate(*args)
     def GetInterpolatedDimension(*args): return _cspace.csCubicSpline_GetInterpolatedDimension(*args)
-_cspace.csCubicSpline_swigregister(csCubicSpline)
+csCubicSpline_swigregister = _cspace.csCubicSpline_swigregister
+csCubicSpline_swigregister(csCubicSpline)
 
 class csBSpline(csSpline):
     __swig_setmethods__ = {}
@@ -1798,11 +1625,8 @@ class csBSpline(csSpline):
     __swig_getmethods__ = {}
     for _s in [csSpline]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, csBSpline, name)
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ csBSpline instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
-    def __init__(self, *args):
+    __repr__ = _swig_repr
+    def __init__(self, *args): 
         this = _cspace.new_csBSpline(*args)
         try: self.this.append(this)
         except: self.this = this
@@ -1810,7 +1634,8 @@ class csBSpline(csSpline):
     __del__ = lambda self : None;
     def Calculate(*args): return _cspace.csBSpline_Calculate(*args)
     def GetInterpolatedDimension(*args): return _cspace.csBSpline_GetInterpolatedDimension(*args)
-_cspace.csBSpline_swigregister(csBSpline)
+csBSpline_swigregister = _cspace.csBSpline_swigregister
+csBSpline_swigregister(csBSpline)
 
 class csCatmullRomSpline(csBSpline):
     __swig_setmethods__ = {}
@@ -1819,18 +1644,16 @@ class csCatmullRomSpline(csBSpline):
     __swig_getmethods__ = {}
     for _s in [csBSpline]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, csCatmullRomSpline, name)
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ csCatmullRomSpline instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
-    def __init__(self, *args):
+    __repr__ = _swig_repr
+    def __init__(self, *args): 
         this = _cspace.new_csCatmullRomSpline(*args)
         try: self.this.append(this)
         except: self.this = this
     __swig_destroy__ = _cspace.delete_csCatmullRomSpline
     __del__ = lambda self : None;
     def Clone(*args): return _cspace.csCatmullRomSpline_Clone(*args)
-_cspace.csCatmullRomSpline_swigregister(csCatmullRomSpline)
+csCatmullRomSpline_swigregister = _cspace.csCatmullRomSpline_swigregister
+csCatmullRomSpline_swigregister(csCatmullRomSpline)
 
 CS_BOUNDINGBOX_MAXVALUE = _cspace.CS_BOUNDINGBOX_MAXVALUE
 CS_BOX_CORNER_xy = _cspace.CS_BOX_CORNER_xy
@@ -1851,10 +1674,7 @@ class csBox2(_object):
     __setattr__ = lambda self, name, value: _swig_setattr(self, csBox2, name, value)
     __swig_getmethods__ = {}
     __getattr__ = lambda self, name: _swig_getattr(self, csBox2, name)
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ csBox2 instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def MinX(*args): return _cspace.csBox2_MinX(*args)
     def MinY(*args): return _cspace.csBox2_MinY(*args)
     def MaxX(*args): return _cspace.csBox2_MaxX(*args)
@@ -1882,7 +1702,7 @@ class csBox2(_object):
     def AddBoundingVertexSmart(*args): return _cspace.csBox2_AddBoundingVertexSmart(*args)
     def AddBoundingVertexTest(*args): return _cspace.csBox2_AddBoundingVertexTest(*args)
     def AddBoundingVertexSmartTest(*args): return _cspace.csBox2_AddBoundingVertexSmartTest(*args)
-    def __init__(self, *args):
+    def __init__(self, *args): 
         this = _cspace.new_csBox2(*args)
         try: self.this.append(this)
         except: self.this = this
@@ -1900,7 +1720,8 @@ class csBox2(_object):
     def __lt__(*args): return _cspace.csBox2___lt__(*args)
     __swig_destroy__ = _cspace.delete_csBox2
     __del__ = lambda self : None;
-_cspace.csBox2_swigregister(csBox2)
+csBox2_swigregister = _cspace.csBox2_swigregister
+csBox2_swigregister(csBox2)
 
 CS_BOX_CORNER_xyz = _cspace.CS_BOX_CORNER_xyz
 CS_BOX_CORNER_xyZ = _cspace.CS_BOX_CORNER_xyZ
@@ -1947,10 +1768,7 @@ class csBox3(_object):
     __setattr__ = lambda self, name, value: _swig_setattr(self, csBox3, name, value)
     __swig_getmethods__ = {}
     __getattr__ = lambda self, name: _swig_getattr(self, csBox3, name)
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ csBox3 instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def MinX(*args): return _cspace.csBox3_MinX(*args)
     def MinY(*args): return _cspace.csBox3_MinY(*args)
     def MinZ(*args): return _cspace.csBox3_MinZ(*args)
@@ -1984,7 +1802,7 @@ class csBox3(_object):
     def AddBoundingVertexTest(*args): return _cspace.csBox3_AddBoundingVertexTest(*args)
     def AddBoundingVertexSmartTest(*args): return _cspace.csBox3_AddBoundingVertexSmartTest(*args)
     def AddBoundingBox(*args): return _cspace.csBox3_AddBoundingBox(*args)
-    def __init__(self, *args):
+    def __init__(self, *args): 
         this = _cspace.new_csBox3(*args)
         try: self.this.append(this)
         except: self.this = this
@@ -2019,8 +1837,8 @@ class csBox3(_object):
     def __lt__(*args): return _cspace.csBox3___lt__(*args)
     __swig_destroy__ = _cspace.delete_csBox3
     __del__ = lambda self : None;
-_cspace.csBox3_swigregister(csBox3)
-
+csBox3_swigregister = _cspace.csBox3_swigregister
+csBox3_swigregister(csBox3)
 csBox3_OtherSide = _cspace.csBox3_OtherSide
 
 class csSegment2(_object):
@@ -2028,11 +1846,8 @@ class csSegment2(_object):
     __setattr__ = lambda self, name, value: _swig_setattr(self, csSegment2, name, value)
     __swig_getmethods__ = {}
     __getattr__ = lambda self, name: _swig_getattr(self, csSegment2, name)
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ csSegment2 instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
-    def __init__(self, *args):
+    __repr__ = _swig_repr
+    def __init__(self, *args): 
         this = _cspace.new_csSegment2(*args)
         try: self.this.append(this)
         except: self.this = this
@@ -2043,18 +1858,16 @@ class csSegment2(_object):
     def SetEnd(*args): return _cspace.csSegment2_SetEnd(*args)
     def Start(*args): return _cspace.csSegment2_Start(*args)
     def End(*args): return _cspace.csSegment2_End(*args)
-_cspace.csSegment2_swigregister(csSegment2)
+csSegment2_swigregister = _cspace.csSegment2_swigregister
+csSegment2_swigregister(csSegment2)
 
 class csSegment3(_object):
     __swig_setmethods__ = {}
     __setattr__ = lambda self, name, value: _swig_setattr(self, csSegment3, name, value)
     __swig_getmethods__ = {}
     __getattr__ = lambda self, name: _swig_getattr(self, csSegment3, name)
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ csSegment3 instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
-    def __init__(self, *args):
+    __repr__ = _swig_repr
+    def __init__(self, *args): 
         this = _cspace.new_csSegment3(*args)
         try: self.this.append(this)
         except: self.this = this
@@ -2065,17 +1878,15 @@ class csSegment3(_object):
     def End(*args): return _cspace.csSegment3_End(*args)
     __swig_destroy__ = _cspace.delete_csSegment3
     __del__ = lambda self : None;
-_cspace.csSegment3_swigregister(csSegment3)
+csSegment3_swigregister = _cspace.csSegment3_swigregister
+csSegment3_swigregister(csSegment3)
 
 class csRGBcolor(_object):
     __swig_setmethods__ = {}
     __setattr__ = lambda self, name, value: _swig_setattr(self, csRGBcolor, name, value)
     __swig_getmethods__ = {}
     __getattr__ = lambda self, name: _swig_getattr(self, csRGBcolor, name)
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ csRGBcolor instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     __swig_setmethods__["red"] = _cspace.csRGBcolor_red_set
     __swig_getmethods__["red"] = _cspace.csRGBcolor_red_get
     if _newclass:red = property(_cspace.csRGBcolor_red_get, _cspace.csRGBcolor_red_set)
@@ -2085,7 +1896,7 @@ class csRGBcolor(_object):
     __swig_setmethods__["blue"] = _cspace.csRGBcolor_blue_set
     __swig_getmethods__["blue"] = _cspace.csRGBcolor_blue_get
     if _newclass:blue = property(_cspace.csRGBcolor_blue_get, _cspace.csRGBcolor_blue_set)
-    def __init__(self, *args):
+    def __init__(self, *args): 
         this = _cspace.new_csRGBcolor(*args)
         try: self.this.append(this)
         except: self.this = this
@@ -2097,17 +1908,15 @@ class csRGBcolor(_object):
     def SafeAdd(*args): return _cspace.csRGBcolor_SafeAdd(*args)
     __swig_destroy__ = _cspace.delete_csRGBcolor
     __del__ = lambda self : None;
-_cspace.csRGBcolor_swigregister(csRGBcolor)
+csRGBcolor_swigregister = _cspace.csRGBcolor_swigregister
+csRGBcolor_swigregister(csRGBcolor)
 
 class csRGBpixel(_object):
     __swig_setmethods__ = {}
     __setattr__ = lambda self, name, value: _swig_setattr(self, csRGBpixel, name, value)
     __swig_getmethods__ = {}
     __getattr__ = lambda self, name: _swig_getattr(self, csRGBpixel, name)
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ csRGBpixel instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     __swig_setmethods__["red"] = _cspace.csRGBpixel_red_set
     __swig_getmethods__["red"] = _cspace.csRGBpixel_red_get
     if _newclass:red = property(_cspace.csRGBpixel_red_get, _cspace.csRGBpixel_red_set)
@@ -2120,7 +1929,7 @@ class csRGBpixel(_object):
     __swig_setmethods__["alpha"] = _cspace.csRGBpixel_alpha_set
     __swig_getmethods__["alpha"] = _cspace.csRGBpixel_alpha_get
     if _newclass:alpha = property(_cspace.csRGBpixel_alpha_get, _cspace.csRGBpixel_alpha_set)
-    def __init__(self, *args):
+    def __init__(self, *args): 
         this = _cspace.new_csRGBpixel(*args)
         try: self.this.append(this)
         except: self.this = this
@@ -2136,7 +1945,8 @@ class csRGBpixel(_object):
     def SafeAdd(*args): return _cspace.csRGBpixel_SafeAdd(*args)
     __swig_destroy__ = _cspace.delete_csRGBpixel
     __del__ = lambda self : None;
-_cspace.csRGBpixel_swigregister(csRGBpixel)
+csRGBpixel_swigregister = _cspace.csRGBpixel_swigregister
+csRGBpixel_swigregister(csRGBpixel)
 
 R_COEF = _cspace.R_COEF
 G_COEF = _cspace.G_COEF
@@ -2152,14 +1962,12 @@ class iShaderVariableAccessor(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iShaderVariableAccessor, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iShaderVariableAccessor instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def PreGetValue(*args): return _cspace.iShaderVariableAccessor_PreGetValue(*args)
     __swig_destroy__ = _cspace.delete_iShaderVariableAccessor
     __del__ = lambda self : None;
-_cspace.iShaderVariableAccessor_swigregister(iShaderVariableAccessor)
+iShaderVariableAccessor_swigregister = _cspace.iShaderVariableAccessor_swigregister
+iShaderVariableAccessor_swigregister(iShaderVariableAccessor)
 
 class csShaderVariable(csRefCount):
     __swig_setmethods__ = {}
@@ -2168,10 +1976,7 @@ class csShaderVariable(csRefCount):
     __swig_getmethods__ = {}
     for _s in [csRefCount]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, csShaderVariable, name)
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ csShaderVariable instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     UNKNOWN = _cspace.csShaderVariable_UNKNOWN
     INT = _cspace.csShaderVariable_INT
     FLOAT = _cspace.csShaderVariable_FLOAT
@@ -2184,7 +1989,7 @@ class csShaderVariable(csRefCount):
     MATRIX = _cspace.csShaderVariable_MATRIX
     TRANSFORM = _cspace.csShaderVariable_TRANSFORM
     ARRAY = _cspace.csShaderVariable_ARRAY
-    def __init__(self, *args):
+    def __init__(self, *args): 
         this = _cspace.new_csShaderVariable(*args)
         try: self.this.append(this)
         except: self.this = this
@@ -2204,7 +2009,8 @@ class csShaderVariable(csRefCount):
     def GetArraySize(*args): return _cspace.csShaderVariable_GetArraySize(*args)
     def GetArrayElement(*args): return _cspace.csShaderVariable_GetArrayElement(*args)
     def SetArrayElement(*args): return _cspace.csShaderVariable_SetArrayElement(*args)
-_cspace.csShaderVariable_swigregister(csShaderVariable)
+csShaderVariable_swigregister = _cspace.csShaderVariable_swigregister
+csShaderVariable_swigregister(csShaderVariable)
 
 class csShaderVariableArrayReadOnly(iBase):
     __swig_setmethods__ = {}
@@ -2214,10 +2020,7 @@ class csShaderVariableArrayReadOnly(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, csShaderVariableArrayReadOnly, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iArrayReadOnly<csShaderVariable * > instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def GetSize(*args): return _cspace.csShaderVariableArrayReadOnly_GetSize(*args)
     def Get(*args): return _cspace.csShaderVariableArrayReadOnly_Get(*args)
     def Top(*args): return _cspace.csShaderVariableArrayReadOnly_Top(*args)
@@ -2227,7 +2030,8 @@ class csShaderVariableArrayReadOnly(iBase):
     def GetAll(*args): return _cspace.csShaderVariableArrayReadOnly_GetAll(*args)
     __swig_destroy__ = _cspace.delete_csShaderVariableArrayReadOnly
     __del__ = lambda self : None;
-_cspace.csShaderVariableArrayReadOnly_swigregister(csShaderVariableArrayReadOnly)
+csShaderVariableArrayReadOnly_swigregister = _cspace.csShaderVariableArrayReadOnly_swigregister
+csShaderVariableArrayReadOnly_swigregister(csShaderVariableArrayReadOnly)
 
 class csShaderVariableArrayChangeElements(csShaderVariableArrayReadOnly):
     __swig_setmethods__ = {}
@@ -2237,15 +2041,13 @@ class csShaderVariableArrayChangeElements(csShaderVariableArrayReadOnly):
     for _s in [csShaderVariableArrayReadOnly]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, csShaderVariableArrayChangeElements, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iArrayChangeElements<csShaderVariable * > instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def Get(*args): return _cspace.csShaderVariableArrayChangeElements_Get(*args)
     def Top(*args): return _cspace.csShaderVariableArrayChangeElements_Top(*args)
     __swig_destroy__ = _cspace.delete_csShaderVariableArrayChangeElements
     __del__ = lambda self : None;
-_cspace.csShaderVariableArrayChangeElements_swigregister(csShaderVariableArrayChangeElements)
+csShaderVariableArrayChangeElements_swigregister = _cspace.csShaderVariableArrayChangeElements_swigregister
+csShaderVariableArrayChangeElements_swigregister(csShaderVariableArrayChangeElements)
 
 class csShaderVariableArray(csShaderVariableArrayChangeElements):
     __swig_setmethods__ = {}
@@ -2255,10 +2057,7 @@ class csShaderVariableArray(csShaderVariableArrayChangeElements):
     for _s in [csShaderVariableArrayChangeElements]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, csShaderVariableArray, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iArrayChangeAll<csShaderVariable * > instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def SetSize(*args): return _cspace.csShaderVariableArray_SetSize(*args)
     def GetExtend(*args): return _cspace.csShaderVariableArray_GetExtend(*args)
     def Put(*args): return _cspace.csShaderVariableArray_Put(*args)
@@ -2275,38 +2074,26 @@ class csShaderVariableArray(csShaderVariableArrayChangeElements):
     def DeleteFast(*args): return _cspace.csShaderVariableArray_DeleteFast(*args)
     __swig_destroy__ = _cspace.delete_csShaderVariableArray
     __del__ = lambda self : None;
-_cspace.csShaderVariableArray_swigregister(csShaderVariableArray)
-
+csShaderVariableArray_swigregister = _cspace.csShaderVariableArray_swigregister
+csShaderVariableArray_swigregister(csShaderVariableArray)
 
 csDefaultRunLoop = _cspace.csDefaultRunLoop
-
 csPlatformStartup = _cspace.csPlatformStartup
-
 csPlatformShutdown = _cspace.csPlatformShutdown
-
 csPrintf = _cspace.csPrintf
-
 csFPrintf = _cspace.csFPrintf
-
 csPrintfErr = _cspace.csPrintfErr
-
 csGetTicks = _cspace.csGetTicks
-
 csGetMicroTicks = _cspace.csGetMicroTicks
-
 csSleep = _cspace.csSleep
-
 csGetUsername = _cspace.csGetUsername
 class csPluginRequest(_object):
     __swig_setmethods__ = {}
     __setattr__ = lambda self, name, value: _swig_setattr(self, csPluginRequest, name, value)
     __swig_getmethods__ = {}
     __getattr__ = lambda self, name: _swig_getattr(self, csPluginRequest, name)
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ csPluginRequest instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
-    def __init__(self, *args):
+    __repr__ = _swig_repr
+    def __init__(self, *args): 
         this = _cspace.new_csPluginRequest(*args)
         try: self.this.append(this)
         except: self.this = this
@@ -2319,8 +2106,8 @@ class csPluginRequest(_object):
     def GetInterfaceVersion(*args): return _cspace.csPluginRequest_GetInterfaceVersion(*args)
     __swig_destroy__ = _cspace.delete_csPluginRequest
     __del__ = lambda self : None;
-_cspace.csPluginRequest_swigregister(csPluginRequest)
-
+csPluginRequest_swigregister = _cspace.csPluginRequest_swigregister
+csPluginRequest_swigregister(csPluginRequest)
 csGetPlatformConfigPath = _cspace.csGetPlatformConfigPath
 
 class csInitializer(_object):
@@ -2328,10 +2115,7 @@ class csInitializer(_object):
     __setattr__ = lambda self, name, value: _swig_setattr(self, csInitializer, name, value)
     __swig_getmethods__ = {}
     __getattr__ = lambda self, name: _swig_getattr(self, csInitializer, name)
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ csInitializer instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     __swig_getmethods__["CreateEnvironment"] = lambda x: _cspace.csInitializer_CreateEnvironment
     if _newclass:CreateEnvironment = staticmethod(_cspace.csInitializer_CreateEnvironment)
     __swig_getmethods__["InitializeSCF"] = lambda x: _cspace.csInitializer_InitializeSCF
@@ -2370,50 +2154,32 @@ class csInitializer(_object):
     if _newclass:DestroyApplication = staticmethod(_cspace.csInitializer_DestroyApplication)
     __swig_getmethods__["GetDefaultAppID"] = lambda x: _cspace.csInitializer_GetDefaultAppID
     if _newclass:GetDefaultAppID = staticmethod(_cspace.csInitializer_GetDefaultAppID)
-    def __init__(self, *args):
+    def __init__(self, *args): 
         this = _cspace.new_csInitializer(*args)
         try: self.this.append(this)
         except: self.this = this
     __swig_destroy__ = _cspace.delete_csInitializer
     __del__ = lambda self : None;
-_cspace.csInitializer_swigregister(csInitializer)
-
+csInitializer_swigregister = _cspace.csInitializer_swigregister
+csInitializer_swigregister(csInitializer)
 csInitializer_CreateEnvironment = _cspace.csInitializer_CreateEnvironment
-
 csInitializer_InitializeSCF = _cspace.csInitializer_InitializeSCF
-
 csInitializer_CreateObjectRegistry = _cspace.csInitializer_CreateObjectRegistry
-
 csInitializer_CreatePluginManager = _cspace.csInitializer_CreatePluginManager
-
 csInitializer_CreateEventQueue = _cspace.csInitializer_CreateEventQueue
-
 csInitializer_CreateVirtualClock = _cspace.csInitializer_CreateVirtualClock
-
 csInitializer_CreateCommandLineParser = _cspace.csInitializer_CreateCommandLineParser
-
 csInitializer_CreateVerbosityManager = _cspace.csInitializer_CreateVerbosityManager
-
 csInitializer_CreateConfigManager = _cspace.csInitializer_CreateConfigManager
-
 csInitializer_CreateInputDrivers = _cspace.csInitializer_CreateInputDrivers
-
 csInitializer_CreateStringSet = _cspace.csInitializer_CreateStringSet
-
 csInitializer_SetupConfigManager = _cspace.csInitializer_SetupConfigManager
-
 csInitializer_SetupVFS = _cspace.csInitializer_SetupVFS
-
 csInitializer__RequestPlugins = _cspace.csInitializer__RequestPlugins
-
 csInitializer_OpenApplication = _cspace.csInitializer_OpenApplication
-
 csInitializer_CloseApplication = _cspace.csInitializer_CloseApplication
-
 csInitializer__SetupEventHandler = _cspace.csInitializer__SetupEventHandler
-
 csInitializer_DestroyApplication = _cspace.csInitializer_DestroyApplication
-
 csInitializer_GetDefaultAppID = _cspace.csInitializer_GetDefaultAppID
 
 class csPluginRequestArray(_object):
@@ -2421,13 +2187,10 @@ class csPluginRequestArray(_object):
     __setattr__ = lambda self, name, value: _swig_setattr(self, csPluginRequestArray, name, value)
     __swig_getmethods__ = {}
     __getattr__ = lambda self, name: _swig_getattr(self, csPluginRequestArray, name)
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ csArray<csPluginRequest > instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     __swig_destroy__ = _cspace.delete_csPluginRequestArray
     __del__ = lambda self : None;
-    def __init__(self, *args):
+    def __init__(self, *args): 
         this = _cspace.new_csPluginRequestArray(*args)
         try: self.this.append(this)
         except: self.this = this
@@ -2449,7 +2212,8 @@ class csPluginRequestArray(_object):
     def __eq__(*args): return _cspace.csPluginRequestArray___eq__(*args)
     def __ne__(*args): return _cspace.csPluginRequestArray___ne__(*args)
     def GetAllocator(*args): return _cspace.csPluginRequestArray_GetAllocator(*args)
-_cspace.csPluginRequestArray_swigregister(csPluginRequestArray)
+csPluginRequestArray_swigregister = _cspace.csPluginRequestArray_swigregister
+csPluginRequestArray_swigregister(csPluginRequestArray)
 
 class iAwsKey(iBase):
     __swig_setmethods__ = {}
@@ -2459,23 +2223,20 @@ class iAwsKey(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iAwsKey, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iAwsKey instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def Type(*args): return _cspace.iAwsKey_Type(*args)
     def Name(*args): return _cspace.iAwsKey_Name(*args)
     __swig_destroy__ = _cspace.delete_iAwsKey
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iAwsKey_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iAwsKey_scfGetVersion)
-_cspace.iAwsKey_swigregister(iAwsKey)
+iAwsKey_swigregister = _cspace.iAwsKey_swigregister
+iAwsKey_swigregister(iAwsKey)
 aws_debug = cvar.aws_debug
 AWSF_AlwaysEraseWindows = cvar.AWSF_AlwaysEraseWindows
 AWSF_AlwaysRedrawWindows = cvar.AWSF_AlwaysRedrawWindows
 AWSF_RaiseOnMouseOver = cvar.AWSF_RaiseOnMouseOver
 AWSF_KeyboardControl = cvar.AWSF_KeyboardControl
-
 iAwsKey_scfGetVersion = _cspace.iAwsKey_scfGetVersion
 
 class iAwsIntKey(iAwsKey):
@@ -2486,14 +2247,12 @@ class iAwsIntKey(iAwsKey):
     for _s in [iAwsKey]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iAwsIntKey, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iAwsIntKey instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def Value(*args): return _cspace.iAwsIntKey_Value(*args)
     __swig_destroy__ = _cspace.delete_iAwsIntKey
     __del__ = lambda self : None;
-_cspace.iAwsIntKey_swigregister(iAwsIntKey)
+iAwsIntKey_swigregister = _cspace.iAwsIntKey_swigregister
+iAwsIntKey_swigregister(iAwsIntKey)
 
 class iAwsFloatKey(iAwsKey):
     __swig_setmethods__ = {}
@@ -2503,14 +2262,12 @@ class iAwsFloatKey(iAwsKey):
     for _s in [iAwsKey]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iAwsFloatKey, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iAwsFloatKey instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def Value(*args): return _cspace.iAwsFloatKey_Value(*args)
     __swig_destroy__ = _cspace.delete_iAwsFloatKey
     __del__ = lambda self : None;
-_cspace.iAwsFloatKey_swigregister(iAwsFloatKey)
+iAwsFloatKey_swigregister = _cspace.iAwsFloatKey_swigregister
+iAwsFloatKey_swigregister(iAwsFloatKey)
 
 class iAwsStringKey(iAwsKey):
     __swig_setmethods__ = {}
@@ -2520,14 +2277,12 @@ class iAwsStringKey(iAwsKey):
     for _s in [iAwsKey]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iAwsStringKey, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iAwsStringKey instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def Value(*args): return _cspace.iAwsStringKey_Value(*args)
     __swig_destroy__ = _cspace.delete_iAwsStringKey
     __del__ = lambda self : None;
-_cspace.iAwsStringKey_swigregister(iAwsStringKey)
+iAwsStringKey_swigregister = _cspace.iAwsStringKey_swigregister
+iAwsStringKey_swigregister(iAwsStringKey)
 
 class iAwsRectKey(iAwsKey):
     __swig_setmethods__ = {}
@@ -2537,14 +2292,12 @@ class iAwsRectKey(iAwsKey):
     for _s in [iAwsKey]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iAwsRectKey, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iAwsRectKey instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def Value(*args): return _cspace.iAwsRectKey_Value(*args)
     __swig_destroy__ = _cspace.delete_iAwsRectKey
     __del__ = lambda self : None;
-_cspace.iAwsRectKey_swigregister(iAwsRectKey)
+iAwsRectKey_swigregister = _cspace.iAwsRectKey_swigregister
+iAwsRectKey_swigregister(iAwsRectKey)
 
 class iAwsRGBKey(iAwsKey):
     __swig_setmethods__ = {}
@@ -2554,14 +2307,12 @@ class iAwsRGBKey(iAwsKey):
     for _s in [iAwsKey]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iAwsRGBKey, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iAwsRGBKey instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def Value(*args): return _cspace.iAwsRGBKey_Value(*args)
     __swig_destroy__ = _cspace.delete_iAwsRGBKey
     __del__ = lambda self : None;
-_cspace.iAwsRGBKey_swigregister(iAwsRGBKey)
+iAwsRGBKey_swigregister = _cspace.iAwsRGBKey_swigregister
+iAwsRGBKey_swigregister(iAwsRGBKey)
 
 class iAwsPointKey(iAwsKey):
     __swig_setmethods__ = {}
@@ -2571,14 +2322,12 @@ class iAwsPointKey(iAwsKey):
     for _s in [iAwsKey]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iAwsPointKey, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iAwsPointKey instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def Value(*args): return _cspace.iAwsPointKey_Value(*args)
     __swig_destroy__ = _cspace.delete_iAwsPointKey
     __del__ = lambda self : None;
-_cspace.iAwsPointKey_swigregister(iAwsPointKey)
+iAwsPointKey_swigregister = _cspace.iAwsPointKey_swigregister
+iAwsPointKey_swigregister(iAwsPointKey)
 
 class iAwsConnectionKey(iAwsKey):
     __swig_setmethods__ = {}
@@ -2588,16 +2337,14 @@ class iAwsConnectionKey(iAwsKey):
     for _s in [iAwsKey]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iAwsConnectionKey, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iAwsConnectionKey instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def Sink(*args): return _cspace.iAwsConnectionKey_Sink(*args)
     def Trigger(*args): return _cspace.iAwsConnectionKey_Trigger(*args)
     def Signal(*args): return _cspace.iAwsConnectionKey_Signal(*args)
     __swig_destroy__ = _cspace.delete_iAwsConnectionKey
     __del__ = lambda self : None;
-_cspace.iAwsConnectionKey_swigregister(iAwsConnectionKey)
+iAwsConnectionKey_swigregister = _cspace.iAwsConnectionKey_swigregister
+iAwsConnectionKey_swigregister(iAwsConnectionKey)
 
 class iAwsKeyContainer(iAwsKey):
     __swig_setmethods__ = {}
@@ -2607,10 +2354,7 @@ class iAwsKeyContainer(iAwsKey):
     for _s in [iAwsKey]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iAwsKeyContainer, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iAwsKeyContainer instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def Find(*args): return _cspace.iAwsKeyContainer_Find(*args)
     def Children(*args): return _cspace.iAwsKeyContainer_Children(*args)
     def Add(*args): return _cspace.iAwsKeyContainer_Add(*args)
@@ -2621,7 +2365,8 @@ class iAwsKeyContainer(iAwsKey):
     def Consume(*args): return _cspace.iAwsKeyContainer_Consume(*args)
     __swig_destroy__ = _cspace.delete_iAwsKeyContainer
     __del__ = lambda self : None;
-_cspace.iAwsKeyContainer_swigregister(iAwsKeyContainer)
+iAwsKeyContainer_swigregister = _cspace.iAwsKeyContainer_swigregister
+iAwsKeyContainer_swigregister(iAwsKeyContainer)
 
 class iAwsComponentNode(iAwsKeyContainer):
     __swig_setmethods__ = {}
@@ -2631,14 +2376,12 @@ class iAwsComponentNode(iAwsKeyContainer):
     for _s in [iAwsKeyContainer]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iAwsComponentNode, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iAwsComponentNode instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def ComponentTypeName(*args): return _cspace.iAwsComponentNode_ComponentTypeName(*args)
     __swig_destroy__ = _cspace.delete_iAwsComponentNode
     __del__ = lambda self : None;
-_cspace.iAwsComponentNode_swigregister(iAwsComponentNode)
+iAwsComponentNode_swigregister = _cspace.iAwsComponentNode_swigregister
+iAwsComponentNode_swigregister(iAwsComponentNode)
 
 class iAws(iBase):
     __swig_setmethods__ = {}
@@ -2648,10 +2391,7 @@ class iAws(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iAws, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iAws instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def GetPrefMgr(*args): return _cspace.iAws_GetPrefMgr(*args)
     def GetSinkMgr(*args): return _cspace.iAws_GetSinkMgr(*args)
     def SetPrefMgr(*args): return _cspace.iAws_SetPrefMgr(*args)
@@ -2738,8 +2478,8 @@ class iAws(iBase):
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iAws_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iAws_scfGetVersion)
     def SetupCanvas(*args): return _cspace.iAws_SetupCanvas(*args)
-_cspace.iAws_swigregister(iAws)
-
+iAws_swigregister = _cspace.iAws_swigregister
+iAws_swigregister(iAws)
 iAws_scfGetVersion = _cspace.iAws_scfGetVersion
 
 class iAwsPrefManager(iBase):
@@ -2750,10 +2490,7 @@ class iAwsPrefManager(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iAwsPrefManager, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iAwsPrefManager instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def Setup(*args): return _cspace.iAwsPrefManager_Setup(*args)
     def Load(*args): return _cspace.iAwsPrefManager_Load(*args)
     def NameToId(*args): return _cspace.iAwsPrefManager_NameToId(*args)
@@ -2794,7 +2531,8 @@ class iAwsPrefManager(iBase):
     def GetCustomStringProperties(*args): return _cspace.iAwsPrefManager_GetCustomStringProperties(*args)
     __swig_destroy__ = _cspace.delete_iAwsPrefManager
     __del__ = lambda self : None;
-_cspace.iAwsPrefManager_swigregister(iAwsPrefManager)
+iAwsPrefManager_swigregister = _cspace.iAwsPrefManager_swigregister
+iAwsPrefManager_swigregister(iAwsPrefManager)
 
 class iAwsSinkManager(iBase):
     __swig_setmethods__ = {}
@@ -2804,10 +2542,7 @@ class iAwsSinkManager(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iAwsSinkManager, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iAwsSinkManager instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def Setup(*args): return _cspace.iAwsSinkManager_Setup(*args)
     def RegisterSink(*args): return _cspace.iAwsSinkManager_RegisterSink(*args)
     def RemoveSink(*args): return _cspace.iAwsSinkManager_RemoveSink(*args)
@@ -2816,7 +2551,8 @@ class iAwsSinkManager(iBase):
     def CreateSlot(*args): return _cspace.iAwsSinkManager_CreateSlot(*args)
     __swig_destroy__ = _cspace.delete_iAwsSinkManager
     __del__ = lambda self : None;
-_cspace.iAwsSinkManager_swigregister(iAwsSinkManager)
+iAwsSinkManager_swigregister = _cspace.iAwsSinkManager_swigregister
+iAwsSinkManager_swigregister(iAwsSinkManager)
 
 class iAwsSink(iBase):
     __swig_setmethods__ = {}
@@ -2826,17 +2562,15 @@ class iAwsSink(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iAwsSink, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iAwsSink instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def GetTriggerID(*args): return _cspace.iAwsSink_GetTriggerID(*args)
     def HandleTrigger(*args): return _cspace.iAwsSink_HandleTrigger(*args)
     def RegisterTrigger(*args): return _cspace.iAwsSink_RegisterTrigger(*args)
     def GetError(*args): return _cspace.iAwsSink_GetError(*args)
     __swig_destroy__ = _cspace.delete_iAwsSink
     __del__ = lambda self : None;
-_cspace.iAwsSink_swigregister(iAwsSink)
+iAwsSink_swigregister = _cspace.iAwsSink_swigregister
+iAwsSink_swigregister(iAwsSink)
 
 class iAwsSource(iBase):
     __swig_setmethods__ = {}
@@ -2846,10 +2580,7 @@ class iAwsSource(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iAwsSource, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iAwsSource instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def WindowManager(*args): return _cspace.iAwsSource_WindowManager(*args)
     def GetComponent(*args): return _cspace.iAwsSource_GetComponent(*args)
     def RegisterSlot(*args): return _cspace.iAwsSource_RegisterSlot(*args)
@@ -2857,7 +2588,8 @@ class iAwsSource(iBase):
     def Broadcast(*args): return _cspace.iAwsSource_Broadcast(*args)
     __swig_destroy__ = _cspace.delete_iAwsSource
     __del__ = lambda self : None;
-_cspace.iAwsSource_swigregister(iAwsSource)
+iAwsSource_swigregister = _cspace.iAwsSource_swigregister
+iAwsSource_swigregister(iAwsSource)
 
 class iAwsSlot(iBase):
     __swig_setmethods__ = {}
@@ -2867,16 +2599,14 @@ class iAwsSlot(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iAwsSlot, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iAwsSlot instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def Connect(*args): return _cspace.iAwsSlot_Connect(*args)
     def Disconnect(*args): return _cspace.iAwsSlot_Disconnect(*args)
     def Emit(*args): return _cspace.iAwsSlot_Emit(*args)
     __swig_destroy__ = _cspace.delete_iAwsSlot
     __del__ = lambda self : None;
-_cspace.iAwsSlot_swigregister(iAwsSlot)
+iAwsSlot_swigregister = _cspace.iAwsSlot_swigregister
+iAwsSlot_swigregister(iAwsSlot)
 
 class iAwsLayoutManager(iBase):
     __swig_setmethods__ = {}
@@ -2886,17 +2616,15 @@ class iAwsLayoutManager(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iAwsLayoutManager, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iAwsLayoutManager instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def SetOwner(*args): return _cspace.iAwsLayoutManager_SetOwner(*args)
     def AddComponent(*args): return _cspace.iAwsLayoutManager_AddComponent(*args)
     def RemoveComponent(*args): return _cspace.iAwsLayoutManager_RemoveComponent(*args)
     def LayoutComponents(*args): return _cspace.iAwsLayoutManager_LayoutComponents(*args)
     __swig_destroy__ = _cspace.delete_iAwsLayoutManager
     __del__ = lambda self : None;
-_cspace.iAwsLayoutManager_swigregister(iAwsLayoutManager)
+iAwsLayoutManager_swigregister = _cspace.iAwsLayoutManager_swigregister
+iAwsLayoutManager_swigregister(iAwsLayoutManager)
 
 class iAwsComponent(iAwsSource):
     __swig_setmethods__ = {}
@@ -2906,10 +2634,7 @@ class iAwsComponent(iAwsSource):
     for _s in [iAwsSource]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iAwsComponent, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iAwsComponent instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def Create(*args): return _cspace.iAwsComponent_Create(*args)
     def Setup(*args): return _cspace.iAwsComponent_Setup(*args)
     def HandleEvent(*args): return _cspace.iAwsComponent_HandleEvent(*args)
@@ -3007,7 +2732,8 @@ class iAwsComponent(iAwsSource):
     def GetMarkToDelete(*args): return _cspace.iAwsComponent_GetMarkToDelete(*args)
     __swig_destroy__ = _cspace.delete_iAwsComponent
     __del__ = lambda self : None;
-_cspace.iAwsComponent_swigregister(iAwsComponent)
+iAwsComponent_swigregister = _cspace.iAwsComponent_swigregister
+iAwsComponent_swigregister(iAwsComponent)
 
 class iAwsComponentFactory(iBase):
     __swig_setmethods__ = {}
@@ -3017,16 +2743,14 @@ class iAwsComponentFactory(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iAwsComponentFactory, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iAwsComponentFactory instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def Create(*args): return _cspace.iAwsComponentFactory_Create(*args)
     def Register(*args): return _cspace.iAwsComponentFactory_Register(*args)
     def RegisterConstant(*args): return _cspace.iAwsComponentFactory_RegisterConstant(*args)
     __swig_destroy__ = _cspace.delete_iAwsComponentFactory
     __del__ = lambda self : None;
-_cspace.iAwsComponentFactory_swigregister(iAwsComponentFactory)
+iAwsComponentFactory_swigregister = _cspace.iAwsComponentFactory_swigregister
+iAwsComponentFactory_swigregister(iAwsComponentFactory)
 
 class iAwsKeyFactory(iBase):
     __swig_setmethods__ = {}
@@ -3036,10 +2760,7 @@ class iAwsKeyFactory(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iAwsKeyFactory, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iAwsKeyFactory instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def Initialize(*args): return _cspace.iAwsKeyFactory_Initialize(*args)
     def AddToWindowList(*args): return _cspace.iAwsKeyFactory_AddToWindowList(*args)
     def AddFactory(*args): return _cspace.iAwsKeyFactory_AddFactory(*args)
@@ -3053,7 +2774,8 @@ class iAwsKeyFactory(iBase):
     def GetThisNode(*args): return _cspace.iAwsKeyFactory_GetThisNode(*args)
     __swig_destroy__ = _cspace.delete_iAwsKeyFactory
     __del__ = lambda self : None;
-_cspace.iAwsKeyFactory_swigregister(iAwsKeyFactory)
+iAwsKeyFactory_swigregister = _cspace.iAwsKeyFactory_swigregister
+iAwsKeyFactory_swigregister(iAwsKeyFactory)
 
 class iAwsConnectionNodeFactory(iBase):
     __swig_setmethods__ = {}
@@ -3063,16 +2785,14 @@ class iAwsConnectionNodeFactory(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iAwsConnectionNodeFactory, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iAwsConnectionNodeFactory instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def Initialize(*args): return _cspace.iAwsConnectionNodeFactory_Initialize(*args)
     def AddConnectionKey(*args): return _cspace.iAwsConnectionNodeFactory_AddConnectionKey(*args)
     def GetThisNode(*args): return _cspace.iAwsConnectionNodeFactory_GetThisNode(*args)
     __swig_destroy__ = _cspace.delete_iAwsConnectionNodeFactory
     __del__ = lambda self : None;
-_cspace.iAwsConnectionNodeFactory_swigregister(iAwsConnectionNodeFactory)
+iAwsConnectionNodeFactory_swigregister = _cspace.iAwsConnectionNodeFactory_swigregister
+iAwsConnectionNodeFactory_swigregister(iAwsConnectionNodeFactory)
 
 MAX_OUTPUT_VERTICES = _cspace.MAX_OUTPUT_VERTICES
 CS_CLIP_OUTSIDE = _cspace.CS_CLIP_OUTSIDE
@@ -3083,10 +2803,7 @@ class csVertexStatus(_object):
     __setattr__ = lambda self, name, value: _swig_setattr(self, csVertexStatus, name, value)
     __swig_getmethods__ = {}
     __getattr__ = lambda self, name: _swig_getattr(self, csVertexStatus, name)
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ csVertexStatus instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     __swig_setmethods__["Type"] = _cspace.csVertexStatus_Type_set
     __swig_getmethods__["Type"] = _cspace.csVertexStatus_Type_get
     if _newclass:Type = property(_cspace.csVertexStatus_Type_get, _cspace.csVertexStatus_Type_set)
@@ -3096,13 +2813,14 @@ class csVertexStatus(_object):
     __swig_setmethods__["Pos"] = _cspace.csVertexStatus_Pos_set
     __swig_getmethods__["Pos"] = _cspace.csVertexStatus_Pos_get
     if _newclass:Pos = property(_cspace.csVertexStatus_Pos_get, _cspace.csVertexStatus_Pos_set)
-    def __init__(self, *args):
+    def __init__(self, *args): 
         this = _cspace.new_csVertexStatus(*args)
         try: self.this.append(this)
         except: self.this = this
     __swig_destroy__ = _cspace.delete_csVertexStatus
     __del__ = lambda self : None;
-_cspace.csVertexStatus_swigregister(csVertexStatus)
+csVertexStatus_swigregister = _cspace.csVertexStatus_swigregister
+csVertexStatus_swigregister(csVertexStatus)
 
 CS_VERTEX_ORIGINAL = _cspace.CS_VERTEX_ORIGINAL
 CS_VERTEX_ONEDGE = _cspace.CS_VERTEX_ONEDGE
@@ -3115,10 +2833,7 @@ class iClipper2D(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iClipper2D, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iClipper2D instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def Clip(*args): return _cspace.iClipper2D_Clip(*args)
     def ClipInPlace(*args): return _cspace.iClipper2D_ClipInPlace(*args)
     def ClassifyBox(*args): return _cspace.iClipper2D_ClassifyBox(*args)
@@ -3130,7 +2845,8 @@ class iClipper2D(iBase):
     def GetClipperType(*args): return _cspace.iClipper2D_GetClipperType(*args)
     __swig_destroy__ = _cspace.delete_iClipper2D
     __del__ = lambda self : None;
-_cspace.iClipper2D_swigregister(iClipper2D)
+iClipper2D_swigregister = _cspace.iClipper2D_swigregister
+iClipper2D_swigregister(iClipper2D)
 
 class iObjectModelListener(iBase):
     __swig_setmethods__ = {}
@@ -3140,17 +2856,14 @@ class iObjectModelListener(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iObjectModelListener, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iObjectModelListener instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def ObjectModelChanged(*args): return _cspace.iObjectModelListener_ObjectModelChanged(*args)
     __swig_destroy__ = _cspace.delete_iObjectModelListener
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iObjectModelListener_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iObjectModelListener_scfGetVersion)
-_cspace.iObjectModelListener_swigregister(iObjectModelListener)
-
+iObjectModelListener_swigregister = _cspace.iObjectModelListener_swigregister
+iObjectModelListener_swigregister(iObjectModelListener)
 iObjectModelListener_scfGetVersion = _cspace.iObjectModelListener_scfGetVersion
 
 class iObjectModel(iBase):
@@ -3161,10 +2874,7 @@ class iObjectModel(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iObjectModel, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iObjectModel instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def GetShapeNumber(*args): return _cspace.iObjectModel_GetShapeNumber(*args)
     def GetPolygonMeshBase(*args): return _cspace.iObjectModel_GetPolygonMeshBase(*args)
     def GetPolygonMeshColldet(*args): return _cspace.iObjectModel_GetPolygonMeshColldet(*args)
@@ -3184,8 +2894,8 @@ class iObjectModel(iBase):
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iObjectModel_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iObjectModel_scfGetVersion)
-_cspace.iObjectModel_swigregister(iObjectModel)
-
+iObjectModel_swigregister = _cspace.iObjectModel_swigregister
+iObjectModel_swigregister(iObjectModel)
 iObjectModel_scfGetVersion = _cspace.iObjectModel_scfGetVersion
 
 class iPath(iBase):
@@ -3196,10 +2906,7 @@ class iPath(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iPath, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iPath instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def Length(*args): return _cspace.iPath_Length(*args)
     def CalculateAtTime(*args): return _cspace.iPath_CalculateAtTime(*args)
     def GetCurrentIndex(*args): return _cspace.iPath_GetCurrentIndex(*args)
@@ -3221,8 +2928,8 @@ class iPath(iBase):
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iPath_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iPath_scfGetVersion)
-_cspace.iPath_swigregister(iPath)
-
+iPath_swigregister = _cspace.iPath_swigregister
+iPath_swigregister(iPath)
 iPath_scfGetVersion = _cspace.iPath_scfGetVersion
 
 class scfPath(iPath):
@@ -3233,17 +2940,15 @@ class scfPath(iPath):
     for _s in [iPath]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, scfPath, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ scfImplementation1<csPath,iPath > instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def IncRef(*args): return _cspace.scfPath_IncRef(*args)
     def DecRef(*args): return _cspace.scfPath_DecRef(*args)
     def GetRefCount(*args): return _cspace.scfPath_GetRefCount(*args)
     def QueryInterface(*args): return _cspace.scfPath_QueryInterface(*args)
     def AddRefOwner(*args): return _cspace.scfPath_AddRefOwner(*args)
     def RemoveRefOwner(*args): return _cspace.scfPath_RemoveRefOwner(*args)
-_cspace.scfPath_swigregister(scfPath)
+scfPath_swigregister = _cspace.scfPath_swigregister
+scfPath_swigregister(scfPath)
 
 CS_POLYMESH_CLOSED = _cspace.CS_POLYMESH_CLOSED
 CS_POLYMESH_NOTCLOSED = _cspace.CS_POLYMESH_NOTCLOSED
@@ -3256,23 +2961,21 @@ class csMeshedPolygon(_object):
     __setattr__ = lambda self, name, value: _swig_setattr(self, csMeshedPolygon, name, value)
     __swig_getmethods__ = {}
     __getattr__ = lambda self, name: _swig_getattr(self, csMeshedPolygon, name)
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ csMeshedPolygon instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     __swig_setmethods__["num_vertices"] = _cspace.csMeshedPolygon_num_vertices_set
     __swig_getmethods__["num_vertices"] = _cspace.csMeshedPolygon_num_vertices_get
     if _newclass:num_vertices = property(_cspace.csMeshedPolygon_num_vertices_get, _cspace.csMeshedPolygon_num_vertices_set)
     __swig_setmethods__["vertices"] = _cspace.csMeshedPolygon_vertices_set
     __swig_getmethods__["vertices"] = _cspace.csMeshedPolygon_vertices_get
     if _newclass:vertices = property(_cspace.csMeshedPolygon_vertices_get, _cspace.csMeshedPolygon_vertices_set)
-    def __init__(self, *args):
+    def __init__(self, *args): 
         this = _cspace.new_csMeshedPolygon(*args)
         try: self.this.append(this)
         except: self.this = this
     __swig_destroy__ = _cspace.delete_csMeshedPolygon
     __del__ = lambda self : None;
-_cspace.csMeshedPolygon_swigregister(csMeshedPolygon)
+csMeshedPolygon_swigregister = _cspace.csMeshedPolygon_swigregister
+csMeshedPolygon_swigregister(csMeshedPolygon)
 
 class iPolygonMesh(iBase):
     __swig_setmethods__ = {}
@@ -3282,10 +2985,7 @@ class iPolygonMesh(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iPolygonMesh, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iPolygonMesh instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def GetVertexCount(*args): return _cspace.iPolygonMesh_GetVertexCount(*args)
     def GetVertices(*args): return _cspace.iPolygonMesh_GetVertices(*args)
     def GetPolygonCount(*args): return _cspace.iPolygonMesh_GetPolygonCount(*args)
@@ -3300,8 +3000,8 @@ class iPolygonMesh(iBase):
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iPolygonMesh_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iPolygonMesh_scfGetVersion)
-_cspace.iPolygonMesh_swigregister(iPolygonMesh)
-
+iPolygonMesh_swigregister = _cspace.iPolygonMesh_swigregister
+iPolygonMesh_swigregister(iPolygonMesh)
 iPolygonMesh_scfGetVersion = _cspace.iPolygonMesh_scfGetVersion
 
 class csPath(scfPath):
@@ -3311,11 +3011,8 @@ class csPath(scfPath):
     __swig_getmethods__ = {}
     for _s in [scfPath]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, csPath, name)
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ csPath instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
-    def __init__(self, *args):
+    __repr__ = _swig_repr
+    def __init__(self, *args): 
         this = _cspace.new_csPath(*args)
         try: self.this.append(this)
         except: self.this = this
@@ -3350,18 +3047,16 @@ class csPath(scfPath):
     def GetDimensionValue(*args): return _cspace.csPath_GetDimensionValue(*args)
     def InsertPoint(*args): return _cspace.csPath_InsertPoint(*args)
     def RemovePoint(*args): return _cspace.csPath_RemovePoint(*args)
-_cspace.csPath_swigregister(csPath)
+csPath_swigregister = _cspace.csPath_swigregister
+csPath_swigregister(csPath)
 
 class csPolygonMesh(_object):
     __swig_setmethods__ = {}
     __setattr__ = lambda self, name, value: _swig_setattr(self, csPolygonMesh, name, value)
     __swig_getmethods__ = {}
     __getattr__ = lambda self, name: _swig_getattr(self, csPolygonMesh, name)
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ csPolygonMesh instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
-    def __init__(self, *args):
+    __repr__ = _swig_repr
+    def __init__(self, *args): 
         this = _cspace.new_csPolygonMesh(*args)
         try: self.this.append(this)
         except: self.this = this
@@ -3385,18 +3080,16 @@ class csPolygonMesh(_object):
     def Unlock(*args): return _cspace.csPolygonMesh_Unlock(*args)
     def GetFlags(*args): return _cspace.csPolygonMesh_GetFlags(*args)
     def GetChangeNumber(*args): return _cspace.csPolygonMesh_GetChangeNumber(*args)
-_cspace.csPolygonMesh_swigregister(csPolygonMesh)
+csPolygonMesh_swigregister = _cspace.csPolygonMesh_swigregister
+csPolygonMesh_swigregister(csPolygonMesh)
 
 class csPolygonMeshBox(_object):
     __swig_setmethods__ = {}
     __setattr__ = lambda self, name, value: _swig_setattr(self, csPolygonMeshBox, name, value)
     __swig_getmethods__ = {}
     __getattr__ = lambda self, name: _swig_getattr(self, csPolygonMeshBox, name)
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ csPolygonMeshBox instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
-    def __init__(self, *args):
+    __repr__ = _swig_repr
+    def __init__(self, *args): 
         this = _cspace.new_csPolygonMeshBox(*args)
         try: self.this.append(this)
         except: self.this = this
@@ -3413,7 +3106,8 @@ class csPolygonMeshBox(_object):
     def Unlock(*args): return _cspace.csPolygonMeshBox_Unlock(*args)
     def GetFlags(*args): return _cspace.csPolygonMeshBox_GetFlags(*args)
     def GetChangeNumber(*args): return _cspace.csPolygonMeshBox_GetChangeNumber(*args)
-_cspace.csPolygonMeshBox_swigregister(csPolygonMeshBox)
+csPolygonMeshBox_swigregister = _cspace.csPolygonMeshBox_swigregister
+csPolygonMeshBox_swigregister(csPolygonMeshBox)
 
 class iFrustumViewUserdata(iBase):
     __swig_setmethods__ = {}
@@ -3423,16 +3117,13 @@ class iFrustumViewUserdata(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iFrustumViewUserdata, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iFrustumViewUserdata instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     __swig_destroy__ = _cspace.delete_iFrustumViewUserdata
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iFrustumViewUserdata_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iFrustumViewUserdata_scfGetVersion)
-_cspace.iFrustumViewUserdata_swigregister(iFrustumViewUserdata)
-
+iFrustumViewUserdata_swigregister = _cspace.iFrustumViewUserdata_swigregister
+iFrustumViewUserdata_swigregister(iFrustumViewUserdata)
 iFrustumViewUserdata_scfGetVersion = _cspace.iFrustumViewUserdata_scfGetVersion
 
 class csFrustumContext(_object):
@@ -3440,11 +3131,8 @@ class csFrustumContext(_object):
     __setattr__ = lambda self, name, value: _swig_setattr(self, csFrustumContext, name, value)
     __swig_getmethods__ = {}
     __getattr__ = lambda self, name: _swig_getattr(self, csFrustumContext, name)
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ csFrustumContext instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
-    def __init__(self, *args):
+    __repr__ = _swig_repr
+    def __init__(self, *args): 
         this = _cspace.new_csFrustumContext(*args)
         try: self.this.append(this)
         except: self.this = this
@@ -3460,7 +3148,8 @@ class csFrustumContext(_object):
     def IsMirrored(*args): return _cspace.csFrustumContext_IsMirrored(*args)
     __swig_destroy__ = _cspace.delete_csFrustumContext
     __del__ = lambda self : None;
-_cspace.csFrustumContext_swigregister(csFrustumContext)
+csFrustumContext_swigregister = _cspace.csFrustumContext_swigregister
+csFrustumContext_swigregister(csFrustumContext)
 
 class iFrustumView(iBase):
     __swig_setmethods__ = {}
@@ -3470,10 +3159,7 @@ class iFrustumView(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iFrustumView, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iFrustumView instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def GetFrustumContext(*args): return _cspace.iFrustumView_GetFrustumContext(*args)
     def CreateFrustumContext(*args): return _cspace.iFrustumView_CreateFrustumContext(*args)
     def CopyFrustumContext(*args): return _cspace.iFrustumView_CopyFrustumContext(*args)
@@ -3492,8 +3178,8 @@ class iFrustumView(iBase):
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iFrustumView_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iFrustumView_scfGetVersion)
-_cspace.iFrustumView_swigregister(iFrustumView)
-
+iFrustumView_swigregister = _cspace.iFrustumView_swigregister
+iFrustumView_swigregister(iFrustumView)
 iFrustumView_scfGetVersion = _cspace.iFrustumView_scfGetVersion
 
 CS_LIGHT_ACTIVEHALO = _cspace.CS_LIGHT_ACTIVEHALO
@@ -3518,10 +3204,7 @@ class iLightCallback(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iLightCallback, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iLightCallback instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def OnColorChange(*args): return _cspace.iLightCallback_OnColorChange(*args)
     def OnPositionChange(*args): return _cspace.iLightCallback_OnPositionChange(*args)
     def OnSectorChange(*args): return _cspace.iLightCallback_OnSectorChange(*args)
@@ -3530,7 +3213,8 @@ class iLightCallback(iBase):
     def OnAttenuationChange(*args): return _cspace.iLightCallback_OnAttenuationChange(*args)
     __swig_destroy__ = _cspace.delete_iLightCallback
     __del__ = lambda self : None;
-_cspace.iLightCallback_swigregister(iLightCallback)
+iLightCallback_swigregister = _cspace.iLightCallback_swigregister
+iLightCallback_swigregister(iLightCallback)
 
 class iLight(iBase):
     __swig_setmethods__ = {}
@@ -3540,10 +3224,7 @@ class iLight(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iLight, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iLight instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def GetLightID(*args): return _cspace.iLight_GetLightID(*args)
     def QueryObject(*args): return _cspace.iLight_QueryObject(*args)
     def GetDynamicType(*args): return _cspace.iLight_GetDynamicType(*args)
@@ -3588,8 +3269,8 @@ class iLight(iBase):
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iLight_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iLight_scfGetVersion)
-_cspace.iLight_swigregister(iLight)
-
+iLight_swigregister = _cspace.iLight_swigregister
+iLight_swigregister(iLight)
 iLight_scfGetVersion = _cspace.iLight_scfGetVersion
 
 class iLightList(iBase):
@@ -3600,10 +3281,7 @@ class iLightList(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iLightList, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iLightList instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def GetCount(*args): return _cspace.iLightList_GetCount(*args)
     def Get(*args): return _cspace.iLightList_Get(*args)
     def Add(*args): return _cspace.iLightList_Add(*args)
@@ -3625,8 +3303,8 @@ class iLightList(iBase):
     def __iter__(self): return self.content_iterator()  
     def __getitem__(*args): return _cspace.iLightList___getitem__(*args)
     def __contains__(*args): return _cspace.iLightList___contains__(*args)
-_cspace.iLightList_swigregister(iLightList)
-
+iLightList_swigregister = _cspace.iLightList_swigregister
+iLightList_swigregister(iLightList)
 iLightList_scfGetVersion = _cspace.iLightList_scfGetVersion
 
 class iLightingProcessData(iBase):
@@ -3637,14 +3315,12 @@ class iLightingProcessData(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iLightingProcessData, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iLightingProcessData instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def FinalizeLighting(*args): return _cspace.iLightingProcessData_FinalizeLighting(*args)
     __swig_destroy__ = _cspace.delete_iLightingProcessData
     __del__ = lambda self : None;
-_cspace.iLightingProcessData_swigregister(iLightingProcessData)
+iLightingProcessData_swigregister = _cspace.iLightingProcessData_swigregister
+iLightingProcessData_swigregister(iLightingProcessData)
 
 class iLightingProcessInfo(iFrustumViewUserdata):
     __swig_setmethods__ = {}
@@ -3654,10 +3330,7 @@ class iLightingProcessInfo(iFrustumViewUserdata):
     for _s in [iFrustumViewUserdata]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iLightingProcessInfo, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iLightingProcessInfo instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def GetLight(*args): return _cspace.iLightingProcessInfo_GetLight(*args)
     def IsDynamic(*args): return _cspace.iLightingProcessInfo_IsDynamic(*args)
     def SetColor(*args): return _cspace.iLightingProcessInfo_SetColor(*args)
@@ -3667,7 +3340,8 @@ class iLightingProcessInfo(iFrustumViewUserdata):
     def FinalizeLighting(*args): return _cspace.iLightingProcessInfo_FinalizeLighting(*args)
     __swig_destroy__ = _cspace.delete_iLightingProcessInfo
     __del__ = lambda self : None;
-_cspace.iLightingProcessInfo_swigregister(iLightingProcessInfo)
+iLightingProcessInfo_swigregister = _cspace.iLightingProcessInfo_swigregister
+iLightingProcessInfo_swigregister(iLightingProcessInfo)
 
 class iLightIterator(iBase):
     __swig_setmethods__ = {}
@@ -3677,17 +3351,15 @@ class iLightIterator(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iLightIterator, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iLightIterator instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def HasNext(*args): return _cspace.iLightIterator_HasNext(*args)
     def Next(*args): return _cspace.iLightIterator_Next(*args)
     def GetLastSector(*args): return _cspace.iLightIterator_GetLastSector(*args)
     def Reset(*args): return _cspace.iLightIterator_Reset(*args)
     __swig_destroy__ = _cspace.delete_iLightIterator
     __del__ = lambda self : None;
-_cspace.iLightIterator_swigregister(iLightIterator)
+iLightIterator_swigregister = _cspace.iLightIterator_swigregister
+iLightIterator_swigregister(iLightIterator)
 
 CS_FOG_MODE_NONE = _cspace.CS_FOG_MODE_NONE
 CS_FOG_MODE_LINEAR = _cspace.CS_FOG_MODE_LINEAR
@@ -3699,10 +3371,7 @@ class csFog(_object):
     __setattr__ = lambda self, name, value: _swig_setattr(self, csFog, name, value)
     __swig_getmethods__ = {}
     __getattr__ = lambda self, name: _swig_getattr(self, csFog, name)
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ csFog instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     __swig_setmethods__["density"] = _cspace.csFog_density_set
     __swig_getmethods__["density"] = _cspace.csFog_density_get
     if _newclass:density = property(_cspace.csFog_density_get, _cspace.csFog_density_set)
@@ -3718,13 +3387,14 @@ class csFog(_object):
     __swig_setmethods__["mode"] = _cspace.csFog_mode_set
     __swig_getmethods__["mode"] = _cspace.csFog_mode_get
     if _newclass:mode = property(_cspace.csFog_mode_get, _cspace.csFog_mode_set)
-    def __init__(self, *args):
+    def __init__(self, *args): 
         this = _cspace.new_csFog(*args)
         try: self.this.append(this)
         except: self.this = this
     __swig_destroy__ = _cspace.delete_csFog
     __del__ = lambda self : None;
-_cspace.csFog_swigregister(csFog)
+csFog_swigregister = _cspace.csFog_swigregister
+csFog_swigregister(csFog)
 
 class iSectorCallback(iBase):
     __swig_setmethods__ = {}
@@ -3734,14 +3404,12 @@ class iSectorCallback(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iSectorCallback, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iSectorCallback instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def Traverse(*args): return _cspace.iSectorCallback_Traverse(*args)
     __swig_destroy__ = _cspace.delete_iSectorCallback
     __del__ = lambda self : None;
-_cspace.iSectorCallback_swigregister(iSectorCallback)
+iSectorCallback_swigregister = _cspace.iSectorCallback_swigregister
+iSectorCallback_swigregister(iSectorCallback)
 
 class iSectorMeshCallback(iBase):
     __swig_setmethods__ = {}
@@ -3751,15 +3419,13 @@ class iSectorMeshCallback(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iSectorMeshCallback, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iSectorMeshCallback instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def NewMesh(*args): return _cspace.iSectorMeshCallback_NewMesh(*args)
     def RemoveMesh(*args): return _cspace.iSectorMeshCallback_RemoveMesh(*args)
     __swig_destroy__ = _cspace.delete_iSectorMeshCallback
     __del__ = lambda self : None;
-_cspace.iSectorMeshCallback_swigregister(iSectorMeshCallback)
+iSectorMeshCallback_swigregister = _cspace.iSectorMeshCallback_swigregister
+iSectorMeshCallback_swigregister(iSectorMeshCallback)
 
 class iLightVisibleCallback(iBase):
     __swig_setmethods__ = {}
@@ -3769,24 +3435,19 @@ class iLightVisibleCallback(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iLightVisibleCallback, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iLightVisibleCallback instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def LightVisible(*args): return _cspace.iLightVisibleCallback_LightVisible(*args)
     __swig_destroy__ = _cspace.delete_iLightVisibleCallback
     __del__ = lambda self : None;
-_cspace.iLightVisibleCallback_swigregister(iLightVisibleCallback)
+iLightVisibleCallback_swigregister = _cspace.iLightVisibleCallback_swigregister
+iLightVisibleCallback_swigregister(iLightVisibleCallback)
 
 class csSectorHitBeamResult(_object):
     __swig_setmethods__ = {}
     __setattr__ = lambda self, name, value: _swig_setattr(self, csSectorHitBeamResult, name, value)
     __swig_getmethods__ = {}
     __getattr__ = lambda self, name: _swig_getattr(self, csSectorHitBeamResult, name)
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ csSectorHitBeamResult instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     __swig_setmethods__["mesh"] = _cspace.csSectorHitBeamResult_mesh_set
     __swig_getmethods__["mesh"] = _cspace.csSectorHitBeamResult_mesh_get
     if _newclass:mesh = property(_cspace.csSectorHitBeamResult_mesh_get, _cspace.csSectorHitBeamResult_mesh_set)
@@ -3799,13 +3460,14 @@ class csSectorHitBeamResult(_object):
     __swig_setmethods__["final_sector"] = _cspace.csSectorHitBeamResult_final_sector_set
     __swig_getmethods__["final_sector"] = _cspace.csSectorHitBeamResult_final_sector_get
     if _newclass:final_sector = property(_cspace.csSectorHitBeamResult_final_sector_get, _cspace.csSectorHitBeamResult_final_sector_set)
-    def __init__(self, *args):
+    def __init__(self, *args): 
         this = _cspace.new_csSectorHitBeamResult(*args)
         try: self.this.append(this)
         except: self.this = this
     __swig_destroy__ = _cspace.delete_csSectorHitBeamResult
     __del__ = lambda self : None;
-_cspace.csSectorHitBeamResult_swigregister(csSectorHitBeamResult)
+csSectorHitBeamResult_swigregister = _cspace.csSectorHitBeamResult_swigregister
+csSectorHitBeamResult_swigregister(csSectorHitBeamResult)
 
 class iSector(iBase):
     __swig_setmethods__ = {}
@@ -3815,10 +3477,7 @@ class iSector(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iSector, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iSector instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def QueryObject(*args): return _cspace.iSector_QueryObject(*args)
     def GetMeshes(*args): return _cspace.iSector_GetMeshes(*args)
     def GetVisibleMeshes(*args): return _cspace.iSector_GetVisibleMeshes(*args)
@@ -3868,8 +3527,8 @@ class iSector(iBase):
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iSector_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iSector_scfGetVersion)
-_cspace.iSector_swigregister(iSector)
-
+iSector_swigregister = _cspace.iSector_swigregister
+iSector_swigregister(iSector)
 iSector_scfGetVersion = _cspace.iSector_scfGetVersion
 
 class iSectorList(iBase):
@@ -3880,10 +3539,7 @@ class iSectorList(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iSectorList, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iSectorList instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def GetCount(*args): return _cspace.iSectorList_GetCount(*args)
     def Get(*args): return _cspace.iSectorList_Get(*args)
     def Add(*args): return _cspace.iSectorList_Add(*args)
@@ -3904,8 +3560,8 @@ class iSectorList(iBase):
     def __iter__(self): return self.content_iterator()  
     def __getitem__(*args): return _cspace.iSectorList___getitem__(*args)
     def __contains__(*args): return _cspace.iSectorList___contains__(*args)
-_cspace.iSectorList_swigregister(iSectorList)
-
+iSectorList_swigregister = _cspace.iSectorList_swigregister
+iSectorList_swigregister(iSectorList)
 iSectorList_scfGetVersion = _cspace.iSectorList_scfGetVersion
 
 class iSectorIterator(iBase):
@@ -3916,17 +3572,15 @@ class iSectorIterator(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iSectorIterator, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iSectorIterator instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def HasNext(*args): return _cspace.iSectorIterator_HasNext(*args)
     def Next(*args): return _cspace.iSectorIterator_Next(*args)
     def GetLastPosition(*args): return _cspace.iSectorIterator_GetLastPosition(*args)
     def Reset(*args): return _cspace.iSectorIterator_Reset(*args)
     __swig_destroy__ = _cspace.delete_iSectorIterator
     __del__ = lambda self : None;
-_cspace.iSectorIterator_swigregister(iSectorIterator)
+iSectorIterator_swigregister = _cspace.iSectorIterator_swigregister
+iSectorIterator_swigregister(iSectorIterator)
 
 CS_ENGINE_CACHE_READ = _cspace.CS_ENGINE_CACHE_READ
 CS_ENGINE_CACHE_WRITE = _cspace.CS_ENGINE_CACHE_WRITE
@@ -3942,14 +3596,12 @@ class iEngineFrameCallback(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iEngineFrameCallback, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iEngineFrameCallback instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def StartFrame(*args): return _cspace.iEngineFrameCallback_StartFrame(*args)
     __swig_destroy__ = _cspace.delete_iEngineFrameCallback
     __del__ = lambda self : None;
-_cspace.iEngineFrameCallback_swigregister(iEngineFrameCallback)
+iEngineFrameCallback_swigregister = _cspace.iEngineFrameCallback_swigregister
+iEngineFrameCallback_swigregister(iEngineFrameCallback)
 
 class iEngineSectorCallback(iBase):
     __swig_setmethods__ = {}
@@ -3959,15 +3611,13 @@ class iEngineSectorCallback(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iEngineSectorCallback, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iEngineSectorCallback instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def NewSector(*args): return _cspace.iEngineSectorCallback_NewSector(*args)
     def RemoveSector(*args): return _cspace.iEngineSectorCallback_RemoveSector(*args)
     __swig_destroy__ = _cspace.delete_iEngineSectorCallback
     __del__ = lambda self : None;
-_cspace.iEngineSectorCallback_swigregister(iEngineSectorCallback)
+iEngineSectorCallback_swigregister = _cspace.iEngineSectorCallback_swigregister
+iEngineSectorCallback_swigregister(iEngineSectorCallback)
 
 class iEngine(iBase):
     __swig_setmethods__ = {}
@@ -3977,10 +3627,7 @@ class iEngine(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iEngine, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iEngine instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def QueryObject(*args): return _cspace.iEngine_QueryObject(*args)
     def Prepare(*args): return _cspace.iEngine_Prepare(*args)
     def PrepareTextures(*args): return _cspace.iEngine_PrepareTextures(*args)
@@ -4089,8 +3736,8 @@ class iEngine(iBase):
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iEngine_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iEngine_scfGetVersion)
-_cspace.iEngine_swigregister(iEngine)
-
+iEngine_swigregister = _cspace.iEngine_swigregister
+iEngine_swigregister(iEngine)
 iEngine_scfGetVersion = _cspace.iEngine_scfGetVersion
 
 class iCameraSectorListener(iBase):
@@ -4101,14 +3748,12 @@ class iCameraSectorListener(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iCameraSectorListener, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iCameraSectorListener instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def NewSector(*args): return _cspace.iCameraSectorListener_NewSector(*args)
     __swig_destroy__ = _cspace.delete_iCameraSectorListener
     __del__ = lambda self : None;
-_cspace.iCameraSectorListener_swigregister(iCameraSectorListener)
+iCameraSectorListener_swigregister = _cspace.iCameraSectorListener_swigregister
+iCameraSectorListener_swigregister(iCameraSectorListener)
 
 class iCamera(iBase):
     __swig_setmethods__ = {}
@@ -4118,10 +3763,7 @@ class iCamera(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iCamera, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iCamera instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def Clone(*args): return _cspace.iCamera_Clone(*args)
     def QuerySceneNode(*args): return _cspace.iCamera_QuerySceneNode(*args)
     def GetFOV(*args): return _cspace.iCamera_GetFOV(*args)
@@ -4156,8 +3798,8 @@ class iCamera(iBase):
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iCamera_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iCamera_scfGetVersion)
-_cspace.iCamera_swigregister(iCamera)
-
+iCamera_swigregister = _cspace.iCamera_swigregister
+iCamera_swigregister(iCamera)
 iCamera_scfGetVersion = _cspace.iCamera_scfGetVersion
 
 class iCameraPosition(iBase):
@@ -4168,10 +3810,7 @@ class iCameraPosition(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iCameraPosition, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iCameraPosition instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def QueryObject(*args): return _cspace.iCameraPosition_QueryObject(*args)
     def Clone(*args): return _cspace.iCameraPosition_Clone(*args)
     def GetSector(*args): return _cspace.iCameraPosition_GetSector(*args)
@@ -4191,8 +3830,8 @@ class iCameraPosition(iBase):
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iCameraPosition_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iCameraPosition_scfGetVersion)
-_cspace.iCameraPosition_swigregister(iCameraPosition)
-
+iCameraPosition_swigregister = _cspace.iCameraPosition_swigregister
+iCameraPosition_swigregister(iCameraPosition)
 iCameraPosition_scfGetVersion = _cspace.iCameraPosition_scfGetVersion
 
 class iCameraPositionList(iBase):
@@ -4203,10 +3842,7 @@ class iCameraPositionList(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iCameraPositionList, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iCameraPositionList instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def NewCameraPosition(*args): return _cspace.iCameraPositionList_NewCameraPosition(*args)
     def GetCount(*args): return _cspace.iCameraPositionList_GetCount(*args)
     def Get(*args): return _cspace.iCameraPositionList_Get(*args)
@@ -4226,7 +3862,8 @@ class iCameraPositionList(iBase):
     def __contains__(*args): return _cspace.iCameraPositionList___contains__(*args)
     __swig_destroy__ = _cspace.delete_iCameraPositionList
     __del__ = lambda self : None;
-_cspace.iCameraPositionList_swigregister(iCameraPositionList)
+iCameraPositionList_swigregister = _cspace.iCameraPositionList_swigregister
+iCameraPositionList_swigregister(iCameraPositionList)
 
 class iTextureCallback(iBase):
     __swig_setmethods__ = {}
@@ -4236,14 +3873,12 @@ class iTextureCallback(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iTextureCallback, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iTextureCallback instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def UseTexture(*args): return _cspace.iTextureCallback_UseTexture(*args)
     __swig_destroy__ = _cspace.delete_iTextureCallback
     __del__ = lambda self : None;
-_cspace.iTextureCallback_swigregister(iTextureCallback)
+iTextureCallback_swigregister = _cspace.iTextureCallback_swigregister
+iTextureCallback_swigregister(iTextureCallback)
 
 class iTextureWrapper(iBase):
     __swig_setmethods__ = {}
@@ -4253,10 +3888,7 @@ class iTextureWrapper(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iTextureWrapper, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iTextureWrapper instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def QueryObject(*args): return _cspace.iTextureWrapper_QueryObject(*args)
     def Clone(*args): return _cspace.iTextureWrapper_Clone(*args)
     def SetImageFile(*args): return _cspace.iTextureWrapper_SetImageFile(*args)
@@ -4280,8 +3912,8 @@ class iTextureWrapper(iBase):
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iTextureWrapper_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iTextureWrapper_scfGetVersion)
-_cspace.iTextureWrapper_swigregister(iTextureWrapper)
-
+iTextureWrapper_swigregister = _cspace.iTextureWrapper_swigregister
+iTextureWrapper_swigregister(iTextureWrapper)
 iTextureWrapper_scfGetVersion = _cspace.iTextureWrapper_scfGetVersion
 
 class iTextureList(iBase):
@@ -4292,10 +3924,7 @@ class iTextureList(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iTextureList, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iTextureList instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def NewTexture(*args): return _cspace.iTextureList_NewTexture(*args)
     def GetCount(*args): return _cspace.iTextureList_GetCount(*args)
     def Get(*args): return _cspace.iTextureList_Get(*args)
@@ -4317,8 +3946,8 @@ class iTextureList(iBase):
     def __iter__(self): return self.content_iterator()  
     def __getitem__(*args): return _cspace.iTextureList___getitem__(*args)
     def __contains__(*args): return _cspace.iTextureList___contains__(*args)
-_cspace.iTextureList_swigregister(iTextureList)
-
+iTextureList_swigregister = _cspace.iTextureList_swigregister
+iTextureList_swigregister(iTextureList)
 iTextureList_scfGetVersion = _cspace.iTextureList_scfGetVersion
 
 class iMaterialWrapper(iBase):
@@ -4329,10 +3958,7 @@ class iMaterialWrapper(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iMaterialWrapper, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iMaterialWrapper instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def QueryObject(*args): return _cspace.iMaterialWrapper_QueryObject(*args)
     def SetMaterial(*args): return _cspace.iMaterialWrapper_SetMaterial(*args)
     def GetMaterial(*args): return _cspace.iMaterialWrapper_GetMaterial(*args)
@@ -4342,8 +3968,8 @@ class iMaterialWrapper(iBase):
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iMaterialWrapper_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iMaterialWrapper_scfGetVersion)
-_cspace.iMaterialWrapper_swigregister(iMaterialWrapper)
-
+iMaterialWrapper_swigregister = _cspace.iMaterialWrapper_swigregister
+iMaterialWrapper_swigregister(iMaterialWrapper)
 iMaterialWrapper_scfGetVersion = _cspace.iMaterialWrapper_scfGetVersion
 
 class iMaterialEngine(iBase):
@@ -4354,16 +3980,14 @@ class iMaterialEngine(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iMaterialEngine, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iMaterialEngine instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def GetTextureWrapper(*args): return _cspace.iMaterialEngine_GetTextureWrapper(*args)
     def Visit(*args): return _cspace.iMaterialEngine_Visit(*args)
     def IsVisitRequired(*args): return _cspace.iMaterialEngine_IsVisitRequired(*args)
     __swig_destroy__ = _cspace.delete_iMaterialEngine
     __del__ = lambda self : None;
-_cspace.iMaterialEngine_swigregister(iMaterialEngine)
+iMaterialEngine_swigregister = _cspace.iMaterialEngine_swigregister
+iMaterialEngine_swigregister(iMaterialEngine)
 
 class iMaterialList(iBase):
     __swig_setmethods__ = {}
@@ -4373,10 +3997,7 @@ class iMaterialList(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iMaterialList, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iMaterialList instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def NewMaterial(*args): return _cspace.iMaterialList_NewMaterial(*args)
     def GetCount(*args): return _cspace.iMaterialList_GetCount(*args)
     def Get(*args): return _cspace.iMaterialList_Get(*args)
@@ -4396,7 +4017,8 @@ class iMaterialList(iBase):
     def __contains__(*args): return _cspace.iMaterialList___contains__(*args)
     __swig_destroy__ = _cspace.delete_iMaterialList
     __del__ = lambda self : None;
-_cspace.iMaterialList_swigregister(iMaterialList)
+iMaterialList_swigregister = _cspace.iMaterialList_swigregister
+iMaterialList_swigregister(iMaterialList)
 
 class iSceneNodeArrayReadOnly(iBase):
     __swig_setmethods__ = {}
@@ -4406,10 +4028,7 @@ class iSceneNodeArrayReadOnly(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iSceneNodeArrayReadOnly, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iArrayReadOnly<iSceneNode * > instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def GetSize(*args): return _cspace.iSceneNodeArrayReadOnly_GetSize(*args)
     def Get(*args): return _cspace.iSceneNodeArrayReadOnly_Get(*args)
     def Top(*args): return _cspace.iSceneNodeArrayReadOnly_Top(*args)
@@ -4419,7 +4038,8 @@ class iSceneNodeArrayReadOnly(iBase):
     def GetAll(*args): return _cspace.iSceneNodeArrayReadOnly_GetAll(*args)
     __swig_destroy__ = _cspace.delete_iSceneNodeArrayReadOnly
     __del__ = lambda self : None;
-_cspace.iSceneNodeArrayReadOnly_swigregister(iSceneNodeArrayReadOnly)
+iSceneNodeArrayReadOnly_swigregister = _cspace.iSceneNodeArrayReadOnly_swigregister
+iSceneNodeArrayReadOnly_swigregister(iSceneNodeArrayReadOnly)
 
 class iSceneNodeArray(iSceneNodeArrayReadOnly):
     __swig_setmethods__ = {}
@@ -4429,16 +4049,13 @@ class iSceneNodeArray(iSceneNodeArrayReadOnly):
     for _s in [iSceneNodeArrayReadOnly]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iSceneNodeArray, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iSceneNodeArray instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     __swig_destroy__ = _cspace.delete_iSceneNodeArray
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iSceneNodeArray_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iSceneNodeArray_scfGetVersion)
-_cspace.iSceneNodeArray_swigregister(iSceneNodeArray)
-
+iSceneNodeArray_swigregister = _cspace.iSceneNodeArray_swigregister
+iSceneNodeArray_swigregister(iSceneNodeArray)
 iSceneNodeArray_scfGetVersion = _cspace.iSceneNodeArray_scfGetVersion
 
 class iSceneNode(iBase):
@@ -4449,10 +4066,7 @@ class iSceneNode(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iSceneNode, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iSceneNode instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def GetMovable(*args): return _cspace.iSceneNode_GetMovable(*args)
     def QueryMesh(*args): return _cspace.iSceneNode_QueryMesh(*args)
     def QueryLight(*args): return _cspace.iSceneNode_QueryLight(*args)
@@ -4465,8 +4079,8 @@ class iSceneNode(iBase):
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iSceneNode_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iSceneNode_scfGetVersion)
-_cspace.iSceneNode_swigregister(iSceneNode)
-
+iSceneNode_swigregister = _cspace.iSceneNode_swigregister
+iSceneNode_swigregister(iSceneNode)
 iSceneNode_scfGetVersion = _cspace.iSceneNode_scfGetVersion
 
 CS_ENTITY_DETAIL = _cspace.CS_ENTITY_DETAIL
@@ -4486,24 +4100,19 @@ class iMeshDrawCallback(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iMeshDrawCallback, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iMeshDrawCallback instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def BeforeDrawing(*args): return _cspace.iMeshDrawCallback_BeforeDrawing(*args)
     __swig_destroy__ = _cspace.delete_iMeshDrawCallback
     __del__ = lambda self : None;
-_cspace.iMeshDrawCallback_swigregister(iMeshDrawCallback)
+iMeshDrawCallback_swigregister = _cspace.iMeshDrawCallback_swigregister
+iMeshDrawCallback_swigregister(iMeshDrawCallback)
 
 class csHitBeamResult(_object):
     __swig_setmethods__ = {}
     __setattr__ = lambda self, name, value: _swig_setattr(self, csHitBeamResult, name, value)
     __swig_getmethods__ = {}
     __getattr__ = lambda self, name: _swig_getattr(self, csHitBeamResult, name)
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ csHitBeamResult instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     __swig_setmethods__["isect"] = _cspace.csHitBeamResult_isect_set
     __swig_getmethods__["isect"] = _cspace.csHitBeamResult_isect_get
     if _newclass:isect = property(_cspace.csHitBeamResult_isect_get, _cspace.csHitBeamResult_isect_set)
@@ -4522,23 +4131,21 @@ class csHitBeamResult(_object):
     __swig_setmethods__["hit"] = _cspace.csHitBeamResult_hit_set
     __swig_getmethods__["hit"] = _cspace.csHitBeamResult_hit_get
     if _newclass:hit = property(_cspace.csHitBeamResult_hit_get, _cspace.csHitBeamResult_hit_set)
-    def __init__(self, *args):
+    def __init__(self, *args): 
         this = _cspace.new_csHitBeamResult(*args)
         try: self.this.append(this)
         except: self.this = this
     __swig_destroy__ = _cspace.delete_csHitBeamResult
     __del__ = lambda self : None;
-_cspace.csHitBeamResult_swigregister(csHitBeamResult)
+csHitBeamResult_swigregister = _cspace.csHitBeamResult_swigregister
+csHitBeamResult_swigregister(csHitBeamResult)
 
 class csScreenBoxResult(_object):
     __swig_setmethods__ = {}
     __setattr__ = lambda self, name, value: _swig_setattr(self, csScreenBoxResult, name, value)
     __swig_getmethods__ = {}
     __getattr__ = lambda self, name: _swig_getattr(self, csScreenBoxResult, name)
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ csScreenBoxResult instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     __swig_setmethods__["sbox"] = _cspace.csScreenBoxResult_sbox_set
     __swig_getmethods__["sbox"] = _cspace.csScreenBoxResult_sbox_get
     if _newclass:sbox = property(_cspace.csScreenBoxResult_sbox_get, _cspace.csScreenBoxResult_sbox_set)
@@ -4548,13 +4155,14 @@ class csScreenBoxResult(_object):
     __swig_setmethods__["distance"] = _cspace.csScreenBoxResult_distance_set
     __swig_getmethods__["distance"] = _cspace.csScreenBoxResult_distance_get
     if _newclass:distance = property(_cspace.csScreenBoxResult_distance_get, _cspace.csScreenBoxResult_distance_set)
-    def __init__(self, *args):
+    def __init__(self, *args): 
         this = _cspace.new_csScreenBoxResult(*args)
         try: self.this.append(this)
         except: self.this = this
     __swig_destroy__ = _cspace.delete_csScreenBoxResult
     __del__ = lambda self : None;
-_cspace.csScreenBoxResult_swigregister(csScreenBoxResult)
+csScreenBoxResult_swigregister = _cspace.csScreenBoxResult_swigregister
+csScreenBoxResult_swigregister(csScreenBoxResult)
 
 class iMeshWrapper(iBase):
     __swig_setmethods__ = {}
@@ -4564,10 +4172,7 @@ class iMeshWrapper(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iMeshWrapper, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iMeshWrapper instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def QueryObject(*args): return _cspace.iMeshWrapper_QueryObject(*args)
     def GetMeshObject(*args): return _cspace.iMeshWrapper_GetMeshObject(*args)
     def SetMeshObject(*args): return _cspace.iMeshWrapper_SetMeshObject(*args)
@@ -4622,8 +4227,8 @@ class iMeshWrapper(iBase):
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iMeshWrapper_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iMeshWrapper_scfGetVersion)
-_cspace.iMeshWrapper_swigregister(iMeshWrapper)
-
+iMeshWrapper_swigregister = _cspace.iMeshWrapper_swigregister
+iMeshWrapper_swigregister(iMeshWrapper)
 iMeshWrapper_scfGetVersion = _cspace.iMeshWrapper_scfGetVersion
 
 class iMeshFactoryWrapper(iBase):
@@ -4634,10 +4239,7 @@ class iMeshFactoryWrapper(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iMeshFactoryWrapper, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iMeshFactoryWrapper instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def QueryObject(*args): return _cspace.iMeshFactoryWrapper_QueryObject(*args)
     def GetMeshObjectFactory(*args): return _cspace.iMeshFactoryWrapper_GetMeshObjectFactory(*args)
     def SetMeshObjectFactory(*args): return _cspace.iMeshFactoryWrapper_SetMeshObjectFactory(*args)
@@ -4666,8 +4268,8 @@ class iMeshFactoryWrapper(iBase):
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iMeshFactoryWrapper_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iMeshFactoryWrapper_scfGetVersion)
-_cspace.iMeshFactoryWrapper_swigregister(iMeshFactoryWrapper)
-
+iMeshFactoryWrapper_swigregister = _cspace.iMeshFactoryWrapper_swigregister
+iMeshFactoryWrapper_swigregister(iMeshFactoryWrapper)
 iMeshFactoryWrapper_scfGetVersion = _cspace.iMeshFactoryWrapper_scfGetVersion
 
 class iMeshList(iBase):
@@ -4678,10 +4280,7 @@ class iMeshList(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iMeshList, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iMeshList instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def GetCount(*args): return _cspace.iMeshList_GetCount(*args)
     def Get(*args): return _cspace.iMeshList_Get(*args)
     def Add(*args): return _cspace.iMeshList_Add(*args)
@@ -4700,7 +4299,8 @@ class iMeshList(iBase):
     def __contains__(*args): return _cspace.iMeshList___contains__(*args)
     __swig_destroy__ = _cspace.delete_iMeshList
     __del__ = lambda self : None;
-_cspace.iMeshList_swigregister(iMeshList)
+iMeshList_swigregister = _cspace.iMeshList_swigregister
+iMeshList_swigregister(iMeshList)
 
 class iMeshFactoryList(iBase):
     __swig_setmethods__ = {}
@@ -4710,10 +4310,7 @@ class iMeshFactoryList(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iMeshFactoryList, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iMeshFactoryList instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def GetCount(*args): return _cspace.iMeshFactoryList_GetCount(*args)
     def Get(*args): return _cspace.iMeshFactoryList_Get(*args)
     def Add(*args): return _cspace.iMeshFactoryList_Add(*args)
@@ -4732,7 +4329,8 @@ class iMeshFactoryList(iBase):
     def __contains__(*args): return _cspace.iMeshFactoryList___contains__(*args)
     __swig_destroy__ = _cspace.delete_iMeshFactoryList
     __del__ = lambda self : None;
-_cspace.iMeshFactoryList_swigregister(iMeshFactoryList)
+iMeshFactoryList_swigregister = _cspace.iMeshFactoryList_swigregister
+iMeshFactoryList_swigregister(iMeshFactoryList)
 
 class iMeshWrapperIterator(iBase):
     __swig_setmethods__ = {}
@@ -4742,10 +4340,7 @@ class iMeshWrapperIterator(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iMeshWrapperIterator, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iMeshWrapperIterator instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def Next(*args): return _cspace.iMeshWrapperIterator_Next(*args)
     def Reset(*args): return _cspace.iMeshWrapperIterator_Reset(*args)
     def HasNext(*args): return _cspace.iMeshWrapperIterator_HasNext(*args)
@@ -4753,8 +4348,8 @@ class iMeshWrapperIterator(iBase):
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iMeshWrapperIterator_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iMeshWrapperIterator_scfGetVersion)
-_cspace.iMeshWrapperIterator_swigregister(iMeshWrapperIterator)
-
+iMeshWrapperIterator_swigregister = _cspace.iMeshWrapperIterator_swigregister
+iMeshWrapperIterator_swigregister(iMeshWrapperIterator)
 iMeshWrapperIterator_scfGetVersion = _cspace.iMeshWrapperIterator_scfGetVersion
 
 class iMovableListener(iBase):
@@ -4765,18 +4360,15 @@ class iMovableListener(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iMovableListener, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iMovableListener instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def MovableChanged(*args): return _cspace.iMovableListener_MovableChanged(*args)
     def MovableDestroyed(*args): return _cspace.iMovableListener_MovableDestroyed(*args)
     __swig_destroy__ = _cspace.delete_iMovableListener
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iMovableListener_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iMovableListener_scfGetVersion)
-_cspace.iMovableListener_swigregister(iMovableListener)
-
+iMovableListener_swigregister = _cspace.iMovableListener_swigregister
+iMovableListener_swigregister(iMovableListener)
 iMovableListener_scfGetVersion = _cspace.iMovableListener_scfGetVersion
 
 class iMovable(iBase):
@@ -4787,10 +4379,7 @@ class iMovable(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iMovable, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iMovable instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def GetSceneNode(*args): return _cspace.iMovable_GetSceneNode(*args)
     def SetSector(*args): return _cspace.iMovable_SetSector(*args)
     def ClearSectors(*args): return _cspace.iMovable_ClearSectors(*args)
@@ -4815,8 +4404,8 @@ class iMovable(iBase):
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iMovable_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iMovable_scfGetVersion)
-_cspace.iMovable_swigregister(iMovable)
-
+iMovable_swigregister = _cspace.iMovable_swigregister
+iMovable_swigregister(iMovable)
 iMovable_scfGetVersion = _cspace.iMovable_scfGetVersion
 
 class iRegion(iBase):
@@ -4827,10 +4416,7 @@ class iRegion(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iRegion, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iRegion instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def QueryObject(*args): return _cspace.iRegion_QueryObject(*args)
     def Add(*args): return _cspace.iRegion_Add(*args)
     def Remove(*args): return _cspace.iRegion_Remove(*args)
@@ -4849,7 +4435,8 @@ class iRegion(iBase):
     def IsInRegion(*args): return _cspace.iRegion_IsInRegion(*args)
     __swig_destroy__ = _cspace.delete_iRegion
     __del__ = lambda self : None;
-_cspace.iRegion_swigregister(iRegion)
+iRegion_swigregister = _cspace.iRegion_swigregister
+iRegion_swigregister(iRegion)
 
 class iRegionList(iBase):
     __swig_setmethods__ = {}
@@ -4859,10 +4446,7 @@ class iRegionList(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iRegionList, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iRegionList instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def GetCount(*args): return _cspace.iRegionList_GetCount(*args)
     def Get(*args): return _cspace.iRegionList_Get(*args)
     def Add(*args): return _cspace.iRegionList_Add(*args)
@@ -4881,7 +4465,8 @@ class iRegionList(iBase):
     def __contains__(*args): return _cspace.iRegionList___contains__(*args)
     __swig_destroy__ = _cspace.delete_iRegionList
     __del__ = lambda self : None;
-_cspace.iRegionList_swigregister(iRegionList)
+iRegionList_swigregister = _cspace.iRegionList_swigregister
+iRegionList_swigregister(iRegionList)
 
 class iVisibilityObjectIterator(iBase):
     __swig_setmethods__ = {}
@@ -4891,16 +4476,14 @@ class iVisibilityObjectIterator(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iVisibilityObjectIterator, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iVisibilityObjectIterator instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def HasNext(*args): return _cspace.iVisibilityObjectIterator_HasNext(*args)
     def Next(*args): return _cspace.iVisibilityObjectIterator_Next(*args)
     def Reset(*args): return _cspace.iVisibilityObjectIterator_Reset(*args)
     __swig_destroy__ = _cspace.delete_iVisibilityObjectIterator
     __del__ = lambda self : None;
-_cspace.iVisibilityObjectIterator_swigregister(iVisibilityObjectIterator)
+iVisibilityObjectIterator_swigregister = _cspace.iVisibilityObjectIterator_swigregister
+iVisibilityObjectIterator_swigregister(iVisibilityObjectIterator)
 
 class iVisibilityCullerListener(iBase):
     __swig_setmethods__ = {}
@@ -4910,14 +4493,12 @@ class iVisibilityCullerListener(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iVisibilityCullerListener, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iVisibilityCullerListener instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def ObjectVisible(*args): return _cspace.iVisibilityCullerListener_ObjectVisible(*args)
     __swig_destroy__ = _cspace.delete_iVisibilityCullerListener
     __del__ = lambda self : None;
-_cspace.iVisibilityCullerListener_swigregister(iVisibilityCullerListener)
+iVisibilityCullerListener_swigregister = _cspace.iVisibilityCullerListener_swigregister
+iVisibilityCullerListener_swigregister(iVisibilityCullerListener)
 
 class iVisibilityCuller(iBase):
     __swig_setmethods__ = {}
@@ -4927,10 +4508,7 @@ class iVisibilityCuller(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iVisibilityCuller, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iVisibilityCuller instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def Setup(*args): return _cspace.iVisibilityCuller_Setup(*args)
     def RegisterVisObject(*args): return _cspace.iVisibilityCuller_RegisterVisObject(*args)
     def UnregisterVisObject(*args): return _cspace.iVisibilityCuller_UnregisterVisObject(*args)
@@ -4944,8 +4522,8 @@ class iVisibilityCuller(iBase):
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iVisibilityCuller_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iVisibilityCuller_scfGetVersion)
-_cspace.iVisibilityCuller_swigregister(iVisibilityCuller)
-
+iVisibilityCuller_swigregister = _cspace.iVisibilityCuller_swigregister
+iVisibilityCuller_swigregister(iVisibilityCuller)
 iVisibilityCuller_scfGetVersion = _cspace.iVisibilityCuller_scfGetVersion
 
 CS_CULLER_HINT_GOODOCCLUDER = _cspace.CS_CULLER_HINT_GOODOCCLUDER
@@ -4958,17 +4536,15 @@ class iVisibilityObject(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iVisibilityObject, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iVisibilityObject instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def GetMovable(*args): return _cspace.iVisibilityObject_GetMovable(*args)
     def GetMeshWrapper(*args): return _cspace.iVisibilityObject_GetMeshWrapper(*args)
     def GetObjectModel(*args): return _cspace.iVisibilityObject_GetObjectModel(*args)
     def GetCullerFlags(*args): return _cspace.iVisibilityObject_GetCullerFlags(*args)
     __swig_destroy__ = _cspace.delete_iVisibilityObject
     __del__ = lambda self : None;
-_cspace.iVisibilityObject_swigregister(iVisibilityObject)
+iVisibilityObject_swigregister = _cspace.iVisibilityObject_swigregister
+iVisibilityObject_swigregister(iVisibilityObject)
 
 CS_PORTAL_CLIPDEST = _cspace.CS_PORTAL_CLIPDEST
 CS_PORTAL_CLIPSTRADDLING = _cspace.CS_PORTAL_CLIPSTRADDLING
@@ -4987,14 +4563,12 @@ class iPortalCallback(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iPortalCallback, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iPortalCallback instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def Traverse(*args): return _cspace.iPortalCallback_Traverse(*args)
     __swig_destroy__ = _cspace.delete_iPortalCallback
     __del__ = lambda self : None;
-_cspace.iPortalCallback_swigregister(iPortalCallback)
+iPortalCallback_swigregister = _cspace.iPortalCallback_swigregister
+iPortalCallback_swigregister(iPortalCallback)
 
 class iPortal(iBase):
     __swig_setmethods__ = {}
@@ -5004,10 +4578,7 @@ class iPortal(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iPortal, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iPortal instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def SetName(*args): return _cspace.iPortal_SetName(*args)
     def GetName(*args): return _cspace.iPortal_GetName(*args)
     def GetSector(*args): return _cspace.iPortal_GetSector(*args)
@@ -5049,8 +4620,8 @@ class iPortal(iBase):
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iPortal_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iPortal_scfGetVersion)
-_cspace.iPortal_swigregister(iPortal)
-
+iPortal_swigregister = _cspace.iPortal_swigregister
+iPortal_swigregister(iPortal)
 iPortal_scfGetVersion = _cspace.iPortal_scfGetVersion
 
 class iPortalContainer(iBase):
@@ -5061,10 +4632,7 @@ class iPortalContainer(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iPortalContainer, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iPortalContainer instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def GetPortalCount(*args): return _cspace.iPortalContainer_GetPortalCount(*args)
     def GetPortal(*args): return _cspace.iPortalContainer_GetPortal(*args)
     def CreatePortal(*args): return _cspace.iPortalContainer_CreatePortal(*args)
@@ -5074,8 +4642,8 @@ class iPortalContainer(iBase):
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iPortalContainer_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iPortalContainer_scfGetVersion)
-_cspace.iPortalContainer_swigregister(iPortalContainer)
-
+iPortalContainer_swigregister = _cspace.iPortalContainer_swigregister
+iPortalContainer_swigregister(iPortalContainer)
 iPortalContainer_scfGetVersion = _cspace.iPortalContainer_scfGetVersion
 
 class iGeneralMeshSubMesh(iBase):
@@ -5086,10 +4654,7 @@ class iGeneralMeshSubMesh(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iGeneralMeshSubMesh, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iGeneralMeshSubMesh instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def GetIndices(*args): return _cspace.iGeneralMeshSubMesh_GetIndices(*args)
     def GetMaterial(*args): return _cspace.iGeneralMeshSubMesh_GetMaterial(*args)
     def GetName(*args): return _cspace.iGeneralMeshSubMesh_GetName(*args)
@@ -5097,7 +4662,8 @@ class iGeneralMeshSubMesh(iBase):
     def SetMaterial(*args): return _cspace.iGeneralMeshSubMesh_SetMaterial(*args)
     __swig_destroy__ = _cspace.delete_iGeneralMeshSubMesh
     __del__ = lambda self : None;
-_cspace.iGeneralMeshSubMesh_swigregister(iGeneralMeshSubMesh)
+iGeneralMeshSubMesh_swigregister = _cspace.iGeneralMeshSubMesh_swigregister
+iGeneralMeshSubMesh_swigregister(iGeneralMeshSubMesh)
 
 class iGeneralMeshCommonState(iBase):
     __swig_setmethods__ = {}
@@ -5107,10 +4673,7 @@ class iGeneralMeshCommonState(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iGeneralMeshCommonState, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iGeneralMeshCommonState instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def SetLighting(*args): return _cspace.iGeneralMeshCommonState_SetLighting(*args)
     def IsLighting(*args): return _cspace.iGeneralMeshCommonState_IsLighting(*args)
     def SetManualColors(*args): return _cspace.iGeneralMeshCommonState_SetManualColors(*args)
@@ -5126,7 +4689,8 @@ class iGeneralMeshCommonState(iBase):
     def GetRenderBufferName(*args): return _cspace.iGeneralMeshCommonState_GetRenderBufferName(*args)
     __swig_destroy__ = _cspace.delete_iGeneralMeshCommonState
     __del__ = lambda self : None;
-_cspace.iGeneralMeshCommonState_swigregister(iGeneralMeshCommonState)
+iGeneralMeshCommonState_swigregister = _cspace.iGeneralMeshCommonState_swigregister
+iGeneralMeshCommonState_swigregister(iGeneralMeshCommonState)
 
 class iGeneralMeshState(iGeneralMeshCommonState):
     __swig_setmethods__ = {}
@@ -5136,10 +4700,7 @@ class iGeneralMeshState(iGeneralMeshCommonState):
     for _s in [iGeneralMeshCommonState]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iGeneralMeshState, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iGeneralMeshState instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def SetAnimationControl(*args): return _cspace.iGeneralMeshState_SetAnimationControl(*args)
     def GetAnimationControl(*args): return _cspace.iGeneralMeshState_GetAnimationControl(*args)
     def FindSubMesh(*args): return _cspace.iGeneralMeshState_FindSubMesh(*args)
@@ -5148,8 +4709,8 @@ class iGeneralMeshState(iGeneralMeshCommonState):
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iGeneralMeshState_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iGeneralMeshState_scfGetVersion)
-_cspace.iGeneralMeshState_swigregister(iGeneralMeshState)
-
+iGeneralMeshState_swigregister = _cspace.iGeneralMeshState_swigregister
+iGeneralMeshState_swigregister(iGeneralMeshState)
 iGeneralMeshState_scfGetVersion = _cspace.iGeneralMeshState_scfGetVersion
 
 class iGeneralFactoryState(iGeneralMeshCommonState):
@@ -5160,10 +4721,7 @@ class iGeneralFactoryState(iGeneralMeshCommonState):
     for _s in [iGeneralMeshCommonState]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iGeneralFactoryState, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iGeneralFactoryState instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def SetColor(*args): return _cspace.iGeneralFactoryState_SetColor(*args)
     def GetColor(*args): return _cspace.iGeneralFactoryState_GetColor(*args)
     def AddVertex(*args): return _cspace.iGeneralFactoryState_AddVertex(*args)
@@ -5218,8 +4776,8 @@ class iGeneralFactoryState(iGeneralMeshCommonState):
     def GetNormalByIndex(*args): return _cspace.iGeneralFactoryState_GetNormalByIndex(*args)
     def GetTriangleByIndex(*args): return _cspace.iGeneralFactoryState_GetTriangleByIndex(*args)
     def GetColorByIndex(*args): return _cspace.iGeneralFactoryState_GetColorByIndex(*args)
-_cspace.iGeneralFactoryState_swigregister(iGeneralFactoryState)
-
+iGeneralFactoryState_swigregister = _cspace.iGeneralFactoryState_swigregister
+iGeneralFactoryState_swigregister(iGeneralFactoryState)
 iGeneralFactoryState_scfGetVersion = _cspace.iGeneralFactoryState_scfGetVersion
 
 class iGenMeshAnimationControl(iBase):
@@ -5230,10 +4788,7 @@ class iGenMeshAnimationControl(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iGenMeshAnimationControl, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iGenMeshAnimationControl instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def AnimatesVertices(*args): return _cspace.iGenMeshAnimationControl_AnimatesVertices(*args)
     def AnimatesTexels(*args): return _cspace.iGenMeshAnimationControl_AnimatesTexels(*args)
     def AnimatesNormals(*args): return _cspace.iGenMeshAnimationControl_AnimatesNormals(*args)
@@ -5245,7 +4800,8 @@ class iGenMeshAnimationControl(iBase):
     def UpdateColors(*args): return _cspace.iGenMeshAnimationControl_UpdateColors(*args)
     __swig_destroy__ = _cspace.delete_iGenMeshAnimationControl
     __del__ = lambda self : None;
-_cspace.iGenMeshAnimationControl_swigregister(iGenMeshAnimationControl)
+iGenMeshAnimationControl_swigregister = _cspace.iGenMeshAnimationControl_swigregister
+iGenMeshAnimationControl_swigregister(iGenMeshAnimationControl)
 
 class iGenMeshAnimationControlFactory(iBase):
     __swig_setmethods__ = {}
@@ -5255,16 +4811,14 @@ class iGenMeshAnimationControlFactory(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iGenMeshAnimationControlFactory, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iGenMeshAnimationControlFactory instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def CreateAnimationControl(*args): return _cspace.iGenMeshAnimationControlFactory_CreateAnimationControl(*args)
     def Load(*args): return _cspace.iGenMeshAnimationControlFactory_Load(*args)
     def Save(*args): return _cspace.iGenMeshAnimationControlFactory_Save(*args)
     __swig_destroy__ = _cspace.delete_iGenMeshAnimationControlFactory
     __del__ = lambda self : None;
-_cspace.iGenMeshAnimationControlFactory_swigregister(iGenMeshAnimationControlFactory)
+iGenMeshAnimationControlFactory_swigregister = _cspace.iGenMeshAnimationControlFactory_swigregister
+iGenMeshAnimationControlFactory_swigregister(iGenMeshAnimationControlFactory)
 
 class iGenMeshAnimationControlType(iBase):
     __swig_setmethods__ = {}
@@ -5274,14 +4828,12 @@ class iGenMeshAnimationControlType(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iGenMeshAnimationControlType, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iGenMeshAnimationControlType instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def CreateAnimationControlFactory(*args): return _cspace.iGenMeshAnimationControlType_CreateAnimationControlFactory(*args)
     __swig_destroy__ = _cspace.delete_iGenMeshAnimationControlType
     __del__ = lambda self : None;
-_cspace.iGenMeshAnimationControlType_swigregister(iGenMeshAnimationControlType)
+iGenMeshAnimationControlType_swigregister = _cspace.iGenMeshAnimationControlType_swigregister
+iGenMeshAnimationControlType_swigregister(iGenMeshAnimationControlType)
 
 class csSprite2DVertexArrayReadOnly(iBase):
     __swig_setmethods__ = {}
@@ -5291,10 +4843,7 @@ class csSprite2DVertexArrayReadOnly(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, csSprite2DVertexArrayReadOnly, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iArrayReadOnly<csSprite2DVertex > instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def GetSize(*args): return _cspace.csSprite2DVertexArrayReadOnly_GetSize(*args)
     def Get(*args): return _cspace.csSprite2DVertexArrayReadOnly_Get(*args)
     def Top(*args): return _cspace.csSprite2DVertexArrayReadOnly_Top(*args)
@@ -5304,7 +4853,8 @@ class csSprite2DVertexArrayReadOnly(iBase):
     def GetAll(*args): return _cspace.csSprite2DVertexArrayReadOnly_GetAll(*args)
     __swig_destroy__ = _cspace.delete_csSprite2DVertexArrayReadOnly
     __del__ = lambda self : None;
-_cspace.csSprite2DVertexArrayReadOnly_swigregister(csSprite2DVertexArrayReadOnly)
+csSprite2DVertexArrayReadOnly_swigregister = _cspace.csSprite2DVertexArrayReadOnly_swigregister
+csSprite2DVertexArrayReadOnly_swigregister(csSprite2DVertexArrayReadOnly)
 
 class csSprite2DVertexArrayChangeElements(csSprite2DVertexArrayReadOnly):
     __swig_setmethods__ = {}
@@ -5314,15 +4864,13 @@ class csSprite2DVertexArrayChangeElements(csSprite2DVertexArrayReadOnly):
     for _s in [csSprite2DVertexArrayReadOnly]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, csSprite2DVertexArrayChangeElements, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iArrayChangeElements<csSprite2DVertex > instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def Get(*args): return _cspace.csSprite2DVertexArrayChangeElements_Get(*args)
     def Top(*args): return _cspace.csSprite2DVertexArrayChangeElements_Top(*args)
     __swig_destroy__ = _cspace.delete_csSprite2DVertexArrayChangeElements
     __del__ = lambda self : None;
-_cspace.csSprite2DVertexArrayChangeElements_swigregister(csSprite2DVertexArrayChangeElements)
+csSprite2DVertexArrayChangeElements_swigregister = _cspace.csSprite2DVertexArrayChangeElements_swigregister
+csSprite2DVertexArrayChangeElements_swigregister(csSprite2DVertexArrayChangeElements)
 
 class csSprite2DVertexArrayChangeAll(csSprite2DVertexArrayChangeElements):
     __swig_setmethods__ = {}
@@ -5332,10 +4880,7 @@ class csSprite2DVertexArrayChangeAll(csSprite2DVertexArrayChangeElements):
     for _s in [csSprite2DVertexArrayChangeElements]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, csSprite2DVertexArrayChangeAll, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iArrayChangeAll<csSprite2DVertex > instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def SetSize(*args): return _cspace.csSprite2DVertexArrayChangeAll_SetSize(*args)
     def GetExtend(*args): return _cspace.csSprite2DVertexArrayChangeAll_GetExtend(*args)
     def Put(*args): return _cspace.csSprite2DVertexArrayChangeAll_Put(*args)
@@ -5352,17 +4897,15 @@ class csSprite2DVertexArrayChangeAll(csSprite2DVertexArrayChangeElements):
     def DeleteFast(*args): return _cspace.csSprite2DVertexArrayChangeAll_DeleteFast(*args)
     __swig_destroy__ = _cspace.delete_csSprite2DVertexArrayChangeAll
     __del__ = lambda self : None;
-_cspace.csSprite2DVertexArrayChangeAll_swigregister(csSprite2DVertexArrayChangeAll)
+csSprite2DVertexArrayChangeAll_swigregister = _cspace.csSprite2DVertexArrayChangeAll_swigregister
+csSprite2DVertexArrayChangeAll_swigregister(csSprite2DVertexArrayChangeAll)
 
 class csSprite2DVertex(_object):
     __swig_setmethods__ = {}
     __setattr__ = lambda self, name, value: _swig_setattr(self, csSprite2DVertex, name, value)
     __swig_getmethods__ = {}
     __getattr__ = lambda self, name: _swig_getattr(self, csSprite2DVertex, name)
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ csSprite2DVertex instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     __swig_setmethods__["pos"] = _cspace.csSprite2DVertex_pos_set
     __swig_getmethods__["pos"] = _cspace.csSprite2DVertex_pos_get
     if _newclass:pos = property(_cspace.csSprite2DVertex_pos_get, _cspace.csSprite2DVertex_pos_set)
@@ -5379,13 +4922,14 @@ class csSprite2DVertex(_object):
     __swig_getmethods__["v"] = _cspace.csSprite2DVertex_v_get
     if _newclass:v = property(_cspace.csSprite2DVertex_v_get, _cspace.csSprite2DVertex_v_set)
     def __eq__(*args): return _cspace.csSprite2DVertex___eq__(*args)
-    def __init__(self, *args):
+    def __init__(self, *args): 
         this = _cspace.new_csSprite2DVertex(*args)
         try: self.this.append(this)
         except: self.this = this
     __swig_destroy__ = _cspace.delete_csSprite2DVertex
     __del__ = lambda self : None;
-_cspace.csSprite2DVertex_swigregister(csSprite2DVertex)
+csSprite2DVertex_swigregister = _cspace.csSprite2DVertex_swigregister
+csSprite2DVertex_swigregister(csSprite2DVertex)
 
 class iColoredVertices(csSprite2DVertexArrayChangeAll):
     __swig_setmethods__ = {}
@@ -5395,13 +4939,11 @@ class iColoredVertices(csSprite2DVertexArrayChangeAll):
     for _s in [csSprite2DVertexArrayChangeAll]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iColoredVertices, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iColoredVertices instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     __swig_destroy__ = _cspace.delete_iColoredVertices
     __del__ = lambda self : None;
-_cspace.iColoredVertices_swigregister(iColoredVertices)
+iColoredVertices_swigregister = _cspace.iColoredVertices_swigregister
+iColoredVertices_swigregister(iColoredVertices)
 
 class iSprite2DUVAnimationFrame(iBase):
     __swig_setmethods__ = {}
@@ -5411,10 +4953,7 @@ class iSprite2DUVAnimationFrame(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iSprite2DUVAnimationFrame, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iSprite2DUVAnimationFrame instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def SetName(*args): return _cspace.iSprite2DUVAnimationFrame_SetName(*args)
     def GetName(*args): return _cspace.iSprite2DUVAnimationFrame_GetName(*args)
     def GetUVCoo(*args): return _cspace.iSprite2DUVAnimationFrame_GetUVCoo(*args)
@@ -5426,7 +4965,8 @@ class iSprite2DUVAnimationFrame(iBase):
     def SetDuration(*args): return _cspace.iSprite2DUVAnimationFrame_SetDuration(*args)
     __swig_destroy__ = _cspace.delete_iSprite2DUVAnimationFrame
     __del__ = lambda self : None;
-_cspace.iSprite2DUVAnimationFrame_swigregister(iSprite2DUVAnimationFrame)
+iSprite2DUVAnimationFrame_swigregister = _cspace.iSprite2DUVAnimationFrame_swigregister
+iSprite2DUVAnimationFrame_swigregister(iSprite2DUVAnimationFrame)
 
 class iSprite2DUVAnimation(iBase):
     __swig_setmethods__ = {}
@@ -5436,10 +4976,7 @@ class iSprite2DUVAnimation(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iSprite2DUVAnimation, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iSprite2DUVAnimation instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def SetName(*args): return _cspace.iSprite2DUVAnimation_SetName(*args)
     def GetName(*args): return _cspace.iSprite2DUVAnimation_GetName(*args)
     def GetFrameCount(*args): return _cspace.iSprite2DUVAnimation_GetFrameCount(*args)
@@ -5449,7 +4986,8 @@ class iSprite2DUVAnimation(iBase):
     def RemoveFrame(*args): return _cspace.iSprite2DUVAnimation_RemoveFrame(*args)
     __swig_destroy__ = _cspace.delete_iSprite2DUVAnimation
     __del__ = lambda self : None;
-_cspace.iSprite2DUVAnimation_swigregister(iSprite2DUVAnimation)
+iSprite2DUVAnimation_swigregister = _cspace.iSprite2DUVAnimation_swigregister
+iSprite2DUVAnimation_swigregister(iSprite2DUVAnimation)
 
 class iSprite2DFactoryState(iBase):
     __swig_setmethods__ = {}
@@ -5459,10 +4997,7 @@ class iSprite2DFactoryState(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iSprite2DFactoryState, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iSprite2DFactoryState instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def SetLighting(*args): return _cspace.iSprite2DFactoryState_SetLighting(*args)
     def HasLighting(*args): return _cspace.iSprite2DFactoryState_HasLighting(*args)
     def GetUVAnimationCount(*args): return _cspace.iSprite2DFactoryState_GetUVAnimationCount(*args)
@@ -5471,7 +5006,8 @@ class iSprite2DFactoryState(iBase):
     def GetUVAnimation(*args): return _cspace.iSprite2DFactoryState_GetUVAnimation(*args)
     __swig_destroy__ = _cspace.delete_iSprite2DFactoryState
     __del__ = lambda self : None;
-_cspace.iSprite2DFactoryState_swigregister(iSprite2DFactoryState)
+iSprite2DFactoryState_swigregister = _cspace.iSprite2DFactoryState_swigregister
+iSprite2DFactoryState_swigregister(iSprite2DFactoryState)
 
 class iSprite2DState(iSprite2DFactoryState):
     __swig_setmethods__ = {}
@@ -5481,10 +5017,7 @@ class iSprite2DState(iSprite2DFactoryState):
     for _s in [iSprite2DFactoryState]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iSprite2DState, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iSprite2DState instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def CreateRegularVertices(*args): return _cspace.iSprite2DState_CreateRegularVertices(*args)
     def SetUVAnimation(*args): return _cspace.iSprite2DState_SetUVAnimation(*args)
     def GetUVAnimation(*args): return _cspace.iSprite2DState_GetUVAnimation(*args)
@@ -5496,8 +5029,8 @@ class iSprite2DState(iSprite2DFactoryState):
     if _newclass:scfGetVersion = staticmethod(_cspace.iSprite2DState_scfGetVersion)
     def GetVertexByIndex(*args): return _cspace.iSprite2DState_GetVertexByIndex(*args)
     def GetVertexCount(*args): return _cspace.iSprite2DState_GetVertexCount(*args)
-_cspace.iSprite2DState_swigregister(iSprite2DState)
-
+iSprite2DState_swigregister = _cspace.iSprite2DState_swigregister
+iSprite2DState_swigregister(iSprite2DState)
 iSprite2DState_scfGetVersion = _cspace.iSprite2DState_scfGetVersion
 
 CS_SPR_LIGHTING_HQ = _cspace.CS_SPR_LIGHTING_HQ
@@ -5518,17 +5051,15 @@ class iSpriteFrame(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iSpriteFrame, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iSpriteFrame instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def SetName(*args): return _cspace.iSpriteFrame_SetName(*args)
     def GetName(*args): return _cspace.iSpriteFrame_GetName(*args)
     def GetAnmIndex(*args): return _cspace.iSpriteFrame_GetAnmIndex(*args)
     def GetTexIndex(*args): return _cspace.iSpriteFrame_GetTexIndex(*args)
     __swig_destroy__ = _cspace.delete_iSpriteFrame
     __del__ = lambda self : None;
-_cspace.iSpriteFrame_swigregister(iSpriteFrame)
+iSpriteFrame_swigregister = _cspace.iSpriteFrame_swigregister
+iSpriteFrame_swigregister(iSpriteFrame)
 
 class iSpriteAction(iBase):
     __swig_setmethods__ = {}
@@ -5538,10 +5069,7 @@ class iSpriteAction(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iSpriteAction, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iSpriteAction instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def SetName(*args): return _cspace.iSpriteAction_SetName(*args)
     def GetName(*args): return _cspace.iSpriteAction_GetName(*args)
     def GetFrameCount(*args): return _cspace.iSpriteAction_GetFrameCount(*args)
@@ -5552,7 +5080,8 @@ class iSpriteAction(iBase):
     def AddFrame(*args): return _cspace.iSpriteAction_AddFrame(*args)
     __swig_destroy__ = _cspace.delete_iSpriteAction
     __del__ = lambda self : None;
-_cspace.iSpriteAction_swigregister(iSpriteAction)
+iSpriteAction_swigregister = _cspace.iSpriteAction_swigregister
+iSpriteAction_swigregister(iSpriteAction)
 
 class iSpriteSocket(iBase):
     __swig_setmethods__ = {}
@@ -5562,10 +5091,7 @@ class iSpriteSocket(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iSpriteSocket, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iSpriteSocket instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def SetName(*args): return _cspace.iSpriteSocket_SetName(*args)
     def GetName(*args): return _cspace.iSpriteSocket_GetName(*args)
     def SetMeshWrapper(*args): return _cspace.iSpriteSocket_SetMeshWrapper(*args)
@@ -5574,7 +5100,8 @@ class iSpriteSocket(iBase):
     def GetTriangleIndex(*args): return _cspace.iSpriteSocket_GetTriangleIndex(*args)
     __swig_destroy__ = _cspace.delete_iSpriteSocket
     __del__ = lambda self : None;
-_cspace.iSpriteSocket_swigregister(iSpriteSocket)
+iSpriteSocket_swigregister = _cspace.iSpriteSocket_swigregister
+iSpriteSocket_swigregister(iSpriteSocket)
 
 class iSprite3DFactoryState(iBase):
     __swig_setmethods__ = {}
@@ -5584,10 +5111,7 @@ class iSprite3DFactoryState(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iSprite3DFactoryState, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iSprite3DFactoryState instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def AddVertices(*args): return _cspace.iSprite3DFactoryState_AddVertices(*args)
     def GetVertexCount(*args): return _cspace.iSprite3DFactoryState_GetVertexCount(*args)
     def GetVertex(*args): return _cspace.iSprite3DFactoryState_GetVertex(*args)
@@ -5632,7 +5156,8 @@ class iSprite3DFactoryState(iBase):
     def MergeNormals(*args): return _cspace.iSprite3DFactoryState_MergeNormals(*args)
     __swig_destroy__ = _cspace.delete_iSprite3DFactoryState
     __del__ = lambda self : None;
-_cspace.iSprite3DFactoryState_swigregister(iSprite3DFactoryState)
+iSprite3DFactoryState_swigregister = _cspace.iSprite3DFactoryState_swigregister
+iSprite3DFactoryState_swigregister(iSprite3DFactoryState)
 
 class iSprite3DState(iBase):
     __swig_setmethods__ = {}
@@ -5642,10 +5167,7 @@ class iSprite3DState(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iSprite3DState, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iSprite3DState instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def SetMixMode(*args): return _cspace.iSprite3DState_SetMixMode(*args)
     def GetMixMode(*args): return _cspace.iSprite3DState_GetMixMode(*args)
     def SetLighting(*args): return _cspace.iSprite3DState_SetLighting(*args)
@@ -5675,8 +5197,8 @@ class iSprite3DState(iBase):
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iSprite3DState_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iSprite3DState_scfGetVersion)
-_cspace.iSprite3DState_swigregister(iSprite3DState)
-
+iSprite3DState_swigregister = _cspace.iSprite3DState_swigregister
+iSprite3DState_swigregister(iSprite3DState)
 iSprite3DState_scfGetVersion = _cspace.iSprite3DState_scfGetVersion
 
 class iSpriteCal3DSocket(iSpriteSocket):
@@ -5687,10 +5209,7 @@ class iSpriteCal3DSocket(iSpriteSocket):
     for _s in [iSpriteSocket]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iSpriteCal3DSocket, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iSpriteCal3DSocket instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def SetSubmeshIndex(*args): return _cspace.iSpriteCal3DSocket_SetSubmeshIndex(*args)
     def GetSubmeshIndex(*args): return _cspace.iSpriteCal3DSocket_GetSubmeshIndex(*args)
     def SetMeshIndex(*args): return _cspace.iSpriteCal3DSocket_SetMeshIndex(*args)
@@ -5706,7 +5225,8 @@ class iSpriteCal3DSocket(iSpriteSocket):
     def FindSecondary(*args): return _cspace.iSpriteCal3DSocket_FindSecondary(*args)
     __swig_destroy__ = _cspace.delete_iSpriteCal3DSocket
     __del__ = lambda self : None;
-_cspace.iSpriteCal3DSocket_swigregister(iSpriteCal3DSocket)
+iSpriteCal3DSocket_swigregister = _cspace.iSpriteCal3DSocket_swigregister
+iSpriteCal3DSocket_swigregister(iSpriteCal3DSocket)
 
 class iSpriteCal3DFactoryState(iBase):
     __swig_setmethods__ = {}
@@ -5716,10 +5236,7 @@ class iSpriteCal3DFactoryState(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iSpriteCal3DFactoryState, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iSpriteCal3DFactoryState instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def Create(*args): return _cspace.iSpriteCal3DFactoryState_Create(*args)
     def ReportLastError(*args): return _cspace.iSpriteCal3DFactoryState_ReportLastError(*args)
     def SetLoadFlags(*args): return _cspace.iSpriteCal3DFactoryState_SetLoadFlags(*args)
@@ -5752,7 +5269,8 @@ class iSpriteCal3DFactoryState(iBase):
     def RemoveAnimCallback(*args): return _cspace.iSpriteCal3DFactoryState_RemoveAnimCallback(*args)
     __swig_destroy__ = _cspace.delete_iSpriteCal3DFactoryState
     __del__ = lambda self : None;
-_cspace.iSpriteCal3DFactoryState_swigregister(iSpriteCal3DFactoryState)
+iSpriteCal3DFactoryState_swigregister = _cspace.iSpriteCal3DFactoryState_swigregister
+iSpriteCal3DFactoryState_swigregister(iSpriteCal3DFactoryState)
 
 class iAnimTimeUpdateHandler(iBase):
     __swig_setmethods__ = {}
@@ -5762,37 +5280,33 @@ class iAnimTimeUpdateHandler(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iAnimTimeUpdateHandler, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iAnimTimeUpdateHandler instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def UpdatePosition(*args): return _cspace.iAnimTimeUpdateHandler_UpdatePosition(*args)
     __swig_destroy__ = _cspace.delete_iAnimTimeUpdateHandler
     __del__ = lambda self : None;
-_cspace.iAnimTimeUpdateHandler_swigregister(iAnimTimeUpdateHandler)
+iAnimTimeUpdateHandler_swigregister = _cspace.iAnimTimeUpdateHandler_swigregister
+iAnimTimeUpdateHandler_swigregister(iAnimTimeUpdateHandler)
 
 class csSpriteCal3DActiveAnim(_object):
     __swig_setmethods__ = {}
     __setattr__ = lambda self, name, value: _swig_setattr(self, csSpriteCal3DActiveAnim, name, value)
     __swig_getmethods__ = {}
     __getattr__ = lambda self, name: _swig_getattr(self, csSpriteCal3DActiveAnim, name)
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ csSpriteCal3DActiveAnim instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     __swig_setmethods__["index"] = _cspace.csSpriteCal3DActiveAnim_index_set
     __swig_getmethods__["index"] = _cspace.csSpriteCal3DActiveAnim_index_get
     if _newclass:index = property(_cspace.csSpriteCal3DActiveAnim_index_get, _cspace.csSpriteCal3DActiveAnim_index_set)
     __swig_setmethods__["weight"] = _cspace.csSpriteCal3DActiveAnim_weight_set
     __swig_getmethods__["weight"] = _cspace.csSpriteCal3DActiveAnim_weight_get
     if _newclass:weight = property(_cspace.csSpriteCal3DActiveAnim_weight_get, _cspace.csSpriteCal3DActiveAnim_weight_set)
-    def __init__(self, *args):
+    def __init__(self, *args): 
         this = _cspace.new_csSpriteCal3DActiveAnim(*args)
         try: self.this.append(this)
         except: self.this = this
     __swig_destroy__ = _cspace.delete_csSpriteCal3DActiveAnim
     __del__ = lambda self : None;
-_cspace.csSpriteCal3DActiveAnim_swigregister(csSpriteCal3DActiveAnim)
+csSpriteCal3DActiveAnim_swigregister = _cspace.csSpriteCal3DActiveAnim_swigregister
+csSpriteCal3DActiveAnim_swigregister(csSpriteCal3DActiveAnim)
 
 class iSpriteCal3DState(iBase):
     __swig_setmethods__ = {}
@@ -5802,10 +5316,7 @@ class iSpriteCal3DState(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iSpriteCal3DState, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iSpriteCal3DState instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     C3D_ANIM_TYPE_NONE = _cspace.iSpriteCal3DState_C3D_ANIM_TYPE_NONE
     C3D_ANIM_TYPE_IDLE = _cspace.iSpriteCal3DState_C3D_ANIM_TYPE_IDLE
     C3D_ANIM_TYPE_TRAVEL = _cspace.iSpriteCal3DState_C3D_ANIM_TYPE_TRAVEL
@@ -5846,8 +5357,8 @@ class iSpriteCal3DState(iBase):
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iSpriteCal3DState_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iSpriteCal3DState_scfGetVersion)
-_cspace.iSpriteCal3DState_swigregister(iSpriteCal3DState)
-
+iSpriteCal3DState_swigregister = _cspace.iSpriteCal3DState_swigregister
+iSpriteCal3DState_swigregister(iSpriteCal3DState)
 iSpriteCal3DState_scfGetVersion = _cspace.iSpriteCal3DState_scfGetVersion
 
 CS_MESH_STATICPOS = _cspace.CS_MESH_STATICPOS
@@ -5861,14 +5372,12 @@ class iMeshObjectDrawCallback(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iMeshObjectDrawCallback, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iMeshObjectDrawCallback instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def BeforeDrawing(*args): return _cspace.iMeshObjectDrawCallback_BeforeDrawing(*args)
     __swig_destroy__ = _cspace.delete_iMeshObjectDrawCallback
     __del__ = lambda self : None;
-_cspace.iMeshObjectDrawCallback_swigregister(iMeshObjectDrawCallback)
+iMeshObjectDrawCallback_swigregister = _cspace.iMeshObjectDrawCallback_swigregister
+iMeshObjectDrawCallback_swigregister(iMeshObjectDrawCallback)
 
 class iMeshObject(iBase):
     __swig_setmethods__ = {}
@@ -5878,10 +5387,7 @@ class iMeshObject(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iMeshObject, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iMeshObject instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def GetFactory(*args): return _cspace.iMeshObject_GetFactory(*args)
     def GetFlags(*args): return _cspace.iMeshObject_GetFlags(*args)
     def Clone(*args): return _cspace.iMeshObject_Clone(*args)
@@ -5908,8 +5414,8 @@ class iMeshObject(iBase):
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iMeshObject_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iMeshObject_scfGetVersion)
-_cspace.iMeshObject_swigregister(iMeshObject)
-
+iMeshObject_swigregister = _cspace.iMeshObject_swigregister
+iMeshObject_swigregister(iMeshObject)
 iMeshObject_scfGetVersion = _cspace.iMeshObject_scfGetVersion
 
 class iMeshObjectFactory(iBase):
@@ -5920,10 +5426,7 @@ class iMeshObjectFactory(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iMeshObjectFactory, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iMeshObjectFactory instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def GetFlags(*args): return _cspace.iMeshObjectFactory_GetFlags(*args)
     def NewInstance(*args): return _cspace.iMeshObjectFactory_NewInstance(*args)
     def Clone(*args): return _cspace.iMeshObjectFactory_Clone(*args)
@@ -5941,8 +5444,8 @@ class iMeshObjectFactory(iBase):
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iMeshObjectFactory_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iMeshObjectFactory_scfGetVersion)
-_cspace.iMeshObjectFactory_swigregister(iMeshObjectFactory)
-
+iMeshObjectFactory_swigregister = _cspace.iMeshObjectFactory_swigregister
+iMeshObjectFactory_swigregister(iMeshObjectFactory)
 iMeshObjectFactory_scfGetVersion = _cspace.iMeshObjectFactory_scfGetVersion
 
 class iMeshObjectType(iBase):
@@ -5953,17 +5456,14 @@ class iMeshObjectType(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iMeshObjectType, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iMeshObjectType instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def NewFactory(*args): return _cspace.iMeshObjectType_NewFactory(*args)
     __swig_destroy__ = _cspace.delete_iMeshObjectType
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iMeshObjectType_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iMeshObjectType_scfGetVersion)
-_cspace.iMeshObjectType_swigregister(iMeshObjectType)
-
+iMeshObjectType_swigregister = _cspace.iMeshObjectType_swigregister
+iMeshObjectType_swigregister(iMeshObjectType)
 iMeshObjectType_scfGetVersion = _cspace.iMeshObjectType_scfGetVersion
 
 class csPolygonRange(_object):
@@ -5971,24 +5471,22 @@ class csPolygonRange(_object):
     __setattr__ = lambda self, name, value: _swig_setattr(self, csPolygonRange, name, value)
     __swig_getmethods__ = {}
     __getattr__ = lambda self, name: _swig_getattr(self, csPolygonRange, name)
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ csPolygonRange instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     __swig_setmethods__["start"] = _cspace.csPolygonRange_start_set
     __swig_getmethods__["start"] = _cspace.csPolygonRange_start_get
     if _newclass:start = property(_cspace.csPolygonRange_start_get, _cspace.csPolygonRange_start_set)
     __swig_setmethods__["end"] = _cspace.csPolygonRange_end_set
     __swig_getmethods__["end"] = _cspace.csPolygonRange_end_get
     if _newclass:end = property(_cspace.csPolygonRange_end_get, _cspace.csPolygonRange_end_set)
-    def __init__(self, *args):
+    def __init__(self, *args): 
         this = _cspace.new_csPolygonRange(*args)
         try: self.this.append(this)
         except: self.this = this
     def Set(*args): return _cspace.csPolygonRange_Set(*args)
     __swig_destroy__ = _cspace.delete_csPolygonRange
     __del__ = lambda self : None;
-_cspace.csPolygonRange_swigregister(csPolygonRange)
+csPolygonRange_swigregister = _cspace.csPolygonRange_swigregister
+csPolygonRange_swigregister(csPolygonRange)
 
 CS_POLY_LIGHTING = _cspace.CS_POLY_LIGHTING
 CS_POLY_COLLDET = _cspace.CS_POLY_COLLDET
@@ -6005,10 +5503,7 @@ class iPolygonHandle(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iPolygonHandle, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iPolygonHandle instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def GetThingFactoryState(*args): return _cspace.iPolygonHandle_GetThingFactoryState(*args)
     def GetMeshObjectFactory(*args): return _cspace.iPolygonHandle_GetMeshObjectFactory(*args)
     def GetThingState(*args): return _cspace.iPolygonHandle_GetThingState(*args)
@@ -6016,7 +5511,8 @@ class iPolygonHandle(iBase):
     def GetIndex(*args): return _cspace.iPolygonHandle_GetIndex(*args)
     __swig_destroy__ = _cspace.delete_iPolygonHandle
     __del__ = lambda self : None;
-_cspace.iPolygonHandle_swigregister(iPolygonHandle)
+iPolygonHandle_swigregister = _cspace.iPolygonHandle_swigregister
+iPolygonHandle_swigregister(iPolygonHandle)
 
 class iThingFactoryState(iBase):
     __swig_setmethods__ = {}
@@ -6026,10 +5522,7 @@ class iThingFactoryState(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iThingFactoryState, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iThingFactoryState instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def CompressVertices(*args): return _cspace.iThingFactoryState_CompressVertices(*args)
     def GetPolygonCount(*args): return _cspace.iThingFactoryState_GetPolygonCount(*args)
     def RemovePolygon(*args): return _cspace.iThingFactoryState_RemovePolygon(*args)
@@ -6079,8 +5572,8 @@ class iThingFactoryState(iBase):
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iThingFactoryState_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iThingFactoryState_scfGetVersion)
-_cspace.iThingFactoryState_swigregister(iThingFactoryState)
-
+iThingFactoryState_swigregister = _cspace.iThingFactoryState_swigregister
+iThingFactoryState_swigregister(iThingFactoryState)
 iThingFactoryState_scfGetVersion = _cspace.iThingFactoryState_scfGetVersion
 
 class iThingState(iBase):
@@ -6091,10 +5584,7 @@ class iThingState(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iThingState, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iThingState instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def GetVertexW(*args): return _cspace.iThingState_GetVertexW(*args)
     def GetVerticesW(*args): return _cspace.iThingState_GetVerticesW(*args)
     def GetMovingOption(*args): return _cspace.iThingState_GetMovingOption(*args)
@@ -6114,8 +5604,8 @@ class iThingState(iBase):
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iThingState_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iThingState_scfGetVersion)
-_cspace.iThingState_swigregister(iThingState)
-
+iThingState_swigregister = _cspace.iThingState_swigregister
+iThingState_swigregister(iThingState)
 iThingState_scfGetVersion = _cspace.iThingState_scfGetVersion
 
 class iThingEnvironment(iBase):
@@ -6126,30 +5616,25 @@ class iThingEnvironment(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iThingEnvironment, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iThingEnvironment instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def Clear(*args): return _cspace.iThingEnvironment_Clear(*args)
     def GetLightmapCellSize(*args): return _cspace.iThingEnvironment_GetLightmapCellSize(*args)
     def SetLightmapCellSize(*args): return _cspace.iThingEnvironment_SetLightmapCellSize(*args)
     def GetDefaultLightmapCellSize(*args): return _cspace.iThingEnvironment_GetDefaultLightmapCellSize(*args)
     __swig_destroy__ = _cspace.delete_iThingEnvironment
     __del__ = lambda self : None;
-_cspace.iThingEnvironment_swigregister(iThingEnvironment)
+iThingEnvironment_swigregister = _cspace.iThingEnvironment_swigregister
+iThingEnvironment_swigregister(iThingEnvironment)
 
 class csCharArrayArray(_object):
     __swig_setmethods__ = {}
     __setattr__ = lambda self, name, value: _swig_setattr(self, csCharArrayArray, name, value)
     __swig_getmethods__ = {}
     __getattr__ = lambda self, name: _swig_getattr(self, csCharArrayArray, name)
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ csArray<csArray<char > > instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     __swig_destroy__ = _cspace.delete_csCharArrayArray
     __del__ = lambda self : None;
-    def __init__(self, *args):
+    def __init__(self, *args): 
         this = _cspace.new_csCharArrayArray(*args)
         try: self.this.append(this)
         except: self.this = this
@@ -6172,7 +5657,8 @@ class csCharArrayArray(_object):
     def __eq__(*args): return _cspace.csCharArrayArray___eq__(*args)
     def __ne__(*args): return _cspace.csCharArrayArray___ne__(*args)
     def GetAllocator(*args): return _cspace.csCharArrayArray_GetAllocator(*args)
-_cspace.csCharArrayArray_swigregister(csCharArrayArray)
+csCharArrayArray_swigregister = _cspace.csCharArrayArray_swigregister
+csCharArrayArray_swigregister(csCharArrayArray)
 
 class iTerrainObjectState(iBase):
     __swig_setmethods__ = {}
@@ -6182,10 +5668,7 @@ class iTerrainObjectState(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iTerrainObjectState, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iTerrainObjectState instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def SetMaterialPalette(*args): return _cspace.iTerrainObjectState_SetMaterialPalette(*args)
     def GetMaterialPalette(*args): return _cspace.iTerrainObjectState_GetMaterialPalette(*args)
     def SetMaterialMap(*args): return _cspace.iTerrainObjectState_SetMaterialMap(*args)
@@ -6205,8 +5688,8 @@ class iTerrainObjectState(iBase):
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iTerrainObjectState_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iTerrainObjectState_scfGetVersion)
-_cspace.iTerrainObjectState_swigregister(iTerrainObjectState)
-
+iTerrainObjectState_swigregister = _cspace.iTerrainObjectState_swigregister
+iTerrainObjectState_swigregister(iTerrainObjectState)
 iTerrainObjectState_scfGetVersion = _cspace.iTerrainObjectState_scfGetVersion
 
 class iTerrainFactoryState(iBase):
@@ -6217,10 +5700,7 @@ class iTerrainFactoryState(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iTerrainFactoryState, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iTerrainFactoryState instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def SetTerraFormer(*args): return _cspace.iTerrainFactoryState_SetTerraFormer(*args)
     def GetTerraFormer(*args): return _cspace.iTerrainFactoryState_GetTerraFormer(*args)
     def SetSamplerRegion(*args): return _cspace.iTerrainFactoryState_SetSamplerRegion(*args)
@@ -6231,8 +5711,8 @@ class iTerrainFactoryState(iBase):
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iTerrainFactoryState_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iTerrainFactoryState_scfGetVersion)
-_cspace.iTerrainFactoryState_swigregister(iTerrainFactoryState)
-
+iTerrainFactoryState_swigregister = _cspace.iTerrainFactoryState_swigregister
+iTerrainFactoryState_swigregister(iTerrainFactoryState)
 iTerrainFactoryState_scfGetVersion = _cspace.iTerrainFactoryState_scfGetVersion
 
 CS_PARTICLE_SORT_NONE = _cspace.CS_PARTICLE_SORT_NONE
@@ -6259,10 +5739,7 @@ class csParticle(_object):
     __setattr__ = lambda self, name, value: _swig_setattr(self, csParticle, name, value)
     __swig_getmethods__ = {}
     __getattr__ = lambda self, name: _swig_getattr(self, csParticle, name)
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ csParticle instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     __swig_setmethods__["position"] = _cspace.csParticle_position_set
     __swig_getmethods__["position"] = _cspace.csParticle_position_get
     if _newclass:position = property(_cspace.csParticle_position_get, _cspace.csParticle_position_set)
@@ -6284,23 +5761,21 @@ class csParticle(_object):
     __swig_setmethods__["pad"] = _cspace.csParticle_pad_set
     __swig_getmethods__["pad"] = _cspace.csParticle_pad_get
     if _newclass:pad = property(_cspace.csParticle_pad_get, _cspace.csParticle_pad_set)
-    def __init__(self, *args):
+    def __init__(self, *args): 
         this = _cspace.new_csParticle(*args)
         try: self.this.append(this)
         except: self.this = this
     __swig_destroy__ = _cspace.delete_csParticle
     __del__ = lambda self : None;
-_cspace.csParticle_swigregister(csParticle)
+csParticle_swigregister = _cspace.csParticle_swigregister
+csParticle_swigregister(csParticle)
 
 class csParticleAux(_object):
     __swig_setmethods__ = {}
     __setattr__ = lambda self, name, value: _swig_setattr(self, csParticleAux, name, value)
     __swig_getmethods__ = {}
     __getattr__ = lambda self, name: _swig_getattr(self, csParticleAux, name)
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ csParticleAux instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     __swig_setmethods__["color"] = _cspace.csParticleAux_color_set
     __swig_getmethods__["color"] = _cspace.csParticleAux_color_get
     if _newclass:color = property(_cspace.csParticleAux_color_get, _cspace.csParticleAux_color_set)
@@ -6310,23 +5785,21 @@ class csParticleAux(_object):
     __swig_setmethods__["pad"] = _cspace.csParticleAux_pad_set
     __swig_getmethods__["pad"] = _cspace.csParticleAux_pad_get
     if _newclass:pad = property(_cspace.csParticleAux_pad_get, _cspace.csParticleAux_pad_set)
-    def __init__(self, *args):
+    def __init__(self, *args): 
         this = _cspace.new_csParticleAux(*args)
         try: self.this.append(this)
         except: self.this = this
     __swig_destroy__ = _cspace.delete_csParticleAux
     __del__ = lambda self : None;
-_cspace.csParticleAux_swigregister(csParticleAux)
+csParticleAux_swigregister = _cspace.csParticleAux_swigregister
+csParticleAux_swigregister(csParticleAux)
 
 class csParticleBuffer(_object):
     __swig_setmethods__ = {}
     __setattr__ = lambda self, name, value: _swig_setattr(self, csParticleBuffer, name, value)
     __swig_getmethods__ = {}
     __getattr__ = lambda self, name: _swig_getattr(self, csParticleBuffer, name)
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ csParticleBuffer instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     __swig_setmethods__["particleData"] = _cspace.csParticleBuffer_particleData_set
     __swig_getmethods__["particleData"] = _cspace.csParticleBuffer_particleData_get
     if _newclass:particleData = property(_cspace.csParticleBuffer_particleData_get, _cspace.csParticleBuffer_particleData_set)
@@ -6336,13 +5809,14 @@ class csParticleBuffer(_object):
     __swig_setmethods__["particleCount"] = _cspace.csParticleBuffer_particleCount_set
     __swig_getmethods__["particleCount"] = _cspace.csParticleBuffer_particleCount_get
     if _newclass:particleCount = property(_cspace.csParticleBuffer_particleCount_get, _cspace.csParticleBuffer_particleCount_set)
-    def __init__(self, *args):
+    def __init__(self, *args): 
         this = _cspace.new_csParticleBuffer(*args)
         try: self.this.append(this)
         except: self.this = this
     __swig_destroy__ = _cspace.delete_csParticleBuffer
     __del__ = lambda self : None;
-_cspace.csParticleBuffer_swigregister(csParticleBuffer)
+csParticleBuffer_swigregister = _cspace.csParticleBuffer_swigregister
+csParticleBuffer_swigregister(csParticleBuffer)
 
 class iParticleEmitter(iBase):
     __swig_setmethods__ = {}
@@ -6352,10 +5826,7 @@ class iParticleEmitter(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iParticleEmitter, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iParticleEmitter instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def SetEnabled(*args): return _cspace.iParticleEmitter_SetEnabled(*args)
     def GetEnabled(*args): return _cspace.iParticleEmitter_GetEnabled(*args)
     def SetStartTime(*args): return _cspace.iParticleEmitter_SetStartTime(*args)
@@ -6375,8 +5846,8 @@ class iParticleEmitter(iBase):
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iParticleEmitter_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iParticleEmitter_scfGetVersion)
-_cspace.iParticleEmitter_swigregister(iParticleEmitter)
-
+iParticleEmitter_swigregister = _cspace.iParticleEmitter_swigregister
+iParticleEmitter_swigregister(iParticleEmitter)
 iParticleEmitter_scfGetVersion = _cspace.iParticleEmitter_scfGetVersion
 
 class iParticleEffector(iBase):
@@ -6387,18 +5858,15 @@ class iParticleEffector(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iParticleEffector, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iParticleEffector instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def Clone(*args): return _cspace.iParticleEffector_Clone(*args)
     def EffectParticles(*args): return _cspace.iParticleEffector_EffectParticles(*args)
     __swig_destroy__ = _cspace.delete_iParticleEffector
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iParticleEffector_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iParticleEffector_scfGetVersion)
-_cspace.iParticleEffector_swigregister(iParticleEffector)
-
+iParticleEffector_swigregister = _cspace.iParticleEffector_swigregister
+iParticleEffector_swigregister(iParticleEffector)
 iParticleEffector_scfGetVersion = _cspace.iParticleEffector_scfGetVersion
 
 class iParticleSystemBase(iBase):
@@ -6409,10 +5877,7 @@ class iParticleSystemBase(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iParticleSystemBase, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iParticleSystemBase instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def SetParticleRenderOrientation(*args): return _cspace.iParticleSystemBase_SetParticleRenderOrientation(*args)
     def GetParticleRenderOrientation(*args): return _cspace.iParticleSystemBase_GetParticleRenderOrientation(*args)
     def SetRotationMode(*args): return _cspace.iParticleSystemBase_SetRotationMode(*args)
@@ -6443,8 +5908,8 @@ class iParticleSystemBase(iBase):
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iParticleSystemBase_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iParticleSystemBase_scfGetVersion)
-_cspace.iParticleSystemBase_swigregister(iParticleSystemBase)
-
+iParticleSystemBase_swigregister = _cspace.iParticleSystemBase_swigregister
+iParticleSystemBase_swigregister(iParticleSystemBase)
 iParticleSystemBase_scfGetVersion = _cspace.iParticleSystemBase_scfGetVersion
 
 class iParticleSystemFactory(iParticleSystemBase):
@@ -6455,18 +5920,15 @@ class iParticleSystemFactory(iParticleSystemBase):
     for _s in [iParticleSystemBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iParticleSystemFactory, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iParticleSystemFactory instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def SetDeepCreation(*args): return _cspace.iParticleSystemFactory_SetDeepCreation(*args)
     def GetDeepCreation(*args): return _cspace.iParticleSystemFactory_GetDeepCreation(*args)
     __swig_destroy__ = _cspace.delete_iParticleSystemFactory
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iParticleSystemFactory_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iParticleSystemFactory_scfGetVersion)
-_cspace.iParticleSystemFactory_swigregister(iParticleSystemFactory)
-
+iParticleSystemFactory_swigregister = _cspace.iParticleSystemFactory_swigregister
+iParticleSystemFactory_swigregister(iParticleSystemFactory)
 iParticleSystemFactory_scfGetVersion = _cspace.iParticleSystemFactory_scfGetVersion
 
 class iParticleSystem(iParticleSystemBase):
@@ -6477,10 +5939,7 @@ class iParticleSystem(iParticleSystemBase):
     for _s in [iParticleSystemBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iParticleSystem, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iParticleSystem instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def GetParticleCount(*args): return _cspace.iParticleSystem_GetParticleCount(*args)
     def GetParticle(*args): return _cspace.iParticleSystem_GetParticle(*args)
     def GetParticleAux(*args): return _cspace.iParticleSystem_GetParticleAux(*args)
@@ -6489,8 +5948,8 @@ class iParticleSystem(iParticleSystemBase):
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iParticleSystem_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iParticleSystem_scfGetVersion)
-_cspace.iParticleSystem_swigregister(iParticleSystem)
-
+iParticleSystem_swigregister = _cspace.iParticleSystem_swigregister
+iParticleSystem_swigregister(iParticleSystem)
 iParticleSystem_scfGetVersion = _cspace.iParticleSystem_scfGetVersion
 
 CS_PARTICLE_BUILTIN_CENTER = _cspace.CS_PARTICLE_BUILTIN_CENTER
@@ -6504,10 +5963,7 @@ class iParticleBuiltinEmitterBase(iParticleEmitter):
     for _s in [iParticleEmitter]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iParticleBuiltinEmitterBase, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iParticleBuiltinEmitterBase instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def SetPosition(*args): return _cspace.iParticleBuiltinEmitterBase_SetPosition(*args)
     def GetPosition(*args): return _cspace.iParticleBuiltinEmitterBase_GetPosition(*args)
     def SetParticlePlacement(*args): return _cspace.iParticleBuiltinEmitterBase_SetParticlePlacement(*args)
@@ -6520,8 +5976,8 @@ class iParticleBuiltinEmitterBase(iParticleEmitter):
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iParticleBuiltinEmitterBase_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iParticleBuiltinEmitterBase_scfGetVersion)
-_cspace.iParticleBuiltinEmitterBase_swigregister(iParticleBuiltinEmitterBase)
-
+iParticleBuiltinEmitterBase_swigregister = _cspace.iParticleBuiltinEmitterBase_swigregister
+iParticleBuiltinEmitterBase_swigregister(iParticleBuiltinEmitterBase)
 iParticleBuiltinEmitterBase_scfGetVersion = _cspace.iParticleBuiltinEmitterBase_scfGetVersion
 
 class iParticleBuiltinEmitterSphere(iParticleBuiltinEmitterBase):
@@ -6532,18 +5988,15 @@ class iParticleBuiltinEmitterSphere(iParticleBuiltinEmitterBase):
     for _s in [iParticleBuiltinEmitterBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iParticleBuiltinEmitterSphere, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iParticleBuiltinEmitterSphere instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def SetRadius(*args): return _cspace.iParticleBuiltinEmitterSphere_SetRadius(*args)
     def GetRadius(*args): return _cspace.iParticleBuiltinEmitterSphere_GetRadius(*args)
     __swig_destroy__ = _cspace.delete_iParticleBuiltinEmitterSphere
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iParticleBuiltinEmitterSphere_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iParticleBuiltinEmitterSphere_scfGetVersion)
-_cspace.iParticleBuiltinEmitterSphere_swigregister(iParticleBuiltinEmitterSphere)
-
+iParticleBuiltinEmitterSphere_swigregister = _cspace.iParticleBuiltinEmitterSphere_swigregister
+iParticleBuiltinEmitterSphere_swigregister(iParticleBuiltinEmitterSphere)
 iParticleBuiltinEmitterSphere_scfGetVersion = _cspace.iParticleBuiltinEmitterSphere_scfGetVersion
 
 class iParticleBuiltinEmitterCone(iParticleBuiltinEmitterBase):
@@ -6554,10 +6007,7 @@ class iParticleBuiltinEmitterCone(iParticleBuiltinEmitterBase):
     for _s in [iParticleBuiltinEmitterBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iParticleBuiltinEmitterCone, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iParticleBuiltinEmitterCone instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def SetExtent(*args): return _cspace.iParticleBuiltinEmitterCone_SetExtent(*args)
     def GetExtent(*args): return _cspace.iParticleBuiltinEmitterCone_GetExtent(*args)
     def SetConeAngle(*args): return _cspace.iParticleBuiltinEmitterCone_SetConeAngle(*args)
@@ -6566,8 +6016,8 @@ class iParticleBuiltinEmitterCone(iParticleBuiltinEmitterBase):
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iParticleBuiltinEmitterCone_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iParticleBuiltinEmitterCone_scfGetVersion)
-_cspace.iParticleBuiltinEmitterCone_swigregister(iParticleBuiltinEmitterCone)
-
+iParticleBuiltinEmitterCone_swigregister = _cspace.iParticleBuiltinEmitterCone_swigregister
+iParticleBuiltinEmitterCone_swigregister(iParticleBuiltinEmitterCone)
 iParticleBuiltinEmitterCone_scfGetVersion = _cspace.iParticleBuiltinEmitterCone_scfGetVersion
 
 class iParticleBuiltinEmitterBox(iParticleBuiltinEmitterBase):
@@ -6578,18 +6028,15 @@ class iParticleBuiltinEmitterBox(iParticleBuiltinEmitterBase):
     for _s in [iParticleBuiltinEmitterBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iParticleBuiltinEmitterBox, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iParticleBuiltinEmitterBox instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def SetBox(*args): return _cspace.iParticleBuiltinEmitterBox_SetBox(*args)
     def GetBox(*args): return _cspace.iParticleBuiltinEmitterBox_GetBox(*args)
     __swig_destroy__ = _cspace.delete_iParticleBuiltinEmitterBox
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iParticleBuiltinEmitterBox_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iParticleBuiltinEmitterBox_scfGetVersion)
-_cspace.iParticleBuiltinEmitterBox_swigregister(iParticleBuiltinEmitterBox)
-
+iParticleBuiltinEmitterBox_swigregister = _cspace.iParticleBuiltinEmitterBox_swigregister
+iParticleBuiltinEmitterBox_swigregister(iParticleBuiltinEmitterBox)
 iParticleBuiltinEmitterBox_scfGetVersion = _cspace.iParticleBuiltinEmitterBox_scfGetVersion
 
 class iParticleBuiltinEmitterCylinder(iParticleBuiltinEmitterBase):
@@ -6600,10 +6047,7 @@ class iParticleBuiltinEmitterCylinder(iParticleBuiltinEmitterBase):
     for _s in [iParticleBuiltinEmitterBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iParticleBuiltinEmitterCylinder, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iParticleBuiltinEmitterCylinder instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def SetRadius(*args): return _cspace.iParticleBuiltinEmitterCylinder_SetRadius(*args)
     def GetRadius(*args): return _cspace.iParticleBuiltinEmitterCylinder_GetRadius(*args)
     def SetExtent(*args): return _cspace.iParticleBuiltinEmitterCylinder_SetExtent(*args)
@@ -6612,8 +6056,8 @@ class iParticleBuiltinEmitterCylinder(iParticleBuiltinEmitterBase):
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iParticleBuiltinEmitterCylinder_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iParticleBuiltinEmitterCylinder_scfGetVersion)
-_cspace.iParticleBuiltinEmitterCylinder_swigregister(iParticleBuiltinEmitterCylinder)
-
+iParticleBuiltinEmitterCylinder_swigregister = _cspace.iParticleBuiltinEmitterCylinder_swigregister
+iParticleBuiltinEmitterCylinder_swigregister(iParticleBuiltinEmitterCylinder)
 iParticleBuiltinEmitterCylinder_scfGetVersion = _cspace.iParticleBuiltinEmitterCylinder_scfGetVersion
 
 class iParticleBuiltinEmitterFactory(iBase):
@@ -6624,10 +6068,7 @@ class iParticleBuiltinEmitterFactory(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iParticleBuiltinEmitterFactory, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iParticleBuiltinEmitterFactory instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def CreateSphere(*args): return _cspace.iParticleBuiltinEmitterFactory_CreateSphere(*args)
     def CreateCone(*args): return _cspace.iParticleBuiltinEmitterFactory_CreateCone(*args)
     def CreateBox(*args): return _cspace.iParticleBuiltinEmitterFactory_CreateBox(*args)
@@ -6636,8 +6077,8 @@ class iParticleBuiltinEmitterFactory(iBase):
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iParticleBuiltinEmitterFactory_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iParticleBuiltinEmitterFactory_scfGetVersion)
-_cspace.iParticleBuiltinEmitterFactory_swigregister(iParticleBuiltinEmitterFactory)
-
+iParticleBuiltinEmitterFactory_swigregister = _cspace.iParticleBuiltinEmitterFactory_swigregister
+iParticleBuiltinEmitterFactory_swigregister(iParticleBuiltinEmitterFactory)
 iParticleBuiltinEmitterFactory_scfGetVersion = _cspace.iParticleBuiltinEmitterFactory_scfGetVersion
 
 class iParticleBuiltinEffectorForce(iParticleEffector):
@@ -6648,10 +6089,7 @@ class iParticleBuiltinEffectorForce(iParticleEffector):
     for _s in [iParticleEffector]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iParticleBuiltinEffectorForce, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iParticleBuiltinEffectorForce instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def SetAcceleration(*args): return _cspace.iParticleBuiltinEffectorForce_SetAcceleration(*args)
     def GetAcceleration(*args): return _cspace.iParticleBuiltinEffectorForce_GetAcceleration(*args)
     def SetForce(*args): return _cspace.iParticleBuiltinEffectorForce_SetForce(*args)
@@ -6662,8 +6100,8 @@ class iParticleBuiltinEffectorForce(iParticleEffector):
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iParticleBuiltinEffectorForce_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iParticleBuiltinEffectorForce_scfGetVersion)
-_cspace.iParticleBuiltinEffectorForce_swigregister(iParticleBuiltinEffectorForce)
-
+iParticleBuiltinEffectorForce_swigregister = _cspace.iParticleBuiltinEffectorForce_swigregister
+iParticleBuiltinEffectorForce_swigregister(iParticleBuiltinEffectorForce)
 iParticleBuiltinEffectorForce_scfGetVersion = _cspace.iParticleBuiltinEffectorForce_scfGetVersion
 
 class iParticleBuiltinEffectorLinColor(iParticleEffector):
@@ -6674,10 +6112,7 @@ class iParticleBuiltinEffectorLinColor(iParticleEffector):
     for _s in [iParticleEffector]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iParticleBuiltinEffectorLinColor, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iParticleBuiltinEffectorLinColor instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def AddColor(*args): return _cspace.iParticleBuiltinEffectorLinColor_AddColor(*args)
     def SetColor(*args): return _cspace.iParticleBuiltinEffectorLinColor_SetColor(*args)
     def GetColor(*args): return _cspace.iParticleBuiltinEffectorLinColor_GetColor(*args)
@@ -6686,8 +6121,8 @@ class iParticleBuiltinEffectorLinColor(iParticleEffector):
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iParticleBuiltinEffectorLinColor_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iParticleBuiltinEffectorLinColor_scfGetVersion)
-_cspace.iParticleBuiltinEffectorLinColor_swigregister(iParticleBuiltinEffectorLinColor)
-
+iParticleBuiltinEffectorLinColor_swigregister = _cspace.iParticleBuiltinEffectorLinColor_swigregister
+iParticleBuiltinEffectorLinColor_swigregister(iParticleBuiltinEffectorLinColor)
 iParticleBuiltinEffectorLinColor_scfGetVersion = _cspace.iParticleBuiltinEffectorLinColor_scfGetVersion
 
 class iParticleBuiltinEffectorFactory(iBase):
@@ -6698,18 +6133,15 @@ class iParticleBuiltinEffectorFactory(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iParticleBuiltinEffectorFactory, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iParticleBuiltinEffectorFactory instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def CreateForce(*args): return _cspace.iParticleBuiltinEffectorFactory_CreateForce(*args)
     def CreateLinColor(*args): return _cspace.iParticleBuiltinEffectorFactory_CreateLinColor(*args)
     __swig_destroy__ = _cspace.delete_iParticleBuiltinEffectorFactory
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iParticleBuiltinEffectorFactory_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iParticleBuiltinEffectorFactory_scfGetVersion)
-_cspace.iParticleBuiltinEffectorFactory_swigregister(iParticleBuiltinEffectorFactory)
-
+iParticleBuiltinEffectorFactory_swigregister = _cspace.iParticleBuiltinEffectorFactory_swigregister
+iParticleBuiltinEffectorFactory_swigregister(iParticleBuiltinEffectorFactory)
 iParticleBuiltinEffectorFactory_scfGetVersion = _cspace.iParticleBuiltinEffectorFactory_scfGetVersion
 
 class iLoaderStatus(iBase):
@@ -6720,15 +6152,13 @@ class iLoaderStatus(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iLoaderStatus, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iLoaderStatus instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def IsReady(*args): return _cspace.iLoaderStatus_IsReady(*args)
     def IsError(*args): return _cspace.iLoaderStatus_IsError(*args)
     __swig_destroy__ = _cspace.delete_iLoaderStatus
     __del__ = lambda self : None;
-_cspace.iLoaderStatus_swigregister(iLoaderStatus)
+iLoaderStatus_swigregister = _cspace.iLoaderStatus_swigregister
+iLoaderStatus_swigregister(iLoaderStatus)
 
 class iMissingLoaderData(iBase):
     __swig_setmethods__ = {}
@@ -6738,10 +6168,7 @@ class iMissingLoaderData(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iMissingLoaderData, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iMissingLoaderData instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def MissingMaterial(*args): return _cspace.iMissingLoaderData_MissingMaterial(*args)
     def MissingTexture(*args): return _cspace.iMissingLoaderData_MissingTexture(*args)
     def MissingShader(*args): return _cspace.iMissingLoaderData_MissingShader(*args)
@@ -6751,7 +6178,8 @@ class iMissingLoaderData(iBase):
     def MissingLight(*args): return _cspace.iMissingLoaderData_MissingLight(*args)
     __swig_destroy__ = _cspace.delete_iMissingLoaderData
     __del__ = lambda self : None;
-_cspace.iMissingLoaderData_swigregister(iMissingLoaderData)
+iMissingLoaderData_swigregister = _cspace.iMissingLoaderData_swigregister
+iMissingLoaderData_swigregister(iMissingLoaderData)
 
 class iLoader(iBase):
     __swig_setmethods__ = {}
@@ -6761,10 +6189,7 @@ class iLoader(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iLoader, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iLoader instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def LoadImage(*args): return _cspace.iLoader_LoadImage(*args)
     def LoadTexture(*args): return _cspace.iLoader_LoadTexture(*args)
     def LoadSoundSysData(*args): return _cspace.iLoader_LoadSoundSysData(*args)
@@ -6785,8 +6210,8 @@ class iLoader(iBase):
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iLoader_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iLoader_scfGetVersion)
-_cspace.iLoader_swigregister(iLoader)
-
+iLoader_swigregister = _cspace.iLoader_swigregister
+iLoader_swigregister(iLoader)
 iLoader_scfGetVersion = _cspace.iLoader_scfGetVersion
 
 class iLoaderPlugin(iBase):
@@ -6797,17 +6222,14 @@ class iLoaderPlugin(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iLoaderPlugin, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iLoaderPlugin instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def Parse(*args): return _cspace.iLoaderPlugin_Parse(*args)
     __swig_destroy__ = _cspace.delete_iLoaderPlugin
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iLoaderPlugin_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iLoaderPlugin_scfGetVersion)
-_cspace.iLoaderPlugin_swigregister(iLoaderPlugin)
-
+iLoaderPlugin_swigregister = _cspace.iLoaderPlugin_swigregister
+iLoaderPlugin_swigregister(iLoaderPlugin)
 iLoaderPlugin_scfGetVersion = _cspace.iLoaderPlugin_scfGetVersion
 
 class iBinaryLoaderPlugin(iBase):
@@ -6818,17 +6240,14 @@ class iBinaryLoaderPlugin(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iBinaryLoaderPlugin, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iBinaryLoaderPlugin instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def Parse(*args): return _cspace.iBinaryLoaderPlugin_Parse(*args)
     __swig_destroy__ = _cspace.delete_iBinaryLoaderPlugin
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iBinaryLoaderPlugin_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iBinaryLoaderPlugin_scfGetVersion)
-_cspace.iBinaryLoaderPlugin_swigregister(iBinaryLoaderPlugin)
-
+iBinaryLoaderPlugin_swigregister = _cspace.iBinaryLoaderPlugin_swigregister
+iBinaryLoaderPlugin_swigregister(iBinaryLoaderPlugin)
 iBinaryLoaderPlugin_scfGetVersion = _cspace.iBinaryLoaderPlugin_scfGetVersion
 
 class iSaver(iBase):
@@ -6839,10 +6258,7 @@ class iSaver(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iSaver, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iSaver instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def SaveMapFile(*args): return _cspace.iSaver_SaveMapFile(*args)
     def SaveAllRegions(*args): return _cspace.iSaver_SaveAllRegions(*args)
     def SaveRegionFile(*args): return _cspace.iSaver_SaveRegionFile(*args)
@@ -6850,7 +6266,8 @@ class iSaver(iBase):
     def SavePortal(*args): return _cspace.iSaver_SavePortal(*args)
     __swig_destroy__ = _cspace.delete_iSaver
     __del__ = lambda self : None;
-_cspace.iSaver_swigregister(iSaver)
+iSaver_swigregister = _cspace.iSaver_swigregister
+iSaver_swigregister(iSaver)
 
 CS_SNDSYS_DATA_UNKNOWN_SIZE = _cspace.CS_SNDSYS_DATA_UNKNOWN_SIZE
 class iSndSysData(iBase):
@@ -6861,10 +6278,7 @@ class iSndSysData(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iSndSysData, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iSndSysData instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def GetFormat(*args): return _cspace.iSndSysData_GetFormat(*args)
     def GetFrameCount(*args): return _cspace.iSndSysData_GetFrameCount(*args)
     def GetDataSize(*args): return _cspace.iSndSysData_GetDataSize(*args)
@@ -6875,8 +6289,8 @@ class iSndSysData(iBase):
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iSndSysData_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iSndSysData_scfGetVersion)
-_cspace.iSndSysData_swigregister(iSndSysData)
-
+iSndSysData_swigregister = _cspace.iSndSysData_swigregister
+iSndSysData_swigregister(iSndSysData)
 iSndSysData_scfGetVersion = _cspace.iSndSysData_scfGetVersion
 
 class iSndSysSoftwareFilter3DProperties(_object):
@@ -6884,10 +6298,7 @@ class iSndSysSoftwareFilter3DProperties(_object):
     __setattr__ = lambda self, name, value: _swig_setattr(self, iSndSysSoftwareFilter3DProperties, name, value)
     __swig_getmethods__ = {}
     __getattr__ = lambda self, name: _swig_getattr(self, iSndSysSoftwareFilter3DProperties, name)
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iSndSysSoftwareFilter3DProperties instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     __swig_setmethods__["clean_buffer"] = _cspace.iSndSysSoftwareFilter3DProperties_clean_buffer_set
     __swig_getmethods__["clean_buffer"] = _cspace.iSndSysSoftwareFilter3DProperties_clean_buffer_get
     if _newclass:clean_buffer = property(_cspace.iSndSysSoftwareFilter3DProperties_clean_buffer_get, _cspace.iSndSysSoftwareFilter3DProperties_clean_buffer_set)
@@ -6918,13 +6329,14 @@ class iSndSysSoftwareFilter3DProperties(_object):
     __swig_setmethods__["channel"] = _cspace.iSndSysSoftwareFilter3DProperties_channel_set
     __swig_getmethods__["channel"] = _cspace.iSndSysSoftwareFilter3DProperties_channel_get
     if _newclass:channel = property(_cspace.iSndSysSoftwareFilter3DProperties_channel_get, _cspace.iSndSysSoftwareFilter3DProperties_channel_set)
-    def __init__(self, *args):
+    def __init__(self, *args): 
         this = _cspace.new_iSndSysSoftwareFilter3DProperties(*args)
         try: self.this.append(this)
         except: self.this = this
     __swig_destroy__ = _cspace.delete_iSndSysSoftwareFilter3DProperties
     __del__ = lambda self : None;
-_cspace.iSndSysSoftwareFilter3DProperties_swigregister(iSndSysSoftwareFilter3DProperties)
+iSndSysSoftwareFilter3DProperties_swigregister = _cspace.iSndSysSoftwareFilter3DProperties_swigregister
+iSndSysSoftwareFilter3DProperties_swigregister(iSndSysSoftwareFilter3DProperties)
 
 class iSndSysSoftwareFilter3D(iBase):
     __swig_setmethods__ = {}
@@ -6934,10 +6346,7 @@ class iSndSysSoftwareFilter3D(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iSndSysSoftwareFilter3D, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iSndSysSoftwareFilter3D instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def Apply(*args): return _cspace.iSndSysSoftwareFilter3D_Apply(*args)
     def AddSubFilter(*args): return _cspace.iSndSysSoftwareFilter3D_AddSubFilter(*args)
     def GetSubFilter(*args): return _cspace.iSndSysSoftwareFilter3D_GetSubFilter(*args)
@@ -6946,8 +6355,8 @@ class iSndSysSoftwareFilter3D(iBase):
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iSndSysSoftwareFilter3D_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iSndSysSoftwareFilter3D_scfGetVersion)
-_cspace.iSndSysSoftwareFilter3D_swigregister(iSndSysSoftwareFilter3D)
-
+iSndSysSoftwareFilter3D_swigregister = _cspace.iSndSysSoftwareFilter3D_swigregister
+iSndSysSoftwareFilter3D_swigregister(iSndSysSoftwareFilter3D)
 iSndSysSoftwareFilter3D_scfGetVersion = _cspace.iSndSysSoftwareFilter3D_scfGetVersion
 
 class iSndSysSoftwareOutputFilter(iBase):
@@ -6958,15 +6367,13 @@ class iSndSysSoftwareOutputFilter(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iSndSysSoftwareOutputFilter, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iSndSysSoftwareOutputFilter instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def FormatNotify(*args): return _cspace.iSndSysSoftwareOutputFilter_FormatNotify(*args)
     def DeliverData(*args): return _cspace.iSndSysSoftwareOutputFilter_DeliverData(*args)
     __swig_destroy__ = _cspace.delete_iSndSysSoftwareOutputFilter
     __del__ = lambda self : None;
-_cspace.iSndSysSoftwareOutputFilter_swigregister(iSndSysSoftwareOutputFilter)
+iSndSysSoftwareOutputFilter_swigregister = _cspace.iSndSysSoftwareOutputFilter_swigregister
+iSndSysSoftwareOutputFilter_swigregister(iSndSysSoftwareOutputFilter)
 
 SS_FILTER_LOC_RENDEROUT = _cspace.SS_FILTER_LOC_RENDEROUT
 SS_FILTER_LOC_SOURCEOUT = _cspace.SS_FILTER_LOC_SOURCEOUT
@@ -6979,10 +6386,7 @@ class iSndSysListener(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iSndSysListener, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iSndSysListener instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def SetDirection(*args): return _cspace.iSndSysListener_SetDirection(*args)
     def SetPosition(*args): return _cspace.iSndSysListener_SetPosition(*args)
     def SetDistanceFactor(*args): return _cspace.iSndSysListener_SetDistanceFactor(*args)
@@ -6995,8 +6399,8 @@ class iSndSysListener(iBase):
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iSndSysListener_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iSndSysListener_scfGetVersion)
-_cspace.iSndSysListener_swigregister(iSndSysListener)
-
+iSndSysListener_swigregister = _cspace.iSndSysListener_swigregister
+iSndSysListener_swigregister(iSndSysListener)
 iSndSysListener_scfGetVersion = _cspace.iSndSysListener_scfGetVersion
 
 class iSndSysLoader(iBase):
@@ -7007,17 +6411,14 @@ class iSndSysLoader(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iSndSysLoader, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iSndSysLoader instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def LoadSound(*args): return _cspace.iSndSysLoader_LoadSound(*args)
     __swig_destroy__ = _cspace.delete_iSndSysLoader
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iSndSysLoader_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iSndSysLoader_scfGetVersion)
-_cspace.iSndSysLoader_swigregister(iSndSysLoader)
-
+iSndSysLoader_swigregister = _cspace.iSndSysLoader_swigregister
+iSndSysLoader_swigregister(iSndSysLoader)
 iSndSysLoader_scfGetVersion = _cspace.iSndSysLoader_scfGetVersion
 
 class iSndSysWrapper(iBase):
@@ -7028,10 +6429,7 @@ class iSndSysWrapper(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iSndSysWrapper, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iSndSysWrapper instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def QueryObject(*args): return _cspace.iSndSysWrapper_QueryObject(*args)
     def GetStream(*args): return _cspace.iSndSysWrapper_GetStream(*args)
     def SetStream(*args): return _cspace.iSndSysWrapper_SetStream(*args)
@@ -7039,8 +6437,8 @@ class iSndSysWrapper(iBase):
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iSndSysWrapper_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iSndSysWrapper_scfGetVersion)
-_cspace.iSndSysWrapper_swigregister(iSndSysWrapper)
-
+iSndSysWrapper_swigregister = _cspace.iSndSysWrapper_swigregister
+iSndSysWrapper_swigregister(iSndSysWrapper)
 iSndSysWrapper_scfGetVersion = _cspace.iSndSysWrapper_scfGetVersion
 
 class iSndSysManager(iBase):
@@ -7051,10 +6449,7 @@ class iSndSysManager(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iSndSysManager, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iSndSysManager instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def CreateSound(*args): return _cspace.iSndSysManager_CreateSound(*args)
     def RemoveSound(*args): return _cspace.iSndSysManager_RemoveSound(*args)
     def RemoveSounds(*args): return _cspace.iSndSysManager_RemoveSounds(*args)
@@ -7065,8 +6460,8 @@ class iSndSysManager(iBase):
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iSndSysManager_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iSndSysManager_scfGetVersion)
-_cspace.iSndSysManager_swigregister(iSndSysManager)
-
+iSndSysManager_swigregister = _cspace.iSndSysManager_swigregister
+iSndSysManager_swigregister(iSndSysManager)
 iSndSysManager_scfGetVersion = _cspace.iSndSysManager_scfGetVersion
 
 CS_SNDSYS_SOURCE_DISTANCE_INFINITE = _cspace.CS_SNDSYS_SOURCE_DISTANCE_INFINITE
@@ -7078,10 +6473,7 @@ class iSndSysSource(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iSndSysSource, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iSndSysSource instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def SetVolume(*args): return _cspace.iSndSysSource_SetVolume(*args)
     def GetVolume(*args): return _cspace.iSndSysSource_GetVolume(*args)
     def GetStream(*args): return _cspace.iSndSysSource_GetStream(*args)
@@ -7092,8 +6484,8 @@ class iSndSysSource(iBase):
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iSndSysSource_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iSndSysSource_scfGetVersion)
-_cspace.iSndSysSource_swigregister(iSndSysSource)
-
+iSndSysSource_swigregister = _cspace.iSndSysSource_swigregister
+iSndSysSource_swigregister(iSndSysSource)
 iSndSysSource_scfGetVersion = _cspace.iSndSysSource_scfGetVersion
 
 class iSndSysSourceSoftware(iSndSysSource):
@@ -7104,15 +6496,13 @@ class iSndSysSourceSoftware(iSndSysSource):
     for _s in [iSndSysSource]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iSndSysSourceSoftware, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iSndSysSourceSoftware instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def MergeIntoBuffer(*args): return _cspace.iSndSysSourceSoftware_MergeIntoBuffer(*args)
     def ProcessOutputFilters(*args): return _cspace.iSndSysSourceSoftware_ProcessOutputFilters(*args)
     __swig_destroy__ = _cspace.delete_iSndSysSourceSoftware
     __del__ = lambda self : None;
-_cspace.iSndSysSourceSoftware_swigregister(iSndSysSourceSoftware)
+iSndSysSourceSoftware_swigregister = _cspace.iSndSysSourceSoftware_swigregister
+iSndSysSourceSoftware_swigregister(iSndSysSourceSoftware)
 
 class iSndSysSourceSoftware3D(iSndSysSourceSoftware):
     __swig_setmethods__ = {}
@@ -7122,10 +6512,7 @@ class iSndSysSourceSoftware3D(iSndSysSourceSoftware):
     for _s in [iSndSysSourceSoftware]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iSndSysSourceSoftware3D, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iSndSysSourceSoftware3D instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def SetPosition(*args): return _cspace.iSndSysSourceSoftware3D_SetPosition(*args)
     def GetPosition(*args): return _cspace.iSndSysSourceSoftware3D_GetPosition(*args)
     def SetDirection(*args): return _cspace.iSndSysSourceSoftware3D_SetDirection(*args)
@@ -7138,7 +6525,8 @@ class iSndSysSourceSoftware3D(iSndSysSourceSoftware):
     def GetMaximumDistance(*args): return _cspace.iSndSysSourceSoftware3D_GetMaximumDistance(*args)
     __swig_destroy__ = _cspace.delete_iSndSysSourceSoftware3D
     __del__ = lambda self : None;
-_cspace.iSndSysSourceSoftware3D_swigregister(iSndSysSourceSoftware3D)
+iSndSysSourceSoftware3D_swigregister = _cspace.iSndSysSourceSoftware3D_swigregister
+iSndSysSourceSoftware3D_swigregister(iSndSysSourceSoftware3D)
 
 CSSNDSYS_SAMPLE_LITTLE_ENDIAN = _cspace.CSSNDSYS_SAMPLE_LITTLE_ENDIAN
 CSSNDSYS_SAMPLE_BIG_ENDIAN = _cspace.CSSNDSYS_SAMPLE_BIG_ENDIAN
@@ -7148,10 +6536,7 @@ class csSndSysSoundFormat(_object):
     __setattr__ = lambda self, name, value: _swig_setattr(self, csSndSysSoundFormat, name, value)
     __swig_getmethods__ = {}
     __getattr__ = lambda self, name: _swig_getattr(self, csSndSysSoundFormat, name)
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ csSndSysSoundFormat instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     __swig_setmethods__["Freq"] = _cspace.csSndSysSoundFormat_Freq_set
     __swig_getmethods__["Freq"] = _cspace.csSndSysSoundFormat_Freq_get
     if _newclass:Freq = property(_cspace.csSndSysSoundFormat_Freq_get, _cspace.csSndSysSoundFormat_Freq_set)
@@ -7164,13 +6549,14 @@ class csSndSysSoundFormat(_object):
     __swig_setmethods__["Flags"] = _cspace.csSndSysSoundFormat_Flags_set
     __swig_getmethods__["Flags"] = _cspace.csSndSysSoundFormat_Flags_get
     if _newclass:Flags = property(_cspace.csSndSysSoundFormat_Flags_get, _cspace.csSndSysSoundFormat_Flags_set)
-    def __init__(self, *args):
+    def __init__(self, *args): 
         this = _cspace.new_csSndSysSoundFormat(*args)
         try: self.this.append(this)
         except: self.this = this
     __swig_destroy__ = _cspace.delete_csSndSysSoundFormat
     __del__ = lambda self : None;
-_cspace.csSndSysSoundFormat_swigregister(csSndSysSoundFormat)
+csSndSysSoundFormat_swigregister = _cspace.csSndSysSoundFormat_swigregister
+csSndSysSoundFormat_swigregister(csSndSysSoundFormat)
 
 CS_SNDSYS_STREAM_PAUSED = _cspace.CS_SNDSYS_STREAM_PAUSED
 CS_SNDSYS_STREAM_UNPAUSED = _cspace.CS_SNDSYS_STREAM_UNPAUSED
@@ -7187,10 +6573,7 @@ class iSndSysStream(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iSndSysStream, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iSndSysStream instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def GetDescription(*args): return _cspace.iSndSysStream_GetDescription(*args)
     def GetRenderedFormat(*args): return _cspace.iSndSysStream_GetRenderedFormat(*args)
     def Get3dMode(*args): return _cspace.iSndSysStream_Get3dMode(*args)
@@ -7219,9 +6602,9 @@ class iSndSysStream(iBase):
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iSndSysStream_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iSndSysStream_scfGetVersion)
-_cspace.iSndSysStream_swigregister(iSndSysStream)
+iSndSysStream_swigregister = _cspace.iSndSysStream_swigregister
+iSndSysStream_swigregister(iSndSysStream)
 CS_SNDSYS_STREAM_UNKNOWN_LENGTH = cvar.CS_SNDSYS_STREAM_UNKNOWN_LENGTH
-
 iSndSysStream_scfGetVersion = _cspace.iSndSysStream_scfGetVersion
 
 class iSndSysStreamCallback(iBase):
@@ -7232,17 +6615,15 @@ class iSndSysStreamCallback(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iSndSysStreamCallback, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iSndSysStreamCallback instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def StreamLoopNotification(*args): return _cspace.iSndSysStreamCallback_StreamLoopNotification(*args)
     def StreamPauseNotification(*args): return _cspace.iSndSysStreamCallback_StreamPauseNotification(*args)
     def StreamUnpauseNotification(*args): return _cspace.iSndSysStreamCallback_StreamUnpauseNotification(*args)
     def StreamFrameNotification(*args): return _cspace.iSndSysStreamCallback_StreamFrameNotification(*args)
     __swig_destroy__ = _cspace.delete_iSndSysStreamCallback
     __del__ = lambda self : None;
-_cspace.iSndSysStreamCallback_swigregister(iSndSysStreamCallback)
+iSndSysStreamCallback_swigregister = _cspace.iSndSysStreamCallback_swigregister
+iSndSysStreamCallback_swigregister(iSndSysStreamCallback)
 
 CS_SNDSYS_SOURCE_STOPPED = _cspace.CS_SNDSYS_SOURCE_STOPPED
 CS_SNDSYS_SOURCE_PLAYING = _cspace.CS_SNDSYS_SOURCE_PLAYING
@@ -7254,10 +6635,7 @@ class iSndSysRenderer(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iSndSysRenderer, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iSndSysRenderer instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def SetVolume(*args): return _cspace.iSndSysRenderer_SetVolume(*args)
     def GetVolume(*args): return _cspace.iSndSysRenderer_GetVolume(*args)
     def CreateStream(*args): return _cspace.iSndSysRenderer_CreateStream(*args)
@@ -7271,8 +6649,8 @@ class iSndSysRenderer(iBase):
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iSndSysRenderer_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iSndSysRenderer_scfGetVersion)
-_cspace.iSndSysRenderer_swigregister(iSndSysRenderer)
-
+iSndSysRenderer_swigregister = _cspace.iSndSysRenderer_swigregister
+iSndSysRenderer_swigregister(iSndSysRenderer)
 iSndSysRenderer_scfGetVersion = _cspace.iSndSysRenderer_scfGetVersion
 
 class iSndSysRendererCallback(iBase):
@@ -7283,17 +6661,15 @@ class iSndSysRendererCallback(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iSndSysRendererCallback, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iSndSysRendererCallback instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def StreamAddNotification(*args): return _cspace.iSndSysRendererCallback_StreamAddNotification(*args)
     def StreamRemoveNotification(*args): return _cspace.iSndSysRendererCallback_StreamRemoveNotification(*args)
     def SourceAddNotification(*args): return _cspace.iSndSysRendererCallback_SourceAddNotification(*args)
     def SourceRemoveNotification(*args): return _cspace.iSndSysRendererCallback_SourceRemoveNotification(*args)
     __swig_destroy__ = _cspace.delete_iSndSysRendererCallback
     __del__ = lambda self : None;
-_cspace.iSndSysRendererCallback_swigregister(iSndSysRendererCallback)
+iSndSysRendererCallback_swigregister = _cspace.iSndSysRendererCallback_swigregister
+iSndSysRendererCallback_swigregister(iSndSysRendererCallback)
 
 class iSndSysRendererSoftware(iBase):
     __swig_setmethods__ = {}
@@ -7303,15 +6679,13 @@ class iSndSysRendererSoftware(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iSndSysRendererSoftware, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iSndSysRendererSoftware instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def AddOutputFilter(*args): return _cspace.iSndSysRendererSoftware_AddOutputFilter(*args)
     def RemoveOutputFilter(*args): return _cspace.iSndSysRendererSoftware_RemoveOutputFilter(*args)
     __swig_destroy__ = _cspace.delete_iSndSysRendererSoftware
     __del__ = lambda self : None;
-_cspace.iSndSysRendererSoftware_swigregister(iSndSysRendererSoftware)
+iSndSysRendererSoftware_swigregister = _cspace.iSndSysRendererSoftware_swigregister
+iSndSysRendererSoftware_swigregister(iSndSysRendererSoftware)
 
 class iSndSysSoftwareDriver(iBase):
     __swig_setmethods__ = {}
@@ -7321,10 +6695,7 @@ class iSndSysSoftwareDriver(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iSndSysSoftwareDriver, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iSndSysSoftwareDriver instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def Open(*args): return _cspace.iSndSysSoftwareDriver_Open(*args)
     def Close(*args): return _cspace.iSndSysSoftwareDriver_Close(*args)
     def StartThread(*args): return _cspace.iSndSysSoftwareDriver_StartThread(*args)
@@ -7333,8 +6704,8 @@ class iSndSysSoftwareDriver(iBase):
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iSndSysSoftwareDriver_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iSndSysSoftwareDriver_scfGetVersion)
-_cspace.iSndSysSoftwareDriver_swigregister(iSndSysSoftwareDriver)
-
+iSndSysSoftwareDriver_swigregister = _cspace.iSndSysSoftwareDriver_swigregister
+iSndSysSoftwareDriver_swigregister(iSndSysSoftwareDriver)
 iSndSysSoftwareDriver_scfGetVersion = _cspace.iSndSysSoftwareDriver_scfGetVersion
 
 class iComponent(iBase):
@@ -7345,17 +6716,14 @@ class iComponent(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iComponent, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iComponent instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def Initialize(*args): return _cspace.iComponent_Initialize(*args)
     __swig_destroy__ = _cspace.delete_iComponent
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iComponent_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iComponent_scfGetVersion)
-_cspace.iComponent_swigregister(iComponent)
-
+iComponent_swigregister = _cspace.iComponent_swigregister
+iComponent_swigregister(iComponent)
 iComponent_scfGetVersion = _cspace.iComponent_scfGetVersion
 
 class iCacheManager(iBase):
@@ -7366,10 +6734,7 @@ class iCacheManager(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iCacheManager, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iCacheManager instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def SetReadOnly(*args): return _cspace.iCacheManager_SetReadOnly(*args)
     def IsReadOnly(*args): return _cspace.iCacheManager_IsReadOnly(*args)
     def SetCurrentType(*args): return _cspace.iCacheManager_SetCurrentType(*args)
@@ -7384,8 +6749,8 @@ class iCacheManager(iBase):
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iCacheManager_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iCacheManager_scfGetVersion)
-_cspace.iCacheManager_swigregister(iCacheManager)
-
+iCacheManager_swigregister = _cspace.iCacheManager_swigregister
+iCacheManager_swigregister(iCacheManager)
 iCacheManager_scfGetVersion = _cspace.iCacheManager_scfGetVersion
 
 class csFileTime(_object):
@@ -7393,10 +6758,7 @@ class csFileTime(_object):
     __setattr__ = lambda self, name, value: _swig_setattr(self, csFileTime, name, value)
     __swig_getmethods__ = {}
     __getattr__ = lambda self, name: _swig_getattr(self, csFileTime, name)
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ csFileTime instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     __swig_setmethods__["sec"] = _cspace.csFileTime_sec_set
     __swig_getmethods__["sec"] = _cspace.csFileTime_sec_get
     if _newclass:sec = property(_cspace.csFileTime_sec_get, _cspace.csFileTime_sec_set)
@@ -7415,13 +6777,14 @@ class csFileTime(_object):
     __swig_setmethods__["year"] = _cspace.csFileTime_year_set
     __swig_getmethods__["year"] = _cspace.csFileTime_year_get
     if _newclass:year = property(_cspace.csFileTime_year_get, _cspace.csFileTime_year_set)
-    def __init__(self, *args):
+    def __init__(self, *args): 
         this = _cspace.new_csFileTime(*args)
         try: self.this.append(this)
         except: self.this = this
     __swig_destroy__ = _cspace.delete_csFileTime
     __del__ = lambda self : None;
-_cspace.csFileTime_swigregister(csFileTime)
+csFileTime_swigregister = _cspace.csFileTime_swigregister
+csFileTime_swigregister(csFileTime)
 
 VFS_PATH_DIVIDER = _cspace.VFS_PATH_DIVIDER
 VFS_PATH_SEPARATOR = _cspace.VFS_PATH_SEPARATOR
@@ -7445,10 +6808,7 @@ class iFile(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iFile, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iFile instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def GetName(*args): return _cspace.iFile_GetName(*args)
     def GetSize(*args): return _cspace.iFile_GetSize(*args)
     def GetStatus(*args): return _cspace.iFile_GetStatus(*args)
@@ -7463,8 +6823,8 @@ class iFile(iBase):
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iFile_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iFile_scfGetVersion)
-_cspace.iFile_swigregister(iFile)
-
+iFile_swigregister = _cspace.iFile_swigregister
+iFile_swigregister(iFile)
 iFile_scfGetVersion = _cspace.iFile_scfGetVersion
 
 class iVFS(iBase):
@@ -7475,10 +6835,7 @@ class iVFS(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iVFS, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iVFS instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def ChDir(*args): return _cspace.iVFS_ChDir(*args)
     def GetCwd(*args): return _cspace.iVFS_GetCwd(*args)
     def PushDir(*args): return _cspace.iVFS_PushDir(*args)
@@ -7507,8 +6864,8 @@ class iVFS(iBase):
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iVFS_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iVFS_scfGetVersion)
-_cspace.iVFS_swigregister(iVFS)
-
+iVFS_swigregister = _cspace.iVFS_swigregister
+iVFS_swigregister(iVFS)
 iVFS_scfGetVersion = _cspace.iVFS_scfGetVersion
 
 class iObjectNameChangeListener(iBase):
@@ -7519,14 +6876,12 @@ class iObjectNameChangeListener(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iObjectNameChangeListener, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iObjectNameChangeListener instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def NameChanged(*args): return _cspace.iObjectNameChangeListener_NameChanged(*args)
     __swig_destroy__ = _cspace.delete_iObjectNameChangeListener
     __del__ = lambda self : None;
-_cspace.iObjectNameChangeListener_swigregister(iObjectNameChangeListener)
+iObjectNameChangeListener_swigregister = _cspace.iObjectNameChangeListener_swigregister
+iObjectNameChangeListener_swigregister(iObjectNameChangeListener)
 
 class iObject(iBase):
     __swig_setmethods__ = {}
@@ -7536,10 +6891,7 @@ class iObject(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iObject, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iObject instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def SetName(*args): return _cspace.iObject_SetName(*args)
     def GetName(*args): return _cspace.iObject_GetName(*args)
     def GetID(*args): return _cspace.iObject_GetID(*args)
@@ -7558,8 +6910,8 @@ class iObject(iBase):
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iObject_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iObject_scfGetVersion)
-_cspace.iObject_swigregister(iObject)
-
+iObject_swigregister = _cspace.iObject_swigregister
+iObject_swigregister(iObject)
 iObject_scfGetVersion = _cspace.iObject_scfGetVersion
 
 class iObjectIterator(iBase):
@@ -7570,10 +6922,7 @@ class iObjectIterator(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iObjectIterator, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iObjectIterator instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def Next(*args): return _cspace.iObjectIterator_Next(*args)
     def Reset(*args): return _cspace.iObjectIterator_Reset(*args)
     def GetParentObj(*args): return _cspace.iObjectIterator_GetParentObj(*args)
@@ -7581,7 +6930,8 @@ class iObjectIterator(iBase):
     def FindName(*args): return _cspace.iObjectIterator_FindName(*args)
     __swig_destroy__ = _cspace.delete_iObjectIterator
     __del__ = lambda self : None;
-_cspace.iObjectIterator_swigregister(iObjectIterator)
+iObjectIterator_swigregister = _cspace.iObjectIterator_swigregister
+iObjectIterator_swigregister(iObjectIterator)
 
 class iStringSet(iBase):
     __swig_setmethods__ = {}
@@ -7591,10 +6941,7 @@ class iStringSet(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iStringSet, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iStringSet instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def Request(*args): return _cspace.iStringSet_Request(*args)
     def Contains(*args): return _cspace.iStringSet_Contains(*args)
     def Delete(*args): return _cspace.iStringSet_Delete(*args)
@@ -7606,9 +6953,9 @@ class iStringSet(iBase):
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iStringSet_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iStringSet_scfGetVersion)
-_cspace.iStringSet_swigregister(iStringSet)
+iStringSet_swigregister = _cspace.iStringSet_swigregister
+iStringSet_swigregister(iStringSet)
 csInvalidStringID = cvar.csInvalidStringID
-
 iStringSet_scfGetVersion = _cspace.iStringSet_scfGetVersion
 
 class iObjectRegistry(iBase):
@@ -7619,10 +6966,7 @@ class iObjectRegistry(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iObjectRegistry, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iObjectRegistry instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def Clear(*args): return _cspace.iObjectRegistry_Clear(*args)
     def Register(*args): return _cspace.iObjectRegistry_Register(*args)
     def Unregister(*args): return _cspace.iObjectRegistry_Unregister(*args)
@@ -7631,8 +6975,8 @@ class iObjectRegistry(iBase):
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iObjectRegistry_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iObjectRegistry_scfGetVersion)
-_cspace.iObjectRegistry_swigregister(iObjectRegistry)
-
+iObjectRegistry_swigregister = _cspace.iObjectRegistry_swigregister
+iObjectRegistry_swigregister(iObjectRegistry)
 iObjectRegistry_scfGetVersion = _cspace.iObjectRegistry_scfGetVersion
 
 class iObjectRegistryIterator(iBase):
@@ -7643,18 +6987,15 @@ class iObjectRegistryIterator(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iObjectRegistryIterator, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iObjectRegistryIterator instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def Reset(*args): return _cspace.iObjectRegistryIterator_Reset(*args)
     def GetCurrentTag(*args): return _cspace.iObjectRegistryIterator_GetCurrentTag(*args)
     def HasNext(*args): return _cspace.iObjectRegistryIterator_HasNext(*args)
     def Next(*args): return _cspace.iObjectRegistryIterator_Next(*args)
     __swig_destroy__ = _cspace.delete_iObjectRegistryIterator
     __del__ = lambda self : None;
-_cspace.iObjectRegistryIterator_swigregister(iObjectRegistryIterator)
-
+iObjectRegistryIterator_swigregister = _cspace.iObjectRegistryIterator_swigregister
+iObjectRegistryIterator_swigregister(iObjectRegistryIterator)
 
 csQueryRegistryTag = _cspace.csQueryRegistryTag
 class iVirtualClock(iBase):
@@ -7665,10 +7006,7 @@ class iVirtualClock(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iVirtualClock, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iVirtualClock instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def Advance(*args): return _cspace.iVirtualClock_Advance(*args)
     def Suspend(*args): return _cspace.iVirtualClock_Suspend(*args)
     def Resume(*args): return _cspace.iVirtualClock_Resume(*args)
@@ -7678,8 +7016,8 @@ class iVirtualClock(iBase):
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iVirtualClock_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iVirtualClock_scfGetVersion)
-_cspace.iVirtualClock_swigregister(iVirtualClock)
-
+iVirtualClock_swigregister = _cspace.iVirtualClock_swigregister
+iVirtualClock_swigregister(iVirtualClock)
 iVirtualClock_scfGetVersion = _cspace.iVirtualClock_scfGetVersion
 
 CS_MAX_MOUSE_COUNT = _cspace.CS_MAX_MOUSE_COUNT
@@ -7696,26 +7034,21 @@ class iEventAttributeIterator(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iEventAttributeIterator, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iEventAttributeIterator instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def HasNext(*args): return _cspace.iEventAttributeIterator_HasNext(*args)
     def Next(*args): return _cspace.iEventAttributeIterator_Next(*args)
     def Reset(*args): return _cspace.iEventAttributeIterator_Reset(*args)
     __swig_destroy__ = _cspace.delete_iEventAttributeIterator
     __del__ = lambda self : None;
-_cspace.iEventAttributeIterator_swigregister(iEventAttributeIterator)
+iEventAttributeIterator_swigregister = _cspace.iEventAttributeIterator_swigregister
+iEventAttributeIterator_swigregister(iEventAttributeIterator)
 
 class csKeyEventData(_object):
     __swig_setmethods__ = {}
     __setattr__ = lambda self, name, value: _swig_setattr(self, csKeyEventData, name, value)
     __swig_getmethods__ = {}
     __getattr__ = lambda self, name: _swig_getattr(self, csKeyEventData, name)
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ csKeyEventData instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     __swig_setmethods__["eventType"] = _cspace.csKeyEventData_eventType_set
     __swig_getmethods__["eventType"] = _cspace.csKeyEventData_eventType_get
     if _newclass:eventType = property(_cspace.csKeyEventData_eventType_get, _cspace.csKeyEventData_eventType_set)
@@ -7734,23 +7067,21 @@ class csKeyEventData(_object):
     __swig_setmethods__["charType"] = _cspace.csKeyEventData_charType_set
     __swig_getmethods__["charType"] = _cspace.csKeyEventData_charType_get
     if _newclass:charType = property(_cspace.csKeyEventData_charType_get, _cspace.csKeyEventData_charType_set)
-    def __init__(self, *args):
+    def __init__(self, *args): 
         this = _cspace.new_csKeyEventData(*args)
         try: self.this.append(this)
         except: self.this = this
     __swig_destroy__ = _cspace.delete_csKeyEventData
     __del__ = lambda self : None;
-_cspace.csKeyEventData_swigregister(csKeyEventData)
+csKeyEventData_swigregister = _cspace.csKeyEventData_swigregister
+csKeyEventData_swigregister(csKeyEventData)
 
 class csMouseEventData(_object):
     __swig_setmethods__ = {}
     __setattr__ = lambda self, name, value: _swig_setattr(self, csMouseEventData, name, value)
     __swig_getmethods__ = {}
     __getattr__ = lambda self, name: _swig_getattr(self, csMouseEventData, name)
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ csMouseEventData instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     __swig_setmethods__["x"] = _cspace.csMouseEventData_x_set
     __swig_getmethods__["x"] = _cspace.csMouseEventData_x_get
     if _newclass:x = property(_cspace.csMouseEventData_x_get, _cspace.csMouseEventData_x_set)
@@ -7769,23 +7100,21 @@ class csMouseEventData(_object):
     __swig_setmethods__["Modifiers"] = _cspace.csMouseEventData_Modifiers_set
     __swig_getmethods__["Modifiers"] = _cspace.csMouseEventData_Modifiers_get
     if _newclass:Modifiers = property(_cspace.csMouseEventData_Modifiers_get, _cspace.csMouseEventData_Modifiers_set)
-    def __init__(self, *args):
+    def __init__(self, *args): 
         this = _cspace.new_csMouseEventData(*args)
         try: self.this.append(this)
         except: self.this = this
     __swig_destroy__ = _cspace.delete_csMouseEventData
     __del__ = lambda self : None;
-_cspace.csMouseEventData_swigregister(csMouseEventData)
+csMouseEventData_swigregister = _cspace.csMouseEventData_swigregister
+csMouseEventData_swigregister(csMouseEventData)
 
 class csJoystickEventData(_object):
     __swig_setmethods__ = {}
     __setattr__ = lambda self, name, value: _swig_setattr(self, csJoystickEventData, name, value)
     __swig_getmethods__ = {}
     __getattr__ = lambda self, name: _swig_getattr(self, csJoystickEventData, name)
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ csJoystickEventData instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     __swig_setmethods__["number"] = _cspace.csJoystickEventData_number_set
     __swig_getmethods__["number"] = _cspace.csJoystickEventData_number_get
     if _newclass:number = property(_cspace.csJoystickEventData_number_get, _cspace.csJoystickEventData_number_set)
@@ -7804,36 +7133,35 @@ class csJoystickEventData(_object):
     __swig_setmethods__["Modifiers"] = _cspace.csJoystickEventData_Modifiers_set
     __swig_getmethods__["Modifiers"] = _cspace.csJoystickEventData_Modifiers_get
     if _newclass:Modifiers = property(_cspace.csJoystickEventData_Modifiers_get, _cspace.csJoystickEventData_Modifiers_set)
-    def __init__(self, *args):
+    def __init__(self, *args): 
         this = _cspace.new_csJoystickEventData(*args)
         try: self.this.append(this)
         except: self.this = this
     __swig_destroy__ = _cspace.delete_csJoystickEventData
     __del__ = lambda self : None;
-_cspace.csJoystickEventData_swigregister(csJoystickEventData)
+csJoystickEventData_swigregister = _cspace.csJoystickEventData_swigregister
+csJoystickEventData_swigregister(csJoystickEventData)
 
 class csCommandEventData(_object):
     __swig_setmethods__ = {}
     __setattr__ = lambda self, name, value: _swig_setattr(self, csCommandEventData, name, value)
     __swig_getmethods__ = {}
     __getattr__ = lambda self, name: _swig_getattr(self, csCommandEventData, name)
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ csCommandEventData instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     __swig_setmethods__["Code"] = _cspace.csCommandEventData_Code_set
     __swig_getmethods__["Code"] = _cspace.csCommandEventData_Code_get
     if _newclass:Code = property(_cspace.csCommandEventData_Code_get, _cspace.csCommandEventData_Code_set)
     __swig_setmethods__["Info"] = _cspace.csCommandEventData_Info_set
     __swig_getmethods__["Info"] = _cspace.csCommandEventData_Info_get
     if _newclass:Info = property(_cspace.csCommandEventData_Info_get, _cspace.csCommandEventData_Info_set)
-    def __init__(self, *args):
+    def __init__(self, *args): 
         this = _cspace.new_csCommandEventData(*args)
         try: self.this.append(this)
         except: self.this = this
     __swig_destroy__ = _cspace.delete_csCommandEventData
     __del__ = lambda self : None;
-_cspace.csCommandEventData_swigregister(csCommandEventData)
+csCommandEventData_swigregister = _cspace.csCommandEventData_swigregister
+csCommandEventData_swigregister(csCommandEventData)
 
 csEventErrNone = _cspace.csEventErrNone
 csEventErrLossy = _cspace.csEventErrLossy
@@ -7860,10 +7188,7 @@ class iEvent(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iEvent, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iEvent instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     __swig_setmethods__["Name"] = _cspace.iEvent_Name_set
     __swig_getmethods__["Name"] = _cspace.iEvent_Name_get
     if _newclass:Name = property(_cspace.iEvent_Name_get, _cspace.iEvent_Name_set)
@@ -7910,8 +7235,8 @@ class iEvent(iBase):
     if _newclass:Joystick = property(_cspace.iEvent_Joystick_get)
     __swig_getmethods__["Command"] = _cspace.iEvent_Command_get
     if _newclass:Command = property(_cspace.iEvent_Command_get)
-_cspace.iEvent_swigregister(iEvent)
-
+iEvent_swigregister = _cspace.iEvent_swigregister
+iEvent_swigregister(iEvent)
 iEvent_scfGetVersion = _cspace.iEvent_scfGetVersion
 
 class iEventPlug(iBase):
@@ -7922,16 +7247,14 @@ class iEventPlug(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iEventPlug, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iEventPlug instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def GetPotentiallyConflictingEvents(*args): return _cspace.iEventPlug_GetPotentiallyConflictingEvents(*args)
     def QueryEventPriority(*args): return _cspace.iEventPlug_QueryEventPriority(*args)
     def EnableEvents(*args): return _cspace.iEventPlug_EnableEvents(*args)
     __swig_destroy__ = _cspace.delete_iEventPlug
     __del__ = lambda self : None;
-_cspace.iEventPlug_swigregister(iEventPlug)
+iEventPlug_swigregister = _cspace.iEventPlug_swigregister
+iEventPlug_swigregister(iEventPlug)
 
 class iEventOutlet(iBase):
     __swig_setmethods__ = {}
@@ -7941,10 +7264,7 @@ class iEventOutlet(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iEventOutlet, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iEventOutlet instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def CreateEvent(*args): return _cspace.iEventOutlet_CreateEvent(*args)
     def Post(*args): return _cspace.iEventOutlet_Post(*args)
     def Key(*args): return _cspace.iEventOutlet_Key(*args)
@@ -7954,7 +7274,8 @@ class iEventOutlet(iBase):
     def ImmediateBroadcast(*args): return _cspace.iEventOutlet_ImmediateBroadcast(*args)
     __swig_destroy__ = _cspace.delete_iEventOutlet
     __del__ = lambda self : None;
-_cspace.iEventOutlet_swigregister(iEventOutlet)
+iEventOutlet_swigregister = _cspace.iEventOutlet_swigregister
+iEventOutlet_swigregister(iEventOutlet)
 
 class iEventCord(iBase):
     __swig_setmethods__ = {}
@@ -7964,10 +7285,7 @@ class iEventCord(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iEventCord, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iEventCord instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def Insert(*args): return _cspace.iEventCord_Insert(*args)
     def Remove(*args): return _cspace.iEventCord_Remove(*args)
     def GetPass(*args): return _cspace.iEventCord_GetPass(*args)
@@ -7975,17 +7293,15 @@ class iEventCord(iBase):
     def GetName(*args): return _cspace.iEventCord_GetName(*args)
     __swig_destroy__ = _cspace.delete_iEventCord
     __del__ = lambda self : None;
-_cspace.iEventCord_swigregister(iEventCord)
+iEventCord_swigregister = _cspace.iEventCord_swigregister
+iEventCord_swigregister(iEventCord)
 
 class csKeyEventHelper(_object):
     __swig_setmethods__ = {}
     __setattr__ = lambda self, name, value: _swig_setattr(self, csKeyEventHelper, name, value)
     __swig_getmethods__ = {}
     __getattr__ = lambda self, name: _swig_getattr(self, csKeyEventHelper, name)
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ csKeyEventHelper instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     __swig_getmethods__["GetRawCode"] = lambda x: _cspace.csKeyEventHelper_GetRawCode
     if _newclass:GetRawCode = staticmethod(_cspace.csKeyEventHelper_GetRawCode)
     __swig_getmethods__["GetCookedCode"] = lambda x: _cspace.csKeyEventHelper_GetCookedCode
@@ -8002,28 +7318,21 @@ class csKeyEventHelper(_object):
     if _newclass:GetModifiersBits = staticmethod(_cspace.csKeyEventHelper_GetModifiersBits)
     __swig_getmethods__["GetModifiers"] = lambda x: _cspace.csKeyEventHelper_GetModifiers
     if _newclass:GetModifiers = staticmethod(_cspace.csKeyEventHelper_GetModifiers)
-    def __init__(self, *args):
+    def __init__(self, *args): 
         this = _cspace.new_csKeyEventHelper(*args)
         try: self.this.append(this)
         except: self.this = this
     __swig_destroy__ = _cspace.delete_csKeyEventHelper
     __del__ = lambda self : None;
-_cspace.csKeyEventHelper_swigregister(csKeyEventHelper)
-
+csKeyEventHelper_swigregister = _cspace.csKeyEventHelper_swigregister
+csKeyEventHelper_swigregister(csKeyEventHelper)
 csKeyEventHelper_GetRawCode = _cspace.csKeyEventHelper_GetRawCode
-
 csKeyEventHelper_GetCookedCode = _cspace.csKeyEventHelper_GetCookedCode
-
 csKeyEventHelper_GetEventType = _cspace.csKeyEventHelper_GetEventType
-
 csKeyEventHelper_GetAutoRepeat = _cspace.csKeyEventHelper_GetAutoRepeat
-
 csKeyEventHelper_GetCharacterType = _cspace.csKeyEventHelper_GetCharacterType
-
 csKeyEventHelper_GetEventData = _cspace.csKeyEventHelper_GetEventData
-
 csKeyEventHelper_GetModifiersBits = _cspace.csKeyEventHelper_GetModifiersBits
-
 csKeyEventHelper_GetModifiers = _cspace.csKeyEventHelper_GetModifiers
 
 class csMouseEventHelper(_object):
@@ -8031,10 +7340,7 @@ class csMouseEventHelper(_object):
     __setattr__ = lambda self, name, value: _swig_setattr(self, csMouseEventHelper, name, value)
     __swig_getmethods__ = {}
     __getattr__ = lambda self, name: _swig_getattr(self, csMouseEventHelper, name)
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ csMouseEventHelper instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     __swig_getmethods__["NewEvent"] = lambda x: _cspace.csMouseEventHelper_NewEvent
     if _newclass:NewEvent = staticmethod(_cspace.csMouseEventHelper_NewEvent)
     __swig_getmethods__["GetEventType"] = lambda x: _cspace.csMouseEventHelper_GetEventType
@@ -8059,36 +7365,25 @@ class csMouseEventHelper(_object):
     if _newclass:GetModifiers = staticmethod(_cspace.csMouseEventHelper_GetModifiers)
     __swig_getmethods__["GetEventData"] = lambda x: _cspace.csMouseEventHelper_GetEventData
     if _newclass:GetEventData = staticmethod(_cspace.csMouseEventHelper_GetEventData)
-    def __init__(self, *args):
+    def __init__(self, *args): 
         this = _cspace.new_csMouseEventHelper(*args)
         try: self.this.append(this)
         except: self.this = this
     __swig_destroy__ = _cspace.delete_csMouseEventHelper
     __del__ = lambda self : None;
-_cspace.csMouseEventHelper_swigregister(csMouseEventHelper)
-
+csMouseEventHelper_swigregister = _cspace.csMouseEventHelper_swigregister
+csMouseEventHelper_swigregister(csMouseEventHelper)
 csMouseEventHelper_NewEvent = _cspace.csMouseEventHelper_NewEvent
-
 csMouseEventHelper_GetEventType = _cspace.csMouseEventHelper_GetEventType
-
 csMouseEventHelper_GetNumber = _cspace.csMouseEventHelper_GetNumber
-
 csMouseEventHelper_GetX = _cspace.csMouseEventHelper_GetX
-
 csMouseEventHelper_GetY = _cspace.csMouseEventHelper_GetY
-
 csMouseEventHelper_GetAxis = _cspace.csMouseEventHelper_GetAxis
-
 csMouseEventHelper_GetNumAxes = _cspace.csMouseEventHelper_GetNumAxes
-
 csMouseEventHelper_GetButton = _cspace.csMouseEventHelper_GetButton
-
 csMouseEventHelper_GetButtonState = _cspace.csMouseEventHelper_GetButtonState
-
 csMouseEventHelper_GetButtonMask = _cspace.csMouseEventHelper_GetButtonMask
-
 csMouseEventHelper_GetModifiers = _cspace.csMouseEventHelper_GetModifiers
-
 csMouseEventHelper_GetEventData = _cspace.csMouseEventHelper_GetEventData
 
 class csJoystickEventHelper(_object):
@@ -8096,10 +7391,7 @@ class csJoystickEventHelper(_object):
     __setattr__ = lambda self, name, value: _swig_setattr(self, csJoystickEventHelper, name, value)
     __swig_getmethods__ = {}
     __getattr__ = lambda self, name: _swig_getattr(self, csJoystickEventHelper, name)
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ csJoystickEventHelper instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     __swig_getmethods__["NewEvent"] = lambda x: _cspace.csJoystickEventHelper_NewEvent
     if _newclass:NewEvent = staticmethod(_cspace.csJoystickEventHelper_NewEvent)
     __swig_getmethods__["GetNumber"] = lambda x: _cspace.csJoystickEventHelper_GetNumber
@@ -8118,30 +7410,22 @@ class csJoystickEventHelper(_object):
     if _newclass:GetModifiers = staticmethod(_cspace.csJoystickEventHelper_GetModifiers)
     __swig_getmethods__["GetEventData"] = lambda x: _cspace.csJoystickEventHelper_GetEventData
     if _newclass:GetEventData = staticmethod(_cspace.csJoystickEventHelper_GetEventData)
-    def __init__(self, *args):
+    def __init__(self, *args): 
         this = _cspace.new_csJoystickEventHelper(*args)
         try: self.this.append(this)
         except: self.this = this
     __swig_destroy__ = _cspace.delete_csJoystickEventHelper
     __del__ = lambda self : None;
-_cspace.csJoystickEventHelper_swigregister(csJoystickEventHelper)
-
+csJoystickEventHelper_swigregister = _cspace.csJoystickEventHelper_swigregister
+csJoystickEventHelper_swigregister(csJoystickEventHelper)
 csJoystickEventHelper_NewEvent = _cspace.csJoystickEventHelper_NewEvent
-
 csJoystickEventHelper_GetNumber = _cspace.csJoystickEventHelper_GetNumber
-
 csJoystickEventHelper_GetAxis = _cspace.csJoystickEventHelper_GetAxis
-
 csJoystickEventHelper_GetNumAxes = _cspace.csJoystickEventHelper_GetNumAxes
-
 csJoystickEventHelper_GetButton = _cspace.csJoystickEventHelper_GetButton
-
 csJoystickEventHelper_GetButtonState = _cspace.csJoystickEventHelper_GetButtonState
-
 csJoystickEventHelper_GetButtonMask = _cspace.csJoystickEventHelper_GetButtonMask
-
 csJoystickEventHelper_GetModifiers = _cspace.csJoystickEventHelper_GetModifiers
-
 csJoystickEventHelper_GetEventData = _cspace.csJoystickEventHelper_GetEventData
 
 class csInputEventHelper(_object):
@@ -8149,24 +7433,20 @@ class csInputEventHelper(_object):
     __setattr__ = lambda self, name, value: _swig_setattr(self, csInputEventHelper, name, value)
     __swig_getmethods__ = {}
     __getattr__ = lambda self, name: _swig_getattr(self, csInputEventHelper, name)
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ csInputEventHelper instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     __swig_getmethods__["GetButton"] = lambda x: _cspace.csInputEventHelper_GetButton
     if _newclass:GetButton = staticmethod(_cspace.csInputEventHelper_GetButton)
     __swig_getmethods__["GetButtonState"] = lambda x: _cspace.csInputEventHelper_GetButtonState
     if _newclass:GetButtonState = staticmethod(_cspace.csInputEventHelper_GetButtonState)
-    def __init__(self, *args):
+    def __init__(self, *args): 
         this = _cspace.new_csInputEventHelper(*args)
         try: self.this.append(this)
         except: self.this = this
     __swig_destroy__ = _cspace.delete_csInputEventHelper
     __del__ = lambda self : None;
-_cspace.csInputEventHelper_swigregister(csInputEventHelper)
-
+csInputEventHelper_swigregister = _cspace.csInputEventHelper_swigregister
+csInputEventHelper_swigregister(csInputEventHelper)
 csInputEventHelper_GetButton = _cspace.csInputEventHelper_GetButton
-
 csInputEventHelper_GetButtonState = _cspace.csInputEventHelper_GetButtonState
 
 class csCommandEventHelper(_object):
@@ -8174,10 +7454,7 @@ class csCommandEventHelper(_object):
     __setattr__ = lambda self, name, value: _swig_setattr(self, csCommandEventHelper, name, value)
     __swig_getmethods__ = {}
     __getattr__ = lambda self, name: _swig_getattr(self, csCommandEventHelper, name)
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ csCommandEventHelper instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     __swig_getmethods__["NewEvent"] = lambda x: _cspace.csCommandEventHelper_NewEvent
     if _newclass:NewEvent = staticmethod(_cspace.csCommandEventHelper_NewEvent)
     __swig_getmethods__["GetCode"] = lambda x: _cspace.csCommandEventHelper_GetCode
@@ -8186,22 +7463,18 @@ class csCommandEventHelper(_object):
     if _newclass:GetInfo = staticmethod(_cspace.csCommandEventHelper_GetInfo)
     __swig_getmethods__["GetEventData"] = lambda x: _cspace.csCommandEventHelper_GetEventData
     if _newclass:GetEventData = staticmethod(_cspace.csCommandEventHelper_GetEventData)
-    def __init__(self, *args):
+    def __init__(self, *args): 
         this = _cspace.new_csCommandEventHelper(*args)
         try: self.this.append(this)
         except: self.this = this
     __swig_destroy__ = _cspace.delete_csCommandEventHelper
     __del__ = lambda self : None;
-_cspace.csCommandEventHelper_swigregister(csCommandEventHelper)
-
+csCommandEventHelper_swigregister = _cspace.csCommandEventHelper_swigregister
+csCommandEventHelper_swigregister(csCommandEventHelper)
 csCommandEventHelper_NewEvent = _cspace.csCommandEventHelper_NewEvent
-
 csCommandEventHelper_GetCode = _cspace.csCommandEventHelper_GetCode
-
 csCommandEventHelper_GetInfo = _cspace.csCommandEventHelper_GetInfo
-
 csCommandEventHelper_GetEventData = _cspace.csCommandEventHelper_GetEventData
-
 
 RemoveWeakListener = _cspace.RemoveWeakListener
 csKeyEventTypeUp = _cspace.csKeyEventTypeUp
@@ -8234,21 +7507,18 @@ class csKeyModifiers(_object):
     __setattr__ = lambda self, name, value: _swig_setattr(self, csKeyModifiers, name, value)
     __swig_getmethods__ = {}
     __getattr__ = lambda self, name: _swig_getattr(self, csKeyModifiers, name)
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ csKeyModifiers instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     __swig_setmethods__["modifiers"] = _cspace.csKeyModifiers_modifiers_set
     __swig_getmethods__["modifiers"] = _cspace.csKeyModifiers_modifiers_get
     if _newclass:modifiers = property(_cspace.csKeyModifiers_modifiers_get, _cspace.csKeyModifiers_modifiers_set)
-    def __init__(self, *args):
+    def __init__(self, *args): 
         this = _cspace.new_csKeyModifiers(*args)
         try: self.this.append(this)
         except: self.this = this
     __swig_destroy__ = _cspace.delete_csKeyModifiers
     __del__ = lambda self : None;
-_cspace.csKeyModifiers_swigregister(csKeyModifiers)
-
+csKeyModifiers_swigregister = _cspace.csKeyModifiers_swigregister
+csKeyModifiers_swigregister(csKeyModifiers)
 RegisterWeakListener = _cspace.RegisterWeakListener
 
 CSKEY_ESC = _cspace.CSKEY_ESC
@@ -8300,10 +7570,7 @@ class iEventQueue(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iEventQueue, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iEventQueue instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def Process(*args): return _cspace.iEventQueue_Process(*args)
     def Dispatch(*args): return _cspace.iEventQueue_Dispatch(*args)
     def Subscribe(*args): return _cspace.iEventQueue_Subscribe(*args)
@@ -8324,8 +7591,8 @@ class iEventQueue(iBase):
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iEventQueue_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iEventQueue_scfGetVersion)
-_cspace.iEventQueue_swigregister(iEventQueue)
-
+iEventQueue_swigregister = _cspace.iEventQueue_swigregister
+iEventQueue_swigregister(iEventQueue)
 iEventQueue_scfGetVersion = _cspace.iEventQueue_scfGetVersion
 
 class csStrKey(_object):
@@ -8333,11 +7600,8 @@ class csStrKey(_object):
     __setattr__ = lambda self, name, value: _swig_setattr(self, csStrKey, name, value)
     __swig_getmethods__ = {}
     __getattr__ = lambda self, name: _swig_getattr(self, csStrKey, name)
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ csStrKey instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
-    def __init__(self, *args):
+    __repr__ = _swig_repr
+    def __init__(self, *args): 
         this = _cspace.new_csStrKey(*args)
         try: self.this.append(this)
         except: self.this = this
@@ -8345,8 +7609,8 @@ class csStrKey(_object):
     __del__ = lambda self : None;
     def assign(*args): return _cspace.csStrKey_assign(*args)
     def GetHash(*args): return _cspace.csStrKey_GetHash(*args)
-_cspace.csStrKey_swigregister(csStrKey)
-
+csStrKey_swigregister = _cspace.csStrKey_swigregister
+csStrKey_swigregister(csStrKey)
 csHashCompute = _cspace.csHashCompute
 
 class iEventNameRegistry(iBase):
@@ -8357,10 +7621,7 @@ class iEventNameRegistry(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iEventNameRegistry, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iEventNameRegistry instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def GetID(*args): return _cspace.iEventNameRegistry_GetID(*args)
     def GetString(*args): return _cspace.iEventNameRegistry_GetString(*args)
     def GetParentID(*args): return _cspace.iEventNameRegistry_GetParentID(*args)
@@ -8370,8 +7631,8 @@ class iEventNameRegistry(iBase):
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iEventNameRegistry_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iEventNameRegistry_scfGetVersion)
-_cspace.iEventNameRegistry_swigregister(iEventNameRegistry)
-
+iEventNameRegistry_swigregister = _cspace.iEventNameRegistry_swigregister
+iEventNameRegistry_swigregister(iEventNameRegistry)
 iEventNameRegistry_scfGetVersion = _cspace.iEventNameRegistry_scfGetVersion
 
 class csEventNameRegistry(_object):
@@ -8380,10 +7641,7 @@ class csEventNameRegistry(_object):
     __swig_getmethods__ = {}
     __getattr__ = lambda self, name: _swig_getattr(self, csEventNameRegistry, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ csEventNameRegistry instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     __swig_destroy__ = _cspace.delete_csEventNameRegistry
     __del__ = lambda self : None;
     __swig_getmethods__["GetString"] = lambda x: _cspace.csEventNameRegistry_GetString
@@ -8396,14 +7654,11 @@ class csEventNameRegistry(_object):
     if _newclass:GetID = staticmethod(_cspace.csEventNameRegistry_GetID)
     __swig_getmethods__["IsKindOf"] = lambda x: _cspace.csEventNameRegistry_IsKindOf
     if _newclass:IsKindOf = staticmethod(_cspace.csEventNameRegistry_IsKindOf)
-_cspace.csEventNameRegistry_swigregister(csEventNameRegistry)
-
+csEventNameRegistry_swigregister = _cspace.csEventNameRegistry_swigregister
+csEventNameRegistry_swigregister(csEventNameRegistry)
 csEventNameRegistry_GetString = _cspace.csEventNameRegistry_GetString
-
 csEventNameRegistry_GetRegistry = _cspace.csEventNameRegistry_GetRegistry
-
 csEventNameRegistry_GetID = _cspace.csEventNameRegistry_GetID
-
 csEventNameRegistry_IsKindOf = _cspace.csEventNameRegistry_IsKindOf
 
 class iEventHandler(iBase):
@@ -8414,10 +7669,7 @@ class iEventHandler(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iEventHandler, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iEventHandler instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def HandleEvent(*args): return _cspace.iEventHandler_HandleEvent(*args)
     def GenericName(*args): return _cspace.iEventHandler_GenericName(*args)
     def GenericID(*args): return _cspace.iEventHandler_GenericID(*args)
@@ -8429,26 +7681,17 @@ class iEventHandler(iBase):
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iEventHandler_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iEventHandler_scfGetVersion)
-_cspace.iEventHandler_swigregister(iEventHandler)
-
+iEventHandler_swigregister = _cspace.iEventHandler_swigregister
+iEventHandler_swigregister(iEventHandler)
 csevMouse = _cspace.csevMouse
-
 csevMouseOp = _cspace.csevMouseOp
-
 csevJoystick = _cspace.csevJoystick
-
 csevJoystickOp = _cspace.csevJoystickOp
-
 csevCanvasOp = _cspace.csevCanvasOp
-
 csevPreProcess = _cspace.csevPreProcess
-
 csevProcess = _cspace.csevProcess
-
 csevPostProcess = _cspace.csevPostProcess
-
 csevFinalProcess = _cspace.csevFinalProcess
-
 iEventHandler_scfGetVersion = _cspace.iEventHandler_scfGetVersion
 
 class iPluginIterator(iBase):
@@ -8459,15 +7702,13 @@ class iPluginIterator(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iPluginIterator, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iPluginIterator instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def HasNext(*args): return _cspace.iPluginIterator_HasNext(*args)
     def Next(*args): return _cspace.iPluginIterator_Next(*args)
     __swig_destroy__ = _cspace.delete_iPluginIterator
     __del__ = lambda self : None;
-_cspace.iPluginIterator_swigregister(iPluginIterator)
+iPluginIterator_swigregister = _cspace.iPluginIterator_swigregister
+iPluginIterator_swigregister(iPluginIterator)
 
 class iPluginManager(iBase):
     __swig_setmethods__ = {}
@@ -8477,10 +7718,7 @@ class iPluginManager(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iPluginManager, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iPluginManager instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def LoadPlugin(*args): return _cspace.iPluginManager_LoadPlugin(*args)
     def QueryPlugin(*args): return _cspace.iPluginManager_QueryPlugin(*args)
     def UnloadPlugin(*args): return _cspace.iPluginManager_UnloadPlugin(*args)
@@ -8492,10 +7730,9 @@ class iPluginManager(iBase):
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iPluginManager_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iPluginManager_scfGetVersion)
-_cspace.iPluginManager_swigregister(iPluginManager)
-
+iPluginManager_swigregister = _cspace.iPluginManager_swigregister
+iPluginManager_swigregister(iPluginManager)
 iPluginManager_scfGetVersion = _cspace.iPluginManager_scfGetVersion
-
 
 csLoadPluginAlways = _cspace.csLoadPluginAlways
 csComposeNoChar = _cspace.csComposeNoChar
@@ -8510,15 +7747,13 @@ class iKeyComposer(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iKeyComposer, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iKeyComposer instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def HandleKey(*args): return _cspace.iKeyComposer_HandleKey(*args)
     def ResetState(*args): return _cspace.iKeyComposer_ResetState(*args)
     __swig_destroy__ = _cspace.delete_iKeyComposer
     __del__ = lambda self : None;
-_cspace.iKeyComposer_swigregister(iKeyComposer)
+iKeyComposer_swigregister = _cspace.iKeyComposer_swigregister
+iKeyComposer_swigregister(iKeyComposer)
 
 class iKeyboardDriver(iBase):
     __swig_setmethods__ = {}
@@ -8528,10 +7763,7 @@ class iKeyboardDriver(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iKeyboardDriver, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iKeyboardDriver instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def Reset(*args): return _cspace.iKeyboardDriver_Reset(*args)
     def DoKey(*args): return _cspace.iKeyboardDriver_DoKey(*args)
     def GetModifierState(*args): return _cspace.iKeyboardDriver_GetModifierState(*args)
@@ -8542,8 +7774,8 @@ class iKeyboardDriver(iBase):
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iKeyboardDriver_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iKeyboardDriver_scfGetVersion)
     def GetKeyState(*args): return _cspace.iKeyboardDriver_GetKeyState(*args)
-_cspace.iKeyboardDriver_swigregister(iKeyboardDriver)
-
+iKeyboardDriver_swigregister = _cspace.iKeyboardDriver_swigregister
+iKeyboardDriver_swigregister(iKeyboardDriver)
 iKeyboardDriver_scfGetVersion = _cspace.iKeyboardDriver_scfGetVersion
 
 class iMouseDriver(iBase):
@@ -8554,10 +7786,7 @@ class iMouseDriver(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iMouseDriver, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iMouseDriver instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def SetDoubleClickTime(*args): return _cspace.iMouseDriver_SetDoubleClickTime(*args)
     def Reset(*args): return _cspace.iMouseDriver_Reset(*args)
     def GetLastX(*args): return _cspace.iMouseDriver_GetLastX(*args)
@@ -8570,8 +7799,8 @@ class iMouseDriver(iBase):
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iMouseDriver_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iMouseDriver_scfGetVersion)
-_cspace.iMouseDriver_swigregister(iMouseDriver)
-
+iMouseDriver_swigregister = _cspace.iMouseDriver_swigregister
+iMouseDriver_swigregister(iMouseDriver)
 iMouseDriver_scfGetVersion = _cspace.iMouseDriver_scfGetVersion
 
 class iJoystickDriver(iBase):
@@ -8582,10 +7811,7 @@ class iJoystickDriver(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iJoystickDriver, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iJoystickDriver instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def Reset(*args): return _cspace.iJoystickDriver_Reset(*args)
     def GetLastX(*args): return _cspace.iJoystickDriver_GetLastX(*args)
     def GetLastY(*args): return _cspace.iJoystickDriver_GetLastY(*args)
@@ -8595,7 +7821,8 @@ class iJoystickDriver(iBase):
     def DoMotion(*args): return _cspace.iJoystickDriver_DoMotion(*args)
     __swig_destroy__ = _cspace.delete_iJoystickDriver
     __del__ = lambda self : None;
-_cspace.iJoystickDriver_swigregister(iJoystickDriver)
+iJoystickDriver_swigregister = _cspace.iJoystickDriver_swigregister
+iJoystickDriver_swigregister(iJoystickDriver)
 
 class iConfigFile(iBase):
     __swig_setmethods__ = {}
@@ -8605,10 +7832,7 @@ class iConfigFile(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iConfigFile, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iConfigFile instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def GetFileName(*args): return _cspace.iConfigFile_GetFileName(*args)
     def GetVFS(*args): return _cspace.iConfigFile_GetVFS(*args)
     def SetFileName(*args): return _cspace.iConfigFile_SetFileName(*args)
@@ -8637,8 +7861,8 @@ class iConfigFile(iBase):
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iConfigFile_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iConfigFile_scfGetVersion)
-_cspace.iConfigFile_swigregister(iConfigFile)
-
+iConfigFile_swigregister = _cspace.iConfigFile_swigregister
+iConfigFile_swigregister(iConfigFile)
 iConfigFile_scfGetVersion = _cspace.iConfigFile_scfGetVersion
 
 class iConfigIterator(iBase):
@@ -8649,10 +7873,7 @@ class iConfigIterator(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iConfigIterator, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iConfigIterator instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def GetConfigFile(*args): return _cspace.iConfigIterator_GetConfigFile(*args)
     def GetSubsection(*args): return _cspace.iConfigIterator_GetSubsection(*args)
     def Rewind(*args): return _cspace.iConfigIterator_Rewind(*args)
@@ -8667,8 +7888,8 @@ class iConfigIterator(iBase):
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iConfigIterator_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iConfigIterator_scfGetVersion)
-_cspace.iConfigIterator_swigregister(iConfigIterator)
-
+iConfigIterator_swigregister = _cspace.iConfigIterator_swigregister
+iConfigIterator_swigregister(iConfigIterator)
 iConfigIterator_scfGetVersion = _cspace.iConfigIterator_scfGetVersion
 
 class iConfigManager(iConfigFile):
@@ -8679,10 +7900,7 @@ class iConfigManager(iConfigFile):
     for _s in [iConfigFile]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iConfigManager, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iConfigManager instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     PriorityMin = _cspace.iConfigManager_PriorityMin
     PriorityVeryLow = _cspace.iConfigManager_PriorityVeryLow
     PriorityLow = _cspace.iConfigManager_PriorityLow
@@ -8709,8 +7927,8 @@ class iConfigManager(iConfigFile):
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iConfigManager_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iConfigManager_scfGetVersion)
-_cspace.iConfigManager_swigregister(iConfigManager)
-
+iConfigManager_swigregister = _cspace.iConfigManager_swigregister
+iConfigManager_swigregister(iConfigManager)
 iConfigManager_scfGetVersion = _cspace.iConfigManager_scfGetVersion
 
 class iStringArray(iBase):
@@ -8721,10 +7939,7 @@ class iStringArray(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iStringArray, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iStringArray instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def GetSize(*args): return _cspace.iStringArray_GetSize(*args)
     def Length(*args): return _cspace.iStringArray_Length(*args)
     def Push(*args): return _cspace.iStringArray_Push(*args)
@@ -8744,8 +7959,8 @@ class iStringArray(iBase):
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iStringArray_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iStringArray_scfGetVersion)
-_cspace.iStringArray_swigregister(iStringArray)
-
+iStringArray_swigregister = _cspace.iStringArray_swigregister
+iStringArray_swigregister(iStringArray)
 iStringArray_scfGetVersion = _cspace.iStringArray_scfGetVersion
 
 CS_NODE_DOCUMENT = _cspace.CS_NODE_DOCUMENT
@@ -8765,15 +7980,13 @@ class iDocumentAttributeIterator(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iDocumentAttributeIterator, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iDocumentAttributeIterator instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def HasNext(*args): return _cspace.iDocumentAttributeIterator_HasNext(*args)
     def Next(*args): return _cspace.iDocumentAttributeIterator_Next(*args)
     __swig_destroy__ = _cspace.delete_iDocumentAttributeIterator
     __del__ = lambda self : None;
-_cspace.iDocumentAttributeIterator_swigregister(iDocumentAttributeIterator)
+iDocumentAttributeIterator_swigregister = _cspace.iDocumentAttributeIterator_swigregister
+iDocumentAttributeIterator_swigregister(iDocumentAttributeIterator)
 
 class iDocumentAttribute(iBase):
     __swig_setmethods__ = {}
@@ -8783,10 +7996,7 @@ class iDocumentAttribute(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iDocumentAttribute, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iDocumentAttribute instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def GetName(*args): return _cspace.iDocumentAttribute_GetName(*args)
     def GetValue(*args): return _cspace.iDocumentAttribute_GetValue(*args)
     def GetValueAsInt(*args): return _cspace.iDocumentAttribute_GetValueAsInt(*args)
@@ -8798,7 +8008,8 @@ class iDocumentAttribute(iBase):
     def SetValueAsFloat(*args): return _cspace.iDocumentAttribute_SetValueAsFloat(*args)
     __swig_destroy__ = _cspace.delete_iDocumentAttribute
     __del__ = lambda self : None;
-_cspace.iDocumentAttribute_swigregister(iDocumentAttribute)
+iDocumentAttribute_swigregister = _cspace.iDocumentAttribute_swigregister
+iDocumentAttribute_swigregister(iDocumentAttribute)
 
 class iDocumentNodeIterator(iBase):
     __swig_setmethods__ = {}
@@ -8808,15 +8019,13 @@ class iDocumentNodeIterator(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iDocumentNodeIterator, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iDocumentNodeIterator instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def HasNext(*args): return _cspace.iDocumentNodeIterator_HasNext(*args)
     def Next(*args): return _cspace.iDocumentNodeIterator_Next(*args)
     __swig_destroy__ = _cspace.delete_iDocumentNodeIterator
     __del__ = lambda self : None;
-_cspace.iDocumentNodeIterator_swigregister(iDocumentNodeIterator)
+iDocumentNodeIterator_swigregister = _cspace.iDocumentNodeIterator_swigregister
+iDocumentNodeIterator_swigregister(iDocumentNodeIterator)
 
 class iDocumentNode(iBase):
     __swig_setmethods__ = {}
@@ -8826,10 +8035,7 @@ class iDocumentNode(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iDocumentNode, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iDocumentNode instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def GetType(*args): return _cspace.iDocumentNode_GetType(*args)
     def Equals(*args): return _cspace.iDocumentNode_Equals(*args)
     def GetValue(*args): return _cspace.iDocumentNode_GetValue(*args)
@@ -8858,7 +8064,8 @@ class iDocumentNode(iBase):
     def SetAttributeAsFloat(*args): return _cspace.iDocumentNode_SetAttributeAsFloat(*args)
     __swig_destroy__ = _cspace.delete_iDocumentNode
     __del__ = lambda self : None;
-_cspace.iDocumentNode_swigregister(iDocumentNode)
+iDocumentNode_swigregister = _cspace.iDocumentNode_swigregister
+iDocumentNode_swigregister(iDocumentNode)
 
 class iDocument(iBase):
     __swig_setmethods__ = {}
@@ -8868,10 +8075,7 @@ class iDocument(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iDocument, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iDocument instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def Clear(*args): return _cspace.iDocument_Clear(*args)
     def CreateRoot(*args): return _cspace.iDocument_CreateRoot(*args)
     def GetRoot(*args): return _cspace.iDocument_GetRoot(*args)
@@ -8882,8 +8086,8 @@ class iDocument(iBase):
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iDocument_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iDocument_scfGetVersion)
-_cspace.iDocument_swigregister(iDocument)
-
+iDocument_swigregister = _cspace.iDocument_swigregister
+iDocument_swigregister(iDocument)
 iDocument_scfGetVersion = _cspace.iDocument_scfGetVersion
 
 class iDocumentSystem(iBase):
@@ -8894,17 +8098,14 @@ class iDocumentSystem(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iDocumentSystem, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iDocumentSystem instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def CreateDocument(*args): return _cspace.iDocumentSystem_CreateDocument(*args)
     __swig_destroy__ = _cspace.delete_iDocumentSystem
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iDocumentSystem_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iDocumentSystem_scfGetVersion)
-_cspace.iDocumentSystem_swigregister(iDocumentSystem)
-
+iDocumentSystem_swigregister = _cspace.iDocumentSystem_swigregister
+iDocumentSystem_swigregister(iDocumentSystem)
 iDocumentSystem_scfGetVersion = _cspace.iDocumentSystem_scfGetVersion
 
 class csTinyDocumentSystem(_object):
@@ -8912,18 +8113,16 @@ class csTinyDocumentSystem(_object):
     __setattr__ = lambda self, name, value: _swig_setattr(self, csTinyDocumentSystem, name, value)
     __swig_getmethods__ = {}
     __getattr__ = lambda self, name: _swig_getattr(self, csTinyDocumentSystem, name)
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ csTinyDocumentSystem instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
-    def __init__(self, *args):
+    __repr__ = _swig_repr
+    def __init__(self, *args): 
         this = _cspace.new_csTinyDocumentSystem(*args)
         try: self.this.append(this)
         except: self.this = this
     __swig_destroy__ = _cspace.delete_csTinyDocumentSystem
     __del__ = lambda self : None;
     def CreateDocument(*args): return _cspace.csTinyDocumentSystem_CreateDocument(*args)
-_cspace.csTinyDocumentSystem_swigregister(csTinyDocumentSystem)
+csTinyDocumentSystem_swigregister = _cspace.csTinyDocumentSystem_swigregister
+csTinyDocumentSystem_swigregister(csTinyDocumentSystem)
 
 class iDataBuffer(iBase):
     __swig_setmethods__ = {}
@@ -8933,10 +8132,7 @@ class iDataBuffer(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iDataBuffer, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iDataBuffer instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def GetSize(*args): return _cspace.iDataBuffer_GetSize(*args)
     def GetData(*args): return _cspace.iDataBuffer_GetData(*args)
     def asString(*args): return _cspace.iDataBuffer_asString(*args)
@@ -8945,8 +8141,8 @@ class iDataBuffer(iBase):
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iDataBuffer_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iDataBuffer_scfGetVersion)
-_cspace.iDataBuffer_swigregister(iDataBuffer)
-
+iDataBuffer_swigregister = _cspace.iDataBuffer_swigregister
+iDataBuffer_swigregister(iDataBuffer)
 iDataBuffer_scfGetVersion = _cspace.iDataBuffer_scfGetVersion
 
 CS_WRITE_BASELINE = _cspace.CS_WRITE_BASELINE
@@ -8956,33 +8152,28 @@ class csPixelCoord(_object):
     __setattr__ = lambda self, name, value: _swig_setattr(self, csPixelCoord, name, value)
     __swig_getmethods__ = {}
     __getattr__ = lambda self, name: _swig_getattr(self, csPixelCoord, name)
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ csPixelCoord instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     __swig_setmethods__["x"] = _cspace.csPixelCoord_x_set
     __swig_getmethods__["x"] = _cspace.csPixelCoord_x_get
     if _newclass:x = property(_cspace.csPixelCoord_x_get, _cspace.csPixelCoord_x_set)
     __swig_setmethods__["y"] = _cspace.csPixelCoord_y_set
     __swig_getmethods__["y"] = _cspace.csPixelCoord_y_get
     if _newclass:y = property(_cspace.csPixelCoord_y_get, _cspace.csPixelCoord_y_set)
-    def __init__(self, *args):
+    def __init__(self, *args): 
         this = _cspace.new_csPixelCoord(*args)
         try: self.this.append(this)
         except: self.this = this
     __swig_destroy__ = _cspace.delete_csPixelCoord
     __del__ = lambda self : None;
-_cspace.csPixelCoord_swigregister(csPixelCoord)
+csPixelCoord_swigregister = _cspace.csPixelCoord_swigregister
+csPixelCoord_swigregister(csPixelCoord)
 
 class csPixelFormat(_object):
     __swig_setmethods__ = {}
     __setattr__ = lambda self, name, value: _swig_setattr(self, csPixelFormat, name, value)
     __swig_getmethods__ = {}
     __getattr__ = lambda self, name: _swig_getattr(self, csPixelFormat, name)
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ csPixelFormat instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     __swig_setmethods__["RedMask"] = _cspace.csPixelFormat_RedMask_set
     __swig_getmethods__["RedMask"] = _cspace.csPixelFormat_RedMask_get
     if _newclass:RedMask = property(_cspace.csPixelFormat_RedMask_get, _cspace.csPixelFormat_RedMask_set)
@@ -9026,23 +8217,21 @@ class csPixelFormat(_object):
     __swig_getmethods__["PixelBytes"] = _cspace.csPixelFormat_PixelBytes_get
     if _newclass:PixelBytes = property(_cspace.csPixelFormat_PixelBytes_get, _cspace.csPixelFormat_PixelBytes_set)
     def complete(*args): return _cspace.csPixelFormat_complete(*args)
-    def __init__(self, *args):
+    def __init__(self, *args): 
         this = _cspace.new_csPixelFormat(*args)
         try: self.this.append(this)
         except: self.this = this
     __swig_destroy__ = _cspace.delete_csPixelFormat
     __del__ = lambda self : None;
-_cspace.csPixelFormat_swigregister(csPixelFormat)
+csPixelFormat_swigregister = _cspace.csPixelFormat_swigregister
+csPixelFormat_swigregister(csPixelFormat)
 
 class csImageArea(_object):
     __swig_setmethods__ = {}
     __setattr__ = lambda self, name, value: _swig_setattr(self, csImageArea, name, value)
     __swig_getmethods__ = {}
     __getattr__ = lambda self, name: _swig_getattr(self, csImageArea, name)
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ csImageArea instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     __swig_setmethods__["x"] = _cspace.csImageArea_x_set
     __swig_getmethods__["x"] = _cspace.csImageArea_x_get
     if _newclass:x = property(_cspace.csImageArea_x_get, _cspace.csImageArea_x_set)
@@ -9058,13 +8247,14 @@ class csImageArea(_object):
     __swig_setmethods__["data"] = _cspace.csImageArea_data_set
     __swig_getmethods__["data"] = _cspace.csImageArea_data_get
     if _newclass:data = property(_cspace.csImageArea_data_get, _cspace.csImageArea_data_set)
-    def __init__(self, *args):
+    def __init__(self, *args): 
         this = _cspace.new_csImageArea(*args)
         try: self.this.append(this)
         except: self.this = this
     __swig_destroy__ = _cspace.delete_csImageArea
     __del__ = lambda self : None;
-_cspace.csImageArea_swigregister(csImageArea)
+csImageArea_swigregister = _cspace.csImageArea_swigregister
+csImageArea_swigregister(csImageArea)
 
 class iOffscreenCanvasCallback(iBase):
     __swig_setmethods__ = {}
@@ -9074,15 +8264,13 @@ class iOffscreenCanvasCallback(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iOffscreenCanvasCallback, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iOffscreenCanvasCallback instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def FinishDraw(*args): return _cspace.iOffscreenCanvasCallback_FinishDraw(*args)
     def SetRGB(*args): return _cspace.iOffscreenCanvasCallback_SetRGB(*args)
     __swig_destroy__ = _cspace.delete_iOffscreenCanvasCallback
     __del__ = lambda self : None;
-_cspace.iOffscreenCanvasCallback_swigregister(iOffscreenCanvasCallback)
+iOffscreenCanvasCallback_swigregister = _cspace.iOffscreenCanvasCallback_swigregister
+iOffscreenCanvasCallback_swigregister(iOffscreenCanvasCallback)
 
 class iGraphics2D(iBase):
     __swig_setmethods__ = {}
@@ -9092,10 +8280,7 @@ class iGraphics2D(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iGraphics2D, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iGraphics2D instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def Open(*args): return _cspace.iGraphics2D_Open(*args)
     def Close(*args): return _cspace.iGraphics2D_Close(*args)
     def GetWidth(*args): return _cspace.iGraphics2D_GetWidth(*args)
@@ -9153,8 +8338,8 @@ class iGraphics2D(iBase):
     def PerformExtension (self, command, *args):
       self._PerformExtension(self.__class__.__name__, command, args);
 
-_cspace.iGraphics2D_swigregister(iGraphics2D)
-
+iGraphics2D_swigregister = _cspace.iGraphics2D_swigregister
+iGraphics2D_swigregister(iGraphics2D)
 iGraphics2D_scfGetVersion = _cspace.iGraphics2D_scfGetVersion
 
 CSDRAW_2DGRAPHICS = _cspace.CSDRAW_2DGRAPHICS
@@ -9243,23 +8428,21 @@ class csAlphaMode(_object):
     __setattr__ = lambda self, name, value: _swig_setattr(self, csAlphaMode, name, value)
     __swig_getmethods__ = {}
     __getattr__ = lambda self, name: _swig_getattr(self, csAlphaMode, name)
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ csAlphaMode instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     alphaNone = _cspace.csAlphaMode_alphaNone
     alphaBinary = _cspace.csAlphaMode_alphaBinary
     alphaSmooth = _cspace.csAlphaMode_alphaSmooth
     __swig_setmethods__["autoAlphaMode"] = _cspace.csAlphaMode_autoAlphaMode_set
     __swig_getmethods__["autoAlphaMode"] = _cspace.csAlphaMode_autoAlphaMode_get
     if _newclass:autoAlphaMode = property(_cspace.csAlphaMode_autoAlphaMode_get, _cspace.csAlphaMode_autoAlphaMode_set)
-    def __init__(self, *args):
+    def __init__(self, *args): 
         this = _cspace.new_csAlphaMode(*args)
         try: self.this.append(this)
         except: self.this = this
     __swig_destroy__ = _cspace.delete_csAlphaMode
     __del__ = lambda self : None;
-_cspace.csAlphaMode_swigregister(csAlphaMode)
+csAlphaMode_swigregister = _cspace.csAlphaMode_swigregister
+csAlphaMode_swigregister(csAlphaMode)
 
 CS_LIGHTPARAM_POSITION = _cspace.CS_LIGHTPARAM_POSITION
 CS_LIGHTPARAM_DIFFUSE = _cspace.CS_LIGHTPARAM_DIFFUSE
@@ -9291,10 +8474,7 @@ class csGraphics3DCaps(_object):
     __setattr__ = lambda self, name, value: _swig_setattr(self, csGraphics3DCaps, name, value)
     __swig_getmethods__ = {}
     __getattr__ = lambda self, name: _swig_getattr(self, csGraphics3DCaps, name)
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ csGraphics3DCaps instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     __swig_setmethods__["minTexHeight"] = _cspace.csGraphics3DCaps_minTexHeight_set
     __swig_getmethods__["minTexHeight"] = _cspace.csGraphics3DCaps_minTexHeight_get
     if _newclass:minTexHeight = property(_cspace.csGraphics3DCaps_minTexHeight_get, _cspace.csGraphics3DCaps_minTexHeight_set)
@@ -9316,13 +8496,14 @@ class csGraphics3DCaps(_object):
     __swig_setmethods__["StencilShadows"] = _cspace.csGraphics3DCaps_StencilShadows_set
     __swig_getmethods__["StencilShadows"] = _cspace.csGraphics3DCaps_StencilShadows_get
     if _newclass:StencilShadows = property(_cspace.csGraphics3DCaps_StencilShadows_get, _cspace.csGraphics3DCaps_StencilShadows_set)
-    def __init__(self, *args):
+    def __init__(self, *args): 
         this = _cspace.new_csGraphics3DCaps(*args)
         try: self.this.append(this)
         except: self.this = this
     __swig_destroy__ = _cspace.delete_csGraphics3DCaps
     __del__ = lambda self : None;
-_cspace.csGraphics3DCaps_swigregister(csGraphics3DCaps)
+csGraphics3DCaps_swigregister = _cspace.csGraphics3DCaps_swigregister
+csGraphics3DCaps_swigregister(csGraphics3DCaps)
 
 CS_MESHTYPE_TRIANGLES = _cspace.CS_MESHTYPE_TRIANGLES
 CS_MESHTYPE_QUADS = _cspace.CS_MESHTYPE_QUADS
@@ -9341,10 +8522,7 @@ class csSimpleRenderMesh(_object):
     __setattr__ = lambda self, name, value: _swig_setattr(self, csSimpleRenderMesh, name, value)
     __swig_getmethods__ = {}
     __getattr__ = lambda self, name: _swig_getattr(self, csSimpleRenderMesh, name)
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ csSimpleRenderMesh instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     __swig_setmethods__["meshtype"] = _cspace.csSimpleRenderMesh_meshtype_set
     __swig_getmethods__["meshtype"] = _cspace.csSimpleRenderMesh_meshtype_get
     if _newclass:meshtype = property(_cspace.csSimpleRenderMesh_meshtype_get, _cspace.csSimpleRenderMesh_meshtype_set)
@@ -9387,13 +8565,14 @@ class csSimpleRenderMesh(_object):
     __swig_setmethods__["object2world"] = _cspace.csSimpleRenderMesh_object2world_set
     __swig_getmethods__["object2world"] = _cspace.csSimpleRenderMesh_object2world_get
     if _newclass:object2world = property(_cspace.csSimpleRenderMesh_object2world_get, _cspace.csSimpleRenderMesh_object2world_set)
-    def __init__(self, *args):
+    def __init__(self, *args): 
         this = _cspace.new_csSimpleRenderMesh(*args)
         try: self.this.append(this)
         except: self.this = this
     __swig_destroy__ = _cspace.delete_csSimpleRenderMesh
     __del__ = lambda self : None;
-_cspace.csSimpleRenderMesh_swigregister(csSimpleRenderMesh)
+csSimpleRenderMesh_swigregister = _cspace.csSimpleRenderMesh_swigregister
+csSimpleRenderMesh_swigregister(csSimpleRenderMesh)
 
 class iGraphics3D(iBase):
     __swig_setmethods__ = {}
@@ -9403,10 +8582,7 @@ class iGraphics3D(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iGraphics3D, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iGraphics3D instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def Open(*args): return _cspace.iGraphics3D_Open(*args)
     def Close(*args): return _cspace.iGraphics3D_Close(*args)
     def GetDriver2D(*args): return _cspace.iGraphics3D_GetDriver2D(*args)
@@ -9460,8 +8636,8 @@ class iGraphics3D(iBase):
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iGraphics3D_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iGraphics3D_scfGetVersion)
-_cspace.iGraphics3D_swigregister(iGraphics3D)
-
+iGraphics3D_swigregister = _cspace.iGraphics3D_swigregister
+iGraphics3D_swigregister(iGraphics3D)
 iGraphics3D_scfGetVersion = _cspace.iGraphics3D_scfGetVersion
 
 csmcNone = _cspace.csmcNone
@@ -9487,14 +8663,12 @@ class iNativeWindowManager(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iNativeWindowManager, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iNativeWindowManager instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def Alert(*args): return _cspace.iNativeWindowManager_Alert(*args)
     __swig_destroy__ = _cspace.delete_iNativeWindowManager
     __del__ = lambda self : None;
-_cspace.iNativeWindowManager_swigregister(iNativeWindowManager)
+iNativeWindowManager_swigregister = _cspace.iNativeWindowManager_swigregister
+iNativeWindowManager_swigregister(iNativeWindowManager)
 
 class iNativeWindow(iBase):
     __swig_setmethods__ = {}
@@ -9504,14 +8678,12 @@ class iNativeWindow(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iNativeWindow, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iNativeWindow instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def SetTitle(*args): return _cspace.iNativeWindow_SetTitle(*args)
     __swig_destroy__ = _cspace.delete_iNativeWindow
     __del__ = lambda self : None;
-_cspace.iNativeWindow_swigregister(iNativeWindow)
+iNativeWindow_swigregister = _cspace.iNativeWindow_swigregister
+iNativeWindow_swigregister(iNativeWindow)
 
 CSFONT_LARGE = _cspace.CSFONT_LARGE
 CSFONT_ITALIC = _cspace.CSFONT_ITALIC
@@ -9526,24 +8698,19 @@ class iFontDeleteNotify(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iFontDeleteNotify, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iFontDeleteNotify instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def BeforeDelete(*args): return _cspace.iFontDeleteNotify_BeforeDelete(*args)
     __swig_destroy__ = _cspace.delete_iFontDeleteNotify
     __del__ = lambda self : None;
-_cspace.iFontDeleteNotify_swigregister(iFontDeleteNotify)
+iFontDeleteNotify_swigregister = _cspace.iFontDeleteNotify_swigregister
+iFontDeleteNotify_swigregister(iFontDeleteNotify)
 
 class csBitmapMetrics(_object):
     __swig_setmethods__ = {}
     __setattr__ = lambda self, name, value: _swig_setattr(self, csBitmapMetrics, name, value)
     __swig_getmethods__ = {}
     __getattr__ = lambda self, name: _swig_getattr(self, csBitmapMetrics, name)
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ csBitmapMetrics instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     __swig_setmethods__["width"] = _cspace.csBitmapMetrics_width_set
     __swig_getmethods__["width"] = _cspace.csBitmapMetrics_width_get
     if _newclass:width = property(_cspace.csBitmapMetrics_width_get, _cspace.csBitmapMetrics_width_set)
@@ -9556,33 +8723,32 @@ class csBitmapMetrics(_object):
     __swig_setmethods__["top"] = _cspace.csBitmapMetrics_top_set
     __swig_getmethods__["top"] = _cspace.csBitmapMetrics_top_get
     if _newclass:top = property(_cspace.csBitmapMetrics_top_get, _cspace.csBitmapMetrics_top_set)
-    def __init__(self, *args):
+    def __init__(self, *args): 
         this = _cspace.new_csBitmapMetrics(*args)
         try: self.this.append(this)
         except: self.this = this
     __swig_destroy__ = _cspace.delete_csBitmapMetrics
     __del__ = lambda self : None;
-_cspace.csBitmapMetrics_swigregister(csBitmapMetrics)
+csBitmapMetrics_swigregister = _cspace.csBitmapMetrics_swigregister
+csBitmapMetrics_swigregister(csBitmapMetrics)
 
 class csGlyphMetrics(_object):
     __swig_setmethods__ = {}
     __setattr__ = lambda self, name, value: _swig_setattr(self, csGlyphMetrics, name, value)
     __swig_getmethods__ = {}
     __getattr__ = lambda self, name: _swig_getattr(self, csGlyphMetrics, name)
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ csGlyphMetrics instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     __swig_setmethods__["advance"] = _cspace.csGlyphMetrics_advance_set
     __swig_getmethods__["advance"] = _cspace.csGlyphMetrics_advance_get
     if _newclass:advance = property(_cspace.csGlyphMetrics_advance_get, _cspace.csGlyphMetrics_advance_set)
-    def __init__(self, *args):
+    def __init__(self, *args): 
         this = _cspace.new_csGlyphMetrics(*args)
         try: self.this.append(this)
         except: self.this = this
     __swig_destroy__ = _cspace.delete_csGlyphMetrics
     __del__ = lambda self : None;
-_cspace.csGlyphMetrics_swigregister(csGlyphMetrics)
+csGlyphMetrics_swigregister = _cspace.csGlyphMetrics_swigregister
+csGlyphMetrics_swigregister(csGlyphMetrics)
 
 class iFont(iBase):
     __swig_setmethods__ = {}
@@ -9592,10 +8758,7 @@ class iFont(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iFont, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iFont instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def AddDeleteCallback(*args): return _cspace.iFont_AddDeleteCallback(*args)
     def RemoveDeleteCallback(*args): return _cspace.iFont_RemoveDeleteCallback(*args)
     def GetSize(*args): return _cspace.iFont_GetSize(*args)
@@ -9615,8 +8778,8 @@ class iFont(iBase):
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iFont_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iFont_scfGetVersion)
-_cspace.iFont_swigregister(iFont)
-
+iFont_swigregister = _cspace.iFont_swigregister
+iFont_swigregister(iFont)
 iFont_scfGetVersion = _cspace.iFont_scfGetVersion
 
 class iFontServer(iBase):
@@ -9627,10 +8790,7 @@ class iFontServer(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iFontServer, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iFontServer instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def LoadFont(*args): return _cspace.iFontServer_LoadFont(*args)
     def SetWarnOnError(*args): return _cspace.iFontServer_SetWarnOnError(*args)
     def GetWarnOnError(*args): return _cspace.iFontServer_GetWarnOnError(*args)
@@ -9638,8 +8798,8 @@ class iFontServer(iBase):
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iFontServer_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iFontServer_scfGetVersion)
-_cspace.iFontServer_swigregister(iFontServer)
-
+iFontServer_swigregister = _cspace.iFontServer_swigregister
+iFontServer_swigregister(iFontServer)
 iFontServer_scfGetVersion = _cspace.iFontServer_scfGetVersion
 
 class iHalo(iBase):
@@ -9650,10 +8810,7 @@ class iHalo(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iHalo, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iHalo instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def GetWidth(*args): return _cspace.iHalo_GetWidth(*args)
     def GetHeight(*args): return _cspace.iHalo_GetHeight(*args)
     def SetColor(*args): return _cspace.iHalo_SetColor(*args)
@@ -9663,8 +8820,8 @@ class iHalo(iBase):
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iHalo_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iHalo_scfGetVersion)
-_cspace.iHalo_swigregister(iHalo)
-
+iHalo_swigregister = _cspace.iHalo_swigregister
+iHalo_swigregister(iHalo)
 iHalo_scfGetVersion = _cspace.iHalo_scfGetVersion
 
 class iShaderVarStack(csShaderVariableArray):
@@ -9675,13 +8832,11 @@ class iShaderVarStack(csShaderVariableArray):
     for _s in [csShaderVariableArray]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iShaderVarStack, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iShaderVarStack instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     __swig_destroy__ = _cspace.delete_iShaderVarStack
     __del__ = lambda self : None;
-_cspace.iShaderVarStack_swigregister(iShaderVarStack)
+iShaderVarStack_swigregister = _cspace.iShaderVarStack_swigregister
+iShaderVarStack_swigregister(iShaderVarStack)
 
 class iShaderVariableContext(iBase):
     __swig_setmethods__ = {}
@@ -9691,10 +8846,7 @@ class iShaderVariableContext(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iShaderVariableContext, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iShaderVariableContext instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def AddVariable(*args): return _cspace.iShaderVariableContext_AddVariable(*args)
     def GetVariable(*args): return _cspace.iShaderVariableContext_GetVariable(*args)
     def GetVariableAdd(*args): return _cspace.iShaderVariableContext_GetVariableAdd(*args)
@@ -9707,10 +8859,9 @@ class iShaderVariableContext(iBase):
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iShaderVariableContext_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iShaderVariableContext_scfGetVersion)
-_cspace.iShaderVariableContext_swigregister(iShaderVariableContext)
-
+iShaderVariableContext_swigregister = _cspace.iShaderVariableContext_swigregister
+iShaderVariableContext_swigregister(iShaderVariableContext)
 csGetShaderVariableFromStack = _cspace.csGetShaderVariableFromStack
-
 iShaderVariableContext_scfGetVersion = _cspace.iShaderVariableContext_scfGetVersion
 
 TagNeutral = _cspace.TagNeutral
@@ -9724,10 +8875,7 @@ class iShaderManager(iShaderVariableContext):
     for _s in [iShaderVariableContext]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iShaderManager, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iShaderManager instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def RegisterShader(*args): return _cspace.iShaderManager_RegisterShader(*args)
     def UnregisterShader(*args): return _cspace.iShaderManager_UnregisterShader(*args)
     def GetShader(*args): return _cspace.iShaderManager_GetShader(*args)
@@ -9744,8 +8892,8 @@ class iShaderManager(iShaderVariableContext):
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iShaderManager_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iShaderManager_scfGetVersion)
-_cspace.iShaderManager_swigregister(iShaderManager)
-
+iShaderManager_swigregister = _cspace.iShaderManager_swigregister
+iShaderManager_swigregister(iShaderManager)
 iShaderManager_scfGetVersion = _cspace.iShaderManager_scfGetVersion
 
 class csShaderMetadata(_object):
@@ -9753,23 +8901,21 @@ class csShaderMetadata(_object):
     __setattr__ = lambda self, name, value: _swig_setattr(self, csShaderMetadata, name, value)
     __swig_getmethods__ = {}
     __getattr__ = lambda self, name: _swig_getattr(self, csShaderMetadata, name)
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ csShaderMetadata instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     __swig_setmethods__["description"] = _cspace.csShaderMetadata_description_set
     __swig_getmethods__["description"] = _cspace.csShaderMetadata_description_get
     if _newclass:description = property(_cspace.csShaderMetadata_description_get, _cspace.csShaderMetadata_description_set)
     __swig_setmethods__["numberOfLights"] = _cspace.csShaderMetadata_numberOfLights_set
     __swig_getmethods__["numberOfLights"] = _cspace.csShaderMetadata_numberOfLights_get
     if _newclass:numberOfLights = property(_cspace.csShaderMetadata_numberOfLights_get, _cspace.csShaderMetadata_numberOfLights_set)
-    def __init__(self, *args):
+    def __init__(self, *args): 
         this = _cspace.new_csShaderMetadata(*args)
         try: self.this.append(this)
         except: self.this = this
     __swig_destroy__ = _cspace.delete_csShaderMetadata
     __del__ = lambda self : None;
-_cspace.csShaderMetadata_swigregister(csShaderMetadata)
+csShaderMetadata_swigregister = _cspace.csShaderMetadata_swigregister
+csShaderMetadata_swigregister(csShaderMetadata)
 
 class iShader(iShaderVariableContext):
     __swig_setmethods__ = {}
@@ -9779,10 +8925,7 @@ class iShader(iShaderVariableContext):
     for _s in [iShaderVariableContext]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iShader, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iShader instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def QueryObject(*args): return _cspace.iShader_QueryObject(*args)
     def GetFileName(*args): return _cspace.iShader_GetFileName(*args)
     def SetFileName(*args): return _cspace.iShader_SetFileName(*args)
@@ -9795,7 +8938,8 @@ class iShader(iShaderVariableContext):
     def GetMetadata(*args): return _cspace.iShader_GetMetadata(*args)
     __swig_destroy__ = _cspace.delete_iShader
     __del__ = lambda self : None;
-_cspace.iShader_swigregister(iShader)
+iShader_swigregister = _cspace.iShader_swigregister
+iShader_swigregister(iShader)
 
 class iShaderPriorityList(iBase):
     __swig_setmethods__ = {}
@@ -9805,15 +8949,13 @@ class iShaderPriorityList(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iShaderPriorityList, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iShaderPriorityList instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def GetCount(*args): return _cspace.iShaderPriorityList_GetCount(*args)
     def GetPriority(*args): return _cspace.iShaderPriorityList_GetPriority(*args)
     __swig_destroy__ = _cspace.delete_iShaderPriorityList
     __del__ = lambda self : None;
-_cspace.iShaderPriorityList_swigregister(iShaderPriorityList)
+iShaderPriorityList_swigregister = _cspace.iShaderPriorityList_swigregister
+iShaderPriorityList_swigregister(iShaderPriorityList)
 
 class iShaderCompiler(iBase):
     __swig_setmethods__ = {}
@@ -9823,10 +8965,7 @@ class iShaderCompiler(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iShaderCompiler, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iShaderCompiler instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def GetName(*args): return _cspace.iShaderCompiler_GetName(*args)
     def CompileShader(*args): return _cspace.iShaderCompiler_CompileShader(*args)
     def ValidateTemplate(*args): return _cspace.iShaderCompiler_ValidateTemplate(*args)
@@ -9834,7 +8973,8 @@ class iShaderCompiler(iBase):
     def GetPriorities(*args): return _cspace.iShaderCompiler_GetPriorities(*args)
     __swig_destroy__ = _cspace.delete_iShaderCompiler
     __del__ = lambda self : None;
-_cspace.iShaderCompiler_swigregister(iShaderCompiler)
+iShaderCompiler_swigregister = _cspace.iShaderCompiler_swigregister
+iShaderCompiler_swigregister(iShaderCompiler)
 
 class iTextureHandle(iBase):
     __swig_setmethods__ = {}
@@ -9844,10 +8984,7 @@ class iTextureHandle(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iTextureHandle, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iTextureHandle instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def GetFlags(*args): return _cspace.iTextureHandle_GetFlags(*args)
     def SetKeyColor(*args): return _cspace.iTextureHandle_SetKeyColor(*args)
     def GetKeyColorStatus(*args): return _cspace.iTextureHandle_GetKeyColorStatus(*args)
@@ -9881,8 +9018,8 @@ class iTextureHandle(iBase):
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iTextureHandle_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iTextureHandle_scfGetVersion)
-_cspace.iTextureHandle_swigregister(iTextureHandle)
-
+iTextureHandle_swigregister = _cspace.iTextureHandle_swigregister
+iTextureHandle_swigregister(iTextureHandle)
 iTextureHandle_scfGetVersion = _cspace.iTextureHandle_scfGetVersion
 
 CS_TEXTURE_2D = _cspace.CS_TEXTURE_2D
@@ -9901,16 +9038,14 @@ class iRendererLightmap(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iRendererLightmap, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iRendererLightmap instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def GetSLMCoords(*args): return _cspace.iRendererLightmap_GetSLMCoords(*args)
     def SetData(*args): return _cspace.iRendererLightmap_SetData(*args)
     def SetLightCellSize(*args): return _cspace.iRendererLightmap_SetLightCellSize(*args)
     __swig_destroy__ = _cspace.delete_iRendererLightmap
     __del__ = lambda self : None;
-_cspace.iRendererLightmap_swigregister(iRendererLightmap)
+iRendererLightmap_swigregister = _cspace.iRendererLightmap_swigregister
+iRendererLightmap_swigregister(iRendererLightmap)
 
 class iSuperLightmap(iBase):
     __swig_setmethods__ = {}
@@ -9920,16 +9055,14 @@ class iSuperLightmap(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iSuperLightmap, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iSuperLightmap instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def RegisterLightmap(*args): return _cspace.iSuperLightmap_RegisterLightmap(*args)
     def Dump(*args): return _cspace.iSuperLightmap_Dump(*args)
     def GetTexture(*args): return _cspace.iSuperLightmap_GetTexture(*args)
     __swig_destroy__ = _cspace.delete_iSuperLightmap
     __del__ = lambda self : None;
-_cspace.iSuperLightmap_swigregister(iSuperLightmap)
+iSuperLightmap_swigregister = _cspace.iSuperLightmap_swigregister
+iSuperLightmap_swigregister(iSuperLightmap)
 
 class iTextureManager(iBase):
     __swig_setmethods__ = {}
@@ -9939,10 +9072,7 @@ class iTextureManager(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iTextureManager, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iTextureManager instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def RegisterTexture(*args): return _cspace.iTextureManager_RegisterTexture(*args)
     def GetTextureFormat(*args): return _cspace.iTextureManager_GetTextureFormat(*args)
     def CreateSuperLightmap(*args): return _cspace.iTextureManager_CreateSuperLightmap(*args)
@@ -9951,8 +9081,8 @@ class iTextureManager(iBase):
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iTextureManager_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iTextureManager_scfGetVersion)
-_cspace.iTextureManager_swigregister(iTextureManager)
-
+iTextureManager_swigregister = _cspace.iTextureManager_swigregister
+iTextureManager_swigregister(iTextureManager)
 iTextureManager_scfGetVersion = _cspace.iTextureManager_scfGetVersion
 
 CS_MATERIAL_VARNAME_FLATCOLOR = _cspace.CS_MATERIAL_VARNAME_FLATCOLOR
@@ -9965,10 +9095,7 @@ class iMaterial(iShaderVariableContext):
     for _s in [iShaderVariableContext]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iMaterial, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iMaterial instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def SetShader(*args): return _cspace.iMaterial_SetShader(*args)
     def GetShader(*args): return _cspace.iMaterial_GetShader(*args)
     def GetShaders(*args): return _cspace.iMaterial_GetShaders(*args)
@@ -9979,8 +9106,8 @@ class iMaterial(iShaderVariableContext):
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iMaterial_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iMaterial_scfGetVersion)
-_cspace.iMaterial_swigregister(iMaterial)
-
+iMaterial_swigregister = _cspace.iMaterial_swigregister
+iMaterial_swigregister(iMaterial)
 iMaterial_scfGetVersion = _cspace.iMaterial_scfGetVersion
 
 CS_IMGFMT_MASK = _cspace.CS_IMGFMT_MASK
@@ -10001,10 +9128,7 @@ class iImage(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iImage, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iImage instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def GetImageData(*args): return _cspace.iImage_GetImageData(*args)
     def GetWidth(*args): return _cspace.iImage_GetWidth(*args)
     def GetHeight(*args): return _cspace.iImage_GetHeight(*args)
@@ -10029,8 +9153,8 @@ class iImage(iBase):
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iImage_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iImage_scfGetVersion)
-_cspace.iImage_swigregister(iImage)
-
+iImage_swigregister = _cspace.iImage_swigregister
+iImage_swigregister(iImage)
 iImage_scfGetVersion = _cspace.iImage_scfGetVersion
 
 class csImageIOFileFormatDescriptions(_object):
@@ -10038,13 +9162,10 @@ class csImageIOFileFormatDescriptions(_object):
     __setattr__ = lambda self, name, value: _swig_setattr(self, csImageIOFileFormatDescriptions, name, value)
     __swig_getmethods__ = {}
     __getattr__ = lambda self, name: _swig_getattr(self, csImageIOFileFormatDescriptions, name)
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ csArray<csImageIOFileFormatDescription const * > instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     __swig_destroy__ = _cspace.delete_csImageIOFileFormatDescriptions
     __del__ = lambda self : None;
-    def __init__(self, *args):
+    def __init__(self, *args): 
         this = _cspace.new_csImageIOFileFormatDescriptions(*args)
         try: self.this.append(this)
         except: self.this = this
@@ -10067,7 +9188,8 @@ class csImageIOFileFormatDescriptions(_object):
     def __eq__(*args): return _cspace.csImageIOFileFormatDescriptions___eq__(*args)
     def __ne__(*args): return _cspace.csImageIOFileFormatDescriptions___ne__(*args)
     def GetAllocator(*args): return _cspace.csImageIOFileFormatDescriptions_GetAllocator(*args)
-_cspace.csImageIOFileFormatDescriptions_swigregister(csImageIOFileFormatDescriptions)
+csImageIOFileFormatDescriptions_swigregister = _cspace.csImageIOFileFormatDescriptions_swigregister
+csImageIOFileFormatDescriptions_swigregister(csImageIOFileFormatDescriptions)
 
 CS_IMAGEIO_LOAD = _cspace.CS_IMAGEIO_LOAD
 CS_IMAGEIO_SAVE = _cspace.CS_IMAGEIO_SAVE
@@ -10076,10 +9198,7 @@ class csImageIOFileFormatDescription(_object):
     __setattr__ = lambda self, name, value: _swig_setattr(self, csImageIOFileFormatDescription, name, value)
     __swig_getmethods__ = {}
     __getattr__ = lambda self, name: _swig_getattr(self, csImageIOFileFormatDescription, name)
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ csImageIOFileFormatDescription instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     __swig_getmethods__["mime"] = _cspace.csImageIOFileFormatDescription_mime_get
     if _newclass:mime = property(_cspace.csImageIOFileFormatDescription_mime_get)
     __swig_getmethods__["subtype"] = _cspace.csImageIOFileFormatDescription_subtype_get
@@ -10087,13 +9206,14 @@ class csImageIOFileFormatDescription(_object):
     __swig_setmethods__["cap"] = _cspace.csImageIOFileFormatDescription_cap_set
     __swig_getmethods__["cap"] = _cspace.csImageIOFileFormatDescription_cap_get
     if _newclass:cap = property(_cspace.csImageIOFileFormatDescription_cap_get, _cspace.csImageIOFileFormatDescription_cap_set)
-    def __init__(self, *args):
+    def __init__(self, *args): 
         this = _cspace.new_csImageIOFileFormatDescription(*args)
         try: self.this.append(this)
         except: self.this = this
     __swig_destroy__ = _cspace.delete_csImageIOFileFormatDescription
     __del__ = lambda self : None;
-_cspace.csImageIOFileFormatDescription_swigregister(csImageIOFileFormatDescription)
+csImageIOFileFormatDescription_swigregister = _cspace.csImageIOFileFormatDescription_swigregister
+csImageIOFileFormatDescription_swigregister(csImageIOFileFormatDescription)
 
 class iImageIO(iBase):
     __swig_setmethods__ = {}
@@ -10103,10 +9223,7 @@ class iImageIO(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iImageIO, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iImageIO instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def GetDescription(*args): return _cspace.iImageIO_GetDescription(*args)
     def Load(*args): return _cspace.iImageIO_Load(*args)
     def SetDithering(*args): return _cspace.iImageIO_SetDithering(*args)
@@ -10115,8 +9232,8 @@ class iImageIO(iBase):
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iImageIO_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iImageIO_scfGetVersion)
-_cspace.iImageIO_swigregister(iImageIO)
-
+iImageIO_swigregister = _cspace.iImageIO_swigregister
+iImageIO_swigregister(iImageIO)
 iImageIO_scfGetVersion = _cspace.iImageIO_scfGetVersion
 
 CS_REPORTER_SEVERITY_BUG = _cspace.CS_REPORTER_SEVERITY_BUG
@@ -10132,17 +9249,14 @@ class iReporterListener(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iReporterListener, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iReporterListener instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def Report(*args): return _cspace.iReporterListener_Report(*args)
     __swig_destroy__ = _cspace.delete_iReporterListener
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iReporterListener_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iReporterListener_scfGetVersion)
-_cspace.iReporterListener_swigregister(iReporterListener)
-
+iReporterListener_swigregister = _cspace.iReporterListener_swigregister
+iReporterListener_swigregister(iReporterListener)
 iReporterListener_scfGetVersion = _cspace.iReporterListener_scfGetVersion
 
 class iReporterIterator(iBase):
@@ -10153,10 +9267,7 @@ class iReporterIterator(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iReporterIterator, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iReporterIterator instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def HasNext(*args): return _cspace.iReporterIterator_HasNext(*args)
     def Next(*args): return _cspace.iReporterIterator_Next(*args)
     def GetMessageSeverity(*args): return _cspace.iReporterIterator_GetMessageSeverity(*args)
@@ -10166,8 +9277,8 @@ class iReporterIterator(iBase):
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iReporterIterator_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iReporterIterator_scfGetVersion)
-_cspace.iReporterIterator_swigregister(iReporterIterator)
-
+iReporterIterator_swigregister = _cspace.iReporterIterator_swigregister
+iReporterIterator_swigregister(iReporterIterator)
 iReporterIterator_scfGetVersion = _cspace.iReporterIterator_scfGetVersion
 
 class iReporter(iBase):
@@ -10178,10 +9289,7 @@ class iReporter(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iReporter, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iReporter instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def Report(*args): return _cspace.iReporter_Report(*args)
     def Clear(*args): return _cspace.iReporter_Clear(*args)
     def GetMessageIterator(*args): return _cspace.iReporter_GetMessageIterator(*args)
@@ -10197,8 +9305,8 @@ class iReporter(iBase):
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iReporter_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iReporter_scfGetVersion)
-_cspace.iReporter_swigregister(iReporter)
-
+iReporter_swigregister = _cspace.iReporter_swigregister
+iReporter_swigregister(iReporter)
 iReporter_scfGetVersion = _cspace.iReporter_scfGetVersion
 
 class csReporterHelper(_object):
@@ -10206,20 +9314,17 @@ class csReporterHelper(_object):
     __setattr__ = lambda self, name, value: _swig_setattr(self, csReporterHelper, name, value)
     __swig_getmethods__ = {}
     __getattr__ = lambda self, name: _swig_getattr(self, csReporterHelper, name)
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ csReporterHelper instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     __swig_getmethods__["Report"] = lambda x: _cspace.csReporterHelper_Report
     if _newclass:Report = staticmethod(_cspace.csReporterHelper_Report)
-    def __init__(self, *args):
+    def __init__(self, *args): 
         this = _cspace.new_csReporterHelper(*args)
         try: self.this.append(this)
         except: self.this = this
     __swig_destroy__ = _cspace.delete_csReporterHelper
     __del__ = lambda self : None;
-_cspace.csReporterHelper_swigregister(csReporterHelper)
-
+csReporterHelper_swigregister = _cspace.csReporterHelper_swigregister
+csReporterHelper_swigregister(csReporterHelper)
 csReporterHelper_Report = _cspace.csReporterHelper_Report
 
 csConPageUp = _cspace.csConPageUp
@@ -10237,14 +9342,12 @@ class iConsoleWatcher(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iConsoleWatcher, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iConsoleWatcher instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def ConsoleVisibilityChanged(*args): return _cspace.iConsoleWatcher_ConsoleVisibilityChanged(*args)
     __swig_destroy__ = _cspace.delete_iConsoleWatcher
     __del__ = lambda self : None;
-_cspace.iConsoleWatcher_swigregister(iConsoleWatcher)
+iConsoleWatcher_swigregister = _cspace.iConsoleWatcher_swigregister
+iConsoleWatcher_swigregister(iConsoleWatcher)
 
 class iConsoleOutput(iBase):
     __swig_setmethods__ = {}
@@ -10254,10 +9357,7 @@ class iConsoleOutput(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iConsoleOutput, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iConsoleOutput instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def PutText(*args): return _cspace.iConsoleOutput_PutText(*args)
     def GetLine(*args): return _cspace.iConsoleOutput_GetLine(*args)
     def Draw2D(*args): return _cspace.iConsoleOutput_Draw2D(*args)
@@ -10281,7 +9381,8 @@ class iConsoleOutput(iBase):
     def PerformExtension(*args): return _cspace.iConsoleOutput_PerformExtension(*args)
     __swig_destroy__ = _cspace.delete_iConsoleOutput
     __del__ = lambda self : None;
-_cspace.iConsoleOutput_swigregister(iConsoleOutput)
+iConsoleOutput_swigregister = _cspace.iConsoleOutput_swigregister
+iConsoleOutput_swigregister(iConsoleOutput)
 
 class iStandardReporterListener(iBase):
     __swig_setmethods__ = {}
@@ -10291,10 +9392,7 @@ class iStandardReporterListener(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iStandardReporterListener, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iStandardReporterListener instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def SetOutputConsole(*args): return _cspace.iStandardReporterListener_SetOutputConsole(*args)
     def SetNativeWindowManager(*args): return _cspace.iStandardReporterListener_SetNativeWindowManager(*args)
     def SetReporter(*args): return _cspace.iStandardReporterListener_SetReporter(*args)
@@ -10308,8 +9406,8 @@ class iStandardReporterListener(iBase):
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iStandardReporterListener_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iStandardReporterListener_scfGetVersion)
-_cspace.iStandardReporterListener_swigregister(iStandardReporterListener)
-
+iStandardReporterListener_swigregister = _cspace.iStandardReporterListener_swigregister
+iStandardReporterListener_swigregister(iStandardReporterListener)
 iStandardReporterListener_scfGetVersion = _cspace.iStandardReporterListener_scfGetVersion
 
 class iView(iBase):
@@ -10320,10 +9418,7 @@ class iView(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iView, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iView instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def GetEngine(*args): return _cspace.iView_GetEngine(*args)
     def SetEngine(*args): return _cspace.iView_SetEngine(*args)
     def GetCamera(*args): return _cspace.iView_GetCamera(*args)
@@ -10342,8 +9437,8 @@ class iView(iBase):
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iView_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iView_scfGetVersion)
-_cspace.iView_swigregister(iView)
-
+iView_swigregister = _cspace.iView_swigregister
+iView_swigregister(iView)
 iView_scfGetVersion = _cspace.iView_scfGetVersion
 
 class csCollisionPair(_object):
@@ -10351,10 +9446,7 @@ class csCollisionPair(_object):
     __setattr__ = lambda self, name, value: _swig_setattr(self, csCollisionPair, name, value)
     __swig_getmethods__ = {}
     __getattr__ = lambda self, name: _swig_getattr(self, csCollisionPair, name)
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ csCollisionPair instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     __swig_setmethods__["a1"] = _cspace.csCollisionPair_a1_set
     __swig_getmethods__["a1"] = _cspace.csCollisionPair_a1_get
     if _newclass:a1 = property(_cspace.csCollisionPair_a1_get, _cspace.csCollisionPair_a1_set)
@@ -10373,23 +9465,21 @@ class csCollisionPair(_object):
     __swig_setmethods__["c2"] = _cspace.csCollisionPair_c2_set
     __swig_getmethods__["c2"] = _cspace.csCollisionPair_c2_get
     if _newclass:c2 = property(_cspace.csCollisionPair_c2_get, _cspace.csCollisionPair_c2_set)
-    def __init__(self, *args):
+    def __init__(self, *args): 
         this = _cspace.new_csCollisionPair(*args)
         try: self.this.append(this)
         except: self.this = this
     __swig_destroy__ = _cspace.delete_csCollisionPair
     __del__ = lambda self : None;
-_cspace.csCollisionPair_swigregister(csCollisionPair)
+csCollisionPair_swigregister = _cspace.csCollisionPair_swigregister
+csCollisionPair_swigregister(csCollisionPair)
 
 class csIntersectingTriangle(_object):
     __swig_setmethods__ = {}
     __setattr__ = lambda self, name, value: _swig_setattr(self, csIntersectingTriangle, name, value)
     __swig_getmethods__ = {}
     __getattr__ = lambda self, name: _swig_getattr(self, csIntersectingTriangle, name)
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ csIntersectingTriangle instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     __swig_setmethods__["a"] = _cspace.csIntersectingTriangle_a_set
     __swig_getmethods__["a"] = _cspace.csIntersectingTriangle_a_get
     if _newclass:a = property(_cspace.csIntersectingTriangle_a_get, _cspace.csIntersectingTriangle_a_set)
@@ -10399,13 +9489,14 @@ class csIntersectingTriangle(_object):
     __swig_setmethods__["c"] = _cspace.csIntersectingTriangle_c_set
     __swig_getmethods__["c"] = _cspace.csIntersectingTriangle_c_get
     if _newclass:c = property(_cspace.csIntersectingTriangle_c_get, _cspace.csIntersectingTriangle_c_set)
-    def __init__(self, *args):
+    def __init__(self, *args): 
         this = _cspace.new_csIntersectingTriangle(*args)
         try: self.this.append(this)
         except: self.this = this
     __swig_destroy__ = _cspace.delete_csIntersectingTriangle
     __del__ = lambda self : None;
-_cspace.csIntersectingTriangle_swigregister(csIntersectingTriangle)
+csIntersectingTriangle_swigregister = _cspace.csIntersectingTriangle_swigregister
+csIntersectingTriangle_swigregister(csIntersectingTriangle)
 
 CS_MESH_COLLIDER = _cspace.CS_MESH_COLLIDER
 CS_TERRAFORMER_COLLIDER = _cspace.CS_TERRAFORMER_COLLIDER
@@ -10417,17 +9508,14 @@ class iCollider(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iCollider, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iCollider instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def GetColliderType(*args): return _cspace.iCollider_GetColliderType(*args)
     __swig_destroy__ = _cspace.delete_iCollider
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iCollider_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iCollider_scfGetVersion)
-_cspace.iCollider_swigregister(iCollider)
-
+iCollider_swigregister = _cspace.iCollider_swigregister
+iCollider_swigregister(iCollider)
 iCollider_scfGetVersion = _cspace.iCollider_scfGetVersion
 
 class iCollideSystem(iBase):
@@ -10438,10 +9526,7 @@ class iCollideSystem(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iCollideSystem, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iCollideSystem instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def CreateCollider(*args): return _cspace.iCollideSystem_CreateCollider(*args)
     def Collide(*args): return _cspace.iCollideSystem_Collide(*args)
     def GetCollisionPairs(*args): return _cspace.iCollideSystem_GetCollisionPairs(*args)
@@ -10464,8 +9549,8 @@ class iCollideSystem(iBase):
         pairs.append(self.GetCollisionPairByIndex(i))
       return pairs
 
-_cspace.iCollideSystem_swigregister(iCollideSystem)
-
+iCollideSystem_swigregister = _cspace.iCollideSystem_swigregister
+iCollideSystem_swigregister(iCollideSystem)
 iCollideSystem_scfGetVersion = _cspace.iCollideSystem_scfGetVersion
 
 class iDynamics(iBase):
@@ -10476,10 +9561,7 @@ class iDynamics(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iDynamics, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iDynamics instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def CreateSystem(*args): return _cspace.iDynamics_CreateSystem(*args)
     def RemoveSystem(*args): return _cspace.iDynamics_RemoveSystem(*args)
     def RemoveSystems(*args): return _cspace.iDynamics_RemoveSystems(*args)
@@ -10489,8 +9571,8 @@ class iDynamics(iBase):
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iDynamics_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iDynamics_scfGetVersion)
-_cspace.iDynamics_swigregister(iDynamics)
-
+iDynamics_swigregister = _cspace.iDynamics_swigregister
+iDynamics_swigregister(iDynamics)
 iDynamics_scfGetVersion = _cspace.iDynamics_scfGetVersion
 
 class iDynamicSystem(iBase):
@@ -10501,10 +9583,7 @@ class iDynamicSystem(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iDynamicSystem, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iDynamicSystem instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def QueryObject(*args): return _cspace.iDynamicSystem_QueryObject(*args)
     def SetGravity(*args): return _cspace.iDynamicSystem_SetGravity(*args)
     def GetGravity(*args): return _cspace.iDynamicSystem_GetGravity(*args)
@@ -10541,8 +9620,8 @@ class iDynamicSystem(iBase):
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iDynamicSystem_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iDynamicSystem_scfGetVersion)
-_cspace.iDynamicSystem_swigregister(iDynamicSystem)
-
+iDynamicSystem_swigregister = _cspace.iDynamicSystem_swigregister
+iDynamicSystem_swigregister(iDynamicSystem)
 iDynamicSystem_scfGetVersion = _cspace.iDynamicSystem_scfGetVersion
 
 class iDynamicsMoveCallback(iBase):
@@ -10553,14 +9632,12 @@ class iDynamicsMoveCallback(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iDynamicsMoveCallback, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iDynamicsMoveCallback instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def Execute(*args): return _cspace.iDynamicsMoveCallback_Execute(*args)
     __swig_destroy__ = _cspace.delete_iDynamicsMoveCallback
     __del__ = lambda self : None;
-_cspace.iDynamicsMoveCallback_swigregister(iDynamicsMoveCallback)
+iDynamicsMoveCallback_swigregister = _cspace.iDynamicsMoveCallback_swigregister
+iDynamicsMoveCallback_swigregister(iDynamicsMoveCallback)
 
 class iDynamicsCollisionCallback(iBase):
     __swig_setmethods__ = {}
@@ -10570,14 +9647,12 @@ class iDynamicsCollisionCallback(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iDynamicsCollisionCallback, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iDynamicsCollisionCallback instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def Execute(*args): return _cspace.iDynamicsCollisionCallback_Execute(*args)
     __swig_destroy__ = _cspace.delete_iDynamicsCollisionCallback
     __del__ = lambda self : None;
-_cspace.iDynamicsCollisionCallback_swigregister(iDynamicsCollisionCallback)
+iDynamicsCollisionCallback_swigregister = _cspace.iDynamicsCollisionCallback_swigregister
+iDynamicsCollisionCallback_swigregister(iDynamicsCollisionCallback)
 
 class iBodyGroup(iBase):
     __swig_setmethods__ = {}
@@ -10587,10 +9662,7 @@ class iBodyGroup(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iBodyGroup, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iBodyGroup instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def AddBody(*args): return _cspace.iBodyGroup_AddBody(*args)
     def RemoveBody(*args): return _cspace.iBodyGroup_RemoveBody(*args)
     def BodyInGroup(*args): return _cspace.iBodyGroup_BodyInGroup(*args)
@@ -10598,8 +9670,8 @@ class iBodyGroup(iBase):
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iBodyGroup_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iBodyGroup_scfGetVersion)
-_cspace.iBodyGroup_swigregister(iBodyGroup)
-
+iBodyGroup_swigregister = _cspace.iBodyGroup_swigregister
+iBodyGroup_swigregister(iBodyGroup)
 iBodyGroup_scfGetVersion = _cspace.iBodyGroup_scfGetVersion
 
 class iRigidBody(iBase):
@@ -10610,10 +9682,7 @@ class iRigidBody(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iRigidBody, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iRigidBody instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def QueryObject(*args): return _cspace.iRigidBody_QueryObject(*args)
     def MakeStatic(*args): return _cspace.iRigidBody_MakeStatic(*args)
     def MakeDynamic(*args): return _cspace.iRigidBody_MakeDynamic(*args)
@@ -10670,7 +9739,8 @@ class iRigidBody(iBase):
     def GetColliderCount(*args): return _cspace.iRigidBody_GetColliderCount(*args)
     __swig_destroy__ = _cspace.delete_iRigidBody
     __del__ = lambda self : None;
-_cspace.iRigidBody_swigregister(iRigidBody)
+iRigidBody_swigregister = _cspace.iRigidBody_swigregister
+iRigidBody_swigregister(iRigidBody)
 
 NO_GEOMETRY = _cspace.NO_GEOMETRY
 BOX_COLLIDER_GEOMETRY = _cspace.BOX_COLLIDER_GEOMETRY
@@ -10686,14 +9756,12 @@ class iDynamicsColliderCollisionCallback(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iDynamicsColliderCollisionCallback, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iDynamicsColliderCollisionCallback instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def Execute(*args): return _cspace.iDynamicsColliderCollisionCallback_Execute(*args)
     __swig_destroy__ = _cspace.delete_iDynamicsColliderCollisionCallback
     __del__ = lambda self : None;
-_cspace.iDynamicsColliderCollisionCallback_swigregister(iDynamicsColliderCollisionCallback)
+iDynamicsColliderCollisionCallback_swigregister = _cspace.iDynamicsColliderCollisionCallback_swigregister
+iDynamicsColliderCollisionCallback_swigregister(iDynamicsColliderCollisionCallback)
 
 class iDynamicsSystemCollider(iBase):
     __swig_setmethods__ = {}
@@ -10703,10 +9771,7 @@ class iDynamicsSystemCollider(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iDynamicsSystemCollider, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iDynamicsSystemCollider instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def CreateSphereGeometry(*args): return _cspace.iDynamicsSystemCollider_CreateSphereGeometry(*args)
     def CreatePlaneGeometry(*args): return _cspace.iDynamicsSystemCollider_CreatePlaneGeometry(*args)
     def CreateMeshGeometry(*args): return _cspace.iDynamicsSystemCollider_CreateMeshGeometry(*args)
@@ -10735,7 +9800,8 @@ class iDynamicsSystemCollider(iBase):
     def IsStatic(*args): return _cspace.iDynamicsSystemCollider_IsStatic(*args)
     __swig_destroy__ = _cspace.delete_iDynamicsSystemCollider
     __del__ = lambda self : None;
-_cspace.iDynamicsSystemCollider_swigregister(iDynamicsSystemCollider)
+iDynamicsSystemCollider_swigregister = _cspace.iDynamicsSystemCollider_swigregister
+iDynamicsSystemCollider_swigregister(iDynamicsSystemCollider)
 
 class iJoint(iBase):
     __swig_setmethods__ = {}
@@ -10745,10 +9811,7 @@ class iJoint(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iJoint, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iJoint instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def Attach(*args): return _cspace.iJoint_Attach(*args)
     def GetAttachedBody(*args): return _cspace.iJoint_GetAttachedBody(*args)
     def SetTransform(*args): return _cspace.iJoint_SetTransform(*args)
@@ -10779,8 +9842,8 @@ class iJoint(iBase):
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iJoint_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iJoint_scfGetVersion)
-_cspace.iJoint_swigregister(iJoint)
-
+iJoint_swigregister = _cspace.iJoint_swigregister
+iJoint_swigregister(iJoint)
 iJoint_scfGetVersion = _cspace.iJoint_scfGetVersion
 
 class iODEFrameUpdateCallback(iBase):
@@ -10791,14 +9854,12 @@ class iODEFrameUpdateCallback(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iODEFrameUpdateCallback, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iODEFrameUpdateCallback instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def Execute(*args): return _cspace.iODEFrameUpdateCallback_Execute(*args)
     __swig_destroy__ = _cspace.delete_iODEFrameUpdateCallback
     __del__ = lambda self : None;
-_cspace.iODEFrameUpdateCallback_swigregister(iODEFrameUpdateCallback)
+iODEFrameUpdateCallback_swigregister = _cspace.iODEFrameUpdateCallback_swigregister
+iODEFrameUpdateCallback_swigregister(iODEFrameUpdateCallback)
 
 class iODEDynamicState(iBase):
     __swig_setmethods__ = {}
@@ -10808,10 +9869,7 @@ class iODEDynamicState(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iODEDynamicState, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iODEDynamicState instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def SetGlobalERP(*args): return _cspace.iODEDynamicState_SetGlobalERP(*args)
     def GlobalERP(*args): return _cspace.iODEDynamicState_GlobalERP(*args)
     def SetGlobalCFM(*args): return _cspace.iODEDynamicState_SetGlobalCFM(*args)
@@ -10840,8 +9898,8 @@ class iODEDynamicState(iBase):
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iODEDynamicState_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iODEDynamicState_scfGetVersion)
-_cspace.iODEDynamicState_swigregister(iODEDynamicState)
-
+iODEDynamicState_swigregister = _cspace.iODEDynamicState_swigregister
+iODEDynamicState_swigregister(iODEDynamicState)
 iODEDynamicState_scfGetVersion = _cspace.iODEDynamicState_scfGetVersion
 
 class iODEDynamicSystemState(iBase):
@@ -10852,10 +9910,7 @@ class iODEDynamicSystemState(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iODEDynamicSystemState, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iODEDynamicSystemState instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def SetERP(*args): return _cspace.iODEDynamicSystemState_SetERP(*args)
     def ERP(*args): return _cspace.iODEDynamicSystemState_ERP(*args)
     def SetCFM(*args): return _cspace.iODEDynamicSystemState_SetCFM(*args)
@@ -10896,8 +9951,8 @@ class iODEDynamicSystemState(iBase):
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iODEDynamicSystemState_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iODEDynamicSystemState_scfGetVersion)
-_cspace.iODEDynamicSystemState_swigregister(iODEDynamicSystemState)
-
+iODEDynamicSystemState_swigregister = _cspace.iODEDynamicSystemState_swigregister
+iODEDynamicSystemState_swigregister(iODEDynamicSystemState)
 iODEDynamicSystemState_scfGetVersion = _cspace.iODEDynamicSystemState_scfGetVersion
 
 CS_ODE_JOINT_TYPE_UNKNOWN = _cspace.CS_ODE_JOINT_TYPE_UNKNOWN
@@ -10917,10 +9972,7 @@ class iODEJointState(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iODEJointState, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iODEJointState instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def GetType(*args): return _cspace.iODEJointState_GetType(*args)
     def SetLoStop(*args): return _cspace.iODEJointState_SetLoStop(*args)
     def SetHiStop(*args): return _cspace.iODEJointState_SetHiStop(*args)
@@ -10995,8 +10047,8 @@ class iODEJointState(iBase):
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iODEJointState_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iODEJointState_scfGetVersion)
-_cspace.iODEJointState_swigregister(iODEJointState)
-
+iODEJointState_swigregister = _cspace.iODEJointState_swigregister
+iODEJointState_swigregister(iODEJointState)
 iODEJointState_scfGetVersion = _cspace.iODEJointState_scfGetVersion
 
 class iODEGeneralJointState(iBase):
@@ -11007,10 +10059,7 @@ class iODEGeneralJointState(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iODEGeneralJointState, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iODEGeneralJointState instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def SetLoStop(*args): return _cspace.iODEGeneralJointState_SetLoStop(*args)
     def SetHiStop(*args): return _cspace.iODEGeneralJointState_SetHiStop(*args)
     def SetVel(*args): return _cspace.iODEGeneralJointState_SetVel(*args)
@@ -11041,7 +10090,8 @@ class iODEGeneralJointState(iBase):
     def GetFeedbackTorque2(*args): return _cspace.iODEGeneralJointState_GetFeedbackTorque2(*args)
     __swig_destroy__ = _cspace.delete_iODEGeneralJointState
     __del__ = lambda self : None;
-_cspace.iODEGeneralJointState_swigregister(iODEGeneralJointState)
+iODEGeneralJointState_swigregister = _cspace.iODEGeneralJointState_swigregister
+iODEGeneralJointState_swigregister(iODEGeneralJointState)
 
 class iODESliderJoint(iODEGeneralJointState):
     __swig_setmethods__ = {}
@@ -11051,10 +10101,7 @@ class iODESliderJoint(iODEGeneralJointState):
     for _s in [iODEGeneralJointState]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iODESliderJoint, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iODESliderJoint instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def SetSliderAxis(*args): return _cspace.iODESliderJoint_SetSliderAxis(*args)
     def GetSliderAxis(*args): return _cspace.iODESliderJoint_GetSliderAxis(*args)
     def GetSliderPosition(*args): return _cspace.iODESliderJoint_GetSliderPosition(*args)
@@ -11063,8 +10110,8 @@ class iODESliderJoint(iODEGeneralJointState):
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iODESliderJoint_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iODESliderJoint_scfGetVersion)
-_cspace.iODESliderJoint_swigregister(iODESliderJoint)
-
+iODESliderJoint_swigregister = _cspace.iODESliderJoint_swigregister
+iODESliderJoint_swigregister(iODESliderJoint)
 iODESliderJoint_scfGetVersion = _cspace.iODESliderJoint_scfGetVersion
 
 class iODEUniversalJoint(iODEGeneralJointState):
@@ -11075,10 +10122,7 @@ class iODEUniversalJoint(iODEGeneralJointState):
     for _s in [iODEGeneralJointState]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iODEUniversalJoint, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iODEUniversalJoint instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def SetUniversalAnchor(*args): return _cspace.iODEUniversalJoint_SetUniversalAnchor(*args)
     def SetUniversalAxis1(*args): return _cspace.iODEUniversalJoint_SetUniversalAxis1(*args)
     def SetUniversalAxis2(*args): return _cspace.iODEUniversalJoint_SetUniversalAxis2(*args)
@@ -11090,8 +10134,8 @@ class iODEUniversalJoint(iODEGeneralJointState):
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iODEUniversalJoint_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iODEUniversalJoint_scfGetVersion)
-_cspace.iODEUniversalJoint_swigregister(iODEUniversalJoint)
-
+iODEUniversalJoint_swigregister = _cspace.iODEUniversalJoint_swigregister
+iODEUniversalJoint_swigregister(iODEUniversalJoint)
 iODEUniversalJoint_scfGetVersion = _cspace.iODEUniversalJoint_scfGetVersion
 
 CS_ODE_AMOTOR_MODE_UNKNOWN = _cspace.CS_ODE_AMOTOR_MODE_UNKNOWN
@@ -11106,10 +10150,7 @@ class iODEAMotorJoint(iODEGeneralJointState):
     for _s in [iODEGeneralJointState]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iODEAMotorJoint, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iODEAMotorJoint instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def SetAMotorMode(*args): return _cspace.iODEAMotorJoint_SetAMotorMode(*args)
     def GetAMotorMode(*args): return _cspace.iODEAMotorJoint_GetAMotorMode(*args)
     def SetAMotorNumAxes(*args): return _cspace.iODEAMotorJoint_SetAMotorNumAxes(*args)
@@ -11124,8 +10165,8 @@ class iODEAMotorJoint(iODEGeneralJointState):
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iODEAMotorJoint_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iODEAMotorJoint_scfGetVersion)
-_cspace.iODEAMotorJoint_swigregister(iODEAMotorJoint)
-
+iODEAMotorJoint_swigregister = _cspace.iODEAMotorJoint_swigregister
+iODEAMotorJoint_swigregister(iODEAMotorJoint)
 iODEAMotorJoint_scfGetVersion = _cspace.iODEAMotorJoint_scfGetVersion
 
 class iODEHinge2Joint(iODEGeneralJointState):
@@ -11136,10 +10177,7 @@ class iODEHinge2Joint(iODEGeneralJointState):
     for _s in [iODEGeneralJointState]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iODEHinge2Joint, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iODEHinge2Joint instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def SetHingeAnchor(*args): return _cspace.iODEHinge2Joint_SetHingeAnchor(*args)
     def SetHingeAxis1(*args): return _cspace.iODEHinge2Joint_SetHingeAxis1(*args)
     def SetHingeAxis2(*args): return _cspace.iODEHinge2Joint_SetHingeAxis2(*args)
@@ -11153,7 +10191,8 @@ class iODEHinge2Joint(iODEGeneralJointState):
     def GetAnchorError(*args): return _cspace.iODEHinge2Joint_GetAnchorError(*args)
     __swig_destroy__ = _cspace.delete_iODEHinge2Joint
     __del__ = lambda self : None;
-_cspace.iODEHinge2Joint_swigregister(iODEHinge2Joint)
+iODEHinge2Joint_swigregister = _cspace.iODEHinge2Joint_swigregister
+iODEHinge2Joint_swigregister(iODEHinge2Joint)
 
 class iODEHingeJoint(iODEGeneralJointState):
     __swig_setmethods__ = {}
@@ -11163,10 +10202,7 @@ class iODEHingeJoint(iODEGeneralJointState):
     for _s in [iODEGeneralJointState]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iODEHingeJoint, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iODEHingeJoint instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def SetHingeAnchor(*args): return _cspace.iODEHingeJoint_SetHingeAnchor(*args)
     def SetHingeAxis(*args): return _cspace.iODEHingeJoint_SetHingeAxis(*args)
     def GetHingeAnchor1(*args): return _cspace.iODEHingeJoint_GetHingeAnchor1(*args)
@@ -11179,8 +10215,8 @@ class iODEHingeJoint(iODEGeneralJointState):
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iODEHingeJoint_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iODEHingeJoint_scfGetVersion)
-_cspace.iODEHingeJoint_swigregister(iODEHingeJoint)
-
+iODEHingeJoint_swigregister = _cspace.iODEHingeJoint_swigregister
+iODEHingeJoint_swigregister(iODEHingeJoint)
 iODEHingeJoint_scfGetVersion = _cspace.iODEHingeJoint_scfGetVersion
 
 class iODEBallJoint(iBase):
@@ -11191,10 +10227,7 @@ class iODEBallJoint(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iODEBallJoint, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iODEBallJoint instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def SetBallAnchor(*args): return _cspace.iODEBallJoint_SetBallAnchor(*args)
     def GetBallAnchor1(*args): return _cspace.iODEBallJoint_GetBallAnchor1(*args)
     def GetBallAnchor2(*args): return _cspace.iODEBallJoint_GetBallAnchor2(*args)
@@ -11209,8 +10242,8 @@ class iODEBallJoint(iBase):
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iODEBallJoint_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iODEBallJoint_scfGetVersion)
-_cspace.iODEBallJoint_swigregister(iODEBallJoint)
-
+iODEBallJoint_swigregister = _cspace.iODEBallJoint_swigregister
+iODEBallJoint_swigregister(iODEBallJoint)
 iODEBallJoint_scfGetVersion = _cspace.iODEBallJoint_scfGetVersion
 
 CS_SEQUENCE_LIGHTCHANGE_NONE = _cspace.CS_SEQUENCE_LIGHTCHANGE_NONE
@@ -11224,15 +10257,13 @@ class iParameterESM(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iParameterESM, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iParameterESM instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def GetValue(*args): return _cspace.iParameterESM_GetValue(*args)
     def IsConstant(*args): return _cspace.iParameterESM_IsConstant(*args)
     __swig_destroy__ = _cspace.delete_iParameterESM
     __del__ = lambda self : None;
-_cspace.iParameterESM_swigregister(iParameterESM)
+iParameterESM_swigregister = _cspace.iParameterESM_swigregister
+iParameterESM_swigregister(iParameterESM)
 
 class iEngineSequenceParameters(iBase):
     __swig_setmethods__ = {}
@@ -11242,10 +10273,7 @@ class iEngineSequenceParameters(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iEngineSequenceParameters, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iEngineSequenceParameters instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def GetParameterCount(*args): return _cspace.iEngineSequenceParameters_GetParameterCount(*args)
     def GetParameter(*args): return _cspace.iEngineSequenceParameters_GetParameter(*args)
     def GetParameterIdx(*args): return _cspace.iEngineSequenceParameters_GetParameterIdx(*args)
@@ -11255,7 +10283,8 @@ class iEngineSequenceParameters(iBase):
     def CreateParameterESM(*args): return _cspace.iEngineSequenceParameters_CreateParameterESM(*args)
     __swig_destroy__ = _cspace.delete_iEngineSequenceParameters
     __del__ = lambda self : None;
-_cspace.iEngineSequenceParameters_swigregister(iEngineSequenceParameters)
+iEngineSequenceParameters_swigregister = _cspace.iEngineSequenceParameters_swigregister
+iEngineSequenceParameters_swigregister(iEngineSequenceParameters)
 
 class iSequenceWrapper(iBase):
     __swig_setmethods__ = {}
@@ -11265,10 +10294,7 @@ class iSequenceWrapper(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iSequenceWrapper, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iSequenceWrapper instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def QueryObject(*args): return _cspace.iSequenceWrapper_QueryObject(*args)
     def GetSequence(*args): return _cspace.iSequenceWrapper_GetSequence(*args)
     def CreateBaseParameterBlock(*args): return _cspace.iSequenceWrapper_CreateBaseParameterBlock(*args)
@@ -11293,7 +10319,8 @@ class iSequenceWrapper(iBase):
     def AddOperationTestTrigger(*args): return _cspace.iSequenceWrapper_AddOperationTestTrigger(*args)
     __swig_destroy__ = _cspace.delete_iSequenceWrapper
     __del__ = lambda self : None;
-_cspace.iSequenceWrapper_swigregister(iSequenceWrapper)
+iSequenceWrapper_swigregister = _cspace.iSequenceWrapper_swigregister
+iSequenceWrapper_swigregister(iSequenceWrapper)
 
 class iSequenceTrigger(iBase):
     __swig_setmethods__ = {}
@@ -11303,10 +10330,7 @@ class iSequenceTrigger(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iSequenceTrigger, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iSequenceTrigger instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def QueryObject(*args): return _cspace.iSequenceTrigger_QueryObject(*args)
     def AddConditionInSector(*args): return _cspace.iSequenceTrigger_AddConditionInSector(*args)
     def AddConditionSectorVisible(*args): return _cspace.iSequenceTrigger_AddConditionSectorVisible(*args)
@@ -11326,7 +10350,8 @@ class iSequenceTrigger(iBase):
     def ForceFire(*args): return _cspace.iSequenceTrigger_ForceFire(*args)
     __swig_destroy__ = _cspace.delete_iSequenceTrigger
     __del__ = lambda self : None;
-_cspace.iSequenceTrigger_swigregister(iSequenceTrigger)
+iSequenceTrigger_swigregister = _cspace.iSequenceTrigger_swigregister
+iSequenceTrigger_swigregister(iSequenceTrigger)
 
 class iSequenceTimedOperation(iBase):
     __swig_setmethods__ = {}
@@ -11336,14 +10361,12 @@ class iSequenceTimedOperation(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iSequenceTimedOperation, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iSequenceTimedOperation instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def Do(*args): return _cspace.iSequenceTimedOperation_Do(*args)
     __swig_destroy__ = _cspace.delete_iSequenceTimedOperation
     __del__ = lambda self : None;
-_cspace.iSequenceTimedOperation_swigregister(iSequenceTimedOperation)
+iSequenceTimedOperation_swigregister = _cspace.iSequenceTimedOperation_swigregister
+iSequenceTimedOperation_swigregister(iSequenceTimedOperation)
 
 class iEngineSequenceManager(iBase):
     __swig_setmethods__ = {}
@@ -11353,10 +10376,7 @@ class iEngineSequenceManager(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iEngineSequenceManager, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iEngineSequenceManager instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def GetSequenceManager(*args): return _cspace.iEngineSequenceManager_GetSequenceManager(*args)
     def CreateParameterESM(*args): return _cspace.iEngineSequenceManager_CreateParameterESM(*args)
     def CreateTrigger(*args): return _cspace.iEngineSequenceManager_CreateTrigger(*args)
@@ -11377,7 +10397,8 @@ class iEngineSequenceManager(iBase):
     def DestroyTimedOperations(*args): return _cspace.iEngineSequenceManager_DestroyTimedOperations(*args)
     __swig_destroy__ = _cspace.delete_iEngineSequenceManager
     __del__ = lambda self : None;
-_cspace.iEngineSequenceManager_swigregister(iEngineSequenceManager)
+iEngineSequenceManager_swigregister = _cspace.iEngineSequenceManager_swigregister
+iEngineSequenceManager_swigregister(iEngineSequenceManager)
 
 class iMovieRecorder(iBase):
     __swig_setmethods__ = {}
@@ -11387,10 +10408,7 @@ class iMovieRecorder(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iMovieRecorder, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iMovieRecorder instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def Start(*args): return _cspace.iMovieRecorder_Start(*args)
     def Stop(*args): return _cspace.iMovieRecorder_Stop(*args)
     def IsRecording(*args): return _cspace.iMovieRecorder_IsRecording(*args)
@@ -11401,8 +10419,8 @@ class iMovieRecorder(iBase):
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iMovieRecorder_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iMovieRecorder_scfGetVersion)
-_cspace.iMovieRecorder_swigregister(iMovieRecorder)
-
+iMovieRecorder_swigregister = _cspace.iMovieRecorder_swigregister
+iMovieRecorder_swigregister(iMovieRecorder)
 iMovieRecorder_scfGetVersion = _cspace.iMovieRecorder_scfGetVersion
 
 class iMapNode(iBase):
@@ -11413,10 +10431,7 @@ class iMapNode(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iMapNode, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iMapNode instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def QueryObject(*args): return _cspace.iMapNode_QueryObject(*args)
     def SetPosition(*args): return _cspace.iMapNode_SetPosition(*args)
     def GetPosition(*args): return _cspace.iMapNode_GetPosition(*args)
@@ -11432,8 +10447,8 @@ class iMapNode(iBase):
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iMapNode_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iMapNode_scfGetVersion)
-_cspace.iMapNode_swigregister(iMapNode)
-
+iMapNode_swigregister = _cspace.iMapNode_swigregister
+iMapNode_swigregister(iMapNode)
 iMapNode_scfGetVersion = _cspace.iMapNode_scfGetVersion
 
 class iScriptObject(iBase):
@@ -11444,10 +10459,7 @@ class iScriptObject(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iScriptObject, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iScriptObject instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def IsType(*args): return _cspace.iScriptObject_IsType(*args)
     def GetPointer(*args): return _cspace.iScriptObject_GetPointer(*args)
     def SetPointer(*args): return _cspace.iScriptObject_SetPointer(*args)
@@ -11469,8 +10481,8 @@ class iScriptObject(iBase):
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iScriptObject_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iScriptObject_scfGetVersion)
-_cspace.iScriptObject_swigregister(iScriptObject)
-
+iScriptObject_swigregister = _cspace.iScriptObject_swigregister
+iScriptObject_swigregister(iScriptObject)
 iScriptObject_scfGetVersion = _cspace.iScriptObject_scfGetVersion
 
 class iScript(iBase):
@@ -11481,10 +10493,7 @@ class iScript(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iScript, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iScript instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def Initialize(*args): return _cspace.iScript_Initialize(*args)
     def RunText(*args): return _cspace.iScript_RunText(*args)
     def LoadModule(*args): return _cspace.iScript_LoadModule(*args)
@@ -11508,8 +10517,8 @@ class iScript(iBase):
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iScript_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iScript_scfGetVersion)
-_cspace.iScript_swigregister(iScript)
-
+iScript_swigregister = _cspace.iScript_swigregister
+iScript_swigregister(iScript)
 iScript_scfGetVersion = _cspace.iScript_scfGetVersion
 
 class iSimpleFormerState(iBase):
@@ -11520,10 +10529,7 @@ class iSimpleFormerState(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iSimpleFormerState, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iSimpleFormerState instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def SetHeightmap(*args): return _cspace.iSimpleFormerState_SetHeightmap(*args)
     def SetScale(*args): return _cspace.iSimpleFormerState_SetScale(*args)
     def SetOffset(*args): return _cspace.iSimpleFormerState_SetOffset(*args)
@@ -11533,8 +10539,8 @@ class iSimpleFormerState(iBase):
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iSimpleFormerState_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iSimpleFormerState_scfGetVersion)
-_cspace.iSimpleFormerState_swigregister(iSimpleFormerState)
-
+iSimpleFormerState_swigregister = _cspace.iSimpleFormerState_swigregister
+iSimpleFormerState_swigregister(iSimpleFormerState)
 iSimpleFormerState_scfGetVersion = _cspace.iSimpleFormerState_scfGetVersion
 
 class iTerraFormer(iBase):
@@ -11545,10 +10551,7 @@ class iTerraFormer(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iTerraFormer, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iTerraFormer instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def GetSampler(*args): return _cspace.iTerraFormer_GetSampler(*args)
     def SampleFloat(*args): return _cspace.iTerraFormer_SampleFloat(*args)
     def SampleVector2(*args): return _cspace.iTerraFormer_SampleVector2(*args)
@@ -11559,8 +10562,8 @@ class iTerraFormer(iBase):
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iTerraFormer_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iTerraFormer_scfGetVersion)
-_cspace.iTerraFormer_swigregister(iTerraFormer)
-
+iTerraFormer_swigregister = _cspace.iTerraFormer_swigregister
+iTerraFormer_swigregister(iTerraFormer)
 iTerraFormer_scfGetVersion = _cspace.iTerraFormer_scfGetVersion
 
 class iTerraSampler(iBase):
@@ -11571,10 +10574,7 @@ class iTerraSampler(iBase):
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iTerraSampler, name)
     def __init__(self): raise AttributeError, "No constructor defined"
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ iTerraSampler instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     def SampleFloat(*args): return _cspace.iTerraSampler_SampleFloat(*args)
     def SampleVector2(*args): return _cspace.iTerraSampler_SampleVector2(*args)
     def SampleVector3(*args): return _cspace.iTerraSampler_SampleVector3(*args)
@@ -11588,8 +10588,8 @@ class iTerraSampler(iBase):
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iTerraSampler_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iTerraSampler_scfGetVersion)
-_cspace.iTerraSampler_swigregister(iTerraSampler)
-
+iTerraSampler_swigregister = _cspace.iTerraSampler_swigregister
+iTerraSampler_swigregister(iTerraSampler)
 iTerraSampler_scfGetVersion = _cspace.iTerraSampler_scfGetVersion
 
 class csObject(_object):
@@ -11597,11 +10597,8 @@ class csObject(_object):
     __setattr__ = lambda self, name, value: _swig_setattr(self, csObject, name, value)
     __swig_getmethods__ = {}
     __getattr__ = lambda self, name: _swig_getattr(self, csObject, name)
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ csObject instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
-    def __init__(self, *args):
+    __repr__ = _swig_repr
+    def __init__(self, *args): 
         this = _cspace.new_csObject(*args)
         try: self.this.append(this)
         except: self.this = this
@@ -11621,18 +10618,16 @@ class csObject(_object):
     def AddNameChangeListener(*args): return _cspace.csObject_AddNameChangeListener(*args)
     def RemoveNameChangeListener(*args): return _cspace.csObject_RemoveNameChangeListener(*args)
     def ObjReleaseOld(*args): return _cspace.csObject_ObjReleaseOld(*args)
-_cspace.csObject_swigregister(csObject)
+csObject_swigregister = _cspace.csObject_swigregister
+csObject_swigregister(csObject)
 
 class csColliderWrapper(_object):
     __swig_setmethods__ = {}
     __setattr__ = lambda self, name, value: _swig_setattr(self, csColliderWrapper, name, value)
     __swig_getmethods__ = {}
     __getattr__ = lambda self, name: _swig_getattr(self, csColliderWrapper, name)
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ csColliderWrapper instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
-    def __init__(self, *args):
+    __repr__ = _swig_repr
+    def __init__(self, *args): 
         this = _cspace.new_csColliderWrapper(*args)
         try: self.this.append(this)
         except: self.this = this
@@ -11643,8 +10638,8 @@ class csColliderWrapper(_object):
     def Collide(*args): return _cspace.csColliderWrapper_Collide(*args)
     __swig_getmethods__["GetColliderWrapper"] = lambda x: _cspace.csColliderWrapper_GetColliderWrapper
     if _newclass:GetColliderWrapper = staticmethod(_cspace.csColliderWrapper_GetColliderWrapper)
-_cspace.csColliderWrapper_swigregister(csColliderWrapper)
-
+csColliderWrapper_swigregister = _cspace.csColliderWrapper_swigregister
+csColliderWrapper_swigregister(csColliderWrapper)
 csColliderWrapper_GetColliderWrapper = _cspace.csColliderWrapper_GetColliderWrapper
 
 class csTraceBeamResult(_object):
@@ -11652,10 +10647,7 @@ class csTraceBeamResult(_object):
     __setattr__ = lambda self, name, value: _swig_setattr(self, csTraceBeamResult, name, value)
     __swig_getmethods__ = {}
     __getattr__ = lambda self, name: _swig_getattr(self, csTraceBeamResult, name)
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ csTraceBeamResult instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     __swig_setmethods__["closest_tri"] = _cspace.csTraceBeamResult_closest_tri_set
     __swig_getmethods__["closest_tri"] = _cspace.csTraceBeamResult_closest_tri_get
     if _newclass:closest_tri = property(_cspace.csTraceBeamResult_closest_tri_get, _cspace.csTraceBeamResult_closest_tri_set)
@@ -11671,23 +10663,21 @@ class csTraceBeamResult(_object):
     __swig_setmethods__["end_sector"] = _cspace.csTraceBeamResult_end_sector_set
     __swig_getmethods__["end_sector"] = _cspace.csTraceBeamResult_end_sector_get
     if _newclass:end_sector = property(_cspace.csTraceBeamResult_end_sector_get, _cspace.csTraceBeamResult_end_sector_set)
-    def __init__(self, *args):
+    def __init__(self, *args): 
         this = _cspace.new_csTraceBeamResult(*args)
         try: self.this.append(this)
         except: self.this = this
     __swig_destroy__ = _cspace.delete_csTraceBeamResult
     __del__ = lambda self : None;
-_cspace.csTraceBeamResult_swigregister(csTraceBeamResult)
+csTraceBeamResult_swigregister = _cspace.csTraceBeamResult_swigregister
+csTraceBeamResult_swigregister(csTraceBeamResult)
 
 class csColliderHelper(_object):
     __swig_setmethods__ = {}
     __setattr__ = lambda self, name, value: _swig_setattr(self, csColliderHelper, name, value)
     __swig_getmethods__ = {}
     __getattr__ = lambda self, name: _swig_getattr(self, csColliderHelper, name)
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ csColliderHelper instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     __swig_getmethods__["InitializeCollisionWrapper"] = lambda x: _cspace.csColliderHelper_InitializeCollisionWrapper
     if _newclass:InitializeCollisionWrapper = staticmethod(_cspace.csColliderHelper_InitializeCollisionWrapper)
     __swig_getmethods__["InitializeCollisionWrappers"] = lambda x: _cspace.csColliderHelper_InitializeCollisionWrappers
@@ -11698,22 +10688,18 @@ class csColliderHelper(_object):
     if _newclass:CollidePath = staticmethod(_cspace.csColliderHelper_CollidePath)
     __swig_getmethods__["TraceBeam"] = lambda x: _cspace.csColliderHelper_TraceBeam
     if _newclass:TraceBeam = staticmethod(_cspace.csColliderHelper_TraceBeam)
-    def __init__(self, *args):
+    def __init__(self, *args): 
         this = _cspace.new_csColliderHelper(*args)
         try: self.this.append(this)
         except: self.this = this
     __swig_destroy__ = _cspace.delete_csColliderHelper
     __del__ = lambda self : None;
-_cspace.csColliderHelper_swigregister(csColliderHelper)
-
+csColliderHelper_swigregister = _cspace.csColliderHelper_swigregister
+csColliderHelper_swigregister(csColliderHelper)
 csColliderHelper_InitializeCollisionWrapper = _cspace.csColliderHelper_InitializeCollisionWrapper
-
 csColliderHelper_InitializeCollisionWrappers = _cspace.csColliderHelper_InitializeCollisionWrappers
-
 csColliderHelper_CollideArray = _cspace.csColliderHelper_CollideArray
-
 csColliderHelper_CollidePath = _cspace.csColliderHelper_CollidePath
-
 csColliderHelper_TraceBeam = _cspace.csColliderHelper_TraceBeam
 
 class csColliderActor(_object):
@@ -11721,11 +10707,8 @@ class csColliderActor(_object):
     __setattr__ = lambda self, name, value: _swig_setattr(self, csColliderActor, name, value)
     __swig_getmethods__ = {}
     __getattr__ = lambda self, name: _swig_getattr(self, csColliderActor, name)
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ csColliderActor instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
-    def __init__(self, *args):
+    __repr__ = _swig_repr
+    def __init__(self, *args): 
         this = _cspace.new_csColliderActor(*args)
         try: self.this.append(this)
         except: self.this = this
@@ -11749,18 +10732,16 @@ class csColliderActor(_object):
     def AdjustForCollisions(*args): return _cspace.csColliderActor_AdjustForCollisions(*args)
     __swig_destroy__ = _cspace.delete_csColliderActor
     __del__ = lambda self : None;
-_cspace.csColliderActor_swigregister(csColliderActor)
+csColliderActor_swigregister = _cspace.csColliderActor_swigregister
+csColliderActor_swigregister(csColliderActor)
 
 class csView(_object):
     __swig_setmethods__ = {}
     __setattr__ = lambda self, name, value: _swig_setattr(self, csView, name, value)
     __swig_getmethods__ = {}
     __getattr__ = lambda self, name: _swig_getattr(self, csView, name)
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ csView instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
-    def __init__(self, *args):
+    __repr__ = _swig_repr
+    def __init__(self, *args): 
         this = _cspace.new_csView(*args)
         try: self.this.append(this)
         except: self.this = this
@@ -11780,38 +10761,26 @@ class csView(_object):
     def UpdateClipper(*args): return _cspace.csView_UpdateClipper(*args)
     def GetClipper(*args): return _cspace.csView_GetClipper(*args)
     def Draw(*args): return _cspace.csView_Draw(*args)
-_cspace.csView_swigregister(csView)
-
+csView_swigregister = _cspace.csView_swigregister
+csView_swigregister(csView)
 
 csfxInterference = _cspace.csfxInterference
-
 csfxFadeOut = _cspace.csfxFadeOut
-
 csfxFadeTo = _cspace.csfxFadeTo
-
 csfxFadeToColor = _cspace.csfxFadeToColor
-
 csfxGreenScreen = _cspace.csfxGreenScreen
-
 csfxRedScreen = _cspace.csfxRedScreen
-
 csfxBlueScreen = _cspace.csfxBlueScreen
-
 csfxWhiteOut = _cspace.csfxWhiteOut
-
 csfxScreenDPFX = _cspace.csfxScreenDPFX
-
 csfxScreenDPFXPartial = _cspace.csfxScreenDPFXPartial
 class csPixmap(_object):
     __swig_setmethods__ = {}
     __setattr__ = lambda self, name, value: _swig_setattr(self, csPixmap, name, value)
     __swig_getmethods__ = {}
     __getattr__ = lambda self, name: _swig_getattr(self, csPixmap, name)
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ csSimplePixmap instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
-    def __init__(self, *args):
+    __repr__ = _swig_repr
+    def __init__(self, *args): 
         this = _cspace.new_csPixmap(*args)
         try: self.this.append(this)
         except: self.this = this
@@ -11825,73 +10794,41 @@ class csPixmap(_object):
     def Height(*args): return _cspace.csPixmap_Height(*args)
     def Advance(*args): return _cspace.csPixmap_Advance(*args)
     def GetTextureHandle(*args): return _cspace.csPixmap_GetTextureHandle(*args)
-_cspace.csPixmap_swigregister(csPixmap)
-
+csPixmap_swigregister = _cspace.csPixmap_swigregister
+csPixmap_swigregister(csPixmap)
 csfxShadeVert = _cspace.csfxShadeVert
 
-
 CS_IS_KEYBOARD_EVENT = _cspace.CS_IS_KEYBOARD_EVENT
-
 CS_IS_MOUSE_EVENT = _cspace.CS_IS_MOUSE_EVENT
-
 CS_IS_JOYSTICK_EVENT = _cspace.CS_IS_JOYSTICK_EVENT
-
 CS_IS_INPUT_EVENT = _cspace.CS_IS_INPUT_EVENT
-
 csevAllEvents = _cspace.csevAllEvents
-
 csevFrame = _cspace.csevFrame
-
 csevInput = _cspace.csevInput
-
 csevQuit = _cspace.csevQuit
-
 csevKeyboardEvent = _cspace.csevKeyboardEvent
-
 csevKeyboardDown = _cspace.csevKeyboardDown
-
 csevKeyboardUp = _cspace.csevKeyboardUp
-
 csevMouseEvent = _cspace.csevMouseEvent
-
 csevMouseButton = _cspace.csevMouseButton
-
 csevMouseUp = _cspace.csevMouseUp
-
 csevMouseDown = _cspace.csevMouseDown
-
 csevMouseClick = _cspace.csevMouseClick
-
 csevMouseDoubleClick = _cspace.csevMouseDoubleClick
-
 csevMouseMove = _cspace.csevMouseMove
-
 csevJoystickEvent = _cspace.csevJoystickEvent
-
 CS_QUERY_REGISTRY_TAG = _cspace.CS_QUERY_REGISTRY_TAG
-
 CS_LOAD_PLUGIN_ALWAYS = _cspace.CS_LOAD_PLUGIN_ALWAYS
-
 CS_FX_SETALPHA = _cspace.CS_FX_SETALPHA
-
 CS_FX_SETALPHA_INT = _cspace.CS_FX_SETALPHA_INT
-
 CS_QUERY_REGISTRY = _cspace.CS_QUERY_REGISTRY
-
 CS_QUERY_REGISTRY_TAG_INTERFACE = _cspace.CS_QUERY_REGISTRY_TAG_INTERFACE
-
 SCF_QUERY_INTERFACE = _cspace.SCF_QUERY_INTERFACE
-
 SCF_QUERY_INTERFACE_SAFE = _cspace.SCF_QUERY_INTERFACE_SAFE
-
 CS_QUERY_PLUGIN_CLASS = _cspace.CS_QUERY_PLUGIN_CLASS
-
 CS_LOAD_PLUGIN = _cspace.CS_LOAD_PLUGIN
-
 CS_GET_CHILD_OBJECT = _cspace.CS_GET_CHILD_OBJECT
-
 CS_GET_NAMED_CHILD_OBJECT = _cspace.CS_GET_NAMED_CHILD_OBJECT
-
 CS_GET_FIRST_NAMED_CHILD_OBJECT = _cspace.CS_GET_FIRST_NAMED_CHILD_OBJECT
 class _csPyEventHandler(iEventHandler):
     __swig_setmethods__ = {}
@@ -11900,10 +10837,7 @@ class _csPyEventHandler(iEventHandler):
     __swig_getmethods__ = {}
     for _s in [iEventHandler]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, _csPyEventHandler, name)
-    def __repr__(self):
-        try: strthis = "at 0x%x" %( self.this, ) 
-        except: strthis = "" 
-        return "<%s.%s; proxy of C++ _csPyEventHandler instance %s>" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    __repr__ = _swig_repr
     __swig_setmethods__["scfRefCount"] = _cspace._csPyEventHandler_scfRefCount_set
     __swig_getmethods__["scfRefCount"] = _cspace._csPyEventHandler_scfRefCount_get
     if _newclass:scfRefCount = property(_cspace._csPyEventHandler_scfRefCount_get, _cspace._csPyEventHandler_scfRefCount_set)
@@ -11920,7 +10854,7 @@ class _csPyEventHandler(iEventHandler):
     def AddRefOwner(*args): return _cspace._csPyEventHandler_AddRefOwner(*args)
     def RemoveRefOwner(*args): return _cspace._csPyEventHandler_RemoveRefOwner(*args)
     def QueryInterface(*args): return _cspace._csPyEventHandler_QueryInterface(*args)
-    def __init__(self, *args):
+    def __init__(self, *args): 
         this = _cspace.new__csPyEventHandler(*args)
         try: self.this.append(this)
         except: self.this = this
@@ -11937,10 +10871,9 @@ class _csPyEventHandler(iEventHandler):
     def GenericSucc(*args): return _cspace._csPyEventHandler_GenericSucc(*args)
     def InstancePrec(*args): return _cspace._csPyEventHandler_InstancePrec(*args)
     def InstanceSucc(*args): return _cspace._csPyEventHandler_InstanceSucc(*args)
-_cspace._csPyEventHandler_swigregister(_csPyEventHandler)
-
+_csPyEventHandler_swigregister = _cspace._csPyEventHandler_swigregister
+_csPyEventHandler_swigregister(_csPyEventHandler)
 _csPyEventHandler_StaticHandlerName = _cspace._csPyEventHandler_StaticHandlerName
-
 _csPyEventHandler_StaticID = _cspace._csPyEventHandler_StaticID
 
 def csevCommandLineHelp(reg):
