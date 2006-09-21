@@ -10,7 +10,6 @@ SubInclude TOP plugins mesh instmesh ;
 SubInclude TOP plugins mesh lghtng ;
 SubInclude TOP plugins mesh null ;
 SubInclude TOP plugins mesh particles ;
-SubInclude TOP plugins mesh rain ;
 SubInclude TOP plugins mesh snow ;
 SubInclude TOP plugins mesh spiral ;
 SubInclude TOP plugins mesh spr2d ;

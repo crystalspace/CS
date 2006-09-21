@@ -71,7 +71,6 @@ Crystal Space supports.
 * MeshObject Fountain:: Fountain Mesh Object
 * MeshObject Fire:: Fire Mesh Object
 * MeshObject Snow:: Snow Mesh Object
-* MeshObject Rain:: Rain Mesh Object
 * MeshObject Spiral:: Spiral Mesh Object
 * MeshObject Haze:: Haze Mesh Object
 * MeshObject Particles:: Particles Mesh Object
@@ -96,7 +95,6 @@ Crystal Space supports.
 @importss{usingcs,meshobj,fountain.txi}
 @importss{usingcs,meshobj,fire.txi}
 @importss{usingcs,meshobj,snow.txi}
-@importss{usingcs,meshobj,rain.txi}
 @importss{usingcs,meshobj,spiral.txi}
 @importss{usingcs,meshobj,haze.txi}
 @importss{usingcs,meshobj,particles.txi}

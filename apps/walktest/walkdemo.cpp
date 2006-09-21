@@ -43,7 +43,6 @@
 #include "imesh/lighting.h"
 #include "imesh/object.h"
 #include "imesh/partsys.h"
-#include "imesh/rain.h"
 #include "imesh/snow.h"
 #include "imesh/spiral.h"
 #include "imesh/sprite3d.h"
@@ -87,9 +86,9 @@ extern void move_mesh (iMeshWrapper* sprite, iSector* where,
 void add_particles_rain (iSector* sector, char* matname, int num, float speed,
 	bool do_camera)
 {
+  iEngine* engine = Sys->view->GetEngine ();
   // First check if the material exists.
-  iMaterialWrapper* mat = Sys->view->GetEngine ()->GetMaterialList ()->
-  	FindByName (matname);
+  iMaterialWrapper* mat = engine->GetMaterialList ()->FindByName (matname);
   if (!mat)
   {
     Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
@@ -103,13 +102,13 @@ void add_particles_rain (iSector* sector, char* matname, int num, float speed,
   else
     sector->CalculateSectorBBox (bbox, true);
 
-  csRef<iMeshFactoryWrapper> mfw (Sys->view->GetEngine ()->
-    CreateMeshFactory ("crystalspace.mesh.object.rain", "rain"));
+  csRef<iMeshFactoryWrapper> mfw = engine->CreateMeshFactory (
+      "crystalspace.mesh.object.particles", "rain");
   if (!mfw) return;
 
-  csRef<iMeshWrapper> exp (
-  	Sys->view->GetEngine ()->CreateMeshWrapper (mfw, "custom rain", sector,
-					  csVector3 (0, 0, 0)));
+  csRef<iMeshWrapper> exp = engine->CreateMeshWrapper (mfw, "custom rain",
+	sector, csVector3 (0, 0, 0));
+
   if (do_camera)
   {
     iEngine* e = Sys->view->GetEngine ();
@@ -118,17 +117,38 @@ void add_particles_rain (iSector* sector, char* matname, int num, float speed,
     exp->SetRenderPriority (c);
   }
   exp->SetZBufMode(CS_ZBUF_TEST);
-
-  csRef<iRainState> rainstate (
-  	SCF_QUERY_INTERFACE (exp->GetMeshObject (), iRainState));
-  exp->GetMeshObject()->SetMaterialWrapper (mat);
   exp->GetMeshObject()->SetMixMode (CS_FX_ADD);
-  exp->GetMeshObject()->SetColor (csColor (.25,.25,.25));
-  rainstate->SetParticleCount (num);
-  rainstate->SetDropSize (0.3f/50.0f, 0.3f);
-  rainstate->SetLighting (false);
-  rainstate->SetBox (bbox.Min (), bbox.Max ());
-  rainstate->SetFallSpeed (csVector3 (0, -speed, 0));
+  exp->GetMeshObject()->SetMaterialWrapper (mat);
+
+  csRef<iParticleBuiltinEmitterFactory> emit_factory = 
+      csLoadPluginCheck<iParticleBuiltinEmitterFactory> (
+        Sys->object_reg, "crystalspace.mesh.object.particles.emitter", false);
+  csRef<iParticleBuiltinEffectorFactory> eff_factory = 
+      csLoadPluginCheck<iParticleBuiltinEffectorFactory> (
+        Sys->object_reg, "crystalspace.mesh.object.particles.effector", false);
+
+  csRef<iParticleBuiltinEmitterBox> boxemit = emit_factory->CreateBox ();
+  boxemit->SetBox (bbox);
+  boxemit->SetParticlePlacement (CS_PARTICLE_BUILTIN_VOLUME);
+  boxemit->SetEmissionRate (float (num) / 2.5f);
+  boxemit->SetInitialMass (5.0f, 7.5f);
+  boxemit->SetUniformVelocity (true);
+  boxemit->SetInitialTTL (2.5f, 2.5f);
+  boxemit->SetInitialVelocity (csVector3 (0, -2.84f * speed / 2.0f, 0),
+      csVector3 (0));
+
+  csRef<iParticleBuiltinEffectorLinColor> lincol = eff_factory->
+    CreateLinColor ();
+  lincol->AddColor (csColor4 (.25,.25,.25,1), 2.5f);
+
+  csRef<iParticleSystem> partstate =
+  	scfQueryInterface<iParticleSystem> (exp->GetMeshObject ());
+  partstate->SetMinBoundingBox (bbox);
+  partstate->SetParticleSize (csVector2 (0.3f/50.0f, 0.3f));
+  partstate->SetParticleRenderOrientation (CS_PARTICLE_ORIENT_COMMON);
+  partstate->SetCommonDirection (csVector3 (0, 1, 0));
+  partstate->AddEmitter (boxemit);
+  partstate->AddEffector (lincol);
 }
 
 //===========================================================================
@@ -276,13 +296,12 @@ void add_particles_explosion (iSector* sector, iEngine* engine,
     return;
   }
 
-  csRef<iMeshFactoryWrapper> mfw = Sys->view->GetEngine ()->
-    CreateMeshFactory ("crystalspace.mesh.object.particles", "explosion");
+  csRef<iMeshFactoryWrapper> mfw = engine->CreateMeshFactory (
+      "crystalspace.mesh.object.particles", "explosion");
   if (!mfw) return;
 
-  csRef<iMeshWrapper> exp (
-  	Sys->view->GetEngine ()->CreateMeshWrapper (mfw, "custom explosion",
-	sector, center));
+  csRef<iMeshWrapper> exp = engine->CreateMeshWrapper (mfw, "custom explosion",
+	sector, center);
 
   exp->SetZBufMode(CS_ZBUF_TEST);
   exp->SetRenderPriority (engine->GetAlphaRenderPriority ());
@@ -318,9 +337,9 @@ void add_particles_explosion (iSector* sector, iEngine* engine,
   partstate->SetParticleSize (csVector2 (0.15f, 0.15f));
   partstate->SetRotationMode (CS_PARTICLE_ROTATE_VERTICES);
   partstate->SetIntegrationMode (CS_PARTICLE_INTEGRATE_BOTH);
-
   partstate->AddEmitter (sphereemit);
   partstate->AddEffector (lincol);
+
   Sys->Engine->DelayedRemoveObject (1100, exp);
   Sys->Engine->DelayedRemoveObject (1101, mfw);
 
