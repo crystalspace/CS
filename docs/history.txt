@@ -11,6 +11,8 @@ chronological order.
 	  to convert old particle systems to the new particle system.
 	  Only the explosion particle system is documented for now.
 	- Jorrit removed the explosion particle system from CS.
+	- Marten fixed the box emitter in the new particle system so that it
+	  isn't double as big as it should be.
 20-Sep-2006
 	- Marten disabled the global overrides of operator new and operator
 	  delete due to the interoperability problems it causes.
