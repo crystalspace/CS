@@ -990,6 +990,8 @@ csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (
     	logparent, -1, false);
   }
 
+  if (anim_ctrl) anim_ctrl->Update (vc->GetCurrentTicks ());
+
   const csReversibleTransform o2wt = movable->GetFullTransform ();
   const csVector3& wo = o2wt.GetOrigin ();
 

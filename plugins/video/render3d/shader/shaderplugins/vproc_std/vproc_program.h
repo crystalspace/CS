@@ -91,8 +91,20 @@ private:
   size_t numLights;
   bool useAttenuation;
   bool doSpecular;
+  bool doVertexSkinning;
+  bool doNormalSkinning;
+  bool doTangentSkinning;
+  bool doBiTangentSkinning;
   csRenderBufferName specularOutputBuffer;
+  csRenderBufferName skinnedPositionOutputBuffer;
+  csRenderBufferName skinnedNormalOutputBuffer;
+  csRenderBufferName skinnedTangentOutputBuffer;
+  csRenderBufferName skinnedBiTangentOutputBuffer;
   ProgramParam shininessParam;
+
+  csStringID bones_indices_name;
+  csStringID bones_weights_name;
+  csStringID bones_name;
 
   struct BufferName
   {
@@ -105,6 +117,8 @@ private:
   BufferName positionBuffer;
   BufferName normalBuffer;
   BufferName colorBuffer;
+  BufferName tangentBuffer;
+  BufferName bitangentBuffer;
 
   csBitArray disableMask;
 
@@ -113,6 +127,8 @@ private:
   iRenderBuffer* GetBuffer (const BufferName& name,
     csRenderMeshModes& modes, 
     const iArrayReadOnly<csShaderVariable*>* stacks);
+  bool UpdateSkinnedVertices (csRenderMeshModes& modes,
+                           const iShaderVarStack* stacks);
 };
 
 }
