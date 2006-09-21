@@ -52,8 +52,6 @@ WALKALL.PLUGINLIST =
   nullmesh
   protomesh
   protomeshldr
-  rain
-  rainldr
   rendloop_loader
   rendstep_std
   reporter
