@@ -17,6 +17,10 @@ chronological order.
 	  code in walktest to create rain to use the new particle system.
 	- Jorrit removed the rain particle system and documented how to convert
 	  from rain to new particles.
+	- caedes augmented CS_CHECK_PROG_VERSION so that it exports a variable
+	  with found version for the checked program.
+	- caedes made some more changes to pycegui configure test to make it
+	  more robust.
 20-Sep-2006
 	- Marten disabled the global overrides of operator new and operator
 	  delete due to the interoperability problems it causes.

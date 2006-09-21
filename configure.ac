@@ -1553,13 +1553,13 @@ AS_IF([test -n "$PYTHON" && test -n "$SWIG"],[
           [PYCEGUI_I_FILE="$with_pycegui/package/cegui.i"
            PYCEGUI_PY_FILE="$with_pycegui/src/cegui.py"],
           [AC_PATH_PROGS([PYCEGUI_I_FILE],[cegui.i],[],[pycegui_paths_default])
-	   PYCEGUI_PY_FILE=`$PYTHON -c "$pyceguitest"`])
-      m4_define([PYCEGUI_EXPECTED_SWIG_VERSION],[$cs_prog_swig_is_version])
+	   PYCEGUI_PY_FILE=CS_RUN_PATH_NORMALIZE([$PYTHON -c "$pyceguitest"])])
+      m4_define([PYCEGUI_EXPECTED_SWIG_VERSION],[cs_prog_swig_version])
       AS_IF([test -f "$PYCEGUI_PY_FILE" && test -f "$PYCEGUI_I_FILE"],[
 	CS_CHECK_PROG_VERSION([cegui.py was generated with same swig],
 		[sed -n -e '1p' "$PYCEGUI_PY_FILE"],
 		[PYCEGUI_EXPECTED_SWIG_VERSION],[9.9|.9],
-		[PYCEGUI_I_DIR=`dirname "$PYCEGUI_I_FILE"`
+		[PYCEGUI_I_DIR=`AS_DIRNAME([$PYCEGUI_I_FILE])`
 		 CS_EMIT_BUILD_PROPERTY([PYCEGUI.SWIGOK], [yes])
 		 CS_EMIT_BUILD_PROPERTY([PYCEGUI.SWIGFLAGS], [-I$PYCEGUI_I_DIR])
 		],[],[=])

@@ -3632,6 +3632,7 @@ echo "$as_me:$LINENO: result: $cs_cv_prog_binutils_version_2_17_ok_annotated" >&
 echo "${ECHO_T}$cs_cv_prog_binutils_version_2_17_ok_annotated" >&6
 if test "$cs_cv_prog_binutils_version_2_17_ok" = yes; then
   cs_cv_binutils_2_17=yes
+
 fi
 
 	if test -z "$cs_cv_binutils_2_17"; then
@@ -3735,6 +3736,7 @@ echo "$as_me:$LINENO: result: $cs_cv_prog_binutils_version_2_16_91_ok_annotated"
 echo "${ECHO_T}$cs_cv_prog_binutils_version_2_16_91_ok_annotated" >&6
 if test "$cs_cv_prog_binutils_version_2_16_91_ok" = yes; then
   cs_cv_binutils_2_17=yes
+
 fi
 
 fi
@@ -6900,6 +6902,7 @@ if test "$cs_cv_prog_bison_version_1_35_ok" = yes; then
 "
 fi
 
+
 fi
 
 fi
@@ -7136,6 +7139,7 @@ if test "$cs_cv_prog_swig_version_1_3_21_ok" = yes; then
 "
 fi
 
+
 fi
 
 fi
@@ -7292,6 +7296,7 @@ echo "$as_me:$LINENO: result: $cs_cv_prog_jam_version_2_4_ok_annotated" >&5
 echo "${ECHO_T}$cs_cv_prog_jam_version_2_4_ok_annotated" >&6
 if test "$cs_cv_prog_jam_version_2_4_ok" = yes; then
   cs_prog_jam_okay=yes
+
 else
   cs_prog_jam_okay=no
 fi
@@ -21310,6 +21315,7 @@ echo "$as_me:$LINENO: result: $cs_cv_prog_binutils_version_2_17_ok_annotated" >&
 echo "${ECHO_T}$cs_cv_prog_binutils_version_2_17_ok_annotated" >&6
 if test "$cs_cv_prog_binutils_version_2_17_ok" = yes; then
   cs_cv_binutils_2_17=yes
+
 fi
 
 	if test -z "$cs_cv_binutils_2_17"; then
@@ -21413,6 +21419,7 @@ echo "$as_me:$LINENO: result: $cs_cv_prog_binutils_version_2_16_91_ok_annotated"
 echo "${ECHO_T}$cs_cv_prog_binutils_version_2_16_91_ok_annotated" >&6
 if test "$cs_cv_prog_binutils_version_2_16_91_ok" = yes; then
   cs_cv_binutils_2_17=yes
+
 fi
 
 fi
@@ -49412,7 +49419,11 @@ fi
   test -n "$PYCEGUI_I_FILE" && break
 done
 
-	   PYCEGUI_PY_FILE=`$PYTHON -c "$pyceguitest"`
+	   PYCEGUI_PY_FILE=`{ (echo "$as_me:$LINENO: \$PYTHON -c \"\$pyceguitest\"") >&5
+  ($PYTHON -c "$pyceguitest") 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 fi
 
 
@@ -49493,7 +49504,18 @@ fi
 echo "$as_me:$LINENO: result: $cs_cv_prog_cegui_py_was_generated_with_same_swig_version_PYCEGUI_EXPECTED_SWIG_VERSION_ok_annotated" >&5
 echo "${ECHO_T}$cs_cv_prog_cegui_py_was_generated_with_same_swig_version_PYCEGUI_EXPECTED_SWIG_VERSION_ok_annotated" >&6
 if test "$cs_cv_prog_cegui_py_was_generated_with_same_swig_version_PYCEGUI_EXPECTED_SWIG_VERSION_ok" = yes; then
-  PYCEGUI_I_DIR=`dirname "$PYCEGUI_I_FILE"`
+  PYCEGUI_I_DIR=`(dirname $PYCEGUI_I_FILE) 2>/dev/null ||
+$as_expr X$PYCEGUI_I_FILE : 'X\(.*[^/]\)//*[^/][^/]*/*$' \| \
+	 X$PYCEGUI_I_FILE : 'X\(//\)[^/]' \| \
+	 X$PYCEGUI_I_FILE : 'X\(//\)$' \| \
+	 X$PYCEGUI_I_FILE : 'X\(/\)' \| \
+	 .     : '\(.\)' 2>/dev/null ||
+echo X$PYCEGUI_I_FILE |
+    sed '/^X\(.*[^/]\)\/\/*[^/][^/]*\/*$/{ s//\1/; q; }
+  	  /^X\(\/\/\)[^/].*/{ s//\1/; q; }
+  	  /^X\(\/\/\)$/{ s//\1/; q; }
+  	  /^X\(\/\).*/{ s//\1/; q; }
+  	  s/.*/./; q'`
 		 cs_build_prop_val="yes"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     if test -n "$cs_build_prop_val"; then
@@ -49507,6 +49529,7 @@ fi
   cs_jamconfig_text="${cs_jamconfig_text}PYCEGUI.SWIGFLAGS ?= \"$cs_build_prop_val\" ;
 "
 fi
+
 
 
 fi
@@ -62506,6 +62529,7 @@ cs_header_text="${cs_header_text}#define CS_LONG_SIZE $ac_cv_sizeof_long
 
     case $host_cpu in
 	[Ii][3-9]86*|[Xx]86*) cs_host_cpu=x86 ;;
+	powerpc*) cs_host_cpu=powerpc ;;
 	*) cs_host_cpu=$host_cpu ;;
     esac
     cs_host_cpu_normalized="`echo "$cs_host_cpu" | $as_tr_cpp`"
