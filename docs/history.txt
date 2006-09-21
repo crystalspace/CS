@@ -6,6 +6,11 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+21-Sep-2006
+	- Jorrit added a new section to the API mod doc which explains how
+	  to convert old particle systems to the new particle system.
+	  Only the explosion particle system is documented for now.
+	- Jorrit removed the explosion particle system from CS.
 20-Sep-2006
 	- Marten disabled the global overrides of operator new and operator
 	  delete due to the interoperability problems it causes.

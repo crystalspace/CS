@@ -24,7 +24,6 @@
 #include "cssysdef.h"
 #include "imesh/bezier.h"
 #include "imesh/emit.h"
-#include "imesh/explode.h"
 #include "imesh/fire.h"
 #include "imesh/fountain.h"
 #include "imesh/genmesh.h"

@@ -1,0 +1,85 @@
+@c -*-texinfo-*-
+@cindex Converting old particle systems
+
+This section documents how to convert the various particle systems
+to the new particle system in Crystal Space.
+
+@menu
+* Api100 PartConv Explo:: Explosion
+@end menu
+
+@node Api100 PartConv Explo, , Api100 Particle system changes, Api100 Particle system changes
+@subsubsection Explosion
+
+To convert the old explosion particle system to new particles you
+can use a sphere emitter with a very small radius and with particle
+placement in center. Set a very small duration and a high emission rate
+so that all particles will appear to be created at once. Using
+a linear color effector you can obtain the fading of the particles (use
+either alpha mixmode or add depending no the kind of fading you want).
+Here is an example of how the old explosion can be emulated using
+the new particle system (in code): Note that this is not an attempt to
+make a realistic or even nice looking explosion. It is just an attempt
+to emulate the ugly old explosion particle system from the past:
+
+@example
+  // Create the factory.
+  csRef<iMeshFactoryWrapper> mfw = engine->CreateMeshFactory (
+	"crystalspace.mesh.object.particles", "explosion");
+  if (!mfw) return;
+
+  // Create the mesh and setup material, mixmode, and color.
+  csRef<iMeshWrapper> exp = engine->CreateMeshWrapper (mfw, "boing",
+	sector, center));
+  exp->SetZBufMode(CS_ZBUF_TEST);
+  exp->SetRenderPriority (engine->GetAlphaRenderPriority ());
+  exp->GetMeshObject()->SetMaterialWrapper (mat);
+  exp->GetMeshObject()->SetMixMode (CS_FX_ALPHA);
+  exp->GetMeshObject()->SetColor (csColor (1, 1, 0));
+
+  // Find/load the built-in emitter factory. From this factory we
+  // can access some of the standard built-in emitters.
+  csRef<iParticleBuiltinEmitterFactory> emit_factory = 
+      csLoadPluginCheck<iParticleBuiltinEmitterFactory> (
+        object_reg, "crystalspace.mesh.object.particles.emitter", false);
+  // Find/load the built-in effector factory. From this factory we
+  // can access some of the standard built-in effectors.
+  csRef<iParticleBuiltinEffectorFactory> eff_factory = 
+      csLoadPluginCheck<iParticleBuiltinEffectorFactory> (
+        object_reg, "crystalspace.mesh.object.particles.effector", false);
+
+  // Create a sphere emitter where we will have a quick burst of
+  // all the particles from the center.
+  csRef<iParticleBuiltinEmitterSphere> sphereemit = emit_factory->
+    CreateSphere ();
+  sphereemit->SetRadius (0.1);
+  sphereemit->SetParticlePlacement (CS_PARTICLE_BUILTIN_CENTER);
+  sphereemit->SetPosition (csVector3 (0, 0, 0));
+  sphereemit->SetInitialVelocity (csVector3 (1, 0, 0), csVector3 (3, 3, 3));
+  sphereemit->SetUniformVelocity (false);
+  sphereemit->SetDuration (0.1f);
+  sphereemit->SetEmissionRate (1000.0f);
+  sphereemit->SetInitialTTL (1.0f, 1.0f);
+
+  // Create a lincolor effector to fade out the particles.
+  csRef<iParticleBuiltinEffectorLinColor> lincol = eff_factory->
+    CreateLinColor ();
+  lincol->AddColor (csColor4 (1,1,1,1), 1.0f);
+  lincol->AddColor (csColor4 (1,1,1,0), 0.0f);
+
+  // Setup the real particle system and add the emitter and effector
+  // we created above.
+  csRef<iParticleSystem> partstate =
+  	scfQueryInterface<iParticleSystem> (exp->GetMeshObject ());
+  partstate->SetParticleSize (csVector2 (0.15f, 0.15f));
+  partstate->SetRotationMode (CS_PARTICLE_ROTATE_VERTICES);
+  partstate->SetIntegrationMode (CS_PARTICLE_INTEGRATE_BOTH);
+  partstate->AddEmitter (sphereemit);
+  partstate->AddEffector (lincol);
+
+  // Make sure that the particle mesh and factories are removed
+  // when all particles are gone (approx 1 second).
+  Sys->Engine->DelayedRemoveObject (1100, exp);
+  Sys->Engine->DelayedRemoveObject (1101, mfw);
+@end example
+

@@ -38,7 +38,6 @@
 #include "igeom/polymesh.h"
 #include "imap/loader.h"
 #include "imesh/particles.h"
-#include "imesh/explode.h"
 #include "imesh/fire.h"
 #include "imesh/fountain.h"
 #include "imesh/lighting.h"
@@ -277,7 +276,6 @@ void add_particles_explosion (iSector* sector, iEngine* engine,
     return;
   }
 
-#if 1
   csRef<iMeshFactoryWrapper> mfw = Sys->view->GetEngine ()->
     CreateMeshFactory ("crystalspace.mesh.object.particles", "explosion");
   if (!mfw) return;
@@ -287,12 +285,7 @@ void add_particles_explosion (iSector* sector, iEngine* engine,
 	sector, center));
 
   exp->SetZBufMode(CS_ZBUF_TEST);
-  exp->GetMeshObject ()->SetMixMode (CS_FX_ALPHA);
-  
   exp->SetRenderPriority (engine->GetAlphaRenderPriority ());
-
-  csRef<iParticleSystem> partstate =
-  	scfQueryInterface<iParticleSystem> (exp->GetMeshObject ());
   exp->GetMeshObject()->SetMaterialWrapper (mat);
   exp->GetMeshObject()->SetMixMode (CS_FX_ALPHA);
   exp->GetMeshObject()->SetColor (csColor (1, 1, 0));
@@ -320,6 +313,8 @@ void add_particles_explosion (iSector* sector, iEngine* engine,
   lincol->AddColor (csColor4 (1,1,1,1), 1.0f);
   lincol->AddColor (csColor4 (1,1,1,0), 0.0f);
 
+  csRef<iParticleSystem> partstate =
+  	scfQueryInterface<iParticleSystem> (exp->GetMeshObject ());
   partstate->SetParticleSize (csVector2 (0.15f, 0.15f));
   partstate->SetRotationMode (CS_PARTICLE_ROTATE_VERTICES);
   partstate->SetIntegrationMode (CS_PARTICLE_INTEGRATE_BOTH);
@@ -328,40 +323,6 @@ void add_particles_explosion (iSector* sector, iEngine* engine,
   partstate->AddEffector (lincol);
   Sys->Engine->DelayedRemoveObject (1100, exp);
   Sys->Engine->DelayedRemoveObject (1101, mfw);
-#else
-  csRef<iMeshFactoryWrapper> mfw (Sys->view->GetEngine ()->
-    CreateMeshFactory ("crystalspace.mesh.object.explosion", "explosion"));
-  if (!mfw) return;
-
-  csRef<iMeshWrapper> exp (
-  	Sys->view->GetEngine ()->CreateMeshWrapper (mfw, "custom explosion",
-	sector, center));
-
-  exp->SetZBufMode(CS_ZBUF_TEST);
-  exp->SetRenderPriority (engine->GetAlphaRenderPriority ());
-
-  csRef<iParticleState> partstate (
-  	SCF_QUERY_INTERFACE (exp->GetMeshObject (), iParticleState));
-  exp->GetMeshObject()->SetMaterialWrapper (mat);
-  //partstate->SetMixMode (CS_FX_SETALPHA (0.50));
-  exp->GetMeshObject()->SetColor (csColor (1, 1, 0));
-  partstate->SetChangeRotation (5.0);
-  partstate->SetChangeSize (1.25);
-  partstate->SetSelfDestruct (3000);
-
-  csRef<iExplosionState> expstate (
-  	SCF_QUERY_INTERFACE (exp->GetMeshObject (), iExplosionState));
-  expstate->SetParticleCount (100);
-  expstate->SetCenter (csVector3 (0, 0, 0));
-  expstate->SetPush (csVector3 (0, 0, 0));
-  expstate->SetNrSides (6);
-  expstate->SetPartRadius (0.15f);
-  expstate->SetLighting (true);
-  expstate->SetSpreadPos (0.6f);
-  expstate->SetSpreadSpeed (2.0f);
-  expstate->SetSpreadAcceleration (2.0f);
-  expstate->SetFadeSprites (500);
-#endif
 
   exp->PlaceMesh ();
 }
