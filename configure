@@ -62016,6 +62016,7 @@ cs_header_text="${cs_header_text}#define CS_LONG_SIZE $ac_cv_sizeof_long
 
     case $host_cpu in
 	[Ii][3-9]86*|[Xx]86*) cs_host_cpu=x86 ;;
+	powerpc*) cs_host_cpu=powerpc ;;
 	*) cs_host_cpu=$host_cpu ;;
     esac
     cs_host_cpu_normalized="`echo "$cs_host_cpu" | $as_tr_cpp`"
