@@ -336,6 +336,8 @@ Add a constant acceleration to particles. Useful for example for gravity.
 Add a constant force to particles.
 @item <randomacceleration>mag</randomacceleration>
 Add a random acceleration with given magnitude.
+@item <randomacceleration x="" y="" z="" />
+Add a random acceleration with given magnitude in the form of a vector.
 @end table
 
 @samp{Lincolor} effector sets the color of particles based on their remaning

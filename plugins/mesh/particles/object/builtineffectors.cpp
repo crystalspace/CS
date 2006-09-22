@@ -59,8 +59,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
 
       csVector3 a = acceleration;
 
-      if (randomAcceleration > 0)
-        a += GetVGen()->Get () * randomAcceleration;
+      if (do_randomAcceleration)
+      {
+        csVector3 r = GetVGen()->Get ();
+	a.x += r.x * randomAcceleration.x;
+	a.y += r.y * randomAcceleration.y;
+	a.z += r.z * randomAcceleration.z;
+      }
 
       particle.linearVelocity += (a + force / particle.mass) * dt;
     }

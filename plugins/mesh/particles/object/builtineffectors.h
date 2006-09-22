@@ -59,7 +59,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
   public:
     ParticleEffectorForce ()
       : scfImplementationType (this),
-      acceleration (0.0f), force (0.0f), randomAcceleration (0.0f)
+      acceleration (0.0f), force (0.0f), randomAcceleration (0.0f, 0.0f, 0.0f),
+      do_randomAcceleration (false)
     {
     }
 
@@ -90,12 +91,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
       return force; 
     }
 
-    virtual void SetRandomAcceleration (float magnitude)
+    virtual void SetRandomAcceleration (const csVector3& magnitude)
     {
       randomAcceleration = magnitude;
+      if (randomAcceleration < .000001f)
+	do_randomAcceleration = false;
+      else
+	do_randomAcceleration = true;
     }
 
-    virtual float GetRandomAcceleration () const
+    virtual const csVector3& GetRandomAcceleration () const
     {
       return randomAcceleration;
     }
@@ -103,7 +108,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
   private:
     csVector3 acceleration;
     csVector3 force;
-    float randomAcceleration;
+    csVector3 randomAcceleration;
+    bool do_randomAcceleration;
   };
 
   class ParticleEffectorLinColor : public
