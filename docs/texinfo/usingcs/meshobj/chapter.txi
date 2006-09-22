@@ -6,9 +6,8 @@
 
 This section covers the Crystal Space Mesh Object plug-in system.  This is a
 very general system for defining various kinds of 3D objects and using them in
-the Crystal Space 3D engine.  There are already a number of mesh objects
-predefined in Crystal Space: particle systems like snow and fountain, 2D
-sprites, a general mesh, etc.
+the Crystal Space 3D engine.  You can use them to simulate things like
+snow, rain, fountains, fire, explosions, @dots{}.
 
 In practice you will probably want to use the following mesh objects
 in your own game:
@@ -70,7 +69,6 @@ Crystal Space supports.
 * MeshObject PartSys:: Particle Systems in General
 * MeshObject Fountain:: Fountain Mesh Object
 * MeshObject Fire:: Fire Mesh Object
-* MeshObject Snow:: Snow Mesh Object
 * MeshObject Spiral:: Spiral Mesh Object
 * MeshObject Haze:: Haze Mesh Object
 * MeshObject Particles:: Particles Mesh Object
@@ -94,7 +92,6 @@ Crystal Space supports.
 @importss{usingcs,meshobj,partsys.txi}
 @importss{usingcs,meshobj,fountain.txi}
 @importss{usingcs,meshobj,fire.txi}
-@importss{usingcs,meshobj,snow.txi}
 @importss{usingcs,meshobj,spiral.txi}
 @importss{usingcs,meshobj,haze.txi}
 @importss{usingcs,meshobj,particles.txi}

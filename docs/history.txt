@@ -17,6 +17,14 @@ chronological order.
 	  a vector with three identical values). If you specify x, y, and z
 	  attributes in the <randomacceleration> tag then it will be
 	  interpreted as a vector.
+	- Jorrit fixed rain so that the particles start at the top and also
+	  made sure that the time to live is exactly long enough for the
+	  height of the current sector.
+	- Jorrit changed the snow in partsys to use new particles.
+	- Jorrit changed the snow in walktest (snow console command) to use
+	  new particles.
+	- Jorrit added documentation about converting snow to new particles.
+	- Jorrit removed the old snow mesh object.
 21-Sep-2006
 	- Jorrit added a new section to the API mod doc which explains how
 	  to convert old particle systems to the new particle system.
