@@ -38,7 +38,6 @@
 #include "igeom/polymesh.h"
 #include "imap/loader.h"
 #include "imesh/particles.h"
-#include "imesh/fire.h"
 #include "imesh/fountain.h"
 #include "imesh/lighting.h"
 #include "imesh/object.h"
@@ -143,7 +142,7 @@ void add_particles_rain (iSector* sector, char* matname, int num, float speed,
 
   csRef<iParticleBuiltinEffectorLinColor> lincol = eff_factory->
     CreateLinColor ();
-  lincol->AddColor (csColor4 (.25,.25,.25,1), 2.5f);
+  lincol->AddColor (csColor4 (.25,.25,.25,1), seconds_to_live);
 
   csRef<iParticleSystem> partstate =
   	scfQueryInterface<iParticleSystem> (exp->GetMeshObject ());
@@ -208,7 +207,7 @@ void add_particles_snow (iSector* sector, char* matname, int num, float speed)
 
   csRef<iParticleBuiltinEffectorLinColor> lincol = eff_factory->
     CreateLinColor ();
-  lincol->AddColor (csColor4 (.25,.25,.25,1), 2.5f);
+  lincol->AddColor (csColor4 (.25,.25,.25,1), seconds_to_live);
 
   csRef<iParticleBuiltinEffectorForce> force = eff_factory->
     CreateForce ();
@@ -229,41 +228,71 @@ void add_particles_snow (iSector* sector, char* matname, int num, float speed)
 void add_particles_fire (iSector* sector, char* matname, int num,
 	const csVector3& origin)
 {
+  iEngine* engine = Sys->view->GetEngine ();
+
   // First check if the material exists.
-  iMaterialWrapper* mat = Sys->view->GetEngine ()->GetMaterialList ()->
-  	FindByName (matname);
+  iMaterialWrapper* mat = engine->GetMaterialList ()->FindByName (matname);
   if (!mat)
   {
     Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Can't find material '%s' in memory!", matname);
     return;
   }
 
-  csRef<iMeshFactoryWrapper> mfw (Sys->view->GetEngine ()->
-    CreateMeshFactory ("crystalspace.mesh.object.fire", "fire"));
+  csRef<iMeshFactoryWrapper> mfw = engine->CreateMeshFactory (
+      "crystalspace.mesh.object.particles", "fire");
   if (!mfw) return;
 
-  csRef<iMeshWrapper> exp (
-  	Sys->view->GetEngine ()->CreateMeshWrapper (mfw, "custom fire", sector,
-	origin));
+  csRef<iMeshWrapper> exp = engine->CreateMeshWrapper (mfw, "custom fire",
+	sector, origin);
 
   exp->SetZBufMode(CS_ZBUF_TEST);
-
-  csRef<iParticleState> partstate (
-  	SCF_QUERY_INTERFACE (exp->GetMeshObject (), iParticleState));
+  exp->GetMeshObject()->SetMixMode (CS_FX_ADD);
   exp->GetMeshObject()->SetMaterialWrapper (mat);
-  partstate->SetMixMode (CS_FX_ADD);
 
-  csRef<iFireState> firestate (
-  	SCF_QUERY_INTERFACE (exp->GetMeshObject (), iFireState));
-  firestate->SetParticleCount (num);
-  //firestate->SetDropSize (.02, .04);
-  firestate->SetDropSize (0.04f, 0.08f);
-  firestate->SetLighting (false);
-  firestate->SetOrigin (csBox3(-csVector3(0.2f, 0, 0.2f),
-    csVector3(0.2f, 0.2f)));
-  firestate->SetDirection (csVector3 (0, 1.0f, 0));
-  firestate->SetSwirl (1.6f);
-  firestate->SetColorScale (0.2f);
+  csRef<iParticleBuiltinEmitterFactory> emit_factory = 
+      csLoadPluginCheck<iParticleBuiltinEmitterFactory> (
+        Sys->object_reg, "crystalspace.mesh.object.particles.emitter", false);
+  csRef<iParticleBuiltinEffectorFactory> eff_factory = 
+      csLoadPluginCheck<iParticleBuiltinEffectorFactory> (
+        Sys->object_reg, "crystalspace.mesh.object.particles.effector", false);
+
+  csRef<iParticleBuiltinEmitterSphere> sphemit = emit_factory->CreateSphere ();
+  // Time to live depends on height of sector.
+  float velocity = 0.5f;
+  float seconds_to_live = 2.0f;
+  sphemit->SetRadius (.2f);
+  sphemit->SetParticlePlacement (CS_PARTICLE_BUILTIN_VOLUME);
+  sphemit->SetEmissionRate (float (num) / seconds_to_live);
+  sphemit->SetInitialMass (5.0f, 7.5f);
+  sphemit->SetUniformVelocity (true);
+  sphemit->SetInitialTTL (seconds_to_live, seconds_to_live);
+  sphemit->SetInitialVelocity (csVector3 (0, velocity, 0),
+      csVector3 (0));
+
+  csRef<iParticleBuiltinEffectorLinColor> lincol = eff_factory->
+    CreateLinColor ();
+  lincol->AddColor (csColor4 (0.00, 0.00, 0.00, 1), 2);
+  lincol->AddColor (csColor4 (1.00, 0.35, 0.00, 0), 1.5);
+  lincol->AddColor (csColor4 (1.00, 0.22, 0.00, .1), 1.3125);
+  lincol->AddColor (csColor4 (1.00, 0.12, 0.00, .3), 1.125);
+  lincol->AddColor (csColor4 (0.80, 0.02, 0.00, .8), 0.9375);
+  lincol->AddColor (csColor4 (0.60, 0.00, 0.00, .9), 0.75);
+  lincol->AddColor (csColor4 (0.40, 0.00, 0.00, .97), 0.5625);
+  lincol->AddColor (csColor4 (0.20, 0.00, 0.00, 1), 0.375);
+  lincol->AddColor (csColor4 (0.00, 0.00, 0.00, 1), 0.1875);
+  lincol->AddColor (csColor4 (0.00, 0.00, 0.00, 1), 0);
+
+  csRef<iParticleBuiltinEffectorForce> force = eff_factory->
+    CreateForce ();
+  force->SetRandomAcceleration (csVector3 (1.5f, 1.5f, 1.5f));
+
+  csRef<iParticleSystem> partstate =
+  	scfQueryInterface<iParticleSystem> (exp->GetMeshObject ());
+  //partstate->SetMinBoundingBox (bbox);
+  partstate->SetParticleSize (csVector2 (0.04f, 0.08f));
+  partstate->AddEmitter (sphemit);
+  partstate->AddEffector (lincol);
+  partstate->AddEffector (force);
 }
 
 //===========================================================================
