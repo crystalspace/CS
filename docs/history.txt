@@ -7,6 +7,8 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 24-Sep-2006
+        - Piotr did some tweaks to phystut app, now walls colliders should
+          work better with ode engine.
 	- Jorrit changed the flame command in walktest to use new particles.
 	- Jorrit replaced the two fire particle systems in partsys
 	  with new particles.
