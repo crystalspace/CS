@@ -9,8 +9,25 @@
         <portaltraversal/>
         <zuse />
       </step>
-      <!-- terrain splatting -->
+      <!-- dynamic lighting -->
       <step plugin="crystalspace.renderloop.step.lightiter">
+        <steps>
+      	  <step plugin="crystalspace.renderloop.step.generic">
+            <shadertype>dynamic</shadertype>
+	    <zoffset>no</zoffset>
+            <zuse />
+          </step>
+        </steps>
+      </step>
+      <!-- terrain splatting ambient -->
+     <step plugin="crystalspace.renderloop.step.generic">
+        <shadertype>splatting ambient</shadertype>
+        <zoffset>no</zoffset>
+	<portaltraversal/>
+        <zuse />
+      </step>
+      <!-- terrain splatting dynamic -->
+       <step plugin="crystalspace.renderloop.step.lightiter">
         <steps>
           <step plugin="crystalspace.renderloop.step.generic">
             <shadertype>terrain splat</shadertype>

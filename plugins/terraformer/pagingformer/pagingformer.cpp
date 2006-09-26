@@ -392,6 +392,11 @@ bool csPagingFormer::SetIntegerMap (csStringID /*type*/, iImage* /*map*/,
   return false;
 }
 
+/// Get the integer map dimensions.
+csVector2 csPagingFormer::GetIntegerMapSize (csStringID type)
+{
+  return csVector2(0,0);
+}
 
 /// Set additional float map.
 bool csPagingFormer::SetFloatMap (csStringID /*type*/, iImage* /*map*/,

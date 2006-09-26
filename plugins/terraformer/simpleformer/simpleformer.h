@@ -91,6 +91,15 @@ private:
   /// Offset vector
   csVector3 offset;
 
+  /// Material scale
+  csVector2 materialScale;
+
+  /// This is for API compatibility.
+  bool materialScaleSet;
+
+  /// Material offset
+  csVector2 materialOffset;
+  
   /// Material palette containing all used materials
   csArray<iMaterialWrapper*> materialPalette;
 
@@ -128,10 +137,20 @@ public:
   /// Set an offset vector to be used in lookups
   void SetOffset (csVector3 offset);
 
+  /// Sets the material scale and offset
+  void SetMaterialScale(csVector2 scale);
+
   /// Set additional integer map.
   bool SetIntegerMap (csStringID type, iImage* map, int scale, int offset);
   /// Set additional float map.
   bool SetFloatMap (csStringID type, iImage* map, float scale, float offset);
+
+  /// Get the integer map dimensions.
+  virtual csVector2 GetIntegerMapSize (csStringID type);
+
+
+  /// Gets the processed heightmap data.
+  float *GetFloatMap () { return heightData; }
 
 
   // ------------ iTerraFormer implementation ------------
