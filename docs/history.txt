@@ -12,6 +12,9 @@ chronological order.
 	- Jorrit removed the fire particle system.
 	- res disabled strict aliasing for wxgl and wxtest (some WX headers
 	  cause aliasing warnings in optimize mode with gcc 4.1.1).
+	- res committed a patch from <oh.hello.joe@gmail.com> to add a
+	  driver DB entry to work around a crash on some old version of the
+	  i810 DRI driver.
 25-Sep-2006
 	- Jorrit added the new kwartz.zip to vfs.
 24-Sep-2006
