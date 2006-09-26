@@ -8,6 +8,7 @@ to the new particle system in Crystal Space.
 * Api100 PartConv Explo:: Explosion
 * Api100 PartConv Rain:: Rain
 * Api100 PartConv Snow:: Snow
+* Api100 PartConv Fire:: Fire
 @end menu
 
 @node Api100 PartConv Explo, Api100 PartConv Rain, Api100 Particle system changes, Api100 Particle system changes
@@ -182,7 +183,7 @@ Here is how this could work in code:
   partstate->AddEffector (lincol);
 @end example
 
-@node Api100 PartConv Snow, , Api100 PartConv Rain, Api100 Particle system changes
+@node Api100 PartConv Snow, Api100 PartConv Fire, Api100 PartConv Rain, Api100 Particle system changes
 @subsubsection Snow
 
 To convert the old snow particle system to new particles you
@@ -283,6 +284,124 @@ Here is how this could work in code:
   partstate->SetMinBoundingBox (bbox);
   partstate->SetParticleSize (csVector2 (0.07f, 0.07f));
   partstate->AddEmitter (boxemit);
+  partstate->AddEffector (lincol);
+  partstate->AddEffector (force);
+@end example
+
+@node Api100 PartConv Fire, , Api100 PartConv Snow, Api100 Particle system changes
+@subsubsection Fire
+
+To convert the old fire particle system to new particles you
+can use a sphere emitter which is oriented at the bottom of the flame.
+You can use a force effector with random acceleration to have the particles
+shift a bit. Here you see an example of a fire particle system in the
+world file:
+
+@example
+  <meshfact name="fireFact">
+    <plugin>crystalspace.mesh.loader.factory.particles</plugin>
+    <params>
+      <particlesize x="0.04" y="0.08" />
+      <sortmode>none</sortmode>
+      <emitter type="sphere">
+      	<radius>.1</radius>
+        <emissionrate>250</emissionrate>
+        <mass min="5" max="7.5" />
+        <uniformvelocity />
+        <initialvelocity x="0" y="1" z="0" />
+        <initialttl min="1" max="1" />
+        <placement>center</placement>
+      </emitter>
+      <effector type="lincolor">
+        <color red="0.00" green="0.00" blue="0.00" time="1" />
+        <color red="1.00" green="0.35" blue="0.00" time="0.96" />
+        <color red="1.00" green="0.22" blue="0.00" time="0.9" />
+        <color red="1.00" green="0.12" blue="0.00" time="0.8" />
+        <color red="0.80" green="0.02" blue="0.00" time="0.7" />
+        <color red="0.60" green="0.00" blue="0.00" time="0.75" />
+        <color red="0.40" green="0.00" blue="0.00" time="0.5625" />
+        <color red="0.20" green="0.05" blue="0.05" time="0.375" />
+        <color red="0.10" green="0.10" blue="0.10" time="0.1875" />
+        <color red="0.00" green="0.00" blue="0.00" time="0" />
+      </effector>
+      <effector type="force">
+	<randomacceleration x="2.5" y="2.5" z="2.5" />
+      </effector>
+    </params>
+  </meshfact>
+  @dots{}
+  <meshobj name="fire">
+    <priority>alpha</priority>
+    <plugin>crystalspace.mesh.loader.particles</plugin>
+    <ztest />
+    <params>
+      <factory>fireFact</factory>
+      <mixmode>
+        <add />
+      </mixmode>
+      <material>firematerial</material>
+    </params>
+    <move>
+      <v x="10" y="0" z="10" />
+    </move>
+  </meshobj>
+@end example
+
+Here is how this could work in code:
+
+@example
+  csRef<iMeshFactoryWrapper> mfw = engine->CreateMeshFactory (
+      "crystalspace.mesh.object.particles", "fire");
+  if (!mfw) return;
+
+  csRef<iMeshWrapper> exp = engine->CreateMeshWrapper (mfw, "custom fire",
+	sector, origin);
+
+  exp->SetZBufMode(CS_ZBUF_TEST);
+  exp->GetMeshObject()->SetMixMode (CS_FX_ADD);
+  exp->GetMeshObject()->SetMaterialWrapper (mat);
+
+  csRef<iParticleBuiltinEmitterFactory> emit_factory = 
+      csLoadPluginCheck<iParticleBuiltinEmitterFactory> (
+        object_reg, "crystalspace.mesh.object.particles.emitter", false);
+  csRef<iParticleBuiltinEffectorFactory> eff_factory = 
+      csLoadPluginCheck<iParticleBuiltinEffectorFactory> (
+        object_reg, "crystalspace.mesh.object.particles.effector", false);
+
+  csRef<iParticleBuiltinEmitterSphere> sphemit = emit_factory->CreateSphere ();
+  // Time to live depends on height of sector.
+  float velocity = 0.5f;
+  float seconds_to_live = 2.0f;
+  sphemit->SetRadius (.2f);
+  sphemit->SetParticlePlacement (CS_PARTICLE_BUILTIN_VOLUME);
+  sphemit->SetEmissionRate (float (num) / seconds_to_live);
+  sphemit->SetInitialMass (5.0f, 7.5f);
+  sphemit->SetUniformVelocity (true);
+  sphemit->SetInitialTTL (seconds_to_live, seconds_to_live);
+  sphemit->SetInitialVelocity (csVector3 (0, velocity, 0),
+      csVector3 (0));
+
+  csRef<iParticleBuiltinEffectorLinColor> lincol = eff_factory->
+    CreateLinColor ();
+  lincol->AddColor (csColor4 (0.00, 0.00, 0.00, 1), 2);
+  lincol->AddColor (csColor4 (1.00, 0.35, 0.00, 0), 1.5);
+  lincol->AddColor (csColor4 (1.00, 0.22, 0.00, .1), 1.3125);
+  lincol->AddColor (csColor4 (1.00, 0.12, 0.00, .3), 1.125);
+  lincol->AddColor (csColor4 (0.80, 0.02, 0.00, .8), 0.9375);
+  lincol->AddColor (csColor4 (0.60, 0.00, 0.00, .9), 0.75);
+  lincol->AddColor (csColor4 (0.40, 0.00, 0.00, .97), 0.5625);
+  lincol->AddColor (csColor4 (0.20, 0.00, 0.00, 1), 0.375);
+  lincol->AddColor (csColor4 (0.00, 0.00, 0.00, 1), 0.1875);
+  lincol->AddColor (csColor4 (0.00, 0.00, 0.00, 1), 0);
+
+  csRef<iParticleBuiltinEffectorForce> force = eff_factory->
+    CreateForce ();
+  force->SetRandomAcceleration (csVector3 (1.5f, 1.5f, 1.5f));
+
+  csRef<iParticleSystem> partstate =
+  	scfQueryInterface<iParticleSystem> (exp->GetMeshObject ());
+  partstate->SetParticleSize (csVector2 (0.04f, 0.08f));
+  partstate->AddEmitter (sphemit);
   partstate->AddEffector (lincol);
   partstate->AddEffector (force);
 @end example

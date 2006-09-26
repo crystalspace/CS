@@ -36,8 +36,6 @@ WALKALL.PLUGINLIST =
   emitldr
   engine
   engseq
-  fire
-  fireldr
   fontplex
   fountain
   fountldr

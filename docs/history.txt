@@ -9,6 +9,7 @@ chronological order.
 26-Sep-2006
 	- Timothy Whitfield (kiokalin) fixed the paging former so that it
 	  actually works now. It is also seamless.
+	- Jorrit removed the fire particle system.
 25-Sep-2006
 	- Jorrit added the new kwartz.zip to vfs.
 24-Sep-2006

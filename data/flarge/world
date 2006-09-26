@@ -8474,10 +8474,6 @@
       <material>robot</material>
     </params>
   </meshfact>
-  <meshfact name="fireFact">
-    <plugin>crystalspace.mesh.loader.factory.fire</plugin>
-    <params />
-  </meshfact>
   <meshfact name="exteriorFact">
     <plugin>crystalspace.mesh.loader.factory.genmesh</plugin>
     <params>
@@ -16160,29 +16156,6 @@
                 <rotx>0</rotx>
               </matrix>
             </move>
-            <!--
-            <meshobj name="flame">
-              <plugin>crystalspace.mesh.loader.fire</plugin>
-              <params>
-                <factory>fireFact</factory>
-                <mixmode>
-                  <add />
-                </mixmode>
-                <number>50</number>
-                <material>raindrop</material>
-                <origin x="0" y="0" z="0" />
-                <dropsize w="0.02" h="0.04" />
-                <lighting>no</lighting>
-                <swirl>0.6</swirl>
-                <colorscale>0.2</colorscale>
-              </params>
-              <move>
-                <v x="0" y="0" z="0" />
-                <matrix>
-                  <rotz>-1.5</rotz>
-                </matrix>
-              </move>
-            </meshobj> -->
             <meshobj>
               <plugin>particles</plugin>
               <params>
