@@ -292,7 +292,10 @@ Here is how this could work in code:
 @subsubsection Fire
 
 To convert the old fire particle system to new particles you
-can use a sphere emitter which is oriented at the bottom of the flame.
+can use an emitter which is oriented at the bottom of the flame.
+To get behaviour equivalent to the old system use a box-shaped emitter, either
+with the metrics specified by either @samp{originbox} or a very small box 
+around @samp{origin}.
 You can use a force effector with random acceleration to have the particles
 shift a bit. Here you see an example of a fire particle system in the
 world file:
