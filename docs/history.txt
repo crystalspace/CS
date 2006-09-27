@@ -14,6 +14,7 @@ chronological order.
 	- Jorrit removed the fountain mesh object.
 	- Jorrit removed csNewParticleSystem since this class is no longer
 	  being used.
+	- Genjix corrected iutil/iConfigIterator not implementing GetTuple.
 26-Sep-2006
 	- Timothy Whitfield (kiokalin) fixed the paging former so that it
 	  actually works now. It is also seamless.
@@ -77,7 +78,7 @@ chronological order.
 	- res fixed the Cg shader plugin to also take compiler options from
 	  the configuration when fragment program routing is used.
 	- res added the definition of a preprocessor macro that contains the
-	  fragment program version when compiling fragment progtams to the Cg 
+	  fragment program version when compiling fragment progtams to the Cg
 	  shader plugin.
 19-Sep-2006
         - Genjix documented a little csIntersect3 behaviour.

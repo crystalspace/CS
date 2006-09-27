@@ -176,6 +176,10 @@ public:
   {
     return (CurrentIterator ? CurrentIterator->GetBool() : false);
   }
+  virtual csPtr<iStringArray> GetTuple() const
+  {
+    return (CurrentIterator ? CurrentIterator->GetTuple() : 0);
+  }
   virtual const char *GetComment() const
   {
     return (CurrentIterator ? CurrentIterator->GetComment() : 0);
