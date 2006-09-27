@@ -9,6 +9,7 @@ to the new particle system in Crystal Space.
 * Api100 PartConv Rain:: Rain
 * Api100 PartConv Snow:: Snow
 * Api100 PartConv Fire:: Fire
+* Api100 PartConv Fountain:: Fountain
 @end menu
 
 @node Api100 PartConv Explo, Api100 PartConv Rain, Api100 Particle system changes, Api100 Particle system changes
@@ -288,7 +289,7 @@ Here is how this could work in code:
   partstate->AddEffector (force);
 @end example
 
-@node Api100 PartConv Fire, , Api100 PartConv Snow, Api100 Particle system changes
+@node Api100 PartConv Fire, Api100 PartConv Fountain, Api100 PartConv Snow, Api100 Particle system changes
 @subsubsection Fire
 
 To convert the old fire particle system to new particles you
@@ -405,6 +406,104 @@ Here is how this could work in code:
   	scfQueryInterface<iParticleSystem> (exp->GetMeshObject ());
   partstate->SetParticleSize (csVector2 (0.04f, 0.08f));
   partstate->AddEmitter (sphemit);
+  partstate->AddEffector (lincol);
+  partstate->AddEffector (force);
+@end example
+
+@node Api100 PartConv Fountain, , Api100 PartConv Fire, Api100 Particle system changes
+@subsubsection Fountain
+
+To convert the old fountain particle system to new particles you
+can use a cone emitter. Use a force emitter with downwards acceleration
+so that the fountain particles fall down after a while.
+Here you see an example of a fountain particle system in the world file:
+
+@example
+  <meshfact name="fountainFact">
+    <plugin>crystalspace.mesh.loader.factory.particles</plugin>
+    <params>
+      <particlesize x="0.1" y="0.1" />
+      <emitter type="cone">
+        <extent x="0" y="2" z="1" />
+        <coneangle>0.2</coneangle>
+        <placement>center</placement>
+        <mass min="7.5" max="10" />
+        <initialttl min="10" max="10.5" />
+        <emissionrate>70</emissionrate>
+        <initialvelocity x="1.8" y="0" z="0" />
+      </emitter>
+      <effector type="force">
+        <acceleration x="0" y="-0.3" z="0" />
+      </effector>
+      <effector type="lincolor">
+        <color red="0" green="0" blue="1" time="10"/>
+        <color red="0" green="0.5" blue="1" time="5"/>
+        <color red="1" green="1" blue="1" time="0"/>
+      </effector>
+    </params>
+  </meshfact>
+  @dots{}
+  <meshobj name="fountain">
+    <priority>alpha</priority>
+    <plugin>crystalspace.mesh.loader.particles</plugin>
+    <ztest />
+    <params>
+      <factory>fountainFact</factory>
+      <mixmode>
+        <add />
+      </mixmode>
+      <material>fountainmaterial</material>
+    </params>
+    <move>
+      <v x="10" y="0" z="10" />
+    </move>
+  </meshobj>
+@end example
+
+Here is how this could work in code:
+
+@example
+  csRef<iMeshFactoryWrapper> mfw = engine->CreateMeshFactory (
+      "crystalspace.mesh.object.particles", "fountain");
+  if (!mfw) return;
+
+  csRef<iMeshWrapper> exp = engine->CreateMeshWrapper (mfw, "custom fountain",
+	sector, origin);
+
+  exp->SetZBufMode(CS_ZBUF_TEST);
+  exp->GetMeshObject()->SetMixMode (CS_FX_ADD);
+  exp->GetMeshObject()->SetMaterialWrapper (mat);
+
+  csRef<iParticleBuiltinEmitterFactory> emit_factory = 
+      csLoadPluginCheck<iParticleBuiltinEmitterFactory> (
+        Sys->object_reg, "crystalspace.mesh.object.particles.emitter", false);
+  csRef<iParticleBuiltinEffectorFactory> eff_factory = 
+      csLoadPluginCheck<iParticleBuiltinEffectorFactory> (
+        Sys->object_reg, "crystalspace.mesh.object.particles.effector", false);
+
+  csRef<iParticleBuiltinEmitterCone> conemit = emit_factory->CreateCone ();
+  float velocity = 3.0f;
+  float seconds_to_live = 1.5f;
+  conemit->SetExtent (csVector3 (0, 0.5f, 0));
+  conemit->SetConeAngle (0.3f);
+  conemit->SetParticlePlacement (CS_PARTICLE_BUILTIN_VOLUME);
+  conemit->SetEmissionRate (float (num) / seconds_to_live);
+  conemit->SetInitialMass (8.0f, 10.0f);
+  conemit->SetInitialTTL (seconds_to_live, seconds_to_live);
+  conemit->SetInitialVelocity (csVector3 (0, velocity, 0), csVector3 (0));
+
+  csRef<iParticleBuiltinEffectorLinColor> lincol = eff_factory->
+    CreateLinColor ();
+  lincol->AddColor (csColor4 (0.25f, 0.35f, 0.55f, 1), seconds_to_live);
+
+  csRef<iParticleBuiltinEffectorForce> force = eff_factory->
+    CreateForce ();
+  force->SetAcceleration (csVector3 (0.0f, -3.0f, 0.0f));
+
+  csRef<iParticleSystem> partstate =
+  	scfQueryInterface<iParticleSystem> (exp->GetMeshObject ());
+  partstate->SetParticleSize (csVector2 (0.1f, 0.1f));
+  partstate->AddEmitter (conemit);
   partstate->AddEffector (lincol);
   partstate->AddEffector (force);
 @end example

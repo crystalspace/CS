@@ -2,7 +2,6 @@ SubDir TOP plugins mesh ;
 
 SubInclude TOP plugins mesh bezier ;
 SubInclude TOP plugins mesh emit ;
-SubInclude TOP plugins mesh fountain ;
 SubInclude TOP plugins mesh genmesh ;
 SubInclude TOP plugins mesh haze ;
 SubInclude TOP plugins mesh instmesh ;

@@ -38,7 +38,6 @@
 #include "igeom/polymesh.h"
 #include "imap/loader.h"
 #include "imesh/particles.h"
-#include "imesh/fountain.h"
 #include "imesh/lighting.h"
 #include "imesh/object.h"
 #include "imesh/partsys.h"
@@ -257,7 +256,6 @@ void add_particles_fire (iSector* sector, char* matname, int num,
         Sys->object_reg, "crystalspace.mesh.object.particles.effector", false);
 
   csRef<iParticleBuiltinEmitterSphere> sphemit = emit_factory->CreateSphere ();
-  // Time to live depends on height of sector.
   float velocity = 0.5f;
   float seconds_to_live = 2.0f;
   sphemit->SetRadius (.2f);
@@ -301,42 +299,59 @@ void add_particles_fire (iSector* sector, char* matname, int num,
 void add_particles_fountain (iSector* sector, char* matname, int num,
 	const csVector3& origin)
 {
+  iEngine* engine = Sys->view->GetEngine ();
+
   // First check if the material exists.
-  iMaterialWrapper* mat = Sys->view->GetEngine ()->GetMaterialList ()->
-  	FindByName (matname);
+  iMaterialWrapper* mat = engine->GetMaterialList ()->FindByName (matname);
   if (!mat)
   {
-    Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Can't find material '%s' in memory!", matname);
+    Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Can't find material '%s'!", matname);
     return;
   }
 
-  csRef<iMeshFactoryWrapper> mfw (Sys->view->GetEngine ()->
-    CreateMeshFactory ("crystalspace.mesh.object.fountain", "fountain"));
+  csRef<iMeshFactoryWrapper> mfw = engine->CreateMeshFactory (
+      "crystalspace.mesh.object.particles", "fountain");
   if (!mfw) return;
 
-  csRef<iMeshWrapper> exp (
-  	Sys->view->GetEngine ()->CreateMeshWrapper (mfw, "custom fountain",
-	sector, origin));
+  csRef<iMeshWrapper> exp = engine->CreateMeshWrapper (mfw, "custom fountain",
+	sector, origin);
+
   exp->SetZBufMode(CS_ZBUF_TEST);
-
-  csRef<iParticleState> partstate (
-  	SCF_QUERY_INTERFACE (exp->GetMeshObject (), iParticleState));
+  exp->GetMeshObject()->SetMixMode (CS_FX_ADD);
   exp->GetMeshObject()->SetMaterialWrapper (mat);
-  partstate->SetMixMode (CS_FX_ADD);
-  exp->GetMeshObject()->SetColor (csColor (0.25f, 0.35f, 0.55f));
-  partstate->SetChangeRotation (7.5f);
 
-  csRef<iFountainState> fountstate (
-  	SCF_QUERY_INTERFACE (exp->GetMeshObject (), iFountainState));
-  fountstate->SetParticleCount (num);
-  fountstate->SetDropSize (0.1f, 0.1f);
-  fountstate->SetOrigin (csVector3 (0, 0, 0));
-  fountstate->SetAcceleration (csVector3 (0, -1.0f, 0));
-  fountstate->SetFallTime (5.0f);
-  fountstate->SetSpeed (3.0f);
-  fountstate->SetElevation (3.1415926f/2.0f);
-  fountstate->SetAzimuth (0);
-  fountstate->SetOpening (0.2f);
+  csRef<iParticleBuiltinEmitterFactory> emit_factory = 
+      csLoadPluginCheck<iParticleBuiltinEmitterFactory> (
+        Sys->object_reg, "crystalspace.mesh.object.particles.emitter", false);
+  csRef<iParticleBuiltinEffectorFactory> eff_factory = 
+      csLoadPluginCheck<iParticleBuiltinEffectorFactory> (
+        Sys->object_reg, "crystalspace.mesh.object.particles.effector", false);
+
+  csRef<iParticleBuiltinEmitterCone> conemit = emit_factory->CreateCone ();
+  float velocity = 3.0f;
+  float seconds_to_live = 1.5f;
+  conemit->SetExtent (csVector3 (0, 0.5f, 0));
+  conemit->SetConeAngle (0.3f);
+  conemit->SetParticlePlacement (CS_PARTICLE_BUILTIN_VOLUME);
+  conemit->SetEmissionRate (float (num) / seconds_to_live);
+  conemit->SetInitialMass (8.0f, 10.0f);
+  conemit->SetInitialTTL (seconds_to_live, seconds_to_live);
+  conemit->SetInitialVelocity (csVector3 (0, velocity, 0), csVector3 (0));
+
+  csRef<iParticleBuiltinEffectorLinColor> lincol = eff_factory->
+    CreateLinColor ();
+  lincol->AddColor (csColor4 (0.25f, 0.35f, 0.55f, 1), seconds_to_live);
+
+  csRef<iParticleBuiltinEffectorForce> force = eff_factory->
+    CreateForce ();
+  force->SetAcceleration (csVector3 (0.0f, -3.0f, 0.0f));
+
+  csRef<iParticleSystem> partstate =
+  	scfQueryInterface<iParticleSystem> (exp->GetMeshObject ());
+  partstate->SetParticleSize (csVector2 (0.1f, 0.1f));
+  partstate->AddEmitter (conemit);
+  partstate->AddEffector (lincol);
+  partstate->AddEffector (force);
 }
 
 //===========================================================================

@@ -15782,50 +15782,6 @@
         <v x="-19.2" y="2.9" z="19.75" />
       </hardmove>
     </meshobj>
-    <!--
-    <meshobj name="fount1">
-      <plugin>crystalspace.mesh.loader.fountain</plugin>
-      <params>
-        <factory>fountainFactory</factory>
-        <number>300</number>
-        <material>spark</material>
-        <origin x="0" y="0" z="0" />
-        <dropsize w="0.05" h="0.05" />
-        <color red="0.7" green="0.9" blue="1" />
-        <accel x="0" y="-0.1" z="0" />
-        <falltime>3</falltime>
-        <speed>1</speed>
-        <elevation>1.5</elevation>
-        <azimuth>0</azimuth>
-        <opening>0.2</opening>
-        <mixmode>
-          <add />
-        </mixmode>
-      </params>
-      <ztest />
-      <priority>alpha</priority>
-      <move>
-        <v x="-10" y="-1" z="14" />
-      </move>
-      < ! - -
-	    <polymesh>
-                <mesh>
-		    <v x="-1" y="-1" z="-1" />
-		    <v x="1" y="-1" z="-1" />
-		    <v x="0" y="4" z="-1" />
-		    <t v1="0" v2="1" v3="2" />
-                </mesh>
-	        <colldet />
-	    </polymesh>
-	    - - >
-      <polymesh>
-        <box>
-          <min x="-1" y="-1" z="-1" />
-          <max x="1" y="4" z="1" />
-        </box>
-        <colldet />
-      </polymesh>
-    </meshobj>-->
     <meshobj name="fount1">
       <plugin>particles</plugin>
       <params>
@@ -16066,30 +16022,6 @@
                 <v x="0" y="0" z="0" />
               </move>
             </meshobj>
-            <!--
-            <meshobj name="laser">
-              <plugin>crystalspace.mesh.loader.fountain</plugin>
-              <params>
-                <factory>fountainFactory</factory>
-                <number>100</number>
-                <material>spark</material>
-                <dropsize w="0.1" h="0.1" />
-                <color red="0.65" green="1" blue="1" />
-                <lighting>no</lighting>
-                <accel x="0" y="0.1" z="0" />
-                <falltime>1.5</falltime>
-                <speed>-1</speed>
-                <elevation>1.5</elevation>
-                <azimuth>0</azimuth>
-                <opening>0.2</opening>
-                <mixmode>
-                  <add />
-                </mixmode>
-              </params>
-              <move>
-                <v x="0" y="0" z="0" />
-              </move>
-            </meshobj> -->
             <meshobj name="laser">
               <plugin>particles</plugin>
               <params>
