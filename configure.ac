@@ -871,11 +871,11 @@ AC_MSG_CHECKING([whether to split debug information])
 AC_ARG_ENABLE([separate-debug-info], 
     [AC_HELP_STRING([--enable-separate-debug-info],
         [split debug information into separate files. (default YES if 
-        binutils >= 2.17 detected and not on Cygwin, otherwise default NO)])])
+        binutils >= 2.17, otherwise default NO)])])
 AS_IF([test -z "$enable_separate_debug_info"], 
     AS_IF([test -z `uname | grep -i CYGWIN`],
         [enable_separate_debug_info=$cs_cv_binutils_2_17],
-        [enable_separate_debug_info=no]))
+        [enable_separate_debug_info=$cs_cv_binutils_true_2_17]))
 AC_MSG_RESULT([$enable_separate_debug_info])
 
 CS_EMIT_BUILD_PROPERTY([LINK.DEBUG.INFO.SEPARATE], [$enable_separate_debug_info])
