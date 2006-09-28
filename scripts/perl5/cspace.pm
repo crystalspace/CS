@@ -8736,6 +8736,10 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetCastShadows = *cspacec::iTerrainObjectState_GetCastShadows;
 *SetMaterialMapFile = *cspacec::iTerrainObjectState_SetMaterialMapFile;
 *GetMaterialMapFile = *cspacec::iTerrainObjectState_GetMaterialMapFile;
+*SetTopNeighbor = *cspacec::iTerrainObjectState_SetTopNeighbor;
+*SetRightNeighbor = *cspacec::iTerrainObjectState_SetRightNeighbor;
+*SetLeftNeighbor = *cspacec::iTerrainObjectState_SetLeftNeighbor;
+*SetBottomNeighbor = *cspacec::iTerrainObjectState_SetBottomNeighbor;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -12029,6 +12033,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetFloat = *cspacec::iConfigIterator_GetFloat;
 *GetStr = *cspacec::iConfigIterator_GetStr;
 *GetBool = *cspacec::iConfigIterator_GetBool;
+*GetTuple = *cspacec::iConfigIterator_GetTuple;
 *GetComment = *cspacec::iConfigIterator_GetComment;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
@@ -15856,6 +15861,8 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *SetOffset = *cspacec::iSimpleFormerState_SetOffset;
 *SetIntegerMap = *cspacec::iSimpleFormerState_SetIntegerMap;
 *SetFloatMap = *cspacec::iSimpleFormerState_SetFloatMap;
+*GetFloatMap = *cspacec::iSimpleFormerState_GetFloatMap;
+*SetMaterialScale = *cspacec::iSimpleFormerState_SetMaterialScale;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -15889,6 +15896,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 %OWNER = ();
 %ITERATORS = ();
 *GetSampler = *cspacec::iTerraFormer_GetSampler;
+*GetIntegerMapSize = *cspacec::iTerraFormer_GetIntegerMapSize;
 *SampleFloat = *cspacec::iTerraFormer_SampleFloat;
 *SampleVector2 = *cspacec::iTerraFormer_SampleVector2;
 *SampleVector3 = *cspacec::iTerraFormer_SampleVector3;

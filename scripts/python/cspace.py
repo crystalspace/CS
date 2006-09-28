@@ -5684,6 +5684,10 @@ class iTerrainObjectState(iBase):
     def GetCastShadows(*args): return _cspace.iTerrainObjectState_GetCastShadows(*args)
     def SetMaterialMapFile(*args): return _cspace.iTerrainObjectState_SetMaterialMapFile(*args)
     def GetMaterialMapFile(*args): return _cspace.iTerrainObjectState_GetMaterialMapFile(*args)
+    def SetTopNeighbor(*args): return _cspace.iTerrainObjectState_SetTopNeighbor(*args)
+    def SetRightNeighbor(*args): return _cspace.iTerrainObjectState_SetRightNeighbor(*args)
+    def SetLeftNeighbor(*args): return _cspace.iTerrainObjectState_SetLeftNeighbor(*args)
+    def SetBottomNeighbor(*args): return _cspace.iTerrainObjectState_SetBottomNeighbor(*args)
     __swig_destroy__ = _cspace.delete_iTerrainObjectState
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iTerrainObjectState_scfGetVersion
@@ -7883,6 +7887,7 @@ class iConfigIterator(iBase):
     def GetFloat(*args): return _cspace.iConfigIterator_GetFloat(*args)
     def GetStr(*args): return _cspace.iConfigIterator_GetStr(*args)
     def GetBool(*args): return _cspace.iConfigIterator_GetBool(*args)
+    def GetTuple(*args): return _cspace.iConfigIterator_GetTuple(*args)
     def GetComment(*args): return _cspace.iConfigIterator_GetComment(*args)
     __swig_destroy__ = _cspace.delete_iConfigIterator
     __del__ = lambda self : None;
@@ -10535,6 +10540,8 @@ class iSimpleFormerState(iBase):
     def SetOffset(*args): return _cspace.iSimpleFormerState_SetOffset(*args)
     def SetIntegerMap(*args): return _cspace.iSimpleFormerState_SetIntegerMap(*args)
     def SetFloatMap(*args): return _cspace.iSimpleFormerState_SetFloatMap(*args)
+    def GetFloatMap(*args): return _cspace.iSimpleFormerState_GetFloatMap(*args)
+    def SetMaterialScale(*args): return _cspace.iSimpleFormerState_SetMaterialScale(*args)
     __swig_destroy__ = _cspace.delete_iSimpleFormerState
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iSimpleFormerState_scfGetVersion
@@ -10553,6 +10560,7 @@ class iTerraFormer(iBase):
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def GetSampler(*args): return _cspace.iTerraFormer_GetSampler(*args)
+    def GetIntegerMapSize(*args): return _cspace.iTerraFormer_GetIntegerMapSize(*args)
     def SampleFloat(*args): return _cspace.iTerraFormer_SampleFloat(*args)
     def SampleVector2(*args): return _cspace.iTerraFormer_SampleVector2(*args)
     def SampleVector3(*args): return _cspace.iTerraFormer_SampleVector3(*args)
