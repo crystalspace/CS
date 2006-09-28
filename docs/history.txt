@@ -11,6 +11,7 @@ chronological order.
 	- mdmkolbe blind commited a change by Timothy "kiolakin" Whitfield
 	  that will allow for skyboxes by letting each mesh specify its own
 	  zbuffer mode.
+	- mdmkolbe converted plugins/bugplug to the new SCF.
 27-Sep-2006
 	- mdmkolbe enabled separate debug info by default on compatible
 	  versions of Cygwin's binutils.
