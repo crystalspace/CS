@@ -12,6 +12,8 @@ chronological order.
 	  that will allow for skyboxes by letting each mesh specify its own
 	  zbuffer mode.
 	- mdmkolbe converted plugins/bugplug to the new SCF.
+	- caedes added std_character2 and std_character_fixed2 shaders so
+	  genmesh animation system can be used with standard lighting.
 27-Sep-2006
 	- mdmkolbe enabled separate debug info by default on compatible
 	  versions of Cygwin's binutils.
