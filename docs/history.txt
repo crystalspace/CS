@@ -20,6 +20,7 @@ chronological order.
 	- Erroroman made spline rotatin of skeleton animation and 
 	  improved a bit the skeleton the code. 
 	- Erroroman added basic API docs to the skeleton interface.
+	- res changed the Cg plugin to cache the profile of a program.
 27-Sep-2006
 	- mdmkolbe enabled separate debug info by default on compatible
 	  versions of Cygwin's binutils.

@@ -60,13 +60,13 @@ csShaderGLCGCommon::~csShaderGLCGCommon ()
 
 void csShaderGLCGCommon::Activate()
 {
-  cgGLEnableProfile (cgGetProgramProfile (program));
+  cgGLEnableProfile (programProfile);
   cgGLBindProgram (program);
 }
 
 void csShaderGLCGCommon::Deactivate()
 {
-  cgGLDisableProfile (cgGetProgramProfile (program));
+  cgGLDisableProfile (programProfile);
 }
 
 void csShaderGLCGCommon::SetupState (const csRenderMesh* /*mesh*/,
@@ -370,6 +370,7 @@ bool csShaderGLCGCommon::DefaultLoadProgram (const char* programStr,
 
   if (!program)
     return false;
+  programProfile = cgGetProgramProfile (program);
 
   if (shaderPlug->debugDump)
     DoDebugDump();
