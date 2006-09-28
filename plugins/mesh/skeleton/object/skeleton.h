@@ -325,21 +325,35 @@ public:
 };
 
 
+struct bone_key_info
+{
+  bool relative;
+  csQuaternion rot;
+  csVector3 pos;
+  csQuaternion tangent;
+  iSkeletonBoneFactory *bone;
+};
+
 class csSkeletonScriptKeyFrame :
   public scfImplementation1<csSkeletonScriptKeyFrame, iSkeletonScriptKeyFrame>
 {
+  public:
+    typedef csHash<bone_key_info, csPtrKey<iSkeletonBoneFactory> > 
+      BoneKeyHash;
   private:
     csString name;
     csTicks duration;
-    struct bone_key_frame
-    {
-      bool relative;
-      csReversibleTransform transform;
-      iSkeletonBoneFactory *bone;
-    };
-    csArray<bone_key_frame> bones_frame_transforms;
+    //csArray<bone_key_info> bones_frame_transforms;
+    //csArray<bone_key_info> bones_frame_transforms;
+    BoneKeyHash bones_frame_transforms;
     csReversibleTransform fallback_transform;
   public:
+
+    bone_key_info & GetKeyInfo(iSkeletonBoneFactory *bone_fact)
+    {
+      bone_key_info fallback;
+      return bones_frame_transforms.Get(bone_fact, fallback);
+    }
     
     csSkeletonScriptKeyFrame (const char* name);
     virtual ~csSkeletonScriptKeyFrame ();
@@ -350,20 +364,24 @@ class csSkeletonScriptKeyFrame :
     virtual csTicks GetDuration () { return duration; }
     virtual void SetDuration (csTicks time) { duration = time; }
     virtual size_t GetTransformsCount() 
-      { return bones_frame_transforms.Length(); }
+      { return bones_frame_transforms.GetSize(); }
 
     virtual void AddTransform(iSkeletonBoneFactory *bone, 
       csReversibleTransform &transform, bool relative)
     {
-      bone_key_frame bf;
-      bf.transform = transform;
+      bone_key_info bf;
+      csQuaternion q;
+      q.SetMatrix(transform.GetO2T());
+      bf.rot = q;
+      bf.pos = transform.GetOrigin();
       bf.bone = bone;
-	  bf.relative = relative;
-      bones_frame_transforms.Push(bf);
+      bf.relative = relative;
+      bones_frame_transforms.Put(bone, bf);
     }
 
     virtual csReversibleTransform & GetTransform(iSkeletonBoneFactory *bone)
     {
+      /*
       for (size_t i = 0; i < bones_frame_transforms.Length() ; i++ )
       {
         if (bones_frame_transforms[i].bone == bone)
@@ -371,12 +389,14 @@ class csSkeletonScriptKeyFrame :
           return bones_frame_transforms[i].transform;
         }
       }
+      */
       return fallback_transform;
     }
 
     virtual void SetTransform(iSkeletonBoneFactory *bone, 
       csReversibleTransform &transform)
     {
+      /*
       for (size_t i = 0; i < bones_frame_transforms.Length() ; i++ )
       {
         if (bones_frame_transforms[i].bone == bone)
@@ -384,16 +404,20 @@ class csSkeletonScriptKeyFrame :
           bones_frame_transforms[i].transform = transform;
         }
       }
+      */
     }
 
-  virtual void GetKeyFrameData(size_t i, iSkeletonBoneFactory *& bone_fact, 
-    csReversibleTransform & transform, bool & relative)
-    {
-	  const bone_key_frame & bkf = bones_frame_transforms[i];
-	  transform = bkf.transform;
-	  bone_fact = bkf.bone;
-	  relative = bkf.relative;
-    }
+  virtual void GetKeyFrameData(iSkeletonBoneFactory *bone_fact, 
+	  csQuaternion & rot, csVector3 & pos, csQuaternion & tangent,
+       bool & relative)
+  {
+	  bone_key_info fallback;
+          const bone_key_info & bki = bones_frame_transforms.Get(bone_fact, fallback);
+	  rot = bki.rot;
+	  pos = bki.pos;
+	  tangent = bki.tangent;
+	  relative = bki.relative;
+  }
 };
 
 class csSkeletonScript :
@@ -405,9 +429,10 @@ private:
   bool loop;
   int loop_times;
   csRefArray<csSkeletonScriptKeyFrame> key_frames;
+  csSkeletonFactory *fact;
 public:
 
-  csSkeletonScript (const char* name);
+  csSkeletonScript (csSkeletonFactory *factory, const char* name);
   virtual ~csSkeletonScript ();
 
   void SetForcedDuration(csTicks new_duration)
@@ -443,11 +468,13 @@ public:
   virtual size_t FindFrameIndex(const char * /*name*/)  { return 0; }
   virtual void RemoveFrame(size_t i) 
     { key_frames.DeleteIndexFast(i); }
+  virtual void RecalcSpline();
 };
 
 struct bone_transform_data
 {
   csQuaternion quat;
+  csQuaternion tangent;
   csVector3 pos;
   csVector3 axis;
   csReversibleTransform transform;
@@ -461,6 +488,7 @@ struct sac_transform_execution
   csVector3 final_position;
   csVector3 position;
   csQuaternion quat;
+  csQuaternion tangent;
   csQuaternion curr_quat;
   csTicks elapsed_ticks;
   int type;
@@ -647,11 +675,18 @@ public:
   csRefArray<csSkeletonBoneFactory>& GetBones () { return bones; }
   csRefArray<csSkeletonSocketFactory>& GetSockets () { return sockets; }
   csArray<size_t>& GetParentBones () { return parent_bones; }
+
+  virtual size_t GetBonesCount() const
+    { return bones.Length(); }
+  virtual iSkeletonBoneFactory * GetBone(size_t i)
+    { return bones[i]; }
+  virtual size_t FindBoneIndex (const char* bonename);
+  virtual iSkeletonBoneFactory *FindBone (const char *name);
+
+  virtual iSkeletonGraveyard *GetGraveyard  ();
+
   virtual iSkeletonScript *CreateScript(const char *name);
   virtual iSkeletonScript *FindScript(const char *name);
-  virtual iSkeletonBoneFactory *FindBone (const char *name);
-  virtual iSkeletonGraveyard *GetGraveyard  ();
-  virtual size_t FindBoneIndex (const char* bonename);
 
   virtual iSkeletonSocketFactory *CreateSocket(const char *name, iSkeletonBoneFactory *bone);
   virtual iSkeletonSocketFactory *FindSocket(const char *name);

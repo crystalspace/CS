@@ -16,6 +16,10 @@ chronological order.
 	  genmesh animation system can be used with standard lighting.
 	- res changed gl3d DeactivateBuffers() to also deactivate vertex 
 	  attributes.
+	- Erroroman added Log, Exp and Squad methods to csQuaternion.
+	- Erroroman made spline rotatin of skeleton animation and 
+	  improved a bit the skeleton the code. 
+	- Erroroman added basic API docs to the skeleton interface.
 27-Sep-2006
 	- mdmkolbe enabled separate debug info by default on compatible
 	  versions of Cygwin's binutils.

@@ -227,7 +227,6 @@ void csSkeletonBone::UpdateBones (csSkeletonBone*)
   // TODO - Ragdoll
 }
 
-
 //-------------------------------iSkeletonBoneFactory------------------------------------------
 
 csSkeletonBoneFactory::csSkeletonBoneFactory (
@@ -396,7 +395,7 @@ csSkeletonScriptKeyFrame::~csSkeletonScriptKeyFrame ()
 
 //--------------------------iSkeletonScript-----------------------------------
 
-csSkeletonScript::csSkeletonScript (const char* name) :
+csSkeletonScript::csSkeletonScript (csSkeletonFactory *factory, const char* name) :
   scfImplementationType(this)
 {
   csSkeletonScript::name = name;
@@ -404,6 +403,7 @@ csSkeletonScript::csSkeletonScript (const char* name) :
   loop = false; //for now
   loop_times = -1;
   forced_duration = 0;
+  fact = factory;
 }
 
 csSkeletonScript::~csSkeletonScript () 
@@ -416,6 +416,78 @@ iSkeletonScriptKeyFrame *csSkeletonScript::CreateFrame(const char* name)
   key_frame.AttachNew(new csSkeletonScriptKeyFrame (name));
   key_frames.Push(key_frame);
   return key_frame;
+}
+
+void csSkeletonScript::RecalcSpline()
+{
+  const csRefArray<csSkeletonBoneFactory>& bones = fact->GetBones ();
+  for (size_t i = 0; i < bones.Length() ; i++ )
+  {
+    csArray<bone_key_info *> tmp_arr;
+    for (size_t j= 0; j < key_frames.Length(); j++ )
+    {
+      csRef<csSkeletonScriptKeyFrame> key_frame = key_frames[j];
+      bone_key_info & bt = key_frame->GetKeyInfo(bones[i]);
+      tmp_arr.Push(&bt);
+    }
+
+    if (tmp_arr.Length() < 2)
+    {
+      continue;
+    }
+
+    //check for backward quaternions
+    for (size_t j = 0; j < tmp_arr.Length() - 1; j++)
+    {
+      csQuaternion q1 = tmp_arr[j]->rot;
+      csQuaternion q2 = tmp_arr[j+1]->rot;
+      float a = (q1-q2).SquaredNorm ();
+      float b = (q1+q2).SquaredNorm ();
+      if (a > b)
+      {
+        tmp_arr[j+1]->rot = -1*q2;
+      }
+    }
+
+    //build the spline
+    size_t num = tmp_arr.Length();
+    for(size_t j = 0; j < num; j++)
+    {
+      csQuaternion p, p1, p2;
+      p = tmp_arr[j]->rot;
+      csQuaternion inv = p.GetConjugate();
+      if (j ==0)
+      {
+        p1 = (inv * tmp_arr[1]->rot).Log();
+        if (loop)
+        {
+          p2 = (inv * tmp_arr[num-1]->rot).Log();
+        }
+        else
+        {
+          p2 = (inv * p).Log();
+        }
+      }
+      else if (j == (num-1))
+      {
+        if (loop)
+        {
+          p1 = (inv * tmp_arr[0]->rot).Log();
+        }
+        else
+        {
+          p1 = (inv * p).Log();
+        }
+        p2 = (inv * tmp_arr[j - 1]->rot).Log();
+      }
+      else
+      {
+        p1 = (inv * tmp_arr[j+1]->rot).Log();
+        p2 = (inv * tmp_arr[j-1]->rot).Log();
+      }
+      tmp_arr[j]->tangent = p*((p1 + p2)/-4.0f).Exp();
+    }
+  }
 }
 
 //------------------------csSkeletonRunnable-------------------------------------
@@ -442,25 +514,6 @@ csSkeletonRunnable::csSkeletonRunnable (csSkeletonScript* script,
   }
 
   /*
-  zero_quat.SetWithEuler (csVector3 (0));
-
-  if (script->GetLoop ())
-  {
-    loop_times = script->GetLoopTimes ();
-  }
-  else
-  {
-    loop_times = 1;
-  }
-
-  for (size_t i = 0; i < script->GetFrames ().Length (); i++)
-  {
-    runnable_frame rf;
-    rf.active = script->GetFrames ().Get (i).active;
-    rf.repeat_times = script->GetFrames ().Get (i).repeat_times;
-    runnable_frames.Push (rf);
-  }
-
   csTicks forced_duration = script->GetForcedDuration ();
   if (forced_duration)
   {
@@ -476,13 +529,18 @@ csSkeletonRunnable::~csSkeletonRunnable ()
 
 void csSkeletonRunnable::ParseFrame(csSkeletonScriptKeyFrame *frame)
 {
-  for (size_t i = 0; i < frame->GetTransformsCount() ; i++)
-  {
-    iSkeletonBoneFactory * bone_fact;
-    csReversibleTransform transform;
-    bool relative;
-    frame->GetKeyFrameData(i, bone_fact, transform, relative);
+  for (size_t i = 0; i < skeleton->GetFactory()->GetBonesCount(); i++)
 
+  {
+    iSkeletonBoneFactory * bone_fact = skeleton->GetFactory()->GetBone(i);
+
+    //key frame bone data
+    csQuaternion rot, tangent;
+    csVector3 pos;
+    bool relative;
+    frame->GetKeyFrameData(bone_fact, rot, pos, tangent, relative);
+
+    //current transform data
     bone_transform_data *bone_transform = GetBoneTransform ((csSkeletonBoneFactory *)bone_fact);
     if (!frame->GetDuration())
     {
@@ -491,15 +549,14 @@ void csSkeletonRunnable::ParseFrame(csSkeletonScriptKeyFrame *frame)
     else
     {
       sac_transform_execution m;
-      //m.bone = frame->GetBone(i);
       m.bone_transform = bone_transform;
       m.elapsed_ticks = 0;
       m.curr_quat = m.bone_transform->quat;
       m.position = bone_transform->pos;
       m.type = 1;
-      //m.quat = csQuaternion (transform.GetT2O());
-      m.quat.SetMatrix (transform.GetO2T());
-      m.final_position = transform.GetOrigin();
+      m.quat = rot;
+      m.tangent = tangent;
+      m.final_position = pos;
 
       csVector3 delta;
       if (relative)
@@ -603,12 +660,15 @@ bool csSkeletonRunnable::Do (csTicks elapsed, bool& stop, csTicks & left)
 
         float slerp = 
           (float)delay.current/ (float)delay.final;
-        m.bone_transform->quat = m.curr_quat.SLerp (m.quat, slerp);
+        //m.bone_transform->quat = m.curr_quat.SLerp (m.quat, slerp);
+        m.bone_transform->quat = m.curr_quat.Squad(m.bone_transform->tangent, 
+			m.tangent, m.quat, slerp);
       }
       else
       {
         m.bone_transform->pos = m.final_position;
         m.bone_transform->quat = m.quat;
+        m.bone_transform->tangent = m.tangent;
         runnable_transforms.DeleteIndexFast (i);
       }
     }
@@ -619,40 +679,24 @@ bool csSkeletonRunnable::Do (csTicks elapsed, bool& stop, csTicks & left)
         csVector3 current_pos = 
           (float) (delay.current - m.elapsed_ticks)*m.delta_per_tick;
 
-        //m.bone_transform->pos = current_pos;
         m.bone_transform->pos += current_pos;
         float slerp = 
           ( (float) (delay.current - m.elapsed_ticks)/ (float)delay.final);
         csQuaternion zero_quat;
-        
-
-        //m.bone_transform->quat = zero_quat.Slerp (m.quat, slerp);
         m.curr_quat = zero_quat.SLerp (m.quat, slerp);
         m.bone_transform->quat = m.curr_quat*m.bone_transform->quat;
         m.elapsed_ticks = delay.current;
-        //printf("m.curr_quat %.3f %.3f %.3f %.3f\n", m.curr_quat.x, m.curr_quat.y, m.curr_quat.z, m.curr_quat.r);
-        //printf("m.bone_transform->quat %.3f %.3f %.3f %.3f\n", m.bone_transform->quat.x, m.bone_transform->quat.y, m.bone_transform->quat.z, m.bone_transform->quat.r);
-        //printf("-------------------------\n");
       }
       else
       {
         csVector3 current_pos = 
           (float) (delay.final - m.elapsed_ticks)*m.delta_per_tick;
-        //m.bone_transform->pos = current_pos;
         m.bone_transform->pos += current_pos;
         float slerp = 
           ( (float) (delay.final - m.elapsed_ticks)/ (float)delay.final);
         csQuaternion zero_quat;
-
-        //m.bone_transform->quat = zero_quat.Slerp (m.quat, slerp);
         m.curr_quat = zero_quat.SLerp (m.quat, slerp);
         m.bone_transform->quat = m.curr_quat*m.bone_transform->quat;
-
-        //printf("m.quat %.3f %.3f %.3f %.3f\n", m.quat.x, m.quat.y, m.quat.z, m.quat.r);
-        //printf("zero_quat %.3f %.3f %.3f %.3f\n", zero_quat.x, zero_quat.y, zero_quat.z, zero_quat.r);
-        //printf("m.curr_quat %.3f %.3f %.3f %.3f\n", m.curr_quat.x, m.curr_quat.y, m.curr_quat.z, m.curr_quat.r);
-        //printf("m.bone_transform->quat %.3f %.3f %.3f %.3f\n", m.bone_transform->quat.x, m.bone_transform->quat.y, m.bone_transform->quat.z, m.bone_transform->quat.r);
-        //printf("-------------------------\n");
         runnable_transforms.DeleteIndexFast (i);
       }
     }
@@ -671,6 +715,7 @@ bone_transform_data *csSkeletonRunnable::GetBoneTransform(
       ->FindBoneIndex(bone_fact);
     b_tr = new bone_transform_data ();
     b_tr->quat = ((csSkeletonBone *)skeleton->GetBone(index))->GetQuaternion ();
+    b_tr->tangent = b_tr->quat;
     b_tr->pos = ((csSkeletonBone *)skeleton->GetBone(index))
       ->GetTransform ().GetOrigin ();
     transforms.Put (bone_fact, b_tr);
@@ -796,15 +841,12 @@ void csSkeleton::UpdateSockets ()
 {
   for (size_t i = 0; i < sockets.Length(); i++)
   {
-    sockets[i]->GetFullTransform () = sockets[i]->GetTransform()*sockets[i]->GetBone()->GetFullTransform ();
-    //csVector3 pos_sock_local = sockets[i]->GetFullTransform ().GetOrigin();
-    //printf("%.3f %.3f %.3f\n", pos_sock_local.x, pos_sock_local.y, pos_sock_local.z);
-
-    //printf("-------------------------------------\n");
+    sockets[i]->GetFullTransform () = 
+		sockets[i]->GetTransform()*sockets[i]->GetBone()->GetFullTransform ();
     if (sockets[i]->GetSceneNode())
     {
-      sockets[i]->GetSceneNode()->GetMovable()->SetTransform(sockets[i]->GetFullTransform ());
-      //sockets[i]->GetSceneNode()->GetMovable()->UpdateMove ();
+      sockets[i]->GetSceneNode()->GetMovable()->SetTransform(
+		  sockets[i]->GetFullTransform ());
     }
   }
 }
@@ -1192,7 +1234,7 @@ void csSkeletonFactory::UpdateParentBones ()
 iSkeletonScript *csSkeletonFactory::CreateScript(const char *name)
 {
   csRef<csSkeletonScript> script;
-  script.AttachNew(new csSkeletonScript (name));
+  script.AttachNew(new csSkeletonScript (this, name));
   scripts.Push(script);
   return script;
 }
