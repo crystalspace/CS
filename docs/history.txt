@@ -21,6 +21,12 @@ chronological order.
 	  improved a bit the skeleton the code. 
 	- Erroroman added basic API docs to the skeleton interface.
 	- res changed the Cg plugin to cache the profile of a program.
+	- res devised an alternative workaround for corruption occuring on
+	  ATI cards. Further investigation leads to that the corruption shows 
+	  up after ARB programs are disabled; apparently this does not work 
+	  correctly. A workaround is to change a fixed function state and call 
+	  glBegin()/glEnd() without specifying any vertices. Hopefully helps
+	  for trac #18.
 27-Sep-2006
 	- mdmkolbe enabled separate debug info by default on compatible
 	  versions of Cygwin's binutils.

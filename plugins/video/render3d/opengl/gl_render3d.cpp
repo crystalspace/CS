@@ -1109,6 +1109,15 @@ bool csGLGraphics3D::Open ()
     }
   }
 
+#define LQUOT   "\xE2\x80\x9c"
+#define RQUOT   "\xE2\x80\x9d"
+  fixedFunctionForcefulEnable = 
+    config->GetBool ("Video.OpenGL.FixedFunctionForcefulEnable", false);
+  if (verbose)
+    Report (CS_REPORTER_SEVERITY_NOTIFY, 
+      LQUOT "Forceful" RQUOT " fixed function enable: %s",
+      fixedFunctionForcefulEnable ? "yes" : "no");
+
   return true;
 }
 
@@ -1228,6 +1237,15 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
         statecache->SetCurrentTU (0);
         statecache->ActivateTU (csGLStateCache::activateImage
           | csGLStateCache::activateTexCoord);
+      }
+
+      if (fixedFunctionForcefulEnable)
+      {
+        const GLenum state = GL_FOG;
+        GLboolean s = glIsEnabled (state);
+        if (s) glDisable (state); else glEnable (state);
+        glBegin (GL_TRIANGLES);  glEnd ();
+        if (s) glEnable (state); else glDisable (state);
       }
 
       needProjectionUpdate = false; 
