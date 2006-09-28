@@ -8,6 +8,9 @@ chronological order.
 
 28-Sep-2006
 	- mdmkolbe changed walktest to exit with code 0 on normal exits.
+	- mdmkolbe blind commited a change by Timothy "kiolakin" Whitfield
+	  that will allow for skyboxes by letting each mesh specify its own
+	  zbuffer mode.
 27-Sep-2006
 	- mdmkolbe enabled separate debug info by default on compatible
 	  versions of Cygwin's binutils.
