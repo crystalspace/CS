@@ -2302,35 +2302,30 @@ void csGLGraphics3D::ApplyBufferChanges()
         RenderLock (buffer, CS_GLBUF_RENDERLOCK_ARRAY, compType);
 
       if (data == (void*)-1) continue;
-      bool forceSetPtr;
 
       switch (att)
       {
       case CS_VATTRIB_POSITION:
-        forceSetPtr = !statecache->IsEnabled_GL_VERTEX_ARRAY();
         statecache->Enable_GL_VERTEX_ARRAY ();
         statecache->SetVertexPointer (buffer->GetComponentCount (),
-          compType, (GLsizei)buffer->GetStride (), data, forceSetPtr);
+          compType, (GLsizei)buffer->GetStride (), data);
         break;
       case CS_VATTRIB_NORMAL:
-        forceSetPtr = !statecache->IsEnabled_GL_NORMAL_ARRAY();
         statecache->Enable_GL_NORMAL_ARRAY ();
         statecache->SetNormalPointer (compType, (GLsizei)buffer->GetStride (), 
-          data, forceSetPtr);
+          data);
         break;
       case CS_VATTRIB_COLOR:
-        forceSetPtr = !statecache->IsEnabled_GL_COLOR_ARRAY();
         statecache->Enable_GL_COLOR_ARRAY ();
         statecache->SetColorPointer (buffer->GetComponentCount (),
-          compType, (GLsizei)buffer->GetStride (), data, forceSetPtr);
+          compType, (GLsizei)buffer->GetStride (), data);
         break;
       case CS_VATTRIB_SECONDARY_COLOR:
         if (ext->CS_GL_EXT_secondary_color)
         {
-          forceSetPtr = !statecache->IsEnabled_GL_SECONDARY_COLOR_ARRAY_EXT ();
 	  statecache->Enable_GL_SECONDARY_COLOR_ARRAY_EXT ();
 	  statecache->SetSecondaryColorPointerExt (buffer->GetComponentCount (),
-	    compType, (GLsizei)buffer->GetStride (), data, forceSetPtr);
+	    compType, (GLsizei)buffer->GetStride (), data);
         }
         break;
       default:
@@ -2342,10 +2337,9 @@ void csGLGraphics3D::ApplyBufferChanges()
           {
             statecache->SetCurrentTU (unit);
           } 
-          forceSetPtr = !statecache->IsEnabled_GL_TEXTURE_COORD_ARRAY ();
           statecache->Enable_GL_TEXTURE_COORD_ARRAY ();
           statecache->SetTexCoordPointer (buffer->GetComponentCount (),
-            compType, (GLsizei)buffer->GetStride (), data, forceSetPtr);
+            compType, (GLsizei)buffer->GetStride (), data);
         }
         else if (CS_VATTRIB_IS_GENERIC(att))
         {
