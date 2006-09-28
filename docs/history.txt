@@ -14,6 +14,10 @@ chronological order.
 	- mdmkolbe converted plugins/bugplug to the new SCF.
 	- caedes added std_character2 and std_character_fixed2 shaders so
 	  genmesh animation system can be used with standard lighting.
+	- res changed gl3d DeactivateBuffers() to also deactivate vertex 
+	  attributes.
+	- res made vertex arrays being set forcibly if the array wasn't
+	  activated earlier.
 27-Sep-2006
 	- mdmkolbe enabled separate debug info by default on compatible
 	  versions of Cygwin's binutils.
