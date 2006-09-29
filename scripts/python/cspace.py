@@ -1556,6 +1556,9 @@ class csQuaternion(_object):
     def GetMatrix(*args): return _cspace.csQuaternion_GetMatrix(*args)
     def NLerp(*args): return _cspace.csQuaternion_NLerp(*args)
     def SLerp(*args): return _cspace.csQuaternion_SLerp(*args)
+    def Log(*args): return _cspace.csQuaternion_Log(*args)
+    def Exp(*args): return _cspace.csQuaternion_Exp(*args)
+    def Squad(*args): return _cspace.csQuaternion_Squad(*args)
     __swig_setmethods__["v"] = _cspace.csQuaternion_v_set
     __swig_getmethods__["v"] = _cspace.csQuaternion_v_get
     if _newclass:v = property(_cspace.csQuaternion_v_get, _cspace.csQuaternion_v_set)

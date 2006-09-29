@@ -2507,6 +2507,9 @@ sub new {
 *GetMatrix = *cspacec::csQuaternion_GetMatrix;
 *NLerp = *cspacec::csQuaternion_NLerp;
 *SLerp = *cspacec::csQuaternion_SLerp;
+*Log = *cspacec::csQuaternion_Log;
+*Exp = *cspacec::csQuaternion_Exp;
+*Squad = *cspacec::csQuaternion_Squad;
 *swig_v_get = *cspacec::csQuaternion_v_get;
 *swig_v_set = *cspacec::csQuaternion_v_set;
 *swig_w_get = *cspacec::csQuaternion_w_get;
