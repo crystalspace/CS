@@ -377,7 +377,9 @@ bool csShaderGLCGCommon::DefaultLoadProgram (const char* programStr,
 
   if (doLoad)
   {
+    cgGetError(); // Clear error
     cgGLLoadProgram (program);
+    if (cgGetError() != CG_NO_ERROR) return false;
     if (!cgGLIsProgramLoaded (program)) return false;
   }
 

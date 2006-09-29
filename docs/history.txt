@@ -37,6 +37,10 @@ chronological order.
 	  The character2 shaders use this tag in the 150 technique (hardware
 	  animation). This means that on Intel Graphics software animation
 	  will be used.
+	- Jorrit got a patch from res2k which makes sure that CG techniques
+	  that generate programs that are too big for the card will really
+	  fail now. That means that the workaround in gldrivers.xml is
+	  no longer required.
 28-Sep-2006
 	- mdmkolbe changed walktest to exit with code 0 on normal exits.
 	- mdmkolbe blind commited a change by Timothy "kiolakin" Whitfield

@@ -174,23 +174,6 @@
 	</OpenGL>
       </Video>
     </config>
-    <!--
-      - Some cards (like Intel Graphics) have a limit on the number
-      - of ARB assembly statements (128 statements). CG shaders that
-      - go beyond this limit need to set the arb128_limit tag so that they
-      - are not selected.
-      -->
-    <config name="arb128Limit">
-      <Video>
-	<ShaderManager>
-	  <Tags>
-	    <arb128_limit>
-	      <Presence>forbidden</Presence>
-	    </arb128_limit>
-	  </Tags>
-	</ShaderManager>
-      </Video>
-    </config>
     <config name="disableMipmapGeneration">
       <Video>
 	<OpenGL>
@@ -413,7 +396,6 @@
 	<usecfg>nolinearfog</usecfg>
 	<usecfg>enableIntensityBlendText</usecfg>
 	<usecfg>disableMipmapGeneration</usecfg>
-	<usecfg>arb128Limit</usecfg>
       </applicable>
     </rule>
     
