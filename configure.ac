@@ -2134,45 +2134,6 @@ CS_SYMBOL_QUALIFIER([how to declare pure functions],
 
 
 #------------------------------------------------------------------------------
-# Check if C++ compiler understands new C++ `explicit' and 'typename' keywords.
-#------------------------------------------------------------------------------
-AC_CACHE_CHECK([for C++ `explicit' keyword], [cs_cv_cxx_explicit],
-    [CS_BUILD_IFELSE(
-	[AC_LANG_PROGRAM([class A { public: explicit A(int); };], [])],
-	[], [C++], [cs_cv_cxx_explicit=yes], [cs_cv_cxx_explicit=no])])
-AS_IF([test $cs_cv_cxx_explicit != no],
-    [CS_HEADER_PROPERTY([CS_HAVE_CXX_KEYWORD_EXPLICIT])])
-
-AC_CACHE_CHECK([for C++ `typename' keyword], [cs_cv_cxx_typename],
-    [CS_BUILD_IFELSE(
-	[AC_LANG_PROGRAM(
-	    [template <typename T> class A { public: T a; };], [])],
-	[], [C++], [cs_cv_cxx_typename=yes], [cs_cv_cxx_typename=no])])
-AS_IF([test $cs_cv_cxx_typename != no],
-    [CS_HEADER_PROPERTY([CS_HAVE_CXX_KEYWORD_TYPENAME])])
-
-
-
-#------------------------------------------------------------------------------
-# Check if C++ compiler understands new explicit template specialization
-# syntax `template<> class Foo<Bar>'.  Older compiler allows specializations
-# without the `template<>' prefix.
-#------------------------------------------------------------------------------
-AC_CACHE_CHECK([for C++ explicit template<> specialization],
-    [cs_cv_cxx_explicit_template_specialization],
-    [CS_BUILD_IFELSE(
-	[AC_LANG_PROGRAM(
-	    [template <class T> class A {}; template<> class A<int> {};], [])],
-	[], [C++],
-	[cs_cv_cxx_explicit_template_specialization=yes],
-	[cs_cv_cxx_explicit_template_specialization=no])])
-
-AS_IF([test $cs_cv_cxx_explicit_template_specialization = no],
-    [CS_HEADER_PROPERTY([CS_USE_OLD_TEMPLATE_SPECIALIZATION])])
-
-
-
-#------------------------------------------------------------------------------
 # CS_CHECK_QSQRT
 #	Check if compiler is able to understand the assembly code in csqsqrt.h.
 #	The MacOS/X PowerPC version of csQsqrt() requires the
