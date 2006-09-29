@@ -31,6 +31,12 @@ chronological order.
 	- Erroroman optimized character_bump2.cgvp by calculating bitangent
 	  as cross product of normal and tangent. Also removed bitangent
 	  from tehnique 150 in character_bump2.xml.
+	- Jorrit added a 'arb128_limit' tag to gldrivers.xml and enabled
+	  it for Intel Graphics. This tag means that the 3D card will
+	  not support ARB assembly programs of more then 128 instructions.
+	  The character2 shaders use this tag in the 150 technique (hardware
+	  animation). This means that on Intel Graphics software animation
+	  will be used.
 28-Sep-2006
 	- mdmkolbe changed walktest to exit with code 0 on normal exits.
 	- mdmkolbe blind commited a change by Timothy "kiolakin" Whitfield

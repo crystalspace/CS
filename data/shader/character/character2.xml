@@ -1,5 +1,6 @@
 <shader compiler="xmlshader" name="character2">
   <technique priority="150">
+    <tag>arb128_limit</tag> 
     <pass>
       <mixmode><copy /></mixmode>
       <buffer source="normal" destination="normal" />

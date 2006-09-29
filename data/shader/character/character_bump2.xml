@@ -1,5 +1,6 @@
 <shader compiler="xmlshader" name="character_bump2">
   <technique priority="150">
+    <tag>arb128_limit</tag> 
     <pass>
         <mixmode><srcalphaadd /></mixmode>
         <buffer source="texture coordinate 0" destination="texture coordinate 0" />
