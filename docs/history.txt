@@ -15,6 +15,10 @@ chronological order.
 	- Jorrit added a workaround for GetTuple() in windows so that
 	  it at least compiles. MacOS/X is still broken and the GetTuple()
 	  implementation in Windows just returns 0.
+	- Jorrit changed flarge to use the new kwartz model. The kwartz
+	  model is also updated to work nicely with software lighting.
+	- Jorrit added kwartz model to isotest app. Unfortunatelly it is not
+	  yet lit there though. Still have to check why.
 28-Sep-2006
 	- mdmkolbe changed walktest to exit with code 0 on normal exits.
 	- mdmkolbe blind commited a change by Timothy "kiolakin" Whitfield
