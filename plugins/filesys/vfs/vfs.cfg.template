@@ -43,7 +43,7 @@ VFS.Mount.lev/r3dsmtest = $(CS_MAPDIR)$/r3dsmtest$/
 
 ; Mount all libraries under the /lib/ directory
 VFS.Mount.lib/std      = $(CS_DATADIR)$/standard.zip
-VFS.Mount.lib/stdtex   = $(CS_DATADIR)$/stdtex.zip
+VFS.Mount.lib/stdtex   = $(CS_DATADIR)$/standard.zip
 VFS.Mount.lib/cubemap  = $(CS_DATADIR)$/cube$/
 VFS.Mount.lib/teapot   = $(CS_DATADIR)$/teapot.zip
 VFS.Mount.lib/kwartz   = $(CS_DATADIR)$/kwartz.zip
