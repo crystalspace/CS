@@ -33,7 +33,7 @@
 #include "csutil/stringarray.h"
 #include "csutil/scf_implementation.h"
 #include "imesh/genmesh.h"
-#include "imesh/gmeshskel.h"
+#include "imesh/gmeshskel2.h"
 #include "iutil/comp.h"
 #include "iutil/eventh.h"
 #include "iutil/virtclk.h"

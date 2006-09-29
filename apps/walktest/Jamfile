@@ -41,7 +41,10 @@ WALKALL.PLUGINLIST =
   genmesh
   gmeshanim
   gmeshldr
-  gmeshskelanim
+  gmeshskelanim2
+  skeleton
+  skelldr
+  vproc_std
   haze
   hazeldr
   imgplex
