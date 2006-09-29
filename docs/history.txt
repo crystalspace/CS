@@ -19,6 +19,9 @@ chronological order.
 	  model is also updated to work nicely with software lighting.
 	- Jorrit added kwartz model to isotest app. Unfortunatelly it is not
 	  yet lit there though. Still have to check why.
+	- Jorrit added textures from new castle level to CS. Castle level
+	  will soon follow.
+	- Jorrit merged stdtex.zip into standard.zip.
 28-Sep-2006
 	- mdmkolbe changed walktest to exit with code 0 on normal exits.
 	- mdmkolbe blind commited a change by Timothy "kiolakin" Whitfield
