@@ -6,6 +6,8 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+29-Sep-2006
+	- Jorrit merged r25427:r25429 into 1.0 (particles).
 21-Sep-2006
 	- res merged r25339:25345, r25364 into 1.0.
 	- res merged r25410 into 1.0.
