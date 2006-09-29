@@ -12,6 +12,9 @@ chronological order.
 	  C++ features anyway): 'typename_qualifier', fake 'explicit' 
 	  keyword, CS_SPECIALIZE_TEMPLATE instead of template<>, 
 	  CSARRAY_INHIBIT_TYPED_KEYS. Adresses trac #16.
+	- Jorrit added a workaround for GetTuple() in windows so that
+	  it at least compiles. MacOS/X is still broken and the GetTuple()
+	  implementation in Windows just returns 0.
 28-Sep-2006
 	- mdmkolbe changed walktest to exit with code 0 on normal exits.
 	- mdmkolbe blind commited a change by Timothy "kiolakin" Whitfield

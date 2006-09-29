@@ -610,6 +610,12 @@ bool csWin32RegistryIterator::GetBool () const
   return owner->RegToBool (type, data, Def);
 }
 
+
+csPtr<iStringArray> csWin32RegistryIterator::GetTuple () const
+{
+  return 0;
+}
+
 const char *csWin32RegistryIterator::GetComment () const
 {
   return 0;
