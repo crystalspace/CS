@@ -12,6 +12,7 @@ chronological order.
 	  for docs/texinfo/appendix/apimod100_part.txi which is
 	  problematic somehow.
 	- res properly fixed docs/texinfo/appendix/apimod100_part.txi.
+	- res merged trunk r25430 into 1.0.
 21-Sep-2006
 	- res merged r25339:25345, r25364 into 1.0.
 	- res merged r25410 into 1.0.
