@@ -7,6 +7,7 @@ to the new particle system in Crystal Space.
 @menu
 * Api100 PartConv Explo:: Explosion
 * Api100 PartConv Rain:: Rain
+* Api100 PartConv Snow:: Snow
 @end menu
 
 @node Api100 PartConv Explo, Api100 PartConv Rain, Api100 Particle system changes, Api100 Particle system changes
@@ -84,7 +85,7 @@ to emulate the ugly old explosion particle system from the past:
   Sys->Engine->DelayedRemoveObject (1101, mfw);
 @end example
 
-@node Api100 PartConv Rain, , Api100 PartConv Explo, Api100 Particle system changes
+@node Api100 PartConv Rain, Api100 PartConv Snow, Api100 PartConv Explo, Api100 Particle system changes
 @subsubsection Rain
 
 To convert the old rain particle system to new particles you
@@ -179,5 +180,110 @@ Here is how this could work in code:
   partstate->SetCommonDirection (csVector3 (0, 1, 0));
   partstate->AddEmitter (boxemit);
   partstate->AddEffector (lincol);
+@end example
+
+@node Api100 PartConv Snow, , Api100 PartConv Rain, Api100 Particle system changes
+@subsubsection Snow
+
+To convert the old snow particle system to new particles you
+can use a box emitter which is oriented at the top where the snow drops
+should appear and which is very thin. You can use a force effector
+with random acceleration on the @sc{xz} plane to get the effect that
+snowflakes drift. Here you see an example of a snow particle system in the
+world file:
+
+@example
+  <meshfact name="snowFact">
+    <plugin>crystalspace.mesh.loader.factory.particles</plugin>
+    <params>
+      <particlesize x="0.17" y="0.17" />
+      <minbb>
+        <min x="-5" y="-0.3" z="-5" />
+        <max x="10" y="6" z="10" />
+      </minbb>
+      <sortmode>none</sortmode>
+      <emitter type="box">
+        <emissionrate>250</emissionrate>
+        <mass min="5" max="7.5" />
+        <box>
+          <min x="-5" y="6" z="-5" />
+          <max x="10" y="6" z="10" />
+        </box>
+        <uniformvelocity />
+        <initialvelocity x="0" y="-1.42" z="0" />
+        <initialttl min="5" max="5" />
+        <placement>volume</placement>
+      </emitter>
+      <effector type="lincolor">
+        <color red="0" green="0" blue="1" time="5" />
+      </effector>
+      <effector type="force">
+	<randomacceleration x="2.5" y="0" z="2.5" />
+      </effector>
+    </params>
+  </meshfact>
+  @dots{}
+  <meshobj name="snowfall">
+    <priority>alpha</priority>
+    <plugin>crystalspace.mesh.loader.particles</plugin>
+    <ztest />
+    <params>
+      <factory>snowFact</factory>
+      <mixmode>
+        <add />
+      </mixmode>
+      <material>snow</material>
+    </params>
+    <move>
+      <v x="10" y="0" z="10" />
+    </move>
+  </meshobj>
+@end example
+
+Here is how this could work in code:
+
+@example
+  csRef<iMeshFactoryWrapper> mfw = engine->CreateMeshFactory (
+      "crystalspace.mesh.object.particles", "snow");
+  if (!mfw) return;
+
+  csRef<iMeshWrapper> exp = engine->CreateMeshWrapper (mfw, "custom snow",
+	sector, csVector3 (0, 0, 0));
+
+  exp->SetZBufMode(CS_ZBUF_TEST);
+  exp->GetMeshObject()->SetMixMode (CS_FX_ADD);
+  exp->GetMeshObject()->SetMaterialWrapper (mat);
+
+  csRef<iParticleBuiltinEmitterFactory> emit_factory = 
+      csLoadPluginCheck<iParticleBuiltinEmitterFactory> (
+        Sys->object_reg, "crystalspace.mesh.object.particles.emitter", false);
+  csRef<iParticleBuiltinEffectorFactory> eff_factory = 
+      csLoadPluginCheck<iParticleBuiltinEffectorFactory> (
+        Sys->object_reg, "crystalspace.mesh.object.particles.effector", false);
+
+  csRef<iParticleBuiltinEmitterBox> boxemit = emit_factory->CreateBox ();
+  boxemit->SetBox (bbox);
+  boxemit->SetParticlePlacement (CS_PARTICLE_BUILTIN_VOLUME);
+  boxemit->SetEmissionRate (num / 5f);
+  boxemit->SetInitialMass (5.0f, 7.5f);
+  boxemit->SetUniformVelocity (true);
+  boxemit->SetInitialTTL (5f, 5f);
+  boxemit->SetInitialVelocity (csVector3 (0, -1.42f, 0), csVector3 (0));
+
+  csRef<iParticleBuiltinEffectorLinColor> lincol = eff_factory->
+    CreateLinColor ();
+  lincol->AddColor (csColor4 (.25,.25,.25,1), 2.5f);
+
+  csRef<iParticleBuiltinEffectorForce> force = eff_factory->
+    CreateForce ();
+  force->SetRandomAcceleration (csVector3 (1.5f, 0.0f, 1.5f));
+
+  csRef<iParticleSystem> partstate =
+  	scfQueryInterface<iParticleSystem> (exp->GetMeshObject ());
+  partstate->SetMinBoundingBox (bbox);
+  partstate->SetParticleSize (csVector2 (0.07f, 0.07f));
+  partstate->AddEmitter (boxemit);
+  partstate->AddEffector (lincol);
+  partstate->AddEffector (force);
 @end example
 
