@@ -1,11 +1,12 @@
 @c -*-texinfo-*-
-@node Release Notes 100, Release Notes 98, Release Notes, Release Notes
+@node Release Notes 100, Release Notes 98, Release Notes 120, Release Notes
 @appendixsec Release Notes from 0.98 to 1.00
 @cindex Release Notes
 
 @noindent
-@emph{Written by Eric Sunshine, @email{sunshine@@sunshineco.com} and
-Frank Richter, @email{res@@crystalspace3d.org},
+@emph{Written by Eric Sunshine, @email{sunshine@@sunshineco.com},
+Frank Richter, @email{res@@crystalspace3d.org} and
+Marten Svanfeldt, @email{developer@@svanfeldt.com},
 with contributions from Adam D. Bradley @email{artdodge@@cs.bu.edu} and others.}
 
 This section documents the major changes between versions 0.98 and 1.00 of

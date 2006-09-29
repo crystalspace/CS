@@ -41,6 +41,7 @@ if $(REGEX.AVAILABLE) != "yes"
 
 SubInclude TOP libs csutil generic ;
 SubInclude TOP libs csutil ptmalloc ;
+SubInclude TOP libs csutil threading ;
 
 CSLIB.CFLAGS +=
   [ FDefines CS_CONFIGDIR='\"$(appconfdir)\"' ]

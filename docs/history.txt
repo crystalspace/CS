@@ -42,6 +42,8 @@ chronological order.
 	  fail now. That means that the workaround in gldrivers.xml is
 	  no longer required.
 	- Erroroman added more API docs in skeleton.h
+	- Marten added first part of reimplemented threading subsystem.
+	- Marten fixed compilation on MSVC after res cleanup earlier.
 28-Sep-2006
 	- mdmkolbe changed walktest to exit with code 0 on normal exits.
 	- mdmkolbe blind commited a change by Timothy "kiolakin" Whitfield
