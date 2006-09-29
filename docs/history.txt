@@ -22,6 +22,12 @@ chronological order.
 	- Jorrit added textures from new castle level to CS. Castle level
 	  will soon follow.
 	- Jorrit merged stdtex.zip into standard.zip.
+	- Jorrit added the indoor castle level from Anders Wisur to svn
+	  and made it default.
+	- Jorrit added license note to castle level and castle textures.
+	  Castle uses Creative Commons NC:
+	  http://creativecommons.org/licenses/by-nc/2.5
+	- Jorrit made castle default level in walktest now.
 28-Sep-2006
 	- mdmkolbe changed walktest to exit with code 0 on normal exits.
 	- mdmkolbe blind commited a change by Timothy "kiolakin" Whitfield

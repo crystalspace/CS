@@ -1,0 +1,4777 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<world>
+  <plugins>
+    <plugin name='null'>crystalspace.mesh.loader.null</plugin>
+    <plugin name='genmesh'>crystalspace.mesh.loader.genmesh</plugin>
+    <plugin name='genmeshfact'>crystalspace.mesh.loader.factory.genmesh</plugin>
+    <plugin name='particles'>crystalspace.mesh.loader.particles</plugin>
+    <plugin name='particlesfact'>crystalspace.mesh.loader.factory.particles</plugin>
+    <plugin name='thing'>crystalspace.mesh.loader.thing</plugin>
+    <plugin name='thingfact'>crystalspace.mesh.loader.factory.thing</plugin>
+  </plugins>
+  <shaders>
+    <shader>
+      <file>/shader/parallaxAtt/parallaxAtt.xml</file>
+    </shader>
+    <shader>
+      <file>/shader/ambient.xml</file>
+    </shader>
+    <shader>
+      <file>/shader/std_lighting.xml</file>
+    </shader>
+  </shaders>
+  <textures>
+    <texture name='castle-detail1_d.jpg'>
+      <file>/lib/std/castle/castle-detail1_d.jpg</file>
+    </texture>
+    <texture name='BUMPcastle-detail1_h.jpg'>
+      <file>/lib/std/castle/castle-detail1_h.jpg</file>
+      <class>normalmap</class>
+    </texture>
+    <texture name='BUMPcastle-detail1_n.jpg'>
+      <file>/lib/std/castle/castle-detail1_n.jpg</file>
+      <class>normalmap</class>
+    </texture>
+    <texture name='wall-stone_2_d.jpg'>
+      <file>/lib/std/castle/wall-stone_2_d.jpg</file>
+    </texture>
+    <texture name='wall-stone2_2_d.jpg'>
+      <file>/lib/std/castle/wall-stone2_2_d.jpg</file>
+    </texture>
+    <texture name='BUMPcobblestone_h.jpg'>
+      <file>/lib/std/castle/cobblestone_h.jpg</file>
+      <class>normalmap</class>
+    </texture>
+    <texture name='BUMPcobblestone_n.jpg'>
+      <file>/lib/std/castle/cobblestone_n.jpg</file>
+      <class>normalmap</class>
+    </texture>
+    <texture name='BUMPwall-stone2_h.jpg'>
+      <file>/lib/std/castle/wall-stone2_h.jpg</file>
+      <class>normalmap</class>
+    </texture>
+    <texture name='BUMPwall-stone2_n.jpg'>
+      <file>/lib/std/castle/wall-stone2_n.jpg</file>
+      <class>normalmap</class>
+    </texture>
+    <texture name='fire1.png'>
+      <file>/lib/std/castle/fire1.png</file>
+    </texture>
+    <texture name='wood_barrel2_d.jpg'>
+      <file>/lib/std/castle/wood_barrel2_d.jpg</file>
+    </texture>
+    <texture name='BUMPwood_barrel_h.jpg'>
+      <file>/lib/std/castle/wood_barrel_h.jpg</file>
+      <class>normalmap</class>
+    </texture>
+    <texture name='BUMPwood_barrel_n.png'>
+      <file>/lib/std/castle/wood_barrel_n.png</file>
+      <class>normalmap</class>
+    </texture>
+    <texture name='wood_d.jpg'>
+      <file>/lib/std/castle/wood_d.jpg</file>
+    </texture>
+    <texture name='BUMPwood2_h.jpg'>
+      <file>/lib/std/castle/wood2_h.jpg</file>
+      <class>normalmap</class>
+    </texture>
+    <texture name='BUMPwood2_n.jpg'>
+      <file>/lib/std/castle/wood2_n.jpg</file>
+      <class>normalmap</class>
+    </texture>
+    <texture name='castle-metal_d.jpg'>
+      <file>/lib/std/castle/castle-metal_d.jpg</file>
+    </texture>
+    <texture name='BUMPmetal_pipes1_h.jpg'>
+      <file>/lib/std/castle/metal_pipes1_h.jpg</file>
+      <class>normalmap</class>
+    </texture>
+    <texture name='BUMPmetal_pipes1_n.png'>
+      <file>/lib/std/castle/metal_pipes1_n.png</file>
+      <class>normalmap</class>
+    </texture>
+    <texture name='castle-detail3_d.jpg'>
+      <file>/lib/std/castle/castle-detail3_d.jpg</file>
+    </texture>
+    <texture name='BUMPcastle-detail3_h.jpg'>
+      <file>/lib/std/castle/castle-detail3_h.jpg</file>
+      <class>normalmap</class>
+    </texture>
+    <texture name='BUMPcastle-detail3_n.jpg'>
+      <file>/lib/std/castle/castle-detail3_n.jpg</file>
+      <class>normalmap</class>
+    </texture>
+    <texture name='wood.jpg'>
+      <file>/lib/std/castle/wood.jpg</file>
+    </texture>
+    <texture name='BUMPwood_h.jpg'>
+      <file>/lib/std/castle/wood_h.jpg</file>
+      <class>normalmap</class>
+    </texture>
+    <texture name='BUMPwood_n.jpg'>
+      <file>/lib/std/castle/wood_n.jpg</file>
+      <class>normalmap</class>
+    </texture>
+    <texture name='concrete_floor4_3.jpg'>
+      <file>/lib/std/castle/concrete_floor4_3.jpg</file>
+    </texture>
+    <texture name='BUMPconcrete_floor4_3_h.jpg'>
+      <file>/lib/std/castle/concrete_floor4_3_h.jpg</file>
+      <class>normalmap</class>
+    </texture>
+    <texture name='BUMPconcrete_floor4_3_n.jpg'>
+      <file>/lib/std/castle/concrete_floor4_3_n.jpg</file>
+      <class>normalmap</class>
+    </texture>
+    <texture name='castle-detail2_d.jpg'>
+      <file>/lib/std/castle/castle-detail2_d.jpg</file>
+    </texture>
+    <texture name='BUMPcastle-detail2_h.jpg'>
+      <file>/lib/std/castle/castle-detail2_h.jpg</file>
+      <class>normalmap</class>
+    </texture>
+    <texture name='BUMPcastle-detail2_n.jpg'>
+      <file>/lib/std/castle/castle-detail2_n.jpg</file>
+      <class>normalmap</class>
+    </texture>
+    <texture name='brick1_d.jpg'>
+      <file>/lib/std/castle/brick1_d.jpg</file>
+    </texture>
+    <texture name='BUMPbrick1_h.png'>
+      <file>/lib/std/castle/brick1_h.png</file>
+      <class>normalmap</class>
+    </texture>
+    <texture name='BUMPbrick1_n.jpg'>
+      <file>/lib/std/castle/brick1_n.jpg</file>
+      <class>normalmap</class>
+    </texture>
+    <texture name='wood_barrel_d.jpg'>
+      <file>/lib/std/castle/wood_barrel_d.jpg</file>
+    </texture>
+    <texture name='concrete_floor6_d.jpg'>
+      <file>/lib/std/castle/concrete_floor6_d.jpg</file>
+    </texture>
+    <texture name='BUMPconcrete_floor6_h.jpg'>
+      <file>/lib/std/castle/concrete_floor6_h.jpg</file>
+      <class>normalmap</class>
+    </texture>
+    <texture name='BUMPconcrete_floor6_n.jpg'>
+      <file>/lib/std/castle/concrete_floor6_n.jpg</file>
+      <class>normalmap</class>
+    </texture>
+    <texture name='powder.jpg'>
+      <file>/lib/std/castle/powder.jpg</file>
+    </texture>
+    <texture name='BUMPpowder_h.jpg'>
+      <file>/lib/std/castle/powder_h.jpg</file>
+      <class>normalmap</class>
+    </texture>
+    <texture name='BUMPpowder_n.jpg'>
+      <file>/lib/std/castle/powder_n.jpg</file>
+      <class>normalmap</class>
+    </texture>
+    <texture name='castle-brick3_d.jpg'>
+      <file>/lib/std/castle/castle-brick3_d.jpg</file>
+    </texture>
+    <texture name='castle-window_d.jpg'>
+      <file>/lib/std/castle/castle-window_d.jpg</file>
+    </texture>
+    <texture name='BUMPcastle-brick1_h.jpg'>
+      <file>/lib/std/castle/castle-brick1_h.jpg</file>
+      <class>normalmap</class>
+    </texture>
+    <texture name='BUMPcastle-brick1_n.jpg'>
+      <file>/lib/std/castle/castle-brick1_n.jpg</file>
+      <class>normalmap</class>
+    </texture>
+    <texture name='BUMPcastle-window-h.jpg'>
+      <file>/lib/std/castle/castle-window-h.jpg</file>
+      <class>normalmap</class>
+    </texture>
+    <texture name='BUMPcastle-window-n.png'>
+      <file>/lib/std/castle/castle-window-n.png</file>
+      <class>normalmap</class>
+    </texture>
+    <texture name='castle_ray.png'>
+      <file>/lib/std/castle/castle_ray.png</file>
+    </texture>
+    <texture name='credits.jpg'>
+      <file>/lib/std/castle/credits.jpg</file>
+    </texture>
+    <texture name='BUMPcredits_h.jpg'>
+      <file>/lib/std/castle/credits_h.jpg</file>
+      <class>normalmap</class>
+    </texture>
+    <texture name='BUMPcredits_n.jpg'>
+      <file>/lib/std/castle/credits_n.jpg</file>
+      <class>normalmap</class>
+    </texture>
+    <texture name='crystal.png'>
+      <file>/lib/std/castle/crystal.png</file>
+    </texture>
+    <texture name='BUMPcrystal_h.jpg'>
+      <file>/lib/std/castle/crystal_h.jpg</file>
+      <class>normalmap</class>
+    </texture>
+    <texture name='BUMPcrystal_n.png'>
+      <file>/lib/std/castle/crystal_n.png</file>
+      <class>normalmap</class>
+    </texture>
+    <texture name='CS-flag.png'>
+      <file>/lib/std/castle/CS-flag.png</file>
+    </texture>
+    <texture name='star.png'>
+      <file>/lib/std/castle/star.png</file>
+    </texture>
+    <texture name='marble_blue.jpg'>
+      <file>/lib/std/castle/marble_blue.jpg</file>
+    </texture>
+  </textures>
+  <materials>
+    <material name='parallaxAtt_detail1-parallaxcastle-detail1_d.jpg'>
+      <texture>castle-detail1_d.jpg</texture>
+      <shader type='diffuse'>parallaxAtt</shader>
+      <shader type='ambient'>ambient</shader>
+      <shadervar type='texture' name='tex normal'>BUMPcastle-detail1_n.jpg</shadervar>
+      <shadervar type='texture' name='tex height'>BUMPcastle-detail1_h.jpg</shadervar>
+      <shadervar type='vector4' name='specular'>1,1,1,1</shadervar>
+    </material>
+    <material name='parallaxAtt_wall-stone-parallaxwall-stone_2_d.jpg'>
+      <texture>wall-stone_2_d.jpg</texture>
+      <shader type='diffuse'>parallaxAtt</shader>
+      <shader type='ambient'>ambient</shader>
+      <shadervar type='texture' name='tex normal'>BUMPcobblestone_n.jpg</shadervar>
+      <shadervar type='texture' name='tex height'>BUMPcobblestone_h.jpg</shadervar>
+      <shadervar type='vector4' name='specular'>0.1,0.1,0.1,0.1</shadervar>
+    </material>
+    <material name='parallaxAtt_wall-stone2-parallawall-stone2_2_d.jpg'>
+      <texture>wall-stone2_2_d.jpg</texture>
+      <shader type='diffuse'>parallaxAtt</shader>
+      <shader type='ambient'>ambient</shader>
+      <shadervar type='texture' name='tex normal'>BUMPwall-stone2_n.jpg</shadervar>
+      <shadervar type='texture' name='tex height'>BUMPwall-stone2_h.jpg</shadervar>
+      <shadervar type='vector4' name='specular'>0.1,0.1,0.1,0.1</shadervar>
+    </material>
+    <material name='std_lighting_explo_firefire1.png'>
+      <texture>fire1.png</texture>
+      <shader type='diffuse'>std_lighting</shader>
+      <shader type='ambient'>*null</shader>
+    </material>
+    <material name='parallaxAtt_barrel2-parallaxwood_barrel2_d.jpg'>
+      <texture>wood_barrel2_d.jpg</texture>
+      <shader type='diffuse'>parallaxAtt</shader>
+      <shader type='ambient'>ambient</shader>
+      <shadervar type='texture' name='tex normal'>BUMPwood_barrel_n.png</shadervar>
+      <shadervar type='texture' name='tex height'>BUMPwood_barrel_h.jpg</shadervar>
+      <shadervar type='vector4' name='specular'>0.3,0.3,0.3,0.3</shadervar>
+    </material>
+    <material name='parallaxAtt_wood2-parallaxwood_d.jpg'>
+      <texture>wood_d.jpg</texture>
+      <shader type='diffuse'>parallaxAtt</shader>
+      <shader type='ambient'>ambient</shader>
+      <shadervar type='texture' name='tex normal'>BUMPwood2_n.jpg</shadervar>
+      <shadervar type='texture' name='tex height'>BUMPwood2_h.jpg</shadervar>
+      <shadervar type='vector4' name='specular'>0.1,0.1,0.1,0.1</shadervar>
+    </material>
+    <material name='parallaxAtt_plain_metal-parallacastle-metal_d.jpg'>
+      <texture>castle-metal_d.jpg</texture>
+      <shader type='diffuse'>parallaxAtt</shader>
+      <shader type='ambient'>ambient</shader>
+      <shadervar type='texture' name='tex normal'>BUMPmetal_pipes1_n.png</shadervar>
+      <shadervar type='texture' name='tex height'>BUMPmetal_pipes1_h.jpg</shadervar>
+      <shadervar type='vector4' name='specular'>1,1,1,1</shadervar>
+    </material>
+    <material name='parallaxAtt_detail3-parallaxcastle-detail3_d.jpg'>
+      <texture>castle-detail3_d.jpg</texture>
+      <shader type='diffuse'>parallaxAtt</shader>
+      <shader type='ambient'>ambient</shader>
+      <shadervar type='texture' name='tex normal'>BUMPcastle-detail3_n.jpg</shadervar>
+      <shadervar type='texture' name='tex height'>BUMPcastle-detail3_h.jpg</shadervar>
+      <shadervar type='vector4' name='specular'>0.2,0.2,0.2,0.2</shadervar>
+    </material>
+    <material name='parallaxAtt_wood_parallaxwood.png'>
+      <texture>wood.jpg</texture>
+      <shader type='diffuse'>parallaxAtt</shader>
+      <shader type='ambient'>ambient</shader>
+      <shadervar type='texture' name='tex normal'>BUMPwood_n.jpg</shadervar>
+      <shadervar type='texture' name='tex height'>BUMPwood_h.jpg</shadervar>
+      <shadervar type='vector4' name='specular'>0.1,0.1,0.1,0.2</shadervar>
+    </material>
+    <material name='parallaxAtt_concrete4_3-parallaconcrete_floor4_3.png'>
+      <texture>concrete_floor4_3.jpg</texture>
+      <shader type='diffuse'>parallaxAtt</shader>
+      <shader type='ambient'>ambient</shader>
+      <shadervar type='texture' name='tex normal'>BUMPconcrete_floor4_3_n.jpg</shadervar>
+      <shadervar type='texture' name='tex height'>BUMPconcrete_floor4_3_h.jpg</shadervar>
+      <shadervar type='vector4' name='specular'>0.1,0.1,0.1,0.1</shadervar>
+    </material>
+    <material name='parallaxAtt_detail2-parallaxcastle-detail2_d.jpg'>
+      <texture>castle-detail2_d.jpg</texture>
+      <shader type='diffuse'>parallaxAtt</shader>
+      <shader type='ambient'>ambient</shader>
+      <shadervar type='texture' name='tex normal'>BUMPcastle-detail2_n.jpg</shadervar>
+      <shadervar type='texture' name='tex height'>BUMPcastle-detail2_h.jpg</shadervar>
+    </material>
+    <material name='parallaxAtt_brick1-parallaxbrick1_d.jpg'>
+      <texture>brick1_d.jpg</texture>
+      <shader type='diffuse'>parallaxAtt</shader>
+      <shader type='ambient'>ambient</shader>
+      <shadervar type='texture' name='tex normal'>BUMPbrick1_n.jpg</shadervar>
+      <shadervar type='texture' name='tex height'>BUMPbrick1_h.png</shadervar>
+      <shadervar type='vector4' name='specular'>0.13,0.15,0.17,0.1</shadervar>
+    </material>
+    <material name='parallaxAtt_barrel-parallaxwood_barrel_d.jpg'>
+      <texture>wood_barrel_d.jpg</texture>
+      <shader type='diffuse'>parallaxAtt</shader>
+      <shader type='ambient'>ambient</shader>
+      <shadervar type='texture' name='tex normal'>BUMPwood_barrel_n.png</shadervar>
+      <shadervar type='texture' name='tex height'>BUMPwood_barrel_h.jpg</shadervar>
+      <shadervar type='vector4' name='specular'>0.5,0.5,0.5,0.5</shadervar>
+    </material>
+    <material name='parallaxAtt_concrete6-parallaxconcrete_floor6_d.jpg'>
+      <texture>concrete_floor6_d.jpg</texture>
+      <shader type='diffuse'>parallaxAtt</shader>
+      <shader type='ambient'>ambient</shader>
+      <shadervar type='texture' name='tex normal'>BUMPconcrete_floor6_n.jpg</shadervar>
+      <shadervar type='texture' name='tex height'>BUMPconcrete_floor6_h.jpg</shadervar>
+      <shadervar type='vector4' name='specular'>0.1,0.1,0.1,0.1</shadervar>
+    </material>
+    <material name='parallaxAtt_powder-parallaxpowder.png'>
+      <texture>powder.jpg</texture>
+      <shader type='diffuse'>parallaxAtt</shader>
+      <shader type='ambient'>ambient</shader>
+      <shadervar type='texture' name='tex normal'>BUMPpowder_n.jpg</shadervar>
+      <shadervar type='texture' name='tex height'>BUMPpowder_h.jpg</shadervar>
+    </material>
+    <material name='parallaxAtt_brick3-parallaxcastle-brick3_d.jpg'>
+      <texture>castle-brick3_d.jpg</texture>
+      <shader type='diffuse'>parallaxAtt</shader>
+      <shader type='ambient'>ambient</shader>
+      <shadervar type='texture' name='tex normal'>BUMPcastle-brick1_n.jpg</shadervar>
+      <shadervar type='texture' name='tex height'>BUMPcastle-brick1_h.jpg</shadervar>
+      <shadervar type='vector4' name='specular'>0.3,0.3,0.3,0.3</shadervar>
+    </material>
+    <material name='parallaxAtt_window-parallaxcastle-window_d.jpg'>
+      <texture>castle-window_d.jpg</texture>
+      <shader type='diffuse'>parallaxAtt</shader>
+      <shader type='ambient'>ambient</shader>
+      <shadervar type='texture' name='tex normal'>BUMPcastle-window-n.png</shadervar>
+      <shadervar type='texture' name='tex height'>BUMPcastle-window-h.jpg</shadervar>
+      <shadervar type='vector4' name='specular'>1,1,1,1</shadervar>
+    </material>
+    <material name='std_lighting_rayscastle_ray.png'>
+      <texture>castle_ray.png</texture>
+      <shader type='diffuse'>std_lighting</shader>
+      <shader type='ambient'>*null</shader>
+    </material>
+    <material name='parallaxAtt_creditscredits.jpg'>
+      <texture>credits.jpg</texture>
+      <shader type='diffuse'>parallaxAtt</shader>
+      <shader type='ambient'>ambient</shader>
+      <shadervar type='texture' name='tex normal'>BUMPcredits_n.jpg</shadervar>
+      <shadervar type='texture' name='tex height'>BUMPcredits_h.jpg</shadervar>
+      <shadervar type='vector4' name='specular'>1,1,1,1</shadervar>
+    </material>
+    <material name='parallaxAtt_crystalcrystal.png'>
+      <texture>crystal.png</texture>
+      <shader type='diffuse'>parallaxAtt</shader>
+      <shader type='ambient'>ambient</shader>
+      <shadervar type='texture' name='tex normal'>BUMPcrystal_n.png</shadervar>
+      <shadervar type='texture' name='tex height'>BUMPcrystal_h.jpg</shadervar>
+      <shadervar type='vector4' name='specular'>1,1,1,1</shadervar>
+    </material>
+    <material name='std_lighting_flagCS-flag.png'>
+      <texture>CS-flag.png</texture>
+      <shader type='diffuse'>std_lighting</shader>
+      <shader type='ambient'>*null</shader>
+    </material>
+    <material name='std_lighting_starstar.png'>
+      <texture>star.png</texture>
+      <shader type='standard'>std_lighting</shader>
+      <shader type='ambient'>*null</shader>
+    </material>
+    <material name='parallaxAtt_marble-parallaxmarble_blue.jpg'>
+      <texture>marble_blue.jpg</texture>
+      <shader type='diffuse'>parallaxAtt</shader>
+      <shader type='ambient'>ambient</shader>
+      <shadervar type='texture' name='tex normal'>BUMPcrystal_n.png</shadervar>
+      <shadervar type='texture' name='tex height'>BUMPcrystal_h.jpg</shadervar>
+      <shadervar type='vector4' name='specular'>1,1,1,1</shadervar>
+    </material>
+  </materials>
+  <sounds/>
+  <settings>
+    <clearscreen>no</clearscreen>
+    <clearzbuf>no</clearzbuf>
+  </settings>
+  <library>factories/genCube</library>
+  <library>factories/genMesh.002</library>
+  <library>factories/genCylinder.003</library>
+  <library>factories/genCube.007</library>
+  <library>factories/genCylinder.026</library>
+  <library>factories/genCube.491</library>
+  <library>factories/genCube.493</library>
+  <library>factories/genCube.496</library>
+  <library>factories/genbment2_tables.001</library>
+  <library>factories/genMesh.001</library>
+  <library>factories/genMesh</library>
+  <library>factories/genCube.009</library>
+  <library>factories/genCylinder.014</library>
+  <library>factories/genbase-floor00</library>
+  <library>factories/genbase-stair-wall</library>
+  <library>factories/genbase-stairs.001</library>
+  <library>factories/genCylinder.002</library>
+  <library>factories/genCylinder.018</library>
+  <library>factories/genbasement-walls.014</library>
+  <library>factories/genbasement-walls.007</library>
+  <library>factories/genCube.219</library>
+  <library>factories/genbasement-walls.004</library>
+  <library>factories/genSphere.001</library>
+  <library>factories/genSphere</library>
+  <library>factories/genbment2_tables.002</library>
+  <library>factories/genbment2_tables.003</library>
+  <library>factories/genbment2_tables.004</library>
+  <library>factories/genCylinder.022</library>
+  <library>factories/genbment2-candleholders</library>
+  <library>factories/genCube.016</library>
+  <library>factories/genSphere.006</library>
+  <library>factories/genbment2_tables</library>
+  <library>factories/genbment2-floor</library>
+  <library>factories/genbment2-walls</library>
+  <library>factories/genCube.505</library>
+  <library>factories/genCube.013</library>
+  <library>factories/genCube.004</library>
+  <library>factories/genCylinder.233</library>
+  <library>factories/genCylinder.211</library>
+  <library>factories/genCube.356</library>
+  <library>factories/genCube.358</library>
+  <library>factories/genCylinder.219</library>
+  <library>factories/genCylinder.220</library>
+  <library>factories/genCube.010</library>
+  <library>factories/genCylinder.224</library>
+  <library>factories/genbasement-walls.008</library>
+  <library>factories/genbasement-walls.013</library>
+  <library>factories/genGRAB IT</library>
+  <library>factories/genCylinder.235</library>
+  <library>factories/genbasement-walls.019</library>
+  <library>factories/genbasement-walls.020</library>
+  <library>factories/genbasement-walls.021</library>
+  <library>factories/genCube.006</library>
+  <library>factories/genCube.003</library>
+  <library>factories/genCube.002</library>
+  <library>factories/genCube.005</library>
+  <library>factories/genCube.508</library>
+  <library>factories/genCube.520</library>
+  <library>factories/genCylinder.027</library>
+  <library>factories/genbment_arras-pole.003</library>
+  <library>factories/genCube.027</library>
+  <library>factories/genPlane.003</library>
+  <library>factories/genCube.517</library>
+  <library>factories/genCube.518</library>
+  <library>factories/genCube.012</library>
+  <library>factories/thingCube.549</library>
+  <library>factories/genCube.550</library>
+  <library>factories/genLine01.002</library>
+  <library>factories/genCube.551</library>
+  <library>factories/genCube.552</library>
+  <library>factories/genCube.553</library>
+  <library>factories/genCylinder.004</library>
+  <library>factories/genCube.554</library>
+  <library>factories/genbasement-walls.003</library>
+  <library>factories/genCube.556</library>
+  <library>factories/genCylinder.010</library>
+  <library>factories/genCylinder.006</library>
+  <library>factories/gencastle_front_wall.003</library>
+  <library>factories/genCylinder.001</library>
+  <library>factories/genCube.542</library>
+  <library>factories/genCube.546</library>
+  <library>factories/genCylinder.009</library>
+  <triggers>
+    <trigger name='LaIpoLamp.014_t'>
+      <sectorvis sector='basement-dungeon'/>
+      <fire sequence='LaIpoLamp.014'/>
+    </trigger>
+    <trigger name='LaIpo.003Lamp.003_t'>
+      <sectorvis sector='basement-dungeon'/>
+      <fire sequence='LaIpo.003Lamp.003'/>
+    </trigger>
+    <trigger name='LaIpo.003Lamp.013_t'>
+      <sectorvis sector='basement00'/>
+      <fire sequence='LaIpo.003Lamp.013'/>
+    </trigger>
+    <trigger name='LaIpoLamp.011_t'>
+      <sectorvis sector='basement00'/>
+      <fire sequence='LaIpoLamp.011'/>
+    </trigger>
+    <trigger name='LaIpo.003Lamp.006_t'>
+      <sectorvis sector='basement01'/>
+      <fire sequence='LaIpo.003Lamp.006'/>
+    </trigger>
+    <trigger name='LaIpoLamp.004_t'>
+      <sectorvis sector='basement01'/>
+      <fire sequence='LaIpoLamp.004'/>
+    </trigger>
+    <trigger name='LaIpo.003Lamp.007_t'>
+      <sectorvis sector='basement02'/>
+      <fire sequence='LaIpo.003Lamp.007'/>
+    </trigger>
+    <trigger name='LaIpoLamp.008_t'>
+      <sectorvis sector='basement02'/>
+      <fire sequence='LaIpoLamp.008'/>
+    </trigger>
+    <trigger name='LaIpo.003Lamp.009_t'>
+      <sectorvis sector='basement03'/>
+      <fire sequence='LaIpo.003Lamp.009'/>
+    </trigger>
+    <trigger name='LaIpoLamp.010_t'>
+      <sectorvis sector='basement03'/>
+      <fire sequence='LaIpoLamp.010'/>
+    </trigger>
+    <trigger name='LaIpo.003Lamp.012_t'>
+      <sectorvis sector='basement04'/>
+      <fire sequence='LaIpo.003Lamp.012'/>
+    </trigger>
+    <trigger name='LaIpo.003Lamp.018_t'>
+      <sectorvis sector='dining-hall'/>
+      <fire sequence='LaIpo.003Lamp.018'/>
+    </trigger>
+    <trigger name='LaIpoLamp.017_t'>
+      <sectorvis sector='dining-hall'/>
+      <fire sequence='LaIpoLamp.017'/>
+    </trigger>
+    <trigger name='ObIpo.002Cube.012_t'>
+      <sectorvis sector='interior'/>
+      <fire sequence='ObIpo.002Cube.012'/>
+    </trigger>
+    <trigger name='LaIpo.003Lamp.020_t'>
+      <sectorvis sector='interior'/>
+      <fire sequence='LaIpo.003Lamp.020'/>
+    </trigger>
+    <trigger name='LaIpoLamp.022_t'>
+      <sectorvis sector='interior'/>
+      <fire sequence='LaIpoLamp.022'/>
+    </trigger>
+    <trigger name='LaIpoLamp.026_t'>
+      <sectorvis sector='throne-room'/>
+      <fire sequence='LaIpoLamp.026'/>
+    </trigger>
+    <trigger name='LaIpo.003Lamp.027_t'>
+      <sectorvis sector='throne-room'/>
+      <fire sequence='LaIpo.003Lamp.027'/>
+    </trigger>
+    <trigger name='LaIpoLamp.028_t'>
+      <sectorvis sector='throne-room'/>
+      <fire sequence='LaIpoLamp.028'/>
+    </trigger>
+  </triggers>
+  <addon>
+    <plugin>crystalspace.renderloop.loop.loader</plugin>
+    <paramsfile>/shader/std_rloop_diffuse.xml</paramsfile>
+  </addon>
+  <meshfact name='parttorch.041'>
+    <plugin>crystalspace.mesh.loader.factory.particles</plugin>
+    <priority>transp</priority>
+    <ztest/>
+    <params>
+      <material>std_lighting_explo_firefire1.png</material>
+      <renderorientation>camface approx</renderorientation>
+      <rotationmode>none</rotationmode>
+      <sortmode>none</sortmode>
+      <integrationmode>linear</integrationmode>
+      <particlesize y='0.159999996424' x='0.159999996424'/>
+      <transformmode>local</transformmode>
+      <emitter type='sphere'>
+        <enabled>yes</enabled>
+        <uniformvelocity>yes</uniformvelocity>
+        <emissionrate>8</emissionrate>
+        <radius>0.0706334</radius>
+        <position y='0' x='0' z='0'/>
+        <initialvelocity y='0' x='0' z='0'/>
+        <mass max='1.0' min='1.0'/>
+        <initialttl max='2' min='1.5'/>
+        <placement>volume</placement>
+      </emitter>
+      <effector type='force'>
+        <acceleration y='0.3' x='0' z='0'/>
+        <force y='0.1' x='0' z='0'/>
+        <randomacceleration>1.0</randomacceleration>
+      </effector>
+      <effector type='lincolor'>
+        <color blue='0.16' green='0.5' red='0.9' time='1'/>
+        <color blue='0.16' green='0.5' red='0.9' time='0.9'/>
+        <color blue='0.144' green='0.45' red='0.81' time='0.8'/>
+        <color blue='0.128' green='0.4' red='0.72' time='0.6'/>
+        <color blue='0.096' green='0.3' red='0.54' time='0.5'/>
+        <color blue='0.064' green='0.2' red='0.36' time='0.4'/>
+        <color blue='0.032' green='0.1' red='0.18' time='0.3'/>
+        <color blue='0.0' green='0.0' red='0.0' time='0.1'/>
+        <color blue='0.0' green='0.0' red='0.0' time='0'/>
+      </effector>
+    </params>
+  </meshfact>
+  <meshfact name='parttorch.030'>
+    <plugin>crystalspace.mesh.loader.factory.particles</plugin>
+    <priority>transp</priority>
+    <ztest/>
+    <params>
+      <material>std_lighting_explo_firefire1.png</material>
+      <renderorientation>camface approx</renderorientation>
+      <rotationmode>none</rotationmode>
+      <sortmode>none</sortmode>
+      <integrationmode>linear</integrationmode>
+      <particlesize y='0.159999996424' x='0.159999996424'/>
+      <transformmode>local</transformmode>
+      <emitter type='sphere'>
+        <enabled>yes</enabled>
+        <uniformvelocity>yes</uniformvelocity>
+        <emissionrate>8</emissionrate>
+        <radius>0.0706334</radius>
+        <position y='0' x='0' z='0'/>
+        <initialvelocity y='0' x='0' z='0'/>
+        <mass max='1.0' min='1.0'/>
+        <initialttl max='2' min='1.5'/>
+        <placement>volume</placement>
+      </emitter>
+      <effector type='force'>
+        <acceleration y='0.3' x='0' z='0'/>
+        <force y='0.1' x='0' z='0'/>
+        <randomacceleration>1.0</randomacceleration>
+      </effector>
+      <effector type='lincolor'>
+        <color blue='0.16' green='0.5' red='0.9' time='1'/>
+        <color blue='0.16' green='0.5' red='0.9' time='0.9'/>
+        <color blue='0.144' green='0.45' red='0.81' time='0.8'/>
+        <color blue='0.128' green='0.4' red='0.72' time='0.6'/>
+        <color blue='0.096' green='0.3' red='0.54' time='0.5'/>
+        <color blue='0.064' green='0.2' red='0.36' time='0.4'/>
+        <color blue='0.032' green='0.1' red='0.18' time='0.3'/>
+        <color blue='0.0' green='0.0' red='0.0' time='0.1'/>
+        <color blue='0.0' green='0.0' red='0.0' time='0'/>
+      </effector>
+    </params>
+  </meshfact>
+  <sector name='basement-dungeon'>
+    <portals name='Plane.001'>
+      <portal>
+        <v y='1.25' x='2.20533735273e-007' z='0.675000190735'/>
+        <v y='-1.24999952316' x='-2.20533735273e-007' z='-0.675000190735'/>
+        <v y='1.25' x='-3.17889679025e-008' z='-0.674999833107'/>
+        <sector>basement03</sector>
+        <float/>
+      </portal>
+      <portal>
+        <v y='-1.25' x='3.17889750079e-008' z='0.675000071526'/>
+        <v y='-1.24999952316' x='-2.20533735273e-007' z='-0.675000190735'/>
+        <v y='1.25' x='2.20533735273e-007' z='0.675000190735'/>
+        <sector>basement03</sector>
+        <float/>
+      </portal>
+      <priority>portal</priority>
+      <hardmove>
+        <v y='-5.98' x='18.04' z='25.595'/>
+        <matrix>
+          <scale y='1' x='1' z='1'/>
+        </matrix>
+      </hardmove>
+    </portals>
+    <renderloop>std_rloop_diffuse</renderloop>
+    <ambient blue='0.1' green='0.1' red='0.1'/>
+    <cullerp plugin='crystalspace.culling.dynavis'/>
+    <meshobj name='Cube.582'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>genCube</factory>
+        <material>parallaxAtt_detail1-parallaxcastle-detail1_d.jpg</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='-5.66814' x='19.9635' z='17.2742'/>
+      </move>
+    </meshobj>
+    <meshobj name='Mesh.002'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>genMesh.002</factory>
+        <material>parallaxAtt_wall-stone2-parallawall-stone2_2_d.jpg</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='-5.67058' x='19.9552' z='18.3282'/>
+      </move>
+    </meshobj>
+    <meshobj name='explo_small_fire.017'>
+      <plugin>particles</plugin>
+      <priority>transp</priority>
+      <params>
+        <factory>parttorch.041</factory>
+        <material>std_lighting_explo_firefire1.png</material>
+        <mixmode>
+          <add/>
+        </mixmode>
+      </params>
+      <ztest/>
+      <move>
+        <v y='-5.34487' x='18.3334' z='11.1665'/>
+      </move>
+    </meshobj>
+    <meshobj name='explo_small_fire.012'>
+      <plugin>particles</plugin>
+      <priority>transp</priority>
+      <params>
+        <factory>parttorch.030</factory>
+        <material>std_lighting_explo_firefire1.png</material>
+        <mixmode>
+          <add/>
+        </mixmode>
+      </params>
+      <ztest/>
+      <move>
+        <v y='-5.34487' x='21.5885' z='27.0652'/>
+      </move>
+    </meshobj>
+    <meshobj name='Cylinder.232'>
+      <plugin>genmesh</plugin>
+      <priority>object</priority>
+      <params>
+        <factory>genCylinder.003</factory>
+        <material>parallaxAtt_barrel2-parallaxwood_barrel2_d.jpg</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='-6.96087' x='21.2347' z='28.2664'/>
+        <matrix>
+          <roty>-2.17626</roty>
+          <rotz>0.553402</rotz>
+          <rotx>1.5708</rotx>
+        </matrix>
+      </move>
+    </meshobj>
+    <meshobj name='Cylinder.231'>
+      <plugin>genmesh</plugin>
+      <priority>object</priority>
+      <params>
+        <factory>genCylinder.003</factory>
+        <material>parallaxAtt_barrel2-parallaxwood_barrel2_d.jpg</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='-5.83' x='20.4772' z='28.8385'/>
+        <matrix>
+          <roty>1.2376</roty>
+        </matrix>
+      </move>
+    </meshobj>
+    <meshobj name='Cylinder.230'>
+      <plugin>genmesh</plugin>
+      <priority>object</priority>
+      <params>
+        <factory>genCylinder.003</factory>
+        <material>parallaxAtt_barrel2-parallaxwood_barrel2_d.jpg</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='-6.81' x='21.479' z='29.3333'/>
+        <matrix>
+          <roty>-2.1242</roty>
+        </matrix>
+      </move>
+    </meshobj>
+    <meshobj name='Cylinder.025'>
+      <plugin>genmesh</plugin>
+      <priority>object</priority>
+      <params>
+        <factory>genCylinder.003</factory>
+        <material>parallaxAtt_barrel2-parallaxwood_barrel2_d.jpg</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='-6.81' x='20.6727' z='29.1317'/>
+        <matrix>
+          <roty>1.2376</roty>
+        </matrix>
+      </move>
+    </meshobj>
+    <meshobj name='Cylinder.012'>
+      <plugin>genmesh</plugin>
+      <priority>object</priority>
+      <params>
+        <factory>genCylinder.003</factory>
+        <material>parallaxAtt_barrel2-parallaxwood_barrel2_d.jpg</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='-6.81' x='20.2573' z='28.4354'/>
+      </move>
+    </meshobj>
+    <meshobj name='Cube.581'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>genCube.007</factory>
+        <material>parallaxAtt_wood2-parallaxwood_d.jpg</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='-6.8951' x='24.2712' z='20.9183'/>
+      </move>
+    </meshobj>
+    <meshobj name='Cube.580'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>genCube.007</factory>
+        <material>parallaxAtt_wood2-parallaxwood_d.jpg</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='-6.8951' x='24.2712' z='16.7183'/>
+      </move>
+    </meshobj>
+    <meshobj name='Cube.579'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>genCube.007</factory>
+        <material>parallaxAtt_wood2-parallaxwood_d.jpg</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='-6.8951' x='24.2712' z='12.5183'/>
+      </move>
+    </meshobj>
+    <meshobj name='Cube.578'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>genCube.007</factory>
+        <material>parallaxAtt_wood2-parallaxwood_d.jpg</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='-6.8951' x='15.6541' z='8.4459'/>
+      </move>
+    </meshobj>
+    <meshobj name='Cube.577'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>genCube.007</factory>
+        <material>parallaxAtt_wood2-parallaxwood_d.jpg</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='-6.8951' x='15.6423' z='21.04'/>
+      </move>
+    </meshobj>
+    <light name='Lamp.014'>
+      <center y='-5.1071' x='21.2151' z='27.0649'/>
+      <color blue='0.393562018871' green='0.800079286098' red='0.99938505888'/>
+      <radius brightness='10.0'>13.0</radius>
+      <attenuation>linear</attenuation>
+    </light>
+    <meshobj name='Cylinder.018'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>genCylinder.026</factory>
+        <material>parallaxAtt_plain_metal-parallacastle-metal_d.jpg</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='-5.55889' x='19.9495' z='19.1131'/>
+      </move>
+    </meshobj>
+    <light name='Lamp.003'>
+      <center y='-5.1071' x='18.6938' z='11.163'/>
+      <color blue='0.335614740849' green='0.76847165823' red='0.99938505888'/>
+      <radius brightness='10.0'>12.0</radius>
+      <attenuation>linear</attenuation>
+    </light>
+    <meshobj name='Cube.483'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>genCube.491</factory>
+        <material>parallaxAtt_detail1-parallaxcastle-detail1_d.jpg</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='-5.66814' x='19.9635' z='17.2742'/>
+      </move>
+    </meshobj>
+    <meshobj name='Cube.485'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>genCube.493</factory>
+        <material>parallaxAtt_wood2-parallaxwood_d.jpg</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='-6.89214' x='19.8869' z='12.7692'/>
+      </move>
+    </meshobj>
+    <meshobj name='Cube.488'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>genCube.496</factory>
+        <material>parallaxAtt_detail3-parallaxcastle-detail3_d.jpg</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='-6.99811' x='19.9573' z='14.745'/>
+      </move>
+    </meshobj>
+    <meshobj name='bment2_tables.001'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>genbment2_tables.001</factory>
+        <material>parallaxAtt_wood_parallaxwood.png</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='-6.84899' x='19.9584' z='19.4349'/>
+      </move>
+    </meshobj>
+    <meshobj name='Mesh'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>genMesh.001</factory>
+        <material>parallaxAtt_concrete4_3-parallaconcrete_floor4_3.png</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='-7.25428' x='19.9552' z='18.0282'/>
+      </move>
+    </meshobj>
+    <meshobj name='Mesh.001'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>genMesh</factory>
+        <material>parallaxAtt_wall-stone2-parallawall-stone2_2_d.jpg</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='-5.67058' x='19.9552' z='18.3282'/>
+      </move>
+    </meshobj>
+  </sector>
+  <meshfact name='parttorch.008'>
+    <plugin>crystalspace.mesh.loader.factory.particles</plugin>
+    <priority>transp</priority>
+    <ztest/>
+    <params>
+      <material>std_lighting_explo_firefire1.png</material>
+      <renderorientation>camface approx</renderorientation>
+      <rotationmode>none</rotationmode>
+      <sortmode>none</sortmode>
+      <integrationmode>linear</integrationmode>
+      <particlesize y='0.159999996424' x='0.159999996424'/>
+      <transformmode>local</transformmode>
+      <emitter type='sphere'>
+        <enabled>yes</enabled>
+        <uniformvelocity>yes</uniformvelocity>
+        <emissionrate>8</emissionrate>
+        <radius>0.0706334</radius>
+        <position y='0' x='0' z='0'/>
+        <initialvelocity y='0' x='0' z='0'/>
+        <mass max='1.0' min='1.0'/>
+        <initialttl max='2' min='1.5'/>
+        <placement>volume</placement>
+      </emitter>
+      <effector type='force'>
+        <acceleration y='0.3' x='0' z='0'/>
+        <force y='0.1' x='0' z='0'/>
+        <randomacceleration>1.0</randomacceleration>
+      </effector>
+      <effector type='lincolor'>
+        <color blue='0.16' green='0.5' red='0.9' time='1'/>
+        <color blue='0.16' green='0.5' red='0.9' time='0.9'/>
+        <color blue='0.144' green='0.45' red='0.81' time='0.8'/>
+        <color blue='0.128' green='0.4' red='0.72' time='0.6'/>
+        <color blue='0.096' green='0.3' red='0.54' time='0.5'/>
+        <color blue='0.064' green='0.2' red='0.36' time='0.4'/>
+        <color blue='0.032' green='0.1' red='0.18' time='0.3'/>
+        <color blue='0.0' green='0.0' red='0.0' time='0.1'/>
+        <color blue='0.0' green='0.0' red='0.0' time='0'/>
+      </effector>
+    </params>
+  </meshfact>
+  <meshfact name='parttorch.003'>
+    <plugin>crystalspace.mesh.loader.factory.particles</plugin>
+    <priority>transp</priority>
+    <ztest/>
+    <params>
+      <material>std_lighting_explo_firefire1.png</material>
+      <renderorientation>camface approx</renderorientation>
+      <rotationmode>none</rotationmode>
+      <sortmode>none</sortmode>
+      <integrationmode>linear</integrationmode>
+      <particlesize y='0.159999996424' x='0.159999996424'/>
+      <transformmode>local</transformmode>
+      <emitter type='sphere'>
+        <enabled>yes</enabled>
+        <uniformvelocity>yes</uniformvelocity>
+        <emissionrate>8</emissionrate>
+        <radius>0.0706334</radius>
+        <position y='0' x='0' z='0'/>
+        <initialvelocity y='0' x='0' z='0'/>
+        <mass max='1.0' min='1.0'/>
+        <initialttl max='2' min='1.5'/>
+        <placement>volume</placement>
+      </emitter>
+      <effector type='force'>
+        <acceleration y='0.3' x='0' z='0'/>
+        <force y='0.1' x='0' z='0'/>
+        <randomacceleration>1.0</randomacceleration>
+      </effector>
+      <effector type='lincolor'>
+        <color blue='0.16' green='0.5' red='0.9' time='1'/>
+        <color blue='0.16' green='0.5' red='0.9' time='0.9'/>
+        <color blue='0.144' green='0.45' red='0.81' time='0.8'/>
+        <color blue='0.128' green='0.4' red='0.72' time='0.6'/>
+        <color blue='0.096' green='0.3' red='0.54' time='0.5'/>
+        <color blue='0.064' green='0.2' red='0.36' time='0.4'/>
+        <color blue='0.032' green='0.1' red='0.18' time='0.3'/>
+        <color blue='0.0' green='0.0' red='0.0' time='0.1'/>
+        <color blue='0.0' green='0.0' red='0.0' time='0'/>
+      </effector>
+    </params>
+  </meshfact>
+  <sector name='basement00'>
+    <portals name='portal-int-bment00'>
+      <portal>
+        <v y='1.45712518692' x='0.0' z='1.2000002861'/>
+        <v y='1.45712518692' x='0.0' z='-1.2000002861'/>
+        <v y='-1.45712518692' x='0.0' z='-1.20000004768'/>
+        <v y='-1.45700097084' x='0.0' z='1.2000002861'/>
+        <sector>interior</sector>
+        <float/>
+      </portal>
+      <priority>portal</priority>
+      <hardmove>
+        <v y='3.89591' x='27.6176' z='28.3'/>
+        <matrix>
+          <scale y='1' x='1' z='1'/>
+        </matrix>
+      </hardmove>
+    </portals>
+    <portals name='portal-bment00-01'>
+      <portal>
+        <v y='1.25' x='2.20533735273e-007' z='0.675000190735'/>
+        <v y='-1.25' x='3.17889679025e-008' z='0.675000071526'/>
+        <v y='-1.24999952316' x='-2.20533735273e-007' z='-0.675000190735'/>
+        <v y='1.25' x='-3.17889750079e-008' z='-0.674999833107'/>
+        <sector>basement01</sector>
+        <float/>
+      </portal>
+      <priority>portal</priority>
+      <hardmove>
+        <v y='-1.75' x='12.54' z='28.355'/>
+        <matrix>
+          <scale y='1' x='1' z='1'/>
+        </matrix>
+      </hardmove>
+    </portals>
+    <renderloop>std_rloop_diffuse</renderloop>
+    <ambient blue='0.1' green='0.1' red='0.1'/>
+    <cullerp plugin='crystalspace.culling.dynavis'/>
+    <meshobj name='explo_small_fire.011'>
+      <plugin>particles</plugin>
+      <priority>transp</priority>
+      <params>
+        <factory>parttorch.008</factory>
+        <material>std_lighting_explo_firefire1.png</material>
+        <mixmode>
+          <add/>
+        </mixmode>
+      </params>
+      <ztest/>
+      <move>
+        <v y='-0.734875' x='16.4459' z='27.4553'/>
+      </move>
+    </meshobj>
+    <meshobj name='explo_small_fire.005'>
+      <plugin>particles</plugin>
+      <priority>transp</priority>
+      <params>
+        <factory>parttorch.003</factory>
+        <material>std_lighting_explo_firefire1.png</material>
+        <mixmode>
+          <add/>
+        </mixmode>
+      </params>
+      <ztest/>
+      <move>
+        <v y='2.75513' x='24.3059' z='27.4553'/>
+      </move>
+    </meshobj>
+    <meshobj name='Cylinder.229'>
+      <plugin>genmesh</plugin>
+      <priority>object</priority>
+      <params>
+        <factory>genCylinder.003</factory>
+        <material>parallaxAtt_barrel2-parallaxwood_barrel2_d.jpg</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='-1.58028' x='13.7392' z='27.5012'/>
+        <matrix>
+          <roty>-1.56883</roty>
+        </matrix>
+      </move>
+    </meshobj>
+    <meshobj name='Cylinder.028'>
+      <plugin>genmesh</plugin>
+      <priority>object</priority>
+      <params>
+        <factory>genCylinder.003</factory>
+        <material>parallaxAtt_barrel2-parallaxwood_barrel2_d.jpg</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='-2.56' x='14.1436' z='27.705'/>
+        <matrix>
+          <roty>-2.49156</roty>
+        </matrix>
+      </move>
+    </meshobj>
+    <meshobj name='Cylinder.026'>
+      <plugin>genmesh</plugin>
+      <priority>object</priority>
+      <params>
+        <factory>genCylinder.003</factory>
+        <material>parallaxAtt_barrel2-parallaxwood_barrel2_d.jpg</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='-2.56' x='13.4334' z='27.5113'/>
+        <matrix>
+          <roty>1.36677</roty>
+        </matrix>
+      </move>
+    </meshobj>
+    <meshobj name='Cube.008'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>genCube.009</factory>
+        <material>parallaxAtt_detail2-parallaxcastle-detail2_d.jpg</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='4.40808' x='27.244' z='28.4002'/>
+      </move>
+    </meshobj>
+    <meshobj name='Cylinder.016'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>genCylinder.014</factory>
+        <material>parallaxAtt_plain_metal-parallacastle-metal_d.jpg</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='0.791105' x='20.374' z='27.317'/>
+      </move>
+    </meshobj>
+    <light name='Lamp.013'>
+      <center y='-0.69421' x='16.4605' z='27.7789'/>
+      <color blue='0.335614740849' green='0.76847165823' red='0.99938505888'/>
+      <radius brightness='10.0'>10.0</radius>
+      <attenuation>linear</attenuation>
+    </light>
+    <light name='Lamp.011'>
+      <center y='2.92413' x='24.3204' z='27.7789'/>
+      <color blue='0.393562018871' green='0.800079286098' red='0.99938505888'/>
+      <radius brightness='10.0'>10.0</radius>
+      <attenuation>linear</attenuation>
+    </light>
+    <meshobj name='baset-floor00'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>genbase-floor00</factory>
+        <material>parallaxAtt_concrete4_3-parallaconcrete_floor4_3.png</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='-3.05' x='14.04' z='28.37'/>
+      </move>
+    </meshobj>
+    <meshobj name='base-stair-wall'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>genbase-stair-wall</factory>
+        <material>parallaxAtt_wall-stone2-parallawall-stone2_2_d.jpg</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='1.12835' x='19.76' z='27.4799'/>
+      </move>
+    </meshobj>
+    <meshobj name='base-stairs.001'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>genbase-stairs.001</factory>
+        <material>parallaxAtt_brick1-parallaxbrick1_d.jpg</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='-0.261231' x='21.069' z='28.3'/>
+      </move>
+    </meshobj>
+  </sector>
+  <meshfact name='parttorch.042'>
+    <plugin>crystalspace.mesh.loader.factory.particles</plugin>
+    <priority>transp</priority>
+    <ztest/>
+    <params>
+      <material>std_lighting_explo_firefire1.png</material>
+      <renderorientation>camface approx</renderorientation>
+      <rotationmode>none</rotationmode>
+      <sortmode>none</sortmode>
+      <integrationmode>linear</integrationmode>
+      <particlesize y='0.159999996424' x='0.159999996424'/>
+      <transformmode>local</transformmode>
+      <emitter type='sphere'>
+        <enabled>yes</enabled>
+        <uniformvelocity>yes</uniformvelocity>
+        <emissionrate>8</emissionrate>
+        <radius>0.0706334</radius>
+        <position y='0' x='0' z='0'/>
+        <initialvelocity y='0' x='0' z='0'/>
+        <mass max='1.0' min='1.0'/>
+        <initialttl max='2' min='1.5'/>
+        <placement>volume</placement>
+      </emitter>
+      <effector type='force'>
+        <acceleration y='0.3' x='0' z='0'/>
+        <force y='0.1' x='0' z='0'/>
+        <randomacceleration>1.0</randomacceleration>
+      </effector>
+      <effector type='lincolor'>
+        <color blue='0.16' green='0.5' red='0.9' time='1'/>
+        <color blue='0.16' green='0.5' red='0.9' time='0.9'/>
+        <color blue='0.144' green='0.45' red='0.81' time='0.8'/>
+        <color blue='0.128' green='0.4' red='0.72' time='0.6'/>
+        <color blue='0.096' green='0.3' red='0.54' time='0.5'/>
+        <color blue='0.064' green='0.2' red='0.36' time='0.4'/>
+        <color blue='0.032' green='0.1' red='0.18' time='0.3'/>
+        <color blue='0.0' green='0.0' red='0.0' time='0.1'/>
+        <color blue='0.0' green='0.0' red='0.0' time='0'/>
+      </effector>
+    </params>
+  </meshfact>
+  <meshfact name='parttorch.016'>
+    <plugin>crystalspace.mesh.loader.factory.particles</plugin>
+    <priority>transp</priority>
+    <ztest/>
+    <params>
+      <material>std_lighting_explo_firefire1.png</material>
+      <renderorientation>camface approx</renderorientation>
+      <rotationmode>none</rotationmode>
+      <sortmode>none</sortmode>
+      <integrationmode>linear</integrationmode>
+      <particlesize y='0.159999996424' x='0.159999996424'/>
+      <transformmode>local</transformmode>
+      <emitter type='sphere'>
+        <enabled>yes</enabled>
+        <uniformvelocity>yes</uniformvelocity>
+        <emissionrate>8</emissionrate>
+        <radius>0.0706334</radius>
+        <position y='0' x='0' z='0'/>
+        <initialvelocity y='0' x='0' z='0'/>
+        <mass max='1.0' min='1.0'/>
+        <initialttl max='2' min='1.5'/>
+        <placement>volume</placement>
+      </emitter>
+      <effector type='force'>
+        <acceleration y='0.3' x='0' z='0'/>
+        <force y='0.1' x='0' z='0'/>
+        <randomacceleration>1.0</randomacceleration>
+      </effector>
+      <effector type='lincolor'>
+        <color blue='0.16' green='0.5' red='0.9' time='1'/>
+        <color blue='0.16' green='0.5' red='0.9' time='0.9'/>
+        <color blue='0.144' green='0.45' red='0.81' time='0.8'/>
+        <color blue='0.128' green='0.4' red='0.72' time='0.6'/>
+        <color blue='0.096' green='0.3' red='0.54' time='0.5'/>
+        <color blue='0.064' green='0.2' red='0.36' time='0.4'/>
+        <color blue='0.032' green='0.1' red='0.18' time='0.3'/>
+        <color blue='0.0' green='0.0' red='0.0' time='0.1'/>
+        <color blue='0.0' green='0.0' red='0.0' time='0'/>
+      </effector>
+    </params>
+  </meshfact>
+  <sector name='basement01'>
+    <portals name='Plane.006'>
+      <portal>
+        <v y='-1.24999952316' x='-0.675000309944' z='7.52002904392e-008'/>
+        <v y='-1.25' x='0.674999952316' z='-7.52002762283e-008'/>
+        <v y='1.25' x='0.675000309944' z='-7.52002904392e-008'/>
+        <v y='1.25' x='-0.674999713898' z='7.52002620175e-008'/>
+        <sector>basement02</sector>
+        <float/>
+      </portal>
+      <priority>portal</priority>
+      <hardmove>
+        <v y='-1.75' x='10.545' z='22.9'/>
+        <matrix>
+          <scale y='1' x='1' z='1'/>
+        </matrix>
+      </hardmove>
+    </portals>
+    <portals name='Plane.003'>
+      <portal>
+        <v y='-1.24999952316' x='-2.20533735273e-007' z='-0.675000190735'/>
+        <v y='-1.25' x='3.17889750079e-008' z='0.675000071526'/>
+        <v y='1.25' x='2.20533735273e-007' z='0.675000190735'/>
+        <v y='1.25' x='-3.17889679025e-008' z='-0.674999833107'/>
+        <sector>basement00</sector>
+        <float/>
+      </portal>
+      <priority>portal</priority>
+      <hardmove>
+        <v y='-1.75' x='12.54' z='28.355'/>
+        <matrix>
+          <scale y='1' x='1' z='1'/>
+        </matrix>
+      </hardmove>
+    </portals>
+    <portals name='basement-walls.010'>
+      <portal>
+        <v y='-2.08591270447' x='1.51006770134' z='0.0'/>
+        <v y='2.08591270447' x='1.51007223129' z='0.0'/>
+        <v y='2.08591270447' x='-1.51007223129' z='0.0'/>
+        <v y='-2.08591270447' x='-1.51007223129' z='0.0'/>
+        <sector>basement03</sector>
+        <float/>
+        <zfill/>
+      </portal>
+      <priority>portal</priority>
+      <hardmove>
+        <v y='-5.21409' x='6.25171' z='30.3941'/>
+        <matrix>
+          <scale y='1' x='1' z='1'/>
+        </matrix>
+      </hardmove>
+    </portals>
+    <renderloop>std_rloop_diffuse</renderloop>
+    <ambient blue='0.1' green='0.1' red='0.1'/>
+    <cullerp plugin='crystalspace.culling.dynavis'/>
+    <meshobj name='explo_small_fire.013'>
+      <plugin>particles</plugin>
+      <priority>transp</priority>
+      <params>
+        <factory>parttorch.042</factory>
+        <material>std_lighting_explo_firefire1.png</material>
+        <mixmode>
+          <add/>
+        </mixmode>
+      </params>
+      <ztest/>
+      <move>
+        <v y='-2.93487' x='0.869642' z='30.4399'/>
+      </move>
+    </meshobj>
+    <meshobj name='explo_small_fire.008'>
+      <plugin>particles</plugin>
+      <priority>transp</priority>
+      <params>
+        <factory>parttorch.016</factory>
+        <material>std_lighting_explo_firefire1.png</material>
+        <mixmode>
+          <add/>
+        </mixmode>
+      </params>
+      <ztest/>
+      <move>
+        <v y='-1.23487' x='12.2309' z='29.2323'/>
+      </move>
+    </meshobj>
+    <meshobj name='Cylinder.228'>
+      <plugin>genmesh</plugin>
+      <priority>object</priority>
+      <params>
+        <factory>genCylinder.002</factory>
+        <material>parallaxAtt_barrel-parallaxwood_barrel_d.jpg</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='-2.71021' x='5.25483' z='24.9006'/>
+        <matrix>
+          <roty>0.840223</roty>
+          <rotz>-3.52901e-024</rotz>
+          <rotx>-4.93038e-032</rotx>
+        </matrix>
+      </move>
+    </meshobj>
+    <meshobj name='Cylinder.227'>
+      <plugin>genmesh</plugin>
+      <priority>object</priority>
+      <params>
+        <factory>genCylinder.002</factory>
+        <material>parallaxAtt_barrel-parallaxwood_barrel_d.jpg</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='-1.58072' x='4.45398' z='24.9398'/>
+        <matrix>
+          <roty>-1.39705</roty>
+          <rotz>-2.22045e-016</rotz>
+          <rotx>-1.5708</rotx>
+        </matrix>
+      </move>
+    </meshobj>
+    <meshobj name='Cylinder.226'>
+      <plugin>genmesh</plugin>
+      <priority>object</priority>
+      <params>
+        <factory>genCylinder.002</factory>
+        <material>parallaxAtt_barrel-parallaxwood_barrel_d.jpg</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='-2.55804' x='4.43339' z='25.3715'/>
+        <matrix>
+          <roty>2.22045e-016</roty>
+          <rotz>-2.22045e-016</rotz>
+          <rotx>-1.5708</rotx>
+        </matrix>
+      </move>
+    </meshobj>
+    <meshobj name='Cylinder.031'>
+      <plugin>genmesh</plugin>
+      <priority>object</priority>
+      <params>
+        <factory>genCylinder.003</factory>
+        <material>parallaxAtt_barrel2-parallaxwood_barrel2_d.jpg</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='-1.58067' x='4.49812' z='24.2085'/>
+        <matrix>
+          <roty>0.387183</roty>
+        </matrix>
+      </move>
+    </meshobj>
+    <meshobj name='Cylinder.030'>
+      <plugin>genmesh</plugin>
+      <priority>object</priority>
+      <params>
+        <factory>genCylinder.003</factory>
+        <material>parallaxAtt_barrel2-parallaxwood_barrel2_d.jpg</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='-2.56' x='4.33945' z='24.6592'/>
+        <matrix>
+          <roty>0.387183</roty>
+        </matrix>
+      </move>
+    </meshobj>
+    <meshobj name='Cylinder.029'>
+      <plugin>genmesh</plugin>
+      <priority>object</priority>
+      <params>
+        <factory>genCylinder.003</factory>
+        <material>parallaxAtt_barrel2-parallaxwood_barrel2_d.jpg</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='-2.56' x='4.94335' z='24.2576'/>
+        <matrix>
+          <roty>1.36677</roty>
+        </matrix>
+      </move>
+    </meshobj>
+    <meshobj name='Cylinder.027'>
+      <plugin>genmesh</plugin>
+      <priority>object</priority>
+      <params>
+        <factory>genCylinder.003</factory>
+        <material>parallaxAtt_barrel2-parallaxwood_barrel2_d.jpg</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='-2.56' x='4.3454' z='23.7548'/>
+        <matrix>
+          <roty>-0.294128</roty>
+        </matrix>
+      </move>
+    </meshobj>
+    <meshobj name='Cylinder.019'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>genCylinder.018</factory>
+        <material>parallaxAtt_plain_metal-parallacastle-metal_d.jpg</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='-2.3089' x='6.55105' z='26.9355'/>
+      </move>
+    </meshobj>
+    <meshobj name='basement-walls.001'>
+      <plugin>genmesh</plugin>
+      <priority>object</priority>
+      <params>
+        <factory>genbasement-walls.014</factory>
+        <material>parallaxAtt_barrel2-parallaxwood_barrel2_d.jpg</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='-1.74442' x='6.30369' z='23.15'/>
+      </move>
+    </meshobj>
+    <light name='Lamp.006'>
+      <center y='-2.72706' x='1.1391' z='30.4443'/>
+      <color blue='0.335614740849' green='0.76847165823' red='0.99938505888'/>
+      <radius brightness='10.0'>12.0</radius>
+      <attenuation>linear</attenuation>
+    </light>
+    <light name='Lamp.004'>
+      <center y='-1.1071' x='11.8857' z='29.2387'/>
+      <color blue='0.393562018871' green='0.800079286098' red='0.99938505888'/>
+      <radius brightness='10.0'>15.0</radius>
+      <attenuation>linear</attenuation>
+    </light>
+    <meshobj name='basement-walls.005'>
+      <plugin>genmesh</plugin>
+      <priority>object</priority>
+      <params>
+        <factory>genbasement-walls.007</factory>
+        <material>parallaxAtt_concrete4_3-parallaconcrete_floor4_3.png</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='-3.05' x='8.19' z='26.85'/>
+      </move>
+    </meshobj>
+    <meshobj name='Cube.240'>
+      <plugin>genmesh</plugin>
+      <priority>object</priority>
+      <params>
+        <factory>genCube.219</factory>
+        <material>parallaxAtt_wall-stone-parallaxwall-stone_2_d.jpg</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='-4.85' x='4.16554' z='30.4002'/>
+      </move>
+    </meshobj>
+    <meshobj name='basement-walls.004'>
+      <plugin>genmesh</plugin>
+      <priority>object</priority>
+      <params>
+        <factory>genbasement-walls.004</factory>
+        <material>parallaxAtt_brick1-parallaxbrick1_d.jpg</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='-3.3' x='6.55966' z='28.3303'/>
+      </move>
+    </meshobj>
+  </sector>
+  <meshfact name='parttorch.043'>
+    <plugin>crystalspace.mesh.loader.factory.particles</plugin>
+    <priority>transp</priority>
+    <ztest/>
+    <params>
+      <material>std_lighting_explo_firefire1.png</material>
+      <renderorientation>camface approx</renderorientation>
+      <rotationmode>none</rotationmode>
+      <sortmode>none</sortmode>
+      <integrationmode>linear</integrationmode>
+      <particlesize y='0.159999996424' x='0.159999996424'/>
+      <transformmode>local</transformmode>
+      <emitter type='sphere'>
+        <enabled>yes</enabled>
+        <uniformvelocity>yes</uniformvelocity>
+        <emissionrate>8</emissionrate>
+        <radius>0.0706334</radius>
+        <position y='0' x='0' z='0'/>
+        <initialvelocity y='0' x='0' z='0'/>
+        <mass max='1.0' min='1.0'/>
+        <initialttl max='2' min='1.5'/>
+        <placement>volume</placement>
+      </emitter>
+      <effector type='force'>
+        <acceleration y='0.3' x='0' z='0'/>
+        <force y='0.1' x='0' z='0'/>
+        <randomacceleration>1.0</randomacceleration>
+      </effector>
+      <effector type='lincolor'>
+        <color blue='0.16' green='0.5' red='0.9' time='1'/>
+        <color blue='0.16' green='0.5' red='0.9' time='0.9'/>
+        <color blue='0.144' green='0.45' red='0.81' time='0.8'/>
+        <color blue='0.128' green='0.4' red='0.72' time='0.6'/>
+        <color blue='0.096' green='0.3' red='0.54' time='0.5'/>
+        <color blue='0.064' green='0.2' red='0.36' time='0.4'/>
+        <color blue='0.032' green='0.1' red='0.18' time='0.3'/>
+        <color blue='0.0' green='0.0' red='0.0' time='0.1'/>
+        <color blue='0.0' green='0.0' red='0.0' time='0'/>
+      </effector>
+    </params>
+  </meshfact>
+  <meshfact name='parttorch.024'>
+    <plugin>crystalspace.mesh.loader.factory.particles</plugin>
+    <priority>transp</priority>
+    <ztest/>
+    <params>
+      <material>std_lighting_explo_firefire1.png</material>
+      <renderorientation>camface approx</renderorientation>
+      <rotationmode>none</rotationmode>
+      <sortmode>none</sortmode>
+      <integrationmode>linear</integrationmode>
+      <particlesize y='0.159999996424' x='0.159999996424'/>
+      <transformmode>local</transformmode>
+      <emitter type='sphere'>
+        <enabled>yes</enabled>
+        <uniformvelocity>yes</uniformvelocity>
+        <emissionrate>8</emissionrate>
+        <radius>0.0706334</radius>
+        <position y='0' x='0' z='0'/>
+        <initialvelocity y='0' x='0' z='0'/>
+        <mass max='1.0' min='1.0'/>
+        <initialttl max='2' min='1.5'/>
+        <placement>volume</placement>
+      </emitter>
+      <effector type='force'>
+        <acceleration y='0.3' x='0' z='0'/>
+        <force y='0.1' x='0' z='0'/>
+        <randomacceleration>1.0</randomacceleration>
+      </effector>
+      <effector type='lincolor'>
+        <color blue='0.16' green='0.5' red='0.9' time='1'/>
+        <color blue='0.16' green='0.5' red='0.9' time='0.9'/>
+        <color blue='0.144' green='0.45' red='0.81' time='0.8'/>
+        <color blue='0.128' green='0.4' red='0.72' time='0.6'/>
+        <color blue='0.096' green='0.3' red='0.54' time='0.5'/>
+        <color blue='0.064' green='0.2' red='0.36' time='0.4'/>
+        <color blue='0.032' green='0.1' red='0.18' time='0.3'/>
+        <color blue='0.0' green='0.0' red='0.0' time='0.1'/>
+        <color blue='0.0' green='0.0' red='0.0' time='0'/>
+      </effector>
+    </params>
+  </meshfact>
+  <sector name='basement02'>
+    <portals name='portal-2-1'>
+      <portal>
+        <v y='1.25' x='0.675000309944' z='-7.52002904392e-008'/>
+        <v y='-1.25' x='0.674999952316' z='-7.52002762283e-008'/>
+        <v y='-1.24999952316' x='-0.675000309944' z='7.52002904392e-008'/>
+        <v y='1.25' x='-0.674999713898' z='7.52002620175e-008'/>
+        <sector>basement01</sector>
+        <float/>
+      </portal>
+      <priority>portal</priority>
+      <hardmove>
+        <v y='-1.75' x='10.545' z='22.9'/>
+        <matrix>
+          <scale y='1' x='1' z='1'/>
+        </matrix>
+      </hardmove>
+    </portals>
+    <renderloop>std_rloop_diffuse</renderloop>
+    <ambient blue='0.1' green='0.1' red='0.1'/>
+    <cullerp plugin='crystalspace.culling.dynavis'/>
+    <meshobj name='explo_small_fire.006'>
+      <plugin>particles</plugin>
+      <priority>transp</priority>
+      <params>
+        <factory>parttorch.043</factory>
+        <material>std_lighting_explo_firefire1.png</material>
+        <mixmode>
+          <add/>
+        </mixmode>
+      </params>
+      <ztest/>
+      <move>
+        <v y='-1.23487' x='6.95276' z='15.1764'/>
+      </move>
+    </meshobj>
+    <meshobj name='explo_small_fire.018'>
+      <plugin>particles</plugin>
+      <priority>transp</priority>
+      <params>
+        <factory>parttorch.024</factory>
+        <material>std_lighting_explo_firefire1.png</material>
+        <mixmode>
+          <add/>
+        </mixmode>
+      </params>
+      <ztest/>
+      <move>
+        <v y='-1.23487' x='18.9528' z='15.1764'/>
+      </move>
+    </meshobj>
+    <meshobj name='Sphere.006'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>genSphere.001</factory>
+        <material>parallaxAtt_detail1-parallaxcastle-detail1_d.jpg</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='-2.5174' x='5.39809' z='15.4119'/>
+      </move>
+    </meshobj>
+    <meshobj name='Sphere.004'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>genSphere.001</factory>
+        <material>parallaxAtt_detail1-parallaxcastle-detail1_d.jpg</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='-2.5174' x='19.5995' z='20.6'/>
+      </move>
+    </meshobj>
+    <meshobj name='Sphere.003'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>genSphere.001</factory>
+        <material>parallaxAtt_detail1-parallaxcastle-detail1_d.jpg</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='-2.5174' x='15.66' z='20.7'/>
+      </move>
+    </meshobj>
+    <meshobj name='Sphere.002'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>genSphere</factory>
+        <material>parallaxAtt_barrel2-parallaxwood_barrel2_d.jpg</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='-2.1652' x='20.5205' z='19.8824'/>
+        <matrix>
+          <roty>0.258573</roty>
+          <rotz>-1.63676</rotz>
+          <rotx>-0.878434</rotx>
+        </matrix>
+      </move>
+    </meshobj>
+    <meshobj name='Sphere.001'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>genSphere</factory>
+        <material>parallaxAtt_barrel2-parallaxwood_barrel2_d.jpg</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='-2.17965' x='20.4971' z='19.5045'/>
+        <matrix>
+          <roty>-0.629859</roty>
+          <rotz>-1.63714</rotz>
+          <rotx>0.0114126</rotx>
+        </matrix>
+      </move>
+    </meshobj>
+    <meshobj name='Sphere'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>genSphere</factory>
+        <material>parallaxAtt_barrel2-parallaxwood_barrel2_d.jpg</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='0.114126' x='21.0974' z='16.6'/>
+      </move>
+    </meshobj>
+    <meshobj name='bment2_tables.018'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>genbment2_tables.002</factory>
+        <material>parallaxAtt_wood_parallaxwood.png</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='-2.60346' x='7.94132' z='19.6201'/>
+        <matrix>
+          <roty>2.48026</roty>
+          <rotz>-0.00151744</rotz>
+          <rotx>0.0421759</rotx>
+        </matrix>
+      </move>
+    </meshobj>
+    <meshobj name='bment2_tables.017'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>genbment2_tables.002</factory>
+        <material>parallaxAtt_wood_parallaxwood.png</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='-2.83043' x='8.8489' z='19.8469'/>
+        <matrix>
+          <roty>2.44206</roty>
+          <rotz>-1.49929</rotz>
+          <rotx>3.87356e-007</rotx>
+        </matrix>
+      </move>
+    </meshobj>
+    <meshobj name='bment2_tables.016'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>genbment2_tables.002</factory>
+        <material>parallaxAtt_wood_parallaxwood.png</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='-2.60346' x='11.2853' z='15.3698'/>
+        <matrix>
+          <roty>-2.91525</roty>
+          <rotz>-0.00151744</rotz>
+          <rotx>0.0421759</rotx>
+        </matrix>
+      </move>
+    </meshobj>
+    <meshobj name='bment2_tables.015'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>genbment2_tables.002</factory>
+        <material>parallaxAtt_wood_parallaxwood.png</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='-2.60346' x='12.9297' z='15.3244'/>
+        <matrix>
+          <roty>-1.03647</roty>
+          <rotz>-0.00151744</rotz>
+          <rotx>0.0421759</rotx>
+        </matrix>
+      </move>
+    </meshobj>
+    <meshobj name='bment2_tables.014'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>genbment2_tables.003</factory>
+        <material>parallaxAtt_wood_parallaxwood.png</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='-2.59898' x='16.3485' z='15.7055'/>
+        <matrix>
+          <roty>1.5844</roty>
+        </matrix>
+      </move>
+    </meshobj>
+    <meshobj name='bment2_tables.013'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>genbment2_tables.003</factory>
+        <material>parallaxAtt_wood_parallaxwood.png</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='-2.59898' x='17.4309' z='15.724'/>
+        <matrix>
+          <roty>-1.57188</roty>
+        </matrix>
+      </move>
+    </meshobj>
+    <meshobj name='bment2_tables.012'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>genbment2_tables.003</factory>
+        <material>parallaxAtt_wood_parallaxwood.png</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='-2.59898' x='13.9524' z='15.724'/>
+        <matrix>
+          <roty>1.53332</roty>
+        </matrix>
+      </move>
+    </meshobj>
+    <meshobj name='bment2_tables.011'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>genbment2_tables.003</factory>
+        <material>parallaxAtt_wood_parallaxwood.png</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='-2.59898' x='15.0348' z='15.7055'/>
+        <matrix>
+          <roty>-1.60827</roty>
+        </matrix>
+      </move>
+    </meshobj>
+    <meshobj name='bment2_tables.007'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>genbment2_tables.002</factory>
+        <material>parallaxAtt_wood_parallaxwood.png</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='-2.60346' x='16.9015' z='16.563'/>
+        <matrix>
+          <roty>1.52913</roty>
+          <rotz>-0.00151744</rotz>
+          <rotx>0.0421759</rotx>
+        </matrix>
+      </move>
+    </meshobj>
+    <meshobj name='bment2_tables.010'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>genbment2_tables.002</factory>
+        <material>parallaxAtt_wood_parallaxwood.png</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='-2.80033' x='13.1799' z='16.5179'/>
+        <matrix>
+          <roty>0.135993</roty>
+          <rotz>-0.0378789</rotz>
+          <rotx>1.62013</rotx>
+        </matrix>
+      </move>
+    </meshobj>
+    <meshobj name='bment2_tables.009'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>genbment2_tables.002</factory>
+        <material>parallaxAtt_wood_parallaxwood.png</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='-2.80033' x='9.77386' z='19.5047'/>
+        <matrix>
+          <roty>0.877058</roty>
+          <rotz>-0.0378789</rotz>
+          <rotx>1.62013</rotx>
+        </matrix>
+      </move>
+    </meshobj>
+    <meshobj name='bment2_tables.008'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>genbment2_tables.002</factory>
+        <material>parallaxAtt_wood_parallaxwood.png</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='-2.83043' x='12.3936' z='17.2892'/>
+        <matrix>
+          <roty>0.889485</roty>
+          <rotz>-1.49929</rotz>
+          <rotx>3.87356e-007</rotx>
+        </matrix>
+      </move>
+    </meshobj>
+    <meshobj name='bment2_tables.006'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>genbment2_tables.004</factory>
+        <material>parallaxAtt_wood_parallaxwood.png</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='-2.625' x='20.5106' z='19.0928'/>
+        <matrix>
+          <roty>0.00552428</roty>
+        </matrix>
+      </move>
+    </meshobj>
+    <meshobj name='bment2_tables.005'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>genbment2_tables.004</factory>
+        <material>parallaxAtt_wood_parallaxwood.png</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='-2.625' x='4.59984' z='17.6979'/>
+        <matrix>
+          <roty>0.00552428</roty>
+        </matrix>
+      </move>
+    </meshobj>
+    <meshobj name='bment2_tables.004'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>genbment2_tables.004</factory>
+        <material>parallaxAtt_wood_parallaxwood.png</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='-2.625' x='4.58362' z='21.1526'/>
+      </move>
+    </meshobj>
+    <meshobj name='bment2_tables.003'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>genbment2_tables.003</factory>
+        <material>parallaxAtt_wood_parallaxwood.png</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='-2.59898' x='8.79026' z='18.2958'/>
+        <matrix>
+          <roty>-2.94034</roty>
+        </matrix>
+      </move>
+    </meshobj>
+    <meshobj name='bment2_tables.002'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>genbment2_tables.002</factory>
+        <material>parallaxAtt_wood_parallaxwood.png</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='-2.60346' x='14.5218' z='16.6075'/>
+        <matrix>
+          <roty>1.52913</roty>
+          <rotz>-0.00151744</rotz>
+          <rotx>0.0421759</rotx>
+        </matrix>
+      </move>
+    </meshobj>
+    <meshobj name='Cylinder.022'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>genCylinder.022</factory>
+        <material>parallaxAtt_plain_metal-parallacastle-metal_d.jpg</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='-1.45889' x='12.7024' z='18.904'/>
+      </move>
+    </meshobj>
+    <meshobj name='bment2-candleholders'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>genbment2-candleholders</factory>
+        <material>parallaxAtt_plain_metal-parallacastle-metal_d.jpg</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='-2.11045' x='12.7348' z='17.3015'/>
+      </move>
+    </meshobj>
+    <meshobj name='Cube.337'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>genCube.016</factory>
+        <material>parallaxAtt_detail1-parallaxcastle-detail1_d.jpg</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='-0.138478' x='21.1268' z='17.9877'/>
+      </move>
+    </meshobj>
+    <meshobj name='Sphere.005'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>genSphere.006</factory>
+        <material>parallaxAtt_detail1-parallaxcastle-detail1_d.jpg</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='-1.41075' x='13.3917' z='19.0487'/>
+      </move>
+    </meshobj>
+    <meshobj name='bment2_tables'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>genbment2_tables</factory>
+        <material>parallaxAtt_wood_parallaxwood.png</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='-2.6257' x='12.0991' z='17.2485'/>
+      </move>
+    </meshobj>
+    <meshobj name='bment2-floor'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>genbment2-floor</factory>
+        <material>parallaxAtt_concrete4_3-parallaconcrete_floor4_3.png</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='-3.05' x='12.54' z='18.9'/>
+      </move>
+    </meshobj>
+    <meshobj name='bment2-walls'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>genbment2-walls</factory>
+        <material>parallaxAtt_concrete6-parallaxconcrete_floor6_d.jpg</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='-1.075' x='12.54' z='19.15'/>
+      </move>
+    </meshobj>
+    <light name='Lamp.007'>
+      <center y='-1.2071' x='6.95591' z='15.4545'/>
+      <color blue='0.335614740849' green='0.76847165823' red='0.99938505888'/>
+      <radius brightness='10.0'>15.0</radius>
+      <attenuation>linear</attenuation>
+    </light>
+    <light name='Lamp.008'>
+      <center y='-1.2071' x='18.9559' z='15.4545'/>
+      <color blue='0.393562018871' green='0.800079286098' red='0.99938505888'/>
+      <radius brightness='10.0'>13.0</radius>
+      <attenuation>linear</attenuation>
+    </light>
+  </sector>
+  <meshfact name='parttorch'>
+    <plugin>crystalspace.mesh.loader.factory.particles</plugin>
+    <priority>transp</priority>
+    <ztest/>
+    <params>
+      <material>std_lighting_explo_firefire1.png</material>
+      <renderorientation>camface approx</renderorientation>
+      <rotationmode>none</rotationmode>
+      <sortmode>none</sortmode>
+      <integrationmode>linear</integrationmode>
+      <particlesize y='0.159999996424' x='0.159999996424'/>
+      <transformmode>local</transformmode>
+      <emitter type='sphere'>
+        <enabled>yes</enabled>
+        <uniformvelocity>yes</uniformvelocity>
+        <emissionrate>8</emissionrate>
+        <radius>0.0706334</radius>
+        <position y='0' x='0' z='0'/>
+        <initialvelocity y='0' x='0' z='0'/>
+        <mass max='1.0' min='1.0'/>
+        <initialttl max='2' min='1.5'/>
+        <placement>volume</placement>
+      </emitter>
+      <effector type='force'>
+        <acceleration y='0.3' x='0' z='0'/>
+        <force y='0.1' x='0' z='0'/>
+        <randomacceleration>1.0</randomacceleration>
+      </effector>
+      <effector type='lincolor'>
+        <color blue='0.16' green='0.5' red='0.9' time='1'/>
+        <color blue='0.16' green='0.5' red='0.9' time='0.9'/>
+        <color blue='0.144' green='0.45' red='0.81' time='0.8'/>
+        <color blue='0.128' green='0.4' red='0.72' time='0.6'/>
+        <color blue='0.096' green='0.3' red='0.54' time='0.5'/>
+        <color blue='0.064' green='0.2' red='0.36' time='0.4'/>
+        <color blue='0.032' green='0.1' red='0.18' time='0.3'/>
+        <color blue='0.0' green='0.0' red='0.0' time='0.1'/>
+        <color blue='0.0' green='0.0' red='0.0' time='0'/>
+      </effector>
+    </params>
+  </meshfact>
+  <meshfact name='parttorch.033'>
+    <plugin>crystalspace.mesh.loader.factory.particles</plugin>
+    <priority>transp</priority>
+    <ztest/>
+    <params>
+      <material>std_lighting_explo_firefire1.png</material>
+      <renderorientation>camface approx</renderorientation>
+      <rotationmode>none</rotationmode>
+      <sortmode>none</sortmode>
+      <integrationmode>linear</integrationmode>
+      <particlesize y='0.159999996424' x='0.159999996424'/>
+      <transformmode>local</transformmode>
+      <emitter type='sphere'>
+        <enabled>yes</enabled>
+        <uniformvelocity>yes</uniformvelocity>
+        <emissionrate>8</emissionrate>
+        <radius>0.0706334</radius>
+        <position y='0' x='0' z='0'/>
+        <initialvelocity y='0' x='0' z='0'/>
+        <mass max='1.0' min='1.0'/>
+        <initialttl max='2' min='1.5'/>
+        <placement>volume</placement>
+      </emitter>
+      <effector type='force'>
+        <acceleration y='0.3' x='0' z='0'/>
+        <force y='0.1' x='0' z='0'/>
+        <randomacceleration>1.0</randomacceleration>
+      </effector>
+      <effector type='lincolor'>
+        <color blue='0.16' green='0.5' red='0.9' time='1'/>
+        <color blue='0.16' green='0.5' red='0.9' time='0.9'/>
+        <color blue='0.144' green='0.45' red='0.81' time='0.8'/>
+        <color blue='0.128' green='0.4' red='0.72' time='0.6'/>
+        <color blue='0.096' green='0.3' red='0.54' time='0.5'/>
+        <color blue='0.064' green='0.2' red='0.36' time='0.4'/>
+        <color blue='0.032' green='0.1' red='0.18' time='0.3'/>
+        <color blue='0.0' green='0.0' red='0.0' time='0.1'/>
+        <color blue='0.0' green='0.0' red='0.0' time='0'/>
+      </effector>
+    </params>
+  </meshfact>
+  <sector name='basement03'>
+    <portals name='basement-walls.006'>
+      <portal>
+        <v y='-2.08591294289' x='1.51006793976' z='0.0'/>
+        <v y='-2.08591294289' x='-1.51007270813' z='0.0'/>
+        <v y='2.08591294289' x='-1.51007270813' z='0.0'/>
+        <v y='2.08591294289' x='1.51007270813' z='0.0'/>
+        <sector>basement01</sector>
+        <float/>
+        <zfill/>
+      </portal>
+      <priority>portal</priority>
+      <hardmove>
+        <v y='-5.21409' x='6.25171' z='30.3941'/>
+        <matrix>
+          <scale y='1' x='1' z='1'/>
+        </matrix>
+      </hardmove>
+    </portals>
+    <portals name='Plane.024'>
+      <portal>
+        <v y='1.25' x='0.0' z='0.675000190735'/>
+        <v y='-1.25' x='0.0' z='0.675000190735'/>
+        <v y='-1.25' x='0.0' z='-0.675000190735'/>
+        <v y='1.25' x='0.0' z='-0.674999713898'/>
+        <sector>basement04</sector>
+        <float/>
+      </portal>
+      <priority>portal</priority>
+      <hardmove>
+        <v y='-5.98' x='3.43999' z='23.395'/>
+        <matrix>
+          <scale y='1' x='1' z='1'/>
+        </matrix>
+      </hardmove>
+    </portals>
+    <portals name='Plane'>
+      <portal>
+        <v y='-1.25' x='-2.38418579102e-007' z='-0.675000190735'/>
+        <v y='-1.25' x='0.0' z='0.675000190735'/>
+        <v y='1.25' x='2.38418579102e-007' z='0.675000190735'/>
+        <v y='1.25' x='0.0' z='-0.674999713898'/>
+        <sector>basement-dungeon</sector>
+        <float/>
+      </portal>
+      <priority>portal</priority>
+      <hardmove>
+        <v y='-5.98' x='18.04' z='25.595'/>
+        <matrix>
+          <scale y='1' x='1' z='1'/>
+        </matrix>
+      </hardmove>
+    </portals>
+    <renderloop>std_rloop_diffuse</renderloop>
+    <ambient blue='0.1' green='0.1' red='0.1'/>
+    <cullerp plugin='crystalspace.culling.dynavis'/>
+    <meshobj name='explo_small_fire.001'>
+      <plugin>particles</plugin>
+      <priority>transp</priority>
+      <params>
+        <factory>parttorch</factory>
+        <material>std_lighting_explo_firefire1.png</material>
+        <mixmode>
+          <add/>
+        </mixmode>
+      </params>
+      <ztest/>
+      <move>
+        <v y='-5.34487' x='17.2383' z='24.7218'/>
+      </move>
+    </meshobj>
+    <meshobj name='explo_small_fire.016'>
+      <plugin>particles</plugin>
+      <priority>transp</priority>
+      <params>
+        <factory>parttorch.033</factory>
+        <material>std_lighting_explo_firefire1.png</material>
+        <mixmode>
+          <add/>
+        </mixmode>
+      </params>
+      <ztest/>
+      <move>
+        <v y='-5.34487' x='4.22834' z='24.4718'/>
+      </move>
+    </meshobj>
+    <meshobj name='Cylinder.024'>
+      <plugin>genmesh</plugin>
+      <priority>object</priority>
+      <params>
+        <factory>genCylinder.003</factory>
+        <material>parallaxAtt_barrel2-parallaxwood_barrel2_d.jpg</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='-6.81' x='5.54195' z='26.9064'/>
+        <matrix>
+          <roty>-0.294128</roty>
+        </matrix>
+      </move>
+    </meshobj>
+    <meshobj name='Cylinder.023'>
+      <plugin>genmesh</plugin>
+      <priority>object</priority>
+      <params>
+        <factory>genCylinder.003</factory>
+        <material>parallaxAtt_barrel2-parallaxwood_barrel2_d.jpg</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='-6.81' x='4.93401' z='28.6013'/>
+        <matrix>
+          <roty>-0.294128</roty>
+        </matrix>
+      </move>
+    </meshobj>
+    <meshobj name='Cylinder.021'>
+      <plugin>genmesh</plugin>
+      <priority>object</priority>
+      <params>
+        <factory>genCylinder.003</factory>
+        <material>parallaxAtt_barrel2-parallaxwood_barrel2_d.jpg</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='-6.95996' x='8.11825' z='22.1043'/>
+        <matrix>
+          <rotz>-1.5708</rotz>
+          <rotx>-0.785398</rotx>
+        </matrix>
+      </move>
+    </meshobj>
+    <meshobj name='Cylinder.020'>
+      <plugin>genmesh</plugin>
+      <priority>object</priority>
+      <params>
+        <factory>genCylinder.002</factory>
+        <material>parallaxAtt_barrel-parallaxwood_barrel_d.jpg</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='-6.80804' x='6.72271' z='21.7633'/>
+        <matrix>
+          <roty>2.22045e-016</roty>
+          <rotz>-2.22045e-016</rotz>
+          <rotx>-1.5708</rotx>
+        </matrix>
+      </move>
+    </meshobj>
+    <meshobj name='Cylinder.015'>
+      <plugin>genmesh</plugin>
+      <priority>object</priority>
+      <params>
+        <factory>genCylinder.002</factory>
+        <material>parallaxAtt_barrel-parallaxwood_barrel_d.jpg</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='-6.96011' x='5.99271' z='21.8933'/>
+        <matrix>
+          <roty>-2.39928e-007</roty>
+          <rotz>-1.39626</rotz>
+          <rotx>2.26331e-007</rotx>
+        </matrix>
+      </move>
+    </meshobj>
+    <meshobj name='Cylinder.014'>
+      <plugin>genmesh</plugin>
+      <priority>object</priority>
+      <params>
+        <factory>genCylinder.002</factory>
+        <material>parallaxAtt_barrel-parallaxwood_barrel_d.jpg</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='-6.96011' x='5.29271' z='21.8933'/>
+        <matrix>
+          <roty>-2.41576e-008</roty>
+          <rotz>-0.610865</rotz>
+          <rotx>1.70135e-008</rotx>
+        </matrix>
+      </move>
+    </meshobj>
+    <meshobj name='Cylinder.013'>
+      <plugin>genmesh</plugin>
+      <priority>object</priority>
+      <params>
+        <factory>genCylinder.002</factory>
+        <material>parallaxAtt_barrel-parallaxwood_barrel_d.jpg</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='-6.96011' x='4.59271' z='21.8933'/>
+        <matrix>
+          <roty>5.16191e-008</roty>
+          <rotz>1.0472</rotz>
+          <rotx>2.98023e-008</rotx>
+        </matrix>
+      </move>
+    </meshobj>
+    <meshobj name='Cylinder.011'>
+      <plugin>genmesh</plugin>
+      <priority>object</priority>
+      <params>
+        <factory>genCylinder.002</factory>
+        <material>parallaxAtt_barrel-parallaxwood_barrel_d.jpg</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='-6.37011' x='4.94271' z='21.8933'/>
+        <matrix>
+          <roty>5.16191e-008</roty>
+          <rotz>1.0472</rotz>
+          <rotx>2.98023e-008</rotx>
+        </matrix>
+      </move>
+    </meshobj>
+    <meshobj name='Cylinder.009'>
+      <plugin>genmesh</plugin>
+      <priority>object</priority>
+      <params>
+        <factory>genCylinder.003</factory>
+        <material>parallaxAtt_barrel2-parallaxwood_barrel2_d.jpg</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='-6.81' x='7.14473' z='22.356'/>
+      </move>
+    </meshobj>
+    <meshobj name='Cylinder.008'>
+      <plugin>genmesh</plugin>
+      <priority>object</priority>
+      <params>
+        <factory>genCylinder.002</factory>
+        <material>parallaxAtt_barrel-parallaxwood_barrel_d.jpg</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='-6.37011' x='5.64271' z='21.8933'/>
+      </move>
+    </meshobj>
+    <meshobj name='Cube.497'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>genCube.505</factory>
+        <material>parallaxAtt_detail1-parallaxcastle-detail1_d.jpg</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='-6.95244' x='15.5762' z='29.4085'/>
+      </move>
+    </meshobj>
+    <meshobj name='Cube.005'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>genCube.013</factory>
+        <material>parallaxAtt_detail1-parallaxcastle-detail1_d.jpg</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='-6.95314' x='15.5762' z='29.4086'/>
+      </move>
+    </meshobj>
+    <meshobj name='Cube.003'>
+      <plugin>genmesh</plugin>
+      <priority>object</priority>
+      <params>
+        <factory>genCube.004</factory>
+        <material>parallaxAtt_wall-stone-parallaxwall-stone_2_d.jpg</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='-6.75467' x='6.67709' z='29.5275'/>
+      </move>
+    </meshobj>
+    <meshobj name='Cylinder.196'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>genCylinder.233</factory>
+        <material>parallaxAtt_plain_metal-parallacastle-metal_d.jpg</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='-5.55889' x='10.735' z='27.0207'/>
+      </move>
+    </meshobj>
+    <meshobj name='Cylinder.184'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>genCylinder.211</factory>
+        <material>parallaxAtt_plain_metal-parallacastle-metal_d.jpg</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='-6.35826' x='13.4' z='24'/>
+      </move>
+    </meshobj>
+    <meshobj name='Cube.370'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>genCube.356</factory>
+        <material>parallaxAtt_wood_parallaxwood.png</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='-6.84898' x='13.3872' z='24.0878'/>
+      </move>
+    </meshobj>
+    <meshobj name='Cube.372'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>genCube.358</factory>
+        <material>parallaxAtt_detail3-parallaxcastle-detail3_d.jpg</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='-7.27818' x='9.84885' z='21.5827'/>
+      </move>
+    </meshobj>
+    <meshobj name='Cylinder.192'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>genCylinder.219</factory>
+        <material>parallaxAtt_detail3-parallaxcastle-detail3_d.jpg</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='-6.28881' x='12.278' z='22.7878'/>
+      </move>
+    </meshobj>
+    <meshobj name='Cylinder.193'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>genCylinder.220</factory>
+        <material>parallaxAtt_detail1-parallaxcastle-detail1_d.jpg</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='-6.868' x='11.2' z='21.7'/>
+      </move>
+    </meshobj>
+    <light name='Lamp.009'>
+      <center y='-5.1071' x='16.9206' z='24.7211'/>
+      <color blue='0.335614740849' green='0.76847165823' red='0.99938505888'/>
+      <radius brightness='10.0'>12.0</radius>
+      <attenuation>linear</attenuation>
+    </light>
+    <light name='Lamp.010'>
+      <center y='-5.1071' x='4.65896' z='24.4711'/>
+      <color blue='0.393562018871' green='0.800079286098' red='0.99938505888'/>
+      <radius brightness='10.0'>13.0</radius>
+      <attenuation>linear</attenuation>
+    </light>
+    <meshobj name='Cube.011'>
+      <plugin>genmesh</plugin>
+      <priority>object</priority>
+      <params>
+        <factory>genCube.010</factory>
+        <material>parallaxAtt_powder-parallaxpowder.png</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='-7.20017' x='5.03246' z='27.1197'/>
+      </move>
+    </meshobj>
+    <meshobj name='Cylinder.006'>
+      <plugin>genmesh</plugin>
+      <priority>object</priority>
+      <params>
+        <factory>genCylinder.224</factory>
+        <material>parallaxAtt_plain_metal-parallacastle-metal_d.jpg</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='-6.04391' x='10.5957' z='25.1753'/>
+      </move>
+    </meshobj>
+    <meshobj name='basement-walls.019'>
+      <plugin>genmesh</plugin>
+      <priority>object</priority>
+      <params>
+        <factory>genbasement-walls.008</factory>
+        <material>parallaxAtt_concrete4_3-parallaconcrete_floor4_3.png</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='-7.3' x='9.05966' z='27.5803'/>
+      </move>
+    </meshobj>
+    <meshobj name='basement-walls.020'>
+      <plugin>genmesh</plugin>
+      <priority>object</priority>
+      <params>
+        <factory>genbasement-walls.013</factory>
+        <material>parallaxAtt_concrete6-parallaxconcrete_floor6_d.jpg</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='-3.3' x='10.5551' z='26.7402'/>
+      </move>
+    </meshobj>
+    <meshobj name='GRAB IT'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>genGRAB IT</factory>
+        <material>parallaxAtt_wood2-parallaxwood_d.jpg</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='-5.21775' x='10.765' z='25.4982'/>
+      </move>
+    </meshobj>
+  </sector>
+  <meshfact name='parttorch.032'>
+    <plugin>crystalspace.mesh.loader.factory.particles</plugin>
+    <priority>transp</priority>
+    <ztest/>
+    <params>
+      <material>std_lighting_explo_firefire1.png</material>
+      <renderorientation>camface approx</renderorientation>
+      <rotationmode>none</rotationmode>
+      <sortmode>none</sortmode>
+      <integrationmode>linear</integrationmode>
+      <particlesize y='0.159999996424' x='0.159999996424'/>
+      <transformmode>local</transformmode>
+      <emitter type='sphere'>
+        <enabled>yes</enabled>
+        <uniformvelocity>yes</uniformvelocity>
+        <emissionrate>8</emissionrate>
+        <radius>0.0706334</radius>
+        <position y='0' x='0' z='0'/>
+        <initialvelocity y='0' x='0' z='0'/>
+        <mass max='1.0' min='1.0'/>
+        <initialttl max='2' min='1.5'/>
+        <placement>volume</placement>
+      </emitter>
+      <effector type='force'>
+        <acceleration y='0.3' x='0' z='0'/>
+        <force y='0.1' x='0' z='0'/>
+        <randomacceleration>1.0</randomacceleration>
+      </effector>
+      <effector type='lincolor'>
+        <color blue='0.16' green='0.5' red='0.9' time='1'/>
+        <color blue='0.16' green='0.5' red='0.9' time='0.9'/>
+        <color blue='0.144' green='0.45' red='0.81' time='0.8'/>
+        <color blue='0.128' green='0.4' red='0.72' time='0.6'/>
+        <color blue='0.096' green='0.3' red='0.54' time='0.5'/>
+        <color blue='0.064' green='0.2' red='0.36' time='0.4'/>
+        <color blue='0.032' green='0.1' red='0.18' time='0.3'/>
+        <color blue='0.0' green='0.0' red='0.0' time='0.1'/>
+        <color blue='0.0' green='0.0' red='0.0' time='0'/>
+      </effector>
+    </params>
+  </meshfact>
+  <sector name='basement04'>
+    <portals name='Plane.007'>
+      <portal>
+        <v y='-1.24999952316' x='-2.20533735273e-007' z='-0.675000190735'/>
+        <v y='-1.25' x='3.17889750079e-008' z='0.675000071526'/>
+        <v y='1.25' x='2.20533735273e-007' z='0.675000190735'/>
+        <v y='1.25' x='-3.17889679025e-008' z='-0.674999833107'/>
+        <sector>basement03</sector>
+        <float/>
+      </portal>
+      <priority>portal</priority>
+      <hardmove>
+        <v y='-5.98' x='3.43999' z='23.3976'/>
+        <matrix>
+          <scale y='1' x='1' z='1'/>
+        </matrix>
+      </hardmove>
+    </portals>
+    <renderloop>std_rloop_diffuse</renderloop>
+    <ambient blue='0.1' green='0.1' red='0.1'/>
+    <cullerp plugin='crystalspace.culling.dynavis'/>
+    <meshobj name='explo_small_fire.010'>
+      <plugin>particles</plugin>
+      <priority>transp</priority>
+      <params>
+        <factory>parttorch.032</factory>
+        <material>std_lighting_explo_firefire1.png</material>
+        <mixmode>
+          <add/>
+        </mixmode>
+      </params>
+      <ztest/>
+      <move>
+        <v y='-5.26488' x='0.392789' z='25.3477'/>
+      </move>
+    </meshobj>
+    <meshobj name='Cylinder.198'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>genCylinder.235</factory>
+        <material>parallaxAtt_plain_metal-parallacastle-metal_d.jpg</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='-5.47889' x='0.394036' z='25.4858'/>
+      </move>
+    </meshobj>
+    <light name='Lamp.012'>
+      <center y='-5.0071' x='0.389008' z='25.0193'/>
+      <color blue='0.335614740849' green='0.76847165823' red='0.99938505888'/>
+      <radius brightness='10.0'>12.0</radius>
+      <attenuation>linear</attenuation>
+    </light>
+    <meshobj name='basement-walls.022'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>genbasement-walls.019</factory>
+        <material>parallaxAtt_barrel2-parallaxwood_barrel2_d.jpg</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='-5.99442' x='-2.80631' z='23.3961'/>
+      </move>
+    </meshobj>
+    <meshobj name='basement-walls.023'>
+      <plugin>genmesh</plugin>
+      <priority>object</priority>
+      <params>
+        <factory>genbasement-walls.020</factory>
+        <material>parallaxAtt_concrete4_3-parallaconcrete_floor4_3.png</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='-7.3' x='0.439995' z='23.5197'/>
+      </move>
+    </meshobj>
+    <meshobj name='basement-walls.024'>
+      <plugin>genmesh</plugin>
+      <priority>object</priority>
+      <params>
+        <factory>genbasement-walls.021</factory>
+        <material>parallaxAtt_concrete6-parallaxconcrete_floor6_d.jpg</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='-5.225' x='0.439994' z='23.52'/>
+      </move>
+    </meshobj>
+  </sector>
+  <meshfact name='parttorch.004'>
+    <plugin>crystalspace.mesh.loader.factory.particles</plugin>
+    <priority>transp</priority>
+    <ztest/>
+    <params>
+      <material>std_lighting_explo_firefire1.png</material>
+      <renderorientation>camface approx</renderorientation>
+      <rotationmode>none</rotationmode>
+      <sortmode>none</sortmode>
+      <integrationmode>linear</integrationmode>
+      <particlesize y='0.159999996424' x='0.159999996424'/>
+      <transformmode>local</transformmode>
+      <emitter type='sphere'>
+        <enabled>yes</enabled>
+        <uniformvelocity>yes</uniformvelocity>
+        <emissionrate>8</emissionrate>
+        <radius>0.0706334</radius>
+        <position y='0' x='0' z='0'/>
+        <initialvelocity y='0' x='0' z='0'/>
+        <mass max='1.0' min='1.0'/>
+        <initialttl max='2' min='1.5'/>
+        <placement>volume</placement>
+      </emitter>
+      <effector type='force'>
+        <acceleration y='0.3' x='0' z='0'/>
+        <force y='0.1' x='0' z='0'/>
+        <randomacceleration>1.0</randomacceleration>
+      </effector>
+      <effector type='lincolor'>
+        <color blue='0.16' green='0.5' red='0.9' time='1'/>
+        <color blue='0.16' green='0.5' red='0.9' time='0.9'/>
+        <color blue='0.144' green='0.45' red='0.81' time='0.8'/>
+        <color blue='0.128' green='0.4' red='0.72' time='0.6'/>
+        <color blue='0.096' green='0.3' red='0.54' time='0.5'/>
+        <color blue='0.064' green='0.2' red='0.36' time='0.4'/>
+        <color blue='0.032' green='0.1' red='0.18' time='0.3'/>
+        <color blue='0.0' green='0.0' red='0.0' time='0.1'/>
+        <color blue='0.0' green='0.0' red='0.0' time='0'/>
+      </effector>
+    </params>
+  </meshfact>
+  <meshfact name='parttorch.039'>
+    <plugin>crystalspace.mesh.loader.factory.particles</plugin>
+    <priority>transp</priority>
+    <ztest/>
+    <params>
+      <material>std_lighting_explo_firefire1.png</material>
+      <renderorientation>camface approx</renderorientation>
+      <rotationmode>none</rotationmode>
+      <sortmode>none</sortmode>
+      <integrationmode>linear</integrationmode>
+      <particlesize y='0.159999996424' x='0.159999996424'/>
+      <transformmode>local</transformmode>
+      <emitter type='sphere'>
+        <enabled>yes</enabled>
+        <uniformvelocity>yes</uniformvelocity>
+        <emissionrate>8</emissionrate>
+        <radius>0.0706334</radius>
+        <position y='0' x='0' z='0'/>
+        <initialvelocity y='0' x='0' z='0'/>
+        <mass max='1.0' min='1.0'/>
+        <initialttl max='2' min='1.5'/>
+        <placement>volume</placement>
+      </emitter>
+      <effector type='force'>
+        <acceleration y='0.3' x='0' z='0'/>
+        <force y='0.1' x='0' z='0'/>
+        <randomacceleration>1.0</randomacceleration>
+      </effector>
+      <effector type='lincolor'>
+        <color blue='0.16' green='0.5' red='0.9' time='1'/>
+        <color blue='0.16' green='0.5' red='0.9' time='0.9'/>
+        <color blue='0.144' green='0.45' red='0.81' time='0.8'/>
+        <color blue='0.128' green='0.4' red='0.72' time='0.6'/>
+        <color blue='0.096' green='0.3' red='0.54' time='0.5'/>
+        <color blue='0.064' green='0.2' red='0.36' time='0.4'/>
+        <color blue='0.032' green='0.1' red='0.18' time='0.3'/>
+        <color blue='0.0' green='0.0' red='0.0' time='0.1'/>
+        <color blue='0.0' green='0.0' red='0.0' time='0'/>
+      </effector>
+    </params>
+  </meshfact>
+  <sector name='dining-hall'>
+    <portals name='Cube.020'>
+      <portal>
+        <v y='1.45712518692' x='0.0' z='1.10000026226'/>
+        <v y='1.45712518692' x='0.0' z='-1.10000026226'/>
+        <v y='-1.45712518692' x='0.0' z='-1.10000002384'/>
+        <v y='-1.45700097084' x='0.0' z='1.10000026226'/>
+        <sector>interior</sector>
+        <float/>
+      </portal>
+      <priority>portal</priority>
+      <hardmove>
+        <v y='3.89591' x='27.6176' z='6.8'/>
+        <matrix>
+          <scale y='1' x='1' z='1'/>
+        </matrix>
+      </hardmove>
+    </portals>
+    <renderloop>std_rloop_diffuse</renderloop>
+    <ambient blue='0.1' green='0.1' red='0.1'/>
+    <cullerp plugin='crystalspace.culling.dynavis'/>
+    <meshobj name='explo_small_fire.002'>
+      <plugin>particles</plugin>
+      <priority>transp</priority>
+      <params>
+        <factory>parttorch.004</factory>
+        <material>std_lighting_explo_firefire1.png</material>
+        <mixmode>
+          <add/>
+        </mixmode>
+      </params>
+      <ztest/>
+      <move>
+        <v y='4.56512' x='26.6344' z='8.12262'/>
+      </move>
+    </meshobj>
+    <meshobj name='explo_small_fire.014'>
+      <plugin>particles</plugin>
+      <priority>transp</priority>
+      <params>
+        <factory>parttorch.039</factory>
+        <material>std_lighting_explo_firefire1.png</material>
+        <mixmode>
+          <add/>
+        </mixmode>
+      </params>
+      <ztest/>
+      <move>
+        <v y='4.56512' x='11.0044' z='11.1426'/>
+      </move>
+    </meshobj>
+    <meshobj name='Cube.576'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>genCube.006</factory>
+        <material>parallaxAtt_wood_parallaxwood.png</material>
+      </params>
+      <zuse/>
+      <staticpos/>
+      <staticshape/>
+      <move>
+        <v y='3.2454' x='14.6797' z='7.4047'/>
+      </move>
+    </meshobj>
+    <meshobj name='Cube.575'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>genCube.003</factory>
+        <material>parallaxAtt_wood_parallaxwood.png</material>
+      </params>
+      <zuse/>
+      <staticpos/>
+      <staticshape/>
+      <move>
+        <v y='3.25061' x='20.4658' z='3.95586'/>
+        <matrix>
+          <roty>3.10894</roty>
+        </matrix>
+      </move>
+    </meshobj>
+    <meshobj name='Cube.574'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>genCube.003</factory>
+        <material>parallaxAtt_wood_parallaxwood.png</material>
+      </params>
+      <zuse/>
+      <staticpos/>
+      <staticshape/>
+      <move>
+        <v y='3.25061' x='21.1074' z='3.80461'/>
+        <matrix>
+          <roty>2.56197</roty>
+        </matrix>
+      </move>
+    </meshobj>
+    <meshobj name='Cube.573'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>genCube.003</factory>
+        <material>parallaxAtt_wood_parallaxwood.png</material>
+      </params>
+      <zuse/>
+      <staticpos/>
+      <staticshape/>
+      <move>
+        <v y='3.25061' x='17.6233' z='4.00073'/>
+        <matrix>
+          <roty>3.01792</roty>
+        </matrix>
+      </move>
+    </meshobj>
+    <meshobj name='Cube.572'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>genCube.003</factory>
+        <material>parallaxAtt_wood_parallaxwood.png</material>
+      </params>
+      <zuse/>
+      <staticpos/>
+      <staticshape/>
+      <move>
+        <v y='3.25061' x='16.9933' z='3.93279'/>
+        <matrix>
+          <roty>3.10894</roty>
+        </matrix>
+      </move>
+    </meshobj>
+    <meshobj name='Cube.571'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>genCube.003</factory>
+        <material>parallaxAtt_wood_parallaxwood.png</material>
+      </params>
+      <zuse/>
+      <staticpos/>
+      <staticshape/>
+      <move>
+        <v y='3.25061' x='11.8711' z='3.55208'/>
+        <matrix>
+          <roty>-2.70903</roty>
+        </matrix>
+      </move>
+    </meshobj>
+    <meshobj name='Cube.570'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>genCube.003</factory>
+        <material>parallaxAtt_wood_parallaxwood.png</material>
+      </params>
+      <zuse/>
+      <staticpos/>
+      <staticshape/>
+      <move>
+        <v y='3.25061' x='12.4549' z='4.04688'/>
+        <matrix>
+          <roty>3.01792</roty>
+        </matrix>
+      </move>
+    </meshobj>
+    <meshobj name='Cube.569'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>genCube.002</factory>
+        <material>parallaxAtt_wood_parallaxwood.png</material>
+      </params>
+      <zuse/>
+      <staticpos/>
+      <staticshape/>
+      <move>
+        <v y='3.25061' x='13.9088' z='3.95658'/>
+        <matrix>
+          <roty>3.10932</roty>
+        </matrix>
+      </move>
+    </meshobj>
+    <meshobj name='Cube.568'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>genCube.002</factory>
+        <material>parallaxAtt_wood_parallaxwood.png</material>
+      </params>
+      <zuse/>
+      <staticpos/>
+      <staticshape/>
+      <move>
+        <v y='3.25061' x='15.5897' z='3.67172'/>
+        <matrix>
+          <roty>2.50046</roty>
+        </matrix>
+      </move>
+    </meshobj>
+    <meshobj name='Cube.567'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>genCube.002</factory>
+        <material>parallaxAtt_wood_parallaxwood.png</material>
+      </params>
+      <zuse/>
+      <staticpos/>
+      <staticshape/>
+      <move>
+        <v y='3.25061' x='19.0448' z='3.86911'/>
+        <matrix>
+          <roty>2.88286</roty>
+        </matrix>
+      </move>
+    </meshobj>
+    <meshobj name='Cube.566'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>genCube.003</factory>
+        <material>parallaxAtt_wood_parallaxwood.png</material>
+      </params>
+      <zuse/>
+      <staticpos/>
+      <staticshape/>
+      <move>
+        <v y='2.73413' x='19.212' z='9.17762'/>
+        <matrix>
+          <roty>-1.4194</roty>
+          <rotz>0.0242521</rotz>
+          <rotx>1.50278</rotx>
+        </matrix>
+      </move>
+    </meshobj>
+    <meshobj name='Cube.565'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>genCube.003</factory>
+        <material>parallaxAtt_wood_parallaxwood.png</material>
+      </params>
+      <zuse/>
+      <staticpos/>
+      <staticshape/>
+      <move>
+        <v y='3.25061' x='19.4656' z='8.16767'/>
+        <matrix>
+          <roty>-0.635322</roty>
+        </matrix>
+      </move>
+    </meshobj>
+    <meshobj name='Cube.564'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>genCube.002</factory>
+        <material>parallaxAtt_wood_parallaxwood.png</material>
+      </params>
+      <zuse/>
+      <staticpos/>
+      <staticshape/>
+      <move>
+        <v y='3.25061' x='17.4561' z='8.31296'/>
+        <matrix>
+          <roty>-0.810778</roty>
+        </matrix>
+      </move>
+    </meshobj>
+    <meshobj name='Cube.563'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>genCube.002</factory>
+        <material>parallaxAtt_wood_parallaxwood.png</material>
+      </params>
+      <zuse/>
+      <staticpos/>
+      <staticshape/>
+      <move>
+        <v y='3.25061' x='20.7302' z='7.93438'/>
+        <matrix>
+          <roty>0.14352</roty>
+        </matrix>
+      </move>
+    </meshobj>
+    <meshobj name='Cube.562'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>genCube.003</factory>
+        <material>parallaxAtt_wood_parallaxwood.png</material>
+      </params>
+      <zuse/>
+      <staticpos/>
+      <staticshape/>
+      <move>
+        <v y='3.25061' x='21.7851' z='7.06211'/>
+        <matrix>
+          <roty>-2.17085</roty>
+        </matrix>
+      </move>
+    </meshobj>
+    <meshobj name='Cube.561'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>genCube.002</factory>
+        <material>parallaxAtt_wood_parallaxwood.png</material>
+      </params>
+      <zuse/>
+      <staticpos/>
+      <staticshape/>
+      <move>
+        <v y='3.25061' x='20.7177' z='6.71251'/>
+        <matrix>
+          <roty>3.1033</roty>
+        </matrix>
+      </move>
+    </meshobj>
+    <meshobj name='Cube.560'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>genCube.002</factory>
+        <material>parallaxAtt_wood_parallaxwood.png</material>
+      </params>
+      <zuse/>
+      <staticpos/>
+      <staticshape/>
+      <move>
+        <v y='3.25061' x='19.0844' z='6.71251'/>
+        <matrix>
+          <roty>3.1033</roty>
+        </matrix>
+      </move>
+    </meshobj>
+    <meshobj name='Cube.559'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>genCube.002</factory>
+        <material>parallaxAtt_wood_parallaxwood.png</material>
+      </params>
+      <zuse/>
+      <staticpos/>
+      <staticshape/>
+      <move>
+        <v y='3.25061' x='17.3513' z='6.66263'/>
+        <matrix>
+          <roty>-3.0578</roty>
+        </matrix>
+      </move>
+    </meshobj>
+    <meshobj name='Cube.558'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>genCube.003</factory>
+        <material>parallaxAtt_wood_parallaxwood.png</material>
+      </params>
+      <zuse/>
+      <staticpos/>
+      <staticshape/>
+      <move>
+        <v y='3.25061' x='15.3154' z='6.57353'/>
+        <matrix>
+          <roty>3.02122</roty>
+        </matrix>
+      </move>
+    </meshobj>
+    <meshobj name='Cube.557'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>genCube.003</factory>
+        <material>parallaxAtt_wood_parallaxwood.png</material>
+      </params>
+      <zuse/>
+      <staticpos/>
+      <staticshape/>
+      <move>
+        <v y='3.25061' x='16.4484' z='6.07307'/>
+        <matrix>
+          <roty>-1.93044</roty>
+        </matrix>
+      </move>
+    </meshobj>
+    <meshobj name='Cube.031'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>genCube.002</factory>
+        <material>parallaxAtt_wood_parallaxwood.png</material>
+      </params>
+      <zuse/>
+      <staticpos/>
+      <staticshape/>
+      <move>
+        <v y='3.25061' x='15.5912' z='8.0196'/>
+        <matrix>
+          <roty>-0.123084</roty>
+        </matrix>
+      </move>
+    </meshobj>
+    <meshobj name='Cube.030'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>genCube.003</factory>
+        <material>parallaxAtt_wood_parallaxwood.png</material>
+      </params>
+      <zuse/>
+      <staticpos/>
+      <staticshape/>
+      <move>
+        <v y='3.25061' x='14.2948' z='8.35658'/>
+        <matrix>
+          <roty>-1.54612</roty>
+        </matrix>
+      </move>
+    </meshobj>
+    <meshobj name='Cube.029'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>genCube.003</factory>
+        <material>parallaxAtt_wood_parallaxwood.png</material>
+      </params>
+      <zuse/>
+      <staticpos/>
+      <staticshape/>
+      <move>
+        <v y='3.25061' x='13.661' z='9.27091'/>
+        <matrix>
+          <roty>-0.432712</roty>
+        </matrix>
+      </move>
+    </meshobj>
+    <meshobj name='Cube.028'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>genCube.002</factory>
+        <material>parallaxAtt_wood_parallaxwood.png</material>
+      </params>
+      <zuse/>
+      <staticpos/>
+      <staticshape/>
+      <move>
+        <v y='3.25061' x='13.8405' z='6.61734'/>
+        <matrix>
+          <roty>-3.0874</roty>
+        </matrix>
+      </move>
+    </meshobj>
+    <meshobj name='Cube.025'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>genCube.005</factory>
+        <material>parallaxAtt_wood_parallaxwood.png</material>
+      </params>
+      <zuse/>
+      <staticpos/>
+      <staticshape/>
+      <move>
+        <v y='3.2454' x='14.6797' z='7.4047'/>
+      </move>
+    </meshobj>
+    <meshobj name='Cube.024'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>genCube.002</factory>
+        <material>parallaxAtt_wood_parallaxwood.png</material>
+      </params>
+      <zuse/>
+      <staticpos/>
+      <staticshape/>
+      <move>
+        <v y='3.25061' x='13.8924' z='5.36013'/>
+        <matrix>
+          <roty>-0.395183</roty>
+        </matrix>
+      </move>
+    </meshobj>
+    <meshobj name='Cube.022'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>genCube.003</factory>
+        <material>parallaxAtt_wood_parallaxwood.png</material>
+      </params>
+      <zuse/>
+      <staticpos/>
+      <staticshape/>
+      <move>
+        <v y='3.25061' x='15.2403' z='5.26032'/>
+        <matrix>
+          <roty>0.561639</roty>
+        </matrix>
+      </move>
+    </meshobj>
+    <meshobj name='Cube.014'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>genCube.002</factory>
+        <material>parallaxAtt_wood_parallaxwood.png</material>
+      </params>
+      <zuse/>
+      <staticpos/>
+      <staticshape/>
+      <move>
+        <v y='3.25061' x='17.264' z='5.20387'/>
+        <matrix>
+          <roty>0.201611</roty>
+        </matrix>
+      </move>
+    </meshobj>
+    <meshobj name='Cube.010'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>genCube.002</factory>
+        <material>parallaxAtt_wood_parallaxwood.png</material>
+      </params>
+      <zuse/>
+      <staticpos/>
+      <staticshape/>
+      <move>
+        <v y='3.25061' x='19.025' z='5.15579'/>
+        <matrix>
+          <roty>-0.0550366</roty>
+        </matrix>
+      </move>
+    </meshobj>
+    <meshobj name='Cube.006'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>genCube.003</factory>
+        <material>parallaxAtt_wood_parallaxwood.png</material>
+      </params>
+      <zuse/>
+      <staticpos/>
+      <staticshape/>
+      <move>
+        <v y='3.25061' x='15.95' z='5.14203'/>
+        <matrix>
+          <roty>-0.125669</roty>
+        </matrix>
+      </move>
+    </meshobj>
+    <meshobj name='Cube.001'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>genCube.002</factory>
+        <material>parallaxAtt_wood_parallaxwood.png</material>
+      </params>
+      <zuse/>
+      <staticpos/>
+      <staticshape/>
+      <move>
+        <v y='3.25061' x='20.725' z='5.15579'/>
+        <matrix>
+          <roty>-0.0463714</roty>
+        </matrix>
+      </move>
+    </meshobj>
+    <meshobj name='Cube.009'>
+      <plugin>genmesh</plugin>
+      <priority>object</priority>
+      <params>
+        <factory>genCube.508</factory>
+        <material>parallaxAtt_brick1-parallaxbrick1_d.jpg</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='2.52754' x='27.289' z='6.798'/>
+      </move>
+    </meshobj>
+    <light name='Lamp.018'>
+      <center y='4.6' x='11.0112' z='10.946'/>
+      <color blue='0.335614740849' green='0.76847165823' red='0.99938505888'/>
+      <radius brightness='10.0'>13.0</radius>
+      <attenuation>linear</attenuation>
+    </light>
+    <meshobj name='Cube.017'>
+      <plugin>genmesh</plugin>
+      <priority>object</priority>
+      <params>
+        <factory>genCube.520</factory>
+        <material>parallaxAtt_detail2-parallaxcastle-detail2_d.jpg</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='4.42272' x='27.2927' z='6.7992'/>
+      </move>
+    </meshobj>
+    <light name='Lamp.017'>
+      <center y='4.6' x='26.4349' z='8.11364'/>
+      <color blue='0.393562018871' green='0.800079286098' red='0.99938505888'/>
+      <radius brightness='10.0'>13.0</radius>
+      <attenuation>linear</attenuation>
+    </light>
+    <meshobj name='Cylinder.224'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>genCylinder.027</factory>
+        <material>parallaxAtt_plain_metal-parallacastle-metal_d.jpg</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='4.3411' x='18.9538' z='6.21571'/>
+      </move>
+    </meshobj>
+    <meshobj name='bment_arras-pole.003'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>genbment_arras-pole.003</factory>
+        <material>parallaxAtt_detail3-parallaxcastle-detail3_d.jpg</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='6.2148' x='17.5' z='11.35'/>
+      </move>
+    </meshobj>
+    <meshobj name='Cube.498'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>genCube.027</factory>
+        <material>parallaxAtt_window-parallaxcastle-window_d.jpg</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='6.7' x='15.5' z='5.38112'/>
+      </move>
+    </meshobj>
+    <meshobj name='Plane.002'>
+      <plugin>genmesh</plugin>
+      <priority>alpha</priority>
+      <params>
+        <factory>genPlane.003</factory>
+        <material>std_lighting_rayscastle_ray.png</material>
+        <mixmode>
+          <alpha/>
+        </mixmode>
+        <color blue='1' green='1' red='1'/>
+      </params>
+      <polymesh>
+        <colldet/>
+        <shadows/>
+      </polymesh>
+      <ztest/>
+      <noshadows/>
+      <staticpos/>
+      <staticshape/>
+      <move>
+        <v y='5.15' x='17' z='4.83'/>
+      </move>
+    </meshobj>
+    <meshobj name='Cube.510'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>genCube.517</factory>
+        <material>parallaxAtt_concrete4_3-parallaconcrete_floor4_3.png</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='2.5' x='16.5252' z='5.92483'/>
+      </move>
+    </meshobj>
+    <meshobj name='Cube.511'>
+      <plugin>genmesh</plugin>
+      <priority>object</priority>
+      <params>
+        <factory>genCube.518</factory>
+        <material>parallaxAtt_concrete6-parallaxconcrete_floor6_d.jpg</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='8.89999' x='15' z='6.82'/>
+      </move>
+    </meshobj>
+  </sector>
+  <meshfact name='parttorch.040'>
+    <plugin>crystalspace.mesh.loader.factory.particles</plugin>
+    <priority>transp</priority>
+    <ztest/>
+    <params>
+      <material>std_lighting_explo_firefire1.png</material>
+      <renderorientation>camface approx</renderorientation>
+      <rotationmode>none</rotationmode>
+      <sortmode>none</sortmode>
+      <integrationmode>linear</integrationmode>
+      <particlesize y='0.159999996424' x='0.159999996424'/>
+      <transformmode>local</transformmode>
+      <emitter type='sphere'>
+        <enabled>yes</enabled>
+        <uniformvelocity>yes</uniformvelocity>
+        <emissionrate>8</emissionrate>
+        <radius>0.0706334</radius>
+        <position y='0' x='0' z='0'/>
+        <initialvelocity y='0' x='0' z='0'/>
+        <mass max='1.0' min='1.0'/>
+        <initialttl max='2' min='1.5'/>
+        <placement>volume</placement>
+      </emitter>
+      <effector type='force'>
+        <acceleration y='0.3' x='0' z='0'/>
+        <force y='0.1' x='0' z='0'/>
+        <randomacceleration>1.0</randomacceleration>
+      </effector>
+      <effector type='lincolor'>
+        <color blue='0.16' green='0.5' red='0.9' time='1'/>
+        <color blue='0.16' green='0.5' red='0.9' time='0.9'/>
+        <color blue='0.144' green='0.45' red='0.81' time='0.8'/>
+        <color blue='0.128' green='0.4' red='0.72' time='0.6'/>
+        <color blue='0.096' green='0.3' red='0.54' time='0.5'/>
+        <color blue='0.064' green='0.2' red='0.36' time='0.4'/>
+        <color blue='0.032' green='0.1' red='0.18' time='0.3'/>
+        <color blue='0.0' green='0.0' red='0.0' time='0.1'/>
+        <color blue='0.0' green='0.0' red='0.0' time='0'/>
+      </effector>
+    </params>
+  </meshfact>
+  <meshfact name='parttorch.001'>
+    <plugin>crystalspace.mesh.loader.factory.particles</plugin>
+    <priority>transp</priority>
+    <ztest/>
+    <params>
+      <material>std_lighting_explo_firefire1.png</material>
+      <renderorientation>camface approx</renderorientation>
+      <rotationmode>none</rotationmode>
+      <sortmode>none</sortmode>
+      <integrationmode>linear</integrationmode>
+      <particlesize y='0.159999996424' x='0.159999996424'/>
+      <transformmode>local</transformmode>
+      <emitter type='sphere'>
+        <enabled>yes</enabled>
+        <uniformvelocity>yes</uniformvelocity>
+        <emissionrate>8</emissionrate>
+        <radius>0.0706334</radius>
+        <position y='0' x='0' z='0'/>
+        <initialvelocity y='0' x='0' z='0'/>
+        <mass max='1.0' min='1.0'/>
+        <initialttl max='2' min='1.5'/>
+        <placement>volume</placement>
+      </emitter>
+      <effector type='force'>
+        <acceleration y='0.3' x='0' z='0'/>
+        <force y='0.1' x='0' z='0'/>
+        <randomacceleration>1.0</randomacceleration>
+      </effector>
+      <effector type='lincolor'>
+        <color blue='0.16' green='0.5' red='0.9' time='1'/>
+        <color blue='0.16' green='0.5' red='0.9' time='0.9'/>
+        <color blue='0.144' green='0.45' red='0.81' time='0.8'/>
+        <color blue='0.128' green='0.4' red='0.72' time='0.6'/>
+        <color blue='0.096' green='0.3' red='0.54' time='0.5'/>
+        <color blue='0.064' green='0.2' red='0.36' time='0.4'/>
+        <color blue='0.032' green='0.1' red='0.18' time='0.3'/>
+        <color blue='0.0' green='0.0' red='0.0' time='0.1'/>
+        <color blue='0.0' green='0.0' red='0.0' time='0'/>
+      </effector>
+    </params>
+  </meshfact>
+  <sector name='interior'>
+    <portals name='Cube.026'>
+      <portal>
+        <v y='1.45712518692' x='0.0' z='1.10000038147'/>
+        <v y='-1.45700097084' x='0.0' z='1.10000038147'/>
+        <v y='-1.45712518692' x='0.0' z='-1.10000038147'/>
+        <v y='1.45712518692' x='0.0' z='-1.10000038147'/>
+        <sector>basement00</sector>
+        <float/>
+      </portal>
+      <priority>portal</priority>
+      <hardmove>
+        <v y='3.89591' x='27.6176' z='28.4'/>
+        <matrix>
+          <scale y='1' x='1' z='1'/>
+        </matrix>
+      </hardmove>
+    </portals>
+    <portals name='Cube.007'>
+      <portal>
+        <v y='1.45712518692' x='0.0' z='1.10000038147'/>
+        <v y='-1.45700097084' x='0.0' z='1.10000038147'/>
+        <v y='-1.45712518692' x='0.0' z='-1.10000038147'/>
+        <v y='1.45712518692' x='0.0' z='-1.10000038147'/>
+        <sector>dining-hall</sector>
+        <float/>
+        <zfill/>
+      </portal>
+      <priority>portal</priority>
+      <hardmove>
+        <v y='3.89591' x='27.6176' z='6.8'/>
+        <matrix>
+          <scale y='1' x='1' z='1'/>
+        </matrix>
+      </hardmove>
+    </portals>
+    <portals name='Cube.002'>
+      <portal>
+        <v y='-0.496808409691' x='0.0' z='-0.143033981323'/>
+        <v y='0.696808338165' x='0.0' z='0.0'/>
+        <v y='-0.496808409691' x='0.0' z='0.143033981323'/>
+        <v y='-0.696808338165' x='0.0' z='0.0'/>
+        <sector>space</sector>
+        <float/>
+        <zfill/>
+      </portal>
+      <priority>portal</priority>
+      <hardmove>
+        <v y='3.82002' x='20.5591' z='17.6871'/>
+        <matrix>
+          <scale y='1' x='1' z='1'/>
+        </matrix>
+      </hardmove>
+    </portals>
+    <portals name='portal_throne-room'>
+      <portal>
+        <v y='-2.91753530502' x='4.76837158203e-007' z='0.897789001465'/>
+        <v y='-2.91753530502' x='4.76837158203e-007' z='-0.897789001465'/>
+        <v y='2.91753530502' x='-4.76837158203e-007' z='-0.897800445557'/>
+        <v y='2.91753530502' x='-4.76837158203e-007' z='0.897800445557'/>
+        <sector>throne-room</sector>
+        <float/>
+        <zfill/>
+      </portal>
+      <priority>portal</priority>
+      <hardmove>
+        <v y='5.15' x='17.0446' z='17.6419'/>
+        <matrix>
+          <scale y='1' x='1' z='1'/>
+        </matrix>
+      </hardmove>
+    </portals>
+    <renderloop>std_rloop_diffuse</renderloop>
+    <ambient blue='0.1' green='0.1' red='0.1'/>
+    <cullerp plugin='crystalspace.culling.dynavis'/>
+    <meshobj name='explo_small_fire.015'>
+      <plugin>particles</plugin>
+      <priority>transp</priority>
+      <params>
+        <factory>parttorch.040</factory>
+        <material>std_lighting_explo_firefire1.png</material>
+        <mixmode>
+          <add/>
+        </mixmode>
+      </params>
+      <ztest/>
+      <move>
+        <v y='2.61513' x='25.2048' z='13.3885'/>
+      </move>
+    </meshobj>
+    <meshobj name='explo_small_fire'>
+      <plugin>particles</plugin>
+      <priority>transp</priority>
+      <params>
+        <factory>parttorch.001</factory>
+        <material>std_lighting_explo_firefire1.png</material>
+        <mixmode>
+          <add/>
+        </mixmode>
+      </params>
+      <ztest/>
+      <move>
+        <v y='2.61513' x='29.4359' z='18.9553'/>
+      </move>
+    </meshobj>
+    <meshobj name='Cube'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>genCube.012</factory>
+        <material>parallaxAtt_creditscredits.jpg</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='2.66423' x='29.9133' z='19.973'/>
+      </move>
+      <key name='particles_initialttl' value='9,2'/>
+    </meshobj>
+    <meshobj name='Cube.012'>
+      <plugin>thing</plugin>
+      <priority>transp</priority>
+      <params>
+        <factory>thingCube.549</factory>
+        <mixmode>
+          <alpha>0.800000011921</alpha>
+        </mixmode>
+      </params>
+      <ztest/>
+      <move>
+        <v y='3.98373' x='20.5497' z='17.6523'/>
+      </move>
+    </meshobj>
+    <meshobj name='Cube.015'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>genCube.550</factory>
+        <material>parallaxAtt_wood_parallaxwood.png</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='1.37573' x='21.7992' z='17.6355'/>
+      </move>
+      <key name='particles_initialttl' value='9,2'/>
+    </meshobj>
+    <meshobj name='Line01'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>genLine01.002</factory>
+        <material>parallaxAtt_plain_metal-parallacastle-metal_d.jpg</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='2.7' x='20.65' z='17.6419'/>
+      </move>
+      <key name='particles_initialttl' value='9,2'/>
+    </meshobj>
+    <meshobj name='Cube.016'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>genCube.551</factory>
+        <material>parallaxAtt_detail3-parallaxcastle-detail3_d.jpg</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='4.84923' x='18.0246' z='17.6318'/>
+      </move>
+      <key name='particles_initialttl' value='9,2'/>
+    </meshobj>
+    <meshobj name='Cube.018'>
+      <plugin>genmesh</plugin>
+      <priority>alpha</priority>
+      <params>
+        <factory>genCube.552</factory>
+        <material>std_lighting_flagCS-flag.png</material>
+        <mixmode>
+          <alpha/>
+        </mixmode>
+      </params>
+      <polymesh>
+        <colldet/>
+      </polymesh>
+      <ztest/>
+      <move>
+        <v y='3.2313' x='20.2621' z='17.6359'/>
+      </move>
+      <key name='particles_initialttl' value='9,2'/>
+    </meshobj>
+    <meshobj name='Cube.019'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>genCube.553</factory>
+        <material>parallaxAtt_brick1-parallaxbrick1_d.jpg</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='1.71597' x='25.5119' z='17.66'/>
+      </move>
+      <key name='particles_initialttl' value='9,2'/>
+    </meshobj>
+    <meshobj name='Cylinder.001'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>genCylinder.004</factory>
+        <material>parallaxAtt_plain_metal-parallacastle-metal_d.jpg</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='2.3411' x='27.4538' z='17.6354'/>
+      </move>
+      <key name='particles_color' value='0.9,0.5,0.16,0.0'/>
+      <key name='particles_initialttl' value='2,2.5'/>
+      <key name='particles_colormethod' value='linear'/>
+      <key name='particles_acceleration' value='0,0.3,0'/>
+      <key name='particles_force' value='0,0.2,0'/>
+    </meshobj>
+    <meshobj name='Cube.021'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>genCube.554</factory>
+        <material>parallaxAtt_detail2-parallaxcastle-detail2_d.jpg</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='4.45431' x='26.2173' z='17.6002'/>
+      </move>
+      <key name='particles_initialttl' value='9,2'/>
+    </meshobj>
+    <light name='Lamp.020'>
+      <center y='2.7' x='29.2335' z='18.9605'/>
+      <color blue='0.335614740849' green='0.76847165823' red='0.99938505888'/>
+      <radius brightness='10.0'>15.0</radius>
+      <attenuation>linear</attenuation>
+    </light>
+    <meshobj name='basement-walls'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>genbasement-walls.003</factory>
+        <material>parallaxAtt_barrel2-parallaxwood_barrel2_d.jpg</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='3.21558' x='28.9932' z='17.0086'/>
+      </move>
+      <key name='particles_initialttl' value='9,2'/>
+    </meshobj>
+    <light name='Lamp.022'>
+      <center y='2.7' x='25.2' z='13.6'/>
+      <color blue='0.393562018871' green='0.800079286098' red='0.99938505888'/>
+      <radius brightness='10.0'>15.0</radius>
+      <attenuation>linear</attenuation>
+    </light>
+    <meshobj name='Cube.027'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>genCube.556</factory>
+        <material>parallaxAtt_concrete4_3-parallaconcrete_floor4_3.png</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='1.75' x='23.7642' z='16.0498'/>
+      </move>
+      <key name='particles_randomacceleration' value='1.0'/>
+      <key name='particles_uniformvelocity' value='false'/>
+      <key name='particles_radius' value='0.10000000149'/>
+      <key name='particles_placement' value='volume'/>
+      <key name='particles_localmode' value='true'/>
+      <key name='particles_renderorientation' value='common approx'/>
+      <key name='particles_color' value='0.9,0.5,0.16,0.0'/>
+      <key name='particles_initialttl' value='2,2.5'/>
+      <key name='particles_colormethod' value='linear'/>
+      <key name='particles_acceleration' value='0,0.3,0'/>
+      <key name='particles_force' value='0,0.2,0'/>
+    </meshobj>
+    <meshobj name='Cylinder.005'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>genCylinder.010</factory>
+        <material>parallaxAtt_window-parallaxcastle-window_d.jpg</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='5.25' x='24.1361' z='16.1683'/>
+      </move>
+      <key name='particles_randomacceleration' value='1.0'/>
+      <key name='particles_uniformvelocity' value='false'/>
+      <key name='particles_radius' value='0.10000000149'/>
+      <key name='particles_placement' value='volume'/>
+      <key name='particles_localmode' value='true'/>
+      <key name='particles_renderorientation' value='common approx'/>
+      <key name='particles_color' value='0.9,0.5,0.16,0.0'/>
+      <key name='particles_initialttl' value='2,2.5'/>
+      <key name='particles_colormethod' value='linear'/>
+      <key name='particles_acceleration' value='0,0.3,0'/>
+      <key name='particles_force' value='0,0.2,0'/>
+    </meshobj>
+  </sector>
+  <meshfact name='partCube.001'>
+    <plugin>crystalspace.mesh.loader.factory.particles</plugin>
+    <priority>transp</priority>
+    <zfill/>
+    <params>
+      <material>std_lighting_starstar.png</material>
+      <renderorientation>camface approx</renderorientation>
+      <rotationmode>none</rotationmode>
+      <sortmode>none</sortmode>
+      <integrationmode>linear</integrationmode>
+      <particlesize y='0.159999996424' x='0.159999996424'/>
+      <transformmode>local</transformmode>
+      <emitter type='sphere'>
+        <enabled>yes</enabled>
+        <uniformvelocity>yes</uniformvelocity>
+        <emissionrate>20</emissionrate>
+        <radius>17.0856</radius>
+        <position y='0' x='0' z='0'/>
+        <initialvelocity y='0' x='0' z='1'/>
+        <mass max='1.0' min='1.0'/>
+        <initialttl max='5' min='5'/>
+        <placement>volume</placement>
+      </emitter>
+      <effector type='force'>
+        <acceleration y='0' x='0.3' z='0'/>
+        <force y='0.0' x='0.5' z='0.0'/>
+      </effector>
+      <effector type='lincolor'>
+        <color blue='1.0' green='1.0' red='1.0' time='1'/>
+        <color blue='1.0' green='1.0' red='1.0' time='0.9'/>
+        <color blue='0.9' green='0.9' red='0.9' time='0.8'/>
+        <color blue='0.8' green='0.8' red='0.8' time='0.6'/>
+        <color blue='0.6' green='0.6' red='0.6' time='0.5'/>
+        <color blue='0.4' green='0.4' red='0.4' time='0.4'/>
+        <color blue='0.2' green='0.2' red='0.2' time='0.3'/>
+        <color blue='0.0' green='0.0' red='0.0' time='0.1'/>
+        <color blue='0.0' green='0.0' red='0.0' time='0'/>
+      </effector>
+    </params>
+  </meshfact>
+  <meshfact name='partCube.011'>
+    <plugin>crystalspace.mesh.loader.factory.particles</plugin>
+    <priority>transp</priority>
+    <zfill/>
+    <params>
+      <material>std_lighting_starstar.png</material>
+      <renderorientation>camface approx</renderorientation>
+      <rotationmode>none</rotationmode>
+      <sortmode>none</sortmode>
+      <integrationmode>linear</integrationmode>
+      <particlesize y='0.0399999991059' x='0.0399999991059'/>
+      <transformmode>local</transformmode>
+      <emitter type='sphere'>
+        <enabled>yes</enabled>
+        <uniformvelocity>yes</uniformvelocity>
+        <emissionrate>20</emissionrate>
+        <radius>11.3904</radius>
+        <position y='0' x='0' z='0'/>
+        <initialvelocity y='0' x='0' z='1'/>
+        <mass max='1.0' min='1.0'/>
+        <initialttl max='5' min='5'/>
+        <placement>volume</placement>
+      </emitter>
+      <effector type='force'>
+        <acceleration y='0' x='0.3' z='0'/>
+        <force y='0.0' x='0.5' z='0.0'/>
+      </effector>
+      <effector type='lincolor'>
+        <color blue='1.0' green='1.0' red='1.0' time='1'/>
+        <color blue='1.0' green='1.0' red='1.0' time='0.9'/>
+        <color blue='0.9' green='0.9' red='0.9' time='0.8'/>
+        <color blue='0.8' green='0.8' red='0.8' time='0.6'/>
+        <color blue='0.6' green='0.6' red='0.6' time='0.5'/>
+        <color blue='0.4' green='0.4' red='0.4' time='0.4'/>
+        <color blue='0.2' green='0.2' red='0.2' time='0.3'/>
+        <color blue='0.0' green='0.0' red='0.0' time='0.1'/>
+        <color blue='0.0' green='0.0' red='0.0' time='0'/>
+      </effector>
+    </params>
+  </meshfact>
+  <sector name='space'>
+    <ambient blue='1' green='1' red='1'/>
+    <cullerp plugin='crystalspace.culling.dynavis'/>
+    <light name='Lamp'>
+      <center y='-1.65113e-005' x='30.009' z='19.9007'/>
+      <color blue='1.0' green='1.0' red='1.0'/>
+      <radius brightness='1.0'>100.0</radius>
+    </light>
+    <meshobj name='Cube.004'>
+      <plugin>particles</plugin>
+      <priority>transp</priority>
+      <params>
+        <factory>partCube.001</factory>
+        <material>std_lighting_starstar.png</material>
+        <mixmode>
+          <add/>
+        </mixmode>
+      </params>
+      <zfill/>
+      <move>
+        <v y='5.39812' x='-17.4434' z='18.5887'/>
+      </move>
+    </meshobj>
+    <meshobj name='Cube.013'>
+      <plugin>particles</plugin>
+      <priority>transp</priority>
+      <params>
+        <factory>partCube.011</factory>
+        <material>std_lighting_starstar.png</material>
+        <mixmode>
+          <add/>
+        </mixmode>
+      </params>
+      <zfill/>
+      <move>
+        <v y='5.39812' x='-6.44338' z='18.5887'/>
+      </move>
+    </meshobj>
+  </sector>
+  <meshfact name='parttorch.006'>
+    <plugin>crystalspace.mesh.loader.factory.particles</plugin>
+    <priority>transp</priority>
+    <ztest/>
+    <params>
+      <material>std_lighting_explo_firefire1.png</material>
+      <renderorientation>camface approx</renderorientation>
+      <rotationmode>none</rotationmode>
+      <sortmode>none</sortmode>
+      <integrationmode>linear</integrationmode>
+      <particlesize y='0.159999996424' x='0.159999996424'/>
+      <transformmode>local</transformmode>
+      <emitter type='sphere'>
+        <enabled>yes</enabled>
+        <uniformvelocity>yes</uniformvelocity>
+        <emissionrate>8</emissionrate>
+        <radius>0.0706334</radius>
+        <position y='0' x='0' z='0'/>
+        <initialvelocity y='0' x='0' z='0'/>
+        <mass max='1.0' min='1.0'/>
+        <initialttl max='2' min='1.5'/>
+        <placement>volume</placement>
+      </emitter>
+      <effector type='force'>
+        <acceleration y='0.3' x='0' z='0'/>
+        <force y='0.1' x='0' z='0'/>
+        <randomacceleration>1.0</randomacceleration>
+      </effector>
+      <effector type='lincolor'>
+        <color blue='0.16' green='0.5' red='0.9' time='1'/>
+        <color blue='0.16' green='0.5' red='0.9' time='0.9'/>
+        <color blue='0.144' green='0.45' red='0.81' time='0.8'/>
+        <color blue='0.128' green='0.4' red='0.72' time='0.6'/>
+        <color blue='0.096' green='0.3' red='0.54' time='0.5'/>
+        <color blue='0.064' green='0.2' red='0.36' time='0.4'/>
+        <color blue='0.032' green='0.1' red='0.18' time='0.3'/>
+        <color blue='0.0' green='0.0' red='0.0' time='0.1'/>
+        <color blue='0.0' green='0.0' red='0.0' time='0'/>
+      </effector>
+    </params>
+  </meshfact>
+  <meshfact name='parttorch.005'>
+    <plugin>crystalspace.mesh.loader.factory.particles</plugin>
+    <priority>transp</priority>
+    <ztest/>
+    <params>
+      <material>std_lighting_explo_firefire1.png</material>
+      <renderorientation>camface approx</renderorientation>
+      <rotationmode>none</rotationmode>
+      <sortmode>none</sortmode>
+      <integrationmode>linear</integrationmode>
+      <particlesize y='0.159999996424' x='0.159999996424'/>
+      <transformmode>local</transformmode>
+      <emitter type='sphere'>
+        <enabled>yes</enabled>
+        <uniformvelocity>yes</uniformvelocity>
+        <emissionrate>8</emissionrate>
+        <radius>0.0706334</radius>
+        <position y='0' x='0' z='0'/>
+        <initialvelocity y='0' x='0' z='0'/>
+        <mass max='1.0' min='1.0'/>
+        <initialttl max='2' min='1.5'/>
+        <placement>volume</placement>
+      </emitter>
+      <effector type='force'>
+        <acceleration y='0.3' x='0' z='0'/>
+        <force y='0.1' x='0' z='0'/>
+        <randomacceleration>1.0</randomacceleration>
+      </effector>
+      <effector type='lincolor'>
+        <color blue='0.16' green='0.5' red='0.9' time='1'/>
+        <color blue='0.16' green='0.5' red='0.9' time='0.9'/>
+        <color blue='0.144' green='0.45' red='0.81' time='0.8'/>
+        <color blue='0.128' green='0.4' red='0.72' time='0.6'/>
+        <color blue='0.096' green='0.3' red='0.54' time='0.5'/>
+        <color blue='0.064' green='0.2' red='0.36' time='0.4'/>
+        <color blue='0.032' green='0.1' red='0.18' time='0.3'/>
+        <color blue='0.0' green='0.0' red='0.0' time='0.1'/>
+        <color blue='0.0' green='0.0' red='0.0' time='0'/>
+      </effector>
+    </params>
+  </meshfact>
+  <meshfact name='parttorch.034'>
+    <plugin>crystalspace.mesh.loader.factory.particles</plugin>
+    <priority>transp</priority>
+    <ztest/>
+    <params>
+      <material>std_lighting_explo_firefire1.png</material>
+      <renderorientation>camface approx</renderorientation>
+      <rotationmode>none</rotationmode>
+      <sortmode>none</sortmode>
+      <integrationmode>linear</integrationmode>
+      <particlesize y='0.159999996424' x='0.159999996424'/>
+      <transformmode>local</transformmode>
+      <emitter type='sphere'>
+        <enabled>yes</enabled>
+        <uniformvelocity>yes</uniformvelocity>
+        <emissionrate>8</emissionrate>
+        <radius>0.0706334</radius>
+        <position y='0' x='0' z='0'/>
+        <initialvelocity y='0' x='0' z='0'/>
+        <mass max='1.0' min='1.0'/>
+        <initialttl max='2' min='1.5'/>
+        <placement>volume</placement>
+      </emitter>
+      <effector type='force'>
+        <acceleration y='0.3' x='0' z='0'/>
+        <force y='0.1' x='0' z='0'/>
+        <randomacceleration>1.0</randomacceleration>
+      </effector>
+      <effector type='lincolor'>
+        <color blue='0.16' green='0.5' red='0.9' time='1'/>
+        <color blue='0.16' green='0.5' red='0.9' time='0.9'/>
+        <color blue='0.144' green='0.45' red='0.81' time='0.8'/>
+        <color blue='0.128' green='0.4' red='0.72' time='0.6'/>
+        <color blue='0.096' green='0.3' red='0.54' time='0.5'/>
+        <color blue='0.064' green='0.2' red='0.36' time='0.4'/>
+        <color blue='0.032' green='0.1' red='0.18' time='0.3'/>
+        <color blue='0.0' green='0.0' red='0.0' time='0.1'/>
+        <color blue='0.0' green='0.0' red='0.0' time='0'/>
+      </effector>
+    </params>
+  </meshfact>
+  <sector name='throne-room'>
+    <portals name='portal_throne-int'>
+      <portal>
+        <v y='2.78492164612' x='-4.76837158203e-007' z='-0.872377634048'/>
+        <v y='-2.78492116928' x='4.76837158203e-007' z='-0.87236726284'/>
+        <v y='-2.78492164612' x='4.76837158203e-007' z='0.87236726284'/>
+        <v y='2.78492164612' x='-4.76837158203e-007' z='0.872377634048'/>
+        <sector>interior</sector>
+        <float/>
+        <zfill/>
+      </portal>
+      <priority>portal</priority>
+      <hardmove>
+        <v y='5.2' x='17.0446' z='17.6419'/>
+        <matrix>
+          <scale y='1' x='1' z='1'/>
+        </matrix>
+      </hardmove>
+    </portals>
+    <renderloop>std_rloop_diffuse</renderloop>
+    <ambient blue='0.1' green='0.1' red='0.1'/>
+    <cullerp plugin='crystalspace.culling.dynavis'/>
+    <meshobj name='explo_small_fire.009'>
+      <plugin>particles</plugin>
+      <priority>transp</priority>
+      <params>
+        <factory>parttorch.006</factory>
+        <material>std_lighting_explo_firefire1.png</material>
+        <mixmode>
+          <add/>
+        </mixmode>
+      </params>
+      <ztest/>
+      <move>
+        <v y='4.46513' x='13.624' z='12.4724'/>
+      </move>
+    </meshobj>
+    <meshobj name='explo_small_fire.003'>
+      <plugin>particles</plugin>
+      <priority>transp</priority>
+      <params>
+        <factory>parttorch.005</factory>
+        <material>std_lighting_explo_firefire1.png</material>
+        <mixmode>
+          <add/>
+        </mixmode>
+      </params>
+      <ztest/>
+      <move>
+        <v y='4.46513' x='5.22399' z='12.4724'/>
+      </move>
+    </meshobj>
+    <meshobj name='explo_small_fire.004'>
+      <plugin>particles</plugin>
+      <priority>transp</priority>
+      <params>
+        <factory>parttorch.034</factory>
+        <material>std_lighting_explo_firefire1.png</material>
+        <mixmode>
+          <add/>
+        </mixmode>
+      </params>
+      <ztest/>
+      <move>
+        <v y='4.46513' x='5.22399' z='22.8124'/>
+      </move>
+    </meshobj>
+    <meshobj name='Cylinder.007'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>genCylinder.006</factory>
+        <material>parallaxAtt_plain_metal-parallacastle-metal_d.jpg</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='4.24111' x='9.42404' z='17.6404'/>
+      </move>
+    </meshobj>
+    <light name='Lamp.026'>
+      <center y='4.6' x='5.2335' z='22.4605'/>
+      <color blue='0.393562018871' green='0.800079286098' red='0.99938505888'/>
+      <radius brightness='10.0'>13.0</radius>
+      <attenuation>linear</attenuation>
+    </light>
+    <light name='Lamp.027'>
+      <center y='4.6' x='5.2335' z='12.8605'/>
+      <color blue='0.335614740849' green='0.76847165823' red='0.99938505888'/>
+      <radius brightness='10.0'>13.0</radius>
+      <attenuation>linear</attenuation>
+    </light>
+    <meshobj name='castle_front_wall.003'>
+      <plugin>genmesh</plugin>
+      <priority>object</priority>
+      <params>
+        <factory>gencastle_front_wall.003</factory>
+        <material>parallaxAtt_brick1-parallaxbrick1_d.jpg</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='2.67941' x='-1.25662' z='17.63'/>
+      </move>
+    </meshobj>
+    <meshobj name='Cylinder'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>genCylinder.001</factory>
+        <material>parallaxAtt_marble-parallaxmarble_blue.jpg</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='4.885' x='6.34221' z='17.6419'/>
+      </move>
+    </meshobj>
+    <light name='Lamp.028'>
+      <center y='4.6' x='13.6335' z='12.8605'/>
+      <color blue='0.393562018871' green='0.800079286098' red='0.99938505888'/>
+      <radius brightness='10.0'>13.0</radius>
+      <attenuation>linear</attenuation>
+    </light>
+    <meshobj name='Cube.552'>
+      <plugin>genmesh</plugin>
+      <priority>object</priority>
+      <params>
+        <factory>genCube.542</factory>
+        <material>parallaxAtt_concrete6-parallaxconcrete_floor6_d.jpg</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='7.47282' x='6.1' z='17.5871'/>
+      </move>
+    </meshobj>
+    <meshobj name='Cube.556'>
+      <plugin>genmesh</plugin>
+      <priority>object</priority>
+      <params>
+        <factory>genCube.546</factory>
+        <material>parallaxAtt_concrete4_3-parallaconcrete_floor4_3.png</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='2.5' x='6.96331' z='17.6419'/>
+      </move>
+    </meshobj>
+    <meshobj name='Cylinder.010'>
+      <plugin>genmesh</plugin>
+      <priority>object</priority>
+      <params>
+        <factory>genCylinder.009</factory>
+        <material>parallaxAtt_brick3-parallaxcastle-brick3_d.jpg</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='4.45' x='6.86605' z='17.6419'/>
+      </move>
+    </meshobj>
+  </sector>
+  <sequences>
+    <sequence name='LaIpoLamp.014'>
+      <fadelight blue='0.463790595531' light='Lamp.014' duration='208.333333333' green='0.805523812771' red='0.987740218639'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.374313294888' light='Lamp.014' duration='208.333333333' green='0.734680473804' red='0.923693656921'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.47765904665' light='Lamp.014' duration='208.333333333' green='0.768636763096' red='0.941160857677'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.46082264185' light='Lamp.014' duration='208.333333333' green='0.748019039631' red='0.923693656921'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.564612746239' light='Lamp.014' duration='208.333333333' green='0.807190358639' red='0.964450538158'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.483588278294' light='Lamp.014' duration='208.333333333' green='0.760956764221' red='0.923693656921'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.464839279652' light='Lamp.014' duration='208.333333333' green='0.725056290627' red='0.88293671608'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.331063807011' light='Lamp.014' duration='208.333333333' green='0.641084969044' red='0.813067674637'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.409244120121' light='Lamp.014' duration='208.333333333' green='0.658219873905' red='0.813067674637'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.431038737297' light='Lamp.014' duration='208.333333333' green='0.735747873783' red='0.906226396561'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.451948046684' light='Lamp.014' duration='208.333333333' green='0.791217684746' red='0.970272958279'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.393562018871' light='Lamp.014' duration='208.333333333' green='0.800079286098' red='0.99938505888'/>
+      <delay time='208.333333333'/>
+      <enable trigger='LaIpoLamp.014_t'/>
+    </sequence>
+    <sequence name='LaIpo.003Lamp.003'>
+      <fadelight blue='0.405843317509' light='Lamp.003' duration='250.0' green='0.773916184902' red='0.987740218639'/>
+      <delay time='250.0'/>
+      <fadelight blue='0.316366016865' light='Lamp.003' duration='208.333333333' green='0.703072845936' red='0.923693656921'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.419711768627' light='Lamp.003' duration='291.666666667' green='0.737029135227' red='0.941160857677'/>
+      <delay time='291.666666667'/>
+      <fadelight blue='0.402875363827' light='Lamp.003' duration='208.333333333' green='0.716411411762' red='0.923693656921'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.331450790167' light='Lamp.003' duration='208.333333333' green='0.76025146246' red='0.964450538158'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.425641000271' light='Lamp.003' duration='208.333333333' green='0.729349136353' red='0.923693656921'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.406892001629' light='Lamp.003' duration='208.333333333' green='0.693448662758' red='0.88293671608'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.376055091619' light='Lamp.003' duration='333.333333333' green='0.609477341175' red='0.861251711845'/>
+      <delay time='333.333333333'/>
+      <fadelight blue='0.351296842098' light='Lamp.003' duration='208.333333333' green='0.694507956505' red='0.861251711845'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.373091459274' light='Lamp.003' duration='208.333333333' green='0.704140245914' red='0.906226396561'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.394000768661' light='Lamp.003' duration='291.666666667' green='0.759610056877' red='0.970272958279'/>
+      <delay time='291.666666667'/>
+      <fadelight blue='0.335614740849' light='Lamp.003' duration='583.333333333' green='0.76847165823' red='0.99938505888'/>
+      <delay time='583.333333333'/>
+      <enable trigger='LaIpo.003Lamp.003_t'/>
+    </sequence>
+    <sequence name='LaIpo.003Lamp.013'>
+      <fadelight blue='0.405843317509' light='Lamp.013' duration='250.0' green='0.773916184902' red='0.987740218639'/>
+      <delay time='250.0'/>
+      <fadelight blue='0.316366016865' light='Lamp.013' duration='208.333333333' green='0.703072845936' red='0.923693656921'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.419711768627' light='Lamp.013' duration='291.666666667' green='0.737029135227' red='0.941160857677'/>
+      <delay time='291.666666667'/>
+      <fadelight blue='0.402875363827' light='Lamp.013' duration='208.333333333' green='0.716411411762' red='0.923693656921'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.331450790167' light='Lamp.013' duration='208.333333333' green='0.76025146246' red='0.964450538158'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.425641000271' light='Lamp.013' duration='208.333333333' green='0.729349136353' red='0.923693656921'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.406892001629' light='Lamp.013' duration='208.333333333' green='0.693448662758' red='0.88293671608'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.376055091619' light='Lamp.013' duration='333.333333333' green='0.609477341175' red='0.861251711845'/>
+      <delay time='333.333333333'/>
+      <fadelight blue='0.351296842098' light='Lamp.013' duration='208.333333333' green='0.694507956505' red='0.861251711845'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.373091459274' light='Lamp.013' duration='208.333333333' green='0.704140245914' red='0.906226396561'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.394000768661' light='Lamp.013' duration='291.666666667' green='0.759610056877' red='0.970272958279'/>
+      <delay time='291.666666667'/>
+      <fadelight blue='0.335614740849' light='Lamp.013' duration='583.333333333' green='0.76847165823' red='0.99938505888'/>
+      <delay time='583.333333333'/>
+      <enable trigger='LaIpo.003Lamp.013_t'/>
+    </sequence>
+    <sequence name='LaIpoLamp.011'>
+      <fadelight blue='0.463790595531' light='Lamp.011' duration='208.333333333' green='0.805523812771' red='0.987740218639'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.374313294888' light='Lamp.011' duration='208.333333333' green='0.734680473804' red='0.923693656921'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.47765904665' light='Lamp.011' duration='208.333333333' green='0.768636763096' red='0.941160857677'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.46082264185' light='Lamp.011' duration='208.333333333' green='0.748019039631' red='0.923693656921'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.564612746239' light='Lamp.011' duration='208.333333333' green='0.807190358639' red='0.964450538158'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.483588278294' light='Lamp.011' duration='208.333333333' green='0.760956764221' red='0.923693656921'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.464839279652' light='Lamp.011' duration='208.333333333' green='0.725056290627' red='0.88293671608'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.331063807011' light='Lamp.011' duration='208.333333333' green='0.641084969044' red='0.813067674637'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.409244120121' light='Lamp.011' duration='208.333333333' green='0.658219873905' red='0.813067674637'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.431038737297' light='Lamp.011' duration='208.333333333' green='0.735747873783' red='0.906226396561'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.451948046684' light='Lamp.011' duration='208.333333333' green='0.791217684746' red='0.970272958279'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.393562018871' light='Lamp.011' duration='208.333333333' green='0.800079286098' red='0.99938505888'/>
+      <delay time='208.333333333'/>
+      <enable trigger='LaIpoLamp.011_t'/>
+    </sequence>
+    <sequence name='LaIpo.003Lamp.006'>
+      <fadelight blue='0.405843317509' light='Lamp.006' duration='250.0' green='0.773916184902' red='0.987740218639'/>
+      <delay time='250.0'/>
+      <fadelight blue='0.316366016865' light='Lamp.006' duration='208.333333333' green='0.703072845936' red='0.923693656921'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.419711768627' light='Lamp.006' duration='291.666666667' green='0.737029135227' red='0.941160857677'/>
+      <delay time='291.666666667'/>
+      <fadelight blue='0.402875363827' light='Lamp.006' duration='208.333333333' green='0.716411411762' red='0.923693656921'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.331450790167' light='Lamp.006' duration='208.333333333' green='0.76025146246' red='0.964450538158'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.425641000271' light='Lamp.006' duration='208.333333333' green='0.729349136353' red='0.923693656921'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.406892001629' light='Lamp.006' duration='208.333333333' green='0.693448662758' red='0.88293671608'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.376055091619' light='Lamp.006' duration='333.333333333' green='0.609477341175' red='0.861251711845'/>
+      <delay time='333.333333333'/>
+      <fadelight blue='0.351296842098' light='Lamp.006' duration='208.333333333' green='0.694507956505' red='0.861251711845'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.373091459274' light='Lamp.006' duration='208.333333333' green='0.704140245914' red='0.906226396561'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.394000768661' light='Lamp.006' duration='291.666666667' green='0.759610056877' red='0.970272958279'/>
+      <delay time='291.666666667'/>
+      <fadelight blue='0.335614740849' light='Lamp.006' duration='583.333333333' green='0.76847165823' red='0.99938505888'/>
+      <delay time='583.333333333'/>
+      <enable trigger='LaIpo.003Lamp.006_t'/>
+    </sequence>
+    <sequence name='LaIpoLamp.004'>
+      <fadelight blue='0.463790595531' light='Lamp.004' duration='208.333333333' green='0.805523812771' red='0.987740218639'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.374313294888' light='Lamp.004' duration='208.333333333' green='0.734680473804' red='0.923693656921'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.47765904665' light='Lamp.004' duration='208.333333333' green='0.768636763096' red='0.941160857677'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.46082264185' light='Lamp.004' duration='208.333333333' green='0.748019039631' red='0.923693656921'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.564612746239' light='Lamp.004' duration='208.333333333' green='0.807190358639' red='0.964450538158'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.483588278294' light='Lamp.004' duration='208.333333333' green='0.760956764221' red='0.923693656921'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.464839279652' light='Lamp.004' duration='208.333333333' green='0.725056290627' red='0.88293671608'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.331063807011' light='Lamp.004' duration='208.333333333' green='0.641084969044' red='0.813067674637'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.409244120121' light='Lamp.004' duration='208.333333333' green='0.658219873905' red='0.813067674637'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.431038737297' light='Lamp.004' duration='208.333333333' green='0.735747873783' red='0.906226396561'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.451948046684' light='Lamp.004' duration='208.333333333' green='0.791217684746' red='0.970272958279'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.393562018871' light='Lamp.004' duration='208.333333333' green='0.800079286098' red='0.99938505888'/>
+      <delay time='208.333333333'/>
+      <enable trigger='LaIpoLamp.004_t'/>
+    </sequence>
+    <sequence name='LaIpo.003Lamp.007'>
+      <fadelight blue='0.405843317509' light='Lamp.007' duration='250.0' green='0.773916184902' red='0.987740218639'/>
+      <delay time='250.0'/>
+      <fadelight blue='0.316366016865' light='Lamp.007' duration='208.333333333' green='0.703072845936' red='0.923693656921'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.419711768627' light='Lamp.007' duration='291.666666667' green='0.737029135227' red='0.941160857677'/>
+      <delay time='291.666666667'/>
+      <fadelight blue='0.402875363827' light='Lamp.007' duration='208.333333333' green='0.716411411762' red='0.923693656921'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.331450790167' light='Lamp.007' duration='208.333333333' green='0.76025146246' red='0.964450538158'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.425641000271' light='Lamp.007' duration='208.333333333' green='0.729349136353' red='0.923693656921'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.406892001629' light='Lamp.007' duration='208.333333333' green='0.693448662758' red='0.88293671608'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.376055091619' light='Lamp.007' duration='333.333333333' green='0.609477341175' red='0.861251711845'/>
+      <delay time='333.333333333'/>
+      <fadelight blue='0.351296842098' light='Lamp.007' duration='208.333333333' green='0.694507956505' red='0.861251711845'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.373091459274' light='Lamp.007' duration='208.333333333' green='0.704140245914' red='0.906226396561'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.394000768661' light='Lamp.007' duration='291.666666667' green='0.759610056877' red='0.970272958279'/>
+      <delay time='291.666666667'/>
+      <fadelight blue='0.335614740849' light='Lamp.007' duration='583.333333333' green='0.76847165823' red='0.99938505888'/>
+      <delay time='583.333333333'/>
+      <enable trigger='LaIpo.003Lamp.007_t'/>
+    </sequence>
+    <sequence name='LaIpoLamp.008'>
+      <fadelight blue='0.463790595531' light='Lamp.008' duration='208.333333333' green='0.805523812771' red='0.987740218639'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.374313294888' light='Lamp.008' duration='208.333333333' green='0.734680473804' red='0.923693656921'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.47765904665' light='Lamp.008' duration='208.333333333' green='0.768636763096' red='0.941160857677'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.46082264185' light='Lamp.008' duration='208.333333333' green='0.748019039631' red='0.923693656921'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.564612746239' light='Lamp.008' duration='208.333333333' green='0.807190358639' red='0.964450538158'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.483588278294' light='Lamp.008' duration='208.333333333' green='0.760956764221' red='0.923693656921'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.464839279652' light='Lamp.008' duration='208.333333333' green='0.725056290627' red='0.88293671608'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.331063807011' light='Lamp.008' duration='208.333333333' green='0.641084969044' red='0.813067674637'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.409244120121' light='Lamp.008' duration='208.333333333' green='0.658219873905' red='0.813067674637'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.431038737297' light='Lamp.008' duration='208.333333333' green='0.735747873783' red='0.906226396561'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.451948046684' light='Lamp.008' duration='208.333333333' green='0.791217684746' red='0.970272958279'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.393562018871' light='Lamp.008' duration='208.333333333' green='0.800079286098' red='0.99938505888'/>
+      <delay time='208.333333333'/>
+      <enable trigger='LaIpoLamp.008_t'/>
+    </sequence>
+    <sequence name='LaIpo.003Lamp.009'>
+      <fadelight blue='0.405843317509' light='Lamp.009' duration='250.0' green='0.773916184902' red='0.987740218639'/>
+      <delay time='250.0'/>
+      <fadelight blue='0.316366016865' light='Lamp.009' duration='208.333333333' green='0.703072845936' red='0.923693656921'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.419711768627' light='Lamp.009' duration='291.666666667' green='0.737029135227' red='0.941160857677'/>
+      <delay time='291.666666667'/>
+      <fadelight blue='0.402875363827' light='Lamp.009' duration='208.333333333' green='0.716411411762' red='0.923693656921'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.331450790167' light='Lamp.009' duration='208.333333333' green='0.76025146246' red='0.964450538158'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.425641000271' light='Lamp.009' duration='208.333333333' green='0.729349136353' red='0.923693656921'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.406892001629' light='Lamp.009' duration='208.333333333' green='0.693448662758' red='0.88293671608'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.376055091619' light='Lamp.009' duration='333.333333333' green='0.609477341175' red='0.861251711845'/>
+      <delay time='333.333333333'/>
+      <fadelight blue='0.351296842098' light='Lamp.009' duration='208.333333333' green='0.694507956505' red='0.861251711845'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.373091459274' light='Lamp.009' duration='208.333333333' green='0.704140245914' red='0.906226396561'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.394000768661' light='Lamp.009' duration='291.666666667' green='0.759610056877' red='0.970272958279'/>
+      <delay time='291.666666667'/>
+      <fadelight blue='0.335614740849' light='Lamp.009' duration='583.333333333' green='0.76847165823' red='0.99938505888'/>
+      <delay time='583.333333333'/>
+      <enable trigger='LaIpo.003Lamp.009_t'/>
+    </sequence>
+    <sequence name='LaIpoLamp.010'>
+      <fadelight blue='0.463790595531' light='Lamp.010' duration='208.333333333' green='0.805523812771' red='0.987740218639'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.374313294888' light='Lamp.010' duration='208.333333333' green='0.734680473804' red='0.923693656921'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.47765904665' light='Lamp.010' duration='208.333333333' green='0.768636763096' red='0.941160857677'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.46082264185' light='Lamp.010' duration='208.333333333' green='0.748019039631' red='0.923693656921'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.564612746239' light='Lamp.010' duration='208.333333333' green='0.807190358639' red='0.964450538158'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.483588278294' light='Lamp.010' duration='208.333333333' green='0.760956764221' red='0.923693656921'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.464839279652' light='Lamp.010' duration='208.333333333' green='0.725056290627' red='0.88293671608'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.331063807011' light='Lamp.010' duration='208.333333333' green='0.641084969044' red='0.813067674637'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.409244120121' light='Lamp.010' duration='208.333333333' green='0.658219873905' red='0.813067674637'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.431038737297' light='Lamp.010' duration='208.333333333' green='0.735747873783' red='0.906226396561'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.451948046684' light='Lamp.010' duration='208.333333333' green='0.791217684746' red='0.970272958279'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.393562018871' light='Lamp.010' duration='208.333333333' green='0.800079286098' red='0.99938505888'/>
+      <delay time='208.333333333'/>
+      <enable trigger='LaIpoLamp.010_t'/>
+    </sequence>
+    <sequence name='LaIpo.003Lamp.012'>
+      <fadelight blue='0.405843317509' light='Lamp.012' duration='250.0' green='0.773916184902' red='0.987740218639'/>
+      <delay time='250.0'/>
+      <fadelight blue='0.316366016865' light='Lamp.012' duration='208.333333333' green='0.703072845936' red='0.923693656921'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.419711768627' light='Lamp.012' duration='291.666666667' green='0.737029135227' red='0.941160857677'/>
+      <delay time='291.666666667'/>
+      <fadelight blue='0.402875363827' light='Lamp.012' duration='208.333333333' green='0.716411411762' red='0.923693656921'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.331450790167' light='Lamp.012' duration='208.333333333' green='0.76025146246' red='0.964450538158'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.425641000271' light='Lamp.012' duration='208.333333333' green='0.729349136353' red='0.923693656921'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.406892001629' light='Lamp.012' duration='208.333333333' green='0.693448662758' red='0.88293671608'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.376055091619' light='Lamp.012' duration='333.333333333' green='0.609477341175' red='0.861251711845'/>
+      <delay time='333.333333333'/>
+      <fadelight blue='0.351296842098' light='Lamp.012' duration='208.333333333' green='0.694507956505' red='0.861251711845'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.373091459274' light='Lamp.012' duration='208.333333333' green='0.704140245914' red='0.906226396561'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.394000768661' light='Lamp.012' duration='291.666666667' green='0.759610056877' red='0.970272958279'/>
+      <delay time='291.666666667'/>
+      <fadelight blue='0.335614740849' light='Lamp.012' duration='583.333333333' green='0.76847165823' red='0.99938505888'/>
+      <delay time='583.333333333'/>
+      <enable trigger='LaIpo.003Lamp.012_t'/>
+    </sequence>
+    <sequence name='LaIpo.003Lamp.018'>
+      <fadelight blue='0.405843317509' light='Lamp.018' duration='250.0' green='0.773916184902' red='0.987740218639'/>
+      <delay time='250.0'/>
+      <fadelight blue='0.316366016865' light='Lamp.018' duration='208.333333333' green='0.703072845936' red='0.923693656921'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.419711768627' light='Lamp.018' duration='291.666666667' green='0.737029135227' red='0.941160857677'/>
+      <delay time='291.666666667'/>
+      <fadelight blue='0.402875363827' light='Lamp.018' duration='208.333333333' green='0.716411411762' red='0.923693656921'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.331450790167' light='Lamp.018' duration='208.333333333' green='0.76025146246' red='0.964450538158'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.425641000271' light='Lamp.018' duration='208.333333333' green='0.729349136353' red='0.923693656921'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.406892001629' light='Lamp.018' duration='208.333333333' green='0.693448662758' red='0.88293671608'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.376055091619' light='Lamp.018' duration='333.333333333' green='0.609477341175' red='0.861251711845'/>
+      <delay time='333.333333333'/>
+      <fadelight blue='0.351296842098' light='Lamp.018' duration='208.333333333' green='0.694507956505' red='0.861251711845'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.373091459274' light='Lamp.018' duration='208.333333333' green='0.704140245914' red='0.906226396561'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.394000768661' light='Lamp.018' duration='291.666666667' green='0.759610056877' red='0.970272958279'/>
+      <delay time='291.666666667'/>
+      <fadelight blue='0.335614740849' light='Lamp.018' duration='583.333333333' green='0.76847165823' red='0.99938505888'/>
+      <delay time='583.333333333'/>
+      <enable trigger='LaIpo.003Lamp.018_t'/>
+    </sequence>
+    <sequence name='LaIpoLamp.017'>
+      <fadelight blue='0.463790595531' light='Lamp.017' duration='208.333333333' green='0.805523812771' red='0.987740218639'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.374313294888' light='Lamp.017' duration='208.333333333' green='0.734680473804' red='0.923693656921'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.47765904665' light='Lamp.017' duration='208.333333333' green='0.768636763096' red='0.941160857677'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.46082264185' light='Lamp.017' duration='208.333333333' green='0.748019039631' red='0.923693656921'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.564612746239' light='Lamp.017' duration='208.333333333' green='0.807190358639' red='0.964450538158'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.483588278294' light='Lamp.017' duration='208.333333333' green='0.760956764221' red='0.923693656921'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.464839279652' light='Lamp.017' duration='208.333333333' green='0.725056290627' red='0.88293671608'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.331063807011' light='Lamp.017' duration='208.333333333' green='0.641084969044' red='0.813067674637'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.409244120121' light='Lamp.017' duration='208.333333333' green='0.658219873905' red='0.813067674637'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.431038737297' light='Lamp.017' duration='208.333333333' green='0.735747873783' red='0.906226396561'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.451948046684' light='Lamp.017' duration='208.333333333' green='0.791217684746' red='0.970272958279'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.393562018871' light='Lamp.017' duration='208.333333333' green='0.800079286098' red='0.99938505888'/>
+      <delay time='208.333333333'/>
+      <enable trigger='LaIpoLamp.017_t'/>
+    </sequence>
+    <sequence name='ObIpo.002Cube.012'>
+      <delay time='41.6666666667'/>
+      <rotate duration='1250.0' mesh='Cube.012'>
+        <roty>-2.09439510239</roty>
+        <v y='3.98372793198' x='20.549703598' z='17.6523342133'/>
+      </rotate>
+      <delay time='1250.0'/>
+      <rotate duration='1250.0' mesh='Cube.012'>
+        <roty>-2.09439510239</roty>
+        <v y='3.98372793198' x='20.549703598' z='17.6523342133'/>
+      </rotate>
+      <delay time='1250.0'/>
+      <rotate duration='1250.0' mesh='Cube.012'>
+        <roty>-2.09439510239</roty>
+        <v y='3.98372793198' x='20.549703598' z='17.6523342133'/>
+      </rotate>
+      <delay time='1250.0'/>
+      <enable trigger='ObIpo.002Cube.012_t'/>
+    </sequence>
+    <sequence name='LaIpo.003Lamp.020'>
+      <fadelight blue='0.405843317509' light='Lamp.020' duration='250.0' green='0.773916184902' red='0.987740218639'/>
+      <delay time='250.0'/>
+      <fadelight blue='0.316366016865' light='Lamp.020' duration='208.333333333' green='0.703072845936' red='0.923693656921'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.419711768627' light='Lamp.020' duration='291.666666667' green='0.737029135227' red='0.941160857677'/>
+      <delay time='291.666666667'/>
+      <fadelight blue='0.402875363827' light='Lamp.020' duration='208.333333333' green='0.716411411762' red='0.923693656921'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.331450790167' light='Lamp.020' duration='208.333333333' green='0.76025146246' red='0.964450538158'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.425641000271' light='Lamp.020' duration='208.333333333' green='0.729349136353' red='0.923693656921'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.406892001629' light='Lamp.020' duration='208.333333333' green='0.693448662758' red='0.88293671608'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.376055091619' light='Lamp.020' duration='333.333333333' green='0.609477341175' red='0.861251711845'/>
+      <delay time='333.333333333'/>
+      <fadelight blue='0.351296842098' light='Lamp.020' duration='208.333333333' green='0.694507956505' red='0.861251711845'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.373091459274' light='Lamp.020' duration='208.333333333' green='0.704140245914' red='0.906226396561'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.394000768661' light='Lamp.020' duration='291.666666667' green='0.759610056877' red='0.970272958279'/>
+      <delay time='291.666666667'/>
+      <fadelight blue='0.335614740849' light='Lamp.020' duration='583.333333333' green='0.76847165823' red='0.99938505888'/>
+      <delay time='583.333333333'/>
+      <enable trigger='LaIpo.003Lamp.020_t'/>
+    </sequence>
+    <sequence name='LaIpoLamp.022'>
+      <fadelight blue='0.463790595531' light='Lamp.022' duration='208.333333333' green='0.805523812771' red='0.987740218639'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.374313294888' light='Lamp.022' duration='208.333333333' green='0.734680473804' red='0.923693656921'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.47765904665' light='Lamp.022' duration='208.333333333' green='0.768636763096' red='0.941160857677'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.46082264185' light='Lamp.022' duration='208.333333333' green='0.748019039631' red='0.923693656921'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.564612746239' light='Lamp.022' duration='208.333333333' green='0.807190358639' red='0.964450538158'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.483588278294' light='Lamp.022' duration='208.333333333' green='0.760956764221' red='0.923693656921'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.464839279652' light='Lamp.022' duration='208.333333333' green='0.725056290627' red='0.88293671608'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.331063807011' light='Lamp.022' duration='208.333333333' green='0.641084969044' red='0.813067674637'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.409244120121' light='Lamp.022' duration='208.333333333' green='0.658219873905' red='0.813067674637'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.431038737297' light='Lamp.022' duration='208.333333333' green='0.735747873783' red='0.906226396561'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.451948046684' light='Lamp.022' duration='208.333333333' green='0.791217684746' red='0.970272958279'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.393562018871' light='Lamp.022' duration='208.333333333' green='0.800079286098' red='0.99938505888'/>
+      <delay time='208.333333333'/>
+      <enable trigger='LaIpoLamp.022_t'/>
+    </sequence>
+    <sequence name='LaIpoLamp.026'>
+      <fadelight blue='0.463790595531' light='Lamp.026' duration='208.333333333' green='0.805523812771' red='0.987740218639'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.374313294888' light='Lamp.026' duration='208.333333333' green='0.734680473804' red='0.923693656921'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.47765904665' light='Lamp.026' duration='208.333333333' green='0.768636763096' red='0.941160857677'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.46082264185' light='Lamp.026' duration='208.333333333' green='0.748019039631' red='0.923693656921'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.564612746239' light='Lamp.026' duration='208.333333333' green='0.807190358639' red='0.964450538158'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.483588278294' light='Lamp.026' duration='208.333333333' green='0.760956764221' red='0.923693656921'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.464839279652' light='Lamp.026' duration='208.333333333' green='0.725056290627' red='0.88293671608'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.331063807011' light='Lamp.026' duration='208.333333333' green='0.641084969044' red='0.813067674637'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.409244120121' light='Lamp.026' duration='208.333333333' green='0.658219873905' red='0.813067674637'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.431038737297' light='Lamp.026' duration='208.333333333' green='0.735747873783' red='0.906226396561'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.451948046684' light='Lamp.026' duration='208.333333333' green='0.791217684746' red='0.970272958279'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.393562018871' light='Lamp.026' duration='208.333333333' green='0.800079286098' red='0.99938505888'/>
+      <delay time='208.333333333'/>
+      <enable trigger='LaIpoLamp.026_t'/>
+    </sequence>
+    <sequence name='LaIpo.003Lamp.027'>
+      <fadelight blue='0.405843317509' light='Lamp.027' duration='250.0' green='0.773916184902' red='0.987740218639'/>
+      <delay time='250.0'/>
+      <fadelight blue='0.316366016865' light='Lamp.027' duration='208.333333333' green='0.703072845936' red='0.923693656921'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.419711768627' light='Lamp.027' duration='291.666666667' green='0.737029135227' red='0.941160857677'/>
+      <delay time='291.666666667'/>
+      <fadelight blue='0.402875363827' light='Lamp.027' duration='208.333333333' green='0.716411411762' red='0.923693656921'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.331450790167' light='Lamp.027' duration='208.333333333' green='0.76025146246' red='0.964450538158'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.425641000271' light='Lamp.027' duration='208.333333333' green='0.729349136353' red='0.923693656921'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.406892001629' light='Lamp.027' duration='208.333333333' green='0.693448662758' red='0.88293671608'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.376055091619' light='Lamp.027' duration='333.333333333' green='0.609477341175' red='0.861251711845'/>
+      <delay time='333.333333333'/>
+      <fadelight blue='0.351296842098' light='Lamp.027' duration='208.333333333' green='0.694507956505' red='0.861251711845'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.373091459274' light='Lamp.027' duration='208.333333333' green='0.704140245914' red='0.906226396561'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.394000768661' light='Lamp.027' duration='291.666666667' green='0.759610056877' red='0.970272958279'/>
+      <delay time='291.666666667'/>
+      <fadelight blue='0.335614740849' light='Lamp.027' duration='583.333333333' green='0.76847165823' red='0.99938505888'/>
+      <delay time='583.333333333'/>
+      <enable trigger='LaIpo.003Lamp.027_t'/>
+    </sequence>
+    <sequence name='LaIpoLamp.028'>
+      <fadelight blue='0.463790595531' light='Lamp.028' duration='208.333333333' green='0.805523812771' red='0.987740218639'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.374313294888' light='Lamp.028' duration='208.333333333' green='0.734680473804' red='0.923693656921'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.47765904665' light='Lamp.028' duration='208.333333333' green='0.768636763096' red='0.941160857677'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.46082264185' light='Lamp.028' duration='208.333333333' green='0.748019039631' red='0.923693656921'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.564612746239' light='Lamp.028' duration='208.333333333' green='0.807190358639' red='0.964450538158'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.483588278294' light='Lamp.028' duration='208.333333333' green='0.760956764221' red='0.923693656921'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.464839279652' light='Lamp.028' duration='208.333333333' green='0.725056290627' red='0.88293671608'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.331063807011' light='Lamp.028' duration='208.333333333' green='0.641084969044' red='0.813067674637'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.409244120121' light='Lamp.028' duration='208.333333333' green='0.658219873905' red='0.813067674637'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.431038737297' light='Lamp.028' duration='208.333333333' green='0.735747873783' red='0.906226396561'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.451948046684' light='Lamp.028' duration='208.333333333' green='0.791217684746' red='0.970272958279'/>
+      <delay time='208.333333333'/>
+      <fadelight blue='0.393562018871' light='Lamp.028' duration='208.333333333' green='0.800079286098' red='0.99938505888'/>
+      <delay time='208.333333333'/>
+      <enable trigger='LaIpoLamp.028_t'/>
+    </sequence>
+  </sequences>
+  <start name='Camera.001'>
+    <sector>interior</sector>
+    <position y='3.57855' x='27.5196' z='16.9281'/>
+    <up y='1' x='-8.74228e-008' z='-1.19249e-008'/>
+    <forward y='-1.94707e-007' x='-1.74846e-007' z='1'/>
+  </start>
+  <start name='Camera'>
+    <sector>interior</sector>
+    <position y='4.41512' x='28.7505' z='3.6565'/>
+    <up y='1' x='-8.74228e-008' z='-1.19249e-008'/>
+    <forward y='-1.94707e-007' x='-1.74846e-007' z='1'/>
+  </start>
+</world>
