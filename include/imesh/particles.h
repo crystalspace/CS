@@ -651,7 +651,7 @@ struct iParticleBuiltinEmitterFactory : public virtual iBase
  */
 struct iParticleBuiltinEffectorForce : public iParticleEffector
 {
-  SCF_INTERFACE(iParticleBuiltinEffectorForce,1,0,0);
+  SCF_INTERFACE(iParticleBuiltinEffectorForce,2,0,0);
   
   /// Set constant acceleration vector
   virtual void SetAcceleration (const csVector3& acceleration) = 0;
@@ -665,11 +665,11 @@ struct iParticleBuiltinEffectorForce : public iParticleEffector
   /// Get the force vector
   virtual const csVector3& GetForce () const = 0;
 
-  /// Set random acceleration magnitude
-  virtual void SetRandomAcceleration (float magnitude) = 0;
+  /// Set random acceleration magnitude.
+  virtual void SetRandomAcceleration (const csVector3& magnitude) = 0;
 
   /// Get random acceleration magnitude
-  virtual float GetRandomAcceleration () const = 0;
+  virtual const csVector3& GetRandomAcceleration () const = 0;
 };
 
 /**

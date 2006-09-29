@@ -116,10 +116,6 @@
     <plugin name="thing">crystalspace.mesh.loader.thing</plugin>
     <plugin name="fireFact">crystalspace.mesh.loader.factory.fire</plugin>
     <plugin name="fire">crystalspace.mesh.loader.fire</plugin>
-    <plugin name="rainFact">crystalspace.mesh.loader.factory.rain</plugin>
-    <plugin name="rain">crystalspace.mesh.loader.rain</plugin>
-    <plugin name="snowFact">crystalspace.mesh.loader.factory.snow</plugin>
-    <plugin name="snow">crystalspace.mesh.loader.snow</plugin>
     <plugin name="fountainFact">crystalspace.mesh.loader.factory.fountain</plugin>
     <plugin name="fountain">crystalspace.mesh.loader.fountain</plugin>
     <plugin name="emitFact">crystalspace.mesh.loader.factory.emit</plugin>
@@ -134,12 +130,62 @@
     <params />
   </meshfact>
   <meshfact name="rainFact">
-    <plugin>rainFact</plugin>
-    <params />
+    <plugin>crystalspace.mesh.loader.factory.particles</plugin>
+    <params>
+      <particlesize x="0.02" y="0.37" />
+      <minbb>
+        <min x="-10" y="0" z="-5" />
+        <max x="5" y="6" z="10" />
+      </minbb>
+      <sortmode>none</sortmode>
+      <renderorientation>common</renderorientation>
+      <commondirection x="0" y="1" z="0" />
+      <emitter type="box">
+        <emissionrate>250</emissionrate>
+        <mass min="5" max="7.5" />
+        <box>
+          <min x="-10" y="6" z="-5" />
+          <max x="5" y="6" z="10" />
+        </box>
+        <uniformvelocity />
+        <initialvelocity x="0" y="-2.84" z="0" />
+        <initialttl min="2.5" max="2.5" />
+        <placement>volume</placement>
+      </emitter>
+      <effector type="lincolor">
+        <color red="0" green="0" blue="1" time="2.5" />
+        <color red="1" green="0" blue="0" time="0" />
+      </effector>
+    </params>
   </meshfact>
   <meshfact name="snowFact">
-    <plugin>snowFact</plugin>
-    <params />
+    <plugin>crystalspace.mesh.loader.factory.particles</plugin>
+    <params>
+      <particlesize x="0.17" y="0.17" />
+      <minbb>
+        <min x="-5" y="-0.3" z="-5" />
+        <max x="10" y="6" z="10" />
+      </minbb>
+      <sortmode>none</sortmode>
+      <emitter type="box">
+        <emissionrate>250</emissionrate>
+        <mass min="5" max="7.5" />
+        <box>
+          <min x="-5" y="6" z="-5" />
+          <max x="10" y="6" z="10" />
+        </box>
+        <uniformvelocity />
+        <initialvelocity x="0" y="-1.42" z="0" />
+        <initialttl min="5" max="5" />
+        <placement>volume</placement>
+      </emitter>
+      <effector type="lincolor">
+        <color red="0" green="0" blue="1" time="5" />
+      </effector>
+      <effector type="force">
+	<randomacceleration x="2.5" y="0" z="2.5" />
+      </effector>
+    </params>
   </meshfact>
   <meshfact name="emitFact">
     <plugin>emitFact</plugin>
@@ -440,52 +486,33 @@
     </meshobj>
     <meshobj name="snowfall">
       <priority>alpha</priority>
-      <plugin>snow</plugin>
+      <plugin>crystalspace.mesh.loader.particles</plugin>
       <ztest />
+      <params>
+        <factory>snowFact</factory>
+        <mixmode>
+          <add />
+        </mixmode>
+        <material>snow</material>
+      </params>
       <move>
         <v x="10" y="0" z="10" />
       </move>
-      <params>
-        <factory>snowFact</factory>
-        <box>
-          <min x="-5" y="-0.3" z="-5" />
-          <max x="10" y="6" z="10" />
-        </box>
-        <mixmode>
-          <add />
-        </mixmode>
-        <number>500</number>
-        <material>snow</material>
-        <dropsize w="0.17" h="0.17" />
-        <lighting>no</lighting>
-        <swirl>0.5</swirl>
-        <color red="0.2" green="0.2" blue="0.5" />
-        <fallspeed x="0" y="-0.4" z="0" />
-      </params>
     </meshobj>
     <meshobj name="rainfall">
       <priority>alpha</priority>
-      <plugin>rain</plugin>
+      <plugin>crystalspace.mesh.loader.particles</plugin>
       <ztest />
-      <move>
-        <v x="-10" y="0" z="10" />
-      </move>
       <params>
         <factory>rainFact</factory>
-        <box>
-          <min x="-10" y="-0.3" z="-5" />
-          <max x="5" y="6" z="10" />
-        </box>
         <mixmode>
           <add />
         </mixmode>
-        <number>500</number>
         <material>raindrop</material>
-        <dropsize w="0.02" h="0.37" />
-        <lighting>no</lighting>
-        <color red="0.2" green="0.35" blue="0.5" />
-        <fallspeed x="0" y="-2.84" z="0" />
       </params>
+      <move>
+        <v x="-10" y="0" z="10" />
+      </move>
     </meshobj>
     <meshobj name="fount1">
       <priority>alpha</priority>

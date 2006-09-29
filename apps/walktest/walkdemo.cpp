@@ -43,7 +43,6 @@
 #include "imesh/lighting.h"
 #include "imesh/object.h"
 #include "imesh/partsys.h"
-#include "imesh/snow.h"
 #include "imesh/spiral.h"
 #include "imesh/sprite3d.h"
 #include "imesh/thing.h"
@@ -128,13 +127,18 @@ void add_particles_rain (iSector* sector, char* matname, int num, float speed,
         Sys->object_reg, "crystalspace.mesh.object.particles.effector", false);
 
   csRef<iParticleBuiltinEmitterBox> boxemit = emit_factory->CreateBox ();
-  boxemit->SetBox (bbox);
+  // Time to live depends on height of sector.
+  float velocity = 2.84f * speed / 2.0f;
+  float seconds_to_live = (bbox.MaxY () - bbox.MinY ()) / velocity;
+  csBox3 emit_bbox = bbox;
+  emit_bbox.SetMin (1, emit_bbox.MaxY ());
+  boxemit->SetBox (emit_bbox);
   boxemit->SetParticlePlacement (CS_PARTICLE_BUILTIN_VOLUME);
-  boxemit->SetEmissionRate (float (num) / 2.5f);
+  boxemit->SetEmissionRate (float (num) / seconds_to_live);
   boxemit->SetInitialMass (5.0f, 7.5f);
   boxemit->SetUniformVelocity (true);
-  boxemit->SetInitialTTL (2.5f, 2.5f);
-  boxemit->SetInitialVelocity (csVector3 (0, -2.84f * speed / 2.0f, 0),
+  boxemit->SetInitialTTL (seconds_to_live, seconds_to_live);
+  boxemit->SetInitialVelocity (csVector3 (0, -velocity, 0),
       csVector3 (0));
 
   csRef<iParticleBuiltinEffectorLinColor> lincol = eff_factory->
@@ -156,6 +160,7 @@ void add_particles_rain (iSector* sector, char* matname, int num, float speed,
 //===========================================================================
 void add_particles_snow (iSector* sector, char* matname, int num, float speed)
 {
+  iEngine* engine = Sys->view->GetEngine ();
   // First check if the material exists.
   iMaterialWrapper* mat = Sys->view->GetEngine ()->GetMaterialList ()->
   	FindByName (matname);
@@ -168,30 +173,54 @@ void add_particles_snow (iSector* sector, char* matname, int num, float speed)
   csBox3 bbox;
   sector->CalculateSectorBBox (bbox, true);
 
-  csRef<iMeshFactoryWrapper> mfw (Sys->view->GetEngine ()->
-    CreateMeshFactory ("crystalspace.mesh.object.snow", "snow"));
+  csRef<iMeshFactoryWrapper> mfw = engine->CreateMeshFactory (
+      "crystalspace.mesh.object.particles", "snow");
   if (!mfw) return;
 
-  csRef<iMeshWrapper> exp (
-  	Sys->view->GetEngine ()->CreateMeshWrapper (mfw, "custom snow", sector,
-	csVector3 (0, 0, 0)));
+  csRef<iMeshWrapper> exp = engine->CreateMeshWrapper (mfw, "custom snow",
+	sector, csVector3 (0, 0, 0));
 
   exp->SetZBufMode(CS_ZBUF_TEST);
-
-  csRef<iParticleState> partstate (
-  	SCF_QUERY_INTERFACE (exp->GetMeshObject (), iParticleState));
+  exp->GetMeshObject()->SetMixMode (CS_FX_ADD);
   exp->GetMeshObject()->SetMaterialWrapper (mat);
-  partstate->SetMixMode (CS_FX_ADD);
-  exp->GetMeshObject()->SetColor (csColor (.25,.25,.25));
 
-  csRef<iSnowState> snowstate (
-  	SCF_QUERY_INTERFACE (exp->GetMeshObject (), iSnowState));
-  snowstate->SetParticleCount (num);
-  snowstate->SetDropSize (0.07f, 0.07f);
-  snowstate->SetLighting (false);
-  snowstate->SetBox (bbox.Min (), bbox.Max ());
-  snowstate->SetFallSpeed (csVector3 (0, -speed, 0));
-  snowstate->SetSwirl (0.2f);
+  csRef<iParticleBuiltinEmitterFactory> emit_factory = 
+      csLoadPluginCheck<iParticleBuiltinEmitterFactory> (
+        Sys->object_reg, "crystalspace.mesh.object.particles.emitter", false);
+  csRef<iParticleBuiltinEffectorFactory> eff_factory = 
+      csLoadPluginCheck<iParticleBuiltinEffectorFactory> (
+        Sys->object_reg, "crystalspace.mesh.object.particles.effector", false);
+
+  csRef<iParticleBuiltinEmitterBox> boxemit = emit_factory->CreateBox ();
+  // Time to live depends on height of sector.
+  float velocity = 2.0f * speed / 2.0f;
+  float seconds_to_live = (bbox.MaxY () - bbox.MinY ()) / velocity;
+  csBox3 emit_bbox = bbox;
+  emit_bbox.SetMin (1, emit_bbox.MaxY ());
+  boxemit->SetBox (emit_bbox);
+  boxemit->SetParticlePlacement (CS_PARTICLE_BUILTIN_VOLUME);
+  boxemit->SetEmissionRate (float (num) / seconds_to_live);
+  boxemit->SetInitialMass (5.0f, 7.5f);
+  boxemit->SetUniformVelocity (true);
+  boxemit->SetInitialTTL (seconds_to_live, seconds_to_live);
+  boxemit->SetInitialVelocity (csVector3 (0, -velocity, 0),
+      csVector3 (0));
+
+  csRef<iParticleBuiltinEffectorLinColor> lincol = eff_factory->
+    CreateLinColor ();
+  lincol->AddColor (csColor4 (.25,.25,.25,1), 2.5f);
+
+  csRef<iParticleBuiltinEffectorForce> force = eff_factory->
+    CreateForce ();
+  force->SetRandomAcceleration (csVector3 (1.5f, 0.0f, 1.5f));
+
+  csRef<iParticleSystem> partstate =
+  	scfQueryInterface<iParticleSystem> (exp->GetMeshObject ());
+  partstate->SetMinBoundingBox (bbox);
+  partstate->SetParticleSize (csVector2 (0.07f, 0.07f));
+  partstate->AddEmitter (boxemit);
+  partstate->AddEffector (lincol);
+  partstate->AddEffector (force);
 }
 
 //===========================================================================
