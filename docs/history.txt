@@ -28,6 +28,9 @@ chronological order.
 	  Castle uses Creative Commons NC:
 	  http://creativecommons.org/licenses/by-nc/2.5
 	- Jorrit made castle default level in walktest now.
+	- Erroroman optimized character_bump2.cgvp by calculating bitangent
+	  as cross product of normal and tangent. Also removed bitangent
+	  from tehnique 150 in character_bump2.xml.
 28-Sep-2006
 	- mdmkolbe changed walktest to exit with code 0 on normal exits.
 	- mdmkolbe blind commited a change by Timothy "kiolakin" Whitfield
