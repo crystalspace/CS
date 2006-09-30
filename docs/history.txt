@@ -37,7 +37,7 @@ chronological order.
 	- Jorrit added license note to castle level and castle textures.
 	  Castle uses Creative Commons NC:
 	  http://creativecommons.org/licenses/by-nc/2.5
-	- Jorrit made castle default level in walktest now1.
+	- Jorrit made castle default level in walktest now.
 	- Erroroman optimized character_bump2.cgvp by calculating bitangent
 	  as cross product of normal and tangent. Also removed bitangent
 	  from tehnique 150 in character_bump2.xml.
