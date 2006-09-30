@@ -10,6 +10,8 @@ chronological order.
 	- res fixed some MSVC warnings.
 	- res fixed some wrong GL extension function declarations and added
 	  the GL_EXT_packed_depth_stencil ext.
+	- res changed scfImplementationPooled to use C++ cast operators and
+	  the CS memory allocator.
 29-Sep-2006
 	- res removed the following compatiblity hacks for older compilers
 	  (which would likely not be able to cope with CS' use of advanced
