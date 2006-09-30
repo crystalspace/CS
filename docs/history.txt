@@ -8,6 +8,8 @@ chronological order.
 
 30-Sep-2006
 	- res fixed some MSVC warnings.
+	- res fixed some wrong GL extension function declarations and added
+	  the GL_EXT_packed_depth_stencil ext.
 29-Sep-2006
 	- res removed the following compatiblity hacks for older compilers
 	  (which would likely not be able to cope with CS' use of advanced
