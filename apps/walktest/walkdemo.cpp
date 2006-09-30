@@ -267,21 +267,21 @@ void add_particles_fire (iSector* sector, char* matname, int num,
   sphemit->SetInitialVelocity (csVector3 (0, velocity, 0),
       csVector3 (0));
 
-  csRef<iParticleBuiltinEffectorLinColor> lincol = eff_factory->
-    CreateLinColor ();
-  lincol->AddColor (csColor4 (0.00, 0.00, 0.00, 1), 2);
-  lincol->AddColor (csColor4 (1.00, 0.35, 0.00, 0), 1.5);
-  lincol->AddColor (csColor4 (1.00, 0.22, 0.00, .1), 1.3125);
-  lincol->AddColor (csColor4 (1.00, 0.12, 0.00, .3), 1.125);
-  lincol->AddColor (csColor4 (0.80, 0.02, 0.00, .8), 0.9375);
-  lincol->AddColor (csColor4 (0.60, 0.00, 0.00, .9), 0.75);
-  lincol->AddColor (csColor4 (0.40, 0.00, 0.00, .97), 0.5625);
-  lincol->AddColor (csColor4 (0.20, 0.00, 0.00, 1), 0.375);
-  lincol->AddColor (csColor4 (0.00, 0.00, 0.00, 1), 0.1875);
-  lincol->AddColor (csColor4 (0.00, 0.00, 0.00, 1), 0);
+  csRef<iParticleBuiltinEffectorLinColor> lincol = 
+    eff_factory->CreateLinColor ();
+  lincol->AddColor (csColor4 (0.00f, 0.00f, 0.00f, 1), 2);
+  lincol->AddColor (csColor4 (1.00f, 0.35f, 0.00f, 0), 1.5f);
+  lincol->AddColor (csColor4 (1.00f, 0.22f, 0.00f, .1f), 1.3125f);
+  lincol->AddColor (csColor4 (1.00f, 0.12f, 0.00f, .3f), 1.125f);
+  lincol->AddColor (csColor4 (0.80f, 0.02f, 0.00f, .8f), 0.9375f);
+  lincol->AddColor (csColor4 (0.60f, 0.00f, 0.00f, .9f), 0.75f);
+  lincol->AddColor (csColor4 (0.40f, 0.00f, 0.00f, .97f), 0.5625f);
+  lincol->AddColor (csColor4 (0.20f, 0.00f, 0.00f, 1), 0.375f);
+  lincol->AddColor (csColor4 (0.00f, 0.00f, 0.00f, 1), 0.1875f);
+  lincol->AddColor (csColor4 (0.00f, 0.00f, 0.00f, 1), 0);
 
-  csRef<iParticleBuiltinEffectorForce> force = eff_factory->
-    CreateForce ();
+  csRef<iParticleBuiltinEffectorForce> force = 
+    eff_factory->CreateForce ();
   force->SetRandomAcceleration (csVector3 (1.5f, 1.5f, 1.5f));
 
   csRef<iParticleSystem> partstate =
@@ -391,7 +391,7 @@ void add_particles_explosion (iSector* sector, iEngine* engine,
 
   csRef<iParticleBuiltinEmitterSphere> sphereemit = emit_factory->
     CreateSphere ();
-  sphereemit->SetRadius (0.1);
+  sphereemit->SetRadius (0.1f);
   sphereemit->SetParticlePlacement (CS_PARTICLE_BUILTIN_CENTER);
   sphereemit->SetPosition (csVector3 (0, 0, 0));
   sphereemit->SetInitialVelocity (csVector3 (1, 0, 0), csVector3 (3, 3, 3));
