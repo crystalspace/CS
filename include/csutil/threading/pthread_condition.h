@@ -31,10 +31,6 @@ namespace Threading
 namespace Implementation
 {
 
-  static void __stdcall NotifyFunc (Implementation::ulong_ptr)
-  {
-  }  
-
   class ConditionBase
   {
   public:

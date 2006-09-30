@@ -88,13 +88,13 @@ namespace Implementation
 
 
   ThreadBase::ThreadBase (Runnable* runnable)
-    : runnable (runnable), threadHandle (0), isRunning (false)
+    : runnable (runnable), isRunning (false)
   {
   }
 
   void ThreadBase::Start ()
   {
-    if (!threadHandle)
+    if (!IsRunning ())
     {
       ThreadStartParams param (runnable, isRunning);
 
@@ -109,12 +109,11 @@ namespace Implementation
 
   void ThreadBase::Stop ()
   {
-    if (threadHandle)
+    if (IsRunning ())
     {
       int res = pthread_cancel (threadHandle);
       if (res == 0)
       {
-        threadHandle = 0;
         AtomicOperations::Set (&isRunning, 0);
       }
     }
@@ -169,6 +168,10 @@ namespace Implementation
     }
   }
 
+  void ThreadBase::Yield () 
+  {
+    sched_yield ();
+  }
 }
 }
 }

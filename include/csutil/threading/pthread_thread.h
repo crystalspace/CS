@@ -53,7 +53,7 @@ namespace Implementation
   private:
     csRef<Runnable> runnable;
 
-    pthread_thread_t threadHandle;
+    pthread_t threadHandle;
     
     int32 isRunning;
   };
