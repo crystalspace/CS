@@ -16,59 +16,53 @@
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_CSUTIL_THREADING_WIN32_THREAD_H__
-#define __CS_CSUTIL_THREADING_WIN32_THREAD_H__
+#ifndef __CS_CSUTIL_THREADING_PTHREAD_CONDITION_H__
+#define __CS_CSUTIL_THREADING_PTHREAD_CONDITION_H__
 
-#include "csutil/sysfunc.h"
 
-#if !defined(CS_PLATFORM_WIN32)
-#error "This file is only for Windows and requires you to include csysdefs.h before"
-#endif
-
+#include "csutil/threading/atomicops.h"
+#include "csutil/threading/mutex.h"
+#include "csutil/noncopyable.h"
 
 namespace CS
 {
 namespace Threading
 {
-
-  enum ThreadPriority;
-  class Runnable;
-
 namespace Implementation
 {
 
-  // Thread base-class for win32
-  class ThreadBase
+  static void __stdcall NotifyFunc (Implementation::ulong_ptr)
+  {
+  }  
+
+  class ConditionBase
   {
   public:
-    ThreadBase (Runnable* runnable);
-
-    ~ThreadBase ();
-
-    void Start ();
-
-    void Stop ();
-
-    bool IsRunning () const;
-
-    bool SetPriority (ThreadPriority prio);
-    
-    void Wait () const;
-
-    static void Yield ()
+    ConditionBase ()
     {
-      csSleep (0);
+      pthread_cond_init (&condition, 0);
     }
 
-  private:
-    csRef<Runnable> runnable;
+    void NotifyOne ()
+    {
+      pthread_cond_signal (&condition);
+    }
 
-    mutable void* threadHandle;
-    uint threadId;
+    void NotifyAll ()
+    {
+      pthread_cond_broadcast (&condition);
+    }
 
-    int32 isRunning;
+    template<typename LockType>
+    void Wait (LockType& lock)
+    {
+      pthread_cond_wait (&condition, lock.mutex);
+    }
+
+
+  protected:
+    pthread_cond_t condition;
   };
-
 
 }
 }

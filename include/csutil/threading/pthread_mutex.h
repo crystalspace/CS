@@ -27,6 +27,7 @@ namespace Threading
 {
 namespace Implementation
 {
+  class ConditionBase;
 
   /**
    * Basic implementation of non-recursive mutex for pthread
@@ -70,6 +71,8 @@ namespace Implementation
     }
 
   protected:
+    friend class ConditionBase;
+
     pthread_mutex_t mutex;
     bool isLocked;
   };

@@ -19,49 +19,9 @@
 #include "cssysdef.h"
 
 #include "csutil/threading/thread.h"
-#include "csutil/threading/win32_thread.h"
+#include "csutil/threading/pthread_thread.h"
 #include "csutil/threading/condition.h"
 
-#include <windows.h>
-
-#if defined (__CYGWIN__) 
-//No _beginthreadex, emulate it
-struct ThreadProxyData
-{
-  typedef unsigned (__stdcall* func)(void*);
-  func startAddress;
-
-  void* arglist;
-  ThreadProxyData (func startAddress,void* arglist) : 
-    startAddress (startAddress), arglist (arglist) 
-  {}
-};
-
-DWORD WINAPI ThreadProxy (LPVOID args)
-{
-  ThreadProxyData* data = reinterpret_cast<ThreadProxyData*>(args);
-  DWORD ret = data->startAddress (data->arglist);
-  delete data;
-  return ret;
-}
-
-inline unsigned _beginthreadex (void* security, unsigned stack_size, 
-                                unsigned (__stdcall* start_address)(void*),
-                                void* arglist, unsigned initflag,
-                                unsigned* thrdaddr)
-{
-  DWORD threadID;
-  HANDLE hthread  = CreateThread  (static_cast<LPSECURITY_ATTRIBUTES> (security),
-    stack_size, ThreadProxy, new ThreadProxyData (start_address, arglist),
-    initflag, &threadID);
-
-  if (hthread!=0)
-    *thrdaddr=threadID;
-
-  return reinterpret_cast<unsigned> (hthread);
-}
-
-#endif
 
 namespace CS
 {
@@ -109,7 +69,7 @@ namespace Implementation
       int32& isRunning;
     };
 
-    unsigned int __stdcall proxyFunc (void* param)
+    void* proxyFunc (void* param)
     {
       ThreadStartParams* tp = reinterpret_cast<ThreadStartParams*>
         (param);
@@ -119,7 +79,8 @@ namespace Implementation
       tp->runnable->Run ();
 
       tp->Stopped ();
-
+      
+      pthread_exit (0);
       return 0;
     }
 
@@ -127,7 +88,7 @@ namespace Implementation
 
 
   ThreadBase::ThreadBase (Runnable* runnable)
-    : runnable (runnable), threadHandle (0), threadId (0), isRunning (false)
+    : runnable (runnable), threadHandle (0), isRunning (false)
   {
   }
 
@@ -137,12 +98,11 @@ namespace Implementation
     {
       ThreadStartParams param (runnable, isRunning);
 
-      threadHandle = reinterpret_cast<void*> (_beginthreadex (0, 0, 
-        &proxyFunc, &param, 0, &threadId));
-
-      if (threadHandle == 0)
-        return;
-
+      pthread_attr_t attr;
+      pthread_attr_init(&attr);
+      pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
+      int rc = pthread_create(&threadHandle, &attr, proxyFunc, &param); 
+      
       param.Wait ();
     }
   }
@@ -151,7 +111,7 @@ namespace Implementation
   {
     if (threadHandle)
     {
-      int res = TerminateThread (threadHandle, ~0);
+      int res = pthread_cancel (threadHandle);
       if (res == 0)
       {
         threadHandle = 0;
@@ -167,15 +127,38 @@ namespace Implementation
 
   bool ThreadBase::SetPriority (ThreadPriority prio)
   {
-    int PrioTable[] = {
-      THREAD_PRIORITY_IDLE,
-      THREAD_PRIORITY_NORMAL,
-      THREAD_PRIORITY_HIGHEST
-    };
+    int res;
+    struct sched_param SchedulerProperties;
 
-    int res = SetThreadPriority (threadHandle, PrioTable[prio]);
+    // Clear the properties initially
+    memset(&SchedulerProperties, 0, sizeof (struct sched_param));
 
-    return res != 0;
+    // Map the CS thread priority identifier to an appropriate platform specific identifier
+    //  or fail if this mapping is not possible.
+    switch(prio)
+    {
+    case THREAD_PRIO_LOW:
+      // Posix Pthreads does not guarantee support for any compatible priority,
+      //  so we'll default to NORMAL
+    case THREAD_PRIO_NORMAL:
+      SchedulerProperties.sched_priority = sched_get_priority_max (SCHED_OTHER);
+      res = pthread_setschedparam (thread, SCHED_OTHER, &SchedulerProperties);
+
+      if (res != 0)
+        return false;
+
+      return true;
+    case THREAD_PRIO_HIGH:
+      SchedulerProperties.sched_priority = sched_get_priority_max (SCHED_RR) - 1;
+      res = pthread_setschedparam (thread, SCHED_RR, &SchedulerProperties);
+
+      if (res != 0)
+        return false;
+
+      return true;
+    }
+
+    return false;
   }
 
   void ThreadBase::Wait () const

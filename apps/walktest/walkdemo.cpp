@@ -267,21 +267,21 @@ void add_particles_fire (iSector* sector, char* matname, int num,
   sphemit->SetInitialVelocity (csVector3 (0, velocity, 0),
       csVector3 (0));
 
-  csRef<iParticleBuiltinEffectorLinColor> lincol = 
-    eff_factory->CreateLinColor ();
-  lincol->AddColor (csColor4 (0.00f, 0.00f, 0.00f, 1), 2);
-  lincol->AddColor (csColor4 (1.00f, 0.35f, 0.00f, 0), 1.5f);
-  lincol->AddColor (csColor4 (1.00f, 0.22f, 0.00f, .1f), 1.3125f);
-  lincol->AddColor (csColor4 (1.00f, 0.12f, 0.00f, .3f), 1.125f);
-  lincol->AddColor (csColor4 (0.80f, 0.02f, 0.00f, .8f), 0.9375f);
-  lincol->AddColor (csColor4 (0.60f, 0.00f, 0.00f, .9f), 0.75f);
-  lincol->AddColor (csColor4 (0.40f, 0.00f, 0.00f, .97f), 0.5625f);
-  lincol->AddColor (csColor4 (0.20f, 0.00f, 0.00f, 1), 0.375f);
-  lincol->AddColor (csColor4 (0.00f, 0.00f, 0.00f, 1), 0.1875f);
-  lincol->AddColor (csColor4 (0.00f, 0.00f, 0.00f, 1), 0);
+  csRef<iParticleBuiltinEffectorLinColor> lincol = eff_factory->
+    CreateLinColor ();
+  lincol->AddColor (csColor4 (0.00f, 0.00f, 0.00f, 1.00f), 2.0000f);
+  lincol->AddColor (csColor4 (1.00f, 0.35f, 0.00f, 0.00f), 1.5000f);
+  lincol->AddColor (csColor4 (1.00f, 0.22f, 0.00f, 0.10f), 1.3125f);
+  lincol->AddColor (csColor4 (1.00f, 0.12f, 0.00f, 0.30f), 1.1250f);
+  lincol->AddColor (csColor4 (0.80f, 0.02f, 0.00f, 0.80f), 0.9375f);
+  lincol->AddColor (csColor4 (0.60f, 0.00f, 0.00f, 0.90f), 0.7500f);
+  lincol->AddColor (csColor4 (0.40f, 0.00f, 0.00f, 0.97f), 0.5625f);
+  lincol->AddColor (csColor4 (0.20f, 0.00f, 0.00f, 1.00f), 0.3750f);
+  lincol->AddColor (csColor4 (0.00f, 0.00f, 0.00f, 1.00f), 0.1875f);
+  lincol->AddColor (csColor4 (0.00f, 0.00f, 0.00f, 1.00f), 0.0000f);
 
-  csRef<iParticleBuiltinEffectorForce> force = 
-    eff_factory->CreateForce ();
+  csRef<iParticleBuiltinEffectorForce> force = eff_factory->
+    CreateForce ();
   force->SetRandomAcceleration (csVector3 (1.5f, 1.5f, 1.5f));
 
   csRef<iParticleSystem> partstate =

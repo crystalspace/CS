@@ -43,8 +43,6 @@ namespace Implementation
   public:
     ThreadBase (Runnable* runnable);
 
-    ~ThreadBase ();
-
     void Start ();
 
     void Stop ();
@@ -55,17 +53,13 @@ namespace Implementation
     
     void Wait () const;
 
-    static void Yield ()
-    {
-      csSleep (0);
-    }
+    static void Yield ();
 
   private:
     csRef<Runnable> runnable;
 
-    mutable void* threadHandle;
-    uint threadId;
-
+    pthread_thread_t threadHandle;
+    
     int32 isRunning;
   };
 
