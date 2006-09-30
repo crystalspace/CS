@@ -20,6 +20,7 @@
 #include "cssysdef.h"
 #include "csutil/csstring.h"
 #include "csutil/util.h"
+#include "csutil/scfstringarray.h"
 #include "csutil/sysfunc.h"
 #include "csutil/win32/registrycfg.h"
 
@@ -610,10 +611,35 @@ bool csWin32RegistryIterator::GetBool () const
   return owner->RegToBool (type, data, Def);
 }
 
-
-csPtr<iStringArray> csWin32RegistryIterator::GetTuple () const
+csPtr<iStringArray> csWin32RegistryIterator::GetTuple() const
 {
-  return 0;
+  const char* Data = GetStr();
+
+  scfStringArray *items = new scfStringArray;		// the output list
+  csString item;
+
+  const char *sinp = Data;
+  const char *comp;
+  size_t len;
+  bool finished = false;
+
+  while (!finished)
+  {
+    comp = strchr (sinp, ',');
+    if (!comp)
+    {
+      finished = true;
+      comp = &sinp [strlen (sinp)];
+    }
+    len = strlen (sinp) - strlen (comp);
+    item = csString (sinp, len);
+    item.Trim ();
+    sinp = comp + 1;
+    items->Push (item);
+  }
+
+  csPtr<iStringArray> v(items);
+  return v;
 }
 
 const char *csWin32RegistryIterator::GetComment () const
