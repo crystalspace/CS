@@ -70,7 +70,7 @@ static int Test (csArray<Plucker>& vertices, const Plucker& plane)
       if (distance > PLANE_THICKNESS)
         value = 1;
       else if (distance < -PLANE_THICKNESS)
-        value = 0;
+        value = -1;
     }
     else if (value == 1)  
     {
@@ -567,12 +567,12 @@ void OcclusionTree::PrintTree () const
 
 void TestUnionTree ()
 {
-  Polygon p1 (csVector3 (0, 0, 0), csVector3 (1, 0, 0), csVector3 (1, 1, 0),
-      csVector3 (0, 1, 0));
-  Polygon p2 (csVector3 (0, 0, 1), csVector3 (0, 1, 1), csVector3 (1, 1, 0),
-      csVector3 (1, 0, 1));
-  Polygon p3 (csVector3 (.5, 0, .5), csVector3 (.5, 1, .5), 
-      csVector3 (1.5, 1, .5), csVector3 (1.5, 0, .5));
+  Polygon p1 (csVector3 (0, 0, 0), csVector3 (0, 1, 0), csVector3 (1, 1, 0),
+      csVector3 (1, 0, 0));
+  Polygon p2 (csVector3 (0, 0, 1), csVector3 (1, 0, 1), csVector3 (1, 1, 0),
+      csVector3 (0, 1, 1));
+  Polygon p3 (csVector3 (.1, 0, .5), csVector3 (1.1, 0, .5), 
+      csVector3 (1.1, 1, .5), csVector3 (.1, 1, .5));
   BlockerPolyhedron (&p1, &p3, "").PrintVertices ();
   OcclusionTree* test = new OcclusionTree ();
   test->Union (&p1, &p2, "number 1");
