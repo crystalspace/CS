@@ -163,13 +163,9 @@ namespace Implementation
 
   void ThreadBase::Wait () const
   {
-    if (threadHandle)
+    if (IsRunning ())
     {
-      int res = 0;
-
-      res = WaitForSingleObject (threadHandle, INFINITE);
-      res = CloseHandle (threadHandle);
-      threadHandle = 0;
+      int res = pthread_join (threadHandle,0);
     }
   }
 

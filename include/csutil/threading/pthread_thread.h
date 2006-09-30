@@ -16,15 +16,10 @@
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_CSUTIL_THREADING_WIN32_THREAD_H__
-#define __CS_CSUTIL_THREADING_WIN32_THREAD_H__
+#ifndef __CS_CSUTIL_THREADING_PTHREAD_THREAD_H__
+#define __CS_CSUTIL_THREADING_PTHREAD_THREAD_H__
 
-#include "csutil/sysfunc.h"
-
-#if !defined(CS_PLATFORM_WIN32)
-#error "This file is only for Windows and requires you to include csysdefs.h before"
-#endif
-
+#include <pthread.h>
 
 namespace CS
 {

@@ -108,6 +108,7 @@ namespace Threading
       return BaseMutex::IsLocked ();
     }
   protected:
+    friend class ConditionBase;
   };
 
   /**

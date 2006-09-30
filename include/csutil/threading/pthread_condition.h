@@ -56,7 +56,7 @@ namespace Implementation
     template<typename LockType>
     void Wait (LockType& lock)
     {
-      pthread_cond_wait (&condition, lock.mutex);
+      pthread_cond_wait (&condition, &lock.mutex);
     }
 
 
