@@ -350,10 +350,6 @@ private:
   float alpha_mindist, sq_alpha_mindist, alpha_maxdist;
   float alpha_scale;
 
-  csEngine* engine;
-  csStringID varTransform;
- 
-
   csVector2 last_pos;
 
   /**
@@ -431,9 +427,9 @@ private:
   size_t CountPositions (int cidx, csMGCell& cell);
   size_t CountAllPositions ();
 
-  friend class csMeshGeneratorGeometry;
-
 public:
+  csEngine* engine;
+  csStringID varTransform;
 
   csMeshGenerator (csEngine* engine);
   virtual ~csMeshGenerator ();

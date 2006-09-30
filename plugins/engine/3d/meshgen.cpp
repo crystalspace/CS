@@ -148,12 +148,6 @@ void csMeshGeneratorGeometry::AddFactory (iMeshFactoryWrapper* factory,
   {
     int cell_dim = generator->GetCellCount ();
     factories[idx].instmeshes.SetLength (cell_dim * cell_dim);
-    for (int i = 0; i < cell_dim * cell_dim; i++)
-    {
-      csShaderVariable var (generator->varTransform);
-      var.SetValue (csReversibleTransform ());
-      factories[idx].instmeshes[i].instmesh_state->AddInstancesVariable (var);
-    }
   }
 
   if (maxdist > total_max_dist) total_max_dist = maxdist;
@@ -204,7 +198,8 @@ csPtr<iMeshWrapper> csMeshGeneratorGeometry::AllocMesh (
     if (geominst.inst_setaside.Length () > 0)
       instance_id = geominst.inst_setaside.Pop ();
     else
-      instance_id = geominst.instmesh_state->AddInstance ();
+      instance_id = geominst.instmesh_state->AddInstance (
+      csReversibleTransform ());
     geominst.instmesh->IncRef ();
     return (iMeshWrapper*)geominst.instmesh;
   }
@@ -244,9 +239,7 @@ void csMeshGeneratorGeometry::MoveMesh (int cidx, iMeshWrapper* mesh,
     csVector3 pos = position - meshpos;
     ////printf ("position=%g,%g,%g    meshpos=%g,%g,%g  ->  pos=%g,%g,%g\n", position.x, position.y, position.z, meshpos.x, meshpos.y, meshpos.z, pos.x, pos.y, pos.z); fflush (stdout);
     csReversibleTransform tr (matrix, pos);
-    csShaderVariable var (generator->varTransform);
-    var.SetValue (tr);
-    geominst.instmesh_state->SetInstanceVariable (instance_id, var);
+    geominst.instmesh_state->MoveInstance (instance_id, tr);
   }
 }
 
@@ -324,9 +317,9 @@ bool csMeshGeneratorGeometry::IsRightLOD (float sqdist, size_t current_lod)
 csMeshGenerator::csMeshGenerator (csEngine* engine) : 
   scfImplementationType (this), total_max_dist (-1.0f), 
   use_density_scaling (false), use_alpha_scaling (false),
-  engine (engine), 
   last_pos (0, 0), setup_cells (false), cell_dim (50), 
-  inuse_blocks (0), inuse_blocks_last (0), max_blocks (100)
+  inuse_blocks (0), inuse_blocks_last (0), max_blocks (100),
+  engine (engine)
 {
   cells = new csMGCell [cell_dim * cell_dim];
 
