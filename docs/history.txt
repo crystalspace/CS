@@ -16,6 +16,8 @@ chronological order.
 	  matrix.
 	- res copied a more elaborate version of GetTuple() into 
 	  csWin32RegistryIterator.
+	- res changed the Cg plugin to define a preprocessor macro
+	  PROGRAM_TYPE_FRAGMENT or PROGRAM_TYPE_VERTEX, depending on the type.
 29-Sep-2006
 	- res removed the following compatiblity hacks for older compilers
 	  (which would likely not be able to cope with CS' use of advanced
