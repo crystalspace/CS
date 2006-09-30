@@ -12,6 +12,8 @@ chronological order.
 	  the GL_EXT_packed_depth_stencil ext.
 	- res changed scfImplementationPooled to use C++ cast operators and
 	  the CS memory allocator.
+	- res changed makeGLMatrix to optionally convert to a row-major 
+	  matrix.
 29-Sep-2006
 	- res removed the following compatiblity hacks for older compilers
 	  (which would likely not be able to cope with CS' use of advanced
