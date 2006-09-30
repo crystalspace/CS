@@ -101,18 +101,12 @@ csInstmeshMeshObject::csInstmeshMeshObject (csInstmeshMeshObjectFactory* factory
   autobb = true;
   radius = 0;
 
-  instance_template = (csPtr<csShaderVariable> (
-      new csShaderVariable (factory->strings->Request ("instance_template"))));
-  instance_template->SetType (csShaderVariable::ARRAY);
-  instance_template->SetArraySize (0);
-
   if (factory->material)
     SetMaterialWrapper (factory->material);
 
   dynamic_ambient_version = 0;
 
   bufferHolder.AttachNew (new csRenderBufferHolder);
-  instances = csHash<csInstance*> (2003);
 
   g3d = CS_QUERY_REGISTRY (factory->object_reg, iGraphics3D);
   object_bbox_valid = false;
@@ -125,29 +119,7 @@ csInstmeshMeshObject::~csInstmeshMeshObject ()
 
   ClearPseudoDynLights ();
 }
-csArray<csVector4> csInstmeshMeshObject::Variable2Vectors (csShaderVariable& parameter)
-{
-  csArray<csVector4> vectors;
-  switch (parameter.GetType ())
-  {
-  case csShaderVariable::COLOR:
-  case csShaderVariable::VECTOR2:
-  case csShaderVariable::VECTOR3:
-  case csShaderVariable::VECTOR4:
-    {
-      csVector4 vector;
-      parameter.GetValue (vector);
-      vectors.Push (vector);
-    }
-    break;
-  case csShaderVariable::MATRIX:
-  case csShaderVariable::TRANSFORM:
-    break;
-  default:
-    break;
-  }
-  return vectors;
-}
+
 void csInstmeshMeshObject::SetBoundingBox (const csBox3& box)
 {
   autobb = false;
@@ -156,149 +128,6 @@ void csInstmeshMeshObject::SetBoundingBox (const csBox3& box)
   object_bbox_valid = false;
 }
 
-size_t csInstmeshMeshObject::max_instance_id = 0;
-
-size_t csInstmeshMeshObject::AddInstancesVariable (
-  const csShaderVariable& parameter)
-{
-  csRef<csShaderVariable> var (csPtr<csShaderVariable> (
-      new csShaderVariable (parameter)));
-  instance_template->AddVariableToArray (var);
-  
-  dummy_variable = parameter;
-  csArray<csVector4> vectors = Variable2Vectors (dummy_variable);
-  
-  size_t s = 0;
-  if (var_vect_indices.GetSize () == 0)
-    var_vect_indices.Push (0);
-  else
-  {
-    size_t s = var_vect_indices.GetSize ();
-    var_vect_indices.Push (var_vect_indices[s - 1] + vectors.GetSize ());
-  }
-
-  csHash<csInstance*>::GlobalIterator it = instances.GetIterator ();
-  while (it.HasNext ())
-  {
-    csRef<csShaderVariable> var (csPtr<csShaderVariable> (
-    new csShaderVariable (parameter)));
-    it.Next ()->values = vectors;
-  }
-  return var_vect_indices[s];
-};
-void csInstmeshMeshObject::SetInstanceVariable (size_t instance_id, csShaderVariable variable)
-{
-  csArray<csVector4> vectors = Variable2Vectors (variable);
-
-  int var_id = -1;
-  //search for variable index
-  for (size_t i = 0; i < instance_template->GetArraySize (); i++)
-  {
-    csShaderVariable* el = instance_template->GetArrayElement (i);
-    if (el->GetName () == variable.GetName ())
-    {
-      var_id = (int)var_vect_indices[i];
-    }
-  }
-  if (var_id != -1)
-  {
-    csArray<csInstance*> inst = instances.GetAll (instance_id);
-
-    for (size_t i = 0; i < inst.GetSize (); i++)
-      if (inst[i]->id == instance_id) 
-      {
-        for (size_t j = 0; j < vectors.GetSize (); j++)
-        {
-          inst[i]->values[var_id + j] = vectors[j];
-        }
-      }
-  }
-}
-void csInstmeshMeshObject::SetInstanceVariable (size_t instance_id, size_t variable_id, 
-    const csVector3 &variable)
-{
-  csArray<csInstance*> inst =
-    instances.GetAll<csArrayElementHandler<csInstance*>,
-    CS::Memory::AllocatorMalloc> (instance_id);
-
-  for (size_t i = 0; i < inst.GetSize (); i++)
-    if (inst[i]->id == instance_id) 
-    {
-      inst[i]->values[variable_id] = variable;
-    }
-}
-const csShaderVariable& csInstmeshMeshObject::GetInstanceVariable (
-  size_t instance_id, size_t variable_id)
-{
-  csArray<csInstance*> inst =
-    instances.GetAll<csArrayElementHandler<csInstance*>,
-    CS::Memory::AllocatorMalloc > (instance_id);
-
-  for (size_t i = 0; i < inst.GetSize (); i++)
-    if (inst[i]->id == instance_id) 
-    {
-      //vectors 2 shader variable
-      csArray<csVector4> variables = inst[i]->values;
-      csShaderVariable* variable = instance_template->GetArrayElement (variable_id);
-      switch (variable->GetType ())
-      {
-      case csShaderVariable::COLOR:
-      case csShaderVariable::VECTOR2:
-      case csShaderVariable::VECTOR3:
-        dummy_variable.SetValue (csVector3 (variables[0].x, variables[0].y, variables[0].z));
-        break;
-      case csShaderVariable::VECTOR4:
-      case csShaderVariable::MATRIX:
-      case csShaderVariable::TRANSFORM:
-        break;
-      default:
-        break;
-      }
-      
-      return dummy_variable;
-    }
-
-  dummy_variable = csShaderVariable ();
-  return dummy_variable;
-}
-
-size_t csInstmeshMeshObject::AddInstance ()
-{
-  csInstance* inst = new csInstance ();
-  for (size_t i = 0; i < instance_template->GetArraySize (); i++)
-  {
-    inst->values = Variable2Vectors (*instance_template->GetArrayElement (i));
-  }
-  object_bbox_valid = false;
-  inst->id = max_instance_id++;
-  instances.PutUnique (inst->id, inst); 
-  return inst->id;
-}
-
-void csInstmeshMeshObject::RemoveInstance (size_t id)
-{
-  csArray<csInstance*> values =
-    instances.GetAll<csArrayElementHandler<csInstance*>,
-    CS::Memory::AllocatorMalloc> (id);
-  for (size_t i = 0; i < values.GetSize (); i++)
-    if (values[i]->id == id) 
-    {
-      instances.Delete (id, values[i]);
-      delete values[i];
-    }
-   object_bbox_valid = false;
-}
-
-void csInstmeshMeshObject::RemoveAllInstances ()
-{
-  csHash<csInstance*>::GlobalIterator it = instances.GetIterator ();
-  while (it.HasNext ())
-  {
-    delete it.Next ();
-  }
-  instances.Empty ();
-  object_bbox_valid = false;
-}
 
 void csInstmeshMeshObject::ClearPseudoDynLights ()
 {
@@ -353,46 +182,7 @@ void csInstmeshMeshObject::InitializeDefault (bool clear)
 void csInstmeshMeshObject::CalculateBBoxRadius ()
 {
   object_bbox_valid = true;
-
-  if (instance_template->GetArraySize () > 0)
-    if (instance_template->GetArrayElement (0)->GetType () ==
-      csShaderVariable::TRANSFORM)
-    {
-      object_bbox.StartBoundingBox ();
-      
-      csHash<csInstance*>::GlobalIterator it = instances.GetIterator ();
-      while (it.HasNext ())
-      {
-        csInstance* inst = it.Next ();
-        csMatrix3 mat (inst->values[0].x, inst->values[0].y, inst->values[0].z,
-          inst->values[1].x, inst->values[1].y, inst->values[1].z,
-          inst->values[2].x, inst->values[2].y, inst->values[2].z);
-        csVector3 vect (inst->values[3].x, inst->values[3].y, inst->values[3].z);
-        csReversibleTransform trans (mat, vect);
-
-        object_bbox.AddBoundingVertex (trans.Other2ThisRelative (factory->factory_bbox.Min ()));
-        object_bbox.AddBoundingVertex (trans.Other2ThisRelative (factory->factory_bbox.Max ()));
-      }
-      
-      float max_sqradius = 0.0f;
-      const csVector3& center = object_bbox.GetCenter ();
-      it = instances.GetIterator ();
-      while (it.HasNext ())
-      {
-        csInstance* inst = it.Next ();
-        csMatrix3 mat (inst->values[0].x, inst->values[0].y, inst->values[0].z,
-          inst->values[1].x, inst->values[1].y, inst->values[1].z,
-          inst->values[2].x, inst->values[2].y, inst->values[2].z);
-        csVector3 vect (inst->values[3].x, inst->values[3].y, inst->values[3].z);
-        csReversibleTransform trans (mat, vect);
-
-        float sqradius = csSquaredDist::PointPoint (center, factory->factory_bbox.Min ());
-        if (sqradius > max_sqradius) max_sqradius = sqradius;
-        sqradius = csSquaredDist::PointPoint (center, factory->factory_bbox.Max ());
-        if (sqradius > max_sqradius) max_sqradius = sqradius;
-      }
-      radius = csQsqrt (max_sqradius);
-    }
+  object_bbox = factory->factory_bbox;
 }
 
 float csInstmeshMeshObject::GetRadius ()
@@ -665,13 +455,6 @@ void csInstmeshMeshObject::AppendShadows (iMovable* movable,
 }
 void csInstmeshMeshObject::SetupShaderParams ()
 {
-  csHash<csRef<iShader>, csStringID>::ConstGlobalIterator it = 
-    material->GetMaterial ()->GetShaders ().GetIterator ();
-  while (it.HasNext ())
-  {
-    csRef<iShader> shader = it.Next ();
-    shader->AddVariable (instance_template);
-  }
 }
 
 bool csInstmeshMeshObject::SetMaterialWrapper (iMaterialWrapper* mat)
@@ -1116,7 +899,6 @@ csRenderMesh** csInstmeshMeshObject::GetRenderMeshes (
   meshPtr->buffers = bufferHolder;
   meshPtr->geometryInstance = (void*)factory;
   meshPtr->object2world = o2wt;
-  meshPtr->instances = instances;
 
   renderMeshes[0] = meshPtr;
 

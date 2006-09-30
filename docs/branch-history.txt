@@ -1,0 +1,15 @@
+Crystal Space detailed change log for "pseudoinstancing" branch.
+
+30-Sep-2006
+	- res overhauled the instancing: 
+	    - Instancing targets and variables are now passed along as simple 
+	      arrays to the renderer.
+	    - Fixed function fallback is provided by a special "object2world"
+	      instancing target.
+	    - Instancing parameters are pulled out of an array-typed shader
+	      variable by the xmlshader plugin. Hence meshes can now be
+	      instanced by simply attaching shader variable(s) with instancing
+	      parameters.
+	    - Consequently, removed instancing support from instmesh since 
+	      it's general now. Made mesh generation use the new instancing
+	      as well.

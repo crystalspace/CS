@@ -109,10 +109,7 @@ private:
   csRef<csRenderBufferHolder> bufferHolder;
   csWeakRef<iGraphics3D> g3d;
 
-  csHash<csInstance*> instances;
-  csRef<csShaderVariable> instance_template;
   csArray<size_t> var_vect_indices;
-  static size_t max_instance_id;
 
   iMovable* lighting_movable;
 
@@ -229,19 +226,8 @@ public:
   bool IsShadowCasting () const { return do_shadows; }
   bool IsShadowReceiving () const { return do_shadow_rec; }
 
-  size_t GetInstancesCount (){return instances.GetSize ();}
-
   iVirtualClock* vc;
 
-  // Instancing functions.
-  size_t AddInstance ();
-  void RemoveInstance (size_t id);
-  void RemoveAllInstances ();
-  size_t AddInstancesVariable (const csShaderVariable& parameter);
-  const csShaderVariable& GetInstanceVariable (size_t instance_id, size_t variable_id);
-  void SetInstanceVariable (size_t instance_id, size_t variable_id, 
-    const csVector3 &variable);
-  void SetInstanceVariable (size_t instance_id, csShaderVariable variable);
   void SetAutomaticBoundingBoxCreation (bool flag){autobb = flag;} 
   void SetupShaderVariableContext ();
 

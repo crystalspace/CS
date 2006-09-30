@@ -40,19 +40,9 @@ struct iInstancingMeshState;
 class csMeshGenerator;
 struct csMGCell;
 
-#define CS_GEOM_MAX_ROTATIONS 16
+#define USE_INSTANCING
 
-/**
- * In case a csMGGeom uses an instmesh then this holds the
- * meshes used for a single cell.
- */
-struct csMGGeomInstMesh
-{
-  // @@@ FIXME: only one instmesh per cell for now?
-  csRef<iMeshWrapper> instmesh;
-  csRef<iInstancingMeshState> instmesh_state;
-  csArray<size_t> inst_setaside;
-};
+#define CS_GEOM_MAX_ROTATIONS 16
 
 /**
  * A single geometry (for a single lod level).
@@ -63,23 +53,20 @@ struct csMGGeom
   float maxdistance;
   float sqmaxdistance;
 
-  /**
-   * 2-dimensional array of cells with cell_dim*cell_dim entries.
-   * This is only used in case this factory represents
-   * an instmesh factory.
-   */
-  csArray<csMGGeomInstMesh> instmeshes;
-
+#ifndef USE_INSTANCING
   /// For every lod level we have a cache of meshes.
   csRefArray<iMeshWrapper> mesh_cache;
-  /// For every lod level we have a cache of meshes that are set aside.
-  csRefArray<iMeshWrapper> mesh_setaside;
-
   /**
-   * A set of geom instmeshes where we have put aside instances.
-   * This is an optimization to prevent having to traverse all cells.
+   * For every lod level we have a cache of meshes that are set aside.
+   * Setaside meshes are still associated with the original sector, while
+   * cached meshes aren't.
    */
-  csSet<csPtrKey<csMGGeomInstMesh> > instmesh_setaside;
+  csRefArray<iMeshWrapper> mesh_setaside;
+#else
+  csRef<csShaderVariable> transformArray;
+  csRef<iMeshWrapper> mesh;
+  csRefArray<csShaderVariable> transform_setaside;
+#endif
 };
 
 struct csMGDensityMaterialFactor
@@ -117,6 +104,8 @@ private:
   csArray<csVector2> *positions;
   int celldim;
 
+  void AddSVToMesh (iMeshWrapper* mesh, csShaderVariable* sv);
+  void SetMeshBBox (iMeshWrapper* mesh, const csBox3& bbox);
 public:
   csMeshGeneratorGeometry (csMeshGenerator* generator);
   virtual ~csMeshGeneratorGeometry ();
@@ -173,7 +162,7 @@ public:
    * instance from an instmesh.
    */
   csPtr<iMeshWrapper> AllocMesh (int cidx, const csMGCell& cell,
-      float sqdist, size_t& lod, size_t& instance_id);
+      float sqdist, size_t& lod, csRef<csShaderVariable>& transformVar);
 
   /**
    * Set aside the mesh temporarily. This is called if we have a mesh that
@@ -185,7 +174,7 @@ public:
    * haven't been reused.
    */
   void SetAsideMesh (int cidx, iMeshWrapper* mesh,
-      size_t lod, size_t instance_id);
+      size_t lod, csShaderVariable* transformVar);
 
   /**
    * Free all meshes that were put aside and that were not reused by
@@ -196,8 +185,9 @@ public:
   /**
    * Move the mesh to some position.
    */
-  void MoveMesh (int cidx, iMeshWrapper* mesh, size_t lod, size_t instance_id,
-      const csVector3& position, const csMatrix3& matrix);
+  void MoveMesh (int cidx, iMeshWrapper* mesh, size_t lod, 
+    csShaderVariable* transformVar, const csVector3& position, 
+    const csMatrix3& matrix);
 
   /**
    * Get the right lod level for the given squared distance.
@@ -209,6 +199,10 @@ public:
    * Check if this is the right mesh for the given LOD level.
    */
   bool IsRightLOD (float sqdist, size_t current_lod);
+
+#ifdef USE_INSTANCING
+  void UpdatePosition (const csVector3& pos);
+#endif
 };
 
 /**
@@ -245,15 +239,10 @@ struct csMGPosition
   iMeshWrapper* mesh;
   /// The LOD level for the mesh above.
   size_t lod;
-  /**
-   * If the mesh on this position is an instmesh then this
-   * number is the id of the instance. Otherwise this id will
-   * be csArrayItemNotFound.
-   */
-  size_t instance_id;
 
-  csMGPosition () : last_mixmode (CS_FX_COPY), mesh (0),
-		    instance_id (csArrayItemNotFound) { }
+  csRef<csShaderVariable> transformVar;
+
+  csMGPosition () : last_mixmode (CS_FX_COPY), mesh (0) { }
 };
 
 struct csMGCell;
@@ -354,7 +343,7 @@ private:
   csStringID varTransform;
  
 
-  csVector2 last_pos;
+  csVector3 last_pos;
 
   /**
    * If true the cells are correctly set up. This is cleared by
@@ -393,7 +382,8 @@ private:
    * the given position.
    * This function assumes the cell has a valid block.
    */
-  void AllocateMeshes (int cidx, csMGCell& cell, const csVector3& pos);
+  void AllocateMeshes (int cidx, csMGCell& cell, const csVector3& pos,
+    const csVector3& delta);
 
   /**
    * Generate the positions in the given block.

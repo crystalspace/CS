@@ -45,14 +45,12 @@ private:
     csZBufMode zMode;
     bool overrideZmode;
     bool flipCulling;
-    bool pseudo_instancing;
 
     shaderPass () 
     { 
       mixMode = CS_FX_MESH;
       overrideZmode = false;
       flipCulling = false;
-      pseudo_instancing = false;
       //setup default mappings
       for (unsigned int i=0; i < STREAMMAX; i++)
         defaultMappings[i] = CS_BUFFER_NONE;
@@ -66,9 +64,13 @@ private:
       TEXTUREMAX = 16
     };
 
+    struct InstanceMapping
+    {
+      csStringID variable;
+      csVertexAttrib destination;
+    };
     //pseudoinstancing mappings
-    csArray< csArray<csVector4> > instances_values;
-    csArray<csVertexAttrib> instances_binds;
+    csArray<InstanceMapping> instances_binds;
 
     // buffer mappings
     // default mapping, index is csVertexAttrib (16 first), value is
@@ -125,14 +127,24 @@ private:
   // metadata
   csShaderMetadata metadata;
 
-  bool ParseInstanceBinds (iDocumentNode *node, shaderPass *pass);
+  CS_DECLARE_STATIC_CLASSVAR_REF(instParamsTargets, GetInstParamsTargets,
+    csDirtyAccessArray<csVertexAttrib>);
+  CS_DECLARE_STATIC_CLASSVAR_REF(instParams, GetInstParams,
+    csDirtyAccessArray<csShaderVariable*>);
+  CS_DECLARE_STATIC_CLASSVAR_REF(instParamPtrs, GetInstParamPtrs,
+    csDirtyAccessArray<csShaderVariable**>);
+  CS_DECLARE_STATIC_CLASSVAR_REF(instOuterVar, GetInstOuterVars,
+    csArray<csShaderVariable*>);
 
-  void SetupInstances (csRenderMeshModes& modes, shaderPass *thispass);
+  void SetupInstances (csRenderMeshModes& modes, shaderPass *thispass,
+    const iShaderVarStack* stacks);
 
+  // Parse a vertex attribute specifier
+  csVertexAttrib ParseVertexAttribute (const char* dest,
+    iShaderDestinationResolver* resolveVP, 
+    iShaderDestinationResolver* resolveFP);
   // load one pass, return false if it fails
   bool LoadPass (iDocumentNode *node, shaderPass *pass, size_t variant);
-  // load a shaderdefinition block
-  //bool LoadSVBlock (iDocumentNode *node, iShaderVariableContext *context);
   // load a shaderprogram
   csPtr<iShaderProgram> LoadProgram (iShaderDestinationResolver* resolve,
   	iDocumentNode *node, shaderPass *pass, size_t variant);

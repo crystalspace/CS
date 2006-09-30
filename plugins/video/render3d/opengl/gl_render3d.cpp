@@ -1583,111 +1583,149 @@ void csGLGraphics3D::SetWorldToCamera (const csReversibleTransform& w2c)
   statecache->SetMatrixMode (GL_MODELVIEW);
   glLoadMatrixf (m);
 }
-void csGLGraphics3D::DrawInstancesUseShader (
-  const csCoreRenderMesh* mymesh, const csRenderMeshModes& modes,
-  GLenum primitivetype, iRenderBuffer* iIndexbuf, void* bufData, 
-  GLenum compType, size_t indexCompsBytes)
-{
 
-  if (ext->glMultiTexCoord4fvARB)
+void csGLGraphics3D::SetupInstance (size_t instParamNum, 
+                                    const csVertexAttrib targets[], 
+                                    csShaderVariable* const params[])
+{
+  csVector4 v;
+  float matrix[16];
+  bool uploadMatrix;
+  for (size_t n = 0; n < instParamNum; n++)
   {
-    size_t values_cnt = modes.instances_binds.GetSize ();
-    //loop through all instances
-    csHash<csInstance*>::ConstGlobalIterator it = modes.instances.GetIterator ();
-    
-    while (it.HasNext ())
+    csShaderVariable* param = params[n];
+    csVertexAttrib target = targets[n];
+    switch (param->GetType())
     {
-      //loop through all parameters
-      csInstance* instance = it.Next ();
-      for (size_t i = 0; i < values_cnt; i++)
-      {
-        GLfloat glvector [4];
-        glvector[0] = instance->values[i].x;
-        glvector[1] = instance->values[i].y;
-        glvector[2] = instance->values[i].z;
-        glvector[3] = instance->values[i].w;
-        switch (modes.instances_binds[i])
+      case csShaderVariable::MATRIX:
         {
-        case CS_VATTRIB_TEXCOORD0:
-          ext->glMultiTexCoord4fvARB (GL_TEXTURE0, glvector);
-          break;
-        case CS_VATTRIB_TEXCOORD1:
-          ext->glMultiTexCoord4fvARB (GL_TEXTURE1, glvector);
-          break;
-        case CS_VATTRIB_TEXCOORD2:
-          ext->glMultiTexCoord4fvARB (GL_TEXTURE2, glvector);
-          break;
-        case CS_VATTRIB_TEXCOORD3:
-          ext->glMultiTexCoord4fvARB (GL_TEXTURE3, glvector);
-          break;
-        case CS_VATTRIB_TEXCOORD4:
-          ext->glMultiTexCoord4fvARB (GL_TEXTURE4, glvector);
+          csMatrix3 m;
+          params[n]->GetValue (m);
+          makeGLMatrix (m, matrix, target != CS_IATTRIB_OBJECT2WORLD);
+          uploadMatrix = true;
+        }
+        break;
+      case csShaderVariable::TRANSFORM:
+        {
+          csReversibleTransform tf;
+          params[n]->GetValue (tf);
+          makeGLMatrix (tf, matrix, target != CS_IATTRIB_OBJECT2WORLD);
+          uploadMatrix = true;
+        }
+        break;
+      default:
+        uploadMatrix = false;
+    }
+    if (uploadMatrix)
+    {
+      switch (target)
+      {
+        case CS_IATTRIB_OBJECT2WORLD:
+          {
+            statecache->SetMatrixMode (GL_MODELVIEW);
+            glPushMatrix ();
+            glMultMatrixf (matrix);
+          }
           break;
         default:
-          break;
-        }
+          if (ext->CS_GL_ARB_multitexture)
+          {
+            if ((target >= CS_VATTRIB_TEXCOORD0) 
+              && (target <= CS_VATTRIB_TEXCOORD7))
+            {
+              size_t maxN = csMin (4, CS_VATTRIB_TEXCOORD7 - target + 1);
+              GLenum tu = GL_TEXTURE0 + (target - CS_VATTRIB_TEXCOORD0);
+              for (size_t n = 0; n < maxN; n++)
+              {
+                ext->glMultiTexCoord4fvARB (tu + n, &matrix[n*4]);
+              }
+            }
+          }
+          if (ext->glVertexAttrib4fvARB)
+          {
+            if (CS_VATTRIB_IS_GENERIC (target))
+            {
+              size_t maxN = csMin (4, CS_VATTRIB_GENERIC_LAST - target + 1);
+              GLenum attr = (target - CS_VATTRIB_GENERIC_FIRST);
+              for (size_t n = 0; n < maxN; n++)
+              {
+                ext->glVertexAttrib4fvARB (attr + n, &matrix[n*4]);
+              }
+            }
+          }
       }
-
-      glDrawRangeElements (primitivetype, (GLuint)iIndexbuf->GetRangeStart(), 
-        (GLuint)iIndexbuf->GetRangeEnd(), mymesh->indexend - mymesh->indexstart,
-        compType, 
-        ((uint8*)bufData) + (indexCompsBytes * mymesh->indexstart));
     }
-  }
-}
-void csGLGraphics3D::DrawInstancesNoShader (
-  const csCoreRenderMesh* mymesh, const csRenderMeshModes& modes,
-  GLenum primitivetype, iRenderBuffer* iIndexbuf, void* bufData, 
-  GLenum compType, size_t indexCompsBytes)
-{
-  bool using_transform = false;
-
-  //FIXME: it works only for for very specyfic setup
-  //loop through all instances
-  csHash<csInstance*>::ConstGlobalIterator it = modes.instances.GetIterator ();
-  while (it.HasNext ())
-  {
-    //loop through all parameters
-    csInstance* instance = it.Next ();
-    if (instance->values.GetSize () != 4) continue;
-    for (size_t j = 0; j < instance->values.GetSize (); j++)
+    else
     {
-      float matrix[16];
-      matrix[0] = instance->values[0].x;
-      matrix[1] = instance->values[0].y;
-      matrix[2] = instance->values[0].z;
-      matrix[3] = instance->values[0].w;
-
-      matrix[4] = instance->values[1].x;
-      matrix[5] = instance->values[1].y;
-      matrix[6] = instance->values[1].z;
-      matrix[7] = instance->values[1].w;
-
-      matrix[8] = instance->values[2].x;
-      matrix[9] = instance->values[2].y;
-      matrix[10] = instance->values[2].z;
-      matrix[11] = instance->values[2].w;
-
-      matrix[12] = instance->values[3].x;
-      matrix[13] = instance->values[3].y;
-      matrix[14] = instance->values[3].z;
-      matrix[15] = instance->values[3].w;
-
-      statecache->SetMatrixMode (GL_MODELVIEW);
-      glPushMatrix ();
-      glMultMatrixf (matrix);
-      using_transform  = true;
+      params[n]->GetValue (v);
+      switch (target)
+      {
+        case CS_VATTRIB_WEIGHT:
+          if (ext->CS_GL_EXT_vertex_weighting)
+            ext->glVertexWeightfvEXT (v.m);
+          break;
+        case CS_VATTRIB_NORMAL:
+          glNormal3fv (v.m);
+          break;
+        case CS_VATTRIB_PRIMARY_COLOR:
+          glColor4fv (v.m);
+          break;
+        case CS_VATTRIB_SECONDARY_COLOR:
+          if (ext->CS_GL_EXT_secondary_color)
+            ext->glSecondaryColor3fvEXT (v.m);
+          break;
+        case CS_VATTRIB_FOGCOORD:
+          if (ext->CS_GL_EXT_fog_coord)
+            ext->glFogCoordfvEXT (v.m);
+          break;
+        case CS_IATTRIB_OBJECT2WORLD:
+          {
+            statecache->SetMatrixMode (GL_MODELVIEW);
+            glPushMatrix ();
+          }
+          break;
+        default:
+          if (ext->CS_GL_ARB_multitexture)
+          {
+            if ((target >= CS_VATTRIB_TEXCOORD0) 
+              && (target <= CS_VATTRIB_TEXCOORD7))
+              ext->glMultiTexCoord4fvARB (
+                GL_TEXTURE0 + (target - CS_VATTRIB_TEXCOORD0), 
+                v.m);
+          }
+          else if (target == CS_VATTRIB_TEXCOORD)
+          {
+            glTexCoord4fv (v.m);
+          }
+          if (ext->glVertexAttrib4fvARB)
+          {
+            if (CS_VATTRIB_IS_GENERIC (target))
+              ext->glVertexAttrib4fvARB (target - CS_VATTRIB_0,
+                v.m);
+          }
+      }
     }
-
-    glDrawRangeElements (primitivetype, (GLuint)iIndexbuf->GetRangeStart(), 
-      (GLuint)iIndexbuf->GetRangeEnd(), mymesh->indexend - mymesh->indexstart,
-      compType, 
-      ((uint8*)bufData) + (indexCompsBytes * mymesh->indexstart));
-
-    if (using_transform)
-      glPopMatrix ();
   }
 }
+
+void csGLGraphics3D::TeardownInstance (size_t instParamNum, 
+                                       const csVertexAttrib targets[])
+{
+  for (size_t n = 0; n < instParamNum; n++)
+  {
+    csVertexAttrib target = targets[n];
+    switch (target)
+    {
+      case CS_IATTRIB_OBJECT2WORLD:
+        {
+          statecache->SetMatrixMode (GL_MODELVIEW);
+          glPopMatrix ();
+        }
+        break;
+    }
+  }
+}
+
 void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
     const csRenderMeshModes& modes,
     const iShaderVarStack* stacks)
@@ -1917,14 +1955,19 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
       alpha = 1.0f - (float)(mixmode & CS_FX_MASK_ALPHA) / 255.0f;
     glColor4f (1.0f, 1.0f, 1.0f, alpha);
 
-    if (modes.instances.GetSize () > 0)
+    if (modes.doInstancing)
     {
-      if (!modes.supports_pseudoinstancing)
-        DrawInstancesNoShader (mymesh, modes, primitivetype, iIndexbuf, bufData,
-        compType, indexCompsBytes);
-      else 
-        DrawInstancesUseShader (mymesh, modes, primitivetype, iIndexbuf, bufData,
-        compType, indexCompsBytes);
+      const size_t instParamNum = modes.instParamNum;
+      const csVertexAttrib* const instParamsTargets = modes.instParamsTargets;
+      for (size_t n = 0; n < modes.instanceNum; n++)
+      {
+        SetupInstance (instParamNum, instParamsTargets, modes.instParams[n]);
+        glDrawRangeElements (primitivetype, (GLuint)iIndexbuf->GetRangeStart(), 
+          (GLuint)iIndexbuf->GetRangeEnd(), mymesh->indexend - mymesh->indexstart,
+          compType, 
+          ((uint8*)bufData) + (indexCompsBytes * mymesh->indexstart));
+        TeardownInstance (instParamNum, instParamsTargets);
+      }
     }
     else
     {
@@ -1932,7 +1975,6 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
         (GLuint)iIndexbuf->GetRangeEnd(), mymesh->indexend - mymesh->indexstart,
         compType, 
         ((uint8*)bufData) + (indexCompsBytes * mymesh->indexstart));
-      //indexbuf->Release();
     }
   }
 

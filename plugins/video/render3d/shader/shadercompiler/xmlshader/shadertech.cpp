@@ -49,6 +49,15 @@ iTextureHandle* csXMLShaderTech::clear_textures[shaderPass::TEXTUREMAX];
 int csXMLShaderTech::textureUnits[shaderPass::TEXTUREMAX];
 size_t csXMLShaderTech::lastTexturesCount;
 
+CS_IMPLEMENT_STATIC_CLASSVAR_REF (csXMLShaderTech, instParamsTargets, 
+  GetInstParamsTargets, csDirtyAccessArray<csVertexAttrib>, ());
+CS_IMPLEMENT_STATIC_CLASSVAR_REF (csXMLShaderTech, instParams, GetInstParams,
+  csDirtyAccessArray<csShaderVariable*>, ());
+CS_IMPLEMENT_STATIC_CLASSVAR_REF (csXMLShaderTech, instParamPtrs, 
+  GetInstParamPtrs, csDirtyAccessArray<csShaderVariable**>, ());
+CS_IMPLEMENT_STATIC_CLASSVAR_REF (csXMLShaderTech, instOuterVar, 
+  GetInstOuterVars, csArray<csShaderVariable*>, ());
+
 csXMLShaderTech::csXMLShaderTech (csXMLShader* parent) : 
   passes(0), passesCount(0), currentPass((size_t)~0),
   xmltokens (parent->compiler->xmltokens)
@@ -72,100 +81,81 @@ static inline bool IsDestalphaMixmode (uint mode)
   return (mode == CS_FX_DESTALPHAADD);
 }
 
-bool csXMLShaderTech::ParseInstanceBinds (iDocumentNode *node, shaderPass *pass)
+csVertexAttrib csXMLShaderTech::ParseVertexAttribute (const char* dest,
+  iShaderDestinationResolver* resolveVP, iShaderDestinationResolver* resolveFP)
 {
-  if (!node) return true;
-
-  csRef<iDocumentNodeIterator> it = node->GetNodes (
-    xmltokens.Request (csXMLShaderCompiler::XMLTOKEN_INSTANCEPARAMETER));
-
-  iStringSet* strings = parent->compiler->strings;
-  csRef<csShaderVariable> instance_template = parent->GetVariable (
-    strings->Request ("instance_template"));
-  if (!instance_template) 
+  csVertexAttrib attrib = CS_VATTRIB_INVALID;
+  int i;
+  for(i=0;i<16;i++)
   {
-    if (do_verbose)
-        SetFailReason ("can't find instances template");
-    return false;
+    csString str;
+    str.Format ("attribute %d", i);
+    if (strcasecmp(str, dest)==0)
+    {
+      attrib = (csVertexAttrib)(CS_VATTRIB_0 + i);
+      break;
+    }
   }
-
-  pass->pseudo_instancing = true;
-
-  while (it->HasNext ())
+  if (attrib == CS_VATTRIB_INVALID)
   {
-    csRef<iDocumentNode> ch_node = it->Next ();
-    csRef<iDocumentNode> src_node = ch_node->GetNode (xmltokens.Request (
-      csXMLShaderCompiler::XMLTOKEN_SOURCE));
-    
-    csStringID source_id = strings->Request (src_node->GetContentsValue ());
-    csRef<csShaderVariable> source_variable;
-    //check if we have such source
-    for (size_t i = 0; i < instance_template->GetArraySize (); i++)
+    if (strcasecmp (dest, "position") == 0)
     {
-      if (instance_template->GetArrayElement (i)->GetName () == source_id)
+      attrib = CS_VATTRIB_POSITION;
+    }
+    else if (strcasecmp (dest, "normal") == 0)
+    {
+      attrib = CS_VATTRIB_NORMAL;
+    }
+    else if (strcasecmp (dest, "color") == 0)
+    {
+      attrib = CS_VATTRIB_COLOR;
+    }
+    else if (strcasecmp (dest, "primary color") == 0)
+    {
+      attrib = CS_VATTRIB_PRIMARY_COLOR;
+    }
+    else if (strcasecmp (dest, "secondary color") == 0)
+    {
+      attrib = CS_VATTRIB_SECONDARY_COLOR;
+    }
+    else if (strcasecmp (dest, "texture coordinate") == 0)
+    {
+      attrib = CS_VATTRIB_TEXCOORD;
+    }
+    else if (strcasecmp (dest, "matrix object2world") == 0)
+    {
+      attrib = CS_IATTRIB_OBJECT2WORLD;
+    }
+    else
+    {
+      static const char mapName[] = "texture coordinate ";
+      if (strncasecmp (dest, mapName, sizeof (mapName) - 1) == 0)
       {
-        source_variable = instance_template->GetArrayElement (i);
-        break;
+        const char* target = dest + sizeof (mapName) - 1;
+
+        int texUnit = 
+          resolveFP ? resolveFP->ResolveTU (target) : -1;
+        if (texUnit >= 0)
+        {
+          attrib = (csVertexAttrib)((int)CS_VATTRIB_TEXCOORD0 + texUnit);
+        }
+        else
+        {
+          char dummy;
+          if (sscanf (target, "%d%c", &texUnit, &dummy) == 1)
+          {
+            attrib = (csVertexAttrib)((int)CS_VATTRIB_TEXCOORD0 + texUnit);
+          }
+        }
       }
-    }
-    if (!source_variable) continue;
-
-    size_t binds_cnt = 0;
-    switch (source_variable->GetType ())
-    {
-    case csShaderVariable::COLOR:
-    case csShaderVariable::VECTOR2:
-    case csShaderVariable::VECTOR3:
-    case csShaderVariable::VECTOR4:
-      binds_cnt = 1;
-      break;
-    case csShaderVariable::MATRIX:
-      binds_cnt = 3;
-      break;
-    case csShaderVariable::TRANSFORM:
-      binds_cnt = 4;
-      break;
-    default:
-      break;
-    }
-
-    csRef<iDocumentNodeIterator> dest_it = ch_node->GetNodes (
-      xmltokens.Request (csXMLShaderCompiler::XMLTOKEN_DESTINATION));
-
-    size_t first_id = pass->instances_binds.GetSize ();
-    for (size_t i = 0; i < binds_cnt; i++)
-      pass->instances_binds.Push (CS_VATTRIB_TEXCOORD0);
-
-    size_t bind = 0;
-    while (dest_it->HasNext ())
-    {
-      if (bind >= binds_cnt) break;
-      size_t index = first_id + bind%binds_cnt;
-      bind++;
-      csRef<iDocumentNode> dest_nodes = dest_it->Next ();
-      switch (xmltokens.Request (dest_nodes->GetContentsValue ()))
+      else
       {
-      case csXMLShaderCompiler::XMLTOKEN_TEXCOORD0:
-        pass->instances_binds[index] = CS_VATTRIB_TEXCOORD0;
-        break;
-      case csXMLShaderCompiler::XMLTOKEN_TEXCOORD1:
-        pass->instances_binds[index] = CS_VATTRIB_TEXCOORD1;
-        break;
-      case csXMLShaderCompiler::XMLTOKEN_TEXCOORD2:
-        pass->instances_binds[index] = CS_VATTRIB_TEXCOORD2;
-        break;
-      case csXMLShaderCompiler::XMLTOKEN_TEXCOORD3:
-        pass->instances_binds[index] = CS_VATTRIB_TEXCOORD3;
-        break;
-      case csXMLShaderCompiler::XMLTOKEN_TEXCOORD4:
-        pass->instances_binds[index] = CS_VATTRIB_TEXCOORD4;
-        break;
-      default:
-        break;
+        attrib = resolveVP ? resolveVP->ResolveBufferDestination (dest) : 
+          CS_VATTRIB_INVALID;
       }
     }
   }
-  return true;
+  return attrib;
 }
 
 bool csXMLShaderTech::LoadPass (iDocumentNode *node, shaderPass *pass, 
@@ -173,13 +163,6 @@ bool csXMLShaderTech::LoadPass (iDocumentNode *node, shaderPass *pass,
 {
   iSyntaxService* synldr = parent->compiler->synldr;
   iStringSet* strings = parent->compiler->strings;
-
-  pass->pseudo_instancing = false;
-  //Load pseudo-instancing binds
-  csRef<iDocumentNode> pi_node = node->GetNode (
-    xmltokens.Request (csXMLShaderCompiler::XMLTOKEN_PSEUDOINSTANCING));
-  if (!ParseInstanceBinds (pi_node, pass))
-    return false;
 
   //Load shadervar block
   csRef<iDocumentNode> varNode = node->GetNode(
@@ -337,85 +320,9 @@ bool csXMLShaderTech::LoadPass (iDocumentNode *node, shaderPass *pass,
     if (mapping->GetType () != CS_NODE_ELEMENT) continue;
     
     const char* dest = mapping->GetAttributeValue ("destination");
-    csVertexAttrib attrib = CS_VATTRIB_INVALID;
-    bool found = false;
-    int i;
-    for(i=0;i<16;i++)
-    {
-      csString str;
-      str.Format ("attribute %d", i);
-      if (strcasecmp(str, dest)==0)
-      {
-        found = true;
-        attrib = (csVertexAttrib)(CS_VATTRIB_0 + i);
-        break;
-      }
-    }
-    if (!found)
-    {
-      if (strcasecmp (dest, "position") == 0)
-      {
-        attrib = CS_VATTRIB_POSITION;
-        found = true;
-      }
-      else if (strcasecmp (dest, "normal") == 0)
-      {
-        attrib = CS_VATTRIB_NORMAL;
-        found = true;
-      }
-      else if (strcasecmp (dest, "color") == 0)
-      {
-        attrib = CS_VATTRIB_COLOR;
-        found = true;
-      }
-      else if (strcasecmp (dest, "primary color") == 0)
-      {
-        attrib = CS_VATTRIB_PRIMARY_COLOR;
-        found = true;
-      }
-      else if (strcasecmp (dest, "secondary color") == 0)
-      {
-        attrib = CS_VATTRIB_SECONDARY_COLOR;
-        found = true;
-      }
-      else if (strcasecmp (dest, "texture coordinate") == 0)
-      {
-        attrib = CS_VATTRIB_TEXCOORD;
-        found = true;
-      }
-      else
-      {
-	static const char mapName[] = "texture coordinate ";
-	if (strncasecmp (dest, mapName, sizeof (mapName) - 1) == 0)
-	{
-	  const char* target = dest + sizeof (mapName) - 1;
-
-	  int texUnit = 
-	    resolveFP ? resolveFP->ResolveTU (target) : -1;
-	  if (texUnit >= 0)
-	  {
-	    attrib = (csVertexAttrib)((int)CS_VATTRIB_TEXCOORD0 + texUnit);
-	    found = true;
-	  }
-	  else
-	  {
-	    char dummy;
-	    if (sscanf (target, "%d%c", &texUnit, &dummy) == 1)
-	    {
-	      attrib = (csVertexAttrib)((int)CS_VATTRIB_TEXCOORD0 + texUnit);
-	      found = true;
-	    }
-	  }
-	}
-	else
-	{
-	  attrib = resolveVP ? resolveVP->ResolveBufferDestination (dest) : 
-	    CS_VATTRIB_INVALID;
-          found = (attrib > CS_VATTRIB_INVALID);
-	}
-      }
-    }
-    if (found)
+    csVertexAttrib attrib = ParseVertexAttribute (dest, resolveVP, resolveFP);
+    if ((attrib > CS_VATTRIB_INVALID)
+      && (CS_VATTRIB_IS_SPECIFIC (attrib) || CS_VATTRIB_IS_GENERIC (attrib)))
     {
       const char* cname = mapping->GetAttributeValue("customsource");
       const char *source = mapping->GetAttributeValue ("source");
@@ -438,7 +345,6 @@ bool csXMLShaderTech::LoadPass (iDocumentNode *node, shaderPass *pass,
 
         csStringID varID = strings->Request (cname);
         pass->custommapping_id.Push (varID);
-        //pass->bufferGeneric[pass->bufferCount] = CS_VATTRIB_IS_GENERIC (attrib);
 
         pass->custommapping_attrib.Push (attrib);
 	pass->custommapping_buffer.Push (CS_BUFFER_NONE);
@@ -453,10 +359,9 @@ bool csXMLShaderTech::LoadPass (iDocumentNode *node, shaderPass *pass,
           return false;
         }
         
-	if ((attrib >= CS_VATTRIB_SPECIFIC_FIRST)
-	  && (attrib <= CS_VATTRIB_SPECIFIC_LAST))
+        if (CS_VATTRIB_IS_SPECIFIC (attrib))
 	  pass->defaultMappings[attrib] = sourceName;
-	else
+        else 
 	{
 	  pass->custommapping_attrib.Push (attrib);
 	  pass->custommapping_buffer.Push (sourceName);
@@ -471,7 +376,7 @@ bool csXMLShaderTech::LoadPass (iDocumentNode *node, shaderPass *pass,
     }
     else
     {
-      if (attrib == CS_VATTRIB_INVALID)
+      if (attrib != CS_VATTRIB_UNUSED)
       {
         parent->compiler->Report (CS_REPORTER_SEVERITY_WARNING,
 	  "Shader '%s', pass %d: invalid buffer destination '%s'",
@@ -511,6 +416,43 @@ bool csXMLShaderTech::LoadPass (iDocumentNode *node, shaderPass *pass,
       pass->textureCount = MAX(pass->textureCount, texUnit + 1);
     }
   }
+
+  //Load pseudo-instancing binds
+  it = node->GetNodes (xmltokens.Request (
+    csXMLShaderCompiler::XMLTOKEN_INSTANCEPARAM));
+  while(it->HasNext ())
+  {
+    csRef<iDocumentNode> mapping = it->Next ();
+    if (mapping->GetType () != CS_NODE_ELEMENT) continue;
+    
+    const char* dest = mapping->GetAttributeValue ("destination");
+    csVertexAttrib attrib = ParseVertexAttribute (dest, resolveVP, resolveFP);
+    if (attrib > CS_VATTRIB_INVALID)
+    {
+      const char *source = mapping->GetAttributeValue ("source");
+      if (source == 0)
+      {
+        SetFailReason ("invalid instanceparam, source missing.");
+        return false;
+      }
+
+      shaderPass::InstanceMapping map;
+      map.variable = strings->Request (source);
+      map.destination = attrib;
+
+      pass->instances_binds.Push (map);
+    }
+    else
+    {
+      if (attrib != CS_VATTRIB_UNUSED)
+      {
+        parent->compiler->Report (CS_REPORTER_SEVERITY_WARNING,
+	  "Shader '%s', pass %d: invalid instanceparam destination '%s'",
+	  parent->GetName (), GetPassNumber (pass), dest);
+      }
+    }
+  }
+  pass->instances_binds.ShrinkBestFit ();
 
   return true;
 }
@@ -850,15 +792,75 @@ bool csXMLShaderTech::SetupPass (const csRenderMesh *mesh,
   if(thispass->fp) thispass->fp->SetupState (mesh, modes, stacks);
 
   //pseudo instancing setup
-  SetupInstances (modes, thispass);
+  SetupInstances (modes, thispass, stacks);
 
   return true;
 }
 
-void csXMLShaderTech::SetupInstances (csRenderMeshModes& modes, shaderPass *thispass)
+void csXMLShaderTech::SetupInstances (csRenderMeshModes& modes, 
+                                      shaderPass *thispass,
+                                      const iShaderVarStack* stacks)
 {
-  modes.supports_pseudoinstancing = thispass->pseudo_instancing;
-  modes.instances_binds = thispass->instances_binds;
+  const csArray<shaderPass::InstanceMapping>& instances_binds =
+    thispass->instances_binds;
+  if (instances_binds.GetSize() == 0)
+  {
+    modes.doInstancing = false;
+    return;
+  }
+
+  size_t numVars = 0;
+  size_t numInsts = 0;
+  GetInstParamsTargets().Empty ();
+  GetInstOuterVars().Empty ();
+
+  // Pass one: collect number of instances, SVs per instance
+  for (size_t i = 0; i < instances_binds.GetSize(); i++)
+  {
+    csShaderVariable* var = 0;
+    var = csGetShaderVariableFromStack (stacks, instances_binds[i].variable);
+    GetInstOuterVars().Push (var);
+    if (var == 0) continue;
+    size_t varElems = 1;
+    if (var->GetType() == csShaderVariable::ARRAY)
+    {
+      varElems = var->GetArraySize();
+    }
+    if (varElems == 0) continue;
+    GetInstParamsTargets().Push (instances_binds[i].destination);
+    numInsts = csMax (varElems, numInsts);
+    numVars++;
+  }
+
+  // Pass two: fill arrays
+  GetInstParams().SetLength (numInsts * numVars);
+  GetInstParamPtrs().SetLength (numInsts);
+  size_t svPos = 0;
+  for (size_t instNum = 0; instNum < numInsts; instNum++)
+  {
+    GetInstParamPtrs()[instNum] = 
+      GetInstParams().GetArray() + svPos;
+    for (size_t i = 0; i < instances_binds.GetSize(); i++)
+    {
+      csShaderVariable* var = GetInstOuterVars()[i];
+      if (var == 0) continue;
+
+      if (var->GetType() == csShaderVariable::ARRAY)
+      {
+        size_t varElems = var->GetArraySize();
+        size_t n = csMin (varElems, instNum);
+        var = var->GetArrayElement (n);
+      }
+      GetInstParams()[svPos] = var;
+      svPos++;
+    }
+  }
+
+  modes.instParamNum = numVars;
+  modes.instParamsTargets = GetInstParamsTargets().GetArray(); 
+  modes.instanceNum = numInsts;
+  modes.instParams = GetInstParamPtrs().GetArray();
+  modes.doInstancing = true;
 }
 
 bool csXMLShaderTech::TeardownPass ()

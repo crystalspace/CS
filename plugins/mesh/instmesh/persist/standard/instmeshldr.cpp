@@ -559,59 +559,6 @@ csPtr<iBase> csInstMeshLoader::Parse (iDocumentNode* node,
     csStringID id = xmltokens.Request (value);
     switch (id)
     {
-      case XMLTOKEN_VARIABLE:
-        {
-          csShaderVariable var (strings->Request (child->GetAttributeValue ("name")));
-          const char* type = child->GetAttributeValue ("type");
-          switch (xmltokens.Request (type))
-          {
-          case XMLTOKEN_VECTOR:
-            var.SetValue (csVector4 (0));
-            break;
-          case XMLTOKEN_MATRIX:
-            var.SetValue (csMatrix3 ());
-            break;
-          default:
-            synldr->ReportError (
-              "crystalspace.instmeshloader.parse.unknowntype",
-              child, "Wrong type name '%s'!", type);
-            return 0;
-          }
-          meshstate->AddInstancesVariable (var);
-        }
-        break;
-
-      case XMLTOKEN_INSTANCE:
-	{
-    csReversibleTransform trans;
-    csRef<iDocumentNodeIterator> ch_it = child->GetNodes ("variable");
-    size_t inst_id = meshstate->AddInstance ();
-    while (ch_it->HasNext ())
-    {
-      csRef<iDocumentNode> var_node = ch_it->Next ();
-      csShaderVariable var (strings->Request (var_node->GetAttributeValue ("name")));
-      csRef<iDocumentNode> matrix_node = var_node->GetNode ("matrix");
-      if (matrix_node)
-      {
-        csMatrix3 m;
-        if (!synldr->ParseMatrix (matrix_node, m))
-          return false;
-        var.SetValue (m);
-      }
-      csRef<iDocumentNode> vector_node = child->GetNode ("v");
-      if (vector_node)
-      {
-        csVector3 v;
-        if (!synldr->ParseVector (vector_node, v))
-          return false;
-        var.SetValue (v);
-      }
-      meshstate->SetInstanceVariable (inst_id, var);
-    }
-    CHECK_MESH (meshstate);
-    
-	}
-	break;
       case XMLTOKEN_MANUALCOLORS:
 	{
 	  bool r;

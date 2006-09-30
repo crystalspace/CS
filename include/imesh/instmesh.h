@@ -97,39 +97,10 @@ struct iInstancingMeshCommonState : public virtual iBase
  */
 struct iInstancingMeshState : public virtual iInstancingMeshCommonState
 {
-  SCF_INTERFACE (iInstancingMeshState, 1, 0, 0);
+  SCF_INTERFACE (iInstancingMeshState, 1, 1, 0);
   
   /**
-   * Add an instance. Returns an ID to identify that instance.
-   */
-  virtual size_t AddInstance () = 0;
-
-  ///Get instances count.
-  virtual size_t GetInstancesCount () = 0;
-
-  /**
-   * Add an instance parameter. Returns an ID to identify that parameter.
-   */
-  virtual size_t AddInstancesVariable (const csShaderVariable& parameter) = 0;
-
-  /**
-   * Get instance variable, using ID from AddInstancesVariable.
-   */
-  virtual const csShaderVariable& GetInstanceVariable (size_t instance_id, size_t variable_id) = 0;
-  
-  /**
-   * Set instance variable with same name as passed 'variable' parameter.
-   */
-  virtual void SetInstanceVariable (size_t instance_id, csShaderVariable variable) = 0;
-
-  /**
-   * Set instance variable, using ID from AddInstancesVariable.
-   */
-  virtual void SetInstanceVariable (size_t instance_id, size_t variable_id, 
-    const csVector3 &variable) = 0;
-
-  /**
-   * Set sutomatic bounding box creation flag. If true instance mesh will try to create
+   * Set automatic bounding box creation flag. If true instance mesh will try to create
    * and update bounding box, based on first variable (only if first variable will be 
    * transform). Instmesh will try to do that by default.
    */
@@ -141,17 +112,6 @@ struct iInstancingMeshState : public virtual iInstancingMeshCommonState
   virtual void SetBoundingBox (const csBox3& box) = 0;
 
   virtual void SetupObject () = 0;
-
-  /**
-   * Remove an instance.
-   */
-  virtual void RemoveInstance (size_t id) = 0;
-
-  /**
-   * Remove all instances.
-   */
-  virtual void RemoveAllInstances () = 0;
-
 };
 
 class csSphere;

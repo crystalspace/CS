@@ -37,12 +37,6 @@
 struct iMaterialWrapper;
 struct iPortalContainer;
 
-struct csInstance
-{
-  size_t id;
-  csArray< csVector4 > values;
-};
-
 /**
  * Mesh render mode information. Contains the Z, mix and alpha modes to use
  * for rendering a mesh. 
@@ -51,12 +45,10 @@ struct csInstance
  */
 struct csRenderMeshModes
 {
-  csRenderMeshModes ()
+  csRenderMeshModes () : z_buf_mode (CS_ZBUF_NONE), mixmode (CS_FX_COPY),
+    flipCulling (false), alphaType (csAlphaMode::alphaNone), 
+    doInstancing (false)
   {
-    z_buf_mode = CS_ZBUF_NONE;
-    mixmode = CS_FX_COPY;
-    flipCulling = false;
-    alphaType = csAlphaMode::alphaNone;
   }
 
   ~csRenderMeshModes () { }
@@ -76,11 +68,11 @@ struct csRenderMeshModes
   /// Holder of default render buffers
   csRef<csRenderBufferHolder> buffers;
 
-  bool supports_pseudoinstancing;
-
-  csHash< csInstance* > instances;
-
-  csArray<csVertexAttrib> instances_binds;
+  bool doInstancing;
+  size_t instParamNum;
+  const csVertexAttrib* instParamsTargets;
+  size_t instanceNum;
+  csShaderVariable** const * instParams;
 };
 
 /**
