@@ -334,14 +334,26 @@ public:
   void ReplaceVariable (csShaderVariable *variable)
   { 
     if (useFallbackContext)
+    {
       fallbackShader->ReplaceVariable (variable);
+      return;
+    }
     GetUsedSVContext().ReplaceVariable (variable);
   }
   void Clear ()
   { 
     if (useFallbackContext)
+    {
       fallbackShader->Clear();
+      return;
+    }
     GetUsedSVContext().Clear();
+  }
+  bool RemoveVariable (csShaderVariable* variable)
+  {
+    if (useFallbackContext)
+      return fallbackShader->RemoveVariable (variable);
+    return GetUsedSVContext().RemoveVariable (variable);
   }
   /** @} */
 

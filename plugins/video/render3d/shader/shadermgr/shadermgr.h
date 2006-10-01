@@ -49,10 +49,12 @@
 CS_PLUGIN_NAMESPACE_BEGIN(ShaderManager)
 {
 
-class csShaderManager : public scfImplementation3<csShaderManager,
-						  iShaderManager,
-						  iEventHandler,
-						  iComponent>
+class csShaderManager : 
+  public scfImplementation3<csShaderManager,
+			    iShaderManager,
+			    iEventHandler,
+			    iComponent>,
+  public CS::ShaderVariableContextImpl
 {
 private:
   iObjectRegistry* objectreg;
@@ -152,35 +154,6 @@ public:
   {
     return activeLights;
   }
-  /** @} */
-
-  /**\name iShaderVariableContext implementation
-   * @{ */
-  /// Add a variable to this context
-  void AddVariable (csShaderVariable *variable)
-    { svcontext.AddVariable (variable); }
-
-  /// Get a named variable from this context
-  csShaderVariable* GetVariable (csStringID name) const
-    { return svcontext.GetVariable (name); }
-
-  /// Get Array of all ShaderVariables
-  const csRefArray<csShaderVariable>& GetShaderVariables () const
-  { return svcontext.GetShaderVariables(); }
-
-  /**
-  * Push the variables of this context onto the variable stacks
-  * supplied in the "stacks" argument
-  */
-  void PushVariables (iShaderVarStack* stacks) const
-    { svcontext.PushVariables (stacks); }
-
-  bool IsEmpty () const 
-  { return svcontext.IsEmpty(); }
-
-  void ReplaceVariable (csShaderVariable *variable)
-  { svcontext.ReplaceVariable(variable); }
-  void Clear () { svcontext.Clear(); }
   /** @} */
 
   /**\name iComponent implementation
