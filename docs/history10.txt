@@ -15,6 +15,7 @@ chronological order.
 	- Marten merged r25443 into 1.0.
 	- Marten merged r25445 into 1.0.
 	- Marten merged r25446 into 1.0.
+	- Marten merged r25450 into 1.0.
 30-Sep-2006
 	- res backed pseudo-instancing out of 1.0: it's a somewhat hacky
 	  implementation and at the moment rarely, if at all, used.
