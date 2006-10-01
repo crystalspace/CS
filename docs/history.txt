@@ -6,6 +6,8 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+23-Sep-2006
+	- Marten disabled global overridden malloc and free.
 22-Sep-2006
 	- Jorrit changed the built-in force effector for new particles so
 	  that the random acceleration is now a vector. That means you can

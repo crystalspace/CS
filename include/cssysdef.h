@@ -681,6 +681,7 @@ CS_FORCEINLINE void* cs_calloc (size_t n, size_t s)
  * incompatibility with external projects) have been solved, this is disabled
  */
 #define CS_NO_NEW_OVERRIDE
+#define CS_NO_MALLOC_OVERRIDE
 
 #ifndef CS_NO_MALLOC_OVERRIDE
 #define malloc 		cs_malloc
