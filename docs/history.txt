@@ -10,6 +10,8 @@ chronological order.
 26-Sep-2006
 	- Timothy Whitfield (kiokalin) fixed the paging former so that it
 	  actually works now. It is also seamless.
+	- res disabled strict aliasing for wxgl and wxtest (some WX headers
+	  cause aliasing warnings in optimize mode with gcc 4.1.1).
 24-Sep-2006
         - Piotr did some tweaks to phystut app, now walls colliders should
           work better with ode engine.
