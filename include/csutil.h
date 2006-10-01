@@ -88,6 +88,7 @@
 #include "csutil/mempool.h"
 #include "csutil/mmapio.h"
 #include "csutil/nobjvec.h"
+#include "csutil/noncopyable.h"
 #include "csutil/nulcache.h"
 #include "csutil/objiter.h"
 #include "csutil/objreg.h"
