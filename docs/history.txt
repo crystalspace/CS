@@ -14,6 +14,7 @@ chronological order.
 	- res fixed some locals in CS::TriangleIndicesStream to use the 
 	  template parameter.
 	- res added iShaderVariableContext::RemoveVariable (csShaderVariable*).
+	- caedes removed stdtex from data Jamfile.
 30-Sep-2006
 	- res fixed some MSVC warnings.
 	- res fixed some wrong GL extension function declarations and added
