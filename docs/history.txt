@@ -142,6 +142,7 @@ chronological order.
 	- res fixed _cspace.so.dbg being tried to be split off before 
 	  _cspace.so is built when installing. Fixes trac #11.
 	- res added debug info splitting for the CS JNI library.
+	- res changed ptpdlight to #include <limits.h> as per SFbug:1546141.
 	- David Bronke fixed some warnings about unused variables and member
 	  initialization order, and added const keyword to
 	  csArray::Iterator::HasNext() and csArray::ConstIterator::HasNext().
