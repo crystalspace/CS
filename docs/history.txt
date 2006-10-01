@@ -10,6 +10,7 @@ chronological order.
 	- Marten implemented pthread thread and condition variables classes 
 	  with new interface. The new improved implementation of threading
 	  should now be fully functional.
+	- res silenced more MSVC deprecation warnings.
 30-Sep-2006
 	- res fixed some MSVC warnings.
 	- res fixed some wrong GL extension function declarations and added
