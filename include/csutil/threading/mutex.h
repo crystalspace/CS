@@ -52,7 +52,7 @@ namespace Threading
    * Users are advised to use the ScopedLock helper class.
    */
   template<typename BaseMutex>
-  class MutexImpl : private BaseMutex, 
+  class MutexImpl : public BaseMutex, 
                     private CS::NonCopyable
   {
   public:

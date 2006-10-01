@@ -101,7 +101,7 @@ namespace Implementation
       pthread_attr_t attr;
       pthread_attr_init(&attr);
       pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
-      int rc = pthread_create(&threadHandle, &attr, proxyFunc, &param); 
+      pthread_create(&threadHandle, &attr, proxyFunc, &param); 
       
       param.Wait ();
     }
@@ -141,7 +141,7 @@ namespace Implementation
       //  so we'll default to NORMAL
     case THREAD_PRIO_NORMAL:
       SchedulerProperties.sched_priority = sched_get_priority_max (SCHED_OTHER);
-      res = pthread_setschedparam (thread, SCHED_OTHER, &SchedulerProperties);
+      res = pthread_setschedparam (threadHandle, SCHED_OTHER, &SchedulerProperties);
 
       if (res != 0)
         return false;
@@ -149,7 +149,7 @@ namespace Implementation
       return true;
     case THREAD_PRIO_HIGH:
       SchedulerProperties.sched_priority = sched_get_priority_max (SCHED_RR) - 1;
-      res = pthread_setschedparam (thread, SCHED_RR, &SchedulerProperties);
+      res = pthread_setschedparam (threadHandle, SCHED_RR, &SchedulerProperties);
 
       if (res != 0)
         return false;
@@ -164,7 +164,7 @@ namespace Implementation
   {
     if (IsRunning ())
     {
-      int res = pthread_join (threadHandle,0);
+      pthread_join (threadHandle,0);
     }
   }
 
