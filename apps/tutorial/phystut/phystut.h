@@ -61,7 +61,7 @@ private:
   iRigidBody* CreateSphere (void);
   iRigidBody* CreateMesh (void);
   iJoint* CreateJointed (void);
-  iRigidBody* CreateWalls (const csVector3& radius);
+  void CreateWalls (const csVector3& radius);
   csRef<iMeshWrapper> walls;
   csRef<iMeshWrapper> avatar;
   csRef<iRigidBody> avatarbody;
