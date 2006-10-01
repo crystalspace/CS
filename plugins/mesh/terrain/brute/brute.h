@@ -113,7 +113,7 @@ public:
 public:
   csTerrBlock (csTerrainObject *terr);
   ~csTerrBlock ();
-
+  
   /// Load data from Former
   void LoadData ();
 
@@ -123,11 +123,14 @@ public:
   /// Detach the node from the tree
   void Detach ();
 
+  /// Set all child neighbours that equal a to b
+  void ReplaceChildNeighbours(csTerrBlock *a, csTerrBlock *b);
+
   /// Split block in 4 children
-  void Split ();
+  bool Split ();
 
   /// Merge block
-  void Merge ();
+  bool Merge ();
 
   /// Checks if something needs to be merged or split
   void CalcLOD ();
@@ -343,6 +346,7 @@ private:
   * mesh, the LOD meshes, normals, ...
   */
   void SetupObject ();
+  csTerrainObject *neighbor[4];
 
   //=============
   // Lighting.
@@ -364,12 +368,23 @@ private:
   void UpdateColors (iMovable* movable);
   //=============
 
+  bool LODCalc;
+
 public:
   CS_LEAKGUARD_DECLARE (csTerrainObject);
 
   /// Constructor.
   csTerrainObject (iObjectRegistry* object_reg, csTerrainFactory* factory);
   virtual ~csTerrainObject ();
+
+  /// Set the neighbor above (1 on Z axis) (For use in combining multiple brute meshes)
+  void SetTopNeighbor(iTerrainObjectState *top);
+  /// Set the neighbor to the right (1 on X axis) (For use in combining multiple brute meshes)
+  void SetRightNeighbor(iTerrainObjectState *right);
+  /// Set the neighbor to the left (-1 on X axis) (For use in combining multiple brute meshes)
+  void SetLeftNeighbor(iTerrainObjectState *left);
+  /// Set the neighbor below (-1 on Z axis) (For use in combining multiple brute meshes)
+  void SetBottomNeighbor(iTerrainObjectState *bottom);
 
   const csDirtyAccessArray<csColor>& GetStaticColors () const
   {
