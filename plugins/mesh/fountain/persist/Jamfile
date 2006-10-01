@@ -1,3 +1,0 @@
-SubDir TOP plugins mesh fountain persist ;
-
-SubInclude TOP plugins mesh fountain persist standard ;

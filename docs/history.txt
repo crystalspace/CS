@@ -7,9 +7,16 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 
+27-Sep-2006
+	- Jorrit removed the particles level after merging the particles
+	  there with partsys.
+	- Jorrit removed the fountain mesh object.
+	- Jorrit removed csNewParticleSystem since this class is no longer
+	  being used.
 26-Sep-2006
 	- Timothy Whitfield (kiokalin) fixed the paging former so that it
 	  actually works now. It is also seamless.
+	- Jorrit removed the fire particle system.
 	- res disabled strict aliasing for wxgl and wxtest (some WX headers
 	  cause aliasing warnings in optimize mode with gcc 4.1.1).
 	- res committed a patch from <oh.hello.joe@gmail.com> to add a
@@ -18,6 +25,9 @@ chronological order.
 24-Sep-2006
         - Piotr did some tweaks to phystut app, now walls colliders should
           work better with ode engine.
+	- Jorrit changed the flame command in walktest to use new particles.
+	- Jorrit replaced the two fire particle systems in partsys
+	  with new particles.
 23-Sep-2006
 	- Marten disabled global overridden malloc and free.
 22-Sep-2006

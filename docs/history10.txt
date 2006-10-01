@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+2-Oct-2006
+	- Marten merged r25438:25439, r25444, r25447:25448, 
+	  r25451:25452 into 1.0 (particle related changes).
 1-Oct-2006
 	- Marten merged r25313 into 1.0 (ptpdlight fix).
 	- Marten merged r25411 into 1.0.

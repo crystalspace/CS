@@ -39,7 +39,6 @@ VFS.Mount.lev/terrain  = $(CS_MAPDIR)$/terrain$/
 VFS.Mount.lev/terrainf = $(CS_MAPDIR)$/terrainf$/
 VFS.Mount.lev/terraina = $(CS_MAPDIR)$/terraina$/
 VFS.Mount.lev/terrainp = $(CS_MAPDIR)$/terrainp$/
-VFS.Mount.lev/particles  = $(CS_MAPDIR)$/particles$/
 VFS.Mount.lev/r3dsmtest = $(CS_MAPDIR)$/r3dsmtest$/
 
 ; Mount all libraries under the /lib/ directory
