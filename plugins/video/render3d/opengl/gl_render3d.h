@@ -211,6 +211,7 @@ private:
   csZBufMode current_zmode;
   bool zmesh;
   bool forceWireframe;
+  bool fixedFunctionForcefulEnable;
 
   int asp_center_x, asp_center_y;
   float aspect, inv_aspect;

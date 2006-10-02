@@ -219,13 +219,10 @@
         </ShaderManager>
       </Video>
     </config>
-    <config name="useAFP2D">
+    <config name="fixedFunctionForcefulEnable">
       <Video>
 	<OpenGL>
-	  <FontCache>
-	    <UseAFP>yes</UseAFP>
-	  </FontCache>
-	  <AFPDrawPixmap>yes</AFPDrawPixmap>
+	  <FixedFunctionForcefulEnable>yes</FixedFunctionForcefulEnable>
 	</OpenGL>
       </Video>
     </config>
@@ -477,8 +474,15 @@
       * 2006-01-03: Vasily Rudnikov reports corruption and subsequent fix
 		    by this tweak with a Radeon 9600, Win32, 
 		    driver 6.14.10.4517 (Cat 4.8)
+      * 2006-09-28: More investigation leads to the corruption showing up 
+		    after ARB programs are disabled; apparently this does not
+		    work correctly. Changing a fixed function state and an
+		    empty glBegin()/glEnd() works around the issue.
+		    Observation made with ATI Radeon 9700Pro, Win32, 
+		    driver 6.14.10.6067 (Cat 6.9). Changed to that workaround
+		    from "2D with AFP" one.
       -->
-    <rule description="ATI: Use AFP for some 2D drawing">
+    <rule description="ATI: 'Forceful' fixed function enable">
       <conditions fulfill="all">
 	<regexp string="vendor" pattern="^ATI" />
 	<conditions fulfill="one">
@@ -487,7 +491,7 @@
 	</conditions>
       </conditions>
       <applicable>
-	<usecfg>useAFP2D</usecfg>
+	<usecfg>fixedFunctionForcefulEnable</usecfg>
       </applicable>
     </rule>
 
