@@ -580,8 +580,6 @@ public:
   /** @} */
 };
 
-#include "csutil/win32/msvc_deprecated_warn_on.h"
-
 /**
 * Factory for terrain.
 */
@@ -657,6 +655,8 @@ public:
   virtual void SetMixMode (uint) { }
   virtual uint GetMixMode () const { return 0; }
 };
+
+#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 /**
 * TerrFunc type. This is the plugin you have to use to create instances
