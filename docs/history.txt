@@ -6,11 +6,15 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
-1-Sep-2006
-	- caedes removed stdtex from data Jamfile.
+2-Oct-2006
+	- Marten fixed csQuaternion::Exp and csQuaternion::Log to actually be
+	  the exponential and logarithmic functions.
+1-Oct-2006
+
 	- res silenced more MSVC deprecation warnings.
 	- res fixed some locals in CS::TriangleIndicesStream to use the 
 	  template parameter.
+	- caedes removed stdtex from data Jamfile.
 30-Sep-2006
 	- res fixed some MSVC warnings.
 	- res fixed some wrong GL extension function declarations and added
