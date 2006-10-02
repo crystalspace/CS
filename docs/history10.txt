@@ -16,6 +16,7 @@ chronological order.
 	- Jorrit merged r25474:25476 into 1.0 (gmeshanim2, CG 128).
 	- Jorrit merged r25480 into 1.0 (gmeshanim2 api docs).
 	- Jorrit merged r25505 into 1.0 (stdtex.zip fix).
+	- Marten merged r25455 into 1.0.
 1-Oct-2006
 	- Marten merged r25313 into 1.0 (ptpdlight fix).
 	- Marten merged r25411 into 1.0.

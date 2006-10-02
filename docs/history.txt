@@ -78,6 +78,8 @@ chronological order.
 	- Erroroman made spline rotatin of skeleton animation and 
 	  improved a bit the skeleton the code. 
 	- Erroroman added basic API docs to the skeleton interface.
+28-Sep-2006
+	- mdmkolbe changed walktest to exit with code 0 on normal exits.
 27-Sep-2006
 	- Jorrit removed the particles level after merging the particles
 	  there with partsys.
