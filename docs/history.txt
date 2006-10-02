@@ -8,6 +8,10 @@ chronological order.
 
 	- caedes added std_character2 and std_character_fixed2 shaders so
 	  genmesh animation system can be used with standard lighting.
+	- Erroroman added Log, Exp and Squad methods to csQuaternion.
+	- Erroroman made spline rotatin of skeleton animation and 
+	  improved a bit the skeleton the code. 
+	- Erroroman added basic API docs to the skeleton interface.
 27-Sep-2006
 	- Jorrit removed the particles level after merging the particles
 	  there with partsys.

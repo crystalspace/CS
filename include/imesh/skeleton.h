@@ -58,24 +58,97 @@ struct iSkeletonBone : public virtual iBase
 {
   SCF_INTERFACE (iSkeletonBone, 1, 0, 0);
 
+  /**
+   * Get name of the bone.
+   */
   virtual const char* GetName () const = 0;
+
+  /**
+   * Set name of the bone.
+   */
   virtual void SetName (const char* name) = 0;
+
+  /**
+   * Get transform of the bone.
+   */
   virtual csReversibleTransform &GetTransform () = 0;
+
+  /**
+   * Set transform of the bone in parent's coordsys.
+   */
   virtual void SetTransform (const csReversibleTransform &transform) = 0;
+
+  /**
+   * Set full transform of the bone.
+   */
   virtual csReversibleTransform &GetFullTransform () = 0;
+
+  /**
+   * Set parent bone.
+   */
   virtual  void SetParent (iSkeletonBone *parent) = 0;
+
+  /**
+   * Get parent bone
+   */
   virtual iSkeletonBone *GetParent () = 0;
+
+  /**
+   * Get number of children bones.
+   */
   virtual int GetChildrenCount () = 0;
+
+  /**
+   * Set child bone by index.
+   */
   virtual iSkeletonBone *GetChild (size_t i) = 0;
+
+  /**
+   * Find child bone by name.
+   */
   virtual iSkeletonBone *FindChild (const char *name) = 0;
+
+  /**
+   * Find child bone index.
+   */
   virtual size_t FindChildIndex (iSkeletonBone *child) = 0;
+
+  /**
+   * Set skin bbox (usefull for creating collider or ragdoll object).
+   */
   virtual void SetSkinBox (csBox3 & box) = 0;
+
+  /**
+   * Get skin bbox.
+   */
   virtual csBox3 & GetSkinBox () = 0;
+
+  /**
+   * Set callback to the bone. By default there
+   * is callback that sets bone transform when updating.
+   */
   virtual void SetUpdateCallback (iSkeletonBoneUpdateCallback *callback) = 0;
+
+  /**
+   * Get update callback.
+   */
   virtual iSkeletonBoneUpdateCallback *GetUpdateCallback () = 0;
+
+  /**
+   * Get skeleton factory.
+   */
   virtual iSkeletonBoneFactory *GetFactory() = 0;
+
+  /**
+   * Set bone transform mode.
+   */
   virtual void SetTransformMode(csBoneTransformType mode) = 0;
+
+  /**
+   * Get bone transform mode.
+   */
   virtual csBoneTransformType GetTransformMode() = 0;
+
   //virtual void SetRigidBody(iODERigidBody *rigid_body, const csReversibleTransform & offset_transform) = 0;
   //virtual iODERigidBody *GetRigidBody() = 0;
   //virtual void SetJoint(iODEJoint *joint) = 0;
@@ -92,52 +165,166 @@ struct iSkeletonBoneUpdateCallback : public virtual iBase
 struct iSkeletonScriptKeyFrame : public virtual iBase
 {
   SCF_INTERFACE (iSkeletonScriptKeyFrame, 1, 0, 0);
+
+  /**
+   * Get name of the key frame.
+   */
   virtual const char* GetName () const = 0;
+
+  /**
+   * Set name of the key frame.
+   */
   virtual void SetName (const char* name) = 0;
+
+  /**
+   * Get key frame duration.
+   */
   virtual csTicks GetDuration () = 0;
+
+  /**
+   * Set key frame duration.
+   */
   virtual void SetDuration (csTicks time) = 0;
+
+  /**
+   * Get number of key transforms.
+   */
   virtual size_t GetTransformsCount() = 0;
+
+  /**
+   * Add new bone transform to the key frame.
+   */
   virtual void AddTransform(iSkeletonBoneFactory *bone, 
 	  csReversibleTransform &transform, bool relative = false) = 0;
+
+  /**
+   * Get the transform of a bone.
+   */
   virtual csReversibleTransform & GetTransform(iSkeletonBoneFactory *bone) = 0;
+
+  /**
+   * Set the transform of a bone.
+   */
   virtual void SetTransform(iSkeletonBoneFactory *bone, 
 	  csReversibleTransform &transform) = 0;
-  virtual void GetKeyFrameData(size_t i, iSkeletonBoneFactory *& bone_fact, 
-	  csReversibleTransform & transform, bool & relative) = 0;
+
+  /**
+   * Get key frame specific data.
+   */
+  virtual void GetKeyFrameData(iSkeletonBoneFactory *bone_fact, 
+	  csQuaternion & rot, csVector3 & pos, csQuaternion & tangent,
+       bool & relative) = 0;
 };
 
 struct iSkeletonScript : public virtual iBase
 {
   SCF_INTERFACE (iSkeletonScript, 1, 0, 0);
 
+  /**
+   * Get script name.
+   */
   virtual const char* GetName () const = 0;
+
+  /**
+   * Set script name.
+   */
   virtual void SetName (const char* name) = 0;
+
+  /**
+   * Get script duration.
+   */
   virtual csTicks GetTime () = 0;
+
+  /**
+   * Set script duration.
+   */
   virtual void SetTime (csTicks time) = 0;
+
+  /**
+   * Get script speed.
+   */
   virtual float GetSpeed () = 0;
+
+  /**
+   * Set script speed (default = 1.0).
+   */
   virtual void SetSpeed (float speed) = 0;
+
+  /**
+   * Set script factor.
+   */
   virtual void SetFactor (float factor) = 0;
+
+  /**
+   * Get script factor.
+   */
   virtual float GetFactor () = 0;
+
+  /**
+   * Set script loop value.
+   */
   virtual void SetLoop (bool loop) = 0;
+
+  /**
+   * Get script loop value.
+   */
   virtual bool GetLoop () = 0;
 
+  /**
+   * Create new key frame.
+   */
   virtual iSkeletonScriptKeyFrame *CreateFrame(const char* name) = 0;
+
+  /**
+   * Get number of frames in the script.
+   */
   virtual size_t GetFramesCount() = 0;
+
+  /**
+   * Get key frame by index.
+   */
   virtual iSkeletonScriptKeyFrame *GetFrame(size_t i) = 0;
+
+  /**
+   * Find key frame by name.
+   */
   virtual size_t FindFrameIndex(const char *name) = 0;
+
+  /**
+   * Remove frame by index.
+   */
   virtual void RemoveFrame(size_t i) = 0;
+
+  /**
+   * Recalculates spline for bones rotations.
+   * Needs to be called every time when new 
+   * frames are added or removed.
+   */
+  virtual void RecalcSpline () = 0;
 };
 
 struct iSkeletonScriptCallback : public virtual iBase
 {
     SCF_INTERFACE (iSkeletonScriptCallback, 1, 0, 0);
+
+    /**
+     * On execute action.
+     */
 	virtual void Execute(iSkeletonScript *script, size_t frame_idx) = 0;
+
+    /**
+     * On finish action.
+     */
 	virtual void OnFinish(iSkeletonScript *script) = 0;
 };
 
 struct iSkeletonUpdateCallback : public virtual iBase
 {
     SCF_INTERFACE (iSkeletonUpdateCallback, 1, 0, 0);
+
+    /**
+     * General skeleon update callback.
+     */
 	virtual void Execute(iSkeleton *skeleton, const csTicks & current_ticks) = 0;
 };
 
@@ -145,44 +332,167 @@ struct iSkeleton : public virtual iBase
 {
   SCF_INTERFACE (iSkeleton, 1, 0, 0);
 
+  /**
+   * Get skeleton name.
+   */
   virtual const char* GetName () const = 0;
+
+  /**
+   * Set skeleton name.
+   */
   virtual void SetName (const char* name) = 0;
+
+  /**
+   * Get number of bones in the skeleton.
+   */
   virtual size_t GetBonesCount () = 0;
+
+  /**
+   * Get bone by index.
+   */
   virtual iSkeletonBone *GetBone (size_t i) = 0;
+
+  /**
+   * Find bone by name.
+   */
   virtual iSkeletonBone *FindBone (const char *name) = 0;
+
+  /**
+   * Find bine index by name.
+   */
   virtual size_t FindBoneIndex (const char *name) = 0;
+
+  /**
+   * Execute specific script.
+   */
   virtual iSkeletonScript* Execute (const char *scriptname) = 0;
+
+  /**
+   * Append script for execution.
+   */
   virtual iSkeletonScript* Append (const char *scriptname) = 0;
+
+  /**
+   * Clear scripts for execution.
+   */
   virtual void ClearPendingScripts () = 0;
+
+  /**
+   * Get number of available scripts.
+   */
   virtual size_t GetScriptsCount () = 0;
+
+  /**
+   * General script by index.
+   */
   virtual iSkeletonScript* GetScript (size_t i) = 0;
+
+  /**
+   * Find script by name.
+   */
   virtual iSkeletonScript* FindScript (const char *scriptname) = 0;
+
+  /**
+   * Find socket by name.
+   */
   virtual iSkeletonSocket* FindSocket (const char *socketname) = 0;
+
+  /**
+   * Stop all executed scripts.
+   */
   virtual void StopAll () = 0;
+
+  /**
+   * Stop executed script by name.
+   */
   virtual void Stop (const char* scriptname) = 0;
+
+  /**
+   * Get skeleton factory.
+   */
   virtual iSkeletonFactory *GetFactory() = 0;
+
+  /**
+   * Get script callback.
+   */
   virtual void SetScriptCallback(iSkeletonScriptCallback *cb) = 0;
+
   //virtual void CreateRagdoll(iODEDynamicSystem *dyn_sys, csReversibleTransform & transform) = 0;
   //virtual void DestroyRagdoll() = 0;
 
+  /**
+   * Adds skeleton update callback.
+   */
   virtual size_t AddUpdateCallback(iSkeletonUpdateCallback *update_callback) = 0;
+
+  /**
+   * Get number of skeleton callbacks.
+   */
   virtual size_t GetUpdateCallbacksCount() = 0;
+
+  /**
+   * Get callback by index.
+   */
   virtual iSkeletonUpdateCallback *GetUpdateCallback(size_t callback_idx) = 0;
+
+  /**
+   * Remove skelton callback by index.
+   */
   virtual void RemoveUpdateCallback(size_t callback_idx) = 0;
 };
 
 struct iSkeletonSocket : public virtual iBase
 {
   SCF_INTERFACE (iSkeletonSocket, 1, 0, 0);
+
+  /**
+   * Get socket name.
+   */
   virtual const char* GetName () const = 0;
+
+  /**
+   * Set socket name.
+   */
   virtual void SetName (const char* name) = 0;
+
+  /**
+   * Get socket transform in parent's coordsys.
+   */
   virtual csReversibleTransform &GetTransform () = 0;
+
+  /**
+   * Set socket transform in parent's coordsys.
+   */
   virtual void SetTransform (const csReversibleTransform &transform) = 0;
+
+  /**
+   * Get full transform of the socket.
+   */
   virtual csReversibleTransform &GetFullTransform () = 0;
+
+  /**
+   * Set parent bone.
+   */
   virtual void SetBone (iSkeletonBone *bone) = 0;
+
+  /**
+   * Get parent bone.
+   */
   virtual iSkeletonBone *GetBone () = 0;
+
+  /**
+   * Set scene node (mesh, camera or light).
+   */
   virtual void SetSceneNode (iSceneNode *node) = 0;
+
+  /**
+   * Get scene node.
+   */
   virtual iSceneNode *GetSceneNode () = 0;
+
+  /**
+   * Get factory of the socket.
+   */
   virtual iSkeletonSocketFactory *GetFactory () = 0;
 };
 
@@ -233,60 +543,225 @@ struct iSkeletonBoneRagdollInfo : public virtual iBase
 struct iSkeletonBoneFactory : public virtual iBase
 {
   SCF_INTERFACE (iSkeletonBoneFactory, 1, 0, 0);
+
+  /**
+   * Get bone factory name.
+   */
   virtual const char* GetName () const = 0;
+
+  /**
+   * Set bone factory of name.
+   */
   virtual void SetName (const char* name) = 0;
+
+  /**
+   * Get bone factory transform in parent's coordsys.
+   */
   virtual csReversibleTransform &GetTransform () = 0;
+
+  /**
+   * Set bone factory transform in parent's coordsys.
+   */
   virtual void SetTransform (const csReversibleTransform &transform) = 0;
+
+  /**
+   * Get bone factory full transform.
+   */
   virtual csReversibleTransform &GetFullTransform () = 0;
+
+  /**
+   * Set parent bone factory .
+   */
   virtual  void SetParent (iSkeletonBoneFactory *parent) = 0;
+
+  /**
+   * Get parent bone factory .
+   */
   virtual iSkeletonBoneFactory *GetParent () = 0;
+
+  /**
+   * Get number of children factories.
+   */
   virtual int GetChildrenCount () = 0;
+
+  /**
+   * Get factory child by index.
+   */
   virtual iSkeletonBoneFactory *GetChild (size_t i) = 0;
+
+  /**
+   * Find child by name.
+   */
   virtual iSkeletonBoneFactory *FindChild (const char *name) = 0;
+
+  /**
+   * Find child index.
+   */
   virtual size_t FindChildIndex (iSkeletonBoneFactory *child) = 0;
+
+  /**
+   * Set skin bbox.
+   */
   virtual void SetSkinBox (csBox3 & box) = 0;
+
+  /**
+   * Get skin bbox.
+   */
   virtual csBox3 & GetSkinBox () = 0;
+
+  /**
+   * Get ragdoll data.
+   */
   virtual iSkeletonBoneRagdollInfo *GetRagdollInfo() = 0;
 };
 
 struct iSkeletonSocketFactory : public virtual iBase
 {
   SCF_INTERFACE (iSkeletonSocketFactory, 1, 0, 0);
+
+  /**
+   * Get name of the socket factory.
+   */
   virtual const char* GetName () const = 0;
+
+  /**
+   * Set name.
+   */
   virtual void SetName (const char* name) = 0;
+
+  /**
+   * Get transform in parent's coordsys.
+   */
   virtual csReversibleTransform &GetTransform () = 0;
+
+  /**
+   * Set transform in parent's coordsys.
+   */
   virtual void SetTransform (const csReversibleTransform &transform) = 0;
+
+  /**
+   * Get full transform.
+   */
   virtual csReversibleTransform &GetFullTransform () = 0;
+
+  /**
+   * Set parent bone factory.
+   */
   virtual void SetBone (iSkeletonBoneFactory *bone) = 0;
+
+  /**
+   * Get parent bone factory.
+   */
   virtual iSkeletonBoneFactory *GetBone () = 0;
 };
 
 struct iSkeletonFactory : public virtual iBase
 {
   SCF_INTERFACE (iSkeletonFactory, 1, 0, 0);
+
+  /**
+   * Get name of the skeleton factory.
+   */
   virtual const char* GetName () const = 0;
+
+  /**
+   * Get name.
+   */
   virtual void SetName (const char* name) = 0;
+
+  /**
+   * Create new bone factory.
+   */
   virtual iSkeletonBoneFactory *CreateBone(const char *name) = 0;
+
+  /**
+   * Create new animation script.
+   */
   virtual iSkeletonScript *CreateScript(const char *name) = 0;
+
+  /**
+   * Find script by name.
+   */
   virtual iSkeletonScript *FindScript(const char *name) = 0;
+
+  /**
+   * Find bone factory by name.
+   */
   virtual iSkeletonBoneFactory *FindBone (const char *name) = 0;
+
+  /**
+   * Find bone facotry index by name.
+   */
   virtual size_t FindBoneIndex (const char *name) = 0;
+
+  /**
+   * Get number of bones factories.
+   */
+  virtual size_t GetBonesCount () const = 0;
+
+  /**
+   * Get bone factory by index.
+   */
+  virtual iSkeletonBoneFactory *GetBone(size_t i) = 0;
+
+  /**
+   * Get the Graveyard.
+   */
   virtual iSkeletonGraveyard *GetGraveyard  () = 0;
 
+  /**
+   * Create new socket factory.
+   */
   virtual iSkeletonSocketFactory *CreateSocket(const char *name, iSkeletonBoneFactory *bone) = 0;
+
+  /**
+   * Find socket factory by name.
+   */
   virtual iSkeletonSocketFactory *FindSocket(const char *name) = 0;
+
+  /**
+   * Get socket factory by name.
+   */
   virtual iSkeletonSocketFactory *GetSocket (int i) = 0;
+
+  /**
+   * Remove socket facotry by index.
+   */
   virtual void RemoveSocket (int i) = 0;
+
+  /**
+   * Get number of socket factories.
+   */
   virtual size_t GetSocketsCount() = 0;
 };
 
 struct iSkeletonGraveyard : public virtual iBase
 {
   SCF_INTERFACE (iSkeletonGraveyard, 1, 0, 0);
+
+  /**
+   * Get number of skeleton factories.
+   */
   virtual size_t GetFactoriesCount() = 0;
+
+  /**
+   * Get skeleton factory by name.
+   */
   virtual iSkeletonFactory *CreateFactory(const char *name) = 0;
+
+  /**
+   * Load skeleton factory from file.
+   */
   virtual iSkeletonFactory *LoadFactory(const char *file_name) = 0;
+
+  /**
+   * Find skeleton factory by name.
+   */
   virtual iSkeletonFactory *FindFactory(const char *name) = 0;
+
+  /**
+   * Create skeleton from specific factory.
+   */
   virtual iSkeleton *CreateSkeleton(iSkeletonFactory *fact, const char *name = 0) = 0;
 };
 
