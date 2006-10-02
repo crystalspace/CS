@@ -8,6 +8,10 @@ chronological order.
 
 1-Sep-2006
 	- caedes removed stdtex from data Jamfile.
+30-Sep-2006
+	- res fixed some MSVC warnings.
+	- res fixed some wrong GL extension function declarations and added
+	  the GL_EXT_packed_depth_stencil ext.
 29-Sep-2006
 	- res removed the following compatiblity hacks for older compilers
 	  (which would likely not be able to cope with CS' use of advanced
@@ -29,7 +33,7 @@ chronological order.
 	- Jorrit added license note to castle level and castle textures.
 	  Castle uses Creative Commons NC:
 	  http://creativecommons.org/licenses/by-nc/2.5
-	- Jorrit made castle default level in walktest now.
+	- Jorrit made castle default level in walktest now1.
 	- Erroroman optimized character_bump2.cgvp by calculating bitangent
 	  as cross product of normal and tangent. Also removed bitangent
 	  from tehnique 150 in character_bump2.xml.

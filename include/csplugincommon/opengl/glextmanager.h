@@ -937,8 +937,8 @@ typedef GLvoid (csAPIENTRY* csGLGETCOMPRESSEDTEXIMAGE) (GLenum target, GLint lev
  * @{ */
 typedef GLvoid (csAPIENTRY* csGLFOGCOORDF) (GLfloat coord);
 typedef GLvoid (csAPIENTRY* csGLFOGCOORDD) (GLdouble coord);
-typedef GLvoid (csAPIENTRY* csGLFOGCOORDFV) (GLfloat coord);
-typedef GLvoid (csAPIENTRY* csGLFOGCOORDDV) (GLdouble coord);
+typedef GLvoid (csAPIENTRY* csGLFOGCOORDFV) (GLfloat* coord);
+typedef GLvoid (csAPIENTRY* csGLFOGCOORDDV) (GLdouble* coord);
 typedef GLvoid (csAPIENTRY* csGLFOGCOORDPOINTER) (GLenum type, GLsizei stride, GLvoid* pointer);
 typedef GLvoid (csAPIENTRY* csGLMULTIDRAWARRAYS) (GLenum mode, GLint* first, GLsizei* count, GLsizei primcount);
 typedef GLvoid (csAPIENTRY* csGLMULTIDRAWELEMENTS) (GLenum mode, GLsizei* count, GLenum type, const GLvoid* indices, GLsizei primcount);
@@ -952,14 +952,14 @@ typedef GLvoid (csAPIENTRY* csGLSECONDARYCOLOR3D) (GLdouble components);
 typedef GLvoid (csAPIENTRY* csGLSECONDARYCOLOR3UB) (GLubyte components);
 typedef GLvoid (csAPIENTRY* csGLSECONDARYCOLOR3US) (GLushort components);
 typedef GLvoid (csAPIENTRY* csGLSECONDARYCOLOR3UI) (GLuint components);
-typedef GLvoid (csAPIENTRY* csGLSECONDARYCOLOR3BV) (GLbyte components);
-typedef GLvoid (csAPIENTRY* csGLSECONDARYCOLOR3SV) (GLshort components);
-typedef GLvoid (csAPIENTRY* csGLSECONDARYCOLOR3IV) (GLint components);
-typedef GLvoid (csAPIENTRY* csGLSECONDARYCOLOR3FV) (GLfloat components);
-typedef GLvoid (csAPIENTRY* csGLSECONDARYCOLOR3DV) (GLdouble components);
-typedef GLvoid (csAPIENTRY* csGLSECONDARYCOLOR3UBV) (GLubyte components);
-typedef GLvoid (csAPIENTRY* csGLSECONDARYCOLOR3USV) (GLushort components);
-typedef GLvoid (csAPIENTRY* csGLSECONDARYCOLOR3UIV) (GLuint components);
+typedef GLvoid (csAPIENTRY* csGLSECONDARYCOLOR3BV) (GLbyte* components);
+typedef GLvoid (csAPIENTRY* csGLSECONDARYCOLOR3SV) (GLshort* components);
+typedef GLvoid (csAPIENTRY* csGLSECONDARYCOLOR3IV) (GLint* components);
+typedef GLvoid (csAPIENTRY* csGLSECONDARYCOLOR3FV) (GLfloat* components);
+typedef GLvoid (csAPIENTRY* csGLSECONDARYCOLOR3DV) (GLdouble* components);
+typedef GLvoid (csAPIENTRY* csGLSECONDARYCOLOR3UBV) (GLubyte* components);
+typedef GLvoid (csAPIENTRY* csGLSECONDARYCOLOR3USV) (GLushort* components);
+typedef GLvoid (csAPIENTRY* csGLSECONDARYCOLOR3UIV) (GLuint* components);
 typedef GLvoid (csAPIENTRY* csGLSECONDARYCOLORPOINTER) (GLint size, GLenum type, GLsizei stride, GLvoid* pointer);
 typedef GLvoid (csAPIENTRY* csGLBLENDFUNCSEPARATE) (GLenum sFactorRGB, GLenum dFactorRGB, GLenum sFactorAlpha, GLenum dFactorAlpha);
 typedef GLvoid (csAPIENTRY* csGLWINDOWPOS2D) (GLdouble x, GLdouble y);
@@ -3790,8 +3790,8 @@ typedef GLvoid (csAPIENTRY* csGLGETCONVOLUTIONPARAMETERFVEXT) (GLenum target, GL
  * @{ */
 typedef GLvoid (csAPIENTRY* csGLFOGCOORDFEXT) (GLfloat coord);
 typedef GLvoid (csAPIENTRY* csGLFOGCOORDDEXT) (GLdouble coord);
-typedef GLvoid (csAPIENTRY* csGLFOGCOORDFVEXT) (GLfloat coord);
-typedef GLvoid (csAPIENTRY* csGLFOGCOORDDVEXT) (GLdouble coord);
+typedef GLvoid (csAPIENTRY* csGLFOGCOORDFVEXT) (GLfloat* coord);
+typedef GLvoid (csAPIENTRY* csGLFOGCOORDDVEXT) (GLdouble* coord);
 typedef GLvoid (csAPIENTRY* csGLFOGCOORDPOINTEREXT) (GLenum type, GLsizei stride, GLvoid* pointer);
 
 /** @} */
@@ -4133,14 +4133,14 @@ typedef GLvoid (csAPIENTRY* csGLSECONDARYCOLOR3DEXT) (GLdouble components);
 typedef GLvoid (csAPIENTRY* csGLSECONDARYCOLOR3UBEXT) (GLubyte components);
 typedef GLvoid (csAPIENTRY* csGLSECONDARYCOLOR3USEXT) (GLushort components);
 typedef GLvoid (csAPIENTRY* csGLSECONDARYCOLOR3UIEXT) (GLuint components);
-typedef GLvoid (csAPIENTRY* csGLSECONDARYCOLOR3BVEXT) (GLbyte components);
-typedef GLvoid (csAPIENTRY* csGLSECONDARYCOLOR3SVEXT) (GLshort components);
-typedef GLvoid (csAPIENTRY* csGLSECONDARYCOLOR3IVEXT) (GLint components);
-typedef GLvoid (csAPIENTRY* csGLSECONDARYCOLOR3FVEXT) (GLfloat components);
-typedef GLvoid (csAPIENTRY* csGLSECONDARYCOLOR3DVEXT) (GLdouble components);
-typedef GLvoid (csAPIENTRY* csGLSECONDARYCOLOR3UBVEXT) (GLubyte components);
-typedef GLvoid (csAPIENTRY* csGLSECONDARYCOLOR3USVEXT) (GLushort components);
-typedef GLvoid (csAPIENTRY* csGLSECONDARYCOLOR3UIVEXT) (GLuint components);
+typedef GLvoid (csAPIENTRY* csGLSECONDARYCOLOR3BVEXT) (GLbyte* components);
+typedef GLvoid (csAPIENTRY* csGLSECONDARYCOLOR3SVEXT) (GLshort* components);
+typedef GLvoid (csAPIENTRY* csGLSECONDARYCOLOR3IVEXT) (GLint* components);
+typedef GLvoid (csAPIENTRY* csGLSECONDARYCOLOR3FVEXT) (GLfloat* components);
+typedef GLvoid (csAPIENTRY* csGLSECONDARYCOLOR3DVEXT) (GLdouble* components);
+typedef GLvoid (csAPIENTRY* csGLSECONDARYCOLOR3UBVEXT) (GLubyte* components);
+typedef GLvoid (csAPIENTRY* csGLSECONDARYCOLOR3USVEXT) (GLushort* components);
+typedef GLvoid (csAPIENTRY* csGLSECONDARYCOLOR3UIVEXT) (GLuint* components);
 typedef GLvoid (csAPIENTRY* csGLSECONDARYCOLORPOINTEREXT) (GLint size, GLenum type, GLsizei stride, GLvoid* pointer);
 
 /** @} */
@@ -10950,6 +10950,33 @@ typedef GLvoid (csAPIENTRY* csGLBLENDEQUATIONSEPARATEEXT) (GLenum modeRGB, GLenu
  * @{ */
 
 /** @} */
+/**\name GL_EXT_packed_depth_stencil constants
+ * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/EXT/packed_depth_stencil.txt">http://www.opengl.org/registry/specs/EXT/packed_depth_stencil.txt</a>.
+ * @{ */
+#ifndef GL_DEPTH_STENCIL_EXT
+#define GL_DEPTH_STENCIL_EXT                                         0x84F9
+#endif
+
+#ifndef GL_UNSIGNED_INT_24_8_EXT
+#define GL_UNSIGNED_INT_24_8_EXT                                     0x84FA
+#endif
+
+#ifndef GL_DEPTH24_STENCIL8_EXT
+#define GL_DEPTH24_STENCIL8_EXT                                      0x88F0
+#endif
+
+#ifndef GL_TEXTURE_STENCIL_SIZE_EXT
+#define GL_TEXTURE_STENCIL_SIZE_EXT                                  0x88F1
+#endif
+
+
+/** @} */
+
+/**\name GL_EXT_packed_depth_stencil functions
+ * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/EXT/packed_depth_stencil.txt">http://www.opengl.org/registry/specs/EXT/packed_depth_stencil.txt</a>.
+ * @{ */
+
+/** @} */
 
 
 // end of definitions
@@ -16685,6 +16712,11 @@ public:
    * @{ */
 
   /** @} */
+  /**\name GL_EXT_packed_depth_stencil functions
+   * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/EXT/packed_depth_stencil.txt">http://www.opengl.org/registry/specs/EXT/packed_depth_stencil.txt</a>.
+   * @{ */
+
+  /** @} */
 
 // end of functions
 };
@@ -17197,6 +17229,9 @@ public:
   /** Whether the <a href="http://www.opengl.org/registry/specs/EXT/texture_sRGB.txt">GL_EXT_texture_sRGB</a> extension was found. 
    * Set by csGLExtensionManager::InitGL_EXT_texture_sRGB(). */
   bool CS_GL_EXT_texture_sRGB;
+  /** Whether the <a href="http://www.opengl.org/registry/specs/EXT/packed_depth_stencil.txt">GL_EXT_packed_depth_stencil</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_EXT_packed_depth_stencil(). */
+  bool CS_GL_EXT_packed_depth_stencil;
 
 protected:
   bool tested_CS_GL_version_1_2;
@@ -17369,6 +17404,7 @@ protected:
   bool tested_CS_GL_ARB_draw_buffers;
   bool tested_CS_GL_EXT_blend_equation_separate;
   bool tested_CS_GL_EXT_texture_sRGB;
+  bool tested_CS_GL_EXT_packed_depth_stencil;
 
 };
 
@@ -23515,6 +23551,35 @@ public:
     {
 
       EXTMGR_REPORT_INIT_RESULT("GL", GL_EXT_texture_sRGB)
+    }
+    else
+    {
+      Report (msgExtNotFound, "GL", ext);
+    }
+  }
+  
+  /** Initialize <a href="http://www.opengl.org/registry/specs/EXT/packed_depth_stencil.txt">GL_EXT_packed_depth_stencil</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_EXT_packed_depth_stencil. */
+  void InitGL_EXT_packed_depth_stencil ()
+  {
+    if (tested_CS_GL_EXT_packed_depth_stencil) return;
+    if (!extstrGL) return;
+    tested_CS_GL_EXT_packed_depth_stencil = true;
+    const char* ext = "GL_EXT_packed_depth_stencil";
+
+    char cfgkey[26 + 27 + 1];
+    sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
+    
+    CS_GL_EXT_packed_depth_stencil = (strstr (extstrGL, ext) != 0);
+
+    bool allclear, funcTest;
+    (void)funcTest; // shut up "variable unused" warnings
+    bool init = CS_GL_EXT_packed_depth_stencil;
+    allclear = true;
+    if (init)	// Don't check the functions if ext isn't reported anyway
+    {
+
+      EXTMGR_REPORT_INIT_RESULT("GL", GL_EXT_packed_depth_stencil)
     }
     else
     {
