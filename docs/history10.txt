@@ -23,6 +23,7 @@ chronological order.
 	- Marten merged r25486:25488 into 1.0.
 	- Marten merged r25489 into 1.0.
 	- Marten merged r25490 into 1.0.
+	- Marten merged r25495 into 1.0.
 1-Oct-2006
 	- Marten merged r25313 into 1.0 (ptpdlight fix).
 	- Marten merged r25411 into 1.0.
