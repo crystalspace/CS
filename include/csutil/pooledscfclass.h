@@ -88,7 +88,7 @@ public:
       while (pool != 0)
       {
 	Entry* n = pool->next;
-	free (pool);
+	cs_free (pool);
       #ifdef CS_MEMORY_TRACKER
         mtiUpdateAmount (mti, -1, 
           -int(sizeof (scfClassType) + sizeof (Entry)));
@@ -117,7 +117,7 @@ public:
     }
     else
     {
-      newEntry = (PoolEntry*)malloc (n);
+      newEntry = reinterpret_cast<PoolEntry*> (cs_malloc (n));
     #ifdef CS_MEMORY_TRACKER
       if (p.mti == 0)
       {
@@ -128,10 +128,10 @@ public:
     #endif
     }
     p.allocedEntries++;
-    scfClassType* newInst = (scfClassType*)(newEntry);
+    scfClassType* newInst = reinterpret_cast<scfClassType*> (newEntry);
     /* A bit nasty: set scfPool member of the (still unconstructed!) 
      * instance... */
-    ((scfPooledImplementationType*)newInst)->scfPool = &p;
+    static_cast<scfPooledImplementationType*> (newInst)->scfPool = &p;
     return newInst;
   }
 
@@ -140,15 +140,15 @@ public:
   inline void operator delete (void* instance, Pool& p) 
   {
     typedef typename Pool::Entry PoolEntry;
-    PoolEntry* entry = (PoolEntry*)(instance);
+    PoolEntry* entry = reinterpret_cast<PoolEntry*> (instance);
     entry->next = p.pool;
     p.pool = entry;
     p.allocedEntries--;
   }
   inline void operator delete (void* instance) 
   {
-    scfClassType* object = (scfClassType*)instance;
-    Pool& p = *(((scfImplementationPooled*)object)->scfPool);
+    scfClassType* object = reinterpret_cast<scfClassType*> (instance);
+    Pool& p = *(static_cast<scfImplementationPooled*> (object)->scfPool);
     scfImplementationPooled::operator delete (object, p);
   }
   //@}
