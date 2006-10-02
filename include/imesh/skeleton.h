@@ -54,6 +54,9 @@ enum csBoneGeomType
 	CS_BGT_CYLINDER
 };
 
+/**
+ * The skeleton bone class.
+ */
 struct iSkeletonBone : public virtual iBase
 {
   SCF_INTERFACE (iSkeletonBone, 1, 0, 0);
@@ -157,11 +160,18 @@ struct iSkeletonBone : public virtual iBase
 
 SCF_VERSION  (iSkeletonBoneUpdateCallback, 0, 0, 1);
 
+/**
+ * This callback fires every time when bone changes it's transform.
+ */
 struct iSkeletonBoneUpdateCallback : public virtual iBase
 {
 	virtual void UpdateTransform(iSkeletonBone *bone, const csReversibleTransform & transform) = 0;
 };
 
+/**
+ * The script key frame contains all bones that will be transformed in 
+ * a specific time of a skeleton script.
+ */
 struct iSkeletonScriptKeyFrame : public virtual iBase
 {
   SCF_INTERFACE (iSkeletonScriptKeyFrame, 1, 0, 0);
@@ -216,6 +226,9 @@ struct iSkeletonScriptKeyFrame : public virtual iBase
        bool & relative) = 0;
 };
 
+/**
+ * Skeleton script is the interface that provides animation of a skeleton.
+ */
 struct iSkeletonScript : public virtual iBase
 {
   SCF_INTERFACE (iSkeletonScript, 1, 0, 0);
@@ -303,6 +316,10 @@ struct iSkeletonScript : public virtual iBase
   virtual void RecalcSpline () = 0;
 };
 
+/**
+ * This is a callback function of an animation script.
+ * It is called every time when script is started or finished.
+ */
 struct iSkeletonScriptCallback : public virtual iBase
 {
     SCF_INTERFACE (iSkeletonScriptCallback, 1, 0, 0);
@@ -318,6 +335,11 @@ struct iSkeletonScriptCallback : public virtual iBase
 	virtual void OnFinish(iSkeletonScript *script) = 0;
 };
 
+/**
+ * This is a callback function of a skeleton.
+ * It is called every time when skeleton is updated.
+ */
+
 struct iSkeletonUpdateCallback : public virtual iBase
 {
     SCF_INTERFACE (iSkeletonUpdateCallback, 1, 0, 0);
@@ -328,6 +350,20 @@ struct iSkeletonUpdateCallback : public virtual iBase
 	virtual void Execute(iSkeleton *skeleton, const csTicks & current_ticks) = 0;
 };
 
+/**
+ * The skeleton interface provides needed functionality
+ * of a skeleton animation. It holds bones, sockets and scripts.
+ * Skeleton is an independend object and it is not realted to a mesh.
+ * Genmesh Skelton Animation 2 plugin makes the connection between
+ * mesh and skeleton.Users can query the iSkeleton from genmeshes as follows:
+ *
+ *   csRef<iGeneralMeshState> genmesh_state (
+ *     SCF_QUERY_INTERFACE (mesh_wrapper->GetMeshObject (), iGeneralMeshState));
+ *   csRef<iGenMeshSkeletonControlState> animcontrol (
+ *     SCF_QUERY_INTERFACE (genmesh_state->GetAnimationControl (), 
+ *           iGenMeshSkeletonControlState));
+ *   iSkeleton* skeleton = animcontrol->GetSkeleton ();
+ */
 struct iSkeleton : public virtual iBase
 {
   SCF_INTERFACE (iSkeleton, 1, 0, 0);
@@ -441,6 +477,12 @@ struct iSkeleton : public virtual iBase
   virtual void RemoveUpdateCallback(size_t callback_idx) = 0;
 };
 
+/**
+ * The skeleton socket object wraps a relative transform of a bone.
+ * It is used to attach meshes, cameras or lights to a bone.
+ * When bone animates it moves the attached object to the socket too.
+ * This is usefull to create an invertory of a model.
+ */
 struct iSkeletonSocket : public virtual iBase
 {
   SCF_INTERFACE (iSkeletonSocket, 1, 0, 0);
@@ -540,6 +582,10 @@ struct iSkeletonBoneRagdollInfo : public virtual iBase
   virtual csVector3 & GetJointMaxTransContraints() = 0;
 };
 
+/**
+ * The skeleton bone factory is class that is used to create
+ * skeleton bones of a iSkeleton object.
+ */
 struct iSkeletonBoneFactory : public virtual iBase
 {
   SCF_INTERFACE (iSkeletonBoneFactory, 1, 0, 0);
@@ -615,6 +661,10 @@ struct iSkeletonBoneFactory : public virtual iBase
   virtual iSkeletonBoneRagdollInfo *GetRagdollInfo() = 0;
 };
 
+/**
+ * The skeleton socket factory is class that is used to create
+ * skeleton sockets of a iSkeleton object.
+ */
 struct iSkeletonSocketFactory : public virtual iBase
 {
   SCF_INTERFACE (iSkeletonSocketFactory, 1, 0, 0);
@@ -655,6 +705,10 @@ struct iSkeletonSocketFactory : public virtual iBase
   virtual iSkeletonBoneFactory *GetBone () = 0;
 };
 
+/**
+ * The skeleton factory is class that is used to create
+ * skeleton objects in the scene.
+ */
 struct iSkeletonFactory : public virtual iBase
 {
   SCF_INTERFACE (iSkeletonFactory, 1, 0, 0);
@@ -735,6 +789,12 @@ struct iSkeletonFactory : public virtual iBase
   virtual size_t GetSocketsCount() = 0;
 };
 
+
+/**
+ * iSkeletonGraveyard is the interface that cares for all skeleton factories. 
+ * It can be accessed via object registry. Also it holds and updates all 
+ * existing skeleton objects.
+ */
 struct iSkeletonGraveyard : public virtual iBase
 {
   SCF_INTERFACE (iSkeletonGraveyard, 1, 0, 0);

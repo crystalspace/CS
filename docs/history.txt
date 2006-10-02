@@ -41,6 +41,7 @@ chronological order.
 	  that generate programs that are too big for the card will really
 	  fail now. That means that the workaround in gldrivers.xml is
 	  no longer required.
+	- Erroroman added more API docs in skeleton.h
 28-Sep-2006
 	- mdmkolbe changed walktest to exit with code 0 on normal exits.
 	- mdmkolbe blind commited a change by Timothy "kiolakin" Whitfield
