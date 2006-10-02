@@ -6,7 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
-1-Sep-2006
+2-Oct-2006
+	- res removed the resolution and windowed vs fullscreen message from
+	  null3d.
+1-Oct-2006
 	- Marten implemented pthread thread and condition variables classes 
 	  with new interface. The new improved implementation of threading
 	  should now be fully functional.
