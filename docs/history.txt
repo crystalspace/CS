@@ -9,6 +9,8 @@ chronological order.
 2-Oct-2006
 	- res removed the resolution and windowed vs fullscreen message from
 	  null3d.
+	- Marten fixed csQuaternion::Exp and csQuaternion::Log to actually be
+	  the exponential and logarithmic functions.
 1-Oct-2006
 	- Marten implemented pthread thread and condition variables classes 
 	  with new interface. The new improved implementation of threading
