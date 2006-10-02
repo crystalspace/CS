@@ -13326,6 +13326,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *IsEmpty = *cspacec::iShaderVariableContext_IsEmpty;
 *ReplaceVariable = *cspacec::iShaderVariableContext_ReplaceVariable;
 *Clear = *cspacec::iShaderVariableContext_Clear;
+*RemoveVariable = *cspacec::iShaderVariableContext_RemoveVariable;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});

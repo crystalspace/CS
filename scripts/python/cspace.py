@@ -8863,6 +8863,7 @@ class iShaderVariableContext(iBase):
     def IsEmpty(*args): return _cspace.iShaderVariableContext_IsEmpty(*args)
     def ReplaceVariable(*args): return _cspace.iShaderVariableContext_ReplaceVariable(*args)
     def Clear(*args): return _cspace.iShaderVariableContext_Clear(*args)
+    def RemoveVariable(*args): return _cspace.iShaderVariableContext_RemoveVariable(*args)
     __swig_destroy__ = _cspace.delete_iShaderVariableContext
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iShaderVariableContext_scfGetVersion
