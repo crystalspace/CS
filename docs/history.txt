@@ -6,6 +6,37 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+29-Sep-2006
+	- res removed the following compatiblity hacks for older compilers
+	  (which would likely not be able to cope with CS' use of advanced
+	  C++ features anyway): 'typename_qualifier', fake 'explicit' 
+	  keyword, CS_SPECIALIZE_TEMPLATE instead of template<>, 
+	  CSARRAY_INHIBIT_TYPED_KEYS. Adresses trac #16.
+	- Jorrit added a workaround for GetTuple() in windows so that
+	  it at least compiles. MacOS/X is still broken and the GetTuple()
+	  implementation in Windows just returns 0.
+	- Jorrit changed flarge to use the new kwartz model. The kwartz
+	  model is also updated to work nicely with software lighting.
+	- Jorrit added kwartz model to isotest app. Unfortunatelly it is not
+	  yet lit there though. Still have to check why.
+	- Jorrit added textures from new castle level to CS. Castle level
+	  will soon follow.
+	- Jorrit merged stdtex.zip into standard.zip.
+	- Jorrit added the indoor castle level from Anders Wisur to svn
+	  and made it default.
+	- Jorrit added license note to castle level and castle textures.
+	  Castle uses Creative Commons NC:
+	  http://creativecommons.org/licenses/by-nc/2.5
+	- Jorrit made castle default level in walktest now.
+	- Erroroman optimized character_bump2.cgvp by calculating bitangent
+	  as cross product of normal and tangent. Also removed bitangent
+	  from tehnique 150 in character_bump2.xml.
+28-Sep-2006
+	- mdmkolbe changed walktest to exit with code 0 on normal exits.
+	- mdmkolbe blind commited a change by Timothy "kiolakin" Whitfield
+	  that will allow for skyboxes by letting each mesh specify its own
+	  zbuffer mode.
+	- mdmkolbe converted plugins/bugplug to the new SCF.
 	- caedes added std_character2 and std_character_fixed2 shaders so
 	  genmesh animation system can be used with standard lighting.
 	- Erroroman added Log, Exp and Squad methods to csQuaternion.
