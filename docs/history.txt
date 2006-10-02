@@ -6,6 +6,8 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+	- caedes added std_character2 and std_character_fixed2 shaders so
+	  genmesh animation system can be used with standard lighting.
 27-Sep-2006
 	- Jorrit removed the particles level after merging the particles
 	  there with partsys.

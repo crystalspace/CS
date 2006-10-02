@@ -10,6 +10,7 @@ chronological order.
 	- Marten merged r25438:25439, r25444, r25447:25448, 
 	  r25451:25452 into 1.0 (particle related changes).
 	- Jorrit merged r25441:25442 into 1.0 (kwartz).
+	- Jorrit merged r25458 into 1.0 (character shader).
 1-Oct-2006
 	- Marten merged r25313 into 1.0 (ptpdlight fix).
 	- Marten merged r25411 into 1.0.
