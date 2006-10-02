@@ -13,6 +13,7 @@ chronological order.
 	- Jorrit merged r25458 into 1.0 (character shader).
 	- Jorrit merged r25461 into 1.0 (gmeshanim2).
 	- Jorrit merged r25468:25473 into 1.0 (castle+kwartz).
+	- Jorrit merged r25474:25476 into 1.0 (gmeshanim2, CG 128).
 1-Oct-2006
 	- Marten merged r25313 into 1.0 (ptpdlight fix).
 	- Marten merged r25411 into 1.0.
