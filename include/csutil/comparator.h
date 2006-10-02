@@ -90,7 +90,7 @@ public:
 /**
  * csComparator<> specialization for strings that uses strcmp().
  */
-CS_SPECIALIZE_TEMPLATE
+template<>
 class csComparator<const char*, const char*> :
   public csComparatorString<const char*> {};
 
@@ -98,10 +98,10 @@ class csComparator<const char*, const char*> :
 /**
  * csComparator<> specialization for csString that uses strcmp().
  */
-CS_SPECIALIZE_TEMPLATE
+template<>
 class csComparator<csString, csString> :
   public csComparatorString<csString> {};
-CS_SPECIALIZE_TEMPLATE
+template<>
 class csComparator<csStringBase, csStringBase> :
   public csComparatorString<csStringBase> {};
 /** @} */
@@ -111,7 +111,7 @@ class csComparator<csStringBase, csStringBase> :
  * data) types. It uses memcmp() to compare the raw memory representing the two
  * items.  Example:
  * \code
- * CS_SPECIALIZE_TEMPLATE csComparator<MyStruct> : 
+ * template<> csComparator<MyStruct> : 
  *   public csComparatorStruct<MyStruct> {};
  * \endcode
  */

@@ -44,6 +44,12 @@ chronological order.
 	  fail now. That means that the workaround in gldrivers.xml is
 	  no longer required.
 	- Erroroman added more API docs in skeleton.h
+29-Sep-2006
+	- res removed the following compatiblity hacks for older compilers
+	  (which would likely not be able to cope with CS' use of advanced
+	  C++ features anyway): 'typename_qualifier', fake 'explicit' 
+	  keyword, CS_SPECIALIZE_TEMPLATE instead of template<>, 
+	  CSARRAY_INHIBIT_TYPED_KEYS. Adresses trac #16.
 28-Sep-2006
 	- mdmkolbe changed walktest to exit with code 0 on normal exits.
 	- mdmkolbe converted plugins/bugplug to the new SCF.

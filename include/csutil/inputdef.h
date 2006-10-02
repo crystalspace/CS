@@ -260,7 +260,7 @@ public:
  * csComparator<> specialization for csInputDefinition to allow its use as 
  * e.g. hash key type.
  */
-CS_SPECIALIZE_TEMPLATE
+template<>
 class csComparator<csInputDefinition, csInputDefinition>
 {
 public:
@@ -274,7 +274,7 @@ public:
  * csHashComputer<> specialization for csInputDefinition to allow its use as 
  * hash key type.
  */
-CS_SPECIALIZE_TEMPLATE
+template<>
 class csHashComputer<csInputDefinition>
 {
 public:

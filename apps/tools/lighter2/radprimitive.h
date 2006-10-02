@@ -206,7 +206,7 @@ namespace lighter
   typedef csSet<RadPrimitive*> RadPrimitivePtrSet;
 }
 
-CS_SPECIALIZE_TEMPLATE
+template<>
 class csHashComputer<lighter::RadPrimitive*> : public csHashComputerIntegral<lighter::RadPrimitive*> {};
 
 #endif

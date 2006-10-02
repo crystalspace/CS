@@ -198,44 +198,6 @@
   #endif
 #endif
 
-// Platforms with compilers which understand the new C++ keyword `explicit'
-// should define CS_HAVE_CXX_KEYWORD_EXPLICIT.
-#if !defined(CS_HAVE_CXX_KEYWORD_EXPLICIT)
-  #define explicit /* nothing */
-#endif
-
-// Platforms with compilers which understand the new C++ keyword `typename'
-// should define CS_HAVE_CXX_KEYWORD_TYPENAME. For other compilers, we fake up
-// a `typename' keyword which can be used to declare template arguments, such
-// as:
-//
-//   template<typename T> class A {...};
-//
-// Furthermore, we fake up a synthesized `typename_qualifier' keyword which
-// should be used to qualify types within a template declaration rather than
-// using `typename'. Usage example:
-//
-// template<typename T> struct A {
-//   typedef int B;
-//   typename_qualifier C::B var;
-//   typename_qualifier T::Functor get_functor() const;
-// };
-#if !defined(CS_HAVE_CXX_KEYWORD_TYPENAME)
-  #define typename class
-  #define typename_qualifier
-#else
-  #define typename_qualifier typename
-#endif
-
-// Platforms with compilers which do not undersatnd the new C++ explicit
-// template specialization syntax `template<>' should define
-// CS_USE_OLD_TEMPLATE_SPECIALIZATION.
-#if defined(CS_USE_OLD_TEMPLATE_SPECIALIZATION)
-  #define CS_SPECIALIZE_TEMPLATE
-#else
-  #define CS_SPECIALIZE_TEMPLATE template<>
-#endif
-
 // The smallest Z at which 3D clipping occurs
 #define SMALL_Z 0.01f
 
