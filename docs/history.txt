@@ -6,6 +6,30 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+<<<<<<< .working
+=======
+1-Sep-2006
+	- Marten implemented pthread thread and condition variables classes 
+	  with new interface. The new improved implementation of threading
+	  should now be fully functional.
+	- res silenced more MSVC deprecation warnings.
+	- res fixed some locals in CS::TriangleIndicesStream to use the 
+	  template parameter.
+	- res added iShaderVariableContext::RemoveVariable (csShaderVariable*).
+	- caedes removed stdtex from data Jamfile.
+30-Sep-2006
+	- res fixed some MSVC warnings.
+	- res fixed some wrong GL extension function declarations and added
+	  the GL_EXT_packed_depth_stencil ext.
+	- res changed scfImplementationPooled to use C++ cast operators and
+	  the CS memory allocator.
+	- res changed makeGLMatrix to optionally convert to a row-major 
+	  matrix.
+	- res copied a more elaborate version of GetTuple() into 
+	  csWin32RegistryIterator.
+	- res changed the Cg plugin to define a preprocessor macro
+	  PROGRAM_TYPE_FRAGMENT or PROGRAM_TYPE_VERTEX, depending on the type.
+>>>>>>> .merge-right.r25505
 29-Sep-2006
 	- res removed the following compatiblity hacks for older compilers
 	  (which would likely not be able to cope with CS' use of advanced
