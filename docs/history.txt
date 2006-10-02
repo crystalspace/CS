@@ -9,6 +9,8 @@ chronological order.
 1-Sep-2006
 	- caedes removed stdtex from data Jamfile.
 	- res silenced more MSVC deprecation warnings.
+	- res fixed some locals in CS::TriangleIndicesStream to use the 
+	  template parameter.
 30-Sep-2006
 	- res fixed some MSVC warnings.
 	- res fixed some wrong GL extension function declarations and added
