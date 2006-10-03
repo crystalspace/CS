@@ -266,11 +266,15 @@ csQuaternion csQuaternion::Log () const
   // q = w + v, w is real, v is complex vector
 
   // let u be v / |v|
-  // log(q) = 1/2*log(|q|) + u*atan(|v|, w)
+  // log(q) = 1/2*log(|q|) + u*atan(|v|/ w)
   float vNorm = v.Norm ();
   float qSqNorm = SquaredNorm ();
 
-  float vCoeff = atan2f (vNorm, w) / vNorm;
+  float vCoeff;
+  if (vNorm > 0.0f)
+    vCoeff = atan2f (vNorm, w) / vNorm;
+  else
+    vCoeff = 0;
 
   return csQuaternion (v * vCoeff, 0.5f * logf (qSqNorm));
 }
@@ -285,7 +289,11 @@ csQuaternion csQuaternion::Exp () const
   float vNorm = v.Norm ();
   float expW = expf (w);
 
-  float vCoeff = expW * sinf (vNorm) / vNorm;
+  float vCoeff;
+  if (vNorm > 0.0f)
+    vCoeff = expW * sinf (vNorm) / vNorm;
+  else
+    vCoeff = 0;
 
   return csQuaternion (v * vCoeff, expW * cosf (vNorm));  
 }
