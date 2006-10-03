@@ -453,39 +453,50 @@ void csSkeletonScript::RecalcSpline()
     size_t num = tmp_arr.Length();
     for(size_t j = 0; j < num; j++)
     {
-      csQuaternion p, p1, p2;
-      p = tmp_arr[j]->rot;
+      csQuaternion p1, p2;
+
+      bone_key_info& boneinfo = *tmp_arr[j];
+      const csQuaternion& p = boneinfo.rot;
+
       csQuaternion inv = p.GetConjugate();
-      if (j ==0)
-      {
-        p1 = (inv * tmp_arr[1]->rot).Log();
+      if (j == 0)
+      {        
         if (loop)
         {
-          p2 = (inv * tmp_arr[num-1]->rot).Log();
+          p1 = tmp_arr[1]->rot;
+          p2 = tmp_arr[num-1]->rot;
         }
         else
         {
-          p2 = (inv * p).Log();
+          // No difference to use, reuse ourselves as tangent
+          boneinfo.tangent = p;
+          continue;
         }
       }
       else if (j == (num-1))
       {
         if (loop)
         {
-          p1 = (inv * tmp_arr[0]->rot).Log();
+          p1 = tmp_arr[0]->rot;
+          p2 = tmp_arr[j-1]->rot;
         }
         else
         {
-          p1 = (inv * p).Log();
+          // No difference to use, reuse ourselves as tangent
+          boneinfo.tangent = p;
+          continue;
         }
-        p2 = (inv * tmp_arr[j - 1]->rot).Log();
       }
       else
       {
-        p1 = (inv * tmp_arr[j+1]->rot).Log();
-        p2 = (inv * tmp_arr[j-1]->rot).Log();
+        p1 = tmp_arr[j+1]->rot;
+        p2 = tmp_arr[j-1]->rot;
       }
-      tmp_arr[j]->tangent = p*((p1 + p2)/-4.0f).Exp();
+
+      p1 = (inv * p1).Log();
+      p2 = (inv * p2).Log();
+
+      tmp_arr[j]->tangent = p*((p1 + p2)/-4.0f).Exp ();
     }
   }
 }
