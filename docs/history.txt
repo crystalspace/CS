@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+3-Oct-2006
+	- mdmkolbe fixed an uninitialized variable that broke procedural
+	  textures on Cygwin.
 2-Oct-2006
 	- res removed the resolution and windowed vs fullscreen message from
 	  null3d.
