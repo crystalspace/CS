@@ -26,6 +26,8 @@ chronological order.
 	- Jorrit added a fallback for light_bumpmap to the light specular
 	  shader. That means that parallaxAtt will also correctly fallback
 	  to light_bumpmap if CG is not available or fails.
+	- Marten fixed a bug in the shader manager which caused shader manager
+	  (the global) SVs not to be properly pushed to the SV stack.
 2-Oct-2006
 	- res removed the resolution and windowed vs fullscreen message from
 	  null3d.

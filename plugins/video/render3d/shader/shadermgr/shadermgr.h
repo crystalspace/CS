@@ -77,7 +77,6 @@ private:
   csRef<csShaderVariable> sv_time;
   void UpdateStandardVariables();
 
-  csShaderVariableContext svcontext;
   csRef<iShaderVarStack> shaderVarStack;
 
   csSet<csStringID> neutralTags;
