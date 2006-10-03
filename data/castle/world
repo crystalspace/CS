@@ -861,7 +861,7 @@
     <light name='Lamp.014'>
       <center y='-5.1071' x='21.2151' z='27.0649'/>
       <color blue='0.393562018871' green='0.800079286098' red='0.99938505888'/>
-      <radius brightness='10.0'>13.0</radius>
+      <radius brightness='10.0'>9.0</radius>
       <attenuation>linear</attenuation>
     </light>
     <meshobj name='Cylinder.018'>
@@ -878,7 +878,7 @@
     <light name='Lamp.003'>
       <center y='-5.1071' x='18.6938' z='11.163'/>
       <color blue='0.335614740849' green='0.76847165823' red='0.99938505888'/>
-      <radius brightness='10.0'>12.0</radius>
+      <radius brightness='10.0'>8.0</radius>
       <attenuation>linear</attenuation>
     </light>
     <meshobj name='Cube.483'>
@@ -1168,13 +1168,13 @@
     <light name='Lamp.013'>
       <center y='-0.69421' x='16.4605' z='27.7789'/>
       <color blue='0.335614740849' green='0.76847165823' red='0.99938505888'/>
-      <radius brightness='10.0'>10.0</radius>
+      <radius brightness='10.0'>6.0</radius>
       <attenuation>linear</attenuation>
     </light>
     <light name='Lamp.011'>
       <center y='2.92413' x='24.3204' z='27.7789'/>
       <color blue='0.393562018871' green='0.800079286098' red='0.99938505888'/>
-      <radius brightness='10.0'>10.0</radius>
+      <radius brightness='10.0'>6.0</radius>
       <attenuation>linear</attenuation>
     </light>
     <meshobj name='baset-floor00'>
@@ -1516,13 +1516,13 @@
     <light name='Lamp.006'>
       <center y='-2.72706' x='1.1391' z='30.4443'/>
       <color blue='0.335614740849' green='0.76847165823' red='0.99938505888'/>
-      <radius brightness='10.0'>12.0</radius>
+      <radius brightness='10.0'>8.0</radius>
       <attenuation>linear</attenuation>
     </light>
     <light name='Lamp.004'>
       <center y='-1.1071' x='11.8857' z='29.2387'/>
       <color blue='0.393562018871' green='0.800079286098' red='0.99938505888'/>
-      <radius brightness='10.0'>15.0</radius>
+      <radius brightness='10.0'>11.0</radius>
       <attenuation>linear</attenuation>
     </light>
     <meshobj name='basement-walls.005'>
@@ -2104,13 +2104,13 @@
     <light name='Lamp.007'>
       <center y='-1.2071' x='6.95591' z='15.4545'/>
       <color blue='0.335614740849' green='0.76847165823' red='0.99938505888'/>
-      <radius brightness='10.0'>15.0</radius>
+      <radius brightness='10.0'>11.0</radius>
       <attenuation>linear</attenuation>
     </light>
     <light name='Lamp.008'>
       <center y='-1.2071' x='18.9559' z='15.4545'/>
       <color blue='0.393562018871' green='0.800079286098' red='0.99938505888'/>
-      <radius brightness='10.0'>13.0</radius>
+      <radius brightness='10.0'>9.0</radius>
       <attenuation>linear</attenuation>
     </light>
   </sector>
@@ -2540,13 +2540,13 @@
     <light name='Lamp.009'>
       <center y='-5.1071' x='16.9206' z='24.7211'/>
       <color blue='0.335614740849' green='0.76847165823' red='0.99938505888'/>
-      <radius brightness='10.0'>12.0</radius>
+      <radius brightness='10.0'>8.0</radius>
       <attenuation>linear</attenuation>
     </light>
     <light name='Lamp.010'>
       <center y='-5.1071' x='4.65896' z='24.4711'/>
       <color blue='0.393562018871' green='0.800079286098' red='0.99938505888'/>
-      <radius brightness='10.0'>13.0</radius>
+      <radius brightness='10.0'>9.0</radius>
       <attenuation>linear</attenuation>
     </light>
     <meshobj name='Cube.011'>
@@ -2700,7 +2700,7 @@
     <light name='Lamp.012'>
       <center y='-5.0071' x='0.389008' z='25.0193'/>
       <color blue='0.335614740849' green='0.76847165823' red='0.99938505888'/>
-      <radius brightness='10.0'>12.0</radius>
+      <radius brightness='10.0'>8.0</radius>
       <attenuation>linear</attenuation>
     </light>
     <meshobj name='basement-walls.022'>
@@ -3379,7 +3379,7 @@
     <light name='Lamp.018'>
       <center y='4.6' x='11.0112' z='10.946'/>
       <color blue='0.335614740849' green='0.76847165823' red='0.99938505888'/>
-      <radius brightness='10.0'>13.0</radius>
+      <radius brightness='10.0'>9.0</radius>
       <attenuation>linear</attenuation>
     </light>
     <meshobj name='Cube.017'>
@@ -3397,7 +3397,7 @@
     <light name='Lamp.017'>
       <center y='4.6' x='26.4349' z='8.11364'/>
       <color blue='0.393562018871' green='0.800079286098' red='0.99938505888'/>
-      <radius brightness='10.0'>13.0</radius>
+      <radius brightness='10.0'>9.0</radius>
       <attenuation>linear</attenuation>
     </light>
     <meshobj name='Cylinder.224'>
@@ -3791,7 +3791,7 @@
     <light name='Lamp.020'>
       <center y='2.7' x='29.2335' z='18.9605'/>
       <color blue='0.335614740849' green='0.76847165823' red='0.99938505888'/>
-      <radius brightness='10.0'>15.0</radius>
+      <radius brightness='10.0'>11.0</radius>
       <attenuation>linear</attenuation>
     </light>
     <meshobj name='basement-walls'>
@@ -3809,7 +3809,7 @@
     <light name='Lamp.022'>
       <center y='2.7' x='25.2' z='13.6'/>
       <color blue='0.393562018871' green='0.800079286098' red='0.99938505888'/>
-      <radius brightness='10.0'>15.0</radius>
+      <radius brightness='10.0'>11.0</radius>
       <attenuation>linear</attenuation>
     </light>
     <meshobj name='Cube.027'>
@@ -4180,13 +4180,13 @@
     <light name='Lamp.026'>
       <center y='4.6' x='5.2335' z='22.4605'/>
       <color blue='0.393562018871' green='0.800079286098' red='0.99938505888'/>
-      <radius brightness='10.0'>13.0</radius>
+      <radius brightness='10.0'>9.0</radius>
       <attenuation>linear</attenuation>
     </light>
     <light name='Lamp.027'>
       <center y='4.6' x='5.2335' z='12.8605'/>
       <color blue='0.335614740849' green='0.76847165823' red='0.99938505888'/>
-      <radius brightness='10.0'>13.0</radius>
+      <radius brightness='10.0'>9.0</radius>
       <attenuation>linear</attenuation>
     </light>
     <meshobj name='castle_front_wall.003'>
@@ -4215,7 +4215,7 @@
     <light name='Lamp.028'>
       <center y='4.6' x='13.6335' z='12.8605'/>
       <color blue='0.393562018871' green='0.800079286098' red='0.99938505888'/>
-      <radius brightness='10.0'>13.0</radius>
+      <radius brightness='10.0'>9.0</radius>
       <attenuation>linear</attenuation>
     </light>
     <meshobj name='Cube.552'>

@@ -6,6 +6,15 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+4-Oct-2006
+	- Jorrit changed all the attenuation based shaders (parallaxAtt,
+	  specular, character, ...) to calculate attenuation a bit
+	  differently so that the resulting lighting is brighter for the
+	  same radius of the light. This makes the lighting intensity
+	  more matched up with the lighting as calculated by the lightmapper.
+	  Another benefit of this change is that it improves speed as
+	  you can now reduce the light radius with same visual effect.
+	- Jorrit reduces the light radius in castle level.
 3-Oct-2006
 	- mdmkolbe fixed an uninitialized variable that broke procedural
 	  textures on Cygwin.

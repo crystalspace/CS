@@ -50,7 +50,7 @@ vertex2fragment main (app2vertex IN,
 	OUT.oLightDir = tangLight;
 	OUT.oEyeVec = tangEyeVec;
 
-	OUT.Attenuation = -objLight*Attenuation.y*0.8 + 0.5;
+	OUT.Attenuation = -objLight*Attenuation.y*0.4 + 0.5;
 	OUT.Attenuation.w = 0.5;
 
 
