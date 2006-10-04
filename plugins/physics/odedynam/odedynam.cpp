@@ -108,15 +108,6 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csODERigidBody::RigidBody)
 SCF_IMPLEMENTS_INTERFACE (iRigidBody)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-SCF_IMPLEMENT_IBASE (csODEJoint)
-SCF_IMPLEMENTS_INTERFACE (iJoint)
-SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iODEJointState)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csODEJoint::ODEJointState)
-SCF_IMPLEMENTS_INTERFACE (iODEJointState)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 SCF_IMPLEMENT_IBASE (ODEBallJoint)
 SCF_IMPLEMENTS_INTERFACE (iODEBallJoint)
 SCF_IMPLEMENT_IBASE_END
@@ -798,9 +789,9 @@ bool csODEDynamicSystem::AttachColliderBox (const csVector3 &size,
                                             const csOrthoTransform& trans, float friction, float elasticity, float softness)
 {
   csODECollider *odec = new csODECollider ();
-  odec->SetElasticity (elasticity);
-  odec->SetFriction (friction);
-  odec->SetSoftness (softness);
+  //odec->SetElasticity (elasticity);
+  //odec->SetFriction (friction);
+  //odec->SetSoftness (softness);
   odec->CreateBoxGeometry (size);
   odec->SetTransform (csOrthoTransform(trans.GetO2T().GetTranspose(),trans.GetOrigin()));
   //odec->SetTransform (trans);
@@ -2411,11 +2402,8 @@ csVector3 ODEBallJoint::GetAnchorError ()
 
 //-------------------------------------------------------------------------------
 
-csODEJoint::csODEJoint (csODEDynamicSystem *sys)
+csODEJoint::csODEJoint (csODEDynamicSystem *sys) : scfImplementationType (this, sys)
 {
-  SCF_CONSTRUCT_IBASE (0);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiODEJointState);
-
   jointID = 0;
 
   body[0] = body[1] = 0;
@@ -2433,9 +2421,17 @@ csODEJoint::csODEJoint (csODEDynamicSystem *sys)
   maxAngle.Set (0, 0, 0);
   minAngle.Set (0, 0, 0);
 
-  stopBounce.Set (0, 0, 0);
-  desiredVelocity.Set (0, 0, 0);
-  fMax.Set (0, 0, 0);
+  lo_stop = csVector3 (-dInfinity, -dInfinity, -dInfinity);
+  hi_stop = csVector3 (dInfinity, dInfinity, dInfinity); 
+  vel = csVector3 (0);
+  fmax = csVector3 (0);
+  fudge_factor = csVector3 (1);
+  bounce = csVector3 (0);
+  cfm = csVector3 (0.1f);
+  stop_erp = csVector3 (0.9f);
+  stop_cfm = csVector3 (0.1f);
+  suspension_erp = csVector3 (0.9f);
+  suspension_cfm = csVector3 (0.1f);
 
   dynsys = sys;
 }
@@ -2444,8 +2440,8 @@ csODEJoint::~csODEJoint ()
 {
   if (jointID)
     dJointDestroy (jointID);
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiODEJointState);
-  SCF_DESTRUCT_IBASE();
+  if (motor_jointID)
+    dJointDestroy (motor_jointID);
 }
 
 void csODEJoint::Attach (iRigidBody *b1, iRigidBody *b2)
@@ -2560,8 +2556,17 @@ void csODEJoint::BuildHinge (const csVector3 &axis, float min, float max)
 void csODEJoint::BuildHinge2 (const csVector3 &axis1, float min1, float max1,
                               const csVector3 &axis2, float min2, float max2)
 {
-  dJointSetHinge2Axis1 (jointID, axis1.x, axis1.y, axis1.z);
-  dJointSetHinge2Axis2 (jointID, axis2.x, axis2.y, axis2.z);
+  if (custom_aconstraint_axis)
+  {
+    dJointSetHinge2Axis1 (jointID,
+      aconstraint_axis[0].x, aconstraint_axis[0].y, aconstraint_axis[0].z);
+    dJointSetHinge2Axis2 (jointID,
+      aconstraint_axis[1].x, aconstraint_axis[1].y, aconstraint_axis[1].z);
+  }else
+  {
+    dJointSetHinge2Axis1 (jointID, axis1.x, axis1.y, axis1.z);
+    dJointSetHinge2Axis2 (jointID, axis2.x, axis2.y, axis2.z);
+  }
   if (max1 > min1)
   {
     dJointSetHinge2Param (jointID, dParamLoStop, min1);
@@ -2599,12 +2604,16 @@ void csODEJoint::BuildSlider (const csVector3 &axis, float min, float max)
   }
 }
 
-void csODEJoint::SetBounce (const csVector3 & bounce)
+void csODEJoint::SetAngularConstraintAxis (const csVector3 &axis, int body)
 {
-  stopBounce = bounce;
-  ApplyJointProperty (dParamBounce, stopBounce);
+  aconstraint_axis[body] = axis; 
+  custom_aconstraint_axis = true;
+  BuildJoint ();
 }
-
+csVector3 csODEJoint::GetAngularConstraintAxis (int body)
+{
+  return aconstraint_axis[body];
+}
 
 // parameter: one of ODE joint parameters.
 // values: up to three possible values for up to 3 possible axis
@@ -2614,7 +2623,7 @@ void csODEJoint::SetBounce (const csVector3 & bounce)
 // for ball and socket joints and angular motors, all three elements
 // are used (NYI).
 
-void csODEJoint::ApplyJointProperty (int parameter, csVector3 & values)
+void csODEJoint::ApplyJointProperty (int parameter, const csVector3 &values)
 {
   int jointType = dJointGetType (jointID);
   switch(jointType)
@@ -2637,38 +2646,17 @@ void csODEJoint::ApplyJointProperty (int parameter, csVector3 & values)
     dJointSetHinge2Param (jointID, parameter + dParamGroup, values.y);
     //dParamXi = dParamX + dParamGroup * (i-1)
   default:
-    //case dJointTypeBall:       // maybe supported later via AMotor
+    case dJointTypeBall:       
+      if (motor_jointID)
+      {
+        dJointSetAMotorParam (motor_jointID, parameter, values.x);
+        //We use only euler mode, se we only need to setup parameter for 2 axes
+        dJointSetAMotorParam (motor_jointID, parameter + 512, values.z);
+      }
     //case dJointTypeAMotor:     // not supported here
     //case dJointTypeUniversal:  // not sure if that's supported in here
     break;
   }
-}
-
-csVector3 csODEJoint::GetBounce ()
-{
-  return stopBounce;
-}
-
-void csODEJoint::SetDesiredVelocity (const csVector3 & velocity)
-{
-  desiredVelocity = velocity;
-  ApplyJointProperty (dParamVel, desiredVelocity);
-}
-
-csVector3 csODEJoint::GetDesiredVelocity ()
-{
-  return desiredVelocity;
-}
-
-void csODEJoint::SetMaxForce (const csVector3 & maxForce)
-{
-  fMax = maxForce;
-  ApplyJointProperty (dParamFMax, fMax);
-}
-
-csVector3 csODEJoint::GetMaxForce ()
-{
-  return fMax;
 }
 
 void csODEJoint::BuildJoint ()
@@ -2676,6 +2664,10 @@ void csODEJoint::BuildJoint ()
   if (!(bodyID[0] || bodyID[1]))
   {
     return;
+  }
+  if (motor_jointID)
+  {
+    dJointDestroy (motor_jointID);
   }
   if (jointID)
   {
@@ -2746,6 +2738,16 @@ void csODEJoint::BuildJoint ()
       dJointAttach (jointID, bodyID[0], bodyID[1]);
       pos = transform.GetOrigin();
       dJointSetBallAnchor (jointID, pos.x, pos.y, pos.z);
+      if (custom_aconstraint_axis)
+      {
+        motor_jointID = dJointCreateAMotor (dynsys->GetWorldID(), 0);
+        dJointAttach (jointID, bodyID[0], bodyID[1]);
+        dJointSetAMotorMode (motor_jointID, dAMotorEuler);
+        dJointSetAMotorAxis (motor_jointID, 0, 1,
+          aconstraint_axis[0].x, aconstraint_axis[0].y, aconstraint_axis[0].z);
+        dJointSetAMotorAxis (motor_jointID, 2, 2,
+          aconstraint_axis[1].x, aconstraint_axis[1].y, aconstraint_axis[1].z);
+      }
       break;
     }
   }
@@ -2781,11 +2783,24 @@ void csODEJoint::BuildJoint ()
   } else {
     /* too unconstrained, don't create joint */
   }
+
+  //stop&motor properties
+  ApplyJointProperty (dParamLoStop, lo_stop);
+  ApplyJointProperty (dParamHiStop, hi_stop);
+  ApplyJointProperty (dParamVel, vel);
+  ApplyJointProperty (dParamFMax, fmax);
+  ApplyJointProperty (dParamFudgeFactor, fudge_factor);
+  ApplyJointProperty (dParamBounce, bounce);
+  ApplyJointProperty (dParamCFM, cfm);
+  ApplyJointProperty (dParamStopERP, stop_erp);
+  ApplyJointProperty (dParamStopCFM, stop_cfm);
+  ApplyJointProperty (dParamSuspensionERP, suspension_erp);
+  ApplyJointProperty (dParamSuspensionCFM, suspension_cfm);
 }
 
-ODEJointType csODEJoint::ODEJointState::GetType()
+ODEJointType csODEJoint::GetType()
 {
-  switch (dJointGetType (scfParent->jointID))
+  switch (dJointGetType (jointID))
   {
   case dJointTypeBall: return CS_ODE_JOINT_TYPE_BALL;
   case dJointTypeHinge: return CS_ODE_JOINT_TYPE_HINGE;
@@ -2799,65 +2814,21 @@ ODEJointType csODEJoint::ODEJointState::GetType()
   return CS_ODE_JOINT_TYPE_UNKNOWN;
 }
 
-void csODEJoint::ODEJointState::SetParam (int parameter, float value)
+csVector3 csODEJoint::GetParam (int parameter)
 {
-  switch(GetType())
-  {
-  case CS_ODE_JOINT_TYPE_HINGE:
-    dJointSetHingeParam (scfParent->jointID, parameter, value);
-    break;
-  case CS_ODE_JOINT_TYPE_SLIDER:
-    dJointSetSliderParam (scfParent->jointID, parameter, value);
-    break;
-  case CS_ODE_JOINT_TYPE_HINGE2:
-    dJointSetHinge2Param (scfParent->jointID, parameter, value);
-    break;
-  case CS_ODE_JOINT_TYPE_AMOTOR:
-    dJointSetAMotorParam (scfParent->jointID, parameter, value);
-    break;
-  default:
-    ; // do nothing
-  }
-}
-float csODEJoint::ODEJointState::GetParam (int parameter)
-{
-  switch(GetType())
-  {
-  case CS_ODE_JOINT_TYPE_HINGE:
-    return dJointGetHingeParam (scfParent->jointID, parameter);
-  case CS_ODE_JOINT_TYPE_SLIDER:
-    return dJointGetSliderParam (scfParent->jointID, parameter);
-  case CS_ODE_JOINT_TYPE_HINGE2:
-    return dJointGetHinge2Param (scfParent->jointID, parameter);
-  case CS_ODE_JOINT_TYPE_AMOTOR:
-    return dJointGetAMotorParam (scfParent->jointID, parameter);
-  default:
+  //switch(GetType())
+  //{
+  //case CS_ODE_JOINT_TYPE_HINGE:
+  //  return dJointGetHingeParam (scfParent->jointID, parameter);
+  //case CS_ODE_JOINT_TYPE_SLIDER:
+  //  return dJointGetSliderParam (scfParent->jointID, parameter);
+  //case CS_ODE_JOINT_TYPE_HINGE2:
+  //  return dJointGetHinge2Param (scfParent->jointID, parameter);
+  //case CS_ODE_JOINT_TYPE_AMOTOR:
+  //  return dJointGetAMotorParam (scfParent->jointID, parameter);
+  //default:
     return 0.0; // this is not a good... the error is ignored silently...
-  }
-}
-
-void csODEJoint::ODEJointState::SetHinge2Axis1 (const csVector3& axis)
-{
-  if (GetType() == CS_ODE_JOINT_TYPE_HINGE2)
-  {
-    dJointSetHinge2Axis1 (scfParent->jointID, axis[0], axis[1], axis[2]);
-  }
-}
-
-void csODEJoint::ODEJointState::SetHinge2Axis2 (const csVector3& axis)
-{
-  if (GetType() == CS_ODE_JOINT_TYPE_HINGE2)
-  {
-    dJointSetHinge2Axis2 (scfParent->jointID, axis[0], axis[1], axis[2]);
-  }
-}
-
-void csODEJoint::ODEJointState::SetHinge2Anchor (const csVector3& point)
-{
-  if (GetType() == CS_ODE_JOINT_TYPE_HINGE2)
-  {
-    dJointSetHinge2Anchor (scfParent->jointID, point[0], point[1], point[2]);
-  }
+  //}
 }
 
 csODEDefaultMoveCallback::csODEDefaultMoveCallback ()
