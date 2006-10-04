@@ -7,6 +7,16 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 4-Oct-2006
+	- Jorrit updated startme:
+	    - Made the icons show from top to bottom.
+	    - Removed particles and awstest demos.
+	    - Changed screenshot for walktest to castle screenshot.
+3-Oct-2006
+	- mdmkolbe fixed an uninitialized variable that broke procedural
+	  textures on Cygwin.
+	- Jorrit committed a new extrudeGlow shader from Anders Wisur.
+	  Still experimental.
+	- Jorrit added a few missing Jamfile's in the data/shader directory.
 	- Jorrit changed all the attenuation based shaders (parallaxAtt,
 	  specular, character, ...) to calculate attenuation a bit
 	  differently so that the resulting lighting is brighter for the
