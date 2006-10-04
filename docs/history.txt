@@ -6,6 +6,11 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+4-Oct-2006
+	- Jorrit updated startme:
+	    - Made the icons show from top to bottom.
+	    - Removed particles and awstest demos.
+	    - Changed screenshot for walktest to castle screenshot.
 3-Oct-2006
 	- mdmkolbe fixed an uninitialized variable that broke procedural
 	  textures on Cygwin.

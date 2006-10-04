@@ -465,7 +465,7 @@ void StartMe::CreateRoom ()
   int rows = int (demos.Length ()-1) / cols + 1;
   float dx = (DEMO_MESH_MAXX-DEMO_MESH_MINX) / float (cols-1);
   float dy = (DEMO_MESH_MAXY-DEMO_MESH_MINY) / float (rows-1);
-  int x = 0, y = 0;
+  int x = 0, y = rows-1;
   for (i = 0 ; i < demos.Length () ; i++)
   {
     demos[i].mesh = CreateDemoMesh (demos[i].name,
@@ -473,7 +473,7 @@ void StartMe::CreateRoom ()
 		   DEMO_MESH_MINY + dy * float (y),
 		   DEMO_MESH_Z));
     x++;
-    if (x >= cols) { y++; x = 0; }
+    if (x >= cols) { y--; x = 0; }
     demos[i].spinning_speed = 0;
   }
 
