@@ -13,6 +13,9 @@ chronological order.
 	    - Changed screenshot for walktest to castle screenshot.
 	- mdmkolbe eliminated improper reinterpret_cast calls with extreme
 	  prejudice.  (Casting from a 'void*' should use static_cast.)
+	- Marten reverted one of mdmkolbes changes. _beginthreadex does
+	  not always return a void*, on some versions of MSVC it gives
+	  uintptr_t and therefor needs the reinterpret_cast.
 3-Oct-2006
 	- mdmkolbe fixed an uninitialized variable that broke procedural
 	  textures on Cygwin.

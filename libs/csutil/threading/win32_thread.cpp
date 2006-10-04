@@ -135,7 +135,8 @@ namespace Implementation
     {
       ThreadStartParams param (runnable, isRunning);
 
-      threadHandle = _beginthreadex (0, 0, &proxyFunc, &param, 0, &threadId);
+      threadHandle = reinterpret_cast<void*> (_beginthreadex (0, 0, &proxyFunc, 
+        &param, 0, &threadId));
 
       if (threadHandle == 0)
         return;
