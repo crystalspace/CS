@@ -22,6 +22,9 @@ chronological order.
 	- Jorrit committed a new extrudeGlow shader from Anders Wisur.
 	  Still experimental.
 	- Jorrit added a few missing Jamfile's in the data/shader directory.
+	- Jorrit added a fallback for light_bumpmap to the light specular
+	  shader. That means that parallaxAtt will also correctly fallback
+	  to light_bumpmap if CG is not available or fails.
 2-Oct-2006
 	- Marten fixed csQuaternion::Exp and csQuaternion::Log to actually be
 	  the exponential and logarithmic functions.
