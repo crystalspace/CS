@@ -11,6 +11,8 @@ chronological order.
 	    - Made the icons show from top to bottom.
 	    - Removed particles and awstest demos.
 	    - Changed screenshot for walktest to castle screenshot.
+	- mdmkolbe eliminated improper reinterpret_cast calls with extreme
+	  prejudice.  (Casting from a 'void*' should use static_cast.)
 3-Oct-2006
 	- mdmkolbe fixed an uninitialized variable that broke procedural
 	  textures on Cygwin.

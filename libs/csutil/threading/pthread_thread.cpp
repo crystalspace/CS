@@ -71,8 +71,7 @@ namespace Implementation
 
     void* proxyFunc (void* param)
     {
-      ThreadStartParams* tp = reinterpret_cast<ThreadStartParams*>
-        (param);
+      ThreadStartParams* tp = static_cast<ThreadStartParams*> (param);
 
       tp->Started ();
 
