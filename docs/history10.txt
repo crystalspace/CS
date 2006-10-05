@@ -6,6 +6,8 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+5-Oct-2006
+	- Marten merged r25553 into 1.0.
 4-Oct-2006
 	- Jorrit merged r25541:25542 into 1.0 (shader changes).
 	- Jorrit merged r25545 into 1.0 (shader changes).

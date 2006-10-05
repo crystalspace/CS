@@ -11,6 +11,8 @@ chronological order.
 	    - Made the icons show from top to bottom.
 	    - Removed particles and awstest demos.
 	    - Changed screenshot for walktest to castle screenshot.
+	- Marten hopefully fixed the particle "clumping" when emitting 
+	  particles with velocity.
 3-Oct-2006
 	- mdmkolbe fixed an uninitialized variable that broke procedural
 	  textures on Cygwin.
