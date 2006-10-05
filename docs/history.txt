@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+5-Oct-2006
+	- Marten changed win32 version resource generation so it strips
+	  any RCxxx tags, appearantly they trip the mingw resource
+	  compiler.
 4-Oct-2006
 	- Jorrit updated startme:
 	    - Made the icons show from top to bottom.

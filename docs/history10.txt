@@ -8,6 +8,7 @@ chronological order.
 
 5-Oct-2006
 	- Marten merged r25553 into 1.0.
+	- Marten merged r25557 into 1.0.
 4-Oct-2006
 	- Jorrit merged r25541:25542 into 1.0 (shader changes).
 	- Jorrit merged r25545 into 1.0 (shader changes).
