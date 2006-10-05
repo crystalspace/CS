@@ -135,6 +135,9 @@ namespace Implementation
     {
       ThreadStartParams param (runnable, isRunning);
 
+      // _beginthreadex does not always return a void*,
+      // on some versions of MSVC it gives uintptr_t
+      // and therefor needs a reinterpret_cast.
       threadHandle = reinterpret_cast<void*> (_beginthreadex (0, 0, &proxyFunc, 
         &param, 0, &threadId));
 

@@ -13,6 +13,8 @@ chronological order.
 	  compiler.
         - Piotr does bug fixes after yesterdays joints commit. Additionally he
           comments out unnecessary code in phystut.
+	- mdmkolbe added a comment to the code explaining why one of the
+	  reinterpret_casts was used.
 4-Oct-2006
 	- Jorrit updated startme:
 	    - Made the icons show from top to bottom.
