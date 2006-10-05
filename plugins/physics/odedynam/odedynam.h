@@ -1871,7 +1871,6 @@ class csODEJoint : public scfImplementation1<
   dBodyID bodyID[2];
 
   int transConstraint[3], rotConstraint[3];
-  csVector3 maxTrans, minTrans, maxAngle, minAngle;
   csVector3 lo_stop, hi_stop, vel, fmax, fudge_factor, bounce,
     cfm, stop_erp, stop_cfm, suspension_cfm, suspension_erp;
   csVector3 aconstraint_axis[2];
@@ -2002,10 +2001,9 @@ private:
   void ApplyJointProperty (int parameter, const csVector3 &values);
   csVector3 GetParam (int parameter);
 
-  void BuildHinge (const csVector3 &axis, float min, float max);
-  void BuildHinge2 (const csVector3 &axis1, float min1, float max1,
-         const csVector3 &axis2, float min2, float max2);
-  void BuildSlider (const csVector3 &axis, float min, float max);
+  void BuildHinge (const csVector3 &axis);
+  void BuildHinge2 (const csVector3 &axis1,const csVector3 &axis2);
+  void BuildSlider (const csVector3 &axis);
   void BuildJoint ();
 
 };

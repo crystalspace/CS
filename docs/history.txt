@@ -10,6 +10,8 @@ chronological order.
 	- Marten changed win32 version resource generation so it strips
 	  any RCxxx tags, appearantly they trip the mingw resource
 	  compiler.
+        - Piotr does bug fixes after yesterdays joints commit. Additionally he
+          comments out unnecessary code in phystut.
 4-Oct-2006
 	- Jorrit updated startme:
 	    - Made the icons show from top to bottom.
