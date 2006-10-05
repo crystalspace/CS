@@ -1873,6 +1873,7 @@ class csODEJoint : public scfImplementation1<
   int transConstraint[3], rotConstraint[3];
   csVector3 lo_stop, hi_stop, vel, fmax, fudge_factor, bounce,
     cfm, stop_erp, stop_cfm, suspension_cfm, suspension_erp;
+
   csVector3 aconstraint_axis[2];
   bool custom_aconstraint_axis;
 
@@ -1892,6 +1893,8 @@ public:
 
   void SetTransform (const csOrthoTransform &trans);
   csOrthoTransform GetTransform ();
+
+  void SetStopAndMotorsParams ();
 
   void SetTransConstraints (bool X, bool Y, bool Z);
   inline bool IsXTransConstrained () { return (transConstraint[0] != 0); }

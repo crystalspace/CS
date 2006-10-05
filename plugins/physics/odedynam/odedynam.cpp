@@ -2424,11 +2424,11 @@ csODEJoint::csODEJoint (csODEDynamicSystem *sys) : scfImplementationType (this, 
   fmax = csVector3 (0);
   fudge_factor = csVector3 (1);
   bounce = csVector3 (0);
-  cfm = csVector3 (0.1f);
-  stop_erp = csVector3 (0.9f);
-  stop_cfm = csVector3 (0.1f);
-  suspension_erp = csVector3 (0.9f);
-  suspension_cfm = csVector3 (0.1f);
+  cfm = csVector3 (9.9999997e-006);
+  stop_erp = csVector3 (0.2f);
+  stop_cfm = csVector3 (9.9999997e-006);
+  suspension_erp = csVector3 (0.0f);
+  suspension_cfm = csVector3 (0.0f);
 
   dynsys = sys;
 }
@@ -2585,7 +2585,19 @@ void csODEJoint::ApplyJointProperty (int parameter, const csVector3 &values)
   switch(jointType)
   {
   case dJointTypeHinge:
-    dJointSetHingeParam (jointID, parameter, values.x);
+    if (rotConstraint[0])
+    {
+      dJointSetHingeParam (jointID, parameter, values.x);
+    }
+    else if (rotConstraint[1])
+    {
+      dJointSetHingeParam (jointID, parameter, values.y);
+    }
+    else if (rotConstraint[2])
+    {
+      dJointSetHingeParam (jointID, parameter, values.z);
+    }
+    
     break;
   case dJointTypeSlider:
     if (transConstraint[0])
@@ -2607,14 +2619,32 @@ void csODEJoint::ApplyJointProperty (int parameter, const csVector3 &values)
       {
         dJointSetAMotorParam (motor_jointID, parameter, values.x);
         //We use only euler mode, se we only need to setup parameter for 2 axes
-        dJointSetAMotorParam (motor_jointID, parameter + 512, values.z);
+        dJointSetAMotorParam (motor_jointID, parameter + 2*dParamGroup, values.z);
       }
     //case dJointTypeAMotor:     // not supported here
     //case dJointTypeUniversal:  // not sure if that's supported in here
     break;
   }
 }
+void csODEJoint::SetStopAndMotorsParams ()
+{
+  //stop&motor properties
+  if (jointID)
+  {
+    ApplyJointProperty (dParamLoStop, lo_stop);
+    ApplyJointProperty (dParamHiStop, hi_stop);
+    ApplyJointProperty (dParamVel, vel);
+    ApplyJointProperty (dParamFMax, fmax);
+    ApplyJointProperty (dParamFudgeFactor, fudge_factor);
+    ApplyJointProperty (dParamBounce, bounce);
+    ApplyJointProperty (dParamCFM, cfm);
+    ApplyJointProperty (dParamStopERP, stop_erp);
+    ApplyJointProperty (dParamStopCFM, stop_cfm);
+    ApplyJointProperty (dParamSuspensionERP, suspension_erp);
+    ApplyJointProperty (dParamSuspensionCFM, suspension_cfm);
+  }
 
+}
 void csODEJoint::BuildJoint ()
 {
   if (!(bodyID[0] || bodyID[1]))
@@ -2641,11 +2671,13 @@ void csODEJoint::BuildJoint ()
     case 0:
       jointID = dJointCreateFixed (dynsys->GetWorldID(), 0);
       dJointAttach (jointID, bodyID[0], bodyID[1]);
+      SetStopAndMotorsParams ();
       dJointSetFixed (jointID);
       break;
     case 1:
       jointID = dJointCreateHinge (dynsys->GetWorldID(), 0);
       dJointAttach (jointID, bodyID[0], bodyID[1]);
+      SetStopAndMotorsParams ();
       pos = transform.GetOrigin();
       dJointSetHingeAnchor (jointID, pos.x, pos.y, pos.z);
       rot = transform.GetO2T();
@@ -2665,6 +2697,7 @@ void csODEJoint::BuildJoint ()
       break;
     case 2:
       jointID = dJointCreateHinge2 (dynsys->GetWorldID(), 0);
+      SetStopAndMotorsParams ();
       dJointAttach (jointID, bodyID[0], bodyID[1]);
       pos = transform.GetOrigin();
       dJointSetHinge2Anchor (jointID, pos.x, pos.y, pos.z);
@@ -2688,6 +2721,7 @@ void csODEJoint::BuildJoint ()
       break;
     case 3:
       jointID = dJointCreateBall (dynsys->GetWorldID(), 0);
+      SetStopAndMotorsParams ();
       dJointAttach (jointID, bodyID[0], bodyID[1]);
       pos = transform.GetOrigin();
       dJointSetBallAnchor (jointID, pos.x, pos.y, pos.z);
@@ -2711,6 +2745,7 @@ void csODEJoint::BuildJoint ()
       /* 0 is accounted for in the previous condition */
     case 1:
       jointID = dJointCreateSlider (dynsys->GetWorldID(), 0);
+      SetStopAndMotorsParams ();
       dJointAttach (jointID, bodyID[0], bodyID[1]);
       rot = transform.GetO2T();
       if (transConstraint[0])
@@ -2735,22 +2770,6 @@ void csODEJoint::BuildJoint ()
     }
   } else {
     /* too unconstrained, don't create joint */
-  }
-
-  //stop&motor properties
-  if (jointID)
-  {
-    ApplyJointProperty (dParamLoStop, lo_stop);
-    ApplyJointProperty (dParamHiStop, hi_stop);
-    ApplyJointProperty (dParamVel, vel);
-    ApplyJointProperty (dParamFMax, fmax);
-    ApplyJointProperty (dParamFudgeFactor, fudge_factor);
-    ApplyJointProperty (dParamBounce, bounce);
-    ApplyJointProperty (dParamCFM, cfm);
-    ApplyJointProperty (dParamStopERP, stop_erp);
-    ApplyJointProperty (dParamStopCFM, stop_cfm);
-    ApplyJointProperty (dParamSuspensionERP, suspension_erp);
-    ApplyJointProperty (dParamSuspensionCFM, suspension_cfm);
   }
 }
 
