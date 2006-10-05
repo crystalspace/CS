@@ -2405,6 +2405,8 @@ csVector3 ODEBallJoint::GetAnchorError ()
 csODEJoint::csODEJoint (csODEDynamicSystem *sys) : scfImplementationType (this, sys)
 {
   jointID = 0;
+  motor_jointID = 0;
+  custom_aconstraint_axis = false;
 
   body[0] = body[1] = 0;
   bodyID[0] = bodyID[1] = 0;
@@ -2785,17 +2787,20 @@ void csODEJoint::BuildJoint ()
   }
 
   //stop&motor properties
-  ApplyJointProperty (dParamLoStop, lo_stop);
-  ApplyJointProperty (dParamHiStop, hi_stop);
-  ApplyJointProperty (dParamVel, vel);
-  ApplyJointProperty (dParamFMax, fmax);
-  ApplyJointProperty (dParamFudgeFactor, fudge_factor);
-  ApplyJointProperty (dParamBounce, bounce);
-  ApplyJointProperty (dParamCFM, cfm);
-  ApplyJointProperty (dParamStopERP, stop_erp);
-  ApplyJointProperty (dParamStopCFM, stop_cfm);
-  ApplyJointProperty (dParamSuspensionERP, suspension_erp);
-  ApplyJointProperty (dParamSuspensionCFM, suspension_cfm);
+  if (jointID)
+  {
+    ApplyJointProperty (dParamLoStop, lo_stop);
+    ApplyJointProperty (dParamHiStop, hi_stop);
+    ApplyJointProperty (dParamVel, vel);
+    ApplyJointProperty (dParamFMax, fmax);
+    ApplyJointProperty (dParamFudgeFactor, fudge_factor);
+    ApplyJointProperty (dParamBounce, bounce);
+    ApplyJointProperty (dParamCFM, cfm);
+    ApplyJointProperty (dParamStopERP, stop_erp);
+    ApplyJointProperty (dParamStopCFM, stop_cfm);
+    ApplyJointProperty (dParamSuspensionERP, suspension_erp);
+    ApplyJointProperty (dParamSuspensionCFM, suspension_cfm);
+  }
 }
 
 ODEJointType csODEJoint::GetType()
