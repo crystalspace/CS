@@ -15,6 +15,12 @@ chronological order.
           comments out unnecessary code in phystut.
 	- mdmkolbe added a comment to the code explaining why one of the
 	  reinterpret_casts was used.
+	- Erroroman changed render buffer "bones indices" elements type from
+	  int to float because of slow hardware animation reported by people
+	  that uses Windows and ATI video cards. Nvidia cards doesn't have
+	  such problem so probably cases about driver problem.
+	- Erroroman adopted kwartz model and the animation shaders to the new
+	  type of the render buffer.
 4-Oct-2006
 	- Jorrit updated startme:
 	    - Made the icons show from top to bottom.

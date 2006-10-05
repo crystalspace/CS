@@ -11,7 +11,7 @@ struct app2vertex {
 	float3 Position : POSITION;
 	float3 TexCoord : TEXCOORD0;
 	float3 Tangent : TEXCOORD1;
-	int4 BonesIndices;
+	float4 BonesIndices;
 	float4 BonesWeights;
 };
 
@@ -40,10 +40,10 @@ vertex2fragment main (app2vertex IN,
 {
 	vertex2fragment OUT;
 
-	int idx1 = IN.BonesIndices.x*2;
-	int idx2 = IN.BonesIndices.y*2;
-	int idx3 = IN.BonesIndices.z*2;
-	int idx4 = IN.BonesIndices.w*2;
+	int idx1 = int(IN.BonesIndices.x)*2;
+	int idx2 = int(IN.BonesIndices.y)*2;
+	int idx3 = int(IN.BonesIndices.z)*2;
+	int idx4 = int(IN.BonesIndices.w)*2;
 
 	float4 position;
 	position.xyz =  (QuatMultVert(Bones[idx1], IN.Position.xyz) + Bones[idx1+1].xyz)*IN.BonesWeights.x;
