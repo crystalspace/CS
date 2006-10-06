@@ -10,6 +10,8 @@ chronological order.
 	- Genjix added iVFS::SymbolicLink function.
 	- caedes added kwartz and castle to Jamfiles.
 	- Marten added a RK45 ODE solver to be used in particle effector.
+	- res slightly reworded the section on procedural textures. Also added
+	  "performance hints".
 5-Oct-2006
         - Genjix added csPython::LoadModule (path, file).
 	- Marten changed win32 version resource generation so it strips
