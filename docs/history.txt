@@ -14,6 +14,12 @@ chronological order.
 	  "performance hints".
 	- res changed the genmesh loader and saver to also accept factory 
 	  submeshes without a material.
+	- res made the following changes to lighter2, among others:
+	    - Support light attenuation.
+	    - Lightmaps are now distributed globally (and not one lightmap per
+	      mesh object).
+	    - Genmesh submeshes are handled better.
+	    - Better handle unknown mesh types.
 5-Oct-2006
         - Genjix added csPython::LoadModule (path, file).
 	- Marten changed win32 version resource generation so it strips

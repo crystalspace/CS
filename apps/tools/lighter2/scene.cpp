@@ -22,6 +22,7 @@
 #include "lighter.h"
 #include "kdtree.h"
 #include "statistics.h"
+#include "radobject_genmesh.h"
 
 using namespace CS;
 
@@ -159,7 +160,7 @@ namespace lighter
     if (!sector) return;
 
     // Setup a sector struct
-    Sector* radSector = new Sector;
+    Sector* radSector = new Sector (this);
     radSector->sectorName = sector->QueryObject ()->GetName ();
     sectors.Put (radSector->sectorName, radSector);
 
@@ -168,9 +169,10 @@ namespace lighter
     int i;
     for (i = 0; i < meshList->GetCount (); i++)
     {
-      if (!ParseMesh (radSector, meshList->Get (i)))
-        globalLighter->Report ("Error parsing mesh in sector '%s'!", 
-          radSector->sectorName.GetData ());
+      iMeshWrapper* mesh = meshList->Get (i);
+      if (ParseMesh (radSector, mesh) == Failure)
+        globalLighter->Report ("Error parsing mesh '%s' in sector '%s'!", 
+          mesh->QueryObject()->GetName(), radSector->sectorName.GetData ());
     }
 
     // Parse all lights (should have selector later!)
@@ -181,6 +183,8 @@ namespace lighter
       csRef<Light> radLight; radLight.AttachNew (new Light);
       radLight->position = light->GetMovable ()->GetFullPosition ();
       radLight->color = light->GetColor ();
+      radLight->attenuation = light->GetAttenuationMode ();
+      radLight->attenuationConsts = light->GetAttenuationConstants();
 
       // Only point-lights for now
       float r = light->GetCutoffDistance ();
@@ -192,35 +196,38 @@ namespace lighter
     }
   }
 
-  RadObject* Scene::ParseMesh (Sector *sector, iMeshWrapper *mesh)
+  Scene::MeshParseResult Scene::ParseMesh (Sector *sector, iMeshWrapper *mesh)
   {
-    if (!sector || !mesh) return 0;
+    if (!sector || !mesh) return Failure;
 
     // Get the factory
-    RadObjectFactory *factory = ParseMeshFactory (mesh->GetFactory ());
-    if (!factory) return 0;
+    RadObjectFactory *factory = 0;
+    MeshParseResult parseFact = ParseMeshFactory (mesh->GetFactory (), factory);
+    if (parseFact != Success) return parseFact;
+    if (!factory) return Failure;
 
     // Construct a new mesh
     RadObject* obj = factory->CreateObject ();
-    if (!obj) return 0;
+    if (!obj) return Failure;
 
     obj->ParseMesh (mesh);
+    obj->StripLightmaps (texturesToClean);
 
     // Save it
     sector->allObjects.Put (obj->meshName, obj);
 
-    return obj;
+    return Success;
   }
 
-  RadObjectFactory* Scene::ParseMeshFactory (iMeshFactoryWrapper *factory)
+  Scene::MeshParseResult Scene::ParseMeshFactory (iMeshFactoryWrapper *factory,
+                                                  RadObjectFactory*& radFact)
   {
-    if (!factory) return 0;
+    if (!factory) return Failure;
 
-    RadObjectFactory *radFact = 0;
     // Check for duplicate
-    csString factName= factory->QueryObject ()->GetName ();
+    csString factName = factory->QueryObject ()->GetName ();
     radFact = radFactories.Get (factName, 0);
-    if (radFact) return radFact;
+    if (radFact) return Success;
 
     csRef<iFactory> ifact = scfQueryInterface<iFactory> (
       factory->GetMeshObjectFactory ()->GetMeshObjectType());
@@ -232,17 +239,49 @@ namespace lighter
       // Genmesh
       radFact = new RadObjectFactory_Genmesh ();
     }
+    else
+      return NotAGenMesh;
     radFact->ParseFactory (factory);
     radFactories.Put (radFact->factoryName, radFact);
 
-    return radFact;
+    return Success;
   }
 
-  // Helper variable
-  csArray<csString> texturesToSave;
+  void Scene::CleanOldLightmaps (LoadedFile* fileInfo, 
+                                 const csStringArray& texFileNames)
+  {
+    csVfsDirectoryChanger chdir (globalLighter->vfs);
+    chdir.ChangeTo (fileInfo->directory);
+
+    for (size_t i = 0; i < texFileNames.GetSize(); i++)
+    {
+      globalLighter->vfs->DeleteFile (texFileNames[i]);
+    }
+  }
 
   void Scene::SaveSceneToDom (iDocumentNode* r, LoadedFile* fileInfo)
   {
+    for (unsigned int i = 0; i < lightmaps.GetSize (); i++)
+    {
+      csString textureFilename;
+      // Save the lightmap
+      {
+        textureFilename = "lightmaps/";
+        textureFilename += i;
+        textureFilename += ".png";
+      }
+      {
+        // Texture file name is relative to world file
+        csVfsDirectoryChanger chdir (globalLighter->vfs);
+        chdir.ChangeTo (fileInfo->directory);
+        lightmaps[i]->SaveLightmap (textureFilename);
+      }
+      SaveTexture savetex;
+      savetex.filename = textureFilename;
+      savetex.texname = lightmaps[i]->GetTextureName();
+      texturesToSave.Push (savetex);
+    }
+
     csRef <iDocumentNode> worldRoot = r->GetNode ("world");
 
     csRef<iDocumentNodeIterator> it = worldRoot->GetNodes ();
@@ -280,8 +319,8 @@ namespace lighter
 
     for (unsigned int i = 0; i < texturesToSave.GetSize (); i++)
     {
-      csString textureFile = texturesToSave[i];
-      csString textureName = GetTextureNameFromFilename (textureFile);
+      const csString& textureFile = texturesToSave[i].filename;
+      const csString& textureName = texturesToSave[i].texname;
       csRef<iDocumentNode> textureNode = 
         texturesNode->CreateNodeBefore (CS_NODE_ELEMENT);
       textureNode->SetValue ("texture");
@@ -301,6 +340,33 @@ namespace lighter
       csRef<iDocumentNode> filenameNode =
         fileNode->CreateNodeBefore (CS_NODE_TEXT);
       filenameNode->SetValue (textureFile.GetData ());
+
+      texturesToClean.Delete (textureName);
+    }
+
+    // Clean out old lightmap textures
+    {
+      csStringArray texFileNames;
+      csRefArray<iDocumentNode> nodesToDelete;
+      csRef<iDocumentNodeIterator> it = texturesNode->GetNodes ("texture");
+      while (it->HasNext())
+      {
+        csRef<iDocumentNode> child = it->Next();
+        if (child->GetType() != CS_NODE_ELEMENT) continue;
+
+        const char* name = child->GetAttributeValue ("name");
+        if ((name != 0) && texturesToClean.Contains (name))
+        {
+          csRef<iDocumentNode> fileNode = child->GetNode ("file");
+          if (fileNode.IsValid())
+            texFileNames.Push (fileNode->GetContentsValue());
+          nodesToDelete.Push (child);
+        }
+      }
+      for (size_t i = 0; i < nodesToDelete.GetSize(); i++)
+        texturesNode->RemoveNode (nodesToDelete[i]);
+
+      CleanOldLightmaps (fileInfo, texFileNames);
     }
 
     DocumentHelper::RemoveDuplicateChildren(texturesNode, 
@@ -352,49 +418,14 @@ namespace lighter
     if (radObj)
     {
       // We do have one
-      radObj->SaveMesh (objNode);
+      radObj->RenormalizeLightmapUVs (lightmaps);
+      radObj->SaveMesh (this, objNode);
 
       // Remove any old lightmap svs
       objNode->RemoveNodes (DocumentHelper::FilterDocumentNodeIterator (
         objNode->GetNodes ("shadervar"),
         DocumentHelper::NodeAttributeRegexpTest ("name", "tex lightmap.*")));
       
-      // Save the names of the lightmaps
-      LightmapPtrDelArray &lightmaps = radObj->GetLightmaps ();
-      for (unsigned int i = 0; i < lightmaps.GetSize (); i++)
-      {
-        csString textureFilename;
-        // Save the lightmap
-        {
-          textureFilename = "lm_";
-          textureFilename += radObj->meshName;
-          textureFilename += "_";
-          textureFilename += i;
-          textureFilename += ".png";
-        }
-	{
-	  // Texture file name is relative to world file
-	  csVfsDirectoryChanger chdir (globalLighter->vfs);
-	  chdir.ChangeTo (fileInfo->directory);
-	  lightmaps[i]->SaveLightmap (textureFilename);
-	}
-        texturesToSave.Push (textureFilename);
-
-        //add a sv to the meshnode
-        csRef<iDocumentNode> svNode = objNode->CreateNodeBefore (CS_NODE_ELEMENT);
-        svNode->SetValue ("shadervar");
-        csString svName = "tex lightmap";
-        if (i!=0)
-        {
-          svName += " "; svName += i;
-        }
-        svNode->SetAttribute ("name", svName.GetData ());
-        svNode->SetAttribute ("type", "texture");
-        
-        csString textureName = GetTextureNameFromFilename (textureFilename);
-        csRef<iDocumentNode> svValNode = svNode->CreateNodeBefore (CS_NODE_TEXT);
-        svValNode->SetValue (textureName.GetData ());
-      }
     }
 
     // Check if we have any child factories
@@ -404,15 +435,5 @@ namespace lighter
       csRef<iDocumentNode> node = it->Next ();
       SaveMeshObjectToDom (node, sect, fileInfo);
     }
-  }
-
-  csString Scene::GetTextureNameFromFilename (csString file)
-  {
-    csString out (file);
-    out.ReplaceAll ("\\", "_"); //replace bad characters
-    out.ReplaceAll ("/", "_"); 
-    out.ReplaceAll (" ", "_"); 
-    out.ReplaceAll (".", "_"); 
-    return out;
   }
 }

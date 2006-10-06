@@ -19,6 +19,8 @@
 #ifndef __DIRECTLIGHT_H__
 #define __DIRECTLIGHT_H__
 
+#include "radprimitive.h"
+
 namespace lighter
 {
   class Sector;
@@ -36,8 +38,15 @@ namespace lighter
 
   private:
 
+    // Shade a number of primitives
+    template<class Attenuation>
+    static void ShadeRadPrimitives (Sector* sector, const Attenuation& attn, 
+      Raytracer &tracer, RadPrimitivePtrArray& prims, Light* light, 
+      float progressStep);
     // Shade a single rad primitive
-    static void ShadeRadPrimitive (Raytracer &tracer, RadPrimitive &prim, Light* light);
+    template<class Attenuation>
+    static void ShadeRadPrimitive (Sector* sector, const Attenuation& attn, 
+      Raytracer &tracer, RadPrimitive &prim, Light* light);
 
     //Make sure we don't instance it
     DirectLighting ();
