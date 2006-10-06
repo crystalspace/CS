@@ -7,6 +7,7 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 6-Oct-2006
+	- Genjix added iVFS::SymbolicLink function.
 	- caedes added kwartz and castle to Jamfiles.
 	- Marten added a RK45 ODE solver to be used in particle effector.
 5-Oct-2006

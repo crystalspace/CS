@@ -37,6 +37,7 @@
 #include "csutil/syspath.h"
 #include "csutil/util.h"
 #include "csutil/vfsplat.h"
+#include "iutil/databuff.h"
 #include "iutil/objreg.h"
 #include "iutil/verbositymanager.h"
 
@@ -1992,6 +1993,15 @@ bool csVFS::DeleteFile (const char *FileName)
 
   ArchiveCache->CheckUp ();
   return rc;
+}
+
+bool csVFS::SymbolicLink(const char *Target, const char *Link, int priority)
+{
+  csRef<iDataBuffer> rpath = GetRealPath (Link);
+  if (!rpath->GetSize ())
+    return false;
+  Mount (Target, rpath->GetData ());
+  return true;
 }
 
 bool csVFS::Mount (const char *VirtualPath, const char *RealPath)
