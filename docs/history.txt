@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+7-Oct-2006
+	- Jorrit added a test to csPhysicalFile so that it no longer
+	  succeeds on directories.
 6-Oct-2006
 	- Genjix added iVFS::SymbolicLink function.
 	- caedes added kwartz and castle to Jamfiles.
