@@ -10585,6 +10585,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *WriteFile = *cspacec::iVFS_WriteFile;
 *DeleteFile = *cspacec::iVFS_DeleteFile;
 *Sync = *cspacec::iVFS_Sync;
+*SymbolicLink = *cspacec::iVFS_SymbolicLink;
 *Mount = *cspacec::iVFS_Mount;
 *Unmount = *cspacec::iVFS_Unmount;
 *MountRoot = *cspacec::iVFS_MountRoot;

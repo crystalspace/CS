@@ -6855,6 +6855,7 @@ class iVFS(iBase):
     def WriteFile(*args): return _cspace.iVFS_WriteFile(*args)
     def DeleteFile(*args): return _cspace.iVFS_DeleteFile(*args)
     def Sync(*args): return _cspace.iVFS_Sync(*args)
+    def SymbolicLink(*args): return _cspace.iVFS_SymbolicLink(*args)
     def Mount(*args): return _cspace.iVFS_Mount(*args)
     def Unmount(*args): return _cspace.iVFS_Unmount(*args)
     def MountRoot(*args): return _cspace.iVFS_MountRoot(*args)
