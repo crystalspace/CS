@@ -17,6 +17,8 @@ chronological order.
 	    - Changed screenshot for walktest to castle screenshot.
 	- Marten hopefully fixed the particle "clumping" when emitting 
 	  particles with velocity.
+	- mdmkolbe eliminated improper reinterpret_cast calls with extreme
+	  prejudice.  (Casting from a 'void*' should use static_cast.)
 3-Oct-2006
 	- mdmkolbe fixed an uninitialized variable that broke procedural
 	  textures on Cygwin.

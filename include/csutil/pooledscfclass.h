@@ -117,7 +117,7 @@ public:
     }
     else
     {
-      newEntry = reinterpret_cast<PoolEntry*> (cs_malloc (n));
+      newEntry = static_cast<PoolEntry*> (cs_malloc (n));
     #ifdef CS_MEMORY_TRACKER
       if (p.mti == 0)
       {
@@ -140,14 +140,14 @@ public:
   inline void operator delete (void* instance, Pool& p) 
   {
     typedef typename Pool::Entry PoolEntry;
-    PoolEntry* entry = reinterpret_cast<PoolEntry*> (instance);
+    PoolEntry* entry = static_cast<PoolEntry*> (instance);
     entry->next = p.pool;
     p.pool = entry;
     p.allocedEntries--;
   }
   inline void operator delete (void* instance) 
   {
-    scfClassType* object = reinterpret_cast<scfClassType*> (instance);
+    scfClassType* object = static_cast<scfClassType*> (instance);
     Pool& p = *(static_cast<scfImplementationPooled*> (object)->scfPool);
     scfImplementationPooled::operator delete (object, p);
   }
