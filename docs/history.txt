@@ -11,6 +11,10 @@ chronological order.
 	  succeeds on directories.
 	- res fixed the font cache to more gracefully handle nested 
 	  CacheGlyph() calls. Fixes trac #164.
+	- res changed the reporter to avoid nested calls into listeners (ie
+	  when Report() is called while being inside Report()) since that may
+	  "confuse" the listeners and lead to weird side effects. Instead,
+	  queue up messages that are reported while in the reporter.
 6-Oct-2006
 	- Genjix added iVFS::SymbolicLink function.
 	- caedes added kwartz and castle to Jamfiles.
