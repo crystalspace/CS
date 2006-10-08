@@ -11,6 +11,8 @@ chronological order.
 	  (iShaderVariableContext::RemoveVariable()).
 	- res merged r25567 into 1.0 (install kwartz, castle).
 	- res merged r25570 into 1.0 (proctex docs).
+	- res merged r25571 into 1.0 (genmesh submesh w/o material
+	  tolerance).
 7-Oct-2006
 	- res merged r25551 into 1.0 (proper C++ casts).
 5-Oct-2006
