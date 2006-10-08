@@ -9,6 +9,8 @@ chronological order.
 7-Oct-2006
 	- Jorrit added a test to csPhysicalFile so that it no longer
 	  succeeds on directories.
+	- res fixed the font cache to more gracefully handle nested 
+	  CacheGlyph() calls. Fixes trac #164.
 6-Oct-2006
 	- caedes added kwartz and castle to Jamfiles.
 	- res slightly reworded the section on procedural textures. Also added

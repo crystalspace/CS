@@ -14,6 +14,7 @@ chronological order.
 	- res merged r25571 into 1.0 (genmesh submesh w/o material
 	  tolerance).
 	- res merged r25574 into 1.0 (csPhysicalFile + directories).
+	- res merged r25575 into 1.0 (fix fontcache assertion).
 7-Oct-2006
 	- res merged r25551 into 1.0 (proper C++ casts).
 5-Oct-2006
