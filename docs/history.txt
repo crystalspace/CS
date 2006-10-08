@@ -289,6 +289,9 @@ chronological order.
 	  be removed through the normal iEngine->RemoveObject()) and a delay.
 	  This new system is more general then the old iEngine->WantToDie()
 	  method that is called by some particle systems.
+11-Sep-2006
+	- Marten fixed (hopefully) the script building (with Swig) on both 
+	  older swigs and for jobber.
 10-Sep-2006
 	- PK changed ViewMesh to use CEGUI instead of AWS.
 	- PK fixed a bug in csHash::Delete (const K& key, const T &value).
