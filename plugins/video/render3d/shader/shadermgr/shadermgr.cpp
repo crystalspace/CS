@@ -212,7 +212,7 @@ bool csShaderManager::Initialize(iObjectRegistry *objreg)
 
   sv_time.AttachNew (new csShaderVariable (strings->Request ("standard time")));
   sv_time->SetValue (0.0f);
-  svcontext.AddVariable (sv_time);
+  AddVariable (sv_time);
 
   return true;
 }

@@ -43,6 +43,8 @@ chronological order.
 	- Jorrit added a fallback for light_bumpmap to the light specular
 	  shader. That means that parallaxAtt will also correctly fallback
 	  to light_bumpmap if CG is not available or fails.
+	- Marten fixed a bug in the shader manager which caused shader manager
+	  (the global) SVs not to be properly pushed to the SV stack.
 2-Oct-2006
 	- Marten fixed csQuaternion::Exp and csQuaternion::Log to actually be
 	  the exponential and logarithmic functions.
@@ -52,6 +54,7 @@ chronological order.
 	- res fixed some locals in CS::TriangleIndicesStream to use the 
 	  template parameter.
 	- caedes removed stdtex from data Jamfile.
+	- res added iShaderVariableContext::RemoveVariable (csShaderVariable*).
 30-Sep-2006
 	- res fixed some MSVC warnings.
 	- res fixed some wrong GL extension function declarations and added
