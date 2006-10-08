@@ -8,6 +8,8 @@ chronological order.
 
 6-Oct-2006
 	- caedes added kwartz and castle to Jamfiles.
+	- res slightly reworded the section on procedural textures. Also added
+	  "performance hints".
 5-Oct-2006
 	- Marten changed win32 version resource generation so it strips
 	  any RCxxx tags, appearantly they trip the mingw resource
