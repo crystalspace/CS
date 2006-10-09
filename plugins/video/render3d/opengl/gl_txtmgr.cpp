@@ -1195,8 +1195,9 @@ void csGLTextureManager::ReadTextureClasses (iConfigFile* config)
   csString extractedClass;
   csRef<iConfigIterator> it = config->Enumerate (
     "Video.OpenGL.TextureClass.");
-  while (it->Next())
+  while (it->HasNext())
   {
+    it->Next();
     const char* keyName = it->GetKey (true);
     const char* dot = strchr (keyName, '.');
     if (dot != 0)

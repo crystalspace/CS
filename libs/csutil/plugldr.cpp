@@ -298,8 +298,9 @@ bool csPluginLoader::LoadPlugins ()
   csRef<iConfigIterator> plugin_list (Config->Enumerate ("System.Plugins."));
   if (plugin_list)
   {
-    while (plugin_list->Next ())
+    while (plugin_list->HasNext ())
     {
+      plugin_list->Next();
       const char *tag = plugin_list->GetKey (true);
       // If -video was used to override 3D driver, then respect it.
       if (g3d_override && strcmp (tag, "iGraphics3D") == 0)

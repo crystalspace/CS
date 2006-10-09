@@ -52,9 +52,12 @@ bool csPrefixConfig::LoadNow(const char *Filename, iVFS *vfs, bool overwrite)
 
   // copy all options for the current user
   csRef<iConfigIterator> it (cfg.Enumerate(Prefix));
-  while (it->Next())
+  while (it->HasNext())
+  {
+    it->Next();
     if (overwrite || !KeyExists(it->GetKey(true)))
       SetStr(it->GetKey(true), it->GetStr());
+  }
 
   // copy the EOF comment
   SetEOFComment(cfg.GetEOFComment());
@@ -77,8 +80,11 @@ bool csPrefixConfig::SaveNow(const char *Filename, iVFS *vfs) const
   // keys in the prefix config file are always grouped by application,
   // which isn't too bad after all.
   it = cfg.Enumerate(Prefix);
-  while (it->Next())
+  while (it->HasNext())
+  {
+    it->Next();
     cfg.DeleteKey(it->GetKey());
+  }
 
   // copy all options for the current user
   it = ((iConfigFile*)this)->Enumerate();

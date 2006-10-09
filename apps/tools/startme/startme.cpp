@@ -508,8 +508,9 @@ void StartMe::LoadConfig ()
     DemoData demo;
     demo.description = new scfString ();
     csRef<iConfigIterator> iterator (confman->Enumerate (pattern.GetData()));
-    while (iterator->Next ())
+    while (iterator->HasNext ())
     {
+      iterator->Next();
       csString key (iterator->GetKey ());
       csString leaf;
       key.SubString (leaf,
