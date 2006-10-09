@@ -88,9 +88,9 @@ private:
   csString Subsection;
   csStringHash Iterated;
 
-  csString currentKey;
-  csString currentValue;
-  csString currentComment;
+  const char* currentKey;
+  const char* currentValue;
+  const char* currentComment;
 
   void FetchNextIterator ()
   {
@@ -193,24 +193,23 @@ public:
 
   virtual const char *GetKey(bool Local) const
   {
-    return !currentKey.IsEmpty() ? 
-      currentKey.GetData() + (Local ? Subsection.Length() : 0) : 0;
+    return currentKey ? currentKey + (Local ? Subsection.Length() : 0) : 0;
   }
   virtual int GetInt() const
   {
-    return !currentValue.IsEmpty() ? atoi (currentValue) : 0;
+    return currentValue ? atoi (currentValue) : 0;
   }
   virtual float GetFloat() const
   {
-    return !currentValue.IsEmpty() ? atof (currentValue) : 0.0f;
+    return currentValue ? atof (currentValue) : 0.0f;
   }
   virtual const char *GetStr() const
   {
-    return !currentValue.IsEmpty() ? currentValue : "";
+    return currentValue ? currentValue : "";
   }
   virtual bool GetBool() const
   {
-  return (!currentValue.IsEmpty() &&
+  return (currentValue &&
     (strcasecmp(currentValue, "true") == 0 ||
      strcasecmp(currentValue, "yes" ) == 0 ||
      strcasecmp(currentValue, "on"  ) == 0 ||
@@ -218,7 +217,7 @@ public:
   }
   virtual csPtr<iStringArray> GetTuple() const
   {
-    if (!currentValue.IsEmpty())
+    if (!currentValue)
       return 0;
 
     scfStringArray *items = new scfStringArray;		// the output list
@@ -249,7 +248,7 @@ public:
   }
   virtual const char *GetComment() const
   {
-    return !currentComment.IsEmpty() ? currentComment.GetData() : 0;
+    return currentComment ? currentComment : 0;
   }
 };
 
