@@ -10,6 +10,8 @@ chronological order.
 	- res fixed a problem in the iConfigIterator::HasNext() which
 	  manifested itself in scrambled "could not load plugin" messages
 	  and subsequent crash on startup.
+	- res updated the documentation transform script for the new site
+	  search URL.
 8-Oct-2006
 	- res added iConfigIterator::HasNext(), loosely based on a patch by
 	  Timothy "kiolakin" Whitfield.
