@@ -326,6 +326,7 @@ The built in effectors are also loadable via the normal particle loader using
 @itemize @bullet
 @item @samp{force}
 @item @samp{lincolor}
+@item @samp{forcefield}
 @end itemize
 
 @samp{Force} effector loader recognize following keywords:
@@ -348,3 +349,20 @@ TTL. It takes a fixed number of "keypoints" and then interpolates between them.
 Set a keypoint color at given time.
 @end table
 
+@samp{Velocityfield} effector is a more complicated and resource using way of giving
+intricate movements to the particles. It works by taking a function defining
+the velocity of particles as a function of position and time. It then integrates
+to the new particle positions. Each function can take a number of vector and
+scalar parameters that affects their output
+To be noted is that @samp{velocityfield} effector does not change the particle
+velocities, so any "external" movement will be integrated as normally.
+@samp{Velocityfield} effector loader recognize following keywords:
+@table @code
+@item <type>field-type</type>
+Set the field function. Currently supported values are @samp{spiral} and 
+@samp{radialpoint}.
+@item <fparam>value</fparam>
+Specify a scalar parameter.
+@item <vparam x="" y="" z="" />
+Specify a vector parameter.
+@end table

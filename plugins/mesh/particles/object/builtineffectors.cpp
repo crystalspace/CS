@@ -19,6 +19,7 @@
 #include "cssysdef.h"
 
 #include "csgeom/math.h"
+#include "csgeom/odesolver.h"
 #include "csutil/scf.h"
 #include "csutil/floatrand.h"
 
@@ -40,6 +41,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     ParticleEffectorFactory::CreateLinColor () const
   {
     return new ParticleEffectorLinColor;
+  }
+
+  csPtr<iParticleBuiltinEffectorVelocityField> 
+    ParticleEffectorFactory::CreateVelocityField () const
+  {
+    return new ParticleEffectorVelocityField;
   }
 
 
@@ -183,5 +190,132 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
 
     precalcInvalid = false;
   }
+
+
+  
+  namespace
+  {
+    // Helper method for stepping system one step using fn
+    template<typename FnType>
+    void StepParticles (FnType& fn, const csParticleBuffer& particleBuffer, 
+      float dt, float t0 = 0)
+    {
+      float invDt = dt ? 1.0f/dt : 0.0f;
+
+      for (size_t idx = 0; idx < particleBuffer.particleCount; ++idx)
+      {
+        csParticle& particle = particleBuffer.particleData[idx];
+        csParticleAux& particleAux = particleBuffer.particleAuxData[idx];
+
+        const csVector3& oldPos = particle.position;
+
+        //Calculate new position
+        float err = CS::Math::Ode45::Step<FnType, float> 
+          (fn, dt, t0, oldPos, particle.position);
+      }
+    }
+
+    // Spiral functor
+    struct SpiralFunc
+    {
+      SpiralFunc (const csVector3& O, const csVector3& D)
+        : lineO (O), lineD (D), velScale (1.0f), velOffset (0.0f)
+      {
+      }
+
+      // y is position, give y' = v
+      csVector3 operator()(float t, const csVector3& y)
+      {
+        float c1 = lineD * (y - lineO);
+        const csVector3 pl = lineO + c1 * lineD;
+        
+        // PP is vector from line to particle
+        const csVector3 PP = (y - pl);
+
+        csVector3 result =  PP%lineD;
+        
+        // fix result
+        result.x *= velScale.x;
+        result.y *= velScale.y;
+        result.z *= velScale.z;
+
+        return result + velOffset;
+      }
+
+      csVector3 lineO, lineD;
+      csVector3 velScale, velOffset;
+    };
+
+    // Radial push/pull functor
+    struct RadialPointFunc
+    {
+      RadialPointFunc (const csVector3& O, float scale)
+        : origin (O), scale1 (scale), scale2 (0.0f)
+      {
+      }
+
+      // y is position, give y' = v
+      csVector3 operator()(float t, const csVector3& y)
+      {
+        return (y - origin).Unit () * (scale1 +  scale2 * sinf(t));
+      }
+
+      csVector3 origin;
+      float scale1, scale2;
+    };
+  }
+
+  void ParticleEffectorVelocityField::EffectParticles (iParticleSystemBase* system,
+    const csParticleBuffer& particleBuffer, float dt, float totalTime)
+  {
+    if (particleBuffer.particleCount == 0)
+      return;
+
+    switch (type)
+    {
+    case CS_PARTICLE_BUILTIN_SPIRAL:
+      {
+        if (vparams.GetSize () < 2)
+          vparams.SetSize (2);
+
+        // First make sure we have enough parameters to evaluate the function
+        SpiralFunc func (vparams[0], vparams[1].Unit ());
+
+        if (vparams.GetSize () >= 3)
+          func.velScale = vparams[2];
+        if (vparams.GetSize () >= 4)
+          func.velOffset = vparams[3];
+
+        StepParticles (func, particleBuffer, dt, totalTime);
+      }
+      break;
+    case CS_PARTICLE_BUILTIN_RADIALPOINT:
+      {
+        if (vparams.GetSize () < 1)
+          vparams.SetSize (1);
+
+        if (fparams.GetSize () < 1)
+          fparams.SetSize (1);
+
+        // First make sure we have enough parameters to evaluate the function
+        RadialPointFunc func (vparams[0], fparams[0]);
+
+        if (fparams.GetSize () >= 2)
+          func.scale2 = fparams[1];
+
+        StepParticles (func, particleBuffer, dt, totalTime);
+      }
+      break;
+    default:
+      break;
+    }
+  }
+
+
+  csPtr<iParticleEffector> ParticleEffectorVelocityField::Clone () const
+  {
+    return 0;
+  }
+
 }
 CS_PLUGIN_NAMESPACE_END(Particles)
