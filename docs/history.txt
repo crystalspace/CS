@@ -12,6 +12,7 @@ chronological order.
 	  and subsequent crash on startup.
 	- res updated the documentation transform script for the new site
 	  search URL.
+	- res slightly tweaked the API docs search box style.
 8-Oct-2006
 	- res added iConfigIterator::HasNext(), loosely based on a patch by
 	  Timothy "kiolakin" Whitfield.
