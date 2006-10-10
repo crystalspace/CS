@@ -19,6 +19,8 @@
 #ifndef __CS_MATH_H__
 #define __CS_MATH_H__
 
+#include "csutil/algorithms.h"
+
 /**\file 
  * Generic mathematic utility functions.
  */
@@ -32,7 +34,7 @@
 template<class T>
 const T& csMax (const T& a, const T& b)
 {
-  if (a >= b) return a;
+  if (b < a) return a;
   return b;
 }
 
@@ -44,6 +46,30 @@ const T& csMin (const T& a, const T& b)
 {
   if (a < b) return a;
   return b;
+}
+
+/**
+ * Sort a and b in order of size.
+ */
+template<class T>
+void csSort (T& a, T& b)
+{
+  if (b < a)
+    CS::Swap (a, b);
+}
+
+/**
+ * Sort a and b in order of size.
+ * If swapping them, also swap x and y
+ */
+template<class T, class U>
+void csSort (T& a, T& b, U& x, U& y)
+{
+  if (b < a)
+  {
+    CS::Swap (a, b);
+    CS::Swap (x, y);
+  }
 }
 
 

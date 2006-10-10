@@ -167,15 +167,19 @@ CS_VCHK_RUNTH([CS_VCHK_PATCOUNT([$3])],
 CS_VCHK_RUNTH([CS_VCHK_PATCOUNT([$3])],
     [cs_prog_$4_min_ver_[]i=`echo $cs_prog_$4_min_version${cs_prog_$4_min_suffix} | sed 'CS_VCHK_SEDEXPRNTH([CS_VCHK_RMALL([$3])], [i])'`
 ])
-cs_cv_prog_$4_version_ok=''
+AS_TR_SH([cs_cv_prog_$4_version_$2_ok])=''
 CS_VCHK_RUNTH([CS_VCHK_PATCOUNT([$3])],
-[test -z "$cs_cv_prog_$4_version_ok" && { expr "$cs_prog_$4_is_ver_[]i" "$5" "$cs_prog_$4_min_ver_[]i" >/dev/null || cs_cv_prog_$4_version_ok=no ; }
-test -z "$cs_cv_prog_$4_version_ok" && { expr "$cs_prog_$4_min_ver_[]i" "$5" "$cs_prog_$4_is_ver_[]i" >/dev/null || cs_cv_prog_$4_version_ok=yes ; }
+[test -z "$AS_TR_SH([cs_cv_prog_$4_version_$2_ok])" \
+  && { expr "$cs_prog_$4_is_ver_[]i" "$5" "$cs_prog_$4_min_ver_[]i" >/dev/null \
+    || AS_TR_SH([cs_cv_prog_$4_version_$2_ok])=no ; }
+test -z "$AS_TR_SH([cs_cv_prog_$4_version_$2_ok])" \
+  && { expr "$cs_prog_$4_min_ver_[]i" "$5" "$cs_prog_$4_is_ver_[]i" >/dev/null \
+    || AS_TR_SH([cs_cv_prog_$4_version_$2_ok])=yes ; }
 ])
-AS_IF([test -z "$cs_cv_prog_$4_version_ok"], [cs_cv_prog_$4_version_ok=yes])
-cs_cv_prog_$4_version_ok_annotated="$cs_cv_prog_$4_version_ok"
+AS_IF([test -z "$AS_TR_SH([cs_cv_prog_$4_version_$2_ok])"], [AS_TR_SH([cs_cv_prog_$4_version_$2_ok])=yes])
+AS_TR_SH([cs_cv_prog_$4_version_$2_ok_annotated])="$AS_TR_SH([cs_cv_prog_$4_version_$2_ok])"
 AS_IF([test -n "$cs_prog_$4_is_version"],
-    [cs_cv_prog_$4_version_ok_annotated="$cs_cv_prog_$4_version_ok_annotated (version $cs_prog_$4_is_version)"])
+    [AS_TR_SH([cs_cv_prog_$4_version_$2_ok_annotated])="$AS_TR_SH([cs_cv_prog_$4_version_$2_ok_annotated]) (version $cs_prog_$4_is_version)"])
 ])
 
 ##############################################################################
@@ -201,7 +205,7 @@ AS_IF([test -n "$cs_prog_$4_is_version"],
 ##############################################################################
 AC_DEFUN([CS_CHECK_PROG_VERSION],
 [AC_CACHE_CHECK([if $1 version m4_default([$7],[>=]) $3],
-    [AS_TR_SH([cs_cv_prog_$1_version_ok_annotated])],
+    [AS_TR_SH([cs_cv_prog_$1_version_$3_ok_annotated])],
     [CS_VCHK_EXTRACTVERSION([$2], [$3], [$4], AS_TR_SH([$1]),
 	m4_default([$7],[>=]))])
-AS_IF([test "$AS_TR_SH([cs_cv_prog_$1_version_ok])" = yes], [$5], [$6])])
+AS_IF([test "$AS_TR_SH([cs_cv_prog_$1_version_$3_ok])" = yes], [$5], [$6])])

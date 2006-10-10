@@ -313,8 +313,12 @@ void csODEDynamics::NearCallback (void *data, dGeomID o1, dGeomID o2)
     int a = dCollide (o1, o2, 1, &(contact[0].geom), sizeof (dContact));
     if (a > 0)
     {
-      c1->Collision (c2);
-      c2->Collision (c1);
+      csVector3 pos (contact[0].geom.pos[0], contact[0].geom.pos[1],
+	  contact[0].geom.pos[2]);
+      csVector3 normal (contact[0].geom.normal[0], contact[0].geom.normal[1],
+	  contact[0].geom.normal[2]);
+      c1->Collision (c2, pos, normal, contact[0].geom.depth);
+      c2->Collision (c1, pos, -normal, contact[0].geom.depth);
     }
   }
 
@@ -326,18 +330,25 @@ void csODEDynamics::NearCallback (void *data, dGeomID o1, dGeomID o2)
   int a = dCollide (o1, o2, 512, &(contact[0].geom), sizeof (dContact));
   if (a > 0)
   {
+    csVector3 pos (contact[0].geom.pos[0], contact[0].geom.pos[1],
+	  contact[0].geom.pos[2]);
+    csVector3 normal (contact[0].geom.normal[0], contact[0].geom.normal[1],
+	  contact[0].geom.normal[2]);
+    float depth = contact[0].geom.depth;
     /* there is only 1 actual body per set */
     if (b1)
     {
-      b1->Collision ((b2) ? &b2->scfiRigidBody : 0);
+      b1->Collision ((b2) ? &b2->scfiRigidBody : 0, pos, normal, depth);
       if (!b2)
-        ((GeomData *)dGeomGetData (o2))->collider->Collision (&b1->scfiRigidBody);
+        ((GeomData *)dGeomGetData (o2))->collider->Collision (
+		&b1->scfiRigidBody, pos, -normal, depth);
     }
     if (b2)
     {
-      b2->Collision ((b1) ? &b1->scfiRigidBody : 0);
+      b2->Collision ((b1) ? &b1->scfiRigidBody : 0, pos, -normal, depth);
       if (!b1)
-        ((GeomData *)dGeomGetData (o1))->collider->Collision (&b2->scfiRigidBody);
+        ((GeomData *)dGeomGetData (o1))->collider->Collision (
+		&b2->scfiRigidBody, pos, normal, depth);
     }
 
     for( int i=0; i<a; i++ )
@@ -800,7 +811,8 @@ bool csODEDynamicSystem::AttachColliderBox (const csVector3 &size,
 }
 
 bool csODEDynamicSystem::AttachColliderSphere (float radius,
-                                               const csVector3 &offset, float friction, float elasticity, float softness)
+                                               const csVector3 &offset, float friction, 
+                                               float elasticity, float softness)
 {
   if (radius > 0) //otherwise ODE will treat radius as a 'bad argument'
   {
@@ -833,7 +845,7 @@ csRef<iDynamicsSystemCollider> csODEDynamicSystem::GetCollider (
 	unsigned int index)
 {
   if (index < colliders.GetSize ())
-    return colliders[index];
+    return csRef<iDynamicsSystemCollider> (colliders[index]);
   else return 0;
 }
 csRef<iDynamicsSystemCollider> csODEDynamicSystem::CreateCollider ()
@@ -974,12 +986,14 @@ bool csODECollider::IsStatic ()
   return is_static;
 }
 
-void csODECollider::Collision (csODECollider* other)
+void csODECollider::Collision (csODECollider* other,
+    const csVector3& pos, const csVector3& normal, float depth)
 {
   if (coll_cb) coll_cb->Execute (this, other);
 }
 
-void csODECollider::Collision (iRigidBody* other)
+void csODECollider::Collision (iRigidBody* other,
+    const csVector3& pos, const csVector3& normal, float depth)
 {
   if (coll_cb) coll_cb->Execute (this, other);
 }
@@ -995,7 +1009,7 @@ void csODECollider::ClearContents ()
 
 void csODECollider::MassCorrection ()
 {
-  if (density > 0 && dGeomGetBody (transformID))
+  if (density > 0 && dGeomGetBody (transformID) && geomID)
   {
     dMass m, om;
     dMassSetZero (&m);
@@ -1837,9 +1851,11 @@ void csODERigidBody::SetCollisionCallback (iDynamicsCollisionCallback* cb)
   coll_cb = cb;
 }
 
-void csODERigidBody::Collision (iRigidBody *other)
+void csODERigidBody::Collision (iRigidBody *other,
+    const csVector3& pos, const csVector3& normal, float depth)
 {
-  if (coll_cb) coll_cb->Execute (&scfiRigidBody, other);
+  if (coll_cb) coll_cb->Execute (&scfiRigidBody, other,
+      pos, normal, depth);
 }
 
 void csODERigidBody::Update ()
@@ -1858,7 +1874,7 @@ void csODERigidBody::Update ()
 csRef<iDynamicsSystemCollider> csODERigidBody::GetCollider (unsigned int index)
 {
   if (index < colliders.GetSize ())
-    return colliders[index];
+    return csRef<iDynamicsSystemCollider> (colliders[index]);
   else return 0;
 }
 //-----------------------csStrictODEJoint-------------------------------------

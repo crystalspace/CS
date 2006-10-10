@@ -13,7 +13,7 @@
 a lot of factors to consider. Crystal Space has a lot of tools to offer
 (like sectors, portals, visibility cullers, etc.) but using these tools
 effectively is an art. In this chapter we will not talk about how to create
-maps. For that you use external tools like Blender, Quark, or some other
+maps. For that you use external tools like Blender, QuArK, or some other
 suitable tool.  This chapter focuses on how you should partition your map into
 sectors, the kind of mesh objects you should use, the visibility cullers,
 packing textures for more efficient rendering, combining objects,

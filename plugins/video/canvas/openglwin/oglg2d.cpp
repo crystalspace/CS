@@ -712,7 +712,7 @@ bool csGraphics2DOpenGL::SetMouseCursor (csMouseCursorID iShape)
 {
   csRef<iWin32Assistant> winhelper (
   	CS_QUERY_REGISTRY (object_reg, iWin32Assistant));
-  CS_ASSERT (winhelper != 0);
+  if (winhelper == 0) return false;
   bool rc;
   if (!m_bHardwareCursor)
   {

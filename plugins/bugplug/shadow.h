@@ -56,6 +56,7 @@ private:
   bool do_rad;	// Show bounding sphere.
   csFlags flags;
   iCamera* keep_camera;
+  csBox3 bbox;
 
 public:
 
@@ -103,7 +104,11 @@ public:
   void GetObjectBoundingBox (csBox3& bbox)
   {
     bbox.Set (-100000, -100000, -100000, 100000, 100000, 100000);
-    return;
+  }
+  const csBox3& GetObjectBoundingBox ()
+  {
+    bbox.Set (-100000, -100000, -100000, 100000, 100000, 100000);
+    return bbox;
   }
   void SetObjectBoundingBox (const csBox3&) { }
   void GetRadius (float& rad, csVector3& cent)

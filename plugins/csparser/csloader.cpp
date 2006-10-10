@@ -5404,40 +5404,29 @@ iSector* csLoader::ParseSector (iLoaderContext* ldr_context,
         break;
       case XMLTOKEN_FOG:
         {
-          csFog *f = sector->GetFog ();
-          f->enabled = true;
-	  f->red = child->GetAttributeValueAsFloat ("red");
-	  f->green = child->GetAttributeValueAsFloat ("green");
-	  f->blue = child->GetAttributeValueAsFloat ("blue");
-	  f->density = child->GetAttributeValueAsFloat ("density");
-	  csRef<iDocumentAttribute> start_attr = child->GetAttribute ("start");
-	  if (start_attr)
-	    f->start = start_attr->GetValueAsFloat();
-	  else
-	    f->start = 1.0f;
-
-	  csRef<iDocumentAttribute> end_attr = child->GetAttribute ("end");
-	  if (end_attr)
-	    f->end = end_attr->GetValueAsFloat();
-	  else
-	    f->end = 1000.0f;
-
+          csFog f;
+	  f.color.red = child->GetAttributeValueAsFloat ("red");
+	  f.color.green = child->GetAttributeValueAsFloat ("green");
+	  f.color.blue = child->GetAttributeValueAsFloat ("blue");
+	  f.density = child->GetAttributeValueAsFloat ("density");
+	  f.start = child->GetAttributeValueAsFloat ("start");
+	  f.end = child->GetAttributeValueAsFloat ("end");
 	  csRef<iDocumentAttribute> mode_attr = child->GetAttribute ("mode");
 	  if (mode_attr)
 	  {
 	    const char* str_mode = mode_attr->GetValue();
 	    if (!strcmp(str_mode, "linear"))
-	      f->mode = CS_FOG_MODE_LINEAR;
+	      f.mode = CS_FOG_MODE_LINEAR;
 	    else if (!strcmp(str_mode, "exp"))
-	      f->mode = CS_FOG_MODE_EXP;
+	      f.mode = CS_FOG_MODE_EXP;
 	    else if (!strcmp(str_mode, "exp2"))
-	      f->mode = CS_FOG_MODE_EXP2;
+	      f.mode = CS_FOG_MODE_EXP2;
 	    else
-	      f->mode = CS_FOG_MODE_NONE;
+	      f.mode = CS_FOG_MODE_NONE;
 	  }
 	  else
-	    f->mode = CS_FOG_MODE_NONE;
-
+            f.mode = CS_FOG_MODE_CRYSTALSPACE;
+          sector->SetFog (f);
         }
         break;
       case XMLTOKEN_KEY:

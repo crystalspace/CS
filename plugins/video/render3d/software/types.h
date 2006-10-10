@@ -20,8 +20,18 @@
 #ifndef __CS_SOFT3D_TYPES_H__
 #define __CS_SOFT3D_TYPES_H__
 
+#include "ivideo/graph3d.h"
+
 CS_PLUGIN_NAMESPACE_BEGIN(Soft3D)
 {
+  #define VATTR_SPEC(x)           (CS_VATTRIB_ ## x - CS_VATTRIB_SPECIFIC_FIRST)
+  #define VATTR_GEN(x)							      \
+    ((CS_VATTRIB_ ## x - CS_VATTRIB_GENERIC_FIRST) + CS_VATTRIB_SPECIFIC_LAST + 1)
+
+  static const size_t activeBufferCount = CS_VATTRIB_SPECIFIC_LAST - 
+    CS_VATTRIB_SPECIFIC_FIRST + 1;
+  static const size_t activeTextureCount = 4;
+
   /// A buffer used to pass vertex data around in the renderer
   struct VertexBuffer
   {

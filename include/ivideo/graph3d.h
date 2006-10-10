@@ -894,6 +894,7 @@ struct iGraphics3D : public virtual iBase
 
   /**
    * Set near clip plane.
+   * The plane is in camera space.
    */
   virtual void SetNearPlane (const csPlane3& pl) = 0;
 

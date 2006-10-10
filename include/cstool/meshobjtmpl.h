@@ -240,9 +240,14 @@ public:
   virtual void GetObjectBoundingBox (csBox3& bbox);
 
   /**
-   * See imesh/objmodel.h for specification. Overrides the default 
-bounding
-   * box.
+   * See imesh/objmodel.h for specification. The default implementation
+   * returns an infinite bounding box.
+   */
+  virtual const csBox3& GetObjectBoundingBox ();
+
+  /**
+   * See imesh/objmodel.h for specification. Overrides the
+   * default bounding box.
    */
   virtual void SetObjectBoundingBox (const csBox3& bbox);
 

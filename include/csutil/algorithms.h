@@ -26,6 +26,18 @@
 
 namespace CS
 {
+
+  /**
+   * Swap two elements
+   */
+  template <class T>
+  CS_FORCEINLINE_TEMPLATEMETHOD void Swap (T& a, T& b)
+  {
+    T tmp = a;
+    a = b;
+    b = tmp;
+  }
+
   /**
    * Iterate over all elements in the iterator and perform operation
    * given by Func.

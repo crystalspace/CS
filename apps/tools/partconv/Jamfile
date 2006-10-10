@@ -1,0 +1,8 @@
+SubDir TOP apps tools partconv ;
+
+Description partconv : "Particle system converter" ;
+
+Application partconv
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith partconv : crystalspace  ;

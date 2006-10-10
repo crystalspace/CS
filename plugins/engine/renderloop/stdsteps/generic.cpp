@@ -152,11 +152,6 @@ csPtr<iRenderStep> csGenericRenderStepFactory::Create ()
 //---------------------------------------------------------------------------
 
 csStringID csGenericRenderStep::fogplane_name;
-csStringID csGenericRenderStep::fogdensity_name;
-csStringID csGenericRenderStep::fogcolor_name;
-csStringID csGenericRenderStep::fogstart_name;
-csStringID csGenericRenderStep::fogend_name;
-csStringID csGenericRenderStep::fogmode_name;
 csStringID csGenericRenderStep::string_object2world;
 csStringID csGenericRenderStep::light_0_type;
 csStringID csGenericRenderStep::light_ambient;
@@ -177,11 +172,6 @@ csGenericRenderStep::csGenericRenderStep (
   zmode = CS_ZBUF_USE;
   currentSettings = false;
   fogplane_name = strings->Request ("fogplane");
-  fogdensity_name = strings->Request ("fog density");
-  fogcolor_name = strings->Request ("fog color");
-  fogstart_name = strings->Request ("fog start");
-  fogend_name = strings->Request ("fog end");
-  fogmode_name = strings->Request ("fog mode");
   string_object2world = strings->Request ("object2world transform");
   light_0_type = strings->Request ("light 0 type");
   light_ambient = strings->Request ("light ambient");
@@ -193,8 +183,40 @@ csGenericRenderStep::~csGenericRenderStep ()
 {
 }
 
+/* @@@ Name could prolly be better.
+ * This struct really contains the various contexts and data sources that
+ * contribute to the shader variables used for rendering.
+ */
+struct ShaderVarPusher
+{
+  iShaderVariableContext* sectorContext;
+  iLight *light;
+  csRenderMesh* mesh;
+  iShaderVariableContext* meshContext;
+  iShader* shader;
+
+  ShaderVarPusher () : sectorContext (0), light (0), mesh (0), meshContext (0),
+    shader (0)
+  { }
+  void PushVariables (iShaderVarStack* stacks) const
+  {
+    if (sectorContext)
+      sectorContext->PushVariables (stacks);
+    if (light)
+      light->GetSVContext()->PushVariables (stacks);
+    if (mesh->variablecontext)
+      mesh->variablecontext->PushVariables (stacks);
+    if (meshContext)
+      meshContext->PushVariables (stacks);
+    shader->PushVariables (stacks);
+    if (mesh->material)
+      mesh->material->GetMaterial()->PushVariables (stacks);
+  }
+};
+
 void csGenericRenderStep::RenderMeshes (iRenderView* rview, iGraphics3D* g3d,
-                                        iShader* shader, iLight *light, size_t ticket,
+                                        const ShaderVarPusher& Pusher,
+					size_t ticket,
 					meshInfo* meshContexts,
                                         csRenderMesh** meshes, 
                                         size_t num,
@@ -209,7 +231,8 @@ void csGenericRenderStep::RenderMeshes (iRenderView* rview, iGraphics3D* g3d,
   csRef<csShaderVariable> svO2W = 
     shadervars.Top ().GetVariable(string_object2world);
 
-  iMaterial *material = 0;
+  ShaderVarPusher pusher (Pusher);
+  iShader* shader = pusher.shader;
 
   bool noclip = false;
   csRef<iClipper2D> old_clipper;
@@ -223,6 +246,7 @@ void csGenericRenderStep::RenderMeshes (iRenderView* rview, iGraphics3D* g3d,
     size_t j;
     for (j = 0; j < num; j++)
     {
+      if (!meshContexts[j].render) continue;
       csRenderMesh* mesh = meshes[j];
       iShaderVariableContext* meshContext = meshContexts[j].svc;
       if (meshContext->IsEmpty())
@@ -231,19 +255,13 @@ void csGenericRenderStep::RenderMeshes (iRenderView* rview, iGraphics3D* g3d,
 
       svO2W->SetValue (mesh->object2world);
 
+      pusher.meshContext = meshContext;
+      pusher.mesh = mesh;
+
       stacks->Empty ();
       shaderManager->PushVariables (stacks);
-	  if (light)
-		  light->GetSVContext()->PushVariables (stacks);
       shadervars.Top ().PushVariables (stacks);
-      if (mesh->variablecontext)
-        mesh->variablecontext->PushVariables (stacks);
-      if (meshContext)
-        meshContext->PushVariables (stacks);
-      shader->PushVariables (stacks);
-      material = mesh->material->GetMaterial ();
-      if (material)
-        material->PushVariables (stacks);
+      pusher.PushVariables (stacks);
 
       csRenderMeshModes modes (*mesh);
       shader->SetupPass (ticket, mesh, modes, stacks);
@@ -317,9 +335,10 @@ private:
   size_t shadervars_idx;
   //csShaderVariableContext& shadervars;
 
-  iMaterial* lastMat;
+  iMaterialWrapper* lastMat;
   iShader* lastShader;
   iShaderVariableContext* lastMeshContext;
+  iShaderVariableContext* lastSectorContext;
   size_t matShadMeshTicket;
 
   void Reset ()
@@ -330,63 +349,39 @@ private:
 public:
   ShaderTicketHelper (iShaderVarStack* stacks,
     const csArray<csShaderVariableContext>& sv,
-    size_t sv_idx) :
-    	stacks (stacks), 
-    	shadervars (sv),
-	shadervars_idx (sv_idx)
+    size_t sv_idx) : stacks (stacks), shadervars (sv), shadervars_idx (sv_idx),
+      lastMat (0), lastShader (0), lastMeshContext (0), lastSectorContext (0)
   {
-    lastMat = 0;
-    lastShader = 0;
-    lastMeshContext = 0;
     Reset ();
   }
 
-  size_t GetTicket (iMaterial* material, iShader* shader, 
-    iShaderVariableContext* meshContext, csRenderMesh* mesh)
+  size_t GetTicket (const ShaderVarPusher& pusher)
   {
-    if ((material != lastMat) || (shader != lastShader)
-      || (meshContext != lastMeshContext))
+    if ((pusher.mesh->material != lastMat) 
+      || (pusher.shader != lastShader)
+      || (pusher.meshContext != lastMeshContext)
+      || (pusher.sectorContext != lastSectorContext))
     {
       Reset ();
-      lastMat = material;
-      lastShader = shader;
-      lastMeshContext = meshContext;
+      lastMat = pusher.mesh->material;
+      lastShader = pusher.shader;
+      lastMeshContext = pusher.meshContext;
+      lastSectorContext = pusher.sectorContext;
     }
-    if (mesh->variablecontext.IsValid () 
-      && !mesh->variablecontext->IsEmpty())
+    bool materialShaderOnly = !(pusher.mesh->variablecontext.IsValid () 
+      && !pusher.mesh->variablecontext->IsEmpty());
+    size_t newTicket = matShadMeshTicket;
+    if (!materialShaderOnly || (matShadMeshTicket == (size_t)~0))
     {
       stacks->Empty ();
       shadervars[shadervars_idx].PushVariables (stacks);
-      if (mesh->variablecontext)
-        mesh->variablecontext->PushVariables (stacks);
-      if (meshContext)
-        meshContext->PushVariables (stacks);
-      shader->PushVariables (stacks);
-      material->PushVariables (stacks);
+      pusher.PushVariables (stacks);
 
-      csRenderMeshModes modes (*mesh);
-      size_t retTicket = shader->GetTicket (modes, stacks);
-
-      return retTicket;
+      csRenderMeshModes modes (*pusher.mesh);
+      newTicket = pusher.shader->GetTicket (modes, stacks);
     }
-    else
-    {
-      if (matShadMeshTicket == (size_t)~0)
-      {
-        stacks->Empty ();
-        shadervars[shadervars_idx].PushVariables (stacks);
-        if (mesh->variablecontext)
-          mesh->variablecontext->PushVariables (stacks);
-        if (meshContext)
-          meshContext->PushVariables (stacks);
-        shader->PushVariables (stacks);
-        material->PushVariables (stacks);
-
-	csRenderMeshModes modes (*mesh);
-	matShadMeshTicket = shader->GetTicket (modes, stacks);
-      }
-      return matShadMeshTicket;
-    }
+    if (materialShaderOnly) matShadMeshTicket = newTicket;
+    return newTicket;
   }
 };
 
@@ -413,19 +408,29 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
     iMeshWrapper* m = imeshes_scratch[i];
     sameShaderMeshInfo[i].svc = m->GetSVContext();
     sameShaderMeshInfo[i].noclip = m->GetFlags ().Check (CS_ENTITY_NOCLIP);
+    sameShaderMeshInfo[i].render = true;
     // Only get this information if we have a light. Otherwise it is not
     // useful.
     if (light)
     {
-      csVector3 obj_center;
-      m->GetMeshObject ()->GetObjectModel ()->GetRadius (
-      	sameShaderMeshInfo[i].radius, obj_center);
+      iObjectModel* objmodel = m->GetMeshObject ()->GetObjectModel ();
       iMovable* mov = m->GetMovable ();
+#if USE_BOX
+      sameShaderMeshInfo[i].obj_model = objmodel;
+      sameShaderMeshInfo[i].movable = mov;
+#else
+      csVector3 obj_center;
+      objmodel->GetRadius (sameShaderMeshInfo[i].radius, obj_center);
       if (mov->IsFullTransformIdentity ())
+      {
         sameShaderMeshInfo[i].wor_center = obj_center;
+      }
       else
-        sameShaderMeshInfo[i].wor_center = mov->GetFullTransform ().
-		This2Other (obj_center);
+      {
+	csReversibleTransform trans = mov->GetFullTransform ();
+        sameShaderMeshInfo[i].wor_center = trans.This2Other (obj_center);
+      }
+#endif
     }
   }
  
@@ -452,19 +457,6 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
 
   if (sector->HasFog())
   {
-    sv = shadervars.Top ().GetVariableAdd (fogdensity_name);
-    sv->SetValue (sector->GetFog()->density);
-    sv = shadervars.Top ().GetVariableAdd (fogcolor_name);
-    sv->SetValue (csVector3 (sector->GetFog()->red,
-    	sector->GetFog()->green,
-	sector->GetFog()->blue));
-    sv = shadervars.Top ().GetVariableAdd (fogstart_name);
-    sv->SetValue (sector->GetFog()->start);
-    sv = shadervars.Top ().GetVariableAdd (fogend_name);
-    sv->SetValue (sector->GetFog()->end);
-    sv = shadervars.Top ().GetVariableAdd (fogmode_name);
-    sv->SetValue (sector->GetFog()->mode);
-
     //construct a cameraplane
     csVector4 fogPlane;
     iPortal *lastPortal = rview->GetLastPortal();
@@ -482,12 +474,10 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
     sv = shadervars.Top ().GetVariableAdd (fogplane_name);
     sv->SetValue (fogPlane);
   }
-  else
-  {
-    sv = shadervars.Top ().GetVariableAdd (fogdensity_name);
-    sv->SetValue (0);
-  }
 
+  ShaderVarPusher pusher;
+  pusher.sectorContext = sector->GetSVContext();
+  pusher.light = light;
   ShaderTicketHelper ticketHelper (stacks, shadervars, shadervars.Length ()-1);
   const csReversibleTransform& camt = rview->GetCamera ()->GetTransform ();
 
@@ -507,11 +497,36 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
     if (light)
     {
       // @@@ TODO: Better test for DIRECTIONAL and SPOTLIGHT
+#if USE_BOX
+      // We transform the light center to object space and then
+      // we test if the transformed light affects the bounding box.
+      iMovable* mov = sameShaderMeshInfo[n].movable;
+      iObjectModel* obj_model = sameShaderMeshInfo[n].obj_model;
+      const csBox3& obj_bbox = obj_model->GetObjectBoundingBox ();
+      bool isect;
+      if (mov->IsFullTransformIdentity ())
+      {
+        isect = csIntersect3::BoxSphere (obj_bbox,
+	    light_center, cutoff_distance * cutoff_distance);
+      }
+      else
+      {
+        csReversibleTransform trans = mov->GetFullTransform ();
+        csVector3 obj_light_center = trans.Other2This (light_center);
+        isect = csIntersect3::BoxSphere (obj_bbox,
+	    obj_light_center, cutoff_distance * cutoff_distance);
+      }
+      if (!isect)
+	sameShaderMeshInfo[n].render = false;
+#else
       float dist = sqrt (csSquaredDist::PointPoint (
 	sameShaderMeshInfo[n].wor_center, //mesh->worldspace_origin,
       	light_center));
-      if (dist-sameShaderMeshInfo[n].radius > cutoff_distance) continue;
+      if (dist-sameShaderMeshInfo[n].radius > cutoff_distance)
+	sameShaderMeshInfo[n].render = false;
+#endif
     }
+    pusher.mesh = mesh;
 
     if (mesh->portal) 
     {
@@ -519,8 +534,9 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
       {
         if (shader != 0)
 	{
+          pusher.shader = shader;
           g3d->SetWorldToCamera (camt.GetInverse ());
-	  RenderMeshes (rview, g3d, shader, light, currentTicket,
+	  RenderMeshes (rview, g3d, pusher, currentTicket,
 	  	sameShaderMeshInfo + lastidx,
 		sameShaderMeshes+lastidx, numSSM, stacks);
           shader = 0;
@@ -575,16 +591,18 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
 	}
 	if (doDefault) meshShader = defShader;
       }
-      size_t newTicket = meshShader ? ticketHelper.GetTicket (
-	mesh->material->GetMaterial (), meshShader, 
-	sameShaderMeshInfo[n].svc, mesh) : (size_t)~0;
+      pusher.shader = meshShader;
+      pusher.mesh = mesh;
+      pusher.meshContext = sameShaderMeshInfo[n].svc;
+      size_t newTicket = meshShader ? ticketHelper.GetTicket (pusher) : (size_t)~0;
       if ((meshShader != shader) || (newTicket != currentTicket))
       {
+        pusher.shader = shader;
         // @@@ Need error reporter
         if (shader != 0)
 	{
           g3d->SetWorldToCamera (camt.GetInverse ());
-          RenderMeshes (rview, g3d, shader, light, currentTicket,
+          RenderMeshes (rview, g3d, pusher, currentTicket,
 	  	sameShaderMeshInfo + lastidx, 
 		sameShaderMeshes + lastidx, numSSM, stacks);
 	}
@@ -600,10 +618,11 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
   if (numSSM != 0)
   {
     // @@@ Need error reporter
+    pusher.shader = shader;
     if (shader != 0)
     {
       g3d->SetWorldToCamera (camt.GetInverse ());
-      RenderMeshes (rview, g3d, shader, light, currentTicket,
+      RenderMeshes (rview, g3d, pusher, currentTicket,
       	sameShaderMeshInfo + lastidx,
         sameShaderMeshes + lastidx, numSSM, stacks);
     }

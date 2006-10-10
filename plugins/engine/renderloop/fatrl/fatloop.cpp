@@ -275,6 +275,7 @@ void csFatLoopStep::Perform (iRenderView* rview, iSector* sector,
 
 void csFatLoopStep::SetupFog (RenderNode* node)
 {
+  // @@@ FIXME: not needed any more since the sector is an SV context now
   csRef<csShaderVariable> sv;
   sv = shadervars.GetVariableAdd (fogdensity_name);
   sv->SetValue (node->fog.density);
@@ -317,9 +318,9 @@ void csFatLoopStep::BuildNodeGraph (RenderNode* node, iRenderView* rview,
 
   if (sector->HasFog())
   {
-    csFog* fog = sector->GetFog();
-    node->fog.density = fog->density;
-    node->fog.color.Set (fog->red, fog->green, fog->blue);
+    const csFog& fog = sector->GetFog();
+    node->fog.density = fog.density;
+    node->fog.color = fog.color;
 
     //construct a cameraplane
     iPortal *lastPortal = rview->GetLastPortal();
@@ -543,6 +544,7 @@ void csFatLoopStep::SetLightSVs (csShaderVariableContext& shadervars,
 				 const csReversibleTransform &objT, 
 				 uint framenr)
 {
+  // @@@ FIXME: probably use arrays for light SVs
   // Light TF, this == object, other == world
   const csReversibleTransform& lightT = 
     light->GetMovable ()->GetFullTransform ();

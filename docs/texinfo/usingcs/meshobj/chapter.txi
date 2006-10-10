@@ -75,6 +75,7 @@ Crystal Space supports.
 * MeshObject Explo:: Explosion Mesh Object
 * MeshObject Spiral:: Spiral Mesh Object
 * MeshObject Haze:: Haze Mesh Object
+* MeshObject Particles:: Particles Mesh Object
 @end menu
 
 @importss{usingcs,meshobj,concepts.txi}
@@ -100,4 +101,4 @@ Crystal Space supports.
 @importss{usingcs,meshobj,explo.txi}
 @importss{usingcs,meshobj,spiral.txi}
 @importss{usingcs,meshobj,haze.txi}
-
+@importss{usingcs,meshobj,particles.txi}

@@ -36,7 +36,7 @@
           <layer> 
             <colorsource num="0" source="previous layer" modifier="color"/>
             <coloroperation operation="replace"/>
-	    <alphasource num="0" source="texture" modifier="replace"/>
+	    <alphasource num="0" source="texture" modifier="alpha"/>
             <alphaoperation operation="replace"/>
           </layer>
 	  <?if vars."fog density".float &gt; 0 ?>

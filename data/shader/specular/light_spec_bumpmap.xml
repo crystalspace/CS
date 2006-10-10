@@ -12,7 +12,12 @@
       <texture destination="TexNormal" name="tex normal" />
       <texture destination="TexDiffuse" name="tex diffuse" />
       <texture destination="TexAttn" name="light 0 attenuationtex" />
-      <fp plugin="glcg" file="/shader/specular/specular.cgfp" />
+      <fp plugin="glcg"> 
+	      <cgfp>
+		      <?Include /shader/specular/specular.cgfp ?>
+	      </cgfp>
+      </fp>
     </pass>
   </technique>
 </shader>
+

@@ -243,7 +243,7 @@ public:
   virtual void SetControlPoint (int index, int control_id) = 0;
 
   /// Return a bounding box in object space for this curve.
-  virtual void GetObjectBoundingBox (csBox3& bbox) = 0;
+  virtual const csBox3& GetObjectBoundingBox () = 0;
 
   /**
    * Get a bounding box in camera space. This function
@@ -328,7 +328,7 @@ public:
   virtual csCurveTesselated* Tesselate (int res);
 
   /// Return a bounding box in object space for this curve.
-  virtual void GetObjectBoundingBox (csBox3& bbox);
+  virtual const csBox3& GetObjectBoundingBox ();
 
   /// Load a curve from disk.
   void Load (char* buf);

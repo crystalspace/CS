@@ -164,6 +164,13 @@
   <?Template CgVertexOptions?>
     <!-- We want position invariance here -->
     <compilerargs>-posinv</compilerargs>
+    <!-- Currently needed for newer NV hardware. Using the e.g. VP40 profile
+         results in some wrong buffer bindings in the assembly: even though
+	 a semantic of COLOR is specified for the varying holding the primary
+	 color, a binding of a generic vertex attribute is used. This 
+	 currently messes up mixmode alpha. This does not occur with arbvp1. 
+    -->
+    <profile>arbvp1</profile>
   <?Endtemplate?>
   <?! Set the vertex program function. ?>
   <?CgSetVertexFunc VertexMain ?>

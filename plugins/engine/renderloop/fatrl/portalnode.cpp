@@ -218,11 +218,11 @@ void csPortalRenderNode::Postprocess (iRenderView* rview)
     varContext.GetVariableAdd (factory->fogplane_name)->SetValue (fogPlane);
 
     //iSector *sector = rview->GetThisSector();
-    csFog* fog = sector->GetFog();
+  // @@@ FIXME: not needed any more since the sector is an SV context now
+    const csFog& fog = sector->GetFog();
     varContext.GetVariableAdd (factory->fogdensity_name)->SetValue (
-      fog->density);
-    varContext.GetVariableAdd (factory->fogcolor_name)->SetValue (
-      csVector3 (fog->red, fog->green, fog->blue));
+      fog.density);
+    varContext.GetVariableAdd (factory->fogcolor_name)->SetValue (fog.color);
 
 
     mesh.dynDomain = &varContext;
