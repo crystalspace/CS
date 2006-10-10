@@ -6132,6 +6132,30 @@ iParticleBuiltinEffectorLinColor_swigregister = _cspace.iParticleBuiltinEffector
 iParticleBuiltinEffectorLinColor_swigregister(iParticleBuiltinEffectorLinColor)
 iParticleBuiltinEffectorLinColor_scfGetVersion = _cspace.iParticleBuiltinEffectorLinColor_scfGetVersion
 
+CS_PARTICLE_BUILTIN_SPIRAL = _cspace.CS_PARTICLE_BUILTIN_SPIRAL
+CS_PARTICLE_BUILTIN_RADIALPOINT = _cspace.CS_PARTICLE_BUILTIN_RADIALPOINT
+class iParticleBuiltinEffectorVelocityField(iParticleEffector):
+    __swig_setmethods__ = {}
+    for _s in [iParticleEffector]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iParticleBuiltinEffectorVelocityField, name, value)
+    __swig_getmethods__ = {}
+    for _s in [iParticleEffector]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, iParticleBuiltinEffectorVelocityField, name)
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def SetType(*args): return _cspace.iParticleBuiltinEffectorVelocityField_SetType(*args)
+    def GetType(*args): return _cspace.iParticleBuiltinEffectorVelocityField_GetType(*args)
+    def SetFParameter(*args): return _cspace.iParticleBuiltinEffectorVelocityField_SetFParameter(*args)
+    def GetFParameter(*args): return _cspace.iParticleBuiltinEffectorVelocityField_GetFParameter(*args)
+    def GetFParameterCount(*args): return _cspace.iParticleBuiltinEffectorVelocityField_GetFParameterCount(*args)
+    def SetVParameter(*args): return _cspace.iParticleBuiltinEffectorVelocityField_SetVParameter(*args)
+    def GetVParameter(*args): return _cspace.iParticleBuiltinEffectorVelocityField_GetVParameter(*args)
+    def GetVParameterCount(*args): return _cspace.iParticleBuiltinEffectorVelocityField_GetVParameterCount(*args)
+    __swig_destroy__ = _cspace.delete_iParticleBuiltinEffectorVelocityField
+    __del__ = lambda self : None;
+iParticleBuiltinEffectorVelocityField_swigregister = _cspace.iParticleBuiltinEffectorVelocityField_swigregister
+iParticleBuiltinEffectorVelocityField_swigregister(iParticleBuiltinEffectorVelocityField)
+
 class iParticleBuiltinEffectorFactory(iBase):
     __swig_setmethods__ = {}
     for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
@@ -6143,6 +6167,7 @@ class iParticleBuiltinEffectorFactory(iBase):
     __repr__ = _swig_repr
     def CreateForce(*args): return _cspace.iParticleBuiltinEffectorFactory_CreateForce(*args)
     def CreateLinColor(*args): return _cspace.iParticleBuiltinEffectorFactory_CreateLinColor(*args)
+    def CreateVelocityField(*args): return _cspace.iParticleBuiltinEffectorFactory_CreateVelocityField(*args)
     __swig_destroy__ = _cspace.delete_iParticleBuiltinEffectorFactory
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iParticleBuiltinEffectorFactory_scfGetVersion
@@ -7886,6 +7911,7 @@ class iConfigIterator(iBase):
     def GetSubsection(*args): return _cspace.iConfigIterator_GetSubsection(*args)
     def Rewind(*args): return _cspace.iConfigIterator_Rewind(*args)
     def Next(*args): return _cspace.iConfigIterator_Next(*args)
+    def HasNext(*args): return _cspace.iConfigIterator_HasNext(*args)
     def GetKey(*args): return _cspace.iConfigIterator_GetKey(*args)
     def GetInt(*args): return _cspace.iConfigIterator_GetInt(*args)
     def GetFloat(*args): return _cspace.iConfigIterator_GetFloat(*args)
