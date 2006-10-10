@@ -166,7 +166,7 @@ struct iConfigIterator : public virtual iBase
   virtual void Rewind () = 0;
   /// Move to the next valid key. Returns false if no more keys exist.
   virtual bool Next() = 0;
-  // Is there another valid key?
+  /// Return whether there is another valid key.
   virtual bool HasNext() = 0;
 
 
