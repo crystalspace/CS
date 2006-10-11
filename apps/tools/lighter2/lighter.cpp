@@ -22,6 +22,7 @@
 #include "config.h"
 #include "lighter.h"
 #include "lightmapuv.h"
+#include "lightmapuv_simple.h"
 #include "radprimitive.h"
 #include "raygenerator.h"
 #include "raytracer.h"

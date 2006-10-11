@@ -118,6 +118,9 @@ namespace lighter
     // for diffuse surfaces
     csVector3 elementCenter = prim.GetMinCoord () + prim.GetuFormVector () * 0.5f + prim.GetvFormVector () * 0.5f;
 
+    float area2pixel = 
+      1.0f / (prim.GetuFormVector () % prim.GetvFormVector ()).Norm();
+
     int minU, minV, maxU, maxV;
     prim.ComputeMinMaxUV (minU, maxU, minV, maxV);
 
@@ -154,7 +157,7 @@ namespace lighter
 
         // Store the reflected color
         Lightmap * lm = sector->scene->GetLightmaps ()[prim.GetGlobalLightmapID ()];
-        lm->GetData ()[v*lm->GetWidth ()+u] += reflected;
+        lm->GetData ()[v*lm->GetWidth ()+u] += reflected * elemArea * area2pixel;
         
 
         // If we later do radiosity, collect the reflected energy

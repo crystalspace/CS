@@ -75,9 +75,6 @@ namespace lighter
       }
     }*/
 
-    /// Remap (in linear fashion) the UVs
-    void RemapUVs (csVector2 &move);
-
     /// Calculate and save primitive plane
     void ComputePlane ();
 

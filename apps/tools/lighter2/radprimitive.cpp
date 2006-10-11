@@ -40,18 +40,6 @@ namespace lighter
     }
   }
 
-  void RadPrimitive::RemapUVs (csVector2 &move)
-  {    
-    for (uint i = 0; i < indexArray.GetSize (); i++)
-    {
-      size_t index = indexArray[i];
-      csVector2 &uv = vertexData.vertexArray[index].lightmapUV;
-      uv += move;
-      //uv.x = (int)(uv.x+0.5f);
-      //uv.y = (int)(uv.y+0.5f);
-    }
-  }
-
   void RadPrimitive::ComputePlane ()
   {
     //Setup a temporary array of our vertices

@@ -9,6 +9,9 @@ chronological order.
 11-Oct-2006
 	- res fixed genmesh to also support Compress() when submeshes are
 	  present.
+	- res changed lighter2 to more efficiently layout primitives. Instead
+	  of layouting every primitive on its own, coplanar neighbouring
+	  primitives are laid out adjacently on the lightmap.
 10-Oct-2006
 	- mdmkolbe fixed searching of Cygwin paths.
 	- mdmkolbe added CS_CONFIGDIR to configuration search paths on Cygwin.

@@ -49,6 +49,7 @@ namespace lighter
       {
         allPrimitives.Push (newPrims[n]);
         lightmaplayouts.Push (lightmaplayout);
+        lightmaplayoutGroups.Push (n);
       }
     }
     while (oldSize-- > 0) allPrimitives.DeleteIndexFast (oldSize);
@@ -123,7 +124,8 @@ namespace lighter
 
       // FIXME: probably separate out to allow for better progress display
       bool res = factory->lightmaplayouts[j]->LayoutUVOnPrimitives (
-        allPrimitives, vertexData, lightmapIDs.GetExtend (j));
+        allPrimitives, factory->lightmaplayoutGroups[j], vertexData, 
+        lightmapIDs.GetExtend (j));
       if (!res) return false;
 
       for (i = 0; i < allPrimitives.GetSize(); i++)
@@ -149,6 +151,7 @@ namespace lighter
     {
       const Lightmap* lm = lightmaps[lightmapIDs[p]];
       const RadPrimitiveArray& prims = allPrimitives[p];
+      csSet<size_t> indicesRemapped;
       // Iterate over lightmaps and renormalize UVs
       for (size_t j = 0; j < prims.GetSize (); ++j)
       {
@@ -157,9 +160,14 @@ namespace lighter
         const SizeTDArray &indexArray = prim.GetIndexArray ();
         for (size_t i = 0; i < indexArray.GetSize (); ++i)
         {
-          csVector2 &lmUV = vertexData.vertexArray[indexArray[i]].lightmapUV;
-          lmUV.x /= lm->GetWidth ();
-          lmUV.y /= lm->GetHeight ();
+          size_t index = indexArray[i];
+          if (!indicesRemapped.Contains (index))
+          {
+            csVector2 &lmUV = vertexData.vertexArray[index].lightmapUV;
+            lmUV.x /= lm->GetWidth ();
+            lmUV.y /= lm->GetHeight ();
+            indicesRemapped.AddNoTest (index);
+          }
         }
       }
     }
@@ -271,6 +279,7 @@ namespace lighter
       {
         const RadPrimitive &prim = primIt.Next ();
         totalArea = (prim.GetuFormVector ()%prim.GetvFormVector ()).Norm ();
+        float area2pixel = 1.0f / totalArea;
 
         int minu,maxu,minv,maxv;
         prim.ComputeMinMaxUV (minu,maxu,minv,maxv);
@@ -282,12 +291,13 @@ namespace lighter
           uint vindex = v * mask.width;
           for (uint u = minu; u <= (uint)maxu; u++, findex++)
           {
-            if (prim.GetElementAreas ()[findex] < FLT_EPSILON) continue; // No area, skip
+            const float elemArea = prim.GetElementAreas ()[findex];
+            if (elemArea < FLT_EPSILON) continue; // No area, skip
 
-            mask.maskData[vindex+u] += prim.GetElementAreas ()[findex]; //Accumulate
+            mask.maskData[vindex+u] += elemArea * area2pixel; //Accumulate
           }
 
-        }
+        } 
       }
     }
 
@@ -295,7 +305,7 @@ namespace lighter
     
     // Un-antialias
     uint i;
- /*   for (i = 0; i < lightmaps.GetSize (); i++)
+    for (i = 0; i < lightmaps.GetSize (); i++)
     {
       csColor* lmData = lightmaps[i]->GetData ().GetArray ();
       float* mmData = masks[i].maskData.GetArray ();
@@ -303,11 +313,11 @@ namespace lighter
 
       for (uint j = 0; j < size; j++, lmData++, mmData++)
       {
-        if (*mmData < FLT_EPSILON || *mmData >= totalArea) continue;
+        if (*mmData < FLT_EPSILON || *mmData >= 1.0f) continue;
 
-        *lmData *= (totalArea / *mmData);
+        *lmData *= (1.0f / *mmData);
       }
-    }*/
+    }
 
     // Do the filtering
     for (i = 0; i < lightmaps.GetSize (); i++)

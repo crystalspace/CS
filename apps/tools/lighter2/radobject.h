@@ -137,6 +137,7 @@ namespace lighter
     const char* saverPluginName;
 
     csPDelArray<LightmapUVLayoutFactory> lightmaplayouts;
+    csArray<size_t> lightmaplayoutGroups;
 
     friend class RadObject;
   };
