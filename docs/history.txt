@@ -9,6 +9,7 @@ chronological order.
 10-Oct-2006
 	- mdmkolbe fixed searching of Cygwin paths.
 	- mdmkolbe added CS_CONFIGDIR to configuration search paths on Cygwin.
+	- Marten added a "outward spiral" term to spiral particle effector.
 9-Oct-2006
 	- res fixed a problem in the iConfigIterator::HasNext() which
 	  manifested itself in scrambled "could not load plugin" messages
