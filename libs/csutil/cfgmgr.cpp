@@ -188,7 +188,7 @@ public:
 
   bool HasNext()
   {
-    return CurrentIterator;
+    return CurrentIterator.IsValid();
   }
 
   virtual const char *GetKey(bool Local) const
