@@ -12,6 +12,7 @@ chronological order.
 	- res changed lighter2 to more efficiently layout primitives. Instead
 	  of layouting every primitive on its own, coplanar neighbouring
 	  primitives are laid out adjacently on the lightmap.
+	- res fixed csConfigIterator::Rewind() not working properly.
 10-Oct-2006
 	- mdmkolbe fixed searching of Cygwin paths.
 	- mdmkolbe added CS_CONFIGDIR to configuration search paths on Cygwin.
