@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+11-Oct-2006
+	- res fixed genmesh to also support Compress() when submeshes are
+	  present.
 10-Oct-2006
 	- mdmkolbe fixed searching of Cygwin paths.
 	- mdmkolbe added CS_CONFIGDIR to configuration search paths on Cygwin.
