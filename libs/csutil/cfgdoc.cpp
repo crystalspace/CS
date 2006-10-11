@@ -19,55 +19,77 @@
 
 #include "cssysdef.h"
 #include "iutil/vfs.h"
+#include "csutil/cfgdoc.h"
 #include "csutil/physfile.h"
 #include "csutil/util.h"
 #include "csutil/scf.h"
 #include "csutil/scf_implementation.h"
 #include "csutil/xmltiny.h"
-#include "csutil/cfgdoc.h"
 
 class csConfigDocumentIterator : public scfImplementation1<
 	csConfigDocumentIterator, iConfigIterator>
 {
   csRef<csConfigDocument> doc;
-  csHash<csConfigDocument::KeyInfo, csStrKey>::GlobalIterator* iterator;
-  char* subsection;
-  size_t subsectionLen;
+  csHash<csConfigDocument::KeyInfo, csString>::GlobalIterator iterator;
+  csString subsection;
   const csConfigDocument::KeyInfo* currentKey;
+  const csConfigDocument::KeyInfo* nextKey;
   const char* currentKeyName;
+  const char* nextKeyName;
+
+  void FetchNext ();
 public:
 
   csConfigDocumentIterator (csConfigDocument* doc, const char* Subsection);
   virtual ~csConfigDocumentIterator();
-  
+
   virtual iConfigFile *GetConfigFile () const;
   virtual const char *GetSubsection () const;
 
   virtual void Rewind ();
   virtual bool Next();
+  virtual bool HasNext();
   virtual const char *GetKey (bool Local = false) const;
   virtual int GetInt () const;
   virtual float GetFloat () const;
   virtual const char *GetStr () const;
   virtual bool GetBool () const;
+  virtual csPtr<iStringArray> GetTuple() const;
   virtual const char *GetComment () const;
 };
 
 
 csConfigDocumentIterator::csConfigDocumentIterator (csConfigDocument* d,
-						    const char* Subsection) 
-  : scfImplementationType (this), doc (d), currentKey (0), currentKeyName(0)
+						    const char* Subsection) : 
+  scfImplementationType (this), doc (d), iterator (d->keys.GetIterator()),
+  subsection (Subsection), currentKey (0), nextKey (0), 
+  currentKeyName(0), nextKeyName (0)
 {
-  subsection = csStrNew (Subsection);
-  subsectionLen = subsection ? strlen (subsection) : 0;
-  iterator = new csHash<csConfigDocument::KeyInfo, 
-    csStrKey>::GlobalIterator (doc->keys.GetIterator ());
+  FetchNext ();
 }
 
 csConfigDocumentIterator::~csConfigDocumentIterator()
 {
-  delete[] subsection;
-  delete iterator;
+}
+
+void csConfigDocumentIterator::FetchNext ()
+{
+  while (iterator.HasNext ())
+  {
+    const csConfigDocument::KeyInfo* key = &iterator.Next ();
+
+    if ((subsection.IsEmpty()) ||
+      (strncasecmp (key->originalKey, subsection, subsection.Length()) == 0))
+    {
+      if (!key->cachedStringValue) continue;
+
+      nextKey = key;
+      nextKeyName = key->originalKey;
+      return;
+    }
+  }
+  nextKey = 0;
+  nextKeyName = 0;
 }
 
 iConfigFile* csConfigDocumentIterator::GetConfigFile () const
@@ -83,12 +105,14 @@ const char* csConfigDocumentIterator::GetSubsection () const
 void csConfigDocumentIterator::Rewind ()
 {
   currentKey = 0;
-  currentKeyName = csStrKey (0);
-  iterator->Reset();
+  currentKeyName = 0;
+  iterator.Reset();
+  FetchNext ();
 }
 
 bool csConfigDocumentIterator::Next()
 {
+#if 0
   while (iterator->HasNext ())
   {
     const csConfigDocument::KeyInfo* key = &iterator->Next ();
@@ -104,18 +128,28 @@ bool csConfigDocumentIterator::Next()
     }
   }
   return false;
+#endif
+  currentKey = nextKey;
+  currentKeyName = nextKeyName;
+  FetchNext ();
+  return currentKey != 0;
+}
+
+bool csConfigDocumentIterator::HasNext()
+{
+  return nextKey != 0;
 }
 
 const char* csConfigDocumentIterator::GetKey (bool Local) const
 {
-  return ((const char*)currentKeyName) + (Local ? subsectionLen : 0);
+  return ((const char*)currentKeyName) + (Local ? subsection.Length() : 0);
 }
 
 int csConfigDocumentIterator::GetInt () const
 {
   if (!currentKey) return 0;
   const char* val = currentKey->cachedStringValue;
-  
+
   int v = 0;
   sscanf (val, "%d", &v);
   return v;
@@ -125,7 +159,7 @@ float csConfigDocumentIterator::GetFloat () const
 {
   if (!currentKey) return 0.0f;
   const char* val = currentKey->cachedStringValue;
-  
+
   float v = 0.0f;
   sscanf (val, "%f", &v);
   return v;
@@ -149,6 +183,11 @@ bool csConfigDocumentIterator::GetBool () const
      strcasecmp(val, "1"   ) == 0);
 }
 
+csPtr<iStringArray> csConfigDocumentIterator::GetTuple () const
+{
+  return 0;
+}
+
 const char* csConfigDocumentIterator::GetComment () const
 {
   if (!currentKey) return 0;
@@ -156,12 +195,12 @@ const char* csConfigDocumentIterator::GetComment () const
 }
 
 //---------------------------------------------------------------------------
-csConfigDocument::csConfigDocument () 
+csConfigDocument::csConfigDocument ()
   : scfImplementationType (this), filename(0)
 {
 }
 
-csConfigDocument::csConfigDocument (const char *Filename, iVFS* vfs) 
+csConfigDocument::csConfigDocument (const char *Filename, iVFS* vfs)
   : scfImplementationType (this), filename(0), fileVFS(vfs)
 {
   filename = csStrNew (Filename);
@@ -175,18 +214,18 @@ csConfigDocument::csConfigDocument (const char *Filename, iVFS* vfs)
     new csTinyDocumentSystem()));
   csRef<iDocument> doc (docsys->CreateDocument ());
   doc->Parse (file, true);
-  
+
   document = doc;
   ParseDocument (doc);
 }
 
-csConfigDocument::csConfigDocument (iDocument* doc) 
+csConfigDocument::csConfigDocument (iDocument* doc)
   : scfImplementationType (this), filename(0), document (doc)
 {
   ParseDocument (doc);
 }
 
-csConfigDocument::csConfigDocument (iDocumentNode* node) 
+csConfigDocument::csConfigDocument (iDocumentNode* node)
   : scfImplementationType (this), filename(0)
 {
   LoadNode (node);
@@ -204,7 +243,7 @@ void csConfigDocument::ParseDocument (iDocument* doc, bool Merge, bool NewWins)
   LoadNode (config, Merge, NewWins);
 }
 
-void csConfigDocument::ParseNode (const char* parent, iDocumentNode* node, 
+void csConfigDocument::ParseNode (const char* parent, iDocumentNode* node,
 				  bool NewWins)
 {
   csString fullKey;
@@ -322,7 +361,7 @@ int csConfigDocument::GetInt (const char *Key, int Def) const
   const char* val = info ? info->cachedStringValue : 0;
 
   if (!val) return Def;
-  
+
   int v = Def;
   sscanf (val, "%d", &v);
   return v;
@@ -335,7 +374,7 @@ float csConfigDocument::GetFloat (const char *Key, float Def) const
   const char* val = info ? info->cachedStringValue : 0;
 
   if (!val) return Def;
-  
+
   float v = Def;
   sscanf (val, "%f", &v);
   return v;
@@ -347,7 +386,7 @@ const char* csConfigDocument::GetStr (const char *Key, const char* Def) const
   const KeyInfo* info = keys.GetElementPointer ((const char*)dcKey);
   const char* val = info ? info->cachedStringValue : 0;
   if (!val) return Def;
-  
+
   return val;
 }
 
@@ -358,12 +397,17 @@ bool csConfigDocument::GetBool (const char *Key, bool Def) const
   const char* val = info ? info->cachedStringValue : 0;
 
   if (!val) return Def;
-  
+
   return (
      strcasecmp(val, "true") == 0 ||
      strcasecmp(val, "yes" ) == 0 ||
      strcasecmp(val, "on"  ) == 0 ||
      strcasecmp(val, "1"   ) == 0);
+}
+
+csPtr<iStringArray> csConfigDocument::GetTuple (const char *Key) const
+{
+  return 0;
 }
 
 const char* csConfigDocument::GetComment (const char *Key) const
@@ -386,6 +430,10 @@ void csConfigDocument::SetFloat (const char * /*Key*/, float /*Value*/)
 }
 
 void csConfigDocument::SetBool (const char * /*Key*/, bool /*Value*/)
+{
+}
+
+void csConfigDocument::SetTuple (const char * /*Key*/, iStringArray* /*Value*/)
 {
 }
 

@@ -219,14 +219,20 @@
         </ShaderManager>
       </Video>
     </config>
-    <config name="useAFP2D">
+    <config name="fixedFunctionForcefulEnable">
       <Video>
 	<OpenGL>
-	  <FontCache>
-	    <UseAFP>yes</UseAFP>
-	  </FontCache>
-	  <AFPDrawPixmap>yes</AFPDrawPixmap>
+	  <FixedFunctionForcefulEnable>yes</FixedFunctionForcefulEnable>
 	</OpenGL>
+      </Video>
+    </config>
+    <config name="disableLodBias">
+      <Video>
+       <OpenGL>
+         <UseExtension>
+           <GL_EXT_texture_lod_bias>no</GL_EXT_texture_lod_bias>
+         </UseExtension>
+       </OpenGL>
       </Video>
     </config>
   </configs>
@@ -432,10 +438,17 @@
       </applicable>
     </rule>
 
+    <!-- 
+      * 2006-09-17: Quadro NVS up to 285 are GF2 derivates
+      * 2006-09-17: GeForce2 GTS is affected 
+		    (source: http://hydlaa.com/smf/index.php?topic=25552.0)
+      -->
     <rule description="GeForce: RECT texture extension support apparently sucks">
       <conditions fulfill="one">
 	<regexp	string="renderer" pattern="GeForce.*MX" />
 	<regexp	string="renderer" pattern="GeForce.*Go" />
+	<regexp	string="renderer" pattern="Quadro.*NVS.*\(50\|1..\|2..\).*" />
+	<regexp	string="renderer" pattern="GeForce2.*GTS" />
       </conditions>
       <applicable>
 	<usecfg>disableRECTTextures</usecfg>
@@ -461,8 +474,15 @@
       * 2006-01-03: Vasily Rudnikov reports corruption and subsequent fix
 		    by this tweak with a Radeon 9600, Win32, 
 		    driver 6.14.10.4517 (Cat 4.8)
+      * 2006-09-28: More investigation leads to the corruption showing up 
+		    after ARB programs are disabled; apparently this does not
+		    work correctly. Changing a fixed function state and an
+		    empty glBegin()/glEnd() works around the issue.
+		    Observation made with ATI Radeon 9700Pro, Win32, 
+		    driver 6.14.10.6067 (Cat 6.9). Changed to that workaround
+		    from "2D with AFP" one.
       -->
-    <rule description="ATI: Use AFP for some 2D drawing">
+    <rule description="ATI: 'Forceful' fixed function enable">
       <conditions fulfill="all">
 	<regexp string="vendor" pattern="^ATI" />
 	<conditions fulfill="one">
@@ -471,7 +491,7 @@
 	</conditions>
       </conditions>
       <applicable>
-	<usecfg>useAFP2D</usecfg>
+	<usecfg>fixedFunctionForcefulEnable</usecfg>
       </applicable>
     </rule>
 
@@ -508,6 +528,20 @@
     </rule>
     
     <!--
+      * 2006-09-25: Older DRI i810 versions crash when using LOD bias
+                    Renderer string: "Mesa DRI I810 20020221", 
+		    version string: "1.2 Mesa 4.0.4" is known to be affected
+      -->
+    <rule description="disable lod bias for i810 driver">
+      <conditions>
+       <regexp string="renderer" pattern="Mesa DRI I810 20020221" />
+      </conditions>
+      <applicable>
+       <usecfg>disableLodBias</usecfg>
+      </applicable>
+    </rule>
+
+    <!--
     <rule description="GeForce MX/Go class HW">
       <conditions fulfill="one">
 	<regexp	string="renderer" pattern="GeForce.*MX" />
@@ -518,5 +552,6 @@
       </applicable>
     </rule>
     -->
+
   </rules>
 </gldriverdb>

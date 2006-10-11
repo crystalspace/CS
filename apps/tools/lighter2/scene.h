@@ -32,6 +32,8 @@ namespace lighter
   public:
     csVector3 position;
     csColor color;
+    csLightAttenuationMode attenuation;
+    csVector3 attenuationConsts;
 
     csColor freeEnergy;
 
@@ -39,12 +41,14 @@ namespace lighter
   };
   typedef csRefArray<Light> LightRefArray;
 
+  class Scene;
+
   // Representation of sector in our local setup
   class Sector : public csRefCount
   {
   public:
-    Sector ()
-      : kdTree (0)
+    Sector (Scene* scene)
+      : kdTree (0), scene (scene)
     {}
 
     ~Sector ()
@@ -66,6 +70,8 @@ namespace lighter
 
     // Sector-name
     csString sectorName;
+
+    Scene* scene;
   };
   typedef csHash<csRef<Sector>, csString> SectorHash;
 
@@ -97,6 +103,11 @@ namespace lighter
 
     inline const SectorHash& GetSectors () const { return sectors; }
 
+    const LightmapPtrDelArray& GetLightmaps () const 
+    { return lightmaps; }
+
+    LightmapPtrDelArray& GetLightmaps () 
+    { return lightmaps; }
   protected:
     
     // Rad factories
@@ -104,6 +115,8 @@ namespace lighter
  
     // All sectors
     SectorHash sectors;
+
+    LightmapPtrDelArray lightmaps;
 
     struct LoadedFile
     {
@@ -114,18 +127,32 @@ namespace lighter
 
     // All files loaded into scene
     csArray<LoadedFile> sceneFiles;
+    // Helper variable
+    struct SaveTexture
+    {
+      csString filename;
+      csString texname;
+    };
+    csArray<SaveTexture> texturesToSave;
+    csSet<csString> texturesToClean;
 
     // Save functions
+    void CleanOldLightmaps (LoadedFile* fileInfo, 
+      const csStringArray& texFileNames);
     void SaveSceneToDom (iDocumentNode* root, LoadedFile* fileInfo);
     void SaveMeshFactoryToDom (iDocumentNode* factNode, LoadedFile* fileInfo);
     void SaveSectorToDom (iDocumentNode* sectorNode, LoadedFile* fileInfo);
     void SaveMeshObjectToDom (iDocumentNode *objNode, Sector* sect, LoadedFile* fileInfo);
-    csString GetTextureNameFromFilename (csString file);
     
     // Load functions
     void ParseSector (iSector *sector);
-    RadObject* ParseMesh (Sector *sector, iMeshWrapper *mesh);
-    RadObjectFactory* ParseMeshFactory (iMeshFactoryWrapper *factory);
+    enum MeshParseResult
+    {
+      Failure, Success, NotAGenMesh
+    };
+    MeshParseResult ParseMesh (Sector *sector, iMeshWrapper *mesh);
+    MeshParseResult ParseMeshFactory (iMeshFactoryWrapper *factory, 
+      RadObjectFactory*& radFact);
 
   };
 }

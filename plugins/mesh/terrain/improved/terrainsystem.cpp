@@ -588,6 +588,12 @@ void csTerrainSystem::GetObjectBoundingBox (csBox3& box)
   box = bbox;
 }
 
+const csBox3& csTerrainSystem::GetObjectBoundingBox ()
+{
+  if ( !bbox_valid ) ComputeBBox ();
+  return bbox;
+}
+
 void csTerrainSystem::SetObjectBoundingBox (const csBox3& box)
 {
   bbox = box;

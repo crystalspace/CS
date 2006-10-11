@@ -65,26 +65,31 @@ namespace lighter
 
   static const char* TUI_SEVERITY_TEXT[] = 
   {
-    CS_ANSI_FW "BUG" CS_ANSI_RST,
-    CS_ANSI_FR "ERR" CS_ANSI_RST,
-    CS_ANSI_FY "WAR" CS_ANSI_RST,
-    CS_ANSI_FW "NOT" CS_ANSI_RST,
-    CS_ANSI_FW "DEB" CS_ANSI_RST
+    CS_ANSI_FK CS_ANSI_BW "B" CS_ANSI_RST " ",
+    CS_ANSI_FW CS_ANSI_BR "X" CS_ANSI_RST " ",
+    CS_ANSI_FK CS_ANSI_BY "!" CS_ANSI_RST " ",
+    CS_ANSI_FW CS_ANSI_BB "i" CS_ANSI_RST " ",
+    CS_ANSI_FW CS_ANSI_BW "D" CS_ANSI_RST " "
   };
 
   bool TUI::Report (iReporter* reporter, int severity, const char* msgId,
     const char* description)
   {
-    csString& buf = messageBuffer[messageBufferEnd];
-    buf.Clear ();
+    csStringArray descrSplit;
+    descrSplit.SplitString (description, "\n");
 
-    buf.Append (TUI_SEVERITY_TEXT[severity]);
-    buf.Append (" - ");
-    csString tmp(description);
-    buf.Append (tmp.Slice (0,69).PadRight (69));
+    for (size_t i = descrSplit.GetSize(); i-- > 0;)
+    {
+      csString& buf = messageBuffer[messageBufferEnd];
+      buf.Clear ();
 
-    messageBufferEnd++;
-    if(messageBufferEnd > 3) messageBufferEnd = 0;
+      buf.Append (TUI_SEVERITY_TEXT[severity]);
+      csString tmp(descrSplit[i]);
+      buf.Append (tmp.Slice (0,69).PadRight (69));
+
+      messageBufferEnd++;
+      if(messageBufferEnd > 3) messageBufferEnd = 0;
+    }
 
     // Print them
     DrawMessage ();

@@ -18,6 +18,7 @@
 */
 
 #include "cssysdef.h"
+#include <limits.h>
 
 #include "limits.h"
 

@@ -22,11 +22,12 @@ m4_define([cs_version_number], [1.1])
 AC_INIT([crystalspace], [cs_version_number],
         [crystal-main@lists.sourceforge.net])
 CS_PACKAGEINFO([Crystal Space],
-    [Copyright (C)1998-2005 Jorrit Tyberghein and others],
+    [Copyright (C)1998-2006 Jorrit Tyberghein and others],
     [http://www.crystalspace3d.org/])
 AC_CONFIG_SRCDIR([libs/Jamfile])
 AC_CONFIG_AUX_DIR([mk/autoconf])
 AC_CANONICAL_HOST
+CS_CHECK_MNO_CYGWIN
 
 
 
@@ -702,7 +703,7 @@ CS_CHECK_BUILD_FLAGS([for "hidden" symbol visibility flag],
 AS_IF([test -n "$cs_cv_prog_cc_visibility_hidden"],
     [CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS], 
 	[$cs_cv_prog_cc_visibility_hidden], [+])])
-	
+
 CS_CHECK_BUILD_FLAGS([for "default" symbol visibility flag],
     [cs_cv_prog_cc_visibility_default],
     [CS_CREATE_TUPLE([-fvisibility=default])])
@@ -870,11 +871,11 @@ AC_MSG_CHECKING([whether to split debug information])
 AC_ARG_ENABLE([separate-debug-info], 
     [AC_HELP_STRING([--enable-separate-debug-info],
         [split debug information into separate files. (default YES if 
-        binutils >= 2.17 detected and not on Cygwin, otherwise default NO)])])
+        binutils >= 2.17, otherwise default NO)])])
 AS_IF([test -z "$enable_separate_debug_info"], 
     AS_IF([test -z `uname | grep -i CYGWIN`],
         [enable_separate_debug_info=$cs_cv_binutils_2_17],
-        [enable_separate_debug_info=no]))
+        [enable_separate_debug_info=$cs_cv_binutils_true_2_17]))
 AC_MSG_RESULT([$enable_separate_debug_info])
 
 CS_EMIT_BUILD_PROPERTY([LINK.DEBUG.INFO.SEPARATE], [$enable_separate_debug_info])
@@ -1033,8 +1034,8 @@ AS_IF([test "$no_x" != yes],
 #------------------------------------------------------------------------------
 # Check for OpenGL and companions.  Also check if GLX extensions are supported
 # and define the (backward) header property CSGL_EXT_STATIC_ASSERTION if they
-# are _not_ supported. Finally, check if the type GLhandleARB is exported by
-# the GL headers. It is starting to show up in very modern headers, but is
+# are _not_ supported. Finally, check if the some GL types are exported by
+# the GL headers. Some are starting to show up in very modern headers, but are
 # absent from most.
 #
 # IMPLEMENTATION NOTES
@@ -1043,14 +1044,17 @@ AS_IF([test "$no_x" != yes],
 # libraries may depend on it (notably Cg).
 #------------------------------------------------------------------------------
 CS_CHECK_OPENGL
-AS_IF([test $cs_cv_libgl = yes],
-    [# Check for GLhandleARB.
-    CS_CHECK_BUILD([for GLhandleARB], [cs_cv_libgl_glhandlearb],
+AC_DEFUN([CS_CHECK_OPENGL_TYPE],
+    [CS_CHECK_BUILD([for $1], [cs_cv_libgl_$1],
 	[AC_LANG_PROGRAM(
 	    [CS_GL_INCLUDE([CS_OPENGL_PATH],[GL],[gl.h])],
-	    [GLhandleARB x; (void)x;])],
-	[], [],	[CS_HEADER_PROPERTY([CS_HAVE_GLHANDLEARB_T])], [], [],
+		[$1 x; (void)x;])],
+	[], [], [$2], [], [],
 	[$cs_cv_libgl_cflags], [$cs_cv_libgl_lflags], [$cs_cv_libgl_libs])])
+AS_IF([test $cs_cv_libgl = yes],
+    [CS_CHECK_OPENGL_TYPE([GLhandleARB], [CS_HEADER_PROPERTY([CS_HAVE_GLHANDLEARB_T])])
+    CS_CHECK_OPENGL_TYPE([GLcharARB], [CS_HEADER_PROPERTY([CS_HAVE_GLCHARARB_T])]) 
+    CS_CHECK_OPENGL_TYPE([GLchar], [CS_HEADER_PROPERTY([CS_HAVE_GLCHAR_T])])])
 CS_CHECK_GLU
 CS_CHECK_GLX
 # Check for GLX extensions.  Define CSGL_EXT_STATIC_ASSERTION if _not_
@@ -1518,7 +1522,51 @@ AS_IF([test $cs_cv_libCEGUI = yes],
 	[$cs_cv_libCEGUI_lflags],
 	[$cs_cv_libCEGUI_libs])])
 
+#------------------------------------------------------------------------------
+# Check if cegui.i is available, cegui.py compatible and cegui new enough
+#------------------------------------------------------------------------------
+m4_define([pycegui_paths_default],
+	  [/usr/local/include/CEGUI/bindings /usr/include/CEGUI/bindings /sw/include/CEGUI/bindings /opt/local/include/CEGUI/bindings /opt/include/CEGUI/bindings])
+pyceguitest="
+import os.path
+try:
+	import cegui
+	pyfile=getattr(cegui,'__'+'file__')
+	print pyfile.replace('.pyc','.py')
+except:
+	pass
+"
+AC_ARG_WITH([pycegui], [AC_HELP_STRING([--with-pycegui],
+    [use pycegui scripting interface (default YES)])])
+AS_IF([test -z "$with_pycegui"], [with_pycegui=yes])
 
+AS_IF([test -n "$PYTHON" && test -n "$SWIG"],[
+
+  AS_IF([test "$with_pycegui" != no && test $cs_cv_libCEGUI = yes], [
+
+    CS_CHECK_BUILD([if CEGUI is bleeding edge], [cs_cv_CEGUI_bleeding],
+      [AC_LANG_PROGRAM(
+	[[#include <CEGUIWindow.h>]],
+	[CEGUI::Window *w=new CEGUI::Window("","");w->getXPosition();])],
+      [], [C++],[
+      AS_IF([test "$with_pycegui" != yes],
+          [PYCEGUI_I_FILE="$with_pycegui/package/cegui.i"
+           PYCEGUI_PY_FILE="$with_pycegui/src/cegui.py"],
+          [AC_PATH_PROGS([PYCEGUI_I_FILE],[cegui.i],[],[pycegui_paths_default])
+	   PYCEGUI_PY_FILE=CS_RUN_PATH_NORMALIZE([$PYTHON -c "$pyceguitest"])])
+      m4_define([PYCEGUI_EXPECTED_SWIG_VERSION],[cs_prog_swig_version])
+      AS_IF([test -f "$PYCEGUI_PY_FILE" && test -f "$PYCEGUI_I_FILE"],[
+	CS_CHECK_PROG_VERSION([cegui.py was generated with same swig],
+		[sed -n -e '1p' "$PYCEGUI_PY_FILE"],
+		[PYCEGUI_EXPECTED_SWIG_VERSION],[9.9|.9],
+		[PYCEGUI_I_DIR=`AS_DIRNAME([$PYCEGUI_I_FILE])`
+		 CS_EMIT_BUILD_PROPERTY([PYCEGUI.SWIGOK], [yes])
+		 CS_EMIT_BUILD_PROPERTY([PYCEGUI.SWIGFLAGS], [-I$PYCEGUI_I_DIR])
+		],[],[=])
+      ]) # AS_IF
+    ],[],[],[$cs_cv_libCEGUI_cflags],[$cs_cv_libCEGUI_lflags],[$cs_cv_libCEGUI_libs])
+  ],[]) # AS_IF ["$with_pycegui" != no && test $cs_cv_libCEGUI = yes]
+],[]) # AS_IF([test -n "$PYTHON" && test -n "$SWIG"],[
 
 #------------------------------------------------------------------------------
 # Check if GNU/Linux joystick API is present.
@@ -1825,6 +1873,7 @@ AC_DEFUN([CS_CHECK_HOST_CPU],
     [AC_REQUIRE([AC_CANONICAL_HOST])
     case $host_cpu in
 	[[Ii][3-9]86*|[Xx]86*]) cs_host_cpu=x86 ;;
+	powerpc*) cs_host_cpu=powerpc ;;
 	*) cs_host_cpu=$host_cpu ;;
     esac
     cs_host_cpu_normalized="AS_TR_CPP([$cs_host_cpu])"])
@@ -2081,45 +2130,6 @@ CS_SYMBOL_QUALIFIER([how to declare pure functions],
     [__attribute__((pure))], [], [C++],
     [CS_HEADER_PROPERTY([CS_PURE_METHOD],
 	[$cs_cv_prog_cxx_declare_pure])])
-
-
-
-#------------------------------------------------------------------------------
-# Check if C++ compiler understands new C++ `explicit' and 'typename' keywords.
-#------------------------------------------------------------------------------
-AC_CACHE_CHECK([for C++ `explicit' keyword], [cs_cv_cxx_explicit],
-    [CS_BUILD_IFELSE(
-	[AC_LANG_PROGRAM([class A { public: explicit A(int); };], [])],
-	[], [C++], [cs_cv_cxx_explicit=yes], [cs_cv_cxx_explicit=no])])
-AS_IF([test $cs_cv_cxx_explicit != no],
-    [CS_HEADER_PROPERTY([CS_HAVE_CXX_KEYWORD_EXPLICIT])])
-
-AC_CACHE_CHECK([for C++ `typename' keyword], [cs_cv_cxx_typename],
-    [CS_BUILD_IFELSE(
-	[AC_LANG_PROGRAM(
-	    [template <typename T> class A { public: T a; };], [])],
-	[], [C++], [cs_cv_cxx_typename=yes], [cs_cv_cxx_typename=no])])
-AS_IF([test $cs_cv_cxx_typename != no],
-    [CS_HEADER_PROPERTY([CS_HAVE_CXX_KEYWORD_TYPENAME])])
-
-
-
-#------------------------------------------------------------------------------
-# Check if C++ compiler understands new explicit template specialization
-# syntax `template<> class Foo<Bar>'.  Older compiler allows specializations
-# without the `template<>' prefix.
-#------------------------------------------------------------------------------
-AC_CACHE_CHECK([for C++ explicit template<> specialization],
-    [cs_cv_cxx_explicit_template_specialization],
-    [CS_BUILD_IFELSE(
-	[AC_LANG_PROGRAM(
-	    [template <class T> class A {}; template<> class A<int> {};], [])],
-	[], [C++],
-	[cs_cv_cxx_explicit_template_specialization=yes],
-	[cs_cv_cxx_explicit_template_specialization=no])])
-
-AS_IF([test $cs_cv_cxx_explicit_template_specialization = no],
-    [CS_HEADER_PROPERTY([CS_USE_OLD_TEMPLATE_SPECIALIZATION])])
 
 
 

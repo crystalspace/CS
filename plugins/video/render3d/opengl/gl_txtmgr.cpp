@@ -89,19 +89,24 @@ csGLTextureHandle::csGLTextureHandle (iImage* image, int flags,
       (G3D->ext->CS_GL_ARB_texture_rectangle
       || G3D->ext->CS_GL_EXT_texture_rectangle
       || G3D->ext->CS_GL_NV_texture_rectangle
-      || txtmgr->enableNonPowerOfTwo2DTextures)
-      // Certain additional texture flags
-      && ((flags & npotsNeededFlags) == npotsNeededFlags))
-      // A 2D image
-      && (image->GetImageType() == csimg2D);
+      || txtmgr->enableNonPowerOfTwo2DTextures
+      || G3D->ext->CS_GL_ARB_texture_non_power_of_two)
+      // Certain additional texture flags, unless we have ARB_tnpot
+      && (((flags & npotsNeededFlags) == npotsNeededFlags) 
+        || G3D->ext->CS_GL_ARB_texture_non_power_of_two))
+      // A 2D image, unless we have ARB_tnpot
+      && ((image->GetImageType() == csimg2D)
+        || G3D->ext->CS_GL_ARB_texture_non_power_of_two);
     if (!npotsValid)
     {
       flags &= ~CS_TEXTURE_NPOTS;
     }
-    else if (!txtmgr->enableNonPowerOfTwo2DTextures)
+    else if (!txtmgr->enableNonPowerOfTwo2DTextures
+      && !G3D->ext->CS_GL_ARB_texture_non_power_of_two)
       /* Note that 'enableNonPowerOfTwo2DTextures' is the flag for ATI's
        * support of non-POT _2D_ textures; that is, the textures, being
-       * NPOTS, need to go to the 2D target, not RECT. */
+       * NPOTS, need to go to the 2D target, not RECT. 
+       * Same when ARB_tnpot is available. */
       target = CS_TEX_IMG_RECT;
   }
   texFlags.Set (flagsPublicMask, flags);
@@ -1190,8 +1195,9 @@ void csGLTextureManager::ReadTextureClasses (iConfigFile* config)
   csString extractedClass;
   csRef<iConfigIterator> it = config->Enumerate (
     "Video.OpenGL.TextureClass.");
-  while (it->Next())
+  while (it->HasNext())
   {
+    it->Next();
     const char* keyName = it->GetKey (true);
     const char* dot = strchr (keyName, '.');
     if (dot != 0)

@@ -137,6 +137,33 @@ enum csParticleIntegrationMode
 };
 
 /**
+ * Particle transformation mode.
+ * Controls how and when particles are transformed, and thereby also controls
+ * the coordinate system for particles, emitters and effectors.
+ */
+enum csParticleTransformMode
+{
+  /**
+   * Fully local mode. 
+   * All positions and coordinates are relative to particle system.
+   */
+  CS_PARTICLE_LOCAL_MODE,
+  /**
+   * Mixed coordinate mode.
+   * Particle position and effectors are specified in world space, while
+   * emitters operate in local mode.
+   * \warning Do note that this mode will introduce extra overhead compared
+   * to the other two modes and use only when neccesary.
+   */
+  CS_PARTICLE_LOCAL_EMITTER,
+  /**
+   * Fully global mode.
+   * All coordinates are in world space (absolute space).
+   */
+  CS_PARTICLE_WORLD_MODE
+};
+
+/**
  * Data representation of a single particle.
  */
 struct csParticle
@@ -310,7 +337,8 @@ struct iParticleEmitter : public virtual iBase
    * Spawn new particles.
    */
   virtual void EmitParticles (iParticleSystemBase* system,
-    const csParticleBuffer& particleBuffer, float dt, float totalTime) = 0;
+    const csParticleBuffer& particleBuffer, float dt, float totalTime,
+    const csReversibleTransform* const emitterToParticle = 0) = 0;
 
 };
 
@@ -376,21 +404,11 @@ struct iParticleSystemBase : public virtual iBase
   /// Get the common direction
   virtual const csVector3& GetCommonDirection () const = 0;
 
-  /**
-   * Set if particle system should be in local transform mode.
-   * 
-   * When a particle system is in local transform mode all positions and
-   * orientations, including emitters, effectors and common directory,
-   * will be relative to the particle system. This is useful for particle
-   * effects that should follow another entity around.
-   *
-   * The opposite to local mode is global mode, where all coordinates will be
-   * in world coordinates.
-   */
-  virtual void SetLocalMode (bool local) = 0;
+  /// Set transform mode
+  virtual void SetTransformMode (csParticleTransformMode mode) = 0;
 
-  /// Get local mode
-  virtual bool GetLocalMode () const = 0;
+  /// Get transform mode
+  virtual csParticleTransformMode GetTransformMode () const = 0;
 
   /// Set if particles should use specified or their own size
   virtual void SetUseIndividualSize (bool individual) = 0;
@@ -633,7 +651,7 @@ struct iParticleBuiltinEmitterFactory : public virtual iBase
  */
 struct iParticleBuiltinEffectorForce : public iParticleEffector
 {
-  SCF_INTERFACE(iParticleBuiltinEffectorForce,1,0,0);
+  SCF_INTERFACE(iParticleBuiltinEffectorForce,2,0,0);
   
   /// Set constant acceleration vector
   virtual void SetAcceleration (const csVector3& acceleration) = 0;
@@ -647,11 +665,11 @@ struct iParticleBuiltinEffectorForce : public iParticleEffector
   /// Get the force vector
   virtual const csVector3& GetForce () const = 0;
 
-  /// Set random acceleration magnitude
-  virtual void SetRandomAcceleration (float magnitude) = 0;
+  /// Set random acceleration magnitude.
+  virtual void SetRandomAcceleration (const csVector3& magnitude) = 0;
 
   /// Get random acceleration magnitude
-  virtual float GetRandomAcceleration () const = 0;
+  virtual const csVector3& GetRandomAcceleration () const = 0;
 };
 
 /**
@@ -689,6 +707,87 @@ struct iParticleBuiltinEffectorLinColor : public iParticleEffector
 };
 
 /**
+ * Velocity field effector types
+ * Determine the ODE the velocity field effector will solve to get new particle
+ * positions from current ones.
+ */
+enum csParticleBuiltinEffectorVFType
+{
+  /**
+   * Spiral around a given line.
+   *
+   * ODE:
+   * pl = closest point on line defined by vparam[0] + t*vparam[1]
+   * p' = vparam[2] * p-pl x vparam[1] + vparam[3]
+   */
+  CS_PARTICLE_BUILTIN_SPIRAL,
+
+  /**
+   * Exhort a radial movement relative to a given point.
+   *
+   * ODE:
+   * p' = p-vparam[0] / |p-vparam[0]| * (fparam[0] + fparam[1] * sin(t))
+   */
+  CS_PARTICLE_BUILTIN_RADIALPOINT
+};
+
+/**
+ * Velocity field effector.
+ *
+ * The velocity field effector works by taking a function that defines the velocity
+ * as a function of point in space and time, and then integrate the position 
+ * according to this function.
+ *
+ * The functions can have a number of (optional) scalar and vector parameters.
+ *
+ * \sa csParticleBuiltinEffectorFFType 
+ */
+struct iParticleBuiltinEffectorVelocityField : public iParticleEffector
+{
+  SCF_INTERFACE(iParticleBuiltinEffectorVelocityField,1,0,0);
+
+  /**
+   * Set force field type
+   */
+  virtual void SetType (csParticleBuiltinEffectorVFType type) = 0;
+
+  /**
+   * Get force field type
+   */
+  virtual csParticleBuiltinEffectorVFType GetType () const = 0;
+
+  /**
+   * Set scalar parameter
+   */
+  virtual void SetFParameter (size_t parameterNumber, float value) = 0;
+  
+  /**
+   * Get value of scalar parameter
+   */
+  virtual float GetFParameter (size_t parameterNumber) const = 0;
+
+  /**
+   * Get the number of set scalar parameters
+   */
+  virtual size_t GetFParameterCount () const = 0;
+
+  /**
+   * Set vector parameter
+   */
+  virtual void SetVParameter (size_t parameterNumber, const csVector3& value) = 0;
+  
+  /**
+   * Get value of vector parameter
+   */
+  virtual csVector3 GetVParameter (size_t parameterNumber) const = 0;
+
+  /**
+   * Get the number of set vector parameters
+   */
+  virtual size_t GetVParameterCount () const = 0;
+};
+
+/**
  * Factory for builtin effectors
  */
 struct iParticleBuiltinEffectorFactory : public virtual iBase
@@ -697,6 +796,7 @@ struct iParticleBuiltinEffectorFactory : public virtual iBase
 
   virtual csPtr<iParticleBuiltinEffectorForce> CreateForce () const = 0;
   virtual csPtr<iParticleBuiltinEffectorLinColor> CreateLinColor () const = 0;
+  virtual csPtr<iParticleBuiltinEffectorVelocityField> CreateVelocityField () const = 0;
 };
 
 /** @} */

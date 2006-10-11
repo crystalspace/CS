@@ -24,6 +24,7 @@
 #include "csutil/scf_implementation.h"
 #include "csutil/flags.h"
 #include "csutil/radixsort.h"
+#include "csutil/weakref.h"
 
 #include "imesh/object.h"
 #include "imesh/particles.h"
@@ -197,14 +198,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
       return commonDirection;
     }
 
-    virtual void SetLocalMode (bool local)
+    virtual void SetTransformMode (csParticleTransformMode mode)
     {
-      localMode = local;
+      transformMode = mode;
     }
 
-    virtual bool GetLocalMode () const
+    virtual csParticleTransformMode GetTransformMode () const
     {
-      return localMode;
+      return transformMode;
     }
 
     virtual void SetUseIndividualSize (bool individual)
@@ -294,8 +295,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     csParticleRotationMode rotationMode;
     csParticleSortMode sortMode;
     csParticleIntegrationMode integrationMode;
+    csParticleTransformMode transformMode;
     csVector3 commonDirection;
-    bool localMode;
     bool individualSize;
     csVector2 particleSize;
     csBox3 minBB;
@@ -304,15 +305,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     csRefArray<iParticleEffector> effectors;
   };
 
+#include "csutil/win32/msvc_deprecated_warn_off.h"
+
   /**
   * Particle mesh object
   */
-  class ParticlesMeshObject : public scfImplementationExt4<ParticlesMeshObject,
+  class ParticlesMeshObject : public scfImplementationExt3<ParticlesMeshObject,
                                                            csObjectModel,
                                                            iMeshObject,
                                                            iParticleSystem,
-                                                           scfFakeInterface<iParticleSystemBase>,
-                                                           iRenderBufferAccessor>
+                                                           scfFakeInterface<iParticleSystemBase> >
   {
   public:
     /// Constructor
@@ -480,6 +482,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     virtual void SetParticleRenderOrientation (csParticleRenderOrientation o)
     {
       particleOrientation = o;
+      InvalidateVertexSetup ();
     }
 
     virtual csParticleRenderOrientation GetParticleRenderOrientation () const
@@ -490,6 +493,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     virtual void SetRotationMode (csParticleRotationMode mode)
     {
       rotationMode = mode;
+      InvalidateVertexSetup ();
     }
 
     virtual csParticleRotationMode GetRotationMode () const
@@ -500,6 +504,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     virtual void SetSortMode (csParticleSortMode mode)
     {
       sortMode = mode;
+      InvalidateVertexSetup ();
     }
 
     virtual csParticleSortMode GetSortMode () const
@@ -520,6 +525,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     virtual void SetCommonDirection (const csVector3& direction)
     {
       commonDirection = direction;
+      InvalidateVertexSetup ();
     }
 
     virtual const csVector3& GetCommonDirection () const
@@ -527,15 +533,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
       return commonDirection;
     }
 
-
-    virtual void SetLocalMode (bool local)
+    virtual void SetTransformMode (csParticleTransformMode mode)
     {
-      localMode = local;
+      transformMode = mode;
     }
 
-    virtual bool GetLocalMode () const
+    virtual csParticleTransformMode GetTransformMode () const
     {
-      return localMode;
+      return transformMode;
     }
 
     virtual void SetUseIndividualSize (bool individual)
@@ -552,6 +557,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     virtual void SetParticleSize (const csVector2& size)
     {
       particleSize = size;
+      InvalidateVertexSetup ();
     }
 
     virtual const csVector2& GetParticleSize () const
@@ -611,10 +617,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
       return effectors.GetSize ();
     }
 
-    //-- iRenderBufferAccessor
-    virtual void PreGetBuffer (csRenderBufferHolder* holder, 
-      csRenderBufferName buffer);
-
+    
   private:
     friend class ParticlesMeshFactory;
     ParticlesMeshFactory* factory;
@@ -651,6 +654,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     csParticleRotationMode rotationMode;
     csParticleIntegrationMode integrationMode;
     csParticleSortMode sortMode;
+    csParticleTransformMode transformMode;
     csVector3 commonDirection;
     bool localMode;
     bool individualSize;
@@ -665,7 +669,36 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     //-- iRenderBufferAccessor
     csRef<iRenderBuffer> tcBuffer;
     csRef<iRenderBuffer> colorBuffer;
+
+    //-- iRenderBufferAccessor
+    void PreGetBuffer (csRenderBufferHolder* holder, 
+      csRenderBufferName buffer);
+
+
+    class RenderBufferAccessor : 
+      public scfImplementation1<RenderBufferAccessor, iRenderBufferAccessor>
+    {
+    public:
+      CS_LEAKGUARD_DECLARE (RenderBufferAccessor);
+      csWeakRef<ParticlesMeshObject> parent;
+      virtual ~RenderBufferAccessor () { }
+      RenderBufferAccessor (ParticlesMeshObject* parent)
+        : scfImplementationType (this)
+      {
+        this->parent = parent;
+      }
+      virtual void PreGetBuffer (csRenderBufferHolder* holder,
+        csRenderBufferName buffer)
+      {
+        if (parent) parent->PreGetBuffer (holder, buffer);
+      }
+    };
+    csRef<RenderBufferAccessor> renderBufferAccessor;
+
   };
+
+#include "csutil/win32/msvc_deprecated_warn_on.h"
+
 }
 CS_PLUGIN_NAMESPACE_END(Particles)
 

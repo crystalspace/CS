@@ -121,7 +121,7 @@ CS_PLUGIN_NAMESPACE_END(XMLShader)
 
 #define NS_XMLSHADER  CS_PLUGIN_NAMESPACE_NAME(XMLShader)
 
-CS_SPECIALIZE_TEMPLATE
+template<>
 class csHashComputer<NS_XMLSHADER::CondOperation>
 {
   static uint ActualHash (NS_XMLSHADER::ConditionOp operation, 
@@ -146,7 +146,7 @@ public:
   }
 };
 
-CS_SPECIALIZE_TEMPLATE
+template<>
 class csComparator<NS_XMLSHADER::CondOperation, 
   NS_XMLSHADER::CondOperation>
 {

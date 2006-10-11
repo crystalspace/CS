@@ -50,13 +50,10 @@ csNullGraphics3D::csNullGraphics3D (iBase *iParent) :
   scfiEventHandler = 0;
   txtmgr = 0;
 
-  Caps.CanClip = false;
   Caps.minTexHeight = 2;
   Caps.minTexWidth = 2;
   Caps.maxTexHeight = 1024;
   Caps.maxTexWidth = 1024;
-  Caps.MaxAspectRatio = 32768;
-  Caps.NeedsPO2Maps = false;
   Caps.SupportsPointSprites = false;
   Caps.DestinationAlpha = false;
   Caps.StencilShadows = false;
@@ -164,10 +161,6 @@ bool csNullGraphics3D::Open ()
 
   pfmt = *G2D->GetPixelFormat ();
   SetDimensions (G2D->GetWidth (), G2D->GetHeight());
-
-  csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
-    "crystalspace.render3d.null", "Using %s mode %dx%d.",
-    fs ? "full screen" : "windowed", w, h);
 
   SetPerspectiveAspect (G2D->GetHeight ());
   SetPerspectiveCenter (G2D->GetWidth ()/2, G2D->GetHeight ()/2);

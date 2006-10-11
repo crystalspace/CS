@@ -124,7 +124,7 @@ csBugPlug::csBugPlug (iBase *iParent)
   initialized = false;
   catcher.AttachNew (new csCameraCatcher ());
   shadow = new csShadow ();
-  scfiEventHandler = 0;
+  weakEventHandler = 0;
 
   do_fps = true;
   fps_frame_count = 0;
@@ -169,12 +169,11 @@ csBugPlug::~csBugPlug ()
     delete mappings;
     mappings = n;
   }
-  if (scfiEventHandler)
+  if (weakEventHandler)
   {
     csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
     if (q)
-      q->RemoveListener (scfiEventHandler);
-    scfiEventHandler->DecRef ();
+      RemoveWeakListener (q, weakEventHandler);
   }
 
   delete shadow;
@@ -195,10 +194,6 @@ bool csBugPlug::Initialize (iObjectRegistry *object_reg)
 
   CS_INITIALIZE_EVENT_SHORTCUTS (object_reg);
 
-  if (!scfiEventHandler)
-  {
-    scfiEventHandler = new EventHandler (this);
-  }
   csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
   if (q != 0)
   {
@@ -211,7 +206,7 @@ bool csBugPlug::Initialize (iObjectRegistry *object_reg)
       SystemClose,
       CS_EVENTLIST_END 
     };
-    q->RegisterListener (scfiEventHandler, esub);
+    RegisterWeakListener (q, this, esub, weakEventHandler);
   }
   return true;
 }
@@ -2375,7 +2370,7 @@ bool csBugPlug::HandleEvent (iEvent& event)
 /* We want to handle frame event in the DEBUG phase,
    and input (key/mouse) events before the renderer or printer */
 
-const csHandlerID * csBugPlug::EventHandler::GenericPrec(
+const csHandlerID * csBugPlug::GenericPrec(
 	csRef<iEventHandlerRegistry> &handler_reg,
 	csRef<iEventNameRegistry> &name_reg,
 	csEventID e) const
@@ -2395,7 +2390,7 @@ const csHandlerID * csBugPlug::EventHandler::GenericPrec(
   }
 }
 
-const csHandlerID * csBugPlug::EventHandler::GenericSucc(
+const csHandlerID * csBugPlug::GenericSucc(
 	csRef<iEventHandlerRegistry> &handler_reg,
 	csRef<iEventNameRegistry> &name_reg,
 	csEventID e) const

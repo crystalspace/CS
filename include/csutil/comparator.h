@@ -75,6 +75,14 @@ class csComparatorString
 public:
   static int Compare (T const& r1, T const& r2)
   {
+    if (((const char*)r1) == 0)
+    {
+      return (((const char*)r2) == 0) ? 0 : 1;
+    }
+    else if (((const char*)r2) == 0)
+    {
+      return -1;
+    }
     return strcmp ((const char*)r1, (const char*)r2);
   }
 };
@@ -82,7 +90,7 @@ public:
 /**
  * csComparator<> specialization for strings that uses strcmp().
  */
-CS_SPECIALIZE_TEMPLATE
+template<>
 class csComparator<const char*, const char*> :
   public csComparatorString<const char*> {};
 
@@ -90,10 +98,10 @@ class csComparator<const char*, const char*> :
 /**
  * csComparator<> specialization for csString that uses strcmp().
  */
-CS_SPECIALIZE_TEMPLATE
+template<>
 class csComparator<csString, csString> :
   public csComparatorString<csString> {};
-CS_SPECIALIZE_TEMPLATE
+template<>
 class csComparator<csStringBase, csStringBase> :
   public csComparatorString<csStringBase> {};
 /** @} */
@@ -103,7 +111,7 @@ class csComparator<csStringBase, csStringBase> :
  * data) types. It uses memcmp() to compare the raw memory representing the two
  * items.  Example:
  * \code
- * CS_SPECIALIZE_TEMPLATE csComparator<MyStruct> : 
+ * template<> csComparator<MyStruct> : 
  *   public csComparatorStruct<MyStruct> {};
  * \endcode
  */

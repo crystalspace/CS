@@ -148,16 +148,31 @@ void csGLShader_FIXED::Open()
       texUnits = useTextureUnits;
     }
 
-    ext->InitGL_version_1_3();
-    if (!ext->CS_GL_version_1_3)
+    ext->InitGL_version_1_4();
+    if (!ext->CS_GL_version_1_4)
       ext->InitGL_ARB_texture_env_crossbar();
-    enableCrossbar = ext->CS_GL_version_1_3 
+    enableCrossbar = ext->CS_GL_version_1_4
       || ext->CS_GL_ARB_texture_env_crossbar;
   }
   
   csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet> (
     object_reg, "crystalspace.shared.stringset");
   lsvCache.SetStrings (strings);
+
+  bool verbose = false;
+  csRef<iVerbosityManager> verbosemgr (
+    CS_QUERY_REGISTRY (object_reg, iVerbosityManager));
+  if (verbosemgr) 
+    verbose = verbosemgr->Enabled ("renderer.shader");
+
+#define LQUOT   "\xe2\x80\x9c"
+#define RQUOT   "\xe2\x80\x9d"
+  fixedFunctionForcefulEnable = 
+    config->GetBool ("Video.OpenGL.FixedFunctionForcefulEnable", false);
+  if (verbose)
+    Report (CS_REPORTER_SEVERITY_NOTIFY, 
+      LQUOT "Forceful" RQUOT " fixed function enable: %s",
+      fixedFunctionForcefulEnable ? "yes" : "no");
 
   isOpen = true;
 }

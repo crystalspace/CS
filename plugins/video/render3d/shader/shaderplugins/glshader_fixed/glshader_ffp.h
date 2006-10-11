@@ -108,7 +108,7 @@ private:
 
   //maximum number of layers
   int maxlayers;
-  csHash<int, csStrKey> layerNames;
+  csHash<int, csString> layerNames;
 
   void Report (int severity, const char* msg, ...);
   void Report (int severity, iDocumentNode* node, const char* msg, ...);

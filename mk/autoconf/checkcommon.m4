@@ -34,6 +34,8 @@ AC_DEFUN([CS_CHECK_COMMON_TOOLS_LINK],
     CS_EMIT_BUILD_PROPERTY([CMD.DLLTOOL], [$DLLTOOL])
     
     CS_CHECK_TOOLS([DLLWRAP], [dllwrap])
+    AS_IF([test "$cs_mno_cygwin" = "yes"],
+      [DLLWRAP="$DLLWRAP --target i386-mingw32"])
     CS_EMIT_BUILD_PROPERTY([CMD.DLLWRAP], [$DLLWRAP])
     
     CS_CHECK_TOOLS([WINDRES], [windres])

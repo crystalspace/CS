@@ -171,6 +171,8 @@ private:
   }
 };
 
+#include "csutil/win32/msvc_deprecated_warn_off.h"
+
 /**
  * The static data for a thing.
  */
@@ -581,6 +583,8 @@ public:
   virtual iTerraFormer* GetTerraFormerColldet () { return 0; }
   virtual iTerrainSystem* GetTerrainColldet () { return 0; }
 };
+
+#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 /**
  * A Thing is a set of polygons. A thing can be used for the

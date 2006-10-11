@@ -204,6 +204,7 @@ public:
 
   // ------------ iObjectModel implementation ------------
   virtual void GetObjectBoundingBox (csBox3& box);
+  virtual const csBox3& GetObjectBoundingBox ();
   virtual void SetObjectBoundingBox (const csBox3& box);
 
   virtual void GetRadius (float& radius, csVector3& center);

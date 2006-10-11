@@ -51,7 +51,7 @@ csCursor::csCursor (iBase *parent) :
 
 csCursor::~csCursor ()
 {
-  if (eventq) RemoveWeakListener (eventq, weakEventHandler);
+  if (eventq) CS::RemoveWeakListener (eventq, weakEventHandler);
   RemoveAllCursors ();
 }
 
@@ -68,7 +68,7 @@ bool csCursor::Initialize (iObjectRegistry *objreg)
   if (!eventq) return false;
   csEventID events[3] = { csevPostProcess(reg), csevMouseEvent(reg), 
 			  CS_EVENTLIST_END };
-  RegisterWeakListener (eventq, this, events, weakEventHandler);
+  CS::RegisterWeakListener (eventq, this, events, weakEventHandler);
 
   return true;
 }
@@ -89,8 +89,9 @@ bool csCursor::ParseConfigFile (iConfigFile* ini)
   // Get all the cursor definitions in an iterator
   csString prefix = "CursorSystem.Cursors.";
   csRef<iConfigIterator> params = ini->Enumerate (prefix);
-  while (params && params->Next())
+  while (params && params->HasNext())
   {
+    params->Next();
     // Work out the name of the cursor
     csString key = params->GetKey() + strlen(params->GetSubsection());
     csString name;
@@ -348,7 +349,7 @@ void csCursor::SetCursor (const char *name, iImage *image, csRGBcolor* key,
 
   // Add to hashlist
   {
-    csHash<CursorInfo*, csStrKey>::Iterator it =
+    csHash<CursorInfo*, csString>::Iterator it =
       cursors.GetIterator (name);
     while (it.HasNext ())
     {
@@ -466,7 +467,7 @@ bool csCursor::RemoveCursor (const char *name)
 
 void csCursor::RemoveAllCursors ()
 {
-  csHash<CursorInfo*, csStrKey>::GlobalIterator it = cursors.GetIterator ();
+  csHash<CursorInfo*, csString>::GlobalIterator it = cursors.GetIterator ();
   while (it.HasNext ())
   {
     CursorInfo* ci = it.Next ();

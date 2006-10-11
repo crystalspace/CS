@@ -89,6 +89,7 @@ public:
    * Get the number of vector points in this spline.
    * \deprecated Use Length() instead.
    */
+  CS_DEPRECATED_METHOD_MSG("Use Length() instead.")
   int GetPointCount()
   {
     return Length();
@@ -102,6 +103,7 @@ public:
    * Calculate internal values for this spline given some time value.
    * \deprecated Use CalculateAtTime() instead.
    */
+  CS_DEPRECATED_METHOD_MSG("Use CalculateAtTime() instead.")
   virtual void Calculate (float time)
   {
     CalculateAtTime(time);
@@ -120,6 +122,7 @@ public:
    * Get one time point.
    * \deprecated Use GetTime() instead.
    */
+  CS_DEPRECATED_METHOD_MSG("Use GetTime() instead.")
   float GetTimeValue (int idx) const
   {
     return spline.GetTimeValue(idx);
@@ -133,6 +136,7 @@ public:
    * Set one time point.
    * \deprecated Use SetTime() instead.
    */
+  CS_DEPRECATED_METHOD_MSG("Use SetTime() instead.")
   virtual void SetTimeValue (int idx, float t)
   {
     SetTime(idx, t);
@@ -151,6 +155,7 @@ public:
    * Set the time values.
    * \deprecated Use SetTimes() instead.
    */
+  CS_DEPRECATED_METHOD_MSG("Use SetTimes() instead.")
   void SetTimeValues (float const* t)
   {
     SetTimes(t);
@@ -164,6 +169,7 @@ public:
    * Get the time values.
    * \deprecated Use GetTimes() instead.
    */
+  CS_DEPRECATED_METHOD_MSG("Use GetTimes() instead.")
   float const* GetTimeValues () const
   {
     return GetTimes();

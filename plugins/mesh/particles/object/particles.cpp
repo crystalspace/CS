@@ -26,11 +26,13 @@
 #include "csutil/algorithms.h"
 #include "csutil/sysfunc.h"
 #include "csutil/radixsort.h"
+#include "csutil/floatrand.h"
 
 #include "imesh/particles.h"
 #include "iengine/material.h"
 #include "iengine/camera.h"
 #include "iengine/rview.h"
+#include "iengine/mesh.h"
 #include "iengine/movable.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/rendermesh.h"
@@ -71,9 +73,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     materialWrapper (0), mixMode (0),
     deepCreation (false), particleOrientation (CS_PARTICLE_CAMERAFACE_APPROX), 
     rotationMode (CS_PARTICLE_ROTATE_NONE), sortMode (CS_PARTICLE_SORT_NONE),
-    integrationMode (CS_PARTICLE_INTEGRATE_LINEAR),
-    commonDirection (1.0f,0,0),
-    localMode (true), individualSize (false), particleSize (1.0f)
+    integrationMode (CS_PARTICLE_INTEGRATE_LINEAR), 
+    transformMode (CS_PARTICLE_LOCAL_MODE),
+    commonDirection (1.0f,0,0), individualSize (false), particleSize (1.0f)
   {
   }
 
@@ -93,8 +95,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     mesh->rotationMode = rotationMode;
     mesh->sortMode = sortMode;
     mesh->integrationMode = integrationMode;
+    mesh->transformMode = transformMode;
     mesh->commonDirection = commonDirection;
-    mesh->localMode = localMode;
     mesh->individualSize = individualSize;
     mesh->particleSize = particleSize;
     mesh->minBB = minBB;
@@ -137,7 +139,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     newFact->sortMode = sortMode;
     newFact->integrationMode = integrationMode;
     newFact->commonDirection = commonDirection;
-    newFact->localMode = localMode;
+    newFact->transformMode = transformMode;
     newFact->individualSize = individualSize;
     newFact->particleSize = particleSize;
     newFact->minBB = minBB;
@@ -177,10 +179,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     externalControl (false),
     particleOrientation (CS_PARTICLE_CAMERAFACE_APPROX), rotationMode (CS_PARTICLE_ROTATE_NONE), 
     integrationMode (CS_PARTICLE_INTEGRATE_LINEAR), 
-    sortMode (CS_PARTICLE_SORT_NONE), commonDirection (1.0f,0,0), localMode (true), 
-    individualSize (false), particleSize (1.0f)
+    sortMode (CS_PARTICLE_SORT_NONE), transformMode (CS_PARTICLE_LOCAL_MODE), 
+    commonDirection (1.0f,0,0), individualSize (false), particleSize (1.0f)
   {
     particleBuffer.particleCount = 0;
+
+    renderBufferAccessor.AttachNew (new RenderBufferAccessor (this));
   }
 
   ParticlesMeshObject::~ParticlesMeshObject ()
@@ -488,7 +492,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     iCamera* camera = rview->GetCamera ();
     csReversibleTransform obj2world;
 
-    if(localMode)
+    if (transformMode == CS_PARTICLE_LOCAL_MODE)
       obj2world = movable->GetFullTransform ();
 
     csReversibleTransform obj2cam = camera->GetTransform () / obj2world;
@@ -506,7 +510,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     {
       mesh->buffers.AttachNew (new csRenderBufferHolder);
       mesh->meshtype = CS_MESHTYPE_TRIANGLES;
-      mesh->buffers->SetAccessor (this, 
+      mesh->buffers->SetAccessor (renderBufferAccessor, 
         CS_BUFFER_COLOR_MASK | CS_BUFFER_TEXCOORD0_MASK);
     }
 
@@ -529,6 +533,42 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     return &mesh;
   }
 
+  void IntegrateLinear (csParticle& particle, float& radiusSq, float dt)
+  {
+    particle.position += particle.linearVelocity * dt;
+
+    float currDistSq = particle.position.SquaredNorm ();
+    if (currDistSq > radiusSq)
+      radiusSq = currDistSq;
+  }
+
+  void IntegrateLinearAngular (csParticle& particle, float& radiusSq, float dt)
+  {
+    particle.position += particle.linearVelocity * dt;
+
+    // Use closed-form quaternion integrator
+    float w = particle.angularVelocity.SquaredNorm ();
+    if (w != 0)
+    {
+      w = sqrtf (w);
+      float v = dt * 0.5f * w;
+      float q = cosf (v);
+      float s = sinf (v) / w;
+
+      csVector3 pqr = particle.angularVelocity * s;
+      csQuaternion qVel (pqr, 0);
+      csQuaternion res = qVel * particle.orientation;
+      particle.orientation = res + particle.orientation * q;
+    }
+
+
+    float currDistSq = particle.position.SquaredNorm ();
+    if (currDistSq > radiusSq)
+      radiusSq = currDistSq;
+  }
+
+  CS_IMPLEMENT_STATIC_VAR(GetFGen, csRandomFloatGen,);
+
   void ParticlesMeshObject::NextFrame (csTicks current_time, const csVector3& pos,
     uint currentFrame)
   {
@@ -537,7 +577,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
       return;
 
     if (lastFrameNumber == 0 ||
-        lastFrameNumber + 1 < currentFrame)
+        lastUpdateTime == current_time)
     {
       lastFrameNumber = currentFrame;
       lastUpdateTime = current_time;
@@ -547,6 +587,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     lastFrameNumber = currentFrame;
     currentDt = current_time - lastUpdateTime;
     lastUpdateTime = current_time;
+
+    // Some artificial limiting of dt
+    if (currentDt > 500) currentDt = 500;
 
     float dt = currentDt/1000.0f;
     totalParticleTime += dt;
@@ -578,6 +621,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     }
 
     // Apply emitters
+    size_t totalEmitted = 0;
+    csReversibleTransform t = meshWrapper->GetMovable ()->GetFullTransform ();
+    csReversibleTransform* tptr = transformMode == CS_PARTICLE_LOCAL_EMITTER ? 
+      &t : 0;
     for (size_t idx = 0; idx < emitters.GetSize (); ++idx)
     {
       iParticleEmitter* emitter = emitters[idx];
@@ -586,13 +633,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
         continue;
 
       ReserveNewParticles (numParticles);
+      totalEmitted += numParticles;
 
       csParticleBuffer tmpBuf;
       tmpBuf.particleCount = numParticles;
       tmpBuf.particleData = particleBuffer.particleData + particleBuffer.particleCount;
       tmpBuf.particleAuxData = particleBuffer.particleAuxData + particleBuffer.particleCount;
       
-      emitter->EmitParticles (this, tmpBuf, dt, totalParticleTime);
+      emitter->EmitParticles (this, tmpBuf, dt, totalParticleTime, tptr);
 
       particleBuffer.particleCount += numParticles;
     }
@@ -609,44 +657,42 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     if (integrationMode == CS_PARTICLE_INTEGRATE_LINEAR)
     {
       for (currentParticleIdx = 0; 
-        currentParticleIdx < particleBuffer.particleCount; ++currentParticleIdx)
+        currentParticleIdx < particleBuffer.particleCount - totalEmitted; 
+        ++currentParticleIdx)
       {
         csParticle &currentParticle = 
           particleBuffer.particleData[currentParticleIdx];
-        currentParticle.position += currentParticle.linearVelocity * dt;
+        IntegrateLinear (currentParticle, newRadiusSq, dt);
+      }
 
-        float currDistSq = currentParticle.position.SquaredNorm ();
-        if (currDistSq > newRadiusSq)
-          newRadiusSq = currDistSq;
+      for (;
+        currentParticleIdx < particleBuffer.particleCount; 
+        ++currentParticleIdx)
+      {
+        csParticle &currentParticle = 
+          particleBuffer.particleData[currentParticleIdx];
+        IntegrateLinear (currentParticle, newRadiusSq, dt * GetFGen ()->Get ());
       }
     }
     else if (integrationMode == CS_PARTICLE_INTEGRATE_BOTH)
     {
       for (currentParticleIdx = 0; 
-        currentParticleIdx < particleBuffer.particleCount; ++currentParticleIdx)
+        currentParticleIdx < particleBuffer.particleCount - totalEmitted; 
+        ++currentParticleIdx)
       {
         csParticle &currentParticle = 
           particleBuffer.particleData[currentParticleIdx];
-        currentParticle.position += currentParticle.linearVelocity * dt;
+        IntegrateLinearAngular (currentParticle, newRadiusSq, dt);
+      }
 
-        // Use closed-form quaternion integrator
-        float w = currentParticle.angularVelocity.SquaredNorm ();
-        if (w != 0)
-        {
-          w = sqrtf (w);
-          float v = dt * 0.5f * w;
-          float q = cosf (v);
-          float s = sinf (v) / w;
-
-          csVector3 pqr = currentParticle.angularVelocity * s;
-          csQuaternion qVel (pqr, 0);
-          csQuaternion res = qVel * currentParticle.orientation;
-          currentParticle.orientation = res + currentParticle.orientation * q;
-        }
-
-        float currDistSq = currentParticle.position.SquaredNorm ();
-        if (currDistSq > newRadiusSq)
-          newRadiusSq = currDistSq;
+      for (;
+        currentParticleIdx < particleBuffer.particleCount; 
+        ++currentParticleIdx)
+      {
+        csParticle &currentParticle = 
+          particleBuffer.particleData[currentParticleIdx];
+        IntegrateLinearAngular (currentParticle, newRadiusSq, 
+          dt * GetFGen ()->Get ());
       }
     }
 

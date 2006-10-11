@@ -675,6 +675,14 @@ CS_FORCEINLINE void* cs_calloc (size_t n, size_t s)
  * use operator new(size_t,const CS::AllocPlatform&).
  */
 //@{
+
+/**
+ * Until bug #146 (intrusive overriding of new and delete causing 
+ * incompatibility with external projects) have been solved, this is disabled
+ */
+#define CS_NO_NEW_OVERRIDE
+#define CS_NO_MALLOC_OVERRIDE
+
 #ifndef CS_NO_MALLOC_OVERRIDE
 #define malloc 		cs_malloc
 #define free 	        cs_free
@@ -893,14 +901,15 @@ inline void* operator new[] (size_t s)
  * Use the CS_DEPRECATED_TYPE macro after type declarations to
  * indicate that they are deprecated. Example:
  * \code
- * typedef csFoo csBar CS_DEPRECATED_TYPE;
+ * typedef CS_DEPRECATED_TYPE csFoo csBar;
+ * class CS_DEPRECATED_TYPE csBaz { };
  * \endcode
  * Compilers which are capable of flagging deprecation will exhibit a warning
  * when it encounters client code using types so tagged.
  */
 #if !defined(CS_DEPRECATED_TYPE) || defined(DOXYGEN_RUN)
 #  if defined(CS_COMPILER_MSVC)
-#    define CS_DEPRECATED_TYPE
+#    define CS_DEPRECATED_TYPE __declspec(deprecated)
 #  else
 #    define CS_DEPRECATED_TYPE
 #  endif
@@ -911,7 +920,11 @@ inline void* operator new[] (size_t s)
  * on compilers that support it.
  */
 #if !defined(CS_DEPRECATED_TYPE_MSG) || defined(DOXYGEN_RUN)
-#  define CS_DEPRECATED_TYPE_MSG(msg) CS_DEPRECATED_TYPE
+#  if defined(CS_COMPILER_MSVC) && _MSC_VER >= 1400
+#    define CS_DEPRECATED_TYPE_MSG(msg) __declspec(deprecated(msg))
+#  else
+#    define CS_DEPRECATED_TYPE_MSG(msg) CS_DEPRECATED_TYPE
+#  endif
 #endif
 
 /**\def CS_CONST_METHOD

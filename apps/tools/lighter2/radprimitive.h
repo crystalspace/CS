@@ -42,7 +42,7 @@ namespace lighter
       : vertexData(dataHolder),
       uFormVector (0), vFormVector (0), illuminationColor (0,0,0),
       reflectanceColor (1.0f,1.0f,1.0f), uPatches (0), vPatches (0), minCoord (0),
-      minUV (0,0), maxUV (0,0), originalPrim (0), radObject (0), lightmapID (0)
+      minUV (0,0), maxUV (0,0), originalPrim (0), radObject (0)
     {
     }
 
@@ -147,13 +147,12 @@ namespace lighter
     inline const RadPrimitive* GetOriginalPrimitive () const { return originalPrim; }
     inline void SetOriginalPrimitive (RadPrimitive *p) { originalPrim = p; }
 
-    inline const uint GetLightmapID () const { return lightmapID; }
-    inline void SetLightmapID (uint id) { lightmapID = id; }
-
     inline const RadObject* GetRadObject () const { return radObject; }
     inline RadObject* GetRadObject () { return radObject; }
     inline void SetRadObject (RadObject *obj) { radObject = obj; }
 
+    inline uint GetGlobalLightmapID () const { return globalLightmapID; }
+    inline void SetGlobalLightmapID (uint id) { globalLightmapID = id; }
   protected:
     // Lightmap texture coordinates
     //Vector2DArray lightmapUVs;
@@ -197,8 +196,9 @@ namespace lighter
     /// Original object
     RadObject* radObject;
 
-    /// Lightmap id
-    uint lightmapID;
+    /// GLobal lightmap id
+    // @@@ Only meaningful for object primitives
+    uint globalLightmapID;
   };
 
   typedef csArray<RadPrimitive> RadPrimitiveArray;
@@ -206,7 +206,7 @@ namespace lighter
   typedef csSet<RadPrimitive*> RadPrimitivePtrSet;
 }
 
-CS_SPECIALIZE_TEMPLATE
+template<>
 class csHashComputer<lighter::RadPrimitive*> : public csHashComputerIntegral<lighter::RadPrimitive*> {};
 
 #endif

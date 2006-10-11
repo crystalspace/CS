@@ -146,14 +146,6 @@ bool csGeneralFactoryLoader::ParseSubMesh(iDocumentNode *node,
     }
   }
 
-  if (!material.IsValid ())
-  {
-    synldr->ReportError (
-      "crystalspace.genmeshloader.parse.unknownmaterial",
-      node, "No material specified in genmesh submesh!");
-    return false;
-  }
-
   iGeneralMeshSubMesh* submesh = factstate->AddSubMesh (indexbuffer, material, 
     node->GetAttributeValue ("name"), do_mixmode ? mixmode : (uint)~0);
   csRef<iShaderVariableContext> svc = 
@@ -791,13 +783,16 @@ static void WriteSubMesh (iSyntaxService* synldr, iGeneralMeshSubMesh* submesh,
   if (submeshName != 0)
     submeshNode->SetAttribute ("name", submeshName);
 
-  csRef<iDocumentNode> materialNode = 
-    submeshNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-  materialNode->SetValue("material");
-  csRef<iDocumentNode> materialNameNode = 
-    materialNode->CreateNodeBefore(CS_NODE_TEXT, 0);
-  materialNameNode->SetValue (
-    submesh->GetMaterial()->QueryObject()->GetName());
+  iMaterialWrapper* material = submesh->GetMaterial();
+  if (material != 0)
+  {
+    csRef<iDocumentNode> materialNode = 
+      submeshNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    materialNode->SetValue("material");
+    csRef<iDocumentNode> materialNameNode = 
+      materialNode->CreateNodeBefore(CS_NODE_TEXT, 0);
+    materialNameNode->SetValue (material->QueryObject()->GetName());
+  }
 
   uint mixmode = submesh->GetMixmode ();
   if (mixmode != (uint)~0)

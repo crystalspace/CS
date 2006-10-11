@@ -69,9 +69,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(Soft3D)
         outBuffers.AddVertex (inData);
         inData += inStride;
       }
-      const size_t maxVert = csMin (rangeEnd, inBuffers.GetVertexCount());
+      const size_t maxVert = csMin (rangeEnd+1, inBuffers.GetVertexCount());
       // Make sure we don't process too many vertices;
-      for (; i <= maxVert; i++)
+      for (; i < maxVert; i++)
       {
         const csVector3 v (inData[posOffs+0], inData[posOffs+1], 
           inData[posOffs+2]);
@@ -86,7 +86,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Soft3D)
     }
     else
     {
-      const size_t maxVert = csMin (rangeEnd, inBuffers.GetVertexCount());
+      const size_t maxVert = csMin (rangeEnd+1, inBuffers.GetVertexCount());
       size_t i;
       for (i = 0; i < maxVert; i++)
       {

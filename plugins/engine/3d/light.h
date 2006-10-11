@@ -49,6 +49,8 @@ struct iMeshWrapper;
 struct iLightingInfo;
 struct iSector;
 
+#include "csutil/win32/msvc_deprecated_warn_off.h"
+
 class csLightObjectModel : public scfImplementationExt0<csLightObjectModel,
                                                         csObjectModel>
 {
@@ -85,6 +87,8 @@ public:
   virtual iTerrainSystem* GetTerrainColldet () { return 0; }
 };
 
+#include "csutil/win32/msvc_deprecated_warn_on.h"
+
 /**
  * Class that represents the influence that a certain light
  * has on a sector.
@@ -116,13 +120,15 @@ typedef csSet<csRef<csLightSectorInfluence> > csLightSectorInfluences;
  * A light subclassing from this has a color, a position
  * and a radius.
  */
-class csLight : public scfImplementationExt5<csLight,
-                                             csObject,
-                                             iLight,
-                                             iVisibilityObject,
-                                             iShaderVariableContext,
-					     iSceneNode,
-					     iSelfDestruct>
+class csLight : 
+  public scfImplementationExt5<csLight,
+                               csObject,
+                               iLight,
+                               iVisibilityObject,
+                               scfFakeInterface<iShaderVariableContext>,
+			       iSceneNode,
+			       iSelfDestruct>,
+  public CS::ShaderVariableContextImpl
 {
 private:
   /// ID for this light (16-byte MD5).
@@ -204,8 +210,6 @@ protected:
 
   /// List of light/sector influences.
   csLightSectorInfluences influences;
-
-  csShaderVariableContext svcontext;
 
   csEngine* engine;
 public:
@@ -477,45 +481,6 @@ public:
     return (iShaderVariableContext*)this;
   }
 
-  /**\name iShaderVariableContext implementation
-   * @{ */
-  /// Add a variable to this context
-  void AddVariable (csShaderVariable *variable)
-  { svcontext.AddVariable (variable); }
-
-  /// Get a named variable from this context
-  csShaderVariable* GetVariable (csStringID name) const
-  { 
-    return svcontext.GetVariable (name); 
-  }
-
-  /// Get Array of all ShaderVariables
-  const csRefArray<csShaderVariable>& GetShaderVariables () const
-  { 
-    // @@@ Will not return factory SVs
-    return svcontext.GetShaderVariables (); 
-  }
-
-  /**
-   * Push the variables of this context onto the variable stacks
-   * supplied in the "stacks" argument
-   */
-  void PushVariables (iShaderVarStack* stacks) const
-  { 
-    svcontext.PushVariables (stacks); 
-  }
-
-  bool IsEmpty () const 
-  {
-    return svcontext.IsEmpty();
-  }
-
-  void ReplaceVariable (csShaderVariable *variable)
-  { svcontext.ReplaceVariable (variable); }
-
-  void Clear () { svcontext.Clear(); }
-  /** @} */
-
   //----------------------------------------------------------------------
   // Light influence stuff.
   //----------------------------------------------------------------------
@@ -640,7 +605,7 @@ class csLightList : public scfImplementation1<csLightList,
 {
 private:
   csRefArrayObject<iLight> list;
-  csHash<iLight*,csStrKey> lights_hash;
+  csHash<iLight*, csString> lights_hash;
 
   class NameChangeListener : public scfImplementation1<NameChangeListener,
   	iObjectNameChangeListener>

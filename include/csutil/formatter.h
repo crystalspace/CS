@@ -46,7 +46,7 @@
 // compilers, it breaks on gcc 3.4.x, which complains (apparently incorrectly?)
 // that IEEEFloatMantissa is not a templated type.
 #if defined(CS_COMPILER_MSVC) && (_MSC_VER >= 1300)
-#define CS_FORMATTER_TYPENAME_QUALIFIER typename_qualifier
+#define CS_FORMATTER_TYPENAME_QUALIFIER typename
 #else
 #define CS_FORMATTER_TYPENAME_QUALIFIER
 #endif

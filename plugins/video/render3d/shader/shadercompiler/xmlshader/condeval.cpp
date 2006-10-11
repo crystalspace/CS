@@ -1050,13 +1050,13 @@ csConditionEvaluator::EvaluatorShadervar::Float (
 }
 
 template<typename Evaluator>
-typename_qualifier Evaluator::EvalResult csConditionEvaluator::Evaluate (
+typename Evaluator::EvalResult csConditionEvaluator::Evaluate (
   Evaluator& eval, csConditionID condition)
 {
-  typedef typename_qualifier Evaluator::EvalResult EvResult;
-  typedef typename_qualifier Evaluator::BoolType EvBool;
-  typedef typename_qualifier Evaluator::FloatType EvFloat;
-  typedef typename_qualifier Evaluator::IntType EvInt;
+  typedef typename Evaluator::EvalResult EvResult;
+  typedef typename Evaluator::BoolType EvBool;
+  typedef typename Evaluator::FloatType EvFloat;
+  typedef typename Evaluator::IntType EvInt;
   EvResult result (eval.GetDefaultResult());
 
   const CondOperation* op = conditions.GetKeyPointer (condition);

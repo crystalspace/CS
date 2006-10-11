@@ -200,8 +200,9 @@ void csInputBinder::LoadConfig (
 {
 #if 0
   csRef<iConfigIterator> iter = cfg->Enumerate (subsection);
-  while (iter->Next ())
+  while (iter->HasNext ())
   {
+    iter->Next();
     const char *key = iter->GetKey (true);
     int val = iter->GetInt ();
 

@@ -19,5 +19,6 @@
       </fp>
     </pass>
   </technique>
+  <fallbackshader name="light_bumpmap" file="/shader/light_bumpmap.xml" />
 </shader>
 

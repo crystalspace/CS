@@ -231,10 +231,10 @@ csQuaternion csQuaternion::SLerp (const csQuaternion& q2, float t) const
     if (cosom < 0.9998f)
     {
       // Yes, do a slerp
-      omega = acos (cosom);
-      invsinom = 1.0f / sin (omega);
-      scale0 = sin ((1.0f - t) * omega) * invsinom;
-      scale1 = sin (t * omega) * invsinom;
+      omega = acosf (cosom);
+      invsinom = 1.0f / sinf (omega);
+      scale0 = sinf ((1.0f - t) * omega) * invsinom;
+      scale1 = sinf (t * omega) * invsinom;
     }
     else
     {
@@ -259,4 +259,47 @@ csQuaternion csQuaternion::SLerp (const csQuaternion& q2, float t) const
     scale0 * v.y + scale1 * quato.v.x,
     scale0 * v.z + scale1 * -quato.w,
     scale0 * w + scale1 * quato.v.z);
+}
+
+csQuaternion csQuaternion::Log () const
+{
+  // q = w + v, w is real, v is complex vector
+
+  // let u be v / |v|
+  // log(q) = 1/2*log(|q|) + u*atan(|v|/ w)
+  float vNorm = v.Norm ();
+  float qSqNorm = SquaredNorm ();
+
+  float vCoeff;
+  if (vNorm > 0.0f)
+    vCoeff = atan2f (vNorm, w) / vNorm;
+  else
+    vCoeff = 0;
+
+  return csQuaternion (v * vCoeff, 0.5f * logf (qSqNorm));
+}
+
+csQuaternion csQuaternion::Exp () const
+{
+  // q = w + v, w is real, v is complex vector
+
+  // let u be v / |v|
+  // exp(q) = exp(w) * (cos(|v|), u*sin(|v|))
+
+  float vNorm = v.Norm ();
+  float expW = expf (w);
+
+  float vCoeff;
+  if (vNorm > 0.0f)
+    vCoeff = expW * sinf (vNorm) / vNorm;
+  else
+    vCoeff = 0;
+
+  return csQuaternion (v * vCoeff, expW * cosf (vNorm));  
+}
+
+csQuaternion csQuaternion::Squad (const csQuaternion & t1, const csQuaternion & t2,
+  const csQuaternion & q, float t) const
+{
+  return SLerp (q, t).SLerp (t1.SLerp (t2, t), 2.0f*t * (1.0f - t));
 }

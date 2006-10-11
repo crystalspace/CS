@@ -61,11 +61,11 @@ static inline long csQfixed24 (float n) { return (int)(n * 16777216.0f); }
 /** @} */
     
 // Backward compatibility. Use csQfixedn() instead.
-CS_DEPRECATED_METHOD
+CS_DEPRECATED_METHOD_MSG("Use csQfixed8() instead")
 static inline long csQint8 (float n) { return csQfixed8 (n); }
-CS_DEPRECATED_METHOD
+CS_DEPRECATED_METHOD_MSG("Use csQfixed16() instead")
 static inline long csQint16(float n) { return csQfixed16(n); }
-CS_DEPRECATED_METHOD
+CS_DEPRECATED_METHOD_MSG("Use csQfixed24() instead")
 static inline long csQint24(float n) { return csQfixed24(n); }
 
 #endif // __CS_CSQINT_H__

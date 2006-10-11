@@ -786,14 +786,19 @@ bool csGLGraphics3D::Open ()
   ext->InitGL_ARB_point_parameters ();
   ext->InitGL_ARB_point_sprite ();
   ext->InitGL_EXT_framebuffer_object ();
-  ext->InitGL_ARB_texture_rectangle ();
-  if (!ext->CS_GL_ARB_texture_rectangle)
+  ext->InitGL_ARB_texture_non_power_of_two ();
+  if (!ext->CS_GL_ARB_texture_non_power_of_two)
   {
-    ext->InitGL_EXT_texture_rectangle();
-    if (!ext->CS_GL_EXT_texture_rectangle)
-      ext->InitGL_NV_texture_rectangle();
+    ext->InitGL_ARB_texture_rectangle ();
+    if (!ext->CS_GL_ARB_texture_rectangle)
+    {
+      ext->InitGL_EXT_texture_rectangle();
+      if (!ext->CS_GL_EXT_texture_rectangle)
+        ext->InitGL_NV_texture_rectangle();
+    }
   }
   ext->InitGL_ARB_vertex_program (); // needed for vertex attrib code
+  // || ARB_vertex_shader, || GL_version_2_0
   ext->InitGL_ARB_fragment_program (); // needed for AFP DrawPixmap() workaround
   //ext->InitGL_ATI_separate_stencil ();
   ext->InitGL_EXT_secondary_color ();
@@ -1104,6 +1109,15 @@ bool csGLGraphics3D::Open ()
     }
   }
 
+#define LQUOT   "\xE2\x80\x9c"
+#define RQUOT   "\xE2\x80\x9d"
+  fixedFunctionForcefulEnable = 
+    config->GetBool ("Video.OpenGL.FixedFunctionForcefulEnable", false);
+  if (verbose)
+    Report (CS_REPORTER_SEVERITY_NOTIFY, 
+      LQUOT "Forceful" RQUOT " fixed function enable: %s",
+      fixedFunctionForcefulEnable ? "yes" : "no");
+
   return true;
 }
 
@@ -1216,17 +1230,22 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
 	Turn off some stuff that isn't needed for 2d (or even can
 	cause visual glitches.)
       */
-      if (use_hw_render_buffers)
-      {
-	ext->glBindBufferARB (GL_ARRAY_BUFFER_ARB, 0);
-	ext->glBindBufferARB (GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
-      }
+      DeactivateBuffers (0, 0);
       statecache->Disable_GL_ALPHA_TEST ();
       if (ext->CS_GL_ARB_multitexture)
       {
         statecache->SetCurrentTU (0);
         statecache->ActivateTU (csGLStateCache::activateImage
           | csGLStateCache::activateTexCoord);
+      }
+
+      if (fixedFunctionForcefulEnable)
+      {
+        const GLenum state = GL_FOG;
+        GLboolean s = glIsEnabled (state);
+        if (s) glDisable (state); else glEnable (state);
+        glBegin (GL_TRIANGLES);  glEnd ();
+        if (s) glEnable (state); else glDisable (state);
       }
 
       needProjectionUpdate = false; 
@@ -1400,6 +1419,13 @@ void csGLGraphics3D::DeactivateBuffers (csVertexAttrib *attribs, unsigned int co
       {
         statecache->SetCurrentTU (i);
         statecache->Disable_GL_TEXTURE_COORD_ARRAY ();
+      }
+    }
+    if (ext->glDisableVertexAttribArrayARB)
+    {
+      for (i = 0; i < CS_VATTRIB_GENERIC_LAST-CS_VATTRIB_GENERIC_FIRST+1; i++)
+      {
+        ext->glDisableVertexAttribArrayARB (i);
       }
     }
 
@@ -2305,7 +2331,7 @@ void csGLGraphics3D::ApplyBufferChanges()
       case CS_VATTRIB_NORMAL:
         statecache->Enable_GL_NORMAL_ARRAY ();
         statecache->SetNormalPointer (compType, (GLsizei)buffer->GetStride (), 
-	  data);
+          data);
         break;
       case CS_VATTRIB_COLOR:
         statecache->Enable_GL_COLOR_ARRAY ();
@@ -3413,7 +3439,7 @@ iHalo *csGLGraphics3D::CreateHalo (float iR, float iG, float iB,
 
 void csGLGraphics3D::RemoveHalo (csOpenGLHalo* halo)
 {
-  halos.DeleteFast (halo);
+  halos.Delete (halo);
 }
 
 float csGLGraphics3D::GetZBuffValue (int x, int y)
