@@ -188,7 +188,7 @@ namespace lighter
 
       // Only point-lights for now
       float r = light->GetCutoffDistance ();
-      radLight->boundingBox.SetSize (csVector3 (r));
+      radLight->boundingBox.SetSize (csVector3 (2*r));
       radLight->boundingBox.SetCenter (radLight->position);
      
       //add more

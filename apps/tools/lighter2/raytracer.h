@@ -20,6 +20,7 @@
 #define __RAYTRACER_H__
 
 #include "statistics.h"
+#include "radprimitive.h"
 
 namespace lighter
 {
@@ -196,10 +197,10 @@ namespace lighter
     // Vistest rayhelpers
 
     static inline float Vistest5 (const Raytracer& rt, const csVector3& viscenter,
-      const csVector3& visu, const csVector3& visv, const csVector3& endp)
+      const csVector3& visu, const csVector3& visv, const csVector3& endp,
+      const RadPrimitive& prim)
     {
       // Perform a 5 point vistest
-      float visibility = 1.0f;
 
       const csVector3 halfu = visu * 0.5f;
       const csVector3 halfv = visv * 0.5f;
@@ -212,6 +213,8 @@ namespace lighter
         viscenter - halfu - halfv
       };
 
+      uint insideNum = 0;
+      uint hitNum = 0;
       for (unsigned int i = 0; i < 5; i++)
       {
         const csVector3& primP = rayStarts[i];
@@ -224,11 +227,16 @@ namespace lighter
         ray.origin = endp;
         ray.direction = dir / ray.maxLength;
         ray.maxLength -= 0.001f;
-        if (rt.TraceAnyHit (ray, hit))
-          visibility -= 0.2f;
+        bool inside = prim.PointInside (primP);
+        bool hitAny = rt.TraceAnyHit (ray, hit);
+        if (inside)
+        {
+          insideNum++;
+          if (hitAny) hitNum++;
+        }
       }
-
-      return visibility;
+      if (insideNum == 0) insideNum = 5;
+      return 1.0f-((float)hitNum/(float)insideNum);
     }
   };
 }

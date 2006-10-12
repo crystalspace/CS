@@ -690,6 +690,24 @@ namespace lighter
     return newArr;
   }
 
+  bool RadPrimitive::PointInside (const csVector3& pt) const
+  {
+    csVector3 p1 = 
+      vertexData.vertexArray[indexArray[indexArray.GetSize()-1]].position;
+    for (size_t i = 0; i < indexArray.GetSize (); i++)
+    {
+      csVector3 p2 = vertexData.vertexArray[indexArray[i]].position;
+
+      csVector3 testPlaneNormal = (p2 - p1) % plane.Normal();
+      csPlane3 testPlane (testPlaneNormal, -testPlaneNormal * p1);
+
+      if (testPlane.Classify (pt) < -EPSILON) return false;
+
+      p1 = p2;
+    }
+    return true;
+  }
+
   int RadPrimitive::Classify (const csPlane3 &plane) const
   {
     size_t i;

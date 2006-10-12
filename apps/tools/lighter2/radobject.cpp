@@ -295,7 +295,7 @@ namespace lighter
             if (elemArea < FLT_EPSILON) continue; // No area, skip
 
             mask.maskData[vindex+u] += elemArea * area2pixel; //Accumulate
-          }
+              }
 
         } 
       }
