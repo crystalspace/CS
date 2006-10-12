@@ -38,7 +38,6 @@
 #include "imesh/partsys.h"
 #include "imesh/protomesh.h"
 #include "imesh/skeleton.h"
-#include "imesh/spiral.h"
 #include "imesh/sprite2d.h"
 #include "imesh/sprite3d.h"
 #include "imesh/spritecal3d.h"

@@ -124,8 +124,6 @@
     <plugin name="emit">crystalspace.mesh.loader.emit</plugin>
     <plugin name="hazeFact">crystalspace.mesh.loader.factory.haze</plugin>
     <plugin name="haze">crystalspace.mesh.loader.haze</plugin>
-    <plugin name="spiralFact">crystalspace.mesh.loader.factory.spiral</plugin>
-    <plugin name="spiral">crystalspace.mesh.loader.spiral</plugin>
   </plugins>
   <meshfact name="fireFact">
     <plugin>crystalspace.mesh.loader.factory.particles</plugin>
@@ -288,10 +286,35 @@
     <plugin>emitFact</plugin>
     <params />
   </meshfact>
+
   <meshfact name="spiralFact">
-    <plugin>spiralFact</plugin>
-    <params />
+    <plugin>crystalspace.mesh.loader.factory.particles</plugin>
+    <params>
+      <particlesize x="0.03" y="0.03" />
+      <emitter type="sphere">
+        <radius>0.05</radius>
+        <placement>volume</placement>
+        <mass min="7.5" max="10" />
+        <initialttl min="2" max="2.5" />
+        <emissionrate>200</emissionrate>
+        <uniformvelocity />
+        <initialvelocity x="2.8" y="1" z="2.8" />
+      </emitter>
+      <effector type="velocityfield">
+	<type>spiral</type>
+	<fparam>1.2</fparam>
+	<vparam x="0" y="0" z="0" />
+	<vparam x="0" y="1" z="0" />
+	<vparam x="24" y="0" z="24" />
+      </effector>
+      <effector type="lincolor">
+        <color red="0" green="0" blue="1" time="10"/>
+        <color red="0" green="0.5" blue="1" time="5"/>
+        <color red="1" green="1" blue="1" time="0"/>
+      </effector>
+    </params>
   </meshfact>
+
   <meshfact name="hazeFact">
     <plugin>hazeFact</plugin>
     <params />
@@ -1287,22 +1310,19 @@
     </meshobj>
 
     <meshobj name="spiral">
+      <plugin>crystalspace.mesh.loader.particles</plugin>
+      <params>
+        <factory>spiralFact</factory>
+        <material>raindrop</material>
+        <mixmode>
+          <add/>
+        </mixmode>
+      </params>
       <priority>alpha</priority>
-      <plugin>spiral</plugin>
       <ztest />
       <move>
         <v x="10" y="0" z="70" />
       </move>
-      <params>
-        <factory>spiralFact</factory>
-        <mixmode>
-          <add />
-        </mixmode>
-        <number>200</number>
-        <material>raindrop</material>
-        <color red="0.2" green="0.9" blue="0.2" />
-        <source x="0" y="0" z="0" />
-      </params>
     </meshobj>
     <meshobj name="emit5">
       <priority>alpha</priority>
