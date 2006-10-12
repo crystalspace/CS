@@ -8528,6 +8528,45 @@ sub ACQUIRE {
 }
 
 
+############# Class : cspace::iParticleBuiltinEffectorVelocityField ##############
+
+package cspace::iParticleBuiltinEffectorVelocityField;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::iParticleEffector cspace );
+%OWNER = ();
+%ITERATORS = ();
+*SetType = *cspacec::iParticleBuiltinEffectorVelocityField_SetType;
+*GetType = *cspacec::iParticleBuiltinEffectorVelocityField_GetType;
+*SetFParameter = *cspacec::iParticleBuiltinEffectorVelocityField_SetFParameter;
+*GetFParameter = *cspacec::iParticleBuiltinEffectorVelocityField_GetFParameter;
+*GetFParameterCount = *cspacec::iParticleBuiltinEffectorVelocityField_GetFParameterCount;
+*SetVParameter = *cspacec::iParticleBuiltinEffectorVelocityField_SetVParameter;
+*GetVParameter = *cspacec::iParticleBuiltinEffectorVelocityField_GetVParameter;
+*GetVParameterCount = *cspacec::iParticleBuiltinEffectorVelocityField_GetVParameterCount;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iParticleBuiltinEffectorVelocityField($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
 ############# Class : cspace::iParticleBuiltinEffectorFactory ##############
 
 package cspace::iParticleBuiltinEffectorFactory;
@@ -8537,6 +8576,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 %ITERATORS = ();
 *CreateForce = *cspacec::iParticleBuiltinEffectorFactory_CreateForce;
 *CreateLinColor = *cspacec::iParticleBuiltinEffectorFactory_CreateLinColor;
+*CreateVelocityField = *cspacec::iParticleBuiltinEffectorFactory_CreateVelocityField;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -12409,6 +12449,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *IsEmpty = *cspacec::iShaderVariableContext_IsEmpty;
 *ReplaceVariable = *cspacec::iShaderVariableContext_ReplaceVariable;
 *Clear = *cspacec::iShaderVariableContext_Clear;
+*RemoveVariable = *cspacec::iShaderVariableContext_RemoveVariable;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -15575,6 +15616,8 @@ sub CS_PARTICLE_WORLD_MODE () { $cspacec::CS_PARTICLE_WORLD_MODE }
 sub CS_PARTICLE_BUILTIN_CENTER () { $cspacec::CS_PARTICLE_BUILTIN_CENTER }
 sub CS_PARTICLE_BUILTIN_VOLUME () { $cspacec::CS_PARTICLE_BUILTIN_VOLUME }
 sub CS_PARTICLE_BUILTIN_SURFACE () { $cspacec::CS_PARTICLE_BUILTIN_SURFACE }
+sub CS_PARTICLE_BUILTIN_SPIRAL () { $cspacec::CS_PARTICLE_BUILTIN_SPIRAL }
+sub CS_PARTICLE_BUILTIN_RADIALPOINT () { $cspacec::CS_PARTICLE_BUILTIN_RADIALPOINT }
 sub CS_SNDSYS_DATA_UNKNOWN_SIZE () { $cspacec::CS_SNDSYS_DATA_UNKNOWN_SIZE }
 sub SS_FILTER_LOC_RENDEROUT () { $cspacec::SS_FILTER_LOC_RENDEROUT }
 sub SS_FILTER_LOC_SOURCEOUT () { $cspacec::SS_FILTER_LOC_SOURCEOUT }
