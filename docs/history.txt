@@ -21,6 +21,7 @@ chronological order.
 	  "performance hints".
 	- res changed the genmesh loader and saver to also accept factory 
 	  submeshes without a material.
+	- Marten added a RK45 ODE solver to be used in particle effector.
 5-Oct-2006
 	- Marten changed win32 version resource generation so it strips
 	  any RCxxx tags, appearantly they trip the mingw resource
