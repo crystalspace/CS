@@ -8,6 +8,10 @@ chronological order.
 
 12-Oct-2006
 	- mdmkolbe commited part of the Cygwin path patch forgotten before.
+	- mdmkolbe added support for Cygwin mount points to VFS.
+	- mdmkolbe forced vfs.cfg to always be regenerated on install
+	  since they may be overridden at install time (e.g. using GNU stow)
+	  and to prevent old "$(appdatadir)" and "$(appconfdir)" being used.
 11-Oct-2006
 	- res fixed genmesh to also support Compress() when submeshes are
 	  present.
