@@ -14,6 +14,7 @@ chronological order.
 	- Jorrit merged r25608 into 1.0 (removal spiral).
 	- Jorrit merged r25613 into 1.0 (fix walktest for removal spiral).
 	- res removed lighter2 per trac #168.
+	- res removed some leftover mentionings of aws apps.
 8-Oct-2006
 	- res merged r25504, r25546 into 1.0 
 	  (iShaderVariableContext::RemoveVariable()).
