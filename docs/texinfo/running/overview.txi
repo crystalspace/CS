@@ -110,11 +110,6 @@ todo
 @item lghtngtest
 todo
 
-@cindex @file{lighter2}
-@cindex Applications, @file{lighter2}
-@item lighter2
-todo
-
 @cindex @file{maya2spr}
 @cindex Applications, @file{maya2spr}
 @item maya2spr

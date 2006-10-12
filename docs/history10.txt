@@ -13,6 +13,7 @@ chronological order.
 	- Jorrit merged r25599 into 1.0 (outward spiral term).
 	- Jorrit merged r25608 into 1.0 (removal spiral).
 	- Jorrit merged r25613 into 1.0 (fix walktest for removal spiral).
+	- res removed lighter2 per trac #168.
 8-Oct-2006
 	- res merged r25504, r25546 into 1.0 
 	  (iShaderVariableContext::RemoveVariable()).
