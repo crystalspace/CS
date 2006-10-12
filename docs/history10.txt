@@ -11,6 +11,7 @@ chronological order.
 	- Jorrit merged r25590 into 1.0 (velocity-field effector).
 	- Jorrit merged r25595 into 1.0 (castle credits correction).
 	- Jorrit merged r25599 into 1.0 (outward spiral term).
+	- Jorrit merged r25608 into 1.0 (removal spiral).
 8-Oct-2006
 	- res merged r25504, r25546 into 1.0 
 	  (iShaderVariableContext::RemoveVariable()).

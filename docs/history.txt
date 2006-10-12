@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+12-Oct-2006
+	- Jorrit changed the spiral particle system in partsys to use
+	  the new particles plugin.
+	- Jorrit removed the spiral mesh object plugin.
 10-Oct-2006
 	- Marten added a "outward spiral" term to spiral particle effector.
 9-Oct-2006
