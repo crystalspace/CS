@@ -31,6 +31,8 @@ chronological order.
 	      since they don't lie on the primitive.
 	- res changed genmeshify to detect when a level name passed is a
 	  directory.
+	- res (blindly) augmented the import kit to support Thing mesh 
+	  objects.
 11-Oct-2006
 	- res fixed genmesh to also support Compress() when submeshes are
 	  present.
