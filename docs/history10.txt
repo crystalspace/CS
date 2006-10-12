@@ -9,6 +9,8 @@ chronological order.
 12-Oct-2006
 	- Jorrit merged r25568 into 1.0 (RK45 ODE solver).
 	- Jorrit merged r25590 into 1.0 (velocity-field effector).
+	- Jorrit merged r25595 into 1.0 (castle credits correction).
+	- Jorrit merged r25599 into 1.0 (outward spiral term).
 8-Oct-2006
 	- res merged r25504, r25546 into 1.0 
 	  (iShaderVariableContext::RemoveVariable()).

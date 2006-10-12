@@ -718,7 +718,7 @@ enum csParticleBuiltinEffectorVFType
    *
    * ODE:
    * pl = closest point on line defined by vparam[0] + t*vparam[1]
-   * p' = vparam[2] * p-pl x vparam[1] + vparam[3]
+   * p' = vparam[2] * p-pl x vparam[1] + (p-pl) * fparam[0] + vparam[3]
    */
   CS_PARTICLE_BUILTIN_SPIRAL,
 
