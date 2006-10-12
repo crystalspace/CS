@@ -10,6 +10,8 @@ chronological order.
 	- Jorrit changed the spiral particle system in partsys to use
 	  the new particles plugin.
 	- Jorrit removed the spiral mesh object plugin.
+	- Jorrit fixed walktest for the removal of spiral. Simply removed
+	  the spiral command. It isn't that useful.
 10-Oct-2006
 	- Marten added a "outward spiral" term to spiral particle effector.
 9-Oct-2006

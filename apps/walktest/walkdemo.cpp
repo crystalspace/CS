@@ -41,7 +41,6 @@
 #include "imesh/lighting.h"
 #include "imesh/object.h"
 #include "imesh/partsys.h"
-#include "imesh/spiral.h"
 #include "imesh/sprite3d.h"
 #include "imesh/thing.h"
 #include "isndsys.h"
@@ -417,44 +416,6 @@ void add_particles_explosion (iSector* sector, iEngine* engine,
   Sys->Engine->DelayedRemoveObject (1101, mfw);
 
   exp->PlaceMesh ();
-}
-
-//===========================================================================
-// Demo particle system (spiral).
-//===========================================================================
-void add_particles_spiral (iSector* sector, const csVector3& bottom,
-	char* matname)
-{
-  // First check if the material exists.
-  iMaterialWrapper* mat = Sys->view->GetEngine ()->GetMaterialList ()->
-  	FindByName (matname);
-  if (!mat)
-  {
-    Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Can't find material '%s' in memory!", matname);
-    return;
-  }
-
-  csRef<iMeshFactoryWrapper> mfw (Sys->view->GetEngine ()->
-    CreateMeshFactory ("crystalspace.mesh.object.spiral", "spiral"));
-  if (!mfw) return;
-
-  csRef<iMeshWrapper> exp (
-  	Sys->view->GetEngine ()->CreateMeshWrapper (mfw, "custom spiral",
-	sector, bottom));
-
-  exp->SetZBufMode(CS_ZBUF_TEST);
-
-  csRef<iParticleState> partstate (
-  	SCF_QUERY_INTERFACE (exp->GetMeshObject (), iParticleState));
-  exp->GetMeshObject()->SetMaterialWrapper (mat);
-  partstate->SetMixMode (CS_FX_SETALPHA (0.50));
-  exp->GetMeshObject()->SetColor (csColor (1, 1, 0));
-  partstate->SetChangeColor (csColor(+0.01f, 0.0f, -0.012f));
-
-  csRef<iSpiralState> spirstate (
-  	SCF_QUERY_INTERFACE (exp->GetMeshObject (), iSpiralState));
-  spirstate->SetParticleCount (500);
-  spirstate->SetSource (csVector3 (0, 0, 0));
 }
 
 //===========================================================================
