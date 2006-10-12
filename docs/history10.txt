@@ -8,6 +8,7 @@ chronological order.
 
 12-Oct-2006
 	- Jorrit merged r25568 into 1.0 (RK45 ODE solver).
+	- Jorrit merged r25590 into 1.0 (velocity-field effector).
 8-Oct-2006
 	- res merged r25504, r25546 into 1.0 
 	  (iShaderVariableContext::RemoveVariable()).

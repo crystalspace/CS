@@ -23,6 +23,8 @@
 #ifndef __CS_CSGEOM_ODESOLVER_H__
 #define __CS_CSGEOM_ODESOLVER_H__
 
+#include "csgeom/vector3.h"
+
 namespace CS
 {
 namespace Math
