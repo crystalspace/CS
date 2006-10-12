@@ -15,6 +15,8 @@ chronological order.
 	- Jorrit changed the spiral particle system in partsys to use
 	  the new particles plugin.
 	- Jorrit removed the spiral mesh object plugin.
+	- Jorrit fixed walktest for the removal of spiral. Simply removed
+	  the spiral command. It isn't that useful.
 11-Oct-2006
 	- res fixed genmesh to also support Compress() when submeshes are
 	  present.

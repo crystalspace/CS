@@ -922,7 +922,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     CONPRI("Statistics:");
     CONPRI("  stats perftest coordshow");
     CONPRI("Special effects:");
-    CONPRI("  addmbot delmbot addbot delbot fire explosion spiral frain");
+    CONPRI("  addmbot delmbot addbot delbot fire explosion frain");
     CONPRI("  rain snow fountain flame portal fs_inter fs_fadeout fs_fadecol");
     CONPRI("  fs_fadetxt fs_red fs_green fs_blue fs_whiteout fs_shadevert");
     CONPRI("Debugging:");
@@ -1858,22 +1858,6 @@ bool CommandHandler (const char *cmd, const char *arg)
       add_particles_explosion (Sys->view->GetCamera ()->GetSector (),
     	Sys->Engine,
 	Sys->view->GetCamera ()->GetTransform ().GetOrigin (), txtname);
-  }
-  else if (!csStrCaseCmp (cmd, "spiral"))
-  {
-    char txtname[100];
-    int cnt = 0;
-    if (arg) cnt = csScanStr (arg, "%s", txtname);
-    extern void add_particles_spiral (iSector* sector, const csVector3& bottom,
-    	char* txtname);
-    if (cnt != 1)
-    {
-      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-      	"Expected parameter 'texture'!");
-    }
-    else
-      add_particles_spiral (Sys->view->GetCamera ()->GetSector (),
-    	Sys->view->GetCamera ()->GetTransform ().GetOrigin (), txtname);
   }
   else if (!csStrCaseCmp (cmd, "loadmesh"))
   {
