@@ -173,7 +173,7 @@ namespace lighter
     virtual void SaveMesh (Scene* scene, iDocumentNode *node);
 
     // Fixup the lightmap borders
-    virtual void FixupLightmaps (LightmapPtrDelArray& lightmaps);
+    virtual void FixupLightmaps (csArray<LightmapPtrDelArray*>& lightmaps);
 
     const csArray<RadPrimitiveArray>& GetPrimitives () const
     { return allPrimitives; }

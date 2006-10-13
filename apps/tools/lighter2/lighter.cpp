@@ -205,7 +205,7 @@ namespace lighter
       while (objIt.HasNext ())
       {
         csRef<RadObject> obj = objIt.Next ();
-        obj->FixupLightmaps (scene->GetLightmaps());
+        obj->FixupLightmaps (scene->GetAllLightmaps());
       }
     }
 

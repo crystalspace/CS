@@ -227,6 +227,7 @@ namespace lighter
         ray.origin = endp;
         ray.direction = dir / ray.maxLength;
         ray.maxLength -= 0.001f;
+        // FIXME: Only do for actual "border lumels"
         bool inside = prim.PointInside (primP);
         bool hitAny = rt.TraceAnyHit (ray, hit);
         if (inside)

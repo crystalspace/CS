@@ -85,6 +85,14 @@ namespace lighter
     return texture;
   }
 
+  bool Lightmap::IsNull () const
+  {
+    for (uint i = 0; i < data.GetSize (); i++)
+      if ((data[i].red != 0) || (data[i].green != 0) || (data[i].blue != 0))
+        return false;
+    return true;
+  }
+
   csString Lightmap::GetTextureNameFromFilename (const csString& file)
   {
     csString out (file);

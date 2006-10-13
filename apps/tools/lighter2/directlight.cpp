@@ -158,9 +158,9 @@ namespace lighter
         csColor reflected = energy * prim.GetOriginalPrimitive ()->GetReflectanceColor();
 
         // Store the reflected color
-        Lightmap * lm = sector->scene->GetLightmaps ()[prim.GetGlobalLightmapID ()];
+        Lightmap* lm = sector->scene->GetLightmap (
+          prim.GetGlobalLightmapID (), light);
         lm->GetData ()[v*lm->GetWidth ()+u] += reflected * lmArea;
-        
 
         // If we later do radiosity, collect the reflected energy
         if (globalConfig.GetLighterProperties ().doRadiosity)

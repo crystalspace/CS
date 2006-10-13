@@ -34,6 +34,8 @@ namespace lighter
     csColor color;
     csLightAttenuationMode attenuation;
     csVector3 attenuationConsts;
+    bool pseudoDynamic;
+    csMD5::Digest lightId;
 
     csColor freeEnergy;
 
@@ -108,6 +110,9 @@ namespace lighter
 
     LightmapPtrDelArray& GetLightmaps () 
     { return lightmaps; }
+
+    Lightmap* GetLightmap (uint lightmapID, Light* light);
+    csArray<LightmapPtrDelArray*> GetAllLightmaps ();
   protected:
     
     // Rad factories
@@ -117,6 +122,8 @@ namespace lighter
     SectorHash sectors;
 
     LightmapPtrDelArray lightmaps;
+    typedef csHash<LightmapPtrDelArray*, csPtrKey<Light> > PDLightmapsHash;
+    PDLightmapsHash pdLightmaps;
 
     struct LoadedFile
     {
@@ -132,6 +139,8 @@ namespace lighter
     {
       csString filename;
       csString texname;
+      csStringArray pdLightmapFiles;
+      csStringArray pdLightIDs;
     };
     csArray<SaveTexture> texturesToSave;
     csSet<csString> texturesToClean;
