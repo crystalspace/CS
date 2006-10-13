@@ -10,6 +10,8 @@ chronological order.
 	- res added PD light support to lighter2.
 	- mdmkolbe fixed a few warnings.
 	- res changed lighter2 to disable mipmaps for lightmap textures.
+	- res changed ptpdlight to use fixed point math and to upload textures
+	  as BGRA (faster on NV).
 12-Oct-2006
 	- mdmkolbe commited part of the Cygwin path patch forgotten before.
 	- mdmkolbe added support for Cygwin mount points to VFS.

@@ -32,6 +32,7 @@
 #include "imap/services.h"
 #include "ivaria/reporter.h"
 #include "itexture/itexloaderctx.h"
+#include "csgeom/fixed.h"
 #include "csgeom/math.h"
 #include "csutil/cscolor.h"
 #include "csutil/csstring.h"
@@ -199,9 +200,7 @@ CS_IMPLEMENT_STATIC_CLASSVAR_REF(ProctexPDLight, lightmapScratch, GetScratch,
 
 void ProctexPDLight::PDMap::ComputeValueBounds ()
 {
-  csRect r (0, 0, 
-    image ? image->GetWidth() : 0, 
-    image ? image->GetHeight() : 0);
+  csRect r (0, 0, imageW, imageH);
   ComputeValueBounds (r);
 }
 
@@ -209,17 +208,16 @@ void ProctexPDLight::PDMap::ComputeValueBounds (const csRect& area)
 {
   maxValue.Set (0, 0, 0);
   nonNullArea.Set (INT_MAX, INT_MAX, INT_MIN, INT_MIN);
-  if (!image) return;
+  if (!imageData) return;
 
-  const int width = image->GetWidth();
-  csRGBpixel* map = ((csRGBpixel*)image->GetImageData()) +
-    area.ymin * width + area.xmin;
+  const int width = imageW;
+  const Lumel* map = imageData->data + area.ymin * width + area.xmin;
   int mapPitch = width - area.Width ();
   for (int y = area.ymin; y < area.ymax; y++)
   {
     for (int x = area.xmin; x < area.xmax; x++)
     {
-      const csRGBpixel& p = *map++;
+      const Lumel& p = *map++;
 
       if (p.red > maxValue.red)
         maxValue.red = p.red;
@@ -235,6 +233,27 @@ void ProctexPDLight::PDMap::ComputeValueBounds (const csRect& area)
     }
     map += mapPitch;
   }
+}
+
+void ProctexPDLight::PDMap::SetImage (iImage* img)
+{
+  csRef<iImage> useImage = CS::ImageAutoConvert (img, CS_IMGFMT_TRUECOLOR);
+  imageW = useImage->GetWidth();
+  imageH = useImage->GetHeight();
+  size_t numPixels = imageW * imageH;
+  imageData.AttachNew (new (numPixels) LumelBuffer);
+  const csRGBpixel* src = (csRGBpixel*)useImage->GetImageData();
+  Lumel* dst = imageData->data;
+  while (numPixels-- > 0)
+  {
+    dst->red = src->red;
+    dst->green = src->green;
+    dst->blue = src->blue;
+    dst->alpha = 0xff;
+    dst++;
+    src++;
+  }
+  ComputeValueBounds (); 
 }
 
 void ProctexPDLight::Report (int severity, const char* msg, ...)
@@ -313,8 +332,8 @@ void ProctexPDLight::UpdateAffectedArea ()
 
 const char* ProctexPDLight::AddLight (const MappedLight& light)
 {
-  if ((light.map->GetWidth() != baseMap->GetWidth())
-    || (light.map->GetHeight() != baseMap->GetHeight()))
+  if ((light.map.imageW != baseMap.imageW)
+    || (light.map.imageH != baseMap.imageH))
     return "PD lightmap dimensions don't correspond to base lightmap dimensions";
   lights.Push (light);
   state.Set (stateAffectedAreaDirty);
@@ -349,8 +368,8 @@ bool ProctexPDLight::PrepareAnim ()
     return false;
   }
 
-  if (!baseMap) return false;
-  lightmapSize = baseMap->GetWidth() * baseMap->GetHeight();
+  if (!baseMap.imageData) return false;
+  lightmapSize = baseMap.imageW * baseMap.imageH;
   for (size_t i = 0; i < lights.GetSize(); )
   {
     MappedLight& light = lights[i];
@@ -395,13 +414,13 @@ void ProctexPDLight::Animate (csTicks /*current_time*/)
       LightmapScratch& scratch = GetScratch();
       scratch.SetSize (lightmapSize);
       {
-        csRGBpixel* basePtr = ((csRGBpixel*)baseMap->GetImageData()) +
+        Lumel* basePtr = (baseMap.imageData->data) +
           totalAffectedAreas.ymin * mat_w + totalAffectedAreas.xmin;
         int lines = totalAffectedAreas.Height();
-        csRGBpixel* scratchPtr = scratch.GetArray();
+        Lumel* scratchPtr = scratch.GetArray();
         for (int y = 0; y < lines; y++)
         {
-          memcpy (scratchPtr, basePtr, scratchW * sizeof (csRGBpixel));
+          memcpy (scratchPtr, basePtr, scratchW * sizeof (Lumel));
           scratchPtr += scratchW;
           basePtr += mat_w;
         }
@@ -419,24 +438,26 @@ void ProctexPDLight::Animate (csTicks /*current_time*/)
         }
         else
           i++;
-        const csColor& lightColor = light.light->GetColor ();
+        csFixed16 lightR = light.light->GetColor ().red;
+        csFixed16 lightG = light.light->GetColor ().green;
+        csFixed16 lightB = light.light->GetColor ().blue;
 
         int mapW = light.map.nonNullArea.Width();
-        const csRGBpixel* mapPtr = ((csRGBpixel*)light.map->GetImageData()) +
+        const Lumel* mapPtr = (light.map.imageData->data) +
           light.map.nonNullArea.ymin * mat_w +
           light.map.nonNullArea.xmin;
         int lines = light.map.nonNullArea.Height();
         int mapPitch = mat_w - mapW;
 
-        csRGBpixel* scratchPtr = scratch.GetArray() + 
+        Lumel* scratchPtr = scratch.GetArray() + 
           (light.map.nonNullArea.ymin - totalAffectedAreas.ymin) * scratchW +
            light.map.nonNullArea.xmin - totalAffectedAreas.xmin;
         int scratchPitch = scratchW - mapW;
 
         csRGBcolor mapMax = light.map.maxValue;
-        mapMax.red = int (mapMax.red * lightColor.red);
-        mapMax.green = int (mapMax.green * lightColor.green);
-        mapMax.blue = int (mapMax.blue * lightColor.blue);
+        mapMax.red = int (lightR * int (mapMax.red));
+        mapMax.green = int (lightG * int (mapMax.green));
+        mapMax.blue = int (lightB * int (mapMax.blue));
         if ((scratchMax.red + mapMax.red <= 255)
           && (scratchMax.green + mapMax.green <= 255)
           && (scratchMax.blue + mapMax.blue <= 255))
@@ -446,10 +467,10 @@ void ProctexPDLight::Animate (csTicks /*current_time*/)
           {
             for (int x = 0; x < mapW; x++)
             {
-              csRGBpixel mappedColor (int (lightColor.red * mapPtr->red),
-                int (lightColor.green * mapPtr->green),
-                int (lightColor.blue * mapPtr->blue));
-              scratchPtr->UnsafeAdd (mappedColor);
+              scratchPtr->UnsafeAdd (
+                int (lightR * int (mapPtr->red)),
+                int (lightG * int (mapPtr->green)),
+                int (lightB * int (mapPtr->blue)));
               scratchPtr++;
               mapPtr++;
             }
@@ -464,10 +485,10 @@ void ProctexPDLight::Animate (csTicks /*current_time*/)
           {
             for (int x = 0; x < mapW; x++)
             {
-              csRGBpixel mappedColor (int (lightColor.red * mapPtr->red),
-                int (lightColor.green * mapPtr->green),
-                int (lightColor.blue * mapPtr->blue));
-              scratchPtr->SafeAdd (mappedColor);
+              scratchPtr->SafeAdd (
+                int (lightR * int (mapPtr->red)),
+                int (lightG * int (mapPtr->green)),
+                int (lightB * int (mapPtr->blue)));
               scratchPtr++;
               mapPtr++;
             }
@@ -481,7 +502,8 @@ void ProctexPDLight::Animate (csTicks /*current_time*/)
       tex->GetTextureHandle ()->Blit (totalAffectedAreas.xmin, 
         totalAffectedAreas.ymin, 
         totalAffectedAreas.Width(), totalAffectedAreas.Height(),
-        (uint8*)scratch.GetArray());
+        (uint8*)scratch.GetArray(),
+        iTextureHandle::BGRA8888);
     }
 
     state.Reset (stateDirty);
