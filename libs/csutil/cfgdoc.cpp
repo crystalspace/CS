@@ -405,7 +405,7 @@ bool csConfigDocument::GetBool (const char *Key, bool Def) const
      strcasecmp(val, "1"   ) == 0);
 }
 
-csPtr<iStringArray> csConfigDocument::GetTuple (const char *Key) const
+csPtr<iStringArray> csConfigDocument::GetTuple (const char * /*Key*/) const
 {
   return 0;
 }

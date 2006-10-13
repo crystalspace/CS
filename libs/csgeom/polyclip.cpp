@@ -141,7 +141,7 @@ struct StatusOutputDefault
   {
     for (size_t vs = 0; vs < count; vs++)
     {
-      CS_ASSERT ((vs+outOffs) >= 0 && (vs+outOffs) < MAX_OUTPUT_VERTICES);
+      CS_ASSERT ((vs+outOffs) < MAX_OUTPUT_VERTICES);
       OutS [vs + outOffs] = InS [inOffs + vs];
       CLIP_PRINTF ("%zu: copy %zu\n", vs + outOffs, inOffs + vs);
     }

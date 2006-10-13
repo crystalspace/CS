@@ -8,6 +8,7 @@ chronological order.
 
 13-Oct-2006
 	- res added PD light support to lighter2.
+	- mdmkolbe fixed a few warnings.
 12-Oct-2006
 	- mdmkolbe commited part of the Cygwin path patch forgotten before.
 	- mdmkolbe added support for Cygwin mount points to VFS.
