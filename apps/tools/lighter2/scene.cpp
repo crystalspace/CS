@@ -432,6 +432,14 @@ namespace lighter
         fileNode->CreateNodeBefore (CS_NODE_TEXT);
       filenameNode->SetValue (textureToSave.filename.GetData ());
 
+      csRef<iDocumentNode> mipmapNode = 
+        textureNode->CreateNodeBefore (CS_NODE_ELEMENT);
+      mipmapNode->SetValue ("mipmap");
+
+      csRef<iDocumentNode> mipmapContents =
+        mipmapNode->CreateNodeBefore (CS_NODE_TEXT);
+      mipmapContents->SetValue ("no");
+
       if (textureToSave.pdLightmapFiles.GetSize() > 0)
       {
         csRef<iDocumentNode> typeNode = 
