@@ -21,8 +21,8 @@
  */
 #define CS_NO_NEW_OVERRIDE
 #include "cssysdef.h"
-
-#include <new>
+/* memtracker overrides new, too, which interferes as well */
+#include "csutil/custom_new_disable.h"
 
 namespace CS
 {
