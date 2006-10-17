@@ -237,7 +237,7 @@ void ProctexPDLight::PDMap::ComputeValueBounds (const csRect& area)
 
 void ProctexPDLight::PDMap::SetImage (iImage* img)
 {
-  csRef<iImage> useImage = CS::ImageAutoConvert (img, CS_IMGFMT_TRUECOLOR);
+  CS::ImageAutoConvert useImage (img, CS_IMGFMT_TRUECOLOR);
   imageW = useImage->GetWidth();
   imageH = useImage->GetHeight();
   size_t numPixels = imageW * imageH;

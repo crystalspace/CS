@@ -9,6 +9,7 @@ chronological order.
 17-Oct-2006
 	- Jorrit fixed a memory leak in the engine (with camera
 	  positions).
+	- res fixed a compile error in ptpdlight.
 13-Oct-2006
 	- res added PD light support to lighter2.
 	- mdmkolbe fixed a few warnings.
