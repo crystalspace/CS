@@ -49,7 +49,7 @@ csCameraPosition::csCameraPosition (const csCameraPosition& other)
 
 csCameraPosition::~csCameraPosition ()
 {
-  delete[] far_plane;
+  delete far_plane;
 }
 
 void csCameraPosition::SelfDestruct ()
@@ -63,8 +63,7 @@ void csCameraPosition::Set (
   const csVector3 &iforward,
   const csVector3 &iupward)
 {
-  delete[] sector;
-  sector = csStrNew (isector);
+  sector = isector;
   position = iposition;
   forward = iforward;
   upward = iupward;
