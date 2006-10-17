@@ -12,6 +12,7 @@ chronological order.
 	- res fixed a compile error in ptpdlight.
 	- res fixed compile errors with memtracker enabled (fixes trac # 135,
 	  #173).
+	- res fixed lighter2 compile errors and warnings.
 13-Oct-2006
 	- res added PD light support to lighter2.
 	- mdmkolbe fixed a few warnings.

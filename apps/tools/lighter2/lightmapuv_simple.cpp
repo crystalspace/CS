@@ -402,8 +402,6 @@ namespace lighter
   bool SimpleUVLayoutFactory::LayoutUVOnPrimitives (RadPrimitiveArray &prims, 
     size_t groupNum, RadObjectVertexData& vertexData, uint& lmID)
   {
-    LightmapPtrDelArray& globalLightmaps = parent->globalLightmaps;
-    size_t lastLightmap = 0;
     const csArray<csArray<size_t> >& coplanarGroup = coplanarGroups[groupNum];
 
     csArray<csVector2> uvsizes;

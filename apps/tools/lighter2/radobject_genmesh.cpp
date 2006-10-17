@@ -119,8 +119,6 @@ namespace lighter
     genFact->RemoveRenderBuffer ("texture coordinate lightmap");
     genFact->Compress ();
 
-    bool keepSubMeshes = globalLighter->settings.keepGenmeshSubmeshes;
-
     csVector3 *verts = genFact->GetVertices ();
     csVector2 *uv = genFact->GetTexels ();
     csVector3 *factNormals = genFact->GetNormals ();
@@ -144,7 +142,6 @@ namespace lighter
       {
         iGeneralMeshSubMesh* subMesh = genFact->GetSubMesh (s);
         iRenderBuffer* indices = subMesh->GetIndices();
-        iMaterialWrapper* material = subMesh->GetMaterial();
 
         CS::TriangleIndicesStream<size_t> tris;
         csRenderBufferLock<uint8> indexLock (indices);
@@ -154,7 +151,7 @@ namespace lighter
 
         while (tris.HasNextTri())
         {
-          size_t a, b, c;
+          size_t a = 0, b = 0, c = 0;
           tris.NextTriangle (a, b, c);
 
           AddPrimitive (a, b, c, subMesh);
