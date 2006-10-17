@@ -32,7 +32,7 @@ csCameraPosition::csCameraPosition (csCameraPositionList* positions,
                                     const csVector3 &forward,
                                     const csVector3 &upward)
   : scfImplementationType (this),
-  sector (csStrNew (sector)), position (position), forward (forward),
+  sector (sector), position (position), forward (forward),
   upward (upward), far_plane (0), positions (positions)
 {
   SetName (name);
@@ -40,7 +40,7 @@ csCameraPosition::csCameraPosition (csCameraPositionList* positions,
 
 csCameraPosition::csCameraPosition (const csCameraPosition& other)
   : iBase(), scfImplementationType (this),
-  sector (csStrNew (other.sector)), position (other.position),
+  sector (other.sector), position (other.position),
   forward (other.forward), upward (other.upward), far_plane (0), 
   positions (other.positions)
 {
@@ -49,7 +49,6 @@ csCameraPosition::csCameraPosition (const csCameraPosition& other)
 
 csCameraPosition::~csCameraPosition ()
 {
-  delete[] sector;
   delete[] far_plane;
 }
 
@@ -124,7 +123,7 @@ const char *csCameraPosition::GetSector ()
 
 void csCameraPosition::SetSector (const char *Name)
 {
-  sector = csStrNew (Name);
+  sector = Name;
 }
 
 const csVector3 &csCameraPosition::GetPosition ()

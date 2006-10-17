@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+17-Oct-2006
+	- Jorrit fixed a memory leak in the engine (with camera
+	  positions).
 13-Oct-2006
 	- res added PD light support to lighter2.
 	- mdmkolbe fixed a few warnings.
