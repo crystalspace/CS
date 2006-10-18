@@ -355,6 +355,8 @@ void csSpriteCal3DMeshObjectFactory::CalculateAllBoneBoundingBoxes()
   calCoreModel.getCoreSkeleton()->calculateBoundingBoxes(&calCoreModel);
 }
 
+#include "csutil/custom_new_disable.h"
+
 int csSpriteCal3DMeshObjectFactory::AddMorphAnimation(const char *name)
 {
   int id = calCoreModel.addCoreMorphAnimation(new (allocPlatform)
@@ -362,6 +364,8 @@ int csSpriteCal3DMeshObjectFactory::AddMorphAnimation(const char *name)
   morph_animation_names.Push(name);
   return id;
 }
+
+#include "csutil/custom_new_enable.h"
 
 bool csSpriteCal3DMeshObjectFactory::AddMorphTarget( int morphanimation_index,
                                                  const char *mesh_name, 
@@ -557,6 +561,7 @@ int csSpriteCal3DMeshObjectFactory::FindMorphAnimationName (
   return -1;
 }
 
+#include "csutil/custom_new_disable.h"
 
 bool csSpriteCal3DMeshObjectFactory::AddCoreMaterial(iMaterialWrapper *mat)
 {
@@ -572,6 +577,8 @@ bool csSpriteCal3DMeshObjectFactory::AddCoreMaterial(iMaterialWrapper *mat)
   calCoreModel.addCoreMaterial(newmat);
   return true;
 }
+
+#include "csutil/custom_new_enable.h"
 
 void csSpriteCal3DMeshObjectFactory::BindMaterials()
 {

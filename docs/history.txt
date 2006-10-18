@@ -10,6 +10,8 @@ chronological order.
 	- Jorrit fixed a memory leak in the engine (with camera
 	  positions).
 	- res fixed a compile error in ptpdlight.
+	- res fixed compile errors with memtracker enabled (fixes trac #135,
+	  #173).
 13-Oct-2006
 	- mdmkolbe fixed a few warnings.
 	- res changed ptpdlight to use fixed point math and to upload textures
