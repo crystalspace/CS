@@ -69,7 +69,7 @@ Snapshots are generated daily and are accompanied by standard @samp{diff}-style
 You can also view the contents of the @sc{svn} repository online including
 all of the historical information.
 
-@uref{http://svn.sourceforge.net/viewcvs.cgi/crystal/}
+@uref{http://svn.sourceforge.net/viewvc/crystal/CS/trunk/}
 
 @subheading Documentation
 @cindex Documentation, Obtaining
@@ -194,8 +194,9 @@ unsubscribing.
 @uref{http://lists.sourceforge.net/mailman/listinfo/crystal-docs/}
 
 The @emph{tracker} mailing list receives notifications each time a change is
-made to one of the Crystal Space tracker databases, such as ``Bugs'', ``Feature
-Requests'', etc., at SourceForge.
+made to the Crystal Space bug tracker ``Trac'', and to the older SourceForge
+tracker databases, such as ``Bugs'', ``Feature Requests'', etc., which are now
+deprecated.
 
 @noindent
 Mailing List: @email{crystal-tracker@@lists.sourceforge.net}.

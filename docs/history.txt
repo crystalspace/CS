@@ -10,11 +10,14 @@ chronological order.
 	- Jorrit forced the character2 shaders to use software animation
 	  since that works better on all hardware and also is faster
 	  in most cases.
+	- Eric Sunshine updated CS manual to refer to new Trac bug database
+	  rather than the deprecated SourceForge bug tracker. Also updated URL
+	  in manual for browsing sources in SVN rather than CVS.
 17-Oct-2006
 	- Jorrit fixed a memory leak in the engine (with camera
 	  positions).
 	- res fixed a compile error in ptpdlight.
-	- res fixed compile errors with memtracker enabled (fixes trac # 135,
+	- res fixed compile errors with memtracker enabled (fixes trac #135,
 	  #173).
 	- res fixed lighter2 compile errors and warnings.
 13-Oct-2006
