@@ -13,6 +13,7 @@ chronological order.
 	- Eric Sunshine updated CS manual to refer to new Trac bug database
 	  rather than the deprecated SourceForge bug tracker. Also updated URL
 	  in manual for browsing sources in SVN rather than CVS.
+	- res removed some leftovers from the earlier "compatibilisms" cleanup.
 17-Oct-2006
 	- Jorrit fixed a memory leak in the engine (with camera
 	  positions).
