@@ -8,6 +8,7 @@ chronological order.
 
 18-Oct-2006
 	- res merged r25517 into 1.0 (remove pointless null3d message).
+	- res merged r25538 into 1.0 (typo).
 12-Oct-2006
 	- Jorrit merged r25568 into 1.0 (RK45 ODE solver).
 	- Jorrit merged r25590 into 1.0 (velocity-field effector).
