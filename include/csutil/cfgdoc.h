@@ -67,7 +67,7 @@ class CS_CRYSTALSPACE_EXPORT csConfigDocument :
       delete[] originalKey;
     }
   };
-  csHash<KeyInfo, csStrKey> keys;
+  csHash<KeyInfo, csString> keys;
 
   void ParseDocument (iDocument* doc, bool Merge = false,
     bool NewWins = true);

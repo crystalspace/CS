@@ -83,8 +83,52 @@ private:
   csRef<csConfigManager> Config;
   csConfigDomain *CurrentDomain;
   csRef<iConfigIterator> CurrentIterator;
-  char *Subsection;
+  csRef<iConfigIterator> nextIterator;
+  csString Subsection;
   csStringHash Iterated;
+
+  const char* currentKey;
+  const char* currentValue;
+  const char* currentComment;
+
+  void FetchNextIterator ()
+  {
+    // move to next domain (which actually means previous domain!)
+    CurrentDomain = CurrentDomain->Prev;
+    if (CurrentDomain == 0)
+    {
+      nextIterator = 0;
+      return;
+    }
+    if (CurrentDomain->Cfg == 0)
+    {
+      nextIterator = 0;
+      return;
+    }
+    nextIterator = CurrentDomain->Cfg->Enumerate(Subsection);
+  }
+  void FetchNext()
+  {
+    do
+    {
+      if (CurrentIterator)
+      {
+        while (CurrentIterator->HasNext())
+        {
+          CurrentIterator->Next();
+          const char* key = CurrentIterator->GetKey();
+          if (!FindIterated(key))
+          {
+            AddIterated(key);
+            return;
+          }
+        }
+      }
+      FetchNextIterator();
+      CurrentIterator = nextIterator;
+    }
+    while (CurrentIterator);
+  }
 public:
 
   void ClearIterated()
@@ -105,15 +149,14 @@ public:
   }
 
   csConfigManagerIterator(csConfigManager *cfg, const char *sub)
-    : scfImplementationType (this), Config (cfg)
+    : scfImplementationType (this), Config (cfg), Subsection (sub)
   {
     CurrentDomain = Config->LastDomain;
-    Subsection = csStrNew(sub);
+    FetchNext();
   }
   virtual ~csConfigManagerIterator()
   {
     Config->RemoveIterator(this);
-    delete[] Subsection;
     ClearIterated();
   }
   virtual iConfigFile *GetConfigFile() const
@@ -129,55 +172,51 @@ public:
     CurrentIterator = 0;
     CurrentDomain = Config->LastDomain;
     ClearIterated();
+    FetchNextIterator();
   }
+
   virtual bool Next()
   {
-    if (CurrentIterator)
-    {
-      if (CurrentIterator->Next())
-      {
-        if (FindIterated(CurrentIterator->GetKey()))
-          return Next();
-        AddIterated(CurrentIterator->GetKey());
-        return true;
-      }
-      else
-      {
-        CurrentIterator = 0;
-      }
-    }
-    // move to next domain (which actually means previous domain!)
-    if (CurrentDomain->Prev == 0)
-      return false;
-    CurrentDomain = CurrentDomain->Prev;
-    if (CurrentDomain->Cfg == 0)
-      return false;
-    CurrentIterator = CurrentDomain->Cfg->Enumerate(Subsection);
-    return Next();
+    if (!CurrentIterator) return false;
+    currentKey = CurrentIterator->GetKey ();
+    currentValue = CurrentIterator->GetStr ();
+    currentComment = CurrentIterator->GetComment ();
+    FetchNext();
+    return true;
   }
+
+  bool HasNext()
+  {
+    return CurrentIterator.IsValid();
+  }
+
   virtual const char *GetKey(bool Local) const
   {
-    return (CurrentIterator ? CurrentIterator->GetKey(Local) : 0);
+    return currentKey ? currentKey + (Local ? Subsection.Length() : 0) : 0;
   }
   virtual int GetInt() const
   {
-    return (CurrentIterator ? CurrentIterator->GetInt() : 0);
+    return currentValue ? atoi (currentValue) : 0;
   }
   virtual float GetFloat() const
   {
-    return (CurrentIterator ? CurrentIterator->GetFloat() : 0.0f);
+    return currentValue ? atof (currentValue) : 0.0f;
   }
   virtual const char *GetStr() const
   {
-    return (CurrentIterator ? CurrentIterator->GetStr() : "");
+    return currentValue ? currentValue : "";
   }
   virtual bool GetBool() const
   {
-    return (CurrentIterator ? CurrentIterator->GetBool() : false);
+  return (currentValue &&
+    (strcasecmp(currentValue, "true") == 0 ||
+     strcasecmp(currentValue, "yes" ) == 0 ||
+     strcasecmp(currentValue, "on"  ) == 0 ||
+     strcasecmp(currentValue, "1"   ) == 0));
   }
   virtual const char *GetComment() const
   {
-    return (CurrentIterator ? CurrentIterator->GetComment() : 0);
+    return currentComment ? currentComment : 0;
   }
 };
 

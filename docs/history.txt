@@ -12,10 +12,17 @@ chronological order.
 	- Jorrit removed the spiral mesh object plugin.
 	- Jorrit fixed walktest for the removal of spiral. Simply removed
 	  the spiral command. It isn't that useful.
+	- res fixed csConfigIterator::Rewind() not working properly.
 10-Oct-2006
 	- Marten added a "outward spiral" term to spiral particle effector.
 9-Oct-2006
+	- res fixed a problem in the iConfigIterator::HasNext() which
+	  manifested itself in scrambled "could not load plugin" messages
+	  and subsequent crash on startup.
 	- Marten added a "velocity-field" particle effector.
+8-Oct-2006
+	- res added iConfigIterator::HasNext(), loosely based on a patch by
+	  Timothy "kiolakin" Whitfield.
 7-Oct-2006
 	- Jorrit added a test to csPhysicalFile so that it no longer
 	  succeeds on directories.

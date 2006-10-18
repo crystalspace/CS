@@ -224,38 +224,33 @@ public:
   csConfigIterator(csConfigFile *Config, const char *Subsection);
   // Delete this iterator
   virtual ~csConfigIterator();
-
 private:
   friend class csConfigFile;
-  csConfigFile *Config;
-  csConfigNode *Node;
-  char *Subsection;
-  size_t SubsectionLength;
+  csRef<csConfigFile> Config;
+  csConfigNode* Node;
+  csConfigNode* nextNode;
+  csString Subsection;
 
   // Utility function to check if a key meets subsection requirement
   bool CheckSubsection(const char *Key) const;
   // Move to the previous node, ignoring subsection
   bool DoPrev();
-  // Move to the next node, ignoring subsection
-  bool DoNext();
   // Move to previous item and return true if the position is valid
   bool Prev ();
+  // Is there another valid key?
+  bool HasNext();
 };
 
-csConfigIterator::csConfigIterator(csConfigFile *c, const char *sub)
-  : scfImplementationType (this), Config (c)
+csConfigIterator::csConfigIterator(csConfigFile *c, const char *sub) :
+  scfImplementationType (this), Config (c), nextNode (Config->FirstNode), 
+  Subsection (sub)
 {
-  Node = Config->FirstNode;
-  Subsection = csStrNew(sub);
-  SubsectionLength = (Subsection ? strlen(Subsection) : 0);
-  Config->IncRef();
+  Next();
 }
 
 csConfigIterator::~csConfigIterator()
 {
   Config->RemoveIterator(this);
-  delete[] Subsection;
-  Config->DecRef();
 }
 
 iConfigFile *csConfigIterator::GetConfigFile() const
@@ -270,7 +265,8 @@ const char *csConfigIterator::GetSubsection() const
 
 void csConfigIterator::Rewind ()
 {
-  Node = Config->FirstNode;
+  nextNode = Config->FirstNode;
+  Next();
 }
 
 bool csConfigIterator::DoPrev()
@@ -280,17 +276,10 @@ bool csConfigIterator::DoPrev()
   return (Node->GetName() != 0);
 }
 
-bool csConfigIterator::DoNext()
-{
-  if (!Node->GetNext()) return false;
-  Node = Node->GetNext();
-  return (Node->GetName() != 0);
-}
-
 bool csConfigIterator::CheckSubsection(const char *Key) const
 {
-  return (SubsectionLength == 0 ||
-    strncasecmp(Key, Subsection, SubsectionLength) == 0);
+  return (Subsection.IsEmpty() ||
+    strncasecmp(Key, Subsection, Subsection.Length()) == 0);
 }
 
 bool csConfigIterator::Prev ()
@@ -300,24 +289,37 @@ bool csConfigIterator::Prev ()
   while (1)
   {
     if (!DoPrev()) return false;
-    if (CheckSubsection(Node->GetName())) return true;
+	if (CheckSubsection(Node->GetName())) return true;
   }
 }
 
 bool csConfigIterator::Next()
 {
-  if (!Subsection) return DoNext();
+  Node = nextNode;
+
+  if (Subsection.IsEmpty()) 
+  {
+    nextNode = Node->GetNext();
+    return Node != 0;
+  }
 
   while (1)
   {
-    if (!DoNext()) return false;
-    if (CheckSubsection(Node->GetName())) return true;
+    nextNode = nextNode->GetNext();
+    if (!nextNode || !nextNode->GetName()) break;
+    if (CheckSubsection(nextNode->GetName())) break;
   }
+  return (Node != 0) && (Node->GetName() != 0);
+}
+
+bool csConfigIterator::HasNext()
+{
+  return (nextNode != 0) && (nextNode->GetName() != 0);
 }
 
 const char *csConfigIterator::GetKey(bool Local) const
 {
-  return Node->GetName() + (Local ? SubsectionLength : 0);
+  return Node->GetName() + (Local ? Subsection.Length() : 0);
 }
 
 int csConfigIterator::GetInt() const

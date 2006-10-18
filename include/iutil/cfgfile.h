@@ -26,9 +26,9 @@
  * @{ */
 #include "csutil/scf_interface.h"
 #include "csutil/ref.h"
+
 struct iConfigIterator;
 struct iVFS;
-
 
 /**
  * Configuration file interface.
@@ -152,7 +152,7 @@ struct iConfigFile : public virtual iBase
  */
 struct iConfigIterator : public virtual iBase
 {
-  SCF_INTERFACE(iConfigIterator, 2,0,0);
+  SCF_INTERFACE(iConfigIterator, 2,1,0);
   /// Returns the configuration object for this iterator.
   virtual iConfigFile *GetConfigFile () const = 0;
   /// Returns the subsection in the configuration.
@@ -162,6 +162,9 @@ struct iConfigIterator : public virtual iBase
   virtual void Rewind () = 0;
   /// Move to the next valid key. Returns false if no more keys exist.
   virtual bool Next() = 0;
+  /// Return whether there is another valid key.
+  virtual bool HasNext() = 0;
+
 
   /**
    * Get the current key name.  Set Local to true to return only the local name
