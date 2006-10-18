@@ -157,7 +157,6 @@ bool csNullGraphics3D::Open ()
     w = h = -1;
     return false;
   }
-  bool fs = G2D->GetFullScreen ();
 
   pfmt = *G2D->GetPixelFormat ();
   SetDimensions (G2D->GetWidth (), G2D->GetHeight());
