@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+18-Oct-2006
+	- Jorrit forced the character2 shaders to use software animation
+	  since that works better on all hardware and also is faster
+	  in most cases.
 17-Oct-2006
 	- Jorrit fixed a memory leak in the engine (with camera
 	  positions).
