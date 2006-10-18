@@ -17,6 +17,7 @@ chronological order.
 	- res merged r25607 into 1.0 (vfs.cfg regeneration).
 	- res merged r25619 into 1.0 (genmeshify friendliness).
 	- res merged r25620, r25624 into 1.0 (typo + warning fixes).
+	- res merged r25626, r25629 into 1.0 (ptpdlight speedup).
 12-Oct-2006
 	- Jorrit merged r25568 into 1.0 (RK45 ODE solver).
 	- Jorrit merged r25590 into 1.0 (velocity-field effector).

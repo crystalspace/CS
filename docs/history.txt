@@ -6,8 +6,12 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+17-Oct-2006
+	- res fixed a compile error in ptpdlight.
 13-Oct-2006
 	- mdmkolbe fixed a few warnings.
+	- res changed ptpdlight to use fixed point math and to upload textures
+	  as BGRA (faster on NV).
 12-Oct-2006
 	- mdmkolbe commited part of the Cygwin path patch forgotten before.
 	- mdmkolbe added support for Cygwin mount points to VFS.
