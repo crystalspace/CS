@@ -6,6 +6,12 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+18-Oct-2006
+	- Eric Sunshine updated CS manual to refer to new Trac bug database
+	  rather than the deprecated SourceForge bug tracker. Also updated URL
+	  in manual for browsing sources in SVN rather than CVS.
+	- res changed the "Resources" manual page to point to the trac SVN
+	  browser and not the SF one.
 17-Oct-2006
 	- Jorrit fixed a memory leak in the engine (with camera
 	  positions).

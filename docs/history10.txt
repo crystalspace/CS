@@ -20,6 +20,7 @@ chronological order.
 	- res merged r25626, r25629 into 1.0 (ptpdlight speedup).
 	- res merged r25626:25628 into 1.0 (camera positions leak).
 	- res merged r25630 into 1.0 (memtracker breakage).
+	- res merged r25633, r25638 into 1.0 (doc updates).
 12-Oct-2006
 	- Jorrit merged r25568 into 1.0 (RK45 ODE solver).
 	- Jorrit merged r25590 into 1.0 (velocity-field effector).
