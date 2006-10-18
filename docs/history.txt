@@ -17,6 +17,8 @@ chronological order.
 	- Jorrit removed the spiral mesh object plugin.
 	- Jorrit fixed walktest for the removal of spiral. Simply removed
 	  the spiral command. It isn't that useful.
+	- res changed genmeshify to detect when a level name passed is a
+	  directory.
 11-Oct-2006
 	- res fixed genmesh to also support Compress() when submeshes are
 	  present.

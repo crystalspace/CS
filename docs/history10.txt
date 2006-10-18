@@ -15,6 +15,7 @@ chronological order.
 	- res merged r25596, r25604, r25606 into 1.0 (cygwin paths).
 	- res merged r25600 into 1.0 (genmesh Compress() + submeshes).
 	- res merged r25607 into 1.0 (vfs.cfg regeneration).
+	- res merged r25619 into 1.0 (genmeshify friendliness).
 12-Oct-2006
 	- Jorrit merged r25568 into 1.0 (RK45 ODE solver).
 	- Jorrit merged r25590 into 1.0 (velocity-field effector).
