@@ -69,7 +69,7 @@ Snapshots are generated daily and are accompanied by standard @samp{diff}-style
 You can also view the contents of the @sc{svn} repository online including
 all of the historical information.
 
-@uref{http://svn.sourceforge.net/viewvc/crystal/CS/trunk/}
+@uref{http://trac.crystalspace3d.org/trac/CS/browser/}
 
 @subheading Documentation
 @cindex Documentation, Obtaining
