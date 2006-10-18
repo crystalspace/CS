@@ -74,8 +74,9 @@ chronological order.
 2-Oct-2006
 	- Marten fixed csQuaternion::Exp and csQuaternion::Log to actually be
 	  the exponential and logarithmic functions.
+	- res removed the resolution and windowed vs fullscreen message from
+	  null3d.
 1-Oct-2006
-
 	- res silenced more MSVC deprecation warnings.
 	- res fixed some locals in CS::TriangleIndicesStream to use the 
 	  template parameter.

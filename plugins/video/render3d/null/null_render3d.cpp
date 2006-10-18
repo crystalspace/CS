@@ -157,14 +157,9 @@ bool csNullGraphics3D::Open ()
     w = h = -1;
     return false;
   }
-  bool fs = G2D->GetFullScreen ();
 
   pfmt = *G2D->GetPixelFormat ();
   SetDimensions (G2D->GetWidth (), G2D->GetHeight());
-
-  csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
-    "crystalspace.render3d.null", "Using %s mode %dx%d.",
-    fs ? "full screen" : "windowed", w, h);
 
   SetPerspectiveAspect (G2D->GetHeight ());
   SetPerspectiveCenter (G2D->GetWidth ()/2, G2D->GetHeight ()/2);
