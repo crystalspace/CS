@@ -11,6 +11,7 @@ chronological order.
 	- res merged r25538 into 1.0 (typo).
 	- res merged r25345:25347, r25585:25587, r25592, r25601:25603 into 1.0
 	  (configuration system).
+	- res merged r25587:25589 into 1.0 (docs search).
 12-Oct-2006
 	- Jorrit merged r25568 into 1.0 (RK45 ODE solver).
 	- Jorrit merged r25590 into 1.0 (velocity-field effector).

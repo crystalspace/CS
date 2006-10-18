@@ -20,6 +20,9 @@ chronological order.
 	  manifested itself in scrambled "could not load plugin" messages
 	  and subsequent crash on startup.
 	- Marten added a "velocity-field" particle effector.
+	- res updated the documentation transform script for the new site
+	  search URL.
+	- res slightly tweaked the API docs search box style.
 8-Oct-2006
 	- res added iConfigIterator::HasNext(), loosely based on a patch by
 	  Timothy "kiolakin" Whitfield.
