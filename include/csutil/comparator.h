@@ -65,7 +65,7 @@ public:
  * types. Assumes presence of `operator char const*()' (the cast operator).
  * Also works for normal C-strings.  Example:
  * \code
- * CS_SPECIALIZE_TEMPLATE csComparator<MyString> : 
+ * template<> csComparator<MyString> : 
  *   public csComparatorString<MyString> {};
  * \endcode
  */

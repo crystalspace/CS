@@ -168,7 +168,7 @@ public:
  * string types (must support cast to const char*).
  * Example:
  * \code
- * CS_SPECIALIZE_TEMPLATE csHashComputer<MyString> : 
+ * template<> csHashComputer<MyString> : 
  *   public csHashComputerString<MyString> {};
  * \endcode
  */

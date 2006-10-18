@@ -10,6 +10,7 @@ chronological order.
 	- Eric Sunshine updated CS manual to refer to new Trac bug database
 	  rather than the deprecated SourceForge bug tracker. Also updated URL
 	  in manual for browsing sources in SVN rather than CVS.
+	- res removed some leftovers from the earlier "compatibilisms" cleanup.
 	- res changed the "Resources" manual page to point to the trac SVN
 	  browser and not the SF one.
 17-Oct-2006
