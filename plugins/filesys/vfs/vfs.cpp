@@ -306,7 +306,8 @@ public:
   char *ConfigKey;
   // The array of real paths/archives bound to this virtual path
   csStringArray RPathV;
-  // The array of unexpanded real paths
+  // The array of real paths that haven't been platform expanded
+  // (e.g. Cygwin paths before they get expanded to Win32 paths)
   csStringArray UPathV;
   // The object registry.
   iObjectRegistry *object_reg;
@@ -981,12 +982,8 @@ bool VfsNode::AddRPath (const char *RealPath, csVFS *Parent)
       rc = true;
       UPathV.Push (src);
 
-      // Now parse this path
       char rpath [CS_MAXPATHLEN + 1];
-      size_t len = strlen (src);
-      len = MIN (len, CS_MAXPATHLEN);
-      memcpy (rpath, src, len);
-      rpath[len] = '\0';
+      csExpandPlatformFilename (src, rpath);
       RPathV.Push (rpath);
       src = cur + 1;
     } /* endif */
@@ -1006,8 +1003,8 @@ bool VfsNode::RemoveRPath (const char *RealPath, csVFS* Parent)
   } /* endif */
   csString const expanded_path = Expand(Parent, RealPath);
   size_t i;
-  for (i = 0; i < RPathV.Length (); i++)
-    if (strcmp ((char *)RPathV.Get (i), expanded_path) == 0)
+  for (i = 0; i < UPathV.Length (); i++)
+    if (strcmp ((char *)UPathV.Get (i), expanded_path) == 0)
     {
       RPathV.DeleteIndex (i);
       UPathV.DeleteIndex (i);

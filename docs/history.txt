@@ -7,13 +7,17 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 12-Oct-2006
+	- mdmkolbe commited part of the Cygwin path patch forgotten before.
 	- Jorrit changed the spiral particle system in partsys to use
 	  the new particles plugin.
 	- Jorrit removed the spiral mesh object plugin.
 	- Jorrit fixed walktest for the removal of spiral. Simply removed
 	  the spiral command. It isn't that useful.
+11-Oct-2006
 	- res fixed csConfigIterator::Rewind() not working properly.
 10-Oct-2006
+	- mdmkolbe fixed searching of Cygwin paths.
+	- mdmkolbe added CS_CONFIGDIR to configuration search paths on Cygwin.
 	- Marten added a "outward spiral" term to spiral particle effector.
 9-Oct-2006
 	- res fixed a problem in the iConfigIterator::HasNext() which
