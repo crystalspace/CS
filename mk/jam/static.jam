@@ -127,6 +127,10 @@ rule LinkStaticPlugins
     # First include static plugin info
     if ! $(HAVE_STATICDEPS.$(package))
     {
+      if ! $($(package).STATICDEPS)
+      {
+        Echo "$(target): Warning: no dependencies file for static plugin package \"$(package)\"" ;
+      }
       include $($(package).STATICDEPS) ;
       HAVE_STATICDEPS.$(package) = yes ;
     }
@@ -143,6 +147,10 @@ rule LinkStaticPlugins
     for p in $(plugins)
     {
       NotFile $(p) ;
+      if ! [ IsElem $(p) : $(STATICPLUGINS.AVAILABLE) ]
+      {
+        Echo "$(target): Warning: Static plugin \"$(p)\" from package \"$(package)\" not available." ;
+      }
       CFlags $(target) : $(STATICPLUGIN.$(p).CFLAGS) ;
       lflags = [ MergeLFlags $(lflags) : $(STATICPLUGIN.$(p).LFLAGS) ] ;
     }
