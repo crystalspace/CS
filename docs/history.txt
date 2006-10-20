@@ -10,6 +10,13 @@ chronological order.
 	- PK fixed a small bug in the parallax shaders.
 	- res added some issue reporting to the static plugin linking Jam
 	  code.
+	- res changed the python detection code to separately check whether 
+	  the pythonX.X/config dir must be specified to link the python lib.
+	  The reason is that this directory seems to contain a static library
+	  which gets preferred over the shared version, however, this static
+	  lib seems to work somewhat worse than the shared version. Hence,
+	  adjust the lib dir search strategy such that a path with a shared
+	  version is preferred.
 18-Oct-2006
 	- Eric Sunshine updated CS manual to refer to new Trac bug database
 	  rather than the deprecated SourceForge bug tracker. Also updated URL
