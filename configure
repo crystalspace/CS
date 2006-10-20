@@ -11096,13 +11096,14 @@ else
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	    cs_cv_pybase_lflags=''
+	    cs_cv_pybase_lflags_base=''
 	    if test -d "$cs_cv_pybase_syslib"; then
-  cs_cv_pybase_lflags="$cs_cv_pybase_lflags -L$cs_cv_pybase_syslib"
+  cs_cv_pybase_lflags_base="$cs_cv_pybase_lflags_base -L$cs_cv_pybase_syslib"
 fi
 
+	    cs_cv_pybase_lflags_ext='$cs_cv_pybase_lflags_base'
 	    if test -d "$cs_cv_pybase_syslib/config"; then
-  cs_cv_pybase_lflags="$cs_cv_pybase_lflags -L$cs_cv_pybase_syslib/config"
+  cs_cv_pybase_lflags_ext="$cs_cv_pybase_lflags_ext -L$cs_cv_pybase_syslib/config"
 fi
 
 	    if test -d "$cs_cv_pybase_sysprefix/lib"; then
@@ -11170,14 +11171,22 @@ echo "${ECHO_T}$cs_cv_python_sdk" >&6
 fi
 
 	    cs_pywinlib=`echo "$cs_cv_pybase" | sed 's/\.//g'`
-	    cs_pyflags="$cs_pyflags `echo @@@$cs_cv_pybase_lflags -framework Python | sed 'y% %#%'`"
+	    cs_pyflags="$cs_pyflags `echo @@@$cs_cv_pybase_lflags_base -framework Python | sed 'y% %#%'`"
 	    cs_pyflags="$cs_pyflags `echo @@@$cs_cv_pybase_sysprefix_lflags -framework Python | sed 'y% %#%'`"
-	    cs_pyflags="$cs_pyflags `echo @@@$cs_cv_pybase_lflags -l$cs_cv_pybase | sed 'y% %#%'`"
+	    cs_pyflags="$cs_pyflags `echo @@@$cs_cv_pybase_lflags_ext -framework Python | sed 'y% %#%'`"
+
+	    cs_pyflags="$cs_pyflags `echo @@@$cs_cv_pybase_lflags_base -l$cs_cv_pybase | sed 'y% %#%'`"
 	    cs_pyflags="$cs_pyflags `echo @@@$cs_cv_pybase_sysprefix_lflags -l$cs_cv_pybase | sed 'y% %#%'`"
-	    cs_pyflags="$cs_pyflags `echo @@@$cs_cv_pybase_lflags -l$cs_pywinlib | sed 'y% %#%'`"
+	    cs_pyflags="$cs_pyflags `echo @@@$cs_cv_pybase_lflags_ext -l$cs_cv_pybase | sed 'y% %#%'`"
+
+	    cs_pyflags="$cs_pyflags `echo @@@$cs_cv_pybase_lflags_base -l$cs_pywinlib | sed 'y% %#%'`"
 	    cs_pyflags="$cs_pyflags `echo @@@$cs_cv_pybase_sysprefix_lflags -l$cs_pywinlib | sed 'y% %#%'`"
-	    cs_pyflags="$cs_pyflags `echo @@-bundle -flat_namespace -undefined suppress@$cs_cv_pybase_lflags | sed 'y% %#%'`"
+	    cs_pyflags="$cs_pyflags `echo @@@$cs_cv_pybase_lflags_ext -l$cs_pywinlib | sed 'y% %#%'`"
+
+	    cs_pyflags="$cs_pyflags `echo @@-bundle -flat_namespace -undefined suppress@$cs_cv_pybase_lflags_base | sed 'y% %#%'`"
 	    cs_pyflags="$cs_pyflags `echo @@-bundle -flat_namespace -undefined suppress@$cs_cv_pybase_sysprefix_lflags | sed 'y% %#%'`"
+	    cs_pyflags="$cs_pyflags `echo @@-bundle -flat_namespace -undefined suppress@$cs_cv_pybase_lflags_ext | sed 'y% %#%'`"
+
 	    if test "" != yes; then
   echo "$as_me:$LINENO: checking if python SDK is usable" >&5
 echo $ECHO_N "checking if python SDK is usable... $ECHO_C" >&6
