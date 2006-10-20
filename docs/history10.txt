@@ -8,6 +8,7 @@ chronological order.
 
 20-Oct-2006
 	- res merged r25652 into 1.0 (parallax shader fix).
+	- res merged r25653 into 1.0 (static plugin linking issue reporting).
 18-Oct-2006
 	- res merged r25517 into 1.0 (remove pointless null3d message).
 	- res merged r25538 into 1.0 (typo).
