@@ -9,6 +9,11 @@ chronological order.
 23-Oct-2006
 	- dfryer fixed some OS X / PowerPC specific compile problems in 
 	  threading support stuff.
+	- Jorrit added iSector->PrecacheDraw(). This function will
+	  precache the visibility culler. In addition it will also render
+	  one frame of that sector with as much visible as possible.
+	  This also helps precaching the shaders. iEngine->PrecacheDraw()
+	  will now call iSector->PrecacheDraw().
 20-Oct-2006
 	- PK fixed a small bug in the parallax shaders.
 	- res added some issue reporting to the static plugin linking Jam

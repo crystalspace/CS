@@ -24,6 +24,7 @@
 #include "csutil/csppulse.h"
 #include "csutil/csstring.h"
 #include "csutil/debug.h"
+#include "cstool/csview.h"
 #include "iengine/portal.h"
 #include "iengine/rview.h"
 #include "igeom/clip2d.h"
@@ -324,6 +325,45 @@ void csSector::RelinkMesh (iMeshWrapper *mesh)
     if (child)
       RelinkMesh (child);
   }
+}
+
+void csSector::PrecacheDraw ()
+{
+  GetVisibilityCuller ()->PrecacheCulling ();
+
+  // First calculate the box of all objects in the level.
+  csBox3 box;
+  box.StartBoundingBox ();
+  int i;
+  for (i = 0; i < meshes.GetCount (); i++)
+  {
+    iMeshWrapper* m = meshes.Get (i);
+    const csBox3& mesh_box = m->GetWorldBoundingBox ();
+    box += mesh_box;
+  }
+
+  // Try to position our camera somewhere above the bounding
+  // box of the sector so we see as much as possible.
+  csVector3 pos = box.GetCenter ();
+  pos.y = box.MaxY () + (box.MaxY () - box.MinY ());
+  csVector3 lookat = pos;
+  lookat.y = box.MinY ();
+
+  csRef<iGraphics3D> g3d = csQueryRegistry<iGraphics3D> (
+      engine->objectRegistry);
+  csRef<csView> view;
+  view.AttachNew (new csView (engine, g3d));
+  iGraphics2D* g2d = g3d->GetDriver2D ();
+  view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());
+
+  iCamera* camera = view->GetCamera ();
+  camera->SetSector (this);
+  camera->GetTransform ().SetOrigin (pos);
+  camera->GetTransform ().LookAt (lookat-pos, csVector3 (0, 0, 1));
+
+  // @@@ Ideally we would want to disable visibility culling
+  // here so that all objects are visible.
+  view->Draw ();
 }
 
 //----------------------------------------------------------------------
