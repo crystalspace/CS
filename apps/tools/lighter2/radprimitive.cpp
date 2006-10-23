@@ -38,6 +38,7 @@ namespace lighter
       max.x = csMax (max.x, uv.x);
       max.y = csMax (max.y, uv.y);
     }
+    max += csVector2(0.5f, 0.5f);
   }
 
   void RadPrimitive::ComputePlane ()
@@ -463,25 +464,37 @@ namespace lighter
     maxUV.x = maxu; maxUV.y = maxv;
 
     // Min xyz
-    csVector2 d = minUV - vertexData.vertexArray[indexArray[0]].lightmapUV;
-    minCoord = vertexData.vertexArray[indexArray[0]].position + uFormVector * d.x + vFormVector * d.y;
+    csVector2 d = minUV - 
+      (vertexData.vertexArray[indexArray[0]].lightmapUV + csVector2 (0.5f));
+    minCoord = vertexData.vertexArray[indexArray[0]].position 
+      + uFormVector * d.x + vFormVector * d.y;
     
     // Number of patches in u/v direction
-    uPatches = uc / uResolution;
-    vPatches = vc / vResolution;
-    if (uc % uResolution) uPatches++;
-    if (vc % vResolution) vPatches++;
+    if ((uResolution > 0) && (vResolution > 0))
+    {
+      uPatches = uc / uResolution;
+      vPatches = vc / vResolution;
+      if (uc % uResolution) uPatches++;
+      if (vc % vResolution) vPatches++;
+    }
+    else
+    {
+      uPatches = vPatches = 0;
+    }
 
     csArray<int> patchECount;
 
     // Set some default info
-    RadPatch dpatch;
-    dpatch.area = 0.0f;
-    dpatch.energy = illuminationColor;
-    dpatch.plane = plane;
-    dpatch.center = csVector3 (0.0f);
-    patches.SetSize (uPatches * vPatches, dpatch);
-    patchECount.SetSize (uPatches * vPatches, 0);
+    if ((uResolution > 0) && (vResolution > 0))
+    {
+      RadPatch dpatch;
+      dpatch.area = 0.0f;
+      dpatch.energy = illuminationColor;
+      dpatch.plane = plane;
+      dpatch.center = csVector3 (0.0f);
+      patches.SetSize (uPatches * vPatches, dpatch);
+      patchECount.SetSize (uPatches * vPatches, 0);
+    }
     elementAreas.SetCapacity (uc * vc);
 
     // Create our splitplanes
@@ -575,90 +588,7 @@ namespace lighter
 
     patches.ShrinkBestFit ();
     elementAreas.ShrinkBestFit ();
-  }
-
-  void RadPrimitive::PrepareNoPatches ()
-  {
-    // Reset current data
-    elementAreas.Empty ();
-
-    // Compute min/max uv
-    uint uc, vc;
-    int maxu, minu, maxv, minv;
-    ComputeMinMaxUV (minu, maxu, minv, maxv);
-
-    uc = maxu - minu + 1;
-    vc = maxv - minv + 1;
-
-    minUV.x = minu; minUV.y = minv;
-    maxUV.x = maxu; maxUV.y = maxv;
-
-    // Min xyz
-    csVector2 d = minUV - vertexData.vertexArray[indexArray[0]].lightmapUV;
-    minCoord = vertexData.vertexArray[indexArray[0]].position + uFormVector * d.x + vFormVector * d.y;
-
-    elementAreas.SetCapacity (uc * vc);
-
-    // Create our splitplanes
-    csPlane3 uCut (plane.Normal () % vFormVector);
-    csVector3 uCutOrigin = minCoord;
-    uCut.SetOrigin (uCutOrigin);
-
-    csPlane3 vCut (plane.Normal () % uFormVector);
-    csVector3 vCutOrigin = minCoord;
-    vCut.SetOrigin (vCutOrigin);
-
-    // Make sure they face correct way
-    csVector3 primCenter = GetCenter ();
-    if (uCut.Classify (primCenter) < 0) uCut.Normal () = -uCut.Normal ();
-    if (vCut.Classify (primCenter) < 0) vCut.Normal () = -vCut.Normal ();
-
-    // Start slicing
-    csPoly3D poly = BuildPoly3D ();
-
-    csPlane3 evCut = vCut;
-    for (uint v = 0; v  < vc; v++)
-    {
-      vCutOrigin += vFormVector;
-      evCut.SetOrigin (vCutOrigin);
-
-      // Cut of a row
-      csPoly3D elRow, rest;
-      if (v < (vc-1)) 
-      {
-        poly.SplitWithPlane (elRow, rest, evCut);
-        poly = rest;
-      }
-      else
-      {
-        elRow = rest;
-      }
-
-      // Cut into elements
-      csPlane3 euCut = uCut;
-      csVector3 euOrigin = uCutOrigin;
-      for (uint u = 0; u < uc; u++)
-      {
-        euOrigin += uFormVector;
-        euCut.SetOrigin (euOrigin);
-
-        csPoly3D el, restRow;
-        if (u < (uc-1))
-        {
-          elRow.SplitWithPlane (el, restRow, euCut);
-          elRow = restRow;
-        }
-        else
-        {
-          el = elRow;
-        }
-
-        float elArea = el.GetArea ();
-        elementAreas.Push (elArea);
-      }
-    }
-
-    elementAreas.ShrinkBestFit ();
+    ComputeBaryCoeffs();
   }
 
   csPoly3D RadPrimitive::BuildPoly3D () const
@@ -727,6 +657,94 @@ namespace lighter
     if (back == 0) return CS_POL_FRONT;
     if (front == 0) return CS_POL_BACK;
     return CS_POL_SPLIT_NEEDED;
+  }
+
+  void RadPrimitive::ComputeBaryCoeffs ()
+  {
+    const csVector3& v1 = vertexData.vertexArray[indexArray[0]].position;
+    const csVector3& v2 = vertexData.vertexArray[indexArray[1]].position;
+    const csVector3& v3 = vertexData.vertexArray[indexArray[2]].position;
+
+    csVector3 diff1_3 = v1 - v3;
+    csVector3 diff2_3 = v2 - v3;
+
+    /* In the divisor, one of both diff1_3 and diff2_3 .x, .y. or .z appear.
+     * Pick one where the two are not both zero (can happen with coplanar
+     * tris.) */
+    int dividingCoord = 0;
+    while ((fabsf (diff1_3[dividingCoord]) < SMALL_EPSILON)
+      && (fabsf (diff2_3[dividingCoord]) < SMALL_EPSILON)
+      && (dividingCoord < 2))
+      dividingCoord++;
+
+    float coeff1_3, coeff2_3;
+    switch (dividingCoord)
+    {
+      case 0:
+        {
+          coeff1_3 = diff2_3[1] + diff2_3[2];
+          coeff2_3 = diff1_3[1] + diff1_3[2];
+          float lambda_factor = 1.0f / 
+            (diff1_3[0]*coeff1_3 - diff2_3[0]*coeff2_3);
+          float my_factor = 1.0f / 
+            (diff2_3[0]*coeff2_3 - diff1_3[0]*coeff1_3);
+          lambdaCoeffTV.Set (
+            -coeff1_3 * lambda_factor, 
+            diff2_3[0]*lambda_factor, 
+            diff2_3[0]*lambda_factor);
+          myCoeffTV.Set (
+            -coeff2_3 * my_factor, 
+            diff1_3[0]*my_factor, 
+            diff1_3[0]*my_factor);
+        }
+        break;
+      case 1:
+        {
+          coeff1_3 = diff2_3[0] + diff2_3[2];
+          coeff2_3 = diff1_3[0] + diff1_3[2];
+          float lambda_factor = 1.0f / 
+            (diff1_3[1]*coeff1_3 - diff2_3[1]*coeff2_3);
+          float my_factor = 1.0f / 
+            (diff2_3[1]*coeff2_3 - diff1_3[1]*coeff1_3);
+          lambdaCoeffTV.Set (
+            diff2_3[1]*lambda_factor, 
+            -coeff1_3 * lambda_factor, 
+            diff2_3[1]*lambda_factor);
+          myCoeffTV.Set (
+            diff1_3[1]*my_factor, 
+            -coeff2_3 * my_factor, 
+            diff1_3[1]*my_factor);
+        }
+        break;
+      case 2:
+        {
+          coeff1_3 = diff2_3[0] + diff2_3[1];
+          coeff2_3 = diff1_3[0] + diff1_3[1];
+          float lambda_factor = 1.0f / 
+            (diff1_3[2]*coeff1_3 - diff2_3[2]*coeff2_3);
+          float my_factor = 1.0f / 
+            (diff2_3[2]*coeff2_3 - diff1_3[2]*coeff1_3);
+          lambdaCoeffTV.Set (
+            diff2_3[2]*lambda_factor, 
+            diff2_3[2]*lambda_factor, 
+            -coeff1_3 * lambda_factor);
+          myCoeffTV.Set (
+            diff1_3[2]*my_factor, 
+            diff1_3[2]*my_factor, 
+            -coeff2_3 * my_factor);
+        }
+        break;
+    }
+  }
+
+  void RadPrimitive::ComputeBaryCoords (const csVector3& v, float& lambda, 
+                                        float& my) const
+  {
+    csVector3 thirdPosToV = 
+      vertexData.vertexArray[indexArray[2]].position - v;
+
+    lambda = (lambdaCoeffTV * thirdPosToV);
+    my = (myCoeffTV * thirdPosToV);
   }
 
 }

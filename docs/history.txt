@@ -22,6 +22,7 @@ chronological order.
 	- res changed the genmesh saver to not write out triangles when
 	  a factory has submeshes.
 	- res added iGeneralFactoryState::DisableAutoNormals().
+	- res added normal interpolation for primitives to lighter2.
 20-Oct-2006
 	- PK fixed a small bug in the parallax shaders.
 	- res added some issue reporting to the static plugin linking Jam
