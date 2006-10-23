@@ -847,11 +847,15 @@ bool csGeneralFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent,
       ->SetValueAsInt(gfact->GetVertexCount());
 
     //Write NumTri Tag
-    csRef<iDocumentNode> numtriNode = 
-      paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-    numtriNode->SetValue("numtri");
-    numtriNode->CreateNodeBefore(CS_NODE_TEXT, 0)
-      ->SetValueAsInt(gfact->GetTriangleCount());
+    bool writeTriangles = gfact->GetSubMeshCount() == 0;
+    if (writeTriangles)
+    {
+      csRef<iDocumentNode> numtriNode = 
+        paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+      numtriNode->SetValue("numtri");
+      numtriNode->CreateNodeBefore(CS_NODE_TEXT, 0)
+        ->SetValueAsInt(gfact->GetTriangleCount());
+    }
 
     int i;
     //Write Vertex Tags
@@ -881,15 +885,18 @@ bool csGeneralFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent,
     }
 
     //Write Triangle Tags
-    for (i=0; i<gfact->GetTriangleCount(); i++)
+    if (writeTriangles)
     {
-      csRef<iDocumentNode> triaNode = 
-        paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-      triaNode->SetValue("t");
-      csTriangle tria = gfact->GetTriangles()[i];
-      triaNode->SetAttributeAsInt("v1", tria.a);
-      triaNode->SetAttributeAsInt("v2", tria.b);
-      triaNode->SetAttributeAsInt("v3", tria.c);
+      for (i=0; i<gfact->GetTriangleCount(); i++)
+      {
+        csRef<iDocumentNode> triaNode = 
+          paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+        triaNode->SetValue("t");
+        csTriangle tria = gfact->GetTriangles()[i];
+        triaNode->SetAttributeAsInt("v1", tria.a);
+        triaNode->SetAttributeAsInt("v2", tria.b);
+        triaNode->SetAttributeAsInt("v3", tria.c);
+      }
     }
 
     //Writedown DefaultColor tag
@@ -983,7 +990,7 @@ bool csGeneralFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent,
     //TBD: Writedown box tag
 
     // Write submeshes
-    if (gfact->GetSubMeshCount() > 0)
+    if (!writeTriangles)
     {
       size_t smc = gfact->GetSubMeshCount();
       for (size_t s = 0; s < smc; s++)
