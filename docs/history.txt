@@ -93,6 +93,9 @@ chronological order.
 	  such problem so probably cases about driver problem.
 	- Erroroman adopted kwartz model and the animation shaders to the new
 	  type of the render buffer.
+	- Erroroman improoved the script for exporting skeletal meshes from
+	  3ds max (still not fully finished)and added some more info to 
+	  the README file.
 4-Oct-2006
 	- Jorrit updated startme:
 	    - Made the icons show from top to bottom.
