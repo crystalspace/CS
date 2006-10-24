@@ -1,4 +1,5 @@
 <shader compiler="xmlshader" name="character_bump2">
+  <!--
   <technique priority="150">
     <pass>
         <mixmode><srcalphaadd /></mixmode>
@@ -18,6 +19,7 @@
 	  </fp>
      </pass>
   </technique>
+  -->
   <technique priority="100">
   <pass>
 	  <mixmode><srcalphaadd /></mixmode>

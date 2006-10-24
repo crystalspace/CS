@@ -6,6 +6,7 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+<<<<<<< .working
 20-Oct-2006
 	- PK fixed a small bug in the parallax shaders.
 	- res added some issue reporting to the static plugin linking Jam
@@ -18,6 +19,9 @@ chronological order.
 	  adjust the lib dir search strategy such that a path with a shared
 	  version is preferred.
 18-Oct-2006
+	- Jorrit forced the character2 shaders to use software animation
+	  since that works better on all hardware and also is faster
+	  in most cases.
 	- Eric Sunshine updated CS manual to refer to new Trac bug database
 	  rather than the deprecated SourceForge bug tracker. Also updated URL
 	  in manual for browsing sources in SVN rather than CVS.
