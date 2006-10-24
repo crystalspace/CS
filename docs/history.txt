@@ -21,7 +21,8 @@ chronological order.
 	- Eric Sunshine updated CS manual to refer to new Trac bug database
 	  rather than the deprecated SourceForge bug tracker. Also updated URL
 	  in manual for browsing sources in SVN rather than CVS.
-	- res removed some leftovers from the earlier "compatibilisms" cleanup.
+	- res removed some leftovers from the earlier "compatibilisms"
+	  cleanup.
 	- res changed the "Resources" manual page to point to the trac SVN
 	  browser and not the SF one.
 17-Oct-2006
@@ -59,10 +60,10 @@ chronological order.
 	- res fixed a problem in the iConfigIterator::HasNext() which
 	  manifested itself in scrambled "could not load plugin" messages
 	  and subsequent crash on startup.
-	- Marten added a "velocity-field" particle effector.
 	- res updated the documentation transform script for the new site
 	  search URL.
 	- res slightly tweaked the API docs search box style.
+	- Marten added a "velocity-field" particle effector.
 8-Oct-2006
 	- res added iConfigIterator::HasNext(), loosely based on a patch by
 	  Timothy "kiolakin" Whitfield.
@@ -77,11 +78,11 @@ chronological order.
 	  queue up messages that are reported while in the reporter.
 6-Oct-2006
 	- caedes added kwartz and castle to Jamfiles.
+	- Marten added a RK45 ODE solver to be used in particle effector.
 	- res slightly reworded the section on procedural textures. Also added
 	  "performance hints".
 	- res changed the genmesh loader and saver to also accept factory 
 	  submeshes without a material.
-	- Marten added a RK45 ODE solver to be used in particle effector.
 5-Oct-2006
 	- Marten changed win32 version resource generation so it strips
 	  any RCxxx tags, appearantly they trip the mingw resource
@@ -109,29 +110,25 @@ chronological order.
 	  Another benefit of this change is that it improves speed as
 	  you can now reduce the light radius with same visual effect.
 	- Jorrit reduces the light radius in castle level.
-3-Oct-2006
 	- Marten fixed a corner case in csQuaternion::Exp and 
 	  csQuaternion::Log as well as some accuracy and efficiency parts in
 	  skeleton spline calculation.
-	- Jorrit committed a new extrudeGlow shader from Anders Wisur.
-	  Still experimental.
-	- Jorrit added a few missing Jamfile's in the data/shader directory.
 	- Jorrit added a fallback for light_bumpmap to the light specular
 	  shader. That means that parallaxAtt will also correctly fallback
 	  to light_bumpmap if CG is not available or fails.
 	- Marten fixed a bug in the shader manager which caused shader manager
 	  (the global) SVs not to be properly pushed to the SV stack.
 2-Oct-2006
-	- Marten fixed csQuaternion::Exp and csQuaternion::Log to actually be
-	  the exponential and logarithmic functions.
 	- res removed the resolution and windowed vs fullscreen message from
 	  null3d.
+	- Marten fixed csQuaternion::Exp and csQuaternion::Log to actually be
+	  the exponential and logarithmic functions.
 1-Oct-2006
 	- res silenced more MSVC deprecation warnings.
 	- res fixed some locals in CS::TriangleIndicesStream to use the 
 	  template parameter.
-	- caedes removed stdtex from data Jamfile.
 	- res added iShaderVariableContext::RemoveVariable (csShaderVariable*).
+	- caedes removed stdtex from data Jamfile.
 30-Sep-2006
 	- res fixed some MSVC warnings.
 	- res fixed some wrong GL extension function declarations and added
@@ -163,7 +160,7 @@ chronological order.
 	- Jorrit added license note to castle level and castle textures.
 	  Castle uses Creative Commons NC:
 	  http://creativecommons.org/licenses/by-nc/2.5
-	- Jorrit made castle default level in walktest now1.
+	- Jorrit made castle default level in walktest now.
 	- Erroroman optimized character_bump2.cgvp by calculating bitangent
 	  as cross product of normal and tangent. Also removed bitangent
 	  from tehnique 150 in character_bump2.xml.
@@ -178,12 +175,6 @@ chronological order.
 	  fail now. That means that the workaround in gldrivers.xml is
 	  no longer required.
 	- Erroroman added more API docs in skeleton.h
-29-Sep-2006
-	- res removed the following compatiblity hacks for older compilers
-	  (which would likely not be able to cope with CS' use of advanced
-	  C++ features anyway): 'typename_qualifier', fake 'explicit' 
-	  keyword, CS_SPECIALIZE_TEMPLATE instead of template<>, 
-	  CSARRAY_INHIBIT_TYPED_KEYS. Adresses trac #16.
 28-Sep-2006
 	- mdmkolbe changed walktest to exit with code 0 on normal exits.
 	- mdmkolbe blind committed a change by Timothy "kiolakin" Whitfield
@@ -268,58 +259,48 @@ chronological order.
 	- res fixed the Cg shader plugin to also take compiler options from
 	  the configuration when fragment program routing is used.
 	- res added the definition of a preprocessor macro that contains the
-	  fragment program version when compiling fragment progtams to the Cg 
+	  fragment program version when compiling fragment progtams to the Cg
 	  shader plugin.
 19-Sep-2006
         - Genjix documented a little csIntersect3 behaviour.
 18-Sep-2006
 	- caedes changed cegui plugin name to cscegui.
-	- Jorrit fixed a misplaced 'break' in ParseMixMode() of the syntax
-	  services plugin. This would cause MESH mixmode to be interpreted
-	  as ALPHATEST instead.
-	- caedes fixed some warnings on cspace.i generation:
-	  - instantiated iArrayReadOnly<iSceneNode*> using %template.
-	  - %ignore ShaderVarName from csgfx/shadervar.h.
 	- Jorrit made csComparatorString safe with regards to null strings.
 	  This is now needed since a recent fix in csHash is using this
 	  comparator to compare keys and keys can sometimes be 0 (empty
 	  string).
 	- Jorrit fixed another bug in csString::GetHash(). This function
 	  would also crash if the string was empty (i.e. null pointer).
+	- Jorrit fixed a misplaced 'break' in ParseMixMode() of the syntax
+	  services plugin. This would cause MESH mixmode to be interpreted
+	  as ALPHATEST instead.
+	- caedes fixed some warnings on cspace.i generation:
+	  - instantiated iArrayReadOnly<iSceneNode*> using %template.
+	  - %ignore ShaderVarName from csgfx/shadervar.h.
 17-Sep-2006
-	- PK changed SimpVS to use CEGUI instead of AWS.
 	- res fixed a bug in the software renderer vertex transformer that
 	  caused the output vertex buffers to be underfilled.
 	- res updated a gldrivers tweak to include certain NV Quadro chips.
 	- res updated a gldrivers tweak to include GF2 GTS chips.
-	- Marten augmented SCF docs with some info about inheritance of 
+	- Marten augmented SCF docs with some info about inheritance of
 	  interfaces and implementations.
+	- PK changed SimpVS to use CEGUI instead of AWS.
 	- res added an overview of the shader system to the manual (based off
 	  his conference talk).
 16-Sep-2006
-	- PK upgraded the ice skin to work with CEGUI 5.0RC2.
-	- PK improved the viewmesh standard dialog a little.
-	- res fixed shared library creation for cygwin with -mno-cygwin using
-	  the solution from Peter Amstutz stated in trac #132.
 	- res declared the weak event listener functions as exported and put
 	  them into the CS namespace.
+	- res fixed shared library creation for cygwin with -mno-cygwin using
+	  the solution from Peter Amstutz stated in trac #132.
 	- Erroroman fixed a bit the new animation shaders.
+	- PK upgraded the ice skin to work with CEGUI 5.0RC2.
+	- PK improved the viewmesh standard dialog a little.
 15-Sep-2006
 	- Jorrit fixed viewmesh so that it starts at the current dir instead
 	  of an internal CEGUI directory.
-	- res changed CS_DEPRECATED_TYPE to be useable on MSVC as well.
-	- res fixed the doxygen settings to correctly handle the
-	  CS_DEPRECATED_..._MSG macros.
-	- res marked some types and methods that were deprecated as per the
-	  API docs with the deprecation macros. Also changed some instances
-	  to use the _MSG variant. Lastly, fixed some deprecation warnings.
-	- res removed some unneeded members from csGraphics3DCaps.
-	- res noted some compiler versions on the requirements manual page.
-	- res updated the docs for the new cs-win32libs version.
-	- res added -mno-cygwin support to configure.
 	- Erroroman did the following:
-	  - added Update() function to genmesh animation interface. It is a 
-	    general update function that is not related to updating render 
+	  - added Update() function to genmesh animation interface. It is a
+	    general update function that is not related to updating render
 	    buffer data.
 	  - updating bones mapping in gmeshskelanim2 is now in Update method.
 	  - changted gmeshskelanim2 bones mapping data
@@ -330,30 +311,39 @@ chronological order.
 	  - adopted vproc_std to access bones and handle skinned vertices.
 	  - added new shaders for animating genmeshes - character2.xml and
 	    character_bump2.xml.The new shaders provides 4 bones per vertex
-	    mapping and software animation using vproc_std. The old shaders 
+	    mapping and software animation using vproc_std. The old shaders
 	    will be removed after improving of the new ones.
+	- res changed CS_DEPRECATED_TYPE to be useable on MSVC as well.
+	- res fixed the doxygen settings to correctly handle the
+	  CS_DEPRECATED_..._MSG macros.
+	- res marked some types and methods that were deprecated as per the
+	  API docs with the deprecation macros. Also changed some instances
+	  to use the _MSG variant. Lastly, fixed some deprecation warnings.
+	- res removed some unneeded members from csGraphics3DCaps.
+	- res noted some compiler versions on the requirements manual page.
+	- res updated the docs for the new cs-win32libs version.
+	- res added -mno-cygwin support to configure.
 12-Sep-2006
-	- PK extended the ice-skin for tabbuttons.
-	- Marten fixed csColor4 for operators + - * and /.
-	- Jorrit changed walktest to use new particles for explosion.
 	- Jorrit fixed a bug with iSector->HitBeamPortals(). It was
 	  broken and failed to detect the correct destination sector.
+	- Marten fixed csColor4 for operators + - * and /.
+	- Jorrit changed walktest to use new particles for explosion.
+	- PK extended the ice-skin for tabbuttons.
 11-Sep-2006
+	- Marten fixed (hopefully) the script building (with Swig) on both
+	  older swigs and for jobber.
 	- Jorrit fixed a bug in particles and particlesldr. It would
 	  initialize start time to -1 which caused particles to fail on
 	  particle systems with very small duration.
-	- Jorrit added a commented out version of the explosion in walktest
-	  using the new particle system. Doesn't yet work 100% (fading is
-	  broken).
 	- Jorrit added a new system in the CS engine so that objects can have
 	  themselves removed after a specific interval. Call
 	  iEngine->DelayedRemoveObject() with an object (any object that can
 	  be removed through the normal iEngine->RemoveObject()) and a delay.
 	  This new system is more general then the old iEngine->WantToDie()
 	  method that is called by some particle systems.
-11-Sep-2006
-	- Marten fixed (hopefully) the script building (with Swig) on both 
-	  older swigs and for jobber.
+	- Jorrit added a commented out version of the explosion in walktest
+	  using the new particle system. Doesn't yet work 100% (fading is
+	  broken).
 10-Sep-2006
 	- PK changed ViewMesh to use CEGUI instead of AWS.
 	- PK fixed a bug in csHash::Delete (const K& key, const T &value).
@@ -362,14 +352,14 @@ chronological order.
 	  a boolean localmode. This makes it possible to have world-space
 	  particles with local space emitter.
 8-Sep-2006
-        - res added tests for some more GL types.
+	- res added tests for some more GL types.
 	- caedes updated cspace.i for the new particles.
 	- res added some more GL extensions and missing GL versions up to 2.1
 	  to the extension manager.
 	- res fixed the glshader_fixed plugin to depend on GL 1.4 for texture
 	  crossbar support and not 1.3.
 	- res fixed a couple of gcc 4.1 optimize warnings.
-	- res fixed _cspace.so.dbg being tried to be split off before 
+	- res fixed _cspace.so.dbg being tried to be split off before
 	  _cspace.so is built when installing. Fixes trac #11.
 	- res added debug info splitting for the CS JNI library.
 	- res changed ptpdlight to #include <limits.h> as per SFbug:1546141.
@@ -383,32 +373,32 @@ chronological order.
 	  now just does a test and returns false in case the assistant
 	  is gone. That way stuff can reset the mouse cursor during
 	  destruction of Crystal Space.
-        - res fixed an issue with the Java bindings where symbols didn't get
-          exported properly from the JNI glue shared library due being hidden
-          by -fvisibility=hidden. Worked around that by also specifying 
-          -fvisibility=default when compiling the JNI glue, causing the
-          symbols to get exported correctly again.
+	- res fixed an issue with the Java bindings where symbols didn't get
+	  exported properly from the JNI glue shared library due being hidden
+	  by -fvisibility=hidden. Worked around that by also specifying
+	  -fvisibility=default when compiling the JNI glue, causing the
+	  symbols to get exported correctly again.
 	- res disabled strict aliasing when compiling the Java JNI glue. This
 	  fixes some issues in release builds.
 	- res fixed some errors having crept into SimpleRoom.java when it was
 	  updated to work with latest CS.
-	- Marten made a small SWIG-tweak to shut up an error from newer 
+	- Marten made a small SWIG-tweak to shut up an error from newer
 	  SWIG versions.
 	- Marten made partconv not crash.
 	- Marten converted nullmesh to new SCF syntax.
 5-Sep-2006
 	- res fixed the Java bindings to build again.
 4-Sep-2006
-        - res changed the configure program version check to support checking
-          the same program with different version numbers.
+	- res changed the configure program version check to support checking
+	  the same program with different version numbers.
 	- res separated the configure binutils recency check into it's own
 	  macro.
 	- res changed the --as-needed check to (a) only use --as-needed for
 	  newer binutils versions (b) disable it by default.
 2-Sep-2006
-	- Marten fixed [ticket:7], invalid alpha modifier in shader 
+	- Marten fixed [ticket:7], invalid alpha modifier in shader
 	  light.xml technique 150.
-	- Marten rewrote the OpenGL pixel format picker to enumerate 
+	- Marten rewrote the OpenGL pixel format picker to enumerate
 	  all the values in strictly decreasing order. This should solve
 	  ticket:1.
 31-Aug-2006
@@ -436,13 +426,13 @@ chronological order.
 	  is not always added as a library search path. This may cause issues
 	  when the user manually specifies paths for some libraries, since
 	  then the Python linker flags cause e.g. /usr/lib to be scanned and
-	  libraries errorneously taken from there. Instead, only add 
+	  libraries errorneously taken from there. Instead, only add
 	  sysprefix-based paths when needed.
 	- res added support for response files when shared libs are enabled.
 	  They're used if supported by the linker.
 	- res fixed some gcc warnings when compiling for shared libraries.
 28-Aug-2006
-	- Piotr added additional geom existence check in odedynam.
+        - Piotr added additional geom existence check in odedynam.
 	- mdmkolbe added event-order constraints for standard console.
 	- Marten reverted his csRefArray fix from yesterday as it introduced
 	  more problems than it solved.
@@ -467,7 +457,7 @@ chronological order.
 	- Marten fixed csRefArray so that operator[] and Get (..) works
 	  as intended and don't cause refcounting errors. Bug 1487132.
 	- Marten fixed his last commit to work on gcc too. One caveat with
-	  current approach is that you cannot assign directly from a 
+	  current approach is that you cannot assign directly from a
 	  csRefArray::operator[] to a new csRef, you need to construct it
 	  (provide an explicit construction). No inefficiency, just some extra
 	  syntax.
