@@ -112,6 +112,13 @@ chronological order.
 	  particles with velocity.
 	- mdmkolbe eliminated improper reinterpret_cast calls with extreme
 	  prejudice.  (Casting from a 'void*' should use static_cast.)
+        - Piotr added angular constraint axis joint parameter which should
+          be anchored to specyfied body (it lets angular stops to be effective
+          when joint have free rotation along all axes in ode dynamics 
+          implementation - "ball joint" limitation).
+        - Piotr cleaned iODEJointState interface (it lets user to change ode
+          specyfic parameters for joints made via iJoint interface).
+
 3-Oct-2006
 	- mdmkolbe fixed an uninitialized variable that broke procedural
 	  textures on Cygwin.
