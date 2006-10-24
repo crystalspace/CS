@@ -14,6 +14,7 @@ chronological order.
 	- res bumped the version numbers for the CS and CEL version checks in
 	  jamtemplate's configure template to 1.0.
 	- res merged r25554, r25556, r25562 into 1.0 (ODE improvements).
+	- res merged r25680 into 1.0 (install.jam + spaces).
 20-Oct-2006
 	- res merged r25652 into 1.0 (parallax shader fix).
 	- res merged r25653 into 1.0 (static plugin linking issue reporting).
