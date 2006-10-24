@@ -7,6 +7,7 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 24-Oct-2006
+	- Jorrit merged r25661 into 1.0 (skelanim loader bug).
 	- Jorrit merged r25632 into 1.0 (character2 animation shader).
 	- Jorrit merged r25566 into 1.0 (gmeshanim2 export script).
 	- Jorrit merged r25564 into 1.0 (character2 animation shader fixes).
