@@ -10,6 +10,9 @@ chronological order.
 	- Jorrit fixed a bug in iSector->HitBeamPortals(). If it would
 	  traverse a portal then the returned intersection point would not be
 	  correct.
+	- res adjusted the X11 detection such that the pkgconfig packages, as
+	  provided by newer X.org versions, are looked for first before
+	  falling back to the autoconf X detection macro.
 24-Oct-2006
 	- res bumped the version numbers for the CS and CEL version checks in
 	  jamtemplate's configure template to 1.1.
