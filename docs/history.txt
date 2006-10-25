@@ -12,6 +12,8 @@ chronological order.
 	- res fixed install.jam to support file names with spaces.
 	- res updated the "external libraries" section in the manual to also
 	  state versions of the dependencies.
+	- Vincent updated rpm/cs.spec. Also added missing files to be
+	  installed.
 23-Oct-2006
 	- dfryer fixed some OS X / PowerPC specific compile problems in 
 	  threading support stuff.
