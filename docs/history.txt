@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+25-Oct-2006
+	- Jorrit fixed a bug in iSector->HitBeamPortals(). If it would
+	  traverse a portal then the returned intersection point would not be
+	  correct.
 	- res fixed install.jam to support file names with spaces.
 23-Oct-2006
 	- Jorrit fixed a bug in the skeletal animation loader. It would
