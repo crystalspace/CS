@@ -8,6 +8,7 @@ chronological order.
 
 26-Oct-2006
 	- Jorrit merged r25695 into 1.0 (odedynam).
+	- Jorrit merged r25686 into 1.0 (rpm/cs.spec).
 	- res merged r25684, r25687 into 1.0 (external libs docs).
 25-Oct-2006
 	- Jorrit merged r25688 into 1.0 (HitBeamPortals).

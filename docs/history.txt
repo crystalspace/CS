@@ -18,6 +18,8 @@ chronological order.
 	- res fixed install.jam to support file names with spaces.
 	- res updated the "external libraries" section in the manual to also
 	  state versions of the dependencies.
+	- Vincent updated rpm/cs.spec. Also added missing files to be
+	  installed.
 23-Oct-2006
 	- Jorrit fixed a bug in the skeletal animation loader. It would
 	  incorrectly test if it could load the skeleton file and if it
