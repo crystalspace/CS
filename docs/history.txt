@@ -11,6 +11,8 @@ chronological order.
 	  interface was defined wrong (GetLowStop() instead of GetLoStop()
 	  for example) and also the odedynam plugin was no longer
 	  implementing that interface.
+	- res fixed the bullet plugin to build with somewhat newer bullet
+	  versions.
 25-Oct-2006
 	- Jorrit fixed a bug in iSector->HitBeamPortals(). If it would
 	  traverse a portal then the returned intersection point would not be
