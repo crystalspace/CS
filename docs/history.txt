@@ -6,6 +6,11 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+26-Oct-2006
+	- Jorrit fixed a problem with physics plugin. The iODEJointState
+	  interface was defined wrong (GetLowStop() instead of GetLoStop()
+	  for example) and also the odedynam plugin was no longer
+	  implementing that interface.
 25-Oct-2006
 	- Jorrit fixed a bug in iSector->HitBeamPortals(). If it would
 	  traverse a portal then the returned intersection point would not be
