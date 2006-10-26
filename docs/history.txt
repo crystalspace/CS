@@ -16,6 +16,8 @@ chronological order.
 	  traverse a portal then the returned intersection point would not be
 	  correct.
 	- res fixed install.jam to support file names with spaces.
+	- res updated the "external libraries" section in the manual to also
+	  state versions of the dependencies.
 23-Oct-2006
 	- Jorrit fixed a bug in the skeletal animation loader. It would
 	  incorrectly test if it could load the skeleton file and if it
