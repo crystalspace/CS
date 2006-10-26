@@ -11,6 +11,7 @@ chronological order.
 	- Jorrit merged r25686 into 1.0 (rpm/cs.spec).
 	- res merged r25684, r25687 into 1.0 (external libs docs).
 	- res merged r25662, r25683 into 1.0 (deb script updates).
+	- res merged r25662:25665 into 1.0 (genmesh updates).
 25-Oct-2006
 	- Jorrit merged r25688 into 1.0 (HitBeamPortals).
 24-Oct-2006
