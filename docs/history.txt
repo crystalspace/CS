@@ -6,6 +6,12 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+27-Oct-2006
+	- Daniel Fryer added HasNext() to the Mac OS X "defaults" 
+	  iConfigFileIterator implementation and also fixed the non-standard
+	  behavior of returning a null iterator instead of an 
+	  empty iterator.  
+
 	***** RELEASE OF 1.0PRE1 *****
 
 26-Oct-2006
