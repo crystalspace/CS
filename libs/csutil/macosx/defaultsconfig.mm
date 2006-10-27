@@ -121,8 +121,8 @@ void csDefaultsConfig::Clear ()
 
 csPtr<iConfigIterator> csDefaultsConfig::Enumerate (const char* Subsection)
 {
-  if (!SubsectionExists (Subsection))
-    return 0;
+  //if (!SubsectionExists (Subsection))
+  //  return 0;
   return new csDefaultsIterator (this, Subsection);
 }
 
@@ -280,6 +280,8 @@ csDefaultsIterator::csDefaultsIterator (
   // Nil out the rest.
   keyenum = nil;
   currentkey = nil;
+  nextkey = nil;
+  Next();
 }
 
 csDefaultsIterator::~csDefaultsIterator()
@@ -309,6 +311,7 @@ void csDefaultsIterator::Rewind ()
     [keyenum release];
   keyenum = nil;
   currentkey = nil;
+  nextkey = nil;
 }
 
 // Navigate though the reg key to the next value entry.
@@ -317,8 +320,16 @@ bool csDefaultsIterator::Next()
   // Create the iterator if we haven't got one.
   if (keyenum == nil)
     keyenum = [[config->dict keyEnumerator] retain];
-  currentkey = [keyenum nextObject];
+    
+  currentkey = nextkey;
+  nextkey = [keyenum nextObject];
   return currentkey != nil;
+  
+}
+
+bool csDefaultsIterator::HasNext()
+{
+    return nextkey != nil;
 }
 
 const char* csDefaultsIterator::GetKey (bool Local) const

@@ -92,6 +92,7 @@ class csDefaultsIterator : public iConfigIterator
   
   NSEnumerator* keyenum;
   NSString* currentkey;
+  NSString* nextkey;
 public:
   SCF_DECLARE_IBASE;
 
@@ -103,6 +104,7 @@ public:
 
   virtual void Rewind ();
   virtual bool Next();
+  virtual bool HasNext();
 
   virtual const char* GetKey (bool Local = false) const;
   virtual int GetInt () const;
