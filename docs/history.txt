@@ -31,6 +31,8 @@ chronological order.
 	- res made the light_bumpmap shader fall back to light.
 	- res changed the "castle" level to have Z buffer clearing enabled
 	  (needed for SR).
+	- Eric Sunshine fixed a quoting problem in configure.ac which caused
+	  X11 check to barf for old-style installations.
 27-Oct-2006
 	- res updated the docs for the new winlibs version.
 26-Oct-2006
