@@ -20,6 +20,9 @@ chronological order.
 	- res augmented the lightiter render step to provide a "light count"
 	  SV with constant value 1. (This makes it possible to use vproc_std
 	  with it.)
+	- res fixed some crashes in the software renderer occuring when 
+	  drawing without BeginDraw() being called (occurs when the engine 
+	  does PrecacheDraw()).
 27-Oct-2006
 	- res updated the docs for the new winlibs version.
 26-Oct-2006
