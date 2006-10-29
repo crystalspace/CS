@@ -48,65 +48,62 @@ namespace lighter
           RadPrimitive& prim = primArray[i];
           
           //root->radPrimitives.Push (&primArray[i]);
-          const SizeTDArray & ia = prim.GetIndexArray ();
+          const size_t* ia = prim.GetIndexArray ();
           //compute bb at same time
           unsigned int j = 0;
-          for (j = 0; j < ia.GetSize ()-2; j++)
+          tree->boundingBox.AddBoundingVertexSmart (vdata.vertexArray[ia[0]].position);
+          KDTreePrimitive p;
+          p.primPointer = &prim;
+          p.vertices[0] = vdata.vertexArray[ia[0]].position;
+          p.vertices[1] = vdata.vertexArray[ia[1]].position;
+          p.vertices[2] = vdata.vertexArray[ia[2]].position;
+          p.normal = prim.GetPlane ().norm;
+
+          // Setup optimized
+          int k = 0;
+          // Find max normal direction
+          if (fabsf (p.normal.x) > fabsf (p.normal.y))
           {
-            tree->boundingBox.AddBoundingVertexSmart (vdata.vertexArray[ia[j]].position);
-            KDTreePrimitive p;
-            p.primPointer = &prim;
-            p.vertices[0] = vdata.vertexArray[ia[j]].position;
-            p.vertices[1] = vdata.vertexArray[ia[j+1]].position;
-            p.vertices[2] = vdata.vertexArray[ia[j+2]].position;
-            p.normal = prim.GetPlane ().norm;
-
-            // Setup optimized
-            int k = 0;
-            // Find max normal direction
-            if (fabsf (p.normal.x) > fabsf (p.normal.y))
-            {
-              if (fabsf (p.normal.x) > fabsf (p.normal.z)) k = 0;
-              else k = 2;
-            }
-            else
-            {
-              if (fabsf (p.normal.y) > fabsf (p.normal.z)) k = 1;
-              else k = 2;
-            }
-
-            p.k = k;
-
-            uint u = (k+1)%3;
-            uint v = (k+2)%3;
-
-            const csVector3& A = p.vertices[0];
-
-            // precalc normal
-            float nkinv = 1.0f/p.normal[k];
-            p.n_u = p.normal[u] * nkinv;
-            p.n_v = p.normal[v] * nkinv;
-            p.n_d = (p.normal * A) * nkinv;
-
-
-            csVector3 b = p.vertices[2] - p.vertices[0];
-            csVector3 c = p.vertices[1] - p.vertices[0];
-
-            float tmp = 1.0f/(b[u] * c[v] - b[v] * c[u]);
-
-            // edge 1
-            p.b_nu = -b[v] * tmp;
-            p.b_nv = b[u] * tmp;
-            p.b_d = (b[v] * A[u] - b[u] * A[v]) * tmp;
-
-            // edge 2
-            p.c_nu = c[v] * tmp;
-            p.c_nv = -c[u] * tmp;
-            p.c_d = (c[u] * A[v] - c[v] * A[u]) * tmp;
-
-            tree->allTriangles.Push (p);
+            if (fabsf (p.normal.x) > fabsf (p.normal.z)) k = 0;
+            else k = 2;
           }
-          for (; j < ia.GetSize (); j++)
+          else
+          {
+            if (fabsf (p.normal.y) > fabsf (p.normal.z)) k = 1;
+            else k = 2;
+          }
+
+          p.k = k;
+
+          uint u = (k+1)%3;
+          uint v = (k+2)%3;
+
+          const csVector3& A = p.vertices[0];
+
+          // precalc normal
+          float nkinv = 1.0f/p.normal[k];
+          p.n_u = p.normal[u] * nkinv;
+          p.n_v = p.normal[v] * nkinv;
+          p.n_d = (p.normal * A) * nkinv;
+
+
+          csVector3 b = p.vertices[2] - p.vertices[0];
+          csVector3 c = p.vertices[1] - p.vertices[0];
+
+          float tmp = 1.0f/(b[u] * c[v] - b[v] * c[u]);
+
+          // edge 1
+          p.b_nu = -b[v] * tmp;
+          p.b_nv = b[u] * tmp;
+          p.b_d = (b[v] * A[u] - b[u] * A[v]) * tmp;
+
+          // edge 2
+          p.c_nu = c[v] * tmp;
+          p.c_nv = -c[u] * tmp;
+          p.c_d = (c[u] * A[v] - c[v] * A[u]) * tmp;
+
+          tree->allTriangles.Push (p);
+          for (uint j = 1; j < 3; j++)
           {
             tree->boundingBox.AddBoundingVertexSmart (vdata.vertexArray[ia[j]].position);
           }

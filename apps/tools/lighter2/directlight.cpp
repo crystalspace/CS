@@ -129,6 +129,12 @@ namespace lighter
 
     uint findex = 0;
 
+    const csVector3 normals[3] = {
+      prim.GetVertexData().vertexArray[prim.GetIndexArray()[0]].normal,
+      prim.GetVertexData().vertexArray[prim.GetIndexArray()[1]].normal,
+      prim.GetVertexData().vertexArray[prim.GetIndexArray()[2]].normal
+    };
+
     for (int v = minV; v <= maxV; v++)
     {
       csVector3 ec = elementCenter;
@@ -146,10 +152,8 @@ namespace lighter
 
         float lambda, my;
         prim.ComputeBaryCoords (ec, lambda, my);
-        csVector3 norm = 
-          lambda * prim.GetVertexData().vertexArray[prim.GetIndexArray()[0]].normal +
-          my * prim.GetVertexData().vertexArray[prim.GetIndexArray()[1]].normal +
-          (1 - lambda - my) * prim.GetVertexData().vertexArray[prim.GetIndexArray()[2]].normal;
+        csVector3 norm = lambda * normals[0] + my * normals[1] + 
+          (1 - lambda - my) * normals[2];
         norm.Normalize();
         float cosTheta_j = (norm * jiVec);
 

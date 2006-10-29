@@ -71,9 +71,9 @@ namespace lighter
     }
 
     RadPrimitive newPrim (vertexData);
-    newPrim.GetIndexArray ().Push (a);
-    newPrim.GetIndexArray ().Push (b);
-    newPrim.GetIndexArray ().Push (c);
+    newPrim.GetIndexArray()[0] = a;
+    newPrim.GetIndexArray()[1] = b;
+    newPrim.GetIndexArray()[2] = c;
 
     newPrim.ComputePlane ();
     
@@ -97,9 +97,9 @@ namespace lighter
     }
 
     RadPrimitive newPrim (vertexData);
-    newPrim.GetIndexArray ().Push (a);
-    newPrim.GetIndexArray ().Push (b);
-    newPrim.GetIndexArray ().Push (c);
+    newPrim.GetIndexArray()[0] = a;
+    newPrim.GetIndexArray()[1] = b;
+    newPrim.GetIndexArray()[2] = c;
 
     newPrim.ComputePlane ();
     
@@ -210,20 +210,11 @@ namespace lighter
       indexArray->SetCapacity (meshPrims.GetSize()*3);
       for (size_t p = 0; p < meshPrims.GetSize(); p++)
       {
-        const SizeTDArray& indices = meshPrims[p].GetIndexArray ();
-        if (indices.GetSize () == 3)
+        const size_t* indices = meshPrims[p].GetIndexArray ();
+        for (int i = 0; i < 3; i++)
         {
-          //Triangle, easy case
-          for (int i = 0; i < 3; i++)
-          {
-            size_t idx = indices[i];
-            indexArray->Push ((int)idx);
-          }
-        }
-        else
-        {
-          //TODO: Implement this case, use a triangulator
-          // @@@ RadObject_Genmesh atm only delivers triangles
+          size_t idx = indices[i];
+          indexArray->Push ((int)idx);
         }
       }
     }
