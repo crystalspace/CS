@@ -14,6 +14,9 @@ chronological order.
 	  reasons is that the address of that symbol may change if the shared
 	  lib happens to be unloaded in between attempts to get an instance
 	  of the component.
+	- res changed the plugin manager to use csRef<>s instead of explicit
+	  reference counting for retaining iComponent references. Also
+	  simplified some code in LoadPlugin().
 27-Oct-2006
 	- res updated the docs for the new winlibs version.
 26-Oct-2006
