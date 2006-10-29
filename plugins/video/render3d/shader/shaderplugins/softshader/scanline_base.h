@@ -43,6 +43,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(SoftShader)
     int colorShift;
     int alphaShift;
     bool colorSum;
+    bool doConstColor;
+    csFixed16 constColor[4];
 
     ScanlineRendererBase() : scfImplementationType (this),
       flat_col (255, 255, 255, 255), colorShift(16), alphaShift (16), 
@@ -62,6 +64,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(SoftShader)
       alphaShift = 16-a;
     }
     void SetColorSum (bool enable) { colorSum = enable; }
+    void SetDoConstColor (bool enable) { doConstColor = enable; }
+    void SetConstColor (const csVector4& v)
+    {
+      constColor[0] = v.x;
+      constColor[1] = v.y;
+      constColor[2] = v.z;
+      constColor[3] = v.w;
+    }
   };
 
 }

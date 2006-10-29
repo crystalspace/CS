@@ -41,15 +41,57 @@ CS_PLUGIN_NAMESPACE_BEGIN(SoftShader)
     void Apply (const ScanlineComp* /*color*/, Pixel& /*col*/) {}
   };
 
-  struct Color_Multiply
+  struct ColorSource_Vertex
   {
     static const size_t compCount = 4;
+
+    ColorSource_Vertex (ScanlineRendererBase* /*This*/) {}
+
+    CS_FORCEINLINE 
+    int32 GetFixedR (const ScanlineComp* color) const
+    { return color[0].c.GetFixed(); }
+    CS_FORCEINLINE 
+    int32 GetFixedG (const ScanlineComp* color) const
+    { return color[1].c.GetFixed(); }
+    CS_FORCEINLINE 
+    int32 GetFixedB (const ScanlineComp* color) const
+    { return color[2].c.GetFixed(); }
+    CS_FORCEINLINE 
+    int32 GetFixedA (const ScanlineComp* color) const
+    { return color[3].c.GetFixed(); }
+  };
+
+  struct ColorSource_Constant
+  {
+    static const size_t compCount = 0;
+
+    csFixed16 r, g, b, a;
+
+    ColorSource_Constant (ScanlineRendererBase* This) :
+      r (This->constColor[0]), g (This->constColor[1]), 
+      b (This->constColor[2]), a (This->constColor[3]) {}
+
+    CS_FORCEINLINE 
+    int32 GetFixedR (const ScanlineComp* color) const { return r.GetFixed(); }
+    CS_FORCEINLINE 
+    int32 GetFixedG (const ScanlineComp* color) const { return g.GetFixed(); }
+    CS_FORCEINLINE
+    int32 GetFixedB (const ScanlineComp* color) const { return b.GetFixed(); }
+    CS_FORCEINLINE 
+    int32 GetFixedA (const ScanlineComp* color) const { return a.GetFixed(); }
+  };
+
+  template<typename ColorSource>
+  struct Color_Multiply : protected ColorSource
+  {
+    using ColorSource::compCount;
 
     const int cshift;
     const int ashift;
 
     Color_Multiply (ScanlineRendererBase* This) : 
-      cshift (This->colorShift), ashift (This->alphaShift) {}
+      ColorSource (This), cshift (This->colorShift), 
+        ashift (This->alphaShift) {}
 
     CS_FORCEINLINE
     static uint8 ClampAndShift (int32 x, const int shift)
@@ -59,13 +101,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(SoftShader)
     }
 
     CS_FORCEINLINE
-    void Apply (const ScanlineComp* color, 
-      Pixel& col) 
+    void Apply (const ScanlineComp* color, Pixel& col) 
     {
-      col.c.r = ClampAndShift (col.c.r * color[0].c.GetFixed(), cshift);
-      col.c.g = ClampAndShift (col.c.g * color[1].c.GetFixed(), cshift);
-      col.c.b = ClampAndShift (col.c.b * color[2].c.GetFixed(), cshift);
-      col.c.a = ClampAndShift (col.c.a * color[3].c.GetFixed(), ashift);
+      col.c.r = ClampAndShift (col.c.r * GetFixedR (color), cshift);
+      col.c.g = ClampAndShift (col.c.g * GetFixedG (color), cshift);
+      col.c.b = ClampAndShift (col.c.b * GetFixedB (color), cshift);
+      col.c.a = ClampAndShift (col.c.a * GetFixedA (color), ashift);
     }
   };
 
@@ -275,8 +316,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(SoftShader)
 						      bool needColors,
 						      bool doAlphaTest)
     {
-      if (doColor)
-	return GetScanlineProcSC<Source, Color_Multiply> (zmode, needColors, doAlphaTest);
+      if (doConstColor)
+        return GetScanlineProcSC<Source, 
+          Color_Multiply<ColorSource_Constant> > (zmode, needColors, doAlphaTest);
+      else if (doColor)
+        return GetScanlineProcSC<Source, 
+          Color_Multiply<ColorSource_Vertex> > (zmode, needColors, doAlphaTest);
       else
 	return GetScanlineProcSC<Source, Color_None> (zmode, needColors, doAlphaTest);
     }
@@ -299,7 +344,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(SoftShader)
       if (doTexture)
 	renderInfoMesh.desiredBuffers |= CS_SOFT3D_BUFFERFLAG(TEXCOORD);
 
-      doColor = ((availableBuffers & CS_SOFT3D_BUFFERFLAG(COLOR)) != 0);
+      doColor = ((availableBuffers & CS_SOFT3D_BUFFERFLAG(COLOR)) != 0)
+        && !doConstColor;
       if (colorSum)
       {
 	static const size_t myBufferComps[] = {4, 3, 2};

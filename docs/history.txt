@@ -23,6 +23,9 @@ chronological order.
 	- res fixed some crashes in the software renderer occuring when 
 	  drawing without BeginDraw() being called (occurs when the engine 
 	  does PrecacheDraw()).
+	- res augmented the software shader plugin to also support 
+	  multiplication by a constant color in addition to multiplication by 
+	  the interpolated vertex color.
 27-Oct-2006
 	- res updated the docs for the new winlibs version.
 26-Oct-2006
