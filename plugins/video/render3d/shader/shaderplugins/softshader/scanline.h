@@ -93,14 +93,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(SoftShader)
       ColorSource (This), cshift (This->colorShift), 
         ashift (This->alphaShift) {}
 
-    CS_FORCEINLINE
+    CS_FORCEINLINE_TEMPLATEMETHOD
     static uint8 ClampAndShift (int32 x, const int shift)
     {
       return (x & 0x80000000) ? 0 : 
 	(((x >> shift) & 0x7fffff00) ? 0xff : (x >> shift));
     }
 
-    CS_FORCEINLINE
+    CS_FORCEINLINE_TEMPLATEMETHOD
     void Apply (const ScanlineComp* color, Pixel& col) 
     {
       col.c.r = ClampAndShift (col.c.r * this->GetFixedR (color), cshift);

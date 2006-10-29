@@ -200,7 +200,7 @@ valid @sc{scf} interface).  This object is global and can be accessed from
 @emph{anywhere}, even from dynamic libraries (plugin modules).  It is used by
 several parts of @sc{scf}.  Note that this object is only available after
 calling @code{scfInitialize()}, the main initialization function of @sc{scf}.
-In typical use, howerver, you rarely need to interact directly with
+In typical use, however, you rarely need to interact directly with
 @samp{iSCF::SCF}.  Instead, you invoke several convenient @sc{scf} macros which
 interact with @samp{iSCF::SCF} on your behalf.
 
