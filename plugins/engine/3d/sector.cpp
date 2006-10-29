@@ -454,7 +454,20 @@ public:
     {
       privMeshlist->AddRenderMeshes (meshes, num,
       	cmesh->csMeshWrapper::GetRenderPriority (),
-	cmesh->csMeshWrapper::GetZBufMode (), (iMeshWrapper*)cmesh);
+	    cmesh->csMeshWrapper::GetZBufMode (), (iMeshWrapper*)cmesh);
+
+      // get extra render meshes
+      num = 0;
+      csRenderMesh** extraMeshes = cmesh->GetExtraRenderMeshes (num, rview,
+                                            frustum_mask);
+      CS_ASSERT(!((num != 0) && (extraMeshes == 0)));
+      if (num > 0)
+      {
+        privMeshlist->AddRenderMeshes (extraMeshes, num,
+          cmesh->csMeshWrapper::GetRenderPriority (),
+          cmesh->csMeshWrapper::GetZBufMode (), (iMeshWrapper*)cmesh);
+      }
+      /* AAR_TODO: make GetRenderPriority get extra render meshes priority */
     }
   }
 

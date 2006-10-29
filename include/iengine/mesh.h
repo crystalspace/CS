@@ -724,6 +724,13 @@ struct iMeshWrapper : public virtual iBase
    * Get the shader variable context of the mesh object.
    */
   virtual iShaderVariableContext* GetSVContext() = 0;
+
+  /**
+   * Adds a render mesh to the list of extra render meshes.
+   * This list is used for special cases (like decals) where additional
+   * things need to be renderered for the mesh in an abstract way.
+   */
+  virtual void AddExtraRenderMesh(csRenderMesh* pRenderMesh) = 0;
 };
 
 /**

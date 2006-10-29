@@ -241,6 +241,9 @@ protected:
   /// For NR: should we draw last
   bool draw_after_fancy_stuff;
 
+  /// used to store extra rendermeshes that something might attach to this mesh (ie, for decals)
+  csDirtyAccessArray<csRenderMesh*> extraRenderMeshes;
+
   /**
    * This value indicates the last time that was used to do animation.
    * If 0 then we haven't done animation yet. We compare this value
@@ -523,6 +526,20 @@ public:
    */
   csRenderMesh** GetRenderMeshes (int& num, iRenderView* rview,
   	uint32 frustum_mask);
+
+  /**
+   * Adds a render mesh to the list of extra render meshes.
+   * This list is used for special cases (like decals) where additional
+   * things need to be renderered for the mesh in an abstract way.
+   */
+  void AddExtraRenderMesh(csRenderMesh* pRenderMesh);
+  
+  /**
+   * Grabs any additional render meshes this mesh might have on top
+   * of the normal rendermeshes through GetRenderMeshes.
+   */
+  csRenderMesh** GetExtraRenderMeshes (int& num, iRenderView* rview,
+    uint32 frustum_mask);
 
   /**
    * Do a hard transform of this object.

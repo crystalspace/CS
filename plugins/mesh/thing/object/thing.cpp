@@ -1915,7 +1915,7 @@ size_t csThing::TestPolygons(const csVector3 * center, float radius,
 {
   size_t count = 0;
   size_t i;
-  
+
   // @@@ This routine is not very optimal. Especially for things
   // with large number of polygons.
   for (i = 0; i < static_data->static_polygons.Length (); i++)

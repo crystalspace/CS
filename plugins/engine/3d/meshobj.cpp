@@ -29,6 +29,7 @@
 #include "csutil/debug.h"
 #include "iengine/rview.h"
 #include "ivideo/graph3d.h"
+#include "ivideo/rendermesh.h"
 
 
 CS_LEAKGUARD_IMPLEMENT (csMeshWrapper);
@@ -655,6 +656,81 @@ csRenderMesh** csMeshWrapper::GetRenderMeshes (int& n, iRenderView* rview,
     csrview->SetCsRenderContext (old_ctxt);
   }
   return rmeshes;
+}
+
+void csMeshWrapper::AddExtraRenderMesh(csRenderMesh* pRenderMesh)
+{
+  extraRenderMeshes.Push(pRenderMesh);
+}
+
+csRenderMesh** csMeshWrapper::GetExtraRenderMeshes (int& num, 
+                    iRenderView* rview, uint32 frustum_mask)
+{
+  // Here we check the CS_ENTITY_NOCLIP flag. If that flag is set
+  // we will only render the object once in a give frame/camera combination.
+  // So if multiple portals arrive in a sector containing this object the
+  // object will be rendered at the first portal and not clipped to that
+  // portal (as is usually the case).
+  csRenderContext* old_ctxt = 0;
+
+  if (flags.Check (CS_ENTITY_NOCLIP))
+  {
+    csRenderView* csrview = (csRenderView*)rview;
+    csRenderContext* ctxt = csrview->GetCsRenderContext ();
+
+    if (last_frame_number == rview->GetCurrentFrameNumber () &&
+    	last_camera == ctxt->icamera)
+    {
+      num = 0;
+      return 0;
+    }
+    last_camera = ctxt->icamera;
+    last_frame_number = rview->GetCurrentFrameNumber ();
+    old_ctxt = ctxt;
+    // Go back to top-level context.
+    while (ctxt->previous) ctxt = ctxt->previous;
+    csrview->SetCsRenderContext (ctxt);
+  }
+
+  csTicks lt = engine->GetLastAnimationTime ();
+  meshobj->NextFrame (lt, movable.GetPosition (), 
+    rview->GetCurrentFrameNumber ());
+
+  csMeshWrapper *meshwrap = this;
+  last_anim_time = lt;
+  csMeshWrapper* lastparent = meshwrap;
+  csMovable* parent = movable.GetParent ();
+  while (parent != 0)
+  {
+    iMeshWrapper* parent_mesh = parent->GetSceneNode ()->QueryMesh ();
+    if (parent_mesh)
+    {
+      parent_mesh->GetMeshObject()->PositionChild (
+      	lastparent->GetMeshObject(), lt);
+      lastparent = (csMeshWrapper*)parent_mesh;
+    }
+    parent = parent->GetParent ();
+  }
+
+  int clip_portal, clip_plane, clip_z_plane;
+  rview->CalculateClipSettings(frustum_mask, clip_portal, clip_plane,
+          clip_z_plane);
+
+  iCamera* pCamera = rview->GetCamera();
+  const csReversibleTransform& o2wt = movable.GetFullTransform();
+  const csVector3& wo = o2wt.GetOrigin();
+  num = extraRenderMeshes.GetSize();
+  for (int a=num-1; a>=0; --a)
+  {
+    extraRenderMeshes[a]->clip_portal = clip_portal;
+    extraRenderMeshes[a]->clip_plane = clip_plane;
+    extraRenderMeshes[a]->clip_z_plane = clip_z_plane;
+    extraRenderMeshes[a]->do_mirror = pCamera->IsMirrored();
+    extraRenderMeshes[a]->worldspace_origin = wo;
+    extraRenderMeshes[a]->object2world = o2wt;
+  }
+
+  return extraRenderMeshes.GetArray();
 }
 
 //----- Min/Max Distance Range ----------------------------------------------

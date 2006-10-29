@@ -698,7 +698,7 @@ void test_decal ()
       return; 
     }
 
-    if (!loader->LoadTexture ("decal", "/this/data/pokey.gif"))
+    if (!loader->LoadTexture ("decal", "/this/data/decal.jpg"))
       Sys->Report(CS_REPORTER_SEVERITY_NOTIFY, 
                   "Couldn't load decal texture!");
 
@@ -714,15 +714,15 @@ void test_decal ()
   csVector3 start = Sys->view->GetCamera()->GetTransform().GetOrigin();
   csVector3 end = start + 
     Sys->view->GetCamera()->GetTransform().This2OtherRelative(
-        csVector3(0,0,1)) * 100.0f;
+        csVector3(0,0,1));
   
   csVector3 normal = start - end;
   csVector3 up =
     Sys->view->GetCamera()->GetTransform().This2OtherRelative(
         csVector3(0,1,0));
 
-  decalMgr->ProjectDecal(material, Sys->view->GetCamera()->GetSector(), 
-      &start, &end, &up, &normal, 1.0f, 1.0f);
+  decalMgr->CreateDecal(material, Sys->view->GetCamera()->GetSector(),
+          &end, &up, &normal, 1.0f, 1.0f);
 }
 
 void AttachRandomLight (iLight* light)

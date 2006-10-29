@@ -11,38 +11,71 @@
 #include <csgeom/poly3d.h>
 #include <csgeom/tri.h>
 #include <ivaria/collider.h>
+#include <csgfx/renderbuffer.h>
+#include <ivideo/rendermesh.h>
 #include "iutil/array.h"
 
 struct iObjectRegistry;
+class csShaderVariableContext;
 
 #define CS_DECAL_CLIP_DECAL
-#define CS_DECAL_DEFAULT_NORMAL_THRESHOLD 0.1f
-#define CS_DECAL_DEFAULT_OFFSET 0.01f
-#define CS_DECAL_DEFAULT_NEAR_FAR_SCALE 1.5f
-#define CS_DECAL_DEFAULT_CLIP_NEAR_FAR false
+#define CS_DECAL_DEFAULT_NORMAL_THRESHOLD   0.1f
+#define CS_DECAL_DEFAULT_OFFSET             0.02f
+#define CS_DECAL_DEFAULT_NEAR_FAR_SCALE     1.5f
+#define CS_DECAL_DEFAULT_CLIP_NEAR_FAR      false
+#define CS_DECAL_MAX_TRIS_PER_DECAL         32
+#define CS_DECAL_MAX_VERTS_PER_DECAL        96 
 
 class csDecal : public iDecal
 {
 private:
-  iObjectRegistry * objectReg;
-  csRef<iEngine> engine;
-  iDecalManager * manager;
-  csRef<iMeshFactoryWrapper> meshFact;
-  csRef<iMeshWrapper> mesh;
-  iMaterialWrapper * material;
-  size_t id;
+  iObjectRegistry*              m_pObjectReg;
+  csRef<iEngine>                m_pEngine;
+  iDecalManager*                m_pManager;
+
+  // unique id for this decal
+  size_t                        m_nID;
+  
+  // buffers and rendermesh to hold the rendering data
+  csRef<csRenderBuffer>         m_pVertexBuffer;
+  csRef<csRenderBuffer>         m_pTexCoordBuffer;
+  csRef<csRenderBuffer>         m_pNormalBuffer;
+  csRef<csRenderBuffer>         m_pColorBuffer;
+  csRef<csRenderBuffer>         m_pIndexBuffer;
+  csRef<csRenderBufferHolder>   m_pBufferHolder;
+  csArray<csRenderMesh*>        m_renderMeshes;
+
+  // used to keep track of the next open slot in our buffers and what to render
+  size_t                        m_nIndexCount;
+  size_t                        m_nVertexCount;
+
+  // some worldspace values defining this decal
+  csVector3                     m_normal;
+  csVector3                     m_right;
+  csVector3                     m_up;
+  csVector3                     m_pos;
+
+  // dimensions of the polygon
+  float                         m_width;
+  float                         m_height;
+
+  // radius is the length from the center of the decal to a corner
+  float                         m_radius;
   
 public:
-  csDecal(iObjectRegistry * objectReg, iDecalManager * manager, size_t id);
+  csDecal(iObjectRegistry * pObjectReg, iDecalManager * pManager, size_t id);
   virtual ~csDecal();
-  bool Create(iMaterialWrapper * material, iSectorList * sectors, 
-      const csReversibleTransform * trans, const csArray<csPoly3D> * polys,
-      const csVector3 * decalRelPos, const csVector3 * normal, 
-      const csVector3 * up, const csVector3 * right, float width, 
-      float height);
+
+  void InitializePosition(const csVector3& normal, 
+        const csVector3& pos, const csVector3& up, const csVector3& right, 
+        float width, float height);
+
+  void AddMeshPolys(iMeshWrapper* pMesh, iMaterialWrapper* pMaterial, 
+          csArray<csPoly3D>& polys);
 };
 
-class csDecalManager : public scfImplementation3<csDecalManager,iDecalManager,
+class csDecalManager : public scfImplementation3<csDecalManager,
+                                                 iDecalManager,
                                                  iComponent,iPolygonCallback>
 {
 private:
@@ -76,23 +109,6 @@ public:
   virtual bool CreateDecal(iMaterialWrapper *  material, iSector * sector, 
       const csVector3 * pos, const csVector3 * up, const csVector3 * normal, 
       float width, float height);
-
-  /**
-   * Projects a decal using TraceBeam.
-   * \param material The material to assign to the decal.
-   * \param sector The sector to begin in the TraceBeam.
-   * \param start The starting vertex of the line passed to TraceBeam.
-   * \param end The end vertex of the line passed to TraceBeam.
-   * \param up The up direction of the decal.
-   * \param normal The overall normal of the decal, or 0 to compute a normal
-   *               based on the first intersecting triangle of the beam.
-   * \param width The width of the decal.
-   * \param height The height of the decal.
-   * \return True if the decal is created.
-   */
-  virtual bool ProjectDecal(iMaterialWrapper * material, iSector * sector, 
-      const csVector3 * start, const csVector3 * end, const csVector3 * up,
-      const csVector3 * normal, float width, float height);
 
   /**
    *  Sets the threshold between polygon normal and decal normal.

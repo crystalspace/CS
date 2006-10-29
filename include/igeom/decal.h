@@ -48,7 +48,6 @@ struct iDecal
  *
  * Then, just use one of the decal creation functions:
  * - iDecalManager::CreateDecal()
- * - iDecalManager::ProjectDecal()
  */
 struct iDecalManager : public virtual iBase
 {
@@ -68,23 +67,6 @@ struct iDecalManager : public virtual iBase
   virtual bool CreateDecal(iMaterialWrapper *  material, iSector * sector, 
       const csVector3 * pos, const csVector3 * up, const csVector3 * normal, 
       float width=1.0f, float height=1.0f) = 0;
-
-  /**
-   * Projects a decal using TraceBeam.
-   * \param material The material to assign to the decal.
-   * \param sector The sector to begin in the TraceBeam.
-   * \param start The starting vertex of the line passed to TraceBeam.
-   * \param end The end vertex of the line passed to TraceBeam.
-   * \param up The up direction of the decal.
-   * \param normal The overall normal of the decal, or 0 to compute a normal
-   *               based on the first intersecting triangle of the beam.
-   * \param width The width of the decal.
-   * \param height The height of the decal.
-   * \return True if the decal is created.
-   */
-  virtual bool ProjectDecal(iMaterialWrapper * material, iSector * sector, 
-      const csVector3 * start, const csVector3 * end, const csVector3 * up,
-      const csVector3 * normal=0.0f, float width=1.0f, float height=1.0f) = 0;
 
   /**
    *  Sets the threshold between polygon normal and decal normal.
