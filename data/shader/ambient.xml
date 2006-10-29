@@ -63,4 +63,20 @@
 	    </fp>
 	</pass>
   </technique>
+  
+  <technique priority="0">
+    <pass>
+      <mixmode><copy/></mixmode>
+      <texture name="tex diffuse" destination="unit 0" />
+      <buffer source="texture coordinate 0" destination="texture coordinate" />
+      <vp plugin="software" />
+      <fp plugin="software">
+	<softfp>
+	  <flatcolor type="shadervar">mat flatcolor</flatcolor>
+	  <constcolor type="shadervar">light ambient</constcolor>
+	</softfp>
+      </fp>
+    </pass>
+  </technique>
+    
 </shader>
