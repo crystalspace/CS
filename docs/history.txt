@@ -29,6 +29,8 @@ chronological order.
 	- res added software renderer techniques to the ambient, light, 
 	  light_spec_bumpmap shaders.
 	- res made the light_bumpmap shader fall back to light.
+	- res changed the "castle" level to have Z buffer clearing enabled
+	  (needed for SR).
 27-Oct-2006
 	- res updated the docs for the new winlibs version.
 26-Oct-2006
