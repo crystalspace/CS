@@ -17,6 +17,9 @@ chronological order.
 	- res changed the plugin manager to use csRef<>s instead of explicit
 	  reference counting for retaining iComponent references. Also
 	  simplified some code in LoadPlugin().
+	- res augmented the lightiter render step to provide a "light count"
+	  SV with constant value 1. (This makes it possible to use vproc_std
+	  with it.)
 27-Oct-2006
 	- res updated the docs for the new winlibs version.
 26-Oct-2006
