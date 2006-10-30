@@ -14,6 +14,8 @@ chronological order.
 	- res merged r25711 into 1.0 (1x1 normal map).
 	- res merged r25733 into 1.0 (plugin unload/load crash fix).
 	- res merged r25736 into 1.0 (software renderer PrecacheDraw() fixes).
+	- res merged r25735, r25736:25741 into 1.0 (software renderer + 
+	  lighting improvements, castle support).
 27-Oct-2006
 
 	***** RELEASE OF 1.0PRE1 *****

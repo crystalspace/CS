@@ -164,5 +164,30 @@
     </pass>
   </technique>
   
+  <!-- Compute all lights with vproc_std (ie software per-vertex) -->
+  <technique priority="0" lights="2147483647">
+    <pass>
+      <mixmode><add/></mixmode>
+      <texture name="tex diffuse" destination="unit 0" />
+      <buffer source="texture coordinate 0" destination="texture coordinate 0" />
+      <buffer source="color" destination="color" />
+      <vp plugin="software" />
+      <vproc plugin="vproc_std">
+	<vproc_std>
+	  <lightmixmode>add</lightmixmode>
+	  <colormixmode>none</colormixmode>
+	  <finalfactor type="float">0.5</finalfactor>
+	  <lights>2147483647</lights>
+	</vproc_std>
+      </vproc>
+      <fp plugin="software">
+	<softfp>
+	  <flatcolor type="shadervar">mat flatcolor</flatcolor>
+	  <colorfactor type="float">2</colorfactor>
+	</softfp>
+      </fp>
+    </pass>
+  </technique>
+  
   <fallbackshader name="std_lighting" />
 </shader>

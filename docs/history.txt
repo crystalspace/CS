@@ -17,6 +17,20 @@ chronological order.
 	- res fixed some crashes in the software renderer occuring when 
 	  drawing without BeginDraw() being called (occurs when the engine 
 	  does PrecacheDraw()).
+	- res augmented the lightiter render step to provide a "light count"
+	  SV with constant value 1. (This makes it possible to use vproc_std
+	  with it.)
+	- res fixed some crashes in the software renderer occuring when 
+	  drawing without BeginDraw() being called (occurs when the engine 
+	  does PrecacheDraw()).
+	- res augmented the software shader plugin to also support 
+	  multiplication by a constant color in addition to multiplication by 
+	  the interpolated vertex color.
+	- res added software renderer techniques to the ambient, light, 
+	  light_spec_bumpmap shaders.
+	- res made the light_bumpmap shader fall back to light.
+	- res changed the "castle" level to have Z buffer clearing enabled
+	  (needed for SR).
 27-Oct-2006
 	- res updated the docs for the new winlibs version.
 	- Daniel Fryer added HasNext() to the Mac OS X "defaults" 

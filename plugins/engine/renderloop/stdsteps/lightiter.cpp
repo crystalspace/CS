@@ -175,7 +175,8 @@ void csLightIterRenderStep::Init ()
     csStringID atxname = strings->Request ("light 0 attenuationtex");
     csStringID infallname = strings->Request ("light 0 inner falloff");
     csStringID ofallname = strings->Request ("light 0 outer falloff");
-	trw_inv_name = strings->Request ("light 0 transform inverse world");
+    trw_inv_name = strings->Request ("light 0 transform inverse world");
+    CS::ShaderVarName lightcountname (strings, "light count");
 
     shadermgr = CS_QUERY_REGISTRY (
     	object_reg, iShaderManager);
@@ -259,6 +260,15 @@ void csLightIterRenderStep::Init ()
       shvar_light_0_outer_falloff->SetType (csShaderVariable::FLOAT);
       shadermgr->AddVariable (shvar_light_0_outer_falloff);
     }
+
+    csRef<csShaderVariable> svLightCount (
+      shadermgr->GetVariable (lightcountname));
+    if (!svLightCount)
+    {
+      svLightCount = new csShaderVariable (lightcountname);
+      shadermgr->AddVariable (svLightCount);
+    }
+    svLightCount->SetValue (1);
   }
 }
 
