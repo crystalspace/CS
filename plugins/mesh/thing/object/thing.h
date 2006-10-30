@@ -1011,9 +1011,12 @@ public:
   virtual void PositionChild (iMeshObject* /*child*/, csTicks /*current_time*/) { }
   virtual size_t TestPolygons(const csVector3 * center, float radius,
       iPolygonCallback * polyCallback);
+  virtual void BuildDecal(const csVector3* pPos, float decalRadius,
+      iDecalBuilder* pDecalBuilder);
   
   //-------------------- iPolygonMesh interface implementation ----------------
   //csRef<PolyMeshHelper> polygonMesh;
+  //
   //-------------------- CD iPolygonMesh implementation -----------------------
   //csRef<PolyMeshHelper> polygonMeshCD;
   //-------------------- Lower detail iPolygonMesh implementation -------------

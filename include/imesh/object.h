@@ -30,6 +30,7 @@
  * \addtogroup meshplugins
  * @{ */
 
+struct iDecalBuilder;
 struct iLight;
 struct iMaterialWrapper;
 struct iMeshWrapper;
@@ -40,8 +41,8 @@ struct iMeshObjectType;
 struct iMovable;
 struct iObjectModel;
 struct iPortal;
-struct iRenderView;
 struct iPolygonCallback;
+struct iRenderView;
 
 struct csRenderMesh;
 
@@ -273,6 +274,9 @@ struct iMeshObject : public virtual iBase
    * it's current state.
    */
   virtual void PositionChild (iMeshObject* child,csTicks current_time) = 0;
+
+  virtual void BuildDecal(const csVector3* pPos, float decalRadius,
+          iDecalBuilder* pDecalBuilder) = 0;
 
   virtual size_t TestPolygons(const csVector3 * center, float radius,
       iPolygonCallback * polyCallback) = 0;

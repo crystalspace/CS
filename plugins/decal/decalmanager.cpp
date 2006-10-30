@@ -19,7 +19,8 @@
 csDecal::csDecal(iObjectRegistry * pObjectReg, iDecalManager * pManager, 
                  size_t id)
        : m_pObjectReg(pObjectReg), m_pManager(pManager), m_nID(id), 
-         m_nIndexCount(0), m_nVertexCount(0), m_width(0), m_height(0)
+         m_nIndexCount(0), m_nVertexCount(0), m_width(0), m_height(0),
+         m_pCurrMesh(0)
 {
   m_pEngine = csQueryRegistry<iEngine>(m_pObjectReg);
 
@@ -49,10 +50,12 @@ csDecal::~csDecal()
     delete m_renderMeshes[a];
 }
 
-void csDecal::InitializePosition(const csVector3& normal, 
-        const csVector3& pos, const csVector3& up, const csVector3& right,
-        float width, float height)
+void csDecal::Initialize(iMaterialWrapper* pMaterial, const csVector3& normal,
+          const csVector3& pos, const csVector3& up, const csVector3& right,
+          float width, float height)
 {
+    m_pMaterial = pMaterial;
+    
     m_normal = normal;
     m_pos = pos;
 
@@ -63,18 +66,9 @@ void csDecal::InitializePosition(const csVector3& normal,
     m_right = right;
 }
 
-void csDecal::AddMeshPolys(iMeshWrapper* pMesh, iMaterialWrapper* pMaterial, 
-          csArray<csPoly3D>& polys)
+void csDecal::BeginMesh(iMeshWrapper* pMesh)
 {
-  size_t a, b;
-  unsigned int tri[3];
-  size_t firstIndex = m_nIndexCount;
-  float normalThreshold = m_pManager->GetPolygonNormalThreshold();
-  size_t polyCount = polys.GetSize();
-
-  // check if we actually have some polygons to add
-  if (polyCount == 0)
-      return;
+  m_pCurrMesh = 0;
 
   // check if InitializePosition has been called with decent parameters
   if (m_width <= 0.01f || m_height <= 0.01f)
@@ -84,123 +78,141 @@ void csDecal::AddMeshPolys(iMeshWrapper* pMesh, iMaterialWrapper* pMaterial,
   if (m_nIndexCount >= CS_DECAL_MAX_TRIS_PER_DECAL*3)
       return;
 
+  m_firstIndex = m_nIndexCount;
   const csReversibleTransform& trans = 
       pMesh->GetMovable()->GetFullTransform();
 
-  csVector3 localNormal = trans.Other2ThisRelative(m_normal);
-  csVector3 localUp = trans.Other2ThisRelative(m_up);
-  csVector3 localRight = trans.Other2ThisRelative(m_right);
-  csVector3 vertOffset = localNormal * m_pManager->GetDecalOffset();
-  csVector3 relPos = trans.Other2This(m_pos);
+  m_localNormal = trans.Other2ThisRelative(m_normal);
+  m_localUp = trans.Other2ThisRelative(m_up);
+  m_localRight = trans.Other2ThisRelative(m_right);
+  m_vertOffset = m_localNormal * m_pManager->GetDecalOffset();
+  m_relPos = trans.Other2This(m_pos);
 
 #ifdef CS_DECAL_CLIP_DECAL
-  // four clip planes at the bottom, top, left, right decal borders
-  // two more for near and far clipping
-  csPlane3 cBottom = csPlane3(-localUp, -m_height*0.5f + localUp * relPos);
-  csPlane3 cTop =    csPlane3( localUp, -m_height*0.5f - localUp * relPos);
+  // bottom
+  m_clipPlanes[0] = 
+      csPlane3(-m_localUp, -m_height*0.5f + m_localUp * m_relPos);
+  
+  // top
+  m_clipPlanes[1] = 
+      csPlane3( m_localUp, -m_height*0.5f - m_localUp * m_relPos);
 
-  csPlane3 cLeft = csPlane3(-localRight, -m_width*0.5f + localRight * relPos);
-  csPlane3 cRight =csPlane3( localRight, -m_width*0.5f - localRight * relPos);
+  // left
+  m_clipPlanes[2] = 
+      csPlane3(-m_localRight, -m_width*0.5f + m_localRight * m_relPos);
 
-  csPlane3 cNear, cFar;
-  bool clipNearFar = m_pManager->GetNearFarClipping();
-  if (clipNearFar)
+  // right
+  m_clipPlanes[3] =
+      csPlane3( m_localRight, -m_width*0.5f - m_localRight * m_relPos);
+
+  if (m_pManager->GetNearFarClipping())
   {
     float nearFarScale = m_pManager->GetNearFarScale();
-    cNear = csPlane3(-localNormal, 
-            -m_radius*nearFarScale + localNormal * relPos);
-    cFar =  csPlane3( localNormal, 
-            -m_radius*nearFarScale - localNormal * relPos);
+    m_clipPlanes[4] = csPlane3(-m_localNormal, 
+            -m_radius*nearFarScale + m_localNormal * m_relPos);
+    m_clipPlanes[5] = csPlane3( m_localNormal, 
+            -m_radius*nearFarScale - m_localNormal * m_relPos);
   }
+#endif // CS_DECAL_CLIP_DECAL
 
-  for (a=0; a<polyCount; ++a)
-  {
-    polys[a].CutToPlane(cBottom);
-    polys[a].CutToPlane(cTop);
-    polys[a].CutToPlane(cLeft);
-    polys[a].CutToPlane(cRight);
+  // we didn't encounter any errors, so validate the current mesh
+  m_pCurrMesh = pMesh;
+}
 
-    if (clipNearFar)
-    {
-      polys[a].CutToPlane(cNear);
-      polys[a].CutToPlane(cFar);
-    }
-  }
-#endif
-      
-  for (a=0; a<polyCount; ++a)
-  {
-    csPoly3D* pPoly = &polys[a];
-    size_t vertCount = pPoly->GetVertexCount();
+void csDecal::AddStaticPoly(const csPoly3D& p)
+{
+  size_t a;
+  unsigned int tri[3];
 
-    if (vertCount < 3)
-        continue;
+  if (!m_pCurrMesh)
+      return;
+
+  csPoly3D poly = p;
+
+#ifdef CS_DECAL_CLIP_DECAL
+  size_t numClipPlanes = m_pManager->GetNearFarClipping() ? 6 : 4;
+  for (a=0; a<numClipPlanes; ++a)
+      poly.CutToPlane(m_clipPlanes[a]);
+#endif // CS_DECAL_CLIP_DECAL
+  
+  size_t vertCount = poly.GetVertexCount();
+
+  // only support triangles and up
+  if (vertCount < 3)
+    return;
     
-    if (-pPoly->ComputeNormal() * localNormal < normalThreshold)
-        continue;
+  // ensure the polygon isn't facing away from the decal's normal too much
+  if (-poly.ComputeNormal() * m_localNormal < 
+          m_pManager->GetPolygonNormalThreshold())
+    return;
 
-    // check if we hit our maximum allowed vertices
-    if (m_nVertexCount + vertCount > CS_DECAL_MAX_VERTS_PER_DECAL)
-        vertCount = CS_DECAL_MAX_VERTS_PER_DECAL - m_nVertexCount;
+  // check if we hit our maximum allowed vertices
+  if (m_nVertexCount + vertCount > CS_DECAL_MAX_VERTS_PER_DECAL)
+    vertCount = CS_DECAL_MAX_VERTS_PER_DECAL - m_nVertexCount;
 
-    if (vertCount == 0)
-        break;
+  if (vertCount < 3)
+    return;
 
-    tri[0] = m_nVertexCount;
-    for (b=0; b<pPoly->GetVertexCount(); ++b)
-    {
-        csVector3 vertPos = *pPoly->GetVertex(b) + vertOffset;
-        csVector3 relVert = vertPos - relPos;
-        size_t vertIdx = m_nVertexCount+b;
+  tri[0] = m_nVertexCount;
+  for (a=0; a<vertCount; ++a)
+  {
+    csVector3 vertPos = *poly.GetVertex(a) + m_vertOffset;
+    csVector3 relVert = vertPos - m_relPos;
+    size_t vertIdx = m_nVertexCount+a;
 
-        // copy over vertex data
-        m_pVertexBuffer->CopyInto(&vertPos, 1, vertIdx);
+    // copy over vertex data
+    m_pVertexBuffer->CopyInto(&vertPos, 1, vertIdx);
         
-        // create the index buffer for each triangle in the poly
-        if (b >= 2)
-        {
-            tri[1] = vertIdx-1;
-            tri[2] = vertIdx;
-            m_pIndexBuffer->CopyInto(&tri, 3, m_nIndexCount);
-            m_nIndexCount += 3;
-        }
-
-        // copy over a color
-        float c[4] = {1.0f, 1.0f, 1.0f, 1.0f};
-        m_pColorBuffer->CopyInto(c, 1, vertIdx);
-
-        // generate uv coordinates
-        csVector2 texCoord((localRight * m_width) * relVert + 0.5f,
-                            -(localUp * m_height) * relVert + 0.5f);
-        m_pTexCoordBuffer->CopyInto(&texCoord, 1, vertIdx);
-         
-        // copy over normal
-        m_pNormalBuffer->CopyInto(&localNormal, 1, vertIdx);
+    // create the index buffer for each triangle in the poly
+    if (a >= 2)
+    {
+      tri[1] = vertIdx-1;
+      tri[2] = vertIdx;
+      m_pIndexBuffer->CopyInto(&tri, 3, m_nIndexCount);
+      m_nIndexCount += 3;
     }
 
-    m_nVertexCount += vertCount;
+    // copy over a color
+    float c[4] = {1.0f, 1.0f, 1.0f, 1.0f};
+    m_pColorBuffer->CopyInto(c, 1, vertIdx);
+
+    // generate uv coordinates
+    csVector2 texCoord((m_localRight * m_width) * relVert + 0.5f,
+                        -(m_localUp * m_height) * relVert + 0.5f);
+    m_pTexCoordBuffer->CopyInto(&texCoord, 1, vertIdx);
+     
+    // copy over normal
+    m_pNormalBuffer->CopyInto(&m_localNormal, 1, vertIdx);
   }
+
+  m_nVertexCount += vertCount;
+}
+
+void csDecal::EndMesh()
+{
+  if (!m_pCurrMesh)
+      return;
 
   // make sure we actually added some geometry before we create a rendermesh
-  if (m_nIndexCount == firstIndex)
+  if (m_nIndexCount == m_firstIndex)
       return;
 
   printf("Creating decal rendermesh with %d indecies\n", 
-          m_nIndexCount-firstIndex);
-        
-  // create a decal rendermesh for this mesh
+          m_nIndexCount-m_firstIndex);
+
+  // create a rendermesh for this mesh
   csRenderMesh* pRenderMesh = new csRenderMesh();
   m_renderMeshes.Push(pRenderMesh);
   pRenderMesh->mixmode = 0;
   pRenderMesh->meshtype = CS_MESHTYPE_TRIANGLES;
-  pRenderMesh->indexstart = firstIndex;
+  pRenderMesh->indexstart = m_firstIndex;
   pRenderMesh->indexend = m_nIndexCount;
-  pRenderMesh->material = pMaterial;
+  pRenderMesh->material = m_pMaterial;
   pRenderMesh->buffers = m_pBufferHolder;
   pRenderMesh->geometryInstance = (void *)m_pBufferHolder;
   //m_variableContext.AttachNew(new csShaderVariableContext);
   //pRenderMesh->variablecontext = m_variableContext;
-  pMesh->AddExtraRenderMesh(pRenderMesh);
+  m_pCurrMesh->AddExtraRenderMesh(pRenderMesh);
 }
 
 CS_IMPLEMENT_PLUGIN
@@ -208,7 +220,7 @@ SCF_IMPLEMENT_FACTORY(csDecalManager)
 
 csDecalManager::csDecalManager(iBase * parent)
               : scfImplementationType(this, parent), 
-                objectReg(0) 
+                objectReg(0), m_pCurrDecal(0)
 {
   polygonNormalThreshold = CS_DECAL_DEFAULT_NORMAL_THRESHOLD;
   decalOffset = CS_DECAL_DEFAULT_OFFSET;
@@ -254,8 +266,6 @@ bool csDecalManager::CreateDecal(iMaterialWrapper * material,
   }
 
   // get all meshes that could be affected by this decal
-  bool success = false;
-  iMeshWrapper * mesh;
   csDecal * pDecal = 0;
   csVector3 relPos;
   csRef<iMeshWrapperIterator> it = engine->GetNearbyMeshes(sector, *pos, 
@@ -264,20 +274,24 @@ bool csDecalManager::CreateDecal(iMaterialWrapper * material,
       return false;
 
   pDecal = new csDecal(objectReg, this, decals.Length());
-  pDecal->InitializePosition(n, *pos, correctUp, right, width, height);
+  pDecal->Initialize(material, n, *pos, correctUp, right, width, height);
   decals.Push(pDecal);
+  m_pCurrDecal = pDecal;
   while (it->HasNext())
   {
-    mesh = it->Next();
-    relPos = mesh->GetMovable()->GetFullTransform().Other2This(*pos);
-    polygonBuffer.Empty();
-    size_t polyCount = mesh->GetMeshObject()->TestPolygons(&relPos,
-        radius, (iPolygonCallback *)this);
+    iMeshWrapper* pMesh = it->Next();
+    csVector3 relPos = 
+        pMesh->GetMovable()->GetFullTransform().Other2This(*pos);
 
-    if (polyCount > 0)
-      pDecal->AddMeshPolys(mesh, material, polygonBuffer);
+    pDecal->BeginMesh(pMesh);
+    //pMesh->GetMeshObject()->TestPolygons(&relPos, radius, 
+    //        (iPolygonCallback*)this);
+    pMesh->GetMeshObject()->BuildDecal(&relPos, radius, 
+            (iDecalBuilder*)pDecal);
+    pDecal->EndMesh();
   }
-  return success;
+  m_pCurrDecal = 0;
+  return true;
 }
 
 /*
@@ -361,6 +375,10 @@ float csDecalManager::GetNearFarScale() const
 
 void csDecalManager::AddPolygon(const csPoly3D & poly)
 {
-  polygonBuffer.Push(poly);
+  if (!m_pCurrDecal)
+      return;
+
+  m_pCurrDecal->AddStaticPoly(poly);
+  //polygonBuffer.Push(poly);
 }
 

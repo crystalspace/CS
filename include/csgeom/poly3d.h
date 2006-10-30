@@ -342,6 +342,9 @@ public:
    * Compute and get the central vertex of this polygon.
    */
   csVector3 GetCenter () const;
+
+  /// Figure out if this polygon is inside or intersecting a sphere
+  bool InSphere(const csVector3& center, float radius);
 };
 
 /// This structure is used by csVector3Array::CompressVertices().

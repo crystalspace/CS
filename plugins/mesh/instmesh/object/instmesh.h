@@ -313,6 +313,11 @@ public:
     return 0;
   }
 
+  virtual void BuildDecal(const csVector3* pPos, float decalRadius,
+          iDecalBuilder* pDecalBuilder)
+  {
+  }
+
   /// Calculate bounding box and radius.
   void CalculateBBoxRadius ();
   const csBox3& GetObjectBoundingBox ();

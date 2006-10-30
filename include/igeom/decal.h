@@ -24,6 +24,7 @@
 struct iSector;
 struct iMaterialWrapper;
 class csVector3;
+class csPoly3D;
 
 /**\file
  * Decal and Decal manager interfaces
@@ -38,6 +39,20 @@ class csVector3;
  */
 struct iDecal
 {
+};
+
+struct iDecalBuilder
+{
+  virtual ~iDecalBuilder() {}
+
+  /**
+   * Adds a static polygon to the decal.  The decal builder
+   * will build geometry for this polygon and append it to
+   * the mesh's extra rendermesh list.
+   * \param p   The polygon to add to the decal.
+   */
+  virtual void AddStaticPoly(const csPoly3D& p) = 0;
+    
 };
 
 /**

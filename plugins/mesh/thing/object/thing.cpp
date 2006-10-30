@@ -70,6 +70,7 @@
 #include "thing.h"
 #include "ivaria/collider.h"
 #include "igeom/polycallback.h"
+#include "igeom/decal.h"
 
 #ifdef CS_DEBUG
   //#define LIGHTMAP_DEBUG
@@ -1916,6 +1917,7 @@ size_t csThing::TestPolygons(const csVector3 * center, float radius,
   size_t count = 0;
   size_t i;
 
+  csPoly3D poly;
   // @@@ This routine is not very optimal. Especially for things
   // with large number of polygons.
   for (i = 0; i < static_data->static_polygons.Length (); i++)
@@ -1925,7 +1927,7 @@ size_t csThing::TestPolygons(const csVector3 * center, float radius,
     {
       ++count;
 
-      csPoly3D poly;
+      poly.SetVertexCount(0);
       for (int a=0; a<p->GetVertexCount(); ++a)
         poly.AddVertex(p->Vobj(a));
 
@@ -1933,6 +1935,27 @@ size_t csThing::TestPolygons(const csVector3 * center, float radius,
     }
   }
   return count;
+}
+void csThing::BuildDecal(const csVector3* pPos, float decalRadius,
+    iDecalBuilder* pDecalBuilder)
+{
+  size_t i;
+  csPoly3D poly;
+
+  // @@@ This routine is not very optimal. Especially for things
+  // with large number of polygons.
+  for (i = 0; i < static_data->static_polygons.Length (); i++)
+  {
+    csPolygon3DStatic *p = static_data->static_polygons.Get (i);
+    if (p->InSphere(*pPos, decalRadius))
+    {
+      poly.SetVertexCount(0);
+      for (int a=0; a<p->GetVertexCount(); ++a)
+        poly.AddVertex(p->Vobj(a));
+
+      pDecalBuilder->AddStaticPoly(poly); 
+    }
+  }
 }
 
 bool csThing::HitBeamOutline (const csVector3& start,

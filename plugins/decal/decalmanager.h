@@ -26,7 +26,7 @@ class csShaderVariableContext;
 #define CS_DECAL_MAX_TRIS_PER_DECAL         32
 #define CS_DECAL_MAX_VERTS_PER_DECAL        96 
 
-class csDecal : public iDecal
+class csDecal : public iDecal, iDecalBuilder
 {
 private:
   iObjectRegistry*              m_pObjectReg;
@@ -45,6 +45,8 @@ private:
   csRef<csRenderBufferHolder>   m_pBufferHolder;
   csArray<csRenderMesh*>        m_renderMeshes;
 
+  iMaterialWrapper*             m_pMaterial;
+
   // used to keep track of the next open slot in our buffers and what to render
   size_t                        m_nIndexCount;
   size_t                        m_nVertexCount;
@@ -61,17 +63,28 @@ private:
 
   // radius is the length from the center of the decal to a corner
   float                         m_radius;
+
+  // some settings for the current mesh
+  iMeshWrapper*                 m_pCurrMesh;
+  size_t                        m_firstIndex;
+  csVector3                     m_localNormal;
+  csVector3                     m_localUp;
+  csVector3                     m_localRight;
+  csVector3                     m_vertOffset;
+  csVector3                     m_relPos;
+  csPlane3                      m_clipPlanes[6];
   
 public:
   csDecal(iObjectRegistry * pObjectReg, iDecalManager * pManager, size_t id);
   virtual ~csDecal();
 
-  void InitializePosition(const csVector3& normal, 
-        const csVector3& pos, const csVector3& up, const csVector3& right, 
-        float width, float height);
-
-  void AddMeshPolys(iMeshWrapper* pMesh, iMaterialWrapper* pMaterial, 
-          csArray<csPoly3D>& polys);
+  void Initialize(iMaterialWrapper* pMaterial, const csVector3& normal,
+          const csVector3& pos, const csVector3& up, const csVector3& right,
+          float width, float height);
+  
+  void BeginMesh(iMeshWrapper* pMesh);
+  virtual void AddStaticPoly(const csPoly3D& p);
+  void EndMesh();
 };
 
 class csDecalManager : public scfImplementation3<csDecalManager,
@@ -88,6 +101,7 @@ private:
   float decalOffset;
   bool clipNearFar;
   float nearFarScale;
+  csDecal* m_pCurrDecal;
 
 public:
   csDecalManager(iBase * parent);

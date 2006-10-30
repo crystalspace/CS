@@ -746,6 +746,10 @@ public:
   {
     return 0;
   }
+  virtual void BuildDecal(const csVector3* pPos, float decalRadius,
+          iDecalBuilder* pDecalBuilder)
+  {
+  }
 
   virtual float GetSphereEmitInnerRadius ()
   { return this->GetEmitSize2 (); }

@@ -134,6 +134,11 @@ public:
     return 0;
   }
 
+  virtual void BuildDecal(const csVector3* pPos, float decalRadius,
+          iDecalBuilder* pDecalBuilder)
+  {
+  }
+
   //------------------------- iLightningState implementation ----------------
   virtual void SetOrigin(const csVector3& pos) { this->origin = pos; }
   virtual const csVector3& GetOrigin() const {return this->origin;}

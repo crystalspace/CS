@@ -725,6 +725,11 @@ public:
     return 0;
   }
 
+  virtual void BuildDecal(const csVector3* pPos, float decalRadius,
+          iDecalBuilder* pDecalBuilder)
+  {
+  }
+
   /** \name iMeshObjectFactory interface implementation
    * @{ */
   virtual csPtr<iMeshObject> NewInstance ();

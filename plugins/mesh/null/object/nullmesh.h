@@ -146,6 +146,10 @@ public:
   {
     return 0;
   }
+  virtual void BuildDecal(const csVector3* pPos, float decalRadius,
+          iDecalBuilder* pDecalBuilder)
+  {
+  }
 
   //------------------------- iNullMeshState implementation ----------------
   class NullMeshState : public iNullMeshState

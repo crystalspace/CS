@@ -1,4 +1,5 @@
 <world>
+
     <textures>
         <texture name="andrew_wood">
             <file>/lib/stdtex/andrew_wood.jpg</file>
@@ -12,8 +13,49 @@
     <plugins>
         <plugin name="thing">crystalspace.mesh.loader.thing</plugin>
     </plugins>
+        
+
+    <meshfact name="cubeFact">
+        <plugin>crystalspace.mesh.loader.factory.genmesh</plugin>
+        <params>
+            <numvt>8</numvt>
+            <numtri>12</numtri>
+            <v x="-2.1" y="2.1" z="2.1" u="0" v="0" />
+            <v x="-2.1" y="2.1" z="-2.1" u="1" v="0" />
+            <v x="2.1" y="2.1" z="-2.1" u="0" v="1" />
+            <v x="2.1" y="2.1" z="2.1" u="1" v="1" />
+            <v x="-2.1" y="-2.1" z="2.1" u="1" v="0" />
+            <v x="-2.1" y="-2.1" z="-2.1" u="0" v="1" />
+            <v x="2.1" y="-2.1" z="-2.1" u="1" v="1" />
+            <v x="2.1" y="-2.1" z="2.1" u="0" v="0" />
+            <t v1="2" v2="3" v3="1" />
+            <t v1="3" v2="2" v3="1" />
+            <t v1="4" v2="5" v3="7" />
+            <t v1="5" v2="6" v3="7" />
+            <t v1="0" v2="4" v3="3" />
+            <t v1="4" v2="7" v3="3" />
+            <t v1="1" v2="6" v3="5" />
+            <t v1="1" v2="2" v3="6" />
+            <t v1="0" v2="1" v3="5" />
+            <t v1="0" v2="5" v3="4" />
+            <t v1="2" v2="3" v3="7" />
+            <t v1="2" v2="7" v3="6" />
+            <autonormals />
+        </params>
+    </meshfact>
+
 
     <sector name="room">
+        <meshobj name="cube">
+            <plugin>crystalspace.mesh.loader.genmesh</plugin>
+            <params>
+                <factory>cubeFact</factory>
+                <material>mosaic</material>
+            </params>
+            <move>
+                <v x="1" y="0" z="3" />
+            </move>
+        </meshobj>
         <meshobj name="walls">
             <plugin>thing</plugin>
             <zuse />
@@ -53,10 +95,12 @@
 
     <sequences>
         <sequence name="rotate_walls">
+        <!--
             <move mesh="walls" duration="100000" x="100" y="0" z="-200" />
             <rotate mesh="walls" duration="100000">
                 <roty>100.5708</roty>
             </rotate>
+        -->
         </sequence>
     </sequences>
     <triggers>

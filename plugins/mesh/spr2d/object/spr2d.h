@@ -248,6 +248,11 @@ public:
     return 0;
   }
 
+  virtual void BuildDecal(const csVector3* pPos, float decalRadius,
+          iDecalBuilder* pDecalBuilder)
+  {
+  }
+
   /**\name iSprite2DState implementation
    * @{ */
   virtual void SetLighting (bool l)
