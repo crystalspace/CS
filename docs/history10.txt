@@ -18,6 +18,7 @@ chronological order.
 	  lighting improvements, castle support).
 	- res merged r25752 into 1.0 (don't bind deprecated some methods).
 	- res merged r25753 into 1.0 (master header fix).
+	- res merged r25755 into 1.0 (fix checks for empty libs).
 27-Oct-2006
 
 	***** RELEASE OF 1.0PRE1 *****

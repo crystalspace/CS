@@ -135,7 +135,8 @@ AC_DEFUN([CS_CHECK_LIB_WITH],
 
 	cs_check_lib_flags=''
 	AS_IF([test $with_$1 = yes],
-	    [m4_foreach([cs_check_lib_alias], [$1, $10],
+	    [m4_foreach([cs_check_lib_alias], 
+		[m4_ifval([$10], [$1, $10], [$1])],
 		[_CS_CHECK_LIB_PKG_CONFIG_FLAGS([cs_check_lib_flags],
 		    cs_check_lib_alias)
 		_CS_CHECK_LIB_CONFIG_FLAGS([cs_check_lib_flags],
@@ -145,7 +146,8 @@ AC_DEFUN([CS_CHECK_LIB_WITH],
 	AS_IF([test $with_$1 != yes],
 	    [cs_check_lib_paths=$with_$1],
 	    [cs_check_lib_paths="| cs_lib_paths_default $3"])
-	m4_foreach([cs_check_lib_alias], [$1, $10],
+	m4_foreach([cs_check_lib_alias], 
+	    [m4_ifval([$10], [$1, $10], [$1])],
 	    [_CS_CHECK_LIB_CREATE_FLAGS([cs_check_lib_flags],
 		cs_check_lib_alias, [$cs_check_lib_paths])
 	    ])

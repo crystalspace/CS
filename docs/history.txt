@@ -10,6 +10,11 @@ chronological order.
 	  deprecated members from cspath.
 	- caedes removed the exclusion of gmeshskel2.h from master headers,
           as the old conflicting gmeshskel.h is already gone.
+	- res tweaked the CS_CHECK_LIB_WITH autoconf macro to fix the
+	  m4_foreach invocations to not have an empty entry in the list if no
+	  lib aliases were given. Apparently, earlier m4 versions skipped the
+	  empty entry. Newer versions don't and caused weird checks for the
+	  "empty lib" in configure.
 29-Oct-2006
 	- Eric Sunshine fixed a quoting problem in configure.ac which caused
 	  X11 check to barf for old-style installations.
