@@ -31,6 +31,7 @@ chronological order.
 	  VECTOR4 now.
 	- res updated lighter2 for the CS::TriangleStream change.
 	- res fixed some VC warnings.
+	- caedes added gmeshkel2.h and skeleton.h interfaces to cspace.i.
 29-Oct-2006
 	- res changed lighter2 to store primitives as triangles instead of
 	  polygons.
