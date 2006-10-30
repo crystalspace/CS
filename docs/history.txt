@@ -23,6 +23,9 @@ chronological order.
 	  position object" SV which is not provided by the standard render 
 	  steps. Fixes occuring floating point exceptions and also probably
 	  makes lighting actually work right.
+	- res added a templated variant of csTriangle, CS::TriangleT<>.
+	- res changed CS::TriangleStream to be more like the other CS 
+	  iterators (ie use HasNext() and Next()).
 29-Oct-2006
 	- res changed lighter2 to store primitives as triangles instead of
 	  polygons.
