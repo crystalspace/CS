@@ -19,6 +19,7 @@ chronological order.
 	- res merged r25755 into 1.0 (fix checks for empty libs).
 	- res merged r25767 into 1.0 (make vproc_std work with standard
 	  rendersteps).
+	- res merged r25771 into 1.0 (VC warning fixes).
 29-Oct-2006
 	- Eric Sunshine merged r25691, r25744, r25745 into 1.0 (X11R7 detection
 	  fixes).
