@@ -12,6 +12,8 @@ chronological order.
 	  and iConfigFileIterator
 	- caedes added some %ignore directives in cspace.i to avoid wrapping
 	  deprecated members from cspath.
+	- caedes removed the exclusion of gmeshskel2.h from master headers,
+          as the old conflicting gmeshskel.h is already gone.
 29-Oct-2006
 	- res changed lighter2 to store primitives as triangles instead of
 	  polygons.
