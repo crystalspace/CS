@@ -17,6 +17,7 @@ chronological order.
 	- res merged r25735, r25736:25741 into 1.0 (software renderer + 
 	  lighting improvements, castle support).
 	- res merged r25752 into 1.0 (don't bind deprecated some methods).
+	- res merged r25753 into 1.0 (master header fix).
 27-Oct-2006
 
 	***** RELEASE OF 1.0PRE1 *****
