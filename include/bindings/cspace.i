@@ -971,6 +971,11 @@ iArrayChangeElements<csShaderVariable * >;
 %include "igeom/path.h"
 %template(scfPath) scfImplementation1<csPath,iPath >;
 %include "igeom/polymesh.h"
+/*Ignore some deprecated functions*/
+%ignore csPath::GetPointCount;
+%ignore csPath::GetTimeValue;
+%ignore csPath::SetTimeValues;
+%ignore csPath::GetTimeValues;
 %include "csgeom/path.h"
 %include "csgeom/polymesh.h"
 %include "csgeom/spline.h"

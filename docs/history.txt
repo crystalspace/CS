@@ -10,6 +10,8 @@ chronological order.
 	- dfryer added GetTuple, SetTuple, and HasNext() functionality
 	  to OS X specific 'defaultsconfig' implementations of iConfigFile
 	  and iConfigFileIterator
+	- caedes added some %ignore directives in cspace.i to avoid wrapping
+	  deprecated members from cspath.
 29-Oct-2006
 	- res changed lighter2 to store primitives as triangles instead of
 	  polygons.
