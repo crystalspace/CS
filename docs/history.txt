@@ -10,6 +10,7 @@ chronological order.
 	- Eric Sunshine fixed a quoting problem in configure.ac which caused
 	  X11 check to barf for old-style installations.
 27-Oct-2006
+	- res updated the docs for the new winlibs version.
 	- Daniel Fryer added HasNext() to the Mac OS X "defaults" 
 	  iConfigFileIterator implementation and also fixed the non-standard
 	  behavior of returning a null iterator instead of an 
@@ -22,6 +23,8 @@ chronological order.
 	  interface was defined wrong (GetLowStop() instead of GetLoStop()
 	  for example) and also the odedynam plugin was no longer
 	  implementing that interface.
+	- res fixed the bullet plugin to build with somewhat newer bullet
+	  versions.
 25-Oct-2006
 	- Jorrit fixed a bug in iSector->HitBeamPortals(). If it would
 	  traverse a portal then the returned intersection point would not be
