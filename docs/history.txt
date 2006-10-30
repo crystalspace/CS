@@ -254,6 +254,8 @@ chronological order.
 	  glBegin()/glEnd() without specifying any vertices. Hopefully helps
 	  for trac #18.
 27-Sep-2006
+	- mdmkolbe enabled separate debug info by default on compatible
+	  versions of Cygwin's binutils.
 	- Jorrit removed the particles level after merging the particles
 	  there with partsys.
 	- Jorrit removed the fountain mesh object.

@@ -9,6 +9,7 @@ chronological order.
 29-Oct-2006
 	- Eric Sunshine merged r25691, r25744, r25745 into 1.0 (X11R7 detection
 	  fixes).
+	- res merged r25449 into 1.0 (enable separate debug info on Cygwin).
 26-Oct-2006
 	- Jorrit merged r25695 into 1.0 (odedynam).
 	- Jorrit merged r25686 into 1.0 (rpm/cs.spec).
