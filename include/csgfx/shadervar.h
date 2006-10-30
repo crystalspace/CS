@@ -26,6 +26,7 @@
  
 #include "csextern.h"
 
+#include "csgeom/math.h"
 #include "csgeom/transfrm.h"
 #include "csgeom/vector2.h"
 #include "csgeom/vector3.h"
@@ -73,8 +74,8 @@ class CS_CRYSTALSPACE_EXPORT csShaderVariable : public csRefCount
 public:
   /**
    * Data types that can be stored.
-   * Data storage and retrieval is not strict - data stored as INT, FLOAT, 
-   * COLOR or any VECTORx data can also be retrieved as any other of those.
+   * Data storage and retrieval is not strict - data stored as INT, FLOAT 
+   * or any VECTORx data can also be retrieved as any other of those.
    */
   enum VariableType
   {
@@ -84,8 +85,6 @@ public:
     INT = 1,
     /// Float
     FLOAT,
-    /// Color
-    COLOR,
     /// Texture
     TEXTURE,
     /// Renderbuffer
@@ -101,7 +100,13 @@ public:
     /// Transform
     TRANSFORM,
     /// Array
-    ARRAY
+    ARRAY,
+    
+    /**
+     * Color
+     * \deprecated Same as VECTOR4.
+     */
+    COLOR = VECTOR4
   };
 
   //CS_LEAKGUARD_DECLARE (csShaderVariable);
@@ -187,10 +192,14 @@ public:
   bool GetValue (csRGBpixel& value)
   {
     if (accessor) accessor->PreGetValue (this);
-    value.red = (char) VectorValue.x;
-    value.green = (char) VectorValue.y;
-    value.blue = (char) VectorValue.z;
-    value.alpha = (char) VectorValue.w;
+    value.red = 
+      (unsigned char) csClamp (int (VectorValue.x * 255.0f), 255, 0);
+    value.green = 
+      (unsigned char) csClamp (int (VectorValue.y * 255.0f), 255, 0);
+    value.blue = 
+      (unsigned char) csClamp (int (VectorValue.z * 255.0f), 255, 0);
+    value.alpha = 
+      (unsigned char) csClamp (int (VectorValue.w * 255.0f), 255, 0);;
     return true;
   }
 
@@ -308,10 +317,10 @@ public:
   bool SetValue (const csRGBpixel &value)
   {
     Type = COLOR;
-    VectorValue.x = (float) value.red;
-    VectorValue.y = (float) value.green;
-    VectorValue.z = (float) value.blue;
-    VectorValue.w = (float) value.alpha;
+    VectorValue.x = (float)value.red / 255.0f;
+    VectorValue.y = (float)value.green / 255.0f;
+    VectorValue.z = (float)value.blue / 255.0f;
+    VectorValue.w = (float)value.alpha / 255.0f;
     return true;
   }
 

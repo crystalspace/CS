@@ -130,7 +130,6 @@ csArray<csVector4> csInstmeshMeshObject::Variable2Vectors (csShaderVariable& par
   csArray<csVector4> vectors;
   switch (parameter.GetType ())
   {
-  case csShaderVariable::COLOR:
   case csShaderVariable::VECTOR2:
   case csShaderVariable::VECTOR3:
   case csShaderVariable::VECTOR4:
@@ -242,7 +241,6 @@ const csShaderVariable& csInstmeshMeshObject::GetInstanceVariable (
       csShaderVariable* variable = instance_template->GetArrayElement (variable_id);
       switch (variable->GetType ())
       {
-      case csShaderVariable::COLOR:
       case csShaderVariable::VECTOR2:
       case csShaderVariable::VECTOR3:
         dummy_variable.SetValue (csVector3 (variables[0].x, variables[0].y, variables[0].z));

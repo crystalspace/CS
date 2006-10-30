@@ -26,6 +26,9 @@ chronological order.
 	- res added a templated variant of csTriangle, CS::TriangleT<>.
 	- res changed CS::TriangleStream to be more like the other CS 
 	  iterators (ie use HasNext() and Next()).
+	- res deprecated the COLOR shader variable type. It does not provide
+	  a significant benefit over VECTOR4. In fact, it's the same as 
+	  VECTOR4 now.
 29-Oct-2006
 	- res changed lighter2 to store primitives as triangles instead of
 	  polygons.

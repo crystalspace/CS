@@ -26,3 +26,12 @@ A header (@file{include/csutil/atomicops.h}) containing definitions of operation
 with guranteed atomicity such as CAS (Compare-And-Set) and increment.
 
 Full documentation in @xref{Threading}.
+
+@subsection Rendering subsystem changes
+
+@subsubheading Shader variable type @samp{COLOR} deprecated
+
+The shader variable type @samp{COLOR} was deprecated as it does not provide
+a significant benefit over @samp{VECTOR4}. Hence, use the latter if you intent
+to store colors. Internally, @samp{COLOR}s are the same as @samp{VECTOR4}s, so
+handling of the @samp{COLOR} type can generally be removed from code.
