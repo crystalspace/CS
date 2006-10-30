@@ -9,6 +9,11 @@ chronological order.
 29-Oct-2006
 	- Eric Sunshine fixed a quoting problem in configure.ac which caused
 	  X11 check to barf for old-style installations.
+	- res changed scfFactory::IncRef() to always get the symbol for the
+	  factory function after the plugin shared lib has been loaded. The
+	  reasons is that the address of that symbol may change if the shared
+	  lib happens to be unloaded in between attempts to get an instance
+	  of the component.
 27-Oct-2006
 	- res updated the docs for the new winlibs version.
 	- Daniel Fryer added HasNext() to the Mac OS X "defaults" 

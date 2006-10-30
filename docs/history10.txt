@@ -12,6 +12,7 @@ chronological order.
 	- res merged r25449 into 1.0 (enable separate debug info on Cygwin).
 	- res merged r25708, r25754 into 1.0 (winlibs update).
 	- res merged r25711 into 1.0 (1x1 normal map).
+	- res merged r25733 into 1.0 (plugin unload/load crash fix).
 27-Oct-2006
 
 	***** RELEASE OF 1.0PRE1 *****
