@@ -2424,9 +2424,9 @@ csODEJoint::csODEJoint (csODEDynamicSystem *sys) : scfImplementationType (this, 
   fmax = csVector3 (0);
   fudge_factor = csVector3 (1);
   bounce = csVector3 (0);
-  cfm = csVector3 (9.9999997e-006);
+  cfm = csVector3 (9.9999997e-006f);
   stop_erp = csVector3 (0.2f);
-  stop_cfm = csVector3 (9.9999997e-006);
+  stop_cfm = csVector3 (9.9999997e-006f);
   suspension_erp = csVector3 (0.0f);
   suspension_cfm = csVector3 (0.0f);
 
