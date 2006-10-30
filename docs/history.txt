@@ -16,6 +16,7 @@ chronological order.
 	  behavior of returning a null iterator instead of an 
 	  empty iterator.  
 26-Oct-2006
+	- Genjix added a flat 1px X 1px normalmap texture inside standard.zip
 	- Jorrit fixed a problem with physics plugin. The iODEJointState
 	  interface was defined wrong (GetLowStop() instead of GetLoStop()
 	  for example) and also the odedynam plugin was no longer
