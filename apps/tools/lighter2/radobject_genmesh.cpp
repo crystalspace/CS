@@ -144,18 +144,14 @@ namespace lighter
         iGeneralMeshSubMesh* subMesh = genFact->GetSubMesh (s);
         iRenderBuffer* indices = subMesh->GetIndices();
 
-        CS::TriangleIndicesStream<size_t> tris;
-        csRenderBufferLock<uint8> indexLock (indices);
-        const uint8* indexEnd = indexLock + indices->GetSize();
-        tris.BeginTriangulate (indexLock, indexEnd, indices->GetElementDistance(),
-          indices->GetComponentType(), CS_MESHTYPE_TRIANGLES);
+        CS::TriangleIndicesStream<size_t> tris (indices, 
+          CS_MESHTYPE_TRIANGLES);
 
-        while (tris.HasNextTri())
+        while (tris.HasNext())
         {
-          size_t a = 0, b = 0, c = 0;
-          tris.NextTriangle (a, b, c);
+          CS::TriangleT<size_t> tri (tris.Next ());
 
-          AddPrimitive (a, b, c, subMesh);
+          AddPrimitive (tri.a, tri.b, tri.c, subMesh);
         }
       }
     }
