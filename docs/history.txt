@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+30-Oct-2006
+	- dfryer added GetTuple, SetTuple, and HasNext() functionality
+	  to OS X specific 'defaultsconfig' implementations of iConfigFile
+	  and iConfigFileIterator
 29-Oct-2006
 	- res changed lighter2 to store primitives as triangles instead of
 	  polygons.
