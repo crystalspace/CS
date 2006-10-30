@@ -6,9 +6,7 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
-29-Oct-2006
-	- Eric Sunshine merged r25691, r25744, r25745 into 1.0 (X11R7 detection
-	  fixes).
+30-Oct-2006
 	- res merged r25449 into 1.0 (enable separate debug info on Cygwin).
 	- res merged r25708, r25754 into 1.0 (winlibs update).
 	- res merged r25711 into 1.0 (1x1 normal map).
@@ -19,6 +17,11 @@ chronological order.
 	- res merged r25752 into 1.0 (don't bind deprecated some methods).
 	- res merged r25753 into 1.0 (master header fix).
 	- res merged r25755 into 1.0 (fix checks for empty libs).
+	- res merged r25767 into 1.0 (make vproc_std work with standard
+	  rendersteps).
+29-Oct-2006
+	- Eric Sunshine merged r25691, r25744, r25745 into 1.0 (X11R7 detection
+	  fixes).
 27-Oct-2006
 
 	***** RELEASE OF 1.0PRE1 *****
