@@ -14,6 +14,9 @@ chronological order.
 	  reasons is that the address of that symbol may change if the shared
 	  lib happens to be unloaded in between attempts to get an instance
 	  of the component.
+	- res fixed some crashes in the software renderer occuring when 
+	  drawing without BeginDraw() being called (occurs when the engine 
+	  does PrecacheDraw()).
 27-Oct-2006
 	- res updated the docs for the new winlibs version.
 	- Daniel Fryer added HasNext() to the Mac OS X "defaults" 
