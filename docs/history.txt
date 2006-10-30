@@ -19,6 +19,10 @@ chronological order.
 	  lib aliases were given. Apparently, earlier m4 versions skipped the
 	  empty entry. Newer versions don't and caused weird checks for the
 	  "empty lib" in configure.
+	- res augmented vproc_std to deal with the absence of a "light 
+	  position object" SV which is not provided by the standard render 
+	  steps. Fixes occuring floating point exceptions and also probably
+	  makes lighting actually work right.
 29-Oct-2006
 	- res changed lighter2 to store primitives as triangles instead of
 	  polygons.
