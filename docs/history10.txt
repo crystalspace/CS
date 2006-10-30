@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+29-Oct-2006
+	- Eric Sunshine merged r25691, r25744, r25745 into 1.0 (X11R7 detection
+	  fixes).
 26-Oct-2006
 	- Jorrit merged r25695 into 1.0 (odedynam).
 	- Jorrit merged r25686 into 1.0 (rpm/cs.spec).

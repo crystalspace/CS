@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+29-Oct-2006
+	- Eric Sunshine fixed a quoting problem in configure.ac which caused
+	  X11 check to barf for old-style installations.
 27-Oct-2006
 	- Daniel Fryer added HasNext() to the Mac OS X "defaults" 
 	  iConfigFileIterator implementation and also fixed the non-standard
@@ -23,6 +26,12 @@ chronological order.
 	- Jorrit fixed a bug in iSector->HitBeamPortals(). If it would
 	  traverse a portal then the returned intersection point would not be
 	  correct.
+	- res adjusted the X11 detection such that the pkgconfig packages, as
+	  provided by newer X.org versions, are looked for first before
+	  falling back to the autoconf X detection macro.
+24-Oct-2006
+	- res bumped the version numbers for the CS and CEL version checks in
+	  jamtemplate's configure template to 1.1.
 	- res fixed install.jam to support file names with spaces.
 	- res updated the "external libraries" section in the manual to also
 	  state versions of the dependencies.
