@@ -15,9 +15,6 @@ chronological order.
 	  iConfigFileIterator implementation and also fixed the non-standard
 	  behavior of returning a null iterator instead of an 
 	  empty iterator.  
-
-	***** RELEASE OF 1.0PRE1 *****
-
 26-Oct-2006
 	- Jorrit fixed a problem with physics plugin. The iODEJointState
 	  interface was defined wrong (GetLowStop() instead of GetLoStop()
