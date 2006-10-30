@@ -6,6 +6,8 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+	- caedes added some %ignore directives in cspace.i to avoid wrapping
+	  deprecated members from cspath.
 29-Oct-2006
 	- Eric Sunshine fixed a quoting problem in configure.ac which caused
 	  X11 check to barf for old-style installations.
