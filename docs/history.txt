@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+01-Nov-2006
+	- Genjix removed redundant ShapeChanged () calls in
+	  iGeneralFactoryState::SetTriangle/VertexCount ().
 30-Oct-2006
 	- dfryer added GetTuple, SetTuple, and HasNext() functionality
 	  to OS X specific 'defaultsconfig' implementations of iConfigFile
