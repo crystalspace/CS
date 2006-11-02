@@ -25,8 +25,9 @@ some outstanding issues in the code as well as making it a bit more efficient.
 A header (@file{include/csutil/atomicops.h}) containing definitions of operations
 with guranteed atomicity such as CAS (Compare-And-Set) and increment.
 
-Full documentation in @xref{Threading}.
+Full documentation in @pxref{Threading}.
 
+@node Api120 Rendering
 @subsection Rendering subsystem changes
 
 @subsubheading Shader variable type @samp{COLOR} deprecated
