@@ -150,6 +150,11 @@ namespace lighter
         float distSq = jiVec.SquaredNorm ();
         jiVec.Normalize ();
 
+#ifndef DUMP_NORMALS
+        // Backface culling
+        if (jiVec * prim.GetPlane().Normal() >= 0.0f) continue;
+#endif
+
         float lambda, my;
         prim.ComputeBaryCoords (ec, lambda, my);
         csVector3 norm = lambda * normals[0] + my * normals[1] + 
@@ -158,7 +163,8 @@ namespace lighter
         float cosTheta_j = (norm * jiVec);
 
 #ifndef DUMP_NORMALS
-        if (cosTheta_j <= 0.0f) continue; //backface culling
+        // Also cull if interpolated normal points away
+        if (cosTheta_j <= 0.0f) continue; 
 #endif
 
         // Do a 5 ray visibility test

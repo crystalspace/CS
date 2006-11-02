@@ -6,7 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
-01-Nov-2006
+2-Nov-2006
+	- res tweaked lighter2 to also use the primitive's normal for backface
+	  culling and not just the interpolated normal.
+1-Nov-2006
 	- Genjix removed redundant ShapeChanged () calls in
 	  iGeneralFactoryState::SetTriangle/VertexCount ().
 30-Oct-2006
