@@ -9,6 +9,8 @@ chronological order.
 2-Nov-2006
 	- res tweaked lighter2 to also use the primitive's normal for backface
 	  culling and not just the interpolated normal.
+	- Genjix added CS::WeakReferenced class for objects implementing
+	  AddRefOwner/RemoveRefOwner, enabling simple objects with csWeakRef.
 1-Nov-2006
 	- Genjix removed redundant ShapeChanged () calls in
 	  iGeneralFactoryState::SetTriangle/VertexCount ().
