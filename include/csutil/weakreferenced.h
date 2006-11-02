@@ -20,7 +20,6 @@
 #ifndef __CS_WEAKREFERENCED_H__
 #define __CS_WEAKREFERENCED_H__
 
-#include "refcount.h"
 #include "array.h"
 
 namespace CS
@@ -30,11 +29,10 @@ namespace CS
  * This is a class which provides basic weak reference-counting semantics.
  * It can be used in conjunction with the smart pointer template class
  * csWeakRef (see <weakref.h>).  This class itself provides no functionality
- * beyond reference counting (csRefCount) and pointer ownership tracking.
- * It is intended that you should subclass CS::WeakReferenced and add needed
- * functionality.
+ * beyond pointer ownership tracking. It is intended to be used to add
+ * weak referencing support to other classes by inheriting from it.
  */
-class WeakReferenced : public csRefCount
+class WeakReferenced
 {
 private:
   typedef csArray<void**,
@@ -44,6 +42,15 @@ private:
   WeakRefOwnerArray* weakref_owners;
 public:
   WeakReferenced () : weakref_owners (0) {}
+  ~WeakReferenced ()
+  {
+    if (weakref_owners)
+    {
+      for (size_t i = 0; i < weakref_owners->GetSize(); i++)
+	*(*weakref_owners[i]) = 0;
+      delete weakref_owners;
+    }
+  }
 
   void AddRefOwner (void** ref_owner)
   {

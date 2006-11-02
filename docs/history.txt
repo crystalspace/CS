@@ -11,6 +11,13 @@ chronological order.
 	  culling and not just the interpolated normal.
 	- Genjix added CS::WeakReferenced class for objects implementing
 	  AddRefOwner/RemoveRefOwner, enabling simple objects with csWeakRef.
+	- res made the following changes to CS::WeakReferenced:
+	    - Renamed header to weakreferenced.h to match class name.
+	    - Added destructor that sets all references tracked to 0.
+	    - Removed inheritance from csRefCount (might interfere in cases of
+	      multiple inheritance; also, it might be possible that weak ref
+	      support without refcounting support is desired in some 
+	      circumstances).
 1-Nov-2006
 	- Genjix removed redundant ShapeChanged () calls in
 	  iGeneralFactoryState::SetTriangle/VertexCount ().
