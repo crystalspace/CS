@@ -6,6 +6,12 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+3-Nov-2006
+	- Jorrit fixed nullmesh factory so that it has a sensible
+	  default bounding box (from -1,-1,-1 to 1,1,1). That prevents
+	  crashes in the kdtree when people forget to initialize this.
+	- Jorrit fixed nullmesh factory SetRadius() call so that it
+	  actually calculates the bounding box correctly from the radius.
 2-Nov-2006
 	- res tweaked lighter2 to also use the primitive's normal for backface
 	  culling and not just the interpolated normal.
