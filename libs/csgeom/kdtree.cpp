@@ -469,7 +469,7 @@ void csKDTree::DistributeLeafObjects ()
   // There should be some threshold at least.
 }
 
-void csKDTree::AddObject (const csBox3& /*bbox*/, csKDTreeChild* obj)
+void csKDTree::AddObjectInt (csKDTreeChild* obj)
 {
   // Add this object to the list of objects to be distributed
   // later.
@@ -483,8 +483,14 @@ csKDTreeChild* csKDTree::AddObject (const csBox3& bbox, void* object)
 {
   csKDTreeChild* obj = TreeAlloc()->tree_children.Alloc ();
   obj->object = object;
-  obj->bbox = bbox;
-  AddObject (bbox, obj);
+  // To fix a problem with illegal bounding boxes (i.e. empty or
+  // not initialized) we set the bounding box to a small value when
+  // we find it.
+  if (bbox.Empty ())
+    obj->bbox.Set (-.1, -.1, -.1, .1, .1, .1);
+  else
+    obj->bbox = bbox;
+  AddObjectInt (obj);
   return obj;
 }
 
@@ -574,7 +580,7 @@ void csKDTree::MoveObject (csKDTreeChild* object, const csBox3& new_bbox)
     if (do_flatten)
       node->Flatten ();
     else
-      node->AddObject (new_bbox, object);
+      node->AddObjectInt (object);
   }
 }
 
