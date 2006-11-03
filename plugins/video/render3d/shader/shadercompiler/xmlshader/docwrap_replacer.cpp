@@ -86,7 +86,8 @@ CS_IMPLEMENT_STATIC_VAR (ReplacerAttrAlloc,
 csRef<iDocumentAttribute> csReplacerDocumentNode::GetAttribute (
   const char* name)
 {
-  csRef<iDocumentAttribute> wrappedAttr = attrCache.Get (name, 0);
+  csRef<iDocumentAttribute> wrappedAttr = attrCache.Get (name, 
+    (iDocumentAttribute*)0);
   if (wrappedAttr.IsValid()) return wrappedAttr;
 
   wrappedAttr = wrappedNode->GetAttribute (name);

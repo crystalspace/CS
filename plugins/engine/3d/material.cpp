@@ -132,7 +132,7 @@ void csMaterial::SetShader (csStringID type, iShader* shd)
 
 iShader* csMaterial::GetShader(csStringID type)
 {
-  return shaders.Get (type, 0);
+  return shaders.Get (type, (iShader*)0);
 }
 
 iTextureHandle *csMaterial::GetTexture ()

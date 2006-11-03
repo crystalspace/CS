@@ -164,6 +164,7 @@ namespace Implementation
         lock.Lock ();
       }
     };
+    template<typename LockType> friend struct AddEntryHelper;
 
     void NotifyEntry (WaitListEntry* entry)
     {

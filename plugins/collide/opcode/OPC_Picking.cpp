@@ -22,7 +22,8 @@
 CS_PLUGIN_NAMESPACE_BEGIN(csOpcode)
 {
 
-using namespace Opcode;
+namespace Opcode
+{
 
 #ifdef OPC_RAYHIT_CALLBACK
 
@@ -181,6 +182,8 @@ float min_dist, float max_dist, const Point& view_point, CullModeCallback callba
 	}
 	return false;
 }
+
+} // namespace Opcode
 
 #endif
 
