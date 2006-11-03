@@ -47,7 +47,9 @@ public:
     if (weakref_owners)
     {
       for (size_t i = 0; i < weakref_owners->GetSize(); i++)
-	*(*weakref_owners[i]) = 0;
+      {
+        *((*weakref_owners)[i]) = 0;
+      }
       delete weakref_owners;
     }
   }

@@ -17,6 +17,7 @@ chronological order.
 	  could cause assertion errors (i.e. leaf_replaced and such). The
 	  work around simply tests for illegal bounding boxes and replaces
 	  that box internally with a very small legal one.
+	- Genjix fixed dodgy referencing of pointer in WeakReferenced destructor.
 2-Nov-2006
 	- res tweaked lighter2 to also use the primitive's normal for backface
 	  culling and not just the interpolated normal.
