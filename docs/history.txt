@@ -20,6 +20,8 @@ chronological order.
 	- Genjix fixed dodgy referencing of pointer in WeakReferenced destructor.
 	- caedes fixed an mistype in csgeom/vector4.h (csVector4 incorrectly
 	  referenced from inside csVector4T).
+	- caedes made the engine add a "mesh creation time" shvar to all
+	  created meshobjects.
 2-Nov-2006
 	- res tweaked lighter2 to also use the primitive's normal for backface
 	  culling and not just the interpolated normal.
