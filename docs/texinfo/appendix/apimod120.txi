@@ -12,9 +12,10 @@ Crystal Space.
 
 @menu
 * Api120 Threading:: Threading changes
+* Api120 Rendering:: Rendering subsystem changes
 @end menu
 
-@node Api120 Threading, , Release Notes 120, Release Notes 120
+@node Api120 Threading, Api120 Rendering, Release Notes 120, Release Notes 120
 @subsection Threading changes
 
 For the 1.2 release the threading subsystem in Crystal Space have been entirely
@@ -27,7 +28,7 @@ with guranteed atomicity such as CAS (Compare-And-Set) and increment.
 
 Full documentation in @pxref{Threading}.
 
-@node Api120 Rendering
+@node Api120 Rendering, , Api120 Threading, Release Notes 120
 @subsection Rendering subsystem changes
 
 @subsubheading Shader variable type @samp{COLOR} deprecated
