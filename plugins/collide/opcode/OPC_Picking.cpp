@@ -36,7 +36,7 @@ namespace Opcode
 
 */
 
-bool Opcode::SetupAllHits(RayCollider& collider, CollisionFaces& contacts)
+bool SetupAllHits(RayCollider& collider, CollisionFaces& contacts)
 {
 	struct Local
 	{
@@ -53,7 +53,7 @@ bool Opcode::SetupAllHits(RayCollider& collider, CollisionFaces& contacts)
 	return true;
 }
 
-bool Opcode::SetupClosestHit(RayCollider& collider, CollisionFace& closest_contact)
+bool SetupClosestHit(RayCollider& collider, CollisionFace& closest_contact)
 {
 	struct Local
 	{
@@ -71,14 +71,14 @@ bool Opcode::SetupClosestHit(RayCollider& collider, CollisionFace& closest_conta
 	return true;
 }
 
-bool Opcode::SetupShadowFeeler(RayCollider& collider)
+bool SetupShadowFeeler(RayCollider& collider)
 {
 	collider.SetFirstContact(true);
 	collider.SetHitCallback(null);
 	return true;
 }
 
-bool Opcode::SetupInOutTest(RayCollider& collider)
+bool SetupInOutTest(RayCollider& collider)
 {
 	collider.SetFirstContact(false);
 	collider.SetHitCallback(null);
@@ -86,7 +86,7 @@ bool Opcode::SetupInOutTest(RayCollider& collider)
 	return true;
 }
 
-bool Opcode::Picking(
+bool Picking(
 CollisionFace& picked_face,
 const Ray& world_ray, const Model& model, const Matrix4x4* world,
 float min_dist, float max_dist, const Point& view_point, CullModeCallback callback, void* user_data)

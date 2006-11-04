@@ -439,7 +439,7 @@ static void cmd_config (char *args)
 {
   bool real_fs;
   get_option (args, real_fs);
-  iVFS *CfgVFS = real_fs ? (iVFS*)0 : VFS;
+  iVFS *CfgVFS = real_fs ? (iVFS*)0 : (iVFS*)VFS;
 
   iConfigFile *config =
     Cfg->AddDomain (args, CfgVFS, iConfigManager::ConfigPriorityCmdLine);
