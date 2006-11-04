@@ -6,6 +6,12 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+4-Nov-2006
+	- res changed the VC project templates to enable "force for loop scope
+	  conformances" (means for loop control variables declared in the for
+	  statement exist only in the inner scope [as the standard says] - VC7
+	  and 7.1 default behaviour is to be compatible with the VC6's broken 
+	  loop variables that also exist on the outside scope).
 3-Nov-2006
 	- Jorrit fixed nullmesh factory so that it has a sensible
 	  default bounding box (from -1,-1,-1 to 1,1,1). That prevents
