@@ -24,6 +24,9 @@ chronological order.
 	  created meshobjects.
 	- res fixed a couple of VC7 errors and warnings.
 	- res fixed a couple of gcc issues after the VC7 fixes.
+	- caedes fixed the PythMod jam rule so it can be used in plugins
+	  external to cs, and adapted cspace and pycscegui modules jamfiles
+	  for the change.
 2-Nov-2006
 	- res tweaked lighter2 to also use the primitive's normal for backface
 	  culling and not just the interpolated normal.
