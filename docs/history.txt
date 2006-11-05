@@ -6,6 +6,61 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+5-Nov-2006
+	- res worked around an apparent VC7 compiler bug causing trouble with
+	  csArray: compiler-generated assignment operators seem to 
+	  errorneously copy a single byte for empty classes.
+	- res fixed shader variables and program parameters filled from
+	  shader expressions to be forced to type VECTOR4.
+	- Eric Sunshine fixed CS_CHECK_LIB_WITH() Autoconf macro
+	  (mk/autoconf/checklib.m4) to generate valid shell variable names even
+	  when the LIBRARY name contains "special" characters, such as hyphens,
+	  periods, etc.  (A similar problem had been fixed for the ALIASES
+	  argument of CS_CHECK_LIB_WITH() in SVN r19486, but that patch
+	  neglected to address the issue for the LIBRARY argument.)
+4-Nov-2006
+	- res changed the VC project templates to enable "force for loop scope
+	  conformances" (means for loop control variables declared in the for
+	  statement exist only in the inner scope [as the standard says] - VC7
+	  and 7.1 default behaviour is to be compatible with the VC6's broken 
+	  loop variables that also exist on the outside scope).
+3-Nov-2006
+	- Jorrit fixed nullmesh factory so that it has a sensible
+	  default bounding box (from -1,-1,-1 to 1,1,1). That prevents
+	  crashes in the kdtree when people forget to initialize this.
+	- Jorrit fixed nullmesh factory SetRadius() call so that it
+	  actually calculates the bounding box correctly from the radius.
+	- Jorrit worked around a very old problem with the kdtree when
+	  it receives objects with empty or illegal bounding boxes. This
+	  could cause assertion errors (i.e. leaf_replaced and such). The
+	  work around simply tests for illegal bounding boxes and replaces
+	  that box internally with a very small legal one.
+	- Genjix fixed dodgy referencing of pointer in WeakReferenced
+	  destructor.
+	- caedes fixed an mistype in csgeom/vector4.h (csVector4 incorrectly
+	  referenced from inside csVector4T).
+	- caedes made the engine add a "mesh creation time" shvar to all
+	  created meshobjects.
+	- res fixed a couple of VC7 errors and warnings.
+	- res fixed a couple of gcc issues after the VC7 fixes.
+	- caedes fixed the PythMod jam rule so it can be used in plugins
+	  external to cs, and adapted cspace and pycscegui modules jamfiles
+	  for the change.
+2-Nov-2006
+	- res tweaked lighter2 to also use the primitive's normal for backface
+	  culling and not just the interpolated normal.
+	- Genjix added CS::WeakReferenced class for objects implementing
+	  AddRefOwner/RemoveRefOwner, enabling simple objects with csWeakRef.
+	- res made the following changes to CS::WeakReferenced:
+	    - Renamed header to weakreferenced.h to match class name.
+	    - Added destructor that sets all references tracked to 0.
+	    - Removed inheritance from csRefCount (might interfere in cases of
+	      multiple inheritance; also, it might be possible that weak ref
+	      support without refcounting support is desired in some 
+	      circumstances).
+1-Nov-2006
+	- Genjix removed redundant ShapeChanged () calls in
+	  iGeneralFactoryState::SetTriangle/VertexCount ().
 30-Oct-2006
 	- caedes added some %ignore directives in cspace.i to avoid wrapping
 	  deprecated members from cspath.

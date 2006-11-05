@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+5-Nov-2006
+	- Eric Sunshine merged r25803 into 1.0 (CS_CHECK_LIB_WITH() macro
+	  "special" characters).
 30-Oct-2006
 	- res merged r25449 into 1.0 (enable separate debug info on Cygwin).
 	- res merged r25708, r25754 into 1.0 (winlibs update).
