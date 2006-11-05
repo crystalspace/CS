@@ -1135,7 +1135,6 @@ bool csTextSyntaxService::ParseShaderVar (iDocumentNode* node,
 	csRef<iShaderVariableAccessor> acc = ParseShaderVarExpr (node);
 	if (!acc.IsValid())
 	  return false;
-	var.SetType (csShaderVariable::VECTOR4);
 	var.SetAccessor (acc);
       }
       break;
