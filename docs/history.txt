@@ -13,7 +13,13 @@ chronological order.
 	  periods, etc.  (A similar problem had been fixed for the ALIASES
 	  argument of CS_CHECK_LIB_WITH() in SVN r19486, but that patch
 	  neglected to address the issue for the LIBRARY argument.)
-01-Nov-2006
+3-Nov-2006
+	- Jorrit fixed nullmesh factory so that it has a sensible
+	  default bounding box (from -1,-1,-1 to 1,1,1). That prevents
+	  crashes in the kdtree when people forget to initialize this.
+	- Jorrit fixed nullmesh factory SetRadius() call so that it
+	  actually calculates the bounding box correctly from the radius.
+1-Nov-2006
 	- Genjix removed redundant ShapeChanged () calls in
 	  iGeneralFactoryState::SetTriangle/VertexCount ().
 30-Oct-2006
