@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+5-Nov-2006
+	- res worked around an apparent VC7 compiler bug causing trouble with
+	  csArray: compiler-generated assignment operators seem to 
+	  errorneously copy a single byte for empty classes.
 4-Nov-2006
 	- res changed the VC project templates to enable "force for loop scope
 	  conformances" (means for loop control variables declared in the for
