@@ -13,6 +13,9 @@ chronological order.
 	  periods, etc.  (A similar problem had been fixed for the ALIASES
 	  argument of CS_CHECK_LIB_WITH() in SVN r19486, but that patch
 	  neglected to address the issue for the LIBRARY argument.)
+01-Nov-2006
+	- Genjix removed redundant ShapeChanged () calls in
+	  iGeneralFactoryState::SetTriangle/VertexCount ().
 30-Oct-2006
 	- caedes added some %ignore directives in cspace.i to avoid wrapping
 	  deprecated members from cspath.

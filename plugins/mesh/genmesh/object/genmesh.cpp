@@ -2001,8 +2001,6 @@ void csGenmeshMeshObjectFactory::SetVertexCount (int n)
   mesh_normals_dirty_flag = true;
   mesh_colors_dirty_flag = true;
   mesh_tangents_dirty_flag = true;
-
-  ShapeChanged ();
 }
 
 void csGenmeshMeshObjectFactory::SetTriangleCount (int n)
@@ -2013,7 +2011,6 @@ void csGenmeshMeshObjectFactory::SetTriangleCount (int n)
   mesh_triangle_dirty_flag = true;
 
   initialized = false;
-  ShapeChanged ();
 }
 
 void csGenmeshMeshObjectFactory::CalculateNormals (bool compress)
