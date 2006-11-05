@@ -24,6 +24,8 @@ chronological order.
 	  could cause assertion errors (i.e. leaf_replaced and such). The
 	  work around simply tests for illegal bounding boxes and replaces
 	  that box internally with a very small legal one.
+	- caedes fixed an mistype in csgeom/vector4.h (csVector4 incorrectly
+	  referenced from inside csVector4T).
 1-Nov-2006
 	- Genjix removed redundant ShapeChanged () calls in
 	  iGeneralFactoryState::SetTriangle/VertexCount ().

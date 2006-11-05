@@ -13,6 +13,7 @@ chronological order.
 	- res merged r25777 into 1.0 (genmesh ShapeChanged() calls).
 	- res merged r25783 into 1.0 (nullmesh bbox).
 	- res merged r25784 into 1.0 (kdtree crash with empty bboxes).
+	- res merged r25886 into 1.0 (csVector4T copy'n'paste error).
 30-Oct-2006
 	- res merged r25449 into 1.0 (enable separate debug info on Cygwin).
 	- res merged r25708, r25754 into 1.0 (winlibs update).
