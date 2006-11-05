@@ -9,6 +9,7 @@ chronological order.
 5-Nov-2006
 	- Eric Sunshine merged r25803 into 1.0 (CS_CHECK_LIB_WITH() macro
 	  "special" characters).
+	- res merged r25774 into 1.0 (gmeshskel2 bindings).
 30-Oct-2006
 	- res merged r25449 into 1.0 (enable separate debug info on Cygwin).
 	- res merged r25708, r25754 into 1.0 (winlibs update).

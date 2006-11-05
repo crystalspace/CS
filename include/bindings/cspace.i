@@ -206,6 +206,7 @@
   INTERFACE_APPLY(iGeneralMeshState)
   INTERFACE_APPLY(iGraphics3D)
   INTERFACE_APPLY(iGraphics2D)
+  INTERFACE_APPLY(iGenMeshSkeletonControlState)
   INTERFACE_APPLY(iHalo)
   INTERFACE_APPLY(iImage)
   INTERFACE_APPLY(iImageIO)
@@ -272,6 +273,16 @@
   INTERFACE_APPLY(iSectorList)
   INTERFACE_APPLY(iShaderManager)
   INTERFACE_APPLY(iShaderVariableContext)
+  INTERFACE_APPLY(iSkeleton)
+  INTERFACE_APPLY(iSkeletonBone)
+  INTERFACE_APPLY(iSkeletonBoneFactory)
+  INTERFACE_APPLY(iSkeletonBoneRagdollInfo)
+  INTERFACE_APPLY(iSkeletonFactory)
+  INTERFACE_APPLY(iSkeletonGraveyard)
+  INTERFACE_APPLY(iSkeletonScript)
+  INTERFACE_APPLY(iSkeletonScriptKeyFrame)
+  INTERFACE_APPLY(iSkeletonSocket)
+  INTERFACE_APPLY(iSkeletonSocketFactory)
   INTERFACE_APPLY(iSndSysData)
   INTERFACE_APPLY(iSndSysManager)
   INTERFACE_APPLY(iSndSysSoftwareDriver)
@@ -1028,6 +1039,8 @@ iArrayChangeElements<csShaderVariable * >;
 %ignore iGeneralFactoryState::GetColors;
 #endif
 %include "imesh/genmesh.h"
+%include "imesh/skeleton.h"
+%include "imesh/gmeshskel2.h"
 struct csSprite2DVertex;
 %ignore iSprite2DState::GetVertices;
 %template(csSprite2DVertexArrayReadOnly) iArrayReadOnly<csSprite2DVertex>;

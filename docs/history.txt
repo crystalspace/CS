@@ -28,6 +28,7 @@ chronological order.
 	  steps. Fixes occuring floating point exceptions and also probably
 	  makes lighting actually work right.
 	- res fixed some VC warnings.
+	- caedes added gmeshkel2.h and skeleton.h interfaces to cspace.i.
 29-Oct-2006
 	- Eric Sunshine fixed a quoting problem in configure.ac which caused
 	  X11 check to barf for old-style installations.
