@@ -19,6 +19,11 @@ chronological order.
 	  crashes in the kdtree when people forget to initialize this.
 	- Jorrit fixed nullmesh factory SetRadius() call so that it
 	  actually calculates the bounding box correctly from the radius.
+	- Jorrit worked around a very old problem with the kdtree when
+	  it receives objects with empty or illegal bounding boxes. This
+	  could cause assertion errors (i.e. leaf_replaced and such). The
+	  work around simply tests for illegal bounding boxes and replaces
+	  that box internally with a very small legal one.
 1-Nov-2006
 	- Genjix removed redundant ShapeChanged () calls in
 	  iGeneralFactoryState::SetTriangle/VertexCount ().
