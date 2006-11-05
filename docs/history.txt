@@ -12,6 +12,12 @@ chronological order.
 	  errorneously copy a single byte for empty classes.
 	- res fixed shader variables and program parameters filled from
 	  shader expressions to be forced to type VECTOR4.
+	- Eric Sunshine fixed CS_CHECK_LIB_WITH() Autoconf macro
+	  (mk/autoconf/checklib.m4) to generate valid shell variable names even
+	  when the LIBRARY name contains "special" characters, such as hyphens,
+	  periods, etc.  (A similar problem had been fixed for the ALIASES
+	  argument of CS_CHECK_LIB_WITH() in SVN r19486, but that patch
+	  neglected to address the issue for the LIBRARY argument.)
 4-Nov-2006
 	- res changed the VC project templates to enable "force for loop scope
 	  conformances" (means for loop control variables declared in the for
@@ -29,7 +35,8 @@ chronological order.
 	  could cause assertion errors (i.e. leaf_replaced and such). The
 	  work around simply tests for illegal bounding boxes and replaces
 	  that box internally with a very small legal one.
-	- Genjix fixed dodgy referencing of pointer in WeakReferenced destructor.
+	- Genjix fixed dodgy referencing of pointer in WeakReferenced
+	  destructor.
 	- caedes fixed an mistype in csgeom/vector4.h (csVector4 incorrectly
 	  referenced from inside csVector4T).
 	- caedes made the engine add a "mesh creation time" shvar to all
