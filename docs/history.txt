@@ -10,6 +10,8 @@ chronological order.
 	- res worked around an apparent VC7 compiler bug causing trouble with
 	  csArray: compiler-generated assignment operators seem to 
 	  errorneously copy a single byte for empty classes.
+	- res fixed shader variables and program parameters filled from
+	  shader expressions to be forced to type VECTOR4.
 	- Eric Sunshine fixed CS_CHECK_LIB_WITH() Autoconf macro
 	  (mk/autoconf/checklib.m4) to generate valid shell variable names even
 	  when the LIBRARY name contains "special" characters, such as hyphens,

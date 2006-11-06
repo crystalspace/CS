@@ -15,6 +15,7 @@ chronological order.
 	- res merged r25784 into 1.0 (kdtree crash with empty bboxes).
 	- res merged r25886 into 1.0 (csVector4T copy'n'paste error).
 	- res merged r25791, r25796, r25799 into 1.0 (VC7 fixes).
+	- res merged r25801 into 1.0 (fix forced SV expression result type).
 30-Oct-2006
 	- res merged r25449 into 1.0 (enable separate debug info on Cygwin).
 	- res merged r25708, r25754 into 1.0 (winlibs update).
