@@ -23,6 +23,8 @@
 
 #ifdef SWIGPYTHON
 
+%include "bindings/python/pyattributes.i"
+
 %ignore ::operator+;
 %ignore ::operator-;
 %ignore ::operator*;

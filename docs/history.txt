@@ -9,6 +9,9 @@ chronological order.
 6-Nov-2006
 	- caedes added the uvanim shader, it is an xml shader for uv frame
 	  animation, ie, it scrolls over frames packed in a texture.
+	- caedes added some templates to swig interface files that allow
+	  python bindings to declare python properties (they work for
+	  external projects also).
 5-Nov-2006
 	- res worked around an apparent VC7 compiler bug causing trouble with
 	  csArray: compiler-generated assignment operators seem to 
