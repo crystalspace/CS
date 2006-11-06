@@ -35,13 +35,13 @@
 #include <CEGUI.h>
 #include "crystalspace.h"
 #include "ivaria/icegui.h"
+
 PyObject *handleException(CEGUI::Exception &e)
 {
     PyErr_SetString(PyExc_TypeError, e.getMessage().c_str());
     Py_INCREF(Py_None);
     return Py_None;
 }
-struct _csPyEventHandler;
 %}
 
 %import "cegui.i"

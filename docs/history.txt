@@ -18,6 +18,19 @@ chronological order.
 	  periods, etc.  (A similar problem had been fixed for the ALIASES
 	  argument of CS_CHECK_LIB_WITH() in SVN r19486, but that patch
 	  neglected to address the issue for the LIBRARY argument.)
+        - caedes made the following changes in swig interface files:
+            - fixed csTriangle wrapping.
+            - added iODEHinge2Joint to interface list.
+            - added wrapping of csVector4, csImageBase and csImageMemory.
+            - added an output typemap for csKeyModifiers, and list like
+              interface to fetch the modifiers.
+            - added extended python function GetValue for getting shadervar
+              values as python objects.
+            - added some ifdef so _csPyEventHandler does not get exported to
+              other modules %importing cspace.i (so now theyre not required
+              to declare it).
+            - removed csPixmap %ignore declaration.
+            - removed the _csPyEventHandler declaration from pycscegui.
 4-Nov-2006
 	- res changed the VC project templates to enable "force for loop scope
 	  conformances" (means for loop control variables declared in the for
