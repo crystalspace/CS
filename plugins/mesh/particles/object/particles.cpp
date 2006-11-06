@@ -567,7 +567,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
       radiusSq = currDistSq;
   }
 
-  CS_IMPLEMENT_STATIC_VAR(GetFGen, csRandomFloatGen,);
+  CS_IMPLEMENT_STATIC_VAR(GetFGen, csRandomFloatGen, ());
 
   void ParticlesMeshObject::NextFrame (csTicks current_time, const csVector3& pos,
     uint currentFrame)

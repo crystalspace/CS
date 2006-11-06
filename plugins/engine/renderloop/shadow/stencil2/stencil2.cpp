@@ -684,7 +684,8 @@ void csStencil2ShadowStep::Perform (iRenderView* rview, iSector* sector,
       {
         iMeshWrapper*& sp = shadowMeshes[m];
 
-        csRef<csStencil2ShadowCacheEntry> shadowCacheEntry = shadowcache.Get (sp, 0);
+        csRef<csStencil2ShadowCacheEntry> shadowCacheEntry = 
+	  shadowcache.Get (sp, (csStencil2ShadowCacheEntry*)0);
 
         if (!shadowCacheEntry) 
         {

@@ -158,7 +158,7 @@ bool csRenderLoopManager::Register (const char* name, iRenderLoop* loop)
  
 iRenderLoop* csRenderLoopManager::Retrieve (const char* name)
 {
-  return (loops.Get (name, 0));
+  return (loops.Get (name, (iRenderLoop*)0));
 }
 
 const char* csRenderLoopManager::GetName (iRenderLoop* loop)

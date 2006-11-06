@@ -487,7 +487,7 @@ csKDTreeChild* csKDTree::AddObject (const csBox3& bbox, void* object)
   // not initialized) we set the bounding box to a small value when
   // we find it.
   if (bbox.Empty ())
-    obj->bbox.Set (-.1, -.1, -.1, .1, .1, .1);
+    obj->bbox.Set (-.1f, -.1f, -.1f, .1f, .1f, .1f);
   else
     obj->bbox = bbox;
   AddObjectInt (obj);

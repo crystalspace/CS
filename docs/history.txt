@@ -7,12 +7,18 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 5-Nov-2006
+	- res worked around an apparent VC7 compiler bug causing trouble with
+	  csArray: compiler-generated assignment operators seem to 
+	  errorneously copy a single byte for empty classes.
 	- Eric Sunshine fixed CS_CHECK_LIB_WITH() Autoconf macro
 	  (mk/autoconf/checklib.m4) to generate valid shell variable names even
 	  when the LIBRARY name contains "special" characters, such as hyphens,
 	  periods, etc.  (A similar problem had been fixed for the ALIASES
 	  argument of CS_CHECK_LIB_WITH() in SVN r19486, but that patch
 	  neglected to address the issue for the LIBRARY argument.)
+4-Nov-2006
+	- res fixed a couple of VC7 errors and warnings.
+	- res fixed a couple of gcc issues after the VC7 fixes.
 3-Nov-2006
 	- Jorrit fixed nullmesh factory so that it has a sensible
 	  default bounding box (from -1,-1,-1 to 1,1,1). That prevents
