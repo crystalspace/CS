@@ -1,11 +1,7 @@
 /* Macros used to generate the right set of accessor methods to transform
  * getters/setters into Python attributes.
  *
- * Class - the class name
- * type - the type of the variable
- * name - the name you wish to use in the python bindings
- * setmethod - the set method in Class
- * getmethod - the get method in Class
+ * Attribute templates:
  * cs_attribute: Create a getter/setter. Both setmethod and getmethod are
     optional, if none is specified then Get and Set will be prepended to the
     attribute name to find the functions. If only setter is specified then
@@ -15,9 +11,14 @@
  * cs_multi_attr_writeonly: For multiple arguments setter only.
  */
 
-/* Helper pythoncode */
-%pythoncode
-%{
+/* Helper pythoncode
+ * All modules that want to use property macros in this file have to
+ * declare CS_PROPERTY_HELPERS
+ */
+
+%define CS_PROPERTY_HELPERS
+
+%pythoncode %{
 def fix_args(funct):
     def _inner(self, args):
         if type(args) == tuple:
@@ -27,6 +28,9 @@ def fix_args(funct):
         return funct(*args)
     return _inner
 %}
+%enddef
+
+CS_PROPERTY_HELPERS
 
 /* Read Write implementation */
 %define %cs_attribute_impl(Module,Class, type, name, getmethod, ...)
