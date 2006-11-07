@@ -164,7 +164,7 @@ AC_DEFUN([CS_CHECK_LIB_WITH],
 AC_DEFUN([_CS_CLW_WITH], [AS_TR_SH([with_$1])])
 AC_DEFUN([_CS_CLW_WITH_DEPRECATED], [AS_TR_SH([with_lib$1])])
 AC_DEFUN([_CS_CLW_WITH_CVAR], [AS_TR_SH([cs_cv_with_$1])])
-AC_DEFUN([_CS_CLW_LIB_CVAR], [AS_TR_SH([cs_cv_lib_$1])])
+AC_DEFUN([_CS_CLW_LIB_CVAR], [AS_TR_SH([cs_cv_lib$1])])
 
 
 

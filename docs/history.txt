@@ -6,6 +6,11 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+7-Nov-2007
+	- Eric Sunshine fixed r25803 bug in CS_CHECK_LIB_WITH() in checklib.m4
+	  which resulted in exported variables being named incorrectly, thus
+	  causing later tests and dependent code which relied upon those
+	  variables to fail.
 5-Nov-2006
 	- res worked around an apparent VC7 compiler bug causing trouble with
 	  csArray: compiler-generated assignment operators seem to 
