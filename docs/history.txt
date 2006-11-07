@@ -6,6 +6,31 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+7-Nov-2007
+	- Eric Sunshine changed CS_CHECK_PROG_VERSION() in progver.m4 to export
+	  shell variables `cs_prog_PROG_version' and `cs_prog_PROG_version_ok'
+	  indicating the discovered version of PROG and whether the version
+	  check succeeded, respectively. These variables are available to the
+	  ACTION-IF-OKAY and ACTION-IF-NOT-OKAY code fragments.
+	- Eric Sunshine clarified and further elaborated
+	  CS_CHECK_PROG_VERSION() documentation.
+	- Eric Sunshine augmented CS_CHECK_CSWIN32LIBS() in checkcswin32libs.m4
+	  to export also the result of the new `cslibs-config --incpath' option
+	  if available.
+	- Eric Sunshine rewrote the `pycegui' check in configure.ac essentially
+	  from scratch.
+	    - Added caching support so that it saves computed information in
+	      the configure cache file (when --config-cache is specified) and
+	      avoids expensive operations when cached information is available.
+	    - It now performs a simple extraction and Swig version comparison
+	      rather than "mis-using" CS_CHECK_PROG_VERSION().
+	    - Broke apart the check into a number of smaller pieces in order to
+	      facilitate comprehension and maintenance.
+	    - Added support for cs-win32libs when attempting to locate the
+	      pycegui.i Swig output file.
+	    - Fixed bug where default search path elements when locating
+	      cegui.i file were incorrectly separated by whitespace rather than
+	      $PATH_SEPARATOR.
 6-Nov-2006
 	- caedes added the uvanim shader, it is an xml shader for uv frame
 	  animation, ie, it scrolls over frames packed in a texture.
