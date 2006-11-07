@@ -1575,7 +1575,7 @@ m4_define([cegui_getver],
 [import sys
 import re
 try:
-    f=open(sys.argv[1],'r')
+    f=open(sys.argv[[1]],'r')
     s=f.readline()
     f.close()
     m=re.search(r'\d+\.\d+(?:\.\d+)*',s)
@@ -1616,7 +1616,7 @@ AS_IF([test "$cs_cv_pycegui" = yes],
     [AC_CACHE_CHECK([if pycegui Swig version is compatible],
         [cs_cv_pycegui_swig_ok],
         [pycegui_swig_ver=CS_RUN_PATH_NORMALIZE(
-            [$PYTHON -c "cegui_getver" "$cs_cv_pycegui_i_file"])
+            [$PYTHON -c "cegui_getver" "$cs_cv_pycegui_py_file"])
         AS_IF([test "$pycegui_swig_ver" = "$cs_prog_swig_version"],
             [cs_cv_pycegui_swig_ok=yes], [cs_cv_pycegui_swig_ok=no])])])
 

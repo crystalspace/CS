@@ -38,6 +38,8 @@ chronological order.
 	- res augmented the particle system to allow manually advancing it
 	  a given duration.
 	- res enabled --as-needed by default.
+	- caedes fixed two minor errors on the new pycegui test in 
+	  configure.ac.
 6-Nov-2006
 	- caedes added the uvanim shader, it is an xml shader for uv frame
 	  animation, ie, it scrolls over frames packed in a texture.
