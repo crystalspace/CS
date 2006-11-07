@@ -35,6 +35,8 @@ chronological order.
 	  which resulted in exported variables being named incorrectly, thus
 	  causing later tests and dependent code which relied upon those
 	  variables to fail.
+	- res augmented the particle system to allow manually advancing it
+	  a given duration.
 6-Nov-2006
 	- caedes added the uvanim shader, it is an xml shader for uv frame
 	  animation, ie, it scrolls over frames packed in a texture.
