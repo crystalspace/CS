@@ -66,6 +66,15 @@ class csWrapPtr(_object):
 csWrapPtr_swigregister = _cspace.csWrapPtr_swigregister
 csWrapPtr_swigregister(csWrapPtr)
 
+def fix_args(funct):
+    def _inner(self, args):
+        if type(args) == tuple:
+            args = (self,) + args
+        else:
+            args = (self, args)
+        return funct(*args)
+    return _inner
+
 class csArrayThresholdVariable(_object):
     __swig_setmethods__ = {}
     __setattr__ = lambda self, name, value: _swig_setattr(self, csArrayThresholdVariable, name, value)
