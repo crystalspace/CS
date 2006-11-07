@@ -22917,7 +22917,7 @@ fi
 	if test "$cs_ignore_cache" != yes; then
   echo "$as_me:$LINENO: checking for libx11" >&5
 echo $ECHO_N "checking for libx11... $ECHO_C" >&6
-if test "${cs_cv_lib_x11+set}" = set; then
+if test "${cs_cv_libx11+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   ac_ext=c
@@ -23057,17 +23057,17 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
   cs_build_cflags=`echo x$cs_cflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_lflags=`echo x$cs_lflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_cv_lib_x11=yes
-		cs_cv_lib_x11_cflags=$cs_build_cflags
-		cs_cv_lib_x11_lflags=$cs_build_lflags
-		cs_cv_lib_x11_libs=$cs_build_libs
+	cs_cv_libx11=yes
+		cs_cv_libx11_cflags=$cs_build_cflags
+		cs_cv_libx11_lflags=$cs_build_lflags
+		cs_cv_libx11_libs=$cs_build_libs
 else
-  cs_cv_lib_x11=no
+  cs_cv_libx11=no
 fi
 
 fi
-echo "$as_me:$LINENO: result: $cs_cv_lib_x11" >&5
-echo "${ECHO_T}$cs_cv_lib_x11" >&6
+echo "$as_me:$LINENO: result: $cs_cv_libx11" >&5
+echo "${ECHO_T}$cs_cv_libx11" >&6
 else
   echo "$as_me:$LINENO: checking for libx11" >&5
 echo $ECHO_N "checking for libx11... $ECHO_C" >&6
@@ -23208,29 +23208,29 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
   cs_build_cflags=`echo x$cs_cflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_lflags=`echo x$cs_lflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_cv_lib_x11=yes
-		cs_cv_lib_x11_cflags=$cs_build_cflags
-		cs_cv_lib_x11_lflags=$cs_build_lflags
-		cs_cv_lib_x11_libs=$cs_build_libs
+	cs_cv_libx11=yes
+		cs_cv_libx11_cflags=$cs_build_cflags
+		cs_cv_libx11_lflags=$cs_build_lflags
+		cs_cv_libx11_libs=$cs_build_libs
 else
-  cs_cv_lib_x11=no
+  cs_cv_libx11=no
 fi
 
-	    echo "$as_me:$LINENO: result: $cs_cv_lib_x11" >&5
-echo "${ECHO_T}$cs_cv_lib_x11" >&6
+	    echo "$as_me:$LINENO: result: $cs_cv_libx11" >&5
+echo "${ECHO_T}$cs_cv_libx11" >&6
 fi
 
-    if test $cs_cv_lib_x11 = yes; then
+    if test $cs_cv_libx11 = yes; then
   :
 else
-  cs_cv_lib_x11_cflags=''
-	cs_cv_lib_x11_lflags=''
-	cs_cv_lib_x11_libs=''
+  cs_cv_libx11_cflags=''
+	cs_cv_libx11_lflags=''
+	cs_cv_libx11_libs=''
 
 fi
 
 else
-  cs_cv_lib_x11=no
+  cs_cv_libx11=no
 fi
 
 
@@ -23667,7 +23667,7 @@ fi
 	if test "$cs_ignore_cache" != yes; then
   echo "$as_me:$LINENO: checking for libxext" >&5
 echo $ECHO_N "checking for libxext... $ECHO_C" >&6
-if test "${cs_cv_lib_xext+set}" = set; then
+if test "${cs_cv_libxext+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   ac_ext=c
@@ -23808,17 +23808,17 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
   cs_build_cflags=`echo x$cs_cflags_test $cs_cv_libx11_lflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_lflags=`echo x$cs_lflags_test $cs_cv_libx11_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_cv_lib_xext=yes
-		cs_cv_lib_xext_cflags=$cs_build_cflags
-		cs_cv_lib_xext_lflags=$cs_build_lflags
-		cs_cv_lib_xext_libs=$cs_build_libs
+	cs_cv_libxext=yes
+		cs_cv_libxext_cflags=$cs_build_cflags
+		cs_cv_libxext_lflags=$cs_build_lflags
+		cs_cv_libxext_libs=$cs_build_libs
 else
-  cs_cv_lib_xext=no
+  cs_cv_libxext=no
 fi
 
 fi
-echo "$as_me:$LINENO: result: $cs_cv_lib_xext" >&5
-echo "${ECHO_T}$cs_cv_lib_xext" >&6
+echo "$as_me:$LINENO: result: $cs_cv_libxext" >&5
+echo "${ECHO_T}$cs_cv_libxext" >&6
 else
   echo "$as_me:$LINENO: checking for libxext" >&5
 echo $ECHO_N "checking for libxext... $ECHO_C" >&6
@@ -23960,34 +23960,34 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
   cs_build_cflags=`echo x$cs_cflags_test $cs_cv_libx11_lflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_lflags=`echo x$cs_lflags_test $cs_cv_libx11_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_cv_lib_xext=yes
-		cs_cv_lib_xext_cflags=$cs_build_cflags
-		cs_cv_lib_xext_lflags=$cs_build_lflags
-		cs_cv_lib_xext_libs=$cs_build_libs
+	cs_cv_libxext=yes
+		cs_cv_libxext_cflags=$cs_build_cflags
+		cs_cv_libxext_lflags=$cs_build_lflags
+		cs_cv_libxext_libs=$cs_build_libs
 else
-  cs_cv_lib_xext=no
+  cs_cv_libxext=no
 fi
 
-	    echo "$as_me:$LINENO: result: $cs_cv_lib_xext" >&5
-echo "${ECHO_T}$cs_cv_lib_xext" >&6
+	    echo "$as_me:$LINENO: result: $cs_cv_libxext" >&5
+echo "${ECHO_T}$cs_cv_libxext" >&6
 fi
 
-    if test $cs_cv_lib_xext = yes; then
+    if test $cs_cv_libxext = yes; then
   :
 else
-  cs_cv_lib_xext_cflags=''
-	cs_cv_lib_xext_lflags=''
-	cs_cv_lib_xext_libs=''
+  cs_cv_libxext_cflags=''
+	cs_cv_libxext_lflags=''
+	cs_cv_libxext_libs=''
 
 fi
 
 else
-  cs_cv_lib_xext=no
+  cs_cv_libxext=no
 fi
 
 
     cs_cv_with_xext="$with_xext"
-    if test "$cs_cv_lib_xext" = yes; then
+    if test "$cs_cv_libxext" = yes; then
   :
 else
   $cs_cv_libx11_cflags
@@ -26463,7 +26463,7 @@ fi
 	if test "$cs_ignore_cache" != yes; then
   echo "$as_me:$LINENO: checking for libxxf86vm" >&5
 echo $ECHO_N "checking for libxxf86vm... $ECHO_C" >&6
-if test "${cs_cv_lib_xxf86vm+set}" = set; then
+if test "${cs_cv_libxxf86vm+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   ac_ext=c
@@ -26607,17 +26607,17 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
   cs_build_cflags=`echo x$cs_cflags_test $X_CFLAGS | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_lflags=`echo x$cs_lflags_test $X_LFLAGS | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test $X_PRE_LIBS $X_LIBS -lX11 -lXext $X_EXTRA_LIBS | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_cv_lib_xxf86vm=yes
-		cs_cv_lib_xxf86vm_cflags=$cs_build_cflags
-		cs_cv_lib_xxf86vm_lflags=$cs_build_lflags
-		cs_cv_lib_xxf86vm_libs=$cs_build_libs
+	cs_cv_libxxf86vm=yes
+		cs_cv_libxxf86vm_cflags=$cs_build_cflags
+		cs_cv_libxxf86vm_lflags=$cs_build_lflags
+		cs_cv_libxxf86vm_libs=$cs_build_libs
 else
-  cs_cv_lib_xxf86vm=no
+  cs_cv_libxxf86vm=no
 fi
 
 fi
-echo "$as_me:$LINENO: result: $cs_cv_lib_xxf86vm" >&5
-echo "${ECHO_T}$cs_cv_lib_xxf86vm" >&6
+echo "$as_me:$LINENO: result: $cs_cv_libxxf86vm" >&5
+echo "${ECHO_T}$cs_cv_libxxf86vm" >&6
 else
   echo "$as_me:$LINENO: checking for libxxf86vm" >&5
 echo $ECHO_N "checking for libxxf86vm... $ECHO_C" >&6
@@ -26762,34 +26762,34 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
   cs_build_cflags=`echo x$cs_cflags_test $X_CFLAGS | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_lflags=`echo x$cs_lflags_test $X_LFLAGS | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test $X_PRE_LIBS $X_LIBS -lX11 -lXext $X_EXTRA_LIBS | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_cv_lib_xxf86vm=yes
-		cs_cv_lib_xxf86vm_cflags=$cs_build_cflags
-		cs_cv_lib_xxf86vm_lflags=$cs_build_lflags
-		cs_cv_lib_xxf86vm_libs=$cs_build_libs
+	cs_cv_libxxf86vm=yes
+		cs_cv_libxxf86vm_cflags=$cs_build_cflags
+		cs_cv_libxxf86vm_lflags=$cs_build_lflags
+		cs_cv_libxxf86vm_libs=$cs_build_libs
 else
-  cs_cv_lib_xxf86vm=no
+  cs_cv_libxxf86vm=no
 fi
 
-	    echo "$as_me:$LINENO: result: $cs_cv_lib_xxf86vm" >&5
-echo "${ECHO_T}$cs_cv_lib_xxf86vm" >&6
+	    echo "$as_me:$LINENO: result: $cs_cv_libxxf86vm" >&5
+echo "${ECHO_T}$cs_cv_libxxf86vm" >&6
 fi
 
-    if test $cs_cv_lib_xxf86vm = yes; then
+    if test $cs_cv_libxxf86vm = yes; then
   :
 else
-  cs_cv_lib_xxf86vm_cflags=''
-	cs_cv_lib_xxf86vm_lflags=''
-	cs_cv_lib_xxf86vm_libs=''
+  cs_cv_libxxf86vm_cflags=''
+	cs_cv_libxxf86vm_lflags=''
+	cs_cv_libxxf86vm_libs=''
 
 fi
 
 else
-  cs_cv_lib_xxf86vm=no
+  cs_cv_libxxf86vm=no
 fi
 
 
     cs_cv_with_xxf86vm="$with_xxf86vm"
-    if test "$cs_cv_lib_xxf86vm" = yes; then
+    if test "$cs_cv_libxxf86vm" = yes; then
   cs_build_prop_val="yes"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     if test -n "$cs_build_prop_val"; then
@@ -27616,7 +27616,7 @@ fi
 	if test "$cs_ignore_cache" != yes; then
   echo "$as_me:$LINENO: checking for libxaw7" >&5
 echo $ECHO_N "checking for libxaw7... $ECHO_C" >&6
-if test "${cs_cv_lib_xaw7+set}" = set; then
+if test "${cs_cv_libxaw7+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   ac_ext=c
@@ -27757,17 +27757,17 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
   cs_build_cflags=`echo x$cs_cflags_test $X_CFLAGS | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_lflags=`echo x$cs_lflags_test $X_LFLAGS | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test $X_PRE_LIBS $X_LIBS -lXt -lX11 $X_EXTRA_LIBS | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_cv_lib_xaw7=yes
-		cs_cv_lib_xaw7_cflags=$cs_build_cflags
-		cs_cv_lib_xaw7_lflags=$cs_build_lflags
-		cs_cv_lib_xaw7_libs=$cs_build_libs
+	cs_cv_libxaw7=yes
+		cs_cv_libxaw7_cflags=$cs_build_cflags
+		cs_cv_libxaw7_lflags=$cs_build_lflags
+		cs_cv_libxaw7_libs=$cs_build_libs
 else
-  cs_cv_lib_xaw7=no
+  cs_cv_libxaw7=no
 fi
 
 fi
-echo "$as_me:$LINENO: result: $cs_cv_lib_xaw7" >&5
-echo "${ECHO_T}$cs_cv_lib_xaw7" >&6
+echo "$as_me:$LINENO: result: $cs_cv_libxaw7" >&5
+echo "${ECHO_T}$cs_cv_libxaw7" >&6
 else
   echo "$as_me:$LINENO: checking for libxaw7" >&5
 echo $ECHO_N "checking for libxaw7... $ECHO_C" >&6
@@ -27909,34 +27909,34 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
   cs_build_cflags=`echo x$cs_cflags_test $X_CFLAGS | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_lflags=`echo x$cs_lflags_test $X_LFLAGS | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test $X_PRE_LIBS $X_LIBS -lXt -lX11 $X_EXTRA_LIBS | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_cv_lib_xaw7=yes
-		cs_cv_lib_xaw7_cflags=$cs_build_cflags
-		cs_cv_lib_xaw7_lflags=$cs_build_lflags
-		cs_cv_lib_xaw7_libs=$cs_build_libs
+	cs_cv_libxaw7=yes
+		cs_cv_libxaw7_cflags=$cs_build_cflags
+		cs_cv_libxaw7_lflags=$cs_build_lflags
+		cs_cv_libxaw7_libs=$cs_build_libs
 else
-  cs_cv_lib_xaw7=no
+  cs_cv_libxaw7=no
 fi
 
-	    echo "$as_me:$LINENO: result: $cs_cv_lib_xaw7" >&5
-echo "${ECHO_T}$cs_cv_lib_xaw7" >&6
+	    echo "$as_me:$LINENO: result: $cs_cv_libxaw7" >&5
+echo "${ECHO_T}$cs_cv_libxaw7" >&6
 fi
 
-    if test $cs_cv_lib_xaw7 = yes; then
+    if test $cs_cv_libxaw7 = yes; then
   :
 else
-  cs_cv_lib_xaw7_cflags=''
-	cs_cv_lib_xaw7_lflags=''
-	cs_cv_lib_xaw7_libs=''
+  cs_cv_libxaw7_cflags=''
+	cs_cv_libxaw7_lflags=''
+	cs_cv_libxaw7_libs=''
 
 fi
 
 else
-  cs_cv_lib_xaw7=no
+  cs_cv_libxaw7=no
 fi
 
 
     cs_cv_with_xaw7="$with_xaw7"
-    if test "$cs_cv_lib_xaw7" = yes; then
+    if test "$cs_cv_libxaw7" = yes; then
   if test "$cs_cv_libxaw7" = yes; then
   cs_build_prop_val="yes"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
@@ -32607,7 +32607,7 @@ fi
 	if test "$cs_ignore_cache" != yes; then
   echo "$as_me:$LINENO: checking for libz" >&5
 echo $ECHO_N "checking for libz... $ECHO_C" >&6
-if test "${cs_cv_lib_z+set}" = set; then
+if test "${cs_cv_libz+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   ac_ext=c
@@ -32747,17 +32747,17 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
   cs_build_cflags=`echo x$cs_cflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_lflags=`echo x$cs_lflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_cv_lib_z=yes
-		cs_cv_lib_z_cflags=$cs_build_cflags
-		cs_cv_lib_z_lflags=$cs_build_lflags
-		cs_cv_lib_z_libs=$cs_build_libs
+	cs_cv_libz=yes
+		cs_cv_libz_cflags=$cs_build_cflags
+		cs_cv_libz_lflags=$cs_build_lflags
+		cs_cv_libz_libs=$cs_build_libs
 else
-  cs_cv_lib_z=no
+  cs_cv_libz=no
 fi
 
 fi
-echo "$as_me:$LINENO: result: $cs_cv_lib_z" >&5
-echo "${ECHO_T}$cs_cv_lib_z" >&6
+echo "$as_me:$LINENO: result: $cs_cv_libz" >&5
+echo "${ECHO_T}$cs_cv_libz" >&6
 else
   echo "$as_me:$LINENO: checking for libz" >&5
 echo $ECHO_N "checking for libz... $ECHO_C" >&6
@@ -32898,34 +32898,34 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
   cs_build_cflags=`echo x$cs_cflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_lflags=`echo x$cs_lflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_cv_lib_z=yes
-		cs_cv_lib_z_cflags=$cs_build_cflags
-		cs_cv_lib_z_lflags=$cs_build_lflags
-		cs_cv_lib_z_libs=$cs_build_libs
+	cs_cv_libz=yes
+		cs_cv_libz_cflags=$cs_build_cflags
+		cs_cv_libz_lflags=$cs_build_lflags
+		cs_cv_libz_libs=$cs_build_libs
 else
-  cs_cv_lib_z=no
+  cs_cv_libz=no
 fi
 
-	    echo "$as_me:$LINENO: result: $cs_cv_lib_z" >&5
-echo "${ECHO_T}$cs_cv_lib_z" >&6
+	    echo "$as_me:$LINENO: result: $cs_cv_libz" >&5
+echo "${ECHO_T}$cs_cv_libz" >&6
 fi
 
-    if test $cs_cv_lib_z = yes; then
+    if test $cs_cv_libz = yes; then
   :
 else
-  cs_cv_lib_z_cflags=''
-	cs_cv_lib_z_lflags=''
-	cs_cv_lib_z_libs=''
+  cs_cv_libz_cflags=''
+	cs_cv_libz_lflags=''
+	cs_cv_libz_libs=''
 
 fi
 
 else
-  cs_cv_lib_z=no
+  cs_cv_libz=no
 fi
 
 
     cs_cv_with_z="$with_z"
-    if test "$cs_cv_lib_z" = yes; then
+    if test "$cs_cv_libz" = yes; then
   if test "$cs_cv_libz" = yes; then
   cs_build_prop_val="yes"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
@@ -33769,7 +33769,7 @@ fi
 	if test "$cs_ignore_cache" != yes; then
   echo "$as_me:$LINENO: checking for libpng" >&5
 echo $ECHO_N "checking for libpng... $ECHO_C" >&6
-if test "${cs_cv_lib_png+set}" = set; then
+if test "${cs_cv_libpng+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   ac_ext=c
@@ -33909,17 +33909,17 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
   cs_build_cflags=`echo x$cs_cflags_test $cs_cv_libz_cflags $cs_cv_libm_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_lflags=`echo x$cs_lflags_test $cs_cv_libz_lflags $cs_cv_libm_lflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test $cs_cv_libz_libs $cs_cv_libm_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_cv_lib_png=yes
-		cs_cv_lib_png_cflags=$cs_build_cflags
-		cs_cv_lib_png_lflags=$cs_build_lflags
-		cs_cv_lib_png_libs=$cs_build_libs
+	cs_cv_libpng=yes
+		cs_cv_libpng_cflags=$cs_build_cflags
+		cs_cv_libpng_lflags=$cs_build_lflags
+		cs_cv_libpng_libs=$cs_build_libs
 else
-  cs_cv_lib_png=no
+  cs_cv_libpng=no
 fi
 
 fi
-echo "$as_me:$LINENO: result: $cs_cv_lib_png" >&5
-echo "${ECHO_T}$cs_cv_lib_png" >&6
+echo "$as_me:$LINENO: result: $cs_cv_libpng" >&5
+echo "${ECHO_T}$cs_cv_libpng" >&6
 else
   echo "$as_me:$LINENO: checking for libpng" >&5
 echo $ECHO_N "checking for libpng... $ECHO_C" >&6
@@ -34060,34 +34060,34 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
   cs_build_cflags=`echo x$cs_cflags_test $cs_cv_libz_cflags $cs_cv_libm_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_lflags=`echo x$cs_lflags_test $cs_cv_libz_lflags $cs_cv_libm_lflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test $cs_cv_libz_libs $cs_cv_libm_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_cv_lib_png=yes
-		cs_cv_lib_png_cflags=$cs_build_cflags
-		cs_cv_lib_png_lflags=$cs_build_lflags
-		cs_cv_lib_png_libs=$cs_build_libs
+	cs_cv_libpng=yes
+		cs_cv_libpng_cflags=$cs_build_cflags
+		cs_cv_libpng_lflags=$cs_build_lflags
+		cs_cv_libpng_libs=$cs_build_libs
 else
-  cs_cv_lib_png=no
+  cs_cv_libpng=no
 fi
 
-	    echo "$as_me:$LINENO: result: $cs_cv_lib_png" >&5
-echo "${ECHO_T}$cs_cv_lib_png" >&6
+	    echo "$as_me:$LINENO: result: $cs_cv_libpng" >&5
+echo "${ECHO_T}$cs_cv_libpng" >&6
 fi
 
-    if test $cs_cv_lib_png = yes; then
+    if test $cs_cv_libpng = yes; then
   :
 else
-  cs_cv_lib_png_cflags=''
-	cs_cv_lib_png_lflags=''
-	cs_cv_lib_png_libs=''
+  cs_cv_libpng_cflags=''
+	cs_cv_libpng_lflags=''
+	cs_cv_libpng_libs=''
 
 fi
 
 else
-  cs_cv_lib_png=no
+  cs_cv_libpng=no
 fi
 
 
     cs_cv_with_png="$with_png"
-    if test "$cs_cv_lib_png" = yes; then
+    if test "$cs_cv_libpng" = yes; then
   if test "$cs_cv_libpng" = yes; then
   cs_build_prop_val="yes"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
@@ -34925,7 +34925,7 @@ fi
 	if test "$cs_ignore_cache" != yes; then
   echo "$as_me:$LINENO: checking for libjpeg" >&5
 echo $ECHO_N "checking for libjpeg... $ECHO_C" >&6
-if test "${cs_cv_lib_jpeg+set}" = set; then
+if test "${cs_cv_libjpeg+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   ac_ext=c
@@ -35067,17 +35067,17 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
   cs_build_cflags=`echo x$cs_cflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_lflags=`echo x$cs_lflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_cv_lib_jpeg=yes
-		cs_cv_lib_jpeg_cflags=$cs_build_cflags
-		cs_cv_lib_jpeg_lflags=$cs_build_lflags
-		cs_cv_lib_jpeg_libs=$cs_build_libs
+	cs_cv_libjpeg=yes
+		cs_cv_libjpeg_cflags=$cs_build_cflags
+		cs_cv_libjpeg_lflags=$cs_build_lflags
+		cs_cv_libjpeg_libs=$cs_build_libs
 else
-  cs_cv_lib_jpeg=no
+  cs_cv_libjpeg=no
 fi
 
 fi
-echo "$as_me:$LINENO: result: $cs_cv_lib_jpeg" >&5
-echo "${ECHO_T}$cs_cv_lib_jpeg" >&6
+echo "$as_me:$LINENO: result: $cs_cv_libjpeg" >&5
+echo "${ECHO_T}$cs_cv_libjpeg" >&6
 else
   echo "$as_me:$LINENO: checking for libjpeg" >&5
 echo $ECHO_N "checking for libjpeg... $ECHO_C" >&6
@@ -35220,34 +35220,34 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
   cs_build_cflags=`echo x$cs_cflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_lflags=`echo x$cs_lflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_cv_lib_jpeg=yes
-		cs_cv_lib_jpeg_cflags=$cs_build_cflags
-		cs_cv_lib_jpeg_lflags=$cs_build_lflags
-		cs_cv_lib_jpeg_libs=$cs_build_libs
+	cs_cv_libjpeg=yes
+		cs_cv_libjpeg_cflags=$cs_build_cflags
+		cs_cv_libjpeg_lflags=$cs_build_lflags
+		cs_cv_libjpeg_libs=$cs_build_libs
 else
-  cs_cv_lib_jpeg=no
+  cs_cv_libjpeg=no
 fi
 
-	    echo "$as_me:$LINENO: result: $cs_cv_lib_jpeg" >&5
-echo "${ECHO_T}$cs_cv_lib_jpeg" >&6
+	    echo "$as_me:$LINENO: result: $cs_cv_libjpeg" >&5
+echo "${ECHO_T}$cs_cv_libjpeg" >&6
 fi
 
-    if test $cs_cv_lib_jpeg = yes; then
+    if test $cs_cv_libjpeg = yes; then
   :
 else
-  cs_cv_lib_jpeg_cflags=''
-	cs_cv_lib_jpeg_lflags=''
-	cs_cv_lib_jpeg_libs=''
+  cs_cv_libjpeg_cflags=''
+	cs_cv_libjpeg_lflags=''
+	cs_cv_libjpeg_libs=''
 
 fi
 
 else
-  cs_cv_lib_jpeg=no
+  cs_cv_libjpeg=no
 fi
 
 
     cs_cv_with_jpeg="$with_jpeg"
-    if test "$cs_cv_lib_jpeg" = yes; then
+    if test "$cs_cv_libjpeg" = yes; then
   if test "$cs_cv_libjpeg" = yes; then
   cs_build_prop_val="yes"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
@@ -35708,7 +35708,7 @@ fi
 	if test "$cs_ignore_cache" != yes; then
   echo "$as_me:$LINENO: checking for liblcms" >&5
 echo $ECHO_N "checking for liblcms... $ECHO_C" >&6
-if test "${cs_cv_lib_lcms+set}" = set; then
+if test "${cs_cv_liblcms+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   ac_ext=c
@@ -35848,17 +35848,17 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
   cs_build_cflags=`echo x$cs_cflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_lflags=`echo x$cs_lflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_cv_lib_lcms=yes
-		cs_cv_lib_lcms_cflags=$cs_build_cflags
-		cs_cv_lib_lcms_lflags=$cs_build_lflags
-		cs_cv_lib_lcms_libs=$cs_build_libs
+	cs_cv_liblcms=yes
+		cs_cv_liblcms_cflags=$cs_build_cflags
+		cs_cv_liblcms_lflags=$cs_build_lflags
+		cs_cv_liblcms_libs=$cs_build_libs
 else
-  cs_cv_lib_lcms=no
+  cs_cv_liblcms=no
 fi
 
 fi
-echo "$as_me:$LINENO: result: $cs_cv_lib_lcms" >&5
-echo "${ECHO_T}$cs_cv_lib_lcms" >&6
+echo "$as_me:$LINENO: result: $cs_cv_liblcms" >&5
+echo "${ECHO_T}$cs_cv_liblcms" >&6
 else
   echo "$as_me:$LINENO: checking for liblcms" >&5
 echo $ECHO_N "checking for liblcms... $ECHO_C" >&6
@@ -35999,29 +35999,29 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
   cs_build_cflags=`echo x$cs_cflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_lflags=`echo x$cs_lflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_cv_lib_lcms=yes
-		cs_cv_lib_lcms_cflags=$cs_build_cflags
-		cs_cv_lib_lcms_lflags=$cs_build_lflags
-		cs_cv_lib_lcms_libs=$cs_build_libs
+	cs_cv_liblcms=yes
+		cs_cv_liblcms_cflags=$cs_build_cflags
+		cs_cv_liblcms_lflags=$cs_build_lflags
+		cs_cv_liblcms_libs=$cs_build_libs
 else
-  cs_cv_lib_lcms=no
+  cs_cv_liblcms=no
 fi
 
-	    echo "$as_me:$LINENO: result: $cs_cv_lib_lcms" >&5
-echo "${ECHO_T}$cs_cv_lib_lcms" >&6
+	    echo "$as_me:$LINENO: result: $cs_cv_liblcms" >&5
+echo "${ECHO_T}$cs_cv_liblcms" >&6
 fi
 
-    if test $cs_cv_lib_lcms = yes; then
+    if test $cs_cv_liblcms = yes; then
   :
 else
-  cs_cv_lib_lcms_cflags=''
-	cs_cv_lib_lcms_lflags=''
-	cs_cv_lib_lcms_libs=''
+  cs_cv_liblcms_cflags=''
+	cs_cv_liblcms_lflags=''
+	cs_cv_liblcms_libs=''
 
 fi
 
 else
-  cs_cv_lib_lcms=no
+  cs_cv_liblcms=no
 fi
 
 
@@ -36830,7 +36830,7 @@ fi
 	if test "$cs_ignore_cache" != yes; then
   echo "$as_me:$LINENO: checking for libmng" >&5
 echo $ECHO_N "checking for libmng... $ECHO_C" >&6
-if test "${cs_cv_lib_mng+set}" = set; then
+if test "${cs_cv_libmng+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   ac_ext=c
@@ -36970,17 +36970,17 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
   cs_build_cflags=`echo x$cs_cflags_test $cs_cv_liblcms_cflags $cs_cv_libjpeg_cflags $cs_cv_libz_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_lflags=`echo x$cs_lflags_test $cs_cv_liblcms_lflags $cs_cv_libjpeg_lflags $cs_cv_libz_lflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test $cs_cv_liblcms_libs $cs_cv_libjpeg_libs $cs_cv_libz_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_cv_lib_mng=yes
-		cs_cv_lib_mng_cflags=$cs_build_cflags
-		cs_cv_lib_mng_lflags=$cs_build_lflags
-		cs_cv_lib_mng_libs=$cs_build_libs
+	cs_cv_libmng=yes
+		cs_cv_libmng_cflags=$cs_build_cflags
+		cs_cv_libmng_lflags=$cs_build_lflags
+		cs_cv_libmng_libs=$cs_build_libs
 else
-  cs_cv_lib_mng=no
+  cs_cv_libmng=no
 fi
 
 fi
-echo "$as_me:$LINENO: result: $cs_cv_lib_mng" >&5
-echo "${ECHO_T}$cs_cv_lib_mng" >&6
+echo "$as_me:$LINENO: result: $cs_cv_libmng" >&5
+echo "${ECHO_T}$cs_cv_libmng" >&6
 else
   echo "$as_me:$LINENO: checking for libmng" >&5
 echo $ECHO_N "checking for libmng... $ECHO_C" >&6
@@ -37121,34 +37121,34 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
   cs_build_cflags=`echo x$cs_cflags_test $cs_cv_liblcms_cflags $cs_cv_libjpeg_cflags $cs_cv_libz_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_lflags=`echo x$cs_lflags_test $cs_cv_liblcms_lflags $cs_cv_libjpeg_lflags $cs_cv_libz_lflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test $cs_cv_liblcms_libs $cs_cv_libjpeg_libs $cs_cv_libz_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_cv_lib_mng=yes
-		cs_cv_lib_mng_cflags=$cs_build_cflags
-		cs_cv_lib_mng_lflags=$cs_build_lflags
-		cs_cv_lib_mng_libs=$cs_build_libs
+	cs_cv_libmng=yes
+		cs_cv_libmng_cflags=$cs_build_cflags
+		cs_cv_libmng_lflags=$cs_build_lflags
+		cs_cv_libmng_libs=$cs_build_libs
 else
-  cs_cv_lib_mng=no
+  cs_cv_libmng=no
 fi
 
-	    echo "$as_me:$LINENO: result: $cs_cv_lib_mng" >&5
-echo "${ECHO_T}$cs_cv_lib_mng" >&6
+	    echo "$as_me:$LINENO: result: $cs_cv_libmng" >&5
+echo "${ECHO_T}$cs_cv_libmng" >&6
 fi
 
-    if test $cs_cv_lib_mng = yes; then
+    if test $cs_cv_libmng = yes; then
   :
 else
-  cs_cv_lib_mng_cflags=''
-	cs_cv_lib_mng_lflags=''
-	cs_cv_lib_mng_libs=''
+  cs_cv_libmng_cflags=''
+	cs_cv_libmng_lflags=''
+	cs_cv_libmng_libs=''
 
 fi
 
 else
-  cs_cv_lib_mng=no
+  cs_cv_libmng=no
 fi
 
 
     cs_cv_with_mng="$with_mng"
-    if test "$cs_cv_lib_mng" = yes; then
+    if test "$cs_cv_libmng" = yes; then
   if test "$cs_cv_libmng" = yes; then
   cs_build_prop_val="yes"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
@@ -37607,7 +37607,7 @@ fi
 	if test "$cs_ignore_cache" != yes; then
   echo "$as_me:$LINENO: checking for libmikmod" >&5
 echo $ECHO_N "checking for libmikmod... $ECHO_C" >&6
-if test "${cs_cv_lib_mikmod+set}" = set; then
+if test "${cs_cv_libmikmod+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   ac_ext=c
@@ -37747,17 +37747,17 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
   cs_build_cflags=`echo x$cs_cflags_test $cs_cv_sys_pthread_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_lflags=`echo x$cs_lflags_test $cs_cv_sys_pthread_lflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test $cs_cv_sys_pthread_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_cv_lib_mikmod=yes
-		cs_cv_lib_mikmod_cflags=$cs_build_cflags
-		cs_cv_lib_mikmod_lflags=$cs_build_lflags
-		cs_cv_lib_mikmod_libs=$cs_build_libs
+	cs_cv_libmikmod=yes
+		cs_cv_libmikmod_cflags=$cs_build_cflags
+		cs_cv_libmikmod_lflags=$cs_build_lflags
+		cs_cv_libmikmod_libs=$cs_build_libs
 else
-  cs_cv_lib_mikmod=no
+  cs_cv_libmikmod=no
 fi
 
 fi
-echo "$as_me:$LINENO: result: $cs_cv_lib_mikmod" >&5
-echo "${ECHO_T}$cs_cv_lib_mikmod" >&6
+echo "$as_me:$LINENO: result: $cs_cv_libmikmod" >&5
+echo "${ECHO_T}$cs_cv_libmikmod" >&6
 else
   echo "$as_me:$LINENO: checking for libmikmod" >&5
 echo $ECHO_N "checking for libmikmod... $ECHO_C" >&6
@@ -37898,34 +37898,34 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
   cs_build_cflags=`echo x$cs_cflags_test $cs_cv_sys_pthread_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_lflags=`echo x$cs_lflags_test $cs_cv_sys_pthread_lflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test $cs_cv_sys_pthread_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_cv_lib_mikmod=yes
-		cs_cv_lib_mikmod_cflags=$cs_build_cflags
-		cs_cv_lib_mikmod_lflags=$cs_build_lflags
-		cs_cv_lib_mikmod_libs=$cs_build_libs
+	cs_cv_libmikmod=yes
+		cs_cv_libmikmod_cflags=$cs_build_cflags
+		cs_cv_libmikmod_lflags=$cs_build_lflags
+		cs_cv_libmikmod_libs=$cs_build_libs
 else
-  cs_cv_lib_mikmod=no
+  cs_cv_libmikmod=no
 fi
 
-	    echo "$as_me:$LINENO: result: $cs_cv_lib_mikmod" >&5
-echo "${ECHO_T}$cs_cv_lib_mikmod" >&6
+	    echo "$as_me:$LINENO: result: $cs_cv_libmikmod" >&5
+echo "${ECHO_T}$cs_cv_libmikmod" >&6
 fi
 
-    if test $cs_cv_lib_mikmod = yes; then
+    if test $cs_cv_libmikmod = yes; then
   :
 else
-  cs_cv_lib_mikmod_cflags=''
-	cs_cv_lib_mikmod_lflags=''
-	cs_cv_lib_mikmod_libs=''
+  cs_cv_libmikmod_cflags=''
+	cs_cv_libmikmod_lflags=''
+	cs_cv_libmikmod_libs=''
 
 fi
 
 else
-  cs_cv_lib_mikmod=no
+  cs_cv_libmikmod=no
 fi
 
 
     cs_cv_with_mikmod="$with_mikmod"
-    if test "$cs_cv_lib_mikmod" = yes; then
+    if test "$cs_cv_libmikmod" = yes; then
   if test "$cs_cv_libmikmod" = yes; then
   cs_build_prop_val="yes"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
@@ -38384,7 +38384,7 @@ fi
 	if test "$cs_ignore_cache" != yes; then
   echo "$as_me:$LINENO: checking for libogg" >&5
 echo $ECHO_N "checking for libogg... $ECHO_C" >&6
-if test "${cs_cv_lib_ogg+set}" = set; then
+if test "${cs_cv_libogg+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   ac_ext=c
@@ -38524,17 +38524,17 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
   cs_build_cflags=`echo x$cs_cflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_lflags=`echo x$cs_lflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_cv_lib_ogg=yes
-		cs_cv_lib_ogg_cflags=$cs_build_cflags
-		cs_cv_lib_ogg_lflags=$cs_build_lflags
-		cs_cv_lib_ogg_libs=$cs_build_libs
+	cs_cv_libogg=yes
+		cs_cv_libogg_cflags=$cs_build_cflags
+		cs_cv_libogg_lflags=$cs_build_lflags
+		cs_cv_libogg_libs=$cs_build_libs
 else
-  cs_cv_lib_ogg=no
+  cs_cv_libogg=no
 fi
 
 fi
-echo "$as_me:$LINENO: result: $cs_cv_lib_ogg" >&5
-echo "${ECHO_T}$cs_cv_lib_ogg" >&6
+echo "$as_me:$LINENO: result: $cs_cv_libogg" >&5
+echo "${ECHO_T}$cs_cv_libogg" >&6
 else
   echo "$as_me:$LINENO: checking for libogg" >&5
 echo $ECHO_N "checking for libogg... $ECHO_C" >&6
@@ -38675,34 +38675,34 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
   cs_build_cflags=`echo x$cs_cflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_lflags=`echo x$cs_lflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_cv_lib_ogg=yes
-		cs_cv_lib_ogg_cflags=$cs_build_cflags
-		cs_cv_lib_ogg_lflags=$cs_build_lflags
-		cs_cv_lib_ogg_libs=$cs_build_libs
+	cs_cv_libogg=yes
+		cs_cv_libogg_cflags=$cs_build_cflags
+		cs_cv_libogg_lflags=$cs_build_lflags
+		cs_cv_libogg_libs=$cs_build_libs
 else
-  cs_cv_lib_ogg=no
+  cs_cv_libogg=no
 fi
 
-	    echo "$as_me:$LINENO: result: $cs_cv_lib_ogg" >&5
-echo "${ECHO_T}$cs_cv_lib_ogg" >&6
+	    echo "$as_me:$LINENO: result: $cs_cv_libogg" >&5
+echo "${ECHO_T}$cs_cv_libogg" >&6
 fi
 
-    if test $cs_cv_lib_ogg = yes; then
+    if test $cs_cv_libogg = yes; then
   :
 else
-  cs_cv_lib_ogg_cflags=''
-	cs_cv_lib_ogg_lflags=''
-	cs_cv_lib_ogg_libs=''
+  cs_cv_libogg_cflags=''
+	cs_cv_libogg_lflags=''
+	cs_cv_libogg_libs=''
 
 fi
 
 else
-  cs_cv_lib_ogg=no
+  cs_cv_libogg=no
 fi
 
 
     cs_cv_with_ogg="$with_ogg"
-    if test "$cs_cv_lib_ogg" = yes; then
+    if test "$cs_cv_libogg" = yes; then
   if test "$cs_cv_libogg" = yes; then
   cs_build_prop_val="yes"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
@@ -39156,7 +39156,7 @@ fi
 	if test "$cs_ignore_cache" != yes; then
   echo "$as_me:$LINENO: checking for libvorbis" >&5
 echo $ECHO_N "checking for libvorbis... $ECHO_C" >&6
-if test "${cs_cv_lib_vorbis+set}" = set; then
+if test "${cs_cv_libvorbis+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   ac_ext=c
@@ -39296,17 +39296,17 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
   cs_build_cflags=`echo x$cs_cflags_test $cs_cv_libogg_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_lflags=`echo x$cs_lflags_test $cs_cv_libogg_lflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test $cs_cv_libogg_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_cv_lib_vorbis=yes
-		cs_cv_lib_vorbis_cflags=$cs_build_cflags
-		cs_cv_lib_vorbis_lflags=$cs_build_lflags
-		cs_cv_lib_vorbis_libs=$cs_build_libs
+	cs_cv_libvorbis=yes
+		cs_cv_libvorbis_cflags=$cs_build_cflags
+		cs_cv_libvorbis_lflags=$cs_build_lflags
+		cs_cv_libvorbis_libs=$cs_build_libs
 else
-  cs_cv_lib_vorbis=no
+  cs_cv_libvorbis=no
 fi
 
 fi
-echo "$as_me:$LINENO: result: $cs_cv_lib_vorbis" >&5
-echo "${ECHO_T}$cs_cv_lib_vorbis" >&6
+echo "$as_me:$LINENO: result: $cs_cv_libvorbis" >&5
+echo "${ECHO_T}$cs_cv_libvorbis" >&6
 else
   echo "$as_me:$LINENO: checking for libvorbis" >&5
 echo $ECHO_N "checking for libvorbis... $ECHO_C" >&6
@@ -39447,34 +39447,34 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
   cs_build_cflags=`echo x$cs_cflags_test $cs_cv_libogg_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_lflags=`echo x$cs_lflags_test $cs_cv_libogg_lflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test $cs_cv_libogg_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_cv_lib_vorbis=yes
-		cs_cv_lib_vorbis_cflags=$cs_build_cflags
-		cs_cv_lib_vorbis_lflags=$cs_build_lflags
-		cs_cv_lib_vorbis_libs=$cs_build_libs
+	cs_cv_libvorbis=yes
+		cs_cv_libvorbis_cflags=$cs_build_cflags
+		cs_cv_libvorbis_lflags=$cs_build_lflags
+		cs_cv_libvorbis_libs=$cs_build_libs
 else
-  cs_cv_lib_vorbis=no
+  cs_cv_libvorbis=no
 fi
 
-	    echo "$as_me:$LINENO: result: $cs_cv_lib_vorbis" >&5
-echo "${ECHO_T}$cs_cv_lib_vorbis" >&6
+	    echo "$as_me:$LINENO: result: $cs_cv_libvorbis" >&5
+echo "${ECHO_T}$cs_cv_libvorbis" >&6
 fi
 
-    if test $cs_cv_lib_vorbis = yes; then
+    if test $cs_cv_libvorbis = yes; then
   :
 else
-  cs_cv_lib_vorbis_cflags=''
-	cs_cv_lib_vorbis_lflags=''
-	cs_cv_lib_vorbis_libs=''
+  cs_cv_libvorbis_cflags=''
+	cs_cv_libvorbis_lflags=''
+	cs_cv_libvorbis_libs=''
 
 fi
 
 else
-  cs_cv_lib_vorbis=no
+  cs_cv_libvorbis=no
 fi
 
 
     cs_cv_with_vorbis="$with_vorbis"
-    if test "$cs_cv_lib_vorbis" = yes; then
+    if test "$cs_cv_libvorbis" = yes; then
   if test "$cs_cv_libvorbis" = yes; then
   cs_build_prop_val="yes"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
@@ -39930,7 +39930,7 @@ fi
 	if test "$cs_ignore_cache" != yes; then
   echo "$as_me:$LINENO: checking for libvorbisfile" >&5
 echo $ECHO_N "checking for libvorbisfile... $ECHO_C" >&6
-if test "${cs_cv_lib_vorbisfile+set}" = set; then
+if test "${cs_cv_libvorbisfile+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   ac_ext=c
@@ -40071,17 +40071,17 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
   cs_build_cflags=`echo x$cs_cflags_test $cs_cv_libogg_cflags $cs_cv_libvorbis_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_lflags=`echo x$cs_lflags_test $cs_cv_libogg_lflags $cs_cv_libvorbis_lflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test $cs_cv_libogg_libs $cs_cv_libvorbis_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_cv_lib_vorbisfile=yes
-		cs_cv_lib_vorbisfile_cflags=$cs_build_cflags
-		cs_cv_lib_vorbisfile_lflags=$cs_build_lflags
-		cs_cv_lib_vorbisfile_libs=$cs_build_libs
+	cs_cv_libvorbisfile=yes
+		cs_cv_libvorbisfile_cflags=$cs_build_cflags
+		cs_cv_libvorbisfile_lflags=$cs_build_lflags
+		cs_cv_libvorbisfile_libs=$cs_build_libs
 else
-  cs_cv_lib_vorbisfile=no
+  cs_cv_libvorbisfile=no
 fi
 
 fi
-echo "$as_me:$LINENO: result: $cs_cv_lib_vorbisfile" >&5
-echo "${ECHO_T}$cs_cv_lib_vorbisfile" >&6
+echo "$as_me:$LINENO: result: $cs_cv_libvorbisfile" >&5
+echo "${ECHO_T}$cs_cv_libvorbisfile" >&6
 else
   echo "$as_me:$LINENO: checking for libvorbisfile" >&5
 echo $ECHO_N "checking for libvorbisfile... $ECHO_C" >&6
@@ -40223,34 +40223,34 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
   cs_build_cflags=`echo x$cs_cflags_test $cs_cv_libogg_cflags $cs_cv_libvorbis_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_lflags=`echo x$cs_lflags_test $cs_cv_libogg_lflags $cs_cv_libvorbis_lflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test $cs_cv_libogg_libs $cs_cv_libvorbis_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_cv_lib_vorbisfile=yes
-		cs_cv_lib_vorbisfile_cflags=$cs_build_cflags
-		cs_cv_lib_vorbisfile_lflags=$cs_build_lflags
-		cs_cv_lib_vorbisfile_libs=$cs_build_libs
+	cs_cv_libvorbisfile=yes
+		cs_cv_libvorbisfile_cflags=$cs_build_cflags
+		cs_cv_libvorbisfile_lflags=$cs_build_lflags
+		cs_cv_libvorbisfile_libs=$cs_build_libs
 else
-  cs_cv_lib_vorbisfile=no
+  cs_cv_libvorbisfile=no
 fi
 
-	    echo "$as_me:$LINENO: result: $cs_cv_lib_vorbisfile" >&5
-echo "${ECHO_T}$cs_cv_lib_vorbisfile" >&6
+	    echo "$as_me:$LINENO: result: $cs_cv_libvorbisfile" >&5
+echo "${ECHO_T}$cs_cv_libvorbisfile" >&6
 fi
 
-    if test $cs_cv_lib_vorbisfile = yes; then
+    if test $cs_cv_libvorbisfile = yes; then
   :
 else
-  cs_cv_lib_vorbisfile_cflags=''
-	cs_cv_lib_vorbisfile_lflags=''
-	cs_cv_lib_vorbisfile_libs=''
+  cs_cv_libvorbisfile_cflags=''
+	cs_cv_libvorbisfile_lflags=''
+	cs_cv_libvorbisfile_libs=''
 
 fi
 
 else
-  cs_cv_lib_vorbisfile=no
+  cs_cv_libvorbisfile=no
 fi
 
 
     cs_cv_with_vorbisfile="$with_vorbisfile"
-    if test "$cs_cv_lib_vorbisfile" = yes; then
+    if test "$cs_cv_libvorbisfile" = yes; then
   if test "$cs_cv_libvorbisfile" = yes; then
   cs_build_prop_val="yes"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
@@ -41469,7 +41469,7 @@ fi
 	if test "$cs_ignore_cache" != yes; then
   echo "$as_me:$LINENO: checking for lib3ds" >&5
 echo $ECHO_N "checking for lib3ds... $ECHO_C" >&6
-if test "${cs_cv_lib_3ds+set}" = set; then
+if test "${cs_cv_lib3ds+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   ac_ext=c
@@ -41609,17 +41609,17 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
   cs_build_cflags=`echo x$cs_cflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_lflags=`echo x$cs_lflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test $cs_cv_libm_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_cv_lib_3ds=yes
-		cs_cv_lib_3ds_cflags=$cs_build_cflags
-		cs_cv_lib_3ds_lflags=$cs_build_lflags
-		cs_cv_lib_3ds_libs=$cs_build_libs
+	cs_cv_lib3ds=yes
+		cs_cv_lib3ds_cflags=$cs_build_cflags
+		cs_cv_lib3ds_lflags=$cs_build_lflags
+		cs_cv_lib3ds_libs=$cs_build_libs
 else
-  cs_cv_lib_3ds=no
+  cs_cv_lib3ds=no
 fi
 
 fi
-echo "$as_me:$LINENO: result: $cs_cv_lib_3ds" >&5
-echo "${ECHO_T}$cs_cv_lib_3ds" >&6
+echo "$as_me:$LINENO: result: $cs_cv_lib3ds" >&5
+echo "${ECHO_T}$cs_cv_lib3ds" >&6
 else
   echo "$as_me:$LINENO: checking for lib3ds" >&5
 echo $ECHO_N "checking for lib3ds... $ECHO_C" >&6
@@ -41760,29 +41760,29 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
   cs_build_cflags=`echo x$cs_cflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_lflags=`echo x$cs_lflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test $cs_cv_libm_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_cv_lib_3ds=yes
-		cs_cv_lib_3ds_cflags=$cs_build_cflags
-		cs_cv_lib_3ds_lflags=$cs_build_lflags
-		cs_cv_lib_3ds_libs=$cs_build_libs
+	cs_cv_lib3ds=yes
+		cs_cv_lib3ds_cflags=$cs_build_cflags
+		cs_cv_lib3ds_lflags=$cs_build_lflags
+		cs_cv_lib3ds_libs=$cs_build_libs
 else
-  cs_cv_lib_3ds=no
+  cs_cv_lib3ds=no
 fi
 
-	    echo "$as_me:$LINENO: result: $cs_cv_lib_3ds" >&5
-echo "${ECHO_T}$cs_cv_lib_3ds" >&6
+	    echo "$as_me:$LINENO: result: $cs_cv_lib3ds" >&5
+echo "${ECHO_T}$cs_cv_lib3ds" >&6
 fi
 
-    if test $cs_cv_lib_3ds = yes; then
+    if test $cs_cv_lib3ds = yes; then
   :
 else
-  cs_cv_lib_3ds_cflags=''
-	cs_cv_lib_3ds_lflags=''
-	cs_cv_lib_3ds_libs=''
+  cs_cv_lib3ds_cflags=''
+	cs_cv_lib3ds_lflags=''
+	cs_cv_lib3ds_libs=''
 
 fi
 
 else
-  cs_cv_lib_3ds=no
+  cs_cv_lib3ds=no
 fi
 
 
@@ -42562,7 +42562,7 @@ fi
 	if test "$cs_ignore_cache" != yes; then
   echo "$as_me:$LINENO: checking for libode" >&5
 echo $ECHO_N "checking for libode... $ECHO_C" >&6
-if test "${cs_cv_lib_ode+set}" = set; then
+if test "${cs_cv_libode+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   ac_ext=cc
@@ -42702,17 +42702,17 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
   cs_build_cflags=`echo x$cs_cflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_lflags=`echo x$cs_lflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_cv_lib_ode=yes
-		cs_cv_lib_ode_cflags=$cs_build_cflags
-		cs_cv_lib_ode_lflags=$cs_build_lflags
-		cs_cv_lib_ode_libs=$cs_build_libs
+	cs_cv_libode=yes
+		cs_cv_libode_cflags=$cs_build_cflags
+		cs_cv_libode_lflags=$cs_build_lflags
+		cs_cv_libode_libs=$cs_build_libs
 else
-  cs_cv_lib_ode=no
+  cs_cv_libode=no
 fi
 
 fi
-echo "$as_me:$LINENO: result: $cs_cv_lib_ode" >&5
-echo "${ECHO_T}$cs_cv_lib_ode" >&6
+echo "$as_me:$LINENO: result: $cs_cv_libode" >&5
+echo "${ECHO_T}$cs_cv_libode" >&6
 else
   echo "$as_me:$LINENO: checking for libode" >&5
 echo $ECHO_N "checking for libode... $ECHO_C" >&6
@@ -42853,29 +42853,29 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
   cs_build_cflags=`echo x$cs_cflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_lflags=`echo x$cs_lflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_cv_lib_ode=yes
-		cs_cv_lib_ode_cflags=$cs_build_cflags
-		cs_cv_lib_ode_lflags=$cs_build_lflags
-		cs_cv_lib_ode_libs=$cs_build_libs
+	cs_cv_libode=yes
+		cs_cv_libode_cflags=$cs_build_cflags
+		cs_cv_libode_lflags=$cs_build_lflags
+		cs_cv_libode_libs=$cs_build_libs
 else
-  cs_cv_lib_ode=no
+  cs_cv_libode=no
 fi
 
-	    echo "$as_me:$LINENO: result: $cs_cv_lib_ode" >&5
-echo "${ECHO_T}$cs_cv_lib_ode" >&6
+	    echo "$as_me:$LINENO: result: $cs_cv_libode" >&5
+echo "${ECHO_T}$cs_cv_libode" >&6
 fi
 
-    if test $cs_cv_lib_ode = yes; then
+    if test $cs_cv_libode = yes; then
   :
 else
-  cs_cv_lib_ode_cflags=''
-	cs_cv_lib_ode_lflags=''
-	cs_cv_lib_ode_libs=''
+  cs_cv_libode_cflags=''
+	cs_cv_libode_lflags=''
+	cs_cv_libode_libs=''
 
 fi
 
 else
-  cs_cv_lib_ode=no
+  cs_cv_libode=no
 fi
 
 
@@ -43977,7 +43977,7 @@ fi
 	if test "$cs_ignore_cache" != yes; then
   echo "$as_me:$LINENO: checking for libbullet" >&5
 echo $ECHO_N "checking for libbullet... $ECHO_C" >&6
-if test "${cs_cv_lib_bullet+set}" = set; then
+if test "${cs_cv_libbullet+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   ac_ext=cc
@@ -44130,17 +44130,17 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
     -lbulletphysicsinterfacecommon \
     -lbulletdynamics \
     -lbullet | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_cv_lib_bullet=yes
-		cs_cv_lib_bullet_cflags=$cs_build_cflags
-		cs_cv_lib_bullet_lflags=$cs_build_lflags
-		cs_cv_lib_bullet_libs=$cs_build_libs
+	cs_cv_libbullet=yes
+		cs_cv_libbullet_cflags=$cs_build_cflags
+		cs_cv_libbullet_lflags=$cs_build_lflags
+		cs_cv_libbullet_libs=$cs_build_libs
 else
-  cs_cv_lib_bullet=no
+  cs_cv_libbullet=no
 fi
 
 fi
-echo "$as_me:$LINENO: result: $cs_cv_lib_bullet" >&5
-echo "${ECHO_T}$cs_cv_lib_bullet" >&6
+echo "$as_me:$LINENO: result: $cs_cv_libbullet" >&5
+echo "${ECHO_T}$cs_cv_libbullet" >&6
 else
   echo "$as_me:$LINENO: checking for libbullet" >&5
 echo $ECHO_N "checking for libbullet... $ECHO_C" >&6
@@ -44294,34 +44294,34 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
     -lbulletphysicsinterfacecommon \
     -lbulletdynamics \
     -lbullet | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_cv_lib_bullet=yes
-		cs_cv_lib_bullet_cflags=$cs_build_cflags
-		cs_cv_lib_bullet_lflags=$cs_build_lflags
-		cs_cv_lib_bullet_libs=$cs_build_libs
+	cs_cv_libbullet=yes
+		cs_cv_libbullet_cflags=$cs_build_cflags
+		cs_cv_libbullet_lflags=$cs_build_lflags
+		cs_cv_libbullet_libs=$cs_build_libs
 else
-  cs_cv_lib_bullet=no
+  cs_cv_libbullet=no
 fi
 
-	    echo "$as_me:$LINENO: result: $cs_cv_lib_bullet" >&5
-echo "${ECHO_T}$cs_cv_lib_bullet" >&6
+	    echo "$as_me:$LINENO: result: $cs_cv_libbullet" >&5
+echo "${ECHO_T}$cs_cv_libbullet" >&6
 fi
 
-    if test $cs_cv_lib_bullet = yes; then
+    if test $cs_cv_libbullet = yes; then
   :
 else
-  cs_cv_lib_bullet_cflags=''
-	cs_cv_lib_bullet_lflags=''
-	cs_cv_lib_bullet_libs=''
+  cs_cv_libbullet_cflags=''
+	cs_cv_libbullet_lflags=''
+	cs_cv_libbullet_libs=''
 
 fi
 
 else
-  cs_cv_lib_bullet=no
+  cs_cv_libbullet=no
 fi
 
 
     cs_cv_with_bullet="$with_bullet"
-    if test "$cs_cv_lib_bullet" = yes; then
+    if test "$cs_cv_libbullet" = yes; then
   if test "$cs_cv_libbullet" = yes; then
   cs_build_prop_val="yes"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
@@ -45545,7 +45545,7 @@ fi
 	if test "$cs_ignore_cache" != yes; then
   echo "$as_me:$LINENO: checking for libfreetype2" >&5
 echo $ECHO_N "checking for libfreetype2... $ECHO_C" >&6
-if test "${cs_cv_lib_freetype2+set}" = set; then
+if test "${cs_cv_libfreetype2+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   ac_ext=c
@@ -45686,17 +45686,17 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
   cs_build_cflags=`echo x$cs_cflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_lflags=`echo x$cs_lflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_cv_lib_freetype2=yes
-		cs_cv_lib_freetype2_cflags=$cs_build_cflags
-		cs_cv_lib_freetype2_lflags=$cs_build_lflags
-		cs_cv_lib_freetype2_libs=$cs_build_libs
+	cs_cv_libfreetype2=yes
+		cs_cv_libfreetype2_cflags=$cs_build_cflags
+		cs_cv_libfreetype2_lflags=$cs_build_lflags
+		cs_cv_libfreetype2_libs=$cs_build_libs
 else
-  cs_cv_lib_freetype2=no
+  cs_cv_libfreetype2=no
 fi
 
 fi
-echo "$as_me:$LINENO: result: $cs_cv_lib_freetype2" >&5
-echo "${ECHO_T}$cs_cv_lib_freetype2" >&6
+echo "$as_me:$LINENO: result: $cs_cv_libfreetype2" >&5
+echo "${ECHO_T}$cs_cv_libfreetype2" >&6
 else
   echo "$as_me:$LINENO: checking for libfreetype2" >&5
 echo $ECHO_N "checking for libfreetype2... $ECHO_C" >&6
@@ -45838,29 +45838,29 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
   cs_build_cflags=`echo x$cs_cflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_lflags=`echo x$cs_lflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_cv_lib_freetype2=yes
-		cs_cv_lib_freetype2_cflags=$cs_build_cflags
-		cs_cv_lib_freetype2_lflags=$cs_build_lflags
-		cs_cv_lib_freetype2_libs=$cs_build_libs
+	cs_cv_libfreetype2=yes
+		cs_cv_libfreetype2_cflags=$cs_build_cflags
+		cs_cv_libfreetype2_lflags=$cs_build_lflags
+		cs_cv_libfreetype2_libs=$cs_build_libs
 else
-  cs_cv_lib_freetype2=no
+  cs_cv_libfreetype2=no
 fi
 
-	    echo "$as_me:$LINENO: result: $cs_cv_lib_freetype2" >&5
-echo "${ECHO_T}$cs_cv_lib_freetype2" >&6
+	    echo "$as_me:$LINENO: result: $cs_cv_libfreetype2" >&5
+echo "${ECHO_T}$cs_cv_libfreetype2" >&6
 fi
 
-    if test $cs_cv_lib_freetype2 = yes; then
+    if test $cs_cv_libfreetype2 = yes; then
   :
 else
-  cs_cv_lib_freetype2_cflags=''
-	cs_cv_lib_freetype2_lflags=''
-	cs_cv_lib_freetype2_libs=''
+  cs_cv_libfreetype2_cflags=''
+	cs_cv_libfreetype2_lflags=''
+	cs_cv_libfreetype2_libs=''
 
 fi
 
 else
-  cs_cv_lib_freetype2=no
+  cs_cv_libfreetype2=no
 fi
 
 
@@ -46831,7 +46831,7 @@ fi
 	if test "$cs_ignore_cache" != yes; then
   echo "$as_me:$LINENO: checking for libcal3d" >&5
 echo $ECHO_N "checking for libcal3d... $ECHO_C" >&6
-if test "${cs_cv_lib_cal3d+set}" = set; then
+if test "${cs_cv_libcal3d+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   ac_ext=cc
@@ -46971,17 +46971,17 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
   cs_build_cflags=`echo x$cs_cflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_lflags=`echo x$cs_lflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_cv_lib_cal3d=yes
-		cs_cv_lib_cal3d_cflags=$cs_build_cflags
-		cs_cv_lib_cal3d_lflags=$cs_build_lflags
-		cs_cv_lib_cal3d_libs=$cs_build_libs
+	cs_cv_libcal3d=yes
+		cs_cv_libcal3d_cflags=$cs_build_cflags
+		cs_cv_libcal3d_lflags=$cs_build_lflags
+		cs_cv_libcal3d_libs=$cs_build_libs
 else
-  cs_cv_lib_cal3d=no
+  cs_cv_libcal3d=no
 fi
 
 fi
-echo "$as_me:$LINENO: result: $cs_cv_lib_cal3d" >&5
-echo "${ECHO_T}$cs_cv_lib_cal3d" >&6
+echo "$as_me:$LINENO: result: $cs_cv_libcal3d" >&5
+echo "${ECHO_T}$cs_cv_libcal3d" >&6
 else
   echo "$as_me:$LINENO: checking for libcal3d" >&5
 echo $ECHO_N "checking for libcal3d... $ECHO_C" >&6
@@ -47122,29 +47122,29 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
   cs_build_cflags=`echo x$cs_cflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_lflags=`echo x$cs_lflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_cv_lib_cal3d=yes
-		cs_cv_lib_cal3d_cflags=$cs_build_cflags
-		cs_cv_lib_cal3d_lflags=$cs_build_lflags
-		cs_cv_lib_cal3d_libs=$cs_build_libs
+	cs_cv_libcal3d=yes
+		cs_cv_libcal3d_cflags=$cs_build_cflags
+		cs_cv_libcal3d_lflags=$cs_build_lflags
+		cs_cv_libcal3d_libs=$cs_build_libs
 else
-  cs_cv_lib_cal3d=no
+  cs_cv_libcal3d=no
 fi
 
-	    echo "$as_me:$LINENO: result: $cs_cv_lib_cal3d" >&5
-echo "${ECHO_T}$cs_cv_lib_cal3d" >&6
+	    echo "$as_me:$LINENO: result: $cs_cv_libcal3d" >&5
+echo "${ECHO_T}$cs_cv_libcal3d" >&6
 fi
 
-    if test $cs_cv_lib_cal3d = yes; then
+    if test $cs_cv_libcal3d = yes; then
   :
 else
-  cs_cv_lib_cal3d_cflags=''
-	cs_cv_lib_cal3d_lflags=''
-	cs_cv_lib_cal3d_libs=''
+  cs_cv_libcal3d_cflags=''
+	cs_cv_libcal3d_lflags=''
+	cs_cv_libcal3d_libs=''
 
 fi
 
 else
-  cs_cv_lib_cal3d=no
+  cs_cv_libcal3d=no
 fi
 
 
@@ -47923,7 +47923,7 @@ fi
 	if test "$cs_ignore_cache" != yes; then
   echo "$as_me:$LINENO: checking for libsdl" >&5
 echo $ECHO_N "checking for libsdl... $ECHO_C" >&6
-if test "${cs_cv_lib_sdl+set}" = set; then
+if test "${cs_cv_libsdl+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   ac_ext=c
@@ -48064,17 +48064,17 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
   cs_build_cflags=`echo x$cs_cflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_lflags=`echo x$cs_lflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_cv_lib_sdl=yes
-		cs_cv_lib_sdl_cflags=$cs_build_cflags
-		cs_cv_lib_sdl_lflags=$cs_build_lflags
-		cs_cv_lib_sdl_libs=$cs_build_libs
+	cs_cv_libsdl=yes
+		cs_cv_libsdl_cflags=$cs_build_cflags
+		cs_cv_libsdl_lflags=$cs_build_lflags
+		cs_cv_libsdl_libs=$cs_build_libs
 else
-  cs_cv_lib_sdl=no
+  cs_cv_libsdl=no
 fi
 
 fi
-echo "$as_me:$LINENO: result: $cs_cv_lib_sdl" >&5
-echo "${ECHO_T}$cs_cv_lib_sdl" >&6
+echo "$as_me:$LINENO: result: $cs_cv_libsdl" >&5
+echo "${ECHO_T}$cs_cv_libsdl" >&6
 else
   echo "$as_me:$LINENO: checking for libsdl" >&5
 echo $ECHO_N "checking for libsdl... $ECHO_C" >&6
@@ -48216,29 +48216,29 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
   cs_build_cflags=`echo x$cs_cflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_lflags=`echo x$cs_lflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_cv_lib_sdl=yes
-		cs_cv_lib_sdl_cflags=$cs_build_cflags
-		cs_cv_lib_sdl_lflags=$cs_build_lflags
-		cs_cv_lib_sdl_libs=$cs_build_libs
+	cs_cv_libsdl=yes
+		cs_cv_libsdl_cflags=$cs_build_cflags
+		cs_cv_libsdl_lflags=$cs_build_lflags
+		cs_cv_libsdl_libs=$cs_build_libs
 else
-  cs_cv_lib_sdl=no
+  cs_cv_libsdl=no
 fi
 
-	    echo "$as_me:$LINENO: result: $cs_cv_lib_sdl" >&5
-echo "${ECHO_T}$cs_cv_lib_sdl" >&6
+	    echo "$as_me:$LINENO: result: $cs_cv_libsdl" >&5
+echo "${ECHO_T}$cs_cv_libsdl" >&6
 fi
 
-    if test $cs_cv_lib_sdl = yes; then
+    if test $cs_cv_libsdl = yes; then
   :
 else
-  cs_cv_lib_sdl_cflags=''
-	cs_cv_lib_sdl_lflags=''
-	cs_cv_lib_sdl_libs=''
+  cs_cv_libsdl_cflags=''
+	cs_cv_libsdl_lflags=''
+	cs_cv_libsdl_libs=''
 
 fi
 
 else
-  cs_cv_lib_sdl=no
+  cs_cv_libsdl=no
 fi
 
 
@@ -49029,7 +49029,7 @@ fi
 	if test "$cs_ignore_cache" != yes; then
   echo "$as_me:$LINENO: checking for libwx" >&5
 echo $ECHO_N "checking for libwx... $ECHO_C" >&6
-if test "${cs_cv_lib_wx+set}" = set; then
+if test "${cs_cv_libwx+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   ac_ext=cc
@@ -49176,17 +49176,17 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
   cs_build_cflags=`echo x$cs_cflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_lflags=`echo x$cs_lflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_cv_lib_wx=yes
-		cs_cv_lib_wx_cflags=$cs_build_cflags
-		cs_cv_lib_wx_lflags=$cs_build_lflags
-		cs_cv_lib_wx_libs=$cs_build_libs
+	cs_cv_libwx=yes
+		cs_cv_libwx_cflags=$cs_build_cflags
+		cs_cv_libwx_lflags=$cs_build_lflags
+		cs_cv_libwx_libs=$cs_build_libs
 else
-  cs_cv_lib_wx=no
+  cs_cv_libwx=no
 fi
 
 fi
-echo "$as_me:$LINENO: result: $cs_cv_lib_wx" >&5
-echo "${ECHO_T}$cs_cv_lib_wx" >&6
+echo "$as_me:$LINENO: result: $cs_cv_libwx" >&5
+echo "${ECHO_T}$cs_cv_libwx" >&6
 else
   echo "$as_me:$LINENO: checking for libwx" >&5
 echo $ECHO_N "checking for libwx... $ECHO_C" >&6
@@ -49334,29 +49334,29 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
   cs_build_cflags=`echo x$cs_cflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_lflags=`echo x$cs_lflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_cv_lib_wx=yes
-		cs_cv_lib_wx_cflags=$cs_build_cflags
-		cs_cv_lib_wx_lflags=$cs_build_lflags
-		cs_cv_lib_wx_libs=$cs_build_libs
+	cs_cv_libwx=yes
+		cs_cv_libwx_cflags=$cs_build_cflags
+		cs_cv_libwx_lflags=$cs_build_lflags
+		cs_cv_libwx_libs=$cs_build_libs
 else
-  cs_cv_lib_wx=no
+  cs_cv_libwx=no
 fi
 
-	    echo "$as_me:$LINENO: result: $cs_cv_lib_wx" >&5
-echo "${ECHO_T}$cs_cv_lib_wx" >&6
+	    echo "$as_me:$LINENO: result: $cs_cv_libwx" >&5
+echo "${ECHO_T}$cs_cv_libwx" >&6
 fi
 
-    if test $cs_cv_lib_wx = yes; then
+    if test $cs_cv_libwx = yes; then
   :
 else
-  cs_cv_lib_wx_cflags=''
-	cs_cv_lib_wx_lflags=''
-	cs_cv_lib_wx_libs=''
+  cs_cv_libwx_cflags=''
+	cs_cv_libwx_lflags=''
+	cs_cv_libwx_libs=''
 
 fi
 
 else
-  cs_cv_lib_wx=no
+  cs_cv_libwx=no
 fi
 
 
@@ -50552,7 +50552,7 @@ fi
 	if test "$cs_ignore_cache" != yes; then
   echo "$as_me:$LINENO: checking for libCEGUI" >&5
 echo $ECHO_N "checking for libCEGUI... $ECHO_C" >&6
-if test "${cs_cv_lib_CEGUI+set}" = set; then
+if test "${cs_cv_libCEGUI+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   ac_ext=cc
@@ -50692,17 +50692,17 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
   cs_build_cflags=`echo x$cs_cflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_lflags=`echo x$cs_lflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_cv_lib_CEGUI=yes
-		cs_cv_lib_CEGUI_cflags=$cs_build_cflags
-		cs_cv_lib_CEGUI_lflags=$cs_build_lflags
-		cs_cv_lib_CEGUI_libs=$cs_build_libs
+	cs_cv_libCEGUI=yes
+		cs_cv_libCEGUI_cflags=$cs_build_cflags
+		cs_cv_libCEGUI_lflags=$cs_build_lflags
+		cs_cv_libCEGUI_libs=$cs_build_libs
 else
-  cs_cv_lib_CEGUI=no
+  cs_cv_libCEGUI=no
 fi
 
 fi
-echo "$as_me:$LINENO: result: $cs_cv_lib_CEGUI" >&5
-echo "${ECHO_T}$cs_cv_lib_CEGUI" >&6
+echo "$as_me:$LINENO: result: $cs_cv_libCEGUI" >&5
+echo "${ECHO_T}$cs_cv_libCEGUI" >&6
 else
   echo "$as_me:$LINENO: checking for libCEGUI" >&5
 echo $ECHO_N "checking for libCEGUI... $ECHO_C" >&6
@@ -50843,29 +50843,29 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
   cs_build_cflags=`echo x$cs_cflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_lflags=`echo x$cs_lflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_cv_lib_CEGUI=yes
-		cs_cv_lib_CEGUI_cflags=$cs_build_cflags
-		cs_cv_lib_CEGUI_lflags=$cs_build_lflags
-		cs_cv_lib_CEGUI_libs=$cs_build_libs
+	cs_cv_libCEGUI=yes
+		cs_cv_libCEGUI_cflags=$cs_build_cflags
+		cs_cv_libCEGUI_lflags=$cs_build_lflags
+		cs_cv_libCEGUI_libs=$cs_build_libs
 else
-  cs_cv_lib_CEGUI=no
+  cs_cv_libCEGUI=no
 fi
 
-	    echo "$as_me:$LINENO: result: $cs_cv_lib_CEGUI" >&5
-echo "${ECHO_T}$cs_cv_lib_CEGUI" >&6
+	    echo "$as_me:$LINENO: result: $cs_cv_libCEGUI" >&5
+echo "${ECHO_T}$cs_cv_libCEGUI" >&6
 fi
 
-    if test $cs_cv_lib_CEGUI = yes; then
+    if test $cs_cv_libCEGUI = yes; then
   :
 else
-  cs_cv_lib_CEGUI_cflags=''
-	cs_cv_lib_CEGUI_lflags=''
-	cs_cv_lib_CEGUI_libs=''
+  cs_cv_libCEGUI_cflags=''
+	cs_cv_libCEGUI_lflags=''
+	cs_cv_libCEGUI_libs=''
 
 fi
 
 else
-  cs_cv_lib_CEGUI=no
+  cs_cv_libCEGUI=no
 fi
 
 
@@ -53260,7 +53260,7 @@ fi
 	if test "$cs_ignore_cache" != yes; then
   echo "$as_me:$LINENO: checking for libCg" >&5
 echo $ECHO_N "checking for libCg... $ECHO_C" >&6
-if test "${cs_cv_lib_Cg+set}" = set; then
+if test "${cs_cv_libCg+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   ac_ext=c
@@ -53400,17 +53400,17 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
   cs_build_cflags=`echo x$cs_cflags_test $cs_cv_libm_cflags $cs_cv_sys_pthread_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_lflags=`echo x$cs_lflags_test $cs_cv_libm_lflags $cs_cv_sys_pthread_lflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test $cs_cv_libm_libs   $cs_cv_sys_pthread_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_cv_lib_Cg=yes
-		cs_cv_lib_Cg_cflags=$cs_build_cflags
-		cs_cv_lib_Cg_lflags=$cs_build_lflags
-		cs_cv_lib_Cg_libs=$cs_build_libs
+	cs_cv_libCg=yes
+		cs_cv_libCg_cflags=$cs_build_cflags
+		cs_cv_libCg_lflags=$cs_build_lflags
+		cs_cv_libCg_libs=$cs_build_libs
 else
-  cs_cv_lib_Cg=no
+  cs_cv_libCg=no
 fi
 
 fi
-echo "$as_me:$LINENO: result: $cs_cv_lib_Cg" >&5
-echo "${ECHO_T}$cs_cv_lib_Cg" >&6
+echo "$as_me:$LINENO: result: $cs_cv_libCg" >&5
+echo "${ECHO_T}$cs_cv_libCg" >&6
 else
   echo "$as_me:$LINENO: checking for libCg" >&5
 echo $ECHO_N "checking for libCg... $ECHO_C" >&6
@@ -53551,29 +53551,29 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
   cs_build_cflags=`echo x$cs_cflags_test $cs_cv_libm_cflags $cs_cv_sys_pthread_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_lflags=`echo x$cs_lflags_test $cs_cv_libm_lflags $cs_cv_sys_pthread_lflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test $cs_cv_libm_libs   $cs_cv_sys_pthread_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_cv_lib_Cg=yes
-		cs_cv_lib_Cg_cflags=$cs_build_cflags
-		cs_cv_lib_Cg_lflags=$cs_build_lflags
-		cs_cv_lib_Cg_libs=$cs_build_libs
+	cs_cv_libCg=yes
+		cs_cv_libCg_cflags=$cs_build_cflags
+		cs_cv_libCg_lflags=$cs_build_lflags
+		cs_cv_libCg_libs=$cs_build_libs
 else
-  cs_cv_lib_Cg=no
+  cs_cv_libCg=no
 fi
 
-	    echo "$as_me:$LINENO: result: $cs_cv_lib_Cg" >&5
-echo "${ECHO_T}$cs_cv_lib_Cg" >&6
+	    echo "$as_me:$LINENO: result: $cs_cv_libCg" >&5
+echo "${ECHO_T}$cs_cv_libCg" >&6
 fi
 
-    if test $cs_cv_lib_Cg = yes; then
+    if test $cs_cv_libCg = yes; then
   :
 else
-  cs_cv_lib_Cg_cflags=''
-	cs_cv_lib_Cg_lflags=''
-	cs_cv_lib_Cg_libs=''
+  cs_cv_libCg_cflags=''
+	cs_cv_libCg_lflags=''
+	cs_cv_libCg_libs=''
 
 fi
 
 else
-  cs_cv_lib_Cg=no
+  cs_cv_libCg=no
 fi
 
 
@@ -56589,7 +56589,7 @@ fi
 	if test "$cs_ignore_cache" != yes; then
   echo "$as_me:$LINENO: checking for libCgGL" >&5
 echo $ECHO_N "checking for libCgGL... $ECHO_C" >&6
-if test "${cs_cv_lib_CgGL+set}" = set; then
+if test "${cs_cv_libCgGL+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   ac_ext=cc
@@ -56730,17 +56730,17 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
   cs_build_cflags=`echo x$cs_cflags_test $cs_cv_libCg_cflags $cs_cv_libgl_cflags $cs_cv_libglu_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_lflags=`echo x$cs_lflags_test $cs_cv_libCg_lflags $cs_cv_libgl_lflags $cs_cv_libglu_lflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test $cs_cv_libCg_libs   $cs_cv_libgl_libs   $cs_cv_libglu_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_cv_lib_CgGL=yes
-		cs_cv_lib_CgGL_cflags=$cs_build_cflags
-		cs_cv_lib_CgGL_lflags=$cs_build_lflags
-		cs_cv_lib_CgGL_libs=$cs_build_libs
+	cs_cv_libCgGL=yes
+		cs_cv_libCgGL_cflags=$cs_build_cflags
+		cs_cv_libCgGL_lflags=$cs_build_lflags
+		cs_cv_libCgGL_libs=$cs_build_libs
 else
-  cs_cv_lib_CgGL=no
+  cs_cv_libCgGL=no
 fi
 
 fi
-echo "$as_me:$LINENO: result: $cs_cv_lib_CgGL" >&5
-echo "${ECHO_T}$cs_cv_lib_CgGL" >&6
+echo "$as_me:$LINENO: result: $cs_cv_libCgGL" >&5
+echo "${ECHO_T}$cs_cv_libCgGL" >&6
 else
   echo "$as_me:$LINENO: checking for libCgGL" >&5
 echo $ECHO_N "checking for libCgGL... $ECHO_C" >&6
@@ -56882,34 +56882,34 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
   cs_build_cflags=`echo x$cs_cflags_test $cs_cv_libCg_cflags $cs_cv_libgl_cflags $cs_cv_libglu_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_lflags=`echo x$cs_lflags_test $cs_cv_libCg_lflags $cs_cv_libgl_lflags $cs_cv_libglu_lflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test $cs_cv_libCg_libs   $cs_cv_libgl_libs   $cs_cv_libglu_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_cv_lib_CgGL=yes
-		cs_cv_lib_CgGL_cflags=$cs_build_cflags
-		cs_cv_lib_CgGL_lflags=$cs_build_lflags
-		cs_cv_lib_CgGL_libs=$cs_build_libs
+	cs_cv_libCgGL=yes
+		cs_cv_libCgGL_cflags=$cs_build_cflags
+		cs_cv_libCgGL_lflags=$cs_build_lflags
+		cs_cv_libCgGL_libs=$cs_build_libs
 else
-  cs_cv_lib_CgGL=no
+  cs_cv_libCgGL=no
 fi
 
-	    echo "$as_me:$LINENO: result: $cs_cv_lib_CgGL" >&5
-echo "${ECHO_T}$cs_cv_lib_CgGL" >&6
+	    echo "$as_me:$LINENO: result: $cs_cv_libCgGL" >&5
+echo "${ECHO_T}$cs_cv_libCgGL" >&6
 fi
 
-    if test $cs_cv_lib_CgGL = yes; then
+    if test $cs_cv_libCgGL = yes; then
   :
 else
-  cs_cv_lib_CgGL_cflags=''
-	cs_cv_lib_CgGL_lflags=''
-	cs_cv_lib_CgGL_libs=''
+  cs_cv_libCgGL_cflags=''
+	cs_cv_libCgGL_lflags=''
+	cs_cv_libCgGL_libs=''
 
 fi
 
 else
-  cs_cv_lib_CgGL=no
+  cs_cv_libCgGL=no
 fi
 
 
     cs_cv_with_CgGL="$with_CgGL"
-    if test "$cs_cv_lib_CgGL" = yes; then
+    if test "$cs_cv_libCgGL" = yes; then
   if test "$cs_cv_libCgGL" = yes; then
   cs_build_prop_val="yes"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
@@ -57826,7 +57826,7 @@ fi
 	if test "$cs_ignore_cache" != yes; then
   echo "$as_me:$LINENO: checking for libjackasyn" >&5
 echo $ECHO_N "checking for libjackasyn... $ECHO_C" >&6
-if test "${cs_cv_lib_jackasyn+set}" = set; then
+if test "${cs_cv_libjackasyn+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   ac_ext=c
@@ -57967,17 +57967,17 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
   cs_build_cflags=`echo x$cs_cflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_lflags=`echo x$cs_lflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_cv_lib_jackasyn=yes
-		cs_cv_lib_jackasyn_cflags=$cs_build_cflags
-		cs_cv_lib_jackasyn_lflags=$cs_build_lflags
-		cs_cv_lib_jackasyn_libs=$cs_build_libs
+	cs_cv_libjackasyn=yes
+		cs_cv_libjackasyn_cflags=$cs_build_cflags
+		cs_cv_libjackasyn_lflags=$cs_build_lflags
+		cs_cv_libjackasyn_libs=$cs_build_libs
 else
-  cs_cv_lib_jackasyn=no
+  cs_cv_libjackasyn=no
 fi
 
 fi
-echo "$as_me:$LINENO: result: $cs_cv_lib_jackasyn" >&5
-echo "${ECHO_T}$cs_cv_lib_jackasyn" >&6
+echo "$as_me:$LINENO: result: $cs_cv_libjackasyn" >&5
+echo "${ECHO_T}$cs_cv_libjackasyn" >&6
 else
   echo "$as_me:$LINENO: checking for libjackasyn" >&5
 echo $ECHO_N "checking for libjackasyn... $ECHO_C" >&6
@@ -58119,34 +58119,34 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
   cs_build_cflags=`echo x$cs_cflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_lflags=`echo x$cs_lflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_cv_lib_jackasyn=yes
-		cs_cv_lib_jackasyn_cflags=$cs_build_cflags
-		cs_cv_lib_jackasyn_lflags=$cs_build_lflags
-		cs_cv_lib_jackasyn_libs=$cs_build_libs
+	cs_cv_libjackasyn=yes
+		cs_cv_libjackasyn_cflags=$cs_build_cflags
+		cs_cv_libjackasyn_lflags=$cs_build_lflags
+		cs_cv_libjackasyn_libs=$cs_build_libs
 else
-  cs_cv_lib_jackasyn=no
+  cs_cv_libjackasyn=no
 fi
 
-	    echo "$as_me:$LINENO: result: $cs_cv_lib_jackasyn" >&5
-echo "${ECHO_T}$cs_cv_lib_jackasyn" >&6
+	    echo "$as_me:$LINENO: result: $cs_cv_libjackasyn" >&5
+echo "${ECHO_T}$cs_cv_libjackasyn" >&6
 fi
 
-    if test $cs_cv_lib_jackasyn = yes; then
+    if test $cs_cv_libjackasyn = yes; then
   :
 else
-  cs_cv_lib_jackasyn_cflags=''
-	cs_cv_lib_jackasyn_lflags=''
-	cs_cv_lib_jackasyn_libs=''
+  cs_cv_libjackasyn_cflags=''
+	cs_cv_libjackasyn_lflags=''
+	cs_cv_libjackasyn_libs=''
 
 fi
 
 else
-  cs_cv_lib_jackasyn=no
+  cs_cv_libjackasyn=no
 fi
 
 
     cs_cv_with_jackasyn="$with_jackasyn"
-    if test "$cs_cv_lib_jackasyn" = yes; then
+    if test "$cs_cv_libjackasyn" = yes; then
   if test "$cs_cv_libjackasyn" = yes; then
   cs_build_prop_val="yes"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
@@ -58607,7 +58607,7 @@ fi
 	if test "$cs_ignore_cache" != yes; then
   echo "$as_me:$LINENO: checking for libasound" >&5
 echo $ECHO_N "checking for libasound... $ECHO_C" >&6
-if test "${cs_cv_lib_asound+set}" = set; then
+if test "${cs_cv_libasound+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   ac_ext=c
@@ -58747,17 +58747,17 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
   cs_build_cflags=`echo x$cs_cflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_lflags=`echo x$cs_lflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_cv_lib_asound=yes
-		cs_cv_lib_asound_cflags=$cs_build_cflags
-		cs_cv_lib_asound_lflags=$cs_build_lflags
-		cs_cv_lib_asound_libs=$cs_build_libs
+	cs_cv_libasound=yes
+		cs_cv_libasound_cflags=$cs_build_cflags
+		cs_cv_libasound_lflags=$cs_build_lflags
+		cs_cv_libasound_libs=$cs_build_libs
 else
-  cs_cv_lib_asound=no
+  cs_cv_libasound=no
 fi
 
 fi
-echo "$as_me:$LINENO: result: $cs_cv_lib_asound" >&5
-echo "${ECHO_T}$cs_cv_lib_asound" >&6
+echo "$as_me:$LINENO: result: $cs_cv_libasound" >&5
+echo "${ECHO_T}$cs_cv_libasound" >&6
 else
   echo "$as_me:$LINENO: checking for libasound" >&5
 echo $ECHO_N "checking for libasound... $ECHO_C" >&6
@@ -58898,34 +58898,34 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
   cs_build_cflags=`echo x$cs_cflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_lflags=`echo x$cs_lflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_cv_lib_asound=yes
-		cs_cv_lib_asound_cflags=$cs_build_cflags
-		cs_cv_lib_asound_lflags=$cs_build_lflags
-		cs_cv_lib_asound_libs=$cs_build_libs
+	cs_cv_libasound=yes
+		cs_cv_libasound_cflags=$cs_build_cflags
+		cs_cv_libasound_lflags=$cs_build_lflags
+		cs_cv_libasound_libs=$cs_build_libs
 else
-  cs_cv_lib_asound=no
+  cs_cv_libasound=no
 fi
 
-	    echo "$as_me:$LINENO: result: $cs_cv_lib_asound" >&5
-echo "${ECHO_T}$cs_cv_lib_asound" >&6
+	    echo "$as_me:$LINENO: result: $cs_cv_libasound" >&5
+echo "${ECHO_T}$cs_cv_libasound" >&6
 fi
 
-    if test $cs_cv_lib_asound = yes; then
+    if test $cs_cv_libasound = yes; then
   :
 else
-  cs_cv_lib_asound_cflags=''
-	cs_cv_lib_asound_lflags=''
-	cs_cv_lib_asound_libs=''
+  cs_cv_libasound_cflags=''
+	cs_cv_libasound_lflags=''
+	cs_cv_libasound_libs=''
 
 fi
 
 else
-  cs_cv_lib_asound=no
+  cs_cv_libasound=no
 fi
 
 
     cs_cv_with_asound="$with_asound"
-    if test "$cs_cv_lib_asound" = yes; then
+    if test "$cs_cv_libasound" = yes; then
   if test "$cs_cv_libasound" = yes; then
   cs_build_prop_val="yes"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
@@ -59762,7 +59762,7 @@ fi
 	if test "$cs_ignore_cache" != yes; then
   echo "$as_me:$LINENO: checking for libcaca" >&5
 echo $ECHO_N "checking for libcaca... $ECHO_C" >&6
-if test "${cs_cv_lib_caca+set}" = set; then
+if test "${cs_cv_libcaca+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   ac_ext=c
@@ -59902,17 +59902,17 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
   cs_build_cflags=`echo x$cs_cflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_lflags=`echo x$cs_lflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_cv_lib_caca=yes
-		cs_cv_lib_caca_cflags=$cs_build_cflags
-		cs_cv_lib_caca_lflags=$cs_build_lflags
-		cs_cv_lib_caca_libs=$cs_build_libs
+	cs_cv_libcaca=yes
+		cs_cv_libcaca_cflags=$cs_build_cflags
+		cs_cv_libcaca_lflags=$cs_build_lflags
+		cs_cv_libcaca_libs=$cs_build_libs
 else
-  cs_cv_lib_caca=no
+  cs_cv_libcaca=no
 fi
 
 fi
-echo "$as_me:$LINENO: result: $cs_cv_lib_caca" >&5
-echo "${ECHO_T}$cs_cv_lib_caca" >&6
+echo "$as_me:$LINENO: result: $cs_cv_libcaca" >&5
+echo "${ECHO_T}$cs_cv_libcaca" >&6
 else
   echo "$as_me:$LINENO: checking for libcaca" >&5
 echo $ECHO_N "checking for libcaca... $ECHO_C" >&6
@@ -60053,34 +60053,34 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
   cs_build_cflags=`echo x$cs_cflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_lflags=`echo x$cs_lflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_cv_lib_caca=yes
-		cs_cv_lib_caca_cflags=$cs_build_cflags
-		cs_cv_lib_caca_lflags=$cs_build_lflags
-		cs_cv_lib_caca_libs=$cs_build_libs
+	cs_cv_libcaca=yes
+		cs_cv_libcaca_cflags=$cs_build_cflags
+		cs_cv_libcaca_lflags=$cs_build_lflags
+		cs_cv_libcaca_libs=$cs_build_libs
 else
-  cs_cv_lib_caca=no
+  cs_cv_libcaca=no
 fi
 
-	    echo "$as_me:$LINENO: result: $cs_cv_lib_caca" >&5
-echo "${ECHO_T}$cs_cv_lib_caca" >&6
+	    echo "$as_me:$LINENO: result: $cs_cv_libcaca" >&5
+echo "${ECHO_T}$cs_cv_libcaca" >&6
 fi
 
-    if test $cs_cv_lib_caca = yes; then
+    if test $cs_cv_libcaca = yes; then
   :
 else
-  cs_cv_lib_caca_cflags=''
-	cs_cv_lib_caca_lflags=''
-	cs_cv_lib_caca_libs=''
+  cs_cv_libcaca_cflags=''
+	cs_cv_libcaca_lflags=''
+	cs_cv_libcaca_libs=''
 
 fi
 
 else
-  cs_cv_lib_caca=no
+  cs_cv_libcaca=no
 fi
 
 
     cs_cv_with_caca="$with_caca"
-    if test "$cs_cv_lib_caca" = yes; then
+    if test "$cs_cv_libcaca" = yes; then
   if test "$cs_cv_libcaca" = yes; then
   cs_build_prop_val="yes"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
@@ -60543,7 +60543,7 @@ fi
 	if test "$cs_ignore_cache" != yes; then
   echo "$as_me:$LINENO: checking for libjs" >&5
 echo $ECHO_N "checking for libjs... $ECHO_C" >&6
-if test "${cs_cv_lib_js+set}" = set; then
+if test "${cs_cv_libjs+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   ac_ext=c
@@ -60683,17 +60683,17 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
   cs_build_cflags=`echo x$cs_cflags_test -D$cs_spidermonkey_platform | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_lflags=`echo x$cs_lflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_cv_lib_js=yes
-		cs_cv_lib_js_cflags=$cs_build_cflags
-		cs_cv_lib_js_lflags=$cs_build_lflags
-		cs_cv_lib_js_libs=$cs_build_libs
+	cs_cv_libjs=yes
+		cs_cv_libjs_cflags=$cs_build_cflags
+		cs_cv_libjs_lflags=$cs_build_lflags
+		cs_cv_libjs_libs=$cs_build_libs
 else
-  cs_cv_lib_js=no
+  cs_cv_libjs=no
 fi
 
 fi
-echo "$as_me:$LINENO: result: $cs_cv_lib_js" >&5
-echo "${ECHO_T}$cs_cv_lib_js" >&6
+echo "$as_me:$LINENO: result: $cs_cv_libjs" >&5
+echo "${ECHO_T}$cs_cv_libjs" >&6
 else
   echo "$as_me:$LINENO: checking for libjs" >&5
 echo $ECHO_N "checking for libjs... $ECHO_C" >&6
@@ -60834,34 +60834,34 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
   cs_build_cflags=`echo x$cs_cflags_test -D$cs_spidermonkey_platform | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_lflags=`echo x$cs_lflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_cv_lib_js=yes
-		cs_cv_lib_js_cflags=$cs_build_cflags
-		cs_cv_lib_js_lflags=$cs_build_lflags
-		cs_cv_lib_js_libs=$cs_build_libs
+	cs_cv_libjs=yes
+		cs_cv_libjs_cflags=$cs_build_cflags
+		cs_cv_libjs_lflags=$cs_build_lflags
+		cs_cv_libjs_libs=$cs_build_libs
 else
-  cs_cv_lib_js=no
+  cs_cv_libjs=no
 fi
 
-	    echo "$as_me:$LINENO: result: $cs_cv_lib_js" >&5
-echo "${ECHO_T}$cs_cv_lib_js" >&6
+	    echo "$as_me:$LINENO: result: $cs_cv_libjs" >&5
+echo "${ECHO_T}$cs_cv_libjs" >&6
 fi
 
-    if test $cs_cv_lib_js = yes; then
+    if test $cs_cv_libjs = yes; then
   :
 else
-  cs_cv_lib_js_cflags=''
-	cs_cv_lib_js_lflags=''
-	cs_cv_lib_js_libs=''
+  cs_cv_libjs_cflags=''
+	cs_cv_libjs_lflags=''
+	cs_cv_libjs_libs=''
 
 fi
 
 else
-  cs_cv_lib_js=no
+  cs_cv_libjs=no
 fi
 
 
     cs_cv_with_js="$with_js"
-    if test "$cs_cv_lib_js" = yes; then
+    if test "$cs_cv_libjs" = yes; then
   if test "$cs_cv_libjs" = yes; then
   cs_build_prop_val="yes"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
@@ -63591,7 +63591,7 @@ fi
 	if test "$cs_ignore_cache" != yes; then
   echo "$as_me:$LINENO: checking for libcppunit" >&5
 echo $ECHO_N "checking for libcppunit... $ECHO_C" >&6
-if test "${cs_cv_lib_cppunit+set}" = set; then
+if test "${cs_cv_libcppunit+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   ac_ext=cc
@@ -63731,17 +63731,17 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
   cs_build_cflags=`echo x$cs_cflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_lflags=`echo x$cs_lflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_cv_lib_cppunit=yes
-		cs_cv_lib_cppunit_cflags=$cs_build_cflags
-		cs_cv_lib_cppunit_lflags=$cs_build_lflags
-		cs_cv_lib_cppunit_libs=$cs_build_libs
+	cs_cv_libcppunit=yes
+		cs_cv_libcppunit_cflags=$cs_build_cflags
+		cs_cv_libcppunit_lflags=$cs_build_lflags
+		cs_cv_libcppunit_libs=$cs_build_libs
 else
-  cs_cv_lib_cppunit=no
+  cs_cv_libcppunit=no
 fi
 
 fi
-echo "$as_me:$LINENO: result: $cs_cv_lib_cppunit" >&5
-echo "${ECHO_T}$cs_cv_lib_cppunit" >&6
+echo "$as_me:$LINENO: result: $cs_cv_libcppunit" >&5
+echo "${ECHO_T}$cs_cv_libcppunit" >&6
 else
   echo "$as_me:$LINENO: checking for libcppunit" >&5
 echo $ECHO_N "checking for libcppunit... $ECHO_C" >&6
@@ -63882,29 +63882,29 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
   cs_build_cflags=`echo x$cs_cflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_lflags=`echo x$cs_lflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_cv_lib_cppunit=yes
-		cs_cv_lib_cppunit_cflags=$cs_build_cflags
-		cs_cv_lib_cppunit_lflags=$cs_build_lflags
-		cs_cv_lib_cppunit_libs=$cs_build_libs
+	cs_cv_libcppunit=yes
+		cs_cv_libcppunit_cflags=$cs_build_cflags
+		cs_cv_libcppunit_lflags=$cs_build_lflags
+		cs_cv_libcppunit_libs=$cs_build_libs
 else
-  cs_cv_lib_cppunit=no
+  cs_cv_libcppunit=no
 fi
 
-	    echo "$as_me:$LINENO: result: $cs_cv_lib_cppunit" >&5
-echo "${ECHO_T}$cs_cv_lib_cppunit" >&6
+	    echo "$as_me:$LINENO: result: $cs_cv_libcppunit" >&5
+echo "${ECHO_T}$cs_cv_libcppunit" >&6
 fi
 
-    if test $cs_cv_lib_cppunit = yes; then
+    if test $cs_cv_libcppunit = yes; then
   :
 else
-  cs_cv_lib_cppunit_cflags=''
-	cs_cv_lib_cppunit_lflags=''
-	cs_cv_lib_cppunit_libs=''
+  cs_cv_libcppunit_cflags=''
+	cs_cv_libcppunit_lflags=''
+	cs_cv_libcppunit_libs=''
 
 fi
 
 else
-  cs_cv_lib_cppunit=no
+  cs_cv_libcppunit=no
 fi
 
 
@@ -72173,7 +72173,7 @@ fi
 	if test "$cs_ignore_cache" != yes; then
   echo "$as_me:$LINENO: checking for libbfd" >&5
 echo $ECHO_N "checking for libbfd... $ECHO_C" >&6
-if test "${cs_cv_lib_bfd+set}" = set; then
+if test "${cs_cv_libbfd+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   ac_ext=c
@@ -72313,17 +72313,17 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
   cs_build_cflags=`echo x$cs_cflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_lflags=`echo x$cs_lflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test -liberty | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_cv_lib_bfd=yes
-		cs_cv_lib_bfd_cflags=$cs_build_cflags
-		cs_cv_lib_bfd_lflags=$cs_build_lflags
-		cs_cv_lib_bfd_libs=$cs_build_libs
+	cs_cv_libbfd=yes
+		cs_cv_libbfd_cflags=$cs_build_cflags
+		cs_cv_libbfd_lflags=$cs_build_lflags
+		cs_cv_libbfd_libs=$cs_build_libs
 else
-  cs_cv_lib_bfd=no
+  cs_cv_libbfd=no
 fi
 
 fi
-echo "$as_me:$LINENO: result: $cs_cv_lib_bfd" >&5
-echo "${ECHO_T}$cs_cv_lib_bfd" >&6
+echo "$as_me:$LINENO: result: $cs_cv_libbfd" >&5
+echo "${ECHO_T}$cs_cv_libbfd" >&6
 else
   echo "$as_me:$LINENO: checking for libbfd" >&5
 echo $ECHO_N "checking for libbfd... $ECHO_C" >&6
@@ -72464,29 +72464,29 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
   cs_build_cflags=`echo x$cs_cflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_lflags=`echo x$cs_lflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test -liberty | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_cv_lib_bfd=yes
-		cs_cv_lib_bfd_cflags=$cs_build_cflags
-		cs_cv_lib_bfd_lflags=$cs_build_lflags
-		cs_cv_lib_bfd_libs=$cs_build_libs
+	cs_cv_libbfd=yes
+		cs_cv_libbfd_cflags=$cs_build_cflags
+		cs_cv_libbfd_lflags=$cs_build_lflags
+		cs_cv_libbfd_libs=$cs_build_libs
 else
-  cs_cv_lib_bfd=no
+  cs_cv_libbfd=no
 fi
 
-	    echo "$as_me:$LINENO: result: $cs_cv_lib_bfd" >&5
-echo "${ECHO_T}$cs_cv_lib_bfd" >&6
+	    echo "$as_me:$LINENO: result: $cs_cv_libbfd" >&5
+echo "${ECHO_T}$cs_cv_libbfd" >&6
 fi
 
-    if test $cs_cv_lib_bfd = yes; then
+    if test $cs_cv_libbfd = yes; then
   :
 else
-  cs_cv_lib_bfd_cflags=''
-	cs_cv_lib_bfd_lflags=''
-	cs_cv_lib_bfd_libs=''
+  cs_cv_libbfd_cflags=''
+	cs_cv_libbfd_lflags=''
+	cs_cv_libbfd_libs=''
 
 fi
 
 else
-  cs_cv_lib_bfd=no
+  cs_cv_libbfd=no
 fi
 
 
@@ -73603,7 +73603,7 @@ fi
 	if test "$cs_ignore_cache" != yes; then
   echo "$as_me:$LINENO: checking for libbfd" >&5
 echo $ECHO_N "checking for libbfd... $ECHO_C" >&6
-if test "${cs_cv_lib_bfd+set}" = set; then
+if test "${cs_cv_libbfd+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   ac_ext=c
@@ -73743,17 +73743,17 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
   cs_build_cflags=`echo x$cs_cflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_lflags=`echo x$cs_lflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test -liberty | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_cv_lib_bfd=yes
-		cs_cv_lib_bfd_cflags=$cs_build_cflags
-		cs_cv_lib_bfd_lflags=$cs_build_lflags
-		cs_cv_lib_bfd_libs=$cs_build_libs
+	cs_cv_libbfd=yes
+		cs_cv_libbfd_cflags=$cs_build_cflags
+		cs_cv_libbfd_lflags=$cs_build_lflags
+		cs_cv_libbfd_libs=$cs_build_libs
 else
-  cs_cv_lib_bfd=no
+  cs_cv_libbfd=no
 fi
 
 fi
-echo "$as_me:$LINENO: result: $cs_cv_lib_bfd" >&5
-echo "${ECHO_T}$cs_cv_lib_bfd" >&6
+echo "$as_me:$LINENO: result: $cs_cv_libbfd" >&5
+echo "${ECHO_T}$cs_cv_libbfd" >&6
 else
   echo "$as_me:$LINENO: checking for libbfd" >&5
 echo $ECHO_N "checking for libbfd... $ECHO_C" >&6
@@ -73894,29 +73894,29 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
   cs_build_cflags=`echo x$cs_cflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_lflags=`echo x$cs_lflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test -liberty | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_cv_lib_bfd=yes
-		cs_cv_lib_bfd_cflags=$cs_build_cflags
-		cs_cv_lib_bfd_lflags=$cs_build_lflags
-		cs_cv_lib_bfd_libs=$cs_build_libs
+	cs_cv_libbfd=yes
+		cs_cv_libbfd_cflags=$cs_build_cflags
+		cs_cv_libbfd_lflags=$cs_build_lflags
+		cs_cv_libbfd_libs=$cs_build_libs
 else
-  cs_cv_lib_bfd=no
+  cs_cv_libbfd=no
 fi
 
-	    echo "$as_me:$LINENO: result: $cs_cv_lib_bfd" >&5
-echo "${ECHO_T}$cs_cv_lib_bfd" >&6
+	    echo "$as_me:$LINENO: result: $cs_cv_libbfd" >&5
+echo "${ECHO_T}$cs_cv_libbfd" >&6
 fi
 
-    if test $cs_cv_lib_bfd = yes; then
+    if test $cs_cv_libbfd = yes; then
   :
 else
-  cs_cv_lib_bfd_cflags=''
-	cs_cv_lib_bfd_lflags=''
-	cs_cv_lib_bfd_libs=''
+  cs_cv_libbfd_cflags=''
+	cs_cv_libbfd_lflags=''
+	cs_cv_libbfd_libs=''
 
 fi
 
 else
-  cs_cv_lib_bfd=no
+  cs_cv_libbfd=no
 fi
 
 

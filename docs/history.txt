@@ -31,6 +31,10 @@ chronological order.
 	    - Fixed bug where default search path elements when locating
 	      cegui.i file were incorrectly separated by whitespace rather than
 	      $PATH_SEPARATOR.
+	- Eric Sunshine fixed r25803 bug in CS_CHECK_LIB_WITH() in checklib.m4
+	  which resulted in exported variables being named incorrectly, thus
+	  causing later tests and dependent code which relied upon those
+	  variables to fail.
 6-Nov-2006
 	- caedes added the uvanim shader, it is an xml shader for uv frame
 	  animation, ie, it scrolls over frames packed in a texture.
