@@ -6,6 +6,14 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+8-Nov-2007
+	- Erroroman changed bones indices render buffer type to ushort. Also 
+	  changed indices type to short in all animation vertex shaders.
+	- Erroroman made Cg skinning default again.
+	- Erroroman dopted max animation exporter script to export ushort bones 
+	  indices.
+	- Erroroman fixed speed problem in shader animation by changing bones 
+	  indices type from ushort to short. Also fixed max exporter again.
 7-Nov-2007
 	- Eric Sunshine fixed r25803 bug in CS_CHECK_LIB_WITH() in checklib.m4
 	  which resulted in exported variables being named incorrectly, thus
