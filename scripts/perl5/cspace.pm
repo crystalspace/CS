@@ -9865,6 +9865,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetParticle = *cspacec::iParticleSystem_GetParticle;
 *GetParticleAux = *cspacec::iParticleSystem_GetParticleAux;
 *LockForExternalControl = *cspacec::iParticleSystem_LockForExternalControl;
+*Advance = *cspacec::iParticleSystem_Advance;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});

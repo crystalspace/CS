@@ -6428,6 +6428,7 @@ class iParticleSystem(iParticleSystemBase):
     def GetParticle(*args): return _cspace.iParticleSystem_GetParticle(*args)
     def GetParticleAux(*args): return _cspace.iParticleSystem_GetParticleAux(*args)
     def LockForExternalControl(*args): return _cspace.iParticleSystem_LockForExternalControl(*args)
+    def Advance(*args): return _cspace.iParticleSystem_Advance(*args)
     __swig_destroy__ = _cspace.delete_iParticleSystem
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iParticleSystem_scfGetVersion
