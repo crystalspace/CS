@@ -12,6 +12,8 @@ chronological order.
 	- Erroroman made Cg skinning default again.
 	- Erroroman dopted max animation exporter script to export ushort bones 
 	  indices.
+	- Erroroman fixed speed problem in shader animation by changing bones 
+	  indices type from ushort to short. Also fixed max exporter again.
 7-Nov-2007
 	- Eric Sunshine changed CS_CHECK_PROG_VERSION() in progver.m4 to export
 	  shell variables `cs_prog_PROG_version' and `cs_prog_PROG_version_ok'
