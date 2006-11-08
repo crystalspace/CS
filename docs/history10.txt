@@ -8,6 +8,7 @@ chronological order.
 
 8-Nov-2006
         - res merged r25832:25834 into 1.0 (gmeshskel2 bone index type fix).
+        - res merged r25456 into 1.0 (terrain + skyboxes).
 7-Nov-2006
 	- Eric Sunshine merged r25825 into 1.0 (CS_CHECK_LIB_WITH() macro
 	  exported variable names fix).

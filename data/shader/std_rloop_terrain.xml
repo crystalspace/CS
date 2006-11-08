@@ -7,7 +7,7 @@
         <shadertype>ambient</shadertype>
         <zoffset>yes</zoffset>
         <portaltraversal/>
-        <zuse />
+        <zmesh />
       </step>
       <!-- dynamic lighting -->
       <step plugin="crystalspace.renderloop.step.lightiter">
