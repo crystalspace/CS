@@ -6,6 +6,12 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+8-Nov-2007
+	- Erroroman changed bones indices render buffer type to ushort. Also 
+	  changed indices type to short in all animation vertex shaders.
+	- Erroroman made Cg skinning default again.
+	- Erroroman dopted max animation exporter script to export ushort bones 
+	  indices.
 7-Nov-2007
 	- Eric Sunshine changed CS_CHECK_PROG_VERSION() in progver.m4 to export
 	  shell variables `cs_prog_PROG_version' and `cs_prog_PROG_version_ok'

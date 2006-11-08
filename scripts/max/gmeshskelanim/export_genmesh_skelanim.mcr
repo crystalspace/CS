@@ -593,7 +593,7 @@ rollout Test1 "Export GenMesh Skelanim 2 to CS" width:238 height:445
 				)
 			)
 
-			format "      <renderbuffer name=\"bones indices\" components=\"4\" type=\"float\">\n" to:outFile
+			format "      <renderbuffer name=\"bones indices\" components=\"4\" type=\"ushort\">\n" to:outFile
 			for b=1 to vertices2bones_weights.count do
 			(
 				idx_1 = vertices2bones_indices[b].the_bones[1]
