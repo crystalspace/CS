@@ -68,7 +68,7 @@ namespace lighter
     LightRefArray allLights;
 
     // KD-tree of all primitives in sector
-    KDTree *kdTree;
+    KDTree_Opt *kdTree;
 
     // Sector-name
     csString sectorName;

@@ -21,6 +21,8 @@
 #include "kdtree.h"
 #include "radprimitive.h"
 
+#include "csutil/alignedalloc.h"
+
 using namespace CS;
 
 namespace lighter
@@ -58,49 +60,6 @@ namespace lighter
           p.vertices[1] = vdata.vertexArray[ia[1]].position;
           p.vertices[2] = vdata.vertexArray[ia[2]].position;
           p.normal = prim.GetPlane ().norm;
-
-          // Setup optimized
-          int k = 0;
-          // Find max normal direction
-          if (fabsf (p.normal.x) > fabsf (p.normal.y))
-          {
-            if (fabsf (p.normal.x) > fabsf (p.normal.z)) k = 0;
-            else k = 2;
-          }
-          else
-          {
-            if (fabsf (p.normal.y) > fabsf (p.normal.z)) k = 1;
-            else k = 2;
-          }
-
-          p.k = k;
-
-          uint u = (k+1)%3;
-          uint v = (k+2)%3;
-
-          const csVector3& A = p.vertices[0];
-
-          // precalc normal
-          float nkinv = 1.0f/p.normal[k];
-          p.n_u = p.normal[u] * nkinv;
-          p.n_v = p.normal[v] * nkinv;
-          p.n_d = (p.normal * A) * nkinv;
-
-
-          csVector3 b = p.vertices[2] - p.vertices[0];
-          csVector3 c = p.vertices[1] - p.vertices[0];
-
-          float tmp = 1.0f/(b[u] * c[v] - b[v] * c[u]);
-
-          // edge 1
-          p.b_nu = -b[v] * tmp;
-          p.b_nv = b[u] * tmp;
-          p.b_d = (b[v] * A[u] - b[u] * A[v]) * tmp;
-
-          // edge 2
-          p.c_nu = c[v] * tmp;
-          p.c_nv = -c[u] * tmp;
-          p.c_d = (c[u] * A[v] - c[v] * A[u]) * tmp;
 
           tree->allTriangles.Push (p);
           for (uint j = 1; j < 3; j++)
@@ -206,7 +165,7 @@ namespace lighter
     const csBox3& currentAABB, unsigned int depth,
     unsigned int lastAxis, float lastPosition)
   {
-    if(depth++ > 20) 
+    if(depth++ > 16) 
       return;
 
     // Work out split direction, might have different logic later?
@@ -295,7 +254,7 @@ namespace lighter
     }
   
     // check if any split is good enough
-    if (bestCost > node->triangleIndices.GetSize ()*2.0f)
+    if (bestCost > node->triangleIndices.GetSize ()*1.0f)
     {
       return;
     }
@@ -327,9 +286,168 @@ namespace lighter
       node->splitLocation);
   }
 
+  struct CountNodesAndTriangles
+  {
+    CountNodesAndTriangles ()
+      : numNodes (0), numTriIndices (0)
+    {}
+
+    void CountTree (KDTreeNode* node)
+    {
+      if (!node)
+        return;
+
+      numNodes++;
+
+      numTriIndices += node->triangleIndices.GetSize ();
+
+      CountTree (node->leftChild);
+      CountTree (node->rightChild);
+    }
+
+    size_t numNodes, numTriIndices;
+  };
+
+  struct OptimizedNodeBuilderConf
+  {
+    KDTreeNode_Opt* freeNodeList;
+    size_t usedNodes;
+
+    KDTreePrimitive_Opt* freePrimitivesList;
+    size_t usedPrimitives;
+
+    KDTree* tree;
+  };
+
+  void SetupOptimizedNode (KDTreeNode* origNode, KDTreeNode_Opt* node,
+    OptimizedNodeBuilderConf& c)
+  {
+    if (origNode->leftChild)
+    {
+      // inner node
+      node->inner.flagDimensionAndOffset = 0x04;
+      
+      node->inner.flagDimensionAndOffset =
+        (node->inner.flagDimensionAndOffset & ~0x03) | 
+        (origNode->splitDimension & 0x03);
+
+      node->inner.splitLocation = origNode->splitLocation;
+
+      // Get nodes for children
+      KDTreeNode_Opt* left = c.freeNodeList + c.usedNodes++;
+      KDTreeNode_Opt* right = c.freeNodeList + c.usedNodes++;
+
+      node->inner.flagDimensionAndOffset = 
+        (node->inner.flagDimensionAndOffset & 0x07) | (((uintptr_t)left) & ~0x07);
+
+      // Setup children
+      SetupOptimizedNode (origNode->leftChild, left, c);
+      SetupOptimizedNode (origNode->rightChild, right, c);
+    }
+    else
+    {
+      // leaf node
+      node->leaf.flagAndOffset = 0;
+
+      node->leaf.numberOfPrimitives = origNode->triangleIndices.GetSize ();
+      
+      KDTreePrimitive_Opt* prims = c.freePrimitivesList + c.usedPrimitives;
+      c.usedPrimitives += node->leaf.numberOfPrimitives;
+      
+      node->leaf.flagAndOffset = 
+        (node->leaf.flagAndOffset & 0x07) | (((uintptr_t)prims) & ~0x07);
 
 
-  bool KDTreeHelper::CollectPrimitives(const KDTree *tree, 
+      // Setup all primitives
+      for (size_t i = 0; i < node->leaf.numberOfPrimitives; ++i)
+      {
+        size_t triIndex = origNode->triangleIndices[i];
+        KDTreePrimitive &prim = c.tree->allTriangles[triIndex];
+
+        KDTreePrimitive_Opt &optPrim = prims[i];
+        
+        // Setup optimized
+        optPrim.primPointer = prim.primPointer;
+        // Find max normal direction
+        size_t k = prim.normal.DominantAxis ();
+        
+        optPrim.normal_K = k;
+
+        size_t u = (k+1)%3;
+        size_t v = (k+2)%3;
+
+        const csVector3& A = prim.vertices[0];
+
+        // precalc normal
+        float nkinv = 1.0f/prim.normal[k];
+        optPrim.normal_U = prim.normal[u] * nkinv;
+        optPrim.normal_V = prim.normal[v] * nkinv;
+        optPrim.normal_D = (prim.normal * A) * nkinv;
+
+
+        csVector3 bb = prim.vertices[2] - prim.vertices[0];
+        csVector3 cc = prim.vertices[1] - prim.vertices[0];
+
+        float tmp = 1.0f/(bb[u] * cc[v] - bb[v] * cc[u]);
+
+        // edge 1
+        optPrim.edgeA_U = -bb[v] * tmp;
+        optPrim.edgeA_V = bb[u] * tmp;
+        optPrim.edgeA_D = (bb[v] * A[u] - bb[u] * A[v]) * tmp;
+
+        // edge 2
+        optPrim.edgeB_U = cc[v] * tmp;
+        optPrim.edgeB_V = -cc[u] * tmp;
+        optPrim.edgeB_D = (cc[u] * A[v] - cc[v] * A[u]) * tmp;
+
+      }
+    }
+  }
+  
+  KDTree_Opt* KDTreeBuilder::OptimizeTree (KDTree* tree)
+  {
+    // null tree -> null result
+    if (!tree)
+      return 0;
+
+    // Simple part
+    KDTree_Opt* optTree = new KDTree_Opt;
+    optTree->boundingBox = tree->boundingBox;
+
+    // Count number of nodes and triangle "indices"
+    CountNodesAndTriangles counter;
+    counter.CountTree (tree->rootNode);
+
+    if (counter.numNodes == 0)
+    {
+      optTree->primitives = 0;
+      optTree->nodeList = 0;
+      return optTree;
+    }
+
+    // Setup arrays
+    optTree->nodeList = static_cast<KDTreeNode_Opt*> (
+      CS::Memory::AlignedMalloc (sizeof (KDTreeNode_Opt) * counter.numNodes+1, 16));
+    optTree->primitives = static_cast<KDTreePrimitive_Opt*> (
+      CS::Memory::AlignedMalloc (sizeof (KDTreePrimitive_Opt) * counter.numTriIndices, 16));
+
+    OptimizedNodeBuilderConf c = {};
+    c.freeNodeList = optTree->nodeList;
+    c.freePrimitivesList = optTree->primitives;
+    c.tree = tree;
+
+    // Get root node    
+    KDTreeNode_Opt* root = c.freeNodeList + c.usedNodes++;
+    c.usedNodes++;
+    SetupOptimizedNode (tree->rootNode, root, c);
+
+    return optTree;
+  }
+
+
+
+  // -- Helper 
+  bool KDTreeHelper::CollectPrimitives(const KDTree_Opt *tree, 
     RadPrimitivePtrArray &primArray, const csBox3 &overlapAABB)
   {
     // Walk and get all primitives within overlapAABB
@@ -338,7 +456,7 @@ namespace lighter
 
     RadPrimitivePtrSet collectedPrimitives;
    
-    CollectPrimitives (tree, tree->rootNode, tree->boundingBox, collectedPrimitives,
+    CollectPrimitives (tree, tree->nodeList, tree->boundingBox, collectedPrimitives,
       overlapAABB);
 
     // Copy result to array
@@ -351,41 +469,56 @@ namespace lighter
     return collectedPrimitives.GetSize () > 0;
   }
 
-  void KDTreeHelper::CollectPrimitives(const KDTree* tree, const KDTreeNode *node, 
-    csBox3 currentBox, RadPrimitivePtrSet& outPrims, const csBox3 &overlapAABB)
+  void KDTreeHelper::CollectPrimitives(const KDTree_Opt* tree, 
+    const KDTreeNode_Opt *node, csBox3 currentBox, RadPrimitivePtrSet& outPrims, 
+    const csBox3 &overlapAABB)
   {
-    if (node->leftChild)
+    if (node->inner.flagDimensionAndOffset & 0x04)
     {
       // Internal node
       csBox3 childBox = currentBox;
 
       // Left
-      childBox.SetMax (node->splitDimension, node->splitLocation);
+      childBox.SetMax (node->inner.flagDimensionAndOffset & 0x03, 
+        node->inner.splitLocation);
       if (childBox.TestIntersect (overlapAABB))
       {
-        CollectPrimitives (tree, node->leftChild, childBox, outPrims, overlapAABB);
+        CollectPrimitives (tree, 
+          reinterpret_cast<KDTreeNode_Opt*> (node->inner.flagDimensionAndOffset & ~0x07), 
+          childBox, outPrims, overlapAABB);
       }
 
       // Right
       childBox = currentBox;
-      childBox.SetMin (node->splitDimension, node->splitLocation);
+      childBox.SetMin (node->inner.flagDimensionAndOffset & 0x03, 
+        node->inner.splitLocation);
       if (childBox.TestIntersect (overlapAABB))
       {
-        CollectPrimitives (tree, node->rightChild, childBox, outPrims, overlapAABB);
+        CollectPrimitives (tree, 
+          reinterpret_cast<KDTreeNode_Opt*> (node->inner.flagDimensionAndOffset & ~0x07) + 1,
+          childBox, outPrims, overlapAABB);
       }
 
     }
     else
     {
       // Leaf node
-      const csArray<size_t>& triIndices = node->triangleIndices;
+      /*const csArray<size_t>& triIndices = node->triangleIndices;
       const csArray<KDTreePrimitive>& allTriangles = tree->allTriangles;
+*/
+      KDTreePrimitive_Opt* primList = 
+        reinterpret_cast<KDTreePrimitive_Opt*> (node->leaf.flagAndOffset & ~0x07);
 
-      for (unsigned int i = 0; i < triIndices.GetSize (); i++)
+      for (unsigned int i = 0; i < node->leaf.numberOfPrimitives; i++)
       {
-        const KDTreePrimitive& prim = allTriangles[triIndices[i]];
-        outPrims.Add (prim.primPointer);
+        outPrims.Add (primList[i].primPointer);
       }
     }
+  }
+
+  KDTree_Opt::~KDTree_Opt ()
+  {
+    CS::Memory::AlignedFree (this->primitives);
+    CS::Memory::AlignedFree (this->nodeList);
   }
 }
