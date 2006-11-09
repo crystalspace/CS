@@ -6,11 +6,20 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+9-Nov-2007
+	- Eric Sunshine worked around problem in configure.ac caused by
+	  unintentional side-effect of recent change to detect newer vs. older
+	  X11 installations.  Autoconf delays performing certain tests until
+	  the test is actually required. In this case, the CPP test was first
+	  needed inside the "old" branch of the X11 check.  For machines with a
+	  newer, modular X.org installation, this resulted in the CPP test
+	  never being run. Fixed by adding an explicit and unconditional
+	  AC_PROG_CPP invocation to configure.ac.
 8-Nov-2007
 	- Erroroman changed bones indices render buffer type to ushort. Also 
 	  changed indices type to short in all animation vertex shaders.
 	- Erroroman made Cg skinning default again.
-	- Erroroman dopted max animation exporter script to export ushort bones 
+	- Erroroman dopted max animation exporter script to export ushort bones
 	  indices.
 	- Erroroman fixed speed problem in shader animation by changing bones 
 	  indices type from ushort to short. Also fixed max exporter again.
