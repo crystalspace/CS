@@ -38,6 +38,12 @@ chronological order.
 	  which resulted in exported variables being named incorrectly, thus
 	  causing later tests and dependent code which relied upon those
 	  variables to fail.
+	- caedes added some templates to swig interface files that allow
+	  python bindings to declare python properties (they work for
+	  external projects also).
+	- caedes changed the python property wrappers interface file so it
+	  can really be used from external projects. Also fixed commenting
+	  a bit.
 	- Eric Sunshine performed minor cleanup and normalization of
 	  configure.ac.
 5-Nov-2006
@@ -52,6 +58,18 @@ chronological order.
 	  periods, etc.  (A similar problem had been fixed for the ALIASES
 	  argument of CS_CHECK_LIB_WITH() in SVN r19486, but that patch
 	  neglected to address the issue for the LIBRARY argument.)
+        - caedes made the following changes in swig interface files:
+            - added iODEHinge2Joint to interface list.
+            - added wrapping of csVector4, csImageBase and csImageMemory.
+            - added an output typemap for csKeyModifiers, and list like
+              interface to fetch the modifiers.
+            - added extended python function GetValue for getting shadervar
+              values as python objects.
+            - added some ifdef so _csPyEventHandler does not get exported to
+              other modules %importing cspace.i (so now theyre not required
+              to declare it).
+            - removed csPixmap %ignore declaration.
+            - removed the _csPyEventHandler declaration from pycscegui.
 4-Nov-2006
 	- res fixed a couple of VC7 errors and warnings.
 	- res fixed a couple of gcc issues after the VC7 fixes.

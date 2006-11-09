@@ -218,6 +218,7 @@
   INTERFACE_APPLY(iODEUniversalJoint)
   INTERFACE_APPLY(iODEAMotorJoint)
   INTERFACE_APPLY(iODEHingeJoint)
+  INTERFACE_APPLY(iODEHinge2Joint)
   INTERFACE_APPLY(iODEBallJoint)
   INTERFACE_APPLY(iKeyboardDriver)
   INTERFACE_APPLY(iLight)
@@ -492,6 +493,8 @@
 #define TYPEMAP_IN_ARRAY_CNT_PTR(a,b)
 #define TYPEMAP_IN_ARRAY_PTR_CNT(a,b) 
 #define TYPEMAP_OUTARG_ARRAY_PTR_CNT(a,b,c)
+#define TYPEMAP_ARGOUT_PTR(T)
+#define APPLY_TYPEMAP_ARGOUT_PTR(T,Args)
 
 #if defined(SWIGPYTHON)
   %include "bindings/python/pythpre.i"
@@ -780,6 +783,14 @@ SET_HELPER(csStringID)
 %ignore csVector3::Norm (const csVector3 &);
 %ignore csVector3::Unit (const csVector3 &);
 %include "csgeom/vector3.h"
+
+template<typename T> struct csVector4T {
+    T x,y,z,w;
+};
+%warnfilter(302) csVector4T; // csVector4T redefined
+%ignore csVector4T::operator[];
+%template(csVector4Float) csVector4T<float >;
+%include "csgeom/vector4.h"
 
 %ignore csMatrix2::operator+ (const csMatrix2 &, const csMatrix2 &);
 %ignore csMatrix2::operator- (const csMatrix2 &, const csMatrix2 &);
@@ -1119,6 +1130,13 @@ iArrayChangeElements<csSprite2DVertex>;
 %ignore csJoystickEventHelper::GetX;
 %ignore csJoystickEventHelper::GetY;
 %include "iutil/event.h"
+
+%ignore csMouseEventHelper::GetModifiers(iEvent const *);
+%ignore csJoystickEventHelper::GetModifiers(iEvent const *);
+
+TYPEMAP_ARGOUT_PTR(csKeyModifiers)
+APPLY_TYPEMAP_ARGOUT_PTR(csKeyModifiers,csKeyModifiers& modifiers)
+
 %include "csutil/event.h"
 %extend iEvent {
 	csEventError RetrieveString(const char *name, char *&v)
@@ -1180,6 +1198,10 @@ iArrayChangeElements<csSprite2DVertex>;
 %include "ivideo/material.h"
 
 %include "igraphic/image.h"
+%template(csImageBaseBase) scfImplementation1<csImageBase, iImage>;
+%include "csgfx/imagebase.h"
+%template(csImageMemoryBase) scfImplementationExt0<csImageMemory, csImageBase>;
+%include "csgfx/imagememory.h"
 %immutable csImageIOFileFormatDescription::mime;
 %immutable csImageIOFileFormatDescription::subtype;
 %template (csImageIOFileFormatDescriptions) csArray<csImageIOFileFormatDescription const*>;
@@ -1240,8 +1262,6 @@ iArrayChangeElements<csSprite2DVertex>;
 %include "cstool/csview.h"
 %include "cstool/csfxscr.h"
 
-%ignore csPixmap;
-%rename(csPixmap) csSimplePixmap;
 %include "cstool/cspixmap.h"
 
 #endif // CS_MINI_SWIG
@@ -1470,6 +1490,11 @@ uint _CS_FX_SETALPHA_INT (uint);
   csVector3& operator /=(const csReversibleTransform& t) { return *self /= t; }
   csVector3 operator /(const csReversibleTransform& t) { return *self / t; }
   csVector3 project(const csVector3& what) const { return what << *self; }
+}
+// csgeom/vector4.h
+%extend csVector4
+{
+  VECTOR_OBJECT_FUNCTIONS(csVector4)
 }
 
 %define BOX_OBJECT_FUNCTIONS(B)

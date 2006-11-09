@@ -23,6 +23,8 @@
 
 #ifdef SWIGPYTHON
 
+%include "bindings/python/pyattributes.i"
+
 %ignore ::operator+;
 %ignore ::operator-;
 %ignore ::operator*;
@@ -441,6 +443,30 @@ _csWrapPtr_to_Python (const csWrapPtr & wp)
 	void append( typename o) {return self->Add(o);}
 	bool __delitem__( typename o) { return self->Delete(o);}
 }
+%enddef
+
+/*
+ * Macro for custom ARGOUT pointers. 
+ * Use when you need to declare some input argument as output only.
+ * Used like in:
+ * TYPEMAP_ARGOUT_PTR(csKeyModifiers)
+ * APPLY_TYPEMAP_ARGOUT_PTR(csKeyModifiers, csKeyModifiers& modifiers)
+ */
+#undef TYPEMAP_ARGOUT_PTR
+%define TYPEMAP_ARGOUT_PTR(Type)
+%typemap (in,numinputs=0) Type * ARGOUT
+{
+   $1 = new Type();
+}
+%typemap (argout) Type * ARGOUT
+{
+   $result = SWIG_NewPointerObj((void*)$1, SWIG_TypeQuery( #Type " *"), 1);
+}
+%enddef
+
+#undef APPLY_TYPEMAP_ARGOUT_PTR
+%define APPLY_TYPEMAP_ARGOUT_PTR(Type,Args)
+%apply Type * ARGOUT { Args };
 %enddef
 
 #endif // ifndef CS_MINI_SWIG

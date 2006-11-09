@@ -11,9 +11,10 @@ chronological order.
 	  macro version export, CS_CHECK_CSWIN32LIBS() m4 macro publishes
 	  `cslibs-config --incpath', configure.ac cleanup).
 	- Eric Sunshine merged r25841 into 1.0 (CPP configure check fix).
+	- res merged r25816, r25820:25822 into 1.0 (python binding updates).
 8-Nov-2006
-        - res merged r25832:25834 into 1.0 (gmeshskel2 bone index type fix).
-        - res merged r25456 into 1.0 (terrain + skyboxes).
+	- res merged r25832:25834 into 1.0 (gmeshskel2 bone index type fix).
+	- res merged r25456 into 1.0 (terrain + skyboxes).
 7-Nov-2006
 	- Eric Sunshine merged r25825 into 1.0 (CS_CHECK_LIB_WITH() m4 macro
 	  exported variable names fix).
