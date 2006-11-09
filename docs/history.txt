@@ -10,15 +10,27 @@ chronological order.
 	- Erroroman changed bones indices render buffer type to ushort. Also 
 	  changed indices type to short in all animation vertex shaders.
 	- Erroroman made Cg skinning default again.
-	- Erroroman dopted max animation exporter script to export ushort bones 
+	- Erroroman dopted max animation exporter script to export ushort bones
 	  indices.
 	- Erroroman fixed speed problem in shader animation by changing bones 
 	  indices type from ushort to short. Also fixed max exporter again.
 7-Nov-2007
+	- Eric Sunshine changed CS_CHECK_PROG_VERSION() in progver.m4 to export
+	  shell variables `cs_prog_PROG_version' and `cs_prog_PROG_version_ok'
+	  indicating the discovered version of PROG and whether the version
+	  check succeeded, respectively. These variables are available to the
+	  ACTION-IF-OKAY and ACTION-IF-NOT-OKAY code fragments.
+	- Eric Sunshine clarified and further elaborated
+	  CS_CHECK_PROG_VERSION() documentation.
+	- Eric Sunshine augmented CS_CHECK_CSWIN32LIBS() in checkcswin32libs.m4
+	  to export also the result of the new `cslibs-config --incpath' option
+	  if available.
 	- Eric Sunshine fixed r25803 bug in CS_CHECK_LIB_WITH() in checklib.m4
 	  which resulted in exported variables being named incorrectly, thus
 	  causing later tests and dependent code which relied upon those
 	  variables to fail.
+	- Eric Sunshine performed minor cleanup and normalization of
+	  configure.ac.
 5-Nov-2006
 	- res worked around an apparent VC7 compiler bug causing trouble with
 	  csArray: compiler-generated assignment operators seem to 

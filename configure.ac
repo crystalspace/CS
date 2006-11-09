@@ -157,7 +157,7 @@ AS_IF([test $ac_cv_lib_m_cosf != no || test $ac_cv_lib_mx_cosf != no],
 
 #------------------------------------------------------------------------------
 # Check for pthread.  Also check if pthread implementation supports the
-# recursive mutex extension.
+# recursive mutex extension and `atfork' functionality.
 #------------------------------------------------------------------------------
 CS_CHECK_PTHREAD([cygwin*])
 CS_EMIT_BUILD_RESULT([cs_cv_sys_pthread], [PTHREAD])
@@ -376,21 +376,17 @@ AS_IF([test "$with_java" != no && test -n "$JAVAC" && test -n "$JAVA"],
     [CS_JAVA_FLAGS([cs_java], [$JAVAC])
     CS_CHECK_BUILD([if Java2 SDK is usable], [cs_cv_java],
 	[AC_LANG_PROGRAM(
-	    [[
-	    #if defined(__GNUC__)
-	        typedef long long __int64; /*For gcc on Windows */
+	    [[#if defined(__GNUC__)
+	    typedef long long __int64; /* For GCC on Windows */
 	    #endif
-
-	    /* fix for 'jlong' on x86_64 */
+	    /* Fix for 'jlong' on x86_64. */
 	    #if defined(__x86_64)
 	    #ifdef _LP64 /* 64-bit Solaris */
 	    #undef _LP64
 	    #endif
 	    #endif
-
 	    #include <jni.h>
-
-	    JNIEXPORT void JNICALL f(JNIEnv *env, jobject obj);]])],
+	    JNIEXPORT void JNICALL f(JNIEnv* env, jobject obj);]])],
 	[CS_CREATE_TUPLE() \
         CS_CREATE_TUPLE([$cs_java_cflags],[$cs_java_lflags],[$cs_java_libs])],
 	[], [CS_EMIT_BUILD_RESULT([cs_cv_java], [JAVA])])])
@@ -627,16 +623,6 @@ CS_EMIT_BUILD_FLAGS([if missing symbols can be reported as warnings],
 
 
 #------------------------------------------------------------------------------
-# Check if linker recognizes "--as-needed" which only links dynamic libs that
-# are really honestly needed.
-#------------------------------------------------------------------------------
-#CS_EMIT_BUILD_FLAGS([if --as-needed is supported], 
-#    [cs_cv_prog_link_as_needed], [CS_CREATE_TUPLE([],[-Wl,--as-needed])], 
-#    [C++], [COMPILER.LFLAGS], [+])
-
-
-
-#------------------------------------------------------------------------------
 # Check if C++ function inlining can be enabled and disabled. Apparently, with
 # some versions of GNU build tools on Windows, the Crystal Space Python plugin
 # fails to link and emits the error message "Error: 0-bit reloc in dll". In
@@ -832,15 +818,6 @@ AS_IF([test $enable_cpu_specific_optimizations != no],
 
 
 #------------------------------------------------------------------------------
-# Check if byteswap.h is available, which contains optimized byte swapping
-# functiosn (used for endian conversion).
-#------------------------------------------------------------------------------
-AC_CHECK_HEADERS([byteswap.h],
-    [CS_HEADER_PROPERTY([CS_HAVE_BYTESWAP_H])])
-
-
-
-#------------------------------------------------------------------------------
 # Check for compiler optimization flags.
 #------------------------------------------------------------------------------
 AC_DEFUN([CS_CHECK_OPTIMIZE_FLAGS],
@@ -888,7 +865,8 @@ AS_IF([test -z "$enable_separate_debug_info"],
         [enable_separate_debug_info=$cs_cv_binutils_true_2_17]))
 AC_MSG_RESULT([$enable_separate_debug_info])
 
-CS_EMIT_BUILD_PROPERTY([LINK.DEBUG.INFO.SEPARATE], [$enable_separate_debug_info])
+CS_EMIT_BUILD_PROPERTY([LINK.DEBUG.INFO.SEPARATE],
+    [$enable_separate_debug_info])
 
 CS_EMIT_BUILD_FLAGS([how to enable debug mode debugging symbols],
     [cs_cv_prog_cxx_debug_symbols_extra],
@@ -970,8 +948,9 @@ CS_CHECK_VA_COPY([__va_copy])
 
 
 #------------------------------------------------------------------------------
-# Check for X-Windows.  If the X-Windows implementation is XFree86, then also
-# enable the `VideoMode' extension.
+# Check for X-Windows and several extensions. This check can identify both
+# new-style modular X.Org installations and old-style monolithic installations,
+# such as XFree86.
 #------------------------------------------------------------------------------
 AC_DEFUN([CS_X_CHECK_PREPARE],
     [AC_REQUIRE([AC_CANONICAL_HOST])
@@ -994,16 +973,18 @@ AC_DEFUN([CS_X_CHECK_PREPARE],
     AS_IF([test x$cs_host_macosx = xyes], [with_x=no])])
 
 CS_X_CHECK_PREPARE
+
 # Compatiblity: use --with-x param for individual X lib checks
 AS_IF([test -z "$with_x11"], [with_x11=$with_x])
-# Newer X.org versions ship with pkgconfig packages, which will be picked up
-# by this check
+
+# Newer X.org versions ship with pkgconfig packages, which will be consulted
+# by CS_CHECK_LIB_WITH().
 CS_CHECK_LIB_WITH([x11],
     [AC_LANG_PROGRAM(
 	[[#include <X11/Xlib.h>]],
 	[XOpenDisplay (0)])])
 AS_IF([test $cs_cv_libx11 = yes],
-    [# Probably "new" X.org
+    [# Probably newer style modular X.org installation.
     AS_IF([test -z "$with_xext"], [with_xext=$with_x])
     CS_CHECK_LIB_WITH([xext],
 	[AC_LANG_PROGRAM(
@@ -1018,7 +999,8 @@ AS_IF([test $cs_cv_libx11 = yes],
     X_LFLAGS="$cs_cv_libxext_lflags $cs_cv_libx11_lflags"
     X_LIBS="$cs_cv_libxext_libs $cs_cv_libx11_libs"
     ],
-    [# Use "old" autoconf X11 macros
+    [# Probably an older style monolithic X11 installation.
+    # Use old Autoconf built-in X11 detection.
     AC_PATH_X
     AC_PATH_XTRA
     X_LFLAGS="$X_PRE_LIBS $X_LIBS -lXext -lX11 $X_EXTRA_LIBS"])
@@ -1085,18 +1067,20 @@ AC_DEFUN([CS_CHECK_OPENGL_TYPE],
     [CS_CHECK_BUILD([for $1], [cs_cv_libgl_$1],
 	[AC_LANG_PROGRAM(
 	    [CS_GL_INCLUDE([CS_OPENGL_PATH],[GL],[gl.h])],
-		[$1 x; (void)x;])],
+	    [$1 x; (void)x;])],
 	[], [], [$2], [], [],
 	[$cs_cv_libgl_cflags], [$cs_cv_libgl_lflags], [$cs_cv_libgl_libs])])
 AS_IF([test $cs_cv_libgl = yes],
-    [CS_CHECK_OPENGL_TYPE([GLhandleARB], [CS_HEADER_PROPERTY([CS_HAVE_GLHANDLEARB_T])])
-    CS_CHECK_OPENGL_TYPE([GLcharARB], [CS_HEADER_PROPERTY([CS_HAVE_GLCHARARB_T])]) 
+    [CS_CHECK_OPENGL_TYPE([GLhandleARB],
+        [CS_HEADER_PROPERTY([CS_HAVE_GLHANDLEARB_T])])
+    CS_CHECK_OPENGL_TYPE([GLcharARB],
+        [CS_HEADER_PROPERTY([CS_HAVE_GLCHARARB_T])]) 
     CS_CHECK_OPENGL_TYPE([GLchar], [CS_HEADER_PROPERTY([CS_HAVE_GLCHAR_T])])])
 CS_CHECK_GLU
 CS_CHECK_GLX
-# Check for GLX extensions.  Define CSGL_EXT_STATIC_ASSERTION if _not_
-# present.
+# Check for GLX extensions.  Define CSGL_EXT_STATIC_ASSERTION if _not_ present.
 CS_CHECK_GLXEXT([], [CS_HEADER_PROPERTY([CSGL_EXT_STATIC_ASSERTION])])
+
 
 
 #------------------------------------------------------------------------------
@@ -1329,11 +1313,15 @@ CS_CHECK_LIB_WITH([bullet],
     #include <CcdPhysics/CcdPhysicsEnvironment.h>
     #include <CollisionDispatch/CollisionDispatcher.h>
     ]],
-    [CollisionDispatcher dispatcher; SimpleBroadphase broadphase;
-    new CcdPhysicsEnvironment (&dispatcher, &broadphase)])],
+    [CollisionDispatcher d;
+    SimpleBroadphase b;
+    CcdPhysicsEnvironment* e = new CcdPhysicsEnvironment (&d, &b)])],
     [], [C++], [CS_EMIT_BUILD_RESULT([cs_cv_libbullet], [BULLET])], [],
     [], [], 
-    [-lbulletccdphysics -lbulletphysicsinterfacecommon -lbulletdynamics -lbullet])
+    [-lbulletccdphysics \
+    -lbulletphysicsinterfacecommon \
+    -lbulletdynamics \
+    -lbullet])
 
 
 
@@ -1379,8 +1367,8 @@ CS_CHECK_LIBOPENAL
 
 #------------------------------------------------------------------------------
 # Check for FreeType2. Note that on MacOS/X, Fink strangely installs
-# `freetype-config' in /sw/lib/freetype2/bin, thus we augment PATH so that
-# CS_CHECK_LIB_WITH() will take this unusual location into account.
+# `freetype-config' in the unusual location /sw/lib/freetype2/bin, thus we
+# augment PATH so that CS_CHECK_LIB_WITH() will be able to find it if present.
 #------------------------------------------------------------------------------
 PATH=$PATH$PATH_SEPARATOR/sw/lib/freetype2/bin
 export PATH
@@ -1474,6 +1462,7 @@ AS_IF([test $cs_cv_libsdl = yes],
 	    [SDL_EnableKeyRepeat(0,0)])],
 	[], [], [CS_EMIT_BUILD_RESULT([cs_cv_libsdl], [SDL])], [], [],
 	[$cs_cv_libsdl_cflags], [$cs_cv_libsdl_lflags], [$cs_cv_libsdl_libs])])
+
 
 
 #------------------------------------------------------------------------------
@@ -1647,8 +1636,10 @@ AS_IF([test $cs_host_family != windows],
     [AS_IF([test $cs_cv_header_soundcard_h = yes],
 	[CS_EMIT_BUILD_PROPERTY([OSS.AVAILABLE], [yes])])])
 
+
+
 #------------------------------------------------------------------------------
-# Check for JACK daemon jackasyn library (JACKASYN)
+# Check for JACK daemon jackasyn library (JACKASYN).
 #------------------------------------------------------------------------------
 AS_IF([test $cs_host_family != windows],
     [CS_CHECK_LIB_WITH([jackasyn],
@@ -1658,8 +1649,10 @@ AS_IF([test $cs_host_family != windows],
 	    [jackoss_open("/dev/dsp",1);])],
 	[], [], [CS_EMIT_BUILD_RESULT([cs_cv_libjackasyn], [JACKASYN])])])
 
+
+
 #------------------------------------------------------------------------------
-# Check for Advanced GNU/Linux Sound Architecture (ALSA)
+# Check for Advanced GNU/Linux Sound Architecture (ALSA).
 #------------------------------------------------------------------------------
 AS_IF([test $cs_host_family != windows],
     [CS_CHECK_LIB_WITH([asound],
@@ -1684,13 +1677,10 @@ CS_CHECK_LIB_WITH([caca],
 # Check for SpiderMonkey JavaScript library.
 #------------------------------------------------------------------------------
 case $cs_host_family in
-    windows)
-	cs_spidermonkey_platform='XP_WIN'
-	;;
-    *)
-	cs_spidermonkey_platform='XP_UNIX'
-	;;
+    windows) cs_spidermonkey_platform='XP_WIN' ;;
+    *) cs_spidermonkey_platform='XP_UNIX' ;;
 esac
+
 CS_CHECK_LIB_WITH([js],
     [AC_LANG_PROGRAM([[#include <js/jsapi.h>]], 
     [JS_NewRuntime(0)])],
@@ -2090,6 +2080,15 @@ AS_IF([test $cs_cv_sys_socket = yes],
 
 
 #------------------------------------------------------------------------------
+# Check if byteswap.h is available, which contains optimized byte swapping
+# functions (used for endian conversion).
+#------------------------------------------------------------------------------
+AC_CHECK_HEADERS([byteswap.h],
+    [CS_HEADER_PROPERTY([CS_HAVE_BYTESWAP_H])])
+
+
+
+#------------------------------------------------------------------------------
 # Check how to declare functions and types deprecated.
 #------------------------------------------------------------------------------
 CS_SYMBOL_QUALIFIER([how to declare deprecations],
@@ -2185,8 +2184,9 @@ CS_CHECK_BUILD([for std::isfinite], [cs_cv_func_std__isfinite],
 	#include <math.h>
 	#endif]],
 	[float f; std::isfinite(f)])],
-    [], [C++], [CS_HEADER_PROPERTY(AS_TR_CPP([CS_HAVE_STD__ISFINITE]))], [], [],
-    [$cs_cv_prog_cxx_enable_pedantic])
+    [], [C++], [CS_HEADER_PROPERTY(AS_TR_CPP([CS_HAVE_STD__ISFINITE]))],
+    [], [], [$cs_cv_prog_cxx_enable_pedantic])
+
 CS_CHECK_FINITE([isfinite])
 CS_CHECK_FINITE([finitef])
 CS_CHECK_FINITE([finite])

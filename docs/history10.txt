@@ -6,14 +6,18 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+9-Nov-2006
+	- Eric Sunshine merged r25824 into 1.0 (CS_CHECK_PROG_VERSION() m4
+	  macro version export, CS_CHECK_CSWIN32LIBS() m4 macro publishes
+	  `cslibs-config --incpath', configure.ac cleanup).
 8-Nov-2006
         - res merged r25832:25834 into 1.0 (gmeshskel2 bone index type fix).
         - res merged r25456 into 1.0 (terrain + skyboxes).
 7-Nov-2006
-	- Eric Sunshine merged r25825 into 1.0 (CS_CHECK_LIB_WITH() macro
+	- Eric Sunshine merged r25825 into 1.0 (CS_CHECK_LIB_WITH() m4 macro
 	  exported variable names fix).
 5-Nov-2006
-	- Eric Sunshine merged r25803 into 1.0 (CS_CHECK_LIB_WITH() macro
+	- Eric Sunshine merged r25803 into 1.0 (CS_CHECK_LIB_WITH() m4 macro
 	  "special" characters).
 	- res merged r25774 into 1.0 (gmeshskel2 bindings).
 	- res merged r25777 into 1.0 (genmesh ShapeChanged() calls).
