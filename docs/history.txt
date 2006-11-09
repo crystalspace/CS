@@ -21,6 +21,7 @@ chronological order.
 	  earlier MSVC compilers.
 	- Marten made an optimization to the ray tracer in lighter2. Should show
 	  some 10-40% speed-up on calculations.
+	- res fixed the perl bindings to compile again.
 8-Nov-2007
 	- Erroroman changed bones indices render buffer type to ushort. Also 
 	  changed indices type to short in all animation vertex shaders.
