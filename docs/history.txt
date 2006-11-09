@@ -17,11 +17,12 @@ chronological order.
 	  AC_PROG_CPP invocation to configure.ac.
 	- Marten added a preadvance option to particles xml-loader that allows
 	  you to advance the particle system on load.
-	- Marten made a slight change to atomicops.h to make it work better on
-	  earlier MSVC compilers.
 	- Marten made an optimization to the ray tracer in lighter2. Should show
 	  some 10-40% speed-up on calculations.
 	- res fixed the perl bindings to compile again.
+	- res reverted r25844: it's not needed any more. Also, it seems that
+	  only the underscored Interlocked* functions are supported as 
+	  intrinsic functions.
 8-Nov-2007
 	- Erroroman changed bones indices render buffer type to ushort. Also 
 	  changed indices type to short in all animation vertex shaders.

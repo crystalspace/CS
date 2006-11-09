@@ -134,16 +134,16 @@ namespace Threading
     inline static void* Set (void** target, void* value)
     {
 #if CS_PROCESSOR_SIZE == 64
-      return (void*)InterlockedExchange64 ((__int64*)target, (__int64)value);
+      return (void*)_InterlockedExchange64 ((__int64*)target, (__int64)value);
 #else
-      return (void*)InterlockedExchange ((long*)target, (long)value);
+      return (void*)_InterlockedExchange ((long*)target, (long)value);
 #endif
     }
 
     inline static int32 CompareAndSet (int32* target, int32 value,
                                        int32 comparand)
     {
-      return (int32)InterlockedCompareExchange ((long*)target,
+      return (int32)_InterlockedCompareExchange ((long*)target,
         (long)value, (long)comparand);
     }
 
@@ -151,22 +151,22 @@ namespace Threading
       void* comparand)
     {
 #if CS_PROCESSOR_SIZE == 64
-      return (void*)InterlockedCompareExchange64 ((__int64*)target, 
+      return (void*)_InterlockedCompareExchange64 ((__int64*)target, 
         (__int64)value, (__int64)comparand);
 #else
-      return (void*)InterlockedCompareExchange ((long*)target, 
+      return (void*)_InterlockedCompareExchange ((long*)target, 
         (long)value, (long)comparand);
 #endif
     }
 
     inline static int32 Increment (int32* target)
     {
-      return (int32)InterlockedIncrement ((long*)target);
+      return (int32)_InterlockedIncrement ((long*)target);
     }
 
     inline static int32 Decrement (int32* target)
     {
-      return (int32)InterlockedDecrement ((long*)target);
+      return (int32)_InterlockedDecrement ((long*)target);
     }
   };
   
