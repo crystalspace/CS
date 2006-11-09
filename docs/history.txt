@@ -23,6 +23,8 @@ chronological order.
 	- res reverted r25844: it's not needed any more. Also, it seems that
 	  only the underscored Interlocked* functions are supported as 
 	  intrinsic functions.
+	- res fixed SetVertexCount in genmesh to not set all normals and 
+	  colors to null but only those that were newly added.
 8-Nov-2007
 	- Erroroman changed bones indices render buffer type to ushort. Also 
 	  changed indices type to short in all animation vertex shaders.
