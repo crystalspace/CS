@@ -49,8 +49,8 @@ public:
   
   @dots{}
   
-  int GetMyData () const { return myDataInt; }
-  void SetMyData (int newData) { myDataInt = newData; }
+  int GetMyData () const @{ return myDataInt; @}
+  void SetMyData (int newData) @{ myDataInt = newData; @}
 @};
 @end example
 

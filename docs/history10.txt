@@ -9,6 +9,7 @@ chronological order.
 10-Nov-2006
 	- res merged r25847 into 1.0 (perl binding updates) and fixed the perl
 	  bindings for the AWS removal.
+	- res merged r25817:25819, r25838 into 1.0 (docs tweaks).
 9-Nov-2006
 	- Eric Sunshine merged r25824 into 1.0 (CS_CHECK_PROG_VERSION() m4
 	  macro version export, CS_CHECK_CSWIN32LIBS() m4 macro publishes

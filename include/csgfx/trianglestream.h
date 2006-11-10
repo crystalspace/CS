@@ -117,7 +117,7 @@ namespace CS
      * \param index Pointer to start of the indices.
      * \param indexEnd Pointer to end of the indices.
      * \param stride Distance between index elements in bytes.
-     * \param meshType Mesh type of the index data.
+     * \param meshtype Mesh type of the index data.
      */
     void BeginTriangulate (const uint8* index, const uint8* indexEnd,
       size_t stride, csRenderBufferComponentType compType,
