@@ -157,11 +157,11 @@ extern CS_CRYSTALSPACE_EXPORT char* cswinGetErrorMessage (HRESULT code);
  */
 extern CS_CRYSTALSPACE_EXPORT wchar_t* cswinGetErrorMessageW (HRESULT code);
 
-/// Windows versions cswinIsWinNT() can identify.
+/// Windows versions cswinGetWinVersion() can identify.
 enum cswinWindowsVersion
 {
-  /// Windows 95/98/ME
-  cswinWin9x = 30,
+  /// Earlier or in other way unsupported
+  cswinUnsupported = 0,
   /// Windows NT 4.0
   cswinWinNT = 40,
   /// Windows 2000
@@ -171,16 +171,14 @@ enum cswinWindowsVersion
 };
 
 /**
- * Returns 'true' if the current Windows is from the NT strain, 'false' if
- * from the 9x strain.
- * \param version Optionally returns more specifically what Windows is used.
- * \return Whether the current OS is an Windows NT derivate.
+ * Returns the windows version.
  * \remarks This function provides functionality specific to the Win32 
  *  platform. To ensure that code using this functionality compiles properly 
  *  on all other platforms, the use of the function and inclusion of the 
  *  header file should be surrounded by appropriate '
  *  '\#if defined(CS_PLATFORM_WIN32) ... \#endif' statements.
  */
-extern CS_CRYSTALSPACE_EXPORT bool cswinIsWinNT (cswinWindowsVersion* version = 0);
+extern CS_CRYSTALSPACE_EXPORT cswinWindowsVersion cswinGetWinVersion ();
+
 
 #endif // __CS_CSSYS_WIN32_WINTOOLS_H__

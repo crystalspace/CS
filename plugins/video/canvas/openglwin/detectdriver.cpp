@@ -92,8 +92,8 @@ void csDetectDriver::DetermineDriver (const char* monitorName)
   {
     // Try to read the OpenGL DLL name from the registry
     csString registryKey;
-    registryKey.Format ("Software\\Microsoft\\%s\\CurrentVersion\\"
-      "OpenGLdrivers\\%s", cswinIsWinNT() ? "Windows NT" : "Windows",
+    registryKey.Format ("Software\\Microsoft\\Windows NT\\CurrentVersion\\"
+      "OpenGLdrivers\\%s",
       screenDriverName.GetData ());
 
     HKEY key;
@@ -113,8 +113,9 @@ void csDetectDriver::DetermineDriver (const char* monitorName)
     else
     {
       // Another try: maybe the driver name is in a key under OpenGLdrivers
-      registryKey.Format ("Software\\Microsoft\\%s\\CurrentVersion\\"
-        "OpenGLdrivers", cswinIsWinNT() ? "Windows NT" : "Windows");
+      registryKey = "Software\\Microsoft\\Windows NT\\CurrentVersion\\"
+        "OpenGLdrivers";
+
       if (RegOpenKeyExA (HKEY_LOCAL_MACHINE, registryKey.GetData(), 0,
         KEY_READ, &key) == ERROR_SUCCESS)
       {
@@ -151,9 +152,8 @@ void csDetectDriver::DetermineDriver (const char* monitorName)
       Could not determine display driver name. Just fetch the first in the
       registry
      */
-    csString registryKey;
-    registryKey.Format ("Software\\Microsoft\\%s\\CurrentVersion\\"
-      "OpenGLdrivers", cswinIsWinNT() ? "Windows NT" : "Windows");
+    csString registryKey = "Software\\Microsoft\\Windows NT\\CurrentVersion\\"
+      "OpenGLdrivers";
 
     HKEY key;
     if (RegOpenKeyExA (HKEY_LOCAL_MACHINE, registryKey.GetData(), 0,

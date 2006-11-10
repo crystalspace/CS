@@ -26,7 +26,6 @@
 
 struct _WinVersion 
 {
-  bool IsWinNT;
   cswinWindowsVersion version;
 
   _WinVersion()
@@ -34,10 +33,10 @@ struct _WinVersion
     OSVERSIONINFO vi;
     vi.dwOSVersionInfoSize = sizeof (vi);
     GetVersionEx (&vi);
-    IsWinNT = (vi.dwPlatformId == VER_PLATFORM_WIN32_NT);
+    bool IsWinNT = (vi.dwPlatformId == VER_PLATFORM_WIN32_NT);
     if (!IsWinNT)
     {
-      version = cswinWin9x;
+      version = cswinUnsupported;
     }
     else
     {
@@ -68,11 +67,9 @@ static _WinVersion* GetWinVer ()
   return winver;
 }
 
-bool cswinIsWinNT (cswinWindowsVersion* version)
+cswinWindowsVersion cswinGetWinVersion ()
 {
-  if (version)
-    *version = GetWinVer ()->version;
-  return GetWinVer ()->IsWinNT;
+  return GetWinVer ()->version;
 }
 
 wchar_t* cswinGetErrorMessageW (HRESULT code)
@@ -81,25 +78,12 @@ wchar_t* cswinGetErrorMessageW (HRESULT code)
   DWORD dwResult;
   wchar_t* ret;
 
-  if (cswinIsWinNT ())
+  dwResult = FormatMessageW (FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,
+    0, code, MAKELANGID (LANG_NEUTRAL, SUBLANG_DEFAULT), (LPWSTR) &lpMsgBuf, 0, 0);
+  if (dwResult != 0)
   {
-    dwResult = FormatMessageW (FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,
-      0, code, MAKELANGID (LANG_NEUTRAL, SUBLANG_DEFAULT), (LPWSTR) &lpMsgBuf, 0, 0);
-    if (dwResult != 0)
-    {
-      ret = csStrNewW ((wchar_t*)lpMsgBuf);
-      LocalFree (lpMsgBuf);
-    }
-  }
-  else
-  {
-    dwResult = FormatMessageA (FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,
-      0, code, MAKELANGID (LANG_NEUTRAL, SUBLANG_DEFAULT), (LPSTR) &lpMsgBuf, 0, 0);
-    if (dwResult != 0)
-    {
-      ret = cswinAnsiToWide ((char*)lpMsgBuf);
-      LocalFree (lpMsgBuf);
-    }
+    ret = csStrNewW ((wchar_t*)lpMsgBuf);
+    LocalFree (lpMsgBuf);
   }
 
   if (dwResult == 0)

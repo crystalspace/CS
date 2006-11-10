@@ -462,49 +462,27 @@ Win32Assistant::Win32Assistant (iObjectRegistry* r)
 
   bool bResult = false;
   HBRUSH backBrush = (HBRUSH)::GetStockObject (BLACK_BRUSH);
-  if (cswinIsWinNT ())
-  {
-    WNDCLASSEXW wc;
-    
-    windowClass = new uint8[(wndClass.Length()+1) * sizeof (WCHAR)];
-    csUnicodeTransform::UTF8toWC ((wchar_t*)windowClass,
-      wndClass.Length()+1, (utf8_char*)(wndClass.GetData()), (size_t)-1);
 
-    wc.cbSize	      = sizeof (wc);
-    wc.hCursor        = 0;
-    wc.hIcon          = appIcon;
-    wc.lpszMenuName   = 0;
-    wc.lpszClassName  = (WCHAR*)windowClass;
-    wc.hbrBackground  = backBrush;
-    wc.hInstance      = ModuleHandle;
-    wc.style          = CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
-    wc.lpfnWndProc    = WindowProc;
-    wc.cbClsExtra     = 0;
-    wc.cbWndExtra     = 2*sizeof (LONG_PTR);
-    wc.hIconSm	      = 0;
-    bResult = RegisterClassExW (&wc) != 0;
-  }
-  else
-  {
-    WNDCLASSEXA wc;
-    
-    windowClass = new uint8[wndClass.Length()+1];
-    strcpy ((char*)windowClass, wndClass);
+  WNDCLASSEXW wc;
+  
+  windowClass = new uint8[(wndClass.Length()+1) * sizeof (WCHAR)];
+  csUnicodeTransform::UTF8toWC ((wchar_t*)windowClass,
+    wndClass.Length()+1, (utf8_char*)(wndClass.GetData()), (size_t)-1);
 
-    wc.cbSize	      = sizeof (wc);
-    wc.hCursor        = 0;
-    wc.hIcon          = appIcon;
-    wc.lpszMenuName   = 0;
-    wc.lpszClassName  = (char*)windowClass;
-    wc.hbrBackground  = backBrush;
-    wc.hInstance      = ModuleHandle;
-    wc.style          = CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
-    wc.lpfnWndProc    = WindowProc;
-    wc.cbClsExtra     = 0;
-    wc.cbWndExtra     = 2*sizeof (LONG_PTR);
-    wc.hIconSm	      = 0;
-    bResult = RegisterClassExA (&wc) != 0;
-  }
+  wc.cbSize	      = sizeof (wc);
+  wc.hCursor        = 0;
+  wc.hIcon          = appIcon;
+  wc.lpszMenuName   = 0;
+  wc.lpszClassName  = (WCHAR*)windowClass;
+  wc.hbrBackground  = backBrush;
+  wc.hInstance      = ModuleHandle;
+  wc.style          = CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
+  wc.lpfnWndProc    = WindowProc;
+  wc.cbClsExtra     = 0;
+  wc.cbWndExtra     = 2*sizeof (LONG_PTR);
+  wc.hIconSm	      = 0;
+  bResult = RegisterClassExW (&wc) != 0;
+
 
   if (!bResult)
   {
@@ -557,10 +535,7 @@ Win32Assistant::~Win32Assistant ()
   //SetConsoleOutputCP (oldCP);
   if (!is_console_app && (console_window || cmdline_help_wanted))
     FreeConsole();
-  if (cswinIsWinNT ())
-    UnregisterClassW ((WCHAR*)windowClass, ModuleHandle);
-  else
-    UnregisterClassA ((char*)windowClass, ModuleHandle); 
+  UnregisterClassW ((WCHAR*)windowClass, ModuleHandle);
   delete[] windowClass;
 }
 
@@ -1058,14 +1033,7 @@ LRESULT Win32Assistant::CBTProc (int nCode, WPARAM wParam, LPARAM lParam)
       HWND Button = FindWindowEx ((HWND)wParam, 0, "Button", 0);
       if (Button)
       {
-	if (cswinIsWinNT ())
-	{
-          SetWindowTextW (Button, csCtoW (msgOkMsg));
-	}
-	else
-	{
-          SetWindowTextA (Button, cswinCtoA (msgOkMsg));
-	}
+        SetWindowTextW (Button, csCtoW (msgOkMsg));
       }
       LRESULT ret = CallNextHookEx (msgBoxOkChanger,
 	nCode, wParam, lParam);
@@ -1139,16 +1107,10 @@ HWND Win32Assistant::CreateCSWindow (iGraphics2D* canvas,
   CreateInfo ci;
   ci.assistant = this;
   ci.canvas = canvas;
-  if (cswinIsWinNT())
-  {
-    wnd = CreateWindowExW (exStyle, (WCHAR*)windowClass, 0, style,
-      x, y, w, h, 0, 0, ModuleHandle, &ci);
-  }
-  else
-  {
-    wnd = CreateWindowExA (exStyle, (char*)windowClass, 0, style,
-      x, y, w, h, 0, 0, ModuleHandle, &ci);
-  }
+
+  wnd = CreateWindowExW (exStyle, (WCHAR*)windowClass, 0, style,
+    x, y, w, h, 0, 0, ModuleHandle, &ci);
+
   return wnd;
 }
 

@@ -21,6 +21,8 @@ chronological order.
 	  that takes a mode3d parameter is now deprecated as this
 	  version creates a stream. Using the 'mode3d' attribute
 	  in maps is now also deprecated.
+	- Marten removed some old left-over code that only was needed for
+	  VC6 and/or windows version 95,98 and Me.
 9-Nov-2007
 	- Eric Sunshine worked around problem in configure.ac caused by
 	  unintentional side-effect of recent change to detect newer vs. older
