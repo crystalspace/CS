@@ -15,6 +15,7 @@ chronological order.
 	  newer, modular X.org installation, this resulted in the CPP test
 	  never being run. Fixed by adding an explicit and unconditional
 	  AC_PROG_CPP invocation to configure.ac.
+	- res fixed the perl bindings to compile again.
 8-Nov-2007
 	- Erroroman changed bones indices render buffer type to ushort. Also 
 	  changed indices type to short in all animation vertex shaders.

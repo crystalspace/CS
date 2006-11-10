@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+10-Nov-2006
+	- res merged r25847 into 1.0 (perl binding updates) and fixed the perl
+	  bindings for the AWS removal.
 9-Nov-2006
 	- Eric Sunshine merged r25824 into 1.0 (CS_CHECK_PROG_VERSION() m4
 	  macro version export, CS_CHECK_CSWIN32LIBS() m4 macro publishes
