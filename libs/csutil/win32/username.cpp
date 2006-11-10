@@ -29,13 +29,24 @@ csString csGetUsername()
 {
   csString username;
   wchar_t* wname = 0;
-  WCHAR buff[UNLEN + 1];
-  DWORD sz = sizeof(buff) / sizeof (WCHAR);
-  if (GetUserNameW (buff, &sz))
+  if (cswinIsWinNT ())
   {
-    wname = csStrNewW (buff);
+    WCHAR buff[UNLEN + 1];
+    DWORD sz = sizeof(buff) / sizeof (WCHAR);
+    if (GetUserNameW (buff, &sz))
+    {
+      wname = csStrNewW (buff);
+    }
   }
-  
+  else
+  {
+    char buff[UNLEN + 1];
+    DWORD sz = sizeof(buff);
+    if (GetUserNameA (buff, &sz))
+    {
+      wname = cswinAnsiToWide (buff);
+    }
+  }
   char* name = csStrNew (wname);
   username.Replace (name);
   delete[] name;

@@ -139,9 +139,18 @@ bool csGraphics2DDDraw3::Open ()
   SetTitle (win_title);
 
   // Subclass the window
-  m_OldWndProc = (WNDPROC)GetWindowLongPtrW (m_hWnd, GWLP_WNDPROC);
-  SetWindowLongPtrW (m_hWnd, GWLP_WNDPROC, (LONG_PTR)WindowProc);
-  SetWindowLongPtrW (m_hWnd, GWLP_USERDATA, (LONG_PTR)this);
+  if (cswinIsWinNT ())
+  {
+    m_OldWndProc = (WNDPROC)GetWindowLongPtrW (m_hWnd, GWLP_WNDPROC);
+    SetWindowLongPtrW (m_hWnd, GWLP_WNDPROC, (LONG_PTR)WindowProc);
+    SetWindowLongPtrW (m_hWnd, GWLP_USERDATA, (LONG_PTR)this);
+  }
+  else
+  {
+    m_OldWndProc = (WNDPROC)GetWindowLongA (m_hWnd, GWLP_WNDPROC);
+    SetWindowLongPtrA (m_hWnd, GWLP_WNDPROC, (LONG_PTR)WindowProc);
+    SetWindowLongPtrA (m_hWnd, GWLP_USERDATA, (LONG_PTR)this);
+  }
 
   // Get ahold of the main DirectDraw object...
   DDetection.CheckDevices2D ();
@@ -940,7 +949,14 @@ LRESULT CALLBACK csGraphics2DDDraw3::WindowProc (HWND hWnd, UINT message,
       This->m_hWnd = 0;
       break;
   }
-  return CallWindowProcW ((WNDPROC)This->m_OldWndProc, hWnd, message, wParam, lParam);
+  if (cswinIsWinNT ())
+  {
+    return CallWindowProcW ((WNDPROC)This->m_OldWndProc, hWnd, message, wParam, lParam);
+  }
+  else
+  {
+    return CallWindowProcA ((WNDPROC)This->m_OldWndProc, hWnd, message, wParam, lParam);
+  }
 }
 
 void csGraphics2DDDraw3::SetTitle (const char* title)
@@ -948,7 +964,14 @@ void csGraphics2DDDraw3::SetTitle (const char* title)
   csGraphics2D::SetTitle (title);
   if (m_hWnd)
   {
-    SetWindowTextW (m_hWnd, csCtoW (title));
+    if (cswinIsWinNT ())
+    {
+      SetWindowTextW (m_hWnd, csCtoW (title));
+    }
+    else
+    {
+      SetWindowTextA (m_hWnd, cswinCtoA (title));
+    }
   }
 }
 

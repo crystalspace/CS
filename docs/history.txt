@@ -23,6 +23,8 @@ chronological order.
 	  in maps is now also deprecated.
 	- Marten removed some old left-over code that only was needed for
 	  VC6 and/or windows version 95,98 and Me.
+	- Marten reverted the part of r25859 that deprecated windows 95, 98
+	  and Me until we decide to retire them.
 9-Nov-2007
 	- Eric Sunshine worked around problem in configure.ac caused by
 	  unintentional side-effect of recent change to detect newer vs. older

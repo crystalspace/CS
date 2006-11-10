@@ -136,7 +136,8 @@ typedef HBITMAP (*CreateCursorBitmapFN)(HDC hDC, const BITMAPINFO* bitmapInfo,
 csWin32CustomCursors::CachedCursor csWin32CustomCursors::CreateCursor(
   iImage* image, const csRGBcolor* keycolor,  int hotspot_x, int hotspot_y)
 {
-  cswinWindowsVersion ver = cswinGetWinVersion ();
+  cswinWindowsVersion ver;
+  cswinIsWinNT (&ver);
   HDC DC = GetDC (0);
   int colorDepth = GetDeviceCaps (DC, BITSPIXEL);
   ReleaseDC (0, DC);
@@ -147,7 +148,8 @@ csWin32CustomCursors::CachedCursor csWin32CustomCursors::CreateCursor(
     && (colorDepth >= 24);
   // Only use a paletted cursor when we're on NT4.0 or the source image
   // has a palette, but we won't use alpha for it.
-  bool doPaletted = (((image->GetFormat() & CS_IMGFMT_MASK) == CS_IMGFMT_PALETTED8)
+  bool doPaletted = (ver == cswinWinNT) 
+    || (((image->GetFormat() & CS_IMGFMT_MASK) == CS_IMGFMT_PALETTED8)
     && !doAlpha);
   CreateCursorBitmapFN CreateCursorBitmap = 
     (ver >= cswinWinXP) ? &CreateCursorBitmapXP : &CreateCursorBitmapOther;
@@ -155,6 +157,12 @@ csWin32CustomCursors::CachedCursor csWin32CustomCursors::CreateCursor(
   const int imgW = image->GetWidth();
   const int imgH = image->GetHeight();
   
+  if ((ver == cswinWin9x) 
+    && ((imgW != GetSystemMetrics (SM_CXCURSOR)) 
+      || (imgH != GetSystemMetrics (SM_CYCURSOR))))
+    // @@@ Support smaller cursors.
+    return CachedCursor ();
+
   uint8* pixels = 0;
   csRGBpixel* palette = 0;
   uint8* pixelsRGB = 0;
