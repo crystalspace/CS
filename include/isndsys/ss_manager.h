@@ -24,6 +24,7 @@
  */
 
 #include "isndsys/ss_stream.h"
+#include "isndsys/ss_data.h"
 
 #include "csutil/scf.h"
 #include "csutil/scf_implementation.h"
@@ -38,16 +39,23 @@ struct iObject;
  */
 struct iSndSysWrapper : public virtual iBase
 {
-  SCF_INTERFACE (iSndSysWrapper, 0, 0, 1);
+  SCF_INTERFACE (iSndSysWrapper, 1, 0, 1);
 
   /// Get the iObject which represents this wrapper.
   virtual iObject* QueryObject () = 0;
 
   /// Get the sound stream associated with this object.
+  CS_DEPRECATED_METHOD_MSG("Use GetData() instead.")
   virtual iSndSysStream* GetStream () = 0;
 
   /// Set the sound stream associated with this object.
+  CS_DEPRECATED_METHOD_MSG("Use SetData() instead.")
   virtual void SetStream (iSndSysStream* stream) = 0;
+
+  /// Get the sound data associated with this wrapper.
+  virtual iSndSysData* GetData () = 0;
+  /// Set the sound data associated with this wrapper.
+  virtual void SetData (iSndSysData* data) = 0;
 };
 
 /**

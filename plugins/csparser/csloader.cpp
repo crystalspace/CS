@@ -1605,6 +1605,9 @@ bool csLoader::LoadSounds (iDocumentNode* node)
 	  csRef<iDocumentAttribute> at = child->GetAttribute ("mode3d");
 	  if (at)
 	  {
+	    ReportWarning (
+	        "crystalspace.maploader.parse.sound",
+                child, "The 'mode3d' attribute is deprecated! Specify 2d/3d mode when playing sound.");
 	    const char* v = at->GetValue ();
 	    if (!strcasecmp ("disable", v))
 	      mode3d = CS_SND3D_DISABLE;
@@ -1621,53 +1624,47 @@ bool csLoader::LoadSounds (iDocumentNode* node)
 	    }
 	  }
 
-	  if (mode3d == -1)
+	  // New sound system.
+	  if (!SndSysLoader)
 	  {
-	    SyntaxService->Report (
-	      "crystalspace.maploader.parse.sound", 
-	      CS_REPORTER_SEVERITY_NOTIFY, child,
-	      "The old sound system is no longer supported. Use 'mode3d'!");
-	    return true;
-	  }
-	  else
-	  {
-	    // New sound system.
-	    if (!SndSysLoader)
-	    {
-	      //SyntaxService->ReportError (
+	    //SyntaxService->ReportError (
 	        //"crystalspace.maploader.parse.sound", child,
 	        //"New sound loader not loaded!");
-	      return true;
-	    }
-            iSndSysWrapper* snd = SndSysManager->FindSoundByName (name);
-            if (!snd)
+	    return true;
+	  }
+          iSndSysWrapper* snd = SndSysManager->FindSoundByName (name);
+          if (!snd)
+	  {
+	    if (mode3d != -1)
               snd = LoadSoundWrapper (name, filename, mode3d);
-            if (snd)
+	    else
+              snd = LoadSoundWrapper (name, filename);
+	  }
+          if (snd)
+          {
+            csRef<iDocumentNodeIterator> it2 (child->GetNodes ());
+            while (it2->HasNext ())
             {
-              csRef<iDocumentNodeIterator> it2 (child->GetNodes ());
-              while (it2->HasNext ())
+              csRef<iDocumentNode> child2 = it2->Next ();
+              if (child2->GetType () != CS_NODE_ELEMENT) continue;
+              switch (xmltokens.Request (child2->GetValue ()))
               {
-                csRef<iDocumentNode> child2 = it2->Next ();
-                if (child2->GetType () != CS_NODE_ELEMENT) continue;
-                switch (xmltokens.Request (child2->GetValue ()))
-                {
-                  case XMLTOKEN_KEY:
+                case XMLTOKEN_KEY:
+                  {
+                    iKeyValuePair *kvp = 0;
+                    SyntaxService->ParseKey (child2, kvp);
+                    if (kvp)
                     {
-                      iKeyValuePair *kvp = 0;
-                      SyntaxService->ParseKey (child2, kvp);
-                      if (kvp)
-                      {
-                        snd->QueryObject ()->ObjAdd (kvp->QueryObject ());
-                        kvp->DecRef ();
-                      }
-		      else
-                        return false;
+                      snd->QueryObject ()->ObjAdd (kvp->QueryObject ());
+                      kvp->DecRef ();
                     }
-                    break;
-                }
+		    else
+                      return false;
+                  }
+                  break;
               }
             }
-	  }
+          }
         }
         break;
       default:

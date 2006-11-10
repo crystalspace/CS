@@ -11,6 +11,16 @@ chronological order.
 	  character_bump2 since they are still giving problems:
 	  	- Not working lighting on linux/ATI
 		- Corrupted lighting on Intel Graphics
+	- Jorrit changed iSndSysWrapper to keep track of iSndSysData
+	  instead (but see later) of iSndSysStream. The idea is that
+	  a sound object should only care about the sound data and
+	  the stream should be created later. For compatibility
+	  reasons a stream is still created however. All methods
+	  taking care of streams in iSndSysWrapper are marked
+	  deprecated. Also in iLoader the version of LoadSoundWrapper()
+	  that takes a mode3d parameter is now deprecated as this
+	  version creates a stream. Using the 'mode3d' attribute
+	  in maps is now also deprecated.
 9-Nov-2007
 	- Eric Sunshine worked around problem in configure.ac caused by
 	  unintentional side-effect of recent change to detect newer vs. older

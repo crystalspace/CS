@@ -261,8 +261,18 @@ struct iLoader : public virtual iBase
    * \param mode3d is one of CS_SND3D_DISABLE, CS_SND3D_RELATIVE, or
    * CS_SND3D_ABSOLUTE.
    */
+  CS_DEPRECATED_METHOD_MSG("Use LoadSoundStream() without mode3d parameter instead.")
   virtual iSndSysWrapper* LoadSoundWrapper (const char *name,
   	const char *fname, int mode3d) = 0;
+
+  /**
+   * New Sound System: Load a sound file, create sound data and create a
+   * wrapper object for it.
+   * \param name of the sound.
+   * \param fname is the VFS filename.
+   */
+  virtual iSndSysWrapper* LoadSoundWrapper (const char *name,
+  	const char *fname) = 0;
 
   /**
    * Load a map file in a thread.
