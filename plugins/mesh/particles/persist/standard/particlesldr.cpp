@@ -826,6 +826,25 @@ CS_PLUGIN_NAMESPACE_BEGIN(ParticlesLoader)
           meshObj->SetMixMode (mm);
         }
         break;
+      case XMLTOKEN_PREADVANCE:
+        {
+          if (!particleSystem)
+          {
+            synldr->ReportError ("crystalspace.particleloader.parsesystem",
+              child, "Specify factory first!");
+
+            return 0;
+          }
+
+          float advtime;
+          advtime = child->GetContentsValueAsFloat ();
+          csTicks msec = (csTicks)(advtime*1000.0f + 0.5f);
+
+          particleSystem->Advance (msec);
+
+
+          break;
+        }
       default:
         {
           if (!particleSystem)
