@@ -18,6 +18,8 @@ chronological order.
 	- Marten added a preadvance option to particles xml-loader that allows
 	  you to advance the particle system on load.
 	- res fixed the perl bindings to compile again.
+	- res fixed SetVertexCount in genmesh to not set all normals and 
+	  colors to null but only those that were newly added.
 8-Nov-2007
 	- Erroroman changed bones indices render buffer type to ushort. Also 
 	  changed indices type to short in all animation vertex shaders.

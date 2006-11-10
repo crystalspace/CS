@@ -1981,14 +1981,19 @@ void csGenmeshMeshObjectFactory::AddTriangle (const csTriangle& tri)
 
 void csGenmeshMeshObjectFactory::SetVertexCount (int n)
 {
+  size_t oldN = mesh_vertices.GetSize ();
   mesh_vertices.SetLength (n);
   mesh_texels.SetLength (n);
   mesh_colors.SetLength (n);
   mesh_normals.SetLength (n);
   initialized = false;
 
-  memset (mesh_normals.GetArray (), 0, sizeof (csVector3)*n);
-  memset (mesh_colors.GetArray (), 0, sizeof (csColor4)*n);
+  if (size_t (n) > oldN)
+  {
+    size_t newN = n - oldN;
+    memset (mesh_normals.GetArray () + oldN, 0, sizeof (csVector3)*newN);
+    memset (mesh_colors.GetArray () + oldN, 0, sizeof (csColor4)*newN);
+  }
 
   vertex_buffer = 0;
   normal_buffer = 0;
