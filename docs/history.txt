@@ -6,7 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
-10-Nov-2007
+11-Nov-2006
+	- Genjix corrected spelling mistake vfs.h and changed the years here.
+10-Nov-2006
 	- Jorrit again disabled techniques 150 for character2 and
 	  character_bump2 since they are still giving problems:
 	  	- Not working lighting on linux/ATI
@@ -25,7 +27,7 @@ chronological order.
 	  VC6 and/or windows version 95,98 and Me.
 	- Marten reverted the part of r25859 that deprecated windows 95, 98
 	  and Me until we decide to retire them.
-9-Nov-2007
+9-Nov-2006
 	- Eric Sunshine worked around problem in configure.ac caused by
 	  unintentional side-effect of recent change to detect newer vs. older
 	  X11 installations.  Autoconf delays performing certain tests until
@@ -44,7 +46,7 @@ chronological order.
 	  intrinsic functions.
 	- res fixed SetVertexCount in genmesh to not set all normals and 
 	  colors to null but only those that were newly added.
-8-Nov-2007
+8-Nov-2006
 	- Erroroman changed bones indices render buffer type to ushort. Also 
 	  changed indices type to short in all animation vertex shaders.
 	- Erroroman made Cg skinning default again.
@@ -52,7 +54,7 @@ chronological order.
 	  indices.
 	- Erroroman fixed speed problem in shader animation by changing bones 
 	  indices type from ushort to short. Also fixed max exporter again.
-7-Nov-2007
+7-Nov-2006
 	- Eric Sunshine changed CS_CHECK_PROG_VERSION() in progver.m4 to export
 	  shell variables `cs_prog_PROG_version' and `cs_prog_PROG_version_ok'
 	  indicating the discovered version of PROG and whether the version
