@@ -6943,6 +6943,8 @@ class iSndSysWrapper(iBase):
     def QueryObject(*args): return _cspace.iSndSysWrapper_QueryObject(*args)
     def GetStream(*args): return _cspace.iSndSysWrapper_GetStream(*args)
     def SetStream(*args): return _cspace.iSndSysWrapper_SetStream(*args)
+    def GetData(*args): return _cspace.iSndSysWrapper_GetData(*args)
+    def SetData(*args): return _cspace.iSndSysWrapper_SetData(*args)
     __swig_destroy__ = _cspace.delete_iSndSysWrapper
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iSndSysWrapper_scfGetVersion

@@ -10723,6 +10723,8 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *QueryObject = *cspacec::iSndSysWrapper_QueryObject;
 *GetStream = *cspacec::iSndSysWrapper_GetStream;
 *SetStream = *cspacec::iSndSysWrapper_SetStream;
+*GetData = *cspacec::iSndSysWrapper_GetData;
+*SetData = *cspacec::iSndSysWrapper_SetData;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
