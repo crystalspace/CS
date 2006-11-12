@@ -2190,11 +2190,13 @@ bool CommandHandler (const char *cmd, const char *arg)
       iSndSysWrapper* sb = mgr->FindSoundByName (arg);
       if (sb)
       {
+	csRef<iSndSysStream> sndstream = Sys->mySound->CreateStream (
+	    sb->GetData (), CS_SND3D_ABSOLUTE);
 	csRef<iSndSysSource> sndsource = Sys->mySound->CreateSource (
-	    sb->GetStream ());
+	    sndstream);
 	sndsource->SetVolume (1.0f);
-        sb->GetStream ()->SetLoopState (CS_SNDSYS_STREAM_DONTLOOP);
-        sb->GetStream ()->Unpause ();
+        sndstream->SetLoopState (CS_SNDSYS_STREAM_DONTLOOP);
+        sndstream->Unpause ();
       }
       else
         Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
