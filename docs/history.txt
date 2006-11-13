@@ -95,9 +95,6 @@ chronological order.
               to declare it).
             - removed csPixmap %ignore declaration.
             - removed the _csPyEventHandler declaration from pycscegui.
-4-Nov-2006
-	- res fixed a couple of VC7 errors and warnings.
-	- res fixed a couple of gcc issues after the VC7 fixes.
 3-Nov-2006
 	- Jorrit fixed nullmesh factory so that it has a sensible
 	  default bounding box (from -1,-1,-1 to 1,1,1). That prevents
@@ -111,6 +108,8 @@ chronological order.
 	  that box internally with a very small legal one.
 	- caedes fixed an mistype in csgeom/vector4.h (csVector4 incorrectly
 	  referenced from inside csVector4T).
+	- res fixed a couple of VC7 errors and warnings.
+	- res fixed a couple of gcc issues after the VC7 fixes.
 1-Nov-2006
 	- Genjix removed redundant ShapeChanged () calls in
 	  iGeneralFactoryState::SetTriangle/VertexCount ().
@@ -131,16 +130,11 @@ chronological order.
 	- res fixed some VC warnings.
 	- caedes added gmeshkel2.h and skeleton.h interfaces to cspace.i.
 29-Oct-2006
-	- Eric Sunshine fixed a quoting problem in configure.ac which caused
-	  X11 check to barf for old-style installations.
 	- res changed scfFactory::IncRef() to always get the symbol for the
 	  factory function after the plugin shared lib has been loaded. The
 	  reasons is that the address of that symbol may change if the shared
 	  lib happens to be unloaded in between attempts to get an instance
 	  of the component.
-	- res fixed some crashes in the software renderer occuring when 
-	  drawing without BeginDraw() being called (occurs when the engine 
-	  does PrecacheDraw()).
 	- res augmented the lightiter render step to provide a "light count"
 	  SV with constant value 1. (This makes it possible to use vproc_std
 	  with it.)
@@ -155,6 +149,8 @@ chronological order.
 	- res made the light_bumpmap shader fall back to light.
 	- res changed the "castle" level to have Z buffer clearing enabled
 	  (needed for SR).
+	- Eric Sunshine fixed a quoting problem in configure.ac which caused
+	  X11 check to barf for old-style installations.
 27-Oct-2006
 	- res updated the docs for the new winlibs version.
 	- Daniel Fryer added HasNext() to the Mac OS X "defaults" 
