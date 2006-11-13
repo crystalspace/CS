@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+13-Nov-2006
+	- Erroroman added bindings SetWithGemeshFactory and SetWithBox to 
+	  csSimpleRenderMesh in cspace.i. That makes easy to create simple
+	  meshes from given geometry when using CS python module.
 11-Nov-2006
 	- Genjix corrected spelling mistake vfs.h and changed the years here.
 10-Nov-2006
