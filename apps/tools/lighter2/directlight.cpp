@@ -183,6 +183,7 @@ namespace lighter
 
       // Get all primitives
       RadPrimitivePtrArray prims;
+
       if (!KDTreeHelper::CollectPrimitives (sector->kdTree, prims, radLight->boundingBox))
         continue;
 

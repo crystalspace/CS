@@ -10,6 +10,8 @@ chronological order.
 	- Erroroman added bindings SetWithGemeshFactory and SetWithBox to 
 	  csSimpleRenderMesh in cspace.i. That makes easy to create simple
 	  meshes from given geometry when using CS python module.
+	- Marten reimplemented the kd-tree builder in lighter2. Gave some 
+	  80-120% speedup in benchmarks.
 11-Nov-2006
 	- Genjix corrected spelling mistake vfs.h and changed the years here.
 10-Nov-2006

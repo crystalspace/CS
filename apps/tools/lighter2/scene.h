@@ -24,7 +24,7 @@
 
 namespace lighter
 {
-  struct KDTree;
+  class KDTree;
 
   // A lightsource
   class Light : public csRefCount
@@ -68,7 +68,7 @@ namespace lighter
     LightRefArray allLights;
 
     // KD-tree of all primitives in sector
-    KDTree_Opt *kdTree;
+    KDTree *kdTree;
 
     // Sector-name
     csString sectorName;

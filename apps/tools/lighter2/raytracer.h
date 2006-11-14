@@ -24,8 +24,8 @@
 
 namespace lighter
 {
-  struct KDTree_Opt;
-  union KDTreeNode_Opt;
+  class KDTree;
+  union KDTreeNode;
   class RadPrimitive;
 
   /**
@@ -138,9 +138,11 @@ namespace lighter
   class Raytracer
   {
   public:
-    Raytracer (KDTree_Opt *tree)
+    Raytracer (KDTree *tree)
       : tree (tree)
     {
+      //Setup a stack for traversal
+      traceStack.SetCapacity (64);
     }
 
     /**
@@ -157,12 +159,19 @@ namespace lighter
 
   protected:
     /// Traverse all primitives in a given node and do intersection against them
-    bool IntersectPrimitives (const KDTreeNode_Opt* node, const Ray &ray, 
+    bool IntersectPrimitives (const KDTreeNode* node, const Ray &ray, 
       HitPoint &hit, bool earlyExit = false) const;
 
-    bool TraceRecursive(const Ray &ray, HitPoint& hit, KDTreeNode_Opt* node, float tmin, float tmax) const;
+    KDTree *tree;
 
-    KDTree_Opt *tree;
+
+    // Helperstruct for kd traversal
+    struct kdTraversalS
+    {
+      KDTreeNode *node;
+      float tnear, tfar;
+    };
+    mutable csArray<kdTraversalS> traceStack;
   };
 
   /// Helper to profile raytracing

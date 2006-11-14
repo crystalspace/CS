@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2005 by Marten Svanfeldt
+  Copyright (C) 2005-2006 by Marten Svanfeldt
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -25,65 +25,12 @@ namespace lighter
 {
   class RadPrimitive;
 
-  /// Single primitive in KD-tree. A single triangle
+  /**
+   * Optimized KD-tree primitive
+   * \todo
+   * Make more efficient on 64 bit platforms!
+   */
   struct KDTreePrimitive
-  {
-    /// The three vertices
-    csVector3 vertices[3];
-
-    csVector3 normal;
-
-    /// The RadPrimitive we belong to
-    RadPrimitive *primPointer;
-  };
-
-
-  /// Node in non-optimized KD-tree
-  struct KDTreeNode
-  {
-    // CS_AXIS_* 
-    uint splitDimension;
-
-    // Split plane location (world space)
-    float splitLocation;
-
-    // Left-right pointer
-    KDTreeNode *leftChild, *rightChild;
-
-    // Triangle indices into triangle lists
-    csArray<size_t> triangleIndices;
-
-    KDTreeNode()
-      : splitDimension(0), splitLocation(0.0f), leftChild(0), rightChild(0)
-    {}
-
-    ~KDTreeNode()
-    { 
-      delete leftChild;
-      delete rightChild;
-    }
-  };
-
-  /// KD-tree
-  struct KDTree
-  {
-    // Bounding box
-    csBox3 boundingBox;
-
-    // Root node
-    KDTreeNode *rootNode;
-
-    // All triangles in tree
-    csArray<KDTreePrimitive> allTriangles;
-
-    KDTree()
-      : rootNode (0)
-    {}
-  };
-
-
-  /// Optimized KD-tree primitive
-  struct KDTreePrimitive_Opt
   {
     /// Normal u, v and d components. Normalized.
     float normal_U, normal_V, normal_D;
@@ -100,36 +47,38 @@ namespace lighter
     /// Edge B u, v and d components
     float edgeB_U, edgeB_V, edgeB_D;
 
+#if (CS_PROCESSOR_SIZE == 32)
     /// Padding
     float pad0;
+#endif
   };
 
   /// Optimized KD-tree node
-  union KDTreeNode_Opt
+  union KDTreeNode
   {
     struct
     {
       /**
-       * Combined flag, dimension and pointer
-       *  Bit 2            Flag indicating node/inner leaf (leaf=0,inner=1)
-       *  Bit 3..length    Pointer to list of primitives
-       */
+      * Combined flag, dimension and pointer
+      *  Bit 2            Flag indicating node/inner leaf (leaf=0,inner=1)
+      *  Bit 3..length    Pointer to list of primitives
+      */
       uintptr_t flagAndOffset;
 
       /**
-       * Number of primitives in node
-       */
+      * Number of primitives in node
+      */
       size_t numberOfPrimitives; 
     } leaf;
 
     struct 
     {
       /**
-       * Combined flag, dimension and pointer
-       *  Bit 0..1         Split dimension (0=x, 1=y, 2=z)
-       *  Bit 2            Flag indicating node/inner leaf (leaf=0,inner=1)
-       *  Bit 3..length-1  Offset to first child
-       */
+      * Combined flag, dimension and pointer
+      *  Bit 0..1         Split dimension (0=x, 1=y, 2=z)
+      *  Bit 2            Flag indicating node/inner leaf (leaf=0,inner=1)
+      *  Bit 3..length-1  Pointer to first child
+      */
       uintptr_t flagDimensionAndOffset;
 
       /// Split location
@@ -138,41 +87,318 @@ namespace lighter
   };
 
   /// Optimized KD-tree
-  struct KDTree_Opt
+  class KDTree
   {
+  public:
     /// Constructor
-    KDTree_Opt ()
+    KDTree ()
       : nodeList (0), primitives (0)
     {
     }
 
     /// Destructor
-    ~KDTree_Opt ();
+    ~KDTree ();
 
     /// Bounding box
     csBox3 boundingBox;
 
     /// Nodes, nodeList[0] is root
-    KDTreeNode_Opt* nodeList;
+    KDTreeNode* nodeList;
 
     /// Primitives
-    KDTreePrimitive_Opt* primitives;
+    KDTreePrimitive* primitives;
   };
 
+  /// Helper to manipulate KDTreeNode
+  class KDTreeNode_Op
+  {
+  public:
+    static CS_FORCEINLINE void SetLeaf (KDTreeNode* node, bool leaf)
+    {
+      if (leaf)
+        node->inner.flagDimensionAndOffset &= ~0x04;
+      else
+        node->inner.flagDimensionAndOffset |= 0x04;
+    }
+
+    static CS_FORCEINLINE bool IsLeaf (const KDTreeNode* node)
+    {
+      return (node->inner.flagDimensionAndOffset & 0x04) != 0;
+    }
+
+    static CS_FORCEINLINE void SetPrimitiveList (KDTreeNode* node, 
+      KDTreePrimitive* primList)
+    {
+      node->leaf.flagAndOffset = (node->leaf.flagAndOffset & 0x07) |
+        (reinterpret_cast<uintptr_t> (primList) & ~0x07);
+    }
+
+    static CS_FORCEINLINE KDTreePrimitive* GetPrimitiveList 
+      (const KDTreeNode* node)
+    {
+      return reinterpret_cast<KDTreePrimitive*>
+        (node->leaf.flagAndOffset & ~0x07);
+    }
+
+    static CS_FORCEINLINE void SetPrimitiveListSize (KDTreeNode* node, 
+      size_t size)
+    {
+      node->leaf.numberOfPrimitives = size;
+    }
+
+    static CS_FORCEINLINE size_t GetPrimitiveListSize (const KDTreeNode* node)
+    {
+      return node->leaf.numberOfPrimitives;
+    }
+
+    static CS_FORCEINLINE void SetDimension (KDTreeNode* node, size_t dim)
+    {
+      node->inner.flagDimensionAndOffset =
+        (node->inner.flagDimensionAndOffset & ~0x03) | dim;
+    }
+
+    static CS_FORCEINLINE size_t GetDimension (const KDTreeNode* node)
+    {
+      return node->inner.flagDimensionAndOffset & 0x03;
+    }
+
+    static CS_FORCEINLINE void SetLeft (KDTreeNode* node, KDTreeNode* left)
+    {
+      node->inner.flagDimensionAndOffset =
+        (node->inner.flagDimensionAndOffset & 0x07) | 
+        (reinterpret_cast<uintptr_t> (left) & ~0x07);
+    }
+
+    static CS_FORCEINLINE KDTreeNode* GetLeft (const KDTreeNode* node)
+    {
+      return reinterpret_cast<KDTreeNode*>
+        (node->inner.flagDimensionAndOffset & ~0x07); 
+    }
+
+    static CS_FORCEINLINE void SetLocation (KDTreeNode* node, float loc)
+    {
+      node->inner.splitLocation = loc;
+    }
+
+    static CS_FORCEINLINE float GetLocation (const KDTreeNode* node)
+    {
+      return node->inner.splitLocation;
+    }
+
+  };
 
   class KDTreeBuilder
   {
   public:
-    /// Build a tree from all the objects returned by iterator
-    static KDTree* BuildTree (const RadObjectHash::GlobalIterator& objectIt);
+    /*
+    Take an object iterator and build a kd-tree from that
+    */
+    KDTree* BuildTree (RadObjectHash::GlobalIterator& objects);
 
-    /// Build an optimized tree from a normal one
-    static KDTree_Opt* OptimizeTree (KDTree* tree);
 
-  protected:
-    static void Subdivide(KDTree *tree, KDTreeNode *node, 
-      const csBox3& currentAABB, unsigned int depth = 0, unsigned int lastAxis = ~0,
-      float lastPosition = 0);
+  private:
+
+    // Building constants
+    enum
+    {
+      TRAVERSAL_COST = 1,
+      INTERSECTION_CONST = 7,
+      MAX_DEPTH = 60,
+      PRIMS_PER_LEAF = 4,
+      NODE_SIZE_EPSILON = 1000 //*1e-9
+    };
+    
+    class PrimBox;
+    // Represent an end-point of triangle along given axis
+    class EndPoint
+    {
+    public:
+      // Get/Set helpers
+      EndPoint* GetNext (size_t a) const
+      {
+        return reinterpret_cast<EndPoint*> (data[a] & ~((size_t)0x03));
+      }
+
+      void SetNext (size_t a, EndPoint* n)
+      {
+        data[a] = GetSide (a) | reinterpret_cast<size_t> (n);
+      }
+
+      size_t GetSide (size_t a) const
+      {
+        return data[a] & 0x03;
+      }
+
+      void SetSide (size_t a, size_t s)
+      {
+        data[a] = s | reinterpret_cast<size_t> (GetNext (a));
+      }
+
+      float GetPosition (size_t a) const
+      {
+        return position[a];
+      }
+
+      void SetPosition (size_t a, float pos)
+      {
+        position[a] = pos;
+      }
+
+      /*
+       Get the (probable) location of the primbox by realigning the this pointer
+       to an even 64/128 byte boundary.
+       Can be dangerous, use with care!
+       */
+      PrimBox* GetBox ()
+      {
+        return reinterpret_cast<PrimBox*> ( reinterpret_cast<size_t> (this) &
+          BOX_ALIGN);
+      }
+
+      enum
+      {
+        SIDE_END = 0,
+        SIDE_PLANAR = 1,
+        SIDE_INVALID = 2,
+        SIDE_START = 3
+      };
+
+    private:
+
+      // Data
+      size_t data[3]; //Side and pointer to next endpoint. Side use two lowest bits
+      float position[3];
+
+#if (CS_PROCESSOR_SIZE == 64)
+      enum {BOX_ALIGN = ~0x7f};
+      float pad0; //For 64-bit we pad this to have a size dividable by even 4 bytes
+#else
+      enum {BOX_ALIGN = ~0x3f};
+#endif
+    }; // 
+
+    //Represent a primitive as an AABB
+    class PrimBox
+    {
+    public:
+      PrimBox ()
+        : primitive (0), clone (0), flags (STATE_STRADDLING)
+      {
+        //Setup side cross references
+        for (size_t i = 0; i < 3; ++i)
+        {
+          side[0].SetNext (i, &side[1]);
+          side[0].SetSide (i, EndPoint::SIDE_START);
+
+          side[1].SetNext (i, 0);
+          side[1].SetSide (i, EndPoint::SIDE_END);
+        } 
+      }
+      
+      enum
+      {
+        STATE_LEFT = 0,
+        STATE_RIGHT,
+        STATE_STRADDLING,
+        STATE_PROCESSED
+      };
+
+      //End-point [min/max]
+      EndPoint side[2];             //48 / 96
+      RadPrimitive* primitive;      // 4 /  8
+      int32 flags;                  // 4 /  4
+      PrimBox* clone;               // 4 /  8 
+
+      uint8 pad[4];                 // 4 /  4
+#if (CS_PROCESSOR_SIZE == 64)
+      //Bit unfortunate, but we need an even pot-2 alignment
+      uint8 pad0[8];                // 0 / 8
+#endif
+    }; //sizeof = 64 / 128
+
+    // Helper class for clipping primitives and computing primitive AABB
+    struct PrimHelper
+    {
+      PrimHelper ()
+      {
+      }
+      
+      //Init with a RadPrrimitive
+      void Init (const RadPrimitive* prim);
+
+      // Clip to an AABB
+      void Clip (const csBox3& box);
+      bool ClipAxis (float pos, float direction, size_t axis);
+
+      void UpdateBB ();
+
+      csBox3 aabb;
+      csVector3 vertices[10];
+      csVector3 tempVertices[10];
+      size_t numVerts, numTempVerts;
+    } primHelper;
+
+    /**
+     * Holder for the sorted end point lists.
+     * The lists are sorted by position followed by side.
+     */
+    struct EndPointList
+    {
+      void Insert (size_t axis, EndPoint* ep);
+      void Remove (size_t axis, EndPoint* ep);
+      void SortList (size_t axis);
+
+      EndPoint* head[3];
+      EndPoint* tail[3];
+     
+      EndPointList ()
+      {
+        head[0] = head[1] = head[2] = 0;
+        tail[0] = tail[1] = tail[2] = 0;
+      }
+    } endPointList;
+
+    //Internal node representing a kd-tree node (inner or leaf) while building
+    struct KDNode
+    {
+      // CS_AXIS_* 
+      uint splitDimension;
+
+      // Split plane location (world space)
+      float splitLocation;
+
+      // Left-right pointer
+      KDNode *leftChild, *rightChild;
+
+      // Primitives
+      RadPrimitivePtrArray primitives;
+
+      KDNode()
+        : splitDimension(0), splitLocation(0.0f), leftChild(0), rightChild(0)
+      {}
+    };
+
+
+    //Allocator for boxes
+    typedef csBlockAllocator<PrimBox, CS::Memory::AllocatorAlign<128> >
+      BoxAllocatorType;
+
+    BoxAllocatorType boxAllocator;
+
+    //Allocator for internal kdtree-nodes
+    typedef csBlockAllocator<KDNode> NodeAllocatorType;
+    NodeAllocatorType nodeAllocator;
+
+    //Object extents, primitive count etc collected on first pass
+    csBox3 objectExtents;
+    size_t numPrimitives;
+
+    //Private functions
+    bool SetupEndpoints (RadObjectHash::GlobalIterator& objects);
+    bool BuildKDNodeRecursive (EndPointList* epList, KDNode* node, 
+      csBox3 aabb, size_t numPrim, size_t treeDepth);
+    KDTree* SetupRealTree (KDNode* rootNode);
+
   };
 
   // Helper to do operations on a kd-tree
@@ -181,15 +407,15 @@ namespace lighter
   public:
 
     // Collect all primitives within given AABB
-    static bool CollectPrimitives (const KDTree_Opt *tree, 
+    static bool CollectPrimitives (const KDTree *tree, 
       RadPrimitivePtrArray& primArray, const csBox3& overlapAABB);
-  
+
   private:
     KDTreeHelper ();
     KDTreeHelper (const KDTreeHelper& o);
 
     // Traverse a node, collect any prims within AABB
-    static void CollectPrimitives (const KDTree_Opt *tree, const KDTreeNode_Opt* node, 
+    static void CollectPrimitives (const KDTree *tree, const KDTreeNode* node, 
       csBox3 currentBox, RadPrimitivePtrSet& outPrims, const csBox3& overlapAABB);
   };
 

@@ -40,11 +40,8 @@ namespace lighter
 
     // Build KD-tree
     objIt.Reset ();
-    KDTree* kdTree_orig = KDTreeBuilder::BuildTree (objIt);
-
-    kdTree = KDTreeBuilder::OptimizeTree (kdTree_orig);
-
-    delete kdTree_orig;
+    KDTreeBuilder builder;
+    kdTree = builder.BuildTree (objIt);
   }
 
 

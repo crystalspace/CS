@@ -24,65 +24,6 @@
 namespace lighter
 {
 
-  // Helperstruct for kd traversal
-  struct kdTraversalS
-  {
-    KDTreeNode_Opt *node;
-    float tnear, tfar;
-  };
-
-
-  bool Raytracer::TraceRecursive(const Ray &ray, HitPoint& hit, 
-    KDTreeNode_Opt* node, float tmin, float tmax) const
-  {
-    /*if(node->leftChild)
-    {
-      //Inner
-      // Check intersection with ray-plane
-      int dim = node->splitDimension;
-      float thit = (node->splitLocation - ray.origin[dim]) / ray.direction[dim];
-      KDTreeNode *nearNode, *farNode;
-      if(ray.direction[dim] > 0) 
-      {
-        nearNode = node->leftChild;
-        farNode = node->rightChild;
-      }
-      else
-      {
-        nearNode = node->rightChild;
-        farNode = node->leftChild;
-      }
-
-      if (thit <= tmin)
-      {
-        if(TraceRecursive (ray, hit, farNode, tmin, tmax))
-          return true;
-      }
-      else if(thit >= tmax)
-      {
-        if(TraceRecursive (ray, hit, nearNode, tmin, tmax))
-          return true;
-      }
-      else
-      {
-        if(TraceRecursive (ray, hit, nearNode, tmin, thit))
-          return true;
-        if(TraceRecursive (ray, hit, farNode, thit, tmax))
-          return true;
-      }
-    }
-    else
-    {
-      //Leaf
-      bool haveHit = IntersectPrimitives (node, ray, hit, true); 
-      if(haveHit)
-      {
-        return true;
-      }
-    }*/
-    return false;
-  }
-
   bool Raytracer::TraceAnyHit (const Ray &ray, HitPoint& hit) const
   {
     if (!tree || !tree->nodeList) return false;
@@ -96,36 +37,35 @@ namespace lighter
 
     float tmin (myRay.minLength), tmax (myRay.maxLength);
 
-    //return TraceRecursive (myRay, hit, tree->rootNode, tmin, tmax);
+    KDTreeNode* node = tree->nodeList;
 
-    KDTreeNode_Opt* node = tree->nodeList;
-
-    //Setup a stack for traversal
-    csArray<kdTraversalS> traceStack;
-    traceStack.SetCapacity (64);
+    size_t nodeOffset[3][2];
+    for (size_t dim = 0; dim < 3; ++dim)
+    {
+      if (ray.direction[dim] > 0)
+      {
+        nodeOffset[dim][0] = 0;
+        nodeOffset[dim][1] = 1;
+      }
+      else
+      {
+        nodeOffset[dim][0] = 1;
+        nodeOffset[dim][1] = 0;
+      }
+    }
     
     while (true)
     {
-      while (node->inner.flagDimensionAndOffset & 0x04)
+      while (!KDTreeNode_Op::IsLeaf (node))
       {
-        uint dim = node->inner.flagDimensionAndOffset & 0x03;
+        uint dim = KDTreeNode_Op::GetDimension (node);
         float thit = (node->inner.splitLocation - ray.origin[dim]) / ray.direction[dim];
 
-        KDTreeNode_Opt *nearNode, *farNode;
-        if(ray.direction[dim] > 0) 
-        {
-          nearNode = reinterpret_cast<KDTreeNode_Opt*> 
-            (node->inner.flagDimensionAndOffset & ~0x07);
-          farNode = reinterpret_cast<KDTreeNode_Opt*> 
-            (node->inner.flagDimensionAndOffset & ~0x07) + 1;
-        }
-        else
-        {
-          nearNode = reinterpret_cast<KDTreeNode_Opt*> 
-            (node->inner.flagDimensionAndOffset & ~0x07) + 1;
-          farNode = reinterpret_cast<KDTreeNode_Opt*> 
-            (node->inner.flagDimensionAndOffset & ~0x07);
-        }
+        KDTreeNode *nearNode, *farNode, *leftNode;
+        leftNode = KDTreeNode_Op::GetLeft (node);
+
+        nearNode = leftNode + nodeOffset[dim][0];
+        farNode = leftNode + nodeOffset[dim][1];        
 
         if (thit <= tmin)
         {
@@ -244,7 +184,7 @@ namespace lighter
 
   static const uint mod5[] = {0,1,2,0,1};
 
-  bool IntersectPrimitiveRay (const KDTreePrimitive_Opt &primitive, const Ray &ray,
+  bool IntersectPrimitiveRay (const KDTreePrimitive &primitive, const Ray &ray,
     HitPoint &hit)
   {
     {
@@ -291,20 +231,19 @@ namespace lighter
     return true;
   }
 
-  bool Raytracer::IntersectPrimitives (const KDTreeNode_Opt* node, const Ray &ray, 
+  bool Raytracer::IntersectPrimitives (const KDTreeNode* node, const Ray &ray, 
     HitPoint &hit, bool earlyExit /* = false */) const
   {
 
     size_t nIdx, nMax;
-    nMax = node->leaf.numberOfPrimitives;
+    nMax = KDTreeNode_Op::GetPrimitiveListSize (node);;
     bool haveHit = false;
     bool haveAnyHit = false;
 
     HitPoint bestHit, thisHit;
     bestHit.distance = FLT_MAX*0.95f;
 
-    KDTreePrimitive_Opt* primList = reinterpret_cast<KDTreePrimitive_Opt*> 
-      (node->leaf.flagAndOffset & ~0x07);
+    KDTreePrimitive* primList = KDTreeNode_Op::GetPrimitiveList (node);
 
     for (nIdx = 0; nIdx < nMax; nIdx++)
     {
