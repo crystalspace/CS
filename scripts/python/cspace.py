@@ -9085,6 +9085,8 @@ class csSimpleRenderMesh(_object):
         this = _cspace.new_csSimpleRenderMesh(*args)
         try: self.this.append(this)
         except: self.this = this
+    def SetWithGemeshFactory(*args): return _cspace.csSimpleRenderMesh_SetWithGemeshFactory(*args)
+    def SetWithBox(*args): return _cspace.csSimpleRenderMesh_SetWithBox(*args)
     __swig_destroy__ = _cspace.delete_csSimpleRenderMesh
     __del__ = lambda self : None;
 csSimpleRenderMesh_swigregister = _cspace.csSimpleRenderMesh_swigregister
@@ -11436,6 +11438,30 @@ CS_QUERY_REGISTRY_TAG = _cspace.CS_QUERY_REGISTRY_TAG
 CS_LOAD_PLUGIN_ALWAYS = _cspace.CS_LOAD_PLUGIN_ALWAYS
 CS_FX_SETALPHA = _cspace.CS_FX_SETALPHA
 CS_FX_SETALPHA_INT = _cspace.CS_FX_SETALPHA_INT
+class csPrimitives(_object):
+    __swig_setmethods__ = {}
+    __setattr__ = lambda self, name, value: _swig_setattr(self, csPrimitives, name, value)
+    __swig_getmethods__ = {}
+    __getattr__ = lambda self, name: _swig_getattr(self, csPrimitives, name)
+    __repr__ = _swig_repr
+    __swig_getmethods__["GenerateBox"] = lambda x: _cspace.csPrimitives_GenerateBox
+    if _newclass:GenerateBox = staticmethod(_cspace.csPrimitives_GenerateBox)
+    __swig_getmethods__["GenerateQuad"] = lambda x: _cspace.csPrimitives_GenerateQuad
+    if _newclass:GenerateQuad = staticmethod(_cspace.csPrimitives_GenerateQuad)
+    __swig_getmethods__["GenerateSphere"] = lambda x: _cspace.csPrimitives_GenerateSphere
+    if _newclass:GenerateSphere = staticmethod(_cspace.csPrimitives_GenerateSphere)
+    def __init__(self, *args): 
+        this = _cspace.new_csPrimitives(*args)
+        try: self.this.append(this)
+        except: self.this = this
+    __swig_destroy__ = _cspace.delete_csPrimitives
+    __del__ = lambda self : None;
+csPrimitives_swigregister = _cspace.csPrimitives_swigregister
+csPrimitives_swigregister(csPrimitives)
+csPrimitives_GenerateBox = _cspace.csPrimitives_GenerateBox
+csPrimitives_GenerateQuad = _cspace.csPrimitives_GenerateQuad
+csPrimitives_GenerateSphere = _cspace.csPrimitives_GenerateSphere
+
 CS_QUERY_REGISTRY = _cspace.CS_QUERY_REGISTRY
 CS_QUERY_REGISTRY_TAG_INTERFACE = _cspace.CS_QUERY_REGISTRY_TAG_INTERFACE
 SCF_QUERY_INTERFACE = _cspace.SCF_QUERY_INTERFACE

@@ -13659,6 +13659,8 @@ sub new {
     bless $self, $pkg if defined($self);
 }
 
+*SetWithGemeshFactory = *cspacec::csSimpleRenderMesh_SetWithGemeshFactory;
+*SetWithBox = *cspacec::csSimpleRenderMesh_SetWithBox;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -17235,6 +17237,46 @@ sub DESTROY {
 *Height = *cspacec::csSimplePixmap_Height;
 *Advance = *cspacec::csSimplePixmap_Advance;
 *GetTextureHandle = *cspacec::csSimplePixmap_GetTextureHandle;
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::csPrimitives ##############
+
+package cspace::csPrimitives;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace );
+%OWNER = ();
+%ITERATORS = ();
+*GenerateBox = *cspacec::csPrimitives_GenerateBox;
+*GenerateQuad = *cspacec::csPrimitives_GenerateQuad;
+*GenerateSphere = *cspacec::csPrimitives_GenerateSphere;
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_csPrimitives(@_);
+    bless $self, $pkg if defined($self);
+}
+
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_csPrimitives($self);
+        delete $OWNER{$self};
+    }
+}
+
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
