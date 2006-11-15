@@ -18,6 +18,8 @@ chronological order.
         - Erroroman made typo fix - SetWithGemeshFactory is renamed to
           SetWithGenmeshFactory. Also removed SetWithBox (
           SetWithGenmeshFactory::GenrateBox can be used for that case).
+	- caedes added a check on csODECollider::CreateMeshGeometry, so it
+	  doesnt crash if there is no collision polygon mesh on the object.
 13-Nov-2006
 	- Erroroman added bindings SetWithGemeshFactory and SetWithBox to 
 	  csSimpleRenderMesh in cspace.i. That makes easy to create simple
