@@ -9,6 +9,7 @@ chronological order.
 15-Nov-2006
 	- res changed csVector3::DominantAxis() to return an (here sufficient)
 	  int.
+	- res fixed some deprecation warnings in walktest.
 13-Nov-2006
 	- Erroroman added bindings SetWithGemeshFactory and SetWithBox to 
 	  csSimpleRenderMesh in cspace.i. That makes easy to create simple
