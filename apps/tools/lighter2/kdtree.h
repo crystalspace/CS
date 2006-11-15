@@ -21,6 +21,11 @@
 
 #include "radobject.h"
 
+// For debugging:
+//#define KDTREE_ASSERT(x)    CS_ASSERT(x)
+// For a tad more speed:
+#define KDTREE_ASSERT(x)  (void)0
+
 namespace lighter
 {
   class RadPrimitive;
@@ -123,14 +128,17 @@ namespace lighter
 
     static CS_FORCEINLINE bool IsLeaf (const KDTreeNode* node)
     {
-      return (node->inner.flagDimensionAndOffset & 0x04) != 0;
+      return (node->inner.flagDimensionAndOffset & 0x04) == 0;
     }
 
     static CS_FORCEINLINE void SetPrimitiveList (KDTreeNode* node, 
       KDTreePrimitive* primList)
     {
+      KDTREE_ASSERT (IsLeaf (node));
+      const uintptr_t primListUI = reinterpret_cast<uintptr_t> (primList);
+      KDTREE_ASSERT ((primListUI & 0x07) == 0);
       node->leaf.flagAndOffset = (node->leaf.flagAndOffset & 0x07) |
-        (reinterpret_cast<uintptr_t> (primList) & ~0x07);
+        primListUI;
     }
 
     static CS_FORCEINLINE KDTreePrimitive* GetPrimitiveList 
@@ -143,6 +151,7 @@ namespace lighter
     static CS_FORCEINLINE void SetPrimitiveListSize (KDTreeNode* node, 
       size_t size)
     {
+      KDTREE_ASSERT (IsLeaf (node));
       node->leaf.numberOfPrimitives = size;
     }
 
@@ -151,22 +160,25 @@ namespace lighter
       return node->leaf.numberOfPrimitives;
     }
 
-    static CS_FORCEINLINE void SetDimension (KDTreeNode* node, size_t dim)
+    static CS_FORCEINLINE void SetDimension (KDTreeNode* node, uint dim)
     {
+      KDTREE_ASSERT (!IsLeaf (node));
       node->inner.flagDimensionAndOffset =
         (node->inner.flagDimensionAndOffset & ~0x03) | dim;
     }
 
-    static CS_FORCEINLINE size_t GetDimension (const KDTreeNode* node)
+    static CS_FORCEINLINE uint GetDimension (const KDTreeNode* node)
     {
       return node->inner.flagDimensionAndOffset & 0x03;
     }
 
     static CS_FORCEINLINE void SetLeft (KDTreeNode* node, KDTreeNode* left)
     {
+      KDTREE_ASSERT (!IsLeaf (node));
+      const uintptr_t leftUI = reinterpret_cast<uintptr_t> (left);
+      KDTREE_ASSERT ((leftUI & 0x07) == 0);
       node->inner.flagDimensionAndOffset =
-        (node->inner.flagDimensionAndOffset & 0x07) | 
-        (reinterpret_cast<uintptr_t> (left) & ~0x07);
+        (node->inner.flagDimensionAndOffset & 0x07) | leftUI;
     }
 
     static CS_FORCEINLINE KDTreeNode* GetLeft (const KDTreeNode* node)
@@ -177,6 +189,7 @@ namespace lighter
 
     static CS_FORCEINLINE void SetLocation (KDTreeNode* node, float loc)
     {
+      KDTREE_ASSERT (!IsLeaf (node));
       node->inner.splitLocation = loc;
     }
 
@@ -420,6 +433,8 @@ namespace lighter
   };
 
 }
+
+#undef KDTREE_ASSERT
 
 #endif
 

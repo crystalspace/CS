@@ -129,10 +129,10 @@ namespace lighter
     float bestPosition = -1;
 
     //Best axis and side for planar
-    size_t bestAxis = -1, bestSide = -1;
+    uint bestAxis = ~0, bestSide = ~0;
     size_t bestNLeft, bestNRight, bestNPlanar;
 
-    for (size_t axis = 0; axis < 3; ++axis)
+    for (uint axis = 0; axis < 3; ++axis)
     {
       // Don't try to split if it is too small
       if (aabb.GetSize ()[axis] < (1e-9 * NODE_SIZE_EPSILON))
@@ -358,7 +358,7 @@ namespace lighter
     }
 
     //Prune invalid primitives
-    for (size_t i = 0; i < 2; ++i)
+    for (int i = 0; i < 2; ++i)
     {
       EndPoint* ep = newEPList[i].head[0];
 
@@ -404,7 +404,7 @@ namespace lighter
       }
 
       //Do the accual resort/cleanup
-      for (size_t axis = 0; axis < 3; ++axis)
+      for (uint axis = 0; axis < 3; ++axis)
       {
         if (needCleanup)
         {
@@ -544,7 +544,7 @@ namespace lighter
             const csVector3& C = vdata.vertexArray[ia[2]].position;
 
             // Find max normal direction
-            size_t k = N.DominantAxis ();
+            int k = N.DominantAxis ();
 
             optPrim.normal_K = k;
 
