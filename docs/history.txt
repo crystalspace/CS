@@ -15,6 +15,9 @@ chronological order.
 	  fixed some VC warnings.
 	- res changed configure to let debug info splitting default to "no" 
 	  in 'profile' mode. Addresses trac #186.
+        - Erroroman made typo fix - SetWithGemeshFactory is renamed to
+          SetWithGenmeshFactory. Also removed SetWithBox (
+          SetWithGenmeshFactory::GenrateBox can be used for that case).
 13-Nov-2006
 	- Erroroman added bindings SetWithGemeshFactory and SetWithBox to 
 	  csSimpleRenderMesh in cspace.i. That makes easy to create simple

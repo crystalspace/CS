@@ -1614,29 +1614,13 @@ uint _CS_FX_SETALPHA_INT (uint);
 %include "cstool/primitives.h"
 %extend csSimpleRenderMesh
 {
-  void SetWithGemeshFactory(iGeneralFactoryState *factory) 
+  void SetWithGenmeshFactory(iGeneralFactoryState *factory) 
   {
     self->vertices = factory->GetVertices(); 
     self->vertexCount = factory->GetVertexCount(); 
     self->indices = (uint *)factory->GetTriangles();
     self->indexCount = factory->GetTriangleCount()*3; 
     self->texcoords = factory->GetTexels();
-  }
-  void SetWithBox(csBox3 & box) 
-  {
-    csDirtyAccessArray<csVector3> mesh_vertices;
-    csDirtyAccessArray<csVector2> mesh_texels;
-    csDirtyAccessArray<csVector3> mesh_normals;
-    csDirtyAccessArray<csTriangle> mesh_triangles;
-
-    csPrimitives::GenerateBox (box, mesh_vertices, mesh_texels,
-        mesh_normals, mesh_triangles);
-
-    self->vertices = mesh_vertices.GetArray(); 
-    self->vertexCount = mesh_vertices.Length(); 
-    self->indices = (uint *)mesh_triangles.GetArray();
-    self->indexCount = mesh_triangles.Length()*3; 
-    self->texcoords = mesh_texels.GetArray();
   }
 }
 
