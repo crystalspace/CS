@@ -1895,6 +1895,8 @@ class csBox3(_object):
     def Set(*args): return _cspace.csBox3_Set(*args)
     def SetMin(*args): return _cspace.csBox3_SetMin(*args)
     def SetMax(*args): return _cspace.csBox3_SetMax(*args)
+    def GetMin(*args): return _cspace.csBox3_GetMin(*args)
+    def GetMax(*args): return _cspace.csBox3_GetMax(*args)
     def Description(*args): return _cspace.csBox3_Description(*args)
     def Split(*args): return _cspace.csBox3_Split(*args)
     def TestSplit(*args): return _cspace.csBox3_TestSplit(*args)

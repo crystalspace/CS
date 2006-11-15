@@ -2978,6 +2978,8 @@ sub new {
 *Set = *cspacec::csBox3_Set;
 *SetMin = *cspacec::csBox3_SetMin;
 *SetMax = *cspacec::csBox3_SetMax;
+*GetMin = *cspacec::csBox3_GetMin;
+*GetMax = *cspacec::csBox3_GetMax;
 *Description = *cspacec::csBox3_Description;
 *Split = *cspacec::csBox3_Split;
 *TestSplit = *cspacec::csBox3_TestSplit;
