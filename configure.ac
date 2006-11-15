@@ -851,6 +851,41 @@ CS_CHECK_OPTIMIZE_FLAGS
 
 
 #------------------------------------------------------------------------------
+# Determine build mode; either "optimize", "debug", or "profile".
+#------------------------------------------------------------------------------
+AC_ARG_ENABLE([optimize], [AC_HELP_STRING([--enable-optimize],
+    [build with optimizations enabled (default YES);
+	same as --enable-mode=optimize])],
+    [test "$enableval" = "yes" && cs_build_mode=optimize])
+
+AC_ARG_ENABLE([debug], [AC_HELP_STRING([--enable-debug],
+    [build with debugging information (default NO);
+	same as --enable-mode=debug])],
+    [test "$enableval" = "yes" && cs_build_mode=debug])
+
+AC_ARG_ENABLE([profile], [AC_HELP_STRING([--enable-profile],
+    [build with profiling information (default NO);
+	same as --enable-mode=profile])],
+    [test "$enableval" = "yes" && cs_build_mode=profile])
+
+AC_ARG_ENABLE([mode], [AC_HELP_STRING([--enable-mode=mode],
+    [set build mode; recognized modes are `optimize', `debug', `profile'
+	(default OPTIMIZE)])],
+    [case $enableval in
+	optimize|debug|profile) cs_build_mode=$enableval ;;
+	*) CS_MSG_ERROR([m4_text_wrap(
+	    [unrecognized mode --enable-mode=$enableval;
+	    use `optimize', `debug', or `profile'], [    ], [[]], [60])]) ;;
+    esac])
+
+AC_MSG_CHECKING([build mode])
+AS_VAR_SET_IF([cs_build_mode], [], [cs_build_mode=optimize])
+AC_MSG_RESULT([$cs_build_mode])
+CS_EMIT_BUILD_PROPERTY([MODE], [$cs_build_mode])
+
+
+
+#------------------------------------------------------------------------------
 # Check for compiler debug flags.
 #------------------------------------------------------------------------------
 CS_CHECK_BINUTILS_2_17
@@ -859,11 +894,14 @@ AC_MSG_CHECKING([whether to split debug information])
 AC_ARG_ENABLE([separate-debug-info], 
     [AC_HELP_STRING([--enable-separate-debug-info],
         [split debug information into separate files. (default YES if 
-        binutils >= 2.17, otherwise default NO)])])
+        binutils >= 2.17 and build mode not 'profile', 
+	otherwise default NO)])])
 AS_IF([test -z "$enable_separate_debug_info"], 
-    AS_IF([test -z `uname | grep -i CYGWIN`],
-        [enable_separate_debug_info=$cs_cv_binutils_2_17],
-        [enable_separate_debug_info=$cs_cv_binutils_true_2_17]))
+    [AS_IF([test "$cs_build_mode$" = "profile"],
+	[enable_separate_debug_info=no],
+	[AS_IF([test -z `uname | grep -i CYGWIN`],
+	    [enable_separate_debug_info=$cs_cv_binutils_2_17],
+	    [enable_separate_debug_info=$cs_cv_binutils_true_2_17])])])
 AC_MSG_RESULT([$enable_separate_debug_info])
 
 CS_EMIT_BUILD_PROPERTY([LINK.DEBUG.INFO.SEPARATE],
@@ -2286,41 +2324,6 @@ AS_IF([test $enable_meta_info_embedding = yes],
     AC_CHECK_HEADERS([elf.h], [CS_HEADER_PROPERTY([CS_HAVE_ELF_H])])
     AS_IF([test "$cs_cv_libbfd_ok" = yes],
 	[CS_HEADER_PROPERTY([CS_HAVE_LIBBFD])])])
-
-
-
-#------------------------------------------------------------------------------
-# Determine build mode; either "optimize", "debug", or "profile".
-#------------------------------------------------------------------------------
-AC_ARG_ENABLE([optimize], [AC_HELP_STRING([--enable-optimize],
-    [build with optimizations enabled (default YES);
-	same as --enable-mode=optimize])],
-    [test "$enableval" = "yes" && cs_build_mode=optimize])
-
-AC_ARG_ENABLE([debug], [AC_HELP_STRING([--enable-debug],
-    [build with debugging information (default NO);
-	same as --enable-mode=debug])],
-    [test "$enableval" = "yes" && cs_build_mode=debug])
-
-AC_ARG_ENABLE([profile], [AC_HELP_STRING([--enable-profile],
-    [build with profiling information (default NO);
-	same as --enable-mode=profile])],
-    [test "$enableval" = "yes" && cs_build_mode=profile])
-
-AC_ARG_ENABLE([mode], [AC_HELP_STRING([--enable-mode=mode],
-    [set build mode; recognized modes are `optimize', `debug', `profile'
-	(default OPTIMIZE)])],
-    [case $enableval in
-	optimize|debug|profile) cs_build_mode=$enableval ;;
-	*) CS_MSG_ERROR([m4_text_wrap(
-	    [unrecognized mode --enable-mode=$enableval;
-	    use `optimize', `debug', or `profile'], [    ], [[]], [60])]) ;;
-    esac])
-
-AC_MSG_CHECKING([build mode])
-AS_VAR_SET_IF([cs_build_mode], [], [cs_build_mode=optimize])
-AC_MSG_RESULT([$cs_build_mode])
-CS_EMIT_BUILD_PROPERTY([MODE], [$cs_build_mode])
 
 
 

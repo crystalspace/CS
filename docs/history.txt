@@ -13,6 +13,8 @@ chronological order.
 	- res fixed a bug in the lighter2 kdtree where a flag had opposite
 	  meanings in different code. Also added some debugging facilities and
 	  fixed some VC warnings.
+	- res changed configure to let debug info splitting default to "no" 
+	  in 'profile' mode. Addresses trac #186.
 13-Nov-2006
 	- Erroroman added bindings SetWithGemeshFactory and SetWithBox to 
 	  csSimpleRenderMesh in cspace.i. That makes easy to create simple
@@ -469,7 +471,7 @@ chronological order.
 	  (which would likely not be able to cope with CS' use of advanced
 	  C++ features anyway): 'typename_qualifier', fake 'explicit' 
 	  keyword, CS_SPECIALIZE_TEMPLATE instead of template<>, 
-	  CSARRAY_INHIBIT_TYPED_KEYS. Adresses trac #16.
+	  CSARRAY_INHIBIT_TYPED_KEYS. Addresses trac #16.
 	- Jorrit added a workaround for GetTuple() in windows so that
 	  it at least compiles. MacOS/X is still broken and the GetTuple()
 	  implementation in Windows just returns 0.
