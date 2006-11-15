@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+15-Nov-2006
+	- res changed csVector3::DominantAxis() to return an (here sufficient)
+	  int.
 13-Nov-2006
 	- Erroroman added bindings SetWithGemeshFactory and SetWithBox to 
 	  csSimpleRenderMesh in cspace.i. That makes easy to create simple
