@@ -6,6 +6,8 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+16-Nov-2006
+	- Jorrit merged r25883 into 1.0 (sound fix).
 12-Nov-2006
         - res merged r25856 into 1.0 (character shader fix).
         - res merged r25861, r25863 into 1.0 (docs tweaks).
