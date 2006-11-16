@@ -9087,8 +9087,7 @@ class csSimpleRenderMesh(_object):
         this = _cspace.new_csSimpleRenderMesh(*args)
         try: self.this.append(this)
         except: self.this = this
-    def SetWithGemeshFactory(*args): return _cspace.csSimpleRenderMesh_SetWithGemeshFactory(*args)
-    def SetWithBox(*args): return _cspace.csSimpleRenderMesh_SetWithBox(*args)
+    def SetWithGenmeshFactory(*args): return _cspace.csSimpleRenderMesh_SetWithGenmeshFactory(*args)
     __swig_destroy__ = _cspace.delete_csSimpleRenderMesh
     __del__ = lambda self : None;
 csSimpleRenderMesh_swigregister = _cspace.csSimpleRenderMesh_swigregister

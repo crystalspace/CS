@@ -13661,8 +13661,7 @@ sub new {
     bless $self, $pkg if defined($self);
 }
 
-*SetWithGemeshFactory = *cspacec::csSimpleRenderMesh_SetWithGemeshFactory;
-*SetWithBox = *cspacec::csSimpleRenderMesh_SetWithBox;
+*SetWithGenmeshFactory = *cspacec::csSimpleRenderMesh_SetWithGenmeshFactory;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
