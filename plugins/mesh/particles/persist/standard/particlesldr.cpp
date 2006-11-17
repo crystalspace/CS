@@ -566,7 +566,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ParticlesLoader)
         {
         case XMLTOKEN_COLOR:
           {
-            csColor c;
+            csColor4 c;
             float t (0.0f);
 
             if (!synldr->ParseColor (child, c))
