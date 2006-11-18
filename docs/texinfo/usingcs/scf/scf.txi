@@ -713,11 +713,7 @@ interfaces:
 @emph{File}: @file{dog.cpp}
 
 @example
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-
-#include "cssysdef.h"
+#include "crystalspace.h"
 #include "idog.h"
 #include "iname.h"
 
@@ -727,7 +723,6 @@ private:
   char* Name;
 
 public:
-  SCF_DECLARE_IBASE;
   csDog(iBase* Parent);
   virtual ~csDog();
 
@@ -746,12 +741,12 @@ SCF_IMPLEMENT_FACTORY(csDog)
 
 csDog::csDog(iBase* Parent) : scfImplementationType (this, Parent)
 @{
-  Name = strdup("<noname>");
+  Name = csStrNew("<noname>");
 @}
 
 csDog::~csDog()
 @{
-  free(Name);
+  delete Name;
 @}
 
 void csDog::Walk()
@@ -774,8 +769,8 @@ char const* csDog::GetName()
 void csDog::SetName(char const* NewName)
 @{
   if (Name != 0)
-    free(Name);
-  Name = strdup(NewName != 0 ? NewName : "");
+    delete Name;
+  Name = csStrNew(NewName != 0 ? NewName : "");
 @}
 
 @end example

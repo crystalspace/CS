@@ -6,6 +6,8 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+18-Nov-2006
+	- Marten fixed the SCF example in manual section 4.3.1.10.
 17-Nov-2006
 	- Marten fixed a bug in particles loader where the lincolor wouldn't
 	  load alpha. Fixes trac #190.
