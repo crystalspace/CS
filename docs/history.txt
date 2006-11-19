@@ -8,6 +8,7 @@ chronological order.
 
 19-Nov-2006
 	- Marten made a number of optimizations to the lighter2 ray tracer.
+	- caedes added iJoystickDriver to cspace.i.
 18-Nov-2006
 	- Marten fixed the SCF example in manual section 4.3.1.10.
 17-Nov-2006
