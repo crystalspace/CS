@@ -176,24 +176,25 @@ namespace lighter
   
     /*
     size_t numRays = 2000000;
-        RandomRayListGenerator<PseudoRandomRaygenerator> rayGen;
-        csArray<Ray> rays = rayGen(numRays, csVector3 (0));
-        Raytracer tracer (scene->GetSectors ().GetIterator ().Next ()->kdTree);
-        for (size_t i = 0; i < numRays; ++i)
-        {
-          Ray& r = rays[i];
-          HitPoint h;
-    
-          tracer.TraceAnyHit (r, h);
-    
-          if ((i % 1000) == 0)
-          {
-            globalTUI.Redraw (TUI::TUI_DRAW_RAYCORE);
-          }
-        }
-    
-        int a = 0;
-        return true;*/
+    RandomRayListGenerator<PseudoRandomRaygenerator> rayGen;
+    csArray<Ray> rays = rayGen(numRays, csVector3 (0));
+    Raytracer tracer (scene->GetSectors ().GetIterator ().Next ()->kdTree);
+    for (size_t i = 0; i < numRays; ++i)
+    {
+      Ray& r = rays[i];
+      HitPoint h;
+
+      tracer.TraceClosestHit (r, h);
+
+      if ((i % 1000) == 0)
+      {
+        globalTUI.Redraw (TUI::TUI_DRAW_RAYCORE);
+      }
+    }
+
+    int a = 0;
+    return true;
+*/
     
     
 

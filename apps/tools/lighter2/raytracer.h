@@ -26,6 +26,7 @@ namespace lighter
 {
   class KDTree;
   union KDTreeNode;
+  struct KDTreePrimitive;
   class RadPrimitive;
 
   /**
@@ -42,6 +43,9 @@ namespace lighter
 
     // Min/max parameter
     float minLength, maxLength;
+
+    // Unique id
+    size_t rayID;
 
     Ray () 
       : origin (0,0,0), direction (1,0,0), minLength (0), maxLength (FLT_MAX*0.9f)
@@ -110,8 +114,8 @@ namespace lighter
 
       return true;
     }
-
   };
+
 
   // Hitpoint returned by the raytracer
   struct HitPoint
@@ -135,43 +139,97 @@ namespace lighter
     }
   };
 
+  class MailboxHash
+  {
+  public:
+    MailboxHash ();
+    ~MailboxHash ();
+
+    CS_FORCEINLINE size_t GetRayID ()
+    {
+      return rayID++;
+    }
+
+    CS_FORCEINLINE bool PutPrimitiveRay (const RadPrimitive* prim, size_t ray)
+    {
+      size_t hashPos = (reinterpret_cast<uintptr_t> (prim) >> 3) & (HASH_SIZE-1);
+      
+      HashEntry& e = hash[hashPos];
+      
+      //Check if we already are in the hash
+      if (e.primPointer == prim &&
+        e.rayID == ray)
+        return true;
+
+      //Insert new entry
+      e.primPointer = prim;
+      e.rayID = ray;
+      return false;
+    }
+
+  private:
+    size_t rayID;
+
+    enum
+    {
+      HASH_SIZE = 64
+    };
+
+    struct HashEntry
+    {
+      const RadPrimitive* primPointer;
+      size_t rayID;
+    };
+    HashEntry* hash;
+  };
+
+
   class Raytracer
   {
   public:
-    Raytracer (KDTree *tree)
-      : tree (tree)
-    {
-      //Setup a stack for traversal
-      traceStack.SetCapacity (64);
-    }
+    Raytracer (KDTree *tree);
+
+    ~Raytracer ();
 
     /**
      * Raytrace until there is any hit.
      * This might not be the closest hit so it is faster but not suitable
      * for all kind of calculations.
      */
-    bool TraceAnyHit (const Ray &ray, HitPoint &hit) const;
+    bool TraceAnyHit (const Ray &ray, HitPoint &hit);
 
     /**
      * Raytrace for closest hit. 
      */
-    bool TraceClosestHit (const Ray &ray, HitPoint &hit) const;    
+    bool TraceClosestHit (const Ray &ray, HitPoint &hit);    
 
   protected:
     /// Traverse all primitives in a given node and do intersection against them
+    template<bool exitFirstHit>
     bool IntersectPrimitives (const KDTreeNode* node, const Ray &ray, 
-      HitPoint &hit, bool earlyExit = false) const;
+      HitPoint &hit);
 
     KDTree *tree;
 
+
+    enum
+    {
+      MAX_STACK_DEPTH = 64
+    };
 
     // Helperstruct for kd traversal
     struct kdTraversalS
     {
       KDTreeNode *node;
+#if (CS_PROCESSOR_SIZE == 32)
+      void* pad;
+#endif
       float tnear, tfar;
     };
-    mutable csArray<kdTraversalS> traceStack;
+    size_t traversalStackPtr;
+    kdTraversalS* traversalStack;
+
+    MailboxHash mailboxes;
   };
 
   /// Helper to profile raytracing
@@ -205,7 +263,7 @@ namespace lighter
   public:
     // Vistest rayhelpers
 
-    static inline float Vistest5 (const Raytracer& rt, const csVector3& viscenter,
+    static inline float Vistest5 (Raytracer& rt, const csVector3& viscenter,
       const csVector3& visu, const csVector3& visv, const csVector3& endp,
       const RadPrimitive& prim)
     {
