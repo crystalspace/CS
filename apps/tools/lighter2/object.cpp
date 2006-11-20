@@ -24,7 +24,7 @@
 #include "lighter.h"
 #include "lightmap.h"
 #include "lightmapuv.h"
-#include "radobject.h"
+#include "object.h"
 #include "config.h"
 
 // Debugging: uncomment to disable border smoothing
@@ -33,18 +33,18 @@
 namespace lighter
 {
 
-  RadObjectFactory::RadObjectFactory ()
+  ObjectFactory::ObjectFactory ()
     : lightmapMaskArrayValid (false), factoryWrapper (0), 
       lightPerVertex (false)
   {
   }
 
-  bool RadObjectFactory::PrepareLightmapUV (LightmapUVLayouter* uvlayout)
+  bool ObjectFactory::PrepareLightmapUV (LightmapUVLayouter* uvlayout)
   {
     size_t oldSize = allPrimitives.GetSize();
     for (size_t i = 0; i < oldSize; i++)
     {
-      csArray<RadPrimitiveArray> newPrims;
+      csArray<PrimitiveArray> newPrims;
       LightmapUVLayoutFactory* lightmaplayout = 
         uvlayout->LayoutFactory (allPrimitives[i], vertexData, newPrims);
       if (!lightmaplayout) return false;
@@ -61,12 +61,12 @@ namespace lighter
     return true;
   }
 
-  RadObject* RadObjectFactory::CreateObject ()
+  Object* ObjectFactory::CreateObject ()
   {
-    return new RadObject (this);
+    return new Object (this);
   }
 
-  void RadObjectFactory::ParseFactory (iMeshFactoryWrapper *factory)
+  void ObjectFactory::ParseFactory (iMeshFactoryWrapper *factory)
   {
     this->factoryWrapper = factory;
     // Get the name
@@ -87,7 +87,7 @@ namespace lighter
     }
   }
 
-  void RadObjectFactory::SaveFactory (iDocumentNode *node)
+  void ObjectFactory::SaveFactory (iDocumentNode *node)
   {
     // Save out the factory to the node
     csRef<iSaverPlugin> saver = 
@@ -108,17 +108,17 @@ namespace lighter
 
   //-------------------------------------------------------------------------
 
-  RadObject::RadObject (RadObjectFactory* fact)
+  Object::Object (ObjectFactory* fact)
     : factory (fact), lightPerVertex (fact->lightPerVertex), litColors (0)
   {
   }
   
-  RadObject::~RadObject ()
+  Object::~Object ()
   {
     delete litColors;
   }
 
-  bool RadObject::Initialize ()
+  bool Object::Initialize ()
   {
     if (!factory || !meshWrapper) return false;
     const csReversibleTransform transform = meshWrapper->GetMovable ()->
@@ -132,17 +132,16 @@ namespace lighter
     unsigned int i = 0;
     for(size_t j = 0; j < factory->allPrimitives.GetSize (); ++j)
     {
-      RadPrimitiveArray& factPrims = factory->allPrimitives[j];
-      RadPrimitiveArray& allPrimitives =
+      PrimitiveArray& factPrims = factory->allPrimitives[j];
+      PrimitiveArray& allPrimitives =
         this->allPrimitives.GetExtend (j);
       for (i = 0; i < factPrims.GetSize(); i++)
       {
-        RadPrimitive newPrim (vertexData);
+        Primitive newPrim (vertexData);
         
-        RadPrimitive& prim = allPrimitives[allPrimitives.Push (newPrim)];
+        Primitive& prim = allPrimitives[allPrimitives.Push (newPrim)];
         prim.SetOriginalPrimitive (&factPrims[i]);
-        memcpy (prim.GetIndexArray (), factPrims[i].GetIndexArray (),
-          sizeof (size_t) * 3);
+        prim.SetTriangle (factPrims[i].GetTriangle ()); 
         prim.ComputePlane ();
       }
 
@@ -157,12 +156,10 @@ namespace lighter
 
       for (i = 0; i < allPrimitives.GetSize(); i++)
       {
-        RadPrimitive& prim = allPrimitives[i];
+        Primitive& prim = allPrimitives[i];
         prim.ComputeUVTransform ();
-        prim.SetRadObject (this);
-        prim.Prepare (
-          globalConfig.GetRadProperties ().uPatchResolution, 
-          globalConfig.GetRadProperties ().vPatchResolution);
+        prim.SetObject (this);
+        prim.Prepare ();
       }
     }
 
@@ -176,7 +173,7 @@ namespace lighter
     return true;
   }
 
-  void RadObject::RenormalizeLightmapUVs (const LightmapPtrDelArray& lightmaps)
+  void Object::RenormalizeLightmapUVs (const LightmapPtrDelArray& lightmaps)
   {
     if (lightPerVertex) return;
 
@@ -188,17 +185,17 @@ namespace lighter
       const Lightmap* lm = lightmaps[lightmapIDs[p]];
       const float factorX = 1.0f / lm->GetWidth ();
       const float factorY = 1.0f / lm->GetHeight ();
-      const RadPrimitiveArray& prims = allPrimitives[p];
+      const PrimitiveArray& prims = allPrimitives[p];
       csSet<size_t> indicesRemapped;
       // Iterate over lightmaps and renormalize UVs
       for (size_t j = 0; j < prims.GetSize (); ++j)
       {
         //TODO make sure no vertex is used in several lightmaps.. 
-        const RadPrimitive &prim = prims.Get (j);
-        const size_t* indexArray = prim.GetIndexArray ();
+        const Primitive &prim = prims.Get (j);
+        const Primitive::TriangleType& t = prim.GetTriangle ();
         for (size_t i = 0; i < 3; ++i)
         {
-          size_t index = indexArray[i];
+          size_t index = t[i];
           if (!indicesRemapped.Contains (index))
           {
             csVector2 &lmUV = vertexData.vertexArray[index].lightmapUV;
@@ -211,7 +208,7 @@ namespace lighter
     }
   }
 
-  void RadObject::StripLightmaps (csSet<csString>& lms)
+  void Object::StripLightmaps (csSet<csString>& lms)
   {
     iShaderVariableContext* svc = meshWrapper->GetSVContext();
     csShaderVariable* sv = svc->GetVariable (
@@ -226,7 +223,7 @@ namespace lighter
     }
   }
 
-  void RadObject::ParseMesh (iMeshWrapper *wrapper)
+  void Object::ParseMesh (iMeshWrapper *wrapper)
   {
     this->meshWrapper = wrapper;
     this->meshName = wrapper->QueryObject ()->GetName ();
@@ -265,7 +262,7 @@ namespace lighter
     }
   }
 
-  void RadObject::SaveMesh (Scene* /*scene*/, iDocumentNode* node)
+  void Object::SaveMesh (Scene* /*scene*/, iDocumentNode* node)
   {
     // Save out the object to the node
     csRef<iSaverPlugin> saver = 
@@ -309,7 +306,7 @@ namespace lighter
     }
   }
 
-  void RadObject::FixupLightmaps (csArray<LightmapPtrDelArray*>& lightmaps)
+  void Object::FixupLightmaps (csArray<LightmapPtrDelArray*>& lightmaps)
   {
     if (lightPerVertex) return;
 
@@ -328,10 +325,10 @@ namespace lighter
     for (size_t i = 0; i < allPrimitives.GetSize(); i++)
     {
       LightmapMask &mask = masks[lightmapIDs[i]];
-      RadPrimitiveArray::Iterator primIt = allPrimitives[i].GetIterator ();
+      PrimitiveArray::Iterator primIt = allPrimitives[i].GetIterator ();
       while (primIt.HasNext ())
       {
-        const RadPrimitive &prim = primIt.Next ();
+        const Primitive &prim = primIt.Next ();
         totalArea = (prim.GetuFormVector ()%prim.GetvFormVector ()).Norm ();
         float area2pixel = 1.0f / totalArea;
 

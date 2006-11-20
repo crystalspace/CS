@@ -16,6 +16,12 @@ chronological order.
 	- res sanitized key/value parsing in the syntax services.
 	- res changed the loader to use iSceneNodeArray.
 	- res added some initial support for per-vertex lighting to lighter2.
+	- Marten made first step of a refactor of lighter2 by:
+	    - Removing the Rad prefix on objects and primitives.
+	    - Removing "patches" as they are radiosity specific.
+	    - Changed Primitive to use a triangle instead of a size_t[3]
+	      array for indices.
+	    - Removed some dead code.
 19-Nov-2006
 	- Marten made a number of optimizations to the lighter2 ray tracer.
 	- caedes added iJoystickDriver to cspace.i.

@@ -23,7 +23,7 @@
 #include "lighter.h"
 #include "lightmapuv.h"
 #include "lightmapuv_simple.h"
-#include "radprimitive.h"
+#include "primitive.h"
 #include "raygenerator.h"
 #include "raytracer.h"
 #include "scene.h"
@@ -140,12 +140,12 @@ namespace lighter
     LightmapUVLayouter *uvLayout = new SimpleUVLayouter (scene->GetLightmaps());
 
     float factoryProgress = 100.0f / scene->GetFactories ().GetSize ();
-    RadObjectFactoryHash::GlobalIterator factIt = 
+    ObjectFactoryHash::GlobalIterator factIt = 
       scene->GetFactories ().GetIterator ();
     while (factIt.HasNext ())
     {
       globalStats.SetTaskProgress ("Lightmap layout", taskI * factoryProgress);
-      csRef<RadObjectFactory> fact = factIt.Next ();
+      csRef<ObjectFactory> fact = factIt.Next ();
       fact->PrepareLightmapUV (uvLayout);
       taskI++;
     }
@@ -215,7 +215,7 @@ namespace lighter
     
     globalStats.SetTotalProgress (40);
 
-    if (globalConfig.GetLighterProperties ().doRadiosity)
+    if (globalConfig.GetLighterProperties ().doiosity)
     {
 
     }
@@ -229,10 +229,10 @@ namespace lighter
     while (sectIt.HasNext ())
     {
       csRef<Sector> sect = sectIt.Next ();
-      RadObjectHash::GlobalIterator objIt = sect->allObjects.GetIterator ();
+      ObjectHash::GlobalIterator objIt = sect->allObjects.GetIterator ();
       while (objIt.HasNext ())
       {
-        csRef<RadObject> obj = objIt.Next ();
+        csRef<Object> obj = objIt.Next ();
         csArray<LightmapPtrDelArray*> allLightmaps (scene->GetAllLightmaps());
         obj->FixupLightmaps (allLightmaps);
       }

@@ -19,7 +19,7 @@
 #include "crystalspace.h"
 
 #include "kdtree.h"
-#include "radprimitive.h"
+#include "primitive.h"
 
 #include "csutil/alignedalloc.h"
 
@@ -34,7 +34,7 @@ namespace lighter
     CS::Memory::AlignedFree (this->nodeList);
   }
 
-  KDTree* KDTreeBuilder::BuildTree (RadObjectHash::GlobalIterator& objects)
+  KDTree* KDTreeBuilder::BuildTree (ObjectHash::GlobalIterator& objects)
   {
     // Collect all primitives into endpoints and boxes for building
     SetupEndpoints (objects);
@@ -52,22 +52,22 @@ namespace lighter
     return tree;
   }
 
-  bool KDTreeBuilder::SetupEndpoints (RadObjectHash::GlobalIterator& objects)
+  bool KDTreeBuilder::SetupEndpoints (ObjectHash::GlobalIterator& objects)
   {
     numPrimitives = 0;
     PrimBox *box, *next = boxAllocator.Alloc (), *first = next;
     while (objects.HasNext())
     {
-      csRef<RadObject> obj = objects.Next ();
+      csRef<Object> obj = objects.Next ();
 
-      csArray<RadPrimitiveArray>& allPrimitives = obj->GetPrimitives ();
+      csArray<PrimitiveArray>& allPrimitives = obj->GetPrimitives ();
       for (size_t i = 0; i < allPrimitives.GetSize (); ++i)
       {
         //For all submeshes...
-        RadPrimitiveArray& primArray = allPrimitives[i];
+        PrimitiveArray& primArray = allPrimitives[i];
         for (size_t j = 0; j < primArray.GetSize (); ++j)
         {
-          RadPrimitive& prim = primArray[j];
+          Primitive& prim = primArray[j];
           numPrimitives++;
 
           box = next;
@@ -528,7 +528,7 @@ namespace lighter
           // Setup all primitives
           for (size_t i = 0; i < node->primitives.GetSize (); ++i)
           {
-            RadPrimitive* prim = node->primitives[i];
+            Primitive* prim = node->primitives[i];
 
             KDTreePrimitive &optPrim = prims[i];
 
@@ -537,11 +537,11 @@ namespace lighter
 
             //Extract our info
             const csVector3& N = prim->GetPlane ().Normal ();
-            RadObjectVertexData &vdata = prim->GetVertexData ();
-            const size_t* ia = prim->GetIndexArray ();
-            const csVector3& A = vdata.vertexArray[ia[0]].position;
-            const csVector3& B = vdata.vertexArray[ia[1]].position;
-            const csVector3& C = vdata.vertexArray[ia[2]].position;
+            ObjectVertexData &vdata = prim->GetVertexData ();
+            const Primitive::TriangleType& t = prim->GetTriangle ();
+            const csVector3& A = vdata.vertexArray[t.a].position;
+            const csVector3& B = vdata.vertexArray[t.b].position;
+            const csVector3& C = vdata.vertexArray[t.c].position;
 
             // Find max normal direction
             int k = N.DominantAxis ();
@@ -744,13 +744,13 @@ namespace lighter
     }
   }
 
-  void KDTreeBuilder::PrimHelper::Init (const RadPrimitive* prim)
+  void KDTreeBuilder::PrimHelper::Init (const Primitive* prim)
   {
-    const RadObjectVertexData &vdata = prim->GetVertexData ();
-    const size_t* ia = prim->GetIndexArray ();
-    const csVector3& A = vdata.vertexArray[ia[0]].position;
-    const csVector3& B = vdata.vertexArray[ia[1]].position;
-    const csVector3& C = vdata.vertexArray[ia[2]].position;
+    const ObjectVertexData &vdata = prim->GetVertexData ();
+    const Primitive::TriangleType& t = prim->GetTriangle ();
+    const csVector3& A = vdata.vertexArray[t.a].position;
+    const csVector3& B = vdata.vertexArray[t.b].position;
+    const csVector3& C = vdata.vertexArray[t.c].position;
 
     vertices[0] = A;
     vertices[1] = B;
@@ -820,19 +820,19 @@ namespace lighter
 
   // -- Helper 
   bool KDTreeHelper::CollectPrimitives(const KDTree *tree, 
-    RadPrimitivePtrArray &primArray, const csBox3 &overlapAABB)
+    PrimitivePtrArray &primArray, const csBox3 &overlapAABB)
   {
     // Walk and get all primitives within overlapAABB
     if (!tree->boundingBox.TestIntersect (overlapAABB))
       return false; //No intersection at all
 
-    RadPrimitivePtrSet collectedPrimitives;
+    PrimitivePtrSet collectedPrimitives;
 
     CollectPrimitives (tree, tree->nodeList, tree->boundingBox, collectedPrimitives,
       overlapAABB);
 
     // Copy result to array
-    RadPrimitivePtrSet::GlobalIterator si (collectedPrimitives.GetIterator ());
+    PrimitivePtrSet::GlobalIterator si (collectedPrimitives.GetIterator ());
     while (si.HasNext ())
     {
       primArray.Push (si.Next ());
@@ -842,7 +842,7 @@ namespace lighter
   }
 
   void KDTreeHelper::CollectPrimitives(const KDTree* tree, 
-    const KDTreeNode *node, csBox3 currentBox, RadPrimitivePtrSet& outPrims, 
+    const KDTreeNode *node, csBox3 currentBox, PrimitivePtrSet& outPrims, 
     const csBox3 &overlapAABB)
   {
     if (KDTreeNode_Op::IsLeaf (node))

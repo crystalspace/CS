@@ -19,7 +19,7 @@
 #ifndef __SCENE_H__
 #define __SCENE_H__
 
-#include "radobject.h"
+#include "object.h"
 #include "kdtree.h"
 
 namespace lighter
@@ -62,7 +62,7 @@ namespace lighter
     void Initialize ();
 
     // All objects in sector
-    RadObjectHash allObjects;
+    ObjectHash allObjects;
 
     // All lightsources
     LightRefArray allLights;
@@ -95,10 +95,10 @@ namespace lighter
     bool ParseEngine ();
 
     // Data access
-    inline RadObjectFactoryHash& GetFactories () 
+    inline ObjectFactoryHash& GetFactories () 
     { return radFactories; }
 
-    inline const RadObjectFactoryHash& GetFactories () const
+    inline const ObjectFactoryHash& GetFactories () const
     { return radFactories; }
 
     inline SectorHash& GetSectors () { return sectors; }
@@ -115,8 +115,8 @@ namespace lighter
     csArray<LightmapPtrDelArray*> GetAllLightmaps ();
   protected:
     
-    // Rad factories
-    RadObjectFactoryHash radFactories;
+    //  factories
+    ObjectFactoryHash radFactories;
  
     // All sectors
     SectorHash sectors;
@@ -161,7 +161,7 @@ namespace lighter
     };
     MeshParseResult ParseMesh (Sector *sector, iMeshWrapper *mesh);
     MeshParseResult ParseMeshFactory (iMeshFactoryWrapper *factory, 
-      RadObjectFactory*& radFact);
+      ObjectFactory*& radFact);
 
   };
 }

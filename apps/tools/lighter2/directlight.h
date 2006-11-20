@@ -19,13 +19,13 @@
 #ifndef __DIRECTLIGHT_H__
 #define __DIRECTLIGHT_H__
 
-#include "radprimitive.h"
+#include "primitive.h"
 
 namespace lighter
 {
   class Sector;
   class Raytracer;
-  class RadPrimitive;
+  class Primitive;
   class Light;
   
   // Class to calculate direct lighting

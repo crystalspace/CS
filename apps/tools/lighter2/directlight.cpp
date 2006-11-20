@@ -31,7 +31,7 @@ namespace lighter
   class Data_Lightmap
   {
     Sector* sector;
-    RadPrimitive& prim;
+    Primitive& prim;
     csVector3 elementCenter;
     float area2pixel;
     int minU, minV, maxU, maxV;
@@ -77,7 +77,7 @@ namespace lighter
       };
     }
   public:
-    Data_Lightmap (Sector* sector, RadPrimitive& prim) : sector (sector), 
+    Data_Lightmap (Sector* sector, Primitive& prim) : sector (sector), 
       prim (prim), findex (0)
     {
       elementCenter = prim.GetMinCoord () 
@@ -89,12 +89,12 @@ namespace lighter
 
       prim.ComputeMinMaxUV (minU, maxU, minV, maxV);
 
-      normals[0] = 
-        prim.GetVertexData().vertexArray[prim.GetIndexArray()[0]].normal;
-      normals[1] = 
-        prim.GetVertexData().vertexArray[prim.GetIndexArray()[1]].normal;
-      normals[2] = 
-        prim.GetVertexData().vertexArray[prim.GetIndexArray()[2]].normal;
+      const Primitive::TriangleType& t = prim.GetTriangle ();
+      const ObjectVertexData& vertexData = prim.GetVertexData ();
+
+      normals[0] = vertexData.vertexArray[t.a].normal;
+      normals[1] = vertexData.vertexArray[t.b].normal;
+      normals[2] = vertexData.vertexArray[t.c].normal;
 
       next.u = minU-1;
       next.v = minV;
@@ -130,9 +130,9 @@ namespace lighter
 	for (size_t i = 0; i < 3; i++)
 	{
 	  const csVector3& v1 = 
-	    prim.GetVertexData().vertexArray[prim.GetIndexArray()[i]].position;
+	    prim.GetVertexData().vertexArray[prim.GetTriangle()[i]].position;
 	  const csVector3& v2 = 
-	    prim.GetVertexData().vertexArray[prim.GetIndexArray()[(i+1)%3]].position;
+	    prim.GetVertexData().vertexArray[prim.GetTriangle()[(i+1)%3]].position;
 	  csVector3 d = v2-v1;
 	  csVector3 dn (d); dn.Normalize();
 	  float f = (state.ec-v1) * dn;
@@ -187,15 +187,15 @@ namespace lighter
 
   class Data_PerVertex
   {
-    RadPrimitivePtrArray& prims;
-    RadObject::LitColorArray* litColors;
+    PrimitivePtrArray& prims;
+    Object::LitColorArray* litColors;
 
     struct State
     {
       size_t primIndex;
       int vertex;
       size_t vertIndex;
-      RadObjectVertexData::Vertex* v;
+      ObjectVertexData::Vertex* v;
     };
     State state, next;
     bool nextValid;
@@ -213,8 +213,8 @@ namespace lighter
           if (next.primIndex >= prims.GetSize()) return;
           next.vertex = 0;
         }
-        RadPrimitive* prim = prims[next.primIndex];
-        size_t v = prim->GetIndexArray()[next.vertex];
+        Primitive* prim = prims[next.primIndex];
+        size_t v = prim->GetTriangle()[next.vertex];
         if (!litVertices.Contains (v))
         {
           litVertices.AddNoTest (v);
@@ -225,7 +225,7 @@ namespace lighter
       }
     }
   public:
-    Data_PerVertex (RadPrimitivePtrArray& prims, RadObject* obj) : 
+    Data_PerVertex (PrimitivePtrArray& prims, Object* obj) : 
       prims (prims), litColors (obj->GetLitColors())
     {
       next.primIndex = 0;
@@ -280,8 +280,8 @@ namespace lighter
     }
   };
 
-  typedef csHash<RadPrimitivePtrArray,
-    csPtrKey<RadObject> > PrimitivesPerObjectHash;
+  typedef csHash<PrimitivePtrArray,
+    csPtrKey<Object> > PrimitivesPerObjectHash;
 
   template<class Attenuation>
   struct Shade
@@ -329,16 +329,6 @@ namespace lighter
 
 	// Store the reflected color
         data.ApplyLight (light, reflected);
-
-#if 0
-	// If we later do radiosity, collect the reflected energy
-	if (globalConfig.GetLighterProperties ().doRadiosity)
-	{
-	  uint patchIndex = (v-minV)/globalConfig.GetRadProperties ().vPatchResolution * prim.GetuPatches ()+(u-minU)/globalConfig.GetRadProperties ().uPatchResolution;
-	  RadPatch &patch = prim.GetPatches ()[patchIndex];
-	  patch.energy += reflected;
-	}
-#endif
       }
     }
 
@@ -352,8 +342,8 @@ namespace lighter
       PrimitivesPerObjectHash::GlobalIterator objIt = prims.GetIterator();
       while (objIt.HasNext ())
       {
-        csPtrKey<RadObject> obj;
-        RadPrimitivePtrArray& objPrims = objIt.Next (obj);
+        csPtrKey<Object> obj;
+        PrimitivePtrArray& objPrims = objIt.Next (obj);
         if (obj->lightPerVertex)
         {
           Data_PerVertex data (objPrims, obj);
@@ -395,7 +385,7 @@ namespace lighter
         globalConfig.GetDIProperties ().pointLightMultiplier;
 
       // Get all primitives
-      RadPrimitivePtrArray prims;
+      PrimitivePtrArray prims;
 
       if (!KDTreeHelper::CollectPrimitives (sector->kdTree, prims, radLight->boundingBox))
         continue;
@@ -403,13 +393,13 @@ namespace lighter
       PrimitivesPerObjectHash primitivesPerObject;
       for (unsigned i = 0; i < prims.GetSize (); i++)
       {
-        RadPrimitive& prim = *prims[i];
-        if (!primitivesPerObject.Contains (prim.GetRadObject()))
+        Primitive& prim = *prims[i];
+        if (!primitivesPerObject.Contains (prim.GetObject()))
         {
-          primitivesPerObject.Put (prim.GetRadObject(), RadPrimitivePtrArray ());
+          primitivesPerObject.Put (prim.GetObject(), PrimitivePtrArray ());
         }
-        RadPrimitivePtrArray* objPrims = 
-          primitivesPerObject.GetElementPointer (prim.GetRadObject());
+        PrimitivePtrArray* objPrims = 
+          primitivesPerObject.GetElementPointer (prim.GetObject());
         objPrims->Push (&prim);
       }
 

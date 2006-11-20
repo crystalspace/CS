@@ -19,7 +19,7 @@
 #ifndef __LIGHTMAPUV_SIMPLE_H__
 #define __LIGHTMAPUV_SIMPLE_H__
 
-#include "radprimitive.h"
+#include "primitive.h"
 #include "lightmapuv.h"
 
 namespace lighter
@@ -35,21 +35,21 @@ namespace lighter
     {}
 
     virtual LightmapUVLayoutFactory* LayoutFactory (
-      const RadPrimitiveArray& inPrims, RadObjectVertexData& vertexData,
-      csArray<RadPrimitiveArray>& outPrims);
+      const PrimitiveArray& inPrims, ObjectVertexData& vertexData,
+      csArray<PrimitiveArray>& outPrims);
   protected:
     friend class SimpleUVLayoutFactory;
 
     LightmapPtrDelArray& globalLightmaps;
 
     void DetermineNeighbouringPrims (
-      const RadPrimitiveArray& inPrims, RadObjectVertexData& vertexData,
-      csArray<RadPrimitiveArray>& outPrims);
+      const PrimitiveArray& inPrims, ObjectVertexData& vertexData,
+      csArray<PrimitiveArray>& outPrims);
 
     bool AllocLightmap (LightmapPtrDelArray& lightmaps, int u, int v, 
       csRect &lightmapArea, int &lightmapID);
 
-    bool ProjectPrimitives (RadPrimitiveArray& prims, 
+    bool ProjectPrimitives (PrimitiveArray& prims, 
       BoolDArray &usedVerts, float uscale, float vscale);
   };
 
@@ -59,8 +59,8 @@ namespace lighter
     SimpleUVLayoutFactory (SimpleUVLayouter* parent) : parent (parent)
     {}
 
-    virtual bool LayoutUVOnPrimitives (RadPrimitiveArray &prims, 
-      size_t groupNum, RadObjectVertexData& vertexData, uint& lmID);
+    virtual bool LayoutUVOnPrimitives (PrimitiveArray &prims, 
+      size_t groupNum, ObjectVertexData& vertexData, uint& lmID);
   protected:
     friend class SimpleUVLayouter;
     SimpleUVLayouter* parent;

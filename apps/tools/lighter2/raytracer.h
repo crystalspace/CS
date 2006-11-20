@@ -20,14 +20,14 @@
 #define __RAYTRACER_H__
 
 #include "statistics.h"
-#include "radprimitive.h"
+#include "primitive.h"
 
 namespace lighter
 {
   class KDTree;
   union KDTreeNode;
   struct KDTreePrimitive;
-  class RadPrimitive;
+  class Primitive;
 
   /**
    * A ray in space.
@@ -121,7 +121,7 @@ namespace lighter
   struct HitPoint
   {
     // The primitive we hit
-    RadPrimitive *primitive;
+    Primitive *primitive;
 
     // Distance along ray (t)
     float distance;
@@ -150,7 +150,7 @@ namespace lighter
       return rayID++;
     }
 
-    CS_FORCEINLINE bool PutPrimitiveRay (const RadPrimitive* prim, size_t ray)
+    CS_FORCEINLINE bool PutPrimitiveRay (const Primitive* prim, size_t ray)
     {
       size_t hashPos = (reinterpret_cast<uintptr_t> (prim) >> 3) & (HASH_SIZE-1);
       
@@ -177,7 +177,7 @@ namespace lighter
 
     struct HashEntry
     {
-      const RadPrimitive* primPointer;
+      const Primitive* primPointer;
       size_t rayID;
     };
     HashEntry* hash;
@@ -263,7 +263,7 @@ namespace lighter
   public:
     // Vistest rayhelpers
 
-    static inline float Vistest1 (const Raytracer& rt, const csVector3& viscenter,
+    static inline float Vistest1 (Raytracer& rt, const csVector3& viscenter,
       const csVector3& endp)
     {
       // Perform a 1 point vistest
@@ -283,7 +283,7 @@ namespace lighter
 
     static inline float Vistest5 (Raytracer& rt, const csVector3& viscenter,
       const csVector3& visu, const csVector3& visv, const csVector3& endp,
-      const RadPrimitive& prim)
+      const Primitive& prim)
     {
       // Perform a 5 point vistest
 

@@ -16,10 +16,10 @@
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __RADOBJECT_H__
-#define __RADOBJECT_H__
+#ifndef __OBJECT_H__
+#define __OBJECT_H__
 
-#include "radprimitive.h"
+#include "primitive.h"
 #include "lightmap.h"
 #include "csgeom/transfrm.h"
 
@@ -27,13 +27,13 @@ namespace lighter
 {
   class LightmapUVLayouter;
   class LightmapUVLayoutFactory;
-  class RadObject;
+  class Object;
   class Scene;
 
   /**
    * Hold per object vertex data
    */
-  struct RadObjectVertexData 
+  struct ObjectVertexData 
   {
     struct Vertex
     {
@@ -94,19 +94,19 @@ namespace lighter
   };
 
   /**
-   * Baseclass for RadObject factories.
+   * Baseclass for Object factories.
    * Needs to be subclassed to provide an interface to a specific mesh
    * object type to be able to import/export geometry data.
    */
-  class RadObjectFactory : public csRefCount
+  class ObjectFactory : public csRefCount
   {
   public:
-    RadObjectFactory ();
+    ObjectFactory ();
 
     virtual bool PrepareLightmapUV (LightmapUVLayouter* uvlayout);
 
     // Get a new object
-    virtual RadObject* CreateObject ();
+    virtual Object* CreateObject ();
 
     // Parse data
     virtual void ParseFactory (iMeshFactoryWrapper *factory);
@@ -122,10 +122,10 @@ namespace lighter
   protected:
 
     // All faces, untransformed
-    csArray<RadPrimitiveArray> allPrimitives;
+    csArray<PrimitiveArray> allPrimitives;
 
     // Vertex data for above faces
-    RadObjectVertexData vertexData;
+    ObjectVertexData vertexData;
 
     // Lightmap masks
     LightmapMaskArray lightmapMasks;
@@ -141,25 +141,25 @@ namespace lighter
     csPDelArray<LightmapUVLayoutFactory> lightmaplayouts;
     csArray<size_t> lightmaplayoutGroups;
 
-    friend class RadObject;
+    friend class Object;
   };
-  typedef csRefArray<RadObjectFactory> RadObjectFactoryRefArray;
-  typedef csHash<csRef<RadObjectFactory>, csString> RadObjectFactoryHash;
+  typedef csRefArray<ObjectFactory> ObjectFactoryRefArray;
+  typedef csHash<csRef<ObjectFactory>, csString> ObjectFactoryHash;
 
   /**
   * A single object in the computational scene.
   * Each object exists in a single spot in a single sector, but there
   * might be more instances created from a single factory in different places.
   */
-  class RadObject : public csRefCount
+  class Object : public csRefCount
   {
-    RadObject (const RadObject&); // Illegal
+    Object (const Object&); // Illegal
   public:
-    // Construct a new RadObject from a RadObjectFactory and transform
-    RadObject (RadObjectFactory* object);
-    ~RadObject ();
+    // Construct a new Object from a ObjectFactory and transform
+    Object (ObjectFactory* object);
+    ~Object ();
 
-    // Initialize the RadObject from factory and wrapper. Call only after
+    // Initialize the Object from factory and wrapper. Call only after
     // constructor and ParseMesh have been called
     virtual bool Initialize ();
 
@@ -178,16 +178,16 @@ namespace lighter
     // Fixup the lightmap borders
     virtual void FixupLightmaps (csArray<LightmapPtrDelArray*>& lightmaps);
 
-    const csArray<RadPrimitiveArray>& GetPrimitives () const
+    const csArray<PrimitiveArray>& GetPrimitives () const
     { return allPrimitives; }
 
-    csArray<RadPrimitiveArray>& GetPrimitives ()
+    csArray<PrimitiveArray>& GetPrimitives ()
     { return allPrimitives; }
     
-    const RadObjectVertexData& GetVertexData () const
+    const ObjectVertexData& GetVertexData () const
     { return vertexData; }
 
-    RadObjectVertexData& GetVertexData ()
+    ObjectVertexData& GetVertexData ()
     { return vertexData; }
 
     typedef csDirtyAccessArray<csColor> LitColorArray;
@@ -201,16 +201,16 @@ namespace lighter
     bool lightPerVertex;
   protected:
     // All faces, already transformed
-    csArray<RadPrimitiveArray> allPrimitives;
+    csArray<PrimitiveArray> allPrimitives;
     csArray<uint> lightmapIDs;
 
     // Vertex data for above, transformed
-    RadObjectVertexData vertexData;
+    ObjectVertexData vertexData;
     /// Lit colors (if object is lit per-vertex)
     LitColorArray* litColors;
 
     // Factory we where created from
-    RadObjectFactory* factory;
+    ObjectFactory* factory;
 
     // Reference to the mesh
     iMeshWrapper *meshWrapper;
@@ -219,10 +219,10 @@ namespace lighter
     // classes
     const char* saverPluginName;
 
-    friend class  RadObjectFactory;
+    friend class  ObjectFactory;
   };
-  typedef csRefArray<RadObject> RadObjectRefArray;
-  typedef csHash<csRef<RadObject>, csString> RadObjectHash;
+  typedef csRefArray<Object> ObjectRefArray;
+  typedef csHash<csRef<Object>, csString> ObjectHash;
 }
 
-#endif // __RADOBJECT_H__
+#endif // __OBJECT_H__

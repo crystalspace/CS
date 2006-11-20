@@ -19,7 +19,7 @@
 #ifndef __KDTREE_H__
 #define __KDTREE_H__
 
-#include "radobject.h"
+#include "object.h"
 
 // For debugging:
 //#define KDTREE_ASSERT(x)    CS_ASSERT(x)
@@ -28,7 +28,7 @@
 
 namespace lighter
 {
-  class RadPrimitive;
+  class Primitive;
 
   /**
    * Optimized KD-tree primitive
@@ -46,8 +46,8 @@ namespace lighter
     /// Edge A u, v and d components
     float edgeA_U, edgeA_V, edgeA_D;
 
-    /// The RadPrimitive we belong to
-    RadPrimitive *primPointer; 
+    /// The Primitive we belong to
+    Primitive *primPointer; 
 
     /// Edge B u, v and d components
     float edgeB_U, edgeB_V, edgeB_D;
@@ -206,7 +206,7 @@ namespace lighter
     /*
     Take an object iterator and build a kd-tree from that
     */
-    KDTree* BuildTree (RadObjectHash::GlobalIterator& objects);
+    KDTree* BuildTree (ObjectHash::GlobalIterator& objects);
 
 
   private:
@@ -318,7 +318,7 @@ namespace lighter
 
       //End-point [min/max]
       EndPoint side[2];             //48 / 96
-      RadPrimitive* primitive;      // 4 /  8
+      Primitive* primitive;      // 4 /  8
       int32 flags;                  // 4 /  4
       PrimBox* clone;               // 4 /  8 
 
@@ -336,8 +336,8 @@ namespace lighter
       {
       }
       
-      //Init with a RadPrrimitive
-      void Init (const RadPrimitive* prim);
+      //Init with a Prrimitive
+      void Init (const Primitive* prim);
 
       // Clip to an AABB
       void Clip (const csBox3& box);
@@ -384,7 +384,7 @@ namespace lighter
       KDNode *leftChild, *rightChild;
 
       // Primitives
-      RadPrimitivePtrArray primitives;
+      PrimitivePtrArray primitives;
 
       KDNode()
         : splitDimension(0), splitLocation(0.0f), leftChild(0), rightChild(0)
@@ -407,7 +407,7 @@ namespace lighter
     size_t numPrimitives;
 
     //Private functions
-    bool SetupEndpoints (RadObjectHash::GlobalIterator& objects);
+    bool SetupEndpoints (ObjectHash::GlobalIterator& objects);
     bool BuildKDNodeRecursive (EndPointList* epList, KDNode* node, 
       csBox3 aabb, size_t numPrim, size_t treeDepth);
     KDTree* SetupRealTree (KDNode* rootNode);
@@ -421,7 +421,7 @@ namespace lighter
 
     // Collect all primitives within given AABB
     static bool CollectPrimitives (const KDTree *tree, 
-      RadPrimitivePtrArray& primArray, const csBox3& overlapAABB);
+      PrimitivePtrArray& primArray, const csBox3& overlapAABB);
 
   private:
     KDTreeHelper ();
@@ -429,7 +429,7 @@ namespace lighter
 
     // Traverse a node, collect any prims within AABB
     static void CollectPrimitives (const KDTree *tree, const KDTreeNode* node, 
-      csBox3 currentBox, RadPrimitivePtrSet& outPrims, const csBox3& overlapAABB);
+      csBox3 currentBox, PrimitivePtrSet& outPrims, const csBox3& overlapAABB);
   };
 
 }

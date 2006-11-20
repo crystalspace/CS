@@ -19,13 +19,13 @@
 #ifndef __LIGHTMAPUV_H__
 #define __LIGHTMAPUV_H__
 
-#include "radprimitive.h"
+#include "primitive.h"
 #include "lightmap.h"
 
 namespace lighter
 {
 
-  struct RadObjectVertexData;
+  struct ObjectVertexData;
   
   class LightmapUVLayoutFactory;
 
@@ -43,8 +43,8 @@ namespace lighter
      *   primitives of a sub-array would fit on a single lightmap.
      */
     virtual LightmapUVLayoutFactory* LayoutFactory (
-      const RadPrimitiveArray& inPrims, RadObjectVertexData& vertexData,
-      csArray<RadPrimitiveArray>& outPrims) = 0;
+      const PrimitiveArray& inPrims, ObjectVertexData& vertexData,
+      csArray<PrimitiveArray>& outPrims) = 0;
   };
 
   class LightmapUVLayoutFactory
@@ -60,8 +60,8 @@ namespace lighter
      * \param lmID Output global lightmap ID onto which all primitives were
      *   layouted.
      */
-    virtual bool LayoutUVOnPrimitives (RadPrimitiveArray &prims, 
-      size_t groupNum, RadObjectVertexData& vertexData, uint& lmID) = 0;
+    virtual bool LayoutUVOnPrimitives (PrimitiveArray &prims, 
+      size_t groupNum, ObjectVertexData& vertexData, uint& lmID) = 0;
   };
 
 } // namespace lighter

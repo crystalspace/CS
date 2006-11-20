@@ -24,25 +24,25 @@
 #include "lighter.h"
 #include "lightmap.h"
 #include "lightmapuv.h"
-#include "radobject_genmesh.h"
+#include "object_genmesh.h"
 #include "config.h"
 #include "scene.h"
 
 namespace lighter
 {
 
-  RadObjectFactory_Genmesh::RadObjectFactory_Genmesh()
+  ObjectFactory_Genmesh::ObjectFactory_Genmesh()
     : normals (0)
   {
     saverPluginName = "crystalspace.mesh.saver.factory.genmesh";
   }
 
-  RadObject* RadObjectFactory_Genmesh::CreateObject ()
+  Object* ObjectFactory_Genmesh::CreateObject ()
   {
-    return new RadObject_Genmesh (this);
+    return new Object_Genmesh (this);
   }
 
-  void RadObjectFactory_Genmesh::AddPrimitive (size_t a, size_t b, size_t c, 
+  void ObjectFactory_Genmesh::AddPrimitive (size_t a, size_t b, size_t c, 
                                                iGeneralMeshSubMesh* submesh)
   {
     size_t submeshIndex = csArrayItemNotFound;
@@ -58,7 +58,7 @@ namespace lighter
       }
     }
 
-    RadPrimitiveArray* primArray;
+    PrimitiveArray* primArray;
     if (submeshIndex != csArrayItemNotFound)
       primArray = &allPrimitives[submeshIndex];
     else
@@ -70,20 +70,19 @@ namespace lighter
       submeshes.Put (newSubmesh, submeshIndex);
     }
 
-    RadPrimitive newPrim (vertexData);
-    newPrim.GetIndexArray()[0] = a;
-    newPrim.GetIndexArray()[1] = b;
-    newPrim.GetIndexArray()[2] = c;
+    Primitive newPrim (vertexData);
+    Primitive::TriangleType t (a, b, c);
+    newPrim.SetTriangle (t);
 
     newPrim.ComputePlane ();
     
     primArray->Push (newPrim);
   }
 
-  void RadObjectFactory_Genmesh::AddPrimitive (size_t a, size_t b, size_t c, 
+  void ObjectFactory_Genmesh::AddPrimitive (size_t a, size_t b, size_t c, 
                                                iMaterialWrapper* material)
   {
-    RadPrimitiveArray* primArray;
+    PrimitiveArray* primArray;
     Submesh sm;
     sm.material = material;
     size_t submesh = submeshes.Get (sm, csArrayItemNotFound);
@@ -96,19 +95,18 @@ namespace lighter
       submeshes.Put (sm, submesh);
     }
 
-    RadPrimitive newPrim (vertexData);
-    newPrim.GetIndexArray()[0] = a;
-    newPrim.GetIndexArray()[1] = b;
-    newPrim.GetIndexArray()[2] = c;
+    Primitive newPrim (vertexData);
+    Primitive::TriangleType t (a, b, c);
+    newPrim.SetTriangle (t);
 
     newPrim.ComputePlane ();
     
     primArray->Push (newPrim);
   }
 
-  void RadObjectFactory_Genmesh::ParseFactory (iMeshFactoryWrapper *factory)
+  void ObjectFactory_Genmesh::ParseFactory (iMeshFactoryWrapper *factory)
   {
-    RadObjectFactory::ParseFactory (factory);
+    ObjectFactory::ParseFactory (factory);
 
     // Very dumb parser, just disconnect all triangles etc
     csRef<iGeneralFactoryState> genFact = 
@@ -131,7 +129,7 @@ namespace lighter
     
     for (i = 0; i < genFact->GetVertexCount (); i++)
     {
-      RadObjectVertexData::Vertex &vertex = vertexData.vertexArray[i];
+      ObjectVertexData::Vertex &vertex = vertexData.vertexArray[i];
       vertex.position = verts[i];
       vertex.normal = factNormals[i];
       vertex.textureUV = uv[i];
@@ -167,7 +165,7 @@ namespace lighter
     }
   }
 
-  void RadObjectFactory_Genmesh::SaveFactory (iDocumentNode *node)
+  void ObjectFactory_Genmesh::SaveFactory (iDocumentNode *node)
   {
     csRef<iGeneralFactoryState> genFact = 
       scfQueryInterface<iGeneralFactoryState> (
@@ -188,7 +186,7 @@ namespace lighter
       // Save vertex-data
       for (int i = 0; i < genFact->GetVertexCount (); ++i)
       {
-        const RadObjectVertexData::Vertex &vertex = vertexData.vertexArray[i];
+        const ObjectVertexData::Vertex &vertex = vertexData.vertexArray[i];
         verts[i] = vertex.position;
         textureUV[i] = vertex.textureUV;
         factNormals[i] = vertex.normal;
@@ -201,15 +199,15 @@ namespace lighter
     // Save primitives, trianglate on the fly
     for (uint i = 0; i < allPrimitives.GetSize (); ++i)
     {
-      const RadPrimitiveArray& meshPrims = allPrimitives[i];
+      const PrimitiveArray& meshPrims = allPrimitives[i];
       IntDArray* indexArray = findHelper.FindSubmesh (i);
       indexArray->SetCapacity (meshPrims.GetSize()*3);
       for (size_t p = 0; p < meshPrims.GetSize(); p++)
       {
-        const size_t* indices = meshPrims[p].GetIndexArray ();
+        const Primitive::TriangleType& t = meshPrims[p].GetTriangle ();
         for (int i = 0; i < 3; i++)
         {
-          size_t idx = indices[i];
+          size_t idx = t[i];
           indexArray->Push ((int)idx);
         }
       }
@@ -217,10 +215,10 @@ namespace lighter
 
     findHelper.CommitSubmeshes (genFact);
 
-    RadObjectFactory::SaveFactory (node);
+    ObjectFactory::SaveFactory (node);
   }
 
-  bool RadObjectFactory_Genmesh::SubmeshesMergeable (iGeneralMeshSubMesh* sm1,
+  bool ObjectFactory_Genmesh::SubmeshesMergeable (iGeneralMeshSubMesh* sm1,
                                                      iGeneralMeshSubMesh* sm2)
   {
     if (sm1->GetMixmode() != sm2->GetMixmode()) return false;
@@ -236,7 +234,7 @@ namespace lighter
     return true;
   }
 
-  IntDArray* RadObjectFactory_Genmesh::SubmeshFindHelper::FindSubmesh (
+  IntDArray* ObjectFactory_Genmesh::SubmeshFindHelper::FindSubmesh (
     size_t submeshIndex)
   {
     AllocatedSubmeshKey key;
@@ -247,7 +245,7 @@ namespace lighter
     if (index == csArrayItemNotFound)
     {
       AllocatedSubmesh newEntry (key);
-      const RadObjectFactory_Genmesh::Submesh* smInfo = 
+      const ObjectFactory_Genmesh::Submesh* smInfo = 
         factory->submeshes.GetKeyPointer (submeshIndex);
       
       if (smInfo->sourceSubmesh)
@@ -270,7 +268,7 @@ namespace lighter
     return &allocatedSubmeshes[index].indices;
   }
 
-  void RadObjectFactory_Genmesh::SubmeshFindHelper::CommitSubmeshes (
+  void ObjectFactory_Genmesh::SubmeshFindHelper::CommitSubmeshes (
     iGeneralFactoryState* genFact)
   {
     for (size_t i = 0; i < allocatedSubmeshes.GetSize(); i++)
@@ -310,7 +308,7 @@ namespace lighter
           minIndex, maxIndex);
       indices->CopyInto (indexArray.GetArray (), indexArray.GetSize());
 
-      const RadObjectFactory_Genmesh::Submesh* srcSubmesh = 
+      const ObjectFactory_Genmesh::Submesh* srcSubmesh = 
         factory->submeshes.GetKeyPointer (allocatedSubmeshes[i].submeshIndex);
       iMaterialWrapper* material = srcSubmesh->sourceSubmesh ? 
         srcSubmesh->sourceSubmesh->GetMaterial() : srcSubmesh->material;
@@ -322,9 +320,9 @@ namespace lighter
     }
   }
 
-  int RadObjectFactory_Genmesh::SubmeshFindHelper::CompareAllocSubmesh (
-    RadObjectFactory_Genmesh::SubmeshFindHelper::AllocatedSubmesh const& item, 
-    RadObjectFactory_Genmesh::SubmeshFindHelper::AllocatedSubmeshKey const& key)
+  int ObjectFactory_Genmesh::SubmeshFindHelper::CompareAllocSubmesh (
+    ObjectFactory_Genmesh::SubmeshFindHelper::AllocatedSubmesh const& item, 
+    ObjectFactory_Genmesh::SubmeshFindHelper::AllocatedSubmeshKey const& key)
   {
     if (item.submeshIndex < key.submeshIndex)
       return -1;
@@ -336,20 +334,20 @@ namespace lighter
 
   //-------------------------------------------------------------------------
 
-  RadObject_Genmesh::RadObject_Genmesh (RadObjectFactory* factory) : RadObject (factory)
+  Object_Genmesh::Object_Genmesh (ObjectFactory* factory) : Object (factory)
   {
     saverPluginName = "crystalspace.mesh.saver.genmesh";
   }
 
-  void RadObject_Genmesh::SaveMesh (Scene* scene, iDocumentNode *node)
+  void Object_Genmesh::SaveMesh (Scene* scene, iDocumentNode *node)
   {
     csRef<iGeneralMeshState> genMesh = 
       scfQueryInterface<iGeneralMeshState> (
       meshWrapper->GetMeshObject());
     if (!genMesh) return; // bail
 
-    RadObjectFactory_Genmesh* factory = 
-      static_cast<RadObjectFactory_Genmesh*> (this->factory);
+    ObjectFactory_Genmesh* factory = 
+      static_cast<ObjectFactory_Genmesh*> (this->factory);
 
     if (lightPerVertex)
     {
@@ -402,21 +400,21 @@ namespace lighter
         // Save vertex-data
         for (size_t i = 0; i < vertexData.vertexArray.GetSize(); ++i)
         {
-          const RadObjectVertexData::Vertex &vertex = vertexData.vertexArray[i];
+          const ObjectVertexData::Vertex &vertex = vertexData.vertexArray[i];
           lightmapUV[i] = vertex.lightmapUV;
         }
       }
     }
 
-    RadObject::SaveMesh (scene, node);
+    Object::SaveMesh (scene, node);
   }
 
-  void RadObject_Genmesh::StripLightmaps (csSet<csString>& lms)
+  void Object_Genmesh::StripLightmaps (csSet<csString>& lms)
   {
-    RadObject::StripLightmaps (lms);
+    Object::StripLightmaps (lms);
 
-    RadObjectFactory_Genmesh* factory = 
-      static_cast<RadObjectFactory_Genmesh*> (this->factory);
+    ObjectFactory_Genmesh* factory = 
+      static_cast<ObjectFactory_Genmesh*> (this->factory);
 
     csRef<iGeneralFactoryState> genFact = 
       scfQueryInterface<iGeneralFactoryState> (
