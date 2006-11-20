@@ -1255,6 +1255,10 @@ void csODECollider::SetTransform (const csOrthoTransform& transform)
   CS2ODEMatrix (transform.GetO2T (), rot);
   dGeomSetRotation (geomID, rot);
 
+  const dReal *gv = dGeomGetPosition (geomID);
+  csVector3 g_pos (gv[0], gv[1], gv[2]);
+
+
   if (dGeomGetBody (transformID))
     MassCorrection ();
 }
@@ -2731,7 +2735,7 @@ void csODEJoint::BuildJoint ()
       dJointAttach (jointID, bodyID[0], bodyID[1]);
       pos = transform.GetOrigin();
       dJointSetBallAnchor (jointID, pos.x, pos.y, pos.z);
-      if (hi_stop > lo_stop)
+      if (hi_stop.x > lo_stop.x || hi_stop.y > lo_stop.y || hi_stop.z > lo_stop.z )
       {
         motor_jointID = dJointCreateAMotor (dynsys->GetWorldID(), 0);
         dJointAttach (jointID, bodyID[0], bodyID[1]);
