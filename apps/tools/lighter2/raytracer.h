@@ -263,6 +263,24 @@ namespace lighter
   public:
     // Vistest rayhelpers
 
+    static inline float Vistest1 (const Raytracer& rt, const csVector3& viscenter,
+      const csVector3& endp)
+    {
+      // Perform a 1 point vistest
+
+      const csVector3& primP = viscenter;
+      const csVector3 dir = primP - endp;
+
+      Ray ray;
+      HitPoint hit;
+      ray.minLength = 0;
+      ray.maxLength = dir.Norm ();
+      ray.origin = endp;
+      ray.direction = dir / ray.maxLength;
+      ray.maxLength -= 0.001f;
+      return rt.TraceAnyHit (ray, hit) ? 0.0f : 1.0f;
+    }
+
     static inline float Vistest5 (Raytracer& rt, const csVector3& viscenter,
       const csVector3& visu, const csVector3& visv, const csVector3& endp,
       const RadPrimitive& prim)

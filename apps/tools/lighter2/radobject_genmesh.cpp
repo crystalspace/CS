@@ -351,48 +351,60 @@ namespace lighter
     RadObjectFactory_Genmesh* factory = 
       static_cast<RadObjectFactory_Genmesh*> (this->factory);
 
-    CS::ShaderVarName lightmapName (globalLighter->strings, "tex lightmap");
-
-    for (uint i = 0; i < allPrimitives.GetSize (); ++i)
+    if (lightPerVertex)
     {
-      csString submeshName;
-      submeshName = factory->submeshNames[i];
+      csRef<csRenderBuffer> colorsBuffer = csRenderBuffer::CreateRenderBuffer (
+        vertexData.vertexArray.GetSize(), CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 3);
+      genMesh->RemoveRenderBuffer ("colors");
+      genMesh->AddRenderBuffer ("colors", colorsBuffer);
+      colorsBuffer->CopyInto (litColors->GetArray(),
+        vertexData.vertexArray.GetSize());
+    }
+    else
+    {
+      CS::ShaderVarName lightmapName (globalLighter->strings, "tex lightmap");
 
-      iGeneralMeshSubMesh* subMesh = genMesh->FindSubMesh (submeshName);
-      if (!subMesh) continue;
-
-      /* Fix up material (factory may not have a material set, but mesh object
-       * material does not "propagate" to submeshes) */
-      if (subMesh->GetMaterial() == 0)
+      for (uint i = 0; i < allPrimitives.GetSize (); ++i)
       {
-        csRef<iMeshObject> mo = 
-          scfQueryInterface<iMeshObject> (genMesh);
-        subMesh->SetMaterial (mo->GetMaterialWrapper());
+        csString submeshName;
+        submeshName = factory->submeshNames[i];
+
+        iGeneralMeshSubMesh* subMesh = genMesh->FindSubMesh (submeshName);
+        if (!subMesh) continue;
+
+        /* Fix up material (factory may not have a material set, but mesh object
+         * material does not "propagate" to submeshes) */
+        if (subMesh->GetMaterial() == 0)
+        {
+          csRef<iMeshObject> mo = 
+            scfQueryInterface<iMeshObject> (genMesh);
+          subMesh->SetMaterial (mo->GetMaterialWrapper());
+        }
+
+        csRef<iShaderVariableContext> svc = 
+          scfQueryInterface<iShaderVariableContext> (subMesh);
+
+        uint lmID = uint (lightmapIDs[i]);
+        Lightmap* lm = scene->GetLightmaps()[lmID];
+        csRef<csShaderVariable> svLightmap;
+        svLightmap.AttachNew (new csShaderVariable (lightmapName));
+        svLightmap->SetValue (lm->GetTexture());
+        svc->AddVariable (svLightmap);
       }
 
-      csRef<iShaderVariableContext> svc = 
-        scfQueryInterface<iShaderVariableContext> (subMesh);
-
-      uint lmID = uint (lightmapIDs[i]);
-      Lightmap* lm = scene->GetLightmaps()[lmID];
-      csRef<csShaderVariable> svLightmap;
-      svLightmap.AttachNew (new csShaderVariable (lightmapName));
-      svLightmap->SetValue (lm->GetTexture());
-      svc->AddVariable (svLightmap);
-    }
-
-    csRef<csRenderBuffer> lightmapBuffer = csRenderBuffer::CreateRenderBuffer (
-      vertexData.vertexArray.GetSize(), CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 2);
-    genMesh->RemoveRenderBuffer ("texture coordinate lightmap");
-    genMesh->AddRenderBuffer ("texture coordinate lightmap", lightmapBuffer);
-    {
-      csRenderBufferLock<csVector2> bufferLock(lightmapBuffer);
-      csVector2 *lightmapUV = bufferLock.Lock ();
-      // Save vertex-data
-      for (size_t i = 0; i < vertexData.vertexArray.GetSize(); ++i)
+      csRef<csRenderBuffer> lightmapBuffer = csRenderBuffer::CreateRenderBuffer (
+        vertexData.vertexArray.GetSize(), CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 2);
+      genMesh->RemoveRenderBuffer ("texture coordinate lightmap");
+      genMesh->AddRenderBuffer ("texture coordinate lightmap", lightmapBuffer);
       {
-        const RadObjectVertexData::Vertex &vertex = vertexData.vertexArray[i];
-        lightmapUV[i] = vertex.lightmapUV;
+        csRenderBufferLock<csVector2> bufferLock(lightmapBuffer);
+        csVector2 *lightmapUV = bufferLock.Lock ();
+        // Save vertex-data
+        for (size_t i = 0; i < vertexData.vertexArray.GetSize(); ++i)
+        {
+          const RadObjectVertexData::Vertex &vertex = vertexData.vertexArray[i];
+          lightmapUV[i] = vertex.lightmapUV;
+        }
       }
     }
 

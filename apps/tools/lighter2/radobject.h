@@ -116,7 +116,9 @@ namespace lighter
 
     // Name of the factory
     csString factoryName;
-  
+
+    /// Whether to light meshes of this factory per vertex
+    bool lightPerVertex;
   protected:
 
     // All faces, untransformed
@@ -155,6 +157,7 @@ namespace lighter
   public:
     // Construct a new RadObject from a RadObjectFactory and transform
     RadObject (RadObjectFactory* object);
+    ~RadObject ();
 
     // Initialize the RadObject from factory and wrapper. Call only after
     // constructor and ParseMesh have been called
@@ -187,9 +190,15 @@ namespace lighter
     RadObjectVertexData& GetVertexData ()
     { return vertexData; }
 
+    typedef csDirtyAccessArray<csColor> LitColorArray;
+    LitColorArray* GetLitColors ()
+    { return litColors; }
+
     // Name
     csString meshName;
 
+    /// Whether to light mesh per vertex
+    bool lightPerVertex;
   protected:
     // All faces, already transformed
     csArray<RadPrimitiveArray> allPrimitives;
@@ -197,6 +206,8 @@ namespace lighter
 
     // Vertex data for above, transformed
     RadObjectVertexData vertexData;
+    /// Lit colors (if object is lit per-vertex)
+    LitColorArray* litColors;
 
     // Factory we where created from
     RadObjectFactory* factory;

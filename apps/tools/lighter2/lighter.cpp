@@ -96,6 +96,7 @@ namespace lighter
 
     engine = csQueryRegistry<iEngine> (objectRegistry);
     if (!engine) return Report ("No iEngine!");
+    engine->SetSaveableFlag (true);
 
     imageIO = csQueryRegistry<iImageIO> (objectRegistry);
     if (!imageIO) return Report ("No iImageIO!");

@@ -34,7 +34,8 @@ namespace lighter
 {
 
   RadObjectFactory::RadObjectFactory ()
-    : lightmapMaskArrayValid (false), factoryWrapper (0)
+    : lightmapMaskArrayValid (false), factoryWrapper (0), 
+      lightPerVertex (false)
   {
   }
 
@@ -70,6 +71,20 @@ namespace lighter
     this->factoryWrapper = factory;
     // Get the name
     this->factoryName = factoryWrapper->QueryObject ()->GetName ();
+    csRef<iObjectIterator> objiter = 
+      factoryWrapper->QueryObject ()->GetIterator();
+    while (objiter->HasNext())
+    {
+      iObject* obj = objiter->Next();
+      csRef<iKeyValuePair> kvp = 
+        scfQueryInterface<iKeyValuePair> (obj);
+      if (kvp.IsValid())
+      {
+        const char* vVertexlight = kvp->GetValue ("vertexlight");
+        if (vVertexlight != 0)
+          lightPerVertex = (strcmp (vVertexlight, "yes") == 0);
+      }
+    }
   }
 
   void RadObjectFactory::SaveFactory (iDocumentNode *node)
@@ -94,10 +109,15 @@ namespace lighter
   //-------------------------------------------------------------------------
 
   RadObject::RadObject (RadObjectFactory* fact)
-    : factory (fact)
+    : factory (fact), lightPerVertex (fact->lightPerVertex), litColors (0)
   {
   }
   
+  RadObject::~RadObject ()
+  {
+    delete litColors;
+  }
+
   bool RadObject::Initialize ()
   {
     if (!factory || !meshWrapper) return false;
@@ -126,11 +146,14 @@ namespace lighter
         prim.ComputePlane ();
       }
 
-      // FIXME: probably separate out to allow for better progress display
-      bool res = factory->lightmaplayouts[j]->LayoutUVOnPrimitives (
-        allPrimitives, factory->lightmaplayoutGroups[j], vertexData, 
-        lightmapIDs.GetExtend (j));
-      if (!res) return false;
+      if (!lightPerVertex)
+      {
+        // FIXME: probably separate out to allow for better progress display
+        bool res = factory->lightmaplayouts[j]->LayoutUVOnPrimitives (
+          allPrimitives, factory->lightmaplayoutGroups[j], vertexData, 
+          lightmapIDs.GetExtend (j));
+        if (!res) return false;
+      }
 
       for (i = 0; i < allPrimitives.GetSize(); i++)
       {
@@ -143,11 +166,20 @@ namespace lighter
       }
     }
 
+    if (lightPerVertex)
+    {
+      litColors = new LitColorArray();
+      litColors->SetSize (vertexData.vertexArray.GetSize(), 
+        csColor (0.0f, 0.0f, 0.0f));
+    }
+
     return true;
   }
 
   void RadObject::RenormalizeLightmapUVs (const LightmapPtrDelArray& lightmaps)
   {
+    if (lightPerVertex) return;
+
     BoolArray vertexProcessed;
     vertexProcessed.SetSize (vertexData.vertexArray.GetSize (),false);
 
@@ -198,6 +230,20 @@ namespace lighter
   {
     this->meshWrapper = wrapper;
     this->meshName = wrapper->QueryObject ()->GetName ();
+    csRef<iObjectIterator> objiter = 
+      wrapper->QueryObject ()->GetIterator();
+    while (objiter->HasNext())
+    {
+      iObject* obj = objiter->Next();
+      csRef<iKeyValuePair> kvp = 
+        scfQueryInterface<iKeyValuePair> (obj);
+      if (kvp.IsValid())
+      {
+        const char* vVertexlight = kvp->GetValue ("vertexlight");
+        if (vVertexlight != 0)
+          lightPerVertex = (strcmp (vVertexlight, "yes") == 0);
+      }
+    }
   }
 
   static void CloneNode (iDocumentNode* from, iDocumentNode* to)
@@ -265,6 +311,8 @@ namespace lighter
 
   void RadObject::FixupLightmaps (csArray<LightmapPtrDelArray*>& lightmaps)
   {
+    if (lightPerVertex) return;
+
     //Create one
     LightmapMaskArray masks;
     LightmapPtrDelArray::Iterator lmIt = lightmaps[0]->GetIterator ();

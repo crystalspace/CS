@@ -10,6 +10,12 @@ chronological order.
         - Piotr made the amotors start working on wiser conditions.
 	- Jorrit changed the mingw building doc to use 'jam' by default
 	  instead of 'make'.
+	- res augmented key/value pairs for a "editoronly" flag. If this flag
+	  is set, the key/value pairs aren't stored in memory unless the 
+	  engine's "saveable" flag is set.
+	- res sanitized key/value parsing in the syntax services.
+	- res changed the loader to use iSceneNodeArray.
+	- res added some initial support for per-vertex lighting to lighter2.
 19-Nov-2006
 	- Marten made a number of optimizations to the lighter2 ray tracer.
 	- caedes added iJoystickDriver to cspace.i.
