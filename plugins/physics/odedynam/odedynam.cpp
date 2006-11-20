@@ -2409,7 +2409,6 @@ csODEJoint::csODEJoint (csODEDynamicSystem *sys) : scfImplementationType (this, 
 {
   jointID = 0;
   motor_jointID = 0;
-  custom_aconstraint_axis = false;
 
   body[0] = body[1] = 0;
   bodyID[0] = bodyID[1] = 0;
@@ -2421,8 +2420,11 @@ csODEJoint::csODEJoint (csODEDynamicSystem *sys) : scfImplementationType (this, 
   rotConstraint[1] = 1;
   rotConstraint[2] = 1;
 
-  lo_stop = csVector3 (-dInfinity, -dInfinity, -dInfinity);
-  hi_stop = csVector3 (dInfinity, dInfinity, dInfinity); 
+  aconstraint_axis[0] = csVector3 (0,1,0);
+  aconstraint_axis[1] = csVector3 (0,0,1);
+
+  lo_stop = csVector3 (dInfinity, dInfinity, dInfinity);
+  hi_stop = csVector3 (-dInfinity, -dInfinity, -dInfinity); 
   vel = csVector3 (0);
   fmax = csVector3 (0);
   fudge_factor = csVector3 (1);
@@ -2432,6 +2434,7 @@ csODEJoint::csODEJoint (csODEDynamicSystem *sys) : scfImplementationType (this, 
   stop_cfm = csVector3 (9.9999997e-006f);
   suspension_erp = csVector3 (0.0f);
   suspension_cfm = csVector3 (0.0f);
+  custom_aconstraint_axis = false;
 
   dynsys = sys;
 }
@@ -2565,8 +2568,8 @@ void csODEJoint::BuildSlider (const csVector3 &axis)
 
 void csODEJoint::SetAngularConstraintAxis (const csVector3 &axis, int body)
 {
-  aconstraint_axis[body] = axis; 
   custom_aconstraint_axis = true;
+  aconstraint_axis[body] = axis; 
   BuildJoint ();
 }
 csVector3 csODEJoint::GetAngularConstraintAxis (int body)
@@ -2616,14 +2619,14 @@ void csODEJoint::ApplyJointProperty (int parameter, const csVector3 &values)
     dJointSetHinge2Param (jointID, parameter, values.x);
     dJointSetHinge2Param (jointID, parameter + dParamGroup, values.y);
     //dParamXi = dParamX + dParamGroup * (i-1)
+  case dJointTypeBall:       
+    if (motor_jointID)
+    {
+      dJointSetAMotorParam (motor_jointID, parameter, values.x);
+      //We use only euler mode, se we only need to setup parameter for 2 axes
+      dJointSetAMotorParam (motor_jointID, parameter + 2*dParamGroup, values.z);
+    }
   default:
-    case dJointTypeBall:       
-      if (motor_jointID)
-      {
-        dJointSetAMotorParam (motor_jointID, parameter, values.x);
-        //We use only euler mode, se we only need to setup parameter for 2 axes
-        dJointSetAMotorParam (motor_jointID, parameter + 2*dParamGroup, values.z);
-      }
     //case dJointTypeAMotor:     // not supported here
     //case dJointTypeUniversal:  // not sure if that's supported in here
     break;
@@ -2728,7 +2731,7 @@ void csODEJoint::BuildJoint ()
       dJointAttach (jointID, bodyID[0], bodyID[1]);
       pos = transform.GetOrigin();
       dJointSetBallAnchor (jointID, pos.x, pos.y, pos.z);
-      if (custom_aconstraint_axis)
+      if (hi_stop > lo_stop)
       {
         motor_jointID = dJointCreateAMotor (dynsys->GetWorldID(), 0);
         dJointAttach (jointID, bodyID[0], bodyID[1]);

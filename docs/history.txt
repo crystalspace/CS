@@ -7,6 +7,7 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 20-Nov-2006
+        - Piotr made the amotors start working on wiser conditions.
 	- Jorrit changed the mingw building doc to use 'jam' by default
 	  instead of 'make'.
 19-Nov-2006
