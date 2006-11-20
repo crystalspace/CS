@@ -12735,6 +12735,7 @@ sub DESTROY {
     }
 }
 
+*scfGetVersion = *cspacec::iJoystickDriver_scfGetVersion;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);

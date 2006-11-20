@@ -8337,8 +8337,11 @@ class iJoystickDriver(iBase):
     def DoMotion(*args): return _cspace.iJoystickDriver_DoMotion(*args)
     __swig_destroy__ = _cspace.delete_iJoystickDriver
     __del__ = lambda self : None;
+    __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iJoystickDriver_scfGetVersion
+    if _newclass:scfGetVersion = staticmethod(_cspace.iJoystickDriver_scfGetVersion)
 iJoystickDriver_swigregister = _cspace.iJoystickDriver_swigregister
 iJoystickDriver_swigregister(iJoystickDriver)
+iJoystickDriver_scfGetVersion = _cspace.iJoystickDriver_scfGetVersion
 
 class iConfigFile(iBase):
     __swig_setmethods__ = {}
