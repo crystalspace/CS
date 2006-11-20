@@ -1255,10 +1255,6 @@ void csODECollider::SetTransform (const csOrthoTransform& transform)
   CS2ODEMatrix (transform.GetO2T (), rot);
   dGeomSetRotation (geomID, rot);
 
-  const dReal *gv = dGeomGetPosition (geomID);
-  csVector3 g_pos (gv[0], gv[1], gv[2]);
-
-
   if (dGeomGetBody (transformID))
     MassCorrection ();
 }
