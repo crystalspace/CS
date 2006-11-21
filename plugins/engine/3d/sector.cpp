@@ -363,7 +363,9 @@ void csSector::PrecacheDraw ()
 
   // @@@ Ideally we would want to disable visibility culling
   // here so that all objects are visible.
+  g3d->BeginDraw (CSDRAW_3DGRAPHICS);
   view->Draw ();
+  g3d->FinishDraw ();
 }
 
 //----------------------------------------------------------------------

@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+21-Nov-2006
+	- Jorrit fixed a bug in csSector::PrecacheDraw(). It forgot to
+	  do BeginDraw() with the result that some essential variables were
+	  not initialized.
 20-Nov-2006
         - Piotr made the amotors start working on wiser conditions.
 	- Jorrit changed the mingw building doc to use 'jam' by default
