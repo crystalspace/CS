@@ -19,6 +19,7 @@
 #ifndef __CS_CSUTIL_THREADING_PTHREAD_CONDITION_H__
 #define __CS_CSUTIL_THREADING_PTHREAD_CONDITION_H__
 
+#ifndef DOXYGEN_RUN
 
 #include "csutil/threading/atomicops.h"
 #include "csutil/threading/mutex.h"
@@ -64,4 +65,6 @@ namespace Implementation
 }
 }
 
-#endif
+#endif // DOXYGEN_RUN
+
+#endif // __CS_CSUTIL_THREADING_PTHREAD_CONDITION_H__
