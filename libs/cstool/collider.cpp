@@ -245,11 +245,12 @@ csColliderWrapper* csColliderHelper::InitializeCollisionWrapper (
     cw->DecRef ();
   }
 
-  const csRefArray<iSceneNode>& ml = mesh->QuerySceneNode ()->GetChildren ();
+  const csRef<iSceneNodeArray> ml = 
+    mesh->QuerySceneNode ()->GetChildrenArray ();
   size_t i;
-  for (i = 0 ; i < ml.Length () ; i++)
+  for (i = 0 ; i < ml->GetSize () ; i++)
   {
-    iMeshWrapper* child = ml[i]->QueryMesh ();
+    iMeshWrapper* child = ml->Get (i)->QueryMesh ();
     // @@@ What if we have a light containing another mesh?
     if (child)
       InitializeCollisionWrapper (colsys, child);
