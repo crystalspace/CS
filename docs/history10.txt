@@ -16,6 +16,7 @@ chronological order.
 	- res merged r25911, r25920 into 1.0 (deprecation warning fix).
 	- res merged r25912 into 1.0 (xmlshader crash fix).
 	- res merged r25922 into 1.0 (deprecation warning fix).
+	- res merged r25919 into 1.0 (VFS LoadMountsFromFile() + variables).
 19-Nov-2006
 	- Eric Sunshine merged r25888 into 1.0 (SCF documentation example fix).
 17-Nov-2006

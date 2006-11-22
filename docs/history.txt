@@ -17,6 +17,9 @@ chronological order.
 	- res fixed a deprecation warning in sndmanager.
 	- res fixed a cut'n'paste error in xmlshader, likely causing memory
 	  corruption. Reportedly fixes trac #194.
+	- caedes fixed csVFS::LoadMountsFromFile so it allows variable
+	  assignments in the loaded file to function correctly (rather than
+	  being ignored).
 	- res fixed a deprecation warning in 
 	  csColliderHelper::InitializeCollisionWrapper().
 20-Nov-2006
