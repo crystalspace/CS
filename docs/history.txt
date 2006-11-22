@@ -9,6 +9,8 @@ chronological order.
 22-Nov-2006
 	- Jorrit marked collections as deprecated and obsolete. They are
 	  never used and are also not useful.
+	- Jorrit made the warnings when lightmaps are not up-to-date a
+	  little bit less verbose.
 21-Nov-2006
 	- Jorrit fixed a bug in csSector::PrecacheDraw(). It forgot to
 	  do BeginDraw() with the result that some essential variables were

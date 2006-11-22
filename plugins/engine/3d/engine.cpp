@@ -1187,14 +1187,17 @@ void csEngine::ShineLights (iRegion *region, iProgressMeter *meter)
     {
       cm->CacheData (data.GetData(), data.Length(), "lm_precalc_info", 0, (uint32)~0);
     }
-    if (do_relight)
+    if (doVerbose)
     {
-      Report ("Lightmaps are not up to date (%s).", reason);
-    }
-    else
-    {
-      Warn ("Lightmaps are not up to date (%s).", reason);
-      Warn ("Use -relight cmd option to calc lighting.");
+      if (do_relight)
+      {
+        Report ("Lightmaps are not up to date (%s).", reason);
+      }
+      else
+      {
+        Warn ("Lightmaps are not up to date (%s).", reason);
+        Warn ("Use -relight cmd option to calc lighting.");
+      }
     }
     lightmapCacheMode &= ~CS_ENGINE_CACHE_READ;
   }
@@ -1270,7 +1273,7 @@ void csEngine::ShineLights (iRegion *region, iProgressMeter *meter)
   }
   if (failed > 0)
   {
-    Warn ("Couldn't load cached lighting for %zu object(s):",
+    Warn ("Couldn't load cached lighting for %zu object(s). Use -relight to calculate lighting:",
 	  failed);
     size_t i;
     for (i = 0 ; i < failed_meshes.Length () ; i++)
@@ -1279,7 +1282,6 @@ void csEngine::ShineLights (iRegion *region, iProgressMeter *meter)
     }
     if (failed_meshes.Length () < failed)
       Warn ("    ...");
-    Warn ("Use -relight cmd option to refresh lighting.");
   }
 
   csTicks start, stop;
