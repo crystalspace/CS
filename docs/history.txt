@@ -17,6 +17,8 @@ chronological order.
 	- res fixed a deprecation warning in sndmanager.
 	- res fixed a cut'n'paste error in xmlshader, likely causing memory
 	  corruption. Reportedly fixes trac #194.
+	- res fixed a deprecation warning in 
+	  csColliderHelper::InitializeCollisionWrapper().
 20-Nov-2006
 	- Jorrit changed the mingw building doc to use 'jam' by default
 	  instead of 'make'.
