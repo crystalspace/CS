@@ -881,11 +881,19 @@ LRESULT CALLBACK Win32Assistant::WindowProc (HWND hWnd, UINT message,
       if (assistant != 0)
       {
         iEventOutlet* outlet = assistant->GetEventOutlet();
-        ::SetCursor (assistant->m_hCursor);
         outlet->Mouse (csmbNone, false, short(LOWORD(lParam)), 
 	  short(HIWORD(lParam)));
       }
       return TRUE;
+    }
+    case WM_SETCURSOR:
+    {
+      if ((assistant != 0) && (LOWORD (lParam) == HTCLIENT))
+      {
+        ::SetCursor (assistant->m_hCursor);
+        return TRUE;
+      }
+      break;
     }
     case WM_SIZE:
     {
