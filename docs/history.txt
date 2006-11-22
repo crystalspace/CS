@@ -12,6 +12,8 @@ chronological order.
 	- Jorrit made the warnings when lightmaps are not up-to-date a
 	  little bit less verbose.
 	- res made the csDog SCF example code in the manual a bit nicer.
+	- res changed the Win32 window proc to set the requested mouse cursor 
+	  upon the WM_SETCURSOR message and not WM_MOUSEMOVE.
 20-Nov-2006
 	- Jorrit changed the mingw building doc to use 'jam' by default
 	  instead of 'make'.
