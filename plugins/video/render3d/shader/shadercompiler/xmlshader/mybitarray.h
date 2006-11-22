@@ -36,7 +36,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
     CS_DECLARE_STATIC_CLASSVAR_REF (bitsAlloc2,
       BitsAlloc2, BitsAlloc2Type);
     
-    typedef csFixedSizeAllocator<sizeof (csBitArrayStorageType) * 2, 
+    typedef csFixedSizeAllocator<sizeof (csBitArrayStorageType) * 4, 
       Allocator> BitsAlloc4Type;
     CS_DECLARE_STATIC_CLASSVAR_REF (bitsAlloc4,
       BitsAlloc4, BitsAlloc4Type);
@@ -74,7 +74,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
     CS_DECLARE_STATIC_CLASSVAR_REF (bitsAlloc2,
       BitsAlloc2, BitsAlloc2Type);
     
-    typedef csFixedSizeAllocator<sizeof (csBitArrayStorageType) * 2, 
+    typedef csFixedSizeAllocator<sizeof (csBitArrayStorageType) * 4, 
       Allocator> BitsAlloc4Type;
     CS_DECLARE_STATIC_CLASSVAR_REF (bitsAlloc4,
       BitsAlloc4, BitsAlloc4Type);

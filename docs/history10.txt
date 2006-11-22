@@ -14,6 +14,7 @@ chronological order.
 	- res merged r25881 into 1.0 (odedynam crash fix).
 	- res merged r25910 into 1.0 (Win32 mouse cursor updating).
 	- res merged r25911 into 1.0 (deprecation warning fix).
+	- res merged r25912 into 1.0 (xmlshader crash fix).
 19-Nov-2006
 	- Eric Sunshine merged r25888 into 1.0 (SCF documentation example fix).
 17-Nov-2006
