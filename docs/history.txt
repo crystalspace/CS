@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+20-Nov-2006
+	- Jorrit changed the mingw building doc to use 'jam' by default
+	  instead of 'make'.
 18-Nov-2006
 	- Marten fixed the SCF example in manual section 4.3.1.10.
 17-Nov-2006
