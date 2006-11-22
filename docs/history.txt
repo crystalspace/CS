@@ -6,6 +6,11 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+22-Nov-2006
+	- Jorrit marked collections as deprecated and obsolete. They are
+	  never used and are also not useful.
+	- Jorrit made the warnings when lightmaps are not up-to-date a
+	  little bit less verbose.
 20-Nov-2006
 	- Jorrit changed the mingw building doc to use 'jam' by default
 	  instead of 'make'.

@@ -1261,7 +1261,11 @@ struct iEngine : public virtual iBase
     /// Get the list of all shared variables.
   virtual iSharedVariableList* GetVariableList () const = 0;
 
-  /// Get the list of collections.
+  /**
+   * Get the list of collections.
+   * \deprecated Collections are obsolete.
+   */
+  CS_DEPRECATED_METHOD_MSG("Collections are obsolete")
   virtual iCollectionList* GetCollections () = 0;
   
   /**
@@ -1275,7 +1279,9 @@ struct iEngine : public virtual iBase
    * doesn't exist. In this case the region parameter is ignored.
    * \param name the engine name of the desired collection
    * \param region if specified, search only this region (also see note above)
+   * \deprecated Collections are obsolete.
    */
+  CS_DEPRECATED_METHOD_MSG("Collections are obsolete")
   virtual iCollection* FindCollection (const char* name,
   	iRegion* region = 0) = 0;
 
