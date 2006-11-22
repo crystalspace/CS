@@ -1275,6 +1275,9 @@ bool csLoader::LoadMap (iLoaderContext* ldr_context, iDocumentNode* worldnode,
 	  return false;
         break;
       case XMLTOKEN_COLLECTION:
+	ReportWarning (
+	        "crystalspace.maploader.parse.region",
+                child, "Collections are obsolete. Don't use them!");
         if (!ParseCollection (ldr_context, child))
 	  return false;
         break;
@@ -4306,6 +4309,9 @@ iCollection* csLoader::ParseCollection (iLoaderContext* ldr_context,
         break;
       case XMLTOKEN_COLLECTION:
         {
+	  ReportWarning (
+	        "crystalspace.maploader.parse.region",
+                child, "Collections are obsolete. Don't use them!");
 	  const char* colname = child->GetContentsValue ();
 	  iCollection* th;
 	  if (ldr_context->GetRegion () && ldr_context->CurrentRegionOnly ())

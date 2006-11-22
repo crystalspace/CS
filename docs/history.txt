@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+22-Nov-2006
+	- Jorrit marked collections as deprecated and obsolete. They are
+	  never used and are also not useful.
 21-Nov-2006
 	- Jorrit fixed a bug in csSector::PrecacheDraw(). It forgot to
 	  do BeginDraw() with the result that some essential variables were

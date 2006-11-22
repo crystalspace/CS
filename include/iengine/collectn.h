@@ -42,8 +42,11 @@ struct iObject;
  * Main users of this interface:
  * - Engine stores them.
  * - Application uses them.
+ *
+ * \deprecated Don't use collections. They are obsolete.
  */
-struct iCollection : public virtual iBase
+struct CS_DEPRECATED_TYPE_MSG ("Collections are obsolete. Don't use then")
+	iCollection : public virtual iBase
 {
   SCF_INTERFACE(iCollection, 2,0,0);
   /// Query the iObject for this collection
