@@ -25,6 +25,8 @@ chronological order.
 	  also implements iSndSysSourceSoftware as it should.
 15-Nov-2006
 	- res fixed some deprecation warnings in walktest.
+	- caedes added a check on csODECollider::CreateMeshGeometry, so it
+	  doesnt crash if there is no collision polygon mesh on the object.
 11-Nov-2006
 	- Genjix corrected spelling mistake vfs.h and changed the years here.
 10-Nov-2006

@@ -1083,8 +1083,11 @@ bool csODECollider::CreateMeshGeometry (iMeshWrapper *mesh)
   iPolygonMesh* p = mesh->GetMeshObject()->GetObjectModel()
   	->GetPolygonMeshColldet();
 
-  if (p->GetVertexCount () == 0 || p->GetTriangleCount () == 0)
+  if (!p || p->GetVertexCount () == 0 || p->GetTriangleCount () == 0)
+  {
+    csFPrintf(stderr, "csODECollider: No collision polygons, triangles or vertices on %s\n",mesh->QueryObject()->GetName());
     return false;
+  }
 
   csTriangle *c_triangle = p->GetTriangles();
   int tr_num = p->GetTriangleCount();
