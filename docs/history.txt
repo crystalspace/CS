@@ -14,6 +14,8 @@ chronological order.
 	- Marten rewrote the ThreadedJobQueue to not have any internal
 	  deadlocks and in the process rewrote it to use the new threading
 	  subsystem.
+	- Marten fixed a few bugs in lighter2 (it now works again) as well
+	  as some more preparation for new ligth computation algorithm.
 22-Nov-2006
 	- Jorrit marked collections as deprecated and obsolete. They are
 	  never used and are also not useful.

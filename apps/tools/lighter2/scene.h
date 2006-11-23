@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2005 by Marten Svanfeldt
+  Copyright (C) 2005-2006 by Marten Svanfeldt
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -27,7 +27,7 @@ namespace lighter
   class KDTree;
 
   // A lightsource
-  class Light : public csRefCount
+  class Light_old : public csRefCount
   {
   public:
     csVector3 position;
@@ -41,7 +41,7 @@ namespace lighter
 
     csBox3 boundingBox;
   };
-  typedef csRefArray<Light> LightRefArray;
+  typedef csRefArray<Light_old> LightRefArray;
 
   class Scene;
 
@@ -111,7 +111,7 @@ namespace lighter
     LightmapPtrDelArray& GetLightmaps () 
     { return lightmaps; }
 
-    Lightmap* GetLightmap (uint lightmapID, Light* light);
+    Lightmap* GetLightmap (uint lightmapID, Light_old* light);
     csArray<LightmapPtrDelArray*> GetAllLightmaps ();
   protected:
     
@@ -122,7 +122,7 @@ namespace lighter
     SectorHash sectors;
 
     LightmapPtrDelArray lightmaps;
-    typedef csHash<LightmapPtrDelArray*, csPtrKey<Light> > PDLightmapsHash;
+    typedef csHash<LightmapPtrDelArray*, csPtrKey<Light_old> > PDLightmapsHash;
     PDLightmapsHash pdLightmaps;
 
     struct LoadedFile

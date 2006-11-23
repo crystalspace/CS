@@ -161,7 +161,7 @@ namespace lighter
     return true;
   }
 
-  Lightmap* Scene::GetLightmap (uint lightmapID, Light* light)
+  Lightmap* Scene::GetLightmap (uint lightmapID, Light_old* light)
   {
     if (!light->pseudoDynamic)
       return lightmaps[lightmapID];
@@ -223,7 +223,7 @@ namespace lighter
     {
       iLight *light = lightList->Get (i);
       if (light->GetDynamicType() == CS_LIGHT_DYNAMICTYPE_DYNAMIC) continue;
-      csRef<Light> radLight; radLight.AttachNew (new Light);
+      csRef<Light_old> radLight; radLight.AttachNew (new Light_old);
       radLight->position = light->GetMovable ()->GetFullPosition ();
       radLight->attenuation = light->GetAttenuationMode ();
       radLight->attenuationConsts = light->GetAttenuationConstants();
@@ -330,7 +330,7 @@ namespace lighter
       PDLightmapsHash::GlobalIterator pdlIt = pdLightmaps.GetIterator();
       while (pdlIt.HasNext())
       {
-        csPtrKey<Light> key;
+        csPtrKey<Light_old> key;
         LightmapPtrDelArray* lm = pdlIt.Next(key);
         if (lm->Get (i)->IsNull()) continue;
 

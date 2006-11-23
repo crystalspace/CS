@@ -54,10 +54,10 @@ namespace lighter
 
   const csVector3 Primitive::GetCenter () const
   {
-    csVector3 centroid(0.0f);
+    csVector3 centroid;
     centroid = vertexData.vertexArray[triangle.a].position;
-    centroid = vertexData.vertexArray[triangle.b].position;
-    centroid = vertexData.vertexArray[triangle.c].position;
+    centroid += vertexData.vertexArray[triangle.b].position;
+    centroid += vertexData.vertexArray[triangle.c].position;
     
     return centroid / 3.0f;
   }
@@ -66,8 +66,8 @@ namespace lighter
   {
     float area = csMath3::DoubleArea3 (
       vertexData.vertexArray[triangle.a].position,
-      vertexData.vertexArray[triangle.a].position, 
-      vertexData.vertexArray[triangle.a].position);
+      vertexData.vertexArray[triangle.b].position, 
+      vertexData.vertexArray[triangle.c].position);
     return area/2.0f;
   }
 
@@ -540,20 +540,9 @@ namespace lighter
 
   bool Primitive::PointInside (const csVector3& pt) const
   {
-    csVector3 p1 = 
-      vertexData.vertexArray[triangle.c].position;
-    for (size_t i = 0; i < 3; i++)
-    {
-      csVector3 p2 = vertexData.vertexArray[triangle[i]].position;
-
-      csVector3 testPlaneNormal = (p2 - p1) % plane.Normal();
-      csPlane3 testPlane (testPlaneNormal, -testPlaneNormal * p1);
-
-      if (testPlane.Classify (pt) < -EPSILON) return false;
-
-      p1 = p2;
-    }
-    return true;
+    float lambda, my;
+    ComputeBaryCoords (pt, lambda, my);
+    return (lambda >= 0.0f && my >= 0.0f && (lambda + my) < 1.0f);
   }
 
   int Primitive::Classify (const csPlane3 &plane) const
@@ -665,4 +654,22 @@ namespace lighter
     my = (myCoeffTV * thirdPosToV);
   }
 
+  size_t Primitive::ComputeElementIndex (const csVector3& pt) const
+  {
+    size_t u = (size_t)(pt * uFormVector);
+    size_t v = (size_t)(pt * vFormVector);
+
+    return v*(maxUV.x - minUV.x + 1) + v;
+  }
+
+
+  ElementProxy& Primitive::GetElement (size_t index)
+  {
+    return ElementProxy(*this, index);
+  }
+
+  ElementProxy& Primitive::GetElement (const csVector3& pt)
+  {
+    return GetElement (ComputeElementIndex (pt));
+  }
 }

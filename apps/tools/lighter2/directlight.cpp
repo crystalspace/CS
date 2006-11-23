@@ -163,7 +163,7 @@ namespace lighter
       return (jiVec * prim.GetPlane().Normal() >= 0.0f);
     }
     /// Apply computed light value to light value for element.
-    void ApplyLight (Light* light, const csColor& reflected)
+    void ApplyLight (Light_old* light, const csColor& reflected)
     {
       Lightmap* lm = sector->scene->GetLightmap (
         prim.GetGlobalLightmapID (), light);
@@ -263,7 +263,7 @@ namespace lighter
       return false;
     }
     /// Apply computed light value to light value for element.
-    void ApplyLight (Light* /*light*/, const csColor& reflected)
+    void ApplyLight (Light_old* /*light*/, const csColor& reflected)
     {
 #ifndef DUMP_NORMALS
       (*litColors)[state.vertIndex] += reflected;
@@ -289,7 +289,7 @@ namespace lighter
     // Shade a single rad primitive
     template<class Data>
     static void ShadeElements (Data& data, const Attenuation& attn, 
-      Raytracer &tracer, Light* light)
+      Raytracer &tracer, Light_old* light)
     {
       // Compute shading for each point on the primitive, using normal Phong shading
       // for diffuse surfaces
@@ -334,7 +334,7 @@ namespace lighter
 
     // Shade a number of primitives
     static void Primitives (Sector* sector, const Attenuation& attn, 
-      Raytracer &tracer, PrimitivesPerObjectHash& prims, Light* light, 
+      Raytracer &tracer, PrimitivesPerObjectHash& prims, Light_old* light, 
       float progressStep)
     {
       // Iterate over primitives
@@ -348,20 +348,17 @@ namespace lighter
         {
           Data_PerVertex data (objPrims, obj);
           ShadeElements (data, attn, tracer, light);
-          globalStats.IncTaskProgress (objProgressStep);
-	  globalTUI.Redraw (TUI::TUI_DRAW_RAYCORE | TUI::TUI_DRAW_PROGRESS);
         }
         else
         {
-          float primProgressStep = objProgressStep / objPrims.GetSize ();
           for (unsigned i = 0; i < objPrims.GetSize (); i++)
           {
             Data_Lightmap data (sector, *objPrims[i]);
             ShadeElements (data, attn, tracer, light);
-	    globalStats.IncTaskProgress (primProgressStep);
-	    globalTUI.Redraw (TUI::TUI_DRAW_RAYCORE | TUI::TUI_DRAW_PROGRESS);
           }
         }
+        globalStats.IncTaskProgress (objProgressStep);
+        globalTUI.Redraw (TUI::TUI_DRAW_RAYCORE | TUI::TUI_DRAW_PROGRESS);
       }
     }
 
@@ -378,7 +375,7 @@ namespace lighter
 
     while (lightIt.HasNext ())
     {
-      csRef<Light> radLight = lightIt.Next ();
+      csRef<Light_old> radLight = lightIt.Next ();
 
       // Rework to use more correct scheme
       radLight->freeEnergy = radLight->color * 

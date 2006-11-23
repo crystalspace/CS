@@ -26,7 +26,7 @@ namespace lighter
   class Sector;
   class Raytracer;
   class Primitive;
-  class Light;
+  class Light_old;
   
   // Class to calculate direct lighting
   class DirectLighting

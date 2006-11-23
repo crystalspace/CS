@@ -20,6 +20,7 @@
 
 #include "kdtree.h"
 #include "primitive.h"
+#include "statistics.h"
 
 #include "csutil/alignedalloc.h"
 
@@ -455,11 +456,11 @@ namespace lighter
     struct CountFunctor
     {
       CountFunctor ()
-        : numNodes (0), numPrimSlots (0)
+        : numNodes (0), numPrimSlots (0), maxDepth (0), sumDepth (0)
       {
       }
       
-      void CountNode (KDNode* node)
+      void CountNode (KDNode* node, size_t depth = 0)
       {
         if (!node)
           return;
@@ -467,13 +468,28 @@ namespace lighter
         numNodes++;
         numPrimSlots += node->primitives.GetSize ();
 
-        CountNode (node->leftChild);
-        CountNode (node->rightChild);
+        //At the same time, collect global statistics
+        if (!node->leftChild)
+        {
+          // Leaf
+          globalStats.kdtree.leafNodes++;
+          sumDepth += depth;
+          maxDepth = csMax (maxDepth, depth);
+        }
+
+
+        CountNode (node->leftChild, depth+1);
+        CountNode (node->rightChild, depth+1);
       }
 
-      size_t numNodes, numPrimSlots;
+      size_t numNodes, numPrimSlots, maxDepth, sumDepth;
     } counter;
     counter.CountNode (rootNode);
+
+    globalStats.kdtree.numNodes += counter.numNodes;
+    globalStats.kdtree.numPrimitives += counter.numPrimSlots;
+    globalStats.kdtree.sumDepth += counter.sumDepth;
+    globalStats.kdtree.maxDepth = csMax(counter.maxDepth, globalStats.kdtree.maxDepth);
 
     //Allocate
     KDTree* newTree = new KDTree;
