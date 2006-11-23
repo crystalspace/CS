@@ -7,6 +7,8 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 22-Nov-2006
+        - Piotr fixed track Ticket #193 (terrain collision problem)
+22-Nov-2006
 	- Jorrit marked collections as deprecated and obsolete. They are
 	  never used and are also not useful.
 	- Jorrit made the warnings when lightmaps are not up-to-date a
