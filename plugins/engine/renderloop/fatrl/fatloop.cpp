@@ -78,7 +78,7 @@ csFatLoopLoader::csFatLoopLoader (iBase* p) : csBaseRenderStepLoader (p)
 
 csPtr<iBase> csFatLoopLoader::Parse (iDocumentNode* node, 
                                      iStreamSource*,
-				     iLoaderContext* /*ldr_context*/,
+				     iLoaderContext* ldr_context,
                                      iBase* /*context*/)
 {
   csRef<csFatLoopStep> step;
@@ -122,7 +122,7 @@ csPtr<iBase> csFatLoopLoader::Parse (iDocumentNode* node,
       case XMLTOKEN_PASS:
         {
           RenderPass pass;
-          if (!ParsePass (child, pass))
+          if (!ParsePass (ldr_context, child, pass))
             return 0;
           step->AddPass (pass);
         }
@@ -140,7 +140,8 @@ csPtr<iBase> csFatLoopLoader::Parse (iDocumentNode* node,
   return csPtr<iBase> (step);
 }
 
-bool csFatLoopLoader::ParsePass (iDocumentNode* node, RenderPass& pass)
+bool csFatLoopLoader::ParsePass (iLoaderContext* ldr_context,
+    iDocumentNode* node, RenderPass& pass)
 {
   csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg, 
     "crystalspace.shared.stringset", iStringSet);
@@ -157,7 +158,7 @@ bool csFatLoopLoader::ParsePass (iDocumentNode* node, RenderPass& pass)
 	pass.shadertype = strings->Request (child->GetContentsValue ());
 	break;
       case XMLTOKEN_DEFAULTSHADER:
-        pass.defShader = synldr->ParseShaderRef (child);
+        pass.defShader = synldr->ParseShaderRef (ldr_context, child);
 	break;
       case XMLTOKEN_MAXLIGHTS:
 	pass.maxLights = child->GetContentsValueAsInt ();

@@ -788,7 +788,9 @@ iShader* csStencilShadowType::GetShadow ()
     csRef<iDocument> shaderDoc = docsys->CreateDocument ();
     shaderDoc->Parse (buf, true);
 
-    shadow = shcom->CompileShader (shaderDoc->GetRoot ()->GetNode ("shader"));
+    // @@@ TODO: Try to get a right ldr_context here???
+    shadow = shcom->CompileShader (0,
+	shaderDoc->GetRoot ()->GetNode ("shader"));
     
     if (!shadow)
     {

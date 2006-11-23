@@ -577,7 +577,7 @@ iMaterialWrapper* csLoader::ParseMaterial (iLoaderContext* ldr_context,
 	  csRef<csShaderVariable> var;
 	  var.AttachNew (new csShaderVariable);
 
-          if (!SyntaxService->ParseShaderVar (child, *var))
+          if (!SyntaxService->ParseShaderVar (ldr_context, child, *var))
           {
             break;
           }

@@ -96,7 +96,7 @@ bool csShadowmapRSLoader::Initialize (iObjectRegistry* object_reg)
 
 csPtr<iBase> csShadowmapRSLoader::Parse (iDocumentNode* node, 
 				       iStreamSource*,
-				       iLoaderContext*,      
+				       iLoaderContext* ldr_context,      
 				       iBase*)
 {
   csShadowmapRenderStep* newstep = 
@@ -104,7 +104,7 @@ csPtr<iBase> csShadowmapRSLoader::Parse (iDocumentNode* node,
   csRef<iRenderStep> step;
   step.AttachNew (newstep);    
 
-  if (!ParseStep (node, newstep, newstep->GetSettings()))
+  if (!ParseStep (ldr_context, node, newstep, newstep->GetSettings()))
     return 0;
 
   if (newstep->GetSettings().shader.IsEmpty() &&
@@ -118,9 +118,10 @@ csPtr<iBase> csShadowmapRSLoader::Parse (iDocumentNode* node,
   return csPtr<iBase> (step);
 }
 
-bool csShadowmapRSLoader::ParseStep (iDocumentNode* node,
-  csShadowmapRenderStep* step, 
-  csShadowmapRenderStep::DrawSettings& settings)
+bool csShadowmapRSLoader::ParseStep (iLoaderContext* ldr_context,
+    iDocumentNode* node,
+    csShadowmapRenderStep* step, 
+    csShadowmapRenderStep::DrawSettings& settings)
 {
   csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
     object_reg, "crystalspace.shared.stringset", iStringSet);
@@ -146,7 +147,8 @@ bool csShadowmapRSLoader::ParseStep (iDocumentNode* node,
 	break;
       case XMLTOKEN_DEFAULTSHADER:
 	{
-	  csRef<iShader> defshader = synldr->ParseShaderRef (child);
+	  csRef<iShader> defshader = synldr->ParseShaderRef (ldr_context,
+	      child);
 	  step->SetDefaultShader(defshader);
 	}
 	break;

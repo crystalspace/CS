@@ -67,7 +67,7 @@ csFullScreenQuadRSLoader::csFullScreenQuadRSLoader (iBase* p) :
 
 csPtr<iBase> csFullScreenQuadRSLoader::Parse (iDocumentNode* node, 
 				       iStreamSource*,
-				       iLoaderContext* /*ldr_context*/, 
+				       iLoaderContext* ldr_context, 
 				       iBase* /*context*/)
 {
   csFullScreenQuadRenderStep* newstep = 
@@ -75,7 +75,7 @@ csPtr<iBase> csFullScreenQuadRSLoader::Parse (iDocumentNode* node,
   csRef<iRenderStep> step;
   step.AttachNew (newstep);    
 
-  if (!ParseStep (node, newstep, newstep->GetOtherSettings(),
+  if (!ParseStep (ldr_context, node, newstep, newstep->GetOtherSettings(),
     false))
     return 0;
 
@@ -101,9 +101,10 @@ csPtr<iBase> csFullScreenQuadRSLoader::Parse (iDocumentNode* node,
   return csPtr<iBase> (step);
 }
 
-bool csFullScreenQuadRSLoader::ParseStep (iDocumentNode* node,
-  csFullScreenQuadRenderStep* step, 
-  csFullScreenQuadRenderStep::DrawSettings& settings, bool firstPass)
+bool csFullScreenQuadRSLoader::ParseStep (iLoaderContext* ldr_context,
+    iDocumentNode* node,
+    csFullScreenQuadRenderStep* step, 
+    csFullScreenQuadRenderStep::DrawSettings& settings, bool firstPass)
 {
   csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
     object_reg, "crystalspace.shared.stringset", iStringSet);
@@ -158,7 +159,7 @@ bool csFullScreenQuadRSLoader::ParseStep (iDocumentNode* node,
 	  csFullScreenQuadRenderStep::DrawSettings& firstSettings =
 	    step->GetFirstSettings();
 	  firstSettings = settings;
-	  if (!ParseStep (child, step, firstSettings, true))
+	  if (!ParseStep (ldr_context, child, step, firstSettings, true))
 	    return false;
 	}
 	break;
@@ -170,7 +171,7 @@ bool csFullScreenQuadRSLoader::ParseStep (iDocumentNode* node,
 	  csRef<csShaderVariable> var;
 	  var.AttachNew (new csShaderVariable);
 
-	  if (!synldr->ParseShaderVar (child, *var))
+	  if (!synldr->ParseShaderVar (ldr_context, child, *var))
 	  {
 	    return false;
 	  }

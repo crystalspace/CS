@@ -109,8 +109,9 @@ bool csXMLShaderCompiler::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-csPtr<iShader> csXMLShaderCompiler::CompileShader (iDocumentNode *templ,
-		int forcepriority)
+csPtr<iShader> csXMLShaderCompiler::CompileShader (
+    	iLoaderContext* ldr_context, iDocumentNode *templ,
+	int forcepriority)
 {
   if (!templ) return 0;
 
@@ -121,7 +122,7 @@ csPtr<iShader> csXMLShaderCompiler::CompileShader (iDocumentNode *templ,
   // Create a shader. The actual loading happens later.
   csRef<csXMLShader> shader;
   if (do_verbose) startTime = csGetTicks();
-  shader.AttachNew (new csXMLShader (this, templ, forcepriority));
+  shader.AttachNew (new csXMLShader (this, ldr_context, templ, forcepriority));
   if (do_verbose) endTime = csGetTicks();
   shader->SetName (templ->GetAttributeValue ("name"));
   shader->SetDescription (templ->GetAttributeValue ("description"));

@@ -137,7 +137,7 @@ bool csGeneralFactoryLoader::ParseSubMesh(iDocumentNode *node,
       {
         csRef<csShaderVariable> sv;
         sv.AttachNew (new csShaderVariable);
-        if (!synldr->ParseShaderVar (child, *sv)) return false;
+        if (!synldr->ParseShaderVar (ldr_context, child, *sv)) return false;
         shadervars.Push (sv);
         break;
       }
@@ -1237,7 +1237,7 @@ bool csGeneralMeshLoader::ParseSubMesh(iDocumentNode *node,
       {
         csRef<csShaderVariable> sv;
         sv.AttachNew (new csShaderVariable);
-        if (!synldr->ParseShaderVar (child, *sv)) return false;
+        if (!synldr->ParseShaderVar (ldr_context, child, *sv)) return false;
         svc->AddVariable (sv);
         break;
       }
