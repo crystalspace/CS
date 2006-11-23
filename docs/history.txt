@@ -11,6 +11,9 @@ chronological order.
 	  variable loading functions. That way shader variables will
 	  correctly find textures using the loader context.
         - Piotr fixed track Ticket #193 (terrain collision problem)
+	- Marten rewrote the ThreadedJobQueue to not have any internal
+	  deadlocks and in the process rewrote it to use the new threading
+	  subsystem.
 22-Nov-2006
 	- Jorrit marked collections as deprecated and obsolete. They are
 	  never used and are also not useful.
