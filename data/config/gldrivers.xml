@@ -567,7 +567,7 @@
     <rule description="Disable texture compression for Intel DRI">
       <conditions>
         <regexp string="renderer" pattern="Mesa.*Intel" />
-        <regexp string="glversion" pattern="6\.5\..." />
+        <regexp string="glversion" pattern="Mesa 6\.5\.." />
       </conditions>
       <applicable>
         <usecfg>disableTC</usecfg>
@@ -581,7 +581,7 @@
     <rule description="Disable ARB_fragment_program for Intel DRI">
       <conditions>
         <regexp string="renderer" pattern="Mesa.*Intel" />
-        <regexp string="glversion" pattern="6\.5\..." />
+        <regexp string="glversion" pattern="Mesa 6\.5\.." />
       </conditions>
       <applicable>
         <usecfg>noafp</usecfg>
