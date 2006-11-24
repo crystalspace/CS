@@ -7,6 +7,8 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 24-Nov-2006
+	- Jorrit fixed some compile errors caused by yesterday's
+	  commit.
 	- res added tweaks to the GL driver database to disable texture
 	  compression and AFP for the Intel DRI driver, since both are broken
 	  there.
