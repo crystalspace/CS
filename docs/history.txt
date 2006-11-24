@@ -12,6 +12,8 @@ chronological order.
 	- res added tweaks to the GL driver database to disable texture
 	  compression and AFP for the Intel DRI driver, since both are broken
 	  there.
+	- Marten updated the documentation for the new threading to actually
+	  say anything useful.
 23-Nov-2006
 	- Jorrit added iLoaderContext parameter to shader and shader
 	  variable loading functions. That way shader variables will
