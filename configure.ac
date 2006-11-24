@@ -1593,13 +1593,6 @@ AS_IF([test $cs_cv_libCEGUI = yes],
 # Check if CEGUI Python bindings (cegui.i, cegui.py) are available, and if
 # CEGUI Python support is sufficiently recent.
 #------------------------------------------------------------------------------
-m4_define([pycegui_paths_default], m4_join([$PATH_SEPARATOR],
-    [/usr/local/include/CEGUI/bindings],
-    [/usr/include/CEGUI/bindings],
-    [/sw/include/CEGUI/bindings],
-    [/opt/local/include/CEGUI/bindings],
-    [/opt/include/CEGUI/bindings]))
-
 m4_define([cegui_findpy],
 [import os.path
 try:
@@ -1641,14 +1634,10 @@ AS_IF([test -n "$PYTHON" && test -n "$SWIG" &&
 AS_IF([test "$cs_cv_libCEGUI_bleeding" = yes],
     [AC_CACHE_CHECK([for pycegui], [cs_cv_pycegui],
         [AS_IF([test "$with_pycegui" != yes],
-            [cs_cv_pycegui_i_file="$with_pycegui/package/cegui.i"
-            cs_cv_pycegui_py_file="$with_pycegui/src/cegui.py"],
-            [AC_PATH_PROGS([cs_cv_pycegui_i_file],[cegui.i],[],
-                [pycegui_paths_default$PATH_SEPARATOR$cs_cv_cslibs_incpath])
-	        cs_cv_pycegui_py_file=CS_RUN_PATH_NORMALIZE(
-	            [$PYTHON -c "cegui_findpy"])])
-        AS_IF([test -f "$cs_cv_pycegui_py_file" &&
-            test -f "$cs_cv_pycegui_i_file"],
+            [cs_cv_pycegui_py_file="$with_pycegui"],
+            [cs_cv_pycegui_py_file=CS_RUN_PATH_NORMALIZE(
+	        [$PYTHON -c "cegui_findpy"])])
+        AS_IF([test -f "$cs_cv_pycegui_py_file"],
             [cs_cv_pycegui=yes], [cs_cv_pycegui=no])])])
             
 AS_IF([test "$cs_cv_pycegui" = yes],
@@ -1660,9 +1649,7 @@ AS_IF([test "$cs_cv_pycegui" = yes],
             [cs_cv_pycegui_swig_ok=yes], [cs_cv_pycegui_swig_ok=no])])])
 
 AS_IF([test "$cs_cv_pycegui_swig_ok" = yes],
-    [pycegui_i_dir=`AS_DIRNAME([$cs_cv_pycegui_i_file])`
-    CS_EMIT_BUILD_PROPERTY([PYCEGUI.SWIGOK], [yes])
-    CS_EMIT_BUILD_PROPERTY([PYCEGUI.SWIGFLAGS], [-I$pycegui_i_dir])])
+    [CS_EMIT_BUILD_PROPERTY([PYCEGUI.SWIGOK], [yes])])
 
 
 

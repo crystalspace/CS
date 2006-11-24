@@ -17,7 +17,7 @@
 */
 /*
   SWIG interface for Crystal Space Python Cegui Plugin
-  Wraps iCEGUI and connects cegui and cspace bindings.
+  Wraps iCEGUI crystalspace module.
 */
 
 %module pycscegui
@@ -32,19 +32,9 @@
 %import "bindings/cspace.i"
 
 %{
-#include <CEGUI.h>
 #include "crystalspace.h"
 #include "ivaria/icegui.h"
-
-PyObject *handleException(CEGUI::Exception &e)
-{
-    PyErr_SetString(PyExc_TypeError, e.getMessage().c_str());
-    Py_INCREF(Py_None);
-    return Py_None;
-}
 %}
-
-%import "cegui.i"
 
 INTERFACE_PRE(iCEGUI);
 %include "ivaria/icegui.h"

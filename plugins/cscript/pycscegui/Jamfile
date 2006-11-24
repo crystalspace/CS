@@ -13,12 +13,12 @@ if $(PYTHON.AVAILABLE) = "yes" && $(CEGUI.AVAILABLE) = "yes" && $(PYCEGUI.SWIGOK
   {
     common = [ DoSourceGrist $(common) ] ;
 
-    if $(CMD.SWIG) && $(PYCEGUI.SWIGFLAGS)
+    if $(CMD.SWIG)
     {
       Swig $(common) $(csceguipy) :
         [ DoSourceGrist pycscegui.i ] :
         python :
-	-c++ -shadow $(CEGUI.CFLAGS) $(PYCEGUI.SWIGFLAGS) :
+	-c++ -shadow :
 	[ ConcatDirs $(TOP) include ]
 	[ ConcatDirs $(BUILDTOP) include ] :
 	[ ConcatDirs $(TOP) include bindings ]

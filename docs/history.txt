@@ -14,6 +14,12 @@ chronological order.
 	  there.
 	- Marten updated the documentation for the new threading to actually
 	  say anything useful.
+	- caedes modified the pycscegui swig interface file so it doesnt
+	  import cegui interface files any more as it was not really needed.
+	- caedes simplified the configure test for pycscegui a bit as it 
+	  doesnt need to test for cegui.i file any more, also now 
+	  only cegui.py file path must be passed to --with-pycegui, instead of
+	  having to point to the whole pycegui sources.
 23-Nov-2006
 	- Jorrit added iLoaderContext parameter to shader and shader
 	  variable loading functions. That way shader variables will
