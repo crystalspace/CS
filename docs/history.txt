@@ -22,7 +22,7 @@ chronological order.
 	  having to point to the whole pycegui sources.
 	- caedes fixed ice.looknfeel for cegui 0.5 since it was broken from
 	  last update (at least on linux), due to not updated Falagard.xsd and
-	  some incorrect elements on xml. All apps using this layout would 
+	  some incorrect elements on xml. All apps using this looknfeel would 
 	  crash.
 23-Nov-2006
 	- Jorrit added iLoaderContext parameter to shader and shader
