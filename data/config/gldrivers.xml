@@ -235,6 +235,24 @@
        </OpenGL>
       </Video>
     </config>
+    <config name="noafp">
+      <Video>
+	<OpenGL>
+	  <UseExtension>
+	    <GL_ARB_fragment_program>no</GL_ARB_fragment_program>
+	  </UseExtension>
+	  <!-- Our GL ext disabling obviously doesn't apply to CgGL, so set
+	       the maximum FP profile to the highest below AFP. -->
+	  <Shader>
+	    <Cg>
+	      <MaxProfile>
+		<Fragment>ps_1_3</Fragment>
+	      </MaxProfile>
+	    </Cg>
+	  </Shader>
+	</OpenGL>
+      </Video>
+    </config>
   </configs>
   <rules>
     <!-- rule description="Some more examples">
@@ -538,6 +556,35 @@
       </conditions>
       <applicable>
        <usecfg>disableLodBias</usecfg>
+      </applicable>
+    </rule>
+
+    <!--
+      * 2006-11-24: S3TC support in Intel DRI (at least in Mesa 6.5.1) is 
+                    broken. Since S3TC may also be used through generic
+		    compression formats, disable TC completely.
+      -->
+    <rule description="Disable texture compression for Intel DRI">
+      <conditions>
+        <regexp string="renderer" pattern="Mesa.*Intel" />
+        <regexp string="glversion" pattern="6\.5\..." />
+      </conditions>
+      <applicable>
+        <usecfg>disableTC</usecfg>
+      </applicable>
+    </rule>
+
+    <!--
+      * 2006-11-24: AFP support in Intel DRI (at least in Mesa 6.5.1) is 
+                    broken.
+      -->
+    <rule description="Disable ARB_fragment_program for Intel DRI">
+      <conditions>
+        <regexp string="renderer" pattern="Mesa.*Intel" />
+        <regexp string="glversion" pattern="6\.5\..." />
+      </conditions>
+      <applicable>
+        <usecfg>noafp</usecfg>
       </applicable>
     </rule>
 

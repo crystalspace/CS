@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+24-Nov-2006
+	- res added tweaks to the GL driver database to disable texture
+	  compression and AFP for the Intel DRI driver, since both are broken
+	  there.
 23-Nov-2006
 	- Jorrit added iLoaderContext parameter to shader and shader
 	  variable loading functions. That way shader variables will
