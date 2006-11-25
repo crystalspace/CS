@@ -9,6 +9,7 @@ chronological order.
 25-Nov-2006
 	- res disabled RECT textures for NVIDIA cards completely since they
 	  seem to cause a lot of crashes.
+	- res updated the dejavu fonts to version 2.12.
 24-Nov-2006
 	- Jorrit fixed some compile errors caused by yesterday's
 	  commit.
