@@ -473,6 +473,20 @@
       </applicable>
     </rule>
 
+    <!-- 
+      * 2006-11-25: A lot of crashes with NVIDIA hardware and RECT textures.
+		    Also see http://trac.crystalspace3d.org/trac/CS/wiki/RECT%20texture%20woes
+      -->
+    <rule description="NVidia: RECT texture extension apparently broken">
+      <conditions fulfill="all">
+	<regexp	string="vendor" pattern="NVIDIA" />
+	<regexp string="platform" pattern="Win32" />
+      </conditions>
+      <applicable>
+	<usecfg>disableRECTTextures</usecfg>
+      </applicable>
+    </rule>
+
     <rule description="SiS: Text drawing only seems to work using the worst method">
       <conditions>
 	<regexp string="vendor" pattern="^SiS" />
