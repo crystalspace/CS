@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+26-Nov-2006
+	- res added a Jam rule to generate icon .pngs from an SVG file. The
+	  generation can be invoked with "jam generateicons". Added a test icon
+	  for startme from Dentoid.
 25-Nov-2006
 	- res disabled RECT textures for NVIDIA cards completely since they
 	  seem to cause a lot of crashes.

@@ -4,3 +4,4 @@ Description startme : "Crystal Space demo launcher" ;
 Application startme : [ Wildcard *.cpp *.h ] ;
 LinkWith startme : crystalspace ;
 
+IconSVG startme ;
