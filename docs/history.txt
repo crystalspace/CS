@@ -25,6 +25,8 @@ chronological order.
 	- caedes changed the pycscegui jamfile so only the build target
 	  depends on cegui now, instead of the generation and freeze
 	  targets also depending on it.
+	- caedes added initial version of the frozen swig generated files
+	  for pycscegui.
 26-Nov-2006
 	- res added a Jam rule to generate icon .pngs from an SVG file. The
 	  generation can be invoked with "jam generateicons". Added a test icon
