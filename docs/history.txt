@@ -15,6 +15,10 @@ chronological order.
 	- Marten reapplied threading bugfixes and changes to 
 	  ThreadedJobQueue (r25929). Correct bugfix is to fix the bug, not
 	  remove bugfixes in the threading and code changes in job queue.
+	- Marten fixed a bug in AtomicOperations::Increment on x86+gcc.
+	  The xadd instruction returns the value prior to increment, not 
+	  after. This fixes the problems with ThreadedJobQueue on mingw and
+	  probably linux.
 26-Nov-2006
 	- res added a Jam rule to generate icon .pngs from an SVG file. The
 	  generation can be invoked with "jam generateicons". Added a test icon

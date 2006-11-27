@@ -41,7 +41,6 @@ namespace Threading
       allThreadState[i] = new ThreadState (this);
       allThreads.Add (allThreadState[i]->threadObject);
     }
-    
     allThreads.StartAll ();
   }
 
