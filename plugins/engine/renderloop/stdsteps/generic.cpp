@@ -71,7 +71,7 @@ csGenericRSLoader::csGenericRSLoader (iBase* p) :
 
 csPtr<iBase> csGenericRSLoader::Parse (iDocumentNode* node, 
 				       iStreamSource*,
-				       iLoaderContext* /*ldr_context*/, 
+				       iLoaderContext* ldr_context,
 				       iBase* /*context*/)
 {
   csRef<iGenericRenderStep> step;
@@ -106,7 +106,8 @@ csPtr<iBase> csGenericRSLoader::Parse (iDocumentNode* node,
 	break;
       case XMLTOKEN_DEFAULTSHADER:
 	{
-	  csRef<iShader> defshader = synldr->ParseShaderRef (child);
+	  csRef<iShader> defshader = synldr->ParseShaderRef (ldr_context,
+	      child);
 	  step->SetDefaultShader (defshader);
 	}
 	break;

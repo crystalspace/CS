@@ -1547,7 +1547,8 @@ csRef<iShader> csEngine::LoadShader (iDocumentSystem* docsys,
   if (shaderFile.IsValid())
   {
     shaderDoc->Parse (shaderFile, false);
-    shader = shcom->CompileShader (shaderDoc->GetRoot ()->
+    csRef<iLoaderContext> elctxt (CreateLoaderContext (0, true));
+    shader = shcom->CompileShader (elctxt, shaderDoc->GetRoot ()->
       GetNode ("shader"));
     if (shader.IsValid()) shaderManager->RegisterShader (shader);
   }

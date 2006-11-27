@@ -280,8 +280,8 @@ struct iSyntaxService : public virtual iBase
   /**
    * Parse a shader variable declaration
    */
-  virtual bool ParseShaderVar (iDocumentNode* node, 
-    csShaderVariable& var) = 0;
+  virtual bool ParseShaderVar (iLoaderContext* ldr_context,
+      iDocumentNode* node, csShaderVariable& var) = 0;
   /**
    * Parse a shader variable expression. Returns an acessor that can be set
    * on a shader variable. The accessor subsequently evaluates the expression.
@@ -358,7 +358,8 @@ struct iSyntaxService : public virtual iBase
    * attribute mismatches, this method fails (and the loaded shader is not
    * registered with the shader manager),
    */
-  virtual csRef<iShader> ParseShaderRef (iDocumentNode* node) = 0;
+  virtual csRef<iShader> ParseShaderRef (iLoaderContext* ldr_context,
+      iDocumentNode* node) = 0;
 };
 
 /** @} */

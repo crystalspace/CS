@@ -100,7 +100,8 @@ public:
 	iString* destSector, bool& handled, bool& autoresolve);
   virtual bool ParseGradient (iDocumentNode* node, iGradient* gradient);
   virtual bool WriteGradient (iDocumentNode* node, iGradient* gradient);
-  virtual bool ParseShaderVar (iDocumentNode* node, csShaderVariable& var);
+  virtual bool ParseShaderVar (iLoaderContext* ldr_context,
+      iDocumentNode* node, csShaderVariable& var);
   virtual csRef<iShaderVariableAccessor> ParseShaderVarExpr (
     iDocumentNode* node);
   virtual bool WriteShaderVar (iDocumentNode* node, csShaderVariable& var);
@@ -118,7 +119,8 @@ public:
   virtual csRef<iRenderBuffer> ParseRenderBuffer (iDocumentNode* node);
   virtual bool WriteRenderBuffer (iDocumentNode* node, iRenderBuffer* buffer);
 
-  virtual csRef<iShader> ParseShaderRef (iDocumentNode* node);
+  virtual csRef<iShader> ParseShaderRef (iLoaderContext* ldr_context,
+      iDocumentNode* node);
 
   virtual void ReportError (const char* msgid, iDocumentNode* errornode,
 	const char* msg, ...);

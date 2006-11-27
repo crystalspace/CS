@@ -2497,7 +2497,7 @@ bool csLoader::LoadMeshObjectFactory (iLoaderContext* ldr_context,
 	  //create a new variable
 	  csRef<csShaderVariable> var;
 	  var.AttachNew (new csShaderVariable);
-	  if (!SyntaxService->ParseShaderVar (child, *var))
+	  if (!SyntaxService->ParseShaderVar (ldr_context, child, *var))
 	  {
 	    break;
 	  }
@@ -3028,7 +3028,7 @@ bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
         const char* varname = child->GetAttributeValue ("name");
 	csRef<csShaderVariable> var;
 	var.AttachNew (new csShaderVariable (stringSet->Request (varname)));
-	if (!SyntaxService->ParseShaderVar (child, *var))
+	if (!SyntaxService->ParseShaderVar (ldr_context, child, *var))
         {
 	  SyntaxService->ReportError (
 	    "crystalspace.maploader.load.meshobject", child,
@@ -4786,7 +4786,7 @@ iLight* csLoader::ParseStatlight (iLoaderContext* ldr_context,
 	  const char* varname = child->GetAttributeValue ("name");
 	  csRef<csShaderVariable> var;
 	  var.AttachNew (new csShaderVariable (stringSet->Request (varname)));
-	  if (!SyntaxService->ParseShaderVar (child, *var))
+	  if (!SyntaxService->ParseShaderVar (ldr_context, child, *var))
 	  {
 	    SyntaxService->ReportError (
 	      "crystalspace.maploader.load.meshobject", child,
@@ -5630,7 +5630,11 @@ bool csLoader::LoadShader (const char* filename)
   if (type == 0)
     type = "xmlshader";
   csRef<iShaderCompiler> shcom = shaderMgr->GetCompiler (type);
-  csRef<iShader> shader = shcom->CompileShader (shaderNode);
+
+  csRef<iLoaderContext> ldr_context = csPtr<iLoaderContext> (
+	new StdLoaderContext (Engine, 0, true, this, false, 0));
+
+  csRef<iShader> shader = shcom->CompileShader (ldr_context, shaderNode);
   if (shader)
   {
     shader->SetFileName (filename);
@@ -5741,7 +5745,7 @@ bool csLoader::ParseShader (iLoaderContext* ldr_context,
       "Could not get shader compiler '%s'", type);
     return false;
   }
-  csRef<iShader> shader = shcom->CompileShader (shaderNode);
+  csRef<iShader> shader = shcom->CompileShader (ldr_context, shaderNode);
   if (shader)
   {
     shader->SetFileName(fileChild->GetContentsValue ());

@@ -126,7 +126,7 @@ class csShadowmapRSLoader :
 
 #include "cstool/tokenlist.h"
 
-  bool ParseStep (iDocumentNode* node, 
+  bool ParseStep (iLoaderContext* ldr_context, iDocumentNode* node, 
     csShadowmapRenderStep* step, 
     csShadowmapRenderStep::DrawSettings& settings);
 public:
