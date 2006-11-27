@@ -42,6 +42,7 @@
 #include "igeom/clip2d.h"
 #include "igraphic/imageio.h"
 #include "imap/loader.h"
+#include "imap/ldrctxt.h"
 #include "imesh/genmesh.h"
 #include "imesh/object.h"
 #include "imesh/thing.h"
@@ -476,7 +477,9 @@ bool csWaterDemo::Initialize ()
   csRef<iShader> shader;
   csRef<iShaderManager> shmgr (CS_QUERY_REGISTRY(object_reg, iShaderManager));
   csRef<iShaderCompiler> shcom (shmgr->GetCompiler ("XMLShader"));
-  shader = shcom->CompileShader (shaderDoc->GetRoot ()->GetNode ("shader"));
+  csRef<iLoaderContext> ldr_context = engine->CreateLoaderContext ();
+  shader = shcom->CompileShader (ldr_context,
+      shaderDoc->GetRoot ()->GetNode ("shader"));
 
   // setup the mesh 
   csRef<iMeshObjectType> gType = csLoadPluginCheck<iMeshObjectType> (

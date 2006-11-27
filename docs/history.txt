@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+24-Nov-2006
+	- Jorrit fixed some compile errors caused by yesterday's
+	  commit.
 23-Nov-2006
 	- Jorrit added iLoaderContext parameter to shader and shader
 	  variable loading functions. That way shader variables will

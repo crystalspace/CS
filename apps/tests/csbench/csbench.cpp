@@ -62,6 +62,7 @@
 #include "ivideo/material.h"
 #include "ivideo/natwin.h"
 #include "ivideo/txtmgr.h"
+#include "imap/ldrctxt.h"
 
 #include "apps/tests/csbench/csbench.h"
 
@@ -466,7 +467,8 @@ void CsBench::PerformShaderTest (const char* shaderPath, const char* shtype,
     csRef<iDocumentNode> shadernode2 = shaderDoc2->GetRoot ()
     	->GetNode ("shader");
     shadertype2 = strings->Request (shtype2);
-    shader2 = shcom->CompileShader (shadernode2);
+    csRef<iLoaderContext> ldr_context = engine->CreateLoaderContext ();
+    shader2 = shcom->CompileShader (ldr_context, shadernode2);
   }
 
   csRef<iShaderPriorityList> prilist = shcom->GetPriorities (shadernode);
@@ -482,7 +484,8 @@ void CsBench::PerformShaderTest (const char* shaderPath, const char* shtype,
   for (i = 0 ; i < prilist->GetCount () ; i++)
   {
     int pri = prilist->GetPriority (i);
-    csRef<iShader> shader = shcom->CompileShader (shadernode, pri);
+    csRef<iLoaderContext> ldr_context = engine->CreateLoaderContext ();
+    csRef<iShader> shader = shcom->CompileShader (ldr_context, shadernode, pri);
     if (shader)
     {
       csRef<iMaterial> matinput = engine->CreateBaseMaterial (
