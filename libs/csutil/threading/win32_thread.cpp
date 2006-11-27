@@ -75,7 +75,7 @@ namespace Implementation
     class ThreadStartParams
     {
     public:
-      ThreadStartParams (Runnable* runner, int32* isRunningFlag)
+      ThreadStartParams (Runnable* runner, int32& isRunningFlag)
         : runnable (runner), isRunning (isRunningFlag)
       {
       }
@@ -84,15 +84,20 @@ namespace Implementation
       void Wait ()
       {
         ScopedLock<Mutex> lock (mutex);
-        while (!(*isRunning))
+        while (!isRunning)
           startCondition.Wait (mutex);
       }
 
       void Started ()
       {
         ScopedLock<Mutex> lock (mutex);
-        AtomicOperations::Set (isRunning, 1);
+        AtomicOperations::Set (&isRunning, 1);
         startCondition.NotifyOne ();
+      }
+
+      void Stopped ()
+      {
+        AtomicOperations::Set (&isRunning, 0);
       }
 
     
@@ -100,20 +105,18 @@ namespace Implementation
       Condition startCondition;
 
       Runnable* runnable;
-      int32* isRunning;
+      int32& isRunning;
     };
 
     unsigned int __stdcall proxyFunc (void* param)
     {
       ThreadStartParams* tp = static_cast<ThreadStartParams*> (param);
 
-      int32* isRunning = tp->isRunning;
-
       tp->Started ();
 
       tp->runnable->Run ();
 
-      AtomicOperations::Set (isRunning, 0);
+      tp->Stopped ();
 
       return 0;
     }
@@ -126,16 +129,11 @@ namespace Implementation
   {
   }
 
-  ThreadBase::~ThreadBase ()
-  {
-
-  }
-
   void ThreadBase::Start ()
   {
     if (!threadHandle)
     {
-      ThreadStartParams param (runnable, &isRunning);
+      ThreadStartParams param (runnable, isRunning);
 
       // _beginthreadex does not always return a void*,
       // on some versions of MSVC it gives uintptr_t

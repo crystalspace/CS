@@ -160,9 +160,6 @@ namespace Threading
   private:
     T& lockObj;
   };
-
-  // Standard lock
-  typedef ScopedLock<Mutex> MutexScopedLock;
 }
 }
 
