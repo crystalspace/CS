@@ -50,3 +50,31 @@ GETTER_METHOD(iCEGUI,MouseCursor)
 GETTER_METHOD(iCEGUI,WindowFactoryManager)
 GETTER_METHOD(iCEGUI,WindowManager)
 
+/* We need this runtime test because most swig versions are incompatible
+   and will either crash or return unwrapped cegui pointers. */
+%pythoncode {
+SWIG_BUILD_VERSION = SWIG_VERSION
+}
+%pythoncode %{
+msg_swig_cant_check = """
+Warning: Could not check pycegui version, note you might experience
+         crashes if pycegui and pycscegui were not built with compatible
+         swig versions.
+"""
+msg_swig_incompatible = """
+Warning: pycegui and pycscegui were generated with different swig versions.
+         You might experience crashes because of this, or swig might not
+         return wrapped cegui pointers from iCEGUI.
+"""
+try:
+	import cegui
+	if not hasattr(cegui,"SWIG_BUILD_VERSION"):
+		print msg_swig_cant_check
+	elif not SWIG_BUILD_VERSION == cegui.SWIG_BUILD_VERSION:
+		print msg_swig_incompatible
+except:
+	print "Warning: You dont seem to have pycegui installed."
+	print "         Please install as pycscegui needs this."
+%}
+
+

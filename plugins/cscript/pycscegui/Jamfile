@@ -1,6 +1,6 @@
 SubDir TOP plugins cscript pycscegui ;
 
-if $(PYTHON.AVAILABLE) = "yes" && $(CEGUI.AVAILABLE) = "yes" && $(PYCEGUI.SWIGOK) = "yes"
+if $(PYTHON.AVAILABLE) = "yes"
 {
   #--------
   # Swig-generated files for cscegui.
@@ -52,7 +52,8 @@ if $(PYTHON.AVAILABLE) = "yes" && $(CEGUI.AVAILABLE) = "yes" && $(PYCEGUI.SWIGOK
   #--------
   # cegui -- Pure Python module
   #--------
-  
+  if $(CEGUI.AVAILABLE) = "yes"
+  {
   PythMod pyceguimod : _pycscegui : 
 	ceguimod.cpp cs_cegui.cpp : 
 	crystalspace_python : 
@@ -60,4 +61,5 @@ if $(PYTHON.AVAILABLE) = "yes" && $(CEGUI.AVAILABLE) = "yes" && $(PYCEGUI.SWIGOK
 	"cegui cs Python module" ;
   Depends pyceguimod : $(csceguipy) ;
   CFlags pyceguimod : $(COMPILER.C++FLAGS.EXCEPTIONS.ENABLE) ;
+  }
 }

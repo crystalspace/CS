@@ -19,6 +19,12 @@ chronological order.
 	  The xadd instruction returns the value prior to increment, not 
 	  after. This fixes the problems with ThreadedJobQueue on mingw and
 	  probably linux.
+	- caedes removed the pycegui configure test and added a runtime test
+	  in pycscegui instead, this makes it possible to build the module 
+	  with no knowledge about pycegui.
+	- caedes changed the pycscegui jamfile so only the build target
+	  depends on cegui now, instead of the generation and freeze
+	  targets also depending on it.
 26-Nov-2006
 	- res added a Jam rule to generate icon .pngs from an SVG file. The
 	  generation can be invoked with "jam generateicons". Added a test icon
