@@ -15,6 +15,7 @@ chronological order.
 	- Jorrit merged r25928 into 1.0 (obi_1 fix on #193).
 	- Jorrit merged r25927 into 1.0 (iLoaderContext parameter).
 	- Jorrit merged r25926 into 1.0 (trac #193, terrain CD bug).
+	- res merged r25934 into 1.0 (fix for r25931).
 22-Nov-2006
 	- Jorrit merged r25894 into 1.0 (mingw doc change).
 	- Jorrit merged r25905:25906 into 1.0 (relight and collections deprec).
