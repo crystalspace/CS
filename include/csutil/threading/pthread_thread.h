@@ -34,7 +34,7 @@ namespace Threading
 namespace Implementation
 {
 
-  // Thread base-class for win32
+  // Thread base-class for pthreads
   class ThreadBase
   {
   public:

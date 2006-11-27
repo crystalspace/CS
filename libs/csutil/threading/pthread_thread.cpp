@@ -36,8 +36,8 @@ namespace Implementation
     class ThreadStartParams
     {
     public:
-      ThreadStartParams (Runnable* runner, int32* isRunningFlag)
-        : runnable (runner), isRunning (isRunningFlag)
+      ThreadStartParams (Runnable* runner, int32* isRunningPtr)
+        : runnable (runner), isRunningPtr (isRunningPtr)
       {
       }
 
@@ -45,14 +45,14 @@ namespace Implementation
       void Wait ()
       {
         ScopedLock<Mutex> lock (mutex);
-        while (!isRunning)
+        while (!(*isRunningPtr))
           startCondition.Wait (mutex);
       }
 
       void Started ()
       {
         ScopedLock<Mutex> lock (mutex);
-        AtomicOperations::Set (isRunning, 1);
+        AtomicOperations::Set (isRunningPtr, 1);
         startCondition.NotifyOne ();
       }
 
@@ -61,19 +61,20 @@ namespace Implementation
       Condition startCondition;
 
       Runnable* runnable;
-      int32* isRunning;
+      int32* isRunningPtr;
     };
 
     void* proxyFunc (void* param)
     {
       ThreadStartParams* tp = static_cast<ThreadStartParams*> (param);
-      int32* isRunning = tp->isRunning;
+      int32* isRunningPtr = tp->isRunningPtr;
+      Runnable* runnable =  tp->runnable;
 
       tp->Started ();
 
-      tp->runnable->Run ();
+      runnable->Run ();
 
-      AtomicOperations::Set (isRunning, 0);
+      AtomicOperations::Set (isRunningPtr, 0);
       
       pthread_exit (0);
       return 0;
@@ -83,7 +84,7 @@ namespace Implementation
 
 
   ThreadBase::ThreadBase (Runnable* runnable)
-    : runnable (runnable), isRunning (false)
+    : runnable (runnable), isRunning (0)
   {
   }
 
