@@ -19,6 +19,10 @@ chronological order.
 	- res added tweaks to the GL driver database to disable texture
 	  compression and AFP for the Intel DRI driver, since both are broken
 	  there.
+	- caedes fixed ice.looknfeel for cegui 0.5 since it was broken from
+	  last update (at least on linux), due to not updated Falagard.xsd and
+	  some incorrect elements on xml. All apps using this layout would 
+	  crash.
 23-Nov-2006
 	- Jorrit added iLoaderContext parameter to shader and shader
 	  variable loading functions. That way shader variables will
