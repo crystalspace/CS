@@ -99,10 +99,10 @@ namespace lighter
     size_t ComputeElementIndex (const csVector3& pt) const;
 
     /// Get an element proxy given element index
-    ElementProxy& GetElement (size_t index);
+    ElementProxy GetElement (size_t index);
 
     /// Get an element proxy given point
-    ElementProxy& GetElement (const csVector3& pt);
+    ElementProxy GetElement (const csVector3& pt);
 
     inline TriangleType& GetTriangle () { return triangle; }
     inline const TriangleType& GetTriangle () const { return triangle; }

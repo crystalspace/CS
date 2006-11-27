@@ -663,12 +663,12 @@ namespace lighter
   }
 
 
-  ElementProxy& Primitive::GetElement (size_t index)
+  ElementProxy Primitive::GetElement (size_t index)
   {
     return ElementProxy(*this, index);
   }
 
-  ElementProxy& Primitive::GetElement (const csVector3& pt)
+  ElementProxy Primitive::GetElement (const csVector3& pt)
   {
     return GetElement (ComputeElementIndex (pt));
   }

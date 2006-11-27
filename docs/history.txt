@@ -27,6 +27,7 @@ chronological order.
 	  targets also depending on it.
 	- caedes added initial version of the frozen swig generated files
 	  for pycscegui.
+	- Marten fixed a build error in lighter2 on gcc.
 26-Nov-2006
 	- res added a Jam rule to generate icon .pngs from an SVG file. The
 	  generation can be invoked with "jam generateicons". Added a test icon
