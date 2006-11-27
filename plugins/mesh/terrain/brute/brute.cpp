@@ -211,22 +211,20 @@ void csTerrBlock::SetupMesh ()
   
     if (size <= cullsize * 1.5 + 0.5) //only for the smallest culled
     {
-  //printf("culled %f\n",size);
-  
-	csVector2 mapRes;
+      csVector2 mapRes;
 
-        csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
+      csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
  	  terr->object_reg, "crystalspace.shared.stringset", iStringSet);
 
-	if(terr->materialAlphaMaps)
-	  mapRes = terr->terraformer->GetIntegerMapSize(
-	      strings->Request("alphamap "));
-	else
-      mapRes = terr->terraformer->GetIntegerMapSize(
-	  strings->Request("materialmap"));
-  //@@@
-  //    res = (int)(size / (terr->block_maxsize /
-  //                  terr->block_minsize)) * terr->GetBlockResolution();
+      if (terr->materialAlphaMaps)
+	mapRes = terr->terraformer->GetIntegerMapSize(
+	      strings->Request("alphamap 0"));
+      else
+        mapRes = terr->terraformer->GetIntegerMapSize(
+	      strings->Request("materialmap"));
+      //@@@
+      //    res = (int)(size / (terr->block_maxsize /
+      //                  terr->block_minsize)) * terr->GetBlockResolution();
     
       csRef<iTerraSampler> mapsampler = terr->terraformer->GetSampler (
 	csBox2 (center.x - size / 2.0, center.z - size / 2.0, 

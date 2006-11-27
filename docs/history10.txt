@@ -7,6 +7,7 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 27-Nov-2006
+	- Jorrit merged r25944 into 1.0 (terrain alphamap fix).
 	- Jorrit merged r25940 into 1.0 (GL driver db: RECT textures).
 	- Jorrit merged r25931 into 1.0 (GL driver database tweaks).
 	- Jorrit merged r25933 into 1.0 (compile fixes on r25927).
