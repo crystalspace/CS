@@ -1081,8 +1081,8 @@ void csBezierMeshObjectType::Clear ()
 csPtr<iMeshObjectFactory> csBezierMeshObjectType::NewFactory ()
 {
   csBezierMesh *cm = new csBezierMesh (this, this);
-  csRef<iMeshObjectFactory> ifact (SCF_QUERY_INTERFACE (
-      cm, iMeshObjectFactory));
+  csRef<iMeshObjectFactory> ifact (
+    scfQueryInterface<iMeshObjectFactory> (cm));
   cm->DecRef ();
   return csPtr<iMeshObjectFactory> (ifact);
 }

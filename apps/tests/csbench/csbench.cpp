@@ -127,8 +127,8 @@ iMeshFactoryWrapper* CsBench::CreateGenmeshLattice (int dim, float size,
   // Create our object.
   csRef<iMeshFactoryWrapper> fact = engine->CreateMeshFactory (
     "crystalspace.mesh.object.genmesh", name);
-  csRef<iGeneralFactoryState> factstate = SCF_QUERY_INTERFACE (
-    fact->GetMeshObjectFactory (), iGeneralFactoryState);
+  csRef<iGeneralFactoryState> factstate = 
+    scfQueryInterface<iGeneralFactoryState> (fact->GetMeshObjectFactory ());
   factstate->SetVertexCount (dim * dim);
   factstate->SetTriangleCount (2 * (dim-1) * (dim-1));
   int x, y;

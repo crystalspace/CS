@@ -127,8 +127,8 @@ bool awsManager::Initialize (iObjectRegistry *object_reg)
   GroupOff = awsGroupOff (object_reg);
   FrameStart = awsFrameStart (object_reg);
 
-  prefmgr = SCF_CREATE_INSTANCE("crystalspace.window.preferencemanager",
-				iAwsPrefManager);
+  prefmgr = scfCreateInstance<iAwsPrefManager> (
+    "crystalspace.window.preferencemanager");
   if (!prefmgr)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR, "crystalspace.aws",
@@ -140,8 +140,8 @@ bool awsManager::Initialize (iObjectRegistry *object_reg)
   if (!prefmgr->Setup (object_reg))
     return false;
 
-  sinkmgr = SCF_CREATE_INSTANCE ("crystalspace.window.sinkmanager",
-			        iAwsSinkManager);
+  sinkmgr = scfCreateInstance<iAwsSinkManager> (
+    "crystalspace.window.sinkmanager");
   if (!sinkmgr)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR, "crystalspace.aws",

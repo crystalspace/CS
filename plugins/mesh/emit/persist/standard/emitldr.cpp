@@ -382,8 +382,8 @@ csPtr<iBase> csEmitLoader::Parse (iDocumentNode* node,
 		factname);
 	    return 0;
 	  }
-	  emitfactorystate = SCF_QUERY_INTERFACE (
-	  	fact->GetMeshObjectFactory(), iEmitFactoryState);
+          emitfactorystate = scfQueryInterface<iEmitFactoryState> (
+	  	fact->GetMeshObjectFactory());
 	}
 	break;
       case XMLTOKEN_MATERIAL:

@@ -325,8 +325,8 @@ public:
         OpSetMaterial::polygonpar = polygonpar;
     }
     if (materialpar->IsConstant ())
-      material = SCF_QUERY_INTERFACE (
-      	materialpar->GetValue (), iMaterialWrapper);
+      material = scfQueryInterface<iMaterialWrapper> (
+      	materialpar->GetValue ());
     else
       OpSetMaterial::materialpar = materialpar;
   }
@@ -334,8 +334,8 @@ public:
   virtual void Do (csTicks /*dt*/, iBase* params)
   {
     if (materialpar)
-      material = SCF_QUERY_INTERFACE (
-      	materialpar->GetValue (params), iMaterialWrapper);
+      material = scfQueryInterface<iMaterialWrapper> (
+      	materialpar->GetValue (params));
     if (polygon || polygonpar)
     {
       if (polygonpar)
@@ -959,8 +959,8 @@ public:
   virtual void Do (csTicks /*dt*/, iBase* params)
   {
     if (triggerpar)
-      trigger = SCF_QUERY_INTERFACE (
-      	triggerpar->GetValue (params), iSequenceTrigger);
+      trigger = scfQueryInterface<iSequenceTrigger> (
+      	triggerpar->GetValue (params));
     if (!trigger) return;
     trigger->SetEnabled (en);
     if (triggerpar)
@@ -993,8 +993,8 @@ public:
   virtual void Do (csTicks /*dt*/, iBase* params)
   {
     if (triggerpar)
-      trigger = SCF_QUERY_INTERFACE (
-      	triggerpar->GetValue (params), iSequenceTrigger);
+      trigger = scfQueryInterface<iSequenceTrigger> (
+        triggerpar->GetValue (params));
     if (!trigger) return;
     trigger->TestConditions (delay);
     if (triggerpar)
@@ -1025,8 +1025,8 @@ public:
   virtual bool Condition (csTicks /*dt*/, iBase* params)
   {
     if (triggerpar)
-      trigger = SCF_QUERY_INTERFACE (
-      	triggerpar->GetValue (params), iSequenceTrigger);
+      trigger = scfQueryInterface<iSequenceTrigger> (
+        triggerpar->GetValue (params));
     if (!trigger) return false;
     bool rc = trigger->CheckState ();
     if (triggerpar)

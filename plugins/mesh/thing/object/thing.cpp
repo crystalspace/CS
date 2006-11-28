@@ -2881,8 +2881,8 @@ void csThingObjectType::Clear ()
 csPtr<iMeshObjectFactory> csThingObjectType::NewFactory ()
 {
   csThingStatic *cm = new csThingStatic (this, this);
-  csRef<iMeshObjectFactory> ifact (SCF_QUERY_INTERFACE (
-      cm, iMeshObjectFactory));
+  csRef<iMeshObjectFactory> ifact (
+    scfQueryInterface<iMeshObjectFactory> (cm));
   cm->DecRef ();
   return csPtr<iMeshObjectFactory> (ifact);
 }

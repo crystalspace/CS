@@ -417,8 +417,9 @@ void StartMe::CreateRoom ()
   iMaterialWrapper* spark_mat = engine->FindMaterial ("spark");
   csRef<iMeshFactoryWrapper> spark_fact = engine->CreateMeshFactory (
   	"crystalspace.mesh.object.genmesh", "spark_fact");
-  csRef<iGeneralFactoryState> spark_state = SCF_QUERY_INTERFACE (
-  	spark_fact->GetMeshObjectFactory (), iGeneralFactoryState);
+  csRef<iGeneralFactoryState> spark_state = 
+    scfQueryInterface<iGeneralFactoryState> (
+      spark_fact->GetMeshObjectFactory ());
   spark_state->SetVertexCount (4);
   spark_state->GetVertices ()[0].Set (-.1f, -.1f, 0);
   spark_state->GetVertices ()[1].Set (.1f, -.1f, 0);
@@ -455,8 +456,9 @@ void StartMe::CreateRoom ()
 
   box_fact = engine->CreateMeshFactory (
   	"crystalspace.mesh.object.genmesh", "box_fact");
-  csRef<iGeneralFactoryState> box_state = SCF_QUERY_INTERFACE (
-  	box_fact->GetMeshObjectFactory (), iGeneralFactoryState);
+  csRef<iGeneralFactoryState> box_state = 
+    scfQueryInterface<iGeneralFactoryState> (
+      box_fact->GetMeshObjectFactory ());
   csBox3 b (-1, -1, -1, 1, 1, 1);
   box_state->GenerateBox (b);
   box_state->CalculateNormals ();

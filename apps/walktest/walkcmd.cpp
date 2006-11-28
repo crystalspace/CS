@@ -1929,9 +1929,9 @@ bool CommandHandler (const char *cmd, const char *arg)
       iMeshWrapper *wrap = Sys->Engine->GetMeshes ()->FindByName (name);
       if (wrap)
       {
-	csRef<iSprite3DFactoryState> fstate (SCF_QUERY_INTERFACE (
-		wrap->GetMeshObject ()->GetFactory (),
-		iSprite3DFactoryState));
+        csRef<iSprite3DFactoryState> fstate (
+          scfQueryInterface<iSprite3DFactoryState> (
+            wrap->GetMeshObject ()->GetFactory ()));
 	iSpriteAction* aspr_act;
 	int i;
 

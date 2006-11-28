@@ -2017,9 +2017,8 @@ bool csLoader::LoadMeshObjectFactory (iLoaderContext* ldr_context,
               child, "Please use 'params' before specifying LOD!");
 	    return false;
 	  }
-	  csRef<iLODControl> lodctrl (SCF_QUERY_INTERFACE (
-	    	stemp->GetMeshObjectFactory (),
-		iLODControl));
+          csRef<iLODControl> lodctrl (scfQueryInterface<iLODControl> (
+	    	stemp->GetMeshObjectFactory ()));
 	  if (!lodctrl)
 	  {
             SyntaxService->ReportError (
@@ -2100,8 +2099,8 @@ bool csLoader::LoadMeshObjectFactory (iLoaderContext* ldr_context,
 	  csBox3 b;
 	  if (!SyntaxService->ParseBox (child, b))
 	    return false;
-	  csRef<iNullFactoryState> nullmesh = SCF_QUERY_INTERFACE (
-		fact, iNullFactoryState);
+          csRef<iNullFactoryState> nullmesh = 
+            scfQueryInterface<iNullFactoryState> (fact);
 	  nullmesh->SetBoundingBox (b);
 	}
         break;
@@ -2661,9 +2660,8 @@ bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
               child, "Mesh object is missing!");
 	  return false;
 	}
-	csRef<iLODControl> lodctrl (SCF_QUERY_INTERFACE (
-	    	mesh->GetMeshObject (),
-		iLODControl));
+        csRef<iLODControl> lodctrl (scfQueryInterface<iLODControl> (
+	    	mesh->GetMeshObject ()));
 	if (!lodctrl)
 	{
           SyntaxService->ReportError (
@@ -2844,8 +2842,8 @@ bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
         size_t i, count = meshesArray.Length ();
         for (i = 0; i < count; i++)
         {
-          csRef<iVisibilityObject> visobj = SCF_QUERY_INTERFACE 
-            (meshesArray[i], iVisibilityObject);
+          csRef<iVisibilityObject> visobj = 
+            scfQueryInterface<iVisibilityObject> (meshesArray[i]);
           if (visobj)
             visobj->GetCullerFlags ().Set (CS_CULLER_HINT_BADOCCLUDER);
         }
@@ -2862,8 +2860,8 @@ bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
         size_t i, count = meshesArray.Length ();
         for (i = 0; i < count; i++)
         {
-          csRef<iVisibilityObject> visobj = SCF_QUERY_INTERFACE 
-            (meshesArray[i], iVisibilityObject);
+          csRef<iVisibilityObject> visobj = 
+            scfQueryInterface<iVisibilityObject> (meshesArray[i]);
           if (visobj)
             visobj->GetCullerFlags ().Set (CS_CULLER_HINT_GOODOCCLUDER);
         }
@@ -3214,8 +3212,8 @@ bool csLoader::LoadPolyMeshInSector (iLoaderContext* ldr_context,
   if (shadows)
     objmodel->SetPolygonMeshShadows (polymesh);
 
-  csRef<iNullMeshState> nullmesh = SCF_QUERY_INTERFACE (
-    	mesh->GetMeshObject (), iNullMeshState);
+  csRef<iNullMeshState> nullmesh = scfQueryInterface<iNullMeshState> (
+    	mesh->GetMeshObject ());
   CS_ASSERT (nullmesh != 0);
   int i;
   csBox3 bbox;
@@ -3383,8 +3381,8 @@ bool csLoader::LoadMeshObject (iLoaderContext* ldr_context,
 	  csBox3 b;
 	  if (!SyntaxService->ParseBox (child, b))
 	    return false;
-	  csRef<iNullMeshState> nullmesh = SCF_QUERY_INTERFACE (
-		mo, iNullMeshState);
+          csRef<iNullMeshState> nullmesh = 
+            scfQueryInterface<iNullMeshState> (mo);
 	  if (nullmesh)
 	    nullmesh->SetBoundingBox (b);
 	}
@@ -4223,6 +4221,8 @@ bool csLoader::LoadSettings (iDocumentNode* node)
   return true;
 }
 
+#include "csutil/win32/msvc_deprecated_warn_off.h"
+
 iCollection* csLoader::ParseCollection (iLoaderContext* ldr_context,
 	iDocumentNode* node)
 {
@@ -4340,6 +4340,8 @@ iCollection* csLoader::ParseCollection (iLoaderContext* ldr_context,
 
   return collection;
 }
+
+#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 bool csLoader::ParseStart (iDocumentNode* node, iCameraPosition* campos)
 {

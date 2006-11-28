@@ -402,8 +402,8 @@ csPtr<iBase> csHazeLoader::Parse (iDocumentNode* node,
 		factname);
 	    return 0;
 	  }
-	  hazefactorystate = SCF_QUERY_INTERFACE (
-	  	fact->GetMeshObjectFactory(), iHazeFactoryState);
+	  hazefactorystate = scfQueryInterface<iHazeFactoryState> (
+	  	fact->GetMeshObjectFactory());
 	}
 	break;
       case XMLTOKEN_MATERIAL:

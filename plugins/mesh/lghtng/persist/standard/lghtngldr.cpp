@@ -354,8 +354,8 @@ csPtr<iBase> csLightningLoader::Parse (iDocumentNode* node,
 		factname);
 	    return 0;
 	  }
-          LightningFactoryState = SCF_QUERY_INTERFACE (
-              fact->GetMeshObjectFactory(), iLightningFactoryState);
+          LightningFactoryState = scfQueryInterface<iLightningFactoryState> (
+              fact->GetMeshObjectFactory());
         }
         break;
 

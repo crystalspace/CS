@@ -182,24 +182,24 @@ bool Simple::HandleEvent (iEvent& ev)
       }
       else if (csKeyEventHelper::GetCookedCode (&ev) == '1')
       { // Toggle stepfast.
-	csRef<iODEDynamicSystemState> osys= SCF_QUERY_INTERFACE (
-	  dynSys, iODEDynamicSystemState);
+        csRef<iODEDynamicSystemState> osys = 
+          scfQueryInterface<iODEDynamicSystemState> (dynSys);
 	osys->EnableStepFast (0);
 	solver=0;
 	return true;
       }
       else if (csKeyEventHelper::GetCookedCode (&ev) == '2')
       { // Toggle stepfast.
-	csRef<iODEDynamicSystemState> osys= SCF_QUERY_INTERFACE (
-	  dynSys, iODEDynamicSystemState);
+        csRef<iODEDynamicSystemState> osys = 
+          scfQueryInterface<iODEDynamicSystemState> (dynSys);
 	osys->EnableStepFast (1);
 	solver=1;
 	return true;
       }
       else if (csKeyEventHelper::GetCookedCode (&ev) == '3')
       { // Toggle quickstep.
-	csRef<iODEDynamicSystemState> osys= SCF_QUERY_INTERFACE (
-	  dynSys, iODEDynamicSystemState);
+        csRef<iODEDynamicSystemState> osys = 
+          scfQueryInterface<iODEDynamicSystemState> (dynSys);
 	osys->EnableQuickStep (1);
 	solver=2;
 	return true;

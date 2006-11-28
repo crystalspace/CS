@@ -206,8 +206,9 @@ bool csBezierLoader::LoadThingPart (iDocumentNode* node,
               child, "Couldn't find bezier mesh factory '%s'!", factname);
             return false;
           }
-	  csRef<iBezierFactoryState> tmpl_thing_state (SCF_QUERY_INTERFACE (
-	  	fact->GetMeshObjectFactory (), iBezierFactoryState));
+	  csRef<iBezierFactoryState> tmpl_thing_state (
+            scfQueryInterface<iBezierFactoryState> (
+              fact->GetMeshObjectFactory ()));
 	  if (!tmpl_thing_state)
 	  {
 	    synldr->ReportError (
@@ -239,8 +240,9 @@ bool csBezierLoader::LoadThingPart (iDocumentNode* node,
             return false;
           }
 
-	  csRef<iBezierFactoryState> tmpl_thing_state (SCF_QUERY_INTERFACE (
-	  	wrap->GetMeshObject (), iBezierFactoryState));
+	  csRef<iBezierFactoryState> tmpl_thing_state (
+            scfQueryInterface<iBezierFactoryState> (
+              wrap->GetMeshObject ()));
 	  if (!tmpl_thing_state)
 	  {
 	    synldr->ReportError (

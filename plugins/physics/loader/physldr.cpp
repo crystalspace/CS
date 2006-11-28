@@ -186,8 +186,8 @@ bool csPhysicsLoader::ParseSystem (iDocumentNode* node, iDynamicSystem* system)
   const char *name = node->GetAttributeValue ("name");
   system->QueryObject()->SetName (name);
   // Look for ODE specific properties
-  csRef<iODEDynamicSystemState> osys= SCF_QUERY_INTERFACE (
-			system, iODEDynamicSystemState);
+  csRef<iODEDynamicSystemState> osys = 
+    scfQueryInterface<iODEDynamicSystemState> (system);
   if (osys)
   {
     if (node->GetAttribute("cfm"))
@@ -296,8 +296,8 @@ bool csPhysicsLoader::ParseSystem (iDocumentNode* node, iDynamicSystem* system)
       }
       case XMLTOKEN_AUTODISABLE:
       {
-	csRef<iODEDynamicSystemState> osys= SCF_QUERY_INTERFACE (
-			system, iODEDynamicSystemState);
+	csRef<iODEDynamicSystemState> osys =
+          scfQueryInterface<iODEDynamicSystemState> (system);
 	if (osys)
 	{
 	  bool autodisable;
@@ -317,8 +317,8 @@ bool csPhysicsLoader::ParseSystem (iDocumentNode* node, iDynamicSystem* system)
     	const char* sm = child->GetContentsValue ();
 	csStringID sm_id = xmltokens.Request (sm);
 
-	csRef<iODEDynamicSystemState> osys= SCF_QUERY_INTERFACE (
-			system, iODEDynamicSystemState);
+	csRef<iODEDynamicSystemState> osys =
+          scfQueryInterface<iODEDynamicSystemState> (system);
 	if (osys)
 	{
 	  switch (sm_id)
