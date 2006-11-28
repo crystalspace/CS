@@ -807,7 +807,7 @@ template<class Interface, class ClassPtr>
 inline CS_DEPRECATED_METHOD_MSG ("SCF_QUERY_INTERFACE_SAFE macro is deprecated")
 csPtr<Interface> SCF_QUERY_INTERFACE_SAFE_is_deprecated (ClassPtr object)
 {
-  return scfQueryInterfaceSafe<Interface> (Object);
+  return scfQueryInterfaceSafe<Interface> (object);
 }
 /**
  * \deprecated Compatibility macro for scfQueryInterfaceSafe
