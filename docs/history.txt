@@ -13,6 +13,7 @@ chronological order.
 	  framerate is.
 	- Andrew Dai made improvements to the collision response algorithm to
 	  prevent actors occasionally becoming stuck on sharp inclines.
+	- Jorrit fixed a memory leak with the graveyard plugin leaking.
 27-Nov-2006
 	- Jorrit fixed a bug in the terrain engine. It would incorrectly
 	  try to get the size from the alphamaps by using 'alphamap '

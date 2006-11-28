@@ -1163,7 +1163,7 @@ void csSkeleton::DestroyRagdoll()
 
 csSkeletonFactory::csSkeletonFactory (csSkeletonGraveyard* graveyard, 
                                       iObjectRegistry* object_reg) :
-  scfImplementationType(this, graveyard)
+  scfImplementationType(this)
 {
   csSkeletonFactory::graveyard = graveyard;
   csSkeletonFactory::object_reg = object_reg;
