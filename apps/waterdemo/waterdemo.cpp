@@ -438,8 +438,8 @@ bool csWaterDemo::Initialize ()
     csQueryRegistry<iPluginManager> (object_reg));
 
   csRef<iStringSet> strings = 
-    CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg, 
-    "crystalspace.shared.stringset", iStringSet);
+    csQueryRegistryTagInterface<iStringSet> 
+    (object_reg, "crystalspace.shared.stringset");
 
   //get a custom renderloop
   csRef<iRenderLoop> rl = engine->GetRenderLoopManager ()->Create ();

@@ -78,8 +78,8 @@ csParticleSystem::csParticleSystem (
   light_mgr = csQueryRegistry<iLightManager> (object_reg);
 
   g3d = csQueryRegistry<iGraphics3D> (object_reg);
-  csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg,
-    "crystalspace.shared.stringset", iStringSet);
+  csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet>
+    (object_reg, "crystalspace.shared.stringset");
 
   part_sides = 0;
 }

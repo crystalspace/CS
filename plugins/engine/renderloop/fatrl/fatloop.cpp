@@ -143,8 +143,8 @@ csPtr<iBase> csFatLoopLoader::Parse (iDocumentNode* node,
 bool csFatLoopLoader::ParsePass (iLoaderContext* ldr_context,
     iDocumentNode* node, RenderPass& pass)
 {
-  csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg, 
-    "crystalspace.shared.stringset", iStringSet);
+  csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet> 
+    (object_reg, "crystalspace.shared.stringset");
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
@@ -224,8 +224,8 @@ csFatLoopStep::csFatLoopStep (iObjectRegistry* object_reg) :
   engine = csQueryRegistry<iEngine> (object_reg);
   lightmgr = csQueryRegistry<iLightManager> (object_reg);
 
-  csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg,
-    "crystalspace.shared.stringset", iStringSet);
+  csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet>
+    (object_reg, "crystalspace.shared.stringset");
   fogplane_name = strings->Request ("fogplane");
   fogdensity_name = strings->Request ("fog density");
   fogcolor_name = strings->Request ("fog color");

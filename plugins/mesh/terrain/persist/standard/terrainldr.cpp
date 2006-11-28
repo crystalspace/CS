@@ -127,8 +127,8 @@ csPtr<iBase> csTerrainFactoryLoader::Parse (iDocumentNode* node,
       case XMLTOKEN_TERRAFORMER:
       {
         const char* name = child->GetContentsValue ();
-        csRef<iTerraFormer> form = CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg,
-	  name, iTerraFormer);
+        csRef<iTerraFormer> form = csQueryRegistryTagInterface<iTerraFormer>
+	  (object_reg, name);
 	if (form == 0) 
 	{
           synldr->ReportError ("crystalspace.terrain.factory.loader",

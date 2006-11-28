@@ -156,8 +156,8 @@ csBezierMesh::csBezierMesh (iBase *parent, csBezierMeshObjectType* thing_type) :
   dynamic_ambient_version = 0;
 
   csRef<iStringSet> strings;
-  strings = CS_QUERY_REGISTRY_TAG_INTERFACE (thing_type->object_reg,
-    "crystalspace.shared.stringset", iStringSet);
+  strings = csQueryRegistryTagInterface<iStringSet>
+    (thing_type->object_reg, "crystalspace.shared.stringset");
 
   if ((vertex_name == csInvalidStringID) ||
     (texel_name == csInvalidStringID) ||

@@ -148,8 +148,8 @@ csProcTexture::~csProcTexture ()
 iEventHandler* csProcTexture::SetupProcEventHandler (
 	iObjectRegistry* object_reg)
 {
-  csRef<iEventHandler> proceh = CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg,
-  	"crystalspace.proctex.eventhandler", iEventHandler);
+  csRef<iEventHandler> proceh = csQueryRegistryTagInterface<iEventHandler>
+  	(object_reg, "crystalspace.proctex.eventhandler");
   if (proceh) return proceh;
   proceh = csPtr<iEventHandler> (new csProcTexEventHandler (object_reg));
   csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (object_reg));

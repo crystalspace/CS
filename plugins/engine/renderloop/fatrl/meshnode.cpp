@@ -162,8 +162,8 @@ csMeshRenderNodeFactory::csMeshRenderNodeFactory (iObjectRegistry* object_reg)
   shaderManager = csQueryRegistry<iShaderManager> (object_reg);
   nullShader = shaderManager->GetShader ("*null");
 
-  csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg, 
-    "crystalspace.shared.stringset", iStringSet);
+  csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet> 
+    (object_reg, "crystalspace.shared.stringset");
   string_object2world = strings->Request ("object2world transform");
 }
 

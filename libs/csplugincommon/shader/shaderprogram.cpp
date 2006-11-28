@@ -41,8 +41,8 @@ csShaderProgram::csShaderProgram (iObjectRegistry* objectReg)
 
   csShaderProgram::objectReg = objectReg;
   synsrv = csQueryRegistry<iSyntaxService> (objectReg);
-  strings = CS_QUERY_REGISTRY_TAG_INTERFACE (objectReg, 
-    "crystalspace.shared.stringset", iStringSet);
+  strings = csQueryRegistryTagInterface<iStringSet> 
+    (objectReg, "crystalspace.shared.stringset");
   
   csRef<iVerbosityManager> verbosemgr (
     csQueryRegistry<iVerbosityManager> (objectReg));

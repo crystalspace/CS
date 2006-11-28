@@ -98,7 +98,7 @@ csCommonImageFile::csCommonImageFile (iObjectRegistry* object_reg, int format)
 {
 #ifdef THREADED_LOADING
   static const char queueTag[] = "crystalspace.jobqueue.imageload";
-  jobQueue = CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg, queueTag, iJobQueue);
+  jobQueue = csQueryRegistryTagInterface<iJobQueue> (object_reg, queueTag);
   if (!jobQueue.IsValid())
   {
     jobQueue.AttachNew (new csThreadJobQueue ());

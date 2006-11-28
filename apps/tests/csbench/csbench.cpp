@@ -323,8 +323,8 @@ bool CsBench::Initialize (int argc, const char* const argv[],
   if (!imageio) return ReportError ("No image loader plugin!");
   vfs = csQueryRegistry<iVFS> (object_reg);
   if (!vfs) return ReportError ("No iVFS plugin!");
-  strings = CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg, 
-    "crystalspace.shared.stringset", iStringSet);
+  strings = csQueryRegistryTagInterface<iStringSet> 
+    (object_reg, "crystalspace.shared.stringset");
   if (!strings) return ReportError ("No string set!");
 
   iGraphics2D* g2d = g3d->GetDriver2D ();

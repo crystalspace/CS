@@ -194,8 +194,8 @@ void csEventTimer::RemoveAllTimerEvents ()
 
 csPtr<iEventTimer> csEventTimer::GetStandardTimer (iObjectRegistry* object_reg)
 {
-  csRef<iEventTimer> timer = CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg,
-  	"crystalspace.timer.standard", iEventTimer);
+  csRef<iEventTimer> timer = csQueryRegistryTagInterface<iEventTimer>
+  	(object_reg, "crystalspace.timer.standard");
   if (!timer)
   {
     timer = csPtr<iEventTimer> (new csEventTimer (object_reg));

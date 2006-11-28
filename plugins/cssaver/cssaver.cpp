@@ -318,8 +318,8 @@ bool csSaver::SaveTextures(iDocumentNode *parent)
 bool csSaver::SaveMaterials(iDocumentNode *parent)
 {
   csRef<iStringSet> stringset =
-    CS_QUERY_REGISTRY_TAG_INTERFACE(object_reg, 
-    "crystalspace.shared.stringset", iStringSet);
+    csQueryRegistryTagInterface<iStringSet> 
+    (object_reg, "crystalspace.shared.stringset");
 
   csStringID texdiffID = stringset->Request("tex diffuse");
   csStringID orlightID = stringset->Request("std_lighting");

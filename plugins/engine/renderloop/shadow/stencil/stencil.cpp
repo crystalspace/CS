@@ -431,8 +431,8 @@ bool csStencilShadowStep::Initialize (iObjectRegistry* objreg)
       "Renderer does not support stencil shadows");
   }
 
-  csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg,
-    "crystalspace.shared.stringset", iStringSet);
+  csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet>
+    (object_reg, "crystalspace.shared.stringset");
   return true;
 }
 

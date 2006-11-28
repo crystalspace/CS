@@ -152,8 +152,8 @@ bool awsManager::Initialize (iObjectRegistry *object_reg)
   if (!sinkmgr->Setup (object_reg))
     return false;
 
-  strset = CS_QUERY_REGISTRY_TAG_INTERFACE(object_reg,
-    "crystalspace.shared.stringset", iStringSet);
+  strset = csQueryRegistryTagInterface<iStringSet>
+    (object_reg, "crystalspace.shared.stringset");
   if (!strset.IsValid())
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR, "crystalspace.aws",

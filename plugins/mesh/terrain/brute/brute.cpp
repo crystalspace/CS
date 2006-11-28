@@ -1459,8 +1459,8 @@ void csTerrainObject::SetupObject ()
     }
 
     csRef<iStringSet> strings =
-      CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg,
-      "crystalspace.shared.stringset", iStringSet);
+      csQueryRegistryTagInterface<iStringSet>
+      (object_reg, "crystalspace.shared.stringset");
 
     int a;
     materialAlphaMaps = !terraformer->SampleInteger(
@@ -1978,8 +1978,8 @@ bool csTerrainObject::SetCurrentMaterialAlphaMaps (
   csRef<iGraphics3D> g3d = 
     csQueryRegistry<iGraphics3D> (object_reg);
   csRef<iStringSet> strings = 
-    CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg,
-    "crystalspace.shared.stringset", iStringSet);
+    csQueryRegistryTagInterface<iStringSet>
+    (object_reg, "crystalspace.shared.stringset");
   csRef<iTextureManager> mgr = g3d->GetTextureManager ();
 
   csRef<csShaderVariable> lod_var = 
@@ -2192,8 +2192,8 @@ bool csTerrainObject::SetCurrentMaterialMap (const csArray<char>& data,
   csRef<iGraphics3D> g3d = 
     csQueryRegistry<iGraphics3D> (object_reg);
   csRef<iStringSet> strings = 
-    CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg,
-    "crystalspace.shared.stringset", iStringSet);
+    csQueryRegistryTagInterface<iStringSet>
+    (object_reg, "crystalspace.shared.stringset");
   iTextureManager* mgr = g3d->GetTextureManager ();
 
   csRef<csShaderVariable> lod_var = 
@@ -2838,7 +2838,7 @@ csTerrainFactory::csTerrainFactory (iObjectRegistry* object_reg,
   brute_type = parent;
 				
   /*terraformer = 
-    CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg, "terrain", iTerraFormer);*/
+    csQueryRegistryTagInterface<iTerraFormer> (object_reg, "terrain");*/
 
   scale = csVector3(1);
   light_mgr = csQueryRegistry<iLightManager> (object_reg);
