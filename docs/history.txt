@@ -18,6 +18,7 @@ chronological order.
 	  Creative Commons by-nc to by-sa which is a less restrictive
 	  license and allows commercial usage. This is done with permission
 	  from Anders Wisur.
+	- res updated the docs for the new winlibs version.
 27-Nov-2006
 	- Jorrit fixed a bug in the terrain engine. It would incorrectly
 	  try to get the size from the alphamaps by using 'alphamap '
