@@ -595,10 +595,22 @@ void csLight::CalculateLighting ()
   ctxt->SetNewLightFrustum (new csFrustum (GetFullCenter ()));
   ctxt->GetLightFrustum ()->MakeInfinite ();
 
+  iSector* sect = GetSector ();
+  if (!sect)
+  {
+    if (movable.GetParent ())
+    {
+      iSectorList* sl = movable.GetParent ()->GetSectors ();
+      if (sl && sl->GetCount () > 0)
+	sect = sl->Get (0);
+    }
+  }
+  if (!sect) return;	// Do nothing.
+
   if (dynamicType == CS_LIGHT_DYNAMICTYPE_DYNAMIC)
   {
     csRef<iMeshWrapperIterator> it = engine->GetNearbyMeshes (
-      GetSector (), GetFullCenter (), GetCutoffDistance ());
+      sect, GetFullCenter (), GetCutoffDistance ());
     while (it->HasNext ())
     {
       iMeshWrapper* m = it->Next ();
@@ -613,7 +625,7 @@ void csLight::CalculateLighting ()
   }
   else
   {
-    GetSector ()->CheckFrustum ((iFrustumView *) &lview);
+    sect->CheckFrustum ((iFrustumView *) &lview);
     lpi->FinalizeLighting ();
   }
 }

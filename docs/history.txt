@@ -23,6 +23,8 @@ chronological order.
 	- Jorrit fixed a memory leak with the graveyard plugin leaking.
 	- Jorrit fixed iEngine->RemoveLight() so that it also works
 	  if the light is not yet in a sector.
+	- Jorrit fixed lights so that they work slightly better if they
+	  are parented. Not perfect yet though.
 27-Nov-2006
 	- Jorrit reverted a threading change (revision 25929) because
 	  it caused programs to hang on mingw and crash on linux.
