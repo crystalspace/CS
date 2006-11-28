@@ -45,6 +45,8 @@ chronological order.
 	- res updated the docs for the new winlibs version.
 	- res fixed a couple of VC deprecation warnings (collection and scene
 	  node array related).
+	- res made the (supposed to be legacy) CS_QUERY_REGISTRY* and 
+	  SCF_QUERY_INTERFACE* macros emit compiler warnings.
 27-Nov-2006
 	- Jorrit reverted a threading change (revision 25929) because
 	  it caused programs to hang on mingw and crash on linux.
