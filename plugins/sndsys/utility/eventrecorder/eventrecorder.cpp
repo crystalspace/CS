@@ -87,8 +87,8 @@ bool csSndSysBasicEventRecorder::Initialize(iObjectRegistry *pObjectRegistry)
 
 
   // Check for overriding sound event log from the command line
-  csRef<iCommandLineParser> cmdline (CS_QUERY_REGISTRY (m_pObjectRegistry,
-    iCommandLineParser));
+  csRef<iCommandLineParser> cmdline (
+    csQueryRegistry<iCommandLineParser> (m_pObjectRegistry));
 
   const char *output_location = cmdline->GetOption("soundeventlog");
   if (!output_location)

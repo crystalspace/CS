@@ -277,8 +277,8 @@ bool PathTut::Initialize (int argc, const char* const argv[])
   	imeshfact, "MySprite", room,
 	csVector3 (-3, 5, 3));
   sprite->GetMovable ()->UpdateMove ();
-  csRef<iSprite3DState> spstate (SCF_QUERY_INTERFACE (sprite->GetMeshObject (),
-  	iSprite3DState));
+  csRef<iSprite3DState> spstate (
+  	scfQueryInterface<iSprite3DState> (sprite->GetMeshObject ()));
   spstate->SetAction ("default");
  
   // Initialize the Path to move the sprite around in a ellipse.

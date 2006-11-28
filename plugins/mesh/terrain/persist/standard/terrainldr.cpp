@@ -84,8 +84,8 @@ bool csTerrainFactoryLoader::Initialize (iObjectRegistry* objreg)
 csPtr<iBase> csTerrainFactoryLoader::Parse (iDocumentNode* node,
   iStreamSource*, iLoaderContext* /*ldr_context*/, iBase* /*context*/)
 {
-  csRef<iPluginManager> plugin_mgr = CS_QUERY_REGISTRY (object_reg,
-    iPluginManager);
+  csRef<iPluginManager> plugin_mgr = 
+    csQueryRegistry<iPluginManager> (object_reg);
 
   csRef<iMeshObjectFactory> fact;
   csRef<iTerrainFactoryState> state;

@@ -541,8 +541,8 @@ iMaterialWrapper* csLoader::ParseMaterial (iLoaderContext* ldr_context,
       case XMLTOKEN_SHADER:
         {
 	  shaders_mentioned = true;
-          csRef<iShaderManager> shaderMgr = CS_QUERY_REGISTRY (object_reg,
-	  	iShaderManager);
+          csRef<iShaderManager> shaderMgr = 
+	  	csQueryRegistry<iShaderManager> (object_reg);
           if (!shaderMgr)
           {
             ReportNotify ("iShaderManager not found, ignoring shader!");

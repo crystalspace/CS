@@ -256,8 +256,8 @@ bool csSndSysRendererSoftware::Initialize (iObjectRegistry *obj_reg)
   m_Config.AddConfig(m_pObjectRegistry, "/config/sound.cfg");
 
   // check for optional sound driver from the commandline
-  csRef<iCommandLineParser> cmdline (CS_QUERY_REGISTRY (m_pObjectRegistry,
-  	iCommandLineParser));
+  csRef<iCommandLineParser> cmdline (
+  	csQueryRegistry<iCommandLineParser> (m_pObjectRegistry));
   const char *drv = cmdline->GetOption ("sounddriver");
   if (!drv)
   {

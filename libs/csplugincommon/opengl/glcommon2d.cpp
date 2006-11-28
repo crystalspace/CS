@@ -402,8 +402,8 @@ void csGraphics2DGLCommon::OpenDriverDB (const char* phase)
     return;
   }
 
-  csRef<iDocumentSystem> docsys = CS_QUERY_REGISTRY (object_reg,
-    iDocumentSystem);
+  csRef<iDocumentSystem> docsys = 
+    csQueryRegistry<iDocumentSystem> (object_reg);
   if (!docsys.IsValid())
     docsys.AttachNew (new csTinyDocumentSystem ());
   csRef<iDocument> doc (docsys->CreateDocument ());

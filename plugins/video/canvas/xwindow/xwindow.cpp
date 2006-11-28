@@ -130,8 +130,8 @@ bool csXWindow::Initialize (iObjectRegistry *object_reg)
   this->object_reg = object_reg;
   this->name_reg = csEventNameRegistry::GetRegistry(object_reg);
   csConfigAccess Config(object_reg, "/config/video.cfg");
-  csRef<iCommandLineParser> cmdline (CS_QUERY_REGISTRY (object_reg,
-						   iCommandLineParser));
+  csRef<iCommandLineParser> cmdline (
+						   csQueryRegistry<iCommandLineParser> (object_reg));
   do_hwmouse = Config->GetBool ("Video.SystemMouseCursor", true);
   if (cmdline->GetOption ("sysmouse")) do_hwmouse = true;
   if (cmdline->GetOption ("nosysmouse")) do_hwmouse = false;

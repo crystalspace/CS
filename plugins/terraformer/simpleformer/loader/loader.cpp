@@ -79,8 +79,8 @@ csPtr<iBase> csSimpleFormerLoader::Parse (iDocumentNode* node,
       node, "Could not loader crystalspace.terraformer.simple plugin");
     return 0;
   }
-  csRef<iSimpleFormerState> state = SCF_QUERY_INTERFACE (former, 
-        iSimpleFormerState);
+  csRef<iSimpleFormerState> state =  
+        scfQueryInterface<iSimpleFormerState> (former);
 
   uint alphamapcount = 0;
   bool material_map_set = false;

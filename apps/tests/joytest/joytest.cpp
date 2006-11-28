@@ -205,8 +205,8 @@ bool Simple::Initialize ()
     iSCF::SCF->QueryClassList ("crystalspace.device.joystick.");
   if (joystickClasses.IsValid())
   {
-    csRef<iPluginManager> plugmgr = CS_QUERY_REGISTRY (object_reg,
-      iPluginManager);
+    csRef<iPluginManager> plugmgr = 
+      csQueryRegistry<iPluginManager> (object_reg);
     for (size_t i = 0; i < joystickClasses->Length (); i++)
     {
       const char* className = joystickClasses->Get (i);

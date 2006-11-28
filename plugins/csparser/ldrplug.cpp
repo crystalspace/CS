@@ -112,8 +112,8 @@ bool csLoader::csLoadedPluginVector::GetPluginFromRec (
     if (rec->Component)
     {
       rec->Plugin = scfQueryInterface<iLoaderPlugin> (rec->Component);
-      rec->BinPlugin = SCF_QUERY_INTERFACE (rec->Component,
-      	iBinaryLoaderPlugin);
+      rec->BinPlugin = 
+      	scfQueryInterface<iBinaryLoaderPlugin> (rec->Component);
     }
   }
   plug = rec->Plugin;

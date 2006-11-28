@@ -3151,8 +3151,8 @@ csPtr<iMeshWrapper> csEngine::CreatePortal (
       {
         if (!strcmp (name, mesh->QueryObject ()->GetName ()))
 	{
-	  pc = SCF_QUERY_INTERFACE (mesh->GetMeshObject (),
-  	    iPortalContainer);
+	  pc = 
+  	    scfQueryInterface<iPortalContainer> (mesh->GetMeshObject ());
           if (!pc) mesh = 0;
 	  break;
 	}
@@ -3163,8 +3163,8 @@ csPtr<iMeshWrapper> csEngine::CreatePortal (
   {
     mesh = CreatePortalContainer (name);
     mesh->QuerySceneNode ()->SetParent (parentMesh->QuerySceneNode ());
-    pc = SCF_QUERY_INTERFACE (mesh->GetMeshObject (),
-  	iPortalContainer);
+    pc = 
+  	scfQueryInterface<iPortalContainer> (mesh->GetMeshObject ());
   }
   portal = pc->CreatePortal (vertices, num_vertices);
   portal->SetSector (destSector);
@@ -3185,16 +3185,16 @@ csPtr<iMeshWrapper> csEngine::CreatePortal (
     mesh = sourceSector->GetMeshes ()->FindByName (name);
     if (mesh)
     {
-      pc = SCF_QUERY_INTERFACE (mesh->GetMeshObject (),
-  	iPortalContainer);
+      pc = 
+  	scfQueryInterface<iPortalContainer> (mesh->GetMeshObject ());
       if (!pc) mesh = 0;
     }
   }
   if (!mesh)
   {
     mesh = CreatePortalContainer (name, sourceSector, pos);
-    pc = SCF_QUERY_INTERFACE (mesh->GetMeshObject (),
-  	iPortalContainer);
+    pc = 
+  	scfQueryInterface<iPortalContainer> (mesh->GetMeshObject ());
   }
   portal = pc->CreatePortal (vertices, num_vertices);
   portal->SetSector (destSector);

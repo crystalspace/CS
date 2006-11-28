@@ -603,8 +603,8 @@ void csXMLShader::DumpStats (csString& str)
 
 csRef<iDocumentNode> csXMLShader::OpenDocFile (const char* filename)
 {
-  csRef<iVFS> VFS = CS_QUERY_REGISTRY (compiler->objectreg, 
-    iVFS);
+  csRef<iVFS> VFS =  
+    csQueryRegistry<iVFS> (compiler->objectreg);
   csRef<iFile> file = VFS->Open (filename, VFS_FILE_READ);
   if (!file)
   {

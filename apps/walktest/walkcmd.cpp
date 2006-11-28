@@ -676,8 +676,8 @@ void BuildSprite(iSector * sector, iObjectIterator* it, csVector3 position)
   iMeshWrapper* sprite = GenerateSprite((char*)(const char*)factName,
   	(char*)(const char*)sprName,sector,position);
 
-  csRef<iSprite3DState> state (SCF_QUERY_INTERFACE(sprite->GetMeshObject(),
-                          iSprite3DState));
+  csRef<iSprite3DState> state (
+                          scfQueryInterface<iSprite3DState> (sprite->GetMeshObject()));
   state->SetAction("default");
 }
 
@@ -862,8 +862,8 @@ void WalkTest::ActivateObject (iObject* src)
   csRef<iObjectIterator> it (src->GetIterator ());
   while (it->HasNext ())
   {
-    csRef<csWalkEntity> wentity (SCF_QUERY_INTERFACE (it->Next (),
-    	csWalkEntity));
+    csRef<csWalkEntity> wentity (
+    	scfQueryInterface<csWalkEntity> (it->Next ()));
     if (wentity)
       wentity->Activate ();
   }
@@ -1401,8 +1401,8 @@ bool CommandHandler (const char *cmd, const char *arg)
     csEngine* engine = (csEngine*)(iEngine*)(Sys->Engine);
     if ((rad = engine->GetRadiosity ()) != 0)
     {
-      csRef<iPolygon3D> p (SCF_QUERY_INTERFACE (rad->GetNextPolygon (),
-      	iPolygon3D));
+      csRef<iPolygon3D> p (
+      	scfQueryInterface<iPolygon3D> (rad->GetNextPolygon ()));
       Sys->selected_polygon = p;
     }
 #endif
@@ -1973,8 +1973,8 @@ bool CommandHandler (const char *cmd, const char *arg)
       else
       {
         csRef<iSprite3DState> state (
-		SCF_QUERY_INTERFACE (wrap->GetMeshObject (),
-		iSprite3DState));
+		
+		scfQueryInterface<iSprite3DState> (wrap->GetMeshObject ()));
         if (state)
         {
           // Test to see if the action exists for that sprite.

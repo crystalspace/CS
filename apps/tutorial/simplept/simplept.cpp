@@ -48,8 +48,8 @@ bool Simple::CreateGenMesh (iMaterialWrapper* mat)
 	"Can't make genmesh factory!");
     return false;
   }
-  factstate = SCF_QUERY_INTERFACE (genmesh_fact->GetMeshObjectFactory (),
-  	iGeneralFactoryState);
+  factstate = 
+  	scfQueryInterface<iGeneralFactoryState> (genmesh_fact->GetMeshObjectFactory ());
   if (!factstate)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -116,8 +116,8 @@ bool Simple::CreateGenMesh (iMaterialWrapper* mat)
     return false;
   }
   csRef<iGeneralMeshState> state (
-  	SCF_QUERY_INTERFACE (genmesh->GetMeshObject (),
-  	iGeneralMeshState));
+  	
+  	scfQueryInterface<iGeneralMeshState> (genmesh->GetMeshObject ()));
   if (!state)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,

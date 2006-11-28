@@ -334,8 +334,8 @@ bool CsBench::Initialize (int argc, const char* const argv[],
   unlink ("csbench_report.zip");
   vfs->Mount ("/lib/report", "csbench_report.zip");
 
-  csRef<iStandardReporterListener> stdrep = CS_QUERY_REGISTRY (object_reg,
-  	iStandardReporterListener);
+  csRef<iStandardReporterListener> stdrep = 
+  	csQueryRegistry<iStandardReporterListener> (object_reg);
   if (!stdrep) return ReportError ("No stdrep plugin!");
   stdrep->SetDebugFile ("/tmp/csbench_report.txt");
   stdrep->SetMessageDestination (CS_REPORTER_SEVERITY_BUG,

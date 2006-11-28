@@ -124,8 +124,8 @@ bool csShaderManager::Initialize(iObjectRegistry *objreg)
     RegisterWeakListener (q, this, events, weakEventHandler);
   }
 
-  csRef<iPluginManager> plugin_mgr = CS_QUERY_REGISTRY  (objectreg,
-	iPluginManager);
+  csRef<iPluginManager> plugin_mgr = 
+	csQueryRegistry<iPluginManager> (objectreg);
 
   strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
     objectreg, "crystalspace.shared.stringset", iStringSet);

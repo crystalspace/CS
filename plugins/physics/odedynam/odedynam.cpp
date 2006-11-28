@@ -401,8 +401,8 @@ void csODEDynamics::SetGlobalERP (float erp)
 
   for (size_t i = 0; i < systems.Length(); i ++)
   {
-    csRef<iODEDynamicSystemState> sys = SCF_QUERY_INTERFACE (systems[i],
-      iODEDynamicSystemState);
+    csRef<iODEDynamicSystemState> sys = 
+      scfQueryInterface<iODEDynamicSystemState> (systems[i]);
     sys->SetERP (erp);
   }
 }
@@ -412,8 +412,8 @@ void csODEDynamics::SetGlobalCFM (float cfm)
   csODEDynamics::cfm = cfm;
   for (size_t i = 0; i < systems.Length(); i ++)
   {
-    csRef<iODEDynamicSystemState> sys = SCF_QUERY_INTERFACE (systems[i],
-      iODEDynamicSystemState);
+    csRef<iODEDynamicSystemState> sys = 
+      scfQueryInterface<iODEDynamicSystemState> (systems[i]);
     sys->SetCFM (cfm);
   }
 }
@@ -425,8 +425,8 @@ void csODEDynamics::EnableStepFast (bool enable)
 
   for (size_t i = 0; i < systems.Length(); i ++)
   {
-    csRef<iODEDynamicSystemState> sys = SCF_QUERY_INTERFACE (systems[i],
-      iODEDynamicSystemState);
+    csRef<iODEDynamicSystemState> sys = 
+      scfQueryInterface<iODEDynamicSystemState> (systems[i]);
     sys->EnableStepFast (enable);
   }
 }
@@ -437,8 +437,8 @@ void csODEDynamics::SetStepFastIterations (int iter)
 
   for (size_t i = 0; i < systems.Length(); i ++)
   {
-    csRef<iODEDynamicSystemState> sys = SCF_QUERY_INTERFACE (systems[i],
-      iODEDynamicSystemState);
+    csRef<iODEDynamicSystemState> sys = 
+      scfQueryInterface<iODEDynamicSystemState> (systems[i]);
     sys->SetStepFastIterations (iter);
   }
 }
@@ -450,8 +450,8 @@ void csODEDynamics::EnableQuickStep (bool enable)
 
   for (size_t i = 0; i < systems.Length(); i ++)
   {
-    csRef<iODEDynamicSystemState> sys = SCF_QUERY_INTERFACE (systems[i],
-      iODEDynamicSystemState);
+    csRef<iODEDynamicSystemState> sys = 
+      scfQueryInterface<iODEDynamicSystemState> (systems[i]);
     sys->EnableQuickStep (enable);
   }
 }
@@ -462,8 +462,8 @@ void csODEDynamics::SetQuickStepIterations (int iter)
 
   for (size_t i = 0; i < systems.Length(); i ++)
   {
-    csRef<iODEDynamicSystemState> sys = SCF_QUERY_INTERFACE (systems[i],
-      iODEDynamicSystemState);
+    csRef<iODEDynamicSystemState> sys = 
+      scfQueryInterface<iODEDynamicSystemState> (systems[i]);
     sys->SetQuickStepIterations (iter);
   }
 }

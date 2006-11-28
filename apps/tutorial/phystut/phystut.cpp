@@ -272,16 +272,16 @@ bool Simple::Initialize ()
   if (phys_engine_name == "bullet")
   {
     phys_engine_id = BULLET_ID;
-    csRef<iPluginManager> plugmgr = CS_QUERY_REGISTRY (object_reg,
-      iPluginManager);
+    csRef<iPluginManager> plugmgr = 
+      csQueryRegistry<iPluginManager> (object_reg);
     dyn = CS_LOAD_PLUGIN (plugmgr, "crystalspace.dynamics.bullet", iDynamics);
   }
   else 
   {
     phys_engine_name = "ode";
     phys_engine_id = ODE_ID;
-    csRef<iPluginManager> plugmgr = CS_QUERY_REGISTRY (object_reg,
-      iPluginManager);
+    csRef<iPluginManager> plugmgr = 
+      csQueryRegistry<iPluginManager> (object_reg);
     dyn = CS_LOAD_PLUGIN (plugmgr, "crystalspace.dynamics.ode", iDynamics);
   }
   if (!dyn)
@@ -466,8 +466,8 @@ bool Simple::Initialize ()
 
   if (phys_engine_id == ODE_ID)
   {
-    csRef<iODEDynamicSystemState> osys= SCF_QUERY_INTERFACE (dynSys,
-      iODEDynamicSystemState);
+    csRef<iODEDynamicSystemState> osys= 
+      scfQueryInterface<iODEDynamicSystemState> (dynSys);
     osys->SetContactMaxCorrectingVel (.1f);
     osys->SetContactSurfaceLayer (.0001f);
   }

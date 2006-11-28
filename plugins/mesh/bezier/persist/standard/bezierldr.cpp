@@ -383,8 +383,8 @@ bool csBezierSaver::WriteDown (iBase* obj, iDocumentNode* parent,
 
   if (objwrap) return WriteObject(obj, paramsNode);
 
-  csRef<iMeshObjectFactory> fact = SCF_QUERY_INTERFACE (obj,
-  	iMeshObjectFactory);
+  csRef<iMeshObjectFactory> fact = 
+  	scfQueryInterface<iMeshObjectFactory> (obj);
   if (fact)
   {
     iMeshFactoryWrapper* factwrap = fact->GetMeshFactoryWrapper ();

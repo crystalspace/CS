@@ -1084,8 +1084,8 @@ bool csBugPlug::ExecCommand (int cmd, const csString& args)
 	  for (i = 0 ; i < ml->GetCount () ; i++)
 	  {
 	    iMeshWrapper* m = ml->Get (i);
-	    csRef<iThingState> th = SCF_QUERY_INTERFACE (m->GetMeshObject (),
-	    	iThingState);
+	    csRef<iThingState> th = 
+	    	scfQueryInterface<iThingState> (m->GetMeshObject ());
 	    if (th)
 	    {
 	      th->Unprepare ();
@@ -1275,8 +1275,8 @@ void csBugPlug::CaptureUberScreen (uint w, uint h)
 
 void csBugPlug::ListLoadedPlugins ()
 {
-  csRef<iPluginManager> plugmgr = CS_QUERY_REGISTRY (object_reg, 
-    iPluginManager);
+  csRef<iPluginManager> plugmgr =  
+    csQueryRegistry<iPluginManager> (object_reg);
   csRef<iPluginIterator> plugiter (plugmgr->GetPlugins ());
 
   csSet<const char*> printedPlugins;
@@ -1284,8 +1284,8 @@ void csBugPlug::ListLoadedPlugins ()
     "Loaded plugins:");
   while (plugiter->HasNext())
   {
-    csRef<iFactory> plugFact = SCF_QUERY_INTERFACE (plugiter->Next (),
-      iFactory);
+    csRef<iFactory> plugFact = 
+      scfQueryInterface<iFactory> (plugiter->Next ());
     if (plugFact.IsValid())
     {
       const char* libname = plugFact->QueryModuleName();
@@ -2516,8 +2516,8 @@ void csBugPlug::DebugSectorBox (const csBox3& box, float r, float g, float b,
   csRef<iMeshFactoryWrapper> mf (Engine->CreateMeshFactory (
   	"crystalspace.mesh.object.genmesh", name ? name : "__BugPlug_fact__"));
   csRef<iGeneralFactoryState> gfs (
-  	SCF_QUERY_INTERFACE (mf->GetMeshObjectFactory (),
-  	iGeneralFactoryState));
+  	
+  	scfQueryInterface<iGeneralFactoryState> (mf->GetMeshObjectFactory ()));
   CS_ASSERT (gfs != 0);
   mf->GetMeshObjectFactory ()->SetMaterialWrapper (mat);
   gfs->GenerateBox (tbox);
@@ -2549,8 +2549,8 @@ void csBugPlug::DebugSectorBox (const csBox3& box, float r, float g, float b,
 
   csRef<iMeshWrapper> mw (Engine->CreateMeshWrapper (
   	mf, name ? name : "__BugPlug_mesh__", debug_sector.sector, pos));
-  csRef<iGeneralMeshState> gms (SCF_QUERY_INTERFACE (mw->GetMeshObject (),
-  	iGeneralMeshState));
+  csRef<iGeneralMeshState> gms (
+  	scfQueryInterface<iGeneralMeshState> (mw->GetMeshObject ()));
   CS_ASSERT (gms != 0);
   gms->SetLighting (false);
   gms->SetManualColors (true);
@@ -2585,8 +2585,8 @@ void csBugPlug::DebugSectorTriangle (const csVector3& s1, const csVector3& s2,
   csRef<iMeshFactoryWrapper> mf (Engine->CreateMeshFactory (
   	"crystalspace.mesh.object.genmesh", "__BugPlug_tri__"));
   csRef<iGeneralFactoryState> gfs (
-  	SCF_QUERY_INTERFACE (mf->GetMeshObjectFactory (),
-  	iGeneralFactoryState));
+  	
+  	scfQueryInterface<iGeneralFactoryState> (mf->GetMeshObjectFactory ()));
   CS_ASSERT (gfs != 0);
   mf->GetMeshObjectFactory ()->SetMaterialWrapper (mat);
   gfs->SetVertexCount (3);
@@ -2611,8 +2611,8 @@ void csBugPlug::DebugSectorTriangle (const csVector3& s1, const csVector3& s2,
 
   csRef<iMeshWrapper> mw (Engine->CreateMeshWrapper (
   	mf, "__BugPlug_tri__", debug_sector.sector, pos));
-  csRef<iGeneralMeshState> gms (SCF_QUERY_INTERFACE (mw->GetMeshObject (),
-  	iGeneralMeshState));
+  csRef<iGeneralMeshState> gms (
+  	scfQueryInterface<iGeneralMeshState> (mw->GetMeshObject ()));
   CS_ASSERT (gms != 0);
   gms->SetLighting (false);
   gms->SetManualColors (true);
@@ -2645,8 +2645,8 @@ void csBugPlug::DebugSectorMesh (
   csRef<iMeshFactoryWrapper> mf (Engine->CreateMeshFactory (
   	"crystalspace.mesh.object.genmesh", "__BugPlug_mesh__"));
   csRef<iGeneralFactoryState> gfs (
-  	SCF_QUERY_INTERFACE (mf->GetMeshObjectFactory (),
-  	iGeneralFactoryState));
+  	
+  	scfQueryInterface<iGeneralFactoryState> (mf->GetMeshObjectFactory ()));
   CS_ASSERT (gfs != 0);
   mf->GetMeshObjectFactory ()->SetMaterialWrapper (mat);
   gfs->SetVertexCount (vertex_count);
@@ -2678,8 +2678,8 @@ void csBugPlug::DebugSectorMesh (
 
   csRef<iMeshWrapper> mw (Engine->CreateMeshWrapper (
   	mf, "__BugPlug_mesh__", debug_sector.sector, pos));
-  csRef<iGeneralMeshState> gms (SCF_QUERY_INTERFACE (mw->GetMeshObject (),
-  	iGeneralMeshState));
+  csRef<iGeneralMeshState> gms (
+  	scfQueryInterface<iGeneralMeshState> (mw->GetMeshObject ()));
   CS_ASSERT (gms != 0);
   gms->SetLighting (false);
   gms->SetManualColors (true);

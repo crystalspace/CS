@@ -148,8 +148,8 @@ bool HeightMapGen::Initialize ()
     return false;
   }
 
-  csRef<iCommandLineParser> cmdline = CS_QUERY_REGISTRY (object_reg,
-  	iCommandLineParser);
+  csRef<iCommandLineParser> cmdline = 
+  	csQueryRegistry<iCommandLineParser> (object_reg);
   const char* configfile = cmdline->GetName (0);
   if (!configfile)
   {

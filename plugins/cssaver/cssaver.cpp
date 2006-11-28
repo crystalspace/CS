@@ -1216,8 +1216,8 @@ bool csSaver::SaveSettings (iDocumentNode* node)
   csRef<iMeshObjectType> type = csLoadPluginCheck<iMeshObjectType> (
   	object_reg, "crystalspace.mesh.object.thing");
   if (!type) return false;
-  csRef<iThingEnvironment> te = SCF_QUERY_INTERFACE (type,
-    iThingEnvironment);
+  csRef<iThingEnvironment> te = 
+    scfQueryInterface<iThingEnvironment> (type);
   int cellsize = te->GetLightmapCellSize ();
   csRef<iDocumentNode> lghtmapcellNode = CreateNode(settingsNode, "lightmapcellsize");
   lghtmapcellNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsInt(cellsize);

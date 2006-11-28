@@ -161,8 +161,8 @@ void WalkTest::SetDefaults ()
   collider_actor.SetCD (do_cd);
   do_logo = Config->GetBool ("Walktest.Settings.DrawLogo", true);
 
-  csRef<iCommandLineParser> cmdline (CS_QUERY_REGISTRY (object_reg,
-  	iCommandLineParser));
+  csRef<iCommandLineParser> cmdline (
+  	csQueryRegistry<iCommandLineParser> (object_reg));
 
   const char *val;
   if (!(val = cmdline->GetName ()))
@@ -1255,8 +1255,8 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
       	first_map->map_dir);
 
     // Check if we have to load every separate map in a separate region.
-    csRef<iCommandLineParser> cmdline = CS_QUERY_REGISTRY (object_reg,
-    	iCommandLineParser);
+    csRef<iCommandLineParser> cmdline = 
+    	csQueryRegistry<iCommandLineParser> (object_reg);
     bool do_regions = false;
     if (cmdline->GetOption ("regions"))
       do_regions = true;

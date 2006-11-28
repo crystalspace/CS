@@ -339,8 +339,8 @@ public:
     if (polygon || polygonpar)
     {
       if (polygonpar)
-        polygon = SCF_QUERY_INTERFACE (polygonpar->GetValue (params),
-		iPolygonHandle);
+        polygon = 
+		scfQueryInterface<iPolygonHandle> (polygonpar->GetValue (params));
       int poly_idx = polygon->GetIndex ();
       iThingFactoryState* tfs = polygon->GetThingFactoryState ();
       if (tfs)
@@ -1797,8 +1797,8 @@ bool csEngineSequenceManager::Initialize (iObjectRegistry *r)
     q->RegisterListener (eventHandler, events);
   }
 
-  csRef<iPluginManager> plugin_mgr (CS_QUERY_REGISTRY (object_reg,
-  	iPluginManager));
+  csRef<iPluginManager> plugin_mgr (
+  	csQueryRegistry<iPluginManager> (object_reg));
   seqmgr = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.utilities.sequence",
   	iSequenceManager);
   if (!seqmgr)

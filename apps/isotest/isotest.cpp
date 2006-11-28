@@ -147,8 +147,8 @@ void IsoTest::SetupFrame ()
     csRef<iGeneralMeshState> spstate (
       scfQueryInterface<iGeneralMeshState> (actor->GetMeshObject ()));
     csRef<iGenMeshSkeletonControlState> animcontrol (
-      SCF_QUERY_INTERFACE (spstate->GetAnimationControl (), 
-      iGenMeshSkeletonControlState));
+       
+      scfQueryInterface<iGenMeshSkeletonControlState> (spstate->GetAnimationControl ()));
     iSkeleton* skeleton = animcontrol->GetSkeleton ();
     if(actor_is_walking && !moved)
     {
@@ -379,8 +379,8 @@ bool IsoTest::CreateActor ()
   csRef<iGeneralMeshState> spstate (
     scfQueryInterface<iGeneralMeshState> (actor->GetMeshObject ()));
   csRef<iGenMeshSkeletonControlState> animcontrol (
-    SCF_QUERY_INTERFACE (spstate->GetAnimationControl (), 
-    iGenMeshSkeletonControlState));
+     
+    scfQueryInterface<iGenMeshSkeletonControlState> (spstate->GetAnimationControl ()));
   iSkeleton* skel = animcontrol->GetSkeleton ();
   skel->StopAll();
   skel->Execute("idle");

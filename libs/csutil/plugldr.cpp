@@ -231,8 +231,8 @@ csPluginLoader::~csPluginLoader ()
 bool csPluginLoader::LoadPlugins ()
 {
   // Collect all options from command line
-  csRef<iCommandLineParser> CommandLine (CS_QUERY_REGISTRY (object_reg,
-  	iCommandLineParser));
+  csRef<iCommandLineParser> CommandLine (
+  	csQueryRegistry<iCommandLineParser> (object_reg));
   CS_ASSERT (CommandLine != 0);
 
   // The list of plugins

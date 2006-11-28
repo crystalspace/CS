@@ -338,8 +338,8 @@ void G2DTestSystemDriver::SetupFrame ()
 	  fontSmall = GetFont (CSFONT_SMALL);
 	  {
 	    csRef<iVFS> vfs = csQueryRegistry<iVFS> (object_reg);
-	    csRef<iImageIO> iio = CS_QUERY_REGISTRY (object_reg,
-	      iImageIO);
+	    csRef<iImageIO> iio = 
+	      csQueryRegistry<iImageIO> (object_reg);
 	    if (vfs.IsValid () && iio.IsValid ())
 	    {
 	      csRef<iFile> testFile = vfs->Open ("/lib/g2dtest/up.png", 
@@ -1686,8 +1686,8 @@ int main (int argc, char *argv[])
 
   csRef<iPluginManager> plugin_mgr (
   	csQueryRegistry<iPluginManager> (object_reg));
-  csRef<iCommandLineParser> cmdline (CS_QUERY_REGISTRY (object_reg,
-  	iCommandLineParser));
+  csRef<iCommandLineParser> cmdline (
+  	csQueryRegistry<iCommandLineParser> (object_reg));
 
   System.myG3D = csQueryRegistry<iGraphics3D> (object_reg);
   // Now load the renderer plugin

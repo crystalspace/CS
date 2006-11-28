@@ -109,8 +109,8 @@ void csPluginManager::Clear ()
 
 void csPluginManager::QueryOptions (iComponent *obj)
 {
-  csRef<iCommandLineParser> CommandLine (CS_QUERY_REGISTRY (object_reg,
-  	iCommandLineParser));
+  csRef<iCommandLineParser> CommandLine (
+  	csQueryRegistry<iCommandLineParser> (object_reg));
 
   csRef<iPluginConfig> Config (scfQueryInterface<iPluginConfig> (obj));
   if (Config)

@@ -356,8 +356,8 @@ iDocumentNode* csShaderProgram::GetProgramNode ()
 
   if (programFile.IsValid ())
   {
-    csRef<iDocumentSystem> docsys = CS_QUERY_REGISTRY (objectReg, 
-      iDocumentSystem);
+    csRef<iDocumentSystem> docsys =  
+      csQueryRegistry<iDocumentSystem> (objectReg);
     if (!docsys)
       docsys.AttachNew (new csTinyDocumentSystem ());
     csRef<iDocument> doc (docsys->CreateDocument ());

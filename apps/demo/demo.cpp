@@ -310,8 +310,8 @@ bool Demo::Initialize (int argc, const char* const argv[],
   Report (CS_REPORTER_SEVERITY_NOTIFY, "Creating world!...");
 
   // Check the demo file and mount it if required.
-  csRef<iCommandLineParser> cmdline (CS_QUERY_REGISTRY (object_reg,
-  	iCommandLineParser));
+  csRef<iCommandLineParser> cmdline (
+  	csQueryRegistry<iCommandLineParser> (object_reg));
   const char *val;
   if ((val = cmdline->GetName ()) != 0)
   {

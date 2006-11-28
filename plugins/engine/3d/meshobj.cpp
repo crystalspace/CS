@@ -1640,8 +1640,8 @@ csMeshFactoryList::~csMeshFactoryList ()
 void csMeshFactoryList::NameChanged (iObject* object, const char* oldname,
   	const char* newname)
 {
-  csRef<iMeshFactoryWrapper> mesh = SCF_QUERY_INTERFACE (object,
-    iMeshFactoryWrapper);
+  csRef<iMeshFactoryWrapper> mesh = 
+    scfQueryInterface<iMeshFactoryWrapper> (object);
   CS_ASSERT (mesh != 0);
   if (oldname) factories_hash.Delete (oldname, mesh);
   if (newname) factories_hash.Put (newname, mesh);

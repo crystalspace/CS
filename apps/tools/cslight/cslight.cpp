@@ -307,8 +307,8 @@ bool Lighter::Initialize (int argc, const char* const argv[],
   int cmd_idx = 0;
   for (;;)
   {
-    csRef<iCommandLineParser> cmdline (CS_QUERY_REGISTRY (object_reg,
-  	  iCommandLineParser));
+    csRef<iCommandLineParser> cmdline (
+  	  csQueryRegistry<iCommandLineParser> (object_reg));
     const char* val = cmdline->GetName (cmd_idx);
     cmd_idx++;
     if (!val) break;
@@ -331,8 +331,8 @@ bool Lighter::Initialize (int argc, const char* const argv[],
   int map_idx = 0;
   for (;;)
   {
-    csRef<iCommandLineParser> cmdline (CS_QUERY_REGISTRY (object_reg,
-  	  iCommandLineParser));
+    csRef<iCommandLineParser> cmdline (
+  	  csQueryRegistry<iCommandLineParser> (object_reg));
     const char* val = cmdline->GetName (cmd_idx);
     cmd_idx++;
     if (!val)

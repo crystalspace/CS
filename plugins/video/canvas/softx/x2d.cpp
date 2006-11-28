@@ -96,8 +96,8 @@ bool csGraphics2DXLib::Initialize (iObjectRegistry *object_reg)
   bool do_shm;
   // Query system settings
   csConfigAccess Config(object_reg, "/config/video.cfg");
-  csRef<iCommandLineParser> cmdline (CS_QUERY_REGISTRY (object_reg,
-						   iCommandLineParser));
+  csRef<iCommandLineParser> cmdline (
+						   csQueryRegistry<iCommandLineParser> (object_reg));
   sim_depth = Config->GetInt ("Video.SimulateDepth", 0);
 
   do_shm = Config->GetBool ("Video.XSHM", true);

@@ -1323,8 +1323,8 @@ csPtr<iBase> csGeneralMeshLoader::Parse (iDocumentNode* node,
 		child, "Couldn't find factory '%s'!", factname);
 	    return 0;
 	  }
-	  factstate = SCF_QUERY_INTERFACE (fact->GetMeshObjectFactory(), 
-	    iGeneralFactoryState);
+	  factstate =  
+	    scfQueryInterface<iGeneralFactoryState> (fact->GetMeshObjectFactory());
 	  if (!factstate)
 	  {
       	    synldr->ReportError (

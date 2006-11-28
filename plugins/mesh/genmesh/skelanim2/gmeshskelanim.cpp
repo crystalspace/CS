@@ -126,8 +126,8 @@ void csGenmeshSkelAnimationControl::Initialize ()
         CS_ASSERT(genmesh_state);
 
         csRef<iGenMeshSkeletonControlState> par_skel_state = 
-          SCF_QUERY_INTERFACE(genmesh_state->GetAnimationControl(),
-          iGenMeshSkeletonControlState);
+          
+          scfQueryInterface<iGenMeshSkeletonControlState> (genmesh_state->GetAnimationControl());
         CS_ASSERT(par_skel_state);
         skeleton = par_skel_state->GetSkeleton();
       }

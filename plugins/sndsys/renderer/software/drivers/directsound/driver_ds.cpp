@@ -83,8 +83,8 @@ bool SndSysDriverDirectSound::Initialize (iObjectRegistry *pObjectRegistry)
   Config.AddConfig(m_pObjectRegistry, "/config/sound.cfg");
 
   // check for optional output buffer length from the command line and config
-  csRef<iCommandLineParser> CMDLine (CS_QUERY_REGISTRY (m_pObjectRegistry,
-    iCommandLineParser));
+  csRef<iCommandLineParser> CMDLine (
+    csQueryRegistry<iCommandLineParser> (m_pObjectRegistry));
 
   m_BufferLengthms=0;
   if (CMDLine)

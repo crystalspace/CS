@@ -79,8 +79,8 @@ csPtr<iBase> csPagingFormerLoader::Parse (iDocumentNode* node,
       node, "Could not loader crystalspace.terraformer.paging plugin");
     return 0;
   }
-  csRef<iPagingFormerState> state = SCF_QUERY_INTERFACE (former, 
-        iPagingFormerState);
+  csRef<iPagingFormerState> state =  
+        scfQueryInterface<iPagingFormerState> (former);
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())

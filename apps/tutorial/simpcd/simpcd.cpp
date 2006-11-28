@@ -362,8 +362,8 @@ bool Simple::Initialize (iObjectRegistry* object_reg)
   parent_sprite = engine->CreateMeshWrapper (
   	imeshfact, "Parent", room,
 	csVector3 (0, 5, 3.5));
-  spstate = SCF_QUERY_INTERFACE (parent_sprite->GetMeshObject (),
-  	iSprite3DState);
+  spstate = 
+  	scfQueryInterface<iSprite3DState> (parent_sprite->GetMeshObject ());
   spstate->SetAction ("default");
   parent_sprite->GetMovable ()->Transform (csZRotMatrix3 (PI/2.));
   parent_sprite->GetMovable ()->UpdateMove ();

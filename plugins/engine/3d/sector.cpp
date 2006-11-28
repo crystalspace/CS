@@ -164,15 +164,15 @@ void csSector::SelfDestruct ()
 void csSector::RegisterLightToCuller (csLight* light)
 {
   light->UseAsCullingObject ();
-  csRef<iVisibilityObject> vo = SCF_QUERY_INTERFACE (light,
-        iVisibilityObject);
+  csRef<iVisibilityObject> vo = 
+        scfQueryInterface<iVisibilityObject> (light);
   culler->RegisterVisObject (vo);
 }
 
 void csSector::UnregisterLightToCuller (csLight* light)
 {
-  csRef<iVisibilityObject> vo = SCF_QUERY_INTERFACE (light,
-        iVisibilityObject);
+  csRef<iVisibilityObject> vo = 
+        scfQueryInterface<iVisibilityObject> (light);
   culler->UnregisterVisObject (vo);
   light->StopUsingAsCullingObject ();
 }
@@ -248,8 +248,8 @@ void csSector::RegisterEntireMeshToCuller (iMeshWrapper* mesh)
   csMeshWrapper* cmesh = (csMeshWrapper*)mesh;
   if (cmesh->SomeParentHasStaticLOD ()) return;
 
-  csRef<iVisibilityObject> vo = SCF_QUERY_INTERFACE (mesh,
-        iVisibilityObject);
+  csRef<iVisibilityObject> vo = 
+        scfQueryInterface<iVisibilityObject> (mesh);
   culler->RegisterVisObject (vo);
 
   if (cmesh->GetStaticLODMesh ()) return;
@@ -268,15 +268,15 @@ void csSector::RegisterMeshToCuller (iMeshWrapper* mesh)
   csMeshWrapper* cmesh = (csMeshWrapper*)mesh;
   if (cmesh->SomeParentHasStaticLOD ()) return;
 
-  csRef<iVisibilityObject> vo = SCF_QUERY_INTERFACE (mesh,
-        iVisibilityObject);
+  csRef<iVisibilityObject> vo = 
+        scfQueryInterface<iVisibilityObject> (mesh);
   culler->RegisterVisObject (vo);
 }
 
 void csSector::UnregisterMeshToCuller (iMeshWrapper* mesh)
 {
-  csRef<iVisibilityObject> vo = SCF_QUERY_INTERFACE (mesh,
-        iVisibilityObject);
+  csRef<iVisibilityObject> vo = 
+        scfQueryInterface<iVisibilityObject> (mesh);
   culler->UnregisterVisObject (vo);
 }
 
@@ -387,8 +387,8 @@ bool csSector::SetVisibilityCullerPlugin (const char *plugname,
   culler = 0;
 
   // Load the culler plugin.
-  csRef<iPluginManager> plugmgr = CS_QUERY_REGISTRY (engine->objectRegistry,
-  	iPluginManager);
+  csRef<iPluginManager> plugmgr = 
+  	csQueryRegistry<iPluginManager> (engine->objectRegistry);
   culler = CS_LOAD_PLUGIN (plugmgr, plugname, iVisibilityCuller);
 
   if (!culler)

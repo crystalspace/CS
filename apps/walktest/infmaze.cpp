@@ -235,8 +235,8 @@ bool InfPortalCS::Traverse (iPortal* portal, iBase* context)
   if (fv)
   {
     iFrustumViewUserdata* ud = fv->GetUserdata ();
-    csRef<iLightingProcessInfo> linfo (SCF_QUERY_INTERFACE (ud,
-    	iLightingProcessInfo));
+    csRef<iLightingProcessInfo> linfo (
+    	scfQueryInterface<iLightingProcessInfo> (ud));
     if (linfo)
     {
       if (false && !linfo->IsDynamic ())
@@ -270,8 +270,8 @@ bool InfPortalCS::Traverse (iPortal* portal, iBase* context)
     for (i = 0 ; i < ml->GetCount () ; i++)
     {
       iMeshWrapper* mesh = ml->Get (i);
-      csRef<iLightingInfo> linfo (SCF_QUERY_INTERFACE (mesh->GetMeshObject (),
-      	iLightingInfo));
+      csRef<iLightingInfo> linfo (
+      	scfQueryInterface<iLightingInfo> (mesh->GetMeshObject ()));
       if (linfo)
         linfo->InitializeDefault (true);
     }
@@ -279,8 +279,8 @@ bool InfPortalCS::Traverse (iPortal* portal, iBase* context)
     for (i = 0 ; i < ml->GetCount () ; i++)
     {
       iMeshWrapper* mesh = ml->Get (i);
-      csRef<iLightingInfo> linfo (SCF_QUERY_INTERFACE (mesh->GetMeshObject (),
-      	iLightingInfo));
+      csRef<iLightingInfo> linfo (
+      	scfQueryInterface<iLightingInfo> (mesh->GetMeshObject ()));
       if (linfo)
         linfo->PrepareLighting ();
     }

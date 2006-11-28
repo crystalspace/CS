@@ -70,8 +70,8 @@ void defFile::ParseNode(registry *reg, csRef< iDocumentNodeIterator> &pos)
 
 bool defFile::Parse(const std::string &txt, registry &reg)
 {
-  /*csRef<iPluginManager> plugin_mgr =  CS_QUERY_REGISTRY (object_reg, 
-    iPluginManager);	
+  /*csRef<iPluginManager> plugin_mgr =   
+    csQueryRegistry<iPluginManager> (object_reg);	
   csRef<iDocumentSystem> inputDS = csPtr<iDocumentSystem> (
     CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.documentsystem.xmltiny", 
     iDocumentSystem));*/

@@ -833,8 +833,8 @@ csPtr<iBase> csStencilShadowLoader::Parse (iDocumentNode* node,
 					   iLoaderContext* /*ldr_context*/,
 					   iBase* /*context*/)
 {
-  csRef<iPluginManager> plugin_mgr (CS_QUERY_REGISTRY (object_reg,
-  	iPluginManager));
+  csRef<iPluginManager> plugin_mgr (
+  	csQueryRegistry<iPluginManager> (object_reg));
   csRef<iRenderStepType> type (CS_LOAD_PLUGIN (plugin_mgr,
   	"crystalspace.renderloop.step.shadow.stencil.type", 
 	iRenderStepType));

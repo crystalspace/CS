@@ -2127,8 +2127,8 @@ bool csLoader::LoadMeshObjectFactory (iLoaderContext* ldr_context,
 	  }
 	  else
 	  {
-	    csRef<iMeshObjectFactory> mof2 (SCF_QUERY_INTERFACE (mof,
-	    	iMeshObjectFactory));
+	    csRef<iMeshObjectFactory> mof2 (
+	    	scfQueryInterface<iMeshObjectFactory> (mof));
 	    if (!mof2)
 	    {
               SyntaxService->ReportError (
@@ -2183,8 +2183,8 @@ bool csLoader::LoadMeshObjectFactory (iLoaderContext* ldr_context,
 	  }
 	  else
 	  {
-	    csRef<iMeshObjectFactory> mof2 (SCF_QUERY_INTERFACE (mof,
-	    	iMeshObjectFactory));
+	    csRef<iMeshObjectFactory> mof2 (
+	    	scfQueryInterface<iMeshObjectFactory> (mof));
 	    if (!mof2)
 	    {
               SyntaxService->ReportError (
@@ -2996,8 +2996,8 @@ bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
       TEST_MISSING_MESH
       else
       {
-	csRef<iShaderVariableContext> svc = SCF_QUERY_INTERFACE (mesh,
-		iShaderVariableContext);
+	csRef<iShaderVariableContext> svc = 
+		scfQueryInterface<iShaderVariableContext> (mesh);
 	CS_ASSERT (svc.IsValid());
         //create a new variable
         const char* varname = child->GetAttributeValue ("name");
@@ -4166,8 +4166,8 @@ bool csLoader::LoadSettings (iDocumentNode* node)
 	    csRef<iMeshObjectType> type = csLoadPluginCheck<iMeshObjectType> (
 	    	object_reg, "crystalspace.mesh.object.thing");
 	    if (!type) return false;
-	    csRef<iThingEnvironment> te = SCF_QUERY_INTERFACE (type,
-		iThingEnvironment);
+	    csRef<iThingEnvironment> te = 
+		scfQueryInterface<iThingEnvironment> (type);
 	    te->SetLightmapCellSize (cellsize);
 	  }
 	  else
@@ -5015,8 +5015,8 @@ bool csLoader::ParsePortal (iLoaderContext* ldr_context,
   if (container_mesh)
   {
     mesh = container_mesh;
-    csRef<iPortalContainer> pc = SCF_QUERY_INTERFACE (mesh->GetMeshObject (),
-    	iPortalContainer);
+    csRef<iPortalContainer> pc = 
+    	scfQueryInterface<iPortalContainer> (mesh->GetMeshObject ());
     CS_ASSERT (pc != 0);
     portal = pc->CreatePortal (poly.GetVertices (), (int)poly.GetVertexCount ());
     portal->SetSector (destSector);
