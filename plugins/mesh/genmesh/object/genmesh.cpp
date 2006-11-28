@@ -1578,8 +1578,8 @@ csGenmeshMeshObjectFactory::csGenmeshMeshObjectFactory (
 
   vc = csQueryRegistry<iVirtualClock> (object_reg);
 
-  csRef<iCommandLineParser> cmdline = CS_QUERY_REGISTRY (
-  	object_reg, iCommandLineParser);
+  csRef<iCommandLineParser> cmdline = 
+  	csQueryRegistry<iCommandLineParser> (object_reg);
   do_fullbright = (cmdline->GetOption ("fullbright") != 0);
 }
 

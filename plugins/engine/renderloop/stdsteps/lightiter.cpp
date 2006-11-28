@@ -178,8 +178,8 @@ void csLightIterRenderStep::Init ()
     trw_inv_name = strings->Request ("light 0 transform inverse world");
     CS::ShaderVarName lightcountname (strings, "light count");
 
-    shadermgr = CS_QUERY_REGISTRY (
-    	object_reg, iShaderManager);
+    shadermgr = 
+    	csQueryRegistry<iShaderManager> (object_reg);
 
     shvar_light_0_position = shadermgr->GetVariable (posname);
     if (!shvar_light_0_position)

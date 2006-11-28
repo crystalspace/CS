@@ -937,8 +937,8 @@ public:
 
 bool csTerrainObject::ReadCDLODFromCache ()
 {
-  csRef<iCommandLineParser> cmdline = CS_QUERY_REGISTRY (
-  	object_reg, iCommandLineParser);
+  csRef<iCommandLineParser> cmdline = 
+  	csQueryRegistry<iCommandLineParser> (object_reg);
   if (cmdline->GetOption ("recalc"))
   {
     static bool reportit = true;
@@ -1355,8 +1355,8 @@ void csTerrainObject::SetBottomNeighbor(iTerrainObjectState *bottom)
 
 void csTerrainObject::SetStaticLighting (bool enable)
 {
-  csRef<iCommandLineParser> cmdline = CS_QUERY_REGISTRY (
-  	object_reg, iCommandLineParser);
+  csRef<iCommandLineParser> cmdline = 
+  	csQueryRegistry<iCommandLineParser> (object_reg);
   if (cmdline->GetOption ("fullbright"))
   {
     staticlighting = false;

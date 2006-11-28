@@ -746,8 +746,8 @@ bool csGLShaderFVP::Load(iShaderDestinationResolver* resolve,
   string_world2camera = strings->Request ("world2camera transform");
   string_object2world = strings->Request ("object2world transform");
 
-  csRef<iShaderManager> shadermgr = CS_QUERY_REGISTRY(
-  	objectReg, iShaderManager);
+  csRef<iShaderManager> shadermgr = 
+  	csQueryRegistry<iShaderManager> (objectReg);
 
   csRef<iDocumentNode> variablesnode = program->GetNode("fixedvp");
   if(variablesnode)

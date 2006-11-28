@@ -99,12 +99,12 @@ bool csNullGraphics3D::Initialize (iObjectRegistry* objreg)
     object_reg->Register (strings, "crystalspace.renderer.stringset");
   }
 
-  csRef<iPluginManager> plugin_mgr = CS_QUERY_REGISTRY (
-  	object_reg, iPluginManager);
+  csRef<iPluginManager> plugin_mgr = 
+  	csQueryRegistry<iPluginManager> (object_reg);
   if (!plugin_mgr) 
     return false;
-  csRef<iCommandLineParser> cmdline = CS_QUERY_REGISTRY (
-  	object_reg, iCommandLineParser);
+  csRef<iCommandLineParser> cmdline = 
+  	csQueryRegistry<iCommandLineParser> (object_reg);
 
   config.AddConfig (object_reg, "/config/null3d.cfg");
 
@@ -145,8 +145,8 @@ bool csNullGraphics3D::HandleEvent (iEvent& e)
 
 bool csNullGraphics3D::Open ()
 {
-  csRef<iPluginManager> plugin_mgr = CS_QUERY_REGISTRY (
-  	object_reg, iPluginManager);
+  csRef<iPluginManager> plugin_mgr = 
+  	csQueryRegistry<iPluginManager> (object_reg);
   if (!plugin_mgr)
     return false;
   if (!G2D->Open ())

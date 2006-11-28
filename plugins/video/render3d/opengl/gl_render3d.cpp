@@ -733,8 +733,8 @@ bool csGLGraphics3D::Open ()
 {
   if (isOpen) return true;
   isOpen = true;
-  csRef<iPluginManager> plugin_mgr = CS_QUERY_REGISTRY (
-  	object_reg, iPluginManager);
+  csRef<iPluginManager> plugin_mgr = 
+  	csQueryRegistry<iPluginManager> (object_reg);
 
   csRef<iVerbosityManager> verbosemgr (
     csQueryRegistry<iVerbosityManager> (object_reg));
@@ -3486,10 +3486,10 @@ bool csGLGraphics3D::Initialize (iObjectRegistry* p)
   strings = csQueryRegistryTagInterface<iStringSet> (
     object_reg, "crystalspace.shared.stringset");
 
-  csRef<iPluginManager> plugin_mgr = CS_QUERY_REGISTRY (
-  	object_reg, iPluginManager);
-  csRef<iCommandLineParser> cmdline = CS_QUERY_REGISTRY (
-  	object_reg, iCommandLineParser);
+  csRef<iPluginManager> plugin_mgr = 
+  	csQueryRegistry<iPluginManager> (object_reg);
+  csRef<iCommandLineParser> cmdline = 
+  	csQueryRegistry<iCommandLineParser> (object_reg);
 
   /* Note: r3dopengl.cfg is also added by the canvases. This is done because
    * either the canvas or the renderer may be loaded before the other, but

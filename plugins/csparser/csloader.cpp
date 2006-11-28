@@ -247,8 +247,8 @@ iLight* StdLoaderContext::FindLight (const char *name)
 
 iShader* StdLoaderContext::FindShader (const char *name)
 {
-  csRef<iShaderManager> shaderMgr = CS_QUERY_REGISTRY (
-  	loader->object_reg, iShaderManager);
+  csRef<iShaderManager> shaderMgr = 
+  	csQueryRegistry<iShaderManager> (loader->object_reg);
   if (!shaderMgr) return 0;
   if (!curRegOnly || !region)
   {
@@ -434,8 +434,8 @@ iLight* ThreadedLoaderContext::FindLight (const char *name)
 
 iShader* ThreadedLoaderContext::FindShader (const char *name)
 {
-  csRef<iShaderManager> shaderMgr = CS_QUERY_REGISTRY (
-  	loader->object_reg, iShaderManager);
+  csRef<iShaderManager> shaderMgr = 
+  	csQueryRegistry<iShaderManager> (loader->object_reg);
   if (!shaderMgr) return 0;
   if (!curRegOnly || !region) return shaderMgr->GetShader (name);
 

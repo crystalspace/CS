@@ -115,8 +115,8 @@ static JSBool Texture (JSContext *cx, JSObject *obj, uintN argc, jsval *argv,
     }
 
     // Get a handle to the image loader.
-    csRef<iImageIO> loader = CS_QUERY_REGISTRY (
-      AwsMgr ()->GetObjectRegistry (), iImageIO);
+    csRef<iImageIO> loader = 
+      csQueryRegistry<iImageIO> (AwsMgr ()->GetObjectRegistry ());
 
     if (!loader)
     {

@@ -204,8 +204,8 @@ iVerbosityManager* csInitializer::CreateVerbosityManager (
   iObjectRegistry* r)
 {
   csVerbosityManager* v = new csVerbosityManager;
-  csRef<iCommandLineParser> cmdline (CS_QUERY_REGISTRY (
-    r, iCommandLineParser));
+  csRef<iCommandLineParser> cmdline (
+    csQueryRegistry<iCommandLineParser> (r));
   if (cmdline.IsValid())
   {
     for (size_t i = 0; ; i++)

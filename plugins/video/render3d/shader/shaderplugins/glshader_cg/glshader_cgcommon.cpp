@@ -517,8 +517,8 @@ bool csShaderGLCGCommon::Load (iShaderDestinationResolver*,
   if(!program)
     return false;
 
-  csRef<iShaderManager> shadermgr = CS_QUERY_REGISTRY(
-  	shaderPlug->object_reg, iShaderManager);
+  csRef<iShaderManager> shadermgr = 
+  	csQueryRegistry<iShaderManager> (shaderPlug->object_reg);
 
   csRef<iDocumentNode> variablesnode = program->GetNode (programType);
   if(variablesnode)

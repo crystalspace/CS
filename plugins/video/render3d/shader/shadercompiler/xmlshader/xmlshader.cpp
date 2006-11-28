@@ -79,8 +79,8 @@ bool csXMLShaderCompiler::Initialize (iObjectRegistry* object_reg)
 
   wrapperFact = new csWrappedDocumentNodeFactory (this);
 
-  csRef<iPluginManager> plugin_mgr = CS_QUERY_REGISTRY (
-      object_reg, iPluginManager);
+  csRef<iPluginManager> plugin_mgr = 
+      csQueryRegistry<iPluginManager> (object_reg);
 
   strings = csQueryRegistryTagInterface<iStringSet> (
     object_reg, "crystalspace.shared.stringset");
