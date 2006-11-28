@@ -42,6 +42,7 @@ chronological order.
 	- Marten added a method to csColor to check if it is all 0.
 	- Marten made various fixes to lighter2 as well as the beginning
 	  of new code to compute direct lighting (not used yet).
+	- res updated the docs for the new winlibs version.
 27-Nov-2006
 	- Jorrit reverted a threading change (revision 25929) because
 	  it caused programs to hang on mingw and crash on linux.
