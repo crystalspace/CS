@@ -181,8 +181,8 @@ csPtr<iBase> csSimpleFormerLoader::Parse (iDocumentNode* node,
 	int scale = child->GetAttributeValueAsInt ("scale");
 	int offset = child->GetAttributeValueAsInt ("offset");
 	const char* typestring = child->GetAttributeValue ("type");
-        csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
-	  objreg, "crystalspace.shared.stringset", iStringSet);
+        csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet> (
+	  objreg, "crystalspace.shared.stringset");
         csStringID type = strings->Request (typestring);
         state->SetIntegerMap (type, map, scale, offset);
         break;
@@ -201,8 +201,8 @@ csPtr<iBase> csSimpleFormerLoader::Parse (iDocumentNode* node,
 	float scale = child->GetAttributeValueAsFloat ("scale");
 	float offset = child->GetAttributeValueAsFloat ("offset");
 	const char* typestring = child->GetAttributeValue ("type");
-        csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
-	  objreg, "crystalspace.shared.stringset", iStringSet);
+        csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet> (
+	  objreg, "crystalspace.shared.stringset");
         csStringID type = strings->Request (typestring);
         state->SetFloatMap (type, map, scale, offset);
         break;
@@ -260,8 +260,8 @@ csPtr<iBase> csSimpleFormerLoader::Parse (iDocumentNode* node,
             return 0;
           }
 
-          csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
-            objreg, "crystalspace.shared.stringset", iStringSet);
+          csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet> (
+            objreg, "crystalspace.shared.stringset");
 
           state->SetIntegerMap(strings->Request("materialmap"), map);
 //          state->SetMaterialMapFile (imagefile, map->GetWidth (),
@@ -318,8 +318,8 @@ csPtr<iBase> csSimpleFormerLoader::Parse (iDocumentNode* node,
           csString id = csString("alphamap ");
           id += alphamapcount++;
 
-          csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
-            objreg, "crystalspace.shared.stringset", iStringSet);
+          csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet> (
+            objreg, "crystalspace.shared.stringset");
 
           state->SetIntegerMap(strings->Request(id), map);
         }

@@ -1059,9 +1059,8 @@ bool csBugPlug::ExecCommand (int cmd, const csString& args)
 	break;
     case DEBUGCMD_MEMORYDUMP:
 	  {
-	    csRef<iMemoryTracker> mtr = CS_QUERY_REGISTRY_TAG_INTERFACE (
-	    	object_reg, "crystalspace.utilities.memorytracker",
-		iMemoryTracker);
+	    csRef<iMemoryTracker> mtr = csQueryRegistryTagInterface<iMemoryTracker> (
+	    	object_reg, "crystalspace.utilities.memorytracker");
 	    if (!mtr)
 	    {
 	      Report (CS_REPORTER_SEVERITY_NOTIFY,

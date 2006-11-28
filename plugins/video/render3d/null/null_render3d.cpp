@@ -91,8 +91,8 @@ bool csNullGraphics3D::Initialize (iObjectRegistry* objreg)
 
   bugplug = csQueryRegistry<iBugPlug> (object_reg);
 
-  strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
-    object_reg, "crystalspace.renderer.stringset", iStringSet);
+  strings = csQueryRegistryTagInterface<iStringSet> (
+    object_reg, "crystalspace.renderer.stringset");
   if (!strings)
   { 
     strings = csPtr<iStringSet> (new csScfStringSet ());

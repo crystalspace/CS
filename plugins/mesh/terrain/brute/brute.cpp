@@ -213,8 +213,8 @@ void csTerrBlock::SetupMesh ()
     {
       csVector2 mapRes;
 
-      csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
- 	  terr->object_reg, "crystalspace.shared.stringset", iStringSet);
+      csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet> (
+ 	  terr->object_reg, "crystalspace.shared.stringset");
 
       if (terr->materialAlphaMaps)
 	mapRes = terr->terraformer->GetIntegerMapSize(
@@ -1932,8 +1932,8 @@ CS_DEPRECATED_METHOD bool csTerrainObject::SetMaterialAlphaMaps (
              " Use adequate method in the formers for others.");
     return false;
   }
-  csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
-    object_reg, "crystalspace.shared.stringset", iStringSet);
+  csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet> (
+    object_reg, "crystalspace.shared.stringset");
 
   for (uint a = 0; a < data.GetSize(); a++)
   {
@@ -2081,8 +2081,8 @@ csArray<iImage*>& maps)
              " Use adequate method in the formers for others.");
     return false;
   }
-  csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
-    object_reg, "crystalspace.shared.stringset", iStringSet);
+  csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet> (
+    object_reg, "crystalspace.shared.stringset");
 
   if (maps.Length () != palette.Length ()-1)
   {
@@ -2159,8 +2159,8 @@ csArray<char>& data, int w, int h)
              " Use adequate method in the formers for others.");
     return false;
   }
-  csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
-    object_reg, "crystalspace.shared.stringset", iStringSet);
+  csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet> (
+    object_reg, "crystalspace.shared.stringset");
 
   csRef<iImage> material = csPtr<iImage> (new csImageMemory (w, h,
     CS_IMGFMT_PALETTED8));
@@ -2266,8 +2266,8 @@ CS_DEPRECATED_METHOD bool csTerrainObject::SetMaterialMap (iImage* map)
              " Use adequate method in the formers for others.");
     return false;
   }
-  csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
-    object_reg, "crystalspace.shared.stringset", iStringSet);
+  csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet> (
+    object_reg, "crystalspace.shared.stringset");
 
   const size_t mapSize = map->GetWidth() * map->GetHeight();
   csArray<char> image_data;

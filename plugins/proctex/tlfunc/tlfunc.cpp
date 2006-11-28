@@ -208,8 +208,8 @@ csPtr<iBase> csFuncTexLoader::Parse (iDocumentNode* node,
 
     if (exprNode)
     {
-      csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
-	object_reg, "crystalspace.shared.stringset", iStringSet);
+      csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet> (
+	object_reg, "crystalspace.shared.stringset");
 
       csShaderExpression expr (object_reg);
       

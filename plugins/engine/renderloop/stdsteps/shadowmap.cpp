@@ -123,8 +123,8 @@ bool csShadowmapRSLoader::ParseStep (iLoaderContext* ldr_context,
     csShadowmapRenderStep* step, 
     csShadowmapRenderStep::DrawSettings& settings)
 {
-  csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
-    object_reg, "crystalspace.shared.stringset", iStringSet);
+  csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet> (
+    object_reg, "crystalspace.shared.stringset");
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())

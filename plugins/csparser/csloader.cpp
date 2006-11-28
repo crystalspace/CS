@@ -1174,8 +1174,8 @@ bool csLoader::Initialize (iObjectRegistry *object_Reg)
 
   InitTokenTable (xmltokens);
 
-  stringSet = CS_QUERY_REGISTRY_TAG_INTERFACE (
-    object_reg, "crystalspace.shared.stringset", iStringSet);
+  stringSet = csQueryRegistryTagInterface<iStringSet> (
+    object_reg, "crystalspace.shared.stringset");
 
   return true;
 }
@@ -3715,8 +3715,8 @@ bool csLoader::LoadMeshGenGeometry (iLoaderContext* ldr_context,
         uint resx = child->GetAttributeValueAsInt ("resx");
         uint resy = child->GetAttributeValueAsInt ("resy");
         
-        csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
-          object_reg, "crystalspace.shared.stringset", iStringSet);
+        csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet> (
+          object_reg, "crystalspace.shared.stringset");
 
         geom->AddPositionsFromMap (map, csBox2 (min.x, min.y, max.x, max.y), 
           resx, resy, value, strings->Request ("heights"));
@@ -3735,8 +3735,8 @@ bool csLoader::LoadMeshGenGeometry (iLoaderContext* ldr_context,
           return false;
         }
         float factor = child->GetAttributeValueAsFloat ("factor");
-        csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
-        object_reg, "crystalspace.shared.stringset", iStringSet);
+        csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet> (
+        object_reg, "crystalspace.shared.stringset");
         geom->SetDensityMap (map_tf, factor, strings->Request ("densitymap"));
       }
       break;

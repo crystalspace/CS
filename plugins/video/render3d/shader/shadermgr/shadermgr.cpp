@@ -127,8 +127,8 @@ bool csShaderManager::Initialize(iObjectRegistry *objreg)
   csRef<iPluginManager> plugin_mgr = 
 	csQueryRegistry<iPluginManager> (objectreg);
 
-  strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
-    objectreg, "crystalspace.shared.stringset", iStringSet);
+  strings = csQueryRegistryTagInterface<iStringSet> (
+    objectreg, "crystalspace.shared.stringset");
 
   {
     csRef<csNullShader> nullShader;

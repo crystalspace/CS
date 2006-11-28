@@ -162,8 +162,8 @@ void csLightIterRenderStep::Init ()
 
     g3d = csQueryRegistry<iGraphics3D> (object_reg);
 
-    csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
-      object_reg, "crystalspace.shared.stringset", iStringSet);
+    csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet> (
+      object_reg, "crystalspace.shared.stringset");
 
     csStringID posname = strings->Request ("light 0 position");
     csStringID poswname = strings->Request ("light 0 position world");

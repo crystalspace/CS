@@ -640,8 +640,8 @@ bool csEngine::HandleEvent (iEvent &Event)
   {
   if (G3D)
   {
-    globalStringSet = CS_QUERY_REGISTRY_TAG_INTERFACE (
-      objectRegistry, "crystalspace.shared.stringset", iStringSet);
+    globalStringSet = csQueryRegistryTagInterface<iStringSet> (
+      objectRegistry, "crystalspace.shared.stringset");
 
     id_creation_time = globalStringSet->Request("mesh creation time");
 

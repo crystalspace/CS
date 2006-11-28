@@ -82,8 +82,8 @@ bool csXMLShaderCompiler::Initialize (iObjectRegistry* object_reg)
   csRef<iPluginManager> plugin_mgr = CS_QUERY_REGISTRY (
       object_reg, iPluginManager);
 
-  strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
-    object_reg, "crystalspace.shared.stringset", iStringSet);
+  strings = csQueryRegistryTagInterface<iStringSet> (
+    object_reg, "crystalspace.shared.stringset");
 
   g3d = csQueryRegistry<iGraphics3D> (object_reg);
   vfs = csQueryRegistry<iVFS> (object_reg);

@@ -2864,8 +2864,8 @@ bool csThingObjectType::Initialize (iObjectRegistry *object_reg)
     Notify ("Lightmapping enabled=%d", (int)csThing::lightmap_enabled);
   }
 
-  stringset = CS_QUERY_REGISTRY_TAG_INTERFACE (
-    object_reg, "crystalspace.shared.stringset", iStringSet);
+  stringset = csQueryRegistryTagInterface<iStringSet> (
+    object_reg, "crystalspace.shared.stringset");
 
   shadermgr = csQueryRegistry<iShaderManager> (object_reg);
 

@@ -106,8 +106,8 @@ bool csFullScreenQuadRSLoader::ParseStep (iLoaderContext* ldr_context,
     csFullScreenQuadRenderStep* step, 
     csFullScreenQuadRenderStep::DrawSettings& settings, bool firstPass)
 {
-  csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
-    object_reg, "crystalspace.shared.stringset", iStringSet);
+  csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet> (
+    object_reg, "crystalspace.shared.stringset");
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
