@@ -19604,13 +19604,6 @@
       </hardmove>
     </meshobj>
   </sector>
-  <collection name="carCol">
-    <meshobj>car</meshobj>
-    <meshobj>tire1</meshobj>
-    <meshobj>tire2</meshobj>
-    <meshobj>tire3</meshobj>
-    <meshobj>tire4</meshobj>
-  </collection>
   <sector name="win4">
     <meshobj name="walls_transp">
       <plugin>thing</plugin>
