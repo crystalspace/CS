@@ -540,7 +540,7 @@ Win32Assistant::Win32Assistant (iObjectRegistry* r)
   }
 
   csRef<iBase> currentKbd = 
-    CS_QUERY_REGISTRY_TAG (r, "iKeyboardDriver");
+    csQueryRegistryTag (r, "iKeyboardDriver");
   if (currentKbd != 0)
   {
     // Bit hacky: remove old keyboard driver

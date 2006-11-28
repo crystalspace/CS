@@ -1837,7 +1837,7 @@ void csBugPlug::DebugCmd (const char* cmd)
     *space = 0;
 
     csRef<iBase> comp;
-    comp = CS_QUERY_REGISTRY_TAG(object_reg, cmdstr);
+    comp = csQueryRegistryTag(object_reg, cmdstr);
 
     if (comp == 0)
     {

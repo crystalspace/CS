@@ -102,7 +102,7 @@ bool csLoader::csLoadedPluginVector::GetPluginFromRec (
 {
   if (!rec->Component)
   {
-    rec->Component = CS_QUERY_REGISTRY_TAG (object_reg, rec->ClassID);
+    rec->Component = csQueryRegistryTag (object_reg, rec->ClassID);
     if (!rec->Component)
     {
       csRef<iComponent> comp = CS_LOAD_PLUGIN (plugin_mgr,

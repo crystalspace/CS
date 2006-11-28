@@ -19,6 +19,7 @@ chronological order.
 	  SCF_QUERY_INTERFACEs with scfQueryInterface<>.
 	- res replaced some CS_QUERY_REGISTRY_TAG_INTERFACEs with 
 	  csQueryRegistryTagInterface<>s.
+	- res replaced CS_QUERY_REGISTRY_TAGs with csQueryRegistryTag.
 27-Nov-2006
 	- Jorrit reverted a threading change (revision 25929) because
 	  it caused programs to hang on mingw and crash on linux.
