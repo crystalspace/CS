@@ -14,6 +14,10 @@ chronological order.
 	- Andrew Dai made improvements to the collision response algorithm to
 	  prevent actors occasionally becoming stuck on sharp inclines.
 	- Jorrit fixed a memory leak with the graveyard plugin leaking.
+	- Jorrit changed the license on the castle level in CS from
+	  Creative Commons by-nc to by-sa which is a less restrictive
+	  license and allows commercial usage. This is done with permission
+	  from Anders Wisur.
 27-Nov-2006
 	- Jorrit fixed a bug in the terrain engine. It would incorrectly
 	  try to get the size from the alphamaps by using 'alphamap '

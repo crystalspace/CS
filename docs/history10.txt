@@ -7,6 +7,7 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 28-Nov-2006
+	- Jorrit merged r25985 into 1.0 (castle license change).
 	- Jorrit merged r25978 into 1.0 (graveyard leak fix).
 	- Jorrit merged r25965 into 1.0 (collider actor bugfix).
 	- Jorrit merged r25974 into 1.0 (flarge collection removal).
