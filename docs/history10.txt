@@ -6,6 +6,8 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+28-Nov-2006
+	- Jorrit merged r25974 into 1.0 (flarge collection removal).
 27-Nov-2006
 	- Jorrit merged r25937 into 1.0 (viewmesh/cegui fix).
 	- Jorrit merged r25944 into 1.0 (terrain alphamap fix).
