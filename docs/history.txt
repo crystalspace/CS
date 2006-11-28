@@ -9,8 +9,8 @@ chronological order.
 28-Nov-2006
 	- Andrew Dai fixed a bug that's been lurking in csColliderActor::Move
 	  from the beginning of time. This occasionally allowed actors to pass
-	  through walls. This should now be impossible no matter what the framerate
-	  is.
+	  through walls. This should now be impossible no matter what the
+	  framerate is.
 	- Andrew Dai made improvements to the collision response algorithm to
 	  prevent actors occasionally becoming stuck on sharp inclines.
 	- res added a dummy _pycscegui.csplugin so the MSVC generation can
