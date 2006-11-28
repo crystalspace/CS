@@ -12,6 +12,7 @@ chronological order.
 	- Jorrit merged r25965 into 1.0 (collider actor bugfix).
 	- Jorrit merged r25974 into 1.0 (flarge collection removal).
 	- res merged r25990 into 1.0 (new winlibs).
+	- res merged r25992 into 1.0 (VC warning fixes).
 27-Nov-2006
 	- Jorrit merged r25937 into 1.0 (viewmesh/cegui fix).
 	- Jorrit merged r25944 into 1.0 (terrain alphamap fix).

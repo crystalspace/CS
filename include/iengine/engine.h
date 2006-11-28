@@ -1261,6 +1261,7 @@ struct iEngine : public virtual iBase
     /// Get the list of all shared variables.
   virtual iSharedVariableList* GetVariableList () const = 0;
 
+#include "csutil/win32/msvc_deprecated_warn_off.h"
   /**
    * Get the list of collections.
    * \deprecated Collections are obsolete.
@@ -1284,6 +1285,7 @@ struct iEngine : public virtual iBase
   CS_DEPRECATED_METHOD_MSG("Collections are obsolete")
   virtual iCollection* FindCollection (const char* name,
   	iRegion* region = 0) = 0;
+#include "csutil/win32/msvc_deprecated_warn_on.h"
 
   /**
    * Convenience function to 'remove' a CS object from the engine.

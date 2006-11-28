@@ -745,10 +745,10 @@ void csMeshGenerator::SetFade (iMeshWrapper* mesh, uint mode)
   if (!mesh) return;
   mesh->GetMeshObject ()->SetMixMode (mode);
   iSceneNode* sn = mesh->QuerySceneNode ();
-  const csRefArray<iSceneNode>& children = sn->GetChildren ();
+  const csRef<iSceneNodeArray> children = sn->GetChildrenArray ();
   size_t i;
-  for (i = 0 ; i < children.Length () ; i++)
-    SetFade (children[i]->QueryMesh (), mode);
+  for (i = 0 ; i < children->GetSize(); i++)
+    SetFade (children->Get (i)->QueryMesh (), mode);
 }
 
 void csMeshGenerator::SetFade (csMGPosition& p, float factor)

@@ -62,12 +62,12 @@ public:
   virtual void AppendShadows (iMovable* movable, iShadowBlockList* shadows,
   	const csVector3& origin)
   {
-    const csRefArray<iSceneNode>& c = static_lod_mesh->QuerySceneNode ()
-    	->GetChildren ();
-    size_t i = c.Length ();
+    const csRef<iSceneNodeArray> c = static_lod_mesh->QuerySceneNode ()
+      ->GetChildrenArray ();
+    size_t i = c->GetSize ();
     while (i-- > 0)
     {
-      iMeshWrapper* child = c[i]->QueryMesh ();
+      iMeshWrapper* child = c->Get (i)->QueryMesh ();
       if (child && child->GetShadowCaster ())
       {
         child->GetShadowCaster ()->AppendShadows (movable, shadows, origin);
@@ -99,13 +99,13 @@ public:
 
   virtual void CastShadows (iMovable* movable, iFrustumView* fview)
   {
-    const csRefArray<iSceneNode>& c = static_lod_mesh->QuerySceneNode ()
-    	->GetChildren ();
-    size_t cnt = c.Length ();
+    const csRef<iSceneNodeArray> c = static_lod_mesh->QuerySceneNode ()
+      ->GetChildrenArray ();
+    size_t cnt = c->GetSize ();
     size_t i;
     for (i = 0 ; i < cnt ; i++)
     {
-      iMeshWrapper* child = c[i]->QueryMesh ();
+      iMeshWrapper* child = c->Get (i)->QueryMesh ();
       if (child && child->GetShadowReceiver ())
         child->GetShadowReceiver ()->CastShadows (movable, fview);
     }

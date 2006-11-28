@@ -19,6 +19,8 @@ chronological order.
 	  license and allows commercial usage. This is done with permission
 	  from Anders Wisur.
 	- res updated the docs for the new winlibs version.
+	- res fixed a couple of VC deprecation warnings (collection and scene
+	  node array related).
 27-Nov-2006
 	- Jorrit fixed a bug in the terrain engine. It would incorrectly
 	  try to get the size from the alphamaps by using 'alphamap '
