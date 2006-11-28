@@ -43,6 +43,8 @@ chronological order.
 	- Marten made various fixes to lighter2 as well as the beginning
 	  of new code to compute direct lighting (not used yet).
 	- res updated the docs for the new winlibs version.
+	- res fixed a couple of VC deprecation warnings (collection and scene
+	  node array related).
 27-Nov-2006
 	- Jorrit reverted a threading change (revision 25929) because
 	  it caused programs to hang on mingw and crash on linux.

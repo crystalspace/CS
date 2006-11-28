@@ -244,6 +244,9 @@ iCameraPosition *csCameraPositionList::FindByName (
 }
 
 //---------------------------------------------------------------------------
+
+#include "csutil/win32/msvc_deprecated_warn_off.h"
+
 csCollectionList::csCollectionList ()
   : scfImplementationType (this)
 {
@@ -302,6 +305,8 @@ iCollection *csCollectionList::FindByName (
 {
   return collections.FindByName (Name);
 }
+
+#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 //---------------------------------------------------------------------------
 
@@ -912,9 +917,8 @@ void csEngine::ResetWorldSpecificSettings()
 {
   SetClearZBuf (defaultClearZBuf);
   SetClearScreen (defaultClearScreen);
-  csRef<iThingEnvironment> te (SCF_QUERY_INTERFACE (
-          GetThingType (),
-          iThingEnvironment));
+  csRef<iThingEnvironment> te (scfQueryInterface<iThingEnvironment> (
+          GetThingType ()));
   te->SetLightmapCellSize (16);
   SetMaxLightmapSize (defaultMaxLightmapWidth, defaultMaxLightmapHeight);
   SetAmbientLight (csColor (
@@ -1076,12 +1080,12 @@ void csEngine::AddMeshAndChildren (iMeshWrapper* mesh)
 {
   meshes.Add (mesh);
   // @@@ Consider no longer putting child meshes on main engine list???
-  const csRefArray<iSceneNode>& children = mesh->QuerySceneNode ()
-  	->GetChildren ();
+  const csRef<iSceneNodeArray> children = mesh->QuerySceneNode ()
+    ->GetChildrenArray ();
   size_t i;
-  for (i = 0 ; i < children.Length () ; i++)
+  for (i = 0 ; i < children->GetSize() ; i++)
   {
-    iMeshWrapper* mesh = children[i]->QueryMesh ();
+    iMeshWrapper* mesh = children->Get (i)->QueryMesh ();
     if (mesh)
       AddMeshAndChildren (mesh);
   }
@@ -1374,11 +1378,12 @@ void csEngine::PrecacheMesh (iMeshWrapper* s, iRenderView* rview)
   if (s->GetMeshObject ())
     s->GetMeshObject ()->GetRenderMeshes (num, rview,
       s->GetMovable (), 0xf);
-  const csRefArray<iSceneNode>& children = s->QuerySceneNode ()->GetChildren ();
+  const csRef<iSceneNodeArray> children = s->QuerySceneNode ()
+    ->GetChildrenArray ();
   size_t i;
-  for (i = 0 ; i < children.Length () ; i++)
+  for (i = 0 ; i < children->GetSize () ; i++)
   {
-    iMeshWrapper* mesh = children[i]->QueryMesh ();
+    iMeshWrapper* mesh = children->Get (i)->QueryMesh ();
     if (mesh)
       PrecacheMesh (mesh, rview);
   }
@@ -1812,6 +1817,8 @@ iCameraPosition* csEngine::FindCameraPosition (const char* name,
   return campos;
 }
 
+#include "csutil/win32/msvc_deprecated_warn_off.h"
+
 iCollection* csEngine::FindCollection (const char* name,
 	iRegion* reg)
 {
@@ -1829,6 +1836,8 @@ iCollection* csEngine::FindCollection (const char* name,
     col = GetCollections ()->FindByName (n);
   return col;
 }
+
+#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 void csEngine::ReadConfig (iConfigFile *Config)
 {
@@ -3140,13 +3149,13 @@ csPtr<iMeshWrapper> csEngine::CreatePortal (
   csRef<iPortalContainer> pc;
   if (name)
   {
-    const csRefArray<iSceneNode>& children = parentMesh->QuerySceneNode ()->
-    	GetChildren ();
+    const csRef<iSceneNodeArray> children = mesh->QuerySceneNode ()
+      ->GetChildrenArray ();
     size_t i;
-    for (i = 0 ; i < children.Length () ; i++)
+    for (i = 0 ; i < children->GetSize(); i++)
     {
       // @@@ Not efficient.
-      iMeshWrapper* mesh = children[i]->QueryMesh ();
+      iMeshWrapper* mesh = children->Get (i)->QueryMesh ();
       if (mesh)
       {
         if (!strcmp (name, mesh->QueryObject ()->GetName ()))
