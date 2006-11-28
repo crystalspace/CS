@@ -25,6 +25,10 @@ chronological order.
 	  if the light is not yet in a sector.
 	- Jorrit fixed lights so that they work slightly better if they
 	  are parented. Not perfect yet though.
+	- Jorrit changed the license on the castle level in CS from
+	  Creative Commons by-nc to by-sa which is a less restrictive
+	  license and allows commercial usage. This is done with permission
+	  from Anders Wisur.
 27-Nov-2006
 	- Jorrit reverted a threading change (revision 25929) because
 	  it caused programs to hang on mingw and crash on linux.
