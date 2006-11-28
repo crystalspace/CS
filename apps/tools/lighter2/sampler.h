@@ -81,6 +81,61 @@ namespace lighter
 
     return (T)index / (T)CONST_INT64(0x100000000);
   }
+
+  /**
+   * Helper for below
+   */
+  class SampleSequenceIndex : public csRefCount
+  {
+  public:
+    SampleSequenceIndex ()
+      : sequenceIndex (0)
+    {
+    }
+
+    uint GetNext ()
+    {
+      return sequenceIndex++;
+    }
+
+  private:
+    uint sequenceIndex;
+  };
+
+  /**
+   * Simple class that provides low discrepancy numbers of given dimension
+   */
+  template<int N>
+  class SamplerSequence
+  {
+  public:
+    SamplerSequence ()
+    {
+      seqIndexHolder.AttachNew (new SampleSequenceIndex);
+    }
+
+    template<int M>
+    SamplerSequence (const SamplerSequence<M>& other)
+    {
+      seqIndexHolder = other.seqIndexHolder;
+    }
+
+    template<int M>
+    SamplerSequence<N>& operator= (const SamplerSequence<M>& other)
+    {
+      seqIndexHolder = other.seqIndexHolder;
+      return *this;
+    }
+
+    /// Get next number in sequence
+    void GetNext (float (&result)[N])
+    {
+      HaltonSequence (seqIndexHolder->GetNext (), result);
+    }
+
+  private:
+    csRef<SampleSequenceIndex> seqIndexHolder;
+  };
 }
 
 #endif

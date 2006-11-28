@@ -43,8 +43,11 @@ public:
   /// Initialize a color object (contents undefined)
   csColor () { }
   /// Initialize a color object with given R,G,B components
-  csColor (float r, float g, float b)
-  { red = r; green = g; blue = b; }
+  csColor (float r, float g, float b) : red (r), green (g), blue (b)
+  {}
+  /// Initialize a color object with same content in R,G,B components
+  csColor (float v) : red (v), green (v), blue (v)
+  {}
   /// Initialize a color object with an existing color
   csColor (const csColor& c)
   { red = c.red; green = c.green; blue = c.blue; }
@@ -67,6 +70,11 @@ public:
     if (red < 0) red = 0;
     if (green < 0) green = 0;
     if (blue < 0) blue = 0;
+  }
+  /// Check if color is all black (red green and blue all 0)
+  bool IsBlack () const
+  {
+    return (red == 0 && green == 0 && blue == 0);
   }
   /// Assign one color object to another.
   csColor& operator= (const csColor& c)

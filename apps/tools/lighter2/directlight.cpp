@@ -28,6 +28,159 @@
 namespace lighter
 {
 
+  // Shade a single point in space with direct lighting
+  csColor DirectLighting::UniformShadeAllLights (Sector* sector, 
+    const csVector3& point, const csVector3& normal, 
+    SamplerSequence<2>& lightSampler, Raytracer& rt)
+  {
+    csColor res (0);
+    const LightRefArray& allLights = sector->allLights;
+
+    for (size_t i = 0; i < allLights.GetSize (); ++i)
+    {
+      float rndValues[2];
+      lightSampler.GetNext (rndValues);
+
+      res += ShadeLight (allLights[i], point, normal, rt, rndValues);
+    }
+
+    return res;
+  }
+
+  // Shade a single point in space with direct lighting using a single light
+  csColor DirectLighting::UniformShadeOneLight (Sector* sector, 
+    const csVector3& point, const csVector3& normal, 
+    SamplerSequence<3>& lightSampler, Raytracer& rt)
+  {
+    csColor res (0);
+    const LightRefArray& allLights = sector->allLights;
+
+    // Select random light
+    float rndValues[3];
+    lightSampler.GetNext (rndValues);
+
+    size_t lightIdx = (size_t) floorf (allLights.GetSize () * rndValues[2]);
+
+    return ShadeLight (allLights[lightIdx], point, normal, rt, rndValues) * 
+      allLights.GetSize ();
+  }
+
+  // Shade a primitive element with direct lighting
+  csColor DirectLighting::UniformShadeAllLights (Sector* sector, 
+    ElementProxy element, SamplerSequence<4>& lightSampler, Raytracer& rt)
+  {
+    // Sample each quadrant of element using stratified sampling
+    // and random values 2 and 3 for coordinates
+    static float quadratConstants[][2] =
+    {
+      {-0.5f, -0.5f},
+      {-0.5f,  0.5f},
+      { 0.5f, -0.5f},
+      { 0.5f,  0.5f}
+    };
+
+    csColor res (0);
+    const LightRefArray& allLights = sector->allLights;
+
+    // Get some data
+    const csVector3& uVec = element.primitive.GetuFormVector ();
+    const csVector3& vVec = element.primitive.GetvFormVector ();
+    const csVector3& elementC = element.primitive.ComputeElementCenter (element.element); 
+
+    const csVector3& normal = element.primitive.GetPlane ().Normal ();
+
+    // Add handling of "half" elements
+
+    for (size_t i = 0; i < allLights.GetSize (); ++i)
+    {
+      for (size_t qi = 0; qi < 4; ++qi)
+      {
+        float rndValues[4];
+        lightSampler.GetNext (rndValues);
+
+        csVector3 offsetVector = uVec * (rndValues[2]*quadratConstants[qi][0]) +
+          vVec * (rndValues[3]*quadratConstants[qi][1]);
+
+        res += ShadeLight (allLights[i], elementC + offsetVector, 
+          normal, rt, rndValues);
+      }
+    }
+    
+    return res * 0.25f;
+  }
+
+  // Shade a primitive element with direct lighting using a single light
+  csColor DirectLighting::UniformShadeOneLight (Sector* sector, 
+    ElementProxy element, SamplerSequence<5>& lightSampler, Raytracer& rt)
+  {
+    // Sample each quadrant of element using stratified sampling
+    // and random values 2 and 3 for coordinates
+    // Use different light per quadrant
+    static float quadratConstants[][2] =
+    {
+      {-0.5f, -0.5f},
+      {-0.5f,  0.5f},
+      { 0.5f, -0.5f},
+      { 0.5f,  0.5f}
+    };
+
+    csColor res (0);
+    const LightRefArray& allLights = sector->allLights;
+
+    // Get some data
+    const csVector3& uVec = element.primitive.GetuFormVector ();
+    const csVector3& vVec = element.primitive.GetvFormVector ();
+    const csVector3& elementC = element.primitive.ComputeElementCenter (element.element); 
+
+    const csVector3& normal = element.primitive.GetPlane ().Normal ();
+
+    // Add handling of "half" elements
+
+    for (size_t qi = 0; qi < 4; ++qi)
+    {
+      float rndValues[5];
+      lightSampler.GetNext (rndValues);
+
+      csVector3 offsetVector = uVec * (rndValues[2]*quadratConstants[qi][0]) +
+        vVec * (rndValues[3]*quadratConstants[qi][1]);
+
+      size_t lightIdx = (size_t) floorf (allLights.GetSize () * rndValues[5]); 
+
+      res += ShadeLight (allLights[lightIdx], elementC + offsetVector, 
+        normal, rt, rndValues);
+    }
+
+    return res * 0.25f * allLights.GetSize ();
+  }
+
+  csColor DirectLighting::ShadeLight (Light* light, const csVector3& point,
+    const csVector3& normal, Raytracer& rt, float lightSamples[2])
+  {
+    // Some variables..
+    VisibilityTester visTester;
+    float lightPdf;
+    csVector3 lightVec;
+
+    csColor lightColor = light->SampleLight (point, normal, lightSamples[0],
+      lightSamples[1], lightVec, lightPdf, visTester);
+
+    if (lightPdf > 0.0f && !lightColor.IsBlack ())
+    {
+      //@@TODO add material...
+      if (!visTester.Unoccluded (rt))
+      {
+        if (light->IsDeltaLight ())
+          return lightColor * fabsf (lightVec * normal) / lightPdf;
+        else
+          // Properly handle area sources! See pbrt page 732
+          return lightColor * fabsf (lightVec * normal) / lightPdf;
+      }
+    }
+
+
+    return csColor (0,0,0);
+  }
+
   class Data_Lightmap
   {
     Sector* sector;
@@ -370,8 +523,8 @@ namespace lighter
     Raytracer rayTracer (sector->kdTree);
 
     // Iterate all lights
-    LightRefArray::Iterator lightIt = sector->allLights.GetIterator ();
-    float lightProgressStep = progressStep / sector->allLights.GetSize ();
+    LightOldRefArray::Iterator lightIt = sector->allLightsOld.GetIterator ();
+    float lightProgressStep = progressStep / sector->allLightsOld.GetSize ();
 
     while (lightIt.HasNext ())
     {

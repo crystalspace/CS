@@ -21,6 +21,7 @@
 
 #include "object.h"
 #include "kdtree.h"
+#include "light.h"
 
 namespace lighter
 {
@@ -41,7 +42,7 @@ namespace lighter
 
     csBox3 boundingBox;
   };
-  typedef csRefArray<Light_old> LightRefArray;
+  typedef csRefArray<Light_old> LightOldRefArray;
 
   class Scene;
 
@@ -64,7 +65,10 @@ namespace lighter
     // All objects in sector
     ObjectHash allObjects;
 
-    // All lightsources
+    // All lightsources (old)
+    LightOldRefArray allLightsOld;
+
+    // All light sources
     LightRefArray allLights;
 
     // KD-tree of all primitives in sector

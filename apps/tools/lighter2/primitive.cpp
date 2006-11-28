@@ -659,7 +659,7 @@ namespace lighter
     size_t u = (size_t)(pt * uFormVector);
     size_t v = (size_t)(pt * vFormVector);
 
-    return v*(maxUV.x - minUV.x + 1) + v;
+    return v*(maxUV.x - minUV.x + 1) + u;
   }
 
 
@@ -671,5 +671,15 @@ namespace lighter
   ElementProxy Primitive::GetElement (const csVector3& pt)
   {
     return GetElement (ComputeElementIndex (pt));
+  }
+
+  csVector3 Primitive::ComputeElementCenter (size_t index) const
+  {
+    size_t uWidth = (maxUV.x - minUV.x + 1);
+
+    size_t u = index % uWidth;
+    size_t v = index / uWidth;
+
+    return minCoord + uFormVector * (u+0.5f) + vFormVector * (v+0.5f);
   }
 }

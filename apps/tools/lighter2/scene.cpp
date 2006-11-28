@@ -240,7 +240,7 @@ namespace lighter
       radLight->boundingBox.SetCenter (radLight->position);
      
       //add more
-      radSector->allLights.Push (radLight);
+      radSector->allLightsOld.Push (radLight);
     }
   }
 

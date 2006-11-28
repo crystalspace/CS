@@ -22,8 +22,16 @@
 
 namespace lighter
 {
+  class Raytracer;
+
   class VisibilityTester
-  {};
+  {
+  public:
+
+    /// Test if we have visibility within given raytracer
+    bool Unoccluded (Raytracer& rt);
+
+  };
 
   typedef float(*LightAttenuationFunc)(float squaredDistance, 
     const csVector3& constants);
@@ -84,6 +92,8 @@ namespace lighter
     // Type
     bool deltaDistribution;
   };
+
+  typedef csRefArray<Light> LightRefArray;
 
 }
 

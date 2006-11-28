@@ -37,6 +37,11 @@ namespace lighter
 
   KDTree* KDTreeBuilder::BuildTree (ObjectHash::GlobalIterator& objects)
   {
+    objects.Reset ();
+
+    if (!objects.HasNext ())
+      return 0;
+
     // Collect all primitives into endpoints and boxes for building
     SetupEndpoints (objects);
 
@@ -56,7 +61,7 @@ namespace lighter
   bool KDTreeBuilder::SetupEndpoints (ObjectHash::GlobalIterator& objects)
   {
     numPrimitives = 0;
-    PrimBox *box, *next = boxAllocator.Alloc (), *first = next;
+    PrimBox *box = 0, *next = boxAllocator.Alloc (), *first = next;
     while (objects.HasNext())
     {
       csRef<Object> obj = objects.Next ();

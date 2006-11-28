@@ -98,11 +98,19 @@ namespace lighter
     /// Given a point, compute the element index
     size_t ComputeElementIndex (const csVector3& pt) const;
 
+    /// Given an element index, compute center point
+    csVector3 ComputeElementCenter (size_t index) const;
+
     /// Get an element proxy given element index
     ElementProxy GetElement (size_t index);
 
     /// Get an element proxy given point
     ElementProxy GetElement (const csVector3& pt);
+
+    size_t GetElementCount () const
+    {
+      return elementAreas.GetSize ();
+    }
 
     inline TriangleType& GetTriangle () { return triangle; }
     inline const TriangleType& GetTriangle () const { return triangle; }

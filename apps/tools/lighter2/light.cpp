@@ -21,6 +21,7 @@
 
 #include "common.h"
 #include "light.h"
+#include "raytracer.h"
 
 // Attenuation functions
 static float LightAttnNone (float, const csVector3&);
@@ -57,6 +58,12 @@ namespace lighter
     attenuationMode = mode;
     attenuationConsts = constants;
     attenuationFunc = attnFuncTable[mode];
+  }
+
+
+  bool VisibilityTester::Unoccluded (Raytracer& rt)
+  {
+    return true;
   }
 
 }
