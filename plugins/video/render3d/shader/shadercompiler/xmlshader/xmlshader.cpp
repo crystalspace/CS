@@ -85,8 +85,8 @@ bool csXMLShaderCompiler::Initialize (iObjectRegistry* object_reg)
   strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
     object_reg, "crystalspace.shared.stringset", iStringSet);
 
-  g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
-  vfs = CS_QUERY_REGISTRY (object_reg, iVFS);
+  g3d = csQueryRegistry<iGraphics3D> (object_reg);
+  vfs = csQueryRegistry<iVFS> (object_reg);
   
   synldr = csQueryRegistryOrLoad<iSyntaxService> (object_reg,
     "crystalspace.syntax.loader.service.text");
@@ -94,7 +94,7 @@ bool csXMLShaderCompiler::Initialize (iObjectRegistry* object_reg)
     return false;
 
   csRef<iVerbosityManager> verbosemgr (
-    CS_QUERY_REGISTRY (object_reg, iVerbosityManager));
+    csQueryRegistry<iVerbosityManager> (object_reg));
   if (verbosemgr) 
     do_verbose = verbosemgr->Enabled ("renderer.shader");
   else
@@ -168,7 +168,7 @@ csPtr<iShaderPriorityList> csXMLShaderCompiler::GetPriorities (
 	iDocumentNode* templ)
 {
   csRef<iShaderManager> shadermgr = 
-    CS_QUERY_REGISTRY (objectreg, iShaderManager);
+    csQueryRegistry<iShaderManager> (objectreg);
   CS_ASSERT (shadermgr); // Should be present - loads us, after all
 
   csShaderPriorityList* list = new csShaderPriorityList ();

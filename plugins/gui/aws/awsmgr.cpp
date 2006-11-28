@@ -97,7 +97,7 @@ awsManager::~awsManager ()
 {
   if (scfiEventHandler)
   {
-    csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
+    csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (object_reg));
     if (q)
       q->RemoveListener (scfiEventHandler);
 
@@ -917,7 +917,7 @@ void awsManager::CreateChildrenFromDef (
     if (key->Type () == KEY_COMPONENT)
     {
       csRef<iAwsComponentNode> comp_node (
-      	SCF_QUERY_INTERFACE(key, iAwsComponentNode));
+      	scfQueryInterface<iAwsComponentNode> (key));
       CS_ASSERT(comp_node);
       iAwsComponentFactory *factory = FindComponentFactory (
           comp_node->ComponentTypeName ()->GetData ());
@@ -939,14 +939,14 @@ void awsManager::CreateChildrenFromDef (
     {
       int j;
       csRef<iAwsKeyContainer> conmap (
-      	SCF_QUERY_INTERFACE(key, iAwsKeyContainer));
+      	scfQueryInterface<iAwsKeyContainer> (key));
       CS_ASSERT(conmap);
       awsSlot *slot = new awsSlot ();
 
       for (j = 0; j < conmap->Length (); ++j)
       {
         csRef<iAwsConnectionKey> con (
-		SCF_QUERY_INTERFACE(conmap->GetAt (j), iAwsConnectionKey));
+		scfQueryInterface<iAwsConnectionKey> (conmap->GetAt (j)));
         CS_ASSERT(con);
 
         slot->Connect (parent, con->Signal (), con->Sink (), con->Trigger ());

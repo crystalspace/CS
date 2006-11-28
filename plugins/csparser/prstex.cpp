@@ -339,7 +339,7 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
     if (image && type.IsEmpty ())
     {
       // special treatment for animated textures
-      csRef<iAnimatedImage> anim = SCF_QUERY_INTERFACE (image, iAnimatedImage);
+      csRef<iAnimatedImage> anim = scfQueryInterface<iAnimatedImage> (image);
       if (anim && anim->IsAnimated())
       {
 	type = PLUGIN_TEXTURELOADER_ANIMIMG;
@@ -419,7 +419,7 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
   {
     csRef<iBase> b = plugin->Parse (ParamsNode,
       0/*ssource*/, ldr_context, static_cast<iBase*> (&context));
-    if (b) tex = SCF_QUERY_INTERFACE (b, iTextureWrapper);
+    if (b) tex = scfQueryInterface<iTextureWrapper> (b);
   }
 
   if (!tex)
@@ -438,7 +438,7 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
     csRef<iBase> b = BuiltinCheckerTexLoader->Parse (ParamsNode,
       0/*ssource*/, ldr_context, static_cast<iBase*> (&context));
     CS_ASSERT(b);
-    tex = SCF_QUERY_INTERFACE (b, iTextureWrapper);
+    tex = scfQueryInterface<iTextureWrapper> (b);
     CS_ASSERT(tex);
   }
 
@@ -455,7 +455,7 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
     if (overrideAlphaType)
       tex->GetTextureHandle()->SetAlphaType (alphaType);
 
-    csRef<iProcTexture> ipt = SCF_QUERY_INTERFACE (tex, iProcTexture);
+    csRef<iProcTexture> ipt = scfQueryInterface<iProcTexture> (tex);
     if (ipt)
       ipt->SetAlwaysAnimate (always_animate);
     AddToRegion (ldr_context, tex->QueryObject ());
@@ -658,7 +658,7 @@ iTextureWrapper* csLoader::ParseCubemap (iLoaderContext* ldr_context,
 
   csRef<iBase> b = plugin->Parse (node, 0/*ssource*/, ldr_context, context);
   csRef<iTextureWrapper> tex;
-  if (b) tex = SCF_QUERY_INTERFACE (b, iTextureWrapper);
+  if (b) tex = scfQueryInterface<iTextureWrapper> (b);
 
   if (tex)
   {
@@ -694,7 +694,7 @@ iTextureWrapper* csLoader::ParseTexture3D (iLoaderContext* ldr_context,
 
   csRef<iBase> b = plugin->Parse (node, 0/*ssource*/, ldr_context, context);
   csRef<iTextureWrapper> tex;
-  if (b) tex = SCF_QUERY_INTERFACE (b, iTextureWrapper);
+  if (b) tex = scfQueryInterface<iTextureWrapper> (b);
 
   if (tex)
   {

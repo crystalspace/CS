@@ -93,8 +93,8 @@ csInstFactoryLoader::~csInstFactoryLoader ()
 bool csInstFactoryLoader::Initialize (iObjectRegistry* object_reg)
 {
   csInstFactoryLoader::object_reg = object_reg;
-  reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
-  synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
+  reporter = csQueryRegistry<iReporter> (object_reg);
+  synldr = csQueryRegistry<iSyntaxService> (object_reg);
 
   xmltokens.Register ("box", XMLTOKEN_BOX);
   xmltokens.Register ("quad", XMLTOKEN_QUAD);
@@ -143,7 +143,7 @@ csPtr<iBase> csInstFactoryLoader::Parse (iDocumentNode* node,
   csRef<iInstancingFactoryState> state;
 
   fact = type->NewFactory ();
-  state = SCF_QUERY_INTERFACE (fact, iInstancingFactoryState);
+  state = scfQueryInterface<iInstancingFactoryState> (fact);
 
   bool auto_normals = false;
   bool auto_normals_nocompress = false;
@@ -367,8 +367,8 @@ csInstFactorySaver::~csInstFactorySaver ()
 bool csInstFactorySaver::Initialize (iObjectRegistry* object_reg)
 {
   csInstFactorySaver::object_reg = object_reg;
-  reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
-  synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
+  reporter = csQueryRegistry<iReporter> (object_reg);
+  synldr = csQueryRegistry<iSyntaxService> (object_reg);
   return true;
 }
 
@@ -384,9 +384,9 @@ bool csInstFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent,
   if (obj)
   {
     csRef<iInstancingFactoryState> gfact = 
-      SCF_QUERY_INTERFACE (obj, iInstancingFactoryState);
+      scfQueryInterface<iInstancingFactoryState> (obj);
     csRef<iMeshObjectFactory> meshfact = 
-      SCF_QUERY_INTERFACE (obj, iMeshObjectFactory);
+      scfQueryInterface<iMeshObjectFactory> (obj);
     if (!gfact) return false;
     if (!meshfact) return false;
 
@@ -516,8 +516,8 @@ csInstMeshLoader::~csInstMeshLoader ()
 bool csInstMeshLoader::Initialize (iObjectRegistry* object_reg)
 {
   csInstMeshLoader::object_reg = object_reg;
-  reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
-  synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
+  reporter = csQueryRegistry<iReporter> (object_reg);
+  synldr = csQueryRegistry<iSyntaxService> (object_reg);
 
   xmltokens.Register ("material", XMLTOKEN_MATERIAL);
   xmltokens.Register ("factory", XMLTOKEN_FACTORY);
@@ -674,7 +674,7 @@ csPtr<iBase> csInstMeshLoader::Parse (iDocumentNode* node,
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
 	  CS_ASSERT (mesh != 0);
-          meshstate = SCF_QUERY_INTERFACE (mesh, iInstancingMeshState);
+          meshstate = scfQueryInterface<iInstancingMeshState> (mesh);
 	  if (!meshstate)
 	  {
       	    synldr->ReportError (
@@ -732,8 +732,8 @@ csInstMeshSaver::~csInstMeshSaver ()
 bool csInstMeshSaver::Initialize (iObjectRegistry* object_reg)
 {
   csInstMeshSaver::object_reg = object_reg;
-  reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
-  synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
+  reporter = csQueryRegistry<iReporter> (object_reg);
+  synldr = csQueryRegistry<iSyntaxService> (object_reg);
   return true;
 }
 
@@ -749,8 +749,8 @@ bool csInstMeshSaver::WriteDown (iBase* obj, iDocumentNode* parent,
   if (obj)
   {
     csRef<iInstancingMeshState> gmesh = 
-      SCF_QUERY_INTERFACE (obj, iInstancingMeshState);
-    csRef<iMeshObject> mesh = SCF_QUERY_INTERFACE (obj, iMeshObject);
+      scfQueryInterface<iInstancingMeshState> (obj);
+    csRef<iMeshObject> mesh = scfQueryInterface<iMeshObject> (obj);
     if (!gmesh) return false;
     if (!mesh) return false;
 

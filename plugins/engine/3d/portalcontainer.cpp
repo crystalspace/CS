@@ -117,7 +117,7 @@ csPortalContainer::csPortalContainer (iEngine* engine,
   polygonMeshCD->SetPortalContainer (this);
   polygonMeshLOD->SetPortalContainer (this);
 
-  shader_man = CS_QUERY_REGISTRY (object_reg, iShaderManager);
+  shader_man = csQueryRegistry<iShaderManager> (object_reg);
   fog_shader = shader_man->GetShader ("std_lighting_portal");
 
   csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg,

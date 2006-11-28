@@ -85,7 +85,7 @@ void CsBench::Report (const char* msg, ...)
 {
   va_list arg;
   va_start (arg, msg);
-  csRef<iReporter> rep (CS_QUERY_REGISTRY (System->object_reg, iReporter));
+  csRef<iReporter> rep (csQueryRegistry<iReporter> (System->object_reg));
   if (rep)
     rep->ReportV (CS_REPORTER_SEVERITY_NOTIFY, "csbench", msg, arg);
   else
@@ -101,7 +101,7 @@ bool CsBench::ReportError (const char* msg, ...)
 {
   va_list arg;
   va_start (arg, msg);
-  csRef<iReporter> rep (CS_QUERY_REGISTRY (System->object_reg, iReporter));
+  csRef<iReporter> rep (csQueryRegistry<iReporter> (System->object_reg));
   if (rep)
     rep->ReportV (CS_REPORTER_SEVERITY_ERROR, "csbench", msg, arg);
   else
@@ -292,7 +292,7 @@ bool CsBench::Initialize (int argc, const char* const argv[],
 
   // Make sure the commandline has -verbose and -console for consistent
   // results.
-  cmdline = CS_QUERY_REGISTRY (object_reg, iCommandLineParser);
+  cmdline = csQueryRegistry<iCommandLineParser> (object_reg);
   cmdline->AddOption ("verbose", "-scf");
   cmdline->AddOption ("console", 0);
 
@@ -312,16 +312,16 @@ bool CsBench::Initialize (int argc, const char* const argv[],
 	CS_REQUEST_END))
     return ReportError ("Couldn't init app!");
 
-  vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
-  g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+  vc = csQueryRegistry<iVirtualClock> (object_reg);
+  g3d = csQueryRegistry<iGraphics3D> (object_reg);
   if (!g3d) return ReportError ("No g3d plugin!");
-  engine = CS_QUERY_REGISTRY (object_reg, iEngine);
+  engine = csQueryRegistry<iEngine> (object_reg);
   if (!engine) return ReportError ("No engine plugin!");
-  loader = CS_QUERY_REGISTRY (object_reg, iLoader);
+  loader = csQueryRegistry<iLoader> (object_reg);
   if (!loader) return ReportError ("No loader plugin!");
-  imageio = CS_QUERY_REGISTRY (object_reg, iImageIO);
+  imageio = csQueryRegistry<iImageIO> (object_reg);
   if (!imageio) return ReportError ("No image loader plugin!");
-  vfs = CS_QUERY_REGISTRY (object_reg, iVFS);
+  vfs = csQueryRegistry<iVFS> (object_reg);
   if (!vfs) return ReportError ("No iVFS plugin!");
   strings = CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg, 
     "crystalspace.shared.stringset", iStringSet);
@@ -428,7 +428,7 @@ iShaderManager* CsBench::GetShaderManager ()
 {
   if (!shader_mgr)
   {
-    shader_mgr = CS_QUERY_REGISTRY (object_reg, iShaderManager);
+    shader_mgr = csQueryRegistry<iShaderManager> (object_reg);
   }
   return shader_mgr;
 }
@@ -437,7 +437,7 @@ iDocumentSystem* CsBench::GetDocumentSystem ()
 {
   if (!docsys)
   {
-    docsys = CS_QUERY_REGISTRY(object_reg, iDocumentSystem);
+    docsys = csQueryRegistry<iDocumentSystem> (object_reg);
     if (docsys == 0)
     {
       docsys.AttachNew (new csTinyDocumentSystem ());
@@ -480,7 +480,7 @@ void CsBench::PerformShaderTest (const char* shaderPath, const char* shtype,
   csRef<iMeshWrapper> walls (engine->FindMeshObject (
     view->GetCamera()->GetSector()->QueryObject()->GetName()));
   csRef<iThingState> ws =
-    SCF_QUERY_INTERFACE (walls->GetMeshObject (), iThingState);
+    scfQueryInterface<iThingState> (walls->GetMeshObject ());
   for (i = 0 ; i < prilist->GetCount () ; i++)
   {
     int pri = prilist->GetPriority (i);

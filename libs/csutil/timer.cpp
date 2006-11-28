@@ -67,7 +67,7 @@ csEventTimer::csEventTimer (iObjectRegistry* object_reg) :
   object_reg (object_reg),
   FinalProcess (csevFinalProcess (object_reg))
 {
-  csRef<iEventQueue> q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+  csRef<iEventQueue> q = csQueryRegistry<iEventQueue> (object_reg);
   CS_ASSERT (q != 0);
   if (q != 0)
   {
@@ -80,7 +80,7 @@ csEventTimer::csEventTimer (iObjectRegistry* object_reg) :
   {
     handler = 0;
   }
-  vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
+  vc = csQueryRegistry<iVirtualClock> (object_reg);
   CS_ASSERT (vc != 0);
 
   minimum_time = 2000000000;
@@ -95,7 +95,7 @@ csEventTimer::~csEventTimer ()
     // the object registry is already being destructed. No idea how I
     // should solve this...
     // @@@@@
-    //csRef<iEventQueue> q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+    //csRef<iEventQueue> q = csQueryRegistry<iEventQueue> (object_reg);
     //if (q != 0)
       //q->RemoveListener (handler);
   }

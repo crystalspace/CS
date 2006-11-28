@@ -62,7 +62,7 @@ void csGraphics2DXLib::Report (int severity, const char* msg, ...)
 {
   va_list arg;
   va_start (arg, msg);
-  csRef<iReporter> rep (CS_QUERY_REGISTRY (object_reg, iReporter));
+  csRef<iReporter> rep (csQueryRegistry<iReporter> (object_reg));
   if (rep)
     rep->ReportV (severity, "crystalspace.canvas.softx", msg, arg);
   else
@@ -81,7 +81,7 @@ bool csGraphics2DXLib::Initialize (iObjectRegistry *object_reg)
     return false;
 
   csRef<iPluginManager> plugin_mgr (
-  	CS_QUERY_REGISTRY (object_reg, iPluginManager));
+  	csQueryRegistry<iPluginManager> (object_reg));
 
   xwin = CS_LOAD_PLUGIN (plugin_mgr, CS_XWIN_SCF_ID, iXWindow);
   if (!xwin)
@@ -121,7 +121,7 @@ bool csGraphics2DXLib::Initialize (iObjectRegistry *object_reg)
     }
   }
 
-  csRef<iEventQueue> q (CS_QUERY_REGISTRY(object_reg, iEventQueue));
+  csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (object_reg));
   if (q != 0)
   {
     // Tell event queue to call us on broadcast messages

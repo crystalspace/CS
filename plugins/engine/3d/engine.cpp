@@ -90,7 +90,7 @@ void csEngine::Report (const char *description, ...)
   va_list arg;
   va_start (arg, description);
 
-  if (!reporter) reporter = CS_QUERY_REGISTRY (objectRegistry, iReporter);
+  if (!reporter) reporter = csQueryRegistry<iReporter> (objectRegistry);
   
   if (reporter)
   {
@@ -115,7 +115,7 @@ void csEngine::Error (const char *description, ...)
   va_list arg;
   va_start (arg, description);
 
-  if (!reporter) reporter = CS_QUERY_REGISTRY (objectRegistry, iReporter);
+  if (!reporter) reporter = csQueryRegistry<iReporter> (objectRegistry);
 
   if (reporter)
   {
@@ -139,7 +139,7 @@ void csEngine::Warn (const char *description, ...)
   va_list arg;
   va_start (arg, description);
 
-  if (!reporter) reporter = CS_QUERY_REGISTRY (objectRegistry, iReporter);
+  if (!reporter) reporter = csQueryRegistry<iReporter> (objectRegistry);
 
   if (reporter)
   {
@@ -163,7 +163,7 @@ void csEngine::ReportBug (const char *description, ...)
   va_list arg;
   va_start (arg, description);
 
-  if (!reporter) reporter = CS_QUERY_REGISTRY (objectRegistry, iReporter);
+  if (!reporter) reporter = csQueryRegistry<iReporter> (objectRegistry);
 
   if (reporter)
   {
@@ -540,7 +540,7 @@ csEngine::~csEngine ()
 {
   if (weakEventHandler != 0)
   {
-    csRef<iEventQueue> q (CS_QUERY_REGISTRY (objectRegistry, iEventQueue));
+    csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (objectRegistry));
     if (q != 0)
       CS::RemoveWeakListener (q, weakEventHandler);
   }
@@ -559,10 +559,10 @@ bool csEngine::Initialize (iObjectRegistry *objectRegistry)
 {
   csEngine::objectRegistry = objectRegistry;
 
-  virtualClock = CS_QUERY_REGISTRY (objectRegistry, iVirtualClock);
+  virtualClock = csQueryRegistry<iVirtualClock> (objectRegistry);
   if (!virtualClock) return false;
 
-  G3D = CS_QUERY_REGISTRY (objectRegistry, iGraphics3D);
+  G3D = csQueryRegistry<iGraphics3D> (objectRegistry);
   if (!G3D)
   {
     // If there is no G3D then we still allow initialization of the
@@ -572,19 +572,19 @@ bool csEngine::Initialize (iObjectRegistry *objectRegistry)
   }
 
   csRef<iVerbosityManager> verbosemgr (
-    CS_QUERY_REGISTRY (objectRegistry, iVerbosityManager));
+    csQueryRegistry<iVerbosityManager> (objectRegistry));
   if (verbosemgr) 
     doVerbose = verbosemgr->Enabled ("engine");
   if (doVerbose)
   {
-    bugplug = CS_QUERY_REGISTRY (objectRegistry, iBugPlug);
+    bugplug = csQueryRegistry<iBugPlug> (objectRegistry);
   }
   else
   {
     bugplug = 0;
   }
 
-  VFS = CS_QUERY_REGISTRY (objectRegistry, iVFS);
+  VFS = csQueryRegistry<iVFS> (objectRegistry);
   if (!VFS) return false;
 
   if (G3D)
@@ -593,11 +593,11 @@ bool csEngine::Initialize (iObjectRegistry *objectRegistry)
     G2D = 0;
 
   // don't check for failure; the engine can work without the image loader
-  imageLoader = CS_QUERY_REGISTRY (objectRegistry, iImageIO);
+  imageLoader = csQueryRegistry<iImageIO> (objectRegistry);
   if (!imageLoader) Warn ("No image loader. Loading images will fail.");
 
   // reporter is optional.
-  reporter = CS_QUERY_REGISTRY (objectRegistry, iReporter);
+  reporter = csQueryRegistry<iReporter> (objectRegistry);
 
   // Tell event queue that we want to handle broadcast events
   CS_INITIALIZE_SYSTEM_EVENT_SHORTCUTS(objectRegistry);
@@ -607,7 +607,7 @@ bool csEngine::Initialize (iObjectRegistry *objectRegistry)
     CanvasClose = csevCanvasClose (objectRegistry, G2D);
   }
 
-  csRef<iEventQueue> q = CS_QUERY_REGISTRY (objectRegistry, iEventQueue);
+  csRef<iEventQueue> q = csQueryRegistry<iEventQueue> (objectRegistry);
   if (q)
   {
     csEventID events[5] = { SystemOpen, SystemClose,
@@ -664,7 +664,7 @@ bool csEngine::HandleEvent (iEvent &Event)
     {
       // Load default shaders
       csRef<iDocumentSystem> docsys (
-	CS_QUERY_REGISTRY(objectRegistry, iDocumentSystem));
+	csQueryRegistry<iDocumentSystem> (objectRegistry));
       if (!docsys.IsValid())
 	docsys.AttachNew (new csTinyDocumentSystem ());
 
@@ -789,7 +789,7 @@ void csEngine::DeleteAll ()
   if (thingMeshType != 0)
   {
     csRef<iThingEnvironment> te (
-  	SCF_QUERY_INTERFACE (thingMeshType, iThingEnvironment));
+  	scfQueryInterface<iThingEnvironment> (thingMeshType));
     CS_ASSERT (((iThingEnvironment*)te) != 0);
     te->Clear ();
   }
@@ -1489,7 +1489,7 @@ csPtr<iRenderLoop> csEngine::CreateDefaultRenderLoop ()
   csRef<iRenderLoop> loop = renderLoopManager->Create ();
 
   csRef<iPluginManager> plugin_mgr (
-  	CS_QUERY_REGISTRY (objectRegistry, iPluginManager));
+  	csQueryRegistry<iPluginManager> (objectRegistry));
 
   char const* const stdstep = "crystalspace.renderloop.step.generic.type";
   csRef<iRenderStepType> genType =
@@ -1504,7 +1504,7 @@ csPtr<iRenderLoop> csEngine::CreateDefaultRenderLoop ()
 
     step = genFact->Create ();
     loop->AddStep (step);
-    genStep = SCF_QUERY_INTERFACE (step, iGenericRenderStep);
+    genStep = scfQueryInterface<iGenericRenderStep> (step);
   
     genStep->SetShaderType ("standard");
     genStep->SetDefaultShader (defaultShader);
@@ -2793,7 +2793,7 @@ csPtr<iMaterial> csEngine::CreateBaseMaterial (iTextureWrapper *txt)
   mat.AttachNew (new csMaterial (this));
   if (txt) mat->SetTextureWrapper (txt);
 
-  csRef<iMaterial> imat (SCF_QUERY_INTERFACE (mat, iMaterial));
+  csRef<iMaterial> imat (scfQueryInterface<iMaterial> (mat));
   return csPtr<iMaterial> (imat);
 }
 
@@ -3026,7 +3026,7 @@ csPtr<iMeshFactoryWrapper> csEngine::LoadMeshFactory (
   iDataBuffer *input)
 {
   csRef<iDocumentSystem> xml (
-    	CS_QUERY_REGISTRY (objectRegistry, iDocumentSystem));
+    	csQueryRegistry<iDocumentSystem> (objectRegistry));
   if (!xml) xml = csPtr<iDocumentSystem> (new csTinyDocumentSystem ());
   csRef<iDocument> doc = xml->CreateDocument ();
   const char* error = doc->Parse (input, true);
@@ -3053,7 +3053,7 @@ csPtr<iMeshFactoryWrapper> csEngine::LoadMeshFactory (
   }
 
   csRef<iMeshObjectFactory> mof2 (
-  	SCF_QUERY_INTERFACE (mof, iMeshObjectFactory));
+  	scfQueryInterface<iMeshObjectFactory> (mof));
   if (!mof2)
   {
     // @@@ ERROR?
@@ -3075,7 +3075,7 @@ csPtr<iMeshWrapper> csEngine::LoadMeshWrapper (
   const csVector3 &pos)
 {
   csRef<iDocumentSystem> xml (
-    	CS_QUERY_REGISTRY (objectRegistry, iDocumentSystem));
+    	csQueryRegistry<iDocumentSystem> (objectRegistry));
   if (!xml) xml = csPtr<iDocumentSystem> (new csTinyDocumentSystem ());
   csRef<iDocument> doc = xml->CreateDocument ();
   const char* error = doc->Parse (input, true);
@@ -3262,7 +3262,7 @@ csPtr<iMeshWrapper> csEngine::CreateMeshWrapper (
   csRef<iMeshObjectFactory> fact (type->NewFactory ());
   if (!fact) return 0;
 
-  csRef<iMeshObject> mo (SCF_QUERY_INTERFACE (fact, iMeshObject));
+  csRef<iMeshObject> mo (scfQueryInterface<iMeshObject> (fact));
   if (!mo)
   {
     // The factory is not itself a mesh object. Let's see if the

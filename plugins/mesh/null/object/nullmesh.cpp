@@ -156,7 +156,7 @@ csPtr<iMeshObjectFactory> csNullmeshMeshObjectType::NewFactory ()
 {
   csNullmeshMeshFactory* cm = new csNullmeshMeshFactory (this);
   csRef<iMeshObjectFactory> ifact (
-  	SCF_QUERY_INTERFACE (cm, iMeshObjectFactory));
+  	scfQueryInterface<iMeshObjectFactory> (cm));
   cm->DecRef ();
   return csPtr<iMeshObjectFactory> (ifact);
 }

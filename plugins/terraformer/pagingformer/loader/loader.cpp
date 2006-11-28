@@ -60,8 +60,8 @@ csPagingFormerLoader::~csPagingFormerLoader ()
 bool csPagingFormerLoader::Initialize (iObjectRegistry* object_reg)
 {
   objreg = object_reg;
-  synldr = CS_QUERY_REGISTRY (objreg, iSyntaxService);
-  pluginmgr = CS_QUERY_REGISTRY (objreg, iPluginManager);
+  synldr = csQueryRegistry<iSyntaxService> (objreg);
+  pluginmgr = csQueryRegistry<iPluginManager> (objreg);
 
   InitTokenTable (xmltokens);
   return true;
@@ -150,7 +150,7 @@ csPtr<iBase> csPagingFormerLoader::Parse (iDocumentNode* node,
       case XMLTOKEN_INTMAP:
       {
         const char *image = child->GetContentsValue ();
-        csRef<iLoader> loader = CS_QUERY_REGISTRY (objreg, iLoader);
+        csRef<iLoader> loader = csQueryRegistry<iLoader> (objreg);
         csRef<iImage> map = loader->LoadImage (image);
         if (map == 0)
         {
@@ -170,7 +170,7 @@ csPtr<iBase> csPagingFormerLoader::Parse (iDocumentNode* node,
       case XMLTOKEN_FLOATMAP:
       {
         const char *image = child->GetContentsValue ();
-        csRef<iLoader> loader = CS_QUERY_REGISTRY (objreg, iLoader);
+        csRef<iLoader> loader = csQueryRegistry<iLoader> (objreg);
         csRef<iImage> map = loader->LoadImage (image);
         if (map == 0)
         {

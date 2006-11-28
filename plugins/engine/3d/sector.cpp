@@ -525,7 +525,7 @@ public:
     }
     else
     {
-      csRef<iLight> light = SCF_QUERY_INTERFACE (visobj, iLight);
+      csRef<iLight> light = scfQueryInterface<iLight> (visobj);
       if (light)
       {
         csSector* csector = (csSector*)sector;
@@ -1236,7 +1236,7 @@ csSectorList::~csSectorList ()
 void csSectorList::NameChanged (iObject* object, const char* oldname,
   	const char* newname)
 {
-  csRef<iSector> sector = SCF_QUERY_INTERFACE (object, iSector);
+  csRef<iSector> sector = scfQueryInterface<iSector> (object);
   CS_ASSERT (sector != 0);
   if (oldname) sectors_hash.Delete (oldname, sector);
   if (newname) sectors_hash.Put (newname, sector);

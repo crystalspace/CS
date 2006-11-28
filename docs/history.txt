@@ -15,6 +15,8 @@ chronological order.
 	  prevent actors occasionally becoming stuck on sharp inclines.
 	- res added a dummy _pycscegui.csplugin so the MSVC generation can
 	  generate a project for _pycscegui.
+	- res replaced some CS_QUERY_REGISTRYs with csQueryRegistry<> and
+	  SCF_QUERY_INTERFACEs with scfQueryInterface<>.
 27-Nov-2006
 	- Jorrit reverted a threading change (revision 25929) because
 	  it caused programs to hang on mingw and crash on linux.

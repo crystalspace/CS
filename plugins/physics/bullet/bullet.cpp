@@ -82,7 +82,7 @@ bool csBulletDynamics::Initialize (iObjectRegistry* object_reg)
 csPtr<iDynamicSystem> csBulletDynamics::CreateSystem ()
 {
   csBulletDynamicsSystem* system = new csBulletDynamicsSystem ();
-  csRef<iDynamicSystem> isystem (SCF_QUERY_INTERFACE (system, iDynamicSystem));
+  csRef<iDynamicSystem> isystem (scfQueryInterface<iDynamicSystem> (system));
   systems.Push (system);
   isystem->DecRef ();
 
@@ -173,7 +173,7 @@ csPtr<iRigidBody> csBulletDynamicsSystem::CreateBody ()
   csBulletRigidBody *b = new csBulletRigidBody (this);
   bullet_sys->addCcdPhysicsController (b->GetBulletBody ());
 
-  csRef<iRigidBody> ib = SCF_QUERY_INTERFACE (b, iRigidBody);
+  csRef<iRigidBody> ib = scfQueryInterface<iRigidBody> (b);
   bodies.Push (ib);
   ib->DecRef ();
 

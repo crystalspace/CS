@@ -1002,7 +1002,7 @@ void csBezierMesh::MergeTemplate (
   static_data->curves_scale = tpl->GetCurvesScale ();
 
   //@@@ TEMPORARY
-  csRef<iBezierState> ith = SCF_QUERY_INTERFACE (tpl, iBezierState);
+  csRef<iBezierState> ith = scfQueryInterface<iBezierState> (tpl);
   ParentTemplate = (csBezierMesh*)(iBezierState*)ith;
 
   for (i = 0; i < tpl->GetCurveVertexCount (); i++)
@@ -1057,15 +1057,15 @@ csBezierMeshObjectType::~csBezierMeshObjectType ()
 bool csBezierMeshObjectType::Initialize (iObjectRegistry *object_reg)
 {
   csBezierMeshObjectType::object_reg = object_reg;
-  csRef<iEngine> e = CS_QUERY_REGISTRY (object_reg, iEngine);
+  csRef<iEngine> e = csQueryRegistry<iEngine> (object_reg);
   engine = e;	// We don't want a real ref here to avoid circular refs.
-  csRef<iGraphics3D> g = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+  csRef<iGraphics3D> g = csQueryRegistry<iGraphics3D> (object_reg);
   G3D = g;
 
   lightpatch_pool = new csBezierLightPatchPool ();
 
   csRef<iVerbosityManager> verbosemgr (
-    CS_QUERY_REGISTRY (object_reg, iVerbosityManager));
+    csQueryRegistry<iVerbosityManager> (object_reg));
   if (verbosemgr) 
     do_verbose = verbosemgr->Enabled ("bezier");
 

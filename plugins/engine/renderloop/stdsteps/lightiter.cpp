@@ -87,7 +87,7 @@ csPtr<iBase> csLightIterRSLoader::Parse (iDocumentNode* node,
   csRef<iLightIterRenderStep> step;
   step.AttachNew (new csLightIterRenderStep (object_reg));
   csRef<iRenderStepContainer> steps =
-    SCF_QUERY_INTERFACE (step, iRenderStepContainer);
+    scfQueryInterface<iRenderStepContainer> (step);
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
@@ -160,7 +160,7 @@ void csLightIterRenderStep::Init ()
   {
     initialized = true;
 
-    g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+    g3d = csQueryRegistry<iGraphics3D> (object_reg);
 
     csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
       object_reg, "crystalspace.shared.stringset", iStringSet);
@@ -360,7 +360,7 @@ void csLightIterRenderStep::Perform (iRenderView* rview, iSector* sector,
 size_t csLightIterRenderStep::AddStep (iRenderStep* step)
 {
   csRef<iLightRenderStep> lrs = 
-    SCF_QUERY_INTERFACE (step, iLightRenderStep);
+    scfQueryInterface<iLightRenderStep> (step);
   if (!lrs) return csArrayItemNotFound;
   return steps.Push (lrs);
 }
@@ -368,7 +368,7 @@ size_t csLightIterRenderStep::AddStep (iRenderStep* step)
 bool csLightIterRenderStep::DeleteStep (iRenderStep* step)
 {
   csRef<iLightRenderStep> lrs = 
-    SCF_QUERY_INTERFACE (step, iLightRenderStep);
+    scfQueryInterface<iLightRenderStep> (step);
   if (!lrs) return false;
   return steps.Delete(lrs);
 }
@@ -381,7 +381,7 @@ iRenderStep* csLightIterRenderStep::GetStep (size_t n) const
 size_t csLightIterRenderStep::Find (iRenderStep* step) const
 {
   csRef<iLightRenderStep> lrs = 
-    SCF_QUERY_INTERFACE (step, iLightRenderStep);
+    scfQueryInterface<iLightRenderStep> (step);
   if (!lrs) return csArrayItemNotFound;
   return steps.Find(lrs);
 }

@@ -53,7 +53,7 @@ bool csVProc_Std::Initialize (iObjectRegistry *reg)
 {
   objreg = reg;
 
-  shaderManager = CS_QUERY_REGISTRY(objreg, iShaderManager);
+  shaderManager = csQueryRegistry<iShaderManager> (objreg);
   csRef<iStringSet> strings = 
     CS_QUERY_REGISTRY_TAG_INTERFACE (objreg, 
     "crystalspace.shared.stringset", iStringSet);

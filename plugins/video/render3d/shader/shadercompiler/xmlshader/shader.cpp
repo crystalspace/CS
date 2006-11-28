@@ -276,7 +276,7 @@ csXMLShader::csXMLShader (csXMLShaderCompiler* compiler,
   csXMLShader::forcepriority = forcepriority;
   useFallbackContext = false;
 
-  shadermgr = CS_QUERY_REGISTRY (compiler->objectreg, iShaderManager);
+  shadermgr = csQueryRegistry<iShaderManager> (compiler->objectreg);
   CS_ASSERT (shadermgr); // Should be present - loads us, after all
 
   csRefArray<iDocumentNode> extraNodes;
@@ -613,7 +613,7 @@ csRef<iDocumentNode> csXMLShader::OpenDocFile (const char* filename)
     return 0;
   }
   csRef<iDocumentSystem> docsys (
-    CS_QUERY_REGISTRY (compiler->objectreg, iDocumentSystem));
+    csQueryRegistry<iDocumentSystem> (compiler->objectreg));
   if (docsys == 0)
     docsys.AttachNew (new csTinyDocumentSystem ());
 

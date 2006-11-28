@@ -160,7 +160,7 @@ bool csXWindow::Initialize (iObjectRegistry *object_reg)
   memset (MouseCursor, 0, sizeof (MouseCursor));
 
   // Create the event outlet
-  csRef<iEventQueue> q (CS_QUERY_REGISTRY(object_reg, iEventQueue));
+  csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (object_reg));
   if (q != 0)
     EventOutlet = q->CreateEventOutlet (this);
 
@@ -169,7 +169,7 @@ bool csXWindow::Initialize (iObjectRegistry *object_reg)
 		       &opcode, &first_event, &first_error))
   {
     csRef<iPluginManager> plugin_mgr (
-    	CS_QUERY_REGISTRY(object_reg, iPluginManager));
+    	csQueryRegistry<iPluginManager> (object_reg));
     xf86vm = CS_LOAD_PLUGIN (plugin_mgr, CS_XEXT_XF86VM_SCF_ID, iXExtF86VM);
   }
   return true;
@@ -357,7 +357,7 @@ bool csXWindow::Open ()
   // Tell event queue to call us on every frame
   if (!scfiEventHandler)
     scfiEventHandler.AttachNew (new EventHandler (this));
-  csRef<iEventQueue> q (CS_QUERY_REGISTRY(object_reg, iEventQueue));
+  csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (object_reg));
   if (q != 0) {
     csEventID events[3] = { csevPreProcess(name_reg), 
 			    csevCommandLineHelp(name_reg), 

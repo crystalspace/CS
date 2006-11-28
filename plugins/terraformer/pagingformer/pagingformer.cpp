@@ -171,7 +171,7 @@ void csPagingFormer::LoadFormer (uint x, uint y)
 
     if (heightmapformat == PAGINGHEIGHT_RAWFLOATLE)
     {
-      csRef<iVFS> vfs = CS_QUERY_REGISTRY (objectRegistry, iVFS);
+      csRef<iVFS> vfs = csQueryRegistry<iVFS> (objectRegistry);
       csRef<iDataBuffer> buf = 
         vfs->ReadFile(heightmapdir+ending+".raw", false);
 

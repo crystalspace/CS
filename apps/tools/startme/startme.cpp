@@ -234,7 +234,7 @@ bool StartMe::OnKeyboard(iEvent& ev)
         // main runloop to stop. To do that we get the event queue from
         // the object registry and then post the event.
         csRef<iEventQueue> q = 
-          CS_QUERY_REGISTRY(GetObjectRegistry(), iEventQueue);
+          csQueryRegistry<iEventQueue> (GetObjectRegistry());
         if (q.IsValid()) 
 	  q->GetEventOutlet()->Broadcast(csevQuit(GetObjectRegistry()));
       }
@@ -248,7 +248,7 @@ bool StartMe::OnMouseDown (iEvent& /*event*/)
   if (InDescriptionMode ())
   {
     csRef<iCommandLineParser> cmdline =
-        CS_QUERY_REGISTRY(GetObjectRegistry(), iCommandLineParser);
+        csQueryRegistry<iCommandLineParser> (GetObjectRegistry());
     csString appdir = cmdline->GetAppDir ();
     system (appdir << CS_PATH_SEPARATOR <<
         csInstallationPathsHelper::GetAppFilename (
@@ -332,31 +332,31 @@ bool StartMe::Application()
   // Now get the pointer to various modules we need. We fetch them
   // from the object registry. The RequestPlugins() call we did earlier
   // registered all loaded plugins with the object registry.
-  g3d = CS_QUERY_REGISTRY(GetObjectRegistry(), iGraphics3D);
+  g3d = csQueryRegistry<iGraphics3D> (GetObjectRegistry());
   if (!g3d) return ReportError("Failed to locate 3D renderer!");
 
-  engine = CS_QUERY_REGISTRY(GetObjectRegistry(), iEngine);
+  engine = csQueryRegistry<iEngine> (GetObjectRegistry());
   if (!engine) return ReportError("Failed to locate 3D engine!");
 
-  vc = CS_QUERY_REGISTRY(GetObjectRegistry(), iVirtualClock);
+  vc = csQueryRegistry<iVirtualClock> (GetObjectRegistry());
   if (!vc) return ReportError("Failed to locate Virtual Clock!");
 
-  kbd = CS_QUERY_REGISTRY(GetObjectRegistry(), iKeyboardDriver);
+  kbd = csQueryRegistry<iKeyboardDriver> (GetObjectRegistry());
   if (!kbd) return ReportError("Failed to locate Keyboard Driver!");
 
-  mouse = CS_QUERY_REGISTRY(GetObjectRegistry(), iMouseDriver);
+  mouse = csQueryRegistry<iMouseDriver> (GetObjectRegistry());
   if (!mouse) return ReportError("Failed to locate Mouse Driver!");
 
-  cdsys = CS_QUERY_REGISTRY(GetObjectRegistry(), iCollideSystem);
+  cdsys = csQueryRegistry<iCollideSystem> (GetObjectRegistry());
   if (!cdsys) return ReportError("Failed to locate CollDet System!");
 
-  loader = CS_QUERY_REGISTRY(GetObjectRegistry(), iLoader);
+  loader = csQueryRegistry<iLoader> (GetObjectRegistry());
   if (!loader) return ReportError("Failed to locate Loader!");
 
-  vfs = CS_QUERY_REGISTRY(GetObjectRegistry(), iVFS);
+  vfs = csQueryRegistry<iVFS> (GetObjectRegistry());
   if (!vfs) return ReportError("Failed to locate VFS!");
 
-  confman = CS_QUERY_REGISTRY(GetObjectRegistry(), iConfigManager);
+  confman = csQueryRegistry<iConfigManager> (GetObjectRegistry());
   if (!confman) return ReportError("Failed to locate Config Manager!");
 
   // We need a View to the virtual world.

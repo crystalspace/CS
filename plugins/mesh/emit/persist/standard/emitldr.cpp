@@ -148,8 +148,8 @@ csEmitLoader::~csEmitLoader ()
 bool csEmitLoader::Initialize (iObjectRegistry* object_reg)
 {
   csEmitLoader::object_reg = object_reg;
-  synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
-  reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
+  synldr = csQueryRegistry<iSyntaxService> (object_reg);
+  reporter = csQueryRegistry<iReporter> (object_reg);
 
   xmltokens.Register ("aging", XMLTOKEN_AGING);
   xmltokens.Register ("attractorforce", XMLTOKEN_ATTRACTORFORCE);
@@ -372,8 +372,8 @@ csPtr<iBase> csEmitLoader::Parse (iDocumentNode* node,
 	    return 0;
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
-          partstate = SCF_QUERY_INTERFACE (mesh, iParticleState);
-          emitstate = SCF_QUERY_INTERFACE (mesh, iEmitState);
+          partstate = scfQueryInterface<iParticleState> (mesh);
+          emitstate = scfQueryInterface<iEmitState> (mesh);
 	  if (!emitstate)
 	  {
       	    synldr->ReportError (
@@ -559,7 +559,7 @@ csEmitSaver::~csEmitSaver ()
 bool csEmitSaver::Initialize (iObjectRegistry* object_reg)
 {
   csEmitSaver::object_reg = object_reg;
-  synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
+  synldr = csQueryRegistry<iSyntaxService> (object_reg);
   return true;
 }
 
@@ -572,9 +572,9 @@ bool csEmitSaver::WriteDown (iBase* obj, iDocumentNode* parent,
     parent->CreateNodeBefore(CS_NODE_ELEMENT, 0);
   paramsNode->SetValue("params");
 
-  csRef<iParticleState> partstate = SCF_QUERY_INTERFACE (obj, iParticleState);
-  csRef<iEmitState> emitstate = SCF_QUERY_INTERFACE (obj, iEmitState);
-  csRef<iMeshObject> mesh = SCF_QUERY_INTERFACE (obj, iMeshObject);
+  csRef<iParticleState> partstate = scfQueryInterface<iParticleState> (obj);
+  csRef<iEmitState> emitstate = scfQueryInterface<iEmitState> (obj);
+  csRef<iMeshObject> mesh = scfQueryInterface<iMeshObject> (obj);
 
   if ( partstate && emitstate && mesh )
   {
@@ -797,7 +797,7 @@ bool csEmitSaver::WriteEmit (iEmitGen3D* emit, iDocumentNode* parent)
   csVector3 a,b;
   float p, q, r, s, t;
 
-  csRef<iEmitFixed> efixed (SCF_QUERY_INTERFACE(emit, iEmitFixed));
+  csRef<iEmitFixed> efixed (scfQueryInterface<iEmitFixed> (emit));
   if(efixed)
   {
     efixed->GetValue(a, b); // b is ignored
@@ -806,7 +806,7 @@ bool csEmitSaver::WriteEmit (iEmitGen3D* emit, iDocumentNode* parent)
     synldr->WriteVector(node, a);
     return true;
   }
-  csRef<iEmitSphere> esphere (SCF_QUERY_INTERFACE(emit, iEmitSphere));
+  csRef<iEmitSphere> esphere (scfQueryInterface<iEmitSphere> (emit));
   if(esphere)
   {
     esphere->GetContent(a, p, q);
@@ -817,7 +817,7 @@ bool csEmitSaver::WriteEmit (iEmitGen3D* emit, iDocumentNode* parent)
     node->SetAttributeAsFloat("q",q);
     return true;
   }
-  csRef<iEmitBox> ebox (SCF_QUERY_INTERFACE(emit, iEmitBox));
+  csRef<iEmitBox> ebox (scfQueryInterface<iEmitBox> (emit));
   if(ebox)
   {
     csBox3 x(a,b);
@@ -827,7 +827,7 @@ bool csEmitSaver::WriteEmit (iEmitGen3D* emit, iDocumentNode* parent)
     synldr->WriteBox(node, x);
     return true;
   }
-  csRef<iEmitCone> econe (SCF_QUERY_INTERFACE(emit, iEmitCone));
+  csRef<iEmitCone> econe (scfQueryInterface<iEmitCone> (emit));
   if(econe)
   {
     econe->GetContent(a, p, q, r, s, t);
@@ -841,7 +841,7 @@ bool csEmitSaver::WriteEmit (iEmitGen3D* emit, iDocumentNode* parent)
     node->SetAttributeAsFloat("t",t);
     return true;
   }
-  csRef<iEmitMix> emix (SCF_QUERY_INTERFACE(emit, iEmitMix));
+  csRef<iEmitMix> emix (scfQueryInterface<iEmitMix> (emit));
   if(emix)
   {
     int i;
@@ -857,7 +857,7 @@ bool csEmitSaver::WriteEmit (iEmitGen3D* emit, iDocumentNode* parent)
     }
     return true;
   }
-  csRef<iEmitLine> eline (SCF_QUERY_INTERFACE(emit, iEmitLine));
+  csRef<iEmitLine> eline (scfQueryInterface<iEmitLine> (emit));
   if(eline)
   {
     csBox3 x(a,b);
@@ -867,7 +867,7 @@ bool csEmitSaver::WriteEmit (iEmitGen3D* emit, iDocumentNode* parent)
     synldr->WriteBox(node, x);
     return true;
   }
-  csRef<iEmitCylinder> ecyl (SCF_QUERY_INTERFACE(emit, iEmitCylinder));
+  csRef<iEmitCylinder> ecyl (scfQueryInterface<iEmitCylinder> (emit));
   if(ecyl) 
   {
     csBox3 x(a,b);
@@ -880,7 +880,7 @@ bool csEmitSaver::WriteEmit (iEmitGen3D* emit, iDocumentNode* parent)
     return true;
   }
   csRef<iEmitCylinderTangent> ecyltan (
-    SCF_QUERY_INTERFACE(emit, iEmitCylinderTangent));
+    scfQueryInterface<iEmitCylinderTangent> (emit));
   if(ecyltan)
   {
     csBox3 x(a,b);
@@ -893,7 +893,7 @@ bool csEmitSaver::WriteEmit (iEmitGen3D* emit, iDocumentNode* parent)
     return true;
   }
   csRef<iEmitSphereTangent> espheretan (
-    SCF_QUERY_INTERFACE(emit, iEmitSphereTangent));
+    scfQueryInterface<iEmitSphereTangent> (emit));
   if(espheretan)
   {
     espheretan->GetContent(a, p, q);

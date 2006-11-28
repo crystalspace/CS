@@ -464,7 +464,7 @@ void csShaderGLCGCommon::DoDebugDump ()
   output << cgGetProgramString (program, CG_COMPILED_PROGRAM);
   output << "\n";
 
-  csRef<iVFS> vfs = CS_QUERY_REGISTRY (objectReg, iVFS);
+  csRef<iVFS> vfs = csQueryRegistry<iVFS> (objectReg);
   if (debugFN.IsEmpty())
   {
     static int programCounter = 0;
@@ -496,7 +496,7 @@ void csShaderGLCGCommon::WriteAdditionalDumpInfo (const char* description,
 {
   if (!shaderPlug->debugDump || !debugFN) return;
 
-  csRef<iVFS> vfs = CS_QUERY_REGISTRY (objectReg, iVFS);
+  csRef<iVFS> vfs = csQueryRegistry<iVFS> (objectReg);
   csRef<iDataBuffer> oldDump = vfs->ReadFile (debugFN, true);
 
   csString output ((char*)oldDump->GetData());

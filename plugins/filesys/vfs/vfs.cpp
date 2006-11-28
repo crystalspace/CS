@@ -1556,7 +1556,7 @@ bool csVFS::Initialize (iObjectRegistry* r)
 #endif
 
   csRef<iVerbosityManager> vm (
-    CS_QUERY_REGISTRY (object_reg, iVerbosityManager));
+    csQueryRegistry<iVerbosityManager> (object_reg));
   if (vm.IsValid()) 
   {
     verbosity = VERBOSITY_NONE;
@@ -1566,7 +1566,7 @@ bool csVFS::Initialize (iObjectRegistry* r)
   }
 
   csRef<iCommandLineParser> cmdline =
-    CS_QUERY_REGISTRY (object_reg, iCommandLineParser);
+    csQueryRegistry<iCommandLineParser> (object_reg);
   if (cmdline)
   {
     resdir = alloc_normalized_path(cmdline->GetResourceDir());

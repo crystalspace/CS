@@ -100,6 +100,6 @@ csBaseProctexSaver::~csBaseProctexSaver ()
 bool csBaseProctexSaver::Initialize (iObjectRegistry* object_reg)
 {
   csBaseProctexSaver::object_reg = object_reg;
-  synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
+  synldr = csQueryRegistry<iSyntaxService> (object_reg);
   return true;
 }

@@ -405,7 +405,7 @@ csHazeMeshObject::csHazeMeshObject (csHazeMeshObjectFactory* factory) :
 {
   csHazeMeshObject::factory = factory;
   logparent = 0;
-  ifactory = SCF_QUERY_INTERFACE (factory, iMeshObjectFactory);
+  ifactory = scfQueryInterface<iMeshObjectFactory> (factory);
   material = factory->GetMaterialWrapper ();
   MixMode = factory->GetMixMode ();
   initialized = false;
@@ -886,7 +886,7 @@ csHazeMeshObjectFactory::~csHazeMeshObjectFactory ()
 csPtr<iMeshObject> csHazeMeshObjectFactory::NewInstance ()
 {
   csHazeMeshObject* cm = new csHazeMeshObject (this);
-  csRef<iMeshObject> im (SCF_QUERY_INTERFACE (cm, iMeshObject));
+  csRef<iMeshObject> im (scfQueryInterface<iMeshObject> (cm));
   cm->DecRef ();
   return csPtr<iMeshObject> (im);
 }
@@ -908,7 +908,7 @@ csPtr<iMeshObjectFactory> csHazeMeshObjectType::NewFactory ()
 {
   csHazeMeshObjectFactory* cm = new csHazeMeshObjectFactory (this);
   csRef<iMeshObjectFactory> ifact (
-  	SCF_QUERY_INTERFACE (cm, iMeshObjectFactory));
+  	scfQueryInterface<iMeshObjectFactory> (cm));
   cm->DecRef ();
   return csPtr<iMeshObjectFactory> (ifact);
 }

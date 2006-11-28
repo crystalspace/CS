@@ -106,7 +106,7 @@ static JSBool Texture (JSContext *cx, JSObject *obj, uintN argc, jsval *argv,
     texture_name = JS_GetStringBytes (name);
 
     // Get a handle to the VFS.		
-    csRef<iVFS> vfs (CS_QUERY_REGISTRY (AwsMgr ()->GetObjectRegistry (), iVFS));
+    csRef<iVFS> vfs (csQueryRegistry<iVFS> (AwsMgr ()->GetObjectRegistry ()));
 
     if (!vfs)
     {

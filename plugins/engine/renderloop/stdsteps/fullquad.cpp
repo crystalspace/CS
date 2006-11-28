@@ -225,12 +225,12 @@ csFullScreenQuadRenderStep::csFullScreenQuadRenderStep (
   scfImplementationType (this)
 {
   csRef<iGraphics3D> g3d = 
-    CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+    csQueryRegistry<iGraphics3D> (object_reg);
   csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg, 
     "crystalspace.shared.stringset", iStringSet);
   csFullScreenQuadRenderStep::object_reg = object_reg;
 
-  engine = CS_QUERY_REGISTRY (object_reg, iEngine);
+  engine = csQueryRegistry<iEngine> (object_reg);
 
   firstPass.material = "";
   firstPass.shader = "";
@@ -255,7 +255,7 @@ void csFullScreenQuadRenderStep::Perform (iRenderView* rview, iSector* /*sector*
 {
   csRef<iGraphics3D> g3d = rview->GetGraphics3D();
   if (!shaderMgr.IsValid())
-    shaderMgr = CS_QUERY_REGISTRY (object_reg, iShaderManager);
+    shaderMgr = csQueryRegistry<iShaderManager> (object_reg);
 
   const DrawSettings& settings = 
     (distinguishFirstPass && isFirstPass) ? firstPass : otherPasses;

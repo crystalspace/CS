@@ -231,7 +231,7 @@ void InfiniteMaze::connect_infinite (int x1, int y1, int z1, int x2, int y2,
 bool InfPortalCS::Traverse (iPortal* portal, iBase* context)
 {
   csRef<iFrustumView> fv;
-  if (context) fv = SCF_QUERY_INTERFACE (context, iFrustumView);
+  if (context) fv = scfQueryInterface<iFrustumView> (context);
   if (fv)
   {
     iFrustumViewUserdata* ud = fv->GetUserdata ();

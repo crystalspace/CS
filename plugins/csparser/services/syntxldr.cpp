@@ -1889,14 +1889,14 @@ csRef<iShader> csTextSyntaxService::ParseShaderRef (
     return 0;
   }
 
-  csRef<iShaderManager> shmgr = CS_QUERY_REGISTRY(object_reg, iShaderManager);
+  csRef<iShaderManager> shmgr = csQueryRegistry<iShaderManager> (object_reg);
   csRef<iShader> shader = shmgr->GetShader (shaderName);
   if (shader.IsValid()) return shader;
 
   const char* shaderFileName = node->GetAttributeValue ("file");
   if (shaderFileName != 0)
   {
-    csRef<iVFS> vfs = CS_QUERY_REGISTRY(object_reg, iVFS);
+    csRef<iVFS> vfs = csQueryRegistry<iVFS> (object_reg);
     csVfsDirectoryChanger dirChanger (vfs);
     csString filename (shaderFileName);
     csRef<iFile> shaderFile = vfs->Open (filename, VFS_FILE_READ);
@@ -1909,7 +1909,7 @@ csRef<iShader> csTextSyntaxService::ParseShaderRef (
     }
 
     csRef<iDocumentSystem> docsys =
-      CS_QUERY_REGISTRY(object_reg, iDocumentSystem);
+      csQueryRegistry<iDocumentSystem> (object_reg);
     if (docsys == 0)
       docsys.AttachNew (new csTinyDocumentSystem ());
     csRef<iDocument> shaderDoc = docsys->CreateDocument ();

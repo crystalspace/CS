@@ -159,7 +159,7 @@ csStringID csMeshRenderNodeFactory::string_object2world = (csStringID)-1;
 
 csMeshRenderNodeFactory::csMeshRenderNodeFactory (iObjectRegistry* object_reg)
 {
-  shaderManager = CS_QUERY_REGISTRY (object_reg, iShaderManager);
+  shaderManager = csQueryRegistry<iShaderManager> (object_reg);
   nullShader = shaderManager->GetShader ("*null");
 
   csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg, 

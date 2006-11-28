@@ -29,7 +29,7 @@ csCEGUIResourceProvider::csCEGUIResourceProvider (iObjectRegistry *reg) :
   CEGUI::ResourceProvider ()
 {
   obj_reg = reg;
-  vfs = CS_QUERY_REGISTRY(obj_reg, iVFS);
+  vfs = csQueryRegistry<iVFS> (obj_reg);
 }
 csCEGUIResourceProvider::~csCEGUIResourceProvider ()
 {

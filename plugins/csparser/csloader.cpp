@@ -551,7 +551,7 @@ bool csLoader::LoadStructuredDoc (const char* file, iDataBuffer* buf,
 	csRef<iDocument>& doc)
 {
   csRef<iDocumentSystem> docsys (
-      CS_QUERY_REGISTRY (object_reg, iDocumentSystem));
+      csQueryRegistry<iDocumentSystem> (object_reg));
   if (!docsys) docsys = csPtr<iDocumentSystem> (new csTinyDocumentSystem ());
   doc = docsys->CreateDocument ();
   const char* error = doc->Parse (buf, true);
@@ -573,7 +573,7 @@ bool csLoader::LoadStructuredDoc (const char* file, iFile* buf,
 	csRef<iDocument>& doc)
 {
   csRef<iDocumentSystem> docsys (
-      CS_QUERY_REGISTRY (object_reg, iDocumentSystem));
+      csQueryRegistry<iDocumentSystem> (object_reg));
   if (!docsys) docsys = csPtr<iDocumentSystem> (new csTinyDocumentSystem ());
   doc = docsys->CreateDocument ();
   const char* error = doc->Parse (buf, true);
@@ -1124,11 +1124,11 @@ csLoader::~csLoader()
 }
 
 #define GET_PLUGIN(var, intf, msgname)				\
-  var = CS_QUERY_REGISTRY(object_reg, intf);			\
+  var = csQueryRegistry<intf> (object_reg);			\
   if (!var && do_verbose) ReportNotify ("Could not get " msgname);
 
 #define GET_CRITICAL_PLUGIN(var, intf, msgname)			\
-  var = CS_QUERY_REGISTRY(object_reg, intf);			\
+  var = csQueryRegistry<intf> (object_reg);			\
   if (!var) { ReportError ("crystalspace.maploader",		\
     "Failed to initialize loader: "				\
     "Could not get " msgname); return false; }
@@ -1138,16 +1138,16 @@ bool csLoader::Initialize (iObjectRegistry *object_Reg)
   csLoader::object_reg = object_Reg;
   loaded_plugins.SetObjectRegistry (object_reg);
   csRef<iVerbosityManager> verbosemgr (
-    CS_QUERY_REGISTRY (object_reg, iVerbosityManager));
+    csQueryRegistry<iVerbosityManager> (object_reg));
   if (verbosemgr) 
     do_verbose = verbosemgr->Enabled ("loader");
   else
     do_verbose = false;
 
   csRef<iPluginManager> plugin_mgr (
-  	CS_QUERY_REGISTRY (object_reg, iPluginManager));
+  	csQueryRegistry<iPluginManager> (object_reg));
 
-  Reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
+  Reporter = csQueryRegistry<iReporter> (object_reg);
 
   loaded_plugins.plugin_mgr = plugin_mgr;
 
@@ -1357,7 +1357,7 @@ bool csLoader::LoadLibraryFromNode (iLoaderContext* ldr_context,
 	iDocumentNode* child, iStreamSource* ssource,
 	iMissingLoaderData* missingdata)
 {
-  csRef<iVFS> vfs = CS_QUERY_REGISTRY(object_reg, iVFS);
+  csRef<iVFS> vfs = csQueryRegistry<iVFS> (object_reg);
   const char* name = child->GetAttributeValue ("checkdupes");
   bool dupes = ldr_context->CheckDupes ();
   if (name)
@@ -3233,7 +3233,7 @@ bool csLoader::LoadPolyMeshInSector (iLoaderContext* ldr_context,
 bool csLoader::HandleMeshObjectPluginResult (iBase* mo, iDocumentNode* child,
 	iMeshWrapper* mesh, bool keepZbuf, bool keepPrio)
 {
-  csRef<iMeshObject> mo2 = SCF_QUERY_INTERFACE (mo, iMeshObject);
+  csRef<iMeshObject> mo2 = scfQueryInterface<iMeshObject> (mo);
   if (!mo2)
   {
     SyntaxService->ReportError (
@@ -3617,7 +3617,7 @@ bool csLoader::LoadMeshObject (iLoaderContext* ldr_context,
 
 bool csLoader::ParseImposterSettings (iMeshWrapper* mesh, iDocumentNode *node)
 {
-  csRef<iImposter> imposter = SCF_QUERY_INTERFACE (mesh, iImposter);
+  csRef<iImposter> imposter = scfQueryInterface<iImposter> (mesh);
   if (!imposter)
   {
     SyntaxService->ReportError (
@@ -5493,7 +5493,7 @@ bool csLoader::ParseShaderList (iLoaderContext* ldr_context,
 	iDocumentNode* node)
 {
   csRef<iShaderManager> shaderMgr (
-    CS_QUERY_REGISTRY (csLoader::object_reg, iShaderManager));
+    csQueryRegistry<iShaderManager> (csLoader::object_reg));
 
   if(!shaderMgr)
   {
@@ -5607,7 +5607,7 @@ bool csLoader::ParseShader (iLoaderContext* ldr_context,
   csRef<iDocumentNode> fileChild = node->GetNode ("file");
 
   csRef<iVFS> vfs;
-  vfs = CS_QUERY_REGISTRY(object_reg, iVFS);
+  vfs = csQueryRegistry<iVFS> (object_reg);
   csVfsDirectoryChanger dirChanger (vfs);
 
   if (fileChild)
@@ -5623,7 +5623,7 @@ bool csLoader::ParseShader (iLoaderContext* ldr_context,
     }
 
     csRef<iDocumentSystem> docsys =
-      CS_QUERY_REGISTRY(object_reg, iDocumentSystem);
+      csQueryRegistry<iDocumentSystem> (object_reg);
     if (docsys == 0)
       docsys.AttachNew (new csTinyDocumentSystem ());
     csRef<iDocument> shaderDoc = docsys->CreateDocument ();

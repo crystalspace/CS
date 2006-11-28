@@ -90,7 +90,7 @@ csSndSysRendererSoftware::~csSndSysRendererSoftware()
   RecordEvent(SSEL_DEBUG, "Sound system destructing.");
   if (weakEventHandler)
   {
-    csRef<iEventQueue> q = CS_QUERY_REGISTRY (m_pObjectRegistry, iEventQueue);
+    csRef<iEventQueue> q = csQueryRegistry<iEventQueue> (m_pObjectRegistry);
     if (q)
       CS::RemoveWeakListener (q, weakEventHandler);
   }
@@ -249,7 +249,7 @@ bool csSndSysRendererSoftware::Initialize (iObjectRegistry *obj_reg)
 
   // Get an interface for the plugin manager
   csRef<iPluginManager> plugin_mgr (
-    CS_QUERY_REGISTRY (m_pObjectRegistry, iPluginManager));
+    csQueryRegistry<iPluginManager> (m_pObjectRegistry));
 
 
   // read the config file
@@ -328,7 +328,7 @@ bool csSndSysRendererSoftware::Initialize (iObjectRegistry *obj_reg)
 
 
   // set event callback
-  csRef<iEventQueue> q (CS_QUERY_REGISTRY(m_pObjectRegistry, iEventQueue));
+  csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (m_pObjectRegistry));
   evSystemOpen = csevSystemOpen(m_pObjectRegistry);
   evSystemClose = csevSystemClose(m_pObjectRegistry);
   evFrame = csevFrame(m_pObjectRegistry);

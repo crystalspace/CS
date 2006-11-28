@@ -61,8 +61,8 @@ void awsTextureManager::Initialize (iObjectRegistry *obj_reg)
   if (!obj_reg) csPrintf ("aws-debug:  bad obj_reg (%s)\n", __FILE__);
   if (!object_reg) csPrintf ("aws-debug:  bad object_reg (%s)\n", __FILE__);
 
-  loader = CS_QUERY_REGISTRY (object_reg, iImageIO);
-  vfs = CS_QUERY_REGISTRY (object_reg, iVFS);
+  loader = csQueryRegistry<iImageIO> (object_reg);
+  vfs = csQueryRegistry<iVFS> (object_reg);
 
   if (!loader)
   {

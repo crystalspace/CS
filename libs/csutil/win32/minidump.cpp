@@ -409,7 +409,7 @@ const char* cswinMinidumpWriter::WriteWrappedMinidump (
 
     if (object_reg)  
     {
-      csRef<iVFS> vfs = CS_QUERY_REGISTRY (object_reg, iVFS);
+      csRef<iVFS> vfs = csQueryRegistry<iVFS> (object_reg);
       csRef<iStandardReporterListener> stdrep = CS_QUERY_REGISTRY (object_reg,
 	iStandardReporterListener);
       if (vfs && stdrep)

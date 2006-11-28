@@ -229,7 +229,7 @@ csDynaVis::~csDynaVis ()
 {
   if (weakEventHandler)
   {
-    csRef<iEventQueue> q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+    csRef<iEventQueue> q = csQueryRegistry<iEventQueue> (object_reg);
     if (q)
       CS::RemoveWeakListener (q, weakEventHandler);
   }
@@ -260,7 +260,7 @@ bool csDynaVis::Initialize (iObjectRegistry *object_reg)
   delete kdtree;
   delete tcovbuf; tcovbuf = 0;
 
-  csRef<iGraphics3D> g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+  csRef<iGraphics3D> g3d = csQueryRegistry<iGraphics3D> (object_reg);
   if (g3d)
   {
     scr_width = g3d->GetWidth ();
@@ -283,7 +283,7 @@ bool csDynaVis::Initialize (iObjectRegistry *object_reg)
   if (g2d)
   {
     CanvasResize = csevCanvasResize(object_reg, g2d);
-    csRef<iEventQueue> q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+    csRef<iEventQueue> q = csQueryRegistry<iEventQueue> (object_reg);
     if (q)
       CS::RegisterWeakListener (q, this, CanvasResize, weakEventHandler);
   }
@@ -329,7 +329,7 @@ bool csDynaVis::Initialize (iObjectRegistry *object_reg)
   desc->DecRef ();
 
   tcovbuf = new csTiledCoverageBuffer (scr_width, scr_height);
-  csRef<iBugPlug> bugplug = CS_QUERY_REGISTRY (object_reg, iBugPlug);
+  csRef<iBugPlug> bugplug = csQueryRegistry<iBugPlug> (object_reg);
   tcovbuf->bugplug = bugplug;
 
   return true;
@@ -339,7 +339,7 @@ bool csDynaVis::HandleEvent (iEvent& ev)
 {
   if (ev.Name == CanvasResize)
   {
-    csRef<iGraphics3D> g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+    csRef<iGraphics3D> g3d = csQueryRegistry<iGraphics3D> (object_reg);
     scr_width = g3d->GetWidth ();
     scr_height = g3d->GetHeight ();
     //printf ("Got resize %dx%d!\n", scr_width, scr_height);fflush (stdout);
@@ -570,7 +570,7 @@ bool PrintObjects (csKDTree* treenode, void*, uint32, uint32&)
   {
     csVisibilityObjectWrapper* visobj_wrap = (csVisibilityObjectWrapper*)
     	objects[i]->GetObject ();
-    csRef<iObject> iobj (SCF_QUERY_INTERFACE (visobj_wrap->visobj, iObject));
+    csRef<iObject> iobj (scfQueryInterface<iObject> (visobj_wrap->visobj));
     if (iobj)
     {
       if (iobj->GetName ()) 
@@ -866,7 +866,7 @@ void csDynaVis::UpdateCoverageBuffer (csVisibilityObjectWrapper* obj)
 # ifdef CS_DEBUG
   if (do_state_dump)
   {
-    csRef<iObject> iobj (SCF_QUERY_INTERFACE (visobj, iObject));
+    csRef<iObject> iobj (scfQueryInterface<iObject> (visobj));
     if (iobj)
     {
       csPrintf ("CovIns of object %s\n", iobj->GetName () ? iobj->GetName () :
@@ -1042,7 +1042,7 @@ void csDynaVis::UpdateCoverageBufferOutline (csVisibilityObjectWrapper* obj)
 # ifdef CS_DEBUG
   if (do_state_dump)
   {
-    csRef<iObject> iobj (SCF_QUERY_INTERFACE (visobj, iObject));
+    csRef<iObject> iobj (scfQueryInterface<iObject> (visobj));
     if (iobj)
     {
       csPrintf ("CovOutIns of object %s (max_depth=%g)\n",
@@ -1133,7 +1133,7 @@ void csDynaVis::AppendWriteQueue (iVisibilityObject* visobj,
 # ifdef CS_DEBUG
   if (do_state_dump)
   {
-    csRef<iObject> iobj (SCF_QUERY_INTERFACE (visobj, iObject));
+    csRef<iObject> iobj (scfQueryInterface<iObject> (visobj));
     if (iobj)
     {
       csPrintf (
@@ -1674,7 +1674,7 @@ end:
   if (do_state_dump)
   {
     const csBox3& obj_bbox = obj->child->GetBBox ();
-    csRef<iObject> iobj (SCF_QUERY_INTERFACE (obj->visobj, iObject));
+    csRef<iObject> iobj (scfQueryInterface<iObject> (obj->visobj));
     csPrintf ("Obj (%g,%g,%g)-(%g,%g,%g) (%s) %s\n",
     	obj_bbox.MinX (), obj_bbox.MinY (), obj_bbox.MinZ (),
     	obj_bbox.MaxX (), obj_bbox.MaxY (), obj_bbox.MaxZ (),
@@ -2660,7 +2660,7 @@ void csDynaVis::CastShadows (iFrustumView* fview)
 csPtr<iString> csDynaVis::UnitTest ()
 {
   csKDTree* kdtree = new csKDTree ();
-  csRef<iDebugHelper> dbghelp (SCF_QUERY_INTERFACE (kdtree, iDebugHelper));
+  csRef<iDebugHelper> dbghelp (scfQueryInterface<iDebugHelper> (kdtree));
   if (dbghelp)
   {
     csRef<iString> rc (dbghelp->UnitTest ());
@@ -2673,7 +2673,7 @@ csPtr<iString> csDynaVis::UnitTest ()
   kdtree->DecRef();
 
   csTiledCoverageBuffer* tcovbuf = new csTiledCoverageBuffer (640, 480);
-  dbghelp = SCF_QUERY_INTERFACE (tcovbuf, iDebugHelper);
+  dbghelp = scfQueryInterface<iDebugHelper> (tcovbuf);
   if (dbghelp)
   {
     csRef<iString> rc (dbghelp->UnitTest ());
@@ -3071,7 +3071,7 @@ bool csDynaVis::DebugCommand (const char* cmd)
   if (!strcmp (cmd, "setup_debugsector"))
   {
     if (!bugplug)
-      bugplug = CS_QUERY_REGISTRY (object_reg, iBugPlug);
+      bugplug = csQueryRegistry<iBugPlug> (object_reg);
     if (bugplug)
     {
       bugplug->SetupDebugSector ();
@@ -3131,7 +3131,7 @@ bool csDynaVis::DebugCommand (const char* cmd)
   else if (!strcmp (cmd, "setup_debugview"))
   {
     if (!bugplug)
-      bugplug = CS_QUERY_REGISTRY (object_reg, iBugPlug);
+      bugplug = csQueryRegistry<iBugPlug> (object_reg);
     if (bugplug)
     {
       bugplug->SetupDebugView ();
@@ -3311,7 +3311,7 @@ bool csDynaVis::DebugCommand (const char* cmd)
     	"Dumped current state.");
     do_state_dump = true;
 
-    csRef<iDebugHelper> dbghelp (SCF_QUERY_INTERFACE (kdtree, iDebugHelper));
+    csRef<iDebugHelper> dbghelp (scfQueryInterface<iDebugHelper> (kdtree));
     if (dbghelp)
     {
       csRef<iString> rc (dbghelp->Dump ());
@@ -3369,7 +3369,7 @@ bool csDynaVis::DebugCommand (const char* cmd)
 	}
 
         csRef<iObject> iobj (
-		SCF_QUERY_INTERFACE (visobj_wrap->visobj, iObject));
+		scfQueryInterface<iObject> (visobj_wrap->visobj));
         csPrintf ("  obj(%zu,'%s')  vis=%s   vispix=%d totpix=%d      %s\n",
       	  i,
 	  (iobj && iobj->GetName ()) ? iobj->GetName () : "?",
@@ -3403,7 +3403,7 @@ csTicks csDynaVis::Benchmark (int num_iterations)
   csTicks rc = 0;
 
   csKDTree* kdtree = new csKDTree ();
-  csRef<iDebugHelper> dbghelp (SCF_QUERY_INTERFACE (kdtree, iDebugHelper));
+  csRef<iDebugHelper> dbghelp (scfQueryInterface<iDebugHelper> (kdtree));
   if (dbghelp)
   {
     csTicks r = dbghelp->Benchmark (num_iterations);

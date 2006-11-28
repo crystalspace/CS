@@ -207,7 +207,7 @@ iShadowCaster* csMeshWrapper::GetShadowCaster ()
 
     if (!meshobj) return 0;
     shadow_caster_valid = true;
-    shadow_caster = SCF_QUERY_INTERFACE (meshobj, iShadowCaster);
+    shadow_caster = scfQueryInterface<iShadowCaster> (meshobj);
   }
   return shadow_caster;
 }
@@ -266,8 +266,8 @@ void csMeshWrapper::SetMeshObject (iMeshObject *meshobj)
 
   if (meshobj)
   {
-    light_info = SCF_QUERY_INTERFACE (meshobj, iLightingInfo);
-    portal_container = SCF_QUERY_INTERFACE (meshobj, iPortalContainer);
+    light_info = scfQueryInterface<iLightingInfo> (meshobj);
+    portal_container = scfQueryInterface<iPortalContainer> (meshobj);
     AddToSectorPortalLists ();
   }
   else
@@ -1478,7 +1478,7 @@ csMeshList::~csMeshList ()
 void csMeshList::NameChanged (iObject* object, const char* oldname,
   	const char* newname)
 {
-  csRef<iMeshWrapper> mesh = SCF_QUERY_INTERFACE (object, iMeshWrapper);
+  csRef<iMeshWrapper> mesh = scfQueryInterface<iMeshWrapper> (object);
   CS_ASSERT (mesh != 0);
   if (oldname) meshes_hash.Delete (oldname, mesh);
   if (newname) meshes_hash.Put (newname, mesh);

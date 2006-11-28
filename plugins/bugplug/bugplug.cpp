@@ -101,7 +101,7 @@ void csBugPlug::Report (int severity, const char* msg, ...)
 {
   va_list arg;
   va_start (arg, msg);
-  csRef<iReporter> rep (CS_QUERY_REGISTRY (object_reg, iReporter));
+  csRef<iReporter> rep (csQueryRegistry<iReporter> (object_reg));
   if (rep)
     rep->ReportV (severity, "crystalspace.bugplug", msg, arg);
   else
@@ -171,7 +171,7 @@ csBugPlug::~csBugPlug ()
   }
   if (weakEventHandler)
   {
-    csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
+    csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (object_reg));
     if (q)
       RemoveWeakListener (q, weakEventHandler);
   }
@@ -184,7 +184,7 @@ bool csBugPlug::Initialize (iObjectRegistry *object_reg)
   csBugPlug::object_reg = object_reg;
 
   csRef<iKeyboardDriver> currentKbd = 
-    CS_QUERY_REGISTRY (object_reg, iKeyboardDriver);
+    csQueryRegistry<iKeyboardDriver> (object_reg);
   if (currentKbd == 0)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "No iKeyboardDriver!");
@@ -194,7 +194,7 @@ bool csBugPlug::Initialize (iObjectRegistry *object_reg)
 
   CS_INITIALIZE_EVENT_SHORTCUTS (object_reg);
 
-  csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
+  csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (object_reg));
   if (q != 0)
   {
     csEventID esub[] = { 
@@ -217,12 +217,12 @@ void csBugPlug::SetupPlugin ()
 
   if (!Engine)
   {
-    Engine = CS_QUERY_REGISTRY (object_reg, iEngine);
+    Engine = csQueryRegistry<iEngine> (object_reg);
     if (Engine)
       Engine->AddEngineFrameCallback (catcher);
   }
 
-  if (!G3D) G3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+  if (!G3D) G3D = csQueryRegistry<iGraphics3D> (object_reg);
 
   if (!G3D)
   {
@@ -245,21 +245,21 @@ void csBugPlug::SetupPlugin ()
     CS_ASSERT (fnt != 0);    
   }
 
-  if (!VFS) VFS = CS_QUERY_REGISTRY (object_reg, iVFS);
+  if (!VFS) VFS = csQueryRegistry<iVFS> (object_reg);
   if (!VFS)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "No VFS!");
     return;
   }
 
-  if (!vc) vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
+  if (!vc) vc = csQueryRegistry<iVirtualClock> (object_reg);
   if (!vc)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "No virtual clock!");
     return;
   }
 
-  if (!Conout) Conout = CS_QUERY_REGISTRY (object_reg, iConsoleOutput);
+  if (!Conout) Conout = csQueryRegistry<iConsoleOutput> (object_reg);
 
   config.AddConfig (object_reg, "/config/bugplug.cfg");
 
@@ -376,7 +376,7 @@ void csBugPlug::VisculCmd (const char* cmd)
       "Bugplug is currently now tracking a visibility culler!");
     return;
   }
-  csRef<iDebugHelper> dbghelp (SCF_QUERY_INTERFACE (visculler, iDebugHelper));
+  csRef<iDebugHelper> dbghelp (scfQueryInterface<iDebugHelper> (visculler));
   if (!dbghelp)
   {
     Report (CS_REPORTER_SEVERITY_NOTIFY,
@@ -580,7 +580,7 @@ bool csBugPlug::ExecCommand (int cmd, const csString& args)
     case DEBUGCMD_ENGINECMD:
 	{
 	  csRef<iDebugHelper> dbghelp (
-	  	SCF_QUERY_INTERFACE (Engine, iDebugHelper));
+	  	scfQueryInterface<iDebugHelper> (Engine));
 	  if (dbghelp)
 	  {
 	    if (dbghelp->DebugCommand (args))
@@ -607,7 +607,7 @@ bool csBugPlug::ExecCommand (int cmd, const csString& args)
     case DEBUGCMD_ENGINESTATE:
 	{
 	  csRef<iDebugHelper> dbghelp (
-	  	SCF_QUERY_INTERFACE (Engine, iDebugHelper));
+	  	scfQueryInterface<iDebugHelper> (Engine));
 	  if (dbghelp)
 	  {
 	    if (dbghelp->GetSupportedTests () & CS_DBGHELP_STATETEST)
@@ -1136,7 +1136,7 @@ bool csBugPlug::ExecCommand (int cmd, const csString& args)
 	  standardShadowShader = shadowmat->GetMaterial()->GetShader();
 	if (!debugShadowShader)
 	{
-	  csRef<iShaderManager> shmgr ( CS_QUERY_REGISTRY(object_reg, iShaderManager));
+	  csRef<iShaderManager> shmgr ( csQueryRegistry<iShaderManager> (object_reg));
 	  if(shmgr)
 	  {
 	    debugShadowShader = shmgr->CreateShader();
@@ -1198,7 +1198,7 @@ void csBugPlug::CaptureScreen ()
     	"The 2D graphics driver does not support screen shots");
     return;
   }
-  csRef<iImageIO> imageio (CS_QUERY_REGISTRY (object_reg, iImageIO));
+  csRef<iImageIO> imageio (csQueryRegistry<iImageIO> (object_reg));
   if (imageio)
   {
     csRef<iDataBuffer> db (imageio->Save (img, captureMIME, 
@@ -1246,7 +1246,7 @@ void csBugPlug::CaptureUberScreen (uint w, uint h)
     	"Could not take %s", descr.GetData());
     return;
   }
-  csRef<iImageIO> imageio (CS_QUERY_REGISTRY (object_reg, iImageIO));
+  csRef<iImageIO> imageio (csQueryRegistry<iImageIO> (object_reg));
   if (imageio)
   {
     csRef<iDataBuffer> db (imageio->Save (img, captureMIME, 
@@ -1513,7 +1513,7 @@ bool csBugPlug::HandleFrame (iEvent& /*event*/)
 
   if (visculler)
   {
-    csRef<iDebugHelper> dbghelp (SCF_QUERY_INTERFACE (visculler, iDebugHelper));
+    csRef<iDebugHelper> dbghelp (scfQueryInterface<iDebugHelper> (visculler));
     if (dbghelp)
       dbghelp->Dump (G3D);
   }
@@ -1843,7 +1843,7 @@ void csBugPlug::DebugCmd (const char* cmd)
     if (comp == 0)
     {
       csRef<iPluginManager> plugmgr = 
-	CS_QUERY_REGISTRY (object_reg, iPluginManager);
+	csQueryRegistry<iPluginManager> (object_reg);
       CS_ASSERT (plugmgr);
       csRef<iBase> comp =
 	CS_QUERY_PLUGIN_CLASS (plugmgr, cmdstr, iBase);
@@ -1858,7 +1858,7 @@ void csBugPlug::DebugCmd (const char* cmd)
     else
     {
       csRef<iDebugHelper> dbghelp = 
-	SCF_QUERY_INTERFACE (comp, iDebugHelper);
+	scfQueryInterface<iDebugHelper> (comp);
       if (!dbghelp)
       {
 	Report (CS_REPORTER_SEVERITY_NOTIFY,
@@ -2215,7 +2215,7 @@ void csBugPlug::Dump (int indent, iMeshWrapper* mesh)
   }
   else
   {
-    csRef<iFactory> fact (SCF_QUERY_INTERFACE (obj, iFactory));
+    csRef<iFactory> fact (scfQueryInterface<iFactory> (obj));
     if (fact)
       Report (CS_REPORTER_SEVERITY_DEBUG, "%*s        Plugin '%s'",
   	  indent, "",

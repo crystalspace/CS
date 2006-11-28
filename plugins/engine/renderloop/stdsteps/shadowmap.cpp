@@ -186,14 +186,14 @@ csShadowmapRenderStep::csShadowmapRenderStep (
   iObjectRegistry* object_reg) :
   scfImplementationType (this)
 {
-  g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+  g3d = csQueryRegistry<iGraphics3D> (object_reg);
   csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg, 
     "crystalspace.shared.stringset", iStringSet);
   csShadowmapRenderStep::object_reg = object_reg;
   bones_name = strings->Request("bones");
   shader_name = strings->Request("distance_animated");
   depth_cubemap_name = strings->Request("cubemap depth");
-  engine = CS_QUERY_REGISTRY (object_reg, iEngine);
+  engine = csQueryRegistry<iEngine> (object_reg);
   context = 0;
   defShader = 0;
 

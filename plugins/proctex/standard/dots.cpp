@@ -94,7 +94,7 @@ csPtr<iBase> csPtDotsLoader::Parse (iDocumentNode* /*node*/,
   	object_reg, CLASSID_DOTSTYPE);
   if (!type) return 0;
   csRef<iSyntaxService> synldr = 
-    CS_QUERY_REGISTRY (object_reg, iSyntaxService);
+    csQueryRegistry<iSyntaxService> (object_reg);
 
   csRef<iTextureFactory> dotsFact = type->NewFactory();
 
@@ -102,7 +102,7 @@ csPtr<iBase> csPtDotsLoader::Parse (iDocumentNode* /*node*/,
   if (context)
   {
     ctx = csPtr<iTextureLoaderContext>
-      (SCF_QUERY_INTERFACE (context, iTextureLoaderContext));
+      (scfQueryInterface<iTextureLoaderContext> (context));
 
     if (ctx)
     {
@@ -116,7 +116,7 @@ csPtr<iBase> csPtDotsLoader::Parse (iDocumentNode* /*node*/,
   }
   csRef<iTextureWrapper> tex = dotsFact->Generate();
 
-  csRef<iGraphics3D> G3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+  csRef<iGraphics3D> G3D = csQueryRegistry<iGraphics3D> (object_reg);
   if (!G3D) return 0;
   csRef<iTextureManager> tm = G3D->GetTextureManager();
   if (!tm) return 0;

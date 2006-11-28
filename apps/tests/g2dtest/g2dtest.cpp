@@ -208,7 +208,7 @@ G2DTestSystemDriver::G2DTestSystemDriver (int argc, char* argv[])
     exit (0);
   }
 
-  csRef<iEventQueue> q (CS_QUERY_REGISTRY(object_reg, iEventQueue));
+  csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (object_reg));
   if (q != 0)
   {
     EventOutlet = q->GetEventOutlet();
@@ -337,7 +337,7 @@ void G2DTestSystemDriver::SetupFrame ()
 	  fontCourier = GetFont (CSFONT_COURIER);
 	  fontSmall = GetFont (CSFONT_SMALL);
 	  {
-	    csRef<iVFS> vfs = CS_QUERY_REGISTRY (object_reg, iVFS);
+	    csRef<iVFS> vfs = csQueryRegistry<iVFS> (object_reg);
 	    csRef<iImageIO> iio = CS_QUERY_REGISTRY (object_reg,
 	      iImageIO);
 	    if (vfs.IsValid () && iio.IsValid ())
@@ -1685,11 +1685,11 @@ int main (int argc, char *argv[])
   }
 
   csRef<iPluginManager> plugin_mgr (
-  	CS_QUERY_REGISTRY (object_reg, iPluginManager));
+  	csQueryRegistry<iPluginManager> (object_reg));
   csRef<iCommandLineParser> cmdline (CS_QUERY_REGISTRY (object_reg,
   	iCommandLineParser));
 
-  System.myG3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+  System.myG3D = csQueryRegistry<iGraphics3D> (object_reg);
   // Now load the renderer plugin
   if (!System.myG3D)
   {
@@ -1733,10 +1733,10 @@ int main (int argc, char *argv[])
     return -1;
   }
   
-  System.cursorPlugin = CS_QUERY_REGISTRY(object_reg, iCursor);
+  System.cursorPlugin = csQueryRegistry<iCursor> (object_reg);
   if (System.cursorPlugin)
   {
-    csRef<iConfigManager> cfg (CS_QUERY_REGISTRY (object_reg, iConfigManager));
+    csRef<iConfigManager> cfg (csQueryRegistry<iConfigManager> (object_reg));
     if (System.cursorPlugin->Setup (System.myG3D))
     {
       System.cursorPlugin->ParseConfigFile ((iConfigManager*)cfg);

@@ -74,8 +74,8 @@ csGeneralFactoryLoader::~csGeneralFactoryLoader ()
 bool csGeneralFactoryLoader::Initialize (iObjectRegistry* object_reg)
 {
   csGeneralFactoryLoader::object_reg = object_reg;
-  reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
-  synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
+  reporter = csQueryRegistry<iReporter> (object_reg);
+  synldr = csQueryRegistry<iSyntaxService> (object_reg);
 
   InitTokenTable (xmltokens);
   return true;
@@ -287,7 +287,7 @@ csPtr<iBase> csGeneralFactoryLoader::Parse (iDocumentNode* node,
   csRef<iGeneralFactoryState> state;
 
   fact = type->NewFactory ();
-  state = SCF_QUERY_INTERFACE (fact, iGeneralFactoryState);
+  state = scfQueryInterface<iGeneralFactoryState> (fact);
 
   bool num_tri_given = false;
   bool num_vt_given = false;
@@ -771,8 +771,8 @@ csGeneralFactorySaver::~csGeneralFactorySaver ()
 bool csGeneralFactorySaver::Initialize (iObjectRegistry* object_reg)
 {
   csGeneralFactorySaver::object_reg = object_reg;
-  reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
-  synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
+  reporter = csQueryRegistry<iReporter> (object_reg);
+  synldr = csQueryRegistry<iSyntaxService> (object_reg);
   return true;
 }
 
@@ -833,9 +833,9 @@ bool csGeneralFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent,
   if (obj)
   {
     csRef<iGeneralFactoryState> gfact = 
-      SCF_QUERY_INTERFACE (obj, iGeneralFactoryState);
+      scfQueryInterface<iGeneralFactoryState> (obj);
     csRef<iMeshObjectFactory> meshfact = 
-      SCF_QUERY_INTERFACE (obj, iMeshObjectFactory);
+      scfQueryInterface<iMeshObjectFactory> (obj);
     if (!gfact) return false;
     if (!meshfact) return false;
 
@@ -1034,8 +1034,8 @@ csGeneralMeshLoader::~csGeneralMeshLoader ()
 bool csGeneralMeshLoader::Initialize (iObjectRegistry* object_reg)
 {
   csGeneralMeshLoader::object_reg = object_reg;
-  reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
-  synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
+  reporter = csQueryRegistry<iReporter> (object_reg);
+  synldr = csQueryRegistry<iSyntaxService> (object_reg);
 
   InitTokenTable (xmltokens);
   return true;
@@ -1335,7 +1335,7 @@ csPtr<iBase> csGeneralMeshLoader::Parse (iDocumentNode* node,
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
 	  CS_ASSERT (mesh != 0);
-          meshstate = SCF_QUERY_INTERFACE (mesh, iGeneralMeshState);
+          meshstate = scfQueryInterface<iGeneralMeshState> (mesh);
 	  if (!meshstate)
 	  {
       	    synldr->ReportError (
@@ -1401,8 +1401,8 @@ csGeneralMeshSaver::~csGeneralMeshSaver ()
 bool csGeneralMeshSaver::Initialize (iObjectRegistry* object_reg)
 {
   csGeneralMeshSaver::object_reg = object_reg;
-  reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
-  synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
+  reporter = csQueryRegistry<iReporter> (object_reg);
+  synldr = csQueryRegistry<iSyntaxService> (object_reg);
   return true;
 }
 

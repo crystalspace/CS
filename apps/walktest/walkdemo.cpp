@@ -452,7 +452,7 @@ void WalkTest::add_bot (float size, iSector* where, csVector3 const& pos,
   botWrapper->GetMovable ()->SetTransform (m);
   
   botWrapper->GetMovable ()->UpdateMove ();
-  csRef<iSprite3DState> state (SCF_QUERY_INTERFACE (botmesh, iSprite3DState));
+  csRef<iSprite3DState> state (scfQueryInterface<iSprite3DState> (botmesh));
   state->SetAction ("default");
   
   Bot* bot = new Bot (Sys->view->GetEngine(), botWrapper);

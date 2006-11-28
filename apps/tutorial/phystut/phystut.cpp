@@ -206,7 +206,7 @@ bool Simple::HandleEvent (iEvent& ev)
       }
       else if (csKeyEventHelper::GetCookedCode (&ev) == CSKEY_ESC)
       {
-	csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
+	csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (object_reg));
 	if (q) q->GetEventOutlet()->Broadcast (csevQuit (object_reg));
 	return true;
       }
@@ -267,7 +267,7 @@ bool Simple::Initialize ()
   }
 
   // Checking for choosen engine
-  csRef<iCommandLineParser> clp = CS_QUERY_REGISTRY (object_reg, iCommandLineParser);
+  csRef<iCommandLineParser> clp = csQueryRegistry<iCommandLineParser> (object_reg);
   phys_engine_name = clp->GetOption ("phys_engine");
   if (phys_engine_name == "bullet")
   {
@@ -293,7 +293,7 @@ bool Simple::Initialize ()
   }
 
   // The virtual clock.
-  vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
+  vc = csQueryRegistry<iVirtualClock> (object_reg);
   if (vc == 0)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -303,7 +303,7 @@ bool Simple::Initialize ()
   }
 
   // Find the pointer to engine plugin
-  engine = CS_QUERY_REGISTRY (object_reg, iEngine);
+  engine = csQueryRegistry<iEngine> (object_reg);
   if (engine == 0)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -312,7 +312,7 @@ bool Simple::Initialize ()
     return false;
   }
 
-  loader = CS_QUERY_REGISTRY (object_reg, iLoader);
+  loader = csQueryRegistry<iLoader> (object_reg);
   if (loader == 0)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -321,7 +321,7 @@ bool Simple::Initialize ()
     return false;
   }
 
-  g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+  g3d = csQueryRegistry<iGraphics3D> (object_reg);
   if (g3d == 0)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -330,7 +330,7 @@ bool Simple::Initialize ()
     return false;
   }
 
-  g2d = CS_QUERY_REGISTRY (object_reg, iGraphics2D);
+  g2d = csQueryRegistry<iGraphics2D> (object_reg);
   if (g2d == 0)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -339,7 +339,7 @@ bool Simple::Initialize ()
     return false;
   }
 
-  kbd = CS_QUERY_REGISTRY (object_reg, iKeyboardDriver);
+  kbd = csQueryRegistry<iKeyboardDriver> (object_reg);
   if (kbd == 0)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,

@@ -952,7 +952,7 @@ bool csTerrainObject::ReadCDLODFromCache ()
     return false;
   }
 
-  csRef<iEngine> engine = CS_QUERY_REGISTRY (object_reg, iEngine);
+  csRef<iEngine> engine = csQueryRegistry<iEngine> (object_reg);
   if (!engine) return false;
   iCacheManager* cache_mgr = engine->GetCacheManager ();
 
@@ -1010,7 +1010,7 @@ bool csTerrainObject::ReadCDLODFromCache ()
 
 void csTerrainObject::WriteCDLODToCache ()
 {
-  csRef<iEngine> engine = CS_QUERY_REGISTRY (object_reg, iEngine);
+  csRef<iEngine> engine = csQueryRegistry<iEngine> (object_reg);
   if (!engine) return;
   iCacheManager* cache_mgr = engine->GetCacheManager ();
   if (!cache_mgr) return;
@@ -1018,7 +1018,7 @@ void csTerrainObject::WriteCDLODToCache ()
   char* cachename = GenerateCacheName ();
 
   csMemFile m;
-  csRef<iFile> mf = SCF_QUERY_INTERFACE ((&m), iFile);
+  csRef<iFile> mf = scfQueryInterface<iFile> ((&m));
 
   char header[5];
   strcpy (header, CDLODMAGIC);
@@ -1770,7 +1770,7 @@ void csTerrainObject::CastShadows (iMovable* movable, iFrustumView* fview)
 {
   SetupObject ();
   iBase* b = (iBase *)fview->GetUserdata ();
-  csRef<iLightingProcessInfo> lpi = SCF_QUERY_INTERFACE(b,iLightingProcessInfo);
+  csRef<iLightingProcessInfo> lpi = scfQueryInterface<iLightingProcessInfo> (b);
   CS_ASSERT (lpi != 0);
 
   iLight* li = lpi->GetLight ();
@@ -1976,7 +1976,7 @@ bool csTerrainObject::SetCurrentMaterialAlphaMaps (
   hm = ((float)(materialMapH - 1)) / (region.MaxY() - region.MinY());
 
   csRef<iGraphics3D> g3d = 
-    CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+    csQueryRegistry<iGraphics3D> (object_reg);
   csRef<iStringSet> strings = 
     CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg,
     "crystalspace.shared.stringset", iStringSet);
@@ -2190,7 +2190,7 @@ bool csTerrainObject::SetCurrentMaterialMap (const csArray<char>& data,
   hm = ((float)(materialMapH - 1)) / (region.MaxY() - region.MinY());
 
   csRef<iGraphics3D> g3d = 
-    CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+    csQueryRegistry<iGraphics3D> (object_reg);
   csRef<iStringSet> strings = 
     CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg,
     "crystalspace.shared.stringset", iStringSet);

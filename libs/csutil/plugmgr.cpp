@@ -112,7 +112,7 @@ void csPluginManager::QueryOptions (iComponent *obj)
   csRef<iCommandLineParser> CommandLine (CS_QUERY_REGISTRY (object_reg,
   	iCommandLineParser));
 
-  csRef<iPluginConfig> Config (SCF_QUERY_INTERFACE (obj, iPluginConfig));
+  csRef<iPluginConfig> Config (scfQueryInterface<iPluginConfig> (obj));
   if (Config)
   {
     size_t on = OptionList.Length ();
@@ -290,7 +290,7 @@ bool csPluginManager::UnloadPlugin (iComponent* obj)
   if (idx == csArrayItemNotFound)
     return false;
 
-  csRef<iPluginConfig> config (SCF_QUERY_INTERFACE (obj, iPluginConfig));
+  csRef<iPluginConfig> config (scfQueryInterface<iPluginConfig> (obj));
   if (config)
   {
     for (size_t i = OptionList.Length (); i > 0; i--)

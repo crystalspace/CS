@@ -145,7 +145,7 @@ void IsoTest::SetupFrame ()
     }
     // update animation state
     csRef<iGeneralMeshState> spstate (
-      SCF_QUERY_INTERFACE (actor->GetMeshObject (), iGeneralMeshState));
+      scfQueryInterface<iGeneralMeshState> (actor->GetMeshObject ()));
     csRef<iGenMeshSkeletonControlState> animcontrol (
       SCF_QUERY_INTERFACE (spstate->GetAnimationControl (), 
       iGenMeshSkeletonControlState));
@@ -236,7 +236,7 @@ bool IsoTest::HandleEvent (iEvent& ev)
     utf32_char c = csKeyEventHelper::GetCookedCode (&ev);
     if (c == CSKEY_ESC)
     {
-      csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
+      csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (object_reg));
       if (q)
 	q->GetEventOutlet()->Broadcast (csevQuit (object_reg));
       return true;
@@ -301,7 +301,7 @@ bool IsoTest::LoadMap ()
   engine->SetLightingCacheMode (0);
 
   // Set VFS current directory to the level we want to load.
-  csRef<iVFS> VFS (CS_QUERY_REGISTRY (object_reg, iVFS));
+  csRef<iVFS> VFS (csQueryRegistry<iVFS> (object_reg));
   VFS->ChDir ("/lev/isomap");
   // Load the level file which is called 'world'.
   if (!loader->LoadMapFile ("world"))
@@ -355,7 +355,7 @@ bool IsoTest::LoadMap ()
 
 bool IsoTest::CreateActor ()
 {
-  csRef<iVFS> vfs (CS_QUERY_REGISTRY (object_reg, iVFS));
+  csRef<iVFS> vfs (csQueryRegistry<iVFS> (object_reg));
   vfs->PushDir ();
   vfs->ChDir ("/lib/kwartz");
   if (!loader->LoadLibraryFile ("kwartz.lib"))
@@ -377,7 +377,7 @@ bool IsoTest::CreateActor ()
     imeshfact, "MySprite", room, csVector3 (-3, 1, 3));
   actor->GetMovable ()->UpdateMove ();
   csRef<iGeneralMeshState> spstate (
-    SCF_QUERY_INTERFACE (actor->GetMeshObject (), iGeneralMeshState));
+    scfQueryInterface<iGeneralMeshState> (actor->GetMeshObject ()));
   csRef<iGenMeshSkeletonControlState> animcontrol (
     SCF_QUERY_INTERFACE (spstate->GetAnimationControl (), 
     iGenMeshSkeletonControlState));
@@ -445,7 +445,7 @@ bool IsoTest::Initialize ()
   }
 
   // The virtual clock.
-  vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
+  vc = csQueryRegistry<iVirtualClock> (object_reg);
   if (!vc)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -455,7 +455,7 @@ bool IsoTest::Initialize ()
   }
 
   // Find the pointer to engine plugin
-  engine = CS_QUERY_REGISTRY (object_reg, iEngine);
+  engine = csQueryRegistry<iEngine> (object_reg);
   if (!engine)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -464,7 +464,7 @@ bool IsoTest::Initialize ()
     return false;
   }
 
-  loader = CS_QUERY_REGISTRY (object_reg, iLoader);
+  loader = csQueryRegistry<iLoader> (object_reg);
   if (!loader)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -473,7 +473,7 @@ bool IsoTest::Initialize ()
     return false;
   }
 
-  g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+  g3d = csQueryRegistry<iGraphics3D> (object_reg);
   if (!g3d)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -482,7 +482,7 @@ bool IsoTest::Initialize ()
     return false;
   }
 
-  kbd = CS_QUERY_REGISTRY (object_reg, iKeyboardDriver);
+  kbd = csQueryRegistry<iKeyboardDriver> (object_reg);
   if (!kbd)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,

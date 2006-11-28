@@ -393,7 +393,7 @@ void csGraphics2DGLCommon::OpenDriverDB (const char* phase)
   int driverDBprio = config->GetInt ("Video.OpenGL.DriverDB.Priority",
     iConfigManager::ConfigPriorityPlugin + 10);
 
-  csRef<iVFS> vfs = CS_QUERY_REGISTRY (object_reg, iVFS);
+  csRef<iVFS> vfs = csQueryRegistry<iVFS> (object_reg);
   csRef<iFile> dbfile = vfs->Open (driverDB, VFS_FILE_READ);
   if (!dbfile)
   {
@@ -826,7 +826,7 @@ bool csGraphics2DGLCommon::DebugCommand (const char* cmdstr)
 
   if (strcasecmp (cmd, "dump_fontcache") == 0)
   {
-    csRef<iImageIO> imgsaver = CS_QUERY_REGISTRY (object_reg, iImageIO);
+    csRef<iImageIO> imgsaver = csQueryRegistry<iImageIO> (object_reg);
     if (!imgsaver)
     {
       Report (CS_REPORTER_SEVERITY_WARNING,
@@ -834,7 +834,7 @@ bool csGraphics2DGLCommon::DebugCommand (const char* cmdstr)
       return false;
     }
 
-    csRef<iVFS> vfs = CS_QUERY_REGISTRY (object_reg, iVFS);
+    csRef<iVFS> vfs = csQueryRegistry<iVFS> (object_reg);
     if (!vfs)
     {
       Report (CS_REPORTER_SEVERITY_WARNING,

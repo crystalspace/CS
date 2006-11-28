@@ -265,7 +265,7 @@ void csPortalRenderNode::PostMeshCollect (iRenderView* rview)
 csPortalRenderNodeFactory::csPortalRenderNodeFactory (
   iObjectRegistry* object_reg)
 {
-  shaderManager = CS_QUERY_REGISTRY (object_reg, iShaderManager);
+  shaderManager = csQueryRegistry<iShaderManager> (object_reg);
   fog_shader = shaderManager->GetShader ("std_lighting_portal");
 
   csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg,

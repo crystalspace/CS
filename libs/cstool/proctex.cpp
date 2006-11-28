@@ -84,7 +84,7 @@ public:
 
 bool csProcTexEventHandler::HandleEvent (iEvent& event)
 {
-  csRef<iVirtualClock> vc (CS_QUERY_REGISTRY (object_reg, iVirtualClock));
+  csRef<iVirtualClock> vc (csQueryRegistry<iVirtualClock> (object_reg));
   csTicks elapsed_time, current_time;
   elapsed_time = vc->GetElapsedTicks ();
   current_time = vc->GetCurrentTicks ();
@@ -152,7 +152,7 @@ iEventHandler* csProcTexture::SetupProcEventHandler (
   	"crystalspace.proctex.eventhandler", iEventHandler);
   if (proceh) return proceh;
   proceh = csPtr<iEventHandler> (new csProcTexEventHandler (object_reg));
-  csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
+  csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (object_reg));
   if (q != 0)
   {
     q->RegisterListener (proceh, csevPreProcess(object_reg));
@@ -189,10 +189,10 @@ bool csProcTexture::Initialize (iObjectRegistry* object_reg)
   if (!proc_image.IsValid())
     proc_image.AttachNew (new csImageMemory (mat_w, mat_h));
 
-  g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
-  g2d = CS_QUERY_REGISTRY (object_reg, iGraphics2D);
+  g3d = csQueryRegistry<iGraphics3D> (object_reg);
+  g2d = csQueryRegistry<iGraphics2D> (object_reg);
 
-  csRef<iEngine> engine (CS_QUERY_REGISTRY (object_reg, iEngine));
+  csRef<iEngine> engine (csQueryRegistry<iEngine> (object_reg));
   tex = engine->GetTextureList ()->NewTexture (proc_image);
   proc_image = 0;
   if (!tex)

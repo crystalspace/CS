@@ -34,32 +34,32 @@ Simple::~Simple ()
 bool Simple::Setup ()
 {
   // The virtual clock.
-  vc = CS_QUERY_REGISTRY (GetObjectRegistry (), iVirtualClock);
+  vc = csQueryRegistry<iVirtualClock> (GetObjectRegistry ());
   if (!vc)
     return ReportError("Can't find the virtual clock!");
 
   // Find the pointer to engine plugin
-  engine = CS_QUERY_REGISTRY (GetObjectRegistry (), iEngine);
+  engine = csQueryRegistry<iEngine> (GetObjectRegistry ());
   if (!engine)
     return ReportError("No iEngine plugin!");
 
-  loader = CS_QUERY_REGISTRY (GetObjectRegistry (), iLoader);
+  loader = csQueryRegistry<iLoader> (GetObjectRegistry ());
   if (!loader)
     return ReportError("No iLoader plugin!");
 
-  kbd = CS_QUERY_REGISTRY (GetObjectRegistry (), iKeyboardDriver);
+  kbd = csQueryRegistry<iKeyboardDriver> (GetObjectRegistry ());
   if (!kbd)
     return ReportError("No iKeyboardDriver plugin!");
 
-  g3d = CS_QUERY_REGISTRY (GetObjectRegistry (), iGraphics3D);
+  g3d = csQueryRegistry<iGraphics3D> (GetObjectRegistry ());
   if (!g3d)
     return ReportError("No iGraphics3D plugin!");
 
-  vfs = CS_QUERY_REGISTRY(GetObjectRegistry(), iVFS);
+  vfs = csQueryRegistry<iVFS> (GetObjectRegistry());
   if (!vfs) 
     return ReportError("Failed to locate Virtual FileSystem!");
 
-  cegui = CS_QUERY_REGISTRY(GetObjectRegistry(), iCEGUI);
+  cegui = csQueryRegistry<iCEGUI> (GetObjectRegistry());
   if (!cegui) 
     return ReportError("Failed to locate CEGUI plugin");
 
@@ -164,7 +164,7 @@ bool Simple::HandleEvent (iEvent& ev)
   else if ((ev.Name == csevKeyboardDown(object_reg)) &&
     (csKeyEventHelper::GetCookedCode (&ev) == CSKEY_ESC))
   {
-    csRef<iEventQueue> q (CS_QUERY_REGISTRY (GetObjectRegistry (), iEventQueue));
+    csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (GetObjectRegistry ()));
     if (q)
       q->GetEventOutlet()->Broadcast (csevQuit(object_reg));
     res = true;
