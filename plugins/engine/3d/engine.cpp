@@ -1020,7 +1020,6 @@ void csEngine::ForceRelight (iLight* light, iRegion* region)
 
 void csEngine::RemoveLight (iLight* light)
 {
-
   int sn;
   int num_meshes = meshes.GetCount ();
 
@@ -1031,7 +1030,8 @@ void csEngine::RemoveLight (iLight* light)
     if (linfo)
       linfo->LightDisconnect (light);
   }
-  light->GetSector ()->GetLights ()->Remove (light);
+  if (light->GetSector ())
+    light->GetSector ()->GetLights ()->Remove (light);
 }
 
 void csEngine::SetVFSCacheManager (const char* vfspath)
