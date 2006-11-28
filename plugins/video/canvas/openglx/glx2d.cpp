@@ -80,7 +80,10 @@ bool csGraphics2DGLX::Initialize (iObjectRegistry *object_reg)
   bool mesaForceS3TCEnable = 
     config->GetBool ("Video.OpenGL.MesaForceS3TCEnable", false);
   if (mesaForceS3TCEnable && !getenv ("force_s3tc_enable"))
-    putenv ("force_s3tc_enable=true");
+  {
+    //putenv ("force_s3tc_enable=true");
+    setenv ("force_s3tc_enable", "true", 1);
+  }
 
   csRef<iPluginManager> plugin_mgr (
   	csQueryRegistry<iPluginManager> (object_reg));

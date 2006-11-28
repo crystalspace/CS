@@ -29,6 +29,16 @@ chronological order.
 	  Creative Commons by-nc to by-sa which is a less restrictive
 	  license and allows commercial usage. This is done with permission
 	  from Anders Wisur.
+	- Jorrit fixed a bug in the glx2d canvas. It used 'putenv' to
+	  change the force_s3tc_enable environment variable. However
+	  'putenv' directly puts the given input string into the environment
+	  (it doesn't make a copy). So when later the glx2d canvas is
+	  unloaded the environment still points to that string (which
+	  is now unloaded and pointing to invalid memory). Replaced the
+	  'putenv' with a 'setenv'. 'setenv' makes an actual copy of the
+	  string so when the glx2d plugin is unloaded the environment
+	  is not corrupted. This fixes a problem in celstart which would
+	  crash after CS is destroyed and created again.
 27-Nov-2006
 	- Jorrit reverted a threading change (revision 25929) because
 	  it caused programs to hang on mingw and crash on linux.
