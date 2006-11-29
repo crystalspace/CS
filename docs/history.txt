@@ -23,6 +23,7 @@ chronological order.
 	  - Added the iterator declaration for some more useful classes:
 	    - iVisibilityObjectIterator, iLightIterator, iSectorIterator,
               iMeshWrapperIterator.
+	- Vincent fixed ref-tracker enabled debug build by adding a header.
 28-Nov-2006
 	- Andrew Dai fixed a bug that's been lurking in csColliderActor::Move
 	  from the beginning of time. This occasionally allowed actors to pass
