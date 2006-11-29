@@ -902,6 +902,7 @@ namespace CS
 }
 %template(TriangleInt) CS::TriangleT<int >;
 %warnfilter(302) TriangleT; // redefined
+%ignore CS::TriangleT::operator[];
 %include "csgeom/tri.h"
 
 %ignore csRect::AddAdjanced; // Deprecated misspelling.
