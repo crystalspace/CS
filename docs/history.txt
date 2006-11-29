@@ -6,6 +6,17 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+29-Nov-2006
+	- caedes made the following changes to swig interface files:
+	  - Added iEngineSequenceManager, iDocumentAttribute, 
+	    iDocumentAttributeIterator, iDocumentNode and 
+	    iDocumentNodeIterator to wrapped interfaces.
+	  - Added an (empty) ITERATOR_FUNTIONS swig macro in cspace.i so
+	    each language can redefine it for implementing language specific
+	    iterator protocol.
+	  - Implemented the ITERATOR_FUNTIONS swig macro for python.
+	  - Added iterator functions for iDocumentAttributeIterator and
+	    iDocumentNodeIterator.
 28-Nov-2006
 	- Andrew Dai fixed a bug that's been lurking in csColliderActor::Move
 	  from the beginning of time. This occasionally allowed actors to pass
