@@ -297,6 +297,7 @@ class csColor(_object):
     def Set(*args): return _cspace.csColor_Set(*args)
     def Clamp(*args): return _cspace.csColor_Clamp(*args)
     def ClampDown(*args): return _cspace.csColor_ClampDown(*args)
+    def IsBlack(*args): return _cspace.csColor_IsBlack(*args)
     def assign(*args): return _cspace.csColor_assign(*args)
     def __iadd__(*args): return _cspace.csColor___iadd__(*args)
     def __isub__(*args): return _cspace.csColor___isub__(*args)
@@ -7513,6 +7514,7 @@ iObjectRegistryIterator_swigregister = _cspace.iObjectRegistryIterator_swigregis
 iObjectRegistryIterator_swigregister(iObjectRegistryIterator)
 
 csQueryRegistryTag = _cspace.csQueryRegistryTag
+CS_QUERY_REGISTRY_TAG_is_deprecated = _cspace.CS_QUERY_REGISTRY_TAG_is_deprecated
 class iVirtualClock(iBase):
     __swig_setmethods__ = {}
     for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
