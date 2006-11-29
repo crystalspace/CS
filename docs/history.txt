@@ -20,6 +20,9 @@ chronological order.
 	  - Added %ignore for CS::TriangleT [] operator so swig doesnt emit
 	    a warning for it.
 	  - Added %extend for csTriangle implementing [] notation in python.
+	  - Added the iterator declaration for some more useful classes:
+	    - iVisibilityObjectIterator, iLightIterator, iSectorIterator,
+              iMeshWrapperIterator.
 28-Nov-2006
 	- Andrew Dai fixed a bug that's been lurking in csColliderActor::Move
 	  from the beginning of time. This occasionally allowed actors to pass

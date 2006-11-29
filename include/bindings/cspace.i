@@ -1063,6 +1063,19 @@ iArrayChangeElements<csShaderVariable * >;
 %include "iengine/portal.h"
 %include "iengine/portalcontainer.h"
 
+%extend iVisibilityObjectIterator {
+  ITERATOR_FUNCTIONS(iVisibilityObjectIterator)
+}
+%extend iLightIterator {
+  ITERATOR_FUNCTIONS(iLightIterator)
+}
+%extend iSectorIterator {
+  ITERATOR_FUNCTIONS(iSectorIterator)
+}
+%extend iMeshWrapperIterator {
+  ITERATOR_FUNCTIONS(iMeshWrapperIterator)
+}
+
 #ifndef CS_SWIG_PUBLISH_IGENERAL_FACTORY_STATE_ARRAYS
 %ignore iGeneralFactoryState::GetVertices;
 %ignore iGeneralFactoryState::GetTexels;
