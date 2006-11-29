@@ -36,6 +36,11 @@
 CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
 {
 
+CS_LEAKGUARD_IMPLEMENT (csReplacerDocumentNode);
+CS_LEAKGUARD_IMPLEMENT (csReplacerDocumentNodeIterator);
+CS_LEAKGUARD_IMPLEMENT (csReplacerDocumentAttributeIterator);
+CS_LEAKGUARD_IMPLEMENT (csReplacerDocumentAttribute);
+
 csReplacerDocumentNode::csReplacerDocumentNode (iDocumentNode* wrappedNode,
   csReplacerDocumentNode* parent, csReplacerDocumentNodeFactory* shared, 
   Substitutions* subst) : scfImplementationType (this), 

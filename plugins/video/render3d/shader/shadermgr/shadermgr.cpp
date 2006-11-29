@@ -55,6 +55,8 @@ CS_IMPLEMENT_PLUGIN
 CS_PLUGIN_NAMESPACE_BEGIN(ShaderManager)
 {
 
+CS_LEAKGUARD_IMPLEMENT (csNullShader);
+
 SCF_IMPLEMENT_FACTORY (csShaderManager)
 
 void csNullShader::SelfDestruct ()
