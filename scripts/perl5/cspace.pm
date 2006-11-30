@@ -12972,6 +12972,7 @@ sub DESTROY {
     }
 }
 
+*scfGetVersion = *cspacec::iDocumentAttributeIterator_scfGetVersion;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -13012,6 +13013,7 @@ sub DESTROY {
     }
 }
 
+*scfGetVersion = *cspacec::iDocumentAttribute_scfGetVersion;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -13045,6 +13047,7 @@ sub DESTROY {
     }
 }
 
+*scfGetVersion = *cspacec::iDocumentNodeIterator_scfGetVersion;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -13102,6 +13105,7 @@ sub DESTROY {
     }
 }
 
+*scfGetVersion = *cspacec::iDocumentNode_scfGetVersion;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -16571,6 +16575,7 @@ sub DESTROY {
     }
 }
 
+*scfGetVersion = *cspacec::iEngineSequenceManager_scfGetVersion;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
