@@ -178,8 +178,8 @@ void csLightIterRenderStep::Init ()
     trw_inv_name = strings->Request ("light 0 transform inverse world");
     CS::ShaderVarName lightcountname (strings, "light count");
 
-    shadermgr = 
-    	csQueryRegistry<iShaderManager> (object_reg);
+    shadermgr = csQueryRegistry<iShaderManager> (object_reg);
+    lightmgr = csQueryRegistry<iLightManager> (object_reg);
 
     shvar_light_0_position = shadermgr->GetVariable (posname);
     if (!shvar_light_0_position)
@@ -292,14 +292,18 @@ void csLightIterRenderStep::Perform (iRenderView* rview, iSector* sector,
 
   // @@@ This code is ignoring dynamic lights. Perhaps we need a better
   // way to represent those.
-  iLightList* lights = sector->GetLights();
-  int nlights = lights->GetCount();
+  //iLightList* lights = sector->GetLights();
+  //int nlights = lights->GetCount();
+  const csArray<iLightSectorInfluence*>& lights = lightmgr->GetRelevantLights (sector,
+      -1, false);
+  int nlights = lights.GetSize ();
 
   csArray<iLight*> lightList (16);
 
   while (nlights-- > 0)
   {
-    iLight* light = lights->Get (nlights);
+    //iLight* light = lights->Get (nlights);
+    iLight* light = lights.Get (nlights)->GetLight ();
     const csVector3 lightPos = light->GetMovable ()->GetFullPosition ();
 
     /* 

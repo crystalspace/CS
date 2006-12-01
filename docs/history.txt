@@ -6,6 +6,16 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+1-Dec-2006
+	- Jorrit fixed a bug in the light code: The LSI system
+	  (LightSectorInfluence) ignored lights that were part of a scene
+	  node hierarchy.
+	- Jorrit extended the iLightManager with a GetRelevantLights() that
+	  works on a sector instead of a mesh.
+	- Jorrit fixed the light iterator step so that it uses the
+	  lightmanager now. That way it also catches lights that are part
+	  of a scene node. This fixes lighting for diffuse and related
+	  renderloops for parented lights.
 29-Nov-2006
 	- caedes made the following changes to swig interface files:
 	  - Added iEngineSequenceManager, iDocumentAttribute, 
