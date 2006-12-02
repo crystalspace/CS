@@ -138,7 +138,7 @@ namespace lighter
 
     unsigned int taskI = 0;
     // Calculate lightmapping coordinates
-    LightmapUVLayouter *uvLayout = new SimpleUVLayouter (scene->GetLightmaps());
+    LightmapUVFactoryLayouter *uvLayout = new SimpleUVFactoryLayouter (scene->GetLightmaps());
 
     float factoryProgress = 100.0f / scene->GetFactories ().GetSize ();
     ObjectFactoryHash::GlobalIterator factIt = 

@@ -27,7 +27,7 @@ namespace lighter
 {
 
   // Very simple FactoryLayouter.. just map "flat" on the lightmap
-  csPtr<LightmapUVObjectLayouter> SimpleUVFactoryLayouter::ObjectLayouter (
+  csPtr<LightmapUVObjectLayouter> SimpleUVFactoryLayouter::LayoutFactory (
     const PrimitiveArray& inPrims, ObjectVertexData& vertexData,
     csArray<PrimitiveArray>& outPrims)
   {
