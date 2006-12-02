@@ -21,6 +21,7 @@
 
 #include "primitive.h"
 #include "lightmap.h"
+#include "lightmapuv.h"
 #include "csgeom/transfrm.h"
 
 namespace lighter
@@ -122,7 +123,18 @@ namespace lighter
   protected:
 
     // All faces, untransformed
-    csArray<PrimitiveArray> allPrimitives;
+    csArray<PrimitiveArray> unlayoutedPrimitives;
+    struct LayoutedPrimitives
+    {
+      PrimitiveArray primitives;
+      csRef<LightmapUVLayoutFactory> factory;
+      size_t group;
+
+      LayoutedPrimitives (const PrimitiveArray& primitives, 
+                          LightmapUVLayoutFactory* factory, size_t group) :
+        primitives (primitives), factory (factory), group (group) {}
+    };
+    csArray<LayoutedPrimitives> layoutedPrimitives;
 
     // Vertex data for above faces
     ObjectVertexData vertexData;
@@ -137,9 +149,6 @@ namespace lighter
     // String identifying the saver plugin. Should be set from derived
     // classes
     const char* saverPluginName;
-
-    csPDelArray<LightmapUVLayoutFactory> lightmaplayouts;
-    csArray<size_t> lightmaplayoutGroups;
 
     friend class Object;
   };

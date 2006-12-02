@@ -60,11 +60,11 @@ namespace lighter
 
     PrimitiveArray* primArray;
     if (submeshIndex != csArrayItemNotFound)
-      primArray = &allPrimitives[submeshIndex];
+      primArray = &unlayoutedPrimitives[submeshIndex];
     else
     {
-      submeshIndex = allPrimitives.GetSize();
-      primArray = &allPrimitives.GetExtend (submeshIndex);
+      submeshIndex = unlayoutedPrimitives.GetSize();
+      primArray = &unlayoutedPrimitives.GetExtend (submeshIndex);
       Submesh newSubmesh;
       newSubmesh.sourceSubmesh = submesh;
       submeshes.Put (newSubmesh, submeshIndex);
@@ -87,11 +87,11 @@ namespace lighter
     sm.material = material;
     size_t submesh = submeshes.Get (sm, csArrayItemNotFound);
     if (submesh != csArrayItemNotFound)
-      primArray = &allPrimitives[submesh];
+      primArray = &unlayoutedPrimitives[submesh];
     else
     {
-      submesh = allPrimitives.GetSize();
-      primArray = &allPrimitives.GetExtend (submesh);
+      submesh = unlayoutedPrimitives.GetSize();
+      primArray = &unlayoutedPrimitives.GetExtend (submesh);
       submeshes.Put (sm, submesh);
     }
 
@@ -197,9 +197,9 @@ namespace lighter
     SubmeshFindHelper findHelper (this);
 
     // Save primitives, trianglate on the fly
-    for (uint i = 0; i < allPrimitives.GetSize (); ++i)
+    for (uint i = 0; i < layoutedPrimitives.GetSize (); ++i)
     {
-      const PrimitiveArray& meshPrims = allPrimitives[i];
+      const PrimitiveArray& meshPrims = layoutedPrimitives[i].primitives;
       IntDArray* indexArray = findHelper.FindSubmesh (i);
       indexArray->SetCapacity (meshPrims.GetSize()*3);
       for (size_t p = 0; p < meshPrims.GetSize(); p++)

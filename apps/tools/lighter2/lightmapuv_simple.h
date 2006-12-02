@@ -34,7 +34,7 @@ namespace lighter
       globalLightmaps (lightmaps)
     {}
 
-    virtual LightmapUVLayoutFactory* LayoutFactory (
+    virtual csPtr<LightmapUVLayoutFactory> LayoutFactory (
       const PrimitiveArray& inPrims, ObjectVertexData& vertexData,
       csArray<PrimitiveArray>& outPrims);
   protected:

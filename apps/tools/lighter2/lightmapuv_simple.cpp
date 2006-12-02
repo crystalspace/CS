@@ -27,7 +27,7 @@ namespace lighter
 {
 
   // Very simple layouter.. just map "flat" on the lightmap
-  LightmapUVLayoutFactory* SimpleUVLayouter::LayoutFactory (
+  csPtr<LightmapUVLayoutFactory> SimpleUVLayouter::LayoutFactory (
     const PrimitiveArray& inPrims, ObjectVertexData& vertexData,
     csArray<PrimitiveArray>& outPrims)
   {
@@ -128,7 +128,7 @@ namespace lighter
       lm->SetSize (newWidth, newHeight);
     }*/
 
-    return newFactory;
+    return csPtr<LightmapUVLayoutFactory> (newFactory);
   }
 
   static int SortPrimByD (const Primitive& prim1, const Primitive& prim2)

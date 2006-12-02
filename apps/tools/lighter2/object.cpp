@@ -41,22 +41,21 @@ namespace lighter
 
   bool ObjectFactory::PrepareLightmapUV (LightmapUVLayouter* uvlayout)
   {
-    size_t oldSize = allPrimitives.GetSize();
+    size_t oldSize = unlayoutedPrimitives.GetSize();
     for (size_t i = 0; i < oldSize; i++)
     {
       csArray<PrimitiveArray> newPrims;
-      LightmapUVLayoutFactory* lightmaplayout = 
-        uvlayout->LayoutFactory (allPrimitives[i], vertexData, newPrims);
+      csRef<LightmapUVLayoutFactory> lightmaplayout = 
+        uvlayout->LayoutFactory (unlayoutedPrimitives[i], vertexData, newPrims);
       if (!lightmaplayout) return false;
 
       for (size_t n = 0; n < newPrims.GetSize(); n++)
       {
-        allPrimitives.Push (newPrims[n]);
-        lightmaplayouts.Push (lightmaplayout);
-        lightmaplayoutGroups.Push (n);
+        layoutedPrimitives.Push (LayoutedPrimitives (newPrims[n],
+          lightmaplayout, n));
       }
     }
-    while (oldSize-- > 0) allPrimitives.DeleteIndexFast (oldSize);
+    unlayoutedPrimitives.DeleteAll();
 
     return true;
   }
@@ -130,9 +129,9 @@ namespace lighter
     vertexData.Transform (transform);
 
     unsigned int i = 0;
-    for(size_t j = 0; j < factory->allPrimitives.GetSize (); ++j)
+    for(size_t j = 0; j < factory->layoutedPrimitives.GetSize (); ++j)
     {
-      PrimitiveArray& factPrims = factory->allPrimitives[j];
+      PrimitiveArray& factPrims = factory->layoutedPrimitives[j].primitives;
       PrimitiveArray& allPrimitives =
         this->allPrimitives.GetExtend (j);
       for (i = 0; i < factPrims.GetSize(); i++)
@@ -148,8 +147,9 @@ namespace lighter
       if (!lightPerVertex)
       {
         // FIXME: probably separate out to allow for better progress display
-        bool res = factory->lightmaplayouts[j]->LayoutUVOnPrimitives (
-          allPrimitives, factory->lightmaplayoutGroups[j], vertexData, 
+        bool res = 
+          factory->layoutedPrimitives[j].factory->LayoutUVOnPrimitives (
+          allPrimitives, factory->layoutedPrimitives[j].group, vertexData, 
           lightmapIDs.GetExtend (j));
         if (!res) return false;
       }

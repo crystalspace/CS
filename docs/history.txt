@@ -10,6 +10,8 @@ chronological order.
 	- Marten rewrote the direct lighting in lighter2 in a way so that
 	  it works better in combination with possible path tracing and/or
 	  photon mapping.
+	- res fixed a bug in lighter2 where data stored in two arrays could
+	  get out of sync.
 1-Dec-2006
 	- Jorrit fixed a bug in the light code: The LSI system
 	  (LightSectorInfluence) ignored lights that were part of a scene

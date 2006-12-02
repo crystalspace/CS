@@ -42,12 +42,12 @@ namespace lighter
      * \param outPrims Output primitives. A number of primitive arrays. All
      *   primitives of a sub-array would fit on a single lightmap.
      */
-    virtual LightmapUVLayoutFactory* LayoutFactory (
+    virtual csPtr<LightmapUVLayoutFactory> LayoutFactory (
       const PrimitiveArray& inPrims, ObjectVertexData& vertexData,
       csArray<PrimitiveArray>& outPrims) = 0;
   };
 
-  class LightmapUVLayoutFactory
+  class LightmapUVLayoutFactory : public csRefCount
   {
   public:
     virtual ~LightmapUVLayoutFactory() {}
