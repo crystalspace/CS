@@ -26,8 +26,8 @@
 
 namespace lighter
 {
-  class LightmapUVLayouter;
-  class LightmapUVLayoutFactory;
+  class LightmapUVFactoryLayouter;
+  class LightmapUVObjectLayouter;
   class Object;
   class Scene;
 
@@ -104,7 +104,7 @@ namespace lighter
   public:
     ObjectFactory ();
 
-    virtual bool PrepareLightmapUV (LightmapUVLayouter* uvlayout);
+    virtual bool PrepareLightmapUV (LightmapUVFactoryLayouter* uvlayout);
 
     // Get a new object
     virtual Object* CreateObject ();
@@ -127,11 +127,11 @@ namespace lighter
     struct LayoutedPrimitives
     {
       PrimitiveArray primitives;
-      csRef<LightmapUVLayoutFactory> factory;
+      csRef<LightmapUVObjectLayouter> factory;
       size_t group;
 
       LayoutedPrimitives (const PrimitiveArray& primitives, 
-                          LightmapUVLayoutFactory* factory, size_t group) :
+                          LightmapUVObjectLayouter* factory, size_t group) :
         primitives (primitives), factory (factory), group (group) {}
     };
     csArray<LayoutedPrimitives> layoutedPrimitives;

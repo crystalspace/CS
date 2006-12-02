@@ -39,13 +39,13 @@ namespace lighter
   {
   }
 
-  bool ObjectFactory::PrepareLightmapUV (LightmapUVLayouter* uvlayout)
+  bool ObjectFactory::PrepareLightmapUV (LightmapUVFactoryLayouter* uvlayout)
   {
     size_t oldSize = unlayoutedPrimitives.GetSize();
     for (size_t i = 0; i < oldSize; i++)
     {
       csArray<PrimitiveArray> newPrims;
-      csRef<LightmapUVLayoutFactory> lightmaplayout = 
+      csRef<LightmapUVObjectLayouter> lightmaplayout = 
         uvlayout->LayoutFactory (unlayoutedPrimitives[i], vertexData, newPrims);
       if (!lightmaplayout) return false;
 

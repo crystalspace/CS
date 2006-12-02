@@ -17,6 +17,8 @@ chronological order.
 	  csEngine::CreatePortal() to actually work. Previously it would 
 	  always create a portal container since the found mesh would be 
 	  stored in the wrong variable.
+	- res changed the names of the lighter2 lightmap layouter classes to 
+	  be less confusing.
 1-Dec-2006
 	- Jorrit fixed a bug in the light code: The LSI system
 	  (LightSectorInfluence) ignored lights that were part of a scene

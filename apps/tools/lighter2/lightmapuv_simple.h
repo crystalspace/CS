@@ -25,20 +25,20 @@
 namespace lighter
 {
 
-  class SimpleUVLayoutFactory;
+  class SimpleUVObjectLayouter;
 
-  class SimpleUVLayouter : public LightmapUVLayouter
+  class SimpleUVFactoryLayouter : public LightmapUVFactoryLayouter
   {
   public:
-    SimpleUVLayouter (LightmapPtrDelArray& lightmaps) : 
+    SimpleUVFactoryLayouter (LightmapPtrDelArray& lightmaps) : 
       globalLightmaps (lightmaps)
     {}
 
-    virtual csPtr<LightmapUVLayoutFactory> LayoutFactory (
+    virtual csPtr<LightmapUVObjectLayouter> LayoutFactory (
       const PrimitiveArray& inPrims, ObjectVertexData& vertexData,
       csArray<PrimitiveArray>& outPrims);
   protected:
-    friend class SimpleUVLayoutFactory;
+    friend class SimpleUVObjectLayouter;
 
     LightmapPtrDelArray& globalLightmaps;
 
@@ -53,17 +53,17 @@ namespace lighter
       BoolDArray &usedVerts, float uscale, float vscale);
   };
 
-  class SimpleUVLayoutFactory : public LightmapUVLayoutFactory
+  class SimpleUVObjectLayouter : public LightmapUVObjectLayouter
   {
   public:
-    SimpleUVLayoutFactory (SimpleUVLayouter* parent) : parent (parent)
+    SimpleUVObjectLayouter (SimpleUVFactoryLayouter* parent) : parent (parent)
     {}
 
     virtual bool LayoutUVOnPrimitives (PrimitiveArray &prims, 
       size_t groupNum, ObjectVertexData& vertexData, uint& lmID);
   protected:
-    friend class SimpleUVLayouter;
-    SimpleUVLayouter* parent;
+    friend class SimpleUVFactoryLayouter;
+    SimpleUVFactoryLayouter* parent;
     csArray<csArray<csArray<size_t> > > coplanarGroups;
 
     void MapComplete (const csArray<csVector2>& sizes, 

@@ -389,7 +389,11 @@ namespace lighter
       
       const char* nodeName = node->GetValue ();
 
-      if (!strcasecmp (nodeName, "meshfact"))
+      if (!strcasecmp (nodeName, "library"))
+      {
+        //SaveSceneLibrary()
+      }
+      else if (!strcasecmp (nodeName, "meshfact"))
       {
         SaveMeshFactoryToDom (node, fileInfo);
       }
