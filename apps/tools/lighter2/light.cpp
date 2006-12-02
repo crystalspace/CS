@@ -61,12 +61,88 @@ namespace lighter
   }
 
 
-  bool VisibilityTester::Unoccluded (Raytracer& rt)
+  //--
+  VisibilityTester::VisibilityTester ()
   {
-    return true;
   }
 
+  void VisibilityTester::SetSegment (const csVector3& start, const csVector3& end)
+  {
+    csVector3 dir = end-start;
+    float d = dir.Norm ();
+
+    SetSegment (start, dir / d, d);
+  }
+
+  void VisibilityTester::SetSegment (const csVector3& start, const csVector3& dir,
+    float maxL)
+  {
+    testRay.origin = start;
+    testRay.direction = dir;
+    testRay.maxLength = maxL - 0.01f;
+  }
+
+  bool VisibilityTester::Unoccluded (Raytracer& rt)
+  {
+    HitPoint hp;
+    return !rt.TraceAnyHit (testRay, hp);
+  }
+
+
+
+  //--
+  PointLight::PointLight ()
+    : Light (true)
+  {
+
+  }
+
+  PointLight::~PointLight ()
+  {
+
+  }
+
+  csColor PointLight::SampleLight (const csVector3& point, const csVector3& n,
+    float u1, float u2, csVector3& lightVec, float& pdf, VisibilityTester& vistest)
+  {
+    lightVec = position - point;
+    float sqD = lightVec.SquaredNorm ();
+    float d = sqrtf (sqD);
+    lightVec /= d;
+
+    pdf = 1;
+
+    vistest.SetSegment (position, -lightVec, d);
+
+    csColor res = color * ComputeAttenuation (sqD);
+
+    return res;
+  }
+
+  csColor PointLight::GetPower () const
+  {
+    return color;
+  }
+
+  void PointLight::SetRadius (float r)
+  {
+    radius = r;
+    //Update bb
+  }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 // Attenuation functions

@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+2-Dec-2006
+	- Marten rewrote the direct lighting in lighter2 in a way so that
+	  it works better in combination with possible path tracing and/or
+	  photon mapping.
 1-Dec-2006
 	- Jorrit fixed a bug in the light code: The LSI system
 	  (LightSectorInfluence) ignored lights that were part of a scene

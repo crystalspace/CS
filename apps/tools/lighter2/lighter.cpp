@@ -210,7 +210,7 @@ namespace lighter
       while (sectIt.HasNext ())
       {
         csRef<Sector> sect = sectIt.Next ();
-        DirectLighting::ShootDirectLighting (sect, 100.0f / scene->GetSectors ().GetSize ());
+        DirectLighting::ShadeDirectLighting (sect, 100.0f / scene->GetSectors ().GetSize ());
       }
     }
     

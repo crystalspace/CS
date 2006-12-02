@@ -68,8 +68,11 @@ namespace lighter
     // All lightsources (old)
     LightOldRefArray allLightsOld;
 
-    // All light sources
-    LightRefArray allLights;
+    // All light sources (no PD lights)
+    LightRefArray allNonPDLights;
+
+    // All PD light sources
+    LightRefArray allPDLights;
 
     // KD-tree of all primitives in sector
     KDTree *kdTree;
@@ -115,7 +118,8 @@ namespace lighter
     LightmapPtrDelArray& GetLightmaps () 
     { return lightmaps; }
 
-    Lightmap* GetLightmap (uint lightmapID, Light_old* light);
+    Lightmap* GetLightmap (uint lightmapID, Light* light);
+
     csArray<LightmapPtrDelArray*> GetAllLightmaps ();
   protected:
     
@@ -126,7 +130,7 @@ namespace lighter
     SectorHash sectors;
 
     LightmapPtrDelArray lightmaps;
-    typedef csHash<LightmapPtrDelArray*, csPtrKey<Light_old> > PDLightmapsHash;
+    typedef csHash<LightmapPtrDelArray*, csPtrKey<Light> > PDLightmapsHash;
     PDLightmapsHash pdLightmaps;
 
     struct LoadedFile

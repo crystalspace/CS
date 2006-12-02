@@ -30,7 +30,6 @@ namespace lighter
   {
     //Setup defaults
     lighterProperties.doDirectLight = true;
-    lighterProperties.doiosity = false;
 
     lmProperties.uTexelPerUnit = 16.0f;
     lmProperties.vTexelPerUnit = 16.0f;

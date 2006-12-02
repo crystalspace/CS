@@ -675,11 +675,26 @@ namespace lighter
 
   csVector3 Primitive::ComputeElementCenter (size_t index) const
   {
-    size_t uWidth = (maxUV.x - minUV.x + 1);
+    size_t u, v;
 
-    size_t u = index % uWidth;
-    size_t v = index / uWidth;
+    GetElementUV (index, u, v);
 
-    return minCoord + uFormVector * (u+0.5f) + vFormVector * (v+0.5f);
+    return minCoord + uFormVector * ((float)u+0.5f) + 
+      vFormVector * ((float)v+0.5f);
   }
+
+  csVector3 Primitive::ComputeNormal (const csVector3& point) const
+  {
+    float lambda, my;
+    ComputeBaryCoords (point, lambda, my);
+
+    csVector3 norm;
+
+    norm = lambda * vertexData.vertexArray[triangle.a].normal + 
+      my * vertexData.vertexArray[triangle.b].normal + 
+      (1 - lambda - my) * vertexData.vertexArray[triangle.c].normal;
+
+    return norm.Unit ();
+  }
+
 }

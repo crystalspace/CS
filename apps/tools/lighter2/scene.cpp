@@ -161,9 +161,10 @@ namespace lighter
     return true;
   }
 
-  Lightmap* Scene::GetLightmap (uint lightmapID, Light_old* light)
+
+  Lightmap* Scene::GetLightmap (uint lightmapID, Light* light)
   {
-    if (!light->pseudoDynamic)
+    if (!light || !light->IsPDLight ())
       return lightmaps[lightmapID];
 
     LightmapPtrDelArray* pdLights = pdLightmaps.Get (light, 0);
@@ -223,6 +224,29 @@ namespace lighter
     {
       iLight *light = lightList->Get (i);
       if (light->GetDynamicType() == CS_LIGHT_DYNAMICTYPE_DYNAMIC) continue;
+
+      bool isPD = light->GetDynamicType() == CS_LIGHT_DYNAMICTYPE_PSEUDO;
+
+      // Atm, only point light
+      csRef<PointLight> intLight;
+      intLight.AttachNew (new PointLight);
+
+      intLight->SetPosition (light->GetMovable ()->GetFullPosition ());
+      intLight->SetColor (isPD ? csColor (1.0f) : light->GetColor ());
+
+      intLight->SetAttenuation (light->GetAttenuationMode (),
+        light->GetAttenuationConstants ());
+      intLight->SetPDLight (isPD);
+      intLight->SetLightID (light->GetLightID());
+
+      intLight->SetRadius (light->GetCutoffDistance ());
+
+      if (isPD)
+        radSector->allPDLights.Push (intLight);
+      else
+        radSector->allNonPDLights.Push (intLight);
+
+#if 0
       csRef<Light_old> radLight; radLight.AttachNew (new Light_old);
       radLight->position = light->GetMovable ()->GetFullPosition ();
       radLight->attenuation = light->GetAttenuationMode ();
@@ -241,6 +265,7 @@ namespace lighter
      
       //add more
       radSector->allLightsOld.Push (radLight);
+#endif
     }
   }
 
@@ -330,11 +355,11 @@ namespace lighter
       PDLightmapsHash::GlobalIterator pdlIt = pdLightmaps.GetIterator();
       while (pdlIt.HasNext())
       {
-        csPtrKey<Light_old> key;
+        csPtrKey<Light> key;
         LightmapPtrDelArray* lm = pdlIt.Next(key);
         if (lm->Get (i)->IsNull()) continue;
 
-        csString lmID (key->lightId.HexString());
+        csString lmID (key->GetLightID ().HexString());
         textureFilename = "lightmaps/";
         textureFilename += i;
         textureFilename += "_";

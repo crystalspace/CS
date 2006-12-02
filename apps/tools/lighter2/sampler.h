@@ -89,7 +89,7 @@ namespace lighter
   {
   public:
     SampleSequenceIndex ()
-      : sequenceIndex (0)
+      : sequenceIndex (1)
     {
     }
 
@@ -117,13 +117,13 @@ namespace lighter
     template<int M>
     SamplerSequence (const SamplerSequence<M>& other)
     {
-      seqIndexHolder = other.seqIndexHolder;
+      seqIndexHolder = other.GetIndexHolder ();
     }
 
     template<int M>
     SamplerSequence<N>& operator= (const SamplerSequence<M>& other)
     {
-      seqIndexHolder = other.seqIndexHolder;
+      seqIndexHolder = other.GetIndexHolder ();
       return *this;
     }
 
@@ -133,6 +133,10 @@ namespace lighter
       HaltonSequence (seqIndexHolder->GetNext (), result);
     }
 
+    csRef<SampleSequenceIndex> GetIndexHolder() const
+    {
+      return seqIndexHolder;
+    }
   private:
     csRef<SampleSequenceIndex> seqIndexHolder;
   };

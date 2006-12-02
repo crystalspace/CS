@@ -67,6 +67,12 @@ namespace lighter
       maxUsedV = csMax (maxUsedV, v);
     }
 
+    // Set a pixel to given color
+    inline void SetAddPixel (uint u, uint v, csColor c)
+    {
+      data[v*width + u] += c;
+    }
+
     // Save the lightmap to given file
     void SaveLightmap (const csString& file);
 
