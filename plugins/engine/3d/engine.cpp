@@ -3149,7 +3149,7 @@ csPtr<iMeshWrapper> csEngine::CreatePortal (
   csRef<iPortalContainer> pc;
   if (name)
   {
-    const csRef<iSceneNodeArray> children = mesh->QuerySceneNode ()
+    const csRef<iSceneNodeArray> children = parentMesh->QuerySceneNode ()
       ->GetChildrenArray ();
     size_t i;
     for (i = 0 ; i < children->GetSize(); i++)

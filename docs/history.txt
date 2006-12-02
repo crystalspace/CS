@@ -12,6 +12,7 @@ chronological order.
 	  photon mapping.
 	- res fixed a bug in lighter2 where data stored in two arrays could
 	  get out of sync.
+	- res fixed a crash in csEngine::CreatePortal() introduced in r25992.
 1-Dec-2006
 	- Jorrit fixed a bug in the light code: The LSI system
 	  (LightSectorInfluence) ignored lights that were part of a scene
