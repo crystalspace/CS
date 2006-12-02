@@ -19,6 +19,8 @@ chronological order.
 	  stored in the wrong variable.
 	- res changed the names of the lighter2 lightmap layouter classes to 
 	  be less confusing.
+	- res fixed genmesify to handle <library path="..." file="..." />-
+	  style library tags. Fixes trac #201.
 1-Dec-2006
 	- Jorrit fixed a bug in the light code: The LSI system
 	  (LightSectorInfluence) ignored lights that were part of a scene
