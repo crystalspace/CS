@@ -3155,7 +3155,7 @@ csPtr<iMeshWrapper> csEngine::CreatePortal (
     for (i = 0 ; i < children->GetSize(); i++)
     {
       // @@@ Not efficient.
-      iMeshWrapper* mesh = children->Get (i)->QueryMesh ();
+      mesh = children->Get (i)->QueryMesh ();
       if (mesh)
       {
         if (!strcmp (name, mesh->QueryObject ()->GetName ()))

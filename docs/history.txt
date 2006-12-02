@@ -13,6 +13,10 @@ chronological order.
 	- res fixed a bug in lighter2 where data stored in two arrays could
 	  get out of sync.
 	- res fixed a crash in csEngine::CreatePortal() introduced in r25992.
+	- res fixed the "search existing portal container" logic in 
+	  csEngine::CreatePortal() to actually work. Previously it would 
+	  always create a portal container since the found mesh would be 
+	  stored in the wrong variable.
 1-Dec-2006
 	- Jorrit fixed a bug in the light code: The LSI system
 	  (LightSectorInfluence) ignored lights that were part of a scene
