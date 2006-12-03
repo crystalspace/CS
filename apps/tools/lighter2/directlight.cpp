@@ -31,8 +31,10 @@ namespace lighter
   // Shade a single point in space with direct lighting
   csColor DirectLighting::UniformShadeAllLightsNonPD (Sector* sector, 
     const csVector3& point, const csVector3& normal, 
-    SamplerSequence<2>& lightSampler, Raytracer& rt)
+    SamplerSequence<1>& sampler, Raytracer& rt)
   {
+    SamplerSequence<2> lightSampler (sampler);
+
     csColor res (0);
     const LightRefArray& allLights = sector->allNonPDLights;
 
@@ -50,8 +52,10 @@ namespace lighter
   // Shade a single point in space with direct lighting using a single light
   csColor DirectLighting::UniformShadeRndLightNonPD (Sector* sector, 
     const csVector3& point, const csVector3& normal, 
-    SamplerSequence<3>& lightSampler, Raytracer& rt)
+    SamplerSequence<1>& sampler, Raytracer& rt)
   {
+    SamplerSequence<3> lightSampler (sampler);
+
     csColor res (0);
     const LightRefArray& allLights = sector->allNonPDLights;
 
@@ -67,8 +71,10 @@ namespace lighter
 
   // Shade a primitive element with direct lighting
   csColor DirectLighting::UniformShadeAllLightsNonPD (Sector* sector, 
-    ElementProxy element, SamplerSequence<4>& lightSampler, Raytracer& rt)
+    ElementProxy element, SamplerSequence<1>& sampler, Raytracer& rt)
   {
+    SamplerSequence<4> lightSampler (sampler);
+
     // Sample each quadrant of element using stratified sampling
     // and random values 2 and 3 for coordinates
     static float quadratConstants[][2] =
@@ -111,21 +117,55 @@ namespace lighter
 
   // Shade a primitive element with direct lighting using a single light
   csColor DirectLighting::UniformShadeRndLightNonPD (Sector* sector, 
-    ElementProxy element, SamplerSequence<5>& lightSampler, Raytracer& rt)
+    ElementProxy element, SamplerSequence<1>& sampler, Raytracer& rt)
   {
+    SamplerSequence<5> lightSampler (sampler);
+
+    // Sample each quadrant of element using stratified sampling
+    // and random values 2 and 3 for coordinates
+    // Use different light per quadrant
+    static float quadratConstants[][2] =
+    {
+      {-0.5f, -0.5f},
+      {-0.5f,  0.5f},
+      { 0.5f, -0.5f},
+      { 0.5f,  0.5f}
+    };
+
+    csColor res (0);
     const LightRefArray& allLights = sector->allNonPDLights;
-    float rndValues[5];
-    lightSampler.GetNext (rndValues);
 
-    size_t lightIdx = (size_t) floorf (allLights.GetSize () * rndValues[2]);
+    // Get some data
+    const csVector3& uVec = element.primitive.GetuFormVector ();
+    const csVector3& vVec = element.primitive.GetvFormVector ();
+    const csVector3& elementC = element.primitive.ComputeElementCenter (element.element); 
 
-    return UniformShadeOneLight (sector, element, allLights[lightIdx],
-      SamplerSequence<4> (lightSampler), rt) * allLights.GetSize ();
+    // Add handling of "half" elements
+
+    for (size_t qi = 0; qi < 4; ++qi)
+    {
+      float rndValues[5];
+      lightSampler.GetNext (rndValues);
+
+      csVector3 offsetVector = uVec * (rndValues[2]*quadratConstants[qi][0]) +
+        vVec * (rndValues[3]*quadratConstants[qi][1]);
+
+      csVector3 pos = elementC + offsetVector;
+
+      size_t lightIdx = (size_t) floorf (allLights.GetSize () * rndValues[4]);
+
+      res += ShadeLight (allLights[lightIdx], pos, element.primitive.ComputeNormal (pos), 
+        rt, rndValues);
+    }
+
+    return res * 0.25f;
   }
 
   csColor DirectLighting::UniformShadeOneLight (Sector* sector, const csVector3& point, 
-    const csVector3& normal, Light* light, SamplerSequence<2>& lightSampler, Raytracer& rt)
+    const csVector3& normal, Light* light, SamplerSequence<1>& sampler, Raytracer& rt)
   {
+    SamplerSequence<2> lightSampler (sampler);
+
     float rndValues[2];
     lightSampler.GetNext (rndValues);
 
@@ -133,8 +173,10 @@ namespace lighter
   }
 
   csColor DirectLighting::UniformShadeOneLight (Sector* sector, ElementProxy element,
-    Light* light, SamplerSequence<4>& lightSampler, Raytracer& rt)
+    Light* light, SamplerSequence<1>& sampler, Raytracer& rt)
   {
+    SamplerSequence<4> lightSampler (sampler);
+
     // Sample each quadrant of element using stratified sampling
     // and random values 2 and 3 for coordinates
     // Use different light per quadrant
@@ -234,7 +276,6 @@ namespace lighter
   void DirectLighting::ShadeLightmap (Sector* sector, Object* obj, Raytracer& rt, 
     SamplerSequence<1>& masterSampler)
   {
-    SamplerSequence<4> subSampler (masterSampler);
     csArray<PrimitiveArray>& submeshArray = obj->GetPrimitives ();
 
     const LightRefArray& allPDLights = sector->allPDLights;
@@ -271,7 +312,7 @@ namespace lighter
 
           // Shade non-PD lights
           ElementProxy ep = prim.GetElement (eidx);
-          csColor c = UniformShadeAllLightsNonPD (sector, ep, subSampler, rt);
+          csColor c = UniformShadeAllLightsNonPD (sector, ep, masterSampler, rt);
 
           uint u, v;
           prim.GetElementUV (eidx, u, v);
@@ -284,7 +325,7 @@ namespace lighter
           for (size_t pdli = 0; pdli < allPDLights.GetSize (); ++pdli)
           {
             csColor c = UniformShadeOneLight (sector, ep, allPDLights[pdli],
-              subSampler, rt);
+              masterSampler, rt);
 
             Lightmap* lm = sector->scene->GetLightmap (prim.GetGlobalLightmapID (),
               allPDLights[pdli]);
@@ -299,8 +340,6 @@ namespace lighter
   void DirectLighting::ShadePerVertex (Sector* sector, Object* obj, Raytracer& rt, 
     SamplerSequence<1>& masterSampler)
   {
-    SamplerSequence<2> subSampler (masterSampler);
-
     const LightRefArray& allPDLights = sector->allPDLights;
 
     Object::LitColorArray* litColors = obj->GetLitColors ();
@@ -313,13 +352,13 @@ namespace lighter
 
       csColor& c = litColors->Get (i);
 
-      c = UniformShadeAllLightsNonPD (sector, pos, normal, subSampler, rt);
+      c = UniformShadeAllLightsNonPD (sector, pos, normal, masterSampler, rt);
 
       // Shade PD lights
       for (size_t pdli = 0; pdli < allPDLights.GetSize (); ++pdli)
       {
         c += UniformShadeOneLight (sector, pos, normal, allPDLights[pdli],
-          subSampler, rt);
+          masterSampler, rt);
       }
     }
 

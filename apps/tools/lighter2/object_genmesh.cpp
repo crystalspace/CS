@@ -248,7 +248,7 @@ namespace lighter
       const ObjectFactory_Genmesh::Submesh* smInfo = 
         factory->submeshes.GetKeyPointer (submeshIndex);
       
-      if (smInfo->sourceSubmesh)
+      if (smInfo && smInfo->sourceSubmesh)
       {
         newEntry.name = smInfo->sourceSubmesh->GetName();
         int n = 0;

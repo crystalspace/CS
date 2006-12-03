@@ -18,8 +18,6 @@
 
 #include "crystalspace.h"
 
-#include <algorithm>
-
 #include "common.h"
 #include "lighter.h"
 #include "lightmap.h"
@@ -243,25 +241,6 @@ namespace lighter
     }
   }
 
-  static void CloneNode (iDocumentNode* from, iDocumentNode* to)
-  {
-    to->SetValue (from->GetValue ());
-    csRef<iDocumentNodeIterator> it = from->GetNodes ();
-    while (it->HasNext ())
-    {
-      csRef<iDocumentNode> child = it->Next ();
-      csRef<iDocumentNode> child_clone = to->CreateNodeBefore (
-    	  child->GetType (), 0);
-      CloneNode (child, child_clone);
-    }
-    csRef<iDocumentAttributeIterator> atit = from->GetAttributes ();
-    while (atit->HasNext ())
-    {
-      csRef<iDocumentAttribute> attr = atit->Next ();
-      to->SetAttribute (attr->GetName (), attr->GetValue ());
-    }
-  }
-
   void Object::SaveMesh (Scene* /*scene*/, iDocumentNode* node)
   {
     // Save out the object to the node
@@ -297,7 +276,7 @@ namespace lighter
               break;
             csRef<iDocumentNode> newNode = node->CreateNodeBefore (
               child->GetType(), 0);
-            CloneNode (child, newNode);
+            CS::DocumentHelper::CloneNode (child, newNode);
             node->RemoveNode (child);
           }
         }

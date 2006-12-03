@@ -6,6 +6,11 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+3-Dec-2006
+	- Marten made a few fixes to lighter2:
+	   - Worked around a bug when lightmap uv-layout code created a new
+	     submesh.
+	   - Unified function signatures in directlight.cpp.
 2-Dec-2006
 	- Marten rewrote the direct lighting in lighter2 in a way so that
 	  it works better in combination with possible path tracing and/or
@@ -33,21 +38,21 @@ chronological order.
 	  renderloops for parented lights.
 29-Nov-2006
 	- caedes made the following changes to swig interface files:
-	  - Added iEngineSequenceManager, iDocumentAttribute, 
-	    iDocumentAttributeIterator, iDocumentNode and 
-	    iDocumentNodeIterator to wrapped interfaces.
-	  - Added an (empty) ITERATOR_FUNTIONS swig macro in cspace.i so
-	    each language can redefine it for implementing language specific
-	    iterator protocol.
-	  - Implemented the ITERATOR_FUNTIONS swig macro for python.
-	  - Added iterator functions for iDocumentAttributeIterator and
-	    iDocumentNodeIterator.
-	  - Added %ignore for CS::TriangleT [] operator so swig doesnt emit
-	    a warning for it.
-	  - Added %extend for csTriangle implementing [] notation in python.
-	  - Added the iterator declaration for some more useful classes:
-	    - iVisibilityObjectIterator, iLightIterator, iSectorIterator,
-	      iMeshWrapperIterator.
+	    - Added iEngineSequenceManager, iDocumentAttribute, 
+	      iDocumentAttributeIterator, iDocumentNode and 
+	      iDocumentNodeIterator to wrapped interfaces.
+	    - Added an (empty) ITERATOR_FUNTIONS swig macro in cspace.i so
+	      each language can redefine it for implementing language specific
+	      iterator protocol.
+	    - Implemented the ITERATOR_FUNTIONS swig macro for python.
+	    - Added iterator functions for iDocumentAttributeIterator and
+	      iDocumentNodeIterator.
+	    - Added %ignore for CS::TriangleT [] operator so swig doesnt emit
+	      a warning for it.
+	    - Added %extend for csTriangle implementing [] notation in python.
+	    - Added the iterator declaration for some more useful classes:
+	      - iVisibilityObjectIterator, iLightIterator, iSectorIterator,
+	        iMeshWrapperIterator.
 	- Vincent fixed ref-tracker enabled debug build by adding a header.
 	- Vincent added a few missing CS_LEAKGUARD_IMPLEMENT statements.
 28-Nov-2006
@@ -223,8 +228,8 @@ chronological order.
 10-Nov-2006
 	- Jorrit again disabled techniques 150 for character2 and
 	  character_bump2 since they are still giving problems:
-	  	- Not working lighting on linux/ATI
-		- Corrupted lighting on Intel Graphics
+	    - Not working lighting on linux/ATI
+	    - Corrupted lighting on Intel Graphics
 	- Jorrit changed iSndSysWrapper to keep track of iSndSysData
 	  instead (but see later) of iSndSysStream. The idea is that
 	  a sound object should only care about the sound data and
