@@ -31,8 +31,8 @@ namespace lighter
     //Setup defaults
     lighterProperties.doDirectLight = true;
 
-    lmProperties.uTexelPerUnit = 16.0f;
-    lmProperties.vTexelPerUnit = 16.0f;
+    lmProperties.uTexelPerUnit = 1.0f;
+    lmProperties.vTexelPerUnit = 1.0f;
     lmProperties.maxLightmapU = 1024;
     lmProperties.maxLightmapV = 1024;
 

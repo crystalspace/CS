@@ -234,6 +234,24 @@ namespace lighter
     return true;
   }
 
+  void ObjectFactory_Genmesh::BeginSubmeshRemap ()
+  {
+  }
+
+  void ObjectFactory_Genmesh::AddSubmeshRemap (size_t oldIndex, size_t newIndex)
+  {
+    const ObjectFactory_Genmesh::Submesh* smInfo = 
+      submeshes.GetKeyPointer (oldIndex);
+
+    tempSubmeshes.Put (*smInfo, newIndex);
+  }
+
+  void ObjectFactory_Genmesh::FinishSubmeshRemap ()
+  {
+    submeshes = tempSubmeshes;
+    tempSubmeshes.Empty ();
+  }
+
   IntDArray* ObjectFactory_Genmesh::SubmeshFindHelper::FindSubmesh (
     size_t submeshIndex)
   {
@@ -248,7 +266,7 @@ namespace lighter
       const ObjectFactory_Genmesh::Submesh* smInfo = 
         factory->submeshes.GetKeyPointer (submeshIndex);
       
-      if (smInfo && smInfo->sourceSubmesh)
+      if (smInfo->sourceSubmesh)
       {
         newEntry.name = smInfo->sourceSubmesh->GetName();
         int n = 0;

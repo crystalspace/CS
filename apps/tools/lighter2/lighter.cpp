@@ -136,7 +136,7 @@ namespace lighter
     globalStats.SetTotalProgress (10);
     
 
-    unsigned int taskI = 0;
+    globalStats.SetTaskProgress ("Lightmap layout", 0);
     // Calculate lightmapping coordinates
     LightmapUVFactoryLayouter *uvLayout = new SimpleUVFactoryLayouter (scene->GetLightmaps());
 
@@ -145,25 +145,21 @@ namespace lighter
       scene->GetFactories ().GetIterator ();
     while (factIt.HasNext ())
     {
-      globalStats.SetTaskProgress ("Lightmap layout", taskI * factoryProgress);
       csRef<ObjectFactory> fact = factIt.Next ();
       fact->PrepareLightmapUV (uvLayout);
-      taskI++;
+      globalStats.IncTaskProgress (factoryProgress);
     }
 
     // Initialize all objects
-    taskI = 0;
+    globalStats.SetTaskProgress ("Initialize objects", 0);
     float sectorProgress = 100.0f / scene->GetSectors ().GetSize();
     SectorHash::GlobalIterator sectIt = 
       scene->GetSectors ().GetIterator ();
     while (sectIt.HasNext ())
     {
-      float thisSectorProgress = taskI * sectorProgress;
-      globalStats.SetTaskProgress ("Initialize objects", 
-        thisSectorProgress);
       csRef<Sector> sect = sectIt.Next ();
       sect->Initialize ();
-      taskI++;
+      globalStats.IncTaskProgress (sectorProgress);
     }
 
     for (size_t i = 0; i < scene->GetLightmaps().GetSize(); i++)
@@ -198,8 +194,6 @@ namespace lighter
     return true;
 */
     
-    
-
     // Progress 20
 
     // Shoot direct lighting
@@ -210,15 +204,8 @@ namespace lighter
       while (sectIt.HasNext ())
       {
         csRef<Sector> sect = sectIt.Next ();
-        DirectLighting::ShadeDirectLighting (sect, 100.0f / scene->GetSectors ().GetSize ());
+        DirectLighting::ShadeDirectLighting (sect, sectorProgress);
       }
-    }
-    
-    globalStats.SetTotalProgress (40);
-
-    if (globalConfig.GetLighterProperties ().doiosity)
-    {
-
     }
 
     globalStats.SetTotalProgress (80);
@@ -227,15 +214,19 @@ namespace lighter
 
     // De-antialias the lightmaps
     sectIt.Reset ();
+    globalStats.SetTaskProgress ("Postprocessing lightmaps", 0);
     while (sectIt.HasNext ())
     {
       csRef<Sector> sect = sectIt.Next ();
+      float objProgress = sectorProgress / sect->allObjects.GetSize ();
       ObjectHash::GlobalIterator objIt = sect->allObjects.GetIterator ();
       while (objIt.HasNext ())
       {
         csRef<Object> obj = objIt.Next ();
         csArray<LightmapPtrDelArray*> allLightmaps (scene->GetAllLightmaps());
         obj->FixupLightmaps (allLightmaps);
+
+        globalStats.IncTaskProgress (objProgress);
       }
     }
 

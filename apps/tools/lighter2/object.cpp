@@ -39,6 +39,7 @@ namespace lighter
 
   bool ObjectFactory::PrepareLightmapUV (LightmapUVFactoryLayouter* uvlayout)
   {
+    BeginSubmeshRemap ();
     size_t oldSize = unlayoutedPrimitives.GetSize();
     for (size_t i = 0; i < oldSize; i++)
     {
@@ -51,9 +52,12 @@ namespace lighter
       {
         layoutedPrimitives.Push (LayoutedPrimitives (newPrims[n],
           lightmaplayout, n));
+
+        AddSubmeshRemap (i, layoutedPrimitives.GetSize () - 1);
       }
     }
     unlayoutedPrimitives.DeleteAll();
+    FinishSubmeshRemap ();
 
     return true;
   }
@@ -95,11 +99,37 @@ namespace lighter
       saverPluginName);
     if (saver) 
     {
-      // Make sure to remove old params node
+      // Write new mesh
       csRef<iDocumentNode> paramChild = node->GetNode ("params");
-      if (paramChild) node->RemoveNode (paramChild);
       saver->WriteDown(factoryWrapper->GetMeshObjectFactory (), node,
-      	0/*ssource*/);
+        0/*ssource*/);
+      if (paramChild) 
+      {
+        // Move all nodes after the old params node to after the new params node
+        csRef<iDocumentNodeIterator> nodes = node->GetNodes();
+        while (nodes->HasNext())
+        {
+          csRef<iDocumentNode> child = nodes->Next();
+          if (child->Equals (paramChild)) break;
+        }
+        // Skip <params>
+        if (nodes->HasNext()) 
+        {
+          // Actual moving
+          while (nodes->HasNext())
+          {
+            csRef<iDocumentNode> child = nodes->Next();
+            if ((child->GetType() == CS_NODE_ELEMENT)
+              && (strcmp (child->GetValue(), "params") == 0))
+              break;
+            csRef<iDocumentNode> newNode = node->CreateNodeBefore (
+              child->GetType(), 0);
+            CS::DocumentHelper::CloneNode (child, newNode);
+            node->RemoveNode (child);
+          }
+        }
+        node->RemoveNode (paramChild);
+      }
     }
   }
 
@@ -289,7 +319,7 @@ namespace lighter
   {
     if (lightPerVertex) return;
 
-    //Create one
+    //Create one, @@TODO: optimise this
     LightmapMaskArray masks;
     LightmapPtrDelArray::Iterator lmIt = lightmaps[0]->GetIterator ();
     while (lmIt.HasNext ())

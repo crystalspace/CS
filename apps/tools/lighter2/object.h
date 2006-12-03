@@ -122,6 +122,18 @@ namespace lighter
     bool lightPerVertex;
   protected:
 
+    // Begin remapping of submeshes
+    virtual void BeginSubmeshRemap ()
+    {}
+
+    // Add a new mapping between old index and new index
+    virtual void AddSubmeshRemap (size_t oldIndex, size_t newIndex)
+    {}
+
+    // Finish remapping of submeshes
+    virtual void FinishSubmeshRemap ()
+    {}
+
     // All faces, untransformed
     csArray<PrimitiveArray> unlayoutedPrimitives;
     struct LayoutedPrimitives
