@@ -11,6 +11,10 @@ chronological order.
 	   - Worked around a bug when lightmap uv-layout code created a new
 	     submesh.
 	   - Unified function signatures in directlight.cpp.
+	- res fixed an issue in OpenGL R2T: the canvas clipping rect was only
+	  updated when all coordinates are different in comparison to the rect
+	  needed for the texture, while the rect needs to change when only
+	  one coordinate is different.
 2-Dec-2006
 	- Marten rewrote the direct lighting in lighter2 in a way so that
 	  it works better in combination with possible path tracing and/or
