@@ -3151,7 +3151,7 @@ csPtr<iMeshWrapper> csEngine::CreatePortal (
 	csVector3* vertices, int num_vertices,
 	iPortal*& portal)
 {
-  csRef<iMeshWrapper> mesh;
+  csRef<iMeshWrapper> portal_mesh;
   csRef<iPortalContainer> pc;
   if (name)
   {
@@ -3161,29 +3161,29 @@ csPtr<iMeshWrapper> csEngine::CreatePortal (
     for (i = 0 ; i < children->GetSize(); i++)
     {
       // @@@ Not efficient.
-      mesh = children->Get (i)->QueryMesh ();
+      iMeshWrapper* mesh = children->Get (i)->QueryMesh ();
       if (mesh)
       {
         if (!strcmp (name, mesh->QueryObject ()->GetName ()))
 	{
 	  pc = 
   	    scfQueryInterface<iPortalContainer> (mesh->GetMeshObject ());
-          if (!pc) mesh = 0;
+          if (pc) portal_mesh = mesh;
 	  break;
 	}
       }
     }
   }
-  if (!mesh)
+  if (!portal_mesh)
   {
-    mesh = CreatePortalContainer (name);
-    mesh->QuerySceneNode ()->SetParent (parentMesh->QuerySceneNode ());
+    portal_mesh = CreatePortalContainer (name);
+    portal_mesh->QuerySceneNode ()->SetParent (parentMesh->QuerySceneNode ());
     pc = 
-  	scfQueryInterface<iPortalContainer> (mesh->GetMeshObject ());
+  	scfQueryInterface<iPortalContainer> (portal_mesh->GetMeshObject ());
   }
   portal = pc->CreatePortal (vertices, num_vertices);
   portal->SetSector (destSector);
-  return csPtr<iMeshWrapper> (mesh);
+  return csPtr<iMeshWrapper> (portal_mesh);
 }
 
 csPtr<iMeshWrapper> csEngine::CreatePortal (
