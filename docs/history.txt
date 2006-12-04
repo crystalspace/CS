@@ -6,11 +6,17 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
-
 4-Dec-2006
         - Piotr fixed bug in odedynam joints (when ball and amotor 
           are used).
 	- res added support for gcc's "malloc" attribute.
+	- Jorrit fixed a bug in the engine. iEngine->DeleteAll() would not
+	  remove the shaders. Added iShaderManager->UnregisterShaders()
+	  to unregister all shaders.
+	- Jorrit changed csShaderExpressionAccessor to also implement iObject
+	  and iSelfDestruct.
+	- Jorrit added functions to iShaderManager to add named shader
+	  variable accessors.
 3-Dec-2006
 	- Marten made a few fixes to lighter2:
 	   - Worked around a bug when lightmap uv-layout code created a new

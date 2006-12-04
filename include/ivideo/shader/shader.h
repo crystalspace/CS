@@ -173,7 +173,7 @@ enum csShaderTagPresence
  */
 struct iShaderManager : public virtual iShaderVariableContext
 {
-  SCF_INTERFACE (iShaderManager, 1, 1, 0);
+  SCF_INTERFACE (iShaderManager, 2, 0, 0);
   /**
    * Register a shader to the shadermanager.
    * Compiler should register all shaders
@@ -181,6 +181,8 @@ struct iShaderManager : public virtual iShaderVariableContext
   virtual void RegisterShader (iShader* shader) = 0;
   /// Unregister a shader.
   virtual void UnregisterShader (iShader* shader) = 0;
+  /// Remove all shaders.
+  virtual void UnregisterShaders () = 0;
   /// Get a shader by name
   virtual iShader* GetShader (const char* name) = 0;
   /// Returns all shaders that have been created
@@ -190,6 +192,27 @@ struct iShaderManager : public virtual iShaderVariableContext
   virtual void RegisterCompiler (iShaderCompiler* compiler) = 0;
   /// Get a shadercompiler by name
   virtual iShaderCompiler* GetCompiler(const char* name) = 0;
+
+  /**
+   * Register a named shader variable accessor.
+   */
+  virtual void RegisterShaderVariableAccessor (const char* name,
+      iShaderVariableAccessor* accessor) = 0;
+  /**
+   * Unregister a shader variable accessor.
+   */
+  virtual void UnregisterShaderVariableAccessor (const char* name,
+      iShaderVariableAccessor* accessor) = 0;
+  /**
+   * Find a shader variable accessor.
+   */
+  virtual iShaderVariableAccessor* GetShaderVariableAccessor (
+      const char* name) = 0;
+
+  /**
+   * Remove all shader variable accessors.
+   */
+  virtual void UnregisterShaderVariableAcessors () = 0;
 
   /// Get the shadervariablestack used to handle shadervariables on rendering
   virtual iShaderVarStack* GetShaderVariableStack () = 0;

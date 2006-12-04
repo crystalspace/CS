@@ -791,6 +791,12 @@ void csEngine::DeleteAll ()
   delete sharedVariables;
   sharedVariables = new csSharedVariableList();
 
+  if (shaderManager)
+  {
+    shaderManager->UnregisterShaderVariableAcessors ();
+    shaderManager->UnregisterShaders ();
+  }
+
   if (thingMeshType != 0)
   {
     csRef<iThingEnvironment> te (
