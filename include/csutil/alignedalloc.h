@@ -36,7 +36,8 @@ namespace CS
      * to a multiple of \p align bytes.
      * \remarks The returned block of memory must be freed with AlignedFree.
      */
-    CS_CRYSTALSPACE_EXPORT void* AlignedMalloc (size_t size, size_t align);
+    CS_CRYSTALSPACE_EXPORT CS_ATTRIBUTE_MALLOC void* AlignedMalloc (
+      size_t size, size_t align);
     /// Free a block of memory allocated with AlignedMalloc.
     CS_CRYSTALSPACE_EXPORT void AlignedFree (void* ptr);
     /**

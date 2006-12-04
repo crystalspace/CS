@@ -84,6 +84,14 @@
 # define CS_FORCEINLINE_TEMPLATEMETHOD CS_FORCEINLINE
 #endif
 
+/**\def CS_ATTRIBUTE_MALLOC
+ * Function attribute that can be used to mark a function as "malloc". See the
+ * gcc manual for the implications of that.
+ */
+#ifndef CS_ATTRIBUTE_MALLOC
+# define CS_ATTRIBUTE_MALLOC
+#endif
+
 /**\def CS_NO_EXCEPTIONS
  * This is defined when the project was compiled without support for 
  * exceptions.
@@ -599,13 +607,13 @@ Type &Class::getterFunc ()                                     \
  * implementations. Useful when interfacing with third party libraries.
  */
 //@{
-CS_FORCEINLINE void* platform_malloc (size_t n)
+CS_FORCEINLINE CS_ATTRIBUTE_MALLOC void* platform_malloc (size_t n)
 { return malloc (n); }
 CS_FORCEINLINE void platform_free (void* p)
 { return free (p); }
 CS_FORCEINLINE void* platform_realloc (void* p, size_t n)
 { return realloc (p, n); }
-CS_FORCEINLINE void* platform_calloc (size_t n, size_t s)
+CS_FORCEINLINE CS_ATTRIBUTE_MALLOC void* platform_calloc (size_t n, size_t s)
 { return calloc (n, s); }
 
 namespace CS
@@ -637,10 +645,11 @@ extern CS_CRYSTALSPACE_EXPORT void operator delete[] (void* p,
  * Directly use the ptmalloc allocation functions. Usually, this is not needed -
  * use cs_malloc() etc instead.
  */
-extern CS_CRYSTALSPACE_EXPORT void* ptmalloc (size_t n);
+extern CS_CRYSTALSPACE_EXPORT CS_ATTRIBUTE_MALLOC void* ptmalloc (size_t n);
 extern CS_CRYSTALSPACE_EXPORT void ptfree (void* p);
 extern CS_CRYSTALSPACE_EXPORT void* ptrealloc (void* p, size_t n);
-extern CS_CRYSTALSPACE_EXPORT void* ptcalloc (size_t n, size_t s);
+extern CS_CRYSTALSPACE_EXPORT CS_ATTRIBUTE_MALLOC void* ptcalloc (size_t n,
+  size_t s);
 //@}
 
 /**\name Default Crystal Space memory allocation
@@ -648,13 +657,13 @@ extern CS_CRYSTALSPACE_EXPORT void* ptcalloc (size_t n, size_t s);
  * Crystal Space.
  */
 //@{
-CS_FORCEINLINE void* cs_malloc (size_t n)
+CS_FORCEINLINE CS_ATTRIBUTE_MALLOC void* cs_malloc (size_t n)
 { return ptmalloc (n); }
 CS_FORCEINLINE void cs_free (void* p)
 { ptfree (p); }
 CS_FORCEINLINE void* cs_realloc (void* p, size_t n)
 { return ptrealloc (p, n); }
-CS_FORCEINLINE void* cs_calloc (size_t n, size_t s)
+CS_FORCEINLINE CS_ATTRIBUTE_MALLOC void* cs_calloc (size_t n, size_t s)
 { return ptcalloc (n, s); }
 //@}
 
@@ -738,13 +747,13 @@ CS_FORCEINLINE void operator delete[] (void* p, const std::nothrow_t&) throw()
 #endif // CS_NO_NEW_OVERRIDE
 
 #else // CS_NO_PTMALLOC
-CS_FORCEINLINE void* cs_malloc (size_t n)
+CS_FORCEINLINE CS_ATTRIBUTE_MALLOC void* cs_malloc (size_t n)
 { return platform_malloc (n); }
 CS_FORCEINLINE void cs_free (void* p)
 { platform_free (p); }
 CS_FORCEINLINE void* cs_realloc (void* p, size_t n)
 { return platform_realloc (p, n); }
-CS_FORCEINLINE void* cs_calloc (size_t n, size_t s)
+CS_FORCEINLINE CS_ATTRIBUTE_MALLOC void* cs_calloc (size_t n, size_t s)
 { return platform_calloc (n, s); }
 #endif // CS_NO_PTMALLOC
 //@}

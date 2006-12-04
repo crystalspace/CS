@@ -47,7 +47,7 @@ namespace CS
       AllocatorMalloc() : mti (0) {}
     #endif
       /// Allocate a block of memory of size \p n.
-      void* Alloc (const size_t n)
+      CS_ATTRIBUTE_MALLOC void* Alloc (const size_t n)
       {
       #ifdef CS_MEMORY_TRACKER
 	size_t* p = (size_t*)cs_malloc (n + sizeof (size_t));
@@ -203,7 +203,7 @@ namespace CS
       /**
        * Allocate a raw block of given size. 
        */
-      static inline void* Alloc (size_t size) 
+      static inline CS_ATTRIBUTE_MALLOC void* Alloc (size_t size) 
       {
         return AlignedMalloc (size, A);
       }

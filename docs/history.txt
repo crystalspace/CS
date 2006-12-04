@@ -10,6 +10,7 @@ chronological order.
 4-Dec-2006
         - Piotr fixed bug in odedynam joints (when ball and amotor 
           are used).
+	- res added support for gcc's "malloc" attribute.
 3-Dec-2006
 	- Marten made a few fixes to lighter2:
 	   - Worked around a bug when lightmap uv-layout code created a new
