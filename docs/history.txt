@@ -19,6 +19,11 @@ chronological order.
 	  variable accessors.
 	- Jorrit fixed csEngine::CreatePortal() so that it works as
 	  intended.
+	- Jorrit added support for a <shaderexpressions> block in the world
+	  file. By doing that one can preload shader expressions and then
+	  reuse them easily on other things. At least... one can preload
+	  shader expressions but there is no way yet to use them as
+	  shader variables through xml. That's next commit.
 3-Dec-2006
 	- Marten made a few fixes to lighter2:
 	   - Worked around a bug when lightmap uv-layout code created a new

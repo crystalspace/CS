@@ -1208,6 +1208,10 @@ bool csLoader::LoadMap (iLoaderContext* ldr_context, iDocumentNode* worldnode,
     csStringID id = xmltokens.Request (value);
     switch (id)
     {
+      case XMLTOKEN_SHADEREXPRESSIONS:
+	if (!LoadShaderExpressions (ldr_context, child))
+	  return false;
+        break;
       case XMLTOKEN_SETTINGS:
 	if (!LoadSettings (child))
 	  return false;
@@ -1437,6 +1441,10 @@ bool csLoader::LoadLibrary (iLoaderContext* ldr_context, iDocumentNode* libnode,
     csStringID id = xmltokens.Request (value);
     switch (id)
     {
+      case XMLTOKEN_SHADEREXPRESSIONS:
+	if (!LoadShaderExpressions (ldr_context, child))
+	  return false;
+        break;
       case XMLTOKEN_LIBRARY:
       {
 	if (!LoadLibraryFromNode (ldr_context, child, ssource, missingdata))
@@ -5490,6 +5498,47 @@ bool csLoader::ParseSharedVariable (iLoaderContext* ldr_context,
 
 //========================================================================
 //========================================================================
+
+bool csLoader::LoadShaderExpressions (iLoaderContext* ldr_context,
+	iDocumentNode* node)
+{
+  csRef<iShaderManager> shaderMgr (
+    csQueryRegistry<iShaderManager> (csLoader::object_reg));
+
+  if(!shaderMgr)
+  {
+    ReportNotify ("iShaderManager not found, ignoring shader expressions!");
+    return true;
+  }
+
+  csRef<iDocumentNodeIterator> it = node->GetNodes ();
+  while (it->HasNext ())
+  {
+    csRef<iDocumentNode> child = it->Next ();
+    if (child->GetType () != CS_NODE_ELEMENT) continue;
+    const char* value = child->GetValue ();
+    csStringID id = xmltokens.Request (value);
+    switch (id)
+    {
+      case XMLTOKEN_SHADEREXPRESSION:
+      {
+	csRef<iShaderVariableAccessor> ac = SyntaxService->
+		ParseShaderVarExpr (child);
+        if (!ac) return false;
+	const char* name = child->GetAttributeValue ("name");
+	csRef<iObject> obj = scfQueryInterface<iObject> (ac);
+	if (obj)
+	{
+	  obj->SetName (name);
+	  AddToRegion (ldr_context, obj);
+	}
+	shaderMgr->RegisterShaderVariableAccessor (name, ac);
+      }
+      break;
+    }
+  }
+  return true;
+}
 
 bool csLoader::ParseShaderList (iLoaderContext* ldr_context,
 	iDocumentNode* node)

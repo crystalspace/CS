@@ -388,6 +388,8 @@ private:
 
   /// -----------------------------------------------------------------------
   /// Parse a shaderlist
+  bool LoadShaderExpressions (iLoaderContext* ldr_context,
+  	iDocumentNode* node);
   bool ParseShaderList (iLoaderContext* ldr_context, iDocumentNode* node);
   bool ParseShader (iLoaderContext* ldr_context, iDocumentNode* node,
     iShaderManager* shaderMgr);
