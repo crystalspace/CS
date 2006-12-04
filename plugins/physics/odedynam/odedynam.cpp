@@ -2660,6 +2660,7 @@ void csODEJoint::BuildJoint ()
   if (motor_jointID)
   {
     dJointDestroy (motor_jointID);
+    motor_jointID = 0;
   }
   if (jointID)
   {
@@ -2727,20 +2728,20 @@ void csODEJoint::BuildJoint ()
       break;
     case 3:
       jointID = dJointCreateBall (dynsys->GetWorldID(), 0);
-      SetStopAndMotorsParams ();
       dJointAttach (jointID, bodyID[0], bodyID[1]);
       pos = transform.GetOrigin();
       dJointSetBallAnchor (jointID, pos.x, pos.y, pos.z);
       if (hi_stop.x > lo_stop.x || hi_stop.y > lo_stop.y || hi_stop.z > lo_stop.z )
       {
         motor_jointID = dJointCreateAMotor (dynsys->GetWorldID(), 0);
-        dJointAttach (jointID, bodyID[0], bodyID[1]);
+        dJointAttach (motor_jointID, bodyID[0], bodyID[1]);
         dJointSetAMotorMode (motor_jointID, dAMotorEuler);
         dJointSetAMotorAxis (motor_jointID, 0, 1,
           aconstraint_axis[0].x, aconstraint_axis[0].y, aconstraint_axis[0].z);
         dJointSetAMotorAxis (motor_jointID, 2, 2,
           aconstraint_axis[1].x, aconstraint_axis[1].y, aconstraint_axis[1].z);
       }
+      SetStopAndMotorsParams ();
       break;
     }
   }
