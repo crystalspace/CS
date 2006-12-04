@@ -1117,6 +1117,33 @@ bool csTextSyntaxService::ParseShaderVar (iLoaderContext* ldr_context,
         var.SetValue (tex);
       }
       break;
+    case XMLTOKEN_EXPRLIB:
+      {
+	const char* exprname = node->GetAttributeValue ("exprname");
+	if (!exprname)
+	{
+	  Report ("crystalspace.syntax.shadervariable.expression",
+		CS_REPORTER_SEVERITY_ERROR,
+		node, "'exprname' attribute missing for shader expression!");
+	  return false;
+	}
+	csRef<iShaderManager> shmgr = csQueryRegistry<iShaderManager> (
+		object_reg);
+	if (shmgr)
+	{
+          iShaderVariableAccessor* acc = shmgr->GetShaderVariableAccessor (
+	    exprname);
+	  if (!acc)
+	  {
+	    Report ("crystalspace.syntax.shadervariable.expression",
+		  CS_REPORTER_SEVERITY_ERROR,
+		  node, "Can't find expression with name %s!", exprname);
+	    return false;
+	  }
+	  var.SetAccessor (acc);
+	}
+      }
+      break;
     case XMLTOKEN_EXPR:
     case XMLTOKEN_EXPRESSION:
       {
