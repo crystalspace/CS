@@ -9,6 +9,8 @@ chronological order.
 5-Dec-2006
 	- Jorrit changed 'exprlib' into 'libexpr' for refering to
 	  previously loaded shader expressions.
+	- caedes added embedgl plugin, a 2d canvas for embedding cs on
+	  an existing gl context.
 4-Dec-2006
         - Piotr fixed bug in odedynam joints (when ball and amotor 
           are used).
