@@ -481,17 +481,10 @@ public:
    */
   static void UnsetTexture (GLenum target, GLuint texture);
 
-  /**
-   * Register a texture. The given input image is IncRef'd and DecRef'ed
-   * later when not needed any more. If you want to keep the input image
-   * make sure you have called IncRef yourselves.
-   */
-  virtual csPtr<iTextureHandle> RegisterTexture (iImage *image, int flags);
-
-  /**
-   * Called from csGLTextureHandle destructor to notify parent texture
-   * manager that a material is going to be destroyed.
-   */
+  virtual csPtr<iTextureHandle> RegisterTexture (iImage *image, int flags,
+      iString* fail_reason = 0);
+  virtual csPtr<iTextureHandle> CreateTexture (int w, int h,
+      const char* format, int flags, iString* fail_reason = 0);
   void UnregisterTexture (csGLTextureHandle* handle);
 
   /**

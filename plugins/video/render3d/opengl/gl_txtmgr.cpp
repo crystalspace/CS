@@ -1299,25 +1299,44 @@ void csGLTextureManager::UnsetTexture (GLenum target, GLuint texture)
 }
 
 csPtr<iTextureHandle> csGLTextureManager::RegisterTexture (iImage *image,
-	int flags)
+	int flags, iString* fail_reason)
 {
   if (!image)
   {
-    G3D->Report(CS_REPORTER_SEVERITY_BUG,
-      "BAAAAAAAD!!! csGLTextureManager::RegisterTexture with 0 image!");
+    if (fail_reason) fail_reason->Replace (
+      "No image given to RegisterTexture!");
     return 0;
   }
 
   if ((image->GetImageType() == csimgCube)
-    && !G3D->ext->CS_GL_ARB_texture_cube_map)
+      && !G3D->ext->CS_GL_ARB_texture_cube_map)
+  {
+    if (fail_reason) fail_reason->Replace (
+      "Cubemap images are not supported!");
     return 0;
+  }
   if ((image->GetImageType() == csimg3D)
-    && !G3D->ext->CS_GL_EXT_texture3D)
+      && !G3D->ext->CS_GL_EXT_texture3D)
+  {
+    if (fail_reason) fail_reason->Replace (
+      "3D images are not supported!");
     return 0;
+  }
 
   csGLTextureHandle *txt = new csGLTextureHandle (image, flags, G3D);
   textures.Push(txt);
   return csPtr<iTextureHandle> (txt);
+}
+
+csPtr<iTextureHandle> csGLTextureManager::CreateTexture (int w, int h,
+      const char* format, int flags, iString* fail_reason)
+{
+  (void)w;
+  (void)h;
+  (void)format;
+  (void)flags;
+  if (fail_reason) fail_reason->Replace ("Not implemented yet!");
+  return 0;
 }
 
 void csGLTextureManager::UnregisterTexture (csGLTextureHandle* handle)

@@ -11,6 +11,20 @@ chronological order.
 	  previously loaded shader expressions.
 	- caedes added embedgl plugin, a 2d canvas for embedding cs on
 	  an existing gl context.
+	- Jorrit started a series of improvements to the texture manager:
+	    - Extended RegisterTexture() with an optional fail_reason
+	      string. That way users of RegisterTexture() can now find
+	      out why the texture didn't register.
+	    - Changed various places in CS to pass along the new fail_reason
+	      parameter and show that reason on the reporter in case of
+	      failure. Didn't change the places that were not already
+	      doing error checking. Probably those have to be checked
+	      in the future as well.
+	    - Added a new iTextureManager->CreateTexture(). This method
+	      will create a texture based on a desired texture format.
+	      At this moment it doesn't do anything yet. Just created
+	      stub implementations in all three renderers (OpenGL, software,
+	      and null renderer).
 4-Dec-2006
         - Piotr fixed bug in odedynam joints (when ball and amotor 
           are used).
