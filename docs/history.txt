@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+5-Dec-2006
+	- Jorrit changed 'exprlib' into 'libexpr' for refering to
+	  previously loaded shader expressions.
 4-Dec-2006
         - Piotr fixed bug in odedynam joints (when ball and amotor 
           are used).

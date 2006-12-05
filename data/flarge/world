@@ -17819,7 +17819,7 @@
         </p>
         <smooth />
       </params>
-      <!--<shadervar name="reflection opacity" type="exprlib" exprname="sinus" />-->
+      <!--<shadervar name="reflection opacity" type="libexpr" exprname="sinus" />-->
       <move>
         <matrix>
           <m11>1</m11>

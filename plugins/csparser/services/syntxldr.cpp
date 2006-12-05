@@ -1117,7 +1117,7 @@ bool csTextSyntaxService::ParseShaderVar (iLoaderContext* ldr_context,
         var.SetValue (tex);
       }
       break;
-    case XMLTOKEN_EXPRLIB:
+    case XMLTOKEN_LIBEXPR:
       {
 	const char* exprname = node->GetAttributeValue ("exprname");
 	if (!exprname)
