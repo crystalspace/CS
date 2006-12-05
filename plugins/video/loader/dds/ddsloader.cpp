@@ -411,15 +411,15 @@ static const char* RawTypeString (csDDSRawDataType type)
   {
     case csrawDXT1:   
     case csrawDXT1Alpha:
-      return "dxt1";
+      return "*dxt1";
     case csrawDXT2:
-      return "dxt2";
+      return "*dxt2";
     case csrawDXT3:
-      return "dxt3";
+      return "*dxt3";
     case csrawDXT4:
-      return "dxt4";
+      return "*dxt4";
     case csrawDXT5:
-      return "dxt5";
+      return "*dxt5";
     case csrawB8G8R8:
       return "b8g8r8";
     case csrawR5G6B5:

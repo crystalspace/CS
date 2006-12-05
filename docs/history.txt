@@ -25,6 +25,17 @@ chronological order.
 	      At this moment it doesn't do anything yet. Just created
 	      stub implementations in all three renderers (OpenGL, software,
 	      and null renderer).
+	- Jorrit did further texture manager improvements:
+	    - iImage->GetRawFormat() must now return a string that is
+	      compatible with iTextureManager->CreateTexture(). Documented
+	      this and changed the dds image loader to return '*dxt1'
+	      instead of 'dxt1' (and others).
+	    - Also changed the GL renderer to react on '*dxt1' (and others)
+	      instead of 'dxt1'.
+	    - Added a new class CS::TextureFormatStrings and a static
+	      method called CanonicalTextureFormat() which converts a
+	      texture format string to a more canonical format (i.e.
+	      'rgba8' will be converted to 'r8g8b8a8_i').
 4-Dec-2006
         - Piotr fixed bug in odedynam joints (when ball and amotor 
           are used).
