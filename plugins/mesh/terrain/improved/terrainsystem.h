@@ -98,6 +98,7 @@ class csTerrainSystem :
   unsigned int dynamic_ambient_version;
   csRef<iLightManager> light_mgr;
   csRef<iEngine> engine;
+  csRefArray<iOnCellLoadedListener> cell_listeners;
 
   void ComputeBBox();
 
@@ -113,6 +114,10 @@ public:
   void SetCollider (iTerrainCollider* collider);
 
   // ------------ iTerrainSystem implementation ------------
+
+  size_t GetCellsCount () {return cells.GetSize ();}
+
+  void AddCellListener (iOnCellLoadedListener* listener){cell_listeners.Push (listener);} 
 
   virtual iTerrainCell* GetCell (const char* name);
   virtual iTerrainCell* GetCell (const csVector2& pos);
@@ -204,8 +209,8 @@ public:
 
   // ------------ iObjectModel implementation ------------
   virtual void GetObjectBoundingBox (csBox3& box);
-  virtual const csBox3& GetObjectBoundingBox ();
   virtual void SetObjectBoundingBox (const csBox3& box);
+  virtual const csBox3& GetObjectBoundingBox ();
 
   virtual void GetRadius (float& radius, csVector3& center);
 

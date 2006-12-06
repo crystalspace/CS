@@ -51,7 +51,7 @@ csFlags& csTerrainFactory::GetFlags ()
 
 csPtr<iMeshObject> csTerrainFactory::NewInstance ()
 {
-  csPtr<iMeshObject> ptr = terrain;
+  csPtr<iMeshObject> ptr = &*terrain;
   terrain = 0;
   return ptr;
 }

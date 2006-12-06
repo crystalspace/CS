@@ -42,7 +42,6 @@
 
 #include "cstool/rbuflock.h"
 
-#include <windows.h>
 
 CS_PLUGIN_NAMESPACE_BEGIN(ImprovedTerrain)
 {
@@ -60,6 +59,7 @@ public:
   CS_LEAKGUARD_DECLARE (csTerrBlock);
 
   csRef<iRenderBuffer> mesh_vertices;
+  csRef<iRenderBuffer> mesh_normals;
   csRef<iRenderBuffer> mesh_texcoords;
   csRef<iRenderBuffer> mesh_heights;
   csRef<csRenderBufferHolder> bufferHolder;
@@ -358,12 +358,18 @@ void csTerrBlock::LoadData ()
       res*res, CS_BUF_STATIC, CS_BUFCOMP_FLOAT,
       3);
 
+  mesh_normals = 
+    csRenderBuffer::CreateRenderBuffer (
+    res*res, CS_BUF_STATIC, CS_BUFCOMP_FLOAT,
+    3);
+
   mesh_texcoords = 
       csRenderBuffer::CreateRenderBuffer (res*res,
       CS_BUF_STATIC, CS_BUFCOMP_FLOAT,
       2);
 
   bufferHolder->SetRenderBuffer (CS_BUFFER_POSITION, mesh_vertices);
+  bufferHolder->SetRenderBuffer (CS_BUFFER_NORMAL, mesh_normals);
   bufferHolder->SetRenderBuffer (CS_BUFFER_TEXCOORD0, mesh_texcoords);
   
   const csVector2& pos = rdata->cell->GetPosition ();
@@ -375,7 +381,8 @@ void csTerrBlock::LoadData ()
     bbox.Empty ();
   
   {
-    csRenderBufferLock<csVector3> vertex_data(mesh_vertices);
+    csRenderBufferLock<csVector3> vertex_data (mesh_vertices);
+    csRenderBufferLock<csVector3> normal_data (mesh_normals);
     
     float min_x = center.x - size.x/2;
     float max_x = center.x + size.x/2;
@@ -399,8 +406,9 @@ void csTerrBlock::LoadData ()
       for (int x = 0; x < res; ++x, row += step)
       {
         float height = *row;
-        
         *vertex_data++ = csVector3(c_x, height, c_z);
+        csVector3 normal = rdata->cell->GetNormal (x*step,y*step).Unit (); 
+        *normal_data++ = normal;       
         
         if (min_height > height) min_height = height;
         if (max_height < height) max_height = height;
@@ -711,6 +719,7 @@ void csTerrBlock::DrawTest (iGraphics3D* g3d,
     
     mesh->meshtype = CS_MESHTYPE_TRIANGLES;
     
+    mesh->buffers = 0;
     mesh->buffers = bufferHolder;
     mesh->clip_portal = clip_portal;
     mesh->clip_plane = clip_plane;
@@ -920,6 +929,9 @@ unsigned int pitch)
 void csTerrainBruteBlockRenderer::OnColorUpdate (iTerrainCell* cell, const
   csColor* data, unsigned int res)
 {
+  if (!data)
+    return;
+
   csRef<csBruteBlockTerrainRenderData> rdata =
     (csBruteBlockTerrainRenderData*)cell->GetRenderData ();
 

@@ -77,6 +77,9 @@ iTerrainRenderer* renderer, iTerrainCollider* collider)
   this->renderer = renderer;
   this->collider = collider;
 
+  step_x = size.x / (grid_width - 1);
+  step_z = size.y / (grid_height - 1);
+
   state = NotLoaded;
 
   render_data = NULL;
@@ -179,7 +182,7 @@ void csTerrainCell::SetLoadState(LoadState state)
         case Loaded: break;
       }
 
-      break;
+      break; 
     }
   }
 }
@@ -517,13 +520,24 @@ csVector3 csTerrainCell::GetBinormal (const csVector2& pos) const
 csVector3 csTerrainCell::GetNormal (int x, int y) const
 {
   float center = GetHeight (x, y);
-  float up = y == 0 ? center : GetHeight (x, y-1);
-  float down = y + 1 == grid_height ? center : GetHeight (x, y+1);
-  float left = x == 0 ? center : GetHeight (x-1, y);
-  float right = x + 1 == grid_width ? center : GetHeight (x+1, y);
 
-  return csVector3((center - left) + (center - right), 1,
-  (center - up) + (center - down));
+  float dfdy = 0;
+  if (y - 1 >= 0 && y + 1 < grid_height)
+    dfdy = (GetHeight (x, y + 1) - GetHeight (x, y - 1)) / 2*step_z; 
+  else if (y - 1 >= 0)
+    dfdy = (center - GetHeight (x, y - 1)) / step_z;
+  else if (y + 1 < grid_height)
+    dfdy = (GetHeight (x, y + 1) - center) / step_z;
+
+  float dfdx = 0;
+  if (x - 1 >= 0 && x + 1 < grid_width)
+    dfdx = (GetHeight (x + 1, y) - GetHeight (x - 1, y)) / 2*step_x; 
+  else if (x - 1 >= 0)
+    dfdx = (center - GetHeight (x - 1, y)) / step_x;
+  else if (x + 1 < grid_width)
+    dfdx = (GetHeight (x + 1, y) - center) / step_x;
+
+  return csVector3 (dfdx, 1, dfdy);
 }
 
 csVector3 csTerrainCell::GetNormal (const csVector2& pos) const

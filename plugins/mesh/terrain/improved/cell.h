@@ -55,6 +55,7 @@ private:
   bool material_persistent;
   csVector2 position;
   csVector3 size;
+  float step_x, step_z;
   csRef<iTerrainDataFeeder> feeder;
   csRef<iTerrainCellRenderProperties> render_properties;
   csRef<iTerrainCellCollisionProperties> collision_properties;

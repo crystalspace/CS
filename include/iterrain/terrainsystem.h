@@ -36,6 +36,12 @@ class csVector3;
 
 class csReversibleTransform;
 
+struct iOnCellLoadedListener : public virtual iBase
+{
+  virtual void CellLoaded (iTerrainCell* cell) = 0;
+  virtual void CellUnloaded (iTerrainCell* cell) = 0;
+};
+
 /**
  * This class represents the terrain object as a set of cells. The object
  * can be rendered and collided with. To gain access to some operations that
@@ -45,6 +51,10 @@ class csReversibleTransform;
 struct iTerrainSystem : public virtual iBase
 {
   SCF_INTERFACE (iTerrainSystem, 1, 0, 0);
+
+  virtual void AddCellListener (iOnCellLoadedListener* listener) = 0;
+
+  virtual size_t GetCellsCount () = 0;
 
   /**
    * Query a cell by name

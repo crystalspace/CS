@@ -38,6 +38,7 @@ class csTerrainFactory :
                             iTerrainFactory>
 {
   csRef<csTerrainSystem> terrain;
+  csRefArray<iOnCellLoadedListener> cell_listeners;
 
   iTerrainRenderer* renderer;
   iTerrainCollider* collider;

@@ -52,6 +52,7 @@ struct csSimpleTerrainRenderData: public csRefCount
   csRef<csRenderBuffer> vb_pos;
   csRef<csRenderBuffer> vb_texcoord;
   csRef<csRenderBuffer> ib;
+  csRef<iRenderBuffer> vb_normals;
 
   csRef<iMaterialWrapper> material;
   
@@ -153,6 +154,7 @@ csRenderMesh** csTerrainSimpleRenderer::GetRenderMeshes (int& n,
     
       mesh->buffers->SetRenderBuffer (CS_BUFFER_POSITION, rdata->vb_pos);
       mesh->buffers->SetRenderBuffer (CS_BUFFER_TEXCOORD0, rdata->vb_texcoord);
+      mesh->buffers->SetRenderBuffer (CS_BUFFER_NORMAL, rdata->vb_normals);
       mesh->buffers->SetRenderBuffer (CS_BUFFER_INDEX, rdata->ib);
       
       meshes.Push (mesh);
@@ -191,6 +193,9 @@ const csRect& rectangle, const float* data, unsigned int pitch)
     rdata->primitive_count = (grid_width-1)*(grid_height-1)*2;
 
     rdata->vb_pos = csRenderBuffer::CreateRenderBuffer (
+    grid_width * grid_height, CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 3);
+
+    rdata->vb_normals = csRenderBuffer::CreateRenderBuffer (
     grid_width * grid_height, CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 3);
     
     rdata->vb_texcoord = csRenderBuffer::CreateRenderBuffer (
@@ -253,6 +258,7 @@ const csRect& rectangle, const float* data, unsigned int pitch)
   }
 
   csRenderBufferLock<float> vlocker(rdata->vb_pos);
+  csRenderBufferLock<csVector3> nlocker(rdata->vb_normals);
   float* vptr = vlocker;
 
   float offset_x = cell->GetPosition ().x;
@@ -267,9 +273,11 @@ const csRect& rectangle, const float* data, unsigned int pitch)
 
     for (int x = rectangle.xmin; x < rectangle.xmax; ++x)
     {
-      *vptr++ = x * scale_x + offset_x;
-      *vptr++ = *row++;
-      *vptr++ = y * scale_y + offset_y;
+      csVector3 v (x * scale_x + offset_x, *row++,y * scale_y + offset_y);
+      *vptr++ = v.x;
+      *vptr++ = v.y;
+      *vptr++ = v.z;
+      *nlocker++ = cell->GetNormal (csVector2 (v.x, v.z));
     }
   }
 }

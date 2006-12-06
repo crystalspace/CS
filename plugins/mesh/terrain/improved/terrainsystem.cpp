@@ -87,6 +87,10 @@ iTerrainCell* csTerrainSystem::GetCell (const char* name)
   if (cell && cell->GetLoadState () != csTerrainCell::Loaded)
   {
     cell->SetLoadState (csTerrainCell::Loaded);
+    for (size_t i = 0; i < cell_listeners.GetSize (); i++)
+    {
+      cell_listeners[i]->CellLoaded (cell);
+    }
   }
 
   return cell;
@@ -99,6 +103,10 @@ iTerrainCell* csTerrainSystem::GetCell (const csVector2& pos)
   if (cell && cell->GetLoadState () != csTerrainCell::Loaded)
   {
     cell->SetLoadState (csTerrainCell::Loaded);
+    for (size_t i = 0; i < cell_listeners.GetSize (); i++)
+    {
+      cell_listeners[i]->CellLoaded (cell);
+    }
   }
 
   return cell;
@@ -177,6 +185,10 @@ bool csTerrainSystem::CollideSegment (const csVector3& start, const csVector3&
       if (cells[i]->GetLoadState () != csTerrainCell::Loaded)
       {
         cells[i]->SetLoadState (csTerrainCell::Loaded);
+        for (size_t j = 0; j < cell_listeners.GetSize (); j++)
+        {
+          cell_listeners[j]->CellLoaded (cells[i]);
+        }
       }
 
       if (cells[i]->CollideSegment (seg.End (), seg.Start (), oneHit, points)
@@ -213,6 +225,10 @@ bool csTerrainSystem::CollideTriangles (const csVector3* vertices,
       if (cells[i]->GetLoadState () != csTerrainCell::Loaded)
       {
         cells[i]->SetLoadState (csTerrainCell::Loaded);
+        for (size_t j = 0; j < cell_listeners.GetSize (); j++)
+        {
+          cell_listeners[j]->CellLoaded (cells[i]);
+        }
       }
 
       if (cells[i]->CollideTriangles (vertices, tri_count, indices, radius,
@@ -247,6 +263,10 @@ bool csTerrainSystem::Collide (iCollider* collider,
       if (cells[i]->GetLoadState () != csTerrainCell::Loaded)
       {
         cells[i]->SetLoadState (csTerrainCell::Loaded);
+        for (size_t j = 0; j < cell_listeners.GetSize (); j++)
+        {
+          cell_listeners[j]->CellLoaded (cells[i]);
+        }
       }
 
       if (cells[i]->Collide (collider, radius, trans, oneHit, pairs) &&
@@ -383,6 +403,10 @@ void csTerrainSystem::UnloadLRUCells ()
     if (!min_cell) return;
 
     min_cell->SetLoadState (iTerrainCell::NotLoaded);
+    for (size_t i = 0; i < cell_listeners.GetSize (); i++)
+    {
+      cell_listeners[i]->CellUnloaded (min_cell);
+    }
   }
 }
 
@@ -429,6 +453,10 @@ csRenderMesh** csTerrainSystem::GetRenderMeshes (int& num, iRenderView* rview,
       if (cells[i]->GetLoadState () != csTerrainCell::Loaded)
       {
         cells[i]->SetLoadState (csTerrainCell::Loaded);
+        for (size_t j = 0; j < cell_listeners.GetSize (); j++)
+        {
+          cell_listeners[j]->CellLoaded (cells[i]);
+        }
       }
       
       cells[i]->UpdateColors (movable, colorVersion, baseColor);
@@ -581,13 +609,11 @@ void csTerrainSystem::ComputeBBox ()
   
   bbox_valid = true;
 }
-
 void csTerrainSystem::GetObjectBoundingBox (csBox3& box)
 {
   if ( !bbox_valid ) ComputeBBox ();
   box = bbox;
 }
-
 const csBox3& csTerrainSystem::GetObjectBoundingBox ()
 {
   if ( !bbox_valid ) ComputeBBox ();
