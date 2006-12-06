@@ -20,6 +20,8 @@
 #include "primitive.h"
 #include "object.h"
 
+static size_t numElementsTotal = 0;
+
 namespace lighter
 {
 
@@ -490,13 +492,14 @@ namespace lighter
     poly.AddVertex (vertexData.vertexArray[triangle.c].position);
 
     csPlane3 evCut = vCut;
+    csPoly3D elRow(4), rest(4);
+    csPoly3D el(4), restRow (4);
     for (uint v = 0; v  < vc; v++)
     {
       vCutOrigin += vFormVector;
       evCut.SetOrigin (vCutOrigin);
       
-      // Cut of a row
-      csPoly3D elRow, rest;
+      // Cut of a row      
       if (v < (vc-1)) 
       {
         poly.SplitWithPlane (elRow, rest, evCut);
@@ -513,11 +516,9 @@ namespace lighter
       for (uint u = 0; u < uc; u++)
       {
         //if (elRow.GetVertexCount () == 0) break; //no idea to try to clip it
-
         euOrigin += uFormVector;
         euCut.SetOrigin (euOrigin);
-
-        csPoly3D el, restRow;
+        
         if (u < (uc-1))
         {
           elRow.SplitWithPlane (el, restRow, euCut);
@@ -535,6 +536,9 @@ namespace lighter
     }
 
     elementAreas.ShrinkBestFit ();
+
+    numElementsTotal += elementAreas.GetSize ();
+
     ComputeBaryCoeffs();
   }
 

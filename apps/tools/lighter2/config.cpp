@@ -16,10 +16,10 @@
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "cssysdef.h"
+#include "crystalspace.h"
 
 #include "config.h"
-
+#include "lighter.h"
 
 namespace lighter
 {
@@ -40,8 +40,18 @@ namespace lighter
     diProperties.areaLightMultiplier = 1.0f;
   }
 
-  void Configuration::Initialize (const csStringArray& /*files*/)
+  void Configuration::Initialize ()
   {
+    csRef<iConfigManager> cfgMgr = globalLighter->configMgr;
     
+    lighterProperties.doDirectLight = cfgMgr->GetBool ("lighter2.DoDirect", true);
+
+
+    lmProperties.uTexelPerUnit = cfgMgr->GetFloat ("lighter2.uTexelPerUnit", 2.0f);
+    lmProperties.vTexelPerUnit = cfgMgr->GetFloat ("lighter2.vTexelPerUnit", 2.0f);
+
+    lmProperties.maxLightmapU = cfgMgr->GetInt ("lighter2.maxLightmapU", 1024);
+    lmProperties.maxLightmapV = cfgMgr->GetInt ("lighter2.maxLightmapV", 1024);
+   
   }
 }

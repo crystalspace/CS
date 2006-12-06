@@ -52,12 +52,33 @@ namespace lighter
 
   bool Lighter::Initialize ()
   {
+    cmdLine = csQueryRegistry<iCommandLineParser> (objectRegistry);
+    if (!cmdLine) return Report ("Cannot get a commandline helper");
+
+    // Check for commandline help.
+    if (csCommandLineHelper::CheckHelp (objectRegistry, cmdLine))
+    {
+      CommandLineHelp ();
+      return true;
+    }
+
     // Load config
-    if (!csInitializer::SetupConfigManager (objectRegistry,0))
+    const char* configFile = cmdLine->GetOption ("config");
+
+    if (!csInitializer::SetupConfigManager (objectRegistry,
+      configFile ? configFile : "/config/lighter2.cfg", "crystalspace.lighter2"))
       return Report ("Cannot setup config manager!");
+
+    configMgr = csQueryRegistry<iConfigManager> (objectRegistry);
+    if (!configMgr) return Report ("Cannot get a configuration manager");
+
+    LoadConfiguration ();
+    globalConfig.Initialize ();
+    globalTUI.Initialize ();
 
     // Initialize the TUI
     globalTUI.Redraw ();
+    globalStats.SetTaskProgress ("Starting up", 0);
 
     // Setup reporter
     {
@@ -83,13 +104,6 @@ namespace lighter
       return Report ("Cannot load plugins!");
 
     lighter::globalStats.SetTaskProgress ("Starting up", 60);
-
-    // Check for commandline help.
-    if (csCommandLineHelper::CheckHelp (objectRegistry))
-    {
-      csCommandLineHelper::Help (objectRegistry);
-      return true;
-    }
 
     // Get the plugins wants to use
     reporter = csQueryRegistry<iReporter> (objectRegistry);
@@ -151,6 +165,7 @@ namespace lighter
     }
 
     // Initialize all objects
+    globalStats.SetTotalProgress (15);
     globalStats.SetTaskProgress ("Initialize objects", 0);
     float sectorProgress = 100.0f / scene->GetSectors ().GetSize();
     SectorHash::GlobalIterator sectIt = 
@@ -166,39 +181,15 @@ namespace lighter
     {
       Lightmap * lm = scene->GetLightmaps ()[i];
       lm->Initialize();
-    }
-
-    globalStats.SetTotalProgress (20);
-
-    // Run performance benchmark
-  
-    /*
-    size_t numRays = 2000000;
-    RandomRayListGenerator<PseudoRandomRaygenerator> rayGen;
-    csArray<Ray> rays = rayGen(numRays, csVector3 (0));
-    Raytracer tracer (scene->GetSectors ().GetIterator ().Next ()->kdTree);
-    for (size_t i = 0; i < numRays; ++i)
-    {
-      Ray& r = rays[i];
-      HitPoint h;
-
-      tracer.TraceClosestHit (r, h);
-
-      if ((i % 1000) == 0)
-      {
-        globalTUI.Redraw (TUI::TUI_DRAW_RAYCORE);
-      }
-    }
-
-    int a = 0;
-    return true;
-*/
+    }    
     
     // Progress 20
+    globalStats.SetTotalProgress (20);
 
     // Shoot direct lighting
     if (globalConfig.GetLighterProperties ().doDirectLight)
     {
+      DirectLighting::Initialize ();
       globalStats.SetTaskProgress ("Direct lighting", 0);
       sectIt.Reset ();
       while (sectIt.HasNext ())
@@ -282,12 +273,46 @@ namespace lighter
     return scene->LoadFiles ();
   }
 
-  void Lighter::LoadSettings ()
+  void Lighter::LoadConfiguration ()
   {
-    csRef<iCommandLineParser> cmdline = 
-      csQueryRegistry<iCommandLineParser> (objectRegistry);
+    //Merge configuration settings from command line into config
+    csRef<csConfigFile> cmdLineConfig;
+    cmdLineConfig.AttachNew (new csConfigFile);
 
-    settings.keepGenmeshSubmeshes = cmdline->GetBoolOption ("keepsubmeshes");
+    const char* option;
+    const char* optionValue;
+    size_t index = 0;
+    csString buffer;
+    while ((option = cmdLine->GetOptionName (index)) != 0)
+    {
+      optionValue = cmdLine->GetOption (index);
+
+      if (!optionValue)
+      {
+        // No option value, a boolean setting, either true or false
+        if (option[0] == 'n' && option[1] == 'o')
+        {
+          option += 2;
+          optionValue = "false";
+        }
+        else
+        {
+          optionValue = "true";
+        }
+      }
+
+      buffer << "lighter2." << option << " = " << optionValue << "\n";
+
+      index++;
+    }
+
+    cmdLineConfig->LoadFromBuffer (buffer.GetDataSafe (), true);
+    configMgr->AddDomain (cmdLineConfig, iConfigManager::ConfigPriorityUserApp);
+  }
+
+  void Lighter::CommandLineHelp () const
+  {
+
   }
 
 }
@@ -296,8 +321,6 @@ int main (int argc, char* argv[])
 {
   iObjectRegistry* object_reg = csInitializer::CreateEnvironment (argc, argv);
   if (!object_reg) return 1;
-
-  lighter::globalStats.SetTaskProgress ("Starting up", 20);
 
   // Load up the global object
   csRef<lighter::Lighter> localLighter;

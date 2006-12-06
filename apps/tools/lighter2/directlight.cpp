@@ -20,13 +20,30 @@
 
 #include "common.h"
 #include "directlight.h"
-#include "lightprop.h"
+#include "lighter.h"
 #include "raytracer.h"
 #include "scene.h"
 #include "statistics.h"
 
 namespace lighter
 {
+
+  DirectLighting::PVLPointShader DirectLighting::pvlPointShader = 0;
+  DirectLighting::LMElementShader DirectLighting::lmElementShader = 0;
+
+  void DirectLighting::Initialize ()
+  {
+    if (globalLighter->configMgr->GetBool ("lighter2.DirectLightRandom", false))
+    {
+      pvlPointShader = UniformShadeRndLightNonPD;
+      lmElementShader = UniformShadeRndLightNonPD;
+    }
+    else
+    {
+      pvlPointShader = UniformShadeAllLightsNonPD;
+      lmElementShader = UniformShadeAllLightsNonPD;
+    }    
+  }
 
   // Shade a single point in space with direct lighting
   csColor DirectLighting::UniformShadeAllLightsNonPD (Sector* sector, 
@@ -312,7 +329,7 @@ namespace lighter
 
           // Shade non-PD lights
           ElementProxy ep = prim.GetElement (eidx);
-          csColor c = UniformShadeAllLightsNonPD (sector, ep, masterSampler, rt);
+          csColor c = lmElementShader (sector, ep, masterSampler, rt);
 
           uint u, v;
           prim.GetElementUV (eidx, u, v);
@@ -352,7 +369,7 @@ namespace lighter
 
       csColor& c = litColors->Get (i);
 
-      c = UniformShadeAllLightsNonPD (sector, pos, normal, masterSampler, rt);
+      c = pvlPointShader (sector, pos, normal, masterSampler, rt);
 
       // Shade PD lights
       for (size_t pdli = 0; pdli < allPDLights.GetSize (); ++pdli)

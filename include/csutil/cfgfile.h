@@ -84,6 +84,14 @@ public:
     bool NewWins = true);
 
   /**
+   * Load the configuration from a data buffer and add it to the current
+   * configuration. This may modify the contents of the file buffer but
+   * will not delete it. This function will set the dirty flag if any
+   * options have been added or modified.
+   */
+  virtual void LoadFromBuffer(const char *Filedata, bool overwrite);
+
+  /**
    * Save configuration to the same place from which it was loaded.  Returns
    * true if the save operation succeeded.
    */
@@ -191,13 +199,7 @@ private:
   void InitializeObject ();
   // load the configuration from a file, ignoring the dirty flag
   virtual bool LoadNow(const char *Filename, iVFS *vfs, bool overwrite);
-  /*
-   * load the configuration from a data buffer and add it to the current
-   * configuration. This may modify the contents of the file buffer but
-   * will not delete it. This function will set the dirty flag if any
-   * options have been added or modified.
-   */
-  virtual void LoadFromBuffer(const char *Filedata, bool overwrite);
+  
   // return a pointer to the named node or the first node of a subsection.
   csConfigNode *FindNode(const char *Name, bool isSubsection = false) const;
   // create a new node in the list

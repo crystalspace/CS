@@ -23,6 +23,12 @@ chronological order.
           the weight of the first bone is 0 and the others weights are 
           greater than 0.
 	- Marten commented out some debug-code in genmesh and instmesh.
+	- Marten added some initial configruation handling to lighter2.
+	  It now merges command line options into config manager and then
+	  load settings from config manager which allows for defaults in
+	  config-file and overrides on command line.
+	- Marten added a simpler output mode for lighter2. Activate with
+	  --simpletui command line parameter.
 5-Dec-2006
 	- Jorrit changed 'exprlib' into 'libexpr' for refering to
 	  previously loaded shader expressions.
