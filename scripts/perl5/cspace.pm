@@ -14482,6 +14482,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 %OWNER = ();
 %ITERATORS = ();
 *RegisterTexture = *cspacec::iTextureManager_RegisterTexture;
+*CreateTexture = *cspacec::iTextureManager_CreateTexture;
 *GetTextureFormat = *cspacec::iTextureManager_GetTextureFormat;
 *CreateSuperLightmap = *cspacec::iTextureManager_CreateSuperLightmap;
 *GetMaxTextureSize = *cspacec::iTextureManager_GetMaxTextureSize;

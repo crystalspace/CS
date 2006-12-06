@@ -9637,6 +9637,7 @@ class iTextureManager(iBase):
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def RegisterTexture(*args): return _cspace.iTextureManager_RegisterTexture(*args)
+    def CreateTexture(*args): return _cspace.iTextureManager_CreateTexture(*args)
     def GetTextureFormat(*args): return _cspace.iTextureManager_GetTextureFormat(*args)
     def CreateSuperLightmap(*args): return _cspace.iTextureManager_CreateSuperLightmap(*args)
     def GetMaxTextureSize(*args): return _cspace.iTextureManager_GetMaxTextureSize(*args)
