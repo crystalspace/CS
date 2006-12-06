@@ -23,69 +23,92 @@
 namespace CS
 {
 
-struct comp
+csString TextureFormatStrings::ConvertCanonical (const char* in)
 {
-  char component;
-  int size;
-};
+  StructuredTextureFormat fmt = CS::TextureFormatStrings::ConvertStructured (in);
+  return fmt.GetCanonical ();
+}
 
-csString TextureFormatStrings::CanonicalTextureFormat (const char* in)
+//--------------------------------------------------------------------------------
+
+void StructuredTextureFormat::FixSizes (int size)
 {
+  uint16 p1 = (coded_components >> 48) & 65535;
+  uint16 p2 = (coded_components >> 32) & 65535;
+  uint16 p3 = (coded_components >> 16) & 65535;
+  uint16 p4 = coded_components & 65535;
+  if (p1 != 0 && (p1 & 255) == 0) p1 += size;
+  if (p2 != 0 && (p2 & 255) == 0) p2 += size;
+  if (p3 != 0 && (p3 & 255) == 0) p3 += size;
+  if (p4 != 0 && (p4 & 255) == 0) p4 += size;
+  coded_components = (uint64 (p1) << 48) + (uint64 (p2) << 32) + (p3 << 16) + p4;
+}
+
+csString StructuredTextureFormat::GetCanonical ()
+{
+  if (format == CS_TEXTUREFORMAT_INVALID) return csString ("-");
+  if (format == CS_TEXTUREFORMAT_STAR) return extra;
   csString out;
+  uint16 p1 = (coded_components >> 48) & 65535;
+  uint16 p2 = (coded_components >> 32) & 65535;
+  uint16 p3 = (coded_components >> 16) & 65535;
+  uint16 p4 = coded_components & 65535;
+  if (p1 != 0) { out += char ((p1>>8)&255); out += p1 & 255; }
+  if (p2 != 0) { out += char ((p2>>8)&255); out += p2 & 255; }
+  if (p3 != 0) { out += char ((p3>>8)&255); out += p3 & 255; }
+  if (p4 != 0) { out += char ((p4>>8)&255); out += p4 & 255; }
+  out += '_';
+  out += format;
+  return out;
+}
 
+//--------------------------------------------------------------------------------
+
+StructuredTextureFormat TextureFormatStrings::ConvertStructured (const char* in)
+{
   // Scan the initial part for components.
-  if (!*in) { out = '-'; return out; }	// Error.
+  if (!in || !*in) return StructuredTextureFormat ();
+
+  StructuredTextureFormat out;
 
   // If we have a string starting with '*' then we just return the
   // string unchanged.
   if (*in == '*')
   {
-    out = in;
+    out.SetStarred (in);
     return out;
   }
 
-  comp components[10];
-  int idx = 0;
   int lastsize = 8;
   do
   {
-    if (idx >= 10) { out = '-'; return out; }	// Error. Too many components.
     char cmp = *in++;
-    if (strchr ("rgbalds", cmp) == 0) { out = '-'; return out; } // Error.
-    components[idx].component = cmp;
+    if (strchr ("rgbalds", cmp) == 0) return StructuredTextureFormat ();
+
     int s = 0;
     while (isdigit (*in))
     {
       s = s*10 + (*in-'0');
       in++;
     }
-    components[idx].size = s;
+    if (!out.AddComponent (cmp, s))
+      return StructuredTextureFormat ();
     if (s != 0) lastsize = s;
-    idx++;
   }
   while (*in && *in != '_');
 
-  char format = 'i';
+  char format = CS_TEXTUREFORMAT_INTEGER;
   if (*in == '_')
   {
     // There is a format that follows.
     in++;
-    if ((*in == 'f' || *in == 'i') && *(in+1) == 0)
+    if ((*in == CS_TEXTUREFORMAT_FLOAT || *in == CS_TEXTUREFORMAT_INTEGER) && *(in+1) == 0)
       format = *in;
-    else { out = '-'; return out; }	// Error.
+    else
+      return StructuredTextureFormat ();
   }
-
-  int i;
-  for (i = 0 ; i < idx ; i++)
-  {
-    out += components[i].component;
-    int s = components[i].size;
-    if (s) out += s;
-    else out += lastsize;
-  }
-  out += '_';
-  out += format;
-
+  out.SetFormat (format);
+  out.FixSizes (lastsize);
   return out;
 }
 

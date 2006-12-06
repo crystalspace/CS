@@ -29,6 +29,83 @@
 
 namespace CS
 {
+#define CS_TEXTUREFORMAT_INVALID '-'
+#define CS_TEXTUREFORMAT_STAR '*'
+#define CS_TEXTUREFORMAT_INTEGER 'i'
+#define CS_TEXTUREFORMAT_FLOAT 'f'
+
+  /**
+   * Structured representation of a texture format.
+   */
+  class CS_CRYSTALSPACE_EXPORT StructuredTextureFormat
+  {
+  private:
+    uint64 coded_components;
+    char format;
+    csString extra;
+
+  public:
+    /// Construct an invalid texture format.
+    StructuredTextureFormat ()
+    {
+      coded_components = CONST_UINT64 (0);
+      format = CS_TEXTUREFORMAT_INVALID;
+    }
+
+    /**
+     * A starred format (like '*dxt1').
+     */
+    void SetStarred (const char* extra)
+    {
+      StructuredTextureFormat::extra = extra;
+      format = CS_TEXTUREFORMAT_STAR;
+    }
+
+    /**
+     * Add a new component to the texture format.
+     * \param cmp is one of 'r', 'g', 'b', 'a', 'd', 's', or 'l'
+     * \param size is the size of that component. If 0 then it will have
+     *  to be set later using FixSizes().
+     * \return false if the component couldn't be added.
+     */
+    bool AddComponent (char cmp, int size)
+    {
+      uint64 shifted = coded_components << 16;
+      if ((shifted >> 16) != coded_components)
+	return false;
+      coded_components = shifted + (CONST_UINT64 (256) * cmp) + size;
+      return true;
+    }
+
+    /**
+     * Set the format (one of the CS_TEXTUREFORMAT_ constants).
+     */
+    void SetFormat (uint format)
+    {
+      StructuredTextureFormat::format = format;
+    }
+
+    /**
+     * Fix the unset sizes (i.e. 0 sizes) so that they 
+     * are filled with the given size.
+     */
+    void FixSizes (int size);
+
+    /**
+     * Convert this structured format to canonical format.
+     */
+    csString GetCanonical ();
+
+    bool operator== (const StructuredTextureFormat& other) const
+    {
+      if (coded_components != other.coded_components) return false;
+      if (format != other.format) return false;
+      return (extra == other.extra);
+    }
+
+    bool IsValid () { return format != CS_TEXTUREFORMAT_INVALID; }
+  };
+
   /**
    * Texture format string parser routines.
    */
@@ -45,7 +122,12 @@ namespace CS
      *    - *dxt1    -> *dxt1 (everything after '*' is unchanged)
      *    - invalid  -> -
      */
-    static csString CanonicalTextureFormat (const char* in);
+    static csString ConvertCanonical (const char* in);
+
+    /**
+     * Convert a (canonical of not) texture format to a structured form.
+     */
+    static StructuredTextureFormat ConvertStructured (const char* in);
   };
 }
 

@@ -181,6 +181,9 @@ public:
     const csRGBpixel* transp_color, csAlphaMode::AlphaType& alphaType);
   csRef<iImage>& GetImage () { return image; }
   void Unprepare () { SetPrepared (false); }
+  /// Prepare a single image (rescale to po2 and make transparency).
+  csRef<iImage> PrepareIntImage (int actual_width, int actual_height,
+      int actual_depth, iImage* srcimage, csAlphaMode::AlphaType newAlphaType);
   /// Merge this texture into current palette, compute mipmaps and so on.
   void PrepareInt ();
 

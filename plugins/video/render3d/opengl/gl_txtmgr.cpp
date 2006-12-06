@@ -286,6 +286,35 @@ static void ComputeNewPo2ImageSize (int texFlags,
     newdepth = max_tex_size;
 }
 
+csRef<iImage> csGLTextureHandle::PrepareIntImage (
+    int actual_width, int actual_height, int actual_depth, iImage* srcimage,
+    csAlphaMode::AlphaType newAlphaType)
+{
+  csRef<iImage> newImage;
+  if (actual_width != srcimage->GetWidth () || actual_height != srcimage->GetHeight () 
+      || actual_depth != srcimage->GetDepth ())
+  {
+    newImage = csImageManipulate::Rescale (srcimage, actual_width, 
+	actual_height, actual_depth);
+  }
+  if (IsTransp())
+  {
+    if (!newImage.IsValid()) 
+      newImage.AttachNew (new csImageMemory (srcimage));
+    // Set the alpha of keycolored images to 0.
+    PrepareKeycolor (newImage, transp_color, newAlphaType);
+  }
+#if 0
+  // Avoid accessing the image data until really needed
+  else
+    /* Check all alpha values for the actual alpha type.  */
+    CheckAlpha  (image->GetWidth(), image->GetHeight(), 
+	(csRGBpixel*)image->GetImageData (), 0, newAlphaType);
+#endif
+  if (newImage.IsValid()) return newImage;
+  return 0;
+}
+
 void csGLTextureHandle::PrepareInt ()
 {
   //@@@ Images may be lost if preparing twice. Some better way of solving it?
@@ -319,21 +348,9 @@ void csGLTextureHandle::PrepareInt ()
       ComputeNewPo2ImageSize (texFlags.Get(), 
 	imgFace->GetWidth(), imgFace->GetHeight(), 1,
 	newFaceW, newFaceH, newFaceD, txtmgr->max_tex_size);
-      csRef<iImage> newFace;
       if (newFaceW != newFaceH) newFaceH = newFaceW;
-      if ((newFaceW != imgFace->GetWidth()) 
-	|| (newFaceH != imgFace->GetHeight()))
-      {
-	newFace = csImageManipulate::Rescale (imgFace, 
-	  newFaceW, newFaceH);
-      }
-      if (IsTransp())
-      {
-	if (!newFace.IsValid()) 
-	  newFace.AttachNew (new csImageMemory (imgFace));
-	// Set the alpha of keycolored images to 0.
-	PrepareKeycolor (newFace, transp_color, newAlphaType);
-      }
+      csRef<iImage> newFace = PrepareIntImage (newFaceW, newFaceH,
+	imgFace->GetDepth (), imgFace, newAlphaType);
       if (newFace.IsValid())
       {
 	// Create a new cube if we needed to resize one face.
@@ -362,29 +379,8 @@ void csGLTextureHandle::PrepareInt ()
   }
   else
   {
-    csRef<iImage> newImage;
-    if (actual_width != orig_width || actual_height != orig_height 
-      || actual_d != orig_d)
-    {
-      newImage = csImageManipulate::Rescale (image, actual_width, 
-	actual_height, actual_d);
-    }
-    if (IsTransp())
-    {
-      if (!newImage.IsValid()) 
-	newImage.AttachNew (new csImageMemory (image));
-      // Set the alpha of keycolored images to 0.
-      PrepareKeycolor (newImage, transp_color, newAlphaType);
-    }
-  #if 0
-    // Avoid accessing the image data until really needed
-    else
-      /*
-	Check all alpha values for the actual alpha type.
-	*/
-      CheckAlpha  (image->GetWidth(), image->GetHeight(), 
-	(csRGBpixel*)image->GetImageData (), 0, newAlphaType);
-  #endif
+    csRef<iImage> newImage = PrepareIntImage (actual_width, actual_height,
+	actual_d, image, newAlphaType);
     if (newImage.IsValid()) image = newImage;
   }
   if (newAlphaType > alphaType) alphaType = newAlphaType;
@@ -454,8 +450,8 @@ void csGLTextureHandle::CreateMipMaps()
     && textureSettings->allowDownsample;
   int mipskip = doReduce ? txtmgr->texture_downsample : 0;
   while (((actual_width >> mipskip) > txtmgr->max_tex_size)
-    || ((actual_height >> mipskip) > txtmgr->max_tex_size)
-    || ((actual_d >> mipskip) > txtmgr->max_tex_size))
+      || ((actual_height >> mipskip) > txtmgr->max_tex_size)
+      || ((actual_d >> mipskip) > txtmgr->max_tex_size))
     mipskip++;
 
   // Delete existing mipmaps, if any
