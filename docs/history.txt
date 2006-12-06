@@ -17,6 +17,9 @@ chronological order.
 	    - Jorrit changed TextureFormatStrings::CanonicalTextureFormat()
 	      to first convert to structured format and then calculate
 	      canonical from that.
+        - Erroroman fixed copy/paste error in vproc skinning, also optimized 
+          it by removing allocation of transform array for bones per 
+          calculation.
 5-Dec-2006
 	- Jorrit changed 'exprlib' into 'libexpr' for refering to
 	  previously loaded shader expressions.

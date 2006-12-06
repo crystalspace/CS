@@ -147,66 +147,61 @@ bool csVProcStandardProgram::UpdateSkinnedVertices (csRenderMeshModes& modes,
     }
   }
 
-  csArray<csReversibleTransform> bone_transforms;
-  bone_transforms.SetSize(_sv->GetArraySize());
-  for (size_t i = 0; i < _sv->GetArraySize()/2; i++)
+  if (doVertexSkinning)
   {
-    csShaderVariable *bone_sv = _sv->GetArrayElement(i*2);
-    csVector4 vec;
-    bone_sv->GetValue(vec);
-    csMatrix3 bone1_rot = csMatrix3(csQuaternion(vec.x, vec.y, vec.z, vec.w));
+    csVertexListWalker<int> bones_indices_bufWalker (bones_indices_buf, 4);
+    csVertexListWalker<float> bones_weights_bufWalker (bones_weights_buf, 4);
+    csVertexListWalker<float> vbufWalker (vbuf, 3);
+    csRenderBufferLock<csVector3, iRenderBuffer*> tmpPos (spbuf);
+    for (size_t i = 0; i < elements_count; i++)
+    {
+      const int* c = bones_indices_bufWalker;
+      const float* d = bones_weights_bufWalker;
+      const float* e = vbufWalker;
 
-    bone_sv = _sv->GetArrayElement(i*2 + 1);
-    bone_sv->GetValue(vec);
-    csVector3 bone1_offs = csVector3(vec.x, vec.y, vec.z);
+      csVector3 origin_pos = csVector3(e[0], e[1], e[2]);
+      if (!d[0])
+      {
+        tmpPos[i] = origin_pos;
+      }
+      else
+      { 
+        for (int k = 0; k < 4; k++)
+        {
+          if (d[k])
+          {
+            csVector4 v;
+            _sv->GetArrayElement(c[k]*2)->GetValue(v);
+            csQuaternion bone_rot;
+            bone_rot.v.x = v.x; bone_rot.v.y = v.y;
+            bone_rot.v.z = v.z; bone_rot.w = v.w;
+            csVector3 bone_pos;
+            _sv->GetArrayElement(c[k]*2 + 1)->GetValue(bone_pos);
+            if (!k)
+            {
+              tmpPos[i] = (bone_rot.Rotate(origin_pos) + bone_pos)*d[k];
+            }
+            else
+            {
+              tmpPos[i] += (bone_rot.Rotate(origin_pos) + bone_pos)*d[k];
+            }
+          }
+        }
+      }
 
-    csReversibleTransform bone_transform;
-    bone_transform.SetT2O(bone1_rot);
-    bone_transform.SetOrigin(bone1_offs);
-    bone_transforms[i] = bone_transform;
+      ++bones_indices_bufWalker;
+      ++bones_weights_bufWalker;
+      ++vbufWalker;
+    }
+    modes.buffers->SetAccessor (modes.buffers->GetAccessor(),
+    modes.buffers->GetAccessorMask() & ~(1 << skinnedPositionOutputBuffer));
+    modes.buffers->SetRenderBuffer (skinnedPositionOutputBuffer, spbuf);
   }
-
-  csVertexListWalker<int> bones_indices_bufWalker (bones_indices_buf, 4);
-  csVertexListWalker<float> bones_weights_bufWalker (bones_weights_buf, 4);
-  csVertexListWalker<float> vbufWalker (vbuf, 3);
-  csRenderBufferLock<csVector3, iRenderBuffer*> tmpPos (spbuf);
-  for (size_t i = 0; i < elements_count; i++)
-  {
-    const int* c = bones_indices_bufWalker;
-    const float* d = bones_weights_bufWalker;
-    const float* e = vbufWalker;
-
-    const csReversibleTransform & bone_transform1 = bone_transforms[c[0]];
-    const csReversibleTransform & bone_transform2 = bone_transforms[c[1]];
-    const csReversibleTransform & bone_transform3 = bone_transforms[c[2]];
-    const csReversibleTransform & bone_transform4 = bone_transforms[c[3]];
-
-    tmpPos[i] = d[0] ? (bone_transform1.GetT2O()*csVector3(e[0], e[1], e[2]) + bone_transform1.GetOrigin())*d[0] : csVector3(e[0], e[1], e[2]);
-    if (d[1])
-    {
-      tmpPos[i] += (bone_transform2.GetT2O()*csVector3(e[0], e[1], e[2]) + bone_transform2.GetOrigin())*d[1];
-    }
-    if (d[2])
-    {
-      tmpPos[i] += (bone_transform3.GetT2O()*csVector3(e[0], e[1], e[2]) + bone_transform2.GetOrigin())*d[2];
-    }
-    if (d[3])
-    {
-      tmpPos[i] += (bone_transform4.GetT2O()*csVector3(e[0], e[1], e[2]) + bone_transform2.GetOrigin())*d[3];
-    }
-
-    ++bones_indices_bufWalker;
-    ++bones_weights_bufWalker;
-    ++vbufWalker;
-  }
-  modes.buffers->SetAccessor (modes.buffers->GetAccessor(),
-  modes.buffers->GetAccessorMask() & ~(1 << skinnedPositionOutputBuffer));
-  modes.buffers->SetRenderBuffer (skinnedPositionOutputBuffer, spbuf);
 
   if (doNormalSkinning)
   {
-    bones_indices_bufWalker.ResetState ();
-    bones_weights_bufWalker.ResetState ();
+    csVertexListWalker<int> bones_indices_bufWalker (bones_indices_buf, 4);
+    csVertexListWalker<float> bones_weights_bufWalker (bones_weights_buf, 4);
     csVertexListWalker<float> nbufWalker (nbuf, 3);
     csRenderBufferLock<csVector3, iRenderBuffer*> tmpNorm (snbuf);
     for (size_t i = 0; i < elements_count; i++)
@@ -215,23 +210,34 @@ bool csVProcStandardProgram::UpdateSkinnedVertices (csRenderMeshModes& modes,
       const float* d = bones_weights_bufWalker;
       const float* e = nbufWalker;
 
-      const csReversibleTransform & bone_transform1 = bone_transforms[c[0]];
-      const csReversibleTransform & bone_transform2 = bone_transforms[c[1]];
-      const csReversibleTransform & bone_transform3 = bone_transforms[c[2]];
-      const csReversibleTransform & bone_transform4 = bone_transforms[c[3]];
-
-      tmpNorm[i] = d[0] ? (bone_transform1.GetT2O()*csVector3(e[0], e[1], e[2]))*d[0] : csVector3(e[0], e[1], e[2]);
-      if (d[1])
+      csVector3 origin_norm = csVector3(e[0], e[1], e[2]);
+      if (!d[0])
       {
-        tmpNorm[i] += (bone_transform2.GetT2O()*csVector3(e[0], e[1], e[2]))*d[1];
+        tmpNorm[i] = origin_norm;
       }
-      if (d[2])
-      {
-        tmpNorm[i] += (bone_transform3.GetT2O()*csVector3(e[0], e[1], e[2]))*d[2];
-      }
-      if (d[3])
-      {
-        tmpNorm[i] += (bone_transform4.GetT2O()*csVector3(e[0], e[1], e[2]))*d[3];
+      else
+      { 
+        for (int k = 0; k < 4; k++)
+        {
+          if (d[k])
+          {
+            csVector4 v;
+            _sv->GetArrayElement(c[k]*2)->GetValue(v);
+            csQuaternion bone_rot;
+            bone_rot.v.x = v.x; bone_rot.v.y = v.y;
+            bone_rot.v.z = v.z; bone_rot.w = v.w;
+            csVector3 bone_pos;
+            _sv->GetArrayElement(c[k]*2 + 1)->GetValue(bone_pos);
+            if (!k)
+            {
+              tmpNorm[i] = (bone_rot.Rotate(origin_norm) + bone_pos)*d[k];
+            }
+            else
+            {
+              tmpNorm[i] += (bone_rot.Rotate(origin_norm) + bone_pos)*d[k];
+            }
+          }
+        }
       }
 
       ++bones_indices_bufWalker;
@@ -245,8 +251,8 @@ bool csVProcStandardProgram::UpdateSkinnedVertices (csRenderMeshModes& modes,
 
   if (doTangentSkinning)
   {
-    bones_indices_bufWalker.ResetState();
-    bones_weights_bufWalker.ResetState();
+    csVertexListWalker<int> bones_indices_bufWalker (bones_indices_buf, 4);
+    csVertexListWalker<float> bones_weights_bufWalker (bones_weights_buf, 4);
     csVertexListWalker<float> tbufWalker (tbuf, 3);
     csRenderBufferLock<csVector3, iRenderBuffer*> tmpTan (tnbuf);
     for (size_t i = 0; i < elements_count; i++)
@@ -255,23 +261,34 @@ bool csVProcStandardProgram::UpdateSkinnedVertices (csRenderMeshModes& modes,
       const float* d = bones_weights_bufWalker;
       const float* e = tbufWalker;
 
-      const csReversibleTransform & bone_transform1 = bone_transforms[c[0]];
-      const csReversibleTransform & bone_transform2 = bone_transforms[c[1]];
-      const csReversibleTransform & bone_transform3 = bone_transforms[c[2]];
-      const csReversibleTransform & bone_transform4 = bone_transforms[c[3]];
-
-      tmpTan[i] = d[0] ? (bone_transform1.GetT2O()*csVector3(e[0], e[1], e[2]))*d[0] : csVector3(e[0], e[1], e[2]);
-      if (d[1])
+      csVector3 origin_tang = csVector3(e[0], e[1], e[2]);
+      if (!d[0])
       {
-        tmpTan[i] += (bone_transform2.GetT2O()*csVector3(e[0], e[1], e[2]))*d[1];
+        tmpTan[i] = origin_tang;
       }
-      if (d[2])
-      {
-        tmpTan[i] += (bone_transform3.GetT2O()*csVector3(e[0], e[1], e[2]))*d[2];
-      }
-      if (d[3])
-      {
-        tmpTan[i] += (bone_transform4.GetT2O()*csVector3(e[0], e[1], e[2]))*d[3];
+      else
+      { 
+        for (int k = 0; k < 4; k++)
+        {
+          if (d[k])
+          {
+            csVector4 v;
+            _sv->GetArrayElement(c[k]*2)->GetValue(v);
+            csQuaternion bone_rot;
+            bone_rot.v.x = v.x; bone_rot.v.y = v.y;
+            bone_rot.v.z = v.z; bone_rot.w = v.w;
+            csVector3 bone_pos;
+            _sv->GetArrayElement(c[k]*2 + 1)->GetValue(bone_pos);
+            if (!k)
+            {
+              tmpTan[i] = (bone_rot.Rotate(origin_tang) + bone_pos)*d[k];
+            }
+            else
+            {
+              tmpTan[i] += (bone_rot.Rotate(origin_tang) + bone_pos)*d[k];
+            }
+          }
+        }
       }
 
       ++bones_indices_bufWalker;
@@ -285,8 +302,8 @@ bool csVProcStandardProgram::UpdateSkinnedVertices (csRenderMeshModes& modes,
 
   if (doBiTangentSkinning)
   {
-    bones_indices_bufWalker.ResetState();
-    bones_weights_bufWalker.ResetState();
+    csVertexListWalker<int> bones_indices_bufWalker (bones_indices_buf, 4);
+    csVertexListWalker<float> bones_weights_bufWalker (bones_weights_buf, 4);
     csVertexListWalker<float> btbufWalker (btbuf, 3);
     csRenderBufferLock<csVector3, iRenderBuffer*> tmpBiTan (btnbuf);
     for (size_t i = 0; i < elements_count; i++)
@@ -295,23 +312,34 @@ bool csVProcStandardProgram::UpdateSkinnedVertices (csRenderMeshModes& modes,
       const float* d = bones_weights_bufWalker;
       const float* e = btbufWalker;
 
-      const csReversibleTransform & bone_transform1 = bone_transforms[c[0]];
-      const csReversibleTransform & bone_transform2 = bone_transforms[c[1]];
-      const csReversibleTransform & bone_transform3 = bone_transforms[c[2]];
-      const csReversibleTransform & bone_transform4 = bone_transforms[c[3]];
-
-      tmpBiTan[i] = d[0] ? (bone_transform1.GetT2O()*csVector3(e[0], e[1], e[2]))*d[0] : csVector3(e[0], e[1], e[2]);
-      if (d[1])
+      csVector3 origin_bitang = csVector3(e[0], e[1], e[2]);
+      if (!d[0])
       {
-        tmpBiTan[i] += (bone_transform2.GetT2O()*csVector3(e[0], e[1], e[2]))*d[1];
+        tmpBiTan[i] = origin_bitang;
       }
-      if (d[2])
-      {
-        tmpBiTan[i] += (bone_transform3.GetT2O()*csVector3(e[0], e[1], e[2]))*d[2];
-      }
-      if (d[3])
-      {
-        tmpBiTan[i] += (bone_transform4.GetT2O()*csVector3(e[0], e[1], e[2]))*d[3];
+      else
+      { 
+        for (int k = 0; k < 4; k++)
+        {
+          if (d[k])
+          {
+            csVector4 v;
+            _sv->GetArrayElement(c[k]*2)->GetValue(v);
+            csQuaternion bone_rot;
+            bone_rot.v.x = v.x; bone_rot.v.y = v.y;
+            bone_rot.v.z = v.z; bone_rot.w = v.w;
+            csVector3 bone_pos;
+            _sv->GetArrayElement(c[k]*2 + 1)->GetValue(bone_pos);
+            if (!k)
+            {
+              tmpBiTan[i] = (bone_rot.Rotate(origin_bitang) + bone_pos)*d[k];
+            }
+            else
+            {
+              tmpBiTan[i] += (bone_rot.Rotate(origin_bitang) + bone_pos)*d[k];
+            }
+          }
+        }
       }
 
       ++bones_indices_bufWalker;
@@ -330,10 +358,11 @@ void csVProcStandardProgram::SetupState (const csRenderMesh* mesh,
                                          csRenderMeshModes& modes,
                                          const iShaderVarStack* Stacks)
 {
-  bool skin_verts_updated = false;// @@@ FIXME - time related detection if vertices are not already updated
-  if (doVertexSkinning)
+  bool skin_updated = false;// @@@ FIXME - time related detection if vertices are not already updated
+  if (doVertexSkinning || doNormalSkinning || 
+        doTangentSkinning || doBiTangentSkinning)
   {
-    skin_verts_updated = UpdateSkinnedVertices (modes, Stacks);
+    skin_updated = UpdateSkinnedVertices (modes, Stacks);
   }
   if (numLights > 0)
   {
@@ -346,11 +375,11 @@ void csVProcStandardProgram::SetupState (const csRenderMesh* mesh,
     if ((stacks->GetSize() > id) && ((sv = stacks->Get (id)) != 0))
       sv->GetValue (lightsActive);
 
-    iRenderBuffer *vbuf = doVertexSkinning && skin_verts_updated ? 
+    iRenderBuffer *vbuf = doVertexSkinning && skin_updated ? 
         modes.buffers->GetRenderBuffer (skinnedPositionOutputBuffer):
       GetBuffer (positionBuffer, modes, stacks);
 
-    iRenderBuffer *nbuf = doNormalSkinning && skin_verts_updated ? 
+    iRenderBuffer *nbuf = doNormalSkinning && skin_updated ? 
         modes.buffers->GetRenderBuffer (skinnedNormalOutputBuffer):
       GetBuffer (normalBuffer, modes, stacks);
 
