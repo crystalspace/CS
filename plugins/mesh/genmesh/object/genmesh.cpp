@@ -1748,8 +1748,8 @@ void csGenmeshMeshObjectFactory::Compress ()
     	mesh_vertices, mesh_texels, mesh_normals, mesh_colors);
   if (vt)
   {
-    printf ("From %d to %d\n", int (old_num), int (mesh_vertices.Length ()));
-    fflush (stdout);
+    //printf ("From %d to %d\n", int (old_num), int (mesh_vertices.Length ()));
+    //fflush (stdout);
 
     if (subMeshes.GetSize () == 0)
     {

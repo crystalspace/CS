@@ -1345,8 +1345,8 @@ void csInstmeshMeshObjectFactory::Compress ()
     fact_vertices, fact_texels, fact_normals, fact_colors);
   if (vt)
   {
-    printf ("From %d to %d\n", int (old_num), int (fact_vertices.Length ()));
-    fflush (stdout);
+    //printf ("From %d to %d\n", int (old_num), int (fact_vertices.Length ()));
+    //fflush (stdout);
 
     // Now we can remap the vertices in all triangles.
     size_t i;

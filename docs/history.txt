@@ -22,6 +22,7 @@ chronological order.
         - Erroroman fixed problem in vproc skinning where it could fail if
           the weight of the first bone is 0 and the others weights are 
           greater than 0.
+	- Marten commented out some debug-code in genmesh and instmesh.
 5-Dec-2006
 	- Jorrit changed 'exprlib' into 'libexpr' for refering to
 	  previously loaded shader expressions.
