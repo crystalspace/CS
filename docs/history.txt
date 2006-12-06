@@ -19,7 +19,9 @@ chronological order.
 	      canonical from that.
         - Erroroman fixed copy/paste error in vproc skinning, also optimized 
           it by removing allocation of transform array for bones per 
-          calculation.
+        - Erroroman fixed problem in vproc skinning where it could fail if
+          the weight of the first bone is 0 and the others weights are 
+          greater than 0.
 5-Dec-2006
 	- Jorrit changed 'exprlib' into 'libexpr' for refering to
 	  previously loaded shader expressions.

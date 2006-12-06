@@ -160,33 +160,32 @@ bool csVProcStandardProgram::UpdateSkinnedVertices (csRenderMeshModes& modes,
       const float* e = vbufWalker;
 
       csVector3 origin_pos = csVector3(e[0], e[1], e[2]);
-      if (!d[0])
+      bool skinned = false;
+      for (int k = 0; k < 4; k++)
       {
-        tmpPos[i] = origin_pos;
-      }
-      else
-      { 
-        for (int k = 0; k < 4; k++)
+        if (d[k])
         {
-          if (d[k])
+          csVector4 v;
+          _sv->GetArrayElement(c[k]*2)->GetValue(v);
+          csQuaternion bone_rot;
+          bone_rot.v.x = v.x; bone_rot.v.y = v.y;
+          bone_rot.v.z = v.z; bone_rot.w = v.w;
+          csVector3 bone_pos;
+          _sv->GetArrayElement(c[k]*2 + 1)->GetValue(bone_pos);
+          if (!skinned)
           {
-            csVector4 v;
-            _sv->GetArrayElement(c[k]*2)->GetValue(v);
-            csQuaternion bone_rot;
-            bone_rot.v.x = v.x; bone_rot.v.y = v.y;
-            bone_rot.v.z = v.z; bone_rot.w = v.w;
-            csVector3 bone_pos;
-            _sv->GetArrayElement(c[k]*2 + 1)->GetValue(bone_pos);
-            if (!k)
-            {
-              tmpPos[i] = (bone_rot.Rotate(origin_pos) + bone_pos)*d[k];
-            }
-            else
-            {
-              tmpPos[i] += (bone_rot.Rotate(origin_pos) + bone_pos)*d[k];
-            }
+            tmpPos[i] = (bone_rot.Rotate(origin_pos) + bone_pos)*d[k];
+            skinned =true;
+          }
+          else
+          {
+            tmpPos[i] += (bone_rot.Rotate(origin_pos) + bone_pos)*d[k];
           }
         }
+      }
+      if (!skinned)
+      {
+        tmpPos[i] = origin_pos;
       }
 
       ++bones_indices_bufWalker;
@@ -211,33 +210,32 @@ bool csVProcStandardProgram::UpdateSkinnedVertices (csRenderMeshModes& modes,
       const float* e = nbufWalker;
 
       csVector3 origin_norm = csVector3(e[0], e[1], e[2]);
-      if (!d[0])
+      bool skinned = false;
+      for (int k = 0; k < 4; k++)
       {
-        tmpNorm[i] = origin_norm;
-      }
-      else
-      { 
-        for (int k = 0; k < 4; k++)
+        if (d[k])
         {
-          if (d[k])
+          csVector4 v;
+          _sv->GetArrayElement(c[k]*2)->GetValue(v);
+          csQuaternion bone_rot;
+          bone_rot.v.x = v.x; bone_rot.v.y = v.y;
+          bone_rot.v.z = v.z; bone_rot.w = v.w;
+          csVector3 bone_pos;
+          _sv->GetArrayElement(c[k]*2 + 1)->GetValue(bone_pos);
+          if (!skinned)
           {
-            csVector4 v;
-            _sv->GetArrayElement(c[k]*2)->GetValue(v);
-            csQuaternion bone_rot;
-            bone_rot.v.x = v.x; bone_rot.v.y = v.y;
-            bone_rot.v.z = v.z; bone_rot.w = v.w;
-            csVector3 bone_pos;
-            _sv->GetArrayElement(c[k]*2 + 1)->GetValue(bone_pos);
-            if (!k)
-            {
-              tmpNorm[i] = (bone_rot.Rotate(origin_norm) + bone_pos)*d[k];
-            }
-            else
-            {
-              tmpNorm[i] += (bone_rot.Rotate(origin_norm) + bone_pos)*d[k];
-            }
+            tmpNorm[i] = (bone_rot.Rotate(origin_norm) + bone_pos)*d[k];
+            skinned = true;
+          }
+          else
+          {
+            tmpNorm[i] += (bone_rot.Rotate(origin_norm) + bone_pos)*d[k];
           }
         }
+      }
+      if (!skinned)
+      {
+        tmpNorm[i] = origin_norm;
       }
 
       ++bones_indices_bufWalker;
@@ -262,33 +260,32 @@ bool csVProcStandardProgram::UpdateSkinnedVertices (csRenderMeshModes& modes,
       const float* e = tbufWalker;
 
       csVector3 origin_tang = csVector3(e[0], e[1], e[2]);
-      if (!d[0])
+      bool skinned = false;
+      for (int k = 0; k < 4; k++)
       {
-        tmpTan[i] = origin_tang;
-      }
-      else
-      { 
-        for (int k = 0; k < 4; k++)
+        if (d[k])
         {
-          if (d[k])
+          csVector4 v;
+          _sv->GetArrayElement(c[k]*2)->GetValue(v);
+          csQuaternion bone_rot;
+          bone_rot.v.x = v.x; bone_rot.v.y = v.y;
+          bone_rot.v.z = v.z; bone_rot.w = v.w;
+          csVector3 bone_pos;
+          _sv->GetArrayElement(c[k]*2 + 1)->GetValue(bone_pos);
+          if (!skinned)
           {
-            csVector4 v;
-            _sv->GetArrayElement(c[k]*2)->GetValue(v);
-            csQuaternion bone_rot;
-            bone_rot.v.x = v.x; bone_rot.v.y = v.y;
-            bone_rot.v.z = v.z; bone_rot.w = v.w;
-            csVector3 bone_pos;
-            _sv->GetArrayElement(c[k]*2 + 1)->GetValue(bone_pos);
-            if (!k)
-            {
-              tmpTan[i] = (bone_rot.Rotate(origin_tang) + bone_pos)*d[k];
-            }
-            else
-            {
-              tmpTan[i] += (bone_rot.Rotate(origin_tang) + bone_pos)*d[k];
-            }
+            tmpTan[i] = (bone_rot.Rotate(origin_tang) + bone_pos)*d[k];
+            skinned = true;
+          }
+          else
+          {
+            tmpTan[i] += (bone_rot.Rotate(origin_tang) + bone_pos)*d[k];
           }
         }
+      }
+      if (!skinned)
+      {
+        tmpTan[i] = origin_tang;
       }
 
       ++bones_indices_bufWalker;
@@ -313,33 +310,32 @@ bool csVProcStandardProgram::UpdateSkinnedVertices (csRenderMeshModes& modes,
       const float* e = btbufWalker;
 
       csVector3 origin_bitang = csVector3(e[0], e[1], e[2]);
-      if (!d[0])
+      bool skinned = false;
+      for (int k = 0; k < 4; k++)
       {
-        tmpBiTan[i] = origin_bitang;
-      }
-      else
-      { 
-        for (int k = 0; k < 4; k++)
+        if (d[k])
         {
-          if (d[k])
+          csVector4 v;
+          _sv->GetArrayElement(c[k]*2)->GetValue(v);
+          csQuaternion bone_rot;
+          bone_rot.v.x = v.x; bone_rot.v.y = v.y;
+          bone_rot.v.z = v.z; bone_rot.w = v.w;
+          csVector3 bone_pos;
+          _sv->GetArrayElement(c[k]*2 + 1)->GetValue(bone_pos);
+          if (!skinned)
           {
-            csVector4 v;
-            _sv->GetArrayElement(c[k]*2)->GetValue(v);
-            csQuaternion bone_rot;
-            bone_rot.v.x = v.x; bone_rot.v.y = v.y;
-            bone_rot.v.z = v.z; bone_rot.w = v.w;
-            csVector3 bone_pos;
-            _sv->GetArrayElement(c[k]*2 + 1)->GetValue(bone_pos);
-            if (!k)
-            {
-              tmpBiTan[i] = (bone_rot.Rotate(origin_bitang) + bone_pos)*d[k];
-            }
-            else
-            {
-              tmpBiTan[i] += (bone_rot.Rotate(origin_bitang) + bone_pos)*d[k];
-            }
+            tmpBiTan[i] = (bone_rot.Rotate(origin_bitang) + bone_pos)*d[k];
+            skinned = true;
+          }
+          else
+          {
+            tmpBiTan[i] += (bone_rot.Rotate(origin_bitang) + bone_pos)*d[k];
           }
         }
+      }
+      if (!skinned)
+      {
+        tmpBiTan[i] = origin_bitang;
       }
 
       ++bones_indices_bufWalker;
