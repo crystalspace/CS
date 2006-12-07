@@ -1525,6 +1525,10 @@ bool CommandHandler (const char *cmd, const char *arg)
         {
 	  Sys->views[0]->GetCamera ()->SetSector (room);
 	  Sys->views[1]->GetCamera ()->SetSector (room);
+	  Sys->views[0]->GetCamera ()->GetTransform ().SetOrigin (
+	      csVector3 (0, 0, 0));
+	  Sys->views[1]->GetCamera ()->GetTransform ().SetOrigin (
+	      csVector3 (0, 0, 0));
 	  camok = true;
         }
       }
