@@ -38,6 +38,7 @@
 #include "igraphic/image.h"
 #include "igraphic/imageio.h"
 #include "iutil/vfs.h"
+#include "csgfx/textureformatstrings.h"
 
 #include "csplugincommon/opengl/glextmanager.h"
 
@@ -45,6 +46,12 @@ class csGLGraphics3D;
 class csGLTextureHandle;
 class csGLTextureManager;
 class csGLTextureCache;
+
+struct csGLSource
+{
+  GLenum format;
+  GLenum type;
+};
 
 struct csGLUploadData
 {
@@ -55,11 +62,7 @@ struct csGLUploadData
   bool isCompressed;
   union
   {
-    struct 
-    {
-      GLenum format;
-      GLenum type;
-    } source;
+    csGLSource source;
     struct
     {
       size_t size;
@@ -141,6 +144,15 @@ private:
     const char* rawFormat, bool& compressedTarget);
   bool transform (bool allowCompressed, 
     GLenum targetFormat, iImage* Image, int mipNum, int imageNum);
+
+  /// Convert an image format (canonical or not) into a GL source structure.
+  bool ConvertFormat2GL (const char* format, csGLSource& source);
+  /// Standard formats.
+  static CS::StructuredTextureFormat fmt_r8g8b8_i;
+  static CS::StructuredTextureFormat fmt_b8g8r8_i;
+  static CS::StructuredTextureFormat fmt_r5g6b5_i;
+  static CS::StructuredTextureFormat fmt_b8g8r8a8_i;
+  static CS::StructuredTextureFormat fmt_l8_i;
 
   GLuint Handle;
   /// Upload the texture to GL.

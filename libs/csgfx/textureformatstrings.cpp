@@ -46,8 +46,8 @@ void StructuredTextureFormat::FixSizes (int size)
 
 csString StructuredTextureFormat::GetCanonical ()
 {
-  if (format == CS_TEXTUREFORMAT_INVALID) return csString ("-");
-  if (format == CS_TEXTUREFORMAT_STAR) return extra;
+  if (format == CS_TEXTUREFORMAT_INVALID) return csString ();
+  if (format == CS_TEXTUREFORMAT_SPECIAL) return special;
   csString out;
   uint16 p1 = (coded_components >> 48) & 65535;
   uint16 p2 = (coded_components >> 32) & 65535;
@@ -75,7 +75,7 @@ StructuredTextureFormat TextureFormatStrings::ConvertStructured (const char* in)
   // string unchanged.
   if (*in == '*')
   {
-    out.SetStarred (in);
+    out.SetSpecial (in);
     return out;
   }
 

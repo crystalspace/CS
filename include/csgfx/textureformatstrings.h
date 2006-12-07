@@ -30,7 +30,7 @@
 namespace CS
 {
 #define CS_TEXTUREFORMAT_INVALID '-'
-#define CS_TEXTUREFORMAT_STAR '*'
+#define CS_TEXTUREFORMAT_SPECIAL '*'
 #define CS_TEXTUREFORMAT_INTEGER 'i'
 #define CS_TEXTUREFORMAT_FLOAT 'f'
 
@@ -42,7 +42,7 @@ namespace CS
   private:
     uint64 coded_components;
     char format;
-    csString extra;
+    csString special;
 
   public:
     /// Construct an invalid texture format.
@@ -53,12 +53,12 @@ namespace CS
     }
 
     /**
-     * A starred format (like '*dxt1').
+     * A special format (like '*dxt1').
      */
-    void SetStarred (const char* extra)
+    void SetSpecial (const char* special)
     {
-      StructuredTextureFormat::extra = extra;
-      format = CS_TEXTUREFORMAT_STAR;
+      StructuredTextureFormat::special = special;
+      format = CS_TEXTUREFORMAT_SPECIAL;
     }
 
     /**
@@ -100,7 +100,7 @@ namespace CS
     {
       if (coded_components != other.coded_components) return false;
       if (format != other.format) return false;
-      return (extra == other.extra);
+      return (special == other.special);
     }
 
     bool IsValid () { return format != CS_TEXTUREFORMAT_INVALID; }

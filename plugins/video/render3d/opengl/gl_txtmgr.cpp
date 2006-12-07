@@ -568,6 +568,35 @@ GLenum csGLTextureHandle::DetermineTargetFormat (GLenum defFormat,
   return targetFormat;
 }
 
+CS::StructuredTextureFormat csGLTextureHandle::fmt_r8g8b8_i
+	= CS::TextureFormatStrings::ConvertStructured ("r8g8b8_i");
+CS::StructuredTextureFormat csGLTextureHandle::fmt_b8g8r8_i
+	= CS::TextureFormatStrings::ConvertStructured ("b8g8r8_i");
+CS::StructuredTextureFormat csGLTextureHandle::fmt_r5g6b5_i
+	= CS::TextureFormatStrings::ConvertStructured ("r5g6b5_i");
+CS::StructuredTextureFormat csGLTextureHandle::fmt_b8g8r8a8_i
+	= CS::TextureFormatStrings::ConvertStructured ("b8g8r8a8_i");
+CS::StructuredTextureFormat csGLTextureHandle::fmt_l8_i
+	= CS::TextureFormatStrings::ConvertStructured ("l8_i");
+
+bool csGLTextureHandle::ConvertFormat2GL (const char* format,
+	csGLSource& s)
+{
+  CS::StructuredTextureFormat fmt = CS::TextureFormatStrings
+  	::ConvertStructured (format);
+  if (fmt == fmt_r8g8b8_i)
+  { s.format = GL_RGB; s.type = GL_UNSIGNED_BYTE; return true; }
+  if (fmt == fmt_b8g8r8_i)
+  { s.format = GL_BGR; s.type = GL_UNSIGNED_BYTE; return true; }
+  if (fmt == fmt_r5g6b5_i)
+  { s.format = GL_RGB; s.type = GL_UNSIGNED_SHORT_5_6_5; return true; }
+  if (fmt == fmt_b8g8r8a8_i)
+  { s.format = GL_BGRA; s.type = GL_UNSIGNED_BYTE; return true; }
+  if (fmt == fmt_l8_i)
+  { s.format = GL_LUMINANCE; s.type = GL_UNSIGNED_BYTE; return true; }
+  return false;
+}
+
 bool csGLTextureHandle::transform (bool allowCompressed, GLenum targetFormat, 
 				   iImage* Image, int mipNum, int imageNum)
 {
