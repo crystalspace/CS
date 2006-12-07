@@ -29,6 +29,8 @@ chronological order.
 	      at most a configurable amount of lightmaps (by default max 
 	      200MB) in memory during processing, spilling them out to z-lib
 	      compressed files on disk on demand.
+	- Marten made some fixes to the tui in lighter2. It now works
+	  sufficiently.
 6-Dec-2006
 	- Jorrit did further texture manager improvements:
 	    - Slightly cleaned up the GL texture manager.

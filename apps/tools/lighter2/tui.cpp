@@ -31,7 +31,8 @@ namespace lighter
 
   TUI::TUI ()
     : scfImplementationType (this), messageBufferEnd (0),
-    simpleMode (false), kdLastNumNudes (0), lastTaskProgress (0.0f)
+    simpleMode (false), prevWasReporter (false), 
+    kdLastNumNudes (0), lastTaskProgress (0.0f)
   {
   }
 
@@ -102,6 +103,14 @@ namespace lighter
       buf.Append (TUI_SEVERITY_TEXT[severity]);
       csString tmp(descrSplit[i]);
       buf.Append (tmp.Slice (0,69).PadRight (69));
+
+      if (simpleMode)
+      {
+        if (!prevWasReporter)
+          csPrintf ("\n");
+        csPrintf ("%s\n", buf.GetDataSafe ());
+        prevWasReporter = true;
+      }
 
       messageBufferEnd++;
       if(messageBufferEnd > 3) messageBufferEnd = 0;
@@ -297,6 +306,7 @@ namespace lighter
     // Check if kd-tree haven't been printed but now have been created
     if (globalStats.kdtree.numNodes != kdLastNumNudes)
     {
+      prevWasReporter = false;
       // Print KD-tree stats
       csPrintf ("\nKD-tree: \n");
       csPrintf ("N: % 8d / % 8d\n", globalStats.kdtree.numNodes, globalStats.kdtree.leafNodes);
@@ -310,7 +320,8 @@ namespace lighter
 
     if (globalStats.progress.taskName != lastTask)
     {
-      csPrintf ("\n % 3d %% - %s ", (int)globalStats.progress.overallProgress,
+      prevWasReporter = false;
+      csPrintf ("\n% 4d %% - %s ", (int)globalStats.progress.overallProgress,
         globalStats.progress.taskName.GetDataSafe ());
 
       // Print new task and global progress
@@ -321,6 +332,7 @@ namespace lighter
     {
       while (lastTaskProgress + 10 < globalStats.progress.taskProgress)
       {
+        prevWasReporter = false;
         csPrintf (".");
         lastTaskProgress += 10;
       }

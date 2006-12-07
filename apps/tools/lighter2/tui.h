@@ -82,7 +82,7 @@ namespace lighter
     uint messageBufferEnd;
 
     // Setting determining simple output mode instead of full TUI
-    bool simpleMode;
+    bool simpleMode, prevWasReporter;
 
     // Last drawn stuff in simple-mode
     size_t kdLastNumNudes;

@@ -245,6 +245,7 @@ namespace lighter
         for (size_t lmI = 0; lmI < lightmaps.GetSize (); ++lmI)
         {
           lightmaps[lmI]->FixupLightmap (lmMasks[lmI]);
+          globalStats.IncTaskProgress (lmProgress);
         }
       }
     }
@@ -254,6 +255,7 @@ namespace lighter
     //Save the result
     if (!scene->SaveFiles ()) return false;
     globalStats.SetTotalProgress (100);
+    globalStats.SetTaskProgress ("Finished!", 0);
 
     return true;  
   }
@@ -341,7 +343,37 @@ namespace lighter
 
   void Lighter::CommandLineHelp () const
   {
+    csPrintf ("Syntax:\n");
+    csPrintf ("  lighter2 [options] <file> [file] [file] ...\n\n");
+    csPrintf ("Options:\n");
+    
+    csPrintf (" --[no]simpletui\n");
+    csPrintf ("  Use simplified text ui for output. Recommended/needed\n"
+              "  for platforms without ANSI console handling such as msys.\n");
 
+    csPrintf (" --lmcachesize=<byte>\n");
+    csPrintf ("  Set the size of the in memory lightmap cache in number of bytes\n");
+
+    csPrintf (" --[no]directlight\n");
+    csPrintf ("  Calculate direct lighting using per lumel/vertex sampling\n");
+
+    csPrintf (" --[no]directlightrandom\n");
+    csPrintf ("  Use random sampling for direct lighting instead of sampling\n"
+              "  every light source.\n");
+
+    csPrintf (" --utexelperunit=<number>\n");
+    csPrintf ("  Set scaling between world space units and lightmap pixels\n"
+              "  in lightmap u-mapping direction\n");
+
+    csPrintf (" --vtexelperunit=<number>\n");
+    csPrintf ("  Set scaling between world space units and lightmap pixels\n"
+              "  in lightmap v-mapping direction\n");
+   
+    csPrintf (" --maxlightmapu=<number>\n");
+    csPrintf ("  Set maximum lightmap size in u-mapping direction\n");
+
+    csPrintf (" --maxlightmapv=<number>\n");
+    csPrintf ("  Set maximum lightmap size in v-mapping direction\n\n");
   }
 
 }
@@ -371,7 +403,6 @@ int main (int argc, char* argv[])
 
   // Remove it
   csInitializer::DestroyApplication (object_reg);
-  csPrintf (CS_ANSI_CLEAR_SCREEN);
 
   return 0;
 }

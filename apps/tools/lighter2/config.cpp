@@ -44,7 +44,7 @@ namespace lighter
   {
     csRef<iConfigManager> cfgMgr = globalLighter->configMgr;
     
-    lighterProperties.doDirectLight = cfgMgr->GetBool ("lighter2.DoDirect", true);
+    lighterProperties.doDirectLight = cfgMgr->GetBool ("lighter2.DirectLight", true);
 
 
     lmProperties.uTexelPerUnit = cfgMgr->GetFloat ("lighter2.uTexelPerUnit", 2.0f);
