@@ -315,18 +315,9 @@ namespace lighter
     }
   }
 
-  void Object::FixupLightmaps (csArray<LightmapPtrDelArray*>& lightmaps)
+  void Object::FillLightmapMask (LightmapMaskArray& masks)
   {
     if (lightPerVertex) return;
-
-    //Create one, @@TODO: optimise this
-    LightmapMaskArray masks;
-    LightmapPtrDelArray::Iterator lmIt = lightmaps[0]->GetIterator ();
-    while (lmIt.HasNext ())
-    {
-      const Lightmap* lm = lmIt.Next ();
-      masks.Push (LightmapMask (*lm));
-    }
 
     float totalArea = 0;
 
@@ -352,13 +343,29 @@ namespace lighter
           for (uint u = minu; u <= (uint)maxu; u++, findex++)
           {
             const float elemArea = prim.GetElementAreas ()[findex];
-            if (elemArea < FLT_EPSILON) continue; // No area, skip
+            if (elemArea == 0) continue; // No area, skip
 
             mask.maskData[vindex+u] += elemArea * area2pixel; //Accumulate
           }
         } 
       }
     }
+
+  }
+
+  void Object::FixupLightmaps (csArray<LightmapPtrDelArray*>& lightmaps)
+  {
+    if (lightPerVertex) return;
+
+    //Create one, @@TODO: optimise this
+    LightmapMaskArray masks;
+    LightmapPtrDelArray::Iterator lmIt = lightmaps[0]->GetIterator ();
+    while (lmIt.HasNext ())
+    {
+      const Lightmap* lm = lmIt.Next ();
+      masks.Push (LightmapMask (*lm));
+    }
+    FillLightmapMask (masks);
 
     // Ok, here we are sure to have a mask
     
@@ -369,9 +376,12 @@ namespace lighter
     {
       for (i = 0; i < lightmaps[l]->GetSize(); i++)
       {
-        csColor* lmData = lightmaps[l]->Get (i)->GetData ().GetArray ();
+        Lightmap* lm = lightmaps[l]->Get (i);
+        
+        LightmapCacheLock l (lm);
+        csColor* lmData = lm->GetData ()->colorArray;
         const float* mmData = masks[i].maskData.GetArray ();
-        const size_t size = lightmaps[l]->Get (i)->GetData ().GetSize ();
+        const size_t size = lm->GetData ()->colorArraySize;
 
         for (uint j = 0; j < size; j++, lmData++, mmData++)
         {
@@ -389,11 +399,15 @@ namespace lighter
     {
       for (i = 0; i < lightmaps[l]->GetSize(); i++)
       {
-        csColor* lmData = lightmaps[l]->Get (i)->GetData ().GetArray ();
+        Lightmap* lm = lightmaps[l]->Get (i);
+
+        LightmapCacheLock l (lm);
+
+        csColor* lmData = lm->GetData ()->colorArray;
         const float* mmData = masks[i].maskData.GetArray ();
               
-        uint lmw = lightmaps[l]->Get (i)->GetWidth ();
-        uint lmh = lightmaps[l]->Get (i)->GetHeight ();
+        uint lmw = lm->GetWidth ();
+        uint lmh = lm->GetHeight ();
         
         for (uint v = 0; v < lmh; v++)
         {

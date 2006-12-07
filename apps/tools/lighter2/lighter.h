@@ -38,6 +38,9 @@ namespace lighter
     // Initialize and load plugins we want
     bool Initialize ();
 
+    // Cleanup and prepare for shutdown
+    void CleanUp ();
+
     // Do the fancy lighting
     bool LightEmUp ();
 

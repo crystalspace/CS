@@ -294,8 +294,9 @@ namespace lighter
     SamplerSequence<1>& masterSampler)
   {
     csArray<PrimitiveArray>& submeshArray = obj->GetPrimitives ();
-
     const LightRefArray& allPDLights = sector->allPDLights;
+
+    csArray<Lightmap*> pdLightLMs;
 
     for (size_t submesh = 0; submesh < submeshArray.GetSize (); ++submesh)
     {
@@ -316,6 +317,19 @@ namespace lighter
         const FloatDArray& areaArray = prim.GetElementAreas ();
         size_t numElements = prim.GetElementCount ();        
         Lightmap* normalLM = sector->scene->GetLightmap (prim.GetGlobalLightmapID (), (Light*)0);
+
+        globalLMCache->LockLM (normalLM);
+
+        pdLightLMs.Empty ();
+        for (size_t pdli = 0; pdli < allPDLights.GetSize (); ++pdli)
+        {
+          Lightmap* lm = sector->scene->GetLightmap (prim.GetGlobalLightmapID (),
+            allPDLights[pdli]);
+
+          globalLMCache->LockLM (lm);
+          pdLightLMs.Push (lm);
+        }
+
 
         csVector2 minUV = prim.GetMinUV ();
 
@@ -344,12 +358,13 @@ namespace lighter
             csColor c = UniformShadeOneLight (sector, ep, allPDLights[pdli],
               masterSampler, rt);
 
-            Lightmap* lm = sector->scene->GetLightmap (prim.GetGlobalLightmapID (),
-              allPDLights[pdli]);
+            Lightmap* lm = pdLightLMs[pdli];
+
             lm->SetAddPixel (u, v, c * pixelArea);
           }
         }
 
+        globalLMCache->UnlockAll ();
       }
     }
   }

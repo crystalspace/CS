@@ -22,6 +22,13 @@ chronological order.
 	- Jorrit fixed the 'loadmap' command so that it also cleans the
 	  engine sequence manager. This is not done automatically by cleaning
 	  the engine.
+	- Marten made a few impovements to lighter2:
+	    - Changed lightmap post-processing to only run once on every
+	      lightmap, not once per object, per lightmap.
+	    - Added an disk file backed lightmap cache. Lighter2 will now keep
+	      at most a configurable amount of lightmaps (by default max 
+	      200MB) in memory during processing, spilling them out to z-lib
+	      compressed files on disk on demand.
 6-Dec-2006
 	- Jorrit did further texture manager improvements:
 	    - Slightly cleaned up the GL texture manager.

@@ -44,8 +44,11 @@ namespace lighter
     kdTree = builder.BuildTree (objIt);
   }
 
-
   Scene::Scene ()
+  {
+  }
+
+  Scene::~Scene ()
   {
     PDLightmapsHash::GlobalIterator pdlIt = pdLightmaps.GetIterator();
     while (pdlIt.HasNext())

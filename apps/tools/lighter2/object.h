@@ -199,6 +199,9 @@ namespace lighter
     // Fixup the lightmap borders
     virtual void FixupLightmaps (csArray<LightmapPtrDelArray*>& lightmaps);
 
+    // Fill lightmap mask with primitive sub-pixel area coverage
+    virtual void FillLightmapMask (LightmapMaskArray& masks);
+
     const csArray<PrimitiveArray>& GetPrimitives () const
     { return allPrimitives; }
 

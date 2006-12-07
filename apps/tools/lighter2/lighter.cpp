@@ -21,6 +21,7 @@
 #include "common.h"
 #include "config.h"
 #include "lighter.h"
+#include "lightmap.h"
 #include "lightmapuv.h"
 #include "lightmapuv_simple.h"
 #include "primitive.h"
@@ -47,7 +48,6 @@ namespace lighter
 
   Lighter::~Lighter ()
   {
-    delete scene;
   }
 
   bool Lighter::Initialize ()
@@ -75,6 +75,7 @@ namespace lighter
     LoadConfiguration ();
     globalConfig.Initialize ();
     globalTUI.Initialize ();
+    LightmapCache::Initialize ();
 
     // Initialize the TUI
     globalTUI.Redraw ();
@@ -136,6 +137,11 @@ namespace lighter
     globalStats.SetTaskProgress ("Starting up", 100);
     globalStats.SetTotalProgress (5);
     return true;
+  }
+
+  void Lighter::CleanUp ()
+  {
+    delete scene;
   }
 
   bool Lighter::LightEmUp ()
@@ -204,24 +210,47 @@ namespace lighter
     //@@ DO OTHER LIGHTING
 
     // De-antialias the lightmaps
-    sectIt.Reset ();
-    globalStats.SetTaskProgress ("Postprocessing lightmaps", 0);
-    while (sectIt.HasNext ())
     {
-      csRef<Sector> sect = sectIt.Next ();
-      float objProgress = sectorProgress / sect->allObjects.GetSize ();
-      ObjectHash::GlobalIterator objIt = sect->allObjects.GetIterator ();
-      while (objIt.HasNext ())
+      LightmapMaskArray lmMasks;
+      LightmapPtrDelArray::Iterator lmIt = scene->GetLightmaps ().GetIterator ();
+      while (lmIt.HasNext ())
       {
-        csRef<Object> obj = objIt.Next ();
-        csArray<LightmapPtrDelArray*> allLightmaps (scene->GetAllLightmaps());
-        obj->FixupLightmaps (allLightmaps);
+        const Lightmap* lm = lmIt.Next ();
+        lmMasks.Push (LightmapMask (*lm));
+      }
 
-        globalStats.IncTaskProgress (objProgress);
+      sectIt.Reset ();
+      globalStats.SetTaskProgress ("Postprocessing lightmaps", 0);
+      while (sectIt.HasNext ())
+      {
+        csRef<Sector> sect = sectIt.Next ();
+        float objProgress = 0.5 * sectorProgress / sect->allObjects.GetSize ();
+        ObjectHash::GlobalIterator objIt = sect->allObjects.GetIterator ();
+        while (objIt.HasNext ())
+        {
+          csRef<Object> obj = objIt.Next ();
+          //csArray<LightmapPtrDelArray*> allLightmaps (scene->GetAllLightmaps());
+          //obj->FixupLightmaps (allLightmaps);
+          obj->FillLightmapMask (lmMasks);
+          globalStats.IncTaskProgress (objProgress);
+        }
+      }
+
+      csArray<LightmapPtrDelArray*> allLightmaps (scene->GetAllLightmaps());
+      for (size_t li = 0; li < allLightmaps.GetSize (); ++li)
+      {
+        LightmapPtrDelArray& lightmaps = *allLightmaps[li];
+        float lmProgress = 50.0f / (allLightmaps.GetSize () * lightmaps.GetSize ());
+
+        for (size_t lmI = 0; lmI < lightmaps.GetSize (); ++lmI)
+        {
+          lightmaps[lmI]->FixupLightmap (lmMasks[lmI]);
+        }
       }
     }
 
     globalStats.SetTotalProgress (90);
+    globalStats.SetTaskProgress ("Saving result", 0);
     //Save the result
     if (!scene->SaveFiles ()) return false;
     globalStats.SetTotalProgress (100);
@@ -333,7 +362,12 @@ int main (int argc, char* argv[])
   // Light em up!
   if (!lighter::globalLighter->LightEmUp ()) return 1;
 
+  // Clean up
+  localLighter->CleanUp ();
+  lighter::LightmapCache::CleanUp ();
+
   localLighter = 0;
+  lighter::globalLighter = 0;
 
   // Remove it
   csInitializer::DestroyApplication (object_reg);

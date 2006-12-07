@@ -88,6 +88,7 @@ namespace lighter
   {
   public:
     Scene ();
+    ~Scene ();
 
     // Add a file for later loading
     void AddFile (const char* directory);
