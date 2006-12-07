@@ -476,7 +476,6 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 %ITERATORS = ();
 *Initialize = *cspacec::iCommandLineParser_Initialize;
 *Reset = *cspacec::iCommandLineParser_Reset;
-*GetOption = *cspacec::iCommandLineParser_GetOption;
 *GetName = *cspacec::iCommandLineParser_GetName;
 *AddOption = *cspacec::iCommandLineParser_AddOption;
 *AddName = *cspacec::iCommandLineParser_AddName;
@@ -487,6 +486,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetAppDir = *cspacec::iCommandLineParser_GetAppDir;
 *GetAppPath = *cspacec::iCommandLineParser_GetAppPath;
 *GetOptionName = *cspacec::iCommandLineParser_GetOptionName;
+*GetOption = *cspacec::iCommandLineParser_GetOption;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});

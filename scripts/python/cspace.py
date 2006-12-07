@@ -256,7 +256,6 @@ class iCommandLineParser(iBase):
     __repr__ = _swig_repr
     def Initialize(*args): return _cspace.iCommandLineParser_Initialize(*args)
     def Reset(*args): return _cspace.iCommandLineParser_Reset(*args)
-    def GetOption(*args): return _cspace.iCommandLineParser_GetOption(*args)
     def GetName(*args): return _cspace.iCommandLineParser_GetName(*args)
     def AddOption(*args): return _cspace.iCommandLineParser_AddOption(*args)
     def AddName(*args): return _cspace.iCommandLineParser_AddName(*args)
@@ -267,6 +266,7 @@ class iCommandLineParser(iBase):
     def GetAppDir(*args): return _cspace.iCommandLineParser_GetAppDir(*args)
     def GetAppPath(*args): return _cspace.iCommandLineParser_GetAppPath(*args)
     def GetOptionName(*args): return _cspace.iCommandLineParser_GetOptionName(*args)
+    def GetOption(*args): return _cspace.iCommandLineParser_GetOption(*args)
     __swig_destroy__ = _cspace.delete_iCommandLineParser
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iCommandLineParser_scfGetVersion
