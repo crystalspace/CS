@@ -1352,7 +1352,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
 	  cp->Load(views[1]->GetCamera (), Engine))
 	camok = true;
     }
-    if (!camok) 
+    if (!camok)
     {
       iSector* room = Engine->GetSectors ()->FindByName ("room");
       if (room)

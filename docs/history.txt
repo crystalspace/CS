@@ -13,6 +13,10 @@ chronological order.
 	      an null string instead of "-" in case of error.
 	    - Made a first version of a function to convert a texture
 	      format into an OpenGL source format.
+	- Jorrit added a new 'loadmap' console command to walktest. This
+	  will clear out the engine and then load the new map. This command
+	  was added to expose several bugs related to completely cleaning
+	  the engine and then loading new maps again.
 6-Dec-2006
 	- Jorrit did further texture manager improvements:
 	    - Slightly cleaned up the GL texture manager.
