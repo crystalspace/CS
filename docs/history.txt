@@ -19,6 +19,9 @@ chronological order.
 	  the engine and then loading new maps again.
 	- Jorrit fixed a camera handling bug in the new 'loadmap' console
 	  command.
+	- Jorrit fixed the 'loadmap' command so that it also cleans the
+	  engine sequence manager. This is not done automatically by cleaning
+	  the engine.
 6-Dec-2006
 	- Jorrit did further texture manager improvements:
 	    - Slightly cleaned up the GL texture manager.

@@ -58,6 +58,7 @@
 #include "ivaria/pmeter.h" 
 #include "ivaria/reporter.h"
 #include "ivaria/view.h"
+#include "ivaria/engseq.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/material.h"
@@ -1499,6 +1500,13 @@ bool CommandHandler (const char *cmd, const char *arg)
         Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
       	  "Couldn't open level '%s'!", level);
 	return false;
+      }
+      csRef<iEngineSequenceManager> engseq = csQueryRegistry<
+	iEngineSequenceManager> (Sys->object_reg);
+      if (engseq)
+      {
+	engseq->RemoveTriggers ();
+	engseq->RemoveSequences ();
       }
       Sys->Engine->DeleteAll ();
       Sys->Engine->SetVFSCacheManager ();
