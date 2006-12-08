@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+9-Dec-2006
+	- Marten removed the random sub-lumel sampling in the lighter2.
+	  It introduced more artifacts than it solved.
 8-Dec-2006
         - Erroroman made an optimization in vproc skinning by defining
           bones and indices buffer walkters globaly in the skin function.
