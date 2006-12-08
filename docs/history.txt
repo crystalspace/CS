@@ -11,6 +11,9 @@ chronological order.
           bones and indices buffer walkters globaly in the skin function.
         - Erroroman precomputed bones position and matrices instead of
           retrieving their values per vertex skin operation.
+	- Marten added a csShaderVariable::GetValue/SetValue pair that 
+	  takes csQuaternion. Avoids one extra copy when storing 
+	  quaternions.
 7-Dec-2006
 	- Jorrit did further texture manager improvements:
 	    - Renamed 'starred' to 'special' in TextureFormatStrings.
