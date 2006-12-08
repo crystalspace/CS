@@ -146,13 +146,17 @@ private:
     GLenum targetFormat, iImage* Image, int mipNum, int imageNum);
 
   /// Convert an image format (canonical or not) into a GL source structure.
-  bool ConvertFormat2GL (const char* format, csGLSource& source);
+  bool ConvertFormat2GL (const char* format, csGLSource& source,
+      GLenum& targetFormat, bool allowCompressed, bool& compressed);
   /// Standard formats.
   static CS::StructuredTextureFormat fmt_r8g8b8_i;
   static CS::StructuredTextureFormat fmt_b8g8r8_i;
   static CS::StructuredTextureFormat fmt_r5g6b5_i;
   static CS::StructuredTextureFormat fmt_b8g8r8a8_i;
   static CS::StructuredTextureFormat fmt_l8_i;
+  static CS::StructuredTextureFormat fmt_dxt1;
+  static CS::StructuredTextureFormat fmt_dxt3;
+  static CS::StructuredTextureFormat fmt_dxt5;
 
   GLuint Handle;
   /// Upload the texture to GL.

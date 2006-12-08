@@ -14,6 +14,9 @@ chronological order.
 	- Marten added a csShaderVariable::GetValue/SetValue pair that 
 	  takes csQuaternion. Avoids one extra copy when storing 
 	  quaternions.
+	- Jorrit did further texture manager improvements:
+	    - Cleaned up the code to transform a texture to GL format
+	      and used the new ConvertFormat2GL() function there.
 7-Dec-2006
 	- Jorrit did further texture manager improvements:
 	    - Renamed 'starred' to 'special' in TextureFormatStrings.

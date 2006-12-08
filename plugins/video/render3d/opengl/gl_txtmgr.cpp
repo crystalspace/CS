@@ -578,22 +578,75 @@ CS::StructuredTextureFormat csGLTextureHandle::fmt_b8g8r8a8_i
 	= CS::TextureFormatStrings::ConvertStructured ("b8g8r8a8_i");
 CS::StructuredTextureFormat csGLTextureHandle::fmt_l8_i
 	= CS::TextureFormatStrings::ConvertStructured ("l8_i");
+CS::StructuredTextureFormat csGLTextureHandle::fmt_dxt1
+	= CS::TextureFormatStrings::ConvertStructured ("*dxt1");
+CS::StructuredTextureFormat csGLTextureHandle::fmt_dxt3
+	= CS::TextureFormatStrings::ConvertStructured ("*dxt3");
+CS::StructuredTextureFormat csGLTextureHandle::fmt_dxt5
+	= CS::TextureFormatStrings::ConvertStructured ("*dxt5");
 
 bool csGLTextureHandle::ConvertFormat2GL (const char* format,
-	csGLSource& s)
+	csGLSource& src, GLenum& targetFormat, bool allowCompressed,
+	bool& compressed)
 {
   CS::StructuredTextureFormat fmt = CS::TextureFormatStrings
   	::ConvertStructured (format);
   if (fmt == fmt_r8g8b8_i)
-  { s.format = GL_RGB; s.type = GL_UNSIGNED_BYTE; return true; }
-  if (fmt == fmt_b8g8r8_i)
-  { s.format = GL_BGR; s.type = GL_UNSIGNED_BYTE; return true; }
-  if (fmt == fmt_r5g6b5_i)
-  { s.format = GL_RGB; s.type = GL_UNSIGNED_SHORT_5_6_5; return true; }
-  if (fmt == fmt_b8g8r8a8_i)
-  { s.format = GL_BGRA; s.type = GL_UNSIGNED_BYTE; return true; }
+  {
+    src.format = GL_RGB;
+    src.type = GL_UNSIGNED_BYTE;
+    return true;
+  }
   if (fmt == fmt_l8_i)
-  { s.format = GL_LUMINANCE; s.type = GL_UNSIGNED_BYTE; return true; }
+  {
+    src.format = GL_LUMINANCE;
+    src.type = GL_UNSIGNED_BYTE;
+    targetFormat = GL_LUMINANCE;
+    return true;
+  }
+  if (G3D->ext->CS_GL_version_1_2)
+  {
+    if (fmt == fmt_b8g8r8_i)
+    {
+      src.format = GL_BGR;
+      src.type = GL_UNSIGNED_BYTE;
+      return true;
+    }
+    else if (fmt == fmt_r5g6b5_i)
+    {
+      src.format = GL_RGB;
+      src.type = GL_UNSIGNED_SHORT_5_6_5;
+      return true;
+    }
+    else if (fmt == fmt_b8g8r8a8_i)
+    {
+      src.format = GL_BGRA;
+      src.type = GL_UNSIGNED_BYTE;
+      return true;
+    }
+  }
+  if (allowCompressed && G3D->ext->CS_GL_EXT_texture_compression_s3tc)
+  {
+   if (fmt == fmt_dxt1)
+    {
+      targetFormat = (alphaType != csAlphaMode::alphaNone) ?
+	    GL_COMPRESSED_RGBA_S3TC_DXT1_EXT : GL_COMPRESSED_RGB_S3TC_DXT1_EXT;
+      compressed = true;
+      return true;
+    }
+    else if (fmt == fmt_dxt3)
+    {
+      targetFormat = GL_COMPRESSED_RGBA_S3TC_DXT3_EXT;
+      compressed = true;
+      return true;
+    }
+    else if (fmt == fmt_dxt3)
+    {
+      targetFormat = GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
+      compressed = true;
+      return true;
+    }
+  }
   return false;
 }
 
@@ -607,53 +660,12 @@ bool csGLTextureHandle::transform (bool allowCompressed, GLenum targetFormat,
   {
     csRef<iDataBuffer> imageRaw = Image->GetRawData();
     uploadData.dataRef = imageRaw;
-    if (strcmp (rawFormat, "r8g8b8") == 0)
+    if (ConvertFormat2GL (rawFormat, uploadData.source, targetFormat,
+	allowCompressed, uploadData.isCompressed))
     {
       uploadData.image_data = imageRaw->GetUint8();
-      uploadData.source.format = GL_RGB;
-      uploadData.source.type = GL_UNSIGNED_BYTE;
-    }
-    else if (G3D->ext->CS_GL_version_1_2
-      && (strcmp (rawFormat, "b8g8r8") == 0))
-    {
-      uploadData.image_data = imageRaw->GetUint8();
-      uploadData.source.format = GL_BGR;
-      uploadData.source.type = GL_UNSIGNED_BYTE;
-    }
-    else if (G3D->ext->CS_GL_version_1_2
-      && (strcmp (rawFormat, "r5g6b5") == 0))
-    {
-      uploadData.image_data = imageRaw->GetUint8();
-      uploadData.source.format = GL_RGB;
-      uploadData.source.type = GL_UNSIGNED_SHORT_5_6_5;
-    }
-    else if (G3D->ext->CS_GL_version_1_2
-      && (strcmp (rawFormat, "b8g8r8a8") == 0))
-    {
-      uploadData.image_data = imageRaw->GetUint8();
-      uploadData.source.format = GL_BGRA;
-      uploadData.source.type = GL_UNSIGNED_BYTE;
-    }
-    else if (strcmp (rawFormat, "l8") == 0)
-    {
-      uploadData.image_data = imageRaw->GetUint8();
-      uploadData.source.format = GL_LUMINANCE;
-      uploadData.source.type = GL_UNSIGNED_BYTE;
-      targetFormat = GL_LUMINANCE;
-    }
-    else 
-    {
-      bool isCompressedTarget;
-      /* Only use glCompressedTexImage if the target format matches
-       * exactly the one of mip 0. */
-      if ((DetermineTargetFormat (targetFormat, allowCompressed,
-	rawFormat, isCompressedTarget) == targetFormat) 
-	&& isCompressedTarget)
-      {
-	uploadData.image_data = imageRaw->GetUint8();
-	uploadData.isCompressed = true;
+      if (uploadData.isCompressed)
 	uploadData.compressed.size = imageRaw->GetSize();
-      }
     }
   }
 
