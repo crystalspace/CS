@@ -574,8 +574,8 @@ CS::StructuredTextureFormat csGLTextureHandle::fmt_b8g8r8_i
 	= CS::TextureFormatStrings::ConvertStructured ("b8g8r8_i");
 CS::StructuredTextureFormat csGLTextureHandle::fmt_r5g6b5_i
 	= CS::TextureFormatStrings::ConvertStructured ("r5g6b5_i");
-CS::StructuredTextureFormat csGLTextureHandle::fmt_b8g8r8a8_i
-	= CS::TextureFormatStrings::ConvertStructured ("b8g8r8a8_i");
+CS::StructuredTextureFormat csGLTextureHandle::fmt_a8r8g8b8_i
+	= CS::TextureFormatStrings::ConvertStructured ("a8r8g8b8_i");
 CS::StructuredTextureFormat csGLTextureHandle::fmt_l8_i
 	= CS::TextureFormatStrings::ConvertStructured ("l8_i");
 CS::StructuredTextureFormat csGLTextureHandle::fmt_dxt1
@@ -591,7 +591,7 @@ bool csGLTextureHandle::ConvertFormat2GL (const char* format,
 {
   CS::StructuredTextureFormat fmt = CS::TextureFormatStrings
   	::ConvertStructured (format);
-  if (fmt == fmt_r8g8b8_i)
+  if (fmt == fmt_b8g8r8_i)
   {
     src.format = GL_RGB;
     src.type = GL_UNSIGNED_BYTE;
@@ -606,7 +606,7 @@ bool csGLTextureHandle::ConvertFormat2GL (const char* format,
   }
   if (G3D->ext->CS_GL_version_1_2)
   {
-    if (fmt == fmt_b8g8r8_i)
+    if (fmt == fmt_r8g8b8_i)
     {
       src.format = GL_BGR;
       src.type = GL_UNSIGNED_BYTE;
@@ -618,7 +618,7 @@ bool csGLTextureHandle::ConvertFormat2GL (const char* format,
       src.type = GL_UNSIGNED_SHORT_5_6_5;
       return true;
     }
-    else if (fmt == fmt_b8g8r8a8_i)
+    else if (fmt == fmt_a8r8g8b8_i)
     {
       src.format = GL_BGRA;
       src.type = GL_UNSIGNED_BYTE;

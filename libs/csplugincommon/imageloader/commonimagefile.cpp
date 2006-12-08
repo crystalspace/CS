@@ -190,7 +190,7 @@ const char* csCommonImageFile::DataTypeString (csLoaderDataType dataType)
   switch (dataType)
   {
     case rdtR8G8B8:
-      return "r8g8b8";
+      return "b8g8r8";
     default:
       return 0;
   }
