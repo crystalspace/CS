@@ -9,6 +9,8 @@ chronological order.
 8-Dec-2006
         - Erroroman made an optimization in vproc skinning by deifning
           bones and indices buffer walkters globaly in the skin function.
+        - Erroroman precomputed bones position and matrices instead of
+          retrieving their values per vertex skin operation.
 7-Dec-2006
 	- Jorrit did further texture manager improvements:
 	    - Renamed 'starred' to 'special' in TextureFormatStrings.
@@ -46,7 +48,7 @@ chronological order.
 	      to first convert to structured format and then calculate
 	      canonical from that.
         - Erroroman fixed copy/paste error in vproc skinning, also optimized 
-          it by removing allocation of transform array for bones per 
+          it by removing allocation of transform array for bones per frame.
         - Erroroman fixed problem in vproc skinning where it could fail if
           the weight of the first bone is 0 and the others weights are 
           greater than 0.

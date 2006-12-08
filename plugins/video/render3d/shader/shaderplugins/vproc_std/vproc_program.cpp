@@ -147,6 +147,17 @@ bool csVProcStandardProgram::UpdateSkinnedVertices (csRenderMeshModes& modes,
     }
   }
 
+  const size_t bones_count = _sv->GetArraySize ()/2;
+  csMatrix3 rotations[bones_count];
+  csVector3 positions[bones_count];
+  for (size_t i = 0; i < bones_count; i++)
+  {
+    csVector4 v;
+    _sv->GetArrayElement(i*2)->GetValue(v);
+    rotations[i] = csQuaternion(v.x, v.y, v.z, v.w).GetMatrix();
+    _sv->GetArrayElement(i*2 + 1)->GetValue(positions[i]);
+  }
+
   csVertexListWalker<int> bones_indices_bufWalker (bones_indices_buf, 4);
   csVertexListWalker<float> bones_weights_bufWalker (bones_weights_buf, 4);
   if (doVertexSkinning)
@@ -165,21 +176,14 @@ bool csVProcStandardProgram::UpdateSkinnedVertices (csRenderMeshModes& modes,
       {
         if (d[k])
         {
-          csVector4 v;
-          _sv->GetArrayElement(c[k]*2)->GetValue(v);
-          csQuaternion bone_rot;
-          bone_rot.v.x = v.x; bone_rot.v.y = v.y;
-          bone_rot.v.z = v.z; bone_rot.w = v.w;
-          csVector3 bone_pos;
-          _sv->GetArrayElement(c[k]*2 + 1)->GetValue(bone_pos);
           if (!skinned)
           {
-            tmpPos[i] = (bone_rot.Rotate(origin_pos) + bone_pos)*d[k];
+            tmpPos[i] = (rotations[c[k]]*origin_pos + positions[c[k]])*d[k];
             skinned =true;
           }
           else
           {
-            tmpPos[i] += (bone_rot.Rotate(origin_pos) + bone_pos)*d[k];
+            tmpPos[i] += (rotations[c[k]]*origin_pos + positions[c[k]])*d[k];
           }
         }
       }
@@ -215,21 +219,14 @@ bool csVProcStandardProgram::UpdateSkinnedVertices (csRenderMeshModes& modes,
       {
         if (d[k])
         {
-          csVector4 v;
-          _sv->GetArrayElement(c[k]*2)->GetValue(v);
-          csQuaternion bone_rot;
-          bone_rot.v.x = v.x; bone_rot.v.y = v.y;
-          bone_rot.v.z = v.z; bone_rot.w = v.w;
-          csVector3 bone_pos;
-          _sv->GetArrayElement(c[k]*2 + 1)->GetValue(bone_pos);
           if (!skinned)
           {
-            tmpNorm[i] = (bone_rot.Rotate(origin_norm) + bone_pos)*d[k];
+            tmpNorm[i] = (rotations[c[k]]*origin_norm)*d[k];
             skinned = true;
           }
           else
           {
-            tmpNorm[i] += (bone_rot.Rotate(origin_norm) + bone_pos)*d[k];
+            tmpNorm[i] += (rotations[c[k]]*origin_norm)*d[k];
           }
         }
       }
@@ -265,21 +262,14 @@ bool csVProcStandardProgram::UpdateSkinnedVertices (csRenderMeshModes& modes,
       {
         if (d[k])
         {
-          csVector4 v;
-          _sv->GetArrayElement(c[k]*2)->GetValue(v);
-          csQuaternion bone_rot;
-          bone_rot.v.x = v.x; bone_rot.v.y = v.y;
-          bone_rot.v.z = v.z; bone_rot.w = v.w;
-          csVector3 bone_pos;
-          _sv->GetArrayElement(c[k]*2 + 1)->GetValue(bone_pos);
           if (!skinned)
           {
-            tmpTan[i] = (bone_rot.Rotate(origin_tang) + bone_pos)*d[k];
+            tmpTan[i] = (rotations[c[k]]*origin_tang)*d[k];
             skinned = true;
           }
           else
           {
-            tmpTan[i] += (bone_rot.Rotate(origin_tang) + bone_pos)*d[k];
+            tmpTan[i] += (rotations[c[k]]*origin_tang)*d[k];
           }
         }
       }
@@ -315,21 +305,14 @@ bool csVProcStandardProgram::UpdateSkinnedVertices (csRenderMeshModes& modes,
       {
         if (d[k])
         {
-          csVector4 v;
-          _sv->GetArrayElement(c[k]*2)->GetValue(v);
-          csQuaternion bone_rot;
-          bone_rot.v.x = v.x; bone_rot.v.y = v.y;
-          bone_rot.v.z = v.z; bone_rot.w = v.w;
-          csVector3 bone_pos;
-          _sv->GetArrayElement(c[k]*2 + 1)->GetValue(bone_pos);
           if (!skinned)
           {
-            tmpBiTan[i] = (bone_rot.Rotate(origin_bitang) + bone_pos)*d[k];
+            tmpBiTan[i] = (rotations[c[k]]*origin_bitang)*d[k];
             skinned = true;
           }
           else
           {
-            tmpBiTan[i] += (bone_rot.Rotate(origin_bitang) + bone_pos)*d[k];
+            tmpBiTan[i] += (rotations[c[k]]*origin_bitang)*d[k];
           }
         }
       }
