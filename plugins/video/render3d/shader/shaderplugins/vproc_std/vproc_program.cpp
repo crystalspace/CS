@@ -148,14 +148,18 @@ bool csVProcStandardProgram::UpdateSkinnedVertices (csRenderMeshModes& modes,
   }
 
   const size_t bones_count = _sv->GetArraySize ()/2;
-  CS_ALLOC_STACK_ARRAY(csMatrix3,rotations,bones_count);
-  CS_ALLOC_STACK_ARRAY(csVector3,positions,bones_count);
+  struct csRotPos
+  {
+    csMatrix3 rot;
+    csVector3 pos;
+  };
+  CS_ALLOC_STACK_ARRAY(csRotPos,rotpos,bones_count);
   for (size_t i = 0; i < bones_count; i++)
   {
     csQuaternion v;
     _sv->GetArrayElement(i*2)->GetValue(v);
-    rotations[i] = v.GetMatrix();
-    _sv->GetArrayElement(i*2 + 1)->GetValue(positions[i]);
+    rotpos[i].rot = v.GetMatrix();
+    _sv->GetArrayElement(i*2 + 1)->GetValue(rotpos[i].pos);
   }
 
   csVertexListWalker<int> bones_indices_bufWalker (bones_indices_buf, 4);
@@ -176,14 +180,15 @@ bool csVProcStandardProgram::UpdateSkinnedVertices (csRenderMeshModes& modes,
       {
         if (d[k])
         {
+	  csRotPos& rp = rotpos[c[k]];
           if (!skinned)
           {
-            tmpPos[i] = (rotations[c[k]]*origin_pos + positions[c[k]])*d[k];
+            tmpPos[i] = (rp.rot*origin_pos + rp.pos)*d[k];
             skinned =true;
           }
           else
           {
-            tmpPos[i] += (rotations[c[k]]*origin_pos + positions[c[k]])*d[k];
+            tmpPos[i] += (rp.rot*origin_pos + rp.pos)*d[k];
           }
         }
       }
@@ -219,14 +224,15 @@ bool csVProcStandardProgram::UpdateSkinnedVertices (csRenderMeshModes& modes,
       {
         if (d[k])
         {
+	  csRotPos& rp = rotpos[c[k]];
           if (!skinned)
           {
-            tmpNorm[i] = (rotations[c[k]]*origin_norm)*d[k];
+            tmpNorm[i] = (rp.rot*origin_norm)*d[k];
             skinned = true;
           }
           else
           {
-            tmpNorm[i] += (rotations[c[k]]*origin_norm)*d[k];
+            tmpNorm[i] += (rp.rot*origin_norm)*d[k];
           }
         }
       }
@@ -262,14 +268,15 @@ bool csVProcStandardProgram::UpdateSkinnedVertices (csRenderMeshModes& modes,
       {
         if (d[k])
         {
+	  csRotPos& rp = rotpos[c[k]];
           if (!skinned)
           {
-            tmpTan[i] = (rotations[c[k]]*origin_tang)*d[k];
+            tmpTan[i] = (rp.rot*origin_tang)*d[k];
             skinned = true;
           }
           else
           {
-            tmpTan[i] += (rotations[c[k]]*origin_tang)*d[k];
+            tmpTan[i] += (rp.rot*origin_tang)*d[k];
           }
         }
       }
@@ -305,14 +312,15 @@ bool csVProcStandardProgram::UpdateSkinnedVertices (csRenderMeshModes& modes,
       {
         if (d[k])
         {
+	  csRotPos& rp = rotpos[c[k]];
           if (!skinned)
           {
-            tmpBiTan[i] = (rotations[c[k]]*origin_bitang)*d[k];
+            tmpBiTan[i] = (rp.rot*origin_bitang)*d[k];
             skinned = true;
           }
           else
           {
-            tmpBiTan[i] += (rotations[c[k]]*origin_bitang)*d[k];
+            tmpBiTan[i] += (rp.rot*origin_bitang)*d[k];
           }
         }
       }
