@@ -147,10 +147,10 @@ bool csVProcStandardProgram::UpdateSkinnedVertices (csRenderMeshModes& modes,
     }
   }
 
+  csVertexListWalker<int> bones_indices_bufWalker (bones_indices_buf, 4);
+  csVertexListWalker<float> bones_weights_bufWalker (bones_weights_buf, 4);
   if (doVertexSkinning)
   {
-    csVertexListWalker<int> bones_indices_bufWalker (bones_indices_buf, 4);
-    csVertexListWalker<float> bones_weights_bufWalker (bones_weights_buf, 4);
     csVertexListWalker<float> vbufWalker (vbuf, 3);
     csRenderBufferLock<csVector3, iRenderBuffer*> tmpPos (spbuf);
     for (size_t i = 0; i < elements_count; i++)
@@ -199,8 +199,8 @@ bool csVProcStandardProgram::UpdateSkinnedVertices (csRenderMeshModes& modes,
 
   if (doNormalSkinning)
   {
-    csVertexListWalker<int> bones_indices_bufWalker (bones_indices_buf, 4);
-    csVertexListWalker<float> bones_weights_bufWalker (bones_weights_buf, 4);
+    bones_indices_bufWalker.ResetState();
+    bones_weights_bufWalker.ResetState();
     csVertexListWalker<float> nbufWalker (nbuf, 3);
     csRenderBufferLock<csVector3, iRenderBuffer*> tmpNorm (snbuf);
     for (size_t i = 0; i < elements_count; i++)
@@ -249,8 +249,8 @@ bool csVProcStandardProgram::UpdateSkinnedVertices (csRenderMeshModes& modes,
 
   if (doTangentSkinning)
   {
-    csVertexListWalker<int> bones_indices_bufWalker (bones_indices_buf, 4);
-    csVertexListWalker<float> bones_weights_bufWalker (bones_weights_buf, 4);
+    bones_indices_bufWalker.ResetState();
+    bones_weights_bufWalker.ResetState();
     csVertexListWalker<float> tbufWalker (tbuf, 3);
     csRenderBufferLock<csVector3, iRenderBuffer*> tmpTan (tnbuf);
     for (size_t i = 0; i < elements_count; i++)
@@ -299,8 +299,8 @@ bool csVProcStandardProgram::UpdateSkinnedVertices (csRenderMeshModes& modes,
 
   if (doBiTangentSkinning)
   {
-    csVertexListWalker<int> bones_indices_bufWalker (bones_indices_buf, 4);
-    csVertexListWalker<float> bones_weights_bufWalker (bones_weights_buf, 4);
+    bones_indices_bufWalker.ResetState();
+    bones_weights_bufWalker.ResetState();
     csVertexListWalker<float> btbufWalker (btbuf, 3);
     csRenderBufferLock<csVector3, iRenderBuffer*> tmpBiTan (btnbuf);
     for (size_t i = 0; i < elements_count; i++)
