@@ -148,8 +148,8 @@ bool csVProcStandardProgram::UpdateSkinnedVertices (csRenderMeshModes& modes,
   }
 
   const size_t bones_count = _sv->GetArraySize ()/2;
-  csMatrix3 rotations[bones_count];
-  csVector3 positions[bones_count];
+  CS_ALLOC_STACK_ARRAY(csMatrix3,rotations,bones_count);
+  CS_ALLOC_STACK_ARRAY(csVector3,positions,bones_count);
   for (size_t i = 0; i < bones_count; i++)
   {
     csQuaternion v;
