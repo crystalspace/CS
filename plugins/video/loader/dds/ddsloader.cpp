@@ -410,8 +410,9 @@ static const char* RawTypeString (csDDSRawDataType type)
   switch (type)
   {
     case csrawDXT1:   
-    case csrawDXT1Alpha:
       return "*dxt1";
+    case csrawDXT1Alpha:
+      return "*dxt1a";
     case csrawDXT2:
       return "*dxt2";
     case csrawDXT3:

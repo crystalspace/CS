@@ -580,6 +580,8 @@ CS::StructuredTextureFormat csGLTextureHandle::fmt_l8_i
 	= CS::TextureFormatStrings::ConvertStructured ("l8_i");
 CS::StructuredTextureFormat csGLTextureHandle::fmt_dxt1
 	= CS::TextureFormatStrings::ConvertStructured ("*dxt1");
+CS::StructuredTextureFormat csGLTextureHandle::fmt_dxt1a
+	= CS::TextureFormatStrings::ConvertStructured ("*dxt1a");
 CS::StructuredTextureFormat csGLTextureHandle::fmt_dxt3
 	= CS::TextureFormatStrings::ConvertStructured ("*dxt3");
 CS::StructuredTextureFormat csGLTextureHandle::fmt_dxt5
@@ -629,8 +631,13 @@ bool csGLTextureHandle::ConvertFormat2GL (const char* format,
   {
    if (fmt == fmt_dxt1)
     {
-      targetFormat = (alphaType != csAlphaMode::alphaNone) ?
-	    GL_COMPRESSED_RGBA_S3TC_DXT1_EXT : GL_COMPRESSED_RGB_S3TC_DXT1_EXT;
+      targetFormat = GL_COMPRESSED_RGB_S3TC_DXT1_EXT;
+      compressed = true;
+      return true;
+    }
+    else if (fmt == fmt_dxt1a)
+    {
+      targetFormat = GL_COMPRESSED_RGBA_S3TC_DXT1_EXT;
       compressed = true;
       return true;
     }

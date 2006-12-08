@@ -155,6 +155,7 @@ private:
   static CS::StructuredTextureFormat fmt_a8r8g8b8_i;
   static CS::StructuredTextureFormat fmt_l8_i;
   static CS::StructuredTextureFormat fmt_dxt1;
+  static CS::StructuredTextureFormat fmt_dxt1a;
   static CS::StructuredTextureFormat fmt_dxt3;
   static CS::StructuredTextureFormat fmt_dxt5;
 
