@@ -23,6 +23,7 @@ chronological order.
 	  to allocate dynamic sized arrays in C++. This is a gcc
 	  extension. Use CS_ALLOC_STACK_ARRAY instead.
 	- Jorrit did another small optimization to vproc_std.
+	- res refactored the DXT decoder in the DDS loader a bit.
 7-Dec-2006
 	- Jorrit did further texture manager improvements:
 	    - Renamed 'starred' to 'special' in TextureFormatStrings.
