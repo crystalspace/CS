@@ -152,9 +152,9 @@ bool csVProcStandardProgram::UpdateSkinnedVertices (csRenderMeshModes& modes,
   csVector3 positions[bones_count];
   for (size_t i = 0; i < bones_count; i++)
   {
-    csVector4 v;
+    csQuaternion v;
     _sv->GetArrayElement(i*2)->GetValue(v);
-    rotations[i] = csQuaternion(v.x, v.y, v.z, v.w).GetMatrix();
+    rotations[i] = v.GetMatrix();
     _sv->GetArrayElement(i*2 + 1)->GetValue(positions[i]);
   }
 

@@ -17,6 +17,8 @@ chronological order.
 	- Jorrit did further texture manager improvements:
 	    - Cleaned up the code to transform a texture to GL format
 	      and used the new ConvertFormat2GL() function there.
+	- Jorrit did another small optimizations to vproc_std by using
+	  the new GetValue() that accepts a csQuaternion.
 7-Dec-2006
 	- Jorrit did further texture manager improvements:
 	    - Renamed 'starred' to 'special' in TextureFormatStrings.
