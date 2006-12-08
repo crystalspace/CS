@@ -28,6 +28,8 @@ chronological order.
 	  sanitized spec.
 	- res "split up" the *dxt1 texture format in *dxt1 (no alpha) and
 	  *dxt1a (with alpha).
+	- res fixed the "old texture cleaning" to also properly clean out
+	  PD light maps.
 7-Dec-2006
 	- Jorrit did further texture manager improvements:
 	    - Renamed 'starred' to 'special' in TextureFormatStrings.

@@ -155,8 +155,10 @@ namespace lighter
     csSet<csString> texturesToClean;
 
     // Save functions
+    void CollectDeleteTextures (iDocumentNode* textureNode,
+      csSet<csString>& filesToDelete);
     void CleanOldLightmaps (LoadedFile* fileInfo, 
-      const csStringArray& texFileNames);
+      const csSet<csString>& texFileNames);
     void SaveSceneToDom (iDocumentNode* root, LoadedFile* fileInfo);
     void SaveMeshFactoryToDom (iDocumentNode* factNode, LoadedFile* fileInfo);
     void SaveSectorToDom (iDocumentNode* sectorNode, LoadedFile* fileInfo);

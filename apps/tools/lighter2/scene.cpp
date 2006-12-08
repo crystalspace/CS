@@ -323,15 +323,47 @@ namespace lighter
     return Success;
   }
 
+  void Scene::CollectDeleteTextures (iDocumentNode* textureNode,
+                                     csSet<csString>& filesToDelete)
+  {
+    csRef<iDocumentNode> fileNode = textureNode->GetNode ("file");
+    if (fileNode.IsValid())
+      filesToDelete.Add (fileNode->GetContentsValue());
+    csRef<iDocumentNode> typeNode = textureNode->GetNode ("type");
+    if (typeNode.IsValid())
+    {
+      const char* typeStr = typeNode->GetContentsValue();
+      if (typeStr && (strcmp (typeStr,
+          "crystalspace.texture.loader.pdlight") == 0))
+      {
+        csRef<iDocumentNode> paramsNode = textureNode->GetNode ("params");
+        if (paramsNode.IsValid())
+        {
+          csRef<iDocumentNodeIterator> mapNodes = 
+            paramsNode->GetNodes ("map");
+          while (mapNodes->HasNext())
+          {
+            csRef<iDocumentNode> mapNode = mapNodes->Next();
+            if (mapNode->GetType() != CS_NODE_ELEMENT) continue;
+            const char* mapName = mapNode->GetContentsValue();
+            if (mapName != 0)
+              filesToDelete.Add (mapName);
+          }
+        }
+      }
+    }
+  }
+
   void Scene::CleanOldLightmaps (LoadedFile* fileInfo, 
-                                 const csStringArray& texFileNames)
+                                 const csSet<csString>& texFileNames)
   {
     csVfsDirectoryChanger chdir (globalLighter->vfs);
     chdir.ChangeTo (fileInfo->directory);
 
-    for (size_t i = 0; i < texFileNames.GetSize(); i++)
+    csSet<csString>::GlobalIterator iter = texFileNames.GetIterator();
+    while (iter.HasNext ())
     {
-      globalLighter->vfs->DeleteFile (texFileNames[i]);
+      globalLighter->vfs->DeleteFile (iter.Next());
     }
   }
 
@@ -421,9 +453,11 @@ namespace lighter
       texturesNode->SetValue ("textures");
     }
 
+    csSet<csString> texFileNamesToDelete;
     for (unsigned int i = 0; i < texturesToSave.GetSize (); i++)
     {
       const SaveTexture& textureToSave = texturesToSave[i];
+
       csRef<iDocumentNode> textureNode;
       {
         csRef<iDocumentNodeIterator> textureNodes = 
@@ -447,7 +481,10 @@ namespace lighter
         textureNode->SetValue ("texture");
       }
       else
+      {
+        CollectDeleteTextures (textureNode, texFileNamesToDelete);
         textureNode->RemoveNodes ();
+      }
       textureNode->SetAttribute ("name", textureToSave.texname.GetData ());
            
       csRef<iDocumentNode> classNode = 
@@ -464,6 +501,7 @@ namespace lighter
       csRef<iDocumentNode> filenameNode =
         fileNode->CreateNodeBefore (CS_NODE_TEXT);
       filenameNode->SetValue (textureToSave.filename.GetData ());
+      texFileNamesToDelete.Delete (textureToSave.filename);
 
       csRef<iDocumentNode> mipmapNode = 
         textureNode->CreateNodeBefore (CS_NODE_ELEMENT);
@@ -496,6 +534,7 @@ namespace lighter
           csRef<iDocumentNode> mapContents = 
             mapNode->CreateNodeBefore (CS_NODE_TEXT, 0);
           mapContents->SetValue (textureToSave.pdLightmapFiles[p]);
+          texFileNamesToDelete.Delete (textureToSave.pdLightmapFiles[p]);
         }
       }
 
@@ -504,7 +543,6 @@ namespace lighter
 
     // Clean out old lightmap textures
     {
-      csStringArray texFileNames;
       csRefArray<iDocumentNode> nodesToDelete;
       csRef<iDocumentNodeIterator> it = texturesNode->GetNodes ("texture");
       while (it->HasNext())
@@ -515,39 +553,14 @@ namespace lighter
         const char* name = child->GetAttributeValue ("name");
         if ((name != 0) && texturesToClean.Contains (name))
         {
-          csRef<iDocumentNode> fileNode = child->GetNode ("file");
-          if (fileNode.IsValid())
-            texFileNames.Push (fileNode->GetContentsValue());
-          csRef<iDocumentNode> typeNode = child->GetNode ("type");
-          if (typeNode.IsValid())
-          {
-            const char* typeStr = typeNode->GetContentsValue();
-            if (typeStr && (strcmp (typeStr,
-                "crystalspace.texture.loader.pdlight") == 0))
-            {
-              csRef<iDocumentNode> paramsNode = child->GetNode ("params");
-              if (paramsNode.IsValid())
-              {
-                csRef<iDocumentNodeIterator> mapNodes = 
-                  paramsNode->GetNodes ("maps");
-                while (mapNodes->HasNext())
-                {
-                  csRef<iDocumentNode> mapNode = mapNodes->Next();
-                  if (mapNode->GetType() != CS_NODE_ELEMENT) continue;
-                  const char* mapName = mapNode->GetContentsValue();
-                  if (mapName != 0)
-                    texFileNames.Push (mapName);
-                }
-              }
-            }
-          }
+          CollectDeleteTextures (child, texFileNamesToDelete);
           nodesToDelete.Push (child);
         }
       }
       for (size_t i = 0; i < nodesToDelete.GetSize(); i++)
         texturesNode->RemoveNode (nodesToDelete[i]);
 
-      CleanOldLightmaps (fileInfo, texFileNames);
+      CleanOldLightmaps (fileInfo, texFileNamesToDelete);
     }
 
     DocumentHelper::RemoveDuplicateChildren(texturesNode, 
