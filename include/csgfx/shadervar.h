@@ -107,7 +107,7 @@ public:
      * Color
      * \deprecated Same as VECTOR4.
      */
-    COLOR = VECTOR4,
+    COLOR = VECTOR4
   };
 
   //CS_LEAKGUARD_DECLARE (csShaderVariable);
