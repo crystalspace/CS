@@ -76,12 +76,12 @@ struct csGLUploadData
 
 struct csGLTextureClassSettings;
 
-class csGLTextureHandle : 
-  public scfImplementation1<csGLTextureHandle, 
+class csGLBasicTextureHandle :
+  public scfImplementation1<csGLBasicTextureHandle, 
 			    iTextureHandle>
 {
-private:
-  CS_LEAKGUARD_DECLARE(csGLTextureHandle);
+protected:
+  CS_LEAKGUARD_DECLARE(csGLBasicTextureHandle);
 
   /// texturemanager handle
   csRef<csGLTextureManager> txtmgr;
@@ -92,12 +92,6 @@ private:
   /// The transparent color
   csRGBpixel transp_color;
   
-  /// Used until Prepare() is called
-  csRef<iImage> image;
-
-  /// Stores the names of the images
-  char* origName;
-
   /// Texture flags (combined public and private)
   csFlags texFlags;
   /// Private texture flags
@@ -164,7 +158,6 @@ private:
   void Load ();
   void Unload ();
 public:
-  int orig_width, orig_height, orig_d;
   int actual_width, actual_height, actual_d;
   csArray<csGLUploadData>* uploadData;
   csWeakRef<csGLGraphics3D> G3D;
@@ -182,27 +175,23 @@ public:
   bool IsNeedMips() const { return texFlags.Check (flagNeedMips); }
   void SetNeedMips (bool b) { texFlags.SetBool (flagNeedMips, b); }
 
-  csGLTextureHandle (iImage* image, int flags, csGLGraphics3D *iG3D);
+  csGLBasicTextureHandle (int flags, csGLGraphics3D *iG3D);
 
-  csGLTextureHandle (int target, GLuint Handle, csGLGraphics3D *iG3D);
-
-  virtual ~csGLTextureHandle ();
+  virtual ~csGLBasicTextureHandle ();
 
   void Clear();
 
-  void AdjustSizePo2 ();
-  void CreateMipMaps();
+  virtual void AdjustSizePo2 () { }
   void PrepareKeycolor (csRef<iImage>& image, const csRGBpixel& transp_color,
     csAlphaMode::AlphaType& alphaType);
   void CheckAlpha (int w, int h, int d, csRGBpixel *src, 
     const csRGBpixel* transp_color, csAlphaMode::AlphaType& alphaType);
-  csRef<iImage>& GetImage () { return image; }
   void Unprepare () { SetPrepared (false); }
   /// Prepare a single image (rescale to po2 and make transparency).
   csRef<iImage> PrepareIntImage (int actual_width, int actual_height,
       int actual_depth, iImage* srcimage, csAlphaMode::AlphaType newAlphaType);
   /// Merge this texture into current palette, compute mipmaps and so on.
-  void PrepareInt ();
+  virtual void PrepareInt ();
 
   /// Retrieve the flags set for this texture
   virtual int GetFlags () const;
@@ -215,12 +204,9 @@ public:
 
   /// Get the key color status (false if disabled, true if enabled).
   virtual bool GetKeyColor () const;
-
   /// Get the key color
   virtual void GetKeyColor (uint8 &red, uint8 &green, uint8 &blue) const;
 
-  /// Release the original image (iImage) as given by the engine.
-  void FreeImage ();
   /**
    * Get the dimensions for a given mipmap level (0 to 3).
    * If the texture was registered just for 2D usage, mipmap levels above
@@ -232,16 +218,6 @@ public:
    * You can get the original image size with GetOriginalDimensions().
    */
   virtual bool GetRendererDimensions (int &mw, int &mh);
-
-  /**
-   * Return the original dimensions of the image used to create this texture.
-   * This is most often equal to GetMipMapDimensions (0, mw, mh) but in
-   * some cases the texture will have been resized in order to accomodate
-   * hardware restrictions (like power of two and maximum texture size).
-   * This function returns the uncorrected coordinates.
-   */
-  virtual void GetOriginalDimensions (int& mw, int& mh);
-
 
   //enum { CS_TEX_IMG_1D = 0, CS_TEX_IMG_2D, CS_TEX_IMG_3D, CS_TEX_IMG_CUBEMAP };
   /**
@@ -263,24 +239,12 @@ public:
    */
   virtual bool GetRendererDimensions (int &mw, int &mh, int &md);
 
-  /**
-   * Return the original dimensions of the image used to create this texture.
-   * This is most often equal to GetMipMapDimensions (0, mw, mh, md) but in
-   * some cases the texture will have been resized in order to accomodate
-   * hardware restrictions (like power of two and maximum texture size).
-   * This function returns the uncorrected coordinates.
-   */
-  virtual void GetOriginalDimensions (int& mw, int& mh, int &md);
-
   virtual void Blit (int x, int y, int width, int height,
     unsigned char const* data, TextureBlitDataFormat format = RGBA8888);
   void SetupAutoMipping();
 
   /// Get the texture target
   virtual int GetTextureTarget () const { return target; }
-
-  /// Get the original image name
-  virtual const char* GetImageName () const;
 
   /**
    * Query the private object associated with this handle.
@@ -314,6 +278,59 @@ public:
    * \remark Returns GL_TEXTURE_CUBE_MAP for cubemaps.
    */
   GLenum GetGLTextureTarget() const;
+};
+
+class csGLTextureHandle : public csGLBasicTextureHandle
+{
+private:
+  /// Used until Prepare() is called
+  csRef<iImage> image;
+
+  /// Stores the names of the images
+  char* origName;
+
+public:
+  int orig_width, orig_height, orig_d;
+
+  csGLTextureHandle (iImage* image, int flags, csGLGraphics3D *iG3D);
+  csGLTextureHandle (int target, GLuint Handle, csGLGraphics3D *iG3D);
+
+  virtual ~csGLTextureHandle ();
+
+  csRef<iImage>& GetImage () { return image; }
+  /// Merge this texture into current palette, compute mipmaps and so on.
+  virtual void PrepareInt ();
+
+  /// Release the original image (iImage) as given by the engine.
+  void FreeImage ();
+  /**
+   * Return the original dimensions of the image used to create this texture.
+   * This is most often equal to GetMipMapDimensions (0, mw, mh) but in
+   * some cases the texture will have been resized in order to accomodate
+   * hardware restrictions (like power of two and maximum texture size).
+   * This function returns the uncorrected coordinates.
+   */
+  virtual void GetOriginalDimensions (int& mw, int& mh);
+
+  void CreateMipMaps();
+  virtual void AdjustSizePo2 ();
+
+  /**
+   * Return the original dimensions of the image used to create this texture.
+   * This is most often equal to GetMipMapDimensions (0, mw, mh, md) but in
+   * some cases the texture will have been resized in order to accomodate
+   * hardware restrictions (like power of two and maximum texture size).
+   * This function returns the uncorrected coordinates.
+   */
+  virtual void GetOriginalDimensions (int& mw, int& mh, int &md);
+
+  /// Get the original image name
+  virtual const char* GetImageName () const;
+
+  /// Get the key color
+  virtual bool GetKeyColor () const
+  { return csGLBasicTextureHandle::GetKeyColor (); }
+  virtual void GetKeyColor (uint8 &red, uint8 &green, uint8 &blue) const;
 };
 
 class csGLSuperLightmap;
@@ -422,7 +439,7 @@ class csGLTextureManager :
 			    iTextureManager>
 {
 private:
-  typedef csWeakRefArray<csGLTextureHandle> csTexVector;
+  typedef csWeakRefArray<csGLBasicTextureHandle> csTexVector;
   /// List of textures.
   csTexVector textures;
 
@@ -505,7 +522,7 @@ public:
       iString* fail_reason = 0);
   virtual csPtr<iTextureHandle> CreateTexture (int w, int h,
       const char* format, int flags, iString* fail_reason = 0);
-  void UnregisterTexture (csGLTextureHandle* handle);
+  void UnregisterTexture (csGLBasicTextureHandle* handle);
 
   /**
    * Query the basic format of textures that can be registered with this
