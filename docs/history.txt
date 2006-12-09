@@ -13,6 +13,8 @@ chronological order.
 	  it is tessellation independent. Should fix some bugs where
 	  normals are wrong due to the way vertices are shared between
 	  triangles.
+	- Jorrit fixed DetermineTargetFormat() in gl texture manager so
+	  it understands the new *dxt1a format as well.
 8-Dec-2006
         - Erroroman made an optimization in vproc skinning by defining
           bones and indices buffer walkters globaly in the skin function.

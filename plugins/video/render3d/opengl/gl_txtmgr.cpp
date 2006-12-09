@@ -549,8 +549,12 @@ GLenum csGLTextureHandle::DetermineTargetFormat (GLenum defFormat,
     {
       if (strcmp (rawFormat, "*dxt1") == 0)
       {
-	targetFormat = (alphaType != csAlphaMode::alphaNone) ?
-	  GL_COMPRESSED_RGBA_S3TC_DXT1_EXT : GL_COMPRESSED_RGB_S3TC_DXT1_EXT;
+	targetFormat = GL_COMPRESSED_RGB_S3TC_DXT1_EXT;
+	compressedFormat = true;
+      }
+      else if (strcmp (rawFormat, "*dxt1a") == 0)
+      {
+	targetFormat = GL_COMPRESSED_RGBA_S3TC_DXT1_EXT;
 	compressedFormat = true;
       }
       else if (strcmp (rawFormat, "*dxt3") == 0)
