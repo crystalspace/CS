@@ -10,6 +10,7 @@ chronological order.
 	- Jorrit added a new csImageType parameter to the currently
 	  unused and unimplemented iTextureManager->CreateTexture()
 	  function.
+        - Piotr fixed ref bug in odedynam.
 9-Dec-2006
 	- Marten removed the random sub-lumel sampling in the lighter2.
 	  It introduced more artifacts than it solved.

@@ -1618,6 +1618,7 @@ bool csODERigidBody::AttachColliderPlane (const csPlane3& plane,
 
 void csODERigidBody::AttachCollider (iDynamicsSystemCollider* collider)
 {
+  colliders.Push (collider);
   dynsys->DestroyCollider (collider);
   if (collider->GetGeometryType () == PLANE_COLLIDER_GEOMETRY)
     ((csODECollider*) collider)->AddToSpace (dynsys->GetSpaceID());
@@ -1626,7 +1627,6 @@ void csODERigidBody::AttachCollider (iDynamicsSystemCollider* collider)
 
   ((csODECollider*) collider)->AttachBody (bodyID);
   collider->MakeDynamic ();
-  colliders.Push (collider);
 }
 
 void csODERigidBody::SetPosition (const csVector3& pos)
