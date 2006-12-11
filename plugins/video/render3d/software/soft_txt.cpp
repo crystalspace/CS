@@ -322,10 +322,12 @@ csPtr<iTextureHandle> csSoftwareTextureManager::RegisterTexture (iImage* image,
 }
 
 csPtr<iTextureHandle> csSoftwareTextureManager::CreateTexture (int w, int h,
-      const char* format, int flags, iString* fail_reason)
+      csImageType imagetype, const char* format, int flags,
+      iString* fail_reason)
 {
   (void)w;
   (void)h;
+  (void)imagetype;
   (void)format;
   (void)flags;
   if (fail_reason) fail_reason->Replace ("Not implemented yet!");

@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+11-Dec-2006
+	- Jorrit added a new csImageType parameter to the currently
+	  unused and unimplemented iTextureManager->CreateTexture()
+	  function.
 9-Dec-2006
 	- Marten removed the random sub-lumel sampling in the lighter2.
 	  It introduced more artifacts than it solved.

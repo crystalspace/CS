@@ -29,6 +29,7 @@
  * @{ */
 
 #include "csutil/scf.h"
+#include "igraphic/image.h"
 
 class Vector2;
 class csMatrix3;
@@ -224,6 +225,7 @@ struct iTextureManager : public virtual iBase
    * 
    * \param w horizontal size of the texture.
    * \param h vertical size of the texture.
+   * \param imagetype the type of the image.
    * \param format is a texture format string.
    * \param flags contains one or several of CS_TEXTURE_XXX flags OR'ed
    *  together. They define the mode texture is going to be used in.
@@ -234,7 +236,8 @@ struct iTextureManager : public virtual iBase
    *  'fail_reason' parameter.
    */
   virtual csPtr<iTextureHandle> CreateTexture (int w, int h,
-      const char* format, int flags, iString* fail_reason = 0) = 0;
+      csImageType imagetype, const char* format, int flags,
+      iString* fail_reason = 0) = 0;
 
   /**
    * Query the basic format of textures that can be registered with this

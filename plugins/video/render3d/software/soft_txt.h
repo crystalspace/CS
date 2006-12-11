@@ -219,7 +219,8 @@ public:
   virtual csPtr<iTextureHandle> RegisterTexture (iImage* image, int flags,
       iString* fail_reason = 0);
   virtual csPtr<iTextureHandle> CreateTexture (int w, int h,
-      const char* format, int flags, iString* fail_reason = 0);
+      csImageType imagetype, const char* format, int flags,
+      iString* fail_reason = 0);
 
   virtual csPtr<iSuperLightmap> CreateSuperLightmap (int width, 
     int height);
