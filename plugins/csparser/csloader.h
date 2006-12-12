@@ -21,24 +21,25 @@
 #define __CS_CSLOADER_H__
 
 #include <stdarg.h>
-#include "ivideo/graph3d.h"
-#include "imap/loader.h"
-#include "iutil/eventh.h"
-#include "iutil/comp.h"
-#include "csutil/csstring.h"
-#include "csutil/util.h"
-#include "csutil/strhash.h"
-#include "csutil/hash.h"
-#include "csutil/array.h"
-#include "csutil/refarr.h"
-#include "csutil/scopedmutexlock.h"
-#include "csutil/scf_implementation.h"
+
 #include "csgeom/quaternion.h"
-#include "iutil/plugin.h"
-#include "imap/services.h"
+#include "csutil/array.h"
+#include "csutil/csstring.h"
+#include "csutil/hash.h"
+#include "csutil/refarr.h"
+#include "csutil/scf_implementation.h"
+#include "csutil/threading/thread.h"
+#include "csutil/strhash.h"
+#include "csutil/util.h"
 #include "imap/ldrctxt.h"
-#include "ivaria/engseq.h"
+#include "imap/loader.h"
+#include "imap/services.h"
 #include "isndsys/ss_renderer.h"
+#include "iutil/comp.h"
+#include "iutil/eventh.h"
+#include "iutil/plugin.h"
+#include "ivaria/engseq.h"
+#include "ivideo/graph3d.h"
 
 class csGenerateImageTexture;
 class csGenerateImageValue;
@@ -228,7 +229,7 @@ private:
   {
   private:
     /// Mutex to make the plugin vector thread-safe.
-    csRef<csMutex> mutex;
+    CS::Threading::RecursiveMutex mutex;
     iObjectRegistry* object_reg;
 
     csArray<csLoaderPluginRec*> vector;

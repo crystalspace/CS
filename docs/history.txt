@@ -22,6 +22,10 @@ chronological order.
 	- Marten added per-factory lightmap density setting to lighter2.
 	- Marten added support for <noshadow/> and <nolighting/> flags
 	  to lighter2.
+	- Marten rewrote all code in CS to use new threading subsystem.
+	- Marten deprecated csThread, csCondition and csMutex. Use the
+	  new threading subsystem in CS::Threading instead, the old ones
+	  will be deleted on later version.
 11-Dec-2006
 	- Jorrit added a new csImageType parameter to the currently
 	  unused and unimplemented iTextureManager->CreateTexture()

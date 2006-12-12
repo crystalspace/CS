@@ -163,6 +163,7 @@ namespace Threading
 
   // Standard lock
   typedef ScopedLock<Mutex> MutexScopedLock;
+  typedef ScopedLock<RecursiveMutex> RecursiveMutexScopedLock;
 }
 }
 

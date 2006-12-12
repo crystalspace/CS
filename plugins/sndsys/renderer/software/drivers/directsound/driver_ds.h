@@ -20,14 +20,17 @@
 #ifndef SNDSYS_SOFTWARE_DRIVER_DIRECTSOUND_H
 #define SNDSYS_SOFTWARE_DRIVER_DIRECTSOUND_H
 
-#include "csutil/cfgacc.h"
-#include "iutil/eventh.h"
-#include "iutil/comp.h"
 
+#include "csutil/cfgacc.h"
+#include "csutil/threading/thread.h"
 #include "csutil/win32/win32.h"
-#include "isndsys/ss_structs.h"
+
 #include "isndsys/ss_driver.h"
 #include "isndsys/ss_eventrecorder.h"
+#include "isndsys/ss_structs.h"
+
+#include "iutil/comp.h"
+#include "iutil/eventh.h"
 
 #include <dsound.h>
 
@@ -37,15 +40,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(SndSysDIRECTSOUND)
 
 class SndSysDriverDirectSound;
 
-class SndSysDriverRunnable : public csRunnable
+class SndSysDriverRunnable : public CS::Threading::Runnable
 {
 private:
   SndSysDriverDirectSound* m_pParent;
   int m_RefCount;
 
 public:
-  SndSysDriverRunnable(SndSysDriverDirectSound* pParent) :
-  	m_pParent(pParent), m_RefCount (1) 
+  SndSysDriverRunnable(SndSysDriverDirectSound* pParent) 
+    : m_pParent(pParent)
   {
   }
 
@@ -55,25 +58,6 @@ public:
 
   /// \brief The main running function of this thread
   virtual void Run();
-
-  virtual void IncRef() 
-  { 
-    ++m_RefCount; 
-  }
-
-  /// Decrement reference count.
-  virtual void DecRef()
-  {
-    --m_RefCount;
-    if (m_RefCount <= 0)
-      delete this;
-  }
-
-  /// Get reference count.
-  virtual int GetRefCount() 
-  {
-    return m_RefCount; 
-  }
 };
 
 struct iConfigFile;
@@ -209,8 +193,8 @@ protected:
   // recognizing a change isn't a big deal.
   volatile bool m_bRunning;
 
-  /// Handle to the csThread object that controls execution of our background thread
-  csRef<csThread> m_pBackgroundThread;
+  /// Handle to the CS::Threading::Thread object that controls execution of our background thread
+  csRef<CS::Threading::Thread> m_pBackgroundThread;
 
   /// The event recorder interface, if active
   csRef<iSndSysEventRecorder> m_pEventRecorder;

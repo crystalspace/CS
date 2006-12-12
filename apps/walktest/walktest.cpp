@@ -905,45 +905,6 @@ bool WalkTest::SetMapDir (const char* map_dir)
   return true;
 }
 
-#if 0
-
-#include "csutil/thread.h"
-#include "csutil/sysfunc.h"
-#include "iutil/document.h"
-
-class MyThread : public csRunnable
-{
-private:
-  int ref;
-
-public:
-  csRef<iDocument> doc;
-  csRef<iDataBuffer> buf;
-
-public:
-  MyThread () : ref (1) { }
-  virtual ~MyThread () { }
-  virtual void Run ()
-  {
-    csSleep (2000);
-    csPrintf ("================ START PARSING!\n"); fflush (stdout);
-    const char* error = doc->Parse (buf, true);
-    if (error != 0)
-    {
-      csPrintf ("Document system error for file '%s'!", error);
-    }
-    csPrintf ("================ END PARSING!\n"); fflush (stdout);
-  }
-  virtual void IncRef () { ref++; }
-  virtual void DecRef () { ref--; if (ref <= 0) delete this; }
-};
-
-static csRef<csThread> thread1;
-static csRef<csThread> thread2;
-static csRef<csThread> thread3;
-
-#endif
-
 bool WalkTest::Initialize (int argc, const char* const argv[],
 	const char *iConfigName)
 {

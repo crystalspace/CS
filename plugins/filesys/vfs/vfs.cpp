@@ -154,7 +154,7 @@ class VfsArchive : public csArchive
 {
 public:
   /// Mutex to make VFS thread-safe.
-  csRef<csMutex> archive_mutex;
+  CS::Threading::RecursiveMutex archive_mutex;
 
   // Last time this archive was used
   long LastUseTime;
@@ -201,8 +201,6 @@ public:
     UpdateTime ();
     if (IsVerbose(csVFS::VERBOSITY_DEBUG))
       csPrintf ("VFS_DEBUG: opening archive \"%s\"\n", filename);
-    // We need a recursive mutex.
-    archive_mutex = csMutex::Create (true);
   }
   virtual ~VfsArchive ()
   {
@@ -816,7 +814,7 @@ ArchiveFile::ArchiveFile (int Mode, VfsNode *ParentNode, size_t RIndex,
   fpos = 0;
   bool const debug = IsVerbose(csVFS::VERBOSITY_DEBUG);
 
-  csScopedMutexLock lock (Archive->archive_mutex);
+  CS::Threading::RecursiveMutexScopedLock lock (Archive->archive_mutex);
   Archive->UpdateTime ();
   ArchiveCache->CheckUp ();
 
@@ -852,7 +850,7 @@ ArchiveFile::~ArchiveFile ()
     csPrintf("VFS_DEBUG: Closing a file from archive \"%s\"\n",
 	     Archive->GetName());
 
-  csScopedMutexLock lock (Archive->archive_mutex);
+  CS::Threading::RecursiveMutexScopedLock lock (Archive->archive_mutex);
   if (fh)
     Archive->Writing--;
   Archive->DecRef ();
@@ -883,7 +881,7 @@ size_t ArchiveFile::Write (const char *Data, size_t DataSize)
     Error = VFS_STATUS_ACCESSDENIED;
     return 0;
   }
-  csScopedMutexLock lock (Archive->archive_mutex);
+  CS::Threading::RecursiveMutexScopedLock lock (Archive->archive_mutex);
   if (!Archive->Write (fh, Data, DataSize))
   {
     Error = VFS_STATUS_NOSPACE;
@@ -896,7 +894,7 @@ void ArchiveFile::Flush ()
 {
   if (Archive)
   {
-    csScopedMutexLock lock (Archive->archive_mutex);
+    CS::Threading::RecursiveMutexScopedLock lock (Archive->archive_mutex);
     Archive->Flush ();
   }
 }
@@ -1463,7 +1461,6 @@ csVFS::csVFS (iBase *iParent) :
   cwd [0] = VFS_PATH_SEPARATOR;
   cwd [1] = 0;
   ArchiveCache = new VfsArchiveCache ();
-  mutex = csMutex::Create (true); // We need a recursive mutex.
 }
 
 csVFS::~csVFS ()
@@ -1742,7 +1739,7 @@ bool csVFS::PreparePath (const char *Path, bool IsDir, VfsNode *&Node,
 bool csVFS::CheckIfMounted(char const* virtual_path) const
 {
   bool ok = false;
-  csScopedMutexLock lock(mutex);
+  CS::Threading::RecursiveMutexScopedLock lock(mutex);
   char* const s = _ExpandPath(virtual_path, true);
   if (s != 0)
   {
@@ -1754,7 +1751,7 @@ bool csVFS::CheckIfMounted(char const* virtual_path) const
 
 bool csVFS::ChDir (const char *Path)
 {
-  csScopedMutexLock lock (mutex);
+  CS::Threading::RecursiveMutexScopedLock lock (mutex);
   // First, transform Path to absolute
   char *newwd = _ExpandPath (Path, true);
   if (!newwd)
@@ -1768,7 +1765,7 @@ bool csVFS::ChDir (const char *Path)
 void csVFS::PushDir (char const* Path)
 {
   { // Scope.
-    csScopedMutexLock lock (mutex);
+    CS::Threading::RecursiveMutexScopedLock lock (mutex);
     dirstack.Push (cwd);
   }
   if (Path != 0)
@@ -1777,7 +1774,7 @@ void csVFS::PushDir (char const* Path)
 
 bool csVFS::PopDir ()
 {
-  csScopedMutexLock lock (mutex);
+  CS::Threading::RecursiveMutexScopedLock lock (mutex);
   if (!dirstack.Length ())
     return false;
   char *olddir = (char *) dirstack.Pop ();
@@ -1794,7 +1791,7 @@ bool csVFS::Exists (const char *Path) const
   VfsNode *node;
   char suffix [VFS_MAX_PATH_LEN + 1];
 
-  csScopedMutexLock lock (mutex);
+  CS::Threading::RecursiveMutexScopedLock lock (mutex);
   PreparePath (Path, false, node, suffix, sizeof (suffix));
   bool exists = (node && (!suffix [0] || node->Exists (suffix)));
 
@@ -1806,7 +1803,7 @@ csRef<iStringArray> csVFS::MountRoot (const char *Path)
 {
   scfStringArray* outv = new scfStringArray;
 
-  csScopedMutexLock lock (mutex);
+  CS::Threading::RecursiveMutexScopedLock lock (mutex);
   if (Path != 0)
   {
     csRef<iStringArray> roots = csInstallationPathsHelper::FindSystemRoots();
@@ -1845,7 +1842,7 @@ csRef<iStringArray> csVFS::MountRoot (const char *Path)
 
 csPtr<iStringArray> csVFS::FindFiles (const char *Path) const
 {
-  csScopedMutexLock lock (mutex);
+  CS::Threading::RecursiveMutexScopedLock lock (mutex);
   scfStringArray *fl = new scfStringArray;		// the output list
 
   csString news;
@@ -1920,7 +1917,7 @@ csPtr<iFile> csVFS::Open (const char *FileName, int Mode)
     return 0;
   VfsNode *node;
   char suffix [VFS_MAX_PATH_LEN + 1];
-  csScopedMutexLock lock (mutex);
+  CS::Threading::RecursiveMutexScopedLock lock (mutex);
   if (!PreparePath (FileName, false, node, suffix, sizeof (suffix)))
     return 0;
 
@@ -1932,7 +1929,7 @@ csPtr<iFile> csVFS::Open (const char *FileName, int Mode)
 
 bool csVFS::Sync ()
 {
-  csScopedMutexLock lock (mutex);
+  CS::Threading::RecursiveMutexScopedLock lock (mutex);
   ArchiveCache->FlushAll ();
   return true;
   //@@@return (ArchiveCache->Length () == 0);
@@ -1940,7 +1937,7 @@ bool csVFS::Sync ()
 
 csPtr<iDataBuffer> csVFS::ReadFile (const char *FileName, bool nullterm)
 {
-  csScopedMutexLock lock (mutex);
+  CS::Threading::RecursiveMutexScopedLock lock (mutex);
   csRef<iFile> F (Open (FileName, VFS_FILE_READ));
   if (!F)
     return 0;
@@ -1969,7 +1966,7 @@ csPtr<iDataBuffer> csVFS::ReadFile (const char *FileName, bool nullterm)
 
 bool csVFS::WriteFile (const char *FileName, const char *Data, size_t Size)
 {
-  csScopedMutexLock lock (mutex);
+  CS::Threading::RecursiveMutexScopedLock lock (mutex);
   csRef<iFile> F (Open (FileName, VFS_FILE_WRITE));
   if (!F)
     return false;
@@ -1985,7 +1982,7 @@ bool csVFS::DeleteFile (const char *FileName)
 
   VfsNode *node;
   char suffix [VFS_MAX_PATH_LEN + 1];
-  csScopedMutexLock lock (mutex);
+  CS::Threading::RecursiveMutexScopedLock lock (mutex);
   if (!PreparePath (FileName, false, node, suffix, sizeof (suffix)))
     return false;
 
@@ -2006,7 +2003,7 @@ bool csVFS::SymbolicLink(const char *Target, const char *Link, int priority)
 
 bool csVFS::Mount (const char *VirtualPath, const char *RealPath)
 {
-  csScopedMutexLock lock (mutex);
+  CS::Threading::RecursiveMutexScopedLock lock (mutex);
   ArchiveCache->CheckUp ();
 
   if (!VirtualPath || !RealPath)
@@ -2037,7 +2034,7 @@ bool csVFS::Mount (const char *VirtualPath, const char *RealPath)
 
 bool csVFS::Unmount (const char *VirtualPath, const char *RealPath)
 {
-  csScopedMutexLock lock (mutex);
+  CS::Threading::RecursiveMutexScopedLock lock (mutex);
   ArchiveCache->CheckUp ();
 
   if (!VirtualPath)
@@ -2075,7 +2072,7 @@ bool csVFS::Unmount (const char *VirtualPath, const char *RealPath)
 
 bool csVFS::SaveMounts (const char *FileName)
 {
-  csScopedMutexLock lock (mutex);
+  CS::Threading::RecursiveMutexScopedLock lock (mutex);
   size_t i;
   for (i = 0; i < NodeList.Length (); i++)
   {
@@ -2272,7 +2269,7 @@ bool csVFS::GetFileTime (const char *FileName, csFileTime &oTime) const
 
   VfsNode *node;
   char suffix [VFS_MAX_PATH_LEN + 1];
-  csScopedMutexLock lock (mutex);
+  CS::Threading::RecursiveMutexScopedLock lock (mutex);
   PreparePath (FileName, false, node, suffix, sizeof (suffix));
 
   bool success = node ? node->GetFileTime (suffix, oTime) : false;
@@ -2288,7 +2285,7 @@ bool csVFS::SetFileTime (const char *FileName, const csFileTime &iTime)
 
   VfsNode *node;
   char suffix [VFS_MAX_PATH_LEN + 1];
-  csScopedMutexLock lock (mutex);
+  CS::Threading::RecursiveMutexScopedLock lock (mutex);
   PreparePath (FileName, false, node, suffix, sizeof (suffix));
 
   bool success = node ? node->SetFileTime (suffix, iTime) : false;
@@ -2304,7 +2301,7 @@ bool csVFS::GetFileSize (const char *FileName, size_t &oSize)
 
   VfsNode *node;
   char suffix [VFS_MAX_PATH_LEN + 1];
-  csScopedMutexLock lock (mutex);
+  CS::Threading::RecursiveMutexScopedLock lock (mutex);
   PreparePath (FileName, false, node, suffix, sizeof (suffix));
 
   bool success = node ? node->GetFileSize (suffix, oSize) : false;
@@ -2320,7 +2317,7 @@ csPtr<iDataBuffer> csVFS::GetRealPath (const char *FileName)
 
   VfsNode *node;
   char suffix [VFS_MAX_PATH_LEN + 1];
-  csScopedMutexLock lock (mutex);
+  CS::Threading::RecursiveMutexScopedLock lock (mutex);
   PreparePath (FileName, false, node, suffix, sizeof (suffix));
   if (!node)
     return 0;
