@@ -270,9 +270,9 @@ void csPoly3D::SplitWithPlane (
   csPoly3D &poly2,
   const csPlane3 &split_plane) const
 {
-  if (vertices.GetSize () == 0) return;
   poly1.MakeEmpty ();
   poly2.MakeEmpty ();
+  if (vertices.GetSize () == 0) return;
 
   csVector3 ptB;
   float sideA, sideB;

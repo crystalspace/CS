@@ -26,6 +26,11 @@ chronological order.
 	- Marten deprecated csThread, csCondition and csMutex. Use the
 	  new threading subsystem in CS::Threading instead, the old ones
 	  will be deleted on later version.
+	- res fixed a bug in csPoly3D::SplitWithPlane(): when an empty poly 
+	  was split, the result polies stayed unchanged. So when a non-empty
+	  polygon was used to receive a result of an empty polygon splitting,
+	  it retained it's old vertices. The proper result values when 
+	  splitting an empty polygon are empty polygons.
 11-Dec-2006
 	- Jorrit added a new csImageType parameter to the currently
 	  unused and unimplemented iTextureManager->CreateTexture()
