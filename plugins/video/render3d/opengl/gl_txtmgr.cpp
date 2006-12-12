@@ -57,8 +57,8 @@ CS_IMPLEMENT_STATIC_VAR (GetRLMAlloc, csRLMAlloc, ())
 
 //---------------------------------------------------------------------------
 
-csGLBasicTextureHandle::csGLBasicTextureHandle (int flags, 
-				      csGLGraphics3D *iG3D) : 
+csGLBasicTextureHandle::csGLBasicTextureHandle (
+    csImageType imagetype, int flags, csGLGraphics3D *iG3D) : 
   scfImplementationType (this), uploadData(0), 
   texFormat((TextureBlitDataFormat)-1)
 {
@@ -67,6 +67,47 @@ csGLBasicTextureHandle::csGLBasicTextureHandle (int flags,
   Handle = 0;
   textureClass = txtmgr->GetTextureClassID ("default");
 
+  switch (imagetype)
+  {
+    case csimgCube:
+      target = CS_TEX_IMG_CUBEMAP;
+      break;
+    case csimg3D:
+      target = CS_TEX_IMG_3D;
+      break;
+    default:
+      target = CS_TEX_IMG_2D;
+      break;
+  }
+  const uint npotsNeededFlags = (CS_TEXTURE_NOMIPMAPS | CS_TEXTURE_CLAMP);
+  if (flags & CS_TEXTURE_NPOTS)
+  {
+    // For NPOTS we need...
+    bool npotsValid = (
+      // The extension
+      (G3D->ext->CS_GL_ARB_texture_rectangle
+      || G3D->ext->CS_GL_EXT_texture_rectangle
+      || G3D->ext->CS_GL_NV_texture_rectangle
+      || txtmgr->enableNonPowerOfTwo2DTextures
+      || G3D->ext->CS_GL_ARB_texture_non_power_of_two)
+      // Certain additional texture flags, unless we have ARB_tnpot
+      && (((flags & npotsNeededFlags) == npotsNeededFlags) 
+        || G3D->ext->CS_GL_ARB_texture_non_power_of_two))
+      // A 2D image, unless we have ARB_tnpot
+      && ((imagetype == csimg2D)
+        || G3D->ext->CS_GL_ARB_texture_non_power_of_two);
+    if (!npotsValid)
+    {
+      flags &= ~CS_TEXTURE_NPOTS;
+    }
+    else if (!txtmgr->enableNonPowerOfTwo2DTextures
+      && !G3D->ext->CS_GL_ARB_texture_non_power_of_two)
+      /* Note that 'enableNonPowerOfTwo2DTextures' is the flag for ATI's
+       * support of non-POT _2D_ textures; that is, the textures, being
+       * NPOTS, need to go to the 2D target, not RECT. 
+       * Same when ARB_tnpot is available. */
+      target = CS_TEX_IMG_RECT;
+  }
   texFlags.Set (flagsPublicMask, flags);
 
   transp_color.red = transp_color.green = transp_color.blue = 0;
@@ -762,53 +803,13 @@ void csGLBasicTextureHandle::PrepareKeycolor (csRef<iImage>& image,
 
 csGLTextureHandle::csGLTextureHandle (iImage* image, int flags, 
 				      csGLGraphics3D *iG3D) : 
-  csGLBasicTextureHandle (flags, iG3D),
+  csGLBasicTextureHandle (image->GetImageType (), flags, iG3D),
   origName(0)
 {
+printf ("image='%s' format='%08x' rawformat='%s' type=%d\n",
+    image->GetName (), image->GetFormat (), image->GetRawFormat (),
+    image->GetImageType ()); fflush (stdout);
   this->image = image;
-  switch (image->GetImageType())
-  {
-    case csimgCube:
-      target = CS_TEX_IMG_CUBEMAP;
-      break;
-    case csimg3D:
-      target = CS_TEX_IMG_3D;
-      break;
-    default:
-      target = CS_TEX_IMG_2D;
-      break;
-  }
-  const uint npotsNeededFlags = (CS_TEXTURE_NOMIPMAPS | CS_TEXTURE_CLAMP);
-  if (flags & CS_TEXTURE_NPOTS)
-  {
-    // For NPOTS we need...
-    bool npotsValid = (
-      // The extension
-      (G3D->ext->CS_GL_ARB_texture_rectangle
-      || G3D->ext->CS_GL_EXT_texture_rectangle
-      || G3D->ext->CS_GL_NV_texture_rectangle
-      || txtmgr->enableNonPowerOfTwo2DTextures
-      || G3D->ext->CS_GL_ARB_texture_non_power_of_two)
-      // Certain additional texture flags, unless we have ARB_tnpot
-      && (((flags & npotsNeededFlags) == npotsNeededFlags) 
-        || G3D->ext->CS_GL_ARB_texture_non_power_of_two))
-      // A 2D image, unless we have ARB_tnpot
-      && ((image->GetImageType() == csimg2D)
-        || G3D->ext->CS_GL_ARB_texture_non_power_of_two);
-    if (!npotsValid)
-    {
-      flags &= ~CS_TEXTURE_NPOTS;
-    }
-    else if (!txtmgr->enableNonPowerOfTwo2DTextures
-      && !G3D->ext->CS_GL_ARB_texture_non_power_of_two)
-      /* Note that 'enableNonPowerOfTwo2DTextures' is the flag for ATI's
-       * support of non-POT _2D_ textures; that is, the textures, being
-       * NPOTS, need to go to the 2D target, not RECT. 
-       * Same when ARB_tnpot is available. */
-      target = CS_TEX_IMG_RECT;
-  }
-  texFlags.Set (flagsPublicMask, flags);
-
   if (image->GetFormat () & CS_IMGFMT_ALPHA)
     alphaType = csAlphaMode::alphaSmooth;
   else if (image->HasKeyColor ())
@@ -822,7 +823,7 @@ csGLTextureHandle::csGLTextureHandle (iImage* image, int flags,
 
 csGLTextureHandle::csGLTextureHandle (int target, GLuint Handle, 
 				      csGLGraphics3D *iG3D) : 
-  csGLBasicTextureHandle (0, iG3D),
+  csGLBasicTextureHandle (csimg2D, 0, iG3D),
   origName(0)
 {
   this->target = target;
@@ -1409,11 +1410,12 @@ csPtr<iTextureHandle> csGLTextureManager::CreateTexture (int w, int h,
 {
   (void)w;
   (void)h;
-  (void)imagetype;
   (void)format;
-  (void)flags;
-  if (fail_reason) fail_reason->Replace ("Not implemented yet!");
-  return 0;
+
+  csGLBasicTextureHandle *txt = new csGLBasicTextureHandle (
+      imagetype, flags, G3D);
+  textures.Push(txt);
+  return csPtr<iTextureHandle> (txt);
 }
 
 void csGLTextureManager::UnregisterTexture (csGLBasicTextureHandle* handle)

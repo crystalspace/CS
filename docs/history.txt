@@ -7,6 +7,15 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 12-Dec-2006
+	- Jorrit did further texture manager improvements:
+	    - Made it possible to instantiate instances of
+	      csGLBasicTextureHandle by adding implementations of
+	      GetOriginalDimensions() and GetImageName() (needed
+	      to implement iTextureHandle).
+	    - Moved some code based on image type from
+	      csGLTextureHandle to csGLBasicTextureHandle.
+	    - Modified the various image loaders to also return "b8g8r8a8"
+	      in case of 32-bit rgba format for GetRawFormat().
 	- res fixed lighter2 to properly handle libraries.
 	- res changed lighter2 to also apply the exposure function to when
 	  doing per-vertex lighting.

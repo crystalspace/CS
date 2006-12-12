@@ -180,6 +180,7 @@ public:
   virtual int GetHeight () const { return Height; }
   virtual int GetDepth () const { return Depth; }
 
+  virtual const char* GetRawFormat() const { return "b8g8r8a8"; }
   virtual int GetFormat () const { return Format; }
   virtual const csRGBpixel* GetPalette () { return GetPalettePtr(); }
   virtual const uint8* GetAlpha () { return GetAlphaPtr(); }

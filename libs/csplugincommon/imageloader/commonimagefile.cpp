@@ -191,6 +191,8 @@ const char* csCommonImageFile::DataTypeString (csLoaderDataType dataType)
   {
     case rdtR8G8B8:
       return "b8g8r8";
+    case rdtRGBpixel:
+      return "b8g8r8a8";
     default:
       return 0;
   }

@@ -157,6 +157,7 @@ protected:
   /// Upload the texture to GL.
   void Load ();
   void Unload ();
+
 public:
   int actual_width, actual_height, actual_d;
   csArray<csGLUploadData>* uploadData;
@@ -175,7 +176,7 @@ public:
   bool IsNeedMips() const { return texFlags.Check (flagNeedMips); }
   void SetNeedMips (bool b) { texFlags.SetBool (flagNeedMips, b); }
 
-  csGLBasicTextureHandle (int flags, csGLGraphics3D *iG3D);
+  csGLBasicTextureHandle (csImageType imagetype, int flags, csGLGraphics3D *iG3D);
 
   virtual ~csGLBasicTextureHandle ();
 
@@ -239,6 +240,15 @@ public:
    */
   virtual bool GetRendererDimensions (int &mw, int &mh, int &md);
 
+  virtual void GetOriginalDimensions (int& mw, int& mh)
+  {
+    GetRendererDimensions (mw, mh);
+  }
+  virtual void GetOriginalDimensions (int& mw, int& mh, int &md)
+  {
+    GetRendererDimensions (mw, mh, md);
+  }
+
   virtual void Blit (int x, int y, int width, int height,
     unsigned char const* data, TextureBlitDataFormat format = RGBA8888);
   void SetupAutoMipping();
@@ -268,6 +278,8 @@ public:
 
   virtual void SetTextureClass (const char* className);
   virtual const char* GetTextureClass ();
+
+  virtual const char* GetImageName () const { return 0; }
 
   void UpdateTexture ();
 
