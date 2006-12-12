@@ -235,10 +235,13 @@ namespace lighter
     {
       csRef<Object> obj = giter.Next ();
 
-      if (obj->lightPerVertex)
-        ShadePerVertex (sector, obj, rt, masterSampler);
-      else
-        ShadeLightmap (sector, obj, rt, masterSampler);
+      if (!obj->GetFlags ().Check (OBJECT_FLAG_NOLIGHT))
+      {
+        if (obj->lightPerVertex)
+          ShadePerVertex (sector, obj, rt, masterSampler);
+        else
+          ShadeLightmap (sector, obj, rt, masterSampler);
+      }
 
       globalStats.IncTaskProgress (progressPerObject);
       globalTUI.Redraw (TUI::TUI_DRAW_RAYCORE);

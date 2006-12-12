@@ -230,9 +230,9 @@ namespace lighter
   static bool IntersectPrimitiveRay (const KDTreePrimitive &primitive, const Ray &ray,
     HitPoint &hit)
   {
-    const uint k = primitive.normal_K;
-    const uint ku = mod5[primitive.normal_K+1];
-    const uint kv = mod5[primitive.normal_K+2];
+    const uint k = primitive.normal_K & ~KDPRIM_FLAG_MASK;
+    const uint ku = mod5[k+1];
+    const uint kv = mod5[k+2];
 
     // prefetch?
 
@@ -290,6 +290,9 @@ namespace lighter
       KDTreePrimitive* prim = primList + nIdx;
 
       if (mailboxes.PutPrimitiveRay (prim->primPointer, ray.rayID))
+        continue;
+
+      if (ray.ignoreFlags & (prim->normal_K & KDPRIM_FLAG_MASK))
         continue;
 
       haveHit = IntersectPrimitiveRay (*prim, ray, thisHit);

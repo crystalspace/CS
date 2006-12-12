@@ -29,6 +29,7 @@ namespace lighter
   // Very simple FactoryLayouter.. just map "flat" on the lightmap
   csPtr<LightmapUVObjectLayouter> SimpleUVFactoryLayouter::LayoutFactory (
     const PrimitiveArray& inPrims, ObjectVertexData& vertexData,
+    const ObjectFactory* factory,
     csArray<PrimitiveArray>& outPrims)
   {
     if (inPrims.GetSize () == 0) return 0;
@@ -54,7 +55,7 @@ namespace lighter
     for (i = 0; i < coplanarPrims.GetSize (); i++)
     {
       PrimitiveArray& prims = coplanarPrims[i];
-      //Primitive prim (inPrims[i]);
+      
       bool lmCoordsGood = false;
       int its = 0; //number of iterations
       
@@ -62,14 +63,9 @@ namespace lighter
       while (!lmCoordsGood && its < 5)
       {
         // Compute lightmapping
-
-        /*prim.SetLightmapMapping (globalSettings.uTexelPerUnit / (1<<its), 
-                                 globalSettings.vTexelPerUnit / (1<<its));*/
-
-
         ProjectPrimitives (prims, vused,
-                           globalConfig.GetLMProperties ().uTexelPerUnit / (1<<its), 
-                           globalConfig.GetLMProperties ().vTexelPerUnit / (1<<its));
+                           factory->GetLMuTexelPerUnit () / (1<<its), 
+                           factory->GetLMvTexelPerUnit () / (1<<its));
 
         // Compute uv-size  
         prims[0].ComputeMinMaxUV (minuv, maxuv);

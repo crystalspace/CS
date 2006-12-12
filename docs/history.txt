@@ -19,6 +19,9 @@ chronological order.
 	- res fixed lighter2 to properly handle libraries.
 	- res changed lighter2 to also apply the exposure function to when
 	  doing per-vertex lighting.
+	- Marten added per-factory lightmap density setting to lighter2.
+	- Marten added support for <noshadow/> and <nolighting/> flags
+	  to lighter2.
 11-Dec-2006
 	- Jorrit added a new csImageType parameter to the currently
 	  unused and unimplemented iTextureManager->CreateTexture()

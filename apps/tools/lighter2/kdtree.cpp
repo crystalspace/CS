@@ -556,6 +556,11 @@ namespace lighter
             // Setup optimized
             optPrim.primPointer = prim;
 
+            int32 kdFlags = 0;
+
+            if (prim->GetObject ()->GetFlags ().Check (OBJECT_FLAG_NOSHADOW))
+              kdFlags |= KDPRIM_FLAG_NOSHADOW;
+
             //Extract our info
             const csVector3& N = prim->GetPlane ().Normal ();
             ObjectVertexData &vdata = prim->GetVertexData ();
@@ -567,7 +572,7 @@ namespace lighter
             // Find max normal direction
             int k = N.DominantAxis ();
 
-            optPrim.normal_K = k;
+            optPrim.normal_K = k | kdFlags;
 
             size_t u = (k+1)%3;
             size_t v = (k+2)%3;

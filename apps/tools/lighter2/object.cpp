@@ -25,15 +25,13 @@
 #include "object.h"
 #include "config.h"
 
-// Debugging: uncomment to disable border smoothing
-//#define NOSMOOTH
-
 namespace lighter
 {
 
   ObjectFactory::ObjectFactory ()
-    : lightmapMaskArrayValid (false), factoryWrapper (0), 
-      lightPerVertex (false)
+    : factoryWrapper (0), lightPerVertex (false),
+    lmuScale (globalConfig.GetLMProperties ().uTexelPerUnit),
+    lmvScale (globalConfig.GetLMProperties ().vTexelPerUnit)
   {
   }
 
@@ -45,7 +43,7 @@ namespace lighter
     {
       csArray<PrimitiveArray> newPrims;
       csRef<LightmapUVObjectLayouter> lightmaplayout = 
-        uvlayout->LayoutFactory (unlayoutedPrimitives[i], vertexData, newPrims);
+        uvlayout->LayoutFactory (unlayoutedPrimitives[i], vertexData, this, newPrims);
       if (!lightmaplayout) return false;
 
       for (size_t n = 0; n < newPrims.GetSize(); n++)
@@ -71,7 +69,9 @@ namespace lighter
   {
     this->factoryWrapper = factory;
     // Get the name
-    this->factoryName = factoryWrapper->QueryObject ()->GetName ();
+    this->factoryName = factoryWrapper->QueryObject ()->GetName ();   
+
+
     csRef<iObjectIterator> objiter = 
       factoryWrapper->QueryObject ()->GetIterator();
     while (objiter->HasNext())
@@ -84,6 +84,17 @@ namespace lighter
         const char* vVertexlight = kvp->GetValue ("vertexlight");
         if (vVertexlight != 0)
           lightPerVertex = (strcmp (vVertexlight, "yes") == 0);
+
+        const char* vLMScale = kvp->GetValue ("lmscale");
+        if (vLMScale)
+        {
+          float u=0,v=0;
+          if (sscanf (vLMScale, "%f;%f", &u, &v) == 2)
+          {
+            lmuScale = u;
+            lmvScale = v;
+          }
+        }
       }
     }
   }
@@ -254,6 +265,13 @@ namespace lighter
   void Object::ParseMesh (iMeshWrapper *wrapper)
   {
     this->meshWrapper = wrapper;
+
+    const csFlags& meshFlags = wrapper->GetFlags ();
+    if (meshFlags.Check (CS_ENTITY_NOSHADOWS))
+      objFlags.Set (OBJECT_FLAG_NOSHADOW);
+    if (meshFlags.Check (CS_ENTITY_NOLIGHTING))
+      objFlags.Set (OBJECT_FLAG_NOLIGHT);
+
     this->meshName = wrapper->QueryObject ()->GetName ();
     csRef<iObjectIterator> objiter = 
       wrapper->QueryObject ()->GetIterator();
@@ -353,115 +371,5 @@ namespace lighter
 
   }
 
-  void Object::FixupLightmaps (csArray<LightmapPtrDelArray*>& lightmaps)
-  {
-    if (lightPerVertex) return;
-
-    //Create one, @@TODO: optimise this
-    LightmapMaskArray masks;
-    LightmapPtrDelArray::Iterator lmIt = lightmaps[0]->GetIterator ();
-    while (lmIt.HasNext ())
-    {
-      const Lightmap* lm = lmIt.Next ();
-      masks.Push (LightmapMask (*lm));
-    }
-    FillLightmapMask (masks);
-
-    // Ok, here we are sure to have a mask
-    
-    // Un-antialias
-    uint i;
-#ifndef DUMP_NORMALS
-    for (size_t l = 0; l < lightmaps.GetSize (); l++)
-    {
-      for (i = 0; i < lightmaps[l]->GetSize(); i++)
-      {
-        Lightmap* lm = lightmaps[l]->Get (i);
-        
-        LightmapCacheLock l (lm);
-        csColor* lmData = lm->GetData ()->colorArray;
-        const float* mmData = masks[i].maskData.GetArray ();
-        const size_t size = lm->GetData ()->colorArraySize;
-
-        for (uint j = 0; j < size; j++, lmData++, mmData++)
-        {
-          if (*mmData < FLT_EPSILON || *mmData >= 1.0f) continue;
-
-          *lmData *= (1.0f / *mmData);
-        }
-      }
-    }
-#endif
-
-#ifndef NOSMOOTH
-    // Do the filtering
-    for (size_t l = 0; l < lightmaps.GetSize (); l++)
-    {
-      for (i = 0; i < lightmaps[l]->GetSize(); i++)
-      {
-        Lightmap* lm = lightmaps[l]->Get (i);
-
-        LightmapCacheLock l (lm);
-
-        csColor* lmData = lm->GetData ()->colorArray;
-        const float* mmData = masks[i].maskData.GetArray ();
-              
-        uint lmw = lm->GetWidth ();
-        uint lmh = lm->GetHeight ();
-        
-        for (uint v = 0; v < lmh; v++)
-        {
-          // now scan over the row
-          for (uint u = 0; u < lmw; u++)
-          {
-            const uint idx = v*lmw+u;
-            
-            // Only try to fix non-masked
-            if (mmData[idx]>0) continue;
-
-            uint count = 0;
-            csColor newColor (0.0f,0.0f,0.0f);
-
-            // We have a row above to use
-            if (v > 0)
-            {
-              // We have a column to the left
-              if (u > 0 && mmData[(v-1)*lmw+(u-1)] > FLT_EPSILON) newColor += lmData[(v-1)*lmw+(u-1)], count++;
-              if (mmData[(v-1)*lmw+(u)] > FLT_EPSILON) newColor += lmData[(v-1)*lmw+(u)], count++;
-              if (u < lmw-1 && mmData[(v-1)*lmw+(u+1)] > FLT_EPSILON) newColor += lmData[(v-1)*lmw+(u+1)], count++;
-            }
-
-            //current row
-            if (u > 0 && mmData[v*lmw+(u-1)] > FLT_EPSILON) newColor += lmData[v*lmw+(u-1)], count++;
-            if (u < lmw-1 && mmData[v*lmw+(u+1)] > FLT_EPSILON) newColor += lmData[v*lmw+(u+1)], count++;
-
-            // We have a row below
-            if (v < (lmh-1))
-            {
-              if (u > 0 && mmData[(v+1)*lmw+(u-1)] > FLT_EPSILON) newColor += lmData[(v+1)*lmw+(u-1)], count++;
-              if (mmData[(v+1)*lmw+(u)] > FLT_EPSILON) newColor += lmData[(v+1)*lmw+(u)], count++;
-              if (u < lmw-1 && mmData[(v+1)*lmw+(u+1)] > FLT_EPSILON) newColor += lmData[(v+1)*lmw+(u+1)], count++;
-            }
-
-            if (count > 0) 
-            {
-#ifndef DUMP_NORMALS
-              newColor *= (1.0f/count);
-#else
-              csVector3 v (
-                newColor.red*2.0f-float (count), 
-                newColor.green*2.0f-float (count), 
-                newColor.blue*2.0f-float (count));
-              v.Normalize();
-              newColor.Set (v.x*0.5f+0.5f, v.y*0.5f+0.5f, v.z*0.5f+0.5f);
-#endif
-              lmData[idx] = newColor;
-            }
-          }
-        }
-      }
-    }
-#endif // NOSMOOTH
-  }
 
 }

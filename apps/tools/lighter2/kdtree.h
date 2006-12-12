@@ -30,6 +30,12 @@ namespace lighter
 {
   class Primitive;
 
+  enum
+  {
+    KDPRIM_FLAG_NOSHADOW = 0x04,
+    KDPRIM_FLAG_MASK = 0xFFFFFFFC
+  };
+
   /**
    * Optimized KD-tree primitive
    * \todo
@@ -40,7 +46,7 @@ namespace lighter
     /// Normal u, v and d components. Normalized.
     float normal_U, normal_V, normal_D;
 
-    /// Index of biggest normal component
+    /// Index of biggest normal component, and flags
     int32 normal_K;
 
     /// Edge A u, v and d components
@@ -318,7 +324,7 @@ namespace lighter
 
       //End-point [min/max]
       EndPoint side[2];             //48 / 96
-      Primitive* primitive;      // 4 /  8
+      Primitive* primitive;         // 4 /  8
       int32 flags;                  // 4 /  4
       PrimBox* clone;               // 4 /  8 
 

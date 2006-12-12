@@ -22,6 +22,7 @@
 #include "common.h"
 #include "light.h"
 #include "raytracer.h"
+#include "kdtree.h"
 
 // Attenuation functions
 static float LightAttnNone (float, const csVector3&);
@@ -80,6 +81,7 @@ namespace lighter
     testRay.origin = start;
     testRay.direction = dir;
     testRay.maxLength = maxL - 0.01f;
+    testRay.ignoreFlags = KDPRIM_FLAG_NOSHADOW; // Ignore primitives that don't cast shadows
   }
 
   bool VisibilityTester::Unoccluded (Raytracer& rt)
