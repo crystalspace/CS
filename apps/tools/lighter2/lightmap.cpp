@@ -48,22 +48,15 @@ namespace lighter
   void Lightmap::AddAmbientTerm (const csColor amb)
   {
     LightmapCacheLock l (this);
-    for (uint i = 0; i < data->colorArraySize; i++)
-    {
-      data->colorArray[i] += amb;
-    }
+    LightmapPostProcess::AddAmbientTerm (data->colorArray,
+      data->colorArraySize, amb);
   }
 
   void Lightmap::ApplyExposureFunction (float expConstant, float expMax)
   {
     LightmapCacheLock l (this);
-    for (uint i = 0; i < data->colorArraySize; i++)
-    {
-      csColor &c = data->colorArray[i];
-      c.red = expMax * (1 - expf (-c.red * expConstant));
-      c.green = expMax * (1 - expf (-c.green * expConstant));
-      c.blue = expMax * (1 - expf (-c.blue * expConstant));
-    }
+    LightmapPostProcess::ApplyExposureFunction (data->colorArray,
+      data->colorArraySize,  expConstant, expMax);
   }
 
   void Lightmap::SaveLightmap (const csString& fname)
@@ -197,6 +190,33 @@ namespace lighter
     return out;
   }
 
+  //-------------------------------------------------------------------------
+
+  void LightmapPostProcess::AddAmbientTerm (csColor* colors, 
+                                            size_t numColors, 
+                                            const csColor amb)
+  {
+    for (uint i = 0; i < numColors; i++)
+    {
+      colors[i] += amb;
+    }
+  }
+
+  void LightmapPostProcess::ApplyExposureFunction (csColor* colors, 
+                                                   size_t numColors, 
+                                                   float expConstant, 
+                                                   float expMax)
+  {
+    for (uint i = 0; i < numColors; i++)
+    {
+      csColor &c = colors[i];
+      c.red = expMax * (1 - expf (-c.red * expConstant));
+      c.green = expMax * (1 - expf (-c.green * expConstant));
+      c.blue = expMax * (1 - expf (-c.blue * expConstant));
+    }
+  }
+
+  //-------------------------------------------------------------------------
 
   LightmapCache::LightmapCache (size_t maxSize)
     : maxCacheSize (maxSize / sizeof(csColor)), currentCacheSize (0),

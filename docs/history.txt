@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+12-Dec-2006
+	- res fixed lighter2 to properly handle libraries.
+	- res changed lighter2 to also apply the exposure function to when
+	  doing per-vertex lighting.
 11-Dec-2006
 	- Jorrit added a new csImageType parameter to the currently
 	  unused and unimplemented iTextureManager->CreateTexture()

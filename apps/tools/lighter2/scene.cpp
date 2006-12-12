@@ -426,7 +426,7 @@ namespace lighter
 
       if (!strcasecmp (nodeName, "library"))
       {
-        //SaveSceneLibrary()
+        HandleLibraryNode (node, fileInfo);
       }
       else if (!strcasecmp (nodeName, "meshfact"))
       {
@@ -566,6 +566,87 @@ namespace lighter
     DocumentHelper::RemoveDuplicateChildren(texturesNode, 
       texturesNode->GetNodes ("texture"),
       DocumentHelper::NodeAttributeCompare("name"));
+  }
+
+  bool Scene::SaveSceneLibrary (const char* libFile, LoadedFile* fileInfo)
+  {
+    csRef<iFile> buf = globalLighter->vfs->Open (libFile, VFS_FILE_READ);
+    if (!buf) 
+    {
+      globalLighter->Report ("Error opening file '%s'!", libFile);
+      return false;
+    }
+
+    csRef<iDocument> doc = globalLighter->docSystem->CreateDocument ();
+    const char* error = doc->Parse (buf, true);
+    if (error != 0)
+    {
+      globalLighter->Report ("Document system error: %s!", error);
+      return false;
+    }
+
+    csRef<iDocumentNode> docRoot = doc->GetRoot();
+
+    csRef<iDocumentNode> libRoot = docRoot->GetNode ("library");
+    if (!libRoot)
+    {
+      globalLighter->Report ("'%s' is not a library", libFile);
+      return false;
+    }
+
+    csRef<iDocumentNodeIterator> it = libRoot->GetNodes ();
+    while (it->HasNext ())
+    {
+      csRef<iDocumentNode> node = it->Next ();
+      if (node->GetType () != CS_NODE_ELEMENT) continue;
+      
+      const char* nodeName = node->GetValue ();
+
+      if (!strcasecmp (nodeName, "library"))
+      {
+        HandleLibraryNode (node, fileInfo);
+      }
+      else if (!strcasecmp (nodeName, "meshfact"))
+      {
+        SaveMeshFactoryToDom (node, fileInfo);
+      }
+    }
+
+    buf = globalLighter->vfs->Open (libFile, VFS_FILE_WRITE);
+    if (!buf) 
+    {
+      globalLighter->Report ("Error opening file '%s' for writing!", libFile);
+      return false;
+    }
+    error = doc->Write (buf);
+    if (error != 0)
+    {
+      globalLighter->Report ("Document system error: %s!", error);
+      return false;
+    }
+
+    return true;
+  }
+
+  void Scene::HandleLibraryNode (iDocumentNode* node, LoadedFile* fileInfo)
+  {
+    const char* file = node->GetAttributeValue ("file");
+    if (file)
+    {
+      csVfsDirectoryChanger changer (globalLighter->vfs);
+      const char* path = node->GetAttributeValue ("path");
+
+      if (path)
+      {
+        changer.PushDir ();
+        globalLighter->vfs->ChDir (path);
+      }
+      SaveSceneLibrary (file, fileInfo);
+    }
+    else
+    {
+      SaveSceneLibrary (node->GetContentsValue (), fileInfo);
+    }
   }
 
   void Scene::SaveMeshFactoryToDom (iDocumentNode* factNode, LoadedFile* fileInfo)

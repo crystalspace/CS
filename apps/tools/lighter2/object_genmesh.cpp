@@ -367,12 +367,17 @@ namespace lighter
     ObjectFactory_Genmesh* factory = 
       static_cast<ObjectFactory_Genmesh*> (this->factory);
 
+    genMesh->RemoveRenderBuffer ("colors");
+    genMesh->RemoveRenderBuffer ("texture coordinate lightmap");
+
     if (lightPerVertex)
     {
       csRef<csRenderBuffer> colorsBuffer = csRenderBuffer::CreateRenderBuffer (
         vertexData.vertexArray.GetSize(), CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 3);
-      genMesh->RemoveRenderBuffer ("colors");
       genMesh->AddRenderBuffer ("colors", colorsBuffer);
+      // @@@ FIXME: Use global options, when we have them
+      LightmapPostProcess::ApplyExposureFunction (litColors->GetArray(),
+        vertexData.vertexArray.GetSize(), 1.8f, 1.0f); 
       colorsBuffer->CopyInto (litColors->GetArray(),
         vertexData.vertexArray.GetSize());
     }
@@ -410,7 +415,6 @@ namespace lighter
 
       csRef<csRenderBuffer> lightmapBuffer = csRenderBuffer::CreateRenderBuffer (
         vertexData.vertexArray.GetSize(), CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 2);
-      genMesh->RemoveRenderBuffer ("texture coordinate lightmap");
       genMesh->AddRenderBuffer ("texture coordinate lightmap", lightmapBuffer);
       {
         csRenderBufferLock<csVector2> bufferLock(lightmapBuffer);

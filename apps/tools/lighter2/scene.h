@@ -160,6 +160,8 @@ namespace lighter
     void CleanOldLightmaps (LoadedFile* fileInfo, 
       const csSet<csString>& texFileNames);
     void SaveSceneToDom (iDocumentNode* root, LoadedFile* fileInfo);
+    bool SaveSceneLibrary (const char* libFile, LoadedFile* fileInfo);
+    void HandleLibraryNode (iDocumentNode* node, LoadedFile* fileInfo);
     void SaveMeshFactoryToDom (iDocumentNode* factNode, LoadedFile* fileInfo);
     void SaveSectorToDom (iDocumentNode* sectorNode, LoadedFile* fileInfo);
     void SaveMeshObjectToDom (iDocumentNode *objNode, Sector* sect, LoadedFile* fileInfo);

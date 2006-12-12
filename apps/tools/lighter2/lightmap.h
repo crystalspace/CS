@@ -148,6 +148,17 @@ namespace lighter
   };
   typedef csArray<LightmapMask> LightmapMaskArray;
 
+  class LightmapPostProcess
+  {
+  public:
+    // Add a general ambient term
+    static void AddAmbientTerm (csColor* colors, size_t numColors, 
+      const csColor amb);
+
+    // Apply the exposure function
+    static void ApplyExposureFunction (csColor* colors, size_t numColors, 
+      float expConstant, float expMax);
+  };
 
   // File-backed cache for LM data
   class LightmapCache
