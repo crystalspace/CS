@@ -462,7 +462,7 @@ void csGLBasicTextureHandle::Blit (int x, int y, int width,
 	SetupAutoMipping();
       }
 
-      glTexImage2D (textarget, 0, textureFormat, actual_width, 
+      glTexImage2D (textarget, 0, GL_RGBA8, actual_width, 
 	actual_height, 0, textureFormat, GL_UNSIGNED_BYTE, pixels);
       delete[] pixels;
     }
