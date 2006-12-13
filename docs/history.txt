@@ -21,6 +21,7 @@ chronological order.
 	  in terrainf to disappear.
 	- Marten blindly updated the linux and osx sound drivers to use new
 	  threading infrastructure.
+	- Marten fixed trac #218, ambiguous datatypes in lighter2.
 12-Dec-2006
 	- Jorrit did further texture manager improvements:
 	    - Made it possible to instantiate instances of

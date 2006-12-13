@@ -79,7 +79,7 @@ namespace lighter
     }
 
     // Set a pixel to given color
-    inline void SetAddPixel (uint u, uint v, csColor c)
+    inline void SetAddPixel (size_t u, size_t v, csColor c)
     {
       data->colorArray[v*width + u] += c;
     }

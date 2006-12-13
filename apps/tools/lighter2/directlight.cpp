@@ -305,7 +305,7 @@ namespace lighter
           ElementProxy ep = prim.GetElement (eidx);
           csColor c = lmElementShader (sector, ep, masterSampler, rt);
 
-          uint u, v;
+          size_t u, v;
           prim.GetElementUV (eidx, u, v);
           u += minUV.x;
           v += minUV.y;
