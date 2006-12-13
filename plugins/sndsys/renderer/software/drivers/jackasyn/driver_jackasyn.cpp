@@ -225,7 +225,7 @@ bool SndSysDriverJackasyn::StartThread()
 
   running=true;
   SndSysDriverRunnable* runnable = new SndSysDriverRunnable (this);
-  bgthread = csThread::Create(runnable);
+  bgthread.AttachNew (new CS::Threading::Thread (runnable, false));
   runnable->DecRef ();
 
   bgthread->Start();
