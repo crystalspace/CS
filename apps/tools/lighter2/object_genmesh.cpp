@@ -221,6 +221,8 @@ namespace lighter
   bool ObjectFactory_Genmesh::SubmeshesMergeable (iGeneralMeshSubMesh* sm1,
                                                      iGeneralMeshSubMesh* sm2)
   {
+    if (sm1 == sm2) return true;
+
     if (sm1->GetMixmode() != sm2->GetMixmode()) return false;
     if (sm1->GetMaterial() != sm2->GetMaterial()) return false;
 
@@ -381,27 +383,29 @@ namespace lighter
       colorsBuffer->CopyInto (litColors->GetArray(),
         vertexData.vertexArray.GetSize());
     }
-    else
+
+    // Still may need to fix up submesh materials...
+    CS::ShaderVarName lightmapName (globalLighter->strings, "tex lightmap");
+
+    for (uint i = 0; i < allPrimitives.GetSize (); ++i)
     {
-      CS::ShaderVarName lightmapName (globalLighter->strings, "tex lightmap");
+      csString submeshName;
+      submeshName = factory->submeshNames[i];
 
-      for (uint i = 0; i < allPrimitives.GetSize (); ++i)
+      iGeneralMeshSubMesh* subMesh = genMesh->FindSubMesh (submeshName);
+      if (!subMesh) continue;
+
+      /* Fix up material (factory may not have a material set, but mesh object
+       * material does not "propagate" to submeshes) */
+      if (subMesh->GetMaterial() == 0)
       {
-        csString submeshName;
-        submeshName = factory->submeshNames[i];
+        csRef<iMeshObject> mo = 
+          scfQueryInterface<iMeshObject> (genMesh);
+        subMesh->SetMaterial (mo->GetMaterialWrapper());
+      }
 
-        iGeneralMeshSubMesh* subMesh = genMesh->FindSubMesh (submeshName);
-        if (!subMesh) continue;
-
-        /* Fix up material (factory may not have a material set, but mesh object
-         * material does not "propagate" to submeshes) */
-        if (subMesh->GetMaterial() == 0)
-        {
-          csRef<iMeshObject> mo = 
-            scfQueryInterface<iMeshObject> (genMesh);
-          subMesh->SetMaterial (mo->GetMaterialWrapper());
-        }
-
+      if (!lightPerVertex)
+      {
         csRef<iShaderVariableContext> svc = 
           scfQueryInterface<iShaderVariableContext> (subMesh);
 
@@ -412,7 +416,10 @@ namespace lighter
         svLightmap->SetValue (lm->GetTexture());
         svc->AddVariable (svLightmap);
       }
+    }
 
+    if (!lightPerVertex)
+    {
       csRef<csRenderBuffer> lightmapBuffer = csRenderBuffer::CreateRenderBuffer (
         vertexData.vertexArray.GetSize(), CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 2);
       genMesh->AddRenderBuffer ("texture coordinate lightmap", lightmapBuffer);

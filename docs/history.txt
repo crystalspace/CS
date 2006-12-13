@@ -9,6 +9,8 @@ chronological order.
 13-Dec-2006
 	- res fixed the gl3d texture manager to upload Blit()ted data with the
 	  right target format.
+	- res fixed lighter2 to also perform the "genmesh submesh material
+	  fixup" for vertex-lit meshes.
 12-Dec-2006
 	- Jorrit did further texture manager improvements:
 	    - Made it possible to instantiate instances of
