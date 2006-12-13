@@ -806,9 +806,9 @@ csGLTextureHandle::csGLTextureHandle (iImage* image, int flags,
   csGLBasicTextureHandle (image->GetImageType (), flags, iG3D),
   origName(0)
 {
-printf ("image='%s' format='%08x' rawformat='%s' type=%d\n",
-    image->GetName (), image->GetFormat (), image->GetRawFormat (),
-    image->GetImageType ()); fflush (stdout);
+//printf ("image='%s' format='%08x' rawformat='%s' type=%d\n",
+    //image->GetName (), image->GetFormat (), image->GetRawFormat (),
+    //image->GetImageType ()); fflush (stdout);
   this->image = image;
   if (image->GetFormat () & CS_IMGFMT_ALPHA)
     alphaType = csAlphaMode::alphaSmooth;
