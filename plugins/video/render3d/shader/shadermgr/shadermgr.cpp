@@ -28,6 +28,7 @@
 #include "csutil/eventnames.h"
 #include "csutil/ref.h"
 #include "csutil/scf.h"
+#include "csutil/callstack.h"
 #include "iengine/engine.h"
 #include "iengine/material.h"
 #include "iengine/texture.h"

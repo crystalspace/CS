@@ -11,6 +11,14 @@ chronological order.
 	  right target format.
 	- res fixed lighter2 to also perform the "genmesh submesh material
 	  fixup" for vertex-lit meshes.
+	- Jorrit fixed a bug in the engine which only surfaced after
+	  shader cleanup was added to iEngine->DeleteAll() recently. The
+	  engine would first load the standard shaders but then it would
+	  call DeleteAll() which would unload them again. Now the loading
+	  of the standard shaders is added to iEngine->DeleteAll() at the
+	  end so that after DeleteAll() we are always in a consistent
+	  state. This bug would cause (among other things) the foliage
+	  in terrainf to disappear.
 12-Dec-2006
 	- Jorrit did further texture manager improvements:
 	    - Made it possible to instantiate instances of
