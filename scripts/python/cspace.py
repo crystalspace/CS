@@ -1624,6 +1624,7 @@ class csQuaternion(_object):
         this = _cspace.new_csQuaternion(*args)
         try: self.this.append(this)
         except: self.this = this
+    def Set(*args): return _cspace.csQuaternion_Set(*args)
     def SetIdentity(*args): return _cspace.csQuaternion_SetIdentity(*args)
     def __iadd__(*args): return _cspace.csQuaternion___iadd__(*args)
     def __isub__(*args): return _cspace.csQuaternion___isub__(*args)
@@ -9808,6 +9809,7 @@ class csImageMemory(csImageMemoryBase):
     def GetWidth(*args): return _cspace.csImageMemory_GetWidth(*args)
     def GetHeight(*args): return _cspace.csImageMemory_GetHeight(*args)
     def GetDepth(*args): return _cspace.csImageMemory_GetDepth(*args)
+    def GetRawFormat(*args): return _cspace.csImageMemory_GetRawFormat(*args)
     def GetFormat(*args): return _cspace.csImageMemory_GetFormat(*args)
     def GetPalette(*args): return _cspace.csImageMemory_GetPalette(*args)
     def GetAlpha(*args): return _cspace.csImageMemory_GetAlpha(*args)

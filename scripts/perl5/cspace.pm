@@ -2625,6 +2625,7 @@ sub new {
     bless $self, $pkg if defined($self);
 }
 
+*Set = *cspacec::csQuaternion_Set;
 *SetIdentity = *cspacec::csQuaternion_SetIdentity;
 *__add_ass__ = *cspacec::csQuaternion___add_ass__;
 *__subtr_ass__ = *cspacec::csQuaternion___subtr_ass__;
@@ -14729,6 +14730,7 @@ sub DESTROY {
 *GetWidth = *cspacec::csImageMemory_GetWidth;
 *GetHeight = *cspacec::csImageMemory_GetHeight;
 *GetDepth = *cspacec::csImageMemory_GetDepth;
+*GetRawFormat = *cspacec::csImageMemory_GetRawFormat;
 *GetFormat = *cspacec::csImageMemory_GetFormat;
 *GetPalette = *cspacec::csImageMemory_GetPalette;
 *GetAlpha = *cspacec::csImageMemory_GetAlpha;
