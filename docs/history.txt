@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+14-Dec-2006
+	- Jorrit fixed the xmlshader compiler and genmesh plugins so that
+	  they compile again if extensive memory debugging is enabled.
 13-Dec-2006
 	- res fixed the gl3d texture manager to upload Blit()ted data with the
 	  right target format.
