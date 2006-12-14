@@ -790,6 +790,7 @@ csPtr<iDataBuffer> DiskFile::GetAllData (bool nullterm)
 
 iDataBuffer* DiskFile::TryCreateMapping ()
 {
+  if (!Size) return 0;
   csMMapDataBuffer* buf = new csMMapDataBuffer (fName, Size);
   if (buf->GetStatus())
     return buf;

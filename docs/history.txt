@@ -9,6 +9,8 @@ chronological order.
 14-Dec-2006
 	- Jorrit fixed the xmlshader compiler and genmesh plugins so that
 	  they compile again if extensive memory debugging is enabled.
+	- Jorrit fixed a problem in VFS where it would sometimes do an
+	  allocation of 0 bytes.
 13-Dec-2006
 	- res fixed the gl3d texture manager to upload Blit()ted data with the
 	  right target format.
