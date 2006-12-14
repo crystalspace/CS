@@ -80,13 +80,16 @@ namespace lighter
   {
     testRay.origin = start;
     testRay.direction = dir;
-    testRay.maxLength = maxL - 0.01f;
+    //testRay.minLength = FLT_EPSILON;
+    //testRay.maxLength = maxL * (1.0f - FLT_EPSILON);
+    testRay.maxLength = maxL - FLT_EPSILON*10.0f;
     testRay.ignoreFlags = KDPRIM_FLAG_NOSHADOW; // Ignore primitives that don't cast shadows
   }
 
-  bool VisibilityTester::Unoccluded (Raytracer& rt)
+  bool VisibilityTester::Unoccluded (Raytracer& rt, const Primitive* ignorePrim)
   {
     HitPoint hp;
+    testRay.ignorePrimitive = ignorePrim;
     return !rt.TraceAnyHit (testRay, hp);
   }
 

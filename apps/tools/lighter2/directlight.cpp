@@ -114,9 +114,11 @@ namespace lighter
 
       for (size_t i = 0; i < allLights.GetSize (); ++i)
       {
-        res += ShadeLight (allLights[i], pos, normal, rt, lightSampler);
+        res += ShadeLight (allLights[i], pos, normal, rt, lightSampler, &element.primitive);
       }
     }
+
+    
     
     return res * 0.25f;
   }
@@ -150,7 +152,7 @@ namespace lighter
 
       size_t lightIdx = (size_t) floorf (allLights.GetSize () * rndValues[2]);
 
-      res += ShadeLight (allLights[lightIdx], pos, normal, rt, sampler);
+      res += ShadeLight (allLights[lightIdx], pos, normal, rt, sampler, &element.primitive);
     }
 
     return res * 0.25f * allLights.GetSize ();
@@ -181,14 +183,15 @@ namespace lighter
       const csVector3 pos = elementC + offsetVector;
       const csVector3 normal = element.primitive.ComputeNormal (pos);
 
-      res += ShadeLight (light, pos, normal, rt, sampler);
+      res += ShadeLight (light, pos, normal, rt, sampler, &element.primitive);
     }
 
     return res * 0.25f;
   }
 
   csColor DirectLighting::ShadeLight (Light* light, const csVector3& point,
-    const csVector3& normal, Raytracer& rt, SamplerSequence<2>& lightSampler)
+    const csVector3& normal, Raytracer& rt, SamplerSequence<2>& lightSampler,
+    const Primitive* shadowIgnorePrimitive)
   {
     // Some variables..
     VisibilityTester visTester;
@@ -205,7 +208,7 @@ namespace lighter
       (cosineTerm = normal * lightVec) > 0)
     {
       //@@TODO add material...
-      if (visTester.Unoccluded (rt))
+      if (visTester.Unoccluded (rt, shadowIgnorePrimitive))
       {
         if (light->IsDeltaLight ())
           return lightColor * fabsf (cosineTerm) / lightPdf;

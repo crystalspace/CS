@@ -81,7 +81,8 @@ namespace lighter
   private:
     // Static methods...
     inline static csColor ShadeLight (Light* light, const csVector3& point,
-      const csVector3& normal, Raytracer& rt, SamplerSequence<2>& lightSampler);
+      const csVector3& normal, Raytracer& rt, SamplerSequence<2>& lightSampler,
+      const Primitive* shadowIgnorePrimitive = 0);
 
     static void ShadeLightmap (Sector* sector, Object* obj, Raytracer& rt, 
       SamplerSequence<2>& masterSampler);

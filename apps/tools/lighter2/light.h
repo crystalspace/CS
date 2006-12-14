@@ -31,7 +31,7 @@ namespace lighter
     VisibilityTester ();
 
     /// Test if we have visibility within given raytracer
-    bool Unoccluded (Raytracer& rt);
+    bool Unoccluded (Raytracer& rt, const Primitive* ignorePrim = 0);
 
     void SetSegment (const csVector3& start, const csVector3& end);
     void SetSegment (const csVector3& start, const csVector3& dir, float maxL);

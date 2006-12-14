@@ -11,6 +11,9 @@ chronological order.
 	  they compile again if extensive memory debugging is enabled.
 	- Jorrit fixed a problem in VFS where it would sometimes do an
 	  allocation of 0 bytes.
+	- Marten fixed a nasty bug in lighter2 where the ray tracer would
+	  miss hits on 0 width kd-nodes.
+	- Marten rewrote how lighter2 avoids element self-shadowing.
 13-Dec-2006
 	- res fixed the gl3d texture manager to upload Blit()ted data with the
 	  right target format.
