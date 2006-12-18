@@ -41,16 +41,6 @@
 #define CS_FORMATTER_PROVIDE_I64
 #endif
 
-// MSVC 7.1 requires us to use a `typename' qualifier on the declaration of
-// `mantissa' in csPrintfFormatter. Although this is accepted by most other
-// compilers, it breaks on gcc 3.4.x, which complains (apparently incorrectly?)
-// that IEEEFloatMantissa is not a templated type.
-#if defined(CS_COMPILER_MSVC) && (_MSC_VER >= 1300)
-#define CS_FORMATTER_TYPENAME_QUALIFIER typename
-#else
-#define CS_FORMATTER_TYPENAME_QUALIFIER
-#endif
-
 /**\addtogroup util
  * @{ */
 
@@ -988,8 +978,8 @@ class csPrintfFormatter
     bool sign;
     Tbase exp;
 
-    CS_FORMATTER_TYPENAME_QUALIFIER
-    csPrintfFormatter<Twriter,Treader>::IEEEFloatMantissa<T, Tbase> mantissa;
+    typename csPrintfFormatter<Twriter,Treader>::
+      template IEEEFloatMantissa<T, Tbase> mantissa;
 
     IEEEFloatSplitter (const T& val, const int mantissaBits,
       const int expBits) 

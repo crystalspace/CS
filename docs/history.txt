@@ -14,6 +14,11 @@ chronological order.
 	- Marten fixed a nasty bug in lighter2 where the ray tracer would
 	  miss hits on 0 width kd-nodes.
 	- Marten rewrote how lighter2 avoids element self-shadowing.
+	- res removed the CS_FORMATTER_TYPENAME_QUALIFIER hack from
+	  formatter.h. Instead, 'typename' is used everywhere. Together with
+	  a missing 'template', this works on VC 7.0, VC 8.0, gcc 3.4 and
+	  gcc 4.1; hence very likely on all compilers we support. Addresses
+	  trac #197.
 13-Dec-2006
 	- res fixed the gl3d texture manager to upload Blit()ted data with the
 	  right target format.
