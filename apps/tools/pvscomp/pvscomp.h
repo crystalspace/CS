@@ -165,8 +165,8 @@ public:
   ~OcclusionTree ();
   
   // Add a polyhedra to the scene.
-  void Union (const struct Polygon* source,
-      const struct Polygon* target, const char* objectName);
+  void Union (struct Polygon* source,
+      struct Polygon* target, const char* objectName);
   // Determine the size of the set of lines.  If below a certain threshold,
   // the IN-NODE will not be included in the PVS.
   void MakeSizeSet ();
@@ -205,10 +205,10 @@ class Compiler
   void ConstructPVSForRegion (const csBox3& region, PVSArray& pvs);
   // Finds PVS for a particular face for rays that point in the same direction
   // as the normal.
-  void ConstructPVSForFace (const struct Polygon* p, PVSArray& pvs);
+  void ConstructPVSForFace (struct Polygon* p, PVSArray& pvs);
   // Creates a polyhedron that represents the rays passing from the source
   // polygon to the rest of the scene.
-  static OcclusionTree* ConstructOT (const struct Polygon* p,
+  static OcclusionTree* ConstructOT (struct Polygon* p,
       csStaticKDTree* node, class OcclusionTree* polyhedron);
   // Distribute the PVS data to non-leaf nodes.
   void PropogatePVS (csStaticKDTree* node);

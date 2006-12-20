@@ -30,6 +30,7 @@ Polygon::Polygon (const csVector3& a, const csVector3& b, const csVector3& c,
     const csVector3& d)
 {
   numVertices = 4;
+  freeData = true;
 
   vertices = new csVector3[4];
   vertices[0] = a;
@@ -47,6 +48,10 @@ Polygon::Polygon (const csVector3& a, const csVector3& b, const csVector3& c,
 Polygon::Polygon (iPolygonMesh* mesh, int polygonIndex)
 {
   csMeshedPolygon* cspolygon = mesh->GetPolygons () + polygonIndex;
+
+  CS_ASSERT (mesh->GetVertices () != NULL);
+  CS_ASSERT (cspolygon->vertices != NULL);
+
   numVertices = cspolygon->num_vertices;
   index = cspolygon->vertices;
   vertices = mesh->GetVertices ();

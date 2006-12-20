@@ -126,6 +126,10 @@ static int Test (const Polygon* p, const csVector3& normal, float planeD)
 static int FaceTest (const Polygon* lhs, const Polygon* rhs, 
     const Polygon* source)
 {
+  lhs->Print();
+  rhs->Print();
+  source->Print();
+
   // First see if either polygon lies in the positive or negative halfspace
   // defined by the other polygon.
   csVector3 normal;
@@ -212,15 +216,17 @@ public:
   // Default constructor
   BlockerPolyhedron () {}
   // Construct a blocker polyhedron from an occluder polygon.
-  BlockerPolyhedron (const Polygon* source, const Polygon* occluder, 
+  BlockerPolyhedron (Polygon* source, Polygon* occluder, 
       const char* objectName);
   // Prints the vertices of the polyhedron.
   void PrintVertices ();
 };
 
-BlockerPolyhedron::BlockerPolyhedron (const Polygon* source, 
-    const Polygon* occluder, const char* objectName)
+BlockerPolyhedron::BlockerPolyhedron (Polygon* source, Polygon* occluder, 
+    const char* objectName)
 {
+  sourcePoly = source;
+  blockerPoly = occluder;
   ExtremalPluckerPoints (source, occluder, vertices);
   PluckerPlanes (source, planes);
   PluckerPlanes (occluder, planes);
@@ -276,6 +282,8 @@ OcclusionTree::OcclusionTree (const Plucker& split)
   splitPlane = split;
   leafNode = NULL;
   parent = NULL;
+  posChild = NULL;
+  negChild = NULL;
 }
 
 OcclusionTree* OcclusionTree::ConstructOutNode ()
@@ -286,6 +294,7 @@ OcclusionTree* OcclusionTree::ConstructOutNode ()
 OcclusionTree* OcclusionTree::ConstructInNode (const BlockerPolyhedron* poly,
     const csArray<Plucker>& splitPlanes)
 {
+  poly->blockerPoly->Print ();
   csArray<Plucker> planes;
   OcclusionTree* inNode = new OcclusionTree (IN_NODE, poly->objectName,
       poly->blockerPoly);
@@ -324,37 +333,43 @@ OcclusionTree* OcclusionTree::ConstructInNode (const BlockerPolyhedron* poly,
 void OcclusionTree::ReplaceWithElementaryOT (
     const csArray<Plucker>& otplanes, OcclusionTree* inLeaf)
 {
+  if (inLeaf->leafNode->poly)
+    inLeaf->leafNode->poly->Print ();
+
   delete leafNode;
   leafNode = NULL;
 
   if (otplanes.Length () > 0)
   {
-    OcclusionTree* currentPoly = NULL;
+    printf("it does happen!\n");
+    OcclusionTree* currentNode = NULL;
    
     for (unsigned int i = 0; i < otplanes.Length (); i++)
     {
-      if (currentPoly == NULL)
+      if (currentNode == NULL)
       {
         // First time through loop
-        currentPoly = this;
-        splitPlane = otplanes[i];
+        currentNode = this;
+        splitPlane = otplanes[0];
+
+        posChild = new OcclusionTree (OUT_NODE, NULL, NULL);
+        posChild->parent = this;
       }
       else
       {
         // Next plane goes to positive halfspace
-        currentPoly->negChild = new OcclusionTree (otplanes[i]);
-        currentPoly->negChild->parent = currentPoly;
-        currentPoly = currentPoly->negChild;
-      }
+        currentNode->negChild = new OcclusionTree (otplanes[i]);
+        currentNode->negChild->parent = currentNode;
+        currentNode = currentNode->negChild;
 
-      // In leaf goes to negative halfspace
-      currentPoly->posChild = new OcclusionTree (OUT_NODE, NULL, NULL);
-      currentPoly->posChild->parent = currentPoly;
+        currentNode->posChild = new OcclusionTree (OUT_NODE, NULL, NULL);
+        currentNode->posChild->parent = currentNode;
+      }
     }
 
     // Last plane node has a leaf child with an in node
-    currentPoly->negChild = inLeaf;
-    inLeaf->parent = currentPoly;
+    currentNode->negChild = inLeaf;
+    inLeaf->parent = currentNode;
   }
   else
   {
@@ -415,7 +430,7 @@ void OcclusionTree::Union (BlockerPolyhedron* polyhedron,
   {
     if (leafNode->type == OUT_NODE)
     {
-      printf ("Arrived at OUT node.\n");
+      printf ("(union) Arrived at OUT node.\n");
       OcclusionTree* inLeaf = ConstructInNode (polyhedron, splitPlanes);
       if (inLeaf)
       {
@@ -424,7 +439,7 @@ void OcclusionTree::Union (BlockerPolyhedron* polyhedron,
     }
     else  // In node
     {
-      printf ("Arrived at IN node.\n");
+      printf ("(union) Arrived at IN node.\n");
 
       // TODO:  I don't think we care about what polygon defines this node
       // as an IN NODE.  We might be able to completely skip the IN node, or
@@ -432,7 +447,7 @@ void OcclusionTree::Union (BlockerPolyhedron* polyhedron,
       if (FaceTest (leafNode->poly, polyhedron->blockerPoly, 
             polyhedron->sourcePoly) < 0)
       {
-        printf ("Special merge.\n");
+        printf ("(union) Special merge.\n");
         // leafNode's polygon is behind our current occluder.
 
         OcclusionTree* inLeaf = ConstructInNode (polyhedron, splitPlanes);
@@ -450,19 +465,19 @@ void OcclusionTree::Union (BlockerPolyhedron* polyhedron,
     int test = Test (polyhedron->vertices, splitPlane);
     if (test > 0)
     {
-      printf ("Polyhedron lies on positive side.\n");
+      printf ("(union) Polyhedron lies on positive side.\n");
       // poly in front
       posChild->Union (polyhedron, splitPlanes);
     }
     else if (test < 0)
     {
-      printf ("Polyhedron lies on negative side.\n");
+      printf ("(union) Polyhedron lies on negative side.\n");
       // poly in back
       negChild->Union (polyhedron, splitPlanes);
     }
     else
     {
-      printf ("Polyhedron lies on both sides.\n");
+      printf ("(union) Polyhedron lies on both sides.\n");
 
       // poly is on both sides of splitPlane
       splitPlanes.Push (splitPlane);
@@ -494,7 +509,7 @@ OcclusionTree::~OcclusionTree ()
   }
 }
 
-void OcclusionTree::Union (const Polygon* source, const Polygon* target, 
+void OcclusionTree::Union (Polygon* source, Polygon* target, 
     const char* objectName)
 {
   BlockerPolyhedron blocker (source, target, objectName);

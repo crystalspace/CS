@@ -246,7 +246,7 @@ void Compiler::ConstructPVSForRegion(const csBox3& region,
   }
 }
 
-void Compiler::ConstructPVSForFace(const Polygon* p, PVSArray& pvs)
+void Compiler::ConstructPVSForFace(Polygon* p, PVSArray& pvs)
 {
   OcclusionTree* poly = ConstructOT (p, pvstree, new OcclusionTree ());
 
@@ -255,7 +255,7 @@ void Compiler::ConstructPVSForFace(const Polygon* p, PVSArray& pvs)
   delete poly;
 }
 
-OcclusionTree* Compiler::ConstructOT(const Polygon* p,
+OcclusionTree* Compiler::ConstructOT(Polygon* p,
     csStaticKDTree* node, OcclusionTree* polyhedron)
 {
   if (node->IsLeafNode ())
@@ -387,6 +387,7 @@ void TestUnionTree ();
 int main (int argc, char** argv)
 {
   TestUnionTree ();
+
 #if 0
   Compiler pvscomp;
   if (!pvscomp.Initialize (argc, argv))
