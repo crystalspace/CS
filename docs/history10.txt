@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+21-Dec-2006
+	- Jorrit merged r26017 into 1.0 (CreatePortal fix).
+	- Jorrit merged r26014 into 1.0 (light_scattering.xml).
 29-Nov-2006
 	- Jorrit merged r25988 into 1.0 (setenv/putenv fix).
 28-Nov-2006
