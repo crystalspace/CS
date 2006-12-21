@@ -7,6 +7,7 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 21-Dec-2006
+	- Jorrit merged r26039:26040 into 1.0 (gmeshanim fixes).
 	- Jorrit merged r26028 into 1.0 (CreatePortal fix).
 	- Jorrit merged r26023 into 1.0 (issue in OpenGL r2t).
 	- Jorrit merged r26021 into 1.0 (genmeshify library fix).

@@ -6,6 +6,12 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+6-Dec-2006
+        - Erroroman fixed copy/paste error in vproc skinning, also optimized 
+          it by removing allocation of transform array for bones per 
+        - Erroroman fixed problem in vproc skinning where it could fail if
+          the weight of the first bone is 0 and the others weights are 
+          greater than 0.
 4-Dec-2006
 	- Jorrit fixed csEngine::CreatePortal() so that it works as
 	  intended.
