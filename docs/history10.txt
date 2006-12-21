@@ -7,6 +7,7 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 21-Dec-2006
+	- Jorrit merged r26093 into 1.0 (fix for #197).
 	- Jorrit merged r26075:26076 into 1.0 (procedural textures fix).
 	- Jorrit merged r26039:26040 into 1.0 (gmeshanim fixes).
 	- Jorrit merged r26028 into 1.0 (CreatePortal fix).
