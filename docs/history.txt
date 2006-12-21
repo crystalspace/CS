@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+21-Dec-2006
+	- Genjix made a common plugin name for both implementations of joystick
+	  driver. Old method of loading them should slowly be deprecated.
 19-Dec-2006
 	- Genjix added fix to iEngine::CreateBlackTexture where it will return 0
 	  when a null pointer is passed for its name parameter.
