@@ -15,6 +15,12 @@ chronological order.
 13-Dec-2006
 	- res fixed the gl3d texture manager to upload Blit()ted data with the
 	  right target format.
+12-Dec-2006
+	- res fixed a bug in csPoly3D::SplitWithPlane(): when an empty poly 
+	  was split, the result polies stayed unchanged. So when a non-empty
+	  polygon was used to receive a result of an empty polygon splitting,
+	  it retained it's old vertices. The proper result values when 
+	  splitting an empty polygon are empty polygons.
 6-Dec-2006
         - Erroroman fixed copy/paste error in vproc skinning, also optimized 
           it by removing allocation of transform array for bones per 
