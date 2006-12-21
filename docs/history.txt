@@ -12,6 +12,8 @@ chronological order.
 	  csEngine::CreatePortal() to actually work. Previously it would 
 	  always create a portal container since the found mesh would be 
 	  stored in the wrong variable.
+	- res fixed genmesify to handle <library path="..." file="..." />-
+	  style library tags. Fixes trac #201.
 28-Nov-2006
 	- Andrew Dai fixed a bug that's been lurking in csColliderActor::Move
 	  from the beginning of time. This occasionally allowed actors to pass
