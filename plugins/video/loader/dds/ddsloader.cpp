@@ -125,7 +125,7 @@ csDDSRawDataType csDDSImageIO::IdentifyPixelFormat (const dds::PixelFormat& pf,
 	&& (pf.bluemask == 0x00000ff))
       {
 	if (!(pf.flags & dds::DDPF_ALPHAPIXEL))
-	  type = csrawB8G8R8;
+	  type = csrawR8G8B8;
       }
     }
     else if (pf.bitdepth == 32)
@@ -134,7 +134,7 @@ csDDSRawDataType csDDSImageIO::IdentifyPixelFormat (const dds::PixelFormat& pf,
 	&& (pf.bluemask == 0x00000ff))
       {
 	if ((pf.flags & dds::DDPF_ALPHAPIXEL) && (pf.alphamask == 0xff000000))
-	  type = csrawB8G8R8A8;
+	  type = csrawA8R8G8B8;
       }
     }
   }
@@ -387,7 +387,7 @@ csRef<iImage> csDDSImageFile::GetMipmap (uint num)
   if (num > mipmaps.Length())
     return 0;
 
-  return mipmaps[num-1];
+  return csRef<iImage> (mipmaps[num-1]);
 }
 
 uint csDDSImageFile::HasSubImages() const 
@@ -402,7 +402,7 @@ csRef<iImage> csDDSImageFile::GetSubImage (uint num)
   if (num > subImages.Length())
     return 0;
 
-  return subImages[num-1];
+  return csRef<iImage> (subImages[num-1]);
 }
 
 static const char* RawTypeString (csDDSRawDataType type)
@@ -410,22 +410,23 @@ static const char* RawTypeString (csDDSRawDataType type)
   switch (type)
   {
     case csrawDXT1:   
+      return "*dxt1";
     case csrawDXT1Alpha:
-      return "dxt1";
+      return "*dxt1a";
     case csrawDXT2:
-      return "dxt2";
+      return "*dxt2";
     case csrawDXT3:
-      return "dxt3";
+      return "*dxt3";
     case csrawDXT4:
-      return "dxt4";
+      return "*dxt4";
     case csrawDXT5:
-      return "dxt5";
-    case csrawB8G8R8:
-      return "b8g8r8";
+      return "*dxt5";
+    case csrawR8G8B8:
+      return "r8g8b8";
     case csrawR5G6B5:
       return "r5g6b5";
-    case csrawB8G8R8A8:
-      return "b8g8r8a8";
+    case csrawA8R8G8B8:
+      return "a8r8g8b8";
     case csrawLum8:
       return "l8";
     default:
@@ -440,7 +441,7 @@ const char* csDDSImageFile::GetRawFormat() const
 
 csRef<iDataBuffer> csDDSImageFile::GetRawData() const
 {
-  return rawInfo ? (rawInfo->rawData) : 0;
+  return rawInfo ? (rawInfo->rawData) : csRef<iDataBuffer> (0);
 }
 
 void csDDSImageFile::Report (int severity, const char* msg, ...)

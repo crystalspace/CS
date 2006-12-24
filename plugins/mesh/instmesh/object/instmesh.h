@@ -92,6 +92,9 @@ public:
     delete[] shadowmap;
   }
 };
+
+#include "csutil/win32/msvc_deprecated_warn_off.h"
+
 /**
 * Instmesh version of mesh object.
 */
@@ -309,7 +312,6 @@ public:
 
   /// Calculate bounding box and radius.
   void CalculateBBoxRadius ();
-  const csBox3& GetObjectBoundingBox ();
   void SetObjectBoundingBox (const csBox3& bbox);
   float GetRadius ();
   /**\name iObjectModel implementation
@@ -318,6 +320,7 @@ public:
   {
     bbox = GetObjectBoundingBox ();
   }
+  virtual const csBox3& GetObjectBoundingBox ();
 
   virtual iObjectModel* GetObjectModel () { return this; }
 
@@ -352,6 +355,8 @@ public:
   csRef<PolyMesh> polygonMesh;
   friend struct PolyMesh;
 };
+
+#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 /**
 * Factory for general meshes.

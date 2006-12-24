@@ -373,7 +373,7 @@ template <class Interface>
 class scfInterfaceTraits
 {
 public:
-  typedef typename_qualifier Interface::InterfaceTraits::InterfaceType 
+  typedef typename Interface::InterfaceTraits::InterfaceType 
     InterfaceType;
 
   /*
@@ -386,7 +386,7 @@ public:
   /**
    * Retrieve the interface's current version number.
    */
-  CS_FORCEINLINE static scfInterfaceVersion GetVersion ()
+  CS_FORCEINLINE_TEMPLATEMETHOD static scfInterfaceVersion GetVersion ()
   {
     return Interface::InterfaceTraits::GetVersion ();
   }
@@ -398,7 +398,7 @@ public:
    * performance reasons, by scfInterfaceID, which is typically a small
    * integer.
    */
-  CS_FORCEINLINE static scfInterfaceID GetID ()
+  CS_FORCEINLINE_TEMPLATEMETHOD static scfInterfaceID GetID ()
   {
     scfInterfaceID& ID = GetMyID ();
     if (ID == (scfInterfaceID)(-1))
@@ -412,14 +412,14 @@ public:
   /**
    * Retrieve the interface's name as a string.
    */
-  CS_FORCEINLINE static char const* GetName ()
+  CS_FORCEINLINE_TEMPLATEMETHOD static char const* GetName ()
   { 
     return Interface::InterfaceTraits::GetName ();
   }
 
 private:
   // This idiom is a Meyers singleton
-  CS_FORCEINLINE static scfInterfaceID& GetMyID ()
+  CS_FORCEINLINE_TEMPLATEMETHOD static scfInterfaceID& GetMyID ()
   {
     static scfInterfaceID ID = (scfInterfaceID)-1;
     return ID;
@@ -445,7 +445,7 @@ private:
  */
 #define SCF_VERSION(Name,Major,Minor,Micro)                \
 struct Name;                                               \
-CS_SPECIALIZE_TEMPLATE                                     \
+template<>                                                 \
 class scfInterfaceTraits<Name>                             \
 {                                                          \
 public:                                                    \

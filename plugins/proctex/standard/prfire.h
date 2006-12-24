@@ -33,7 +33,10 @@ struct csRGBcolor;
 /**
  * Fire.
  */
-class csProcFire : public csProcTexture, public iFireTexture
+class csProcFire : 
+  public scfImplementationExt1<csProcFire,
+                               csProcTexture, 
+                               iFireTexture>
 {
 private:
   /// Palette.
@@ -76,8 +79,6 @@ private:
   csRandomGen rng;
 
 public:
-  SCF_DECLARE_IBASE_EXT(csProcTexture);
-
   /// Create a new texture.
   csProcFire (iTextureFactory* p, int w = 128, int h = 128);
   ///
@@ -118,7 +119,7 @@ public:
   virtual void SetPostSmoothing (int amount);
   virtual int GetPostSmoothing ();
 
-  virtual void SetPalette (const csGradient gradient);
+  virtual void SetPalette (iGradient* gradient);
 };
 
 #endif // __CS_PROCFIRETEX_H__

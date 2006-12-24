@@ -21,10 +21,10 @@
 
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
-#include "csutil/scf.h"
+#include "csutil/scf_implementation.h"
 #include "csutil/parray.h"
 #include "csutil/refarr.h"
-#include "csutil/scopedmutexlock.h"
+#include "csutil/threading/mutex.h"
 #include "ivaria/reporter.h"
 
 /**
@@ -44,17 +44,29 @@ struct csReporterMessage
  * Reporter plugin. This plugin supports the notion of error and
  * general message reporting.
  */
-class csReporter : public iReporter
+class csReporter :
+  public scfImplementation2<csReporter, iReporter, iComponent>
 {
 private:
-  csRef<csMutex> mutex;
+  CS::Threading::RecursiveMutex mutex;
   iObjectRegistry *object_reg;
   csPDelArray<csReporterMessage> messages;
   csRefArray<iReporterListener> listeners;
 
+  /// Whether Report() call is nested
+  bool inReporting;
+  struct ReportedMessage
+  {
+    int severity;
+    csString msgID;
+    csStringFast<768> buf;
+  };
+  /// Queue of messages that were reported while nested
+  csArray<ReportedMessage> messageQueue;
+  /// Actually report a message to listeners and record
+  void ActualReport (const csRefArray<iReporterListener>& listeners,
+    int severity, const char* msgId, const char* buf);
 public:
-  SCF_DECLARE_IBASE;
-
   csReporter (iBase *iParent);
   virtual ~csReporter ();
   virtual bool Initialize (iObjectRegistry *object_reg);
@@ -69,13 +81,6 @@ public:
   virtual void AddReporterListener (iReporterListener* listener);
   virtual void RemoveReporterListener (iReporterListener* listener);
   virtual bool FindReporterListener (iReporterListener* listener);
-
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csReporter);
-    virtual bool Initialize (iObjectRegistry* p)
-    { return scfParent->Initialize (p); }
-  } scfiComponent;
 };
 
 #endif // __CS_REPORTER_H__

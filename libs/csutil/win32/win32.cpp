@@ -222,7 +222,7 @@ bool csPlatformStartup(iObjectRegistry* r)
    */
   SetThreadAffinityMask (GetCurrentThread(), 1);
   
-  csRef<iCommandLineParser> cmdline (CS_QUERY_REGISTRY (r, iCommandLineParser));
+  csRef<iCommandLineParser> cmdline (csQueryRegistry<iCommandLineParser> (r));
 
   csPathsList* pluginpaths = csGetPluginPaths (cmdline->GetAppPath());
 
@@ -309,7 +309,7 @@ bool csPlatformShutdown(iObjectRegistry* r)
     r->Unregister(assi, "iWin32Assistant");
     Win32Assistant* a = (Win32Assistant*)((iWin32Assistant*)assi);
     a->Shutdown();
-    assistants.DeleteFast (a);
+    assistants.Delete (a);
     return true;
   }
   return false;
@@ -370,7 +370,7 @@ Win32Assistant::Win32Assistant (iObjectRegistry* r)
 
   use_own_message_loop = true;
 
-  csRef<iCommandLineParser> cmdline (CS_QUERY_REGISTRY (r, iCommandLineParser));
+  csRef<iCommandLineParser> cmdline (csQueryRegistry<iCommandLineParser> (r));
   console_window = cmdline->GetBoolOption ("console", console_window);
 
   cmdline_help_wanted = (cmdline->GetOption ("help") != 0);
@@ -513,7 +513,7 @@ Win32Assistant::Win32Assistant (iObjectRegistry* r)
 
   m_hCursor = LoadCursor (0, IDC_ARROW);
 
-  csRef<iEventQueue> q (CS_QUERY_REGISTRY (registry, iEventQueue));
+  csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (registry));
   CS_ASSERT (q != 0);
   csEventID events[] = {
     csevPreProcess (registry),
@@ -540,12 +540,12 @@ Win32Assistant::Win32Assistant (iObjectRegistry* r)
   }
 
   csRef<iBase> currentKbd = 
-    CS_QUERY_REGISTRY_TAG (r, "iKeyboardDriver");
+    csQueryRegistryTag (r, "iKeyboardDriver");
   if (currentKbd != 0)
   {
     // Bit hacky: remove old keyboard driver
-    csRef<iEventHandler> eh = SCF_QUERY_INTERFACE (currentKbd, 
-      iEventHandler);
+    csRef<iEventHandler> eh =  
+      scfQueryInterface<iEventHandler> (currentKbd);
     q->RemoveListener (eh);
     r->Unregister (currentKbd, "iKeyboardDriver");
   }
@@ -566,7 +566,7 @@ Win32Assistant::~Win32Assistant ()
 
 void Win32Assistant::Shutdown()
 {
-  csRef<iEventQueue> q (CS_QUERY_REGISTRY (registry, iEventQueue));
+  csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (registry));
   if (q != 0)
     q->RemoveListener(this);
   if (!is_console_app && (cmdline_help_wanted || console_window))
@@ -612,7 +612,7 @@ iEventOutlet* Win32Assistant::GetEventOutlet()
 {
   if (!EventOutlet.IsValid())
   {
-    csRef<iEventQueue> q (CS_QUERY_REGISTRY(registry, iEventQueue));
+    csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (registry));
     if (q != 0)
       EventOutlet = q->CreateEventOutlet(this);
   }
@@ -881,11 +881,19 @@ LRESULT CALLBACK Win32Assistant::WindowProc (HWND hWnd, UINT message,
       if (assistant != 0)
       {
         iEventOutlet* outlet = assistant->GetEventOutlet();
-        ::SetCursor (assistant->m_hCursor);
         outlet->Mouse (csmbNone, false, short(LOWORD(lParam)), 
 	  short(HIWORD(lParam)));
       }
       return TRUE;
+    }
+    case WM_SETCURSOR:
+    {
+      if ((assistant != 0) && (LOWORD (lParam) == HTCLIENT))
+      {
+        ::SetCursor (assistant->m_hCursor);
+        return TRUE;
+      }
+      break;
     }
     case WM_SIZE:
     {
@@ -1000,13 +1008,13 @@ void Win32Assistant::DisableConsole ()
     char* buf = 0;
     while (lasterr == ERROR_INSUFFICIENT_BUFFER)
     {
-      buf = (char*)realloc (buf, bufSize);
+      buf = (char*)cs_realloc (buf, bufSize);
       GetModuleFileName (0, buf, bufSize);
       bufSize += MAX_PATH;
       lasterr = GetLastError ();
     }
     outName = buf;
-    free (buf);
+    cs_free (buf);
   }
 
   {

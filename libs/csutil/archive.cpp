@@ -23,7 +23,6 @@
 
 #include "csutil/archive.h"
 #include "csutil/csendian.h"
-#include "csutil/csstring.h"
 #include "csutil/set.h"
 #include "csutil/snprintf.h"
 #include "csutil/sysfunc.h"
@@ -142,7 +141,7 @@ void csArchive::ReadDirectory ()
 
   // First, make a list of all possible directory components.
   csString filename, slice;
-  csSet<csStrKey> dset;
+  csSet<csString> dset;
   for (size_t i = 0, n = dir.Length(); i < n; i++)
   {
     ArchiveEntry const* e = dir.Get (i);
@@ -158,13 +157,13 @@ void csArchive::ReadDirectory ()
       {
 	filename.SubString (slice, 0, ++sep);
         if (!dset.In (slice.GetData()))
-          dset.AddNoTest (csStrKey (slice)); 
+          dset.AddNoTest (slice); 
       }
     }
   }
 
   // Now, iterate over `dset' and create fake directory components.
-  csSet<csStrKey>::GlobalIterator it = dset.GetIterator();
+  csSet<csString>::GlobalIterator it = dset.GetIterator();
   while (it.HasNext())
   {
     csString dname (it.Next());
@@ -916,7 +915,7 @@ csArchive::ArchiveEntry::~ArchiveEntry ()
 
 void csArchive::ArchiveEntry::FreeBuffer ()
 {
-  if (buffer) free (buffer);
+  if (buffer) cs_free (buffer);
   buffer = 0;
   buffer_pos = 0;
   buffer_size = 0;
@@ -931,7 +930,7 @@ bool csArchive::ArchiveEntry::Append (const void *data, size_t size)
     // If the user has defined the uncompressed file size, take it
     if (buffer_size < info.ucsize)
       buffer_size = info.ucsize;
-    buffer = (char *)realloc (buffer, buffer_size);
+    buffer = (char *)cs_realloc (buffer, buffer_size);
     if (!buffer)
     {
       buffer_pos = buffer_size = info.ucsize = 0;

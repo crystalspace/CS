@@ -26,6 +26,18 @@
 
 namespace CS
 {
+
+  /**
+   * Swap two elements
+   */
+  template <class T>
+  CS_FORCEINLINE_TEMPLATEMETHOD void Swap (T& a, T& b)
+  {
+    T tmp = a;
+    a = b;
+    b = tmp;
+  }
+
   /**
    * Iterate over all elements in the iterator and perform operation
    * given by Func.
@@ -37,7 +49,7 @@ namespace CS
    * \endcode
    */
   template <class T, class Fn>
-  CS_FORCEINLINE Fn& ForEach (T it, Fn& Func)
+  CS_FORCEINLINE_TEMPLATEMETHOD Fn& ForEach (T it, Fn& Func)
   {
     while (it.HasNext ())
     {
@@ -51,7 +63,7 @@ namespace CS
    * given by Func.
    */
   template <class T, class Fn>
-  CS_FORCEINLINE Fn& ForEach (T* start, T* end, Fn& Func)
+  CS_FORCEINLINE_TEMPLATEMETHOD Fn& ForEach (T* start, T* end, Fn& Func)
   {
     while (start != end)
     {
@@ -66,7 +78,7 @@ namespace CS
    * given by Func.
    */
   template <class T, class Fn, class P>
-  CS_FORCEINLINE Fn& ForEach (T it, Fn& Func, P& p)
+  CS_FORCEINLINE_TEMPLATEMETHOD Fn& ForEach (T it, Fn& Func, P& p)
   {
     while (it.HasNext ())
     {
@@ -83,7 +95,7 @@ namespace CS
     { }
 
     template<class T>
-    CS_FORCEINLINE bool operator () (T obj)
+    CS_FORCEINLINE_TEMPLATEMETHOD bool operator () (T obj)
     {
       return (op1 (obj) && op2 (obj));
     }
@@ -93,4 +105,4 @@ namespace CS
   };
 }
 
-#endif
+#endif // __CSUTIL_ALGORITHMS_H__

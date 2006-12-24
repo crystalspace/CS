@@ -4,7 +4,7 @@
 
 @noindent
 @emph{Written by Eric Sunshine, @email{sunshine@@sunshineco.com}.  Originally
-written by Philip Wyett, @email{philip.wyett@@w-tech.co.uk}.  Last updated 13
+written by Philip Wyett, @email{philipwyett@@blueyonder.co.uk}.  Last updated 13
 Dec 2004.}
 
 These instructions are for building Crystal Space with MinGW, the
@@ -103,8 +103,8 @@ which you type commands.
 Crystal Space can be built with either @file{make} or Jam (@pxref{GettingJam}).
 Both tools work equally well.  The @file{cs-win32libs} package contains a
 pre-built version of Jam which you can invoke simply by typing @samp{jam} at
-the @sc{msys} command prompt.  In the examples below, wherever @samp{make -k}
-is used, you can instead substitute @file{jam} if you so desire.
+the @sc{msys} command prompt.  In the examples below, wherever @samp{jam}
+is used, you can instead substitute @file{make -k} if you so desire.
 
 At the shell prompt, go to your @file{CS} directory with the @samp{cd} command.
 For example, if Crystal Space resides at @file{C:\work\CS}, invoke the command
@@ -113,20 +113,15 @@ sequence of commands:
 
 @example
 ./configure
-make -k all
+jam
 @end example
-
-The @samp{-k} option used in @samp{make -k all} instructs the @file{make}
-utility to ignore errors and continue building the project.  This may be
-necessary if you are using the bleeding-edge version of Crystal Space from the
-@sc{svn} repository and some module fails to build correctly.
 
 If you prefer to build a @dfn{debug} version of Crystal Space, substitute
 the following commands for those shown above:
 
 @example
 ./configure --enable-debug
-make -k all
+jam
 @end example
 
 If the Crystal Space source directory is read-only, if it is shared between
@@ -138,7 +133,7 @@ For instance:
 mkdir $HOME/builddir
 cd $HOME/builddir
 /c/work/CS/configure --enable-debug
-make -k all
+jam
 @end example
 
 Finally, if you want to utilize Crystal Space as a software development kit
@@ -146,8 +141,8 @@ Finally, if you want to utilize Crystal Space as a software development kit
 process:
 
 @example
-make install
-make distclean
+jam install
+jam distclean
 @end example
 
 @subsubheading Additional Build Options
@@ -156,8 +151,8 @@ Sometimes it is a good idea to remove all of the built programs and executable
 files and start from scratch.  You can do this with the following commands:
 
 @example
-make clean
-make -k all
+jam clean
+jam
 @end example
 
 Once in a while it is even a good idea to completely clean and re-configure the
@@ -165,9 +160,9 @@ project.  This may be required if you are using the bleeding-edge version of
 Crystal Space from the @sc{svn} repository after some radical change.
 
 @example
-make distclean
+jam distclean
 ./configure
-make -k all
+jam
 @end example
 
 @subsubheading Troubleshooting

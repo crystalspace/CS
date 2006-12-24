@@ -24,28 +24,28 @@
  * ODE-specific interfaces
  */
 
-#include "csutil/scf.h"
-
-SCF_VERSION (iODEFrameUpdateCallback, 0, 0, 1);
+#include "csutil/scf_interface.h"
 
 /**
  * This class can be passed in as a callback during the physics update
  * it is only called if FrameRate is enabled.
  */
-struct iODEFrameUpdateCallback : public iBase
+struct iODEFrameUpdateCallback : public virtual iBase
 {
+  SCF_INTERFACE(iODEFrameUpdateCallback, 2, 0, 0);
+
   /// Executes the per update callback
   virtual void Execute (float stepsize) = 0;
 };
-
-SCF_VERSION (iODEDynamicState, 0, 0, 1);
 
 /**
  * This class exposes parameters specific to odedynam as an implementation
  * of iDynamics
  */
-struct iODEDynamicState : public iBase
+struct iODEDynamicState : public virtual iBase
 {
+  SCF_INTERFACE(iODEDynamicState, 2, 0, 0);
+
 
   /// Sets ODE's Error Resolution Parameter (see ode docs for details)
   virtual void SetGlobalERP (float erp) = 0;
@@ -117,8 +117,6 @@ struct iODEDynamicState : public iBase
 
 };
 
-SCF_VERSION (iODEDynamicSystemState, 0, 0, 2);
-
 struct iODEBallJoint;
 struct iODEHingeJoint;
 struct iODEHinge2Joint;
@@ -131,8 +129,10 @@ struct iODESliderJoint;
  * of iDynamics.  In most cases SystemState should not be modified directly
  * unless you want the behavior of a specific system different from others.
  */
-struct iODEDynamicSystemState : public iBase
+struct iODEDynamicSystemState : public virtual iBase
 {
+  SCF_INTERFACE(iODEDynamicSystemState, 2, 0, 0);
+
   /**
    * Sets ODE's Error Resolution Parameter (see ode docs for details)
    * Setting this in iODEDynamicState will set it for each System
@@ -319,100 +319,128 @@ enum ODEJointType
   CS_ODE_JOINT_TYPE_AMOTOR
 };
 
-SCF_VERSION (iODEJointState, 0, 0, 2);
-
 /**
 * General joint state. Here
 */
-struct iODEJointState : public iBase
+struct iODEJointState : public virtual iBase
 {
+  SCF_INTERFACE(iODEJointState, 2, 0, 0);
+
   virtual ODEJointType GetType() = 0;
 
-  // Baaad interface. Are those number axes? If so, perhaps pass it as
-  // parameter.
-  virtual void SetLoStop (float value) = 0;
-  virtual void SetHiStop (float value) = 0;
-  virtual void SetVel (float value) = 0;
-  virtual void SetFMax (float value) = 0;
-  virtual void SetFudgeFactor (float value) = 0;
-  virtual void SetBounce (float value) = 0;
-  virtual void SetCFM (float value) = 0;
-  virtual void SetStopERP (float value) = 0;
-  virtual void SetStopCFM (float value) = 0;
-  virtual void SetSuspensionERP (float value) = 0;
-  virtual void SetSuspensionCFM (float value) = 0;
+  /**
+   * Set low stop angle or position. For rotational joints, this
+   * stop must be greater than - pi to be effective.
+   */
+  virtual void SetLoStop (const csVector3 &value) = 0;
 
-  virtual void SetLoStop2 (float value) = 0;
-  virtual void SetHiStop2 (float value) = 0;
-  virtual void SetVel2 (float value) = 0;
-  virtual void SetFMax2 (float value) = 0;
-  virtual void SetFudgeFactor2 (float value) = 0;
-  virtual void SetBounce2 (float value) = 0;
-  virtual void SetCFM2 (float value) = 0;
-  virtual void SetStopERP2 (float value) = 0;
-  virtual void SetStopCFM2 (float value) = 0;
-  virtual void SetSuspensionERP2 (float value) = 0;
-  virtual void SetSuspensionCFM2 (float value) = 0;
+  /**
+   * Set high stop angle or position. For rotational joints, this stop must
+   * be less than pi to be effective. If the high stop is less than the low
+   * stop then both stops will be ineffective.
+   */
+  virtual void SetHiStop (const csVector3 &value) = 0;
 
-  virtual void SetLoStop3 (float value) = 0;
-  virtual void SetHiStop3 (float value) = 0;
-  virtual void SetVel3 (float value) = 0;
-  virtual void SetFMax3 (float value) = 0;
-  virtual void SetFudgeFactor3 (float value) = 0;
-  virtual void SetBounce3 (float value) = 0;
-  virtual void SetCFM3 (float value) = 0;
-  virtual void SetStopERP3 (float value) = 0;
-  virtual void SetStopCFM3 (float value) = 0;
-  virtual void SetSuspensionERP3 (float value) = 0;
-  virtual void SetSuspensionCFM3 (float value) = 0;
+  /// Set desired motor velocity (this will be an angular or linear velocity).
+  virtual void SetVel (const csVector3 &value) = 0;
 
-  virtual float GetLoStop () = 0;
-  virtual float GetHiStop () = 0;
-  virtual float GetVel () = 0;
-  virtual float GetFMax () = 0;
-  virtual float GetFudgeFactor () = 0;
-  virtual float GetBounce () = 0;
-  virtual float GetCFM () = 0;
-  virtual float GetStopERP () = 0;
-  virtual float GetStopCFM () = 0;
-  virtual float GetSuspensionERP () = 0;
-  virtual float GetSuspensionCFM () = 0;
+  /**
+   * Set the maximum force or torque that the motor will use to achieve the
+   * desired velocity. This must always be greater than or equal to zero.
+   * Setting this to zero turns off the motor.
+   */
+  virtual void SetFMax (const csVector3 &value) = 0;
 
-  virtual float GetLoStop2 () = 0;
-  virtual float GetHiStop2 () = 0;
-  virtual float GetVel2 () = 0;
-  virtual float GetFMax2 () = 0;
-  virtual float GetFudgeFactor2 () = 0;
-  virtual float GetBounce2 () = 0;
-  virtual float GetCFM2 () = 0;
-  virtual float GetStopERP2 () = 0;
-  virtual float GetStopCFM2 () = 0;
-  virtual float GetSuspensionERP2 () = 0;
-  virtual float GetSuspensionCFM2 () = 0;
+  /**
+   * Set the fudge factor. The current joint stop/motor implementation has a
+   * small problem: when the joint is at one stop and the motor is set to move
+   * it away from the stop, too much force may be applied for one time step,
+   * causing a ``jumping'' motion. This fudge factor is used to scale this
+   * excess force. It should have a value between zero and one (the default
+   * value). If the jumping motion is too visible in a
+   * joint, the value can be reduced. Making this value too small can prevent
+   * the motor from being able to move the joint away from a stop.
+   */
+  virtual void SetFudgeFactor (const csVector3 &value) = 0;
 
-  virtual float GetLoStop3 () = 0;
-  virtual float GetHiStop3 () = 0;
-  virtual float GetVel3 () = 0;
-  virtual float GetFMax3 () = 0;
-  virtual float GetFudgeFactor3 () = 0;
-  virtual float GetBounce3 () = 0;
-  virtual float GetCFM3 () = 0;
-  virtual float GetStopERP3 () = 0;
-  virtual float GetStopCFM3 () = 0;
-  virtual float GetSuspensionERP3 () = 0;
-  virtual float GetSuspensionCFM3 () = 0;
+  /**
+   * Set the bouncyness of the stops. This is a restitution parameter in the
+   * range 0..1. 0 means the stops are not bouncy at all, 1 means maximum
+   * bouncyness.
+   */
+  virtual void SetBounce (const csVector3 &value) = 0;
 
-  // This is a very ugly hack quite specific to NmS
-  virtual void SetHinge2Axis1 (const csVector3& axis) = 0;
-  virtual void SetHinge2Axis2 (const csVector3& axis) = 0;
-  virtual void SetHinge2Anchor (const csVector3& point) = 0;
+  /**
+   * Set the constraint force mixing (CFM) value for joint used when not at a
+   * stop.
+   */
+  virtual void SetCFM (const csVector3 &value) = 0;
+
+  /// Set the error reduction parameter (ERP) used by the stops.
+  virtual void SetStopERP (const csVector3 &value) = 0;
+
+  /**
+   * Set the constraint force mixing (CFM) value for joint used by the stops.
+   * Together with the ERP value this can be used to get spongy or soft stops.
+   * Note that this is intended for unpowered joints, it does not really work
+   * as expected when a powered joint reaches its limit.
+   */
+  virtual void SetStopCFM (const csVector3 &value) = 0;
+
+  /// Set suspension error reduction parameter (ERP).
+  virtual void SetSuspensionERP (const csVector3 &value) = 0;
+
+  /// Set suspension constraint force mixing (CFM) value.
+  virtual void SetSuspensionCFM (const csVector3 &value) = 0;
+
+  /// Get low stop angle or position.
+  virtual csVector3 GetLoStop () = 0;
+
+  /// Get high stop angle or position.
+  virtual csVector3 GetHiStop () = 0;
+
+  /// Get desired motor velocity (this will be an angular or linear velocity).
+  virtual csVector3 GetVel () = 0;
+
+  /**
+   * Get the maximum force or torque that the motor will use to achieve the
+   * desired velocity.
+   */
+  virtual csVector3 GetMaxForce () = 0;
+
+  /// Get the fudge factor.
+  virtual csVector3 GetFudgeFactor () = 0;
+
+  /// Get the bouncyness of the stops.
+  virtual csVector3 GetBounce () = 0;
+
+  /**
+   * Get the constraint force mixing (CFM) value for joint used when not
+   * at a stop.
+   */
+  virtual csVector3 GetCFM () = 0;
+
+  /// Get the error reduction parameter (ERP) used by the stops.
+  virtual csVector3 GetStopERP () = 0;
+
+  /// Get the constraint force mixing (CFM) value for joint used by the stops.
+  virtual csVector3 GetStopCFM () = 0;
+
+  /// Get suspension error reduction parameter (ERP).
+  virtual csVector3 GetSuspensionERP () = 0;
+
+  /// Get suspension constraint force mixing (CFM) value.
+  virtual csVector3 GetSuspensionCFM () = 0;
+
 };
 
 /**
  * General joint state.
  */
-struct iODEGeneralJointState : public iBase
+struct iODEGeneralJointState : public virtual iBase
 {
+  SCF_INTERFACE(iODEGeneralJointState, 2, 0, 0);
+
   /**
    * Set low stop angle or position. For rotational joints, this
    * stop must be greater than - pi to be effective.
@@ -543,10 +571,10 @@ struct iODEGeneralJointState : public iBase
 
 };
 
-SCF_VERSION (iODESliderJoint, 0, 0, 1);
-
 struct iODESliderJoint : public iODEGeneralJointState
 {
+  SCF_INTERFACE(iODESliderJoint, 2, 0, 0);
+
   ///Set the slider axis.
   virtual void SetSliderAxis (float x, float y, float z) = 0;
 
@@ -564,7 +592,6 @@ struct iODESliderJoint : public iODEGeneralJointState
   virtual float GetSliderPositionRate () = 0;
 };
 
-SCF_VERSION (iODEUniversalJoint, 0, 0, 1);
 /**
  * A universal joint is like a ball and socket joint that constrains
  * an extra degree of rotational freedom. Given axis 1 on body 1, and
@@ -574,6 +601,8 @@ SCF_VERSION (iODEUniversalJoint, 0, 0, 1);
  */
 struct iODEUniversalJoint : public iODEGeneralJointState
 {
+  SCF_INTERFACE(iODEUniversalJoint, 2, 0, 0);
+
   /// Set universal anchor.
   virtual void SetUniversalAnchor (float x, float y, float z) = 0;
 
@@ -615,8 +644,6 @@ enum ODEAMotorMode
   CS_ODE_AMOTOR_MODE_LAST
 };
 
-SCF_VERSION (iODEAMotorJoint, 0, 0, 1);
-
 /**
  * ODE AMotor joint. An angular motor (AMotor) allows the relative
  * angular velocities of two bodies to be controlled. The angular
@@ -630,6 +657,7 @@ SCF_VERSION (iODEAMotorJoint, 0, 0, 1);
  */
 struct iODEAMotorJoint : public iODEGeneralJointState
 {
+  SCF_INTERFACE(iODEAMotorJoint, 2, 0, 0);
 
   /**
    * Set the angular motor mode. The mode parameter must be one of the
@@ -721,14 +749,14 @@ struct iODEAMotorJoint : public iODEGeneralJointState
   virtual float GetAMotorAngleRate (int axis_num) = 0;
 };
 
-SCF_VERSION (iODEHinge2Joint, 0, 0, 1);
-
 /**
  * ODE hinge 2 joint. The hinge-2 joint is the same as two hinges connected 
  * in series, with different hinge axe.
  */
 struct iODEHinge2Joint : public iODEGeneralJointState
 {
+  SCF_INTERFACE(iODEHinge2Joint, 2, 0, 0);
+
   /**
    * Set the joint anchor point. The joint will try to keep this point
    * on each body together. Input specified in world coordinates.
@@ -793,13 +821,13 @@ struct iODEHinge2Joint : public iODEGeneralJointState
 
 };
 
-SCF_VERSION (iODEHingeJoint, 0, 0, 1);
-
 /**
  * ODE hinge joint (contrainted translation and 1 free rotation axis).
  */
 struct iODEHingeJoint : public iODEGeneralJointState
 {
+  SCF_INTERFACE(iODEHingeJoint, 2, 0, 0);
+
   /**
    * Set the joint anchor point. The joint will try to keep this point
    * on each body together. Input specified in world coordinates.
@@ -848,13 +876,13 @@ struct iODEHingeJoint : public iODEGeneralJointState
 
 };
 
-SCF_VERSION (iODEBallJoint, 0, 0, 1);
-
 /**
  * ODE ball and socket joint (contrainted translation and free rotation).
  */
-struct iODEBallJoint : public iBase
+struct iODEBallJoint : public virtual iBase
 {
+  SCF_INTERFACE(iODEBallJoint, 2, 0, 0);
+
   /**
    * Set the joint anchor point. The joint will try to keep this point
    * on each body together. Input specified in world coordinates.
@@ -902,7 +930,5 @@ struct iODEBallJoint : public iBase
   /// Get torque that joint applies to body 2
   virtual csVector3 GetFeedbackTorque2 () = 0;
 };
-
-
 
 #endif // __CS_IVARIA_ODE_H__

@@ -169,7 +169,7 @@ static inline char* FindConfigPath ()
     csString crystalPath (envpath);
 
     size_t colon = crystalPath.FindFirst (';'); 
-      // MSYS converts :-separated paths to ;-separation in Win32 style.
+    // MSYS converts :-separated paths to ;-separation in Win32 style.
     size_t subStrLen;
     if (colon == (size_t)-1)
       subStrLen = crystalPath.Length();
@@ -263,9 +263,10 @@ csPathsList* csInstallationPathsHelper::GetPlatformInstallationPaths()
   // 1. CRYSTAL environment variable
   // 2. this machine's system registry
   // 3. if current working directory contains 'vfs.cfg' use this dir.
-  // 4. The dir where the app is
-  // 5. A "CrystalSpace" subfolder under the "Program Files" dir.
-  // 6. hard-wired default path
+  // 4. CS_CONFIGPATH if defined and on Cygwin
+  // 5. The dir where the app is
+  // 6. A "CrystalSpace" subfolder under the "Program Files" dir.
+  // 7. hard-wired default path
 
   // try env variable first
   // we check this before we check registry, so that one app can putenv() to
@@ -278,8 +279,7 @@ csPathsList* csInstallationPathsHelper::GetPlatformInstallationPaths()
   {
     // Multiple paths, split.
     // Note that MSYS converts :-separated paths to ;-separation in Win32 style.
-    return 
-      new csPathsList (csPathsUtilities::ExpandAll (csPathsList (envpath)));
+    return new csPathsList (envpath, true);
   }
 
   csPathsList* paths = new csPathsList;
@@ -297,11 +297,17 @@ csPathsList* csInstallationPathsHelper::GetPlatformInstallationPaths()
 
   // No luck to fetch a config setting. Add in order:
   // - current directory
+  // - CS_CONFIGDIR if defined and on Cygwin
   // - application directory
   // - %ProgramFiles%\CrystalSpace
   // - C:\Program Files\CrystalSpace
 
   paths->AddUniqueExpanded (".");
+#ifdef __CYGWIN__
+#ifdef CS_CONFIGDIR
+  paths->AddUniqueExpanded (CS_CONFIGDIR);
+#endif
+#endif
 
   {
     char apppath[MAX_PATH + 1];

@@ -20,6 +20,7 @@
 #define __XRPRIV_H__
 
 #include "iutil/document.h"
+#include "csutil/scf_implementation.h"
 #include "xr.h"
 
 class csXmlReadDocument;
@@ -27,7 +28,9 @@ class csXmlReadDocument;
 /**
  * This is an SCF compatible wrapper for an attribute iterator.
  */
-struct csXmlReadAttributeIterator : public iDocumentAttributeIterator
+struct csXmlReadAttributeIterator :
+  public scfImplementation1<csXmlReadAttributeIterator,
+    iDocumentAttributeIterator>
 {
 private:
   size_t current;
@@ -38,8 +41,6 @@ public:
   csXmlReadAttributeIterator (TrDocumentNode* parent);
   virtual ~csXmlReadAttributeIterator ();
 
-  SCF_DECLARE_IBASE;
-
   virtual bool HasNext ();
   virtual csRef<iDocumentAttribute> Next ();
 };
@@ -47,30 +48,19 @@ public:
 /**
  * This is an SCF compatible wrapper for an attribute in XmlRead.
  */
-struct csXmlReadAttribute : public iDocumentAttribute
+struct csXmlReadAttribute :
+  public scfImplementation1<csXmlReadAttribute, iDocumentAttribute>
 {
 private:
   TrDocumentAttribute* attr;
 
 public:
-  csXmlReadAttribute ()
-  {
-    SCF_CONSTRUCT_IBASE (0);
-    attr = 0;
-  }
+  csXmlReadAttribute () : scfImplementationType(this), attr(0) { }
 
-  csXmlReadAttribute (TrDocumentAttribute* attr)
-  {
-    SCF_CONSTRUCT_IBASE (0);
-    csXmlReadAttribute::attr = attr;
-  }
+  csXmlReadAttribute (TrDocumentAttribute* attr) :
+    scfImplementationType(this), attr(attr) { }
 
-  virtual ~csXmlReadAttribute ()
-  {
-    SCF_DESTRUCT_IBASE();
-  }
-
-  SCF_DECLARE_IBASE;
+  virtual ~csXmlReadAttribute () { }
 
   virtual const char* GetName ()
   {
@@ -117,7 +107,8 @@ public:
 /**
  * This is an SCF compatible wrapper for a node iterator.
  */
-struct csXmlReadNodeIterator : public iDocumentNodeIterator
+struct csXmlReadNodeIterator :
+  public scfImplementation1<csXmlReadNodeIterator, iDocumentNodeIterator>
 {
 private:
   csXmlReadDocument* doc;
@@ -131,8 +122,6 @@ public:
 	TrDocumentNodeChildren* parent, const char* value);
   virtual ~csXmlReadNodeIterator ();
 
-  SCF_DECLARE_IBASE;
-
   virtual bool HasNext ();
   virtual csRef<iDocumentNode> Next ();
 };
@@ -140,7 +129,8 @@ public:
 /**
  * This is an SCF compatible wrapper for a node in XmlRead.
  */
-struct csXmlReadNode : public iDocumentNode
+struct csXmlReadNode :
+  public scfImplementation1<csXmlReadNode, iDocumentNode>
 {
 private:
   friend class csXmlReadDocument;
@@ -158,6 +148,7 @@ private:
 
 public:
   virtual ~csXmlReadNode ();
+  virtual void DecRef ();
 
   TrDocumentNode* GetTiNode () { return node; }
   void SetTiNode (TrDocumentNode* node, bool use_contents_value)
@@ -166,8 +157,6 @@ public:
     csXmlReadNode::use_contents_value = use_contents_value;
     node_children = node->ToDocumentNodeChildren ();
   }
-
-  SCF_DECLARE_IBASE;
 
   virtual csDocumentNodeType GetType ();
   virtual bool Equals (iDocumentNode* other);
@@ -208,7 +197,8 @@ public:
 /**
  * This is an SCF compatible wrapper for a document in XmlRead.
  */
-class csXmlReadDocument : public iDocument
+class csXmlReadDocument :
+  public scfImplementation1<csXmlReadDocument, iDocument>
 {
 private:
   TrDocument* root;
@@ -221,8 +211,6 @@ private:
 public:
   csXmlReadDocument (csXmlReadDocumentSystem* sys);
   virtual ~csXmlReadDocument ();
-
-  SCF_DECLARE_IBASE;
 
   virtual void Clear ();
   virtual csRef<iDocumentNode> CreateRoot ();

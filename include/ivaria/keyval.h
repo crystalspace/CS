@@ -44,7 +44,7 @@ struct iSector;
  */
 struct iKeyValuePair : public virtual iBase
 {
-  SCF_INTERFACE(iKeyValuePair, 2, 0, 0);
+  SCF_INTERFACE(iKeyValuePair, 2, 0, 1);
 
   /// Get the iObject.
   virtual iObject *QueryObject() = 0;
@@ -81,6 +81,13 @@ struct iKeyValuePair : public virtual iBase
    * Get a list of the names of values in the pair.
    */
   virtual csRef<iStringArray> GetValueNames () const = 0;
+
+  /**
+   * Query whether this pair is an "editor-only" pair.
+   * They're marked as such in world files and are normally not kept in
+   * memory.
+   */
+  virtual bool GetEditorOnly () const = 0;
 };
 
 #endif // __CS_IVARIA_KEYVAL_H__

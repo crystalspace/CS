@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2005 by Marten Svanfeldt
+  Copyright (C) 2005-2006 by Marten Svanfeldt
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -25,8 +25,8 @@ namespace lighter
 {
   class Scene;
   class Sector;
-  class Light;
-  class RadPrimitive;
+  class Light_old;
+  class Primitive;
   class Raytracer;
 
   class Lighter : public csRefCount
@@ -37,6 +37,9 @@ namespace lighter
 
     // Initialize and load plugins we want
     bool Initialize ();
+
+    // Cleanup and prepare for shutdown
+    void CleanUp ();
 
     // Do the fancy lighting
     bool LightEmUp ();
@@ -52,11 +55,18 @@ namespace lighter
     csRef<iPluginManager> pluginManager;
     csRef<iReporter> reporter;
     csRef<iVFS> vfs;
+    csRef<iCommandLineParser> cmdLine;
+    csRef<iConfigManager> configMgr;
     iObjectRegistry *objectRegistry;
+    csRef<iStringSet> strings;
 
   protected:
     // Parse the commandline and load any files specified
     bool LoadFiles ();
+
+    void LoadConfiguration ();
+
+    void CommandLineHelp () const;
 
     Scene *scene;
   };

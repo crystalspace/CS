@@ -900,8 +900,8 @@ iSequenceWrapper* csLoader::LoadSequence (iLoaderContext* ldr_context,
 		break;
 	      case XMLTOKEN_AUTOOFFSET:
 		{
-		  csRef<iMeshWrapper> mw = SCF_QUERY_INTERFACE (
-		  	target->GetValue(), iMeshWrapper);
+                  csRef<iMeshWrapper> mw = scfQueryInterface<iMeshWrapper> (
+		  	target->GetValue());
 		  if (mw)
 		  {
 		    csBox3 box;
@@ -910,8 +910,8 @@ iSequenceWrapper* csLoader::LoadSequence (iLoaderContext* ldr_context,
 		  }
 		  else
 		  {
-		    csRef<iLight> light = SCF_QUERY_INTERFACE (
-		    	target->GetValue(),iLight);
+                    csRef<iLight> light = scfQueryInterface<iLight> (
+		    	target->GetValue());
 		    if (light)
 		    {
 		      offset = light->GetCenter();

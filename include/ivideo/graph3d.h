@@ -154,6 +154,10 @@ enum csZBufMode
  */
 enum csVertexAttrib
 {
+  /**
+   * An attribute is valid, but unused by a shader program and can be 
+   * discarded */
+  CS_VATTRIB_UNUSED	      = -2,
   /// Invalid attribute
   CS_VATTRIB_INVALID	      = -1,
   /// Position vertex attribute
@@ -501,14 +505,10 @@ enum G3D_RENDERSTATEOPTION
 /// Information about 3d renderer capabilities.
 struct csGraphics3DCaps
 {
-  bool CanClip;
+  /// Minimum texture dimensions
   int minTexHeight, minTexWidth;
+  /// Maximum texture dimensions
   int maxTexHeight, maxTexWidth;
-  bool NeedsPO2Maps;
-  int MaxAspectRatio;
-
-  // The following caps are only used by NR
-
   /**
    * Whether point sprites are supported. If \a true, geometry of the type
    * CS_MESHTYPE_POINT_SPRITES can be drawn.
@@ -890,6 +890,7 @@ struct iGraphics3D : public virtual iBase
 
   /**
    * Set near clip plane.
+   * The plane is in camera space.
    */
   virtual void SetNearPlane (const csPlane3& pl) = 0;
 

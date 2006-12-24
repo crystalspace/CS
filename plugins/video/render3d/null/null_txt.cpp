@@ -26,6 +26,7 @@
 #include "iutil/event.h"
 #include "iutil/eventq.h"
 #include "iutil/objreg.h"
+#include "iutil/string.h"
 #include "igraphic/image.h"
 
 //--------------------------------------------------- csTextureHandleNull ---//
@@ -77,13 +78,31 @@ void csTextureManagerNull::SetPixelFormat (csPixelFormat &PixelFormat)
 }
 
 csPtr<iTextureHandle> csTextureManagerNull::RegisterTexture (iImage* image,
-  int flags)
+  int flags, iString* fail_reason)
 {
-  if (!image) return 0;
+  if (!image)
+  {
+    if (fail_reason) fail_reason->Replace (
+      "No image given to RegisterTexture!");
+    return 0;
+  }
 
   csTextureHandleNull *txt = new csTextureHandleNull (this, image, flags);
   textures.Push (txt);
   return csPtr<iTextureHandle> (txt);
+}
+
+csPtr<iTextureHandle> csTextureManagerNull::CreateTexture (int w, int h,
+      csImageType imagetype, const char* format, int flags,
+      iString* fail_reason)
+{
+  (void)w;
+  (void)h;
+  (void)imagetype;
+  (void)format;
+  (void)flags;
+  if (fail_reason) fail_reason->Replace ("Not implemented yet!");
+  return 0;
 }
 
 void csTextureManagerNull::UnregisterTexture (csTextureHandleNull* handle)
@@ -103,14 +122,4 @@ void csTextureManagerNull::GetMaxTextureSize (int& w, int& h, int& aspect)
 {
   w = h = 2048;
   aspect = 32768;
-}
-
-void csTextureManagerNull::GetLightmapRendererCoords (
-  int /*slmWidth*/, int /*slmHeight*/, int lm_x1, int lm_y1, int lm_x2, int lm_y2,
-  float& lm_u1, float& lm_v1, float &lm_u2, float& lm_v2)
-{
-  lm_u1 = lm_x1;
-  lm_v1 = lm_y1;
-  lm_u2 = lm_x2;
-  lm_v2 = lm_y2;
 }

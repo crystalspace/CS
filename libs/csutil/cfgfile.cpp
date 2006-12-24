@@ -22,9 +22,11 @@
 #include "csutil/databuf.h"
 #include "csutil/physfile.h"
 #include "csutil/scf_implementation.h"
+#include "csutil/scfstringarray.h"
 #include "csutil/snprintf.h"
 #include "csutil/sysfunc.h"
 #include "csutil/util.h"
+#include "iutil/cmdline.h"
 #include "iutil/vfs.h"
 #include <ctype.h>
 
@@ -50,12 +52,14 @@ public:
   void SetInt(int);
   void SetFloat(float);
   void SetBool(bool);
+  void SetTuple (iStringArray* Value);
   void SetComment(const char*);
   // get data
   const char *GetStr() const;
   int GetInt() const;
   float GetFloat() const;
   bool GetBool() const;
+  csPtr<iStringArray> GetTuple() const;
   const char *GetComment() const;
   // return prev and next node
   csConfigNode *GetPrev() const;
@@ -149,6 +153,21 @@ void csConfigNode::SetBool(bool b)
   SetStr(b ? "true" : "false");
 }
 
+void csConfigNode::SetTuple (iStringArray* Value)
+{
+  // this should output a string like
+  // abc, def, ghi
+  csString s;
+  while (!Value->IsEmpty ())
+  {
+    csString i = Value->Pop ();
+    if (!Value->IsEmpty ())
+      i.Append (", ");
+    s.Append(i);
+  }
+  SetStr (s);
+}
+
 void csConfigNode::SetComment(const char *s)
 {
   delete[] Comment;
@@ -179,6 +198,38 @@ bool csConfigNode::GetBool() const
      strcasecmp(Data, "1"   ) == 0));
 }
 
+csPtr<iStringArray> csConfigNode::GetTuple() const
+{
+  if (!Data)
+    return 0;
+
+  scfStringArray *items = new scfStringArray;		// the output list
+  csString item;
+
+  char *sinp = Data;
+  char *comp;
+  size_t len;
+  bool finished = false;
+
+  while (!finished)
+  {
+    comp = strchr (sinp, ',');
+    if (!comp)
+    {
+      finished = true;
+      comp = &sinp [strlen (sinp)];
+    }
+    len = strlen (sinp) - strlen (comp);
+    item = csString (sinp, len);
+    item.Trim ();
+    sinp = comp + 1;
+    items->Push (item);
+  }
+
+  csPtr<iStringArray> v(items);
+  return v;
+}
+
 const char *csConfigNode::GetComment() const
 {
   return Comment;
@@ -186,7 +237,7 @@ const char *csConfigNode::GetComment() const
 
 /* config iterator */
 
-class csConfigIterator : public scfImplementation1<csConfigIterator, 
+class csConfigIterator : public scfImplementation1<csConfigIterator,
                                                    iConfigIterator>
 {
 public:
@@ -216,6 +267,8 @@ public:
   virtual const char *GetStr() const;
   /// Get a boolean value from the configuration.
   virtual bool GetBool() const;
+  /// Get a tuple set from the configuration.
+  virtual csPtr<iStringArray> GetTuple() const;
   /// Get the comment of the given key, or 0 if no comment exists.
   virtual const char *GetComment() const;
 
@@ -223,38 +276,33 @@ public:
   csConfigIterator(csConfigFile *Config, const char *Subsection);
   // Delete this iterator
   virtual ~csConfigIterator();
-
 private:
   friend class csConfigFile;
-  csConfigFile *Config;
-  csConfigNode *Node;
-  char *Subsection;
-  size_t SubsectionLength;
+  csRef<csConfigFile> Config;
+  csConfigNode* Node;
+  csConfigNode* nextNode;
+  csString Subsection;
 
   // Utility function to check if a key meets subsection requirement
   bool CheckSubsection(const char *Key) const;
   // Move to the previous node, ignoring subsection
   bool DoPrev();
-  // Move to the next node, ignoring subsection
-  bool DoNext();
   // Move to previous item and return true if the position is valid
   bool Prev ();
+  // Is there another valid key?
+  bool HasNext();
 };
 
-csConfigIterator::csConfigIterator(csConfigFile *c, const char *sub)
-  : scfImplementationType (this), Config (c)
+csConfigIterator::csConfigIterator(csConfigFile *c, const char *sub) :
+  scfImplementationType (this), Config (c), nextNode (Config->FirstNode), 
+  Subsection (sub)
 {
-  Node = Config->FirstNode;
-  Subsection = csStrNew(sub);
-  SubsectionLength = (Subsection ? strlen(Subsection) : 0);
-  Config->IncRef();
+  Next();
 }
 
 csConfigIterator::~csConfigIterator()
 {
   Config->RemoveIterator(this);
-  delete[] Subsection;
-  Config->DecRef();
 }
 
 iConfigFile *csConfigIterator::GetConfigFile() const
@@ -269,7 +317,8 @@ const char *csConfigIterator::GetSubsection() const
 
 void csConfigIterator::Rewind ()
 {
-  Node = Config->FirstNode;
+  nextNode = Config->FirstNode;
+  Next();
 }
 
 bool csConfigIterator::DoPrev()
@@ -279,17 +328,10 @@ bool csConfigIterator::DoPrev()
   return (Node->GetName() != 0);
 }
 
-bool csConfigIterator::DoNext()
-{
-  if (!Node->GetNext()) return false;
-  Node = Node->GetNext();
-  return (Node->GetName() != 0);
-}
-
 bool csConfigIterator::CheckSubsection(const char *Key) const
 {
-  return (SubsectionLength == 0 ||
-    strncasecmp(Key, Subsection, SubsectionLength) == 0);
+  return (Subsection.IsEmpty() ||
+    strncasecmp(Key, Subsection, Subsection.Length()) == 0);
 }
 
 bool csConfigIterator::Prev ()
@@ -299,24 +341,37 @@ bool csConfigIterator::Prev ()
   while (1)
   {
     if (!DoPrev()) return false;
-    if (CheckSubsection(Node->GetName())) return true;
+	if (CheckSubsection(Node->GetName())) return true;
   }
 }
 
 bool csConfigIterator::Next()
 {
-  if (!Subsection) return DoNext();
+  Node = nextNode;
+
+  if (Subsection.IsEmpty()) 
+  {
+    nextNode = Node->GetNext();
+    return Node != 0;
+  }
 
   while (1)
   {
-    if (!DoNext()) return false;
-    if (CheckSubsection(Node->GetName())) return true;
+    nextNode = nextNode->GetNext();
+    if (!nextNode || !nextNode->GetName()) break;
+    if (CheckSubsection(nextNode->GetName())) break;
   }
+  return (Node != 0) && (Node->GetName() != 0);
+}
+
+bool csConfigIterator::HasNext()
+{
+  return (nextNode != 0) && (nextNode->GetName() != 0);
 }
 
 const char *csConfigIterator::GetKey(bool Local) const
 {
-  return Node->GetName() + (Local ? SubsectionLength : 0);
+  return Node->GetName() + (Local ? Subsection.Length() : 0);
 }
 
 int csConfigIterator::GetInt() const
@@ -337,6 +392,11 @@ const char *csConfigIterator::GetStr() const
 bool csConfigIterator::GetBool() const
 {
   return Node->GetBool();
+}
+
+csPtr<iStringArray> csConfigIterator::GetTuple() const
+{
+  return Node->GetTuple();
 }
 
 const char *csConfigIterator::GetComment() const
@@ -441,10 +501,10 @@ bool csConfigFile::Save()
 {
   if (!Dirty)
     return true;
-  
+
   if (!SaveNow(Filename, VFS))
     return false;
-  
+
   Dirty = false;
   return true;
 }
@@ -584,6 +644,12 @@ bool csConfigFile::GetBool(const char *Key, bool Def) const
   return Node ? Node->GetBool() : Def;
 }
 
+csPtr<iStringArray> csConfigFile::GetTuple(const char *Key) const
+{
+  csConfigNode *Node = FindNode(Key);
+  return Node ? Node->GetTuple() : 0;
+}
+
 const char *csConfigFile::GetComment(const char *Key) const
 {
   csConfigNode *Node = FindNode(Key);
@@ -641,6 +707,50 @@ void csConfigFile::SetBool (const char *Key, bool Value)
   }
 }
 
+void csConfigFile::SetTuple (const char *Key, iStringArray* Value)
+{
+  csConfigNode *Node = FindNode(Key);
+  bool const Create = !Node;
+  if (Create) Node = CreateNode(Key);
+
+  bool changed = false;
+  // This checks to see whether the thing
+  // we're saving is the same as the saved
+  if (Node)
+  {
+    csRef<iStringArray> sa = Node->GetTuple ();
+    // was the tuple valid ?
+    if (sa)
+    {
+      // its different if lengths differ
+      if (sa->Length () != Value->Length ())
+      {
+        changed = true;
+      }
+      else
+      {
+        for (uint i = 0 ; i < sa->Length (); i++)
+        {
+          // found 2 different strings in tuple
+          if (sa->Get (i) != Value->Get (i))
+          {
+            changed = true;
+            break;
+          }
+        }
+      }
+    }
+    else
+      changed = true;
+  }
+
+  if (Node && (Create || changed))
+  {
+    Node->SetTuple(Value);
+    Dirty = true;
+  }
+}
+
 bool csConfigFile::SetComment (const char *Key, const char *Text)
 {
   csConfigNode *Node = FindNode(Key);
@@ -694,40 +804,32 @@ bool csConfigFile::LoadNow(const char *fName, iVFS *vfs, bool overwrite)
   return true;
 }
 
-void csConfigFile::LoadFromBuffer(char *Filedata, bool overwrite)
+void csConfigFile::LoadFromBuffer(const char *Filedata, bool overwrite)
 {
-  csString CurrentComment;
-  char* s = 0;
+  csString CurrentComment, currentLineBuf, key, value;
+  const char* s = 0;
   int SkipCount = 0;
   bool LastLine = false;
   int  Line;
   for (Line = 1; !LastLine; Line++, Filedata = s + SkipCount)
   {
-    s = Filedata + strcspn(Filedata, "\n\r");
+    s = Filedata + strcspn (Filedata, "\n\r");
     LastLine = (*s == 0);
     // Advance past LF, CR, or CRLF.
     SkipCount = (!LastLine && *s == '\r' && *(s+1) == '\n' ? 2 : 1);
-    *s = 0;
 
-    // Filedata is now a null-terminated string containing the current line
-    // skip initial whitespace
-    while (isspace(*Filedata)) Filedata++;
-    // delete whitespace at end of line
-    if (Filedata != s) {
-      char* t = s;
-      while (isspace(*(t-1))) t--;
-      *t = 0;
-    }
+    currentLineBuf.Replace (Filedata, s - Filedata);
+    currentLineBuf.Trim ();
 
     // check if this is a comment or a blank line
-    if (*Filedata == '\0' || *Filedata == ';')
-      CurrentComment << Filedata << '\n';
+    if (currentLineBuf.IsEmpty() || currentLineBuf.GetAt (0) == ';')
+      CurrentComment << currentLineBuf << '\n';
     else
     {
       // this is a key. Find equal sign
-      char *t = strchr(Filedata, '=');
+      size_t eqPos = currentLineBuf.FindFirst ('=');
       // if no equal sign, this is an invalid line
-      if (!t)
+      if (eqPos == (size_t)-1)
       {
         csFPrintf(stderr, "Missing `=' on line %d of %s\n", Line,
 	  (Filename ? Filename : "configuration data"));
@@ -735,7 +837,7 @@ void csConfigFile::LoadFromBuffer(char *Filedata, bool overwrite)
         continue;
       }
       // check for missing key name
-      if (t == Filedata)
+      if (eqPos == 0)
       {
         csFPrintf(stderr, "Missing key name (before `=') on line %d of %s\n",
 	  Line, (Filename ? Filename : "configuration data"));
@@ -743,22 +845,21 @@ void csConfigFile::LoadFromBuffer(char *Filedata, bool overwrite)
         continue;
       }
       // delete whitespace before equal sign
-      char *u = t;
-      while (isspace(*(u-1))) u--;
-      *u = 0;
+      key.Replace (currentLineBuf, eqPos);
+      key.RTrim();
       // check if node already exists and create node
-      csConfigNode *Node = FindNode(Filedata);
+      csConfigNode *Node = FindNode (key);
       if (Node && !overwrite)
       {
         CurrentComment.Clear();
         continue;
       }
-      if (!Node) Node = CreateNode(Filedata);
+      if (!Node) Node = CreateNode (key);
       // skip whitespace after equal sign
-      Filedata = t+1;
-      while (isspace(*Filedata)) Filedata++;
+      value.Replace (currentLineBuf.GetData() + eqPos + 1);
+      value.LTrim();
       // extract key value
-      Node->SetStr(Filedata);
+      Node->SetStr (value);
       // apply comment
       if (!CurrentComment.IsEmpty())
       {
@@ -817,4 +918,59 @@ void csConfigFile::SetEOFComment(const char *text)
 const char *csConfigFile::GetEOFComment() const
 {
   return EOFComment;
+}
+
+void csConfigFile::ParseCommandLine (iCommandLineParser* cmdline, iVFS* vfs,
+                                     bool Merge, bool NewWins)
+{
+  // We want these changes even if the new config file does not exist:
+  if (!Merge)
+  {
+    Clear();
+    SetFileName ("<command line>", 0);
+    Dirty = true;
+  }
+
+  csString buffer;
+  size_t index = 0, cfgsetNum = 0, cfgfileNum = 0;
+  const char* option;
+  while ((option = cmdline->GetOptionName (index)) != 0)
+  {
+    index++;
+    if (strcmp (option, "cfgset") == 0)
+    {
+      const char* setting = cmdline->GetOption ("cfgset", cfgsetNum++);
+      buffer << setting << '\n';
+    }
+    else if (strcmp (option, "cfgfile") == 0)
+    {
+      const char* fName = cmdline->GetOption ("cfgfile", cfgfileNum++);
+      csRef<iDataBuffer> Filedata;
+      if (vfs)
+      {
+        Filedata = vfs->ReadFile(fName);
+      }
+      else
+      {
+        csRef<iFile> file;
+        file.AttachNew (new csPhysicalFile (fName, "rb"));
+        Filedata = file->GetAllData (true);
+      }
+      if (Filedata.IsValid())
+      {
+        buffer.Append (Filedata->GetData(), Filedata->GetSize());
+        buffer << '\n';
+      }
+    }
+  }
+
+  if (!buffer.IsEmpty ())
+    LoadFromBuffer (buffer, NewWins);
+
+  if (!Merge)
+  {
+    // the file has successfully replaced the old configuration. Now the
+    // configuration is in sync with the file, so clear the dirty flag.
+    Dirty = false;
+  }
 }

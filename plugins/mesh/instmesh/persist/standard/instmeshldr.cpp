@@ -76,65 +76,25 @@ enum
   XMLTOKEN_VECTOR
 };
 
-SCF_IMPLEMENT_IBASE (csInstFactoryLoader)
-  SCF_IMPLEMENTS_INTERFACE (iLoaderPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csInstFactoryLoader::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csInstFactorySaver)
-  SCF_IMPLEMENTS_INTERFACE (iSaverPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csInstFactorySaver::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csInstMeshLoader)
-  SCF_IMPLEMENTS_INTERFACE (iLoaderPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csInstMeshLoader::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csInstMeshSaver)
-  SCF_IMPLEMENTS_INTERFACE (iSaverPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csInstMeshSaver::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 SCF_IMPLEMENT_FACTORY (csInstFactoryLoader)
 SCF_IMPLEMENT_FACTORY (csInstFactorySaver)
 SCF_IMPLEMENT_FACTORY (csInstMeshLoader)
 SCF_IMPLEMENT_FACTORY (csInstMeshSaver)
 
-
-csInstFactoryLoader::csInstFactoryLoader (iBase* pParent)
+csInstFactoryLoader::csInstFactoryLoader (iBase* pParent) :
+  scfImplementationType(this, pParent)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 csInstFactoryLoader::~csInstFactoryLoader ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csInstFactoryLoader::Initialize (iObjectRegistry* object_reg)
 {
   csInstFactoryLoader::object_reg = object_reg;
-  reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
-  synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
+  reporter = csQueryRegistry<iReporter> (object_reg);
+  synldr = csQueryRegistry<iSyntaxService> (object_reg);
 
   xmltokens.Register ("box", XMLTOKEN_BOX);
   xmltokens.Register ("quad", XMLTOKEN_QUAD);
@@ -183,7 +143,7 @@ csPtr<iBase> csInstFactoryLoader::Parse (iDocumentNode* node,
   csRef<iInstancingFactoryState> state;
 
   fact = type->NewFactory ();
-  state = SCF_QUERY_INTERFACE (fact, iInstancingFactoryState);
+  state = scfQueryInterface<iInstancingFactoryState> (fact);
 
   bool auto_normals = false;
   bool auto_normals_nocompress = false;
@@ -395,23 +355,20 @@ csPtr<iBase> csInstFactoryLoader::Parse (iDocumentNode* node,
 
 //---------------------------------------------------------------------------
 
-csInstFactorySaver::csInstFactorySaver (iBase* pParent)
+csInstFactorySaver::csInstFactorySaver (iBase* pParent) :
+  scfImplementationType(this, pParent)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 csInstFactorySaver::~csInstFactorySaver ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csInstFactorySaver::Initialize (iObjectRegistry* object_reg)
 {
   csInstFactorySaver::object_reg = object_reg;
-  reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
-  synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
+  reporter = csQueryRegistry<iReporter> (object_reg);
+  synldr = csQueryRegistry<iSyntaxService> (object_reg);
   return true;
 }
 
@@ -427,9 +384,9 @@ bool csInstFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent,
   if (obj)
   {
     csRef<iInstancingFactoryState> gfact = 
-      SCF_QUERY_INTERFACE (obj, iInstancingFactoryState);
+      scfQueryInterface<iInstancingFactoryState> (obj);
     csRef<iMeshObjectFactory> meshfact = 
-      SCF_QUERY_INTERFACE (obj, iMeshObjectFactory);
+      scfQueryInterface<iMeshObjectFactory> (obj);
     if (!gfact) return false;
     if (!meshfact) return false;
 
@@ -547,23 +504,20 @@ bool csInstFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent,
 
 //---------------------------------------------------------------------------
 
-csInstMeshLoader::csInstMeshLoader (iBase* pParent)
+csInstMeshLoader::csInstMeshLoader (iBase* pParent) :
+  scfImplementationType(this, pParent)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 csInstMeshLoader::~csInstMeshLoader ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csInstMeshLoader::Initialize (iObjectRegistry* object_reg)
 {
   csInstMeshLoader::object_reg = object_reg;
-  reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
-  synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
+  reporter = csQueryRegistry<iReporter> (object_reg);
+  synldr = csQueryRegistry<iSyntaxService> (object_reg);
 
   xmltokens.Register ("material", XMLTOKEN_MATERIAL);
   xmltokens.Register ("factory", XMLTOKEN_FACTORY);
@@ -708,8 +662,8 @@ csPtr<iBase> csInstMeshLoader::Parse (iDocumentNode* node,
 		child, "Couldn't find factory '%s'!", factname);
 	    return 0;
 	  }
-	  factstate = SCF_QUERY_INTERFACE (fact->GetMeshObjectFactory(), 
-	    iInstancingFactoryState);
+	  factstate =  
+	    scfQueryInterface<iInstancingFactoryState> (fact->GetMeshObjectFactory());
 	  if (!factstate)
 	  {
       	    synldr->ReportError (
@@ -720,7 +674,7 @@ csPtr<iBase> csInstMeshLoader::Parse (iDocumentNode* node,
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
 	  CS_ASSERT (mesh != 0);
-          meshstate = SCF_QUERY_INTERFACE (mesh, iInstancingMeshState);
+          meshstate = scfQueryInterface<iInstancingMeshState> (mesh);
 	  if (!meshstate)
 	  {
       	    synldr->ReportError (
@@ -766,23 +720,20 @@ csPtr<iBase> csInstMeshLoader::Parse (iDocumentNode* node,
 
 //---------------------------------------------------------------------------
 
-csInstMeshSaver::csInstMeshSaver (iBase* pParent)
+csInstMeshSaver::csInstMeshSaver (iBase* pParent) :
+  scfImplementationType(this, pParent)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 csInstMeshSaver::~csInstMeshSaver ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csInstMeshSaver::Initialize (iObjectRegistry* object_reg)
 {
   csInstMeshSaver::object_reg = object_reg;
-  reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
-  synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
+  reporter = csQueryRegistry<iReporter> (object_reg);
+  synldr = csQueryRegistry<iSyntaxService> (object_reg);
   return true;
 }
 
@@ -798,8 +749,8 @@ bool csInstMeshSaver::WriteDown (iBase* obj, iDocumentNode* parent,
   if (obj)
   {
     csRef<iInstancingMeshState> gmesh = 
-      SCF_QUERY_INTERFACE (obj, iInstancingMeshState);
-    csRef<iMeshObject> mesh = SCF_QUERY_INTERFACE (obj, iMeshObject);
+      scfQueryInterface<iInstancingMeshState> (obj);
+    csRef<iMeshObject> mesh = scfQueryInterface<iMeshObject> (obj);
     if (!gmesh) return false;
     if (!mesh) return false;
 

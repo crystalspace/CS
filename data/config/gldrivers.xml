@@ -219,20 +219,37 @@
         </ShaderManager>
       </Video>
     </config>
-    <config name="forceprecompressedDXTupload">
+    <config name="fixedFunctionForcefulEnable">
       <Video>
 	<OpenGL>
-	  <ForcePrecompressedDXTUpload>yes</ForcePrecompressedDXTUpload>
+	  <FixedFunctionForcefulEnable>yes</FixedFunctionForcefulEnable>
 	</OpenGL>
       </Video>
     </config>
-    <config name="useAFP2D">
+    <config name="disableLodBias">
+      <Video>
+       <OpenGL>
+         <UseExtension>
+           <GL_EXT_texture_lod_bias>no</GL_EXT_texture_lod_bias>
+         </UseExtension>
+       </OpenGL>
+      </Video>
+    </config>
+    <config name="noafp">
       <Video>
 	<OpenGL>
-	  <FontCache>
-	    <UseAFP>yes</UseAFP>
-	  </FontCache>
-	  <AFPDrawPixmap>yes</AFPDrawPixmap>
+	  <UseExtension>
+	    <GL_ARB_fragment_program>no</GL_ARB_fragment_program>
+	  </UseExtension>
+	  <!-- Our GL ext disabling obviously doesn't apply to CgGL, so set
+	       the maximum FP profile to the highest below AFP. -->
+	  <Shader>
+	    <Cg>
+	      <MaxProfile>
+		<Fragment>ps_1_3</Fragment>
+	      </MaxProfile>
+	    </Cg>
+	  </Shader>
 	</OpenGL>
       </Video>
     </config>
@@ -439,10 +456,31 @@
       </applicable>
     </rule>
 
+    <!-- 
+      * 2006-09-17: Quadro NVS up to 285 are GF2 derivates
+      * 2006-09-17: GeForce2 GTS is affected 
+		    (source: http://hydlaa.com/smf/index.php?topic=25552.0)
+      -->
     <rule description="GeForce: RECT texture extension support apparently sucks">
       <conditions fulfill="one">
 	<regexp	string="renderer" pattern="GeForce.*MX" />
 	<regexp	string="renderer" pattern="GeForce.*Go" />
+	<regexp	string="renderer" pattern="Quadro.*NVS.*\(50\|1..\|2..\).*" />
+	<regexp	string="renderer" pattern="GeForce2.*GTS" />
+      </conditions>
+      <applicable>
+	<usecfg>disableRECTTextures</usecfg>
+      </applicable>
+    </rule>
+
+    <!-- 
+      * 2006-11-25: A lot of crashes with NVIDIA hardware and RECT textures.
+		    Also see http://trac.crystalspace3d.org/trac/CS/wiki/RECT%20texture%20woes
+      -->
+    <rule description="NVidia: RECT texture extension apparently broken">
+      <conditions fulfill="all">
+	<regexp	string="vendor" pattern="NVIDIA" />
+	<regexp string="platform" pattern="Win32" />
       </conditions>
       <applicable>
 	<usecfg>disableRECTTextures</usecfg>
@@ -468,8 +506,15 @@
       * 2006-01-03: Vasily Rudnikov reports corruption and subsequent fix
 		    by this tweak with a Radeon 9600, Win32, 
 		    driver 6.14.10.4517 (Cat 4.8)
+      * 2006-09-28: More investigation leads to the corruption showing up 
+		    after ARB programs are disabled; apparently this does not
+		    work correctly. Changing a fixed function state and an
+		    empty glBegin()/glEnd() works around the issue.
+		    Observation made with ATI Radeon 9700Pro, Win32, 
+		    driver 6.14.10.6067 (Cat 6.9). Changed to that workaround
+		    from "2D with AFP" one.
       -->
-    <rule description="ATI: Use AFP for some 2D drawing">
+    <rule description="ATI: 'Forceful' fixed function enable">
       <conditions fulfill="all">
 	<regexp string="vendor" pattern="^ATI" />
 	<conditions fulfill="one">
@@ -478,25 +523,29 @@
 	</conditions>
       </conditions>
       <applicable>
-	<usecfg>useAFP2D</usecfg>
+	<usecfg>fixedFunctionForcefulEnable</usecfg>
       </applicable>
     </rule>
 
  
     <!--
+      * 2006-06-05: ATI Radeon 9700Pro, Win32, OpenGL 2.0.5885 (Cat 6.5)
+		    Apparently NPOTS textures via glTexture2D don't get 
+		    garbled anymore.
+      -->
     <rule description="ATI: Enable hidden 2D texture NPOTS support">
       <conditions>
 	<regexp string="vendor" pattern="^ATI" />
 	<conditions fulfill="one">
-	  <regexp string="renderer" pattern="^R\(ADEON\|adeon\) 9\(5\|6\|7\|8\).." />
-	  <regexp string="renderer" pattern="^R\(ADEON\|adeon\) X..." />
+	  <regexp string="renderer" pattern="^R\(ADEON\|adeon\) 9\(5\|6\|7\|8\).*" />
+	  <regexp string="renderer" pattern="^R\(ADEON\|adeon\) X.*" />
 	</conditions>
+	<comparever version="gl" relation="ge 2.0.5885" />
       </conditions>
       <applicable>
 	<usecfg>hiddenNPOTS</usecfg>
       </applicable>
     </rule>
-    -->
     
     <rule description="Software GL tweaks">
       <conditions fulfill="one">
@@ -511,6 +560,49 @@
     </rule>
     
     <!--
+      * 2006-09-25: Older DRI i810 versions crash when using LOD bias
+                    Renderer string: "Mesa DRI I810 20020221", 
+		    version string: "1.2 Mesa 4.0.4" is known to be affected
+      -->
+    <rule description="disable lod bias for i810 driver">
+      <conditions>
+       <regexp string="renderer" pattern="Mesa DRI I810 20020221" />
+      </conditions>
+      <applicable>
+       <usecfg>disableLodBias</usecfg>
+      </applicable>
+    </rule>
+
+    <!--
+      * 2006-11-24: S3TC support in Intel DRI (at least in Mesa 6.5.1) is 
+                    broken. Since S3TC may also be used through generic
+		    compression formats, disable TC completely.
+      -->
+    <rule description="Disable texture compression for Intel DRI">
+      <conditions>
+        <regexp string="renderer" pattern="Mesa.*Intel" />
+        <regexp string="glversion" pattern="Mesa 6\.5\.." />
+      </conditions>
+      <applicable>
+        <usecfg>disableTC</usecfg>
+      </applicable>
+    </rule>
+
+    <!--
+      * 2006-11-24: AFP support in Intel DRI (at least in Mesa 6.5.1) is 
+                    broken.
+      -->
+    <rule description="Disable ARB_fragment_program for Intel DRI">
+      <conditions>
+        <regexp string="renderer" pattern="Mesa.*Intel" />
+        <regexp string="glversion" pattern="Mesa 6\.5\.." />
+      </conditions>
+      <applicable>
+        <usecfg>noafp</usecfg>
+      </applicable>
+    </rule>
+
+    <!--
     <rule description="GeForce MX/Go class HW">
       <conditions fulfill="one">
 	<regexp	string="renderer" pattern="GeForce.*MX" />
@@ -521,22 +613,6 @@
       </applicable>
     </rule>
     -->
-    
-    <!--
-      * 2005-12-24: DRI Intel supports DXT textures with at least Mesa 6.4.1.
-      -->
-    <rule description="Mesa DRI: Force upload of precompressed DXT textures">
-      <conditions fulfill="one">
-	<conditions fulfill="all">
-	  <!-- A renderer known to support DXT -->
-	  <regexp string="renderer" pattern="^Mesa DRI Intel" />
-	  <!-- Mesa version after which the driver supports DXT -->
-	  <comparever version="mesa" relation="ge 6.4.1" />
-	</conditions>
-      </conditions>
-      <applicable>
-	<usecfg>forceprecompressedDXTupload</usecfg>
-      </applicable>
-    </rule>
+
   </rules>
 </gldriverdb>

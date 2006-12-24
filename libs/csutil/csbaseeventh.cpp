@@ -43,7 +43,7 @@ csBaseEventHandler::csBaseEventHandler() :
 void csBaseEventHandler::Initialize (iObjectRegistry *r)
 {
   object_registry = r;
-  self = csEventHandlerRegistry::GetID (r, eventh);
+  self = csEventHandlerRegistry::RegisterID (r, eventh);
   FrameEvent = csevFrame (r);
   PreProcess = csevPreProcess (r);
   Process = csevProcess (r);
@@ -53,10 +53,10 @@ void csBaseEventHandler::Initialize (iObjectRegistry *r)
 
 csBaseEventHandler::~csBaseEventHandler()
 {
-  if (queue)
-    queue->RemoveListener (eventh);
   if (object_registry)
     csEventHandlerRegistry::ReleaseID (object_registry, eventh);
+  if (queue)
+    queue->RemoveListener (eventh);
   eventh->parent = 0;
 }
 
@@ -83,7 +83,7 @@ bool csBaseEventHandler::RegisterQueue (iEventQueue* q, csEventID events[])
 bool csBaseEventHandler::RegisterQueue (iObjectRegistry* registry,
 	csEventID event)
 {
-  csRef<iEventQueue> q (CS_QUERY_REGISTRY (registry, iEventQueue));
+  csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (registry));
   if (0 == q)
     return false;
   return RegisterQueue (q, event);
@@ -92,10 +92,17 @@ bool csBaseEventHandler::RegisterQueue (iObjectRegistry* registry,
 bool csBaseEventHandler::RegisterQueue (iObjectRegistry* registry,
 	csEventID events[])
 {
-  csRef<iEventQueue> q (CS_QUERY_REGISTRY (registry, iEventQueue));
+  csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (registry));
   if (0 == q)
     return false;
   return RegisterQueue (q, events);
+}
+
+void csBaseEventHandler::UnregisterQueue ()
+{
+  if (queue)
+    queue->RemoveListener (eventh);
+  queue = 0;
 }
 
 bool csBaseEventHandler::HandleEvent (iEvent &event)

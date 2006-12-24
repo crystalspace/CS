@@ -87,7 +87,9 @@ const bool aws_debug = false;  // set to true to turn on debugging printf()'s
 #define AWS_VOIDP_IS_ERROR
 #endif
 #ifdef AWS_DEPRECATE_VOIDP
-#define AWS_VOIDP_IS_WARNING CS_DEPRECATED_METHOD
+#define AWS_VOIDP_IS_WARNING \
+CS_DEPRECATED_METHOD_MSG("For proper 64-bit platform support, use the intptr_t \
+version")
 #else
 #define AWS_VOIDP_IS_WARNING
 #endif
@@ -949,7 +951,7 @@ struct iAwsComponent : public iAwsSource
   virtual csRect getInsets() = 0;
 
   /// Returns true if this window overlaps the given rect.
-  virtual bool Overlaps(csRect &r) = 0;
+  virtual bool Overlaps(const csRect &r) = 0;
 
   /// Returns the state of the hidden flag
   virtual bool isHidden() = 0;

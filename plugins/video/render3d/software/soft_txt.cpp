@@ -20,12 +20,13 @@
 #include "soft_txt.h"
 #include "csgfx/bakekeycolor.h"
 #include "csgfx/imagemanipulate.h"
-#include "csgfx/memimage.h"
+#include "csgfx/imagememory.h"
 #include "csgfx/packrgb.h"
 #include "csgfx/xorpat.h"
 #include "iutil/cfgfile.h"
 #include "iutil/event.h"
 #include "iutil/eventq.h"
+#include "iutil/string.h"
 #include "igraphic/image.h"
 #include "ivaria/reporter.h"
 #include "csqint.h"
@@ -305,22 +306,32 @@ uint32 csSoftwareTextureManager::encode_rgb (int r, int g, int b)
 }
 
 csPtr<iTextureHandle> csSoftwareTextureManager::RegisterTexture (iImage* image,
-  int flags)
+  int flags, iString* fail_reason)
 {
   if (!image)
   {
-    G3D->Report(CS_REPORTER_SEVERITY_BUG,
-      "BAAAD!!! csSoftwareTextureManager::RegisterTexture with 0 image!");
-
-    csRef<iImage> im (csCreateXORPatternImage(32, 32, 5));
-    image = im;
-    im->IncRef ();	// Avoid smart pointer cleanup. @@@ UGLY
+    if (fail_reason) fail_reason->Replace (
+      "No image given to RegisterTexture!");
+    return 0;
   }
 
   csSoftwareTextureHandle *txt = new csSoftwareTextureHandle (
   	this, image, flags);
   textures.Push (txt);
   return csPtr<iTextureHandle> (txt);
+}
+
+csPtr<iTextureHandle> csSoftwareTextureManager::CreateTexture (int w, int h,
+      csImageType imagetype, const char* format, int flags,
+      iString* fail_reason)
+{
+  (void)w;
+  (void)h;
+  (void)imagetype;
+  (void)format;
+  (void)flags;
+  if (fail_reason) fail_reason->Replace ("Not implemented yet!");
+  return 0;
 }
 
 void csSoftwareTextureManager::UnregisterTexture (
@@ -340,15 +351,6 @@ void csSoftwareTextureManager::GetMaxTextureSize (int& w, int& h, int& aspect)
 {
   w = h = 2048;
   aspect = 32768;
-}
-
-void csSoftwareTextureManager::GetLightmapRendererCoords (
-  int /*slmWidth*/, int /*slmHeight*/, int lm_x1, int lm_y1, int /*lm_x2*/,
-  int /*lm_y2*/, float& lm_u1, float& lm_v1, float &lm_u2, float& lm_v2)
-{
-  lm_u1 = lm_x1;
-  lm_v1 = lm_y1;
-  lm_u2 = lm_v2 = 0.0f;
 }
 
 }

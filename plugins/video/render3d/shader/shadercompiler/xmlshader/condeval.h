@@ -65,7 +65,7 @@ struct ValueSetArray
   }
 };
 
-CS_SPECIALIZE_TEMPLATE
+template<>
 struct ValueSetArray<1>
 {
   ValueSet x;
@@ -381,7 +381,7 @@ protected:
   class CowBlockAllocator
   {
   public:
-    typedef csBlockAllocator<uint8[ValuesArrayWrapper::allocSize], 
+    typedef csFixedSizeAllocator<ValuesArrayWrapper::allocSize, 
       TempHeapAlloc> BlockAlloc;
   private:
     CS_DECLARE_STATIC_CLASSVAR_REF (allocator,
@@ -391,11 +391,11 @@ protected:
     {
       (void)n; // Pacify compiler warnings
       CS_ASSERT(n == ValuesArrayWrapper::allocSize);
-      return Allocator().AllocUninit ();
+      return Allocator().Alloc ();
     }
     static void Free (void* p)
     {
-      Allocator().Free ((uint8(*)[ValuesArrayWrapper::allocSize])p, false);
+      Allocator().Free (p);
     }
     static void CompactAllocator()
     {
@@ -537,7 +537,7 @@ class csConditionEvaluator
   };
 public:
   template<typename Evaluator>
-  typename_qualifier Evaluator::EvalResult Evaluate (Evaluator& eval, csConditionID condition);
+  typename Evaluator::EvalResult Evaluate (Evaluator& eval, csConditionID condition);
 
   csConditionEvaluator (iStringSet* strings, 
     const csConditionConstants& constants);

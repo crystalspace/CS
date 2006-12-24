@@ -53,6 +53,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Spr2D)
 
 class csSprite2DMeshObjectFactory;
 
+#include "csutil/win32/msvc_deprecated_warn_off.h"
+
 /**
  * Sprite 2D version of mesh object.
  */
@@ -126,6 +128,7 @@ private:
   bool initialized;
   csRef<iMeshObjectDrawCallback> vis_cb;
   float radius;
+  csBox3 obj_bbox;
   float current_lod;
   uint32 current_features;
   csBox2 bbox_2d;
@@ -180,6 +183,7 @@ public:
   /**\name iObjectModel implementation
    * @{ */
   void GetObjectBoundingBox (csBox3& bbox);
+  const csBox3& GetObjectBoundingBox ();
   void SetObjectBoundingBox (const csBox3& bbox);
   void GetRadius (float& rad, csVector3& cent)
   { rad = radius; cent.Set (0,0,0); }
@@ -225,7 +229,7 @@ public:
   /** @} */
 
   virtual iObjectModel* GetObjectModel () { return static_cast<iObjectModel*> (this); }
-  virtual bool SetColor (const csColor&) { return false; }
+  virtual bool SetColor (const csColor&);
   virtual bool GetColor (csColor&) const { return false; }
   virtual bool SetMaterialWrapper (iMaterialWrapper* mat)
   {
@@ -277,6 +281,8 @@ public:
 	const csReversibleTransform& transform);
   /** @} */
 };
+
+#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 /**
  * Factory for 2D sprites. This factory also implements iSprite2DFactoryState.

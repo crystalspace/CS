@@ -1,0 +1,1234 @@
+<library>
+  <meshfact name='thingCube.549'>
+    <plugin>thingfact</plugin>
+    <priority>transp</priority>
+    <ztest/>
+    <params>
+      <mixmode><alpha/></mixmode>
+      <material>parallaxAtt_crystalcrystal.png</material>
+      <v x='-0.0306199' y='-0.682842' z='-0.230765'/>
+      <v x='-0.0712557' y='0.37657' z='0.110145'/>
+      <v x='-0.152271' y='-0.122128' z='-0.0438936'/>
+      <v x='0.036469' y='-0.944595' z='0.0305383'/>
+      <v x='-0.0026302' y='0.837211' z='0.0642604'/>
+      <v x='-0.0269487' y='-0.943074' z='0.024335'/>
+      <v x='-0.0209786' y='0.661566' z='-0.0670675'/>
+      <v x='-0.0381942' y='0.794329' z='0.0736282'/>
+      <v x='0.0118968' y='-0.959225' z='-0.0102504'/>
+      <v x='0.0146953' y='0.109398' z='0.155146'/>
+      <v x='-0.163733' y='-0.671724' z='-0.0899611'/>
+      <v x='-0.0759527' y='0.814983' z='0.0106953'/>
+      <v x='-0.17701' y='-0.68603' z='0.0244161'/>
+      <v x='0.0980975' y='-0.913419' z='-0.0132711'/>
+      <v x='0.22164' y='-0.637026' z='-0.0412967'/>
+      <v x='-0.07817' y='-0.65163' z='-0.188329'/>
+      <v x='-0.0176915' y='0.959225' z='0.0175806'/>
+      <v x='0.059994' y='-0.664097' z='0.207816'/>
+      <v x='0.0289289' y='-0.94967' z='-0.0470577'/>
+      <v x='-0.0313136' y='-0.65085' z='0.175897'/>
+      <v x='0.024684' y='-0.612604' z='-0.209775'/>
+      <v x='-0.139262' y='-0.094364' z='0.0382588'/>
+      <v x='-0.058914' y='0.780454' z='-0.0304835'/>
+      <v x='0.0347121' y='0.776698' z='-0.0162482'/>
+      <v x='0.04773' y='0.786807' z='0.0422657'/>
+      <v x='-0.142311' y='-0.714394' z='0.142833'/>
+      <v x='-0.118645' y='0.429514' z='-0.0114058'/>
+      <v x='0.121656' y='0.263491' z='0.0387515'/>
+      <v x='0.105852' y='-0.648901' z='-0.170688'/>
+      <v x='-0.0364666' y='-0.13447' z='-0.161728'/>
+      <v x='0.160737' y='-0.243001' z='-0.0382643'/>
+      <v x='0.0912211' y='0.0820496' z='0.0950539'/>
+      <v x='0.172899' y='-0.558913' z='-0.101853'/>
+      <v x='-0.0320816' y='-0.136765' z='0.14954'/>
+      <v x='-0.120496' y='-0.019874' z='-0.104578'/>
+      <v x='0.112845' y='0.261148' z='-0.0190059'/>
+      <v x='0.177675' y='-0.0451006' z='0.0461055'/>
+      <v x='-0.099341' y='-0.0175586' z='0.115361'/>
+      <v x='0.227665' y='-0.607688' z='0.0376322'/>
+      <p name="0">
+        <v>18</v>
+        <v>8</v>
+        <v>10</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.267385' v='0.102138'/>          <uv idx='1' u='0.327993' v='0.792573'/>          <uv idx='0' u='0.423825' v='0.771883'/>        </texmap>
+      </p>
+      <p name="0">
+        <v>10</v>
+        <v>8</v>
+        <v>18</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.423825' v='0.771883'/>          <uv idx='1' u='0.327993' v='0.792573'/>          <uv idx='0' u='0.267385' v='0.102138'/>        </texmap>
+      </p>
+      <p name="1">
+        <v>8</v>
+        <v>3</v>
+        <v>17</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.443781' v='0.0853577'/>          <uv idx='1' u='0.73268' v='0.757637'/>          <uv idx='0' u='0.835825' v='0.792573'/>        </texmap>
+      </p>
+      <p name="1">
+        <v>17</v>
+        <v>3</v>
+        <v>8</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.835825' v='0.792573'/>          <uv idx='1' u='0.73268' v='0.757637'/>          <uv idx='0' u='0.443781' v='0.0853577'/>        </texmap>
+      </p>
+      <p name="2">
+        <v>8</v>
+        <v>18</v>
+        <v>13</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.66866' v='0.548815'/>          <uv idx='1' u='0.850997' v='0.576175'/>          <uv idx='0' u='0.835825' v='0.672007'/>        </texmap>
+      </p>
+      <p name="2">
+        <v>13</v>
+        <v>18</v>
+        <v>8</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.835825' v='0.672007'/>          <uv idx='1' u='0.850997' v='0.576175'/>          <uv idx='0' u='0.66866' v='0.548815'/>        </texmap>
+      </p>
+      <p name="3">
+        <v>3</v>
+        <v>8</v>
+        <v>13</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.66866' v='0.548815'/>          <uv idx='1' u='0.835825' v='0.672007'/>          <uv idx='0' u='0.73268' v='0.719003'/>        </texmap>
+      </p>
+      <p name="3">
+        <v>13</v>
+        <v>8</v>
+        <v>3</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.73268' v='0.719003'/>          <uv idx='1' u='0.835825' v='0.672007'/>          <uv idx='0' u='0.66866' v='0.548815'/>        </texmap>
+      </p>
+      <p name="4">
+        <v>13</v>
+        <v>18</v>
+        <v>14</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.455808' v='0.0371171'/>          <uv idx='1' u='0.850997' v='0.771883'/>          <uv idx='0' u='0.66866' v='0.687931'/>        </texmap>
+      </p>
+      <p name="4">
+        <v>14</v>
+        <v>18</v>
+        <v>13</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.66866' v='0.687931'/>          <uv idx='1' u='0.850997' v='0.771883'/>          <uv idx='0' u='0.455808' v='0.0371171'/>        </texmap>
+      </p>
+      <p name="5">
+        <v>3</v>
+        <v>13</v>
+        <v>38</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.539946' v='0.965001'/>          <uv idx='1' u='0.451185' v='1.68793'/>          <uv idx='0' u='0.280997' v='1.75764'/>        </texmap>
+      </p>
+      <p name="5">
+        <v>38</v>
+        <v>13</v>
+        <v>3</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.280997' v='1.75764'/>          <uv idx='1' u='0.451185' v='1.68793'/>          <uv idx='0' u='0.539946' v='0.965001'/>        </texmap>
+      </p>
+      <p name="6">
+        <v>5</v>
+        <v>8</v>
+        <v>19</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.920061' v='0.0503327'/>          <uv idx='1' u='1.32799' v='0.792573'/>          <uv idx='0' u='1.20893' v='0.751066'/>        </texmap>
+      </p>
+      <p name="6">
+        <v>19</v>
+        <v>8</v>
+        <v>5</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='1.20893' v='0.751066'/>          <uv idx='1' u='1.32799' v='0.792573'/>          <uv idx='0' u='0.920061' v='0.0503327'/>        </texmap>
+      </p>
+      <p name="7">
+        <v>8</v>
+        <v>5</v>
+        <v>12</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.0231991' v='0.131784'/>          <uv idx='1' u='0.208928' v='0.751066'/>          <uv idx='0' u='0.327993' v='0.792573'/>        </texmap>
+      </p>
+      <p name="7">
+        <v>12</v>
+        <v>5</v>
+        <v>8</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.327993' v='0.792573'/>          <uv idx='1' u='0.208928' v='0.751066'/>          <uv idx='0' u='0.0231991' v='0.131784'/>        </texmap>
+      </p>
+      <p name="8">
+        <v>26</v>
+        <v>37</v>
+        <v>11</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.94068' v='0.564534'/>          <uv idx='1' u='0.86655' v='2.54157'/>          <uv idx='0' u='1.0632' v='1.48063'/>        </texmap>
+      </p>
+      <p name="8">
+        <v>11</v>
+        <v>37</v>
+        <v>26</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='1.0632' v='1.48063'/>          <uv idx='1' u='0.86655' v='2.54157'/>          <uv idx='0' u='0.94068' v='0.564534'/>        </texmap>
+      </p>
+      <p name="9">
+        <v>38</v>
+        <v>13</v>
+        <v>14</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.686088' v='0.0371171'/>          <uv idx='1' u='0.451185' v='0.687931'/>          <uv idx='0' u='0.539946' v='-0.0349987'/>        </texmap>
+      </p>
+      <p name="9">
+        <v>14</v>
+        <v>13</v>
+        <v>38</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.539946' v='-0.0349987'/>          <uv idx='1' u='0.451185' v='0.687931'/>          <uv idx='0' u='0.686088' v='0.0371171'/>        </texmap>
+      </p>
+      <p name="10">
+        <v>14</v>
+        <v>32</v>
+        <v>30</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.562946' v='0.096128'/>          <uv idx='1' u='0.630849' v='0.850752'/>          <uv idx='0' u='0.455808' v='1.03712'/>        </texmap>
+      </p>
+      <p name="10">
+        <v>30</v>
+        <v>32</v>
+        <v>14</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.455808' v='1.03712'/>          <uv idx='1' u='0.630849' v='0.850752'/>          <uv idx='0' u='0.562946' v='0.096128'/>        </texmap>
+      </p>
+      <p name="11">
+        <v>31</v>
+        <v>9</v>
+        <v>17</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.977845' v='0.0853577'/>          <uv idx='1' u='1.06402' v='-1.75625'/>          <uv idx='0' u='1.28295' v='-1.68538'/>        </texmap>
+      </p>
+      <p name="11">
+        <v>17</v>
+        <v>9</v>
+        <v>31</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='1.28295' v='-1.68538'/>          <uv idx='1' u='1.06402' v='-1.75625'/>          <uv idx='0' u='0.977845' v='0.0853577'/>        </texmap>
+      </p>
+      <p name="12">
+        <v>36</v>
+        <v>31</v>
+        <v>38</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.539946' v='0.965001'/>          <uv idx='1' u='0.282947' v='-0.685381'/>          <uv idx='0' u='0.487612' v='-0.376836'/>        </texmap>
+      </p>
+      <p name="12">
+        <v>38</v>
+        <v>31</v>
+        <v>36</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.487612' v='-0.376836'/>          <uv idx='1' u='0.282947' v='-0.685381'/>          <uv idx='0' u='0.539946' v='0.965001'/>        </texmap>
+      </p>
+      <p name="13">
+        <v>32</v>
+        <v>28</v>
+        <v>6</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.939229' v='0.934978'/>          <uv idx='1' u='0.856893' v='4.06386'/>          <uv idx='0' u='0.630849' v='3.85075'/>        </texmap>
+      </p>
+      <p name="13">
+        <v>6</v>
+        <v>28</v>
+        <v>32</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.630849' v='3.85075'/>          <uv idx='1' u='0.856893' v='4.06386'/>          <uv idx='0' u='0.939229' v='0.934978'/>        </texmap>
+      </p>
+      <p name="14">
+        <v>27</v>
+        <v>31</v>
+        <v>36</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.487612' v='0.623164'/>          <uv idx='1' u='0.282947' v='0.314619'/>          <uv idx='0' u='0.444535' v='-0.113892'/>        </texmap>
+      </p>
+      <p name="14">
+        <v>36</v>
+        <v>31</v>
+        <v>27</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.444535' v='-0.113892'/>          <uv idx='1' u='0.282947' v='0.314619'/>          <uv idx='0' u='0.487612' v='0.623164'/>        </texmap>
+      </p>
+      <p name="15">
+        <v>31</v>
+        <v>27</v>
+        <v>24</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.367977' v='0.636716'/>          <uv idx='1' u='0.444535' v='1.88611'/>          <uv idx='0' u='0.282947' v='2.31462'/>        </texmap>
+      </p>
+      <p name="15">
+        <v>24</v>
+        <v>27</v>
+        <v>31</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.282947' v='2.31462'/>          <uv idx='1' u='0.444535' v='1.88611'/>          <uv idx='0' u='0.367977' v='0.636716'/>        </texmap>
+      </p>
+      <p name="16">
+        <v>16</v>
+        <v>23</v>
+        <v>6</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.939229' v='0.934978'/>          <uv idx='1' u='0.759007' v='0.662046'/>          <uv idx='0' u='0.813215' v='0.223881'/>        </texmap>
+      </p>
+      <p name="16">
+        <v>6</v>
+        <v>23</v>
+        <v>16</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.813215' v='0.223881'/>          <uv idx='1' u='0.759007' v='0.662046'/>          <uv idx='0' u='0.939229' v='0.934978'/>        </texmap>
+      </p>
+      <p name="17">
+        <v>7</v>
+        <v>37</v>
+        <v>1</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.0531282' v='0.605028'/>          <uv idx='1' u='-0.0161972' v='1.54157'/>          <uv idx='0' u='0.19215' v='-0.386488'/>        </texmap>
+      </p>
+      <p name="17">
+        <v>1</v>
+        <v>37</v>
+        <v>7</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.19215' v='-0.386488'/>          <uv idx='1' u='-0.0161972' v='1.54157'/>          <uv idx='0' u='0.0531282' v='0.605028'/>        </texmap>
+      </p>
+      <p name="18">
+        <v>1</v>
+        <v>9</v>
+        <v>7</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.782834' v='0.613512'/>          <uv idx='1' u='0.585595' v='2.24375'/>          <uv idx='0' u='0.809036' v='1.60503'/>        </texmap>
+      </p>
+      <p name="18">
+        <v>7</v>
+        <v>9</v>
+        <v>1</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.809036' v='1.60503'/>          <uv idx='1' u='0.585595' v='2.24375'/>          <uv idx='0' u='0.782834' v='0.613512'/>        </texmap>
+      </p>
+      <p name="19">
+        <v>22</v>
+        <v>16</v>
+        <v>6</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.939229' v='0.934978'/>          <uv idx='1' u='0.813215' v='0.223881'/>          <uv idx='0' u='0.962667' v='0.648918'/>        </texmap>
+      </p>
+      <p name="19">
+        <v>6</v>
+        <v>16</v>
+        <v>22</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.962667' v='0.648918'/>          <uv idx='1' u='0.813215' v='0.223881'/>          <uv idx='0' u='0.939229' v='0.934978'/>        </texmap>
+      </p>
+      <p name="20">
+        <v>15</v>
+        <v>18</v>
+        <v>10</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.267385' v='0.102138'/>          <uv idx='1' u='0.423825' v='0.771883'/>          <uv idx='0' u='0.576489' v='0.0617857'/>        </texmap>
+      </p>
+      <p name="20">
+        <v>10</v>
+        <v>18</v>
+        <v>15</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.576489' v='0.0617857'/>          <uv idx='1' u='0.423825' v='0.771883'/>          <uv idx='0' u='0.267385' v='0.102138'/>        </texmap>
+      </p>
+      <p name="21">
+        <v>16</v>
+        <v>7</v>
+        <v>4</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.72413' v='0.513521'/>          <uv idx='1' u='0.782834' v='0.613512'/>          <uv idx='0' u='0.813215' v='0.223881'/>        </texmap>
+      </p>
+      <p name="21">
+        <v>4</v>
+        <v>7</v>
+        <v>16</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.813215' v='0.223881'/>          <uv idx='1' u='0.782834' v='0.613512'/>          <uv idx='0' u='0.72413' v='0.513521'/>        </texmap>
+      </p>
+      <p name="22">
+        <v>37</v>
+        <v>26</v>
+        <v>21</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.0497637' v='0.72492'/>          <uv idx='1' u='0.0631981' v='-0.519366'/>          <uv idx='0' u='-0.13345' v='0.541567'/>        </texmap>
+      </p>
+      <p name="22">
+        <v>21</v>
+        <v>26</v>
+        <v>37</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='-0.13345' v='0.541567'/>          <uv idx='1' u='0.0631981' v='-0.519366'/>          <uv idx='0' u='0.0497637' v='0.72492'/>        </texmap>
+      </p>
+      <p name="23">
+        <v>14</v>
+        <v>30</v>
+        <v>35</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.620278' v='0.893138'/>          <uv idx='1' u='0.562946' v='2.09613'/>          <uv idx='0' u='0.455808' v='3.03712'/>        </texmap>
+      </p>
+      <p name="23">
+        <v>35</v>
+        <v>30</v>
+        <v>14</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.455808' v='3.03712'/>          <uv idx='1' u='0.562946' v='2.09613'/>          <uv idx='0' u='0.620278' v='0.893138'/>        </texmap>
+      </p>
+      <p name="24">
+        <v>9</v>
+        <v>1</v>
+        <v>33</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.691023' v='0.827529'/>          <uv idx='1' u='0.809036' v='-0.394972'/>          <uv idx='0' u='0.585595' v='0.243752'/>        </texmap>
+      </p>
+      <p name="24">
+        <v>33</v>
+        <v>1</v>
+        <v>9</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.585595' v='0.243752'/>          <uv idx='1' u='0.809036' v='-0.394972'/>          <uv idx='0' u='0.691023' v='0.827529'/>        </texmap>
+      </p>
+      <p name="25">
+        <v>25</v>
+        <v>19</v>
+        <v>37</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.86655' v='0.541567'/>          <uv idx='1' u='0.666191' v='2.05033'/>          <uv idx='0' u='0.930748' v='2.19714'/>        </texmap>
+      </p>
+      <p name="25">
+        <v>37</v>
+        <v>19</v>
+        <v>25</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.930748' v='2.19714'/>          <uv idx='1' u='0.666191' v='2.05033'/>          <uv idx='0' u='0.86655' v='0.541567'/>        </texmap>
+      </p>
+      <p name="26">
+        <v>33</v>
+        <v>37</v>
+        <v>19</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.666191' v='0.0503327'/>          <uv idx='1' u='0.86655' v='-1.45843'/>          <uv idx='0' u='0.691023' v='-1.17247'/>        </texmap>
+      </p>
+      <p name="26">
+        <v>19</v>
+        <v>37</v>
+        <v>33</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.691023' v='-1.17247'/>          <uv idx='1' u='0.86655' v='-1.45843'/>          <uv idx='0' u='0.666191' v='0.0503327'/>        </texmap>
+      </p>
+      <p name="27">
+        <v>37</v>
+        <v>33</v>
+        <v>1</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.809036' v='0.605028'/>          <uv idx='1' u='0.691023' v='1.82753'/>          <uv idx='0' u='0.86655' v='1.54157'/>        </texmap>
+      </p>
+      <p name="27">
+        <v>1</v>
+        <v>33</v>
+        <v>37</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.86655' v='1.54157'/>          <uv idx='1' u='0.691023' v='1.82753'/>          <uv idx='0' u='0.809036' v='0.605028'/>        </texmap>
+      </p>
+      <p name="28">
+        <v>18</v>
+        <v>32</v>
+        <v>14</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.455808' v='0.0371171'/>          <uv idx='1' u='0.630849' v='-0.149248'/>          <uv idx='0' u='0.850997' v='0.771883'/>        </texmap>
+      </p>
+      <p name="28">
+        <v>14</v>
+        <v>32</v>
+        <v>18</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.850997' v='0.771883'/>          <uv idx='1' u='0.630849' v='-0.149248'/>          <uv idx='0' u='0.455808' v='0.0371171'/>        </texmap>
+      </p>
+      <p name="29">
+        <v>16</v>
+        <v>4</v>
+        <v>24</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.367977' v='0.636716'/>          <uv idx='1' u='0.260323' v='0.513521'/>          <uv idx='0' u='0.339108' v='0.223881'/>        </texmap>
+      </p>
+      <p name="29">
+        <v>24</v>
+        <v>4</v>
+        <v>16</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.339108' v='0.223881'/>          <uv idx='1' u='0.260323' v='0.513521'/>          <uv idx='0' u='0.367977' v='0.636716'/>        </texmap>
+      </p>
+      <p name="30">
+        <v>10</v>
+        <v>8</v>
+        <v>12</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.0231991' v='0.131784'/>          <uv idx='1' u='0.327993' v='0.792573'/>          <uv idx='0' u='0.267385' v='0.102138'/>        </texmap>
+      </p>
+      <p name="30">
+        <v>12</v>
+        <v>8</v>
+        <v>10</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.267385' v='0.102138'/>          <uv idx='1' u='0.327993' v='0.792573'/>          <uv idx='0' u='0.0231991' v='0.131784'/>        </texmap>
+      </p>
+      <p name="31">
+        <v>17</v>
+        <v>38</v>
+        <v>31</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.282947' v='0.314619'/>          <uv idx='1' u='0.539946' v='1.965'/>          <uv idx='0' u='-0.0221548' v='2.08536'/>        </texmap>
+      </p>
+      <p name="31">
+        <v>31</v>
+        <v>38</v>
+        <v>17</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='-0.0221548' v='2.08536'/>          <uv idx='1' u='0.539946' v='1.965'/>          <uv idx='0' u='0.282947' v='0.314619'/>        </texmap>
+      </p>
+      <p name="32">
+        <v>2</v>
+        <v>21</v>
+        <v>26</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.232865' v='0.480634'/>          <uv idx='1' u='0.0786257' v='1.72492'/>          <uv idx='0' u='0.221922' v='1.79305'/>        </texmap>
+      </p>
+      <p name="32">
+        <v>26</v>
+        <v>21</v>
+        <v>2</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.221922' v='1.79305'/>          <uv idx='1' u='0.0786257' v='1.72492'/>          <uv idx='0' u='0.232865' v='0.480634'/>        </texmap>
+      </p>
+      <p name="33">
+        <v>18</v>
+        <v>20</v>
+        <v>28</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.856893' v='0.0638624'/>          <uv idx='1' u='1.06831' v='-0.0252885'/>          <uv idx='0' u='0.850997' v='0.771883'/>        </texmap>
+      </p>
+      <p name="33">
+        <v>28</v>
+        <v>20</v>
+        <v>18</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.850997' v='0.771883'/>          <uv idx='1' u='1.06831' v='-0.0252885'/>          <uv idx='0' u='0.856893' v='0.0638624'/>        </texmap>
+      </p>
+      <p name="34">
+        <v>18</v>
+        <v>0</v>
+        <v>20</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.0683069' v='0.974712'/>          <uv idx='1' u='0.20702' v='1.13983'/>          <uv idx='0' u='-0.149003' v='1.77188'/>        </texmap>
+      </p>
+      <p name="34">
+        <v>20</v>
+        <v>0</v>
+        <v>18</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='-0.149003' v='1.77188'/>          <uv idx='1' u='0.20702' v='1.13983'/>          <uv idx='0' u='0.0683069' v='0.974712'/>        </texmap>
+      </p>
+      <p name="35">
+        <v>7</v>
+        <v>16</v>
+        <v>11</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.94068' v='0.564534'/>          <uv idx='1' u='0.813215' v='0.223881'/>          <uv idx='0' u='0.782834' v='0.613512'/>        </texmap>
+      </p>
+      <p name="35">
+        <v>11</v>
+        <v>16</v>
+        <v>7</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.782834' v='0.613512'/>          <uv idx='1' u='0.813215' v='0.223881'/>          <uv idx='0' u='0.94068' v='0.564534'/>        </texmap>
+      </p>
+      <p name="36">
+        <v>12</v>
+        <v>25</v>
+        <v>37</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.86655' v='0.541567'/>          <uv idx='1' u='0.930748' v='2.19714'/>          <uv idx='0' u='1.15625' v='2.13178'/>        </texmap>
+      </p>
+      <p name="36">
+        <v>37</v>
+        <v>25</v>
+        <v>12</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='1.15625' v='2.13178'/>          <uv idx='1' u='0.930748' v='2.19714'/>          <uv idx='0' u='0.86655' v='0.541567'/>        </texmap>
+      </p>
+      <p name="37">
+        <v>12</v>
+        <v>5</v>
+        <v>25</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.834111' v='0.197144'/>          <uv idx='1' u='1.20893' v='0.751066'/>          <uv idx='0' u='1.0232' v='0.131784'/>        </texmap>
+      </p>
+      <p name="37">
+        <v>25</v>
+        <v>5</v>
+        <v>12</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='1.0232' v='0.131784'/>          <uv idx='1' u='1.20893' v='0.751066'/>          <uv idx='0' u='0.834111' v='0.197144'/>        </texmap>
+      </p>
+      <p name="38">
+        <v>19</v>
+        <v>17</v>
+        <v>9</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.585595' v='0.243752'/>          <uv idx='1' u='0.443781' v='2.08536'/>          <uv idx='0' u='0.666191' v='2.05033'/>        </texmap>
+      </p>
+      <p name="38">
+        <v>9</v>
+        <v>17</v>
+        <v>19</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.666191' v='2.05033'/>          <uv idx='1' u='0.443781' v='2.08536'/>          <uv idx='0' u='0.585595' v='0.243752'/>        </texmap>
+      </p>
+      <p name="39">
+        <v>20</v>
+        <v>6</v>
+        <v>28</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.856893' v='0.0638624'/>          <uv idx='1' u='0.939229' v='-3.06502'/>          <uv idx='0' u='1.06831' v='-0.0252885'/>        </texmap>
+      </p>
+      <p name="39">
+        <v>28</v>
+        <v>6</v>
+        <v>20</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='1.06831' v='-0.0252885'/>          <uv idx='1' u='0.939229' v='-3.06502'/>          <uv idx='0' u='0.856893' v='0.0638624'/>        </texmap>
+      </p>
+      <p name="40">
+        <v>4</v>
+        <v>9</v>
+        <v>24</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.367977' v='0.636716'/>          <uv idx='1' u='0.0640154' v='2.24375'/>          <uv idx='0' u='0.260323' v='0.513521'/>        </texmap>
+      </p>
+      <p name="40">
+        <v>24</v>
+        <v>9</v>
+        <v>4</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.260323' v='0.513521'/>          <uv idx='1' u='0.0640154' v='2.24375'/>          <uv idx='0' u='0.367977' v='0.636716'/>        </texmap>
+      </p>
+      <p name="41">
+        <v>38</v>
+        <v>14</v>
+        <v>27</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.444535' v='0.886108'/>          <uv idx='1' u='0.686088' v='3.03712'/>          <uv idx='0' u='0.539946' v='2.965'/>        </texmap>
+      </p>
+      <p name="41">
+        <v>27</v>
+        <v>14</v>
+        <v>38</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.539946' v='2.965'/>          <uv idx='1' u='0.686088' v='3.03712'/>          <uv idx='0' u='0.444535' v='0.886108'/>        </texmap>
+      </p>
+      <p name="42">
+        <v>35</v>
+        <v>27</v>
+        <v>14</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.686088' v='0.0371171'/>          <uv idx='1' u='0.444535' v='-2.11389'/>          <uv idx='0' u='0.54667' v='-2.10686'/>        </texmap>
+      </p>
+      <p name="42">
+        <v>14</v>
+        <v>27</v>
+        <v>35</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.54667' v='-2.10686'/>          <uv idx='1' u='0.444535' v='-2.11389'/>          <uv idx='0' u='0.686088' v='0.0371171'/>        </texmap>
+      </p>
+      <p name="43">
+        <v>27</v>
+        <v>36</v>
+        <v>38</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.338149' v='0.965001'/>          <uv idx='1' u='0.412645' v='-0.376836'/>          <uv idx='0' u='0.52593' v='-1.11389'/>        </texmap>
+      </p>
+      <p name="43">
+        <v>38</v>
+        <v>36</v>
+        <v>27</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.52593' v='-1.11389'/>          <uv idx='1' u='0.412645' v='-0.376836'/>          <uv idx='0' u='0.338149' v='0.965001'/>        </texmap>
+      </p>
+      <p name="44">
+        <v>23</v>
+        <v>16</v>
+        <v>24</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.655174' v='0.636716'/>          <uv idx='1' u='0.813215' v='0.223881'/>          <uv idx='0' u='0.759007' v='0.662046'/>        </texmap>
+      </p>
+      <p name="44">
+        <v>24</v>
+        <v>16</v>
+        <v>23</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.759007' v='0.662046'/>          <uv idx='1' u='0.813215' v='0.223881'/>          <uv idx='0' u='0.655174' v='0.636716'/>        </texmap>
+      </p>
+      <p name="45">
+        <v>24</v>
+        <v>27</v>
+        <v>35</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.54667' v='0.893138'/>          <uv idx='1' u='0.444535' v='0.886108'/>          <uv idx='0' u='0.367977' v='-0.363284'/>        </texmap>
+      </p>
+      <p name="45">
+        <v>35</v>
+        <v>27</v>
+        <v>24</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.367977' v='-0.363284'/>          <uv idx='1' u='0.444535' v='0.886108'/>          <uv idx='0' u='0.54667' v='0.893138'/>        </texmap>
+      </p>
+      <p name="46">
+        <v>7</v>
+        <v>9</v>
+        <v>4</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.72413' v='0.513521'/>          <uv idx='1' u='0.585595' v='2.24375'/>          <uv idx='0' u='0.782834' v='0.613512'/>        </texmap>
+      </p>
+      <p name="46">
+        <v>4</v>
+        <v>9</v>
+        <v>7</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.782834' v='0.613512'/>          <uv idx='1' u='0.585595' v='2.24375'/>          <uv idx='0' u='0.72413' v='0.513521'/>        </texmap>
+      </p>
+      <p name="47">
+        <v>10</v>
+        <v>2</v>
+        <v>34</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.389589' v='0.553229'/>          <uv idx='1' u='0.221922' v='0.793048'/>          <uv idx='0' u='0.267385' v='2.10214'/>        </texmap>
+      </p>
+      <p name="47">
+        <v>34</v>
+        <v>2</v>
+        <v>10</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.267385' v='2.10214'/>          <uv idx='1' u='0.221922' v='0.793048'/>          <uv idx='0' u='0.389589' v='0.553229'/>        </texmap>
+      </p>
+      <p name="48">
+        <v>22</v>
+        <v>34</v>
+        <v>2</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.221922' v='0.793048'/>          <uv idx='1' u='0.389589' v='0.553229'/>          <uv idx='0' u='0.369287' v='-1.35108'/>        </texmap>
+      </p>
+      <p name="48">
+        <v>2</v>
+        <v>34</v>
+        <v>22</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.369287' v='-1.35108'/>          <uv idx='1' u='0.389589' v='0.553229'/>          <uv idx='0' u='0.221922' v='0.793048'/>        </texmap>
+      </p>
+      <p name="49">
+        <v>10</v>
+        <v>12</v>
+        <v>2</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.221922' v='0.793048'/>          <uv idx='1' u='0.0231991' v='2.13178'/>          <uv idx='0' u='0.267385' v='2.10214'/>        </texmap>
+      </p>
+      <p name="49">
+        <v>2</v>
+        <v>12</v>
+        <v>10</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.267385' v='2.10214'/>          <uv idx='1' u='0.0231991' v='2.13178'/>          <uv idx='0' u='0.221922' v='0.793048'/>        </texmap>
+      </p>
+      <p name="50">
+        <v>37</v>
+        <v>7</v>
+        <v>11</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.94068' v='0.564534'/>          <uv idx='1' u='0.782834' v='0.613512'/>          <uv idx='0' u='0.86655' v='2.54157'/>        </texmap>
+      </p>
+      <p name="50">
+        <v>11</v>
+        <v>7</v>
+        <v>37</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.86655' v='2.54157'/>          <uv idx='1' u='0.782834' v='0.613512'/>          <uv idx='0' u='0.94068' v='0.564534'/>        </texmap>
+      </p>
+      <p name="51">
+        <v>34</v>
+        <v>22</v>
+        <v>6</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.485439' v='0.934978'/>          <uv idx='1' u='0.369287' v='0.648918'/>          <uv idx='0' u='0.389589' v='2.55323'/>        </texmap>
+      </p>
+      <p name="51">
+        <v>6</v>
+        <v>22</v>
+        <v>34</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.389589' v='2.55323'/>          <uv idx='1' u='0.369287' v='0.648918'/>          <uv idx='0' u='0.485439' v='0.934978'/>        </texmap>
+      </p>
+      <p name="52">
+        <v>2</v>
+        <v>26</v>
+        <v>22</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.369287' v='0.648918'/>          <uv idx='1' u='0.232865' v='1.48063'/>          <uv idx='0' u='0.221922' v='2.79305'/>        </texmap>
+      </p>
+      <p name="52">
+        <v>22</v>
+        <v>26</v>
+        <v>2</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.221922' v='2.79305'/>          <uv idx='1' u='0.232865' v='1.48063'/>          <uv idx='0' u='0.369287' v='0.648918'/>        </texmap>
+      </p>
+      <p name="53">
+        <v>9</v>
+        <v>31</v>
+        <v>24</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.367977' v='0.636716'/>          <uv idx='1' u='0.282947' v='2.31462'/>          <uv idx='0' u='0.0640154' v='2.24375'/>        </texmap>
+      </p>
+      <p name="53">
+        <v>24</v>
+        <v>31</v>
+        <v>9</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.0640154' v='2.24375'/>          <uv idx='1' u='0.282947' v='2.31462'/>          <uv idx='0' u='0.367977' v='0.636716'/>        </texmap>
+      </p>
+      <p name="54">
+        <v>29</v>
+        <v>6</v>
+        <v>20</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.0683069' v='0.974712'/>          <uv idx='1' u='-0.060771' v='-2.06502'/>          <uv idx='0' u='0.114076' v='-0.167959'/>        </texmap>
+      </p>
+      <p name="54">
+        <v>20</v>
+        <v>6</v>
+        <v>29</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.114076' v='-0.167959'/>          <uv idx='1' u='-0.060771' v='-2.06502'/>          <uv idx='0' u='0.0683069' v='0.974712'/>        </texmap>
+      </p>
+      <p name="55">
+        <v>26</v>
+        <v>11</v>
+        <v>22</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.369287' v='0.648918'/>          <uv idx='1' u='0.267241' v='0.564534'/>          <uv idx='0' u='0.232865' v='1.48063'/>        </texmap>
+      </p>
+      <p name="55">
+        <v>22</v>
+        <v>11</v>
+        <v>26</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.232865' v='1.48063'/>          <uv idx='1' u='0.267241' v='0.564534'/>          <uv idx='0' u='0.369287' v='0.648918'/>        </texmap>
+      </p>
+      <p name="56">
+        <v>29</v>
+        <v>0</v>
+        <v>15</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.576489' v='0.0617857'/>          <uv idx='1' u='0.721805' v='0.139831'/>          <uv idx='0' u='0.607907' v='-1.16796'/>        </texmap>
+      </p>
+      <p name="56">
+        <v>15</v>
+        <v>0</v>
+        <v>29</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.607907' v='-1.16796'/>          <uv idx='1' u='0.721805' v='0.139831'/>          <uv idx='0' u='0.576489' v='0.0617857'/>        </texmap>
+      </p>
+      <p name="57">
+        <v>23</v>
+        <v>35</v>
+        <v>32</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.630849' v='0.850752'/>          <uv idx='1' u='0.620278' v='-1.10686'/>          <uv idx='0' u='0.759007' v='-2.33795'/>        </texmap>
+      </p>
+      <p name="57">
+        <v>32</v>
+        <v>35</v>
+        <v>23</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.759007' v='-2.33795'/>          <uv idx='1' u='0.620278' v='-1.10686'/>          <uv idx='0' u='0.630849' v='0.850752'/>        </texmap>
+      </p>
+      <p name="58">
+        <v>9</v>
+        <v>33</v>
+        <v>19</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.666191' v='0.0503327'/>          <uv idx='1' u='0.691023' v='-1.17247'/>          <uv idx='0' u='0.585595' v='-1.75625'/>        </texmap>
+      </p>
+      <p name="58">
+        <v>19</v>
+        <v>33</v>
+        <v>9</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.585595' v='-1.75625'/>          <uv idx='1' u='0.691023' v='-1.17247'/>          <uv idx='0' u='0.666191' v='0.0503327'/>        </texmap>
+      </p>
+      <p name="59">
+        <v>34</v>
+        <v>29</v>
+        <v>15</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.576489' v='0.0617857'/>          <uv idx='1' u='0.607907' v='-1.16796'/>          <uv idx='0' u='0.389589' v='-1.44677'/>        </texmap>
+      </p>
+      <p name="59">
+        <v>15</v>
+        <v>29</v>
+        <v>34</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.389589' v='-1.44677'/>          <uv idx='1' u='0.607907' v='-1.16796'/>          <uv idx='0' u='0.576489' v='0.0617857'/>        </texmap>
+      </p>
+      <p name="60">
+        <v>29</v>
+        <v>34</v>
+        <v>6</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.485439' v='0.934978'/>          <uv idx='1' u='0.389589' v='2.55323'/>          <uv idx='0' u='0.607907' v='2.83204'/>        </texmap>
+      </p>
+      <p name="60">
+        <v>6</v>
+        <v>34</v>
+        <v>29</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.607907' v='2.83204'/>          <uv idx='1' u='0.389589' v='2.55323'/>          <uv idx='0' u='0.485439' v='0.934978'/>        </texmap>
+      </p>
+      <p name="61">
+        <v>25</v>
+        <v>5</v>
+        <v>19</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.666191' v='0.0503327'/>          <uv idx='1' u='0.866075' v='0.751066'/>          <uv idx='0' u='0.930748' v='0.197144'/>        </texmap>
+      </p>
+      <p name="61">
+        <v>19</v>
+        <v>5</v>
+        <v>25</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.930748' v='0.197144'/>          <uv idx='1' u='0.866075' v='0.751066'/>          <uv idx='0' u='0.666191' v='0.0503327'/>        </texmap>
+      </p>
+      <p name="62">
+        <v>15</v>
+        <v>0</v>
+        <v>18</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.423825' v='0.771883'/>          <uv idx='1' u='0.721805' v='0.139831'/>          <uv idx='0' u='0.576489' v='0.0617857'/>        </texmap>
+      </p>
+      <p name="62">
+        <v>18</v>
+        <v>0</v>
+        <v>15</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.576489' v='0.0617857'/>          <uv idx='1' u='0.721805' v='0.139831'/>          <uv idx='0' u='0.423825' v='0.771883'/>        </texmap>
+      </p>
+      <p name="63">
+        <v>21</v>
+        <v>2</v>
+        <v>12</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.0231991' v='0.131784'/>          <uv idx='1' u='0.221922' v='-1.20695'/>          <uv idx='0' u='0.0786257' v='-1.27508'/>        </texmap>
+      </p>
+      <p name="63">
+        <v>12</v>
+        <v>2</v>
+        <v>21</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.0786257' v='-1.27508'/>          <uv idx='1' u='0.221922' v='-1.20695'/>          <uv idx='0' u='0.0231991' v='0.131784'/>        </texmap>
+      </p>
+      <p name="64">
+        <v>15</v>
+        <v>10</v>
+        <v>34</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.389589' v='0.553229'/>          <uv idx='1' u='0.267385' v='2.10214'/>          <uv idx='0' u='0.576489' v='2.06179'/>        </texmap>
+      </p>
+      <p name="64">
+        <v>34</v>
+        <v>10</v>
+        <v>15</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.576489' v='2.06179'/>          <uv idx='1' u='0.267385' v='2.10214'/>          <uv idx='0' u='0.389589' v='0.553229'/>        </texmap>
+      </p>
+      <p name="65">
+        <v>35</v>
+        <v>23</v>
+        <v>24</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.655174' v='0.636716'/>          <uv idx='1' u='0.759007' v='0.662046'/>          <uv idx='0' u='0.620278' v='1.89314'/>        </texmap>
+      </p>
+      <p name="65">
+        <v>24</v>
+        <v>23</v>
+        <v>35</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.620278' v='1.89314'/>          <uv idx='1' u='0.759007' v='0.662046'/>          <uv idx='0' u='0.655174' v='0.636716'/>        </texmap>
+      </p>
+      <p name="66">
+        <v>32</v>
+        <v>6</v>
+        <v>23</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.759007' v='0.662046'/>          <uv idx='1' u='0.939229' v='0.934978'/>          <uv idx='0' u='0.630849' v='3.85075'/>        </texmap>
+      </p>
+      <p name="66">
+        <v>23</v>
+        <v>6</v>
+        <v>32</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.630849' v='3.85075'/>          <uv idx='1' u='0.939229' v='0.934978'/>          <uv idx='0' u='0.759007' v='0.662046'/>        </texmap>
+      </p>
+      <p name="67">
+        <v>30</v>
+        <v>32</v>
+        <v>35</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.620278' v='0.893138'/>          <uv idx='1' u='0.630849' v='2.85075'/>          <uv idx='0' u='0.562946' v='2.09613'/>        </texmap>
+      </p>
+      <p name="67">
+        <v>35</v>
+        <v>32</v>
+        <v>30</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.562946' v='2.09613'/>          <uv idx='1' u='0.630849' v='2.85075'/>          <uv idx='0' u='0.620278' v='0.893138'/>        </texmap>
+      </p>
+      <p name="68">
+        <v>37</v>
+        <v>21</v>
+        <v>12</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.156255' v='0.131784'/>          <uv idx='1' u='0.0497637' v='-1.27508'/>          <uv idx='0' u='-0.13345' v='-1.45843'/>        </texmap>
+      </p>
+      <p name="68">
+        <v>12</v>
+        <v>21</v>
+        <v>37</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='-0.13345' v='-1.45843'/>          <uv idx='1' u='0.0497637' v='-1.27508'/>          <uv idx='0' u='0.156255' v='0.131784'/>        </texmap>
+      </p>
+      <p name="69">
+        <v>11</v>
+        <v>16</v>
+        <v>22</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.369287' v='0.648918'/>          <uv idx='1' u='0.339108' v='0.223881'/>          <uv idx='0' u='0.267241' v='0.564534'/>        </texmap>
+      </p>
+      <p name="69">
+        <v>22</v>
+        <v>16</v>
+        <v>11</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.267241' v='0.564534'/>          <uv idx='1' u='0.339108' v='0.223881'/>          <uv idx='0' u='0.369287' v='0.648918'/>        </texmap>
+      </p>
+      <p name="70">
+        <v>3</v>
+        <v>38</v>
+        <v>17</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.977845' v='0.0853577'/>          <uv idx='1' u='1.53995' v='-0.0349987'/>          <uv idx='0' u='1.281' v='0.757637'/>        </texmap>
+      </p>
+      <p name="70">
+        <v>17</v>
+        <v>38</v>
+        <v>3</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='1.281' v='0.757637'/>          <uv idx='1' u='1.53995' v='-0.0349987'/>          <uv idx='0' u='0.977845' v='0.0853577'/>        </texmap>
+      </p>
+      <p name="71">
+        <v>20</v>
+        <v>0</v>
+        <v>29</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.114076' v='0.832041'/>          <uv idx='1' u='0.20702' v='2.13983'/>          <uv idx='0' u='0.0683069' v='1.97471'/>        </texmap>
+      </p>
+      <p name="71">
+        <v>29</v>
+        <v>0</v>
+        <v>20</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.0683069' v='1.97471'/>          <uv idx='1' u='0.20702' v='2.13983'/>          <uv idx='0' u='0.114076' v='0.832041'/>        </texmap>
+      </p>
+      <p name="72">
+        <v>18</v>
+        <v>28</v>
+        <v>32</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.630849' v='0.850752'/>          <uv idx='1' u='0.856893' v='1.06386'/>          <uv idx='0' u='0.850997' v='1.77188'/>        </texmap>
+      </p>
+      <p name="72">
+        <v>32</v>
+        <v>28</v>
+        <v>18</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.850997' v='1.77188'/>          <uv idx='1' u='0.856893' v='1.06386'/>          <uv idx='0' u='0.630849' v='0.850752'/>        </texmap>
+      </p>
+      <p name="73">
+        <v>19</v>
+        <v>8</v>
+        <v>17</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.443781' v='0.0853577'/>          <uv idx='1' u='0.835825' v='0.792573'/>          <uv idx='0' u='0.666191' v='0.0503327'/>        </texmap>
+      </p>
+      <p name="73">
+        <v>17</v>
+        <v>8</v>
+        <v>19</v>
+        <material>parallaxAtt_crystalcrystal.png</material>
+        <texmap>
+          <uv idx='2' u='0.666191' v='0.0503327'/>          <uv idx='1' u='0.835825' v='0.792573'/>          <uv idx='0' u='0.443781' v='0.0853577'/>        </texmap>
+      </p>
+    </params>
+  </meshfact>
+</library>

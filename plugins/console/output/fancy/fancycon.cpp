@@ -49,28 +49,13 @@
 
 CS_IMPLEMENT_PLUGIN
 
-SCF_IMPLEMENT_IBASE(csFancyConsole)
-  SCF_IMPLEMENTS_INTERFACE(iConsoleOutput)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csFancyConsole::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE(iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csFancyConsole::EventHandler)
-  SCF_IMPLEMENTS_INTERFACE(iEventHandler)
-SCF_IMPLEMENT_IBASE_END
-
 SCF_IMPLEMENT_FACTORY(csFancyConsole)
-
-
 
 void csFancyConsole::Report (int severity, const char* msg, ...)
 {
   va_list arg;
   va_start (arg, msg);
-  csRef<iReporter> rep (CS_QUERY_REGISTRY (object_reg, iReporter));
+  csRef<iReporter> rep (csQueryRegistry<iReporter> (object_reg));
   if (rep)
     rep->ReportV (severity, "crystalspace.console.output.fancy", msg, arg);
   else
@@ -82,32 +67,27 @@ void csFancyConsole::Report (int severity, const char* msg, ...)
 }
 
 csFancyConsole::csFancyConsole (iBase *p) :
+  scfImplementationType(this, p),
   object_reg(0), border_computed(false),
   pix_loaded(false), system_ready(false), auto_update(true), visible(true)
 {
-  SCF_CONSTRUCT_IBASE (p);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-  scfiEventHandler = 0;
 }
 
 csFancyConsole::~csFancyConsole ()
 {
-  if (scfiEventHandler)
+  if (weakEventHandler)
   {
-    csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
+    csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (object_reg));
     if (q)
-      q->RemoveListener (scfiEventHandler);
-    scfiEventHandler->DecRef ();
+      CS::RemoveWeakListener (q, weakEventHandler);
   }
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csFancyConsole::Initialize (iObjectRegistry *object_reg)
 {
   csFancyConsole::object_reg = object_reg;
 
-  VFS = CS_QUERY_REGISTRY (object_reg, iVFS);
+  VFS = csQueryRegistry<iVFS> (object_reg);
   if (!VFS)
     return false;
 
@@ -115,12 +95,12 @@ bool csFancyConsole::Initialize (iObjectRegistry *object_reg)
   char const* baseclass = ini->GetStr("FancyConsole.General.Superclass",
     "crystalspace.console.output.standard");
   csRef<iPluginManager> plugin_mgr (
-  	CS_QUERY_REGISTRY (object_reg, iPluginManager));
+  	csQueryRegistry<iPluginManager> (object_reg));
   base = CS_LOAD_PLUGIN (plugin_mgr, baseclass, iConsoleOutput);
   if (!base)
     return false;
 
-  G3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+  G3D = csQueryRegistry<iGraphics3D> (object_reg);
   if (!G3D)
     return false;
   G2D = G3D->GetDriver2D ();
@@ -129,13 +109,11 @@ bool csFancyConsole::Initialize (iObjectRegistry *object_reg)
 
   // Tell event queue that we want to handle broadcast events
   CS_INITIALIZE_SYSTEM_EVENT_SHORTCUTS (object_reg);
-  if (!scfiEventHandler)
-    scfiEventHandler = new EventHandler (this);
-  csRef<iEventQueue> q (CS_QUERY_REGISTRY(object_reg, iEventQueue));
+  csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (object_reg));
   if (q != 0)
   {
     csEventID events[3] = { SystemOpen, SystemClose, CS_EVENTLIST_END };
-    q->RegisterListener (scfiEventHandler, events);
+    CS::RegisterWeakListener (q, this, events, weakEventHandler);
   }
 
   int x, y, w, h;
@@ -152,7 +130,7 @@ bool csFancyConsole::HandleEvent (iEvent &Event)
           system_ready = true;
 	  if (!pix_loaded)
 	  {
-            ImageLoader = CS_QUERY_REGISTRY (object_reg, iImageIO);
+            ImageLoader = csQueryRegistry<iImageIO> (object_reg);
 	    LoadPix ();
 	    pix_loaded = true;
 	  }

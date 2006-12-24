@@ -50,7 +50,7 @@ void csGraphics2DGLX::Report (int severity, const char* msg, ...)
 {
   va_list arg;
   va_start (arg, msg);
-  csRef<iReporter> rep (CS_QUERY_REGISTRY (object_reg, iReporter));
+  csRef<iReporter> rep (csQueryRegistry<iReporter> (object_reg));
   if (rep)
     rep->ReportV (severity, "crystalspace.canvas.glx2d", msg, arg);
   else
@@ -71,8 +71,22 @@ bool csGraphics2DGLX::Initialize (iObjectRegistry *object_reg)
   if (!csGraphics2DGLCommon::Initialize (object_reg))
     return false;
 
+  /* Mesa DRI drivers don't support S3TC compressed textures entirely, only
+   * upload. This behaviour is not conform to the specification for the
+   * texture compression spec, so the ext is not reported by default.
+   * However, it can nevertheless be activated by setting the 
+   * force_s3tc_enable env var to true.
+   * Do that since CS can take advantage of the upload-only support. */
+  bool mesaForceS3TCEnable = 
+    config->GetBool ("Video.OpenGL.MesaForceS3TCEnable", false);
+  if (mesaForceS3TCEnable && !getenv ("force_s3tc_enable"))
+  {
+    //putenv ("force_s3tc_enable=true");
+    setenv ("force_s3tc_enable", "true", 1);
+  }
+
   csRef<iPluginManager> plugin_mgr (
-  	CS_QUERY_REGISTRY (object_reg, iPluginManager));
+  	csQueryRegistry<iPluginManager> (object_reg));
   if ((strDriver = config->GetStr ("Video.OpenGL.Display.Driver", 0)))
   {
     dispdriver = CS_LOAD_PLUGIN (plugin_mgr, strDriver, iOpenGLDisp);
@@ -109,7 +123,7 @@ bool csGraphics2DGLX::Initialize (iObjectRegistry *object_reg)
   pfmt.PixelBytes = 0;
 
   // Create the event outlet
-  csRef<iEventQueue> q (CS_QUERY_REGISTRY(object_reg, iEventQueue));
+  csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (object_reg));
   if (q != 0)
     EventOutlet = q->CreateEventOutlet (this);
 
@@ -140,7 +154,7 @@ bool csGraphics2DGLX::Open()
 
   xwin->SetColormap (cmap);
   xwin->SetVisualInfo (xvis);
-  xwin->SetCanvas ((iGraphics2D *)this);
+  xwin->SetCanvas (static_cast<iGraphics2D*> (this));
   if (!xwin->Open ())
   {
     Report (CS_REPORTER_SEVERITY_ERROR,
@@ -229,7 +243,7 @@ bool csGraphics2DGLX::ChooseVisual ()
 {
   bool do_verbose = false;
   csRef<iVerbosityManager> verbosemgr (
-    CS_QUERY_REGISTRY (object_reg, iVerbosityManager));
+    csQueryRegistry<iVerbosityManager> (object_reg));
   if (verbosemgr) 
     do_verbose = verbosemgr->Enabled ("renderer.x.visual");
     

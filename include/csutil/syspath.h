@@ -101,12 +101,12 @@ public:
   /// Copy constructor.
   csPathsList (csPathsList const& o) : paths(o.paths) {}
   /// Construct from a list of paths separated by CS_PATH_DELIMITER.
-  csPathsList (const char* pathList);
+  csPathsList (const char* pathList, bool expand = false);
   /**
    * Construct from a list of single paths. The list must be terminated by a
    * 0 entry.
    */
-  csPathsList (const char* const pathList[]);
+  csPathsList (const char* const pathList[], bool expand = false);
   /// Destructor.
   ~csPathsList() {}
   /// Assignment operator.
@@ -175,11 +175,18 @@ public:
   void DeleteIndex (size_t index)
   { paths.DeleteIndex (index); }
   
+  //@{
   /// Return number of contained paths.
   size_t Length () const { return paths.Length(); }
-  CS_DEPRECATED_METHOD size_t GetCount () const { return Length(); }
+  size_t GetSize () const { return paths.Length(); }
+  //@}
+  CS_DEPRECATED_METHOD_MSG("Use Length() instead") 
+  size_t GetCount () const { return Length(); }
+  //@{
   /// Retrieve the n'th path record.
   Entry const& operator [] (size_t n) const { return paths[n]; }
+  Entry& operator [] (size_t n) { return paths[n]; }
+  //@}
   
   //@{
   /**

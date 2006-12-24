@@ -60,13 +60,13 @@ csShaderGLCGCommon::~csShaderGLCGCommon ()
 
 void csShaderGLCGCommon::Activate()
 {
-  cgGLEnableProfile (cgGetProgramProfile (program));
+  cgGLEnableProfile (programProfile);
   cgGLBindProgram (program);
 }
 
 void csShaderGLCGCommon::Deactivate()
 {
-  cgGLDisableProfile (cgGetProgramProfile (program));
+  cgGLDisableProfile (programProfile);
 }
 
 void csShaderGLCGCommon::SetupState (const csRenderMesh* /*mesh*/,
@@ -334,7 +334,7 @@ void csShaderGLCGCommon::ResetState()
 }
 
 bool csShaderGLCGCommon::DefaultLoadProgram (const char* programStr, 
-  CGGLenum type, bool compiled, bool doLoad)
+  CGGLenum type, CGprofile maxProfile, bool compiled, bool doLoad)
 {
   if (!programStr || !*programStr) return false;
 
@@ -347,6 +347,9 @@ bool csShaderGLCGCommon::DefaultLoadProgram (const char* programStr,
 
   if(profile == CG_PROFILE_UNKNOWN)
     profile = cgGLGetLatestProfile (type);
+
+  if (maxProfile != CG_PROFILE_UNKNOWN)
+    profile = csMin (profile, maxProfile);
 
   if (shaderPlug->doVerbose)
   {
@@ -367,13 +370,16 @@ bool csShaderGLCGCommon::DefaultLoadProgram (const char* programStr,
 
   if (!program)
     return false;
+  programProfile = cgGetProgramProfile (program);
 
   if (shaderPlug->debugDump)
     DoDebugDump();
 
   if (doLoad)
   {
+    cgGetError(); // Clear error
     cgGLLoadProgram (program);
+    if (cgGetError() != CG_NO_ERROR) return false;
     if (!cgGLIsProgramLoaded (program)) return false;
   }
 
@@ -458,7 +464,7 @@ void csShaderGLCGCommon::DoDebugDump ()
   output << cgGetProgramString (program, CG_COMPILED_PROGRAM);
   output << "\n";
 
-  csRef<iVFS> vfs = CS_QUERY_REGISTRY (objectReg, iVFS);
+  csRef<iVFS> vfs = csQueryRegistry<iVFS> (objectReg);
   if (debugFN.IsEmpty())
   {
     static int programCounter = 0;
@@ -490,7 +496,7 @@ void csShaderGLCGCommon::WriteAdditionalDumpInfo (const char* description,
 {
   if (!shaderPlug->debugDump || !debugFN) return;
 
-  csRef<iVFS> vfs = CS_QUERY_REGISTRY (objectReg, iVFS);
+  csRef<iVFS> vfs = csQueryRegistry<iVFS> (objectReg);
   csRef<iDataBuffer> oldDump = vfs->ReadFile (debugFN, true);
 
   csString output ((char*)oldDump->GetData());
@@ -511,8 +517,8 @@ bool csShaderGLCGCommon::Load (iShaderDestinationResolver*,
   if(!program)
     return false;
 
-  csRef<iShaderManager> shadermgr = CS_QUERY_REGISTRY(
-  	shaderPlug->object_reg, iShaderManager);
+  csRef<iShaderManager> shadermgr = 
+  	csQueryRegistry<iShaderManager> (shaderPlug->object_reg);
 
   csRef<iDocumentNode> variablesnode = program->GetNode (programType);
   if(variablesnode)

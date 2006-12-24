@@ -64,11 +64,7 @@ void csShadowMap::CalcMaxShadow (long lmsize)
 
 //---------------------------------------------------------------------------
 
-// Hack: Work around problems caused by #defining 'new'.
-#if defined(CS_EXTENSIVE_MEMDEBUG) || defined(CS_MEMORY_TRACKER)
-# undef new
-#endif
-#include <new>
+#include "csutil/custom_new_disable.h"
 
 class ParasiticDataBufferBlockAllocated : public csParasiticDataBufferBase
 {
@@ -98,12 +94,10 @@ public:
   }
 };
 
+#include "csutil/custom_new_enable.h"
+
 CS_IMPLEMENT_STATIC_CLASSVAR_REF(ParasiticDataBufferBlockAllocated, bufAlloc, 
   BufAlloc, ParasiticDataBufferBlockAllocated::Allocator, (1024));
-
-#if defined(CS_EXTENSIVE_MEMDEBUG) || defined(CS_MEMORY_TRACKER)
-# define new CS_EXTENSIVE_MEMDEBUG_NEW
-#endif
 
 //---------------------------------------------------------------------------
 int csLightMap::lightcell_size = 16;
@@ -181,6 +175,17 @@ csShadowMap *csLightMap::FindShadowMap (iLight *light)
   return 0;
 }
 
+csShadowMap *csLightMap::GetShadowMap (size_t n)
+{
+  csShadowMap *smap = first_smap;
+  while (smap && (n-- > 0))
+  {
+    smap = smap->next;
+  }
+
+  return smap;
+}
+
 void csLightMap::SetSize (int w, int h)
 {
   lwidth = csLightMap::CalcLightMapWidth (w);
@@ -249,7 +254,7 @@ const char* csLightMap::ReadFromCache (
   csThing* parent = poly->GetParent ();
 
   SetSize (w, h);
-  long lm_size = lwidth * lheight;
+  size_t lm_size = lwidth * lheight;
 
   strcpy (pswanted.header, LMMAGIC);
   if (poly)

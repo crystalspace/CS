@@ -218,11 +218,11 @@ void csPortalRenderNode::Postprocess (iRenderView* rview)
     varContext.GetVariableAdd (factory->fogplane_name)->SetValue (fogPlane);
 
     //iSector *sector = rview->GetThisSector();
-    csFog* fog = sector->GetFog();
+  // @@@ FIXME: not needed any more since the sector is an SV context now
+    const csFog& fog = sector->GetFog();
     varContext.GetVariableAdd (factory->fogdensity_name)->SetValue (
-      fog->density);
-    varContext.GetVariableAdd (factory->fogcolor_name)->SetValue (
-      csVector3 (fog->red, fog->green, fog->blue));
+      fog.density);
+    varContext.GetVariableAdd (factory->fogcolor_name)->SetValue (fog.color);
 
 
     mesh.dynDomain = &varContext;
@@ -265,11 +265,11 @@ void csPortalRenderNode::PostMeshCollect (iRenderView* rview)
 csPortalRenderNodeFactory::csPortalRenderNodeFactory (
   iObjectRegistry* object_reg)
 {
-  shaderManager = CS_QUERY_REGISTRY (object_reg, iShaderManager);
+  shaderManager = csQueryRegistry<iShaderManager> (object_reg);
   fog_shader = shaderManager->GetShader ("std_lighting_portal");
 
-  csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg,
-    "crystalspace.shared.stringset", iStringSet);
+  csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet>
+    (object_reg, "crystalspace.shared.stringset");
   fogplane_name = strings->Request ("fogplane");
   fogdensity_name = strings->Request ("fog density");
   fogcolor_name = strings->Request ("fog color");

@@ -180,7 +180,7 @@ void csGraphics2DOpenGL::Report (int severity, const char* msg, ...)
 {
   va_list arg;
   va_start (arg, msg);
-  csRef<iReporter> rep (CS_QUERY_REGISTRY (object_reg, iReporter));
+  csRef<iReporter> rep (csQueryRegistry<iReporter> (object_reg));
   if (rep)
     rep->ReportV (severity, "crystalspace.canvas.openglwin", msg, arg);
   else
@@ -196,7 +196,7 @@ bool csGraphics2DOpenGL::Initialize (iObjectRegistry *object_reg)
   if (!csGraphics2DGLCommon::Initialize (object_reg))
     return false;
 
-  m_piWin32Assistant = CS_QUERY_REGISTRY (object_reg, iWin32Assistant);
+  m_piWin32Assistant = csQueryRegistry<iWin32Assistant> (object_reg);
   if (!m_piWin32Assistant)
     SystemFatalError (L"csGraphics2DOpenGL::Open(QI) -- system passed does not support iWin32Assistant.");
 
@@ -211,12 +211,12 @@ bool csGraphics2DOpenGL::Initialize (iObjectRegistry *object_reg)
   }
 
   // Create the event outlet
-  csRef<iEventQueue> q (CS_QUERY_REGISTRY(object_reg, iEventQueue));
+  csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (object_reg));
   if (q != 0)
     EventOutlet = q->CreateEventOutlet (this);
 
   csRef<iCommandLineParser> cmdline (
-  	CS_QUERY_REGISTRY (object_reg, iCommandLineParser));
+  	csQueryRegistry<iCommandLineParser> (object_reg));
   m_bHardwareCursor = config->GetBool ("Video.SystemMouseCursor", true);
   if (cmdline->GetOption ("sysmouse")) m_bHardwareCursor = true;
   if (cmdline->GetOption ("nosysmouse")) m_bHardwareCursor = false;
@@ -430,7 +430,7 @@ bool csGraphics2DOpenGL::Open ()
   if (is_open) return true;
 
   csRef<iVerbosityManager> verbosemgr (
-    CS_QUERY_REGISTRY (object_reg, iVerbosityManager));
+    csQueryRegistry<iVerbosityManager> (object_reg));
   if (verbosemgr) 
     detector.SetVerbose (verbosemgr->Enabled ("renderer.windows.gldriver"));
   
@@ -711,8 +711,8 @@ void csGraphics2DOpenGL::SetRGB (int i, int r, int g, int b)
 bool csGraphics2DOpenGL::SetMouseCursor (csMouseCursorID iShape)
 {
   csRef<iWin32Assistant> winhelper (
-  	CS_QUERY_REGISTRY (object_reg, iWin32Assistant));
-  CS_ASSERT (winhelper != 0);
+  	csQueryRegistry<iWin32Assistant> (object_reg));
+  if (winhelper == 0) return false;
   bool rc;
   if (!m_bHardwareCursor)
   {

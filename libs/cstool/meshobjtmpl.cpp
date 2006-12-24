@@ -44,7 +44,7 @@ void csMeshObject::WantToDie ()
   // @@@ Ugly!
   if (Engine)
   {
-    csRef<iMeshWrapper> m = SCF_QUERY_INTERFACE (LogParent, iMeshWrapper);
+    csRef<iMeshWrapper> m = scfQueryInterface<iMeshWrapper> (LogParent);
     if (m) Engine->WantToDie (m);
   }
 }
@@ -120,6 +120,11 @@ void csMeshObject::GetObjectBoundingBox (csBox3& bbox)
   bbox = boundingbox;
 }
 
+const csBox3& csMeshObject::GetObjectBoundingBox ()
+{
+  return boundingbox;
+}
+
 void csMeshObject::SetObjectBoundingBox (const csBox3& bbox)
 {
   boundingbox = bbox;
@@ -127,8 +132,7 @@ void csMeshObject::SetObjectBoundingBox (const csBox3& bbox)
 
 void csMeshObject::GetRadius (float& radius, csVector3& center)
 {
-  csBox3 b;
-  GetObjectBoundingBox (b);
+  csBox3 b (GetObjectBoundingBox ());
   radius = csQsqrt (csSquaredDist::PointPoint (b.Max (), b.Min ())) * 0.5f;
   center = b.GetCenter ();
 }
@@ -185,7 +189,7 @@ csMeshType::~csMeshType ()
 
 bool csMeshType::Initialize (iObjectRegistry* reg)
 {
-  csRef<iEngine> e = CS_QUERY_REGISTRY (reg, iEngine);
+  csRef<iEngine> e = csQueryRegistry<iEngine> (reg);
   Engine = e;
   object_reg = reg;
   return true;

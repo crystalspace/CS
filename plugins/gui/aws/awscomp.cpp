@@ -293,13 +293,13 @@ bool awsComponent::Setup (iAws *_wmgr, iAwsComponentNode *settings)
       if (strcmp ("GridBag", ln->GetData ()) == 0)
       {
         awsGridBagLayout* temp = new awsGridBagLayout (self, settings, pm);
-        layout = SCF_QUERY_INTERFACE (temp, iAwsLayoutManager);
+        layout = scfQueryInterface<iAwsLayoutManager> (temp);
         temp->DecRef ();
       }
       else if (strcmp ("Border", ln->GetData ()) == 0)
       {
         awsBorderLayout* temp = new awsBorderLayout (self, settings, pm);
-        layout = SCF_QUERY_INTERFACE (temp, iAwsLayoutManager);
+        layout = scfQueryInterface<iAwsLayoutManager> (temp);
         temp->DecRef ();
       }
     }
@@ -537,7 +537,7 @@ bool awsComponent::HandleEvent (iEvent &Event)
 #undef UNSAVE_COMP
 }
 
-bool awsComponent::Overlaps (csRect &r)
+bool awsComponent::Overlaps (const csRect &r)
 {
   return self->Frame().Intersects (r);
 }

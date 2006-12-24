@@ -141,6 +141,9 @@ struct csFlareComponent
   float width, height;
   /// visual image of component
   iMaterialWrapper *image;
+
+  csVector4 color;
+
   /// mixmode for drawing
   uint mixmode;
   /// next component to draw
@@ -159,6 +162,9 @@ private:
   csFlareComponent *components;
   /// Last flare component to make adding efficient.
   csFlareComponent *last;
+  uint cmp_cnt;
+
+
 public:
   /// Create an (empty) flare
   csFlareHalo();
@@ -179,9 +185,12 @@ public:
   * Add a visual component to the flare.
   * give position, size, image and mixmode.
   * The component is added at the end of the list - to be displayed last.
+  * Returns last component id.
   */
-  void AddComponent(float pos, float w, float h, uint mode,
+  uint AddComponent(float pos, float w, float h, uint mode,
     iMaterialWrapper *image);
+
+  void SetComponentColor (uint component, const csVector4& color);
 };
 
 /**

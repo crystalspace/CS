@@ -24,21 +24,10 @@
  * Emitter particle mesh object
  */ 
 
-#include "csutil/scf.h"
+#include "csutil/scf_interface.h"
 
 class csColor;
 class csVector3;
-
-SCF_VERSION (iEmitGen3D, 0, 0, 1);
-SCF_VERSION (iEmitFixed, 0, 0, 1);
-SCF_VERSION (iEmitSphere, 0, 0, 1);
-SCF_VERSION (iEmitBox, 0, 0, 1);
-SCF_VERSION (iEmitCone, 0, 0, 1);
-SCF_VERSION (iEmitCylinder, 0, 0, 1);
-SCF_VERSION (iEmitMix, 0, 0, 1);
-SCF_VERSION (iEmitLine, 0, 0, 1);
-SCF_VERSION (iEmitSphereTangent, 0, 0, 1);
-SCF_VERSION (iEmitCylinderTangent, 0, 0, 1);
 
 /**
  * This interface is for objects that can generate 3d vectors, which
@@ -47,8 +36,10 @@ SCF_VERSION (iEmitCylinderTangent, 0, 0, 1);
  * Main users of this interface:
  * - iEmitState
  */
-struct iEmitGen3D : public iBase
+struct iEmitGen3D : public virtual iBase
 {
+  SCF_INTERFACE(iEmitGen3D, 2, 0, 0);
+
   /// get the 3d value, posibly using a given value.
   virtual void GetValue(csVector3& value, csVector3 &given) = 0;
 };
@@ -64,6 +55,8 @@ struct iEmitGen3D : public iBase
  */
 struct iEmitFixed : public iEmitGen3D
 {
+  SCF_INTERFACE(iEmitFixed, 2, 0, 0);
+
   /// set the fixed value
   virtual void SetValue(const csVector3& value) = 0;
 };
@@ -79,6 +72,8 @@ struct iEmitFixed : public iEmitGen3D
  */
 struct iEmitSphere : public iEmitGen3D
 {
+  SCF_INTERFACE(iEmitSphere, 2, 0, 0);
+
   /// set content, center and min, max radius
   virtual void SetContent(const csVector3& center, float min, float max) = 0;
   /// get content
@@ -96,6 +91,8 @@ struct iEmitSphere : public iEmitGen3D
  */
 struct iEmitBox : public iEmitGen3D
 {
+  SCF_INTERFACE(iEmitBox, 2, 0, 0);
+
   /// set content, min and max vector values
   virtual void SetContent(const csVector3& min, const csVector3& max) = 0;
   /// get content
@@ -113,6 +110,8 @@ struct iEmitBox : public iEmitGen3D
  */
 struct iEmitCone : public iEmitGen3D
 {
+  SCF_INTERFACE(iEmitCone, 2, 0, 0);
+
   /**
    * Set content, origin, elevation, azimuth, aperture(opening),
    * and distance min, distance max from the origin of the cone.
@@ -135,6 +134,8 @@ struct iEmitCone : public iEmitGen3D
  */
 struct iEmitMix : public iEmitGen3D
 {
+  SCF_INTERFACE(iEmitMix, 2, 0, 0);
+
   /// add a weighted emitter to the mix
   virtual void AddEmitter(float weight, iEmitGen3D* emit) = 0;
   /**
@@ -168,6 +169,8 @@ struct iEmitMix : public iEmitGen3D
  */
 struct iEmitLine : public iEmitGen3D
 {
+  SCF_INTERFACE(iEmitLine, 2, 0, 0);
+
   /// set content, start and end vector values
   virtual void SetContent(const csVector3& start, const csVector3& end) = 0;
   /// get content
@@ -185,6 +188,8 @@ struct iEmitLine : public iEmitGen3D
  */
 struct iEmitCylinder : public iEmitGen3D
 {
+  SCF_INTERFACE(iEmitCylinder, 2, 0, 0);
+
   /// set content, start and end position of cylinder, min/max distance
   virtual void SetContent(const csVector3& start, const csVector3& end,
     float min, float max) = 0;
@@ -205,6 +210,8 @@ struct iEmitCylinder : public iEmitGen3D
  */
 struct iEmitSphereTangent : public iEmitGen3D
 {
+  SCF_INTERFACE(iEmitSphereTangent, 2, 0, 0);
+
   /// set content, center of sphere, min/max size
   virtual void SetContent(const csVector3& center, float min, float max) = 0;
   /// get content
@@ -223,6 +230,8 @@ struct iEmitSphereTangent : public iEmitGen3D
  */
 struct iEmitCylinderTangent : public iEmitGen3D
 {
+  SCF_INTERFACE(iEmitCylinderTangent, 2, 0, 0);
+
   /// set content, start,end of cylinder, min/max size
   virtual void SetContent(const csVector3& start, const csVector3& end,
     float min, float max) = 0;
@@ -230,8 +239,6 @@ struct iEmitCylinderTangent : public iEmitGen3D
   virtual void GetContent(csVector3& start, csVector3& end,
     float& min, float& max) = 0;
 };
-
-SCF_VERSION (iEmitFactoryState, 0, 0, 2);
 
 /**
  * This interface describes the API for the emitter mesh factory object.
@@ -246,8 +253,10 @@ SCF_VERSION (iEmitFactoryState, 0, 0, 2);
  * Main users of this interface:
  * - Emit Factory Loader plugin (crystalspace.mesh.loader.factory.emit)
  */
-struct iEmitFactoryState : public iBase
+struct iEmitFactoryState : public virtual iBase
 {
+  SCF_INTERFACE(iEmitFactoryState, 2, 0, 0);
+
   /// create an emitter, you have to set the content
   virtual csRef<iEmitFixed> CreateFixed() = 0;
   /// create an emitter
@@ -268,8 +277,6 @@ struct iEmitFactoryState : public iBase
   virtual csRef<iEmitCylinderTangent> CreateCylinderTangent() = 0;
 };
 
-SCF_VERSION (iEmitState, 0, 0, 1);
-
 /**
  * This interface describes the API for the emitter mesh object.
  * 
@@ -283,12 +290,14 @@ SCF_VERSION (iEmitState, 0, 0, 1);
  * Main users of this interface:
  * - Emit Loader plugin (crystalspace.mesh.loader.emit)
  */
-struct iEmitState : public iBase
+struct iEmitState : public virtual iBase
 {
+  SCF_INTERFACE(iEmitState, 2, 0, 0);
+
   /// Set the number of particles to use.
   virtual void SetParticleCount (int num) = 0;
   /// Get the number of particles used.
-  virtual int GetParticleCount () const = 0;
+  virtual size_t GetParticleCount () const = 0;
   /// Enable or disable lighting.
   virtual void SetLighting (bool l) = 0;
   /// See if lighting is enabled.

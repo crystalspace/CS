@@ -18,9 +18,11 @@
 
 #include "ceguitest.h"
 
-#include "CEGUI.h"
-#include "CEGUIWindowManager.h" 
-#include "CEGUILogger.h"
+#include "csutil/custom_new_disable.h"
+#include <CEGUI.h>
+#include <CEGUIWindowManager.h>
+#include <CEGUILogger.h>
+#include "csutil/custom_new_enable.h"
 
 
 CS_IMPLEMENT_APPLICATION
@@ -138,25 +140,25 @@ bool CEGUITest::Application()
   if (!OpenApplication(GetObjectRegistry()))
     return ReportError("Error opening system!");
 
-  vfs = CS_QUERY_REGISTRY(GetObjectRegistry(), iVFS);
+  vfs = csQueryRegistry<iVFS> (GetObjectRegistry());
   if (!vfs) return ReportError("Failed to locate VFS!");
 
-  g3d = CS_QUERY_REGISTRY(GetObjectRegistry(), iGraphics3D);
+  g3d = csQueryRegistry<iGraphics3D> (GetObjectRegistry());
   if (!g3d) return ReportError("Failed to locate 3D renderer!");
 
-  engine = CS_QUERY_REGISTRY(GetObjectRegistry(), iEngine);
+  engine = csQueryRegistry<iEngine> (GetObjectRegistry());
   if (!engine) return ReportError("Failed to locate 3D engine!");
 
-  vc = CS_QUERY_REGISTRY(GetObjectRegistry(), iVirtualClock);
+  vc = csQueryRegistry<iVirtualClock> (GetObjectRegistry());
   if (!vc) return ReportError("Failed to locate Virtual Clock!");
 
-  kbd = CS_QUERY_REGISTRY(GetObjectRegistry(), iKeyboardDriver);
+  kbd = csQueryRegistry<iKeyboardDriver> (GetObjectRegistry());
   if (!kbd) return ReportError("Failed to locate Keyboard Driver!");
 
-  loader = CS_QUERY_REGISTRY(GetObjectRegistry(), iLoader);
+  loader = csQueryRegistry<iLoader> (GetObjectRegistry());
   if (!loader) return ReportError("Failed to locate Loader!");
 
-  cegui = CS_QUERY_REGISTRY(GetObjectRegistry(), iCEGUI);
+  cegui = csQueryRegistry<iCEGUI> (GetObjectRegistry());
   if (!cegui) return ReportError("Failed to locate CEGUI plugin");
 
   // Initialize CEGUI wrapper
@@ -165,14 +167,29 @@ bool CEGUITest::Application()
   // Set the logging level
   cegui->GetLoggerPtr ()->setLoggingLevel(CEGUI::Informative);
 
+#if (CEGUI_VERSION_MAJOR == 0) && (CEGUI_VERSION_MINOR >= 5)
+  // Use the 0.5 version of the skin
+  vfs->ChDir ("/ceguitest/0.5/");
+#else
+  // Use the old version of the skin
   vfs->ChDir ("/ceguitest/");
+#endif
 
   // Load the ice skin (which uses Falagard skinning system)
   cegui->GetSchemeManagerPtr ()->loadScheme("ice.scheme");
 
   cegui->GetSystemPtr ()->setDefaultMouseCursor("ice", "MouseArrow");
-  cegui->GetFontManagerPtr ()->createFont("Vera", "/fonts/ttf/Vera.ttf", 10, 
+
+#if (CEGUI_VERSION_MAJOR == 0) && (CEGUI_VERSION_MINOR >= 5)
+  CEGUI::Font* font = cegui->GetFontManagerPtr ()->createFont("FreeType",
+    "Vera", "/fonts/ttf/Vera.ttf");
+  font->setProperty("PointSize", "10");
+  font->load();
+#else
+  cegui->GetFontManagerPtr ()->createFont("Vera", "/fonts/ttf/Vera.ttf", 10,
     CEGUI::Default);
+#endif
+
   CEGUI::WindowManager* winMgr = cegui->GetWindowManagerPtr ();
 
   // Load layout and set as root
@@ -203,10 +220,10 @@ bool CEGUITest::Application()
   return true;
 }
 
-bool CEGUITest::OnExitButtonClicked (const CEGUI::EventArgs& e)
+bool CEGUITest::OnExitButtonClicked (const CEGUI::EventArgs&)
 {
   csRef<iEventQueue> q =
-    CS_QUERY_REGISTRY(GetObjectRegistry(), iEventQueue);
+    csQueryRegistry<iEventQueue> (GetObjectRegistry());
   if (q.IsValid()) q->GetEventOutlet()->Broadcast(csevQuit(GetObjectRegistry()));
   return true;
 }
@@ -220,7 +237,7 @@ bool CEGUITest::OnKeyboard(iEvent& ev)
     if (code == CSKEY_ESC)
     {
       csRef<iEventQueue> q =
-        CS_QUERY_REGISTRY(GetObjectRegistry(), iEventQueue);
+        csQueryRegistry<iEventQueue> (GetObjectRegistry());
       if (q.IsValid()) q->GetEventOutlet()->Broadcast(csevQuit(GetObjectRegistry()));
     }
   }

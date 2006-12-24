@@ -287,7 +287,7 @@ void scriptManager::Initialize (iObjectRegistry *obj_reg)
   }
 
   // Get the VFS object.
-  vfs = CS_QUERY_REGISTRY (obj_reg, iVFS);
+  vfs = csQueryRegistry<iVFS> (obj_reg);
 
   ScriptCon ()->Message ("AWS2 automation initialized.");
 

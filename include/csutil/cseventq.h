@@ -35,8 +35,9 @@
 #include "csutil/array.h"
 #include "csutil/hash.h"
 #include "csutil/ref.h"
+#include "csutil/refarr.h"
 #include "csutil/scf_implementation.h"
-#include "csutil/thread.h"
+#include "csutil/threading/mutex.h"
 #include "csutil/weakref.h"
 #include "csutil/eventhandlers.h"
 #include "iutil/eventh.h"
@@ -55,7 +56,7 @@ class csPoolEvent;
  */
 #define DEF_EVENT_QUEUE_LENGTH  256
 
-CS_SPECIALIZE_TEMPLATE
+template<>
 class csHashComputer<iEventHandler *> : public csHashComputerIntegral<iEventHandler *> {};
 
 /**
@@ -85,7 +86,7 @@ private:
   // The maximum queue length
   volatile size_t Length;
   // Protection against multiple threads accessing same event queue
-  csRef<csMutex> Mutex;
+  CS::Threading::Mutex Mutex;
   // Event tree.  All subscription PO graphs and delivery queues hang off
   // of this.
   csEventTree *EventTree;
@@ -97,13 +98,15 @@ private:
   csHash<csEventCord *, csEventID> EventCords;
   // Pool of event objects
   csPoolEvent* EventPool;
+  /// Registered event handler (used for proper cleanup in RemoveAllListeners())
+  csRefArray<iEventHandler> handlers;
 
   // Enlarge the queue size.
   void Resize (size_t iLength);
   // Lock the queue for modifications: NESTED CALLS TO LOCK/UNLOCK NOT ALLOWED!
-  inline void Lock () { Mutex->LockWait(); }
+  inline void Lock () { Mutex.Lock(); }
   // Unlock the queue
-  inline void Unlock () { Mutex->Release(); }
+  inline void Unlock () { Mutex.Unlock (); }
   // Send broadcast pseudo-events (bypassing event queue).
   void Notify (const csEventID &name);
 

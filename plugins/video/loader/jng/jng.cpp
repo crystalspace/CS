@@ -72,7 +72,7 @@ void Report (iObjectRegistry *object_reg, int severity, const char* msg, ...)
 {
   va_list arg;
   va_start (arg, msg);
-  csRef<iReporter> rep = CS_QUERY_REGISTRY (object_reg, iReporter);
+  csRef<iReporter> rep = csQueryRegistry<iReporter> (object_reg);
   if (rep)
     rep->ReportV (severity, "crystalspace.graphic.image.io.jng", 
       msg, arg);
@@ -222,7 +222,7 @@ struct jpg_datastore{
   size_t len;
 
   jpg_datastore () { data = 0; len = 0; }
-  ~jpg_datastore () { free (data); }
+  ~jpg_datastore () { cs_free (data); }
 };
 
 
@@ -250,7 +250,7 @@ static jpeg_boolean empty_output_buffer (j_compress_ptr cinfo)
 {
   my_dst_mgr *dest = (my_dst_mgr*)cinfo->dest;
 
-  dest->ds->data = (unsigned char*)realloc (dest->ds->data,
+  dest->ds->data = (unsigned char*)cs_realloc (dest->ds->data,
     dest->ds->len + sizeof(JOCTET) * my_dst_mgr::buf_len);
   if (!dest->ds->data)
     ERREXITS(cinfo,JERR_OUT_OF_MEMORY, "Could not reallocate enough memory");
@@ -269,7 +269,7 @@ static void term_destination (j_compress_ptr cinfo)
 
   if (len > 0)
   {
-    dest->ds->data = (unsigned char*)realloc (dest->ds->data,
+    dest->ds->data = (unsigned char*)cs_realloc (dest->ds->data,
       dest->ds->len + sizeof(JOCTET) * len);
     if (!dest->ds->data)
       ERREXITS(cinfo,JERR_OUT_OF_MEMORY, "Could not reallocate enough memory");
@@ -773,7 +773,7 @@ ImageJngFile::ImageJngFile (int iFormat, iObjectRegistry* p) :
   scfImplementationType (this, iFormat)
 { 
   object_reg = p; 
-  vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
+  vc = csQueryRegistry<iVirtualClock> (object_reg);
 
   NewImage = 0;
   dirtyrect = 0;

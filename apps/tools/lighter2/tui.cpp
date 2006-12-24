@@ -21,6 +21,7 @@
 #include "common.h"
 #include "config.h"
 #include "statistics.h"
+#include "lighter.h"
 #include "tui.h"
 
 
@@ -29,13 +30,25 @@ namespace lighter
   TUI globalTUI;
 
   TUI::TUI ()
-    : scfImplementationType (this), messageBufferEnd (0)
+    : scfImplementationType (this), messageBufferEnd (0),
+    simpleMode (false), prevWasReporter (false), 
+    kdLastNumNudes (0), lastTaskProgress (0.0f)
   {
   }
 
-  void TUI::Redraw (int drawFlags) const
+  void TUI::Initialize ()
+  {
+    simpleMode = globalLighter->configMgr->GetBool ("lighter2.simpletui", false);
+  }
+
+  void TUI::Redraw (int drawFlags)
   {
     // Redraw the "static" background
+    if (simpleMode)
+    {
+      DrawSimple ();
+      return;
+    }
 
     // Clear
     if (drawFlags & TUI_DRAW_CLEAR)
@@ -61,33 +74,50 @@ namespace lighter
     // Draw global settings
     if (drawFlags & TUI_DRAW_SETTINGS)
       DrawSettings ();
+
+    // Draw global stats
+    if (drawFlags & TUI_DRAW_STATS)
+      DrawStats ();
   }
 
   static const char* TUI_SEVERITY_TEXT[] = 
   {
-    CS_ANSI_FW "BUG" CS_ANSI_RST,
-    CS_ANSI_FR "ERR" CS_ANSI_RST,
-    CS_ANSI_FY "WAR" CS_ANSI_RST,
-    CS_ANSI_FW "NOT" CS_ANSI_RST,
-    CS_ANSI_FW "DEB" CS_ANSI_RST
+    CS_ANSI_FK CS_ANSI_BW "B" CS_ANSI_RST " ",
+    CS_ANSI_FW CS_ANSI_BR "X" CS_ANSI_RST " ",
+    CS_ANSI_FK CS_ANSI_BY "!" CS_ANSI_RST " ",
+    CS_ANSI_FW CS_ANSI_BB "i" CS_ANSI_RST " ",
+    CS_ANSI_FW CS_ANSI_BW "D" CS_ANSI_RST " "
   };
 
   bool TUI::Report (iReporter* reporter, int severity, const char* msgId,
     const char* description)
   {
-    csString& buf = messageBuffer[messageBufferEnd];
-    buf.Clear ();
+    csStringArray descrSplit;
+    descrSplit.SplitString (description, "\n");
 
-    buf.Append (TUI_SEVERITY_TEXT[severity]);
-    buf.Append (" - ");
-    csString tmp(description);
-    buf.Append (tmp.Slice (0,69).PadRight (69));
+    for (size_t i = descrSplit.GetSize(); i-- > 0;)
+    {
+      csString& buf = messageBuffer[messageBufferEnd];
+      buf.Clear ();
 
-    messageBufferEnd++;
-    if(messageBufferEnd > 3) messageBufferEnd = 0;
+      buf.Append (TUI_SEVERITY_TEXT[severity]);
+      csString tmp(descrSplit[i]);
+      buf.Append (tmp.Slice (0,69).PadRight (69));
+
+      if (simpleMode)
+      {
+        if (!prevWasReporter)
+          csPrintf ("\n");
+        csPrintf ("%s\n", buf.GetDataSafe ());
+        prevWasReporter = true;
+      }
+
+      messageBufferEnd++;
+      if(messageBufferEnd > 3) messageBufferEnd = 0;
+    }
 
     // Print them
-    DrawMessage ();
+    Redraw (TUI::TUI_DRAW_MESSAGES);
 
     return true;
   }
@@ -107,11 +137,11 @@ namespace lighter
     csPrintf ("|          | [ ] AO     |                                                     |\n");
     csPrintf ("| Rays/s:  | PLM:       | Lightmaps:                                          |\n");
     csPrintf ("|          |            |                                                     |\n");
-    csPrintf ("|          | ALM:       |                                                     |\n");
-    csPrintf ("|          |            |                                                     |\n");
-    csPrintf ("|          | Tu/u:      |                                                     |\n");
-    csPrintf ("|          |            |                                                     |\n");
-    csPrintf ("|          | Tv/u:      |                                                     |\n");
+    csPrintf ("|          | ALM:       | KD-stats                                            |\n");
+    csPrintf ("|          |            | N:                                                  |\n");
+    csPrintf ("|          | Tu/u:      | D:                                                  |\n");
+    csPrintf ("|          |            | P:                                                  |\n");
+    csPrintf ("|          | Tv/v:      |                                                     |\n");
     csPrintf ("|          |            |                                                     |\n");
     csPrintf ("|- CS Messages ---------------------------------------------------------------|\n");
     csPrintf ("|                                                                             |\n");
@@ -122,10 +152,19 @@ namespace lighter
     csPrintf (CS_ANSI_CURSOR(0,0));
   }
 
+  void TUI::DrawStats () const
+  {
+    csPrintf (CS_ANSI_CURSOR(29,14) "% 8d / % 8d", globalStats.kdtree.numNodes, globalStats.kdtree.leafNodes);
+    csPrintf (CS_ANSI_CURSOR(29,15) "% 8d / % 8.03f", globalStats.kdtree.maxDepth, 
+      (float)globalStats.kdtree.sumDepth / (float)globalStats.kdtree.leafNodes);
+    csPrintf (CS_ANSI_CURSOR(29,16) "% 8d / % 8.03f", globalStats.kdtree.numPrimitives, 
+      (float)globalStats.kdtree.numPrimitives / (float)globalStats.kdtree.leafNodes);
+  }
+
   void TUI::DrawSettings () const
   {
     csPrintf (CS_ANSI_CURSOR(14,7) "%s", globalConfig.GetLighterProperties ().doDirectLight ? "X" : "");
-    csPrintf (CS_ANSI_CURSOR(14,8) "%s", globalConfig.GetLighterProperties ().doRadiosity ? "X" : "");
+    csPrintf (CS_ANSI_CURSOR(14,8) "%s", false ? "X" : "");
     csPrintf (CS_ANSI_CURSOR(14,9) "%s", true ? "X" : "");
     csPrintf (CS_ANSI_CURSOR(14,10) "%s", false ? "X" : "");
   
@@ -187,7 +226,7 @@ namespace lighter
       prefix++;
     }
 
-    csPrintf (CS_ANSI_CURSOR(2,12) "%2" PRIu64 ".%03" PRIu64 " %s", raysPerS, raysPerSfraction, siConv[prefix]);
+    csPrintf (CS_ANSI_CURSOR(1,12) "%2" PRIu64 ".%03" PRIu64 " %s", raysPerS, raysPerSfraction, siConv[prefix]);
     csPrintf (CS_ANSI_CURSOR(0,0));
   }
 
@@ -259,5 +298,44 @@ namespace lighter
     result.Append ('|');
 
     return result;
+  }
+
+
+  void TUI::DrawSimple ()
+  {
+    // Check if kd-tree haven't been printed but now have been created
+    if (globalStats.kdtree.numNodes != kdLastNumNudes)
+    {
+      prevWasReporter = false;
+      // Print KD-tree stats
+      csPrintf ("\nKD-tree: \n");
+      csPrintf ("N: % 8d / % 8d\n", globalStats.kdtree.numNodes, globalStats.kdtree.leafNodes);
+      csPrintf ("D: % 8d / % 8.03f\n", globalStats.kdtree.maxDepth, 
+        (float)globalStats.kdtree.sumDepth / (float)globalStats.kdtree.leafNodes);
+      csPrintf ("P: % 8d / % 8.03f\n", globalStats.kdtree.numPrimitives, 
+        (float)globalStats.kdtree.numPrimitives / (float)globalStats.kdtree.leafNodes);
+
+      kdLastNumNudes = globalStats.kdtree.numNodes;
+    }
+
+    if (globalStats.progress.taskName != lastTask)
+    {
+      prevWasReporter = false;
+      csPrintf ("\n% 4d %% - %s ", (int)globalStats.progress.overallProgress,
+        globalStats.progress.taskName.GetDataSafe ());
+
+      // Print new task and global progress
+      lastTaskProgress = 0;
+      lastTask = globalStats.progress.taskName;
+    }
+    else
+    {
+      while (lastTaskProgress + 10 < globalStats.progress.taskProgress)
+      {
+        prevWasReporter = false;
+        csPrintf (".");
+        lastTaskProgress += 10;
+      }
+    }
   }
 }

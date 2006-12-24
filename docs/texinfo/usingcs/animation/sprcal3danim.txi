@@ -4,5 +4,4 @@
 @cindex SpriteCal3D
 @cindex Cal3D
 
-TODO!
-
+@sc{todo}!

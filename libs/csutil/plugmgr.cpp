@@ -45,7 +45,6 @@ csPluginManager::csPlugin::~csPlugin ()
 {
   //csPrintf ("DecRef %08p/'%s' ref=%d\n", Plugin, ClassID, Plugin->GetRefCount ()); fflush (stdout);
   delete [] ClassID;
-  Plugin->DecRef ();
 }
 
 //------------------------------------------------------------------------
@@ -89,8 +88,6 @@ csPluginManager::csPluginManager (iObjectRegistry* object_reg)
   : scfImplementationType (this), object_reg (object_reg),
   Plugins (8, 8), OptionList (16, 16)
 {
-  // We need a recursive mutex.
-  mutex = csMutex::Create (true);
 }
 
 csPluginManager::~csPluginManager ()
@@ -100,7 +97,8 @@ csPluginManager::~csPluginManager ()
 
 void csPluginManager::Clear ()
 {
-  csScopedMutexLock lock (mutex);
+  CS::Threading::RecursiveMutexScopedLock lock (mutex);
+ 
   OptionList.DeleteAll ();
 
   // Free all plugins.
@@ -110,10 +108,10 @@ void csPluginManager::Clear ()
 
 void csPluginManager::QueryOptions (iComponent *obj)
 {
-  csRef<iCommandLineParser> CommandLine (CS_QUERY_REGISTRY (object_reg,
-  	iCommandLineParser));
+  csRef<iCommandLineParser> CommandLine (
+  	csQueryRegistry<iCommandLineParser> (object_reg));
 
-  csRef<iPluginConfig> Config (SCF_QUERY_INTERFACE (obj, iPluginConfig));
+  csRef<iPluginConfig> Config (scfQueryInterface<iPluginConfig> (obj));
   if (Config)
   {
     size_t on = OptionList.Length ();
@@ -172,15 +170,7 @@ void csPluginManager::QueryOptions (iComponent *obj)
 
 iBase *csPluginManager::LoadPlugin (const char *classID, bool init)
 {
-  iComponent *p = 0;
-  { 
-    // The reference must be held beyond the scope of this block.
-    csRef<iComponent> dummy (SCF_CREATE_INSTANCE (classID, iComponent));
-    if (dummy) {
-      p = dummy;
-      p->IncRef ();
-    }
-  }
+  csRef<iComponent> p (scfCreateInstance<iComponent> (classID));
   
   if (!p)
   {
@@ -190,8 +180,8 @@ iBase *csPluginManager::LoadPlugin (const char *classID, bool init)
   }
   else
   {
-    csScopedMutexLock lock (mutex);
-    size_t index = (size_t)-1;
+    CS::Threading::RecursiveMutexScopedLock lock (mutex);
+    size_t index = csArrayItemNotFound;
     // See if the plugin is already in our plugin list.
     for (size_t i = 0 ; i < Plugins.Length () ; i++)
     {
@@ -204,46 +194,23 @@ iBase *csPluginManager::LoadPlugin (const char *classID, bool init)
 	}
     }
 
-    bool added_here = false;
-    if (index == (size_t)-1)
+    if (index == csArrayItemNotFound)
     {
       // The plugin wasn't in our plugin list yet. Add it here.
       index = Plugins.Push (new csPlugin (p, classID));
-      added_here = true;
     }
 
     if ((!init) || p->Initialize (object_reg))
     {
       p->IncRef();
-      if (p)
-      {
-        if (!added_here)
-	{
-	  // If we didn't add the plugin (i.e. this is not the first time
-	  // we called LoadPlugin() for this plugin) then we need to
-	  // DecRef() the component to avoid memory leaks.
-	  p->DecRef ();
-	}
-
-        if (init) QueryOptions (p);
-        return p;
-      }
-      else
-      {
-        if (!added_here)
-	{
-	  // If we didn't add the plugin (i.e. this is not the first time
-	  // we called LoadPlugin() for this plugin) then we need to
-	  // DecRef() the component to avoid memory leaks.
-	  p->DecRef ();
-	}
-      }
+      if (init) QueryOptions (p);
+      return p;
     }
     csReport (object_reg, CS_REPORTER_SEVERITY_WARNING,
     	"crystalspace.pluginmgr.loadplugin",
     	"failed to initialize plugin '%s'", classID);
     // If we added this plugin in this call then we remove it here as well.
-    if (added_here)
+    if (index != csArrayItemNotFound)
       Plugins.DeleteIndex (index);
   }
   return 0;
@@ -252,12 +219,11 @@ iBase *csPluginManager::LoadPlugin (const char *classID, bool init)
 bool csPluginManager::RegisterPlugin (const char *classID,
   iComponent *obj)
 {
-  csScopedMutexLock lock (mutex);
+  CS::Threading::RecursiveMutexScopedLock lock (mutex);
   size_t index = Plugins.Push (new csPlugin (obj, classID));
   if (obj->Initialize (object_reg))
   {
     QueryOptions (obj);
-    obj->IncRef ();
     return true;
   }
   else
@@ -272,7 +238,7 @@ bool csPluginManager::RegisterPlugin (const char *classID,
 
 csPtr<iPluginIterator> csPluginManager::GetPlugins ()
 {
-  csScopedMutexLock lock (mutex);
+  CS::Threading::RecursiveMutexScopedLock lock (mutex);
   csPluginIterator* it = new csPluginIterator ();
   size_t i;
   for (i = 0 ; i < Plugins.Length () ; i++)
@@ -285,7 +251,7 @@ csPtr<iPluginIterator> csPluginManager::GetPlugins ()
 iBase *csPluginManager::QueryPlugin (const char *iInterface, int iVersion)
 {
   scfInterfaceID ifID = iSCF::SCF->GetInterfaceID (iInterface);
-  csScopedMutexLock lock (mutex);
+  CS::Threading::RecursiveMutexScopedLock lock (mutex);
   for (size_t i = 0; i < Plugins.Length (); i++)
   {
     iBase *ret = Plugins.Get (i)->Plugin;
@@ -300,7 +266,7 @@ iBase *csPluginManager::QueryPlugin (const char* classID,
                                      int iVersion)
 {
   scfInterfaceID ifID = iSCF::SCF->GetInterfaceID (iInterface);
-  csScopedMutexLock lock (mutex);
+  CS::Threading::RecursiveMutexScopedLock lock (mutex);
   for (size_t i = 0 ; i < Plugins.Length () ; i++)
   {
     csPlugin* pl = Plugins.Get (i);
@@ -317,13 +283,13 @@ iBase *csPluginManager::QueryPlugin (const char* classID,
 
 bool csPluginManager::UnloadPlugin (iComponent* obj)
 {
-  csScopedMutexLock lock (mutex);
+  CS::Threading::RecursiveMutexScopedLock lock (mutex);
   size_t idx = Plugins.FindKey (
     csArrayCmp<csPlugin*,iComponent*>(obj, csPluginsVector::CompareAddress));
   if (idx == csArrayItemNotFound)
     return false;
 
-  csRef<iPluginConfig> config (SCF_QUERY_INTERFACE (obj, iPluginConfig));
+  csRef<iPluginConfig> config (scfQueryInterface<iPluginConfig> (obj));
   if (config)
   {
     for (size_t i = OptionList.Length (); i > 0; i--)

@@ -62,12 +62,12 @@ public:
   virtual void AppendShadows (iMovable* movable, iShadowBlockList* shadows,
   	const csVector3& origin)
   {
-    const csRefArray<iSceneNode>& c = static_lod_mesh->QuerySceneNode ()
-    	->GetChildren ();
-    size_t i = c.Length ();
+    const csRef<iSceneNodeArray> c = static_lod_mesh->QuerySceneNode ()
+      ->GetChildrenArray ();
+    size_t i = c->GetSize ();
     while (i-- > 0)
     {
-      iMeshWrapper* child = c[i]->QueryMesh ();
+      iMeshWrapper* child = c->Get (i)->QueryMesh ();
       if (child && child->GetShadowCaster ())
       {
         child->GetShadowCaster ()->AppendShadows (movable, shadows, origin);
@@ -99,13 +99,13 @@ public:
 
   virtual void CastShadows (iMovable* movable, iFrustumView* fview)
   {
-    const csRefArray<iSceneNode>& c = static_lod_mesh->QuerySceneNode ()
-    	->GetChildren ();
-    size_t cnt = c.Length ();
+    const csRef<iSceneNodeArray> c = static_lod_mesh->QuerySceneNode ()
+      ->GetChildrenArray ();
+    size_t cnt = c->GetSize ();
     size_t i;
     for (i = 0 ; i < cnt ; i++)
     {
-      iMeshWrapper* child = c[i]->QueryMesh ();
+      iMeshWrapper* child = c->Get (i)->QueryMesh ();
       if (child && child->GetShadowReceiver ())
         child->GetShadowReceiver ()->CastShadows (movable, fview);
     }
@@ -161,6 +161,12 @@ csMeshWrapper::csMeshWrapper (csEngine* engine, iMeshObject *meshobj)
 
   last_camera = 0;
   last_frame_number = 0;
+
+  // Set creation time on the mesh
+  csRef<csShaderVariable> sv_creation_time;
+  sv_creation_time.AttachNew(new csShaderVariable(engine->id_creation_time));
+  sv_creation_time->SetValue((float)engine->virtualClock->GetCurrentTicks() / 1000.0f);
+  GetSVContext()->AddVariable(sv_creation_time);
 }
 
 void csMeshWrapper::SelfDestruct ()
@@ -201,7 +207,7 @@ iShadowCaster* csMeshWrapper::GetShadowCaster ()
 
     if (!meshobj) return 0;
     shadow_caster_valid = true;
-    shadow_caster = SCF_QUERY_INTERFACE (meshobj, iShadowCaster);
+    shadow_caster = scfQueryInterface<iShadowCaster> (meshobj);
   }
   return shadow_caster;
 }
@@ -260,8 +266,8 @@ void csMeshWrapper::SetMeshObject (iMeshObject *meshobj)
 
   if (meshobj)
   {
-    light_info = SCF_QUERY_INTERFACE (meshobj, iLightingInfo);
-    portal_container = SCF_QUERY_INTERFACE (meshobj, iPortalContainer);
+    light_info = scfQueryInterface<iLightingInfo> (meshobj);
+    portal_container = scfQueryInterface<iPortalContainer> (meshobj);
     AddToSectorPortalLists ();
   }
   else
@@ -1018,8 +1024,7 @@ float csMeshWrapper::GetSquaredDistance (iRenderView *rview)
 float csMeshWrapper::GetSquaredDistance (const csVector3& pos)
 {
   // calculate distance from pos to mesh
-  csBox3 obox;
-  GetObjectModel ()->GetObjectBoundingBox (obox);
+  const csBox3& obox = GetObjectModel ()->GetObjectBoundingBox ();
   csVector3 obj_center = (obox.Min () + obox.Max ()) / 2;
   csVector3 wor_center;
   if (movable.IsFullTransformIdentity ())
@@ -1032,7 +1037,7 @@ float csMeshWrapper::GetSquaredDistance (const csVector3& pos)
 
 void csMeshWrapper::GetFullBBox (csBox3& box)
 {
-  GetObjectModel ()->GetObjectBoundingBox (box);
+  box = GetObjectModel ()->GetObjectBoundingBox ();
   csMovable* mov = &movable;
   while (mov)
   {
@@ -1112,8 +1117,7 @@ csHitBeamResult csMeshWrapper::HitBeamBBox (
   const csVector3 &end)
 {
   csHitBeamResult rc;
-  csBox3 b;
-  GetObjectModel ()->GetObjectBoundingBox (b);
+  const csBox3& b = GetObjectModel ()->GetObjectBoundingBox ();
 
   csSegment3 seg (start, end);
   rc.facehit = csIntersect3::BoxSegment (b, seg, rc.isect, &rc.r);
@@ -1126,8 +1130,7 @@ int csMeshWrapper::HitBeamBBox (
   csVector3 &isect,
   float *pr)
 {
-  csBox3 b;
-  GetObjectModel ()->GetObjectBoundingBox (b);
+  const csBox3& b = GetObjectModel ()->GetObjectBoundingBox ();
 
   csSegment3 seg (start, end);
   return csIntersect3::BoxSegment (b, seg, isect, pr);
@@ -1140,11 +1143,10 @@ const csBox3& csMeshWrapper::GetWorldBoundingBox ()
     wor_bbox_movablenr = movable.GetUpdateNumber ();
 
     if (movable.IsFullTransformIdentity ())
-      GetObjectModel ()->GetObjectBoundingBox (wor_bbox);
+      wor_bbox = GetObjectModel ()->GetObjectBoundingBox ();
     else
     {
-      csBox3 obj_bbox;
-      GetObjectModel ()->GetObjectBoundingBox (obj_bbox);
+      const csBox3& obj_bbox = GetObjectModel ()->GetObjectBoundingBox ();
 
       // @@@ Maybe it would be better to really calculate the bounding box
       // here instead of just transforming the object space bounding box?
@@ -1170,8 +1172,8 @@ void csMeshWrapper::GetWorldBoundingBox (csBox3 &cbox)
 csBox3 csMeshWrapper::GetTransformedBoundingBox (
   const csReversibleTransform &trans)
 {
-  csBox3 cbox, box;
-  GetObjectModel ()->GetObjectBoundingBox (box);
+  csBox3 cbox;
+  const csBox3& box = GetObjectModel ()->GetObjectBoundingBox ();
   cbox.StartBoundingBox (trans * box.GetCorner (0));
   cbox.AddBoundingVertexSmart (trans * box.GetCorner (1));
   cbox.AddBoundingVertexSmart (trans * box.GetCorner (2));
@@ -1476,7 +1478,7 @@ csMeshList::~csMeshList ()
 void csMeshList::NameChanged (iObject* object, const char* oldname,
   	const char* newname)
 {
-  csRef<iMeshWrapper> mesh = SCF_QUERY_INTERFACE (object, iMeshWrapper);
+  csRef<iMeshWrapper> mesh = scfQueryInterface<iMeshWrapper> (object);
   CS_ASSERT (mesh != 0);
   if (oldname) meshes_hash.Delete (oldname, mesh);
   if (newname) meshes_hash.Put (newname, mesh);
@@ -1491,7 +1493,7 @@ iMeshWrapper* csMeshList::FindByNameWithChild (const char *Name) const
   csString firstName;
   firstName.Append (Name, firstsize);
 
-  iMeshWrapper* m = meshes_hash.Get (csStrKey (firstName), 0);
+  iMeshWrapper* m = meshes_hash.Get (firstName, 0);
   if (!m) return 0;
   return m->FindChildByName (p+1);
 }
@@ -1638,8 +1640,8 @@ csMeshFactoryList::~csMeshFactoryList ()
 void csMeshFactoryList::NameChanged (iObject* object, const char* oldname,
   	const char* newname)
 {
-  csRef<iMeshFactoryWrapper> mesh = SCF_QUERY_INTERFACE (object,
-    iMeshFactoryWrapper);
+  csRef<iMeshFactoryWrapper> mesh = 
+    scfQueryInterface<iMeshFactoryWrapper> (object);
   CS_ASSERT (mesh != 0);
   if (oldname) factories_hash.Delete (oldname, mesh);
   if (newname) factories_hash.Put (newname, mesh);

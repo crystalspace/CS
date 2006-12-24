@@ -26,6 +26,8 @@
 #include "csextern.h"
 #include "csutil/thread.h"
 
+#include "csutil/win32/msvc_deprecated_warn_off.h"
+
 /**
  * This is a utility class for locking a Mutex. If A MutexLock class is
  * created it locks the mutex, when it is destroyed it unlocks the Mutex
@@ -41,7 +43,7 @@
  *  }
  * \endcode
  */
-class CS_CRYSTALSPACE_EXPORT csScopedMutexLock
+class csScopedMutexLock
 {
 public:
   csScopedMutexLock (csMutex* newmutex)
@@ -52,6 +54,21 @@ public:
 
   csMutex* mutex;
 };
+
+template<class T>
+class csScopedLock
+{
+public:
+  csScopedLock (T& lock)
+    : lock (lock)
+  { lock.LockWait (); }
+  ~csScopedLock ()
+  { lock.Release (); }
+
+  T& lock;
+};
+
+#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 #endif
 

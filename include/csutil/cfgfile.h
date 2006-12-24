@@ -31,11 +31,12 @@
 
 class csConfigNode;
 class csConfigIterator;
+struct iCommandLineParser;
 
 /**
  * Configuration file which implements the iConfigFile SCF interface.
  */
-class CS_CRYSTALSPACE_EXPORT csConfigFile : 
+class CS_CRYSTALSPACE_EXPORT csConfigFile :
   public scfImplementation1<csConfigFile, iConfigFile>
 {
 public:
@@ -66,10 +67,10 @@ public:
 
   /**
    * Load a configuration file.
-   * <p>
+   *
    * If the file resides in a real filesystem, rather than a VFS filesystem,
    * then pass 0 for the VFS argument.
-   * <p>
+   *
    * You can set the Merge flag to merge the newly loaded configuration
    * information into the existing information.  If you do so, nothing will
    * happen if the named file doesn't exist.  The NewWins flag determines
@@ -81,6 +82,14 @@ public:
    */
   virtual bool Load (const char* iFileName, iVFS* = 0, bool Merge = false,
     bool NewWins = true);
+
+  /**
+   * Load the configuration from a data buffer and add it to the current
+   * configuration. This may modify the contents of the file buffer but
+   * will not delete it. This function will set the dirty flag if any
+   * options have been added or modified.
+   */
+  virtual void LoadFromBuffer(const char *Filedata, bool overwrite);
 
   /**
    * Save configuration to the same place from which it was loaded.  Returns
@@ -120,6 +129,8 @@ public:
   virtual const char *GetStr(const char *Key, const char *Def = "") const;
   /// Get a boolean value from the configuration.
   virtual bool GetBool(const char *Key, bool Def = false) const;
+  /// Get a tuple set from the configuration.
+  virtual csPtr<iStringArray> GetTuple(const char *Key) const;
   /// Get the comment of the given key, or 0 if no comment exists.
   virtual const char *GetComment(const char *Key) const;
 
@@ -131,6 +142,8 @@ public:
   virtual void SetFloat (const char *Key, float Value);
   /// Set a boolean value.
   virtual void SetBool (const char *Key, bool Value);
+  /// Set a tuple value.
+  virtual void SetTuple (const char *Key, iStringArray* Value);
   /**
    * Set the comment for given key.  In addition to an actual comment, you can
    * use "" for Text to place an empty comment line before this key, or 0 to
@@ -145,6 +158,16 @@ public:
   /// return the final comment at the end of the configuration file
   virtual const char *GetEOFComment() const;
 
+  /**
+   * Parse the command line for configuration options.
+   * Recognized are the <tt>-cfgset</tt> parameters, which sets a single
+   * setting, and <tt>-cfgfile</tt>, which reads settings from the specified file.
+   *
+   * The meanings of the \p vfs, \p Merge and \p NewWins arguments are the
+   * same as for Load().
+   */
+  virtual void ParseCommandLine (iCommandLineParser* cmdline, iVFS* vfs,
+    bool Merge = false, bool NewWins = true);
 private:
   friend class csConfigIterator;
 
@@ -176,13 +199,7 @@ private:
   void InitializeObject ();
   // load the configuration from a file, ignoring the dirty flag
   virtual bool LoadNow(const char *Filename, iVFS *vfs, bool overwrite);
-  /*
-   * load the configuration from a data buffer and add it to the current
-   * configuration. This may modify the contents of the file buffer but
-   * will not delete it. This function will set the dirty flag if any
-   * options have been added or modified.
-   */
-  virtual void LoadFromBuffer(char *Filedata, bool overwrite);
+  
   // return a pointer to the named node or the first node of a subsection.
   csConfigNode *FindNode(const char *Name, bool isSubsection = false) const;
   // create a new node in the list

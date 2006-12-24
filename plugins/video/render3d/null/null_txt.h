@@ -100,18 +100,16 @@ public:
   int GetTextureFormat ()
   { return CS_IMGFMT_TRUECOLOR | CS_IMGFMT_ALPHA; }
 
-  ///
-  virtual csPtr<iTextureHandle> RegisterTexture (iImage* image, int flags);
-  ///
+  virtual csPtr<iTextureHandle> RegisterTexture (iImage* image, int flags,
+      iString* fail_reason = 0);
+  virtual csPtr<iTextureHandle> CreateTexture (int w, int h,
+      csImageType imagetype, const char* format, int flags,
+      iString* fail_reason = 0);
   virtual void UnregisterTexture (csTextureHandleNull* handle);
 
   virtual csPtr<iSuperLightmap> CreateSuperLightmap(int w, int h);
   
   virtual void GetMaxTextureSize (int& w, int& h, int& aspect);
-
-  virtual void GetLightmapRendererCoords (int slmWidth, int slmHeight,
-    int lm_x1, int lm_y1, int lm_x2, int lm_y2,
-    float& lm_u1, float& lm_v1, float &lm_u2, float& lm_v2);
 };
 
 #endif // __CS_NULL_TXT_H__

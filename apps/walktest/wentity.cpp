@@ -29,28 +29,14 @@ extern WalkTest* Sys;
 
 //--------------------------------------------------------------------------
 
-struct AnimPortalCallback : public iPortalCallback
+struct AnimPortalCallback :
+  public scfImplementation1<AnimPortalCallback, iPortalCallback>
 {
-  AnimPortalCallback ();
-  virtual ~AnimPortalCallback ();
+  AnimPortalCallback () : scfImplementationType(this) { }
+  virtual ~AnimPortalCallback () { }
   csAnimatedPortal* animportal;
-  SCF_DECLARE_IBASE;
   virtual bool Traverse (iPortal* portal, iBase* context);
 };
-
-SCF_IMPLEMENT_IBASE (AnimPortalCallback)
-  SCF_IMPLEMENTS_INTERFACE (iPortalCallback)
-SCF_IMPLEMENT_IBASE_END
-
-AnimPortalCallback::AnimPortalCallback ()
-{
-  SCF_CONSTRUCT_IBASE (0);
-}
-
-AnimPortalCallback::~AnimPortalCallback ()
-{
-  SCF_DESTRUCT_IBASE ();
-}
 
 bool AnimPortalCallback::Traverse (iPortal*, iBase* )
 {

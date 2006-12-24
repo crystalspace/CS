@@ -40,9 +40,9 @@
 
 /**
  * A 2D point object
- * Deprecated! Use csVector2 instead
+ * \deprecated Use csVector2 instead
  */
-typedef csVector2 csPoint;
+typedef CS_DEPRECATED_TYPE_MSG("Use csVector2 instead") csVector2 csPoint;
 
 /** @} */
 

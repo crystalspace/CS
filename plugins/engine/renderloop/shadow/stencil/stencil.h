@@ -35,6 +35,7 @@
 #include "csutil/hash.h"
 #include "csutil/csstring.h"
 #include "csutil/strhash.h"
+#include "csutil/scf_implementation.h"
 #include "csutil/dirtyaccessarray.h"
 #include "csutil/weakref.h"
 #include "csgfx/shadervarcontext.h"
@@ -45,7 +46,8 @@
 class csStencilShadowStep;
 class csStencilShadowType;
 
-class csStencilShadowCacheEntry : public iObjectModelListener				  
+class csStencilShadowCacheEntry :
+  public scfImplementation1<csStencilShadowCacheEntry, iObjectModelListener>
 {
 private:
   csStencilShadowStep* parent;
@@ -93,7 +95,6 @@ private:
     csHash<EdgeInfo*>& edge_stack, int& NextEdge, int& TriIndex);
   void HandleEdge (EdgeInfo* e, csHash<EdgeInfo*>& edge_stack);
 public:
-  SCF_DECLARE_IBASE;
   csRef<csRenderBufferHolder> bufferHolder;
 
   csStencilShadowCacheEntry (csStencilShadowStep* parent, 
@@ -112,9 +113,10 @@ public:
   void UpdateBuffers() ;
 };
 
-class csStencilShadowStep : public iRenderStep,
-			    public iLightRenderStep,
-			    public iRenderStepContainer
+class csStencilShadowStep : 
+  public scfImplementation4<csStencilShadowStep,
+    iRenderStep, iLightRenderStep, iRenderStepContainer,
+    iVisibilityCullerListener>
 {
 private:
   friend class csStencilShadowCacheEntry;
@@ -137,8 +139,6 @@ private:
   void Report (int severity, const char* msg, ...);
 
 public:
-  SCF_DECLARE_IBASE;
-
   csStencilShadowStep (csStencilShadowType* type);
   virtual ~csStencilShadowStep ();
 
@@ -155,27 +155,17 @@ public:
   virtual size_t Find (iRenderStep* step) const;
   virtual size_t GetStepCount () const;
 
-  struct ShadowDrawVisCallback : public iVisibilityCullerListener
-  {
-    csStencilShadowStep* parent;
-
-    SCF_DECLARE_IBASE;
-    ShadowDrawVisCallback ();
-    virtual ~ShadowDrawVisCallback ();
-
-    virtual void ObjectVisible (iVisibilityObject *visobject, 
-      iMeshWrapper *mesh, uint32 frustum_mask);
-  } shadowDrawVisCallback;
-  friend struct ShadowDrawVisCallback;
+  virtual void ObjectVisible (iVisibilityObject *visobject, 
+    iMeshWrapper *mesh, uint32 frustum_mask);
 };
 
-class csStencilShadowFactory : public iRenderStepFactory
+class csStencilShadowFactory :
+  public scfImplementation1<csStencilShadowFactory, iRenderStepFactory>
 {
   iObjectRegistry* object_reg;
   csRef<csStencilShadowType> type;
-public:
-  SCF_DECLARE_IBASE;
 
+public:
   csStencilShadowFactory (iObjectRegistry* object_reg,
       csStencilShadowType* type);
   virtual ~csStencilShadowFactory ();
@@ -184,7 +174,8 @@ public:
 
 };
 
-class csStencilShadowType : public csBaseRenderStepType
+class csStencilShadowType :
+  public scfImplementationExt0<csStencilShadowType, csBaseRenderStepType>
 {
   csRef<iShader> shadow;
   bool shadowLoaded;
@@ -199,7 +190,8 @@ public:
   iShader* GetShadow ();
 };
 
-class csStencilShadowLoader : public csBaseRenderStepLoader
+class csStencilShadowLoader :
+  public scfImplementationExt0<csStencilShadowLoader, csBaseRenderStepLoader>
 {
   csRenderStepParser rsp;
 

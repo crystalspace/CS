@@ -45,7 +45,7 @@ private:
   void Copy(csStringHash const&);
 
 public:
-  typedef HashType::GlobalIterator GlobalIterator;
+  typedef HashType::ConstGlobalIterator GlobalIterator;
 
 public:
   /// Constructor.
@@ -139,7 +139,8 @@ public:
    * Delete all stored strings.
    * \deprecated Use Empty() instead.
    */
-  /*CS_DEPRECATED_METHOD*/ void Clear ()
+  /*CS_DEPRECATED_METHOD("Use Empty() instead.")*/
+  void Clear ()
   { Empty(); }
 
   /// Get the number of elements in the hash.

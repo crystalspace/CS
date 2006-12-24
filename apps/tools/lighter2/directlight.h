@@ -19,29 +19,80 @@
 #ifndef __DIRECTLIGHT_H__
 #define __DIRECTLIGHT_H__
 
+#include "csutil/noncopyable.h"
+
+#include "primitive.h"
+#include "sampler.h"
+
 namespace lighter
 {
   class Sector;
   class Raytracer;
-  class RadPrimitive;
+  class Primitive;
+  class Light_old;
   class Light;
   
   // Class to calculate direct lighting
-  class DirectLighting
+  class DirectLighting : private CS::NonCopyable
   {
   public:
+    // Setup
+    static void Initialize ();
 
     // Shade by using all primitives within range
-    static void ShootDirectLighting (Sector* sector, float progressStep);
+    static void ShadeDirectLighting (Sector* sector, float progressStep);
+
+    //-- Shade a point
+    typedef csColor (*PVLPointShader)(Sector* sector, 
+      const csVector3& point, const csVector3& normal, 
+      SamplerSequence<2>& lightSampler, Raytracer& rt);
+
+    // Shade a single point in space with direct lighting
+    static csColor UniformShadeAllLightsNonPD (Sector* sector, const csVector3& point,
+      const csVector3& normal, SamplerSequence<2>& lightSampler, Raytracer& rt);
+
+    // Shade a single point in space with direct lighting using a single light
+    static csColor UniformShadeRndLightNonPD (Sector* sector, const csVector3& point,
+      const csVector3& normal, SamplerSequence<2>& lightSampler, Raytracer& rt);
+
+    //-- Shade a lightmap element
+    typedef csColor (*LMElementShader)(Sector* sector, ElementProxy element,
+      SamplerSequence<2>& lightSampler, Raytracer& rt);
+
+    // Shade a primitive element with direct lighting
+    static csColor UniformShadeAllLightsNonPD (Sector* sector, ElementProxy element,
+      SamplerSequence<2>& lightSampler, Raytracer& rt);
+
+    // Shade a primitive element with direct lighting using a single light
+    static csColor UniformShadeRndLightNonPD (Sector* sector, ElementProxy element,
+      SamplerSequence<2>& lightSampler, Raytracer& rt);
+
+
+    //-- Shade using one light
+    // Shade a primitive element with direct lighting
+    static csColor UniformShadeOneLight (Sector* sector, const csVector3& point,
+      const csVector3& normal, Light* light, SamplerSequence<2>& lightSampler, 
+      Raytracer& rt);
+
+    // Shade a primitive element with direct lighting
+    static csColor UniformShadeOneLight (Sector* sector, ElementProxy element,
+      Light* light, SamplerSequence<2>& lightSampler, Raytracer& rt);
 
   private:
+    // Static methods...
+    inline static csColor ShadeLight (Light* light, const csVector3& point,
+      const csVector3& normal, Raytracer& rt, SamplerSequence<2>& lightSampler,
+      const Primitive* shadowIgnorePrimitive = 0);
 
-    // Shade a single rad primitive
-    static void ShadeRadPrimitive (Raytracer &tracer, RadPrimitive &prim, Light* light);
+    static void ShadeLightmap (Sector* sector, Object* obj, Raytracer& rt, 
+      SamplerSequence<2>& masterSampler);
 
-    //Make sure we don't instance it
-    DirectLighting ();
-    DirectLighting (const DirectLighting& o);
+    static void ShadePerVertex (Sector* sector, Object* obj, Raytracer& rt,
+      SamplerSequence<2>& masterSampler);
+
+    // Static data
+    static PVLPointShader pvlPointShader;
+    static LMElementShader lmElementShader;
   };
 }
 

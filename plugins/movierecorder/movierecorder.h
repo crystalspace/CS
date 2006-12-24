@@ -29,8 +29,10 @@
 #include "iutil/eventh.h"
 #include "iutil/virtclk.h"
 #include "csutil/cfgacc.h"
-#include "csutil/util.h"
 #include "csutil/eventnames.h"
+#include "csutil/util.h"
+#include "csutil/weakref.h"
+#include "cstool/numberedfilenamehelper.h"
 #include "nuppelwriter.h"
 
 struct iObjectRegistry;
@@ -39,6 +41,9 @@ struct iGraphics2D;
 struct iVFS;
 struct iFile;
 
+CS_PLUGIN_NAMESPACE_BEGIN(Movierecorder)
+{
+
 /**
  * Movie recorder plugin. After loading this plugin, it can be activated
  * either programmatically or from the keyboard. The files produced are
@@ -46,7 +51,10 @@ struct iFile;
  * lossless codec. Note that this module is GPLed rather than LGPLed due to
  * licenses on the existing compression code.
  */
-class csMovieRecorder : public iMovieRecorder, public iComponent
+class csMovieRecorder : 
+  public scfImplementation2<csMovieRecorder, 
+                            iMovieRecorder, 
+			    iComponent>
 {
 private:
   iObjectRegistry *object_reg;
@@ -78,9 +86,8 @@ private:
   csTicks frameStartTime, totalFrameTime, minFrameTime, maxFrameTime;
 
   /// format of the movie filename (e.g. "/this/cryst%03d.nuv")
-  char* captureFormat;
-  int captureFormatNumberMax;
-  char movieFileName[CS_MAXPATHLEN];
+  CS::NumberedFilenameHelper captureFormat;
+  csString movieFileName;
 
   /// Capture settings
   float frameRate, rtjQuality;
@@ -137,78 +144,71 @@ public:
   virtual void UnPause(void);
   virtual bool IsPaused(void) const;
 
-  SCF_DECLARE_IBASE;
-
   /**
    * Embedded iEventHandler interface that forwards its events to
    * csMovieRecorder's event handler
    */
-  class EventHandler : public iEventHandler
+  class EventHandler : 
+    public scfImplementation1<EventHandler, 
+                              iEventHandler>
   {
   private:
-    csMovieRecorder* parent;
+    csWeakRef<csMovieRecorder> parent;
   public:
-    SCF_DECLARE_IBASE;
-    EventHandler (csMovieRecorder* parent)
-    {
-      SCF_CONSTRUCT_IBASE (0);
-      EventHandler::parent = parent;
-    }
-    virtual ~EventHandler ()
-    {
-      SCF_DESTRUCT_IBASE();
-    }
+    EventHandler (csMovieRecorder* parent) : scfImplementationType (this),
+      parent (parent) { }
+    virtual ~EventHandler () { }
     virtual bool HandleEvent (iEvent& ev)
     {
-      return parent->HandleEvent (ev);
+      return parent ? parent->HandleEvent (ev) : false;
     }
     CS_EVENTHANDLER_NAMES("crystalspace.movierecorder")
     CS_EVENTHANDLER_NIL_CONSTRAINTS /* DOME : actually, we want a lot of constraints... */
-  } *scfiEventHandler;
+  };
+  csRef<EventHandler> eventHandler;
 
   /**
    * Embedded iVirtualClock. We replace the system's default virtual clock
    * with this in order to tie the application's timing to the movie rather
    * than real time when we're recording.
    */
-  class VirtualClock : public iVirtualClock
+  class VirtualClock : 
+    public scfImplementation1<VirtualClock,
+			      iVirtualClock>
   {
   private:
-    csMovieRecorder* parent;
+    csWeakRef<csMovieRecorder> parent;
   public:
-    SCF_DECLARE_IBASE;
-    VirtualClock (csMovieRecorder* parent)
-    {
-      SCF_CONSTRUCT_IBASE (0);
-      VirtualClock::parent = parent;
-    }
-    virtual ~VirtualClock()
-    {
-      SCF_DESTRUCT_IBASE();
-    }
+    VirtualClock (csMovieRecorder* parent) : scfImplementationType (this),
+      parent (parent) { }
+    virtual ~VirtualClock() { }
     virtual void Advance ()
     {
-      parent->ClockAdvance();
+      if (parent) parent->ClockAdvance();
     }
     virtual void Suspend ()
     {
-      parent->ClockSuspend();
+      if (parent) parent->ClockSuspend();
     }
     virtual void Resume ()
     {
-      parent->ClockResume();
+      if (parent) parent->ClockResume();
     }
     virtual csTicks GetElapsedTicks () const
     {
-      return parent->ClockGetElapsedTicks();
+      return parent ? parent->ClockGetElapsedTicks() : 0;
     }
     virtual csTicks GetCurrentTicks () const
     {
-      return parent->ClockGetCurrentTicks();
+      return parent ? parent->ClockGetCurrentTicks() : 0;
     }
-  } *scfiVirtualClock;
+  };
+  csRef<VirtualClock> virtualClock;
 
   CS_DECLARE_EVENT_SHORTCUTS;
 };
+
+}
+CS_PLUGIN_NAMESPACE_END(Movierecorder)
 
 #endif // __CS_MOVIERECORDER_H__

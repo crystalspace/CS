@@ -59,22 +59,10 @@ CS_IMPLEMENT_PLUGIN
 SCF_IMPLEMENT_FACTORY (csFrustumVis)
 
 
-SCF_IMPLEMENT_IBASE (csFrustumVis)
-  SCF_IMPLEMENTS_INTERFACE (iVisibilityCuller)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csFrustumVis::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csFrustumVis::eiEventHandler)
-  SCF_IMPLEMENTS_INTERFACE (iEventHandler)
-SCF_IMPLEMENT_IBASE_END
-
 //----------------------------------------------------------------------
 
-class csFrustVisObjIt : public iVisibilityObjectIterator
+class csFrustVisObjIt :
+  public scfImplementation1<csFrustVisObjIt, iVisibilityObjectIterator>
 {
 private:
   csArray<iVisibilityObject*>* vector;
@@ -82,12 +70,10 @@ private:
   bool* vistest_objects_inuse;
 
 public:
-  SCF_DECLARE_IBASE;
-
   csFrustVisObjIt (csArray<iVisibilityObject*>* vector,
-  	bool* vistest_objects_inuse)
+    bool* vistest_objects_inuse) :
+    scfImplementationType(this)
   {
-    SCF_CONSTRUCT_IBASE (0);
     csFrustVisObjIt::vector = vector;
     csFrustVisObjIt::vistest_objects_inuse = vistest_objects_inuse;
     if (vistest_objects_inuse) *vistest_objects_inuse = true;
@@ -102,7 +88,6 @@ public:
       *vistest_objects_inuse = false;
     else
       delete vector;
-    SCF_DESTRUCT_IBASE();
   }
 
   virtual iVisibilityObject* Next()
@@ -129,16 +114,7 @@ public:
   }
 };
 
-SCF_IMPLEMENT_IBASE (csFrustVisObjIt)
-  SCF_IMPLEMENTS_INTERFACE (iVisibilityObjectIterator)
-SCF_IMPLEMENT_IBASE_END
-
 //----------------------------------------------------------------------
-
-SCF_IMPLEMENT_IBASE (csFrustVisObjectWrapper)
-  SCF_IMPLEMENTS_INTERFACE (iObjectModelListener)
-  SCF_IMPLEMENTS_INTERFACE (iMovableListener)
-SCF_IMPLEMENT_IBASE_END
 
 void csFrustVisObjectWrapper::ObjectModelChanged (iObjectModel* /*model*/)
 {
@@ -173,29 +149,25 @@ public:
 //----------------------------------------------------------------------
 
 csFrustumVis::csFrustumVis (iBase *iParent) :
-	vistest_objects (256, 256),
-	visobj_vector (256, 256),
-	update_queue (151, 59)
+  scfImplementationType (this, iParent),
+  vistest_objects (256, 256),
+  visobj_vector (256, 256),
+  update_queue (151, 59)
 {
-  SCF_CONSTRUCT_IBASE (iParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
   object_reg = 0;
   kdtree = 0;
   current_vistest_nr = 1;
   vistest_objects_inuse = false;
   updating = false;
-
-  scfiEventHandler = new eiEventHandler (this);
 }
 
 csFrustumVis::~csFrustumVis ()
 {
-  if (scfiEventHandler)
+  if (object_reg)
   {
-    csRef<iEventQueue> q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+    csRef<iEventQueue> q = csQueryRegistry<iEventQueue> (object_reg);
     if (q)
-      q->RemoveListener (scfiEventHandler);
-    scfiEventHandler->DecRef ();
+      CS::RemoveWeakListener (q, weakEventHandler);
   }
 
   while (visobj_vector.Length () > 0)
@@ -210,15 +182,13 @@ csFrustumVis::~csFrustumVis ()
     visobj->DecRef ();
   }
   delete kdtree;
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csFrustumVis::HandleEvent (iEvent& ev)
 {
   if (ev.Name == CanvasResize)
   {
-    csRef<iGraphics3D> g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+    csRef<iGraphics3D> g3d = csQueryRegistry<iGraphics3D> (object_reg);
     scr_width = g3d->GetWidth ();
     scr_height = g3d->GetHeight ();
     //printf ("Got resize %dx%d!\n", scr_width, scr_height);fflush (stdout);
@@ -232,7 +202,7 @@ bool csFrustumVis::Initialize (iObjectRegistry *object_reg)
 
   delete kdtree;
 
-  csRef<iGraphics3D> g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+  csRef<iGraphics3D> g3d = csQueryRegistry<iGraphics3D> (object_reg);
   if (g3d)
   {
     scr_width = g3d->GetWidth ();
@@ -254,9 +224,9 @@ bool csFrustumVis::Initialize (iObjectRegistry *object_reg)
   if (g2d)
   {
     CanvasResize = csevCanvasResize(object_reg, g2d);
-    csRef<iEventQueue> q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+    csRef<iEventQueue> q = csQueryRegistry<iEventQueue> (object_reg);
     if (q)
-      q->RegisterListener (scfiEventHandler, CanvasResize);
+      CS::RegisterWeakListener (q, this, CanvasResize, weakEventHandler);
   }
 
   return true;
@@ -271,12 +241,11 @@ void csFrustumVis::CalculateVisObjBBox (iVisibilityObject* visobj, csBox3& bbox)
   iMovable* movable = visobj->GetMovable ();
   if (movable->IsFullTransformIdentity ())
   {
-    visobj->GetObjectModel ()->GetObjectBoundingBox (bbox);
+    bbox = visobj->GetObjectModel ()->GetObjectBoundingBox ();
   }
   else
   {
-    csBox3 box;
-    visobj->GetObjectModel ()->GetObjectBoundingBox (box);
+    const csBox3& box = visobj->GetObjectModel ()->GetObjectBoundingBox ();
     csReversibleTransform trans = movable->GetFullTransform ();
     bbox.StartBoundingBox (trans.This2Other (box.GetCorner (0)));
     bbox.AddBoundingVertexSmart (trans.This2Other (box.GetCorner (1)));

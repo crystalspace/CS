@@ -24,6 +24,7 @@
 #include "csutil/csppulse.h"
 #include "csutil/csstring.h"
 #include "csutil/debug.h"
+#include "cstool/csview.h"
 #include "iengine/portal.h"
 #include "iengine/rview.h"
 #include "igeom/clip2d.h"
@@ -121,7 +122,6 @@ csSector::csSector (csEngine *engine) :
   scfImplementationType (this), engine (engine)
 {
   DG_TYPE (this, "csSector");
-  fog.enabled = false;
   drawBusy = 0;
   dynamicAmbientLightColor.Set (0,0,0);
   dynamicAmbientLightVersion = (uint)~0;
@@ -132,6 +132,23 @@ csSector::csSector (csEngine *engine) :
   renderloop = 0;
   use_lightculling = false;
   single_mesh = 0;
+  relevant_lights_dirty = true;
+
+  SetupSVNames();
+  svDynamicAmbient.AttachNew (new csShaderVariable (SVNames().dynamicAmbient));
+  svDynamicAmbient->SetValue (dynamicAmbientLightColor);
+  AddVariable (svDynamicAmbient);
+  svFogColor.AttachNew (new csShaderVariable (SVNames().fogColor));
+  AddVariable (svFogColor);
+  svFogMode.AttachNew (new csShaderVariable (SVNames().fogMode));
+  AddVariable (svFogMode);
+  svFogStart.AttachNew (new csShaderVariable (SVNames().fogStart));
+  AddVariable (svFogStart);
+  svFogEnd.AttachNew (new csShaderVariable (SVNames().fogEnd));
+  AddVariable (svFogEnd);
+  svFogDensity.AttachNew (new csShaderVariable (SVNames().fogDensity));
+  AddVariable (svFogDensity);
+  UpdateFogSVs();
 }
 
 csSector::~csSector ()
@@ -148,15 +165,15 @@ void csSector::SelfDestruct ()
 void csSector::RegisterLightToCuller (csLight* light)
 {
   light->UseAsCullingObject ();
-  csRef<iVisibilityObject> vo = SCF_QUERY_INTERFACE (light,
-        iVisibilityObject);
+  csRef<iVisibilityObject> vo = 
+        scfQueryInterface<iVisibilityObject> (light);
   culler->RegisterVisObject (vo);
 }
 
 void csSector::UnregisterLightToCuller (csLight* light)
 {
-  csRef<iVisibilityObject> vo = SCF_QUERY_INTERFACE (light,
-        iVisibilityObject);
+  csRef<iVisibilityObject> vo = 
+        scfQueryInterface<iVisibilityObject> (light);
   culler->UnregisterVisObject (vo);
   light->StopUsingAsCullingObject ();
 }
@@ -232,8 +249,8 @@ void csSector::RegisterEntireMeshToCuller (iMeshWrapper* mesh)
   csMeshWrapper* cmesh = (csMeshWrapper*)mesh;
   if (cmesh->SomeParentHasStaticLOD ()) return;
 
-  csRef<iVisibilityObject> vo = SCF_QUERY_INTERFACE (mesh,
-        iVisibilityObject);
+  csRef<iVisibilityObject> vo = 
+        scfQueryInterface<iVisibilityObject> (mesh);
   culler->RegisterVisObject (vo);
 
   if (cmesh->GetStaticLODMesh ()) return;
@@ -252,15 +269,15 @@ void csSector::RegisterMeshToCuller (iMeshWrapper* mesh)
   csMeshWrapper* cmesh = (csMeshWrapper*)mesh;
   if (cmesh->SomeParentHasStaticLOD ()) return;
 
-  csRef<iVisibilityObject> vo = SCF_QUERY_INTERFACE (mesh,
-        iVisibilityObject);
+  csRef<iVisibilityObject> vo = 
+        scfQueryInterface<iVisibilityObject> (mesh);
   culler->RegisterVisObject (vo);
 }
 
 void csSector::UnregisterMeshToCuller (iMeshWrapper* mesh)
 {
-  csRef<iVisibilityObject> vo = SCF_QUERY_INTERFACE (mesh,
-        iVisibilityObject);
+  csRef<iVisibilityObject> vo = 
+        scfQueryInterface<iVisibilityObject> (mesh);
   culler->UnregisterVisObject (vo);
 }
 
@@ -311,6 +328,47 @@ void csSector::RelinkMesh (iMeshWrapper *mesh)
   }
 }
 
+void csSector::PrecacheDraw ()
+{
+  GetVisibilityCuller ()->PrecacheCulling ();
+
+  // First calculate the box of all objects in the level.
+  csBox3 box;
+  box.StartBoundingBox ();
+  int i;
+  for (i = 0; i < meshes.GetCount (); i++)
+  {
+    iMeshWrapper* m = meshes.Get (i);
+    const csBox3& mesh_box = m->GetWorldBoundingBox ();
+    box += mesh_box;
+  }
+
+  // Try to position our camera somewhere above the bounding
+  // box of the sector so we see as much as possible.
+  csVector3 pos = box.GetCenter ();
+  pos.y = box.MaxY () + (box.MaxY () - box.MinY ());
+  csVector3 lookat = pos;
+  lookat.y = box.MinY ();
+
+  csRef<iGraphics3D> g3d = csQueryRegistry<iGraphics3D> (
+      engine->objectRegistry);
+  csRef<csView> view;
+  view.AttachNew (new csView (engine, g3d));
+  iGraphics2D* g2d = g3d->GetDriver2D ();
+  view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());
+
+  iCamera* camera = view->GetCamera ();
+  camera->SetSector (this);
+  camera->GetTransform ().SetOrigin (pos);
+  camera->GetTransform ().LookAt (lookat-pos, csVector3 (0, 0, 1));
+
+  // @@@ Ideally we would want to disable visibility culling
+  // here so that all objects are visible.
+  g3d->BeginDraw (CSDRAW_3DGRAPHICS);
+  view->Draw ();
+  g3d->FinishDraw ();
+}
+
 //----------------------------------------------------------------------
 
 bool csSector::SetVisibilityCullerPlugin (const char *plugname,
@@ -330,8 +388,8 @@ bool csSector::SetVisibilityCullerPlugin (const char *plugname,
   culler = 0;
 
   // Load the culler plugin.
-  csRef<iPluginManager> plugmgr = CS_QUERY_REGISTRY (engine->objectRegistry,
-  	iPluginManager);
+  csRef<iPluginManager> plugmgr = 
+  	csQueryRegistry<iPluginManager> (engine->objectRegistry);
   culler = CS_LOAD_PLUGIN (plugmgr, plugname, iVisibilityCuller);
 
   if (!culler)
@@ -468,7 +526,7 @@ public:
     }
     else
     {
-      csRef<iLight> light = SCF_QUERY_INTERFACE (visobj, iLight);
+      csRef<iLight> light = scfQueryInterface<iLight> (visobj);
       if (light)
       {
         csSector* csector = (csSector*)sector;
@@ -1050,6 +1108,7 @@ void csSector::SetDynamicAmbientLight (const csColor& color)
 {
   dynamicAmbientLightColor = color;
   dynamicAmbientLightVersion++;
+  svDynamicAmbient->SetValue (dynamicAmbientLightColor);
 }
 
 void csSector::CalculateSectorBBox (csBox3 &bbox, bool do_meshes) const
@@ -1079,16 +1138,43 @@ void csSector::CleanupLSI ()
     ((csLight*)inf->light)->RemoveLSI (inf);
   }
   influences.Empty ();
+  relevant_lights_dirty = true;
 }
 
 void csSector::AddLSI (csLightSectorInfluence* inf)
 {
   influences.Add (inf);
+  relevant_lights_dirty = true;
 }
 
 void csSector::RemoveLSI (csLightSectorInfluence* inf)
 {
   influences.Delete (inf);
+  relevant_lights_dirty = true;
+}
+
+const csArray<iLightSectorInfluence*>& csSector::GetRelevantLights (
+  	int maxLights, bool desireSorting)
+{
+  if (relevant_lights_dirty)
+  {
+    if (maxLights != -1)
+      relevant_lights.SetSize (maxLights);
+    relevant_lights.Empty ();
+    csLightSectorInfluences::GlobalIterator it = influences.GetIterator ();
+    size_t cnt = 0;
+    while (it.HasNext ())
+    {
+      csLightSectorInfluence* inf = it.Next ();
+      relevant_lights.Push (inf);
+      cnt++;
+      if (maxLights != -1 && cnt >= (size_t)maxLights)
+	break;
+    }
+
+    relevant_lights_dirty = false;
+  }
+  return relevant_lights;
 }
 
 //---------------------------------------------------------------------------
@@ -1130,6 +1216,37 @@ void csSector::UnregisterPortalMesh (iMeshWrapper* mesh)
   portalMeshes.Delete (mesh);
 }
 
+CS_IMPLEMENT_STATIC_CLASSVAR_REF(csSector, svNames, SVNames,
+                                 csSector::SVNamesHolder, ());
+
+void csSector::UpdateFogSVs ()
+{
+  svFogColor->SetValue (fog.color);
+  svFogMode->SetValue (int (fog.mode));
+  svFogStart->SetValue (fog.start);
+  svFogEnd->SetValue (fog.end);
+  svFogDensity->SetValue (fog.density);
+}
+
+void csSector::SetupSVNames()
+{
+  if (SVNames().dynamicAmbient == csInvalidStringID)
+  {
+    SVNames().dynamicAmbient = CS::ShaderVarName (engine->globalStringSet,
+      "dynamic ambient");
+    SVNames().fogColor = CS::ShaderVarName (engine->globalStringSet,
+      "fog color");
+    SVNames().fogMode = CS::ShaderVarName (engine->globalStringSet,
+      "fog mode");
+    SVNames().fogStart = CS::ShaderVarName (engine->globalStringSet,
+      "fog start");
+    SVNames().fogEnd = CS::ShaderVarName (engine->globalStringSet,
+      "fog end");
+    SVNames().fogDensity = CS::ShaderVarName (engine->globalStringSet,
+      "fog density");
+  }
+}
+
 //---------------------------------------------------------------------------
 
 
@@ -1147,7 +1264,7 @@ csSectorList::~csSectorList ()
 void csSectorList::NameChanged (iObject* object, const char* oldname,
   	const char* newname)
 {
-  csRef<iSector> sector = SCF_QUERY_INTERFACE (object, iSector);
+  csRef<iSector> sector = scfQueryInterface<iSector> (object);
   CS_ASSERT (sector != 0);
   if (oldname) sectors_hash.Delete (oldname, sector);
   if (newname) sectors_hash.Put (newname, sector);

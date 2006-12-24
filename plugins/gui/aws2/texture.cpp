@@ -28,7 +28,7 @@
 #include "ivideo/texture.h"
 #include "ivideo/txtmgr.h"
 #include "iutil/databuff.h"
-#include "csgfx/memimage.h"
+#include "csgfx/imagememory.h"
 
 
 #define CHECK(objname, check) \
@@ -106,7 +106,7 @@ static JSBool Texture (JSContext *cx, JSObject *obj, uintN argc, jsval *argv,
     texture_name = JS_GetStringBytes (name);
 
     // Get a handle to the VFS.		
-    csRef<iVFS> vfs (CS_QUERY_REGISTRY (AwsMgr ()->GetObjectRegistry (), iVFS));
+    csRef<iVFS> vfs (csQueryRegistry<iVFS> (AwsMgr ()->GetObjectRegistry ()));
 
     if (!vfs)
     {
@@ -115,8 +115,8 @@ static JSBool Texture (JSContext *cx, JSObject *obj, uintN argc, jsval *argv,
     }
 
     // Get a handle to the image loader.
-    csRef<iImageIO> loader = CS_QUERY_REGISTRY (
-      AwsMgr ()->GetObjectRegistry (), iImageIO);
+    csRef<iImageIO> loader = 
+      csQueryRegistry<iImageIO> (AwsMgr ()->GetObjectRegistry ());
 
     if (!loader)
     {

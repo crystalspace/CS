@@ -22,7 +22,7 @@ GREP ?= grep ;
 
 SubDir TOP mk msvcgen ;
 
-InstallData [ Wildcard *.tlib ] : build msvcgen ;
+InstallData [ Wildcard *.cslib *.jam *.tlib ] : build msvcgen ;
 
 MsvcGenSubDir TOP mk msvc : common ;
 MsvcGenSubDir TOP mk msvc7 : 7 ;

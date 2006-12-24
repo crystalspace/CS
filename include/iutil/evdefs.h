@@ -82,7 +82,7 @@ enum csMouseButton
   csmbMiddle = 2,
   /// Wheel was scrolled up
   csmbWheelUp = 3,
-  /// Wheel was scrolled up
+  /// Wheel was scrolled down
   csmbWheelDown = 4,
   /// Thumb button 1 (e.g. on 5-button mice)
   csmbExtra1 = 5,

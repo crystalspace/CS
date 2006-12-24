@@ -23,343 +23,293 @@
 
 namespace lighter
 {
-
-  // Helperstruct for kd traversal
-  struct kdTraversalS
+  MailboxHash::MailboxHash ()
+    : rayID (1)
   {
-    KDTreeNode *node;
-    float tnear, tfar;
-  };
-
-
-  bool Raytracer::TraceRecursive(const Ray &ray, HitPoint& hit, KDTreeNode* node, float tmin, float tmax) const
-  {
-    if(node->leftChild)
-    {
-      //Inner
-      // Check intersection with ray-plane
-      int dim = node->splitDimension;
-      float thit = (node->splitLocation - ray.origin[dim]) / ray.direction[dim];
-      KDTreeNode *nearNode, *farNode;
-      if(ray.direction[dim] > 0) 
-      {
-        nearNode = node->leftChild;
-        farNode = node->rightChild;
-      }
-      else
-      {
-        nearNode = node->rightChild;
-        farNode = node->leftChild;
-      }
-
-      if (thit <= tmin)
-      {
-        if(TraceRecursive (ray, hit, farNode, tmin, tmax))
-          return true;
-      }
-      else if(thit >= tmax)
-      {
-        if(TraceRecursive (ray, hit, nearNode, tmin, tmax))
-          return true;
-      }
-      else
-      {
-        if(TraceRecursive (ray, hit, nearNode, tmin, thit))
-          return true;
-        if(TraceRecursive (ray, hit, farNode, thit, tmax))
-          return true;
-      }
-    }
-    else
-    {
-      //Leaf
-      bool haveHit = IntersectPrimitives (node, ray, hit, true); 
-      if(haveHit)
-      {
-        return true;
-      }
-    }
-    return false;
+    hash = static_cast<HashEntry*> (CS::Memory::AlignedMalloc (
+      sizeof (HashEntry) * HASH_SIZE, 16));
+    memset (hash, 0, sizeof (HashEntry) * HASH_SIZE);
   }
 
-  bool Raytracer::TraceAnyHit (const Ray &ray, HitPoint& hit) const
+  MailboxHash::~MailboxHash ()
   {
-    if (!tree || !tree->rootNode) return false;
+    CS::Memory::AlignedFree (hash);
+  }
 
-    RaytraceProfiler prof(1);
+  Raytracer::Raytracer (KDTree *tree)
+    : tree (tree), traversalStackPtr (0)
+  {
+    traversalStack = static_cast<kdTraversalS*> (CS::Memory::AlignedMalloc (
+      sizeof (kdTraversalS) * MAX_STACK_DEPTH, 32));
+  }
+
+  Raytracer::~Raytracer ()
+  {
+    CS::Memory::AlignedFree (traversalStack);
+  }
+
+  bool Raytracer::TraceAnyHit (const Ray &ray, HitPoint& hit)
+  {
+    if (!tree || !tree->nodeList) return false;
+
+    //RaytraceProfiler prof(1);
 
     //Copy and clip the ray
     Ray myRay = ray;
     if (!myRay.Clip (tree->boundingBox))
       return false;
 
+    myRay.rayID = mailboxes.GetRayID ();
     float tmin (myRay.minLength), tmax (myRay.maxLength);
 
-    //return TraceRecursive (myRay, hit, tree->rootNode, tmin, tmax);
+    hit.distance = FLT_MAX*0.95f;
 
-    KDTreeNode* node = tree->rootNode;
+    KDTreeNode* node = tree->nodeList;
 
-    //Setup a stack for traversal
-    csArray<kdTraversalS> traceStack;
-    traceStack.SetCapacity (64);
+    size_t nodeOffset[3][2];
+    csVector3 invD;
+    
+    traversalStackPtr = 0;
+
+    for (size_t dim = 0; dim < 3; ++dim)
+    {
+      if (ray.direction[dim] > 0)
+      {
+        nodeOffset[dim][0] = 0;
+        nodeOffset[dim][1] = 1;
+      }
+      else
+      {
+        nodeOffset[dim][0] = 1;
+        nodeOffset[dim][1] = 0;
+      }
+      invD[dim] = 1.0f / ray.direction[dim];
+    }
     
     while (true)
     {
-      while (node->leftChild)
+      while (!KDTreeNode_Op::IsLeaf (node))
       {
-        uint dim = node->splitDimension;
-        float thit = (node->splitLocation - ray.origin[dim]) / ray.direction[dim];
+        uint dim = KDTreeNode_Op::GetDimension (node);
+        //float thit = (node->inner.splitLocation - ray.origin[dim]) / ray.direction[dim];
+        float thit = (node->inner.splitLocation - ray.origin[dim]) * invD[dim];
 
-        KDTreeNode *nearNode, *farNode;
-        if(ray.direction[dim] > 0) 
-        {
-          nearNode = node->leftChild;
-          farNode = node->rightChild;
-        }
-        else
-        {
-          nearNode = node->rightChild;
-          farNode = node->leftChild;
-        }
+        csVector3 hitPoint = myRay.origin + myRay.direction * thit;
 
-        if (thit <= tmin)
+        KDTreeNode *nearNode, *farNode, *leftNode;
+        leftNode = KDTreeNode_Op::GetLeft (node);
+
+        nearNode = leftNode + nodeOffset[dim][0];
+        farNode = leftNode + nodeOffset[dim][1];        
+
+        if (thit < tmin)
         {
           node = farNode;
         }
-        else if (thit >= tmax)
+        else if (thit > tmax)
         {
           node = nearNode;
         }
         else
         {
-          kdTraversalS e = {farNode, thit, tmax};
+          traversalStack[traversalStackPtr].node = farNode;
+          traversalStack[traversalStackPtr].tnear = thit;
+          traversalStack[traversalStackPtr].tfar = tmax;
+          traversalStackPtr++;
+          CS_ASSERT(traversalStackPtr < MAX_STACK_DEPTH);
+
           node = nearNode;
           tmax = thit;
-          traceStack.Push (e);
         }
       }
 
-      if (IntersectPrimitives (node, ray, hit, true))
+      if (IntersectPrimitives<true> (node, myRay, hit))
         return true;
 
-      if (traceStack.IsEmpty ())
+      if (traversalStackPtr == 0)
         return false;
 
-      kdTraversalS n = traceStack.Pop ();
-      node = n.node;
-      tmin = n.tnear;
-      tmax = n.tfar;
+      traversalStackPtr--;
+      node = traversalStack[traversalStackPtr].node;
+      tmin = traversalStack[traversalStackPtr].tnear;
+      tmax = traversalStack[traversalStackPtr].tfar;
     }
 
     return true;
-
   }
 
-  bool Raytracer::TraceClosestHit (const Ray &ray, HitPoint &hit) const
+  bool Raytracer::TraceClosestHit (const Ray &ray, HitPoint &hit) 
   {
-    return false;
-    /*if (!tree || !tree->rootNode) return false;
+    if (!tree || !tree->nodeList) return false;
+
+    //RaytraceProfiler prof(1);
 
     //Copy and clip the ray
     Ray myRay = ray;
-    if (!myRay.Clip (tree->rootNode->boundingBox))
+    if (!myRay.Clip (tree->boundingBox))
       return false;
 
-    float minT (myRay.minLength), maxT (myRay.maxLength);
+    myRay.rayID = mailboxes.GetRayID ();
+    float tmin (myRay.minLength), tmax (myRay.maxLength);
 
+    KDTreeNode* node = tree->nodeList;
 
-    // Setup for traversal
-    csArray<kdTraversalS> kdstack;
-    kdstack.SetCapacity (64);
-    float t;
-    HitPoint hitPoint, bestHit;
-    hitPoint.distance = myRay.maxLength;
-    bestHit.distance = FLT_MAX*0.9f;
+    hit.distance = FLT_MAX*0.95f;
 
-    KDTreeNode *node = tree->rootNode;
+    size_t nodeOffset[3][2];
+    csVector3 invD;
+    bool haveAnyHit = false;
+
+    traversalStackPtr = 0;
+
+    for (size_t dim = 0; dim < 3; ++dim)
+    {
+      if (ray.direction[dim] > 0)
+      {
+        nodeOffset[dim][0] = 0;
+        nodeOffset[dim][1] = 1;
+      }
+      else
+      {
+        nodeOffset[dim][0] = 1;
+        nodeOffset[dim][1] = 0;
+      }
+      invD[dim] = 1.0f / ray.direction[dim];
+    }
 
     while (true)
     {
-      // traverse until we hit a leaf
-      while (node->leftChild)
+      while (!KDTreeNode_Op::IsLeaf (node))
       {
-        uint splitDim = node->splitDimension;
+        uint dim = KDTreeNode_Op::GetDimension (node);
+        //float thit = (node->inner.splitLocation - ray.origin[dim]) / ray.direction[dim];
+        float thit = (node->inner.splitLocation - ray.origin[dim]) * invD[dim];
 
-        t = (node->splitLocation - ray.origin[splitDim]) / ray.direction[splitDim];
+        KDTreeNode *nearNode, *farNode, *leftNode;
+        leftNode = KDTreeNode_Op::GetLeft (node);
 
-        if (t <= minT)
+        nearNode = leftNode + nodeOffset[dim][0];
+        farNode = leftNode + nodeOffset[dim][1];        
+
+        if (thit < tmin)
         {
-          // t <= minLength <= maxLength, cull left traverse right
-          node = node->rightChild;
+          node = farNode;
         }
-        else if (t >= maxT)
+        else if (thit > tmax)
         {
-          // minLength <= maxLength <= t, cull right traverse left
-          node = node->leftChild;
+          node = nearNode;
         }
         else
         {
-          // minLength < t < maxLength, traverse both
-          kdstack.Push (kdTraversalS (node->rightChild, t, maxT));
-          node = node->leftChild;
-          maxT = t;
+          traversalStack[traversalStackPtr].node = farNode;
+          traversalStack[traversalStackPtr].tnear = thit;
+          traversalStack[traversalStackPtr].tfar = tmax;
+          traversalStackPtr++;
+          CS_ASSERT(traversalStackPtr < MAX_STACK_DEPTH);
+
+          node = nearNode;
+          tmax = thit;
         }
       }
 
-      // Ok, down to leaf.. process it
-      bool anyHit = IntersectPrimitives (node, myRay, hitPoint);
-      
-      if (anyHit)
-      {
-        if (hitPoint.distance < bestHit.distance) bestHit = hitPoint;
-      }
+      if (IntersectPrimitives<false> (node, myRay, hit))
+        haveAnyHit = true;
 
-      // Early termination
-      if (anyHit && maxT <= hitPoint.distance)
-      {
-        hit = bestHit;
-        return true;
-      }
+      if (traversalStackPtr == 0)
+        return haveAnyHit;
 
-      if (kdstack.GetSize () == 0)
-      {
-        // no more nodes, and no hit.. return
-        hit = bestHit;
-        return anyHit;
-      }
-
-      kdTraversalS s = kdstack.Pop ();
-      node = s.node;
-      minT = s.tnear;
-      maxT = s.tfar;
+      traversalStackPtr--;
+      node = traversalStack[traversalStackPtr].node;
+      tmin = traversalStack[traversalStackPtr].tnear;
+      tmax = traversalStack[traversalStackPtr].tfar;
     }
 
-    return false;*/
+    return haveAnyHit;
   }
 
   static const uint mod5[] = {0,1,2,0,1};
 
-  bool IntersectPrimitiveRay (const KDTreePrimitive &primitive, const Ray &ray,
+  static bool IntersectPrimitiveRay (const KDTreePrimitive &primitive, const Ray &ray,
     HitPoint &hit)
   {
-    /*
-    {
-      
-      float nom = - (primitive.normal * (ray.origin - primitive.vertices[0]));
-      float den = primitive.normal * ray.direction;
+    const uint k = primitive.normal_K & ~KDPRIM_FLAG_MASK;
+    const uint ku = mod5[k+1];
+    const uint kv = mod5[k+2];
 
-      if(den < 0) 
-        return false; //backface culling
+    // prefetch?
 
+    const float nd = 1.0f / (ray.direction[k] + 
+      primitive.normal_U * ray.direction[ku] + primitive.normal_V * ray.direction[kv]);
 
-      float dist = nom / den;
-      if(dist < ray.minLength || dist > ray.maxLength)
-        return false;
+    const float f = (primitive.normal_D - ray.origin[k] - 
+      primitive.normal_U * ray.origin[ku] - primitive.normal_V * ray.origin[kv]) * nd;
 
-      csVector3 I = ray.origin + ray.direction * dist;
+    // Check for distance..
+    if (!(ray.maxLength > f && f > ray.minLength)) return false;
 
-      // Is inside?
-      csVector3 u, v, w;
-      float uu, uv, vv, wu, wv, D;
+    // Compute hitpoint on plane
+    const float hu = (ray.origin[ku] + f * ray.direction[ku]);
+    const float hv = (ray.origin[kv] + f * ray.direction[kv]);
 
-      u = primitive.vertices[2] - primitive.vertices[0];
-      v = primitive.vertices[1] - primitive.vertices[0];
+    // First barycentric coordinate
+    const float lambda = (hu * primitive.edgeA_U + hv * primitive.edgeA_V + primitive.edgeA_D);
+    if (lambda < 0.0f) 
+      return false;
 
-      uu = u*u;
-      uv = u*v;
-      vv = v*v;
-      w = I - primitive.vertices[0];
-      wu = w*u;
-      wv = w*v;
-      D = uv*uv - uu*vv;
+    // Second barycentric coordinate
+    const float mu = (hu * primitive.edgeB_U + hv * primitive.edgeB_V + primitive.edgeB_D);
+    if (mu < 0.0f) 
+      return false;
 
-      // Test barycentric
-      float s, t;
-      s = (uv*wv - vv*wu) / D;
-      if (s < 0.0f || s > 1.0f)
-        return false;
+    // Third barycentric coordinate
+    if (lambda + mu > 1.0f) 
+      return false;
 
-      t = (uv*wu - uu*wv) / D;
-      if (t < 0.0f || (t+s) > 1.0f)
-        return false;
-
-      hit.hitPoint = I;
-      hit.distance = dist;
-      hit.primitive = primitive.primPointer;
-    }*/
- 
-
-    {
-      const uint k = primitive.k;
-      const uint ku = mod5[primitive.k+1];
-      const uint kv = mod5[primitive.k+2];
-
-      // prefetch?
-
-      const float nd = 1.0f / (ray.direction[k] + 
-        primitive.n_u * ray.direction[ku] + primitive.n_v * ray.direction[kv]);
-
-      const float f = (primitive.n_d - ray.origin[k] - 
-        primitive.n_u * ray.origin[ku] - primitive.n_v * ray.origin[kv]) * nd;
-
-      // Check for distance..
-      if (!(ray.maxLength > f && f > ray.minLength)) return false;
-
-      // Compute hitpoint on plane
-      const float hu = (ray.origin[ku] + f * ray.direction[ku]);
-      const float hv = (ray.origin[kv] + f * ray.direction[kv]);
-
-      // First barycentric coordinate
-      const float lambda = (hu * primitive.b_nu + hv * primitive.b_nv + primitive.b_d);
-      if (lambda < 0.0f) 
-        return false;
-
-      // Second barycentric coordinate
-      const float mu = (hu * primitive.c_nu + hv * primitive.c_nv + primitive.c_d);
-      if (mu < 0.0f) 
-        return false;
-
-      // Third barycentric coordinate
-      if (lambda + mu > 1.0f) 
-        return false;
-
-      // Ok, is a hit, store it
-      hit.hitPoint = ray.origin + ray.direction * f;
-      hit.distance = f;
-      hit.primitive = primitive.primPointer;
-    }
-
+    // Ok, is a hit, store it
+    hit.hitPoint = ray.origin + ray.direction * f;
+    hit.distance = f;
+    hit.primitive = primitive.primPointer;
 
     return true;
   }
 
+  template<bool exitFirstHit>
   bool Raytracer::IntersectPrimitives (const KDTreeNode* node, const Ray &ray, 
-    HitPoint &hit, bool earlyExit /* = false */) const
+    HitPoint &hit)
   {
     size_t nIdx, nMax;
-    nMax = node->triangleIndices.GetSize ();
+    nMax = KDTreeNode_Op::GetPrimitiveListSize (node);;
     bool haveHit = false;
     bool haveAnyHit = false;
 
-    HitPoint bestHit, thisHit;
-    bestHit.distance = FLT_MAX*0.95f;
+    HitPoint thisHit;
+
+    KDTreePrimitive* primList = KDTreeNode_Op::GetPrimitiveList (node);
 
     for (nIdx = 0; nIdx < nMax; nIdx++)
     {
-      haveHit = IntersectPrimitiveRay (tree->allTriangles[node->triangleIndices[nIdx]], ray, thisHit);
+      KDTreePrimitive* prim = primList + nIdx;
+
+      if (prim->primPointer == ray.ignorePrimitive ||
+        mailboxes.PutPrimitiveRay (prim->primPointer, ray.rayID))
+        continue;
+
+      if (ray.ignoreFlags & (prim->normal_K & KDPRIM_FLAG_MASK))
+        continue;
+
+      haveHit = IntersectPrimitiveRay (*prim, ray, thisHit);
       if (haveHit)
       {
         haveAnyHit = true;
-        if (earlyExit) 
+        if (exitFirstHit) 
         {
           hit = thisHit;
           return true;
         }
-        if (thisHit.distance < bestHit.distance) bestHit = thisHit;
+        if (thisHit.distance < hit.distance) 
+          hit = thisHit;
       }
     }
-
-    hit = bestHit;
 
     return haveAnyHit;
   }

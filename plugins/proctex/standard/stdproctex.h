@@ -20,7 +20,7 @@
 #ifndef __CS_STDPROCTEX_H__
 #define __CS_STDPROCTEX_H__
 
-#include "csutil/scf.h"
+#include "csutil/scf_implementation.h"
 #include "iutil/comp.h"
 #include "iutil/plugin.h"
 #include "imap/reader.h"
@@ -30,28 +30,29 @@
 
 class csProcTexture;
 
-class csBaseProctexType : public iComponent, public iTextureType
+class csBaseProctexType :
+  public scfImplementation2<csBaseProctexType,
+    iComponent, iTextureType>
 {
 protected:
   iObjectRegistry* object_reg;
-public:
-  SCF_DECLARE_IBASE;
 
+public:
   csBaseProctexType (iBase *p);
   virtual ~csBaseProctexType ();
 
   virtual bool Initialize(iObjectRegistry *object_reg);
 };  
 
-class csBaseProctexLoader : public iLoaderPlugin
+class csBaseProctexLoader :
+  public scfImplementation2<csBaseProctexLoader, iLoaderPlugin, iComponent>
 {
 protected:
   iObjectRegistry* object_reg;
 
   csPtr<iBase> PrepareProcTex (csProcTexture* pt);
-public:
-  SCF_DECLARE_IBASE;
 
+public:
   csBaseProctexLoader (iBase *p);
   virtual ~csBaseProctexLoader ();
 
@@ -60,25 +61,16 @@ public:
   virtual csPtr<iBase> Parse (iDocumentNode* node,
   	iStreamSource*, iLoaderContext* ldr_context,
   	iBase* context) = 0;
-
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csBaseProctexLoader);
-
-    virtual bool Initialize (iObjectRegistry* p)
-    { return scfParent->Initialize(p); }
-  } scfiComponent;
 };  
 
-class csBaseProctexSaver : public iSaverPlugin
+class csBaseProctexSaver :
+  public scfImplementation2<csBaseProctexSaver, iSaverPlugin, iComponent>
 {
 private:
   iObjectRegistry* object_reg;
   csRef<iSyntaxService> synldr;
 
 public:
-  SCF_DECLARE_IBASE;
-
   csBaseProctexSaver (iBase*);
   virtual ~csBaseProctexSaver ();
 
@@ -86,14 +78,6 @@ public:
 
   virtual bool WriteDown (iBase *obj, iDocumentNode* parent,
   	iStreamSource*) = 0;
-
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csBaseProctexSaver);
-    virtual bool Initialize (iObjectRegistry* p)
-    { return scfParent->Initialize (p); }
-  } scfiComponent;
-  friend struct eiComponent;
 };
 
 #endif

@@ -20,7 +20,7 @@
 #include "cssysdef.h"
 #include <math.h>
 
-#include "csgfx/memimage.h"
+#include "csgfx/imagememory.h"
 #include "cstool/proctex.h"
 #include "csutil/hash.h"
 #include "csutil/event.h"
@@ -67,15 +67,15 @@ public:
 
   virtual bool HandleEvent (iEvent& event);
 
-  CS_EVENTHANDLER_NAMES("crystalspace.proxtex")
+  CS_EVENTHANDLER_NAMES("crystalspace.proctex")
   CS_EVENTHANDLER_NIL_CONSTRAINTS
 
 public:
-  void PushTexture (csProcTexture* txt)
+  virtual void PushTexture (csProcTexture* txt)
   {
     textures.Add (txt);
   }
-  void PopTexture (csProcTexture* txt)
+  virtual void PopTexture (csProcTexture* txt)
   {
     textures.Delete (txt);
   }
@@ -84,7 +84,7 @@ public:
 
 bool csProcTexEventHandler::HandleEvent (iEvent& event)
 {
-  csRef<iVirtualClock> vc (CS_QUERY_REGISTRY (object_reg, iVirtualClock));
+  csRef<iVirtualClock> vc (csQueryRegistry<iVirtualClock> (object_reg));
   csTicks elapsed_time, current_time;
   elapsed_time = vc->GetElapsedTicks ();
   current_time = vc->GetCurrentTicks ();
@@ -148,11 +148,11 @@ csProcTexture::~csProcTexture ()
 iEventHandler* csProcTexture::SetupProcEventHandler (
 	iObjectRegistry* object_reg)
 {
-  csRef<iEventHandler> proceh = CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg,
-  	"crystalspace.proctex.eventhandler", iEventHandler);
+  csRef<iEventHandler> proceh = csQueryRegistryTagInterface<iEventHandler>
+  	(object_reg, "crystalspace.proctex.eventhandler");
   if (proceh) return proceh;
   proceh = csPtr<iEventHandler> (new csProcTexEventHandler (object_reg));
-  csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
+  csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (object_reg));
   if (q != 0)
   {
     q->RegisterListener (proceh, csevPreProcess(object_reg));
@@ -174,9 +174,7 @@ struct csProcTexCallback :
 
 void csProcTexCallback::UseTexture (iTextureWrapper*)
 {
-  if (!pt->PrepareAnim ()) return;
-  pt->visible = true;
-  ((csProcTexEventHandler*)(iEventHandler*)(pt->proceh))->PushTexture (pt);
+  pt->UseTexture ();
 }
 iProcTexture* csProcTexCallback::GetProcTexture() const
 {
@@ -191,10 +189,10 @@ bool csProcTexture::Initialize (iObjectRegistry* object_reg)
   if (!proc_image.IsValid())
     proc_image.AttachNew (new csImageMemory (mat_w, mat_h));
 
-  g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
-  g2d = CS_QUERY_REGISTRY (object_reg, iGraphics2D);
+  g3d = csQueryRegistry<iGraphics3D> (object_reg);
+  g2d = csQueryRegistry<iGraphics2D> (object_reg);
 
-  csRef<iEngine> engine (CS_QUERY_REGISTRY (object_reg, iEngine));
+  csRef<iEngine> engine (csQueryRegistry<iEngine> (object_reg));
   tex = engine->GetTextureList ()->NewTexture (proc_image);
   proc_image = 0;
   if (!tex)
@@ -253,6 +251,13 @@ void csProcTexture::SetAlwaysAnimate (bool enable)
   {
     ((csProcTexEventHandler*)(iEventHandler*)proceh)->PushTexture (this);
   }
+}
+
+void csProcTexture::UseTexture ()
+{
+  if (!PrepareAnim ()) return;
+  visible = true;
+  ((csProcTexEventHandler*)(iEventHandler*)(proceh))->PushTexture (this);
 }
 
 //-----------------------------------------------------------------------------

@@ -52,13 +52,9 @@
 #include "ivideo/rendermesh.h"
 #include "ivideo/rndbuf.h"
 
-// Hack: work around problems caused by #defining 'new'
-#if defined(CS_EXTENSIVE_MEMDEBUG) || defined(CS_MEMORY_TRACKER)
-# undef new
-#endif
-#include <new>
-
+#include "csutil/custom_new_disable.h"
 #include <cal3d/cal3d.h>
+#include "csutil/custom_new_enable.h"
 
 struct iObjectRegistry;
 struct iEngine;
@@ -66,11 +62,7 @@ struct iMaterialWrapper;
 
 #define ALL_LOD_FEATURES (CS_LOD_TRIANGLE_REDUCTION|CS_LOD_DISTANCE_REDUCTION)
 
-namespace CS
-{
-namespace Plugins
-{
-namespace SprCal3d
+CS_PLUGIN_NAMESPACE_BEGIN(SprCal3d)
 {
 
 class csSpriteCal3DMeshObjectType;
@@ -201,6 +193,8 @@ public:
 
 class csSpriteCal3DMeshObject;
 
+#include "csutil/win32/msvc_deprecated_warn_off.h"
+
 /**
  * A Cal3D sprite based on a triangle mesh with a single texture.  Animation is
  * done with frames.  This class represents a template from which a
@@ -233,6 +227,7 @@ private:
   csString basePath;
   csPDelArray<csSpriteCal3DSocket> sockets;
   csFlags flags;
+  csBox3 obj_bbox;
 
   struct MeshBuffers
   {
@@ -356,6 +351,7 @@ public:
    * @{ */
   void GetObjectBoundingBox (csBox3& bbox, csVector3 *verts,int vertCount);
   void GetObjectBoundingBox (csBox3& bbox);
+  const csBox3& GetObjectBoundingBox ();
   void SetObjectBoundingBox (const csBox3& bbox);
   void GetRadius (float& rad, csVector3& cent);
   virtual iTerraFormer* GetTerraFormerColldet () { return 0; }
@@ -624,8 +620,8 @@ public:
 
   virtual iMeshObjectFactory* GetFactory () const
   {
-    csRef<iMeshObjectFactory> ifact (SCF_QUERY_INTERFACE (factory,
-    	iMeshObjectFactory));
+    csRef<iMeshObjectFactory> ifact (
+    	scfQueryInterface<iMeshObjectFactory> (factory));
     return ifact;	// DecRef is ok here.
   }
   virtual csFlags& GetFlags () { return flags; }
@@ -764,11 +760,14 @@ public:
    * @{ */
   void GetObjectBoundingBox (csBox3& bbox, csVector3 *verts, int vertCount);
   void GetObjectBoundingBox (csBox3& bbox);
+  const csBox3& GetObjectBoundingBox ();
   void SetObjectBoundingBox (const csBox3& bbox);
   void GetRadius (float& rad, csVector3& cent);
   virtual iTerraFormer* GetTerraFormerColldet () { return 0; }
   /** @} */
 };
+
+#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 /**
  * Sprite Cal3D type. This is the plugin you have to use to create instances
@@ -834,8 +833,7 @@ public:
   csRef<iPolygonMesh> nullPolyMesh;
 };
 
-} // namespace SprCal3d
-} // namespace Plugins
-} // namespace CS
+}
+CS_PLUGIN_NAMESPACE_END(SprCal3d)
 
 #endif // __CS_SPRCAL3D_H__

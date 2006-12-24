@@ -31,8 +31,34 @@ Use this option to select the type of 2D canvas to use.
 Use this option to select type of display driver to use.  Other options
 are @code{software}, @code{null}, etc.
 
+@item -fs
+Open in fullscreen mode (default is windowed).
+
+@item -verbose
+This enable very verbose output. This is useful for debugging why
+Crystal Space isn't behaving as it should. If you just specify @samp{-verbose}
+you will get a lot of output. If your problem is not @sc{scf} related
+you can also do: @samp{-verbose=-scf}.
+
 @item -relight
 Use this option to recalculate all lightmaps after you changed lighting
 or geometry in a level that you're trying. If you don't do this you either
-get the old lightmaps or no lightmaps at all.
+get the old lightmaps or no lightmaps at all. Note that this command
+is only for the old lightmap system as used by the thing mesh object.
+
+@item -fullbright
+Use this option to get fullbright rendering of all objects. This is useful
+for debugging maps if you don't want to spend time relighting them first.
+
+@item -plugin=@dots{}
+This is a general commandline option with which you can load any plugin
+into your application. One common option is to use this for loading
+the @samp{bugplug} debugging plugin like this: @samp{-plugin=bugplug}.
+
+@item -cfgset=@dots{}
+With this commandline option you can set a configuration option on
+the commandline. For example: @samp{-cfgset=Video.OpenGL.DelaySwap=yes}.
+
+@item -cfgfile=@dots{}
+This option loads an entire file to the configuration manager.
 @end table

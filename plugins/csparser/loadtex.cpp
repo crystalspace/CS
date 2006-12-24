@@ -29,6 +29,7 @@
 #include "csgfx/imagevolumemaker.h"
 #include "csgfx/xorpat.h"
 #include "csutil/cscolor.h"
+#include "csutil/scfstr.h"
 #include "iengine/engine.h"
 #include "iengine/material.h"
 #include "iengine/texture.h"
@@ -46,6 +47,15 @@
 
 #include "csloader.h"
 #include "loadtex.h"
+
+static void ReportError (iObjectRegistry* object_reg,
+    const char* id, const char* description, ...)
+{
+  va_list arg;
+  va_start (arg, description);
+  csReportV (object_reg, CS_REPORTER_SEVERITY_ERROR, id, description, arg);
+  va_end (arg);
+}
 
 csPtr<iImage> csLoader::LoadImage (iDataBuffer* buf, const char* fname,
 	int Format)
@@ -122,12 +132,16 @@ csPtr<iTextureHandle> csLoader::LoadTexture (iDataBuffer* buf, int Flags,
   if (!tm)
     return 0;
   
-  csRef<iTextureHandle> TexHandle = tm->RegisterTexture (Image, Flags);
+  csRef<scfString> fail_reason;
+  fail_reason.AttachNew (new scfString ());
+  csRef<iTextureHandle> TexHandle = tm->RegisterTexture (Image, Flags,
+      fail_reason);
   if (!TexHandle)
   {
     ReportError (
 	"crystalspace.maploader.parse.texture",
-	"Cannot create texture!");
+	"Cannot create texture: %s",
+	fail_reason->GetData ());
     return 0;
   }
 
@@ -204,12 +218,16 @@ csPtr<iTextureHandle> csLoader::LoadTexture (const char *fname, int Flags,
   if (!tm)
     return 0;
   
-  csRef<iTextureHandle> TexHandle (tm->RegisterTexture (Image, Flags));
+  csRef<scfString> fail_reason;
+  fail_reason.AttachNew (new scfString ());
+  csRef<iTextureHandle> TexHandle (tm->RegisterTexture (Image, Flags,
+	fail_reason));
   if (!TexHandle)
   {
     ReportError (
 	"crystalspace.maploader.parse.texture",
-	"Cannot create texture from '%s'!", fname);
+	"Cannot create texture from '%s': '%s'", fname,
+	fail_reason->GetData ());
     return 0;
   }
 
@@ -257,14 +275,9 @@ iTextureWrapper* csLoader::LoadTexture (const char *name,
 
 //----------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE(TextureLoaderContext);
-  SCF_IMPLEMENTS_INTERFACE(iTextureLoaderContext);
-SCF_IMPLEMENT_IBASE_END
-
-TextureLoaderContext::TextureLoaderContext (const char* texname)
+TextureLoaderContext::TextureLoaderContext (const char* texname) :
+  scfImplementationType(this)
 {
-  SCF_CONSTRUCT_IBASE (0);
-
   has_flags = false;
   flags = CS_TEXTURE_3D;
 
@@ -279,7 +292,6 @@ TextureLoaderContext::TextureLoaderContext (const char* texname)
 
 TextureLoaderContext::~TextureLoaderContext ()
 {
-  SCF_DESTRUCT_IBASE();
 }
 
 void TextureLoaderContext::SetFlags (int Flags)
@@ -347,19 +359,13 @@ const char* TextureLoaderContext::GetClass ()
 
 //----------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE(csBaseTextureLoader);
-  SCF_IMPLEMENTS_INTERFACE(iLoaderPlugin);
-  SCF_IMPLEMENTS_INTERFACE(iComponent);
-SCF_IMPLEMENT_IBASE_END
-
-csBaseTextureLoader::csBaseTextureLoader (iBase *p)
+csBaseTextureLoader::csBaseTextureLoader (iBase *p) :
+  scfImplementationType(this, p)
 {
-  SCF_CONSTRUCT_IBASE (p);
 }
 
 csBaseTextureLoader::~csBaseTextureLoader ()
 {
-  SCF_DESTRUCT_IBASE();
 }
 
 bool csBaseTextureLoader::Initialize(iObjectRegistry *object_reg)
@@ -373,7 +379,7 @@ bool csBaseTextureLoader::Initialize(iObjectRegistry *object_reg)
 SCF_IMPLEMENT_FACTORY(csImageTextureLoader)
 
 csImageTextureLoader::csImageTextureLoader (iBase *p) : 
-  csBaseTextureLoader(p)
+  scfImplementationType(this, p)
 {
 }
 
@@ -384,22 +390,29 @@ csPtr<iBase> csImageTextureLoader::Parse (iDocumentNode* /*node*/,
 {
   if (!context) return 0;
   csRef<iTextureLoaderContext> ctx = csPtr<iTextureLoaderContext>
-    (SCF_QUERY_INTERFACE (context, iTextureLoaderContext));
+    (scfQueryInterface<iTextureLoaderContext> (context));
   if (!ctx) return 0;
   if (!ctx->HasImage() || !ctx->GetImage())
     return 0;
 
-  csRef<iGraphics3D> G3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+  csRef<iGraphics3D> G3D = csQueryRegistry<iGraphics3D> (object_reg);
   if (!G3D) return 0;
   csRef<iTextureManager> tm = G3D->GetTextureManager();
   if (!tm) return 0;
-  csRef<iEngine> Engine = CS_QUERY_REGISTRY (object_reg, iEngine);
+  csRef<iEngine> Engine = csQueryRegistry<iEngine> (object_reg);
   if (!Engine)
     return 0;
 
+  csRef<scfString> fail_reason;
+  fail_reason.AttachNew (new scfString ());
   csRef<iTextureHandle> TexHandle (tm->RegisterTexture (ctx->GetImage(), 
-    ctx->HasFlags() ? ctx->GetFlags() : CS_TEXTURE_3D));
-  if (!TexHandle) return 0;
+    ctx->HasFlags() ? ctx->GetFlags() : CS_TEXTURE_3D, fail_reason));
+  if (!TexHandle)
+  {
+    ReportError (object_reg, "crystalspace.imagetextureloader",
+	"Error creating texture: %s", fail_reason->GetData ());
+    return 0;
+  }
 
   csRef<iTextureWrapper> TexWrapper =
 	Engine->GetTextureList ()->NewTexture(TexHandle);
@@ -413,7 +426,7 @@ csPtr<iBase> csImageTextureLoader::Parse (iDocumentNode* /*node*/,
 SCF_IMPLEMENT_FACTORY(csCheckerTextureLoader)
 
 csCheckerTextureLoader::csCheckerTextureLoader (iBase *p) : 
-  csBaseTextureLoader(p)
+  scfImplementationType(this, p)
 {
 }
 
@@ -427,7 +440,7 @@ csPtr<iBase> csCheckerTextureLoader::Parse (iDocumentNode* node,
   csRef<iTextureLoaderContext> ctx;
   if (context)
   {
-    ctx = SCF_QUERY_INTERFACE (context, iTextureLoaderContext);
+    ctx = scfQueryInterface<iTextureLoaderContext> (context);
     if (ctx)
     {
       if (ctx->HasSize())
@@ -450,7 +463,7 @@ csPtr<iBase> csCheckerTextureLoader::Parse (iDocumentNode* node,
     if (colorNode)
     {
       csRef<iSyntaxService> synserv = 
-	CS_QUERY_REGISTRY (object_reg, iSyntaxService);
+	csQueryRegistry<iSyntaxService> (object_reg);
       if (synserv)
       {
 	synserv->ParseColor (colorNode, color);
@@ -461,17 +474,24 @@ csPtr<iBase> csCheckerTextureLoader::Parse (iDocumentNode* node,
   csRef<iImage> Image = csCreateXORPatternImage (w, h, depth, color.red,
   	color.green, color.blue);
 
-  csRef<iGraphics3D> G3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+  csRef<iGraphics3D> G3D = csQueryRegistry<iGraphics3D> (object_reg);
   if (!G3D) return 0;
   csRef<iTextureManager> tm = G3D->GetTextureManager();
   if (!tm) return 0;
-  csRef<iEngine> Engine = CS_QUERY_REGISTRY (object_reg, iEngine);
+  csRef<iEngine> Engine = csQueryRegistry<iEngine> (object_reg);
   if (!Engine)
     return 0;
 
+  csRef<scfString> fail_reason;
+  fail_reason.AttachNew (new scfString ());
   csRef<iTextureHandle> TexHandle (tm->RegisterTexture (Image, 
-    (ctx && ctx->HasFlags()) ? ctx->GetFlags() : CS_TEXTURE_3D));
-  if (!TexHandle) return 0;
+    (ctx && ctx->HasFlags()) ? ctx->GetFlags() : CS_TEXTURE_3D, fail_reason));
+  if (!TexHandle)
+  {
+    ReportError (object_reg, "crystalspace.cubemaploader",
+	"Error creating texture: %s", fail_reason->GetData ());
+    return 0;
+  }
 
   csRef<iTextureWrapper> TexWrapper =
 	Engine->GetTextureList ()->NewTexture(TexHandle);
@@ -486,7 +506,7 @@ csPtr<iBase> csCheckerTextureLoader::Parse (iDocumentNode* node,
 SCF_IMPLEMENT_FACTORY(csCubemapTextureLoader)
 
 csCubemapTextureLoader::csCubemapTextureLoader (iBase *p) : 
-  csBaseTextureLoader(p)
+  scfImplementationType(this, p)
 {
   InitTokenTable (xmltokens);
 }
@@ -498,15 +518,15 @@ csPtr<iBase> csCubemapTextureLoader::Parse (iDocumentNode* node,
 {
   if (!context) return 0;
   csRef<iTextureLoaderContext> ctx = csPtr<iTextureLoaderContext>
-    (SCF_QUERY_INTERFACE (context, iTextureLoaderContext));
+    (scfQueryInterface<iTextureLoaderContext> (context));
   if (!ctx) return 0;
   
-  csRef<iEngine> Engine = CS_QUERY_REGISTRY (object_reg, iEngine);
-  csRef<iGraphics3D> G3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+  csRef<iEngine> Engine = csQueryRegistry<iEngine> (object_reg);
+  csRef<iGraphics3D> G3D = csQueryRegistry<iGraphics3D> (object_reg);
   csRef<iTextureManager> tm = G3D->GetTextureManager();
-  csRef<iLoader> loader = CS_QUERY_REGISTRY (object_reg, iLoader);
+  csRef<iLoader> loader = csQueryRegistry<iLoader> (object_reg);
   csRef<iSyntaxService> SyntaxService = 
-    CS_QUERY_REGISTRY (object_reg, iSyntaxService);
+    csQueryRegistry<iSyntaxService> (object_reg);
 
   csRef<csImageCubeMapMaker> cube;
   cube.AttachNew (new csImageCubeMapMaker (ctx->GetImage()));
@@ -611,9 +631,16 @@ csPtr<iBase> csCubemapTextureLoader::Parse (iDocumentNode* node,
   }
 
 
+  csRef<scfString> fail_reason;
+  fail_reason.AttachNew (new scfString ());
   csRef<iTextureHandle> TexHandle (tm->RegisterTexture (cube, 
-    ctx->HasFlags() ? ctx->GetFlags() : CS_TEXTURE_3D));
-  if (!TexHandle) return 0;
+    ctx->HasFlags() ? ctx->GetFlags() : CS_TEXTURE_3D, fail_reason));
+  if (!TexHandle)
+  {
+    ReportError (object_reg, "crystalspace.checkertextureloader",
+	"Error creating texture: %s", fail_reason->GetData ());
+    return 0;
+  }
 
   csRef<iTextureWrapper> TexWrapper =
 	Engine->GetTextureList ()->NewTexture(TexHandle);
@@ -627,7 +654,8 @@ csPtr<iBase> csCubemapTextureLoader::Parse (iDocumentNode* node,
 
 SCF_IMPLEMENT_FACTORY(csTexture3DLoader)
 
-csTexture3DLoader::csTexture3DLoader (iBase *p) : csBaseTextureLoader(p)
+csTexture3DLoader::csTexture3DLoader (iBase *p) :
+  scfImplementationType(this, p)
 {
   InitTokenTable (xmltokens);
 }
@@ -639,15 +667,15 @@ csPtr<iBase> csTexture3DLoader::Parse (iDocumentNode* node,
 {
   if (!context) return 0;
   csRef<iTextureLoaderContext> ctx = csPtr<iTextureLoaderContext>
-    (SCF_QUERY_INTERFACE (context, iTextureLoaderContext));
+    (scfQueryInterface<iTextureLoaderContext> (context));
   if (!ctx) return 0;
   
-  csRef<iEngine> Engine = CS_QUERY_REGISTRY (object_reg, iEngine);
-  csRef<iGraphics3D> G3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+  csRef<iEngine> Engine = csQueryRegistry<iEngine> (object_reg);
+  csRef<iGraphics3D> G3D = csQueryRegistry<iGraphics3D> (object_reg);
   csRef<iTextureManager> tm = G3D->GetTextureManager();
-  csRef<iLoader> loader = CS_QUERY_REGISTRY (object_reg, iLoader);
+  csRef<iLoader> loader = csQueryRegistry<iLoader> (object_reg);
   csRef<iSyntaxService> SyntaxService = 
-    CS_QUERY_REGISTRY (object_reg, iSyntaxService);
+    csQueryRegistry<iSyntaxService> (object_reg);
 
   int Format = tm->GetTextureFormat ();
   csRef<csImageVolumeMaker> vol;
@@ -693,9 +721,16 @@ csPtr<iBase> csTexture3DLoader::Parse (iDocumentNode* node,
   }
 
 
+  csRef<scfString> fail_reason;
+  fail_reason.AttachNew (new scfString ());
   csRef<iTextureHandle> TexHandle (tm->RegisterTexture (vol, 
-    ctx->HasFlags() ? ctx->GetFlags() : CS_TEXTURE_3D));
-  if (!TexHandle) return 0;
+    ctx->HasFlags() ? ctx->GetFlags() : CS_TEXTURE_3D, fail_reason));
+  if (!TexHandle)
+  {
+    ReportError (object_reg, "crystalspace.3dtextureloader",
+	"Error creating texture: %s", fail_reason->GetData ());
+    return 0;
+  }
 
   csRef<iTextureWrapper> TexWrapper =
 	Engine->GetTextureList ()->NewTexture(TexHandle);

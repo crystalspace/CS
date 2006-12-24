@@ -94,20 +94,21 @@ public:
 	if (!cacheData->hasGlyph) continue;
       }
   
-      register uint8 *CharImageAlpha = cacheData->glyphAlphaData;
-      register uint8 *CharImage = cacheData->glyphData;
-      if ((!CharImage) && (!CharImageAlpha))
-	continue;
-  
       csBitmapMetrics* bmetrics;
-      if (CharImageAlpha)
+      if (cacheData->glyphAlphaDataBuf.IsValid())
       {
 	bmetrics = &cacheData->alphaMetrics;
       }
-      else
+      else if (cacheData->glyphDataBuf.IsValid())
       {
 	bmetrics = &cacheData->bitmapMetrics;
       }
+      else
+        continue;
+
+      register uint8 *CharImageAlpha = cacheData->glyphAlphaData;
+      register uint8 *CharImage = cacheData->glyphData;
+  
       charW = bmetrics->width;
       charH = bmetrics->height;
       
@@ -246,7 +247,7 @@ public:
 	      }
 	    }
 	  }
-	  else
+	  else if (CharImage)
 	  {
 	    for (int i = 0; i < charH; i++, cury++)
 	    {
@@ -341,7 +342,7 @@ public:
 	      }
 	    }
 	  }
-	  else
+	  else if (CharImage)
 	  {
 	    for (int i = 0; i < charH; i++, cury++)
 	    {

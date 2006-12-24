@@ -29,6 +29,8 @@
 #include "csutil/array.h"
 #include "csutil/scf_implementation.h"
 
+#include "csutil/win32/msvc_deprecated_warn_off.h"
+
 /**\addtogroup util_containers
  * @{ */
 
@@ -62,11 +64,18 @@ public:
   /// The array storage
   Backend storage;
 
+  //@{
   /// Construct with empty storage.
   scfArray () : scfImplementationType (this) {}
+  scfArray (iBase* scfParent) : scfImplementationType (this, scfParent) {}
+  //@}
+  //@{
   /// Construct and copy to storage contents from given array.
   scfArray (const Backend& storage) : scfImplementationType (this), 
     storage (storage) {}
+  scfArray (const Backend& storage, iBase* scfParent) : 
+    scfImplementationType (this, scfParent), storage (storage) {}
+  //@}
 
   /**\name iArrayReadOnly<> implementation
    * @{ */
@@ -152,9 +161,13 @@ public:
   /// Reference to the array storage.
   Backend& storage;
 
+  //@{
   /// Initialize with a reference to the given storage.
   scfArrayWrap (Backend& storage) : scfImplementationType (this), 
     storage (storage) {}
+  scfArrayWrap (Backend& storage, iBase* scfParent) : 
+    scfImplementationType (this, scfParent), storage (storage) {}
+  //@}
 
   /**\name iArrayReadOnly<> implementation
    * @{ */
@@ -239,9 +252,13 @@ public:
   /// Reference to the array storage.
   const Backend& storage;
 
+  //@{
   /// Initialize with a reference to the given storage.
   scfArrayWrapConst (const Backend& storage) : scfImplementationType (this), 
     storage (storage) {}
+  scfArrayWrapConst (const Backend& storage, iBase* scfParent) : 
+    scfImplementationType (this, scfParent), storage (storage) {}
+  //@}
 
   /**\name iArrayReadOnly<> implementation
    * @{ */
@@ -264,6 +281,8 @@ public:
   }
   /** @} */
 };
+
+#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 /** @} */
 

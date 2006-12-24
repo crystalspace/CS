@@ -32,7 +32,7 @@ void csPathsList::Entry::FixSeparators()
   }
 }
 
-csPathsList::csPathsList (const char* pathList)
+csPathsList::csPathsList (const char* pathList, bool expand)
 {
   csStringFast<CS_MAXPATHLEN> scratch;
 
@@ -41,22 +41,31 @@ csPathsList::csPathsList (const char* pathList)
   while ((delim = strchr (remain, CS_PATH_DELIMITER)) != 0)
   {
     scratch.Replace (remain, delim - remain);
-    AddUnique (scratch);
+    if (expand)
+      AddUniqueExpanded (scratch);
+    else
+      AddUnique (scratch);
     remain = delim + 1;
   }
   if ((remain != 0) && (*remain != 0))
   {
-    AddUnique (remain);
+    if (expand)
+      AddUniqueExpanded (remain);
+    else
+      AddUnique (remain);
   }
 }
 
-csPathsList::csPathsList (const char* const pathList[])
+csPathsList::csPathsList (const char* const pathList[], bool expanded)
 {
   const char* const* pp = pathList;
 
   while (*pp)
   {
-    AddUnique (*pp);
+    if (expanded)
+      AddUniqueExpanded (*pp);
+    else
+      AddUnique (*pp);
     pp++;
   }
 }
@@ -74,7 +83,7 @@ size_t csPathsList::AddUnique (const char* path1, bool scanRecursive,
   size_t i;
   for (i = 0; i < paths.Length(); i++)
   {
-    if (csPathsUtilities::PathsIdentical (path, paths[i].path))
+    if (csPathsUtilities::PathsIdentical (path, paths[i].path.GetDataSafe()))
     {
       if (overrideRecursive)
       {
@@ -211,33 +220,30 @@ csPathsList* csInstallationPathsHelper::GetPluginPaths (const char* argv0)
     "",
     0};
 
-  csPathsList paths;
+  csPathsList* paths = new csPathsList;
 
   csString appPath = GetAppDir (argv0);
   csString resPath = GetResourceDir (argv0);
-  csPathsList* configPaths = GetPlatformInstallationPaths ();
   
   // Don't add "/" since it won't work on Windows.
   if (!resPath.IsEmpty() && resPath != CS_PATH_SEPARATOR)
-    paths.AddUnique (resPath, DO_SCAN_RECURSION, "app");
+    paths->AddUniqueExpanded (resPath, DO_SCAN_RECURSION, "app");
   if (!appPath.IsEmpty() && appPath != CS_PATH_SEPARATOR)
-    paths.AddUnique (appPath, DO_SCAN_RECURSION, "app");
+    paths->AddUniqueExpanded (appPath, DO_SCAN_RECURSION, "app");
 
-  paths.AddUnique (*configPaths * csPathsList (pluginSubdirs));
+  csPathsList* configPaths = GetPlatformInstallationPaths ();
+  paths->AddUniqueExpanded (*configPaths * csPathsList (pluginSubdirs));
+  delete configPaths;
 
   const char* crystal_plugin = getenv("CRYSTAL_PLUGIN");
   if (crystal_plugin)
-    paths.AddUniqueExpanded(crystal_plugin, DO_SCAN_RECURSION, CS_PACKAGE_NAME);
+    paths->AddUniqueExpanded(crystal_plugin, DO_SCAN_RECURSION, CS_PACKAGE_NAME);
 
 #ifdef CS_PLUGINDIR
-  paths.AddUnique (CS_PLUGINDIR, DO_SCAN_RECURSION, CS_PACKAGE_NAME);
+  paths->AddUniqueExpanded (CS_PLUGINDIR, DO_SCAN_RECURSION, CS_PACKAGE_NAME);
 #endif
 
-  delete configPaths;
+  csPathsUtilities::FilterInvalid (*paths);
 
-  csPathsList* newPaths = 
-    new csPathsList (csPathsUtilities::ExpandAll (paths));
-  csPathsUtilities::FilterInvalid (*newPaths);
-
-  return newPaths;
+  return paths;
 }

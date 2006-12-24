@@ -28,11 +28,7 @@
 #include "csutil/allocator.h"
 #include "csutil/comparator.h"
 
-// Hack: Work around problems caused by #defining 'new'.
-#if defined(CS_EXTENSIVE_MEMDEBUG) || defined(CS_MEMORY_TRACKER)
-# undef new
-#endif
-#include <new>
+#include "csutil/custom_new_disable.h"
 
 #if defined(CS_MEMORY_TRACKER)
 #include "csutil/memdebug.h"
@@ -42,18 +38,6 @@
 
 /**\addtogroup util_containers
  * @{ */
-
-// Define CSARRAY_INHIBIT_TYPED_KEYS if the compiler is too old or too buggy to
-// properly support templated functions within a templated class.  When this is
-// defined, rather than using a properly typed "key" argument, search methods
-// fall back to dealing with opaque void* for the "key" argument.  Note,
-// however, that this fact is completely hidden from the client; the client
-// simply creates csArrayCmp<> functors using correct types for the keys
-// regardless of whether the compiler actually supports this feature.  (The
-// MSVC6 compiler, for example, does support templated functions within a
-// template class but crashes and burns horribly when a function pointer or
-// functor is thrown into the mix; thus this should be defined for MSVC6.)
-#if !defined(CSARRAY_INHIBIT_TYPED_KEYS)
 
 /**
  * A functor template which encapsulates a key and a comparison function for
@@ -110,45 +94,6 @@ private:
   K key;
   CF cmp;
 };
-
-#define csArrayTemplate(K) template <class K>
-#define csArrayCmpDecl(T1,T2) csArrayCmp<T1,T2>
-#define csArrayCmpInvoke(C,R) C(R)
-
-#else // CSARRAY_INHIBIT_TYPED_KEYS
-
-class csArrayCmpAbstract
-{
-public:
-  typedef int(*CF)(void const*, void const*);
-  virtual int operator()(void const*) const = 0;
-  virtual operator CF() const = 0;
-};
-
-template <class T, class K>
-class csArrayCmp : public csArrayCmpAbstract
-{
-public:
-  typedef int(*CFTyped)(T const&, K const&);
-  csArrayCmp(K const& k, CFTyped c = DefaultCompare) : key(k), cmp(CF(c)) {}
-  csArrayCmp(csArrayCmp const& o) : key(o.key), cmp(o.cmp) {}
-  csArrayCmp& operator=(csArrayCmp const& o)
-    { key = o.key; cmp = o.cmp; return *this; }
-  virtual int operator()(void const* p) const { return cmp(p, &key); }
-  virtual operator CF() const { return cmp; }
-  operator K const&() const { return key; }
-  static int DefaultCompare(T const& r, K const& k)
-    { return csComparator<T,K>::Compare(r,k); }
-private:
-  K key;
-  CF cmp;
-};
-
-#define csArrayTemplate(K)
-#define csArrayCmpDecl(T1,T2) csArrayCmpAbstract const&
-#define csArrayCmpInvoke(C,R) C(&(R))
-
-#endif // CSARRAY_INHIBIT_TYPED_KEYS
 
 /**
  * The default element handler for csArray.
@@ -317,6 +262,9 @@ public:
   { (void)x; }
   /// Return the threshold.
   size_t GetThreshold() const { return N; }
+  // Work around VC7 bug apparently incorrectly copying this empty class
+  csArrayThresholdFixed& operator= (const csArrayThresholdFixed&) 
+  { return *this; }
 };
 
 /**
@@ -587,6 +535,7 @@ public:
    * Return the number of elements in the array.
    * \deprecated Use GetSize() instead.
    */
+  /*CS_DEPRECATED_METHOD_MSG("Use GetSize() instead.")*/
   size_t Length () const
   {
     return GetSize();
@@ -668,7 +617,9 @@ public:
    * Set the actual number of items in this array.
    * \deprecated Use SetSize() instead.
    */
+  /*CS_DEPRECATED_METHOD_MSG("Use SetSize() instead.")*/
   void SetLength (size_t n, T const& what) { SetSize(n, what); }
+  /*CS_DEPRECATED_METHOD_MSG("Use SetSize() instead.")*/
   void SetLength (size_t n) { SetSize(n); }
   /** @} */
 
@@ -726,11 +677,11 @@ public:
    * type.
    * \return csArrayItemNotFound if not found, else item index.
    */
-  csArrayTemplate(K)
-  size_t FindKey (csArrayCmpDecl(T,K) comparekey) const
+  template <class K>
+  size_t FindKey (csArrayCmp<T,K> comparekey) const
   {
     for (size_t i = 0 ; i < Length () ; i++)
-      if (csArrayCmpInvoke(comparekey, root.p[i]) == 0)
+      if (comparekey (root.p[i]) == 0)
         return i;
     return csArrayItemNotFound;
   }
@@ -828,15 +779,15 @@ public:
    * \return csArrayItemNotFound if not found, else the item index.
    * \remarks The array must be sorted.
    */
-  csArrayTemplate(K)
-  size_t FindSortedKey (csArrayCmpDecl(T,K) comparekey,
+  template <class K>
+  size_t FindSortedKey (csArrayCmp<T,K> comparekey,
                         size_t* candidate = 0) const
   {
     size_t m = 0, l = 0, r = Length ();
     while (l < r)
     {
       m = (l + r) / 2;
-      int cmp = csArrayCmpInvoke(comparekey, root.p[m]);
+      int cmp = comparekey (root.p[m]);
       if (cmp == 0)
       {
         if (candidate) *candidate = csArrayItemNotFound;
@@ -1134,6 +1085,7 @@ public:
    *   faster to keep the array sorted, search for \c item using
    *   FindSortedKey(), and then remove it using the plain DeleteIndex().
    */
+  CS_DEPRECATED_METHOD_MSG("'Fast' is illusory. See documentation")
   bool DeleteFast (T const& item)
   {
     size_t const n = Find (item);
@@ -1155,7 +1107,7 @@ public:
     { currentelem = r.currentelem; array = r.array; return *this; }
 
     /** Returns true if the next Next() call will return an element */
-    bool HasNext()
+    bool HasNext() const
     { return currentelem < array.Length(); }
 
     /** Returns the next element in the array. */
@@ -1189,7 +1141,7 @@ public:
     { currentelem = r.currentelem; array = r.array; return *this; }
 
     /** Returns true if the next Next() call will return an element */
-    bool HasNext()
+    bool HasNext() const
     { return currentelem < array.Length(); }
 
     /** Returns the next element in the array. */
@@ -1257,9 +1209,7 @@ public:
   }
 };
 
-#if defined(CS_EXTENSIVE_MEMDEBUG) || defined(CS_MEMORY_TRACKER)
-# define new CS_EXTENSIVE_MEMDEBUG_NEW
-#endif
+#include "csutil/custom_new_enable.h"
 
 /** @} */
 

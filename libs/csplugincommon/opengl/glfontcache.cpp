@@ -28,7 +28,7 @@
 #endif
 
 #include "csutil/csuctransform.h"
-#include "csgfx/memimage.h"
+#include "csgfx/imagememory.h"
 #include "iutil/databuff.h"
 #include "ivideo/fontserv.h"
 
@@ -110,7 +110,7 @@ void csGLFontCache::Setup()
     "Video.OpenGL.FontCache.UseIntensityBlend", true);
 
   csRef<iVerbosityManager> verbosemgr (
-    CS_QUERY_REGISTRY (G2D->object_reg, iVerbosityManager));
+    csQueryRegistry<iVerbosityManager> (G2D->object_reg));
   bool do_verbose = false;
   if (verbosemgr) 
     do_verbose = verbosemgr->Enabled ("renderer.fontcache");

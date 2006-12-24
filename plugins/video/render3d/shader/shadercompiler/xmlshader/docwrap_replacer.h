@@ -49,8 +49,7 @@ public:
  * Wrapper around a document node, supporting conditionals.
  */
 class csReplacerDocumentNode : 
-  public scfImplementationPooled<
-    scfImplementationExt0<csReplacerDocumentNode, csDocumentNodeReadOnly> >
+  public scfImplementationExt0<csReplacerDocumentNode, csDocumentNodeReadOnly>
 {
   friend class csReplacerDocumentNodeIterator;
   friend class csReplacerDocumentAttributeIterator;
@@ -80,7 +79,10 @@ public:
   { return value; }
 
   virtual csRef<iDocumentNode> GetParent ()
-  { return parent ? csRef<iDocumentNode> (parent) : wrappedNode->GetParent(); }
+  { 
+    return parent ? csRef<iDocumentNode> ((iDocumentNode*)parent) : 
+      wrappedNode->GetParent(); 
+  }
   virtual csRef<iDocumentNodeIterator> GetNodes ();
   virtual csRef<iDocumentNode> GetNode (const char* value);
 
@@ -153,8 +155,6 @@ class csReplacerDocumentNodeFactory
   friend class csReplacerDocumentAttributeIterator;
   friend class csReplacerDocumentAttribute;
 
-  csReplacerDocumentNode::Pool nodePool;
-  //csReplacerDocumentAttribute::Pool attrPool;
   csReplacerDocumentNodeIterator::Pool iterPool;
   csReplacerDocumentAttributeIterator::Pool attrIterPool;
 

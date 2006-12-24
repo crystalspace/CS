@@ -221,6 +221,8 @@ public:
   /** @} */
 };
 
+#include "csutil/win32/msvc_deprecated_warn_off.h"
+
 /**
  * Factory for proto meshes.
  */
@@ -306,6 +308,7 @@ public:
   /** @} */
 
   void GetObjectBoundingBox (csBox3& bbox);
+  const csBox3& GetObjectBoundingBox ();
   void SetObjectBoundingBox (const csBox3& b);
   void GetRadius (float& radius, csVector3& center);
 
@@ -372,6 +375,8 @@ public:
 
   void PreGetBuffer (csRenderBufferHolder* holder, csRenderBufferName buffer);
 };
+
+#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 /**
  * Protomesh type. This is the plugin you have to use to create instances

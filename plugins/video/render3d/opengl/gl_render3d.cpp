@@ -26,7 +26,7 @@
 #include "csgeom/polyclip.h"
 #include "csgeom/transfrm.h"
 #include "csgeom/vector4.h"
-#include "csgfx/memimage.h"
+#include "csgfx/imagememory.h"
 #include "csgfx/renderbuffer.h"
 #include "csplugincommon/opengl/glextmanager.h"
 #include "csplugincommon/opengl/glhelper.h"
@@ -147,7 +147,7 @@ csGLGraphics3D::csGLGraphics3D (iBase *parent) :
 
 csGLGraphics3D::~csGLGraphics3D()
 {
-  csRef<iEventQueue> q (CS_QUERY_REGISTRY(object_reg, iEventQueue));
+  csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (object_reg));
   if (q)
     q->RemoveListener (scfiEventHandler);
 }
@@ -733,11 +733,11 @@ bool csGLGraphics3D::Open ()
 {
   if (isOpen) return true;
   isOpen = true;
-  csRef<iPluginManager> plugin_mgr = CS_QUERY_REGISTRY (
-  	object_reg, iPluginManager);
+  csRef<iPluginManager> plugin_mgr = 
+  	csQueryRegistry<iPluginManager> (object_reg);
 
   csRef<iVerbosityManager> verbosemgr (
-    CS_QUERY_REGISTRY (object_reg, iVerbosityManager));
+    csQueryRegistry<iVerbosityManager> (object_reg));
   if (verbosemgr) verbose = verbosemgr->Enabled ("renderer");
   if (!verbose) bugplug = 0;
 
@@ -786,14 +786,19 @@ bool csGLGraphics3D::Open ()
   ext->InitGL_ARB_point_parameters ();
   ext->InitGL_ARB_point_sprite ();
   ext->InitGL_EXT_framebuffer_object ();
-  ext->InitGL_ARB_texture_rectangle ();
-  if (!ext->CS_GL_ARB_texture_rectangle)
+  ext->InitGL_ARB_texture_non_power_of_two ();
+  if (!ext->CS_GL_ARB_texture_non_power_of_two)
   {
-    ext->InitGL_EXT_texture_rectangle();
-    if (!ext->CS_GL_EXT_texture_rectangle)
-      ext->InitGL_NV_texture_rectangle();
+    ext->InitGL_ARB_texture_rectangle ();
+    if (!ext->CS_GL_ARB_texture_rectangle)
+    {
+      ext->InitGL_EXT_texture_rectangle();
+      if (!ext->CS_GL_EXT_texture_rectangle)
+        ext->InitGL_NV_texture_rectangle();
+    }
   }
   ext->InitGL_ARB_vertex_program (); // needed for vertex attrib code
+  // || ARB_vertex_shader, || GL_version_2_0
   ext->InitGL_ARB_fragment_program (); // needed for AFP DrawPixmap() workaround
   //ext->InitGL_ATI_separate_stencil ();
   ext->InitGL_EXT_secondary_color ();
@@ -1034,12 +1039,12 @@ bool csGLGraphics3D::Open ()
   cache_clip_z_plane = -1;
 
   const char* r2tBackendStr;
-  /*if (ext->CS_GL_EXT_framebuffer_object)
+  if (ext->CS_GL_EXT_framebuffer_object)
   {
     r2tBackendStr = "EXT_framebuffer_object";
     r2tbackend = new csGLRender2TextureEXTfbo (this);
   }
-  else*/
+  else
   {
     r2tBackendStr = "framebuffer";
     r2tbackend = new csGLRender2TextureFramebuf (this);
@@ -1103,6 +1108,15 @@ bool csGLGraphics3D::Open ()
       }
     }
   }
+
+#define LQUOT   "\xE2\x80\x9c"
+#define RQUOT   "\xE2\x80\x9d"
+  fixedFunctionForcefulEnable = 
+    config->GetBool ("Video.OpenGL.FixedFunctionForcefulEnable", false);
+  if (verbose)
+    Report (CS_REPORTER_SEVERITY_NOTIFY, 
+      LQUOT "Forceful" RQUOT " fixed function enable: %s",
+      fixedFunctionForcefulEnable ? "yes" : "no");
 
   return true;
 }
@@ -1216,17 +1230,22 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
 	Turn off some stuff that isn't needed for 2d (or even can
 	cause visual glitches.)
       */
-      if (use_hw_render_buffers)
-      {
-	ext->glBindBufferARB (GL_ARRAY_BUFFER_ARB, 0);
-	ext->glBindBufferARB (GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
-      }
+      DeactivateBuffers (0, 0);
       statecache->Disable_GL_ALPHA_TEST ();
       if (ext->CS_GL_ARB_multitexture)
       {
         statecache->SetCurrentTU (0);
         statecache->ActivateTU (csGLStateCache::activateImage
           | csGLStateCache::activateTexCoord);
+      }
+
+      if (fixedFunctionForcefulEnable)
+      {
+        const GLenum state = GL_FOG;
+        GLboolean s = glIsEnabled (state);
+        if (s) glDisable (state); else glEnable (state);
+        glBegin (GL_TRIANGLES);  glEnd ();
+        if (s) glEnable (state); else glDisable (state);
       }
 
       needProjectionUpdate = false; 
@@ -1402,6 +1421,13 @@ void csGLGraphics3D::DeactivateBuffers (csVertexAttrib *attribs, unsigned int co
         statecache->Disable_GL_TEXTURE_COORD_ARRAY ();
       }
     }
+    if (ext->glDisableVertexAttribArrayARB)
+    {
+      for (i = 0; i < CS_VATTRIB_GENERIC_LAST-CS_VATTRIB_GENERIC_FIRST+1; i++)
+      {
+        ext->glDisableVertexAttribArrayARB (i);
+      }
+    }
 
     for (i = 0; i < CS_VATTRIB_SPECIFIC_LAST-CS_VATTRIB_SPECIFIC_FIRST+1; i++)
     {
@@ -1567,7 +1593,7 @@ void csGLGraphics3D::DrawInstancesUseShader (
   {
     size_t values_cnt = modes.instances_binds.GetSize ();
     //loop through all instances
-    csHash<csInstance*>::GlobalIterator it = modes.instances.GetIterator ();
+    csHash<csInstance*>::ConstGlobalIterator it = modes.instances.GetIterator ();
     
     while (it.HasNext ())
     {
@@ -1618,7 +1644,7 @@ void csGLGraphics3D::DrawInstancesNoShader (
 
   //FIXME: it works only for for very specyfic setup
   //loop through all instances
-  csHash<csInstance*>::GlobalIterator it = modes.instances.GetIterator ();
+  csHash<csInstance*>::ConstGlobalIterator it = modes.instances.GetIterator ();
   while (it.HasNext ())
   {
     //loop through all parameters
@@ -2305,7 +2331,7 @@ void csGLGraphics3D::ApplyBufferChanges()
       case CS_VATTRIB_NORMAL:
         statecache->Enable_GL_NORMAL_ARRAY ();
         statecache->SetNormalPointer (compType, (GLsizei)buffer->GetStride (), 
-	  data);
+          data);
         break;
       case CS_VATTRIB_COLOR:
         statecache->Enable_GL_COLOR_ARRAY ();
@@ -3234,16 +3260,10 @@ bool csGLGraphics3D::PerformExtension (char const* command, ...)
   return rc;
 }
 
-SCF_IMPLEMENT_IBASE (csOpenGLHalo)
-  SCF_IMPLEMENTS_INTERFACE (iHalo)
-SCF_IMPLEMENT_IBASE_END
-
-csOpenGLHalo::csOpenGLHalo (float iR, float iG, float iB, unsigned char *iAlpha,
-  int iWidth, int iHeight, csGLGraphics3D* iG3D)
-  : R(iR), G(iG), B(iB)
+csOpenGLHalo::csOpenGLHalo (float iR, float iG, float iB,
+  unsigned char *iAlpha, int iWidth, int iHeight, csGLGraphics3D* iG3D) :
+  scfImplementationType(this), R(iR), G(iG), B(iB)
 {
-  SCF_CONSTRUCT_IBASE (0);
-
   // Initialization  
   R = iR; G = iG; B = iB;
   // OpenGL can only use 2^n sized textures
@@ -3302,7 +3322,6 @@ csOpenGLHalo::~csOpenGLHalo ()
 {
   DeleteTexture();
   G3D->DecRef ();
-  SCF_DESTRUCT_IBASE();
 }
 
 void csOpenGLHalo::DeleteTexture ()
@@ -3420,7 +3439,7 @@ iHalo *csGLGraphics3D::CreateHalo (float iR, float iG, float iB,
 
 void csGLGraphics3D::RemoveHalo (csOpenGLHalo* halo)
 {
-  halos.DeleteFast (halo);
+  halos.Delete (halo);
 }
 
 float csGLGraphics3D::GetZBuffValue (int x, int y)
@@ -3453,7 +3472,7 @@ bool csGLGraphics3D::Initialize (iObjectRegistry* p)
   SystemOpen = csevSystemOpen(object_reg);
   SystemClose = csevSystemClose(object_reg);
 
-  csRef<iEventQueue> q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
+  csRef<iEventQueue> q = csQueryRegistry<iEventQueue> (object_reg);
   if (q)
   {
     csEventID events[] = { SystemOpen, SystemClose, 
@@ -3462,15 +3481,15 @@ bool csGLGraphics3D::Initialize (iObjectRegistry* p)
   }
   // We subscribe to csevCanvasResize after G2D has been created
   
-  bugplug = CS_QUERY_REGISTRY (object_reg, iBugPlug);
+  bugplug = csQueryRegistry<iBugPlug> (object_reg);
 
-  strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
-    object_reg, "crystalspace.shared.stringset", iStringSet);
+  strings = csQueryRegistryTagInterface<iStringSet> (
+    object_reg, "crystalspace.shared.stringset");
 
-  csRef<iPluginManager> plugin_mgr = CS_QUERY_REGISTRY (
-  	object_reg, iPluginManager);
-  csRef<iCommandLineParser> cmdline = CS_QUERY_REGISTRY (
-  	object_reg, iCommandLineParser);
+  csRef<iPluginManager> plugin_mgr = 
+  	csQueryRegistry<iPluginManager> (object_reg);
+  csRef<iCommandLineParser> cmdline = 
+  	csQueryRegistry<iCommandLineParser> (object_reg);
 
   /* Note: r3dopengl.cfg is also added by the canvases. This is done because
    * either the canvas or the renderer may be loaded before the other, but
@@ -3560,7 +3579,7 @@ bool csGLGraphics3D::DebugCommand (const char* cmdstr)
 
   if (strcasecmp (cmd, "dump_slms") == 0)
   {
-    csRef<iImageIO> imgsaver = CS_QUERY_REGISTRY (object_reg, iImageIO);
+    csRef<iImageIO> imgsaver = csQueryRegistry<iImageIO> (object_reg);
     if (!imgsaver)
     {
       Report (CS_REPORTER_SEVERITY_WARNING,
@@ -3568,7 +3587,7 @@ bool csGLGraphics3D::DebugCommand (const char* cmdstr)
       return false;
     }
 
-    csRef<iVFS> vfs = CS_QUERY_REGISTRY (object_reg, iVFS);
+    csRef<iVFS> vfs = csQueryRegistry<iVFS> (object_reg);
     if (!vfs)
     {
       Report (CS_REPORTER_SEVERITY_WARNING, 
@@ -3603,7 +3622,7 @@ bool csGLGraphics3D::DebugCommand (const char* cmdstr)
 
 void csGLGraphics3D::DumpZBuffer (const char* path)
 {
-  csRef<iImageIO> imgsaver = CS_QUERY_REGISTRY (object_reg, iImageIO);
+  csRef<iImageIO> imgsaver = csQueryRegistry<iImageIO> (object_reg);
   if (!imgsaver)
   {
     Report (CS_REPORTER_SEVERITY_WARNING,
@@ -3611,7 +3630,7 @@ void csGLGraphics3D::DumpZBuffer (const char* path)
     return;
   }
 
-  csRef<iVFS> vfs = CS_QUERY_REGISTRY (object_reg, iVFS);
+  csRef<iVFS> vfs = csQueryRegistry<iVFS> (object_reg);
   if (!vfs)
   {
     Report (CS_REPORTER_SEVERITY_WARNING, 

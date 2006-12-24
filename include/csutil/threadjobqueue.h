@@ -30,49 +30,82 @@
 #include "csutil/thread.h"
 #include "iutil/job.h"
 
-/**
- * iJobQueue implementation that lets the jobs run in a thread.
- */
-class CS_CRYSTALSPACE_EXPORT csThreadJobQueue : 
-  public scfImplementation1<csThreadJobQueue, iJobQueue>
+#include "csutil/threading/condition.h"
+#include "csutil/threading/mutex.h"
+#include "csutil/threading/thread.h"
+
+namespace CS
 {
-  typedef csFIFO<csRef<iJob> > JobFifo;
-  struct QueueAndRunnableShared
-  {
-    JobFifo* jobFifo;
-    csRef<csMutex> fifoXS;
-    csRef<csCondition> queueWake;
-    csRef<iJob>* currentJob;
-    csRef<csMutex> jobXS;
-    csRef<csCondition> jobFinish;
-  };
-  class CS_CRYSTALSPACE_EXPORT QueueRunnable : public csRunnable
-  {
-    int refCount;
-    QueueAndRunnableShared sharedData;
-  public:
-    QueueRunnable (const QueueAndRunnableShared& sharedData);
-    virtual ~QueueRunnable();
+namespace Threading
+{
 
-    virtual void Run ();
-    virtual void IncRef();
-    virtual void DecRef();
-    virtual int GetRefCount();
-  };
-  csRef<csThread> queueThread;
-  QueueAndRunnableShared sharedData;
-  csRef<iJob> currentJob;
-  csRef<csMutex> jobFinishMutex;
-  // stats
-  uint jobsAdded, jobsPulled, jobsWaited, jobsUnqueued;
+class CS_CRYSTALSPACE_EXPORT ThreadedJobQueue :
+  public scfImplementation1<ThreadedJobQueue, iJobQueue>
+{
 public:
-
-  csThreadJobQueue();
-  virtual ~csThreadJobQueue();
+  ThreadedJobQueue (size_t numWorkers = 1);
+  virtual ~ThreadedJobQueue ();
 
   virtual void Enqueue (iJob* job);
   virtual void PullAndRun (iJob* job);
   virtual void Unqueue (iJob* job, bool waitIfCurrent = true);
+
+  enum
+  {
+    MAX_WORKER_THREADS = 16
+  };
+
+private:
+  
+  // Runnable
+  struct ThreadState;
+
+  class QueueRunnable : public Runnable
+  {
+  public:
+    QueueRunnable (ThreadedJobQueue* queue, ThreadState* ts);
+
+    virtual void Run ();
+
+  private:
+    ThreadedJobQueue* ownerQueue;
+    ThreadState* threadState;
+  };
+
+  // Per thread state
+  struct ThreadState
+  {
+    ThreadState (ThreadedJobQueue* queue)
+    {
+      runnable.AttachNew (new QueueRunnable (queue, this));
+      threadObject.AttachNew (new Thread (runnable, false));
+    }
+
+    csRef<QueueRunnable> runnable;
+    csRef<Thread> threadObject;
+    csRef<iJob> currentJob;
+    Condition jobFinished;
+  };
+
+  // Shared queue state
+  typedef csFIFO<csRef<iJob> > JobFifo;
+  JobFifo jobQueue;
+  Mutex jobMutex;
+  Condition newJob;
+
+  ThreadState* allThreadState[MAX_WORKER_THREADS];
+  ThreadGroup allThreads;
+  Mutex threadStateMutex;
+  Mutex jobFinishMutex;
+
+  size_t numWorkerThreads;
+  bool shutdownQueue;
 };
+
+}
+}
+
+typedef CS::Threading::ThreadedJobQueue csThreadJobQueue;
+
 
 #endif // __CS_CSUTIL_THREADJOBQUEUE_H__

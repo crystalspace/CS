@@ -156,8 +156,8 @@ csBezierMesh::csBezierMesh (iBase *parent, csBezierMeshObjectType* thing_type) :
   dynamic_ambient_version = 0;
 
   csRef<iStringSet> strings;
-  strings = CS_QUERY_REGISTRY_TAG_INTERFACE (thing_type->object_reg,
-    "crystalspace.shared.stringset", iStringSet);
+  strings = csQueryRegistryTagInterface<iStringSet>
+    (thing_type->object_reg, "crystalspace.shared.stringset");
 
   if ((vertex_name == csInvalidStringID) ||
     (texel_name == csInvalidStringID) ||
@@ -178,9 +178,6 @@ csBezierMesh::~csBezierMesh ()
 
 char* csBezierMesh::GenerateCacheName ()
 {
-  csBox3 b;
-  GetBoundingBox (b);
-
   csMemFile mf;
   int32 l;
   l = csLittleEndian::Convert ((int32)static_data->num_curve_vertices);
@@ -424,8 +421,7 @@ void csBezierMesh::GetTransformedBoundingBox (
   // @@@ Shouldn't we try to cache this depending on camera/movable number?
 
   // Similar to what happens in csSprite3D.
-  csBox3 box;
-  GetBoundingBox (box);
+  const csBox3& box = GetBoundingBox ();
   cbox.StartBoundingBox (trans * box.GetCorner (0));
   cbox.AddBoundingVertexSmart (trans * box.GetCorner (1));
   cbox.AddBoundingVertexSmart (trans * box.GetCorner (2));
@@ -536,44 +532,39 @@ void csBezierMesh::AppendShadows (
 
 void csBezierMesh::GetRadius (float &rad, csVector3 &cent)
 {
-  csBox3 b;
-  GetBoundingBox (b);
+  const csBox3& b = GetBoundingBox ();
   rad = static_data->obj_radius;
   cent = b.GetCenter ();
 }
 
-void csBezierMesh::GetBoundingBox (csBox3 &box)
+const csBox3& csBezierMesh::GetBoundingBox ()
 {
   int i;
 
   if (static_data->obj_bbox_valid)
-  {
-    box = static_data->obj_bbox;
-    return ;
-  }
+    return static_data->obj_bbox;
 
   static_data->obj_bbox_valid = true;
 
   if (static_data->num_curve_vertices == 0)
   {
     static_data->obj_bbox.Set (0, 0, 0, 0, 0, 0);
-    box = static_data->obj_bbox;
-    return ;
+    return static_data->obj_bbox;
   }
 
   if (static_data->num_curve_vertices > 0)
   {
     static_data->obj_bbox.StartBoundingBox (static_data->curve_vertices[0]);
-
     for (i = 1 ; i < static_data->num_curve_vertices ; i++)
     {
-      static_data->obj_bbox.AddBoundingVertexSmart (static_data->curve_vertices[i]);
+      static_data->obj_bbox.AddBoundingVertexSmart (
+	  static_data->curve_vertices[i]);
     }
   }
 
   static_data->obj_radius = csQsqrt (csSquaredDist::PointPoint (
   	static_data->obj_bbox.Max (), static_data->obj_bbox.Min ())) * 0.5f;
-  box = static_data->obj_bbox;
+  return static_data->obj_bbox;
 }
 
 void csBezierMesh::SetBoundingBox (const csBox3& b)
@@ -588,7 +579,7 @@ void csBezierMesh::GetBoundingBox (iMovable *movable, csBox3 &box)
   if (wor_bbox_movablenr != movable->GetUpdateNumber ())
   {
     // First make sure obj_bbox is valid.
-    GetBoundingBox (box);
+    box = GetBoundingBox ();
     wor_bbox_movablenr = movable->GetUpdateNumber ();
     csBox3& obj_bbox = static_data->obj_bbox;
 
@@ -1011,7 +1002,7 @@ void csBezierMesh::MergeTemplate (
   static_data->curves_scale = tpl->GetCurvesScale ();
 
   //@@@ TEMPORARY
-  csRef<iBezierState> ith = SCF_QUERY_INTERFACE (tpl, iBezierState);
+  csRef<iBezierState> ith = scfQueryInterface<iBezierState> (tpl);
   ParentTemplate = (csBezierMesh*)(iBezierState*)ith;
 
   for (i = 0; i < tpl->GetCurveVertexCount (); i++)
@@ -1066,15 +1057,15 @@ csBezierMeshObjectType::~csBezierMeshObjectType ()
 bool csBezierMeshObjectType::Initialize (iObjectRegistry *object_reg)
 {
   csBezierMeshObjectType::object_reg = object_reg;
-  csRef<iEngine> e = CS_QUERY_REGISTRY (object_reg, iEngine);
+  csRef<iEngine> e = csQueryRegistry<iEngine> (object_reg);
   engine = e;	// We don't want a real ref here to avoid circular refs.
-  csRef<iGraphics3D> g = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+  csRef<iGraphics3D> g = csQueryRegistry<iGraphics3D> (object_reg);
   G3D = g;
 
   lightpatch_pool = new csBezierLightPatchPool ();
 
   csRef<iVerbosityManager> verbosemgr (
-    CS_QUERY_REGISTRY (object_reg, iVerbosityManager));
+    csQueryRegistry<iVerbosityManager> (object_reg));
   if (verbosemgr) 
     do_verbose = verbosemgr->Enabled ("bezier");
 
@@ -1090,8 +1081,8 @@ void csBezierMeshObjectType::Clear ()
 csPtr<iMeshObjectFactory> csBezierMeshObjectType::NewFactory ()
 {
   csBezierMesh *cm = new csBezierMesh (this, this);
-  csRef<iMeshObjectFactory> ifact (SCF_QUERY_INTERFACE (
-      cm, iMeshObjectFactory));
+  csRef<iMeshObjectFactory> ifact (
+    scfQueryInterface<iMeshObjectFactory> (cm));
   cm->DecRef ();
   return csPtr<iMeshObjectFactory> (ifact);
 }

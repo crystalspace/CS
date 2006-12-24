@@ -171,21 +171,19 @@ void csObjectRegistryTest::testGet()
   objreg->Register(v2, "Test Object Registry two");
   objreg->Register(v2);
 
-  csRef<iString> if1 = SCF_QUERY_INTERFACE(v1, iString);
-  csRef<iString> if2 = SCF_QUERY_INTERFACE(v2, iString);
+  csRef<iString> if1 = scfQueryInterface<iString> (v1);
+  csRef<iString> if2 = scfQueryInterface<iString> (v2);
 
   CPPUNIT_ASSERT(if1.IsValid());
   CPPUNIT_ASSERT(if2.IsValid());
 
   csRef<iString> cmp1, cmp2;
-  cmp1.AttachNew(static_cast<iString*> (objreg->Get(
-    "Test Object Registry one",
-    scfInterfaceTraits<iString>::GetID(),
-    scfInterfaceTraits<iString>::GetVersion())));
-  cmp2.AttachNew(static_cast<iString*> (objreg->Get(
-    "Test Object Registry two",
-    scfInterfaceTraits<iString>::GetID(),
-    scfInterfaceTraits<iString>::GetVersion())));
+  
+  cmp1 = csQueryRegistryTagInterface<iString> (objreg,
+    "Test Object Registry one");
+  cmp2 = csQueryRegistryTagInterface<iString> (objreg,
+    "Test Object Registry two");
+
 
   CPPUNIT_ASSERT_EQUAL(if1, cmp1);
   CPPUNIT_ASSERT_EQUAL(if2, cmp2);

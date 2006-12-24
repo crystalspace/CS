@@ -914,6 +914,7 @@ struct iEngine : public virtual iBase
    * If the region already exists then this function will just
    * return the pointer to that region.
    * \param name the engine name for the region
+   * \remarks Can be removed with RemoveObject().
    */
   virtual iRegion* CreateRegion (const char* name) = 0;
   /// Get the list of all regions
@@ -1260,7 +1261,12 @@ struct iEngine : public virtual iBase
     /// Get the list of all shared variables.
   virtual iSharedVariableList* GetVariableList () const = 0;
 
-  /// Get the list of collections.
+#include "csutil/win32/msvc_deprecated_warn_off.h"
+  /**
+   * Get the list of collections.
+   * \deprecated Collections are obsolete.
+   */
+  CS_DEPRECATED_METHOD_MSG("Collections are obsolete")
   virtual iCollectionList* GetCollections () = 0;
   
   /**
@@ -1274,16 +1280,19 @@ struct iEngine : public virtual iBase
    * doesn't exist. In this case the region parameter is ignored.
    * \param name the engine name of the desired collection
    * \param region if specified, search only this region (also see note above)
+   * \deprecated Collections are obsolete.
    */
+  CS_DEPRECATED_METHOD_MSG("Collections are obsolete")
   virtual iCollection* FindCollection (const char* name,
   	iRegion* region = 0) = 0;
+#include "csutil/win32/msvc_deprecated_warn_on.h"
 
   /**
    * Convenience function to 'remove' a CS object from the engine.
    * This will not clear the object but it will remove all references
    * to that object that the engine itself keeps. This function works
-   * for: iSector, iCollection, iMeshWrapper, iMeshFactoryWrapper,
-   * iCameraPosition, iLight, iMaterialWrapper, and iTextureWrapper.
+   * for: iCameraPosition, iCollection, iLight, iMaterialWrapper, 
+   * iMeshFactoryWrapper,iMeshWrapper, iRegion, iSector and iTextureWrapper.
    * Note that the object is only removed if the resulting ref count will
    * become zero. So basically this function only releases the references
    * that the engine holds.
@@ -1294,6 +1303,23 @@ struct iEngine : public virtual iBase
    * This function will also remove the object from the region it may be in.
    */
   virtual bool RemoveObject (iBase* object) = 0;
+
+  /**
+   * This function can be used to remove an object after a specific amount
+   * of time. This is mostly useful for particle systems (like explosions)
+   * that you want to live for a specific time before they are automatically
+   * cleaned up by the engine. Note that calling this function will cause
+   * the engine to keep an additional reference until it is time to delete
+   * the object.
+   */
+  virtual void DelayedRemoveObject (csTicks delay, iBase* object) = 0;
+
+  /**
+   * Clear all delayed removals.
+   * \param remove if true then the objects will also be removed from engine.
+   * Otherwise they are simply removed from this list.
+   */
+  virtual void RemoveDelayedRemoves (bool remove = false) = 0;
  
   /// Delete everything in the engine.
   virtual void DeleteAll () = 0;

@@ -31,6 +31,7 @@
 #include "cstypes.h"	// for bool
 
 #include "csgeom/csrect.h"
+#include "csgeom/math.h"
 #include "csgeom/vector2.h"
 #include "csgeom/vector3.h"
 #include "csgeom/segment.h"
@@ -639,10 +640,10 @@ public:
   /// Get the maximum Z value of the box
   inline float MaxZ () const { return maxbox.z; }
   /// Get Min component for 0 (x), 1 (y), or 2 (z).
-  inline float Min (int idx) const
+  inline float Min (size_t idx) const
   { return minbox[idx]; }
   /// Get Max component for 0 (x), 1 (y), or 2 (z).
-  inline float Max (int idx) const
+  inline float Max (size_t idx) const
   { return maxbox[idx]; }
   /// Get the 3d vector of minimum (x, y, z) values
   inline const csVector3& Min () const { return minbox; }
@@ -913,6 +914,20 @@ public:
     return AddBoundingVertexSmartTest (v.x, v.y, v.z);
   }
 
+  /**
+   * Add another bounding box into this one, combining the two of them
+   */
+  inline void AddBoundingBox (const csBox3& box)
+  {
+    minbox.x = csMin(minbox.x, box.minbox.x);
+    minbox.y = csMin(minbox.y, box.minbox.y);
+    minbox.z = csMin(minbox.z, box.minbox.z);
+
+    maxbox.x = csMax(maxbox.x, box.maxbox.x);
+    maxbox.y = csMax(maxbox.y, box.maxbox.y);
+    maxbox.z = csMax(maxbox.z, box.maxbox.z);
+  }
+
   /// Initialize this box to empty.
   csBox3 () :
     minbox ( CS_BOUNDINGBOX_MAXVALUE,
@@ -955,19 +970,27 @@ public:
   }
 
   /// Set Min component for 0 (x), 1 (y), or 2 (z).
-  inline void SetMin (int idx, float val)
+  inline void SetMin (size_t idx, float val)
   {
-    if (idx == 1) minbox.y = val;
-    else if (idx == 0) minbox.x = val;
-    else minbox.z = val;
+    minbox[idx] = val;
   }
 
   /// Set Max component for 0 (x), 1 (y), or 2 (z).
-  inline void SetMax (int idx, float val)
+  inline void SetMax (size_t idx, float val)
   {
-    if (idx == 1) maxbox.y = val;
-    else if (idx == 0) maxbox.x = val;
-    else maxbox.z = val;
+    maxbox[idx] = val;
+  }
+
+  /// Get Min component for 0 (x), 1 (y), or 2 (z).
+  inline float GetMin (size_t idx)
+  {
+    return minbox[idx];
+  }
+
+  /// Get Max component for 0 (x), 1 (y), or 2 (z).
+  inline float GetMax (size_t idx)
+  {
+    return maxbox[idx];
   }
 
   /**

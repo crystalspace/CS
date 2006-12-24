@@ -23,21 +23,32 @@
 
 namespace lighter
 {
+  class LightmapMask;
+
+  struct LightmapData
+  {
+    LightmapData ()
+      : colorArray (0), colorArraySize (0)
+    {}
+
+    ~LightmapData ()
+    {
+      delete[] colorArray;
+    }
+
+    csColor *colorArray;
+    size_t colorArraySize;
+  };
 
   class Lightmap
   {
   public:
-    Lightmap (uint width, uint height)
-      : width (0), height (0), maxUsedU (0), maxUsedV (0), 
-      lightmapAllocator (csRect (0,0,1,1))
-    {
-      Grow (width, height);
-    }
+    Lightmap (uint width, uint height);
+
+    ~Lightmap ();
 
     inline void Initialize ()
-    {
-      data.DeleteAll ();
-      data.SetSize (width*height, csColor (0.0f,0.0f,0.0f));
+    {      
     }
 
     // Add a general ambient term
@@ -67,12 +78,21 @@ namespace lighter
       maxUsedV = csMax (maxUsedV, v);
     }
 
+    // Set a pixel to given color
+    inline void SetAddPixel (size_t u, size_t v, csColor c)
+    {
+      data->colorArray[v*width + u] += c;
+    }
+
     // Save the lightmap to given file
     void SaveLightmap (const csString& file);
 
+    // Fixup, de-antialise lightmap etc
+    void FixupLightmap (const LightmapMask& mask);
+
     // Data getters
-    inline ColorDArray& GetData () { return data; }
-    inline const ColorDArray& GetData () const { return data; }
+    inline LightmapData* GetData () const { return data; }
+    inline void SetData (LightmapData* d) { data = d; }
 
     inline uint GetWidth () const {return width; }
     inline uint GetHeight () const {return height; }
@@ -84,10 +104,15 @@ namespace lighter
     inline const csSubRectangles& GetAllocator () const { return lightmapAllocator; }
 
     inline const csString& GetFilename () { return filename; }
+    inline csString GetTextureName () 
+    { return GetTextureNameFromFilename (filename); }
 
+    iTextureWrapper* GetTexture();
+
+    bool IsNull ();
   protected:
     // The color data itself
-    ColorDArray data;
+    LightmapData* data;
 
     // Size
     uint width, height;
@@ -100,6 +125,9 @@ namespace lighter
 
     // Filename
     csString filename;
+
+    iTextureWrapper* texture;
+    csString GetTextureNameFromFilename (const csString& file);
   };
   typedef csArray<Lightmap> LightmapArray;
   typedef csPDelArray<Lightmap> LightmapPtrDelArray;
@@ -112,13 +140,119 @@ namespace lighter
       : width (lm.GetWidth ()), height (lm.GetHeight ())
     {
       // Copy over the size from the lightmap
-      maskData.SetSize (lm.GetWidth ()*lm.GetHeight (), 0);
+      maskData.SetSize (width*height, 0);
     }
     
     csDirtyAccessArray<float> maskData;
     uint width, height;
   };
   typedef csArray<LightmapMask> LightmapMaskArray;
+
+  class LightmapPostProcess
+  {
+  public:
+    // Add a general ambient term
+    static void AddAmbientTerm (csColor* colors, size_t numColors, 
+      const csColor amb);
+
+    // Apply the exposure function
+    static void ApplyExposureFunction (csColor* colors, size_t numColors, 
+      float expConstant, float expMax);
+  };
+
+  // File-backed cache for LM data
+  class LightmapCache
+  {
+  public:
+    LightmapCache (size_t maxSize);
+    ~LightmapCache ();
+
+    // Initialize, load config, preallocate etc
+    static void Initialize ();
+
+    // Remove etc
+    static void CleanUp ();
+
+    // Lock a light map in cache, make sure it have data.
+    // Post condition: lightmap have a sufficiently large memory buffer
+    void LockLM (Lightmap* lm);
+
+    // Unlock a light map in cache, potentially it can be swapped out after this
+    void UnlockLM (Lightmap* lm);
+
+    // Unlock all light maps in cache
+    void UnlockAll ();
+
+    // Remove any trace of lm
+    void RemoveLM (Lightmap* lm);
+  private:
+    // One in-memory entry
+    struct LMEntry
+    {
+      LMEntry ()
+        : lm (0), data (0), lastUnlockTime (0)
+      {
+      }
+
+      Lightmap* lm;
+      LightmapData* data;
+      size_t lastUnlockTime;
+    };
+
+    // Swap out one LM-entry to disk
+    bool SwapOut (LMEntry* e);
+
+    // Swap in one LM-entry from disk
+    bool SwapIn (LMEntry* e);
+
+    // Free memory, around size bytes
+    void FreeMemory (size_t desiredAmount);
+
+    // Allocate
+    LightmapData* AllocateData (size_t size);
+
+    // Given a lightmap, get a temporary filename for the cache
+    csString GetLMFileName (Lightmap* lm);
+
+    // Compare two LM entries
+    static int LMEntryAgeCompare (LMEntry* const & e1, LMEntry* const& e2)
+    {
+      return (int)e1->lastUnlockTime - (int)e2->lastUnlockTime;
+    }
+    
+    //All current LM cache entries
+    typedef csHash<LMEntry*, csPtrKey<Lightmap> > LMCacheType;
+    LMCacheType lmCache;
+
+    //Currently unlocked LM cache entires (potential to be swapped out)
+    typedef csSet<csPtrKey<LMEntry> > UnlockedEntriesType;
+    UnlockedEntriesType unlockedCacheEntries;
+
+    //Statistics for house-keeping
+    size_t maxCacheSize, currentCacheSize;
+    size_t currentUnlockTime;
+  };
+  extern LightmapCache* globalLMCache;
+
+  // Small helper to lock LMs
+  class LightmapCacheLock
+  {
+  public:
+    LightmapCacheLock (Lightmap* lm)
+      : lightmap (lm)
+    {
+      globalLMCache->LockLM (lightmap);
+    }
+
+
+    ~LightmapCacheLock ()
+    {
+      globalLMCache->UnlockLM (lightmap);
+    }
+
+  private:
+    Lightmap* lightmap;
+  };
 }
 
 #endif

@@ -22,13 +22,9 @@
 #include "vfs.h"
 #include "manager.h"
 
-#include "igraphic/image.h"
-#include "igraphic/imageio.h"
 #include "iutil/vfs.h"
-#include "ivideo/txtmgr.h"
 #include "iutil/databuff.h"
 #include "iutil/stringarray.h"
-#include "csgfx/memimage.h"
 
 
 #define CHECK(objname, check) \
@@ -55,7 +51,7 @@ static JSBool Vfs (JSContext *cx, JSObject *obj, uintN argc, jsval *argv,
 	vfs_name = JS_GetStringBytes (name);
 	
 	// Get a handle to the VFS.		
-	csRef<iVFS> *to = new csRef<iVFS>((CS_QUERY_REGISTRY (AwsMgr ()->GetObjectRegistry (), iVFS)));
+	csRef<iVFS> *to = new csRef<iVFS>((csQueryRegistry<iVFS> (AwsMgr ()->GetObjectRegistry ())));
 	
 	if (!(to->IsValid()))
 	{
@@ -169,7 +165,7 @@ static JSBool FindFiles (JSContext *cx, JSObject *obj, uintN argc, jsval *argv,
      }
      
      // Create a new array object
-     JSObject *array = JS_NewArrayObject(cx, files->GetSize(), entries);
+     JSObject *array = JS_NewArrayObject(cx, (jsint)files->GetSize(), entries);
      
      // Return the object
      *rval = OBJECT_TO_JSVAL(array);

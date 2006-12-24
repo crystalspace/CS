@@ -24,8 +24,8 @@
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "csutil/strhash.h"
+#include "csutil/scf_implementation.h"
 
-struct iEngine;
 struct iReporter;
 struct iPluginManager;
 struct iObjectRegistry;
@@ -33,20 +33,27 @@ struct iSyntaxService;
 struct iGeneralFactoryState;
 struct iGeneralMeshState;
 
+CS_PLUGIN_NAMESPACE_BEGIN(GenMeshLoader)
+{
+
 /**
  * General Mesh factory loader.
  */
-class csGeneralFactoryLoader : public iLoaderPlugin
+class csGeneralFactoryLoader :
+  public scfImplementation2<csGeneralFactoryLoader,
+    iLoaderPlugin, iComponent>
 {
 private:
   iObjectRegistry* object_reg;
   csRef<iReporter> reporter;
   csRef<iSyntaxService> synldr;
+
   csStringHash xmltokens;
+#define CS_TOKEN_ITEM_FILE "plugins/mesh/genmesh/persist/standard/gmeshldr.tok"
+#include "cstool/tokenlist.h"
+#undef CS_TOKEN_ITEM_FILE 
 
 public:
-  SCF_DECLARE_IBASE;
-
   /// Constructor.
   csGeneralFactoryLoader (iBase*);
 
@@ -57,27 +64,22 @@ public:
   virtual bool Initialize (iObjectRegistry *object_reg);
 
   /// Parse a submesh node
-  bool ParseSubMesh (iDocumentNode *node, iGeneralMeshCommonState* state, 
-    iGeneralFactoryState* factstate, iLoaderContext* ldr_context);
+  bool ParseSubMesh (iDocumentNode *node, iGeneralFactoryState* factstate, 
+    iLoaderContext* ldr_context);
 
   /// Parse a given node and return a new object for it.
   virtual csPtr<iBase> Parse (iDocumentNode* node,
     iStreamSource*, iLoaderContext* ldr_context, iBase* context);
 
   bool ParseRenderBuffer (iDocumentNode *node, iGeneralFactoryState* state);
-
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csGeneralFactoryLoader);
-    virtual bool Initialize (iObjectRegistry* p)
-    { return scfParent->Initialize(p); }
-  } scfiComponent;
 };
 
 /**
  * General Mesh factory saver.
  */
-class csGeneralFactorySaver : public iSaverPlugin
+class csGeneralFactorySaver :
+  public scfImplementation2<csGeneralFactorySaver,
+    iSaverPlugin, iComponent>
 {
 private:
   iObjectRegistry* object_reg;
@@ -85,8 +87,6 @@ private:
   csRef<iSyntaxService> synldr;
 
 public:
-  SCF_DECLARE_IBASE;
-
   /// Constructor.
   csGeneralFactorySaver (iBase*);
 
@@ -99,29 +99,28 @@ public:
   /// Write down given object and add to iDocumentNode.
   virtual bool WriteDown (iBase *obj, iDocumentNode* parent,
   	iStreamSource*);
-
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csGeneralFactorySaver);
-    virtual bool Initialize (iObjectRegistry* p)
-    { return scfParent->Initialize(p); }
-  } scfiComponent;
 };
 
 /**
  * General Mesh loader.
  */
-class csGeneralMeshLoader : public iLoaderPlugin
+class csGeneralMeshLoader :
+  public scfImplementation2<csGeneralMeshLoader,
+    iLoaderPlugin, iComponent>
 {
 private:
   iObjectRegistry* object_reg;
   csRef<iReporter> reporter;
   csRef<iSyntaxService> synldr;
+
   csStringHash xmltokens;
+#define CS_TOKEN_ITEM_FILE "plugins/mesh/genmesh/persist/standard/gmeshldr.tok"
+#include "cstool/tokenlist.h"
+#undef CS_TOKEN_ITEM_FILE 
 
+  bool ParseLegacySubMesh (iDocumentNode *node, iGeneralMeshState* state, 
+    iLoaderContext* ldr_context);
 public:
-  SCF_DECLARE_IBASE;
-
   /// Constructor.
   csGeneralMeshLoader (iBase*);
 
@@ -138,21 +137,16 @@ public:
   bool ParseRenderBuffer (iDocumentNode *node, iGeneralMeshState* state, 
     iGeneralFactoryState* factstate);
   /// Parse a submesh node
-  bool ParseSubMesh (iDocumentNode *node, iGeneralMeshCommonState* state, 
-    iGeneralFactoryState* factstate, iLoaderContext* ldr_context);
-
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csGeneralMeshLoader);
-    virtual bool Initialize (iObjectRegistry* p)
-    { return scfParent->Initialize(p); }
-  } scfiComponent;
+  bool ParseSubMesh (iDocumentNode *node, iGeneralMeshState* state, 
+    iLoaderContext* ldr_context);
 };
 
 /**
  * General Mesh saver.
  */
-class csGeneralMeshSaver : public iSaverPlugin
+class csGeneralMeshSaver :
+  public scfImplementation2<csGeneralMeshSaver,
+    iSaverPlugin, iComponent>
 {
 private:
   iObjectRegistry* object_reg;
@@ -160,8 +154,6 @@ private:
   csRef<iSyntaxService> synldr;
 
 public:
-  SCF_DECLARE_IBASE;
-
   /// Constructor.
   csGeneralMeshSaver (iBase*);
 
@@ -174,14 +166,10 @@ public:
   /// Write down given object and add to iDocumentNode.
   virtual bool WriteDown (iBase *obj, iDocumentNode* parent,
   	iStreamSource*);
-
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csGeneralMeshSaver);
-    virtual bool Initialize (iObjectRegistry* p)
-    { return scfParent->Initialize(p); }
-  } scfiComponent;
 };
+
+}
+CS_PLUGIN_NAMESPACE_END(GenMeshLoader)
 
 #endif // __CS_GMESHLDR_H__
 

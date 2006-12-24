@@ -2,18 +2,12 @@ SubDir TOP plugins mesh ;
 
 SubInclude TOP plugins mesh bezier ;
 SubInclude TOP plugins mesh emit ;
-SubInclude TOP plugins mesh explo ;
-SubInclude TOP plugins mesh fire ;
-SubInclude TOP plugins mesh fountain ;
 SubInclude TOP plugins mesh genmesh ;
 SubInclude TOP plugins mesh haze ;
 SubInclude TOP plugins mesh instmesh ;
 SubInclude TOP plugins mesh lghtng ;
 SubInclude TOP plugins mesh null ;
 SubInclude TOP plugins mesh particles ;
-SubInclude TOP plugins mesh rain ;
-SubInclude TOP plugins mesh snow ;
-SubInclude TOP plugins mesh spiral ;
 SubInclude TOP plugins mesh spr2d ;
 SubInclude TOP plugins mesh spr3d ;
 SubInclude TOP plugins mesh sprcal3d ;

@@ -96,7 +96,7 @@ public:
     else
     {
       //Heap-allocated
-      uint8* tmpStorage = (uint8*)malloc(size*sizeof(T));
+      uint8* tmpStorage = (uint8*)cs_malloc(size*sizeof(T));
       T* dest = (T*)tmpStorage;
       for(size_t i = 0; i < size; i++)
       {
@@ -107,7 +107,7 @@ public:
         source[i] = dest[i];
         dest[i].~T();
       }
-      free(tmpStorage);
+      cs_free(tmpStorage);
     }
   }
 

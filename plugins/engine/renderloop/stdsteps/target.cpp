@@ -41,7 +41,8 @@ SCF_IMPLEMENT_FACTORY(csTargetRSLoader)
 
 //---------------------------------------------------------------------------
 
-csTargetRSType::csTargetRSType (iBase* p) : csBaseRenderStepType (p)
+csTargetRSType::csTargetRSType (iBase* p) :
+  scfImplementationType (this, p)
 {
 }
 
@@ -53,7 +54,8 @@ csPtr<iRenderStepFactory> csTargetRSType::NewFactory()
 
 //---------------------------------------------------------------------------
 
-csTargetRSLoader::csTargetRSLoader (iBase* p) : csBaseRenderStepLoader (p)
+csTargetRSLoader::csTargetRSLoader (iBase* p) :
+  scfImplementationType (this, p)
 {
   InitTokenTable (tokens);
 }
@@ -80,7 +82,7 @@ csPtr<iBase> csTargetRSLoader::Parse (iDocumentNode* node,
   newstep.AttachNew (step);
 
   csRef<iRenderStepContainer> steps =
-    SCF_QUERY_INTERFACE (step, iRenderStepContainer);
+    scfQueryInterface<iRenderStepContainer> (step);
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
@@ -143,20 +145,15 @@ csPtr<iBase> csTargetRSLoader::Parse (iDocumentNode* node,
 
 //---------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE(csTargetRenderStepFactory);
-  SCF_IMPLEMENTS_INTERFACE(iRenderStepFactory);
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 csTargetRenderStepFactory::csTargetRenderStepFactory (
-  iObjectRegistry* object_reg)
+  iObjectRegistry* object_reg) :
+  scfImplementationType (this)
 {
-  SCF_CONSTRUCT_IBASE(0);
   csTargetRenderStepFactory::object_reg = object_reg;
 }
 
 csTargetRenderStepFactory::~csTargetRenderStepFactory ()
 {
-  SCF_DESTRUCT_IBASE();
 }
 
 csPtr<iRenderStep> csTargetRenderStepFactory::Create ()
@@ -167,23 +164,17 @@ csPtr<iRenderStep> csTargetRenderStepFactory::Create ()
 
 //---------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE(csTargetRenderStep);
-  SCF_IMPLEMENTS_INTERFACE(iRenderStep);
-  SCF_IMPLEMENTS_INTERFACE(iRenderStepContainer);
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 csTargetRenderStep::csTargetRenderStep (
-  iObjectRegistry* object_reg)
+  iObjectRegistry* object_reg) :
+  scfImplementationType (this)
 {
-  SCF_CONSTRUCT_IBASE(0);
-  engine = CS_QUERY_REGISTRY (object_reg, iEngine);
+  engine = csQueryRegistry<iEngine> (object_reg);
   doCreate = false;
   persistent = false;
 }
 
 csTargetRenderStep::~csTargetRenderStep ()
 {
-  SCF_DESTRUCT_IBASE();
 }
 
 void csTargetRenderStep::Perform (iRenderView* rview, iSector* sector,
@@ -244,5 +235,3 @@ size_t csTargetRenderStep::GetStepCount () const
 {
   return steps.Length();
 }
-
-

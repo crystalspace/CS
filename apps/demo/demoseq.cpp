@@ -56,7 +56,7 @@ DemoSequenceManager::DemoSequenceManager (Demo* demo)
   loader = 0;
   iObjectRegistry* object_reg = demo->object_reg;
   csRef<iPluginManager> plugin_mgr (
-  	CS_QUERY_REGISTRY (object_reg, iPluginManager));
+  	csQueryRegistry<iPluginManager> (object_reg));
   seqmgr = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.utilities.sequence",
   	iSequenceManager);
   if (!seqmgr)
@@ -262,7 +262,7 @@ void DemoSequenceManager::ControlPaths (iCamera* camera, csTicks elapsed_time)
       r = 1;
       do_path = false;
     }
-    pfm->path->Calculate (r);
+    pfm->path->CalculateAtTime (r);
     csVector3 oldpos;
     iSector* oldsector;
     csVector3 pos, up, forward;
@@ -346,7 +346,7 @@ void DemoSequenceManager::DebugPositionObjects (iCamera* camera,
     	/ float (pfm->total_path_time);
     if (r >= 0 && r <= 1)
     {
-      pfm->path->Calculate (r);
+      pfm->path->CalculateAtTime (r);
       csVector3 pos, up, forward;
       pfm->path->GetInterpolatedPosition (pos);
       pfm->path->GetInterpolatedUp (up);
@@ -378,7 +378,7 @@ void DemoSequenceManager::DebugDrawPath (csNamedPath* np, bool hi,
   csVector3 p;
   for (r = 0 ; r <= 1 ; r += 0.001f)
   {
-    np->Calculate (r);
+    np->CalculateAtTime (r);
     np->GetInterpolatedPosition (p);
     int x = int ((p.x-tl.x)*dim / (br.x-tl.x));
     int y = int ((p.z-tl.y)*dim / (br.y-tl.y));
@@ -478,7 +478,7 @@ void DemoSequenceManager::DebugDrawPaths (iCamera* camera,
   if (selnp)
   {
     // Calculate where we are in time on the selected path.
-    float t = selnp->GetTimeValue (selpoint);
+    float t = selnp->GetTime (selpoint);
     seltime = csTicks (start + total*t);
   }
 
@@ -513,7 +513,7 @@ void DemoSequenceManager::DebugDrawPaths (iCamera* camera,
     float r = float (ct - pfm->start_path_time)
     	/ float (pfm->total_path_time);
     if (r >= 1) r = 1;
-    pfm->path->Calculate (r);
+    pfm->path->CalculateAtTime (r);
     // We are going to show both the position as the forward vector.
     csVector3 pos, forward;
     pfm->path->GetInterpolatedPosition (pos);
@@ -529,7 +529,7 @@ void DemoSequenceManager::DebugDrawPaths (iCamera* camera,
       	/ float (pfm->total_path_time);
       if (r >= 0 && r <= 1)
       {
-	pfm->path->Calculate (r);
+	pfm->path->CalculateAtTime (r);
 	pfm->path->GetInterpolatedPosition (pos);
 	pfm->path->GetInterpolatedForward (forward);
         DrawSelPoint (pos, forward, tl, br, dim, demo->col_cyan, 10);
@@ -643,7 +643,7 @@ void DemoSequenceManager::SetupRotatePart (iMeshWrapper* mesh,
 	float angle_speed, csTicks total_rotate_time, csTicks already_elapsed)
 {
   MeshRotation* mrot = new MeshRotation ();
-  mrot->particle = SCF_QUERY_INTERFACE (mesh->GetMeshObject (), iParticle);
+  mrot->particle = scfQueryInterface<iParticle> (mesh->GetMeshObject ());
   if (!mrot->particle)
   {
     delete mrot;

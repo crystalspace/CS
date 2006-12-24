@@ -82,31 +82,31 @@ public:
 /**
  * csHashComputer<> specialization for an integral type.
  */
-CS_SPECIALIZE_TEMPLATE
+template<>
 class csHashComputer<void*> : public csHashComputerIntegral<void*> {};
   
-CS_SPECIALIZE_TEMPLATE
+template<>
 class csHashComputer<int> : public csHashComputerIntegral<int> {}; 
-CS_SPECIALIZE_TEMPLATE
+template<>
 class csHashComputer<unsigned int> : 
   public csHashComputerIntegral<unsigned int> {}; 
     
-CS_SPECIALIZE_TEMPLATE
+template<>
 class csHashComputer<long> : public csHashComputerIntegral<long> {}; 
-CS_SPECIALIZE_TEMPLATE
+template<>
 class csHashComputer<unsigned long> : 
   public csHashComputerIntegral<unsigned long> {}; 
 
 #if (CS_LONG_SIZE < 8)    
-CS_SPECIALIZE_TEMPLATE
+template<>
 class csHashComputer<longlong> : 
   public csHashComputerIntegral<longlong> {}; 
-CS_SPECIALIZE_TEMPLATE
+template<>
 class csHashComputer<ulonglong> : 
   public csHashComputerIntegral<ulonglong> {}; 
 #endif
     
-CS_SPECIALIZE_TEMPLATE
+template<>
 class csHashComputer<float>
 {
 public:
@@ -122,7 +122,7 @@ public:
     return float2uint.u;
   }
 };
-CS_SPECIALIZE_TEMPLATE
+template<>
 class csHashComputer<double>
 {
 public:
@@ -168,7 +168,7 @@ public:
  * string types (must support cast to const char*).
  * Example:
  * \code
- * CS_SPECIALIZE_TEMPLATE csHashComputer<MyString> : 
+ * template<> csHashComputer<MyString> : 
  *   public csHashComputerString<MyString> {};
  * \endcode
  */
@@ -185,7 +185,7 @@ public:
 /**
  * csHashComputer<> specialization for strings that uses csHashCompute().
  */
-CS_SPECIALIZE_TEMPLATE
+template<>
 class csHashComputer<const char*> : public csHashComputerString<const char*> {};
 
 /**
@@ -207,12 +207,15 @@ public:
   }
 };
 
+#include "csutil/win32/msvc_deprecated_warn_off.h"
+
 /**
  * This is a simple helper class to make a copy of a const char*.
  * This can be used to have a hash that makes copies of the keys.
  * \deprecated csString can also be used for hash keys.
  */
-class csStrKey
+class CS_DEPRECATED_TYPE_MSG("csString can also be used for hash keys") 
+  csStrKey
 {
 private:
   char* str;
@@ -234,8 +237,10 @@ public:
 /**
  * csComparator<> specialization for csStrKey that uses strcmp().
  */
-CS_SPECIALIZE_TEMPLATE
+template<>
 class csComparator<csStrKey, csStrKey> : public csComparatorString<csStrKey> {};
+
+#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 /**
  * A generic hash table class,
@@ -250,6 +255,12 @@ template <class T, class K = unsigned int,
   class ArrayMemoryAlloc = CS::Memory::AllocatorMalloc> 
 class csHash
 {
+public:
+  typedef csHash<T, K, ArrayMemoryAlloc> ThisType;
+  typedef T ValueType;
+  typedef K KeyType;
+  typedef ArrayMemoryAlloc AllocatorType;
+
 protected:
   struct Element
   {
@@ -357,8 +368,8 @@ public:
   /// Get all the elements with the given key, or empty if there are none.
   csArray<T> GetAll (const K& key) const
   {
-    return GetAll<typename_qualifier csArray<T>::ElementHandlerType, 
-      typename_qualifier csArray<T>::AllocatorType> (key);
+    return GetAll<typename csArray<T>::ElementHandlerType, 
+      typename csArray<T>::AllocatorType> (key);
   }
 
   /// Get all the elements with the given key, or empty if there are none.
@@ -406,7 +417,8 @@ public:
    * Add an element to the hash table, overwriting if the key already exists.
    * \deprecated Use PutUnique() instead.
    */
-  CS_DEPRECATED_METHOD void PutFirst (const K& key, const T &value)
+  CS_DEPRECATED_METHOD_MSG("Use PutUnique() instead.")
+  void PutFirst (const K& key, const T &value)
   {
     PutUnique(key, value);
   }
@@ -554,7 +566,7 @@ public:
     {
       const size_t idx = i - 1;
       if ((csComparator<K, K>::Compare (values[idx].key, key) == 0) && 
-	(values[idx].value == value))
+	  (csComparator<T, T>::Compare (values[idx].value, value) == 0 ))
       {
         values.DeleteIndexFast (idx);
         ret = true;
@@ -584,7 +596,7 @@ public:
   class Iterator
   {
   private:
-    const csHash<T, K>* hash;
+    csHash<T, K>* hash;
     const K key;
     size_t bucket, size, element;
 
@@ -597,7 +609,7 @@ public:
     }
 
   protected:
-    Iterator (const csHash<T, K>* hash0, const K& key0) :
+    Iterator (csHash<T, K>* hash0, const K& key0) :
       hash(hash0),
       key(key0), 
       bucket(csHashComputer<K>::ComputeHash (key) % hash->Modulo),
@@ -632,9 +644,9 @@ public:
     }
 
     /// Get the next element's value.
-    const T& Next ()
+    T& Next ()
     {
-      const T &ret = hash->Elements[bucket][element].value;
+      T &ret = hash->Elements[bucket][element].value;
       element++;
       Seek ();
       return ret;
@@ -647,6 +659,175 @@ public:
 
   /// An iterator class for the hash.
   class GlobalIterator
+  {
+  private:
+    csHash<T, K> *hash;
+    size_t bucket, size, element;
+
+    void Zero () { bucket = element = 0; }
+    void Init () 
+    { 
+      size = 
+        (hash->Elements.GetSize() > 0) ? hash->Elements[bucket].Length () : 0;
+    }
+
+    void FindItem ()
+    {
+      if (element >= size)
+      {
+	while (++bucket < hash->Elements.Length ())
+	{
+          Init ();
+	  if (size != 0)
+	  {
+	    element = 0;
+	    break;
+	  }
+	}
+      }
+    }
+
+  protected:
+    GlobalIterator (csHash<T, K> *hash0) : hash (hash0) 
+    { 
+      Zero (); 
+      Init (); 
+      FindItem ();
+    }
+
+    friend class csHash<T, K>;
+  public:
+    /// Copy constructor.
+    GlobalIterator (const GlobalIterator &o) :
+      hash (o.hash),
+      bucket (o.bucket),
+      size (o.size),
+      element (o.element) {}
+
+    /// Assignment operator.
+    GlobalIterator& operator=(const GlobalIterator& o)
+    {
+      hash = o.hash;
+      bucket = o.bucket;
+      size = o.size;
+      element = o.element;
+      return *this;
+    }
+
+    /// Returns a boolean indicating whether or not the hash has more elements.
+    bool HasNext () const
+    {
+      if (hash->Elements.Length () == 0) return false;
+      return element < size || bucket < hash->Elements.Length ();
+    }
+
+    /// Advance the iterator of one step
+    void Advance ()
+    {
+      element++;
+      FindItem ();
+    }
+
+    /// Get the next element's value, don't move the iterator.
+    T& NextNoAdvance ()
+    {
+      return hash->Elements[bucket][element].value;
+    }
+
+    /// Get the next element's value.
+    T& Next ()
+    {
+      T &ret = NextNoAdvance ();
+      Advance ();
+      return ret;
+    }
+
+    /// Get the next element's value and key, don't move the iterator.
+    T& NextNoAdvance (K &key)
+    {
+      key = hash->Elements[bucket][element].key;
+      return NextNoAdvance ();
+    }
+
+    /// Get the next element's value and key.
+    T& Next (K &key)
+    {
+      key = hash->Elements[bucket][element].key;
+      return Next ();
+    }
+
+    /// Move the iterator back to the first element.
+    void Reset () { Zero (); Init (); FindItem (); }
+  };
+  friend class GlobalIterator;
+
+  /// An const iterator class for the hash.
+  class ConstIterator
+  {
+  private:
+    const csHash<T, K>* hash;
+    const K key;
+    size_t bucket, size, element;
+
+    void Seek ()
+    {
+      while ((element < size) && 
+        (csComparator<K, K>::Compare (hash->Elements[bucket][element].key, 
+	key) != 0))
+          element++;
+    }
+
+  protected:
+    ConstIterator (const csHash<T, K>* hash0, const K& key0) :
+      hash(hash0),
+      key(key0), 
+      bucket(csHashComputer<K>::ComputeHash (key) % hash->Modulo),
+      size((hash->Elements.GetSize() > 0) ? hash->Elements[bucket].Length () : 0)
+      { Reset (); }
+
+    friend class csHash<T, K>;
+  public:
+    /// Copy constructor.
+    ConstIterator (const ConstIterator &o) :
+      hash (o.hash),
+      key(o.key),
+      bucket(o.bucket),
+      size(o.size),
+      element(o.element) {}
+
+    /// Assignment operator.
+    ConstIterator& operator=(const ConstIterator& o)
+    {
+      hash = o.hash;
+      key = o.key;
+      bucket = o.bucket;
+      size = o.size;
+      element = o.element;
+      return *this;
+    }
+
+    /// Returns a boolean indicating whether or not the hash has more elements.
+    bool HasNext () const
+    {
+      return element < size;
+    }
+
+    /// Get the next element's value.
+    const T& Next ()
+    {
+      const T &ret = hash->Elements[bucket][element].value;
+      element++;
+      Seek ();
+      return ret;
+    }
+
+    /// Move the iterator back to the first element.
+    void Reset () { element = 0; Seek (); }
+  };
+  friend class ConstIterator;
+
+  /// An const iterator class for the hash.
+  class ConstGlobalIterator
   {
   private:
     const csHash<T, K> *hash;
@@ -676,7 +857,7 @@ public:
     }
 
   protected:
-    GlobalIterator (const csHash<T, K> *hash0) : hash (hash0) 
+    ConstGlobalIterator (const csHash<T, K> *hash0) : hash (hash0) 
     { 
       Zero (); 
       Init (); 
@@ -686,14 +867,14 @@ public:
     friend class csHash<T, K>;
   public:
     /// Copy constructor.
-    GlobalIterator (const Iterator &o) :
+    ConstGlobalIterator (const ConstGlobalIterator &o) :
       hash (o.hash),
       bucket (o.bucket),
       size (o.size),
       element (o.element) {}
 
     /// Assignment operator.
-    GlobalIterator& operator=(const GlobalIterator& o)
+    ConstGlobalIterator& operator=(const ConstGlobalIterator& o)
     {
       hash = o.hash;
       bucket = o.bucket;
@@ -747,11 +928,21 @@ public:
     /// Move the iterator back to the first element.
     void Reset () { Zero (); Init (); FindItem (); }
   };
-  friend class GlobalIterator;
+  friend class ConstGlobalIterator;
 
   /// Delete the element pointed by the iterator. This is safe for this
   /// iterator, not for the others.
   void DeleteElement (GlobalIterator& iterator)
+  {
+    Elements[iterator.bucket].DeleteIndex(iterator.element);
+    Size--;
+    iterator.size--;
+    iterator.FindItem ();
+  }
+
+  /// Delete the element pointed by the iterator. This is safe for this
+  /// iterator, not for the others.
+  void DeleteElement (ConstGlobalIterator& iterator)
   {
     Elements[iterator.bucket].DeleteIndex(iterator.element);
     Size--;
@@ -765,7 +956,7 @@ public:
    * \warning Modifying the hash (except with DeleteElement()) while you have
    *   open iterators will result in undefined behaviour.
    */
-  Iterator GetIterator (const K& key) const
+  Iterator GetIterator (const K& key)
   {
     return Iterator (this, key);
   }
@@ -775,9 +966,30 @@ public:
    * \warning Modifying the hash (except with DeleteElement()) while you have
    *   open iterators will result in undefined behaviour.
    */
-  GlobalIterator GetIterator () const
+  GlobalIterator GetIterator ()
   {
     return GlobalIterator (this);
+  }
+
+  /**
+   * Return a const iterator for the hash, to iterate only over the elements
+   * with the given key.
+   * \warning Modifying the hash (except with DeleteElement()) while you have
+   *   open iterators will result in undefined behaviour.
+   */
+  ConstIterator GetIterator (const K& key) const
+  {
+    return ConstIterator (this, key);
+  }
+
+  /**
+   * Return a const iterator for the hash, to iterate over all elements.
+   * \warning Modifying the hash (except with DeleteElement()) while you have
+   *   open iterators will result in undefined behaviour.
+   */
+  ConstGlobalIterator GetIterator () const
+  {
+    return ConstGlobalIterator (this);
   }
 };
 

@@ -28,8 +28,11 @@
 #include "csgeom/tri.h"
 #include "csgeom/vector2.h"
 #include "csgeom/vector3.h"
+#include "csgeom/math3d.h"
 #include "cstool/collider.h"
 #include "cstool/csview.h"
+#include "cstool/uberscreenshot.h"
+#include "cstool/enginetools.h"
 #include "csutil/cscolor.h"
 #include "csutil/csuctransform.h"
 #include "csutil/debug.h"
@@ -98,7 +101,7 @@ void csBugPlug::Report (int severity, const char* msg, ...)
 {
   va_list arg;
   va_start (arg, msg);
-  csRef<iReporter> rep (CS_QUERY_REGISTRY (object_reg, iReporter));
+  csRef<iReporter> rep (csQueryRegistry<iReporter> (object_reg));
   if (rep)
     rep->ReportV (severity, "crystalspace.bugplug", msg, arg);
   else
@@ -121,7 +124,7 @@ csBugPlug::csBugPlug (iBase *iParent)
   initialized = false;
   catcher.AttachNew (new csCameraCatcher ());
   shadow = new csShadow ();
-  scfiEventHandler = 0;
+  weakEventHandler = 0;
 
   do_fps = true;
   fps_frame_count = 0;
@@ -150,8 +153,6 @@ csBugPlug::csBugPlug (iBase *iParent)
   debug_view.object = 0;
   debug_view.drag_point = -1;
 
-  captureFormat = 0;
-
   do_shadow_debug = false;
   delay_command = DEBUGCMD_UNKNOWN;
 }
@@ -168,14 +169,12 @@ csBugPlug::~csBugPlug ()
     delete mappings;
     mappings = n;
   }
-  if (scfiEventHandler)
+  if (weakEventHandler)
   {
-    csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
+    csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (object_reg));
     if (q)
-      q->RemoveListener (scfiEventHandler);
-    scfiEventHandler->DecRef ();
+      RemoveWeakListener (q, weakEventHandler);
   }
-  delete[] captureFormat;
 
   delete shadow;
 }
@@ -185,7 +184,7 @@ bool csBugPlug::Initialize (iObjectRegistry *object_reg)
   csBugPlug::object_reg = object_reg;
 
   csRef<iKeyboardDriver> currentKbd = 
-    CS_QUERY_REGISTRY (object_reg, iKeyboardDriver);
+    csQueryRegistry<iKeyboardDriver> (object_reg);
   if (currentKbd == 0)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "No iKeyboardDriver!");
@@ -195,11 +194,7 @@ bool csBugPlug::Initialize (iObjectRegistry *object_reg)
 
   CS_INITIALIZE_EVENT_SHORTCUTS (object_reg);
 
-  if (!scfiEventHandler)
-  {
-    scfiEventHandler = new EventHandler (this);
-  }
-  csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
+  csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (object_reg));
   if (q != 0)
   {
     csEventID esub[] = { 
@@ -211,7 +206,7 @@ bool csBugPlug::Initialize (iObjectRegistry *object_reg)
       SystemClose,
       CS_EVENTLIST_END 
     };
-    q->RegisterListener (scfiEventHandler, esub);
+    RegisterWeakListener (q, this, esub, weakEventHandler);
   }
   return true;
 }
@@ -222,12 +217,12 @@ void csBugPlug::SetupPlugin ()
 
   if (!Engine)
   {
-    Engine = CS_QUERY_REGISTRY (object_reg, iEngine);
+    Engine = csQueryRegistry<iEngine> (object_reg);
     if (Engine)
       Engine->AddEngineFrameCallback (catcher);
   }
 
-  if (!G3D) G3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+  if (!G3D) G3D = csQueryRegistry<iGraphics3D> (object_reg);
 
   if (!G3D)
   {
@@ -250,95 +245,31 @@ void csBugPlug::SetupPlugin ()
     CS_ASSERT (fnt != 0);    
   }
 
-  if (!VFS) VFS = CS_QUERY_REGISTRY (object_reg, iVFS);
+  if (!VFS) VFS = csQueryRegistry<iVFS> (object_reg);
   if (!VFS)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "No VFS!");
     return;
   }
 
-  if (!vc) vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
+  if (!vc) vc = csQueryRegistry<iVirtualClock> (object_reg);
   if (!vc)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "No virtual clock!");
     return;
   }
 
-  if (!Conout) Conout = CS_QUERY_REGISTRY (object_reg, iConsoleOutput);
+  if (!Conout) Conout = csQueryRegistry<iConsoleOutput> (object_reg);
 
   config.AddConfig (object_reg, "/config/bugplug.cfg");
 
   ReadKeyBindings (config->GetStr ("Bugplug.Keybindings", 
     "/config/bugplug.key"));
 
-  captureFormat = csStrNew (config->GetStr ("Bugplug.Capture.FilenameFormat",
+  captureFormat.SetMask (config->GetStr ("Bugplug.Capture.FilenameFormat",
     "/this/cryst000.png"));
-  // since this string is passed to format later,
-  // replace all '%' with '%%'
-  {
-    char* newstr = new char[strlen(captureFormat)*2 + 1];
-    memset (newstr, 0, strlen(captureFormat)*2 + 1);
-
-    char* pos = captureFormat;
-    while (pos)
-    {
-      char* percent = strchr (pos, '%');
-      if (percent)
-      {
-	strncat (newstr, pos, percent-pos);
-	strcat (newstr, "%%");
-	pos = percent + 1;
-      }
-      else
-      {
-	strcat (newstr, pos);
-	pos = 0;
-      }
-    }
-    delete[] captureFormat;
-    captureFormat = newstr;
-  }
-  // scan for the rightmost string of digits
-  // and create an appropriate format string
-  {
-    captureFormatNumberMax = 1;
-    uint captureFormatNumberDigits = 0;
-
-    char* end = strrchr (captureFormat, 0);
-    if (end != captureFormat)
-    {
-      do
-      {
-	end--;
-      }
-      while ((end >= captureFormat) && (!isdigit (*end)));
-      if (end >= captureFormat)
-      {
-	do
-	{
-	  captureFormatNumberMax *= 10;
-	  captureFormatNumberDigits++; 
-	  end--;
-	}
-	while ((end >= captureFormat) && (isdigit (*end)));
-	
-	csString nameForm;
-	nameForm.Format ("%%0%uu", captureFormatNumberDigits);
-
-        csString newCapForm;
-        newCapForm.Append (captureFormat, end-captureFormat+1);
-        newCapForm.Append (nameForm);
-        newCapForm.Append (end+captureFormatNumberDigits+1);
-
-	delete[] captureFormat;
-	captureFormat = csStrNew (newCapForm);
-      }
-    }
-  }
-
   captureMIME = config->GetStr ("Bugplug.Capture.Image.MIME",
     "image/png");
-
   captureOptions = config->GetStr ("Bugplug.Capture.Image.Options");
 
   initialized = true;
@@ -445,7 +376,7 @@ void csBugPlug::VisculCmd (const char* cmd)
       "Bugplug is currently now tracking a visibility culler!");
     return;
   }
-  csRef<iDebugHelper> dbghelp (SCF_QUERY_INTERFACE (visculler, iDebugHelper));
+  csRef<iDebugHelper> dbghelp (scfQueryInterface<iDebugHelper> (visculler));
   if (!dbghelp)
   {
     Report (CS_REPORTER_SEVERITY_NOTIFY,
@@ -508,30 +439,16 @@ void csBugPlug::ToggleG3DState (G3D_RENDERSTATEOPTION op, const char* name)
 
 void csBugPlug::MouseButtonRight (iCamera* camera)
 {
-  csVector3 v;
-  // Setup perspective vertex, invert mouse Y axis.
-  csVector2 p (mouse_x, camera->GetShiftY() * 2 - mouse_y);
-
-  v = camera->InvPerspective (p, 100);
-  csVector3 end = camera->GetTransform ().This2Other (v);
-
-  iSector* sector = camera->GetSector ();
-  CS_ASSERT (sector != 0);
-  csVector3 origin = camera->GetTransform ().GetO2TTranslation ();
-  csVector3 isect;
-
-  csRef<iCollideSystem> cdsys = CS_QUERY_REGISTRY (object_reg, iCollideSystem);
-  csIntersectingTriangle closest_tri;
-  iMeshWrapper* sel;
-  float sqdist = csColliderHelper::TraceBeam (cdsys, sector,
-	origin, end, true,
-	closest_tri, isect, &sel);
-
-  if (sqdist >= 0 && sel)
+  csRef<iCollideSystem> cdsys = csQueryRegistry<iCollideSystem> (object_reg);
+  csScreenTargetResult result = csEngineTools::FindScreenTarget (
+      csVector2 (mouse_x, mouse_y), 100.0f, camera, cdsys);
+  if (result.mesh)
   {
+    float sqdist = csSquaredDist::PointPoint (
+	camera->GetTransform ().GetOrigin (), result.isect);
     Report (CS_REPORTER_SEVERITY_NOTIFY,
     	"Hit a mesh '%s' at distance %g!",
-	sel->QueryObject ()->GetName (), csQsqrt (sqdist));
+	result.mesh->QueryObject ()->GetName (), csQsqrt (sqdist));
   }
   else
   {
@@ -542,29 +459,19 @@ void csBugPlug::MouseButtonRight (iCamera* camera)
 
 void csBugPlug::MouseButtonLeft (iCamera* camera)
 {
-  csVector3 v;
-  // Setup perspective vertex, invert mouse Y axis.
-  csVector2 p (mouse_x, camera->GetShiftY() * 2 - mouse_y);
+  csScreenTargetResult result = csEngineTools::FindScreenTarget (
+      csVector2 (mouse_x, mouse_y), 100.0f, camera);
+  iMeshWrapper* sel = result.mesh;
 
-  v = camera->InvPerspective (p, 100);
-  csVector3 end = camera->GetTransform ().This2Other (v);
-
-  iSector* sector = camera->GetSector ();
-  CS_ASSERT (sector != 0);
-  csVector3 origin = camera->GetTransform ().GetO2TTranslation ();
-  csVector3 isect;
-
-  int polyidx = -1;
-  iMeshWrapper* sel = sector->HitBeam (origin, end, isect, &polyidx);
   const char* poly_name = 0;
-  if (polyidx != -1)
+  if (result.polygon_idx != -1)
   {
     csRef<iThingFactoryState> tfs = scfQueryInterface<iThingFactoryState> 
       (sel->GetMeshObject ()->GetFactory());
     if (tfs)
     {
-      poly_name = tfs->GetPolygonName (polyidx);
-      Dump (tfs, polyidx);
+      poly_name = tfs->GetPolygonName (result.polygon_idx);
+      Dump (tfs, result.polygon_idx);
     }
   }
   else
@@ -572,8 +479,8 @@ void csBugPlug::MouseButtonLeft (iCamera* camera)
     poly_name = 0;
   }
 
-  csVector3 vw = isect;
-  v = camera->GetTransform ().Other2This (vw);
+  csVector3 vw = result.isect;
+  csVector3 v = camera->GetTransform ().Other2This (vw);
   Report (CS_REPORTER_SEVERITY_NOTIFY,
     "LMB down : c:(%f,%f,%f) w:(%f,%f,%f) p:'%s'",
     v.x, v.y, v.z, vw.x, vw.y, vw.z, poly_name ? poly_name : "<none>");
@@ -673,7 +580,7 @@ bool csBugPlug::ExecCommand (int cmd, const csString& args)
     case DEBUGCMD_ENGINECMD:
 	{
 	  csRef<iDebugHelper> dbghelp (
-	  	SCF_QUERY_INTERFACE (Engine, iDebugHelper));
+	  	scfQueryInterface<iDebugHelper> (Engine));
 	  if (dbghelp)
 	  {
 	    if (dbghelp->DebugCommand (args))
@@ -700,7 +607,7 @@ bool csBugPlug::ExecCommand (int cmd, const csString& args)
     case DEBUGCMD_ENGINESTATE:
 	{
 	  csRef<iDebugHelper> dbghelp (
-	  	SCF_QUERY_INTERFACE (Engine, iDebugHelper));
+	  	scfQueryInterface<iDebugHelper> (Engine));
 	  if (dbghelp)
 	  {
 	    if (dbghelp->GetSupportedTests () & CS_DBGHELP_STATETEST)
@@ -1152,9 +1059,8 @@ bool csBugPlug::ExecCommand (int cmd, const csString& args)
 	break;
     case DEBUGCMD_MEMORYDUMP:
 	  {
-	    csRef<iMemoryTracker> mtr = CS_QUERY_REGISTRY_TAG_INTERFACE (
-	    	object_reg, "crystalspace.utilities.memorytracker",
-		iMemoryTracker);
+	    csRef<iMemoryTracker> mtr = csQueryRegistryTagInterface<iMemoryTracker> (
+	    	object_reg, "crystalspace.utilities.memorytracker");
 	    if (!mtr)
 	    {
 	      Report (CS_REPORTER_SEVERITY_NOTIFY,
@@ -1177,8 +1083,8 @@ bool csBugPlug::ExecCommand (int cmd, const csString& args)
 	  for (i = 0 ; i < ml->GetCount () ; i++)
 	  {
 	    iMeshWrapper* m = ml->Get (i);
-	    csRef<iThingState> th = SCF_QUERY_INTERFACE (m->GetMeshObject (),
-	    	iThingState);
+	    csRef<iThingState> th = 
+	    	scfQueryInterface<iThingState> (m->GetMeshObject ());
 	    if (th)
 	    {
 	      th->Unprepare ();
@@ -1229,7 +1135,7 @@ bool csBugPlug::ExecCommand (int cmd, const csString& args)
 	  standardShadowShader = shadowmat->GetMaterial()->GetShader();
 	if (!debugShadowShader)
 	{
-	  csRef<iShaderManager> shmgr ( CS_QUERY_REGISTRY(object_reg, iShaderManager));
+	  csRef<iShaderManager> shmgr ( csQueryRegistry<iShaderManager> (object_reg));
 	  if(shmgr)
 	  {
 	    debugShadowShader = shmgr->CreateShader();
@@ -1265,6 +1171,17 @@ bool csBugPlug::ExecCommand (int cmd, const csString& args)
     case DEBUGCMD_LISTPLUGINS:
 	ListLoadedPlugins();
 	break;
+    case DEBUGCMD_UBERSCREENSHOT:
+        {
+          uint shotW, shotH;
+          if (args.IsEmpty() || (sscanf (args, "%u %u", &shotW, &shotH) != 2))
+          {
+            shotW = 2048;
+            shotH = 1536;
+	  }
+	  CaptureUberScreen (shotW, shotH);
+        }
+        break;
     default:
         return false;
   }
@@ -1273,24 +1190,6 @@ bool csBugPlug::ExecCommand (int cmd, const csString& args)
 
 void csBugPlug::CaptureScreen ()
 {
-  uint i = 0;
-  csString name;
-
-  bool exists = false;
-  do
-  {
-    name.Format (captureFormat, i);
-    if (exists = VFS->Exists (name)) i++;
-  }
-  while ((i < captureFormatNumberMax) && (exists));
-
-  if (i >= captureFormatNumberMax)
-  {
-    Report (CS_REPORTER_SEVERITY_NOTIFY,
-    	"Too many screenshot files in current directory");
-    return;
-  }
-
   csRef<iImage> img (csPtr<iImage> (G2D->ScreenShot ()));
   if (!img)
   {
@@ -1298,20 +1197,23 @@ void csBugPlug::CaptureScreen ()
     	"The 2D graphics driver does not support screen shots");
     return;
   }
-  csRef<iImageIO> imageio (CS_QUERY_REGISTRY (object_reg, iImageIO));
+  csRef<iImageIO> imageio (csQueryRegistry<iImageIO> (object_reg));
   if (imageio)
   {
     csRef<iDataBuffer> db (imageio->Save (img, captureMIME, 
       captureOptions));
     if (db)
     {
-      Report (CS_REPORTER_SEVERITY_NOTIFY, "Screenshot: %s", name.GetData());
+      csString name = captureFormat.FindNextFilename (VFS);
       if (!VFS->WriteFile (name, (const char*)db->GetData (),
       		db->GetSize ()))
       {
         Report (CS_REPORTER_SEVERITY_NOTIFY,
-		"There was an error while writing screen shot");
+		"There was an error while writing screen shot to %s",
+		name.GetData());
       }
+      else
+        Report (CS_REPORTER_SEVERITY_NOTIFY, "Wrote screenshot %s", name.GetData());
     }
     else
     {
@@ -1321,10 +1223,59 @@ void csBugPlug::CaptureScreen ()
   }
 }
 
+void csBugPlug::CaptureUberScreen (uint w, uint h)
+{
+  csString descr; descr.Format ("%ux%u \xC3\xBC" "berscreenshot", w, h);
+
+  if (!catcher->camera)
+  {
+    Report (CS_REPORTER_SEVERITY_NOTIFY,
+    	"Could not take %s: no camera", descr.GetData());
+    return;
+  }
+
+  csRef<iImage> img;
+  {
+    CS::UberScreenshotMaker shotMaker (w, h, catcher->camera, Engine, G3D);
+    img = shotMaker.Shoot();
+  }
+  if (!img)
+  {
+    Report (CS_REPORTER_SEVERITY_NOTIFY,
+    	"Could not take %s", descr.GetData());
+    return;
+  }
+  csRef<iImageIO> imageio (csQueryRegistry<iImageIO> (object_reg));
+  if (imageio)
+  {
+    csRef<iDataBuffer> db (imageio->Save (img, captureMIME, 
+      captureOptions));
+    if (db)
+    {
+      csString name = captureFormat.FindNextFilename (VFS);
+      if (!VFS->WriteFile (name, (const char*)db->GetData (),
+      		db->GetSize ()))
+      {
+        Report (CS_REPORTER_SEVERITY_NOTIFY,
+		"There was an error while writing %s to %s", descr.GetData(), 
+		name.GetData());
+      }
+      else
+	Report (CS_REPORTER_SEVERITY_NOTIFY, "Wrote %s %s", descr.GetData(), 
+	  name.GetData());
+    }
+    else
+    {
+      Report (CS_REPORTER_SEVERITY_NOTIFY, 
+	      "Could not encode %s", descr.GetData());
+    }
+  }
+}
+
 void csBugPlug::ListLoadedPlugins ()
 {
-  csRef<iPluginManager> plugmgr = CS_QUERY_REGISTRY (object_reg, 
-    iPluginManager);
+  csRef<iPluginManager> plugmgr =  
+    csQueryRegistry<iPluginManager> (object_reg);
   csRef<iPluginIterator> plugiter (plugmgr->GetPlugins ());
 
   csSet<const char*> printedPlugins;
@@ -1332,8 +1283,8 @@ void csBugPlug::ListLoadedPlugins ()
     "Loaded plugins:");
   while (plugiter->HasNext())
   {
-    csRef<iFactory> plugFact = SCF_QUERY_INTERFACE (plugiter->Next (),
-      iFactory);
+    csRef<iFactory> plugFact = 
+      scfQueryInterface<iFactory> (plugiter->Next ());
     if (plugFact.IsValid())
     {
       const char* libname = plugFact->QueryModuleName();
@@ -1561,7 +1512,7 @@ bool csBugPlug::HandleFrame (iEvent& /*event*/)
 
   if (visculler)
   {
-    csRef<iDebugHelper> dbghelp (SCF_QUERY_INTERFACE (visculler, iDebugHelper));
+    csRef<iDebugHelper> dbghelp (scfQueryInterface<iDebugHelper> (visculler));
     if (dbghelp)
       dbghelp->Dump (G3D);
   }
@@ -1633,9 +1584,8 @@ bool csBugPlug::HandleFrame (iEvent& /*event*/)
       if (do_bbox)
       {
         int bbox_color = G3D->GetDriver2D ()->FindRGB (0, 255, 255);
-        csBox3 bbox;
-        selected_meshes[k]->GetMeshObject ()->GetObjectModel ()->
-    	  GetObjectBoundingBox (bbox);
+        const csBox3& bbox = selected_meshes[k]->GetMeshObject ()
+	  ->GetObjectModel ()->GetObjectBoundingBox ();
         csVector3 vxyz = tr_o2c * bbox.GetCorner (CS_BOX_CORNER_xyz);
         csVector3 vXyz = tr_o2c * bbox.GetCorner (CS_BOX_CORNER_Xyz);
         csVector3 vxYz = tr_o2c * bbox.GetCorner (CS_BOX_CORNER_xYz);
@@ -1887,12 +1837,12 @@ void csBugPlug::DebugCmd (const char* cmd)
     *space = 0;
 
     csRef<iBase> comp;
-    comp = CS_QUERY_REGISTRY_TAG(object_reg, cmdstr);
+    comp = csQueryRegistryTag(object_reg, cmdstr);
 
     if (comp == 0)
     {
       csRef<iPluginManager> plugmgr = 
-	CS_QUERY_REGISTRY (object_reg, iPluginManager);
+	csQueryRegistry<iPluginManager> (object_reg);
       CS_ASSERT (plugmgr);
       csRef<iBase> comp =
 	CS_QUERY_PLUGIN_CLASS (plugmgr, cmdstr, iBase);
@@ -1907,7 +1857,7 @@ void csBugPlug::DebugCmd (const char* cmd)
     else
     {
       csRef<iDebugHelper> dbghelp = 
-	SCF_QUERY_INTERFACE (comp, iDebugHelper);
+	scfQueryInterface<iDebugHelper> (comp);
       if (!dbghelp)
       {
 	Report (CS_REPORTER_SEVERITY_NOTIFY,
@@ -1983,6 +1933,8 @@ int csBugPlug::GetKeyCode (const char* keystring, bool& shift, bool& alt,
 
 int csBugPlug::GetCommandCode (const char* cmdstr, csString& args)
 {
+  if ((cmdstr == 0) || (*cmdstr == 0)) return DEBUGCMD_UNKNOWN;
+
   csString cmd;
   char const* spc = strchr (cmdstr, ' ');
   if (spc)
@@ -2070,6 +2022,7 @@ int csBugPlug::GetCommandCode (const char* cmdstr, csString& args)
   if (!strcmp (cmd, "listplugins"))	return DEBUGCMD_LISTPLUGINS;
   if (!strcmp (cmd, "profdump"))	return DEBUGCMD_PROFDUMP;
   if (!strcmp (cmd, "profreset"))	return DEBUGCMD_PROFRESET;
+  if (!strcmp (cmd, "uberscreenshot"))	return DEBUGCMD_UBERSCREENSHOT;
 
   return DEBUGCMD_UNKNOWN;
 }
@@ -2261,13 +2214,12 @@ void csBugPlug::Dump (int indent, iMeshWrapper* mesh)
   }
   else
   {
-    csRef<iFactory> fact (SCF_QUERY_INTERFACE (obj, iFactory));
+    csRef<iFactory> fact (scfQueryInterface<iFactory> (obj));
     if (fact)
       Report (CS_REPORTER_SEVERITY_DEBUG, "%*s        Plugin '%s'",
   	  indent, "",
           fact->QueryDescription () ? fact->QueryDescription () : "0");
-    csBox3 bbox;
-    obj->GetObjectModel ()->GetObjectBoundingBox (bbox);
+    const csBox3& bbox = obj->GetObjectModel ()->GetObjectBoundingBox ();
     Report (CS_REPORTER_SEVERITY_DEBUG, "%*s        Object bounding box:",
       indent, "");
     Dump (indent+8, bbox);
@@ -2417,7 +2369,7 @@ bool csBugPlug::HandleEvent (iEvent& event)
 /* We want to handle frame event in the DEBUG phase,
    and input (key/mouse) events before the renderer or printer */
 
-const csHandlerID * csBugPlug::EventHandler::GenericPrec(
+const csHandlerID * csBugPlug::GenericPrec(
 	csRef<iEventHandlerRegistry> &handler_reg,
 	csRef<iEventNameRegistry> &name_reg,
 	csEventID e) const
@@ -2437,7 +2389,7 @@ const csHandlerID * csBugPlug::EventHandler::GenericPrec(
   }
 }
 
-const csHandlerID * csBugPlug::EventHandler::GenericSucc(
+const csHandlerID * csBugPlug::GenericSucc(
 	csRef<iEventHandlerRegistry> &handler_reg,
 	csRef<iEventNameRegistry> &name_reg,
 	csEventID e) const
@@ -2563,8 +2515,8 @@ void csBugPlug::DebugSectorBox (const csBox3& box, float r, float g, float b,
   csRef<iMeshFactoryWrapper> mf (Engine->CreateMeshFactory (
   	"crystalspace.mesh.object.genmesh", name ? name : "__BugPlug_fact__"));
   csRef<iGeneralFactoryState> gfs (
-  	SCF_QUERY_INTERFACE (mf->GetMeshObjectFactory (),
-  	iGeneralFactoryState));
+  	
+  	scfQueryInterface<iGeneralFactoryState> (mf->GetMeshObjectFactory ()));
   CS_ASSERT (gfs != 0);
   mf->GetMeshObjectFactory ()->SetMaterialWrapper (mat);
   gfs->GenerateBox (tbox);
@@ -2596,8 +2548,8 @@ void csBugPlug::DebugSectorBox (const csBox3& box, float r, float g, float b,
 
   csRef<iMeshWrapper> mw (Engine->CreateMeshWrapper (
   	mf, name ? name : "__BugPlug_mesh__", debug_sector.sector, pos));
-  csRef<iGeneralMeshState> gms (SCF_QUERY_INTERFACE (mw->GetMeshObject (),
-  	iGeneralMeshState));
+  csRef<iGeneralMeshState> gms (
+  	scfQueryInterface<iGeneralMeshState> (mw->GetMeshObject ()));
   CS_ASSERT (gms != 0);
   gms->SetLighting (false);
   gms->SetManualColors (true);
@@ -2632,8 +2584,8 @@ void csBugPlug::DebugSectorTriangle (const csVector3& s1, const csVector3& s2,
   csRef<iMeshFactoryWrapper> mf (Engine->CreateMeshFactory (
   	"crystalspace.mesh.object.genmesh", "__BugPlug_tri__"));
   csRef<iGeneralFactoryState> gfs (
-  	SCF_QUERY_INTERFACE (mf->GetMeshObjectFactory (),
-  	iGeneralFactoryState));
+  	
+  	scfQueryInterface<iGeneralFactoryState> (mf->GetMeshObjectFactory ()));
   CS_ASSERT (gfs != 0);
   mf->GetMeshObjectFactory ()->SetMaterialWrapper (mat);
   gfs->SetVertexCount (3);
@@ -2658,8 +2610,8 @@ void csBugPlug::DebugSectorTriangle (const csVector3& s1, const csVector3& s2,
 
   csRef<iMeshWrapper> mw (Engine->CreateMeshWrapper (
   	mf, "__BugPlug_tri__", debug_sector.sector, pos));
-  csRef<iGeneralMeshState> gms (SCF_QUERY_INTERFACE (mw->GetMeshObject (),
-  	iGeneralMeshState));
+  csRef<iGeneralMeshState> gms (
+  	scfQueryInterface<iGeneralMeshState> (mw->GetMeshObject ()));
   CS_ASSERT (gms != 0);
   gms->SetLighting (false);
   gms->SetManualColors (true);
@@ -2692,8 +2644,8 @@ void csBugPlug::DebugSectorMesh (
   csRef<iMeshFactoryWrapper> mf (Engine->CreateMeshFactory (
   	"crystalspace.mesh.object.genmesh", "__BugPlug_mesh__"));
   csRef<iGeneralFactoryState> gfs (
-  	SCF_QUERY_INTERFACE (mf->GetMeshObjectFactory (),
-  	iGeneralFactoryState));
+  	
+  	scfQueryInterface<iGeneralFactoryState> (mf->GetMeshObjectFactory ()));
   CS_ASSERT (gfs != 0);
   mf->GetMeshObjectFactory ()->SetMaterialWrapper (mat);
   gfs->SetVertexCount (vertex_count);
@@ -2725,8 +2677,8 @@ void csBugPlug::DebugSectorMesh (
 
   csRef<iMeshWrapper> mw (Engine->CreateMeshWrapper (
   	mf, "__BugPlug_mesh__", debug_sector.sector, pos));
-  csRef<iGeneralMeshState> gms (SCF_QUERY_INTERFACE (mw->GetMeshObject (),
-  	iGeneralMeshState));
+  csRef<iGeneralMeshState> gms (
+  	scfQueryInterface<iGeneralMeshState> (mw->GetMeshObject ()));
   CS_ASSERT (gms != 0);
   gms->SetLighting (false);
   gms->SetManualColors (true);

@@ -41,6 +41,7 @@
 #include "iengine/sector.h"
 #include "iengine/sharevar.h"
 #include "iengine/scenenode.h"
+#include "iengine/campos.h"
 #include "igeom/clip2d.h"
 #include "igraphic/imageio.h"
 #include "imap/loader.h"
@@ -57,6 +58,7 @@
 #include "ivaria/pmeter.h" 
 #include "ivaria/reporter.h"
 #include "ivaria/view.h"
+#include "ivaria/engseq.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/material.h"
@@ -402,7 +404,7 @@ void list_meshes (void)
 
 void SetConfigOption (iBase* plugin, const char* optName, const char* optValue)
 {
-  csRef<iPluginConfig> config (SCF_QUERY_INTERFACE (plugin, iPluginConfig));
+  csRef<iPluginConfig> config (scfQueryInterface<iPluginConfig> (plugin));
   if (!config)
     Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
     	"No config interface for this plugin.");
@@ -453,7 +455,7 @@ void SetConfigOption (iBase* plugin, const char* optName, const char* optValue)
 
 void SetConfigOption (iBase* plugin, const char* optName, csVariant& optValue)
 {
-  csRef<iPluginConfig> config (SCF_QUERY_INTERFACE (plugin, iPluginConfig));
+  csRef<iPluginConfig> config (scfQueryInterface<iPluginConfig> (plugin));
   if (!config)
     Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
     	"No config interface for this plugin.");
@@ -475,7 +477,7 @@ void SetConfigOption (iBase* plugin, const char* optName, csVariant& optValue)
 
 bool GetConfigOption (iBase* plugin, const char* optName, csVariant& optValue)
 {
-  csRef<iPluginConfig> config (SCF_QUERY_INTERFACE (plugin, iPluginConfig));
+  csRef<iPluginConfig> config (scfQueryInterface<iPluginConfig> (plugin));
   if (!config)
     Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
     	"No config interface for this plugin.");
@@ -504,7 +506,7 @@ csString LookForKeyValue (iObjectIterator* it,const char* key)
   it->Reset();
   while (it->HasNext())
   {
-    csRef<iKeyValuePair> kp = SCF_QUERY_INTERFACE(it->Next(),iKeyValuePair);
+    csRef<iKeyValuePair> kp = scfQueryInterface<iKeyValuePair> (it->Next());
     if(!kp)
       continue;
     if(!strcmp(key,kp->GetKey()))
@@ -606,7 +608,7 @@ void RegisterMaterials(iObjectIterator* it,iEngine* Engine,
 
   while(it->HasNext())
   {
-    kp = SCF_QUERY_INTERFACE(it->Next(),iKeyValuePair);
+    kp = scfQueryInterface<iKeyValuePair> (it->Next());
     if(!kp)
     {
       continue;
@@ -676,14 +678,14 @@ void BuildSprite(iSector * sector, iObjectIterator* it, csVector3 position)
   iMeshWrapper* sprite = GenerateSprite((char*)(const char*)factName,
   	(char*)(const char*)sprName,sector,position);
 
-  csRef<iSprite3DState> state (SCF_QUERY_INTERFACE(sprite->GetMeshObject(),
-                          iSprite3DState));
+  csRef<iSprite3DState> state (
+                          scfQueryInterface<iSprite3DState> (sprite->GetMeshObject()));
   state->SetAction("default");
 }
 
 
 
-void BuildObject(iObjectRegistry* object_reg, iSector * sector,
+void BuildObject(iSector * sector,
 	iObjectIterator* it, iEngine* Engine,
 	csVector3 position, iGraphics3D* MyG3D, iLoader* loader,
 	iObjectRegistry* objReg)
@@ -706,19 +708,19 @@ void BuildObject(iObjectRegistry* object_reg, iSector * sector,
 void WalkTest::ParseKeyNodes(iObject* src)
 {
   csRef<iObjectIterator> it (src->GetIterator());
-  csRef<iSector> sector (SCF_QUERY_INTERFACE(src,iSector));
+  csRef<iSector> sector (scfQueryInterface<iSector> (src));
 
   while(it->HasNext())
   {
     iObject* node_obj = it->Next ();
-    csRef<iMapNode> node (SCF_QUERY_INTERFACE(node_obj, iMapNode));
+    csRef<iMapNode> node (scfQueryInterface<iMapNode> (node_obj));
     if(!node)
     {
       continue;
     }
     csRef<iObjectIterator> it2 (node_obj->GetIterator());
 
-    BuildObject(object_reg, sector,it2, Engine, node->GetPosition(), myG3D,
+    BuildObject(sector, it2, Engine, node->GetPosition(), myG3D,
 		LevelLoader, object_reg);
   }
 }
@@ -729,14 +731,14 @@ void WalkTest::ParseKeyCmds (iObject* src)
   while (it->HasNext ())
   {
     csRef<iKeyValuePair> kp (
-    	SCF_QUERY_INTERFACE (it->Next (), iKeyValuePair));
+    	scfQueryInterface<iKeyValuePair> (it->Next ()));
     if (!kp)
     {
       continue;
     }
     if (!strcmp (kp->GetKey (), "cmd_AnimateSky"))
     {
-      csRef<iSector> Sector (SCF_QUERY_INTERFACE (src, iSector));
+      csRef<iSector> Sector (scfQueryInterface<iSector> (src));
       if (Sector)
       {
         char name[100], rot[100];
@@ -749,23 +751,22 @@ void WalkTest::ParseKeyCmds (iObject* src)
     }
     else if (!strcmp (kp->GetKey (), "cmd_AnimateDirLight"))
     {
-      csRef<iMeshWrapper> wrap (SCF_QUERY_INTERFACE (src, iMeshWrapper));
+      csRef<iMeshWrapper> wrap = scfQueryInterface<iMeshWrapper> (src);
       if (wrap)
         anim_dirlight = wrap;	// @@@ anim_dirlight should be csRef
     }
     else if (!strcmp (kp->GetKey (), "entity_WavePortal"))
     {
-      csRef<iMeshWrapper> wrap = SCF_QUERY_INTERFACE (src, iMeshWrapper);
+      csRef<iMeshWrapper> wrap = scfQueryInterface<iMeshWrapper> (src);
       if (wrap)
       {
-	const csRefArray<iSceneNode>& ml = wrap->QuerySceneNode ()
-		->GetChildren ();
+        const csRef<iSceneNodeArray> ml = 
+          wrap->QuerySceneNode ()->GetChildrenArray ();
 	size_t i;
 	iMeshWrapper* pcmesh = 0;
-	for (i = 0 ; i < ml.Length () ; i++)
-	  if (ml[i]->QueryMesh ())
+        for (i = 0 ; i < ml->GetSize() ; i++)
+          if ((pcmesh = ml->Get(i)->QueryMesh ()))
 	  {
-	    pcmesh = ml[i]->QueryMesh ();
 	    break;
 	  }
 	if (pcmesh)
@@ -817,14 +818,15 @@ void WalkTest::ParseKeyCmds (iObject* src)
     }
   }
 
-  csRef<iMeshWrapper> mesh (SCF_QUERY_INTERFACE (src, iMeshWrapper));
+  csRef<iMeshWrapper> mesh (scfQueryInterface<iMeshWrapper> (src));
   if (mesh)
   {
     size_t k;
-    const csRefArray<iSceneNode>& ml = mesh->QuerySceneNode ()->GetChildren ();
-    for (k = 0 ; k < ml.Length () ; k++)
+    const csRef<iSceneNodeArray> ml = 
+      mesh->QuerySceneNode ()->GetChildrenArray ();
+    for (k = 0 ; k < ml->GetSize() ; k++)
     {
-      iMeshWrapper* spr = ml[k]->QueryMesh ();
+      iMeshWrapper* spr = ml->Get(k)->QueryMesh ();
       // @@@ Also for others?
       if (spr)
         ParseKeyCmds (spr->QueryObject ());
@@ -862,8 +864,8 @@ void WalkTest::ActivateObject (iObject* src)
   csRef<iObjectIterator> it (src->GetIterator ());
   while (it->HasNext ())
   {
-    csRef<csWalkEntity> wentity (SCF_QUERY_INTERFACE (it->Next (),
-    	csWalkEntity));
+    csRef<csWalkEntity> wentity (
+    	scfQueryInterface<csWalkEntity> (it->Next ()));
     if (wentity)
       wentity->Activate ();
   }
@@ -922,7 +924,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     CONPRI("Statistics:");
     CONPRI("  stats perftest coordshow");
     CONPRI("Special effects:");
-    CONPRI("  addmbot delmbot addbot delbot fire explosion spiral frain");
+    CONPRI("  addmbot delmbot addbot delbot fire explosion frain");
     CONPRI("  rain snow fountain flame portal fs_inter fs_fadeout fs_fadecol");
     CONPRI("  fs_fadetxt fs_red fs_green fs_blue fs_whiteout fs_shadevert");
     CONPRI("Debugging:");
@@ -936,7 +938,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     CONPRI("  coordsave coordload bind p_alpha s_fog");
     CONPRI("  snd_play snd_volume record play playonce clrrec saverec");
     CONPRI("  loadrec action plugins conflist confset do_logo");
-    CONPRI("  varlist var setvar setvarv setvarc");
+    CONPRI("  varlist var setvar setvarv setvarc loadmap");
     CONPRI("  saveworld");
 
 #   undef CONPRI
@@ -962,7 +964,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     while (it->HasNext ())
     {
       iBase* plugin = it->Next ();
-      csRef<iFactory> fact (SCF_QUERY_INTERFACE (plugin, iFactory));
+      csRef<iFactory> fact (scfQueryInterface<iFactory> (plugin));
       Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
       	"%d: %s", i, fact->QueryDescription ());
       i++;
@@ -1132,7 +1134,7 @@ bool CommandHandler (const char *cmd, const char *arg)
 		"Bad value for plugin (see 'plugins' command)!");
       else
       {
-        csRef<iPluginConfig> config (SCF_QUERY_INTERFACE (plugin, iPluginConfig));
+        csRef<iPluginConfig> config (scfQueryInterface<iPluginConfig> (plugin));
 	if (!config)
 	  Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
 	  	"No config interface for this plugin.");
@@ -1401,8 +1403,8 @@ bool CommandHandler (const char *cmd, const char *arg)
     csEngine* engine = (csEngine*)(iEngine*)(Sys->Engine);
     if ((rad = engine->GetRadiosity ()) != 0)
     {
-      csRef<iPolygon3D> p (SCF_QUERY_INTERFACE (rad->GetNextPolygon (),
-      	iPolygon3D));
+      csRef<iPolygon3D> p (
+      	scfQueryInterface<iPolygon3D> (rad->GetNextPolygon ()));
       Sys->selected_polygon = p;
     }
 #endif
@@ -1462,12 +1464,12 @@ bool CommandHandler (const char *cmd, const char *arg)
   }
   else if (!csStrCaseCmp (cmd, "s_fog"))
   {
-    csFog* f = Sys->view->GetCamera ()->GetSector ()->GetFog ();
     if (!arg)
     {
+      const csFog& f = Sys->view->GetCamera ()->GetSector ()->GetFog ();
       Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
       	"Fog in current sector (%f,%f,%f) density=%f",
-      	f->red, f->green, f->blue, f->density);
+      	f.color.red, f.color.green, f.color.blue, f.density);
     }
     else
     {
@@ -1478,18 +1480,81 @@ bool CommandHandler (const char *cmd, const char *arg)
 		"Expected r,g,b,density. Got something else!");
         return false;
       }
-      f->enabled = true;
-      f->density = dens;
-      f->red = r;
-      f->green = g;
-      f->blue = b;
+      csFog f;
+      f.density = dens;
+      f.color.red = r;
+      f.color.green = g;
+      f.color.blue = b;
+      f.mode = CS_FOG_MODE_CRYSTALSPACE;
+      Sys->view->GetCamera ()->GetSector ()->SetFog (f);
+    }
+  }
+  else if (!csStrCaseCmp (cmd, "loadmap"))
+  {
+    if (arg)
+    {
+      char level[300];
+      csScanStr (arg, "%s", level);
+      if (!Sys->SetMapDir (level))
+      {
+        Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
+      	  "Couldn't open level '%s'!", level);
+	return false;
+      }
+      csRef<iEngineSequenceManager> engseq = csQueryRegistry<
+	iEngineSequenceManager> (Sys->object_reg);
+      if (engseq)
+      {
+	engseq->RemoveTriggers ();
+	engseq->RemoveSequences ();
+      }
+      Sys->Engine->DeleteAll ();
+      Sys->Engine->SetVFSCacheManager ();
+      if (!Sys->LevelLoader->LoadMapFile ("world"))
+      {
+        Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
+      	  "Couldn't load level '%s'!", level);
+	return false;
+      }
+      Sys->Engine->Prepare ();
+      // Look for the start sector in this map.
+      bool camok = false;
+      if (!camok && Sys->Engine->GetCameraPositions ()->GetCount () > 0)
+      {
+        iCameraPosition *cp = Sys->Engine->GetCameraPositions ()->Get (0);
+        if (cp->Load(Sys->views[0]->GetCamera (), Sys->Engine) &&
+	    cp->Load(Sys->views[1]->GetCamera (), Sys->Engine))
+	  camok = true;
+      }
+      if (!camok)
+      {
+        iSector* room = Sys->Engine->GetSectors ()->FindByName ("room");
+        if (room)
+        {
+	  Sys->views[0]->GetCamera ()->SetSector (room);
+	  Sys->views[1]->GetCamera ()->SetSector (room);
+	  Sys->views[0]->GetCamera ()->GetTransform ().SetOrigin (
+	      csVector3 (0, 0, 0));
+	  Sys->views[1]->GetCamera ()->GetTransform ().SetOrigin (
+	      csVector3 (0, 0, 0));
+	  camok = true;
+        }
+      }
+      if (!camok)
+      {
+        Sys->Report (CS_REPORTER_SEVERITY_ERROR,
+          "Map does not contain a valid starting point!\n"
+          "Try adding a room called 'room' or a START keyword");
+        return false;
+      }
+      Sys->InitCollDet (Sys->Engine, 0);
     }
   }
   else if (!csStrCaseCmp (cmd, "portal"))
   {
     if (arg)
     {
-      char level[100];
+      char level[300];
       csScanStr (arg, "%s", level);
       void OpenPortal (iLoader*, iView* view, char* lev);
       OpenPortal (Sys->LevelLoader, Sys->view, level);
@@ -1857,22 +1922,6 @@ bool CommandHandler (const char *cmd, const char *arg)
     	Sys->Engine,
 	Sys->view->GetCamera ()->GetTransform ().GetOrigin (), txtname);
   }
-  else if (!csStrCaseCmp (cmd, "spiral"))
-  {
-    char txtname[100];
-    int cnt = 0;
-    if (arg) cnt = csScanStr (arg, "%s", txtname);
-    extern void add_particles_spiral (iSector* sector, const csVector3& bottom,
-    	char* txtname);
-    if (cnt != 1)
-    {
-      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-      	"Expected parameter 'texture'!");
-    }
-    else
-      add_particles_spiral (Sys->view->GetCamera ()->GetSector (),
-    	Sys->view->GetCamera ()->GetTransform ().GetOrigin (), txtname);
-  }
   else if (!csStrCaseCmp (cmd, "loadmesh"))
   {
     char filename[100], tempname[100], txtname[100];
@@ -1943,9 +1992,9 @@ bool CommandHandler (const char *cmd, const char *arg)
       iMeshWrapper *wrap = Sys->Engine->GetMeshes ()->FindByName (name);
       if (wrap)
       {
-	csRef<iSprite3DFactoryState> fstate (SCF_QUERY_INTERFACE (
-		wrap->GetMeshObject ()->GetFactory (),
-		iSprite3DFactoryState));
+        csRef<iSprite3DFactoryState> fstate (
+          scfQueryInterface<iSprite3DFactoryState> (
+            wrap->GetMeshObject ()->GetFactory ()));
 	iSpriteAction* aspr_act;
 	int i;
 
@@ -1987,8 +2036,8 @@ bool CommandHandler (const char *cmd, const char *arg)
       else
       {
         csRef<iSprite3DState> state (
-		SCF_QUERY_INTERFACE (wrap->GetMeshObject (),
-		iSprite3DState));
+		
+		scfQueryInterface<iSprite3DState> (wrap->GetMeshObject ()));
         if (state)
         {
           // Test to see if the action exists for that sprite.
@@ -2187,7 +2236,7 @@ bool CommandHandler (const char *cmd, const char *arg)
   }
   else if (!csStrCaseCmp (cmd, "relight"))
   {
-    csRef<iConsoleOutput> console = CS_QUERY_REGISTRY(Sys->object_reg, iConsoleOutput);
+    csRef<iConsoleOutput> console = csQueryRegistry<iConsoleOutput> (Sys->object_reg);
     if(console.IsValid())
     {
       csTextProgressMeter* meter = new csTextProgressMeter(console);
@@ -2204,11 +2253,13 @@ bool CommandHandler (const char *cmd, const char *arg)
       iSndSysWrapper* sb = mgr->FindSoundByName (arg);
       if (sb)
       {
+	csRef<iSndSysStream> sndstream = Sys->mySound->CreateStream (
+	    sb->GetData (), CS_SND3D_ABSOLUTE);
 	csRef<iSndSysSource> sndsource = Sys->mySound->CreateSource (
-	    sb->GetStream ());
+	    sndstream);
 	sndsource->SetVolume (1.0f);
-        sb->GetStream ()->SetLoopState (CS_SNDSYS_STREAM_DONTLOOP);
-        sb->GetStream ()->Unpause ();
+        sndstream->SetLoopState (CS_SNDSYS_STREAM_DONTLOOP);
+        sndstream->Unpause ();
       }
       else
         Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
@@ -2311,7 +2362,7 @@ bool CommandHandler (const char *cmd, const char *arg)
         "saveworld: Specified file `%s' already exists.", arg);
       return true;
     }
-    csRef<iSaver> saver = CS_QUERY_REGISTRY(Sys->object_reg, iSaver);
+    csRef<iSaver> saver = csQueryRegistry<iSaver> (Sys->object_reg);
     if (!saver.IsValid ())
     {
       saver = CS_LOAD_PLUGIN(Sys->plugin_mgr, "crystalspace.level.saver", iSaver);
@@ -2330,7 +2381,7 @@ bool CommandHandler (const char *cmd, const char *arg)
   }
   else if (!csStrCaseCmp (cmd, "cubemapshots"))
   {
-    csRef<iImageIO> iio = CS_QUERY_REGISTRY (Sys->object_reg, iImageIO);
+    csRef<iImageIO> iio = csQueryRegistry<iImageIO> (Sys->object_reg);
     int dim = MIN (Sys->myG3D->GetWidth (), Sys->myG3D->GetHeight ());
     dim = csFindNearestPowerOf2 (dim + 1) >> 1;
     int g2dh = Sys->myG3D->GetHeight ();

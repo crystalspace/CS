@@ -289,6 +289,7 @@ public:
    * Return the number of stored bits.
    * \deprecated Use GetSize() instead.
    */
+  /*CS_DEPRECATED_METHOD_MSG("Use GetSize() instead.")*/
   size_t Length () const
   {
     return GetSize();
@@ -298,6 +299,7 @@ public:
    * Set the number of stored bits.
    * \deprecated Use SetSize() instead.
    */
+  /*CS_DEPRECATED_METHOD_MSG("Use SetSize() instead.")*/
   void SetLength (size_t newSize)
   {
     SetSize (newSize);
@@ -610,7 +612,7 @@ public:
  * csComparator<> specialization for csBitArray to allow its use as 
  * e.g. hash key type.
  */
-CS_SPECIALIZE_TEMPLATE
+template<>
 class csComparator<csBitArray, csBitArray> : 
   public csComparatorBitArray<csBitArray> { };
 
@@ -619,7 +621,7 @@ class csComparator<csBitArray, csBitArray> :
  * csHashComputer<> specialization for csBitArray to allow its use as 
  * hash key type.
  */
-CS_SPECIALIZE_TEMPLATE
+template<>
 class csHashComputer<csBitArray> : 
   public csHashComputerBitArray<csBitArray> { };
 

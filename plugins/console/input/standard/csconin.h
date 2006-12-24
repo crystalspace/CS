@@ -27,12 +27,15 @@
 #include "iutil/comp.h"
 #include "csutil/csstring.h"
 #include "csutil/stringarray.h"
+#include "csutil/scf_implementation.h"
 
 /**
  * This is the standard command-line handler with history and
  * a connection to a iConsoleOutput for output.
  */
-class csConsoleInput : public iConsoleInput
+class csConsoleInput :
+  public scfImplementation3<csConsoleInput,
+    iConsoleInput, iComponent, iConsoleWatcher>
 {
   csRef<iEventNameRegistry> name_reg;
   // The command history
@@ -67,8 +70,6 @@ class csConsoleInput : public iConsoleInput
   void Refresh ();
 
 public:
-  SCF_DECLARE_IBASE;
-
   /// Construct the object
   csConsoleInput (iBase *iParent);
   /// Destroy the object
@@ -113,21 +114,9 @@ public:
   /// Set the prompt string
   virtual void SetPrompt (const char *iPrompt);
 
-  // Implement iComponent interface.
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csConsoleInput);
-    virtual bool Initialize (iObjectRegistry* p)
-    { return scfParent->Initialize(p); }
-  } scfiComponent;
-
   // Implement iConsoleWatcher interface.
-  struct eiConsoleWatcher : public iConsoleWatcher
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csConsoleInput);
-    virtual void ConsoleVisibilityChanged(iConsoleOutput*, bool visible);
-  } scfiConsoleWatcher;
-  friend struct eiConsoleWatcher;
+  virtual void ConsoleVisibilityChanged(iConsoleOutput*, bool visible)
+  { if (visible) Refresh(); }
 };
 
 #endif // __CS_CSCONIN_H__

@@ -19,6 +19,7 @@
 #include "cssysdef.h"
 #include "csgeom/math3d.h"
 #include "csutil/util.h"
+#include "csutil/event.h"
 #include "iutil/document.h"
 #include "iutil/eventq.h"
 #include "iutil/objreg.h"
@@ -27,29 +28,7 @@
 
 CS_IMPLEMENT_PLUGIN
 
-SCF_IMPLEMENT_IBASE (csGenmeshAnimationControlType)
-  SCF_IMPLEMENTS_INTERFACE (iGenMeshAnimationControlType)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csGenmeshAnimationControlType::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 SCF_IMPLEMENT_FACTORY (csGenmeshAnimationControlType)
-
-SCF_IMPLEMENT_IBASE (csGenmeshAnimationControlFactory)
-  SCF_IMPLEMENTS_INTERFACE (iGenMeshAnimationControlFactory)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csGenmeshAnimationControl)
-  SCF_IMPLEMENTS_INTERFACE (iGenMeshAnimationControl)
-  SCF_IMPLEMENTS_INTERFACE (iGenMeshAnimationControlState)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csGenmeshAnimationControlType::EventHandler)
-  SCF_IMPLEMENTS_INTERFACE (iEventHandler)
-SCF_IMPLEMENT_IBASE_END
 
 //-------------------------------------------------------------------------
 
@@ -299,7 +278,7 @@ bool csAnimControlRunnable::Do (csTicks current, bool& stop)
 	  ac_color_execution m;
 	  m.final = current + inst.color.duration;
 	  m.group = groups[inst.color.group_id];
-	  csColor4 current_col = m.group->GetColor ();
+	  csColor current_col = m.group->GetColor ();
 	  m.final_color.Set (inst.color.red, inst.color.green,
 	  	inst.color.blue);
 	  if (inst.color.duration == 0)
@@ -345,9 +324,9 @@ bool csAnimControlRunnable::Do (csTicks current, bool& stop)
 //-------------------------------------------------------------------------
 
 csGenmeshAnimationControl::csGenmeshAnimationControl (
-	csGenmeshAnimationControlFactory* fact)
+  csGenmeshAnimationControlFactory* fact) :
+  scfImplementationType(this)
 {
-  SCF_CONSTRUCT_IBASE (0);
   factory = fact;
   num_animated_verts = 0;
   animated_verts = 0;
@@ -371,8 +350,6 @@ csGenmeshAnimationControl::~csGenmeshAnimationControl ()
 {
   delete[] animated_verts;
   delete[] animated_colors;
-
-  SCF_DESTRUCT_IBASE ();
 }
 
 void csGenmeshAnimationControl::UpdateAnimation (csTicks current,
@@ -587,9 +564,9 @@ bool csGenmeshAnimationControl::Execute (const char* scriptname)
 //-------------------------------------------------------------------------
 
 csGenmeshAnimationControlFactory::csGenmeshAnimationControlFactory (
-	csGenmeshAnimationControlType* type, iObjectRegistry* object_reg)
+  csGenmeshAnimationControlType* type, iObjectRegistry* object_reg) :
+  scfImplementationType(this)
 {
-  SCF_CONSTRUCT_IBASE (0);
   csGenmeshAnimationControlFactory::type = type;
   csGenmeshAnimationControlFactory::object_reg = object_reg;
   InitTokenTable (xmltokens);
@@ -603,7 +580,6 @@ csGenmeshAnimationControlFactory::csGenmeshAnimationControlFactory (
 
 csGenmeshAnimationControlFactory::~csGenmeshAnimationControlFactory ()
 {
-  SCF_DESTRUCT_IBASE ();
 }
 
 csPtr<iGenMeshAnimationControl> csGenmeshAnimationControlFactory::
@@ -940,7 +916,7 @@ const char* csGenmeshAnimationControlFactory::Load (iDocumentNode* node)
 
 const char* csGenmeshAnimationControlFactory::Save (iDocumentNode* parent)
 {
-  csRef<iFactory> plugin = SCF_QUERY_INTERFACE(type, iFactory);
+  csRef<iFactory> plugin = scfQueryInterface<iFactory> (type);
   if (!plugin) return "Couldn't get Class ID";
   parent->SetAttribute("plugin", plugin->QueryClassID());
   return "Not implemented yet!";
@@ -949,37 +925,31 @@ const char* csGenmeshAnimationControlFactory::Save (iDocumentNode* parent)
 //-------------------------------------------------------------------------
 
 csGenmeshAnimationControlType::csGenmeshAnimationControlType (
-	iBase* pParent)
+  iBase* pParent) :
+  scfImplementationType(this, pParent), object_reg(0)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-  scfiEventHandler = 0;
 }
 
 csGenmeshAnimationControlType::~csGenmeshAnimationControlType ()
 {
-  if (scfiEventHandler)
+  if (weakEventHandler)
   {
-    csRef<iEventQueue> q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+    csRef<iEventQueue> q = csQueryRegistry<iEventQueue> (object_reg);
     if (q)
-      q->RemoveListener (scfiEventHandler);
-    scfiEventHandler->DecRef ();
+      CS::RemoveWeakListener (q, weakEventHandler);
   }
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csGenmeshAnimationControlType::Initialize (iObjectRegistry* object_reg)
 {
-  csGenmeshAnimationControlType::object_reg = object_reg;
+  this->object_reg = object_reg;
   Frame = csevFrame (object_reg);
   PreProcess = csevPreProcess (object_reg);
-  scfiEventHandler = new EventHandler (this);
-  csRef<iEventQueue> q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+  csRef<iEventQueue> q = csQueryRegistry<iEventQueue> (object_reg);
   // \todo It looks like @csGenmeshAnimationControlType doesn't actually handle any events.  So why does it register an event listener?
   if (q != 0) {
     csEventID events[] = { Frame, PreProcess, CS_EVENTLIST_END };
-    q->RegisterListener (scfiEventHandler, events);
+    CS::RegisterWeakListener (q, this, events, weakEventHandler);
   }
   return true;
 }

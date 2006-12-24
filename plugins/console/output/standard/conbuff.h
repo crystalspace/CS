@@ -21,6 +21,8 @@
 
 #include "csutil/csstring.h"
 
+CS_PLUGIN_NAMESPACE_BEGIN(ConOut)
+{
 class csConsoleBuffer
 {
 public:
@@ -58,5 +60,8 @@ private:
   csString **buffer, *empty;
   bool *dirty;
 };
+
+}
+CS_PLUGIN_NAMESPACE_END(ConOut)
 
 #endif // __CS_CONBUFF_H__

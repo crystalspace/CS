@@ -19,17 +19,17 @@
 #ifndef __CS_LIGHT_H__
 #define __CS_LIGHT_H__
 
-#include "csutil/scf_implementation.h"
 #include "csgeom/transfrm.h"
 #include "cstool/objmodel.h"
-#include "csutil/scf_implementation.h"
-#include "csutil/csobject.h"
 #include "csutil/cscolor.h"
-#include "csutil/weakref.h"
+#include "csutil/csobject.h"
 #include "csutil/flags.h"
-#include "csutil/nobjvec.h"
 #include "csutil/hash.h"
+#include "csutil/nobjvec.h"
 #include "csutil/refarr.h"
+#include "csutil/scf_implementation.h"
+#include "csutil/scfarray.h"
+#include "csutil/weakref.h"
 #include "iutil/selfdestruct.h"
 #include "plugins/engine/3d/lview.h"
 #include "plugins/engine/3d/halo.h"
@@ -48,6 +48,8 @@ class csKDTreeChild;
 struct iMeshWrapper;
 struct iLightingInfo;
 struct iSector;
+
+#include "csutil/win32/msvc_deprecated_warn_off.h"
 
 class csLightObjectModel : public scfImplementationExt0<csLightObjectModel,
                                                         csObjectModel>
@@ -68,6 +70,10 @@ public:
   {
     bbox = box;
   }
+  virtual const csBox3& GetObjectBoundingBox ()
+  {
+    return box;
+  }
   virtual void SetObjectBoundingBox (const csBox3& bbox)
   {
     box = bbox;
@@ -79,6 +85,8 @@ public:
   }
   virtual iTerraFormer* GetTerraFormerColldet () { return 0; }
 };
+
+#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 /**
  * Class that represents the influence that a certain light
@@ -104,18 +112,22 @@ public:
 
 typedef csSet<csRef<csLightSectorInfluence> > csLightSectorInfluences;
 
+#include "csutil/win32/msvc_deprecated_warn_off.h"
+
 /**
  * Superclass of all positional lights.
  * A light subclassing from this has a color, a position
  * and a radius.
  */
-class csLight : public scfImplementationExt5<csLight,
-                                             csObject,
-                                             iLight,
-                                             iVisibilityObject,
-                                             iShaderVariableContext,
-					     iSceneNode,
-					     iSelfDestruct>
+class csLight : 
+  public scfImplementationExt5<csLight,
+                               csObject,
+                               iLight,
+                               iVisibilityObject,
+                               scfFakeInterface<iShaderVariableContext>,
+			       iSceneNode,
+			       iSelfDestruct>,
+  public CS::ShaderVariableContextImpl
 {
 private:
   /// ID for this light (16-byte MD5).
@@ -197,8 +209,6 @@ protected:
 
   /// List of light/sector influences.
   csLightSectorInfluences influences;
-
-  csShaderVariableContext svcontext;
 
   csEngine* engine;
 public:
@@ -296,6 +306,11 @@ public:
     }
     return s;
   }
+
+  /**
+   * Get the current full sector (including parents).
+   */
+  iSector* GetFullSector ();
 
   /**
    * Set the center position.
@@ -470,45 +485,6 @@ public:
     return (iShaderVariableContext*)this;
   }
 
-  /**\name iShaderVariableContext implementation
-   * @{ */
-  /// Add a variable to this context
-  void AddVariable (csShaderVariable *variable)
-  { svcontext.AddVariable (variable); }
-
-  /// Get a named variable from this context
-  csShaderVariable* GetVariable (csStringID name) const
-  { 
-    return svcontext.GetVariable (name); 
-  }
-
-  /// Get Array of all ShaderVariables
-  const csRefArray<csShaderVariable>& GetShaderVariables () const
-  { 
-    // @@@ Will not return factory SVs
-    return svcontext.GetShaderVariables (); 
-  }
-
-  /**
-   * Push the variables of this context onto the variable stacks
-   * supplied in the "stacks" argument
-   */
-  void PushVariables (iShaderVarStack* stacks) const
-  { 
-    svcontext.PushVariables (stacks); 
-  }
-
-  bool IsEmpty () const 
-  {
-    return svcontext.IsEmpty();
-  }
-
-  void ReplaceVariable (csShaderVariable *variable)
-  { svcontext.ReplaceVariable (variable); }
-
-  void Clear () { svcontext.Clear(); }
-  /** @} */
-
   //----------------------------------------------------------------------
   // Light influence stuff.
   //----------------------------------------------------------------------
@@ -570,8 +546,8 @@ public:
   virtual iObjectModel* GetObjectModel () { return object_model; }
   virtual csFlags& GetCullerFlags () { return culler_flags; }
 
-  //--------------------- iSceneNode implementation ----------------------//
-
+  /**\name iSceneNode implementation
+   * @{ */
   virtual void SetParent (iSceneNode* parent)
   {
     csSceneNode::SetParent ((iSceneNode*)this, parent, &movable);
@@ -587,9 +563,16 @@ public:
   {
     return movable.GetChildren ();
   }
+  virtual csPtr<iSceneNodeArray> GetChildrenArray () const
+  {
+    return csPtr<iSceneNodeArray> (
+      new scfArrayWrapConst<iSceneNodeArray, csRefArray<iSceneNode> > (
+      movable.GetChildren ()));
+  }
   virtual iMeshWrapper* QueryMesh () { return 0; }
   virtual iLight* QueryLight () { return this; }
   virtual iCamera* QueryCamera () { return 0; }
+  /** @} */
 
   //--------------------- iSelfDestruct implementation -------------------//
 
@@ -616,6 +599,8 @@ public:
 
 };
 
+#include "csutil/win32/msvc_deprecated_warn_on.h"
+
 /**
  * List of lights for a sector. This class implements iLightList.
  */
@@ -624,7 +609,7 @@ class csLightList : public scfImplementation1<csLightList,
 {
 private:
   csRefArrayObject<iLight> list;
-  csHash<iLight*,csStrKey> lights_hash;
+  csHash<iLight*, csString> lights_hash;
 
   class NameChangeListener : public scfImplementation1<NameChangeListener,
   	iObjectNameChangeListener>

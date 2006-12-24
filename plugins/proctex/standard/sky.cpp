@@ -26,6 +26,7 @@
 #include "imap/services.h"
 #include "ivideo/txtmgr.h"
 #include "ivideo/texture.h"
+#include "csutil/scf.h"
 
 #include "prsky.h"
 #include "stdproctex.h"
@@ -37,7 +38,8 @@ SCF_IMPLEMENT_FACTORY(csPtSkySaver)
 
 #define CLASSID_SKYTYPE "crystalspace.texture.type.sky"
 
-csPtSkyType::csPtSkyType (iBase* p) : csBaseProctexType(p)
+csPtSkyType::csPtSkyType (iBase* p) :
+  scfImplementationType(this, p)
 {
 }
 
@@ -50,8 +52,8 @@ csPtr<iTextureFactory> csPtSkyType::NewFactory()
 //---------------------------------------------------------------------------
 // 'Sky' PT factory
 
-csPtSkyFactory::csPtSkyFactory (iTextureType* p, iObjectRegistry* object_reg) : 
-    csBaseTextureFactory (p, object_reg)
+csPtSkyFactory::csPtSkyFactory (iTextureType* p, iObjectRegistry* object_reg) :
+  scfImplementationType(this, p, object_reg)
 {
 }
 
@@ -75,7 +77,8 @@ csPtr<iTextureWrapper> csPtSkyFactory::Generate ()
 //---------------------------------------------------------------------------
 // 'Sky' loader.
 
-csPtSkyLoader::csPtSkyLoader(iBase *p) : csBaseProctexLoader(p)
+csPtSkyLoader::csPtSkyLoader(iBase *p) :
+  scfImplementationType(this, p)
 {
 //  init_token_table (tokens);
 }
@@ -93,7 +96,7 @@ csPtr<iBase> csPtSkyLoader::Parse (iDocumentNode* /*node*/,
   	object_reg, CLASSID_SKYTYPE);
   if (!type) return 0;
   csRef<iSyntaxService> synldr = 
-    CS_QUERY_REGISTRY (object_reg, iSyntaxService);
+    csQueryRegistry<iSyntaxService> (object_reg);
 
   csRef<iTextureFactory> skyFact = type->NewFactory();
 
@@ -101,7 +104,7 @@ csPtr<iBase> csPtSkyLoader::Parse (iDocumentNode* /*node*/,
   if (context)
   {
     ctx = csPtr<iTextureLoaderContext>
-      (SCF_QUERY_INTERFACE (context, iTextureLoaderContext));
+      (scfQueryInterface<iTextureLoaderContext> (context));
 
     if (ctx)
     {
@@ -115,7 +118,7 @@ csPtr<iBase> csPtSkyLoader::Parse (iDocumentNode* /*node*/,
   }
   csRef<iTextureWrapper> tex = skyFact->Generate();
 
-  csRef<iGraphics3D> G3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+  csRef<iGraphics3D> G3D = csQueryRegistry<iGraphics3D> (object_reg);
   if (!G3D) return 0;
   csRef<iTextureManager> tm = G3D->GetTextureManager();
   if (!tm) return 0;
@@ -127,7 +130,8 @@ csPtr<iBase> csPtSkyLoader::Parse (iDocumentNode* /*node*/,
 //---------------------------------------------------------------------------
 // 'Sky' saver.
 
-csPtSkySaver::csPtSkySaver (iBase* p) : csBaseProctexSaver(p)
+csPtSkySaver::csPtSkySaver (iBase* p) :
+  scfImplementationType(this, p)
 {
 }
 

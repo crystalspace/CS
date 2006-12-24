@@ -22,7 +22,7 @@
 #include "csgeom/math.h"
 #include "csgeom/polyclip.h"
 #include "csgeom/sphere.h"
-#include "csgfx/memimage.h"
+#include "csgfx/imagememory.h"
 #include "csqint.h"
 #include "csutil/cfgacc.h"
 #include "csutil/databuf.h"
@@ -90,7 +90,7 @@ void csEngine::Report (const char *description, ...)
   va_list arg;
   va_start (arg, description);
 
-  if (!reporter) reporter = CS_QUERY_REGISTRY (objectRegistry, iReporter);
+  if (!reporter) reporter = csQueryRegistry<iReporter> (objectRegistry);
   
   if (reporter)
   {
@@ -115,7 +115,7 @@ void csEngine::Error (const char *description, ...)
   va_list arg;
   va_start (arg, description);
 
-  if (!reporter) reporter = CS_QUERY_REGISTRY (objectRegistry, iReporter);
+  if (!reporter) reporter = csQueryRegistry<iReporter> (objectRegistry);
 
   if (reporter)
   {
@@ -139,7 +139,7 @@ void csEngine::Warn (const char *description, ...)
   va_list arg;
   va_start (arg, description);
 
-  if (!reporter) reporter = CS_QUERY_REGISTRY (objectRegistry, iReporter);
+  if (!reporter) reporter = csQueryRegistry<iReporter> (objectRegistry);
 
   if (reporter)
   {
@@ -163,7 +163,7 @@ void csEngine::ReportBug (const char *description, ...)
   va_list arg;
   va_start (arg, description);
 
-  if (!reporter) reporter = CS_QUERY_REGISTRY (objectRegistry, iReporter);
+  if (!reporter) reporter = csQueryRegistry<iReporter> (objectRegistry);
 
   if (reporter)
   {
@@ -244,6 +244,9 @@ iCameraPosition *csCameraPositionList::FindByName (
 }
 
 //---------------------------------------------------------------------------
+
+#include "csutil/win32/msvc_deprecated_warn_off.h"
+
 csCollectionList::csCollectionList ()
   : scfImplementationType (this)
 {
@@ -302,6 +305,8 @@ iCollection *csCollectionList::FindByName (
 {
   return collections.FindByName (Name);
 }
+
+#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 //---------------------------------------------------------------------------
 
@@ -529,26 +534,23 @@ csEngine::csEngine (iBase *iParent) :
   clearZBuf (false), defaultClearZBuf (false), 
   clearScreen (false),  defaultClearScreen (false), 
   defaultMaxLightmapWidth (256), defaultMaxLightmapHeight (256),
-  currentRenderContext (0)
+  currentRenderContext (0), weakEventHandler(0)
 {
   DG_TYPE (this, "csEngine");
-
-  scfiEventHandler = new eiEventHandler (this);
 
   ClearRenderPriorities ();
 }
 
 csEngine::~csEngine ()
 {
-  if (scfiEventHandler)
+  if (weakEventHandler != 0)
   {
-    csRef<iEventQueue> q (CS_QUERY_REGISTRY (objectRegistry, iEventQueue));
+    csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (objectRegistry));
     if (q != 0)
-      q->RemoveListener (scfiEventHandler);
-    scfiEventHandler->DecRef ();
+      CS::RemoveWeakListener (q, weakEventHandler);
   }
 
-  DeleteAll ();
+  DeleteAllForce ();
 
   renderPriorities.DeleteAll ();
 
@@ -562,10 +564,10 @@ bool csEngine::Initialize (iObjectRegistry *objectRegistry)
 {
   csEngine::objectRegistry = objectRegistry;
 
-  virtualClock = CS_QUERY_REGISTRY (objectRegistry, iVirtualClock);
+  virtualClock = csQueryRegistry<iVirtualClock> (objectRegistry);
   if (!virtualClock) return false;
 
-  G3D = CS_QUERY_REGISTRY (objectRegistry, iGraphics3D);
+  G3D = csQueryRegistry<iGraphics3D> (objectRegistry);
   if (!G3D)
   {
     // If there is no G3D then we still allow initialization of the
@@ -575,19 +577,19 @@ bool csEngine::Initialize (iObjectRegistry *objectRegistry)
   }
 
   csRef<iVerbosityManager> verbosemgr (
-    CS_QUERY_REGISTRY (objectRegistry, iVerbosityManager));
+    csQueryRegistry<iVerbosityManager> (objectRegistry));
   if (verbosemgr) 
     doVerbose = verbosemgr->Enabled ("engine");
   if (doVerbose)
   {
-    bugplug = CS_QUERY_REGISTRY (objectRegistry, iBugPlug);
+    bugplug = csQueryRegistry<iBugPlug> (objectRegistry);
   }
   else
   {
     bugplug = 0;
   }
 
-  VFS = CS_QUERY_REGISTRY (objectRegistry, iVFS);
+  VFS = csQueryRegistry<iVFS> (objectRegistry);
   if (!VFS) return false;
 
   if (G3D)
@@ -596,11 +598,11 @@ bool csEngine::Initialize (iObjectRegistry *objectRegistry)
     G2D = 0;
 
   // don't check for failure; the engine can work without the image loader
-  imageLoader = CS_QUERY_REGISTRY (objectRegistry, iImageIO);
+  imageLoader = csQueryRegistry<iImageIO> (objectRegistry);
   if (!imageLoader) Warn ("No image loader. Loading images will fail.");
 
   // reporter is optional.
-  reporter = CS_QUERY_REGISTRY (objectRegistry, iReporter);
+  reporter = csQueryRegistry<iReporter> (objectRegistry);
 
   // Tell event queue that we want to handle broadcast events
   CS_INITIALIZE_SYSTEM_EVENT_SHORTCUTS(objectRegistry);
@@ -610,7 +612,7 @@ bool csEngine::Initialize (iObjectRegistry *objectRegistry)
     CanvasClose = csevCanvasClose (objectRegistry, G2D);
   }
 
-  csRef<iEventQueue> q = CS_QUERY_REGISTRY (objectRegistry, iEventQueue);
+  csRef<iEventQueue> q = csQueryRegistry<iEventQueue> (objectRegistry);
   if (q)
   {
     csEventID events[5] = { SystemOpen, SystemClose,
@@ -620,7 +622,7 @@ bool csEngine::Initialize (iObjectRegistry *objectRegistry)
     // discard canvas events if there is no canvas, by truncating the array
     if (!G2D) events[2] = CS_EVENTLIST_END;
 
-    q->RegisterListener (scfiEventHandler, events);
+    CS::RegisterWeakListener (q, this, events, weakEventHandler);
   }
 
   csConfigAccess cfg (objectRegistry, "/config/engine.cfg");
@@ -643,84 +645,12 @@ bool csEngine::HandleEvent (iEvent &Event)
   {
   if (G3D)
   {
-    globalStringSet = CS_QUERY_REGISTRY_TAG_INTERFACE (
-      objectRegistry, "crystalspace.shared.stringset", iStringSet);
+    globalStringSet = csQueryRegistryTagInterface<iStringSet> (
+      objectRegistry, "crystalspace.shared.stringset");
+
+    id_creation_time = globalStringSet->Request("mesh creation time");
 
     maxAspectRatio = 4096;
-    shaderManager = csQueryRegistryOrLoad<iShaderManager> (objectRegistry,
-    	"crystalspace.graphics3d.shadermanager");
-    if (!shaderManager) return false;
-
-    csRef<iShaderCompiler> shcom (shaderManager->
-      GetCompiler ("XMLShader"));
-
-    if (!shcom.IsValid())
-    {
-      Warn ("'XMLShader' shader compiler not available - "
-	"default shaders are unavailable.");
-    }
-    else
-    {
-      // Load default shaders
-      csRef<iDocumentSystem> docsys (
-	CS_QUERY_REGISTRY(objectRegistry, iDocumentSystem));
-      if (!docsys.IsValid())
-	docsys.AttachNew (new csTinyDocumentSystem ());
-      csRef<iDocument> shaderDoc = docsys->CreateDocument ();
-
-      VFS->PushDir();
-      VFS->ChDir ("/shader/");
-      char const* shaderPath = "std_lighting.xml";
-      csRef<iFile> shaderFile = VFS->Open (shaderPath, VFS_FILE_READ);
-      if (shaderFile.IsValid())
-      {
-	shaderDoc->Parse (shaderFile, true);
-	defaultShader = shcom->CompileShader (shaderDoc->GetRoot ()->
-	  GetNode ("shader"));
-	shaderManager->RegisterShader (defaultShader);
-      }
-      else
-	Warn ("Shader %s not available", shaderPath);
-
-      shaderDoc = docsys->CreateDocument ();
-      shaderPath = "std_lighting_portal.xml";
-      shaderFile = VFS->Open (shaderPath, VFS_FILE_READ);
-      if (shaderFile.IsValid())
-      {
-	shaderDoc->Parse (shaderFile, true);
-	csRef<iShader> portal_shader = shcom->CompileShader (
-	  shaderDoc->GetRoot ()->GetNode ("shader"));
-	shaderManager->RegisterShader (portal_shader);
-      }
-      else
-	Warn ("Shader %s not available", shaderPath);
-      VFS->PopDir();
-    }
-
-    csConfigAccess cfg (objectRegistry, "/config/engine.cfg");
-    // Now, try to load the user-specified default render loop.
-    const char* configLoop = cfg->GetStr ("Engine.RenderLoop.Default", 0);
-    if (!override_renderloop.IsEmpty ())
-    {
-      defaultRenderLoop = renderLoopManager->Load (override_renderloop);
-      if (!defaultRenderLoop)
-	return false;
-    }
-    else if (!configLoop)
-    {
-      defaultRenderLoop = CreateDefaultRenderLoop ();
-    }
-    else
-    {
-      defaultRenderLoop = renderLoopManager->Load (configLoop);
-      if (!defaultRenderLoop)
-	return false;
-    }
-
-    // Register it.
-    renderLoopManager->Register (CS_DEFAULT_RENDERLOOP_NAME, 
-      defaultRenderLoop);
-
     frameWidth = G3D->GetWidth ();
     frameHeight = G3D->GetHeight ();
   }
@@ -777,7 +707,7 @@ iMeshObjectType* csEngine::GetThingType ()
   return (iMeshObjectType*)thingMeshType;
 }
 
-void csEngine::DeleteAll ()
+void csEngine::DeleteAllForce ()
 {
   // First notify all sector removal callbacks.
   int i;
@@ -787,6 +717,8 @@ void csEngine::DeleteAll ()
   nextframePending = 0;
   halos.DeleteAll ();
   collections.RemoveAll ();
+  wantToDieSet.Empty ();
+  RemoveDelayedRemoves (false);
 
   GetMeshes ()->RemoveAll ();
   meshFactories.RemoveAll ();
@@ -800,10 +732,16 @@ void csEngine::DeleteAll ()
   delete sharedVariables;
   sharedVariables = new csSharedVariableList();
 
+  if (shaderManager)
+  {
+    shaderManager->UnregisterShaderVariableAcessors ();
+    shaderManager->UnregisterShaders ();
+  }
+
   if (thingMeshType != 0)
   {
     csRef<iThingEnvironment> te (
-  	SCF_QUERY_INTERFACE (thingMeshType, iThingEnvironment));
+  	scfQueryInterface<iThingEnvironment> (thingMeshType));
     CS_ASSERT (((iThingEnvironment*)te) != 0);
     te->Clear ();
   }
@@ -818,6 +756,83 @@ void csEngine::DeleteAll ()
 
   // remove objects
   QueryObject ()->ObjRemoveAll ();
+}
+
+void csEngine::DeleteAll ()
+{
+  DeleteAllForce ();
+
+  // Initialize some of the standard shaders again.
+  if (G3D)
+  {
+    csConfigAccess cfg (objectRegistry, "/config/engine.cfg");
+    shaderManager = csQueryRegistryOrLoad<iShaderManager> (objectRegistry,
+    	"crystalspace.graphics3d.shadermanager");
+    if (!shaderManager)
+    {
+      Warn ("Shader manager is missing!");
+      return;
+    }
+
+    csRef<iShaderCompiler> shcom (shaderManager->
+      GetCompiler ("XMLShader"));
+
+    if (!shcom.IsValid())
+    {
+      Warn ("'XMLShader' shader compiler not available - "
+	"default shaders are unavailable.");
+    }
+    else
+    {
+      // Load default shaders
+      csRef<iDocumentSystem> docsys (
+	csQueryRegistry<iDocumentSystem> (objectRegistry));
+      if (!docsys.IsValid())
+	docsys.AttachNew (new csTinyDocumentSystem ());
+
+      const char* shaderPath;
+      shaderPath = cfg->GetStr ("Engine.Shader.Default", 
+        "/shader/std_lighting.xml");
+      defaultShader = LoadShader (docsys, shcom, shaderPath);
+      if (!defaultShader.IsValid())
+	Warn ("Shader %s not available", shaderPath);
+
+      shaderPath = cfg->GetStr ("Engine.Shader.Portal", 
+        "/shader/std_lighting_portal.xml");
+      csRef<iShader> portal_shader = LoadShader (docsys, shcom, shaderPath);
+      if (!portal_shader.IsValid())
+	Warn ("Shader %s not available", shaderPath);
+    }
+
+    // Now, try to load the user-specified default render loop.
+    const char* configLoop = cfg->GetStr ("Engine.RenderLoop.Default", 0);
+    if (!override_renderloop.IsEmpty ())
+    {
+      defaultRenderLoop = renderLoopManager->Load (override_renderloop);
+      if (!defaultRenderLoop)
+      {
+	Warn ("Default renderloop couldn't be created!");
+	return;
+      }
+    }
+    else if (!configLoop)
+    {
+      defaultRenderLoop = CreateDefaultRenderLoop ();
+    }
+    else
+    {
+      defaultRenderLoop = renderLoopManager->Load (configLoop);
+      if (!defaultRenderLoop)
+      {
+	Warn ("Default renderloop couldn't be created!");
+	return;
+      }
+    }
+
+    // Register it.
+    renderLoopManager->Register (CS_DEFAULT_RENDERLOOP_NAME, 
+      defaultRenderLoop);
+  }
 }
 
 iObject *csEngine::QueryObject ()
@@ -926,9 +941,8 @@ void csEngine::ResetWorldSpecificSettings()
 {
   SetClearZBuf (defaultClearZBuf);
   SetClearScreen (defaultClearScreen);
-  csRef<iThingEnvironment> te (SCF_QUERY_INTERFACE (
-          GetThingType (),
-          iThingEnvironment));
+  csRef<iThingEnvironment> te (scfQueryInterface<iThingEnvironment> (
+          GetThingType ()));
   te->SetLightmapCellSize (16);
   SetMaxLightmapSize (defaultMaxLightmapWidth, defaultMaxLightmapHeight);
   SetAmbientLight (csColor (
@@ -1034,7 +1048,6 @@ void csEngine::ForceRelight (iLight* light, iRegion* region)
 
 void csEngine::RemoveLight (iLight* light)
 {
-
   int sn;
   int num_meshes = meshes.GetCount ();
 
@@ -1045,7 +1058,8 @@ void csEngine::RemoveLight (iLight* light)
     if (linfo)
       linfo->LightDisconnect (light);
   }
-  light->GetSector ()->GetLights ()->Remove (light);
+  if (light->GetSector ())
+    light->GetSector ()->GetLights ()->Remove (light);
 }
 
 void csEngine::SetVFSCacheManager (const char* vfspath)
@@ -1090,12 +1104,12 @@ void csEngine::AddMeshAndChildren (iMeshWrapper* mesh)
 {
   meshes.Add (mesh);
   // @@@ Consider no longer putting child meshes on main engine list???
-  const csRefArray<iSceneNode>& children = mesh->QuerySceneNode ()
-  	->GetChildren ();
+  const csRef<iSceneNodeArray> children = mesh->QuerySceneNode ()
+    ->GetChildrenArray ();
   size_t i;
-  for (i = 0 ; i < children.Length () ; i++)
+  for (i = 0 ; i < children->GetSize() ; i++)
   {
-    iMeshWrapper* mesh = children[i]->QueryMesh ();
+    iMeshWrapper* mesh = children->Get (i)->QueryMesh ();
     if (mesh)
       AddMeshAndChildren (mesh);
   }
@@ -1201,14 +1215,17 @@ void csEngine::ShineLights (iRegion *region, iProgressMeter *meter)
     {
       cm->CacheData (data.GetData(), data.Length(), "lm_precalc_info", 0, (uint32)~0);
     }
-    if (do_relight)
+    if (doVerbose)
     {
-      Report ("Lightmaps are not up to date (%s).", reason);
-    }
-    else
-    {
-      Warn ("Lightmaps are not up to date (%s).", reason);
-      Warn ("Use -relight cmd option to calc lighting.");
+      if (do_relight)
+      {
+        Report ("Lightmaps are not up to date (%s).", reason);
+      }
+      else
+      {
+        Warn ("Lightmaps are not up to date (%s).", reason);
+        Warn ("Use -relight cmd option to calc lighting.");
+      }
     }
     lightmapCacheMode &= ~CS_ENGINE_CACHE_READ;
   }
@@ -1284,7 +1301,7 @@ void csEngine::ShineLights (iRegion *region, iProgressMeter *meter)
   }
   if (failed > 0)
   {
-    Warn ("Couldn't load cached lighting for %zu object(s):",
+    Warn ("Couldn't load cached lighting for %zu object(s). Use -relight to calculate lighting:",
 	  failed);
     size_t i;
     for (i = 0 ; i < failed_meshes.Length () ; i++)
@@ -1293,7 +1310,6 @@ void csEngine::ShineLights (iRegion *region, iProgressMeter *meter)
     }
     if (failed_meshes.Length () < failed)
       Warn ("    ...");
-    Warn ("Use -relight cmd option to refresh lighting.");
   }
 
   csTicks start, stop;
@@ -1386,11 +1402,12 @@ void csEngine::PrecacheMesh (iMeshWrapper* s, iRenderView* rview)
   if (s->GetMeshObject ())
     s->GetMeshObject ()->GetRenderMeshes (num, rview,
       s->GetMovable (), 0xf);
-  const csRefArray<iSceneNode>& children = s->QuerySceneNode ()->GetChildren ();
+  const csRef<iSceneNodeArray> children = s->QuerySceneNode ()
+    ->GetChildrenArray ();
   size_t i;
-  for (i = 0 ; i < children.Length () ; i++)
+  for (i = 0 ; i < children->GetSize () ; i++)
   {
-    iMeshWrapper* mesh = children[i]->QueryMesh ();
+    iMeshWrapper* mesh = children->Get (i)->QueryMesh ();
     if (mesh)
       PrecacheMesh (mesh, rview);
   }
@@ -1420,7 +1437,7 @@ void csEngine::PrecacheDraw (iRegion* region)
   {
     iSector* s = sectors.Get (sn);
     if (!region || region->IsInRegion (s->QueryObject ()))
-      s->GetVisibilityCuller ()->PrecacheCulling ();
+      s->PrecacheDraw ();
   }
 
   size_t i;
@@ -1501,7 +1518,7 @@ csPtr<iRenderLoop> csEngine::CreateDefaultRenderLoop ()
   csRef<iRenderLoop> loop = renderLoopManager->Create ();
 
   csRef<iPluginManager> plugin_mgr (
-  	CS_QUERY_REGISTRY (objectRegistry, iPluginManager));
+  	csQueryRegistry<iPluginManager> (objectRegistry));
 
   char const* const stdstep = "crystalspace.renderloop.step.generic.type";
   csRef<iRenderStepType> genType =
@@ -1516,7 +1533,7 @@ csPtr<iRenderLoop> csEngine::CreateDefaultRenderLoop ()
 
     step = genFact->Create ();
     loop->AddStep (step);
-    genStep = SCF_QUERY_INTERFACE (step, iGenericRenderStep);
+    genStep = scfQueryInterface<iGenericRenderStep> (step);
   
     genStep->SetShaderType ("standard");
     genStep->SetDefaultShader (defaultShader);
@@ -1536,6 +1553,39 @@ void csEngine::LoadDefaultRenderLoop (const char* fileName)
   csRef<iRenderLoop> newDefault = renderLoopManager->Load (fileName);
   if (newDefault != 0)
     defaultRenderLoop = newDefault;
+}
+
+csRef<iShader> csEngine::LoadShader (iDocumentSystem* docsys,
+                                     iShaderCompiler* shcom,
+                                     const char* filename)
+{
+  csRef<iDocument> shaderDoc = docsys->CreateDocument ();
+  csRef<iShader> shader;
+  csString shaderFn (filename);
+  csString shaderDir;
+
+  size_t slash = shaderFn.FindLast ('/');
+  if (slash == (size_t)-1)
+    shaderDir = "/shader/";
+  else
+  {
+    shaderDir = shaderFn.Slice (0, slash + 1);
+    shaderFn.DeleteAt (0, slash + 1);
+  }
+
+  VFS->PushDir();
+  VFS->ChDir (shaderDir);
+  csRef<iFile> shaderFile = VFS->Open (shaderFn, VFS_FILE_READ);
+  if (shaderFile.IsValid())
+  {
+    shaderDoc->Parse (shaderFile, false);
+    csRef<iLoaderContext> elctxt (CreateLoaderContext (0, true));
+    shader = shcom->CompileShader (elctxt, shaderDoc->GetRoot ()->
+      GetNode ("shader"));
+    if (shader.IsValid()) shaderManager->RegisterShader (shader);
+  }
+  VFS->PopDir();
+  return shader;
 }
 
 void csEngine::AddHalo (iCamera* camera, csLight *Light)
@@ -1560,12 +1610,10 @@ void csEngine::AddHalo (iCamera* camera, csLight *Light)
   if (!topLevelClipper->GetClipper ()->IsInside (csVector2 (v.x, v.y))) return ;
 
   // Check if light is not obscured by anything
-  csVector3 isect;
-  int polyidx = 0;
-  if(camera->GetSector ()->HitBeamPortals (camera->GetTransform().GetOrigin(), 
-      light_pos, isect, &polyidx))
+  csSectorHitBeamResult hbresult = camera->GetSector ()->HitBeamPortals (camera->GetTransform().GetOrigin(), light_pos );
+  if(hbresult.mesh)
     return; // hit a mesh
-  if(polyidx != -1) // double check on the above.
+  if(hbresult.polygon_idx != -1) // double check on the above.
     return; // hit a polygon
 
   // Halo size is 1/4 of the screen height; also we make sure its odd
@@ -1652,6 +1700,16 @@ void csEngine::ControlMeshes ()
     GetMeshes ()->Remove (mesh);
   }
   wantToDieSet.Empty ();
+
+  // Delete all objects that should be removed given the current
+  // time.
+  csTicks current = virtualClock->GetCurrentTicks ();
+  while (delayedRemoves.Length () > 0
+      && delayedRemoves.Top ().time_to_delete <= current)
+  {
+    csDelayedRemoveObject ro = delayedRemoves.Pop ();
+    RemoveObject (ro.object);
+  }
 }
 
 char* csEngine::SplitRegionName (const char* name, iRegion*& region,
@@ -1783,6 +1841,8 @@ iCameraPosition* csEngine::FindCameraPosition (const char* name,
   return campos;
 }
 
+#include "csutil/win32/msvc_deprecated_warn_off.h"
+
 iCollection* csEngine::FindCollection (const char* name,
 	iRegion* reg)
 {
@@ -1800,6 +1860,8 @@ iCollection* csEngine::FindCollection (const char* name,
     col = GetCollections ()->FindByName (n);
   return col;
 }
+
+#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 void csEngine::ReadConfig (iConfigFile *Config)
 {
@@ -2641,6 +2703,9 @@ iTextureWrapper *csEngine::CreateBlackTexture (
   csColor *iTransp,
   int iFlags)
 {
+  if (!name)
+    return 0;
+
   csRef<iImage> ifile = csPtr<iImage>(new csImageMemory (w, h));
   ifile->SetName (name);
 
@@ -2764,7 +2829,7 @@ csPtr<iMaterial> csEngine::CreateBaseMaterial (iTextureWrapper *txt)
   mat.AttachNew (new csMaterial (this));
   if (txt) mat->SetTextureWrapper (txt);
 
-  csRef<iMaterial> imat (SCF_QUERY_INTERFACE (mat, iMaterial));
+  csRef<iMaterial> imat (scfQueryInterface<iMaterial> (mat));
   return csPtr<iMaterial> (imat);
 }
 
@@ -2997,7 +3062,7 @@ csPtr<iMeshFactoryWrapper> csEngine::LoadMeshFactory (
   iDataBuffer *input)
 {
   csRef<iDocumentSystem> xml (
-    	CS_QUERY_REGISTRY (objectRegistry, iDocumentSystem));
+    	csQueryRegistry<iDocumentSystem> (objectRegistry));
   if (!xml) xml = csPtr<iDocumentSystem> (new csTinyDocumentSystem ());
   csRef<iDocument> doc = xml->CreateDocument ();
   const char* error = doc->Parse (input, true);
@@ -3024,7 +3089,7 @@ csPtr<iMeshFactoryWrapper> csEngine::LoadMeshFactory (
   }
 
   csRef<iMeshObjectFactory> mof2 (
-  	SCF_QUERY_INTERFACE (mof, iMeshObjectFactory));
+  	scfQueryInterface<iMeshObjectFactory> (mof));
   if (!mof2)
   {
     // @@@ ERROR?
@@ -3046,7 +3111,7 @@ csPtr<iMeshWrapper> csEngine::LoadMeshWrapper (
   const csVector3 &pos)
 {
   csRef<iDocumentSystem> xml (
-    	CS_QUERY_REGISTRY (objectRegistry, iDocumentSystem));
+    	csQueryRegistry<iDocumentSystem> (objectRegistry));
   if (!xml) xml = csPtr<iDocumentSystem> (new csTinyDocumentSystem ());
   csRef<iDocument> doc = xml->CreateDocument ();
   const char* error = doc->Parse (input, true);
@@ -3107,39 +3172,39 @@ csPtr<iMeshWrapper> csEngine::CreatePortal (
 	csVector3* vertices, int num_vertices,
 	iPortal*& portal)
 {
-  csRef<iMeshWrapper> mesh;
+  csRef<iMeshWrapper> portal_mesh;
   csRef<iPortalContainer> pc;
   if (name)
   {
-    const csRefArray<iSceneNode>& children = parentMesh->QuerySceneNode ()->
-    	GetChildren ();
+    const csRef<iSceneNodeArray> children = parentMesh->QuerySceneNode ()
+      ->GetChildrenArray ();
     size_t i;
-    for (i = 0 ; i < children.Length () ; i++)
+    for (i = 0 ; i < children->GetSize(); i++)
     {
       // @@@ Not efficient.
-      iMeshWrapper* mesh = children[i]->QueryMesh ();
+      iMeshWrapper* mesh = children->Get (i)->QueryMesh ();
       if (mesh)
       {
         if (!strcmp (name, mesh->QueryObject ()->GetName ()))
 	{
-	  pc = SCF_QUERY_INTERFACE (mesh->GetMeshObject (),
-  	    iPortalContainer);
-          if (!pc) mesh = 0;
+	  pc = 
+  	    scfQueryInterface<iPortalContainer> (mesh->GetMeshObject ());
+          if (pc) portal_mesh = mesh;
 	  break;
 	}
       }
     }
   }
-  if (!mesh)
+  if (!portal_mesh)
   {
-    mesh = CreatePortalContainer (name);
-    mesh->QuerySceneNode ()->SetParent (parentMesh->QuerySceneNode ());
-    pc = SCF_QUERY_INTERFACE (mesh->GetMeshObject (),
-  	iPortalContainer);
+    portal_mesh = CreatePortalContainer (name);
+    portal_mesh->QuerySceneNode ()->SetParent (parentMesh->QuerySceneNode ());
+    pc = 
+  	scfQueryInterface<iPortalContainer> (portal_mesh->GetMeshObject ());
   }
   portal = pc->CreatePortal (vertices, num_vertices);
   portal->SetSector (destSector);
-  return csPtr<iMeshWrapper> (mesh);
+  return csPtr<iMeshWrapper> (portal_mesh);
 }
 
 csPtr<iMeshWrapper> csEngine::CreatePortal (
@@ -3156,16 +3221,16 @@ csPtr<iMeshWrapper> csEngine::CreatePortal (
     mesh = sourceSector->GetMeshes ()->FindByName (name);
     if (mesh)
     {
-      pc = SCF_QUERY_INTERFACE (mesh->GetMeshObject (),
-  	iPortalContainer);
+      pc = 
+  	scfQueryInterface<iPortalContainer> (mesh->GetMeshObject ());
       if (!pc) mesh = 0;
     }
   }
   if (!mesh)
   {
     mesh = CreatePortalContainer (name, sourceSector, pos);
-    pc = SCF_QUERY_INTERFACE (mesh->GetMeshObject (),
-  	iPortalContainer);
+    pc = 
+  	scfQueryInterface<iPortalContainer> (mesh->GetMeshObject ());
   }
   portal = pc->CreatePortal (vertices, num_vertices);
   portal->SetSector (destSector);
@@ -3233,7 +3298,7 @@ csPtr<iMeshWrapper> csEngine::CreateMeshWrapper (
   csRef<iMeshObjectFactory> fact (type->NewFactory ());
   if (!fact) return 0;
 
-  csRef<iMeshObject> mo (SCF_QUERY_INTERFACE (fact, iMeshObject));
+  csRef<iMeshObject> mo (scfQueryInterface<iMeshObject> (fact));
   if (!mo)
   {
     // The factory is not itself a mesh object. Let's see if the
@@ -3245,6 +3310,39 @@ csPtr<iMeshWrapper> csEngine::CreateMeshWrapper (
   }
 
   return CreateMeshWrapper (mo, name, sector, pos);
+}
+
+static int CompareDelayedRemoveObject (csDelayedRemoveObject const& r1,
+	csDelayedRemoveObject const& r2)
+{
+  // Reverse sort!
+  if (r1.time_to_delete < r2.time_to_delete) return 1;
+  else if (r2.time_to_delete < r1.time_to_delete) return -1;
+  else return 0;
+}
+
+void csEngine::DelayedRemoveObject (csTicks delay, iBase *object)
+{
+  csDelayedRemoveObject ro;
+  ro.object = object;
+  ro.time_to_delete = virtualClock->GetCurrentTicks () + delay;
+  delayedRemoves.InsertSorted (ro, CompareDelayedRemoveObject);
+}
+
+void csEngine::RemoveDelayedRemoves (bool remove)
+{
+  if (remove)
+  {
+    while (delayedRemoves.Length () > 0)
+    {
+      csDelayedRemoveObject ro = delayedRemoves.Pop ();
+      RemoveObject (ro.object);
+    }
+  }
+  else
+  {
+    delayedRemoves.DeleteAll ();
+  }
 }
 
 bool csEngine::RemoveObject (iBase *object)

@@ -25,7 +25,7 @@
  */
 /**\addtogroup loadsave
  * @{ */
-#include "csutil/scf.h"
+#include "csutil/scf_interface.h"
 
 #include "igraphic/image.h"
 #include "ivideo/txtmgr.h"
@@ -47,13 +47,13 @@ struct iSndSysData;
 struct iSndSysWrapper;
 struct iSndSysStream;
 
-SCF_VERSION (iLoaderStatus, 0, 1, 0);
-
 /**
  * An object to query about the status of the threaded loader.
  */
-struct iLoaderStatus : public iBase
+struct iLoaderStatus : public virtual iBase
 {
+  SCF_INTERFACE (iLoaderStatus, 1, 0, 0);
+
   /// Check if the loader is ready.
   virtual bool IsReady () = 0;
   /// Check if there was an error during loading.
@@ -133,7 +133,7 @@ struct iMissingLoaderData : public virtual iBase
  */
 struct iLoader : public virtual iBase
 {
-  SCF_INTERFACE (iLoader, 1, 0, 0);
+  SCF_INTERFACE (iLoader, 2, 0, 0);
 
   /**
    * Load an image file. The image will be loaded in the format requested by
@@ -256,13 +256,25 @@ struct iLoader : public virtual iBase
   /**
    * New Sound System: Load a sound file, create a stream and create a
    * wrapper object for it.
+   * \deprecated Use LoadSoundStream() without mode3d parameter. The mode
+   * should be given at the time the stream is created later.
    * \param name of the sound.
    * \param fname is the VFS filename.
    * \param mode3d is one of CS_SND3D_DISABLE, CS_SND3D_RELATIVE, or
    * CS_SND3D_ABSOLUTE.
    */
+  CS_DEPRECATED_METHOD_MSG("Use LoadSoundStream() without mode3d parameter instead.")
   virtual iSndSysWrapper* LoadSoundWrapper (const char *name,
   	const char *fname, int mode3d) = 0;
+
+  /**
+   * New Sound System: Load a sound file, create sound data and create a
+   * wrapper object for it.
+   * \param name of the sound.
+   * \param fname is the VFS filename.
+   */
+  virtual iSndSysWrapper* LoadSoundWrapper (const char *name,
+  	const char *fname) = 0;
 
   /**
    * Load a map file in a thread.

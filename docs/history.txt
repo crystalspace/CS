@@ -1,11 +1,2021 @@
 Crystal Space detailed change log.
-http://www.crystalspace3d.org/ 
+http://www.crystalspace3d.org/
 
 The overall history is in reverse (descending) chronological order, so that
 each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+23-Dec-2006
+  - Andrew Dai made the constant used in testing for leg collisions with
+    the actor larger to prevent infinite loops from math inaccuracies
+    when testing against artifact triangles in the world.
+21-Dec-2006
+	- Genjix made a common plugin name for both implementations of joystick
+	  driver. Old method of loading them should slowly be deprecated.
+19-Dec-2006
+	- Genjix added fix to iEngine::CreateBlackTexture where it will return 0
+	  when a null pointer is passed for its name parameter.
+14-Dec-2006
+	- Jorrit fixed the xmlshader compiler and genmesh plugins so that
+	  they compile again if extensive memory debugging is enabled.
+	- Jorrit fixed a problem in VFS where it would sometimes do an
+	  allocation of 0 bytes.
+	- Marten fixed a nasty bug in lighter2 where the ray tracer would
+	  miss hits on 0 width kd-nodes.
+	- Marten rewrote how lighter2 avoids element self-shadowing.
+	- res removed the CS_FORMATTER_TYPENAME_QUALIFIER hack from
+	  formatter.h. Instead, 'typename' is used everywhere. Together with
+	  a missing 'template', this works on VC 7.0, VC 8.0, gcc 3.4 and
+	  gcc 4.1; hence very likely on all compilers we support. Addresses
+	  trac #197.
+13-Dec-2006
+	- res fixed the gl3d texture manager to upload Blit()ted data with the
+	  right target format.
+	- res fixed lighter2 to also perform the "genmesh submesh material
+	  fixup" for vertex-lit meshes.
+	- Jorrit fixed a bug in the engine which only surfaced after
+	  shader cleanup was added to iEngine->DeleteAll() recently. The
+	  engine would first load the standard shaders but then it would
+	  call DeleteAll() which would unload them again. Now the loading
+	  of the standard shaders is added to iEngine->DeleteAll() at the
+	  end so that after DeleteAll() we are always in a consistent
+	  state. This bug would cause (among other things) the foliage
+	  in terrainf to disappear.
+	- Marten blindly updated the linux and osx sound drivers to use new
+	  threading infrastructure.
+	- Marten fixed trac #218, ambiguous datatypes in lighter2.
+12-Dec-2006
+	- Jorrit did further texture manager improvements:
+	    - Made it possible to instantiate instances of
+	      csGLBasicTextureHandle by adding implementations of
+	      GetOriginalDimensions() and GetImageName() (needed
+	      to implement iTextureHandle).
+	    - Moved some code based on image type from
+	      csGLTextureHandle to csGLBasicTextureHandle.
+	    - Modified the various image loaders to also return "b8g8r8a8"
+	      in case of 32-bit rgba format for GetRawFormat().
+	- res fixed lighter2 to properly handle libraries.
+	- res changed lighter2 to also apply the exposure function to when
+	  doing per-vertex lighting.
+	- Marten added per-factory lightmap density setting to lighter2.
+	- Marten added support for <noshadow/> and <nolighting/> flags
+	  to lighter2.
+	- Marten rewrote all code in CS to use new threading subsystem.
+	- Marten deprecated csThread, csCondition and csMutex. Use the
+	  new threading subsystem in CS::Threading instead, the old ones
+	  will be deleted on later version.
+	- res fixed a bug in csPoly3D::SplitWithPlane(): when an empty poly 
+	  was split, the result polies stayed unchanged. So when a non-empty
+	  polygon was used to receive a result of an empty polygon splitting,
+	  it retained it's old vertices. The proper result values when 
+	  splitting an empty polygon are empty polygons.
+11-Dec-2006
+	- Jorrit added a new csImageType parameter to the currently
+	  unused and unimplemented iTextureManager->CreateTexture()
+	  function.
+        - Piotr fixed ref bug in odedynam.
+9-Dec-2006
+	- Marten removed the random sub-lumel sampling in the lighter2.
+	  It introduced more artifacts than it solved.
+	- Marten rewrote csNormalCalculator::CalculateNormals so that
+	  it is tessellation independent. Should fix some bugs where
+	  normals are wrong due to the way vertices are shared between
+	  triangles.
+	- Jorrit did further texture manager improvements:
+	    - Fixed DetermineTargetFormat() in gl texture manager so
+	      it understands the new *dxt1a format as well.
+	    - Split csGLTextureHandle into csGLTextureHandle and
+	      csGLBasicTextureHandle. csGLBasicTextureHandle is the
+	      version that doesn't know about textures. This is only
+	      an initial split. More work has to be done so that
+	      csGLBasicTextureHandle is actually useful for textures
+	      that have no image associated with them.
+8-Dec-2006
+        - Erroroman made an optimization in vproc skinning by defining
+          bones and indices buffer walkters globaly in the skin function.
+        - Erroroman precomputed bones position and matrices instead of
+          retrieving their values per vertex skin operation.
+	- Marten added a csShaderVariable::GetValue/SetValue pair that 
+	  takes csQuaternion. Avoids one extra copy when storing 
+	  quaternions.
+	- Jorrit did further texture manager improvements:
+	    - Cleaned up the code to transform a texture to GL format
+	      and used the new ConvertFormat2GL() function there.
+	- Jorrit did another small optimization to vproc_std by using
+	  the new GetValue() that accepts a csQuaternion.
+	- Jorrit fixed vproc_std so it compiles on VC. It is illegal
+	  to allocate dynamic sized arrays in C++. This is a gcc
+	  extension. Use CS_ALLOC_STACK_ARRAY instead.
+	- Jorrit did another small optimization to vproc_std.
+	- res refactored the DXT decoder in the DDS loader a bit.
+	- res updated used texture format specifier to match up with the 
+	  sanitized spec.
+	- res "split up" the *dxt1 texture format in *dxt1 (no alpha) and
+	  *dxt1a (with alpha).
+	- res fixed the "old texture cleaning" to also properly clean out
+	  PD light maps.
+7-Dec-2006
+	- Jorrit did further texture manager improvements:
+	    - Renamed 'starred' to 'special' in TextureFormatStrings.
+	    - TextureFormatStrings::ConvertCanonical() will now return
+	      an null string instead of "-" in case of error.
+	    - Made a first version of a function to convert a texture
+	      format into an OpenGL source format.
+	- Jorrit added a new 'loadmap' console command to walktest. This
+	  will clear out the engine and then load the new map. This command
+	  was added to expose several bugs related to completely cleaning
+	  the engine and then loading new maps again.
+	- Jorrit fixed a camera handling bug in the new 'loadmap' console
+	  command.
+	- Jorrit fixed the 'loadmap' command so that it also cleans the
+	  engine sequence manager. This is not done automatically by cleaning
+	  the engine.
+	- Marten made a few impovements to lighter2:
+	    - Changed lightmap post-processing to only run once on every
+	      lightmap, not once per object, per lightmap.
+	    - Added an disk file backed lightmap cache. Lighter2 will now keep
+	      at most a configurable amount of lightmaps (by default max 
+	      200MB) in memory during processing, spilling them out to z-lib
+	      compressed files on disk on demand.
+	- Marten made some fixes to the tui in lighter2. It now works
+	  sufficiently.
+6-Dec-2006
+	- Jorrit did further texture manager improvements:
+	    - Slightly cleaned up the GL texture manager.
+	    - Renamed TextureFormatStrings::CanonicalTextureFormat() to
+	      ConvertCanonical().
+	    - Added a new TextureFormatStrings::ConvertStructured() which
+	      takes a texture format string and converts it to a structured
+	      format (CS::StructuredTextureFormat class).
+	    - Jorrit changed TextureFormatStrings::CanonicalTextureFormat()
+	      to first convert to structured format and then calculate
+	      canonical from that.
+        - Erroroman fixed copy/paste error in vproc skinning, also optimized 
+          it by removing allocation of transform array for bones per frame.
+        - Erroroman fixed problem in vproc skinning where it could fail if
+          the weight of the first bone is 0 and the others weights are 
+          greater than 0.
+	- Marten commented out some debug-code in genmesh and instmesh.
+	- Marten added some initial configruation handling to lighter2.
+	  It now merges command line options into config manager and then
+	  load settings from config manager which allows for defaults in
+	  config-file and overrides on command line.
+	- Marten added a simpler output mode for lighter2. Activate with
+	  --simpletui command line parameter.
+5-Dec-2006
+	- Jorrit changed 'exprlib' into 'libexpr' for refering to
+	  previously loaded shader expressions.
+	- caedes added embedgl plugin, a 2d canvas for embedding cs on
+	  an existing gl context.
+	- Jorrit started a series of improvements to the texture manager:
+	    - Extended RegisterTexture() with an optional fail_reason
+	      string. That way users of RegisterTexture() can now find
+	      out why the texture didn't register.
+	    - Changed various places in CS to pass along the new fail_reason
+	      parameter and show that reason on the reporter in case of
+	      failure. Didn't change the places that were not already
+	      doing error checking. Probably those have to be checked
+	      in the future as well.
+	    - Added a new iTextureManager->CreateTexture(). This method
+	      will create a texture based on a desired texture format.
+	      At this moment it doesn't do anything yet. Just created
+	      stub implementations in all three renderers (OpenGL, software,
+	      and null renderer).
+	- Jorrit did further texture manager improvements:
+	    - iImage->GetRawFormat() must now return a string that is
+	      compatible with iTextureManager->CreateTexture(). Documented
+	      this and changed the dds image loader to return '*dxt1'
+	      instead of 'dxt1' (and others).
+	    - Also changed the GL renderer to react on '*dxt1' (and others)
+	      instead of 'dxt1'.
+	    - Added a new class CS::TextureFormatStrings and a static
+	      method called CanonicalTextureFormat() which converts a
+	      texture format string to a more canonical format (i.e.
+	      'rgba8' will be converted to 'r8g8b8a8_i').
+4-Dec-2006
+        - Piotr fixed bug in odedynam joints (when ball and amotor 
+          are used).
+	- res added support for gcc's "malloc" attribute.
+	- Jorrit fixed a bug in the engine. iEngine->DeleteAll() would not
+	  remove the shaders. Added iShaderManager->UnregisterShaders()
+	  to unregister all shaders.
+	- Jorrit changed csShaderExpressionAccessor to also implement iObject
+	  and iSelfDestruct.
+	- Jorrit added functions to iShaderManager to add named shader
+	  variable accessors.
+	- Jorrit fixed csEngine::CreatePortal() so that it works as
+	  intended.
+	- Jorrit added support for a <shaderexpressions> block in the world
+	  file. By doing that one can preload shader expressions and then
+	  reuse them easily on other things. At least... one can preload
+	  shader expressions but there is no way yet to use them as
+	  shader variables through xml. That's next commit.
+	- Jorrit added support for specifying a shadervar from an expression
+	  library:
+	  	<shadervar name="..." type="exprlib" exprname="..." />
+	  Added a currently not-doing-anything example to flarge.
+3-Dec-2006
+	- Marten made a few fixes to lighter2:
+	   - Worked around a bug when lightmap uv-layout code created a new
+	     submesh.
+	   - Unified function signatures in directlight.cpp.
+	- res fixed an issue in OpenGL R2T: the canvas clipping rect was only
+	  updated when all coordinates are different in comparison to the rect
+	  needed for the texture, while the rect needs to change when only
+	  one coordinate is different.
+	- Marten properly fixed the bug in lighter2 related to uv-layout code 
+	  creating new submeshes.
+2-Dec-2006
+	- Marten rewrote the direct lighting in lighter2 in a way so that
+	  it works better in combination with possible path tracing and/or
+	  photon mapping.
+	- res fixed a bug in lighter2 where data stored in two arrays could
+	  get out of sync.
+	- res fixed a crash in csEngine::CreatePortal() introduced in r25992.
+	- res fixed the "search existing portal container" logic in 
+	  csEngine::CreatePortal() to actually work. Previously it would 
+	  always create a portal container since the found mesh would be 
+	  stored in the wrong variable.
+	- res changed the names of the lighter2 lightmap layouter classes to 
+	  be less confusing.
+	- res fixed genmesify to handle <library path="..." file="..." />-
+	  style library tags. Fixes trac #201.
+1-Dec-2006
+	- Jorrit fixed a bug in the light code: The LSI system
+	  (LightSectorInfluence) ignored lights that were part of a scene
+	  node hierarchy.
+	- Jorrit extended the iLightManager with a GetRelevantLights() that
+	  works on a sector instead of a mesh.
+	- Jorrit fixed the light iterator step so that it uses the
+	  lightmanager now. That way it also catches lights that are part
+	  of a scene node. This fixes lighting for diffuse and related
+	  renderloops for parented lights.
+29-Nov-2006
+	- caedes made the following changes to swig interface files:
+	    - Added iEngineSequenceManager, iDocumentAttribute, 
+	      iDocumentAttributeIterator, iDocumentNode and 
+	      iDocumentNodeIterator to wrapped interfaces.
+	    - Added an (empty) ITERATOR_FUNTIONS swig macro in cspace.i so
+	      each language can redefine it for implementing language specific
+	      iterator protocol.
+	    - Implemented the ITERATOR_FUNTIONS swig macro for python.
+	    - Added iterator functions for iDocumentAttributeIterator and
+	      iDocumentNodeIterator.
+	    - Added %ignore for CS::TriangleT [] operator so swig doesnt emit
+	      a warning for it.
+	    - Added %extend for csTriangle implementing [] notation in python.
+	    - Added the iterator declaration for some more useful classes:
+	      - iVisibilityObjectIterator, iLightIterator, iSectorIterator,
+	        iMeshWrapperIterator.
+	- Vincent fixed ref-tracker enabled debug build by adding a header.
+	- Vincent added a few missing CS_LEAKGUARD_IMPLEMENT statements.
+28-Nov-2006
+	- Andrew Dai fixed a bug that's been lurking in csColliderActor::Move
+	  from the beginning of time. This occasionally allowed actors to pass
+	  through walls. This should now be impossible no matter what the
+	  framerate is.
+	- Andrew Dai made improvements to the collision response algorithm to
+	  prevent actors occasionally becoming stuck on sharp inclines.
+	- res added a dummy _pycscegui.csplugin so the MSVC generation can
+	  generate a project for _pycscegui.
+	- res replaced some CS_QUERY_REGISTRYs with csQueryRegistry<> and
+	  SCF_QUERY_INTERFACEs with scfQueryInterface<>.
+	- res replaced some CS_QUERY_REGISTRY_TAG_INTERFACEs with 
+	  csQueryRegistryTagInterface<>s.
+	- res replaced CS_QUERY_REGISTRY_TAGs with csQueryRegistryTag.
+	- Jorrit fixed a memory leak with the graveyard plugin leaking.
+	- Jorrit fixed iEngine->RemoveLight() so that it also works
+	  if the light is not yet in a sector.
+	- Jorrit fixed lights so that they work slightly better if they
+	  are parented. Not perfect yet though.
+	- Jorrit changed the license on the castle level in CS from
+	  Creative Commons by-nc to by-sa which is a less restrictive
+	  license and allows commercial usage. This is done with permission
+	  from Anders Wisur.
+	- Jorrit fixed a bug in the glx2d canvas. It used 'putenv' to
+	  change the force_s3tc_enable environment variable. However
+	  'putenv' directly puts the given input string into the environment
+	  (it doesn't make a copy). So when later the glx2d canvas is
+	  unloaded the environment still points to that string (which
+	  is now unloaded and pointing to invalid memory). Replaced the
+	  'putenv' with a 'setenv'. 'setenv' makes an actual copy of the
+	  string so when the glx2d plugin is unloaded the environment
+	  is not corrupted. This fixes a problem in celstart which would
+	  crash after CS is destroyed and created again.
+	- Marten added a method to csColor to check if it is all 0.
+	- Marten made various fixes to lighter2 as well as the beginning
+	  of new code to compute direct lighting (not used yet).
+	- res updated the docs for the new winlibs version.
+	- res fixed a couple of VC deprecation warnings (collection and scene
+	  node array related).
+	- res made the (supposed to be legacy) CS_QUERY_REGISTRY* and 
+	  SCF_QUERY_INTERFACE* macros emit compiler warnings.
+27-Nov-2006
+	- Jorrit reverted a threading change (revision 25929) because
+	  it caused programs to hang on mingw and crash on linux.
+	- Jorrit fixed a bug in the terrain engine. It would incorrectly
+	  try to get the size from the alphamaps by using 'alphamap '
+	  as string ID instead of 'alphamap 0'.
+	- Marten reapplied threading bugfixes and changes to 
+	  ThreadedJobQueue (r25929). Correct bugfix is to fix the bug, not
+	  remove bugfixes in the threading and code changes in job queue.
+	- Marten fixed a bug in AtomicOperations::Increment on x86+gcc.
+	  The xadd instruction returns the value prior to increment, not 
+	  after. This fixes the problems with ThreadedJobQueue on mingw and
+	  probably linux.
+	- caedes removed the pycegui configure test and added a runtime test
+	  in pycscegui instead, this makes it possible to build the module 
+	  with no knowledge about pycegui.
+	- caedes changed the pycscegui jamfile so only the build target
+	  depends on cegui now, instead of the generation and freeze
+	  targets also depending on it.
+	- caedes added initial version of the frozen swig generated files
+	  for pycscegui.
+	- Marten fixed a build error in lighter2 on gcc.
+	- Marten made one more fix to the threading, removing a very apparent
+	  race condition.
+26-Nov-2006
+	- res added a Jam rule to generate icon .pngs from an SVG file. The
+	  generation can be invoked with "jam generateicons". Added a test icon
+	  for startme from Dentoid.
+25-Nov-2006
+	- res disabled RECT textures for NVIDIA cards completely since they
+	  seem to cause a lot of crashes.
+	- res updated the dejavu fonts to version 2.12.
+24-Nov-2006
+	- Jorrit fixed some compile errors caused by yesterday's
+	  commit.
+	- res added tweaks to the GL driver database to disable texture
+	  compression and AFP for the Intel DRI driver, since both are broken
+	  there.
+	- Marten updated the documentation for the new threading to actually
+	  say anything useful.
+	- caedes modified the pycscegui swig interface file so it doesnt
+	  import cegui interface files any more as it was not really needed.
+	- caedes simplified the configure test for pycscegui a bit as it 
+	  doesnt need to test for cegui.i file any more, also now 
+	  only cegui.py file path must be passed to --with-pycegui, instead of
+	  having to point to the whole pycegui sources.
+	- caedes fixed ice.looknfeel for cegui 0.5 since it was broken from
+	  last update (at least on linux), due to not updated Falagard.xsd and
+	  some incorrect elements on xml. All apps using this looknfeel would 
+	  crash.
+23-Nov-2006
+	- Jorrit added iLoaderContext parameter to shader and shader
+	  variable loading functions. That way shader variables will
+	  correctly find textures using the loader context.
+        - Piotr fixed track Ticket #193 (terrain collision problem)
+	- Marten rewrote the ThreadedJobQueue to not have any internal
+	  deadlocks and in the process rewrote it to use the new threading
+	  subsystem.
+	- Marten fixed a few bugs in lighter2 (it now works again) as well
+	  as some more preparation for new ligth computation algorithm.
+22-Nov-2006
+	- Jorrit marked collections as deprecated and obsolete. They are
+	  never used and are also not useful.
+	- Jorrit made the warnings when lightmaps are not up-to-date a
+	  little bit less verbose.
+	- res made the csDog SCF example code in the manual a bit nicer.
+	- res changed the Win32 window proc to set the requested mouse cursor 
+	  upon the WM_SETCURSOR message and not WM_MOUSEMOVE.
+	- res fixed a deprecation warning in sndmanager.
+	- res fixed a cut'n'paste error in xmlshader, likely causing memory
+	  corruption. Reportedly fixes trac #194.
+	- caedes fixed csVFS::LoadMountsFromFile so it allows variable
+	  assignments in the loaded file to function correctly (rather than
+	  being ignored).
+	- res fixed a deprecation warning in 
+	  csColliderHelper::InitializeCollisionWrapper().
+21-Nov-2006
+	- Jorrit fixed a bug in csSector::PrecacheDraw(). It forgot to
+	  do BeginDraw() with the result that some essential variables were
+	  not initialized.
+20-Nov-2006
+        - Piotr made the amotors start working on wiser conditions.
+	- Jorrit changed the mingw building doc to use 'jam' by default
+	  instead of 'make'.
+	- res augmented key/value pairs for a "editoronly" flag. If this flag
+	  is set, the key/value pairs aren't stored in memory unless the 
+	  engine's "saveable" flag is set.
+	- res sanitized key/value parsing in the syntax services.
+	- res changed the loader to use iSceneNodeArray.
+	- res added some initial support for per-vertex lighting to lighter2.
+	- Marten made first step of a refactor of lighter2 by:
+	    - Removing the Rad prefix on objects and primitives.
+	    - Removing "patches" as they are radiosity specific.
+	    - Changed Primitive to use a triangle instead of a size_t[3]
+	      array for indices.
+	    - Removed some dead code.
+19-Nov-2006
+	- Marten made a number of optimizations to the lighter2 ray tracer.
+	- caedes added iJoystickDriver to cspace.i.
+18-Nov-2006
+	- Marten fixed the SCF example in manual section 4.3.1.10.
+17-Nov-2006
+	- Marten fixed a bug in particles loader where the lincolor wouldn't
+	  load alpha. Fixes trac #190.
+16-Nov-2006
+	- Jorrit fixed the 3D sound source implementation so that it now
+	  also implements iSndSysSourceSoftware as it should.
+15-Nov-2006
+	- res changed csVector3::DominantAxis() to return an (here sufficient)
+	  int.
+	- res fixed some deprecation warnings in walktest.
+	- res fixed a bug in the lighter2 kdtree where a flag had opposite
+	  meanings in different code. Also added some debugging facilities and
+	  fixed some VC warnings.
+	- res changed configure to let debug info splitting default to "no" 
+	  in 'profile' mode. Addresses trac #186.
+        - Erroroman made typo fix - SetWithGemeshFactory is renamed to
+          SetWithGenmeshFactory. Also removed SetWithBox (
+          SetWithGenmeshFactory::GenrateBox can be used for that case).
+	- caedes added a check on csODECollider::CreateMeshGeometry, so it
+	  doesnt crash if there is no collision polygon mesh on the object.
+13-Nov-2006
+	- Erroroman added bindings SetWithGemeshFactory and SetWithBox to 
+	  csSimpleRenderMesh in cspace.i. That makes easy to create simple
+	  meshes from given geometry when using CS python module.
+	- Marten reimplemented the kd-tree builder in lighter2. Gave some 
+	  80-120% speedup in benchmarks.
+11-Nov-2006
+	- Genjix corrected spelling mistake vfs.h and changed the years here.
+10-Nov-2006
+	- Jorrit again disabled techniques 150 for character2 and
+	  character_bump2 since they are still giving problems:
+	    - Not working lighting on linux/ATI
+	    - Corrupted lighting on Intel Graphics
+	- Jorrit changed iSndSysWrapper to keep track of iSndSysData
+	  instead (but see later) of iSndSysStream. The idea is that
+	  a sound object should only care about the sound data and
+	  the stream should be created later. For compatibility
+	  reasons a stream is still created however. All methods
+	  taking care of streams in iSndSysWrapper are marked
+	  deprecated. Also in iLoader the version of LoadSoundWrapper()
+	  that takes a mode3d parameter is now deprecated as this
+	  version creates a stream. Using the 'mode3d' attribute
+	  in maps is now also deprecated.
+	- Marten removed some old left-over code that only was needed for
+	  VC6 and/or windows version 95,98 and Me.
+	- Marten reverted the part of r25859 that deprecated windows 95, 98
+	  and Me until we decide to retire them.
+9-Nov-2006
+	- Eric Sunshine worked around problem in configure.ac caused by
+	  unintentional side-effect of recent change to detect newer vs. older
+	  X11 installations.  Autoconf delays performing certain tests until
+	  the test is actually required. In this case, the CPP test was first
+	  needed inside the "old" branch of the X11 check.  For machines with a
+	  newer, modular X.org installation, this resulted in the CPP test
+	  never being run. Fixed by adding an explicit and unconditional
+	  AC_PROG_CPP invocation to configure.ac.
+	- Marten added a preadvance option to particles xml-loader that allows
+	  you to advance the particle system on load.
+	- Marten made an optimization to the ray tracer in lighter2. Should show
+	  some 10-40% speed-up on calculations.
+	- res fixed the perl bindings to compile again.
+	- res reverted r25844: it's not needed any more. Also, it seems that
+	  only the underscored Interlocked* functions are supported as 
+	  intrinsic functions.
+	- res fixed SetVertexCount in genmesh to not set all normals and 
+	  colors to null but only those that were newly added.
+8-Nov-2006
+	- Erroroman changed bones indices render buffer type to ushort. Also 
+	  changed indices type to short in all animation vertex shaders.
+	- Erroroman made Cg skinning default again.
+	- Erroroman dopted max animation exporter script to export ushort bones
+	  indices.
+	- Erroroman fixed speed problem in shader animation by changing bones 
+	  indices type from ushort to short. Also fixed max exporter again.
+7-Nov-2006
+	- Eric Sunshine changed CS_CHECK_PROG_VERSION() in progver.m4 to export
+	  shell variables `cs_prog_PROG_version' and `cs_prog_PROG_version_ok'
+	  indicating the discovered version of PROG and whether the version
+	  check succeeded, respectively. These variables are available to the
+	  ACTION-IF-OKAY and ACTION-IF-NOT-OKAY code fragments.
+	- Eric Sunshine clarified and further elaborated
+	  CS_CHECK_PROG_VERSION() documentation.
+	- Eric Sunshine augmented CS_CHECK_CSWIN32LIBS() in checkcswin32libs.m4
+	  to export also the result of the new `cslibs-config --incpath' option
+	  if available.
+	- Eric Sunshine rewrote the `pycegui' check in configure.ac essentially
+	  from scratch.
+	    - Added caching support so that it saves computed information in
+	      the configure cache file (when --config-cache is specified) and
+	      avoids expensive operations when cached information is available.
+	    - It now performs a simple extraction and Swig version comparison
+	      rather than "mis-using" CS_CHECK_PROG_VERSION().
+	    - Broke apart the check into a number of smaller pieces in order to
+	      facilitate comprehension and maintenance.
+	    - Added support for cs-win32libs when attempting to locate the
+	      pycegui.i Swig output file.
+	    - Fixed bug where default search path elements when locating
+	      cegui.i file were incorrectly separated by whitespace rather than
+	      $PATH_SEPARATOR.
+	- Eric Sunshine fixed r25803 bug in CS_CHECK_LIB_WITH() in checklib.m4
+	  which resulted in exported variables being named incorrectly, thus
+	  causing later tests and dependent code which relied upon those
+	  variables to fail.
+	- res augmented the particle system to allow manually advancing it
+	  a given duration.
+	- res enabled --as-needed by default.
+	- caedes fixed two minor errors on the new pycegui test in 
+	  configure.ac.
+6-Nov-2006
+	- caedes added the uvanim shader, it is an xml shader for uv frame
+	  animation, ie, it scrolls over frames packed in a texture.
+	- caedes added some templates to swig interface files that allow
+	  python bindings to declare python properties (they work for
+	  external projects also).
+	- caedes changed the python property wrappers interface file so it
+	  can really be used from external projects. Also fixed commenting
+	  a bit.
+5-Nov-2006
+	- res worked around an apparent VC7 compiler bug causing trouble with
+	  csArray: compiler-generated assignment operators seem to 
+	  errorneously copy a single byte for empty classes.
+	- res fixed shader variables and program parameters filled from
+	  shader expressions to be forced to type VECTOR4.
+	- Eric Sunshine fixed CS_CHECK_LIB_WITH() Autoconf macro
+	  (mk/autoconf/checklib.m4) to generate valid shell variable names even
+	  when the LIBRARY name contains "special" characters, such as hyphens,
+	  periods, etc.  (A similar problem had been fixed for the ALIASES
+	  argument of CS_CHECK_LIB_WITH() in SVN r19486, but that patch
+	  neglected to address the issue for the LIBRARY argument.)
+        - caedes made the following changes in swig interface files:
+            - fixed csTriangle wrapping.
+            - added iODEHinge2Joint to interface list.
+            - added wrapping of csVector4, csImageBase and csImageMemory.
+            - added an output typemap for csKeyModifiers, and list like
+              interface to fetch the modifiers.
+            - added extended python function GetValue for getting shadervar
+              values as python objects.
+            - added some ifdef so _csPyEventHandler does not get exported to
+              other modules %importing cspace.i (so now theyre not required
+              to declare it).
+            - removed csPixmap %ignore declaration.
+            - removed the _csPyEventHandler declaration from pycscegui.
+4-Nov-2006
+	- res changed the VC project templates to enable "force for loop scope
+	  conformances" (means for loop control variables declared in the for
+	  statement exist only in the inner scope [as the standard says] - VC7
+	  and 7.1 default behaviour is to be compatible with the VC6's broken 
+	  loop variables that also exist on the outside scope).
+3-Nov-2006
+	- Jorrit fixed nullmesh factory so that it has a sensible
+	  default bounding box (from -1,-1,-1 to 1,1,1). That prevents
+	  crashes in the kdtree when people forget to initialize this.
+	- Jorrit fixed nullmesh factory SetRadius() call so that it
+	  actually calculates the bounding box correctly from the radius.
+	- Jorrit worked around a very old problem with the kdtree when
+	  it receives objects with empty or illegal bounding boxes. This
+	  could cause assertion errors (i.e. leaf_replaced and such). The
+	  work around simply tests for illegal bounding boxes and replaces
+	  that box internally with a very small legal one.
+	- Genjix fixed dodgy referencing of pointer in WeakReferenced
+	  destructor.
+	- caedes fixed an mistype in csgeom/vector4.h (csVector4 incorrectly
+	  referenced from inside csVector4T).
+	- caedes made the engine add a "mesh creation time" shvar to all
+	  created meshobjects.
+	- res fixed a couple of VC7 errors and warnings.
+	- res fixed a couple of gcc issues after the VC7 fixes.
+	- caedes fixed the PythMod jam rule so it can be used in plugins
+	  external to cs, and adapted cspace and pycscegui modules jamfiles
+	  for the change.
+2-Nov-2006
+	- res tweaked lighter2 to also use the primitive's normal for backface
+	  culling and not just the interpolated normal.
+	- Genjix added CS::WeakReferenced class for objects implementing
+	  AddRefOwner/RemoveRefOwner, enabling simple objects with csWeakRef.
+	- res made the following changes to CS::WeakReferenced:
+	    - Renamed header to weakreferenced.h to match class name.
+	    - Added destructor that sets all references tracked to 0.
+	    - Removed inheritance from csRefCount (might interfere in cases of
+	      multiple inheritance; also, it might be possible that weak ref
+	      support without refcounting support is desired in some 
+	      circumstances).
+1-Nov-2006
+	- Genjix removed redundant ShapeChanged () calls in
+	  iGeneralFactoryState::SetTriangle/VertexCount ().
+30-Oct-2006
+	- dfryer added GetTuple, SetTuple, and HasNext() functionality
+	  to OS X specific 'defaultsconfig' implementations of iConfigFile
+	  and iConfigFileIterator
+	- caedes added some %ignore directives in cspace.i to avoid wrapping
+	  deprecated members from cspath.
+	- caedes removed the exclusion of gmeshskel2.h from master headers,
+          as the old conflicting gmeshskel.h is already gone.
+	- res tweaked the CS_CHECK_LIB_WITH autoconf macro to fix the
+	  m4_foreach invocations to not have an empty entry in the list if no
+	  lib aliases were given. Apparently, earlier m4 versions skipped the
+	  empty entry. Newer versions don't and caused weird checks for the
+	  "empty lib" in configure.
+	- res augmented vproc_std to deal with the absence of a "light 
+	  position object" SV which is not provided by the standard render 
+	  steps. Fixes occuring floating point exceptions and also probably
+	  makes lighting actually work right.
+	- res added a templated variant of csTriangle, CS::TriangleT<>.
+	- res changed CS::TriangleStream to be more like the other CS 
+	  iterators (ie use HasNext() and Next()).
+	- res deprecated the COLOR shader variable type. It does not provide
+	  a significant benefit over VECTOR4. In fact, it's the same as 
+	  VECTOR4 now.
+	- res updated lighter2 for the CS::TriangleStream change.
+	- res fixed some VC warnings.
+	- caedes added gmeshkel2.h and skeleton.h interfaces to cspace.i.
+29-Oct-2006
+	- res changed lighter2 to store primitives as triangles instead of
+	  polygons.
+	- res changed scfFactory::IncRef() to always get the symbol for the
+	  factory function after the plugin shared lib has been loaded. The
+	  reasons is that the address of that symbol may change if the shared
+	  lib happens to be unloaded in between attempts to get an instance
+	  of the component.
+	- res changed the plugin manager to use csRef<>s instead of explicit
+	  reference counting for retaining iComponent references. Also
+	  simplified some code in LoadPlugin().
+	- res augmented the lightiter render step to provide a "light count"
+	  SV with constant value 1. (This makes it possible to use vproc_std
+	  with it.)
+	- res fixed some crashes in the software renderer occuring when 
+	  drawing without BeginDraw() being called (occurs when the engine 
+	  does PrecacheDraw()).
+	- res augmented the software shader plugin to also support 
+	  multiplication by a constant color in addition to multiplication by 
+	  the interpolated vertex color.
+	- res added software renderer techniques to the ambient, light, 
+	  light_spec_bumpmap shaders.
+	- res made the light_bumpmap shader fall back to light.
+	- res changed the "castle" level to have Z buffer clearing enabled
+	  (needed for SR).
+	- Eric Sunshine fixed a quoting problem in configure.ac which caused
+	  X11 check to barf for old-style installations.
+27-Oct-2006
+	- res updated the docs for the new winlibs version.
+26-Oct-2006
+	- Genjix added a flat 1px X 1px normalmap texture inside standard.zip
+	- Jorrit fixed a problem with physics plugin. The iODEJointState
+	  interface was defined wrong (GetLowStop() instead of GetLoStop()
+	  for example) and also the odedynam plugin was no longer
+	  implementing that interface.
+	- res fixed the bullet plugin to build with somewhat newer bullet
+	  versions.
+25-Oct-2006
+	- Jorrit fixed a bug in iSector->HitBeamPortals(). If it would
+	  traverse a portal then the returned intersection point would not be
+	  correct.
+	- res adjusted the X11 detection such that the pkgconfig packages, as
+	  provided by newer X.org versions, are looked for first before
+	  falling back to the autoconf X detection macro.
+24-Oct-2006
+	- res bumped the version numbers for the CS and CEL version checks in
+	  jamtemplate's configure template to 1.1.
+	- res fixed install.jam to support file names with spaces.
+	- res updated the "external libraries" section in the manual to also
+	  state versions of the dependencies.
+	- Vincent updated rpm/cs.spec. Also added missing files to be
+	  installed.
+23-Oct-2006
+	- dfryer fixed some OS X / PowerPC specific compile problems in 
+	  threading support stuff.
+	- Jorrit added iSector->PrecacheDraw(). This function will
+	  precache the visibility culler. In addition it will also render
+	  one frame of that sector with as much visible as possible.
+	  This also helps precaching the shaders. iEngine->PrecacheDraw()
+	  will now call iSector->PrecacheDraw().
+	- Jorrit fixed a bug in the skeletal animation loader. It would
+	  incorrectly test if it could load the skeleton file and if it
+	  couldn't load it it would not give an error.
+	- res fixed the genmesh autonormals support to properly support 
+	  submeshes.
+	- res changed the genmesh saver to not write out triangles when
+	  a factory has submeshes.
+	- res added iGeneralFactoryState::DisableAutoNormals().
+	- res added normal interpolation for primitives to lighter2.
+20-Oct-2006
+	- PK fixed a small bug in the parallax shaders.
+	- res added some issue reporting to the static plugin linking Jam
+	  code.
+	- res changed the python detection code to separately check whether 
+	  the pythonX.X/config dir must be specified to link the python lib.
+	  The reason is that this directory seems to contain a static library
+	  which gets preferred over the shared version, however, this static
+	  lib seems to work somewhat worse than the shared version. Hence,
+	  adjust the lib dir search strategy such that a path with a shared
+	  version is preferred.
+18-Oct-2006
+	- Jorrit forced the character2 shaders to use software animation
+	  since that works better on all hardware and also is faster
+	  in most cases.
+	- Eric Sunshine updated CS manual to refer to new Trac bug database
+	  rather than the deprecated SourceForge bug tracker. Also updated URL
+	  in manual for browsing sources in SVN rather than CVS.
+	- res removed some leftovers from the earlier "compatibilisms"
+	  cleanup.
+	- res changed the "Resources" manual page to point to the trac SVN
+	  browser and not the SF one.
+17-Oct-2006
+	- Jorrit fixed a memory leak in the engine (with camera
+	  positions).
+	- res fixed a compile error in ptpdlight.
+	- res fixed compile errors with memtracker enabled (fixes trac #135,
+	  #173).
+	- res fixed lighter2 compile errors and warnings.
+13-Oct-2006
+	- res added PD light support to lighter2.
+	- mdmkolbe fixed a few warnings.
+	- res changed lighter2 to disable mipmaps for lightmap textures.
+	- res changed ptpdlight to use fixed point math and to upload textures
+	  as BGRA (faster on NV).
+12-Oct-2006
+	- mdmkolbe commited part of the Cygwin path patch forgotten before.
+	- mdmkolbe added support for Cygwin mount points to VFS.
+	- mdmkolbe forced vfs.cfg to always be regenerated on install
+	  since they may be overridden at install time (e.g. using GNU stow)
+	  and to prevent old "$(appdatadir)" and "$(appconfdir)" being used.
+	- Jorrit changed the spiral particle system in partsys to use
+	  the new particles plugin.
+	- Jorrit removed the spiral mesh object plugin.
+	- Jorrit fixed walktest for the removal of spiral. Simply removed
+	  the spiral command. It isn't that useful.
+	- res made the following changes to lighter2:
+	    - Fixed a copy'n'paste mistake in the primitive min/max UV coord
+	      computation.
+	    - Fixed the light bounding boxes having incorrect dimensions
+	      (influence radius was used for the box size when diameter is
+	      correct).
+	    - Change the lumel visibility testing to only take sampling points
+	      into account that lie on the primitive. This fixes dark borders
+	      that can occur when adjacent geometry occludes some sampling 
+	      points which cause a darker than correct light value to be used,
+	      even though the occluded sampling points should not be used 
+	      since they don't lie on the primitive.
+	- res changed genmeshify to detect when a level name passed is a
+	  directory.
+	- res (blindly) augmented the import kit to support Thing mesh 
+	  objects.
+11-Oct-2006
+	- res fixed genmesh to also support Compress() when submeshes are
+	  present.
+	- res changed lighter2 to more efficiently layout primitives. Instead
+	  of layouting every primitive on its own, coplanar neighbouring
+	  primitives are laid out adjacently on the lightmap.
+	- res fixed csConfigIterator::Rewind() not working properly.
+10-Oct-2006
+	- mdmkolbe fixed searching of Cygwin paths.
+	- mdmkolbe added CS_CONFIGDIR to configuration search paths on Cygwin.
+	- Marten added a "outward spiral" term to spiral particle effector.
+9-Oct-2006
+	- res fixed a problem in the iConfigIterator::HasNext() which
+	  manifested itself in scrambled "could not load plugin" messages
+	  and subsequent crash on startup.
+	- res updated the documentation transform script for the new site
+	  search URL.
+	- res slightly tweaked the API docs search box style.
+	- Marten added a "velocity-field" particle effector.
+8-Oct-2006
+	- res added iConfigIterator::HasNext(), loosely based on a patch by
+	  Timothy "kiolakin" Whitfield.
+7-Oct-2006
+	- Jorrit added a test to csPhysicalFile so that it no longer
+	  succeeds on directories.
+	- res fixed the font cache to more gracefully handle nested 
+	  CacheGlyph() calls. Fixes trac #164.
+	- res changed the reporter to avoid nested calls into listeners (ie
+	  when Report() is called while being inside Report()) since that may
+	  "confuse" the listeners and lead to weird side effects. Instead,
+	  queue up messages that are reported while in the reporter.
+6-Oct-2006
+	- Genjix added iVFS::SymbolicLink function.
+	- caedes added kwartz and castle to Jamfiles.
+	- Marten added a RK45 ODE solver to be used in particle effector.
+	- res slightly reworded the section on procedural textures. Also added
+	  "performance hints".
+	- res changed the genmesh loader and saver to also accept factory 
+	  submeshes without a material.
+	- res made the following changes to lighter2, among others:
+	    - Support light attenuation.
+	    - Lightmaps are now distributed globally (and not one lightmap per
+	      mesh object).
+	    - Genmesh submeshes are handled better.
+	    - Better handle unknown mesh types.
+5-Oct-2006
+        - Genjix added csPython::LoadModule (path, file).
+	- Marten changed win32 version resource generation so it strips
+	  any RCxxx tags, appearantly they trip the mingw resource
+	  compiler.
+        - Piotr does bug fixes after yesterdays joints commit. Additionally he
+          comments out unnecessary code in phystut.
+	- mdmkolbe added a comment to the code explaining why one of the
+	  reinterpret_casts was used.
+	- Erroroman changed render buffer "bones indices" elements type from
+	  int to float because of slow hardware animation reported by people
+	  that uses Windows and ATI video cards. Nvidia cards doesn't have
+	  such problem so probably cases about driver problem.
+	- Erroroman adopted kwartz model and the animation shaders to the new
+	  type of the render buffer.
+	- Erroroman improoved the script for exporting skeletal meshes from
+	  3ds max (still not fully finished)and added some more info to 
+	  the README file.
+4-Oct-2006
+	- Jorrit updated startme:
+	    - Made the icons show from top to bottom.
+	    - Removed particles and awstest demos.
+	    - Changed screenshot for walktest to castle screenshot.
+	- mdmkolbe eliminated improper reinterpret_cast calls with extreme
+	  prejudice.  (Casting from a 'void*' should use static_cast.)
+	- Marten reverted one of mdmkolbes changes. _beginthreadex does
+	  not always return a void*, on some versions of MSVC it gives
+	  uintptr_t and therefor needs the reinterpret_cast.
+	- Marten hopefully fixed the particle "clumping" when emitting 
+	  particles with velocity.
+        - Piotr added angular constraint axis joint parameter which should
+          be anchored to specyfied body (it lets angular stops to be effective
+          when joint have free rotation along all axes in ode dynamics 
+          implementation - "ball joint" limitation).
+        - Piotr cleaned iODEJointState interface (it lets user to change ode
+          specyfic parameters for joints made via iJoint interface).
+3-Oct-2006
+	- mdmkolbe fixed an uninitialized variable that broke procedural
+	  textures on Cygwin.
+	- Jorrit committed a new extrudeGlow shader from Anders Wisur.
+	  Still experimental.
+	- Jorrit added a few missing Jamfile's in the data/shader directory.
+	- Jorrit changed all the attenuation based shaders (parallaxAtt,
+	  specular, character, ...) to calculate attenuation a bit
+	  differently so that the resulting lighting is brighter for the
+	  same radius of the light. This makes the lighting intensity
+	  more matched up with the lighting as calculated by the lightmapper.
+	  Another benefit of this change is that it improves speed as
+	  you can now reduce the light radius with same visual effect.
+	- Jorrit reduces the light radius in castle level.
+	- Marten fixed a corner case in csQuaternion::Exp and 
+	  csQuaternion::Log as well as some accuracy and efficiency parts in
+	  skeleton spline calculation.
+	- Jorrit added a fallback for light_bumpmap to the light specular
+	  shader. That means that parallaxAtt will also correctly fallback
+	  to light_bumpmap if CG is not available or fails.
+	- Marten fixed a bug in the shader manager which caused shader manager
+	  (the global) SVs not to be properly pushed to the SV stack.
+2-Oct-2006
+	- res removed the resolution and windowed vs fullscreen message from
+	  null3d.
+	- Marten fixed csQuaternion::Exp and csQuaternion::Log to actually be
+	  the exponential and logarithmic functions.
+1-Oct-2006
+	- Marten implemented pthread thread and condition variables classes 
+	  with new interface. The new improved implementation of threading
+	  should now be fully functional.
+	- res silenced more MSVC deprecation warnings.
+	- res fixed some locals in CS::TriangleIndicesStream to use the 
+	  template parameter.
+	- res added iShaderVariableContext::RemoveVariable (csShaderVariable*).
+	- caedes removed stdtex from data Jamfile.
+30-Sep-2006
+	- res fixed some MSVC warnings.
+	- res fixed some wrong GL extension function declarations and added
+	  the GL_EXT_packed_depth_stencil ext.
+	- res changed scfImplementationPooled to use C++ cast operators and
+	  the CS memory allocator.
+	- res changed makeGLMatrix to optionally convert to a row-major 
+	  matrix.
+	- res copied a more elaborate version of GetTuple() into 
+	  csWin32RegistryIterator.
+	- res changed the Cg plugin to define a preprocessor macro
+	  PROGRAM_TYPE_FRAGMENT or PROGRAM_TYPE_VERTEX, depending on the type.
+29-Sep-2006
+	- res removed the following compatiblity hacks for older compilers
+	  (which would likely not be able to cope with CS' use of advanced
+	  C++ features anyway): 'typename_qualifier', fake 'explicit' 
+	  keyword, CS_SPECIALIZE_TEMPLATE instead of template<>, 
+	  CSARRAY_INHIBIT_TYPED_KEYS. Addresses trac #16.
+	- Jorrit added a workaround for GetTuple() in windows so that
+	  it at least compiles. MacOS/X is still broken and the GetTuple()
+	  implementation in Windows just returns 0.
+	- Jorrit changed flarge to use the new kwartz model. The kwartz
+	  model is also updated to work nicely with software lighting.
+	- Jorrit added kwartz model to isotest app. Unfortunatelly it is not
+	  yet lit there though. Still have to check why.
+	- Jorrit added textures from new castle level to CS. Castle level
+	  will soon follow.
+	- Jorrit merged stdtex.zip into standard.zip.
+	- Jorrit added the indoor castle level from Anders Wisur to svn
+	  and made it default.
+	- Jorrit added license note to castle level and castle textures.
+	  Castle uses Creative Commons NC:
+	  http://creativecommons.org/licenses/by-nc/2.5
+	- Jorrit made castle default level in walktest now.
+	- Erroroman optimized character_bump2.cgvp by calculating bitangent
+	  as cross product of normal and tangent. Also removed bitangent
+	  from tehnique 150 in character_bump2.xml.
+	- Jorrit added a 'arb128_limit' tag to gldrivers.xml and enabled
+	  it for Intel Graphics. This tag means that the 3D card will
+	  not support ARB assembly programs of more then 128 instructions.
+	  The character2 shaders use this tag in the 150 technique (hardware
+	  animation). This means that on Intel Graphics software animation
+	  will be used.
+	- Jorrit got a patch from res2k which makes sure that CG techniques
+	  that generate programs that are too big for the card will really
+	  fail now. That means that the workaround in gldrivers.xml is
+	  no longer required.
+	- Erroroman added more API docs in skeleton.h
+	- Marten added first part of reimplemented threading subsystem.
+	- Marten fixed compilation on MSVC after res cleanup earlier.
+28-Sep-2006
+	- mdmkolbe changed walktest to exit with code 0 on normal exits.
+	- mdmkolbe blind committed a change by Timothy "kiolakin" Whitfield
+	  that will allow for skyboxes by letting each mesh specify its own
+	  zbuffer mode.
+	- mdmkolbe converted plugins/bugplug to the new SCF.
+	- caedes added std_character2 and std_character_fixed2 shaders so
+	  genmesh animation system can be used with standard lighting.
+	- res changed gl3d DeactivateBuffers() to also deactivate vertex 
+	  attributes.
+	- Erroroman added Log, Exp and Squad methods to csQuaternion.
+	- Erroroman made spline rotatin of skeleton animation and 
+	  improved a bit the skeleton the code. 
+	- Erroroman added basic API docs to the skeleton interface.
+	- res changed the Cg plugin to cache the profile of a program.
+	- res devised an alternative workaround for corruption occuring on
+	  ATI cards. Further investigation leads to that the corruption shows 
+	  up after ARB programs are disabled; apparently this does not work 
+	  correctly. A workaround is to change a fixed function state and call 
+	  glBegin()/glEnd() without specifying any vertices. Hopefully helps
+	  for trac #18.
+27-Sep-2006
+	- mdmkolbe enabled separate debug info by default on compatible
+	  versions of Cygwin's binutils.
+	- Jorrit removed the particles level after merging the particles
+	  there with partsys.
+	- Jorrit removed the fountain mesh object.
+	- Jorrit removed csNewParticleSystem since this class is no longer
+	  being used.
+	- Genjix corrected iutil/iConfigIterator not implementing GetTuple.
+26-Sep-2006
+	- Timothy Whitfield (kiokalin) fixed the paging former so that it
+	  actually works now. It is also seamless.
+	- Jorrit removed the fire particle system.
+	- res disabled strict aliasing for wxgl and wxtest (some WX headers
+	  cause aliasing warnings in optimize mode with gcc 4.1.1).
+	- res committed a patch from <oh.hello.joe@gmail.com> to add a
+	  driver DB entry to work around a crash on some old version of the
+	  i810 DRI driver.
+25-Sep-2006
+	- Jorrit added the new kwartz.zip to vfs.
+24-Sep-2006
+        - Piotr did some tweaks to phystut app, now walls colliders should
+          work better with ode engine.
+	- Jorrit changed the flame command in walktest to use new particles.
+	- Jorrit replaced the two fire particle systems in partsys
+	  with new particles.
+23-Sep-2006
+	- Marten disabled global overridden malloc and free.
+22-Sep-2006
+	- Jorrit changed the built-in force effector for new particles so
+	  that the random acceleration is now a vector. That means you can
+	  get different magnitude for the random acceleration in x, y, and
+	  z direction. This affects the method
+	  iParticleBuiltinEffectorForce->SetRandomAcceleration().
+	  The loader is also changed. The old syntax of using a single value
+	  is still supported (and will automatically be interpreted as using
+	  a vector with three identical values). If you specify x, y, and z
+	  attributes in the <randomacceleration> tag then it will be
+	  interpreted as a vector.
+	- Jorrit fixed rain so that the particles start at the top and also
+	  made sure that the time to live is exactly long enough for the
+	  height of the current sector.
+	- Jorrit changed the snow in partsys to use new particles.
+	- Jorrit changed the snow in walktest (snow console command) to use
+	  new particles.
+	- Jorrit added documentation about converting snow to new particles.
+	- Jorrit removed the old snow mesh object.
+21-Sep-2006
+	- Jorrit added a new section to the API mod doc which explains how
+	  to convert old particle systems to the new particle system.
+	  Only the explosion particle system is documented for now.
+	- Jorrit removed the explosion particle system from CS.
+	- Marten fixed the box emitter in the new particle system so that it
+	  isn't double as big as it should be.
+	- Jorrit converted the rain particle system in partsys and the
+	  code in walktest to create rain to use the new particle system.
+	- Jorrit removed the rain particle system and documented how to convert
+	  from rain to new particles.
+	- caedes augmented CS_CHECK_PROG_VERSION so that it exports a variable
+	  with found version for the checked program.
+	- caedes made some more changes to pycegui configure test to make it
+	  more robust.
+20-Sep-2006
+	- Marten disabled the global overrides of operator new and operator
+	  delete due to the interoperability problems it causes.
+	- Marten fixed unit tests to compile and run, trac #85.
+	- Marten fixed circular ref problem in particles, trac #143.
+	- res changed the configure platform check to normalize powerpc* to
+	  powerpc. Adresses trac #137.
+	- res fixed the Cg shader plugin to also take compiler options from
+	  the configuration when fragment program routing is used.
+	- res added the definition of a preprocessor macro that contains the
+	  fragment program version when compiling fragment progtams to the Cg
+	  shader plugin.
+19-Sep-2006
+        - Genjix documented a little csIntersect3 behaviour.
+	- caedes added cscript/pycscegui, an additional python module that
+	  allows to use cs and cegui python bindings together (jam target is
+	  pyceguimod). Also added a pyceguitest.py test script at
+	  scripts/python.
+	- caedes fixed an error in the configure test for pycegui (was testing
+	  SWIG instead of $SWIG) and also made style a bit better.
+18-Sep-2006
+	- caedes changed cegui plugin name to cscegui.
+	- Jorrit made csComparatorString safe with regards to null strings.
+	  This is now needed since a recent fix in csHash is using this
+	  comparator to compare keys and keys can sometimes be 0 (empty
+	  string).
+	- Jorrit fixed another bug in csString::GetHash(). This function
+	  would also crash if the string was empty (i.e. null pointer).
+	- Jorrit fixed a misplaced 'break' in ParseMixMode() of the syntax
+	  services plugin. This would cause MESH mixmode to be interpreted
+	  as ALPHATEST instead.
+	- caedes fixed some warnings on cspace.i generation:
+	  - instantiated iArrayReadOnly<iSceneNode*> using %template.
+	  - %ignore ShaderVarName from csgfx/shadervar.h.
+17-Sep-2006
+	- res fixed a bug in the software renderer vertex transformer that
+	  caused the output vertex buffers to be underfilled.
+	- res updated a gldrivers tweak to include certain NV Quadro chips.
+	- res updated a gldrivers tweak to include GF2 GTS chips.
+	- Marten augmented SCF docs with some info about inheritance of
+	  interfaces and implementations.
+	- PK changed SimpVS to use CEGUI instead of AWS.
+	- res added an overview of the shader system to the manual (based off
+	  his conference talk).
+	- res added support for GL_ARB_texture_non_power_of_two to gl3d
+	  (although untested).
+16-Sep-2006
+	- res declared the weak event listener functions as exported and put
+	  them into the CS namespace.
+	- res fixed shared library creation for cygwin with -mno-cygwin using
+	  the solution from Peter Amstutz stated in trac #132.
+	- Erroroman fixed a bit the new animation shaders.
+	- PK upgraded the ice skin to work with CEGUI 5.0RC2.
+	- PK improved the viewmesh standard dialog a little.
+15-Sep-2006
+	- Jorrit fixed viewmesh so that it starts at the current dir instead
+	  of an internal CEGUI directory.
+	- Erroroman did the following:
+	  - added Update() function to genmesh animation interface. It is a
+	    general update function that is not related to updating render
+	    buffer data.
+	  - updating bones mapping in gmeshskelanim2 is now in Update method.
+	  - changted gmeshskelanim2 bones mapping data
+	    - the buffer "bone data" that represents bone mapping is
+	      replaced with 2 new render buffers:
+	      "bones indices" - contains the indices of bones for the vertex.
+	      "bones weights" - contains the weights of every bone.
+	  - adopted vproc_std to access bones and handle skinned vertices.
+	  - added new shaders for animating genmeshes - character2.xml and
+	    character_bump2.xml.The new shaders provides 4 bones per vertex
+	    mapping and software animation using vproc_std. The old shaders
+	    will be removed after improving of the new ones.
+	- res changed CS_DEPRECATED_TYPE to be useable on MSVC as well.
+	- res fixed the doxygen settings to correctly handle the
+	  CS_DEPRECATED_..._MSG macros.
+	- res marked some types and methods that were deprecated as per the
+	  API docs with the deprecation macros. Also changed some instances
+	  to use the _MSG variant. Lastly, fixed some deprecation warnings.
+	- res removed some unneeded members from csGraphics3DCaps.
+	- res noted some compiler versions on the requirements manual page.
+	- res updated the docs for the new cs-win32libs version.
+	- res added -mno-cygwin support to configure.
+14-Sep-2006
+        - Genjix added iConfigFile GetTuple() and SetTuple(), for storing
+          and getting a list of variable objects in config files.
+12-Sep-2006
+	- Jorrit fixed a bug with iSector->HitBeamPortals(). It was
+	  broken and failed to detect the correct destination sector.
+	- Marten fixed csColor4 for operators + - * and /.
+	- Jorrit changed walktest to use new particles for explosion.
+	- PK extended the ice-skin for tabbuttons.
+11-Sep-2006
+	- Marten fixed (hopefully) the script building (with Swig) on both
+	  older swigs and for jobber.
+	- Jorrit fixed a bug in particles and particlesldr. It would
+	  initialize start time to -1 which caused particles to fail on
+	  particle systems with very small duration.
+	- Jorrit added some missing operators for csColor4.
+	- Jorrit removed the operators again as they break compilation of CS
+	  in some cases.
+	- Jorrit added a new system in the CS engine so that objects can have
+	  themselves removed after a specific interval. Call
+	  iEngine->DelayedRemoveObject() with an object (any object that can
+	  be removed through the normal iEngine->RemoveObject()) and a delay.
+	  This new system is more general then the old iEngine->WantToDie()
+	  method that is called by some particle systems.
+	- Jorrit added a commented out version of the explosion in walktest
+	  using the new particle system. Doesn't yet work 100% (fading is
+	  broken).
+10-Sep-2006
+	- PK changed ViewMesh to use CEGUI instead of AWS.
+	- PK fixed a bug in csHash::Delete (const K& key, const T &value).
+9-Sep-2006
+	- Marten changed particles to have a transform-mode instead of just
+	  a boolean localmode. This makes it possible to have world-space
+	  particles with local space emitter.
+8-Sep-2006
+	- res added tests for some more GL types.
+	- caedes updated cspace.i for the new particles.
+	- res added some more GL extensions and missing GL versions up to 2.1
+	  to the extension manager.
+	- res fixed the glshader_fixed plugin to depend on GL 1.4 for texture
+	  crossbar support and not 1.3.
+	- res put the FBO stencil support into preprocessor conditionals (and
+	  also noted the current state of stencil attachment support).
+	- res fixed a couple of gcc 4.1 optimize warnings.
+	- res fixed _cspace.so.dbg being tried to be split off before
+	  _cspace.so is built when installing. Fixes trac #11.
+	- res added debug info splitting for the CS JNI library.
+	- res changed ptpdlight to #include <limits.h> as per SFbug:1546141.
+	- David Bronke fixed some warnings about unused variables and member
+	  initialization order, and added const keyword to
+	  csArray::Iterator::HasNext() and csArray::ConstIterator::HasNext().
+6-Sep-2006
+	- Jorrit fixed a bug in csGraphics2DOpenGL::SetMouseCursor().
+	  It would assert (in debug mode) or crash (in release mode) in
+	  case the iWin32Assistant was gone already. Instead of that it
+	  now just does a test and returns false in case the assistant
+	  is gone. That way stuff can reset the mouse cursor during
+	  destruction of Crystal Space.
+	- res fixed an issue with the Java bindings where symbols didn't get
+	  exported properly from the JNI glue shared library due being hidden
+	  by -fvisibility=hidden. Worked around that by also specifying
+	  -fvisibility=default when compiling the JNI glue, causing the
+	  symbols to get exported correctly again.
+	- res disabled strict aliasing when compiling the Java JNI glue. This
+	  fixes some issues in release builds.
+	- res fixed some errors having crept into SimpleRoom.java when it was
+	  updated to work with latest CS.
+	- Marten made a small SWIG-tweak to shut up an error from newer
+	  SWIG versions.
+	- Marten made partconv not crash.
+	- Marten converted nullmesh to new SCF syntax.
+5-Sep-2006
+	- res fixed the Java bindings to build again.
+4-Sep-2006
+	- res changed the configure program version check to support checking
+	  the same program with different version numbers.
+	- res separated the configure binutils recency check into it's own
+	  macro.
+	- res changed the --as-needed check to (a) only use --as-needed for
+	  newer binutils versions (b) disable it by default.
+2-Sep-2006
+	- Marten fixed [ticket:7], invalid alpha modifier in shader
+	  light.xml technique 150.
+	- Marten rewrote the OpenGL pixel format picker to enumerate
+	  all the values in strictly decreasing order. This should solve
+	  ticket:1.
+31-Aug-2006
+	- Marten updated version numbers on trunk to reflect the fact that
+	  the 1.0 branch have been created.
+30-Aug-2006
+	- Marten fixed csIntersect3::TriangleTriangle to return a correct
+	  intersection line even for coplanar case. Also rewrote it a bit
+	  for clarity.
+	- res fixed a number of compile warnings and soft3d compilation
+	  in optimize mode.
+	- res added support for the --as-needed linker flag.
+	- Erroroman fixed missing shader bump_attn.cgvp in r3dsmtest
+29-Aug-2006
+	- res changed the software renderer vertex processing to make it more
+	  flexible. Though not pluggable, that'd be at least easier than
+	  before.
+	- res added portal near plane clipping to the software renderer.
+	- res added some missing includes to trianglestream.h.
+	- res worked around mixmode alpha not working in std_lighting on newer
+	  NV hardware.
+	- res added an option to link libgcc and libstdc++ statically to
+	  configure.
+	- res tweaked the Python detection such that the $sysprefix/lib path
+	  is not always added as a library search path. This may cause issues
+	  when the user manually specifies paths for some libraries, since
+	  then the Python linker flags cause e.g. /usr/lib to be scanned and
+	  libraries errorneously taken from there. Instead, only add
+	  sysprefix-based paths when needed.
+	- res added support for response files when shared libs are enabled.
+	  They're used if supported by the linker.
+	- res fixed some gcc warnings when compiling for shared libraries.
+28-Aug-2006
+        - Piotr added additional geom existence check in odedynam.
+	- mdmkolbe added event-order constraints for standard console.
+	- Marten reverted his csRefArray fix from yesterday as it introduced
+	  more problems than it solved.
+	- Jorrit fixed 'walkall' target so that it no longer attempts to
+	  compile partphys_simple.
+	- Jorrit added missing SCF_IMPLEMENT_FACTORY for the saver classes
+	  in the particlesldr plugin. Without these it is impossible to
+	  static link.
+	- Jorrit removed it again since it doesn't seem to solve the problem
+	  for some reason.
+	- Jorrit removed the commented Saver section from
+	  particlesldr.csplugin since even stuff inside XML comments is
+	  considered for static linking (uses a simple sed expression).
+	- res2k fixed a problem with static compilation and cleanup
+	  of static variables (using CS_IMPLEMENT_STATIC_VAR_EXT and
+	  related). The problem manifested itself if you use
+	  DestroyApplication() and then after that initialize CS again.
+27-Aug-2006
+	- Fossi fixed the longstanding brute bug that kept materialmaps with
+	  a size bigger than 512 pixels from working. Now these should work,
+	  but they are still internally interpolated to 512 pixels.
+	- Marten fixed csRefArray so that operator[] and Get (..) works
+	  as intended and don't cause refcounting errors. Bug 1487132.
+	- Marten fixed his last commit to work on gcc too. One caveat with
+	  current approach is that you cannot assign directly from a
+	  csRefArray::operator[] to a new csRef, you need to construct it
+	  (provide an explicit construction). No inefficiency, just some extra
+	  syntax.
+26-Aug-2006
+	- Vincent fixed apps/tools/Jamfile so that 'partconv' gets built. Also
+	  made a few fixes to the particle mesh object manual page.
+25-Aug-2006
+	- res changed the logic used by glshader_cg to determine whether
+	  routing is used or not. Instead of using routing all the time when
+	  ARB_f_p is not available or disabled, non-routing profiles are
+	  preferred, if these are available. Routing can be preferred by
+	  choosing a maximum fragment program profile that is ps1_x.
+24-Aug-2006
+	- Jorrit fixed a serious bug in the generic renderloop code
+	  with regards to light culling. This bug could cause flickering
+	  and other bad artifacts.
+	- Marten integrated newparticles branch revisions 24389-25212 into
+	  trunk.
+	- Marten added a note to apimod100 for new particles.
+23-Aug-2006
+	- Jorrit deprecated iObjectModel->GetObjectBoundingBox(csBox3).
+	  Instead there is now iObjectModel->GetObjectBoundingBox() which
+	  returns a reference to the box. This is more optimal and it is
+	  better to use a return value anyway.
+	- Jorrit changed standard diffuse renderloop so that it now culls
+	  objects in object space (for lights). So the light center is
+	  transformed into object space and then the object bounding
+	  box is tested. This is faster (no need to transform the object
+	  bounding box to world space) and also more accurate as we
+	  are essentially testing against the OBB instead of the AABB (so
+	  this should in some cases speed up lighting at runtime).
+	- Jorrit added a new syntax for loading vertices and triangles
+	  from genmesh. You can now say instead of:
+	      <v x="1" y="2" z="2" u="3" v="4" nx="5" ny="7" nz="8"
+	       red="9" green="10" blue="11" alpha="12" />
+	      <v x="1" y="2" z="2" u="3" v="4" nx="5" ny="7" nz="8"
+	       red="9" green="10" blue="11" alpha="12" />
+	      <v x="1" y="2" z="2" u="3" v="4" nx="5" ny="7" nz="8"
+	       red="9" green="10" blue="11" alpha="12" />
+	      ...
+	  the following:
+	      <vertices format="vunc">
+	      1 2 3 4 5 6 7 8 9 10 11 12
+	      1 2 3 4 5 6 7 8 9 10 11 12
+	      1 2 3 4 5 6 7 8 9 10 11 12
+	      ...
+	      </vertices>
+	  Similar for triangles:
+	      <t v1="1" v2="2" v3="3"/>
+	      <t v1="1" v2="2" v3="3"/>
+	      <t v1="1" v2="2" v3="3"/>
+	      ...
+	  becomes:
+	      <triangles>
+	      1 2 3
+	      1 2 3
+	      1 2 3
+	      ...
+	      </triangles>
+	  This loads faster and is also a lot smaller (note: even better
+	  would be the streaming loader).
+	- Jorrit and Hristo worked a bit further on parallaxAtt. Technique
+	  150 is now more correct and actually works on intel graphics now.
+	  So that means that the intel graphics specific rule to forbid 150
+	  can now be removed. Technique 130 is kept because it can work
+	  on cards with only 4 texture units.
+	- Jorrit fixed stencil2 plugin to compile again after latest
+	  changes to GetObjectBoundingBox().
+	- Hristo did some additional fixes on the specular shader.
+22-Aug-2006
+	- Jorrit fixed a bug with the new genmesh submesh system.
+	  HitBeamObject() and HitBeamOutline() were broken because they
+	  tested on the first triangle all the time.
+	- Jorrit changed the standard renderloop object/light culler to
+	  use bounding box instead of bounding radius (for the meshes).
+	  While that is slightly slower to calculate it gives a much
+	  more accurate test and thus a big speedup at runtime for the
+	  lighting calculations. This also fixes visibility of particle
+	  systems on maps using diffuse renderloop since apparently
+	  the particle systems report a wrong bounding sphere but the
+	  bounding box is correct.
+	- Jorrit and Hristo did several changes to the parallaxAtt and
+	  specular changes to get attenuation right. This makes levels
+	  darker but it fixes flickering and provides the correct
+	  attenuation results now. Also the priority 130 technique
+	  has been replaced with a two-pass technique that does proper
+	  attenuation.
+21-Aug-2006
+	- caedes added SCF_IMPLEMENT_FACTORY to movierecorder plugin.
+	- res added a helper to iterate over triangles from an index buffer
+	  (also supporting e.g. strips and quads).
+	- res changed the software renderer to use aforementioned helper.
+	- Jorrit fixed the bullet plugin so that it compiles again.
+	- caedes added pythmod.jam file with a rule for building python
+	  modules for crystalspace and made cspython use it.
+	- caedes added tooltip skin to the ice cegui theme (only for 0.5+).
+	- res made the xmlshader wrapper document properly keep track of node
+	  parents.
+20-Aug-2006
+	- res added texture crossbar support to glshader_fixed.
+	- res fixed an initialization bug in engseq.
+	- res moved the dynamic ambient application in case of lightmapping
+	  from code to shaders.
+18-Aug-2006
+        - res worked around some issues with wx in wxtest.
+	- Jorrit augmented the iDynamicsCollisionCallback with a position
+	  of collision, the normal of the collision and the penetration
+	  depth.
+	- res removed the legacy diffuse/ambient/reflection options from
+	  iMaterial.
+	- res made sectors be shader variable contexts as well. Fog and
+	  dynamic ambient SVs are now provided by the sector itself. Also
+	  streamlined csFog.
+15-Aug-2006
+	- res committed a patch from Timothy Whitfield <whitfieldts@gmail.com>
+	  to add csBaseEventHandler::UnregisterQueue ().
+14-Aug-2006
+	- res changed the way libraries are handled by genmeshify: instead
+	  of collecting them first and converting them after the main file
+	  was converted they're now converted as encountered, as this seems
+	  more robust.
+	- res re-used the standard loader context from genmeshify to better
+	  deal with "sloppy" maps that rely on the "try to load texture with
+	  name" and "create material from texture with name" features.
+	- res added the ability to override submesh materials in the mesh
+	  object to genmesh.
+	- res added a method to query material replacements from a Thing
+	  object.
+	- res added support for material replacements to genmeshify.
+	- res fixed tangent + bitangent generation for genmeshes with
+	  submeshes.
+13-Aug-2006
+	- res added CS_REQUEST_PLUGIN_TAG.
+	- res made genmeshify use the document plexer plugin.
+	- res made genmeshify properly handle the <settings> tag (fixes
+	  conversion of maps with custom lightmap cell sizes).
+12-Aug-2006
+	- res changed ptpdlight to not just update the light map the next
+	  frame after it's initially needed.
+	- res fixed some flaws in ptpdlight.
+	- res fixed genmeshify to always write a new factory for
+	  hardtransformed meshes.
+	- res added PD light support to genmeshify.
+	- res fixed csRect::Extend() to truly ensure that the given point is
+	  inside the rectangle (it didn't adhere to csRect's exclusivity of
+	  xmax/ymax).
+	- res fixed a crash when polygons from a polygonmesh of a genmesh with
+	  submeshes are requested.
+	- res csODECollider::CreateMeshGeometry() to use the polymesh
+	  triangles directly instead of csPolygonMeshTools::Triangulate().
+	- Jorrit fixed compilation of the DDS image loader.
+	- Jorrit fixed compilation of walktest.
+	- Vincent fixed compilation of a few apps with GCC (GNU/Linux).
+	- res fixed some more XK_MISCELLANY warnings.
+	- res changed the way the TinyXML classes are wrapped: instead of
+	  defining a set of macros to change their classnames put them into
+	  the CS namespace instead.
+11-Aug-2006
+	- mdmkolbe fixed some minor warnings.
+	- mdmkolbe tweaked the signature of RemoveWeakListener.
+	- mdmkolbe mass converted to RegisterWeakListener.
+	- mdmkolbe fixed compilation problems in x2d and sdl2d due to the
+	  RemoveWeakListener conversion of csGraphics2D.  Reported by vknecht.
+	- res added the ability to query lightmaps for PD lights to Thing.
+	- res fixed the proctex event handler to properly work across modules.
+	- res renamed csgfx/memimage.h to csgfx/imagememory.h; this better
+	  reflects the name of the class defined withing and is in line with
+	  the other image-related image*.h headers.
+	- res added a plugin namespace to the ptanimimg sources.
+	- res fixed a potential crasher in ptanimimg.
+	- res added a texture plugin for lightmaps that are affected by PD
+	  lights.
+10-Aug-2006
+	- caedes changed CS_REQUEST_PLUGIN wrapper in pythpost.i so it works
+	  also with interfaces provided by other python modules.
+9-Aug-2006
+	- Jorrit extended parallaxAtt with a technique at priority 130.
+	  This technique is exactly the same as priority 150 but it
+	  doesn't handle attenuation correctly. This is useful on
+	  intel graphics hardware where the 150 technique is not working
+	  properly.
+	- Jorrit added a new 'crappyintelgraphics' config to gldrivers.xml.
+	  This config will add a 'crappy_intel_graphics' tag so that
+	  the technique 150 of parallaxAtt can disable itself.
+	- caedes fixed a problem that would make the python tutorials fail.
+	- mdmkolbe cleaned up miscellaneous warnings.
+	- mdmkolbe added RegisterWeakListener and RemoveWeakListener to
+	  handle registration and removal of event handlers that should
+	  be proxied through a weak reference.
+	- mdmkolbe converted libs/csplugincommon/canvas/graph2d.cpp and
+	  plugins/engine/3d/engine.cpp to use RegisterWeakListener.
+8-Aug-2006
+	- res re-added support for triangle-based submeshes in genmesh objects
+	  in order to provide backwards compatibility.
+	- Jorrit renamed the type class in the old gmeshanim so that it no
+	  longer conflicts with the new gmeshanim in static builds.
+	- Jorrit fixed a problem in csEngineTools::FindScreenTarget(). If
+	  the maximum distance was very large it wouldn't work very well
+	  due to inaccuracy problems.
+	- caedes moved all swig interface files to include/bindings.
+7-Aug-2006
+	- res added ability to convert referenced libraries to genmeshify.
+	- Jorrit fixed a bug in the skeleton loader. It would return a
+	  reference to a factory (as a csPtr) without doing an IncRef.
+	  That would cause crashes at exit.
+	- Jorrit also made the event handler in the skeleton graveyard
+	  embedded to try to fix a leak there.
+6-Aug-2006
+	- Anders separated csHash iterators into const and non-const, like
+	  csArray. This may lead to compile errors in user code. In most
+	  cases the solution to these is to change "GlobalIterator" to
+	  "ConstGlobalIterator".
+	- Vincent made the following changes:
+	    - Changed csInputDefinition::InitializeFromEvent() to get/set
+	      changed axis number for both mouse and joystick. It will use the
+	      first axis found that changed...
+	    - Fixed csJoystickEventHelper::GetButtonState().
+	    - Changed eventtest to get csInputDefinition constructed from
+	      event, and to only print changed joystick axis value (not x/y).
+	- res changed genmesh to preserve user-set poly meshes when switching
+	  between "standard"/"submesh" poly meshes.
+	- res added writing of of polymeshes to genmeshify.
+5-Aug-2006
+	- mdmkolbe removed a redundant check of do_infinite in walktest.
+	- res added the iSelfDestruct interface to the csSaverFile,
+	  csLibraryReference and csAddonReference so they can be removed from
+	  regions.
+	- res made cssynldr's WriteMixmode() output a bit nicer.
+	- res made <move> tags written by cssaver's less redundant.
+	- res made cssaver correctly write portal flags, warping and mirror
+	  portals.
+	- res fixed a flipped condition in the genmesh saver.
+	- res made genmeshify's command line help a bit better.
+	- res made genmeshify better support libraries.
+	- res made genmeshify support Things created from factories.
+	- mdmkolbe removed an outdated 'friend' declaration.
+	- Vincent fixed joystick button string construction in inputdef.cpp,
+	  which seem to need more work for parsing them correctly (mouseButton
+	  vs. joystickButton)...
+	- mdmkolbe eliminated a few embedded classes in genmesh and spr3d.
+	- mdmkolbe reverted his change to genmesh and spr3d because there
+	  was some weak referencing going on that he failed to notice
+	  before that made the change incorrect.
+4-Aug-2006
+	- res fixed the default csRenderBufferLock<> storage to
+	  iRenderBuffer*: it seems to be the rule rather than the exception
+	  that a render buffer is valid while a lock is instantiated.
+	- res split up csShaderVariableContext into
+	  CS::ShaderVariableContextImpl, which contains an
+	  iShaderVariableContext implementation but no SCF goop, and
+	  csShaderVariableContext on top of that, which continues to be a full
+	  SCF class. This way the simple iShaderVariableContext implementation
+	  can be reused by other SCF classes without having to resort to
+	  manual forwarding.
+	- res changed iSyntaxService->ParseShaderVar() to also parse the
+	  shader variable name.
+	- res changed the genmesh submeshes to be accessed via an interface.
+	- res added some initial support for per-submesh shader vars to
+	  genmesh.
+	- res tweaked the Cg shader framework to shuffle the primaryColor from
+	  vertex to fragment programs with COLOR semantics.
+	- Jorrit added an option to stdrep so that you can now specify
+	  'silent' mode in a config file too ('Reporter.Silent').
+	- Jorrit fixed stdrep so that the reading 'Reporter.AppendFile'
+	  actually works now.
+        - Jorrit fixed compilation of the python plugin (not linking,
+          that's still broken due to -Wl,Symbolic flag) so that it compiles
+          again.
+	- res changed the way genmesh submeshes work. Now, meshobjects can't
+	  contain completely custom submeshes; however, certain aspects of the
+	  submesh as defined in the factory can be overridden (right now only
+	  shader variables, but in the future probably at least materials and
+	  mixmodes as well). Basically, you can't have different sets of
+	  triangles in the mesh object.
+	- res added methods to query lightmap-related data from Thing meshes.
+	- res moved the lightmap-on-superlightmap texture coordinate
+	  computation from the renderer(s) to the Thing plugin.
+	- res added support for static lightmaps to genmeshify.
+3-Aug-2006
+	- Jorrit fixed a small problem which caused CS not to compile
+	  in optimize mode.
+2-Aug-2006
+	- res added operator+= to csRenderBufferLock<>.
+	- res fixed a stupid typo in the gmeshldr index buffer check.
+	- res added proper object model support to genmeshes when submeshes
+	  are used.
+	- res changed csRenderBufferLock<> to lock/unlock on construction/
+	  destruction, as opposed to checking for being locked and locking on
+	  demand on every access. This is somewhat less overhead, and most
+	  (if not all) of the current usage does not unlock a buffer in the
+	  middle of some operations.
+	- Jorrit fixed compilation of genmesh on gcc.
+	- res changed the saver plugin to also expose the portal saving
+	  method.
+	- res changed iSceneNode to also return the children in an SCF array
+	  (keep in mind, references to csArray<>s in interfaces are not safe).
+	- res fixed an instance of a stack-based SCF object in thingldr.
+	- res changed the csRenderBufferLock<> ++ and += operators to only
+	  check whether the returned element is in range when it's really
+	  used.
+	- res added portal support to genmeshify.
+1-Aug-2006
+	- res changed the csRenderBufferLock pre-increment operator to return
+	  the element after incrementation.
+	- res added a post-increment operator to csRenderBufferLock, allowing
+	  to iterate over render buffers pointer-style.
+	- res changed the genmesh submesh support somewhat: now takes a render
+	  buffer with indices instead of a pointer to a triangle array. Also
+	  added some management methods - submeshes can be given a name,
+	  enumerated, and selectively deleted.
+	- res updated the genmesh loader to support index buffer specification
+	  for genmeshes.
+	- res added submesh saving to the genmesh saver.
+	- res started work on genmeshify, a tool to convert Things in world
+	  files to genmeshes.
+	- res fixed genmesh's index buffer creation for submeshes.
+	- res fixed genmesh's submesh class to properly copy itself.
+	- res fixed cssynldr to correctly mark index buffers when writing
+	  render buffers.
+31-Jul-2006
+	- Jorrit fixed compilation of xmlshader. It was using a wrong
+	  CS_GNUC_PRINTF.
+	- Jorrit added a new function csEngineTools::FindScreenTarget().
+	  This function performs the commonly used operation of finding
+	  the object that was clicked upon with the mouse. It can work
+	  both in accurate mode (using iSector->HitBeamPortals) or
+	  faster mode (using csColliderHelper::TraceBeam).
+	- Jorrit changed WalkTest and BugPlug to use the new
+	  FindScreenTarget() function.
+30-Jul-2006
+	- res added some comments to the new shader snippets.
+	- res changed std_lighting_detail over to use Cg.
+	- res added support for "unused" buffer bindings for VPs (ununsed
+	  vertex attribs are not invalid but shouldn't be bound either).
+	- Vincent added joystick support to eventtest. Needs more work for
+	  correct reporting... Also changed inputdef.cpp assert to not choke
+	  on joystick buttons Up/Down events, and print the faulty event name.
+	- res added a bit of optional debug output to peek into the inner
+	  workings of xmlshader's instruction processor.
+	- res fixed conditional resource sharing in the Cg framework.
+	- res improved passing of params with spaces and quotes to xmlshader
+	  templates.
+	- res updated the extension registry URL in the extension manager
+	  docs.
+	- res made it possible to disable all extensions by default, by
+	  setting "Video.OpenGL.UseExtension.ALL = false".
+	- res added a couple of configuration files to emulate certain
+	  hardware. The idea is to use these with the new "configuration file
+	  on command line" feature to easily emulate older HW, e.g. a GeForce3
+	  by running an application with "-cfgfile=/config/emulate_gf3.cfg"
+	  on the command line. Settings covered right now are basically just
+	  those for Cg.
+	- res added the ability to explicitly disable VP or FP support to the
+	  Cg shader plugin.
+29-Jul-2006
+	- res augmented xmlshader to support template arguments with spaces.
+	- res fixed an assertion in xmlshader when using buffer mappings with
+	  custom variable names.
+	- res fixed some assorted xmlshader issues.
+	- res fixed the standard shader loading in the engine to conserve
+	  whitespaces.
+	- res added support for the TEXCOORD instruction to the glshader_ps1
+	  PS1.x-to-1.4 converter.
+	- res fixed compiler argument parsing for the glshader_cg plugin.
+	- res updated the contained DejaVu fonts to version 2.8.
+	- res started work to improve the shader snippets.
+27-Jul-2006
+	- res changed an array in glshader_ps1 that is never changed from
+	  dynamic to compile-time creation.
+	- res added some true static conditionals to xmlshader.
+	- caedes changed the scattering shaders so they keep their nice
+	  previous defaults while preserving xotic's changes.
+25-Jul-2006
+	- mdmkolbe converted the following plugins to the new SCF:
+	    - plugins/physics/loader/
+	    - plugins/culling/frustvis/
+	    - plugins/engine/3d/
+	    - plugins/engine/renderloop/
+	    - plugins/sequence/
+	- res reworked the "Mesa DRI DXT upload only" support.
+	- res unmerged the changes from r24885:24886 ("res disabled
+	  RTLD_GLOBAL for unix plugin loading again...") since the original
+	  issue was solved in a different way. RTLD_GLOBAL is at least needed
+	  for python as well.
+	- mdmkolbe converted plugins/culling/dynavis/ to the new SCF.
+	- David Bronke added a patch from contingencyplan (Brian DeVries) which
+	  adds a copy constructor and an assignment operator to csVariant, which
+	  allows it to be used in a csHash, among other things.
+24-Jul-2006
+	- Jorrit documented the new -cfgfile and -cfgset commandline
+	  options and also added documentation for a few other commonly
+	  used options.
+	- Jorrit fixed a crash in the handling of the new -cfgfile
+	  option. If you didn't use that option then applications would
+	  crash.
+23-Jul-2006
+	- mdmkolbe converted the following plugins to the new SCF:
+	    - plugins/csparser/
+	    - plugins/documentsystem/
+	    - plugins/proctex/standard/
+	    - plugins/terraformer/
+	    - plugins/reporter/
+	- res added the ability to specify configuration settings via the
+	  command line. Accepted are two new switches, -cfgset=<key=value>,
+	  which adds a single setting to the configuration manager, and
+	  -cfgfile=<file>, which adds a complete file to the configuration
+	  manager.
+	- res fixed a crash on VC due ptmalloc being shut down before some
+	  global variables were destructed.
+	- res fixed a destruction issue of xmlshader's TempString.
+	- res augmented the shader conditionaly to support "weak templates"
+	  which don't override existing templates of the same name.
+	  Instruction is <?TemplateWeak ...?>.
+	- res fixed xmlshader to correctly deal with sub-conditions of
+	  conditions always being false.
+	- res fixed a bug in the PS1.x to 1.4 where texture registers as the
+	  destination were not handled correctly.
+	- res enhanced the PS1.x to 1.4 converter to track register usage more
+	  finely.
+	- res added the ability to specify an upper cap for program profiles
+	  to the Cg plugin.
+	- res committed a patch from Gellule <gellule.xg@free.fr> to add
+	  csStringBase::FindLast (const char*, size_t).
+22-Jul-2006
+	- Oktal fixed the order of some declaration qualifiers in spinlock.h;
+	  CS_FORCEINLINE must come *before* the method's return type, at least
+	  on gcc3. This is my first commit by SVN, so I hope it doesn't break.
+	- res fixed the configure freetype check to not reference an internal
+	  header (doesn't work with FreeType2.2 any more).
+	- mdmkolbe applied a (modified) patch from res2k that fixes a crash
+	  caused by the interaction between ptmalloc and Cygwin.
+21-Jul-2006
+	- res fixed an assertion triggered by csBaseEventHandler that could
+	  occur when the destruction occured after
+	  iEventQueue->RemoveAllListeners() was already called.
+	- res fixed csEventHandlerRegistry::ReleaseID(iEventHandler*) to
+	  not ignore the "refcount" of an ID (and thus prematurely releasing
+	  an ID even though not all RegisterID() calls are balanced with a
+	  ReleaseID() call).
+	- res changed the CEGUI resource provider to use platform new (since
+	  it sometimes is freed with the platform delete).
+20-Jul-2006
+	- Andres added the svn:eol-style property to all text files lacking
+	  it (set to native). This is needed to have the eol set to the
+	  native version of the platform (eg \r\n on win, \n on linux).
+	  Without it eg. cross building and manual generation doesnt work
+	  properly. All people adding new text files should look that the
+	  property is set to native. (There is a mechanism called autoprops
+	  which does this for you)
+	- Jorrit added a section in the manual explaining several tricks
+	  you can use to speed up map loading and runtime performance.
+	- iceeey added "normal scale" shadervar to splatting_scattering.
+	  This can be used to separately scale the normal texture on terrain.
+	  When not specified, the "texture scale" is used by default.
+	  The Marble material in 'terrain' level demonstrates this.
+	- iceeey updated cegui plugin to work with CEGUI 0.5.0 while
+	  retaining compatibility with older versions.
+	- iceeey added a CEGUI 0.5.0 compatible version of the 'ice' skin which
+	  ceguitest will use depending on which version of CEGUI you have.
+	- res worked around a FreeType2.2.1 issue where it would return an
+	  error when rendering an empty glyph (e.g SPACE).
+19-Jul-2006
+	- Jorrit simplified viewmesh a lot. It no longer attempts to do
+	  any path handling automatically. So the ':' notation is gone
+	  and it no longer attempts to automatically guess the VFS dir
+	  to use as the current directory. Instead there are two new
+	  commandline options:
+	      -R: this option takes a real path and it will mount it to
+	          /tmp/viewmesh. Then it makes that directory the current
+		  directory.
+	      -C: this option takes a VFS path and it will make that directory
+	          the current directory. If this option is used together
+		  with -R then you can change the VFS dir to be relative
+		  to the location mounted with -R.
+	  The filename itself will be used as-is.
+	- Jorrit added a documentation section for viewmesh (under the new
+	  'rule' that every new feature that is added to CS should now
+	  be immediatelly documented :-)
+	- Jorrit updated the documentation about Blender (removed the
+	  mention of the obsolete old blend2cs tool).
+	- Jorrit added a reference to the new ViewMesh documentation
+	  from the overview.
+17-Jul-2006
+	- res changed csSpinLock to use a non-volatile pthread_mutex_t.
+	- res applied a patch from Joerg Fischer to fix the offsets in
+	  plugins/device/joystick/windows/dinputdefs.h.
+12-Jul-2006
+        - res added a check for the -Bsymbolic linker option to configure.
+          This binds "references to global symbols to the definition within
+          the shared library" (from man ld). If this flag is not set, it can
+          happen that symbols in plugins get bound against symbols from other
+          modules (including the application executable itself), causing
+          side-effects such as violating the "memory allocation and freeing in
+          the same module" rule.
+	- res once more tweaked the objcopy version check to also work with
+	  X.Y.Z style versions again.
+11-Jul-2006
+	- res fixed a crash in bugplug related to empty commands.
+	- res augmented csPathLists to have a non-const operator[].
+	- res fixed a crash bug in csPathsList when dealing with empty
+	  paths.
+10-Jul-2006
+	- Jorrit fixed a fundamental problem with the engine sequence
+	  manager and timed operations. This problem would cause timed
+	  operations to remain in memory even after the sequence was
+	  destroyed. The result was crashes when unloading maps using
+	  these kinds of sequences. Fixed it by using the unique sequence_id
+	  that is already assigned to engine sequences and attaching
+	  that id to every timed operation in the engine sequence manager.
+	  When the sequence wrapper is destroyed it will then remove
+	  the timed operations.
+	- res moved the "numbered filename" logic out of bugplug/movierecorder
+	  into its own class, CS::NumberedFilenameHelper.
+	- res fixed csImageMemory::Copy() to ensure that an image buffers
+	  is available as well as converting the source image to the
+	  format of the destination image.
+	- res converted the movierecorder plugin to new SCF.
+	- res added a helper for "uberscreenshots", to create screenshots
+	  larger than the framebuffer resolution.
+	- res tweaked the uberscreenshot helper to facilitate customization.
+9-Jul-2006
+        - res disabled RTLD_GLOBAL for unix plugin loading again, since it has
+          undesireable side effects; for one, static libraries are suddenly
+          not static anymore, as e.g. symbols may be taken from other plugins.
+          Approached the original reason for adding this (DRI drivers failing
+	  to load otherwise) by a workaround in glx2d: it now manually loads
+	  libGL.so with the RTLD_GLOBAL flag. This is sufficient to make DRI
+	  drivers happy.
+	- res fixed a crash in the GL driver db when it was closed without
+	  being opened.
+	- res fixed XK_MISCELLANY redefined warnings.
+8-Jul-2006
+	- res changed the event handler ID registration. Since the handler
+	  registry keeps a reference to registered handlers, handlers have to
+	  be unregistered properly to ensure none are leaking. Changed GetID()
+	  to not auto-register handlers; instead, RegisterID() has to be used
+	  (where each call must be balanced with a call to ReleaseID() for
+	  proper housekeeping).
+	- res fixed some errors to not cause crashes any more.
+	- res fixed apparently incorrect handling of the removal of a
+	  currently called event handler.
+7-Jul-2006
+	- res fixed the engine default shader loading to not reuse the same
+	  document, but create a new one instead. Fixes some crashing.
+6-Jul-2006
+	- res added the ability to override the default and portal shader with
+	  config file settings (instead of being purely hardcoded in the
+	  engine).
+	- mdmkolbe converted the following plugins to the new SCF:
+	    - plugins/csparser/prshtgen.cpp (other parts of csparser remain)
+	    - plugins/console/
+	    - plugins/bugplug/
+	    - plugins/cssaver/
+	    - plugins/collide/
+	- res worked around a gcc 3.4 bug where __attribute__((always_inline))
+	  is not always supported.
+	- res augmented the CS python module building to also split debug info
+	  off.
+5-Jul-2006
+	- Fossi made a small bugfix to the sequence manager header
+	- res re-enabled the ATI "hidden NPOTS" support as it seems to be
+	  supported properly with the latest drivers.
+	- res added a gcc version of CS_FORCEINLINE.
+	- res declared the overridden operator new etc. as forced inline.
+	  This also seems to fix some issues with ptmalloc for external
+	  projects.
+	- res changed the aligned alloc functions to use ptmemalign if
+	  ptmalloc is enabled.
+4-Jul-2006
+	- res fixed an issue in ptmalloc where one of dlmalloc's internal
+	  structures would not be always initialized properly.
+	- res completely converted engseq to new SCF.
+3-Jul-2006
+	- caedes corrected an error in the swig list wrapper extensions
+	  that would make them unusable for wrapping interfaces in cel.
+	- Philip Wyett fixed eliminated error when using 'alt-r' to start
+          recording a movie with the movie recorder plugin. Plugin was
+          starting and stopping and only recording one frame.
+	- caedes added swig wrapper helper for csSet template, it allows
+	  using len(set), set.append(id), a in set (test only), del set[id].
+	  This introduces a new %define for extending csSet in language
+	  specific ways. Only implemented for python but other languages can
+	  implement their own extensions.
+	- caedes declared csSet<csStringID> for wrapping in cspace.i.
+	- mdmkolbe fixed a mistake in his previous commit.
+	- res fixed the binutils version detection to also work with the
+	  latest version (which reports "2.17").
+	- res added a detection for __attribute__((visibility("hidden"))) to
+	  configure (to complement the detection for default visibility).
+	- res updated the doxygen stylesheets for doxygen 1.4.7.
+2-Jul-2006
+	- caedes added wrappers so cspace Lists (like iMeshList) can be used
+	  as python lists where applicable. Allows search by index and name by
+	  using [], also can iterate normally over their contents, and use
+	  len(list) and list.append.
+	- caedes added dummy templates for list wrapping to the java and perl
+	  interface files.
+	- caedes fixed or silenced most warnings on generation of python
+          interfaces (tested on linux_x86, swig .24, and from .27 to .29):
+	    - removed reference to cspoint.h (deprecated).
+	    - silenced scfImplementation* warnings, now we can wrap this but
+	      should not be done in all situations, the silenced warnings can
+	      be controlled at include/ivaria/scf.i.
+	    - declared csShaderVariable and csSprite2DVertex necessary array
+	      templates.
+	    - made some workaround for the situation where swig would need
+	      directives in the middle of csutil/array.h to understand the
+	      templated class hierachy.
+	    - declare iSCF::SCF as immutable.
+29-Jun-2006
+	- res split csFixedSizeAllocator off csBlockAllocator, which only
+	  allocates blocks of fixed size. csBlockAllocator now builds upon
+	  csFixedSizeAllocator; handling of unfreed objects is now handled
+	  via a template parameter.
+	- Vincent fixed build error with gcc about extra semicolon.
+	- Marten fixed some compilation errors introdu9ced by res recent
+	  split of csBlockAllocator.
+	- mdmkolbe fixed some of the event handlers in plugins/mesh so they
+	  the listeners are only removed if they have already been added.
+27-Jun-2006
+        - Arianna fixed other warnings: size_t/int issues, mainly.
+	- res took another jab at the operator new issues:
+	    - Removed "static" again since that makes gcc complain (and wasn't
+	      very clean either).
+	    - Pragmatically implemented the platform-specific new by using
+	      platform_malloc() instead of trying to employ trickery to use the
+	      platform's default operator new.
+	- caedes added initial interface code for the scfImplementation macros
+	  to the swig wrappers (file ivaria/scf.i).
+	- caedes made a workaround in cspace.i so python bindings can also be
+	  generated using swig 1.3.28.
+	- res renamed timemeasure.h to measuretime.h.
+	- res split the CS::MeasureTime time printing code out into a separate
+	  source file to avoid a warning in -ansi -pedantic.
+25-Jun-2006
+        - Piotr Obrzut added setting color feature for flare halo components.
+	- res made CS' own overriding operator new/delete static to avoid
+	  having them used by other object files.
+	- res added operator new overloads to call the platform-specific
+	  operator new.
+	- res fixed sprcal3d to use those new overloads.
+24-Jun-2006
+	- Peter Amstutz deleted the vos plugin from the Crystal Space tree,
+	  as it will now be maintained directly as part of the VOS tree.
+	- Peter Amstutz modified the cs-config script to search for the
+	  CS link libraries under several different possible names, so
+	  as to support finding and linking with the shared library
+	  version of libcrystalspace.
+23-Jun-2006
+	- res fixed spinlock.h compilation for Intel Macs.
+	- res (blindly) fixed the core audio driver reinterpreting pointers
+	  to 32bit values as strings which is problematic since quite a bit
+	  of random data may appear before the saving null terminator.
+	- res converted csconout to new SCF.
+	- res changed csconout to use RGBA instead of RGB colors for
+	  foreground/background/shadows.
+	- caedes added floor operation to shader expressions.
+	- Jorrit fixed csQuaternion::SetMatrix() so that gmeshskelanim2
+	  again works correctly.
+	- Marten reverted jorrits change to csQuaternion as it is wrong.
+	  csQuaternion::SetMatrix was correct as it is, it must be
+	  gmeshskelanim2 that is buggy. Please people, do not change the
+	  basic math classes unless you know the maths there.
+	- caedes fixed skeleton and gmeshskelanim2 to work again correctly
+	  with the good quaternion math.
+	- caedes added a more finished version of the ambient with additive
+	  layer (pulse is still not handled totally correctly though).
+	- caedes removed glow from parallax.xml and related files as its now
+	  handled in a more general way in ambient.
+	- caedes removed ambient2.xml and specifyambient.xml files as they
+	  don't seem to have any useful difference with ambient.xml.
+22-Jun-2006
+        - Philip Wyett eliminated _POSIX_C_SOURCE redefinition warning in
+          python plugin on GNU Linux with Python 2.3.
+        - Philip Wyett continued changes to docs.
+	- Jorrit fixed handling of the ':' in path names with viewmesh.
+	- Jorrit fixed several problems in the genmeshanim2 plugin related
+	  to the recent convertion to new SCF. The problem is that it is
+	  unsafe to do this in a header:
+	    virtual iBla* GetBla ()
+	    {
+	      return (iBla*) bla;
+	    }
+	  When the definition of 'bla' is not known this will cause the
+	  cast to go wrong with bad results. To avoid this problem better
+	  use static_cast<iBla*> so that the compiler can catch this.
+	  The correct fix is then to not inline that method and put the
+	  implementation in the cpp file instead.
+20-Jun-2006
+	- mdmkolbe converted the following plugins to the new SCF:
+	    - plugins/mesh/lghtng/
+	    - plugins/mesh/particles/
+	    - plugins/mesh/genmesh/
+	    - plugins/mesh/haze/
+	    - plugins/mesh/terrain/
+	- mdmkolbe made a few messages more informative.
+	- mdmkolbe changed iEventHandlerRegistry so it doesn't
+	  use csStrings in the interface.
+        - Philip Wyett corrected a copy and paste error he made in documents.
+        - Philip Wyett edited Jorrits genesis for the youngsters to let
+          them know that comp.graphics.algoritms is a newsgroup.
+	- mdmkolbe tweaked the previous message change for compatibility with
+	  dialog boxes.
+	- David H. Bronke fixed an error in libs/csutil/eventhandlers.cpp
+	  where a const char* was being used as a csString.
+	- David H. Bronke committed a patch by lindquist to fix the CEGUI plugin
+	  for the latest SVN version of CEGUI.
+	- David H. Bronke added a missing #include to include/iengine/sector.h.
+	- res merged the ptmalloc branch.
+	  The main change is that an implementation of ptmalloc3 is used as
+	  the default memory allocator throughout CS (and also external
+	  projects).
+	  Use of ptmalloc can be disabled for the whole project by passing
+	  --enable-ptmalloc=no to configure, or defining CS_NO_PTMALLOC in
+	  include/csutil/win32/csconfig.h for MSVC.
+	  The platform-default memory allocation can be access by using the
+	  platform_malloc() etc. functions. CS' default allocator - ptmalloc3,
+	  or the platform's default, depending on the users choice - can be
+	  accessed by using cs_malloc() etc. All memory allocations in CS
+	  itself should use the cs_ functions.
+	  By default, malloc() etc. are overridden with the cs_malloc() etc.
+	  functions. To disable that for individual source files, define
+	  CS_NO_MALLOC_OVERRIDE	before including cssysdef.h.
+	  Likewise, new and delete are overridden to use cs_malloc()/cs_free()
+	  by default, this can be disabled by defining CS_NO_NEW_OVERRIDE
+	  before including cssysdef.h. This is useful to interface with some
+	  3rd party libraries that take ownership of pointers passed into the
+	  library (and later attempt to free it with the default allocator).
+19-Jun-2006
+	- Philip Wyett made Quick Start more explanatory for the CS newcomers.
+	- res changed csRectRegion to use a csArray<> for rectangle storage.
+	- res fixed fallout from the csRectRegion change.
+	- mdmkolbe converted the following plugins to the new SCF:
+	    - plugins/mesh/bezier/
+	    - plugins/mesh/fountain/
+	    - plugins/mesh/skeleton/
+	    - plugins/mesh/fire/
+	    - plugins/mesh/snow/
+	    - plugins/mesh/explo/
+	    - plugins/mesh/rain/
+	    - plugins/mesh/instmesh/
+	    - plugins/mesh/spiral/
+	    - plugins/mesh/spr2d/
+	    - plugins/mesh/emit/
+	- Jorrit fixed compilation of csGradient.
+        - Philip Wyett continued docs cleanup.
+        - Philip Wyett began adding more of the bundled CS applications with
+          basic descriptions to the application overview section of the
+          documentation.
+	- res changed the configure optimization flag detection to try
+	  -march=prescott before -march=i686 on Intel Macs.
+	- res excluded the custom new enabling/disabling headers from the
+	  master headers.
+18-Jun-2006
+        - Arianna fixed some warnings: size_t/uint conversions and some
+          deprecated method.
+	- mdmkolbe converted the remainder of of apps/ to the new SCF.
+	- Eric Sunshine performed project-wide spelling corrections:
+	    conveniance --> convenience
+	    conveniant	--> convenient
+	- res fixed spr2d's SetColor() to actually do something again.
+	- res added convenience includes to disable/enable CS' 'new' and
+	    'delete' overrides when the memtracker is enabled.
+	- res added some missing custom new re-enablings.
+	- res augmented the scfArray* classes with constructors that also take
+	  and SCF parent argument.
+	- res made an interface version iGradient of csGradient, so you can
+	  pass them across plugins.
+	- Philip Wyett changed his email address in docs. Changed 'written by'
+	  to 'originally written by' for Windows related documentation as I
+	  will no longer being working with the Windows codebase daily (as I
+	  have not done for a long time) and will be concentrating on Linux.
+	- Philip Wyett starts some maintenance work and changes to
+	  documentation.
+17-Jun-2006
+        - Piotr Obrzut fixed phystut crash on exit problem (when running
+          with bullet plugin)
+        - Piotr Obrzut fixes bullet plugin unused parameter/variable warnings
+	- mdmkolbe converted libs/csplugincommon/opengl to the new SCF.
+16-Jun-2006
+	- AndyDude fixed the MacOSX menu bug and launching in background bug.
+	- AndyDude changed the non-error CoreAudio messages to be not so
+	  'loud'. The two CoreAudio messages that I changed were Report()'d
+	  at very high severity levels, when it wasn't really that severe.
+	- res fixed msvcgen.jam to use the "common" directory to generate
+	  the relative path for icon resources, not the version-specific one.
+	- mdmkolbe fixed a few unused parameter warnings.
 15-Jun-2006
 	- thebolt fixed a bug in csQuaternion which caused matrix to
 	  quaternion to go wrong.
@@ -64,7 +2074,7 @@ chronological order.
 	- res updated spr2d to use new SCF.
 	- res changed configure to apply -fvisibility=hidden not only to C++
 	  but also to C sources.
-	- res changed the spr2d to use an iArray instead of a csArray for the 
+	- res changed the spr2d to use an iArray instead of a csArray for the
 	  "colored vertices".
 	- res changed csShaderVariable::GetType() to call the accessor if a
 	  value has not yet been set.
@@ -132,7 +2142,7 @@ chronological order.
 	  adds support for glow.
 	- Jorrit added new parallaxAtt shader from Erroroman.
 	- res changed "CS_STRICT_ALIGNMENT" from being defined on all but x86
-	  processors to be only defined on Sparc (where it was originally 
+	  processors to be only defined on Sparc (where it was originally
 	  needed).
 	- res fixed the GL renderer to repack csRGBcolor to an RGB bytestream
 	  on platforms that need it.
@@ -196,7 +2206,7 @@ chronological order.
 	- Marten fixed the quaternion class. The woman in flarge now looks
 	  normal, or at least as normal as before.
 30-May-2006
-	- res improved the debug facilities for the ATI_fragment_shader 
+	- res improved the debug facilities for the ATI_fragment_shader
 	  support in glshader_ps1.
 	- res changed glshader_ps1 to use a plugin namespace.
 	- res fixed the software canvases to properly flip alpha component
@@ -223,7 +2233,7 @@ chronological order.
 	  reject bogus "images" are needed.)
 	- res fixed a crash in the ddraw2d plugin when switching the double
 	  buffer mode while in a BeginDraw()/EndDraw().
-	- res changed fontplex to also use any available font server 
+	- res changed fontplex to also use any available font server
 	  automatically and not just those explicitly specified by the user.
 	  This behaviour is more like the other multiplexers.
 	- res changed picview so it really starts on the first file on startup
@@ -249,24 +2259,24 @@ chronological order.
 	  const refs instead of pointers of the values to write.
 	- res moved cssynldr to new SCF.
 27-May-2006
-	- res fixed the delimIgnoreDifferent mode for 
+	- res fixed the delimIgnoreDifferent mode for
 	  csStringArray::SplitString() to work as it should.
 	- res changed dsplex to new SCF.
 	- res changed dsplex to try each document system only once when
 	  parsing a document. This fixes the redundancy in error messages.
 	- res changed stdrep to show alert windows before splitting a message
-	  into multiple lines (so only one alert is visible per message and 
+	  into multiple lines (so only one alert is visible per message and
 	  not one per line of the message).
 	- res changed csVariant to store strings in iString*s rather than
 	  char*s, as outlined in bug #1388079.
 26-May-2006
-        - dfryer rearranged bitarray.h to avoid an ICE in Apple's gcc 3.3 
+        - dfryer rearranged bitarray.h to avoid an ICE in Apple's gcc 3.3
           build
 25-May-2006
 	- res removed the now-useless WinCVS tutorial from the manual.
 	- res changed some references to CVS in the manual to SVN and also
 	  updated some CVS-specific parts.
-	- res changed the jobber config to pass the 'quiet' flags to svn 
+	- res changed the jobber config to pass the 'quiet' flags to svn
 	  invocations.
 	- res changed the Win32 -[no]console stuff to respect user-specified
 	  redirects of the standard handles.
@@ -281,14 +2291,14 @@ chronological order.
 	- res added csBlockAllocator<>::FreeUninit() as a counterpart to
 	  csBlockAllocator<>::AllocUninit().
 	- res added CS::Memory::Heap which implements a separate memory heap
-	  (based on dlmalloc). If used properly, a separate heap can 
-	  significantly reduce fragmentation of the main application heap in 
+	  (based on dlmalloc). If used properly, a separate heap can
+	  significantly reduce fragmentation of the main application heap in
 	  case a lot of temporary mixed with non-temporary data is allocated.
 	- res made xmlshader more memory-friendly for shaders with lots of
 	  different variants.
 	- Jorrit fixed csHash so it compiles again.
 	- Jorrit did an optimization in genmesh lighting in case
-	  --fullbright is selected.	
+	  --fullbright is selected.
 	- Marten made a whole bunch of changes:
 	    - Added methods to csOBB to access the base matrix.
 	    - Rewrote csQuaternion a bit to make it more efficient and easier
@@ -298,7 +2308,7 @@ chronological order.
 	    - Added currentFrame number to iMeshObject::NextFrame and updated
 	      all mesh objects for the change.
 	    - Force csQsqrt/csQisqrt to be inlined.
-	    - Added one more version of CS::ForEach to work on normal arrays 
+	    - Added one more version of CS::ForEach to work on normal arrays
 	      instead of iterators.
 	    - Added a number of public typedefs to the standard containers to
 	      allow easier access of template parameters.
@@ -311,13 +2321,13 @@ chronological order.
 	- res fixed the xmlshader bug where programs in auxiliary files (ie
 	  included via a file attribute) did not work properly in some cases.
 	  The problem was that conditions in that file did not contribute to
-	  the main condition tree, ie a appeared that condition in an 
+	  the main condition tree, ie a appeared that condition in an
 	  auxiliary file but not the main shader file would not lead to more
 	  variants. Fixed by also parsing auxiliary files for conditions and
 	  adding those to the main condition tree.
-	- res fixed the double-typedefintion of csArray<>::ElementHandler et 
+	- res fixed the double-typedefintion of csArray<>::ElementHandler et
 	  al.
-        - acraig re-added the changes to the sprcal3d plugin to fix the 
+        - acraig re-added the changes to the sprcal3d plugin to fix the
           flipping of left and right on models.
 23-May-2006
 	- res fixed bugplug to properly accept commands via keys again.
@@ -335,22 +2345,22 @@ chronological order.
         - res fixed the xwin linking issues.
 	- res updated bindoc to use new SCF.
 	- res augmented bugplug to allow programmatic command execution (and
-	  not just via user input). Added new "bugplugcmd" command to 
+	  not just via user input). Added new "bugplugcmd" command to
 	  walktest.
-	- res renamed csMeasureTime to CS::MeasureTime and changed it to use 
+	- res renamed csMeasureTime to CS::MeasureTime and changed it to use
 	  csGetMicroTicks().
 	- res augmented csHash to allow specification of an allocator.
-	- res changed Memory::LocalBufferAllocator to have a templated 
+	- res changed Memory::LocalBufferAllocator to have a templated
 	  fallback allocator. Also improved detection of errorneous usage.
-	- res added a csArray constructor that allows custom initialization of 
+	- res added a csArray constructor that allows custom initialization of
 	  the allocator.
 	- res fixed gcc 3.4 compile errors after the array.h change.
 	- res fixed some gcc compile warnings.
 	- res moved AWS and AWS2 to plugins/gui/.
 19-May-2006
-        - res made the separate debug info and optimize mode debug info 
+        - res made the separate debug info and optimize mode debug info
           features toggleable via configure switches.
-	- res changed separate debug info only to be enabled by default 
+	- res changed separate debug info only to be enabled by default
 	  when binutils >= 2.16 are present.
 	- res changed the optimize mode debug info to only be enabled by
 	  default when separate debug info is enabled (since otherwise
@@ -372,7 +2382,7 @@ chronological order.
 	  widgets to compile properly when created directly or through XML,
 	  added a ListBox, a FileChooser widget, and is working on a ComboBox
 	  widget.
-	  He also added several icons to the AWS data file to help make the 
+	  He also added several icons to the AWS data file to help make the
 	  FileChooser pretty.
 	- Fossi also added terrainp to the vfs template as pointed out by eric
 15-May-2006
@@ -380,16 +2390,16 @@ chronological order.
 	  terrainf. Also made the lib files more standalone.
 14-May-2006
 	- Piotr Obrzut added support for pseudo instancing.
-	- Piotr Obrzut fixes compile warning/errors related to 
+	- Piotr Obrzut fixes compile warning/errors related to
           pseudo-instancing.
-	- Piotr Obrzut aplies patch from Lak_Moore: added check for 
-          valid references to 3D and 2D graphics plugins to 
-          csReporterListener::HandleEvent before trying to use them.  
-          Useful for console applications using the Standard Reporter 
-          plugin. 
+	- Piotr Obrzut aplies patch from Lak_Moore: added check for
+          valid references to 3D and 2D graphics plugins to
+          csReporterListener::HandleEvent before trying to use them.
+          Useful for console applications using the Standard Reporter
+          plugin.
 	- Philip Wyett added entries for Cal3D and lib3ds to external
 	  libraries section of manual.
-	- res fixed building of aws and the CEGUI stuff with memtracker 
+	- res fixed building of aws and the CEGUI stuff with memtracker
 	  enabled.
 	- res changed csBlockAllocator to disallow assignments and copy-
 	  constructing.
@@ -411,7 +2421,7 @@ chronological order.
 	  handler to the array element handler which more correctly belong
 	  to the latter.
 	- Adam updated the signpost event handlers to force full order even
-	  when they are only partially instantiated.  Also added by-name 
+	  when they are only partially instantiated.  Also added by-name
           GetID interface to iEventHandlerRegistry.
 	- Adam added a method to csPartialOrder to query an edge's presence.
 	- Adam added code to enforce ":pre"-then-":post" metahandler ordering
@@ -444,7 +2454,7 @@ chronological order.
 	- Jorrit fixed alpha fading in meshgen.
 	- Jorrit reverted an optimization which only recalculates
 	  the foliage density when the camera moves on x/z plane.
-	- caedes uploaded correct bump.cgvp for light_spec_bumpamp from 
+	- caedes uploaded correct bump.cgvp for light_spec_bumpamp from
 	  Erroroman.
 	- Jorrit added a forest to terrainf.
 	- Jorrit fixed the mesh generator so that it correctly fades
@@ -474,7 +2484,7 @@ chronological order.
 	- Erroroman added another rendering tehnique in shadowmap.xml.
 	- Erroroman added abillity light shadervars to override shader manager
 	  shadervars in generic render step.
-	- Erroroman fixed light_spec_bumpamp shader and added attenuation 
+	- Erroroman fixed light_spec_bumpamp shader and added attenuation
 	  support in it.
 	- Erroroman added r3dsmtest in vfs.cfg.template.
 5-May-2006
@@ -492,7 +2502,7 @@ chronological order.
 	  GetMaterialWrapper(), GetMixMode(), and SetMixMode().
 	- Jorrit removed SetMaterialWrapper(), SetMixMode() and related from:
 	    - iGeneralFactoryState
-	    - iHazeFactoryState 
+	    - iHazeFactoryState
 	    - iInstancingFactoryState
 	    - iLightningFactoryState
 	    - iSprite2DFactoryState
@@ -516,23 +2526,23 @@ chronological order.
 	- Christopher enhanced picview by having it actually tell you what it's
 	  doing.  While some may feel that this is a radical paradigm shift, he
 	  felt that taking the plunge was really worthwhile, and that everyone
-	  will be better off for it eventually.	
+	  will be better off for it eventually.
 4-May-2006
 	- Erroroman made the following:
 	    - Generic render step now handles light shader variables.
-	    - Lightiter render step shader variable for light world 
+	    - Lightiter render step shader variable for light world
 	      inverse transform.
-	    - Added param "subtexture" to iGraphics3D->SetRenderTarget, 
+	    - Added param "subtexture" to iGraphics3D->SetRenderTarget,
 	      that is used if texture is cubemap.
 	    - Added crystalspace.renderloop.step.shadowmap interface. It
-	      renders each direction to cubemap face. This is very usefull 
-	      for point lights. In future it will provide rendering to 2D 
-	      (depth) texture for spot lights. There are problems when 
+	      renders each direction to cubemap face. This is very usefull
+	      for point lights. In future it will provide rendering to 2D
+	      (depth) texture for spot lights. There are problems when
 	      rendering from light position - sometimes vis culler doesn't
 	      render some objects and their shadows are not visible/correct.
-	    - Added distance and shadowmap Cg shaders. At the moment there 
-	      is no depth texture support and depth coding/encoding is 
-	      made by fragment shaders, so fragment program support is 
+	    - Added distance and shadowmap Cg shaders. At the moment there
+	      is no depth texture support and depth coding/encoding is
+	      made by fragment shaders, so fragment program support is
 	      neccessary.
 	    - Added r3dsmtest level.
 	    - Added std_rloop_shadowmap.xml renderloop.
@@ -546,7 +2556,7 @@ chronological order.
           right.
 	- res fixed some more "no virtual dtor" warnings.
 	- Peter Amstutz added a try/catch block in material setup
-	  in the VOS plugin to handle some exceptional conditions that 
+	  in the VOS plugin to handle some exceptional conditions that
 	  would cause meshes to not be assigned any material at all.
 	- Jorrit did some small improvements to the engine API ref
 	  documentation.
@@ -570,7 +2580,7 @@ chronological order.
 	  working though.
 	- res re-added a SCF_IMPLEMENT_FACTORY to genmesh that somehow got
 	  lost.
-	- res fixed a gcc 4.1 compile fix to also work on Win32 with shared 
+	- res fixed a gcc 4.1 compile fix to also work on Win32 with shared
 	  libs.
 	- Jorrit fixed a cast error in genmesh which caused everything
 	  to crash.
@@ -578,10 +2588,10 @@ chronological order.
 	  of the function-based notification mechanism.
 	- res consolidated the various 1.0 API modifications somewhat to have
 	  less "Table of Contents spam".
-	- res fixed csbench, mazing and startme for the removal of some 
+	- res fixed csbench, mazing and startme for the removal of some
 	  methods from iGeneralMeshState.
 1-May-2006
-        - Arianna fixed some warning for MSVC 7.1 and some deprecated 
+        - Arianna fixed some warning for MSVC 7.1 and some deprecated
           function.
 	- Jorrit removed the simple output console in favor of the
 	  standard output console. There is no need to keep two consoles
@@ -598,7 +2608,7 @@ chronological order.
 	  crashes if the loader context is not given to the function.
 	  This fixes a crash in csbench.
 	- res tweaked the devapi doxygen settings a bit.
-	- res removed the "no virtual destructor" warning suppression on GCC4 
+	- res removed the "no virtual destructor" warning suppression on GCC4
 	- res re-activated the iBase virtual dtor.
 	- res changed a couple of meshes to not implement iPolygonMesh as an
 	  embedded interface but allocate it from the heap, to fix "abstract
@@ -653,7 +2663,7 @@ chronological order.
 	  high detail version of the object but the camera can see the
 	  low detail version.
 	- res attempted to tweak the configure "code generation flags" to
-	  work on Intel Macs. The minimum "-march=i586" conflicts with a 
+	  work on Intel Macs. The minimum "-march=i586" conflicts with a
 	  default setting of the compiler there, so use "-march=i686" on
 	  Apples.
 28-Apr-2006
@@ -691,7 +2701,7 @@ chronological order.
 27-Apr-2006
 	- Jorrit did a few more fixes to csMeshOnTexture. It finally starts
 	  to work now.
-	- Jorrit added a new conveniance method: csQueryRegistryOrLoad().
+	- Jorrit added a new convenience method: csQueryRegistryOrLoad().
 	  This method will first look for an interface in the object registry.
 	  If it is not there it will try to load the plugin and register
 	  that to the object registry.
@@ -699,7 +2709,7 @@ chronological order.
 	  Started work on the auto-fit version of ScaleCamera() too.
 26-Apr-2006
 	- Jorrit fixed a small bug in the csMeshOnTexture class.
-	- Jorrit fixed another small bug in the csMeshOnTexture class.	
+	- Jorrit fixed another small bug in the csMeshOnTexture class.
 	- Christopher began adding documentation for Aws2.  He also added
 	  the XML to Widget conversion function so that you can make interfaces
 	  in XML.  Also, he added the partedit2 data resources for Aws2.
@@ -729,7 +2739,7 @@ chronological order.
 	  This fixed (among other possible problems) bogus ambient values
 	  from the engine in the generic renderstep plugin.
 	- res fixed cspace.i to also ignore the _MSG deprecation macros.
-	- Christopher renamed iAws to iAws2 for AWS2 interfaces.  This fixes 
+	- Christopher renamed iAws to iAws2 for AWS2 interfaces.  This fixes
 	  a problem where the <crystalspace.h> include would die when including
 	  both sets of interfaces.
 23-Apr-2006
@@ -756,29 +2766,29 @@ chronological order.
 	  (two page long) error on top of the display when starting terrain
 	  on some systems.
 	- Christopher fixed a bug in AWS2 compositing, with help from res. He
-	  also committed a small change to the opengl screenshot mechanism 
-	  that inlcudes alpha values.  I'm sure this doesn't affect most 
-	  situations where screenshot is used, but it's VERY handy for 
+	  also committed a small change to the opengl screenshot mechanism
+	  that inlcudes alpha values.  I'm sure this doesn't affect most
+	  situations where screenshot is used, but it's VERY handy for
 	  procedural textures.
-	- Christopher added a new tool, partedit2.  Since he volunteered to 
-	  fix this app for AWS2, and since he wants to make sure that AWS2 
-	  works well with complicated applications needing sophisticated GUI 
-	  support, he has decided to start building this application now.  
-	  This will let him make sure that he's making something that will be 
-	  useful and reasonably simple to use.  This app compiles but 
+	- Christopher added a new tool, partedit2.  Since he volunteered to
+	  fix this app for AWS2, and since he wants to make sure that AWS2
+	  works well with complicated applications needing sophisticated GUI
+	  support, he has decided to start building this application now.
+	  This will let him make sure that he's making something that will be
+	  useful and reasonably simple to use.  This app compiles but
 	  currently does nothing at all useful.
 20-Apr-2006
 	- Jorrit added a patch from Frank which fixes the issue with an
 	  CG program failing but the technique using that CG program was
 	  still succeeding. This caused rendering errors in some
 	  situations.
-	- Christopher added SetMixMode to csPen and csMemoryPen.  He also 
-	  added SetMixMode to Pen in AWS2, and added several mixmodes as 
-	  constants.  This basically makes up the compositing functions in 
+	- Christopher added SetMixMode to csPen and csMemoryPen.  He also
+	  added SetMixMode to Pen in AWS2, and added several mixmodes as
+	  constants.  This basically makes up the compositing functions in
 	  AWS2.
 	- res fixed some doxygen comments.
 	- res fixed missing DLL exporting for some SndSys classes.
-        - dfryer added a patch from Simon Mihevc (G0thic) to enable mouse 
+        - dfryer added a patch from Simon Mihevc (G0thic) to enable mouse
           wheel events in the wxgl canvas
 19-Apr-2006
 	- Piotr Obrzut fixed moving instances in instmesh.
@@ -789,36 +2799,36 @@ chronological order.
 18-Apr-2006
 	- Jorrit restored the ambient to a dark value after iceeey changed
 	  it to a very bright value some time ago.
-	- Piotr Obrzut reverts his changes to instmeshes since they are bad 
+	- Piotr Obrzut reverts his changes to instmeshes since they are bad
 	  when someone deletes instances.
 	- res fixed res' inability to count bits as well as res' lack of cut-
 	  and-paste skill. Also reinstantiated caedes' fix for the point size
-	  in std_lighting.cscg since the rendering issues where due now-fixed 
+	  in std_lighting.cscg since the rendering issues where due now-fixed
 	  xmlshader bugs.
 17-Apr-2006
 	- res removed the now-obsolete sounddrivers and soundrenderers compile
 	  groups.
-	- res changed the doxygen configs to expand the 
+	- res changed the doxygen configs to expand the
 	  CS_EVENTHANDLER_NIL_CONSTRAINTS macro as defined.
-	- res fixed missing GUID_NULL symbols with Win32 shared library 
+	- res fixed missing GUID_NULL symbols with Win32 shared library
 	  builds.
 	- res fixed csjoywin issues with Win32 shared library builds.
 	- res fixed csArray to allow the compiler to not reserve dummy memory
 	  for empty allocator classes.
-	- res changed csArray so that the threshold logic is templated as 
+	- res changed csArray so that the threshold logic is templated as
 	  well.
 	- res made csBitArray more tweakable (csBitArray now inherits from a
-	  templated class csBitArrayTweakable that essentially contains the 
+	  templated class csBitArrayTweakable that essentially contains the
 	  logic).
 	- res added some methods to csBlockAllocator to allocate an object but
-	  don't construct it, free an object without destructing it, and a 
+	  don't construct it, free an object without destructing it, and a
 	  free method that does not assert on memory not from the allocator.
 	- res added a simple template "copy-on-write" variables.
 	- res changed the way the csHash<> internal arrays are declared a bit.
 	- res simplified SndSysBasicData::SetDescription().
 	- res tweaked the "VFS not found" message for OS/X.
 	- res corrected some statements in glfontcache.cpp.
-	- res changed the static class variable macros to not require the 
+	- res changed the static class variable macros to not require the
 	  member to be public.
 	- res added a MsvcExtraFile jamfile statement. Useful for e.g. adding
 	  .tok files to VC projects.
@@ -828,16 +2838,16 @@ chronological order.
 	  modes (with blend ops and alpha test flags).
 	- res removed superfluous definitions of CS_USE_ODE_EXTERN_C.
 	- res changed the sound system wav loader to utilize the function from
-	  csendian.h for endiannes handling. Also enclosed everything into a 
+	  csendian.h for endiannes handling. Also enclosed everything into a
 	  plugin namespace.
-	- res moved the "pooled SCF class" support over to a templated, 
+	- res moved the "pooled SCF class" support over to a templated,
 	  new SCF style implementation.
 	- res made various optimizations in xmlshader.
-        - Arianna fixed some warnings found compiling with MSVC 7.1 in 64-bits 
+        - Arianna fixed some warnings found compiling with MSVC 7.1 in 64-bits
           mode.
 	- res attempted to fix some gcc4.1 warnings.
 15-Apr-2006
-	- Piotr Obrzut fixed small bug in adding positions from map in meshgen.   
+	- Piotr Obrzut fixed small bug in adding positions from map in meshgen.
 	- Piotr Obrzut did some optimizations to meshgen.
 	- Adam added missing newlines (silences a gcc warning).
 	- Peter Amstutz fixed a bug in the csvosa3dl plugin whereby an object
@@ -846,7 +2856,7 @@ chronological order.
 14-Apr-2006
 	- caedes changed comment formatting on some shaders to be more parser
 	  friendly (specially some <?! !> to <!-- --> in std_lighting.xml).
-	- caedes changed <? include ?> to <? Include ?> at parallax.xml as 
+	- caedes changed <? include ?> to <? Include ?> at parallax.xml as
 	  the first seems deprecated.
 	- caedes fixed an error at std_lighting.cscg where state.point.size
 	  was incorrectly assigned to a variable.
@@ -854,10 +2864,10 @@ chronological order.
 	- Piotr Obrzut added feature to add positions from map in meshgenerator
 	  (still there are some problems with resolution probably).
 13-Apr-2006
-	- Piotr Obrzut added method for direct adding position for meshgen 
+	- Piotr Obrzut added method for direct adding position for meshgen
 	  geometry.
 12-Apr-2006
-	- Piotr Obrzut changed instmesh mixmode to alpha test (should be done 
+	- Piotr Obrzut changed instmesh mixmode to alpha test (should be done
           from xml somehow).
 	- Peter Amstutz updated the VOS plugin to take out a useless scaling
 	  check in voscube, and changed vospolygonmesh to load vertex normals
@@ -872,24 +2882,24 @@ chronological order.
 	  rolling texture on the slider, and fixed that too.
 	- Piotr Obrzut fixed bug with instmesh ligtning.
 	- Marten did some general warning fixes and formating cleanup. Please
-	  people, remember the CS code guidelines. Thhere's more to be done 
+	  people, remember the CS code guidelines. Thhere's more to be done
 	  later, be sure of that.
-11-Apr-2006 
-        - Piotr Obrzut fixed meshgen to delete instmeshes instances 
+11-Apr-2006
+        - Piotr Obrzut fixed meshgen to delete instmeshes instances
           when needed.
 9-Apr-2006
 	- Rhad renamed CS::Sound namespace to CS::SndSys for all SndSys
 	  sound system components. This naming is consistant with the
 	  rest of the newer sound system and distinguishes components of
 	  the new system from the old system.
-	- Rhad added the components in csplugincommon/sndsys/ to the 
+	- Rhad added the components in csplugincommon/sndsys/ to the
 	  CS::SndSys namespace.
 	- Rhad commented and cleaned up the CS::SndSys::Queue class.
 	- Marten did some more work on the lighter.
 	- Marten fixed a few do-not-compile-on-vc8 bugs.
 	- Marten made some improvements to csBox3 and csString.
 8-Apr-2006
-	- Rhad removed erroneous CS_PURE_METHOD specifier on 
+	- Rhad removed erroneous CS_PURE_METHOD specifier on
 	  csMouseEventHelper::GetEventData.
 	- Rhad made more updates to the sound system:
 	  - Cleaned up excess useless comments in iSndSysSoftwareDriver
@@ -912,9 +2922,9 @@ chronological order.
 	    data base classes.
 	  - Fixed gcc4.1 reported warnings in the sound system.
 	- Fossi reverted the remove of polymesh from brute because it is
-	  still used by ODE. So this will need to wait until a new 
+	  still used by ODE. So this will need to wait until a new
 	  collidertype for heightmaps is added.
-	- Fossi added backup of paging former. Should work, but with 
+	- Fossi added backup of paging former. Should work, but with
           severe artifacts. No test level yet.
 	- Piotr Obrzut changed instmesh vertices transforms to look right.
 	- Piotr Obrzut optimized moving instances for instmesh.
@@ -944,7 +2954,7 @@ chronological order.
 	- acraig updated sprcal3d for changes in Cal3d that fixes orientation
 	  issues when loading a model.  Also updated the configure.ac file for
 	  the more recent check on cal3d.
-5-Apr-2006      
+5-Apr-2006
 	- Piotr Obrzut changed terrain collider to be more optimized for
 	  smaller 'other' colliders. Terrain colliders are now on.
 	- Luca added the csHashReversible::PutUnique method, so that the
@@ -963,13 +2973,13 @@ chronological order.
 	  performance.  Added functionality to the dock so that certain
 	  events are forwarded to widgets in certain dock locations.
 	- Christopher made pens able to render into a texture for AWS2.
-	  He also added a Level widget, which currently has some 
+	  He also added a Level widget, which currently has some
 	  problems due to the procedural texture bug.
 29-Mar-2006
-	- Fossi fixed bruteblock's SetMaterial(Alpha)Map to work as 
+	- Fossi fixed bruteblock's SetMaterial(Alpha)Map to work as
 	  previously. But since handling of materials is done in the
 	  Formers now, their methods should be preferred over bruteblocks.
-	- Christopher Nelson fixed the bug where text was appearing in the 
+	- Christopher Nelson fixed the bug where text was appearing in the
 	  wrong place.  He also fixed the problem with one of the test
 	  windows not having filled shapes.
 	- Fossi made the samplers actually return the right resolution for
@@ -977,8 +2987,8 @@ chronological order.
   	- Christopher Nelson added a texture object to AWS2, and turned the
 	  texturing option on in csPen.  He also fixed some texture-related
 	  bugs.  Now any shape that csPen can draw can also be textured.
-        - Piotr Obrzut updated terrain formers cd test (works but it is very 
-          slow) - not active by default 
+        - Piotr Obrzut updated terrain formers cd test (works but it is very
+          slow) - not active by default
         - Christopher Nelson made linear gradients render into a texture.
         - Christopher Nelson added csGradient4, which handles alphas and
 	  csColor4's and renders into csRGBpixel.  He also made AWS2 use this
@@ -996,15 +3006,15 @@ chronological order.
 	  all shapes.  There is currently no way to specify custom texture
 	  coordinates.  Textures mapped to a triangle shape will probably
 	  not look right.  He also added csMemoryPen, which is the AWS2
-	  caching layer for drawing.  AWS2 now subclasses from this pen.  
-	  The current skin was updated for the changes to the drawing layer.  
+	  caching layer for drawing.  AWS2 now subclasses from this pen.
+	  The current skin was updated for the changes to the drawing layer.
 	  A Gradient object was added to AWS2, but it's currently not much
 	  use.  Eventually the gradient object will be used to create a
 	  texture which can be mapped to a shape for more complex gradients.
 27-Mar-2006
 	- Eric Sunshine fixed outdated information in CS/INSTALL document.
 26-Mar-2006
-	- Piotr Obrzut makes his changes to cs cd system silent. He also 
+	- Piotr Obrzut makes his changes to cs cd system silent. He also
 	  adds code for real fix of the problem (not yet finished).
 	- caedes made the following changes to cspace.i:
 	    - Added includes to be able to access shader variables.
@@ -1031,7 +3041,7 @@ chronological order.
 	    - Cleaned up member variable naming conventions on most components
 	      and added more comments.
 	    - The sound system now 'keeps time' internally in frame count
-	      instead of milliseconds.  This should simplify the flow and 
+	      instead of milliseconds.  This should simplify the flow and
 	      reduce/eliminate drift.
 	    - Added a 'compressor' class (unused for now) to ultimately
 	      contain the logic for sound buffer normalization.
@@ -1040,8 +3050,8 @@ chronological order.
 	  generated VC projects.
 	- res moved the CS-specific defines for VC projects out of the
 	  project templates into the template customization code.
-	- Fossi moved the material and alphamap handling from bruteblock 
-	  into the formers. 
+	- Fossi moved the material and alphamap handling from bruteblock
+	  into the formers.
 	- res added a "nomanifest" option for applications to inhibit
 	  manifest generation on Win32/for VC projects.
 	- res changed the msvcgen well-known compile group setup to only
@@ -1058,7 +3068,7 @@ chronological order.
 19-Mar-2006
 	- Vincent added 'shared' option to cs.spec for RPM using shared lib.
 	- Vincent added missing 'partsys' parameter to startme.cfg.
-	- Anders added PerformExtension support for 3d renderers, and 
+	- Anders added PerformExtension support for 3d renderers, and
 	  backface culling control to shaders.
 16-Mar-2006
 	- Fossi added support for non-square regions to terrain formers.
@@ -1068,7 +3078,7 @@ chronological order.
 	  macros, and migrated the four ProcessFrameEventDispatcher flavors
 	  to schedule themselves around the signposts instead of each other.
 15-Mar-2006
-	- Piotr Obrzut added float4x4 array maping with arrays of csVector4 
+	- Piotr Obrzut added float4x4 array maping with arrays of csVector4
 	  arrays to cg shader plugin.
 	- Fossi added some more interface changes for the new terrain CD.
 14-Mar-2006
@@ -1078,7 +3088,7 @@ chronological order.
 	  factories either through iMeshFactoryWrapper->CreateMeshWrapper()
 	  or the loader will also do it if you create meshobjects
 	  from factories from XML.
-	- Piotr Obrzut changed his previous float4x4 maping to be more 
+	- Piotr Obrzut changed his previous float4x4 maping to be more
 	  intuitive.
 13-Mar-2006
 	- Vincent fixed 'jam install' so that it also installs terrainf *.lib,
@@ -1096,7 +3106,7 @@ chronological order.
 	  names.
 11-Mar-2006
 	- Vincent changed sound drivers to use namespaces.
-	- Piotr Obrzut added float4x4 maping with 4 csVector4's in cg 
+	- Piotr Obrzut added float4x4 maping with 4 csVector4's in cg
           shader plugin
 	- Peter Amstutz changed the way the VOS plugin synchronized
 	  network updates to object in the CS engine.  This should fix some
@@ -1107,9 +3117,9 @@ chronological order.
 	  for events.
 10-Mar-2006
 	- Dan changed M_PI to PI in pen.cpp since it msvc 7.0 didn't like
-	  it. Also fixed a typo in pen.h in a function declaration, and 
+	  it. Also fixed a typo in pen.h in a function declaration, and
 	  fixed a truncation warning from double to float.
-	- Christopher added the parent property and Broadcast function 
+	- Christopher added the parent property and Broadcast function
 	  to Widgets, and the CheckBox, RadioButton, Window, ResizeKnob,
 	  StatusBar, and ToolTip widgets.
 9-Mar-2006
@@ -1136,10 +3146,10 @@ chronological order.
 	  object so that scripts can send output to the console.  The
 	  ScrollBar is essentially complete, the only thing lacking is
 	  proportional scrolling, and handling correct redraw when the range
-	  is something other than (min>0,max<infinity).   
+	  is something other than (min>0,max<infinity).
 7-Mar-2006
 	- Christopher added the basic event system to AWS2, and completed the
-	  required features for the Pen object.  Christopher also added a 
+	  required features for the Pen object.  Christopher also added a
 	  clock widget and started to implement mouse events for widgets. He
 	  also corrected a silly bug in the widget::Contains function that
 	  would cause children to never be resolved as the mouse container.
@@ -1202,7 +3212,7 @@ chronological order.
 	  to load AWS2 again, and added some test files to the data portion
 	  of the repository.  To see the new changes, uncomment the define in
 	  awstest_config.h
-	- res revamped the Win32 shared library Jam code to handle the 
+	- res revamped the Win32 shared library Jam code to handle the
 	  massive amount of object files libcrystalspace contains.
 	- res fixed some classes for proper DLL exporting.
 	- res made shared libs install properly.
@@ -1210,7 +3220,7 @@ chronological order.
 	  GNU/Linux, gcc 3.4.4.
 	- res fixed a couple of shared lib issues.
 2-Mar-2006
-	- Fossi commited another backup of the paging terrain.
+	- Fossi committed another backup of the paging terrain.
 	- Fossi copied priority 50 to terrain_fixed_base, so that terrain
 	  does at least show on old hardware.
 	- Jorrit fixed iObjectRegistryIterator so that it doesn't skip the
@@ -1266,13 +3276,13 @@ chronological order.
 28-Feb-2006
 	- Jorrit fixed csStringArray::SplitString() with option delimIgnore
 	  so that it actually does what it is advertized to do.
-	- Jorrit commited the workarounds for CG related problems on some
+	- Jorrit committed the workarounds for CG related problems on some
 	  3d cards. This should fix disco effects on terrainf, incorrect
 	  point sprites and incorrect portals. Note that these are
 	  workarounds! We need real fixes.
         - Daniel Fryer committed fixes for Mac mouse events (using wrong
           constants for buttons) and for OSXGetDirs.cpp (missing a slash in
-          path names).  Mouse fixes required moving mouse button enum from 
+          path names).  Mouse fixes required moving mouse button enum from
           event.h to evdefs.h
 27-Feb-2006
 	- Erroroman added new iSkeleton interface (still not usable).
@@ -1315,18 +3325,18 @@ chronological order.
 	- Marten added a const iteartor to csArray.
 	- Marten added another version of ForEach function.
 	- Marten added some getters to csBox.
-	- res enabled generation of Python-related VC projects. (Not in any 
+	- res enabled generation of Python-related VC projects. (Not in any
 	  workspace by default.)
 	- res fixed an issue in the Python bindings where _csWrapPtr_to_Python
-	  would store the iBase pointer and and not the queried interface 
+	  would store the iBase pointer and and not the queried interface
 	  pointer. Later, the store pointer would be statically cast to the
 	  desired interface pointer, which does not work with the iBase*.
 	- res added csApplicationFramework::OnCommandLineHelp().
 	- res modernized pysimp.
 23-Feb-2006
-	- caedes commited a patch he prepared with rhohr that fixes the python 
-	  SetupEventHandler, the python event handler itself and the python 
-	  tutorials. All this was broken since last event system changes. Now 
+	- caedes committed a patch he prepared with rhohr that fixes the python
+	  SetupEventHandler, the python event handler itself and the python
+	  tutorials. All this was broken since last event system changes. Now
 	  python only cs apps can again be made.
 22-Feb-2006
 	- Jorrit added a version of iEngine->GetNearbyMeshes() that works
@@ -1345,21 +3355,21 @@ chronological order.
 	- res fixed xmlshader to not throw an assertion on external programs.
 	- Jorrit added GF 6600 to the driver database so that it doesn't
 	  use point sprites.
-	- Fossi moved iObjectModel from igeom to imesh and changed 
+	- Fossi moved iObjectModel from igeom to imesh and changed
 	  includes accordingly to prepare for the terrain CD.
 	- Fossi missed some includes in the first try...
-	- Peter Amstutz fixed a longstanding (but elusive) bug in 
-	  csKDTree where the static allocators could sometimes 
-	  themselves be destructed in the wrong order, causing a 
+	- Peter Amstutz fixed a longstanding (but elusive) bug in
+	  csKDTree where the static allocators could sometimes
+	  themselves be destructed in the wrong order, causing a
 	  crash when the program exits.
 19-Feb-2006
-	- Piotr Obrzut removed unecesery and wrong conditions checks while 
+	- Piotr Obrzut removed unecesery and wrong conditions checks while
 	  seting autodisable params in ode dynamics system.
 	- res changed the image loaders to employ the CS_PLUGIN_NAMESPACE_*
 	  macros for namespaces.
 	- res converted imgplex to new SCF.
 	- res changed the VC templates to use /O2 instead of /Ox. Also fixed
-	  the whole program optimization setting to work in VC8. 
+	  the whole program optimization setting to work in VC8.
 18-Feb-2006
 	- res fixed xmlshader so nested conditions and logic expressions
 	  actually work.
@@ -1407,7 +3417,7 @@ chronological order.
 	- res fixed stdrep to properly handle newlines in messages to report.
 	- res converted stdrep to new SCF.
 	- res simplified the condition culling code in xmlshader.
-	- res changed the "template", "endtemplate" and "include" shader 
+	- res changed the "template", "endtemplate" and "include" shader
 	  processing instructions to "Template", "Endtemplate" and "Include".
 	  The idea is to distinguish them visually from "if" etc (which have
 	  somewhat different instructions).
@@ -1416,8 +3426,8 @@ chronological order.
 	- res fixed a bug in xmlshader where the overlap of two value sets
 	  was computed wrong.
 15-Feb-2006
-	- Erroroman added support for 'checkelementcount' option in genmesh 
-	  factory loader (omits a warning when the element count of a 
+	- Erroroman added support for 'checkelementcount' option in genmesh
+	  factory loader (omits a warning when the element count of a
 	  custom buffer does not match the vertex count).
 	- res fixed csFinite() compilation on MinGW with -ansi -pedantic.
 	- Jorrit fixed a bug in csSector and meshgen. It was casting
@@ -1425,12 +3435,12 @@ chronological order.
 	  right inheritance structure. This caused meshgen's to not
 	  destruct properly (i.e. crash).
 14-Feb-2006
-	- Piotr Obrzut fixes bugs he left after adding support for different 
+	- Piotr Obrzut fixes bugs he left after adding support for different
 	  sized maps in simple terraformer.
 	- Jorrit fixed compile errors in simpleformer.
 	- res added a csFinite() function to wrap the platform-dependent
 	  way to check for the finiteness of a floating point value.
-	- res worked around an issue in xmlshader where the condition 
+	- res worked around an issue in xmlshader where the condition
 	  result check failed to work (ultimatively leading to consumption of
 	  huge amounts of memory). The issue was caused by gcc apparently
 	  performing an unexpected cast.
@@ -1442,11 +3452,11 @@ chronological order.
 	- Marten started cleaning up the namespace mess. Not finished yet.
 	- Eric Sunshine fixed 'jam install' so that it also installs the
 	  CS/data/flarge/factories directory.
-	- res tweaked the softrenderer & softshader to more appropriately use 
+	- res tweaked the softrenderer & softshader to more appropriately use
 	  "bool"s instead of "int"s for some template parameters.
 	- res fixed some VC8 warnings occuring with enabled memtracker.
 	- res added macros to reduce typing for plugin namespaces.
-	- res changed the way XMLshader detects redundant conditions. 
+	- res changed the way XMLshader detects redundant conditions.
 	  Basically, for each possible outcome of some condition, the ranges
 	  of values a shader variable can take is stored, and a condition is
 	  checked whether it is definitely true or definitely false, based on
@@ -1479,7 +3489,7 @@ chronological order.
 	  std_rloop_terrain to "terrain splat" so it is more consistent
 	  with std_rloop_terrainfixed renderloop.
         - Daniel Fryer fixed compile error in cursor plugin
-7-Feb-2006 
+7-Feb-2006
 	- Piotr Obrzut fixed a bug in dynamics system colliders reported
 	  by CAOZANE. Setting offset for sphere collider wasn't working right
 	  when collider was attached to body.
@@ -1487,7 +3497,7 @@ chronological order.
 	- Erroroman added support for light shader variables in loader.
         - Daniel Fryer fixed compile error in CoreAudio driver
 6-Feb-2006
-	- Piotr Obrzut reverts back his changes in protomesh related to index 
+	- Piotr Obrzut reverts back his changes in protomesh related to index
 	  buffer creation as previous resolution was right.
 	- Erroroman fixed creating quaterion from matrix
 	- res committed a patch from Andres to annotate.php, to make it work
@@ -1498,7 +3508,7 @@ chronological order.
 	  differing maximum numbers of texture coordinate sets and texture
 	  image units.
 5-Feb-2006
-	- Marten fixed the lighter2 after last refactoring. Running lighter2 
+	- Marten fixed the lighter2 after last refactoring. Running lighter2
 	  on cornell level should now work out-of-the-box. Still work to do to
 	  make it work on other levels and more features.
 	- res added routines to get descriptions for DirectX error codes to
@@ -1509,7 +3519,7 @@ chronological order.
 	- Jorrit did a small fix to the documentation with regards
 	  to the removed iThingState->GetFactory().
 4-Feb-2006
-	- Piotr fixed small bug in protmesh when index_buffer is created 
+	- Piotr fixed small bug in protmesh when index_buffer is created
 	  (csTriangle attributes are stored as int not unsigned int)
 	- Jorrit changed the driver database to disable point sprites
 	  for ATI on Linux. The particles are miniscule.
@@ -1552,9 +3562,9 @@ chronological order.
 	- Jorrit fixed a big bug in portal container introduced yesterday.
 	  The problem was an uninitialized radius variable causing havoc
 	  in portal culling.
-	- rvl_ removed logical bug in his code (that was trying to clear 
+	- rvl_ removed logical bug in his code (that was trying to clear
 	  stencil in ClosePortal() on hardware where stencil is not available)
-	  Portal flags coversion was added to make renderer portal code 
+	  Portal flags coversion was added to make renderer portal code
 	  independent of engine stuff.
 	- res fixed a VC7 compile error in Marten's static typechecking.
 	- res made the VC _byteswap_* functions intrinsic.
@@ -1578,11 +3588,11 @@ chronological order.
 	  mdl2spr.
 	- res changed wxtest to use RequestPlugins() to load the WX canvas.
 29-Jan-2006
-	- rvl_ corrected portal logic of opengl renderer to handle 
-	  rendering to target correctly. Some code logic/style was 
+	- rvl_ corrected portal logic of opengl renderer to handle
+	  rendering to target correctly. Some code logic/style was
 	  changed as advised by res.
 	  Removed dependence on engine headers (portal.h) from opengl &
-	  software renderers. Version of iGraphics3D was bumped up 
+	  software renderers. Version of iGraphics3D was bumped up
 	  according to past OpenPortal/ClosePortal changes.
 	- Marten added some static type-checking to SCF.
 	- Marten fixed VC8 compatibility for rvl_s latest commit.
@@ -1601,7 +3611,7 @@ chronological order.
 	- res added support for specular lighting to vproc_std.
 	- res added support for color sum to softshader.
 	- res changed the fatloop to use new SCF.
-	- res changed lights to have their specular color the same as the 
+	- res changed lights to have their specular color the same as the
 	  diffuse color by default.
 	- res revived csVertexListWalker<>, albeit with a slightly different
 	  purpose: it now converts the data inside a render buffer to some
@@ -1622,11 +3632,11 @@ chronological order.
 	- Jorrit removed a few asserts in waterdemo which caused it to crash.
 	- res fixed the Win32 and (blindly) OS/X port to set the correct
 	  event info on FocusGained/FocusLost events.
-	- res restored the waterdemo asserts (since the real cause is fixed 
+	- res restored the waterdemo asserts (since the real cause is fixed
 	  now).
 	- res worked around a crash on exit that occured when the csVFS
 	  object gets released before all VFS files get.
-	- res added a missing SCF_INTERFACE to iDebugGraph. Absence of 
+	- res added a missing SCF_INTERFACE to iDebugGraph. Absence of
 	  SCF_INTERFACE in an interface causes weirdness at runtime.
 	- res made csColliderActor::InitializeColliders() tolerate a 0 mesh.
 25-Jan-2006
@@ -1734,14 +3744,14 @@ chronological order.
 	- res changed csparser to not have a hardcoded model loader list.
 	- res made some warning fixes.
 	- res fixed a gl3d crash when no canvas is present.
-	- res fixed gl3d to properly activate buffers from a holder bound to 
+	- res fixed gl3d to properly activate buffers from a holder bound to
 	  the secondary color.
 	- res changed the xmlshader plugin to not have buffer mappings for
-	  the color, normal and texcoord buffers by default. While conveniant,
+	  the color, normal and texcoord buffers by default. While convenient,
 	  it could also result in subtle performance issues, e.g. when a
 	  buffer is autobound that has to be calculated relatively expensively
 	  by a buffer getter, yet is not used in the actual shader (e.g. Thing
-	  vertex colors, which are often not used). In this context, requiring 
+	  vertex colors, which are often not used). In this context, requiring
 	  an explicit mapping of all buffers seems the better approach - you
 	  can see if you forgot a mapping, but may never notice if you waste
 	  cycles because of an autobound buffer you don't need.
@@ -1809,12 +3819,12 @@ chronological order.
 	- Rhad added basic thread priority adjustment to the csThread interface
 	  and implementations.
 21-Jan-2006
-	- rvl_ changed iGraphics3D::OpenPortal(...) to give a render 
-	  plugin more information about portal's properties (flags). 
-	  Portal flags are stored in 'clipportal_stack' member of 
-	  render plugins (opengl, soft3d). iGraphics3D::ClosePortal() 
-	  is called without parameters now. 
-	  Corresponding changes were made in engine code (portalcontainer, 
+	- rvl_ changed iGraphics3D::OpenPortal(...) to give a render
+	  plugin more information about portal's properties (flags).
+	  Portal flags are stored in 'clipportal_stack' member of
+	  render plugins (opengl, soft3d). iGraphics3D::ClosePortal()
+	  is called without parameters now.
+	  Corresponding changes were made in engine code (portalcontainer,
 	  fat renderloop) and render plugins code (null, opengl, soft3d).
 	- Jorrit fixed a very big memory leak in the engine. All objects
 	  that would use software dynamic lighting (like genmesh by
@@ -1824,7 +3834,7 @@ chronological order.
 	- res added an option to the GM loader to omit a warning when the
 	  element count of a custom buffer does not match the vertex count
 	  (there is the odd legitimate use for that).
-	- res added support for index buffers to 
+	- res added support for index buffers to
 	  csTextSyntaxService->ParseBuffer().
 	- res took the "no texture mappings" warning out of xmlshader.
 20-Jan-2006
@@ -1902,7 +3912,7 @@ chronological order.
 	  missing. Now the factory material is really optional.
 	- Jorrit added a new md2 loader for spr3d. This will help replace
 	  the model importing system.
-	- Jorrit added a new iModelLoader interface. This is a conveniance
+	- Jorrit added a new iModelLoader interface. This is a convenience
 	  interface that some loading plugins can implement. This makes it
 	  easier to create a mesh factory from a model file. Currently
 	  this is implemented by the new gmesh3ds and spr3md2 plugins.
@@ -1946,15 +3956,15 @@ chronological order.
 	  submeshes or else Compress() should not be called at all.
 	- res made the following changes:
 	    - Fixed a VC warning in collider.cpp.
-	    - Added scfImplementation::operator=() which does nothing. The 
+	    - Added scfImplementation::operator=() which does nothing. The
 	      compiler-generated operator would be unsuitable.
-	    - Copy constructor for scfImplementation which triggers an 
-	      assertion. The compiler-generated constructor would be 
+	    - Copy constructor for scfImplementation which triggers an
+	      assertion. The compiler-generated constructor would be
 	      unsuitable.
 	    - Changed iBinaryLoaderPlugin::Parse() to take an iDataBuffer*
 	      instead of a pointer and a size.
 	    - The scfImplementation::operator=() addition allows the removal
-	      of the less than beautiful "scfRefCount = 1" in 
+	      of the less than beautiful "scfRefCount = 1" in
 	      csCamera::Clone().
 	- Peter Amstutz added support for setting gravity and collision
 	  detection policies for sectors in the csvosa3dl plugin.
@@ -1970,7 +3980,7 @@ chronological order.
 	  a specific type of mesh depending on a material.
 	- Jorrit added a elapsed time cap to csColliderActor to prevent
 	  falling through terrain in case of very slow fps.
-	- res added csStringBase& csStringBase::operator= (const 
+	- res added csStringBase& csStringBase::operator= (const
 	  csStringBase&) to allow assignment of a csStringBase& to another
 	  csStringBase&.
 	- mdmkolbe fixed multiple declarations of 'struct dirent' in the
@@ -1985,13 +3995,13 @@ chronological order.
 	- mdmkolbe fixed some compile errors in the Swig bindings
 	  that happen when compiling with a separate build directory.
 15-Jan-2006
-	- rhad added two missing interface declarations for software sound 
-	  source types. The lack of these could cause SCF_QUERY_INTERFACE 
+	- rhad added two missing interface declarations for software sound
+	  source types. The lack of these could cause SCF_QUERY_INTERFACE
 	  to return a non-null pointer cast as an incorrect interface.
 	- rhad made some updates to the oss software sound driver so
 	  that it respects byte order requests from the renderer.
 	- rhad made some updates to the mac coreaudio software sound driver
-	  so that it respects byte order requests from the renderer. 
+	  so that it respects byte order requests from the renderer.
 	  (and shouldn't crash now).  Mac changes are untested even for
 	  compilation as I don't own a Mac, sorry! :(
 14-Jan-2006
@@ -2024,7 +4034,7 @@ chronological order.
 9-Jan-2006
         - res dropped the VC project generation for VC6 and added generation
           for VC7.1 and VC8.
-	- res dropped the "ExtensiveMemDebug" VC project build configuration, 
+	- res dropped the "ExtensiveMemDebug" VC project build configuration,
 	  but added they (probably more useful) MemoryTracker and RefTracker
 	  configurations.
 	- res changed the MemoryTracker and RefTracker VC project build
@@ -2051,11 +4061,11 @@ chronological order.
 	- Marten removed some warning-disable #pragmas for VC, and
 	  cleaned up the warnins instead.
 5-Jan-2006
-        - Arianna fixed some warnings in MSVC 7.1 (64bits) related to 
+        - Arianna fixed some warnings in MSVC 7.1 (64bits) related to
           size_t int conversions.
 4-Jan-2006
 	- res updated the driver DB tweak against terrainf corruption on ATIs
-	  to also include older drivers (Cat 4.8, as reported by Vasily 
+	  to also include older drivers (Cat 4.8, as reported by Vasily
 	  Rudnikov).
 	- mdmkolbe fixed some more unused parameter warnings.
 3-Jan-2006
@@ -2117,7 +4127,7 @@ chronological order.
 	  optimizations to do and then the mesh generator has to be modified
 	  to work with it.
 	- Oktal fixed compilation on Cygwin.
-	- res fixed the "darkness" of the std_lighting_detail_alpha and 
+	- res fixed the "darkness" of the std_lighting_detail_alpha and
 	  std_lighting_detail_alpha_scroll shaders, inspired by a different
 	  fix from Vasily Rudnikov.
 27-Dec-2005
@@ -2142,7 +4152,7 @@ chronological order.
 	- res fixed the fat RL to propagate the light specular color.
 	- res added some specularity to simplelights.zip. Shiiiney!
 25-Dec-2005
-        - res fixed a crash in xmlshader when retrieving metadata from a 
+        - res fixed a crash in xmlshader when retrieving metadata from a
           fallback shader that itself did not have validated techniques.
 	- res updated the DDS plugin to use new SCF.
 	- res added a SR technique for the "lighting_vproc" shader.
@@ -2150,7 +4160,7 @@ chronological order.
 	- Jorrit optimized meshgen lod handling considerably.
 	- Jorrit optimized meshgen alpha handling considerably.
 	- res added support to gl3d for uploading DXT-compressed textures even
-	  if the S3TC ext is not present (since some DRI drivers support that, 
+	  if the S3TC ext is not present (since some DRI drivers support that,
 	  but don't expose the ext since their implmentation is not conformant
 	  in other aspects).
 23-Dec-2005
@@ -2333,7 +4343,7 @@ chronological order.
         - BigG Removed unnecessary call to Texture Manager in sndtest.cpp
         - BigG modified g2d.cpp - csGraphics2DDDraw3::PerformExtensionV to
           meet code standards. Removed unused variables.
-	- caedes commited changes to pysimp script, as he forgot after fixing
+	- caedes committed changes to pysimp script, as he forgot after fixing
 	  it on 15-Dec-2005.
 	- Jorrit continued work on the mesh generator. Still not functional.
 	  Removed the iMeshGeneratorMapping interface.
@@ -3327,7 +5337,7 @@ chronological order.
 	  AWS2.
 27-Sep-2005
 	- Jorrit added csTransform::GetUp(), GetFront(), and GetRight().
-	  These three conveniance functions get the up, front, and right
+	  These three convenience functions get the up, front, and right
 	  vectors in 'other' space. They are very efficient.
 	- Jorrit fixed the loader so it is no longer an error if the
 	  sound loader is not present. Sounds will simply be ignored then.
@@ -3410,7 +5420,7 @@ chronological order.
 	  scfFakeInterface<If> by having scfFakeInterface<> inherit from If,
 	  to make things work again until Marten can take a look.
 	- res removed csDataStream since it overlapped with csMemFile; the
-	  conveniance functions have been moved to csFileReadHelper.
+	  convenience functions have been moved to csFileReadHelper.
 	- res moved csVideoPreferences into the simpvs app.
 	- mdmkolbe fixed some inheritance ambiguity warnings due to virtual
 	  inheritance from iBase.
@@ -4136,7 +6146,7 @@ chronological order.
 	  members to 0.
 	- res changed the names of the "STANDARD_LIGHT_0_FOO" shader variables
 	  to "light 0 foo".
-	- Marten commited recent work to the lighter. It is right now added
+	- Marten committed recent work to the lighter. It is right now added
 	  as lighter2 but later it will replace the current ligter. Also
 	  applied older changes to old lighter.
 	- Marten added two helpers which operates on iDocument* structures
@@ -5086,7 +7096,7 @@ chronological order.
 	      center. Now shifted correct by trial and error.
 26-May-2005
 	- Piotr Obrzut added getters for joint feedback information to
-	  strict ode joints.	
+	  strict ode joints.
 	- Jorrit did a small optimization to bruteblock.
 	- Jorrit fixed a bug in the OpenGL renderer introduced by Anders
 	  on 17-Jul-2004. For some strange reason he set the number of
@@ -6447,15 +8457,15 @@ chronological order.
 	  following.  Formats for floats and strings were not changed.
 	    int i; unsigned u;
 	    printf("%d %X %u", i, i, u);
-	    ...	
+	    ...
 	    short s; unsigned short us;
 	    long l; unsigned long l;
 	    printf("%hd %hu %ld %lu", s, us, l, ul);
-	    ...	
+	    ...
 	    uint32 u32; size_t size; ptrdiff_t diff; int a, b; bool b;
 	    printf("%" PRId32 " %zu %td %td %d",
 	      u32, size, diff, &a - &b, (int) b);
-	    ...	
+	    ...
 	    intptr_t ip; int *p;
 	    printf("%p %p", ip, p);
 	- Eric Sunshine rewrote some bogus logic in the "well formed integer"
@@ -10290,7 +12300,7 @@ chronological order.
 	- Luca fixed a little compilation error (in xmlshader) that was
 	  happening on the VisualC++ 6.0 "compiler".
 	- Squee fixed a problem in OpenGL canvases where alpha colors didn't
-	  always blend as expected.	
+	  always blend as expected.
 14-Oct-2004
 	- Eric Sunshine added an AAlib (ASCII Art library) check to
 	  configure.ac. If the package is present, then the CS `asciiart'

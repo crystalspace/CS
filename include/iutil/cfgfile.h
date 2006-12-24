@@ -26,9 +26,9 @@
  * @{ */
 #include "csutil/scf_interface.h"
 #include "csutil/ref.h"
+
 struct iConfigIterator;
 struct iVFS;
-
 
 /**
  * Configuration file interface.
@@ -119,6 +119,8 @@ struct iConfigFile : public virtual iBase
    * value (Def parameter) will be used if the key was not found.
    */
   virtual bool GetBool (const char *Key, bool Def = false) const = 0;
+  /// Get a tuple set from the configuration.
+  virtual csPtr<iStringArray> GetTuple(const char *Key) const = 0;
   /// Get the comment of the given key, or 0 if no comment exists.
   virtual const char *GetComment (const char *Key) const = 0;
 
@@ -130,6 +132,8 @@ struct iConfigFile : public virtual iBase
   virtual void SetFloat (const char *Key, float Value) = 0;
   /// Set a boolean value.
   virtual void SetBool (const char *Key, bool Value) = 0;
+  /// Set a tuple value.
+  virtual void SetTuple (const char *Key, iStringArray* Value) = 0;
   /**
    * Set the comment for given key.  In addition to an actual comment, you can
    * use "" for Text to place an empty comment line before this key, or 0 to
@@ -152,7 +156,7 @@ struct iConfigFile : public virtual iBase
  */
 struct iConfigIterator : public virtual iBase
 {
-  SCF_INTERFACE(iConfigIterator, 2,0,0);
+  SCF_INTERFACE(iConfigIterator, 2,1,0);
   /// Returns the configuration object for this iterator.
   virtual iConfigFile *GetConfigFile () const = 0;
   /// Returns the subsection in the configuration.
@@ -162,6 +166,9 @@ struct iConfigIterator : public virtual iBase
   virtual void Rewind () = 0;
   /// Move to the next valid key. Returns false if no more keys exist.
   virtual bool Next() = 0;
+  /// Return whether there is another valid key.
+  virtual bool HasNext() = 0;
+
 
   /**
    * Get the current key name.  Set Local to true to return only the local name
@@ -178,6 +185,8 @@ struct iConfigIterator : public virtual iBase
   virtual const char *GetStr () const = 0;
   /// Get a boolean value from the configuration.
   virtual bool GetBool () const = 0;
+  /// Get a tuple set from the configuration.
+  virtual csPtr<iStringArray> GetTuple() const = 0;
   /// Get the comment of the given key, or 0 if no comment exists.
   virtual const char *GetComment () const = 0;
 };

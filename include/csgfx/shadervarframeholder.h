@@ -40,7 +40,7 @@ class CS_CRYSTALSPACE_EXPORT csShaderVariableFrameHolder
   /// Actual holder
   csFrameDataHolder<csRef<csShaderVariable> > svCache;
   /// Allocator for variables
-  csShaderVarBlockAlloc svAlloc;
+  csShaderVarBlockAlloc<> svAlloc;
   
   /// Allocate new
   csRef<csShaderVariable> AllocFrameSv (uint framenr);

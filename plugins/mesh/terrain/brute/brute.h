@@ -30,6 +30,7 @@
 #include "csutil/list.h"
 #include "csutil/refarr.h"
 #include "csutil/sysfunc.h"
+#include "csutil/scf_implementation.h"
 #include "csutil/thread.h"
 #include "csutil/weakref.h"
 #include "iengine/lightmgr.h"
@@ -112,7 +113,7 @@ public:
 public:
   csTerrBlock (csTerrainObject *terr);
   ~csTerrBlock ();
-
+  
   /// Load data from Former
   void LoadData ();
 
@@ -122,11 +123,14 @@ public:
   /// Detach the node from the tree
   void Detach ();
 
+  /// Set all child neighbours that equal a to b
+  void ReplaceChildNeighbours(csTerrBlock *a, csTerrBlock *b);
+
   /// Split block in 4 children
-  void Split ();
+  bool Split ();
 
   /// Merge block
-  void Merge ();
+  bool Merge ();
 
   /// Checks if something needs to be merged or split
   void CalcLOD ();
@@ -144,90 +148,6 @@ public:
   bool IsMaterialUsed (int index);
 };
 
-
-#if 0
-// The block builder is not currently used.
-class csBlockBuilder : public csRunnable
-{
-private:
-  csTerrainObject* terr;
-  csList< csRef<csTerrBlock> > pendingbuilds;
-  int buildcount;
-  int refcount;
-  bool run;
-  csRef<csCondition> processlock;
-  csRef<csMutex> listlock;
-
-  void Process ()
-  {
-    while (true)
-    {
-      csRef<csTerrBlock> block;
-      if (listlock->LockWait ())
-      {
-        if (pendingbuilds.IsEmpty ())
-          break;
-
-        block = pendingbuilds.Last ();
-        pendingbuilds.PopBack ();
-        listlock->Release ();
-      }
-
-      if (block->GetRefCount ()>1)
-        block->SetupMesh ();
-    }
-  }
-
-public:
-
-  csBlockBuilder::csBlockBuilder (csTerrainObject *t)
-  {
-    processlock = csCondition::Create ();
-    listlock = csMutex::Create ();
-    run = true;
-    terr = t;
-    refcount = 1;
-    buildcount = 0;
-  }
-
-  virtual csBlockBuilder::~csBlockBuilder ()
-  {
-  }
-
-  virtual void Run ()
-  {
-    listlock->LockWait ();
-    while (run)
-    {
-      processlock->Wait (listlock);
-      listlock->Release ();
-      if (!run)
-        break;
-      Process ();
-    }
-  }
-
-  void BuildBlock (csTerrBlock *block)
-  {
-    if (listlock->LockWait ())
-    {
-      pendingbuilds.PushFront (block);
-      listlock->Release ();
-      processlock->Signal ();
-    }
-  }
-
-  void Stop ()
-  {
-    run = false;
-    processlock->Signal ();
-  }
-
-  virtual void IncRef() {refcount++;}
-  virtual void DecRef() {refcount--;}
-  virtual int GetRefCount() {return refcount;}
-};
-#endif
 
 /**
  * An array giving shadow information for a pseudo-dynamic light.
@@ -294,9 +214,6 @@ private:
   float block_minsize;
   int block_res;
 
-  //csBlockBuilder *builder;
-  csRef<csThread> buildthread;
-
   csRef<iTerraFormer> terraformer;
 
   //bool use_singlemap;
@@ -342,6 +259,7 @@ private:
   * mesh, the LOD meshes, normals, ...
   */
   void SetupObject ();
+  csTerrainObject *neighbor[4];
 
   //=============
   // Lighting.
@@ -363,12 +281,23 @@ private:
   void UpdateColors (iMovable* movable);
   //=============
 
+  bool LODCalc;
+
 public:
   CS_LEAKGUARD_DECLARE (csTerrainObject);
 
   /// Constructor.
   csTerrainObject (iObjectRegistry* object_reg, csTerrainFactory* factory);
   virtual ~csTerrainObject ();
+
+  /// Set the neighbor above (1 on Z axis) (For use in combining multiple brute meshes)
+  void SetTopNeighbor(iTerrainObjectState *top);
+  /// Set the neighbor to the right (1 on X axis) (For use in combining multiple brute meshes)
+  void SetRightNeighbor(iTerrainObjectState *right);
+  /// Set the neighbor to the left (-1 on X axis) (For use in combining multiple brute meshes)
+  void SetLeftNeighbor(iTerrainObjectState *left);
+  /// Set the neighbor below (-1 on Z axis) (For use in combining multiple brute meshes)
+  void SetBottomNeighbor(iTerrainObjectState *bottom);
 
   const csDirtyAccessArray<csColor>& GetStaticColors () const
   {
@@ -428,6 +357,7 @@ public:
   int CollisionDetect (iMovable *m, csTransform *p);
 
   void GetObjectBoundingBox (csBox3& bbox);
+  const csBox3& GetObjectBoundingBox ();
   void SetObjectBoundingBox (const csBox3& bbox);
   void GetRadius (float& rad, csVector3& cent);
 
@@ -563,8 +493,6 @@ public:
   /** @} */
 };
 
-#include "csutil/win32/msvc_deprecated_warn_on.h"
-
 /**
 * Factory for terrain.
 */
@@ -580,6 +508,7 @@ private:
   iMeshObjectType* brute_type;
 
   csFlags flags;
+  csBox3 obj_bbox;
 
 public:
   CS_LEAKGUARD_DECLARE (csTerrainFactory);
@@ -624,71 +553,14 @@ public:
 
   virtual csFlags& GetFlags () { return flags; }
 
-#if 0
-  class eiTerrainFactoryState : public iTerrainFactoryState
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csTerrainFactory);
-    virtual void SetTerraFormer (iTerraFormer* form)
-    {
-      scfParent->SetTerraFormer (form);
-    }
-
-    virtual iTerraFormer* GetTerraFormer ()
-    {
-      return scfParent->GetTerraFormer ();
-    }
-
-    virtual void SetSamplerRegion (const csBox2& region)
-    {
-      scfParent->SetSamplerRegion (region);
-    }
-
-    virtual const csBox2& GetSamplerRegion ()
-    {
-      return scfParent->GetSamplerRegion ();
-    }
-
-    virtual bool SaveState (const char* /*filename*/)
-    {
-      return true;
-    }
-    virtual bool RestoreState (const char* /*filename*/)
-    {
-      return true;
-    }
-  } scfiTerrainFactoryState;
-
-  friend class eiTerrainFactoryState;
-#endif
-
   /**\name iObjectModel implementation
    * @{ */
   iTerraFormer* GetTerraFormerColldet () { return terraformer; }
   void GetObjectBoundingBox (csBox3& /*bbox*/) { }
+  const csBox3& GetObjectBoundingBox () { return obj_bbox; }
   void SetObjectBoundingBox (const csBox3& /*bbox*/) { }
   void GetRadius (float& /*rad*/, csVector3& /*cent*/) { }
   /** @} */
-#if 0
-  class eiObjectModel : public csObjectModel
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csTerrainFactory);
-    virtual void GetObjectBoundingBox (csBox3& /*bbox*/)
-    {
-      //scfParent->GetObjectBoundingBox (bbox);
-    }
-    virtual void SetObjectBoundingBox (const csBox3& /*bbox*/)
-    {
-      //scfParent->SetObjectBoundingBox (bbox);
-    }
-    virtual void GetRadius (float& /*rad*/, csVector3& /*cent*/)
-    {
-      //scfParent->GetRadius (rad, cent);
-    }
-    virtual iTerraFormer* GetTerraFormerColldet ()
-    { return scfParent->terraformer; }
-  } scfiObjectModel;
-  friend class eiObjectModel;
-#endif
 
   virtual iObjectModel* GetObjectModel () { return this; }
   virtual bool SetMaterialWrapper (iMaterialWrapper*) { return false; }
@@ -697,18 +569,20 @@ public:
   virtual uint GetMixMode () const { return 0; }
 };
 
+#include "csutil/win32/msvc_deprecated_warn_on.h"
+
 /**
 * TerrFunc type. This is the plugin you have to use to create instances
 * of csTerrainFactory.
 */
-class csTerrainObjectType : public iMeshObjectType
+class csTerrainObjectType :
+  public scfImplementation2<csTerrainObjectType,
+    iMeshObjectType, iComponent>
 {
 private:
   iObjectRegistry *object_reg;
 
 public:
-  SCF_DECLARE_IBASE;
-
   /// Constructor.
   csTerrainObjectType (iBase*);
   /// Destructor.
@@ -717,13 +591,8 @@ public:
   /// create a new factory.
   virtual csPtr<iMeshObjectFactory> NewFactory ();
 
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csTerrainObjectType);
-    virtual bool Initialize (iObjectRegistry* p)
-    { scfParent->object_reg = p; return true; }
-  } scfiComponent;
-  friend struct eiComponent;
+  virtual bool Initialize (iObjectRegistry* p)
+  { this->object_reg = p; return true; }
 };
 
 }

@@ -311,7 +311,7 @@ bool csCommandProcessor::perform (const char* cmd, const char* arg)
 
   if (!csStrCaseCmp (cmd, "quit"))
   {
-    csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
+    csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (object_reg));
     if (q)
       q->GetEventOutlet()->Broadcast (csevQuit (object_reg));
   }
@@ -360,7 +360,7 @@ bool csCommandProcessor::perform (const char* cmd, const char* arg)
   else if (!csStrCaseCmp (cmd, "lod"))
   {
     csRef<iPluginManager> plugin_mgr (
-    	CS_QUERY_REGISTRY (object_reg, iPluginManager));
+    	csQueryRegistry<iPluginManager> (object_reg));
     csRef<iMeshObjectType> type (CS_QUERY_PLUGIN_CLASS (plugin_mgr,
     	"crystalspace.mesh.object.sprite.3d", iMeshObjectType));
     csVariant lod_level;
@@ -373,7 +373,7 @@ bool csCommandProcessor::perform (const char* cmd, const char* arg)
   else if (!csStrCaseCmp (cmd, "sprlight"))
   {
     csRef<iPluginManager> plugin_mgr (
-    	CS_QUERY_REGISTRY (object_reg, iPluginManager));
+    	csQueryRegistry<iPluginManager> (object_reg));
     csRef<iMeshObjectType> type (CS_QUERY_PLUGIN_CLASS (plugin_mgr,
     	"crystalspace.mesh.object.sprite.3d", iMeshObjectType));
     csVariant lqual;
@@ -473,7 +473,7 @@ bool csCommandProcessor::perform (const char* cmd, const char* arg)
 bool csCommandProcessor::start_script (const char* scr)
 {
   bool ok = false;
-  csRef<iVFS> v (CS_QUERY_REGISTRY (object_reg, iVFS));
+  csRef<iVFS> v (csQueryRegistry<iVFS> (object_reg));
   if (v)
   {
     if (v->Exists (scr))

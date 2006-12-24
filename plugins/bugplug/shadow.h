@@ -21,6 +21,7 @@
 
 #include "csgeom/box.h"
 #include "csutil/flags.h"
+#include "csutil/scf_implementation.h"
 #include "imesh/objmodel.h"
 #include "imesh/object.h"
 #include "ivideo/graph3d.h"
@@ -29,6 +30,7 @@ struct iEngine;
 struct iMeshWrapper;
 struct iCamera;
 
+#include "csutil/win32/msvc_deprecated_warn_off.h"
 
 /**
  * BugPlug is the hiding place for many dark creatures. While Spider only
@@ -45,7 +47,8 @@ struct iCamera;
  * This mesh object follows another mesh object and it will render a bounding
  * box for that object.
  */
-class csShadow : public iMeshObject
+class csShadow :
+  public scfImplementation2<csShadow, iMeshObject, iObjectModel>
 {
 private:
   iMeshWrapper* logparent;
@@ -54,6 +57,7 @@ private:
   bool do_rad;	// Show bounding sphere.
   csFlags flags;
   iCamera* keep_camera;
+  csBox3 bbox;
 
 public:
 
@@ -101,7 +105,11 @@ public:
   void GetObjectBoundingBox (csBox3& bbox)
   {
     bbox.Set (-100000, -100000, -100000, 100000, 100000, 100000);
-    return;
+  }
+  const csBox3& GetObjectBoundingBox ()
+  {
+    bbox.Set (-100000, -100000, -100000, 100000, 100000, 100000);
+    return bbox;
   }
   void SetObjectBoundingBox (const csBox3&) { }
   void GetRadius (float& rad, csVector3& cent)
@@ -109,8 +117,6 @@ public:
     rad = 200000;
     cent.Set (0,0,0);
   }
-
-  SCF_DECLARE_IBASE;
 
   virtual iMeshObjectFactory* GetFactory () const { return 0; }
   virtual csFlags& GetFlags () { return flags; }
@@ -132,42 +138,21 @@ public:
   virtual iMeshWrapper* GetMeshWrapper () const { return logparent; }
 
   //------------------------- iObjectModel implementation ----------------
-  class ObjectModel : public iObjectModel
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csShadow);
-    virtual long GetShapeNumber () const { return 1; }
-    virtual iPolygonMesh* GetPolygonMeshBase () { return 0; }
-    virtual iPolygonMesh* GetPolygonMeshColldet () { return 0; }
-    virtual iTerraFormer* GetTerraFormerColldet () { return 0; }
-    virtual void SetPolygonMeshColldet (iPolygonMesh*) { }
-    virtual iPolygonMesh* GetPolygonMeshViscull () { return 0; }
-    virtual void SetPolygonMeshViscull (iPolygonMesh*) { }
-    virtual iPolygonMesh* GetPolygonMeshShadows () { return 0; }
-    virtual void SetPolygonMeshShadows (iPolygonMesh*) { }
-    virtual csPtr<iPolygonMesh> CreateLowerDetailPolygonMesh (float)
-    { return 0; }
-    virtual void GetObjectBoundingBox (csBox3& bbox)
-    {
-      scfParent->GetObjectBoundingBox (bbox);
-    }
-    virtual void SetObjectBoundingBox (const csBox3& bbox)
-    {
-      scfParent->SetObjectBoundingBox (bbox);
-    }
-    virtual void GetRadius (float& rad, csVector3& cent)
-    {
-      scfParent->GetRadius (rad, cent);
-    }
-    virtual void AddListener (iObjectModelListener*)
-    {
-    }
-    virtual void RemoveListener (iObjectModelListener*)
-    {
-    }
-  } scfiObjectModel;
-  friend class ObjectModel;
+  virtual long GetShapeNumber () const { return 1; }
+  virtual iPolygonMesh* GetPolygonMeshBase () { return 0; }
+  virtual iPolygonMesh* GetPolygonMeshColldet () { return 0; }
+  virtual iTerraFormer* GetTerraFormerColldet () { return 0; }
+  virtual void SetPolygonMeshColldet (iPolygonMesh*) { }
+  virtual iPolygonMesh* GetPolygonMeshViscull () { return 0; }
+  virtual void SetPolygonMeshViscull (iPolygonMesh*) { }
+  virtual iPolygonMesh* GetPolygonMeshShadows () { return 0; }
+  virtual void SetPolygonMeshShadows (iPolygonMesh*) { }
+  virtual csPtr<iPolygonMesh> CreateLowerDetailPolygonMesh (float)
+  { return 0; }
+  virtual void AddListener (iObjectModelListener*) { }
+  virtual void RemoveListener (iObjectModelListener*) { }
 
-  virtual iObjectModel* GetObjectModel () { return &scfiObjectModel; }
+  virtual iObjectModel* GetObjectModel () { return this; }
   virtual bool SetColor (const csColor&) { return false; }
   virtual bool GetColor (csColor&) const { return false; }
   virtual bool SetMaterialWrapper (iMaterialWrapper*) { return false; }
@@ -181,5 +166,7 @@ public:
    */
   virtual void PositionChild (iMeshObject* /*child*/, csTicks /*current_time*/) { }
 };
+
+#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 #endif // __CS_SHADOW_H__

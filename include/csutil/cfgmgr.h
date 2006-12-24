@@ -20,7 +20,7 @@
 #define __CS_CFGMGR_H__
 
 /**\file
- * Implementation for iConfigManager 
+ * Implementation for iConfigManager
  */
 
 #include "csextern.h"
@@ -37,8 +37,8 @@ class csConfigManagerIterator;
  * appear to be a single configuration object.  See the description of the
  * iConfigManager interface for full details.
  */
-class CS_CRYSTALSPACE_EXPORT csConfigManager 
-  : public scfImplementation2<csConfigManager, 
+class CS_CRYSTALSPACE_EXPORT csConfigManager
+  : public scfImplementation2<csConfigManager,
                               iConfigManager,
                               scfFakeInterface<iConfigFile> >
 {
@@ -115,7 +115,7 @@ public:
    * registered, then false is returned.
    */
   virtual bool SetDynamicDomain(iConfigFile*);
-  /** 
+  /**
    * Return a pointer to the dynamic configuration domain.  The returned
    * pointer will remain valid as long as the domain is registered with the
    * configuration manager.
@@ -209,6 +209,8 @@ public:
   virtual const char *GetStr(const char *Key, const char *Def = "") const;
   /// Get a boolean value from the configuration.
   virtual bool GetBool(const char *Key, bool Def = false) const;
+  /// Get a tuple set from the configuration.
+  virtual csPtr<iStringArray> GetTuple(const char *Key) const;
   /// Get the comment of the given key, or 0 if no comment exists.
   virtual const char *GetComment(const char *Key) const;
 
@@ -220,6 +222,8 @@ public:
   virtual void SetFloat (const char *Key, float Value);
   /// Set a boolean value.
   virtual void SetBool (const char *Key, bool Value);
+  /// Set a tuple value.
+  virtual void SetTuple (const char *Key, iStringArray* Value);
   /**
    * Set the comment for given key.  In addition to an actual comment, you can
    * use "" for Text to place an empty comment line before this key, or 0 to

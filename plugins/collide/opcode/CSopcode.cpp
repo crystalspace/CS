@@ -43,15 +43,6 @@ CS_IMPLEMENT_PLUGIN
 CS_PLUGIN_NAMESPACE_BEGIN(csOpcode)
 {
 
-SCF_IMPLEMENT_IBASE (csOPCODECollideSystem)
-  SCF_IMPLEMENTS_INTERFACE (iCollideSystem)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csOPCODECollideSystem::Component)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 SCF_IMPLEMENT_FACTORY (csOPCODECollideSystem)
 
 using namespace Opcode;
@@ -86,10 +77,9 @@ void csOPCODECollideSystem::OpcodeReportV (int severity, const char* message,
     severity, "crystalspace.collisiondetection.opcode", message, args);
 }
 
-csOPCODECollideSystem::csOPCODECollideSystem (iBase *pParent)
+csOPCODECollideSystem::csOPCODECollideSystem (iBase *pParent) :
+  scfImplementationType(this, pParent)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
   TreeCollider.SetFirstContact (false);
   TreeCollider.SetFullBoxBoxTest (false);
   TreeCollider.SetFullPrimBoxTest (false);
@@ -101,8 +91,6 @@ csOPCODECollideSystem::csOPCODECollideSystem (iBase *pParent)
 
 csOPCODECollideSystem::~csOPCODECollideSystem ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
-  SCF_DESTRUCT_IBASE ();
   rep_object_reg = 0;
 }
 
@@ -195,7 +183,7 @@ void csOPCODECollideSystem::CopyCollisionPairs (csOPCODECollider* col1,
 }
 bool csOPCODECollideSystem::Collide (
   csOPCODECollider* col1, const csReversibleTransform* trans1,
-  csTerraFormerCollider* terraformer)
+  csTerraFormerCollider* terraformer, const csReversibleTransform* trans2)
 {
   ColCache.Model0 = col1->m_pCollisionModel;
   terraformer->UpdateOPCODEModel (trans1->GetOrigin (), col1->GetRadius ());
@@ -224,6 +212,28 @@ bool csOPCODECollideSystem::Collide (
   col1->transform.m[3][1] = u.y;
   col1->transform.m[3][2] = u.z;
 
+
+  if (trans1) m1 = trans2->GetT2O ();
+
+  u = m1.Row1 ();
+  terraformer->transform.m[0][0] = u.x;
+  terraformer->transform.m[1][0] = u.y;
+  terraformer->transform.m[2][0] = u.z;
+  u = m1.Row2 ();
+  terraformer->transform.m[0][1] = u.x;
+  terraformer->transform.m[1][1] = u.y;
+  terraformer->transform.m[2][1] = u.z;
+  u = m1.Row3 ();
+  terraformer->transform.m[0][2] = u.x;
+  terraformer->transform.m[1][2] = u.y;
+  terraformer->transform.m[2][2] = u.z;
+
+  if (trans1) u = trans2->GetO2TTranslation ();
+  else u.Set (0, 0, 0);
+  terraformer->transform.m[3][0] = u.x;
+  terraformer->transform.m[3][1] = u.y;
+  terraformer->transform.m[3][2] = u.z;
+
   bool isOk = TreeCollider.Collide (ColCache, &col1->transform,
   	&terraformer->transform);
   if (isOk)
@@ -248,11 +258,11 @@ bool csOPCODECollideSystem::Collide (
   // csPrintf( " we are in Collide \n");
   if (collider1->GetColliderType () == CS_TERRAFORMER_COLLIDER && 
     collider2->GetColliderType () == CS_MESH_COLLIDER)
-    return Collide ((csOPCODECollider*)collider2, trans2, (csTerraFormerCollider*)collider1);
+    return Collide ((csOPCODECollider*)collider2, trans2, (csTerraFormerCollider*)collider1, trans1);
     
   if (collider2->GetColliderType () == CS_TERRAFORMER_COLLIDER && 
     collider1->GetColliderType () == CS_MESH_COLLIDER)
-    return Collide ((csOPCODECollider*)collider1, trans1, (csTerraFormerCollider*)collider2);
+    return Collide ((csOPCODECollider*)collider1, trans1, (csTerraFormerCollider*)collider2, trans2);
 
   csOPCODECollider* col1 = (csOPCODECollider*) collider1;
   csOPCODECollider* col2 = (csOPCODECollider*) collider2;

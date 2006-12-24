@@ -619,7 +619,7 @@ void csMouseDriver::Reset ()
 iKeyboardDriver* csMouseDriver::GetKeyboardDriver()
 {
   if (Keyboard == 0)
-    Keyboard = CS_QUERY_REGISTRY(Registry, iKeyboardDriver);
+    Keyboard = csQueryRegistry<iKeyboardDriver> (Registry);
   return Keyboard;
 }
 
@@ -782,7 +782,7 @@ void csJoystickDriver::Reset ()
 iKeyboardDriver* csJoystickDriver::GetKeyboardDriver()
 {
   if (Keyboard == 0)
-    Keyboard = CS_QUERY_REGISTRY(Registry, iKeyboardDriver);
+    Keyboard = csQueryRegistry<iKeyboardDriver> (Registry);
   return Keyboard;
 }
 

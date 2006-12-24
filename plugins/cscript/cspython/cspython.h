@@ -45,6 +45,7 @@ public:
   virtual bool HandleEvent(iEvent&);
   virtual bool RunText(const char *Text);
   virtual bool LoadModule(const char *Text);
+  virtual bool LoadModule (const char *path, const char *name);
   virtual bool Store(const char* name, void* data, void* tag);
 
   /*

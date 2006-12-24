@@ -43,8 +43,11 @@ public:
   /// Initialize a color object (contents undefined)
   csColor () { }
   /// Initialize a color object with given R,G,B components
-  csColor (float r, float g, float b)
-  { red = r; green = g; blue = b; }
+  csColor (float r, float g, float b) : red (r), green (g), blue (b)
+  {}
+  /// Initialize a color object with same content in R,G,B components
+  csColor (float v) : red (v), green (v), blue (v)
+  {}
   /// Initialize a color object with an existing color
   csColor (const csColor& c)
   { red = c.red; green = c.green; blue = c.blue; }
@@ -67,6 +70,11 @@ public:
     if (red < 0) red = 0;
     if (green < 0) green = 0;
     if (blue < 0) blue = 0;
+  }
+  /// Check if color is all black (red green and blue all 0)
+  bool IsBlack () const
+  {
+    return (red == 0 && green == 0 && blue == 0);
   }
   /// Assign one color object to another.
   csColor& operator= (const csColor& c)
@@ -116,6 +124,22 @@ inline csColor operator* (const csColor& v1, const csColor& v2)
   		  v1.green * v2.green,
 		  v1.blue * v2.blue);
 }
+
+
+/// Multiply a color by a scalar value.
+inline csColor operator* (const csColor& s, float f)
+{ csColor c (s); c *= f; return c; }
+
+/// Multiply a scalar value by a color.
+inline csColor operator* (float f, const csColor& s)
+{ csColor c (s); c *= f; return c; }
+
+/// Add two colors.
+inline csColor operator+ (const csColor& s1, const csColor& s2)
+{ csColor c (s1); c += s2; return c; }
+/// Subtract two colors.
+inline csColor operator- (const csColor& s1, const csColor& s2)
+{ csColor c (s1); c -= s2; return c; }
 
 /**
  * A class used to represent a color in RGBA space.
@@ -217,19 +241,32 @@ public:
   }
 };
 
+
+/// Divide a color by a scalar.
+inline csColor4 operator/ (const csColor4& v, float f)
+{ f = 1.0f/f; return csColor4(v.red*f, v.green*f, v.blue*f); }
+/// Multiply two colors.
+inline csColor4 operator* (const csColor4& v1, const csColor4& v2)
+{
+  return csColor4 (v1.red * v2.red,
+    v1.green * v2.green,
+    v1.blue * v2.blue);
+}
+
+
 /// Multiply a color by a scalar value.
-inline csColor operator* (const csColor& s, float f)
-{ csColor c (s); c *= f; return c; }
+inline csColor4 operator* (const csColor4& s, float f)
+{ csColor4 c (s); c *= f; return c; }
 
 /// Multiply a scalar value by a color.
-inline csColor operator* (float f, const csColor& s)
-{ csColor c (s); c *= f; return c; }
+inline csColor4 operator* (float f, const csColor4& s)
+{ csColor4 c (s); c *= f; return c; }
 
 /// Add two colors.
-inline csColor operator+ (const csColor& s1, const csColor& s2)
-{ csColor c (s1); c += s2; return c; }
+inline csColor4 operator+ (const csColor4& s1, const csColor4& s2)
+{ csColor4 c (s1); c += s2; return c; }
 /// Subtract two colors.
-inline csColor operator- (const csColor& s1, const csColor& s2)
-{ csColor c (s1); c -= s2; return c; }
+inline csColor4 operator- (const csColor4& s1, const csColor4& s2)
+{ csColor4 c (s1); c -= s2; return c; }
 
 #endif // __CS_CSCOLOR_H__

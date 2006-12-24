@@ -30,11 +30,7 @@
 
 #include "csutil/scf.h"
 
-// hack: work around problems caused by #defining 'new'
-#if defined(CS_EXTENSIVE_MEMDEBUG) || defined(CS_MEMORY_TRACKER)
-# undef new
-#endif
-#include <new>
+#include "csutil/custom_new_disable.h"
 
 /**
  * Derive an SCF implementation from this class to have it pooled.
@@ -92,7 +88,7 @@ public:
       while (pool != 0)
       {
 	Entry* n = pool->next;
-	free (pool);
+	cs_free (pool);
       #ifdef CS_MEMORY_TRACKER
         mtiUpdateAmount (mti, -1, 
           -int(sizeof (scfClassType) + sizeof (Entry)));
@@ -121,23 +117,21 @@ public:
     }
     else
     {
-      newEntry = (PoolEntry*)malloc (sizeof (PoolEntry) + n);
+      newEntry = static_cast<PoolEntry*> (cs_malloc (n));
     #ifdef CS_MEMORY_TRACKER
       if (p.mti == 0)
       {
-        p.mti = mtiRegisterAlloc (sizeof (PoolEntry) + n, 
-          typeid (Pool).name());
+        p.mti = mtiRegisterAlloc (n, typeid (Pool).name());
       }
       else
-        mtiUpdateAmount (p.mti, 1, int (sizeof (PoolEntry) + n));
+        mtiUpdateAmount (p.mti, 1, (int)n);
     #endif
     }
     p.allocedEntries++;
-    scfClassType* newInst = 
-      (scfClassType*)((uint8*)newEntry + sizeof (PoolEntry));
+    scfClassType* newInst = reinterpret_cast<scfClassType*> (newEntry);
     /* A bit nasty: set scfPool member of the (still unconstructed!) 
      * instance... */
-    ((scfPooledImplementationType*)newInst)->scfPool = &p;
+    static_cast<scfPooledImplementationType*> (newInst)->scfPool = &p;
     return newInst;
   }
 
@@ -146,16 +140,15 @@ public:
   inline void operator delete (void* instance, Pool& p) 
   {
     typedef typename Pool::Entry PoolEntry;
-    // Go from instance to pool entry pointer
-    PoolEntry* entry = (PoolEntry*)((uint8*)instance - sizeof (PoolEntry));
+    PoolEntry* entry = static_cast<PoolEntry*> (instance);
     entry->next = p.pool;
     p.pool = entry;
     p.allocedEntries--;
   }
   inline void operator delete (void* instance) 
   {
-    scfClassType* object = (scfClassType*)instance;
-    Pool& p = *(((scfImplementationPooled*)object)->scfPool);
+    scfClassType* object = static_cast<scfClassType*> (instance);
+    Pool& p = *(static_cast<scfImplementationPooled*> (object)->scfPool);
     scfImplementationPooled::operator delete (object, p);
   }
   //@}
@@ -165,7 +158,6 @@ public:
   {
     if (this->scfRefCount == 1)
     {
-      //this->operator delete (this->scfObject, *scfPool);
       delete this->scfObject;
       return;
     }
@@ -197,5 +189,7 @@ public:
 };
 
 /** @} */
+
+#include "csutil/custom_new_enable.h"
 
 #endif // __CS_UTIL_POOLEDSCFCLASS_H__

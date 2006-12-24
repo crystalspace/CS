@@ -33,7 +33,7 @@ class MyOwnData : public scfImplementationExt1<MyOwnData, csObject,
 	scfFakeInterface<MyOwnData> >
 @{
 private:
-  int my_data_int;
+  int myDataInt;
 
 public:
   SCF_INTERFACE (MyOwnData, 1, 0, 0);
@@ -46,6 +46,11 @@ public:
   @{
     @dots{}
   @}
+  
+  @dots{}
+  
+  int GetMyData () const @{ return myDataInt; @}
+  void SetMyData (int newData) @{ myDataInt = newData; @}
 @};
 @end example
 
@@ -56,7 +61,7 @@ properly.
 Basically you create a class called @samp{MyOwnData} which inherits
 from @code{csObject}. In that class you can do whatever you want
 with respect to your own game data. In the example above we only
-have a variable @samp{my_data_int} but of course you can do whatever
+have a variable @samp{myDataInt} but of course you can do whatever
 you want. The @sc{scf} templates make sure that you can later query for
 that object (using @code{scfQueryInterface} for example).
 
@@ -67,11 +72,10 @@ To attach your own data to some Crystal Space object you can use
 an instance of @code{MyOwnData} to a mesh:
 
 @example
-MyOwnData* mydata = new MyOwnData ();
-mydata->my_data_int = @dots{};
+csRef<MyOwnData> mydata; mydata.AttachNew (new MyOwnData ());
+mydata->SetMyData (@dots{});
 iMeshWrapper* mesh = @dots{};
 mesh->QueryObject ()->ObjAdd (mydata);
-mydata->DecRef ();
 @end example
 
 @code{mesh->QueryObject()} is interesting. Many Crystal Space objects

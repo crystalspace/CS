@@ -91,7 +91,7 @@ bool csGraphics2DDDraw3::Initialize (iObjectRegistry *object_reg)
   if (!csGraphics2D::Initialize (object_reg))
     return false;
 
-  m_piWin32Assistant = CS_QUERY_REGISTRY (object_reg, iWin32Assistant);
+  m_piWin32Assistant = csQueryRegistry<iWin32Assistant> (object_reg);
   if (!m_piWin32Assistant)
   {
     MessageBox (0, 
@@ -103,8 +103,8 @@ bool csGraphics2DDDraw3::Initialize (iObjectRegistry *object_reg)
 
   DDetection.object_reg = object_reg;
 
-  csRef<iCommandLineParser> cmdline = CS_QUERY_REGISTRY (object_reg,
-						   iCommandLineParser);
+  csRef<iCommandLineParser> cmdline = 
+						   csQueryRegistry<iCommandLineParser> (object_reg);
   m_bHardwareCursor = config->GetBool ("Video.SystemMouseCursor", true);
   if (cmdline->GetOption ("sysmouse")) m_bHardwareCursor = true;
   if (cmdline->GetOption ("nosysmouse")) m_bHardwareCursor = false;
@@ -840,7 +840,7 @@ void csGraphics2DDDraw3::ClearSystemPalette ()
   HPALETTE BlackPal, OldPal;
   HDC hdc;
 
-  Palette = (LOGPALETTE*)malloc(sizeof(LOGPALETTE)+sizeof(PALETTEENTRY)*256);
+  Palette = (LOGPALETTE*)cs_malloc(sizeof(LOGPALETTE)+sizeof(PALETTEENTRY)*256);
 
   Palette->palNumEntries = 256;
   Palette->palVersion = 0x300;
@@ -866,7 +866,7 @@ void csGraphics2DDDraw3::ClearSystemPalette ()
   hdc = GetDC (0);
 
   BlackPal = CreatePalette (Palette);
-  free((void*)Palette);
+  cs_free((void*)Palette);
 
   OldPal = SelectPalette (hdc, BlackPal, FALSE);
   RealizePalette (hdc);
@@ -884,7 +884,7 @@ bool csGraphics2DDDraw3::CreateIdentityPalette (csRGBpixel *p)
   if (m_hWndPalette)
     DeleteObject (m_hWndPalette);
 
-  Palette = (LOGPALETTE*)malloc(sizeof(LOGPALETTE)+sizeof(PALETTEENTRY)*256);
+  Palette = (LOGPALETTE*)cs_malloc(sizeof(LOGPALETTE)+sizeof(PALETTEENTRY)*256);
 
   Palette->palNumEntries = 256;
   Palette->palVersion = 0x300;
@@ -908,7 +908,7 @@ bool csGraphics2DDDraw3::CreateIdentityPalette (csRGBpixel *p)
 
   m_hWndPalette = CreatePalette (Palette);
 
-  free((void*)Palette);
+  cs_free((void*)Palette);
 
   if (!m_hWndPalette)
     return false;

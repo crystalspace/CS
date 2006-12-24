@@ -19,27 +19,32 @@
 #ifndef __CS_CSCONOUT_H__
 #define __CS_CSCONOUT_H__
 
-#include "ivaria/conout.h"
-#include "csutil/scopedmutexlock.h"
 #include "csutil/eventnames.h"
-#include "iutil/eventh.h"
-#include "iutil/comp.h"
+#include "csutil/scopedmutexlock.h"
+#include "csutil/weakref.h"
 #include "csgeom/csrect.h"
 #include "csgfx/rgbpixel.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
+#include "ivaria/conout.h"
 
 struct iGraphics2D;
 struct iGraphics3D;
+
+CS_PLUGIN_NAMESPACE_BEGIN(ConOut)
+{
 class csConsoleBuffer;
 
-class csConsoleOutput : public iConsoleOutput
+class csConsoleOutput : 
+  public scfImplementation2<csConsoleOutput, 
+                            iConsoleOutput,
+                            iComponent>
 {
 private:
   csRef<csMutex> mutex;
   CS_DECLARE_SYSTEM_EVENT_SHORTCUTS;
 
 public:
-  SCF_DECLARE_IBASE;
-
   csConsoleOutput (iBase *base);
   virtual ~csConsoleOutput ();
 
@@ -161,33 +166,45 @@ public:
   /// Implement simple extension commands.
   virtual bool PerformExtensionV (const char *iCommand, va_list);
 
-  // Implement iComponent interface.
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csConsoleOutput);
-    virtual bool Initialize (iObjectRegistry* p)
-    { return scfParent->Initialize(p); }
-  } scfiComponent;
-  // Implement iEventHandler interface.
-  struct EventHandler : public iEventHandler
+  /// iEventHandler interface
+  struct EventHandler : 
+    public scfImplementation1<EventHandler,
+                              iEventHandler>
   {
   private:
-    csConsoleOutput* parent;
+    csWeakRef<csConsoleOutput> parent;
   public:
-    SCF_DECLARE_IBASE;
-    EventHandler (csConsoleOutput* parent)
+    EventHandler (csConsoleOutput* parent) : scfImplementationType (this),
+      parent (parent)
     {
-      SCF_CONSTRUCT_IBASE (0);
-      EventHandler::parent = parent;
     }
-    virtual ~EventHandler ()
+    virtual ~EventHandler () { }
+    virtual bool HandleEvent (iEvent& e) 
+    { 
+      return parent ? parent->HandleEvent(e) : false; 
+    }
+    CS_EVENTHANDLER_NAMES("crystalspace.console")
+    CS_CONST_METHOD virtual const csHandlerID * GenericPrec(
+      csRef<iEventHandlerRegistry> &r1, csRef<iEventNameRegistry> &r2,
+      csEventID e) const
     {
-      SCF_DESTRUCT_IBASE ();
+      if (e == csevSystemOpen (r2)) {
+        /* TODO : not thread-safe */
+        static csHandlerID precs[2] =
+          { r1->GetGenericID("crystalspace.graphics3d"), CS_HANDLERLIST_END };
+        return precs;
+      } else {
+        return 0;
+      }
     }
-    virtual bool HandleEvent (iEvent& e) { return parent->HandleEvent(e); }
-    CS_EVENTHANDLER_NAMES("crystalspace.console");
-    CS_EVENTHANDLER_NIL_CONSTRAINTS
-  } * scfiEventHandler;
+    CS_CONST_METHOD virtual const csHandlerID * GenericSucc(
+      csRef<iEventHandlerRegistry> &, csRef<iEventNameRegistry> &,
+      csEventID) const
+    { return 0; }
+    
+    CS_EVENTHANDLER_DEFAULT_INSTANCE_CONSTRAINTS
+  };
+  csRef<EventHandler> eventHandler;
 
 private:
   void GetPosition (int &x, int &y, int &width, int &height) const;
@@ -216,11 +233,14 @@ private:
   iConsoleWatcher *Client;
 
   //  Foreground and background colors
-  csRGBcolor fg_rgb;
-  csRGBcolor bg_rgb;
-  csRGBcolor shadow_rgb;
-  // The texture manager codes for the colors
+  csRGBpixel fg_rgb;
+  csRGBpixel bg_rgb;
+  csRGBpixel shadow_rgb;
+  // The graphics2d codes for the colors
   int fg, bg, shadow;
 };
+
+}
+CS_PLUGIN_NAMESPACE_END(ConOut)
 
 #endif // __CS_CSCONOUT_H__

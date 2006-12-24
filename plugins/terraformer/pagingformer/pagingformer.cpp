@@ -35,7 +35,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 //@@@ debugging
 #include "cstool/debugimagewriter.h"
-#include "csgfx/memimage.h"
+#include "csgfx/imagememory.h"
 
 #include "pagingformer.h"
 
@@ -72,8 +72,8 @@ bool csPagingFormer::Initialize (iObjectRegistry* objectRegistry)
   csPagingFormer::objectRegistry = objectRegistry;
 
   // Get the shared string repository
-  csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
-    objectRegistry, "crystalspace.shared.stringset", iStringSet);
+  csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet> (
+    objectRegistry, "crystalspace.shared.stringset");
 
   // Grab string IDs
   stringVertices = strings->Request ("vertices");
@@ -171,7 +171,7 @@ void csPagingFormer::LoadFormer (uint x, uint y)
 
     if (heightmapformat == PAGINGHEIGHT_RAWFLOATLE)
     {
-      csRef<iVFS> vfs = CS_QUERY_REGISTRY (objectRegistry, iVFS);
+      csRef<iVFS> vfs = csQueryRegistry<iVFS> (objectRegistry);
       csRef<iDataBuffer> buf = 
         vfs->ReadFile(heightmapdir+ending+".raw", false);
 
@@ -267,7 +267,7 @@ void csPagingFormer::SetHeightmapDir (const char* path, const char *type)
   sscanf(lastname.GetData(),"%d",&numy);
   numy++;
 
-  uint numx = heightmapnames->GetSize() / numy;
+  uint numx = (uint)heightmapnames->GetSize() / numy;
   countx = numx;
   county = numy;
 
@@ -297,7 +297,7 @@ void csPagingFormer::SetIntmapDir (const csStringID type,
   sscanf(lastname.GetData(),"%d",&numy);
   numy++;
 
-  uint numx = heightmapnames->GetSize() / numy;
+  uint numx = (uint)heightmapnames->GetSize() / numy;
 
   if (numx == countx && numy == county)
   {
@@ -323,7 +323,7 @@ void csPagingFormer::SetFloatmapDir (const csStringID type,
   sscanf(lastname.GetData(),"%d",&numy);
   numy++;
 
-  uint numx = heightmapnames->GetSize() / numy;
+  uint numx = (uint)heightmapnames->GetSize() / numy;
 
   if (numx == countx && numy == county)
   {
@@ -392,6 +392,11 @@ bool csPagingFormer::SetIntegerMap (csStringID /*type*/, iImage* /*map*/,
   return false;
 }
 
+/// Get the integer map dimensions.
+csVector2 csPagingFormer::GetIntegerMapSize (csStringID type)
+{
+  return csVector2(0,0);
+}
 
 /// Set additional float map.
 bool csPagingFormer::SetFloatMap (csStringID /*type*/, iImage* /*map*/,
@@ -680,12 +685,12 @@ void csPagingSampler::CachePositions ()
   positions = new csVector3[resx*resz];
 
   // buffer for all the samplers maps
-  uint num = sampler.GetSize();
+  size_t num = sampler.GetSize();
   const csVector3 **maps = new const csVector3*[num];
 
   // first get the raw data from all the samplers
   // @@@ excluded from loop below for easier profiling
-  uint k;
+  size_t k;
   //uint sumresx = 0;
   //uint sumresz = 0;
   //uint formerresx;
@@ -1020,12 +1025,12 @@ const int *csPagingSampler::SampleInteger (csStringID type)
     int *map = new int[resx*resz];
 
     // buffer for all the samplers maps
-    uint num = sampler.GetSize();
+    size_t num = sampler.GetSize();
     const int **maps = new const int*[num];
 
   // first get the raw data from all the samplers
   // @@@ excluded from loop below for easier profiling
-  uint k;
+  size_t k;
   //uint sumresx = 0;
   //uint sumresz = 0;
   //uint formerresx;

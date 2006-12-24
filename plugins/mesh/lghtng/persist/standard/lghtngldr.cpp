@@ -58,65 +58,25 @@ enum
   XMLTOKEN_WILDNESS
 };
 
-SCF_IMPLEMENT_IBASE (csLightningFactoryLoader)
-  SCF_IMPLEMENTS_INTERFACE (iLoaderPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csLightningFactoryLoader::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csLightningFactorySaver)
-  SCF_IMPLEMENTS_INTERFACE (iSaverPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csLightningFactorySaver::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csLightningLoader)
-  SCF_IMPLEMENTS_INTERFACE (iLoaderPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csLightningLoader::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csLightningSaver)
-  SCF_IMPLEMENTS_INTERFACE (iSaverPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csLightningSaver::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 SCF_IMPLEMENT_FACTORY (csLightningFactoryLoader)
 SCF_IMPLEMENT_FACTORY (csLightningFactorySaver)
 SCF_IMPLEMENT_FACTORY (csLightningLoader)
 SCF_IMPLEMENT_FACTORY (csLightningSaver)
 
-
-csLightningFactoryLoader::csLightningFactoryLoader (iBase* pParent)
+csLightningFactoryLoader::csLightningFactoryLoader (iBase* pParent) :
+  scfImplementationType(this, pParent)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 csLightningFactoryLoader::~csLightningFactoryLoader ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csLightningFactoryLoader::Initialize (iObjectRegistry* object_reg)
 {
   csLightningFactoryLoader::object_reg = object_reg;
-  synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
-  reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
+  synldr = csQueryRegistry<iSyntaxService> (object_reg);
+  reporter = csQueryRegistry<iReporter> (object_reg);
 
   xmltokens.Register ("bandwidth", XMLTOKEN_BANDWIDTH);
   xmltokens.Register ("directional", XMLTOKEN_DIRECTIONAL);
@@ -145,7 +105,7 @@ csPtr<iBase> csLightningFactoryLoader::Parse (iDocumentNode* node,
   csRef<iMeshObjectFactory> fact;
   fact = type->NewFactory ();
   csRef<iLightningFactoryState> LightningFactoryState (
-        SCF_QUERY_INTERFACE (fact, iLightningFactoryState));
+        scfQueryInterface<iLightningFactoryState> (fact));
   CS_ASSERT (LightningFactoryState);
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
@@ -239,22 +199,19 @@ csPtr<iBase> csLightningFactoryLoader::Parse (iDocumentNode* node,
 
 //---------------------------------------------------------------------------
 
-csLightningFactorySaver::csLightningFactorySaver (iBase* pParent)
+csLightningFactorySaver::csLightningFactorySaver (iBase* pParent) :
+  scfImplementationType(this, pParent)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 csLightningFactorySaver::~csLightningFactorySaver ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csLightningFactorySaver::Initialize (iObjectRegistry* object_reg)
 {
   csLightningFactorySaver::object_reg = object_reg;
-  synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
+  synldr = csQueryRegistry<iSyntaxService> (object_reg);
   return true;
 }
 
@@ -267,8 +224,8 @@ bool csLightningFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent,
   csRef<iDocumentNode> paramsNode = parent->CreateNodeBefore(CS_NODE_ELEMENT, 0);
   paramsNode->SetValue("params");
 
-  csRef<iLightningState> light = SCF_QUERY_INTERFACE (obj, iLightningState);
-  csRef<iMeshObject> mesh = SCF_QUERY_INTERFACE (obj, iMeshObject);
+  csRef<iLightningState> light = scfQueryInterface<iLightningState> (obj);
+  csRef<iMeshObject> mesh = scfQueryInterface<iMeshObject> (obj);
 
   if (mesh && light)
   {
@@ -339,23 +296,20 @@ bool csLightningFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent,
 
 //---------------------------------------------------------------------------
 
-csLightningLoader::csLightningLoader (iBase* pParent)
+csLightningLoader::csLightningLoader (iBase* pParent) :
+  scfImplementationType(this, pParent)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 csLightningLoader::~csLightningLoader ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csLightningLoader::Initialize (iObjectRegistry* object_reg)
 {
   csLightningLoader::object_reg = object_reg;
-  synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
-  reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
+  synldr = csQueryRegistry<iSyntaxService> (object_reg);
+  reporter = csQueryRegistry<iReporter> (object_reg);
 
   xmltokens.Register ("factory", XMLTOKEN_FACTORY);
   // @@@TODO
@@ -391,7 +345,7 @@ csPtr<iBase> csLightningLoader::Parse (iDocumentNode* node,
             return 0;
           }
           mesh = fact->GetMeshObjectFactory ()->NewInstance ();
-          Lightningstate = SCF_QUERY_INTERFACE (mesh, iLightningState);
+          Lightningstate = scfQueryInterface<iLightningState> (mesh);
 	  if (!Lightningstate)
 	  {
       	    synldr->ReportError (
@@ -400,8 +354,8 @@ csPtr<iBase> csLightningLoader::Parse (iDocumentNode* node,
 		factname);
 	    return 0;
 	  }
-          LightningFactoryState = SCF_QUERY_INTERFACE (
-              fact->GetMeshObjectFactory(), iLightningFactoryState);
+          LightningFactoryState = scfQueryInterface<iLightningFactoryState> (
+              fact->GetMeshObjectFactory());
         }
         break;
 
@@ -417,16 +371,13 @@ csPtr<iBase> csLightningLoader::Parse (iDocumentNode* node,
 //---------------------------------------------------------------------------
 
 
-csLightningSaver::csLightningSaver (iBase* pParent)
+csLightningSaver::csLightningSaver (iBase* pParent) :
+  scfImplementationType(this, pParent)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 csLightningSaver::~csLightningSaver ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csLightningSaver::Initialize (iObjectRegistry* object_reg)
@@ -444,7 +395,7 @@ bool csLightningSaver::WriteDown (iBase* obj, iDocumentNode* parent,
   csRef<iDocumentNode> paramsNode = parent->CreateNodeBefore(CS_NODE_ELEMENT, 0);
   paramsNode->SetValue("params");
 
-  csRef<iMeshObject> mesh = SCF_QUERY_INTERFACE (obj, iMeshObject);
+  csRef<iMeshObject> mesh = scfQueryInterface<iMeshObject> (obj);
 
   if ( mesh )
   {
@@ -464,4 +415,3 @@ bool csLightningSaver::WriteDown (iBase* obj, iDocumentNode* parent,
   }
   return true;
 }
-

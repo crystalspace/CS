@@ -50,10 +50,10 @@ csPerl5::csPerl5 (iBase *parent)
 
 bool csPerl5::Init (iObjectRegistry *objreg)
 {
-  reporter = CS_QUERY_REGISTRY (objreg, iReporter);
+  reporter = csQueryRegistry<iReporter> (objreg);
   if (! reporter) return false;
 
-  csRef<iVFS> vfs = CS_QUERY_REGISTRY (objreg, iVFS);
+  csRef<iVFS> vfs = csQueryRegistry<iVFS> (objreg);
   if (! vfs)
   {
     reporter->ReportError ("crystalspace.script.perl5.init.plugins",
@@ -291,7 +291,7 @@ csPerl5::Object::~Object ()
 
 csPerl5::Object* csPerl5::Query (iScriptObject *obj) const
 {
-  csRef<csPerl5Object> priv = SCF_QUERY_INTERFACE (obj, csPerl5Object);
+  csRef<csPerl5Object> priv = scfQueryInterface<csPerl5Object> (obj);
   if (priv == 0)
     reporter->Report (CS_REPORTER_SEVERITY_WARNING,
       "crystalspace.script.perl5.call", "This iScriptObject isn't from Perl!");

@@ -39,6 +39,8 @@ struct csGradientShade;
 CS_PLUGIN_NAMESPACE_BEGIN(SyntaxService)
 {
 
+#include "csutil/win32/msvc_deprecated_warn_off.h"
+
 /**
  * This component provides services for other loaders to easily parse
  * properties of standard CS world syntax. This implementation will parse
@@ -56,6 +58,7 @@ protected:
   csStringHash xmltokens;
 #define CS_TOKEN_ITEM_FILE "plugins/csparser/services/syntxldr.tok"
 #include "cstool/tokenlist.h"
+  csRef<iStringSet> strings;
 
   void ReportV (const char* msgid, int severity, 
 	iDocumentNode* errornode, const char* msg, va_list arg);
@@ -82,6 +85,8 @@ public:
   virtual bool WriteVector (iDocumentNode* node, const csVector2& v);
   virtual bool ParseBox (iDocumentNode* node, csBox3 &v);
   virtual bool WriteBox (iDocumentNode* node, const csBox3& v);
+  virtual bool ParseBox (iDocumentNode* node, csOBB &v);
+  virtual bool WriteBox (iDocumentNode* node, const csOBB& v);
   virtual bool ParseColor (iDocumentNode* node, csColor &c);
   virtual bool WriteColor (iDocumentNode* node, const csColor& c);
   virtual bool ParseColor (iDocumentNode* node, csColor4 &c);
@@ -95,9 +100,10 @@ public:
 	uint32 &flags, bool &mirror, bool &warp, int& msv,
 	csMatrix3 &m, csVector3 &before, csVector3 &after,
 	iString* destSector, bool& handled, bool& autoresolve);
-  virtual bool ParseGradient (iDocumentNode* node, csGradient& gradient);
-  virtual bool WriteGradient (iDocumentNode* node, const csGradient& gradient);
-  virtual bool ParseShaderVar (iDocumentNode* node, csShaderVariable& var);
+  virtual bool ParseGradient (iDocumentNode* node, iGradient* gradient);
+  virtual bool WriteGradient (iDocumentNode* node, iGradient* gradient);
+  virtual bool ParseShaderVar (iLoaderContext* ldr_context,
+      iDocumentNode* node, csShaderVariable& var);
   virtual csRef<iShaderVariableAccessor> ParseShaderVarExpr (
     iDocumentNode* node);
   virtual bool WriteShaderVar (iDocumentNode* node, csShaderVariable& var);
@@ -110,12 +116,14 @@ public:
   virtual bool WriteZMode (iDocumentNode* node, csZBufMode zmode,
     bool allowZmesh);
   virtual bool ParseKey (iDocumentNode* node, iKeyValuePair* &keyvalue);
+  virtual csPtr<iKeyValuePair> ParseKey (iDocumentNode* node);
   virtual bool WriteKey (iDocumentNode* node, iKeyValuePair* keyvalue);
 
   virtual csRef<iRenderBuffer> ParseRenderBuffer (iDocumentNode* node);
   virtual bool WriteRenderBuffer (iDocumentNode* node, iRenderBuffer* buffer);
 
-  virtual csRef<iShader> ParseShaderRef (iDocumentNode* node);
+  virtual csRef<iShader> ParseShaderRef (iLoaderContext* ldr_context,
+      iDocumentNode* node);
 
   virtual void ReportError (const char* msgid, iDocumentNode* errornode,
 	const char* msg, ...);
@@ -140,6 +148,8 @@ public:
   virtual bool DebugCommand (const char* /*cmd*/)
   { return false; }
 };
+
+#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 }
 CS_PLUGIN_NAMESPACE_END(SyntaxService)

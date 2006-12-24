@@ -20,12 +20,14 @@
 #define __RAYTRACER_H__
 
 #include "statistics.h"
+#include "primitive.h"
 
 namespace lighter
 {
-  struct KDTree;
-  struct KDTreeNode;
-  class RadPrimitive;
+  class KDTree;
+  union KDTreeNode;
+  struct KDTreePrimitive;
+  class Primitive;
 
   /**
    * A ray in space.
@@ -42,8 +44,18 @@ namespace lighter
     // Min/max parameter
     float minLength, maxLength;
 
+    // Unique id
+    size_t rayID;
+
+    // Flags for primitives to ignore
+    uint32 ignoreFlags;
+
+    // Specific primitive to ignore
+    const Primitive* ignorePrimitive;
+
     Ray () 
-      : origin (0,0,0), direction (1,0,0), minLength (0), maxLength (FLT_MAX*0.9f)
+      : origin (0,0,0), direction (1,0,0), minLength (0), maxLength (FLT_MAX*0.9f),
+      rayID (0), ignoreFlags (0), ignorePrimitive (0)
     {}
 
     // Clip to box. Returns if ray touch box at all
@@ -52,7 +64,7 @@ namespace lighter
       const csVector3& minBox = box.Min ();
       const csVector3& maxBox = box.Max ();
 
-      float mint = 0;
+      float mint = minLength;
       float maxt = maxLength;
 
       // Check if ray have any chance of going through box
@@ -109,14 +121,14 @@ namespace lighter
 
       return true;
     }
-
   };
+
 
   // Hitpoint returned by the raytracer
   struct HitPoint
   {
     // The primitive we hit
-    RadPrimitive *primitive;
+    Primitive *primitive;
 
     // Distance along ray (t)
     float distance;
@@ -134,34 +146,97 @@ namespace lighter
     }
   };
 
+  class MailboxHash
+  {
+  public:
+    MailboxHash ();
+    ~MailboxHash ();
+
+    CS_FORCEINLINE size_t GetRayID ()
+    {
+      return rayID++;
+    }
+
+    CS_FORCEINLINE bool PutPrimitiveRay (const Primitive* prim, size_t ray)
+    {
+      size_t hashPos = (reinterpret_cast<uintptr_t> (prim) >> 3) & (HASH_SIZE-1);
+      
+      HashEntry& e = hash[hashPos];
+      
+      //Check if we already are in the hash
+      if (e.primPointer == prim &&
+        e.rayID == ray)
+        return true;
+
+      //Insert new entry
+      e.primPointer = prim;
+      e.rayID = ray;
+      return false;
+    }
+
+  private:
+    size_t rayID;
+
+    enum
+    {
+      HASH_SIZE = 64
+    };
+
+    struct HashEntry
+    {
+      const Primitive* primPointer;
+      size_t rayID;
+    };
+    HashEntry* hash;
+  };
+
+
   class Raytracer
   {
   public:
-    Raytracer (KDTree *tree)
-      : tree (tree)
-    {
-    }
+    Raytracer (KDTree *tree);
+
+    ~Raytracer ();
 
     /**
      * Raytrace until there is any hit.
      * This might not be the closest hit so it is faster but not suitable
      * for all kind of calculations.
      */
-    bool TraceAnyHit (const Ray &ray, HitPoint &hit) const;
+    bool TraceAnyHit (const Ray &ray, HitPoint &hit);
 
     /**
      * Raytrace for closest hit. 
      */
-    bool TraceClosestHit (const Ray &ray, HitPoint &hit) const;    
+    bool TraceClosestHit (const Ray &ray, HitPoint &hit);    
 
   protected:
     /// Traverse all primitives in a given node and do intersection against them
+    template<bool exitFirstHit>
     bool IntersectPrimitives (const KDTreeNode* node, const Ray &ray, 
-      HitPoint &hit, bool earlyExit = false) const;
-
-    bool TraceRecursive(const Ray &ray, HitPoint& hit, KDTreeNode* node, float tmin, float tmax) const;
+      HitPoint &hit);
 
     KDTree *tree;
+
+
+    enum
+    {
+      MAX_STACK_DEPTH = 64
+    };
+
+    // Helperstruct for kd traversal
+    struct kdTraversalS
+    {
+      KDTreeNode *node;
+#if (CS_PROCESSOR_SIZE == 32)
+      void* pad;
+#endif
+      float tnear, tfar;
+    };
+    size_t traversalStackPtr;
+    kdTraversalS* traversalStack;
+
+    MailboxHash mailboxes;
   };
 
   /// Helper to profile raytracing
@@ -195,11 +270,29 @@ namespace lighter
   public:
     // Vistest rayhelpers
 
-    static inline float Vistest5 (const Raytracer& rt, const csVector3& viscenter,
-      const csVector3& visu, const csVector3& visv, const csVector3& endp)
+    static inline float Vistest1 (Raytracer& rt, const csVector3& viscenter,
+      const csVector3& endp)
+    {
+      // Perform a 1 point vistest
+
+      const csVector3& primP = viscenter;
+      const csVector3 dir = primP - endp;
+
+      Ray ray;
+      HitPoint hit;
+      ray.minLength = 0;
+      ray.maxLength = dir.Norm ();
+      ray.origin = endp;
+      ray.direction = dir / ray.maxLength;
+      ray.maxLength -= 0.001f;
+      return rt.TraceAnyHit (ray, hit) ? 0.0f : 1.0f;
+    }
+
+    static inline float Vistest5 (Raytracer& rt, const csVector3& viscenter,
+      const csVector3& visu, const csVector3& visv, const csVector3& endp,
+      const Primitive& prim)
     {
       // Perform a 5 point vistest
-      float visibility = 1.0f;
 
       const csVector3 halfu = visu * 0.5f;
       const csVector3 halfv = visv * 0.5f;
@@ -212,6 +305,8 @@ namespace lighter
         viscenter - halfu - halfv
       };
 
+      uint insideNum = 0;
+      uint hitNum = 0;
       for (unsigned int i = 0; i < 5; i++)
       {
         const csVector3& primP = rayStarts[i];
@@ -224,11 +319,17 @@ namespace lighter
         ray.origin = endp;
         ray.direction = dir / ray.maxLength;
         ray.maxLength -= 0.001f;
-        if (rt.TraceAnyHit (ray, hit))
-          visibility -= 0.2f;
+        // FIXME: Only do for actual "border lumels"
+        bool inside = prim.PointInside (primP);
+        bool hitAny = rt.TraceAnyHit (ray, hit);
+        if (inside)
+        {
+          insideNum++;
+          if (hitAny) hitNum++;
+        }
       }
-
-      return visibility;
+      if (insideNum == 0) insideNum = 5;
+      return 1.0f-((float)hitNum/(float)insideNum);
     }
   };
 }

@@ -30,30 +30,27 @@ WALKALL.PLUGINLIST =
   csparser
   cssynldr
   dynavis
+  particles
+  particlesldr
   emit
   emitldr
   engine
   engseq
-  explo
-  exploldr
-  fire
-  fireldr
   fontplex
-  fountain
-  fountldr
   frustvis
   genmesh
   gmeshanim
   gmeshldr
-  gmeshskelanim
+  gmeshskelanim2
+  skeleton
+  skelldr
+  vproc_std
   haze
   hazeldr
   imgplex
   nullmesh
   protomesh
   protomeshldr
-  rain
-  rainldr
   rendloop_loader
   rendstep_std
   reporter
@@ -63,10 +60,6 @@ WALKALL.PLUGINLIST =
   simpleformerldr
   bruteblock
   terrainldr
-  snow
-  snowldr
-  spiral
-  spirldr
   spr2d
   spr2dldr
   spr3d

@@ -193,7 +193,8 @@ public:
   void AddAdjacent (const csRect &rect);
   
   ///\deprecated Misspelling; use AddAdjacent() instead
-  CS_DEPRECATED_METHOD void AddAdjanced (const csRect &rect)
+  CS_DEPRECATED_METHOD_MSG("Misspelling; use AddAdjacent() instead")
+  void AddAdjanced (const csRect &rect)
   { AddAdjacent (rect); }
 
   /// Test equality of two rectangles.
@@ -211,8 +212,8 @@ public:
   /// Extend rectangle so that it will include given point
   inline void Extend (int x, int y)
   {
-    if (xmin > x) xmin = x; if (xmax < x) xmax = x;
-    if (ymin > y) ymin = y; if (ymax < y) ymax = y;
+    if (xmin > x) xmin = x; if (xmax < x+1) xmax = x+1;
+    if (ymin > y) ymin = y; if (ymax < y+1) ymax = y+1;
   }
 
   /// Joins two rects by their minimum and maximum bounds

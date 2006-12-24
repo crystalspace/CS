@@ -21,10 +21,11 @@
 #ifndef __CS_GENERIC_H__
 #define __CS_GENERIC_H__
 
-#include "csutil/scf.h"
+#include "csutil/scf_implementation.h"
 #include "csutil/csstring.h"
 #include "csutil/weakref.h"
 #include "csutil/dirtyaccessarray.h"
+#include "csgeom/box.h"
 #include "iengine/light.h"
 #include "iengine/renderloop.h"
 #include "iengine/viscull.h"
@@ -39,7 +40,8 @@
 #include "csplugincommon/renderstep/basesteptype.h"
 #include "csplugincommon/renderstep/basesteploader.h"
 
-class csGenericRSType : public csBaseRenderStepType
+class csGenericRSType :
+  public scfImplementationExt0<csGenericRSType, csBaseRenderStepType>
 {
 public:
   csGenericRSType (iBase* p);
@@ -47,7 +49,8 @@ public:
   virtual csPtr<iRenderStepFactory> NewFactory();
 };
 
-class csGenericRSLoader : public csBaseRenderStepLoader
+class csGenericRSLoader :
+  public scfImplementationExt0<csGenericRSLoader, csBaseRenderStepLoader>
 {
   csStringHash tokens;
 #define CS_TOKEN_ITEM_FILE "plugins/engine/renderloop/stdsteps/generic.tok"
@@ -61,31 +64,40 @@ public:
     iBase* context);
 };
 
-class csGenericRenderStepFactory : public iRenderStepFactory
+class csGenericRenderStepFactory :
+  public scfImplementation1<csGenericRenderStepFactory, iRenderStepFactory>
 {
 private:
   iObjectRegistry* object_reg;
 
 public:
-  SCF_DECLARE_IBASE;
-
   csGenericRenderStepFactory (iObjectRegistry* object_reg);
   virtual ~csGenericRenderStepFactory ();
 
   virtual csPtr<iRenderStep> Create ();
 };
 
+#define USE_BOX 1
+
 struct meshInfo
 {
   iShaderVariableContext* svc;
-  bool noclip;	// From iMeshWrapper CS_ENTITY_NOCLIP.
+  bool noclip;		// From iMeshWrapper CS_ENTITY_NOCLIP.
+  bool render;		// Set to true if this should be rendered.
+#if USE_BOX
+  iObjectModel* obj_model;
+  iMovable* movable;
+#else
   csVector3 wor_center;	// Center of the bounding sphere of this object.
   float radius;		// Radius of the bounding sphere of this object.
+#endif
 };
 
-class csGenericRenderStep : public iRenderStep, 
-			    public iGenericRenderStep,
-			    public iLightRenderStep
+struct ShaderVarPusher;
+
+class csGenericRenderStep :
+  public scfImplementation3<csGenericRenderStep,
+    iRenderStep, iGenericRenderStep, iLightRenderStep>
 {
 private:
   csStringID shadertype;
@@ -113,17 +125,11 @@ private:
   csArray<csStringID> disableDefaultTypes;
 
   static csStringID fogplane_name;
-  static csStringID fogdensity_name;
-  static csStringID fogcolor_name;
-  static csStringID fogstart_name;
-  static csStringID fogend_name;
-  static csStringID fogmode_name;
   static csStringID string_object2world;
   static csStringID light_0_type;
   static csStringID light_ambient;
-public:
-  SCF_DECLARE_IBASE;
 
+public:
   csGenericRenderStep (iObjectRegistry* object_reg);
   virtual ~csGenericRenderStep ();
 
@@ -152,13 +158,12 @@ public:
   virtual void RemoveDisableDefaultTriggerType (const char* type);
 
   inline void RenderMeshes (iRenderView* rview,
-  	iGraphics3D* g3d, iShader* shader, iLight *light, 
+  	iGraphics3D* g3d, const ShaderVarPusher& Pusher,
 	size_t ticket, meshInfo* meshContext,
 	csRenderMesh** meshes, size_t num, iShaderVarStack* stacks);
 
   /// Enables/disables z offset and z mode as needed
   inline void ToggleStepSettings (iGraphics3D* g3d, bool settings);
 };
-
 
 #endif

@@ -24,7 +24,8 @@
 #include "csutil/stringarray.h"
 #include "csutil/event.h"
 #include "csutil/eventnames.h"
-#include "csgfx/memimage.h"
+#include "csutil/scfstr.h"
+#include "csgfx/imagememory.h"
 #include "iutil/objreg.h"
 #include "iutil/eventq.h"
 #include "iutil/evdefs.h"
@@ -40,38 +41,19 @@ CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_FACTORY (csCursor)
 
-SCF_IMPLEMENT_IBASE (csCursor)
-  SCF_IMPLEMENTS_INTERFACE (iCursor)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iEventHandler)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csCursor::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csCursor::eiEventHandler)
-  SCF_IMPLEMENTS_INTERFACE (iEventHandler)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 // String to define our SCF name - only used when reporting 
 static const char * const CURSOR_SCF_NAME = "crystalspace.graphic.cursor";
 
 csCursor::csCursor (iBase *parent) :
+  scfImplementationType(this, parent),
   reg(0), isActive(false), useOS(false), checkedOSsupport(false)
 {
-  SCF_CONSTRUCT_IBASE (parent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiEventHandler);
 }
 
 csCursor::~csCursor ()
 {
-  if (eventq) eventq->RemoveListener (&scfiEventHandler);
+  if (eventq) CS::RemoveWeakListener (eventq, weakEventHandler);
   RemoveAllCursors ();
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiEventHandler);
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csCursor::Initialize (iObjectRegistry *objreg)
@@ -79,22 +61,22 @@ bool csCursor::Initialize (iObjectRegistry *objreg)
   reg = objreg;
 
   // Get image IO
-  io = CS_QUERY_REGISTRY (reg, iImageIO);
+  io = csQueryRegistry<iImageIO> (reg);
   if (!io) return false;
 
   // Get event queue
-  eventq = CS_QUERY_REGISTRY (reg, iEventQueue);
+  eventq = csQueryRegistry<iEventQueue> (reg);
   if (!eventq) return false;
   csEventID events[3] = { csevPostProcess(reg), csevMouseEvent(reg), 
 			  CS_EVENTLIST_END };
-  eventq->RegisterListener (&scfiEventHandler, events);
+  CS::RegisterWeakListener (eventq, this, events, weakEventHandler);
 
   return true;
 }
 
 bool csCursor::ParseConfigFile (iConfigFile* ini)
 {
-  csRef<iVFS> VFS = CS_QUERY_REGISTRY (reg, iVFS);
+  csRef<iVFS> VFS = csQueryRegistry<iVFS> (reg);
   if (!VFS)
       return false;
 
@@ -108,8 +90,9 @@ bool csCursor::ParseConfigFile (iConfigFile* ini)
   // Get all the cursor definitions in an iterator
   csString prefix = "CursorSystem.Cursors.";
   csRef<iConfigIterator> params = ini->Enumerate (prefix);
-  while (params && params->Next())
+  while (params && params->HasNext())
   {
+    params->Next();
     // Work out the name of the cursor
     csString key = params->GetKey() + strlen(params->GetSubsection());
     csString name;
@@ -226,12 +209,15 @@ bool csCursor::HandleEvent (iEvent &ev)
 	ci->image = newImage;
 
 	// Create texture 
+        csRef<scfString> fail_reason;
+        fail_reason.AttachNew (new scfString ());
 	csRef<iTextureHandle> txt = txtmgr->RegisterTexture (ci->image, 
-	  CS_TEXTURE_2D);
+	  CS_TEXTURE_2D, fail_reason);
 	if (!txt)
 	{ 
 	  csReport (reg, CS_REPORTER_SEVERITY_ERROR, CURSOR_SCF_NAME,
-		    "Could not register texture for cursor %s, ignoring", name);
+		    "Could not register texture for cursor %s (%s), ignoring",
+		    name, fail_reason->GetData ());
 	  RemoveCursor (name);
 	  return false;
 	}
@@ -252,9 +238,9 @@ bool csCursor::HandleEvent (iEvent &ev)
 	}
 	ci->pixmap = pixmap;
       }
-      csRef<iVirtualClock> vc = CS_QUERY_REGISTRY (reg, iVirtualClock);
+      csRef<iVirtualClock> vc = csQueryRegistry<iVirtualClock> (reg);
       ci->pixmap->Advance (vc->GetElapsedTicks ());
-      csRef<iMouseDriver> mouse = CS_QUERY_REGISTRY (reg, iMouseDriver);
+      csRef<iMouseDriver> mouse = csQueryRegistry<iMouseDriver> (reg);
 
       ci->pixmap->Draw (g3d, (int)(mouse->GetLastX() - ci->hotspot.x),
                              (int)(mouse->GetLastY() - ci->hotspot.y),
@@ -367,7 +353,7 @@ void csCursor::SetCursor (const char *name, iImage *image, csRGBcolor* key,
 
   // Add to hashlist
   {
-    csHash<CursorInfo*, csStrKey>::Iterator it =
+    csHash<CursorInfo*, csString>::Iterator it =
       cursors.GetIterator (name);
     while (it.HasNext ())
     {
@@ -485,7 +471,7 @@ bool csCursor::RemoveCursor (const char *name)
 
 void csCursor::RemoveAllCursors ()
 {
-  csHash<CursorInfo*, csStrKey>::GlobalIterator it = cursors.GetIterator ();
+  csHash<CursorInfo*, csString>::GlobalIterator it = cursors.GetIterator ();
   while (it.HasNext ())
   {
     CursorInfo* ci = it.Next ();

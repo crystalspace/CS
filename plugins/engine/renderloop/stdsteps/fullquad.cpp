@@ -46,8 +46,8 @@ SCF_IMPLEMENT_FACTORY(csFullScreenQuadRSLoader)
 
 //---------------------------------------------------------------------------
 
-csFullScreenQuadRSType::csFullScreenQuadRSType (iBase* p)
-	: csBaseRenderStepType (p)
+csFullScreenQuadRSType::csFullScreenQuadRSType (iBase* p) :
+  scfImplementationType (this, p)
 {
 }
 
@@ -59,15 +59,15 @@ csPtr<iRenderStepFactory> csFullScreenQuadRSType::NewFactory()
 
 //---------------------------------------------------------------------------
 
-csFullScreenQuadRSLoader::csFullScreenQuadRSLoader (iBase* p)
-	: csBaseRenderStepLoader (p)
+csFullScreenQuadRSLoader::csFullScreenQuadRSLoader (iBase* p) :
+  scfImplementationType (this, p)
 {
   InitTokenTable (tokens);
 }
 
 csPtr<iBase> csFullScreenQuadRSLoader::Parse (iDocumentNode* node, 
 				       iStreamSource*,
-				       iLoaderContext* /*ldr_context*/, 
+				       iLoaderContext* ldr_context, 
 				       iBase* /*context*/)
 {
   csFullScreenQuadRenderStep* newstep = 
@@ -75,7 +75,7 @@ csPtr<iBase> csFullScreenQuadRSLoader::Parse (iDocumentNode* node,
   csRef<iRenderStep> step;
   step.AttachNew (newstep);    
 
-  if (!ParseStep (node, newstep, newstep->GetOtherSettings(),
+  if (!ParseStep (ldr_context, node, newstep, newstep->GetOtherSettings(),
     false))
     return 0;
 
@@ -101,12 +101,13 @@ csPtr<iBase> csFullScreenQuadRSLoader::Parse (iDocumentNode* node,
   return csPtr<iBase> (step);
 }
 
-bool csFullScreenQuadRSLoader::ParseStep (iDocumentNode* node,
-  csFullScreenQuadRenderStep* step, 
-  csFullScreenQuadRenderStep::DrawSettings& settings, bool firstPass)
+bool csFullScreenQuadRSLoader::ParseStep (iLoaderContext* ldr_context,
+    iDocumentNode* node,
+    csFullScreenQuadRenderStep* step, 
+    csFullScreenQuadRenderStep::DrawSettings& settings, bool firstPass)
 {
-  csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
-    object_reg, "crystalspace.shared.stringset", iStringSet);
+  csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet> (
+    object_reg, "crystalspace.shared.stringset");
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
@@ -158,28 +159,27 @@ bool csFullScreenQuadRSLoader::ParseStep (iDocumentNode* node,
 	  csFullScreenQuadRenderStep::DrawSettings& firstSettings =
 	    step->GetFirstSettings();
 	  firstSettings = settings;
-	  if (!ParseStep (child, step, firstSettings, true))
+	  if (!ParseStep (ldr_context, child, step, firstSettings, true))
 	    return false;
 	}
 	break;
       case XMLTOKEN_SHADERVAR:
 	{
-	  const char* varname = child->GetAttributeValue ("name");
-	  if (!varname)
-	  {
-	    synldr->Report ("crystalspace.renderloop.step.fullscreenquad",
-	      CS_REPORTER_SEVERITY_WARNING, child,
-	      "<shadervar> without name");
-	    return false;
-	  }
 	  if (!settings.svContext.IsValid())
 	    settings.svContext.AttachNew (new csShaderVariableContext ());
 
 	  csRef<csShaderVariable> var;
-	  var.AttachNew (new csShaderVariable (strings->Request (varname)));
+	  var.AttachNew (new csShaderVariable);
 
-	  if (!synldr->ParseShaderVar (child, *var))
+	  if (!synldr->ParseShaderVar (ldr_context, child, *var))
 	  {
+	    return false;
+	  }
+	  if (var->GetName() == csInvalidStringID)
+	  {
+	    synldr->Report ("crystalspace.renderloop.step.fullscreenquad",
+	      CS_REPORTER_SEVERITY_WARNING, child,
+	      "<shadervar> without name");
 	    return false;
 	  }
 	  settings.svContext->AddVariable (var);
@@ -201,20 +201,15 @@ bool csFullScreenQuadRSLoader::ParseStep (iDocumentNode* node,
 
 //---------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE(csFullScreenQuadRenderStepFactory);
-  SCF_IMPLEMENTS_INTERFACE(iRenderStepFactory);
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 csFullScreenQuadRenderStepFactory::csFullScreenQuadRenderStepFactory (
-  iObjectRegistry* object_reg)
+  iObjectRegistry* object_reg) :
+  scfImplementationType (this)
 {
-  SCF_CONSTRUCT_IBASE(0);
   csFullScreenQuadRenderStepFactory::object_reg = object_reg;
 }
 
 csFullScreenQuadRenderStepFactory::~csFullScreenQuadRenderStepFactory ()
 {
-  SCF_DESTRUCT_IBASE();
 }
 
 csPtr<iRenderStep> csFullScreenQuadRenderStepFactory::Create ()
@@ -225,22 +220,17 @@ csPtr<iRenderStep> csFullScreenQuadRenderStepFactory::Create ()
 
 //---------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE(csFullScreenQuadRenderStep);
-  SCF_IMPLEMENTS_INTERFACE(iRenderStep);
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 csFullScreenQuadRenderStep::csFullScreenQuadRenderStep (
-  iObjectRegistry* object_reg)
+  iObjectRegistry* object_reg) :
+  scfImplementationType (this)
 {
-  SCF_CONSTRUCT_IBASE(0);
-
   csRef<iGraphics3D> g3d = 
-    CS_QUERY_REGISTRY (object_reg, iGraphics3D);
-  csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg, 
-    "crystalspace.shared.stringset", iStringSet);
+    csQueryRegistry<iGraphics3D> (object_reg);
+  csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet> 
+    (object_reg, "crystalspace.shared.stringset");
   csFullScreenQuadRenderStep::object_reg = object_reg;
 
-  engine = CS_QUERY_REGISTRY (object_reg, iEngine);
+  engine = csQueryRegistry<iEngine> (object_reg);
 
   firstPass.material = "";
   firstPass.shader = "";
@@ -258,7 +248,6 @@ csFullScreenQuadRenderStep::csFullScreenQuadRenderStep (
 
 csFullScreenQuadRenderStep::~csFullScreenQuadRenderStep ()
 {
-  SCF_DESTRUCT_IBASE();
 }
 
 void csFullScreenQuadRenderStep::Perform (iRenderView* rview, iSector* /*sector*/,
@@ -266,7 +255,7 @@ void csFullScreenQuadRenderStep::Perform (iRenderView* rview, iSector* /*sector*
 {
   csRef<iGraphics3D> g3d = rview->GetGraphics3D();
   if (!shaderMgr.IsValid())
-    shaderMgr = CS_QUERY_REGISTRY (object_reg, iShaderManager);
+    shaderMgr = csQueryRegistry<iShaderManager> (object_reg);
 
   const DrawSettings& settings = 
     (distinguishFirstPass && isFirstPass) ? firstPass : otherPasses;

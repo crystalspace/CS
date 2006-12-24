@@ -59,65 +59,25 @@ enum
   XMLTOKEN_ANIMATE
 };
 
-SCF_IMPLEMENT_IBASE (csSprite2DFactoryLoader)
-  SCF_IMPLEMENTS_INTERFACE (iLoaderPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csSprite2DFactoryLoader::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csSprite2DFactorySaver)
-  SCF_IMPLEMENTS_INTERFACE (iSaverPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csSprite2DFactorySaver::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csSprite2DLoader)
-  SCF_IMPLEMENTS_INTERFACE (iLoaderPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csSprite2DLoader::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csSprite2DSaver)
-  SCF_IMPLEMENTS_INTERFACE (iSaverPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csSprite2DSaver::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 SCF_IMPLEMENT_FACTORY (csSprite2DFactoryLoader)
 SCF_IMPLEMENT_FACTORY (csSprite2DFactorySaver)
 SCF_IMPLEMENT_FACTORY (csSprite2DLoader)
 SCF_IMPLEMENT_FACTORY (csSprite2DSaver)
 
-
-csSprite2DFactoryLoader::csSprite2DFactoryLoader (iBase* pParent)
+csSprite2DFactoryLoader::csSprite2DFactoryLoader (iBase* pParent) :
+  scfImplementationType(this, pParent)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 csSprite2DFactoryLoader::~csSprite2DFactoryLoader ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csSprite2DFactoryLoader::Initialize (iObjectRegistry* object_reg)
 {
   csSprite2DFactoryLoader::object_reg = object_reg;
-  reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
-  synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
+  reporter = csQueryRegistry<iReporter> (object_reg);
+  synldr = csQueryRegistry<iSyntaxService> (object_reg);
 
   xmltokens.Register ("lighting", XMLTOKEN_LIGHTING);
   xmltokens.Register ("material", XMLTOKEN_MATERIAL);
@@ -212,7 +172,7 @@ csPtr<iBase> csSprite2DFactoryLoader::Parse (iDocumentNode* node,
   }
   csRef<iMeshObjectFactory> fact (type->NewFactory ());
   csRef<iSprite2DFactoryState> spr2dLook (
-  	SCF_QUERY_INTERFACE (fact, iSprite2DFactoryState));
+  	scfQueryInterface<iSprite2DFactoryState> (fact));
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
@@ -268,23 +228,20 @@ csPtr<iBase> csSprite2DFactoryLoader::Parse (iDocumentNode* node,
 }
 
 //---------------------------------------------------------------------------
-csSprite2DFactorySaver::csSprite2DFactorySaver (iBase* pParent)
+csSprite2DFactorySaver::csSprite2DFactorySaver (iBase* pParent) :
+  scfImplementationType(this, pParent)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 csSprite2DFactorySaver::~csSprite2DFactorySaver ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csSprite2DFactorySaver::Initialize (iObjectRegistry* object_reg)
 {
   csSprite2DFactorySaver::object_reg = object_reg;
-  reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
-  synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
+  reporter = csQueryRegistry<iReporter> (object_reg);
+  synldr = csQueryRegistry<iSyntaxService> (object_reg);
   return true;
 }
 
@@ -297,8 +254,8 @@ bool csSprite2DFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent,
   csRef<iDocumentNode> paramsNode = parent->CreateNodeBefore(CS_NODE_ELEMENT, 0);
   paramsNode->SetValue("params");
 
-  csRef<iSprite2DFactoryState> spritefact = SCF_QUERY_INTERFACE (obj, iSprite2DFactoryState);
-  csRef<iMeshObjectFactory> meshfact = SCF_QUERY_INTERFACE (obj, iMeshObjectFactory);
+  csRef<iSprite2DFactoryState> spritefact = scfQueryInterface<iSprite2DFactoryState> (obj);
+  csRef<iMeshObjectFactory> meshfact = scfQueryInterface<iMeshObjectFactory> (obj);
   if (!spritefact) return false;
   if (!meshfact) return false;
 
@@ -356,23 +313,20 @@ bool csSprite2DFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent,
 }
 //---------------------------------------------------------------------------
 
-csSprite2DLoader::csSprite2DLoader (iBase* pParent)
+csSprite2DLoader::csSprite2DLoader (iBase* pParent) :
+  scfImplementationType(this, pParent)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 csSprite2DLoader::~csSprite2DLoader ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csSprite2DLoader::Initialize (iObjectRegistry* object_reg)
 {
   csSprite2DLoader::object_reg = object_reg;
-  reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
-  synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
+  reporter = csQueryRegistry<iReporter> (object_reg);
+  synldr = csQueryRegistry<iSyntaxService> (object_reg);
 
   xmltokens.Register ("color", XMLTOKEN_COLOR);
   xmltokens.Register ("factory", XMLTOKEN_FACTORY);
@@ -426,7 +380,7 @@ csPtr<iBase> csSprite2DLoader::Parse (iDocumentNode* node,
 	    return 0;
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
-          spr2dLook = SCF_QUERY_INTERFACE (mesh, iSprite2DState);
+          spr2dLook = scfQueryInterface<iSprite2DState> (mesh);
 	  if (!spr2dLook)
 	  {
       	    synldr->ReportError (
@@ -544,23 +498,20 @@ csPtr<iBase> csSprite2DLoader::Parse (iDocumentNode* node,
 
 //---------------------------------------------------------------------------
 
-csSprite2DSaver::csSprite2DSaver (iBase* pParent)
+csSprite2DSaver::csSprite2DSaver (iBase* pParent) :
+  scfImplementationType(this, pParent)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 csSprite2DSaver::~csSprite2DSaver ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csSprite2DSaver::Initialize (iObjectRegistry* object_reg)
 {
   csSprite2DSaver::object_reg = object_reg;
-  reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
-  synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
+  reporter = csQueryRegistry<iReporter> (object_reg);
+  synldr = csQueryRegistry<iSyntaxService> (object_reg);
   return true;
 }
 
@@ -573,8 +524,8 @@ bool csSprite2DSaver::WriteDown (iBase* obj, iDocumentNode* parent,
   csRef<iDocumentNode> paramsNode = parent->CreateNodeBefore(CS_NODE_ELEMENT, 0);
   paramsNode->SetValue("params");
 
-  csRef<iSprite2DState> sprite = SCF_QUERY_INTERFACE (obj, iSprite2DState);
-  csRef<iMeshObject> mesh = SCF_QUERY_INTERFACE (obj, iMeshObject);
+  csRef<iSprite2DState> sprite = scfQueryInterface<iSprite2DState> (obj);
+  csRef<iMeshObject> mesh = scfQueryInterface<iMeshObject> (obj);
 
   if (!sprite) return false;
   if (!mesh) return false;

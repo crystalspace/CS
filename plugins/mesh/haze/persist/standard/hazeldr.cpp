@@ -58,65 +58,25 @@ enum
   XMLTOKEN_SCALE
 };
 
-SCF_IMPLEMENT_IBASE (csHazeFactoryLoader)
-  SCF_IMPLEMENTS_INTERFACE (iLoaderPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csHazeFactoryLoader::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csHazeFactorySaver)
-  SCF_IMPLEMENTS_INTERFACE (iSaverPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csHazeFactorySaver::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csHazeLoader)
-  SCF_IMPLEMENTS_INTERFACE (iLoaderPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csHazeLoader::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csHazeSaver)
-  SCF_IMPLEMENTS_INTERFACE (iSaverPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csHazeSaver::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 SCF_IMPLEMENT_FACTORY (csHazeFactoryLoader)
 SCF_IMPLEMENT_FACTORY (csHazeFactorySaver)
 SCF_IMPLEMENT_FACTORY (csHazeLoader)
 SCF_IMPLEMENT_FACTORY (csHazeSaver)
 
-
-csHazeFactoryLoader::csHazeFactoryLoader (iBase* pParent)
+csHazeFactoryLoader::csHazeFactoryLoader (iBase* pParent) :
+  scfImplementationType(this, pParent)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 csHazeFactoryLoader::~csHazeFactoryLoader ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csHazeFactoryLoader::Initialize (iObjectRegistry* object_reg)
 {
   csHazeFactoryLoader::object_reg = object_reg;
-  synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
-  reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
+  synldr = csQueryRegistry<iSyntaxService> (object_reg);
+  reporter = csQueryRegistry<iReporter> (object_reg);
 
   xmltokens.Register ("directional", XMLTOKEN_DIRECTIONAL);
   xmltokens.Register ("factory", XMLTOKEN_FACTORY);
@@ -140,7 +100,7 @@ static iHazeHull* ParseHull (csStringHash& xmltokens, iReporter*,
   float p, q;
 
   csRef<iHazeHullCreation> hullcreate (
-  	SCF_QUERY_INTERFACE (fstate, iHazeHullCreation));
+  	scfQueryInterface<iHazeHullCreation> (fstate));
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
@@ -158,7 +118,7 @@ static iHazeHull* ParseHull (csStringHash& xmltokens, iReporter*,
 	    return 0;
 	  csRef<iHazeHullBox> ebox =
 	    hullcreate->CreateBox (box.Min (), box.Max ());
-	  result = SCF_QUERY_INTERFACE (ebox, iHazeHull);
+	  result = scfQueryInterface<iHazeHull> (ebox);
 	  CS_ASSERT (result);
 	}
 	break;
@@ -172,7 +132,7 @@ static iHazeHull* ParseHull (csStringHash& xmltokens, iReporter*,
 	  q = child->GetAttributeValueAsFloat ("q");
 	  csRef<iHazeHullCone> econe =
 	    hullcreate->CreateCone (number, box.Min (), box.Max (), p, q);
-	  result = SCF_QUERY_INTERFACE (econe, iHazeHull);
+	  result = scfQueryInterface<iHazeHull> (econe);
 	  CS_ASSERT (result);
 	}
 	break;
@@ -200,7 +160,7 @@ csPtr<iBase> csHazeFactoryLoader::Parse (iDocumentNode* node,
   csRef<iMeshObjectFactory> fact;
   fact = type->NewFactory ();
   csRef<iHazeFactoryState> hazefactorystate (
-  	SCF_QUERY_INTERFACE (fact, iHazeFactoryState));
+  	scfQueryInterface<iHazeFactoryState> (fact));
   CS_ASSERT (hazefactorystate);
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
@@ -263,22 +223,19 @@ csPtr<iBase> csHazeFactoryLoader::Parse (iDocumentNode* node,
 
 //---------------------------------------------------------------------------
 
-csHazeFactorySaver::csHazeFactorySaver (iBase* pParent)
+csHazeFactorySaver::csHazeFactorySaver (iBase* pParent) :
+  scfImplementationType(this, pParent)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 csHazeFactorySaver::~csHazeFactorySaver ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csHazeFactorySaver::Initialize (iObjectRegistry* object_reg)
 {
   csHazeFactorySaver::object_reg = object_reg;
-  synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
+  synldr = csQueryRegistry<iSyntaxService> (object_reg);
   return true;
 }
 
@@ -291,8 +248,8 @@ bool csHazeFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent,
   csRef<iDocumentNode> paramsNode = parent->CreateNodeBefore(CS_NODE_ELEMENT, 0);
   paramsNode->SetValue("params");
 
-  csRef<iHazeFactoryState> haze = SCF_QUERY_INTERFACE (obj, iHazeFactoryState);
-  csRef<iMeshObjectFactory> mesh = SCF_QUERY_INTERFACE (obj, iMeshObjectFactory);
+  csRef<iHazeFactoryState> haze = scfQueryInterface<iHazeFactoryState> (obj);
+  csRef<iMeshObjectFactory> mesh = scfQueryInterface<iMeshObjectFactory> (obj);
 
   if (mesh && haze)
   {
@@ -322,7 +279,7 @@ bool csHazeFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent,
     origNode->SetValue("origin");
     synldr->WriteVector(origNode, orig);
 
-    for (int i=0; i<haze->GetLayerCount(); i++)
+    for (int i=0; i<(int)haze->GetLayerCount(); i++)
     {
       csRef<iDocumentNode> layerNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
       layerNode->SetValue("layer");
@@ -333,8 +290,8 @@ bool csHazeFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent,
       scaleNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(scale);
 
       iHazeHull* hull = haze->GetLayerHull(i);
-      csRef<iHazeHullBox> hullbox = SCF_QUERY_INTERFACE(hull, iHazeHullBox);
-      csRef<iHazeHullCone> hullcone = SCF_QUERY_INTERFACE(hull, iHazeHullCone);
+      csRef<iHazeHullBox> hullbox = scfQueryInterface<iHazeHullBox> (hull);
+      csRef<iHazeHullCone> hullcone = scfQueryInterface<iHazeHullCone> (hull);
       if (hullbox)
       {
         csVector3 min, max;
@@ -371,23 +328,20 @@ bool csHazeFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent,
 
 //---------------------------------------------------------------------------
 
-csHazeLoader::csHazeLoader (iBase* pParent)
+csHazeLoader::csHazeLoader (iBase* pParent) :
+  scfImplementationType(this, pParent)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 csHazeLoader::~csHazeLoader ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csHazeLoader::Initialize (iObjectRegistry* object_reg)
 {
   csHazeLoader::object_reg = object_reg;
-  synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
-  reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
+  synldr = csQueryRegistry<iSyntaxService> (object_reg);
+  reporter = csQueryRegistry<iReporter> (object_reg);
 
   xmltokens.Register ("directional", XMLTOKEN_DIRECTIONAL);
   xmltokens.Register ("factory", XMLTOKEN_FACTORY);
@@ -439,7 +393,7 @@ csPtr<iBase> csHazeLoader::Parse (iDocumentNode* node,
 	    return 0;
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
-          hazestate = SCF_QUERY_INTERFACE (mesh, iHazeState);
+          hazestate = scfQueryInterface<iHazeState> (mesh);
 	  if (!hazestate)
 	  {
       	    synldr->ReportError (
@@ -448,8 +402,8 @@ csPtr<iBase> csHazeLoader::Parse (iDocumentNode* node,
 		factname);
 	    return 0;
 	  }
-	  hazefactorystate = SCF_QUERY_INTERFACE (
-	  	fact->GetMeshObjectFactory(), iHazeFactoryState);
+	  hazefactorystate = scfQueryInterface<iHazeFactoryState> (
+	  	fact->GetMeshObjectFactory());
 	}
 	break;
       case XMLTOKEN_MATERIAL:
@@ -509,22 +463,19 @@ csPtr<iBase> csHazeLoader::Parse (iDocumentNode* node,
 //---------------------------------------------------------------------------
 
 
-csHazeSaver::csHazeSaver (iBase* pParent)
+csHazeSaver::csHazeSaver (iBase* pParent) :
+  scfImplementationType(this, pParent)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 csHazeSaver::~csHazeSaver ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csHazeSaver::Initialize (iObjectRegistry* object_reg)
 {
   csHazeSaver::object_reg = object_reg;
-  synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
+  synldr = csQueryRegistry<iSyntaxService> (object_reg);
   return true;
 }
 
@@ -537,8 +488,8 @@ bool csHazeSaver::WriteDown (iBase* obj, iDocumentNode* parent,
   csRef<iDocumentNode> paramsNode = parent->CreateNodeBefore(CS_NODE_ELEMENT, 0);
   paramsNode->SetValue("params");
 
-  csRef<iHazeState> haze = SCF_QUERY_INTERFACE (obj, iHazeState);
-  csRef<iMeshObject> mesh = SCF_QUERY_INTERFACE (obj, iMeshObject);
+  csRef<iHazeState> haze = scfQueryInterface<iHazeState> (obj);
+  csRef<iMeshObject> mesh = scfQueryInterface<iMeshObject> (obj);
 
   if (mesh && haze)
   {
@@ -581,7 +532,7 @@ bool csHazeSaver::WriteDown (iBase* obj, iDocumentNode* parent,
     origNode->SetValue("origin");
     synldr->WriteVector(origNode, orig);
 
-    for (int i=0; i<haze->GetLayerCount(); i++)
+    for (int i=0; i<(int)haze->GetLayerCount(); i++)
     {
       csRef<iDocumentNode> layerNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
       layerNode->SetValue("layer");
@@ -592,8 +543,8 @@ bool csHazeSaver::WriteDown (iBase* obj, iDocumentNode* parent,
       scaleNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(scale);
 
       iHazeHull* hull = haze->GetLayerHull(i);
-      csRef<iHazeHullBox> hullbox = SCF_QUERY_INTERFACE(hull, iHazeHullBox);
-      csRef<iHazeHullCone> hullcone = SCF_QUERY_INTERFACE(hull, iHazeHullCone);
+      csRef<iHazeHullBox> hullbox = scfQueryInterface<iHazeHullBox> (hull);
+      csRef<iHazeHullCone> hullcone = scfQueryInterface<iHazeHullCone> (hull);
       if (hullbox)
       {
         csVector3 min, max;

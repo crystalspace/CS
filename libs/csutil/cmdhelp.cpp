@@ -78,11 +78,11 @@ void csCommandLineHelper::Help (iObjectRegistry* object_reg,
 {
   csRef<iCommandLineParser> cmd = cmdline;
   if (!cmd)
-    cmd = CS_QUERY_REGISTRY (object_reg, iCommandLineParser);
+    cmd = csQueryRegistry<iCommandLineParser> (object_reg);
   CS_ASSERT (cmd != 0);
 
   // First send a global csevCommandLineHelp event.
-  csRef<iEventQueue> evq (CS_QUERY_REGISTRY (object_reg, iEventQueue));
+  csRef<iEventQueue> evq (csQueryRegistry<iEventQueue> (object_reg));
   if (evq)
   {
     iEventOutlet* evout = evq->GetEventOutlet ();
@@ -93,15 +93,15 @@ void csCommandLineHelper::Help (iObjectRegistry* object_reg,
     evout->ImmediateBroadcast (csevCommandLineHelp(object_reg), 0);
   }
 
-  csRef<iPluginManager> plgmgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  csRef<iPluginManager> plgmgr = csQueryRegistry<iPluginManager> (object_reg);
   csRef<iPluginIterator> it = plgmgr->GetPlugins ();
   while (it->HasNext ())
   {
     iBase* plug = it->Next ();
-    csRef<iPluginConfig> config (SCF_QUERY_INTERFACE (plug, iPluginConfig));
+    csRef<iPluginConfig> config (scfQueryInterface<iPluginConfig> (plug));
     if (config)
     {
-      csRef<iFactory> fact (SCF_QUERY_INTERFACE (plug, iFactory));
+      csRef<iFactory> fact (scfQueryInterface<iFactory> (plug));
       if (fact)
         csPrintf ("Options for %s:\n", fact->QueryDescription ());
       else
@@ -114,10 +114,12 @@ void csCommandLineHelper::Help (iObjectRegistry* object_reg,
   csPrintf (
 "General options:\n"
 "  -help              this help\n"
-"  -video=<s>         the 3D rendering driver (opengl, software, ...)\n"
 "  -canvas=<s>        the 2D canvas driver (asciiart, x2d, ...)\n"
+"  -cfgfile=<file>    load a configuration file\n"
+"  -cfgset=<key=val>  specify a configuration setting\n"
 "  -plugin=<s>        load the plugin after all others\n"
-"  -verbose           be more verbose; print better diagnostic messages\n");
+"  -verbose           be more verbose; print better diagnostic messages\n"
+"  -video=<s>         the 3D rendering driver (opengl, software, ...)\n");
 }
 
 bool csCommandLineHelper::CheckHelp (iObjectRegistry* object_reg,
@@ -125,7 +127,7 @@ bool csCommandLineHelper::CheckHelp (iObjectRegistry* object_reg,
 {
   csRef<iCommandLineParser> cmd = cmdline;
   if (!cmd)
-    cmd = CS_QUERY_REGISTRY (object_reg, iCommandLineParser);
+    cmd = csQueryRegistry<iCommandLineParser> (object_reg);
   CS_ASSERT (cmd != 0);
   bool rc = cmd->GetOption ("help") != 0;
   return rc;

@@ -141,6 +141,11 @@ public:
   void GetBoundingBox (csBox3& b) const { b = box; }
 
   /**
+   * Get the bounding box in object space.
+   */
+  const csBox3& GetBoundingBox () const { return box; }
+
+  /**
    * Set the radius of this frame in object space.
    */
   void SetRadius (float r) { radius = r; }
@@ -279,6 +284,8 @@ public:
 };
 
 class csSprite3DMeshObject;
+
+#include "csutil/win32/msvc_deprecated_warn_off.h"
 
 /**
  * A 3D sprite based on a triangle mesh with a single texture.
@@ -625,6 +632,7 @@ public:
 
   void SetupFactory ();
   void GetObjectBoundingBox (csBox3& bbox);
+  const csBox3& GetObjectBoundingBox ();
   void SetObjectBoundingBox (const csBox3& bbox);
   void GetRadius (float& rad, csVector3 &cent);
 
@@ -728,6 +736,8 @@ public:
 
   /** @} */
 };
+
+#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 /**
  * A 3D sprite based on a triangle mesh with a single texture.
@@ -1377,6 +1387,7 @@ public:
   void SetupLODListeners (iSharedVariable* varm, iSharedVariable* vara);
 
   void GetObjectBoundingBox (csBox3& bbox);
+  const csBox3& GetObjectBoundingBox ();
   void SetObjectBoundingBox (const csBox3& bbox);
   void GetRadius (float& rad, csVector3 &cent);
 
@@ -1400,8 +1411,8 @@ public:
    * @{ */
   virtual iMeshObjectFactory* GetFactory () const
   {
-    csRef<iMeshObjectFactory> ifact (SCF_QUERY_INTERFACE (factory,
-    	iMeshObjectFactory));
+    csRef<iMeshObjectFactory> ifact (
+    	scfQueryInterface<iMeshObjectFactory> (factory));
     return ifact;	// DecRef is ok here.
   }
   virtual csFlags& GetFlags () { return flags; }

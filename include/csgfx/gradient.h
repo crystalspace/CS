@@ -18,97 +18,55 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_CSTOOL_GRADIENT_H__
-#define __CS_CSTOOL_GRADIENT_H__
+#ifndef __CS_CSGFX_GRADIENT_H__
+#define __CS_CSGFX_GRADIENT_H__
 
 /**\file
- * Simple color gradient
+ * Simple color gradient implementation
  */
 
 #include "csextern.h"
 
-#include "csutil/cscolor.h"
+#include "ivaria/gradient.h"
+
 #include "csutil/array.h"
+#include "csutil/cscolor.h"
+#include "csutil/scf_implementation.h"
+#include "csutil/scfarray.h"
 #include "csgfx/rgbpixel.h"
-
-class csGradient;
-
-/**
- * An entry in a csGradient gradient.
- */
-struct CS_CRYSTALSPACE_EXPORT csGradientShade 
-{
-  /// Color of the left side
-  csColor4 left;
-  /// Color of the right side
-  csColor4 right;
-  /// Position in the gradient
-  float position;
-  
-  /// Construct with all values set to 0
-  csGradientShade ();
-  /// Construct supplying all values
-  csGradientShade (csColor4 left_color, csColor4 right_color, float pos);
-  
-  /// Construct supplying all values
-  explicit csGradientShade (csColor left_color, csColor right_color, float pos);
-  /**
-   * Construct using a color and position. Both left and right will have the 
-   * value of color.
-   */
-  csGradientShade (csColor4 color, float pos);
-  
-  /**
-   * Construct using a color and position. Both left and right will have the 
-   * value of color.
-   */
-  explicit csGradientShade (csColor color, float pos);
-  
-};
 
 /**
  * A simple color gradient.
  * If you ever have worked with an image creation/manipulation program with
  * a slightly higher niveau than Windows Paint then you probably know what 
- * this is. <p>
+ * this is.
+ *
  * Colors(here called 'shades') can be placed at arbitrary positions; although 
  * commonly a range of [0;1] is used, negative positions and positions larger 
- * than 1 are supported.<p>
+ * than 1 are supported.
+ *
  * Shades contain actually two colors, a 'left' and 'right' one. You can think
  * of this as, when approaching from one side, you'll get closer and closer to
  * the respective color. If you step over a shade, you have the other color, 
  * but you're getting farther and farther from it (and towards the next color) 
  * when moving on. This feature can be used for sharp transitions; for smooth 
- * ones they are simply set to the same value.<p>
- * Examples:
- * \code
- * csGradient grad;
- * // Rainbow-ish
- * grad.AddShade (csGradientShade (csColor4 (1.0f, 0.0f, 0.0f, 1.0f), 0.0f)));
- * grad.AddShade (csGradientShade (csColor4 (1.0f, 1.0f, 0.0f, 1.0f), 0.2f)));
- * grad.AddShade (csGradientShade (csColor4 (0.0f, 1.0f, 0.0f, 1.0f), 0.4f)));
- * grad.AddShade (csGradientShade (csColor4 (0.0f, 1.0f, 1.0f, 1.0f), 0.6f)));
- * grad.AddShade (csGradientShade (csColor4 (0.0f, 0.0f, 1.0f, 1.0f), 0.8f)));
- * grad.AddShade (csGradientShade (csColor4 (1.0f, 0.0f, 1.0f, 1.0f), 1.0f)));
+ * ones they are simply set to the same value.
  *
- * // German flag
- * grad.Clear ();
- * grad.AddShade (csGradientShade (csColor4 (0.0f, 0.0f, 0.0f, 1.0f), 0.0f)));
- * grad.AddShade (csGradientShade (csColor4 (0.0f, 0.0f, 0.0f, 1.0f), 
- *  csGradientShade (csColor4 (1.0f, 0.0f, 0.0f, 1.0f)
- *  0.33f)));
- * grad.AddShade (csGradientShade (csColor4 (1.0f, 0.0f, 0.0f, 1.0f), 
- *  csGradientShade (csColor4 (1.0f, 1.0f, 0.0f, 1.0f)
- *  0.66f)));
- * grad.AddShade (csGradientShade (csColor4 (1.0f, 1.0f, 0.0f, 1.0f), 1.0f)));
- * \endcode
- * \todo More shade management (e.g. getting, deleting of single shades.)
+ * For some examples see the iGradient documentation.
  */
-class CS_CRYSTALSPACE_EXPORT csGradient
+class CS_CRYSTALSPACE_EXPORT csGradient :
+  public scfImplementation1<csGradient, iGradient>
 {
 protected:
   /// The entries in this gradient.
   csArray<csGradientShade> shades;
+  struct scfGradientShadesArray : public scfArrayWrapConst<iGradientShades,
+    csArray<csGradientShade> >
+  {
+    scfGradientShadesArray (csGradient* parent) : 
+      scfArrayWrapConst<iGradientShades, csArray<csGradientShade> > (
+      	parent->shades, parent) {}
+  };
 public:
   /// Construct an empty gradient.
   csGradient ();
@@ -116,7 +74,13 @@ public:
   csGradient (csColor4 first, csColor4 last);
   
   /// Add a shade
-  void AddShade (csGradientShade shade);
+  //@{
+  /// Add a shade
+  void AddShade (const csGradientShade& shade);
+  void AddShade (const csColor4& color, float position);
+  void AddShade (const csColor4& left, const csColor4& right, 
+    float position);
+  //@}
   
   /// Clear all shades
   void Clear ();
@@ -160,8 +124,8 @@ public:
     float end = 1.0f) const;
 
   /// Get the array of shades
-  const csArray<csGradientShade>& GetShades () const { return shades; }
+  csPtr<iGradientShades> GetShades ();
 };
 
 
-#endif
+#endif // __CS_CSGFX_GRADIENT_H__

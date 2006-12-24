@@ -167,41 +167,59 @@ CS_VCHK_RUNTH([CS_VCHK_PATCOUNT([$3])],
 CS_VCHK_RUNTH([CS_VCHK_PATCOUNT([$3])],
     [cs_prog_$4_min_ver_[]i=`echo $cs_prog_$4_min_version${cs_prog_$4_min_suffix} | sed 'CS_VCHK_SEDEXPRNTH([CS_VCHK_RMALL([$3])], [i])'`
 ])
-cs_cv_prog_$4_version_ok=''
+AS_TR_SH([cs_cv_prog_$4_version_$2_ok])=''
 CS_VCHK_RUNTH([CS_VCHK_PATCOUNT([$3])],
-[test -z "$cs_cv_prog_$4_version_ok" && { expr "$cs_prog_$4_is_ver_[]i" "$5" "$cs_prog_$4_min_ver_[]i" >/dev/null || cs_cv_prog_$4_version_ok=no ; }
-test -z "$cs_cv_prog_$4_version_ok" && { expr "$cs_prog_$4_min_ver_[]i" "$5" "$cs_prog_$4_is_ver_[]i" >/dev/null || cs_cv_prog_$4_version_ok=yes ; }
+[test -z "$AS_TR_SH([cs_cv_prog_$4_version_$2_ok])" \
+  && { expr "$cs_prog_$4_is_ver_[]i" "$5" "$cs_prog_$4_min_ver_[]i" >/dev/null \
+    || AS_TR_SH([cs_cv_prog_$4_version_$2_ok])=no ; }
+test -z "$AS_TR_SH([cs_cv_prog_$4_version_$2_ok])" \
+  && { expr "$cs_prog_$4_min_ver_[]i" "$5" "$cs_prog_$4_is_ver_[]i" >/dev/null \
+    || AS_TR_SH([cs_cv_prog_$4_version_$2_ok])=yes ; }
 ])
-AS_IF([test -z "$cs_cv_prog_$4_version_ok"], [cs_cv_prog_$4_version_ok=yes])
-cs_cv_prog_$4_version_ok_annotated="$cs_cv_prog_$4_version_ok"
+AS_IF([test -z "$AS_TR_SH([cs_cv_prog_$4_version_$2_ok])"], [AS_TR_SH([cs_cv_prog_$4_version_$2_ok])=yes])
+AS_IF([test "$AS_TR_SH([cs_cv_prog_$4_version_$2_ok])" = yes],
+    [AS_TR_SH([cs_prog_$4_version_ok])=yes],
+    [AS_TR_SH([cs_prog_$4_version_ok])=no])
+AS_TR_SH([cs_cv_prog_$4_version_$2_ok_annotated])="$AS_TR_SH([cs_cv_prog_$4_version_$2_ok])"
 AS_IF([test -n "$cs_prog_$4_is_version"],
-    [cs_cv_prog_$4_version_ok_annotated="$cs_cv_prog_$4_version_ok_annotated (version $cs_prog_$4_is_version)"])
+    [AS_TR_SH([cs_cv_prog_$4_version_$2_ok_annotated])="$AS_TR_SH([cs_cv_prog_$4_version_$2_ok_annotated]) (version $cs_prog_$4_is_version)"
+    AS_TR_SH([cs_prog_$4_version])="$AS_TR_SH([cs_prog_$4_is_version])"],
+    [AS_TR_SH([cs_prog_$4_version])=''])
 ])
 
 ##############################################################################
-# CS_CHECK_PROG_VERSION(PROG, EXTRACT_CALL, VERSION, PATTERN,
+# CS_CHECK_PROG_VERSION(PROGRAM, EXTRACT, VERSION, PATTERN,
 #                       [ACTION-IF-OKAY], [ACTION-IF-NOT-OKAY], [CMP])
-# Check the version of a program PROG.
-# Version information is emitted by EXTRACT_CALL (for instance "bison -V").
-# The discovered program version is compared against VERSION.
-# The pattern of the version string matches PATTERN
-# The extracted version and the supplied version are compared with the CMP
-# operator. i.e. EXTRACTED_VERSION CMP SUPPLIED_VERSION
-# CMP defaults to >= if not specified.
-# ACTION-IF-OKAY is invoked if comparision yields true, otherwise
+# Check the version of program PROGRAM. PROGRAM is just a tag used when
+# composing shell variable names and in the emitted "checking..." message. The
+# actual version number of PROGRAM is gleaned with EXTRACT, which is shell
+# code, such as "$BISON -V" or "$FLEX --version".  The discovered program
+# version is compared against VERSION.  PATTERN is used to pluck the version
+# string from the output of EXTRACT.  PATTERN will correctly match even if the
+# result of EXTRACT embeds the version number in a longer string. For instance,
+# PATTERN "9.9.9" will properly match the "1.23.45" in the string "This is foo
+# version 1.23.45; built on 1800/01/05".  The extracted version and the
+# supplied version are compared with the CMP operator, as in `EXTRACTED_VERSION
+# CMP VERSION'.  CMP defaults to `>=' if not specified.  ACTION-IF-OKAY is
+# invoked if the comparison succeeds with respect to CMP, otherwise
 # ACTION-IF-NOT-OKAY is invoked.
 #
-# PATTERN literals: 9 .. marks a non empty sequence of digits
-#                   _ .. marks a non empty sequence of characters from [a-zA-Z]
-#                   | .. everything behind is optional
-#                     .. everything else is taken as separator - it is better
-#                        to not try stuff like space, slash or comma.
+# PATTERN literals
+#    9 .. marks a non empty sequence of digits
+#    _ .. marks a non empty sequence of characters from [a-zA-Z]
+#    | .. everything following this is optional
+#      .. everything else is taken as separator - it is better to not try stuff
+#         like space, slash or comma.
 #
-# The test results in cs_cv_prog_PROG_version_ok being either yes or no.
+# A shell variable named `cs_prog_PROG_version_ok' is set to yes or no
+# depending upon the result of the test.  A shell variable named
+# cs_prog_PROG_version is set to the value of the discovered program version.
+# Both variables may be accessed in ACTION-IF-OKAY and ACTION-IF-NOT-OKAY, if
+# needed.
 ##############################################################################
 AC_DEFUN([CS_CHECK_PROG_VERSION],
 [AC_CACHE_CHECK([if $1 version m4_default([$7],[>=]) $3],
-    [AS_TR_SH([cs_cv_prog_$1_version_ok_annotated])],
+    [AS_TR_SH([cs_cv_prog_$1_version_$3_ok_annotated])],
     [CS_VCHK_EXTRACTVERSION([$2], [$3], [$4], AS_TR_SH([$1]),
 	m4_default([$7],[>=]))])
-AS_IF([test "$AS_TR_SH([cs_cv_prog_$1_version_ok])" = yes], [$5], [$6])])
+AS_IF([test "$AS_TR_SH([cs_cv_prog_$1_version_$3_ok])" = yes], [$5], [$6])])

@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<!-- cscegui.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.cegui.wrapper</name>
+        <implementation>csCEGUIRenderer</implementation>
+        <description>Crystal Space CEGUI Wrapper</description>
+        <requires>
+          <class>crystalspace.graphics3d.</class>
+          <class>crystalspace.graphic.image.io.</class>
+        </requires>
+      </class>
+    </classes>
+  </scf>
+</plugin>

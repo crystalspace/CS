@@ -23,6 +23,8 @@ CS_MASTER_HEADER_REJECTS =
   [ ConcatDirs cstool   tokenlist.h  ]
   [ ConcatDirs csutil   archive.h    ]
   [ ConcatDirs csutil   csosdefs.h   ]
+  [ ConcatDirs csutil   custom_new_disable.h ]
+  [ ConcatDirs csutil   custom_new_enable.h ]
   [ ConcatDirs csutil   getopt.h     ]
   [ ConcatDirs csutil   mmap_dummy.h ]
   [ ConcatDirs csutil   mmap_posix.h ]
@@ -46,13 +48,11 @@ CS_MASTER_HEADER_REJECTS +=
   [ ConcatDirs csgeom fastsqrt.h     ]
   [ ConcatDirs csgeom quaterni.h     ]
   [ ConcatDirs csgeom subrec2.h      ]
+  [ ConcatDirs csgfx  memimage.h     ]
   [ ConcatDirs csutil garray.h       ]
   [ ConcatDirs csutil hashhandlers.h ]
   [ ConcatDirs csutil objpool.h      ]
   ;
-
-# Excluded because of name clash with gmeshskel.h
-CS_MASTER_HEADER_REJECTS += [ ConcatDirs imesh gmeshskel2.h ] ;
 
 {
   local CSWIN32LIBS_REJECTS =

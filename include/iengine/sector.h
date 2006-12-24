@@ -28,8 +28,10 @@
  * \addtogroup engine3d
  * @{ */
 
+#include "csutil/cscolor.h"
 #include "csutil/scf.h"
 #include "csutil/set.h"
+#include "csgeom/vector3.h"
 
 struct iMeshWrapper;
 struct iMeshGenerator;
@@ -37,6 +39,7 @@ struct iMeshList;
 struct iLightList;
 struct iLight;
 struct iVisibilityCuller;
+struct iLightSectorInfluence;
 
 struct iObject;
 
@@ -46,8 +49,9 @@ struct iFrustumView;
 struct iSector;
 struct iDocumentNode;
 
+struct iShaderVariableContext;
+
 class csBox3;
-class csColor;
 class csRenderMeshList;
 class csReversibleTransform;
 class csVector3;
@@ -57,7 +61,8 @@ enum csFogMode
   CS_FOG_MODE_NONE = 0,
   CS_FOG_MODE_LINEAR,
   CS_FOG_MODE_EXP,
-  CS_FOG_MODE_EXP2
+  CS_FOG_MODE_EXP2,
+  CS_FOG_MODE_CRYSTALSPACE
 };
 
 /**
@@ -65,22 +70,19 @@ enum csFogMode
  */
 struct csFog
 {
-  /// If true then fog is enabled.
-  bool enabled;
-  /// Density (0 is off).
+  /// Density (for CS_FOG_MODE_EXP, CS_FOG_MODE_EXP2, CS_FOG_MODE_CRYSTALSPACE)
   float density;
-  /// Color (red).
-  float red;
-  /// Color (green).
-  float green;
-  /// Color (blue).
-  float blue;
-  /// Fog start.
+  /// Color
+  csColor color;
+  /// Fog fade start distance (for CS_FOG_MODE_LINEAR).
   float start;
-  /// Fog end.
+  /// Fog fade end distance (for CS_FOG_MODE_LINEAR).
   float end;
   /// Fog mode.
   csFogMode mode;
+
+  csFog() : density (0), color (0, 0, 0), start (0), end (0), 
+    mode (CS_FOG_MODE_NONE) {}
 };
 
 /**
@@ -185,7 +187,7 @@ struct csSectorHitBeamResult
  */
 struct iSector : public virtual iBase
 {
-  SCF_INTERFACE(iSector,2,0,0);
+  SCF_INTERFACE(iSector,2,1,1);
   /// Get the iObject for this sector.
   virtual iObject *QueryObject () = 0;
 
@@ -308,9 +310,11 @@ struct iSector : public virtual iBase
   /// Has this sector fog?
   virtual bool HasFog () const = 0;
   /// Return the fog structure (even if fog is disabled)
-  virtual csFog *GetFog () const = 0;
+  virtual const csFog& GetFog () const = 0;
   /// Fill the fog structure with the given values
   virtual void SetFog (float density, const csColor& color) = 0;
+  /// Set a fog structure directly.
+  virtual void SetFog (const csFog& fog) = 0;
   /// Disable fog in this sector
   virtual void DisableFog () = 0;
   /** @} */
@@ -383,8 +387,10 @@ struct iSector : public virtual iBase
    * containing the 'start' point. 'isect' will be the intersection point
    * if a polygon is returned. This function returns -1 if no polygon
    * was hit or the polygon index otherwise.
+   * \deprecated Use the csSectorHitBeamResult version instead
    */
-  CS_DEPRECATED_METHOD virtual iMeshWrapper* HitBeamPortals (
+  CS_DEPRECATED_METHOD_MSG("Use the csSectorHitBeamResult version instead")
+  virtual iMeshWrapper* HitBeamPortals (
   	const csVector3& start, const csVector3& end, csVector3& isect,
 	int* polygon_idx, iSector** final_sector = 0) = 0;
 
@@ -394,8 +400,10 @@ struct iSector : public virtual iBase
    * filled with the indices of the polygon that was hit.
    * If polygon_idx is null then the polygon will not be filled in.
    * This function doesn't support portals.
+   * \deprecated Use the csSectorHitBeamResult version instead
    */
-  CS_DEPRECATED_METHOD virtual iMeshWrapper* HitBeam (const csVector3& start,
+  CS_DEPRECATED_METHOD_MSG("Use the csSectorHitBeamResult version instead")
+  virtual iMeshWrapper* HitBeam (const csVector3& start,
   	const csVector3& end, csVector3& intersect, int* polygon_idx,
 	bool accurate = false) = 0;
 
@@ -444,8 +452,8 @@ struct iSector : public virtual iBase
     csVector3& new_position, bool& mirror, bool only_portals = false) = 0;
   /** @} */
 
-  /**\name Various  
-   * @ { */
+  /**\name Sector callbacks
+   * @{ */
   /**
    * Set the sector callback. This will call IncRef() on the callback
    * So make sure you call DecRef() to release your own reference.
@@ -462,7 +470,10 @@ struct iSector : public virtual iBase
 
   /// Get the specified sector callback.
   virtual iSectorCallback* GetSectorCallback (int idx) const = 0;
+  /** @} */
 
+  /**\name Light culling
+   * @{ */
   /**
    * Set/reset culling objects for all lights in the sector.
    * This can be used for hardware accelerated lighting techniques that
@@ -484,6 +495,15 @@ struct iSector : public virtual iBase
    */
   virtual void RemoveLightVisibleCallback (iLightVisibleCallback* cb) = 0;
   /** @} */
+
+  /// Get the shader variable context for this sector.
+  virtual iShaderVariableContext* GetSVContext() = 0;
+
+  /**
+   * This function precaches a sector by rendering one frame
+   * with this sector visible. This will speed up later rendering.
+   */
+  virtual void PrecacheDraw () = 0;
 };
 
 

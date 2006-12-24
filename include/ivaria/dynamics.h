@@ -290,7 +290,7 @@ struct iDynamicsMoveCallback : public virtual iBase
   virtual void Execute (csOrthoTransform& t) = 0;
 };
 
-SCF_VERSION (iDynamicsCollisionCallback, 0, 0, 1);
+SCF_VERSION (iDynamicsCollisionCallback, 0, 0, 2);
 
 /**
  * This is the interface for attaching a collider callback to the body
@@ -304,7 +304,14 @@ SCF_VERSION (iDynamicsCollisionCallback, 0, 0, 1);
  */
 struct iDynamicsCollisionCallback : public iBase
 {
-  virtual void Execute (iRigidBody *thisbody, iRigidBody *otherbody) = 0;
+  /**
+   * A collision occured.
+   * \param pos is the position on which the collision occured.
+   * \param normal is the collision normal.
+   * \param depth is the penetration depth.
+   */
+  virtual void Execute (iRigidBody *thisbody, iRigidBody *otherbody,
+      const csVector3& pos, const csVector3& normal, float depth) = 0;
 };
 
 SCF_VERSION (iBodyGroup, 0, 0, 1);
@@ -596,8 +603,14 @@ struct iRigidBody : public virtual iBase
    */
   virtual void SetCollisionCallback (iDynamicsCollisionCallback* cb) = 0;
 
-  /// If there's a collision callback with this body, execute it
-  virtual void Collision (iRigidBody *other) = 0;
+  /**
+   * If there's a collision callback with this body, execute it
+   * \param pos is the position on which the collision occured.
+   * \param normal is the collision normal.
+   * \param depth is the penetration depth.
+   */
+  virtual void Collision (iRigidBody *other, const csVector3& pos,
+      const csVector3& normal, float depth) = 0;
 
   /// Update transforms for mesh and/or bone
   virtual void Update () = 0;
@@ -779,8 +792,6 @@ struct iDynamicsSystemCollider : public virtual iBase
   virtual bool IsStatic () = 0;
 };
 
-SCF_VERSION (iJoint, 0, 0, 1);
-
 /**
  * This is the interface for a joint.  It works by constraining
  * the relative motion between the two bodies it attaches.  For
@@ -794,8 +805,10 @@ SCF_VERSION (iJoint, 0, 0, 1);
  * Main users of this interface:
  * - iDynamicSystem
  */
-struct iJoint : public iBase
+struct iJoint : public virtual iBase
 {
+  SCF_INTERFACE (iJoint, 0, 0, 1);
+
   /// Set which two bodies to be affected by this joint
   virtual void Attach (iRigidBody* body1, iRigidBody* body2) = 0;
   /// Get an attached body (valid values for body are 0 and 1)
@@ -851,6 +864,8 @@ struct iJoint : public iBase
   /// Gets the maximum constrained angle between bodies
   virtual csVector3 GetMaximumAngle () = 0;
 
+  //Motor parameters
+
   /** 
    * Sets the restitution of the joint's stop point (this is the 
    * elasticity of the joint when say throwing open a door how 
@@ -860,11 +875,16 @@ struct iJoint : public iBase
   /// Get the joint restitution
   virtual csVector3 GetBounce () = 0;
   /// Apply a motor velocity to joint (for instance on wheels)
-  virtual void SetDesiredVelocity (const csVector3 & velocity ) = 0;
+  virtual void SetDesiredVelocity (const csVector3 &velocity ) = 0;
   virtual csVector3 GetDesiredVelocity () = 0;
   /// Sets the force at which the desired velocity will be achieved
   virtual void SetMaxForce (const csVector3 & maxForce ) = 0;
   virtual csVector3 GetMaxForce () = 0;
+  /// Set custom angular constraint axis (have sense only with rotation free minimum along 2 axis)
+  virtual void SetAngularConstraintAxis (const csVector3 &axis, int body) = 0;
+  /// Get custom angular constraint axis.
+  virtual csVector3 GetAngularConstraintAxis (int body) = 0;
+
 };
 
 #endif // __CS_IVARIA_DYNAMICS_H__

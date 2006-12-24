@@ -36,6 +36,7 @@ include $(jamrulesdir)/dump.jam ;
 include $(jamrulesdir)/options.jam ;
 include $(jamrulesdir)/variant.jam ;
 include $(jamrulesdir)/resource.jam ;
+include $(jamrulesdir)/icons.jam ;
 
 include $(jamrulesdir)/helper.jam ;
 include $(jamrulesdir)/help.jam ;
@@ -49,6 +50,7 @@ include $(jamrulesdir)/objectivec.jam ;
 include $(jamrulesdir)/assembler.jam ;
 include $(jamrulesdir)/bisonflex.jam ;
 include $(jamrulesdir)/swig.jam ;
+include $(jamrulesdir)/pythmod.jam ;
 include $(jamrulesdir)/strip.jam ;
 
 include $(jamrulesdir)/flags.jam ;

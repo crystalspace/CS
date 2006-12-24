@@ -26,7 +26,7 @@
 #include "csutil/parray.h"
 #include "csutil/hash.h"
 #include "csutil/blockallocator.h"
-#include "csutil/scf.h"
+#include "csutil/scf_implementation.h"
 #include "csutil/set.h"
 #include "csutil/leakguard.h"
 #include "csutil/weakref.h"
@@ -77,8 +77,9 @@ struct VisTest_Front2BackData;
 /**
  * This object is a wrapper for an iVisibilityObject from the engine.
  */
-class csVisibilityObjectWrapper : public iObjectModelListener,
-	public iMovableListener
+class csVisibilityObjectWrapper :
+  public scfImplementation2<csVisibilityObjectWrapper,
+    iObjectModelListener, iMovableListener>
 {
 public:
   CS_LEAKGUARD_DECLARE (csVisibilityObjectWrapper);
@@ -103,9 +104,9 @@ public:
   csRef<iMeshWrapper> mesh;
   csRef<iShadowCaster> caster;
 
-  csVisibilityObjectWrapper ()
+  csVisibilityObjectWrapper () :
+    scfImplementationType (this)
   {
-    SCF_CONSTRUCT_IBASE (0);
     history = new csVisibilityObjectHistory ();
     last_visible_vistestnr = 0;
     full_transform_identity = false;
@@ -113,7 +114,6 @@ public:
   virtual ~csVisibilityObjectWrapper ()
   {
     history->DecRef ();
-    SCF_DESTRUCT_IBASE();
   }
   void SetDynavis (csDynaVis* dynavis)
   {
@@ -148,8 +148,6 @@ public:
     history->history_frame_cnt = history_frame_cnt;
   }
 
-  SCF_DECLARE_IBASE;
-
   /// The object model has changed.
   virtual void ObjectModelChanged (iObjectModel* model);
   /// The movable has changed.
@@ -180,7 +178,9 @@ public:
 /**
  * A dynamic visisibility culling system.
  */
-class csDynaVis : public iVisibilityCuller
+class csDynaVis :
+  public scfImplementation4<csDynaVis,
+    iVisibilityCuller, iEventHandler, iComponent, iDebugHelper>
 {
 public:
   // List of objects to iterate over (after VisTest()).
@@ -193,6 +193,7 @@ private:
   iObjectRegistry* object_reg;
   csEventID CanvasResize;
   csRef<iBugPlug> bugplug;
+  csRef<iEventHandler> weakEventHandler;
   csKDTree* kdtree;
   // Ever growing box of all objects that were ever in the tree.
   // This puts an upper limit of all boxes in the kdtree itself because
@@ -293,8 +294,6 @@ private:
 	const csTestRectData& testrect_data, const csBox2& sbox);
 
 public:
-  SCF_DECLARE_IBASE;
-
   csDynaVis (iBase *iParent);
   virtual ~csDynaVis ();
   virtual bool Initialize (iObjectRegistry *object_reg);
@@ -349,80 +348,25 @@ public:
   virtual const char* ParseCullerParameters (iDocumentNode*) { return 0; }
 
   // Debugging functions.
-  csPtr<iString> Debug_UnitTest ();
-  csPtr<iString> Debug_StateTest ();
-  csPtr<iString> Debug_Dump ();
-  void Debug_Dump (iGraphics3D* g3d);
-  csTicks Debug_Benchmark (int num_iterations);
-  bool Debug_DebugCommand (const char* cmd);
+  csPtr<iString> UnitTest ();
+  csPtr<iString> StateTest ();
+  csPtr<iString> Dump ();
+  void Dump (iGraphics3D* g3d);
+  csTicks Benchmark (int num_iterations);
+  bool DebugCommand (const char* cmd);
   csKDTree* GetKDTree () { return kdtree; }
 
   bool HandleEvent (iEvent& ev);
 
-  struct eiEventHandler : public iEventHandler
-  {
-    csWeakRef<csDynaVis> parent;
-    SCF_DECLARE_IBASE;
-    eiEventHandler (csDynaVis* parent)
-    {
-      SCF_CONSTRUCT_IBASE (0);
-      eiEventHandler::parent = parent;
-    }
-    virtual ~eiEventHandler ()
-    {
-      SCF_DESTRUCT_IBASE ();
-    }
-    virtual bool HandleEvent (iEvent& ev)
-    {
-      if (parent) return parent->HandleEvent (ev);
-      else return false;
-    }
-    CS_EVENTHANDLER_NAMES("crystalspace.dynavis")
-    CS_EVENTHANDLER_NIL_CONSTRAINTS
-  } * scfiEventHandler;
+  CS_EVENTHANDLER_NAMES("crystalspace.dynavis")
+  CS_EVENTHANDLER_NIL_CONSTRAINTS
 
-  struct eiComponent : public iComponent
+  virtual int GetSupportedTests () const
   {
-    SCF_DECLARE_EMBEDDED_IBASE (csDynaVis);
-    virtual bool Initialize (iObjectRegistry* p)
-    { return scfParent->Initialize (p); }
-  } scfiComponent;
-
-  struct DebugHelper : public iDebugHelper
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csDynaVis);
-    virtual int GetSupportedTests () const
-    {
-      return CS_DBGHELP_UNITTEST | CS_DBGHELP_TXTDUMP |
-      	CS_DBGHELP_STATETEST | CS_DBGHELP_BENCHMARK |
-	CS_DBGHELP_GFXDUMP;
-    }
-    virtual csPtr<iString> UnitTest ()
-    {
-      return scfParent->Debug_UnitTest ();
-    }
-    virtual csPtr<iString> StateTest ()
-    {
-      return scfParent->Debug_StateTest ();
-    }
-    virtual csTicks Benchmark (int num_iterations)
-    {
-      return scfParent->Debug_Benchmark (num_iterations);
-    }
-    virtual csPtr<iString> Dump ()
-    {
-      return scfParent->Debug_Dump ();
-    }
-    virtual void Dump (iGraphics3D* g3d)
-    {
-      scfParent->Debug_Dump (g3d);
-    }
-    virtual bool DebugCommand (const char* cmd)
-    {
-      return scfParent->Debug_DebugCommand (cmd);
-    }
-  } scfiDebugHelper;
+    return CS_DBGHELP_UNITTEST | CS_DBGHELP_TXTDUMP |
+      CS_DBGHELP_STATETEST | CS_DBGHELP_BENCHMARK |
+      CS_DBGHELP_GFXDUMP;
+  }
 };
 
 #endif // __CS_DYNAVIS_H__
-

@@ -15,6 +15,10 @@ General Public License (@sc{lgpl}).  @xref{Licenses}.}
 @emph{Documentation revised significantly by Eric Sunshine,
 @email{sunshine@@sunshineco.com}.  Last updated September 24, 2003.}
 
+@noindent
+@emph{@sc{SCF} implementation revised by M@aa{}rten Svanfeldt and Michael Adams
+2005-2006}
+
 This library is intended for separating C++ class implementations from programs
 that use them.  This is achieved by separating class implementations into a
 separate module in the form of shared libraries, which are also called
@@ -41,6 +45,7 @@ The @sc{scf} implementation is resides within the @file{CS/libs/csutil} module.
 * SCF Explained:: How it Works
 * SCF Using:: Using @sc{scf}
 * SCF Multiple Interfaces:: Classes Implementing Multiple Interfaces
+* SCF Interface and implementation inheritance:: Interface and implementation inheritance
 * SCF Versions:: Interface Versions
 * SCF Client:: Client Side
 * SCF Meta Info:: Plugin Meta-Information
@@ -117,7 +122,7 @@ class MyDog : public iDog
 @{
 private:
   // private member functions & variables @dots{}
-  char* Name;
+  csString Name;
 public:
   virtual bool IsAlive();
   virtual char const* GetName();
@@ -140,9 +145,7 @@ char const* MyDog::GetName()
 
 void MyDog::SetName(char const* NewName)
 @{
-  if (Name != 0)
-    free (Name);
-  Name = strcpy (NewName);
+  Name = NewName;
 @}
 
 // And so on @dots{}
@@ -195,7 +198,7 @@ valid @sc{scf} interface).  This object is global and can be accessed from
 @emph{anywhere}, even from dynamic libraries (plugin modules).  It is used by
 several parts of @sc{scf}.  Note that this object is only available after
 calling @code{scfInitialize()}, the main initialization function of @sc{scf}.
-In typical use, howerver, you rarely need to interact directly with
+In typical use, however, you rarely need to interact directly with
 @samp{iSCF::SCF}.  Instead, you invoke several convenient @sc{scf} macros which
 interact with @samp{iSCF::SCF} on your behalf.
 
@@ -271,7 +274,7 @@ public:
 SCF_IMPLEMENT_FACTORY(Test)
 @end example
 
-@node SCF Multiple Interfaces, SCF Versions, SCF Using, SCF
+@node SCF Multiple Interfaces, SCF Interface and implementation inheritance, SCF Using, SCF
 @subsubsection Classes Implementing Multiple Interfaces
 
 Sometimes we will want one object to implement several interfaces.  For
@@ -292,7 +295,78 @@ This is an example of a class implementing three interfaces. You need
 to give the implementation of all functions from those three interfaces
 in @samp{MyGraphics3D}.
 
-@node SCF Versions, SCF Client, SCF Multiple Interfaces, SCF
+@node SCF Interface and implementation inheritance, SCF Versions, SCF Multiple Interfaces, SCF
+@subsubsection Interface and implementation inheritance
+
+From time to time there might be a need or want for using normal inheritance
+together with @sc{scf}. In practice there are two times you want to do this;
+interface deriving from another interface to add methods and deriving from an
+implementation class to add new interfaces.
+
+In the first case where you want an interface to extend another, the declaration
+of the interfaces is straight forward using normal C++ inheritance. However, to
+make the implementation class aware of the base interfaces it should also expose
+you need to use the @code{scfFakeInterface<>} template class in the parameter
+to @code{scfImplementationN<>}.
+
+Example:
+
+@example
+// Abstract interface file (itest2.h)
+struct iTestBase : public virtual iBase
+@{
+  SCF_INTERFACE (iTestBase, 1, 0, 0);
+  @dots{}
+  virtual void SomeFunction () = 0;
+@};
+
+struct iTest2 : public iTestBase
+@{
+  SCF_INTERFACE (iTest2, 1, 0, 0);
+  @dots{}
+  virtual void NewFunction () = 0;
+@};
+
+// Concrete implementation header (test2.h)
+class Test2 : public scfImplementation2<Test2, 
+                                        scfFakeInterface<iTestBase>,
+                                        iTest2>
+@{
+  @dots{}
+@};
+
+@end example
+
+The other situation is when you want to take an already existing implementation
+class, derive from it and add one or more new interfaces. Using only normal C++
+inheritance and @code{scfImplementationN<>} like above is the right way to go if
+the base class does not implement any @sc{scf} interfaces, if they do you need
+to use the extra functionality that the template @code{scfImplementationExtN<>}.
+
+@code{scfImplementationExtN<>} have same template parameters as 
+@code{scfImplementationN<>} with one difference, the second parameter is the base
+class to use. 
+
+Example: Lets extend Test2 from above with one more interface
+
+@example
+struct iNewIf : public virtual iBase
+@{
+  SCF_INTERFACE (iNewIf, 1, 0, 0);
+  virtual void PrintMe () = 0;
+@}
+
+class NewTest2 : public scfImplementationExt1<NewTest2, Test2, iNewIf>
+@{
+  @dots{}
+  void PrintMe ();
+@}
+
+@end example
+
+
+
+@node SCF Versions, SCF Client, SCF Interface and implementation inheritance, SCF
 @subsubsection Interface Versions
 
 Unlike @sc{com}, @sc{scf} supports interface versions.  That is, a shared class
@@ -637,21 +711,16 @@ interfaces:
 @emph{File}: @file{dog.cpp}
 
 @example
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-
-#include "cssysdef.h"
+#include "crystalspace.h"
 #include "idog.h"
 #include "iname.h"
 
 class csDog : public scfImplementation2<csDog,iDog,iName>
 @{
 private:
-  char* Name;
+  csString Name;
 
 public:
-  SCF_DECLARE_IBASE;
   csDog(iBase* Parent);
   virtual ~csDog();
 
@@ -668,24 +737,23 @@ public:
 
 SCF_IMPLEMENT_FACTORY(csDog)
 
-csDog::csDog(iBase* Parent) : scfImplementationType (this, Parent)
+csDog::csDog(iBase* Parent) : scfImplementationType (this, Parent),
+  Name ("<noname>")
 @{
-  Name = strdup("<noname>");
 @}
 
 csDog::~csDog()
 @{
-  free(Name);
 @}
 
 void csDog::Walk()
 @{
-  printf("%s: I'm walking\n", Name);
+  printf("%s: I'm walking\n", Name.GetData());
 @}
 
 void csDog::Shout(char const* Message)
 @{
-  printf("I'm %s: shout, shout, %s\n", Name, Message);
+  printf("I'm %s: shout, shout, %s\n", Name.GetData(), Message);
 @}
 
 // iName interface for dog.
@@ -697,9 +765,7 @@ char const* csDog::GetName()
 
 void csDog::SetName(char const* NewName)
 @{
-  if (Name != 0)
-    free(Name);
-  Name = strdup(NewName != 0 ? NewName : "");
+  Name = NewName != 0 ? NewName : "";
 @}
 
 @end example

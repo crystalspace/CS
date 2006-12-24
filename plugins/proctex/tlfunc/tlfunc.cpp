@@ -23,7 +23,8 @@
 #include "csutil/csmd5.h"
 #include "csutil/ref.h"
 #include "csutil/scfarray.h"
-#include "csgfx/memimage.h"
+#include "csutil/scf.h"
+#include "csgfx/imagememory.h"
 #include "csgfx/shaderexp.h"
 #include "csgfx/shadervarcontext.h"
 
@@ -44,33 +45,20 @@
 
 CS_LEAKGUARD_IMPLEMENT (csFuncTexLoader);
 
-SCF_IMPLEMENT_IBASE(csFuncTexLoader);
-  SCF_IMPLEMENTS_INTERFACE(iLoaderPlugin);
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iComponent);
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csFuncTexLoader::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_FACTORY(csFuncTexLoader)
 
 //---------------------------------------------------------------------------
 
-csFuncTexLoader::csFuncTexLoader (iBase *p)
+csFuncTexLoader::csFuncTexLoader (iBase *p) :
+  scfImplementationType(this, p)
 {
-  SCF_CONSTRUCT_IBASE (p);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
-
   InitTokenTable (tokens);
 }
 
 csFuncTexLoader::~csFuncTexLoader()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
-  SCF_DESTRUCT_IBASE();
 }
 
 bool csFuncTexLoader::Initialize(iObjectRegistry *object_reg)
@@ -111,14 +99,14 @@ csPtr<iBase> csFuncTexLoader::Parse (iDocumentNode* node,
 				     iBase* context)
 {
   csRef<iSyntaxService> synldr = 
-    CS_QUERY_REGISTRY (object_reg, iSyntaxService);
+    csQueryRegistry<iSyntaxService> (object_reg);
 
   int w = 256, h = 256;
   csRef<iTextureLoaderContext> ctx;
   if (context)
   {
     ctx = csPtr<iTextureLoaderContext>
-      (SCF_QUERY_INTERFACE (context, iTextureLoaderContext));
+      (scfQueryInterface<iTextureLoaderContext> (context));
     if (ctx) 
     {
       if (ctx->HasSize())
@@ -184,13 +172,13 @@ csPtr<iBase> csFuncTexLoader::Parse (iDocumentNode* node,
 
   // Cache stuff
   csRef<iImage> Image;
-  csRef<iEngine> Engine = CS_QUERY_REGISTRY (object_reg, iEngine);
+  csRef<iEngine> Engine = csQueryRegistry<iEngine> (object_reg);
   if (!Engine)
     return 0;
   const char* cache_type = "tlfunc";
   csString cache_scope (ctx->GetName ());
   csRef<iCacheManager> cache = Engine->GetCacheManager();
-  csRef<iImageIO> imageio (CS_QUERY_REGISTRY (object_reg, iImageIO));
+  csRef<iImageIO> imageio (csQueryRegistry<iImageIO> (object_reg));
   bool do_cache = imageio && cache && cache_scope;
 
   if (exprNode)
@@ -220,8 +208,8 @@ csPtr<iBase> csFuncTexLoader::Parse (iDocumentNode* node,
 
     if (exprNode)
     {
-      csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
-	object_reg, "crystalspace.shared.stringset", iStringSet);
+      csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet> (
+	object_reg, "crystalspace.shared.stringset");
 
       csShaderExpression expr (object_reg);
       
@@ -283,7 +271,7 @@ csPtr<iBase> csFuncTexLoader::Parse (iDocumentNode* node,
     }
   }
 
-  csRef<iGraphics3D> G3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+  csRef<iGraphics3D> G3D = csQueryRegistry<iGraphics3D> (object_reg);
   if (!G3D) return 0;
   csRef<iTextureManager> tm = G3D->GetTextureManager();
   if (!tm) return 0;

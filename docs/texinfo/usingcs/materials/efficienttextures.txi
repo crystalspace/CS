@@ -106,7 +106,7 @@ which is available from NVidia
 @subsubheading Texture quality control
 As mentioned above, textures in CS are compressed before being uploaded to the 
 graphics hardware; while compressed textures are fast, they are sometimes 
-undesireable (e.g. for normal maps - see 
+undesirable (e.g. for normal maps - see 
 @uref{http://developer.nvidia.com/object/bump_map_compression.html} for an 
 illustration of the problems). 
 

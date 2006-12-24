@@ -113,7 +113,6 @@ bool csXMLShaderTech::ParseInstanceBinds (iDocumentNode *node, shaderPass *pass)
     size_t binds_cnt = 0;
     switch (source_variable->GetType ())
     {
-    case csShaderVariable::COLOR:
     case csShaderVariable::VECTOR2:
     case csShaderVariable::VECTOR3:
     case csShaderVariable::VECTOR4:
@@ -337,7 +336,7 @@ bool csXMLShaderTech::LoadPass (iDocumentNode *node, shaderPass *pass,
     if (mapping->GetType () != CS_NODE_ELEMENT) continue;
     
     const char* dest = mapping->GetAttributeValue ("destination");
-    csVertexAttrib attrib = CS_VATTRIB_0;
+    csVertexAttrib attrib = CS_VATTRIB_INVALID;
     bool found = false;
     int i;
     for(i=0;i<16;i++)
@@ -409,14 +408,9 @@ bool csXMLShaderTech::LoadPass (iDocumentNode *node, shaderPass *pass,
 	}
 	else
 	{
-	  csVertexAttrib attr = 
-	    resolveVP ? resolveVP->ResolveBufferDestination (dest) : 
+	  attrib = resolveVP ? resolveVP->ResolveBufferDestination (dest) : 
 	    CS_VATTRIB_INVALID;
-	  if (attr != CS_VATTRIB_INVALID)
-	  {
-	    attrib = attr;
-	    found = true;
-	  }
+          found = (attrib > CS_VATTRIB_INVALID);
 	}
       }
     }
@@ -465,6 +459,7 @@ bool csXMLShaderTech::LoadPass (iDocumentNode *node, shaderPass *pass,
 	{
 	  pass->custommapping_attrib.Push (attrib);
 	  pass->custommapping_buffer.Push (sourceName);
+          pass->custommapping_id.Push (csInvalidStringID);
 	  /* Those buffers are mapped by default to some specific vattribs; 
 	   * since they are now to be mapped to some generic vattrib,
 	   * turn off the default map. */
@@ -475,9 +470,12 @@ bool csXMLShaderTech::LoadPass (iDocumentNode *node, shaderPass *pass,
     }
     else
     {
-      parent->compiler->Report (CS_REPORTER_SEVERITY_WARNING,
-	"Shader '%s', pass %d: invalid buffer destination '%s'",
-	parent->GetName (), GetPassNumber (pass), dest);
+      if (attrib == CS_VATTRIB_INVALID)
+      {
+        parent->compiler->Report (CS_REPORTER_SEVERITY_WARNING,
+	  "Shader '%s', pass %d: invalid buffer destination '%s'",
+	  parent->GetName (), GetPassNumber (pass), dest);
+      }
     }
   }
 
@@ -516,8 +514,8 @@ bool csXMLShaderTech::LoadPass (iDocumentNode *node, shaderPass *pass,
   return true;
 }
 
-bool csXMLShaderCompiler::LoadSVBlock (iDocumentNode *node,
-  iShaderVariableContext *context)
+bool csXMLShaderCompiler::LoadSVBlock (iLoaderContext* ldr_context,
+    iDocumentNode *node, iShaderVariableContext *context)
 {
   csRef<csShaderVariable> svVar;
   
@@ -525,10 +523,9 @@ bool csXMLShaderCompiler::LoadSVBlock (iDocumentNode *node,
   while (it->HasNext ())
   {
     csRef<iDocumentNode> var = it->Next ();
-    svVar.AttachNew (new csShaderVariable (
-      strings->Request(var->GetAttributeValue ("name"))));
+    svVar.AttachNew (new csShaderVariable);
 
-    if (synldr->ParseShaderVar (var, *svVar))
+    if (synldr->ParseShaderVar (ldr_context, var, *svVar))
       context->AddVariable(svVar);
   }
 
@@ -592,8 +589,8 @@ csPtr<iShaderProgram> csXMLShaderTech::LoadProgram (
   return csPtr<iShaderProgram> (program);
 }
 
-bool csXMLShaderTech::Load (iDocumentNode* node, iDocumentNode* parentSV, 
-                            size_t variant)
+bool csXMLShaderTech::Load (iLoaderContext* ldr_context,
+    iDocumentNode* node, iDocumentNode* parentSV, size_t variant)
 {
   if ((node->GetType() != CS_NODE_ELEMENT) || 
     (xmltokens.Request (node->GetValue()) 
@@ -656,14 +653,14 @@ bool csXMLShaderTech::Load (iDocumentNode* node, iDocumentNode* parentSV,
     csRef<iDocumentNode> varNode = parentSV->GetNode(
       xmltokens.Request (csXMLShaderCompiler::XMLTOKEN_SHADERVARS));
     if (varNode)
-      parent->compiler->LoadSVBlock (varNode, &svcontext);
+      parent->compiler->LoadSVBlock (ldr_context, varNode, &svcontext);
   }
 
   csRef<iDocumentNode> varNode = node->GetNode(
     xmltokens.Request (csXMLShaderCompiler::XMLTOKEN_SHADERVARS));
 
   if (varNode)
-    parent->compiler->LoadSVBlock (varNode, &svcontext);
+    parent->compiler->LoadSVBlock (ldr_context, varNode, &svcontext);
 
   // copy over metadata from parent
   metadata.description = csStrNew (parent->allShaderMeta.description);

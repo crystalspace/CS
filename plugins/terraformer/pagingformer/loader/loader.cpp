@@ -21,6 +21,7 @@
 #include "csutil/csstring.h"
 #include "csutil/csendian.h"
 #include "csutil/dirtyaccessarray.h"
+#include "csutil/scf.h"
 
 #include "iengine/engine.h"
 #include "iengine/mesh.h"
@@ -45,34 +46,22 @@ CS_IMPLEMENT_PLUGIN
 namespace cspluginPagingFormerLoader
 {
 
-SCF_IMPLEMENT_IBASE (csPagingFormerLoader)
-  SCF_IMPLEMENTS_INTERFACE (iLoaderPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csPagingFormerLoader::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 SCF_IMPLEMENT_FACTORY (csPagingFormerLoader)
 
-csPagingFormerLoader::csPagingFormerLoader (iBase* parent)
+csPagingFormerLoader::csPagingFormerLoader (iBase* parent) :
+  scfImplementationType(this, parent)
 {
-  SCF_CONSTRUCT_IBASE (parent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
 }
 
 csPagingFormerLoader::~csPagingFormerLoader ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csPagingFormerLoader::Initialize (iObjectRegistry* object_reg)
 {
   objreg = object_reg;
-  synldr = CS_QUERY_REGISTRY (objreg, iSyntaxService);
-  pluginmgr = CS_QUERY_REGISTRY (objreg, iPluginManager);
+  synldr = csQueryRegistry<iSyntaxService> (objreg);
+  pluginmgr = csQueryRegistry<iPluginManager> (objreg);
 
   InitTokenTable (xmltokens);
   return true;
@@ -90,8 +79,8 @@ csPtr<iBase> csPagingFormerLoader::Parse (iDocumentNode* node,
       node, "Could not loader crystalspace.terraformer.paging plugin");
     return 0;
   }
-  csRef<iPagingFormerState> state = SCF_QUERY_INTERFACE (former, 
-        iPagingFormerState);
+  csRef<iPagingFormerState> state =  
+        scfQueryInterface<iPagingFormerState> (former);
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
@@ -120,8 +109,8 @@ csPtr<iBase> csPagingFormerLoader::Parse (iDocumentNode* node,
       {
         const char* typestring = child->GetAttributeValue ("type");
         const char *dir = child->GetContentsValue ();
-        csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
-          objreg, "crystalspace.shared.stringset", iStringSet);
+        csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet> (
+          objreg, "crystalspace.shared.stringset");
         state->SetIntmapDir (strings->Request(typestring),dir);
         break;
       }
@@ -129,8 +118,8 @@ csPtr<iBase> csPagingFormerLoader::Parse (iDocumentNode* node,
       {
         const char* typestring = child->GetAttributeValue ("type");
         const char *dir = child->GetContentsValue ();
-        csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
-          objreg, "crystalspace.shared.stringset", iStringSet);
+        csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet> (
+          objreg, "crystalspace.shared.stringset");
         state->SetFloatmapDir (strings->Request(typestring),dir);
         break;
       }
@@ -161,7 +150,7 @@ csPtr<iBase> csPagingFormerLoader::Parse (iDocumentNode* node,
       case XMLTOKEN_INTMAP:
       {
         const char *image = child->GetContentsValue ();
-        csRef<iLoader> loader = CS_QUERY_REGISTRY (objreg, iLoader);
+        csRef<iLoader> loader = csQueryRegistry<iLoader> (objreg);
         csRef<iImage> map = loader->LoadImage (image);
         if (map == 0)
         {
@@ -172,8 +161,8 @@ csPtr<iBase> csPagingFormerLoader::Parse (iDocumentNode* node,
         int scale = child->GetAttributeValueAsInt ("scale");
         int offset = child->GetAttributeValueAsInt ("offset");
         const char* typestring = child->GetAttributeValue ("type");
-        csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
-          objreg, "crystalspace.shared.stringset", iStringSet);
+        csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet> (
+          objreg, "crystalspace.shared.stringset");
         csStringID type = strings->Request (typestring);
         state->SetIntegerMap (type, map, scale, offset);
         break;
@@ -181,7 +170,7 @@ csPtr<iBase> csPagingFormerLoader::Parse (iDocumentNode* node,
       case XMLTOKEN_FLOATMAP:
       {
         const char *image = child->GetContentsValue ();
-        csRef<iLoader> loader = CS_QUERY_REGISTRY (objreg, iLoader);
+        csRef<iLoader> loader = csQueryRegistry<iLoader> (objreg);
         csRef<iImage> map = loader->LoadImage (image);
         if (map == 0)
         {
@@ -192,8 +181,8 @@ csPtr<iBase> csPagingFormerLoader::Parse (iDocumentNode* node,
         float scale = child->GetAttributeValueAsFloat ("scale");
         float offset = child->GetAttributeValueAsFloat ("offset");
         const char* typestring = child->GetAttributeValue ("type");
-        csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
-          objreg, "crystalspace.shared.stringset", iStringSet);
+        csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet> (
+          objreg, "crystalspace.shared.stringset");
         csStringID type = strings->Request (typestring);
         state->SetFloatMap (type, map, scale, offset);
         break;

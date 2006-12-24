@@ -31,17 +31,16 @@
 #include "csutil/refarr.h"
 #include "csutil/strhash.h"
 #include "csutil/stringarray.h"
+#include "csutil/scf_implementation.h"
 #include "imesh/genmesh.h"
-#include "imesh/gmeshskel.h"
+#include "imesh/gmeshskel2.h"
 #include "iutil/comp.h"
 #include "iutil/eventh.h"
 #include "iutil/virtclk.h"
 #include "imesh/object.h"
-//#include "ivaria/dynamics.h"
 #include "imesh/skeleton.h"
 #include <iengine/scenenode.h>
 #include <iengine/movable.h>
-//#include <iphysics/dynamics.h>
 
 class csSkeleton;
 class csSkeletonFactory;
@@ -49,7 +48,8 @@ class csSkeletonBoneFactory;
 class csSkeletonGraveyard;
 class csSkeletonSocketFactory;
 
-class csSkeletonBone : public iSkeletonBone
+class csSkeletonBone :
+  public scfImplementation1<csSkeletonBone, iSkeletonBone>
 {
 private:
   csString name;
@@ -87,14 +87,13 @@ public:
   csSkeletonBone (csSkeleton *skeleton, csSkeletonBoneFactory *factory_bone);
   virtual ~csSkeletonBone ();
 
-  SCF_DECLARE_IBASE;
   virtual const char* GetName () const { return name.GetData(); }
   virtual void SetName (const char* name) { csSkeletonBone::name = name; }
   virtual csReversibleTransform &GetTransform () { return transform; }
   virtual void SetTransform (const csReversibleTransform &transform) 
   {
     csSkeletonBone::transform = transform;
-    rot_quat.SetMatrix (transform.GetT2O());
+    rot_quat.SetMatrix (transform.GetO2T());
   }
   virtual csReversibleTransform &GetFullTransform () 
     { return full_transform; }
@@ -107,8 +106,7 @@ public:
     { cb = callback; }
   virtual iSkeletonBoneUpdateCallback *GetUpdateCallback () 
     { return cb; };
-  virtual iSkeletonBoneFactory *GetFactory() 
-    { return (iSkeletonBoneFactory *)factory_bone; }
+  virtual iSkeletonBoneFactory *GetFactory();
   virtual size_t FindChildIndex (iSkeletonBone *child);
   virtual void SetSkinBox (csBox3 & box) { skin_box = box; }
   virtual csBox3 & GetSkinBox () { return skin_box; }
@@ -131,21 +129,16 @@ public:
   { return transform_mode; }
 };
 
-class csSkeletonBoneDefaultUpdateCallback : public iSkeletonBoneUpdateCallback
+class csSkeletonBoneDefaultUpdateCallback :
+  public scfImplementation1<csSkeletonBoneDefaultUpdateCallback,
+    iSkeletonBoneUpdateCallback>
 {
 public:
-  SCF_DECLARE_IBASE;
-  csSkeletonBoneDefaultUpdateCallback()
-  {
-    SCF_CONSTRUCT_IBASE(0);
-  }
-  
-  virtual ~csSkeletonBoneDefaultUpdateCallback()
-  {
-    SCF_DESTRUCT_IBASE();
-  }
+  csSkeletonBoneDefaultUpdateCallback() : scfImplementationType(this) { }
+  virtual ~csSkeletonBoneDefaultUpdateCallback() { }
 
-  virtual void UpdateTransform(iSkeletonBone *bone, const csReversibleTransform & transform)
+  virtual void UpdateTransform(iSkeletonBone *bone,
+    const csReversibleTransform & transform)
   {
     //bone->GetTransform().SetO2T(transform.GetO2T());
     //bone->GetTransform().SetOrigin(transform.GetOrigin());
@@ -155,7 +148,8 @@ public:
 
 //----------------------------------------- csSkeletonSocket ------------------------------------------
 
-class csSkeletonSocket : public iSkeletonSocket
+class csSkeletonSocket :
+  public scfImplementation1<csSkeletonSocket, iSkeletonSocket>
 {
 private:
   csString name;
@@ -167,7 +161,6 @@ private:
 public:
   csSkeletonSocket (csSkeleton *skeleton, csSkeletonSocketFactory *socket_factory);
   virtual ~csSkeletonSocket ();
-  SCF_DECLARE_IBASE;
   virtual const char* GetName () const
   { return name; }
   virtual void SetName (const char* name)
@@ -186,14 +179,14 @@ public:
   { csSkeletonSocket::node = node; }
     virtual iSceneNode *GetSceneNode ()
   { return node; }
-    virtual iSkeletonSocketFactory *GetFactory ()
-  { return (iSkeletonSocketFactory *)factory; }
+    virtual iSkeletonSocketFactory *GetFactory ();
 };
 
 
 //----------------------------- csSkeletonBoneFactory -------------------------------
 
-class csSkeletonBoneFactory : public iSkeletonBoneFactory
+class csSkeletonBoneFactory :
+  public scfImplementation1<csSkeletonBoneFactory, iSkeletonBoneFactory>
 {
 private:
   csString name;
@@ -215,7 +208,6 @@ public:
   csSkeletonBoneFactory (csSkeletonFactory *);
   virtual ~csSkeletonBoneFactory ();
 
-  SCF_DECLARE_IBASE;
   virtual const char* GetName () const { return name.GetData(); }
   virtual void SetName (const char* name){ csSkeletonBoneFactory::name = name; }
   virtual csReversibleTransform &GetTransform () { return transform; }
@@ -236,7 +228,9 @@ public:
 
 //---------------------------------iSkeletonBoneRagdollInfo ----------
 
-class csSkeletonBoneRagdollInfo : public iSkeletonBoneRagdollInfo
+class csSkeletonBoneRagdollInfo :
+  public scfImplementation1<csSkeletonBoneRagdollInfo,
+    iSkeletonBoneRagdollInfo>
 {
 private:
   bool enabled;
@@ -257,7 +251,6 @@ public:
   csSkeletonBoneRagdollInfo (csSkeletonBoneFactory *bone_fact);
   virtual ~csSkeletonBoneRagdollInfo ();
 
-  SCF_DECLARE_IBASE;
   virtual void SetEnabled(bool enabled)
   { csSkeletonBoneRagdollInfo::enabled = enabled; }
   virtual bool GetEnabled()
@@ -332,45 +325,63 @@ public:
 };
 
 
-class csSkeletonScriptKeyFrame: public iSkeletonScriptKeyFrame
+struct bone_key_info
 {
+  bool relative;
+  csQuaternion rot;
+  csVector3 pos;
+  csQuaternion tangent;
+  iSkeletonBoneFactory *bone;
+};
+
+class csSkeletonScriptKeyFrame :
+  public scfImplementation1<csSkeletonScriptKeyFrame, iSkeletonScriptKeyFrame>
+{
+  public:
+    typedef csHash<bone_key_info, csPtrKey<iSkeletonBoneFactory> > 
+      BoneKeyHash;
   private:
     csString name;
     csTicks duration;
-    struct bone_key_frame
-    {
-      bool relative;
-      csReversibleTransform transform;
-      iSkeletonBoneFactory *bone;
-    };
-    csArray<bone_key_frame> bones_frame_transforms;
+    //csArray<bone_key_info> bones_frame_transforms;
+    //csArray<bone_key_info> bones_frame_transforms;
+    BoneKeyHash bones_frame_transforms;
     csReversibleTransform fallback_transform;
   public:
+
+    bone_key_info & GetKeyInfo(iSkeletonBoneFactory *bone_fact)
+    {
+      bone_key_info fallback;
+      return bones_frame_transforms.Get(bone_fact, fallback);
+    }
     
     csSkeletonScriptKeyFrame (const char* name);
     virtual ~csSkeletonScriptKeyFrame ();
 
-    SCF_DECLARE_IBASE;
     virtual const char* GetName () const { return name; }
     virtual void SetName (const char* name)
       { csSkeletonScriptKeyFrame::name = name; }
     virtual csTicks GetDuration () { return duration; }
     virtual void SetDuration (csTicks time) { duration = time; }
     virtual size_t GetTransformsCount() 
-      { return bones_frame_transforms.Length(); }
+      { return bones_frame_transforms.GetSize(); }
 
     virtual void AddTransform(iSkeletonBoneFactory *bone, 
       csReversibleTransform &transform, bool relative)
     {
-      bone_key_frame bf;
-      bf.transform = transform;
+      bone_key_info bf;
+      csQuaternion q;
+      q.SetMatrix(transform.GetO2T());
+      bf.rot = q;
+      bf.pos = transform.GetOrigin();
       bf.bone = bone;
-	  bf.relative = relative;
-      bones_frame_transforms.Push(bf);
+      bf.relative = relative;
+      bones_frame_transforms.Put(bone, bf);
     }
 
     virtual csReversibleTransform & GetTransform(iSkeletonBoneFactory *bone)
     {
+      /*
       for (size_t i = 0; i < bones_frame_transforms.Length() ; i++ )
       {
         if (bones_frame_transforms[i].bone == bone)
@@ -378,12 +389,14 @@ class csSkeletonScriptKeyFrame: public iSkeletonScriptKeyFrame
           return bones_frame_transforms[i].transform;
         }
       }
+      */
       return fallback_transform;
     }
 
     virtual void SetTransform(iSkeletonBoneFactory *bone, 
       csReversibleTransform &transform)
     {
+      /*
       for (size_t i = 0; i < bones_frame_transforms.Length() ; i++ )
       {
         if (bones_frame_transforms[i].bone == bone)
@@ -391,19 +404,24 @@ class csSkeletonScriptKeyFrame: public iSkeletonScriptKeyFrame
           bones_frame_transforms[i].transform = transform;
         }
       }
+      */
     }
 
-  virtual void GetKeyFrameData(size_t i, iSkeletonBoneFactory *& bone_fact, 
-    csReversibleTransform & transform, bool & relative)
-    {
-	  const bone_key_frame & bkf = bones_frame_transforms[i];
-	  transform = bkf.transform;
-	  bone_fact = bkf.bone;
-	  relative = bkf.relative;
-    }
+  virtual void GetKeyFrameData(iSkeletonBoneFactory *bone_fact, 
+	  csQuaternion & rot, csVector3 & pos, csQuaternion & tangent,
+       bool & relative)
+  {
+	  bone_key_info fallback;
+          const bone_key_info & bki = bones_frame_transforms.Get(bone_fact, fallback);
+	  rot = bki.rot;
+	  pos = bki.pos;
+	  tangent = bki.tangent;
+	  relative = bki.relative;
+  }
 };
 
-class csSkeletonScript : public iSkeletonScript
+class csSkeletonScript :
+  public scfImplementation1<csSkeletonScript, iSkeletonScript>
 {
 private:
   csString name;
@@ -411,12 +429,11 @@ private:
   bool loop;
   int loop_times;
   csRefArray<csSkeletonScriptKeyFrame> key_frames;
+  csSkeletonFactory *fact;
 public:
 
-  csSkeletonScript (const char* name);
+  csSkeletonScript (csSkeletonFactory *factory, const char* name);
   virtual ~csSkeletonScript ();
-
-  SCF_DECLARE_IBASE;
 
   void SetForcedDuration(csTicks new_duration)
   { forced_duration = new_duration; }
@@ -451,11 +468,13 @@ public:
   virtual size_t FindFrameIndex(const char * /*name*/)  { return 0; }
   virtual void RemoveFrame(size_t i) 
     { key_frames.DeleteIndexFast(i); }
+  virtual void RecalcSpline();
 };
 
 struct bone_transform_data
 {
   csQuaternion quat;
+  csQuaternion tangent;
   csVector3 pos;
   csVector3 axis;
   csReversibleTransform transform;
@@ -469,6 +488,7 @@ struct sac_transform_execution
   csVector3 final_position;
   csVector3 position;
   csQuaternion quat;
+  csQuaternion tangent;
   csQuaternion curr_quat;
   csTicks elapsed_ticks;
   int type;
@@ -537,7 +557,8 @@ public:
   void SetSpeed (float speed) { return script->SetSpeed (speed); }
 };
 
-class csSkeleton : public iSkeleton
+class csSkeleton :
+  public scfImplementation1<csSkeleton, iSkeleton>
 {
 private:
   csString name;
@@ -556,7 +577,7 @@ private:
   csRefArray<csSkeletonSocket> sockets;
   csArray<size_t> parent_bones;
 
-  iSkeletonScriptCallback *script_callback;
+  csRef<iSkeletonScriptCallback> script_callback;
 
   csRefArray<iSkeletonUpdateCallback> update_callbacks;
 
@@ -587,8 +608,6 @@ public:
   csSkeleton (csSkeletonFactory* fact);
   virtual ~csSkeleton ();
 
-  SCF_DECLARE_IBASE;
-
   virtual const char* GetName () const { return name; }
   virtual void SetName (const char* name) 
     { csSkeleton::name = name; }
@@ -607,8 +626,7 @@ public:
   virtual void Stop (const char* scriptname);
   virtual void Stop (iSkeletonScript *script);
   virtual size_t FindBoneIndex (const char* bonename);
-  virtual iSkeletonFactory *GetFactory() 
-  { return (iSkeletonFactory *)(csSkeletonFactory*)factory; }
+  virtual iSkeletonFactory *GetFactory();
     virtual void SetScriptCallback(iSkeletonScriptCallback *cb)
   { script_callback = cb; }
     virtual iSkeletonSocket* FindSocket (const char *socketname);
@@ -626,7 +644,8 @@ public:
   { update_callbacks.DeleteIndexFast(callback_idx); }
 };
 
-class csSkeletonFactory : public iSkeletonFactory
+class csSkeletonFactory :
+  public scfImplementation1<csSkeletonFactory, iSkeletonFactory>
 {
 private:
   csString name;
@@ -644,7 +663,6 @@ public:
   csSkeletonFactory (csSkeletonGraveyard* graveyard,
     iObjectRegistry* object_reg);
   virtual ~csSkeletonFactory ();
-  SCF_DECLARE_IBASE;
 
   virtual iSkeletonBoneFactory *CreateBone(const char *name);
   virtual const char* GetName () const { return name; }
@@ -657,11 +675,18 @@ public:
   csRefArray<csSkeletonBoneFactory>& GetBones () { return bones; }
   csRefArray<csSkeletonSocketFactory>& GetSockets () { return sockets; }
   csArray<size_t>& GetParentBones () { return parent_bones; }
+
+  virtual size_t GetBonesCount() const
+    { return bones.Length(); }
+  virtual iSkeletonBoneFactory * GetBone(size_t i)
+    { return bones[i]; }
+  virtual size_t FindBoneIndex (const char* bonename);
+  virtual iSkeletonBoneFactory *FindBone (const char *name);
+
+  virtual iSkeletonGraveyard *GetGraveyard  ();
+
   virtual iSkeletonScript *CreateScript(const char *name);
   virtual iSkeletonScript *FindScript(const char *name);
-  virtual iSkeletonBoneFactory *FindBone (const char *name);
-  virtual iSkeletonGraveyard *GetGraveyard  () { return (iSkeletonGraveyard *)graveyard; }
-  virtual size_t FindBoneIndex (const char* bonename);
 
   virtual iSkeletonSocketFactory *CreateSocket(const char *name, iSkeletonBoneFactory *bone);
   virtual iSkeletonSocketFactory *FindSocket(const char *name);
@@ -670,7 +695,8 @@ public:
   virtual size_t GetSocketsCount();
 };
 
-class csSkeletonSocketFactory : public iSkeletonSocketFactory
+class csSkeletonSocketFactory :
+  public scfImplementation1<csSkeletonSocketFactory, iSkeletonSocketFactory>
 {
 private:
   csString name;
@@ -680,7 +706,6 @@ private:
 public:
   csSkeletonSocketFactory (const char *name, iSkeletonBoneFactory *bone);
   virtual ~csSkeletonSocketFactory ();
-  SCF_DECLARE_IBASE;
   virtual const char* GetName () const
   { return name; }
   virtual void SetName (const char* name)
@@ -697,7 +722,9 @@ public:
   { return bone; }
 };
 
-class csSkeletonGraveyard : public iSkeletonGraveyard
+class csSkeletonGraveyard :
+  public scfImplementation2<csSkeletonGraveyard,
+    iSkeletonGraveyard, iComponent>
 {
 private:
   iObjectRegistry* object_reg;
@@ -711,33 +738,31 @@ public:
   bool Initialize (iObjectRegistry* object_reg);
   bool HandleEvent (iEvent& ev);
 
-  virtual int GetFactoriesCount() { return factories.Length(); }
+  virtual size_t GetFactoriesCount() { return factories.Length(); }
   virtual iSkeletonFactory *CreateFactory(const char *name);
   virtual iSkeletonFactory *LoadFactory(const char * /*file_name*/) { return 0; }
   virtual iSkeletonFactory *FindFactory(const char * /*name*/) { return 0; }
   virtual iSkeleton *CreateSkeleton(iSkeletonFactory *fact, const char *name);
 
-  SCF_DECLARE_IBASE;
-
-  struct eiComponent : public iComponent
+  class csSkelEventHandler : public scfImplementation1<csSkelEventHandler,
+  	iEventHandler>
   {
-    SCF_DECLARE_EMBEDDED_IBASE (csSkeletonGraveyard);
-    virtual bool Initialize (iObjectRegistry* object_reg)
+  private:
+    csSkeletonGraveyard* parent;
+
+  public:
+    csSkelEventHandler (csSkeletonGraveyard* parent)
+      : scfImplementationType (this), parent (parent) { }
+    virtual ~csSkelEventHandler () { }
+    virtual bool HandleEvent (iEvent& ev)
     {
-      return scfParent->Initialize (object_reg);
+      return parent->HandleEvent (ev);
     }
-  } scfiComponent;
 
-  struct EventHandler : public iEventHandler
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csSkeletonGraveyard);
-    virtual bool HandleEvent (iEvent &event)
-    { return scfParent->HandleEvent (event); }
     CS_EVENTHANDLER_NAMES("crystalspace.skeleton.graveyard")
     CS_EVENTHANDLER_NIL_CONSTRAINTS
-  } scfiEventHandler;
-  friend struct EventHandler;
-
+  };
+  csRef<csSkelEventHandler> evhandler;
 };
 
 #endif // __CS_SKELETON_H__

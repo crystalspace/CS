@@ -118,6 +118,13 @@
 #define SCF_IMPL_CAT_I(a, b) SCF_IMPL_CAT_II(a ## b)
 #define SCF_IMPL_CAT_II(res) res
 
+/* The deprecation turn-off may seem odd here - but MSVC emits
+ * deprecation warnings when using the destructor of a deprecated
+ * class. Since interfaces may be deprecated this may cause 
+ * deprecation warnings emitted in ~SCF_IMPL_NAME, which is kinda silly.
+ */
+#include "csutil/win32/msvc_deprecated_warn_off.h"
+
 template<class Class SCF_IMPL_TYPES>
 class CS_CRYSTALSPACE_EXPORT SCF_IMPL_NAME :
   public SCF_IMPL_SUPER
@@ -238,7 +245,7 @@ protected:
 
 private:
   template<typename I>
-  CS_FORCEINLINE static void* GetInterface(
+  CS_FORCEINLINE_TEMPLATEMETHOD static void* GetInterface (
     Class* scfObject, scfInterfaceID id, scfInterfaceVersion version)
   {
     if (id == scfInterfaceTraits<I>::GetID() &&
@@ -246,7 +253,7 @@ private:
     {
       scfObject->IncRef();
       return static_cast<
-        typename_qualifier scfInterfaceTraits<I>::InterfaceType*> (scfObject);
+        typename scfInterfaceTraits<I>::InterfaceType*> (scfObject);
     }
     else
     {
@@ -255,20 +262,22 @@ private:
   }
 
   template<typename I>
-  CS_FORCEINLINE static void AddReftrackerAlias (Class* scfObject)
+  CS_FORCEINLINE_TEMPLATEMETHOD static void AddReftrackerAlias (
+    Class* scfObject)
   {
     csRefTrackerAccess::AddAlias(
       static_cast<
-        typename_qualifier scfInterfaceTraits<I>::InterfaceType*> (scfObject),
+        typename scfInterfaceTraits<I>::InterfaceType*> (scfObject),
       scfObject);
   }
 
   template<typename I>
-  CS_FORCEINLINE static void RemoveReftrackerAlias (Class* scfObject)
+  CS_FORCEINLINE_TEMPLATEMETHOD static void RemoveReftrackerAlias (
+    Class* scfObject)
   {
     csRefTrackerAccess::RemoveAlias(
       static_cast<
-        typename_qualifier scfInterfaceTraits<I>::InterfaceType*> (scfObject),
+        typename scfInterfaceTraits<I>::InterfaceType*> (scfObject),
       scfObject);
   }
  
@@ -340,6 +349,8 @@ private:
 #endif
   }
 };
+
+#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 #undef SCF_IMPL_NAME
 #undef SCF_IMPL_SUPER

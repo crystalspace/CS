@@ -349,6 +349,13 @@ void csSprite2DMeshObject::GetObjectBoundingBox (csBox3& bbox)
   bbox.Set (-radius, radius);
 }
 
+const csBox3& csSprite2DMeshObject::GetObjectBoundingBox ()
+{
+  SetupObject ();
+  obj_bbox.Set (-radius, radius);
+  return obj_bbox;
+}
+
 void csSprite2DMeshObject::SetObjectBoundingBox (const csBox3&)
 {
   // @@@ TODO
@@ -418,6 +425,20 @@ void csSprite2DMeshObject::AddColor (const csColor& col)
       vertices->Get (i).color = vertices->Get (i).color_init;
 
   colors_dirty = true;
+}
+
+bool csSprite2DMeshObject::SetColor (const csColor& col)
+{
+  iColoredVertices* vertices = GetVertices ();
+  size_t i;
+  for (i = 0 ; i < vertices->GetSize(); i++)
+    vertices->Get (i).color_init = col;
+  if (!lighting)
+    for (i = 0 ; i < vertices->GetSize(); i++)
+      vertices->Get (i).color = col;
+
+  colors_dirty = true;
+  return true;
 }
 
 void csSprite2DMeshObject::ScaleBy (float factor)

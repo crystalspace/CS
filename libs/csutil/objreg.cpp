@@ -25,7 +25,6 @@
 #include "csutil/objreg.h"
 #include "csutil/refarr.h"
 #include "csutil/scf.h"
-#include "csutil/scopedmutexlock.h"
 #include "csutil/sysfunc.h"
 #include "csutil/util.h"
 #include "csutil/eventnames.h"
@@ -106,8 +105,6 @@ void csObjectRegistryIterator::Add (iBase* obj, char const* tag)
 csObjectRegistry::csObjectRegistry () 
   : scfImplementationType (this), clearing (false)
 {
-  // We need a recursive mutex.
-  mutex = csMutex::Create (true);
 #if defined(CS_DEBUG) || defined (CS_MEMORY_TRACKER)
   if (iSCF::SCF == 0)
     scfInitialize (0); // Make sure we've got an iSCF::SCF
@@ -124,7 +121,7 @@ csObjectRegistry::~csObjectRegistry ()
 
 void csObjectRegistry::Clear ()
 {
-  csScopedMutexLock lock (mutex);
+  CS::Threading::RecursiveMutexScopedLock lock (mutex);
 
   clearing = true;
   size_t i;
@@ -146,7 +143,7 @@ bool csObjectRegistry::Register (iBase* obj, char const* tag)
   if (obj == 0)
     return false;
 
-  csScopedMutexLock lock (mutex);
+  CS::Threading::RecursiveMutexScopedLock lock (mutex);
 
   CS_ASSERT (registry.Length () == tags.Length ());
   if (!clearing)
@@ -173,7 +170,7 @@ bool csObjectRegistry::Register (iBase* obj, char const* tag)
 
 void csObjectRegistry::Unregister (iBase* obj, char const* tag)
 {
-  csScopedMutexLock lock (mutex);
+  CS::Threading::RecursiveMutexScopedLock lock (mutex);
 
   CS_ASSERT (registry.Length () == tags.Length ());
   if (!clearing && obj != 0)
@@ -200,7 +197,7 @@ void csObjectRegistry::Unregister (iBase* obj, char const* tag)
 
 iBase* csObjectRegistry::Get (char const* tag)
 {
-  csScopedMutexLock lock (mutex);
+  CS::Threading::RecursiveMutexScopedLock lock (mutex);
 
   CS_ASSERT (registry.Length () == tags.Length ());
   size_t i;
@@ -219,7 +216,7 @@ iBase* csObjectRegistry::Get (char const* tag)
 
 iBase* csObjectRegistry::Get (char const* tag, scfInterfaceID id, int version)
 {
-  csScopedMutexLock lock (mutex);
+  CS::Threading::RecursiveMutexScopedLock lock (mutex);
 
   CS_ASSERT (registry.Length () == tags.Length ());
   size_t i;
@@ -250,7 +247,7 @@ csPtr<iObjectRegistryIterator> csObjectRegistry::Get (
 {
   csObjectRegistryIterator* iterator = new csObjectRegistryIterator ();
   size_t i;
-  csScopedMutexLock lock (mutex);
+  CS::Threading::RecursiveMutexScopedLock lock (mutex);
   for (i = registry.Length(); i > 0; i--)
   {
     iBase* b = registry[i - 1];
@@ -269,7 +266,7 @@ csPtr<iObjectRegistryIterator> csObjectRegistry::Get ()
 {
   csObjectRegistryIterator* iterator = new csObjectRegistryIterator ();
   size_t i;
-  csScopedMutexLock lock (mutex);
+  CS::Threading::RecursiveMutexScopedLock lock (mutex);
   for (i = registry.Length(); i > 0; i--)
   {
     iBase* b = registry[i - 1];

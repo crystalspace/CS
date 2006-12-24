@@ -439,7 +439,7 @@ static void cmd_config (char *args)
 {
   bool real_fs;
   get_option (args, real_fs);
-  iVFS *CfgVFS = real_fs ? 0 : VFS;
+  iVFS *CfgVFS = real_fs ? (iVFS*)0 : (iVFS*)VFS;
 
   iConfigFile *config =
     Cfg->AddDomain (args, CfgVFS, iConfigManager::ConfigPriorityCmdLine);
@@ -605,14 +605,14 @@ int main (int argc, char *argv [])
 	CS_REQUEST_END))
     return -1;
 
-  VFS = CS_QUERY_REGISTRY (object_reg, iVFS);
+  VFS = csQueryRegistry<iVFS> (object_reg);
   if (!VFS)
   {
     csPrintfErr ("Cannot load iVFS plugin\n");
     return -1;
   }
 
-  Cfg = CS_QUERY_REGISTRY (object_reg, iConfigManager);
+  Cfg = csQueryRegistry<iConfigManager> (object_reg);
   if (!Cfg)
   {
     csPrintfErr ("Cannot load iConfigManager plugin\n");

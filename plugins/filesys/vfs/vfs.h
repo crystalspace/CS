@@ -23,7 +23,7 @@
 #include "csutil/cfgfile.h"
 #include "csutil/parray.h"
 #include "csutil/scf_implementation.h"
-#include "csutil/scopedmutexlock.h"
+#include "csutil/threading/mutex.h"
 #include "csutil/stringarray.h"
 #include "iutil/vfs.h"
 #include "iutil/eventh.h"
@@ -118,7 +118,7 @@ private:
   friend class VfsNode;
 
   /// Mutex to make VFS thread-safe.
-  csRef<csMutex> mutex;
+  mutable CS::Threading::RecursiveMutex mutex;
 
   // A vector of VFS nodes
   class VfsVector : public csPDelArray<VfsNode>
@@ -212,6 +212,10 @@ public:
 
   /// Close all opened archives, free temporary storage etc.
   virtual bool Sync ();
+
+  /// Create or add a symbolic link
+  virtual bool SymbolicLink(const char *Target, const char *Link = 0, 
+    int priority = 0);
 
   /// Mount an VFS path on a "real-world-filesystem" path
   virtual bool Mount (const char *VirtualPath, const char *RealPath);

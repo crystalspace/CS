@@ -22,6 +22,7 @@
 #include "csgfx/shadervar.h"
 #include "csgfx/vertexlight.h"
 #include "csgfx/vertexlistwalker.h"
+#include "csgeom/quaternion.h"
 
 #include "imap/services.h"
 #include "iutil/document.h"
@@ -40,12 +41,23 @@ csVProcStandardProgram::csVProcStandardProgram (csVProc_Std *plug)
   lightMixMode (LIGHTMIXMODE_NONE), 
   colorMixMode (LIGHTMIXMODE_NONE), 
   numLights (0), useAttenuation (true), doSpecular (false),
+  doVertexSkinning (false), doNormalSkinning (false), 
+  doTangentSkinning (false), doBiTangentSkinning (false),
   specularOutputBuffer (CS_BUFFER_NONE),
+  skinnedPositionOutputBuffer (CS_BUFFER_NONE),
+  skinnedNormalOutputBuffer (CS_BUFFER_NONE),
+  skinnedTangentOutputBuffer (CS_BUFFER_NONE),
+  skinnedBiTangentOutputBuffer (CS_BUFFER_NONE),
   positionBuffer (CS_BUFFER_POSITION),
   normalBuffer (CS_BUFFER_NORMAL),
-  colorBuffer (CS_BUFFER_COLOR_UNLIT)
+  colorBuffer (CS_BUFFER_COLOR_UNLIT),
+  tangentBuffer (CS_BUFFER_TANGENT),
+  bitangentBuffer (CS_BUFFER_BINORMAL)
 {
   InitTokenTable (tokens);
+  bones_indices_name = strings->Request("bones indices");
+  bones_weights_name = strings->Request("bones weights");
+  bones_name = strings->Request("bones");
 }
 
 csVProcStandardProgram::~csVProcStandardProgram ()
@@ -60,10 +72,285 @@ void csVProcStandardProgram::Deactivate ()
 {
 }
 
+bool csVProcStandardProgram::UpdateSkinnedVertices (csRenderMeshModes& modes,
+                           const iShaderVarStack* Stacks)
+{
+   csRef<csShaderVariable>_sv;
+   _sv = csGetShaderVariableFromStack (Stacks, bones_name);
+   if (!_sv.IsValid())
+   {
+     return false;
+   }
+
+   const iArrayReadOnly<csShaderVariable*>* stacks = Stacks;
+
+  BufferName bones_indices_buff_name;
+  BufferName bones_weights_buff_name;
+  bones_indices_buff_name.userName = bones_indices_name;
+  bones_weights_buff_name.userName = bones_weights_name;
+  iRenderBuffer *bones_indices_buf = GetBuffer (bones_indices_buff_name, modes, stacks);
+  if (!bones_indices_buf)
+  {
+    return false;
+  }
+
+  iRenderBuffer *bones_weights_buf = GetBuffer (bones_weights_buff_name, modes, stacks);
+  if (!bones_weights_buf)
+  {
+    return false;
+  }
+
+  iRenderBuffer *vbuf = GetBuffer (positionBuffer, modes, stacks);
+  iRenderBuffer *nbuf = GetBuffer (normalBuffer, modes, stacks);
+  iRenderBuffer *tbuf = GetBuffer (tangentBuffer, modes, stacks);
+  iRenderBuffer *btbuf = GetBuffer (bitangentBuffer, modes, stacks);
+
+  size_t elements_count = vbuf->GetElementCount ();
+
+    csRef<iRenderBuffer> spbuf = modes.buffers->GetRenderBuffer (skinnedPositionOutputBuffer);
+  if (!spbuf.IsValid())
+  {
+      spbuf = csRenderBuffer::CreateRenderBuffer (elements_count, CS_BUF_STREAM,
+      CS_BUFCOMP_FLOAT, 3, true);
+  }
+
+    csRef<iRenderBuffer> snbuf;
+  if (doNormalSkinning)
+  {
+    snbuf = modes.buffers->GetRenderBuffer (skinnedNormalOutputBuffer);
+    if (!snbuf.IsValid())
+    {
+      snbuf = csRenderBuffer::CreateRenderBuffer (elements_count, CS_BUF_STREAM,
+      CS_BUFCOMP_FLOAT, 3, true);
+    }
+  }
+
+  csRef<iRenderBuffer> tnbuf;
+  tnbuf = modes.buffers->GetRenderBuffer (skinnedTangentOutputBuffer);
+  if (doTangentSkinning)
+  {
+    if (!tnbuf.IsValid())
+    {
+      tnbuf = csRenderBuffer::CreateRenderBuffer (elements_count, CS_BUF_STREAM,
+      CS_BUFCOMP_FLOAT, 3, true);
+    }
+  }
+
+  csRef<iRenderBuffer> btnbuf;
+  if (doBiTangentSkinning)
+  {
+    btnbuf = modes.buffers->GetRenderBuffer (skinnedBiTangentOutputBuffer);
+    if (!btnbuf.IsValid())
+    {
+      btnbuf = csRenderBuffer::CreateRenderBuffer (elements_count, CS_BUF_STREAM,
+      CS_BUFCOMP_FLOAT, 3, true);
+    }
+  }
+
+  const size_t bones_count = _sv->GetArraySize ()/2;
+  struct csRotPos
+  {
+    csMatrix3 rot;
+    csVector3 pos;
+  };
+  CS_ALLOC_STACK_ARRAY(csRotPos,rotpos,bones_count);
+  for (size_t i = 0; i < bones_count; i++)
+  {
+    csQuaternion v;
+    _sv->GetArrayElement(i*2)->GetValue(v);
+    rotpos[i].rot = v.GetMatrix();
+    _sv->GetArrayElement(i*2 + 1)->GetValue(rotpos[i].pos);
+  }
+
+  csVertexListWalker<int> bones_indices_bufWalker (bones_indices_buf, 4);
+  csVertexListWalker<float> bones_weights_bufWalker (bones_weights_buf, 4);
+  if (doVertexSkinning)
+  {
+    csVertexListWalker<float> vbufWalker (vbuf, 3);
+    csRenderBufferLock<csVector3, iRenderBuffer*> tmpPos (spbuf);
+    for (size_t i = 0; i < elements_count; i++)
+    {
+      const int* c = bones_indices_bufWalker;
+      const float* d = bones_weights_bufWalker;
+      const float* e = vbufWalker;
+
+      csVector3 origin_pos = csVector3(e[0], e[1], e[2]);
+      bool skinned = false;
+      for (int k = 0; k < 4; k++)
+      {
+        if (d[k])
+        {
+	  csRotPos& rp = rotpos[c[k]];
+          if (!skinned)
+          {
+            tmpPos[i] = (rp.rot*origin_pos + rp.pos)*d[k];
+            skinned =true;
+          }
+          else
+          {
+            tmpPos[i] += (rp.rot*origin_pos + rp.pos)*d[k];
+          }
+        }
+      }
+      if (!skinned)
+      {
+        tmpPos[i] = origin_pos;
+      }
+
+      ++bones_indices_bufWalker;
+      ++bones_weights_bufWalker;
+      ++vbufWalker;
+    }
+    modes.buffers->SetAccessor (modes.buffers->GetAccessor(),
+    modes.buffers->GetAccessorMask() & ~(1 << skinnedPositionOutputBuffer));
+    modes.buffers->SetRenderBuffer (skinnedPositionOutputBuffer, spbuf);
+  }
+
+  if (doNormalSkinning)
+  {
+    bones_indices_bufWalker.ResetState();
+    bones_weights_bufWalker.ResetState();
+    csVertexListWalker<float> nbufWalker (nbuf, 3);
+    csRenderBufferLock<csVector3, iRenderBuffer*> tmpNorm (snbuf);
+    for (size_t i = 0; i < elements_count; i++)
+    {
+      const int* c = bones_indices_bufWalker;
+      const float* d = bones_weights_bufWalker;
+      const float* e = nbufWalker;
+
+      csVector3 origin_norm = csVector3(e[0], e[1], e[2]);
+      bool skinned = false;
+      for (int k = 0; k < 4; k++)
+      {
+        if (d[k])
+        {
+	  csRotPos& rp = rotpos[c[k]];
+          if (!skinned)
+          {
+            tmpNorm[i] = (rp.rot*origin_norm)*d[k];
+            skinned = true;
+          }
+          else
+          {
+            tmpNorm[i] += (rp.rot*origin_norm)*d[k];
+          }
+        }
+      }
+      if (!skinned)
+      {
+        tmpNorm[i] = origin_norm;
+      }
+
+      ++bones_indices_bufWalker;
+      ++bones_weights_bufWalker;
+      ++nbufWalker;
+    }
+    modes.buffers->SetAccessor (modes.buffers->GetAccessor(),
+    modes.buffers->GetAccessorMask() & ~(1 << skinnedNormalOutputBuffer));
+    modes.buffers->SetRenderBuffer (skinnedNormalOutputBuffer, snbuf);
+  }
+
+  if (doTangentSkinning)
+  {
+    bones_indices_bufWalker.ResetState();
+    bones_weights_bufWalker.ResetState();
+    csVertexListWalker<float> tbufWalker (tbuf, 3);
+    csRenderBufferLock<csVector3, iRenderBuffer*> tmpTan (tnbuf);
+    for (size_t i = 0; i < elements_count; i++)
+    {
+      const int* c = bones_indices_bufWalker;
+      const float* d = bones_weights_bufWalker;
+      const float* e = tbufWalker;
+
+      csVector3 origin_tang = csVector3(e[0], e[1], e[2]);
+      bool skinned = false;
+      for (int k = 0; k < 4; k++)
+      {
+        if (d[k])
+        {
+	  csRotPos& rp = rotpos[c[k]];
+          if (!skinned)
+          {
+            tmpTan[i] = (rp.rot*origin_tang)*d[k];
+            skinned = true;
+          }
+          else
+          {
+            tmpTan[i] += (rp.rot*origin_tang)*d[k];
+          }
+        }
+      }
+      if (!skinned)
+      {
+        tmpTan[i] = origin_tang;
+      }
+
+      ++bones_indices_bufWalker;
+      ++bones_weights_bufWalker;
+      ++tbufWalker;
+    }
+    modes.buffers->SetAccessor (modes.buffers->GetAccessor(),
+    modes.buffers->GetAccessorMask() & ~(1 << skinnedTangentOutputBuffer));
+    modes.buffers->SetRenderBuffer (skinnedTangentOutputBuffer, tnbuf);
+  }
+
+  if (doBiTangentSkinning)
+  {
+    bones_indices_bufWalker.ResetState();
+    bones_weights_bufWalker.ResetState();
+    csVertexListWalker<float> btbufWalker (btbuf, 3);
+    csRenderBufferLock<csVector3, iRenderBuffer*> tmpBiTan (btnbuf);
+    for (size_t i = 0; i < elements_count; i++)
+    {
+      const int* c = bones_indices_bufWalker;
+      const float* d = bones_weights_bufWalker;
+      const float* e = btbufWalker;
+
+      csVector3 origin_bitang = csVector3(e[0], e[1], e[2]);
+      bool skinned = false;
+      for (int k = 0; k < 4; k++)
+      {
+        if (d[k])
+        {
+	  csRotPos& rp = rotpos[c[k]];
+          if (!skinned)
+          {
+            tmpBiTan[i] = (rp.rot*origin_bitang)*d[k];
+            skinned = true;
+          }
+          else
+          {
+            tmpBiTan[i] += (rp.rot*origin_bitang)*d[k];
+          }
+        }
+      }
+      if (!skinned)
+      {
+        tmpBiTan[i] = origin_bitang;
+      }
+
+      ++bones_indices_bufWalker;
+      ++bones_weights_bufWalker;
+      ++btbufWalker;
+    }
+    modes.buffers->SetAccessor (modes.buffers->GetAccessor(),
+    modes.buffers->GetAccessorMask() & ~(1 << skinnedBiTangentOutputBuffer));
+    modes.buffers->SetRenderBuffer (skinnedBiTangentOutputBuffer, btnbuf);
+  }
+
+  return true;
+}
+
 void csVProcStandardProgram::SetupState (const csRenderMesh* mesh,
                                          csRenderMeshModes& modes,
                                          const iShaderVarStack* Stacks)
 {
+  bool skin_updated = false;// @@@ FIXME - time related detection if vertices are not already updated
+  if (doVertexSkinning || doNormalSkinning || 
+        doTangentSkinning || doBiTangentSkinning)
+  {
+    skin_updated = UpdateSkinnedVertices (modes, Stacks);
+  }
   if (numLights > 0)
   {
     const iArrayReadOnly<csShaderVariable*>* stacks = Stacks;
@@ -75,8 +362,14 @@ void csVProcStandardProgram::SetupState (const csRenderMesh* mesh,
     if ((stacks->GetSize() > id) && ((sv = stacks->Get (id)) != 0))
       sv->GetValue (lightsActive);
 
-    iRenderBuffer *vbuf = GetBuffer (positionBuffer, modes, stacks);
-    iRenderBuffer *nbuf = GetBuffer (normalBuffer, modes, stacks);
+    iRenderBuffer *vbuf = doVertexSkinning && skin_updated ? 
+        modes.buffers->GetRenderBuffer (skinnedPositionOutputBuffer):
+      GetBuffer (positionBuffer, modes, stacks);
+
+    iRenderBuffer *nbuf = doNormalSkinning && skin_updated ? 
+        modes.buffers->GetRenderBuffer (skinnedNormalOutputBuffer):
+      GetBuffer (normalBuffer, modes, stacks);
+
     iRenderBuffer *cbuf = GetBuffer (colorBuffer, modes, stacks);
 
     if (vbuf == 0 || nbuf == 0) return;
@@ -123,6 +416,7 @@ void csVProcStandardProgram::SetupState (const csRenderMesh* mesh,
 	  || !disableMask.IsBitSet (lightNum))
 	{
 	  csLightProperties light (lightNum, shaderPlugin->lsvCache, Stacks);
+          FixupLightWorldPos (light, lightNum, stacks, mesh->object2world);
 	  iVertexLightCalculator *calc = 
 	    shaderPlugin->GetLightCalculator (light, useAttenuation);
 	  calc->CalculateLighting (light, eyePosObject, shininess, elementCount, 
@@ -141,6 +435,7 @@ void csVProcStandardProgram::SetupState (const csRenderMesh* mesh,
 	  }
 	  
 	  csLightProperties light (i, shaderPlugin->lsvCache, Stacks);
+          FixupLightWorldPos (light, i, stacks, mesh->object2world);
 	  iVertexLightCalculator *calc = 
 	    shaderPlugin->GetLightCalculator (light, useAttenuation);
 
@@ -244,6 +539,28 @@ void csVProcStandardProgram::SetupState (const csRenderMesh* mesh,
 	modes.buffers->GetAccessorMask() & ~(1 << specularOutputBuffer));
       modes.buffers->SetRenderBuffer (specularOutputBuffer, specBuf);
     }
+  }
+}
+
+void csVProcStandardProgram::FixupLightWorldPos (csLightProperties& light, 
+  size_t lightNum, const iArrayReadOnly<csShaderVariable*>* stacks, 
+  const csReversibleTransform& object2world)
+{
+  csStringID idLightPosObj = shaderPlugin->lsvCache.GetLightSVId (
+    lightNum, csLightShaderVarCache::lightPosition);
+  if ((stacks->GetSize() <= idLightPosObj)
+    || (stacks->Get (idLightPosObj) == 0))
+  {
+    csStringID idLightPosWorld = shaderPlugin->lsvCache.GetLightSVId (
+      lightNum, csLightShaderVarCache::lightPositionWorld);
+    csShaderVariable* sv;
+    csVector3 lightPosWorld;
+    if ((stacks->GetSize() > idLightPosWorld) 
+      && ((sv = stacks->Get (idLightPosWorld)) != 0))
+      sv->GetValue (lightPosWorld);
+    else
+      lightPosWorld.Set (0, 0, 0);
+    light.posObject = object2world.Other2This (lightPosWorld);
   }
 }
 
@@ -394,6 +711,90 @@ bool csVProcStandardProgram::Load (iShaderDestinationResolver* /*resolve*/,
 	  ParamFloat | ParamShaderExp))
 	  return false;
         break;
+      case XMLTOKEN_SKINNED_POSITION:
+        {
+	  if (!synsrv->ParseBool (child, doVertexSkinning, true))
+	    return false;
+	  const char* buffer = child->GetAttributeValue ("buffer");
+	  if (!buffer)
+	  {
+	    synsrv->ReportError ("crystalspace.graphics3d.shader.vproc_std",
+	      pnode, "'buffer' attribute missing");
+	    return false;
+	  }
+	  csRenderBufferName bufferName = csRenderBuffer::GetBufferNameFromDescr (buffer);
+	  if (bufferName == CS_BUFFER_NONE)
+	  {
+	    synsrv->ReportError ("crystalspace.graphics3d.shader.vproc_std",
+	      pnode, "buffer name '%s' invalid here", buffer);
+	    return false;
+	  }
+	  skinnedPositionOutputBuffer = bufferName;
+	}
+	break;
+      case XMLTOKEN_SKINNED_NORMAL:
+        {
+	  if (!synsrv->ParseBool (child, doNormalSkinning, true))
+	    return false;
+	  const char* buffer = child->GetAttributeValue ("buffer");
+	  if (!buffer)
+	  {
+	    synsrv->ReportError ("crystalspace.graphics3d.shader.vproc_std",
+	      pnode, "'buffer' attribute missing");
+	    return false;
+	  }
+	  csRenderBufferName bufferName = csRenderBuffer::GetBufferNameFromDescr (buffer);
+	  if (bufferName == CS_BUFFER_NONE)
+	  {
+	    synsrv->ReportError ("crystalspace.graphics3d.shader.vproc_std",
+	      pnode, "buffer name '%s' invalid here", buffer);
+	    return false;
+	  }
+	  skinnedNormalOutputBuffer = bufferName;
+	}
+	break;
+      case XMLTOKEN_SKINNED_TANGENT:
+        {
+	  if (!synsrv->ParseBool (child, doTangentSkinning, true))
+	    return false;
+	  const char* buffer = child->GetAttributeValue ("buffer");
+	  if (!buffer)
+	  {
+	    synsrv->ReportError ("crystalspace.graphics3d.shader.vproc_std",
+	      pnode, "'buffer' attribute missing");
+	    return false;
+	  }
+	  csRenderBufferName bufferName = csRenderBuffer::GetBufferNameFromDescr (buffer);
+	  if (bufferName == CS_BUFFER_NONE)
+	  {
+	    synsrv->ReportError ("crystalspace.graphics3d.shader.vproc_std",
+	      pnode, "buffer name '%s' invalid here", buffer);
+	    return false;
+	  }
+	  skinnedTangentOutputBuffer = bufferName;
+	}
+	break;
+      case XMLTOKEN_SKINNED_BITANGENT:
+        {
+	  if (!synsrv->ParseBool (child, doBiTangentSkinning, true))
+	    return false;
+	  const char* buffer = child->GetAttributeValue ("buffer");
+	  if (!buffer)
+	  {
+	    synsrv->ReportError ("crystalspace.graphics3d.shader.vproc_std",
+	      pnode, "'buffer' attribute missing");
+	    return false;
+	  }
+	  csRenderBufferName bufferName = csRenderBuffer::GetBufferNameFromDescr (buffer);
+	  if (bufferName == CS_BUFFER_NONE)
+	  {
+	    synsrv->ReportError ("crystalspace.graphics3d.shader.vproc_std",
+	      pnode, "buffer name '%s' invalid here", buffer);
+	    return false;
+	  }
+	  skinnedBiTangentOutputBuffer = bufferName;
+	}
+	break;
       default:
         {
           switch (commonTokens.Request (value))

@@ -73,6 +73,7 @@ class csSectorList;
 class csTextureList;
 struct iClipper2D;
 struct iConfigFile;
+struct iDocumentSystem;
 struct iLight;
 struct iMaterialWrapper;
 struct iObjectRegistry;
@@ -124,6 +125,8 @@ private:
   iLight* FetchNext ();
 };
 
+#include "csutil/win32/msvc_deprecated_warn_off.h"
+
 /**
  * List of collections for the engine. This class implements iCollectionList.
  */
@@ -150,12 +153,20 @@ private:
   csRefArrayObject<iCollection> collections;
 };
 
+#include "csutil/win32/msvc_deprecated_warn_on.h"
+
 struct csSectorPos
 {
   iSector* sector;
   csVector3 pos;
   csSectorPos (iSector* sector, const csVector3& pos) :
   	sector (sector), pos (pos) { }
+};
+
+struct csDelayedRemoveObject
+{
+  csRef<iBase> object;
+  csTicks time_to_delete;
 };
 
 /**
@@ -195,17 +206,15 @@ public:
 };
 
 
+#include "csutil/win32/msvc_deprecated_warn_off.h"
+
 /**
  * The 3D engine.
  * This class manages all components which comprise a 3D world including
  * sectors, polygons, curves, mesh objects, etc.
  */
-class csEngine : public scfImplementationExt4<csEngine,
-                                              csObject,
-                                              iEngine,
-                                              iComponent,
-                                              iPluginConfig,
-                                              iDebugHelper>
+class csEngine : public scfImplementationExt5<csEngine, csObject,
+  iEngine, iComponent, iPluginConfig, iDebugHelper, iEventHandler>
 {
   // friends
   friend class csLight;
@@ -560,8 +569,11 @@ public:
   	iRegion* region = 0);
 
   virtual bool RemoveObject (iBase* object);
+  virtual void DelayedRemoveObject (csTicks delay, iBase *object);
+  virtual void RemoveDelayedRemoves (bool remove = false);
 
   virtual void DeleteAll ();
+  void DeleteAllForce ();
 
   virtual void ResetWorldSpecificSettings(); 
 
@@ -571,28 +583,11 @@ public:
   virtual bool SetOption (int id, csVariant* value);
   virtual bool GetOption (int id, csVariant* value);
 
+  // -- iEventHandler
   bool HandleEvent (iEvent &Event);
 
-  // -- iEventHandler
-  struct eiEventHandler : public scfImplementation1<
-  	eiEventHandler,iEventHandler>
-  {
-    csWeakRef<csEngine> parent;
-    eiEventHandler (csEngine* parent) : scfImplementationType (this)
-    {
-      eiEventHandler::parent = parent;
-    }
-    virtual ~eiEventHandler ()
-    {
-    }
-    virtual bool HandleEvent (iEvent& ev)
-    {
-      if (parent) return parent->HandleEvent (ev);
-      else return false;
-    }
-    CS_EVENTHANDLER_NAMES("crystalspace.engine.3d")
-    CS_EVENTHANDLER_NIL_CONSTRAINTS
-  } * scfiEventHandler;
+  CS_EVENTHANDLER_NAMES("crystalspace.engine.3d")
+  CS_EVENTHANDLER_NIL_CONSTRAINTS
 
   // -- iDebugHelper
   
@@ -681,6 +676,8 @@ private:
   // Renderloop loading/creation
   csPtr<iRenderLoop> CreateDefaultRenderLoop ();
   void LoadDefaultRenderLoop (const char* fileName);
+  csRef<iShader> LoadShader (iDocumentSystem* docsys, iShaderCompiler* shcom,
+    const char* filename);
 
   /**
    * Setup for starting a Draw or DrawFunc.
@@ -778,6 +775,12 @@ public:
   csRef<iGraphics3D> G3D;
   /// Pointer to the shader manager
   csRef<iShaderManager> shaderManager;
+  
+  /// Store virtual clock to speed up time queries.
+  csRef<iVirtualClock> virtualClock;
+
+  /// Store engine shadervar names
+  csStringID id_creation_time;
   /**
    * This is the Virtual File System object where all the files
    * used by the engine live. Textures, models, data, everything -
@@ -873,6 +876,9 @@ private:
   /// Array of objects that want to die next frame (iMeshWrapper*).
   csSet<csPtrKey<iMeshWrapper> > wantToDieSet;
 
+  /// An array of objects to remove at a specific time.
+  csArray<csDelayedRemoveObject> delayedRemoves;
+
   /// The list of all named render priorities.
   csStringArray renderPriorities;
   /// Sorting flags for the render priorities.
@@ -885,9 +891,6 @@ private:
    * and warning messages.
    */
   csRef<iReporter> reporter;
-
-  /// Store virtual clock to speed up time queries.
-  csRef<iVirtualClock> virtualClock;
 
   /// Default render loop
   csRef<iRenderLoop> defaultRenderLoop;
@@ -993,6 +996,9 @@ private:
   CS_DECLARE_SYSTEM_EVENT_SHORTCUTS;
   csEventID CanvasResize;
   csEventID CanvasClose;
+  csRef<iEventHandler> weakEventHandler;
 };
+
+#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 #endif // __CS_ENGINE_H__

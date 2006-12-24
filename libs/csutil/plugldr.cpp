@@ -231,8 +231,8 @@ csPluginLoader::~csPluginLoader ()
 bool csPluginLoader::LoadPlugins ()
 {
   // Collect all options from command line
-  csRef<iCommandLineParser> CommandLine (CS_QUERY_REGISTRY (object_reg,
-  	iCommandLineParser));
+  csRef<iCommandLineParser> CommandLine (
+  	csQueryRegistry<iCommandLineParser> (object_reg));
   CS_ASSERT (CommandLine != 0);
 
   // The list of plugins
@@ -294,12 +294,13 @@ bool csPluginLoader::LoadPlugins ()
   }
 
   // Now load and initialize all plugins
-  csRef<iConfigManager> Config (CS_QUERY_REGISTRY (object_reg, iConfigManager));
+  csRef<iConfigManager> Config (csQueryRegistry<iConfigManager> (object_reg));
   csRef<iConfigIterator> plugin_list (Config->Enumerate ("System.Plugins."));
   if (plugin_list)
   {
-    while (plugin_list->Next ())
+    while (plugin_list->HasNext ())
     {
+      plugin_list->Next();
       const char *tag = plugin_list->GetKey (true);
       // If -video was used to override 3D driver, then respect it.
       if (g3d_override && strcmp (tag, "iGraphics3D") == 0)
@@ -310,7 +311,7 @@ bool csPluginLoader::LoadPlugins ()
     }
   }
 
-  csRef<iVFS> VFS (CS_QUERY_REGISTRY (object_reg, iVFS));
+  csRef<iVFS> VFS (csQueryRegistry<iVFS> (object_reg));
 
   // Check all requested plugins and see if there is already
   // a plugin with that tag present. If not we add it.
@@ -343,7 +344,7 @@ bool csPluginLoader::LoadPlugins ()
   }
 
   csRef<iPluginManager> plugin_mgr (
-  	CS_QUERY_REGISTRY (object_reg, iPluginManager));
+  	csQueryRegistry<iPluginManager> (object_reg));
 
   // Load all plugins
   for (n = 0; n < PluginList.Length (); n++)

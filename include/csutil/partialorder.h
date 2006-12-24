@@ -171,14 +171,14 @@ public:
     // delete all posts pointing to node
     for (size_t iter=0 ; iter<Nodes[p].pre.Length() ; iter++) 
     {
-      Nodes[Nodes[p].pre[iter]].post.DeleteFast(p);
+      Nodes[Nodes[p].pre[iter]].post.Delete(p);
     }
     // delete node's pre's
     Nodes[p].pre.DeleteAll();
     // delete all pres pointing to node
     for (size_t iter=0 ; iter<Nodes[p].post.Length() ; iter++) 
     {
-      Nodes[Nodes[p].post[iter]].pre.DeleteFast(p);
+      Nodes[Nodes[p].post[iter]].pre.Delete(p);
     }
     // delete node's post's
     Nodes[p].post.DeleteAll();
@@ -419,7 +419,10 @@ protected:
 	for (size_t i3=0 ; i3<Nodes[Nodes[i1].pre[i2]].post.Length() ; i3++)
 	{
 	  if (Nodes[Nodes[i1].pre[i2]].post[i3] == i1)
+          {
 	    reciprocal_post_exists = true;
+            break;
+          }
 	}
 	CS_ASSERT_MSG ("Node prefix does not have reciprocal postfix", 
 		       reciprocal_post_exists);
@@ -434,7 +437,10 @@ protected:
 	for (size_t i3=0 ; i3<Nodes[Nodes[i1].post[i2]].pre.Length() ; i3++)
 	{
 	  if (Nodes[Nodes[i1].post[i2]].pre[i3] == i1)
+          {
 	    reciprocal_pre_exists = true;
+            break;
+          }
 	}
 	CS_ASSERT_MSG ("Node postfix does not have reciprocal prefix",
 		       reciprocal_pre_exists);
@@ -445,8 +451,6 @@ protected:
     while (iter.HasNext())
     {
       size_t idx = iter.Next();
-      CS_ASSERT_MSG ("NodeMap contains a negative index",
-		     idx >= 0);
       CS_ASSERT_MSG ("NodeMap contains an index larger than Nodes list",
 		     idx < Nodes.Length());
     }

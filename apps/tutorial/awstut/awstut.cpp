@@ -26,7 +26,7 @@ AwsTutorial *System;
 //-----------------------------------------------------------------------------
 
 #define QUERY_REG(myPlug, iFace, errMsg) \
-  myPlug = CS_QUERY_REGISTRY (object_reg, iFace); \
+  myPlug = csQueryRegistry<iFace> (object_reg); \
   if (!myPlug) \
   { \
     Report (CS_REPORTER_SEVERITY_ERROR, errMsg); \
@@ -195,7 +195,7 @@ bool AwsTutorial::HandleEvent (iEvent &Event)
   if ((Event.Name == csevKeyboardDown(object_reg)) && 
     (csKeyEventHelper::GetCookedCode (&Event) == CSKEY_ESC))
   {
-    csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
+    csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (object_reg));
     if (q)
       q->GetEventOutlet()->Broadcast (csevQuit(object_reg));
     return true;

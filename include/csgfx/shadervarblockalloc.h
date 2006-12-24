@@ -35,6 +35,7 @@
  * \remarks Check the csBlockAllocator documentation for information on
  *   general block allocators.
  */
+template<class ObjectDispose = csBlockAllocatorDisposeDelete<csShaderVariable> >
 class csShaderVarBlockAlloc
 {
   struct BlockAllocatedSV : public csShaderVariable
@@ -43,15 +44,17 @@ class csShaderVarBlockAlloc
     virtual void Delete() { allocator->blockAlloc.Free (this); }
   };
   friend struct BlockAllocatedSV;
-  csBlockAllocator<BlockAllocatedSV> blockAlloc;
+  csBlockAllocator<BlockAllocatedSV,
+    CS::Memory::AllocatorMalloc,
+    ObjectDispose> blockAlloc;
 public:
   /**
    * Construct a new allocator.
    * \remarks The parameters are the same as to 
    *   csBlockAllocator<T>::csBlockAllocator().
    */
-  csShaderVarBlockAlloc (size_t nelem = 32, bool warn_unfreed = false) :
-    blockAlloc(nelem, warn_unfreed) {}
+  csShaderVarBlockAlloc (size_t nelem = 32) :
+    blockAlloc(nelem) {}
   /**
    * Allocate a new shader variable.
    * \remarks Returned object freed when all references are released, but 

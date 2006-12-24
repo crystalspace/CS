@@ -25,7 +25,7 @@
 #include "csgfx/bakekeycolor.h"
 #include "csgfx/imagemanipulate.h"
 #include "csgfx/imagetools.h"
-#include "csgfx/memimage.h"
+#include "csgfx/imagememory.h"
 #include "csqsqrt.h"
 #include "cstool/initapp.h"
 #include "csutil/cfgfile.h"
@@ -638,7 +638,7 @@ int main (int argc, char *argv[])
     exit (0);
   }
 
-  ImageLoader = CS_QUERY_REGISTRY (object_reg, iImageIO);
+  ImageLoader = csQueryRegistry<iImageIO> (object_reg);
   if (!ImageLoader)
   {
     csPrintf("could not load image loader\n");

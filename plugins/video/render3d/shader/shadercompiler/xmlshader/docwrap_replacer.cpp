@@ -1,6 +1,6 @@
 /*
-  Copyright (C) 2005 by Frank Richter
-	    (C) 2005 by Jorrit Tyberghein
+  Copyright (C) 2005-2006 by Frank Richter
+	    (C) 2005-2006 by Jorrit Tyberghein
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -29,15 +29,21 @@
 #include "iutil/document.h"
 
 #include "docwrap_replacer.h"
+#include "tempheap.h"
 
 //---------------------------------------------------------------------------
 
 CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
 {
 
+CS_LEAKGUARD_IMPLEMENT (csReplacerDocumentNode);
+CS_LEAKGUARD_IMPLEMENT (csReplacerDocumentNodeIterator);
+CS_LEAKGUARD_IMPLEMENT (csReplacerDocumentAttributeIterator);
+CS_LEAKGUARD_IMPLEMENT (csReplacerDocumentAttribute);
+
 csReplacerDocumentNode::csReplacerDocumentNode (iDocumentNode* wrappedNode,
   csReplacerDocumentNode* parent, csReplacerDocumentNodeFactory* shared, 
-  Substitutions* subst) : scfPooledImplementationType (this), 
+  Substitutions* subst) : scfImplementationType (this), 
   wrappedNode (wrappedNode), parent (parent), shared (shared), subst (subst)
 {
   shared->Substitute (wrappedNode->GetValue(), value, *this->subst);
@@ -51,6 +57,8 @@ bool csReplacerDocumentNode::Equals (iDocumentNode* other)
 {
   return ((csReplacerDocumentNode*)other)->Equals (wrappedNode);
 }
+
+#include "csutil/custom_new_disable.h"
 
 csRef<iDocumentNodeIterator> csReplacerDocumentNode::GetNodes ()
 {
@@ -75,13 +83,16 @@ csReplacerDocumentNode::GetAttributes ()
   return csPtr<iDocumentAttributeIterator> (iter);
 }
 
+#include "csutil/custom_new_enable.h"
+
 CS_IMPLEMENT_STATIC_VAR (ReplacerAttrAlloc, 
                          csBlockAllocator<csReplacerDocumentAttribute>, ())
 
 csRef<iDocumentAttribute> csReplacerDocumentNode::GetAttribute (
   const char* name)
 {
-  csRef<iDocumentAttribute> wrappedAttr = attrCache.Get (name, 0);
+  csRef<iDocumentAttribute> wrappedAttr = attrCache.Get (name, 
+    (iDocumentAttribute*)0);
   if (wrappedAttr.IsValid()) return wrappedAttr;
 
   wrappedAttr = wrappedNode->GetAttribute (name);
@@ -198,7 +209,7 @@ csRef<iDocumentNode> csReplacerDocumentNodeFactory::CreateWrapper (
   Substitutions* subst)
 {
   csReplacerDocumentNode* newNode = 
-    new (nodePool) csReplacerDocumentNode (wrappedNode, parent, this, subst);
+    new csReplacerDocumentNode (wrappedNode, parent, this, subst);
   return csPtr<iDocumentNode> (newNode);
 }
 
@@ -215,14 +226,44 @@ void csReplacerDocumentNodeFactory::Substitute (const char* in,
     if (*p == '$')
     {
       p++;
+      bool quote = false;
+      if (*p == '"') { quote = true; p++; }
       const char* varStart = p;
       while ((*p != '$') && (*p != 0)) p++;
       const char* varEnd = p;
-      csString varName (varStart, varEnd-varStart);
+      TempString<> varName (varStart, varEnd-varStart);
       if (varName.IsEmpty())
 	out << '$';
       else
-	out << subst.Get (varName, ""); // @@@ FIXME: Error reporting
+      {
+        // @@@ FIXME: Error reporting?
+        TempString<> substStr = subst.Get (varName, ""); 
+        if (quote)
+        {
+          /* The inserted string will be quoted in the fashion needed by
+           * the processing instructions parser */
+          TempString<> newSubst;
+          newSubst << '"';
+          for (size_t i = 0; i < substStr.Length(); i++)
+          {
+            char c = substStr[i];
+            switch (c)
+            {
+              case '"':
+                newSubst << "\\\"";
+                break;
+              case '\\':
+                newSubst << "\\\\";
+                break;
+              default:
+                newSubst << c;
+            }
+          }
+          newSubst << '"';
+          substStr = newSubst;
+        }
+	out << substStr;
+      }
       if (*p == 0) break;
     }
     else

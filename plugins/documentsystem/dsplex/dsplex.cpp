@@ -358,7 +358,7 @@ void csDocumentSystemMultiplexer::RewardPlugin (size_t num)
   if ((num >= orderedlist.Length()) && 
     (autolist.Length() - (anum = num - orderedlist.Length()) > 4))
   {
-    csRef<iDocumentSystem> plugin = autolist[anum];
+    csRef<iDocumentSystem> plugin (autolist[anum]);
     autolist.Push (plugin);
     autolist.DeleteIndex (anum);
   }

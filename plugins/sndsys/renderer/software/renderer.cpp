@@ -88,6 +88,12 @@ csSndSysRendererSoftware::csSndSysRendererSoftware(iBase* pParent) :
 csSndSysRendererSoftware::~csSndSysRendererSoftware()
 {
   RecordEvent(SSEL_DEBUG, "Sound system destructing.");
+  if (weakEventHandler)
+  {
+    csRef<iEventQueue> q = csQueryRegistry<iEventQueue> (m_pObjectRegistry);
+    if (q)
+      CS::RemoveWeakListener (q, weakEventHandler);
+  }
 
   delete[] m_pSampleBuffer;
   delete m_pSoundCompressor;
@@ -238,19 +244,20 @@ bool csSndSysRendererSoftware::Initialize (iObjectRegistry *obj_reg)
   m_pObjectRegistry=obj_reg;
 
   // Use report here since the eventrecorder isn't ready yet
-  Report (CS_REPORTER_SEVERITY_DEBUG, "Software Renderer Initializing..");
+  Report (CS_REPORTER_SEVERITY_DEBUG,
+    "Sound System Software Renderer Initializing...");
 
   // Get an interface for the plugin manager
   csRef<iPluginManager> plugin_mgr (
-    CS_QUERY_REGISTRY (m_pObjectRegistry, iPluginManager));
+    csQueryRegistry<iPluginManager> (m_pObjectRegistry));
 
 
   // read the config file
   m_Config.AddConfig(m_pObjectRegistry, "/config/sound.cfg");
 
   // check for optional sound driver from the commandline
-  csRef<iCommandLineParser> cmdline (CS_QUERY_REGISTRY (m_pObjectRegistry,
-  	iCommandLineParser));
+  csRef<iCommandLineParser> cmdline (
+  	csQueryRegistry<iCommandLineParser> (m_pObjectRegistry));
   const char *drv = cmdline->GetOption ("sounddriver");
   if (!drv)
   {
@@ -321,13 +328,13 @@ bool csSndSysRendererSoftware::Initialize (iObjectRegistry *obj_reg)
 
 
   // set event callback
-  csRef<iEventQueue> q (CS_QUERY_REGISTRY(m_pObjectRegistry, iEventQueue));
+  csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (m_pObjectRegistry));
   evSystemOpen = csevSystemOpen(m_pObjectRegistry);
   evSystemClose = csevSystemClose(m_pObjectRegistry);
   evFrame = csevFrame(m_pObjectRegistry);
   if (q != 0) {
     csEventID subEvents[] = { evSystemOpen, evSystemClose, evFrame, CS_EVENTLIST_END };
-    q->RegisterListener(this, subEvents);
+    CS::RegisterWeakListener(q, this, subEvents, weakEventHandler);
   }
 
   return true;

@@ -84,6 +84,8 @@ void csShaderGLCGFP::ResetState()
 
 bool csShaderGLCGFP::Compile ()
 {
+  if (!shaderPlug->enableFP) return false;
+
   csRef<iDataBuffer> programBuffer = GetProgramData();
   if (!programBuffer.IsValid())
     return false;
@@ -96,9 +98,15 @@ bool csShaderGLCGFP::Compile ()
   // (psplg will be 0 if wrapping isn't wanted)
   if (shaderPlug->psplg)
   {
+    ArgumentArray args;
+    shaderPlug->GetProfileCompilerArgs ("fragment", shaderPlug->psProfile, 
+      args);
+    for (i = 0; i < compilerArgs.GetSize(); i++) 
+      args.Push (compilerArgs[i]);
+    args.Push (0);
     program = cgCreateProgram (shaderPlug->context, CG_SOURCE,
       programStr, shaderPlug->psProfile, 
-      !entrypoint.IsEmpty() ? entrypoint : "main", 0);
+      !entrypoint.IsEmpty() ? entrypoint : "main", args.GetArray());
 
     if (!program)
       return false;
@@ -146,7 +154,8 @@ bool csShaderGLCGFP::Compile ()
   }
   else
   {
-    return DefaultLoadProgram (programStr, CG_GL_FRAGMENT);
+    return DefaultLoadProgram (programStr, CG_GL_FRAGMENT, 
+      shaderPlug->maxProfileFragment);
   }
 
   return true;

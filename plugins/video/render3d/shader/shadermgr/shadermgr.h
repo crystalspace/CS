@@ -49,16 +49,21 @@
 CS_PLUGIN_NAMESPACE_BEGIN(ShaderManager)
 {
 
-class csShaderManager : public scfImplementation3<csShaderManager,
-						  iShaderManager,
-						  iEventHandler,
-						  iComponent>
+typedef csHash<csRef<iShaderVariableAccessor>,csStringBase> csSVAHash;
+
+class csShaderManager : 
+  public scfImplementation3<csShaderManager,
+			    iShaderManager,
+			    iEventHandler,
+			    iComponent>,
+  public CS::ShaderVariableContextImpl
 {
 private:
   iObjectRegistry* objectreg;
   csRef<iVirtualClock> vc;
   csRef<iTextureManager> txtmgr;
   csRef<iStringSet> strings;
+  csRef<iEventHandler> weakEventHandler;
 
   bool do_verbose;
 
@@ -74,7 +79,6 @@ private:
   csRef<csShaderVariable> sv_time;
   void UpdateStandardVariables();
 
-  csShaderVariableContext svcontext;
   csRef<iShaderVarStack> shaderVarStack;
 
   csSet<csStringID> neutralTags;
@@ -87,6 +91,9 @@ private:
   };
   csSet<csStringID>& GetTagSet (csShaderTagPresence presence);
   csHash<TagInfo, csStringID> tagInfo;
+
+  // We maintain a hash of shader variable accessors.
+  csSVAHash sva_hash;
 
   csArray<iLight*> activeLights;
 
@@ -110,6 +117,7 @@ public:
    */
   virtual void RegisterShader (iShader* shader);
   virtual void UnregisterShader (iShader* shader);
+  virtual void UnregisterShaders ();
   /// Get a shader by name
   virtual iShader* GetShader (const char* name);
   /// Returns all shaders that have been created
@@ -120,6 +128,14 @@ public:
   virtual void RegisterCompiler (iShaderCompiler* compiler);
   /// Get a shadercompiler by name
   virtual iShaderCompiler* GetCompiler (const char* name);
+
+  virtual void RegisterShaderVariableAccessor (const char* name,
+      iShaderVariableAccessor* accessor);
+  virtual void UnregisterShaderVariableAccessor (const char* name,
+      iShaderVariableAccessor* accessor);
+  virtual iShaderVariableAccessor* GetShaderVariableAccessor (
+      const char* name);
+  virtual void UnregisterShaderVariableAcessors ();
 
   /// Report a message.
   void Report (int severity, const char* msg, ...);
@@ -151,35 +167,6 @@ public:
   {
     return activeLights;
   }
-  /** @} */
-
-  /**\name iShaderVariableContext implementation
-   * @{ */
-  /// Add a variable to this context
-  void AddVariable (csShaderVariable *variable)
-    { svcontext.AddVariable (variable); }
-
-  /// Get a named variable from this context
-  csShaderVariable* GetVariable (csStringID name) const
-    { return svcontext.GetVariable (name); }
-
-  /// Get Array of all ShaderVariables
-  const csRefArray<csShaderVariable>& GetShaderVariables () const
-  { return svcontext.GetShaderVariables(); }
-
-  /**
-  * Push the variables of this context onto the variable stacks
-  * supplied in the "stacks" argument
-  */
-  void PushVariables (iShaderVarStack* stacks) const
-    { svcontext.PushVariables (stacks); }
-
-  bool IsEmpty () const 
-  { return svcontext.IsEmpty(); }
-
-  void ReplaceVariable (csShaderVariable *variable)
-  { svcontext.ReplaceVariable(variable); }
-  void Clear () { svcontext.Clear(); }
   /** @} */
 
   /**\name iComponent implementation

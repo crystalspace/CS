@@ -9,6 +9,7 @@ LinkWith vfs : crystalspace ;
 rule VfsCfgGen
 {
   Depends $(<) : $(>) ;
+  Always $(<) ;
   Clean vfsclean : $(<) ;
 }
 

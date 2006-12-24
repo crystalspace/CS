@@ -48,7 +48,7 @@ awsTimer::~awsTimer ()
 {
   if (!stopped)
   {
-    csRef<iEventQueue> eq (CS_QUERY_REGISTRY (object_reg, iEventQueue));
+    csRef<iEventQueue> eq (csQueryRegistry<iEventQueue> (object_reg));
     if (eq)
       eq->RemoveListener (&scfiEventHandler);
   }
@@ -59,7 +59,7 @@ bool awsTimer::Setup ()
 {
   if (!bSetup)
   {
-    if (!vc) vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
+    if (!vc) vc = csQueryRegistry<iVirtualClock> (object_reg);
 
     bSetup = (vc != 0);
   }
@@ -101,7 +101,7 @@ void awsTimer::Stop ()
   if (!stopped)
   {
     stopped = true;
-    csRef<iEventQueue> eq(CS_QUERY_REGISTRY (object_reg, iEventQueue));
+    csRef<iEventQueue> eq(csQueryRegistry<iEventQueue> (object_reg));
     if (eq)
       eq->RemoveListener (&scfiEventHandler);
   }
@@ -111,7 +111,7 @@ bool awsTimer::Start ()
 {
   if (Setup () && stopped)
   {
-    csRef<iEventQueue> eq(CS_QUERY_REGISTRY (object_reg, iEventQueue));
+    csRef<iEventQueue> eq(csQueryRegistry<iEventQueue> (object_reg));
     if (eq)
     {
       eq->RegisterListener (&scfiEventHandler, 

@@ -26,6 +26,7 @@
 #include "csextern.h"
 
 #include "csutil/csobject.h"
+#include "csutil/csstring.h"
 #include "csutil/hash.h"
 #include "csutil/scf_implementation.h"
 #include "csutil/set.h"
@@ -44,9 +45,9 @@ class CS_CRYSTALSPACE_EXPORT csKeyValuePair :
 {
 private:
   const char *m_Value;	// Points to a string in the hash below.
-  csHash<csStrKey, csStrKey> values;
-  csSet<csStrKey> names;
-
+  csHash<csString, csString> values;
+  csSet<csString> names;
+  bool editoronly;
 public:
   /// The constructor. Requires both key and value. Data is being copied!
   csKeyValuePair (const char* Key, const char* Value);
@@ -55,7 +56,12 @@ public:
   /// The destructor as usual
   virtual ~csKeyValuePair ();
 
-  //----------------------- iKeyValuePair --------------------------
+  /// Set the "editor only" flag of this key value pair
+  void SetEditorOnly (bool flag)
+  { editoronly = flag; }
+
+  /**\name iKeyValuePair implementation
+   * @{ */
   virtual iObject *QueryObject() { return (csObject*)this; }
   virtual const char *GetKey () const;
   virtual void SetKey (const char* s);
@@ -66,6 +72,9 @@ public:
 
   virtual csRef<iStringArray> GetValueNames () const;
 
+  virtual bool GetEditorOnly () const
+  { return editoronly; }
+  /** @} */
 };
 
 #endif // __CS_KEYVAL_H__

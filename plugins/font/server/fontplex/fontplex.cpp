@@ -141,8 +141,9 @@ bool csFontServerMultiplexer::Initialize (iObjectRegistry *object_reg)
   if (fontset) mapKey << fontset << '.';
   
   csRef<iConfigIterator> mapEnum (config->Enumerate (mapKey));
-  while (mapEnum->Next ())
+  while (mapEnum->HasNext ())
   {
+    mapEnum->Next();
     const char* pluginName = mapEnum->GetStr ();
     csRef<iFontServer> fs = csLoadPluginCheck<iFontServer> (object_reg, 
       pluginName);
@@ -280,6 +281,7 @@ csPtr<iFont> csFontServerMultiplexer::LoadFont (const char *filename,
 
   csRef<csFontPlexer> newFont;
   newFont.AttachNew (new csFontPlexer (this, fontid, size, order));
+  loadedFonts.Put (fontid, newFont);
 
   // The first font that could be loaded is the "primary" font.
   iFont* primary = 0;
@@ -302,13 +304,12 @@ csPtr<iFont> csFontServerMultiplexer::LoadFont (const char *filename,
   if (primary == 0)
   {
     // Not a single font in the substitution list could be loaded?...
-    delete order;
+    // Note: order is deleted when newFont gets released.
     return 0;
   }
   else
   {
     newFont->primaryFont = primary;
-    loadedFonts.Put (fontid, newFont);
     return csPtr<iFont> (newFont);
   }
 }
@@ -363,8 +364,8 @@ void csFontServerMultiplexer::ParseFontLoaderOrder (
 
 csPtr<iFontServer> csFontServerMultiplexer::ResolveFontServer (const char* name)
 {
-  csRef<iPluginManager> plugin_mgr = CS_QUERY_REGISTRY (object_reg,
-    iPluginManager);
+  csRef<iPluginManager> plugin_mgr = 
+    csQueryRegistry<iPluginManager> (object_reg);
 
   csRef<iFontServer> fs;
   if (iSCF::SCF->ClassRegistered (name))
@@ -373,7 +374,7 @@ csPtr<iFontServer> csFontServerMultiplexer::ResolveFontServer (const char* name)
   }
   if (fs == 0)
   {
-    csHash<FontServerMapEntry, csStrKey>::Iterator it = 
+    csHash<FontServerMapEntry, csString>::Iterator it = 
       fontServerMap.GetIterator (name);
 
     while (it.HasNext ())

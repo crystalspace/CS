@@ -66,7 +66,6 @@ csString csReporterListener::DefaultDebugFilename()
 csReporterListener::csReporterListener (iBase *iParent) : 
 scfImplementationType (this, iParent)
 {
-  mutex = csMutex::Create (true);
   object_reg = 0;
   reporter = 0;
   silent = false;
@@ -152,18 +151,21 @@ bool csReporterListener::Initialize (iObjectRegistry* r)
   if (q != 0)
     q->RegisterListener (eventHandler, PostProcess);
 
-  csRef<iConfigManager> cfg(csQueryRegistry<iConfigManager> (r));
-  if ( cfg )
+  csRef<iConfigManager> cfg = csQueryRegistry<iConfigManager> (r);
+  if (cfg)
   {
-    append = cfg->GetBool("Reporter.FileAppend", false );
+    append = cfg->GetBool ("Reporter.FileAppend", false);
+    silent = cfg->GetBool ("Reporter.Silent", silent);
   }
 
   csRef<iCommandLineParser> cmdline = 
     csQueryRegistry<iCommandLineParser> (object_reg);
   if (cmdline)
   {
-    silent = cmdline->GetOption ("silent") != 0;
-    append = cmdline->GetOption ("append") != 0;
+    if (cmdline->GetOption ("silent"))
+      silent = true;
+    if (cmdline->GetOption ("append"))
+      append = true;
   }
   csRef<iVerbosityManager> verbosemgr (
     csQueryRegistry<iVerbosityManager> (object_reg));
@@ -299,7 +301,7 @@ void csReporterListener::WriteLine (int severity, const char* msgID,
   {
     if (!silent)
     {
-      csScopedMutexLock lock (mutex);
+      CS::Threading::RecursiveMutexScopedLock lock (mutex);
       csString popmsg;
       if (!repeatedID)
       {
@@ -342,7 +344,7 @@ bool csReporterListener::HandleEvent (iEvent& event)
 {
   if (event.Name == PostProcess)
   {
-    csScopedMutexLock lock (mutex);
+    CS::Threading::RecursiveMutexScopedLock lock (mutex);
     size_t l = messages.Length ();
     if (l > 0)
     {

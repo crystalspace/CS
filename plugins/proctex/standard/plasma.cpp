@@ -26,6 +26,7 @@
 #include "imap/services.h"
 #include "ivideo/txtmgr.h"
 #include "ivideo/texture.h"
+#include "csutil/scf.h"
 
 #include "prplasma.h"
 #include "stdproctex.h"
@@ -37,7 +38,8 @@ SCF_IMPLEMENT_FACTORY(csPtPlasmaSaver)
 
 #define CLASSID_PLASMATYPE "crystalspace.texture.type.plasma"
 
-csPtPlasmaType::csPtPlasmaType (iBase* p) : csBaseProctexType(p)
+csPtPlasmaType::csPtPlasmaType (iBase* p) :
+  scfImplementationType(this, p)
 {
 }
 
@@ -51,7 +53,7 @@ csPtr<iTextureFactory> csPtPlasmaType::NewFactory()
 // 'Plasma' PT factory
 
 csPtPlasmaFactory::csPtPlasmaFactory (iTextureType* p, iObjectRegistry* object_reg) : 
-    csBaseTextureFactory (p, object_reg)
+  scfImplementationType(this, p, object_reg)
 {
 }
 
@@ -72,7 +74,8 @@ csPtr<iTextureWrapper> csPtPlasmaFactory::Generate ()
 //---------------------------------------------------------------------------
 // 'Plasma' loader.
 
-csPtPlasmaLoader::csPtPlasmaLoader(iBase *p) : csBaseProctexLoader(p)
+csPtPlasmaLoader::csPtPlasmaLoader(iBase *p) :
+  scfImplementationType(this, p)
 {
 //  init_token_table (tokens);
 }
@@ -90,7 +93,7 @@ csPtr<iBase> csPtPlasmaLoader::Parse (iDocumentNode* /*node*/,
   	object_reg, CLASSID_PLASMATYPE);
   if (!type) return 0;
   csRef<iSyntaxService> synldr = 
-    CS_QUERY_REGISTRY (object_reg, iSyntaxService);
+    csQueryRegistry<iSyntaxService> (object_reg);
 
   csRef<iTextureFactory> plasmaFact = type->NewFactory();
 
@@ -98,7 +101,7 @@ csPtr<iBase> csPtPlasmaLoader::Parse (iDocumentNode* /*node*/,
   if (context)
   {
     ctx = csPtr<iTextureLoaderContext>
-      (SCF_QUERY_INTERFACE (context, iTextureLoaderContext));
+      (scfQueryInterface<iTextureLoaderContext> (context));
 
     if (ctx)
     {
@@ -112,7 +115,7 @@ csPtr<iBase> csPtPlasmaLoader::Parse (iDocumentNode* /*node*/,
   }
   csRef<iTextureWrapper> tex = plasmaFact->Generate();
 
-  csRef<iGraphics3D> G3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+  csRef<iGraphics3D> G3D = csQueryRegistry<iGraphics3D> (object_reg);
   if (!G3D) return 0;
   csRef<iTextureManager> tm = G3D->GetTextureManager();
   if (!tm) return 0;
@@ -124,7 +127,8 @@ csPtr<iBase> csPtPlasmaLoader::Parse (iDocumentNode* /*node*/,
 //---------------------------------------------------------------------------
 // 'Plasma' saver.
 
-csPtPlasmaSaver::csPtPlasmaSaver (iBase* p) : csBaseProctexSaver(p)
+csPtPlasmaSaver::csPtPlasmaSaver (iBase* p) :
+  scfImplementationType(this, p)
 {
 }
 

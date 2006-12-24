@@ -53,13 +53,16 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
 #include "sprcal3d.h"
+#include <cal3d/coretrack.h>
+#include <cal3d/corekeyframe.h>
 
 // STL include required by cal3d
 #include <string>
 
 CS_IMPLEMENT_PLUGIN
 
-using namespace CS::Plugins::SprCal3d;
+CS_PLUGIN_NAMESPACE_BEGIN(SprCal3d)
+{
 
 CS_LEAKGUARD_IMPLEMENT (csCal3DMesh);
 CS_LEAKGUARD_IMPLEMENT (csSpriteCal3DMeshObject);
@@ -172,7 +175,7 @@ csSpriteCal3DMeshObjectFactory::csSpriteCal3DMeshObjectFactory (
 
   csSpriteCal3DMeshObjectFactory::object_reg = object_reg;
 
-  light_mgr = CS_QUERY_REGISTRY (object_reg, iLightManager);
+  light_mgr = csQueryRegistry<iLightManager> (object_reg);
 }
 
 csSpriteCal3DMeshObjectFactory::~csSpriteCal3DMeshObjectFactory ()
@@ -352,12 +355,17 @@ void csSpriteCal3DMeshObjectFactory::CalculateAllBoneBoundingBoxes()
   calCoreModel.getCoreSkeleton()->calculateBoundingBoxes(&calCoreModel);
 }
 
+#include "csutil/custom_new_disable.h"
+
 int csSpriteCal3DMeshObjectFactory::AddMorphAnimation(const char *name)
 {
-  int id = calCoreModel.addCoreMorphAnimation(new CalCoreMorphAnimation());
+  int id = calCoreModel.addCoreMorphAnimation(new (allocPlatform)
+    CalCoreMorphAnimation());
   morph_animation_names.Push(name);
   return id;
 }
+
+#include "csutil/custom_new_enable.h"
 
 bool csSpriteCal3DMeshObjectFactory::AddMorphTarget( int morphanimation_index,
                                                  const char *mesh_name, 
@@ -553,10 +561,11 @@ int csSpriteCal3DMeshObjectFactory::FindMorphAnimationName (
   return -1;
 }
 
+#include "csutil/custom_new_disable.h"
 
 bool csSpriteCal3DMeshObjectFactory::AddCoreMaterial(iMaterialWrapper *mat)
 {
-  CalCoreMaterial *newmat = new CalCoreMaterial;
+  CalCoreMaterial *newmat = new (allocPlatform) CalCoreMaterial;
   CalCoreMaterial::Map newmap;
   newmap.userData = mat;
 
@@ -568,6 +577,8 @@ bool csSpriteCal3DMeshObjectFactory::AddCoreMaterial(iMaterialWrapper *mat)
   calCoreModel.addCoreMaterial(newmat);
   return true;
 }
+
+#include "csutil/custom_new_enable.h"
 
 void csSpriteCal3DMeshObjectFactory::BindMaterials()
 {
@@ -600,7 +611,7 @@ csPtr<iMeshObject> csSpriteCal3DMeshObjectFactory::NewInstance ()
   spr->updateanim_sqdistance3 = sprcal3d_type->updateanim_sqdistance3;
   spr->updateanim_skip3 = sprcal3d_type->updateanim_skip3;
 
-  csRef<iMeshObject> im (SCF_QUERY_INTERFACE (spr, iMeshObject));
+  csRef<iMeshObject> im (scfQueryInterface<iMeshObject> (spr));
   spr->DecRef ();
   return csPtr<iMeshObject> (im);
 }
@@ -655,10 +666,12 @@ void csSpriteCal3DMeshObjectFactory::HardTransform (
     ->getVectorCoreBone();
 
   // loop through all root core bones
-  std::list<int>::iterator iteratorRootCoreBoneId;
-  for (iteratorRootCoreBoneId = pCoreSkeleton->getListRootCoreBoneId().begin()
-    ; iteratorRootCoreBoneId != pCoreSkeleton->getListRootCoreBoneId().end()
-    ; ++iteratorRootCoreBoneId)
+  std::vector<int>& rootCoreBones = 
+    pCoreSkeleton->getVectorRootCoreBoneId();
+  std::vector<int>::iterator iteratorRootCoreBoneId;
+  for (iteratorRootCoreBoneId = rootCoreBones.begin();
+       iteratorRootCoreBoneId != rootCoreBones.end();
+       ++iteratorRootCoreBoneId)
   {
     CalCoreBone *bone = vectorCoreBone[*iteratorRootCoreBoneId];
     CalQuaternion bonerot = bone->getRotation();
@@ -675,32 +688,25 @@ void csSpriteCal3DMeshObjectFactory::HardTransform (
   {
     CalCoreAnimation *anim = calCoreModel.getCoreAnimation(i);
     if (!anim) continue;
-
-    const uint trackCount = anim->getTrackCount();
-    std::vector<CalTransform> poses = anim->getPoses();
-    const uint frameCount = (uint)poses.size() / trackCount;
-
     // loop through all root core bones
-    std::list<int>::iterator iteratorRootCoreBoneId;
-    for (iteratorRootCoreBoneId = pCoreSkeleton->getListRootCoreBoneId().begin()
-        ; iteratorRootCoreBoneId != pCoreSkeleton->getListRootCoreBoneId().end()
-    ; ++iteratorRootCoreBoneId)
+    for (iteratorRootCoreBoneId = rootCoreBones.begin();
+         iteratorRootCoreBoneId != rootCoreBones.end();
+         ++iteratorRootCoreBoneId)
     {
-      int boneTrack = anim->getTrackAssignment (*iteratorRootCoreBoneId);
-      if (boneTrack < 0) continue;
-      for (uint j = 0; j < frameCount; j++)
+      CalCoreTrack *track = anim->getCoreTrack(*iteratorRootCoreBoneId);
+      if (!track) continue;
+      for (int j=0; j<track->getCoreKeyframeCount(); j++)
       {
-        CalTransform& tf = poses[j * trackCount + boneTrack];
-        CalQuaternion bonerot = tf.getRotation();
-        CalVector bonevec = tf.getTranslation();
-        bonerot *= quatrot;
-        bonevec *= quatrot;
-        bonevec += translation;
-        tf.setRotation (bonerot);
-        tf.setTranslation (bonevec);
+	CalCoreKeyframe *frame = track->getCoreKeyframe(j);
+	CalQuaternion bonerot = frame->getRotation();
+	CalVector bonevec = frame->getTranslation();
+	bonerot *= quatrot;
+	bonevec *= quatrot;
+	bonevec += translation;
+	frame->setRotation(bonerot);
+	frame->setTranslation(bonevec);
       }
     }
-    anim->setPoses (poses, trackCount);
   }
 //  calCoreModel.getCoreSkeleton()->calculateBoundingBoxes(&calCoreModel);
 }
@@ -858,6 +864,12 @@ void csSpriteCal3DMeshObject::GetObjectBoundingBox (csBox3& bbox)
   bbox = object_bbox;
 }
 
+const csBox3& csSpriteCal3DMeshObject::GetObjectBoundingBox ()
+{
+  RecalcBoundingBox (object_bbox);
+  return object_bbox;
+}
+
 void csSpriteCal3DMeshObject::SetObjectBoundingBox (const csBox3& bbox)
 {
   object_bbox = bbox;
@@ -884,6 +896,12 @@ void csSpriteCal3DMeshObjectFactory::GetObjectBoundingBox (csBox3& bbox)
   {
     bbox.AddBoundingVertexSmart(p[i].x, p[i].y, p[i].z);
   }
+}
+
+const csBox3& csSpriteCal3DMeshObjectFactory::GetObjectBoundingBox ()
+{
+  obj_bbox = GetObjectBoundingBox ();
+  return obj_bbox;
 }
 
 void csSpriteCal3DMeshObjectFactory::SetObjectBoundingBox (const csBox3&)
@@ -2245,3 +2263,6 @@ csPtr<iMeshObjectFactory> csSpriteCal3DMeshObjectType::NewFactory ()
   return csPtr<iMeshObjectFactory> (cm);
 }
 
+
+}
+CS_PLUGIN_NAMESPACE_END(SprCal3d)

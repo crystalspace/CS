@@ -32,8 +32,8 @@
 class csBox3;
 class csColor;
 class csColor4;
-class csGradient;
 class csMatrix3;
+class csOBB;
 class csPlane3;
 class csShaderVariable;
 class csVector2;
@@ -42,6 +42,7 @@ class csVector3;
 struct csAlphaMode;
 
 struct iDocumentNode;
+struct iGradient;
 struct iKeyValuePair;
 struct iLoaderContext;
 struct iMaterialWrapper;
@@ -71,7 +72,7 @@ struct iThingFactoryState;
  */
 struct iSyntaxService : public virtual iBase
 {
-  SCF_INTERFACE (iSyntaxService, 2, 0, 0);
+  SCF_INTERFACE (iSyntaxService, 2, 1, 1);
   
   /**\name Parse reporting helpers
    * @{ */
@@ -208,6 +209,16 @@ struct iSyntaxService : public virtual iBase
   virtual bool WriteBox (iDocumentNode* node, const csBox3& v) = 0;
 
   /**
+   * Parse a box description. Returns true if successful.
+   */
+  virtual bool ParseBox (iDocumentNode* node, csOBB &b) = 0;
+
+  /**
+   * Write a box description. Returns true if successful.
+   */
+  virtual bool WriteBox (iDocumentNode* node, const csOBB& b) = 0;
+
+  /**
    * Parse a color description. Returns true if successful.
    */
   virtual bool ParseColor (iDocumentNode* node, csColor &c) = 0;
@@ -253,21 +264,24 @@ struct iSyntaxService : public virtual iBase
 
   /**
    * Parse a color gradient.
+   * \param node Document node containing the gradient data.
+   * \param gradient Valid pointer to a gradient interface which is filled 
+   *   with the data from the document node.
    */
   virtual bool ParseGradient (iDocumentNode* node,
-			      csGradient& gradient) = 0;
+			      iGradient* gradient) = 0;
 
   /**
    * Write a color gradient.
    */
   virtual bool WriteGradient (iDocumentNode* node,
-			      const csGradient& gradient) = 0;
+			      iGradient* gradient) = 0;
 
   /**
    * Parse a shader variable declaration
    */
-  virtual bool ParseShaderVar (iDocumentNode* node, 
-    csShaderVariable& var) = 0;
+  virtual bool ParseShaderVar (iLoaderContext* ldr_context,
+      iDocumentNode* node, csShaderVariable& var) = 0;
   /**
    * Parse a shader variable expression. Returns an acessor that can be set
    * on a shader variable. The accessor subsequently evaluates the expression.
@@ -316,6 +330,7 @@ struct iSyntaxService : public virtual iBase
    * return in "keyvalue", with refcount 1
    * Returns true if successful.
    */
+  CS_DEPRECATED_METHOD_MSG("Use the csRef<iKeyValuePair> version instead")
   virtual bool ParseKey (iDocumentNode* node, iKeyValuePair*& keyvalue) = 0;
 
   /**
@@ -344,7 +359,14 @@ struct iSyntaxService : public virtual iBase
    * attribute mismatches, this method fails (and the loaded shader is not
    * registered with the shader manager),
    */
-  virtual csRef<iShader> ParseShaderRef (iDocumentNode* node) = 0;
+  virtual csRef<iShader> ParseShaderRef (iLoaderContext* ldr_context,
+      iDocumentNode* node) = 0;
+
+  /**
+   * Parse a key definition. A iKeyValuePair instance is
+   * returned if successful.
+   */
+  virtual csPtr<iKeyValuePair> ParseKey (iDocumentNode* node) = 0;
 };
 
 /** @} */

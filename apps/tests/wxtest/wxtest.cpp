@@ -17,10 +17,11 @@
 */
 
 #define CS_IMPLEMENT_PLATFORM_APPLICATION
+/* This is needed due the WX headers using free() inline, but the opposing
+ * malloc() is in the WX libs. */
+#define CS_NO_MALLOC_OVERRIDE
 
 #include "cssysdef.h"
-
-#include <wx/wx.h>
 
 #include "csutil/sysfunc.h"
 #include "csutil/event.h"
@@ -59,6 +60,10 @@
 #include "ivaria/stdrep.h"
 #include "csutil/cmdhelp.h"
 #include "csutil/event.h"
+
+/* Fun fact: should occur after csutil/event.h, otherwise, gcc may report
+ * missing csMouseEventHelper symbols. */
+#include <wx/wx.h>
 
 CS_IMPLEMENT_APPLICATION
 
@@ -190,7 +195,7 @@ bool Simple::HandleEvent (iEvent& ev)
     if((ev.Name == KeyboardDown) &&
        (csKeyEventHelper::GetCookedCode (&ev) == CSKEY_ESC))
     {
-      csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
+      csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (object_reg));
       if (q) q->GetEventOutlet()->Broadcast (csevQuit(object_reg));
       return true;
     }
@@ -264,7 +269,7 @@ bool Simple::Initialize ()
   }
 
   // The virtual clock.
-  vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
+  vc = csQueryRegistry<iVirtualClock> (object_reg);
   if (vc == 0)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -274,7 +279,7 @@ bool Simple::Initialize ()
   }
 
   // Find the pointer to engine plugin
-  engine = CS_QUERY_REGISTRY (object_reg, iEngine);
+  engine = csQueryRegistry<iEngine> (object_reg);
   if (engine == 0)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -283,7 +288,7 @@ bool Simple::Initialize ()
     return false;
   }
 
-  loader = CS_QUERY_REGISTRY (object_reg, iLoader);
+  loader = csQueryRegistry<iLoader> (object_reg);
   if (loader == 0)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -292,7 +297,7 @@ bool Simple::Initialize ()
     return false;
   }
 
-  g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+  g3d = csQueryRegistry<iGraphics3D> (object_reg);
   if (g3d == 0)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -301,7 +306,7 @@ bool Simple::Initialize ()
     return false;
   }
 
-  kbd = CS_QUERY_REGISTRY (object_reg, iKeyboardDriver);
+  kbd = csQueryRegistry<iKeyboardDriver> (object_reg);
   if (kbd == 0)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -316,7 +321,7 @@ bool Simple::Initialize ()
   panel->Show(true);
 
   iGraphics2D* g2d = g3d->GetDriver2D();
-  csRef<iWxWindow> wxwin = SCF_QUERY_INTERFACE(g2d, iWxWindow);
+  csRef<iWxWindow> wxwin = scfQueryInterface<iWxWindow> (g2d);
   if( !wxwin )
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -392,10 +397,10 @@ bool Simple::Initialize ()
 
 void Simple::PushFrame ()
 {
-  csRef<iEventQueue> q (CS_QUERY_REGISTRY(object_reg, iEventQueue));
+  csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (object_reg));
   if (!q)
     return ;
-  csRef<iVirtualClock> vc (CS_QUERY_REGISTRY(object_reg, iVirtualClock));
+  csRef<iVirtualClock> vc (csQueryRegistry<iVirtualClock> (object_reg));
 
   if (vc)
     vc->Advance();
@@ -467,7 +472,7 @@ IMPLEMENT_APP(MyApp)
 {
 #if defined(wxUSE_UNICODE) && wxUSE_UNICODE
   char** csargv;
-  csargv = (char**)malloc(sizeof(char*) * argc);
+  csargv = (char**)cs_malloc(sizeof(char*) * argc);
   for(int i = 0; i < argc; i++) 
   {
     csargv[i] = strdup (wxString(argv[i]).mb_str().data());

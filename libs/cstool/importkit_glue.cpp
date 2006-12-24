@@ -54,7 +54,7 @@ namespace CS
     
     Glue::Glue (iObjectRegistry* objectReg) : objectReg(objectReg), texId(0)
     {
-      vfs = CS_QUERY_REGISTRY (objectReg, iVFS);
+      vfs = csQueryRegistry<iVFS> (objectReg);
     }
 
     Glue::~Glue()
@@ -101,7 +101,7 @@ namespace CS
 	if (!file) return false;
 
 	csRef<iDocumentSystem> docsys (
-	    CS_QUERY_REGISTRY (objectReg, iDocumentSystem));
+	    csQueryRegistry<iDocumentSystem> (objectReg));
 	if (!docsys) docsys = csPtr<iDocumentSystem> (new csTinyDocumentSystem ());
 	csRef<iDocument> doc = docsys->CreateDocument ();
 	const char* error = doc->Parse (file, true);
@@ -122,6 +122,7 @@ namespace CS
 	if (ProbeMeshFactory (container, obj)) continue;
 	if (ProbeMaterial (container, obj)) continue;
 	if (ProbeTexture (container, obj)) continue;
+	if (ProbeMeshObject (container, obj)) continue;
       }
 
       engine->RemoveObject (loadRegion);
@@ -157,7 +158,7 @@ namespace CS
       }
       ret = vfs->ChDir (path);
 
-      free (cwd);
+      platform_free (cwd);
       return ret;
     }
 
@@ -301,12 +302,25 @@ namespace CS
     }
 
     bool Glue::ProbeThingFactory (ImportKit::Container& container, 
-			       iMeshFactoryWrapper* fact, const char* name)
+			          iMeshFactoryWrapper* fact, const char* name)
     {
       csRef<iThingFactoryState> thingfact = 
 	scfQueryInterface<iThingFactoryState> (fact->GetMeshObjectFactory());
       if (!thingfact ) return false;
 
+      ImportKit::Container::Model newModel;
+      if (HandleThingFactory (newModel, thingfact))
+      {
+        newModel.name = csStrNewW (name);
+        container.models.Push (newModel);
+        return true;
+      }
+      return false;
+    }
+
+    bool Glue::HandleThingFactory (ImportKit::Container::Model& newModel,
+                                   iThingFactoryState* thingfact)
+    {
       csHash<GluedModel, size_t> models;
       size_t totalVert = 0, totalTri = 0;
 
@@ -349,7 +363,6 @@ namespace CS
 	}
       }
 
-      ImportKit::Container::Model newModel;
       GluedModel* model = glueModelPool.Alloc();
       model->allVertices.SetCapacity (totalVert);
       model->allNormals.SetCapacity (totalVert);
@@ -398,10 +411,38 @@ namespace CS
       }
 
       newModel.glueModel = model;
-      newModel.name = csStrNewW (name);
-      container.models.Push (newModel);
       
       return true;
+    }
+
+    bool Glue::ProbeMeshObject (ImportKit::Container& container, 
+			        iObject* obj)
+    {
+      csRef<iMeshWrapper> wrap = 
+	scfQueryInterface<iMeshWrapper> (obj);
+      if (!wrap) return false;
+      if (ProbeThingObject (container, wrap, obj->GetName()))
+	return true;
+      return false;
+    }
+
+    bool Glue::ProbeThingObject (ImportKit::Container& container, 
+			         iMeshWrapper* wrap, const char* name)
+    {
+      csRef<iThingFactoryState> thingfact = 
+	scfQueryInterface<iThingFactoryState> (
+        wrap->GetFactory ()->GetMeshObjectFactory());
+      if (!thingfact ) return false;
+
+      ImportKit::Container::Model newModel;
+      if (HandleThingFactory (newModel, thingfact))
+      {
+        newModel.name = csStrNewW (name);
+        newModel.type = ImportKit::Container::Model::Object;
+        container.models.Push (newModel);
+        return true;
+      }
+      return false;
     }
 
   } // namespace ImportKitImpl 

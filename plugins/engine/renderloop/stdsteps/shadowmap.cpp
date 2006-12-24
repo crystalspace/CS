@@ -51,7 +51,7 @@
 #include "igraphic/image.h"
 #include "ivideo/txtmgr.h"
 #include <iutil/object.h>
-#include "csgfx/memimage.h"
+#include "csgfx/imagememory.h"
 
 #include "shadowmap.h"
 
@@ -62,8 +62,8 @@ SCF_IMPLEMENT_FACTORY(csShadowmapRSLoader)
 
 //---------------------------------------------------------------------------
 
-csShadowmapRSType::csShadowmapRSType (iBase* p)
-	: csBaseRenderStepType (p)
+csShadowmapRSType::csShadowmapRSType (iBase* p) :
+  scfImplementationType (this, p)
 {
 }
 
@@ -75,8 +75,8 @@ csPtr<iRenderStepFactory> csShadowmapRSType::NewFactory()
 
 //---------------------------------------------------------------------------
 
-csShadowmapRSLoader::csShadowmapRSLoader (iBase* p)
-	: csBaseRenderStepLoader (p)
+csShadowmapRSLoader::csShadowmapRSLoader (iBase* p) :
+  scfImplementationType (this, p)
 {
   InitTokenTable (tokens);
 }
@@ -96,7 +96,7 @@ bool csShadowmapRSLoader::Initialize (iObjectRegistry* object_reg)
 
 csPtr<iBase> csShadowmapRSLoader::Parse (iDocumentNode* node, 
 				       iStreamSource*,
-				       iLoaderContext*,      
+				       iLoaderContext* ldr_context,      
 				       iBase*)
 {
   csShadowmapRenderStep* newstep = 
@@ -104,7 +104,7 @@ csPtr<iBase> csShadowmapRSLoader::Parse (iDocumentNode* node,
   csRef<iRenderStep> step;
   step.AttachNew (newstep);    
 
-  if (!ParseStep (node, newstep, newstep->GetSettings()))
+  if (!ParseStep (ldr_context, node, newstep, newstep->GetSettings()))
     return 0;
 
   if (newstep->GetSettings().shader.IsEmpty() &&
@@ -118,12 +118,13 @@ csPtr<iBase> csShadowmapRSLoader::Parse (iDocumentNode* node,
   return csPtr<iBase> (step);
 }
 
-bool csShadowmapRSLoader::ParseStep (iDocumentNode* node,
-  csShadowmapRenderStep* step, 
-  csShadowmapRenderStep::DrawSettings& settings)
+bool csShadowmapRSLoader::ParseStep (iLoaderContext* ldr_context,
+    iDocumentNode* node,
+    csShadowmapRenderStep* step, 
+    csShadowmapRenderStep::DrawSettings& settings)
 {
-  csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
-    object_reg, "crystalspace.shared.stringset", iStringSet);
+  csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet> (
+    object_reg, "crystalspace.shared.stringset");
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
@@ -146,7 +147,8 @@ bool csShadowmapRSLoader::ParseStep (iDocumentNode* node,
 	break;
       case XMLTOKEN_DEFAULTSHADER:
 	{
-	  csRef<iShader> defshader = synldr->ParseShaderRef (child);
+	  csRef<iShader> defshader = synldr->ParseShaderRef (ldr_context,
+	      child);
 	  step->SetDefaultShader(defshader);
 	}
 	break;
@@ -161,20 +163,15 @@ bool csShadowmapRSLoader::ParseStep (iDocumentNode* node,
 
 //---------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE(csShadowmapRenderStepFactory);
-  SCF_IMPLEMENTS_INTERFACE(iRenderStepFactory);
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 csShadowmapRenderStepFactory::csShadowmapRenderStepFactory (
-  iObjectRegistry* object_reg)
+  iObjectRegistry* object_reg) :
+  scfImplementationType (this)
 {
-  SCF_CONSTRUCT_IBASE(0);
   csShadowmapRenderStepFactory::object_reg = object_reg;
 }
 
 csShadowmapRenderStepFactory::~csShadowmapRenderStepFactory ()
 {
-  SCF_DESTRUCT_IBASE();
 }
 
 csPtr<iRenderStep> csShadowmapRenderStepFactory::Create ()
@@ -185,30 +182,23 @@ csPtr<iRenderStep> csShadowmapRenderStepFactory::Create ()
 
 //---------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE(csShadowmapRenderStep);
-  SCF_IMPLEMENTS_INTERFACE(iRenderStep);
-  SCF_IMPLEMENTS_INTERFACE(iLightIterRenderStep)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 csShadowmapRenderStep::csShadowmapRenderStep (
-  iObjectRegistry* object_reg) : r2tVisCallback ()
+  iObjectRegistry* object_reg) :
+  scfImplementationType (this)
 {
-  SCF_CONSTRUCT_IBASE(0);
-
-  g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
-  csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg, 
-    "crystalspace.shared.stringset", iStringSet);
+  g3d = csQueryRegistry<iGraphics3D> (object_reg);
+  csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet> 
+    (object_reg, "crystalspace.shared.stringset");
   csShadowmapRenderStep::object_reg = object_reg;
   bones_name = strings->Request("bones");
   shader_name = strings->Request("distance_animated");
   depth_cubemap_name = strings->Request("cubemap depth");
-  engine = CS_QUERY_REGISTRY (object_reg, iEngine);
+  engine = csQueryRegistry<iEngine> (object_reg);
   context = 0;
   defShader = 0;
 
   settings = DrawSettings();
 
-  r2tVisCallback.parent = this;
   mesh_list = new csRenderMeshList(engine);
 
 	/*
@@ -252,7 +242,6 @@ csShadowmapRenderStep::csShadowmapRenderStep (
 
 csShadowmapRenderStep::~csShadowmapRenderStep ()
 {
-  SCF_DESTRUCT_IBASE();
   delete mesh_list;
 }
 
@@ -335,7 +324,7 @@ void csShadowmapRenderStep::Perform (iRenderView* rview, iSector* sector,
 
       lightMeshes.Truncate(0);
 
-      culler->VisTest (planes, 5, &r2tVisCallback);
+      culler->VisTest (planes, 5, this);
 
       mesh_list->Empty();
 
@@ -406,23 +395,9 @@ void csShadowmapRenderStep::Perform (iRenderView* rview, iSector* sector,
     | CSDRAW_CLEARSCREEN);
 }
 
-SCF_IMPLEMENT_IBASE(csShadowmapRenderStep::R2TVisCallback)
-SCF_IMPLEMENTS_INTERFACE(iVisibilityCullerListener)
-SCF_IMPLEMENT_IBASE_END
-
-csShadowmapRenderStep::R2TVisCallback::R2TVisCallback ()
-{
-  SCF_CONSTRUCT_IBASE(0);
-}
-
-csShadowmapRenderStep::R2TVisCallback::~R2TVisCallback ()
-{
-  SCF_DESTRUCT_IBASE();
-}
-
-void csShadowmapRenderStep::R2TVisCallback::ObjectVisible (
+void csShadowmapRenderStep::ObjectVisible (
   iVisibilityObject * /*visobject*/, iMeshWrapper *mesh,
   uint32 /*frustum_mask*/)
 {
-  parent->lightMeshes.Push (mesh);
+  lightMeshes.Push (mesh);
 }

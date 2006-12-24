@@ -27,6 +27,8 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "csutil/csobject.h"
 #include "csutil/nobjvec.h"
 
+CS_PLUGIN_NAMESPACE_BEGIN(Bullet)
+{
 
 /**
 * This is the implementation for the actual plugin.
@@ -118,7 +120,7 @@ public:
   void AttachCollider (iDynamicsSystemCollider* collider);
   csRef<iDynamicsSystemCollider> CreateCollider ();
   csRef<iDynamicsSystemCollider> GetCollider (unsigned int index) 
-  {return colliders[index];}
+  {return csRef<iDynamicsSystemCollider> (colliders[index]);}
   int GetColliderCount () 
   {return (int) colliders.GetSize ();}
 
@@ -284,7 +286,8 @@ public:
 
   void SetMoveCallback (iDynamicsMoveCallback* cb);
   void SetCollisionCallback (iDynamicsCollisionCallback* cb);
-  void Collision (iRigidBody *other);
+  void Collision (iRigidBody *other, const csVector3& pos,
+      const csVector3& normal, float depth);
   csRef<iDynamicsSystemCollider> GetCollider (unsigned int index);
   int GetColliderCount ();
 
@@ -347,5 +350,8 @@ public:
 protected:
     void ResetShape ();
 };
+
+}
+CS_PLUGIN_NAMESPACE_END(Bullet)
 
 #endif //__CS_BULLET_DYNAMICS_H__

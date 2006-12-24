@@ -1,3 +1,0 @@
-SubDir TOP plugins net ;
-
-SubInclude TOP plugins net vos ;

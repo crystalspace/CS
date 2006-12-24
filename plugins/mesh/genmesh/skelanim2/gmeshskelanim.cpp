@@ -37,32 +37,15 @@
 
 CS_IMPLEMENT_PLUGIN
 
-SCF_IMPLEMENT_IBASE (csGenmeshSkelAnimationControlType)
-SCF_IMPLEMENTS_INTERFACE (iGenMeshAnimationControlType)
-SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csGenmeshSkelAnimationControlType::eiComponent)
-SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 SCF_IMPLEMENT_FACTORY (csGenmeshSkelAnimationControlType)
-
-SCF_IMPLEMENT_IBASE (csGenmeshSkelAnimationControlFactory)
-SCF_IMPLEMENTS_INTERFACE (iGenMeshAnimationControlFactory)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csGenmeshSkelAnimationControl)
-SCF_IMPLEMENTS_INTERFACE (iGenMeshAnimationControl)
-SCF_IMPLEMENTS_INTERFACE (iGenMeshSkeletonControlState)
-SCF_IMPLEMENT_IBASE_END
 
 //-------------------------------------------------------------------------
 
 csGenmeshSkelAnimationControl::csGenmeshSkelAnimationControl (
-  csGenmeshSkelAnimationControlFactory* fact, iMeshObject *mesh, iObjectRegistry* object_reg)
+  csGenmeshSkelAnimationControlFactory* fact, iMeshObject *mesh,
+  iObjectRegistry* object_reg) :
+  scfImplementationType(this)
 {
-  SCF_CONSTRUCT_IBASE (0);
   csGenmeshSkelAnimationControl::object_reg = object_reg;
   mesh_obj = mesh;
   factory = fact;
@@ -97,8 +80,8 @@ csGenmeshSkelAnimationControl::csGenmeshSkelAnimationControl (
   tangents_mapped = false;
   bitangents_mapped = false;
 
-  csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg, 
-    "crystalspace.shared.stringset", iStringSet);
+  csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet> 
+    (object_reg, "crystalspace.shared.stringset");
 
 
   bones_name = strings->Request ("bones");
@@ -121,7 +104,6 @@ csGenmeshSkelAnimationControl::~csGenmeshSkelAnimationControl ()
   delete[] animated_vert_norms;
   delete[] animated_tangents;
   delete[] animated_bitangents;
-  SCF_DESTRUCT_IBASE ();
 }
 
 void csGenmeshSkelAnimationControl::Initialize ()
@@ -134,18 +116,18 @@ void csGenmeshSkelAnimationControl::Initialize ()
       iSceneNode *parent_node = mesh_obj->GetMeshWrapper()->QuerySceneNode()->GetParent();
       if (parent_node)
       {
-        parent_mesh = SCF_QUERY_INTERFACE(parent_node, iMeshWrapper);
+        parent_mesh = scfQueryInterface<iMeshWrapper> (parent_node);
       }
 
       if (parent_mesh)
       {
         csRef<iGeneralMeshState> genmesh_state = 
-          SCF_QUERY_INTERFACE(parent_mesh->GetMeshObject(), iGeneralMeshState);
+          scfQueryInterface<iGeneralMeshState> (parent_mesh->GetMeshObject());
         CS_ASSERT(genmesh_state);
 
         csRef<iGenMeshSkeletonControlState> par_skel_state = 
-          SCF_QUERY_INTERFACE(genmesh_state->GetAnimationControl(),
-          iGenMeshSkeletonControlState);
+          
+          scfQueryInterface<iGenMeshSkeletonControlState> (genmesh_state->GetAnimationControl());
         CS_ASSERT(par_skel_state);
         skeleton = par_skel_state->GetSkeleton();
       }
@@ -186,12 +168,20 @@ void csGenmeshSkelAnimationControl::UpdateVertNormArrays (int /*num_norms*/)
 {
 }
 
-const csVector3* csGenmeshSkelAnimationControl::UpdateVertices (csTicks current,
-                                                                const csVector3* verts, int num_verts, uint32 version_id)
+void csGenmeshSkelAnimationControl::Update (csTicks current)
 {
+  if (last_update_time != current)
+  {
+     last_update_time = current;
+  }
+  else
+  {
+    return;
+  }
+
   if (!mesh_obj->GetMeshWrapper())
   {
-    return verts;
+    return;
   }
 
   Initialize();
@@ -207,7 +197,7 @@ const csVector3* csGenmeshSkelAnimationControl::UpdateVertices (csTicks current,
         skeleton->GetBone(bone_idx)->GetFullTransform();
 
       csShaderVariable* boneQuat = _bones->GetArrayElement (i*2+0);
-      csQuaternion quat; quat.SetMatrix(offset_tr.GetO2T());
+      csQuaternion quat; quat.SetMatrix(offset_tr.GetT2O());
       boneQuat->SetValue(csVector4 (quat.v.x, quat.v.y, quat.v.z, quat.w));
 
       csShaderVariable *boneOffs = _bones->GetArrayElement (i*2+1);
@@ -217,7 +207,8 @@ const csVector3* csGenmeshSkelAnimationControl::UpdateVertices (csTicks current,
   }
   else
   {
-    _bones = csPtr<csShaderVariable> (new csShaderVariable(bones_name));
+    csRef<csShaderVariable> _bones;
+    _bones.AttachNew(new csShaderVariable(bones_name));
     _bones->SetType (csShaderVariable::ARRAY);
 
     _bones->SetArraySize (used_bones.Length()*2);
@@ -229,7 +220,8 @@ const csVector3* csGenmeshSkelAnimationControl::UpdateVertices (csTicks current,
         skeleton->GetBone(bone_idx)->GetFactory()->GetFullTransform().GetInverse()*
         skeleton->GetBone(bone_idx)->GetFullTransform();
 
-      csRef<csShaderVariable> boneQuat = csPtr<csShaderVariable> (new csShaderVariable(csInvalidStringID));
+      csRef<csShaderVariable> boneQuat;
+      boneQuat.AttachNew(new csShaderVariable(csInvalidStringID));
       _bones->SetArrayElement (i*2+0, boneQuat);
       csQuaternion quat;
       if (quat.v.x != 0 || quat.v.y != 0 || quat.v.z != 0 || quat.w != 0)
@@ -237,7 +229,8 @@ const csVector3* csGenmeshSkelAnimationControl::UpdateVertices (csTicks current,
         boneQuat->SetValue(csVector4 (quat.v.x, quat.v.y, quat.v.z, quat.w));
       }
 
-      csRef<csShaderVariable> boneOffs = csPtr<csShaderVariable> (new csShaderVariable(csInvalidStringID));
+      csRef<csShaderVariable> boneOffs;
+       boneOffs.AttachNew(new csShaderVariable(csInvalidStringID));
       _bones->SetArrayElement (i*2+1, boneOffs);
       csVector3 offset_pos = offset_tr.GetOrigin();
       boneOffs->SetValue(csVector4(offset_pos.x, offset_pos.y, offset_pos.z, 0));
@@ -245,6 +238,11 @@ const csVector3* csGenmeshSkelAnimationControl::UpdateVertices (csTicks current,
     mesh_obj->GetMeshWrapper()->GetSVContext ()->AddVariable (_bones);
     vertices_mapped = true;
   }
+}
+
+const csVector3* csGenmeshSkelAnimationControl::UpdateVertices (csTicks current,
+  const csVector3* verts, int /*num_verts*/, uint32 /*version_id*/)
+{
   return verts;
 }
 
@@ -281,9 +279,9 @@ const csVector3* csGenmeshSkelAnimationControl::UpdateBiTangents (csTicks,
 //-------------------------------------------------------------------------
 
 csGenmeshSkelAnimationControlFactory::csGenmeshSkelAnimationControlFactory (
-  csGenmeshSkelAnimationControlType* type, iObjectRegistry* object_reg)
+  csGenmeshSkelAnimationControlType* type, iObjectRegistry* object_reg) :
+  scfImplementationType(this, type)
 {
-  SCF_CONSTRUCT_IBASE (type);
   csGenmeshSkelAnimationControlFactory::type = type;
   csGenmeshSkelAnimationControlFactory::object_reg = object_reg;
   InitTokenTable (xmltokens);
@@ -300,7 +298,6 @@ csGenmeshSkelAnimationControlFactory::csGenmeshSkelAnimationControlFactory (
 
 csGenmeshSkelAnimationControlFactory::~csGenmeshSkelAnimationControlFactory ()
 {
-  SCF_DESTRUCT_IBASE ();
 }
 
 csPtr<iGenMeshAnimationControl> csGenmeshSkelAnimationControlFactory::
@@ -317,7 +314,7 @@ CreateAnimationControl (iMeshObject *mesh)
 const char* csGenmeshSkelAnimationControlFactory::Load (iDocumentNode* node)
 {
   csRef<iPluginManager> plugin_mgr (
-    CS_QUERY_REGISTRY (object_reg, iPluginManager));
+    csQueryRegistry<iPluginManager> (object_reg));
 
   csRef<iLoaderPlugin> ldr_plg = CS_QUERY_PLUGIN_CLASS(plugin_mgr, 
     "crystalspace.graveyard.loader", iLoaderPlugin);
@@ -363,16 +360,17 @@ const char* csGenmeshSkelAnimationControlFactory::Load (iDocumentNode* node)
         if (!use_parent)
         {
           csRef<iBase> skf = ldr_plg->Parse(child, 0, 0, 0);
-          skeleton_factory = SCF_QUERY_INTERFACE (skf, iSkeletonFactory);
+          skeleton_factory = scfQueryInterface<iSkeletonFactory> (skf);
           gr = skeleton_factory->GetGraveyard();
         }
       }
       break;
     case XMLTOKEN_SKELFILE:
       {
-        csRef<iVFS> vfs = CS_QUERY_REGISTRY(object_reg, iVFS);
-        csRef<iDataBuffer> buf (vfs->ReadFile(child->GetContentsValue()));
-        if (buf || buf->GetSize())
+        csRef<iVFS> vfs = csQueryRegistry<iVFS> (object_reg);
+	const char* filename = child->GetContentsValue ();
+        csRef<iDataBuffer> buf (vfs->ReadFile(filename));
+        if (buf && buf->GetSize())
         {
           csRef<iDocument> doc;
 
@@ -381,7 +379,7 @@ const char* csGenmeshSkelAnimationControlFactory::Load (iDocumentNode* node)
           while (*b == ' ' || *b == '\n' || *b == '\t') b++;
           if (*b == '<')
           {
-            csRef<iDocumentSystem> xml (CS_QUERY_REGISTRY (object_reg, iDocumentSystem));
+            csRef<iDocumentSystem> xml (csQueryRegistry<iDocumentSystem> (object_reg));
             if (!xml) xml = csPtr<iDocumentSystem> (new csTinyDocumentSystem ());
             doc = xml->CreateDocument ();
             error = doc->Parse(buf);
@@ -389,7 +387,7 @@ const char* csGenmeshSkelAnimationControlFactory::Load (iDocumentNode* node)
           if (!error)
           {
             csRef<iBase> skf = ldr_plg->Parse(doc->GetRoot(), 0, 0, 0);
-            skeleton_factory = SCF_QUERY_INTERFACE (skf, iSkeletonFactory);
+            skeleton_factory = scfQueryInterface<iSkeletonFactory> (skf);
             gr = skeleton_factory->GetGraveyard();
           }
           else
@@ -397,6 +395,12 @@ const char* csGenmeshSkelAnimationControlFactory::Load (iDocumentNode* node)
             return error;
           }
         }
+	else
+	{
+          error_buf.Format (
+            "Can't load skeleton file '%s'!", filename);
+          return error_buf;
+	}
       }
       break;
     case XMLTOKEN_USE_BONES:
@@ -440,7 +444,7 @@ const char* csGenmeshSkelAnimationControlFactory::Load (iDocumentNode* node)
 
 const char* csGenmeshSkelAnimationControlFactory::Save (iDocumentNode* parent)
 {
-  csRef<iFactory> plugin = SCF_QUERY_INTERFACE (type, iFactory);
+  csRef<iFactory> plugin = scfQueryInterface<iFactory> (type);
   if (!plugin) return "Couldn't get Class ID";
   parent->SetAttribute ("plugin", plugin->QueryClassID ());
   return "Not implemented yet!";
@@ -449,17 +453,13 @@ const char* csGenmeshSkelAnimationControlFactory::Save (iDocumentNode* parent)
 //-------------------------------------------------------------------------
 
 csGenmeshSkelAnimationControlType::csGenmeshSkelAnimationControlType (
-  iBase* pParent)
+  iBase* pParent) :
+  scfImplementationType(this, pParent)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
-
 }
 
 csGenmeshSkelAnimationControlType::~csGenmeshSkelAnimationControlType ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csGenmeshSkelAnimationControlType::Initialize (iObjectRegistry* object_reg)

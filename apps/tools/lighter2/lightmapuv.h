@@ -19,38 +19,52 @@
 #ifndef __LIGHTMAPUV_H__
 #define __LIGHTMAPUV_H__
 
-#include "radprimitive.h"
+#include "primitive.h"
 #include "lightmap.h"
 
 namespace lighter
 {
 
-  struct RadObjectVertexData;
+  struct ObjectVertexData;
   
-  class LightmapUVLayouter 
+  class LightmapUVObjectLayouter;
+  class ObjectFactory;
+
+  class LightmapUVFactoryLayouter 
   {
   public:
-    virtual bool LayoutUVOnPrimitives (RadPrimitiveArray &prims, 
-      RadObjectVertexData& vertexData,
-      LightmapPtrDelArray& lightmaps) = 0;
+    virtual ~LightmapUVFactoryLayouter () {}
+    /**
+     * Lay out lightmaps for a factory.
+     * This should split vertices as necessary and assign primitives
+     * to lightmaps.
+     * \param inPrims Input primitives.
+     * \param inPrims Input vertex data.
+     * \param factory Factory object primitives are part of
+     * \param outPrims Output primitives. A number of primitive arrays. All
+     *   primitives of a sub-array would fit on a single lightmap.
+     */
+    virtual csPtr<LightmapUVObjectLayouter> LayoutFactory (
+      const PrimitiveArray& inPrims, ObjectVertexData& vertexData,
+      const ObjectFactory* factory, csArray<PrimitiveArray>& outPrims) = 0;
   };
 
-  class SimpleUVLayouter : public LightmapUVLayouter
+  class LightmapUVObjectLayouter : public csRefCount
   {
   public:
-    virtual bool LayoutUVOnPrimitives (RadPrimitiveArray &prims, 
-      RadObjectVertexData& vertexData,
-      LightmapPtrDelArray& lightmaps);
-
-  protected:
-    bool AllocLightmap (LightmapPtrDelArray& lightmaps, int u, int v,
-      csRect &lightmapArea,  int &lightmapID);
-
-    bool ProjectPrimitive (RadPrimitive &prim, BoolDArray &usedVerts,
-      float uscale, float vscale);
+    /**
+     * Lay out lightmaps for primitives of an object.
+     * \param prims Input primitives.
+     * \param groupNum Index of the primitive arrays as returned by 
+     *   LightmapUVLayouter::LayoutFactory.
+     * \param inPrims Input vertex data.
+     * \param lmID Output global lightmap ID onto which all primitives were
+     *   layouted.
+     */
+    virtual bool LayoutUVOnPrimitives (PrimitiveArray &prims, 
+      size_t groupNum, ObjectVertexData& vertexData, uint& lmID) = 0;
   };
 
-}
+} // namespace lighter
 
-#endif
-
+#endif // __LIGHTMAPUV_H__

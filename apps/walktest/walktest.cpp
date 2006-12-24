@@ -141,7 +141,7 @@ void WalkTest::Report (int severity, const char* msg, ...)
 {
   va_list arg;
   va_start (arg, msg);
-  csRef<iReporter> rep (CS_QUERY_REGISTRY (object_reg, iReporter));
+  csRef<iReporter> rep (csQueryRegistry<iReporter> (object_reg));
   if (rep)
   {
     rep->ReportV (severity, "crystalspace.system", msg, arg);
@@ -156,13 +156,13 @@ void WalkTest::Report (int severity, const char* msg, ...)
 
 void WalkTest::SetDefaults ()
 {
-  csRef<iConfigManager> Config (CS_QUERY_REGISTRY (object_reg, iConfigManager));
+  csRef<iConfigManager> Config (csQueryRegistry<iConfigManager> (object_reg));
   bool do_cd = Config->GetBool ("Walktest.Settings.Colldet", true);
   collider_actor.SetCD (do_cd);
   do_logo = Config->GetBool ("Walktest.Settings.DrawLogo", true);
 
-  csRef<iCommandLineParser> cmdline (CS_QUERY_REGISTRY (object_reg,
-  	iCommandLineParser));
+  csRef<iCommandLineParser> cmdline (
+  	csQueryRegistry<iCommandLineParser> (object_reg));
 
   const char *val;
   if (!(val = cmdline->GetName ()))
@@ -239,7 +239,7 @@ void WalkTest::SetDefaults ()
 
 void WalkTest::Help ()
 {
-  csRef<iConfigManager> cfg (CS_QUERY_REGISTRY (object_reg, iConfigManager));
+  csRef<iConfigManager> cfg (csQueryRegistry<iConfigManager> (object_reg));
   csPrintf ("Options for WalkTest:\n");
   csPrintf ("  -exec=<script>     execute given script at startup\n");
   csPrintf ("  -[no]colldet       collision detection system (default '%scolldet')\n", collider_actor.HasCD () ? "" : "no");
@@ -905,45 +905,6 @@ bool WalkTest::SetMapDir (const char* map_dir)
   return true;
 }
 
-#if 0
-
-#include "csutil/thread.h"
-#include "csutil/sysfunc.h"
-#include "iutil/document.h"
-
-class MyThread : public csRunnable
-{
-private:
-  int ref;
-
-public:
-  csRef<iDocument> doc;
-  csRef<iDataBuffer> buf;
-
-public:
-  MyThread () : ref (1) { }
-  virtual ~MyThread () { }
-  virtual void Run ()
-  {
-    csSleep (2000);
-    csPrintf ("================ START PARSING!\n"); fflush (stdout);
-    const char* error = doc->Parse (buf, true);
-    if (error != 0)
-    {
-      csPrintf ("Document system error for file '%s'!", error);
-    }
-    csPrintf ("================ END PARSING!\n"); fflush (stdout);
-  }
-  virtual void IncRef () { ref++; }
-  virtual void DecRef () { ref--; if (ref <= 0) delete this; }
-};
-
-static csRef<csThread> thread1;
-static csRef<csThread> thread2;
-static csRef<csThread> thread3;
-
-#endif
-
 bool WalkTest::Initialize (int argc, const char* const argv[],
 	const char *iConfigName)
 {
@@ -956,11 +917,13 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
 
   if (!csInitializer::SetupConfigManager (object_reg, iConfigName))
   {
-    Report (CS_REPORTER_SEVERITY_ERROR, "Failed to initialize config!");
+    Report (CS_REPORTER_SEVERITY_ERROR, "Failed to initialize config!\n"
+      " (A common cause is the CRYSTAL environment variable "
+      "not being set correctly.)");
     return false;
   }
 
-  csRef<iConfigManager> cfg (CS_QUERY_REGISTRY (object_reg, iConfigManager));
+  csRef<iConfigManager> cfg (csQueryRegistry<iConfigManager> (object_reg));
 #if defined(CS_PLATFORM_WIN32)
   const bool mdumpDefault =
 #if defined(CS_COMPILER_MSVC)
@@ -1011,31 +974,31 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
     exit (0);
   }
 
-  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
-  vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
+  plugin_mgr = csQueryRegistry<iPluginManager> (object_reg);
+  vc = csQueryRegistry<iVirtualClock> (object_reg);
 
-  myG3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+  myG3D = csQueryRegistry<iGraphics3D> (object_reg);
   if (!myG3D)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "No iGraphics3D plugin!");
     return false;
   }
 
-  myG2D = CS_QUERY_REGISTRY (object_reg, iGraphics2D);
+  myG2D = csQueryRegistry<iGraphics2D> (object_reg);
   if (!myG2D)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "No iGraphics2D plugin!");
     return false;
   }
 
-  myVFS = CS_QUERY_REGISTRY (object_reg, iVFS);
+  myVFS = csQueryRegistry<iVFS> (object_reg);
   if (!myVFS)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "No iVFS plugin!");
     return false;
   }
 
-  kbd = CS_QUERY_REGISTRY (object_reg, iKeyboardDriver);
+  kbd = csQueryRegistry<iKeyboardDriver> (object_reg);
   if (!kbd)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "No iKeyboardDriver!");
@@ -1046,8 +1009,8 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
   CanvasExposed = csevCanvasExposed (name_reg, myG2D);
   CanvasResize = csevCanvasResize (name_reg, myG2D);
 
-  myConsole = CS_QUERY_REGISTRY (object_reg, iConsoleOutput);
-  mySound = CS_QUERY_REGISTRY (object_reg, iSndSysRenderer);
+  myConsole = csQueryRegistry<iConsoleOutput> (object_reg);
+  mySound = csQueryRegistry<iSndSysRenderer> (object_reg);
 
   // Some commercials...
   Report (CS_REPORTER_SEVERITY_NOTIFY, "Crystal Space version %s (%s).", CS_VERSION, CS_RELEASE_DATE);
@@ -1098,6 +1061,11 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
   FrameHeight = Gfx2D->GetHeight ();
 
   // Find the font we'll use
+  if (!Gfx2D->GetFontServer ())
+  {
+    Report (CS_REPORTER_SEVERITY_ERROR, "No font server available");
+    return false;
+  }
   Font = Gfx2D->GetFontServer ()->LoadFont (cfg_font);
   if (!Font)
   {
@@ -1105,12 +1073,17 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
       cfg_font);
     Font = Gfx2D->GetFontServer ()->LoadFont (CSFONT_COURIER);
   }
+  if (!Font)
+  {
+    Report (CS_REPORTER_SEVERITY_ERROR, "Could not load any font");
+    return false;
+  }
 
   // Open the startup console
   start_console ();
 
   // Find the engine plugin and query the csEngine object from it...
-  Engine = CS_QUERY_REGISTRY (object_reg, iEngine);
+  Engine = csQueryRegistry<iEngine> (object_reg);
   if (!Engine)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "No iEngine plugin!");
@@ -1119,7 +1092,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
   Engine->SetSaveableFlag (doSave);
 
   // Find the level loader plugin
-  LevelLoader = CS_QUERY_REGISTRY (object_reg, iLoader);
+  LevelLoader = csQueryRegistry<iLoader> (object_reg);
   if (!LevelLoader)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "No level loader plugin!");
@@ -1182,43 +1155,40 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
       return false;
     }
 
-    if (do_infinite)
-    {
-      iSector* room;
-      // Create the initial (non-random) part of the maze.
-      infinite_maze = new InfiniteMaze ();
-      room = infinite_maze->create_six_room (Engine, 0, 0, 0)->sector;
-      infinite_maze->create_six_room (Engine, 0, 0, 1);
-      infinite_maze->create_six_room (Engine, 0, 0, 2);
-      infinite_maze->create_six_room (Engine, 1, 0, 2);
-      infinite_maze->create_six_room (Engine, 0, 1, 2);
-      infinite_maze->create_six_room (Engine, 1, 1, 2);
-      infinite_maze->create_six_room (Engine, 0, 0, 3);
-      infinite_maze->create_six_room (Engine, 0, 0, 4);
-      infinite_maze->create_six_room (Engine, -1, 0, 4);
-      infinite_maze->create_six_room (Engine, -2, 0, 4);
-      infinite_maze->create_six_room (Engine, 0, -1, 3);
-      infinite_maze->create_six_room (Engine, 0, -2, 3);
-      infinite_maze->create_six_room (Engine, 0, 1, 3);
-      infinite_maze->create_six_room (Engine, 0, 2, 3);
-      infinite_maze->connect_infinite (0, 0, 0, 0, 0, 1);
-      infinite_maze->connect_infinite (0, 0, 1, 0, 0, 2);
-      infinite_maze->connect_infinite (0, 0, 2, 0, 0, 3);
-      infinite_maze->connect_infinite (0, 0, 2, 1, 0, 2);
-      infinite_maze->connect_infinite (0, 0, 2, 0, 1, 2);
-      infinite_maze->connect_infinite (1, 1, 2, 0, 1, 2);
-      infinite_maze->connect_infinite (1, 1, 2, 1, 0, 2);
-      infinite_maze->connect_infinite (0, 0, 3, 0, 0, 4);
-      infinite_maze->connect_infinite (-1, 0, 4, 0, 0, 4);
-      infinite_maze->connect_infinite (-2, 0, 4, -1, 0, 4);
-      infinite_maze->connect_infinite (0, 0, 3, 0, -1, 3);
-      infinite_maze->connect_infinite (0, -1, 3, 0, -2, 3);
-      infinite_maze->connect_infinite (0, 0, 3, 0, 1, 3);
-      infinite_maze->connect_infinite (0, 1, 3, 0, 2, 3);
-      infinite_maze->create_loose_portal (-2, 0, 4, -2, 1, 4);
-      view->GetCamera ()->SetSector(room);
-      printf ("Done creation of infinite maze!\n"); fflush (stdout);
-    }
+    iSector* room;
+    // Create the initial (non-random) part of the maze.
+    infinite_maze = new InfiniteMaze ();
+    room = infinite_maze->create_six_room (Engine, 0, 0, 0)->sector;
+    infinite_maze->create_six_room (Engine, 0, 0, 1);
+    infinite_maze->create_six_room (Engine, 0, 0, 2);
+    infinite_maze->create_six_room (Engine, 1, 0, 2);
+    infinite_maze->create_six_room (Engine, 0, 1, 2);
+    infinite_maze->create_six_room (Engine, 1, 1, 2);
+    infinite_maze->create_six_room (Engine, 0, 0, 3);
+    infinite_maze->create_six_room (Engine, 0, 0, 4);
+    infinite_maze->create_six_room (Engine, -1, 0, 4);
+    infinite_maze->create_six_room (Engine, -2, 0, 4);
+    infinite_maze->create_six_room (Engine, 0, -1, 3);
+    infinite_maze->create_six_room (Engine, 0, -2, 3);
+    infinite_maze->create_six_room (Engine, 0, 1, 3);
+    infinite_maze->create_six_room (Engine, 0, 2, 3);
+    infinite_maze->connect_infinite (0, 0, 0, 0, 0, 1);
+    infinite_maze->connect_infinite (0, 0, 1, 0, 0, 2);
+    infinite_maze->connect_infinite (0, 0, 2, 0, 0, 3);
+    infinite_maze->connect_infinite (0, 0, 2, 1, 0, 2);
+    infinite_maze->connect_infinite (0, 0, 2, 0, 1, 2);
+    infinite_maze->connect_infinite (1, 1, 2, 0, 1, 2);
+    infinite_maze->connect_infinite (1, 1, 2, 1, 0, 2);
+    infinite_maze->connect_infinite (0, 0, 3, 0, 0, 4);
+    infinite_maze->connect_infinite (-1, 0, 4, 0, 0, 4);
+    infinite_maze->connect_infinite (-2, 0, 4, -1, 0, 4);
+    infinite_maze->connect_infinite (0, 0, 3, 0, -1, 3);
+    infinite_maze->connect_infinite (0, -1, 3, 0, -2, 3);
+    infinite_maze->connect_infinite (0, 0, 3, 0, 1, 3);
+    infinite_maze->connect_infinite (0, 1, 3, 0, 2, 3);
+    infinite_maze->create_loose_portal (-2, 0, 4, -2, 1, 4);
+    view->GetCamera ()->SetSector(room);
+    printf ("Done creation of infinite maze!\n"); fflush (stdout);
 
     // Prepare the engine. This will calculate all lighting and
     // prepare the lightmaps for the 3D rasterizer.
@@ -1246,8 +1216,8 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
       	first_map->map_dir);
 
     // Check if we have to load every separate map in a separate region.
-    csRef<iCommandLineParser> cmdline = CS_QUERY_REGISTRY (object_reg,
-    	iCommandLineParser);
+    csRef<iCommandLineParser> cmdline = 
+    	csQueryRegistry<iCommandLineParser> (object_reg);
     bool do_regions = false;
     if (cmdline->GetOption ("regions"))
       do_regions = true;
@@ -1343,7 +1313,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
 	  cp->Load(views[1]->GetCamera (), Engine))
 	camok = true;
     }
-    if (!camok) 
+    if (!camok)
     {
       iSector* room = Engine->GetSectors ()->FindByName ("room");
       if (room)
@@ -1382,7 +1352,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
   {
     myConsole->SetVisible (false);
     myConsole->AutoUpdate (false);
-    ConsoleInput = CS_QUERY_REGISTRY (object_reg, iConsoleInput);
+    ConsoleInput = csQueryRegistry<iConsoleInput> (object_reg);
     if (ConsoleInput)
     {
       ConsoleInput->Bind (myConsole);
@@ -1432,7 +1402,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
 #if 0
 {
   csRef<iDocumentSystem> xml (
-      CS_QUERY_REGISTRY (object_reg, iDocumentSystem));
+      csQueryRegistry<iDocumentSystem> (object_reg));
 
   MyThread* t1 = new MyThread ();
   MyThread* t2 = new MyThread ();
@@ -1477,9 +1447,10 @@ int main (int argc, char* argv[])
   // (3D, 2D, network, sound, ..., engine) and initialize them.
   if (!Sys->Initialize (argc, argv, "/config/walktest.cfg"))
   {
-    Sys->Report (CS_REPORTER_SEVERITY_ERROR, "Error initializing system!");
+    Sys->Report (CS_REPORTER_SEVERITY_ERROR,
+      "Error initializing system!");
     Cleanup();
-    exit (-1);
+    return -1;
   }
 
   // Start the 'autoexec.cfg' script and fully execute it.
@@ -1499,6 +1470,6 @@ int main (int argc, char* argv[])
 
   Cleanup ();
 
-  return 1;
+  return 0;
 }
 

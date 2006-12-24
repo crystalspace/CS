@@ -26,6 +26,7 @@
 #include "imap/services.h"
 #include "ivideo/txtmgr.h"
 #include "ivideo/texture.h"
+#include "csutil/scf.h"
 
 #include "prdots.h"
 #include "stdproctex.h"
@@ -37,7 +38,8 @@ SCF_IMPLEMENT_FACTORY(csPtDotsSaver)
 
 #define CLASSID_DOTSTYPE "crystalspace.texture.type.dots"
 
-csPtDotsType::csPtDotsType (iBase* p) : csBaseProctexType(p)
+csPtDotsType::csPtDotsType (iBase* p) :
+  scfImplementationType(this, p)
 {
 }
 
@@ -50,8 +52,9 @@ csPtr<iTextureFactory> csPtDotsType::NewFactory()
 //---------------------------------------------------------------------------
 // 'Dots' PT factory
 
-csPtDotsFactory::csPtDotsFactory (iTextureType* p, iObjectRegistry* object_reg) : 
-    csBaseTextureFactory (p, object_reg)
+csPtDotsFactory::csPtDotsFactory (iTextureType* p,
+  iObjectRegistry* object_reg) : 
+  scfImplementationType(this, p, object_reg)
 {
 }
 
@@ -72,7 +75,8 @@ csPtr<iTextureWrapper> csPtDotsFactory::Generate ()
 //---------------------------------------------------------------------------
 // 'Dots' loader.
 
-csPtDotsLoader::csPtDotsLoader(iBase *p) : csBaseProctexLoader(p)
+csPtDotsLoader::csPtDotsLoader(iBase *p) :
+  scfImplementationType(this, p)
 {
 //  init_token_table (tokens);
 }
@@ -90,7 +94,7 @@ csPtr<iBase> csPtDotsLoader::Parse (iDocumentNode* /*node*/,
   	object_reg, CLASSID_DOTSTYPE);
   if (!type) return 0;
   csRef<iSyntaxService> synldr = 
-    CS_QUERY_REGISTRY (object_reg, iSyntaxService);
+    csQueryRegistry<iSyntaxService> (object_reg);
 
   csRef<iTextureFactory> dotsFact = type->NewFactory();
 
@@ -98,7 +102,7 @@ csPtr<iBase> csPtDotsLoader::Parse (iDocumentNode* /*node*/,
   if (context)
   {
     ctx = csPtr<iTextureLoaderContext>
-      (SCF_QUERY_INTERFACE (context, iTextureLoaderContext));
+      (scfQueryInterface<iTextureLoaderContext> (context));
 
     if (ctx)
     {
@@ -112,7 +116,7 @@ csPtr<iBase> csPtDotsLoader::Parse (iDocumentNode* /*node*/,
   }
   csRef<iTextureWrapper> tex = dotsFact->Generate();
 
-  csRef<iGraphics3D> G3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+  csRef<iGraphics3D> G3D = csQueryRegistry<iGraphics3D> (object_reg);
   if (!G3D) return 0;
   csRef<iTextureManager> tm = G3D->GetTextureManager();
   if (!tm) return 0;
@@ -124,7 +128,8 @@ csPtr<iBase> csPtDotsLoader::Parse (iDocumentNode* /*node*/,
 //---------------------------------------------------------------------------
 // 'Dots' saver.
 
-csPtDotsSaver::csPtDotsSaver (iBase* p) : csBaseProctexSaver(p)
+csPtDotsSaver::csPtDotsSaver (iBase* p) :
+  scfImplementationType(this, p)
 {
 }
 

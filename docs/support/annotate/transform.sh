@@ -15,15 +15,17 @@ for d in $DIRS; do
       -e "s:</body>:<?php require(\"annotate.php\"); ?></body>:i" \
       -e "s!(<li><a href=\"pages.php\"><span>Related&nbsp;Pages</span></a></li>)!\
 \$1\
-<li><form class=\"search\" action=\"/cgi-bin/htsearch\" method=\"get\">\
+<li><form class=\"search\" action=\"/cgi-bin/search.cgi\" method=\"get\">\
 <table cellspacing=\"0\" border=\"0\">\
 <tr><td><label>Search:</label></td>\
-<td><input class=\"search\" type=\"text\" name=\"words\" value=\"\" size=\"20\"/></td></tr>\
+<td><input class=\"search\" type=\"text\" name=\"q\" value=\"\" size=\"20\"/>
+<input type=\"hidden\" name=\"ul\" value=\"/docs/\" /></td></tr>\
 </table></form></li>!" \
       -e "s!( \? </a>]</td>)!\$1
 <td align=\"left\" valign=\"middle\">[ Search: \
-<form style=\"display:inline;\" class=\"search\" action=\"/cgi-bin/htsearch\" method=\"get\">\
-<input class=\"search\" type=\"text\" name=\"words\" value=\"\" size=\"20\"/>\
+<form style=\"display:inline;\" class=\"search\" action=\"/cgi-bin/search.cgi\" method=\"get\">\
+<input class=\"search\" type=\"text\" name=\"q\" value=\"\" size=\"20\"/>\
+<input type=\"hidden\" name=\"ul\" value=\"/docs/\" />\
 </form> ]</td>!i" \
       $d
     cp docs/support/annotate/*.php $d

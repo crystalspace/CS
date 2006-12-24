@@ -62,7 +62,7 @@ class csMeshList : public scfImplementation1<csMeshList, iMeshList>
 {
 private:
   csRefArrayObject<iMeshWrapper> list;
-  csHash<iMeshWrapper*,csStrKey> meshes_hash;
+  csHash<iMeshWrapper*, csString> meshes_hash;
 
   class NameChangeListener : public scfImplementation1<NameChangeListener,
   	iObjectNameChangeListener>
@@ -121,7 +121,7 @@ class csMeshFactoryList : public scfImplementation1<csMeshFactoryList,
 {
 private:
   csRefArrayObject<iMeshFactoryWrapper> list;
-  csHash<iMeshFactoryWrapper*,csStrKey>
+  csHash<iMeshFactoryWrapper*, csString>
   	factories_hash;
 
   class NameChangeListener : public scfImplementation1<NameChangeListener,
@@ -681,14 +681,20 @@ public:
   void ReplaceVariable (csShaderVariable *variable)
   { svcontext.ReplaceVariable (variable); }
   void Clear () { svcontext.Clear(); }
+  
+  bool RemoveVariable (csShaderVariable* variable)
+  { 
+    // @@@ Also remove from factory?
+    return svcontext.RemoveVariable (variable); 
+  }
   /** @} */
 
   //--------------------- iSelfDestruct implementation -------------------//
 
   virtual void SelfDestruct ();
 
-  //--------------------- iSceneNode implementation ----------------------//
-
+  /**\name iSceneNode implementation
+   * @{ */
   virtual void SetParent (iSceneNode* parent);
   virtual iSceneNode* GetParent () const
   {
@@ -704,6 +710,13 @@ public:
   virtual iMeshWrapper* QueryMesh () { return this; }
   virtual iLight* QueryLight () { return 0; }
   virtual iCamera* QueryCamera () { return 0; }
+  virtual csPtr<iSceneNodeArray> GetChildrenArray () const
+  {
+    return csPtr<iSceneNodeArray> (
+      new scfArrayWrapConst<iSceneNodeArray, csRefArray<iSceneNode> > (
+      movable.GetChildren ()));
+  }
+  /** @} */
 
   //--------------------- iMeshWrapper implementation --------------------//
 
@@ -754,11 +767,13 @@ public:
 /**
  * The holder class for all implementations of iMeshObjectFactory.
  */
-class csMeshFactoryWrapper : public scfImplementationExt3<csMeshFactoryWrapper,
-                                                          csObject, 
-                                                          iMeshFactoryWrapper,
-                                                          iShaderVariableContext,
-							  iSelfDestruct>
+class csMeshFactoryWrapper : 
+  public scfImplementationExt3<csMeshFactoryWrapper,
+                               csObject, 
+                               iMeshFactoryWrapper,
+                               scfFakeInterface<iShaderVariableContext>,
+			       iSelfDestruct>,
+  public CS::ShaderVariableContextImpl
 {
 private:
   /// Mesh object factory corresponding with this csMeshFactoryWrapper.
@@ -783,8 +798,6 @@ private:
   long render_priority;
   /// Suggestion for new children created from factory.
   csZBufMode zbufMode;
-
-  csShaderVariableContext svcontext;
 
   csFlags flags;
 
@@ -876,35 +889,6 @@ public:
   //--------------------- iSelfDestruct implementation -------------------//
 
   virtual void SelfDestruct ();
-
-  /**\name iShaderVariableContext implementation
-   * @{ */
-  /// Add a variable to this context
-  void AddVariable (csShaderVariable *variable)
-  { svcontext.AddVariable (variable); }
-
-  /// Get a named variable from this context
-  csShaderVariable* GetVariable (csStringID name) const
-  { return svcontext.GetVariable (name); }
-
-  /// Get Array of all ShaderVariables
-  const csRefArray<csShaderVariable>& GetShaderVariables () const
-  { return svcontext.GetShaderVariables (); }
-
-  /**
-   * Push the variables of this context onto the variable stacks
-   * supplied in the "stacks" argument
-   */
-  void PushVariables (iShaderVarStack* stacks) const
-  { svcontext.PushVariables (stacks); }
-
-  bool IsEmpty () const 
-  { return svcontext.IsEmpty(); }
-
-  void ReplaceVariable (csShaderVariable *variable)
-  { svcontext.ReplaceVariable (variable); }
-  void Clear () { svcontext.Clear(); }
-  /** @} */
 };
 
 #endif // __CS_MESHOBJ_H__

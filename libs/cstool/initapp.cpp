@@ -204,8 +204,8 @@ iVerbosityManager* csInitializer::CreateVerbosityManager (
   iObjectRegistry* r)
 {
   csVerbosityManager* v = new csVerbosityManager;
-  csRef<iCommandLineParser> cmdline (CS_QUERY_REGISTRY (
-    r, iCommandLineParser));
+  csRef<iCommandLineParser> cmdline (
+    csQueryRegistry<iCommandLineParser> (r));
   if (cmdline.IsValid())
   {
     for (size_t i = 0; ; i++)
@@ -235,7 +235,7 @@ iConfigManager* csInitializer::CreateConfigManager (iObjectRegistry* r)
 static void SetupPluginLoadErrVerbosity(iObjectRegistry* r)
 {
   csRef<iVerbosityManager> verbosemgr (
-    CS_QUERY_REGISTRY(r, iVerbosityManager));
+    csQueryRegistry<iVerbosityManager> (r));
   bool verbose = CS_LOAD_LIB_VERBOSE;
   if (verbosemgr.IsValid())
     verbose = verbosemgr->Enabled("loadlib");
@@ -244,17 +244,17 @@ static void SetupPluginLoadErrVerbosity(iObjectRegistry* r)
 
 iVFS* csInitializer::SetupVFS(iObjectRegistry* r, const char* pluginID)
 {
-  csRef<iVFS> VFS (CS_QUERY_REGISTRY (r, iVFS));
+  csRef<iVFS> VFS (csQueryRegistry<iVFS> (r));
   if (!VFS)
   {
-    csRef<iPluginManager> plugin_mgr (CS_QUERY_REGISTRY (r, iPluginManager));
+    csRef<iPluginManager> plugin_mgr (csQueryRegistry<iPluginManager> (r));
     csRef<iBase> b = csPtr<iBase> (plugin_mgr->QueryPlugin (
       "iVFS", scfInterfaceTraits<iVFS>::GetVersion()));
     VFS = scfQueryInterfaceSafe<iVFS> (b);
   }
   if (!VFS)
   {
-    csRef<iPluginManager> plugin_mgr (CS_QUERY_REGISTRY (r, iPluginManager));
+    csRef<iPluginManager> plugin_mgr (csQueryRegistry<iPluginManager> (r));
     VFS = CS_LOAD_PLUGIN (plugin_mgr, pluginID, iVFS);
     if (!VFS)
     {
@@ -305,7 +305,7 @@ bool csInitializer::SetupConfigManager (
 
   csRef<iVFS> VFS = SetupVFS(r);
 
-  csRef<iConfigManager> Config (CS_QUERY_REGISTRY (r, iConfigManager));
+  csRef<iConfigManager> Config (csQueryRegistry<iConfigManager> (r));
   csRef<iConfigFile> cfg = Config->GetDynamicDomain ();
   Config->SetDomainPriority (cfg, iConfigManager::ConfigPriorityApplication);
 
@@ -328,6 +328,19 @@ bool csInitializer::SetupConfigManager (
       cfg = csGetPlatformConfig (appid);
       Config->AddDomain (cfg, iConfigManager::ConfigPriorityUserApp);
       Config->SetDynamicDomain (cfg);
+    }
+  }
+
+  // Handle command line config settings
+  {
+    csRef<iCommandLineParser> cmdline = 
+      csQueryRegistry<iCommandLineParser> (r);
+    if (cmdline.IsValid())
+    {
+      csRef<csConfigFile> cmdlineConfig;
+      cmdlineConfig.AttachNew (new csConfigFile);
+      cmdlineConfig->ParseCommandLine (cmdline, VFS);
+      Config->AddDomain (cmdlineConfig, iConfigManager::ConfigPriorityCmdLine);
     }
   }
 
@@ -395,7 +408,7 @@ bool csInitializer::SetupEventHandler (
   const csEventID events[])
 {
   CS_ASSERT(installed_event_handler == 0);
-  csRef<iEventQueue> q (CS_QUERY_REGISTRY (r, iEventQueue));
+  csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (r));
   if (q) {
     return (q->RegisterListener (evhdlr, events) != CS_HANDLER_INVALID);
   }
@@ -440,7 +453,7 @@ bool csInitializer::OpenApplication (iObjectRegistry* r)
   SetupConfigManager (r, 0);
 
   // Pass the open event to all interested listeners.
-  csRef<iEventQueue> EventQueue (CS_QUERY_REGISTRY (r, iEventQueue));
+  csRef<iEventQueue> EventQueue (csQueryRegistry<iEventQueue> (r));
   CS_ASSERT (EventQueue != 0);
   csEventID ename = csevSystemOpen(r);
   csRef<iEvent> e = EventQueue->CreateBroadcastEvent(ename);
@@ -452,7 +465,7 @@ bool csInitializer::OpenApplication (iObjectRegistry* r)
 void csInitializer::CloseApplication (iObjectRegistry* r)
 {
   // Notify all interested listeners that the system is going down
-  csRef<iEventQueue> EventQueue (CS_QUERY_REGISTRY (r, iEventQueue));
+  csRef<iEventQueue> EventQueue (csQueryRegistry<iEventQueue> (r));
   if (EventQueue)
   {
     csRef<iEvent> e = EventQueue->CreateBroadcastEvent(csevSystemClose(r));
@@ -469,7 +482,7 @@ void csInitializer::DestroyApplication (iObjectRegistry* r)
   // all other event handlers which are registered through plug-ins or
   // other sources.
   {
-    csRef<iEventQueue> q (CS_QUERY_REGISTRY (r, iEventQueue));
+    csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (r));
     if (q)
       q->RemoveAllListeners ();
   }
@@ -478,7 +491,7 @@ void csInitializer::DestroyApplication (iObjectRegistry* r)
   // some plugins hold references to the plugin manager so the plugin
   // manager will never get destructed if there are still plugins in memory.
   {
-    csRef<iPluginManager> plugin_mgr (CS_QUERY_REGISTRY (r, iPluginManager));
+    csRef<iPluginManager> plugin_mgr (csQueryRegistry<iPluginManager> (r));
     if (plugin_mgr)
       plugin_mgr->Clear ();
     // Force cleanup here.

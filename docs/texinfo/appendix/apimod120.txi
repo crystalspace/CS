@@ -1,0 +1,39 @@
+@c -*-texinfo-*-
+@node Release Notes 120, Release Notes 100, Release Notes, Release Notes
+@appendixsec Release Notes from 1.00 to 1.20
+@cindex Release Notes
+
+@noindent
+@emph{Written Marten Svanfeldt, @email{developer@@svanfeldt.com},
+with contributions from others.}
+
+This section documents the major changes between versions 1.0 and 1.2 of of
+Crystal Space.
+
+@menu
+* Api120 Threading:: Threading changes
+* Api120 Rendering:: Rendering subsystem changes
+@end menu
+
+@node Api120 Threading, Api120 Rendering, Release Notes 120, Release Notes 120
+@subsection Threading changes
+
+For the 1.2 release the threading subsystem in Crystal Space have been entirely
+rewritten from scratch. The main rationale for this change is to clear up
+some outstanding issues in the code as well as making it a bit more efficient.
+
+@subsubheading Atomic operations
+A header (@file{include/csutil/atomicops.h}) containing definitions of operations
+with guranteed atomicity such as CAS (Compare-And-Set) and increment.
+
+Full documentation in @pxref{Threading}.
+
+@node Api120 Rendering, , Api120 Threading, Release Notes 120
+@subsection Rendering subsystem changes
+
+@subsubheading Shader variable type @samp{COLOR} deprecated
+
+The shader variable type @samp{COLOR} was deprecated as it does not provide
+a significant benefit over @samp{VECTOR4}. Hence, use the latter if you intent
+to store colors. Internally, @samp{COLOR}s are the same as @samp{VECTOR4}s, so
+handling of the @samp{COLOR} type can generally be removed from code.

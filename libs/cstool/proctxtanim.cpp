@@ -35,7 +35,7 @@ csProcAnimated::csProcAnimated (iImage* img) : csProcTexture (0, img)
 {
   image = img;
   animation = csPtr<iAnimatedImage>
-    (SCF_QUERY_INTERFACE (image, iAnimatedImage));
+    (scfQueryInterface<iAnimatedImage> (image));
 
   mat_w = image->GetWidth ();
   mat_h = image->GetHeight ();

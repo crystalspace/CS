@@ -44,13 +44,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(csOpcode)
 
 using namespace Opcode;
 
-SCF_IMPLEMENT_IBASE (csOPCODECollider)
-  SCF_IMPLEMENTS_INTERFACE (iCollider)
-SCF_IMPLEMENT_IBASE_END
-
-csOPCODECollider::csOPCODECollider (iPolygonMesh* mesh)
+csOPCODECollider::csOPCODECollider (iPolygonMesh* mesh) :
+  scfImplementationType(this)
 {
-  SCF_CONSTRUCT_IBASE (0);
   m_pCollisionModel = 0;
   indexholder = 0;
   vertholder = 0;
@@ -134,7 +130,6 @@ csOPCODECollider::~csOPCODECollider ()
 
   delete[] indexholder;
   delete[] vertholder;
-  SCF_DESTRUCT_IBASE ();
 }
 
 void csOPCODECollider::MeshCallback (udword triangle_index, 

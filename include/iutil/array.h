@@ -248,6 +248,7 @@ struct iArrayChangeAll : public virtual iArrayChangeElements<T>
    *   faster to keep the array sorted, search for \c item using
    *   FindSortedKey(), and then remove it using the plain DeleteIndex().
    */
+  CS_DEPRECATED_METHOD_MSG("'Fast' is illusional; see documentation")
   virtual bool DeleteFast (T const& item) = 0;
 };
 

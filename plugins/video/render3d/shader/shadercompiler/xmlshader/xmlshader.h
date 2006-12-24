@@ -29,6 +29,7 @@
 #include "condition.h"
 
 struct iSyntaxService;
+struct iLoaderContext;
 struct iVFS;
 
 CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
@@ -56,8 +57,9 @@ public:
   { return "XMLShader"; }
 
   /// Compile a template into a shader. Will return 0 if it fails
-  virtual csPtr<iShader> CompileShader (iDocumentNode *templ,
-		  int forcepriority = -1);
+  virtual csPtr<iShader> CompileShader (
+	iLoaderContext* ldr_context, iDocumentNode *templ,
+	int forcepriority = -1);
 
   /// Validate if a template is a valid shader to this compiler
   virtual bool ValidateTemplate (iDocumentNode *templ);
@@ -71,13 +73,15 @@ public:
 
   void Report (int severity, const char* msg, ...);
 
-  bool LoadSVBlock (iDocumentNode *node, iShaderVariableContext *context);
+  bool LoadSVBlock (iLoaderContext* ldr_context,
+      iDocumentNode *node, iShaderVariableContext *context);
 public:
   bool do_verbose;
   bool doDumpXML;
   bool doDumpConds;
   /// XML Token and management
   csStringHash xmltokens;
+  bool debugInstrProcessing;
 
   //Standard vars
   iObjectRegistry* objectreg;

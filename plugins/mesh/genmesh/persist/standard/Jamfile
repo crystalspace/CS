@@ -6,6 +6,8 @@ Plugin gmeshldr
 	: [ Wildcard *.cpp *.h ]
 ;
 LinkWith gmeshldr : crystalspace ;
+Includes gmeshldr.h : $(SUBDIR)/gmeshldr.tok ;
+MsvcExtraFile gmeshldr : $(SUBDIR)/gmeshldr.tok ;
 
 CompileGroups gmeshldr :  meshes ;
 

@@ -108,16 +108,22 @@ private:
 
   //maximum number of layers
   int maxlayers;
-  csHash<int, csStrKey> layerNames;
+  csHash<int, csString> layerNames;
 
   void Report (int severity, const char* msg, ...);
+  void Report (int severity, iDocumentNode* node, const char* msg, ...);
 
+  int GetCrossbarSource (const char* str);
   bool LoadLayer(mtexlayer* layer, iDocumentNode* node);
   bool LoadEnvironment(mtexlayer* layer, iDocumentNode* node);
   bool ParseFog (iDocumentNode* node, FogInfo& fog);
 
   void DumpTexFunc (const mtexlayer::TexFunc& tf);
   void CompactLayers();
+  /**
+   * Try if texture function tf1 and its following function, tf2, can be merged
+   * into one.
+   */
   bool TryMergeTexFuncs (mtexlayer::TexFunc& newTF, 
     const mtexlayer::TexFunc& tf1, const mtexlayer::TexFunc& tf2);
 

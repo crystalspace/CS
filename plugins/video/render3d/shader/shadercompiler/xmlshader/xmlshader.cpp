@@ -21,6 +21,7 @@
 
 // For builtin shader consts:
 #include "iengine/light.h"
+#include "iengine/sector.h"
 #include "imap/services.h"
 #include "iutil/plugin.h"
 #include "iutil/vfs.h"
@@ -46,7 +47,7 @@ CS_LEAKGUARD_IMPLEMENT (csXMLShaderCompiler);
 SCF_IMPLEMENT_FACTORY (csXMLShaderCompiler)
 
 csXMLShaderCompiler::csXMLShaderCompiler(iBase* parent) : 
-  scfImplementationType (this, parent)
+  scfImplementationType (this, parent), debugInstrProcessing (false)
 {
   wrapperFact = 0;
   InitTokenTable (xmltokens);
@@ -78,14 +79,14 @@ bool csXMLShaderCompiler::Initialize (iObjectRegistry* object_reg)
 
   wrapperFact = new csWrappedDocumentNodeFactory (this);
 
-  csRef<iPluginManager> plugin_mgr = CS_QUERY_REGISTRY (
-      object_reg, iPluginManager);
+  csRef<iPluginManager> plugin_mgr = 
+      csQueryRegistry<iPluginManager> (object_reg);
 
-  strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
-    object_reg, "crystalspace.shared.stringset", iStringSet);
+  strings = csQueryRegistryTagInterface<iStringSet> (
+    object_reg, "crystalspace.shared.stringset");
 
-  g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
-  vfs = CS_QUERY_REGISTRY (object_reg, iVFS);
+  g3d = csQueryRegistry<iGraphics3D> (object_reg);
+  vfs = csQueryRegistry<iVFS> (object_reg);
   
   synldr = csQueryRegistryOrLoad<iSyntaxService> (object_reg,
     "crystalspace.syntax.loader.service.text");
@@ -93,7 +94,7 @@ bool csXMLShaderCompiler::Initialize (iObjectRegistry* object_reg)
     return false;
 
   csRef<iVerbosityManager> verbosemgr (
-    CS_QUERY_REGISTRY (object_reg, iVerbosityManager));
+    csQueryRegistry<iVerbosityManager> (object_reg));
   if (verbosemgr) 
     do_verbose = verbosemgr->Enabled ("renderer.shader");
   else
@@ -102,12 +103,15 @@ bool csXMLShaderCompiler::Initialize (iObjectRegistry* object_reg)
   csConfigAccess config (object_reg);
   doDumpXML = config->GetBool ("Video.XMLShader.DumpVariantXML");
   doDumpConds = config->GetBool ("Video.XMLShader.DumpConditions");
+  debugInstrProcessing = 
+    config->GetBool ("Video.XMLShader.DebugInstructionProcessing");
 
   return true;
 }
 
-csPtr<iShader> csXMLShaderCompiler::CompileShader (iDocumentNode *templ,
-		int forcepriority)
+csPtr<iShader> csXMLShaderCompiler::CompileShader (
+    	iLoaderContext* ldr_context, iDocumentNode *templ,
+	int forcepriority)
 {
   if (!templ) return 0;
 
@@ -118,7 +122,7 @@ csPtr<iShader> csXMLShaderCompiler::CompileShader (iDocumentNode *templ,
   // Create a shader. The actual loading happens later.
   csRef<csXMLShader> shader;
   if (do_verbose) startTime = csGetTicks();
-  shader.AttachNew (new csXMLShader (this, templ, forcepriority));
+  shader.AttachNew (new csXMLShader (this, ldr_context, templ, forcepriority));
   if (do_verbose) endTime = csGetTicks();
   shader->SetName (templ->GetAttributeValue ("name"));
   shader->SetDescription (templ->GetAttributeValue ("description"));
@@ -134,8 +138,8 @@ csPtr<iShader> csXMLShaderCompiler::CompileShader (iDocumentNode *templ,
   csRef<iDocumentNodeIterator> tagIt = templ->GetNodes ("key");
   while (tagIt->HasNext ())
   {
-    iKeyValuePair *keyvalue = 0;
-    synldr->ParseKey (tagIt->Next (), keyvalue);
+    // @@@ FIXME: also keeps "editoronly" keys
+    csRef<iKeyValuePair> keyvalue = synldr->ParseKey (tagIt->Next ());
     if (keyvalue)
       shader->QueryObject ()->ObjAdd (keyvalue->QueryObject ());
   }
@@ -164,7 +168,7 @@ csPtr<iShaderPriorityList> csXMLShaderCompiler::GetPriorities (
 	iDocumentNode* templ)
 {
   csRef<iShaderManager> shadermgr = 
-    CS_QUERY_REGISTRY (objectreg, iShaderManager);
+    csQueryRegistry<iShaderManager> (objectreg);
   CS_ASSERT (shadermgr); // Should be present - loads us, after all
 
   csShaderPriorityList* list = new csShaderPriorityList ();

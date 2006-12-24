@@ -86,8 +86,6 @@ struct iMaterialWrapper : public virtual iBase
   virtual bool IsVisitRequired () const = 0;
 };
 
-SCF_VERSION (iMaterialEngine, 0, 0, 2);
-
 /**
  * This interface represents the engine part of the material definition.
  * Using this interface you will be able to access the original texture
@@ -99,8 +97,10 @@ SCF_VERSION (iMaterialEngine, 0, 0, 2);
  * Main ways to get pointers to this interface:
  *   - scfQueryInterface<iMaterialEngine>() from iMaterial
  */
-struct iMaterialEngine : public iBase
+struct iMaterialEngine : public virtual iBase
 {
+  SCF_INTERFACE (iMaterialEngine, 2, 0, 0);
+
   /**
    * Get the base texture from the material.
    */

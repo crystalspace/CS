@@ -53,65 +53,26 @@ enum
   XMLTOKEN_RENDERBUFFER
 };
 
-SCF_IMPLEMENT_IBASE (csNullFactoryLoader)
-  SCF_IMPLEMENTS_INTERFACE (iLoaderPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csNullFactoryLoader::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csNullFactorySaver)
-  SCF_IMPLEMENTS_INTERFACE (iSaverPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csNullFactorySaver::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csNullMeshLoader)
-  SCF_IMPLEMENTS_INTERFACE (iLoaderPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csNullMeshLoader::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csNullMeshSaver)
-  SCF_IMPLEMENTS_INTERFACE (iSaverPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csNullMeshSaver::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 SCF_IMPLEMENT_FACTORY (csNullFactoryLoader)
 SCF_IMPLEMENT_FACTORY (csNullFactorySaver)
 SCF_IMPLEMENT_FACTORY (csNullMeshLoader)
 SCF_IMPLEMENT_FACTORY (csNullMeshSaver)
 
 
-csNullFactoryLoader::csNullFactoryLoader (iBase* pParent)
+csNullFactoryLoader::csNullFactoryLoader (iBase* pParent) :
+  scfImplementationType (this, pParent)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 csNullFactoryLoader::~csNullFactoryLoader ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csNullFactoryLoader::Initialize (iObjectRegistry* object_reg)
 {
   csNullFactoryLoader::object_reg = object_reg;
-  reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
-  synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
+  reporter = csQueryRegistry<iReporter> (object_reg);
+  synldr = csQueryRegistry<iSyntaxService> (object_reg);
 
   xmltokens.Register ("box", XMLTOKEN_BOX);
   xmltokens.Register ("radius", XMLTOKEN_RADIUS);
@@ -270,7 +231,7 @@ csPtr<iBase> csNullFactoryLoader::Parse (iDocumentNode* node,
   csRef<iNullFactoryState> state;
 
   fact = type->NewFactory ();
-  state = SCF_QUERY_INTERFACE (fact, iNullFactoryState);
+  state = scfQueryInterface<iNullFactoryState> (fact);
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
@@ -305,23 +266,20 @@ csPtr<iBase> csNullFactoryLoader::Parse (iDocumentNode* node,
 }
 //---------------------------------------------------------------------------
 
-csNullFactorySaver::csNullFactorySaver (iBase* pParent)
+csNullFactorySaver::csNullFactorySaver (iBase* pParent) :
+  scfImplementationType (this, pParent)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 csNullFactorySaver::~csNullFactorySaver ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csNullFactorySaver::Initialize (iObjectRegistry* object_reg)
 {
   csNullFactorySaver::object_reg = object_reg;
-  reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
-  synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
+  reporter = csQueryRegistry<iReporter> (object_reg);
+  synldr = csQueryRegistry<iSyntaxService> (object_reg);
   return true;
 }
 
@@ -334,8 +292,8 @@ bool csNullFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent,
   csRef<iDocumentNode> paramsNode = parent->CreateNodeBefore(CS_NODE_ELEMENT, 0);
   paramsNode->SetValue("params");
 
-  csRef<iNullFactoryState> nullfact = SCF_QUERY_INTERFACE (obj, iNullFactoryState);
-  csRef<iMeshObjectFactory> meshfact = SCF_QUERY_INTERFACE (obj, iMeshObjectFactory);
+  csRef<iNullFactoryState> nullfact = scfQueryInterface<iNullFactoryState> (obj);
+  csRef<iMeshObjectFactory> meshfact = scfQueryInterface<iMeshObjectFactory> (obj);
 
   if ( nullfact && meshfact )
   {
@@ -359,23 +317,20 @@ bool csNullFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent,
 
 //---------------------------------------------------------------------------
 
-csNullMeshLoader::csNullMeshLoader (iBase* pParent)
+csNullMeshLoader::csNullMeshLoader (iBase* pParent) :
+  scfImplementationType (this, pParent)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 csNullMeshLoader::~csNullMeshLoader ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csNullMeshLoader::Initialize (iObjectRegistry* object_reg)
 {
   csNullMeshLoader::object_reg = object_reg;
-  reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
-  synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
+  reporter = csQueryRegistry<iReporter> (object_reg);
+  synldr = csQueryRegistry<iSyntaxService> (object_reg);
 
   xmltokens.Register ("box", XMLTOKEN_BOX);
   xmltokens.Register ("radius", XMLTOKEN_RADIUS);
@@ -431,7 +386,7 @@ csPtr<iBase> csNullMeshLoader::Parse (iDocumentNode* node,
 	    return 0;
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
-          state = SCF_QUERY_INTERFACE (mesh, iNullMeshState);
+          state = scfQueryInterface<iNullMeshState> (mesh);
 	  if (!state)
 	  {
       	    synldr->ReportError (
@@ -453,23 +408,20 @@ csPtr<iBase> csNullMeshLoader::Parse (iDocumentNode* node,
 
 //---------------------------------------------------------------------------
 
-csNullMeshSaver::csNullMeshSaver (iBase* pParent)
+csNullMeshSaver::csNullMeshSaver (iBase* pParent) :
+  scfImplementationType (this, pParent)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 csNullMeshSaver::~csNullMeshSaver ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csNullMeshSaver::Initialize (iObjectRegistry* object_reg)
 {
   csNullMeshSaver::object_reg = object_reg;
-  reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
-  synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
+  reporter = csQueryRegistry<iReporter> (object_reg);
+  synldr = csQueryRegistry<iSyntaxService> (object_reg);
   return true;
 }
 
@@ -482,8 +434,8 @@ bool csNullMeshSaver::WriteDown (iBase* obj, iDocumentNode* parent,
   csRef<iDocumentNode> paramsNode = parent->CreateNodeBefore(CS_NODE_ELEMENT, 0);
   paramsNode->SetValue("params");
 
-  csRef<iNullMeshState> nullstate = SCF_QUERY_INTERFACE (obj, iNullMeshState);
-  csRef<iMeshObject> mesh = SCF_QUERY_INTERFACE (obj, iMeshObject);
+  csRef<iNullMeshState> nullstate = scfQueryInterface<iNullMeshState> (obj);
+  csRef<iMeshObject> mesh = scfQueryInterface<iMeshObject> (obj);
 
   if ( nullstate && mesh )
   {
@@ -502,7 +454,7 @@ bool csNullMeshSaver::WriteDown (iBase* obj, iDocumentNode* parent,
     }    
 
     iMeshObjectFactory* meshfact = fact->GetMeshObjectFactory();
-    csRef<iNullFactoryState> nullfact = SCF_QUERY_INTERFACE(meshfact, iNullFactoryState);
+    csRef<iNullFactoryState> nullfact = scfQueryInterface<iNullFactoryState> (meshfact);
 
     //Writedown Box tag
     csBox3 box, boxfact;

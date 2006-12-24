@@ -22,7 +22,7 @@
 #include "csqint.h"
 
 #include "csgeom/sphere.h"
-#include "csgfx/memimage.h"
+#include "csgfx/imagememory.h"
 #include "csutil/cscolor.h"
 #include "iengine/camera.h"
 #include "iengine/light.h"
@@ -48,7 +48,8 @@ SCF_IMPLEMENT_FACTORY(csLightIterRSLoader)
 
 //---------------------------------------------------------------------------
 
-csLightIterRSType::csLightIterRSType (iBase* p) : csBaseRenderStepType (p)
+csLightIterRSType::csLightIterRSType (iBase* p) :
+  scfImplementationType (this, p)
 {
 }
 
@@ -60,7 +61,8 @@ csPtr<iRenderStepFactory> csLightIterRSType::NewFactory()
 
 //---------------------------------------------------------------------------
 
-csLightIterRSLoader::csLightIterRSLoader (iBase* p) : csBaseRenderStepLoader (p)
+csLightIterRSLoader::csLightIterRSLoader (iBase* p) :
+  scfImplementationType (this, p)
 {
   InitTokenTable (tokens);
 }
@@ -85,7 +87,7 @@ csPtr<iBase> csLightIterRSLoader::Parse (iDocumentNode* node,
   csRef<iLightIterRenderStep> step;
   step.AttachNew (new csLightIterRenderStep (object_reg));
   csRef<iRenderStepContainer> steps =
-    SCF_QUERY_INTERFACE (step, iRenderStepContainer);
+    scfQueryInterface<iRenderStepContainer> (step);
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
@@ -112,20 +114,15 @@ csPtr<iBase> csLightIterRSLoader::Parse (iDocumentNode* node,
 
 //---------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE(csLightIterRenderStepFactory);
-  SCF_IMPLEMENTS_INTERFACE(iRenderStepFactory);
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 csLightIterRenderStepFactory::csLightIterRenderStepFactory (
-  iObjectRegistry* object_reg)
+  iObjectRegistry* object_reg) :
+  scfImplementationType (this)
 {
-  SCF_CONSTRUCT_IBASE(0);
   csLightIterRenderStepFactory::object_reg = object_reg;
 }
 
 csLightIterRenderStepFactory::~csLightIterRenderStepFactory ()
 {
-  SCF_DESTRUCT_IBASE();
 }
 
 csPtr<iRenderStep> csLightIterRenderStepFactory::Create ()
@@ -136,16 +133,10 @@ csPtr<iRenderStep> csLightIterRenderStepFactory::Create ()
 
 //---------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE(csLightIterRenderStep);
-  SCF_IMPLEMENTS_INTERFACE(iRenderStep);
-  SCF_IMPLEMENTS_INTERFACE(iRenderStepContainer);
-  SCF_IMPLEMENTS_INTERFACE(iLightIterRenderStep);
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 csLightIterRenderStep::csLightIterRenderStep (
-  iObjectRegistry* object_reg)
+  iObjectRegistry* object_reg) :
+  scfImplementationType (this)
 {
-  SCF_CONSTRUCT_IBASE(0);
   csLightIterRenderStep::object_reg = object_reg;
   initialized = false;
 }
@@ -161,8 +152,6 @@ csLightIterRenderStep::~csLightIterRenderStep ()
     LightSVAccessor* cb = it.Next (light);
     light->RemoveLightCallback (cb);
   }
-
-  SCF_DESTRUCT_IBASE();
 }
 
 void csLightIterRenderStep::Init ()
@@ -171,10 +160,10 @@ void csLightIterRenderStep::Init ()
   {
     initialized = true;
 
-    g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+    g3d = csQueryRegistry<iGraphics3D> (object_reg);
 
-    csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
-      object_reg, "crystalspace.shared.stringset", iStringSet);
+    csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet> (
+      object_reg, "crystalspace.shared.stringset");
 
     csStringID posname = strings->Request ("light 0 position");
     csStringID poswname = strings->Request ("light 0 position world");
@@ -186,10 +175,11 @@ void csLightIterRenderStep::Init ()
     csStringID atxname = strings->Request ("light 0 attenuationtex");
     csStringID infallname = strings->Request ("light 0 inner falloff");
     csStringID ofallname = strings->Request ("light 0 outer falloff");
-	trw_inv_name = strings->Request ("light 0 transform inverse world");
+    trw_inv_name = strings->Request ("light 0 transform inverse world");
+    CS::ShaderVarName lightcountname (strings, "light count");
 
-    shadermgr = CS_QUERY_REGISTRY (
-    	object_reg, iShaderManager);
+    shadermgr = csQueryRegistry<iShaderManager> (object_reg);
+    lightmgr = csQueryRegistry<iLightManager> (object_reg);
 
     shvar_light_0_position = shadermgr->GetVariable (posname);
     if (!shvar_light_0_position)
@@ -270,6 +260,15 @@ void csLightIterRenderStep::Init ()
       shvar_light_0_outer_falloff->SetType (csShaderVariable::FLOAT);
       shadermgr->AddVariable (shvar_light_0_outer_falloff);
     }
+
+    csRef<csShaderVariable> svLightCount (
+      shadermgr->GetVariable (lightcountname));
+    if (!svLightCount)
+    {
+      svLightCount = new csShaderVariable (lightcountname);
+      shadermgr->AddVariable (svLightCount);
+    }
+    svLightCount->SetValue (1);
   }
 }
 
@@ -293,14 +292,18 @@ void csLightIterRenderStep::Perform (iRenderView* rview, iSector* sector,
 
   // @@@ This code is ignoring dynamic lights. Perhaps we need a better
   // way to represent those.
-  iLightList* lights = sector->GetLights();
-  int nlights = lights->GetCount();
+  //iLightList* lights = sector->GetLights();
+  //int nlights = lights->GetCount();
+  const csArray<iLightSectorInfluence*>& lights = lightmgr->GetRelevantLights (sector,
+      -1, false);
+  int nlights = lights.GetSize ();
 
   csArray<iLight*> lightList (16);
 
   while (nlights-- > 0)
   {
-    iLight* light = lights->Get (nlights);
+    //iLight* light = lights->Get (nlights);
+    iLight* light = lights.Get (nlights)->GetLight ();
     const csVector3 lightPos = light->GetMovable ()->GetFullPosition ();
 
     /* 
@@ -361,7 +364,7 @@ void csLightIterRenderStep::Perform (iRenderView* rview, iSector* sector,
 size_t csLightIterRenderStep::AddStep (iRenderStep* step)
 {
   csRef<iLightRenderStep> lrs = 
-    SCF_QUERY_INTERFACE (step, iLightRenderStep);
+    scfQueryInterface<iLightRenderStep> (step);
   if (!lrs) return csArrayItemNotFound;
   return steps.Push (lrs);
 }
@@ -369,7 +372,7 @@ size_t csLightIterRenderStep::AddStep (iRenderStep* step)
 bool csLightIterRenderStep::DeleteStep (iRenderStep* step)
 {
   csRef<iLightRenderStep> lrs = 
-    SCF_QUERY_INTERFACE (step, iLightRenderStep);
+    scfQueryInterface<iLightRenderStep> (step);
   if (!lrs) return false;
   return steps.Delete(lrs);
 }
@@ -382,7 +385,7 @@ iRenderStep* csLightIterRenderStep::GetStep (size_t n) const
 size_t csLightIterRenderStep::Find (iRenderStep* step) const
 {
   csRef<iLightRenderStep> lrs = 
-    SCF_QUERY_INTERFACE (step, iLightRenderStep);
+    scfQueryInterface<iLightRenderStep> (step);
   if (!lrs) return csArrayItemNotFound;
   return steps.Find(lrs);
 }
@@ -439,16 +442,10 @@ csPtr<iTextureHandle> csLightIterRenderStep::GetAttenuationTexture (
 
 //---------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE(csLightIterRenderStep::LightSVAccessor)
-  SCF_IMPLEMENTS_INTERFACE(iLightCallback)
-  SCF_IMPLEMENTS_INTERFACE(iShaderVariableAccessor)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 csLightIterRenderStep::LightSVAccessor::LightSVAccessor (iLight* light,
-  csLightIterRenderStep* parent)
+  csLightIterRenderStep* parent) :
+  scfImplementationType (this)
 {
-  SCF_CONSTRUCT_IBASE(0);
-
   LightSVAccessor::light = light;
   LightSVAccessor::parent = parent;
 
@@ -458,7 +455,6 @@ csLightIterRenderStep::LightSVAccessor::LightSVAccessor (iLight* light,
 
 csLightIterRenderStep::LightSVAccessor::~LightSVAccessor ()
 {
-  SCF_DESTRUCT_IBASE();
 }
 
 void csLightIterRenderStep::LightSVAccessor::OnColorChange (iLight* /*light*/,

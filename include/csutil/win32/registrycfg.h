@@ -60,7 +60,7 @@ private:
   {
     csStringHash strings;
   } rcStatus;
-  rcStatus* status;
+  mutable rcStatus status;
 
   csArray<csWin32RegistryIterator*> iters;
 
@@ -147,52 +147,6 @@ public:
   virtual void DeleteKey (const char *Key);
   virtual const char *GetEOFComment () const;
   virtual void SetEOFComment (const char *Text);
-};
-
-/**
- * Iterates over a registry key subkeys and values.
- * \remarks This class provides functionality specific to the Win32 
- *  platform. To ensure that code using this functionality compiles properly 
- *  on all other platforms, the use of the interface and inclusion of the 
- *  header file should be surrounded by appropriate 
- *  '\#if defined(CS_PLATFORM_WIN32) ... \#endif' statements.
- */
-class CS_CRYSTALSPACE_EXPORT csWin32RegistryIterator : 
-  public scfImplementation1<csWin32RegistryIterator, iConfigIterator>
-{
-  csRef<csWin32RegistryConfig> owner;
-
-  typedef struct 
-  {
-    csStringHash strings;
-  } riStatus;
-  riStatus* status;
-
-  DWORD EnumIndex;
-
-  char* SubsectionName;
-
-  // shortcut to RegEnumValue/RegQueryValueEx
-  bool GetCurrentData (DWORD& type, 
-    csWin32RegistryConfig::Block_O_Mem& data) const;
-public:
-
-  csWin32RegistryIterator (csWin32RegistryConfig* Owner, 
-    const char* Subsection);
-  virtual ~csWin32RegistryIterator();
-
-  virtual iConfigFile *GetConfigFile () const;
-  virtual const char *GetSubsection () const;
-
-  virtual void Rewind ();
-  virtual bool Next();
-
-  virtual const char *GetKey (bool Local = false) const;
-  virtual int GetInt () const;
-  virtual float GetFloat () const;
-  virtual const char *GetStr () const;
-  virtual bool GetBool () const;
-  virtual const char *GetComment () const;
 };
 
 #endif

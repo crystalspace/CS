@@ -24,6 +24,7 @@
 #include "csgeom/box.h"
 #include "csgeom/math.h"
 #include "csgeom/matrix3.h"
+#include "csgeom/obb.h"
 #include "csgeom/plane3.h"
 #include "csgeom/transfrm.h"
 #include "csgeom/vector2.h"
@@ -88,6 +89,9 @@ bool csTextSyntaxService::Initialize (iObjectRegistry* object_reg)
   reporter = csQueryRegistry<iReporter> (object_reg);
 
   InitTokenTable (xmltokens);
+
+  strings = csQueryRegistryTagInterface<iStringSet> (
+    object_reg, "crystalspace.shared.stringset");
 
   return true;
 }
@@ -390,6 +394,44 @@ bool csTextSyntaxService::WriteBox (iDocumentNode* node, const csBox3& v)
   return true;
 }
 
+bool csTextSyntaxService::ParseBox (iDocumentNode* node, csOBB &b)
+{
+  csRef<iDocumentNode> boxNode = node->GetNode ("box");
+  
+  if (!boxNode)
+  {
+    ReportError ("crystalspace.syntax.box", node, "Expected 'box' node!");
+    return false;
+  }
+
+  if (!ParseBox (boxNode, (csBox3&)b))
+    return false;
+
+  csRef<iDocumentNode> matrixNode = node->GetNode ("matrix");
+  
+  if (matrixNode && !ParseMatrix (matrixNode, b.GetMatrix ()))
+    return false;
+
+  return true;
+}
+
+bool csTextSyntaxService::WriteBox (iDocumentNode* node, const csOBB& b)
+{
+  csRef<iDocumentNode> boxNode = node->CreateNodeBefore (CS_NODE_ELEMENT, 0);
+  boxNode->SetValue ("box");
+  
+  if (!WriteBox (boxNode, (const csBox3&)b))
+    return false;
+
+  csRef<iDocumentNode> matrixNode = node->CreateNodeBefore (CS_NODE_ELEMENT, 0);
+  matrixNode->SetValue ("matrix");
+
+  if (!WriteMatrix (matrixNode, b.GetMatrix ()))
+    return false;
+
+  return true;
+}
+
 bool csTextSyntaxService::ParseVector (iDocumentNode* node, csVector3 &v)
 {
   v.x = node->GetAttributeValueAsFloat ("x");
@@ -561,8 +603,8 @@ bool csTextSyntaxService::ParseMixmode (iDocumentNode* node, uint &mixmode,
 	if (allowFxMesh)
 	{
 	  MIXMODE_EXCLUSIVE mixmode = CS_MIXMODE_TYPE_MESH; 
-	  break;
 	}
+	break;
       case XMLTOKEN_ALPHATEST:
         {
           mixmodeSpecified = true;
@@ -631,34 +673,43 @@ static const char* BlendFactorToString (uint factor)
 bool csTextSyntaxService::WriteMixmode (iDocumentNode* node, uint mixmode,
 					bool /*allowFxMesh*/)
 {
+  uint defaultModeAlphaTest = CS_MIXMODE_ALPHATEST_AUTO;
   if ((mixmode & CS_MIXMODE_TYPE_MASK) == CS_MIXMODE_TYPE_AUTO)
     node->CreateNodeBefore(CS_NODE_ELEMENT)->SetValue ("copy");
   else if ((mixmode & CS_MIXMODE_TYPE_MASK) == CS_MIXMODE_TYPE_MESH)
     node->CreateNodeBefore(CS_NODE_ELEMENT)->SetValue ("mesh");
   else
   {
-    // mixmode type is "blendop"
+    // Handle default mixmodes
     switch (mixmode & CS_FX_MASK_MIXMODE)
     {
       case CS_FX_TRANSPARENT:
         node->CreateNodeBefore(CS_NODE_ELEMENT)->SetValue ("transparent");
+        defaultModeAlphaTest = mixmode & CS_MIXMODE_ALPHATEST_MASK;
+        break;
       case CS_FX_MULTIPLY: 
         node->CreateNodeBefore(CS_NODE_ELEMENT)->SetValue ("multiply");
+        defaultModeAlphaTest = mixmode & CS_MIXMODE_ALPHATEST_MASK;
         break;
       case CS_FX_MULTIPLY2: 
         node->CreateNodeBefore(CS_NODE_ELEMENT)->SetValue ("multipy2");
+        defaultModeAlphaTest = mixmode & CS_MIXMODE_ALPHATEST_MASK;
         break;
       case CS_FX_ADD: 
         node->CreateNodeBefore(CS_NODE_ELEMENT)->SetValue ("add");
+        defaultModeAlphaTest = mixmode & CS_MIXMODE_ALPHATEST_MASK;
         break;
       case CS_FX_DESTALPHAADD:
         node->CreateNodeBefore(CS_NODE_ELEMENT)->SetValue ("destalphaadd");
+        defaultModeAlphaTest = mixmode & CS_MIXMODE_ALPHATEST_MASK;
         break;
       case CS_FX_SRCALPHAADD:
         node->CreateNodeBefore(CS_NODE_ELEMENT)->SetValue ("destalphaadd");
+        defaultModeAlphaTest = mixmode & CS_MIXMODE_ALPHATEST_MASK;
         break;
       case CS_FX_PREMULTALPHA:
         node->CreateNodeBefore(CS_NODE_ELEMENT)->SetValue ("premultalpha");
+        defaultModeAlphaTest = mixmode & CS_MIXMODE_ALPHATEST_MASK;
         break;
       case CS_FX_ALPHA:
         {
@@ -667,6 +718,7 @@ bool csTextSyntaxService::WriteMixmode (iDocumentNode* node, uint mixmode,
           alpha->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat (
             (float) ((mixmode & CS_FX_MASK_ALPHA) / 255.0f));
         }
+        defaultModeAlphaTest = mixmode & CS_MIXMODE_ALPHATEST_MASK;
         break;
       default:
         {
@@ -677,21 +729,30 @@ bool csTextSyntaxService::WriteMixmode (iDocumentNode* node, uint mixmode,
           blendOp->SetAttribute ("dst", 
             BlendFactorToString (CS_MIXMODE_BLENDOP_DST (mixmode)));
         }
-    }        
+    }
   }
 
   // Write out alphatest flag
-  if ((mixmode & CS_MIXMODE_ALPHATEST_MASK) == CS_MIXMODE_ALPHATEST_ENABLE)
+  if ((mixmode & CS_MIXMODE_ALPHATEST_MASK) != defaultModeAlphaTest)
   {
-    csRef<iDocumentNode> alphatest = node->CreateNodeBefore(CS_NODE_ELEMENT);
-    alphatest->SetValue ("alphatest");
-    alphatest->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValue ("enable");
-  }
-  else if ((mixmode & CS_MIXMODE_ALPHATEST_MASK) == CS_MIXMODE_ALPHATEST_DISABLE)
-  {
-    csRef<iDocumentNode> alphatest = node->CreateNodeBefore(CS_NODE_ELEMENT);
-    alphatest->SetValue ("alphatest");
-    alphatest->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValue ("disable");
+    if ((mixmode & CS_MIXMODE_ALPHATEST_MASK) == CS_MIXMODE_ALPHATEST_ENABLE)
+    {
+      csRef<iDocumentNode> alphatest = node->CreateNodeBefore(CS_NODE_ELEMENT);
+      alphatest->SetValue ("alphatest");
+      alphatest->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValue ("enable");
+    }
+    else if ((mixmode & CS_MIXMODE_ALPHATEST_MASK) == CS_MIXMODE_ALPHATEST_DISABLE)
+    {
+      csRef<iDocumentNode> alphatest = node->CreateNodeBefore(CS_NODE_ELEMENT);
+      alphatest->SetValue ("alphatest");
+      alphatest->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValue ("disable");
+    }
+    else if ((mixmode & CS_MIXMODE_ALPHATEST_MASK) == CS_MIXMODE_ALPHATEST_AUTO)
+    {
+      csRef<iDocumentNode> alphatest = node->CreateNodeBefore(CS_NODE_ELEMENT);
+      alphatest->SetValue ("alphatest");
+      alphatest->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValue ("auto");
+    }
   }
 
   // Write out alpha value, but only if not written above
@@ -939,8 +1000,9 @@ bool csTextSyntaxService::WriteGradientShade (iDocumentNode* node,
 }
 
 bool csTextSyntaxService::ParseGradient (iDocumentNode* node,
-					 csGradient& gradient)
+					 iGradient* gradient)
 {
+  gradient->Clear();
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
   {
@@ -959,7 +1021,7 @@ bool csTextSyntaxService::ParseGradient (iDocumentNode* node,
 	  }
 	  else
 	  {
-	    gradient.AddShade (shade);
+	    gradient->AddShade (shade);
 	  }
 	}
 	break;
@@ -972,13 +1034,12 @@ bool csTextSyntaxService::ParseGradient (iDocumentNode* node,
 }
 
 bool csTextSyntaxService::WriteGradient (iDocumentNode* node,
-					 const csGradient& gradient)
+					 iGradient* gradient)
 {
-  const csArray<csGradientShade>& shades = gradient.GetShades ();
-  csArray<csGradientShade>::ConstIterator it = shades.GetIterator ();
-  while (it.HasNext ())
+  csRef<iGradientShades> shades = gradient->GetShades ();
+  for (size_t i = 0; i < shades->GetSize(); i++)
   {
-    const csGradientShade& shade = it.Next ();
+    const csGradientShade& shade = shades->Get (i);
     csRef<iDocumentNode> child = node->CreateNodeBefore (CS_NODE_ELEMENT, 0);
     child->SetValue ("shade");
     WriteGradientShade (child, shade);
@@ -987,9 +1048,14 @@ bool csTextSyntaxService::WriteGradient (iDocumentNode* node,
   return true;
 }
 
-bool csTextSyntaxService::ParseShaderVar (iDocumentNode* node,
-					  csShaderVariable& var)
+bool csTextSyntaxService::ParseShaderVar (iLoaderContext* ldr_context,
+    	iDocumentNode* node, csShaderVariable& var)
 {
+  const char *name = node->GetAttributeValue("name");
+  if (name != 0)
+  {
+    var.SetName (strings->Request (name));
+  }
   const char *type = node->GetAttributeValue("type");
   if (!type)
   {
@@ -1038,29 +1104,44 @@ bool csTextSyntaxService::ParseShaderVar (iDocumentNode* node,
 	csRef<iTextureWrapper> tex;
         // @@@ This should be done in a better way...
 	//  @@@ E.g. lazy retrieval of the texture with an accessor?
-        csRef<iEngine> eng = CS_QUERY_REGISTRY (object_reg, iEngine);
-        if (eng)
-        {
-          const char* texname = node->GetContentsValue ();
-          tex = eng->FindTexture (texname);
-          if (!tex)
-	  {
-            Report (
+        const char* texname = node->GetContentsValue ();
+        tex = ldr_context->FindTexture (texname);
+        if (!tex)
+	{
+          Report (
               "crystalspace.syntax.shadervariable",
               CS_REPORTER_SEVERITY_WARNING,
               node,
               "Texture '%s' not found.", texname);
-          }
-        }
-        else
-        {
-          Report (
-            "crystalspace.syntax.shadervariable",
-            CS_REPORTER_SEVERITY_WARNING,
-            node,
-            "Engine not found.");
         }
         var.SetValue (tex);
+      }
+      break;
+    case XMLTOKEN_LIBEXPR:
+      {
+	const char* exprname = node->GetAttributeValue ("exprname");
+	if (!exprname)
+	{
+	  Report ("crystalspace.syntax.shadervariable.expression",
+		CS_REPORTER_SEVERITY_ERROR,
+		node, "'exprname' attribute missing for shader expression!");
+	  return false;
+	}
+	csRef<iShaderManager> shmgr = csQueryRegistry<iShaderManager> (
+		object_reg);
+	if (shmgr)
+	{
+          iShaderVariableAccessor* acc = shmgr->GetShaderVariableAccessor (
+	    exprname);
+	  if (!acc)
+	  {
+	    Report ("crystalspace.syntax.shadervariable.expression",
+		  CS_REPORTER_SEVERITY_ERROR,
+		  node, "Can't find expression with name %s!", exprname);
+	    return false;
+	  }
+	  var.SetAccessor (acc);
+	}
       }
       break;
     case XMLTOKEN_EXPR:
@@ -1069,7 +1150,6 @@ bool csTextSyntaxService::ParseShaderVar (iDocumentNode* node,
 	csRef<iShaderVariableAccessor> acc = ParseShaderVarExpr (node);
 	if (!acc.IsValid())
 	  return false;
-	var.SetType (csShaderVariable::VECTOR4);
 	var.SetAccessor (acc);
       }
       break;
@@ -1095,7 +1175,7 @@ bool csTextSyntaxService::ParseShaderVar (iDocumentNode* node,
           csRef<csShaderVariable> elementVar = 
             csPtr<csShaderVariable> (new csShaderVariable (csInvalidStringID));
           var.SetArrayElement (varCount, elementVar);
-          ParseShaderVar (varNode, *elementVar);
+          ParseShaderVar (ldr_context, varNode, *elementVar);
           varCount++;
         }
       }
@@ -1152,9 +1232,8 @@ csRef<iShaderVariableAccessor> csTextSyntaxService::ParseShaderVarExpr (
 bool csTextSyntaxService::WriteShaderVar (iDocumentNode* node,
 					  csShaderVariable& var)
 {
-  csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
-    object_reg, "crystalspace.shared.stringset", iStringSet);
-  node->SetAttribute ("name", strings->Request (var.GetName ()));
+  const char* name = strings->Request (var.GetName ());
+  if (name != 0) node->SetAttribute ("name", name);
   switch (var.GetType ())
   {
     case csShaderVariable::INT:
@@ -1409,31 +1488,46 @@ bool csTextSyntaxService::WriteZMode (iDocumentNode* node,
   return true;
 }
 
-bool csTextSyntaxService::ParseKey (iDocumentNode *node, iKeyValuePair* &keyvalue)
+csPtr<iKeyValuePair> csTextSyntaxService::ParseKey (iDocumentNode* node)
 {
   const char* name = node->GetAttributeValue ("name");
   if (!name)
   {
     ReportError ("crystalspace.syntax.key",
     	        node, "Missing 'name' attribute for 'key'!");
-    return false;
+    return 0;
   }
-  csKeyValuePair* cskvp = new csKeyValuePair (name);
+  csRef<csKeyValuePair> cskvp;
+  cskvp.AttachNew (new csKeyValuePair (name));
+
+  bool editoronly = node->GetAttributeValueAsBool ("editoronly");
+  cskvp->SetEditorOnly (editoronly);
+
   csRef<iDocumentAttributeIterator> atit = node->GetAttributes ();
   while (atit->HasNext ())
   {
     csRef<iDocumentAttribute> at = atit->Next ();
-    cskvp->SetValue (at->GetName (), at->GetValue ());
+    const char* attrName = at->GetName ();
+    if (strcmp (attrName, "editoronly") == 0) continue;
+    cskvp->SetValue (attrName, at->GetValue ());
   }
-  csRef<iKeyValuePair> kvp = SCF_QUERY_INTERFACE (cskvp, iKeyValuePair);
-  
+  return scfQueryInterface<iKeyValuePair> (cskvp);
+}
+
+bool csTextSyntaxService::ParseKey (iDocumentNode *node, iKeyValuePair* &keyvalue)
+{
+  csRef<iKeyValuePair> kvp = ParseKey (node);
+  if (!kvp.IsValid()) return false;
   keyvalue = kvp;
+  keyvalue->IncRef();
   return true;
 }
 
 bool csTextSyntaxService::WriteKey (iDocumentNode *node, iKeyValuePair *keyvalue)
 {
   node->SetAttribute ("name", keyvalue->GetKey ());
+  if (keyvalue->GetEditorOnly ())
+    node->SetAttribute ("editoronly", "yes");
   csRef<iStringArray> vnames = keyvalue->GetValueNames ();
   for (size_t i=0; i<vnames->Length (); i++)
   {
@@ -1803,11 +1897,16 @@ bool csTextSyntaxService::WriteRenderBuffer (iDocumentNode* node, iRenderBuffer*
     return false;
   }
 
+  if (buffer->IsIndexBuffer())
+    node->SetAttribute ("indices", "yes");
+
   return true;
 }
 
-csRef<iShader> csTextSyntaxService::ParseShaderRef (iDocumentNode* node)
+csRef<iShader> csTextSyntaxService::ParseShaderRef (
+    iLoaderContext* ldr_context, iDocumentNode* node)
 {
+  // @@@ FIXME: unify with csLoader::ParseShader()?
   static const char* msgid = "crystalspace.syntax.shaderred";
 
   const char* shaderName = node->GetAttributeValue ("name");
@@ -1817,14 +1916,14 @@ csRef<iShader> csTextSyntaxService::ParseShaderRef (iDocumentNode* node)
     return 0;
   }
 
-  csRef<iShaderManager> shmgr = CS_QUERY_REGISTRY(object_reg, iShaderManager);
+  csRef<iShaderManager> shmgr = csQueryRegistry<iShaderManager> (object_reg);
   csRef<iShader> shader = shmgr->GetShader (shaderName);
   if (shader.IsValid()) return shader;
 
   const char* shaderFileName = node->GetAttributeValue ("file");
   if (shaderFileName != 0)
   {
-    csRef<iVFS> vfs = CS_QUERY_REGISTRY(object_reg, iVFS);
+    csRef<iVFS> vfs = csQueryRegistry<iVFS> (object_reg);
     csVfsDirectoryChanger dirChanger (vfs);
     csString filename (shaderFileName);
     csRef<iFile> shaderFile = vfs->Open (filename, VFS_FILE_READ);
@@ -1837,7 +1936,7 @@ csRef<iShader> csTextSyntaxService::ParseShaderRef (iDocumentNode* node)
     }
 
     csRef<iDocumentSystem> docsys =
-      CS_QUERY_REGISTRY(object_reg, iDocumentSystem);
+      csQueryRegistry<iDocumentSystem> (object_reg);
     if (docsys == 0)
       docsys.AttachNew (new csTinyDocumentSystem ());
     csRef<iDocument> shaderDoc = docsys->CreateDocument ();
@@ -1863,7 +1962,13 @@ csRef<iShader> csTextSyntaxService::ParseShaderRef (iDocumentNode* node)
       return 0;
     }
     csRef<iShaderCompiler> shcom = shmgr->GetCompiler (type);
-    shader = shcom->CompileShader (shaderNode);
+    if (!shcom.IsValid()) 
+    {
+      ReportError (msgid, shaderNode,
+        "Could not get shader compiler '%s'", type);
+      return false;
+    }
+    shader = shcom->CompileShader (ldr_context, shaderNode);
     if (shader && (strcmp (shader->QueryObject()->GetName(), shaderName) == 0))
     {
       shader->SetFileName (shaderFileName);
