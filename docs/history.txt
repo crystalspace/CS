@@ -6,10 +6,12 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+25-Dec-2006
+	- Genjix fixed Andrew Dai's history.txt entry.
 23-Dec-2006
-  - Andrew Dai made the constant used in testing for leg collisions with
-    the actor larger to prevent infinite loops from math inaccuracies
-    when testing against artifact triangles in the world.
+	- Andrew Dai made the constant used in testing for leg collisions with
+	  the actor larger to prevent infinite loops from math inaccuracies
+	  when testing against artifact triangles in the world.
 21-Dec-2006
 	- Genjix made a common plugin name for both implementations of joystick
 	  driver. Old method of loading them should slowly be deprecated.
