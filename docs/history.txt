@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+26-Dec-2006
+	- Luca corrected some typos in the section 4.5.2.2 (Threading library)
+	  of the manual.
 25-Dec-2006
 	- Genjix fixed Andrew Dai's history.txt entry.
 23-Dec-2006
