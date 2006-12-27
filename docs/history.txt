@@ -11,6 +11,9 @@ chronological order.
 	  appendix entry on the event system changes, somewhat reworded).
 	- res made some doxygen settings tweaks.
 	- res renamed "gfxtest" to "imagetool".
+	- res made some tweaks to the lighter2 TUI to better work on Linux.
+	- res fixed the lighter2 tui and Win32 ANSI support for the fact that
+	  cursor positions are 1-based, not 0-based.
 26-Dec-2006
 	- Luca corrected some typos in the section 4.5.2.2 (Threading library)
 	  of the manual.

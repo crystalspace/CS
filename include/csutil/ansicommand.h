@@ -83,7 +83,10 @@
 
 /**\name Cursor movement commands
  * @{ */
-/// Move to specific position
+/**
+ * Move to specific position.
+ * \remarks Coordinates are 1-based.
+ */
 #define CS_ANSI_CURSOR(x,y)             "\033[" #y ";" #x "H"
 /// Move up specified number of lines
 #define CS_ANSI_CURSOR_UP(l)            "\033[" #l "A"
