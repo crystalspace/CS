@@ -1,0 +1,5 @@
+SubDir TOP apps tools imagetool ;
+
+Description imagetool : "image manipulator" ;
+Application imagetool : [ Wildcard *.cpp *.h ] : console ;
+LinkWith imagetool : crystalspace ;
