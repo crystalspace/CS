@@ -1,0 +1,16 @@
+@c -*-texinfo-*-
+@node Event System, Options, SCF Chapter, Using Crystal Space
+@section Event System
+@cindex Event System
+
+@menu
+* Event Names:: Names
+* Event Scheduling:: Scheduling
+* Event Subscription:: Subscription
+* Frame phase events::
+@end menu
+
+@importss{usingcs,events,names.txi}
+@importss{usingcs,events,scheduling.txi}
+@importss{usingcs,events,subscription.txi}
+@importss{usingcs,events,framephases.txi}

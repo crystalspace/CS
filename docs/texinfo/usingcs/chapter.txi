@@ -10,6 +10,7 @@ Space for your own 3D applications.
 * The Basics:: Basics and Overview
 * Tutorials::
 * SCF Chapter:: Plugins, Reference counting, Interfaces (@sc{scf})
+* Event System::
 * Options:: Configuring Crystal Space
 * Libraries:: Basic Libraries
 * VFS:: Virtual File System (@sc{vfs})
@@ -34,6 +35,7 @@ Space for your own 3D applications.
 @imports{usingcs,basics.txi}
 @importss{usingcs,tutorials,chapter.txi}
 @importss{usingcs,scf,chapter.txi}
+@importss{usingcs,events,chapter.txi}
 @importss{usingcs,configuration,chapter.txi}
 @importss{usingcs,libs,chapter.txi}
 @imports{usingcs,vfs.txi}
