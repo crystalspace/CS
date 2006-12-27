@@ -9,6 +9,7 @@ chronological order.
 27-Dec-2006
 	- res added some documentation on the new event system (essentially the
 	  appendix entry on the event system changes, somewhat reworded).
+	- res made some doxygen settings tweaks.
 26-Dec-2006
 	- Luca corrected some typos in the section 4.5.2.2 (Threading library)
 	  of the manual.
