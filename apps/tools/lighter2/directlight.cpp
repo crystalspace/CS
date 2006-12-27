@@ -310,8 +310,8 @@ namespace lighter
 
           size_t u, v;
           prim.GetElementUV (eidx, u, v);
-          u += minUV.x;
-          v += minUV.y;
+          u += size_t (minUV.x);
+          v += size_t (minUV.y);
 
           normalLM->SetAddPixel (u, v, c * pixelArea);
 

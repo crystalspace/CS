@@ -663,7 +663,7 @@ namespace lighter
     size_t u = (size_t)(pt * uFormVector);
     size_t v = (size_t)(pt * vFormVector);
 
-    return v*(maxUV.x - minUV.x + 1) + u;
+    return v*size_t (maxUV.x - minUV.x + 1) + u;
   }
 
 

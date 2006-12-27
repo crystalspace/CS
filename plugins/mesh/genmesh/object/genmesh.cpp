@@ -1801,6 +1801,8 @@ void csGenmeshMeshObjectFactory::Compress ()
           case CS_BUFCOMP_DOUBLE:
             RemapIndexBuffer<double> (subMesh->index_buffer, vt);
             break;
+	  case CS_BUFCOMP_TYPECOUNT:
+	    CS_ASSERT_MSG("invalid component type", false);
         }
       }
     }

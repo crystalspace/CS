@@ -116,7 +116,7 @@ namespace lighter
     /// Get u/v offset of element
     inline void GetElementUV (size_t elementIndex, size_t &u, size_t &v) const
     {
-      size_t uWidth = (maxUV.x - minUV.x + 1);
+      size_t uWidth = size_t (maxUV.x - minUV.x + 1);
 
       u = (elementIndex % uWidth);
       v = (elementIndex / uWidth);

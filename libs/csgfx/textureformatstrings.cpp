@@ -31,6 +31,21 @@ csString TextureFormatStrings::ConvertCanonical (const char* in)
 
 //--------------------------------------------------------------------------------
 
+StructuredTextureFormat::StructuredTextureFormat ()
+{
+  coded_components = CONST_UINT64 (0);
+  format = CS_TEXTUREFORMAT_INVALID;
+}
+
+bool StructuredTextureFormat::AddComponent (char cmp, int size)
+{
+  uint64 shifted = coded_components << 16;
+  if ((shifted >> 16) != coded_components)
+    return false;
+  coded_components = shifted + (CONST_UINT64 (256) * cmp) + size;
+  return true;
+}
+
 void StructuredTextureFormat::FixSizes (int size)
 {
   uint16 p1 = (coded_components >> 48) & 65535;

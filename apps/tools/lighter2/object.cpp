@@ -29,9 +29,10 @@ namespace lighter
 {
 
   ObjectFactory::ObjectFactory ()
-    : factoryWrapper (0), lightPerVertex (false),
+    : lightPerVertex (false),
     lmuScale (globalConfig.GetLMProperties ().uTexelPerUnit),
-    lmvScale (globalConfig.GetLMProperties ().vTexelPerUnit)
+    lmvScale (globalConfig.GetLMProperties ().vTexelPerUnit), 
+    factoryWrapper (0)
   {
   }
 
@@ -147,7 +148,7 @@ namespace lighter
   //-------------------------------------------------------------------------
 
   Object::Object (ObjectFactory* fact)
-    : factory (fact), lightPerVertex (fact->lightPerVertex), litColors (0)
+    : lightPerVertex (fact->lightPerVertex), litColors (0), factory (fact)
   {
   }
   

@@ -169,6 +169,6 @@ namespace lighter
     float radius;
 
   };
-}
+} // namespace lighter
 
-#endif
+#endif // __LIGHT_H__
