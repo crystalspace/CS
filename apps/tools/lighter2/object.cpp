@@ -80,7 +80,7 @@ namespace lighter
       iObject* obj = objiter->Next();
       csRef<iKeyValuePair> kvp = 
         scfQueryInterface<iKeyValuePair> (obj);
-      if (kvp.IsValid())
+      if (kvp.IsValid() && (strcmp (kvp->GetKey(), "lighter2") == 0))
       {
         const char* vVertexlight = kvp->GetValue ("vertexlight");
         if (vVertexlight != 0)
@@ -281,7 +281,7 @@ namespace lighter
       iObject* obj = objiter->Next();
       csRef<iKeyValuePair> kvp = 
         scfQueryInterface<iKeyValuePair> (obj);
-      if (kvp.IsValid())
+      if (kvp.IsValid() && (strcmp (kvp->GetKey(), "lighter2") == 0))
       {
         const char* vVertexlight = kvp->GetValue ("vertexlight");
         if (vVertexlight != 0)
