@@ -139,30 +139,48 @@ namespace lighter
       return 0;
   }
 
-  struct Edge
+  bool SimpleUVFactoryLayouter::Edge::equals (VertexEquality veq, 
+                                              const Edge& other)
   {
-    size_t a, b;
-
-    Edge (size_t a, size_t b) : a (a), b (b) {}
-
-    friend bool operator== (const Edge& e1, const Edge& e2)
+    switch (veq)
     {
-      return (e1.a == e2.b) && (e1.b == e2.a);
+      case Pedantic:
+        return (a == other.b) && (b == other.a);
+      case PositionAndNormal:
+        {
+          const csVector3& n1 = prim.GetVertexData().vertexArray[a].normal;
+          const csVector3& n2 = 
+            other.prim.GetVertexData().vertexArray[other.b].normal;
+          if (!((n1-n2).IsZero (SMALL_EPSILON))) return false;
+        }
+        {
+          const csVector3& n1 = prim.GetVertexData().vertexArray[other.a].normal;
+          const csVector3& n2 = 
+            other.prim.GetVertexData().vertexArray[b].normal;
+          if (!((n1-n2).IsZero (SMALL_EPSILON))) return false;
+        }
+        // Fall through
+      case Position:
+        {
+          const csVector3& p1 = prim.GetVertexData().vertexArray[a].position;
+          const csVector3& p2 = 
+            other.prim.GetVertexData().vertexArray[other.b].position;
+          if (!((p1-p2).IsZero (SMALL_EPSILON))) return false;
+        }
+        {
+          const csVector3& p1 = prim.GetVertexData().vertexArray[other.a].position;
+          const csVector3& p2 = 
+            other.prim.GetVertexData().vertexArray[b].position;
+          if (!((p1-p2).IsZero (SMALL_EPSILON))) return false;
+        }
+        return true;
     }
-  };
+    CS_ASSERT_MSG("Should not happen - someone forgot a 'case'", false);
+    return false;
+  }
 
-  struct UberPrimitive
-  {
-    PrimitiveArray prims;
-    csArray<Edge> outsideEdges;
-
-    UberPrimitive (const Primitive& startPrim);
-
-    bool UsesEdge (const Edge& edge);
-    void AddPrimitive (const Primitive& prim);
-  };
-
-  UberPrimitive::UberPrimitive (const Primitive& startPrim)
+  SimpleUVFactoryLayouter::UberPrimitive::UberPrimitive (
+    VertexEquality equality, const Primitive& startPrim) : equality (equality)
   {
     prims.Push (startPrim);
 
@@ -170,33 +188,35 @@ namespace lighter
     
     for (size_t e = 0; e < 3; e++)
     {
-      Edge edge (t[e], t[(e+1) % 3]);
+      Edge edge (startPrim, t[e], t[(e+1) % 3]);
       outsideEdges.Push (edge);
     }
   }
 
-  bool UberPrimitive::UsesEdge (const Edge& edge)
+  bool SimpleUVFactoryLayouter::UberPrimitive::UsesEdge (
+    const Edge& edge)
   {
     for (size_t o = 0; o < outsideEdges.GetSize(); o++)
     {
-      if (outsideEdges[o] == edge) return true;
+      if (outsideEdges[o].equals (equality, edge)) return true;
     }
     return false;
   }
 
-  void UberPrimitive::AddPrimitive (const Primitive& prim)
+  void SimpleUVFactoryLayouter::UberPrimitive::AddPrimitive (
+    const Primitive& prim)
   {
     prims.Push (prim);
     const Primitive::TriangleType& t = prim.GetTriangle ();
     for (size_t e = 0; e < 3; e++)
     {
-      Edge edge (t[e], t[(e+1) % 3]);
+      Edge edge (prim, t[e], t[(e+1) % 3]);
       bool found = false;
       /* If edge is an "outside edge", remove from the outside list
        * Otherwise add it */
       for (size_t o = 0; o < outsideEdges.GetSize(); o++)
       {
-        if (outsideEdges[o] == edge) 
+        if (outsideEdges[o].equals (equality, edge)) 
         {
           found = true;
           outsideEdges.DeleteIndexFast (o);
@@ -246,7 +266,7 @@ namespace lighter
       while (coplanarPrims.GetSize() > 0)
       {
         const Primitive& prim (coplanarPrims[0]);
-        UberPrimitive& ubp = uberPrims[uberPrims.Push (UberPrimitive (prim))];
+        UberPrimitive& ubp = uberPrims[uberPrims.Push (UberPrimitive (Position, prim))];
         coplanarPrims.DeleteIndexFast (0);
 
         bool primAdded;
@@ -259,7 +279,7 @@ namespace lighter
             const Primitive::TriangleType& t = prim.GetTriangle ();
             for (size_t e = 0; e < 3; e++)
             {
-              Edge edge (t[e], t[(e+1) % 3]);
+              Edge edge (prim, t[e], t[(e+1) % 3]);
               if (ubp.UsesEdge (edge))
               {
                 ubp.AddPrimitive (prim);
@@ -415,6 +435,12 @@ namespace lighter
       }
       uvSize = (maxuv-minuv)+csVector2(2.0f,2.0f);
       uvsizes.Push (uvSize);
+      /* Subtle: causes lumels to be aligned on a world space grid.
+       * The intention is that the lightmap coordinates for vertices 
+       * for two adjacent faces are lined up nicely.
+       * @@@ Does not take object translation into account. */
+      minuv.x = floor (minuv.x);
+      minuv.y = floor (minuv.y);
       minuvs.Push (minuv);
     }
 
