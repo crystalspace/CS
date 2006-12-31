@@ -39,23 +39,37 @@ namespace lighter
   bool ObjectFactory::PrepareLightmapUV (LightmapUVFactoryLayouter* uvlayout)
   {
     BeginSubmeshRemap ();
-    size_t oldSize = unlayoutedPrimitives.GetSize();
-    for (size_t i = 0; i < oldSize; i++)
+    if (lightPerVertex)
     {
-      csArray<PrimitiveArray> newPrims;
-      csRef<LightmapUVObjectLayouter> lightmaplayout = 
-        uvlayout->LayoutFactory (unlayoutedPrimitives[i], vertexData, this, newPrims);
-      if (!lightmaplayout) return false;
-
-      for (size_t n = 0; n < newPrims.GetSize(); n++)
+      size_t oldSize = unlayoutedPrimitives.GetSize();
+      for (size_t i = 0; i < oldSize; i++)
       {
-        layoutedPrimitives.Push (LayoutedPrimitives (newPrims[n],
-          lightmaplayout, n));
-
-        AddSubmeshRemap (i, layoutedPrimitives.GetSize () - 1);
+        layoutedPrimitives.Push (LayoutedPrimitives (unlayoutedPrimitives[i],
+          0, 0));
+        AddSubmeshRemap (i, i);
       }
+      unlayoutedPrimitives.DeleteAll();
     }
-    unlayoutedPrimitives.DeleteAll();
+    else
+    {
+      size_t oldSize = unlayoutedPrimitives.GetSize();
+      for (size_t i = 0; i < oldSize; i++)
+      {
+        csArray<PrimitiveArray> newPrims;
+        csRef<LightmapUVObjectLayouter> lightmaplayout = 
+          uvlayout->LayoutFactory (unlayoutedPrimitives[i], vertexData, this, newPrims);
+        if (!lightmaplayout) return false;
+
+        for (size_t n = 0; n < newPrims.GetSize(); n++)
+        {
+          layoutedPrimitives.Push (LayoutedPrimitives (newPrims[n],
+            lightmaplayout, n));
+
+          AddSubmeshRemap (i, layoutedPrimitives.GetSize () - 1);
+        }
+      }
+      unlayoutedPrimitives.DeleteAll();
+    }
     FinishSubmeshRemap ();
 
     return true;
@@ -283,9 +297,14 @@ namespace lighter
         scfQueryInterface<iKeyValuePair> (obj);
       if (kvp.IsValid() && (strcmp (kvp->GetKey(), "lighter2") == 0))
       {
-        const char* vVertexlight = kvp->GetValue ("vertexlight");
-        if (vVertexlight != 0)
-          lightPerVertex = (strcmp (vVertexlight, "yes") == 0);
+        if (!factory->lightPerVertex)
+        {
+          /* Disallow "disabling" of per-vertex lighting in an object when
+           * it's enabled for the factory. */
+          const char* vVertexlight = kvp->GetValue ("vertexlight");
+          if (vVertexlight != 0)
+            lightPerVertex = (strcmp (vVertexlight, "yes") == 0);
+        }
       }
     }
   }
