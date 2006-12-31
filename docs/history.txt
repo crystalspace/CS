@@ -8,6 +8,7 @@ chronological order.
 
 31-Dec-2006
 	- res added csConstPtrKey (so const pointers can be used in hashes).
+	- res fixed VC8 deprecation warnings in textureformatstrings.cpp.
 28-Dec-2006
 	- res dropped CEGUI 0.4 support.
 27-Dec-2006
