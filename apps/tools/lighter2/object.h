@@ -91,12 +91,13 @@ namespace lighter
       return newVertex;
     }
 
-    /// Transform all vertex positions
+    /// Transform all vertex positions and normal
     void Transform (const csReversibleTransform& transform)
     {
       for(size_t i = 0; i < vertexArray.GetSize (); ++i)
       {
         vertexArray[i].position = transform.This2Other (vertexArray[i].position);
+        vertexArray[i].normal = transform.This2OtherRelative (vertexArray[i].normal);
       }
     }
   };
