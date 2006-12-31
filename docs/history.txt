@@ -17,8 +17,8 @@ chronological order.
 	  neighbouring coplanar primitives, but whose adjacent vertices have
 	  different indices, are still layouted next to each other on the 
 	  lightmap.
-	- The intention is that the lightmap coordinates for vertices for two
-	  adjacent faces are lined up nicely.
+	- res added a small hack to the lightmap layouter so that the lightmap 
+	  coordinates for vertices for two adjacent faces are lined up nicely.
 28-Dec-2006
 	- res dropped CEGUI 0.4 support.
 27-Dec-2006
