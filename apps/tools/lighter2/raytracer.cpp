@@ -60,18 +60,15 @@ namespace lighter
     void RegisterHit (const Primitive* prim) {}
   };
 
-  class IgnoreTestCoplanar
+  class IgnorePrimitive
   {
-    const csPlane3& plane;
+    const Primitive* prim;
   public:
-    IgnoreTestCoplanar (const csPlane3& plane) : plane (plane) {}
+    IgnorePrimitive (const Primitive* prim) : prim (prim) {}
 
     bool Ignore (const Primitive* prim) const
     {
-      if (!prim) return false;
-
-      return (fabsf (prim->GetPlane().DD - plane.DD) < SMALL_EPSILON)
-        && ((prim->GetPlane().norm - plane.norm).IsZero (SMALL_EPSILON));
+      return this->prim == prim;
     }
     void RegisterHit (const Primitive* prim) {}
   };
@@ -220,8 +217,8 @@ namespace lighter
     }
     else if (ray.ignorePrimitive)
     {
-      IgnoreTestCoplanar ignorer (ray.ignorePrimitive->GetPlane());
-      KDTTraverser<true, IgnoreTestCoplanar> traverser (*this, myRay, ignorer);
+      IgnorePrimitive ignorer (ray.ignorePrimitive);
+      KDTTraverser<true, IgnorePrimitive> traverser (*this, myRay, ignorer);
       while (true)
       {
         int result = traverser.Traverse (hit);
@@ -286,8 +283,8 @@ namespace lighter
     }
     else if (ray.ignorePrimitive)
     {
-      IgnoreTestCoplanar ignorer (ray.ignorePrimitive->GetPlane());
-      KDTTraverser<false, IgnoreTestCoplanar> traverser (*this, myRay, ignorer);
+      IgnorePrimitive ignorer (ray.ignorePrimitive);
+      KDTTraverser<false, IgnorePrimitive> traverser (*this, myRay, ignorer);
       while (true)
       {
         int result = traverser.Traverse (hit);
