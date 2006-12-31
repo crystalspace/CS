@@ -38,6 +38,9 @@ chronological order.
 	  can be saved when the factory is set for PVL.
 	- res changed lighter2's ObjectVertexData::Transform() to also #
 	  transform the normal.
+	- Eric Sunshine made minor grammatical and mark-up corrections to the
+	  new event system documentation (CS/docs/texinfo/usingcs/events).
+	  Also fixed some other mark-up errors reported by 'makeinfo'.
 28-Dec-2006
 	- res dropped CEGUI 0.4 support.
 27-Dec-2006
