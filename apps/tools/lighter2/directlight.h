@@ -22,6 +22,7 @@
 #include "csutil/noncopyable.h"
 
 #include "primitive.h"
+#include "raytracer.h"
 #include "sampler.h"
 
 namespace lighter
@@ -31,6 +32,28 @@ namespace lighter
   class Primitive;
   class Light_old;
   class Light;
+
+  class PartialElementIgnoreCallback : public HitIgnoreCallback
+  {
+    const Primitive* originalPrim;
+    bool inside;
+    csSet<csConstPtrKey<Primitive> > insideHits;
+    int pass;
+  public:
+    PartialElementIgnoreCallback (const Primitive* originalPrim) : 
+      originalPrim (originalPrim), pass (0)
+    {
+    }
+
+    void SetSampleInside (bool inside)
+    {
+      this->inside = inside;
+    }
+    void SetPass2 () { pass = 1; }
+
+    virtual bool Ignore (const Primitive* prim) const;
+    virtual void RegisterHit (const Primitive* prim);
+  };
   
   // Class to calculate direct lighting
   class DirectLighting : private CS::NonCopyable
@@ -57,15 +80,18 @@ namespace lighter
 
     //-- Shade a lightmap element
     typedef csColor (*LMElementShader)(Sector* sector, ElementProxy element,
-      SamplerSequence<2>& lightSampler, Raytracer& rt);
+      SamplerSequence<2>& lightSampler, Raytracer& rt, 
+      PartialElementIgnoreCallback* ignoreCB);
 
     // Shade a primitive element with direct lighting
     static csColor UniformShadeAllLightsNonPD (Sector* sector, ElementProxy element,
-      SamplerSequence<2>& lightSampler, Raytracer& rt);
+      SamplerSequence<2>& lightSampler, Raytracer& rt, 
+      PartialElementIgnoreCallback* ignoreCB = 0);
 
     // Shade a primitive element with direct lighting using a single light
     static csColor UniformShadeRndLightNonPD (Sector* sector, ElementProxy element,
-      SamplerSequence<2>& lightSampler, Raytracer& rt);
+      SamplerSequence<2>& lightSampler, Raytracer& rt, 
+      PartialElementIgnoreCallback* ignoreCB = 0);
 
 
     //-- Shade using one light
@@ -76,13 +102,17 @@ namespace lighter
 
     // Shade a primitive element with direct lighting
     static csColor UniformShadeOneLight (Sector* sector, ElementProxy element,
-      Light* light, SamplerSequence<2>& lightSampler, Raytracer& rt);
+      Light* light, SamplerSequence<2>& lightSampler, Raytracer& rt, 
+      PartialElementIgnoreCallback* ignoreCB = 0);
 
   private:
     // Static methods...
     inline static csColor ShadeLight (Light* light, const csVector3& point,
       const csVector3& normal, Raytracer& rt, SamplerSequence<2>& lightSampler,
       const Primitive* shadowIgnorePrimitive = 0);
+    inline static csColor ShadeLight (Light* light, const csVector3& point,
+      const csVector3& normal, Raytracer& rt, SamplerSequence<2>& lightSampler,
+      PartialElementIgnoreCallback* ignoreCB);
 
     static void ShadeLightmap (Sector* sector, Object* obj, Raytracer& rt, 
       SamplerSequence<2>& masterSampler);

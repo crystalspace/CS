@@ -93,6 +93,13 @@ namespace lighter
     return !rt.TraceAnyHit (testRay, hp);
   }
 
+  bool VisibilityTester::Unoccluded (Raytracer& rt, HitIgnoreCallback* ignoreCB)
+  {
+    HitPoint hp;
+    //return !rt.TraceAnyHit (testRay, hp, ignoreCB);
+    // @@@ Hack: make sure ignoreCB sees all hits
+    return !rt.TraceClosestHit (testRay, hp, ignoreCB);
+  }
 
 
   //--

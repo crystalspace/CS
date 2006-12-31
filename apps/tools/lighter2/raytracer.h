@@ -190,6 +190,16 @@ namespace lighter
     HashEntry* hash;
   };
 
+  template<bool exitFirstHit, class IgnoreTest> class KDTTraverser;
+
+  class HitIgnoreCallback
+  {
+  public:
+    virtual ~HitIgnoreCallback() {}
+
+    virtual bool Ignore (const Primitive* prim) const = 0;
+    virtual void RegisterHit (const Primitive* prim) = 0;
+  };
 
   class Raytracer
   {
@@ -203,18 +213,22 @@ namespace lighter
      * This might not be the closest hit so it is faster but not suitable
      * for all kind of calculations.
      */
-    bool TraceAnyHit (const Ray &ray, HitPoint &hit);
+    bool TraceAnyHit (const Ray &ray, HitPoint &hit, 
+      HitIgnoreCallback* ignoreCB = 0);
 
     /**
      * Raytrace for closest hit. 
      */
-    bool TraceClosestHit (const Ray &ray, HitPoint &hit);    
+    bool TraceClosestHit (const Ray &ray, HitPoint &hit, 
+      HitIgnoreCallback* ignoreCB = 0);
 
   protected:
+    template<bool exitFirstHit, class IgnoreTest> friend class KDTTraverser;
+
     /// Traverse all primitives in a given node and do intersection against them
-    template<bool exitFirstHit>
+    template<bool exitFirstHit, class IgnoreTest>
     bool IntersectPrimitives (const KDTreeNode* node, const Ray &ray, 
-      HitPoint &hit);
+      HitPoint &hit, IgnoreTest& ignoreTest);
 
     KDTree *tree;
 
@@ -233,7 +247,6 @@ namespace lighter
 #endif
       float tnear, tfar;
     };
-    size_t traversalStackPtr;
     kdTraversalS* traversalStack;
 
     MailboxHash mailboxes;
