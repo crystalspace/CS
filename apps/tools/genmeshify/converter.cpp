@@ -343,6 +343,13 @@ namespace genmeshify
     }
   };
 
+  struct Submesh
+  {
+    csArray<size_t> triangles;
+    csString name;
+    iMaterialWrapper* material;
+  };
+
   bool Converter::CopyThingToGM (iThingFactoryState* from, 
                                  iGeneralFactoryState* to,
                                  const char* name, 
@@ -416,7 +423,7 @@ namespace genmeshify
 
     MatPolyHash polies;
     const csVector3* vertices = from->GetVertices();
-    const csVector3* normals = from->GetNormals();
+    const csVector3* oldNormals = from->GetNormals();
 
     float* lmcoordPtr = lmCoords.GetArray();
     for (int p = 0; p < polycount; p++)
@@ -458,7 +465,7 @@ namespace genmeshify
         int vt = vtIndex[v];
         PolyVertex newVertex;
         newVertex.pos = vertices[vt];
-        newVertex.normal = normals ? normals[vt] : polynormal;
+        newVertex.normal = oldNormals ? -oldNormals[vt] : polynormal;
         csVector3 t = object2texture.Other2This (newVertex.pos);
         newVertex.tc.Set (t.x, t.y);
         if (lm.hasLM)
@@ -506,60 +513,48 @@ namespace genmeshify
       }
     }
 
-    // Step 3: create GM submeshes
+    // Step 3: Triangulate + submesh split
+    csDirtyAccessArray<csVector3> positions;
+    csDirtyAccessArray<csVector3> newNormals;
+    csDirtyAccessArray<csVector2> texcoords;
+    csDirtyAccessArray<csVector2> lmcoords;
+    csDirtyAccessArray<csTriangle> triangles;
+    csArray<Submesh> submeshes;
+
     {
       size_t submeshNum = 0;
-      size_t vertexTotal = 0;
-      csDirtyAccessArray<csVector2> tclm;
+      size_t vertexNum = 0;
       MatPolyHash::GlobalIterator it = polies.GetIterator ();
       while (it.HasNext())
       {
         PolyHashKey key;
         const csArray<Poly>& polies = it.Next (key);
 
-        size_t numVerts = 0;
-        size_t numTris = 0;
+        Submesh& thisSubmesh = submeshes.GetExtend (submeshes.GetSize());
+        csArray<size_t>& thisSubmeshTris = thisSubmesh.triangles;
         for (size_t p = 0; p < polies.GetSize(); p++)
         {
-          numVerts += polies[p].vertices.GetSize();
-          numTris += polies[p].vertices.GetSize() - 2;
-        }
-        size_t vertexNum = vertexTotal;
-        vertexTotal += numVerts;
-
-        to->SetVertexCount ((int)vertexTotal);
-        tclm.SetSize (vertexTotal);
-        csVector3* vertPtr = to->GetVertices() + vertexNum;
-        csVector3* normPtr = to->GetNormals() + vertexNum;
-        csVector2* tcPtr = to->GetTexels() + vertexNum;
-        csVector2* tclmPtr = tclm.GetArray() + vertexNum;
-
-        csRef<iRenderBuffer> indexBuffer = 
-          csRenderBuffer::CreateIndexRenderBuffer (numTris * 3, 
-          CS_BUF_STATIC, CS_BUFCOMP_UNSIGNED_INT, 0, numVerts - 1);
-        {
-          csRenderBufferLock<uint, iRenderBuffer*> index (indexBuffer);
-
-          for (size_t p = 0; p < polies.GetSize(); p++)
+          const csArray<PolyVertex>& verts = polies[p].vertices;
+          size_t vertex0 = vertexNum;
+          for (size_t v = 0; v < verts.GetSize(); v++)
           {
-            const csArray<PolyVertex>& verts = polies[p].vertices;
-            size_t vertex0 = vertexNum;
-            for (size_t v = 0; v < verts.GetSize(); v++)
+            positions.Push (verts[v].pos);
+            newNormals.Push  (verts[v].normal);
+            texcoords.Push (verts[v].tc);
+            lmcoords.Push (verts[v].tclm);
+
+            if (v >= 2)
             {
-              *vertPtr++ = verts[v].pos;
-              *normPtr++ = verts[v].normal;
-              *tcPtr++ = verts[v].tc;
-              *tclmPtr++ = verts[v].tclm;
-              if (v >= 2)
-              {
-                *index++ = (uint)vertex0;
-                *index++ = (uint)(vertexNum-1);
-                *index++ = (uint)(vertexNum);
-              }
-              vertexNum++;
+              csTriangle t;
+              t.a = (uint)vertex0;
+              t.b = (uint)(vertexNum-1);
+              t.c = (uint)(vertexNum);
+              thisSubmeshTris.Push (triangles.Push (t));
             }
+            vertexNum++;
           }
         }
+
         csString submeshName;
         if (key.slm != csArrayItemNotFound)
         {
@@ -572,13 +567,67 @@ namespace genmeshify
         }
         else
           submeshName.Format ("%zu", submeshNum);
-        to->AddSubMesh (indexBuffer, key.material, submeshName);
-        submeshNum++;
+        thisSubmesh.name = submeshName;
+        thisSubmesh.material = key.material;
       }
+    }
+
+    /* Step 4: Compute normals for smoothed Things
+     *  While Thing's normal computation isn't completely awful, we can still
+     *  do a better job here. */
+    if (from->GetSmoothingFlag ())
+    {
+      csNormalCalculator::CalculateNormals (positions, triangles,
+        newNormals, true);
+    }
+
+    // Step 5: Copy vertex data
+    size_t vertexTotal = positions.GetSize();
+    {
+      to->SetVertexCount ((int)vertexTotal);
+
+      memcpy (to->GetVertices (), positions.GetArray(), 
+        vertexTotal * sizeof (csVector3));
+      positions.DeleteAll();
+
+      memcpy (to->GetNormals (), newNormals.GetArray(), 
+        vertexTotal * sizeof (csVector3));
+      newNormals.DeleteAll();
+
+      memcpy (to->GetTexels (), texcoords.GetArray(), 
+        vertexTotal * sizeof (csVector2));
+      texcoords.DeleteAll();
+
       csRef<csRenderBuffer> tclmBuffer = csRenderBuffer::CreateRenderBuffer (
-        tclm.GetSize(), CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 2);
-      tclmBuffer->CopyInto (tclm.GetArray(), tclm.GetSize());
+        lmcoords.GetSize(), CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 2);
+      tclmBuffer->CopyInto (lmcoords.GetArray(), lmcoords.GetSize());
       to->AddRenderBuffer ("texture coordinate lightmap", tclmBuffer);
+      lmcoords.DeleteAll();
+    }
+
+    // Step 6: create GM submeshes
+    {
+      for (size_t s = 0; s < submeshes.GetSize(); s++)
+      {
+        const Submesh& thisSubmesh = submeshes[s];
+        const csArray<size_t>& thisSubmeshTris = thisSubmesh.triangles;
+
+        csRef<iRenderBuffer> indexBuffer = 
+          csRenderBuffer::CreateIndexRenderBuffer (thisSubmeshTris.GetSize() * 3, 
+          CS_BUF_STATIC, CS_BUFCOMP_UNSIGNED_INT, 0, vertexTotal - 1);
+        {
+          csRenderBufferLock<uint, iRenderBuffer*> index (indexBuffer);
+      
+          for (size_t t = 0; t < thisSubmeshTris.GetSize(); t++)
+          {
+            const csTriangle& tri = triangles[thisSubmeshTris[t]];
+            *index++ = tri.a;
+            *index++ = tri.b;
+            *index++ = tri.c;
+          }
+        }
+        to->AddSubMesh (indexBuffer, thisSubmesh.material, thisSubmesh.name);
+      }
     }
     
     return true;
