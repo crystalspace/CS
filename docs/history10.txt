@@ -6,6 +6,8 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+2-Jan-2007
+	- res bumped the version number back to 1.0rc2.
 21-Dec-2006
 	- Jorrit merged r26093 into 1.0 (fix for #197).
 	- Jorrit merged r26075:26076 into 1.0 (procedural textures fix).
