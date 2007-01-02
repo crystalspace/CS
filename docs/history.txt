@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+2-Jan-2007
+	- res renamed 'imagetool' to 'csimagetool', as suggested by Eric
+	  (Since the pretty generic name 'imagetool' can easily collide with 
+	  other packages when installed in locations like /usr/bin).
 1-Jan-2007
 	- res changed genmeshify to better handle smoothed Things.
 31-Dec-2006
