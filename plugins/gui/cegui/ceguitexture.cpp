@@ -75,24 +75,17 @@ void csCEGUITexture::loadFromFile (const CEGUI::String &filename,
   hTxt->SetTextureClass ("nocompress");
 }
 
-#if CEGUI_VERSION_MINOR < 5
-void csCEGUITexture::loadFromMemory (const void *buffPtr, 
-  CEGUI::uint buffWidth, CEGUI::uint buffHeight)
-#else
 void csCEGUITexture::loadFromMemory (const void *buffPtr, 
   CEGUI::uint buffWidth, CEGUI::uint buffHeight, CEGUI::Texture::PixelFormat pixFmt)
-#endif
 {
   csRef<iGraphics3D> g3d = CS_QUERY_REGISTRY(obj_reg, iGraphics3D);
   if (!g3d)
     return;
 
   csRef<csImageMemory> image;
-#if CEGUI_VERSION_MINOR >= 5
   // this should never happen as CEGUI itself will only ask for RGBA
   if (pixFmt != CEGUI::Texture::PF_RGBA)
     return;
-#endif
   image.AttachNew(new csImageMemory (buffWidth, buffHeight, buffPtr, 
     CS_IMGFMT_TRUECOLOR | CS_IMGFMT_ALPHA));
 

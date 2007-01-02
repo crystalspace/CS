@@ -76,13 +76,8 @@ bool csCEGUIRenderer::Initialize (iScript* script)
 
   if (script)
   {
-  #if (CEGUI_VERSION_MAJOR == 0) && (CEGUI_VERSION_MINOR < 5)
-    scriptModule = new csCEGUIScriptModule (script, obj_reg);
-    new CEGUI::System (this, scriptModule);
-  #else
     scriptModule = new csCEGUIScriptModule (script, obj_reg);
     new CEGUI::System (this, 0, 0, scriptModule);  
-  #endif
   }
   else
   {

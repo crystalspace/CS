@@ -10,6 +10,7 @@ chronological order.
 	- res bumped the version number back to 1.0rc2.
 	- res merged r26124, r26145 into 1.0 (event system docs).
 	- res merged r26126, r26149 into 1.0 (renamed gfxtest to csimagetool).
+	- res merged r26132 into 1.0 (drop CEGUI 0.4 support).
 21-Dec-2006
 	- Jorrit merged r26093 into 1.0 (fix for #197).
 	- Jorrit merged r26075:26076 into 1.0 (procedural textures fix).

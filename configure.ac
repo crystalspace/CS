@@ -1542,7 +1542,11 @@ AS_IF([test $cs_cv_libCEGUI = yes],
     [CS_CHECK_BUILD([if CEGUI is sufficiently recent], [cs_cv_CEGUI_recent],
 	[AC_LANG_PROGRAM(
 	    [[#include <falagard/CEGUIFalWidgetLookManager.h>]],
-	    [CEGUI::WidgetLookManager::getSingleton();])],
+	    [CEGUI::WidgetLookManager::getSingleton();
+	    #if (CEGUI_VERSION_MAJOR == 0) && (CEGUI_VERSION_MINOR < 5)
+	    who took the ram from the ramalamadingdong?
+	    #endif
+	    ])],
 	[], [C++],
 	[CS_EMIT_BUILD_RESULT([cs_cv_libCEGUI], [CEGUI])], [], [],
 	[$cs_cv_libCEGUI_cflags],
