@@ -152,7 +152,7 @@ class OcclusionTree
   void ReplaceWithElementaryOT (const csArray<Plucker>& otplanes,
       OcclusionTree* inLeaf);
   // Unions a BlockerPolyhedron that was originally an IN node.
-  void OcclusionTree::InUnion (BlockerPolyhedron* blocker,
+  void InUnion (BlockerPolyhedron* blocker,
       csArray<Plucker> splitPlanes);
   // Unions a BlockerPolyhedron.
   void Union (struct BlockerPolyhedron* polyhedron, 
