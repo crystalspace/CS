@@ -6,6 +6,13 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+31-Dec-2006
+	- Eric Sunshine made minor grammatical and mark-up corrections to the
+	  new event system documentation (CS/docs/texinfo/usingcs/events).
+	  Also fixed some other mark-up errors reported by 'makeinfo'.
+27-Dec-2006
+	- res added some documentation on the new event system (essentially the
+	  appendix entry on the event system changes, somewhat reworded).
 14-Dec-2006
 	- res removed the CS_FORMATTER_TYPENAME_QUALIFIER hack from
 	  formatter.h. Instead, 'typename' is used everywhere. Together with

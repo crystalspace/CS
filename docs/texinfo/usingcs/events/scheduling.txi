@@ -1,0 +1,98 @@
+@c -*-texinfo-*-
+@node Event Scheduling, Event Subscription, Event Names, Event System
+@subsection Scheduling
+@cindex Events, Scheduling
+
+The event system provides a generic mechanism for representing the order in 
+which handlers of particular events should be invoked, regardless of the order 
+in which they are initialized or in which their respective plugins are loaded.
+
+The event scheduler takes advantage of properties exposed by the
+@code{iEventHandler} interface to do exactly this.  For each event name to
+which an event handler subscribes, it may also specify essentially arbitrary
+@emph{happens-before} and @emph{happens-after} relationships with other event
+handlers, both abstractly (@emph{I want to handle all input events before any
+instance of the @samp{crystalspace.aws} handler}) and specifically (@emph{I
+want to handle the mouse event only after the @samp{crystalspace.cel} event
+handler}).
+
+The specific functions which all @code{iEventHandler} implementations must
+provide are:
+
+@itemize @bullet
+@item
+@code{const char *GenericName()}: Returns a simple text name common to all 
+instances of this event handler.
+
+@item
+@code{csHandlerID GenericID()}: A @samp{csHandlerID} is a lightweight way to
+manage generic handler names.  Under almost all circumstances, the
+implementation of this method simply is implemented as:
+
+@example
+return csHandlerRegistry::GetID(this->GenericName());
+@end example
+
+@item
+@code{const csHandlerID[] GenericPrec(csEventID)}: Returns an array 
+(terminated by @samp{CS_EVENTLIST_END}) of @samp{csHandlerID}s of generic 
+event handlers which, for the event name identified by the argument, should 
+always handle events with that name @emph{before} instances of the current
+handler.
+
+@item
+@code{const csHandlerID[] GenericSucc(csEventID)}: Returns an array 
+(terminated by @samp{CS_EVENTLIST_END}) of @samp{csHandlerID}s of generic 
+event handlers which, for the event name identified by the argument, should 
+always handle events with that name @emph{after} instances of the current 
+handler.
+
+@item
+@code{const csHandlerID[] InstancePrec(csEventID)}: Returns an array 
+(terminated by @samp{CS_EVENTLIST_END}) of @samp{csHandlerID}s of both generic 
+event handlers and event handler instances which, for the event name 
+identified by the argument, should always handle events with that name 
+@emph{before} this @emph{particular} instance of the event handler.
+
+@item
+@code{const csHandlerID[] InstanceSucc(csEventID)}: Returns an array 
+(terminated by @samp{CS_EVENTLIST_END}) of @samp{csHandlerID}s of both generic 
+event handlers and event handler instances which, for the event name 
+identified by the argument, should always handle event with that name 
+@emph{after} this @emph{particular} instance of the event handler.
+@end itemize
+
+In many simple cases, you will want to use default implementations of these 
+functions provided by the @code{CS_EVENTHANDLER_NAMES()} and 
+@samp{CS_EVENTHANDLER_NIL_CONSTRAINTS} macros, like so:
+
+@example
+struct myEventHandler : public iEventHandler
+@{
+  virtual bool HandleEvent (iEvent &Event)
+  @{
+    foo();
+    bar();
+    return baz();
+  @}
+  CS_EVENTHANDLER_NAMES("crystalspace.module.name")
+  CS_EVENTHANDLER_NIL_CONSTRAINTS
+@}
+@end example
+
+As a convention, most @samp{csEventHandler}s will implement a static method, 
+@samp{const char *StaticHandlerName()}, which can be retrieved and converted 
+without instantiating the handler.  This name string can then be converted 
+into a @samp{csHandlerID} by invoking:
+
+@example
+@code{csHandlerRegistry::GetID(myHandlerClass::StaticHandlerName())}
+@end example
+
+The @samp{csHandlerID} of an instance of an event handler class can be 
+retrieved by passing a pointer to that class to 
+@code{csHandlerRegistry::GetID()}. For example:
+
+@example
+@code{csHandlerRegistry::GetID(new myHandlerClass())}
+@end example

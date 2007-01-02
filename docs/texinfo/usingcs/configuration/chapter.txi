@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Options, Libraries, SCF Chapter, Using Crystal Space
+@node Options, Libraries, Event System, Using Crystal Space
 @section Configuring Crystal Space
 @cindex Options
 @cindex configuration
