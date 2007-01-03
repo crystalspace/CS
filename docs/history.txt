@@ -10,6 +10,8 @@ chronological order.
 	- res made lighter2 add an ambient term to the lightmaps.
 	- res moved lighter2's cleanup code from an explicitly called method
 	  to the app class destructor.
+	- res fixed lighter2 to properly add the ambient term for vertex-lit
+	  meshes affected by PD lights.
 3-Jan-2007
 	- res tweaked ptpdlight to not store light IDs as hex strings
 	  internally but as raw data.

@@ -372,19 +372,22 @@ namespace lighter
     genMesh->RemoveRenderBuffer ("colors");
     genMesh->RemoveRenderBuffer ("texture coordinate lightmap");
 
-    if (lightPerVertex && !litColorsPD)
+    if (lightPerVertex)
     {
-      csRef<csRenderBuffer> colorsBuffer = csRenderBuffer::CreateRenderBuffer (
-        vertexData.vertexArray.GetSize(), CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 3);
-      genMesh->AddRenderBuffer ("colors", colorsBuffer);
-
       scene->lightmapPostProc.ApplyAmbient (litColors->GetArray(),
         vertexData.vertexArray.GetSize()); 
       scene->lightmapPostProc.ApplyExposure (litColors->GetArray(),
         vertexData.vertexArray.GetSize()); 
 
-      colorsBuffer->CopyInto (litColors->GetArray(),
-        vertexData.vertexArray.GetSize());
+      if (!litColorsPD)
+      {
+        csRef<csRenderBuffer> colorsBuffer = csRenderBuffer::CreateRenderBuffer (
+          vertexData.vertexArray.GetSize(), CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 3);
+        genMesh->AddRenderBuffer ("colors", colorsBuffer);
+
+        colorsBuffer->CopyInto (litColors->GetArray(),
+          vertexData.vertexArray.GetSize());
+      }
     }
 
     // Still may need to fix up submesh materials...
