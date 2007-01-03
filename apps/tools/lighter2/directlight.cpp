@@ -371,13 +371,10 @@ namespace lighter
       {
         Primitive& prim = primArray[pidx];
 
-        if (pidx == 0)
-        {
-          area2pixel = 
-            1.0f / (prim.GetuFormVector () % prim.GetvFormVector ()).Norm();
-        }
+        area2pixel = 
+          1.0f / (prim.GetuFormVector () % prim.GetvFormVector ()).Norm();
 
-        const FloatDArray& areaArray = prim.GetElementAreas ();
+        const ElementAreas& areas = prim.GetElementAreas ();
         size_t numElements = prim.GetElementCount ();        
         Lightmap* normalLM = sector->scene->GetLightmap (prim.GetGlobalLightmapID (), (Light*)0);
 
@@ -399,10 +396,11 @@ namespace lighter
         // Iterate all elements
         for (size_t eidx = 0; eidx < numElements; ++eidx)
         {
-          if (areaArray[eidx] == 0)
+          const float elArea = areas.GetElementArea (eidx);
+          if (elArea == 0)
             continue;
 
-          float pixelArea = (areaArray[eidx]*area2pixel);
+          float pixelArea = (elArea*area2pixel);
           bool borderElement = fabsf (pixelArea - 1.0f) > SMALL_EPSILON;
 
           // Shade non-PD lights

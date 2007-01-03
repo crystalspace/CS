@@ -25,6 +25,81 @@ static size_t numElementsTotal = 0;
 namespace lighter
 {
 
+  void ElementAreas::DeleteAll()
+  {
+    elementsBits.SetSize (0);
+    fractionalElements.DeleteAll ();
+    elementCount = 0;
+  }
+
+  void ElementAreas::SetSize (size_t count)
+  {
+    elementCount = count;
+    elementsBits.SetSize (2*count);
+  }
+
+  void ElementAreas::SetElementArea (size_t element, float area)
+  {
+    if (area == 0)
+    {
+      elementsBits.SetBit (2*element);
+    }
+    else if (fabsf (area - fullArea) < SMALL_EPSILON)
+    {
+      elementsBits.SetBit (2*element+1);
+    }
+    else
+    {
+      ElementFloatPair elem;
+      elem.area = area;
+      elem.element = element;
+      fractionalElements.InsertSorted (elem, ElementFloatPairCompare);
+    }
+  }
+
+  void ElementAreas::ShrinkBestFit ()
+  {
+    fractionalElements.ShrinkBestFit ();
+  }
+
+  int ElementAreas::ElementFloatPairCompare (const ElementFloatPair& i1,
+                                             const ElementFloatPair& i2)
+  {
+    if (i1.element > i2.element)
+      return 1;
+    else if (i1.element < i2.element)
+      return -1;
+    else
+      return 0;
+  }
+  
+  int ElementAreas::ElementFloatPairSearch (const ElementFloatPair& item,
+                                            const size_t& key)
+  {
+    if (item.element > key)
+      return 1;
+    else if (item.element < key)
+      return -1;
+    else
+      return 0;
+  }
+
+  float ElementAreas::GetElementArea (size_t element) const
+  {
+    if (elementsBits.IsBitSet (2*element))
+      return 0;
+    else if (elementsBits.IsBitSet (2*element+1))
+      return fullArea;
+    else
+    {
+      size_t index = fractionalElements.FindSortedKey (
+        csArrayCmp<ElementFloatPair, size_t> (element, ElementFloatPairSearch));
+      return fractionalElements[index].area;
+    }
+  }
+
+  //-------------------------------------------------------------------------
+
   void Primitive::ComputeMinMaxUV (csVector2 &min, csVector2 &max) const
   {
     size_t index = triangle[0];
@@ -448,6 +523,7 @@ namespace lighter
   {
     // Reset current data
     elementAreas.DeleteAll ();
+    elementAreas.SetFullArea ((uFormVector % vFormVector).Norm());
 
     // Compute min/max uv
     uint uc, vc;
@@ -467,7 +543,7 @@ namespace lighter
       + uFormVector * d.x + vFormVector * d.y;
 
     // Set some default info
-    elementAreas.SetCapacity (uc * vc);
+    elementAreas.SetSize (uc * vc);
 
     // Create our splitplanes
     csPlane3 uCut (plane.Normal () % vFormVector);
@@ -494,6 +570,7 @@ namespace lighter
     csPlane3 evCut = vCut;
     csPoly3D elRow(4), rest(4);
     csPoly3D el(4), restRow (4);
+    size_t elNum = 0;
     for (uint v = 0; v  < vc; v++)
     {
       vCutOrigin += vFormVector;
@@ -530,7 +607,7 @@ namespace lighter
         }
 
         float elArea = el.GetArea ();
-        elementAreas.Push (elArea);
+        elementAreas.SetElementArea (elNum++, elArea);
 
       }
     }

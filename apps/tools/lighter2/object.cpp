@@ -383,7 +383,7 @@ namespace lighter
           uint vindex = v * mask.width;
           for (uint u = minu; u <= (uint)maxu; u++, findex++)
           {
-            const float elemArea = prim.GetElementAreas ()[findex];
+            const float elemArea = prim.GetElementAreas ().GetElementArea (findex);
             if (elemArea == 0) continue; // No area, skip
 
             mask.maskData[vindex+u] += elemArea * area2pixel; //Accumulate
