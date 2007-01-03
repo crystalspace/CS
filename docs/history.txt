@@ -12,6 +12,7 @@ chronological order.
 	- res augmented the genmesh loader to also take anim controls in
 	  objects: it loads the anim control factory, creates a single control,
 	  and sets that on the mesh object.
+	- res added a genmesh animation plugin for per-vertex PD lighting.
 2-Jan-2007
 	- res renamed 'imagetool' to 'csimagetool', as suggested by Eric
 	  (Since the pretty generic name 'imagetool' can easily collide with 
