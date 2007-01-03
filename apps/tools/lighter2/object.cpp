@@ -162,13 +162,15 @@ namespace lighter
   //-------------------------------------------------------------------------
 
   Object::Object (ObjectFactory* fact)
-    : lightPerVertex (fact->lightPerVertex), litColors (0), factory (fact)
+    : lightPerVertex (fact->lightPerVertex), litColors (0), litColorsPD (0), 
+      factory (fact)
   {
   }
   
   Object::~Object ()
   {
     delete litColors;
+    delete litColorsPD;
   }
 
   bool Object::Initialize ()
@@ -222,6 +224,7 @@ namespace lighter
       litColors = new LitColorArray();
       litColors->SetSize (vertexData.vertexArray.GetSize(), 
         csColor (0.0f, 0.0f, 0.0f));
+      litColorsPD = new LitColorsPDHash();
     }
 
     return true;
@@ -391,5 +394,15 @@ namespace lighter
 
   }
 
+  Object::LitColorArray* Object::GetLitColorsPD (Light* light)
+  {
+    LitColorArray* colors = litColorsPD->GetElementPointer (light);
+    if (colors != 0) return colors;
+
+    LitColorArray newArray;
+    newArray.SetSize (litColors->GetSize(), csColor (0));
+    litColorsPD->Put (light, newArray);
+    return litColorsPD->GetElementPointer (light);
+  }
 
 }

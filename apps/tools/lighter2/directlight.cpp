@@ -477,7 +477,8 @@ namespace lighter
       // Shade PD lights
       for (size_t pdli = 0; pdli < allPDLights.GetSize (); ++pdli)
       {
-        c += UniformShadeOneLight (sector, pos, normal, allPDLights[pdli],
+        Object::LitColorArray* pdlColors = obj->GetLitColorsPD (allPDLights[pdli]);
+        pdlColors->Get (i) += UniformShadeOneLight (sector, pos, normal, allPDLights[pdli],
           masterSampler, rt);
       }
     }

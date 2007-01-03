@@ -19,7 +19,10 @@
 #ifndef __OBJECT_H__
 #define __OBJECT_H__
 
+#include "csutil/hash.h"
+
 #include "primitive.h"
+#include "light.h"
 #include "lightmap.h"
 #include "lightmapuv.h"
 #include "csgeom/transfrm.h"
@@ -232,6 +235,13 @@ namespace lighter
     inline LitColorArray* GetLitColors ()
     { return litColors; }
 
+    typedef csHash<LitColorArray, csPtrKey<Light> > LitColorsPDHash;
+    /// Return lit colors for all PD lights
+    inline LitColorsPDHash* GetLitColorsPD ()
+    { return litColorsPD; }
+    /// Return lit colors for one PD light
+    LitColorArray* GetLitColorsPD (Light* light);
+
     inline const csFlags& GetFlags () const
     { return objFlags; }
 
@@ -247,8 +257,11 @@ namespace lighter
 
     // Vertex data for above, transformed
     ObjectVertexData vertexData;
+    //@{
     /// Lit colors (if object is lit per-vertex)
     LitColorArray* litColors;
+    LitColorsPDHash* litColorsPD;
+    //@}
 
     // Factory we where created from
     ObjectFactory* factory;
