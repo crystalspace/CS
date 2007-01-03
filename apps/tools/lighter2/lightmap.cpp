@@ -66,11 +66,6 @@ namespace lighter
     filename = fname;
     //write it out
 
-#ifndef DUMP_NORMALS
-    // 0.5 to account for the fact that the shader does *2
-    ApplyExposureFunction (1.8f, 0.5f); 
-#endif
-
     // first we downsample to LDR csRGBpixel RGBA
     csRGBpixel *pixelData = new csRGBpixel[width*height];
     for (uint i = 0; i < data->colorArraySize; i++)

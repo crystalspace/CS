@@ -44,7 +44,7 @@ namespace lighter
     kdTree = builder.BuildTree (objIt);
   }
 
-  Scene::Scene ()
+  Scene::Scene () : lightmapPostProc (this)
   {
   }
 
@@ -381,6 +381,10 @@ namespace lighter
         // Texture file name is relative to world file
         csVfsDirectoryChanger chdir (globalLighter->vfs);
         chdir.ChangeTo (fileInfo->directory);
+      #ifndef DUMP_NORMALS
+        lightmapPostProc.ApplyAmbient (lightmaps[i]);
+        lightmapPostProc.ApplyExposure (lightmaps[i]);
+      #endif
         lightmaps[i]->SaveLightmap (textureFilename);
       }
       SaveTexture savetex;
@@ -405,6 +409,9 @@ namespace lighter
           // Texture file name is relative to world file
           csVfsDirectoryChanger chdir (globalLighter->vfs);
           chdir.ChangeTo (fileInfo->directory);
+        #ifndef DUMP_NORMALS
+          lightmapPostProc.ApplyExposure (lm->Get (i));
+        #endif
           lm->Get (i)->SaveLightmap (textureFilename);
         }
         savetex.pdLightmapFiles.Push (textureFilename);
@@ -712,4 +719,43 @@ namespace lighter
       SaveMeshObjectToDom (node, sect, fileInfo);
     }
   }
+
+  //-------------------------------------------------------------------------
+
+  Scene::LightingPostProcessor::LightingPostProcessor (Scene* scene) : scene (scene)
+  {
+  }
+
+  void Scene::LightingPostProcessor::ApplyExposure (Lightmap* lightmap)
+  {
+    // 0.5 to account for the fact that the shader does *2
+    lightmap->ApplyExposureFunction (1.8f, 0.5f);
+  }
+
+  void Scene::LightingPostProcessor::ApplyExposure (csColor* colors, size_t numColors)
+  {
+    // @@@ ATM shader does *not* do *2 for vertex lighting
+    LightmapPostProcess::ApplyExposureFunction(colors, numColors, 1.8f, 1.0f);
+  }
+  
+  void Scene::LightingPostProcessor::ApplyAmbient (Lightmap* lightmap)
+  {
+    //if (!<indirect lighting enabled>)
+    {
+      csColor amb;
+      globalLighter->engine->GetAmbientLight (amb);
+      lightmap->AddAmbientTerm (amb);
+    }
+  }
+
+  void Scene::LightingPostProcessor::ApplyAmbient (csColor* colors, size_t numColors)
+  {
+    //if (!<indirect lighting enabled>)
+    {
+      csColor amb;
+      globalLighter->engine->GetAmbientLight (amb);
+      LightmapPostProcess::AddAmbientTerm (colors, numColors, amb);
+    }
+  }
+
 }

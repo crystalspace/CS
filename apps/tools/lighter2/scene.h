@@ -122,6 +122,37 @@ namespace lighter
     Lightmap* GetLightmap (uint lightmapID, Light* light);
 
     csArray<LightmapPtrDelArray*> GetAllLightmaps ();
+
+    /**
+     * Helper class to perform some lightmap postprocessing
+     * (exposure + ambient term).
+     */
+    class LightingPostProcessor
+    {
+    private:
+      friend class Scene;
+      Scene* scene;
+
+      LightingPostProcessor (Scene* scene);
+    public:
+      //@{
+      /// Apply exposure function
+      void ApplyExposure (Lightmap* lightmap);
+      void ApplyExposure (csColor* colors, size_t numColors);
+      //@}
+
+      //@{
+      /**
+       * Apply ambient term.
+       * Ambient may be a hack to approximate indirect lighting, but then, 
+       * as long as that is not supported, or disabled by the user later on, 
+       * ambient can still serve a purpose.
+       */
+      void ApplyAmbient (Lightmap* lightmap);
+      void ApplyAmbient (csColor* colors, size_t numColors);
+      //@}
+    };
+    LightingPostProcessor lightmapPostProc;
   protected:
     
     //  factories

@@ -377,9 +377,12 @@ namespace lighter
       csRef<csRenderBuffer> colorsBuffer = csRenderBuffer::CreateRenderBuffer (
         vertexData.vertexArray.GetSize(), CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 3);
       genMesh->AddRenderBuffer ("colors", colorsBuffer);
-      // @@@ FIXME: Use global options, when we have them
-      LightmapPostProcess::ApplyExposureFunction (litColors->GetArray(),
-        vertexData.vertexArray.GetSize(), 1.8f, 1.0f); 
+
+      scene->lightmapPostProc.ApplyAmbient (litColors->GetArray(),
+        vertexData.vertexArray.GetSize()); 
+      scene->lightmapPostProc.ApplyExposure (litColors->GetArray(),
+        vertexData.vertexArray.GetSize()); 
+
       colorsBuffer->CopyInto (litColors->GetArray(),
         vertexData.vertexArray.GetSize());
     }
@@ -474,9 +477,8 @@ namespace lighter
         lightChild->SetValue ("light");
         lightChild->SetAttribute ("lightid", light->GetLightID().HexString());
 
-        // @@@ FIXME: Use global options, when we have them
-        LightmapPostProcess::ApplyExposureFunction (colors.GetArray(), 
-          colors.GetSize(), 1.8f, 1.0f); 
+        scene->lightmapPostProc.ApplyExposure (colors.GetArray(),
+          colors.GetSize()); 
 
         csRef<iRenderBuffer> colorsBuf = 
           csRenderBuffer::CreateRenderBuffer (colors.GetSize(), 
