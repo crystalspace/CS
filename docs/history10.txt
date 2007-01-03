@@ -6,6 +6,8 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+3-Jan-2007
+	- res merged r26160 into 1.0 (VC build docs tweak).
 2-Jan-2007
 	- res bumped the version number back to 1.0rc2.
 	- res merged r26124, r26145 into 1.0 (event system docs).
