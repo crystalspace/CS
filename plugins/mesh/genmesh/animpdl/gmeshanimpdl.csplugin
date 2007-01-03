@@ -5,7 +5,7 @@
     <classes>
       <class>
         <name>crystalspace.mesh.anim.pdlight</name>
-        <implementation>csGenmeshAnimationPDLType</implementation>
+        <implementation>GenmeshAnimationPDLType</implementation>
         <description>Crystal Space Genmesh animation plugin for PD lights</description>
       </class>
     </classes>
