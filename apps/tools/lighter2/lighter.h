@@ -38,9 +38,6 @@ namespace lighter
     // Initialize and load plugins we want
     bool Initialize ();
 
-    // Cleanup and prepare for shutdown
-    void CleanUp ();
-
     // Do the fancy lighting
     bool LightEmUp ();
 
@@ -61,6 +58,9 @@ namespace lighter
     csRef<iStringSet> strings;
 
   protected:
+    // Cleanup and prepare for shutdown
+    void CleanUp ();
+
     // Parse the commandline and load any files specified
     bool LoadFiles ();
 
