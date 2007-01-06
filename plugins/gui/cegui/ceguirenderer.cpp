@@ -417,6 +417,30 @@ csVector4 csCEGUIRenderer::ColorToCS (const CEGUI::colour& col) const
   return color;
 }
 
+/// Allow CEGUI to capture mouse events.
+void csCEGUIRenderer::EnableMouseCapture ()
+{
+  events->EnableMouseCapture ();
+}
+
+/// Keep CEGUI from capturing mouse events.
+void csCEGUIRenderer::DisableMouseCapture ()
+{
+  events->DisableMouseCapture ();
+}
+
+/// Allow CEGUI to capture keyboard events.
+void csCEGUIRenderer::EnableKeyboardCapture ()
+{
+  events->EnableKeyboardCapture ();
+}
+
+/// Keep CEGUI from capturing keyboard events.
+void csCEGUIRenderer::DisableKeyboardCapture ()
+{
+  events->DisableKeyboardCapture ();
+}
+
 // TODO add description
 void csCEGUIRenderer::setDisplaySize (const CEGUI::Size& sz)
 {
