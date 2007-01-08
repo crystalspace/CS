@@ -268,31 +268,50 @@ namespace lighter
   bool Raytracer::TraceAnyHit (const KDTree* tree, const Ray &ray, 
     HitPoint& hit, HitIgnoreCallback* ignoreCB)
   {
+    HitCallbackNone hitCB;
     if (ignoreCB)
-      return TraceFunction<true> (tree, ray, hit, HitCallbackNone (), IgnoreCallbackObj (ignoreCB));
+    {
+      IgnoreCallbackObj ignCB (ignoreCB);
+      return TraceFunction<true> (tree, ray, hit, hitCB, ignCB);
+    }
     else
-      return TraceFunction<true> (tree, ray, hit, HitCallbackNone (), IgnoreCallbackNone ());
+    {
+      IgnoreCallbackNone ignCB;
+      return TraceFunction<true> (tree, ray, hit, hitCB, ignCB);
+    }
   }
 
   bool Raytracer::TraceClosestHit (const KDTree* tree, const Ray &ray, 
     HitPoint &hit, HitIgnoreCallback* ignoreCB) 
   {
+    HitCallbackNone hitCB;
     if (ignoreCB)
-      return TraceFunction<false> (tree, ray, hit, HitCallbackNone (), IgnoreCallbackObj (ignoreCB));
+    {
+      IgnoreCallbackObj ignCB (ignoreCB);
+      return TraceFunction<false> (tree, ray, hit, hitCB, ignCB);
+    }
     else
-      return TraceFunction<false> (tree, ray, hit, HitCallbackNone (), IgnoreCallbackNone ());;
+    {
+      IgnoreCallbackNone ignCB;
+      return TraceFunction<false> (tree, ray, hit, hitCB, ignCB);;
+    }
   }
 
   void Raytracer::TraceAllHits (const KDTree* tree, const Ray &ray, 
     HitPointCallback* hitCallback, HitIgnoreCallback* ignoreCB)
   {
+    HitCallbackObj hitCB (hitCallback);
     HitPoint hit;
     if (ignoreCB)
-      TraceFunction<false> (tree, ray, hit, HitCallbackObj (hitCallback), 
-        IgnoreCallbackObj (ignoreCB));
+    {
+      IgnoreCallbackObj ignCB (ignoreCB);
+      TraceFunction<false> (tree, ray, hit, hitCB, ignCB);
+    }
     else
-      TraceFunction<false> (tree, ray, hit, HitCallbackObj (hitCallback), 
-        IgnoreCallbackNone ());
+    {
+      IgnoreCallbackNone ignCB;
+      TraceFunction<false> (tree, ray, hit, hitCB, ignCB);
+    }
   }
 }
 

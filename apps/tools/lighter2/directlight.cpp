@@ -442,7 +442,7 @@ namespace lighter
   {
     // Some variables..
     VisibilityTester visTester;
-    float lightPdf, cosineTerm = 0;
+    float lightPdf/*, cosineTerm = 0*/;
     csVector3 lightVec;
 
     float lightSamples[2];

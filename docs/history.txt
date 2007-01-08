@@ -10,6 +10,7 @@ chronological order.
 	- Marten did various optimizations and cleanups in lighter2.
 	- Marten made sure the core parts of lighter2 are thread safe to
 	  later make it mutli-threaded.
+	- res fixed some gcc compiler errors and warnings in lighter2.
 7-Jan-2007
 	- David Bronke fixed the windows joystick plugin and corrected his
 	  previous history.txt entry.
