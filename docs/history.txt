@@ -6,6 +6,12 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+7-Jan-2007
+	- David Bronke fixed the windows joystick plugin and corrected his
+	  previous history.txt entry.
+6-Jan-2007
+	- David Bronke added functions to iCEGUI to enable and disable
+	  capturing of mouse and keyboard input events.
 4-Jan-2007
 	- res made lighter2 add an ambient term to the lightmaps.
 	- res moved lighter2's cleanup code from an explicitly called method
@@ -15,8 +21,6 @@ chronological order.
 	- res changed the way lighter2 stores element areas to take less
 	  memory. Now, a bit array stores whether an element is empty or full,
 	  and only the area of neither empty not full elements is stored.
-	- David Bronke added functions to iCEGUI to enable and disable
-	  capturing of mouse and keyboard input events.
 3-Jan-2007
 	- res tweaked ptpdlight to not store light IDs as hex strings
 	  internally but as raw data.
