@@ -26,25 +26,22 @@
 namespace lighter
 {
   class KDTree;
+  class Scene;
+  class Sector;
 
-  // A lightsource
-  class Light_old : public csRefCount
+  class Portal : public csRefCount
   {
   public:
-    csVector3 position;
-    csColor color;
-    csLightAttenuationMode attenuation;
-    csVector3 attenuationConsts;
-    bool pseudoDynamic;
-    csMD5::Digest lightId;
+    Portal ()
+    {}
 
-    csColor freeEnergy;
-
-    csBox3 boundingBox;
+    Sector* sourceSector;
+    Sector* destSector;
+    csReversibleTransform wrapTransform;
+    Vector3DArray worldVertices;
+    csPlane3 portalPlane;
   };
-  typedef csRefArray<Light_old> LightOldRefArray;
-
-  class Scene;
+  typedef csRefArray<Portal> PortalRefArray;
 
   // Representation of sector in our local setup
   class Sector : public csRefCount
@@ -65,14 +62,14 @@ namespace lighter
     // All objects in sector
     ObjectHash allObjects;
 
-    // All lightsources (old)
-    LightOldRefArray allLightsOld;
-
     // All light sources (no PD lights)
     LightRefArray allNonPDLights;
 
     // All PD light sources
     LightRefArray allPDLights;
+
+    // All portals in sector
+    PortalRefArray allPortals;
 
     // KD-tree of all primitives in sector
     KDTree *kdTree;
@@ -160,6 +157,8 @@ namespace lighter
  
     // All sectors
     SectorHash sectors;
+    typedef csHash<Sector*, csPtrKey<iSector> > SectorOrigSectorHash;
+    SectorOrigSectorHash originalSectorHash;
 
     LightmapPtrDelArray lightmaps;
     typedef csHash<LightmapPtrDelArray*, csPtrKey<Light> > PDLightmapsHash;
@@ -199,6 +198,7 @@ namespace lighter
     
     // Load functions
     void ParseSector (iSector *sector);
+    void ParsePortals (iSector *srcSect, Sector* sector);
     enum MeshParseResult
     {
       Failure, Success, NotAGenMesh
@@ -206,6 +206,7 @@ namespace lighter
     MeshParseResult ParseMesh (Sector *sector, iMeshWrapper *mesh);
     MeshParseResult ParseMeshFactory (iMeshFactoryWrapper *factory, 
       ObjectFactory*& radFact);
+    void PropagateLight (Light* light, const csFrustum& lightFrustum);
 
   };
 }

@@ -33,6 +33,7 @@ namespace lighter
   class LightmapUVObjectLayouter;
   class Object;
   class Scene;
+  class Light;
 
   enum ObjectFlags
   {

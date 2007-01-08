@@ -23,6 +23,8 @@
 
 namespace lighter
 {
+  RaytraceCore globalRaycore;
+
   MailboxHash::MailboxHash ()
     : rayID (1)
   {
@@ -31,286 +33,22 @@ namespace lighter
     memset (hash, 0, sizeof (HashEntry) * HASH_SIZE);
   }
 
+
   MailboxHash::~MailboxHash ()
   {
     CS::Memory::AlignedFree (hash);
   }
 
-  Raytracer::Raytracer (KDTree *tree)
-    : tree (tree)
+  RaytraceState::RaytraceState ()
+    : traversalStackPtr (0)
   {
-    traversalStack = static_cast<kdTraversalS*> (CS::Memory::AlignedMalloc (
-      sizeof (kdTraversalS) * MAX_STACK_DEPTH, 32));
+    traversalStack = static_cast<KDTraversalNode*> (CS::Memory::AlignedMalloc (
+      sizeof (KDTraversalNode) * MAX_STACK_DEPTH, 32));
   }
 
-  Raytracer::~Raytracer ()
+  RaytraceState::~RaytraceState ()
   {
     CS::Memory::AlignedFree (traversalStack);
-  }
-
-  class IgnoreNone
-  {
-  public:
-    IgnoreNone () {}
-
-    bool Ignore (const Primitive* prim) const
-    {
-      return false;
-    }
-    void RegisterHit (const Primitive* prim) {}
-  };
-
-  class IgnorePrimitive
-  {
-    const Primitive* prim;
-  public:
-    IgnorePrimitive (const Primitive* prim) : prim (prim) {}
-
-    bool Ignore (const Primitive* prim) const
-    {
-      return this->prim == prim;
-    }
-    void RegisterHit (const Primitive* prim) {}
-  };
-
-  class IgnoreCallback
-  {
-    HitIgnoreCallback* cb;
-  public:
-    IgnoreCallback (HitIgnoreCallback* cb) : cb (cb) {}
-
-    bool Ignore (const Primitive* prim) const
-    {
-      return cb->Ignore (prim);
-    }
-    void RegisterHit (const Primitive* prim)
-    {
-      cb->RegisterHit (prim);
-    }
-  };
-
-  enum 
-  {
-    TraverseHit      = 0x1,
-    TraverseFinished = 0x2
-  };
-
-  template<bool exitFirstHit, class IgnoreTest>
-  class KDTTraverser
-  {
-    Raytracer& raytracer;
-    const Ray& ray;
-    IgnoreTest& ignore;
-    float tmin, tmax;
-
-    KDTreeNode* node;
-
-    size_t nodeOffset[3][2];
-    csVector3 invD;
-    size_t traversalStackPtr;
-    Raytracer::kdTraversalS* traversalStack;
-  public:
-    KDTTraverser (Raytracer& raytracer, const Ray& ray, 
-                  IgnoreTest& ignore) : 
-      raytracer (raytracer),  ray (ray), ignore (ignore),
-      tmin (ray.minLength), tmax (ray.maxLength), 
-      node (raytracer.tree->nodeList), traversalStackPtr (0), 
-      traversalStack (raytracer.traversalStack)
-    {
-      for (size_t dim = 0; dim < 3; ++dim)
-      {
-        if (ray.direction[dim] > 0)
-        {
-          nodeOffset[dim][0] = 0;
-          nodeOffset[dim][1] = 1;
-        }
-        else
-        {
-          nodeOffset[dim][0] = 1;
-          nodeOffset[dim][1] = 0;
-        }
-        invD[dim] = 1.0f / ray.direction[dim];
-      }
-    }
-
-    int Traverse (HitPoint& hit)
-    {
-      while (!KDTreeNode_Op::IsLeaf (node))
-      {
-        uint dim = KDTreeNode_Op::GetDimension (node);
-        //float thit = (node->inner.splitLocation - ray.origin[dim]) / ray.direction[dim];
-        float thit = (node->inner.splitLocation - ray.origin[dim]) * invD[dim];
-
-        csVector3 hitPoint = ray.origin + ray.direction * thit;
-
-        KDTreeNode *nearNode, *farNode, *leftNode;
-        leftNode = KDTreeNode_Op::GetLeft (node);
-
-        nearNode = leftNode + nodeOffset[dim][0];
-        farNode = leftNode + nodeOffset[dim][1];        
-
-        if (thit < tmin)
-        {
-          node = farNode;
-        }
-        else if (thit > tmax)
-        {
-          node = nearNode;
-        }
-        else
-        {
-          traversalStack[traversalStackPtr].node = farNode;
-          traversalStack[traversalStackPtr].tnear = thit;
-          traversalStack[traversalStackPtr].tfar = tmax;
-          traversalStackPtr++;
-          CS_ASSERT(traversalStackPtr < Raytracer::MAX_STACK_DEPTH);
-
-          node = nearNode;
-          tmax = thit;
-        }
-      }
-
-      int result = 0;
-      if (raytracer.IntersectPrimitives<exitFirstHit, IgnoreTest> (node, ray, hit, ignore))
-        result |= TraverseHit;
-
-      if (traversalStackPtr == 0)
-        result |= TraverseFinished;
-
-      traversalStackPtr--;
-      node = traversalStack[traversalStackPtr].node;
-      tmin = traversalStack[traversalStackPtr].tnear;
-      tmax = traversalStack[traversalStackPtr].tfar;
-
-      return result;
-    }
-  };
-
-  bool Raytracer::TraceAnyHit (const Ray &ray, HitPoint& hit, 
-                               HitIgnoreCallback* ignoreCB)
-  {
-    if (!tree || !tree->nodeList) return false;
-
-    //RaytraceProfiler prof(1);
-
-    //Copy and clip the ray
-    Ray myRay = ray;
-    if (!myRay.Clip (tree->boundingBox))
-      return false;
-
-    myRay.rayID = mailboxes.GetRayID ();
-    hit.distance = FLT_MAX*0.95f;
-
-    if (ignoreCB)
-    {
-      IgnoreCallback ignorer (ignoreCB);
-      KDTTraverser<true, IgnoreCallback> traverser (*this, myRay, ignorer);
-      while (true)
-      {
-        int result = traverser.Traverse (hit);
-        if (result & TraverseHit)
-          return true;
-        
-        if (result & TraverseFinished)
-          return false;
-      }
-    }
-    else if (ray.ignorePrimitive)
-    {
-      IgnorePrimitive ignorer (ray.ignorePrimitive);
-      KDTTraverser<true, IgnorePrimitive> traverser (*this, myRay, ignorer);
-      while (true)
-      {
-        int result = traverser.Traverse (hit);
-        if (result & TraverseHit)
-          return true;
-        
-        if (result & TraverseFinished)
-          return false;
-      }
-    }
-    else
-    {
-      IgnoreNone ignorer;
-      KDTTraverser<true, IgnoreNone> traverser (*this, myRay, ignorer);
-      while (true)
-      {
-        int result = traverser.Traverse (hit);
-        if (result & TraverseHit)
-          return true;
-        
-        if (result & TraverseFinished)
-          return false;
-      }
-    }
-
-    return true;
-  }
-
-  bool Raytracer::TraceClosestHit (const Ray &ray, HitPoint &hit, 
-                                   HitIgnoreCallback* ignoreCB)
-  {
-    if (!tree || !tree->nodeList) return false;
-
-    //RaytraceProfiler prof(1);
-
-    //Copy and clip the ray
-    Ray myRay = ray;
-    if (!myRay.Clip (tree->boundingBox))
-      return false;
-
-    myRay.rayID = mailboxes.GetRayID ();
-    float tmin (myRay.minLength), tmax (myRay.maxLength);
-
-    KDTreeNode* node = tree->nodeList;
-
-    hit.distance = FLT_MAX*0.95f;
-
-    bool haveAnyHit = false;
-    if (ignoreCB)
-    {
-      IgnoreCallback ignorer (ignoreCB);
-      KDTTraverser<false, IgnoreCallback> traverser (*this, myRay, ignorer);
-      while (true)
-      {
-        int result = traverser.Traverse (hit);
-        if (result & TraverseHit)
-          haveAnyHit = true;
-        
-        if (result & TraverseFinished)
-          return haveAnyHit;
-      }
-    }
-    else if (ray.ignorePrimitive)
-    {
-      IgnorePrimitive ignorer (ray.ignorePrimitive);
-      KDTTraverser<false, IgnorePrimitive> traverser (*this, myRay, ignorer);
-      while (true)
-      {
-        int result = traverser.Traverse (hit);
-        if (result & TraverseHit)
-          haveAnyHit = true;
-        
-        if (result & TraverseFinished)
-          return haveAnyHit;
-      }
-    }
-    else
-    {
-      IgnoreNone ignorer;
-      KDTTraverser<false, IgnoreNone> traverser (*this, myRay, ignorer);
-      while (true)
-      {
-        int result = traverser.Traverse (hit);
-        if (result & TraverseHit)
-          haveAnyHit = true;
-        
-        if (result & TraverseFinished)
-          return haveAnyHit;
-      }
-    }
-
-    return haveAnyHit;
   }
 
   static const uint mod5[] = {0,1,2,0,1};
@@ -359,9 +97,9 @@ namespace lighter
     return true;
   }
 
-  template<bool exitFirstHit, class IgnoreTest>
-  bool Raytracer::IntersectPrimitives (const KDTreeNode* node, const Ray &ray, 
-    HitPoint &hit, IgnoreTest& ignoreTest)
+  template<bool ExitFirstHit, typename HitCallback, typename HitIgnore>
+  static bool IntersectPrimitives (const KDTreeNode* node, const Ray &ray, 
+    HitPoint &hit, RaytraceState& state, HitCallback& hitCB, HitIgnore& ignoreCB)
   {
     size_t nIdx, nMax;
     nMax = KDTreeNode_Op::GetPrimitiveListSize (node);;
@@ -376,19 +114,18 @@ namespace lighter
     {
       KDTreePrimitive* prim = primList + nIdx;
 
-      if (ignoreTest.Ignore (prim->primPointer)
-        || mailboxes.PutPrimitiveRay (prim->primPointer, ray.rayID))
-        continue;
-
-      if (ray.ignoreFlags & (prim->normal_K & KDPRIM_FLAG_MASK))
+      if (ignoreCB (prim->primPointer) ||
+        ray.ignorePrimitive == prim->primPointer ||
+        state.mailbox.PutPrimitiveRay (prim->primPointer, ray.rayID))
         continue;
 
       haveHit = IntersectPrimitiveRay (*prim, ray, thisHit);
       if (haveHit)
       {
-        ignoreTest.RegisterHit (prim->primPointer);
+        hitCB (ray, thisHit);
+
         haveAnyHit = true;
-        if (exitFirstHit) 
+        if (ExitFirstHit) 
         {
           hit = thisHit;
           return true;
@@ -399,6 +136,163 @@ namespace lighter
     }
 
     return haveAnyHit;
+  }
+
+  // Generic traversal function
+
+  template<bool ExitFirstHit, typename HitCallback, typename HitIgnore>
+  static bool TraceFunction (const KDTree* tree, const Ray& ray, HitPoint& hit, 
+    HitCallback& hitCB, HitIgnore& ignoreCB)
+  {
+    if (!tree || !tree->nodeList) 
+      return false;
+
+    RaytraceProfiler prof (1);
+
+    //Copy and clip the ray
+    Ray myRay = ray;
+    if (!myRay.Clip (tree->boundingBox))
+      return false;
+
+    // Get a state object
+    RaytraceState& state = globalRaycore.GetRaytraceState ();
+
+    state.SetupState (myRay);
+    float tmin (myRay.minLength), tmax (myRay.maxLength);
+
+    KDTreeNode* node = tree->nodeList;
+
+    enum 
+    {
+      HaveHit = 0x01,
+      TraversalFinished = 0x02
+    };
+
+    size_t traversalState = 0;
+
+    while (!(traversalState & TraversalFinished))
+    {
+      while (!KDTreeNode_Op::IsLeaf (node))
+      {
+        uint dim = KDTreeNode_Op::GetDimension (node);
+        //float thit = (node->inner.splitLocation - ray.origin[dim]) / ray.direction[dim];
+        const float thit = (node->inner.splitLocation - ray.origin[dim]) * state.invD[dim];
+
+        const csVector3 hitPoint = myRay.origin + myRay.direction * thit;
+
+        KDTreeNode *nearNode, *farNode, *leftNode;
+        leftNode = KDTreeNode_Op::GetLeft (node);
+
+        state.GetNewNodes (leftNode, dim, nearNode, farNode);
+
+        if (thit < tmin)
+        {
+          node = farNode;
+        }
+        else if (thit > tmax)
+        {
+          node = nearNode;
+        }
+        else
+        {
+          state.PutNode (farNode, thit, tmax);
+
+          node = nearNode;
+          tmax = thit;
+        }
+      }
+
+      if (IntersectPrimitives<ExitFirstHit, HitCallback, HitIgnore> 
+        (node, myRay, hit, state, hitCB, ignoreCB))
+      {
+        traversalState |= HaveHit;
+
+        if (ExitFirstHit)
+          traversalState |= TraversalFinished;
+      }
+
+      if (!state.GetNode (node, tmin, tmax))
+        traversalState |= TraversalFinished;
+    }
+
+    return traversalState & HaveHit;
+  }
+
+  // Hit callback functors
+  struct HitCallbackNone 
+  {
+    CS_FORCEINLINE void operator () (const Ray& ray, const HitPoint& hit)
+    {}
+  };
+
+  struct HitCallbackObj
+  {
+    HitCallbackObj (HitPointCallback* hitCallback)
+      : cb (hitCallback)
+    {}
+
+    CS_FORCEINLINE void operator () (const Ray& ray, const HitPoint& hit)
+    {
+      cb->RegisterHit (ray, hit);
+    }
+
+    HitPointCallback* cb;
+  };
+
+  // Hit ignore functors
+  struct IgnoreCallbackNone
+  {
+    CS_FORCEINLINE bool operator () (const Primitive* prim)
+    {
+      return false;
+    }
+  };
+
+  struct IgnoreCallbackObj
+  {
+    IgnoreCallbackObj (HitIgnoreCallback* cb)
+      : cb (cb)
+    {}
+
+    CS_FORCEINLINE bool operator () (const Primitive* prim)
+    {
+      return cb->IgnoreHit (prim);
+    }
+
+    HitIgnoreCallback* cb;
+  };
+
+
+  //-- Primary ray trace functions
+
+  bool Raytracer::TraceAnyHit (const KDTree* tree, const Ray &ray, 
+    HitPoint& hit, HitIgnoreCallback* ignoreCB)
+  {
+    if (ignoreCB)
+      return TraceFunction<true> (tree, ray, hit, HitCallbackNone (), IgnoreCallbackObj (ignoreCB));
+    else
+      return TraceFunction<true> (tree, ray, hit, HitCallbackNone (), IgnoreCallbackNone ());
+  }
+
+  bool Raytracer::TraceClosestHit (const KDTree* tree, const Ray &ray, 
+    HitPoint &hit, HitIgnoreCallback* ignoreCB) 
+  {
+    if (ignoreCB)
+      return TraceFunction<false> (tree, ray, hit, HitCallbackNone (), IgnoreCallbackObj (ignoreCB));
+    else
+      return TraceFunction<false> (tree, ray, hit, HitCallbackNone (), IgnoreCallbackNone ());;
+  }
+
+  void Raytracer::TraceAllHits (const KDTree* tree, const Ray &ray, 
+    HitPointCallback* hitCallback, HitIgnoreCallback* ignoreCB)
+  {
+    HitPoint hit;
+    if (ignoreCB)
+      TraceFunction<false> (tree, ray, hit, HitCallbackObj (hitCallback), 
+        IgnoreCallbackObj (ignoreCB));
+    else
+      TraceFunction<false> (tree, ray, hit, HitCallbackObj (hitCallback), 
+        IgnoreCallbackNone ());
   }
 }
 

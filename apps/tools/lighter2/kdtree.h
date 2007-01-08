@@ -19,8 +19,6 @@
 #ifndef __KDTREE_H__
 #define __KDTREE_H__
 
-#include "object.h"
-
 // For debugging:
 //#define KDTREE_ASSERT(x)    CS_ASSERT(x)
 // For a tad more speed:
@@ -29,6 +27,7 @@
 namespace lighter
 {
   class Primitive;
+  class Object;
 
   enum
   {
@@ -212,7 +211,7 @@ namespace lighter
     /*
     Take an object iterator and build a kd-tree from that
     */
-    KDTree* BuildTree (ObjectHash::GlobalIterator& objects);
+    KDTree* BuildTree (csHash<csRef<Object>, csString>::GlobalIterator& objects);
 
 
   private:
@@ -390,7 +389,7 @@ namespace lighter
       KDNode *leftChild, *rightChild;
 
       // Primitives
-      PrimitivePtrArray primitives;
+      csArray<Primitive*> primitives;
 
       KDNode()
         : splitDimension(0), splitLocation(0.0f), leftChild(0), rightChild(0)
@@ -413,7 +412,7 @@ namespace lighter
     size_t numPrimitives;
 
     //Private functions
-    bool SetupEndpoints (ObjectHash::GlobalIterator& objects);
+    bool SetupEndpoints (csHash<csRef<Object>, csString>::GlobalIterator& objects);
     bool BuildKDNodeRecursive (EndPointList* epList, KDNode* node, 
       csBox3 aabb, size_t numPrim, size_t treeDepth);
     KDTree* SetupRealTree (KDNode* rootNode);
@@ -427,7 +426,7 @@ namespace lighter
 
     // Collect all primitives within given AABB
     static bool CollectPrimitives (const KDTree *tree, 
-      PrimitivePtrArray& primArray, const csBox3& overlapAABB);
+      csArray<Primitive*>& primArray, const csBox3& overlapAABB);
 
   private:
     KDTreeHelper ();
@@ -435,7 +434,7 @@ namespace lighter
 
     // Traverse a node, collect any prims within AABB
     static void CollectPrimitives (const KDTree *tree, const KDTreeNode* node, 
-      csBox3 currentBox, PrimitivePtrSet& outPrims, const csBox3& overlapAABB);
+      csBox3 currentBox, csSet<Primitive*>& outPrims, const csBox3& overlapAABB);
   };
 
 }

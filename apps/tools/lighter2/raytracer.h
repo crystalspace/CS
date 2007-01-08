@@ -20,12 +20,12 @@
 #define __RAYTRACER_H__
 
 #include "statistics.h"
-#include "primitive.h"
+//#include "primitive.h"
+#include "kdtree.h"
 
 namespace lighter
 {
   class KDTree;
-  union KDTreeNode;
   struct KDTreePrimitive;
   class Primitive;
 
@@ -127,17 +127,17 @@ namespace lighter
   // Hitpoint returned by the raytracer
   struct HitPoint
   {
-    // The primitive we hit
-    Primitive *primitive;
-
     // Distance along ray (t)
     float distance;
 
     // Hitpoint (world coordinates)
     csVector3 hitPoint;
 
+    // The primitive we hit
+    Primitive *primitive;
+
     HitPoint ()
-      : primitive (0), distance (0), hitPoint (0,0,0)
+      : distance (0), hitPoint (0,0,0), primitive (0)
     {}
 
     bool operator< (const HitPoint& o)
@@ -145,6 +145,21 @@ namespace lighter
       return distance < o.distance;
     }
   };
+
+  struct HitPointCallback
+  {
+    virtual ~HitPointCallback () {}
+
+    virtual void RegisterHit (const Ray &ray, const HitPoint &hit) = 0;
+  };
+
+  struct HitIgnoreCallback
+  {
+    virtual ~HitIgnoreCallback () {}
+
+    virtual bool IgnoreHit (const Primitive* prim) = 0;
+  };
+
 
   class MailboxHash
   {
@@ -190,56 +205,73 @@ namespace lighter
     HashEntry* hash;
   };
 
-  template<bool exitFirstHit, class IgnoreTest> class KDTTraverser;
-
-  class HitIgnoreCallback
+  struct RaytraceState
   {
-  public:
-    virtual ~HitIgnoreCallback() {}
+    RaytraceState ();
+    ~RaytraceState ();
 
-    virtual bool Ignore (const Primitive* prim) const = 0;
-    virtual void RegisterHit (const Primitive* prim) = 0;
-  };
+    // Setup some state data
+    CS_FORCEINLINE void SetupState (Ray& ray)
+    {
+      traversalStackPtr = 0;
 
-  class Raytracer
-  {
-  public:
-    Raytracer (KDTree *tree);
+      for (size_t dim = 0; dim < 3; ++dim)
+      {
+        if (ray.direction[dim] > 0)
+        {
+          nodeOffset[dim][0] = 0;
+          nodeOffset[dim][1] = 1;
+        }
+        else
+        {
+          nodeOffset[dim][0] = 1;
+          nodeOffset[dim][1] = 0;
+        }
+        invD[dim] = 1.0f / ray.direction[dim];
+      }
 
-    ~Raytracer ();
+      ray.rayID = mailbox.GetRayID ();
+    }
 
-    /**
-     * Raytrace until there is any hit.
-     * This might not be the closest hit so it is faster but not suitable
-     * for all kind of calculations.
-     */
-    bool TraceAnyHit (const Ray &ray, HitPoint &hit, 
-      HitIgnoreCallback* ignoreCB = 0);
+    // Stack handling
+    CS_FORCEINLINE void PutNode (KDTreeNode* node, float tnear, float tfar)
+    {
+      traversalStack[traversalStackPtr].node = node;
+      traversalStack[traversalStackPtr].tnear = tnear;
+      traversalStack[traversalStackPtr].tfar = tfar;
+      traversalStackPtr++;
+      CS_ASSERT(traversalStackPtr < MAX_STACK_DEPTH);
+    }
 
-    /**
-     * Raytrace for closest hit. 
-     */
-    bool TraceClosestHit (const Ray &ray, HitPoint &hit, 
-      HitIgnoreCallback* ignoreCB = 0);
+    CS_FORCEINLINE bool GetNode (KDTreeNode*& node, float& tnear, float& tfar)
+    {
+      if (traversalStackPtr == 0)
+        return false;
 
-  protected:
-    template<bool exitFirstHit, class IgnoreTest> friend class KDTTraverser;
+      traversalStackPtr--;
+      node = traversalStack[traversalStackPtr].node;
+      tnear = traversalStack[traversalStackPtr].tnear;
+      tfar = traversalStack[traversalStackPtr].tfar;
+      return true;
+    }
 
-    /// Traverse all primitives in a given node and do intersection against them
-    template<bool exitFirstHit, class IgnoreTest>
-    bool IntersectPrimitives (const KDTreeNode* node, const Ray &ray, 
-      HitPoint &hit, IgnoreTest& ignoreTest);
-
-    KDTree *tree;
-
+    CS_FORCEINLINE void GetNewNodes (KDTreeNode* left, uint dim, 
+      KDTreeNode*& nearNode, KDTreeNode*& farNode)
+    {
+      nearNode = left + nodeOffset[dim][0];
+      farNode = left + nodeOffset[dim][1];
+    }
 
     enum
     {
       MAX_STACK_DEPTH = 64
     };
 
+    // Data
+    MailboxHash mailbox;
+
     // Helperstruct for kd traversal
-    struct kdTraversalS
+    struct KDTraversalNode
     {
       KDTreeNode *node;
 #if (CS_PROCESSOR_SIZE == 32)
@@ -247,102 +279,57 @@ namespace lighter
 #endif
       float tnear, tfar;
     };
-    kdTraversalS* traversalStack;
+    size_t traversalStackPtr;
+    KDTraversalNode* traversalStack;
 
-    MailboxHash mailboxes;
+    size_t nodeOffset[3][2];
+    csVector3 invD;
   };
 
-  /// Helper to profile raytracing
-  class RaytraceProfiler
+  class RaytraceCore
   {
   public:
-
-    RaytraceProfiler (uint numRays)
+    RaytraceState& GetRaytraceState ()
     {
-      startTime = csGetMicroTicks ();
-      globalStats.raytracer.numRays += numRays;
-    }
-
-    ~RaytraceProfiler ()
-    {
-      int64 endTime = csGetMicroTicks ();
-      int64 diffTime = endTime-startTime;
-      if(diffTime > 0)
-      {
-        globalStats.raytracer.usRaytracing += diffTime;
-      }
+      return rayState;
     }
 
   private:
-    int64 startTime;
+    // For now, only one, later we want per-thread state
+    RaytraceState rayState;
   };
+  extern RaytraceCore globalRaycore;
 
-  /// Helper for often-used ray tracing operations
-  class RaytraceFunctions
+  class Raytracer
   {
   public:
-    // Vistest rayhelpers
+    /**
+     * Raytrace until there is any hit.
+     * This might not be the closest hit so it is faster but not suitable
+     * for all kind of calculations.
+     */
+    static bool TraceAnyHit (const KDTree* tree, const Ray &ray, HitPoint &hit, 
+      HitIgnoreCallback* ignoreCB = 0);
 
-    static inline float Vistest1 (Raytracer& rt, const csVector3& viscenter,
-      const csVector3& endp)
+    /**
+     * Raytrace for closest hit. 
+     */
+    static bool TraceClosestHit (const KDTree* tree, const Ray &ray, 
+      HitPoint &hit, HitIgnoreCallback* ignoreCB = 0);    
+
+    /**
+     * Raytrace for all hits along a ray.
+     */
+    static void TraceAllHits (const KDTree* tree, const Ray &ray, 
+      HitPointCallback* hitCallback, HitIgnoreCallback* ignoreCB = 0);
+  };
+
+  class RaytraceProfiler
+  {
+  public:
+    RaytraceProfiler (uint numRays)
     {
-      // Perform a 1 point vistest
-
-      const csVector3& primP = viscenter;
-      const csVector3 dir = primP - endp;
-
-      Ray ray;
-      HitPoint hit;
-      ray.minLength = 0;
-      ray.maxLength = dir.Norm ();
-      ray.origin = endp;
-      ray.direction = dir / ray.maxLength;
-      ray.maxLength -= 0.001f;
-      return rt.TraceAnyHit (ray, hit) ? 0.0f : 1.0f;
-    }
-
-    static inline float Vistest5 (Raytracer& rt, const csVector3& viscenter,
-      const csVector3& visu, const csVector3& visv, const csVector3& endp,
-      const Primitive& prim)
-    {
-      // Perform a 5 point vistest
-
-      const csVector3 halfu = visu * 0.5f;
-      const csVector3 halfv = visv * 0.5f;
-
-      const csVector3 rayStarts[] = {
-        viscenter, 
-        viscenter + halfu + halfv,
-        viscenter + halfu - halfv,
-        viscenter - halfu + halfv,
-        viscenter - halfu - halfv
-      };
-
-      uint insideNum = 0;
-      uint hitNum = 0;
-      for (unsigned int i = 0; i < 5; i++)
-      {
-        const csVector3& primP = rayStarts[i];
-        const csVector3 dir = primP - endp;
-
-        Ray ray;
-        HitPoint hit;
-        ray.minLength = 0;
-        ray.maxLength = dir.Norm ();
-        ray.origin = endp;
-        ray.direction = dir / ray.maxLength;
-        ray.maxLength -= 0.001f;
-        // FIXME: Only do for actual "border lumels"
-        bool inside = prim.PointInside (primP);
-        bool hitAny = rt.TraceAnyHit (ray, hit);
-        if (inside)
-        {
-          insideNum++;
-          if (hitAny) hitNum++;
-        }
-      }
-      if (insideNum == 0) insideNum = 5;
-      return 1.0f-((float)hitNum/(float)insideNum);
+      globalStats.raytracer.numRays += numRays;
     }
   };
 }

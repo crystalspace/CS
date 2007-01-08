@@ -27,7 +27,37 @@
 
 namespace lighter
 {
-  bool PartialElementIgnoreCallback::Ignore (const Primitive* prim) const
+  class PartialElementIgnoreCallback : public HitIgnoreCallback,
+    public HitPointCallback
+  {
+  public:
+    PartialElementIgnoreCallback (const Primitive* originalPrim) 
+      : originalPrim (originalPrim), pass (0)
+    {
+    }
+
+    void SetSampleInside (bool inside)
+    {
+      this->inside = inside;
+    }
+    void SetPass2 () { pass = 1; }
+
+    virtual bool IgnoreHit (const Primitive* prim);
+    virtual void RegisterHit (const Ray &ray, const HitPoint &hit);
+
+    inline csSet<csConstPtrKey<Primitive> >& GetSet ()
+    {
+      return insideHits;
+    }
+
+  protected:
+    const Primitive* originalPrim;
+    bool inside;
+    csSet<csConstPtrKey<Primitive> > insideHits;
+    int pass;
+  };
+
+  bool PartialElementIgnoreCallback::IgnoreHit (const Primitive* prim)
   {
     const csPlane3& plane = originalPrim->GetPlane();
 
@@ -66,10 +96,10 @@ namespace lighter
     return false;
   }
 
-  void PartialElementIgnoreCallback::RegisterHit (const Primitive* prim)
+  void PartialElementIgnoreCallback::RegisterHit (const Ray &ray, const HitPoint &hit)
   {
     if (inside)
-      insideHits.Add (prim);
+      insideHits.Add (hit.primitive);
   }
 
   //-------------------------------------------------------------------------
@@ -84,6 +114,7 @@ namespace lighter
 
   DirectLighting::PVLPointShader DirectLighting::pvlPointShader = 0;
   DirectLighting::LMElementShader DirectLighting::lmElementShader = 0;
+  DirectLighting::LMElementCollectShadowPrims DirectLighting::lmElementCollect = 0;
 
   void DirectLighting::Initialize ()
   {
@@ -91,18 +122,20 @@ namespace lighter
     {
       pvlPointShader = UniformShadeRndLightNonPD;
       lmElementShader = UniformShadeRndLightNonPD;
+      lmElementCollect = CollectShadowRndLightNonPD;
     }
     else
     {
       pvlPointShader = UniformShadeAllLightsNonPD;
       lmElementShader = UniformShadeAllLightsNonPD;
+      lmElementCollect = CollectShadowAllLightsNonPD;
     }    
   }
 
   // Shade a single point in space with direct lighting
   csColor DirectLighting::UniformShadeAllLightsNonPD (Sector* sector, 
     const csVector3& point, const csVector3& normal, 
-    SamplerSequence<2>& lightSampler, Raytracer& rt)
+    SamplerSequence<2>& lightSampler)
   {
     csColor res (0);
     const LightRefArray& allLights = sector->allNonPDLights;
@@ -112,7 +145,7 @@ namespace lighter
       float rndValues[2];
       lightSampler.GetNext (rndValues);
 
-      res += ShadeLight (allLights[i], point, normal, rt, lightSampler);
+      res += ShadeLight (allLights[i], point, normal, lightSampler);
     }
 
     return res;
@@ -121,7 +154,7 @@ namespace lighter
   // Shade a single point in space with direct lighting using a single light
   csColor DirectLighting::UniformShadeRndLightNonPD (Sector* sector, 
     const csVector3& point, const csVector3& normal, 
-    SamplerSequence<2>& sampler, Raytracer& rt)
+    SamplerSequence<2>& sampler)
   {
     SamplerSequence<3> lightSampler (sampler);
 
@@ -134,13 +167,13 @@ namespace lighter
 
     size_t lightIdx = (size_t) floorf (allLights.GetSize () * rndValues[2]);
 
-    return ShadeLight (allLights[lightIdx], point, normal, rt, sampler) * 
+    return ShadeLight (allLights[lightIdx], point, normal, sampler) * 
       allLights.GetSize ();
   }
 
   // Shade a primitive element with direct lighting
   csColor DirectLighting::UniformShadeAllLightsNonPD (Sector* sector, 
-    ElementProxy element, SamplerSequence<2>& lightSampler, Raytracer& rt, 
+    ElementProxy element, SamplerSequence<2>& lightSampler, 
     PartialElementIgnoreCallback* ignoreCB)
   {
     csColor res (0);
@@ -165,14 +198,14 @@ namespace lighter
         ignoreCB->SetSampleInside (element.primitive.PointInside (pos));
         for (size_t i = 0; i < allLights.GetSize (); ++i)
         {
-          res += ShadeLight (allLights[i], pos, normal, rt, lightSampler, ignoreCB);
+          res += ShadeLight (allLights[i], pos, normal, lightSampler, ignoreCB);
         }
       }
       else
       {
         for (size_t i = 0; i < allLights.GetSize (); ++i)
         {
-          res += ShadeLight (allLights[i], pos, normal, rt, lightSampler, &element.primitive);
+          res += ShadeLight (allLights[i], pos, normal, lightSampler, &element.primitive);
         }
       }
     }
@@ -184,7 +217,7 @@ namespace lighter
 
   // Shade a primitive element with direct lighting using a single light
   csColor DirectLighting::UniformShadeRndLightNonPD (Sector* sector, 
-    ElementProxy element, SamplerSequence<2>& sampler, Raytracer& rt,
+    ElementProxy element, SamplerSequence<2>& sampler,
     PartialElementIgnoreCallback* ignoreCB)
   {
     SamplerSequence<3> lightSampler (sampler);
@@ -215,23 +248,23 @@ namespace lighter
       if (ignoreCB)
       {
         ignoreCB->SetSampleInside (element.primitive.PointInside (pos));
-        res += ShadeLight (allLights[lightIdx], pos, normal, rt, sampler, ignoreCB);
+        res += ShadeLight (allLights[lightIdx], pos, normal, sampler, ignoreCB);
       }
       else
-        res += ShadeLight (allLights[lightIdx], pos, normal, rt, sampler, &element.primitive);
+        res += ShadeLight (allLights[lightIdx], pos, normal, sampler, &element.primitive);
     }
 
     return res * 0.25f * allLights.GetSize ();
   }
 
   csColor DirectLighting::UniformShadeOneLight (Sector* sector, const csVector3& point, 
-    const csVector3& normal, Light* light, SamplerSequence<2>& sampler, Raytracer& rt)
+    const csVector3& normal, Light* light, SamplerSequence<2>& sampler)
   {
-    return ShadeLight (light, point, normal, rt, sampler);
+    return ShadeLight (light, point, normal, sampler);
   }
 
   csColor DirectLighting::UniformShadeOneLight (Sector* sector, ElementProxy element,
-    Light* light, SamplerSequence<2>& sampler, Raytracer& rt, 
+    Light* light, SamplerSequence<2>& sampler, 
     PartialElementIgnoreCallback* ignoreCB)
   {
     csColor res (0);
@@ -251,16 +284,16 @@ namespace lighter
       const csVector3 normal = element.primitive.ComputeNormal (pos);
 
       if (ignoreCB)
-        res += ShadeLight (light, pos, normal, rt, sampler, ignoreCB);
+        res += ShadeLight (light, pos, normal, sampler, ignoreCB);
       else
-        res += ShadeLight (light, pos, normal, rt, sampler, &element.primitive);
+        res += ShadeLight (light, pos, normal, sampler, &element.primitive);
     }
 
     return res * 0.25f;
   }
 
   csColor DirectLighting::ShadeLight (Light* light, const csVector3& point,
-    const csVector3& normal, Raytracer& rt, SamplerSequence<2>& lightSampler,
+    const csVector3& normal, SamplerSequence<2>& lightSampler,
     const Primitive* shadowIgnorePrimitive)
   {
     // Some variables..
@@ -278,7 +311,7 @@ namespace lighter
       (cosineTerm = normal * lightVec) > 0)
     {
       //@@TODO add material...
-      if (visTester.Unoccluded (rt, shadowIgnorePrimitive))
+      if (visTester.Unoccluded (shadowIgnorePrimitive))
       {
         if (light->IsDeltaLight ())
           return lightColor * fabsf (cosineTerm) / lightPdf;
@@ -292,7 +325,7 @@ namespace lighter
   }
 
   csColor DirectLighting::ShadeLight (Light* light, const csVector3& point,
-    const csVector3& normal, Raytracer& rt, SamplerSequence<2>& lightSampler,
+    const csVector3& normal, SamplerSequence<2>& lightSampler,
     PartialElementIgnoreCallback* ignoreCB)
   {
     // Some variables..
@@ -310,7 +343,7 @@ namespace lighter
       (cosineTerm = normal * lightVec) > 0)
     {
       //@@TODO add material...
-      if (visTester.Unoccluded (rt, ignoreCB))
+      if (visTester.Unoccluded (ignoreCB))
       {
         if (light->IsDeltaLight ())
           return lightColor * fabsf (cosineTerm) / lightPdf;
@@ -323,12 +356,109 @@ namespace lighter
     return csColor (0,0,0);
   }
 
+  void DirectLighting::CollectShadowAllLightsNonPD(Sector* sector, ElementProxy element,
+    SamplerSequence<2>& lightSampler, PartialElementIgnoreCallback* ignoreCB,
+    csSet<csConstPtrKey<Primitive> > &primitives)
+  {
+    const LightRefArray& allLights = sector->allNonPDLights;
 
+    // Get some data
+    const csVector3& uVec = element.primitive.GetuFormVector ();
+    const csVector3& vVec = element.primitive.GetvFormVector ();
+    const csVector3& elementC = element.primitive.ComputeElementCenter (element.element); 
+
+    // Add handling of "half" elements
+    for (size_t qi = 0; qi < 4; ++qi)
+    {
+      const csVector3 offsetVector = uVec * ElementQuadrantConstants[qi][0] +
+        vVec * ElementQuadrantConstants[qi][1];
+
+      const csVector3 pos = elementC + offsetVector;
+
+      ignoreCB->SetSampleInside (element.primitive.PointInside (pos));
+      for (size_t i = 0; i < allLights.GetSize (); ++i)
+      {
+        CollectShadowLight (allLights[i], pos, lightSampler, ignoreCB, primitives);
+      }
+    }
+  }
+
+  void DirectLighting::CollectShadowRndLightNonPD(Sector* sector, ElementProxy element,
+    SamplerSequence<2>& sampler, PartialElementIgnoreCallback* ignoreCB,
+    csSet<csConstPtrKey<Primitive> > &primitives)
+  {
+    SamplerSequence<3> lightSampler (sampler);
+
+    csColor res (0);
+    const LightRefArray& allLights = sector->allNonPDLights;
+
+    // Get some data
+    const csVector3& uVec = element.primitive.GetuFormVector ();
+    const csVector3& vVec = element.primitive.GetvFormVector ();
+    const csVector3& elementC = element.primitive.ComputeElementCenter (element.element); 
+
+    // Add handling of "half" elements
+
+    for (size_t qi = 0; qi < 4; ++qi)
+    {
+      float rndValues[3];
+      lightSampler.GetNext (rndValues);
+
+      const csVector3 offsetVector = uVec * ElementQuadrantConstants[qi][0] +
+        vVec * ElementQuadrantConstants[qi][1];
+
+      const csVector3 pos = elementC + offsetVector;
+
+      size_t lightIdx = (size_t) floorf (allLights.GetSize () * rndValues[2]);
+
+      ignoreCB->SetSampleInside (element.primitive.PointInside (pos));
+      CollectShadowLight (allLights[lightIdx], pos, sampler, ignoreCB, primitives);
+    }
+  }
+
+  void DirectLighting::CollectShadowOneLight(Sector* sector, ElementProxy element,
+    Light* light, SamplerSequence<2>& lightSampler, PartialElementIgnoreCallback* ignoreCB,
+    csSet<csConstPtrKey<Primitive> > &primitives)
+  {
+    const csVector3& uVec = element.primitive.GetuFormVector ();
+    const csVector3& vVec = element.primitive.GetvFormVector ();
+    const csVector3& elementC = element.primitive.ComputeElementCenter (element.element); 
+
+    for (size_t qi = 0; qi < 4; ++qi)
+    {
+      const csVector3 offsetVector = uVec * ElementQuadrantConstants[qi][0] +
+        vVec * ElementQuadrantConstants[qi][1];
+
+      const csVector3 pos = elementC + offsetVector;
+
+      ignoreCB->SetSampleInside (element.primitive.PointInside (pos));
+      CollectShadowLight (light, pos, lightSampler, ignoreCB, primitives);
+    }
+  }
+
+  void DirectLighting::CollectShadowLight (Light* light, const csVector3& point,
+    SamplerSequence<2>& lightSampler, PartialElementIgnoreCallback* ignoreCB, 
+    csSet<csConstPtrKey<Primitive> > &primitives)
+  {
+    // Some variables..
+    VisibilityTester visTester;
+    float lightPdf, cosineTerm = 0;
+    csVector3 lightVec;
+
+    float lightSamples[2];
+    lightSampler.GetNext (lightSamples);
+
+    //@@TODO: Change to real sampling for visibility
+    csColor lightColor = light->SampleLight (point, csVector3 (0), lightSamples[0],
+      lightSamples[1], lightVec, lightPdf, visTester);
+    visTester.CollectHits (primitives, ignoreCB);
+  }
+
+  //--------------------------------------------------------------------------
   void DirectLighting::ShadeDirectLighting (Sector* sector, float progressStep)
   {
     // Setup some common stuff
     SamplerSequence<2> masterSampler;
-    Raytracer rt (sector->kdTree);
 
     float progressPerObject = progressStep / sector->allObjects.GetSize ();
 
@@ -341,9 +471,9 @@ namespace lighter
       if (!obj->GetFlags ().Check (OBJECT_FLAG_NOLIGHT))
       {
         if (obj->lightPerVertex)
-          ShadePerVertex (sector, obj, rt, masterSampler);
+          ShadePerVertex (sector, obj, masterSampler);
         else
-          ShadeLightmap (sector, obj, rt, masterSampler);
+          ShadeLightmap (sector, obj, masterSampler);
       }
 
       globalStats.IncTaskProgress (progressPerObject);
@@ -353,7 +483,7 @@ namespace lighter
     return;
   }
   
-  void DirectLighting::ShadeLightmap (Sector* sector, Object* obj, Raytracer& rt, 
+  void DirectLighting::ShadeLightmap (Sector* sector, Object* obj, 
     SamplerSequence<2>& masterSampler)
   {
     csArray<PrimitiveArray>& submeshArray = obj->GetPrimitives ();
@@ -410,13 +540,14 @@ namespace lighter
           {
             PartialElementIgnoreCallback callback (&prim);
             // Pass 1: collect inside hits
-            lmElementShader (sector, ep, masterSampler, rt, &callback);
+            //lmElementShader (sector, ep, masterSampler, &callback);
+            lmElementCollect (sector, ep, masterSampler, &callback, callback.GetSet ());
             // Pass 2: "real" lighting
             callback.SetPass2 ();
-            c = lmElementShader (sector, ep, masterSampler, rt, &callback);
+            c = lmElementShader (sector, ep, masterSampler, &callback);
           }
           else
-            c = lmElementShader (sector, ep, masterSampler, rt, 0);
+            c = lmElementShader (sector, ep, masterSampler, 0);
 
           size_t u, v;
           prim.GetElementUV (eidx, u, v);
@@ -433,16 +564,18 @@ namespace lighter
             {
               PartialElementIgnoreCallback callback (&prim);
               // Pass 1: collect inside hits
-              UniformShadeOneLight (sector, ep, allPDLights[pdli],
-                masterSampler, rt, &callback);
+              CollectShadowOneLight (sector, ep, allPDLights[pdli],
+                masterSampler, &callback, callback.GetSet ());
+              //UniformShadeOneLight (sector, ep, allPDLights[pdli],
+              //  masterSampler, &callback);
               // Pass 2: "real" lighting
               callback.SetPass2 ();
               c = UniformShadeOneLight (sector, ep, allPDLights[pdli],
-                masterSampler, rt, &callback);
+                masterSampler, &callback);
             }
             else
               c = UniformShadeOneLight (sector, ep, allPDLights[pdli],
-                masterSampler, rt, 0);
+                masterSampler, 0);
 
             Lightmap* lm = pdLightLMs[pdli];
 
@@ -455,7 +588,7 @@ namespace lighter
     }
   }
 
-  void DirectLighting::ShadePerVertex (Sector* sector, Object* obj, Raytracer& rt, 
+  void DirectLighting::ShadePerVertex (Sector* sector, Object* obj, 
     SamplerSequence<2>& masterSampler)
   {
     const LightRefArray& allPDLights = sector->allPDLights;
@@ -470,14 +603,14 @@ namespace lighter
 
       csColor& c = litColors->Get (i);
 
-      c = pvlPointShader (sector, pos, normal, masterSampler, rt);
+      c = pvlPointShader (sector, pos, normal, masterSampler);
 
       // Shade PD lights
       for (size_t pdli = 0; pdli < allPDLights.GetSize (); ++pdli)
       {
         Object::LitColorArray* pdlColors = obj->GetLitColorsPD (allPDLights[pdli]);
         pdlColors->Get (i) += UniformShadeOneLight (sector, pos, normal, allPDLights[pdli],
-          masterSampler, rt);
+          masterSampler);
       }
     }
 

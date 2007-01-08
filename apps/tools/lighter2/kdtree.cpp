@@ -21,6 +21,7 @@
 #include "kdtree.h"
 #include "primitive.h"
 #include "statistics.h"
+#include "object.h"
 
 #include "csutil/alignedalloc.h"
 

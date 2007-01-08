@@ -24,21 +24,32 @@
 namespace lighter
 {
   class Raytracer;
+  class Sector;
+  struct HitIgnoreCallback;
+  class Primitive;
+  class KDTree;
   
   class VisibilityTester
   {
   public:
     VisibilityTester ();
 
-    /// Test if we have visibility within given raytracer
-    bool Unoccluded (Raytracer& rt, const Primitive* ignorePrim = 0);
-    bool Unoccluded (Raytracer& rt, HitIgnoreCallback* ignoreCB);
+    bool Unoccluded (const Primitive* ignorePrim = 0);
+    bool Unoccluded (HitIgnoreCallback* ignoreCB);
 
-    void SetSegment (const csVector3& start, const csVector3& end);
-    void SetSegment (const csVector3& start, const csVector3& dir, float maxL);
+    void CollectHits (csSet<csConstPtrKey<Primitive> > &primitives, 
+      HitIgnoreCallback* ignoreCB);
+
+    void AddSegment (KDTree* tree, const csVector3& start, const csVector3& end);
+    void AddSegment (KDTree* tree, const csVector3& start, const csVector3& dir, float maxL);
 
   private:
-    Ray testRay;
+    struct Segment
+    {
+      KDTree* tree;
+      Ray ray;
+    };
+    csArray<Segment> allSegments;
   };
 
   typedef float(*LightAttenuationFunc)(float squaredDistance, 
@@ -84,6 +95,16 @@ namespace lighter
       pseudoDynamic = pd;
     }
 
+    inline bool IsRealLight () const
+    {
+      return realLight;
+    }
+
+    inline Sector* GetSector () const
+    {
+      return ownerSector;
+    }
+
     inline const csVector3& GetPosition () const
     {
       return position;
@@ -92,6 +113,7 @@ namespace lighter
     inline void SetPosition (const csVector3& p)
     {
       position = p;
+      lightFrustum.SetOrigin (p);
     }
 
     inline const csColor& GetColor () const
@@ -114,9 +136,19 @@ namespace lighter
       memcpy (lightId.data, id, csMD5::Digest::DigestLen);
     }
 
+    inline const csBox3& GetBoundingBox () const 
+    {
+      return boundingBox;
+    }
+
+    inline const csFrustum& GetFrustum () const
+    {
+      return lightFrustum;
+    }
+
   protected:
     /// Constructor
-    Light (bool deltaDistribution);
+    Light (Sector* owner, bool deltaDistribution);
 
     /// Helper methods to attenuate light
     inline float ComputeAttenuation (float sqD)
@@ -132,13 +164,18 @@ namespace lighter
     LightAttenuationFunc attenuationFunc;
 
     // Common properties
+    Sector* ownerSector;
     csVector3 position;
     csColor color;
     csMD5::Digest lightId;
+    csBox3 boundingBox;
+
+    csFrustum lightFrustum;
 
     // Type
     bool deltaDistribution;
     bool pseudoDynamic;
+    bool realLight;
   };
   typedef csRefArray<Light> LightRefArray;
 
@@ -147,7 +184,7 @@ namespace lighter
   class PointLight : public Light
   {
   public:
-    PointLight ();
+    PointLight (Sector* owner);
 
     virtual ~PointLight();
 
@@ -168,8 +205,26 @@ namespace lighter
 
   protected:
     float radius;
+  };
 
+  // Proxy light, used when light source is in different sector
+  class ProxyLight : public Light
+  {
+  public:
+    ProxyLight (Sector* owner, Light* parentLight);
+    virtual ~ProxyLight();
+
+    virtual csColor SampleLight (const csVector3& point, const csVector3& n,
+      float u1, float u2, csVector3& lightVec, float& pdf, VisibilityTester& vistest);
+
+    /**
+     * Return light power over S2 sphere
+     */
+    virtual csColor GetPower () const;
+
+  private:
+    Light* parent;
   };
 } // namespace lighter
 
-#endif // __LIGHT_H__
+#endif
