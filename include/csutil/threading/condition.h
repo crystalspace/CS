@@ -77,6 +77,8 @@ namespace Threading
      *   restored.
      * \param timeout Timeout in milliseconds for the wait. A value of 0 means
      *   infinite wait.
+     * \return \c true when the condition was changed, or \c false if the wait
+     *   timed out.
      * \remarks The reason that the mutex must not be locked recursively is
      *   because the implicit unlock performed by Wait() <em>must</em> actually
      *   release the mutex in order for other threads to be able to satisfy the
@@ -84,11 +86,13 @@ namespace Threading
      *   the one implicit unlock operation performed by Wait() will actually
      *   release the mutex since it might have been locked multiple times within
      *   the same thread.
+     * \remarks Having to use a timed wait may indicate a code flaw. Try to
+     *   avoid timed waits and instead fix your synchronization logic.
      */
     template<typename LockType>
-    void Wait (LockType& lock, csTicks timeout = 0)
+    bool Wait (LockType& lock, csTicks timeout = 0)
     {
-      ConditionBase::Wait (lock, timeout);
+      return ConditionBase::Wait (lock, timeout);
     }
   };
 

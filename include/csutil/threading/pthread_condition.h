@@ -51,7 +51,7 @@ namespace Implementation
     }
 
     template<typename LockType>
-    void Wait (LockType& lock, csTicks timeout)
+    bool Wait (LockType& lock, csTicks timeout)
     {
       if (timeout > 0)
       {
@@ -67,11 +67,13 @@ namespace Implementation
           to.tv_sec += to.tv_nsec / nsec_per_sec;
           to.tv_nsec %= nsec_per_sec;
         }
-        pthread_cond_timedwait (&condition, &lock.mutex, &to);
+        return pthread_cond_timedwait (&condition, &lock.mutex, &to) 
+	  == 0;
       }
       else
       {
         pthread_cond_wait (&condition, &lock.mutex);
+	return true;
       }      
     }
 
