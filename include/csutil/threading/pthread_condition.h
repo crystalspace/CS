@@ -25,6 +25,8 @@
 #include "csutil/threading/mutex.h"
 #include "csutil/noncopyable.h"
 
+#include <sys/time.h>
+
 namespace CS
 {
 namespace Threading
@@ -57,9 +59,8 @@ namespace Implementation
       {
         long const nsec_per_sec = 1000 * 1000 * 1000;
         struct timeval now;
-        struct timezone tz;
         struct timespec to;
-        gettimeofday (&now, &tz);
+        gettimeofday (&now, 0);
         to.tv_sec = now.tv_sec + (timeout / 1000);
         to.tv_nsec = (now.tv_usec + (timeout % 1000) * 1000) * 1000;
         if (to.tv_nsec >= nsec_per_sec) // Catch overflow.
