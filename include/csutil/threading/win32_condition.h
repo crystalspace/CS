@@ -77,7 +77,7 @@ namespace Implementation
     }
 
     template<typename LockType>
-    void Wait (LockType& lock)
+    void Wait (LockType& lock, csTicks timeout)
     {
       WaitListEntry waitEntry;
 
@@ -92,7 +92,7 @@ namespace Implementation
 
         // Loop until notified
         while (!AtomicOperations::Read (&waitEntry.notified) &&
-                Implementation::SleepEx (INFINITE, true) == WAIT_IO_COMPLETION)
+          Implementation::SleepEx (timeout == 0 ? INFINITE : timeout, true) == WAIT_IO_COMPLETION)
           ;
       }
     }
