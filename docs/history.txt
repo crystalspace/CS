@@ -14,6 +14,9 @@ chronological order.
 	  timed out or ended due a change of the condition.
 	- res fixed compilation of the pthreads CS::Threading::Condition::Wait().
 	- res added a simple translator plugin from Darek Dawidowski.
+	- Anders Stenberg added a halfassed water test level (water.zip). 
+	  It's not very good right now, but could be a test bed for further
+	  testing.
 8-Jan-2007
 	- Marten did various optimizations and cleanups in lighter2.
 	- Marten made sure the core parts of lighter2 are thread safe to
