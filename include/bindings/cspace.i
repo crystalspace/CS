@@ -1025,6 +1025,12 @@ iArrayChangeElements<csShaderVariable * >;
 %include "csgeom/path.h"
 %include "csgeom/polymesh.h"
 
+%ignore csArray<csArray<int> >::Contains;
+%template(csIntArray) csArray<int>;
+%template(csIntArrayArray) csArray<csArray<int> >;
+ARRAY_OBJECT_FUNCTIONS(csArray<int>,int)
+ARRAY_OBJECT_FUNCTIONS(csArray<csArray<int> >,csArray<int>)
+%newobject csPolygonMeshTools::CalculateVertexConnections;
 %include "csgeom/pmtools.h"
 %include "csgeom/spline.h"
 

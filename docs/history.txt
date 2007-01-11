@@ -38,6 +38,11 @@ chronological order.
 	    - updated python event handler for new scf.
 	- caedes added csPolygonMeshTools::CalculateVertexConnections to get
 	  vertex connection information from a polymesh.
+	- caedes added csArray<csArray<int> > template declaration to swig
+	  interface files so it can be handled.
+	- caedes added added %newobject declaration in swig interface files
+	  for csPolygonMeshTools::CalculateVertexConnections so it will be
+	  cleaned up by python.
 9-Jan-2007
 	- Marten added a timeout parameter to CS::Threading::Condition::Wait.
 	- res fixed the clipping rectangle for walktest's "cubemapshots"
