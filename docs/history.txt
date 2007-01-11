@@ -6,6 +6,14 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+11-Jan-2007
+	- res committed a number of patches from Ryan Thorik to allow building
+	  on Solaris and IRIX:
+	    * finite() is declared in ieeefp.h on Solaris 10.
+	    * Add MIPS, SPARC, and Alpha to the IEEE float arch list.
+	    * Allow dlmalloc to get IRIX's pagesize (otherwise it would be 
+	      complaining about _PAGESZ being undefined).
+	    * Fix "va_list' has not been declared" issue on Solaris.
 9-Jan-2007
 	- Marten added a timeout parameter to CS::Threading::Condition::Wait.
 	- res fixed the clipping rectangle for walktest's "cubemapshots"
