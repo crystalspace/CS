@@ -894,3 +894,37 @@ bool csPolygonMeshTools::BoxInClosedMesh (const csBox3& box,
   return true;
 }
 
+csArray<csArray<int> > *csPolygonMeshTools::CalculateVertexConnections (iPolygonMesh* mesh)
+{
+  int i,j,k;
+  int vert_count = mesh->GetVertexCount ();
+  csArray<csArray<int> > *link_array = new csArray<csArray<int> >(vert_count);
+
+  // Initialize array
+  csArray<int> newarray;
+  for (i = 0 ; i < vert_count ; i++)
+    link_array->Put(i,newarray);
+
+  // Fill connection information.
+  int poly_count = mesh->GetPolygonCount ();
+  csMeshedPolygon* poly = mesh->GetPolygons ();
+  for (i = 0 ; i < poly_count ; i++, poly++)
+  {
+    int* vi = poly->vertices;
+    for (j = 0 ; j < poly->num_vertices ; j++)
+    {
+      int vt1 = vi[j];
+      csArray<int> *vset = &link_array->Get(vt1);
+      for (k = 0 ; k < poly->num_vertices ; k++)
+      {
+        int vt2 = vi[k];
+        if (vt1 != vt2)
+        {
+          vset->PushSmart(vt2);
+        }
+      }
+    }
+  }
+  return link_array;
+}
+
