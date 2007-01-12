@@ -1023,6 +1023,8 @@ iArrayChangeElements<csShaderVariable * >;
 %ignore csPath::SetTimeValues;
 %ignore csPath::GetTimeValues;
 %include "csgeom/path.h"
+%template(pycsPolygonMesh) scfImplementation1<csPolygonMesh, iPolygonMesh>;
+%template(pycsPolygonMeshBox) scfImplementation1<csPolygonMeshBox, iPolygonMesh>;
 %include "csgeom/polymesh.h"
 
 %ignore csArray<csArray<int> >::Contains;
@@ -1312,11 +1314,13 @@ APPLY_TYPEMAP_ARGOUT_PTR(csKeyModifiers,csKeyModifiers& modifiers)
 %include "ivaria/simpleformer.h"
 %include "ivaria/terraform.h"
 
+%template(pycsObject) scfImplementation1<csObject,iObject >;
 %include "csutil/csobject.h"
 
 %ignore csColliderHelper::TraceBeam (iCollideSystem*, iSector*,
   const csVector3&, const csVector3&, bool, csIntersectingTriangle&,
   csVector3&, iMeshWrapper**);
+%template(pycsColliderWrapper) scfImplementationExt1<csColliderWrapper,csObject,scfFakeInterface<csColliderWrapper> >;
 %include "cstool/collider.h"
 %include "cstool/csview.h"
 %include "cstool/csfxscr.h"

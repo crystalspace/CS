@@ -6,6 +6,12 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+12-Jan-2007
+	- caedes added scfImplementationExt1 template to scf.i swig file so
+	  this template can be wrapped.
+	- caedes added %template declarations in swig files for csPolygonMesh,
+	  csPolygonMeshBox, csObject and csColliderWrapper implementations so
+	  class inheritance info is preserved in scripting languages,
 11-Jan-2007
 	- res committed a number of patches from Ryan Thorik to allow building
 	  on Solaris and IRIX:
