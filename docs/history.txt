@@ -14,6 +14,9 @@ chronological order.
 	  class inheritance info is preserved in scripting languages,
 	- caedes added csColliderWrapper::UpdateCollider functions to allow
 	  updating collider info for a collider wrapper.
+	- caedes removed the incref and decref in python event handler ctor and
+	  dtor inside swig files as it would cause a memory leak (due to decref
+	  in dtor never being called).
 11-Jan-2007
 	- res committed a number of patches from Ryan Thorik to allow building
 	  on Solaris and IRIX:
