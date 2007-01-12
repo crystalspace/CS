@@ -12,6 +12,8 @@ chronological order.
 	- caedes added %template declarations in swig files for csPolygonMesh,
 	  csPolygonMeshBox, csObject and csColliderWrapper implementations so
 	  class inheritance info is preserved in scripting languages,
+	- caedes added csColliderWrapper::UpdateCollider functions to allow
+	  updating collider info for a collider wrapper.
 11-Jan-2007
 	- res committed a number of patches from Ryan Thorik to allow building
 	  on Solaris and IRIX:
