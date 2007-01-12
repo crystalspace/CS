@@ -22,7 +22,7 @@
             <colorsource num="0" source="previous layer" modifier="color" />
             <colorsource num="1" source="texture" modifier="color" />
             <coloroperation operation="modulate" />
-            <alphasource num="0" source="texture" modifier="color" />
+            <alphasource num="0" source="texture" modifier="alpha" />
             <alphaoperation operation="replace" />
           </layer>
         </fixedfp>
