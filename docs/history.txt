@@ -6,6 +6,11 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+13-Jan-2007
+	- Jorrit fixed a problem in the segmentcell header of opcode
+	  which handles collision detection for new terrain. It was
+	  using 'abs' which is for integers so all floating point
+	  things were wrongly truncated. Replaced all 'abs' with 'fabs'.
 6-Dec-2006
         - Piotr added normals handling to new terrain.
         - Piotr added "on cel load" callback to new terrain system.

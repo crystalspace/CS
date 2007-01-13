@@ -82,8 +82,8 @@ public:
     dv = v1 - v0;
     dh = h1 - h0;
     
-    if (abs (du) < EPSILON) du = EPSILON;
-    if (abs (dv) < EPSILON) dv = EPSILON;
+    if (fabs (du) < EPSILON) du = EPSILON;
+    if (fabs (dv) < EPSILON) dv = EPSILON;
    
     oneOverdu = 1 / du;
     oneOverdv = 1 / dv;
@@ -95,10 +95,10 @@ public:
     // Differences and distance to intersection with diagonal
     dp = (du + dv) / rootOf2;
     
-    if (abs (dp) < EPSILON) dp = EPSILON;
+    if (fabs (dp) < EPSILON) dp = EPSILON;
     
     oneOverdp = 1 / dp;
-    ep = abs(dp) * (1 - eu - ev) / (dv + du); // line-line intersection
+    ep = fabs(dp) * (1 - eu - ev) / (dv + du); // line-line intersection
     
     // Fixup for positive directions
     if (du > 0) eu = 1 - eu;
@@ -131,9 +131,9 @@ public:
       
     if (!firsttime)
     {
-      float tToU = eu * abs (oneOverdu); // Time to reach U intersection
-      float tToV = ev * abs (oneOverdv); // Time to reach V intersection
-      float tToP = ep * abs (oneOverdp); // Time to reach P intersection
+      float tToU = eu * fabs (oneOverdu); // Time to reach U intersection
+      float tToV = ev * fabs (oneOverdv); // Time to reach V intersection
+      float tToP = ep * fabs (oneOverdp); // Time to reach P intersection
       
       if (tToU <= tToV && tToU <= tToP)
       {
@@ -145,8 +145,8 @@ public:
          
         // Update distances
         eu = 0;
-        ev -= abs(dv) * tToU;
-        ep -= abs(dp) * tToU;
+        ev -= fabs(dv) * tToU;
+        ep -= fabs(dp) * tToU;
          
         // Update height
         h += dh * tToU;
@@ -160,9 +160,9 @@ public:
         t += tToV;
  
         // Update distances
-        eu -= abs(du) * tToV;
+        eu -= fabs(du) * tToV;
         ev = 0;
-        ep -= abs(dp) * tToV;
+        ep -= fabs(dp) * tToV;
        
         // Update height
         h += dh * tToV;
@@ -176,8 +176,8 @@ public:
         t += tToP;
           
         // Update distances
-        eu -= abs(du) * tToP;
-        ev -= abs(dv) * tToP;
+        eu -= fabs(du) * tToP;
+        ev -= fabs(dv) * tToP;
         ep = 0;
         
         // Update height
@@ -207,7 +207,7 @@ public:
     int cmp_h0 = sign (r_h0 - h_h0);
     int cmp_h1 = sign (r_h1 - h_h1);
       
-    if (cmp_h0 * cmp_h1 == -1 || abs (r_h1 - h_h1) < EPSILON)
+    if (cmp_h0 * cmp_h1 == -1 || fabs (r_h1 - h_h1) < EPSILON)
     {
       float correct_t = t;
        
@@ -217,7 +217,7 @@ public:
         // (vertex) ------(intersection)------- (vertex)
         // AC = tstep (in terms of t), we have to subtract
         // BC from correct_t. AB / BC equals the height ratio
-        float coeff = abs(r_h0 - h_h0) / abs(r_h1 - h_h1);
+        float coeff = fabs(r_h0 - h_h0) / fabs(r_h1 - h_h1);
           
         // AB / BC = coeff
         // AB + BC = tstep
