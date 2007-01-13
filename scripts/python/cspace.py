@@ -3158,10 +3158,48 @@ class csPath(scfPath):
 csPath_swigregister = _cspace.csPath_swigregister
 csPath_swigregister(csPath)
 
-class csPolygonMesh(_object):
+class pycsPolygonMesh(iPolygonMesh):
     __swig_setmethods__ = {}
+    for _s in [iPolygonMesh]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, pycsPolygonMesh, name, value)
+    __swig_getmethods__ = {}
+    for _s in [iPolygonMesh]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, pycsPolygonMesh, name)
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def IncRef(*args): return _cspace.pycsPolygonMesh_IncRef(*args)
+    def DecRef(*args): return _cspace.pycsPolygonMesh_DecRef(*args)
+    def GetRefCount(*args): return _cspace.pycsPolygonMesh_GetRefCount(*args)
+    def QueryInterface(*args): return _cspace.pycsPolygonMesh_QueryInterface(*args)
+    def AddRefOwner(*args): return _cspace.pycsPolygonMesh_AddRefOwner(*args)
+    def RemoveRefOwner(*args): return _cspace.pycsPolygonMesh_RemoveRefOwner(*args)
+pycsPolygonMesh_swigregister = _cspace.pycsPolygonMesh_swigregister
+pycsPolygonMesh_swigregister(pycsPolygonMesh)
+
+class pycsPolygonMeshBox(iPolygonMesh):
+    __swig_setmethods__ = {}
+    for _s in [iPolygonMesh]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, pycsPolygonMeshBox, name, value)
+    __swig_getmethods__ = {}
+    for _s in [iPolygonMesh]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, pycsPolygonMeshBox, name)
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def IncRef(*args): return _cspace.pycsPolygonMeshBox_IncRef(*args)
+    def DecRef(*args): return _cspace.pycsPolygonMeshBox_DecRef(*args)
+    def GetRefCount(*args): return _cspace.pycsPolygonMeshBox_GetRefCount(*args)
+    def QueryInterface(*args): return _cspace.pycsPolygonMeshBox_QueryInterface(*args)
+    def AddRefOwner(*args): return _cspace.pycsPolygonMeshBox_AddRefOwner(*args)
+    def RemoveRefOwner(*args): return _cspace.pycsPolygonMeshBox_RemoveRefOwner(*args)
+pycsPolygonMeshBox_swigregister = _cspace.pycsPolygonMeshBox_swigregister
+pycsPolygonMeshBox_swigregister(pycsPolygonMeshBox)
+
+class csPolygonMesh(pycsPolygonMesh):
+    __swig_setmethods__ = {}
+    for _s in [pycsPolygonMesh]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, csPolygonMesh, name, value)
     __swig_getmethods__ = {}
+    for _s in [pycsPolygonMesh]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, csPolygonMesh, name)
     __repr__ = _swig_repr
     def __init__(self, *args): 
@@ -3179,11 +3217,20 @@ class csPolygonMesh(_object):
     def SetPolygonCount(*args): return _cspace.csPolygonMesh_SetPolygonCount(*args)
     def ShapeChanged(*args): return _cspace.csPolygonMesh_ShapeChanged(*args)
     def GetVertexCount(*args): return _cspace.csPolygonMesh_GetVertexCount(*args)
-    def GetVertices(*args): return _cspace.csPolygonMesh_GetVertices(*args)
+    def GetVertices(self):
+      return CSMutableArrayHelper(self.GetVertexByIndex, self.GetVertexCount)
+
+
     def GetPolygonCount(*args): return _cspace.csPolygonMesh_GetPolygonCount(*args)
-    def GetPolygons(*args): return _cspace.csPolygonMesh_GetPolygons(*args)
+    def GetPolygons(self):
+      return CSMutableArrayHelper(self.GetPolygonByIndex, self.GetPolygonCount)
+
+
     def GetTriangleCount(*args): return _cspace.csPolygonMesh_GetTriangleCount(*args)
-    def GetTriangles(*args): return _cspace.csPolygonMesh_GetTriangles(*args)
+    def GetTriangles(self):
+      return CSMutableArrayHelper(self.GetTriangleByIndex, self.GetTriangleCount)
+
+
     def Lock(*args): return _cspace.csPolygonMesh_Lock(*args)
     def Unlock(*args): return _cspace.csPolygonMesh_Unlock(*args)
     def GetFlags(*args): return _cspace.csPolygonMesh_GetFlags(*args)
@@ -3191,10 +3238,12 @@ class csPolygonMesh(_object):
 csPolygonMesh_swigregister = _cspace.csPolygonMesh_swigregister
 csPolygonMesh_swigregister(csPolygonMesh)
 
-class csPolygonMeshBox(_object):
+class csPolygonMeshBox(pycsPolygonMeshBox):
     __swig_setmethods__ = {}
+    for _s in [pycsPolygonMeshBox]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, csPolygonMeshBox, name, value)
     __swig_getmethods__ = {}
+    for _s in [pycsPolygonMeshBox]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, csPolygonMeshBox, name)
     __repr__ = _swig_repr
     def __init__(self, *args): 
@@ -3205,11 +3254,20 @@ class csPolygonMeshBox(_object):
     __del__ = lambda self : None;
     def SetBox(*args): return _cspace.csPolygonMeshBox_SetBox(*args)
     def GetVertexCount(*args): return _cspace.csPolygonMeshBox_GetVertexCount(*args)
-    def GetVertices(*args): return _cspace.csPolygonMeshBox_GetVertices(*args)
+    def GetVertices(self):
+      return CSMutableArrayHelper(self.GetVertexByIndex, self.GetVertexCount)
+
+
     def GetPolygonCount(*args): return _cspace.csPolygonMeshBox_GetPolygonCount(*args)
-    def GetPolygons(*args): return _cspace.csPolygonMeshBox_GetPolygons(*args)
+    def GetPolygons(self):
+      return CSMutableArrayHelper(self.GetPolygonByIndex, self.GetPolygonCount)
+
+
     def GetTriangleCount(*args): return _cspace.csPolygonMeshBox_GetTriangleCount(*args)
-    def GetTriangles(*args): return _cspace.csPolygonMeshBox_GetTriangles(*args)
+    def GetTriangles(self):
+      return CSMutableArrayHelper(self.GetTriangleByIndex, self.GetTriangleCount)
+
+
     def Lock(*args): return _cspace.csPolygonMeshBox_Lock(*args)
     def Unlock(*args): return _cspace.csPolygonMeshBox_Unlock(*args)
     def GetFlags(*args): return _cspace.csPolygonMeshBox_GetFlags(*args)
@@ -11452,10 +11510,30 @@ iTerraSampler_swigregister = _cspace.iTerraSampler_swigregister
 iTerraSampler_swigregister(iTerraSampler)
 iTerraSampler_scfGetVersion = _cspace.iTerraSampler_scfGetVersion
 
-class csObject(_object):
+class pycsObject(iObject):
     __swig_setmethods__ = {}
+    for _s in [iObject]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, pycsObject, name, value)
+    __swig_getmethods__ = {}
+    for _s in [iObject]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, pycsObject, name)
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def IncRef(*args): return _cspace.pycsObject_IncRef(*args)
+    def DecRef(*args): return _cspace.pycsObject_DecRef(*args)
+    def GetRefCount(*args): return _cspace.pycsObject_GetRefCount(*args)
+    def QueryInterface(*args): return _cspace.pycsObject_QueryInterface(*args)
+    def AddRefOwner(*args): return _cspace.pycsObject_AddRefOwner(*args)
+    def RemoveRefOwner(*args): return _cspace.pycsObject_RemoveRefOwner(*args)
+pycsObject_swigregister = _cspace.pycsObject_swigregister
+pycsObject_swigregister(pycsObject)
+
+class csObject(pycsObject):
+    __swig_setmethods__ = {}
+    for _s in [pycsObject]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, csObject, name, value)
     __swig_getmethods__ = {}
+    for _s in [pycsObject]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, csObject, name)
     __repr__ = _swig_repr
     def __init__(self, *args): 
@@ -11481,10 +11559,30 @@ class csObject(_object):
 csObject_swigregister = _cspace.csObject_swigregister
 csObject_swigregister(csObject)
 
-class csColliderWrapper(_object):
+class pycsColliderWrapper(csObject):
     __swig_setmethods__ = {}
+    for _s in [csObject]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, pycsColliderWrapper, name, value)
+    __swig_getmethods__ = {}
+    for _s in [csObject]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, pycsColliderWrapper, name)
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def IncRef(*args): return _cspace.pycsColliderWrapper_IncRef(*args)
+    def DecRef(*args): return _cspace.pycsColliderWrapper_DecRef(*args)
+    def GetRefCount(*args): return _cspace.pycsColliderWrapper_GetRefCount(*args)
+    def QueryInterface(*args): return _cspace.pycsColliderWrapper_QueryInterface(*args)
+    def AddRefOwner(*args): return _cspace.pycsColliderWrapper_AddRefOwner(*args)
+    def RemoveRefOwner(*args): return _cspace.pycsColliderWrapper_RemoveRefOwner(*args)
+pycsColliderWrapper_swigregister = _cspace.pycsColliderWrapper_swigregister
+pycsColliderWrapper_swigregister(pycsColliderWrapper)
+
+class csColliderWrapper(pycsColliderWrapper):
+    __swig_setmethods__ = {}
+    for _s in [pycsColliderWrapper]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, csColliderWrapper, name, value)
     __swig_getmethods__ = {}
+    for _s in [pycsColliderWrapper]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, csColliderWrapper, name)
     __repr__ = _swig_repr
     def __init__(self, *args): 
@@ -11498,6 +11596,7 @@ class csColliderWrapper(_object):
     def Collide(*args): return _cspace.csColliderWrapper_Collide(*args)
     __swig_getmethods__["GetColliderWrapper"] = lambda x: _cspace.csColliderWrapper_GetColliderWrapper
     if _newclass:GetColliderWrapper = staticmethod(_cspace.csColliderWrapper_GetColliderWrapper)
+    def UpdateCollider(*args): return _cspace.csColliderWrapper_UpdateCollider(*args)
 csColliderWrapper_swigregister = _cspace.csColliderWrapper_swigregister
 csColliderWrapper_swigregister(csColliderWrapper)
 csColliderWrapper_GetColliderWrapper = _cspace.csColliderWrapper_GetColliderWrapper

@@ -4899,11 +4899,61 @@ sub ACQUIRE {
 }
 
 
+############# Class : cspace::pycsPolygonMesh ##############
+
+package cspace::pycsPolygonMesh;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::iPolygonMesh cspace );
+%OWNER = ();
+*IncRef = *cspacec::pycsPolygonMesh_IncRef;
+*DecRef = *cspacec::pycsPolygonMesh_DecRef;
+*GetRefCount = *cspacec::pycsPolygonMesh_GetRefCount;
+*QueryInterface = *cspacec::pycsPolygonMesh_QueryInterface;
+*AddRefOwner = *cspacec::pycsPolygonMesh_AddRefOwner;
+*RemoveRefOwner = *cspacec::pycsPolygonMesh_RemoveRefOwner;
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::pycsPolygonMeshBox ##############
+
+package cspace::pycsPolygonMeshBox;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::iPolygonMesh cspace );
+%OWNER = ();
+*IncRef = *cspacec::pycsPolygonMeshBox_IncRef;
+*DecRef = *cspacec::pycsPolygonMeshBox_DecRef;
+*GetRefCount = *cspacec::pycsPolygonMeshBox_GetRefCount;
+*QueryInterface = *cspacec::pycsPolygonMeshBox_QueryInterface;
+*AddRefOwner = *cspacec::pycsPolygonMeshBox_AddRefOwner;
+*RemoveRefOwner = *cspacec::pycsPolygonMeshBox_RemoveRefOwner;
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
 ############# Class : cspace::csPolygonMesh ##############
 
 package cspace::csPolygonMesh;
 use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
-@ISA = qw( cspace );
+@ISA = qw( cspace::pycsPolygonMesh cspace );
 %OWNER = ();
 %ITERATORS = ();
 sub new {
@@ -4932,11 +4982,8 @@ sub DESTROY {
 *SetPolygonCount = *cspacec::csPolygonMesh_SetPolygonCount;
 *ShapeChanged = *cspacec::csPolygonMesh_ShapeChanged;
 *GetVertexCount = *cspacec::csPolygonMesh_GetVertexCount;
-*GetVertices = *cspacec::csPolygonMesh_GetVertices;
 *GetPolygonCount = *cspacec::csPolygonMesh_GetPolygonCount;
-*GetPolygons = *cspacec::csPolygonMesh_GetPolygons;
 *GetTriangleCount = *cspacec::csPolygonMesh_GetTriangleCount;
-*GetTriangles = *cspacec::csPolygonMesh_GetTriangles;
 *Lock = *cspacec::csPolygonMesh_Lock;
 *Unlock = *cspacec::csPolygonMesh_Unlock;
 *GetFlags = *cspacec::csPolygonMesh_GetFlags;
@@ -4958,7 +5005,7 @@ sub ACQUIRE {
 
 package cspace::csPolygonMeshBox;
 use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
-@ISA = qw( cspace );
+@ISA = qw( cspace::pycsPolygonMeshBox cspace );
 %OWNER = ();
 %ITERATORS = ();
 sub new {
@@ -4980,11 +5027,8 @@ sub DESTROY {
 
 *SetBox = *cspacec::csPolygonMeshBox_SetBox;
 *GetVertexCount = *cspacec::csPolygonMeshBox_GetVertexCount;
-*GetVertices = *cspacec::csPolygonMeshBox_GetVertices;
 *GetPolygonCount = *cspacec::csPolygonMeshBox_GetPolygonCount;
-*GetPolygons = *cspacec::csPolygonMeshBox_GetPolygons;
 *GetTriangleCount = *cspacec::csPolygonMeshBox_GetTriangleCount;
-*GetTriangles = *cspacec::csPolygonMeshBox_GetTriangles;
 *Lock = *cspacec::csPolygonMeshBox_Lock;
 *Unlock = *cspacec::csPolygonMeshBox_Unlock;
 *GetFlags = *cspacec::csPolygonMeshBox_GetFlags;
@@ -17153,11 +17197,36 @@ sub ACQUIRE {
 }
 
 
+############# Class : cspace::pycsObject ##############
+
+package cspace::pycsObject;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::iObject cspace );
+%OWNER = ();
+*IncRef = *cspacec::pycsObject_IncRef;
+*DecRef = *cspacec::pycsObject_DecRef;
+*GetRefCount = *cspacec::pycsObject_GetRefCount;
+*QueryInterface = *cspacec::pycsObject_QueryInterface;
+*AddRefOwner = *cspacec::pycsObject_AddRefOwner;
+*RemoveRefOwner = *cspacec::pycsObject_RemoveRefOwner;
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
 ############# Class : cspace::csObject ##############
 
 package cspace::csObject;
 use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
-@ISA = qw( cspace );
+@ISA = qw( cspace::pycsObject cspace );
 %OWNER = ();
 %ITERATORS = ();
 sub new {
@@ -17204,11 +17273,36 @@ sub ACQUIRE {
 }
 
 
+############# Class : cspace::pycsColliderWrapper ##############
+
+package cspace::pycsColliderWrapper;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::csObject cspace );
+%OWNER = ();
+*IncRef = *cspacec::pycsColliderWrapper_IncRef;
+*DecRef = *cspacec::pycsColliderWrapper_DecRef;
+*GetRefCount = *cspacec::pycsColliderWrapper_GetRefCount;
+*QueryInterface = *cspacec::pycsColliderWrapper_QueryInterface;
+*AddRefOwner = *cspacec::pycsColliderWrapper_AddRefOwner;
+*RemoveRefOwner = *cspacec::pycsColliderWrapper_RemoveRefOwner;
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
 ############# Class : cspace::csColliderWrapper ##############
 
 package cspace::csColliderWrapper;
 use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
-@ISA = qw( cspace );
+@ISA = qw( cspace::pycsColliderWrapper cspace );
 %OWNER = ();
 %ITERATORS = ();
 sub new {
@@ -17232,6 +17326,7 @@ sub DESTROY {
 *GetCollideSystem = *cspacec::csColliderWrapper_GetCollideSystem;
 *Collide = *cspacec::csColliderWrapper_Collide;
 *GetColliderWrapper = *cspacec::csColliderWrapper_GetColliderWrapper;
+*UpdateCollider = *cspacec::csColliderWrapper_UpdateCollider;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
