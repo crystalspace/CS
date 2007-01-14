@@ -403,7 +403,7 @@ Win32Assistant::Win32Assistant (iObjectRegistry* r)
       if (!IsStdHandleRedirected (STD_OUTPUT_HANDLE)) 
         freopen("CONOUT$", "a", stdout);
       if (!IsStdHandleRedirected (STD_INPUT_HANDLE)) 
-        freopen("CONIN$", "a", stdin);
+        freopen("CONIN$", "r", stdin);
     }
   }
 
