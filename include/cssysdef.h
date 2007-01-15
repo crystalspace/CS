@@ -986,6 +986,9 @@ inline void* operator new[] (size_t s)
 #if !defined (CS_IEEE_DOUBLE_FORMAT)
 #  if defined (CS_PROCESSOR_X86) || \
       defined (CS_PROCESSOR_POWERPC) || \
+      defined (CS_PROCESSOR_MIPS) || \
+      defined (CS_PROCESSOR_SPARC) || \
+      defined (CS_PROCESSOR_ALPHA) || \
       defined (CS_PROCESSOR_M68K)
 #    define CS_IEEE_DOUBLE_FORMAT
 #  endif
