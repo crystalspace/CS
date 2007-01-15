@@ -2333,8 +2333,8 @@ bool CommandHandler (const char *cmd, const char *arg)
     sideView->SetRectangle (0, 0, dim, dim);
     int cMinX, cMinY, cMaxX, xMaxY;
     Sys->myG2D->GetClipRect (cMinX, cMinY, cMaxX, xMaxY);
-    Sys->myG2D->SetClipRect (0, 0, dim, dim);
-    
+    Sys->myG2D->SetClipRect (0, 0, Sys->myG3D->GetWidth(), g2dh);
+
     static const csVector3 lookAtVecs[12] = {
       csVector3 ( 0.0f,  0.0f,  1.0f), csVector3 (0.0f, 1.0f,  0.0f), 
       csVector3 ( 0.0f,  0.0f, -1.0f), csVector3 (0.0f, 1.0f,  0.0f), 
@@ -2348,7 +2348,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     for (int i = 0; i < 6; i++)
     {
       if (!Sys->myG3D->BeginDraw (Sys->Engine->GetBeginDrawFlags () 
-	| CSDRAW_3DGRAPHICS | CSDRAW_CLEARZBUFFER))
+        | CSDRAW_3DGRAPHICS | CSDRAW_CLEARZBUFFER))
       {
 	Sys->myG2D->SetClipRect (cMinX, cMinY, cMaxX, xMaxY);
 	return true;
