@@ -1438,6 +1438,24 @@ APPLY_FOR_EACH_INTERFACE
   }
 %}
 
+
+// iutil/evdefs.h
+#define _CSKEY_SHIFT_NUM(n) CSKEY_SHIFT_NUM(n)
+#undef CSKEY_SHIFT_NUM
+int CSKEY_SHIFT_NUM(int n);
+
+#define _CSKEY_SPECIAL(n) CSKEY_SPECIAL(n)
+#undef CSKEY_SPECIAL
+int CSKEY_SPECIAL(int n);
+
+#define _CSKEY_SPECIAL_NUM(code) CSKEY_SPECIAL_NUM(code)
+#undef CSKEY_SPECIAL_NUM
+int CSKEY_SPECIAL_NUM(int code);
+
+#define _CSKEY_MODIFIER(type,num) CSKEY_MODIFIER(type,num)
+#undef CSKEY_MODIFIER
+int CSKEY_MODIFIER(int type,int num);
+
 // csutil/eventnames.h
 #define _CS_IS_KEYBOARD_EVENT(reg,e) CS_IS_KEYBOARD_EVENT(reg,e)
 #undef CS_IS_KEYBOARD_EVENT
@@ -1451,6 +1469,7 @@ bool _CS_IS_JOYSTICK_EVENT (iObjectRegistry *,const iEvent &);
 #define _CS_IS_INPUT_EVENT(reg,e) CS_IS_INPUT_EVENT(reg,e)
 #undef CS_IS_INPUT_EVENT
 bool _CS_IS_INPUT_EVENT (iObjectRegistry *,const iEvent &);
+
 
 /*
  New Macros for to use instead of event type masks
@@ -1554,7 +1573,7 @@ uint _CS_FX_SETALPHA_INT (uint);
   V operator - (const V & v) const { return *self - v; }
   float operator * (const V & v) const { return *self * v; }
   V operator * (float f) const { return *self * f; }
-  V operator / (float f) const { return *self * f; }
+  V operator / (float f) const { return *self / f; }
   bool operator == (const V & v) const { return *self == v; }
   bool operator != (const V & v) const { return *self != v; }
   bool operator < (float f) const { return *self < f; }
