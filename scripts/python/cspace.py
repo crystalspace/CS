@@ -11969,6 +11969,10 @@ class csMemoryPen(iPen):
 csMemoryPen_swigregister = _cspace.csMemoryPen_swigregister
 csMemoryPen_swigregister(csMemoryPen)
 
+CSKEY_SHIFT_NUM = _cspace.CSKEY_SHIFT_NUM
+CSKEY_SPECIAL = _cspace.CSKEY_SPECIAL
+CSKEY_SPECIAL_NUM = _cspace.CSKEY_SPECIAL_NUM
+CSKEY_MODIFIER = _cspace.CSKEY_MODIFIER
 CS_IS_KEYBOARD_EVENT = _cspace.CS_IS_KEYBOARD_EVENT
 CS_IS_MOUSE_EVENT = _cspace.CS_IS_MOUSE_EVENT
 CS_IS_JOYSTICK_EVENT = _cspace.CS_IS_JOYSTICK_EVENT
