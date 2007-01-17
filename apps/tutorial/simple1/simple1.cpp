@@ -16,7 +16,7 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "bproctest.h"
+#include "simple1.h"
 
 CS_IMPLEMENT_APPLICATION
 
