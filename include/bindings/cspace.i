@@ -690,7 +690,6 @@ SET_HELPER(csStringID)
 %ignore csStringBase;
 %ignore csStringBase::operator [] (size_t);
 %ignore csStringBase::operator [] (size_t) const;
-%ignore csStringFast;
 %ignore csString::csString (size_t);
 %ignore csString::csString (char);
 %ignore csString::csString (unsigned char);
@@ -1200,6 +1199,14 @@ APPLY_TYPEMAP_ARGOUT_PTR(csKeyModifiers,csKeyModifiers& modifiers)
 %include "iutil/evdefs.h"
 %include "iutil/eventq.h"
 %ignore csStrKey::operator const char*;
+%ignore csHash::ConstGlobalIterator;
+%ignore csHash::GlobalIterator;
+%ignore csHash::Iterator;
+%ignore csHash::PutFirst;
+%ignore csHash::GetIterator;
+%ignore csHash::DeleteElement;
+%ignore csHash::Get (const K& key, T& fallback);
+%ignore csHash::csHash (const csHash<T> &o);
 %include "csutil/hash.h"
 %include "iutil/eventnames.h"
 %include "csutil/eventnames.h"

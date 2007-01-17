@@ -516,6 +516,23 @@ def __iter__(self):
 
 %ignore iPen::Rotate;
 
+// csStringFast typemaps
+%typemap(out) csStringFast *
+{
+        const char *res = $1->GetData();
+        $result = SWIG_FromCharPtr(res);
+}
+
+%typemap(in) csStringFast *
+{
+        $1 = new $1_basetype (PyString_AsString($input));
+}
+
+%typemap(freearg) csStringFast *
+{
+   delete $1;
+}
+
 #endif // ifndef CS_MINI_SWIG
 
 #endif // SWIGPYTHON

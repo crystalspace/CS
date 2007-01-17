@@ -6,6 +6,15 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+17-Jan-2007
+	- caedes did the following changes to cspace.i:
+	    - removed ignore for csStringFast.
+	    - added some ignores for csHash members and methods that cant
+	      be wrapped.
+	- caedes did the following changes to python swig files:
+	    - added in and out typemaps for csStringFast to python string 
+	      conversion.
+	    - added dict like interface for csHash (no iterator yet though).
 16-Jan-2007
 	- caedes did the following changes to cspace.i:
 	    - fixed vector division, was misimplemented as multiplication.
