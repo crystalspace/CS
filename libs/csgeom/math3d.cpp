@@ -577,7 +577,7 @@ bool csIntersect3::SegmentPlane (
     const csVector3 d = end - start;
     const float dd = d * plane.norm;
 
-    if (dd < 0)
+    if (dd > 0)
     {
       // Plane pointing opposite to segment, update end
       segment.SetEnd (isec);

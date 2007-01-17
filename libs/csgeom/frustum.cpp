@@ -176,6 +176,28 @@ csFrustum::~csFrustum ()
   Clear ();
 }
 
+const csFrustum& csFrustum::operator= (const csFrustum& copy)
+{
+  Clear ();
+  origin = copy.origin;
+  num_vertices = copy.num_vertices;
+  max_vertices = copy.max_vertices;
+  wide = copy.wide;
+  mirrored = copy.mirrored;
+
+  if (copy.vertices)
+  {
+    vertices = GetVertexArrayAlloc ()->GetVertexArray (max_vertices);
+    memcpy (vertices, copy.vertices, sizeof (csVector3) * num_vertices);
+  }
+  else
+    vertices = 0;
+
+  backplane = copy.backplane ? new csPlane3 (*copy.backplane) : 0;
+
+  return *this;
+}
+
 void csFrustum::Clear ()
 {
   GetVertexArrayAlloc ()->FreeVertexArray (vertices, max_vertices);
@@ -842,6 +864,63 @@ csPtr<csFrustum> csFrustum::Intersect (csVector3 *poly, int num) const
   }
 
   return new_frustum;
+}
+
+bool csFrustum::Intersect (csSegment3& segment)
+{
+  // Any segment is part of an infinite frustum
+  if (IsInfinite ())
+    return true;
+
+  csSegment3 newSegment (segment.Start () - origin, segment.End () - origin);
+
+  if (backplane)
+  {
+    //Handle backplane
+    bool startB = (backplane->Classify (newSegment.Start ()) < 0);
+    bool endB = (backplane->Classify (newSegment.End ()) < 0);
+
+    if (startB || endB)
+    {
+      // Either in front, no modification, we do intersect
+      csIntersect3::SegmentPlane (*backplane, newSegment);
+    }
+    else
+    {
+      // Both behind, no intersection, no modification
+      return false; 
+    }
+  }
+
+  // Now intersect all the others
+  // Loop through all planes that makes the frustum
+  for (int fv = 0, fvp = num_vertices - 1; fv < num_vertices; fvp = fv++)
+  {
+    const csVector3 &v1 = vertices[fvp];
+    const csVector3 &v2 = vertices[fv];
+    
+    /// Clip segment against plane origo,v1,v2
+    const csPlane3 pl (v1, v2);
+
+    bool startPl = (pl.Classify (newSegment.Start ()) < 0);
+    bool endPl = (pl.Classify (newSegment.End ()) < 0);
+
+    if (startPl || endPl)
+    {
+      // Either in front, no modification, we do intersect
+      if (!startPl || !endPl)
+        csIntersect3::SegmentPlane (pl, newSegment);
+    }
+    else
+    {
+      // Both behind, no intersection, no modification
+      return false;
+    }
+  }
+
+  segment = csSegment3 (newSegment.Start ()+origin, newSegment.End ()+origin);
+
+  return true;
 }
 
 bool csFrustum::Contains (const csVector3 &point)

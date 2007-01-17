@@ -346,20 +346,28 @@ namespace lighter
       Portal* portal = it.Next ();
       
       if (portal->portalPlane.Classify (lightCenter) < -0.01f && //light in front of portal
-        csIntersect3::BoxPlane (lightBB, portal->portalPlane)) //light at least cuts portal plane
+        true) //csIntersect3::BoxPlane (lightBB, portal->portalPlane)) //light at least cuts portal plane
       {
+        const csVector3& origin = lightFrustum.GetOrigin ();
+        CS_ALLOC_STACK_ARRAY(csVector3, tmpVertices, portal->worldVertices.GetSize ());
+        for (size_t i = 0; i < portal->worldVertices.GetSize (); ++i)
+        {
+          tmpVertices[i] = portal->worldVertices[i] - origin;
+        }
+
         csRef<csFrustum> newFrustum = lightFrustum.Intersect (
-          portal->worldVertices.GetArray (), portal->worldVertices.GetSize ());
+          tmpVertices, portal->worldVertices.GetSize ());
 
         if (newFrustum && !newFrustum->IsEmpty ())
         {
-          //Have something left to push through, use that
-          newFrustum->SetBackPlane (portal->portalPlane);
+          //Have something left to push through, use that          
           newFrustum->Transform (&portal->wrapTransform);
 
           // Now, setup our proxy light
           csRef<ProxyLight> proxyLight;
-          proxyLight.AttachNew (new ProxyLight (portal->destSector, light));
+          proxyLight.AttachNew (new ProxyLight (portal->destSector, light, *newFrustum, 
+            portal->wrapTransform, portal->portalPlane));
+          proxyLight->SetPosition (newFrustum->GetOrigin ());
           
           if (proxyLight->IsPDLight ())
             portal->destSector->allPDLights.Push (proxyLight);

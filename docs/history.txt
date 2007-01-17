@@ -15,6 +15,8 @@ chronological order.
 	    - added in and out typemaps for csStringFast to python string 
 	      conversion.
 	    - added dict like interface for csHash (no iterator yet though).
+	- Marten finished support for portals (including space-warping ones)
+	  in lighter2.
 16-Jan-2007
 	- caedes did the following changes to cspace.i:
 	    - fixed vector division, was misimplemented as multiplication.

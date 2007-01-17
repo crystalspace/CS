@@ -73,12 +73,16 @@ namespace lighter
      * Returns color, outgoing vector, pdf and a functor to test visibility
      */
     virtual csColor SampleLight (const csVector3& point, const csVector3& n,
-      float u1, float u2, csVector3& lightVec, float& pdf, VisibilityTester& vistest) = 0;
+      float u1, float u2, csVector3& lightVec, float& pdf, VisibilityTester& vistest,
+      const csPlane3* visLimitPlane = 0) = 0;
 
     /**
      * Return light power over S2 sphere
      */
     virtual csColor GetPower () const = 0;
+
+    /// Compute the light position from given sampling values
+    virtual csVector3 GetLightSamplePosition (float u1, float u2) = 0;
 
     // Properties
     void SetAttenuation (csLightAttenuationMode mode, const csVector3& constants);
@@ -156,6 +160,8 @@ namespace lighter
       return attenuationFunc (sqD, attenuationConsts);
     }
 
+ 
+
     // Data
 
     // Atteunation related
@@ -189,7 +195,8 @@ namespace lighter
     virtual ~PointLight();
 
     virtual csColor SampleLight (const csVector3& point, const csVector3& n,
-      float u1, float u2, csVector3& lightVec, float& pdf, VisibilityTester& vistest);
+      float u1, float u2, csVector3& lightVec, float& pdf, VisibilityTester& vistest,
+      const csPlane3* visLimitPlane = 0);
 
     /**
      * Return light power over S2 sphere
@@ -204,6 +211,12 @@ namespace lighter
     void SetRadius (float radius);
 
   protected:
+    /// Compute the light position from given sampling values
+    virtual csVector3 GetLightSamplePosition (float u1, float u2)
+    {
+      return GetPosition ();
+    }
+
     float radius;
   };
 
@@ -211,11 +224,13 @@ namespace lighter
   class ProxyLight : public Light
   {
   public:
-    ProxyLight (Sector* owner, Light* parentLight);
+    ProxyLight (Sector* owner, Light* parentLight, const csFrustum& frustum,
+      const csReversibleTransform& transform, const csPlane3& portalPlane);
     virtual ~ProxyLight();
 
     virtual csColor SampleLight (const csVector3& point, const csVector3& n,
-      float u1, float u2, csVector3& lightVec, float& pdf, VisibilityTester& vistest);
+      float u1, float u2, csVector3& lightVec, float& pdf, VisibilityTester& vistest,
+      const csPlane3* visLimitPlane = 0);
 
     /**
      * Return light power over S2 sphere
@@ -223,7 +238,12 @@ namespace lighter
     virtual csColor GetPower () const;
 
   private:
+    /// Compute the light position from given sampling values
+    virtual csVector3 GetLightSamplePosition (float u1, float u2);
+
     Light* parent;
+    csReversibleTransform proxyTransform;
+    csPlane3 portalPlane;
   };
 } // namespace lighter
 
