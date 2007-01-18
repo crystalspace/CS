@@ -9,6 +9,8 @@ chronological order.
 18-Jan-2007
 	- caedes added csRadixSorter and csConfigFile to the swig interface 
 	  files.
+	- res fixed the genmesh 3DS loader to allocate a correctly sized index
+	  buffer. Addresses #236.
 17-Jan-2007
 	- caedes did the following changes to cspace.i:
 	    - removed ignore for csStringFast.

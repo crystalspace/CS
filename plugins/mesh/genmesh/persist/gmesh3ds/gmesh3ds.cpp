@@ -386,7 +386,7 @@ csPtr<iBase> csGenmesh3DSFactoryLoader::Parse (iDataBuffer* buf,
     for (j = 0 ; j < materials_and_tris.Length () ; j++)
     {
       csRef<iRenderBuffer> indexBuffer = csRenderBuffer::CreateIndexRenderBuffer (
-        materials_and_tris[j].tris.GetSize(), CS_BUF_STATIC, 
+        materials_and_tris[j].tris.GetSize()*3, CS_BUF_STATIC, 
         CS_BUFCOMP_UNSIGNED_INT, 0, gmstate->GetVertexCount() - 1);
       {
         csRenderBufferLock<uint> indices (indexBuffer);
