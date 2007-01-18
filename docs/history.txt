@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+18-Jan-2007
+	- caedes added csRadixSorter and csConfigFile to the swig interface 
+	  files.
 17-Jan-2007
 	- caedes did the following changes to cspace.i:
 	    - removed ignore for csStringFast.
