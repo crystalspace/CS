@@ -18,6 +18,9 @@ chronological order.
 	      when proxy lights are used.
 	    - Fixed regression where the "noshadow" attribute of meshes was
 	      ignored.
+	- res made lighter2's CollectShadow...() methods more act like the 
+	  "real" lighting functions do. Also, for border elements, only the
+	  hits for "inside" points should be collected, not all hits.
 17-Jan-2007
 	- caedes did the following changes to cspace.i:
 	    - removed ignore for csStringFast.

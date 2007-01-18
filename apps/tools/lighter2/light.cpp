@@ -122,29 +122,14 @@ namespace lighter
     return true;
   }
 
-  void VisibilityTester::CollectHits (csSet<csConstPtrKey<Primitive> > &primitives, 
+  void VisibilityTester::CollectHits (HitPointCallback* hitCB, 
     HitIgnoreCallback* ignoreCB)
   {
-    struct HitCB : public HitPointCallback
-    {
-      HitCB (csSet<csConstPtrKey<Primitive> > &primitives)
-        : primitives (primitives)
-      {
-      }
-      
-      virtual void RegisterHit (const Ray &ray, const HitPoint &hit)
-      {
-        primitives.Add (hit.primitive);
-      }
-
-      csSet<csConstPtrKey<Primitive> > &primitives;
-    } hitCB (primitives);
-
     for (size_t i = 0; i < allSegments.GetSize (); ++i)
     {
       Segment& s = allSegments[i];
 
-      Raytracer::TraceAllHits (s.tree, s.ray, &hitCB, ignoreCB);
+      Raytracer::TraceAllHits (s.tree, s.ray, hitCB, ignoreCB);
     }
   }
 

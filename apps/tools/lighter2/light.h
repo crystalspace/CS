@@ -37,8 +37,7 @@ namespace lighter
     bool Unoccluded (const Primitive* ignorePrim = 0);
     bool Unoccluded (HitIgnoreCallback* ignoreCB);
 
-    void CollectHits (csSet<csConstPtrKey<Primitive> > &primitives, 
-      HitIgnoreCallback* ignoreCB);
+    void CollectHits (HitPointCallback* hitCB, HitIgnoreCallback* ignoreCB);
 
     void AddSegment (KDTree* tree, const csVector3& start, const csVector3& end);
     void AddSegment (KDTree* tree, const csVector3& start, const csVector3& dir, float maxL);
