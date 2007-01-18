@@ -150,6 +150,11 @@ namespace lighter
       return lightFrustum;
     }
 
+    /**
+     * If the light is a proxy, returns the pointer to the "original" light.
+     * If the light is not a proxy simply returns pointer to itself.
+     */
+    virtual Light* GetOriginalLight () { return this; }
   protected:
     /// Constructor
     Light (Sector* owner, bool deltaDistribution);
@@ -237,6 +242,7 @@ namespace lighter
      */
     virtual csColor GetPower () const;
 
+    virtual Light* GetOriginalLight () { return parent->GetOriginalLight(); }
   private:
     /// Compute the light position from given sampling values
     virtual csVector3 GetLightSamplePosition (float u1, float u2);

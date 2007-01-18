@@ -11,6 +11,13 @@ chronological order.
 	  files.
 	- res fixed the genmesh 3DS loader to allocate a correctly sized index
 	  buffer. Addresses #236.
+	- res made the following changes to lighter2:
+	    - Changed main() slightly to ensure proper cleanup.
+	    - Silenced "Error parsing mesh" for portal containers.
+	    - Changed Scene::GetLightmap() to return the correct PD light map
+	      when proxy lights are used.
+	    - Fixed regression where the "noshadow" attribute of meshes was
+	      ignored.
 17-Jan-2007
 	- caedes did the following changes to cspace.i:
 	    - removed ignore for csStringFast.

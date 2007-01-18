@@ -206,6 +206,7 @@ namespace lighter
     if (!light || !light->IsPDLight ())
       return lightmaps[lightmapID];
 
+    light = light->GetOriginalLight();
     LightmapPtrDelArray* pdLights = pdLightmaps.Get (light, 0);
     if (pdLights == 0)
     {
@@ -254,8 +255,11 @@ namespace lighter
     {
       iMeshWrapper* mesh = meshList->Get (i);
       if (ParseMesh (radSector, mesh) == Failure)
-        globalLighter->Report ("Error parsing mesh '%s' in sector '%s'!", 
-          mesh->QueryObject()->GetName(), radSector->sectorName.GetData ());
+      {
+        if (!mesh->GetPortalContainer())
+          globalLighter->Report ("Error parsing mesh '%s' in sector '%s'!", 
+            mesh->QueryObject()->GetName(), radSector->sectorName.GetData ());
+      }
     }
 
     // Parse all lights (should have selector later!)
