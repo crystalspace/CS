@@ -26,7 +26,6 @@
 #include "csqint.h"
 #include "csutil/cfgacc.h"
 #include "csutil/databuf.h"
-#include "csutil/debug.h"
 #include "csutil/scf.h"
 #include "csutil/scfstrset.h"
 #include "csutil/sysfunc.h"
@@ -536,8 +535,6 @@ csEngine::csEngine (iBase *iParent) :
   defaultMaxLightmapWidth (256), defaultMaxLightmapHeight (256),
   currentRenderContext (0), weakEventHandler(0)
 {
-  DG_TYPE (this, "csEngine");
-
   ClearRenderPriorities ();
 }
 
