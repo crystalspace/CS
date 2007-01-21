@@ -1,6 +1,5 @@
 SubDir TOP plugins ;
 
-SubInclude TOP plugins bugplug ;
 SubInclude TOP plugins collide ;
 SubInclude TOP plugins console ;
 SubInclude TOP plugins cscript ;

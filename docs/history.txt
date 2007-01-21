@@ -17,6 +17,8 @@ chronological order.
 	- res partially undid the csDebuggingGraph removal: the class and
 	  macros are still there, but now are no-ops and emit deprecation
 	  warnings.
+	- res fixed plugins/Jamfile for the bugplug move. Also fixed bugplug
+	  for the debugging graph & profiler removals.
 19-Jan-2007
 	- Marten removed csDebuggingGraph and related classes. They weren't
 	  used anyhow.

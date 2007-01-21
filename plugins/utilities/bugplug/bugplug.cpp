@@ -39,7 +39,6 @@
 #include "csutil/eventnames.h"
 #include "csutil/eventhandlers.h"
 #include "csutil/flags.h"
-#include "csutil/profile.h"
 #include "csutil/regexp.h"
 #include "csutil/scanstr.h"
 #include "csutil/scf.h"
@@ -571,10 +570,6 @@ bool csBugPlug::ExecCommand (int cmd, const csString& args)
     case DEBUGCMD_STATUS:
       Report (CS_REPORTER_SEVERITY_NOTIFY,
 		"I'm running smoothly, thank you...");
-      break;
-    case DEBUGCMD_DEBUGGRAPH:
-      Report (CS_REPORTER_SEVERITY_NOTIFY, "Debug graph dumped!");
-	csDebuggingGraph::Dump (object_reg);
       break;
     case DEBUGCMD_ENGINECMD:
 	{
@@ -1118,12 +1113,6 @@ bool csBugPlug::ExecCommand (int cmd, const csString& args)
 	    s->SetDynamicAmbientLight (color_table[i%14]);
 	  }
 	}
-      break;
-    case DEBUGCMD_PROFDUMP:
-      CS_PROFDUMP(object_reg);
-      break;
-    case DEBUGCMD_PROFRESET:
-      CS_PROFRESET(object_reg);
       break;
     case DEBUGCMD_SHADOWDEBUG:
 	// swap the default shadow volume material shader to/from a version
