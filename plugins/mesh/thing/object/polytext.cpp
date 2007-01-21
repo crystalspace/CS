@@ -21,7 +21,6 @@
 #include "csqint.h"
 #include "csqsqrt.h"
 
-#include "csutil/debug.h"
 #include "csgeom/frustum.h"
 #include "csgeom/math.h"
 #include "csgeom/poly3d.h"

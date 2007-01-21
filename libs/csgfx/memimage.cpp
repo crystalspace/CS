@@ -22,7 +22,6 @@
 #include "csgfx/quantize.h"
 #include "csgfx/imagememory.h"
 #include "csgfx/rgbpixel.h"
-#include "csutil/debug.h"
 #include "csutil/util.h"
 
 CS_LEAKGUARD_IMPLEMENT (csImageMemory);

@@ -35,7 +35,6 @@
 #include "cstool/enginetools.h"
 #include "csutil/cscolor.h"
 #include "csutil/csuctransform.h"
-#include "csutil/debug.h"
 #include "csutil/event.h"
 #include "csutil/eventnames.h"
 #include "csutil/eventhandlers.h"

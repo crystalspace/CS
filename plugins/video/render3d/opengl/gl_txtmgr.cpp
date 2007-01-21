@@ -21,7 +21,6 @@
 #include "cssysdef.h"
 #include "csutil/array.h"
 #include "csutil/databuf.h"
-#include "csutil/debug.h"
 #include "csutil/util.h"
 #include "csgfx/bakekeycolor.h"
 #include "csgfx/imagecubemapmaker.h"

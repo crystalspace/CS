@@ -21,7 +21,6 @@
 #include <stdarg.h>
 #include "csplugincommon/render3d/txtmgr.h"
 #include "csutil/util.h"
-#include "csutil/debug.h"
 #include "csgfx/imagemanipulate.h"
 #include "iutil/objreg.h"
 #include "csqint.h"
