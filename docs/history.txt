@@ -21,6 +21,8 @@ chronological order.
 	  for the debugging graph & profiler removals.
 	- res moved xmlshader's conditionals & processing instructions code
 	  into its own subdirectory.
+	- res added some no-op versions of the old profiler so code using it
+	  will continue to compile.
 19-Jan-2007
 	- Marten removed csDebuggingGraph and related classes. They weren't
 	  used anyhow.
