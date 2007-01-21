@@ -26,7 +26,7 @@
 #include "csutil/weakref.h"
 #include "csutil/scf_implementation.h"
 
-#include "condition.h"
+#include "cpi/condition.h"
 
 struct iSyntaxService;
 struct iLoaderContext;

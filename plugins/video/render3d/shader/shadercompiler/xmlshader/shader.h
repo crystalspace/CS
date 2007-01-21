@@ -28,10 +28,10 @@
 #include "csutil/csobject.h"
 #include "csutil/dirtyaccessarray.h"
 
-#include "condition.h"
-#include "docwrap.h"
+#include "cpi/condition.h"
+#include "cpi/docwrap.h"
 #include "shadertech.h"
-#include "mybitarray.h"
+#include "cpi/mybitarray.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
 {

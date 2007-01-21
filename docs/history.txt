@@ -19,6 +19,8 @@ chronological order.
 	  warnings.
 	- res fixed plugins/Jamfile for the bugplug move. Also fixed bugplug
 	  for the debugging graph & profiler removals.
+	- res moved xmlshader's conditionals & processing instructions code
+	  into its own subdirectory.
 19-Jan-2007
 	- Marten removed csDebuggingGraph and related classes. They weren't
 	  used anyhow.

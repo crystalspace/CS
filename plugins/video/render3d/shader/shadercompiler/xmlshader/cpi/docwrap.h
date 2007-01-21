@@ -354,7 +354,7 @@ class csWrappedDocumentNodeFactory
 
   csStringHash pitokens;
 #define CS_TOKEN_ITEM_FILE \
-  "plugins/video/render3d/shader/shadercompiler/xmlshader/docwrap.tok"
+  "plugins/video/render3d/shader/shadercompiler/xmlshader/cpi/docwrap.tok"
 #define CS_TOKEN_LIST_TOKEN_PREFIX PITOKEN_
 #include "cstool/tokenlist.h"
 #undef CS_TOKEN_ITEM_FILE
