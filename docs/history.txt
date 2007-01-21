@@ -13,6 +13,7 @@ chronological order.
 	  Advantages include support for profiling without the object registry,
 	  no crash if a plugin with profiling points is unloaded and support
 	  for counters (simple counters without time information).
+	- Marten moved the source for bugplug plugin to utilities subdirectory.
 19-Jan-2007
 	- Marten removed csDebuggingGraph and related classes. They weren't
 	  used anyhow.
