@@ -35,6 +35,7 @@
 #include "ivaria/ode.h"
 #include "ivaria/pagingformer.h"
 #include "ivaria/pmeter.h"
+#include "ivaria/profile.h"
 #include "ivaria/reporter.h"
 #include "ivaria/script.h"
 #include "ivaria/sequence.h"
