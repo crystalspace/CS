@@ -14,6 +14,9 @@ chronological order.
 	  no crash if a plugin with profiling points is unloaded and support
 	  for counters (simple counters without time information).
 	- Marten moved the source for bugplug plugin to utilities subdirectory.
+	- res partially undid the csDebuggingGraph removal: the class and
+	  macros are still there, but now are no-ops and emit deprecation
+	  warnings.
 19-Jan-2007
 	- Marten removed csDebuggingGraph and related classes. They weren't
 	  used anyhow.
