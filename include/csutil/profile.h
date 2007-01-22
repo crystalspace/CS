@@ -46,17 +46,23 @@ csProfiler : public scfImplementation0<csProfiler>
 {
 public:
   csArray<csProfileInfo> profile_info;
+  csArray<CS::Debug::ProfileZone*> profile_zones;
+  csArray<CS::Debug::ProfileCounter*> profile_counters;
 
 public:
-  csProfiler () {}
+  csProfiler () : scfImplementationType (this) {}
   virtual ~csProfiler () {}
 
   // Dummies to keep class compiling
   void Reset () {}
-  CS::Debug::ProfileZone* GetProfileZone (const char* zonename) {}
-  CS::Debug::ProfileCounter* GetProfileCounter (const char* countername) {}
-  const csArray<CS::Debug::ProfileZone*>& GetProfileZones () {}
-  const csArray<CS::Debug::ProfileCounter*>& GetProfileCounters () {}
+  CS::Debug::ProfileZone* GetProfileZone (const char* zonename)
+  { return 0; }
+  CS::Debug::ProfileCounter* GetProfileCounter (const char* countername)
+  { return 0; }
+  const csArray<CS::Debug::ProfileZone*>& GetProfileZones ()
+  { return profile_zones; }
+  const csArray<CS::Debug::ProfileCounter*>& GetProfileCounters ()
+  { return profile_counters; }
 };
 
 namespace CS
