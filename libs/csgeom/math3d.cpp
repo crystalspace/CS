@@ -877,10 +877,10 @@ bool csIntersect3::BoxFrustum (const csBox3& box, const csFrustum* frustum)
   csVector3 d = box.Max ()-m;		// Half-diagonal.
 
   const csVector3& origin = frustum->GetOrigin ();
-  int vtcount = frustum->GetVertexCount ();
+  size_t vtcount = frustum->GetVertexCount ();
   csVector3* vts = frustum->GetVertices ();
-  int i1 = vtcount-1;
-  int i;
+  size_t i1 = vtcount-1;
+  size_t i;
   for (i = 0 ; i < vtcount ; i++)
   {
     csPlane3 p (origin, vts[i], vts[i1]);
