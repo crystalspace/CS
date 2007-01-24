@@ -14,6 +14,7 @@ chronological order.
 	- res changed the engine's standard shader loading to not hardcode
 	  the xmlshader compiler.
 	- res removed a number of deprecated header files.
+	- res removed the deprecated csArray<>::DeleteFast().
 23-Jan-2007
 	- res made compileassert.h use the correct namespace (CS instead of
 	  CrystalSpace).
