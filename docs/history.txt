@@ -26,6 +26,7 @@ chronological order.
 	  ELF reader. Addresses #231.
 	- res changed the "CPU optimization" detection in configure to also
 	  test for -mtune=generic (supported by future GCCs).
+	- res fixed a compiler error in xmlshader with gcc 3.2.
 23-Jan-2007
 	- res made compileassert.h use the correct namespace (CS instead of
 	  CrystalSpace).
