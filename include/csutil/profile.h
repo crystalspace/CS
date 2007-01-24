@@ -20,7 +20,6 @@
 #define __CS_UTIL_PROFILE_H__
 
 /**\file
- * Profiling utilities.
  */
 
 #include "csextern.h"
@@ -29,6 +28,11 @@
 #include "csutil/scf_implementation.h"
 #include "ivaria/profile.h"
 
+#include "csutil/win32/msvc_deprecated_warn_off.h"
+
+/**
+ * \deprecated Old profiling discontinued; check docs for new API
+ */
 struct CS_DEPRECATED_TYPE_MSG("Old profiling discontinued; check docs for new API")
 csProfileInfo
 {
@@ -41,6 +45,9 @@ csProfileInfo
   uint32* ptr_timemax;
 };
 
+/**
+ * \deprecated Old profiling discontinued; use iProfiler interface
+ */
 class CS_DEPRECATED_TYPE_MSG("Old profiling discontinued; check docs for new API")
 csProfiler : public scfImplementation0<csProfiler>
 {
@@ -82,11 +89,28 @@ namespace CS
   } // namespace Macros
 } // namespace CS
 
+/**\def CS_PROFTIME
+ * \deprecated Old profiling discontinued; use iProfiler interface
+ */
 #define CS_PROFTIME(v) CS::Macros::CS_PROFTIME(); v = 0
+/**\def CS_PROFRESET
+ * \deprecated Old profiling discontinued; use iProfiler interface
+ */
 #define CS_PROFRESET(a) CS::Macros::CS_PROFRESET()
+/**\def CS_PROFDUMP
+ * \deprecated Old profiling discontinued; use iProfiler interface
+ */
 #define CS_PROFDUMP(a) CS::Macros::CS_PROFDUMP()
+/**\def CS_PROFSTART
+ * \deprecated Old profiling discontinued; use iProfiler interface
+ */
 #define CS_PROFSTART(a,b) CS::Macros::CS_PROFSTART()
+/**\def CS_PROFSTOP
+ * \deprecated Old profiling discontinued; use iProfiler interface
+ */
 #define CS_PROFSTOP(a) CS::Macros::CS_PROFSTOP()
+
+#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 #endif //__CS_UTIL_PROFILE_H__
 

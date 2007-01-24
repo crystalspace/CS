@@ -112,11 +112,17 @@ struct iProfiler : public virtual iBase
 {
   SCF_INTERFACE (iProfiler, 3,0,1);
   
+  /**\name Deprecated methods
+   * \deprecated These methods are present solely for source code 
+   *   compatibility; don't use.
+   * @{
+   */
   CS_DEPRECATED_METHOD_MSG("Old profiling discontinued; check docs for new API")
   static void RegisterProfilePoint (const char*, const char*, int, uint32*, 
     uint32*, uint32*, uint32*) {}
   CS_DEPRECATED_METHOD_MSG("Old profiling discontinued; check docs for new API")
   static void Dump () {}
+  /** @} */
   
   /**
    * Get a pointer to a profiler zone.

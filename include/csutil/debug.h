@@ -20,13 +20,9 @@
 #define __CS_UTIL_DEBUG_H__
 
 /**\file
- * Debugging graph
  */
 
 #include "csextern.h"
-
-// Enable the following define to have the DG_... macros.
-//#define CS_USE_GRAPHDEBUG
 
 struct iBase;
 struct iObjectRegistry;
@@ -51,20 +47,62 @@ namespace CS
   } // namespace Macros
 } // namespace CS
 
+/**\def DG_ADD
+ * \deprecated Discontinued cruft
+ */
 #define DG_ADD(a,b) CS::Macros::DG_ADD ()
+/**\def DG_ADDI
+ * \deprecated Discontinued cruft
+ */
 #define DG_ADDI(a,b) CS::Macros::DG_ADDI ()
+/**\def DG_TYPE
+ * \deprecated Discontinued cruft
+ */
 #define DG_TYPE(a,b) CS::Macros::DG_TYPE ()
+/**\def DG_DESCRIBE0
+ * \deprecated Discontinued cruft
+ */
 #define DG_DESCRIBE0(a,b) CS::Macros::DG_DESCRIBE0 ()
+/**\def DG_DESCRIBE1
+ * \deprecated Discontinued cruft
+ */
 #define DG_DESCRIBE1(a,b,c) CS::Macros::DG_DESCRIBE1 ()
+/**\def DG_DESCRIBE2
+ * \deprecated Discontinued cruft
+ */
 #define DG_DESCRIBE2(a,b,c,d) CS::Macros::DG_DESCRIBE2 ()
+/**\def DG_REM
+ * \deprecated Discontinued cruft
+ */
 #define DG_REM(a) CS::Macros::DG_REM ()
+/**\def DG_ADDCHILD
+ * \deprecated Discontinued cruft
+ */
 #define DG_ADDCHILD(a,b) CS::Macros::DG_ADDCHILD ()
+/**\def DG_ADDPARENT
+ * \deprecated Discontinued cruft
+ */
 #define DG_ADDPARENT(a,b) CS::Macros::DG_ADDPARENT ()
+/**\def DG_REMCHILD
+ * \deprecated Discontinued cruft
+ */
 #define DG_REMCHILD(a,b) CS::Macros::DG_REMCHILD ()
+/**\def DG_REMPARENT
+ * \deprecated Discontinued cruft
+ */
 #define DG_REMPARENT(a,b) CS::Macros::DG_REMPARENT ()
+/**\def DG_LINK
+ * \deprecated Discontinued cruft
+ */
 #define DG_LINK(a,b) CS::Macros::DG_LINK ()
+/**\def DG_UNLINK
+ * \deprecated Discontinued cruft
+ */
 #define DG_UNLINK(a,b) CS::Macros::DG_UNLINK ()
 
+/**
+ * \deprecated Discontinued cruft
+ */
 class CS_DEPRECATED_TYPE_MSG("Discontinued cruft") csDebuggingGraph
 {
 public:
