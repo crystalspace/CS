@@ -278,7 +278,7 @@ void csFrustum::ClipPolyToPlane (csPlane3 *plane)
   size_t i, i1;
 
   bool front[100];              // @@@ Hard coded limit.
-  int count_front = 0;
+  size_t count_front = 0;
   for (i = 0; i < num_vertices; i++)
   {
     front[i] = csMath3::Visible (vertices[i], *plane);
@@ -361,7 +361,7 @@ void csFrustum::ClipPolyToPlane (csPlane3 *plane)
 
 void csFrustum::ClipToPlane (csVector3 &v1, csVector3 &v2)
 {
-  size_t cw_offset = ~0;
+  size_t cw_offset = (size_t)~0;
   size_t ccw_offset;
   bool first_vertex_side;
   csVector3 isect_cw, isect_ccw;
@@ -391,7 +391,7 @@ void csFrustum::ClipToPlane (csVector3 &v1, csVector3 &v2)
     }
   }
 
-  if (cw_offset == ~0)
+  if (cw_offset == (size_t)~0)
   {
     // Return, if there is no intersection.
     if (first_vertex_side)
@@ -406,8 +406,10 @@ void csFrustum::ClipToPlane (csVector3 &v1, csVector3 &v2)
   }
 
   // Calculate the intersection points.
-  i = cw_offset - 1;
-  if (i < 0) i = num_vertices - 1;
+  if (cw_offset == 0)
+    i = num_vertices - 1;
+  else
+    i = cw_offset - 1;
 
   float dummy;
   csIntersect3::SegmentPlane (
@@ -437,11 +439,15 @@ void csFrustum::ClipToPlane (csVector3 &v1, csVector3 &v2)
   else
   {
     if (cw_offset + 1 < ccw_offset)
+    {
       for (i = 0; i < num_vertices - ccw_offset - 1; i++)
         vertices[cw_offset + 2 + i] = vertices[ccw_offset + 1 + i];
+    }
     else if (cw_offset + 1 > ccw_offset)
-      for (i = num_vertices - 2 - ccw_offset; i >= 0; i--)
+    {
+      for (i = num_vertices - 2 - ccw_offset; i-- > 0; )
         vertices[cw_offset + 2 + i] = vertices[ccw_offset + 1 + i];
+    }
 
     vertices[cw_offset] = isect_cw;
     vertices[cw_offset + 1] = isect_ccw;
@@ -455,7 +461,7 @@ void csFrustum::ClipToPlane (
   csClipInfo *clipinfo,
   const csPlane3 &plane)
 {
-  size_t cw_offset = ~0;
+  size_t cw_offset = (size_t)~0;
   size_t ccw_offset;
   bool first_vertex_side;
   csVector3 isect_cw, isect_ccw;
@@ -473,7 +479,7 @@ void csFrustum::ClipToPlane (
     }
   }
 
-  if (cw_offset == ~0)
+  if (cw_offset == (size_t)~0)
   {
     // Return, if there is no intersection.
     if (first_vertex_side)
@@ -490,8 +496,10 @@ void csFrustum::ClipToPlane (
   }
 
   // Calculate the intersection points.
-  i = cw_offset - 1;
-  if (i < 0) i = num_vertices - 1;
+  if (cw_offset == 0)
+    i = num_vertices - 1;
+  else
+    i = cw_offset - 1;
 
   float dist_cw, dist_ccw;
   csIntersect3::SegmentPlane (
@@ -575,7 +583,7 @@ void csFrustum::ClipToPlane (
     }
     else if (cw_offset + 1 > ccw_offset)
     {
-      for (i = num_vertices - 2 - ccw_offset; i >= 0; i--)
+      for (i = num_vertices - 2 - ccw_offset; i-- > 0; )
       {
         vertices[cw_offset + 2 + i] = vertices[ccw_offset + 1 + i];
         clipinfo[cw_offset + 2 + i].Copy (clipinfo[ccw_offset + 1 + i]);
@@ -619,7 +627,7 @@ void csFrustum::ClipToPlane (
     }
   }
 
-  if (cw_offset == -1)
+  if (cw_offset == (size_t)~0)
   {
     // Return, if there is no intersection.
     if (first_vertex_side)
@@ -636,8 +644,10 @@ void csFrustum::ClipToPlane (
   }
 
   // Calculate the intersection points.
-  i = cw_offset - 1;
-  if (i < 0) i = num_vertices - 1;
+  if (cw_offset == 0)
+    i = num_vertices - 1;
+  else
+    i = cw_offset - 1;
 
   float dist_cw, dist_ccw;
   csIntersect3::SegmentPlane (
@@ -723,7 +733,7 @@ void csFrustum::ClipToPlane (
     }
     else if (cw_offset + 1 > ccw_offset)
     {
-      for (i = num_vertices - 2 - ccw_offset; i >= 0; i--)
+      for (i = num_vertices - 2 - ccw_offset; i-- > 0; )
       {
         vertices[cw_offset + 2 + i] = vertices[ccw_offset + 1 + i];
         clipinfo[cw_offset + 2 + i].Copy (clipinfo[ccw_offset + 1 + i]);
