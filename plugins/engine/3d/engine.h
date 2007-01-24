@@ -639,8 +639,7 @@ private:
   // Renderloop loading/creation
   csPtr<iRenderLoop> CreateDefaultRenderLoop ();
   void LoadDefaultRenderLoop (const char* fileName);
-  csRef<iShader> LoadShader (iDocumentSystem* docsys, iShaderCompiler* shcom,
-    const char* filename);
+  csRef<iShader> LoadShader (iDocumentSystem* docsys, const char* filename);
 
   /**
    * Setup for starting a Draw or DrawFunc.

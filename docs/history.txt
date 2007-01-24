@@ -11,6 +11,8 @@ chronological order.
 	- res removed the deprecated engine collection stuff from the source.
 	- res fixed warning+oversights caused by the csFrustum 
 	  size_t-ification.
+	- res changed the engine's standard shader loading to not hardcode
+	  the xmlshader compiler.
 23-Jan-2007
 	- res made compileassert.h use the correct namespace (CS instead of
 	  CrystalSpace).

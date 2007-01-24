@@ -704,35 +704,24 @@ void csEngine::DeleteAll ()
       return;
     }
 
-    csRef<iShaderCompiler> shcom (shaderManager->
-      GetCompiler ("XMLShader"));
+    // Load default shaders
+    csRef<iDocumentSystem> docsys (
+      csQueryRegistry<iDocumentSystem> (objectRegistry));
+    if (!docsys.IsValid())
+      docsys.AttachNew (new csTinyDocumentSystem ());
 
-    if (!shcom.IsValid())
-    {
-      Warn ("'XMLShader' shader compiler not available - "
-	"default shaders are unavailable.");
-    }
-    else
-    {
-      // Load default shaders
-      csRef<iDocumentSystem> docsys (
-	csQueryRegistry<iDocumentSystem> (objectRegistry));
-      if (!docsys.IsValid())
-	docsys.AttachNew (new csTinyDocumentSystem ());
+    const char* shaderPath;
+    shaderPath = cfg->GetStr ("Engine.Shader.Default", 
+      "/shader/std_lighting.xml");
+    defaultShader = LoadShader (docsys, shaderPath);
+    if (!defaultShader.IsValid())
+      Warn ("Default shader %s not available", shaderPath);
 
-      const char* shaderPath;
-      shaderPath = cfg->GetStr ("Engine.Shader.Default", 
-        "/shader/std_lighting.xml");
-      defaultShader = LoadShader (docsys, shcom, shaderPath);
-      if (!defaultShader.IsValid())
-	Warn ("Shader %s not available", shaderPath);
-
-      shaderPath = cfg->GetStr ("Engine.Shader.Portal", 
-        "/shader/std_lighting_portal.xml");
-      csRef<iShader> portal_shader = LoadShader (docsys, shcom, shaderPath);
-      if (!portal_shader.IsValid())
-	Warn ("Shader %s not available", shaderPath);
-    }
+    shaderPath = cfg->GetStr ("Engine.Shader.Portal", 
+      "/shader/std_lighting_portal.xml");
+    csRef<iShader> portal_shader = LoadShader (docsys, shaderPath);
+    if (!portal_shader.IsValid())
+      Warn ("Default shader %s not available", shaderPath);
 
     // Now, try to load the user-specified default render loop.
     const char* configLoop = cfg->GetStr ("Engine.RenderLoop.Default", 0);
@@ -1486,7 +1475,6 @@ void csEngine::LoadDefaultRenderLoop (const char* fileName)
 }
 
 csRef<iShader> csEngine::LoadShader (iDocumentSystem* docsys,
-                                     iShaderCompiler* shcom,
                                      const char* filename)
 {
   csRef<iDocument> shaderDoc = docsys->CreateDocument ();
@@ -1508,10 +1496,36 @@ csRef<iShader> csEngine::LoadShader (iDocumentSystem* docsys,
   csRef<iFile> shaderFile = VFS->Open (shaderFn, VFS_FILE_READ);
   if (shaderFile.IsValid())
   {
-    shaderDoc->Parse (shaderFile, false);
+    const char* err = shaderDoc->Parse (shaderFile, false);
+    if (err != 0)
+    {
+      Warn ("Error parsing %s: %s", filename, err);
+      return 0;
+    }
+    
+    csRef<iDocumentNode> shaderNode = shaderDoc->GetRoot ()->
+      GetNode ("shader");
+    if (!shaderNode)
+    {
+      Warn ("%s has no 'shader' node", filename);
+      return 0;
+    }
+    
+    const char* compilerAttr = shaderNode->GetAttributeValue ("compiler");
+    if (!compilerAttr)
+    {
+      Warn ("%s: 'shader' node has no 'compiler' attribute", filename);
+      return 0;
+    }
+    
+    csRef<iShaderCompiler> shcom (shaderManager->GetCompiler (compilerAttr));
+    if (!shcom.IsValid())
+    {
+      Warn ("%s: '%s' shader compiler not available", filename, compilerAttr);
+    }
+    
     csRef<iLoaderContext> elctxt (CreateLoaderContext (0, true));
-    shader = shcom->CompileShader (elctxt, shaderDoc->GetRoot ()->
-      GetNode ("shader"));
+    shader = shcom->CompileShader (elctxt, shaderNode);
     if (shader.IsValid()) shaderManager->RegisterShader (shader);
   }
   VFS->PopDir();
