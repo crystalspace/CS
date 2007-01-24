@@ -44,7 +44,7 @@ CS_MASTER_HEADER_REJECTS =
 # List of headers that should not appear in the master-headers because they 
 # are deprecated.
 CS_MASTER_HEADER_REJECTS +=
-  # No deprecations at the moment.
+  [ ConcatDirs csutil profile.h      ]
   ;
 
 {
