@@ -47,7 +47,6 @@
 #include "iengine/region.h"
 #include "iengine/texture.h"
 #include "iengine/material.h"
-#include "iengine/collectn.h"
 #include "iengine/sector.h"
 #include "iengine/movable.h"
 #include "iengine/halo.h"
@@ -1276,13 +1275,6 @@ bool csLoader::LoadMap (iLoaderContext* ldr_context, iDocumentNode* worldnode,
 	break;
       case XMLTOKEN_SECTOR:
         if (!ParseSector (ldr_context, child, ssource))
-	  return false;
-        break;
-      case XMLTOKEN_COLLECTION:
-	ReportWarning (
-	        "crystalspace.maploader.parse.region",
-                child, "Collections are obsolete. Don't use them!");
-        if (!ParseCollection (ldr_context, child))
 	  return false;
         break;
       case XMLTOKEN_SEQUENCES:
@@ -4228,128 +4220,6 @@ bool csLoader::LoadSettings (iDocumentNode* node)
 
   return true;
 }
-
-#include "csutil/win32/msvc_deprecated_warn_off.h"
-
-iCollection* csLoader::ParseCollection (iLoaderContext* ldr_context,
-	iDocumentNode* node)
-{
-  iCollection* collection = Engine->GetCollections ()->NewCollection (
-		  node->GetAttributeValue ("name"));
-  AddToRegion (ldr_context, collection->QueryObject ());
-
-  csRef<iDocumentNodeIterator> it = node->GetNodes ();
-  while (it->HasNext ())
-  {
-    csRef<iDocumentNode> child = it->Next ();
-    if (child->GetType () != CS_NODE_ELEMENT) continue;
-    const char* value = child->GetValue ();
-    csStringID id = xmltokens.Request (value);
-    switch (id)
-    {
-      case XMLTOKEN_ADDON:
-	SyntaxService->ReportError (
-		"crystalspace.maploader.parse.collection",
-         	child, "'addon' not yet supported in collection!");
-	return 0;
-      case XMLTOKEN_META:
-	SyntaxService->ReportError (
-		"crystalspace.maploader.parse.collection",
-         	child, "'addon' not yet supported in collection!");
-	return 0;
-      case XMLTOKEN_KEY:
-        if (!ParseKey (child, collection->QueryObject()))
-          return false;
-        break;
-      case XMLTOKEN_MESHOBJ:
-#if 0
-	SyntaxService->ReportError (
-		"crystalspace.maploader.parse.collection",
-         	child, "'meshobj' not yet supported in collection!");
-#endif
-        break;
-      case XMLTOKEN_LIGHT:
-        {
-	  const char* lightname = child->GetContentsValue ();
-	  iLight* l = 0;
-	  iSectorList* sl = Engine->GetSectors ();
-	  int i;
-	  for (i = 0 ; i < sl->GetCount () ; i++)
-	  {
-	    iSector* sect = sl->Get (i);
-	    if ((!ldr_context->GetRegion ()) ||
-	    	(!ldr_context->CurrentRegionOnly ()) ||
-	        ldr_context->GetRegion ()->IsInRegion (sect->QueryObject ()))
-	    {
-	      l = sect->GetLights ()->FindByName (lightname);
-	      if (l) break;
-	    }
-	  }
-          if (!l)
-	  {
-	    SyntaxService->ReportError (
-		"crystalspace.maploader.parse.collection",
-            	child, "Light '%s' not found!", lightname);
-	    return 0;
-	  }
-	  else
-	  {
-	    collection->AddObject (l->QueryObject ());
-	  }
-        }
-        break;
-      case XMLTOKEN_SECTOR:
-        {
-	  const char* sectname = child->GetContentsValue ();
-	  iSector* s = ldr_context->FindSector (sectname);
-          if (!s)
-	  {
-	    SyntaxService->ReportError (
-		"crystalspace.maploader.parse.collection",
-            	child, "Sector '%s' not found!", sectname);
-	    return 0;
-	  }
-	  else
-	  {
-            collection->AddObject (s->QueryObject ());
-	  }
-        }
-        break;
-      case XMLTOKEN_COLLECTION:
-        {
-	  ReportWarning (
-	        "crystalspace.maploader.parse.region",
-                child, "Collections are obsolete. Don't use them!");
-	  const char* colname = child->GetContentsValue ();
-	  iCollection* th;
-	  if (ldr_context->GetRegion () && ldr_context->CurrentRegionOnly ())
-	    th = ldr_context->GetRegion ()->FindCollection (colname);
-	  else
-            th = Engine->GetCollections ()->FindByName (colname);
-          if (!th)
-	  {
-	    SyntaxService->ReportError (
-		"crystalspace.maploader.parse.collection",
-            	child, "Collection '%s' not found!", colname);
-	    return 0;
-	  }
-	  else
-	  {
-            collection->AddObject (th->QueryObject());
-	  }
-        }
-        break;
-      default:
-	SyntaxService->ReportBadToken (child);
-	collection->DecRef ();
-	return 0;
-    }
-  }
-
-  return collection;
-}
-
-#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 bool csLoader::ParseStart (iDocumentNode* node, iCameraPosition* campos)
 {

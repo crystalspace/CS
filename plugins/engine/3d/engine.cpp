@@ -64,7 +64,6 @@
 #include "ivideo/txtmgr.h"
 #include "plugins/engine/3d/camera.h"
 #include "plugins/engine/3d/campos.h"
-#include "plugins/engine/3d/cscoll.h"
 #include "plugins/engine/3d/engine.h"
 #include "plugins/engine/3d/halo.h"
 #include "plugins/engine/3d/light.h"
@@ -241,71 +240,6 @@ iCameraPosition *csCameraPositionList::FindByName (
 {
   return positions.FindByName (Name);
 }
-
-//---------------------------------------------------------------------------
-
-#include "csutil/win32/msvc_deprecated_warn_off.h"
-
-csCollectionList::csCollectionList ()
-  : scfImplementationType (this)
-{
-}
-
-csCollectionList::~csCollectionList ()
-{
-}
-
-iCollection *csCollectionList::NewCollection (const char *name)
-{
-  csRef<csCollection> c;
-  c.AttachNew (new csCollection (this));
-  c->SetName (name);
-  collections.Push (c);
-  return c;
-}
-
-int csCollectionList::GetCount () const
-{
-  return (int)collections.Length ();
-}
-
-iCollection *csCollectionList::Get (int n) const
-{
-  return collections.Get (n);
-}
-
-int csCollectionList::Add (iCollection *obj)
-{
-  return (int)collections.Push (obj);
-}
-
-bool csCollectionList::Remove (iCollection *obj)
-{
-  return collections.Delete (obj);
-}
-
-bool csCollectionList::Remove (int n)
-{
-  return collections.DeleteIndex (n);
-}
-
-void csCollectionList::RemoveAll ()
-{
-  collections.DeleteAll ();
-}
-
-int csCollectionList::Find (iCollection *obj) const
-{
-  return (int)collections.Find (obj);
-}
-
-iCollection *csCollectionList::FindByName (
-  const char *Name) const
-{
-  return collections.FindByName (Name);
-}
-
-#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 //---------------------------------------------------------------------------
 
@@ -713,7 +647,6 @@ void csEngine::DeleteAllForce ()
 
   nextframePending = 0;
   halos.DeleteAll ();
-  collections.RemoveAll ();
   wantToDieSet.Empty ();
   RemoveDelayedRemoves (false);
 
@@ -1837,28 +1770,6 @@ iCameraPosition* csEngine::FindCameraPosition (const char* name,
     campos = GetCameraPositions ()->FindByName (n);
   return campos;
 }
-
-#include "csutil/win32/msvc_deprecated_warn_off.h"
-
-iCollection* csEngine::FindCollection (const char* name,
-	iRegion* reg)
-{
-  iRegion* region;
-  bool global;
-  char* n = SplitRegionName (name, region, global);
-  if (!n) return 0;
-
-  iCollection* col;
-  if (region)
-    col = region->FindCollection (n);
-  else if (!global && reg)
-    col = reg->FindCollection (n);
-  else
-    col = GetCollections ()->FindByName (n);
-  return col;
-}
-
-#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 void csEngine::ReadConfig (iConfigFile *Config)
 {

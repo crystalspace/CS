@@ -8,6 +8,7 @@ chronological order.
 
 24-Jan-2007
 	- res moved the movierecorder plugin to the utilities subdirectory.
+	- res removed the deprecated engine collection stuff from the source.
 23-Jan-2007
 	- res made compileassert.h use the correct namespace (CS instead of
 	  CrystalSpace).
