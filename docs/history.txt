@@ -6,6 +6,8 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+24-Jan-2007
+	- res moved the movierecorder plugin to the utilities subdirectory.
 23-Jan-2007
 	- res made compileassert.h use the correct namespace (CS instead of
 	  CrystalSpace).
