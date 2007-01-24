@@ -24,6 +24,8 @@ chronological order.
 	  'datarootdir', as required by autoconf 2.60+. Should address #239.
 	- res committed a patch from Ryan Thorik to resolve ambiguities in the
 	  ELF reader. Addresses #231.
+	- res changed the "CPU optimization" detection in configure to also
+	  test for -mtune=generic (supported by future GCCs).
 23-Jan-2007
 	- res made compileassert.h use the correct namespace (CS instead of
 	  CrystalSpace).
