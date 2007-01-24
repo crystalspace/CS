@@ -20,6 +20,8 @@ chronological order.
 	- res silenced some MSVC warnings in csutil/profile.h.
 	- res added docs reflecting the deprecation to csutil/profile.h and 
 	  csutil/debug.h.
+	- res fixed configure to also emit the directory variable 
+	  'datarootdir', as required by autoconf 2.60+. Should address #239.
 23-Jan-2007
 	- res made compileassert.h use the correct namespace (CS instead of
 	  CrystalSpace).
