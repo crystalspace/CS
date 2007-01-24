@@ -6241,8 +6241,6 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *CreateFrustumView = *cspacec::iEngine_CreateFrustumView;
 *CreateObjectWatcher = *cspacec::iEngine_CreateObjectWatcher;
 *GetVariableList = *cspacec::iEngine_GetVariableList;
-*GetCollections = *cspacec::iEngine_GetCollections;
-*FindCollection = *cspacec::iEngine_FindCollection;
 *RemoveObject = *cspacec::iEngine_RemoveObject;
 *DelayedRemoveObject = *cspacec::iEngine_DelayedRemoveObject;
 *RemoveDelayedRemoves = *cspacec::iEngine_RemoveDelayedRemoves;
@@ -7276,7 +7274,6 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *FindTexture = *cspacec::iRegion_FindTexture;
 *FindMaterial = *cspacec::iRegion_FindMaterial;
 *FindCameraPosition = *cspacec::iRegion_FindCameraPosition;
-*FindCollection = *cspacec::iRegion_FindCollection;
 *IsInRegion = *cspacec::iRegion_IsInRegion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');

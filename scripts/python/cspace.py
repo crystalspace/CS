@@ -4119,8 +4119,6 @@ class iEngine(iBase):
     def CreateFrustumView(*args): return _cspace.iEngine_CreateFrustumView(*args)
     def CreateObjectWatcher(*args): return _cspace.iEngine_CreateObjectWatcher(*args)
     def GetVariableList(*args): return _cspace.iEngine_GetVariableList(*args)
-    def GetCollections(*args): return _cspace.iEngine_GetCollections(*args)
-    def FindCollection(*args): return _cspace.iEngine_FindCollection(*args)
     def RemoveObject(*args): return _cspace.iEngine_RemoveObject(*args)
     def DelayedRemoveObject(*args): return _cspace.iEngine_DelayedRemoveObject(*args)
     def RemoveDelayedRemoves(*args): return _cspace.iEngine_RemoveDelayedRemoves(*args)
@@ -4828,7 +4826,6 @@ class iRegion(iBase):
     def FindTexture(*args): return _cspace.iRegion_FindTexture(*args)
     def FindMaterial(*args): return _cspace.iRegion_FindMaterial(*args)
     def FindCameraPosition(*args): return _cspace.iRegion_FindCameraPosition(*args)
-    def FindCollection(*args): return _cspace.iRegion_FindCollection(*args)
     def IsInRegion(*args): return _cspace.iRegion_IsInRegion(*args)
     __swig_destroy__ = _cspace.delete_iRegion
     __del__ = lambda self : None;
