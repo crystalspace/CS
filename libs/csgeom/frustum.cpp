@@ -32,6 +32,8 @@ struct vecar5 { csVector3 ar[5]; };
 struct vecar6 { csVector3 ar[6]; };
 struct vecar10 { csVector3 ar[10]; };
 
+#include "csutil/custom_new_disable.h"
+
 class csVertexArrayAlloc
 {
 public:
@@ -101,6 +103,8 @@ public:
     }
   }
 };
+
+#include "csutil/custom_new_enable.h"
 
 CS_IMPLEMENT_STATIC_VAR (GetVertexArrayAlloc, csVertexArrayAlloc, ())
 
