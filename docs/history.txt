@@ -13,6 +13,11 @@ chronological order.
 	  cs_malloc()/cs_free() and is intended as a base class to have
 	  classes allocated with ptmalloc(if enabled) rather than the default
 	  allocator. Addresses #146.
+	- res changed scfImplementation to inherit from 
+	  CS::Memory::CustomAllocated (ie SCF classes are allocated with
+	  ptmalloc). (This shouldn't become an issue for third parties; with 
+	  proper SCF class instance usage a mix-up of allocators shouldn't
+	  occur.)
 24-Jan-2007
 	- res moved the movierecorder plugin to the utilities subdirectory.
 	- res removed the deprecated engine collection stuff from the source.
