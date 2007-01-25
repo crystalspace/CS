@@ -2187,7 +2187,6 @@ class csShaderVariableArray(csShaderVariableArrayChangeElements):
     def DeleteIndex(*args): return _cspace.csShaderVariableArray_DeleteIndex(*args)
     def DeleteIndexFast(*args): return _cspace.csShaderVariableArray_DeleteIndexFast(*args)
     def Delete(*args): return _cspace.csShaderVariableArray_Delete(*args)
-    def DeleteFast(*args): return _cspace.csShaderVariableArray_DeleteFast(*args)
     __swig_destroy__ = _cspace.delete_csShaderVariableArray
     __del__ = lambda self : None;
 csShaderVariableArray_swigregister = _cspace.csShaderVariableArray_swigregister
@@ -5688,7 +5687,6 @@ class csSprite2DVertexArrayChangeAll(csSprite2DVertexArrayChangeElements):
     def DeleteIndex(*args): return _cspace.csSprite2DVertexArrayChangeAll_DeleteIndex(*args)
     def DeleteIndexFast(*args): return _cspace.csSprite2DVertexArrayChangeAll_DeleteIndexFast(*args)
     def Delete(*args): return _cspace.csSprite2DVertexArrayChangeAll_Delete(*args)
-    def DeleteFast(*args): return _cspace.csSprite2DVertexArrayChangeAll_DeleteFast(*args)
     __swig_destroy__ = _cspace.delete_csSprite2DVertexArrayChangeAll
     __del__ = lambda self : None;
 csSprite2DVertexArrayChangeAll_swigregister = _cspace.csSprite2DVertexArrayChangeAll_swigregister
