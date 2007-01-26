@@ -104,7 +104,7 @@ namespace lighter
         if (vLMScale)
         {
           float u=0,v=0;
-          if (sscanf (vLMScale, "%f;%f", &u, &v) == 2)
+          if (sscanf (vLMScale, "%f,%f", &u, &v) == 2)
           {
             lmuScale = u;
             lmvScale = v;
