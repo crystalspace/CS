@@ -57,7 +57,7 @@
 %ignore csString::operator[];
 
 %{
-PyObject *
+CS_EXPORT_SYM PyObject *
 _csRef_to_Python (const csRef<iBase> & ref, void * ptr, const char * name)
 {
   if (!ref.IsValid())
