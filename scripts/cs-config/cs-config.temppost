@@ -5,7 +5,7 @@ lflags=""
 
 for libname in lib${libcrystalspace}.so \
 	       lib${libcrystalspace}.dylib \
-	       lib${libcrystalspace}.a \
+	       lib${libcrystalspace}.dll.a \
 	       ; do
     if test -r "$prefix/Jamfile" && \
 	test -r "$prefix/$makeout/libs/$libname"; then
@@ -44,7 +44,7 @@ do
   libbase=${!libbase_var}
   if test -r "$libdir/lib$libbase.so" \
     || test -r "$libdir/lib$libbase.dylib" \
-    || test -r "$libdir/lib$libbase.a" ; then
+    || test -r "$libdir/lib$libbase.dll.a" ; then
     liblist="$liblist $l"
   fi
 done
