@@ -234,15 +234,18 @@ rule ConstructApplicationTarget
 }
 rule ConstructStaticLibraryTarget
 {
-  return lib$(<)$(SUFLIB) ;
+  local libbase = [ LibraryBaseName $(<) ] ;
+  return lib$(libbase)$(SUFLIB) ;
 }
 rule ConstructSharedLibraryTarget
 {
-  return $(<)-$(COMPILER.TYPE).dll ;
+  local libbase = [ LibraryBaseName $(<) ] ;
+  return $(libbase)-$(COMPILER.TYPE).dll ;
 }
 rule ConstructSharedLibraryLinkLib
 {
-  return lib$(<)$(SUFLIB) ;
+  local libbase = [ LibraryBaseName $(<) ] ;
+  return lib$(libbase)$(SUFLIB) ;
 }
 rule ConstructPluginTarget
 {

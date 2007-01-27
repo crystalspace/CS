@@ -21,6 +21,11 @@
 # Suppress ar's noisy report that it created the archive we asked it to create.
 if $(AR) && $(AR[2]) = ru { AR = $(AR[1]) ruc ; }
 
+# Library versioning control. When set to "yes", the string in 
+# LIBRARY_VERSION_TAG will be appended to names of libraries.
+LIBRARY_VERSIONING ?= yes ;
+LIBRARY_VERSION_TAG ?= "$(PACKAGE_VERSION_LIST[1]).$(PACKAGE_VERSION_LIST[2])" ;
+
 ##  Library libname : sources [ : options ]
 ##    Build a library out of sourcefiles. All sourcefiles will be passed
 ##    to the Objects rule which tries to compile them into object-files. You
@@ -218,9 +223,11 @@ rule LibraryStatic
   {
     RmTemps $(target) : $(objects) ;
   }
+
+  $(<)_CLEANEXTRA += $(target) ;
 }
 
-# LibraryStatic libname : sources : options : decoratedtarget
+# LibraryShared libname : sources : options : decoratedtarget
 rule LibraryShared
 {
   local objects = $(>) ;
@@ -260,11 +267,13 @@ rule LibraryShared
   }
 
   Depends $(<) : $(linklib) ;
+  MakeLocate $(linklib) : $(LOCATE.OBJECTS)/libs ;
+  SEARCH on $(linklib) = $(LOCATE.OBJECTS)/libs ;
   if $(linklib) != $(target)
   {
     Depends $(linklib) : $(target) ;
-    MakeLocate $(linklib) : $(LOCATE.OBJECTS)/libs ;
-    SEARCH on $(linklib) = $(LOCATE.OBJECTS)/libs ;
+    MakeLocate $(target) : $(BUILDTOP) ;
+    SEARCH on $(target) = $(BUILDTOP) ;
   }
   Depends $(target) : $(objects) ;
   $(<)_CLEANEXTRA += $(target) ;
@@ -284,6 +293,21 @@ rule LibraryShared
       NoCare $(debugfile) ;
       Depends install_lib : [ DoInstall $(debugfile) : $(libdir) : $(INSTALL_DATA) ] ;
     }
+  }
+}
+
+# LibraryBaseName
+#   Construct library base name string from library name - appends version if
+#   LIBRARY_VERSIONING is "yes".
+rule LibraryBaseName
+{
+  if $(LIBRARY_VERSIONING) = "yes"
+  {
+    return "$(1)-$(LIBRARY_VERSION_TAG)" ;
+  }
+  else
+  {
+    return "$(1)" ;
   }
 }
 
