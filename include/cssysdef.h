@@ -818,6 +818,15 @@ inline void* operator new[] (size_t s)
 #define new CS_EXTENSIVE_MEMDEBUG_NEW
 #endif
 
+namespace CS
+{
+  namespace Debug
+  {
+    extern void CS_CRYSTALSPACE_EXPORT AssertMessage (const char* expr, 
+      const char* filename, int line, const char* msg = 0);
+  } // namespace Debug
+} // namespace CS
+
 #ifdef CS_DEBUG
 #  if !defined (CS_DEBUG_BREAK)
 #    if defined (CS_PLATFORM_WIN32)
@@ -833,14 +842,6 @@ inline void* operator new[] (size_t s)
 #    endif
 #  endif
 #  if !defined (CS_ASSERT_MSG)
-    namespace CS
-    {
-      namespace Debug
-      {
-	extern void CS_CRYSTALSPACE_EXPORT AssertMessage (const char* expr, 
-	  const char* filename, int line, const char* msg = 0);
-      } // namespace Debug
-    } // namespace CS
 #   define CS_ASSERT_MSG(msg,x) 					\
       if (!(x)) CS::Debug::AssertMessage (#x, __FILE__, __LINE__, msg);
 #  endif
