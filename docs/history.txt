@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+28-Jan-2007
+	- Eric Sunshine made some minor clarifications to the Dev-CPP tutorial
+	  suggested by Johannes Schoen <schoen.johannes@arcor.de>.
 27-Jan-2007
 	- res re-added an iengine/collectn.h that contains a message about
 	  the removal of iCollection and instructs to remove all inclusions
