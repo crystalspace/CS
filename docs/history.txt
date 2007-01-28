@@ -11,6 +11,8 @@ chronological order.
 	  suggested by Johannes Schoen <schoen.johannes@arcor.de>.
 	- res fixed dllwrap invocation in case the CMD.LINK variable has
 	  multiple entries.
+	- Genjix fixed problem in cs-config script for systems where /bin/sh
+	  doesn't neccessarily symlink bash (like ubuntu where its dash).
 27-Jan-2007
 	- res re-added an iengine/collectn.h that contains a message about
 	  the removal of iCollection and instructs to remove all inclusions
