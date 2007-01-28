@@ -566,13 +566,13 @@ else
 {
   actions LinkPlugin bind NEEDLIBS bind EXTRAOBJECTS bind EXPORTDEFS
   {
-    $(CMD.DLLWRAP) --driver-name=$(CMD.LINK) --dllname $(<:B) --def=$(EXPORTDEFS) -o $(<) $(>) $(EXTRAOBJECTS) $(NEEDLIBS) $(LINKLIBS)
+    $(CMD.DLLWRAP) --driver-name=$(CMD.LINK[1]) --dllname $(<:B) --def=$(EXPORTDEFS) -o $(<) $(>) $(EXTRAOBJECTS) $(NEEDLIBS) $(LINKLIBS)
   }
 }
 
 actions LinkSharedLibrary bind NEEDLIBS bind EXTRAOBJECTS bind EXPORTDEFS bind IMPLIB
 {
-  $(CMD.DLLWRAP) --driver-name=$(CMD.LINK) --dllname $(<:B).dll --def=$(EXPORTDEFS) --implib $(IMPLIB) -o $(<) $(>) $(EXTRAOBJECTS) $(NEEDLIBS) $(LINKLIBS)
+  $(CMD.DLLWRAP) --driver-name=$(CMD.LINK[1]) --dllname $(<:B).dll --def=$(EXPORTDEFS) --implib $(IMPLIB) -o $(<) $(>) $(EXTRAOBJECTS) $(NEEDLIBS) $(LINKLIBS)
   touch $(IMPLIB) # ensure the IMPLIB is always newer than the DLL, 
                   # since the IMPLIB depends on the DLL.
 }
