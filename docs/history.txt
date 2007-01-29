@@ -10,6 +10,8 @@ chronological order.
 	- Jorrit removed collectn.h again. It is a lot easier just to fix
 	  the remaining code as in this case 1.0 has already been released
 	  with the interface removed.
+	- Jorrit reverted a change from Genjix yesterday. /bin/bash doesn't
+	  exist on mingw.
 28-Jan-2007
 	- Eric Sunshine made some minor clarifications to the Dev-CPP tutorial
 	  suggested by Johannes Schoen <schoen.johannes@arcor.de>.
