@@ -12,6 +12,8 @@ chronological order.
 	  with the interface removed.
 	- Jorrit reverted a change from Genjix yesterday. /bin/bash doesn't
 	  exist on mingw.
+	- res rigged (the deprecated) csutil/profile.h to emit a warning when
+	  included.
 28-Jan-2007
 	- Eric Sunshine made some minor clarifications to the Dev-CPP tutorial
 	  suggested by Johannes Schoen <schoen.johannes@arcor.de>.

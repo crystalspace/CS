@@ -16,6 +16,15 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#ifdef CS_COMPILER_GCC
+  #warning Profiler support from csutil/profile.h has been deprecated. \
+Check ivaria/profile.h for new interfacce.
+#endif
+#ifdef CS_COMPILER_MSVC
+  #pragma message ("Profiler support from csutil/profile.h has been deprecated. \
+Check ivaria/profile.h for new interfacce.")
+#endif
+
 #ifndef __CS_UTIL_PROFILE_H__
 #define __CS_UTIL_PROFILE_H__
 
