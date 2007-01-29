@@ -46,7 +46,6 @@ CS_MASTER_HEADER_REJECTS =
 CS_MASTER_HEADER_REJECTS +=
   [ ConcatDirs csutil  debug.h        ]
   [ ConcatDirs csutil  profile.h      ]
-  [ ConcatDirs iengine collectn.h     ]
   ;
 
 {
