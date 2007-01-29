@@ -10,7 +10,7 @@ rule csConfigGen
   Depends $(<) : Jamconfig cs-config.temppre cs-config.temppost 
   		 [ ConcatDirs $(TOP) scripts cs-config Jamfile ] ;
 
-  local l d e s liblist libdep libdepstr libstrings libaddstrings libbasestrs libbase ;
+  local l d e s liblist libdep libdepstr libstrings libaddstrings libbasestrs libbase libswitchcase ;
   
   for l in $(INSTALLEDLIBS) $(INSTALLEDLIBS_OPTIONAL)
   {
@@ -40,6 +40,16 @@ rule csConfigGen
 " ;
   }
 
+  # Hack to have cs-config fake indirection on ubuntu dash
+  for l in $(INSTALLEDLIBS) $(INSTALLEDLIBS_OPTIONAL)
+  {
+    # split this up since it seems impossible to escape \$
+    libbase = [ LibraryBaseName $(l) ] ;
+    libswitchcase += "   \"$(l)\"):
+      libbase=$(libbase) ;;
+" ;
+  }
+
   # Hack to produce a makevars output similar to the 'make' build system.
   switch $(TARGET.OS)
   {
@@ -58,6 +68,7 @@ rule csConfigGen
   libstrings on $(<) = $(libstrings) ;
   libaddstrings on $(<) = $(libaddstrings) ;
   libbasestrs on $(<) = $(libbasestrs) ;
+  libswitchcase on $(<) = $(libswitchcase) ;
 
   csConfigGen1 $(<) : $(>) ;
 }
@@ -184,6 +195,22 @@ liblist_opt="\
 "
 
 $(libbasestrs)
+
+__END__
+
+  cat >> $(<) << __END__
+
+# Hack to do variable indirection for posix compliant systems that don't use bash (like ubuntu)
+give_libbase()
+{
+  case \$1 in
+ $(libswitchcase)
+    *)
+      # should never ever happen
+      echo "Internal error, due to unspecified libbase."
+      exit;;
+    esac
+}
 
 __END__
 

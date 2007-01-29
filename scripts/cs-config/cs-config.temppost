@@ -40,8 +40,7 @@ done
 
 for l in $liblist_opt
 do
-  libbase_var=lib$l
-  libbase=${!libbase_var}
+  give_libbase $l
   if test -r "$libdir/lib$libbase.so" \
     || test -r "$libdir/lib$libbase.dylib" \
     || test -r "$libdir/lib$libbase.a" ; then
