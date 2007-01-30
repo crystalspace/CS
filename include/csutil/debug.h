@@ -115,19 +115,31 @@ namespace CS
 class CS_DEPRECATED_TYPE_MSG("Discontinued cruft") csDebuggingGraph
 {
 public:
+  CS_DEPRECATED_METHOD_MSG ("Discontinued cruft") 
   static void SetupGraph (iObjectRegistry*) {}
+  CS_DEPRECATED_METHOD_MSG ("Discontinued cruft") 
   static void AddObject (iObjectRegistry*, void*, bool, char*, int, 
         char*, ...) {}
+  CS_DEPRECATED_METHOD_MSG ("Discontinued cruft") 
   static void AttachDescription (iObjectRegistry*, void*t, char*, ...) 
         CS_GNUC_PRINTF (3, 4) {}
+  CS_DEPRECATED_METHOD_MSG ("Discontinued cruft") 
   static void AttachType (iObjectRegistry*, void*, char*) {}
+  CS_DEPRECATED_METHOD_MSG ("Discontinued cruft") 
   static void RemoveObject (iObjectRegistry*, void*, char*, int) {}
+  CS_DEPRECATED_METHOD_MSG ("Discontinued cruft") 
   static void AddChild (iObjectRegistry*, void*, void*) {}
+  CS_DEPRECATED_METHOD_MSG ("Discontinued cruft") 
   static void AddParent (iObjectRegistry*, void*, void*) {}
+  CS_DEPRECATED_METHOD_MSG ("Discontinued cruft") 
   static void RemoveChild (iObjectRegistry*, void*, void*) {}
+  CS_DEPRECATED_METHOD_MSG ("Discontinued cruft") 
   static void RemoveParent (iObjectRegistry*, void*, void*) {}
+  CS_DEPRECATED_METHOD_MSG ("Discontinued cruft") 
   static void Clear (iObjectRegistry*) {}
+  CS_DEPRECATED_METHOD_MSG ("Discontinued cruft") 
   static void Dump (iObjectRegistry*) {}
+  CS_DEPRECATED_METHOD_MSG ("Discontinued cruft") 
   static void Dump (iObjectRegistry*, void*, bool reset_mark = true) {}
 };
 
