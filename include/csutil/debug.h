@@ -16,6 +16,15 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#ifdef CS_COMPILER_GCC
+  #warning Debugging graph has been discontinued. Please remove \
+csutil/debug.h inclusions.
+#endif
+#ifdef CS_COMPILER_MSVC
+  #pragma message ("Debugging graph has been discontinued. Please remove \
+csutil/debug.h inclusions.")
+#endif
+
 #ifndef __CS_UTIL_DEBUG_H__
 #define __CS_UTIL_DEBUG_H__
 

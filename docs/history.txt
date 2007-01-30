@@ -6,8 +6,11 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+30-Jan-2007
+	- res rigged (the deprecated) csutil/debug.h to emit a warning when
+	  included.
 29-Jan-2007
-    - Andrew Robberts fixed a warning from checking if an unsigned is >= 0.
+	- Andrew Robberts fixed a warning from checking if an unsigned is >= 0.
 	- Jorrit reverted a change from Genjix yesterday. /bin/bash doesn't
 	  exist on mingw.
 	- res rigged (the deprecated) csutil/profile.h to emit a warning when
