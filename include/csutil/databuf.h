@@ -25,74 +25,90 @@
  */
 
 #include "csextern.h"
+#include "csutil/allocator.h"
 #include "csutil/scf_implementation.h"
 #include "iutil/databuff.h"
 
-/**
- * This is an implementation of iDataBuffer interface.
- * The object is extremely lightweight and is recommended
- * for use in plugins as a mean to transparently exchange
- * abstract data between plugins.
- */
-class csDataBuffer : public scfImplementation1<csDataBuffer, iDataBuffer>
+namespace CS
 {
-  /// The data buffer
-  char *Data;
-  /// Data size
-  size_t Size;
-  /// Should the buffer be deleted when we're done with it?
-  bool do_delete;
-
-public:
-  /// Construct an preallocated data buffer (filled with garbage initially)
-  csDataBuffer (size_t iSize)
-    : scfImplementationType (this)
-  {
-    Size = iSize;
-    Data = new char [Size]; 
-    do_delete = true;
-  }
-
-  /// Construct an data buffer object given a existing (new char []) pointer
-  csDataBuffer (char *iData, size_t iSize, bool should_delete = true)
-    : scfImplementationType (this)
-  {
-    Data = iData; 
-    Size = iSize; 
-    do_delete = should_delete;
-  }
-
-  /// Duplicate an existing data buffer. Also appends a 0 char.
-  csDataBuffer (iDataBuffer *source)
-    : scfImplementationType (this)
-  {
-    Size = source->GetSize();
-    Data = new char [Size + 1];
-    memcpy (Data, source->GetData(), Size);
-    Data[Size] = 0;
-    do_delete = true;
-  }
-
-  /// Destroy (free) the buffer
-  virtual ~csDataBuffer ()
-  {
-    if (do_delete)
-      delete [] Data;
-  }
-
-  /// Query the buffer size
-  virtual size_t GetSize () const
-  { return Size; }
-
-  /// Get the buffer as an abstract pointer
-  virtual char* GetData () const
-  { return Data; }
-
   /**
-   * Return true if this databuffer will destroy its memory
-   * on destruction.
+   * This is an implementation of iDataBuffer interface.
+   * The object is extremely lightweight and is recommended
+   * for use in plugins as a mean to transparently exchange
+   * abstract data between plugins.
    */
-  bool GetDeleteOnDestruct () const { return do_delete; }
-};
+  template<class Allocator = Memory::AllocatorMalloc>
+  class DataBuffer : public scfImplementation1<DataBuffer<Allocator>, 
+                                               iDataBuffer>
+  {
+    /// The data buffer
+    Memory::AllocatorPointerWrapper<char, Allocator> Data;
+    /// Data size
+    size_t Size;
+    /// Should the buffer be deleted when we're done with it?
+    bool do_delete;
+
+  public:
+    /// Construct an preallocated data buffer (filled with garbage initially)
+    DataBuffer (size_t iSize)
+      : scfImplementationType (this), Size (iSize), do_delete (true)
+    {
+      Data.p = (char*)Data.Alloc (Size);
+    }
+    /// Construct an preallocated data buffer (filled with garbage initially)
+    DataBuffer (size_t iSize, const Allocator& alloc)
+      : scfImplementationType (this), Data (alloc), Size (iSize), do_delete (true)
+    {
+      Data.p = Data.Alloc (Size);
+    }
+
+
+    /**
+     * Construct an data buffer object given a existing pointer. The pointer
+     * must be allocated by an allocator compatible to the given.
+     */
+    DataBuffer (char *iData, size_t iSize, bool should_delete = true)
+      : scfImplementationType (this), Size (iSize), do_delete (should_delete)
+    {
+      Data.p = iData; 
+    }
+
+    /// Duplicate an existing data buffer. Also appends a 0 char.
+    DataBuffer (iDataBuffer *source)
+      : scfImplementationType (this), Size (source->GetSize()),
+        do_delete (true)
+    {
+      Data.p = (char*)Data.Alloc (Size+1);
+      memcpy (Data.p, source->GetData(), Size);
+      Data.p[Size] = 0;
+    }
+
+    /// Destroy (free) the buffer
+    virtual ~DataBuffer ()
+    {
+      if (do_delete)
+        Data.Free (Data.p);
+    }
+
+    /// Query the buffer size
+    virtual size_t GetSize () const
+    { return Size; }
+
+    /// Get the buffer as an abstract pointer
+    virtual char* GetData () const
+    { return Data.p; }
+
+    /**
+     * Return true if this databuffer will destroy its memory
+     * on destruction.
+     */
+    bool GetDeleteOnDestruct () const { return do_delete; }
+  };
+} // namespace CS
+
+/**
+ * Standard data buffer, using new char[] for allocations.
+ */
+typedef CS::DataBuffer<CS::Memory::AllocatorNewChar<false > > csDataBuffer;
 
 #endif // __CS_DATABUF_H__

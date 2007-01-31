@@ -17,6 +17,10 @@ chronological order.
 	- Jorrit changed the png loader again so that it now correctly sets
 	  up the rawData from the decoded image data.
 	- res added a memory allocator mixin using new char[].
+	- res turned csDataBuffer into template<Allocator> CS::DataBuffer. 
+	  This allows to use different allocators for data buffers. (The
+	  default DataBuffer now uses cs_malloc(); csDataBuffer still uses
+	  new char[].)
 30-Jan-2007
 	- res rigged (the deprecated) csutil/debug.h to emit a warning when
 	  included.
