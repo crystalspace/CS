@@ -595,6 +595,8 @@ nomem2:
 	(NewImage, Width * Height);
       delete[] NewImage;
     }
+    rawData.AttachNew (new csDataBuffer ((char*)rgbaData,
+	  Width * Height * 4, false));
   }
   else if (ImageType == imgPAL)
   {
@@ -628,6 +630,8 @@ nomem2:
       keycolor.blue = palette[keycolor_index].blue;
     }
     indexData = NewImage;
+    rawData.AttachNew (new csDataBuffer ((char*)indexData,
+	  Width * Height * 1, false));
   }
   else // grayscale + alpha
   {
@@ -649,6 +653,8 @@ nomem2:
       alpha [i] = *src++;
     }
     delete [] (uint8 *)NewImage;
+    rawData.AttachNew (new csDataBuffer ((char*)indexData,
+	  Width * Height * 1, false));
   }
 
   // clean up after the read, and free any memory allocated
