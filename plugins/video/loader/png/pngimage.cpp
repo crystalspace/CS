@@ -375,8 +375,8 @@ ImagePngFile::PngLoader::~PngLoader()
 
 bool ImagePngFile::PngLoader::InitOk ()
 {
-  const png_bytep iBuffer = rawData->GetUint8();
-  const size_t iSize = rawData->GetSize();
+  const png_bytep iBuffer = dataSource->GetUint8();
+  const size_t iSize = dataSource->GetSize();
 
   if (!png_check_sig (iBuffer, (int)iSize))
     return false;
@@ -658,7 +658,7 @@ nomem2:
   // Free the row pointers array that is not needed anymore
   delete [] row_pointers;
 
-  //rawData = 0;
+  dataSource = 0;
   return true;
 }
 

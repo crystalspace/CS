@@ -11,6 +11,9 @@ chronological order.
 	  of its image memory. That way it can also implement GetRawData().
 	- Jorrit changed the png loader to use rawData instead
 	  of dataSource.
+	- Jorrit reverted the png loader change as it was assigning the raw
+	  file data to rawData but rawData is supposed to contain the
+	  decoded image data.
 30-Jan-2007
 	- res rigged (the deprecated) csutil/debug.h to emit a warning when
 	  included.

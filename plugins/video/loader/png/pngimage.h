@@ -80,6 +80,7 @@ private:
     int bit_depth, color_type;
     enum { imgRGB, imgPAL, imgGrayAlpha } ImageType;
     int keycolor_index;
+    csRef<iDataBuffer> dataSource;
     ImagePngRawData raw;
 
     static void ImagePngRead (png_structp png, png_bytep data, 
@@ -87,10 +88,7 @@ private:
   public:
     PngLoader (int Format, iDataBuffer* source) 
       : csCommonImageFileLoader (Format), png (0), info (0), 
-      keycolor_index (-1)
-    {
-      rawData = source;
-    }
+      keycolor_index (-1), dataSource (source) {}
     virtual ~PngLoader();
     bool InitOk();
     /// Try to read the PNG file from the buffer and return success status
