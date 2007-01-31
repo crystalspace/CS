@@ -87,6 +87,12 @@ public:
   /// Get the buffer as an abstract pointer
   virtual char* GetData () const
   { return Data; }
+
+  /**
+   * Return true if this databuffer will destroy its memory
+   * on destruction.
+   */
+  bool GetDeleteOnDestruct () const { return do_delete; }
 };
 
 #endif // __CS_DATABUF_H__

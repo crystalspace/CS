@@ -63,7 +63,7 @@ protected:
    * this is an internal state only. No operation should fail due
    * undefined image data (although the data may stay undefined).
    */
-  void* Image;
+  csRef<csDataBuffer> databuf;
   /// The image palette or 0
   csRGBpixel *Palette;
   /// The alpha map
@@ -181,6 +181,7 @@ public:
   virtual int GetDepth () const { return Depth; }
 
   virtual const char* GetRawFormat() const { return "b8g8r8a8"; }
+  virtual csRef<iDataBuffer> GetRawData() const { return databuf; }
   virtual int GetFormat () const { return Format; }
   virtual const csRGBpixel* GetPalette () { return GetPalettePtr(); }
   virtual const uint8* GetAlpha () { return GetAlphaPtr(); }
