@@ -355,17 +355,12 @@ void csSpriteCal3DMeshObjectFactory::CalculateAllBoneBoundingBoxes()
   calCoreModel.getCoreSkeleton()->calculateBoundingBoxes(&calCoreModel);
 }
 
-#include "csutil/custom_new_disable.h"
-
 int csSpriteCal3DMeshObjectFactory::AddMorphAnimation(const char *name)
 {
-  int id = calCoreModel.addCoreMorphAnimation(new (allocPlatform)
-    CalCoreMorphAnimation());
+  int id = calCoreModel.addCoreMorphAnimation(new CalCoreMorphAnimation());
   morph_animation_names.Push(name);
   return id;
 }
-
-#include "csutil/custom_new_enable.h"
 
 bool csSpriteCal3DMeshObjectFactory::AddMorphTarget( int morphanimation_index,
                                                  const char *mesh_name, 

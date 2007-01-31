@@ -23,6 +23,7 @@ chronological order.
 	  new char[].)
 	- res fixed the JNG plugin for the change in the way csImageMemory 
 	  stores image data.
+	- res fixed some deprecation warnings caused by r26260.
 30-Jan-2007
 	- res rigged (the deprecated) csutil/debug.h to emit a warning when
 	  included.
