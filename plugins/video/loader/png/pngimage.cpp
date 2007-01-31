@@ -48,7 +48,8 @@ SCF_IMPLEMENT_FACTORY (csPNGImageIO)
 
 #define PNG_MIME "image/png"
 
-struct datastore{
+struct datastore
+{
   unsigned char *data;
   size_t pos;
   size_t length;
@@ -119,8 +120,8 @@ void csPNGImageIO::SetDithering (bool)
 {
 }
 
-csPtr<iDataBuffer> csPNGImageIO::Save (iImage *Image, iImageIO::FileFormatDescription *,
-  const char* extraoptions)
+csPtr<iDataBuffer> csPNGImageIO::Save (iImage *Image,
+    iImageIO::FileFormatDescription *, const char* extraoptions)
 {
   if (!Image)
     return 0;
@@ -206,13 +207,15 @@ error2:
       rowlen = Image->GetWidth ();
       break;
     case CS_IMGFMT_TRUECOLOR:
-      colortype = (format & CS_IMGFMT_ALPHA) ? PNG_COLOR_TYPE_RGB_ALPHA : PNG_COLOR_TYPE_RGB;
+      colortype = (format & CS_IMGFMT_ALPHA)
+	? PNG_COLOR_TYPE_RGB_ALPHA
+	: PNG_COLOR_TYPE_RGB;
       rowlen = Image->GetWidth () * 4;
       break;
     default:
       // unknown format
       goto error2;
-  } /* endswitch */
+  }
   png_set_IHDR (png, info, width, height, 8, colortype,
     interlace?PNG_INTERLACE_ADAM7:PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_BASE, 
     PNG_FILTER_TYPE_BASE);
@@ -230,7 +233,7 @@ error2:
       palette [i].red   = pal [i].red;
       palette [i].green = pal [i].green;
       palette [i].blue  = pal [i].blue;
-    } /* endfor */
+    }
     int max_color = 0;
     // seek maximum color index used in the image
     int n = Image->GetWidth() * Image->GetHeight();
@@ -361,7 +364,7 @@ void ImagePngFile::PngLoader::ImagePngRead (png_structp png, png_bytep data,
     memcpy (data, self->r_data, size);
     self->r_size -= size;
     self->r_data += size;
-  } /* endif */
+  }
 }
 
 ImagePngFile::PngLoader::~PngLoader()
@@ -372,8 +375,8 @@ ImagePngFile::PngLoader::~PngLoader()
 
 bool ImagePngFile::PngLoader::InitOk ()
 {
-  const png_bytep iBuffer = dataSource->GetUint8();
-  const size_t iSize = dataSource->GetSize();
+  const png_bytep iBuffer = rawData->GetUint8();
+  const size_t iSize = rawData->GetSize();
 
   if (!png_check_sig (iBuffer, (int)iSize))
     return false;
@@ -655,7 +658,7 @@ nomem2:
   // Free the row pointers array that is not needed anymore
   delete [] row_pointers;
 
-  dataSource = 0;
+  //rawData = 0;
   return true;
 }
 
