@@ -6,11 +6,83 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+11-Oct-2006
+	- res fixed genmesh to also support Compress() when submeshes are
+	  present.
+10-Oct-2006
+	- mdmkolbe fixed searching of Cygwin paths.
+	- mdmkolbe added CS_CONFIGDIR to configuration search paths on Cygwin.
+	- Marten added a "outward spiral" term to spiral particle effector.
+9-Oct-2006
+	- res fixed a problem in the iConfigIterator::HasNext() which
+	  manifested itself in scrambled "could not load plugin" messages
+	  and subsequent crash on startup.
+	- res updated the documentation transform script for the new site
+	  search URL.
+	- res slightly tweaked the API docs search box style.
+	- Marten added a "velocity-field" particle effector.
+8-Oct-2006
+	- res added iConfigIterator::HasNext(), loosely based on a patch by
+	  Timothy "kiolakin" Whitfield.
+7-Oct-2006
+	- Jorrit added a test to csPhysicalFile so that it no longer
+	  succeeds on directories.
+	- res fixed the font cache to more gracefully handle nested 
+	  CacheGlyph() calls. Fixes trac #164.
+	- res changed the reporter to avoid nested calls into listeners (ie
+	  when Report() is called while being inside Report()) since that may
+	  "confuse" the listeners and lead to weird side effects. Instead,
+	  queue up messages that are reported while in the reporter.
+6-Oct-2006
+	- Genjix added iVFS::SymbolicLink function.
+	- caedes added kwartz and castle to Jamfiles.
+	- Marten added a RK45 ODE solver to be used in particle effector.
+	- res slightly reworded the section on procedural textures. Also added
+	  "performance hints".
+	- res changed the genmesh loader and saver to also accept factory 
+	  submeshes without a material.
+	- res made the following changes to lighter2, among others:
+	    - Support light attenuation.
+	    - Lightmaps are now distributed globally (and not one lightmap per
+	      mesh object).
+	    - Genmesh submeshes are handled better.
+	    - Better handle unknown mesh types.
+5-Oct-2006
+        - Genjix added csPython::LoadModule (path, file).
+	- Marten changed win32 version resource generation so it strips
+	  any RCxxx tags, appearantly they trip the mingw resource
+	  compiler.
+        - Piotr does bug fixes after yesterdays joints commit. Additionally he
+          comments out unnecessary code in phystut.
+	- mdmkolbe added a comment to the code explaining why one of the
+	  reinterpret_casts was used.
+	- Erroroman changed render buffer "bones indices" elements type from
+	  int to float because of slow hardware animation reported by people
+	  that uses Windows and ATI video cards. Nvidia cards doesn't have
+	  such problem so probably cases about driver problem.
+	- Erroroman adopted kwartz model and the animation shaders to the new
+	  type of the render buffer.
+	- Erroroman improoved the script for exporting skeletal meshes from
+	  3ds max (still not fully finished)and added some more info to 
+	  the README file.
 4-Oct-2006
 	- Jorrit updated startme:
 	    - Made the icons show from top to bottom.
 	    - Removed particles and awstest demos.
 	    - Changed screenshot for walktest to castle screenshot.
+	- mdmkolbe eliminated improper reinterpret_cast calls with extreme
+	  prejudice.  (Casting from a 'void*' should use static_cast.)
+	- Marten reverted one of mdmkolbes changes. _beginthreadex does
+	  not always return a void*, on some versions of MSVC it gives
+	  uintptr_t and therefor needs the reinterpret_cast.
+	- Marten hopefully fixed the particle "clumping" when emitting 
+	  particles with velocity.
+        - Piotr added angular constraint axis joint parameter which should
+          be anchored to specyfied body (it lets angular stops to be effective
+          when joint have free rotation along all axes in ode dynamics 
+          implementation - "ball joint" limitation).
+        - Piotr cleaned iODEJointState interface (it lets user to change ode
+          specyfic parameters for joints made via iJoint interface).
 3-Oct-2006
 	- mdmkolbe fixed an uninitialized variable that broke procedural
 	  textures on Cygwin.

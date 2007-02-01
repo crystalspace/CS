@@ -41,9 +41,8 @@ void csFontCache::FontDeleteNotify::BeforeDelete (iFont* font)
 
 //---------------------------------------------------------------------------
 
-csFontCache::csFontCache () : LRUAlloc (512)
+csFontCache::csFontCache () : head (0), tail (0), LRUAlloc (512)
 {
-  head = tail = 0;
   deleteCallback = new FontDeleteNotify (this);
 }
 
@@ -319,9 +318,17 @@ void csFontCache::AddCacheData (KnownFont* font, utf32_char glyph,
 				GlyphCacheData* cacheData)
 {
   CS_ASSERT (font != 0);
-  CS_ASSERT (FindLRUEntry (font, glyph) == 0);
+  LRUEntry* entry = FindLRUEntry (font, glyph);
 
-  LRUEntry* entry = LRUAlloc.Alloc ();
+  if (entry != 0)
+  {
+    // This may happen in case of nested CacheGlyph() calls
+    InternalUncacheGlyph (entry->cacheData);
+    entry->cacheData = cacheData;
+    return;
+  }
+
+  entry = LRUAlloc.Alloc ();
   entry->prev = 0;
   entry->next = head;
   if (head)

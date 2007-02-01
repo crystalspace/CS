@@ -6,6 +6,7 @@ InstallData
   standard.zip
   startme.zip
   teapot.zip
+  kwartz.zip
   ttf-dejavu.zip
   ttf-vera.zip
   unifont.zip 
@@ -28,6 +29,7 @@ for map in $(maps)
 }
 
 SubInclude TOP data aws ;
+SubInclude TOP data castle ;
 SubInclude TOP data ceguitest ;
 SubInclude TOP data config ;
 SubInclude TOP data cube ;

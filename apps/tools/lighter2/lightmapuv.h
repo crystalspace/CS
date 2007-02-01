@@ -27,30 +27,75 @@ namespace lighter
 
   struct RadObjectVertexData;
   
+  class LightmapUVLayoutFactory;
+
   class LightmapUVLayouter 
   {
   public:
-    virtual bool LayoutUVOnPrimitives (RadPrimitiveArray &prims, 
-      RadObjectVertexData& vertexData,
-      LightmapPtrDelArray& lightmaps) = 0;
+    /**
+     * Lay out lightmaps for a factory.
+     * This should split vertices as necessary and assign primitives
+     * to lightmaps.
+     * \param inPrims Input primitives.
+     * \param inPrims Input vertex data.
+     * \param outPrims Output primitives. A number of primitive arrays. All
+     *   primitives of a sub-array would fit on a single lightmap.
+     */
+    virtual LightmapUVLayoutFactory* LayoutFactory (
+      const RadPrimitiveArray& inPrims, RadObjectVertexData& vertexData,
+      csArray<RadPrimitiveArray>& outPrims) = 0;
   };
+
+  class LightmapUVLayoutFactory
+  {
+  public:
+    virtual ~LightmapUVLayoutFactory() {}
+    /**
+     * Lay out lightmaps for primitives of ab object.
+     * \param prims Input primitives.
+     * \param inPrims Input vertex data.
+     * \param lmID Output global lightmap ID onto which all primitives were
+     *   layouted.
+     */
+    virtual bool LayoutUVOnPrimitives (RadPrimitiveArray &prims, 
+      RadObjectVertexData& vertexData, uint& lmID) = 0;
+  };
+
+  class SimpleUVLayoutFactory;
 
   class SimpleUVLayouter : public LightmapUVLayouter
   {
   public:
-    virtual bool LayoutUVOnPrimitives (RadPrimitiveArray &prims, 
-      RadObjectVertexData& vertexData,
-      LightmapPtrDelArray& lightmaps);
+    SimpleUVLayouter (LightmapPtrDelArray& lightmaps) : 
+      globalLightmaps (lightmaps)
+    {}
 
+    virtual LightmapUVLayoutFactory* LayoutFactory (
+      const RadPrimitiveArray& inPrims, RadObjectVertexData& vertexData,
+      csArray<RadPrimitiveArray>& outPrims);
   protected:
-    bool AllocLightmap (LightmapPtrDelArray& lightmaps, int u, int v,
-      csRect &lightmapArea,  int &lightmapID);
+    friend class SimpleUVLayoutFactory;
+
+    LightmapPtrDelArray& globalLightmaps;
+
+    bool AllocLightmap (LightmapPtrDelArray& lightmaps, int u, int v, 
+      csRect &lightmapArea, int &lightmapID);
 
     bool ProjectPrimitive (RadPrimitive &prim, BoolDArray &usedVerts,
       float uscale, float vscale);
   };
 
-}
+  class SimpleUVLayoutFactory : public LightmapUVLayoutFactory
+  {
+  public:
+    SimpleUVLayoutFactory (SimpleUVLayouter* parent) : parent (parent) {}
 
-#endif
+    virtual bool LayoutUVOnPrimitives (RadPrimitiveArray &prims, 
+      RadObjectVertexData& vertexData, uint& lmID);
+  protected:
+    SimpleUVLayouter* parent;
+  };
 
+} // namespace lighter
+
+#endif // __LIGHTMAPUV_H__

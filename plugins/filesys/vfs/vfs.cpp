@@ -37,6 +37,7 @@
 #include "csutil/syspath.h"
 #include "csutil/util.h"
 #include "csutil/vfsplat.h"
+#include "iutil/databuff.h"
 #include "iutil/objreg.h"
 #include "iutil/verbositymanager.h"
 
@@ -1602,8 +1603,11 @@ bool csVFS::Initialize (iObjectRegistry* r)
 bool csVFS::ReadConfig ()
 {
   csRef<iConfigIterator> iterator (config.Enumerate ("VFS.Mount."));
-  while (iterator->Next ())
+  while (iterator->HasNext ())
+  {
+    iterator->Next();
     AddLink (iterator->GetKey (true), iterator->GetStr ());
+  }
   NodeList.Sort (NodeList.Compare);
   return true;
 }
@@ -1994,6 +1998,15 @@ bool csVFS::DeleteFile (const char *FileName)
   return rc;
 }
 
+bool csVFS::SymbolicLink(const char *Target, const char *Link, int priority)
+{
+  csRef<iDataBuffer> rpath = GetRealPath (Link);
+  if (!rpath->GetSize ())
+    return false;
+  Mount (Target, rpath->GetData ());
+  return true;
+}
+
 bool csVFS::Mount (const char *VirtualPath, const char *RealPath)
 {
   csScopedMutexLock lock (mutex);
@@ -2105,8 +2118,9 @@ bool csVFS::LoadMountsFromFile (iConfigFile* file)
   bool success = true;
 
   csRef<iConfigIterator> iter = file->Enumerate ("VFS.Mount.");
-  while (iter->Next ())
+  while (iter->HasNext ())
   {
+	iter->Next();
     const char *rpath = iter->GetKey (true);
     const char *vpath = iter->GetStr ();
     if (!Mount (rpath, vpath)) {

@@ -661,7 +661,7 @@ void Simple::CreateWalls (const csVector3& /*radius*/)
   t.SetOrigin(csVector3(10.0f,0.0f,0.0f));
 
   //FIXME: this should work same in both engines (needs finishing bullet plugin)
-  if (phys_engine_id == ODE_ID)
+  if (0/*phys_engine_id == ODE_ID*/)
   {
     csRef<iDynamicsSystemCollider> collider = dynSys->CreateCollider ();
     collider->CreateBoxGeometry (size);
@@ -691,19 +691,20 @@ void Simple::CreateWalls (const csVector3& /*radius*/)
     collider = dynSys->CreateCollider ();
     collider->CreateBoxGeometry (size);
     collider->SetTransform (t);
+  }else
+  {
+    dynSys->AttachColliderBox (size, t, 10, 0);
+    t.SetOrigin(csVector3(-10.0f,0.0f,0.0f));
+    dynSys->AttachColliderBox (size, t, 10, 0);
+    t.SetOrigin(csVector3(0.0f,10.0f,0.0f));
+    dynSys->AttachColliderBox (size, t, 10, 0);
+    t.SetOrigin(csVector3(0.0f,-10.0f,0.0f));
+    dynSys->AttachColliderBox (size, t, 10, 0);
+    t.SetOrigin(csVector3(0.0f,0.0f,10.0f));
+    dynSys->AttachColliderBox (size, t, 10, 0);
+    t.SetOrigin(csVector3(0.0f,0.0f,-10.0f));
+    dynSys->AttachColliderBox (size, t, 10, 0);
   }
-
-  dynSys->AttachColliderBox (size, t, 10, 0);
-  t.SetOrigin(csVector3(-10.0f,0.0f,0.0f));
-  dynSys->AttachColliderBox (size, t, 10, 0);
-  t.SetOrigin(csVector3(0.0f,10.0f,0.0f));
-  dynSys->AttachColliderBox (size, t, 10, 0);
-  t.SetOrigin(csVector3(0.0f,-10.0f,0.0f));
-  dynSys->AttachColliderBox (size, t, 10, 0);
-  t.SetOrigin(csVector3(0.0f,0.0f,10.0f));
-  dynSys->AttachColliderBox (size, t, 10, 0);
-  t.SetOrigin(csVector3(0.0f,0.0f,-10.0f));
-  dynSys->AttachColliderBox (size, t, 10, 0);
 
 #endif
 

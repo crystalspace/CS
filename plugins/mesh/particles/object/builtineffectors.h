@@ -42,6 +42,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     //-- iParticleBuiltinEffectorFactory
     virtual csPtr<iParticleBuiltinEffectorForce> CreateForce () const;
     virtual csPtr<iParticleBuiltinEffectorLinColor> CreateLinColor () const;
+    virtual csPtr<iParticleBuiltinEffectorVelocityField> 
+      CreateVelocityField () const;
 
     //-- iComponent
     virtual bool Initialize (iObjectRegistry*)
@@ -169,6 +171,76 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     csArray<PrecalcEntry> precalcList;
   };
 
+  class ParticleEffectorVelocityField : public 
+    scfImplementation2<ParticleEffectorVelocityField,
+                       iParticleBuiltinEffectorVelocityField,
+                       scfFakeInterface<iParticleEffector> >
+  {
+  public:
+    ParticleEffectorVelocityField  ()
+      : scfImplementationType (this),
+      type (CS_PARTICLE_BUILTIN_SPIRAL)
+    {
+    }
+
+    //-- iParticleEffector
+    virtual csPtr<iParticleEffector> Clone () const;
+
+    virtual void EffectParticles (iParticleSystemBase* system,
+      const csParticleBuffer& particleBuffer, float dt, float totalTime);
+
+    //-- iParticleBuiltinEffectorForce
+    virtual void SetType (csParticleBuiltinEffectorVFType type)
+    {
+      this->type = type;
+    }
+
+    virtual csParticleBuiltinEffectorVFType GetType () const
+    {
+      return type;
+    }
+
+    virtual void SetFParameter (size_t parameterNumber, float value)
+    {
+      fparams.Put (parameterNumber, value);
+    }
+
+    virtual float GetFParameter (size_t parameterNumber) const
+    {
+      if (parameterNumber >= fparams.GetSize ())
+        return 0;
+
+      return fparams[parameterNumber];
+    }
+
+    virtual size_t GetFParameterCount () const
+    {
+      return fparams.GetSize ();
+    }
+
+    virtual void SetVParameter (size_t parameterNumber, const csVector3& value)
+    {
+      vparams.Put (parameterNumber, value);
+    }
+
+    virtual csVector3 GetVParameter (size_t parameterNumber) const
+    {
+      if (parameterNumber >= vparams.GetSize ())
+        return csVector3(0,0,0);
+
+      return vparams[parameterNumber];
+    }
+
+    virtual size_t GetVParameterCount () const
+    {
+      return vparams.GetSize ();
+    }
+
+  private:
+    csParticleBuiltinEffectorVFType type;
+    csArray<csVector3> vparams;
+    csArray<float> fparams;
+  };
 }
 CS_PLUGIN_NAMESPACE_END(Particles)
 

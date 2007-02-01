@@ -101,12 +101,12 @@ public:
   /// Copy constructor.
   csPathsList (csPathsList const& o) : paths(o.paths) {}
   /// Construct from a list of paths separated by CS_PATH_DELIMITER.
-  csPathsList (const char* pathList);
+  csPathsList (const char* pathList, bool expand = false);
   /**
    * Construct from a list of single paths. The list must be terminated by a
    * 0 entry.
    */
-  csPathsList (const char* const pathList[]);
+  csPathsList (const char* const pathList[], bool expand = false);
   /// Destructor.
   ~csPathsList() {}
   /// Assignment operator.

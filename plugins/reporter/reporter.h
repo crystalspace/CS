@@ -53,6 +53,19 @@ private:
   csPDelArray<csReporterMessage> messages;
   csRefArray<iReporterListener> listeners;
 
+  /// Whether Report() call is nested
+  bool inReporting;
+  struct ReportedMessage
+  {
+    int severity;
+    csString msgID;
+    csStringFast<768> buf;
+  };
+  /// Queue of messages that were reported while nested
+  csArray<ReportedMessage> messageQueue;
+  /// Actually report a message to listeners and record
+  void ActualReport (const csRefArray<iReporterListener>& listeners,
+    int severity, const char* msgId, const char* buf);
 public:
   csReporter (iBase *iParent);
   virtual ~csReporter ();
