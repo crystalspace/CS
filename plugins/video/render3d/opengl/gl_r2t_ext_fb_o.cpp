@@ -121,7 +121,8 @@ void csGLRender2TextureEXTfbo::SetRenderTarget (iTextureHandle* handle,
       if ((framebuffer == 0) || (txthandle != handle))
       {
         csGLRender2TextureEXTfbo::txthandle = handle;
-        if ((txt_w > fb_w) || (txt_h > fb_h))
+        CS_ASSERT(framebuffer == 0 ? (txt_w > fb_w) || (txt_h > fb_h) : true);
+        if ((framebuffer == 0) || (txt_w > fb_w) || (txt_h > fb_h))
         {
           FreeBuffers();
 

@@ -35,7 +35,7 @@ class csGLRender2TextureEXTfbo : public csGLRender2TextureFramebuf
 public:
   csGLRender2TextureEXTfbo (csGLGraphics3D* G3D) 
     : csGLRender2TextureFramebuf (G3D), enableFBO(true), framebuffer (0),
-      depthRB(0), stencilRB(0), txthandle(0) { }
+      depthRB(0), stencilRB(0), fb_w(-1), fb_h(-1), txthandle(0) { }
   virtual ~csGLRender2TextureEXTfbo();
 
   virtual void SetRenderTarget (iTextureHandle* handle, bool persistent,

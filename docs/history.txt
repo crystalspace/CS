@@ -6,10 +6,47 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
-1-Sep-2006
+4-Oct-2006
+	- Jorrit updated startme:
+	    - Made the icons show from top to bottom.
+	    - Removed particles and awstest demos.
+	    - Changed screenshot for walktest to castle screenshot.
+3-Oct-2006
+	- mdmkolbe fixed an uninitialized variable that broke procedural
+	  textures on Cygwin.
+	- Jorrit committed a new extrudeGlow shader from Anders Wisur.
+	  Still experimental.
+	- Jorrit added a few missing Jamfile's in the data/shader directory.
+	- Jorrit changed all the attenuation based shaders (parallaxAtt,
+	  specular, character, ...) to calculate attenuation a bit
+	  differently so that the resulting lighting is brighter for the
+	  same radius of the light. This makes the lighting intensity
+	  more matched up with the lighting as calculated by the lightmapper.
+	  Another benefit of this change is that it improves speed as
+	  you can now reduce the light radius with same visual effect.
+	- Jorrit reduces the light radius in castle level.
+	- Marten fixed a corner case in csQuaternion::Exp and 
+	  csQuaternion::Log as well as some accuracy and efficiency parts in
+	  skeleton spline calculation.
+	- Jorrit added a fallback for light_bumpmap to the light specular
+	  shader. That means that parallaxAtt will also correctly fallback
+	  to light_bumpmap if CG is not available or fails.
+	- Marten fixed a bug in the shader manager which caused shader manager
+	  (the global) SVs not to be properly pushed to the SV stack.
+2-Oct-2006
+	- res removed the resolution and windowed vs fullscreen message from
+	  null3d.
+	- Marten fixed csQuaternion::Exp and csQuaternion::Log to actually be
+	  the exponential and logarithmic functions.
+1-Oct-2006
 	- Marten implemented pthread thread and condition variables classes 
 	  with new interface. The new improved implementation of threading
 	  should now be fully functional.
+	- res silenced more MSVC deprecation warnings.
+	- res fixed some locals in CS::TriangleIndicesStream to use the 
+	  template parameter.
+	- res added iShaderVariableContext::RemoveVariable (csShaderVariable*).
+	- caedes removed stdtex from data Jamfile.
 30-Sep-2006
 	- res fixed some MSVC warnings.
 	- res fixed some wrong GL extension function declarations and added
@@ -62,7 +99,7 @@ chronological order.
 	- Marten fixed compilation on MSVC after res cleanup earlier.
 28-Sep-2006
 	- mdmkolbe changed walktest to exit with code 0 on normal exits.
-	- mdmkolbe blind commited a change by Timothy "kiolakin" Whitfield
+	- mdmkolbe blind committed a change by Timothy "kiolakin" Whitfield
 	  that will allow for skyboxes by letting each mesh specify its own
 	  zbuffer mode.
 	- mdmkolbe converted plugins/bugplug to the new SCF.
@@ -2359,7 +2396,7 @@ chronological order.
 	  GNU/Linux, gcc 3.4.4.
 	- res fixed a couple of shared lib issues.
 2-Mar-2006
-	- Fossi commited another backup of the paging terrain.
+	- Fossi committed another backup of the paging terrain.
 	- Fossi copied priority 50 to terrain_fixed_base, so that terrain
 	  does at least show on old hardware.
 	- Jorrit fixed iObjectRegistryIterator so that it doesn't skip the
@@ -2415,7 +2452,7 @@ chronological order.
 28-Feb-2006
 	- Jorrit fixed csStringArray::SplitString() with option delimIgnore
 	  so that it actually does what it is advertized to do.
-	- Jorrit commited the workarounds for CG related problems on some
+	- Jorrit committed the workarounds for CG related problems on some
 	  3d cards. This should fix disco effects on terrainf, incorrect
 	  point sprites and incorrect portals. Note that these are
 	  workarounds! We need real fixes.
@@ -2473,7 +2510,7 @@ chronological order.
 	- res added csApplicationFramework::OnCommandLineHelp().
 	- res modernized pysimp.
 23-Feb-2006
-	- caedes commited a patch he prepared with rhohr that fixes the python
+	- caedes committed a patch he prepared with rhohr that fixes the python
 	  SetupEventHandler, the python event handler itself and the python
 	  tutorials. All this was broken since last event system changes. Now
 	  python only cs apps can again be made.
@@ -3482,7 +3519,7 @@ chronological order.
         - BigG Removed unnecessary call to Texture Manager in sndtest.cpp
         - BigG modified g2d.cpp - csGraphics2DDDraw3::PerformExtensionV to
           meet code standards. Removed unused variables.
-	- caedes commited changes to pysimp script, as he forgot after fixing
+	- caedes committed changes to pysimp script, as he forgot after fixing
 	  it on 15-Dec-2005.
 	- Jorrit continued work on the mesh generator. Still not functional.
 	  Removed the iMeshGeneratorMapping interface.
@@ -5285,7 +5322,7 @@ chronological order.
 	  members to 0.
 	- res changed the names of the "STANDARD_LIGHT_0_FOO" shader variables
 	  to "light 0 foo".
-	- Marten commited recent work to the lighter. It is right now added
+	- Marten committed recent work to the lighter. It is right now added
 	  as lighter2 but later it will replace the current ligter. Also
 	  applied older changes to old lighter.
 	- Marten added two helpers which operates on iDocument* structures
