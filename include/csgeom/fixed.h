@@ -37,8 +37,11 @@ class csFixed16
 {
   int32 v;
 public:
+  csFixed16 () {}
+  csFixed16 (const float f) : v (csQfixed16 (f)) {}
+
   /// Assign floating point number
-  csFixed16& operator= (float f)
+  csFixed16& operator= (const float f)
   {
     v = csQfixed16 (f);
     return *this;
@@ -75,6 +78,15 @@ public:
   { 
     csFixed16 v;
     v.v = (int32)(v1.v * v2);
+    return v;
+  }
+  
+  /// Multiply a fixed point number with an int, result is fixed
+  inline friend csFixed16 operator* (const csFixed16& v1, 
+    int v2)
+  { 
+    csFixed16 v;
+    v.v = v1.v * v2;
     return v;
   }
   

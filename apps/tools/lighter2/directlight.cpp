@@ -118,6 +118,9 @@ namespace lighter
     // for diffuse surfaces
     csVector3 elementCenter = prim.GetMinCoord () + prim.GetuFormVector () * 0.5f + prim.GetvFormVector () * 0.5f;
 
+    float area2pixel = 
+      1.0f / (prim.GetuFormVector () % prim.GetvFormVector ()).Norm();
+
     int minU, minV, maxU, maxV;
     prim.ComputeMinMaxUV (minU, maxU, minV, maxV);
 
@@ -130,6 +133,8 @@ namespace lighter
       {
         const float elemArea = prim.GetElementAreas ()[findex];
         if (elemArea <= 0.0f) continue; //need an area
+        const float lmArea = elemArea * area2pixel;
+        //bool complete
 
         csVector3 jiVec = light->position - ec;
 
@@ -142,7 +147,7 @@ namespace lighter
 
         // Do a 5 ray visibility test
         float visFact = RaytraceFunctions::Vistest5 (tracer, 
-          ec, prim.GetuFormVector (), prim.GetvFormVector (), light->position);
+          ec, prim.GetuFormVector (), prim.GetvFormVector (), light->position, prim);
         //float visFact = 1.0f;
         
         // refl = reflectance * lightsource * cos(theta) / distance^2 * visfact
@@ -153,9 +158,9 @@ namespace lighter
         csColor reflected = energy * prim.GetOriginalPrimitive ()->GetReflectanceColor();
 
         // Store the reflected color
-        Lightmap * lm = sector->scene->GetLightmaps ()[prim.GetGlobalLightmapID ()];
-        lm->GetData ()[v*lm->GetWidth ()+u] += reflected;
-        
+        Lightmap* lm = sector->scene->GetLightmap (
+          prim.GetGlobalLightmapID (), light);
+        lm->GetData ()[v*lm->GetWidth ()+u] += reflected * lmArea;
 
         // If we later do radiosity, collect the reflected energy
         if (globalConfig.GetLighterProperties ().doRadiosity)

@@ -22,6 +22,7 @@
 #include "config.h"
 #include "lighter.h"
 #include "lightmapuv.h"
+#include "lightmapuv_simple.h"
 #include "radprimitive.h"
 #include "raygenerator.h"
 #include "raytracer.h"
@@ -204,7 +205,8 @@ namespace lighter
       while (objIt.HasNext ())
       {
         csRef<RadObject> obj = objIt.Next ();
-        obj->FixupLightmaps (scene->GetLightmaps());
+        csArray<LightmapPtrDelArray*> allLightmaps (scene->GetAllLightmaps());
+        obj->FixupLightmaps (allLightmaps);
       }
     }
 

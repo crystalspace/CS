@@ -59,8 +59,8 @@ namespace lighter
       ComputeMinMaxUV (min, max);
       minU = (int)floor (min.x);
       minV = (int)floor (min.y);
-      maxU = (int)floor (max.x);
-      maxV = (int)floor (max.y);
+      maxU = (int)ceil (max.x);
+      maxV = (int)ceil (max.y);
     }
 
     /// Fix down the min/max to ints..
@@ -74,9 +74,6 @@ namespace lighter
         uv.y = int(uv.y+0.5);
       }
     }*/
-
-    /// Remap (in linear fashion) the UVs
-    void RemapUVs (csVector2 &move);
 
     /// Calculate and save primitive plane
     void ComputePlane ();
@@ -107,6 +104,8 @@ namespace lighter
 
     /// Return triangles (triangulated version)
     csArray<csTriangle> BuildTriangulated() const;
+
+    bool PointInside (const csVector3& pt) const;
 
     // Data accessors
     /*

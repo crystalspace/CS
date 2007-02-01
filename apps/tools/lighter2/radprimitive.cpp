@@ -40,18 +40,6 @@ namespace lighter
     }
   }
 
-  void RadPrimitive::RemapUVs (csVector2 &move)
-  {    
-    for (uint i = 0; i < indexArray.GetSize (); i++)
-    {
-      size_t index = indexArray[i];
-      csVector2 &uv = vertexData.vertexArray[index].lightmapUV;
-      uv += move;
-      //uv.x = (int)(uv.x+0.5f);
-      //uv.y = (int)(uv.y+0.5f);
-    }
-  }
-
   void RadPrimitive::ComputePlane ()
   {
     //Setup a temporary array of our vertices
@@ -700,6 +688,24 @@ namespace lighter
     }
 
     return newArr;
+  }
+
+  bool RadPrimitive::PointInside (const csVector3& pt) const
+  {
+    csVector3 p1 = 
+      vertexData.vertexArray[indexArray[indexArray.GetSize()-1]].position;
+    for (size_t i = 0; i < indexArray.GetSize (); i++)
+    {
+      csVector3 p2 = vertexData.vertexArray[indexArray[i]].position;
+
+      csVector3 testPlaneNormal = (p2 - p1) % plane.Normal();
+      csPlane3 testPlane (testPlaneNormal, -testPlaneNormal * p1);
+
+      if (testPlane.Classify (pt) < -EPSILON) return false;
+
+      p1 = p2;
+    }
+    return true;
   }
 
   int RadPrimitive::Classify (const csPlane3 &plane) const

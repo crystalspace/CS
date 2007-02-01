@@ -137,6 +137,7 @@ namespace lighter
     const char* saverPluginName;
 
     csPDelArray<LightmapUVLayoutFactory> lightmaplayouts;
+    csArray<size_t> lightmaplayoutGroups;
 
     friend class RadObject;
   };
@@ -172,7 +173,7 @@ namespace lighter
     virtual void SaveMesh (Scene* scene, iDocumentNode *node);
 
     // Fixup the lightmap borders
-    virtual void FixupLightmaps (LightmapPtrDelArray& lightmaps);
+    virtual void FixupLightmaps (csArray<LightmapPtrDelArray*>& lightmaps);
 
     const csArray<RadPrimitiveArray>& GetPrimitives () const
     { return allPrimitives; }

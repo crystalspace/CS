@@ -116,7 +116,8 @@ namespace lighter
     
     if (!genFact) return; // bail
 
-    bool keepSubMeshes = globalLighter->settings.keepGenmeshSubmeshes;
+    genFact->RemoveRenderBuffer ("texture coordinate lightmap");
+    genFact->Compress ();
 
     csVector3 *verts = genFact->GetVertices ();
     csVector2 *uv = genFact->GetTexels ();
@@ -141,7 +142,6 @@ namespace lighter
       {
         iGeneralMeshSubMesh* subMesh = genFact->GetSubMesh (s);
         iRenderBuffer* indices = subMesh->GetIndices();
-        iMaterialWrapper* material = subMesh->GetMaterial();
 
         CS::TriangleIndicesStream<size_t> tris;
         csRenderBufferLock<uint8> indexLock (indices);
@@ -151,7 +151,7 @@ namespace lighter
 
         while (tris.HasNextTri())
         {
-          size_t a, b, c;
+          size_t a = 0, b = 0, c = 0;
           tris.NextTriangle (a, b, c);
 
           AddPrimitive (a, b, c, subMesh);
@@ -163,7 +163,7 @@ namespace lighter
       csTriangle *tris = genFact->GetTriangles ();
       iMaterialWrapper* material = 
         factory->GetMeshObjectFactory()->GetMaterialWrapper();
-      for (i=0; i<genFact->GetTriangleCount ();i++)
+      for (i=0; i < genFact->GetTriangleCount ();i++)
       {
         AddPrimitive (tris[i].a, tris[i].b, tris[i].c, material);
       }
@@ -228,8 +228,6 @@ namespace lighter
     }
 
     findHelper.CommitSubmeshes (genFact);
-
-    genFact->RemoveRenderBuffer ("texture coordinate lightmap");
 
     RadObjectFactory::SaveFactory (node);
   }

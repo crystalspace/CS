@@ -172,7 +172,7 @@ void* ptcalloc (size_t n, size_t s)
 #if defined(CS_PLATFORM_WIN32)
 
 /* Cygwin has funny issues with atexit() that ptmalloc seems to tickle.
- * So within ptmalloc we use own own single-use implementation of atexit()
+ * So within ptmalloc we use our own single-use implementation of atexit()
  * when on Cygwin.  Note that use of a static variable could lead to incorrect
  * cleanup order so we use the GCC "__attribute__ ((init_priority (101))"
  * extention to force atexitHandler to be constructed before other
