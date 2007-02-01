@@ -182,6 +182,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     commonDirection (1.0f,0,0), individualSize (false), particleSize (1.0f)
   {
     particleBuffer.particleCount = 0;
+
+    renderBufferAccessor.AttachNew (new RenderBufferAccessor (this));
   }
 
   ParticlesMeshObject::~ParticlesMeshObject ()
@@ -507,7 +509,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     {
       mesh->buffers.AttachNew (new csRenderBufferHolder);
       mesh->meshtype = CS_MESHTYPE_TRIANGLES;
-      mesh->buffers->SetAccessor (this, 
+      mesh->buffers->SetAccessor (renderBufferAccessor, 
         CS_BUFFER_COLOR_MASK | CS_BUFFER_TEXCOORD0_MASK);
     }
 
