@@ -51,13 +51,15 @@ namespace CS
   public:
     /// Construct an preallocated data buffer (filled with garbage initially)
     DataBuffer (size_t iSize)
-      : scfImplementationType (this), Size (iSize), do_delete (true)
+      : scfImplementation1<DataBuffer, iDataBuffer> (this), Size (iSize), 
+      do_delete (true)
     {
       Data.p = (char*)Data.Alloc (Size);
     }
     /// Construct an preallocated data buffer (filled with garbage initially)
     DataBuffer (size_t iSize, const Allocator& alloc)
-      : scfImplementationType (this), Data (alloc), Size (iSize), do_delete (true)
+      : scfImplementation1<DataBuffer, iDataBuffer> (this), Data (alloc), 
+      Size (iSize), do_delete (true)
     {
       Data.p = Data.Alloc (Size);
     }
@@ -68,14 +70,15 @@ namespace CS
      * must be allocated by an allocator compatible to the given.
      */
     DataBuffer (char *iData, size_t iSize, bool should_delete = true)
-      : scfImplementationType (this), Size (iSize), do_delete (should_delete)
+      : scfImplementation1<DataBuffer, iDataBuffer> (this), Size (iSize), 
+      do_delete (should_delete)
     {
       Data.p = iData; 
     }
 
     /// Duplicate an existing data buffer. Also appends a 0 char.
     DataBuffer (iDataBuffer *source)
-      : scfImplementationType (this), Size (source->GetSize()),
+      : scfImplementation1<DataBuffer, iDataBuffer> (this), Size (source->GetSize()),
         do_delete (true)
     {
       Data.p = (char*)Data.Alloc (Size+1);
