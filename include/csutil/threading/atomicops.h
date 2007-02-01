@@ -296,7 +296,7 @@ namespace Threading
 
       __asm__ __volatile__ (
       "       lwsync \n"
-      "1:     lwarx   %0,0,%2"
+      "1:     lwarx   %0,0,%2\n"
       "       cmpw    0,%0,%3\n"
       "       bne-    2f\n"
       "       dcbt     0,%2 \n"
@@ -317,7 +317,7 @@ namespace Threading
         (int32)comparand);
     }
 
-    inline static int32 Increment (int32* target, int32 incr = 1;)
+    inline static int32 Increment (int32* target, int32 incr = 1)
     {
       //@@Potentially dangerous code, needs to be revisited
       int32 prevValue, currValue, nextValue;
@@ -332,7 +332,7 @@ namespace Threading
 
     inline static int32 Decrement (int32* target)
     {
-      return (int32)Decrement (target, -1);
+      return (int32)Increment (target, -1);
     }
   };
 

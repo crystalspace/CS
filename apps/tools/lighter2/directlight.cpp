@@ -18,6 +18,7 @@
 
 #include "crystalspace.h"
 
+#include "common.h"
 #include "directlight.h"
 #include "lightprop.h"
 #include "raytracer.h"
@@ -116,7 +117,9 @@ namespace lighter
   {
     // Compute shading for each point on the primitive, using normal Phong shading
     // for diffuse surfaces
-    csVector3 elementCenter = prim.GetMinCoord () + prim.GetuFormVector () * 0.5f + prim.GetvFormVector () * 0.5f;
+    csVector3 elementCenter = prim.GetMinCoord () 
+      + prim.GetuFormVector () * 0.5f 
+      + prim.GetvFormVector () * 0.5f;
 
     float area2pixel = 
       1.0f / (prim.GetuFormVector () % prim.GetvFormVector ()).Norm();
@@ -129,21 +132,30 @@ namespace lighter
     for (int v = minV; v <= maxV; v++)
     {
       csVector3 ec = elementCenter;
-      for (int u = minU; u <= maxU; u++, findex++, ec += prim.GetuFormVector ())
+      for (int u = minU; u <= maxU; u++, findex++, 
+        ec += prim.GetuFormVector ())
       {
         const float elemArea = prim.GetElementAreas ()[findex];
         if (elemArea <= 0.0f) continue; //need an area
         const float lmArea = elemArea * area2pixel;
-        //bool complete
 
         csVector3 jiVec = light->position - ec;
 
         float distSq = jiVec.SquaredNorm ();
         jiVec.Normalize ();
 
-        float cosTheta_j = - (prim.GetPlane ().GetNormal () * jiVec);
+        float lambda, my;
+        prim.ComputeBaryCoords (ec, lambda, my);
+        csVector3 norm = 
+          lambda * prim.GetVertexData().vertexArray[prim.GetIndexArray()[0]].normal +
+          my * prim.GetVertexData().vertexArray[prim.GetIndexArray()[1]].normal +
+          (1 - lambda - my) * prim.GetVertexData().vertexArray[prim.GetIndexArray()[2]].normal;
+        norm.Normalize();
+        float cosTheta_j = (norm * jiVec);
 
+#ifndef DUMP_NORMALS
         if (cosTheta_j <= 0.0f) continue; //backface culling
+#endif
 
         // Do a 5 ray visibility test
         float visFact = RaytraceFunctions::Vistest5 (tracer, 
@@ -160,7 +172,12 @@ namespace lighter
         // Store the reflected color
         Lightmap* lm = sector->scene->GetLightmap (
           prim.GetGlobalLightmapID (), light);
+#ifndef DUMP_NORMALS
         lm->GetData ()[v*lm->GetWidth ()+u] += reflected * lmArea;
+#else
+        lm->GetData ()[v*lm->GetWidth ()+u].Set (norm.x*0.5+0.5, 
+          norm.y*0.5+0.5, norm.z*0.5+0.5);
+#endif
 
         // If we later do radiosity, collect the reflected energy
         if (globalConfig.GetLighterProperties ().doRadiosity)

@@ -27,6 +27,9 @@
 #include "radobject.h"
 #include "config.h"
 
+// Debugging: uncomment to disable border smoothing
+//#define NOSMOOTH
+
 namespace lighter
 {
 
@@ -150,6 +153,8 @@ namespace lighter
     for (size_t p = 0; p < allPrimitives.GetSize (); p++)
     {
       const Lightmap* lm = lightmaps[lightmapIDs[p]];
+      const float factorX = 1.0f / lm->GetWidth ();
+      const float factorY = 1.0f / lm->GetHeight ();
       const RadPrimitiveArray& prims = allPrimitives[p];
       csSet<size_t> indicesRemapped;
       // Iterate over lightmaps and renormalize UVs
@@ -164,8 +169,8 @@ namespace lighter
           if (!indicesRemapped.Contains (index))
           {
             csVector2 &lmUV = vertexData.vertexArray[index].lightmapUV;
-            lmUV.x /= lm->GetWidth ();
-            lmUV.y /= lm->GetHeight ();
+            lmUV.x = (lmUV.x + 0.5f) * factorX;
+            lmUV.y = (lmUV.y + 0.5f) * factorY;
             indicesRemapped.AddNoTest (index);
           }
         }
@@ -304,6 +309,7 @@ namespace lighter
     
     // Un-antialias
     uint i;
+#ifndef DUMP_NORMALS
     for (size_t l = 0; l < lightmaps.GetSize (); l++)
     {
       for (i = 0; i < lightmaps[l]->GetSize(); i++)
@@ -320,7 +326,9 @@ namespace lighter
         }
       }
     }
+#endif
 
+#ifndef NOSMOOTH
     // Do the filtering
     for (size_t l = 0; l < lightmaps.GetSize (); l++)
     {
@@ -368,13 +376,23 @@ namespace lighter
 
             if (count > 0) 
             {
+#ifndef DUMP_NORMALS
               newColor *= (1.0f/count);
+#else
+              csVector3 v (
+                newColor.red*2.0f-float (count), 
+                newColor.green*2.0f-float (count), 
+                newColor.blue*2.0f-float (count));
+              v.Normalize();
+              newColor.Set (v.x*0.5f+0.5f, v.y*0.5f+0.5f, v.z*0.5f+0.5f);
+#endif
               lmData[idx] = newColor;
             }
           }
         }
       }
     }
+#endif // NOSMOOTH
   }
 
 }

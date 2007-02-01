@@ -100,7 +100,7 @@ copyright = "Copyright (C) 2000-2005 by " + author_info + "\nSVN support by Mart
 #        destination package name.
 #------------------------------------------------------------------------------
 
-svnurl = "https://svn.sourceforge.net/svnroot/crystal/trunk/CS/"
+svnurl = "file:///home/crystal/scm/crystal/CS/trunk/"
 stripdotsvn = True
 basedir = "CS"
 ownergroup = "crystal"
@@ -159,7 +159,7 @@ class Snapshot:
         self.revision = 0
         self.hasdiff = False
         self.dirstack = DirStack()
-        self.svncommand = os.path.join(os.getcwd(), "./svnwrapper")
+        self.svncommand = '/usr/bin/svn'
 
 
     def timenow(self):
@@ -279,11 +279,11 @@ class Snapshot:
         self.log("Retrieving latest version of " + svnurl)
         self.makedirectory(outdir)
         self.dirstack.pushdir(outdir)
-        rc = self.run(self.svncommand + " co " + svnurl)
+        rc = self.run(self.svncommand + " export -q " + svnurl + ' ' + basedir)
         if rc:
             # Get revision
             rc2 = commands.getstatusoutput(self.svncommand + " info " +
-                                           basedir)
+                                           svnurl)
             if rc2[0] == 0:
                 try:
                     s = rc2[1]
@@ -304,7 +304,7 @@ class Snapshot:
             self.log("Generating diff of " + oldrevision + " & " +
                      self.revision)
             self.run(self.svncommand + " diff -r " + oldrevision + ":" +
-                     self.revision + " " + basedir +  " > " + self.diffname)
+                     self.revision + " " + svnurl +  " > " + self.diffname)
             self.hasdiff = True
 
     def genpackage(self, dirname, dict, src, dst):
@@ -369,8 +369,8 @@ class Snapshot:
     def dobulk(self):
         if self.checkout(self.builddir):
             self.gendiff()
-            if stripdotsvn:
-                self.cleardotsvn(self.builddir)
+            #if stripdotsvn:
+            #    self.cleardotsvn(self.builddir)
             self.genpackages()
             self.makelinks()
             self.purgeold()

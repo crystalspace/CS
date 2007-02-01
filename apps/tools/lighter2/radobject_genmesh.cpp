@@ -118,6 +118,7 @@ namespace lighter
 
     genFact->RemoveRenderBuffer ("texture coordinate lightmap");
     genFact->Compress ();
+    genFact->DisableAutoNormals();
 
     csVector3 *verts = genFact->GetVertices ();
     csVector2 *uv = genFact->GetTexels ();

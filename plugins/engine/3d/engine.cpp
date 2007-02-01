@@ -1403,7 +1403,7 @@ void csEngine::PrecacheDraw (iRegion* region)
   {
     iSector* s = sectors.Get (sn);
     if (!region || region->IsInRegion (s->QueryObject ()))
-      s->GetVisibilityCuller ()->PrecacheCulling ();
+      s->PrecacheDraw ();
   }
 
   size_t i;
