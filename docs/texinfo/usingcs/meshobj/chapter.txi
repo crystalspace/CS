@@ -67,7 +67,6 @@ Crystal Space supports.
 * MeshObject SprCal3D:: SpriteCal3D Mesh Object
 * MeshObject Emit:: Emitter Mesh Object
 * MeshObject PartSys:: Particle Systems in General
-* MeshObject Fountain:: Fountain Mesh Object
 * MeshObject Spiral:: Spiral Mesh Object
 * MeshObject Haze:: Haze Mesh Object
 * MeshObject Particles:: Particles Mesh Object
@@ -89,7 +88,6 @@ Crystal Space supports.
 @importss{usingcs,meshobj,sprcal3d.txi}
 @importss{usingcs,meshobj,emit.txi}
 @importss{usingcs,meshobj,partsys.txi}
-@importss{usingcs,meshobj,fountain.txi}
 @importss{usingcs,meshobj,spiral.txi}
 @importss{usingcs,meshobj,haze.txi}
 @importss{usingcs,meshobj,particles.txi}

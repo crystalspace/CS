@@ -38,7 +38,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Soft3D)
   template<typename Pix>
   class Specifica : public iPixTypeSpecifica
   {
-    typedef typename_qualifier Pix::PixType PixType;
+    typedef typename Pix::PixType PixType;
     Pix pix;
 
     template<typename SrcBlend, typename DstBlend, bool alphaTest,

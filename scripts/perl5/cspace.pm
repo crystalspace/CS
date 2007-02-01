@@ -2389,6 +2389,9 @@ sub new {
 *GetMatrix = *cspacec::csQuaternion_GetMatrix;
 *NLerp = *cspacec::csQuaternion_NLerp;
 *SLerp = *cspacec::csQuaternion_SLerp;
+*Log = *cspacec::csQuaternion_Log;
+*Exp = *cspacec::csQuaternion_Exp;
+*Squad = *cspacec::csQuaternion_Squad;
 *swig_v_get = *cspacec::csQuaternion_v_get;
 *swig_v_set = *cspacec::csQuaternion_v_set;
 *swig_w_get = *cspacec::csQuaternion_w_get;
@@ -8440,6 +8443,10 @@ package cspace::iTerrainObjectState;
 *GetCastShadows = *cspacec::iTerrainObjectState_GetCastShadows;
 *SetMaterialMapFile = *cspacec::iTerrainObjectState_SetMaterialMapFile;
 *GetMaterialMapFile = *cspacec::iTerrainObjectState_GetMaterialMapFile;
+*SetTopNeighbor = *cspacec::iTerrainObjectState_SetTopNeighbor;
+*SetRightNeighbor = *cspacec::iTerrainObjectState_SetRightNeighbor;
+*SetLeftNeighbor = *cspacec::iTerrainObjectState_SetLeftNeighbor;
+*SetBottomNeighbor = *cspacec::iTerrainObjectState_SetBottomNeighbor;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -11635,6 +11642,7 @@ package cspace::iConfigIterator;
 *GetFloat = *cspacec::iConfigIterator_GetFloat;
 *GetStr = *cspacec::iConfigIterator_GetStr;
 *GetBool = *cspacec::iConfigIterator_GetBool;
+*GetTuple = *cspacec::iConfigIterator_GetTuple;
 *GetComment = *cspacec::iConfigIterator_GetComment;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
@@ -15372,6 +15380,8 @@ package cspace::iSimpleFormerState;
 *SetOffset = *cspacec::iSimpleFormerState_SetOffset;
 *SetIntegerMap = *cspacec::iSimpleFormerState_SetIntegerMap;
 *SetFloatMap = *cspacec::iSimpleFormerState_SetFloatMap;
+*GetFloatMap = *cspacec::iSimpleFormerState_GetFloatMap;
+*SetMaterialScale = *cspacec::iSimpleFormerState_SetMaterialScale;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -15404,6 +15414,7 @@ package cspace::iTerraFormer;
 %OWNER = ();
 %ITERATORS = ();
 *GetSampler = *cspacec::iTerraFormer_GetSampler;
+*GetIntegerMapSize = *cspacec::iTerraFormer_GetIntegerMapSize;
 *SampleFloat = *cspacec::iTerraFormer_SampleFloat;
 *SampleVector2 = *cspacec::iTerraFormer_SampleVector2;
 *SampleVector3 = *cspacec::iTerraFormer_SampleVector3;

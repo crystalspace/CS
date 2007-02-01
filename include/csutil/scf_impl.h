@@ -246,7 +246,7 @@ private:
     {
       scfObject->IncRef();
       return static_cast<
-        typename_qualifier scfInterfaceTraits<I>::InterfaceType*> (scfObject);
+        typename scfInterfaceTraits<I>::InterfaceType*> (scfObject);
     }
     else
     {
@@ -260,7 +260,7 @@ private:
   {
     csRefTrackerAccess::AddAlias(
       static_cast<
-        typename_qualifier scfInterfaceTraits<I>::InterfaceType*> (scfObject),
+        typename scfInterfaceTraits<I>::InterfaceType*> (scfObject),
       scfObject);
   }
 
@@ -270,7 +270,7 @@ private:
   {
     csRefTrackerAccess::RemoveAlias(
       static_cast<
-        typename_qualifier scfInterfaceTraits<I>::InterfaceType*> (scfObject),
+        typename scfInterfaceTraits<I>::InterfaceType*> (scfObject),
       scfObject);
   }
  

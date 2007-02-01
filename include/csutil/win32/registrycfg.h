@@ -192,6 +192,7 @@ public:
   virtual float GetFloat () const;
   virtual const char *GetStr () const;
   virtual bool GetBool () const;
+  virtual csPtr<iStringArray> GetTuple() const;
   virtual const char *GetComment () const;
 };
 

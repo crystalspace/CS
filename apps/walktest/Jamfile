@@ -37,13 +37,14 @@ WALKALL.PLUGINLIST =
   engine
   engseq
   fontplex
-  fountain
-  fountldr
   frustvis
   genmesh
   gmeshanim
   gmeshldr
-  gmeshskelanim
+  gmeshskelanim2
+  skeleton
+  skelldr
+  vproc_std
   haze
   hazeldr
   imgplex

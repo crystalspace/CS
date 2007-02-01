@@ -174,6 +174,10 @@ void csGLShader_CG::GetProfileCompilerArgs (const char* type,
     profileMacroArg.Format ("-DFRAGMENT_PROGRAM_LEVEL=0x%x", profileLevel);
     args.Push (profileMacroArg);
   }
+  csString typeStr (type);
+  typeStr.Upcase();
+  typeStr = "-DPROGRAM_TYPE_" + typeStr;
+  args.Push (typeStr);
 }
 
 ////////////////////////////////////////////////////////////////////

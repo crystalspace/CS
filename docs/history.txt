@@ -6,9 +6,90 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+1-Sep-2006
+	- Marten implemented pthread thread and condition variables classes 
+	  with new interface. The new improved implementation of threading
+	  should now be fully functional.
+30-Sep-2006
+	- res fixed some MSVC warnings.
+	- res fixed some wrong GL extension function declarations and added
+	  the GL_EXT_packed_depth_stencil ext.
+	- res changed scfImplementationPooled to use C++ cast operators and
+	  the CS memory allocator.
+	- res changed makeGLMatrix to optionally convert to a row-major 
+	  matrix.
+	- res copied a more elaborate version of GetTuple() into 
+	  csWin32RegistryIterator.
+	- res changed the Cg plugin to define a preprocessor macro
+	  PROGRAM_TYPE_FRAGMENT or PROGRAM_TYPE_VERTEX, depending on the type.
+29-Sep-2006
+	- res removed the following compatiblity hacks for older compilers
+	  (which would likely not be able to cope with CS' use of advanced
+	  C++ features anyway): 'typename_qualifier', fake 'explicit' 
+	  keyword, CS_SPECIALIZE_TEMPLATE instead of template<>, 
+	  CSARRAY_INHIBIT_TYPED_KEYS. Adresses trac #16.
+	- Jorrit added a workaround for GetTuple() in windows so that
+	  it at least compiles. MacOS/X is still broken and the GetTuple()
+	  implementation in Windows just returns 0.
+	- Jorrit changed flarge to use the new kwartz model. The kwartz
+	  model is also updated to work nicely with software lighting.
+	- Jorrit added kwartz model to isotest app. Unfortunatelly it is not
+	  yet lit there though. Still have to check why.
+	- Jorrit added textures from new castle level to CS. Castle level
+	  will soon follow.
+	- Jorrit merged stdtex.zip into standard.zip.
+	- Jorrit added the indoor castle level from Anders Wisur to svn
+	  and made it default.
+	- Jorrit added license note to castle level and castle textures.
+	  Castle uses Creative Commons NC:
+	  http://creativecommons.org/licenses/by-nc/2.5
+	- Jorrit made castle default level in walktest now.
+	- Erroroman optimized character_bump2.cgvp by calculating bitangent
+	  as cross product of normal and tangent. Also removed bitangent
+	  from tehnique 150 in character_bump2.xml.
+	- Jorrit added a 'arb128_limit' tag to gldrivers.xml and enabled
+	  it for Intel Graphics. This tag means that the 3D card will
+	  not support ARB assembly programs of more then 128 instructions.
+	  The character2 shaders use this tag in the 150 technique (hardware
+	  animation). This means that on Intel Graphics software animation
+	  will be used.
+	- Jorrit got a patch from res2k which makes sure that CG techniques
+	  that generate programs that are too big for the card will really
+	  fail now. That means that the workaround in gldrivers.xml is
+	  no longer required.
+	- Erroroman added more API docs in skeleton.h
+	- Marten added first part of reimplemented threading subsystem.
+	- Marten fixed compilation on MSVC after res cleanup earlier.
+28-Sep-2006
+	- mdmkolbe changed walktest to exit with code 0 on normal exits.
+	- mdmkolbe blind commited a change by Timothy "kiolakin" Whitfield
+	  that will allow for skyboxes by letting each mesh specify its own
+	  zbuffer mode.
+	- mdmkolbe converted plugins/bugplug to the new SCF.
+	- caedes added std_character2 and std_character_fixed2 shaders so
+	  genmesh animation system can be used with standard lighting.
+	- res changed gl3d DeactivateBuffers() to also deactivate vertex 
+	  attributes.
+	- Erroroman added Log, Exp and Squad methods to csQuaternion.
+	- Erroroman made spline rotatin of skeleton animation and 
+	  improved a bit the skeleton the code. 
+	- Erroroman added basic API docs to the skeleton interface.
+	- res changed the Cg plugin to cache the profile of a program.
+	- res devised an alternative workaround for corruption occuring on
+	  ATI cards. Further investigation leads to that the corruption shows 
+	  up after ARB programs are disabled; apparently this does not work 
+	  correctly. A workaround is to change a fixed function state and call 
+	  glBegin()/glEnd() without specifying any vertices. Hopefully helps
+	  for trac #18.
 27-Sep-2006
 	- mdmkolbe enabled separate debug info by default on compatible
 	  versions of Cygwin's binutils.
+	- Jorrit removed the particles level after merging the particles
+	  there with partsys.
+	- Jorrit removed the fountain mesh object.
+	- Jorrit removed csNewParticleSystem since this class is no longer
+	  being used.
+	- Genjix corrected iutil/iConfigIterator not implementing GetTuple.
 26-Sep-2006
 	- Timothy Whitfield (kiokalin) fixed the paging former so that it
 	  actually works now. It is also seamless.
@@ -72,7 +153,7 @@ chronological order.
 	- res fixed the Cg shader plugin to also take compiler options from
 	  the configuration when fragment program routing is used.
 	- res added the definition of a preprocessor macro that contains the
-	  fragment program version when compiling fragment progtams to the Cg 
+	  fragment program version when compiling fragment progtams to the Cg
 	  shader plugin.
 19-Sep-2006
         - Genjix documented a little csIntersect3 behaviour.

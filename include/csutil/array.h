@@ -39,18 +39,6 @@
 /**\addtogroup util_containers
  * @{ */
 
-// Define CSARRAY_INHIBIT_TYPED_KEYS if the compiler is too old or too buggy to
-// properly support templated functions within a templated class.  When this is
-// defined, rather than using a properly typed "key" argument, search methods
-// fall back to dealing with opaque void* for the "key" argument.  Note,
-// however, that this fact is completely hidden from the client; the client
-// simply creates csArrayCmp<> functors using correct types for the keys
-// regardless of whether the compiler actually supports this feature.  (The
-// MSVC6 compiler, for example, does support templated functions within a
-// template class but crashes and burns horribly when a function pointer or
-// functor is thrown into the mix; thus this should be defined for MSVC6.)
-#if !defined(CSARRAY_INHIBIT_TYPED_KEYS)
-
 /**
  * A functor template which encapsulates a key and a comparison function for
  * use with key-related csArray<> searching methods, such as FindKey() and
@@ -106,45 +94,6 @@ private:
   K key;
   CF cmp;
 };
-
-#define csArrayTemplate(K) template <class K>
-#define csArrayCmpDecl(T1,T2) csArrayCmp<T1,T2>
-#define csArrayCmpInvoke(C,R) C(R)
-
-#else // CSARRAY_INHIBIT_TYPED_KEYS
-
-class csArrayCmpAbstract
-{
-public:
-  typedef int(*CF)(void const*, void const*);
-  virtual int operator()(void const*) const = 0;
-  virtual operator CF() const = 0;
-};
-
-template <class T, class K>
-class csArrayCmp : public csArrayCmpAbstract
-{
-public:
-  typedef int(*CFTyped)(T const&, K const&);
-  csArrayCmp(K const& k, CFTyped c = DefaultCompare) : key(k), cmp(CF(c)) {}
-  csArrayCmp(csArrayCmp const& o) : key(o.key), cmp(o.cmp) {}
-  csArrayCmp& operator=(csArrayCmp const& o)
-    { key = o.key; cmp = o.cmp; return *this; }
-  virtual int operator()(void const* p) const { return cmp(p, &key); }
-  virtual operator CF() const { return cmp; }
-  operator K const&() const { return key; }
-  static int DefaultCompare(T const& r, K const& k)
-    { return csComparator<T,K>::Compare(r,k); }
-private:
-  K key;
-  CF cmp;
-};
-
-#define csArrayTemplate(K)
-#define csArrayCmpDecl(T1,T2) csArrayCmpAbstract const&
-#define csArrayCmpInvoke(C,R) C(&(R))
-
-#endif // CSARRAY_INHIBIT_TYPED_KEYS
 
 /**
  * The default element handler for csArray.
@@ -725,11 +674,11 @@ public:
    * type.
    * \return csArrayItemNotFound if not found, else item index.
    */
-  csArrayTemplate(K)
-  size_t FindKey (csArrayCmpDecl(T,K) comparekey) const
+  template <class K>
+  size_t FindKey (csArrayCmp<T,K> comparekey) const
   {
     for (size_t i = 0 ; i < Length () ; i++)
-      if (csArrayCmpInvoke(comparekey, root.p[i]) == 0)
+      if (comparekey (root.p[i]) == 0)
         return i;
     return csArrayItemNotFound;
   }
@@ -827,15 +776,15 @@ public:
    * \return csArrayItemNotFound if not found, else the item index.
    * \remarks The array must be sorted.
    */
-  csArrayTemplate(K)
-  size_t FindSortedKey (csArrayCmpDecl(T,K) comparekey,
+  template <class K>
+  size_t FindSortedKey (csArrayCmp<T,K> comparekey,
                         size_t* candidate = 0) const
   {
     size_t m = 0, l = 0, r = Length ();
     while (l < r)
     {
       m = (l + r) / 2;
-      int cmp = csArrayCmpInvoke(comparekey, root.p[m]);
+      int cmp = comparekey (root.p[m]);
       if (cmp == 0)
       {
         if (candidate) *candidate = csArrayItemNotFound;

@@ -306,7 +306,7 @@ inline void csList<T>::DeleteAll ()
 
 /// Add one item last in the list
 template <class T>
-inline typename_qualifier csList<T>::Iterator csList<T>::PushBack (const T& e)
+inline typename csList<T>::Iterator csList<T>::PushBack (const T& e)
 {
   csListElement* el = new csListElement (e, 0, tail);
   if (tail)
@@ -319,7 +319,7 @@ inline typename_qualifier csList<T>::Iterator csList<T>::PushBack (const T& e)
 
 /// Add one item first in the list
 template <class T>
-inline typename_qualifier csList<T>::Iterator csList<T>::PushFront (const T& e)
+inline typename csList<T>::Iterator csList<T>::PushFront (const T& e)
 {
   csListElement* el = new csListElement (e, head, 0);
   if (head)

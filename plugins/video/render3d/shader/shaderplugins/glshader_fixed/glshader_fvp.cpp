@@ -55,6 +55,14 @@ csGLShaderFVP::~csGLShaderFVP ()
 
 void csGLShaderFVP::Activate ()
 {
+  if (!do_lighting && shaderPlug->fixedFunctionForcefulEnable)
+  {
+    const GLenum state = GL_LIGHTING;
+    GLboolean s = glIsEnabled (state);
+    if (s) glDisable (state); else glEnable (state);
+    glBegin (GL_TRIANGLES);  glEnd ();
+    if (s) glEnable (state); else glDisable (state);
+  }
 }
 
 void csGLShaderFVP::Deactivate()

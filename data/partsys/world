@@ -64,6 +64,9 @@
         </palette>
       </params>
     </texture>
+    <texture name="dot">
+      <file>dot.png</file>
+    </texture>
   </textures>
   <materials>
     <material name="wood">
@@ -111,11 +114,12 @@
     <material name="flamelet">
       <texture>flamelet</texture>
     </material>
+    <material name="particle">
+      <texture>dot</texture>
+    </material>
   </materials>
   <plugins>
     <plugin name="thing">crystalspace.mesh.loader.thing</plugin>
-    <plugin name="fountainFact">crystalspace.mesh.loader.factory.fountain</plugin>
-    <plugin name="fountain">crystalspace.mesh.loader.fountain</plugin>
     <plugin name="emitFact">crystalspace.mesh.loader.factory.emit</plugin>
     <plugin name="emit">crystalspace.mesh.loader.emit</plugin>
     <plugin name="hazeFact">crystalspace.mesh.loader.factory.haze</plugin>
@@ -161,6 +165,36 @@
       </effector>
     </params>
   </meshfact>
+  <meshfact name="fireFACT">
+    <plugin>crystalspace.mesh.loader.factory.particles</plugin>
+    <params>
+      <particlesize x="0.3" y="0.3" />
+      <sortmode>none</sortmode>
+      <emitter type="sphere">
+        <emissionrate>300</emissionrate>
+        <mass min="1" max="1" />
+        <radius>0.3</radius>
+        <uniformvelocity />
+        <initialvelocity x="0" y="4" z="0" />
+        <initialttl min="1" max="1.5" />
+      </emitter>
+      <effector type="force">
+        <acceleration x="0" y="-1" z="0" />
+      </effector>
+      <effector type="lincolor">
+        <color red="1.00" green="0.35" blue="0.00" alpha="0" time="1.5" />
+        <color red="1.00" green="0.22" blue="0.00" alpha=".1" time="1.3125" />
+        <color red="1.00" green="0.12" blue="0.00" alpha=".3" time="1.125" />
+        <color red="0.80" green="0.02" blue="0.00" alpha=".8" time="0.9375" />
+        <color red="0.60" green="0.00" blue="0.00" alpha=".9" time="0.75" />
+        <color red="0.40" green="0.00" blue="0.00" alpha=".97" time="0.5625" />
+        <color red="0.20" green="0.00" blue="0.00" alpha="1" time="0.375" />
+        <color red="0.00" green="0.00" blue="0.00" alpha="1" time="0.1875" />
+        <color red="0.00" green="0.00" blue="0.00" alpha="1" time="0" />
+      </effector>
+    </params>
+  </meshfact> 
+
   <meshfact name="flameFact">
     <plugin>crystalspace.mesh.loader.factory.particles</plugin>
     <params>
@@ -254,10 +288,6 @@
     <plugin>emitFact</plugin>
     <params />
   </meshfact>
-  <meshfact name="fountainFact">
-    <plugin>fountainFact</plugin>
-    <params />
-  </meshfact>
   <meshfact name="spiralFact">
     <plugin>spiralFact</plugin>
     <params />
@@ -266,52 +296,17 @@
     <plugin>hazeFact</plugin>
     <params />
   </meshfact>
-  <!--
-	<meshfact name="fountainFACT">
-	  <plugin>crystalspace.mesh.loader.factory.particles</plugin>
-	    <params>
-		  <emitter type="sphere">
-			<time>3000000</time>
-			<innerradius>0.01</innerradius>
-			<outerradius>0.03</outerradius>
-		    <force type="linear">
-			  <direction x="0" y="2" z="1"/>
-			  <directionvariation x="0" y="1" z="1"/>
-  			  <amount>10</amount>
-			  <range>3.0</range>
-			  <falloff>linear</falloff>
-		    </force>
-		  </emitter>
-		  <dampener>0.1</dampener>
-		  <mass>5</mass>
-		  <massvariation>2.5</massvariation>
-		  <pps>30</pps>
-		  <initial>0</initial>
-		  <gravity x="0" y="-1" z="0"/>
-		  <diffusion>0.1</diffusion>
-		  <radius>0.075</radius>
-		  <ttl>10</ttl>
-		  <timevariation>0.5</timevariation>
-		  <colormethod type="linear">
-  		    <gradient>
-			  <color red="0" green="0" blue="1"/>
-			  <color red="0" green="0.5" blue="1"/>
-			  <color red="1" green="1" blue="1"/>
-		    </gradient>
-	      </colormethod>
-	  </params>
-	  </meshfact> -->
   <meshfact name="fountainFACT">
     <plugin>crystalspace.mesh.loader.factory.particles</plugin>
     <params>
-      <particlesize x="0.075" y="0.075" />
+      <particlesize x="0.1" y="0.1" />
       <emitter type="cone">
         <extent x="0" y="2" z="1" />
         <coneangle>0.2</coneangle>
         <placement>center</placement>
-        <mass min="5" max="7.5" />
+        <mass min="7.5" max="10" />
         <initialttl min="10" max="10.5" />
-        <emissionrate>30</emissionrate>
+        <emissionrate>70</emissionrate>
         <!-- <uniformvelocity /> -->
         <initialvelocity x="1.8" y="0" z="0" />
       </emitter>
@@ -571,36 +566,11 @@
         <v x="-10" y="0" z="10" />
       </move>
     </meshobj>
-    <meshobj name="fount1">
-      <priority>alpha</priority>
-      <plugin>fountain</plugin>
-      <params>
-        <factory>fountainFact</factory>
-        <number>300</number>
-        <material>spark</material>
-        <origin x="0" y="0" z="0" />
-        <dropsize w="0.15" h="0.15" />
-        <color red="0.7" green="0.9" blue="1" />
-        <accel x="0" y="-0.3" z="0" />
-        <falltime>9</falltime>
-        <speed>1.8</speed>
-        <elevation>1</elevation>
-        <azimuth>1.75</azimuth>
-        <opening>0.2</opening>
-        <mixmode>
-          <add />
-        </mixmode>
-      </params>
-      <ztest />
-      <move>
-        <v x="15" y="0" z="-15" />
-      </move>
-    </meshobj>
     <meshobj name="fount2">
       <plugin>crystalspace.mesh.loader.particles</plugin>
       <params>
         <factory>fountainFACT</factory>
-        <material>spark</material>
+        <material>dot</material>
         <mixmode>
           <add />
         </mixmode>
@@ -1285,7 +1255,7 @@
       <radius>40</radius>
       <color red="1" green="0" blue="1" />
     </light>
-    <meshobj name="fire">
+    <meshobj name="fire1">
       <priority>alpha</priority>
       <plugin>crystalspace.mesh.loader.particles</plugin>
       <ztest />
@@ -1300,6 +1270,22 @@
         <v x="-10" y="0" z="70" />
       </move>
     </meshobj>
+    <meshobj name="fire2">
+      <plugin>crystalspace.mesh.loader.particles</plugin>
+      <params>
+        <factory>fireFACT</factory>
+        <material>particle</material>
+        <mixmode>
+          <add/>
+        </mixmode>
+      </params>
+      <move>
+        <v x="-11" y="0" z="71" />
+      </move>
+      <priority>alpha</priority>
+      <ztest/>
+    </meshobj>
+
     <meshobj name="spiral">
       <priority>alpha</priority>
       <plugin>spiral</plugin>

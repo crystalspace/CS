@@ -33,9 +33,9 @@
 
 CS_IMPLEMENT_PLUGIN
 
-CS_SPECIALIZE_TEMPLATE
+template<>
 class csHashComputer<iParticleEmitter*> : public csHashComputerIntegral<iParticleEmitter*> {};
-CS_SPECIALIZE_TEMPLATE
+template<>
 class csHashComputer<iParticleEffector*> : public csHashComputerIntegral<iParticleEffector*> {};
 
 CS_PLUGIN_NAMESPACE_BEGIN(ParticlesLoader)

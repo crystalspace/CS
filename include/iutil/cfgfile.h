@@ -182,6 +182,8 @@ struct iConfigIterator : public virtual iBase
   virtual const char *GetStr () const = 0;
   /// Get a boolean value from the configuration.
   virtual bool GetBool () const = 0;
+  /// Get a tuple set from the configuration.
+  virtual csPtr<iStringArray> GetTuple() const = 0;
   /// Get the comment of the given key, or 0 if no comment exists.
   virtual const char *GetComment () const = 0;
 };
