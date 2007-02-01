@@ -52,9 +52,9 @@ Shader variables are ``parameters'' for shaders and are commonly used for
 things that should be customizeable, e.g. the diffuse texture of a surface
 or its shininess. A shader variable defined in the shader itself acts like a 
 default value which can be overridden by other shader variable sources like
-materials. Shader variables are more described in a more detailed fashion in
-the section <fill me in>, a number of commonly used shader variables are
-listed in <fill me in>.
+materials. Shader variables are more described in a more detailed fashion
+further down. A number of commonly used shader variables are listed in
+@ref{Shader Variables}.
 
 @subsubheading Techniques
 
@@ -134,7 +134,7 @@ via @sc{xml} statements.  The actual format of the mapping destinations
 depends on the shader programs used - e.g. for Cg programs, variable names
 used in the actual programs can be utilized as targets.  Other program types
 may have more abstract mappings (e.g. registers for @sc{arb} programs).
-# There should really be a reference or so for that, and a link to it here.
+@c There should really be a reference or so for that, and a link to it here.
 
 
 @subheading Shader Variables
@@ -237,6 +237,9 @@ parameters can be inserted.
 Last but not least other files can be included.  This can be used to move
 recurring blocks of XML into separate file, or have the included file
 generate a number of utility templates.
+
+For a detailed reference of both shader conditions and processing instructions
+@pxref{Shader Conditions and Processing Instructions Reference}. 
 
 @subsubheading Caveats
 

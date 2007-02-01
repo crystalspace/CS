@@ -1,0 +1,63 @@
+SubDir TOP plugins cscript pycscegui ;
+
+if $(PYTHON.AVAILABLE) = "yes" && $(CEGUI.AVAILABLE) = "yes" && $(PYCEGUI.SWIGOK) = "yes"
+{
+  #--------
+  # Swig-generated files for cscegui.
+  #--------
+  local common = cs_cegui.cpp ;
+  local csceguipy = [ DoSourceGrist pycscegui.py ] ;
+  MakeLocate $(csceguipy) : $(LOCATE.TARGETS) ;
+
+  if ! [ Property build : projgen ]
+  {
+    common = [ DoSourceGrist $(common) ] ;
+
+    if $(CMD.SWIG) && $(PYCEGUI.SWIGFLAGS)
+    {
+      Swig $(common) $(csceguipy) :
+        [ DoSourceGrist pycscegui.i ] :
+        python :
+	-c++ -shadow $(CEGUI.CFLAGS) $(PYCEGUI.SWIGFLAGS) :
+	[ ConcatDirs $(TOP) include ]
+	[ ConcatDirs $(BUILDTOP) include ] :
+	[ ConcatDirs $(TOP) include bindings ]
+	[ ConcatDirs $(TOP) include bindings python ] :
+	$(SEARCH_SOURCE) [ ConcatDirs $(TOP) scripts python ] :
+	pycscegui :
+	[ on $(csceguipy) GetVar LOCATE ] ;
+      Depends csceguipyclean : pythonswigclean ;
+    }
+    else
+    {
+      SEARCH on $(common) = $(SEARCH_SOURCE) ;
+      local frozenpy = $(csceguipy:G=frozencsceguipy) ;
+      SEARCH on $(frozenpy) = [ ConcatDirs $(TOP) scripts python ] ;
+      Copy $(csceguipy) : $(frozenpy) ;
+      Depends $(csceguipy) : $(frozenpy) ;
+    }
+  }
+  Clean csceguipyclean : $(csceguipy) ;
+  Depends clean : csceguipyclean ;
+
+  rule InstallCSCeguiPY
+  {
+    # Temporary SUBDIR override for InstallData.
+    local SUBDIR = [ on $(<) GetVar LOCATE ] ;
+    InstallData $(<) : $(>) ;
+  }
+  InstallCSCeguiPY $(csceguipy) : bindings python ;
+
+
+  #--------
+  # cegui -- Pure Python module
+  #--------
+  
+  PythMod pyceguimod : _pycscegui : 
+	ceguimod.cpp cs_cegui.cpp : 
+	: 
+	CEGUI : 
+	"cegui cs Python module" ;
+  Depends pyceguimod : $(csceguipy) ;
+  CFlags pyceguimod : $(COMPILER.C++FLAGS.EXCEPTIONS.ENABLE) ;
+}

@@ -8,9 +8,11 @@ chronological order.
 
 This file describes the history of the SoC imposter branch.
 
+1-Feb-2007
+	- Jorrit merged 25383:25400 from trunk
 18-Sep-2006
 	- Fossi merged 25271:25382 from trunk
-05-Sep-2006
+5-Sep-2006
 	- Fossi finished merging and fixed imposters to work
 	- Fossi updated configure and msvc project files
 	- Fossi fixed opentree plugin after the merge
@@ -38,7 +40,7 @@ This file describes the history of the SoC imposter branch.
 12-Aug-2006
 	- Fossi fixed imposter mesh rendering to work
 	- Fossi improved imposter texture to show something at least
-06-Aug-2006
+6-Aug-2006
 	- Fossi made some minor changes
 28-Jul-2006
 	- Jorrit fixed a small bug in csMeshWrapper::GetRenderMeshes().
