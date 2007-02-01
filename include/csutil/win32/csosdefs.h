@@ -343,32 +343,6 @@ struct DIR;
 # endif // CS_BUILD_SHARED_LIBS
 #endif
 
-#if defined (CS_COMPILER_BCC) || defined (__CYGWIN32__)
-#  define GETPID() getpid()
-#else
-#  define GETPID() _getpid()
-#endif
-
-#ifdef __CYGWIN32__
-#  include <unistd.h>
-#  define CS_TEMP_FILE "cs%lu.tmp", (unsigned long)getpid()
-#  define CS_TEMP_DIR  "/tmp"
-#else
-#  include <process.h>
-#  define CS_TEMP_FILE "%x.cs", (int)GETPID()
-#  define CS_TEMP_DIR win32_tempdir()
-   // This is the function called by CS_TEMP_DIR macro
-   static inline char *win32_tempdir()
-   {
-     char *tmp;
-     if ((tmp = getenv ("TMP")) != 0)
-       return tmp;
-     if ((tmp = getenv ("TEMP")) != 0)
-       return tmp;
-     return "";
-   }
-#endif
-
 #ifdef CS_COMPILER_BCC
 // Major hack due to pow failures in CS for Borland, removing this
 // causes millions of strings to print out -- Brandon Ehle

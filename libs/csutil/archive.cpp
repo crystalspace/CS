@@ -27,6 +27,7 @@
 #include "csutil/snprintf.h"
 #include "csutil/sysfunc.h"
 #include "csutil/util.h"
+#include "csutil/csstring.h"
 #include "iutil/vfs.h"	// For csFileTime
 
 // Default compression method to use when adding entries (there is no choice for now)
@@ -529,7 +530,8 @@ bool csArchive::Flush ()
 // Write pending operations into ZIP archive
 bool csArchive::WriteZipArchive ()
 {
-  char temp_file[CS_MAXPATHLEN];
+  //char temp_file[CS_MAXPATHLEN];
+  csString temp_file ((size_t)CS_MAXPATHLEN);
   FILE *temp;
   char buff [16 * 1024];
   bool success = false;
@@ -540,13 +542,11 @@ bool csArchive::WriteZipArchive ()
 
   // Step one: Copy archive file into a temporary file,
   // skipping entries marked as 'deleted'
-  strcpy (temp_file, CS_TEMP_DIR);
-  size_t tmplen = strlen (temp_file);
+  temp_file = CS::Platform::GetTempDirectory ();
+  temp_file << CS_PATH_SEPARATOR;
+  temp_file += CS::Platform::GetTempFilename (temp_file.GetData ());
 
-  APPEND_SLASH (temp_file, tmplen);
-    
-  cs_snprintf (&temp_file[tmplen], CS_MAXPATHLEN - tmplen, CS_TEMP_FILE);
-  if ((temp = fopen (temp_file, "w+b")) == 0)
+  if ((temp = fopen (temp_file.GetDataSafe (), "w+b")) == 0)
     return false;               /* Cannot create temporary file */
   fseek (file, 0, SEEK_SET);
 

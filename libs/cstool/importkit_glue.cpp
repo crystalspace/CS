@@ -66,7 +66,7 @@ namespace CS
     const char* Glue::GetTempName()
     {
       static int n = 0;
-      GetTempScratch()->Format (CS_TEMP_FILE);
+      (*GetTempScratch()) = CS::Platform::GetTempFilename ();
       GetTempScratch()->AppendFmt ("_%d", n++);
       return GetTempScratch()->GetData();
     }
