@@ -15203,6 +15203,7 @@ sub DESTROY {
 *GetHeight = *cspacec::csImageMemory_GetHeight;
 *GetDepth = *cspacec::csImageMemory_GetDepth;
 *GetRawFormat = *cspacec::csImageMemory_GetRawFormat;
+*GetRawData = *cspacec::csImageMemory_GetRawData;
 *GetFormat = *cspacec::csImageMemory_GetFormat;
 *GetPalette = *cspacec::csImageMemory_GetPalette;
 *GetAlpha = *cspacec::csImageMemory_GetAlpha;

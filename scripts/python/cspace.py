@@ -10181,6 +10181,7 @@ class csImageMemory(csImageMemoryBase):
     def GetHeight(*args): return _cspace.csImageMemory_GetHeight(*args)
     def GetDepth(*args): return _cspace.csImageMemory_GetDepth(*args)
     def GetRawFormat(*args): return _cspace.csImageMemory_GetRawFormat(*args)
+    def GetRawData(*args): return _cspace.csImageMemory_GetRawData(*args)
     def GetFormat(*args): return _cspace.csImageMemory_GetFormat(*args)
     def GetPalette(*args): return _cspace.csImageMemory_GetPalette(*args)
     def GetAlpha(*args): return _cspace.csImageMemory_GetAlpha(*args)
