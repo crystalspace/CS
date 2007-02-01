@@ -229,6 +229,15 @@
 	</OpenGL>
       </Video>
     </config>
+    <config name="disableLodBias">
+      <Video>
+       <OpenGL>
+         <UseExtension>
+           <GL_EXT_texture_lod_bias>no</GL_EXT_texture_lod_bias>
+         </UseExtension>
+       </OpenGL>
+      </Video>
+    </config>
   </configs>
   <rules>
     <!-- rule description="Some more examples">
@@ -515,6 +524,20 @@
     </rule>
     
     <!--
+      * 2006-09-25: Older DRI i810 versions crash when using LOD bias
+                    Renderer string: "Mesa DRI I810 20020221", 
+		    version string: "1.2 Mesa 4.0.4" is known to be affected
+      -->
+    <rule description="disable lod bias for i810 driver">
+      <conditions>
+       <regexp string="renderer" pattern="Mesa DRI I810 20020221" />
+      </conditions>
+      <applicable>
+       <usecfg>disableLodBias</usecfg>
+      </applicable>
+    </rule>
+
+    <!--
     <rule description="GeForce MX/Go class HW">
       <conditions fulfill="one">
 	<regexp	string="renderer" pattern="GeForce.*MX" />
@@ -525,5 +548,6 @@
       </applicable>
     </rule>
     -->
+
   </rules>
 </gldriverdb>

@@ -6,6 +6,62 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+27-Sep-2006
+	- mdmkolbe enabled separate debug info by default on compatible
+	  versions of Cygwin's binutils.
+26-Sep-2006
+	- Timothy Whitfield (kiokalin) fixed the paging former so that it
+	  actually works now. It is also seamless.
+	- Jorrit removed the fire particle system.
+	- res disabled strict aliasing for wxgl and wxtest (some WX headers
+	  cause aliasing warnings in optimize mode with gcc 4.1.1).
+	- res committed a patch from <oh.hello.joe@gmail.com> to add a
+	  driver DB entry to work around a crash on some old version of the
+	  i810 DRI driver.
+25-Sep-2006
+	- Jorrit added the new kwartz.zip to vfs.
+24-Sep-2006
+        - Piotr did some tweaks to phystut app, now walls colliders should
+          work better with ode engine.
+	- Jorrit changed the flame command in walktest to use new particles.
+	- Jorrit replaced the two fire particle systems in partsys
+	  with new particles.
+23-Sep-2006
+	- Marten disabled global overridden malloc and free.
+22-Sep-2006
+	- Jorrit changed the built-in force effector for new particles so
+	  that the random acceleration is now a vector. That means you can
+	  get different magnitude for the random acceleration in x, y, and
+	  z direction. This affects the method
+	  iParticleBuiltinEffectorForce->SetRandomAcceleration().
+	  The loader is also changed. The old syntax of using a single value
+	  is still supported (and will automatically be interpreted as using
+	  a vector with three identical values). If you specify x, y, and z
+	  attributes in the <randomacceleration> tag then it will be
+	  interpreted as a vector.
+	- Jorrit fixed rain so that the particles start at the top and also
+	  made sure that the time to live is exactly long enough for the
+	  height of the current sector.
+	- Jorrit changed the snow in partsys to use new particles.
+	- Jorrit changed the snow in walktest (snow console command) to use
+	  new particles.
+	- Jorrit added documentation about converting snow to new particles.
+	- Jorrit removed the old snow mesh object.
+21-Sep-2006
+	- Jorrit added a new section to the API mod doc which explains how
+	  to convert old particle systems to the new particle system.
+	  Only the explosion particle system is documented for now.
+	- Jorrit removed the explosion particle system from CS.
+	- Marten fixed the box emitter in the new particle system so that it
+	  isn't double as big as it should be.
+	- Jorrit converted the rain particle system in partsys and the
+	  code in walktest to create rain to use the new particle system.
+	- Jorrit removed the rain particle system and documented how to convert
+	  from rain to new particles.
+	- caedes augmented CS_CHECK_PROG_VERSION so that it exports a variable
+	  with found version for the checked program.
+	- caedes made some more changes to pycegui configure test to make it
+	  more robust.
 20-Sep-2006
 	- Marten disabled the global overrides of operator new and operator
 	  delete due to the interoperability problems it causes.

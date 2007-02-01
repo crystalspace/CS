@@ -628,18 +628,13 @@ iJoint* Simple::CreateJointed (void)
   return joint;
 }
 
-iRigidBody* Simple::CreateWalls (const csVector3& /*radius*/)
+void Simple::CreateWalls (const csVector3& /*radius*/)
 {
-  // Create a body for the room.
-  csRef<iRigidBody> rb = dynSys->CreateBody ();
-  rb->SetMoveCallback(0);
-  rb->SetPosition (csVector3 (0));
-  rb->MakeStatic ();
+  csOrthoTransform t;
 
   csRef<iThingFactoryState> walls_state = 
     scfQueryInterface<iThingFactoryState> (walls->GetMeshObject ()->GetFactory());
 
-  csOrthoTransform t;
 #if 0
   // Enabling this will work, however, mesh<->mesh collision
   // requires a lot of hand tuning. When this is enabled,
@@ -661,8 +656,43 @@ iRigidBody* Simple::CreateWalls (const csVector3& /*radius*/)
   }
 #endif
 #if 1
+
   csVector3 size (10.0f, 10.0f, 10.0f); // This should be the same size as the mesh.
   t.SetOrigin(csVector3(10.0f,0.0f,0.0f));
+
+  //FIXME: this should work same in both engines (needs finishing bullet plugin)
+  if (phys_engine_id == ODE_ID)
+  {
+    csRef<iDynamicsSystemCollider> collider = dynSys->CreateCollider ();
+    collider->CreateBoxGeometry (size);
+    collider->SetTransform (t);
+
+    t.SetOrigin(csVector3(-10.0f,0.0f,0.0f));
+    collider = dynSys->CreateCollider ();
+    collider->CreateBoxGeometry (size);
+    collider->SetTransform (t);
+
+    t.SetOrigin(csVector3(0.0f,10.0f,0.0f));
+    collider = dynSys->CreateCollider ();
+    collider->CreateBoxGeometry (size);
+    collider->SetTransform (t);
+
+    t.SetOrigin(csVector3(0.0f,-10.0f,0.0f));
+    collider = dynSys->CreateCollider ();
+    collider->CreateBoxGeometry (size);
+    collider->SetTransform (t);
+
+    t.SetOrigin(csVector3(0.0f,0.0f,10.0f));
+    collider = dynSys->CreateCollider ();
+    collider->CreateBoxGeometry (size);
+    collider->SetTransform (t);
+
+    t.SetOrigin(csVector3(0.0f,0.0f,-10.0f));
+    collider = dynSys->CreateCollider ();
+    collider->CreateBoxGeometry (size);
+    collider->SetTransform (t);
+  }
+
   dynSys->AttachColliderBox (size, t, 10, 0);
   t.SetOrigin(csVector3(-10.0f,0.0f,0.0f));
   dynSys->AttachColliderBox (size, t, 10, 0);
@@ -676,7 +706,7 @@ iRigidBody* Simple::CreateWalls (const csVector3& /*radius*/)
   dynSys->AttachColliderBox (size, t, 10, 0);
 
 #endif
-  return rb;
+
 }
 
 void Simple::Start ()

@@ -479,7 +479,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ParticlesLoader)
 
     csRef<iParticleEffector> effector;
     csVector3 force (0.0f), acceleration (0.0f);
-    float randomAcc (0.0f);
+    csVector3 randomAcc (0.0f, 0.0f, 0.0f);
     csArray<float> timeList;
     csArray<csColor> colorList;
 
@@ -514,7 +514,22 @@ CS_PLUGIN_NAMESPACE_BEGIN(ParticlesLoader)
         }
         break;
       case XMLTOKEN_RANDOMACCELERATION:
-        randomAcc = child->GetContentsValueAsFloat ();
+	{
+	  csRef<iDocumentAttribute> attr = child->GetAttribute ("x");
+	  if (attr)
+	  {
+            if (!synldr->ParseVector (child, randomAcc))
+            {
+              synldr->ReportError ("crystalspace.particleloader.parseeffector", child,
+                "Error parsing randomacceleration!");
+            }
+	  }
+	  else
+	  {
+            float r = child->GetContentsValueAsFloat ();
+	    randomAcc.Set (r, r, r);
+	  }
+	}
         break;
       case XMLTOKEN_COLOR:
         {
