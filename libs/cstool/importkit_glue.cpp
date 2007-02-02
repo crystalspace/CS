@@ -46,7 +46,10 @@
 #include "importkit_glue.h"
 
 #include <ctype.h>
+#if defined(CS_PLATFORM_WIN32) && !defined(__CYGWIN__)
 #include <process.h>
+#define getpid _getpid
+#endif
 
 namespace CS
 {
@@ -67,7 +70,7 @@ namespace CS
     const char* Glue::GetTempName()
     {
       static int n = 0;
-      GetTempScratch()->Format ("%x_%d", _getpid (), n++);
+      GetTempScratch()->Format ("%x_%d", getpid (), n++);
       return GetTempScratch()->GetData();
     }
 
