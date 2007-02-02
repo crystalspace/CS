@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+2-Feb-2007
+	- res worked around Cg not being properly detected on Linux when
+	  -Wl,--as-needed was passed in LDFLAGS.
 1-Feb-2007
 	- Marten fixed compilation of CS::DataBuffer on gcc.
 	- Marten made sure genmesh doesn't return any rendermeshes when
