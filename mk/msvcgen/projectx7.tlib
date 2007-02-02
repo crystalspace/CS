@@ -119,3 +119,16 @@
 [% MACRO librarian_library_release GET library_outfile('') %]
 [% MACRO librarian_library_debug   GET library_outfile('_d') %]
 [% MACRO librarian_group	   GET library_outfile('') %]
+
+[% MACRO postbuild_common BLOCK -%]
+				CommandLine="mkdir &quot;[% path([workroot, 'bin']) %]&quot;&#x0D;&#x0A;copy &quot;[% path([my.doc.buildroot.0, my.doc.target.0]) %]&quot; &quot;[% path([workroot, 'bin', my.doc.target.0]) %]&quot;"
+[% END %]
+[% MACRO postbuild_plugin BLOCK -%]
+[% postbuild_common -%]
+[% END %]
+[% MACRO postbuild_appgui BLOCK -%]
+[% postbuild_common -%]
+[% END %]
+[% MACRO postbuild_appcon BLOCK -%]
+[% postbuild_common -%]
+[% END %]
