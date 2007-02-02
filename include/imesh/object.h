@@ -108,7 +108,7 @@ struct iMeshObjectDrawCallback : public iBase
  */
 struct iMeshObject : public virtual iBase
 {
-  SCF_INTERFACE(iMeshObject, 2,0,0);
+  SCF_INTERFACE(iMeshObject, 2,1,0);
   /**
    * Get the reference to the factory that created this mesh object.
    */
