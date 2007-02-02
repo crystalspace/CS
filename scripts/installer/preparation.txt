@@ -1,0 +1,6 @@
+General:
+--------
+ * Extract the 1.0 API docs into the source tree.
+ * The installed maps should be lit with cslight: parallaxtest, partsys, 
+   r3dtest, stenciltest, terrain, terrainf, castle, flarge.
+  
