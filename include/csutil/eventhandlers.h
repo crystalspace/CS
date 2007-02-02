@@ -20,7 +20,7 @@
 #ifndef __CS_UTIL_EVENTHNAMES_H__
 #define __CS_UTIL_EVENTHNAMES_H__
 
-#include "cssysdef.h" /* CS_DEBUG changes our definitions... */
+#include "cssysdef.h"
 #include "csextern.h"
 #include "iutil/eventnames.h"
 #include "iutil/eventhandlers.h"
@@ -205,8 +205,6 @@ public:
 };
 
 /* @} */
-
-
 
 
 
@@ -481,9 +479,8 @@ CS_CONST_METHOD virtual const csHandlerID * GenericSucc			\
 
 /**
  * Use this macro to declare your event handler as wanting to
- * handle the csevFrame event in the "Debug" phase (i.e.,
- * after any handlers in the "Console" phase and before any
- * handlers in the "Frame" phase).
+ * handle the csevFrame event in the "Frame" phase (i.e.,
+ * after any handlers in the "Debug" phase.
  */
 #define CS_EVENTHANDLER_PHASE_FRAME(x)					\
 CS_EVENTHANDLER_NAMES(x)						\
@@ -507,6 +504,5 @@ CS_CONST_METHOD virtual const csHandlerID * GenericSucc			\
  csEventID) const {							\
   return 0;								\
 }
-
 
 #endif // __CS_UTIL_EVENTHNAMES_H__

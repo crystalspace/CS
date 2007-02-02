@@ -14,7 +14,7 @@ namespace.
 
 @subsubheading Atomic operations
 Atomic operations are the basic and smallest operations behind threading safe
-code. Atomic in this context means that they are guranteed to complete with a
+code. Atomic in this context means that they are guaranteed to complete with a
 deterministic result in relation to other threads and even cores doing other
 atomic operations on the same data.
 
@@ -26,7 +26,7 @@ operations, namely:
 @item Operation @tab Function @tab Description
 @item Set
 @tab @code{AtomicOperations::Set}
-@tab Atomically set the content of a poiner or 32 bit integer variable and 
+@tab Atomically set the content of a pointer or 32 bit integer variable and 
 return the value it had before setting it.
 
 @item Read
@@ -55,7 +55,7 @@ to decrementation.
 
 @subsubheading Threads
 A thread is the smallest unit of execution when looking at multithreaded
-execution. Each thread is a "lane" of sequencial execution and by having multiple
+execution. Each thread is a "lane" of sequential execution and by having multiple
 threads executing at the same time you get the effect of simultaneous 
 execution.
 

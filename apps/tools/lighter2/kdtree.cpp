@@ -21,6 +21,7 @@
 #include "kdtree.h"
 #include "primitive.h"
 #include "statistics.h"
+#include "object.h"
 
 #include "csutil/alignedalloc.h"
 
@@ -243,7 +244,7 @@ namespace lighter
       }
     }
 
-    if (bestSide == -1 || numPrim <= PRIMS_PER_LEAF || treeDepth == MAX_DEPTH)
+    if (bestSide == (uint)~0 || numPrim <= PRIMS_PER_LEAF || treeDepth == MAX_DEPTH)
     {
       //No best side, make a leaf
       EndPoint* ep = epList->head[0];

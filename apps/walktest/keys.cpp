@@ -587,6 +587,13 @@ void WalkTest::MouseClick2Handler(iEvent &Event)
 	ps ? ps->GetPolygonName (sel) : "<null>");
     //Dumper::dump (sel);
   }
+  else
+  {
+    csRef<iObject> psobj = 
+    	scfQueryInterface<iObject> (mesh->GetMeshObject ()->GetMeshWrapper ());
+    Sys->Report (CS_REPORTER_SEVERITY_DEBUG, "Hit mesh '%s'",
+    	psobj ? psobj->GetName () : "<null>");
+  }
 
   extern csVector2 coord_check_vector;
   coord_check_vector.x = csMouseEventHelper::GetX(&Event);

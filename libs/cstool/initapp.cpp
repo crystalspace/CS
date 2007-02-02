@@ -280,6 +280,9 @@ iVFS* csInitializer::SetupVFS(iObjectRegistry* r, const char* pluginID)
       csFPrintf (stderr, "Check if the CRYSTAL environment var points to the\n");
       csFPrintf (stderr, "  correct location - usually the directory CS was "
 	"built in.\n");
+      csFPrintf (stderr, "  You can also use the '--verbose' command line switch "
+	"to troubleshoot\n");
+      csFPrintf (stderr, "  where CS looks for plugins.\n");
       return 0;
     }
     r->Register (VFS, "iVFS");

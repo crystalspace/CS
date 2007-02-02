@@ -46,11 +46,7 @@ namespace CS
 
   public:
     /// Construct an invalid texture format.
-    StructuredTextureFormat ()
-    {
-      coded_components = CONST_UINT64 (0);
-      format = CS_TEXTUREFORMAT_INVALID;
-    }
+    StructuredTextureFormat ();
 
     /**
      * A special format (like '*dxt1').
@@ -68,14 +64,7 @@ namespace CS
      *  to be set later using FixSizes().
      * \return false if the component couldn't be added.
      */
-    bool AddComponent (char cmp, int size)
-    {
-      uint64 shifted = coded_components << 16;
-      if ((shifted >> 16) != coded_components)
-	return false;
-      coded_components = shifted + (CONST_UINT64 (256) * cmp) + size;
-      return true;
-    }
+    bool AddComponent (char cmp, int size);
 
     /**
      * Set the format (one of the CS_TEXTUREFORMAT_ constants).

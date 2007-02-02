@@ -398,15 +398,44 @@ _csWrapPtr_to_Python (const csWrapPtr & wp)
 %feature("shadow") iGeneralFactoryState::GetColors()
 %{
   def GetColors(self):
-    return CSMutableArrayHelper(self.GetNormalByIndex, self.GetVertexCount)
+    return CSMutableArrayHelper(self.GetColorByIndex, self.GetVertexCount)
 %}
+
+%feature("shadow") iPolygonMesh::GetTriangles()
+%{
+  def GetTriangles(self):
+    return CSMutableArrayHelper(self.GetTriangleByIndex, self.GetTriangleCount)
+%}
+%feature("shadow") iPolygonMesh::GetPolygons()
+%{
+  def GetPolygons(self):
+    return CSMutableArrayHelper(self.GetPolygonByIndex, self.GetPolygonCount)
+%}
+%feature("shadow") iPolygonMesh::GetVertices()
+%{
+  def GetVertices(self):
+    return CSMutableArrayHelper(self.GetVertexByIndex, self.GetVertexCount)
+%}
+
+/* Macro to add an iterator to a python proxy
+   requires the class to have __len__ and __getitem__ methods */
+%define PYITERATOR_PROTOCOL(classname)
+%extend classname
+{
+    %pythoncode %{
+        def content_iterator(self):
+                for idx in xrange(len(self)):
+                        yield self.__getitem__(idx)
+        def __iter__(self): return self.content_iterator()  %}
+}
+%enddef
 
 /* List Methods*/
 
 %define PYLIST_BASE_FUNCTIONS(classname,typename,idxtype,countmethod,getmethod,addmethod,removemethod,findmethod)
 %extend classname {
-        typename *__getitem__( idxtype n) {return self-> ## getmethod ## (n);}
-	bool __contains__(typename *obj) {
+        typename __getitem__( idxtype n) {return self-> ## getmethod ## (n);}
+	bool __contains__(typename obj) {
 		if (self-> ## findmethod ## (obj) == 
 				(idxtype)csArrayItemNotFound)
 			return false;
@@ -414,17 +443,13 @@ _csWrapPtr_to_Python (const csWrapPtr & wp)
 	}
         bool __delitem__(idxtype n) { return self-> ## removemethod ## (n); }
         int __len__() { return self-> ## countmethod ## (); }
-        void append(typename *e) { self-> ## addmethod ## (e); }
-        %pythoncode %{
-        def content_iterator(self):
-                for idx in xrange(len(self)):
-                        yield self. ## getmethod ## (idx)
-        def __iter__(self): return self.content_iterator()  %}
+        void append(typename e) { self-> ## addmethod ## (e); }
 }
+PYITERATOR_PROTOCOL(classname)
 %enddef
 %define PYLIST_BYNAME_FUNCTIONS(classname,typename,findbynamemethod)
 %extend classname {
-	typename *__getitem__( const char* name) {return self-> ## findbynamemethod ## (name);}
+	typename __getitem__( const char* name) {return self-> ## findbynamemethod ## (name);}
 	bool __contains__(const char *name) {
 		if (self-> ## findbynamemethod ## (name))
 			return true;
@@ -432,10 +457,17 @@ _csWrapPtr_to_Python (const csWrapPtr & wp)
 	}
 }
 %enddef
-%define LIST_OBJECT_FUNCTIONS(classname,typename)
-        PYLIST_BASE_FUNCTIONS(classname,typename,int,GetCount,Get,Add,Remove,Find)
-        PYLIST_BYNAME_FUNCTIONS(classname,typename,FindByName)
+/* Array Functions */
+#undef ARRAY_OBJECT_FUNCTIONS
+%define ARRAY_OBJECT_FUNCTIONS(classname,typename)
+        PYLIST_BASE_FUNCTIONS(classname,typename,size_t,GetSize,Get,Push,Delete,Find)
 %enddef
+/* Pseudo-List Functions */
+%define LIST_OBJECT_FUNCTIONS(classname,typename)
+        PYLIST_BASE_FUNCTIONS(classname,typename *,int,GetCount,Get,Add,Remove,Find)
+        PYLIST_BYNAME_FUNCTIONS(classname,typename *,FindByName)
+%enddef
+
 %define SET_OBJECT_FUNCTIONS(classname,typename)
 %extend classname {
 	int __len__() {return self->GetSize();}
@@ -481,6 +513,8 @@ def __iter__(self):
     while self.HasNext():
         yield self.Next() %}
 %enddef
+
+%ignore iPen::Rotate;
 
 #endif // ifndef CS_MINI_SWIG
 

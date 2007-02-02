@@ -23,6 +23,7 @@ SubInclude TOP plugins sequence ;
 SubInclude TOP plugins sndsys ;
 SubInclude TOP plugins stdrep ;
 SubInclude TOP plugins terraformer ;
+SubInclude TOP plugins translator ;
 SubInclude TOP plugins video ;
 
 # Assemble big static plugins lib

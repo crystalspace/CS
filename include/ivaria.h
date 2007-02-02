@@ -41,6 +41,7 @@
 #include "ivaria/simpleformer.h"
 #include "ivaria/stdrep.h"
 #include "ivaria/terraform.h"
+#include "ivaria/translator.h"
 #include "ivaria/view.h"
 #endif /* __IVARIA_H__ */
 

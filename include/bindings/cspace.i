@@ -504,6 +504,7 @@
 #define TYPEMAP_ARGOUT_PTR(T)
 #define APPLY_TYPEMAP_ARGOUT_PTR(T,Args)
 #define ITERATOR_FUNCTIONS(T)
+#define ARRAY_OBJECT_FUNCTIONS(classname,typename)
 
 #if defined(SWIGPYTHON)
   %include "bindings/python/pythpre.i"
@@ -1010,6 +1011,11 @@ iArrayChangeElements<csShaderVariable * >;
 %include "imesh/objmodel.h"
 %include "igeom/path.h"
 %template(scfPath) scfImplementation1<csPath,iPath >;
+#ifndef CS_SWIG_PUBLISH_IGENERAL_FACTORY_STATE_ARRAYS
+%ignore iPolygonMesh::GetTriangles;
+%ignore iPolygonMesh::GetVertices;
+%ignore iPolygonMesh::GetPolygons;
+#endif
 %include "igeom/polymesh.h"
 /*Ignore some deprecated functions*/
 %ignore csPath::GetPointCount;
@@ -1017,7 +1023,17 @@ iArrayChangeElements<csShaderVariable * >;
 %ignore csPath::SetTimeValues;
 %ignore csPath::GetTimeValues;
 %include "csgeom/path.h"
+%template(pycsPolygonMesh) scfImplementation1<csPolygonMesh, iPolygonMesh>;
+%template(pycsPolygonMeshBox) scfImplementation1<csPolygonMeshBox, iPolygonMesh>;
 %include "csgeom/polymesh.h"
+
+%ignore csArray<csArray<int> >::Contains;
+%template(csIntArray) csArray<int>;
+%template(csIntArrayArray) csArray<csArray<int> >;
+ARRAY_OBJECT_FUNCTIONS(csArray<int>,int)
+ARRAY_OBJECT_FUNCTIONS(csArray<csArray<int> >,csArray<int>)
+%newobject csPolygonMeshTools::CalculateVertexConnections;
+%include "csgeom/pmtools.h"
 %include "csgeom/spline.h"
 
 %include "iengine/fview.h"
@@ -1129,6 +1145,7 @@ iArrayChangeElements<csSprite2DVertex>;
 %include "iutil/object.h"
 %include "iutil/strset.h"
 #endif // CS_MINI_SWIG
+%ignore CS_QUERY_REGISTRY_TAG_is_deprecated;
 %include "iutil/objreg.h"
 #ifndef CS_MINI_SWIG
 %include "iutil/virtclk.h"
@@ -1297,17 +1314,21 @@ APPLY_TYPEMAP_ARGOUT_PTR(csKeyModifiers,csKeyModifiers& modifiers)
 %include "ivaria/simpleformer.h"
 %include "ivaria/terraform.h"
 
+%template(pycsObject) scfImplementation1<csObject,iObject >;
 %include "csutil/csobject.h"
 
 %ignore csColliderHelper::TraceBeam (iCollideSystem*, iSector*,
   const csVector3&, const csVector3&, bool, csIntersectingTriangle&,
   csVector3&, iMeshWrapper**);
+%template(pycsColliderWrapper) scfImplementationExt1<csColliderWrapper,csObject,scfFakeInterface<csColliderWrapper> >;
 %include "cstool/collider.h"
 %include "cstool/csview.h"
 %include "cstool/csfxscr.h"
 
 %include "cstool/cspixmap.h"
+%include "cstool/enginetools.h"
 
+%include "cstool/pen.h"
 #endif // CS_MINI_SWIG
 
 %define INTERFACE_POST(T)
@@ -1350,6 +1371,24 @@ APPLY_FOR_EACH_INTERFACE
 
   csColor *GetColorByIndex(int index)
   { return &(self->GetColors()[index]); }
+}
+
+%extend iPolygonMesh
+{
+  csVector3 *GetVertexByIndex(int index)
+  { return &(self->GetVertices()[index]); }
+
+  csMeshedPolygon *GetPolygonByIndex(int index)
+  { return &(self->GetPolygons()[index]); }
+
+  csTriangle *GetTriangleByIndex(int index)
+  { return &(self->GetTriangles()[index]); }
+}
+
+%extend csMeshedPolygon
+{
+  int GetVertexByIndex(int index)
+  { return self->vertices[index]; }
 }
 
 // iaws/aws.h
@@ -1482,11 +1521,6 @@ csEventID _csevMouseMove (iObjectRegistry *,uint x);
 #define _csevJoystickEvent(reg) csevJoystickEvent(reg)
 #undef csevJoystickEvent
 csEventID _csevJoystickEvent (iObjectRegistry *);
-
-// iutil/objreg.h
-#define _CS_QUERY_REGISTRY_TAG(a, b) CS_QUERY_REGISTRY_TAG(a, b)
-#undef CS_QUERY_REGISTRY_TAG
-csPtr<iBase> _CS_QUERY_REGISTRY_TAG (iObjectRegistry *, const char *);
 
 // iutil/plugin.h
 #define _CS_LOAD_PLUGIN_ALWAYS(a, b) CS_LOAD_PLUGIN_ALWAYS(a, b)

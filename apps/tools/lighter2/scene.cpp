@@ -44,7 +44,7 @@ namespace lighter
     kdTree = builder.BuildTree (objIt);
   }
 
-  Scene::Scene ()
+  Scene::Scene () : lightmapPostProc (this)
   {
   }
 
@@ -153,12 +153,48 @@ namespace lighter
 
   bool Scene::ParseEngine ()
   {
-    int i=0;
- 
+    // Parse sectors
     iSectorList *sectorList = globalLighter->engine->GetSectors ();
-    for (i = 0; i < sectorList->GetCount (); i++)
+    for (int i = 0; i < sectorList->GetCount (); i++)
     {
       ParseSector (sectorList->Get (i));
+    }
+
+    // Parse portals
+    SectorOrigSectorHash::GlobalIterator sectIt = originalSectorHash.GetIterator ();
+    while (sectIt.HasNext ())
+    {
+      Sector* sector;
+      csPtrKey<iSector> srcSector;
+
+      sector = sectIt.Next (srcSector);
+      ParsePortals (srcSector, sector);
+    }
+
+    // Propagate light in sectors
+    sectIt.Reset ();
+    while (sectIt.HasNext ())
+    {
+      Sector* sector = sectIt.Next ();
+      
+      LightRefArray tmpArray = sector->allNonPDLights;
+      LightRefArray::Iterator lid = tmpArray.GetIterator ();
+      while (lid.HasNext ())
+      {
+        Light* l = lid.Next ();
+        if (l->IsRealLight ())
+          PropagateLight (l, l->GetFrustum ());
+      }
+
+      tmpArray = sector->allPDLights;
+      lid = tmpArray.GetIterator ();
+      while (lid.HasNext ())
+      {
+        Light* l = lid.Next ();
+        
+        if (l->IsRealLight ())
+          PropagateLight (l, l->GetFrustum ());
+      }
     }
 
     return true;
@@ -209,6 +245,7 @@ namespace lighter
     Sector* radSector = new Sector (this);
     radSector->sectorName = sector->QueryObject ()->GetName ();
     sectors.Put (radSector->sectorName, radSector);
+    originalSectorHash.Put (sector, radSector);
 
     // Parse all meshes (should have selector later!)
     iMeshList *meshList = sector->GetMeshes ();
@@ -232,7 +269,7 @@ namespace lighter
 
       // Atm, only point light
       csRef<PointLight> intLight;
-      intLight.AttachNew (new PointLight);
+      intLight.AttachNew (new PointLight (radSector));
 
       intLight->SetPosition (light->GetMovable ()->GetFullPosition ());
       intLight->SetColor (isPD ? csColor (1.0f) : light->GetColor ());
@@ -248,27 +285,90 @@ namespace lighter
         radSector->allPDLights.Push (intLight);
       else
         radSector->allNonPDLights.Push (intLight);
+    }
+  }
 
-#if 0
-      csRef<Light_old> radLight; radLight.AttachNew (new Light_old);
-      radLight->position = light->GetMovable ()->GetFullPosition ();
-      radLight->attenuation = light->GetAttenuationMode ();
-      radLight->attenuationConsts = light->GetAttenuationConstants();
-      radLight->pseudoDynamic = 
-        light->GetDynamicType() == CS_LIGHT_DYNAMICTYPE_PSEUDO;
-      memcpy (radLight->lightId.data, light->GetLightID(), 
-        csMD5::Digest::DigestLen);
-      radLight->color = 
-        radLight->pseudoDynamic ? csColor (1, 1, 1) : light->GetColor ();
+  void Scene::ParsePortals (iSector *srcSect, Sector* sector)
+  {
+    // Parse portals
+    const csSet<csPtrKey<iMeshWrapper> >& allPortals = srcSect->GetPortalMeshes ();
+    csSet<csPtrKey<iMeshWrapper> >::GlobalIterator it = allPortals.GetIterator ();
 
-      // Only point-lights for now
-      float r = light->GetCutoffDistance ();
-      radLight->boundingBox.SetSize (csVector3 (2*r));
-      radLight->boundingBox.SetCenter (radLight->position);
-     
-      //add more
-      radSector->allLightsOld.Push (radLight);
-#endif
+    while (it.HasNext ())
+    {
+      iMeshWrapper *portalMesh = it.Next ();
+      iPortalContainer *portalCont = portalMesh->GetPortalContainer ();
+
+      for (int i = 0; i < portalCont->GetPortalCount (); ++i)
+      {
+        iPortal* portal = portalCont->GetPortal (i);
+        portal->CompleteSector (0);
+
+        iSector* destSector = portal->GetSector ();
+        if (!destSector)
+          continue;
+
+        csRef<Portal> lightPortal; lightPortal.AttachNew (new Portal);
+        lightPortal->sourceSector = sector;
+        lightPortal->destSector = originalSectorHash.Get (destSector, 0);
+        lightPortal->portalPlane = portal->GetWorldPlane ();
+        
+        if (portal->GetFlags ().Check (CS_PORTAL_WARP))
+        {
+          //Compute wrapping
+          portal->ObjectToWorld (portalMesh->GetMovable ()->GetFullTransform (),
+            lightPortal->wrapTransform);
+        }
+
+        // Get vertices, in world space
+        int* vi = portal->GetVertexIndices ();
+        const csVector3* vertices = portal->GetWorldVertices ();
+        for (int j = 0; j < portal->GetVertexIndicesCount (); ++j)
+        {
+          lightPortal->worldVertices.Push (vertices[vi[j]]);
+        }
+
+        sector->allPortals.Push (lightPortal);
+      }
+    }
+  }
+
+  void Scene::PropagateLight (Light* light, const csFrustum& lightFrustum)
+  {
+    //Propagate light through all portals in its current sector, setup proxy-lights in targets
+    Sector* sourceSector = light->GetSector ();
+    const csVector3& lightCenter = light->GetPosition ();
+    const csBox3& lightBB = light->GetBoundingBox ();
+
+    PortalRefArray::Iterator it = sourceSector->allPortals.GetIterator ();
+    while (it.HasNext ())
+    {
+      Portal* portal = it.Next ();
+      
+      if (portal->portalPlane.Classify (lightCenter) < -0.01f && //light in front of portal
+        csIntersect3::BoxPlane (lightBB, portal->portalPlane)) //light at least cuts portal plane
+      {
+        csRef<csFrustum> newFrustum = lightFrustum.Intersect (
+          portal->worldVertices.GetArray (), portal->worldVertices.GetSize ());
+
+        if (newFrustum && !newFrustum->IsEmpty ())
+        {
+          //Have something left to push through, use that
+          newFrustum->SetBackPlane (portal->portalPlane);
+          newFrustum->Transform (&portal->wrapTransform);
+
+          // Now, setup our proxy light
+          csRef<ProxyLight> proxyLight;
+          proxyLight.AttachNew (new ProxyLight (portal->destSector, light));
+          
+          if (proxyLight->IsPDLight ())
+            portal->destSector->allPDLights.Push (proxyLight);
+          else
+            portal->destSector->allNonPDLights.Push (proxyLight);
+
+          PropagateLight (proxyLight, proxyLight->GetFrustum ());
+        }
+      }
     }
   }
 
@@ -381,6 +481,10 @@ namespace lighter
         // Texture file name is relative to world file
         csVfsDirectoryChanger chdir (globalLighter->vfs);
         chdir.ChangeTo (fileInfo->directory);
+      #ifndef DUMP_NORMALS
+        lightmapPostProc.ApplyAmbient (lightmaps[i]);
+        lightmapPostProc.ApplyExposure (lightmaps[i]);
+      #endif
         lightmaps[i]->SaveLightmap (textureFilename);
       }
       SaveTexture savetex;
@@ -405,6 +509,9 @@ namespace lighter
           // Texture file name is relative to world file
           csVfsDirectoryChanger chdir (globalLighter->vfs);
           chdir.ChangeTo (fileInfo->directory);
+        #ifndef DUMP_NORMALS
+          lightmapPostProc.ApplyExposure (lm->Get (i));
+        #endif
           lm->Get (i)->SaveLightmap (textureFilename);
         }
         savetex.pdLightmapFiles.Push (textureFilename);
@@ -712,4 +819,43 @@ namespace lighter
       SaveMeshObjectToDom (node, sect, fileInfo);
     }
   }
+
+  //-------------------------------------------------------------------------
+
+  Scene::LightingPostProcessor::LightingPostProcessor (Scene* scene) : scene (scene)
+  {
+  }
+
+  void Scene::LightingPostProcessor::ApplyExposure (Lightmap* lightmap)
+  {
+    // 0.5 to account for the fact that the shader does *2
+    lightmap->ApplyExposureFunction (1.8f, 0.5f);
+  }
+
+  void Scene::LightingPostProcessor::ApplyExposure (csColor* colors, size_t numColors)
+  {
+    // @@@ ATM shader does *not* do *2 for vertex lighting
+    LightmapPostProcess::ApplyExposureFunction(colors, numColors, 1.8f, 1.0f);
+  }
+  
+  void Scene::LightingPostProcessor::ApplyAmbient (Lightmap* lightmap)
+  {
+    //if (!<indirect lighting enabled>)
+    {
+      csColor amb;
+      globalLighter->engine->GetAmbientLight (amb);
+      lightmap->AddAmbientTerm (amb);
+    }
+  }
+
+  void Scene::LightingPostProcessor::ApplyAmbient (csColor* colors, size_t numColors)
+  {
+    //if (!<indirect lighting enabled>)
+    {
+      csColor amb;
+      globalLighter->engine->GetAmbientLight (amb);
+      LightmapPostProcess::AddAmbientTerm (colors, numColors, amb);
+    }
+  }
+
 }

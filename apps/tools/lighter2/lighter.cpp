@@ -48,6 +48,8 @@ namespace lighter
 
   Lighter::~Lighter ()
   {
+    CleanUp ();
+    LightmapCache::CleanUp ();
   }
 
   bool Lighter::Initialize ()
@@ -393,10 +395,6 @@ int main (int argc, char* argv[])
 
   // Light em up!
   if (!lighter::globalLighter->LightEmUp ()) return 1;
-
-  // Clean up
-  localLighter->CleanUp ();
-  lighter::LightmapCache::CleanUp ();
 
   localLighter = 0;
   lighter::globalLighter = 0;

@@ -561,6 +561,39 @@ bool csIntersect3::SegmentPlane (
   return true;
 }
 
+bool csIntersect3::SegmentPlane (
+  const csPlane3& plane,
+  csSegment3& segment)
+{
+  const csVector3& start = segment.Start ();
+  const csVector3& end = segment.End ();
+
+  csVector3 isec;
+  float dist;
+
+  if (SegmentPlane (start, end, plane, isec, dist))
+  {
+    // Have an intersection, update segment
+    const csVector3 d = end - start;
+    const float dd = d * plane.norm;
+
+    if (dd < 0)
+    {
+      // Plane pointing opposite to segment, update end
+      segment.SetEnd (isec);
+    }
+    else
+    {
+      segment.SetStart (isec);
+    }
+
+    return true;
+  }
+
+
+  return false;
+}
+
 bool csIntersect3::ThreePlanes (
   const csPlane3 &p1,
   const csPlane3 &p2,

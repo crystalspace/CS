@@ -23,6 +23,7 @@
 #include "light.h"
 #include "raytracer.h"
 #include "kdtree.h"
+#include "scene.h"
 
 // Attenuation functions
 static float LightAttnNone (float, const csVector3&);
@@ -44,9 +45,11 @@ static lighter::LightAttenuationFunc attnFuncTable[] =
 namespace lighter
 {
 
-  Light::Light (bool deltaDistribution)
-    : deltaDistribution (deltaDistribution)
+  Light::Light (Sector* o, bool deltaDistribution)
+    : ownerSector (o), lightFrustum (csVector3 (0,0,0)),
+    deltaDistribution (deltaDistribution),  pseudoDynamic (false), realLight (true)
   {
+    lightFrustum.MakeInfinite ();
   }
 
   Light::~Light ()
@@ -67,37 +70,87 @@ namespace lighter
   {
   }
 
-  void VisibilityTester::SetSegment (const csVector3& start, const csVector3& end)
+  void VisibilityTester::AddSegment (KDTree* tree, const csVector3& start, const csVector3& end)
   {
     csVector3 dir = end-start;
     float d = dir.Norm ();
 
-    SetSegment (start, dir / d, d);
+    AddSegment (tree, start, dir / d, d);
   }
 
-  void VisibilityTester::SetSegment (const csVector3& start, const csVector3& dir,
+  void VisibilityTester::AddSegment (KDTree* tree, const csVector3& start, const csVector3& dir,
     float maxL)
   {
-    testRay.origin = start;
-    testRay.direction = dir;
-    //testRay.minLength = FLT_EPSILON;
-    //testRay.maxLength = maxL * (1.0f - FLT_EPSILON);
-    testRay.maxLength = maxL - FLT_EPSILON*10.0f;
-    testRay.ignoreFlags = KDPRIM_FLAG_NOSHADOW; // Ignore primitives that don't cast shadows
+    Segment s;
+
+    s.ray.origin = start;
+    s.ray.direction = dir;
+    s.ray.maxLength = maxL - FLT_EPSILON*10.0f;
+    s.ray.ignoreFlags = KDPRIM_FLAG_NOSHADOW; // Ignore primitives that don't cast shadows
+    s.tree = tree;
+
+    allSegments.Push (s);
   }
 
-  bool VisibilityTester::Unoccluded (Raytracer& rt, const Primitive* ignorePrim)
+  bool VisibilityTester::Unoccluded (const Primitive* ignorePrim)
   {
     HitPoint hp;
-    testRay.ignorePrimitive = ignorePrim;
-    return !rt.TraceAnyHit (testRay, hp);
+    for (size_t i = 0; i < allSegments.GetSize (); ++i)
+    {
+      Segment& s = allSegments[i];
+      s.ray.ignorePrimitive = ignorePrim;
+
+      if (Raytracer::TraceAnyHit (s.tree, s.ray, hp))
+        return false;
+    }
+
+    return true;    
   }
 
+  bool VisibilityTester::Unoccluded (HitIgnoreCallback* ignoreCB)
+  {
+    HitPoint hp;
+    for (size_t i = 0; i < allSegments.GetSize (); ++i)
+    {
+      Segment& s = allSegments[i];
+
+      if (Raytracer::TraceAnyHit (s.tree, s.ray, hp, ignoreCB))
+        return false;
+    }
+
+    return true;
+  }
+
+  void VisibilityTester::CollectHits (csSet<csConstPtrKey<Primitive> > &primitives, 
+    HitIgnoreCallback* ignoreCB)
+  {
+    struct HitCB : public HitPointCallback
+    {
+      HitCB (csSet<csConstPtrKey<Primitive> > &primitives)
+        : primitives (primitives)
+      {
+      }
+      
+      virtual void RegisterHit (const Ray &ray, const HitPoint &hit)
+      {
+        primitives.Add (hit.primitive);
+      }
+
+      csSet<csConstPtrKey<Primitive> > &primitives;
+    } hitCB (primitives);
+
+    for (size_t i = 0; i < allSegments.GetSize (); ++i)
+    {
+      Segment& s = allSegments[i];
+
+      Raytracer::TraceAllHits (s.tree, s.ray, &hitCB, ignoreCB);
+    }
+  }
 
 
   //--
-  PointLight::PointLight ()
-    : Light (true)
+  PointLight::PointLight (Sector* o)
+    : Light (o, true)
   {
 
   }
@@ -117,7 +170,7 @@ namespace lighter
 
     pdf = 1;
 
-    vistest.SetSegment (position, -lightVec, d);
+    vistest.AddSegment (ownerSector->kdTree, position, -lightVec, d);
 
     csColor res = color * ComputeAttenuation (sqD);
 
@@ -133,6 +186,33 @@ namespace lighter
   {
     radius = r;
     //Update bb
+    boundingBox.SetSize (csVector3 (r));
+  }
+
+
+  ProxyLight::ProxyLight (Sector* owner, Light* parentLight)
+    : Light (owner, parentLight->IsDeltaLight ()), parent (parentLight)
+  {
+    realLight = false;
+
+    SetPDLight (parent->IsPDLight ());
+    SetColor (parent->GetColor ());
+    SetLightID ((const char*)parent->GetLightID ().data);
+  }
+
+  ProxyLight::~ProxyLight ()
+  {
+  }
+
+  csColor ProxyLight::SampleLight (const csVector3& point, const csVector3& n,
+    float u1, float u2, csVector3& lightVec, float& pdf, VisibilityTester& vistest)
+  {
+    return parent->SampleLight (point, n, u1, u2, lightVec, pdf, vistest);
+  }
+
+  csColor ProxyLight::GetPower () const
+  {
+    return parent->GetPower ();
   }
 }
 

@@ -43,6 +43,44 @@ namespace lighter
 
     LightmapPtrDelArray& globalLightmaps;
 
+    /**
+     * Vertex equality criterium, for determination of nieghbouring primitives.
+     */
+    enum VertexEquality
+    {
+      /// Two vertices are considered equal if they're the same vertex.
+      Pedantic,
+      /**
+       * Two vertices are considered equal if they have the same position and
+       * normal.
+       */
+      PositionAndNormal,
+      /// Two vertices are considered equal if they have the same position
+      Position
+    };
+
+    struct Edge
+    {
+      const Primitive& prim;
+      size_t a, b;
+
+      Edge (const Primitive& prim, size_t a, size_t b) : 
+        prim (prim), a (a), b (b) {}
+
+      bool equals (VertexEquality veq, const Edge& other);
+    };
+    struct UberPrimitive
+    {
+      PrimitiveArray prims;
+      csArray<Edge> outsideEdges;
+      VertexEquality equality;
+
+      UberPrimitive (VertexEquality equality, const Primitive& startPrim);
+
+      bool UsesEdge (const Edge& edge);
+      void AddPrimitive (const Primitive& prim);
+    };
+
     void DetermineNeighbouringPrims (
       const PrimitiveArray& inPrims, ObjectVertexData& vertexData,
       csArray<PrimitiveArray>& outPrims);

@@ -70,7 +70,6 @@ package cspace;
 *csGetUsername = *cspacec::csGetUsername;
 *csGetPlatformConfigPath = *cspacec::csGetPlatformConfigPath;
 *csQueryRegistryTag = *cspacec::csQueryRegistryTag;
-*CS_QUERY_REGISTRY_TAG_is_deprecated = *cspacec::CS_QUERY_REGISTRY_TAG_is_deprecated;
 *RegisterWeakListener = *cspacec::RegisterWeakListener;
 *RemoveWeakListener = *cspacec::RemoveWeakListener;
 *csHashCompute = *cspacec::csHashCompute;
@@ -115,7 +114,6 @@ package cspace;
 *csevMouseDoubleClick = *cspacec::csevMouseDoubleClick;
 *csevMouseMove = *cspacec::csevMouseMove;
 *csevJoystickEvent = *cspacec::csevJoystickEvent;
-*CS_QUERY_REGISTRY_TAG = *cspacec::CS_QUERY_REGISTRY_TAG;
 *CS_LOAD_PLUGIN_ALWAYS = *cspacec::CS_LOAD_PLUGIN_ALWAYS;
 *CS_FX_SETALPHA = *cspacec::CS_FX_SETALPHA;
 *CS_FX_SETALPHA_INT = *cspacec::CS_FX_SETALPHA_INT;
@@ -4609,6 +4607,7 @@ package cspace::csMeshedPolygon;
 *swig_num_vertices_set = *cspacec::csMeshedPolygon_num_vertices_set;
 *swig_vertices_get = *cspacec::csMeshedPolygon_vertices_get;
 *swig_vertices_set = *cspacec::csMeshedPolygon_vertices_set;
+*GetVertexByIndex = *cspacec::csMeshedPolygon_GetVertexByIndex;
 sub new {
     my $pkg = shift;
     my $self = cspacec::new_csMeshedPolygon(@_);
@@ -4646,11 +4645,8 @@ package cspace::iPolygonMesh;
 %OWNER = ();
 %ITERATORS = ();
 *GetVertexCount = *cspacec::iPolygonMesh_GetVertexCount;
-*GetVertices = *cspacec::iPolygonMesh_GetVertices;
 *GetPolygonCount = *cspacec::iPolygonMesh_GetPolygonCount;
-*GetPolygons = *cspacec::iPolygonMesh_GetPolygons;
 *GetTriangleCount = *cspacec::iPolygonMesh_GetTriangleCount;
-*GetTriangles = *cspacec::iPolygonMesh_GetTriangles;
 *Lock = *cspacec::iPolygonMesh_Lock;
 *Unlock = *cspacec::iPolygonMesh_Unlock;
 *GetFlags = *cspacec::iPolygonMesh_GetFlags;
@@ -4667,6 +4663,9 @@ sub DESTROY {
 }
 
 *scfGetVersion = *cspacec::iPolygonMesh_scfGetVersion;
+*GetVertexByIndex = *cspacec::iPolygonMesh_GetVertexByIndex;
+*GetPolygonByIndex = *cspacec::iPolygonMesh_GetPolygonByIndex;
+*GetTriangleByIndex = *cspacec::iPolygonMesh_GetTriangleByIndex;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -4741,10 +4740,60 @@ sub ACQUIRE {
 }
 
 
+############# Class : cspace::pycsPolygonMesh ##############
+
+package cspace::pycsPolygonMesh;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::iPolygonMesh cspace );
+%OWNER = ();
+*IncRef = *cspacec::pycsPolygonMesh_IncRef;
+*DecRef = *cspacec::pycsPolygonMesh_DecRef;
+*GetRefCount = *cspacec::pycsPolygonMesh_GetRefCount;
+*QueryInterface = *cspacec::pycsPolygonMesh_QueryInterface;
+*AddRefOwner = *cspacec::pycsPolygonMesh_AddRefOwner;
+*RemoveRefOwner = *cspacec::pycsPolygonMesh_RemoveRefOwner;
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::pycsPolygonMeshBox ##############
+
+package cspace::pycsPolygonMeshBox;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::iPolygonMesh cspace );
+%OWNER = ();
+*IncRef = *cspacec::pycsPolygonMeshBox_IncRef;
+*DecRef = *cspacec::pycsPolygonMeshBox_DecRef;
+*GetRefCount = *cspacec::pycsPolygonMeshBox_GetRefCount;
+*QueryInterface = *cspacec::pycsPolygonMeshBox_QueryInterface;
+*AddRefOwner = *cspacec::pycsPolygonMeshBox_AddRefOwner;
+*RemoveRefOwner = *cspacec::pycsPolygonMeshBox_RemoveRefOwner;
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
 ############# Class : cspace::csPolygonMesh ##############
 
 package cspace::csPolygonMesh;
-@ISA = qw( cspace );
+@ISA = qw( cspace::pycsPolygonMesh cspace );
 %OWNER = ();
 %ITERATORS = ();
 sub new {
@@ -4773,11 +4822,8 @@ sub DESTROY {
 *SetPolygonCount = *cspacec::csPolygonMesh_SetPolygonCount;
 *ShapeChanged = *cspacec::csPolygonMesh_ShapeChanged;
 *GetVertexCount = *cspacec::csPolygonMesh_GetVertexCount;
-*GetVertices = *cspacec::csPolygonMesh_GetVertices;
 *GetPolygonCount = *cspacec::csPolygonMesh_GetPolygonCount;
-*GetPolygons = *cspacec::csPolygonMesh_GetPolygons;
 *GetTriangleCount = *cspacec::csPolygonMesh_GetTriangleCount;
-*GetTriangles = *cspacec::csPolygonMesh_GetTriangles;
 *Lock = *cspacec::csPolygonMesh_Lock;
 *Unlock = *cspacec::csPolygonMesh_Unlock;
 *GetFlags = *cspacec::csPolygonMesh_GetFlags;
@@ -4798,7 +4844,7 @@ sub ACQUIRE {
 ############# Class : cspace::csPolygonMeshBox ##############
 
 package cspace::csPolygonMeshBox;
-@ISA = qw( cspace );
+@ISA = qw( cspace::pycsPolygonMeshBox cspace );
 %OWNER = ();
 %ITERATORS = ();
 sub new {
@@ -4820,15 +4866,271 @@ sub DESTROY {
 
 *SetBox = *cspacec::csPolygonMeshBox_SetBox;
 *GetVertexCount = *cspacec::csPolygonMeshBox_GetVertexCount;
-*GetVertices = *cspacec::csPolygonMeshBox_GetVertices;
 *GetPolygonCount = *cspacec::csPolygonMeshBox_GetPolygonCount;
-*GetPolygons = *cspacec::csPolygonMeshBox_GetPolygons;
 *GetTriangleCount = *cspacec::csPolygonMeshBox_GetTriangleCount;
-*GetTriangles = *cspacec::csPolygonMeshBox_GetTriangles;
 *Lock = *cspacec::csPolygonMeshBox_Lock;
 *Unlock = *cspacec::csPolygonMeshBox_Unlock;
 *GetFlags = *cspacec::csPolygonMeshBox_GetFlags;
 *GetChangeNumber = *cspacec::csPolygonMeshBox_GetChangeNumber;
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::csIntArray ##############
+
+package cspace::csIntArray;
+use overload
+    "!=" => sub { $_[0]->__ne__($_[1])},
+    "==" => sub { $_[0]->__eq__($_[1])},
+    "fallback" => 1;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace );
+%OWNER = ();
+%ITERATORS = ();
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_csIntArray($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_csIntArray(@_);
+    bless $self, $pkg if defined($self);
+}
+
+*GetSize = *cspacec::csIntArray_GetSize;
+*Length = *cspacec::csIntArray_Length;
+*Get = *cspacec::csIntArray_Get;
+*Put = *cspacec::csIntArray_Put;
+*Push = *cspacec::csIntArray_Push;
+*Pop = *cspacec::csIntArray_Pop;
+*Top = *cspacec::csIntArray_Top;
+*Insert = *cspacec::csIntArray_Insert;
+*Contains = *cspacec::csIntArray_Contains;
+*Truncate = *cspacec::csIntArray_Truncate;
+*Empty = *cspacec::csIntArray_Empty;
+*IsEmpty = *cspacec::csIntArray_IsEmpty;
+*SetMinimalCapacity = *cspacec::csIntArray_SetMinimalCapacity;
+*DeleteIndex = *cspacec::csIntArray_DeleteIndex;
+*DeleteIndexFast = *cspacec::csIntArray_DeleteIndexFast;
+*DeleteRange = *cspacec::csIntArray_DeleteRange;
+*__eq__ = *cspacec::csIntArray___eq__;
+*__ne__ = *cspacec::csIntArray___ne__;
+*GetAllocator = *cspacec::csIntArray_GetAllocator;
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::csIntArrayArray ##############
+
+package cspace::csIntArrayArray;
+use overload
+    "!=" => sub { $_[0]->__ne__($_[1])},
+    "==" => sub { $_[0]->__eq__($_[1])},
+    "fallback" => 1;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace );
+%OWNER = ();
+%ITERATORS = ();
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_csIntArrayArray($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_csIntArrayArray(@_);
+    bless $self, $pkg if defined($self);
+}
+
+*GetSize = *cspacec::csIntArrayArray_GetSize;
+*Length = *cspacec::csIntArrayArray_Length;
+*Get = *cspacec::csIntArrayArray_Get;
+*Put = *cspacec::csIntArrayArray_Put;
+*Push = *cspacec::csIntArrayArray_Push;
+*Pop = *cspacec::csIntArrayArray_Pop;
+*Top = *cspacec::csIntArrayArray_Top;
+*Insert = *cspacec::csIntArrayArray_Insert;
+*Truncate = *cspacec::csIntArrayArray_Truncate;
+*Empty = *cspacec::csIntArrayArray_Empty;
+*IsEmpty = *cspacec::csIntArrayArray_IsEmpty;
+*SetMinimalCapacity = *cspacec::csIntArrayArray_SetMinimalCapacity;
+*DeleteIndex = *cspacec::csIntArrayArray_DeleteIndex;
+*DeleteIndexFast = *cspacec::csIntArrayArray_DeleteIndexFast;
+*DeleteRange = *cspacec::csIntArrayArray_DeleteRange;
+*__eq__ = *cspacec::csIntArrayArray___eq__;
+*__ne__ = *cspacec::csIntArrayArray___ne__;
+*GetAllocator = *cspacec::csIntArrayArray_GetAllocator;
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::csPolygonMeshEdge ##############
+
+package cspace::csPolygonMeshEdge;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace );
+%OWNER = ();
+%ITERATORS = ();
+*swig_vt1_get = *cspacec::csPolygonMeshEdge_vt1_get;
+*swig_vt1_set = *cspacec::csPolygonMeshEdge_vt1_set;
+*swig_vt2_get = *cspacec::csPolygonMeshEdge_vt2_get;
+*swig_vt2_set = *cspacec::csPolygonMeshEdge_vt2_set;
+*swig_poly1_get = *cspacec::csPolygonMeshEdge_poly1_get;
+*swig_poly1_set = *cspacec::csPolygonMeshEdge_poly1_set;
+*swig_poly2_get = *cspacec::csPolygonMeshEdge_poly2_get;
+*swig_poly2_set = *cspacec::csPolygonMeshEdge_poly2_set;
+*swig_active_get = *cspacec::csPolygonMeshEdge_active_get;
+*swig_active_set = *cspacec::csPolygonMeshEdge_active_set;
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_csPolygonMeshEdge(@_);
+    bless $self, $pkg if defined($self);
+}
+
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_csPolygonMeshEdge($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::csTriangleMinMax ##############
+
+package cspace::csTriangleMinMax;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::csTriangle cspace );
+%OWNER = ();
+%ITERATORS = ();
+*swig_minx_get = *cspacec::csTriangleMinMax_minx_get;
+*swig_minx_set = *cspacec::csTriangleMinMax_minx_set;
+*swig_maxx_get = *cspacec::csTriangleMinMax_maxx_get;
+*swig_maxx_set = *cspacec::csTriangleMinMax_maxx_set;
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_csTriangleMinMax(@_);
+    bless $self, $pkg if defined($self);
+}
+
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_csTriangleMinMax($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::csPolygonMeshTools ##############
+
+package cspace::csPolygonMeshTools;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace );
+%OWNER = ();
+%ITERATORS = ();
+*CalculateNormals = *cspacec::csPolygonMeshTools_CalculateNormals;
+*CalculatePlanes = *cspacec::csPolygonMeshTools_CalculatePlanes;
+*CalculateEdges = *cspacec::csPolygonMeshTools_CalculateEdges;
+*CheckActiveEdges = *cspacec::csPolygonMeshTools_CheckActiveEdges;
+*CalculateOutline = *cspacec::csPolygonMeshTools_CalculateOutline;
+*IsMeshClosed = *cspacec::csPolygonMeshTools_IsMeshClosed;
+*IsMeshConvex = *cspacec::csPolygonMeshTools_IsMeshConvex;
+*CloseMesh = *cspacec::csPolygonMeshTools_CloseMesh;
+*Triangulate = *cspacec::csPolygonMeshTools_Triangulate;
+*Polygonize = *cspacec::csPolygonMeshTools_Polygonize;
+*SortTrianglesX = *cspacec::csPolygonMeshTools_SortTrianglesX;
+*PointInClosedMesh = *cspacec::csPolygonMeshTools_PointInClosedMesh;
+*LineInClosedMesh = *cspacec::csPolygonMeshTools_LineInClosedMesh;
+*BoxInClosedMesh = *cspacec::csPolygonMeshTools_BoxInClosedMesh;
+*CalculateVertexConnections = *cspacec::csPolygonMeshTools_CalculateVertexConnections;
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_csPolygonMeshTools(@_);
+    bless $self, $pkg if defined($self);
+}
+
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_csPolygonMeshTools($self);
+        delete $OWNER{$self};
+    }
+}
+
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -16409,10 +16711,35 @@ sub ACQUIRE {
 }
 
 
+############# Class : cspace::pycsObject ##############
+
+package cspace::pycsObject;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::iObject cspace );
+%OWNER = ();
+*IncRef = *cspacec::pycsObject_IncRef;
+*DecRef = *cspacec::pycsObject_DecRef;
+*GetRefCount = *cspacec::pycsObject_GetRefCount;
+*QueryInterface = *cspacec::pycsObject_QueryInterface;
+*AddRefOwner = *cspacec::pycsObject_AddRefOwner;
+*RemoveRefOwner = *cspacec::pycsObject_RemoveRefOwner;
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
 ############# Class : cspace::csObject ##############
 
 package cspace::csObject;
-@ISA = qw( cspace );
+@ISA = qw( cspace::pycsObject cspace );
 %OWNER = ();
 %ITERATORS = ();
 sub new {
@@ -16459,10 +16786,35 @@ sub ACQUIRE {
 }
 
 
+############# Class : cspace::pycsColliderWrapper ##############
+
+package cspace::pycsColliderWrapper;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::csObject cspace );
+%OWNER = ();
+*IncRef = *cspacec::pycsColliderWrapper_IncRef;
+*DecRef = *cspacec::pycsColliderWrapper_DecRef;
+*GetRefCount = *cspacec::pycsColliderWrapper_GetRefCount;
+*QueryInterface = *cspacec::pycsColliderWrapper_QueryInterface;
+*AddRefOwner = *cspacec::pycsColliderWrapper_AddRefOwner;
+*RemoveRefOwner = *cspacec::pycsColliderWrapper_RemoveRefOwner;
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
 ############# Class : cspace::csColliderWrapper ##############
 
 package cspace::csColliderWrapper;
-@ISA = qw( cspace );
+@ISA = qw( cspace::pycsColliderWrapper cspace );
 %OWNER = ();
 %ITERATORS = ();
 sub new {
@@ -16486,6 +16838,7 @@ sub DESTROY {
 *GetCollideSystem = *cspacec::csColliderWrapper_GetCollideSystem;
 *Collide = *cspacec::csColliderWrapper_Collide;
 *GetColliderWrapper = *cspacec::csColliderWrapper_GetColliderWrapper;
+*UpdateCollider = *cspacec::csColliderWrapper_UpdateCollider;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -16761,6 +17114,291 @@ sub DESTROY {
 *Height = *cspacec::csSimplePixmap_Height;
 *Advance = *cspacec::csSimplePixmap_Advance;
 *GetTextureHandle = *cspacec::csSimplePixmap_GetTextureHandle;
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::csShortestDistanceResult ##############
+
+package cspace::csShortestDistanceResult;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace );
+%OWNER = ();
+%ITERATORS = ();
+*swig_sqdistance_get = *cspacec::csShortestDistanceResult_sqdistance_get;
+*swig_sqdistance_set = *cspacec::csShortestDistanceResult_sqdistance_set;
+*swig_direction_get = *cspacec::csShortestDistanceResult_direction_get;
+*swig_direction_set = *cspacec::csShortestDistanceResult_direction_set;
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_csShortestDistanceResult(@_);
+    bless $self, $pkg if defined($self);
+}
+
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_csShortestDistanceResult($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::csScreenTargetResult ##############
+
+package cspace::csScreenTargetResult;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace );
+%OWNER = ();
+%ITERATORS = ();
+*swig_mesh_get = *cspacec::csScreenTargetResult_mesh_get;
+*swig_mesh_set = *cspacec::csScreenTargetResult_mesh_set;
+*swig_isect_get = *cspacec::csScreenTargetResult_isect_get;
+*swig_isect_set = *cspacec::csScreenTargetResult_isect_set;
+*swig_polygon_idx_get = *cspacec::csScreenTargetResult_polygon_idx_get;
+*swig_polygon_idx_set = *cspacec::csScreenTargetResult_polygon_idx_set;
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_csScreenTargetResult(@_);
+    bless $self, $pkg if defined($self);
+}
+
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_csScreenTargetResult($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::csEngineTools ##############
+
+package cspace::csEngineTools;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace );
+%OWNER = ();
+%ITERATORS = ();
+*FindShortestDistance = *cspacec::csEngineTools_FindShortestDistance;
+*FindScreenTarget = *cspacec::csEngineTools_FindScreenTarget;
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_csEngineTools(@_);
+    bless $self, $pkg if defined($self);
+}
+
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_csEngineTools($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iPen ##############
+
+package cspace::iPen;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace );
+%OWNER = ();
+*SetFlag = *cspacec::iPen_SetFlag;
+*ClearFlag = *cspacec::iPen_ClearFlag;
+*SetMixMode = *cspacec::iPen_SetMixMode;
+*SetColor = *cspacec::iPen_SetColor;
+*SetTexture = *cspacec::iPen_SetTexture;
+*SwapColors = *cspacec::iPen_SwapColors;
+*SetPenWidth = *cspacec::iPen_SetPenWidth;
+*ClearTransform = *cspacec::iPen_ClearTransform;
+*PushTransform = *cspacec::iPen_PushTransform;
+*PopTransform = *cspacec::iPen_PopTransform;
+*SetOrigin = *cspacec::iPen_SetOrigin;
+*Translate = *cspacec::iPen_Translate;
+*Rotate = *cspacec::iPen_Rotate;
+*DrawLine = *cspacec::iPen_DrawLine;
+*DrawPoint = *cspacec::iPen_DrawPoint;
+*DrawRect = *cspacec::iPen_DrawRect;
+*DrawMiteredRect = *cspacec::iPen_DrawMiteredRect;
+*DrawRoundedRect = *cspacec::iPen_DrawRoundedRect;
+*DrawArc = *cspacec::iPen_DrawArc;
+*DrawTriangle = *cspacec::iPen_DrawTriangle;
+*Write = *cspacec::iPen_Write;
+*WriteBoxed = *cspacec::iPen_WriteBoxed;
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::csPen ##############
+
+package cspace::csPen;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::iPen cspace );
+%OWNER = ();
+%ITERATORS = ();
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_csPen(@_);
+    bless $self, $pkg if defined($self);
+}
+
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_csPen($self);
+        delete $OWNER{$self};
+    }
+}
+
+*SetFlag = *cspacec::csPen_SetFlag;
+*ClearFlag = *cspacec::csPen_ClearFlag;
+*SetMixMode = *cspacec::csPen_SetMixMode;
+*SetColor = *cspacec::csPen_SetColor;
+*SetTexture = *cspacec::csPen_SetTexture;
+*SwapColors = *cspacec::csPen_SwapColors;
+*SetPenWidth = *cspacec::csPen_SetPenWidth;
+*ClearTransform = *cspacec::csPen_ClearTransform;
+*PushTransform = *cspacec::csPen_PushTransform;
+*PopTransform = *cspacec::csPen_PopTransform;
+*SetOrigin = *cspacec::csPen_SetOrigin;
+*Translate = *cspacec::csPen_Translate;
+*Rotate = *cspacec::csPen_Rotate;
+*DrawLine = *cspacec::csPen_DrawLine;
+*DrawThickLine = *cspacec::csPen_DrawThickLine;
+*DrawPoint = *cspacec::csPen_DrawPoint;
+*DrawRect = *cspacec::csPen_DrawRect;
+*DrawMiteredRect = *cspacec::csPen_DrawMiteredRect;
+*DrawRoundedRect = *cspacec::csPen_DrawRoundedRect;
+*DrawArc = *cspacec::csPen_DrawArc;
+*DrawTriangle = *cspacec::csPen_DrawTriangle;
+*Write = *cspacec::csPen_Write;
+*WriteBoxed = *cspacec::csPen_WriteBoxed;
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::csMemoryPen ##############
+
+package cspace::csMemoryPen;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::iPen cspace );
+%OWNER = ();
+%ITERATORS = ();
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_csMemoryPen(@_);
+    bless $self, $pkg if defined($self);
+}
+
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_csMemoryPen($self);
+        delete $OWNER{$self};
+    }
+}
+
+*Clear = *cspacec::csMemoryPen_Clear;
+*Draw = *cspacec::csMemoryPen_Draw;
+*SetFlag = *cspacec::csMemoryPen_SetFlag;
+*ClearFlag = *cspacec::csMemoryPen_ClearFlag;
+*SetMixMode = *cspacec::csMemoryPen_SetMixMode;
+*SetColor = *cspacec::csMemoryPen_SetColor;
+*SetTexture = *cspacec::csMemoryPen_SetTexture;
+*SwapColors = *cspacec::csMemoryPen_SwapColors;
+*SetPenWidth = *cspacec::csMemoryPen_SetPenWidth;
+*ClearTransform = *cspacec::csMemoryPen_ClearTransform;
+*PushTransform = *cspacec::csMemoryPen_PushTransform;
+*PopTransform = *cspacec::csMemoryPen_PopTransform;
+*SetOrigin = *cspacec::csMemoryPen_SetOrigin;
+*Translate = *cspacec::csMemoryPen_Translate;
+*Rotate = *cspacec::csMemoryPen_Rotate;
+*DrawLine = *cspacec::csMemoryPen_DrawLine;
+*DrawPoint = *cspacec::csMemoryPen_DrawPoint;
+*DrawRect = *cspacec::csMemoryPen_DrawRect;
+*DrawMiteredRect = *cspacec::csMemoryPen_DrawMiteredRect;
+*DrawRoundedRect = *cspacec::csMemoryPen_DrawRoundedRect;
+*DrawArc = *cspacec::csMemoryPen_DrawArc;
+*DrawTriangle = *cspacec::csMemoryPen_DrawTriangle;
+*Write = *cspacec::csMemoryPen_Write;
+*WriteBoxed = *cspacec::csMemoryPen_WriteBoxed;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -17343,6 +17981,15 @@ sub CS_ODE_AMOTOR_MODE_LAST () { $cspacec::CS_ODE_AMOTOR_MODE_LAST }
 sub CS_SEQUENCE_LIGHTCHANGE_NONE () { $cspacec::CS_SEQUENCE_LIGHTCHANGE_NONE }
 sub CS_SEQUENCE_LIGHTCHANGE_LESS () { $cspacec::CS_SEQUENCE_LIGHTCHANGE_LESS }
 sub CS_SEQUENCE_LIGHTCHANGE_GREATER () { $cspacec::CS_SEQUENCE_LIGHTCHANGE_GREATER }
+sub CS_PEN_TA_TOP () { $cspacec::CS_PEN_TA_TOP }
+sub CS_PEN_TA_BOT () { $cspacec::CS_PEN_TA_BOT }
+sub CS_PEN_TA_LEFT () { $cspacec::CS_PEN_TA_LEFT }
+sub CS_PEN_TA_RIGHT () { $cspacec::CS_PEN_TA_RIGHT }
+sub CS_PEN_TA_CENTER () { $cspacec::CS_PEN_TA_CENTER }
+sub CS_PEN_FILL () { $cspacec::CS_PEN_FILL }
+sub CS_PEN_SWAPCOLORS () { $cspacec::CS_PEN_SWAPCOLORS }
+sub CS_PEN_TEXTURE_ONLY () { $cspacec::CS_PEN_TEXTURE_ONLY }
+sub CS_PEN_TEXTURE () { $cspacec::CS_PEN_TEXTURE }
 
 # ------- VARIABLE STUBS --------
 

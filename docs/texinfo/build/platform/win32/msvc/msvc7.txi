@@ -114,7 +114,8 @@ anything doesn't work, see the Win32 @sc{faq}, @ref{MSVC7 FAQ}.
 
 @enumerate
 @item
-Load @file{CS\mk\msvc\wkstypical.sln}.
+Load @file{CS\mk\msvcN\wkstypical.sln}, where @samp{N} must be replaced with
+the version number of the MSVC version you use.
 
 @item
 From the file menu select @emph{Build->Build Solution}.  @emph{Note}: If you

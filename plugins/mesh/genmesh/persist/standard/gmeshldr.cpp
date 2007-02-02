@@ -1378,6 +1378,50 @@ csPtr<iBase> csGeneralMeshLoader::Parse (iDocumentNode* node,
 	CHECK_MESH(meshstate);
         ParseSubMesh (child, meshstate, ldr_context);
         break;
+      case XMLTOKEN_ANIMCONTROL:
+        {
+	  const char* pluginname = child->GetAttributeValue ("plugin");
+	  if (!pluginname)
+	  {
+	    synldr->ReportError (
+		    "crystalspace.genmeshfactoryloader.parse",
+		    child, "Plugin name missing for <animcontrol>!");
+	    return 0;
+	  }
+	  csRef<iGenMeshAnimationControlType> type =
+	  	csLoadPluginCheck<iGenMeshAnimationControlType> (
+		object_reg, pluginname, false);
+	  if (!type)
+	  {
+	    synldr->ReportError (
+		"crystalspace.genmeshloader.parse",
+		child, "Could not load animation control plugin '%s'!",
+		pluginname);
+	    return 0;
+    	  }
+	  csRef<iGenMeshAnimationControlFactory> anim_ctrl_fact = type->
+	  	CreateAnimationControlFactory ();
+	  const char* error = anim_ctrl_fact->Load (child);
+	  if (error)
+	  {
+	    synldr->ReportError (
+		"crystalspace.genmeshloader.parse",
+		child, "Error loading animation control factory: '%s'!",
+		error);
+	    return 0;
+	  }
+          csRef<iGenMeshAnimationControl> animctrl = 
+            anim_ctrl_fact->CreateAnimationControl (mesh);
+	  if (!type)
+	  {
+	    synldr->ReportError (
+		"crystalspace.genmeshloader.parse",
+		child, "Could not create animation control");
+	    return 0;
+    	  }
+          meshstate->SetAnimationControl (animctrl);
+	}
+	break;
       default:
         synldr->ReportBadToken (child);
 	return 0;
