@@ -1643,9 +1643,8 @@ AC_DEFUN([CS_CHECK_LIBCG],
     [AC_REQUIRE([CS_CHECK_COMMON_LIBS])
     AC_REQUIRE([CS_CHECK_PTHREAD])
     AC_REQUIRE([CS_PROG_LINK])
-    AS_IF([test "$enable_as_needed" != "no"],
-    	[LDFLAGS_BACKUP="$LDFLAGS"
-    	LDFLAGS=`echo "$LDFLAGS" | sed s/-Wl,--as-needed//`])
+    LDFLAGS_BACKUP="$LDFLAGS"
+    LDFLAGS=`echo "$LDFLAGS" | sed s/-Wl,--as-needed//`
     CS_CHECK_LIB_WITH([Cg],
     	[AC_LANG_PROGRAM(
     	    [[#if HAVE_MATH_H
@@ -1683,8 +1682,7 @@ AC_DEFUN([CS_CHECK_LIBCG],
 	    [$cs_cv_libCg_libs   $cs_cv_libgl_libs   $cs_cv_libglu_libs],
 	    [cggl, cgGL, CGGL, Cg, cg, CG])])
 	    
-    AS_IF([test "$enable_as_needed" != "no"],
-    	[LDFLAGS="$LDFLAGS_BACKUP"])])
+    LDFLAGS="$LDFLAGS_BACKUP"])
 
 CS_CHECK_LIBCG
 
