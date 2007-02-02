@@ -1647,11 +1647,7 @@ AC_DEFUN([CS_CHECK_LIBCG],
     LDFLAGS=`echo "$LDFLAGS" | sed s/-Wl,--as-needed//`
     CS_CHECK_LIB_WITH([Cg],
     	[AC_LANG_PROGRAM(
-    	    [[#if HAVE_MATH_H
-    	    #include <math.h>
-    	    #endif
-    	    #include <pthread.h>
-    	    #include <Cg/cg.h>]],
+    	    [[#include <Cg/cg.h>]],
 	   [CGcontext c = cgCreateContext();])],
     	[], [], [], [],
     	[$cs_cv_libm_cflags $cs_cv_sys_pthread_cflags], 
