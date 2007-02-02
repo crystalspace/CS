@@ -7,6 +7,7 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 2-Feb-2007
+        - Andrew Robberts added missing include/igeom/decal.h
         - Andrew Robberts fixed copyright, interface versions, and comments
 	  for decals commit.
 	- Andrew Robberts added decal support and a decalmanager plugin
