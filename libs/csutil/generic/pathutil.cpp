@@ -60,23 +60,23 @@ bool csPathsUtilities::PathsIdentical (const char* path1, const char* path2)
 
 namespace CS
 {
-namespace Platform
-{
+  namespace Platform
+  {
 
-csString GetTempDirectory ()
-{
-  return "/tmp";
-}
+    csString GetTempDirectory ()
+    {
+      return "/tmp";
+    }
+  
+    csString GetTempFilename (const char* /*path*/)
+    {
+      char filename[64];
+  
+      // Fallback
+      cs_snprintf (filename, 64, "cs%x.tmp", getpid ());
+  
+      return filename;
+    }
 
-csString GetTempFilename (const char* /*path*/)
-{
-  char filename[64];
-
-  // Fallback
-  cs_snprintf (filename, 64, "cs%x.tmp", getpid ());
-
-  return filename;
-}
-
-}
+  }
 }

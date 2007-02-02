@@ -46,6 +46,7 @@
 #include "importkit_glue.h"
 
 #include <ctype.h>
+#include <process.h>
 
 namespace CS
 {
@@ -66,8 +67,7 @@ namespace CS
     const char* Glue::GetTempName()
     {
       static int n = 0;
-      (*GetTempScratch()) = CS::Platform::GetTempFilename ();
-      GetTempScratch()->AppendFmt ("_%d", n++);
+      GetTempScratch()->Format ("%x_%d", _getpid (), n++);
       return GetTempScratch()->GetData();
     }
 

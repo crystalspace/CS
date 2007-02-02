@@ -164,42 +164,42 @@ csString csInstallationPathsHelper::GetAppFilename (const char* basename)
 
 namespace CS
 {
-namespace Platform
-{
-
-csString GetTempDirectory ()
-{
-  char tmpDir[MAX_PATH*2];
-  ::GetTempPath (MAX_PATH*2-1, tmpDir);
-  tmpDir[MAX_PATH*2-1] = '\0';
-
-  return tmpDir;
-}
-
-csString GetTempFilename (const char* path)
-{
-  char filename[MAX_PATH];
-
-  if (::GetTempFileName (path ? path : ".", "CS", 0, filename) > 0)
+  namespace Platform
   {
-    filename[MAX_PATH-1] = '\0';
-    csString result (filename);
 
-    size_t pos = result.FindLast (CS_PATH_SEPARATOR);
-    if (pos != (size_t)-1 && pos < result.Length () - 2)
+    csString GetTempDirectory ()
     {
-      result = result.Slice (pos+1);
+      char tmpDir[MAX_PATH*2];
+      ::GetTempPath (MAX_PATH*2-1, tmpDir);
+      tmpDir[MAX_PATH*2-1] = '\0';
+    
+      return tmpDir;
+    }
+    
+    csString GetTempFilename (const char* path)
+    {
+      char filename[MAX_PATH];
+    
+      if (::GetTempFileName (path ? path : ".", "CS", 0, filename) > 0)
+      {
+	filename[MAX_PATH-1] = '\0';
+	csString result (filename);
+    
+	size_t pos = result.FindLast (CS_PATH_SEPARATOR);
+	if (pos != (size_t)-1 && pos < result.Length () - 2)
+	{
+	  result = result.Slice (pos+1);
+	}
+    
+    
+	return result;
+      }
+    
+      // Fallback
+      cs_snprintf (filename, MAX_PATH, "cs%x.tmp", _getpid ());
+    
+      return filename;
     }
 
-
-    return result;
   }
-
-  // Fallback
-  cs_snprintf (filename, MAX_PATH, "cs%x.tmp", _getpid ());
-
-  return filename;
-}
-
-}
 }

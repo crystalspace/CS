@@ -23,11 +23,12 @@
 
 #include "csutil/archive.h"
 #include "csutil/csendian.h"
+#include "csutil/csstring.h"
 #include "csutil/set.h"
 #include "csutil/snprintf.h"
 #include "csutil/sysfunc.h"
+#include "csutil/syspath.h"
 #include "csutil/util.h"
-#include "csutil/csstring.h"
 #include "iutil/vfs.h"	// For csFileTime
 
 // Default compression method to use when adding entries (there is no choice for now)

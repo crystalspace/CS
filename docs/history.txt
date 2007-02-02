@@ -21,6 +21,11 @@ chronological order.
 	  is internally used by the CS build test macros as a separator.
 	  Worked around by not using the CS build macros but the relevant AC_
 	  macros directly.)
+	- res fixed a couple of warnings and errors after the temp file name
+	  stuff change. Also removed an (actually inappropriate) use of
+	  GetTempFilename in importkit_glue.cpp.
+	- res slightly changed CS_TEMP_DIR and CS_TEMP_FILE to emit a warning
+	  when employed.
 1-Feb-2007
 	- Marten fixed compilation of CS::DataBuffer on gcc.
 	- Marten made sure genmesh doesn't return any rendermeshes when
