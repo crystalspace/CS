@@ -126,6 +126,8 @@ private:
   iLight* FetchNext ();
 };
 
+#include "csutil/win32/msvc_deprecated_warn_off.h"
+
 /**
  * List of collections for the engine. This class implements iCollectionList.
  */
@@ -151,6 +153,8 @@ public:
 private:
   csRefArrayObject<iCollection> collections;
 };
+
+#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 struct csSectorPos
 {
@@ -202,6 +206,8 @@ public:
   virtual void FreeMesh (iMeshWrapper*);
 };
 
+
+#include "csutil/win32/msvc_deprecated_warn_off.h"
 
 /**
  * The 3D engine.
@@ -997,5 +1003,7 @@ private:
   csEventID CanvasClose;
   csRef<iEventHandler> weakEventHandler;
 };
+
+#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 #endif // __CS_ENGINE_H__

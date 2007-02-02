@@ -409,9 +409,9 @@ const char* cswinMinidumpWriter::WriteWrappedMinidump (
 
     if (object_reg)  
     {
-      csRef<iVFS> vfs = CS_QUERY_REGISTRY (object_reg, iVFS);
-      csRef<iStandardReporterListener> stdrep = CS_QUERY_REGISTRY (object_reg,
-	iStandardReporterListener);
+      csRef<iVFS> vfs = csQueryRegistry<iVFS> (object_reg);
+      csRef<iStandardReporterListener> stdrep = 
+	csQueryRegistry<iStandardReporterListener> (object_reg);
       if (vfs && stdrep)
       {
 	csRef<iDataBuffer> realConPath = 

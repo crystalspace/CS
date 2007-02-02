@@ -194,7 +194,7 @@ csPVSVis::~csPVSVis ()
 {
   if (scfiEventHandler)
   {
-    csRef<iEventQueue> q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+    csRef<iEventQueue> q = csQueryRegistry<iEventQueue> (object_reg);
     if (q)
       q->RemoveListener (scfiEventHandler);
     scfiEventHandler->DecRef ();
@@ -220,7 +220,7 @@ bool csPVSVis::HandleEvent (iEvent& ev)
 {
   if (ev.Name == CanvasResize)
   {
-    csRef<iGraphics3D> g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+    csRef<iGraphics3D> g3d = csQueryRegistry<iGraphics3D> (object_reg);
     scr_width = g3d->GetWidth ();
     scr_height = g3d->GetHeight ();
   }
@@ -233,7 +233,7 @@ bool csPVSVis::Initialize (iObjectRegistry *object_reg)
 
   delete kdtree;
 
-  csRef<iGraphics3D> g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+  csRef<iGraphics3D> g3d = csQueryRegistry<iGraphics3D> (object_reg);
   if (g3d)
   {
     scr_width = g3d->GetWidth ();
@@ -255,7 +255,7 @@ bool csPVSVis::Initialize (iObjectRegistry *object_reg)
   if (g2d)
   {
     CanvasResize = csevCanvasResize(object_reg, g2d);
-    csRef<iEventQueue> q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+    csRef<iEventQueue> q = csQueryRegistry<iEventQueue> (object_reg);
     if (q)
       q->RegisterListener (scfiEventHandler, CanvasResize);
   }

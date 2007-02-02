@@ -38,14 +38,16 @@ namespace CS
   template<typename T>
   struct TriangleT
   {
-    /// Triangle vertices or edges.
 #if !defined(__STRICT_ANSI__) && !defined(SWIG)
     union
     {
       struct 
       {
 #endif
+        //@{
+        /// Triangle vertices or edges.
         T a, b, c;
+        //@}
 #if !defined(__STRICT_ANSI__) && !defined(SWIG)
       };
       /// All components

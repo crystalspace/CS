@@ -62,12 +62,12 @@ public:
   virtual void AppendShadows (iMovable* movable, iShadowBlockList* shadows,
   	const csVector3& origin)
   {
-    const csRefArray<iSceneNode>& c = static_lod_mesh->QuerySceneNode ()
-    	->GetChildren ();
-    size_t i = c.Length ();
+    const csRef<iSceneNodeArray> c = static_lod_mesh->QuerySceneNode ()
+      ->GetChildrenArray ();
+    size_t i = c->GetSize ();
     while (i-- > 0)
     {
-      iMeshWrapper* child = c[i]->QueryMesh ();
+      iMeshWrapper* child = c->Get (i)->QueryMesh ();
       if (child && child->GetShadowCaster ())
       {
         child->GetShadowCaster ()->AppendShadows (movable, shadows, origin);
@@ -99,13 +99,13 @@ public:
 
   virtual void CastShadows (iMovable* movable, iFrustumView* fview)
   {
-    const csRefArray<iSceneNode>& c = static_lod_mesh->QuerySceneNode ()
-    	->GetChildren ();
-    size_t cnt = c.Length ();
+    const csRef<iSceneNodeArray> c = static_lod_mesh->QuerySceneNode ()
+      ->GetChildrenArray ();
+    size_t cnt = c->GetSize ();
     size_t i;
     for (i = 0 ; i < cnt ; i++)
     {
-      iMeshWrapper* child = c[i]->QueryMesh ();
+      iMeshWrapper* child = c->Get (i)->QueryMesh ();
       if (child && child->GetShadowReceiver ())
         child->GetShadowReceiver ()->CastShadows (movable, fview);
     }
@@ -207,7 +207,7 @@ iShadowCaster* csMeshWrapper::GetShadowCaster ()
 
     if (!meshobj) return 0;
     shadow_caster_valid = true;
-    shadow_caster = SCF_QUERY_INTERFACE (meshobj, iShadowCaster);
+    shadow_caster = scfQueryInterface<iShadowCaster> (meshobj);
   }
   return shadow_caster;
 }
@@ -266,8 +266,8 @@ void csMeshWrapper::SetMeshObject (iMeshObject *meshobj)
 
   if (meshobj)
   {
-    light_info = SCF_QUERY_INTERFACE (meshobj, iLightingInfo);
-    portal_container = SCF_QUERY_INTERFACE (meshobj, iPortalContainer);
+    light_info = scfQueryInterface<iLightingInfo> (meshobj);
+    portal_container = scfQueryInterface<iPortalContainer> (meshobj);
     AddToSectorPortalLists ();
   }
   else
@@ -1499,7 +1499,7 @@ csMeshList::~csMeshList ()
 void csMeshList::NameChanged (iObject* object, const char* oldname,
   	const char* newname)
 {
-  csRef<iMeshWrapper> mesh = SCF_QUERY_INTERFACE (object, iMeshWrapper);
+  csRef<iMeshWrapper> mesh = scfQueryInterface<iMeshWrapper> (object);
   CS_ASSERT (mesh != 0);
   if (oldname) meshes_hash.Delete (oldname, mesh);
   if (newname) meshes_hash.Put (newname, mesh);
@@ -1661,8 +1661,8 @@ csMeshFactoryList::~csMeshFactoryList ()
 void csMeshFactoryList::NameChanged (iObject* object, const char* oldname,
   	const char* newname)
 {
-  csRef<iMeshFactoryWrapper> mesh = SCF_QUERY_INTERFACE (object,
-    iMeshFactoryWrapper);
+  csRef<iMeshFactoryWrapper> mesh = 
+    scfQueryInterface<iMeshFactoryWrapper> (object);
   CS_ASSERT (mesh != 0);
   if (oldname) factories_hash.Delete (oldname, mesh);
   if (newname) factories_hash.Put (newname, mesh);

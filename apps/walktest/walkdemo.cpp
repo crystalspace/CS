@@ -384,7 +384,7 @@ void WalkTest::add_bot (float size, iSector* where, csVector3 const& pos,
   botWrapper->GetMovable ()->SetTransform (m);
   
   botWrapper->GetMovable ()->UpdateMove ();
-  csRef<iSprite3DState> state (SCF_QUERY_INTERFACE (botmesh, iSprite3DState));
+  csRef<iSprite3DState> state (scfQueryInterface<iSprite3DState> (botmesh));
   state->SetAction ("default");
   
   Bot* bot = new Bot (Sys->view->GetEngine(), botWrapper);
@@ -600,8 +600,8 @@ bool HandleDynLight (iLight* dyn, iEngine* engine)
 
 void show_lightning ()
 {
-  csRef<iEngineSequenceManager> seqmgr(CS_QUERY_REGISTRY (Sys->object_reg,
-  	iEngineSequenceManager));
+  csRef<iEngineSequenceManager> seqmgr(
+  	csQueryRegistry<iEngineSequenceManager> (Sys->object_reg));
   if (seqmgr)
   {
     // This finds the light L1 (the colored light over the stairs) and
@@ -873,8 +873,8 @@ static csPtr<iMeshWrapper> CreatePortalThing (const char* name, iSector* room,
   thing_fact_state->SetPolygonMaterial (CS_POLYRANGE_ALL, tm);
   thing_fact_state->SetPolygonFlags (CS_POLYRANGE_ALL, CS_POLY_COLLDET);
 
-  csRef<iLightingInfo> linfo (SCF_QUERY_INTERFACE (thing->GetMeshObject (),
-    iLightingInfo));
+  csRef<iLightingInfo> linfo (
+    scfQueryInterface<iLightingInfo> (thing->GetMeshObject ()));
   linfo->InitializeDefault (true);
   room->ShineLights (thing);
   linfo->PrepareLighting ();

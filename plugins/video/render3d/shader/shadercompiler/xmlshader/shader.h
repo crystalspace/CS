@@ -22,6 +22,7 @@
 
 #include "iutil/selfdestruct.h"
 #include "ivideo/shader/shader.h"
+#include "imap/ldrctxt.h"
 
 #include "csutil/bitarray.h"
 #include "csutil/csobject.h"
@@ -133,6 +134,9 @@ class csXMLShader : public scfImplementationExt2<csXMLShader,
   int forcepriority;
   csHash<csRef<iDocumentNode>, csString> programSources;
 
+  // We need a reference to the loader context for delayed loading.
+  csRef<iLoaderContext> ldr_context;
+
   // struct to hold all techniques, until we decide which to use
   struct TechniqueKeeper
   {
@@ -185,7 +189,7 @@ class csXMLShader : public scfImplementationExt2<csXMLShader,
   bool useFallbackContext;
 
   csShaderVariableContext globalSVContext;
-  void ParseGlobalSVs (iDocumentNode* node);
+  void ParseGlobalSVs (iLoaderContext* ldr_context, iDocumentNode* node);
 
   csShaderVariableContext& GetUsedSVContext ()
   {
@@ -198,8 +202,9 @@ class csXMLShader : public scfImplementationExt2<csXMLShader,
 public:
   CS_LEAKGUARD_DECLARE (csXMLShader);
 
-  csXMLShader (csXMLShaderCompiler* compiler, iDocumentNode* source,
-    int forcepriority);
+  csXMLShader (csXMLShaderCompiler* compiler,
+      iLoaderContext* ldr_context, iDocumentNode* source,
+      int forcepriority);
   virtual ~csXMLShader();
 
   virtual iObject* QueryObject () 
@@ -214,7 +219,7 @@ public:
   { this->filename = csStrNew(filename); }
 
   virtual size_t GetTicket (const csRenderMeshModes& modes,
-    const iShaderVarStack* stacks);
+      const iShaderVarStack* stacks);
 
   /// Get number of passes this shader have
   virtual size_t GetNumberOfPasses (size_t ticket)

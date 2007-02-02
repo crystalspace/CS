@@ -590,7 +590,7 @@ void csPortal::CheckFrustum (iFrustumView *lview,
     copied_frustums = true;
 
     iFrustumViewUserdata *ud = lview->GetUserdata ();
-    if (ud) linfo = SCF_QUERY_INTERFACE (ud, iLightingProcessInfo);
+    if (ud) linfo = scfQueryInterface<iLightingProcessInfo> (ud);
     if (linfo)
     {
       if (alpha)

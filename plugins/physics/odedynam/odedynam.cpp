@@ -185,7 +185,7 @@ csODEDynamics::~csODEDynamics ()
 {
   if (scfiEventHandler)
   {
-    csRef<iEventQueue> q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+    csRef<iEventQueue> q = csQueryRegistry<iEventQueue> (object_reg);
     if (q)
       q->RemoveListener (scfiEventHandler);
   }
@@ -198,7 +198,7 @@ bool csODEDynamics::Initialize (iObjectRegistry* object_reg)
 {
   csODEDynamics::object_reg = object_reg;
 
-  clock = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
+  clock = csQueryRegistry<iVirtualClock> (object_reg);
   if (!clock)
     return false;
 
@@ -210,7 +210,7 @@ bool csODEDynamics::Initialize (iObjectRegistry* object_reg)
 csPtr<iDynamicSystem> csODEDynamics::CreateSystem ()
 {
   csODEDynamicSystem* system = new csODEDynamicSystem (erp, cfm);
-  csRef<iDynamicSystem> isystem (SCF_QUERY_INTERFACE (system, iDynamicSystem));
+  csRef<iDynamicSystem> isystem (scfQueryInterface<iDynamicSystem> (system));
   systems.Push (isystem);
   isystem->DecRef ();
   if(stepfast) system->EnableStepFast(true);
@@ -401,8 +401,8 @@ void csODEDynamics::SetGlobalERP (float erp)
 
   for (size_t i = 0; i < systems.Length(); i ++)
   {
-    csRef<iODEDynamicSystemState> sys = SCF_QUERY_INTERFACE (systems[i],
-      iODEDynamicSystemState);
+    csRef<iODEDynamicSystemState> sys = 
+      scfQueryInterface<iODEDynamicSystemState> (systems[i]);
     sys->SetERP (erp);
   }
 }
@@ -412,8 +412,8 @@ void csODEDynamics::SetGlobalCFM (float cfm)
   csODEDynamics::cfm = cfm;
   for (size_t i = 0; i < systems.Length(); i ++)
   {
-    csRef<iODEDynamicSystemState> sys = SCF_QUERY_INTERFACE (systems[i],
-      iODEDynamicSystemState);
+    csRef<iODEDynamicSystemState> sys = 
+      scfQueryInterface<iODEDynamicSystemState> (systems[i]);
     sys->SetCFM (cfm);
   }
 }
@@ -425,8 +425,8 @@ void csODEDynamics::EnableStepFast (bool enable)
 
   for (size_t i = 0; i < systems.Length(); i ++)
   {
-    csRef<iODEDynamicSystemState> sys = SCF_QUERY_INTERFACE (systems[i],
-      iODEDynamicSystemState);
+    csRef<iODEDynamicSystemState> sys = 
+      scfQueryInterface<iODEDynamicSystemState> (systems[i]);
     sys->EnableStepFast (enable);
   }
 }
@@ -437,8 +437,8 @@ void csODEDynamics::SetStepFastIterations (int iter)
 
   for (size_t i = 0; i < systems.Length(); i ++)
   {
-    csRef<iODEDynamicSystemState> sys = SCF_QUERY_INTERFACE (systems[i],
-      iODEDynamicSystemState);
+    csRef<iODEDynamicSystemState> sys = 
+      scfQueryInterface<iODEDynamicSystemState> (systems[i]);
     sys->SetStepFastIterations (iter);
   }
 }
@@ -450,8 +450,8 @@ void csODEDynamics::EnableQuickStep (bool enable)
 
   for (size_t i = 0; i < systems.Length(); i ++)
   {
-    csRef<iODEDynamicSystemState> sys = SCF_QUERY_INTERFACE (systems[i],
-      iODEDynamicSystemState);
+    csRef<iODEDynamicSystemState> sys = 
+      scfQueryInterface<iODEDynamicSystemState> (systems[i]);
     sys->EnableQuickStep (enable);
   }
 }
@@ -462,8 +462,8 @@ void csODEDynamics::SetQuickStepIterations (int iter)
 
   for (size_t i = 0; i < systems.Length(); i ++)
   {
-    csRef<iODEDynamicSystemState> sys = SCF_QUERY_INTERFACE (systems[i],
-      iODEDynamicSystemState);
+    csRef<iODEDynamicSystemState> sys = 
+      scfQueryInterface<iODEDynamicSystemState> (systems[i]);
     sys->SetQuickStepIterations (iter);
   }
 }
@@ -476,7 +476,7 @@ void csODEDynamics::EnableEventProcessing (bool enable)
 
     if (!scfiEventHandler)
       scfiEventHandler = csPtr<EventHandler> (new EventHandler (this));
-    csRef<iEventQueue> q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+    csRef<iEventQueue> q = csQueryRegistry<iEventQueue> (object_reg);
     if (q)
       q->RegisterListener (scfiEventHandler, PreProcess);
   }
@@ -486,7 +486,7 @@ void csODEDynamics::EnableEventProcessing (bool enable)
 
     if (scfiEventHandler)
     {
-      csRef<iEventQueue> q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+      csRef<iEventQueue> q = csQueryRegistry<iEventQueue> (object_reg);
       if (q)
         q->RemoveListener (scfiEventHandler);
       scfiEventHandler = 0;

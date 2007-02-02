@@ -28,6 +28,7 @@ namespace lighter
 {
   class Object;
   struct ObjectVertexData;
+  struct ElementProxy;
 
   /**
   * Primitive in the radiosity world.
@@ -88,7 +89,28 @@ namespace lighter
     /// Classify with respect to another plane
     int Classify (const csPlane3 &plane) const;
 
+    /// Compute the two barycentric coordinates given a point
+    void ComputeBaryCoords (const csVector3& v, float& lambda, float& my) const;
+
+    /// Compute if point is inside primitive or not
     bool PointInside (const csVector3& pt) const;
+
+    /// Given a point, compute the element index
+    size_t ComputeElementIndex (const csVector3& pt) const;
+
+    /// Given an element index, compute center point
+    csVector3 ComputeElementCenter (size_t index) const;
+
+    /// Get an element proxy given element index
+    ElementProxy GetElement (size_t index);
+
+    /// Get an element proxy given point
+    ElementProxy GetElement (const csVector3& pt);
+
+    size_t GetElementCount () const
+    {
+      return elementAreas.GetSize ();
+    }
 
     inline TriangleType& GetTriangle () { return triangle; }
     inline const TriangleType& GetTriangle () const { return triangle; }
@@ -121,7 +143,7 @@ namespace lighter
     inline uint GetGlobalLightmapID () const { return globalLightmapID; }
     inline void SetGlobalLightmapID (uint id) { globalLightmapID = id; }
 
-    void ComputeBaryCoords (const csVector3& v, float& lambda, float& my) const;
+    
   protected:
     /// Vertex data holder
     ObjectVertexData& vertexData;
@@ -176,6 +198,22 @@ namespace lighter
   typedef csArray<Primitive> PrimitiveArray;
   typedef csArray<Primitive*> PrimitivePtrArray;
   typedef csSet<Primitive*> PrimitivePtrSet;
+
+
+  /// Small helper that acts as a reference to a single element (pixel)
+  struct ElementProxy
+  {
+    ElementProxy (Primitive& p, size_t e)
+      : primitive (p), element (e)
+    {
+    }
+
+    /// Primitive we are a part of
+    Primitive& primitive;
+
+    /// Primitive index
+    size_t element;
+  };
 }
 
 template<>

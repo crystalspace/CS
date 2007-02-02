@@ -117,8 +117,8 @@ namespace aws2
 
   bool defFile::Parse (const scfString &txt, JSObject *sc)
   {
-    /*csRef<iPluginManager> plugin_mgr =  CS_QUERY_REGISTRY (object_reg, 
-    iPluginManager);	
+    /*csRef<iPluginManager> plugin_mgr =   
+    csQueryRegistry<iPluginManager> (object_reg);	
     csRef<iDocumentSystem> inputDS = csPtr<iDocumentSystem> (
     CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.documentsystem.xmltiny", 
     iDocumentSystem));*/

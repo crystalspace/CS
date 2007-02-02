@@ -96,7 +96,7 @@ public:
   OpSetFog (iParameterESM* sectorpar, const csColor& color, float density)
   {
     if (sectorpar->IsConstant ())
-      sector = SCF_QUERY_INTERFACE (sectorpar->GetValue (), iSector);
+      sector = scfQueryInterface<iSector> (sectorpar->GetValue ());
     else
       OpSetFog::sectorpar = sectorpar;
     OpSetFog::color = color;
@@ -106,7 +106,7 @@ public:
   virtual void Do (csTicks /*dt*/, iBase* params)
   {
     if (sectorpar)
-      sector = SCF_QUERY_INTERFACE (sectorpar->GetValue (params), iSector);
+      sector = scfQueryInterface<iSector> (sectorpar->GetValue (params));
     if (density < 0.001)
       sector->DisableFog ();
     else
@@ -166,7 +166,7 @@ public:
     eseqmgr (eseqmgr), sequence_id (sequence_id)
   {
     if (sectorpar->IsConstant ())
-      sector = SCF_QUERY_INTERFACE (sectorpar->GetValue (), iSector);
+      sector = scfQueryInterface<iSector> (sectorpar->GetValue ());
     else
       OpFadeFog::sectorpar = sectorpar;
   }
@@ -174,7 +174,7 @@ public:
   virtual void Do (csTicks dt, iBase* params)
   {
     if (sectorpar)
-      sector = SCF_QUERY_INTERFACE (sectorpar->GetValue (params), iSector);
+      sector = scfQueryInterface<iSector> (sectorpar->GetValue (params));
     const csFog& fog = sector->GetFog ();
 
     FadeFogInfo* fi = new FadeFogInfo ();
@@ -313,20 +313,20 @@ public:
     if (meshpar)
     {
       if (meshpar->IsConstant ())
-        mesh = SCF_QUERY_INTERFACE (meshpar->GetValue (), iMeshWrapper);
+        mesh = scfQueryInterface<iMeshWrapper> (meshpar->GetValue ());
       else
         OpSetMaterial::meshpar = meshpar;
     }
     if (polygonpar)
     {
       if (polygonpar->IsConstant ())
-        polygon = SCF_QUERY_INTERFACE (polygonpar->GetValue (), iPolygonHandle);
+        polygon = scfQueryInterface<iPolygonHandle> (polygonpar->GetValue ());
       else
         OpSetMaterial::polygonpar = polygonpar;
     }
     if (materialpar->IsConstant ())
-      material = SCF_QUERY_INTERFACE (
-      	materialpar->GetValue (), iMaterialWrapper);
+      material = scfQueryInterface<iMaterialWrapper> (
+      	materialpar->GetValue ());
     else
       OpSetMaterial::materialpar = materialpar;
   }
@@ -334,13 +334,13 @@ public:
   virtual void Do (csTicks /*dt*/, iBase* params)
   {
     if (materialpar)
-      material = SCF_QUERY_INTERFACE (
-      	materialpar->GetValue (params), iMaterialWrapper);
+      material = scfQueryInterface<iMaterialWrapper> (
+      	materialpar->GetValue (params));
     if (polygon || polygonpar)
     {
       if (polygonpar)
-        polygon = SCF_QUERY_INTERFACE (polygonpar->GetValue (params),
-		iPolygonHandle);
+        polygon = 
+		scfQueryInterface<iPolygonHandle> (polygonpar->GetValue (params));
       int poly_idx = polygon->GetIndex ();
       iThingFactoryState* tfs = polygon->GetThingFactoryState ();
       if (tfs)
@@ -353,7 +353,7 @@ public:
     else
     {
       if (meshpar)
-        mesh = SCF_QUERY_INTERFACE (meshpar->GetValue (params), iMeshWrapper);
+        mesh = scfQueryInterface<iMeshWrapper> (meshpar->GetValue (params));
       mesh->GetMeshObject ()->SetMaterialWrapper (material);
       if (meshpar)
         mesh = 0;
@@ -379,7 +379,7 @@ public:
   OpSetLight (iParameterESM* lightpar, const csColor& color)
   {
     if (lightpar->IsConstant ())
-      light = SCF_QUERY_INTERFACE (lightpar->GetValue (), iLight);
+      light = scfQueryInterface<iLight> (lightpar->GetValue ());
     else
       OpSetLight::lightpar = lightpar;
     OpSetLight::color = color;
@@ -388,7 +388,7 @@ public:
   virtual void Do (csTicks /*dt*/, iBase* params)
   {
     if (lightpar)
-      light = SCF_QUERY_INTERFACE (lightpar->GetValue (params), iLight);
+      light = scfQueryInterface<iLight> (lightpar->GetValue (params));
     light->SetColor (color);
     if (lightpar)
       light = 0;
@@ -438,7 +438,7 @@ public:
     sequence_id (sequence_id)
   {
     if (lightpar->IsConstant ())
-      light = SCF_QUERY_INTERFACE (lightpar->GetValue (), iLight);
+      light = scfQueryInterface<iLight> (lightpar->GetValue ());
     else
       OpFadeLight::lightpar = lightpar;
   }
@@ -446,7 +446,7 @@ public:
   virtual void Do (csTicks dt, iBase* params)
   {
     if (lightpar)
-      light = SCF_QUERY_INTERFACE (lightpar->GetValue (params), iLight);
+      light = scfQueryInterface<iLight> (lightpar->GetValue (params));
     FadeLightInfo* fl = new FadeLightInfo ();
     fl->light = light;
     fl->start_col = light->GetColor ();
@@ -476,7 +476,7 @@ public:
   OpSetAmbientLight (iParameterESM* sectorpar, const csColor& color,
 		     iSharedVariable *varcolor)
   {
-    sector = SCF_QUERY_INTERFACE (sectorpar->GetValue (), iSector);
+    sector = scfQueryInterface<iSector> (sectorpar->GetValue ());
     if (varcolor)
       colorvar = varcolor;
     else
@@ -533,7 +533,7 @@ public:
     end_col (color), duration (duration), eseqmgr (eseqmgr),
     sequence_id (sequence_id)
   {
-    sector = SCF_QUERY_INTERFACE (sectorpar->GetValue (), iSector);
+    sector = scfQueryInterface<iSector> (sectorpar->GetValue ());
   }
 
   virtual void Do (csTicks dt, iBase* /*params*/)
@@ -563,7 +563,7 @@ public:
   OpSetMeshColor (iParameterESM* meshpar, const csColor& color)
   {
     if (meshpar->IsConstant ())
-      mesh = SCF_QUERY_INTERFACE (meshpar->GetValue (), iMeshWrapper);
+      mesh = scfQueryInterface<iMeshWrapper> (meshpar->GetValue ());
     else
       OpSetMeshColor::meshpar = meshpar;
     OpSetMeshColor::color = color;
@@ -572,7 +572,7 @@ public:
   virtual void Do (csTicks /*dt*/, iBase* params)
   {
     if (meshpar)
-      mesh = SCF_QUERY_INTERFACE (meshpar->GetValue (params), iMeshWrapper);
+      mesh = scfQueryInterface<iMeshWrapper> (meshpar->GetValue (params));
     mesh->GetMeshObject ()->SetColor (color);
     if (meshpar)
       mesh = 0;
@@ -623,7 +623,7 @@ public:
     sequence_id (sequence_id)
   {
     if (meshpar->IsConstant ())
-      mesh = SCF_QUERY_INTERFACE (meshpar->GetValue (), iMeshWrapper);
+      mesh = scfQueryInterface<iMeshWrapper> (meshpar->GetValue ());
     else
       OpFadeMeshColor::meshpar = meshpar;
   }
@@ -631,7 +631,7 @@ public:
   virtual void Do (csTicks dt, iBase* params)
   {
     if (meshpar)
-      mesh = SCF_QUERY_INTERFACE (meshpar->GetValue (params), iMeshWrapper);
+      mesh = scfQueryInterface<iMeshWrapper> (meshpar->GetValue (params));
     FadeMeshColorInfo* fm = new FadeMeshColorInfo ();
     fm->mesh = mesh;
     mesh->GetMeshObject ()->GetColor (fm->start_col);
@@ -744,9 +744,9 @@ public:
   {
     if (meshpar->IsConstant ())
     {
-      mesh = SCF_QUERY_INTERFACE (meshpar->GetValue (), iMeshWrapper);
+      mesh = scfQueryInterface<iMeshWrapper> (meshpar->GetValue ());
       if (!mesh)
-        light = SCF_QUERY_INTERFACE (meshpar->GetValue (), iLight);
+        light = scfQueryInterface<iLight> (meshpar->GetValue ());
     }
     else
       OpRotate::meshpar = meshpar;
@@ -756,9 +756,9 @@ public:
   {
     if (meshpar)
     {
-      mesh = SCF_QUERY_INTERFACE (meshpar->GetValue (params), iMeshWrapper);
+      mesh = scfQueryInterface<iMeshWrapper> (meshpar->GetValue (params));
       if (!mesh)
-        light = SCF_QUERY_INTERFACE (meshpar->GetValue (), iLight);
+        light = scfQueryInterface<iLight> (meshpar->GetValue ());
     }
     iMovable* movable = NULL;
     if (mesh)
@@ -856,9 +856,9 @@ public:
   {
     if (meshpar->IsConstant ())
     {
-      mesh = SCF_QUERY_INTERFACE (meshpar->GetValue (), iMeshWrapper);
+      mesh = scfQueryInterface<iMeshWrapper> (meshpar->GetValue ());
       if (!mesh)
-        light = SCF_QUERY_INTERFACE (meshpar->GetValue (), iLight);
+        light = scfQueryInterface<iLight> (meshpar->GetValue ());
     }
     else
     {
@@ -870,9 +870,9 @@ public:
   {
     if (meshpar)
     {
-      mesh = SCF_QUERY_INTERFACE (meshpar->GetValue (params), iMeshWrapper);
+      mesh = scfQueryInterface<iMeshWrapper> (meshpar->GetValue (params));
       if (!mesh)
-        light = SCF_QUERY_INTERFACE (meshpar->GetValue (params), iLight);
+        light = scfQueryInterface<iLight> (meshpar->GetValue (params));
     }
     if (mesh)
     {
@@ -950,7 +950,7 @@ public:
   OpTriggerState (iParameterESM* triggerpar, bool en)
   {
     if (triggerpar->IsConstant ())
-      trigger = SCF_QUERY_INTERFACE (triggerpar->GetValue (), iSequenceTrigger);
+      trigger = scfQueryInterface<iSequenceTrigger> (triggerpar->GetValue ());
     else
       OpTriggerState::triggerpar = triggerpar;
     OpTriggerState::en = en;
@@ -959,8 +959,8 @@ public:
   virtual void Do (csTicks /*dt*/, iBase* params)
   {
     if (triggerpar)
-      trigger = SCF_QUERY_INTERFACE (
-      	triggerpar->GetValue (params), iSequenceTrigger);
+      trigger = scfQueryInterface<iSequenceTrigger> (
+      	triggerpar->GetValue (params));
     if (!trigger) return;
     trigger->SetEnabled (en);
     if (triggerpar)
@@ -984,7 +984,7 @@ public:
   OpCheckTrigger (iParameterESM* triggerpar, csTicks delay)
   {
     if (triggerpar->IsConstant ())
-      trigger = SCF_QUERY_INTERFACE (triggerpar->GetValue (), iSequenceTrigger);
+      trigger = scfQueryInterface<iSequenceTrigger> (triggerpar->GetValue ());
     else
       OpCheckTrigger::triggerpar = triggerpar;
     OpCheckTrigger::delay = delay;
@@ -993,8 +993,8 @@ public:
   virtual void Do (csTicks /*dt*/, iBase* params)
   {
     if (triggerpar)
-      trigger = SCF_QUERY_INTERFACE (
-      	triggerpar->GetValue (params), iSequenceTrigger);
+      trigger = scfQueryInterface<iSequenceTrigger> (
+        triggerpar->GetValue (params));
     if (!trigger) return;
     trigger->TestConditions (delay);
     if (triggerpar)
@@ -1017,7 +1017,7 @@ public:
   CondTestTrigger (iParameterESM* triggerpar)
   {
     if (triggerpar->IsConstant ())
-      trigger = SCF_QUERY_INTERFACE (triggerpar->GetValue (), iSequenceTrigger);
+      trigger = scfQueryInterface<iSequenceTrigger> (triggerpar->GetValue ());
     else
       CondTestTrigger::triggerpar = triggerpar;
   }
@@ -1025,8 +1025,8 @@ public:
   virtual bool Condition (csTicks /*dt*/, iBase* params)
   {
     if (triggerpar)
-      trigger = SCF_QUERY_INTERFACE (
-      	triggerpar->GetValue (params), iSequenceTrigger);
+      trigger = scfQueryInterface<iSequenceTrigger> (
+        triggerpar->GetValue (params));
     if (!trigger) return false;
     bool rc = trigger->CheckState ();
     if (triggerpar)
@@ -1391,7 +1391,7 @@ public:
 
   virtual void Traverse (iSector* /*sector*/, iBase* context)
   {
-    csRef<iRenderView> rview (SCF_QUERY_INTERFACE (context, iRenderView));
+    csRef<iRenderView> rview (scfQueryInterface<iRenderView> (context));
     if (rview)
     {
       uint32 global_framenr = trigger->GetEngineSequenceManager ()
@@ -1778,7 +1778,7 @@ csEngineSequenceManager::~csEngineSequenceManager ()
 {
   if (eventHandler.IsValid())
   {
-    csRef<iEventQueue> q (CS_QUERY_REGISTRY(object_reg, iEventQueue));
+    csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (object_reg));
     if (q != 0)
       q->RemoveListener (eventHandler);
   }
@@ -1790,15 +1790,15 @@ bool csEngineSequenceManager::Initialize (iObjectRegistry *r)
   eventHandler.AttachNew (new EventHandler (this));
   PostProcess = csevPostProcess (object_reg);
   MouseEvent = csevMouseEvent (object_reg);
-  csRef<iEventQueue> q (CS_QUERY_REGISTRY(object_reg, iEventQueue));
+  csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (object_reg));
   if (q != 0)
   {
     csEventID events[3] = { PostProcess, MouseEvent, CS_EVENTLIST_END };
     q->RegisterListener (eventHandler, events);
   }
 
-  csRef<iPluginManager> plugin_mgr (CS_QUERY_REGISTRY (object_reg,
-  	iPluginManager));
+  csRef<iPluginManager> plugin_mgr (
+  	csQueryRegistry<iPluginManager> (object_reg));
   seqmgr = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.utilities.sequence",
   	iSequenceManager);
   if (!seqmgr)

@@ -30,6 +30,7 @@
 #include "statistics.h"
 #include "tui.h"
 #include "directlight.h"
+#include "sampler.h"
 
 CS_IMPLEMENT_APPLICATION
 

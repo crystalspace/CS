@@ -71,7 +71,7 @@ csGenericRSLoader::csGenericRSLoader (iBase* p) :
 
 csPtr<iBase> csGenericRSLoader::Parse (iDocumentNode* node, 
 				       iStreamSource*,
-				       iLoaderContext* /*ldr_context*/, 
+				       iLoaderContext* ldr_context,
 				       iBase* /*context*/)
 {
   csRef<iGenericRenderStep> step;
@@ -106,7 +106,8 @@ csPtr<iBase> csGenericRSLoader::Parse (iDocumentNode* node,
 	break;
       case XMLTOKEN_DEFAULTSHADER:
 	{
-	  csRef<iShader> defshader = synldr->ParseShaderRef (child);
+	  csRef<iShader> defshader = synldr->ParseShaderRef (ldr_context,
+	      child);
 	  step->SetDefaultShader (defshader);
 	}
 	break;
@@ -162,9 +163,9 @@ csGenericRenderStep::csGenericRenderStep (
 {
   objreg = object_reg;
 
-  strings = CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg, 
-    "crystalspace.shared.stringset", iStringSet);
-  shaderManager = CS_QUERY_REGISTRY (object_reg, iShaderManager);
+  strings = csQueryRegistryTagInterface<iStringSet> 
+    (object_reg, "crystalspace.shared.stringset");
+  shaderManager = csQueryRegistry<iShaderManager> (object_reg);
 
   shadertype = 0;
   zOffset = false;
@@ -226,7 +227,7 @@ void csGenericRenderStep::RenderMeshes (iRenderView* rview, iGraphics3D* g3d,
   ToggleStepSettings (g3d, true);
   if (!shaderManager)
   {
-    shaderManager = CS_QUERY_REGISTRY (objreg, iShaderManager);
+    shaderManager = csQueryRegistry<iShaderManager> (objreg);
   }
   csRef<csShaderVariable> svO2W = 
     shadervars.Top ().GetVariable(string_object2world);

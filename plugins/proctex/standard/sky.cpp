@@ -96,7 +96,7 @@ csPtr<iBase> csPtSkyLoader::Parse (iDocumentNode* /*node*/,
   	object_reg, CLASSID_SKYTYPE);
   if (!type) return 0;
   csRef<iSyntaxService> synldr = 
-    CS_QUERY_REGISTRY (object_reg, iSyntaxService);
+    csQueryRegistry<iSyntaxService> (object_reg);
 
   csRef<iTextureFactory> skyFact = type->NewFactory();
 
@@ -104,7 +104,7 @@ csPtr<iBase> csPtSkyLoader::Parse (iDocumentNode* /*node*/,
   if (context)
   {
     ctx = csPtr<iTextureLoaderContext>
-      (SCF_QUERY_INTERFACE (context, iTextureLoaderContext));
+      (scfQueryInterface<iTextureLoaderContext> (context));
 
     if (ctx)
     {
@@ -118,7 +118,7 @@ csPtr<iBase> csPtSkyLoader::Parse (iDocumentNode* /*node*/,
   }
   csRef<iTextureWrapper> tex = skyFact->Generate();
 
-  csRef<iGraphics3D> G3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+  csRef<iGraphics3D> G3D = csQueryRegistry<iGraphics3D> (object_reg);
   if (!G3D) return 0;
   csRef<iTextureManager> tm = G3D->GetTextureManager();
   if (!tm) return 0;

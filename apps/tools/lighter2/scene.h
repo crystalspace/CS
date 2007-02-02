@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2005 by Marten Svanfeldt
+  Copyright (C) 2005-2006 by Marten Svanfeldt
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -21,13 +21,14 @@
 
 #include "object.h"
 #include "kdtree.h"
+#include "light.h"
 
 namespace lighter
 {
   class KDTree;
 
   // A lightsource
-  class Light : public csRefCount
+  class Light_old : public csRefCount
   {
   public:
     csVector3 position;
@@ -41,7 +42,7 @@ namespace lighter
 
     csBox3 boundingBox;
   };
-  typedef csRefArray<Light> LightRefArray;
+  typedef csRefArray<Light_old> LightOldRefArray;
 
   class Scene;
 
@@ -64,7 +65,10 @@ namespace lighter
     // All objects in sector
     ObjectHash allObjects;
 
-    // All lightsources
+    // All lightsources (old)
+    LightOldRefArray allLightsOld;
+
+    // All light sources
     LightRefArray allLights;
 
     // KD-tree of all primitives in sector
@@ -111,7 +115,7 @@ namespace lighter
     LightmapPtrDelArray& GetLightmaps () 
     { return lightmaps; }
 
-    Lightmap* GetLightmap (uint lightmapID, Light* light);
+    Lightmap* GetLightmap (uint lightmapID, Light_old* light);
     csArray<LightmapPtrDelArray*> GetAllLightmaps ();
   protected:
     
@@ -122,7 +126,7 @@ namespace lighter
     SectorHash sectors;
 
     LightmapPtrDelArray lightmaps;
-    typedef csHash<LightmapPtrDelArray*, csPtrKey<Light> > PDLightmapsHash;
+    typedef csHash<LightmapPtrDelArray*, csPtrKey<Light_old> > PDLightmapsHash;
     PDLightmapsHash pdLightmaps;
 
     struct LoadedFile

@@ -165,7 +165,7 @@ csFrustumVis::~csFrustumVis ()
 {
   if (object_reg)
   {
-    csRef<iEventQueue> q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+    csRef<iEventQueue> q = csQueryRegistry<iEventQueue> (object_reg);
     if (q)
       CS::RemoveWeakListener (q, weakEventHandler);
   }
@@ -188,7 +188,7 @@ bool csFrustumVis::HandleEvent (iEvent& ev)
 {
   if (ev.Name == CanvasResize)
   {
-    csRef<iGraphics3D> g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+    csRef<iGraphics3D> g3d = csQueryRegistry<iGraphics3D> (object_reg);
     scr_width = g3d->GetWidth ();
     scr_height = g3d->GetHeight ();
     //printf ("Got resize %dx%d!\n", scr_width, scr_height);fflush (stdout);
@@ -202,7 +202,7 @@ bool csFrustumVis::Initialize (iObjectRegistry *object_reg)
 
   delete kdtree;
 
-  csRef<iGraphics3D> g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+  csRef<iGraphics3D> g3d = csQueryRegistry<iGraphics3D> (object_reg);
   if (g3d)
   {
     scr_width = g3d->GetWidth ();
@@ -224,7 +224,7 @@ bool csFrustumVis::Initialize (iObjectRegistry *object_reg)
   if (g2d)
   {
     CanvasResize = csevCanvasResize(object_reg, g2d);
-    csRef<iEventQueue> q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+    csRef<iEventQueue> q = csQueryRegistry<iEventQueue> (object_reg);
     if (q)
       CS::RegisterWeakListener (q, this, CanvasResize, weakEventHandler);
   }

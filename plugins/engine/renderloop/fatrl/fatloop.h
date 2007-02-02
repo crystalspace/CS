@@ -71,7 +71,8 @@ class csFatLoopLoader : public csBaseRenderStepLoader
 #define CS_TOKEN_ITEM_FILE "plugins/engine/renderloop/fatrl/fatloop.tok"
 #include "cstool/tokenlist.h"
 
-  bool ParsePass (iDocumentNode* node, RenderPass& pass);
+  bool ParsePass (iLoaderContext* ldr_context,
+      iDocumentNode* node, RenderPass& pass);
 public:
   csFatLoopLoader (iBase* p);
 

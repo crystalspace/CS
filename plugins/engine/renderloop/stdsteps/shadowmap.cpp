@@ -96,7 +96,7 @@ bool csShadowmapRSLoader::Initialize (iObjectRegistry* object_reg)
 
 csPtr<iBase> csShadowmapRSLoader::Parse (iDocumentNode* node, 
 				       iStreamSource*,
-				       iLoaderContext*,      
+				       iLoaderContext* ldr_context,      
 				       iBase*)
 {
   csShadowmapRenderStep* newstep = 
@@ -104,7 +104,7 @@ csPtr<iBase> csShadowmapRSLoader::Parse (iDocumentNode* node,
   csRef<iRenderStep> step;
   step.AttachNew (newstep);    
 
-  if (!ParseStep (node, newstep, newstep->GetSettings()))
+  if (!ParseStep (ldr_context, node, newstep, newstep->GetSettings()))
     return 0;
 
   if (newstep->GetSettings().shader.IsEmpty() &&
@@ -118,12 +118,13 @@ csPtr<iBase> csShadowmapRSLoader::Parse (iDocumentNode* node,
   return csPtr<iBase> (step);
 }
 
-bool csShadowmapRSLoader::ParseStep (iDocumentNode* node,
-  csShadowmapRenderStep* step, 
-  csShadowmapRenderStep::DrawSettings& settings)
+bool csShadowmapRSLoader::ParseStep (iLoaderContext* ldr_context,
+    iDocumentNode* node,
+    csShadowmapRenderStep* step, 
+    csShadowmapRenderStep::DrawSettings& settings)
 {
-  csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
-    object_reg, "crystalspace.shared.stringset", iStringSet);
+  csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet> (
+    object_reg, "crystalspace.shared.stringset");
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
@@ -146,7 +147,8 @@ bool csShadowmapRSLoader::ParseStep (iDocumentNode* node,
 	break;
       case XMLTOKEN_DEFAULTSHADER:
 	{
-	  csRef<iShader> defshader = synldr->ParseShaderRef (child);
+	  csRef<iShader> defshader = synldr->ParseShaderRef (ldr_context,
+	      child);
 	  step->SetDefaultShader(defshader);
 	}
 	break;
@@ -184,14 +186,14 @@ csShadowmapRenderStep::csShadowmapRenderStep (
   iObjectRegistry* object_reg) :
   scfImplementationType (this)
 {
-  g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
-  csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg, 
-    "crystalspace.shared.stringset", iStringSet);
+  g3d = csQueryRegistry<iGraphics3D> (object_reg);
+  csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet> 
+    (object_reg, "crystalspace.shared.stringset");
   csShadowmapRenderStep::object_reg = object_reg;
   bones_name = strings->Request("bones");
   shader_name = strings->Request("distance_animated");
   depth_cubemap_name = strings->Request("cubemap depth");
-  engine = CS_QUERY_REGISTRY (object_reg, iEngine);
+  engine = csQueryRegistry<iEngine> (object_reg);
   context = 0;
   defShader = 0;
 

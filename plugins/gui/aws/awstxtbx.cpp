@@ -84,7 +84,7 @@ bool awsTextBox::Setup (iAws *_wmgr, iAwsComponentNode *settings)
   if (!awsComponent::Setup (_wmgr, settings)) return false;
 
   csRef<iKeyboardDriver> currentKbd = 
-    CS_QUERY_REGISTRY (wmgr->GetObjectRegistry (), iKeyboardDriver);
+    csQueryRegistry<iKeyboardDriver> (wmgr->GetObjectRegistry ());
   if (currentKbd == 0)
   {
     return false;

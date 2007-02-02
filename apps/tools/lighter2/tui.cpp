@@ -61,6 +61,10 @@ namespace lighter
     // Draw global settings
     if (drawFlags & TUI_DRAW_SETTINGS)
       DrawSettings ();
+
+    // Draw global stats
+    if (drawFlags & TUI_DRAW_STATS)
+      DrawStats ();
   }
 
   static const char* TUI_SEVERITY_TEXT[] = 
@@ -112,10 +116,10 @@ namespace lighter
     csPrintf ("|          | [ ] AO     |                                                     |\n");
     csPrintf ("| Rays/s:  | PLM:       | Lightmaps:                                          |\n");
     csPrintf ("|          |            |                                                     |\n");
-    csPrintf ("|          | ALM:       |                                                     |\n");
-    csPrintf ("|          |            |                                                     |\n");
-    csPrintf ("|          | Tu/u:      |                                                     |\n");
-    csPrintf ("|          |            |                                                     |\n");
+    csPrintf ("|          | ALM:       | KD-stats                                            |\n");
+    csPrintf ("|          |            | N:                                                  |\n");
+    csPrintf ("|          | Tu/u:      | D:                                                  |\n");
+    csPrintf ("|          |            | P:                                                  |\n");
     csPrintf ("|          | Tv/u:      |                                                     |\n");
     csPrintf ("|          |            |                                                     |\n");
     csPrintf ("|- CS Messages ---------------------------------------------------------------|\n");
@@ -125,6 +129,15 @@ namespace lighter
     csPrintf ("|                                                                             |\n");
     csPrintf ("\\-----------------------------------------------------------------------------/\n");
     csPrintf (CS_ANSI_CURSOR(0,0));
+  }
+
+  void TUI::DrawStats () const
+  {
+    csPrintf (CS_ANSI_CURSOR(29,14) "% 8d / % 8d", globalStats.kdtree.numNodes, globalStats.kdtree.leafNodes);
+    csPrintf (CS_ANSI_CURSOR(29,15) "% 8d / % 8.03f", globalStats.kdtree.maxDepth, 
+      (float)globalStats.kdtree.sumDepth / (float)globalStats.kdtree.leafNodes);
+    csPrintf (CS_ANSI_CURSOR(29,16) "% 8d / % 8.03f", globalStats.kdtree.numPrimitives, 
+      (float)globalStats.kdtree.numPrimitives / (float)globalStats.kdtree.leafNodes);
   }
 
   void TUI::DrawSettings () const
@@ -192,7 +205,7 @@ namespace lighter
       prefix++;
     }
 
-    csPrintf (CS_ANSI_CURSOR(2,12) "%2" PRIu64 ".%03" PRIu64 " %s", raysPerS, raysPerSfraction, siConv[prefix]);
+    csPrintf (CS_ANSI_CURSOR(1,12) "%2" PRIu64 ".%03" PRIu64 " %s", raysPerS, raysPerSfraction, siConv[prefix]);
     csPrintf (CS_ANSI_CURSOR(0,0));
   }
 

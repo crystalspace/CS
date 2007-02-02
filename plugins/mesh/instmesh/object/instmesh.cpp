@@ -114,7 +114,7 @@ csInstmeshMeshObject::csInstmeshMeshObject (csInstmeshMeshObjectFactory* factory
   bufferHolder.AttachNew (new csRenderBufferHolder);
   instances = csHash<csInstance*> (2003);
 
-  g3d = CS_QUERY_REGISTRY (factory->object_reg, iGraphics3D);
+  g3d = csQueryRegistry<iGraphics3D> (factory->object_reg);
   object_bbox_valid = false;
 }
 
@@ -745,7 +745,7 @@ void csInstmeshMeshObject::CastShadows (iMovable* movable, iFrustumView* fview)
   if (!do_lighting) return;
 
   iBase* b = (iBase *)fview->GetUserdata ();
-  csRef<iLightingProcessInfo> lpi = SCF_QUERY_INTERFACE(b,iLightingProcessInfo);
+  csRef<iLightingProcessInfo> lpi = scfQueryInterface<iLightingProcessInfo> (b);
   CS_ASSERT (lpi != 0);
 
   iLight* li = lpi->GetLight ();
@@ -1415,7 +1415,7 @@ csPtr<iMeshObject> csInstmeshMeshObjectFactory::NewInstance ()
   cm->SetShadowCasting (default_shadowcasting);
   cm->SetShadowReceiving (default_shadowreceiving);
 
-  csRef<iMeshObject> im (SCF_QUERY_INTERFACE (cm, iMeshObject));
+  csRef<iMeshObject> im (scfQueryInterface<iMeshObject> (cm));
   cm->DecRef ();
   return csPtr<iMeshObject> (im);
 }

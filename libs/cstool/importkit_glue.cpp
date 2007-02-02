@@ -54,7 +54,7 @@ namespace CS
     
     Glue::Glue (iObjectRegistry* objectReg) : objectReg(objectReg), texId(0)
     {
-      vfs = CS_QUERY_REGISTRY (objectReg, iVFS);
+      vfs = csQueryRegistry<iVFS> (objectReg);
     }
 
     Glue::~Glue()
@@ -101,7 +101,7 @@ namespace CS
 	if (!file) return false;
 
 	csRef<iDocumentSystem> docsys (
-	    CS_QUERY_REGISTRY (objectReg, iDocumentSystem));
+	    csQueryRegistry<iDocumentSystem> (objectReg));
 	if (!docsys) docsys = csPtr<iDocumentSystem> (new csTinyDocumentSystem ());
 	csRef<iDocument> doc = docsys->CreateDocument ();
 	const char* error = doc->Parse (file, true);

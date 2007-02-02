@@ -250,7 +250,7 @@ namespace Threading
       : "0" (incr), "m" (*target)
       : "memory"
       );
-      return result;
+      return result + incr;
     }
 
     inline static int32 Decrement (int32* target)

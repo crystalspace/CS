@@ -155,7 +155,8 @@ public:
   bool TeardownPass();
   bool DeactivatePass();
 
-  bool Load (iDocumentNode* node, iDocumentNode* parentSV, size_t variant);
+  bool Load (iLoaderContext* ldr_context, iDocumentNode* node,
+      iDocumentNode* parentSV, size_t variant);
 
   const char* GetFailReason()
   { return fail_reason.GetData(); }

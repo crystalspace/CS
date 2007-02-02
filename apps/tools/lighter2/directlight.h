@@ -19,27 +19,46 @@
 #ifndef __DIRECTLIGHT_H__
 #define __DIRECTLIGHT_H__
 
+#include "csutil/noncopyable.h"
+
 #include "primitive.h"
+#include "sampler.h"
 
 namespace lighter
 {
   class Sector;
   class Raytracer;
   class Primitive;
+  class Light_old;
   class Light;
   
   // Class to calculate direct lighting
-  class DirectLighting
+  class DirectLighting : private CS::NonCopyable
   {
   public:
 
     // Shade by using all primitives within range
     static void ShootDirectLighting (Sector* sector, float progressStep);
 
+    // Shade a single point in space with direct lighting
+    static csColor UniformShadeAllLights (Sector* sector, const csVector3& point,
+      const csVector3& normal, SamplerSequence<2>& lightSampler, Raytracer& rt);
+
+    // Shade a single point in space with direct lighting using a single light
+    static csColor UniformShadeOneLight (Sector* sector, const csVector3& point,
+      const csVector3& normal, SamplerSequence<3>& lightSampler, Raytracer& rt);
+
+    // Shade a primitive element with direct lighting
+    static csColor UniformShadeAllLights (Sector* sector, ElementProxy element,
+      SamplerSequence<4>& lightSampler, Raytracer& rt);
+
+    // Shade a primitive element with direct lighting using a single light
+    static csColor UniformShadeOneLight (Sector* sector, ElementProxy element,
+      SamplerSequence<5>& lightSampler, Raytracer& rt);
+
   private:
-    //Make sure we don't instance it
-    DirectLighting ();
-    DirectLighting (const DirectLighting& o);
+    static csColor ShadeLight (Light* light, const csVector3& point,
+      const csVector3& normal, Raytracer& rt, float* lightSamples);
   };
 }
 

@@ -70,6 +70,7 @@ package cspace;
 *csGetUsername = *cspacec::csGetUsername;
 *csGetPlatformConfigPath = *cspacec::csGetPlatformConfigPath;
 *csQueryRegistryTag = *cspacec::csQueryRegistryTag;
+*CS_QUERY_REGISTRY_TAG_is_deprecated = *cspacec::CS_QUERY_REGISTRY_TAG_is_deprecated;
 *RegisterWeakListener = *cspacec::RegisterWeakListener;
 *RemoveWeakListener = *cspacec::RemoveWeakListener;
 *csHashCompute = *cspacec::csHashCompute;
@@ -534,6 +535,7 @@ sub new {
 *Set = *cspacec::csColor_Set;
 *Clamp = *cspacec::csColor_Clamp;
 *ClampDown = *cspacec::csColor_ClampDown;
+*IsBlack = *cspacec::csColor_IsBlack;
 *__copy__ = *cspacec::csColor___copy__;
 *__add_ass__ = *cspacec::csColor___add_ass__;
 *__subtr_ass__ = *cspacec::csColor___subtr_ass__;

@@ -364,8 +364,8 @@ void csFontServerMultiplexer::ParseFontLoaderOrder (
 
 csPtr<iFontServer> csFontServerMultiplexer::ResolveFontServer (const char* name)
 {
-  csRef<iPluginManager> plugin_mgr = CS_QUERY_REGISTRY (object_reg,
-    iPluginManager);
+  csRef<iPluginManager> plugin_mgr = 
+    csQueryRegistry<iPluginManager> (object_reg);
 
   csRef<iFontServer> fs;
   if (iSCF::SCF->ClassRegistered (name))
