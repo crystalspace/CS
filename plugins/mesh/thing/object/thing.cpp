@@ -66,6 +66,8 @@
 #include "polyrender.h"
 #include "polytext.h"
 #include "thing.h"
+#include "ivaria/collider.h"
+#include "igeom/decal.h"
 
 #ifdef CS_DEBUG
   //#define LIGHTMAP_DEBUG
@@ -1973,6 +1975,28 @@ void csThing::InvalidateThing ()
 
   delete [] static_data->obj_normals; static_data->obj_normals = 0;
   static_data->InvalidateShape ();
+}
+
+void csThing::BuildDecal(const csVector3* pos, float decalRadius,
+    iDecalBuilder* decalBuilder)
+{
+  size_t i;
+  csPoly3D poly;
+
+  // @@@ This routine is not very optimal. Especially for things
+  // with large number of polygons.
+  for (i = 0; i < static_data->static_polygons.Length (); i++)
+  {
+    csPolygon3DStatic *p = static_data->static_polygons.Get (i);
+    if (p->InSphere(*pos, decalRadius))
+    {
+      poly.SetVertexCount(0);
+      for (int a=0; a<p->GetVertexCount(); ++a)
+        poly.AddVertex(p->Vobj(a));
+
+      decalBuilder->AddStaticPoly(poly); 
+    }
+  }
 }
 
 bool csThing::HitBeamOutline (const csVector3& start,

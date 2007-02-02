@@ -28,6 +28,7 @@
 #include "iengine/portal.h"
 #include "iengine/rview.h"
 #include "ivideo/graph3d.h"
+#include "ivideo/rendermesh.h"
 
 
 CS_LEAKGUARD_IMPLEMENT (csMeshWrapper);
@@ -658,6 +659,97 @@ csRenderMesh** csMeshWrapper::GetRenderMeshes (int& n, iRenderView* rview,
     csrview->SetCsRenderContext (old_ctxt);
   }
   return rmeshes;
+}
+
+void csMeshWrapper::AddExtraRenderMesh(csRenderMesh* renderMesh, long priority,
+        csZBufMode zBufMode)
+{
+  ExtraRenderMeshData data;
+  extraRenderMeshes.Push(renderMesh);
+
+  data.priority = priority;
+  data.zBufMode = zBufMode;
+  extraRenderMeshData.Push(data);
+}
+
+csRenderMesh** csMeshWrapper::GetExtraRenderMeshes (int& num, 
+                    iRenderView* rview, uint32 frustum_mask)
+{
+  // Here we check the CS_ENTITY_NOCLIP flag. If that flag is set
+  // we will only render the object once in a give frame/camera combination.
+  // So if multiple portals arrive in a sector containing this object the
+  // object will be rendered at the first portal and not clipped to that
+  // portal (as is usually the case).
+  csRenderContext* old_ctxt = 0;
+
+  if (flags.Check (CS_ENTITY_NOCLIP))
+  {
+    csRenderView* csrview = (csRenderView*)rview;
+    csRenderContext* ctxt = csrview->GetCsRenderContext ();
+
+    if (last_frame_number == rview->GetCurrentFrameNumber () &&
+    	last_camera == ctxt->icamera)
+    {
+      num = 0;
+      return 0;
+    }
+    last_camera = ctxt->icamera;
+    last_frame_number = rview->GetCurrentFrameNumber ();
+    old_ctxt = ctxt;
+    // Go back to top-level context.
+    while (ctxt->previous) ctxt = ctxt->previous;
+    csrview->SetCsRenderContext (ctxt);
+  }
+
+  int clip_portal, clip_plane, clip_z_plane;
+  rview->CalculateClipSettings(frustum_mask, clip_portal, clip_plane,
+          clip_z_plane);
+
+  iCamera* pCamera = rview->GetCamera();
+  const csReversibleTransform& o2wt = movable.GetFullTransform();
+  const csVector3& wo = o2wt.GetOrigin();
+  num = extraRenderMeshes.GetSize();
+  for (int a=num-1; a>=0; --a)
+  {
+    extraRenderMeshes[a]->clip_portal = clip_portal;
+    extraRenderMeshes[a]->clip_plane = clip_plane;
+    extraRenderMeshes[a]->clip_z_plane = clip_z_plane;
+    extraRenderMeshes[a]->do_mirror = pCamera->IsMirrored();
+    extraRenderMeshes[a]->worldspace_origin = wo;
+    extraRenderMeshes[a]->object2world = o2wt;
+  }
+
+  return extraRenderMeshes.GetArray();
+}
+
+long csMeshWrapper::GetExtraRenderMeshPriority(size_t idx) const
+{
+    return extraRenderMeshData[idx].priority;
+}
+
+csZBufMode csMeshWrapper::GetExtraRenderMeshZBufMode(size_t idx) const
+{
+    return extraRenderMeshData[idx].zBufMode;
+}
+
+void csMeshWrapper::RemoveExtraRenderMesh(csRenderMesh* renderMesh)
+{
+    size_t len = extraRenderMeshes.GetSize();
+    for (size_t a=0; a<len; ++a)
+    {
+        if (extraRenderMeshes[a] != renderMesh)
+            continue;
+
+        // copy last value in list over top of the one we're removing
+        extraRenderMeshes[a] = extraRenderMeshes[len-1];
+        extraRenderMeshData[a] = extraRenderMeshData[len-1];
+
+        // remove the last one
+        extraRenderMeshes.DeleteIndexFast(len-1);
+        extraRenderMeshData.DeleteIndexFast(len-1);
+
+        return;
+    }
 }
 
 //----- Min/Max Distance Range ----------------------------------------------

@@ -62,6 +62,8 @@
 #include "cstool/vertexcompress.h"
 #include "cstool/normalcalc.h"
 #include "cstool/primitives.h"
+#include "csgeom/poly3d.h"
+#include "igeom/decal.h"
 
 #include "genmesh.h"
 
@@ -1366,6 +1368,27 @@ bool csGenmeshMeshObject::HitBeamObject (const csVector3& start,
   }
 
   return true;
+}
+
+void csGenmeshMeshObject::BuildDecal(const csVector3* pos, float decalRadius,
+          iDecalBuilder* decalBuilder)
+{
+  size_t a;
+  size_t triCount = factory->GetTriangleCount();
+  csTriangle* tris = factory->GetTriangles();
+  csVector3* vertices = factory->GetVertices();
+  csPoly3D poly;
+  poly.SetVertexCount(3);
+  
+  for (a=0; a<triCount; ++a)
+  {
+    poly[0] = vertices[tris[a].a];
+    poly[1] = vertices[tris[a].b];
+    poly[2] = vertices[tris[a].c];
+
+    if (poly.InSphere(*pos, decalRadius))
+        decalBuilder->AddStaticPoly(poly);
+  }
 }
 
 iObjectModel* csGenmeshMeshObject::GetObjectModel ()

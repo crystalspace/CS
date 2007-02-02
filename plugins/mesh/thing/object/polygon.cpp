@@ -899,6 +899,76 @@ bool csPolygon3DStatic::PointOnPolygon (const csVector3 &v)
   return true;
 }
 
+bool csPolygon3DStatic::InSphere (const csVector3& center, float radius)
+{
+  int i, i1;
+  
+  // first check distance from polygon
+  float dist = polygon_data.plane_obj.Classify(center);
+  if (fabs(dist) > radius)
+    return false;
+
+  float rsquared = radius*radius;
+  
+  // second, check to see if any vertex is inside the sphere
+  for (i=0; i<polygon_data.num_vertices; ++i)
+  {
+    if ((Vobj(i) - center).SquaredNorm() <= rsquared)
+      return true;
+  }
+
+  csVector3 p, d, pc;
+  float pcDotd, dDotd, pcDotpc;
+  
+  // didn't work, so test sphere with each edge
+  i1 = polygon_data.num_vertices - 1;
+  for (i = 0; i < polygon_data.num_vertices; i++)
+  {
+    p = Vobj(i);
+    d = Vobj(i1) - p;
+    pc = p - center;
+
+    // check if line points in opposite direction
+    pcDotd = pc * d;
+    if (pcDotd > 0)
+      continue;
+   
+    dDotd = d * d;
+    pcDotpc = pc * pc;
+
+    float det = pcDotd * pcDotd - dDotd * (pcDotpc - rsquared);
+
+    // check if there's actually an intersection with the circle
+    if (det < 0)
+    {
+      // no intersection
+    }
+    else if (det <= 0.01)
+    {
+      // one intersection
+      float t = -pcDotd / dDotd;
+      if (t >= 0 && t <= 1)
+        return true;
+    }
+    else
+    {
+      // two intersections
+      float sqrtDet = sqrt(det);
+      float t = (-pcDotd - sqrtDet) / dDotd;
+      if (t >= 0 && t <= 1)
+        return true;
+      t = (-pcDotd + sqrtDet) / dDotd;
+      if (t >= 0 && t <= 1)
+        return true;
+    }
+    i1 = i;
+  }
+
+  // last resort, project sphere center onto polygon and test point in poly
+  p = center - polygon_data.plane_obj.Normal() * dist;
+  return PointOnPolygon(p);
+}
+
 bool csPolygon3DStatic::IntersectRay (const csVector3 &start,
     const csVector3 &end)
 {

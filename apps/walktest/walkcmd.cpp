@@ -1818,6 +1818,11 @@ bool CommandHandler (const char *cmd, const char *arg)
     extern void fire_missile ();
     fire_missile ();
   }
+  else if (!csStrCaseCmp (cmd, "decal_test"))
+  {
+    extern void test_decal();
+    test_decal ();
+  }
   else if (!csStrCaseCmp (cmd, "lightning"))
   {
     extern void show_lightning ();

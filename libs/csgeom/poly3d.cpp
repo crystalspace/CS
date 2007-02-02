@@ -339,6 +339,9 @@ void csPoly3D::SplitWithPlane (
 
 void csPoly3D::CutToPlane (const csPlane3 &split_plane)
 {
+  if (vertices.GetSize() < 3)
+    return; 
+
   csPoly3D old (*this);
   MakeEmpty ();
 
@@ -626,6 +629,76 @@ int csPoly3D::ComputeMainNormalAxis () const
   {
     return CS_AXIS_Z;
   }
+}
+
+bool csPoly3D::InSphere(const csVector3& center, float radius)
+{
+  size_t i, i1;
+  csPlane3 plane = ComputePlane();
+  size_t vertCount = GetVertexCount();
+  
+  // first check distance from polygon
+  float dist = plane.Classify(center);
+  if (fabs(dist) > radius)
+    return false;
+
+  float rsquared = radius*radius;
+  
+  // second, check to see if any vertex is inside the sphere
+  for (i=0; i<vertCount; ++i)
+  {
+    if ((vertices[i] - center).SquaredNorm() <= rsquared)
+      return true;
+  }
+
+  csVector3 d, pc;
+  float pcDotd, dDotd, pcDotpc;
+  
+  // didn't work, so test sphere with each edge
+  i1 = vertCount - 1;
+  for (i=0; i<vertCount; i++)
+  {
+    const csVector3& p = vertices[i];
+    d = vertices[i1] - p;
+    pc = p - center;
+
+    // check if line points in opposite direction
+    pcDotd = pc * d;
+    if (pcDotd > 0)
+      continue;
+   
+    dDotd = d * d;
+    pcDotpc = pc * pc;
+
+    float det = pcDotd * pcDotd - dDotd * (pcDotpc - rsquared);
+
+    // check if there's actually an intersection with the circle
+    if (det < 0)
+    {
+      // no intersection
+    }
+    else if (det <= 0.01)
+    {
+      // one intersection
+      float t = -pcDotd / dDotd;
+      if (t >= 0 && t <= 1)
+        return true;
+    }
+    else
+    {
+      // two intersections
+      float sqrtDet = sqrt(det);
+      float t = (-pcDotd - sqrtDet) / dDotd;
+      if (t >= 0 && t <= 1)
+        return true;
+      t = (-pcDotd + sqrtDet) / dDotd;
+      if (t >= 0 && t <= 1)
+        return true;
+    }
+    i1 = i;
+  }
+  // last resort, project sphere center onto polygon and test point in poly
+  return In(center - plane.Normal() * dist);
 }
 
 //---------------------------------------------------------------------------

@@ -624,6 +624,10 @@ public:
     	scfQueryInterface<iMeshObjectFactory> (factory));
     return ifact;	// DecRef is ok here.
   }
+  virtual void BuildDecal(const csVector3* pos, float decalRadius,
+          iDecalBuilder* decalBuilder)
+  {
+  }
   virtual csFlags& GetFlags () { return flags; }
   virtual csPtr<iMeshObject> Clone () { return 0; }
   virtual csRenderMesh **GetRenderMeshes (int &n, iRenderView* rview,

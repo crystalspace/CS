@@ -1024,7 +1024,8 @@ public:
   virtual bool SetMaterialWrapper (iMaterialWrapper*) { return false; }
   virtual iMaterialWrapper* GetMaterialWrapper () const { return 0; }
   virtual void PositionChild (iMeshObject* /*child*/, csTicks /*current_time*/) { }
-
+  virtual void BuildDecal(const csVector3* pos, float decalRadius,
+	iDecalBuilder* decalBuilder);
   //-------------------- iPolygonMesh interface implementation ----------------
   //csRef<PolyMeshHelper> polygonMesh;
   //-------------------- CD iPolygonMesh implementation -----------------------

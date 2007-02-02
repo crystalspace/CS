@@ -190,6 +190,10 @@ public:
   {
     // We don't support sockets.
   }
+  virtual void BuildDecal(const csVector3* pos, float decalRadius,
+          iDecalBuilder* decalBuilder)
+  {
+  }
   /** @} */
 
   /**\name iRenderBufferAccessor implementation

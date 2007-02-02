@@ -510,7 +510,20 @@ public:
     {
       privMeshlist->AddRenderMeshes (meshes, num,
       	cmesh->csMeshWrapper::GetRenderPriority (),
-	cmesh->csMeshWrapper::GetZBufMode (), (iMeshWrapper*)cmesh);
+      	cmesh->csMeshWrapper::GetZBufMode (), (iMeshWrapper*)cmesh);
+
+      // get extra render meshes
+      num = 0;
+      csRenderMesh** extraMeshes = cmesh->GetExtraRenderMeshes (num, rview,
+                                            frustum_mask);
+      CS_ASSERT(!((num != 0) && (extraMeshes == 0)));
+      for (i = 0; i < num; ++i)
+      {
+          privMeshlist->AddRenderMeshes (&extraMeshes[i], 1,
+                  cmesh->csMeshWrapper::GetExtraRenderMeshPriority(i),
+                  cmesh->csMeshWrapper::GetExtraRenderMeshZBufMode(i),
+                  (iMeshWrapper*)cmesh);
+      }
     }
   }
 

@@ -506,6 +506,11 @@ public:
    */
   bool PointOnPolygon (const csVector3& v);
 
+  /**
+   * Test if any part of this polygon is inside a sphere.
+   */
+  bool InSphere (const csVector3& center, float radius);
+
   /// Get the material handle for the texture manager.
   iMaterial* GetMaterial ();
 

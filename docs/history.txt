@@ -7,6 +7,13 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 2-Feb-2007
+	- Andrew Robberts added decal support and a decalmanager plugin
+	  to CS.  Decals are currently supported by thing and static
+	  genmeshes.
+	- Andrew Robberts added an InSphere function to poly3d to test 
+  	  if the poly is within a sphere.
+	- Andrew Robberts added the ability to attach arbitrary rendermeshes 
+	  with priority and zbufmodes to any iMeshWrapper.
 	- res worked around Cg not being properly detected on Linux when
 	  -Wl,--as-needed was passed in LDFLAGS.
 	- res correctly placed a comment in compiler.m4 and fixed the response
