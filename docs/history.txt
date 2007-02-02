@@ -9,6 +9,11 @@ chronological order.
 2-Feb-2007
 	- res worked around Cg not being properly detected on Linux when
 	  -Wl,--as-needed was passed in LDFLAGS.
+	- res correctly placed a comment in compiler.m4 and fixed the response
+	  file support test. (Previously it didn't work - the used @ sign
+	  is internally used by the CS build test macros as a separator.
+	  Worked around by not using the CS build macros but the relevant AC_
+	  macros directly.)
 1-Feb-2007
 	- Marten fixed compilation of CS::DataBuffer on gcc.
 	- Marten made sure genmesh doesn't return any rendermeshes when
