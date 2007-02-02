@@ -40,15 +40,18 @@ rule ConstructApplicationTarget
 }
 rule ConstructStaticLibraryTarget
 {
-  return lib$(<)$(SUFLIB) ;
+  local libbase = [ LibraryBaseName $(<) ] ;
+  return lib$(libbase)$(SUFLIB) ;
 }
 rule ConstructSharedLibraryTarget
 {
-  return lib$(<).so.$(PACKAGE_VERSION) ; 
+  local libbase = [ LibraryBaseName $(<) ] ;
+  return lib$(libbase).so ; 
 }
 rule ConstructSharedLibraryLinkLib
 {
-  return lib$(<).so.$(PACKAGE_VERSION) ; 
+  local libbase = [ LibraryBaseName $(<) ] ;
+  return lib$(libbase).so ; 
 }
 rule ConstructPluginTarget
 {

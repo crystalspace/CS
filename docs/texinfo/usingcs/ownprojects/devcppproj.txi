@@ -36,11 +36,13 @@ active in the popup and then switch to the @emph{Directories} tab.  On that tab
 change the path of everything to point to your MinGW installation rather than
 the Dev-@sc{cpp} versions. In the @emph{Binaries} sub-tab you have to add both
 the @file{bin} directory of MinGW, as well as the the @file{bin} directory of
-@sc{msys} (and remove the path to Dev-@sc{cpp}). In the @emph{Libraries}
-sub-tab add the path to the MinGW @file{lib} directory, and do the same for the
-@emph{C Includes} sub-tab. In the @emph{C++ Includes} tab you have to add the
-correct @samp{C++} MinGW @file{include} directory.  If this is done correctly
-you should now be able to use the compiler from MinGW.
+@sc{msys}, and remove the path to Dev-@sc{cpp}. In the @emph{Libraries}
+sub-tab add the path to the MinGW @file{lib} directory, and remove the path
+to Dev-@sc{cpp}. Do the same for on @emph{C Includes} sub-tab, add MinGW and
+remove Dev-@sc{cpp}. In the @emph{C++ Includes} tab you have to add the
+correct @samp{C++} MinGW @file{include} directory, and remove the Dev-@sc{cpp}
+directory.  If this is all done correctly you should now be able to use the
+compiler from MinGW.
 
 @subsubheading Creating a New Project
 

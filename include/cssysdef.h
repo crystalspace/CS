@@ -92,6 +92,72 @@
 # define CS_ATTRIBUTE_MALLOC
 #endif
 
+/**\def CS_DEPRECATED_METHOD
+ * Use the CS_DEPRECATED_METHOD macro in front of method declarations to
+ * indicate that they are deprecated. Example:
+ * \code
+ * struct iFoo : iBase {
+ *   CS_DEPRECATED_METHOD virtual void Plankton() const = 0;
+ * }
+ * \endcode
+ * Compilers which are capable of flagging deprecation will exhibit a warning
+ * when it encounters client code invoking methods so tagged.
+ */
+#if !defined(CS_DEPRECATED_METHOD) || defined(DOXYGEN_RUN)
+#  if defined(CS_COMPILER_MSVC)
+#    define CS_DEPRECATED_METHOD	__declspec(deprecated)
+      /* Unfortunately, MSVC is overzealous with warnings; it even emits one 
+	 when a deprecated method is overridden, e.g. when implementing an 
+	 interface method. 
+	 To work around this, use msvc_deprecated_warn_off.h/
+	 msvc_deprecated_warn_on.h. */
+#  else
+#    define CS_DEPRECATED_METHOD
+#  endif
+#endif
+
+/**\def CS_DEPRECATED_METHOD_MSG
+ * A variant of #CS_DEPRECATED_METHOD that also emits the message \a msg
+ * on compilers that support it.
+ */
+#if !defined(CS_DEPRECATED_METHOD_MSG) || defined(DOXYGEN_RUN)
+#  if defined(CS_COMPILER_MSVC) && _MSC_VER >= 1400
+#    define CS_DEPRECATED_METHOD_MSG(msg) __declspec(deprecated(msg))
+#  else
+#    define CS_DEPRECATED_METHOD_MSG(msg) CS_DEPRECATED_METHOD
+#  endif
+#endif
+
+/**\def CS_DEPRECATED_TYPE
+ * Use the CS_DEPRECATED_TYPE macro after type declarations to
+ * indicate that they are deprecated. Example:
+ * \code
+ * typedef CS_DEPRECATED_TYPE csFoo csBar;
+ * class CS_DEPRECATED_TYPE csBaz { };
+ * \endcode
+ * Compilers which are capable of flagging deprecation will exhibit a warning
+ * when it encounters client code using types so tagged.
+ */
+#if !defined(CS_DEPRECATED_TYPE) || defined(DOXYGEN_RUN)
+#  if defined(CS_COMPILER_MSVC)
+#    define CS_DEPRECATED_TYPE __declspec(deprecated)
+#  else
+#    define CS_DEPRECATED_TYPE
+#  endif
+#endif
+
+/**\def CS_DEPRECATED_TYPE_MSG
+ * A variant of CS_DEPRECATED_TYPE that also emits the message \a msg
+ * on compilers that support it.
+ */
+#if !defined(CS_DEPRECATED_TYPE_MSG) || defined(DOXYGEN_RUN)
+#  if defined(CS_COMPILER_MSVC) && _MSC_VER >= 1400
+#    define CS_DEPRECATED_TYPE_MSG(msg) __declspec(deprecated(msg))
+#  else
+#    define CS_DEPRECATED_TYPE_MSG(msg) CS_DEPRECATED_TYPE
+#  endif
+#endif
+
 /**\def CS_NO_EXCEPTIONS
  * This is defined when the project was compiled without support for 
  * exceptions.
@@ -593,8 +659,6 @@ Type &Class::getterFunc ()                                     \
 #  define CS_FUNCTION_NAME		"<?\?\?>"
 #endif
 
-/* Include now, if it's included later, the malloc re#definition below may
- * interfere with that header. */
 #include <stdlib.h>
 #ifdef CS_HAVE_MALLOC_H
 #include <malloc.h>
@@ -607,12 +671,20 @@ Type &Class::getterFunc ()                                     \
  * implementations. Useful when interfacing with third party libraries.
  */
 //@{
+CS_DEPRECATED_METHOD_MSG("malloc override was removed; "
+  "platform_malloc() unnecessary, use normal malloc() instead")
 CS_FORCEINLINE CS_ATTRIBUTE_MALLOC void* platform_malloc (size_t n)
 { return malloc (n); }
+CS_DEPRECATED_METHOD_MSG("malloc override was removed; "
+  "platform_free() unnecessary, use normal free() instead")
 CS_FORCEINLINE void platform_free (void* p)
 { return free (p); }
+CS_DEPRECATED_METHOD_MSG("malloc override was removed; "
+  "platform_realloc() unnecessary, use normal realloc() instead")
 CS_FORCEINLINE void* platform_realloc (void* p, size_t n)
 { return realloc (p, n); }
+CS_DEPRECATED_METHOD_MSG("malloc override was removed; "
+  "platform_calloc() unnecessary, use normal calloc() instead")
 CS_FORCEINLINE CS_ATTRIBUTE_MALLOC void* platform_calloc (size_t n, size_t s)
 { return calloc (n, s); }
 
@@ -625,16 +697,24 @@ namespace CS
  * Platform-dependent operator new.
  * \remarks Won't throw an exception if allocation fails.
  */
+CS_DEPRECATED_METHOD_MSG("operator new override was removed; "
+  "using 'platform new' should be unnecessary")
 extern CS_CRYSTALSPACE_EXPORT void* operator new (size_t s, 
   const CS::AllocPlatform&) throw();
 /**
  * Platform-dependent operator new.
  * \remarks Won't throw an exception if allocation fails.
  */
+CS_DEPRECATED_METHOD_MSG("operator new override was removed; "
+  "using 'platform new' should be unnecessary")
 extern CS_CRYSTALSPACE_EXPORT void* operator new[] (size_t s, 
   const CS::AllocPlatform&) throw();
+CS_DEPRECATED_METHOD_MSG("operator new override was removed; "
+  "using 'platform delete' should be unnecessary")
 extern CS_CRYSTALSPACE_EXPORT void operator delete (void* p, 
   const CS::AllocPlatform&) throw();
+CS_DEPRECATED_METHOD_MSG("operator new override was removed; "
+  "using 'platform delete' should be unnecessary")
 extern CS_CRYSTALSPACE_EXPORT void operator delete[] (void* p, 
   const CS::AllocPlatform&) throw();
 //@}
@@ -667,94 +747,15 @@ CS_FORCEINLINE CS_ATTRIBUTE_MALLOC void* cs_calloc (size_t n, size_t s)
 { return ptcalloc (n, s); }
 //@}
 
-/**\name Memory allocation override
- * By default, ptmalloc is used for memory allocations, for both C-style
- * malloc/free as well as C++ new/delete. Use of ptmalloc can be disabled
- * for the whole project by passing <tt>--enable-ptmalloc=no</tt> to
- * configure or defining <tt>CS_NO_PTMALLOC</tt> in 
- * <tt>include/csutil/win32/csconfig.h</tt> for MSVC.
- *
- * To disable malloc overriding for individual source files, define 
- * <tt>CS_NO_MALLOC_OVERRIDE</tt> before including <tt>cssysdef.h</tt>.
- *
- * new overriding can be disabled with <tt>CS_NO_NEW_OVERRIDE</tt>, 
- * however, this is not recommended since it may result in mismatches
- * between new and delete calls, where one may be overridden, while the
- * other is not. If you need to call the platform's operator new,
- * use operator new(size_t,const CS::AllocPlatform&).
- */
-//@{
-
-/**
- * Until bug #146 (intrusive overriding of new and delete causing 
- * incompatibility with external projects) have been solved, this is disabled
- */
-#define CS_NO_NEW_OVERRIDE
-#define CS_NO_MALLOC_OVERRIDE
-
-#ifndef CS_NO_MALLOC_OVERRIDE
-#define malloc 		cs_malloc
-#define free 	        cs_free
-#define realloc 	cs_realloc
-#define calloc 		cs_calloc
-#endif // CS_NO_MALLOC_OVERRIDE
-
-#ifndef CS_NO_NEW_OVERRIDE
-
-#if !defined(CS_MEMORY_TRACKER) && !defined(CS_MEMORY_TRACKER_IMPLEMENT) \
-  && !defined(CS_EXTENSIVE_MEMDEBUG) && !defined(CS_EXTENSIVE_MEMDEBUG_IMPLEMENT)
-
-#ifndef CS_NO_EXCEPTIONS
-CS_FORCEINLINE void* operator new (size_t s) throw (std::bad_alloc)
-{ 
-  void* p = ptmalloc (s);
-  if (!p) throw std::bad_alloc();
-  return p;
-}
-CS_FORCEINLINE void* operator new[] (size_t s) throw (std::bad_alloc)
-{ 
-  void* p = ptmalloc (s);
-  if (!p) throw std::bad_alloc();
-  return p;
-}
-#else
-CS_FORCEINLINE void* operator new (size_t s) throw ()
-{ 
-  return ptmalloc (s);
-}
-CS_FORCEINLINE void* operator new[] (size_t s) throw ()
-{ 
-  return ptmalloc (s);
-}
-#endif
-
-CS_FORCEINLINE void operator delete (void* p) throw()
-{ ptfree (p); }
-CS_FORCEINLINE void operator delete[] (void* p) throw()
-{ ptfree (p); }
-
-CS_FORCEINLINE void* operator new (size_t s, const std::nothrow_t&) throw()
-{ return ptmalloc (s); }
-CS_FORCEINLINE void* operator new[] (size_t s, const std::nothrow_t&) throw()
-{ return ptmalloc (s); }
-CS_FORCEINLINE void operator delete (void* p, const std::nothrow_t&) throw()
-{ ptfree (p); }
-CS_FORCEINLINE void operator delete[] (void* p, const std::nothrow_t&) throw()
-{ ptfree (p); }
-
-#endif /* !defined(CS_MEMORY_TRACKER) && !defined(CS_MEMORY_TRACKER_IMPLEMENT)
-  && !defined(CS_EXTENSIVE_MEMDEBUG) && !defined(CS_EXTENSIVE_MEMDEBUG_IMPLEMENT) */
-#endif // CS_NO_NEW_OVERRIDE
-
 #else // CS_NO_PTMALLOC
 CS_FORCEINLINE CS_ATTRIBUTE_MALLOC void* cs_malloc (size_t n)
-{ return platform_malloc (n); }
+{ return malloc (n); }
 CS_FORCEINLINE void cs_free (void* p)
-{ platform_free (p); }
+{ free (p); }
 CS_FORCEINLINE void* cs_realloc (void* p, size_t n)
-{ return platform_realloc (p, n); }
+{ return realloc (p, n); }
 CS_FORCEINLINE CS_ATTRIBUTE_MALLOC void* cs_calloc (size_t n, size_t s)
-{ return platform_calloc (n, s); }
+{ return calloc (n, s); }
 #endif // CS_NO_PTMALLOC
 //@}
 
@@ -817,6 +818,15 @@ inline void* operator new[] (size_t s)
 #define new CS_EXTENSIVE_MEMDEBUG_NEW
 #endif
 
+namespace CS
+{
+  namespace Debug
+  {
+    extern void CS_CRYSTALSPACE_EXPORT AssertMessage (const char* expr, 
+      const char* filename, int line, const char* msg = 0);
+  } // namespace Debug
+} // namespace CS
+
 #ifdef CS_DEBUG
 #  if !defined (CS_DEBUG_BREAK)
 #    if defined (CS_PLATFORM_WIN32)
@@ -832,14 +842,6 @@ inline void* operator new[] (size_t s)
 #    endif
 #  endif
 #  if !defined (CS_ASSERT_MSG)
-    namespace CS
-    {
-      namespace Debug
-      {
-	extern void CS_CRYSTALSPACE_EXPORT AssertMessage (const char* expr, 
-	  const char* filename, int line, const char* msg = 0);
-      } // namespace Debug
-    } // namespace CS
 #   define CS_ASSERT_MSG(msg,x) 					\
       if (!(x)) CS::Debug::AssertMessage (#x, __FILE__, __LINE__, msg);
 #  endif
@@ -869,72 +871,6 @@ inline void* operator new[] (size_t s)
 /**\def CS_ASSERT_MSG(msg, expr)
  * Same as #CS_ASSERT(expr), but additionally prints \a msg to <tt>stderr</tt>.
  */
-    
-/**\def CS_DEPRECATED_METHOD
- * Use the CS_DEPRECATED_METHOD macro in front of method declarations to
- * indicate that they are deprecated. Example:
- * \code
- * struct iFoo : iBase {
- *   CS_DEPRECATED_METHOD virtual void Plankton() const = 0;
- * }
- * \endcode
- * Compilers which are capable of flagging deprecation will exhibit a warning
- * when it encounters client code invoking methods so tagged.
- */
-#if !defined(CS_DEPRECATED_METHOD) || defined(DOXYGEN_RUN)
-#  if defined(CS_COMPILER_MSVC)
-#    define CS_DEPRECATED_METHOD	__declspec(deprecated)
-      /* Unfortunately, MSVC is overzealous with warnings; it even emits one 
-	 when a deprecated method is overridden, e.g. when implementing an 
-	 interface method. 
-	 To work around this, use msvc_deprecated_warn_off.h/
-	 msvc_deprecated_warn_on.h. */
-#  else
-#    define CS_DEPRECATED_METHOD
-#  endif
-#endif
-
-/**\def CS_DEPRECATED_METHOD_MSG
- * A variant of #CS_DEPRECATED_METHOD that also emits the message \a msg
- * on compilers that support it.
- */
-#if !defined(CS_DEPRECATED_METHOD_MSG) || defined(DOXYGEN_RUN)
-#  if defined(CS_COMPILER_MSVC) && _MSC_VER >= 1400
-#    define CS_DEPRECATED_METHOD_MSG(msg) __declspec(deprecated(msg))
-#  else
-#    define CS_DEPRECATED_METHOD_MSG(msg) CS_DEPRECATED_METHOD
-#  endif
-#endif
-
-/**\def CS_DEPRECATED_TYPE
- * Use the CS_DEPRECATED_TYPE macro after type declarations to
- * indicate that they are deprecated. Example:
- * \code
- * typedef CS_DEPRECATED_TYPE csFoo csBar;
- * class CS_DEPRECATED_TYPE csBaz { };
- * \endcode
- * Compilers which are capable of flagging deprecation will exhibit a warning
- * when it encounters client code using types so tagged.
- */
-#if !defined(CS_DEPRECATED_TYPE) || defined(DOXYGEN_RUN)
-#  if defined(CS_COMPILER_MSVC)
-#    define CS_DEPRECATED_TYPE __declspec(deprecated)
-#  else
-#    define CS_DEPRECATED_TYPE
-#  endif
-#endif
-
-/**\def CS_DEPRECATED_TYPE_MSG
- * A variant of CS_DEPRECATED_TYPE that also emits the message \a msg
- * on compilers that support it.
- */
-#if !defined(CS_DEPRECATED_TYPE_MSG) || defined(DOXYGEN_RUN)
-#  if defined(CS_COMPILER_MSVC) && _MSC_VER >= 1400
-#    define CS_DEPRECATED_TYPE_MSG(msg) __declspec(deprecated(msg))
-#  else
-#    define CS_DEPRECATED_TYPE_MSG(msg) CS_DEPRECATED_TYPE
-#  endif
-#endif
 
 /**\def CS_CONST_METHOD
  * Use the CS_CONST_METHOD macro in front of method declarations to

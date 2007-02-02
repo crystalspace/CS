@@ -3343,7 +3343,6 @@ package cspace::csShaderVariableArray;
 *DeleteIndex = *cspacec::csShaderVariableArray_DeleteIndex;
 *DeleteIndexFast = *cspacec::csShaderVariableArray_DeleteIndexFast;
 *Delete = *cspacec::csShaderVariableArray_Delete;
-*DeleteFast = *cspacec::csShaderVariableArray_DeleteFast;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -8335,7 +8334,6 @@ package cspace::csSprite2DVertexArrayChangeAll;
 *DeleteIndex = *cspacec::csSprite2DVertexArrayChangeAll_DeleteIndex;
 *DeleteIndexFast = *cspacec::csSprite2DVertexArrayChangeAll_DeleteIndexFast;
 *Delete = *cspacec::csSprite2DVertexArrayChangeAll_Delete;
-*DeleteFast = *cspacec::csSprite2DVertexArrayChangeAll_DeleteFast;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -14771,6 +14769,7 @@ sub DESTROY {
 *GetHeight = *cspacec::csImageMemory_GetHeight;
 *GetDepth = *cspacec::csImageMemory_GetDepth;
 *GetRawFormat = *cspacec::csImageMemory_GetRawFormat;
+*GetRawData = *cspacec::csImageMemory_GetRawData;
 *GetFormat = *cspacec::csImageMemory_GetFormat;
 *GetPalette = *cspacec::csImageMemory_GetPalette;
 *GetAlpha = *cspacec::csImageMemory_GetAlpha;

@@ -33,6 +33,7 @@
 #       bindir
 #       sbindir
 #       libexecdir
+#       datarootdir
 #       datadir
 #       sysconfdir
 #       sharedstatedir
@@ -64,6 +65,8 @@ _CS_OUTPUT_INSTALL_DIRS([$1], [sbindir],
     [CS_PREPARE_INSTALLPATH([$sbindir], [$2])])
 _CS_OUTPUT_INSTALL_DIRS([$1], [libexecdir],
     [CS_PREPARE_INSTALLPATH([$libexecdir], [$2])])
+_CS_OUTPUT_INSTALL_DIRS([$1], [datarootdir],
+    [CS_PREPARE_INSTALLPATH([$datarootdir], [$2])])
 _CS_OUTPUT_INSTALL_DIRS([$1], [datadir],
     [CS_PREPARE_INSTALLPATH([$datadir], [$2])])
 _CS_OUTPUT_INSTALL_DIRS([$1], [sysconfdir], 

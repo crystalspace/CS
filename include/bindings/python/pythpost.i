@@ -318,7 +318,7 @@ extern "C" {
 #endif
 
 // Not `static' because it is published for use by other clients in same DLL.
-PyObject* csWrapTypedObject(void* objectptr, const char *typetag,
+CS_EXPORT_SYM PyObject* csWrapTypedObject(void* objectptr, const char *typetag,
   int own)
 {
   swig_type_info *ti = SWIG_TypeQuery (typetag);

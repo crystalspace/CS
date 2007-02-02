@@ -10,18 +10,20 @@ rule csConfigGen
   Depends $(<) : Jamconfig cs-config.temppre cs-config.temppost 
   		 [ ConcatDirs $(TOP) scripts cs-config Jamfile ] ;
 
-  local l d e s liblist libdep libdepstr libstrings libaddstrings ;
+  local l d e s liblist libdep libdepstr libstrings libaddstrings libbasestrs libbase libswitchcase ;
   
   for l in $(INSTALLEDLIBS) $(INSTALLEDLIBS_OPTIONAL)
   {
+    libbase = [ LibraryBaseName $(l) ] ;
     libaddstrings += "    $(l)) \
-	addlib \"-l$(l)\" 	\
+	addlib \"-l$(libbase)\" 	\
 	;;			\
 " ;
     libdep = ;
     for d in $($(l)_depends)
     {
-      libdep += -l$(d) ;
+      local depbase = [ LibraryBaseName $(d) ] ;
+      libdep += -l$(depbase) ;
     }
     for e in $($(l).EXTERNALLIBS)
     {
@@ -32,7 +34,19 @@ rule csConfigGen
     {
       libdepstr = "$(libdepstr) $(s)" ;
     }
-    libstrings += "       -l$(l)) DEPS=\"$(libdepstr)\" ;;\
+    libstrings += "       -l$(libbase)) DEPS=\"$(libdepstr)\" ;;\
+" ;
+    libbasestrs += "lib$(l)=$(libbase)
+" ;
+  }
+
+  # Hack to have cs-config fake indirection on ubuntu dash
+  for l in $(INSTALLEDLIBS) $(INSTALLEDLIBS_OPTIONAL)
+  {
+    # split this up since it seems impossible to escape \$
+    libbase = [ LibraryBaseName $(l) ] ;
+    libswitchcase += "   \"$(l)\"):
+      libbase=$(libbase) ;;
 " ;
   }
 
@@ -53,6 +67,8 @@ rule csConfigGen
   liblist_opt on $(<) = [ Sort $(INSTALLEDLIBS_OPTIONAL) ] ;
   libstrings on $(<) = $(libstrings) ;
   libaddstrings on $(<) = $(libaddstrings) ;
+  libbasestrs on $(<) = $(libbasestrs) ;
+  libswitchcase on $(<) = $(libswitchcase) ;
 
   csConfigGen1 $(<) : $(>) ;
 }
@@ -68,7 +84,7 @@ if test "\${PATH_SEPARATOR+set}" != set; then
   echo "#! /bin/sh" >conf\$\$.sh
   echo  "exit 0"   >>conf\$\$.sh
   chmod +x conf\$\$.sh
-  if (PATH="/nonexistent;."; conf$$.sh) >/dev/null 2>&1; then
+  if (PATH="/nonexistent;."; conf\$\$.sh) >/dev/null 2>&1; then
     PATH_SEPARATOR=';'
   else
     PATH_SEPARATOR=:
@@ -177,6 +193,25 @@ liblist="\
 liblist_opt="\
  $(liblist_opt)
 "
+
+$(libbasestrs)
+
+__END__
+
+  cat >> $(<) << __END__
+
+# Hack to do variable indirection for posix compliant systems that don't use bash (like ubuntu)
+give_libbase()
+{
+  case \$1 in
+ $(libswitchcase)
+    *)
+      # should never ever happen
+      echo "Internal error, due to unspecified libbase."
+      exit;;
+    esac
+}
+
 __END__
 
   cat $(SUBDIR)/cs-config.temppost >> $(<)
