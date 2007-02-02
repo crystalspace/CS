@@ -1135,7 +1135,6 @@ bool csTextSyntaxService::ParseShaderVar (iDocumentNode* node,
 	csRef<iShaderVariableAccessor> acc = ParseShaderVarExpr (node);
 	if (!acc.IsValid())
 	  return false;
-	var.SetType (csShaderVariable::VECTOR4);
 	var.SetAccessor (acc);
       }
       break;
@@ -1474,31 +1473,46 @@ bool csTextSyntaxService::WriteZMode (iDocumentNode* node,
   return true;
 }
 
-bool csTextSyntaxService::ParseKey (iDocumentNode *node, iKeyValuePair* &keyvalue)
+csPtr<iKeyValuePair> csTextSyntaxService::ParseKey (iDocumentNode* node)
 {
   const char* name = node->GetAttributeValue ("name");
   if (!name)
   {
     ReportError ("crystalspace.syntax.key",
     	        node, "Missing 'name' attribute for 'key'!");
-    return false;
+    return 0;
   }
-  csKeyValuePair* cskvp = new csKeyValuePair (name);
+  csRef<csKeyValuePair> cskvp;
+  cskvp.AttachNew (new csKeyValuePair (name));
+
+  bool editoronly = node->GetAttributeValueAsBool ("editoronly");
+  cskvp->SetEditorOnly (editoronly);
+
   csRef<iDocumentAttributeIterator> atit = node->GetAttributes ();
   while (atit->HasNext ())
   {
     csRef<iDocumentAttribute> at = atit->Next ();
-    cskvp->SetValue (at->GetName (), at->GetValue ());
+    const char* attrName = at->GetName ();
+    if (strcmp (attrName, "editoronly") == 0) continue;
+    cskvp->SetValue (attrName, at->GetValue ());
   }
-  csRef<iKeyValuePair> kvp = SCF_QUERY_INTERFACE (cskvp, iKeyValuePair);
-  
+  return scfQueryInterface<iKeyValuePair> (cskvp);
+}
+
+bool csTextSyntaxService::ParseKey (iDocumentNode *node, iKeyValuePair* &keyvalue)
+{
+  csRef<iKeyValuePair> kvp = ParseKey (node);
+  if (!kvp.IsValid()) return false;
   keyvalue = kvp;
+  keyvalue->IncRef();
   return true;
 }
 
 bool csTextSyntaxService::WriteKey (iDocumentNode *node, iKeyValuePair *keyvalue)
 {
   node->SetAttribute ("name", keyvalue->GetKey ());
+  if (keyvalue->GetEditorOnly ())
+    node->SetAttribute ("editoronly", "yes");
   csRef<iStringArray> vnames = keyvalue->GetValueNames ();
   for (size_t i=0; i<vnames->Length (); i++)
   {

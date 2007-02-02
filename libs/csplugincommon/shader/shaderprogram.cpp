@@ -117,7 +117,6 @@ bool csShaderProgram::ParseProgramParam (iDocumentNode* node,
   {
     // Parse exp and save it
     csRef<iShaderVariableAccessor> acc = synsrv->ParseShaderVarExpr (node);
-    var->SetType (csShaderVariable::VECTOR4);
     var->SetAccessor (acc);
     param.var = var;
     param.valid = true;

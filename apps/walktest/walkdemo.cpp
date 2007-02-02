@@ -439,6 +439,7 @@ struct MissileStruct
   csOrthoTransform dir;
   csRef<iMeshWrapper> sprite;
   csRef<iSndSysSource> snd;
+  csRef<iSndSysStream> snd_stream;
 };
 
 struct ExplosionStruct
@@ -494,14 +495,15 @@ bool HandleDynLight (iLight* dyn, iEngine* engine)
         dyn->QueryObject ()->ObjRemove (ido);
         if (ms->snd)
         {
-          ms->snd->GetStream ()->Pause();
+          ms->snd_stream->Pause();
         }
         delete ms;
         if (Sys->mySound)
         {
 	  if (Sys->wMissile_boom)
 	  {
-	    iSndSysStream* st = Sys->wMissile_boom->GetStream ();
+	    csRef<iSndSysStream> st = Sys->mySound->CreateStream (
+		Sys->wMissile_boom->GetData (), CS_SND3D_ABSOLUTE);
 	    csRef<iSndSysSource> sndsource = Sys->mySound->
 	      	CreateSource (st);
 	    if (sndsource)
@@ -639,8 +641,9 @@ void fire_missile ()
   ms->snd = 0;
   if (Sys->mySound)
   {
-    iSndSysStream* sndstream = Sys->wMissile_whoosh->GetStream ();
-    ms->snd = Sys->mySound->CreateSource (sndstream);
+    iSndSysData* snddata = Sys->wMissile_whoosh->GetData ();
+    ms->snd_stream = Sys->mySound->CreateStream (snddata, CS_SND3D_ABSOLUTE);
+    ms->snd = Sys->mySound->CreateSource (ms->snd_stream);
     if (ms->snd)
     {
       csRef<iSndSysSourceSoftware3D> sndsource3d
@@ -648,7 +651,7 @@ void fire_missile ()
 
       sndsource3d->SetPosition (pos);
       sndsource3d->SetVolume (1.0f);
-      ms->snd->GetStream ()->Unpause ();
+      ms->snd_stream->Unpause ();
     }
   }
   ms->type = DYN_TYPE_MISSILE;

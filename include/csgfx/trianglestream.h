@@ -119,7 +119,7 @@ namespace CS
     /**
      * Construct triangle stream with an index buffer.
      * \param indices Index buffer to triangulate.
-     * \param meshType Mesh type of the index data.
+     * \param meshtype Mesh type of the index data.
      * \param indexStart Element of the index buffer to start iterating at.
      * \param indexEnd Element of the index buffer to stop iterating at.
      *   (size_t)~0 means last element.
@@ -142,7 +142,7 @@ namespace CS
      * \param indexEnd Pointer to end of the indices.
      * \param stride Distance between index elements in bytes.
      * \param compType Type of component contained in the data.
-     * \param meshType Mesh type of the index data.
+     * \param meshtype Mesh type of the index data.
      */
     void BeginTriangulate (const uint8* index, const uint8* indexEnd,
       size_t stride, csRenderBufferComponentType compType,
@@ -173,7 +173,7 @@ namespace CS
     /**
      * Begin triangulation of an index buffer.
      * \param indices Index buffer to triangulate.
-     * \param meshType Mesh type of the index data.
+     * \param meshtype Mesh type of the index data.
      * \param indexStart Element of the index buffer to start iterating at.
      * \param indexEnd Element of the index buffer to stop iterating at.
      *   (size_t)~0 means last element.

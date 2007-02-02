@@ -17,20 +17,20 @@
 */
 
 #include "crystalspace.h"
-#include "radprimitive.h"
-#include "radobject.h"
+#include "primitive.h"
+#include "object.h"
 
 namespace lighter
 {
 
-  void RadPrimitive::ComputeMinMaxUV (csVector2 &min, csVector2 &max) const
+  void Primitive::ComputeMinMaxUV (csVector2 &min, csVector2 &max) const
   {
-    size_t index = indexArray[0];
+    size_t index = triangle[0];
     min = vertexData.vertexArray[index].lightmapUV;
     max = vertexData.vertexArray[index].lightmapUV;
     for (uint i = 1; i < 3; ++i)
     {
-      index = indexArray[i];
+      index = triangle[i];
       const csVector2 &uv = vertexData.vertexArray[index].lightmapUV;
       min.x = csMin (min.x, uv.x);
       min.y = csMin (min.y, uv.y);
@@ -41,51 +41,52 @@ namespace lighter
     max += csVector2(0.5f, 0.5f);
   }
 
-  void RadPrimitive::ComputePlane ()
+  void Primitive::ComputePlane ()
   {
     //Setup a temporary array of our vertices
     Vector3DArray vertices;
-    for(uint i = 0; i < 3; ++i)
-    {
-      vertices.Push (vertexData.vertexArray[indexArray[i]].position);
-    }
+    vertices.Push (vertexData.vertexArray[triangle.a].position);
+    vertices.Push (vertexData.vertexArray[triangle.b].position);
+    vertices.Push (vertexData.vertexArray[triangle.c].position);
+
     plane = csPoly3D::ComputePlane (vertices);
   }
 
-  const csVector3 RadPrimitive::GetCenter () const
+  const csVector3 Primitive::GetCenter () const
   {
     csVector3 centroid(0.0f);
-    for(uint i = 0; i < 3; ++i)
-    {
-      centroid += vertexData.vertexArray[indexArray[i]].position;
-    }
+    centroid = vertexData.vertexArray[triangle.a].position;
+    centroid = vertexData.vertexArray[triangle.b].position;
+    centroid = vertexData.vertexArray[triangle.c].position;
+    
     return centroid / 3.0f;
   }
 
-  float RadPrimitive::GetArea () const
+  float Primitive::GetArea () const
   {
-    float area = csMath3::DoubleArea3 (vertexData.vertexArray[indexArray[0]].position,
-      vertexData.vertexArray[indexArray[1]].position, 
-      vertexData.vertexArray[indexArray[2]].position);
+    float area = csMath3::DoubleArea3 (
+      vertexData.vertexArray[triangle.a].position,
+      vertexData.vertexArray[triangle.a].position, 
+      vertexData.vertexArray[triangle.a].position);
     return area/2.0f;
   }
 
-  void RadPrimitive::GetExtent (uint axis, float &min, float &max) const
+  void Primitive::GetExtent (uint axis, float &min, float &max) const
   {
     min = FLT_MAX;
     max = -FLT_MAX;
     for (unsigned int i = 0; i < 3; ++i)
     {
-      float val = vertexData.vertexArray[indexArray[0]].position[axis];
+      float val = vertexData.vertexArray[triangle.a].position[axis];
       min = csMin(min, val);
       max = csMax(max, val);
     }
   }
 
 
-  bool RadPrimitive::Split (const csPlane3& splitPlane, 
-                            csArray<RadPrimitive>& front,
-                            csArray<RadPrimitive>& back) const
+  bool Primitive::Split (const csPlane3& splitPlane, 
+                            csArray<Primitive>& front,
+                            csArray<Primitive>& back) const
   {
     // Do a split
     
@@ -97,7 +98,7 @@ namespace lighter
 
     for (i = 0; i < 3; i++)
     {
-      float c = splitPlane.Classify (vertexData.vertexArray[indexArray[i]].position);
+      float c = splitPlane.Classify (vertexData.vertexArray[triangle[i]].position);
       if (c > LITEPSILON) p = true;
       else if (c < LITEPSILON) n = true;
 
@@ -144,8 +145,8 @@ namespace lighter
       size_t i0 = 2;
       for (size_t i1 = 0; i1 < 3; ++i1)
       {
-        size_t v0 = indexArray[i0];
-        size_t v1 = indexArray[i1];
+        size_t v0 = triangle[i0];
+        size_t v1 = triangle[i1];
         
         float d0 = classification[i0];
         float d1 = classification[i1];
@@ -166,7 +167,7 @@ namespace lighter
           // neg-pos xing
           float D = d0 / (d1 - d0);
 
-          RadObjectVertexData::Vertex isec = 
+          ObjectVertexData::Vertex isec = 
             vertexData.InterpolateVertex (v0, v1, D);
 
           size_t vi = vertexData.vertexArray.Push (isec);
@@ -193,7 +194,7 @@ namespace lighter
         {
           // pos-neg
           float D = d1 / (d0 - d1);
-          RadObjectVertexData::Vertex isec = 
+          ObjectVertexData::Vertex isec = 
             vertexData.InterpolateVertex (v0, v1, D);
 
           size_t vi = vertexData.vertexArray.Push (isec);
@@ -217,18 +218,18 @@ namespace lighter
       }
       for(uint i = 2; i < posIndex.GetSize(); ++i)
       {
-        RadPrimitive newPrim (*this);
-        newPrim.indexArray[0] = posIndex[i-2];
-        newPrim.indexArray[1] = posIndex[i-1];
-        newPrim.indexArray[2] = posIndex[i];
+        Primitive newPrim (*this);
+        newPrim.triangle.a = posIndex[i-2];
+        newPrim.triangle.b = posIndex[i-1];
+        newPrim.triangle.c = posIndex[i];
         front.Push (newPrim);
       }
       for(uint i = 2; i < negIndex.GetSize(); ++i)
       {
-        RadPrimitive newPrim (*this);
-        newPrim.indexArray[0] = negIndex[i-2];
-        newPrim.indexArray[1] = negIndex[i-1];
-        newPrim.indexArray[2] = negIndex[i];
+        Primitive newPrim (*this);
+        newPrim.triangle.a = negIndex[i-2];
+        newPrim.triangle.b = negIndex[i-1];
+        newPrim.triangle.c = negIndex[i];
         back.Push (newPrim);
       }
     }
@@ -359,7 +360,7 @@ namespace lighter
    * ---------------------------------------------------------------------------------------------------------------------------------
    */
 
-  void RadPrimitive::ComputeUVTransform ()
+  void Primitive::ComputeUVTransform ()
   {
     uFormVector.Set (0.0f);
     vFormVector.Set (0.0f);
@@ -373,7 +374,7 @@ namespace lighter
     //visit all vertices
     for (uint i = 0; i < 3; i++)
     {
-      const RadObjectVertexData::Vertex& v = vertexData.vertexArray[indexArray[i]];
+      const ObjectVertexData::Vertex& v = vertexData.vertexArray[triangle[i]];
       const csVector3& c3D = v.position;
       const csVector2& c2D = v.lightmapUV;
 
@@ -385,8 +386,8 @@ namespace lighter
         // Skip those that includes current vertex
         if (v0 != i && v1 != i)
         {
-          const RadObjectVertexData::Vertex& vert0 = vertexData.vertexArray[indexArray[v0]];
-          const RadObjectVertexData::Vertex& vert1 = vertexData.vertexArray[indexArray[v1]];
+          const ObjectVertexData::Vertex& vert0 = vertexData.vertexArray[triangle[v0]];
+          const ObjectVertexData::Vertex& vert1 = vertexData.vertexArray[triangle[v1]];
 
           const csVector3& v03D = vert0.position;
           const csVector3& v13D = vert1.position;
@@ -441,11 +442,10 @@ namespace lighter
   }
 
 
-  void RadPrimitive::Prepare (uint uResolution, uint vResolution)
+  void Primitive::Prepare ()
   {
     // Reset current data
     elementAreas.DeleteAll ();
-    patches.DeleteAll ();
 
     // Compute min/max uv
     uint uc, vc;
@@ -460,36 +460,11 @@ namespace lighter
 
     // Min xyz
     csVector2 d = minUV - 
-      (vertexData.vertexArray[indexArray[0]].lightmapUV + csVector2 (0.5f));
-    minCoord = vertexData.vertexArray[indexArray[0]].position 
+      (vertexData.vertexArray[triangle.a].lightmapUV + csVector2 (0.5f));
+    minCoord = vertexData.vertexArray[triangle.a].position 
       + uFormVector * d.x + vFormVector * d.y;
-    
-    // Number of patches in u/v direction
-    if ((uResolution > 0) && (vResolution > 0))
-    {
-      uPatches = uc / uResolution;
-      vPatches = vc / vResolution;
-      if (uc % uResolution) uPatches++;
-      if (vc % vResolution) vPatches++;
-    }
-    else
-    {
-      uPatches = vPatches = 0;
-    }
-
-    csArray<int> patchECount;
 
     // Set some default info
-    if ((uResolution > 0) && (vResolution > 0))
-    {
-      RadPatch dpatch;
-      dpatch.area = 0.0f;
-      dpatch.energy = illuminationColor;
-      dpatch.plane = plane;
-      dpatch.center = csVector3 (0.0f);
-      patches.SetSize (uPatches * vPatches, dpatch);
-      patchECount.SetSize (uPatches * vPatches, 0);
-    }
     elementAreas.SetCapacity (uc * vc);
 
     // Create our splitplanes
@@ -509,8 +484,10 @@ namespace lighter
     if (vCut.Classify (primCenter) < 0) vCut.Normal () = -vCut.Normal ();
 
     // Start slicing
-    csPoly3D poly = BuildPoly3D ();
-
+    csPoly3D poly;
+    poly.AddVertex (vertexData.vertexArray[triangle.a].position);
+    poly.AddVertex (vertexData.vertexArray[triangle.b].position);
+    poly.AddVertex (vertexData.vertexArray[triangle.c].position);
 
     csPlane3 evCut = vCut;
     for (uint v = 0; v  < vc; v++)
@@ -554,74 +531,20 @@ namespace lighter
         float elArea = el.GetArea ();
         elementAreas.Push (elArea);
 
-        if (elArea > 0 && patches.GetSize () > 0)
-        {
-          //Fix patch too
-          uint patchIdx = v/vResolution * uPatches + u/uResolution;
-          
-          RadPatch &patch = patches[patchIdx];
-          patch.area += elArea;
-          patch.center += el.GetCenter ();
-
-          patchECount[patchIdx]++;
-        }
       }
     }
 
-    // Fix patches
-    if (patches.GetSize () > 0)
-    {
-      float primArea = GetArea ();
-
-      for (uint i = 0; i < patches.GetSize (); i++)
-      {
-        RadPatch &patch = patches[i];
-        patch.center /= patchECount[i];
-        patch.energy *= patch.area / primArea;
-      }
-    }
-
-    patches.ShrinkBestFit ();
     elementAreas.ShrinkBestFit ();
     ComputeBaryCoeffs();
   }
 
-  csPoly3D RadPrimitive::BuildPoly3D () const
-  {
-    csPoly3D poly;
-
-    for(uint i = 0; i < 3; ++i)
-    {
-      poly.AddVertex (vertexData.vertexArray[indexArray[i]].position);
-    }
-
-    return poly;
-  }
-
-  csArray<csTriangle> RadPrimitive::BuildTriangulated() const
-  {
-    csArray<csTriangle> newArr;
-
-    //Triangulate as if it is convex 
-    for(uint i = 2; i < 3; ++i)
-    {
-      csTriangle t;
-      t.a = (int)indexArray[i-2];
-      t.b = (int)indexArray[i-1];
-      t.c = (int)indexArray[i];
-      newArr.Push (t);
-    }
-
-    return newArr;
-  }
-
-  bool RadPrimitive::PointInside (const csVector3& pt) const
+  bool Primitive::PointInside (const csVector3& pt) const
   {
     csVector3 p1 = 
-      vertexData.vertexArray[indexArray[2]].position;
+      vertexData.vertexArray[triangle.c].position;
     for (size_t i = 0; i < 3; i++)
     {
-      csVector3 p2 = vertexData.vertexArray[indexArray[i]].position;
+      csVector3 p2 = vertexData.vertexArray[triangle[i]].position;
 
       csVector3 testPlaneNormal = (p2 - p1) % plane.Normal();
       csPlane3 testPlane (testPlaneNormal, -testPlaneNormal * p1);
@@ -633,14 +556,14 @@ namespace lighter
     return true;
   }
 
-  int RadPrimitive::Classify (const csPlane3 &plane) const
+  int Primitive::Classify (const csPlane3 &plane) const
   {
     size_t i;
     size_t front = 0, back = 0;
 
     for (i = 0; i < 3; i++)
     {
-      float dot = plane.Classify (vertexData.vertexArray[indexArray[i]].position);
+      float dot = plane.Classify (vertexData.vertexArray[triangle[i]].position);
       if (ABS (dot) < EPSILON) dot = 0;
       if (dot > 0)
         back++;
@@ -654,11 +577,11 @@ namespace lighter
     return CS_POL_SPLIT_NEEDED;
   }
 
-  void RadPrimitive::ComputeBaryCoeffs ()
+  void Primitive::ComputeBaryCoeffs ()
   {
-    const csVector3& v1 = vertexData.vertexArray[indexArray[0]].position;
-    const csVector3& v2 = vertexData.vertexArray[indexArray[1]].position;
-    const csVector3& v3 = vertexData.vertexArray[indexArray[2]].position;
+    const csVector3& v1 = vertexData.vertexArray[triangle.a].position;
+    const csVector3& v2 = vertexData.vertexArray[triangle.b].position;
+    const csVector3& v3 = vertexData.vertexArray[triangle.c].position;
 
     csVector3 diff1_3 = v1 - v3;
     csVector3 diff2_3 = v2 - v3;
@@ -732,11 +655,11 @@ namespace lighter
     }
   }
 
-  void RadPrimitive::ComputeBaryCoords (const csVector3& v, float& lambda, 
+  void Primitive::ComputeBaryCoords (const csVector3& v, float& lambda, 
                                         float& my) const
   {
     csVector3 thirdPosToV = 
-      vertexData.vertexArray[indexArray[2]].position - v;
+      vertexData.vertexArray[triangle.c].position - v;
 
     lambda = (lambdaCoeffTV * thirdPosToV);
     my = (myCoeffTV * thirdPosToV);

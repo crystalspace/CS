@@ -26,7 +26,7 @@ namespace lighter
   class Scene;
   class Sector;
   class Light;
-  class RadPrimitive;
+  class Primitive;
   class Raytracer;
 
   class Lighter : public csRefCount

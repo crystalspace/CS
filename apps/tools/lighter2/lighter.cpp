@@ -23,7 +23,7 @@
 #include "lighter.h"
 #include "lightmapuv.h"
 #include "lightmapuv_simple.h"
-#include "radprimitive.h"
+#include "primitive.h"
 #include "raygenerator.h"
 #include "raytracer.h"
 #include "scene.h"
@@ -96,6 +96,7 @@ namespace lighter
 
     engine = csQueryRegistry<iEngine> (objectRegistry);
     if (!engine) return Report ("No iEngine!");
+    engine->SetSaveableFlag (true);
 
     imageIO = csQueryRegistry<iImageIO> (objectRegistry);
     if (!imageIO) return Report ("No iImageIO!");
@@ -132,18 +133,19 @@ namespace lighter
     if (!scene->ParseEngine ()) 
       return false;
     globalStats.SetTotalProgress (10);
+    
 
     unsigned int taskI = 0;
     // Calculate lightmapping coordinates
     LightmapUVLayouter *uvLayout = new SimpleUVLayouter (scene->GetLightmaps());
 
     float factoryProgress = 100.0f / scene->GetFactories ().GetSize ();
-    RadObjectFactoryHash::GlobalIterator factIt = 
+    ObjectFactoryHash::GlobalIterator factIt = 
       scene->GetFactories ().GetIterator ();
     while (factIt.HasNext ())
     {
       globalStats.SetTaskProgress ("Lightmap layout", taskI * factoryProgress);
-      csRef<RadObjectFactory> fact = factIt.Next ();
+      csRef<ObjectFactory> fact = factIt.Next ();
       fact->PrepareLightmapUV (uvLayout);
       taskI++;
     }
@@ -171,6 +173,32 @@ namespace lighter
 
     globalStats.SetTotalProgress (20);
 
+    // Run performance benchmark
+  
+    /*
+    size_t numRays = 2000000;
+    RandomRayListGenerator<PseudoRandomRaygenerator> rayGen;
+    csArray<Ray> rays = rayGen(numRays, csVector3 (0));
+    Raytracer tracer (scene->GetSectors ().GetIterator ().Next ()->kdTree);
+    for (size_t i = 0; i < numRays; ++i)
+    {
+      Ray& r = rays[i];
+      HitPoint h;
+
+      tracer.TraceClosestHit (r, h);
+
+      if ((i % 1000) == 0)
+      {
+        globalTUI.Redraw (TUI::TUI_DRAW_RAYCORE);
+      }
+    }
+
+    int a = 0;
+    return true;
+*/
+    
+    
+
     // Progress 20
 
     // Shoot direct lighting
@@ -187,7 +215,7 @@ namespace lighter
     
     globalStats.SetTotalProgress (40);
 
-    if (globalConfig.GetLighterProperties ().doRadiosity)
+    if (globalConfig.GetLighterProperties ().doiosity)
     {
 
     }
@@ -201,10 +229,10 @@ namespace lighter
     while (sectIt.HasNext ())
     {
       csRef<Sector> sect = sectIt.Next ();
-      RadObjectHash::GlobalIterator objIt = sect->allObjects.GetIterator ();
+      ObjectHash::GlobalIterator objIt = sect->allObjects.GetIterator ();
       while (objIt.HasNext ())
       {
-        csRef<RadObject> obj = objIt.Next ();
+        csRef<Object> obj = objIt.Next ();
         csArray<LightmapPtrDelArray*> allLightmaps (scene->GetAllLightmaps());
         obj->FixupLightmaps (allLightmaps);
       }

@@ -45,6 +45,7 @@
 %}
 
 #ifndef CS_MINI_SWIG
+%include "pyshadervar.i"
 %pythoncode %{
   csReport = csReporterHelper.Report
 %}
@@ -97,6 +98,14 @@
 %}
 
 #ifndef CS_MINI_SWIG
+%extend csKeyModifiers {
+  unsigned int __getitem__ (size_t i) const
+  {
+      if (i<csKeyModifierTypeLast)
+          return self->modifiers[i];
+      return 0;
+  }
+}
 %extend iCollideSystem
 {
   %rename(_GetCollisionPairs) GetCollisionPairs;
@@ -127,6 +136,15 @@
 %extend csVector3
 {
   VECTOR_PYTHON_OBJECT_FUNCTIONS(3)
+
+  float __getitem__ (int i) const { return self->operator[](i); }
+  void __setitem__ (int i, float v) { self->operator[](i) = v; }
+  bool __nonzero__ () const { return !self->IsZero(); }
+}
+
+%extend csVector4
+{
+  VECTOR_PYTHON_OBJECT_FUNCTIONS(4)
 
   float __getitem__ (int i) const { return self->operator[](i); }
   void __setitem__ (int i, float v) { self->operator[](i) = v; }

@@ -749,23 +749,22 @@ void WalkTest::ParseKeyCmds (iObject* src)
     }
     else if (!strcmp (kp->GetKey (), "cmd_AnimateDirLight"))
     {
-      csRef<iMeshWrapper> wrap (SCF_QUERY_INTERFACE (src, iMeshWrapper));
+      csRef<iMeshWrapper> wrap = scfQueryInterface<iMeshWrapper> (src);
       if (wrap)
         anim_dirlight = wrap;	// @@@ anim_dirlight should be csRef
     }
     else if (!strcmp (kp->GetKey (), "entity_WavePortal"))
     {
-      csRef<iMeshWrapper> wrap = SCF_QUERY_INTERFACE (src, iMeshWrapper);
+      csRef<iMeshWrapper> wrap = scfQueryInterface<iMeshWrapper> (src);
       if (wrap)
       {
-	const csRefArray<iSceneNode>& ml = wrap->QuerySceneNode ()
-		->GetChildren ();
+        const csRef<iSceneNodeArray> ml = 
+          wrap->QuerySceneNode ()->GetChildrenArray ();
 	size_t i;
 	iMeshWrapper* pcmesh = 0;
-	for (i = 0 ; i < ml.Length () ; i++)
-	  if (ml[i]->QueryMesh ())
+        for (i = 0 ; i < ml->GetSize() ; i++)
+          if ((pcmesh = ml->Get(i)->QueryMesh ()))
 	  {
-	    pcmesh = ml[i]->QueryMesh ();
 	    break;
 	  }
 	if (pcmesh)
@@ -817,14 +816,15 @@ void WalkTest::ParseKeyCmds (iObject* src)
     }
   }
 
-  csRef<iMeshWrapper> mesh (SCF_QUERY_INTERFACE (src, iMeshWrapper));
+  csRef<iMeshWrapper> mesh (scfQueryInterface<iMeshWrapper> (src));
   if (mesh)
   {
     size_t k;
-    const csRefArray<iSceneNode>& ml = mesh->QuerySceneNode ()->GetChildren ();
-    for (k = 0 ; k < ml.Length () ; k++)
+    const csRef<iSceneNodeArray> ml = 
+      mesh->QuerySceneNode ()->GetChildrenArray ();
+    for (k = 0 ; k < ml->GetSize() ; k++)
     {
-      iMeshWrapper* spr = ml[k]->QueryMesh ();
+      iMeshWrapper* spr = ml->Get(k)->QueryMesh ();
       // @@@ Also for others?
       if (spr)
         ParseKeyCmds (spr->QueryObject ());
@@ -2190,11 +2190,13 @@ bool CommandHandler (const char *cmd, const char *arg)
       iSndSysWrapper* sb = mgr->FindSoundByName (arg);
       if (sb)
       {
+	csRef<iSndSysStream> sndstream = Sys->mySound->CreateStream (
+	    sb->GetData (), CS_SND3D_ABSOLUTE);
 	csRef<iSndSysSource> sndsource = Sys->mySound->CreateSource (
-	    sb->GetStream ());
+	    sndstream);
 	sndsource->SetVolume (1.0f);
-        sb->GetStream ()->SetLoopState (CS_SNDSYS_STREAM_DONTLOOP);
-        sb->GetStream ()->Unpause ();
+        sndstream->SetLoopState (CS_SNDSYS_STREAM_DONTLOOP);
+        sndstream->Unpause ();
       }
       else
         Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,

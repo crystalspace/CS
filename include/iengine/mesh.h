@@ -527,13 +527,13 @@ struct iMeshWrapper : public virtual iBase
    * Enabling flags:
    * \code
    * csRef<iMeshWrapper> someWrapper = ...;
-   * someWrapper->SetFlags (CS_ENTITY_INVISIBLE | CS_ENTITY_NOCLIP);
+   * someWrapper->SetFlagsRecursive (CS_ENTITY_INVISIBLE | CS_ENTITY_NOCLIP);
    * \endcode
    * <p>
    * Disabling flags:
    * \code
    * csRef<iMeshWrapper> someWrapper = ...;
-   * someWrapper->SetFlags (CS_ENTITY_INVISIBLE | CS_ENTITY_NOCLIP, 0);
+   * someWrapper->SetFlagsRecursive (CS_ENTITY_INVISIBLE | CS_ENTITY_NOCLIP, 0);
    * \endcode
    * \remarks To set flags non-recursive, use GetFlags().Set().
    */

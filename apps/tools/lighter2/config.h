@@ -40,7 +40,7 @@ namespace lighter
       bool doDirectLight;
 
       // Indirect lighting by radiosity
-      bool doRadiosity;
+      bool doiosity;
     };
 
     // Lightmap and lightmap layout properties
@@ -65,13 +65,6 @@ namespace lighter
     };
 
 
-    // Radiosity settings
-    struct RadProperties
-    {
-      // Element/patch densities
-      uint uPatchResolution, vPatchResolution;
-    };
-
     // Public accessible (readable) properties
     const LighterProperties& GetLighterProperties () const
     {
@@ -88,18 +81,11 @@ namespace lighter
       return diProperties;
     }
 
-    const RadProperties& GetRadProperties () const
-    {
-      return radProperties;
-    }
-
   protected:
     // Properties
     LighterProperties     lighterProperties;
     LightmapProperties    lmProperties;
     DIProperties          diProperties;
-    RadProperties         radProperties;
-
   };
 
 }

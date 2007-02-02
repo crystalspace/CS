@@ -1,6 +1,7 @@
 /*
-    Crystal Space Weak Reference Counting Interface
-    Copyright (C) 2002 by Jorrit Tyberghein
+    Crystal Space Weak Reference Counting Implementation
+    Copyright (C) 2006 by Jorrit Tyberghein
+	      (C) 2006 by Amir Taaki
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -17,8 +18,12 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_WEAKREFERENCED_H__
-#define __CS_WEAKREFERENCED_H__
+#ifndef __CS_CSUTIL_WEAKREFERENCED_H__
+#define __CS_CSUTIL_WEAKREFERENCED_H__
+
+/**\file
+ * Weak Reference Counting Implementation
+ */
 
 #include "array.h"
 
@@ -75,4 +80,4 @@ public:
 
 }
 
-#endif // __CS_WEAKREFERENCED_H__
+#endif // __CS_CSUTIL_WEAKREFERENCED_H__

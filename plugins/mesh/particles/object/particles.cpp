@@ -568,36 +568,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
   }
 
   CS_IMPLEMENT_STATIC_VAR(GetFGen, csRandomFloatGen, ());
-
-  void ParticlesMeshObject::NextFrame (csTicks current_time, const csVector3& pos,
-    uint currentFrame)
+  
+  void ParticlesMeshObject::Advance (float dt, float& newRadiusSq)
   {
-    // Update the particle buffers etc
-    if (lastFrameNumber == currentFrame)
-      return;
-
-    if (lastFrameNumber == 0 ||
-        lastUpdateTime == current_time)
-    {
-      lastFrameNumber = currentFrame;
-      lastUpdateTime = current_time;
-      return; //first update, or been invisible for a while
-    }
-
-    lastFrameNumber = currentFrame;
-    currentDt = current_time - lastUpdateTime;
-    lastUpdateTime = current_time;
-
-    // Some artificial limiting of dt
-    if (currentDt > 500) currentDt = 500;
-
-    float dt = currentDt/1000.0f;
     totalParticleTime += dt;
 
     if (externalControl)
       return;
-
-    float newRadiusSq = 0;
 
     // Retire old particles
     size_t currentParticleIdx = 0;
@@ -695,13 +672,40 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
           dt * GetFGen ()->Get ());
       }
     }
+  }
 
-    newRadiusSq = csMax(sqrtf(newRadiusSq), minRadius);
+  void ParticlesMeshObject::NextFrame (csTicks current_time, const csVector3& pos,
+    uint currentFrame)
+  {
+    // Update the particle buffers etc
+    if (lastFrameNumber == currentFrame)
+      return;
 
-    if (newRadiusSq > radius)
+    if (lastFrameNumber == 0 ||
+        lastUpdateTime == current_time)
     {
-      radius = newRadiusSq;
-      ShapeChanged ();      
+      lastFrameNumber = currentFrame;
+      lastUpdateTime = current_time;
+      return; //first update, or been invisible for a while
+    }
+
+    lastFrameNumber = currentFrame;
+    currentDt = current_time - lastUpdateTime;
+    lastUpdateTime = current_time;
+
+    // Some artificial limiting of dt
+    if (currentDt > 500) currentDt = 500;
+
+    float dt = currentDt/1000.0f;
+    float newRadiusSq = 0;
+    Advance (dt, newRadiusSq);
+
+    float newRadius = csMax(sqrtf(newRadiusSq), minRadius);
+
+    if (newRadius > radius)
+    {
+      radius = newRadius;
+      ShapeChanged ();
     }
   }
 
@@ -762,6 +766,29 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     externalControl = true; 
 
     return &particleBuffer;
+  }
+  
+  void ParticlesMeshObject::Advance (csTicks time)
+  {
+    // Advance particle system in slices of that duration
+    const csTicks advanceSlice = 50;
+  
+    float newRadius = minRadius;
+    while (time > 0)
+    {
+      csTicks currentDt = csMin (time, advanceSlice);
+      float dt = currentDt/1000.0f;
+      float newRadiusSq = 0;
+      Advance (dt, newRadiusSq);
+      newRadius = csMax(sqrtf(newRadiusSq), newRadius);
+      time -= currentDt;
+    }
+
+    if (newRadius > radius)
+    {
+      radius = newRadius;
+      ShapeChanged ();
+    }
   }
 }
 CS_PLUGIN_NAMESPACE_END(Particles)

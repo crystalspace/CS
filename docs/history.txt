@@ -6,10 +6,169 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+20-Nov-2006
+        - Piotr made the amotors start working on wiser conditions.
+	- Jorrit changed the mingw building doc to use 'jam' by default
+	  instead of 'make'.
+	- res augmented key/value pairs for a "editoronly" flag. If this flag
+	  is set, the key/value pairs aren't stored in memory unless the 
+	  engine's "saveable" flag is set.
+	- res sanitized key/value parsing in the syntax services.
+	- res changed the loader to use iSceneNodeArray.
+	- res added some initial support for per-vertex lighting to lighter2.
+	- Marten made first step of a refactor of lighter2 by:
+	    - Removing the Rad prefix on objects and primitives.
+	    - Removing "patches" as they are radiosity specific.
+	    - Changed Primitive to use a triangle instead of a size_t[3]
+	      array for indices.
+	    - Removed some dead code.
+19-Nov-2006
+	- Marten made a number of optimizations to the lighter2 ray tracer.
+	- caedes added iJoystickDriver to cspace.i.
+18-Nov-2006
+	- Marten fixed the SCF example in manual section 4.3.1.10.
+17-Nov-2006
+	- Marten fixed a bug in particles loader where the lincolor wouldn't
+	  load alpha. Fixes trac #190.
+16-Nov-2006
+	- Jorrit fixed the 3D sound source implementation so that it now
+	  also implements iSndSysSourceSoftware as it should.
+15-Nov-2006
+	- res changed csVector3::DominantAxis() to return an (here sufficient)
+	  int.
+	- res fixed some deprecation warnings in walktest.
+	- res fixed a bug in the lighter2 kdtree where a flag had opposite
+	  meanings in different code. Also added some debugging facilities and
+	  fixed some VC warnings.
+	- res changed configure to let debug info splitting default to "no" 
+	  in 'profile' mode. Addresses trac #186.
+        - Erroroman made typo fix - SetWithGemeshFactory is renamed to
+          SetWithGenmeshFactory. Also removed SetWithBox (
+          SetWithGenmeshFactory::GenrateBox can be used for that case).
+	- caedes added a check on csODECollider::CreateMeshGeometry, so it
+	  doesnt crash if there is no collision polygon mesh on the object.
+13-Nov-2006
+	- Erroroman added bindings SetWithGemeshFactory and SetWithBox to 
+	  csSimpleRenderMesh in cspace.i. That makes easy to create simple
+	  meshes from given geometry when using CS python module.
+	- Marten reimplemented the kd-tree builder in lighter2. Gave some 
+	  80-120% speedup in benchmarks.
+11-Nov-2006
+	- Genjix corrected spelling mistake vfs.h and changed the years here.
+10-Nov-2006
+	- Jorrit again disabled techniques 150 for character2 and
+	  character_bump2 since they are still giving problems:
+	  	- Not working lighting on linux/ATI
+		- Corrupted lighting on Intel Graphics
+	- Jorrit changed iSndSysWrapper to keep track of iSndSysData
+	  instead (but see later) of iSndSysStream. The idea is that
+	  a sound object should only care about the sound data and
+	  the stream should be created later. For compatibility
+	  reasons a stream is still created however. All methods
+	  taking care of streams in iSndSysWrapper are marked
+	  deprecated. Also in iLoader the version of LoadSoundWrapper()
+	  that takes a mode3d parameter is now deprecated as this
+	  version creates a stream. Using the 'mode3d' attribute
+	  in maps is now also deprecated.
+	- Marten removed some old left-over code that only was needed for
+	  VC6 and/or windows version 95,98 and Me.
+	- Marten reverted the part of r25859 that deprecated windows 95, 98
+	  and Me until we decide to retire them.
+9-Nov-2006
+	- Eric Sunshine worked around problem in configure.ac caused by
+	  unintentional side-effect of recent change to detect newer vs. older
+	  X11 installations.  Autoconf delays performing certain tests until
+	  the test is actually required. In this case, the CPP test was first
+	  needed inside the "old" branch of the X11 check.  For machines with a
+	  newer, modular X.org installation, this resulted in the CPP test
+	  never being run. Fixed by adding an explicit and unconditional
+	  AC_PROG_CPP invocation to configure.ac.
+	- Marten added a preadvance option to particles xml-loader that allows
+	  you to advance the particle system on load.
+	- Marten made an optimization to the ray tracer in lighter2. Should show
+	  some 10-40% speed-up on calculations.
+	- res fixed the perl bindings to compile again.
+	- res reverted r25844: it's not needed any more. Also, it seems that
+	  only the underscored Interlocked* functions are supported as 
+	  intrinsic functions.
+	- res fixed SetVertexCount in genmesh to not set all normals and 
+	  colors to null but only those that were newly added.
+8-Nov-2006
+	- Erroroman changed bones indices render buffer type to ushort. Also 
+	  changed indices type to short in all animation vertex shaders.
+	- Erroroman made Cg skinning default again.
+	- Erroroman dopted max animation exporter script to export ushort bones
+	  indices.
+	- Erroroman fixed speed problem in shader animation by changing bones 
+	  indices type from ushort to short. Also fixed max exporter again.
+7-Nov-2006
+	- Eric Sunshine changed CS_CHECK_PROG_VERSION() in progver.m4 to export
+	  shell variables `cs_prog_PROG_version' and `cs_prog_PROG_version_ok'
+	  indicating the discovered version of PROG and whether the version
+	  check succeeded, respectively. These variables are available to the
+	  ACTION-IF-OKAY and ACTION-IF-NOT-OKAY code fragments.
+	- Eric Sunshine clarified and further elaborated
+	  CS_CHECK_PROG_VERSION() documentation.
+	- Eric Sunshine augmented CS_CHECK_CSWIN32LIBS() in checkcswin32libs.m4
+	  to export also the result of the new `cslibs-config --incpath' option
+	  if available.
+	- Eric Sunshine rewrote the `pycegui' check in configure.ac essentially
+	  from scratch.
+	    - Added caching support so that it saves computed information in
+	      the configure cache file (when --config-cache is specified) and
+	      avoids expensive operations when cached information is available.
+	    - It now performs a simple extraction and Swig version comparison
+	      rather than "mis-using" CS_CHECK_PROG_VERSION().
+	    - Broke apart the check into a number of smaller pieces in order to
+	      facilitate comprehension and maintenance.
+	    - Added support for cs-win32libs when attempting to locate the
+	      pycegui.i Swig output file.
+	    - Fixed bug where default search path elements when locating
+	      cegui.i file were incorrectly separated by whitespace rather than
+	      $PATH_SEPARATOR.
+	- Eric Sunshine fixed r25803 bug in CS_CHECK_LIB_WITH() in checklib.m4
+	  which resulted in exported variables being named incorrectly, thus
+	  causing later tests and dependent code which relied upon those
+	  variables to fail.
+	- res augmented the particle system to allow manually advancing it
+	  a given duration.
+	- res enabled --as-needed by default.
+	- caedes fixed two minor errors on the new pycegui test in 
+	  configure.ac.
+6-Nov-2006
+	- caedes added the uvanim shader, it is an xml shader for uv frame
+	  animation, ie, it scrolls over frames packed in a texture.
+	- caedes added some templates to swig interface files that allow
+	  python bindings to declare python properties (they work for
+	  external projects also).
+	- caedes changed the python property wrappers interface file so it
+	  can really be used from external projects. Also fixed commenting
+	  a bit.
 5-Nov-2006
 	- res worked around an apparent VC7 compiler bug causing trouble with
 	  csArray: compiler-generated assignment operators seem to 
 	  errorneously copy a single byte for empty classes.
+	- res fixed shader variables and program parameters filled from
+	  shader expressions to be forced to type VECTOR4.
+	- Eric Sunshine fixed CS_CHECK_LIB_WITH() Autoconf macro
+	  (mk/autoconf/checklib.m4) to generate valid shell variable names even
+	  when the LIBRARY name contains "special" characters, such as hyphens,
+	  periods, etc.  (A similar problem had been fixed for the ALIASES
+	  argument of CS_CHECK_LIB_WITH() in SVN r19486, but that patch
+	  neglected to address the issue for the LIBRARY argument.)
+        - caedes made the following changes in swig interface files:
+            - fixed csTriangle wrapping.
+            - added iODEHinge2Joint to interface list.
+            - added wrapping of csVector4, csImageBase and csImageMemory.
+            - added an output typemap for csKeyModifiers, and list like
+              interface to fetch the modifiers.
+            - added extended python function GetValue for getting shadervar
+              values as python objects.
+            - added some ifdef so _csPyEventHandler does not get exported to
+              other modules %importing cspace.i (so now theyre not required
+              to declare it).
+            - removed csPixmap %ignore declaration.
+            - removed the _csPyEventHandler declaration from pycscegui.
 4-Nov-2006
 	- res changed the VC project templates to enable "force for loop scope
 	  conformances" (means for loop control variables declared in the for
@@ -27,7 +186,8 @@ chronological order.
 	  could cause assertion errors (i.e. leaf_replaced and such). The
 	  work around simply tests for illegal bounding boxes and replaces
 	  that box internally with a very small legal one.
-	- Genjix fixed dodgy referencing of pointer in WeakReferenced destructor.
+	- Genjix fixed dodgy referencing of pointer in WeakReferenced
+	  destructor.
 	- caedes fixed an mistype in csgeom/vector4.h (csVector4 incorrectly
 	  referenced from inside csVector4T).
 	- caedes made the engine add a "mesh creation time" shvar to all
@@ -343,7 +503,7 @@ chronological order.
 	  (which would likely not be able to cope with CS' use of advanced
 	  C++ features anyway): 'typename_qualifier', fake 'explicit' 
 	  keyword, CS_SPECIALIZE_TEMPLATE instead of template<>, 
-	  CSARRAY_INHIBIT_TYPED_KEYS. Adresses trac #16.
+	  CSARRAY_INHIBIT_TYPED_KEYS. Addresses trac #16.
 	- Jorrit added a workaround for GetTuple() in windows so that
 	  it at least compiles. MacOS/X is still broken and the GetTuple()
 	  implementation in Windows just returns 0.

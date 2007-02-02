@@ -659,6 +659,7 @@ CXXFLAGS
 ac_ct_CXX
 LD
 ac_ct_LD
+CPP
 CXXCPP
 RANLIB
 DLLTOOL
@@ -705,7 +706,6 @@ PYTHON
 JAVA
 JAVAC
 ANT
-CPP
 PKG_CONFIG
 ac_ct_PKG_CONFIG
 CONFIG_X11
@@ -773,7 +773,7 @@ CONFIG_CEGUI
 ac_ct_CONFIG_CEGUI
 CONFIG_CEGUIBASE
 ac_ct_CONFIG_CEGUIBASE
-PYCEGUI_I_FILE
+cs_cv_pycegui_i_file
 CONFIG_CG
 ac_ct_CONFIG_CG
 CONFIG_CGGL
@@ -806,8 +806,8 @@ CPPFLAGS
 CXX
 CXXFLAGS
 CCC
-CXXCPP
 CPP
+CXXCPP
 XMKMF'
 
 
@@ -1390,7 +1390,7 @@ Optional Features:
   --enable-mno-cygwin     Compile with the -mno-cygwin option. (default YES)
   --enable-as-needed      Utilize --as-needed linker flag, if supported by
                           linker and if the used binutils version is recent
-                          enough to support it properly (default NO)
+                          enough to support it properly (default YES)
   --enable-static-baselibs
                           Link statically againts libgcc and libstdc++. Use
                           with caution; enabling this option may cause issues
@@ -1407,10 +1407,18 @@ Optional Features:
                           processor will not work with earlier processors (for
                           example, Intel 686-specific code will not work with
                           a 586)
+  --enable-optimize       build with optimizations enabled (default YES); same
+                          as --enable-mode=optimize
+  --enable-debug          build with debugging information (default NO); same
+                          as --enable-mode=debug
+  --enable-profile        build with profiling information (default NO); same
+                          as --enable-mode=profile
+  --enable-mode=mode      set build mode; recognized modes are `optimize',
+                          `debug', `profile' (default OPTIMIZE)
   --enable-separate-debug-info
                           split debug information into separate files.
-                          (default YES if binutils >= 2.17, otherwise default
-                          NO)
+                          (default YES if binutils >= 2.17 and build mode not
+                          'profile', otherwise default NO)
   --enable-optimize-mode-debug-info
                           whether to enable debug information even in optimize
                           builds. (default YES if separate debug information
@@ -1429,14 +1437,6 @@ Optional Features:
                           not available, enable this option on Unix only if
                           you are certain you want a GPL-licensed library
                           infecting your project
-  --enable-optimize       build with optimizations enabled (default YES); same
-                          as --enable-mode=optimize
-  --enable-debug          build with debugging information (default NO); same
-                          as --enable-mode=debug
-  --enable-profile        build with profiling information (default NO); same
-                          as --enable-mode=profile
-  --enable-mode=mode      set build mode; recognized modes are `optimize',
-                          `debug', `profile' (default OPTIMIZE)
   --enable-ptmalloc       enable the built-in ptmalloc which provides fast
                           memory allocations, but may cause problems in rare
                           cases. (default YES)
@@ -1560,8 +1560,8 @@ Some influential environment variables:
               you have headers in a nonstandard directory <include dir>
   CXX         C++ compiler command
   CXXFLAGS    C++ compiler flags
-  CXXCPP      C++ preprocessor
   CPP         C preprocessor
+  CXXCPP      C++ preprocessor
   XMKMF       Path to xmkmf, Makefile generator for X Window System
 
 Use these variables to override the choices made by `configure' or to help
@@ -4386,9 +4386,18 @@ if test -z "$cs_cv_prog_binutils_version_2_17_ok"; then
   cs_cv_prog_binutils_version_2_17_ok=yes
 fi
 
+if test "$cs_cv_prog_binutils_version_2_17_ok" = yes; then
+  cs_prog_binutils_version_ok=yes
+else
+  cs_prog_binutils_version_ok=no
+fi
+
 cs_cv_prog_binutils_version_2_17_ok_annotated="$cs_cv_prog_binutils_version_2_17_ok"
 if test -n "$cs_prog_binutils_is_version"; then
   cs_cv_prog_binutils_version_2_17_ok_annotated="$cs_cv_prog_binutils_version_2_17_ok_annotated (version $cs_prog_binutils_is_version)"
+    cs_prog_binutils_version="$cs_prog_binutils_is_version"
+else
+  cs_prog_binutils_version=''
 fi
 
 
@@ -4397,7 +4406,6 @@ fi
 echo "${ECHO_T}$cs_cv_prog_binutils_version_2_17_ok_annotated" >&6; }
 if test "$cs_cv_prog_binutils_version_2_17_ok" = yes; then
   cs_cv_binutils_true_2_17=yes
-
 else
   cs_cv_binutils_true_2_17=no
 fi
@@ -4496,9 +4504,18 @@ if test -z "$cs_cv_prog_binutils_version_2_16_91_ok"; then
   cs_cv_prog_binutils_version_2_16_91_ok=yes
 fi
 
+if test "$cs_cv_prog_binutils_version_2_16_91_ok" = yes; then
+  cs_prog_binutils_version_ok=yes
+else
+  cs_prog_binutils_version_ok=no
+fi
+
 cs_cv_prog_binutils_version_2_16_91_ok_annotated="$cs_cv_prog_binutils_version_2_16_91_ok"
 if test -n "$cs_prog_binutils_is_version"; then
   cs_cv_prog_binutils_version_2_16_91_ok_annotated="$cs_cv_prog_binutils_version_2_16_91_ok_annotated (version $cs_prog_binutils_is_version)"
+    cs_prog_binutils_version="$cs_prog_binutils_is_version"
+else
+  cs_prog_binutils_version=''
 fi
 
 
@@ -4507,7 +4524,6 @@ fi
 echo "${ECHO_T}$cs_cv_prog_binutils_version_2_16_91_ok_annotated" >&6; }
 if test "$cs_cv_prog_binutils_version_2_16_91_ok" = yes; then
   cs_cv_binutils_2_17=yes
-
 fi
 
 fi
@@ -5454,7 +5470,7 @@ if test "${enable_as_needed+set}" = set; then
 fi
 
     if test -z "$enable_as_needed"; then
-  enable_as_needed=no
+  enable_as_needed=yes
 fi
 
     if test "$enable_as_needed" != "no"; then
@@ -5809,6 +5825,264 @@ fi
 fi
 
 
+
+ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+{ echo "$as_me:$LINENO: checking how to run the C preprocessor" >&5
+echo $ECHO_N "checking how to run the C preprocessor... $ECHO_C" >&6; }
+# On Suns, sometimes $CPP names a directory.
+if test -n "$CPP" && test -d "$CPP"; then
+  CPP=
+fi
+if test -z "$CPP"; then
+  if test "${ac_cv_prog_CPP+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+      # Double quotes because CPP needs to be expanded
+    for CPP in "$CC -E" "$CC -E -traditional-cpp" "/lib/cpp"
+    do
+      ac_preproc_ok=false
+for ac_c_preproc_warn_flag in '' yes
+do
+  # Use a header file that comes with gcc, so configuring glibc
+  # with a fresh cross-compiler works.
+  # Prefer <limits.h> to <assert.h> if __STDC__ is defined, since
+  # <limits.h> exists even on freestanding compilers.
+  # On the NeXT, cc -E runs the code through the compiler's parser,
+  # not just through cpp. "Syntax error" is here to catch this case.
+  cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+#ifdef __STDC__
+# include <limits.h>
+#else
+# include <assert.h>
+#endif
+		     Syntax error
+_ACEOF
+if { (ac_try="$ac_cpp conftest.$ac_ext"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
+  (eval "$ac_cpp conftest.$ac_ext") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } >/dev/null; then
+  if test -s conftest.err; then
+    ac_cpp_err=$ac_c_preproc_warn_flag
+    ac_cpp_err=$ac_cpp_err$ac_c_werror_flag
+  else
+    ac_cpp_err=
+  fi
+else
+  ac_cpp_err=yes
+fi
+if test -z "$ac_cpp_err"; then
+  :
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+  # Broken: fails on valid input.
+continue
+fi
+
+rm -f conftest.err conftest.$ac_ext
+
+  # OK, works on sane cases.  Now check whether nonexistent headers
+  # can be detected and how.
+  cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+#include <ac_nonexistent.h>
+_ACEOF
+if { (ac_try="$ac_cpp conftest.$ac_ext"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
+  (eval "$ac_cpp conftest.$ac_ext") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } >/dev/null; then
+  if test -s conftest.err; then
+    ac_cpp_err=$ac_c_preproc_warn_flag
+    ac_cpp_err=$ac_cpp_err$ac_c_werror_flag
+  else
+    ac_cpp_err=
+  fi
+else
+  ac_cpp_err=yes
+fi
+if test -z "$ac_cpp_err"; then
+  # Broken: success on invalid input.
+continue
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+  # Passes both tests.
+ac_preproc_ok=:
+break
+fi
+
+rm -f conftest.err conftest.$ac_ext
+
+done
+# Because of `break', _AC_PREPROC_IFELSE's cleaning code was skipped.
+rm -f conftest.err conftest.$ac_ext
+if $ac_preproc_ok; then
+  break
+fi
+
+    done
+    ac_cv_prog_CPP=$CPP
+
+fi
+  CPP=$ac_cv_prog_CPP
+else
+  ac_cv_prog_CPP=$CPP
+fi
+{ echo "$as_me:$LINENO: result: $CPP" >&5
+echo "${ECHO_T}$CPP" >&6; }
+ac_preproc_ok=false
+for ac_c_preproc_warn_flag in '' yes
+do
+  # Use a header file that comes with gcc, so configuring glibc
+  # with a fresh cross-compiler works.
+  # Prefer <limits.h> to <assert.h> if __STDC__ is defined, since
+  # <limits.h> exists even on freestanding compilers.
+  # On the NeXT, cc -E runs the code through the compiler's parser,
+  # not just through cpp. "Syntax error" is here to catch this case.
+  cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+#ifdef __STDC__
+# include <limits.h>
+#else
+# include <assert.h>
+#endif
+		     Syntax error
+_ACEOF
+if { (ac_try="$ac_cpp conftest.$ac_ext"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
+  (eval "$ac_cpp conftest.$ac_ext") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } >/dev/null; then
+  if test -s conftest.err; then
+    ac_cpp_err=$ac_c_preproc_warn_flag
+    ac_cpp_err=$ac_cpp_err$ac_c_werror_flag
+  else
+    ac_cpp_err=
+  fi
+else
+  ac_cpp_err=yes
+fi
+if test -z "$ac_cpp_err"; then
+  :
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+  # Broken: fails on valid input.
+continue
+fi
+
+rm -f conftest.err conftest.$ac_ext
+
+  # OK, works on sane cases.  Now check whether nonexistent headers
+  # can be detected and how.
+  cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+#include <ac_nonexistent.h>
+_ACEOF
+if { (ac_try="$ac_cpp conftest.$ac_ext"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
+  (eval "$ac_cpp conftest.$ac_ext") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } >/dev/null; then
+  if test -s conftest.err; then
+    ac_cpp_err=$ac_c_preproc_warn_flag
+    ac_cpp_err=$ac_cpp_err$ac_c_werror_flag
+  else
+    ac_cpp_err=
+  fi
+else
+  ac_cpp_err=yes
+fi
+if test -z "$ac_cpp_err"; then
+  # Broken: success on invalid input.
+continue
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+  # Passes both tests.
+ac_preproc_ok=:
+break
+fi
+
+rm -f conftest.err conftest.$ac_ext
+
+done
+# Because of `break', _AC_PREPROC_IFELSE's cleaning code was skipped.
+rm -f conftest.err conftest.$ac_ext
+if $ac_preproc_ok; then
+  :
+else
+  { { echo "$as_me:$LINENO: error: C preprocessor \"$CPP\" fails sanity check
+See \`config.log' for more details." >&5
+echo "$as_me: error: C preprocessor \"$CPP\" fails sanity check
+See \`config.log' for more details." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+
+ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
@@ -7984,9 +8258,18 @@ if test -z "$cs_cv_prog_bison_version_1_35_ok"; then
   cs_cv_prog_bison_version_1_35_ok=yes
 fi
 
+if test "$cs_cv_prog_bison_version_1_35_ok" = yes; then
+  cs_prog_bison_version_ok=yes
+else
+  cs_prog_bison_version_ok=no
+fi
+
 cs_cv_prog_bison_version_1_35_ok_annotated="$cs_cv_prog_bison_version_1_35_ok"
 if test -n "$cs_prog_bison_is_version"; then
   cs_cv_prog_bison_version_1_35_ok_annotated="$cs_cv_prog_bison_version_1_35_ok_annotated (version $cs_prog_bison_is_version)"
+    cs_prog_bison_version="$cs_prog_bison_is_version"
+else
+  cs_prog_bison_version=''
 fi
 
 
@@ -8000,7 +8283,6 @@ if test "$cs_cv_prog_bison_version_1_35_ok" = yes; then
   cs_jamconfig_text="${cs_jamconfig_text}CMD.BISON ?= \"$cs_build_prop_val\" ;
 "
 fi
-
 
 fi
 
@@ -8241,9 +8523,18 @@ if test -z "$cs_cv_prog_swig_version_1_3_21_ok"; then
   cs_cv_prog_swig_version_1_3_21_ok=yes
 fi
 
+if test "$cs_cv_prog_swig_version_1_3_21_ok" = yes; then
+  cs_prog_swig_version_ok=yes
+else
+  cs_prog_swig_version_ok=no
+fi
+
 cs_cv_prog_swig_version_1_3_21_ok_annotated="$cs_cv_prog_swig_version_1_3_21_ok"
 if test -n "$cs_prog_swig_is_version"; then
   cs_cv_prog_swig_version_1_3_21_ok_annotated="$cs_cv_prog_swig_version_1_3_21_ok_annotated (version $cs_prog_swig_is_version)"
+    cs_prog_swig_version="$cs_prog_swig_is_version"
+else
+  cs_prog_swig_version=''
 fi
 
 
@@ -8257,7 +8548,6 @@ if test "$cs_cv_prog_swig_version_1_3_21_ok" = yes; then
   cs_jamconfig_text="${cs_jamconfig_text}CMD.SWIG ?= \"$cs_build_prop_val\" ;
 "
 fi
-
 
 fi
 
@@ -8405,9 +8695,18 @@ if test -z "$cs_cv_prog_jam_version_2_4_ok"; then
   cs_cv_prog_jam_version_2_4_ok=yes
 fi
 
+if test "$cs_cv_prog_jam_version_2_4_ok" = yes; then
+  cs_prog_jam_version_ok=yes
+else
+  cs_prog_jam_version_ok=no
+fi
+
 cs_cv_prog_jam_version_2_4_ok_annotated="$cs_cv_prog_jam_version_2_4_ok"
 if test -n "$cs_prog_jam_is_version"; then
   cs_cv_prog_jam_version_2_4_ok_annotated="$cs_cv_prog_jam_version_2_4_ok_annotated (version $cs_prog_jam_is_version)"
+    cs_prog_jam_version="$cs_prog_jam_is_version"
+else
+  cs_prog_jam_version=''
 fi
 
 
@@ -8416,7 +8715,6 @@ fi
 echo "${ECHO_T}$cs_cv_prog_jam_version_2_4_ok_annotated" >&6; }
 if test "$cs_cv_prog_jam_version_2_4_ok" = yes; then
   cs_prog_jam_okay=yes
-
 else
   cs_prog_jam_okay=no
 fi
@@ -8650,12 +8948,24 @@ fi
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+               if $CSLIBS_CONFIG --incpath >/dev/null 2>&1; then
+  cs_cv_cslibs_incpath=`{ (echo "$as_me:$LINENO: \$CSLIBS_CONFIG --incpath \$cs_cv_cslibs_compiler") >&5
+  ($CSLIBS_CONFIG --incpath $cs_cv_cslibs_compiler) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+else
+  cs_cv_cslibs_incpath=''
+fi
+
                if $CSLIBS_CONFIG --pcpath >/dev/null 2>&1; then
   cs_cv_cslibs_pcpath=`{ (echo "$as_me:$LINENO: \$CSLIBS_CONFIG --pcpath \$cs_cv_cslibs_compiler") >&5
   ($CSLIBS_CONFIG --pcpath $cs_cv_cslibs_compiler) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+else
+  cs_cv_cslibs_pcpath=''
 fi
 
 else
@@ -9990,7 +10300,7 @@ fi
 
 #------------------------------------------------------------------------------
 # Check for pthread.  Also check if pthread implementation supports the
-# recursive mutex extension.
+# recursive mutex extension and `atfork' functionality.
 #------------------------------------------------------------------------------
 
     case $host_os in
@@ -13447,21 +13757,17 @@ _ACEOF
 cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
-
-	    #if defined(__GNUC__)
-	        typedef long long __int64; /*For gcc on Windows */
+#if defined(__GNUC__)
+	    typedef long long __int64; /* For GCC on Windows */
 	    #endif
-
-	    /* fix for 'jlong' on x86_64 */
+	    /* Fix for 'jlong' on x86_64. */
 	    #if defined(__x86_64)
 	    #ifdef _LP64 /* 64-bit Solaris */
 	    #undef _LP64
 	    #endif
 	    #endif
-
 	    #include <jni.h>
-
-	    JNIEXPORT void JNICALL f(JNIEnv *env, jobject obj);
+	    JNIEXPORT void JNICALL f(JNIEnv* env, jobject obj);
 int
 main ()
 {
@@ -13627,21 +13933,17 @@ _ACEOF
 cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
-
-	    #if defined(__GNUC__)
-	        typedef long long __int64; /*For gcc on Windows */
+#if defined(__GNUC__)
+	    typedef long long __int64; /* For GCC on Windows */
 	    #endif
-
-	    /* fix for 'jlong' on x86_64 */
+	    /* Fix for 'jlong' on x86_64. */
 	    #if defined(__x86_64)
 	    #ifdef _LP64 /* 64-bit Solaris */
 	    #undef _LP64
 	    #endif
 	    #endif
-
 	    #include <jni.h>
-
-	    JNIEXPORT void JNICALL f(JNIEnv *env, jobject obj);
+	    JNIEXPORT void JNICALL f(JNIEnv* env, jobject obj);
 int
 main ()
 {
@@ -22700,442 +23002,6 @@ fi
 
 
 #------------------------------------------------------------------------------
-# Check if byteswap.h is available, which contains optimized byte swapping
-# functiosn (used for endian conversion).
-#------------------------------------------------------------------------------
-ac_ext=c
-ac_cpp='$CPP $CPPFLAGS'
-ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_c_compiler_gnu
-{ echo "$as_me:$LINENO: checking how to run the C preprocessor" >&5
-echo $ECHO_N "checking how to run the C preprocessor... $ECHO_C" >&6; }
-# On Suns, sometimes $CPP names a directory.
-if test -n "$CPP" && test -d "$CPP"; then
-  CPP=
-fi
-if test -z "$CPP"; then
-  if test "${ac_cv_prog_CPP+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-      # Double quotes because CPP needs to be expanded
-    for CPP in "$CC -E" "$CC -E -traditional-cpp" "/lib/cpp"
-    do
-      ac_preproc_ok=false
-for ac_c_preproc_warn_flag in '' yes
-do
-  # Use a header file that comes with gcc, so configuring glibc
-  # with a fresh cross-compiler works.
-  # Prefer <limits.h> to <assert.h> if __STDC__ is defined, since
-  # <limits.h> exists even on freestanding compilers.
-  # On the NeXT, cc -E runs the code through the compiler's parser,
-  # not just through cpp. "Syntax error" is here to catch this case.
-  cat >conftest.$ac_ext <<_ACEOF
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-#ifdef __STDC__
-# include <limits.h>
-#else
-# include <assert.h>
-#endif
-		     Syntax error
-_ACEOF
-if { (ac_try="$ac_cpp conftest.$ac_ext"
-case "(($ac_try" in
-  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
-  *) ac_try_echo=$ac_try;;
-esac
-eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
-  (eval "$ac_cpp conftest.$ac_ext") 2>conftest.er1
-  ac_status=$?
-  grep -v '^ *+' conftest.er1 >conftest.err
-  rm -f conftest.er1
-  cat conftest.err >&5
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } >/dev/null; then
-  if test -s conftest.err; then
-    ac_cpp_err=$ac_c_preproc_warn_flag
-    ac_cpp_err=$ac_cpp_err$ac_c_werror_flag
-  else
-    ac_cpp_err=
-  fi
-else
-  ac_cpp_err=yes
-fi
-if test -z "$ac_cpp_err"; then
-  :
-else
-  echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-  # Broken: fails on valid input.
-continue
-fi
-
-rm -f conftest.err conftest.$ac_ext
-
-  # OK, works on sane cases.  Now check whether nonexistent headers
-  # can be detected and how.
-  cat >conftest.$ac_ext <<_ACEOF
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-#include <ac_nonexistent.h>
-_ACEOF
-if { (ac_try="$ac_cpp conftest.$ac_ext"
-case "(($ac_try" in
-  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
-  *) ac_try_echo=$ac_try;;
-esac
-eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
-  (eval "$ac_cpp conftest.$ac_ext") 2>conftest.er1
-  ac_status=$?
-  grep -v '^ *+' conftest.er1 >conftest.err
-  rm -f conftest.er1
-  cat conftest.err >&5
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } >/dev/null; then
-  if test -s conftest.err; then
-    ac_cpp_err=$ac_c_preproc_warn_flag
-    ac_cpp_err=$ac_cpp_err$ac_c_werror_flag
-  else
-    ac_cpp_err=
-  fi
-else
-  ac_cpp_err=yes
-fi
-if test -z "$ac_cpp_err"; then
-  # Broken: success on invalid input.
-continue
-else
-  echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-  # Passes both tests.
-ac_preproc_ok=:
-break
-fi
-
-rm -f conftest.err conftest.$ac_ext
-
-done
-# Because of `break', _AC_PREPROC_IFELSE's cleaning code was skipped.
-rm -f conftest.err conftest.$ac_ext
-if $ac_preproc_ok; then
-  break
-fi
-
-    done
-    ac_cv_prog_CPP=$CPP
-
-fi
-  CPP=$ac_cv_prog_CPP
-else
-  ac_cv_prog_CPP=$CPP
-fi
-{ echo "$as_me:$LINENO: result: $CPP" >&5
-echo "${ECHO_T}$CPP" >&6; }
-ac_preproc_ok=false
-for ac_c_preproc_warn_flag in '' yes
-do
-  # Use a header file that comes with gcc, so configuring glibc
-  # with a fresh cross-compiler works.
-  # Prefer <limits.h> to <assert.h> if __STDC__ is defined, since
-  # <limits.h> exists even on freestanding compilers.
-  # On the NeXT, cc -E runs the code through the compiler's parser,
-  # not just through cpp. "Syntax error" is here to catch this case.
-  cat >conftest.$ac_ext <<_ACEOF
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-#ifdef __STDC__
-# include <limits.h>
-#else
-# include <assert.h>
-#endif
-		     Syntax error
-_ACEOF
-if { (ac_try="$ac_cpp conftest.$ac_ext"
-case "(($ac_try" in
-  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
-  *) ac_try_echo=$ac_try;;
-esac
-eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
-  (eval "$ac_cpp conftest.$ac_ext") 2>conftest.er1
-  ac_status=$?
-  grep -v '^ *+' conftest.er1 >conftest.err
-  rm -f conftest.er1
-  cat conftest.err >&5
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } >/dev/null; then
-  if test -s conftest.err; then
-    ac_cpp_err=$ac_c_preproc_warn_flag
-    ac_cpp_err=$ac_cpp_err$ac_c_werror_flag
-  else
-    ac_cpp_err=
-  fi
-else
-  ac_cpp_err=yes
-fi
-if test -z "$ac_cpp_err"; then
-  :
-else
-  echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-  # Broken: fails on valid input.
-continue
-fi
-
-rm -f conftest.err conftest.$ac_ext
-
-  # OK, works on sane cases.  Now check whether nonexistent headers
-  # can be detected and how.
-  cat >conftest.$ac_ext <<_ACEOF
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-#include <ac_nonexistent.h>
-_ACEOF
-if { (ac_try="$ac_cpp conftest.$ac_ext"
-case "(($ac_try" in
-  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
-  *) ac_try_echo=$ac_try;;
-esac
-eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
-  (eval "$ac_cpp conftest.$ac_ext") 2>conftest.er1
-  ac_status=$?
-  grep -v '^ *+' conftest.er1 >conftest.err
-  rm -f conftest.er1
-  cat conftest.err >&5
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } >/dev/null; then
-  if test -s conftest.err; then
-    ac_cpp_err=$ac_c_preproc_warn_flag
-    ac_cpp_err=$ac_cpp_err$ac_c_werror_flag
-  else
-    ac_cpp_err=
-  fi
-else
-  ac_cpp_err=yes
-fi
-if test -z "$ac_cpp_err"; then
-  # Broken: success on invalid input.
-continue
-else
-  echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-  # Passes both tests.
-ac_preproc_ok=:
-break
-fi
-
-rm -f conftest.err conftest.$ac_ext
-
-done
-# Because of `break', _AC_PREPROC_IFELSE's cleaning code was skipped.
-rm -f conftest.err conftest.$ac_ext
-if $ac_preproc_ok; then
-  :
-else
-  { { echo "$as_me:$LINENO: error: C preprocessor \"$CPP\" fails sanity check
-See \`config.log' for more details." >&5
-echo "$as_me: error: C preprocessor \"$CPP\" fails sanity check
-See \`config.log' for more details." >&2;}
-   { (exit 1); exit 1; }; }
-fi
-
-ac_ext=c
-ac_cpp='$CPP $CPPFLAGS'
-ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_c_compiler_gnu
-
-
-
-for ac_header in byteswap.h
-do
-as_ac_Header=`echo "ac_cv_header_$ac_header" | $as_tr_sh`
-if { as_var=$as_ac_Header; eval "test \"\${$as_var+set}\" = set"; }; then
-  { echo "$as_me:$LINENO: checking for $ac_header" >&5
-echo $ECHO_N "checking for $ac_header... $ECHO_C" >&6; }
-if { as_var=$as_ac_Header; eval "test \"\${$as_var+set}\" = set"; }; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-fi
-ac_res=`eval echo '${'$as_ac_Header'}'`
-	       { echo "$as_me:$LINENO: result: $ac_res" >&5
-echo "${ECHO_T}$ac_res" >&6; }
-else
-  # Is the header compilable?
-{ echo "$as_me:$LINENO: checking $ac_header usability" >&5
-echo $ECHO_N "checking $ac_header usability... $ECHO_C" >&6; }
-cat >conftest.$ac_ext <<_ACEOF
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-$ac_includes_default
-#include <$ac_header>
-_ACEOF
-rm -f conftest.$ac_objext
-if { (ac_try="$ac_compile"
-case "(($ac_try" in
-  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
-  *) ac_try_echo=$ac_try;;
-esac
-eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
-  (eval "$ac_compile") 2>conftest.er1
-  ac_status=$?
-  grep -v '^ *+' conftest.er1 >conftest.err
-  rm -f conftest.er1
-  cat conftest.err >&5
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag" || test ! -s conftest.err'
-  { (case "(($ac_try" in
-  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
-  *) ac_try_echo=$ac_try;;
-esac
-eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
-  (eval "$ac_try") 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; } &&
-	 { ac_try='test -s conftest.$ac_objext'
-  { (case "(($ac_try" in
-  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
-  *) ac_try_echo=$ac_try;;
-esac
-eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
-  (eval "$ac_try") 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; }; then
-  ac_header_compiler=yes
-else
-  echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-	ac_header_compiler=no
-fi
-
-rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
-{ echo "$as_me:$LINENO: result: $ac_header_compiler" >&5
-echo "${ECHO_T}$ac_header_compiler" >&6; }
-
-# Is the header present?
-{ echo "$as_me:$LINENO: checking $ac_header presence" >&5
-echo $ECHO_N "checking $ac_header presence... $ECHO_C" >&6; }
-cat >conftest.$ac_ext <<_ACEOF
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-#include <$ac_header>
-_ACEOF
-if { (ac_try="$ac_cpp conftest.$ac_ext"
-case "(($ac_try" in
-  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
-  *) ac_try_echo=$ac_try;;
-esac
-eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
-  (eval "$ac_cpp conftest.$ac_ext") 2>conftest.er1
-  ac_status=$?
-  grep -v '^ *+' conftest.er1 >conftest.err
-  rm -f conftest.er1
-  cat conftest.err >&5
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } >/dev/null; then
-  if test -s conftest.err; then
-    ac_cpp_err=$ac_c_preproc_warn_flag
-    ac_cpp_err=$ac_cpp_err$ac_c_werror_flag
-  else
-    ac_cpp_err=
-  fi
-else
-  ac_cpp_err=yes
-fi
-if test -z "$ac_cpp_err"; then
-  ac_header_preproc=yes
-else
-  echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-  ac_header_preproc=no
-fi
-
-rm -f conftest.err conftest.$ac_ext
-{ echo "$as_me:$LINENO: result: $ac_header_preproc" >&5
-echo "${ECHO_T}$ac_header_preproc" >&6; }
-
-# So?  What about this header?
-case $ac_header_compiler:$ac_header_preproc:$ac_c_preproc_warn_flag in
-  yes:no: )
-    { echo "$as_me:$LINENO: WARNING: $ac_header: accepted by the compiler, rejected by the preprocessor!" >&5
-echo "$as_me: WARNING: $ac_header: accepted by the compiler, rejected by the preprocessor!" >&2;}
-    { echo "$as_me:$LINENO: WARNING: $ac_header: proceeding with the compiler's result" >&5
-echo "$as_me: WARNING: $ac_header: proceeding with the compiler's result" >&2;}
-    ac_header_preproc=yes
-    ;;
-  no:yes:* )
-    { echo "$as_me:$LINENO: WARNING: $ac_header: present but cannot be compiled" >&5
-echo "$as_me: WARNING: $ac_header: present but cannot be compiled" >&2;}
-    { echo "$as_me:$LINENO: WARNING: $ac_header:     check for missing prerequisite headers?" >&5
-echo "$as_me: WARNING: $ac_header:     check for missing prerequisite headers?" >&2;}
-    { echo "$as_me:$LINENO: WARNING: $ac_header: see the Autoconf documentation" >&5
-echo "$as_me: WARNING: $ac_header: see the Autoconf documentation" >&2;}
-    { echo "$as_me:$LINENO: WARNING: $ac_header:     section \"Present But Cannot Be Compiled\"" >&5
-echo "$as_me: WARNING: $ac_header:     section \"Present But Cannot Be Compiled\"" >&2;}
-    { echo "$as_me:$LINENO: WARNING: $ac_header: proceeding with the preprocessor's result" >&5
-echo "$as_me: WARNING: $ac_header: proceeding with the preprocessor's result" >&2;}
-    { echo "$as_me:$LINENO: WARNING: $ac_header: in the future, the compiler will take precedence" >&5
-echo "$as_me: WARNING: $ac_header: in the future, the compiler will take precedence" >&2;}
-    ( cat <<\_ASBOX
-## ------------------------------------------------- ##
-## Report this to crystal-main@lists.sourceforge.net ##
-## ------------------------------------------------- ##
-_ASBOX
-     ) | sed "s/^/$as_me: WARNING:     /" >&2
-    ;;
-esac
-{ echo "$as_me:$LINENO: checking for $ac_header" >&5
-echo $ECHO_N "checking for $ac_header... $ECHO_C" >&6; }
-if { as_var=$as_ac_Header; eval "test \"\${$as_var+set}\" = set"; }; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  eval "$as_ac_Header=\$ac_header_preproc"
-fi
-ac_res=`eval echo '${'$as_ac_Header'}'`
-	       { echo "$as_me:$LINENO: result: $ac_res" >&5
-echo "${ECHO_T}$ac_res" >&6; }
-
-fi
-if test `eval echo '${'$as_ac_Header'}'` = yes; then
-  cat >>confdefs.h <<_ACEOF
-#define `echo "HAVE_$ac_header" | $as_tr_cpp` 1
-_ACEOF
- cs_header_text="${cs_header_text}#define CS_HAVE_BYTESWAP_H
-"
-fi
-
-done
-
-
-
-
-#------------------------------------------------------------------------------
 # Check for compiler optimization flags.
 #------------------------------------------------------------------------------
 
@@ -23683,6 +23549,133 @@ fi
 
 
 #------------------------------------------------------------------------------
+# Determine build mode; either "optimize", "debug", or "profile".
+#------------------------------------------------------------------------------
+# Check whether --enable-optimize was given.
+if test "${enable_optimize+set}" = set; then
+  enableval=$enable_optimize; test "$enableval" = "yes" && cs_build_mode=optimize
+fi
+
+
+# Check whether --enable-debug was given.
+if test "${enable_debug+set}" = set; then
+  enableval=$enable_debug; test "$enableval" = "yes" && cs_build_mode=debug
+fi
+
+
+# Check whether --enable-profile was given.
+if test "${enable_profile+set}" = set; then
+  enableval=$enable_profile; test "$enableval" = "yes" && cs_build_mode=profile
+fi
+
+
+# Check whether --enable-mode was given.
+if test "${enable_mode+set}" = set; then
+  enableval=$enable_mode; case $enableval in
+	optimize|debug|profile) cs_build_mode=$enableval ;;
+	*) cat >confcache <<\_ACEOF
+# This file is a shell script that caches the results of configure
+# tests run on this system so they can be shared between configure
+# scripts and configure runs, see configure's option --config-cache.
+# It is not useful on other systems.  If it contains results you don't
+# want to keep, you may remove or edit it.
+#
+# config.status only pays attention to the cache file if you give it
+# the --recheck option to rerun configure.
+#
+# `ac_cv_env_foo' variables (set or unset) will be overridden when
+# loading this file, other *unset* `ac_cv_foo' will be assigned the
+# following values.
+
+_ACEOF
+
+# The following way of writing the cache mishandles newlines in values,
+# but we know of no workaround that is simple, portable, and efficient.
+# So, we kill variables containing newlines.
+# Ultrix sh set writes to stderr and can't be redirected directly,
+# and sets the high bit in the cache file unless we assign to the vars.
+(
+  for ac_var in `(set) 2>&1 | sed -n 's/^\([a-zA-Z_][a-zA-Z0-9_]*\)=.*/\1/p'`; do
+    eval ac_val=\$$ac_var
+    case $ac_val in #(
+    *${as_nl}*)
+      case $ac_var in #(
+      *_cv_*) { echo "$as_me:$LINENO: WARNING: Cache variable $ac_var contains a newline." >&5
+echo "$as_me: WARNING: Cache variable $ac_var contains a newline." >&2;} ;;
+      esac
+      case $ac_var in #(
+      _ | IFS | as_nl) ;; #(
+      *) $as_unset $ac_var ;;
+      esac ;;
+    esac
+  done
+
+  (set) 2>&1 |
+    case $as_nl`(ac_space=' '; set) 2>&1` in #(
+    *${as_nl}ac_space=\ *)
+      # `set' does not quote correctly, so add quotes (double-quote
+      # substitution turns \\\\ into \\, and sed turns \\ into \).
+      sed -n \
+	"s/'/'\\\\''/g;
+	  s/^\\([_$as_cr_alnum]*_cv_[_$as_cr_alnum]*\\)=\\(.*\\)/\\1='\\2'/p"
+      ;; #(
+    *)
+      # `set' quotes correctly as required by POSIX, so do not add quotes.
+      sed -n "/^[_$as_cr_alnum]*_cv_[_$as_cr_alnum]*=/p"
+      ;;
+    esac |
+    sort
+) |
+  sed '
+     /^ac_cv_env_/b end
+     t clear
+     :clear
+     s/^\([^=]*\)=\(.*[{}].*\)$/test "${\1+set}" = set || &/
+     t end
+     s/^\([^=]*\)=\(.*\)$/\1=${\1=\2}/
+     :end' >>confcache
+if diff "$cache_file" confcache >/dev/null 2>&1; then :; else
+  if test -w "$cache_file"; then
+    test "x$cache_file" != "x/dev/null" &&
+      { echo "$as_me:$LINENO: updating cache $cache_file" >&5
+echo "$as_me: updating cache $cache_file" >&6;}
+    cat confcache >$cache_file
+  else
+    { echo "$as_me:$LINENO: not updating unwritable cache $cache_file" >&5
+echo "$as_me: not updating unwritable cache $cache_file" >&6;}
+  fi
+fi
+rm -f confcache
+    { { echo "$as_me:$LINENO: error:     unrecognized mode --enable-mode=$enableval; use
+    \`optimize', \`debug', or \`profile'" >&5
+echo "$as_me: error:     unrecognized mode --enable-mode=$enableval; use
+    \`optimize', \`debug', or \`profile'" >&2;}
+   { (exit 1); exit 1; }; } ;;
+    esac
+fi
+
+
+{ echo "$as_me:$LINENO: checking build mode" >&5
+echo $ECHO_N "checking build mode... $ECHO_C" >&6; }
+if test "${cs_build_mode+set}" = set; then
+  :
+else
+  cs_build_mode=optimize
+fi
+
+{ echo "$as_me:$LINENO: result: $cs_build_mode" >&5
+echo "${ECHO_T}$cs_build_mode" >&6; }
+cs_build_prop_val="$cs_build_mode"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}MODE ?= \"$cs_build_prop_val\" ;
+"
+fi
+
+
+
+
+#------------------------------------------------------------------------------
 # Check for compiler debug flags.
 #------------------------------------------------------------------------------
 
@@ -23895,9 +23888,18 @@ if test -z "$cs_cv_prog_binutils_version_2_17_ok"; then
   cs_cv_prog_binutils_version_2_17_ok=yes
 fi
 
+if test "$cs_cv_prog_binutils_version_2_17_ok" = yes; then
+  cs_prog_binutils_version_ok=yes
+else
+  cs_prog_binutils_version_ok=no
+fi
+
 cs_cv_prog_binutils_version_2_17_ok_annotated="$cs_cv_prog_binutils_version_2_17_ok"
 if test -n "$cs_prog_binutils_is_version"; then
   cs_cv_prog_binutils_version_2_17_ok_annotated="$cs_cv_prog_binutils_version_2_17_ok_annotated (version $cs_prog_binutils_is_version)"
+    cs_prog_binutils_version="$cs_prog_binutils_is_version"
+else
+  cs_prog_binutils_version=''
 fi
 
 
@@ -23906,7 +23908,6 @@ fi
 echo "${ECHO_T}$cs_cv_prog_binutils_version_2_17_ok_annotated" >&6; }
 if test "$cs_cv_prog_binutils_version_2_17_ok" = yes; then
   cs_cv_binutils_true_2_17=yes
-
 else
   cs_cv_binutils_true_2_17=no
 fi
@@ -24005,9 +24006,18 @@ if test -z "$cs_cv_prog_binutils_version_2_16_91_ok"; then
   cs_cv_prog_binutils_version_2_16_91_ok=yes
 fi
 
+if test "$cs_cv_prog_binutils_version_2_16_91_ok" = yes; then
+  cs_prog_binutils_version_ok=yes
+else
+  cs_prog_binutils_version_ok=no
+fi
+
 cs_cv_prog_binutils_version_2_16_91_ok_annotated="$cs_cv_prog_binutils_version_2_16_91_ok"
 if test -n "$cs_prog_binutils_is_version"; then
   cs_cv_prog_binutils_version_2_16_91_ok_annotated="$cs_cv_prog_binutils_version_2_16_91_ok_annotated (version $cs_prog_binutils_is_version)"
+    cs_prog_binutils_version="$cs_prog_binutils_is_version"
+else
+  cs_prog_binutils_version=''
 fi
 
 
@@ -24016,7 +24026,6 @@ fi
 echo "${ECHO_T}$cs_cv_prog_binutils_version_2_16_91_ok_annotated" >&6; }
 if test "$cs_cv_prog_binutils_version_2_16_91_ok" = yes; then
   cs_cv_binutils_2_17=yes
-
 fi
 
 fi
@@ -24036,10 +24045,15 @@ if test "${enable_separate_debug_info+set}" = set; then
 fi
 
 if test -z "$enable_separate_debug_info"; then
+  if test "$cs_build_mode$" = "profile"; then
+  enable_separate_debug_info=no
+else
   if test -z `uname | grep -i CYGWIN`; then
   enable_separate_debug_info=$cs_cv_binutils_2_17
 else
   enable_separate_debug_info=$cs_cv_binutils_true_2_17
+fi
+
 fi
 
 fi
@@ -25358,8 +25372,9 @@ fi
 
 
 #------------------------------------------------------------------------------
-# Check for X-Windows.  If the X-Windows implementation is XFree86, then also
-# enable the `VideoMode' extension.
+# Check for X-Windows and several extensions. This check can identify both
+# new-style modular X.Org installations and old-style monolithic installations,
+# such as XFree86.
 #------------------------------------------------------------------------------
 
 
@@ -25384,13 +25399,15 @@ fi
   with_x=no
 fi
 
+
 # Compatiblity: use --with-x param for individual X lib checks
 if test -z "$with_x11"; then
   with_x11=$with_x
 fi
 
-# Newer X.org versions ship with pkgconfig packages, which will be picked up
-# by this check
+
+# Newer X.org versions ship with pkgconfig packages, which will be consulted
+# by CS_CHECK_LIB_WITH().
 
 # Check whether --with-x11 was given.
 if test "${with_x11+set}" = set; then
@@ -25399,7 +25416,8 @@ fi
 
 
     # Backward compatibility: Recognize --with-libx11 as alias for --with-x11.
-    if test -n "$with_libx11" && test -z "$with_x11"; then
+    if test -n "$with_libx11" &&
+           test -z "$with_x11"; then
   with_x11="$with_libx11"
 fi
 
@@ -26198,8 +26216,9 @@ fi
 
     cs_cv_with_x11="$with_x11"
 
+
 if test $cs_cv_libx11 = yes; then
-  # Probably "new" X.org
+  # Probably newer style modular X.org installation.
     if test -z "$with_xext"; then
   with_xext=$with_x
 fi
@@ -26212,7 +26231,8 @@ fi
 
 
     # Backward compatibility: Recognize --with-libxext as alias for --with-xext.
-    if test -n "$with_libxext" && test -z "$with_xext"; then
+    if test -n "$with_libxext" &&
+           test -z "$with_xext"; then
   with_xext="$with_libxext"
 fi
 
@@ -27024,7 +27044,8 @@ fi
     X_LIBS="$cs_cv_libxext_libs $cs_cv_libx11_libs"
 
 else
-  # Use "old" autoconf X11 macros
+  # Probably an older style monolithic X11 installation.
+    # Use old Autoconf built-in X11 detection.
     { echo "$as_me:$LINENO: checking for X" >&5
 echo $ECHO_N "checking for X... $ECHO_C" >&6; }
 
@@ -28657,7 +28678,8 @@ fi
 
 
     # Backward compatibility: Recognize --with-libxxf86vm as alias for --with-xxf86vm.
-    if test -n "$with_libxxf86vm" && test -z "$with_xxf86vm"; then
+    if test -n "$with_libxxf86vm" &&
+           test -z "$with_xxf86vm"; then
   with_xxf86vm="$with_libxxf86vm"
 fi
 
@@ -29909,7 +29931,8 @@ fi
 
 
     # Backward compatibility: Recognize --with-libxaw7 as alias for --with-xaw7.
-    if test -n "$with_libxaw7" && test -z "$with_xaw7"; then
+    if test -n "$with_libxaw7" &&
+           test -z "$with_xaw7"; then
   with_xaw7="$with_libxaw7"
 fi
 
@@ -33713,8 +33736,7 @@ fi
 
 fi
 
-# Check for GLX extensions.  Define CSGL_EXT_STATIC_ASSERTION if _not_
-# present.
+# Check for GLX extensions.  Define CSGL_EXT_STATIC_ASSERTION if _not_ present.
 
     if test x$cs_cv_libglx = "xyes"; then
   # Check for GLX extensions.
@@ -34065,6 +34087,7 @@ else
 fi
 
 fi
+
 
 
 
@@ -35321,7 +35344,8 @@ fi
 
 
     # Backward compatibility: Recognize --with-libz as alias for --with-z.
-    if test -n "$with_libz" && test -z "$with_z"; then
+    if test -n "$with_libz" &&
+           test -z "$with_z"; then
   with_z="$with_libz"
 fi
 
@@ -36582,7 +36606,8 @@ fi
 
 
     # Backward compatibility: Recognize --with-libpng as alias for --with-png.
-    if test -n "$with_libpng" && test -z "$with_png"; then
+    if test -n "$with_libpng" &&
+           test -z "$with_png"; then
   with_png="$with_libpng"
 fi
 
@@ -37837,7 +37862,8 @@ fi
 
 
     # Backward compatibility: Recognize --with-libjpeg as alias for --with-jpeg.
-    if test -n "$with_libjpeg" && test -z "$with_jpeg"; then
+    if test -n "$with_libjpeg" &&
+           test -z "$with_jpeg"; then
   with_jpeg="$with_libjpeg"
 fi
 
@@ -39096,7 +39122,8 @@ fi
 
 
     # Backward compatibility: Recognize --with-liblcms as alias for --with-lcms.
-    if test -n "$with_liblcms" && test -z "$with_lcms"; then
+    if test -n "$with_liblcms" &&
+           test -z "$with_lcms"; then
   with_lcms="$with_liblcms"
 fi
 
@@ -39904,7 +39931,8 @@ fi
 
 
     # Backward compatibility: Recognize --with-libmng as alias for --with-mng.
-    if test -n "$with_libmng" && test -z "$with_mng"; then
+    if test -n "$with_libmng" &&
+           test -z "$with_mng"; then
   with_mng="$with_libmng"
 fi
 
@@ -41157,7 +41185,8 @@ fi
 
 
     # Backward compatibility: Recognize --with-libmikmod as alias for --with-mikmod.
-    if test -n "$with_libmikmod" && test -z "$with_mikmod"; then
+    if test -n "$with_libmikmod" &&
+           test -z "$with_mikmod"; then
   with_mikmod="$with_libmikmod"
 fi
 
@@ -41997,7 +42026,8 @@ fi
 
 
     # Backward compatibility: Recognize --with-libogg as alias for --with-ogg.
-    if test -n "$with_libogg" && test -z "$with_ogg"; then
+    if test -n "$with_libogg" &&
+           test -z "$with_ogg"; then
   with_ogg="$with_libogg"
 fi
 
@@ -42832,7 +42862,8 @@ fi
 
 
     # Backward compatibility: Recognize --with-libvorbis as alias for --with-vorbis.
-    if test -n "$with_libvorbis" && test -z "$with_vorbis"; then
+    if test -n "$with_libvorbis" &&
+           test -z "$with_vorbis"; then
   with_vorbis="$with_libvorbis"
 fi
 
@@ -43669,7 +43700,8 @@ fi
 
 
     # Backward compatibility: Recognize --with-libvorbisfile as alias for --with-vorbisfile.
-    if test -n "$with_libvorbisfile" && test -z "$with_vorbisfile"; then
+    if test -n "$with_libvorbisfile" &&
+           test -z "$with_vorbisfile"; then
   with_vorbisfile="$with_libvorbisfile"
 fi
 
@@ -44517,7 +44549,8 @@ fi
 
 
     # Backward compatibility: Recognize --with-lib3ds as alias for --with-3ds.
-    if test -n "$with_lib3ds" && test -z "$with_3ds"; then
+    if test -n "$with_lib3ds" &&
+           test -z "$with_3ds"; then
   with_3ds="$with_lib3ds"
 fi
 
@@ -46527,7 +46560,8 @@ fi
 
 
     # Backward compatibility: Recognize --with-libode as alias for --with-ode.
-    if test -n "$with_libode" && test -z "$with_ode"; then
+    if test -n "$with_libode" &&
+           test -z "$with_ode"; then
   with_ode="$with_libode"
 fi
 
@@ -48061,7 +48095,8 @@ fi
 
 
     # Backward compatibility: Recognize --with-libbullet as alias for --with-bullet.
-    if test -n "$with_libbullet" && test -z "$with_bullet"; then
+    if test -n "$with_libbullet" &&
+           test -z "$with_bullet"; then
   with_bullet="$with_libbullet"
 fi
 
@@ -48586,7 +48621,10 @@ fi
 
 	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
-	LIBS="$cs_libs_test -lbulletccdphysics -lbulletphysicsinterfacecommon -lbulletdynamics -lbullet $cs_libs_save"
+	LIBS="$cs_libs_test -lbulletccdphysics \
+    -lbulletphysicsinterfacecommon \
+    -lbulletdynamics \
+    -lbullet $cs_libs_save"
 	cat >conftest.$ac_ext <<_ACEOF
 /* confdefs.h.  */
 _ACEOF
@@ -48602,8 +48640,9 @@ cat >>conftest.$ac_ext <<_ACEOF
 int
 main ()
 {
-CollisionDispatcher dispatcher; SimpleBroadphase broadphase;
-    new CcdPhysicsEnvironment (&dispatcher, &broadphase)
+CollisionDispatcher d;
+    SimpleBroadphase b;
+    CcdPhysicsEnvironment* e = new CcdPhysicsEnvironment (&d, &b)
   ;
   return 0;
 }
@@ -48672,7 +48711,10 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
     if test $cs_build_ok = yes; then
   cs_build_cflags=`echo x$cs_cflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_lflags=`echo x$cs_lflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_build_libs=`echo x$cs_libs_test -lbulletccdphysics -lbulletphysicsinterfacecommon -lbulletdynamics -lbullet | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_libs=`echo x$cs_libs_test -lbulletccdphysics \
+    -lbulletphysicsinterfacecommon \
+    -lbulletdynamics \
+    -lbullet | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_libbullet=yes
 		cs_cv_libbullet_cflags=$cs_build_cflags
 		cs_cv_libbullet_lflags=$cs_build_lflags
@@ -48757,7 +48799,10 @@ fi
 
 	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
-	LIBS="$cs_libs_test -lbulletccdphysics -lbulletphysicsinterfacecommon -lbulletdynamics -lbullet $cs_libs_save"
+	LIBS="$cs_libs_test -lbulletccdphysics \
+    -lbulletphysicsinterfacecommon \
+    -lbulletdynamics \
+    -lbullet $cs_libs_save"
 	cat >conftest.$ac_ext <<_ACEOF
 /* confdefs.h.  */
 _ACEOF
@@ -48773,8 +48818,9 @@ cat >>conftest.$ac_ext <<_ACEOF
 int
 main ()
 {
-CollisionDispatcher dispatcher; SimpleBroadphase broadphase;
-    new CcdPhysicsEnvironment (&dispatcher, &broadphase)
+CollisionDispatcher d;
+    SimpleBroadphase b;
+    CcdPhysicsEnvironment* e = new CcdPhysicsEnvironment (&d, &b)
   ;
   return 0;
 }
@@ -48843,7 +48889,10 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
     if test $cs_build_ok = yes; then
   cs_build_cflags=`echo x$cs_cflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_lflags=`echo x$cs_lflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_build_libs=`echo x$cs_libs_test -lbulletccdphysics -lbulletphysicsinterfacecommon -lbulletdynamics -lbullet | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_libs=`echo x$cs_libs_test -lbulletccdphysics \
+    -lbulletphysicsinterfacecommon \
+    -lbulletdynamics \
+    -lbullet | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_libbullet=yes
 		cs_cv_libbullet_cflags=$cs_build_cflags
 		cs_cv_libbullet_lflags=$cs_build_lflags
@@ -49315,8 +49364,8 @@ fi
 
 #------------------------------------------------------------------------------
 # Check for FreeType2. Note that on MacOS/X, Fink strangely installs
-# `freetype-config' in /sw/lib/freetype2/bin, thus we augment PATH so that
-# CS_CHECK_LIB_WITH() will take this unusual location into account.
+# `freetype-config' in the unusual location /sw/lib/freetype2/bin, thus we
+# augment PATH so that CS_CHECK_LIB_WITH() will be able to find it if present.
 #------------------------------------------------------------------------------
 PATH=$PATH$PATH_SEPARATOR/sw/lib/freetype2/bin
 export PATH
@@ -49329,7 +49378,8 @@ fi
 
 
     # Backward compatibility: Recognize --with-libfreetype2 as alias for --with-freetype2.
-    if test -n "$with_libfreetype2" && test -z "$with_freetype2"; then
+    if test -n "$with_libfreetype2" &&
+           test -z "$with_freetype2"; then
   with_freetype2="$with_libfreetype2"
 fi
 
@@ -51133,7 +51183,8 @@ fi
 
 
     # Backward compatibility: Recognize --with-libcal3d as alias for --with-cal3d.
-    if test -n "$with_libcal3d" && test -z "$with_cal3d"; then
+    if test -n "$with_libcal3d" &&
+           test -z "$with_cal3d"; then
   with_cal3d="$with_libcal3d"
 fi
 
@@ -52316,7 +52367,8 @@ fi
 
 
     # Backward compatibility: Recognize --with-libsdl as alias for --with-sdl.
-    if test -n "$with_libsdl" && test -z "$with_sdl"; then
+    if test -n "$with_libsdl" &&
+           test -z "$with_sdl"; then
   with_sdl="$with_libsdl"
 fi
 
@@ -53491,6 +53543,7 @@ fi
 
 
 
+
 #------------------------------------------------------------------------------
 # Check for wxWidgets. Also check if it was built with OpenGL support since it
 # is required by the Crystal Space wxWidgets canvas.
@@ -53512,7 +53565,8 @@ fi
 
 
     # Backward compatibility: Recognize --with-libwx as alias for --with-wx.
-    if test -n "$with_libwx" && test -z "$with_wx"; then
+    if test -n "$with_libwx" &&
+           test -z "$with_wx"; then
   with_wx="$with_libwx"
 fi
 
@@ -54749,7 +54803,8 @@ fi
 
 
     # Backward compatibility: Recognize --with-libCEGUI as alias for --with-CEGUI.
-    if test -n "$with_libCEGUI" && test -z "$with_CEGUI"; then
+    if test -n "$with_libCEGUI" &&
+           test -z "$with_CEGUI"; then
   with_CEGUI="$with_libCEGUI"
 fi
 
@@ -56332,19 +56387,18 @@ fi
 fi
 
 
+
+
 #------------------------------------------------------------------------------
-# Check if cegui.i is available, cegui.py compatible and cegui new enough
+# Check if CEGUI Python bindings (cegui.i, cegui.py) are available, and if
+# CEGUI Python support is sufficiently recent.
 #------------------------------------------------------------------------------
 
-pyceguitest="
-import os.path
-try:
-	import cegui
-	pyfile=getattr(cegui,'__'+'file__')
-	print pyfile.replace('.pyc','.py')
-except:
-	pass
-"
+
+
+
+
+
 
 # Check whether --with-pycegui was given.
 if test "${with_pycegui+set}" = set; then
@@ -56356,16 +56410,12 @@ if test -z "$with_pycegui"; then
 fi
 
 
-if test -n "$PYTHON" && test -n "$SWIG"; then
-
-
-  if test "$with_pycegui" != no && test $cs_cv_libCEGUI = yes; then
-
-
-    if test "" != yes; then
+if test -n "$PYTHON" && test -n "$SWIG" &&
+    test "$with_pycegui" != no && test $cs_cv_libCEGUI = yes; then
+  if test "" != yes; then
   { echo "$as_me:$LINENO: checking if CEGUI is bleeding edge" >&5
 echo $ECHO_N "checking if CEGUI is bleeding edge... $ECHO_C" >&6; }
-if test "${cs_cv_CEGUI_bleeding+set}" = set; then
+if test "${cs_cv_libCEGUI_bleeding+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   ac_ext=cpp
@@ -56449,7 +56499,7 @@ cat >>conftest.$ac_ext <<_ACEOF
 int
 main ()
 {
-CEGUI::Window *w=new CEGUI::Window("","");w->getXPosition();
+CEGUI::Window* w=new CEGUI::Window("",""); w->getXPosition();
   ;
   return 0;
 }
@@ -56519,17 +56569,17 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
   cs_build_cflags=`echo x$cs_cflags_test $cs_cv_libCEGUI_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_lflags=`echo x$cs_lflags_test $cs_cv_libCEGUI_lflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test $cs_cv_libCEGUI_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_cv_CEGUI_bleeding=yes
-		cs_cv_CEGUI_bleeding_cflags=$cs_build_cflags
-		cs_cv_CEGUI_bleeding_lflags=$cs_build_lflags
-		cs_cv_CEGUI_bleeding_libs=$cs_build_libs
+	cs_cv_libCEGUI_bleeding=yes
+		cs_cv_libCEGUI_bleeding_cflags=$cs_build_cflags
+		cs_cv_libCEGUI_bleeding_lflags=$cs_build_lflags
+		cs_cv_libCEGUI_bleeding_libs=$cs_build_libs
 else
-  cs_cv_CEGUI_bleeding=no
+  cs_cv_libCEGUI_bleeding=no
 fi
 
 fi
-{ echo "$as_me:$LINENO: result: $cs_cv_CEGUI_bleeding" >&5
-echo "${ECHO_T}$cs_cv_CEGUI_bleeding" >&6; }
+{ echo "$as_me:$LINENO: result: $cs_cv_libCEGUI_bleeding" >&5
+echo "${ECHO_T}$cs_cv_libCEGUI_bleeding" >&6; }
 else
   { echo "$as_me:$LINENO: checking if CEGUI is bleeding edge" >&5
 echo $ECHO_N "checking if CEGUI is bleeding edge... $ECHO_C" >&6; }
@@ -56614,7 +56664,7 @@ cat >>conftest.$ac_ext <<_ACEOF
 int
 main ()
 {
-CEGUI::Window *w=new CEGUI::Window("","");w->getXPosition();
+CEGUI::Window* w=new CEGUI::Window("",""); w->getXPosition();
   ;
   return 0;
 }
@@ -56684,23 +56734,39 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
   cs_build_cflags=`echo x$cs_cflags_test $cs_cv_libCEGUI_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_lflags=`echo x$cs_lflags_test $cs_cv_libCEGUI_lflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test $cs_cv_libCEGUI_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_cv_CEGUI_bleeding=yes
-		cs_cv_CEGUI_bleeding_cflags=$cs_build_cflags
-		cs_cv_CEGUI_bleeding_lflags=$cs_build_lflags
-		cs_cv_CEGUI_bleeding_libs=$cs_build_libs
+	cs_cv_libCEGUI_bleeding=yes
+		cs_cv_libCEGUI_bleeding_cflags=$cs_build_cflags
+		cs_cv_libCEGUI_bleeding_lflags=$cs_build_lflags
+		cs_cv_libCEGUI_bleeding_libs=$cs_build_libs
 else
-  cs_cv_CEGUI_bleeding=no
+  cs_cv_libCEGUI_bleeding=no
 fi
 
-	    { echo "$as_me:$LINENO: result: $cs_cv_CEGUI_bleeding" >&5
-echo "${ECHO_T}$cs_cv_CEGUI_bleeding" >&6; }
+	    { echo "$as_me:$LINENO: result: $cs_cv_libCEGUI_bleeding" >&5
+echo "${ECHO_T}$cs_cv_libCEGUI_bleeding" >&6; }
 fi
 
-    if test $cs_cv_CEGUI_bleeding = yes; then
+    if test $cs_cv_libCEGUI_bleeding = yes; then
+  :
+else
+  cs_cv_libCEGUI_bleeding_cflags=''
+	cs_cv_libCEGUI_bleeding_lflags=''
+	cs_cv_libCEGUI_bleeding_libs=''
 
-      if test "$with_pycegui" != yes; then
-  PYCEGUI_I_FILE="$with_pycegui/package/cegui.i"
-           PYCEGUI_PY_FILE="$with_pycegui/src/cegui.py"
+fi
+
+fi
+
+
+if test "$cs_cv_libCEGUI_bleeding" = yes; then
+  { echo "$as_me:$LINENO: checking for pycegui" >&5
+echo $ECHO_N "checking for pycegui... $ECHO_C" >&6; }
+if test "${cs_cv_pycegui+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  if test "$with_pycegui" != yes; then
+  cs_cv_pycegui_i_file="$with_pycegui/package/cegui.i"
+            cs_cv_pycegui_py_file="$with_pycegui/src/cegui.py"
 else
   for ac_prog in cegui.i
 do
@@ -56708,22 +56774,22 @@ do
 set dummy $ac_prog; ac_word=$2
 { echo "$as_me:$LINENO: checking for $ac_word" >&5
 echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6; }
-if test "${ac_cv_path_PYCEGUI_I_FILE+set}" = set; then
+if test "${ac_cv_path_cs_cv_pycegui_i_file+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
-  case $PYCEGUI_I_FILE in
+  case $cs_cv_pycegui_i_file in
   [\\/]* | ?:[\\/]*)
-  ac_cv_path_PYCEGUI_I_FILE="$PYCEGUI_I_FILE" # Let the user override the test with a path.
+  ac_cv_path_cs_cv_pycegui_i_file="$cs_cv_pycegui_i_file" # Let the user override the test with a path.
   ;;
   *)
   as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in /usr/local/include/CEGUI/bindings /usr/include/CEGUI/bindings /sw/include/CEGUI/bindings /opt/local/include/CEGUI/bindings /opt/include/CEGUI/bindings
+for as_dir in /usr/local/include/CEGUI/bindings$PATH_SEPARATOR/usr/include/CEGUI/bindings$PATH_SEPARATOR/sw/include/CEGUI/bindings$PATH_SEPARATOR/opt/local/include/CEGUI/bindings$PATH_SEPARATOR/opt/include/CEGUI/bindings$PATH_SEPARATOR$cs_cv_cslibs_incpath
 do
   IFS=$as_save_IFS
   test -z "$as_dir" && as_dir=.
   for ac_exec_ext in '' $ac_executable_extensions; do
   if { test -f "$as_dir/$ac_word$ac_exec_ext" && $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; }; then
-    ac_cv_path_PYCEGUI_I_FILE="$as_dir/$ac_word$ac_exec_ext"
+    ac_cv_path_cs_cv_pycegui_i_file="$as_dir/$ac_word$ac_exec_ext"
     echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
     break 2
   fi
@@ -56734,110 +56800,103 @@ IFS=$as_save_IFS
   ;;
 esac
 fi
-PYCEGUI_I_FILE=$ac_cv_path_PYCEGUI_I_FILE
-if test -n "$PYCEGUI_I_FILE"; then
-  { echo "$as_me:$LINENO: result: $PYCEGUI_I_FILE" >&5
-echo "${ECHO_T}$PYCEGUI_I_FILE" >&6; }
+cs_cv_pycegui_i_file=$ac_cv_path_cs_cv_pycegui_i_file
+if test -n "$cs_cv_pycegui_i_file"; then
+  { echo "$as_me:$LINENO: result: $cs_cv_pycegui_i_file" >&5
+echo "${ECHO_T}$cs_cv_pycegui_i_file" >&6; }
 else
   { echo "$as_me:$LINENO: result: no" >&5
 echo "${ECHO_T}no" >&6; }
 fi
 
 
-  test -n "$PYCEGUI_I_FILE" && break
+  test -n "$cs_cv_pycegui_i_file" && break
 done
 
-	   PYCEGUI_PY_FILE=`{ (echo "$as_me:$LINENO: \$PYTHON -c \"\$pyceguitest\"") >&5
-  ($PYTHON -c "$pyceguitest") 2>&5
+	        cs_cv_pycegui_py_file=`{ (echo "$as_me:$LINENO: \$PYTHON -c \"import os.path
+try:
+    import cegui
+    f=getattr(cegui,'__file__')
+    print f.replace('.pyc','.py')
+except:
+    pass
+\"") >&5
+  ($PYTHON -c "import os.path
+try:
+    import cegui
+    f=getattr(cegui,'__file__')
+    print f.replace('.pyc','.py')
+except:
+    pass
+") 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 fi
 
+        if test -f "$cs_cv_pycegui_py_file" &&
+            test -f "$cs_cv_pycegui_i_file"; then
+  cs_cv_pycegui=yes
+else
+  cs_cv_pycegui=no
+fi
 
-      if test -f "$PYCEGUI_PY_FILE" && test -f "$PYCEGUI_I_FILE"; then
+fi
+{ echo "$as_me:$LINENO: result: $cs_cv_pycegui" >&5
+echo "${ECHO_T}$cs_cv_pycegui" >&6; }
+fi
 
-	{ echo "$as_me:$LINENO: checking if cegui.py was generated with same swig version = $cs_prog_swig_is_version" >&5
-echo $ECHO_N "checking if cegui.py was generated with same swig version = $cs_prog_swig_is_version... $ECHO_C" >&6; }
-if test "${cs_cv_prog_cegui_py_was_generated_with_same_swig_version_PYCEGUI_EXPECTED_SWIG_VERSION_ok_annotated+set}" = set; then
+
+if test "$cs_cv_pycegui" = yes; then
+  { echo "$as_me:$LINENO: checking if pycegui Swig version is compatible" >&5
+echo $ECHO_N "checking if pycegui Swig version is compatible... $ECHO_C" >&6; }
+if test "${cs_cv_pycegui_swig_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
-  cs_prog_cegui_py_was_generated_with_same_swig_is_version=
-cs_prog_cegui_py_was_generated_with_same_swig_min_version=
-cs_prog_cegui_py_was_generated_with_same_swig_is_suffix=
-cs_prog_cegui_py_was_generated_with_same_swig_min_suffix=
-cs_prog_cegui_py_was_generated_with_same_swig_is_suffix_done=
-cs_prog_cegui_py_was_generated_with_same_swig_min_suffix_done=
-
-
-
-
-test -z $cs_prog_cegui_py_was_generated_with_same_swig_is_version && cs_prog_cegui_py_was_generated_with_same_swig_is_version=`sed -n -e '1p' "$PYCEGUI_PY_FILE" | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
-test -n "$cs_prog_cegui_py_was_generated_with_same_swig_is_version" && test -z $cs_prog_cegui_py_was_generated_with_same_swig_is_suffix_done  && { cs_prog_cegui_py_was_generated_with_same_swig_is_suffix_done=yes ; cs_prog_cegui_py_was_generated_with_same_swig_is_suffix= ; }
-
-test -z $cs_prog_cegui_py_was_generated_with_same_swig_is_version && cs_prog_cegui_py_was_generated_with_same_swig_is_version=`sed -n -e '1p' "$PYCEGUI_PY_FILE" | sed '/[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
-test -n "$cs_prog_cegui_py_was_generated_with_same_swig_is_version" && test -z $cs_prog_cegui_py_was_generated_with_same_swig_is_suffix_done  && { cs_prog_cegui_py_was_generated_with_same_swig_is_suffix_done=yes ; cs_prog_cegui_py_was_generated_with_same_swig_is_suffix=.0 ; }
-
-
-
-
-
-
-test -z $cs_prog_cegui_py_was_generated_with_same_swig_min_version && cs_prog_cegui_py_was_generated_with_same_swig_min_version=`echo $cs_prog_swig_is_version | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
-test -n "$cs_prog_cegui_py_was_generated_with_same_swig_min_version" && test -z $cs_prog_cegui_py_was_generated_with_same_swig_min_suffix_done  && { cs_prog_cegui_py_was_generated_with_same_swig_min_suffix_done=yes ; cs_prog_cegui_py_was_generated_with_same_swig_min_suffix= ; }
-
-test -z $cs_prog_cegui_py_was_generated_with_same_swig_min_version && cs_prog_cegui_py_was_generated_with_same_swig_min_version=`echo $cs_prog_swig_is_version | sed '/[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
-test -n "$cs_prog_cegui_py_was_generated_with_same_swig_min_version" && test -z $cs_prog_cegui_py_was_generated_with_same_swig_min_suffix_done  && { cs_prog_cegui_py_was_generated_with_same_swig_min_suffix_done=yes ; cs_prog_cegui_py_was_generated_with_same_swig_min_suffix=.0 ; }
-
-
-cs_prog_cegui_py_was_generated_with_same_swig_is_ver_1=`echo ${cs_prog_cegui_py_was_generated_with_same_swig_is_version}${cs_prog_cegui_py_was_generated_with_same_swig_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\1/'`
-cs_prog_cegui_py_was_generated_with_same_swig_is_ver_2=`echo ${cs_prog_cegui_py_was_generated_with_same_swig_is_version}${cs_prog_cegui_py_was_generated_with_same_swig_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\2/'`
-cs_prog_cegui_py_was_generated_with_same_swig_is_ver_3=`echo ${cs_prog_cegui_py_was_generated_with_same_swig_is_version}${cs_prog_cegui_py_was_generated_with_same_swig_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\3/'`
-
-cs_prog_cegui_py_was_generated_with_same_swig_min_ver_1=`echo $cs_prog_cegui_py_was_generated_with_same_swig_min_version${cs_prog_cegui_py_was_generated_with_same_swig_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\1/'`
-cs_prog_cegui_py_was_generated_with_same_swig_min_ver_2=`echo $cs_prog_cegui_py_was_generated_with_same_swig_min_version${cs_prog_cegui_py_was_generated_with_same_swig_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\2/'`
-cs_prog_cegui_py_was_generated_with_same_swig_min_ver_3=`echo $cs_prog_cegui_py_was_generated_with_same_swig_min_version${cs_prog_cegui_py_was_generated_with_same_swig_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\3/'`
-
-cs_cv_prog_cegui_py_was_generated_with_same_swig_version_PYCEGUI_EXPECTED_SWIG_VERSION_ok=''
-test -z "$cs_cv_prog_cegui_py_was_generated_with_same_swig_version_PYCEGUI_EXPECTED_SWIG_VERSION_ok" \
-  && { expr "$cs_prog_cegui_py_was_generated_with_same_swig_is_ver_1" "=" "$cs_prog_cegui_py_was_generated_with_same_swig_min_ver_1" >/dev/null \
-    || cs_cv_prog_cegui_py_was_generated_with_same_swig_version_PYCEGUI_EXPECTED_SWIG_VERSION_ok=no ; }
-test -z "$cs_cv_prog_cegui_py_was_generated_with_same_swig_version_PYCEGUI_EXPECTED_SWIG_VERSION_ok" \
-  && { expr "$cs_prog_cegui_py_was_generated_with_same_swig_min_ver_1" "=" "$cs_prog_cegui_py_was_generated_with_same_swig_is_ver_1" >/dev/null \
-    || cs_cv_prog_cegui_py_was_generated_with_same_swig_version_PYCEGUI_EXPECTED_SWIG_VERSION_ok=yes ; }
-test -z "$cs_cv_prog_cegui_py_was_generated_with_same_swig_version_PYCEGUI_EXPECTED_SWIG_VERSION_ok" \
-  && { expr "$cs_prog_cegui_py_was_generated_with_same_swig_is_ver_2" "=" "$cs_prog_cegui_py_was_generated_with_same_swig_min_ver_2" >/dev/null \
-    || cs_cv_prog_cegui_py_was_generated_with_same_swig_version_PYCEGUI_EXPECTED_SWIG_VERSION_ok=no ; }
-test -z "$cs_cv_prog_cegui_py_was_generated_with_same_swig_version_PYCEGUI_EXPECTED_SWIG_VERSION_ok" \
-  && { expr "$cs_prog_cegui_py_was_generated_with_same_swig_min_ver_2" "=" "$cs_prog_cegui_py_was_generated_with_same_swig_is_ver_2" >/dev/null \
-    || cs_cv_prog_cegui_py_was_generated_with_same_swig_version_PYCEGUI_EXPECTED_SWIG_VERSION_ok=yes ; }
-test -z "$cs_cv_prog_cegui_py_was_generated_with_same_swig_version_PYCEGUI_EXPECTED_SWIG_VERSION_ok" \
-  && { expr "$cs_prog_cegui_py_was_generated_with_same_swig_is_ver_3" "=" "$cs_prog_cegui_py_was_generated_with_same_swig_min_ver_3" >/dev/null \
-    || cs_cv_prog_cegui_py_was_generated_with_same_swig_version_PYCEGUI_EXPECTED_SWIG_VERSION_ok=no ; }
-test -z "$cs_cv_prog_cegui_py_was_generated_with_same_swig_version_PYCEGUI_EXPECTED_SWIG_VERSION_ok" \
-  && { expr "$cs_prog_cegui_py_was_generated_with_same_swig_min_ver_3" "=" "$cs_prog_cegui_py_was_generated_with_same_swig_is_ver_3" >/dev/null \
-    || cs_cv_prog_cegui_py_was_generated_with_same_swig_version_PYCEGUI_EXPECTED_SWIG_VERSION_ok=yes ; }
-
-if test -z "$cs_cv_prog_cegui_py_was_generated_with_same_swig_version_PYCEGUI_EXPECTED_SWIG_VERSION_ok"; then
-  cs_cv_prog_cegui_py_was_generated_with_same_swig_version_PYCEGUI_EXPECTED_SWIG_VERSION_ok=yes
+  pycegui_swig_ver=`{ (echo "$as_me:$LINENO: \$PYTHON -c \"import sys
+import re
+try:
+    f=open(sys.argv[1],'r')
+    s=f.readline()
+    f.close()
+    m=re.search(r'\d+\.\d+(?:\.\d+)*',s)
+    if m: print m.group()
+except:
+    pass
+\" \"\$cs_cv_pycegui_py_file\"") >&5
+  ($PYTHON -c "import sys
+import re
+try:
+    f=open(sys.argv[1],'r')
+    s=f.readline()
+    f.close()
+    m=re.search(r'\d+\.\d+(?:\.\d+)*',s)
+    if m: print m.group()
+except:
+    pass
+" "$cs_cv_pycegui_py_file") 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+        if test "$pycegui_swig_ver" = "$cs_prog_swig_version"; then
+  cs_cv_pycegui_swig_ok=yes
+else
+  cs_cv_pycegui_swig_ok=no
 fi
 
-cs_cv_prog_cegui_py_was_generated_with_same_swig_version_PYCEGUI_EXPECTED_SWIG_VERSION_ok_annotated="$cs_cv_prog_cegui_py_was_generated_with_same_swig_version_PYCEGUI_EXPECTED_SWIG_VERSION_ok"
-if test -n "$cs_prog_cegui_py_was_generated_with_same_swig_is_version"; then
-  cs_cv_prog_cegui_py_was_generated_with_same_swig_version_PYCEGUI_EXPECTED_SWIG_VERSION_ok_annotated="$cs_cv_prog_cegui_py_was_generated_with_same_swig_version_PYCEGUI_EXPECTED_SWIG_VERSION_ok_annotated (version $cs_prog_cegui_py_was_generated_with_same_swig_is_version)"
+fi
+{ echo "$as_me:$LINENO: result: $cs_cv_pycegui_swig_ok" >&5
+echo "${ECHO_T}$cs_cv_pycegui_swig_ok" >&6; }
 fi
 
 
-fi
-{ echo "$as_me:$LINENO: result: $cs_cv_prog_cegui_py_was_generated_with_same_swig_version_PYCEGUI_EXPECTED_SWIG_VERSION_ok_annotated" >&5
-echo "${ECHO_T}$cs_cv_prog_cegui_py_was_generated_with_same_swig_version_PYCEGUI_EXPECTED_SWIG_VERSION_ok_annotated" >&6; }
-if test "$cs_cv_prog_cegui_py_was_generated_with_same_swig_version_PYCEGUI_EXPECTED_SWIG_VERSION_ok" = yes; then
-  PYCEGUI_I_DIR=`$as_dirname -- $PYCEGUI_I_FILE ||
-$as_expr X$PYCEGUI_I_FILE : 'X\(.*[^/]\)//*[^/][^/]*/*$' \| \
-	 X$PYCEGUI_I_FILE : 'X\(//\)[^/]' \| \
-	 X$PYCEGUI_I_FILE : 'X\(//\)$' \| \
-	 X$PYCEGUI_I_FILE : 'X\(/\)' \| . 2>/dev/null ||
-echo X$PYCEGUI_I_FILE |
+if test "$cs_cv_pycegui_swig_ok" = yes; then
+  pycegui_i_dir=`$as_dirname -- $cs_cv_pycegui_i_file ||
+$as_expr X$cs_cv_pycegui_i_file : 'X\(.*[^/]\)//*[^/][^/]*/*$' \| \
+	 X$cs_cv_pycegui_i_file : 'X\(//\)[^/]' \| \
+	 X$cs_cv_pycegui_i_file : 'X\(//\)$' \| \
+	 X$cs_cv_pycegui_i_file : 'X\(/\)' \| . 2>/dev/null ||
+echo X$cs_cv_pycegui_i_file |
     sed '/^X\(.*[^/]\)\/\/*[^/][^/]*\/*$/{
 	    s//\1/
 	    q
@@ -56855,41 +56914,24 @@ echo X$PYCEGUI_I_FILE |
 	    q
 	  }
 	  s/.*/./; q'`
-		 cs_build_prop_val="yes"
+    cs_build_prop_val="yes"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     if test -n "$cs_build_prop_val"; then
   cs_jamconfig_text="${cs_jamconfig_text}PYCEGUI.SWIGOK ?= \"$cs_build_prop_val\" ;
 "
 fi
 
-		 cs_build_prop_val="-I$PYCEGUI_I_DIR"
+    cs_build_prop_val="-I$pycegui_i_dir"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     if test -n "$cs_build_prop_val"; then
   cs_jamconfig_text="${cs_jamconfig_text}PYCEGUI.SWIGFLAGS ?= \"$cs_build_prop_val\" ;
 "
 fi
 
-
-
 fi
 
 
-fi
- # AS_IF
 
-else
-  cs_cv_CEGUI_bleeding_cflags=''
-	cs_cv_CEGUI_bleeding_lflags=''
-	cs_cv_CEGUI_bleeding_libs=''
-
-fi
-
-
-fi
- # AS_IF ["$with_pycegui" != no && test $cs_cv_libCEGUI = yes]
-
-fi
- # AS_IF([test -n "$PYTHON" && test -n "$SWIG"],[
 
 #------------------------------------------------------------------------------
 # Check if GNU/Linux joystick API is present.
@@ -57288,7 +57330,8 @@ fi
 
 
     # Backward compatibility: Recognize --with-libCg as alias for --with-Cg.
-    if test -n "$with_libCg" && test -z "$with_Cg"; then
+    if test -n "$with_libCg" &&
+           test -z "$with_Cg"; then
   with_Cg="$with_libCg"
 fi
 
@@ -59272,7 +59315,8 @@ fi
 
 
     # Backward compatibility: Recognize --with-libCgGL as alias for --with-CgGL.
-    if test -n "$with_libCgGL" && test -z "$with_CgGL"; then
+    if test -n "$with_libCgGL" &&
+           test -z "$with_CgGL"; then
   with_CgGL="$with_libCgGL"
 fi
 
@@ -63087,8 +63131,10 @@ fi
 fi
 
 
+
+
 #------------------------------------------------------------------------------
-# Check for JACK daemon jackasyn library (JACKASYN)
+# Check for JACK daemon jackasyn library (JACKASYN).
 #------------------------------------------------------------------------------
 if test $cs_host_family != windows; then
 
@@ -63099,7 +63145,8 @@ fi
 
 
     # Backward compatibility: Recognize --with-libjackasyn as alias for --with-jackasyn.
-    if test -n "$with_libjackasyn" && test -z "$with_jackasyn"; then
+    if test -n "$with_libjackasyn" &&
+           test -z "$with_jackasyn"; then
   with_jackasyn="$with_libjackasyn"
 fi
 
@@ -63929,8 +63976,10 @@ fi
 fi
 
 
+
+
 #------------------------------------------------------------------------------
-# Check for Advanced GNU/Linux Sound Architecture (ALSA)
+# Check for Advanced GNU/Linux Sound Architecture (ALSA).
 #------------------------------------------------------------------------------
 if test $cs_host_family != windows; then
 
@@ -63941,7 +63990,8 @@ fi
 
 
     # Backward compatibility: Recognize --with-libasound as alias for --with-asound.
-    if test -n "$with_libasound" && test -z "$with_asound"; then
+    if test -n "$with_libasound" &&
+           test -z "$with_asound"; then
   with_asound="$with_libasound"
 fi
 
@@ -64782,7 +64832,8 @@ fi
 
 
     # Backward compatibility: Recognize --with-libcaca as alias for --with-caca.
-    if test -n "$with_libcaca" && test -z "$with_caca"; then
+    if test -n "$with_libcaca" &&
+           test -z "$with_caca"; then
   with_caca="$with_libcaca"
 fi
 
@@ -66027,13 +66078,10 @@ fi
 # Check for SpiderMonkey JavaScript library.
 #------------------------------------------------------------------------------
 case $cs_host_family in
-    windows)
-	cs_spidermonkey_platform='XP_WIN'
-	;;
-    *)
-	cs_spidermonkey_platform='XP_UNIX'
-	;;
+    windows) cs_spidermonkey_platform='XP_WIN' ;;
+    *) cs_spidermonkey_platform='XP_UNIX' ;;
 esac
+
 
 # Check whether --with-js was given.
 if test "${with_js+set}" = set; then
@@ -66042,7 +66090,8 @@ fi
 
 
     # Backward compatibility: Recognize --with-libjs as alias for --with-js.
-    if test -n "$with_libjs" && test -z "$with_js"; then
+    if test -n "$with_libjs" &&
+           test -z "$with_js"; then
   with_js="$with_libjs"
 fi
 
@@ -69343,7 +69392,8 @@ fi
 
 
     # Backward compatibility: Recognize --with-libcppunit as alias for --with-cppunit.
-    if test -n "$with_libcppunit" && test -z "$with_cppunit"; then
+    if test -n "$with_libcppunit" &&
+           test -z "$with_cppunit"; then
   with_cppunit="$with_libcppunit"
 fi
 
@@ -75728,6 +75778,183 @@ fi
 
 
 #------------------------------------------------------------------------------
+# Check if byteswap.h is available, which contains optimized byte swapping
+# functions (used for endian conversion).
+#------------------------------------------------------------------------------
+
+for ac_header in byteswap.h
+do
+as_ac_Header=`echo "ac_cv_header_$ac_header" | $as_tr_sh`
+if { as_var=$as_ac_Header; eval "test \"\${$as_var+set}\" = set"; }; then
+  { echo "$as_me:$LINENO: checking for $ac_header" >&5
+echo $ECHO_N "checking for $ac_header... $ECHO_C" >&6; }
+if { as_var=$as_ac_Header; eval "test \"\${$as_var+set}\" = set"; }; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+fi
+ac_res=`eval echo '${'$as_ac_Header'}'`
+	       { echo "$as_me:$LINENO: result: $ac_res" >&5
+echo "${ECHO_T}$ac_res" >&6; }
+else
+  # Is the header compilable?
+{ echo "$as_me:$LINENO: checking $ac_header usability" >&5
+echo $ECHO_N "checking $ac_header usability... $ECHO_C" >&6; }
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+$ac_includes_default
+#include <$ac_header>
+_ACEOF
+rm -f conftest.$ac_objext
+if { (ac_try="$ac_compile"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
+  (eval "$ac_compile") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+	 { ac_try='test -z "$ac_c_werror_flag" || test ! -s conftest.err'
+  { (case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
+  (eval "$ac_try") 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; } &&
+	 { ac_try='test -s conftest.$ac_objext'
+  { (case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
+  (eval "$ac_try") 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  ac_header_compiler=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+	ac_header_compiler=no
+fi
+
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+{ echo "$as_me:$LINENO: result: $ac_header_compiler" >&5
+echo "${ECHO_T}$ac_header_compiler" >&6; }
+
+# Is the header present?
+{ echo "$as_me:$LINENO: checking $ac_header presence" >&5
+echo $ECHO_N "checking $ac_header presence... $ECHO_C" >&6; }
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+#include <$ac_header>
+_ACEOF
+if { (ac_try="$ac_cpp conftest.$ac_ext"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
+  (eval "$ac_cpp conftest.$ac_ext") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } >/dev/null; then
+  if test -s conftest.err; then
+    ac_cpp_err=$ac_c_preproc_warn_flag
+    ac_cpp_err=$ac_cpp_err$ac_c_werror_flag
+  else
+    ac_cpp_err=
+  fi
+else
+  ac_cpp_err=yes
+fi
+if test -z "$ac_cpp_err"; then
+  ac_header_preproc=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+  ac_header_preproc=no
+fi
+
+rm -f conftest.err conftest.$ac_ext
+{ echo "$as_me:$LINENO: result: $ac_header_preproc" >&5
+echo "${ECHO_T}$ac_header_preproc" >&6; }
+
+# So?  What about this header?
+case $ac_header_compiler:$ac_header_preproc:$ac_c_preproc_warn_flag in
+  yes:no: )
+    { echo "$as_me:$LINENO: WARNING: $ac_header: accepted by the compiler, rejected by the preprocessor!" >&5
+echo "$as_me: WARNING: $ac_header: accepted by the compiler, rejected by the preprocessor!" >&2;}
+    { echo "$as_me:$LINENO: WARNING: $ac_header: proceeding with the compiler's result" >&5
+echo "$as_me: WARNING: $ac_header: proceeding with the compiler's result" >&2;}
+    ac_header_preproc=yes
+    ;;
+  no:yes:* )
+    { echo "$as_me:$LINENO: WARNING: $ac_header: present but cannot be compiled" >&5
+echo "$as_me: WARNING: $ac_header: present but cannot be compiled" >&2;}
+    { echo "$as_me:$LINENO: WARNING: $ac_header:     check for missing prerequisite headers?" >&5
+echo "$as_me: WARNING: $ac_header:     check for missing prerequisite headers?" >&2;}
+    { echo "$as_me:$LINENO: WARNING: $ac_header: see the Autoconf documentation" >&5
+echo "$as_me: WARNING: $ac_header: see the Autoconf documentation" >&2;}
+    { echo "$as_me:$LINENO: WARNING: $ac_header:     section \"Present But Cannot Be Compiled\"" >&5
+echo "$as_me: WARNING: $ac_header:     section \"Present But Cannot Be Compiled\"" >&2;}
+    { echo "$as_me:$LINENO: WARNING: $ac_header: proceeding with the preprocessor's result" >&5
+echo "$as_me: WARNING: $ac_header: proceeding with the preprocessor's result" >&2;}
+    { echo "$as_me:$LINENO: WARNING: $ac_header: in the future, the compiler will take precedence" >&5
+echo "$as_me: WARNING: $ac_header: in the future, the compiler will take precedence" >&2;}
+    ( cat <<\_ASBOX
+## ------------------------------------------------- ##
+## Report this to crystal-main@lists.sourceforge.net ##
+## ------------------------------------------------- ##
+_ASBOX
+     ) | sed "s/^/$as_me: WARNING:     /" >&2
+    ;;
+esac
+{ echo "$as_me:$LINENO: checking for $ac_header" >&5
+echo $ECHO_N "checking for $ac_header... $ECHO_C" >&6; }
+if { as_var=$as_ac_Header; eval "test \"\${$as_var+set}\" = set"; }; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  eval "$as_ac_Header=\$ac_header_preproc"
+fi
+ac_res=`eval echo '${'$as_ac_Header'}'`
+	       { echo "$as_me:$LINENO: result: $ac_res" >&5
+echo "${ECHO_T}$ac_res" >&6; }
+
+fi
+if test `eval echo '${'$as_ac_Header'}'` = yes; then
+  cat >>confdefs.h <<_ACEOF
+#define `echo "HAVE_$ac_header" | $as_tr_cpp` 1
+_ACEOF
+ cs_header_text="${cs_header_text}#define CS_HAVE_BYTESWAP_H
+"
+fi
+
+done
+
+
+
+
+#------------------------------------------------------------------------------
 # Check how to declare functions and types deprecated.
 #------------------------------------------------------------------------------
 { echo "$as_me:$LINENO: checking how to declare deprecations" >&5
@@ -76820,6 +77047,7 @@ else
 	cs_cv_func_std__isfinite_libs=''
 
 fi
+
 
 if test "" != yes; then
   { echo "$as_me:$LINENO: checking for isfinite" >&5
@@ -78712,7 +78940,8 @@ fi
 
 
     # Backward compatibility: Recognize --with-libbfd as alias for --with-bfd.
-    if test -n "$with_libbfd" && test -z "$with_bfd"; then
+    if test -n "$with_libbfd" &&
+           test -z "$with_bfd"; then
   with_bfd="$with_libbfd"
 fi
 
@@ -80122,133 +80351,6 @@ fi
 
 
 #------------------------------------------------------------------------------
-# Determine build mode; either "optimize", "debug", or "profile".
-#------------------------------------------------------------------------------
-# Check whether --enable-optimize was given.
-if test "${enable_optimize+set}" = set; then
-  enableval=$enable_optimize; test "$enableval" = "yes" && cs_build_mode=optimize
-fi
-
-
-# Check whether --enable-debug was given.
-if test "${enable_debug+set}" = set; then
-  enableval=$enable_debug; test "$enableval" = "yes" && cs_build_mode=debug
-fi
-
-
-# Check whether --enable-profile was given.
-if test "${enable_profile+set}" = set; then
-  enableval=$enable_profile; test "$enableval" = "yes" && cs_build_mode=profile
-fi
-
-
-# Check whether --enable-mode was given.
-if test "${enable_mode+set}" = set; then
-  enableval=$enable_mode; case $enableval in
-	optimize|debug|profile) cs_build_mode=$enableval ;;
-	*) cat >confcache <<\_ACEOF
-# This file is a shell script that caches the results of configure
-# tests run on this system so they can be shared between configure
-# scripts and configure runs, see configure's option --config-cache.
-# It is not useful on other systems.  If it contains results you don't
-# want to keep, you may remove or edit it.
-#
-# config.status only pays attention to the cache file if you give it
-# the --recheck option to rerun configure.
-#
-# `ac_cv_env_foo' variables (set or unset) will be overridden when
-# loading this file, other *unset* `ac_cv_foo' will be assigned the
-# following values.
-
-_ACEOF
-
-# The following way of writing the cache mishandles newlines in values,
-# but we know of no workaround that is simple, portable, and efficient.
-# So, we kill variables containing newlines.
-# Ultrix sh set writes to stderr and can't be redirected directly,
-# and sets the high bit in the cache file unless we assign to the vars.
-(
-  for ac_var in `(set) 2>&1 | sed -n 's/^\([a-zA-Z_][a-zA-Z0-9_]*\)=.*/\1/p'`; do
-    eval ac_val=\$$ac_var
-    case $ac_val in #(
-    *${as_nl}*)
-      case $ac_var in #(
-      *_cv_*) { echo "$as_me:$LINENO: WARNING: Cache variable $ac_var contains a newline." >&5
-echo "$as_me: WARNING: Cache variable $ac_var contains a newline." >&2;} ;;
-      esac
-      case $ac_var in #(
-      _ | IFS | as_nl) ;; #(
-      *) $as_unset $ac_var ;;
-      esac ;;
-    esac
-  done
-
-  (set) 2>&1 |
-    case $as_nl`(ac_space=' '; set) 2>&1` in #(
-    *${as_nl}ac_space=\ *)
-      # `set' does not quote correctly, so add quotes (double-quote
-      # substitution turns \\\\ into \\, and sed turns \\ into \).
-      sed -n \
-	"s/'/'\\\\''/g;
-	  s/^\\([_$as_cr_alnum]*_cv_[_$as_cr_alnum]*\\)=\\(.*\\)/\\1='\\2'/p"
-      ;; #(
-    *)
-      # `set' quotes correctly as required by POSIX, so do not add quotes.
-      sed -n "/^[_$as_cr_alnum]*_cv_[_$as_cr_alnum]*=/p"
-      ;;
-    esac |
-    sort
-) |
-  sed '
-     /^ac_cv_env_/b end
-     t clear
-     :clear
-     s/^\([^=]*\)=\(.*[{}].*\)$/test "${\1+set}" = set || &/
-     t end
-     s/^\([^=]*\)=\(.*\)$/\1=${\1=\2}/
-     :end' >>confcache
-if diff "$cache_file" confcache >/dev/null 2>&1; then :; else
-  if test -w "$cache_file"; then
-    test "x$cache_file" != "x/dev/null" &&
-      { echo "$as_me:$LINENO: updating cache $cache_file" >&5
-echo "$as_me: updating cache $cache_file" >&6;}
-    cat confcache >$cache_file
-  else
-    { echo "$as_me:$LINENO: not updating unwritable cache $cache_file" >&5
-echo "$as_me: not updating unwritable cache $cache_file" >&6;}
-  fi
-fi
-rm -f confcache
-    { { echo "$as_me:$LINENO: error:     unrecognized mode --enable-mode=$enableval; use
-    \`optimize', \`debug', or \`profile'" >&5
-echo "$as_me: error:     unrecognized mode --enable-mode=$enableval; use
-    \`optimize', \`debug', or \`profile'" >&2;}
-   { (exit 1); exit 1; }; } ;;
-    esac
-fi
-
-
-{ echo "$as_me:$LINENO: checking build mode" >&5
-echo $ECHO_N "checking build mode... $ECHO_C" >&6; }
-if test "${cs_build_mode+set}" = set; then
-  :
-else
-  cs_build_mode=optimize
-fi
-
-{ echo "$as_me:$LINENO: result: $cs_build_mode" >&5
-echo "${ECHO_T}$cs_build_mode" >&6; }
-cs_build_prop_val="$cs_build_mode"
-    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}MODE ?= \"$cs_build_prop_val\" ;
-"
-fi
-
-
-
-
-#------------------------------------------------------------------------------
 # Check for libbfd in debug mode on Windows so that CS_ASSERT() can dump a
 # meaningful traceback in addition to emitting the failed condition. (On Linux,
 # backtrace() is used instead.)
@@ -80271,7 +80373,8 @@ fi
 
 
     # Backward compatibility: Recognize --with-libbfd as alias for --with-bfd.
-    if test -n "$with_libbfd" && test -z "$with_bfd"; then
+    if test -n "$with_libbfd" &&
+           test -z "$with_bfd"; then
   with_bfd="$with_libbfd"
 fi
 
@@ -82625,6 +82728,7 @@ CXXFLAGS!$CXXFLAGS$ac_delim
 ac_ct_CXX!$ac_ct_CXX$ac_delim
 LD!$LD$ac_delim
 ac_ct_LD!$ac_ct_LD$ac_delim
+CPP!$CPP$ac_delim
 CXXCPP!$CXXCPP$ac_delim
 RANLIB!$RANLIB$ac_delim
 DLLTOOL!$DLLTOOL$ac_delim
@@ -82664,7 +82768,6 @@ JAM!$JAM$ac_delim
 MAKE!$MAKE$ac_delim
 CSLIBS_CONFIG!$CSLIBS_CONFIG$ac_delim
 ac_ct_CSLIBS_CONFIG!$ac_ct_CSLIBS_CONFIG$ac_delim
-GREP!$GREP$ac_delim
 _ACEOF
 
   if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 97; then
@@ -82706,13 +82809,13 @@ _ACEOF
 ac_delim='%!_!# '
 for ac_last_try in false false false false false :; do
   cat >conf$$subs.sed <<_ACEOF
+GREP!$GREP$ac_delim
 EGREP!$EGREP$ac_delim
 PERL!$PERL$ac_delim
 PYTHON!$PYTHON$ac_delim
 JAVA!$JAVA$ac_delim
 JAVAC!$JAVAC$ac_delim
 ANT!$ANT$ac_delim
-CPP!$CPP$ac_delim
 PKG_CONFIG!$PKG_CONFIG$ac_delim
 ac_ct_PKG_CONFIG!$ac_ct_PKG_CONFIG$ac_delim
 CONFIG_X11!$CONFIG_X11$ac_delim
@@ -82780,7 +82883,7 @@ CONFIG_CEGUI!$CONFIG_CEGUI$ac_delim
 ac_ct_CONFIG_CEGUI!$ac_ct_CONFIG_CEGUI$ac_delim
 CONFIG_CEGUIBASE!$CONFIG_CEGUIBASE$ac_delim
 ac_ct_CONFIG_CEGUIBASE!$ac_ct_CONFIG_CEGUIBASE$ac_delim
-PYCEGUI_I_FILE!$PYCEGUI_I_FILE$ac_delim
+cs_cv_pycegui_i_file!$cs_cv_pycegui_i_file$ac_delim
 CONFIG_CG!$CONFIG_CG$ac_delim
 ac_ct_CONFIG_CG!$ac_ct_CONFIG_CG$ac_delim
 CONFIG_CGGL!$CONFIG_CGGL$ac_delim

@@ -975,19 +975,20 @@ void csLoader::AddToRegion (iLoaderContext* ldr_context, iObject* obj)
 }
 
 void csLoader::AddChildrenToRegion (iLoaderContext* ldr_context,
-	const csRefArray<iSceneNode>& children)
+                                    const iSceneNodeArray* children)
 {
   size_t i;
-  for (i = 0 ; i < children.Length () ; i++)
+  for (i = 0 ; i < children->GetSize(); i++)
   {
-    iSceneNode* sn = children[i];
+    iSceneNode* sn = children->Get(i);
     iObject* obj = 0;
     if (sn->QueryMesh ()) obj = sn->QueryMesh ()->QueryObject ();
     else if (sn->QueryLight ()) obj = sn->QueryLight ()->QueryObject ();
     //else if (sn->QueryCamera ()) obj = sn->QueryCamera ()->QueryObject ();
     if (obj)
       AddToRegion (ldr_context, obj);
-    AddChildrenToRegion (ldr_context, sn->GetChildren ());
+    const csRef<iSceneNodeArray> nodeChildren = sn->GetChildrenArray ();
+    AddChildrenToRegion (ldr_context, nodeChildren);
   }
 }
 
@@ -1323,15 +1324,8 @@ bool csLoader::LoadMap (iLoaderContext* ldr_context, iDocumentNode* worldnode,
       }
       case XMLTOKEN_KEY:
       {
-        iKeyValuePair* kvp = 0;
-        SyntaxService->ParseKey (child, kvp);
-        if (kvp)
-        {
-          Engine->QueryObject()->ObjAdd (kvp->QueryObject ());
-	  kvp->DecRef ();
-        }
-	else
-	  return false;
+        if (!ParseKey (child, Engine->QueryObject()))
+          return false;
         break;
       }
       case XMLTOKEN_SHADERS:
@@ -1605,6 +1599,9 @@ bool csLoader::LoadSounds (iDocumentNode* node)
 	  csRef<iDocumentAttribute> at = child->GetAttribute ("mode3d");
 	  if (at)
 	  {
+	    ReportWarning (
+	        "crystalspace.maploader.parse.sound",
+                child, "The 'mode3d' attribute is deprecated! Specify 2d/3d mode when playing sound.");
 	    const char* v = at->GetValue ();
 	    if (!strcasecmp ("disable", v))
 	      mode3d = CS_SND3D_DISABLE;
@@ -1621,53 +1618,40 @@ bool csLoader::LoadSounds (iDocumentNode* node)
 	    }
 	  }
 
-	  if (mode3d == -1)
+	  // New sound system.
+	  if (!SndSysLoader)
 	  {
-	    SyntaxService->Report (
-	      "crystalspace.maploader.parse.sound", 
-	      CS_REPORTER_SEVERITY_NOTIFY, child,
-	      "The old sound system is no longer supported. Use 'mode3d'!");
-	    return true;
-	  }
-	  else
-	  {
-	    // New sound system.
-	    if (!SndSysLoader)
-	    {
-	      //SyntaxService->ReportError (
+	    //SyntaxService->ReportError (
 	        //"crystalspace.maploader.parse.sound", child,
 	        //"New sound loader not loaded!");
-	      return true;
-	    }
-            iSndSysWrapper* snd = SndSysManager->FindSoundByName (name);
-            if (!snd)
+	    return true;
+	  }
+          iSndSysWrapper* snd = SndSysManager->FindSoundByName (name);
+          if (!snd)
+	  {
+	    if (mode3d != -1)
               snd = LoadSoundWrapper (name, filename, mode3d);
-            if (snd)
+	    else
+              snd = LoadSoundWrapper (name, filename);
+	  }
+          if (snd)
+          {
+            csRef<iDocumentNodeIterator> it2 (child->GetNodes ());
+            while (it2->HasNext ())
             {
-              csRef<iDocumentNodeIterator> it2 (child->GetNodes ());
-              while (it2->HasNext ())
+              csRef<iDocumentNode> child2 = it2->Next ();
+              if (child2->GetType () != CS_NODE_ELEMENT) continue;
+              switch (xmltokens.Request (child2->GetValue ()))
               {
-                csRef<iDocumentNode> child2 = it2->Next ();
-                if (child2->GetType () != CS_NODE_ELEMENT) continue;
-                switch (xmltokens.Request (child2->GetValue ()))
-                {
-                  case XMLTOKEN_KEY:
-                    {
-                      iKeyValuePair *kvp = 0;
-                      SyntaxService->ParseKey (child2, kvp);
-                      if (kvp)
-                      {
-                        snd->QueryObject ()->ObjAdd (kvp->QueryObject ());
-                        kvp->DecRef ();
-                      }
-		      else
-                        return false;
-                    }
-                    break;
-                }
+                case XMLTOKEN_KEY:
+                  {
+                    if (!ParseKey (child2, snd->QueryObject()))
+                      return false;
+                  }
+                  break;
               }
             }
-	  }
+          }
         }
         break;
       default:
@@ -2046,14 +2030,8 @@ bool csLoader::LoadMeshObjectFactory (iLoaderContext* ldr_context,
         break;
       case XMLTOKEN_KEY:
         {
-          iKeyValuePair* kvp = 0;
-          SyntaxService->ParseKey (child, kvp);
-	  if (kvp)
-          {
-            stemp->QueryObject()->ObjAdd (kvp->QueryObject ());
-	    kvp->DecRef ();
-          } else
-	    return false;
+          if (!ParseKey (child, stemp->QueryObject()))
+            return false;
         }
         break;
       case XMLTOKEN_ADDON:
@@ -2928,14 +2906,8 @@ bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
       TEST_MISSING_MESH
       else
       {
-        iKeyValuePair* kvp = 0;
-        SyntaxService->ParseKey (child, kvp);
-	if (kvp)
-        {
-          mesh->QueryObject()->ObjAdd (kvp->QueryObject ());
-	  kvp->DecRef ();
-        } else
-	  return false;
+        if (!ParseKey (child, mesh->QueryObject()))
+          return false;
       }
       break;
     case XMLTOKEN_HARDMOVE:
@@ -3098,8 +3070,8 @@ csRef<iMeshWrapper> csLoader::LoadMeshObjectFromFactory (iLoaderContext* ldr_con
 	  {
 	    AddToRegion (ldr_context, mesh->QueryObject ());
 	    // Now also add the child mesh objects to the region.
-	    const csRefArray<iSceneNode>& children = mesh->QuerySceneNode ()->
-	    	GetChildren ();
+            const csRef<iSceneNodeArray> children = 
+              mesh->QuerySceneNode ()->GetChildrenArray ();
 	    AddChildrenToRegion (ldr_context, children);
 	  }
 	}
@@ -4275,16 +4247,8 @@ iCollection* csLoader::ParseCollection (iLoaderContext* ldr_context,
          	child, "'addon' not yet supported in collection!");
 	return 0;
       case XMLTOKEN_KEY:
-	{
-          iKeyValuePair* kvp = 0;
-          SyntaxService->ParseKey (child, kvp);
-          if (kvp)
-          {
-            collection->QueryObject ()->ObjAdd (kvp->QueryObject ());
-	    kvp->DecRef ();
-          } else
-	    return 0;
-	}
+        if (!ParseKey (child, collection->QueryObject()))
+          return false;
         break;
       case XMLTOKEN_MESHOBJ:
 #if 0
@@ -4535,16 +4499,8 @@ iLight* csLoader::ParseStatlight (iLoaderContext* ldr_context,
 	}
         break;
       case XMLTOKEN_KEY:
-	{
-          iKeyValuePair* kvp = 0;
-          SyntaxService->ParseKey (child, kvp);
-          if (kvp)
-          {
-            Keys.ObjAdd (kvp->QueryObject ());
-	    kvp->DecRef ();
-          } else
-	    return 0;
-	}
+        if (!ParseKey (child, &Keys))
+          return false;
         break;
       case XMLTOKEN_HALO:
 	{
@@ -4919,16 +4875,8 @@ iMapNode* csLoader::ParseNode (iDocumentNode* node, iSector* sec)
         	child, "'meta' not yet supported in node!");
 	return 0;
       case XMLTOKEN_KEY:
-        {
-          iKeyValuePair* kvp = 0;
-          SyntaxService->ParseKey (child, kvp);
-          if (kvp)
-          {
-            pNode->QueryObject ()->ObjAdd (kvp->QueryObject ());
-	    kvp->DecRef ();
-          } else
-	    return 0;
-	}
+        if (!ParseKey (child, pNode->QueryObject()))
+          return false;
         break;
       case XMLTOKEN_POSITION:
 	if (!SyntaxService->ParseVector (child, pos))
@@ -5116,13 +5064,7 @@ bool csLoader::ParsePortal (iLoaderContext* ldr_context,
   size_t i;
   for (i = 0 ; i < key_nodes.Length () ; i++)
   {
-    iKeyValuePair* kvp = 0;
-    SyntaxService->ParseKey (key_nodes[i], kvp);
-    if (kvp)
-    {
-      container_mesh->QueryObject()->ObjAdd (kvp->QueryObject ());
-      kvp->DecRef ();
-    } else
+    if (!ParseKey (key_nodes[i], container_mesh->QueryObject()))
       return false;
   }
 
@@ -5430,17 +5372,8 @@ iSector* csLoader::ParseSector (iLoaderContext* ldr_context,
         }
         break;
       case XMLTOKEN_KEY:
-        {
-          iKeyValuePair* kvp = 0;
-          SyntaxService->ParseKey (child, kvp);
-	  if (kvp)
-          {
-            sector->QueryObject()->ObjAdd (kvp->QueryObject ());
-	    kvp->DecRef ();
-          }
-	  else
-	    return 0;
-        }
+        if (!ParseKey (child, sector->QueryObject()))
+          return 0;
         break;
       default:
 	SyntaxService->ReportBadToken (child);
@@ -5759,12 +5692,12 @@ void csLoader::CollectAllChildren (iMeshWrapper* meshWrapper,
   while (lastMeshVisited < meshesArray.Length ())
   {
     // Get the children of the current mesh (ie 'mesh').
-    const csRefArray<iSceneNode>& ml = meshesArray[lastMeshVisited++]
-    	->QuerySceneNode ()->GetChildren ();
+    const csRef<iSceneNodeArray> ml = 
+      meshesArray[lastMeshVisited++]->QuerySceneNode ()->GetChildrenArray ();
     size_t i;
-    for (i = 0; i < ml.Length (); i++)
+    for (i = 0; i < ml->GetSize(); i++)
     {
-      iMeshWrapper* m = ml[i]->QueryMesh ();
+      iMeshWrapper* m = ml->Get(i)->QueryMesh ();
       if (m)
         meshesArray.Push (m);
     }
@@ -5799,4 +5732,17 @@ void csLoader::ConvexFlags (iMeshWrapper* mesh)
   if (objmodel->GetPolygonMeshShadows ())
     objmodel->GetPolygonMeshShadows ()->GetFlags ().Set (
     CS_POLYMESH_CONVEX | CS_POLYMESH_NOTCONVEX, CS_POLYMESH_CONVEX);
+}
+
+bool csLoader::ParseKey (iDocumentNode* node, iObject* obj)
+{
+  csRef<iKeyValuePair> kvp = SyntaxService->ParseKey (node);
+  if (!kvp.IsValid())
+    return false;
+
+  bool editoronly = node->GetAttributeValueAsBool ("editoronly");
+  if (!editoronly || !Engine || Engine->GetSaveableFlag())
+    obj->ObjAdd (kvp->QueryObject ());
+
+  return true;
 }

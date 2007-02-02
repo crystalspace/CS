@@ -47,6 +47,7 @@ class csSndSysWrapper : public scfImplementationExt2<csSndSysWrapper,
 private:
   csSndSysManager* mgr;
   csRef<iSndSysStream> stream;
+  csRef<iSndSysData> data;
 
 public:
   csSndSysWrapper (csSndSysManager* mgr, const char* name)
@@ -61,6 +62,12 @@ public:
   virtual void SetStream (iSndSysStream* stream)
   {
     csSndSysWrapper::stream = stream;
+  }
+  virtual iSndSysData* GetData () { return data; }
+  /// Set the sound data associated with this wrapper.
+  virtual void SetData (iSndSysData* data)
+  {
+    csSndSysWrapper::data = data;
   }
 
   //--------------------- iSelfDestruct implementation -------------------//

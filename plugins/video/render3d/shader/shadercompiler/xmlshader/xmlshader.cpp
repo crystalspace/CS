@@ -137,8 +137,8 @@ csPtr<iShader> csXMLShaderCompiler::CompileShader (iDocumentNode *templ,
   csRef<iDocumentNodeIterator> tagIt = templ->GetNodes ("key");
   while (tagIt->HasNext ())
   {
-    iKeyValuePair *keyvalue = 0;
-    synldr->ParseKey (tagIt->Next (), keyvalue);
+    // @@@ FIXME: also keeps "editoronly" keys
+    csRef<iKeyValuePair> keyvalue = synldr->ParseKey (tagIt->Next ());
     if (keyvalue)
       shader->QueryObject ()->ObjAdd (keyvalue->QueryObject ());
   }

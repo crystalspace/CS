@@ -130,7 +130,7 @@ namespace lighter
   void TUI::DrawSettings () const
   {
     csPrintf (CS_ANSI_CURSOR(14,7) "%s", globalConfig.GetLighterProperties ().doDirectLight ? "X" : "");
-    csPrintf (CS_ANSI_CURSOR(14,8) "%s", globalConfig.GetLighterProperties ().doRadiosity ? "X" : "");
+    csPrintf (CS_ANSI_CURSOR(14,8) "%s", globalConfig.GetLighterProperties ().doiosity ? "X" : "");
     csPrintf (CS_ANSI_CURSOR(14,9) "%s", true ? "X" : "");
     csPrintf (CS_ANSI_CURSOR(14,10) "%s", false ? "X" : "");
   
