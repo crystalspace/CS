@@ -262,6 +262,9 @@ public:
   { (void)x; }
   /// Return the threshold.
   size_t GetThreshold() const { return N; }
+  // Work around VC7 bug apparently incorrectly copying this empty class
+  csArrayThresholdFixed& operator= (const csArrayThresholdFixed&) 
+  { return *this; }
 };
 
 /**

@@ -43,7 +43,7 @@ rule PythMod
     Description $(2) : $(desc) ;
     MSVCGEN.PLUGIN_EXT.$(2) = .pyd ;
     Plugin $(2) : $(3) ;
-    LinkWith $(2) : crystalspace $(4) ;
+    LinkWith $(2) : $(4) ;
     ExternalLibs $(2) : PYTHON $(5) ;
     Depends $(2) : $(1) ;
   }
@@ -64,7 +64,7 @@ rule PythMod
     $(<)_TARGET = $(target) ;
     $(<)_SOURCES = $(sources) ;
     $(<)_OBJECTS = $(objects) ;
-    LinkWith $(<) : crystalspace $(4) ;
+    LinkWith $(<) : $(4) ;
     ExternalLibs $(<) : PYTHON $(5) ;
     CFlags $(<) : $(PLUGIN.CFLAGS) ;
     LFlags $(<) : $(PLUGIN.LFLAGS) $(LINKLIBS) ;

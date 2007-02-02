@@ -642,6 +642,9 @@ bool csEngine::HandleEvent (iEvent &Event)
   {
     globalStringSet = CS_QUERY_REGISTRY_TAG_INTERFACE (
       objectRegistry, "crystalspace.shared.stringset", iStringSet);
+
+    id_creation_time = globalStringSet->Request("mesh creation time");
+
     csConfigAccess cfg (objectRegistry, "/config/engine.cfg");
 
     maxAspectRatio = 4096;

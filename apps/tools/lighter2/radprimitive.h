@@ -46,8 +46,9 @@ namespace lighter
     {
     }
 
-    ///Split primitive into two. Front side is kept in current
-    bool Split (const csPlane3& plane, RadPrimitive &back);
+    /// Split primitive into two.
+    bool Split (const csPlane3& splitPlane, csArray<RadPrimitive>& front,
+      csArray<RadPrimitive>& back) const;
 
     /// Calculate min-max UV-coords
     void ComputeMinMaxUV (csVector2 &min, csVector2 &max) const;
@@ -118,8 +119,8 @@ namespace lighter
     inline IntDArray& GetExtraData () { return extraData; }
     inline const IntDArray& GetExtraData () const { return extraData; }
 */
-    inline SizeTDArray& GetIndexArray () { return indexArray; }
-    inline const SizeTDArray& GetIndexArray () const { return indexArray; }
+    inline size_t* GetIndexArray () { return indexArray; }
+    inline const size_t* GetIndexArray () const { return indexArray; }
 
     inline RadObjectVertexData& GetVertexData () { return vertexData; }
     inline const RadObjectVertexData& GetVertexData () const { return vertexData; }
@@ -165,7 +166,7 @@ namespace lighter
     RadObjectVertexData& vertexData;
 
     /// Index array for this primitive
-    SizeTDArray indexArray;
+    size_t indexArray[3];
 
     /// Computed plane
     /* Plane normal seems to point into opposite direction compared to e.g.

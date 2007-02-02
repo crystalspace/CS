@@ -169,12 +169,11 @@ namespace lighter
   UberPrimitive::UberPrimitive (const RadPrimitive& startPrim)
   {
     prims.Push (startPrim);
-    const SizeTDArray& primIndices = startPrim.GetIndexArray();
-    const size_t primVerts = primIndices.GetSize();
-    for (size_t e = 0; e < primVerts; e++)
+    const size_t* primIndices = startPrim.GetIndexArray();
+    for (size_t e = 0; e < 3; e++)
     {
       Edge edge (primIndices[e], 
-        primIndices[(e+1) % primVerts]);
+        primIndices[(e+1) % 3]);
       outsideEdges.Push (edge);
     }
   }
@@ -191,12 +190,11 @@ namespace lighter
   void UberPrimitive::AddPrimitive (const RadPrimitive& prim)
   {
     prims.Push (prim);
-    const SizeTDArray& primIndices = prim.GetIndexArray();
-    const size_t primVerts = primIndices.GetSize();
-    for (size_t e = 0; e < primVerts; e++)
+    const size_t* primIndices = prim.GetIndexArray();
+    for (size_t e = 0; e < 3; e++)
     {
       Edge edge (primIndices[e], 
-        primIndices[(e+1) % primVerts]);
+        primIndices[(e+1) % 3]);
       bool found = false;
       /* If edge is an "outside edge", remove from the outside list
        * Otherwise add it */
@@ -262,12 +260,11 @@ namespace lighter
           for (size_t p = 0; (p < coplanarPrims.GetSize()) && !primAdded; p++)
           {
             const RadPrimitive& prim (coplanarPrims[p]);
-            const SizeTDArray& primIndices = prim.GetIndexArray();
-            const size_t primVerts = primIndices.GetSize();
-            for (size_t e = 0; e < primVerts; e++)
+            const size_t* primIndices = prim.GetIndexArray();
+            for (size_t e = 0; e < 3; e++)
             {
               Edge edge (primIndices[e], 
-                primIndices[(e+1) % primVerts]);
+                primIndices[(e+1) % 3]);
               if (ubp.UsesEdge (edge))
               {
                 ubp.AddPrimitive (prim);
@@ -351,11 +348,9 @@ namespace lighter
 
       RadObjectVertexData &vdata = prim.GetVertexData ();
 
-      SizeTDArray &indexArray = prim.GetIndexArray ();
+      size_t* indexArray = prim.GetIndexArray ();
 
-      size_t oldIndexSize = indexArray.GetSize ();
-
-      for (i = 0; i < oldIndexSize; ++i)
+      for (i = 0; i < 3; ++i)
       {
         size_t index = indexArray[i]; 
         if (usedVerts[index])
@@ -377,7 +372,7 @@ namespace lighter
         primsUsedVerts.Add (index);
       }
 
-      for (i = 0; i < indexArray.GetSize (); ++i)
+      for (i = 0; i < 3; ++i)
       {
         size_t index = indexArray[i];
         const csVector3 &position = vdata.vertexArray[index].position;
@@ -437,10 +432,10 @@ namespace lighter
       for (size_t p = 0; p < coPrim.GetSize(); p++)
       {
         RadPrimitive& prim (prims[coPrim[p]]);
-        const SizeTDArray& indexData = prim.GetIndexArray();
+        const size_t* indexData = prim.GetIndexArray();
         // Be careful to remap each distinct vertex only once
         const csVector2& move = remaps[c];
-        for (size_t v = 0; v < indexData.GetSize(); v++)
+        for (size_t v = 0; v < 3; v++)
         {
           size_t index = indexData [v];
           if (!remapped.Contains (index))

@@ -121,7 +121,8 @@ namespace lighter
         
         RadPrimitive& prim = allPrimitives[allPrimitives.Push (newPrim)];
         prim.SetOriginalPrimitive (&factPrims[i]);
-        prim.GetIndexArray () = factPrims[i].GetIndexArray ();
+        memcpy (prim.GetIndexArray (), factPrims[i].GetIndexArray (),
+          sizeof (size_t) * 3);
         prim.ComputePlane ();
       }
 
@@ -162,8 +163,8 @@ namespace lighter
       {
         //TODO make sure no vertex is used in several lightmaps.. 
         const RadPrimitive &prim = prims.Get (j);
-        const SizeTDArray &indexArray = prim.GetIndexArray ();
-        for (size_t i = 0; i < indexArray.GetSize (); ++i)
+        const size_t* indexArray = prim.GetIndexArray ();
+        for (size_t i = 0; i < 3; ++i)
         {
           size_t index = indexArray[i];
           if (!indicesRemapped.Contains (index))

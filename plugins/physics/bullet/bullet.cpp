@@ -48,8 +48,12 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "bullet.h"
 
+class TriangleCallback;
 
 CS_IMPLEMENT_PLUGIN
+
+CS_PLUGIN_NAMESPACE_BEGIN(Bullet)
+{
 
 SCF_IMPLEMENT_FACTORY (csBulletDynamics)
 
@@ -113,7 +117,7 @@ csBulletDynamicsSystem::csBulletDynamicsSystem ()
 :  scfImplementationType (this)
 {
   CollisionDispatcher* dispatcher = new CollisionDispatcher ();
-  BroadphaseInterface* broadphase = new SimpleBroadphase();
+  SimpleBroadphase* broadphase = new SimpleBroadphase();
 
   bullet_sys = new CcdPhysicsEnvironment(dispatcher,broadphase);
 }
@@ -262,6 +266,15 @@ csRef<iDynamicsSystemCollider> csBulletDynamicsSystem::CreateCollider ()
 }
 
 //-------------------------------csBulletRigidBody----------------------------------------------//
+
+class EmptyShape_Fixed : public EmptyShape
+{
+public:
+  void ProcessAllTriangles(TriangleCallback* callback,
+    const SimdVector3& aabbMin, const SimdVector3& aabbMax) const
+  { }
+};
+
 csBulletRigidBody::csBulletRigidBody (csBulletDynamicsSystem* dynsys)
 :  scfImplementationType (this)
 {
@@ -272,7 +285,7 @@ csBulletRigidBody::csBulletRigidBody (csBulletDynamicsSystem* dynsys)
 
   CcdConstructionInfo ccdObjectCi;
 
-  ccdObjectCi.m_collisionShape = new EmptyShape ();
+  ccdObjectCi.m_collisionShape = new EmptyShape_Fixed ();
   ccdObjectCi.m_collisionShape->SetMargin (1);
   ccdObjectCi.m_gravity = SimdVector3(0,0,0);
   ccdObjectCi.m_localInertiaTensor = SimdVector3(0,0,0);
@@ -670,7 +683,7 @@ csBulletCollider::csBulletCollider (csBulletDynamicsSystem* dynsys)
   ms->setWorldPosition (0, 0, 0);
   ms->setWorldOrientation (0,0,0,1);
 
-  ccdObjectCi.m_collisionShape = new EmptyShape ();
+  ccdObjectCi.m_collisionShape = new EmptyShape_Fixed ();
   ccdObjectCi.m_collisionShape->SetMargin (1.f);
   ccdObjectCi.m_gravity = SimdVector3(0,0,0);
   ccdObjectCi.m_localInertiaTensor = SimdVector3(0,0,0);
@@ -835,3 +848,6 @@ bool csBulletCollider::IsStatic ()
 {
   return false;
 }
+
+}
+CS_PLUGIN_NAMESPACE_END(Bullet)

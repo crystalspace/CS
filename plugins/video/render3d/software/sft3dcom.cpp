@@ -676,7 +676,8 @@ void csSoftwareGraphics3DCommon::ClosePortal ()
   if (clipportal_stack.Length () <= 0) return;
   csClipPortal* cp = clipportal_stack.Pop ();
 
-  if (cp->flags.Check(CS_OPENPORTAL_ZFILL))
+  if (cp->flags.Check(CS_OPENPORTAL_ZFILL)
+    && (DrawMode != 0)) // polyrast_ZFill is only valid after a BefinDraw()
   {
     CS_ALLOC_STACK_ARRAY(csVector3, vertices, cp->num_poly);
     for (int v = 0; v < cp->num_poly; v++)
@@ -1001,6 +1002,8 @@ void csSoftwareGraphics3DCommon::DrawMesh (const csCoreRenderMesh* mesh,
     const csRenderMeshModes& modes,
     const iShaderVarStack* stacks)
 {
+  if (DrawMode == 0) return;
+
   ScanlineRendererHelper aNameThatDoesNotReallyMatter (this);
   if (!scanlineRenderer) return;
 

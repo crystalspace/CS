@@ -113,7 +113,6 @@ bool csXMLShaderTech::ParseInstanceBinds (iDocumentNode *node, shaderPass *pass)
     size_t binds_cnt = 0;
     switch (source_variable->GetType ())
     {
-    case csShaderVariable::COLOR:
     case csShaderVariable::VECTOR2:
     case csShaderVariable::VECTOR3:
     case csShaderVariable::VECTOR4:

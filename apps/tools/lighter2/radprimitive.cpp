@@ -28,7 +28,7 @@ namespace lighter
     size_t index = indexArray[0];
     min = vertexData.vertexArray[index].lightmapUV;
     max = vertexData.vertexArray[index].lightmapUV;
-    for (uint i = 1; i < indexArray.GetSize (); ++i)
+    for (uint i = 1; i < 3; ++i)
     {
       index = indexArray[i];
       const csVector2 &uv = vertexData.vertexArray[index].lightmapUV;
@@ -45,7 +45,7 @@ namespace lighter
   {
     //Setup a temporary array of our vertices
     Vector3DArray vertices;
-    for(uint i = 0; i < indexArray.GetSize (); ++i)
+    for(uint i = 0; i < 3; ++i)
     {
       vertices.Push (vertexData.vertexArray[indexArray[i]].position);
     }
@@ -55,22 +55,18 @@ namespace lighter
   const csVector3 RadPrimitive::GetCenter () const
   {
     csVector3 centroid(0.0f);
-    for(uint i = 0; i < indexArray.GetSize (); ++i)
+    for(uint i = 0; i < 3; ++i)
     {
       centroid += vertexData.vertexArray[indexArray[i]].position;
     }
-    return centroid / (float)indexArray.GetSize ();
+    return centroid / 3.0f;
   }
 
   float RadPrimitive::GetArea () const
   {
-    float area = 0;
-    for(uint i = 0; i < indexArray.GetSize () - 2; ++i)
-    {
-      area += csMath3::DoubleArea3 (vertexData.vertexArray[indexArray[i]].position,
-        vertexData.vertexArray[indexArray[i+1]].position, 
-        vertexData.vertexArray[indexArray[i+2]].position);
-    }
+    float area = csMath3::DoubleArea3 (vertexData.vertexArray[indexArray[0]].position,
+      vertexData.vertexArray[indexArray[1]].position, 
+      vertexData.vertexArray[indexArray[2]].position);
     return area/2.0f;
   }
 
@@ -78,33 +74,34 @@ namespace lighter
   {
     min = FLT_MAX;
     max = -FLT_MAX;
-    for (unsigned int i = 0; i < indexArray.GetSize (); ++i)
+    for (unsigned int i = 0; i < 3; ++i)
     {
-      float val = vertexData.vertexArray[indexArray[i]].position[axis];
+      float val = vertexData.vertexArray[indexArray[0]].position[axis];
       min = csMin(min, val);
       max = csMax(max, val);
     }
   }
 
 
-  bool RadPrimitive::Split (const csPlane3& splitPlane, RadPrimitive &back)
+  bool RadPrimitive::Split (const csPlane3& splitPlane, 
+                            csArray<RadPrimitive>& front,
+                            csArray<RadPrimitive>& back) const
   {
     // Do a split
     
     // Classify all points
-    FloatArray classification;
-    classification.SetSize (indexArray.GetSize ());
+    float classification[3];
     
     bool n = false, p = false;
     uint i;
 
-    for (i = 0; i < indexArray.GetSize (); i++)
+    for (i = 0; i < 3; i++)
     {
       float c = splitPlane.Classify (vertexData.vertexArray[indexArray[i]].position);
       if (c > LITEPSILON) p = true;
       else if (c < LITEPSILON) n = true;
 
-      classification.Push (c);
+      classification[i] = c;
     }
 
     // Handle special cases
@@ -123,37 +120,35 @@ namespace lighter
     if (!n)
     {
       //No negative, back is empty
-      back.indexArray.DeleteAll ();
+      front.Push (*this);
+      back.DeleteAll ();
       return true;
     }
     else if (!p)
     {
       //No positive, current is back
-      back.indexArray = indexArray;
-      
-      indexArray.DeleteAll ();
+      front.DeleteAll ();
+      back.Push (*this);
     }
     else
     {
       // Split-time! :)
-      back.plane = plane;
-
       SizeTDArray negIndex;
       SizeTDArray posIndex;
 
-      negIndex.SetCapacity (indexArray.GetSize ());
-      posIndex.SetCapacity (indexArray.GetSize ());
+      negIndex.SetCapacity (3);
+      posIndex.SetCapacity (3);
 
       // Visit all edges, add vertices to back/front as needed. Add intersection-points
       // if needed
-      size_t i0 = indexArray.GetSize () - 1;
-      for (size_t i1 = 0; i1 < indexArray.GetSize (); ++i1)
+      size_t i0 = 2;
+      for (size_t i1 = 0; i1 < 3; ++i1)
       {
         size_t v0 = indexArray[i0];
         size_t v1 = indexArray[i1];
         
-        float d0 = classification[v0];
-        float d1 = classification[v1];
+        float d0 = classification[i0];
+        float d1 = classification[i1];
 
         if (d0 < 0 && d1 < 0)
         {
@@ -220,22 +215,22 @@ namespace lighter
         //next
         v0 = v1;
       }
-      // set ourself as front
-      indexArray = posIndex;
-      back.indexArray = negIndex;
-    }
-
-
-    // Make sure back gets any extra data
-    if (back.indexArray.GetSize ())
-    {
-      back.plane = plane;
-      back.uFormVector = uFormVector;
-      back.vFormVector = vFormVector;
-      back.illuminationColor = illuminationColor;
-      back.reflectanceColor = reflectanceColor;
-      back.originalPrim = originalPrim;
-      back.globalLightmapID = globalLightmapID;
+      for(uint i = 2; i < posIndex.GetSize(); ++i)
+      {
+        RadPrimitive newPrim (*this);
+        newPrim.indexArray[0] = posIndex[i-2];
+        newPrim.indexArray[1] = posIndex[i-1];
+        newPrim.indexArray[2] = posIndex[i];
+        front.Push (newPrim);
+      }
+      for(uint i = 2; i < negIndex.GetSize(); ++i)
+      {
+        RadPrimitive newPrim (*this);
+        newPrim.indexArray[0] = negIndex[i-2];
+        newPrim.indexArray[1] = negIndex[i-1];
+        newPrim.indexArray[2] = negIndex[i];
+        back.Push (newPrim);
+      }
     }
 
     return true;
@@ -376,16 +371,16 @@ namespace lighter
     float maxuDist = -1, maxvDist = -1;
 
     //visit all vertices
-    for (uint i = 0; i < indexArray.GetSize (); i++)
+    for (uint i = 0; i < 3; i++)
     {
       const RadObjectVertexData::Vertex& v = vertexData.vertexArray[indexArray[i]];
       const csVector3& c3D = v.position;
       const csVector2& c2D = v.lightmapUV;
 
-      size_t v0 = indexArray.GetSize () - 1;
+      size_t v0 = 2;
 
       // Visit all edges
-      for (size_t v1 = 0; v1 < indexArray.GetSize (); v1++)
+      for (size_t v1 = 0; v1 < 3; v1++)
       {
         // Skip those that includes current vertex
         if (v0 != i && v1 != i)
@@ -595,7 +590,7 @@ namespace lighter
   {
     csPoly3D poly;
 
-    for(uint i = 0; i < indexArray.GetSize (); ++i)
+    for(uint i = 0; i < 3; ++i)
     {
       poly.AddVertex (vertexData.vertexArray[indexArray[i]].position);
     }
@@ -608,7 +603,7 @@ namespace lighter
     csArray<csTriangle> newArr;
 
     //Triangulate as if it is convex 
-    for(uint i = 2; i < indexArray.GetSize (); ++i)
+    for(uint i = 2; i < 3; ++i)
     {
       csTriangle t;
       t.a = (int)indexArray[i-2];
@@ -623,8 +618,8 @@ namespace lighter
   bool RadPrimitive::PointInside (const csVector3& pt) const
   {
     csVector3 p1 = 
-      vertexData.vertexArray[indexArray[indexArray.GetSize()-1]].position;
-    for (size_t i = 0; i < indexArray.GetSize (); i++)
+      vertexData.vertexArray[indexArray[2]].position;
+    for (size_t i = 0; i < 3; i++)
     {
       csVector3 p2 = vertexData.vertexArray[indexArray[i]].position;
 
@@ -643,7 +638,7 @@ namespace lighter
     size_t i;
     size_t front = 0, back = 0;
 
-    for (i = 0; i < indexArray.GetSize (); i++)
+    for (i = 0; i < 3; i++)
     {
       float dot = plane.Classify (vertexData.vertexArray[indexArray[i]].position);
       if (ABS (dot) < EPSILON) dot = 0;

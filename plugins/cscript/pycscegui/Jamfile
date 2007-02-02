@@ -55,7 +55,7 @@ if $(PYTHON.AVAILABLE) = "yes" && $(CEGUI.AVAILABLE) = "yes" && $(PYCEGUI.SWIGOK
   
   PythMod pyceguimod : _pycscegui : 
 	ceguimod.cpp cs_cegui.cpp : 
-	: 
+	crystalspace_python : 
 	CEGUI : 
 	"cegui cs Python module" ;
   Depends pyceguimod : $(csceguipy) ;

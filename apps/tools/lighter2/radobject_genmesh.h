@@ -109,11 +109,11 @@ namespace lighter
 }
 
 template<>
-struct csHashComputer<lighter::RadObjectFactory_Genmesh::Submesh> :
+class csHashComputer<lighter::RadObjectFactory_Genmesh::Submesh> :
   public csHashComputerStruct<lighter::RadObjectFactory_Genmesh::Submesh> { };
 
 template<>
-struct csComparator<lighter::RadObjectFactory_Genmesh::Submesh, 
+class csComparator<lighter::RadObjectFactory_Genmesh::Submesh, 
   lighter::RadObjectFactory_Genmesh::Submesh> : 
 public csComparatorStruct<lighter::RadObjectFactory_Genmesh::Submesh> { };
 

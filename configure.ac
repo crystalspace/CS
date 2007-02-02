@@ -1011,7 +1011,7 @@ AS_IF([test $cs_cv_libx11 = yes],
     [# Use "old" autoconf X11 macros
     AC_PATH_X
     AC_PATH_XTRA
-    X_LFLAGS=$(X_PRE_LIBS) $(X_LIBS) -lXext -lX11 $(X_EXTRA_LIBS)])
+    X_LFLAGS="$X_PRE_LIBS $X_LIBS -lXext -lX11 $X_EXTRA_LIBS"])
 
 
 AS_IF([test "$no_x" != yes],

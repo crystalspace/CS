@@ -273,7 +273,7 @@ namespace lighter
 
     // Check for duplicate
     csString factName = factory->QueryObject ()->GetName ();
-    radFact = radFactories.Get (factName, 0);
+    radFact = radFactories.Get (factName, (RadObjectFactory*)0);
     if (radFact) return Success;
 
     csRef<iFactory> ifact = scfQueryInterface<iFactory> (
@@ -526,7 +526,8 @@ namespace lighter
   {
     // Save a single factory to the dom
     csString name = factNode->GetAttributeValue ("name");
-    csRef<RadObjectFactory> radFact = radFactories.Get (name, 0);
+    csRef<RadObjectFactory> radFact = radFactories.Get (name, 
+      (RadObjectFactory*)0);
     if (radFact)
     {
       // We do have one
@@ -545,7 +546,7 @@ namespace lighter
   void Scene::SaveSectorToDom (iDocumentNode* sectorNode, LoadedFile* fileInfo)
   {
     csString name = sectorNode->GetAttributeValue ("name");
-    csRef<Sector> sector = sectors.Get (name, 0);
+    csRef<Sector> sector = sectors.Get (name, (Sector*)0);
     if (sector)
     {
       //ok, have the sector, try to save all objects
@@ -562,7 +563,7 @@ namespace lighter
   {
     // Save the mesh
     csString name = objNode->GetAttributeValue ("name");
-    csRef<RadObject> radObj = sect->allObjects.Get (name, 0);
+    csRef<RadObject> radObj = sect->allObjects.Get (name, (RadObject*)0);
     if (radObj)
     {
       // We do have one
