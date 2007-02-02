@@ -56,7 +56,7 @@ public:
   /// Get the pointer to the start of the array.
   T* GetArray ()
   {
-    if (this->Length () > 0) // see *1*
+    if (this->GetSize () > 0) // see *1*
       return &this->Get (0);
     else
       return 0;
@@ -65,7 +65,7 @@ public:
   /// Get the pointer to the start of the array.
   const T* GetArray () const
   {
-    if (this->Length () > 0) // see *1*
+    if (this->GetSize () > 0) // see *1*
       return &this->Get (0);
     else
       return 0;
@@ -80,8 +80,8 @@ public:
   {
     if (this->Length () > 0) // see *1*
     {
-      T* copy = new T [this->Length ()];
-      memcpy (copy, &this->Get (0), sizeof (T) * this->Length ());
+      T* copy = new T [this->GetSize ()];
+      memcpy (copy, &this->Get (0), sizeof (T) * this->GetSize ());
       return copy;
     }
     else

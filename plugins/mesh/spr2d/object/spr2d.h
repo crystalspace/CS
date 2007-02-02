@@ -343,7 +343,7 @@ public:
   /// Has this sprite lighting?
   bool HasLighting () const { return lighting; }
 
-  int GetUVAnimationCount () const {return (int)vAnims.Length ();}
+  int GetUVAnimationCount () const {return (int)vAnims.GetSize ();}
   iSprite2DUVAnimation *CreateUVAnimation ()
   {
     csSprite2DUVAnimation *p = new csSprite2DUVAnimation (0);

@@ -210,7 +210,7 @@ void csThingStatic::Prepare (iBase* thing_logparent)
 
     size_t i;
     csPolygon3DStatic* sp;
-    for (i = 0; i < static_polygons.Length (); i++)
+    for (i = 0; i < static_polygons.GetSize (); i++)
     {
       sp = static_polygons.Get (i);
       // If a Finish() call returns false this means the textures are not
@@ -257,7 +257,7 @@ void csThingStatic::PrepareLMLayout ()
   csHash<csStaticPolyGroup*, csPtrKey<iMaterialWrapper> > polysSorted;
 
   int i;
-  for (i = 0; i < (int)static_polygons.Length (); i++)
+  for (i = 0; i < (int)static_polygons.GetSize (); i++)
   {
     int polyIdx = i;
     csPolygon3DStatic* sp = static_polygons.Get (polyIdx);
@@ -304,7 +304,7 @@ void csThingStatic::PrepareLMLayout ()
   }
 
   csStaticPolyGroup* rejectedPolys = new csStaticPolyGroup;
-  for (i = 0; i < (int)polys.Length (); i++)
+  for (i = 0; i < (int)polys.GetSize (); i++)
   {
     csStaticPolyGroup* lp = polys[i];
     lp->polys.ShrinkBestFit ();
@@ -316,7 +316,7 @@ void csThingStatic::PrepareLMLayout ()
     else
     {
       DistributePolyLMs (*lp, litPolys, rejectedPolys);
-      if (rejectedPolys->polys.Length () > 0)
+      if (rejectedPolys->polys.GetSize () > 0)
       {
         unlitPolys.Push (rejectedPolys);
         rejectedPolys = new csStaticPolyGroup;
@@ -330,7 +330,7 @@ void csThingStatic::PrepareLMLayout ()
   litPolys.ShrinkBestFit ();
   unlitPolys.ShrinkBestFit ();
 
-  for (i = 0 ; i < (int)litPolys.Length () ; i++)
+  for (i = 0 ; i < (int)litPolys.GetSize () ; i++)
   {
     StaticSuperLM* slm = litPolys[i]->staticSLM;
     delete slm->rects;
@@ -415,7 +415,7 @@ void csThingStatic::DistributePolyLMs (
   inputQueues[0].minLMArea = INT_MAX;
   inputQueues[1].material = inputPolys.material;
   // Sort polys and filter out oversized polys on the way
-  for (i = 0; i < inputPolys.polys.Length(); i++)
+  for (i = 0; i < inputPolys.polys.GetSize (); i++)
   {
     int polyIdx  = inputPolys.polys[i];
     csPolygon3DStatic* sp = static_polygons[polyIdx];
@@ -451,11 +451,11 @@ void csThingStatic::DistributePolyLMs (
   }
 
   csStaticLitPolyGroup* curOutputPolys = new csStaticLitPolyGroup;
-  while (inputQueues[curQueue].polys.Length () > 0)
+  while (inputQueues[curQueue].polys.GetSize () > 0)
   {
     // Try to fit as much polys as possible into the SLMs.
     size_t s = 0;
-    while ((s<superLMs.Length ()) && (inputQueues[curQueue].polys.Length ()>0))
+    while ((s<superLMs.GetSize ()) && (inputQueues[curQueue].polys.GetSize ()>0))
     {
       StaticSuperLM* slm = superLMs[s];
 
@@ -477,7 +477,7 @@ void csThingStatic::DistributePolyLMs (
       inputQueues[curQueue ^ 1].maxlmh = 0;
       inputQueues[curQueue ^ 1].minLMArea = INT_MAX;
 
-      while (inputQueues[curQueue].polys.Length () > 0)
+      while (inputQueues[curQueue].polys.GetSize () > 0)
       {
         bool stuffed = false;
         csSubRect* slmSR;
@@ -528,7 +528,7 @@ void csThingStatic::DistributePolyLMs (
         s++;
       }
 
-      if (curOutputPolys->polys.Length () > 0)
+      if (curOutputPolys->polys.GetSize () > 0)
       {
         curOutputPolys->lmRects.ShrinkBestFit ();
         curOutputPolys->polys.ShrinkBestFit ();
@@ -540,11 +540,11 @@ void csThingStatic::DistributePolyLMs (
     }
 
     // Not all polys could be stuffed away, so we possibly need more space.
-    if (inputQueues[curQueue].polys.Length () > 0)
+    if (inputQueues[curQueue].polys.GetSize () > 0)
     {
       // Try if enlarging an existing SLM suffices.
       bool foundNew = false;
-      s = superLMs.Length ();
+      s = superLMs.GetSize ();
       while (s > 0)
       {
         s--;
@@ -591,10 +591,10 @@ void csThingStatic::DistributePolyLMs (
 
   //superLMs.ShrinkBestFit ();
 
-  for (i = 0; i < litPolys.Length(); i++)
+  for (i = 0; i < litPolys.GetSize (); i++)
   {
     StaticSuperLM* slm = litPolys[i]->staticSLM;
-    for (size_t j = 0; j < litPolys[i]->polys.Length(); j++)
+    for (size_t j = 0; j < litPolys[i]->polys.GetSize (); j++)
     {
       csPolygon3DStatic* sp = static_polygons[litPolys[i]->polys[j]];
       const csRect& r = litPolys[i]->lmRects[j];
@@ -622,7 +622,7 @@ void csThingStatic::UnprepareLMLayout ()
   unlitPolys.DeleteAll ();
 
   size_t i;
-  for (i = 0; i < superLMs.Length (); i++)
+  for (i = 0; i < superLMs.GetSize (); i++)
   {
     StaticSuperLM* sslm = superLMs[i];
     delete sslm;
@@ -714,7 +714,7 @@ void csThingStatic::CompressVertices ()
   // Now we can remap the vertices in all polygons.
   size_t i;
   int j;
-  for (i = 0; i < static_polygons.Length (); i++)
+  for (i = 0; i < static_polygons.GetSize (); i++)
   {
     csPolygon3DStatic *p = static_polygons.Get (i);
     int *idx = p->GetVertexIndices ();
@@ -736,7 +736,7 @@ void csThingStatic::RemoveUnusedVertices ()
   for (i = 0; i < num_vertices; i++) used[i] = false;
 
   // Mark all vertices that are used as used.
-  for (k = 0; k < static_polygons.Length (); k++)
+  for (k = 0; k < static_polygons.GetSize (); k++)
   {
     csPolygon3DStatic *p = static_polygons.Get (k);
     int *idx = p->GetVertexIndices ();
@@ -780,7 +780,7 @@ void csThingStatic::RemoveUnusedVertices ()
   num_vertices = max_vertices = count_relevant;
 
   // Now we can remap the vertices in all polygons.
-  for (k = 0; k < static_polygons.Length (); k++)
+  for (k = 0; k < static_polygons.GetSize (); k++)
   {
     csPolygon3DStatic *p = static_polygons.Get (k);
     int *idx = p->GetVertexIndices ();
@@ -801,7 +801,7 @@ struct PolygonsForVertex
 
 void csThingStatic::CalculateNormals ()
 {
-  int polyCount = (int)static_polygons.Length();
+  int polyCount = (int)static_polygons.GetSize ();
   int i, k;
 
   delete[] obj_normals;
@@ -864,7 +864,7 @@ int csThingStatic::IntersectSegmentIndex (
 
   // @@@ This routine is not very optimal. Especially for things
   // with large number of polygons.
-  for (i = 0; i < static_polygons.Length (); i++)
+  for (i = 0; i < static_polygons.GetSize (); i++)
   {
     csPolygon3DStatic *p = static_polygons.Get (i);
     if (p->IntersectSegment (start, end, cur_isect, &r))
@@ -916,7 +916,7 @@ csPtr<csThingStatic> csThingStatic::CloneStatic ()
   }
 
   size_t i;
-  for (i = 0 ; i < static_polygons.Length () ; i++)
+  for (i = 0 ; i < static_polygons.GetSize () ; i++)
   {
     csPolygon3DStatic* p = static_polygons.Get (i)->Clone (clone);
     clone->static_polygons.Push (p);
@@ -943,7 +943,7 @@ void csThingStatic::HardTransform (const csReversibleTransform &t)
   //-------
   // Now transform the polygons.
   //-------
-  for (int j = 0; j < (int)static_polygons.Length (); j++)
+  for (int j = 0; j < (int)static_polygons.GetSize (); j++)
   {
     csPolygon3DStatic *p = GetPolygon3DStatic (j);
     p->HardTransform (t);
@@ -1005,21 +1005,21 @@ void csThingStatic::FillRenderMeshes (csThing* instance,
         const csArray<RepMaterial>& repMaterials,
         uint mixmode)
 {
-  for (size_t i = 0; i < (litPolys.Length () + unlitPolys.Length ()); i++)
+  for (size_t i = 0; i < (litPolys.GetSize () + unlitPolys.GetSize ()); i++)
   {
     const csStaticPolyGroup& pg =
-      (i < litPolys.Length ()) ? *(litPolys[i]) :
-        *(unlitPolys[i - litPolys.Length ()]) ;
+      (i < litPolys.GetSize ()) ? *(litPolys[i]) :
+        *(unlitPolys[i - litPolys.GetSize ()]) ;
     csRenderMesh* rm = thing_type->blk_rendermesh.Alloc();
 
     csRef<csPolygonRenderer> polyRenderer;
-    if (polyRenderers.Length () <= i)
+    if (polyRenderers.GetSize () <= i)
     {
       polyRenderer.AttachNew (new csPolygonRenderer (thing_type));
       polyRenderers.Push (polyRenderer);
 
       size_t j;
-      for (j = 0; j< pg.polys.Length(); j++)
+      for (j = 0; j< pg.polys.GetSize (); j++)
       {
         polyRenderer->AddPolygon (pg.polys[j],
 	  &static_polygons[pg.polys[j]]->polygon_data,
@@ -1031,7 +1031,7 @@ void csThingStatic::FillRenderMeshes (csThing* instance,
 
     rm->mixmode = mixmode;
     iMaterialWrapper* material = pg.material;
-    for (size_t m = 0; m < repMaterials.Length(); m++)
+    for (size_t m = 0; m < repMaterials.GetSize (); m++)
     {
       if (repMaterials[m].old_mat == material)
       {
@@ -1052,7 +1052,7 @@ void csThingStatic::FillRenderMeshes (csThing* instance,
     sv->SetAccessor (sva);
 
     /*rm->variablecontext->GetVariable (static_data->texLightmapName)->
-      SetValue (i < litPolys.Length() ? litPolys[i]->SLM->GetTexture() : 0);*/
+      SetValue (i < litPolys.GetSize () ? litPolys[i]->SLM->GetTexture() : 0);*/
 
     polyRenderer->PrepareRenderMesh (*rm);
   
@@ -1060,7 +1060,7 @@ void csThingStatic::FillRenderMeshes (csThing* instance,
     bufferHolder.AttachNew (new csRenderBufferHolder);
 
     polyRenderer->SetupBufferHolder (instance, bufferHolder,
-      (i < litPolys.Length ()));
+      (i < litPolys.GetSize ()));
     rm->buffers = bufferHolder;
 
     rmeshes.Push (rm);
@@ -1095,8 +1095,8 @@ void csThingStatic::GetRealRange (const csPolygonRange& requested_range,
   start = requested_range.start;
   end = requested_range.end;
   if (start < 0) start = 0;
-  if ((size_t)end >= static_polygons.Length ())
-    end = (int)static_polygons.Length ()-1;
+  if ((size_t)end >= static_polygons.GetSize ())
+    end = (int)static_polygons.GetSize ()-1;
 }
 
 int csThingStatic::AddEmptyPolygon ()
@@ -1645,7 +1645,7 @@ csThing::~csThing ()
   csDirtyAccessArray<csRenderMesh*>& renderMeshes =
     meshesHolder.GetUnusedData (meshesCreated, 0);
   size_t i;
-  for (i = 0; i < renderMeshes.Length () ; i++)
+  for (i = 0; i < renderMeshes.GetSize () ; i++)
   {
     // @@@ Is this needed?
     //if (renderMeshes[i]->variablecontext != 0)
@@ -1669,7 +1669,7 @@ csString csThing::GenerateCacheName ()
   int32 l;
   l = csLittleEndian::Convert ((int32)static_data->num_vertices);
   mf.Write ((char*)&l, 4);
-  l = csLittleEndian::Convert ((int32)polygons.Length ());
+  l = csLittleEndian::Convert ((int32)polygons.GetSize ());
   mf.Write ((char*)&l, 4);
 
   if (logparent)
@@ -1703,7 +1703,7 @@ void csThing::LightDisconnect (iLight* light)
   MarkLightmapsDirty ();
   int dt = light->GetDynamicType ();
   int i;
-  for (i = 0 ; i < (int)polygons.Length () ; i++)
+  for (i = 0 ; i < (int)polygons.GetSize () ; i++)
   {
     csPolygon3D *p = GetPolygon3D (i);
     if (dt == CS_LIGHT_DYNAMICTYPE_DYNAMIC)
@@ -1788,14 +1788,14 @@ void csThing::WorUpdate ()
           csReversibleTransform movtrans = cached_movable->GetFullTransform ();
           for (j = 0; j < static_data->num_vertices; j++)
             wor_verts[j] = movtrans.This2Other (static_data->obj_verts[j]);
-          if (!polygon_world_planes || polygon_world_planes_num < polygons.Length () ||
+          if (!polygon_world_planes || polygon_world_planes_num < polygons.GetSize () ||
             polygon_world_planes_num == (size_t)-1)
           {
             delete[] polygon_world_planes;
-            polygon_world_planes_num = polygons.Length ();
+            polygon_world_planes_num = polygons.GetSize ();
             polygon_world_planes = new csPlane3[polygon_world_planes_num];
           }
-          for (i = 0; i < polygons.Length (); i++)
+          for (i = 0; i < polygons.GetSize (); i++)
           {
             csPolygon3DStatic* sp = static_data->GetPolygon3DStatic ((int)i);
             movtrans.This2Other (sp->polygon_data.plane_obj,
@@ -1831,8 +1831,8 @@ void csThing::PreparePolygons ()
   polygon_world_planes_num = (size_t)-1;        // Not checked!
 
   size_t i;
-  polygons.SetLength (static_data->static_polygons.Length ());
-  for (i = 0; i < static_data->static_polygons.Length (); i++)
+  polygons.SetSize (static_data->static_polygons.GetSize ());
+  for (i = 0; i < static_data->static_polygons.GetSize (); i++)
   {
     p = &polygons.Get (i);
     ps = static_data->static_polygons.Get (i);
@@ -1909,7 +1909,7 @@ void csThing::PrepareSomethingOrOther ()
 iMaterialWrapper* csThing::FindRealMaterial (iMaterialWrapper* old_mat)
 {
   size_t i;
-  for (i = 0 ; i < replace_materials.Length () ; i++)
+  for (i = 0 ; i < replace_materials.GetSize () ; i++)
   {
     if (replace_materials[i].old_mat == old_mat)
       return replace_materials[i].new_mat;
@@ -1985,7 +1985,7 @@ void csThing::BuildDecal(const csVector3* pos, float decalRadius,
 
   // @@@ This routine is not very optimal. Especially for things
   // with large number of polygons.
-  for (i = 0; i < static_data->static_polygons.Length (); i++)
+  for (i = 0; i < static_data->static_polygons.GetSize (); i++)
   {
     csPolygon3DStatic *p = static_data->static_polygons.Get (i);
     if (p->InSphere(*pos, decalRadius))
@@ -2006,7 +2006,7 @@ bool csThing::HitBeamOutline (const csVector3& start,
 
   // @@@ This routine is not very optimal. Especially for things
   // with large number of polygons.
-  for (i = 0; i < static_data->static_polygons.Length (); i++)
+  for (i = 0; i < static_data->static_polygons.GetSize (); i++)
   {
     csPolygon3DStatic *p = static_data->static_polygons.Get (i);
     if (p->IntersectSegment (start, end, isect, pr))
@@ -2084,14 +2084,14 @@ void csThing::AppendShadows (
   WorUpdate ();
 
   iShadowBlock *list = shadows->NewShadowBlock (
-      (int)polygons.Length ());
+      (int)polygons.GetSize ());
   csFrustum *frust;
   size_t i;
   int j;
   csPolygon3DStatic *sp;
   csPolygon3D *p;
   bool cw = true;                   //@@@ Use mirroring parameter here!
-  for (i = 0; i < static_data->static_polygons.Length (); i++)
+  for (i = 0; i < static_data->static_polygons.GetSize (); i++)
   {
     sp = static_data->static_polygons.Get (i);
     p = &polygons.Get (i);
@@ -2199,7 +2199,7 @@ void PolyMeshHelper::Setup ()
 
   size_t i;
   const csPolygonStaticArray &pol = thing->static_polygons;
-  for (i = 0 ; i < pol.Length () ; i++)
+  for (i = 0 ; i < pol.GetSize () ; i++)
   {
     csPolygon3DStatic *p = pol.Get (i);
     if (p->flags.CheckAll (poly_flag)) num_poly++;
@@ -2215,7 +2215,7 @@ void PolyMeshHelper::Setup ()
   {
     polygons = new csMeshedPolygon[num_poly];
     num_poly = 0;
-    for (i = 0 ; i < pol.Length () ; i++)
+    for (i = 0 ; i < pol.GetSize () ; i++)
     {
       csPolygon3DStatic *p = pol.Get (i);
       if (p->flags.CheckAll (poly_flag))
@@ -2309,7 +2309,7 @@ void csThing::CastShadows (iMovable* movable, iFrustumView *lview)
   }
 
   bool affect = false;
-  for (i = 0; i < polygons.Length (); i++)
+  for (i = 0; i < polygons.GetSize (); i++)
   {
     csPolygon3D* poly = GetPolygon3D ((int)i);
     csPolygon3DStatic* spoly = static_data->GetPolygon3DStatic ((int)i);
@@ -2351,7 +2351,7 @@ void csThing::InitializeDefault (bool clear)
   PrepareSomethingOrOther ();
 
   size_t i;
-  for (i = 0; i < polygons.Length (); i++)
+  for (i = 0; i < polygons.GetSize (); i++)
     polygons.Get (i).InitializeDefault (clear);
 }
 
@@ -2376,7 +2376,7 @@ bool csThing::ReadFromCache (iCacheManager* cache_mgr)
   {
     csMemFile mf (db, true);
     size_t i;
-    for (i = 0; i < polygons.Length (); i++)
+    for (i = 0; i < polygons.GetSize (); i++)
     {
       csPolygon3D& p = polygons.Get (i);
       csPolygon3DStatic* sp = static_data->GetPolygon3DStatic ((int)i);
@@ -2416,7 +2416,7 @@ bool csThing::WriteToCache (iCacheManager* cache_mgr)
   size_t i;
   bool rc = false;
   csMemFile mf;
-  for (i = 0; i < polygons.Length (); i++)
+  for (i = 0; i < polygons.GetSize (); i++)
   {
     csPolygon3D& p = polygons.Get (i);
     csPolygon3DStatic* sp = static_data->GetPolygon3DStatic ((int)i);
@@ -2438,7 +2438,7 @@ void csThing::PrepareLighting ()
   csColor ambient;
   static_data->thing_type->engine->GetAmbientLight (ambient);
   size_t i;
-  for (i = 0 ; i < polygons.Length () ; i++)
+  for (i = 0 ; i < polygons.GetSize () ; i++)
   {
     csPolygon3D& p = polygons.Get (i);
     csLightMap* lm = p.GetPolyTexture ()->GetLightMap ();
@@ -2459,7 +2459,7 @@ void csThing::PrepareRenderMeshes (
 {
   size_t i;
 
-  for (i = 0; i < renderMeshes.Length () ; i++)
+  for (i = 0; i < renderMeshes.GetSize () ; i++)
   {
     // @@@ Is this needed?
     //if (renderMeshes[i]->variablecontext != 0)
@@ -2471,18 +2471,18 @@ void csThing::PrepareRenderMeshes (
     mixmode);
   renderMeshes.ShrinkBestFit ();
   materials_to_visit.DeleteAll ();
-  for (i = 0 ; i < renderMeshes.Length () ; i++)
+  for (i = 0 ; i < renderMeshes.GetSize () ; i++)
   {
     if (renderMeshes[i]->material->IsVisitRequired ())
       materials_to_visit.Push (renderMeshes[i]->material);
   }
   materials_to_visit.ShrinkBestFit ();
 
-  /*for (i = 0; i < renderMeshes.Length(); i++)
+  /*for (i = 0; i < renderMeshes.GetSize (); i++)
   {
     csRenderMesh* rm = renderMeshes[i];
     rm->variablecontext->GetVariable (static_data->texLightmapName)->
-      SetValue (i < litPolys.Length() ? litPolys[i]->SLM->GetTexture() : 0);
+      SetValue (i < litPolys.GetSize () ? litPolys[i]->SLM->GetTexture() : 0);
   }*/
 
 }
@@ -2499,7 +2499,7 @@ void csThing::PrepareForUse ()
   bool meshesCreated;
   csDirtyAccessArray<csRenderMesh*>& renderMeshes =
     meshesHolder.GetUnusedData (meshesCreated, 0);
-  if (renderMeshes.Length() == 0)
+  if (renderMeshes.GetSize () == 0)
   {
     PrepareRenderMeshes (renderMeshes);
   }
@@ -2540,7 +2540,7 @@ csRenderMesh **csThing::GetRenderMeshes (int &num, iRenderView* rview,
   csDirtyAccessArray<csRenderMesh*>& renderMeshes =
     meshesHolder.GetUnusedData (meshesCreated, currentFrame);
 
-  if (renderMeshes.Length() == 0)
+  if (renderMeshes.GetSize () == 0)
   {
     PrepareRenderMeshes (renderMeshes);
   }
@@ -2548,7 +2548,7 @@ csRenderMesh **csThing::GetRenderMeshes (int &num, iRenderView* rview,
   const csVector3& wo = movable->GetFullPosition ();
   const csReversibleTransform& t = movable->GetFullTransform ();
 
-  for (i = 0; i < renderMeshes.Length(); i++)
+  for (i = 0; i < renderMeshes.GetSize (); i++)
   {
     csRenderMesh* rm = renderMeshes[i];
     rm->worldspace_origin = wo;
@@ -2561,13 +2561,13 @@ csRenderMesh **csThing::GetRenderMeshes (int &num, iRenderView* rview,
 
     // Jorrit: Moved the code below to PrepareRenderMeshes().
     //rm->variablecontext->GetVariable (static_data->texLightmapName)->
-      //SetValue (i < litPolys.Length() ? litPolys[i]->SLM->GetTexture() : 0);
+      //SetValue (i < litPolys.GetSize () ? litPolys[i]->SLM->GetTexture() : 0);
   }
 
   //UpdateDirtyLMs (); // @@@ Here?
 
-  num = (int)renderMeshes.Length ();
-  for (i = 0; i < materials_to_visit.Length (); i++)
+  num = (int)renderMeshes.GetSize ();
+  for (i = 0; i < materials_to_visit.GetSize (); i++)
   {
     materials_to_visit[i]->Visit ();
   }
@@ -2586,7 +2586,7 @@ void csThing::PrepareLMs ()
     csPtrKey<csThingStatic::StaticSuperLM> > superLMs;
 
   size_t i;
-  for (i = 0; i < static_data->litPolys.Length(); i++)
+  for (i = 0; i < static_data->litPolys.GetSize (); i++)
   {
     const csThingStatic::csStaticLitPolyGroup& slpg =
       *(static_data->litPolys[i]);
@@ -2612,8 +2612,8 @@ void csThing::PrepareLMs ()
       if (pg->material == 0) pg->material = slpg.material;
 
       size_t j;
-      pg->polys.SetLength (slpg.polys.Length ());
-      for (j = 0; j < slpg.polys.Length(); j++)
+      pg->polys.SetSize (slpg.polys.GetSize ());
+      for (j = 0; j < slpg.polys.GetSize (); j++)
       {
         pg->polys.Put (j, slpg.polys[j]);
       }
@@ -2629,9 +2629,9 @@ void csThing::PrepareLMs ()
       lpg->SLM = SLM;
 
       size_t j;
-      lpg->lightmaps.SetLength (slpg.polys.Length ());
-      lpg->polys.SetLength (slpg.polys.Length ());
-      for (j = 0; j < slpg.polys.Length(); j++)
+      lpg->lightmaps.SetSize (slpg.polys.GetSize ());
+      lpg->polys.SetSize (slpg.polys.GetSize ());
+      for (j = 0; j < slpg.polys.GetSize (); j++)
       {
         csPolygon3D* poly = &polygons[slpg.polys[j]];
 
@@ -2651,7 +2651,7 @@ void csThing::PrepareLMs ()
     }
   }
 
-  for (i = 0; i < static_data->unlitPolys.Length(); i++)
+  for (i = 0; i < static_data->unlitPolys.GetSize (); i++)
   {
     const csThingStatic::csStaticPolyGroup& spg =
       *(static_data->unlitPolys[i]);
@@ -2660,8 +2660,8 @@ void csThing::PrepareLMs ()
     if (pg->material == 0) pg->material = spg.material;
 
     size_t j;
-    pg->polys.SetLength (spg.polys.Length ());
-    for (j = 0; j < spg.polys.Length(); j++)
+    pg->polys.SetSize (spg.polys.GetSize ());
+    for (j = 0; j < spg.polys.GetSize (); j++)
     {
       pg->polys.Put (j, spg.polys[j]);
     }
@@ -2710,10 +2710,10 @@ void csThing::UpdateDirtyLMs ()
   csVector3 v_world2tex;
 
   size_t i;
-  for (i = 0; i < litPolys.Length (); i++)
+  for (i = 0; i < litPolys.GetSize (); i++)
   {
     size_t j;
-    for (j = 0; j < litPolys[i]->polys.Length (); j++)
+    for (j = 0; j < litPolys[i]->polys.GetSize (); j++)
     {
       csPolygon3D& poly = polygons[litPolys[i]->polys[j]];
       csPolyTexture* lmi = poly.GetPolyTexture ();

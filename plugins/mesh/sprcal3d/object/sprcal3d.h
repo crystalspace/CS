@@ -171,7 +171,7 @@ public:
    * primary mesh)
    */
   virtual size_t GetSecondaryCount () const
-  { return (int)secondary_meshes.Length(); }
+  { return (int)secondary_meshes.GetSize (); }
   /// Get the attached secondary mesh at the given index
   virtual iMeshWrapper * GetSecondaryMesh (size_t index)
   { return secondary_meshes[index].mesh; }
@@ -300,8 +300,8 @@ public:
     float min_interval);
   bool RemoveAnimCallback(const char *anim, CalAnimationCallback *callback);
 
-  int GetMeshCount() { return (int)meshes.Length(); }
-  int GetMorphAnimationCount() { return (int)morph_animation_names.Length(); }
+  int GetMeshCount() { return (int)meshes.GetSize (); }
+  int GetMorphAnimationCount() { return (int)morph_animation_names.GetSize (); }
   int GetMorphTargetCount(int mesh_id);
   const char *GetMeshName(int idx);
   int  FindMeshName(const char *meshName);
@@ -319,11 +319,11 @@ public:
   /// find a socked based on the sprite attached to it
   iSpriteCal3DSocket* FindSocket (iMeshWrapper *mesh) const;
   /// Query the number of sockets
-  int GetSocketCount () const { return (int)sockets.Length (); }
+  int GetSocketCount () const { return (int)sockets.GetSize (); }
   /// Query the socket number f
   iSpriteCal3DSocket* GetSocket (int f) const
   {
-    return ((size_t)f < sockets.Length()) ?
+    return ((size_t)f < sockets.GetSize ()) ?
       (csSpriteCal3DSocket*)sockets [f] : (csSpriteCal3DSocket*)0;
   }
   /** @} */
@@ -711,11 +711,11 @@ public:
   /// find a socked based on the sprite attached to it
   iSpriteCal3DSocket* FindSocket (iMeshWrapper *mesh) const;
   /// Query the number of sockets
-  int GetSocketCount () const { return (int)sockets.Length (); }
+  int GetSocketCount () const { return (int)sockets.GetSize (); }
   /// Query the socket number f
   iSpriteCal3DSocket* GetSocket (int f) const
   {
-    return ((size_t)f < sockets.Length()) ?
+    return ((size_t)f < sockets.GetSize ()) ?
       (csSpriteCal3DSocket*)sockets[f] : (csSpriteCal3DSocket*)0;
   }
 

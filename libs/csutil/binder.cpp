@@ -119,7 +119,7 @@ void csInputBinder::BindButton (const csInputDefinition &def, unsigned cmd,
 
 int csInputBinder::Axis (unsigned cmd)
 {
-  if (axisArray.Length () > cmd)
+  if (axisArray.GetSize () > cmd)
   {
     AxisCmd *bind = axisArray[cmd];
     if (bind) return bind->val * bind->sens;
@@ -129,7 +129,7 @@ int csInputBinder::Axis (unsigned cmd)
 
 bool csInputBinder::Button (unsigned cmd)
 {
-  if (btnArray.Length () > cmd)
+  if (btnArray.GetSize () > cmd)
   {
     BtnCmd *bind = btnArray[cmd];
     if (bind) return bind->down;
@@ -139,7 +139,7 @@ bool csInputBinder::Button (unsigned cmd)
 
 bool csInputBinder::UnbindAxis (unsigned cmd)
 {
-  if (axisArray.Length () <= cmd) return false;
+  if (axisArray.GetSize () <= cmd) return false;
   AxisCmd *bind = axisArray[cmd];
   if (! bind) return false;
 
@@ -159,7 +159,7 @@ bool csInputBinder::UnbindAxis (unsigned cmd)
 
 bool csInputBinder::UnbindButton (unsigned cmd)
 {
-  if (btnArray.Length () <= cmd) return false;
+  if (btnArray.GetSize () <= cmd) return false;
   BtnCmd *bind = btnArray[cmd];
   if (! bind) return false;
 
@@ -180,12 +180,12 @@ bool csInputBinder::UnbindButton (unsigned cmd)
 void csInputBinder::UnbindAll ()
 {
   size_t i;
-  for (i = 0; i < axisArray.Length (); i++)
+  for (i = 0; i < axisArray.GetSize (); i++)
   {
     delete axisArray[i];
     axisArray[i] = 0;
   }
-  for (i = 0; i < btnArray.Length (); i++)
+  for (i = 0; i < btnArray.GetSize (); i++)
   {
     delete btnArray[i];
     btnArray[i] = 0;

@@ -234,7 +234,7 @@ public:
   size_t FindKey (const char* Key) const
   {
     size_t i;
-    for (i = 0; i < array.Length (); i++)
+    for (i = 0; i < array.GetSize (); i++)
       if (strcmp (array[i]->GetName (), Key) == 0)
         return i;
     return (size_t)-1;
@@ -247,7 +247,7 @@ public:
 
   size_t Length () const
   {
-    return array.Length ();
+    return array.GetSize ();
   }
 
   void Push (VfsArchive* ar)
@@ -263,7 +263,7 @@ public:
   void FlushAll ()
   {
     size_t i = 0;
-    while (i < array.Length ())
+    while (i < array.GetSize ())
     {
       array[i]->Flush ();
       if (array[i]->RefCount == 0)
@@ -279,7 +279,7 @@ public:
 
   void CheckUp ()
   {
-    size_t i = array.Length ();
+    size_t i = array.GetSize ();
     while (i > 0)
     {
       i--;
@@ -960,7 +960,7 @@ bool VfsNode::AddRPath (const char *RealPath, csVFS *Parent)
   bool rc = false;
   csString const expanded_path = Expand(Parent, RealPath);
   // Split rpath into several, separated by commas
-  size_t rpl = expanded_path.Length();
+  size_t rpl = expanded_path.Length ();
   char *cur, *src;
   char *oldsrc = src = csStrNew (expanded_path);
   for (cur = src, rpl++; rpl-- > 0; cur++)
@@ -1003,7 +1003,7 @@ bool VfsNode::RemoveRPath (const char *RealPath, csVFS* Parent)
   } /* endif */
   csString const expanded_path = Expand(Parent, RealPath);
   size_t i;
-  for (i = 0; i < UPathV.Length (); i++)
+  for (i = 0; i < UPathV.GetSize (); i++)
     if (strcmp ((char *)UPathV.Get (i), expanded_path) == 0)
     {
       RPathV.DeleteIndex (i);
@@ -1142,7 +1142,7 @@ void VfsNode::FindFiles (const char *Suffix, const char *Mask,
   // Look through all RPathV's for file or directory
   size_t i;
   csString vpath;
-  for (i = 0; i < RPathV.Length (); i++)
+  for (i = 0; i < RPathV.GetSize (); i++)
   {
     char *rpath = (char *)RPathV [i];
     size_t rpl = strlen (rpath);
@@ -1251,7 +1251,7 @@ iFile* VfsNode::Open (int Mode, const char *FileName)
 
   // Look through all RPathV's for file or directory
   size_t i;
-  for (i = 0; i < RPathV.Length (); i++)
+  for (i = 0; i < RPathV.GetSize (); i++)
   {
     char *rpath = (char *)RPathV [i];
     if (rpath [strlen (rpath) - 1] == CS_PATH_SEPARATOR)
@@ -1303,7 +1303,7 @@ bool VfsNode::FindFile (const char *Suffix, char *RealPath,
 {
   // Look through all RPathV's for file or directory
   size_t i;
-  for (i = 0; i < RPathV.Length (); i++)
+  for (i = 0; i < RPathV.GetSize (); i++)
   {
     char *rpath = (char *)RPathV [i];
     if (rpath [strlen (rpath) - 1] == CS_PATH_SEPARATOR)
@@ -1477,7 +1477,7 @@ csVFS::~csVFS ()
 
 static void add_final_delimiter(csString& s)
 {
-  if (!s.IsEmpty() && s[s.Length() - 1] != CS_PATH_SEPARATOR)
+  if (!s.IsEmpty() && s[s.Length () - 1] != CS_PATH_SEPARATOR)
     s << CS_PATH_SEPARATOR;
 }
 
@@ -1545,7 +1545,7 @@ bool csVFS::Initialize (iObjectRegistry* r)
 #endif
 
   configPaths = csPathsUtilities::LocateFile (configPaths, "vfs.cfg", true);
-  if (configPaths.Length() > 0)
+  if (configPaths.GetSize () > 0)
   {
     basedir = alloc_normalized_path (configPaths[0].path);
   }
@@ -1584,7 +1584,7 @@ bool csVFS::Initialize (iObjectRegistry* r)
   result = load_vfs_config(config, appdir,  seen, verbose_scan);
   if (result && (basedir == 0))
     basedir = alloc_normalized_path (appdir);
-  for (size_t i = 0; i < configPaths.Length(); i++)
+  for (size_t i = 0; i < configPaths.GetSize (); i++)
   {
     load_vfs_config(config, configPaths[i].path,  seen, verbose_scan);
   }
@@ -1697,7 +1697,7 @@ VfsNode *csVFS::GetNode (const char *Path, char *NodePrefix,
 {
   size_t i, best_i = (size_t)-1;
   size_t best_l = 0, path_l = strlen (Path);
-  for (i = 0; i < NodeList.Length (); i++)
+  for (i = 0; i < NodeList.GetSize (); i++)
   {
     VfsNode *node = (VfsNode *)NodeList [i];
     size_t vpath_l = strlen (node->VPath);
@@ -1776,7 +1776,7 @@ void csVFS::PushDir (char const* Path)
 bool csVFS::PopDir ()
 {
   CS::Threading::RecursiveMutexScopedLock lock (mutex);
-  if (!dirstack.Length ())
+  if (!dirstack.GetSize ())
     return false;
   char *olddir = (char *) dirstack.Pop ();
   bool retcode = ChDir (olddir);
@@ -1814,7 +1814,7 @@ csRef<iStringArray> csVFS::MountRoot (const char *Path)
     {
       char const* t = roots->Get(i);
       csString s(t);
-      size_t const slen = s.Length();
+      size_t const slen = s.Length ();
       char c = '\0';
 
       csString vfs_dir;
@@ -1881,7 +1881,7 @@ csPtr<iStringArray> csVFS::FindFiles (const char *Path) const
     // these are "directories" and will have a slash appended
     size_t sl = strlen (XPath);
     size_t i;
-    for (i = 0; i < NodeList.Length (); i++)
+    for (i = 0; i < NodeList.GetSize (); i++)
     {
       VfsNode *node = (VfsNode *)NodeList [i];
       if ((memcmp (node->VPath, XPath, sl) == 0) && (node->VPath [sl]))
@@ -2022,7 +2022,7 @@ bool csVFS::Mount (const char *VirtualPath, const char *RealPath)
   }
 
   node->AddRPath (RealPath, this);
-  if (node->RPathV.Length () == 0)
+  if (node->RPathV.GetSize () == 0)
   {
     size_t idx = NodeList.Find (node);
     if (idx != csArrayItemNotFound)
@@ -2054,7 +2054,7 @@ bool csVFS::Unmount (const char *VirtualPath, const char *RealPath)
   if (!node->RemoveRPath (RealPath, this))
     return false;
 
-  if (node->RPathV.Length () == 0)
+  if (node->RPathV.GetSize () == 0)
   {
     csString s("VFS.Mount.");
     s+=node->ConfigKey;
@@ -2075,22 +2075,22 @@ bool csVFS::SaveMounts (const char *FileName)
 {
   CS::Threading::RecursiveMutexScopedLock lock (mutex);
   size_t i;
-  for (i = 0; i < NodeList.Length (); i++)
+  for (i = 0; i < NodeList.GetSize (); i++)
   {
     VfsNode *node = (VfsNode *)NodeList.Get (i);
     size_t j;
     size_t sl = 0;
-    for (j = 0; j < node->UPathV.Length (); j++)
+    for (j = 0; j < node->UPathV.GetSize (); j++)
       sl += strlen ((char *)node->UPathV.Get (j)) + 1;
 
     char *tmp = new char[sl + 1];
     sl = 0;
-    for (j = 0; j < node->UPathV.Length (); j++)
+    for (j = 0; j < node->UPathV.GetSize (); j++)
     {
       char *rp = (char *)node->UPathV.Get (j);
       size_t rpl = strlen (rp);
       memcpy (tmp + sl, rp, rpl);
-      if (j < node->UPathV.Length () - 1)
+      if (j < node->UPathV.GetSize () - 1)
       {
         tmp [sl + rpl] = ',';
         sl++;
@@ -2187,7 +2187,7 @@ static char* TransformPath (const char* path, bool add_end)
 static csString compose_vfs_path(char const* dir, char const* file)
 {
   csString path(dir);
-  size_t const n = path.Length();
+  size_t const n = path.Length ();
   if (n > 0 && path[n - 1] != VFS_PATH_SEPARATOR)
     path << VFS_PATH_SEPARATOR;
   path << file;
@@ -2234,7 +2234,7 @@ bool csVFS::ChDirAuto (const char* path, const csStringArray* paths,
   // Now try to see if we can get it from one of the paths.
   if (paths)
   {
-    for (size_t i = 0; i < paths->Length(); i++)
+    for (size_t i = 0; i < paths->GetSize (); i++)
     {
       csString testpath = compose_vfs_path(paths->Get(i), path);
       if (TryChDirAuto(testpath, filename))
@@ -2326,7 +2326,7 @@ csPtr<iDataBuffer> csVFS::GetRealPath (const char *FileName)
   bool ok = false;
   char path [CS_MAXPATHLEN + 1];
   size_t i;
-  for (i = 0; !ok && i < node->RPathV.Length (); i++)
+  for (i = 0; !ok && i < node->RPathV.GetSize (); i++)
   {
     const char *rpath = node->RPathV.Get (i);
     cs_snprintf (path, sizeof(path), "%s%s", rpath, suffix);
@@ -2336,7 +2336,7 @@ csPtr<iDataBuffer> csVFS::GetRealPath (const char *FileName)
 
   if (!ok)
   {
-    CS_ASSERT(node->RPathV.Length() != 0);
+    CS_ASSERT(node->RPathV.GetSize () != 0);
     char const* defpath = node->RPathV.Get(0);
     CS_ASSERT(defpath != 0);
     size_t const len = strlen(defpath);
@@ -2354,7 +2354,7 @@ csPtr<iDataBuffer> csVFS::GetRealPath (const char *FileName)
 csRef<iStringArray> csVFS::GetMounts ()
 {
   scfStringArray* mounts = new scfStringArray;
-  for (size_t i=0; i<NodeList.Length (); i++)
+  for (size_t i=0; i<NodeList.GetSize (); i++)
   {
     mounts->Push (NodeList[i]->VPath);
   }
@@ -2376,7 +2376,7 @@ csRef<iStringArray> csVFS::GetRealMountPaths (const char *VirtualPath)
   if (PreparePath (VirtualPath, true, node, suffix, sizeof (suffix))
     && !suffix [0])
   {
-    for (size_t i=0; i<node->RPathV.Length (); i++)
+    for (size_t i=0; i<node->RPathV.GetSize (); i++)
       rmounts->Push (node->RPathV[i]);
   }
 

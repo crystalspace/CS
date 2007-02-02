@@ -177,10 +177,10 @@ public:
   
   //@{
   /// Return number of contained paths.
-  size_t Length () const { return paths.Length(); }
-  size_t GetSize () const { return paths.Length(); }
+  size_t Length () const { return paths.GetSize (); }
+  size_t GetSize () const { return paths.GetSize (); }
   //@}
-  CS_DEPRECATED_METHOD_MSG("Use Length() instead") 
+  CS_DEPRECATED_METHOD_MSG("Use GetSize() instead") 
   size_t GetCount () const { return Length(); }
   //@{
   /// Retrieve the n'th path record.

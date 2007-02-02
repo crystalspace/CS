@@ -280,7 +280,7 @@ csMeshWrapper::~csMeshWrapper ()
   // Copy the array because we are going to unlink the children.
   csRefArray<iSceneNode> children = movable.GetChildren ();
   size_t i;
-  for (i = 0 ; i < children.Length () ; i++)
+  for (i = 0 ; i < children.GetSize () ; i++)
     children[i]->SetParent (0);
   delete imposter_mesh;
   ClearFromSectorPortalLists ();
@@ -323,7 +323,7 @@ void csMeshWrapper::MoveToSector (iSector *s)
 
   const csRefArray<iSceneNode>& children = movable.GetChildren ();
   size_t i;
-  for (i = 0; i < children.Length (); i++)
+  for (i = 0; i < children.GetSize (); i++)
   {
     iMeshWrapper* spr = children[i]->QueryMesh ();
     // @@@ What for other types of objects like lights and camera???
@@ -351,7 +351,7 @@ void csMeshWrapper::RemoveFromSectors (iSector* sector)
   ClearFromSectorPortalLists (sector);
   const csRefArray<iSceneNode>& children = movable.GetChildren ();
   size_t i;
-  for (i = 0; i < children.Length (); i++)
+  for (i = 0; i < children.GetSize (); i++)
   {
     iMeshWrapper* spr = children[i]->QueryMesh ();
     // @@@ What to do in case of light!
@@ -391,7 +391,7 @@ void csMeshWrapper::SetFlagsRecursive (uint32 mask, uint32 value)
   flags.Set (mask, value);
   const csRefArray<iSceneNode>& children = movable.GetChildren ();
   size_t i;
-  for (i = 0 ; i < children.Length () ; i++)
+  for (i = 0 ; i < children.GetSize () ; i++)
   {
     iMeshWrapper* mesh = children[i]->QueryMesh ();
     if (mesh)
@@ -404,7 +404,7 @@ void csMeshWrapper::SetZBufModeRecursive (csZBufMode mode)
   SetZBufMode (mode);
   const csRefArray<iSceneNode>& children = movable.GetChildren ();
   size_t i;
-  for (i = 0 ; i < children.Length () ; i++)
+  for (i = 0 ; i < children.GetSize () ; i++)
   {
     iMeshWrapper* mesh = children[i]->QueryMesh ();
     if (mesh)
@@ -417,7 +417,7 @@ void csMeshWrapper::SetRenderPriorityRecursive (long rp)
   SetRenderPriority (rp);
   const csRefArray<iSceneNode>& children = movable.GetChildren ();
   size_t i;
-  for (i = 0 ; i < children.Length () ; i++)
+  for (i = 0 ; i < children.GetSize () ; i++)
   {
     iMeshWrapper* mesh = children[i]->QueryMesh ();
     if (mesh)
@@ -475,7 +475,7 @@ const csArray<iLightSectorInfluence*>& csMeshWrapper::GetRelevantLights (
       // Object didn't move. Now check lights (moved or destroyed).
       bool relevant = true;
       size_t i;
-      for (i = 0 ; i < relevant_lights.Length () ; i++)
+      for (i = 0 ; i < relevant_lights.GetSize () ; i++)
       {
 	if (!relevant_lights_ref[i].lsi)
 	{
@@ -505,8 +505,8 @@ const csArray<iLightSectorInfluence*>& csMeshWrapper::GetRelevantLights (
     csBox3 box;
     GetFullBBox (box);
 
-    if (relevant_lights_max > relevant_lights.Length ())
-      relevant_lights.SetLength (relevant_lights_max);
+    if (relevant_lights_max > relevant_lights.GetSize ())
+      relevant_lights.SetSize (relevant_lights_max);
 
     iSector *sect = movable_sectors->Get (0);
     csVector3 pos = movable.GetFullPosition ();
@@ -562,8 +562,8 @@ const csArray<iLightSectorInfluence*>& csMeshWrapper::GetRelevantLights (
     }
     if (cnt > relevant_lights_max) cnt = relevant_lights_max;
     if (maxLights != -1 && int (cnt) > maxLights) cnt = maxLights;
-    relevant_lights.SetLength (cnt);
-    relevant_lights_ref.SetLength (cnt);
+    relevant_lights.SetSize (cnt);
+    relevant_lights_ref.SetSize (cnt);
     size_t i;
     for (i = 0 ; i < cnt ; i++)
     {
@@ -593,7 +593,7 @@ csRenderMesh** csMeshWrapper::GetRenderMeshes (int& n, iRenderView* rview,
 
   // Callback are traversed in reverse order so that they can safely
   // delete themselves.
-  size_t i = draw_cb_vector.Length ();
+  size_t i = draw_cb_vector.GetSize ();
   while (i > 0)
   {
     i--;
@@ -1062,7 +1062,7 @@ void csMeshWrapper::HardTransform (const csReversibleTransform &t)
 
   const csRefArray<iSceneNode>& children = movable.GetChildren ();
   size_t i;
-  for (i = 0 ; i < children.Length () ; i++)
+  for (i = 0 ; i < children.GetSize () ; i++)
   {
     iMeshWrapper* mesh = children[i]->QueryMesh ();
     if (mesh)
@@ -1082,11 +1082,11 @@ void csMeshWrapper::GetRadius (float &rad, csVector3 &cent) const
 {
   meshobj->GetObjectModel ()->GetRadius (rad, cent);
   const csRefArray<iSceneNode>& children = movable.GetChildren ();
-  if (children.Length () > 0)
+  if (children.GetSize () > 0)
   {
     csSphere sphere (cent, rad);
     size_t i;
-    for (i = 0; i < children.Length (); i++)
+    for (i = 0; i < children.GetSize (); i++)
     {
       iMeshWrapper *spr = children[i]->QueryMesh ();
       if (spr)
@@ -1338,7 +1338,7 @@ iMeshWrapper* csMeshWrapper::FindChildByName (const char* name)
   char const* p = strchr (name, ':');
   if (!p)
   {
-    for (i = 0 ; i < children.Length () ; i++)
+    for (i = 0 ; i < children.GetSize () ; i++)
     {
       iMeshWrapper* m = children[i]->QueryMesh ();
       if (m && !strcmp (name, m->QueryObject ()->GetName ()))
@@ -1351,7 +1351,7 @@ iMeshWrapper* csMeshWrapper::FindChildByName (const char* name)
   csString firstName;
   firstName.Append (name, firstsize);
 
-  for (i = 0 ; i < children.Length () ; i++)
+  for (i = 0 ; i < children.GetSize () ; i++)
   {
     iMeshWrapper* m = children[i]->QueryMesh ();
     if (m && !strcmp (firstName, m->QueryObject ()->GetName ()))
@@ -1478,7 +1478,7 @@ csPtr<iMeshWrapper> csMeshFactoryWrapper::CreateMeshWrapper ()
         csArray<iMeshFactoryWrapper*>& facts_for_lod =
       	  static_lod->GetMeshesForLOD (l);
         size_t j;
-	for (j = 0 ; j < facts_for_lod.Length () ; j++)
+	for (j = 0 ; j < facts_for_lod.GetSize () ; j++)
 	{
 	  if (facts_for_lod[j] == childfact)
 	    mesh->AddMeshToStaticLOD (l, child);
@@ -1623,7 +1623,7 @@ bool csMeshList::Remove (int n)
 void csMeshList::RemoveAll ()
 {
   size_t i;
-  for (i = 0 ; i < list.Length () ; i++)
+  for (i = 0 ; i < list.GetSize () ; i++)
   {
     list[i]->QueryObject ()->RemoveNameChangeListener (listener);
     FreeMesh (list[i]);
@@ -1765,7 +1765,7 @@ bool csMeshFactoryList::Remove (int n)
 void csMeshFactoryList::RemoveAll ()
 {
   size_t i;
-  for (i = 0 ; i < list.Length () ; i++)
+  for (i = 0 ; i < list.GetSize () ; i++)
   {
     list[i]->QueryObject ()->RemoveNameChangeListener (listener);
     FreeFactory (list[i]);

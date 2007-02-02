@@ -56,7 +56,7 @@ void csRegion::DeleteAll ()
     copy.Push (o);
   }
 
-  size_t total = copy.Length ();
+  size_t total = copy.GetSize ();
 
   // Now we iterate over all objects in the 'copy' vector and
   // delete them. This will release them as csObject children
@@ -70,7 +70,7 @@ void csRegion::DeleteAll ()
 
   // The first loop is the most general one where we just use
   // engine->RemoveObject().
-  for (i = 0; i < copy.Length (); i++)
+  for (i = 0; i < copy.GetSize (); i++)
   {
     iBase* b = (iBase*)copy[i];
 #ifdef REGION_CHECK
@@ -85,7 +85,7 @@ void csRegion::DeleteAll ()
   }
 
 #ifdef REGION_CHECK
-  for (i = 0 ; i < copy.Length () ; i++)
+  for (i = 0 ; i < copy.GetSize () ; i++)
     if (rc[i].weakb != 0)
       printf ("Not Deleted %p '%s' ref=%d\n",
 	  (iBase*)rc[i].weakb, (const char*)rc[i].n,
@@ -100,7 +100,7 @@ void csRegion::DeleteAll ()
   {
     // Sanity check. There should be no more
     // non-0 references in the copy array now.
-    for (i = 0; i < copy.Length (); i++)
+    for (i = 0; i < copy.GetSize (); i++)
       if (copy[i])
       {
         iObject *o = copy[i];
@@ -236,7 +236,7 @@ csRegionList::~csRegionList()
 
 int csRegionList::GetCount () const
 {
-  return (int)regionList.Length ();
+  return (int)regionList.GetSize ();
 }
 
 iRegion *csRegionList::Get (int n) const

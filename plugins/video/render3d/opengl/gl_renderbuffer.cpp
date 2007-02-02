@@ -553,7 +553,7 @@ csGLVBOBufferSlot* csGLVBOBufferManager::csGLVBOBuffer::FindEmptySlot (
             {
               bool handled = false;
               //check if we follow on any of the already existant slots
-              for (j = 0; j<sortList.Length (); j++)
+              for (j = 0; j<sortList.GetSize (); j++)
               {
                 SlotSortStruct *t = sortList[j];
                 if (tmpSlot->offset == (t->lastOffset+blocksize))
@@ -571,7 +571,7 @@ csGLVBOBufferSlot* csGLVBOBufferManager::csGLVBOBuffer::FindEmptySlot (
                   handled = true;
                 }
                 
-                if (t->slotList.Length ()>=blocksToMerge)
+                if (t->slotList.GetSize ()>=blocksToMerge)
                 {
                   sortSlotidx = j;
                   break;
@@ -591,7 +591,7 @@ csGLVBOBufferSlot* csGLVBOBufferManager::csGLVBOBuffer::FindEmptySlot (
 
               //then run through all slotSortStructs and merge them,
               //stop if we find one with enough slots to merge
-              for (j = 0; j<sortList.Length ()-1; j++)
+              for (j = 0; j<sortList.GetSize ()-1; j++)
               {
                 SlotSortStruct* s = sortList[j];
                 SlotSortStruct* s2 = sortList[j+1];
@@ -600,14 +600,14 @@ csGLVBOBufferSlot* csGLVBOBufferManager::csGLVBOBuffer::FindEmptySlot (
                 {
                   sortList.DeleteIndex (j+1);
                   s->lastOffset = s2->lastOffset;
-                  for (uint n=0; n < s2->slotList.Length (); n++)
+                  for (uint n=0; n < s2->slotList.GetSize (); n++)
                   {
                     s->slotList.Push (s2->slotList[n]);
                   }
                   delete s2;
                 }
 
-                if (sortList[j]->slotList.Length ()>blocksToMerge)
+                if (sortList[j]->slotList.GetSize ()>blocksToMerge)
                 {
                   sortSlotidx = j;
                   break;
@@ -634,7 +634,7 @@ csGLVBOBufferSlot* csGLVBOBufferManager::csGLVBOBuffer::FindEmptySlot (
             slots[idx].PushFront (newslot);
             slots[idx].totalCount++;
 
-            for (uint i = 0; i < sortList[sortSlotidx]->slotList.Length (); i++)
+            for (uint i = 0; i < sortList[sortSlotidx]->slotList.GetSize (); i++)
             {
               tmpSlot = sortList[sortSlotidx]->slotList[i];
               //remove old

@@ -379,7 +379,7 @@ bool csGLBasicTextureHandle::transform (bool allowCompressed, GLenum targetForma
 				   iImage* Image, int mipNum, int imageNum)
 {
   csGLUploadData& uploadData = this->uploadData->GetExtend (
-    this->uploadData->Length());
+    this->uploadData->GetSize());
   const char* rawFormat = Image->GetRawFormat();
   if (rawFormat)
   {
@@ -549,7 +549,7 @@ void csGLBasicTextureHandle::Load ()
     }
 
     size_t i;
-    for (i = 0; i < uploadData->Length(); i++)
+    for (i = 0; i < uploadData->GetSize(); i++)
     {
       const csGLUploadData& uploadData = this->uploadData->Get (i);
       if (uploadData.isCompressed)
@@ -587,7 +587,7 @@ void csGLBasicTextureHandle::Load ()
     }
 
     size_t i;
-    for (i = 0; i < uploadData->Length(); i++)
+    for (i = 0; i < uploadData->GetSize (); i++)
     {
       const csGLUploadData& uploadData = this->uploadData->Get (i);
       if (uploadData.isCompressed)
@@ -630,7 +630,7 @@ void csGLBasicTextureHandle::Load ()
     }
 
     size_t i;
-    for (i = 0; i < uploadData->Length(); i++)
+    for (i = 0; i < uploadData->GetSize (); i++)
     {
       const csGLUploadData& uploadData = this->uploadData->Get (i);
 
@@ -669,7 +669,7 @@ void csGLBasicTextureHandle::Load ()
     }
 
     size_t i;
-    for (i = 0; i < uploadData->Length(); i++)
+    for (i = 0; i < uploadData->GetSize (); i++)
     {
       const csGLUploadData& uploadData = this->uploadData->Get (i);
       if (uploadData.isCompressed)
@@ -1088,7 +1088,7 @@ void csGLTextureHandle::AdjustSizePo2 ()
   if (IsSizeAdjusted ()) return;
   SetSizeAdjusted (true);
 
-  //actual_d = orig_d = images->Length();
+  //actual_d = orig_d = images->GetSize ();
   orig_width  = image->GetWidth();
   orig_height = image->GetHeight();
   orig_d = image->GetDepth();
@@ -1332,12 +1332,12 @@ void csGLTextureManager::ReadTextureClasses (iConfigFile* config)
 void csGLTextureManager::Clear()
 {
   size_t i;
-  for (i=0; i < textures.Length (); i++)
+  for (i=0; i < textures.GetSize (); i++)
   {
     csGLBasicTextureHandle* tex = textures[i];
     if (tex != 0) tex->Clear ();
   }
-  for (i = 0; i < superLMs.Length(); i++)
+  for (i = 0; i < superLMs.GetSize (); i++)
   {
     superLMs[i]->DeleteTexture();
   }
@@ -1446,7 +1446,7 @@ void csGLTextureManager::DumpSuperLightmaps (iVFS* VFS, iImageIO* iio,
 					     const char* dir)
 {
   csString outfn;
-  for (size_t i = 0; i < superLMs.Length(); i++)
+  for (size_t i = 0; i < superLMs.GetSize (); i++)
   {
     csRef<iImage> img = superLMs[i]->Dump ();
     if (img)

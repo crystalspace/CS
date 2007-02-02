@@ -299,7 +299,7 @@ namespace aws
 	{
 	   pen->SetColor (attr->stroke_color);
 
-	   for(size_t i=0; i<poly.Length ()-1; ++i)
+	   for(size_t i=0; i<poly.GetSize ()-1; ++i)
 	   {
              pen->DrawLine ((int)poly[i].x, (int)poly[i].y, 
                             (int)poly[i+1].x, (int)poly[i+1].y);

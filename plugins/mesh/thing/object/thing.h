@@ -464,7 +464,7 @@ public:
     csVector3 &isect,
     float *pr);
 
-  virtual int GetPolygonCount () { return (int)static_polygons.Length (); }
+  virtual int GetPolygonCount () { return (int)static_polygons.GetSize (); }
   virtual void RemovePolygon (int idx);
   virtual void RemovePolygons ();
 
@@ -814,7 +814,7 @@ public:
 
   /// Get the number of polygons in this thing.
   int GetPolygonCount ()
-  { return (int)polygons.Length (); }
+  { return (int)polygons.GetSize (); }
 
   /// Get the specified polygon from this set.
   csPolygon3DStatic *GetPolygon3DStatic (int idx)
@@ -908,7 +908,7 @@ public:
    */
   iTextureHandle* GetPolygonTexture (size_t index)
   {
-    return index < litPolys.Length() ? litPolys[index]->SLM->GetTexture() : 0;
+    return index < litPolys.GetSize () ? litPolys[index]->SLM->GetTexture() : 0;
   }
   /// Ensure lightmap textures are up-to-date
   void UpdateDirtyLMs ();

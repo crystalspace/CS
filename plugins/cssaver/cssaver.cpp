@@ -485,7 +485,7 @@ bool csSaver::SaveShaders (iDocumentNode *parent)
 
   csRefArray<iShader> shaders = shaderMgr->GetShaders ();
   size_t i;
-  for (i = 0 ; i < shaders.Length () ; i++)
+  for (i = 0 ; i < shaders.GetSize () ; i++)
   {
     iShader* shader = shaders[i];
     
@@ -848,7 +848,7 @@ bool csSaver::SaveSectorMeshes(iMeshList* meshList,
     //Save all childmeshes
     const csRefArray<iSceneNode>& childlist = meshwrapper->QuerySceneNode ()->
 	    GetChildren ();
-    if (childlist.Length () > 0) SaveSectorMeshes(childlist, meshNode);
+    if (childlist.GetSize () > 0) SaveSectorMeshes(childlist, meshNode);
   }
   return true;
 }
@@ -856,7 +856,7 @@ bool csSaver::SaveSectorMeshes(iMeshList* meshList,
 bool csSaver::SaveSectorMeshes(const csRefArray<iSceneNode>& meshList,
 		iDocumentNode *parent)
 {
-  for (size_t i=0; i<meshList.Length(); i++)
+  for (size_t i=0; i<meshList.GetSize (); i++)
   {
     iMeshWrapper* meshwrapper = meshList[i]->QueryMesh ();
     if (!meshwrapper) continue;
@@ -963,7 +963,7 @@ bool csSaver::SaveSectorMeshes(const csRefArray<iSceneNode>& meshList,
     //Save all childmeshes
     const csRefArray<iSceneNode>& childlist = meshwrapper->QuerySceneNode ()->
 	    GetChildren ();
-    if (childlist.Length () > 0) SaveSectorMeshes(childlist, meshNode);
+    if (childlist.GetSize () > 0) SaveSectorMeshes(childlist, meshNode);
   }
   return true;
 }

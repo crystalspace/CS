@@ -29,6 +29,10 @@ chronological order.
 	  GetTempFilename in importkit_glue.cpp.
 	- res slightly changed CS_TEMP_DIR and CS_TEMP_FILE to emit a warning
 	  when employed.
+	- Marten removed deprecated methods from:
+	    - csArray and derived types
+	    - csPath
+	    - csImageBase
 1-Feb-2007
 	- Marten fixed compilation of CS::DataBuffer on gcc.
 	- Marten made sure genmesh doesn't return any rendermeshes when

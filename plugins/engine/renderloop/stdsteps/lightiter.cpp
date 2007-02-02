@@ -353,7 +353,7 @@ void csLightIterRenderStep::Perform (iRenderView* rview, iSector* sector,
     if (rview->TestBSphere (camTransR, lightSphere))
     {
       size_t i;
-      for (i = 0; i < steps.Length(); i++)
+      for (i = 0; i < steps.GetSize (); i++)
       {
         steps[i]->Perform (rview, sector, light, stacks);
       }
@@ -392,7 +392,7 @@ size_t csLightIterRenderStep::Find (iRenderStep* step) const
 
 size_t csLightIterRenderStep::GetStepCount () const
 {
-  return steps.Length();
+  return steps.GetSize ();
 }
 
 csPtr<iTextureHandle> csLightIterRenderStep::GetAttenuationTexture (

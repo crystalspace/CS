@@ -40,9 +40,9 @@ void csPen::Start ()
 {
   poly.MakeEmpty();
   poly_idx.MakeEmpty();
-  colors.SetLength (0);  
-  texcoords.SetLength(0);
-  line_points.SetLength(0);  
+  colors.SetSize (0);  
+  texcoords.SetSize (0);
+  line_points.SetSize (0);  
   gen_tex_coords=false;
 }
 
@@ -63,7 +63,7 @@ void csPen::AddVertex (float x, float y, bool force_add)
   {
 	point p = {x,y};			
 	  
-	if (line_points.Length())
+	if (line_points.GetSize ())
 	{
 		AddThickPoints(line_points.Top().x, line_points.Top().y, x, y);
 	}	  
@@ -124,7 +124,7 @@ void csPen::AddThickPoints(float fx1, float fy1, float fx2, float fy2)
 	
 	float a1 = angle - (PI/2.0);	
 	float ca1 = cos(a1)*pen_width, sa1 = sin(a1)*pen_width;
-	bool first = line_points.Length()<2;
+	bool first = line_points.GetSize ()<2;
 	
 // 	AddVertex(fx1+ca1, fy1+sa1, true);		
 // 	AddVertex(fx2+ca1, fy2+sa1, true);

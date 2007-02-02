@@ -85,7 +85,7 @@ void csSkeletonBone::SetParent (iSkeletonBone *par)
 
 iSkeletonBone *csSkeletonBone::FindChild (const char *name)
 {
-  for (size_t i = 0; i < bones.Length () ; i++)
+  for (size_t i = 0; i < bones.GetSize () ; i++)
   {
     if (!strcmp (bones[i]->GetName (), name))
     {
@@ -97,7 +97,7 @@ iSkeletonBone *csSkeletonBone::FindChild (const char *name)
 
 size_t csSkeletonBone::FindChildIndex (iSkeletonBone *child)
 {
-  for (size_t i = 0; i < bones.Length () ; i++)
+  for (size_t i = 0; i < bones.GetSize () ; i++)
   {
     if (bones[i] == (csSkeletonBone *)child)
     {
@@ -109,7 +109,7 @@ size_t csSkeletonBone::FindChildIndex (iSkeletonBone *child)
 
 void csSkeletonBone::UpdateTransform ()
 {
-  size_t scripts_len = skeleton->GetRunningScripts ().Length ();
+  size_t scripts_len = skeleton->GetRunningScripts ().GetSize ();
   if (!scripts_len) return;
 
   if (scripts_len == 1)
@@ -245,7 +245,7 @@ csSkeletonBoneFactory::~csSkeletonBoneFactory()
 
 iSkeletonBoneFactory *csSkeletonBoneFactory::FindChild (const char *name)
 {
-  for (size_t i = 0; i < bones.Length () ; i++)
+  for (size_t i = 0; i < bones.GetSize () ; i++)
   {
     if (!strcmp (bones[i]->GetName (), name))
     {
@@ -257,7 +257,7 @@ iSkeletonBoneFactory *csSkeletonBoneFactory::FindChild (const char *name)
 
 size_t csSkeletonBoneFactory::FindChildIndex (iSkeletonBoneFactory *child)
 {
-  for (size_t i = 0; i < bones.Length () ; i++)
+  for (size_t i = 0; i < bones.GetSize () ; i++)
   {
     if (bones[i] == (csSkeletonBoneFactory *)child)
     {
@@ -421,23 +421,23 @@ iSkeletonScriptKeyFrame *csSkeletonScript::CreateFrame(const char* name)
 void csSkeletonScript::RecalcSpline()
 {
   const csRefArray<csSkeletonBoneFactory>& bones = fact->GetBones ();
-  for (size_t i = 0; i < bones.Length() ; i++ )
+  for (size_t i = 0; i < bones.GetSize () ; i++ )
   {
     csArray<bone_key_info *> tmp_arr;
-    for (size_t j= 0; j < key_frames.Length(); j++ )
+    for (size_t j= 0; j < key_frames.GetSize (); j++ )
     {
       csRef<csSkeletonScriptKeyFrame> key_frame = key_frames[j];
       bone_key_info & bt = key_frame->GetKeyInfo(bones[i]);
       tmp_arr.Push(&bt);
     }
 
-    if (tmp_arr.Length() < 2)
+    if (tmp_arr.GetSize () < 2)
     {
       continue;
     }
 
     //check for backward quaternions
-    for (size_t j = 0; j < tmp_arr.Length() - 1; j++)
+    for (size_t j = 0; j < tmp_arr.GetSize () - 1; j++)
     {
       csQuaternion q1 = tmp_arr[j]->rot;
       csQuaternion q2 = tmp_arr[j+1]->rot;
@@ -450,7 +450,7 @@ void csSkeletonScript::RecalcSpline()
     }
 
     //build the spline
-    size_t num = tmp_arr.Length();
+    size_t num = tmp_arr.GetSize ();
     for(size_t j = 0; j < num; j++)
     {
       csQuaternion p1, p2;
@@ -656,7 +656,7 @@ bool csSkeletonRunnable::Do (csTicks elapsed, bool& stop, csTicks & left)
     left = 0;
   }
 
-  i = runnable_transforms.Length ();
+  i = runnable_transforms.GetSize ();
   while (i > 0)
   {
     i--;
@@ -744,7 +744,7 @@ csSkeleton::csSkeleton(csSkeletonFactory* fact) :
   //dynamic_system = 0;
   csRefArray<csSkeletonBoneFactory>& fact_bones = fact->GetBones ();
   csRefArray<csSkeletonSocketFactory>& fact_sockets = fact->GetSockets ();
-  for (size_t i = 0; i < fact_bones.Length(); i++ )
+  for (size_t i = 0; i < fact_bones.GetSize (); i++ )
   {
     csRef<csSkeletonBone> bone;
     bone.AttachNew(new csSkeletonBone (this, fact_bones[i]));
@@ -752,7 +752,7 @@ csSkeleton::csSkeleton(csSkeletonFactory* fact) :
     bones.Push(bone);
   }
 
-  for (size_t i = 0; i < bones.Length(); i++ )
+  for (size_t i = 0; i < bones.GetSize (); i++ )
   {
     iSkeletonBoneFactory *fact_parent_bone = bones[i]->GetFactory()
       ->GetParent();
@@ -768,7 +768,7 @@ csSkeleton::csSkeleton(csSkeletonFactory* fact) :
   }
 
 
-  for (size_t i = 0; i < fact_sockets.Length(); i++ )
+  for (size_t i = 0; i < fact_sockets.GetSize (); i++ )
   {
     csRef<csSkeletonSocket> socket;
     socket.AttachNew(new csSkeletonSocket (this, fact_sockets[i]));
@@ -786,7 +786,7 @@ csSkeleton::csSkeleton(csSkeletonFactory* fact) :
 
 
   csArray<size_t> fact_parent_bones = fact->GetParentBones();
-  for (size_t i=0; i < fact_parent_bones.Length() ; i++ )
+  for (size_t i=0; i < fact_parent_bones.GetSize () ; i++ )
   {
     parent_bones.Push(fact_parent_bones[i]);
   }
@@ -813,12 +813,12 @@ iSkeletonFactory *csSkeleton::GetFactory()
 void csSkeleton::UpdateBones ()
 {
   size_t i;
-  for (i = 0 ; i < bones.Length () ; i++)
+  for (i = 0 ; i < bones.GetSize () ; i++)
   {
     bones[i]->UpdateTransform ();
   }
 
-  for (i = 0 ; i < parent_bones.Length () ; i++)
+  for (i = 0 ; i < parent_bones.GetSize () ; i++)
   {
     csRef<csSkeletonBone> parent_bone (bones[parent_bones[i]]);
     {
@@ -840,7 +840,7 @@ void csSkeleton::UpdateBones ()
     }
   }
 
-  for (i = 0 ; i < bones.Length () ; i++)
+  for (i = 0 ; i < bones.GetSize () ; i++)
   {
     bones[i]->FireCallback ();
   }
@@ -850,7 +850,7 @@ void csSkeleton::UpdateBones ()
 
 void csSkeleton::UpdateSockets ()
 {
-  for (size_t i = 0; i < sockets.Length(); i++)
+  for (size_t i = 0; i < sockets.GetSize (); i++)
   {
     sockets[i]->GetFullTransform () = 
 		sockets[i]->GetTransform()*sockets[i]->GetBone()->GetFullTransform ();
@@ -877,13 +877,13 @@ bool csSkeleton::UpdateAnimation (csTicks current)
   if (elapsed)
   {
     size_t i;
-    for (i = 0; i < update_callbacks.Length(); i++)
+    for (i = 0; i < update_callbacks.GetSize (); i++)
     {
       update_callbacks[i]->Execute(this, current);
     }
 
     last_update_time = current;
-    i = running_scripts.Length ();
+    i = running_scripts.GetSize ();
     while (i > 0)
     {
       i--;
@@ -908,7 +908,7 @@ bool csSkeleton::UpdateAnimation (csTicks current)
       }
     }
 
-    if (!running_scripts.Length() && pending_scripts.Length())
+    if (!running_scripts.GetSize () && pending_scripts.GetSize ())
     {
       Execute(pending_scripts[0]);
       pending_scripts.DeleteIndexFast(0);
@@ -924,7 +924,7 @@ bool csSkeleton::UpdateAnimation (csTicks current)
 iSkeletonBone *csSkeleton::FindBone (const char *name)
 {
   size_t i;
-  for (i = 0 ; i < bones.Length () ; i++)
+  for (i = 0 ; i < bones.GetSize () ; i++)
     if (strcmp (bones[i]->GetName (), name) == 0)
       return (iSkeletonBone *)bones[i];
   return 0;
@@ -961,7 +961,7 @@ iSkeletonScript* csSkeleton::Append (const char *scriptname)
 iSkeletonScript* csSkeleton::FindScript (const char *scriptname)
 {
   size_t i;
-  for (i = 0 ; i < running_scripts.Length () ; i++)
+  for (i = 0 ; i < running_scripts.GetSize () ; i++)
     if (strcmp (running_scripts[i].GetName (), scriptname) == 0)
       return running_scripts[i].GetScript();
   return 0;
@@ -970,7 +970,7 @@ iSkeletonScript* csSkeleton::FindScript (const char *scriptname)
 iSkeletonSocket* csSkeleton::FindSocket (const char *socketname)
 {
   size_t i;
-  for (i = 0 ; i < sockets.Length () ; i++)
+  for (i = 0 ; i < sockets.GetSize () ; i++)
     if (strcmp (sockets[i]->GetName (), socketname) == 0)
       return (iSkeletonSocket*)sockets[i];
   return 0;
@@ -984,7 +984,7 @@ void csSkeleton::StopAll ()
 void csSkeleton::Stop (const char* scriptname)
 {
   size_t i;
-  for (i = 0 ; i < running_scripts.Length () ; i++)
+  for (i = 0 ; i < running_scripts.GetSize () ; i++)
     if (strcmp (running_scripts[i].GetName (), scriptname) == 0)
       running_scripts.DeleteIndexFast (i);
 }
@@ -997,7 +997,7 @@ void csSkeleton::Stop (iSkeletonScript *script)
 
 iSkeletonScript* csSkeleton::GetScript (size_t i)
 {
-  if (i < running_scripts.Length ())
+  if (i < running_scripts.GetSize ())
   {
     return running_scripts[i].GetScript();
   }
@@ -1007,7 +1007,7 @@ iSkeletonScript* csSkeleton::GetScript (size_t i)
 size_t csSkeleton::FindBoneIndex (const char* bonename)
 {
   size_t i;
-  for (i = 0 ; i < bones.Length () ; i++)
+  for (i = 0 ; i < bones.GetSize () ; i++)
   {
     if (strcmp (bones[i]->GetName (), bonename) == 0)
       return i;
@@ -1019,7 +1019,7 @@ size_t csSkeleton::FindBoneIndex (const char* bonename)
 void csSkeleton::CreateRagdoll(iODEDynamicSystem *dyn_sys, csReversibleTransform & transform)
 {
   dynamic_system = dyn_sys;
-  for (size_t i = 0; i < bones.Length(); i++)
+  for (size_t i = 0; i < bones.GetSize (); i++)
   {
     //printf("\n");
     iSkeletonBoneRagdollInfo *ragdoll_info = bones[i]->GetFactory()->GetRagdollInfo();
@@ -1143,7 +1143,7 @@ void csSkeleton::DestroyRagdoll()
 {
   if (dynamic_system)
   {
-    for (size_t i = 0; i < bones.Length(); i++)
+    for (size_t i = 0; i < bones.GetSize (); i++)
     {
       if (bones[i]->GetJoint())
       {
@@ -1190,7 +1190,7 @@ iSkeletonGraveyard *csSkeletonFactory::GetGraveyard  ()
 iSkeletonScript* csSkeletonFactory::FindScript (const char* scriptname)
 {
   size_t i;
-  for (i = 0 ; i < scripts.Length () ; i++)
+  for (i = 0 ; i < scripts.GetSize () ; i++)
   {
     if (strcmp (scripts[i]->GetName (), scriptname) == 0)
     {
@@ -1203,7 +1203,7 @@ iSkeletonScript* csSkeletonFactory::FindScript (const char* scriptname)
 iSkeletonBoneFactory* csSkeletonFactory::FindBone (const char* name)
 {
   size_t i;
-  for (i = 0 ; i < bones.Length () ; i++)
+  for (i = 0 ; i < bones.GetSize () ; i++)
     if (strcmp (bones[i]->GetName (), name) == 0)
       return bones[i];
   return 0;
@@ -1212,7 +1212,7 @@ iSkeletonBoneFactory* csSkeletonFactory::FindBone (const char* name)
 size_t csSkeletonFactory::FindBoneIndex (const char* bonename)
 {
   size_t i;
-  for (i = 0 ; i < bones.Length () ; i++)
+  for (i = 0 ; i < bones.GetSize () ; i++)
   {
     if (strcmp (bones[i]->GetName (), bonename) == 0)
       return i;
@@ -1223,7 +1223,7 @@ size_t csSkeletonFactory::FindBoneIndex (const char* bonename)
 size_t csSkeletonFactory::FindBoneIndex (csSkeletonBoneFactory *bone) const
 {
   size_t i;
-  for (i = 0 ; i < bones.Length () ; i++)
+  for (i = 0 ; i < bones.GetSize () ; i++)
     if (bones[i] == bone)
       return i;
   return csArrayItemNotFound;
@@ -1231,8 +1231,8 @@ size_t csSkeletonFactory::FindBoneIndex (csSkeletonBoneFactory *bone) const
 
 void csSkeletonFactory::UpdateParentBones ()
 {
-  parent_bones.SetLength (0);
-  for (size_t i = 0; i < bones.Length (); i++)
+  parent_bones.SetSize (0);
+  for (size_t i = 0; i < bones.GetSize (); i++)
   {
     if (!bones[i]->GetParent ())
     {
@@ -1261,7 +1261,7 @@ iSkeletonSocketFactory *csSkeletonFactory::CreateSocket(const char *name, iSkele
 iSkeletonSocketFactory *csSkeletonFactory::FindSocket(const char *name)
 {
   size_t i;
-  for (i = 0 ; i < sockets.Length () ; i++)
+  for (i = 0 ; i < sockets.GetSize () ; i++)
     if (strcmp (sockets[i]->GetName (), name) == 0)
       return sockets[i];
   return 0;
@@ -1279,7 +1279,7 @@ void csSkeletonFactory::RemoveSocket (int)
 
 size_t csSkeletonFactory::GetSocketsCount()
 {
-  return sockets.Length ();
+  return sockets.GetSize ();
 }
 
 //--------------------------------iSkeletonGraveyard-----------------------------------------
@@ -1339,7 +1339,7 @@ bool csSkeletonGraveyard::HandleEvent (iEvent& ev)
 {
   if (ev.Name == PreProcess)
   {
-    for (size_t i = 0; i < skeletons.Length() ; i++)
+    for (size_t i = 0; i < skeletons.GetSize () ; i++)
     {
       skeletons[i]->UpdateAnimation(vc->GetCurrentTicks ());
     }

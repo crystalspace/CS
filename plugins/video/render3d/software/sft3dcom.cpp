@@ -490,7 +490,7 @@ bool csSoftwareGraphics3DCommon::BeginDraw (int DrawFlags)
 {
   clipportal_dirty = true;
   clipportal_floating = 0;
-  CS_ASSERT (clipportal_stack.Length () == 0);
+  CS_ASSERT (clipportal_stack.GetSize () == 0);
 
   if ((G2D->GetWidth() != display_width) ||
       (G2D->GetHeight() != display_height))
@@ -673,7 +673,7 @@ void csSoftwareGraphics3DCommon::OpenPortal (size_t numVertices,
 
 void csSoftwareGraphics3DCommon::ClosePortal ()
 {
-  if (clipportal_stack.Length () <= 0) return;
+  if (clipportal_stack.GetSize () <= 0) return;
   csClipPortal* cp = clipportal_stack.Pop ();
 
   if (cp->flags.Check(CS_OPENPORTAL_ZFILL)

@@ -291,7 +291,7 @@ private:
   csWeakRefArray<iMeshWrapper> selected_meshes;
   void AddSelectedMesh (iMeshWrapper* m);
   void RemoveSelectedMesh (iMeshWrapper* m);
-  bool HasSelectedMeshes () const { return selected_meshes.Length () > 0; }
+  bool HasSelectedMeshes () const { return selected_meshes.GetSize () > 0; }
   void MoveSelectedMeshes (const csVector3& offset);
 
   // Shadow!

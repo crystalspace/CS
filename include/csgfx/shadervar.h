@@ -456,7 +456,7 @@ public:
     if (array == 0)
       return 0;
     else
-      return array->Length ();
+      return array->GetSize ();
   }
 
   /**
@@ -466,7 +466,7 @@ public:
    */
   csShaderVariable *GetArrayElement (size_t element)
   {
-    if (array != 0 && element<array->Length ())
+    if (array != 0 && element<array->GetSize ())
     {
       return array->Get (element);
     }

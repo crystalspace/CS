@@ -182,7 +182,7 @@ public:
       iMovable* movable);
 
   /// How many particles the system currently has.
-  inline size_t GetNumParticles () const { return particles.Length();}
+  inline size_t GetNumParticles () const { return particles.GetSize ();}
   /// Get a particle.
   inline iParticle* GetParticle (size_t idx) const
   { return particles[idx]; }

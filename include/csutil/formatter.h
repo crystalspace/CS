@@ -139,7 +139,7 @@ class csPrintfFormatter
   public:
     void WriteTo (Twriter& writer, size_t offset = 0, size_t len = (size_t)~0)
     {
-      const size_t n = MIN (len, Length());
+      const size_t n = MIN (len, GetSize ());
       for (size_t i = offset; i < n; i++) writer.Put (Get (i));
     }
   };
@@ -620,17 +620,17 @@ class csPrintfFormatter
     size_t i;
     // Determine order of params
     csArray<FormatSpec*> paramOrder;
-    paramOrder.SetCapacity (formatSpecs.Length());
-    for (i = 0; i < formatSpecs.Length(); i++)
+    paramOrder.SetCapacity (formatSpecs.GetSize ());
+    for (i = 0; i < formatSpecs.GetSize (); i++)
     {
       FormatSpec& currentFormat = formatSpecs[i];
       if (currentFormat.conversion == convNone) continue;
-      if (paramOrder.Length() <= (size_t)currentFormat.paramIdx)
-	paramOrder.SetLength (currentFormat.paramIdx + 1, 0);
+      if (paramOrder.GetSize () <= (size_t)currentFormat.paramIdx)
+	paramOrder.SetSize (currentFormat.paramIdx + 1, 0);
       paramOrder[currentFormat.paramIdx] = &currentFormat;
     }
     // Fetch params from stack in order, store at correct place in params array
-    for (i = 0; i < paramOrder.Length(); i++)
+    for (i = 0; i < paramOrder.GetSize (); i++)
     {
       FmtParam& param = params.GetExtend (i);
       FormatSpec* fmtPtr = paramOrder[i];
@@ -750,7 +750,7 @@ class csPrintfFormatter
       return;
     }
 
-    size_t scratchOffs = scratch.Length();
+    size_t scratchOffs = scratch.GetSize ();
     size_t len = 0;
     {
       const T* ptr = stringPtr;
@@ -767,16 +767,16 @@ class csPrintfFormatter
       len -= (size_t)n;
     }
     if (!currentFormat.leftJustify 
-      && ((size_t)currentFormat.width > (scratch.Length() - scratchOffs)))
+      && ((size_t)currentFormat.width > (scratch.GetSize () - scratchOffs)))
     {
-      size_t d = (size_t)currentFormat.width - scratch.Length() + scratchOffs;
+      size_t d = (size_t)currentFormat.width - scratch.GetSize () + scratchOffs;
       while (d-- > 0) writer.Put (' ');
     }
     scratch.WriteTo (writer, scratchOffs);
     if (currentFormat.leftJustify 
-      && ((size_t)currentFormat.width > (scratch.Length() - scratchOffs)))
+      && ((size_t)currentFormat.width > (scratch.GetSize () - scratchOffs)))
     {
-      size_t d = (size_t)currentFormat.width - scratch.Length() + scratchOffs;
+      size_t d = (size_t)currentFormat.width - scratch.GetSize () + scratchOffs;
       while (d-- > 0) writer.Put (' ');
     }
     scratch.Truncate (scratchOffs);
@@ -788,7 +788,7 @@ class csPrintfFormatter
   {
     if (currentFormat.leftJustify)
     {
-      while ((size_t)currentFormat.width > (scratch.Length() - scratchOffs))
+      while ((size_t)currentFormat.width > (scratch.GetSize () - scratchOffs))
       {
 	scratch.Push (' ');
       }
@@ -797,14 +797,14 @@ class csPrintfFormatter
     {
       if (currentFormat.padZero)
       {
-	while ((size_t)currentFormat.width > (scratch.Length() - scratchOffs))
+	while ((size_t)currentFormat.width > (scratch.GetSize () - scratchOffs))
 	{
 	  scratch.Insert (insert0offs, '0');
 	}
       }
       else
       {
-	while ((size_t)currentFormat.width > (scratch.Length() - scratchOffs))
+	while ((size_t)currentFormat.width > (scratch.GetSize () - scratchOffs))
 	{
 	  scratch.Insert (scratchOffs, ' ');
 	}
@@ -816,7 +816,7 @@ class csPrintfFormatter
   template<class T>
   void OutputInt (Twriter& writer, const FormatSpec& currentFormat, T value)
   {
-    const size_t scratchOffs = scratch.Length();
+    const size_t scratchOffs = scratch.GetSize ();
     size_t insertOffs = scratchOffs;
 
     if (value < 0)
@@ -860,7 +860,7 @@ class csPrintfFormatter
     T value, uint radix = 10, const char* prefix = 0)
   {
     const utf32_char letterFirst = currentFormat.uppercase ? 'A' : 'a';
-    const size_t scratchOffs = scratch.Length();
+    const size_t scratchOffs = scratch.GetSize ();
     size_t insertOffs = scratchOffs;
 
     if (prefix != 0)
@@ -1076,7 +1076,7 @@ class csPrintfFormatter
       return;
     }
 
-    const size_t scratchOffs = scratch.Length();
+    const size_t scratchOffs = scratch.GetSize ();
     if (vSplit.sign)
     {
       scratch.Push ('-');
@@ -1134,7 +1134,7 @@ class csPrintfFormatter
     }
     else
       scratch.Push ('+');
-    const size_t insertOffs = scratch.Length();;
+    const size_t insertOffs = scratch.GetSize ();;
     do
     {
       uint d = e % 10;
@@ -1175,7 +1175,7 @@ public:
     reader.Reset();
     size_t i = 0;
     utf32_char ch;
-    while (i < formatSpecs.Length())
+    while (i < formatSpecs.GetSize ())
     {
       const FormatSpec& currentFormat = formatSpecs[i];
       size_t n;

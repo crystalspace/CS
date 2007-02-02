@@ -226,14 +226,14 @@ public:
 
   virtual uint HasMipmaps () const 
   { 
-    size_t num = mipmaps.Length();
+    size_t num = mipmaps.GetSize ();
     while ((num > 0) && (mipmaps[num-1] == 0)) num--;
     return (uint)num; 
   }
   virtual csRef<iImage> GetMipmap (uint num) 
   { 
     if (num == 0) return this;
-    if (num <= mipmaps.Length()) return mipmaps[num-1];
+    if (num <= mipmaps.GetSize ()) return mipmaps[num-1];
     return 0; 
   }
   /**

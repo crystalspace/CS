@@ -323,7 +323,7 @@ void csBugPlug::SelectMesh (iSector* sector, const char* meshname)
 void csBugPlug::MoveSelectedMeshes (const csVector3& offset)
 {
   size_t i;
-  size_t count = selected_meshes.Length ();
+  size_t count = selected_meshes.GetSize ();
   for (i = 0 ; i < count ; i++)
   {
     // Assign selected_mesh[i] to temporary variable to avoid an
@@ -337,7 +337,7 @@ void csBugPlug::MoveSelectedMeshes (const csVector3& offset)
 void csBugPlug::AddSelectedMesh (iMeshWrapper* m)
 {
   size_t i;
-  size_t count = selected_meshes.Length ();
+  size_t count = selected_meshes.GetSize ();
   for (i = 0 ; i < count ; i++)
   {
     // Assign selected_mesh[i] to temporary variable to avoid an
@@ -352,7 +352,7 @@ void csBugPlug::AddSelectedMesh (iMeshWrapper* m)
 void csBugPlug::RemoveSelectedMesh (iMeshWrapper* m)
 {
   size_t i;
-  size_t count = selected_meshes.Length ();
+  size_t count = selected_meshes.GetSize ();
   for (i = 0 ; i < count ; i++)
   {
     // Assign selected_mesh[i] to temporary variable to avoid an
@@ -1016,7 +1016,7 @@ bool csBugPlug::ExecCommand (int cmd, const csString& args)
       if (HasSelectedMeshes ())
 	{
 	  size_t j;
-	  for (j = 0 ; j < selected_meshes.Length () ; j++)
+	  for (j = 0 ; j < selected_meshes.GetSize () ; j++)
 	  {
 	    if (selected_meshes[j])
 	      selected_meshes[j]->GetFlags ().Set (CS_ENTITY_INVISIBLE);
@@ -1032,7 +1032,7 @@ bool csBugPlug::ExecCommand (int cmd, const csString& args)
       if (HasSelectedMeshes ())
 	{
 	  size_t j;
-	  for (j = 0 ; j < selected_meshes.Length () ; j++)
+	  for (j = 0 ; j < selected_meshes.GetSize () ; j++)
 	  {
 	    if (selected_meshes[j])
 	      selected_meshes[j]->GetFlags ().Reset (CS_ENTITY_INVISIBLE);
@@ -1564,7 +1564,7 @@ bool csBugPlug::HandleFrame (iEvent& /*event*/)
     bool do_bbox, do_rad;
     shadow->GetShowOptions (do_bbox, do_rad);
     G3D->BeginDraw (CSDRAW_2DGRAPHICS);
-    for (k = 0 ; k < selected_meshes.Length () ; k++)
+    for (k = 0 ; k < selected_meshes.GetSize () ; k++)
     {
       if (!selected_meshes[k]) continue;
       iMovable* mov = selected_meshes[k]->GetMovable ();
@@ -2235,7 +2235,7 @@ void csBugPlug::Dump (int indent, iMeshWrapper* mesh)
   }
   const csRefArray<iSceneNode>& children = mesh->QuerySceneNode ()
   	->GetChildren ();
-  for (size_t i=0; i<children.Length (); ++i)
+  for (size_t i=0; i<children.GetSize (); ++i)
   {
     iMeshWrapper* m = children[i]->QueryMesh ();
     if (m)
@@ -2807,7 +2807,7 @@ void csBugPlug::SwitchDebugView (bool clear)
 int csBugPlug::FindCounter (const char* countername)
 {
   size_t i;
-  for (i = 0 ; i < counters.Length () ; i++)
+  for (i = 0 ; i < counters.GetSize () ; i++)
     if (!strcmp (counters[i]->countername, countername))
       return (int)i;
   return -1;
@@ -2816,7 +2816,7 @@ int csBugPlug::FindCounter (const char* countername)
 void csBugPlug::FullResetCounters ()
 {
   size_t i;
-  for (i = 0 ; i < counters.Length () ; i++)
+  for (i = 0 ; i < counters.GetSize () ; i++)
   {
     int j;
     for (j = 0 ; j < 10 ; j++)
@@ -2830,7 +2830,7 @@ void csBugPlug::FullResetCounters ()
 
 void csBugPlug::ShowCounters ()
 {
-  if (counters.Length () == 0) return;
+  if (counters.GetSize () == 0) return;
 
   G3D->BeginDraw (CSDRAW_2DGRAPHICS);
   if (!fnt) return;
@@ -2844,7 +2844,7 @@ void csBugPlug::ShowCounters ()
   if (!counter_freeze) counter_frames++;
   size_t i;
   int cur_y = 10;
-  for (i = 0 ; i < counters.Length () ; i++)
+  for (i = 0 ; i < counters.GetSize () ; i++)
   {
     csCounter* c = counters[i];
     int j;

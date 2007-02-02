@@ -267,7 +267,7 @@ void WalkTest::SetupFrame ()
   {
     // Emit recorded commands directly to the CommandHandler
     if (cfg_playrecording > 0 &&
-	recording.Length () > 0)
+	recording.GetSize () > 0)
     {
       csRecordedCamera* reccam = (csRecordedCamera*)recording[
       	cfg_playrecording];
@@ -339,12 +339,12 @@ void WalkTest::MoveSystems (csTicks elapsed_time, csTicks current_time)
   size_t i;
   busy_vector.DeleteAll ();
   csWalkEntity* wentity;
-  for (i = 0 ; i < busy_entities.Length () ; i++)
+  for (i = 0 ; i < busy_entities.GetSize () ; i++)
   {
     wentity = busy_entities[i];
     busy_vector.Push (wentity);
   }
-  for (i = 0 ; i < busy_vector.Length () ; i++)
+  for (i = 0 ; i < busy_vector.GetSize () ; i++)
   {
     wentity = busy_vector[i];
     wentity->NextFrame (elapsed_time);
@@ -572,7 +572,7 @@ void WalkTest::DrawFrame3D (int drawflags, csTicks /*current_time*/)
 
   // Apply lighting BEFORE the very first frame
   size_t i;
-  for (i = 0 ; i < dynamic_lights.Length () ; i++)
+  for (i = 0 ; i < dynamic_lights.GetSize () ; i++)
   {
     iLight* dyn = dynamic_lights[i];
     extern bool HandleDynLight (iLight*, iEngine*);
@@ -673,12 +673,12 @@ void WalkTest::DrawFrame (csTicks elapsed_time, csTicks current_time)
       recorded_cmd = recorded_arg = 0;
       recording.Push (reccam);
     }
-    if (cfg_playrecording >= 0 && recording.Length () > 0)
+    if (cfg_playrecording >= 0 && recording.GetSize () > 0)
     {
       csRecordedCamera* reccam = (csRecordedCamera*)recording[cfg_playrecording];
       cfg_playrecording++;
       record_frame_count++;
-      if ((size_t)cfg_playrecording >= recording.Length ())
+      if ((size_t)cfg_playrecording >= recording.GetSize ())
       {
 	csTicks t1 = record_start_time;
 	csTicks t2 = csGetTicks ();
@@ -779,7 +779,7 @@ void perf_test (int num)
   int i;
   for (i = 0 ; i < num ; i++)
   {
-    if (Sys->cfg_playrecording >= 0 && Sys->recording.Length () > 0)
+    if (Sys->cfg_playrecording >= 0 && Sys->recording.GetSize () > 0)
     {
       Sys->record_frame_count++;
     }

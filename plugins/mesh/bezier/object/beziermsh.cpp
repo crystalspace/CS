@@ -181,7 +181,7 @@ char* csBezierMesh::GenerateCacheName ()
   int32 l;
   l = csLittleEndian::Convert ((int32)static_data->num_curve_vertices);
   mf.Write ((char*)&l, 4);
-  l = csLittleEndian::Convert ((int32)curves.Length ());
+  l = csLittleEndian::Convert ((int32)curves.GetSize ());
   mf.Write ((char*)&l, 4);
 
   if (logparent)
@@ -216,7 +216,7 @@ void csBezierMesh::LightDisconnect (iLight* light)
   MarkLightmapsDirty ();
   size_t i;
   int dt = light->GetDynamicType ();
-  for (i = 0; i < curves.Length (); i++)
+  for (i = 0; i < curves.GetSize (); i++)
   {
     csCurve *c = curves[i];
     if (dt == CS_LIGHT_DYNAMICTYPE_DYNAMIC)
@@ -230,7 +230,7 @@ void csBezierMesh::DisconnectAllLights ()
 {
   MarkLightmapsDirty ();
   size_t i;
-  for (i = 0; i < curves.Length (); i++)
+  for (i = 0; i < curves.GetSize (); i++)
   {
     csCurve *c = curves[i];
     c->DisconnectAllLights ();
@@ -349,7 +349,7 @@ void csBezierMesh::InvalidateThing ()
 csCurve *csBezierMesh::GetCurve (char *name) const
 {
   size_t i;
-  for (i = 0 ; i < curves.Length () ; i++)
+  for (i = 0 ; i < curves.GetSize () ; i++)
   {
     const char* n = curves[i]->GetName ();
     if (n && !strcmp (n, name))
@@ -404,7 +404,7 @@ void csBezierMesh::HardTransform (const csReversibleTransform &t)
       	static_data->curve_vertices[i]);
 
   curves_transf_ok = false;
-  for (i = 0; i < curves.Length (); i++)
+  for (i = 0; i < curves.GetSize (); i++)
   {
     csCurve *c = curves[i];
     c->HardTransform (t);
@@ -498,13 +498,13 @@ void csBezierMesh::AppendShadows (
   WorUpdate ();
 
   iShadowBlock *list = shadows->NewShadowBlock (0);
-      //@@@polygons.Length ());
+      //@@@polygons.GetSize ());
 (void)list;
 #if 0
   csFrustum *frust;
   int i, j;
   bool cw = true;                   //@@@ Use mirroring parameter here!
-  for (i = 0; i < static_data->static_polygons.Length (); i++)
+  for (i = 0; i < static_data->static_polygons.GetSize (); i++)
   {
     sp = static_data->static_polygons.Get (i);
     if (sp->GetPortal ()) continue;  // No portals
@@ -766,7 +766,7 @@ csRenderMesh** csBezierMesh::GetRenderMeshes (int &n, iRenderView* rview,
   bool listCreated;
   csDirtyAccessArray<csRenderMesh*>& meshes = rmListHolder.GetUnusedData (
     listCreated, currentFrame);
-  meshes.SetLength (GetCurveCount(), 0);
+  meshes.SetSize (GetCurveCount(), 0);
 
   iSector* s = movable->GetSectors ()->Get (0);
   csColor ambient = s->GetDynamicAmbientLight ();
@@ -855,7 +855,7 @@ csRenderMesh** csBezierMesh::GetRenderMeshes (int &n, iRenderView* rview,
     rm->material = c->GetMaterial ();
   }
 
-  n = (int)meshes.Length();
+  n = (int)meshes.GetSize ();
   return meshes.GetArray();
 }
 
@@ -981,7 +981,7 @@ void csBezierMesh::Merge (csBezierMesh *other)
     AddCurveVertex (other->static_data->GetCurveVertex (i),
     	other->static_data->GetCurveTexel (i));
 
-  while (other->curves.Length () > 0)
+  while (other->curves.GetSize () > 0)
   {
     csCurve *c = other->curves.Extract (0);
     AddCurve (c);

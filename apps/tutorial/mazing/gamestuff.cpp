@@ -408,7 +408,7 @@ void Adversary::ThinkAndMove (float elapsed_seconds)
     Maze* maze = app->GetGame ().GetMaze ();
     const csArray<RoomCoordinate>& connections = maze->GetConnections (
 	current_location);
-    size_t moveto = (rand () >> 3) % connections.Length ();
+    size_t moveto = (rand () >> 3) % connections.GetSize ();
     if (maze->IsSpaceFree (connections[moveto]))
     {
       start.x = float (current_location.x) * ROOM_DIMENSION;
@@ -698,7 +698,7 @@ void Game::StartExplosion (iSector* sector, const csVector3& pos)
 void Game::HandleExplosions (csTicks elapsed_ticks)
 {
   size_t i = 0;
-  while (i < explosions.Length ())
+  while (i < explosions.GetSize ())
   {
     if (explosions[i].Handle (elapsed_ticks)) i++;
     else
@@ -724,7 +724,7 @@ void Game::Handle (csTicks elapsed_ticks)
 
   // Let all the adversaries think about what to do.
   size_t i;
-  for (i = 0 ; i < adversaries.Length () ; i++)
+  for (i = 0 ; i < adversaries.GetSize () ; i++)
     adversaries[i]->ThinkAndMove (elapsed_seconds);
 }
 

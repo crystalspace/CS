@@ -148,7 +148,7 @@ public:
   const char* Parse (const csExpressionTokenList& tokens,
     csExpression*& result)
   {
-    return Parse (tokens, result, 0, tokens.Length ());
+    return Parse (tokens, result, 0, tokens.GetSize ());
   }
 };
 

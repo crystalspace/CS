@@ -65,7 +65,7 @@ void csLoader::csLoadedPluginVector::DeleteAll ()
 {
   CS::Threading::RecursiveMutexScopedLock lock (mutex);
   size_t i;
-  for (i = 0 ; i < vector.Length () ; i++)
+  for (i = 0 ; i < vector.GetSize () ; i++)
   {
     csLoaderPluginRec* rec = vector[i];
     if (rec->Component && plugin_mgr)
@@ -84,7 +84,7 @@ csLoaderPluginRec* csLoader::csLoadedPluginVector::FindPluginRec (
 {
   CS::Threading::RecursiveMutexScopedLock lock (mutex);
   size_t i;
-  for (i=0 ; i<vector.Length () ; i++)
+  for (i=0 ; i<vector.GetSize () ; i++)
   {
     csLoaderPluginRec* pl = vector.Get (i);
     if ((!pl->ShortName.IsEmpty ()) && !strcmp (name, pl->ShortName))
@@ -136,7 +136,7 @@ bool csLoader::csLoadedPluginVector::FindPlugin (
   // create a new loading record
   vector.Push (new csLoaderPluginRec (0, Name, 0, 0, 0));
   defaults = 0;
-  return GetPluginFromRec (vector.Get(vector.Length()-1),
+  return GetPluginFromRec (vector.Get(vector.GetSize ()-1),
   	plug, binplug);
 }
 

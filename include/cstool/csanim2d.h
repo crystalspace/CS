@@ -56,7 +56,7 @@ public:
 
   /// get number of frames
   inline size_t GetFrameCount() const
-  {return Frames.Length();}
+  {return Frames.GetSize ();}
   /// get total length of animation (all delays added together)
   inline csTicks GetLength() const
   { 

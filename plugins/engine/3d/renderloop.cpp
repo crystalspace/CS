@@ -78,7 +78,7 @@ void csRenderLoop::Draw (iRenderView *rview, iSector *s, iMeshWrapper* mesh)
     cs->SetSingleMesh (mesh);
 
     size_t i;
-    for (i = 0; i < steps.Length(); i++)
+    for (i = 0; i < steps.GetSize (); i++)
     {
       steps[i]->Perform (rview, s, varStack);
     }
@@ -118,7 +118,7 @@ size_t csRenderLoop::Find (iRenderStep* step) const
 
 size_t csRenderLoop::GetStepCount () const
 {
-  return steps.Length();
+  return steps.GetSize ();
 }
 
 //---------------------------------------------------------------------------

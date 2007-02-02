@@ -558,7 +558,7 @@ public:
       const csVector2& uv, const csVector3& normal,
       const csColor4& color);
   void SetVertexCount (int n);
-  int GetVertexCount () const { return (int)mesh_vertices.Length (); }
+  int GetVertexCount () const { return (int)mesh_vertices.GetSize (); }
   csVector3* GetVertices ()
   {
     SetupFactory ();
@@ -583,7 +583,7 @@ public:
   void AddTriangle (const csTriangle& tri);
   void SetTriangleCount (int n);
 
-  int GetTriangleCount () const { return (int)mesh_triangles.Length (); }
+  int GetTriangleCount () const { return (int)mesh_triangles.GetSize (); }
   csTriangle* GetTriangles ()
   {
     SetupFactory ();

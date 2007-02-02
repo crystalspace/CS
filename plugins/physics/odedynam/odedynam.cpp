@@ -257,10 +257,10 @@ void csODEDynamics::Step (float elapsed_time)
   while (total_elapsed > stepsize)
   {
     total_elapsed -= stepsize;
-    for (size_t i=0; i<systems.Length(); i++)
+    for (size_t i=0; i<systems.GetSize (); i++)
     {
       systems.Get (i)->Step (stepsize);
-      for (size_t j = 0; j < updates.Length(); j ++)
+      for (size_t j = 0; j < updates.GetSize (); j ++)
       {
         updates[i]->Execute (stepsize);
       }
@@ -399,7 +399,7 @@ void csODEDynamics::SetGlobalERP (float erp)
 {
   csODEDynamics::erp = erp;
 
-  for (size_t i = 0; i < systems.Length(); i ++)
+  for (size_t i = 0; i < systems.GetSize (); i ++)
   {
     csRef<iODEDynamicSystemState> sys = 
       scfQueryInterface<iODEDynamicSystemState> (systems[i]);
@@ -410,7 +410,7 @@ void csODEDynamics::SetGlobalERP (float erp)
 void csODEDynamics::SetGlobalCFM (float cfm)
 {
   csODEDynamics::cfm = cfm;
-  for (size_t i = 0; i < systems.Length(); i ++)
+  for (size_t i = 0; i < systems.GetSize (); i ++)
   {
     csRef<iODEDynamicSystemState> sys = 
       scfQueryInterface<iODEDynamicSystemState> (systems[i]);
@@ -423,7 +423,7 @@ void csODEDynamics::EnableStepFast (bool enable)
   stepfast = enable;
   quickstep = false;
 
-  for (size_t i = 0; i < systems.Length(); i ++)
+  for (size_t i = 0; i < systems.GetSize (); i ++)
   {
     csRef<iODEDynamicSystemState> sys = 
       scfQueryInterface<iODEDynamicSystemState> (systems[i]);
@@ -435,7 +435,7 @@ void csODEDynamics::SetStepFastIterations (int iter)
 {
   sfiter = iter;
 
-  for (size_t i = 0; i < systems.Length(); i ++)
+  for (size_t i = 0; i < systems.GetSize (); i ++)
   {
     csRef<iODEDynamicSystemState> sys = 
       scfQueryInterface<iODEDynamicSystemState> (systems[i]);
@@ -448,7 +448,7 @@ void csODEDynamics::EnableQuickStep (bool enable)
   quickstep = enable;
   stepfast = false;
 
-  for (size_t i = 0; i < systems.Length(); i ++)
+  for (size_t i = 0; i < systems.GetSize (); i ++)
   {
     csRef<iODEDynamicSystemState> sys = 
       scfQueryInterface<iODEDynamicSystemState> (systems[i]);
@@ -460,7 +460,7 @@ void csODEDynamics::SetQuickStepIterations (int iter)
 {
   qsiter = iter;
 
-  for (size_t i = 0; i < systems.Length(); i ++)
+  for (size_t i = 0; i < systems.GetSize (); i ++)
   {
     csRef<iODEDynamicSystemState> sys = 
       scfQueryInterface<iODEDynamicSystemState> (systems[i]);
@@ -507,10 +507,10 @@ bool csODEDynamics::HandleEvent (iEvent& Event)
     while (total_elapsed > stepsize)
     {
       total_elapsed -= stepsize;
-      for (size_t i=0; i<systems.Length(); i++)
+      for (size_t i=0; i<systems.GetSize (); i++)
       {
         systems.Get (i)->Step (stepsize);
-        for (size_t j = 0; j < updates.Length(); j ++)
+        for (size_t j = 0; j < updates.GetSize (); j ++)
         {
           updates[i]->Execute (stepsize);
         }
@@ -727,7 +727,7 @@ void csODEDynamicSystem::Step (float elapsed_time)
     {
       dWorldStepFast1 (worldID, stepsize, sfiter);
     }
-    for (size_t i = 0; i < bodies.Length(); i ++)
+    for (size_t i = 0; i < bodies.GetSize (); i ++)
     {
       iRigidBody *b = bodies.Get(i);
       // only do this if the body is enabled
@@ -737,13 +737,13 @@ void csODEDynamicSystem::Step (float elapsed_time)
         b->SetLinearVelocity (b->GetLinearVelocity () * lin_damp);
       }
     }
-    for (size_t j = 0; j < updates.Length(); j ++)
+    for (size_t j = 0; j < updates.GetSize (); j ++)
     {
       updates[j]->Execute (stepsize);
     }
   }
 
-  for (size_t i=0; i<bodies.Length(); i++)
+  for (size_t i=0; i<bodies.GetSize (); i++)
   {
     iRigidBody *b = bodies.Get(i);
     b->Update ();
@@ -896,7 +896,7 @@ csODEBodyGroup::csODEBodyGroup (csODEDynamicSystem* sys)
 
 csODEBodyGroup::~csODEBodyGroup ()
 {
-  for (size_t i = 0; i < bodies.Length(); i ++)
+  for (size_t i = 0; i < bodies.GetSize (); i ++)
   {
     ((csODERigidBody *)(iRigidBody*)bodies[i])->UnsetGroup ();
   }
@@ -1444,7 +1444,7 @@ void DestroyGeoms( csGeomList & geoms )
   dGeomID tempID;
   size_t i=0;
 
-  for (;i < geoms.Length(); i++)
+  for (;i < geoms.GetSize (); i++)
   {
     tempID = geoms[i];
     if (dGeomGetClass (geoms[i]) == dGeomTransformClass)

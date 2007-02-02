@@ -656,7 +656,7 @@ namespace aws
   void widget::Draw (iPen *output_pen)
   {    
 	// Don't bother if we have no pen and no children.
-	if (wpen==0 && children.Length()==0) return;
+	if (wpen==0 && children.GetSize ()==0) return;
 	  
 	csString msg;
 	jsval argv[1], rval;
@@ -688,7 +688,7 @@ namespace aws
     }
 
 	// Draw all children.
-	for(size_t i=0; i<children.Length (); ++i)
+	for(size_t i=0; i<children.GetSize (); ++i)
 	{
 		if (children[i]->visible)
 			children[i]->Draw (output_pen);						
@@ -876,7 +876,7 @@ namespace aws
     char *func_name = JS_GetStringBytes (func_name_str);
 
     // Now fire it in all children.
-    for(size_t i=0; i<children.Length (); ++i)
+    for(size_t i=0; i<children.GetSize (); ++i)
     {
       jsval func_val, rv;
 

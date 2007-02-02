@@ -51,7 +51,7 @@ public:
 
   virtual bool HasNext ()
   {
-    return idx < messages.Length ();
+    return idx < messages.GetSize ();
   }
 
   virtual void Next ()
@@ -94,7 +94,7 @@ void csReporter::ActualReport (const csRefArray<iReporterListener>& listeners,
 {
   bool add_msg = true;
   size_t i;
-  for (i = 0 ; i < listeners.Length () ; i++)
+  for (i = 0 ; i < listeners.GetSize () ; i++)
   {
     iReporterListener* listener = listeners[i];
     if (listener->Report (this, severity, msgId, buf))
@@ -112,7 +112,7 @@ void csReporter::ActualReport (const csRefArray<iReporterListener>& listeners,
     msg->description = csStrNew (buf);
     CS::Threading::RecursiveMutexScopedLock lock (mutex);
     messages.Push (msg);
-    if (listeners.Length () == 0 && (severity == CS_REPORTER_SEVERITY_ERROR
+    if (listeners.GetSize () == 0 && (severity == CS_REPORTER_SEVERITY_ERROR
     	|| severity == CS_REPORTER_SEVERITY_BUG))
     {
       csPrintf ("%s\n", buf);
@@ -157,7 +157,7 @@ void csReporter::ReportV (int severity, const char* msgId,
   {
     CS::Threading::RecursiveMutexScopedLock lock (mutex);
     size_t i;
-    for (i = 0 ; i < listeners.Length () ; i++)
+    for (i = 0 ; i < listeners.GetSize () ; i++)
     {
       iReporterListener* listener = listeners[i];
       copy.Push (listener);
@@ -183,7 +183,7 @@ void csReporter::Clear (int severity)
   CS::Threading::RecursiveMutexScopedLock lock (mutex);
 
   size_t i = 0;
-  size_t len = messages.Length ();
+  size_t len = messages.GetSize ();
   while (i < len)
   {
     csReporterMessage* msg = messages[i];
@@ -203,7 +203,7 @@ void csReporter::Clear (const char* mask)
 {
   CS::Threading::RecursiveMutexScopedLock lock (mutex);
   size_t i = 0;
-  size_t len = messages.Length ();
+  size_t len = messages.GetSize ();
   while (i < len)
   {
     csReporterMessage* msg = messages[i];
@@ -224,7 +224,7 @@ csPtr<iReporterIterator> csReporter::GetMessageIterator ()
   CS::Threading::RecursiveMutexScopedLock lock (mutex);
   csReporterIterator* it = new csReporterIterator ();
   size_t i;
-  for (i = 0 ; i < messages.Length () ; i++)
+  for (i = 0 ; i < messages.GetSize () ; i++)
   {
     csReporterMessage* msg = new csReporterMessage ();
     msg->severity = messages[i]->severity;

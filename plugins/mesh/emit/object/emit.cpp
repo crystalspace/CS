@@ -745,7 +745,7 @@ void csEmitMeshObject::Update (csTicks elapsed_time)
   int elapsed = elapsed_time;
   // age particles;
   int i;
-  for (i=0 ; i < (int)particles.Length () ; i++)
+  for (i=0 ; i < (int)particles.GetSize () ; i++)
   {
     if(ages[i] + elapsed > timetolive)
     {

@@ -163,7 +163,7 @@ static int list_supported_formats (iObjectRegistry * /*r*/)
   size_t i;
   csPrintf (mask, "MIME", "description", "load?", "save?");
   csPrintf (mask, "----", "-----------", "-----", "-----");
-  for (i = 0; i < descr.Length (); i++)
+  for (i = 0; i < descr.GetSize (); i++)
   {
     iImageIO::FileFormatDescription *format =
       (iImageIO::FileFormatDescription*) descr.Get (i);

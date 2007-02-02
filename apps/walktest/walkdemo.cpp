@@ -471,12 +471,12 @@ void WalkTest::del_bot (bool manual)
 {
   if (manual)
   {
-    if (manual_bots.Length () > 0)
+    if (manual_bots.GetSize () > 0)
       manual_bots.DeleteIndex (0);
   }
   else
   {
-    if (bots.Length () > 0)
+    if (bots.GetSize () > 0)
       bots.DeleteIndex (0);
   }
 }
@@ -484,7 +484,7 @@ void WalkTest::del_bot (bool manual)
 void WalkTest::move_bots (csTicks elapsed_time)
 {
   size_t i;
-  for (i = 0; i < bots.Length(); i++)
+  for (i = 0; i < bots.GetSize (); i++)
   {
     bots[i]->move (elapsed_time);
   }

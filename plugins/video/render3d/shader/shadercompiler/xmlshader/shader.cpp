@@ -320,7 +320,7 @@ csXMLShader::csXMLShader (csXMLShaderCompiler* compiler,
     resolver->DumpConditionTree (tree);
     csString filename;
     filename.Format ("/tmp/shader/cond_%s.txt", source->GetAttributeValue ("name"));
-    compiler->vfs->WriteFile (filename, tree.GetData(), tree.Length());
+    compiler->vfs->WriteFile (filename, tree.GetData(), tree.Length ());
   }
   else
     wrappedNode.AttachNew (compiler->wrapperFact->CreateWrapper (source, 
@@ -345,7 +345,7 @@ csXMLShader::csXMLShader (csXMLShaderCompiler* compiler,
 
 csXMLShader::~csXMLShader ()
 {
-  for (size_t i = 0; i < variants.Length(); i++)
+  for (size_t i = 0; i < variants.GetSize (); i++)
   {
     delete variants[i].tech;
   }
@@ -639,7 +639,7 @@ csRef<iDocumentNode> csXMLShader::LoadProgramFile (const char* filename,
   if (compiler->doDumpConds || compiler->doDumpXML)
   {
     csString filenameClean (filename);
-    for (size_t p = 0; p < filenameClean.Length(); p++)
+    for (size_t p = 0; p < filenameClean.Length (); p++)
     {
       if (!isalnum (filenameClean[p])) filenameClean[p] = '_';
     }
@@ -655,7 +655,7 @@ csRef<iDocumentNode> csXMLShader::LoadProgramFile (const char* filename,
       programRoot, resolver, &tree));
     resolver->DumpConditionTree (tree);
     compiler->vfs->WriteFile (csString().Format ("/tmp/shader/%s_%zu.txt",
-      dumpFN.GetData(), variant), tree.GetData(), tree.Length());
+      dumpFN.GetData(), variant), tree.GetData(), tree.Length ());
   }
   else
     programNode.AttachNew (compiler->wrapperFact->CreateWrapperStatic (

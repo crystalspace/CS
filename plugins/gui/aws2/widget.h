@@ -235,7 +235,7 @@ namespace aws
     /// Returns true if the widget is a child of this widget.
     bool HasChild (widget *w)
     {
-      for(size_t i=0; i<children.Length (); ++i)
+      for(size_t i=0; i<children.GetSize (); ++i)
       {
         if (children[i] == w) return true;	   		   
         if (children[i]->HasChild (w)) return true;
@@ -428,7 +428,7 @@ namespace aws
     /// Adjusts all children when we've been resized.
     void AdjustChildrenForStickiness ()
     {
-      for(size_t i=0; i<children.Length (); ++i)
+      for(size_t i=0; i<children.GetSize (); ++i)
       {
         children[i]->AdjustForStickiness ();	 
         children[i]->AdjustDocked ();
@@ -448,7 +448,7 @@ namespace aws
     {
       if (Bounds ().Contains (x,y)==false) return 0;
 
-      for(size_t i=0; i<children.Length (); ++i)
+      for(size_t i=0; i<children.GetSize (); ++i)
       {
         widget *w = children[i]->Contains (x-Bounds ().xmin,y-Bounds ().ymin);
         if (w) return w;	 		 	

@@ -136,9 +136,9 @@ bool csShaderProgram::ParseProgramParam (iDocumentNode* node,
 
     //Save the params
     var->SetType (csShaderVariable::ARRAY);
-    var->SetArraySize (allParams.Length ());
+    var->SetArraySize (allParams.GetSize ());
 
-    for (uint i = 0; i < allParams.Length (); i++)
+    for (uint i = 0; i < allParams.GetSize (); i++)
     {
       var->SetArrayElement (i, allParams[i].var);
     }
@@ -407,7 +407,7 @@ void csShaderProgram::DumpProgramInfo (csString& output)
 
 void csShaderProgram::DumpVariableMappings (csString& output)
 {
-  for (size_t v = 0; v < variablemap.Length(); v++)
+  for (size_t v = 0; v < variablemap.GetSize (); v++)
   {
     const VariableMapEntry& vme = variablemap[v];
 

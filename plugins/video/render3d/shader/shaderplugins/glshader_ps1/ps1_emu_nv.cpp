@@ -85,7 +85,7 @@ void csShaderGLPS1_NV::SetupState (const csRenderMesh* /*mesh*/,
     var->GetValue (vectorVal);
 
     const float* vptr = &vectorVal.x;
-    for(size_t j = 0; j < constant_pairs.Length (); j++)
+    for(size_t j = 0; j < constant_pairs.GetSize (); j++)
     {
       nv_constant_pair &pair = constant_pairs.Get (j);
       if (pair.first == i)
@@ -140,7 +140,7 @@ void csShaderGLPS1_NV::ActivateTextureShaders ()
   }
 
 
-  for(i = 0; i < texture_shader_stages.Length (); i++)
+  for(i = 0; i < texture_shader_stages.GetSize (); i++)
   {
     const nv_texture_shader_stage &shader = texture_shader_stages.Get(i);
 
@@ -268,10 +268,10 @@ bool csShaderGLPS1_NV::ActivateRegisterCombiners ()
 
   GLenum glstage = GL_COMBINER0_NV;
 
-  for(size_t i = 0; i < stages.Length (); i++)
+  for(size_t i = 0; i < stages.GetSize (); i++)
   {
     const nv_combiner_stage &stage = stages.Get (i);
-    for(size_t j = 0; j < stage.inputs.Length(); j++)
+    for(size_t j = 0; j < stage.inputs.GetSize (); j++)
     {
       const nv_input &input = stage.inputs.Get (j);
       ext->glCombinerInputNV (glstage, input.portion, input.variable,
@@ -297,7 +297,7 @@ bool csShaderGLPS1_NV::ActivateRegisterCombiners ()
           i);
       return false;
     }
-    if(i+1 < stages.Length ())
+    if(i+1 < stages.GetSize ())
     {
       nv_combiner_stage &next = stages.Get (i+1);
       /* If there is any difference in outputs, or it's not
@@ -351,7 +351,7 @@ GLenum csShaderGLPS1_NV::GetTexTarget()
 bool csShaderGLPS1_NV::GetTextureShaderInstructions (
   const csArray<csPSProgramInstruction> &instrs)
 {
-  for(size_t i = 0; i < instrs.Length (); i++)
+  for(size_t i = 0; i < instrs.GetSize (); i++)
   {
     const csPSProgramInstruction &inst = instrs.Get (i);
 
@@ -386,7 +386,7 @@ bool csShaderGLPS1_NV::GetTextureShaderInstructions (
 bool csShaderGLPS1_NV::GetNVInstructions (csPixelShaderParser& parser,
 					  const csArray<csPSProgramInstruction> &instrs)
 {
-  for(size_t i = 0; i < instrs.Length (); i++)
+  for(size_t i = 0; i < instrs.GetSize (); i++)
   {
     const csPSProgramInstruction &inst = instrs.Get(i);
 
@@ -706,7 +706,7 @@ bool csShaderGLPS1_NV::LoadProgramStringToGL ()
 
   size_t i;
 
-  for(i = 0; i < constants.Length(); i++)
+  for(i = 0; i < constants.GetSize (); i++)
   {
     const csPSConstant& constant = constants.Get (i);
 
@@ -724,10 +724,10 @@ bool csShaderGLPS1_NV::LoadProgramStringToGL ()
   // Then translate PS instructions into NV_register_combiners info
   if(!GetNVInstructions (parser, instrs)) return false;
 
-  if(stages.Length () < 1) return false;
+  if(stages.GetSize () < 1) return false;
 
   int prev_combiner = 0;
-  for(i = 0; i < stages.Length (); i++)
+  for(i = 0; i < stages.GetSize (); i++)
   {
     const nv_combiner_stage &stage = stages.Get (i);
     if(prev_combiner != num_combiners)
@@ -739,7 +739,7 @@ bool csShaderGLPS1_NV::LoadProgramStringToGL ()
       constant_pairs.Push(constant_pair);
       prev_combiner = num_combiners;
     }
-    if(i+1 < stages.Length ())
+    if(i+1 < stages.GetSize ())
     {
       nv_combiner_stage &next = stages.Get (i+1);
       /* If there is any difference in outputs, or it's not

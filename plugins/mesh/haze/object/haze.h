@@ -363,7 +363,7 @@ public:
   { this->directional=pos;}
   virtual const csVector3& GetDirectional() const
   {return this->directional;}
-  virtual size_t GetLayerCount() const {return this->layers.Length();}
+  virtual size_t GetLayerCount() const {return this->layers.GetSize ();}
   virtual void AddLayer(iHazeHull *hull, float scale)
   {
     csHazeLayer *lay = new csHazeLayer(hull, scale);
@@ -443,7 +443,7 @@ public:
   { this->directional=pos;}
   virtual const csVector3& GetDirectional() const
   {return this->directional;}
-  virtual size_t GetLayerCount() const {return this->layers.Length();}
+  virtual size_t GetLayerCount() const {return this->layers.GetSize ();}
   virtual void AddLayer(iHazeHull *hull, float scale)
   {
     csHazeLayer *lay = new csHazeLayer(hull, scale);

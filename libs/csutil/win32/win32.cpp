@@ -324,7 +324,7 @@ BOOL WINAPI Win32Assistant::ConsoleHandlerRoutine (DWORD dwCtrlType)
     case CTRL_LOGOFF_EVENT:
     case CTRL_SHUTDOWN_EVENT:
       {
-	for (size_t i = 0; i < assistants.Length(); i++)
+	for (size_t i = 0; i < assistants.GetSize (); i++)
 	{
 	  assistants[i]->GetEventOutlet()->ImmediateBroadcast (
 	    csevQuit (assistants[i]->registry), 0);

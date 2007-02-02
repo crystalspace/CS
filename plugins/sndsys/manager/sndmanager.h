@@ -107,7 +107,7 @@ public:
   virtual void RemoveSound (iSndSysWrapper* snd);
   virtual void RemoveSound (size_t idx);
   virtual void RemoveSounds ();
-  virtual size_t GetSoundCount () const { return sounds.Length (); }
+  virtual size_t GetSoundCount () const { return sounds.GetSize (); }
   virtual iSndSysWrapper* GetSound (size_t idx);
   virtual iSndSysWrapper* FindSoundByName (const char* name);
 };

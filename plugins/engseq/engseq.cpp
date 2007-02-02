@@ -1833,7 +1833,7 @@ bool csEngineSequenceManager::HandleEvent (iEvent &event)
     global_framenr++;
 
     csTicks curtime = seqmgr->GetMainTime () + seqmgr->GetDeltaTime ();
-    size_t i = timed_operations.Length ();
+    size_t i = timed_operations.GetSize ();
     while (i-- > 0)
     {
       csTimedOperation* op = timed_operations[i];
@@ -1857,7 +1857,7 @@ bool csEngineSequenceManager::HandleEvent (iEvent &event)
     int mouse_x = csMouseEventHelper::GetX(&event);
     int mouse_y = csMouseEventHelper::GetY(&event);
     iCamera* camera = cameracatcher->camera;
-    if (camera != 0 && mesh_triggers.Length () > 0)
+    if (camera != 0 && mesh_triggers.GetSize () > 0)
     {
       csVector3 v;
       // Setup perspective vertex, invert mouse Y axis.
@@ -1875,7 +1875,7 @@ bool csEngineSequenceManager::HandleEvent (iEvent &event)
       iMeshWrapper * sel = hitBeamResult.mesh;
 
       size_t i;
-      for (i = 0 ; i < mesh_triggers.Length () ; i++)
+      for (i = 0 ; i < mesh_triggers.GetSize () ; i++)
       {
 	if (mesh_triggers[i]->GetClickMesh () == sel)
 	  mesh_triggers[i]->Fire ();
@@ -1929,7 +1929,7 @@ void csEngineSequenceManager::RemoveTriggers ()
 
 size_t csEngineSequenceManager::GetTriggerCount () const
 {
-  return triggers.Length ();
+  return triggers.GetSize ();
 }
 
 iSequenceTrigger* csEngineSequenceManager::GetTrigger (size_t idx) const
@@ -1941,7 +1941,7 @@ iSequenceTrigger* csEngineSequenceManager::FindTriggerByName (
 	const char* name) const
 {
   size_t i;
-  for (i = 0 ; i < triggers.Length () ; i++)
+  for (i = 0 ; i < triggers.GetSize () ; i++)
   {
     if (!strcmp (name, triggers[i]->QueryObject ()->GetName ()))
       return triggers[i];
@@ -1984,7 +1984,7 @@ void csEngineSequenceManager::RemoveSequences ()
 
 size_t csEngineSequenceManager::GetSequenceCount () const
 {
-  return sequences.Length ();
+  return sequences.GetSize ();
 }
 
 iSequenceWrapper* csEngineSequenceManager::GetSequence (size_t idx) const
@@ -1996,7 +1996,7 @@ iSequenceWrapper* csEngineSequenceManager::FindSequenceByName (
 	const char* name) const
 {
   size_t i;
-  for (i = 0 ; i < sequences.Length () ; i++)
+  for (i = 0 ; i < sequences.GetSize () ; i++)
   {
     if (!strcmp (name, sequences[i]->QueryObject ()->GetName ()))
       return sequences[i];
@@ -2041,7 +2041,7 @@ void csEngineSequenceManager::FireTimedOperation (csTicks delta,
 void csEngineSequenceManager::DestroyTimedOperations (uint sequence_id)
 {
   size_t i = 0;
-  while (i < timed_operations.Length ())
+  while (i < timed_operations.GetSize ())
   {
     csTimedOperation* top = timed_operations[i];
     if (top->GetSequenceID () == sequence_id)
