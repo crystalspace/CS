@@ -1144,6 +1144,28 @@ public:
   {
     return root;
   }
+
+  /**
+  * Return the number of elements in the array.
+  * \deprecated Use GetSize() instead.
+  */
+  CS_DEPRECATED_METHOD_MSG("Use GetSize() instead.")
+  size_t Length () const
+  {
+    return GetSize();
+  }
+
+  /** @{ */
+  /**
+  * Set the actual number of items in this array.
+  * \deprecated Use SetSize() instead.
+  */
+  CS_DEPRECATED_METHOD_MSG("Use SetSize() instead.")
+  void SetLength (size_t n, T const& what) { SetSize(n, what); }
+  CS_DEPRECATED_METHOD_MSG("Use SetSize() instead.")
+  void SetLength (size_t n) { SetSize(n); }
+  /** @} */
+
 };
 
 /**

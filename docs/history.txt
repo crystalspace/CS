@@ -33,6 +33,8 @@ chronological order.
 	    - csArray and derived types
 	    - csPath
 	    - csImageBase
+	- Marten put back csArray::Length and csArray::SetLength but properly
+	  marked them deprecated.
 1-Feb-2007
 	- Marten fixed compilation of CS::DataBuffer on gcc.
 	- Marten made sure genmesh doesn't return any rendermeshes when
