@@ -55476,7 +55476,7 @@ fi
 
 
     if test $cs_cv_libCg = yes; then
-  if test "$cs_cv_libCg_cflags" != yes; then
+  if test "" != yes; then
   { echo "$as_me:$LINENO: checking if Cg is sufficiently recent" >&5
 echo $ECHO_N "checking if Cg is sufficiently recent... $ECHO_C" >&6; }
 if test "${cs_cv_libCg_recent+set}" = set; then
@@ -55550,9 +55550,9 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test $cs_cv_libCg_lflags $cs_cflags_save"
-	LDFLAGS="$cs_lflags_test $cs_cv_libCg_libs $cs_lflags_save"
-	LIBS="$cs_libs_test  $cs_libs_save"
+	CFLAGS="$cs_cflags_test $cs_cv_libCg_cflags $cs_cflags_save"
+	LDFLAGS="$cs_lflags_test $cs_cv_libCg_lflags $cs_lflags_save"
+	LIBS="$cs_libs_test $cs_cv_libCg_libs $cs_libs_save"
 	cat >conftest.$ac_ext <<_ACEOF
 /* confdefs.h.  */
 _ACEOF
@@ -55614,9 +55614,9 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
     if test $cs_build_ok = yes; then
-  cs_build_cflags=`echo x$cs_cflags_test $cs_cv_libCg_lflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_build_lflags=`echo x$cs_lflags_test $cs_cv_libCg_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_build_libs=`echo x$cs_libs_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  cs_build_cflags=`echo x$cs_cflags_test $cs_cv_libCg_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_lflags=`echo x$cs_lflags_test $cs_cv_libCg_lflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_libs=`echo x$cs_libs_test $cs_cv_libCg_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_libCg_recent=yes
 		cs_cv_libCg_recent_cflags=$cs_build_cflags
 		cs_cv_libCg_recent_lflags=$cs_build_lflags
@@ -55699,9 +55699,9 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test $cs_cv_libCg_lflags $cs_cflags_save"
-	LDFLAGS="$cs_lflags_test $cs_cv_libCg_libs $cs_lflags_save"
-	LIBS="$cs_libs_test  $cs_libs_save"
+	CFLAGS="$cs_cflags_test $cs_cv_libCg_cflags $cs_cflags_save"
+	LDFLAGS="$cs_lflags_test $cs_cv_libCg_lflags $cs_lflags_save"
+	LIBS="$cs_libs_test $cs_cv_libCg_libs $cs_libs_save"
 	cat >conftest.$ac_ext <<_ACEOF
 /* confdefs.h.  */
 _ACEOF
@@ -55763,9 +55763,9 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
     if test $cs_build_ok = yes; then
-  cs_build_cflags=`echo x$cs_cflags_test $cs_cv_libCg_lflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_build_lflags=`echo x$cs_lflags_test $cs_cv_libCg_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_build_libs=`echo x$cs_libs_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  cs_build_cflags=`echo x$cs_cflags_test $cs_cv_libCg_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_lflags=`echo x$cs_lflags_test $cs_cv_libCg_lflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_libs=`echo x$cs_libs_test $cs_cv_libCg_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_libCg_recent=yes
 		cs_cv_libCg_recent_cflags=$cs_build_cflags
 		cs_cv_libCg_recent_lflags=$cs_build_lflags
