@@ -27,11 +27,6 @@
 #       CFLAGS variable because Autoconf's -g and -O defaults are not always
 #       desired.  This will also set the CMD.CC and COMPILER.CFLAGS variables
 #       in Jamconfig
-#       Also, it is checked whether the linker supports the --as-needed
-#       command line option, and if so, it is employed. As some libraries
-#       reportedly don't support that feature, you can put 
-#       $cs_cv_prog_link_no_as_needed and $cs_cv_prog_link_as_needed around
-#       the linker flags to disable this feature for a particular library.
 #-----------------------------------------------------------------------------
 AC_DEFUN([CS_PROG_CC],[
     CFLAGS="$CFLAGS" # Filter undesired flags
@@ -80,6 +75,12 @@ AC_DEFUN([CS_PROG_CXX],[
 #       respects the LDFLAGS environment variable.  Finally, checks if linker
 #	recognizes -shared and sets PLUGIN.LFLAGS; and checks if linker
 #	recognizes -soname and sets PLUGIN.LFLAGS.USE_SONAME to "yes".
+#
+#       Also, it is checked whether the linker supports the --as-needed
+#       command line option, and if so, it is employed. As some libraries
+#       reportedly don't support that feature, you can put 
+#       $cs_cv_prog_link_no_as_needed and $cs_cv_prog_link_as_needed around
+#       the linker flags to disable this feature for a particular library.
 #-----------------------------------------------------------------------------
 AC_DEFUN([CS_PROG_LINK],[
     AC_REQUIRE([CS_PROG_CXX])
@@ -108,12 +109,20 @@ AC_DEFUN([CS_PROG_LINK],[
 	[CS_EMIT_BUILD_PROPERTY([PLUGIN.LFLAGS.USE_SONAME], [yes])])
 	
     # Check if binutils support response files
-    rm -f conftest.resp
-    echo "" > conftest.resp
-    CS_CHECK_BUILD([if response files are accepted], [cs_cv_prog_link_respfile], [],
-	[-Wl,@conftest.resp], [C++],
-	[CS_EMIT_BUILD_PROPERTY([LINKER.RESPONSEFILES], [yes])])
-    rm -f conftest.resp
+    rm -f conf$$.resp
+    echo "" > conf$$.resp
+    AC_CACHE_CHECK([if response files are accepted], [cs_cv_prog_link_respfile],
+	[AC_LANG_PUSH([C++])
+        cs_lflags_save="$LDFLAGS"
+	LDFLAGS="-Wl,@conf$$.resp $cs_lflags_save"
+	AC_LINK_IFELSE([AC_LANG_PROGRAM([],[])],
+	    [cs_cv_prog_link_respfile=yes],
+	    [cs_cv_prog_link_respfile=no])
+	LDFLAGS=$cs_lflags_save
+    	AC_LANG_POP([C++])])
+    AS_IF([test $cs_cv_prog_link_respfile = yes], 
+    	[CS_EMIT_BUILD_PROPERTY([LINKER.RESPONSEFILES], [yes])])
+    rm -f conf$$.resp
     
     # Check if linker supports --as-needed.
     CS_EMIT_BUILD_FLAGS([if --as-needed is supported], 

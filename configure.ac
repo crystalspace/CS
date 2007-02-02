@@ -1629,18 +1629,30 @@ AS_IF([test $cs_host_family != windows],
 
 #------------------------------------------------------------------------------
 # Check for Cg shader package.
+#
+# A note on the 'log()' call: on Linux, libCg.so itself doesn't depend on
+# the libmy's shared object. However, if the --as-needed flag is used in 
+# LDFLAGS, and the app itself doesn't use a function from libm, it's symbols 
+# won't be available, causing problems. Normally any app calls some libm
+# function. However, the default test program doesn't, so a call to log() was 
+# added explicitly.
+# And the same applies to pthread, too.
+# The workaround is to explicitly strip -Wl,--as-needed from LDFLAGS.
 #------------------------------------------------------------------------------
 AC_DEFUN([CS_CHECK_LIBCG],
     [AC_REQUIRE([CS_CHECK_COMMON_LIBS])
     AC_REQUIRE([CS_CHECK_PTHREAD])
+    AC_REQUIRE([CS_PROG_LINK])
+    LDFLAGS_BACKUP="$LDFLAGS"
+    LDFLAGS=`echo "$LDFLAGS" | sed s/-Wl,--as-needed//`
     CS_CHECK_LIB_WITH([Cg],
-	[AC_LANG_PROGRAM(
-	    [[#include <Cg/cg.h>]],
-	    [CGcontext c = cgCreateContext()])],
-	[], [], [], [],
-	[$cs_cv_libm_cflags $cs_cv_sys_pthread_cflags], 
-	[$cs_cv_libm_lflags $cs_cv_sys_pthread_lflags], 
-	[$cs_cv_libm_libs   $cs_cv_sys_pthread_libs],
+    	[AC_LANG_PROGRAM(
+    	    [[#include <Cg/cg.h>]],
+	   [CGcontext c = cgCreateContext();])],
+    	[], [], [], [],
+    	[$cs_cv_libm_cflags $cs_cv_sys_pthread_cflags], 
+    	[$cs_cv_libm_lflags $cs_cv_sys_pthread_lflags], 
+    	[$cs_cv_libm_libs   $cs_cv_sys_pthread_libs],
 	[cg, CG])
 
     AS_IF([test $cs_cv_libCg = yes],
@@ -1664,7 +1676,9 @@ AC_DEFUN([CS_CHECK_LIBCG],
 	    [$cs_cv_libCg_cflags $cs_cv_libgl_cflags $cs_cv_libglu_cflags],
 	    [$cs_cv_libCg_lflags $cs_cv_libgl_lflags $cs_cv_libglu_lflags],
 	    [$cs_cv_libCg_libs   $cs_cv_libgl_libs   $cs_cv_libglu_libs],
-	    [cggl, cgGL, CGGL, Cg, cg, CG])])])
+	    [cggl, cgGL, CGGL, Cg, cg, CG])])
+	    
+    LDFLAGS="$LDFLAGS_BACKUP"])
 
 CS_CHECK_LIBCG
 

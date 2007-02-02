@@ -265,6 +265,7 @@ public:
   static csPathsList ExpandAll (const csPathsList& paths);
 };
 
+
 /**
  * A helper class containing a number of functions to deal with Crystal Space
  * installation paths.
@@ -363,6 +364,22 @@ CS_DEPRECATED_METHOD inline csString csGetAppDir (const char* argv0)
 CS_DEPRECATED_METHOD inline csString csGetResourceDir (const char* argv0)
 { return csInstallationPathsHelper::GetResourceDir (argv0); }
 //@}
+
+
+namespace CS
+{
+namespace Platform
+{
+
+/// Get system specific temporary folder
+csString GetTempDirectory ();
+
+/// Get file name for temporary file within specified directory
+csString GetTempFilename (const char* path/* = 0*/);
+
+}
+}
+
 
 /** @} */
 /** @} */

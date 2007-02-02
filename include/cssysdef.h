@@ -202,26 +202,41 @@
 #  endif
 #endif
 
+
+
+
 /**\def CS_TEMP_DIR
  * Directory for temporary files
+ * \deprecated Use CS::Platform::GetTempDirectory () from syspath.h
  */
 #ifndef CS_TEMP_DIR
-#  if defined(CS_PLATFORM_UNIX)
-#    define CS_TEMP_DIR "/tmp/"
-#  else
-#    define CS_TEMP_DIR ""
-#  endif
+class csString;
+
+namespace CS
+{
+namespace Platform
+{
+  csString GetTempDirectory ();
+}
+}
+#  define CS_TEMP_DIR CS::Platform::GetTempDirectory ().GetDataSafe()
 #endif
+
 
 /**\def CS_TEMP_FILE
  * Name for temporary files
+ * \deprecated Use CS::Platform::GetTempFilename () from syspath.h
  */
 #ifndef CS_TEMP_FILE
-#  if defined(CS_PLATFORM_UNIX)
-#    define CS_TEMP_FILE "cs%lud.tmp", (unsigned long)getpid()
-#  else
-#    define CS_TEMP_FILE "$cs$.tmp"
-#  endif
+class csString;
+namespace CS
+{
+namespace Platform
+{
+  csString GetTempFilename (const char* p = 0);
+}
+}
+#  define CS_TEMP_FILE CS::Platform::GetTempFilename ().GetDataSafe()
 #endif
 
 /**\def CS_HAVE_POSIX_MMAP
