@@ -71,7 +71,6 @@ struct iRenderLoop;
 
 struct iObject;
 struct iThingState;
-struct iCollection;
 struct iMaterialWrapper;
 struct iMeshFactoryWrapper;
 struct iMeshWrapper;
@@ -353,9 +352,6 @@ private:
   	iDocumentNode* node, const char* prefix = 0);
   /// Parse a renderloop.
   iRenderLoop* ParseRenderLoop (iDocumentNode* node, bool& set);
-  /// Parse a collection definition and add the collection to the engine
-  iCollection* ParseCollection (iLoaderContext* ldr_context,
-  	iDocumentNode* node);
   /// Parse a camera position.
   bool ParseStart (iDocumentNode* node, iCameraPosition* campos);
   /// Parse a static light definition and add the light to the engine

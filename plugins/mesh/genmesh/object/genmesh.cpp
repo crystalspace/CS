@@ -1984,6 +1984,7 @@ void csGenmeshMeshObjectFactory::AddVertex (const csVector3& v,
 void csGenmeshMeshObjectFactory::AddTriangle (const csTriangle& tri)
 {
   mesh_triangles.Push (tri);
+
   Invalidate ();
 }
 
@@ -2230,6 +2231,8 @@ void csGenmeshMeshObjectFactory::Invalidate ()
   object_bbox_valid = false;
   delete[] polygons;
   polygons = 0;
+  index_buffer = 0;
+  initialized = false;
 
   mesh_vertices_dirty_flag = true;
   mesh_texels_dirty_flag = true;

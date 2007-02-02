@@ -74,18 +74,15 @@ namespace lighter
 
     //-- Collect potentially shadowing primitives
     typedef void (*LMElementCollectShadowPrims)(Sector* sector, ElementProxy element,
-      SamplerSequence<2>& lightSampler, PartialElementIgnoreCallback* ignoreCB,
-      csSet<csConstPtrKey<Primitive> > &primitives);
+      SamplerSequence<2>& lightSampler, PartialElementIgnoreCallback* ignoreCB);
 
     static void CollectShadowAllLightsNonPD(Sector* sector, ElementProxy element,
-      SamplerSequence<2>& lightSampler, PartialElementIgnoreCallback* ignoreCB,
-      csSet<csConstPtrKey<Primitive> > &primitives);
+      SamplerSequence<2>& lightSampler, PartialElementIgnoreCallback* ignoreCB);
     static void CollectShadowRndLightNonPD(Sector* sector, ElementProxy element,
-      SamplerSequence<2>& lightSampler, PartialElementIgnoreCallback* ignoreCB,
-      csSet<csConstPtrKey<Primitive> > &primitives);
+      SamplerSequence<2>& lightSampler, PartialElementIgnoreCallback* ignoreCB);
     static void CollectShadowOneLight(Sector* sector, ElementProxy element,
-      Light* light, SamplerSequence<2>& lightSampler, PartialElementIgnoreCallback* ignoreCB,
-      csSet<csConstPtrKey<Primitive> > &primitives);
+      Light* light, SamplerSequence<2>& lightSampler, 
+      PartialElementIgnoreCallback* ignoreCB);
 
     //-- Shade using one light
     // Shade a primitive element with direct lighting
@@ -107,8 +104,8 @@ namespace lighter
       PartialElementIgnoreCallback* ignoreCB);
 
     inline static void CollectShadowLight (Light* light, const csVector3& point,
-      SamplerSequence<2>& lightSampler, PartialElementIgnoreCallback* ignoreCB, 
-      csSet<csConstPtrKey<Primitive> > &primitives);
+      const csVector3& normal, SamplerSequence<2>& lightSampler, 
+      PartialElementIgnoreCallback* ignoreCB);
 
     static void ShadeLightmap (Sector* sector, Object* obj, 
       SamplerSequence<2>& masterSampler);

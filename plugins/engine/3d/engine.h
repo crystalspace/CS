@@ -35,7 +35,6 @@
 #include "csutil/weakrefarr.h"
 #include "csutil/eventnames.h"
 #include "iengine/campos.h"
-#include "iengine/collectn.h"
 #include "iengine/engine.h"
 #include "iengine/renderloop.h"
 #include "igraphic/imageio.h"
@@ -125,36 +124,6 @@ private:
   /// Get light from iterator. Return 0 at end.
   iLight* FetchNext ();
 };
-
-#include "csutil/win32/msvc_deprecated_warn_off.h"
-
-/**
- * List of collections for the engine. This class implements iCollectionList.
- */
-class csCollectionList : public scfImplementation1<csCollectionList,
-                                                   iCollectionList>
-{
-public:
-  /// constructor
-  csCollectionList ();
-  virtual ~csCollectionList ();
-
-  //-- iCollectionList
-  virtual iCollection* NewCollection (const char* name);
-  virtual int GetCount () const;
-  virtual iCollection *Get (int n) const;
-  virtual int Add (iCollection *obj);
-  virtual bool Remove (iCollection *obj);
-  virtual bool Remove (int n);
-  virtual void RemoveAll ();
-  virtual int Find (iCollection *obj) const;
-  virtual iCollection *FindByName (const char *Name) const;
-
-private:
-  csRefArrayObject<iCollection> collections;
-};
-
-#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 struct csSectorPos
 {
@@ -563,12 +532,6 @@ public:
 
   virtual iSharedVariableList* GetVariableList () const;
 
-  virtual iCollectionList* GetCollections ()
-  { return &collections; }
-  
-  virtual iCollection* FindCollection (const char* name,
-  	iRegion* region = 0);
-
   virtual bool RemoveObject (iBase* object);
   virtual void DelayedRemoveObject (csTicks delay, iBase *object);
   virtual void RemoveDelayedRemoves (bool remove = false);
@@ -677,8 +640,7 @@ private:
   // Renderloop loading/creation
   csPtr<iRenderLoop> CreateDefaultRenderLoop ();
   void LoadDefaultRenderLoop (const char* fileName);
-  csRef<iShader> LoadShader (iDocumentSystem* docsys, iShaderCompiler* shcom,
-    const char* filename);
+  csRef<iShader> LoadShader (iDocumentSystem* docsys, const char* filename);
 
   /**
    * Setup for starting a Draw or DrawFunc.
@@ -827,12 +789,6 @@ private:
    * to add sectors to the engine.
    */
   csSectorList sectors;
-
-  /**
-   * List of all collections in the engine. This vector contains objects
-   * of type iCollection*.
-   */
-  csCollectionList collections;
 
   /**
    * List of mesh object factories. This vector contains objects of

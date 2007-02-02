@@ -20,7 +20,6 @@
 #include "cssysdef.h"
 #include "csqsqrt.h"
 #include "iengine/portal.h"
-#include "csutil/debug.h"
 #include "iengine/rview.h"
 #include "ivideo/graph3d.h"
 #include "csgfx/renderbuffer.h"

@@ -22,6 +22,7 @@ This file describes the history of the SoC imposter branch.
 	- Jorrit merged 25901:26000 from trunk
 	- Jorrit merged 26001:26100 from trunk
 	- Jorrit merged 26101:26200 from trunk
+	- Jorrit merged 26201:26250 from trunk
 18-Sep-2006
 	- Fossi merged 25271:25382 from trunk
 5-Sep-2006

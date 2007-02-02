@@ -38,7 +38,7 @@
 
 #include "docwrap.h"
 #include "tokenhelper.h"
-#include "xmlshader.h"
+#include "../xmlshader.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
 {

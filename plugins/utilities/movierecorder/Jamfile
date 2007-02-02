@@ -1,4 +1,4 @@
-SubDir TOP plugins movierecorder ;
+SubDir TOP plugins utilities movierecorder ;
 
 Description movierecorder : "realtime movie recorder" ;
 

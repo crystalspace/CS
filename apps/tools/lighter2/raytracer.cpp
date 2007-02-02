@@ -114,6 +114,9 @@ namespace lighter
     {
       KDTreePrimitive* prim = primList + nIdx;
 
+      if (ray.ignoreFlags & (prim->normal_K & KDPRIM_FLAG_MASK)) 
+        continue; 
+
       if (ignoreCB (prim->primPointer) ||
         ray.ignorePrimitive == prim->primPointer ||
         state.mailbox.PutPrimitiveRay (prim->primPointer, ray.rayID))

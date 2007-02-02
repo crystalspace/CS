@@ -25,7 +25,6 @@
 #include "csgeom/textrans.h"
 #include "csutil/csendian.h"
 #include "csutil/dirtyaccessarray.h"
-#include "csutil/debug.h"
 #include "csutil/memfile.h"
 
 #include "iengine/engine.h"

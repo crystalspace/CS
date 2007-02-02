@@ -35,6 +35,8 @@ namespace lighter
     Lighter (iObjectRegistry *objectRegistry);
     ~Lighter ();
 
+    int Run ();
+
     // Initialize and load plugins we want
     bool Initialize ();
 

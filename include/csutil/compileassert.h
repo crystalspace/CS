@@ -22,7 +22,7 @@
 /**\file 
  * Compile time assert macro.
  */
-namespace CrystalSpace
+namespace CS
 {
 
 template <bool x> 
@@ -40,7 +40,7 @@ template <int x>
 struct CompileAssertTest
 {
 };
-}
+} // namespace CS
 
 
 #define CS_JOIN( X, Y ) CS_DO_JOIN( X, Y )
@@ -48,9 +48,9 @@ struct CompileAssertTest
 #define CS_DO_JOIN2( X, Y ) X##Y
 
 #define CS_COMPILE_ASSERT(B) \
-  typedef CrystalSpace::CompileAssertTest< \
-    sizeof(CrystalSpace::COMPILE_ASSERT_FAILURE<(bool)(B)>)> \
+  typedef CS::CompileAssertTest< \
+    sizeof(CS::COMPILE_ASSERT_FAILURE<(bool)(B)>)> \
     CS_JOIN(CrystalSpaceCompileAssertTypedef, __LINE__)
 
 
-#endif
+#endif // __CSUTIL_COMPILEASSERT_H__

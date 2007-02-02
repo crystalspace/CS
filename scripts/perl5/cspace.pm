@@ -95,6 +95,10 @@ package cspace;
 *csfxShadeVert = *cspacec::csfxShadeVert;
 *csfxScreenDPFX = *cspacec::csfxScreenDPFX;
 *csfxScreenDPFXPartial = *cspacec::csfxScreenDPFXPartial;
+*CSKEY_SHIFT_NUM = *cspacec::CSKEY_SHIFT_NUM;
+*CSKEY_SPECIAL = *cspacec::CSKEY_SPECIAL;
+*CSKEY_SPECIAL_NUM = *cspacec::CSKEY_SPECIAL_NUM;
+*CSKEY_MODIFIER = *cspacec::CSKEY_MODIFIER;
 *CS_IS_KEYBOARD_EVENT = *cspacec::CS_IS_KEYBOARD_EVENT;
 *CS_IS_MOUSE_EVENT = *cspacec::CS_IS_MOUSE_EVENT;
 *CS_IS_JOYSTICK_EVENT = *cspacec::CS_IS_JOYSTICK_EVENT;
@@ -782,10 +786,53 @@ sub ACQUIRE {
 }
 
 
+############# Class : cspace::csStringParent ##############
+
+package cspace::csStringParent;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace );
+%OWNER = ();
+%ITERATORS = ();
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_csStringParent(@_);
+    bless $self, $pkg if defined($self);
+}
+
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_csStringParent($self);
+        delete $OWNER{$self};
+    }
+}
+
+*__copy__ = *cspacec::csStringParent___copy__;
+*GetData = *cspacec::csStringParent_GetData;
+*GetCapacity = *cspacec::csStringParent_GetCapacity;
+*ShrinkBestFit = *cspacec::csStringParent_ShrinkBestFit;
+*Free = *cspacec::csStringParent_Free;
+*Detach = *cspacec::csStringParent_Detach;
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
 ############# Class : cspace::csString ##############
 
 package cspace::csString;
-@ISA = qw( cspace );
+@ISA = qw( cspace::csStringParent cspace );
 %OWNER = ();
 %ITERATORS = ();
 sub new {
@@ -6013,8 +6060,6 @@ package cspace::iEngine;
 *CreateFrustumView = *cspacec::iEngine_CreateFrustumView;
 *CreateObjectWatcher = *cspacec::iEngine_CreateObjectWatcher;
 *GetVariableList = *cspacec::iEngine_GetVariableList;
-*GetCollections = *cspacec::iEngine_GetCollections;
-*FindCollection = *cspacec::iEngine_FindCollection;
 *RemoveObject = *cspacec::iEngine_RemoveObject;
 *DeleteAll = *cspacec::iEngine_DeleteAll;
 *ResetWorldSpecificSettings = *cspacec::iEngine_ResetWorldSpecificSettings;
@@ -6985,7 +7030,6 @@ package cspace::iRegion;
 *FindTexture = *cspacec::iRegion_FindTexture;
 *FindMaterial = *cspacec::iRegion_FindMaterial;
 *FindCameraPosition = *cspacec::iRegion_FindCameraPosition;
-*FindCollection = *cspacec::iRegion_FindCollection;
 *IsInRegion = *cspacec::iRegion_IsInRegion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
@@ -13078,6 +13122,134 @@ sub DESTROY {
 }
 
 *scfGetVersion = *cspacec::iDocumentSystem_scfGetVersion;
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::scfConfigFile ##############
+
+package cspace::scfConfigFile;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::iConfigFile cspace );
+%OWNER = ();
+*IncRef = *cspacec::scfConfigFile_IncRef;
+*DecRef = *cspacec::scfConfigFile_DecRef;
+*GetRefCount = *cspacec::scfConfigFile_GetRefCount;
+*QueryInterface = *cspacec::scfConfigFile_QueryInterface;
+*AddRefOwner = *cspacec::scfConfigFile_AddRefOwner;
+*RemoveRefOwner = *cspacec::scfConfigFile_RemoveRefOwner;
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::csConfigFile ##############
+
+package cspace::csConfigFile;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::scfConfigFile cspace );
+%OWNER = ();
+%ITERATORS = ();
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_csConfigFile(@_);
+    bless $self, $pkg if defined($self);
+}
+
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_csConfigFile($self);
+        delete $OWNER{$self};
+    }
+}
+
+*IsEmpty = *cspacec::csConfigFile_IsEmpty;
+*GetFileName = *cspacec::csConfigFile_GetFileName;
+*GetVFS = *cspacec::csConfigFile_GetVFS;
+*SetFileName = *cspacec::csConfigFile_SetFileName;
+*Load = *cspacec::csConfigFile_Load;
+*LoadFromBuffer = *cspacec::csConfigFile_LoadFromBuffer;
+*Save = *cspacec::csConfigFile_Save;
+*Clear = *cspacec::csConfigFile_Clear;
+*Enumerate = *cspacec::csConfigFile_Enumerate;
+*KeyExists = *cspacec::csConfigFile_KeyExists;
+*SubsectionExists = *cspacec::csConfigFile_SubsectionExists;
+*GetInt = *cspacec::csConfigFile_GetInt;
+*GetFloat = *cspacec::csConfigFile_GetFloat;
+*GetStr = *cspacec::csConfigFile_GetStr;
+*GetBool = *cspacec::csConfigFile_GetBool;
+*GetTuple = *cspacec::csConfigFile_GetTuple;
+*GetComment = *cspacec::csConfigFile_GetComment;
+*SetStr = *cspacec::csConfigFile_SetStr;
+*SetInt = *cspacec::csConfigFile_SetInt;
+*SetFloat = *cspacec::csConfigFile_SetFloat;
+*SetBool = *cspacec::csConfigFile_SetBool;
+*SetTuple = *cspacec::csConfigFile_SetTuple;
+*SetComment = *cspacec::csConfigFile_SetComment;
+*DeleteKey = *cspacec::csConfigFile_DeleteKey;
+*SetEOFComment = *cspacec::csConfigFile_SetEOFComment;
+*GetEOFComment = *cspacec::csConfigFile_GetEOFComment;
+*ParseCommandLine = *cspacec::csConfigFile_ParseCommandLine;
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::csRadixSorter ##############
+
+package cspace::csRadixSorter;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace );
+%OWNER = ();
+%ITERATORS = ();
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_csRadixSorter(@_);
+    bless $self, $pkg if defined($self);
+}
+
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_csRadixSorter($self);
+        delete $OWNER{$self};
+    }
+}
+
+*Sort = *cspacec::csRadixSorter_Sort;
+*GetRanks = *cspacec::csRadixSorter_GetRanks;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);

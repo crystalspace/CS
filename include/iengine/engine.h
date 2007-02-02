@@ -43,8 +43,6 @@ struct iCamera;
 struct iCameraPosition;
 struct iCameraPositionList;
 struct iClipper2D;
-struct iCollection;
-struct iCollectionList;
 struct iDataBuffer;
 struct iFrustumView;
 struct iLight;
@@ -175,7 +173,7 @@ struct iEngineSectorCallback : public virtual iBase
  */
 struct iEngine : public virtual iBase
 {
-  SCF_INTERFACE(iEngine,2,0,0);
+  SCF_INTERFACE(iEngine,2,1,0);
   
   /// Get the iObject for the engine.
   virtual iObject *QueryObject() = 0;
@@ -1260,32 +1258,6 @@ struct iEngine : public virtual iBase
 
     /// Get the list of all shared variables.
   virtual iSharedVariableList* GetVariableList () const = 0;
-
-#include "csutil/win32/msvc_deprecated_warn_off.h"
-  /**
-   * Get the list of collections.
-   * \deprecated Collections are obsolete.
-   */
-  CS_DEPRECATED_METHOD_MSG("Collections are obsolete")
-  virtual iCollectionList* GetCollections () = 0;
-  
-  /**
-   * Find the given collection. The name can be a normal
-   * name. In that case this function will look in all regions
-   * except if region is not 0 in which case it will only
-   * look in that region.
-   * If the name is specified as 'regionname/objectname' then
-   * this function will only look in the specified region and return
-   * 0 if that region doesn't contain the object or the region
-   * doesn't exist. In this case the region parameter is ignored.
-   * \param name the engine name of the desired collection
-   * \param region if specified, search only this region (also see note above)
-   * \deprecated Collections are obsolete.
-   */
-  CS_DEPRECATED_METHOD_MSG("Collections are obsolete")
-  virtual iCollection* FindCollection (const char* name,
-  	iRegion* region = 0) = 0;
-#include "csutil/win32/msvc_deprecated_warn_on.h"
 
   /**
    * Convenience function to 'remove' a CS object from the engine.

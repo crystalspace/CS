@@ -1,4 +1,4 @@
-SubDir TOP plugins bugplug ;
+SubDir TOP plugins utilities bugplug ;
 
 Description bugplug : "debugging plugin" ;
 

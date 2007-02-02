@@ -64,8 +64,6 @@ bool HeightMapGen::LoadMap ()
 
 bool HeightMapGen::Initialize ()
 {
-  csDebuggingGraph::SetupGraph (object_reg);
-
   if (!csInitializer::RequestPlugins (object_reg,
   	CS_REQUEST_VFS,
 	CS_REQUEST_PLUGIN("crystalspace.graphics3d.null", iGraphics3D),

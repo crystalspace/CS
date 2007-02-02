@@ -26,7 +26,6 @@
 #include "plugins/engine/3d/light.h"
 #include "plugins/engine/3d/engine.h"
 #include "iengine/portal.h"
-#include "csutil/debug.h"
 #include "iengine/rview.h"
 #include "ivideo/graph3d.h"
 
@@ -120,8 +119,6 @@ public:
 csMeshWrapper::csMeshWrapper (csEngine* engine, iMeshObject *meshobj) 
   : scfImplementationType (this), engine (engine)
 {
-  DG_TYPE (this, "csMeshWrapper");
-
 //  movable.scfParent = this; //@TODO: CHECK THIS
   wor_bbox_movablenr = -1;
   movable.SetMeshWrapper (this);
