@@ -229,7 +229,7 @@ struct iDecalBuilder
    * the mesh's extra rendermesh list.
    * \param p   The polygon to add to the decal.
    */
-  virtual void AddStaticPoly(const csPoly3D& p) = 0;
+  virtual void AddStaticPoly(const csPoly3D & p) = 0;
     
 };
 
@@ -257,9 +257,9 @@ struct iDecalManager : public virtual iBase
    * \param height The height of the decal.
    * \return True if the decal is created.
    */
-  virtual bool CreateDecal(csRef<iDecalTemplate> & decalTemplate, 
-    iSector * sector, const csVector3 * pos, const csVector3 * up, 
-    const csVector3 * normal, float width=1.0f, float height=1.0f) = 0;
+  virtual bool CreateDecal(iDecalTemplate * decalTemplate, 
+    iSector * sector, const csVector3 & pos, const csVector3 & up, 
+    const csVector3 & normal, float width=1.0f, float height=1.0f) = 0;
 
   /**
    * Creates a decal template and fills it with default values.

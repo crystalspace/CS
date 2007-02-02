@@ -822,7 +822,7 @@ void test_decal ()
 
   // create the decal
   decalMgr->CreateDecal(decalTemplate, Sys->view->GetCamera()->GetSector(),
-	  &start, &up, &normal, 1.0f, 0.5f);
+	  start, up, normal, 1.0f, 0.5f);
 }
 
 void AttachRandomLight (iLight* light)

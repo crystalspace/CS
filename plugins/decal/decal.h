@@ -97,12 +97,12 @@ public:
   csDecal(iObjectRegistry * objectReg, iDecalManager * pManager);
   virtual ~csDecal();
 
-  void Initialize(csRef<iDecalTemplate> & decalTemplate, 
-      const csVector3& normal, const csVector3& pos, const csVector3& up, 
-      const csVector3& right, float width, float height);
+  void Initialize(iDecalTemplate * decalTemplate, 
+      const csVector3 & normal, const csVector3 & pos, const csVector3& up, 
+      const csVector3 & right, float width, float height);
   
-  void BeginMesh(iMeshWrapper* mesh);
-  virtual void AddStaticPoly(const csPoly3D& p);
+  void BeginMesh(iMeshWrapper * mesh);
+  virtual void AddStaticPoly(const csPoly3D & p);
   void EndMesh();
 
   bool Age(csTicks ticks);

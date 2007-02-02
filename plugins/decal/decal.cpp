@@ -68,9 +68,9 @@ csDecal::~csDecal()
   }
 }
 
-void csDecal::Initialize(csRef<iDecalTemplate> & decalTemplate, 
-    const csVector3& normal, const csVector3& pos, const csVector3& up, 
-    const csVector3& right, float width, float height)
+void csDecal::Initialize(iDecalTemplate * decalTemplate, 
+    const csVector3 & normal, const csVector3 & pos, const csVector3 & up, 
+    const csVector3 & right, float width, float height)
 {
   this->decalTemplate = decalTemplate;
     
@@ -89,7 +89,7 @@ void csDecal::Initialize(csRef<iDecalTemplate> & decalTemplate,
   life = 0;
 }
 
-void csDecal::BeginMesh(iMeshWrapper* mesh)
+void csDecal::BeginMesh(iMeshWrapper * mesh)
 {
   currMesh = 0;
 
@@ -138,7 +138,7 @@ void csDecal::BeginMesh(iMeshWrapper* mesh)
   currMesh = mesh;
 }
 
-void csDecal::AddStaticPoly(const csPoly3D& p)
+void csDecal::AddStaticPoly(const csPoly3D & p)
 {
   size_t a;
   unsigned int tri[3];

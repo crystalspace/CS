@@ -56,12 +56,12 @@ public:
 
   virtual bool Initialize(iObjectRegistry * objectReg);
 
-  virtual bool CreateDecal(csRef<iDecalTemplate> & decalTemplate, 
-      iSector * sector, const csVector3 * pos, const csVector3 * up, 
-      const csVector3 * normal, float width, float height);
+  virtual bool CreateDecal(iDecalTemplate * decalTemplate, 
+      iSector * sector, const csVector3 & pos, const csVector3 & up, 
+      const csVector3 & normal, float width, float height);
 
   virtual csRef<iDecalTemplate> CreateDecalTemplate(
-      iMaterialWrapper* material);
+      iMaterialWrapper * material);
 
   virtual void DeleteDecal(const iDecal * decal);
   virtual size_t GetDecalCount() const;

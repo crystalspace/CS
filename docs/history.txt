@@ -7,16 +7,7 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 2-Feb-2007
-        - Andrew Robberts added missing include/igeom/decal.h
-        - Andrew Robberts fixed copyright, interface versions, and comments
 	  for decals commit.
-	- Andrew Robberts added decal support and a decalmanager plugin
-	  to CS.  Decals are currently supported by thing and static
-	  genmeshes.
-	- Andrew Robberts added an InSphere function to poly3d to test 
-  	  if the poly is within a sphere.
-	- Andrew Robberts added the ability to attach arbitrary rendermeshes 
-	  with priority and zbufmodes to any iMeshWrapper.
 	- res worked around Cg not being properly detected on Linux when
 	  -Wl,--as-needed was passed in LDFLAGS.
 	- res correctly placed a comment in compiler.m4 and fixed the response
@@ -35,6 +26,16 @@ chronological order.
 	    - csImageBase
 	- Marten put back csArray::Length and csArray::SetLength but properly
 	  marked them deprecated.
+	- Andrew Robberts added the ability to attach arbitrary rendermeshes 
+	  with priority and zbufmodes to any iMeshWrapper.
+	- Andrew Robberts added an InSphere function to poly3d to test 
+  	  if the poly is within a sphere.
+	- Andrew Robberts added decal support and a decalmanager plugin
+	  to CS.  Decals are currently supported by thing and static
+	  genmeshes.
+        - Andrew Robberts fixed copyright, interface versions, and comments
+        - Andrew Robberts added missing include/igeom/decal.h
+	- Andrew Robberts fixed pointer and csRef references in decals.
 1-Feb-2007
 	- Marten fixed compilation of CS::DataBuffer on gcc.
 	- Marten made sure genmesh doesn't return any rendermeshes when

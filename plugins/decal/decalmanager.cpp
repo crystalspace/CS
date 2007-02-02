@@ -47,7 +47,7 @@ csDecalManager::csDecalManager(iBase * parent)
 
 csDecalManager::~csDecalManager()
 {
-  for (size_t a=0; a<decals.Length(); ++a)
+  for (size_t a=0; a<decals.GetSize(); ++a)
     delete decals[a];
 
   if (objectReg)
@@ -70,19 +70,19 @@ bool csDecalManager::Initialize(iObjectRegistry * objectReg)
   return true;
 }
 
-bool csDecalManager::CreateDecal(csRef<iDecalTemplate> & decalTemplate, 
-    iSector * sector, const csVector3 * pos, const csVector3 * up, 
-    const csVector3 * normal, float width, float height)
+bool csDecalManager::CreateDecal(iDecalTemplate * decalTemplate, 
+    iSector * sector, const csVector3 & pos, const csVector3 & up, 
+    const csVector3 & normal, float width, float height)
 {
   // compute the maximum distance the decal can reach
   float radius = sqrt(width*width + height*height) * 2.0f;
 
-  csVector3 n = normal->Unit();
+  csVector3 n = normal.Unit();
 
   // our generated up vector depends on the primary axis of the normal
-  csVector3 normalAxis = normal->UnitAxisClamped(); 
+  csVector3 normalAxis = normal.UnitAxisClamped(); 
 
-  csVector3 right = n % *up;
+  csVector3 right = n % up;
   csVector3 correctUp = right % n;
 
   if (!engine)
@@ -99,19 +99,19 @@ bool csDecalManager::CreateDecal(csRef<iDecalTemplate> & decalTemplate,
   // get all meshes that could be affected by this decal
   csDecal * decal = 0;
   csVector3 relPos;
-  csRef<iMeshWrapperIterator> it = engine->GetNearbyMeshes(sector, *pos, 
+  csRef<iMeshWrapperIterator> it = engine->GetNearbyMeshes(sector, pos, 
                                                            radius, true);
   if (!it->HasNext())
       return false;
 
   decal = new csDecal(objectReg, this);
-  decal->Initialize(decalTemplate, n, *pos, correctUp, right, width, height);
+  decal->Initialize(decalTemplate, n, pos, correctUp, right, width, height);
   decals.Push(decal);
   while (it->HasNext())
   {
     iMeshWrapper* mesh = it->Next();
     csVector3 relPos = 
-        mesh->GetMovable()->GetFullTransform().Other2This(*pos);
+        mesh->GetMovable()->GetFullTransform().Other2This(pos);
 
     decal->BeginMesh(mesh);
     mesh->GetMeshObject()->BuildDecal(&relPos, radius, 
