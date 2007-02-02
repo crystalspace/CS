@@ -101,7 +101,7 @@ csCommonImageFile::csCommonImageFile (iObjectRegistry* object_reg, int format)
   jobQueue = csQueryRegistryTagInterface<iJobQueue> (object_reg, queueTag);
   if (!jobQueue.IsValid())
   {
-    jobQueue.AttachNew (new csThreadJobQueue ());
+    jobQueue.AttachNew (new CS::Threading::ThreadedJobQueue ());
     object_reg->Register (jobQueue, queueTag);
   }
 #endif
@@ -190,7 +190,9 @@ const char* csCommonImageFile::DataTypeString (csLoaderDataType dataType)
   switch (dataType)
   {
     case rdtR8G8B8:
-      return "r8g8b8";
+      return "b8g8r8";
+    case rdtRGBpixel:
+      return "b8g8r8a8";
     default:
       return 0;
   }

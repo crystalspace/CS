@@ -6,6 +6,266 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+21-Dec-2006
+	- Genjix made a common plugin name for both implementations of joystick
+	  driver. Old method of loading them should slowly be deprecated.
+19-Dec-2006
+	- Genjix added fix to iEngine::CreateBlackTexture where it will return 0
+	  when a null pointer is passed for its name parameter.
+14-Dec-2006
+	- Jorrit fixed the xmlshader compiler and genmesh plugins so that
+	  they compile again if extensive memory debugging is enabled.
+	- Jorrit fixed a problem in VFS where it would sometimes do an
+	  allocation of 0 bytes.
+	- Marten fixed a nasty bug in lighter2 where the ray tracer would
+	  miss hits on 0 width kd-nodes.
+	- Marten rewrote how lighter2 avoids element self-shadowing.
+	- res removed the CS_FORMATTER_TYPENAME_QUALIFIER hack from
+	  formatter.h. Instead, 'typename' is used everywhere. Together with
+	  a missing 'template', this works on VC 7.0, VC 8.0, gcc 3.4 and
+	  gcc 4.1; hence very likely on all compilers we support. Addresses
+	  trac #197.
+13-Dec-2006
+	- res fixed the gl3d texture manager to upload Blit()ted data with the
+	  right target format.
+	- res fixed lighter2 to also perform the "genmesh submesh material
+	  fixup" for vertex-lit meshes.
+	- Jorrit fixed a bug in the engine which only surfaced after
+	  shader cleanup was added to iEngine->DeleteAll() recently. The
+	  engine would first load the standard shaders but then it would
+	  call DeleteAll() which would unload them again. Now the loading
+	  of the standard shaders is added to iEngine->DeleteAll() at the
+	  end so that after DeleteAll() we are always in a consistent
+	  state. This bug would cause (among other things) the foliage
+	  in terrainf to disappear.
+	- Marten blindly updated the linux and osx sound drivers to use new
+	  threading infrastructure.
+	- Marten fixed trac #218, ambiguous datatypes in lighter2.
+12-Dec-2006
+	- Jorrit did further texture manager improvements:
+	    - Made it possible to instantiate instances of
+	      csGLBasicTextureHandle by adding implementations of
+	      GetOriginalDimensions() and GetImageName() (needed
+	      to implement iTextureHandle).
+	    - Moved some code based on image type from
+	      csGLTextureHandle to csGLBasicTextureHandle.
+	    - Modified the various image loaders to also return "b8g8r8a8"
+	      in case of 32-bit rgba format for GetRawFormat().
+	- res fixed lighter2 to properly handle libraries.
+	- res changed lighter2 to also apply the exposure function to when
+	  doing per-vertex lighting.
+	- Marten added per-factory lightmap density setting to lighter2.
+	- Marten added support for <noshadow/> and <nolighting/> flags
+	  to lighter2.
+	- Marten rewrote all code in CS to use new threading subsystem.
+	- Marten deprecated csThread, csCondition and csMutex. Use the
+	  new threading subsystem in CS::Threading instead, the old ones
+	  will be deleted on later version.
+	- res fixed a bug in csPoly3D::SplitWithPlane(): when an empty poly 
+	  was split, the result polies stayed unchanged. So when a non-empty
+	  polygon was used to receive a result of an empty polygon splitting,
+	  it retained it's old vertices. The proper result values when 
+	  splitting an empty polygon are empty polygons.
+11-Dec-2006
+	- Jorrit added a new csImageType parameter to the currently
+	  unused and unimplemented iTextureManager->CreateTexture()
+	  function.
+        - Piotr fixed ref bug in odedynam.
+9-Dec-2006
+	- Marten removed the random sub-lumel sampling in the lighter2.
+	  It introduced more artifacts than it solved.
+	- Marten rewrote csNormalCalculator::CalculateNormals so that
+	  it is tessellation independent. Should fix some bugs where
+	  normals are wrong due to the way vertices are shared between
+	  triangles.
+	- Jorrit did further texture manager improvements:
+	    - Fixed DetermineTargetFormat() in gl texture manager so
+	      it understands the new *dxt1a format as well.
+	    - Split csGLTextureHandle into csGLTextureHandle and
+	      csGLBasicTextureHandle. csGLBasicTextureHandle is the
+	      version that doesn't know about textures. This is only
+	      an initial split. More work has to be done so that
+	      csGLBasicTextureHandle is actually useful for textures
+	      that have no image associated with them.
+8-Dec-2006
+        - Erroroman made an optimization in vproc skinning by defining
+          bones and indices buffer walkters globaly in the skin function.
+        - Erroroman precomputed bones position and matrices instead of
+          retrieving their values per vertex skin operation.
+	- Marten added a csShaderVariable::GetValue/SetValue pair that 
+	  takes csQuaternion. Avoids one extra copy when storing 
+	  quaternions.
+	- Jorrit did further texture manager improvements:
+	    - Cleaned up the code to transform a texture to GL format
+	      and used the new ConvertFormat2GL() function there.
+	- Jorrit did another small optimization to vproc_std by using
+	  the new GetValue() that accepts a csQuaternion.
+	- Jorrit fixed vproc_std so it compiles on VC. It is illegal
+	  to allocate dynamic sized arrays in C++. This is a gcc
+	  extension. Use CS_ALLOC_STACK_ARRAY instead.
+	- Jorrit did another small optimization to vproc_std.
+	- res refactored the DXT decoder in the DDS loader a bit.
+	- res updated used texture format specifier to match up with the 
+	  sanitized spec.
+	- res "split up" the *dxt1 texture format in *dxt1 (no alpha) and
+	  *dxt1a (with alpha).
+	- res fixed the "old texture cleaning" to also properly clean out
+	  PD light maps.
+7-Dec-2006
+	- Jorrit did further texture manager improvements:
+	    - Renamed 'starred' to 'special' in TextureFormatStrings.
+	    - TextureFormatStrings::ConvertCanonical() will now return
+	      an null string instead of "-" in case of error.
+	    - Made a first version of a function to convert a texture
+	      format into an OpenGL source format.
+	- Jorrit added a new 'loadmap' console command to walktest. This
+	  will clear out the engine and then load the new map. This command
+	  was added to expose several bugs related to completely cleaning
+	  the engine and then loading new maps again.
+	- Jorrit fixed a camera handling bug in the new 'loadmap' console
+	  command.
+	- Jorrit fixed the 'loadmap' command so that it also cleans the
+	  engine sequence manager. This is not done automatically by cleaning
+	  the engine.
+	- Marten made a few impovements to lighter2:
+	    - Changed lightmap post-processing to only run once on every
+	      lightmap, not once per object, per lightmap.
+	    - Added an disk file backed lightmap cache. Lighter2 will now keep
+	      at most a configurable amount of lightmaps (by default max 
+	      200MB) in memory during processing, spilling them out to z-lib
+	      compressed files on disk on demand.
+	- Marten made some fixes to the tui in lighter2. It now works
+	  sufficiently.
+6-Dec-2006
+	- Jorrit did further texture manager improvements:
+	    - Slightly cleaned up the GL texture manager.
+	    - Renamed TextureFormatStrings::CanonicalTextureFormat() to
+	      ConvertCanonical().
+	    - Added a new TextureFormatStrings::ConvertStructured() which
+	      takes a texture format string and converts it to a structured
+	      format (CS::StructuredTextureFormat class).
+	    - Jorrit changed TextureFormatStrings::CanonicalTextureFormat()
+	      to first convert to structured format and then calculate
+	      canonical from that.
+        - Erroroman fixed copy/paste error in vproc skinning, also optimized 
+          it by removing allocation of transform array for bones per frame.
+        - Erroroman fixed problem in vproc skinning where it could fail if
+          the weight of the first bone is 0 and the others weights are 
+          greater than 0.
+	- Marten commented out some debug-code in genmesh and instmesh.
+	- Marten added some initial configruation handling to lighter2.
+	  It now merges command line options into config manager and then
+	  load settings from config manager which allows for defaults in
+	  config-file and overrides on command line.
+	- Marten added a simpler output mode for lighter2. Activate with
+	  --simpletui command line parameter.
+5-Dec-2006
+	- Jorrit changed 'exprlib' into 'libexpr' for refering to
+	  previously loaded shader expressions.
+	- caedes added embedgl plugin, a 2d canvas for embedding cs on
+	  an existing gl context.
+	- Jorrit started a series of improvements to the texture manager:
+	    - Extended RegisterTexture() with an optional fail_reason
+	      string. That way users of RegisterTexture() can now find
+	      out why the texture didn't register.
+	    - Changed various places in CS to pass along the new fail_reason
+	      parameter and show that reason on the reporter in case of
+	      failure. Didn't change the places that were not already
+	      doing error checking. Probably those have to be checked
+	      in the future as well.
+	    - Added a new iTextureManager->CreateTexture(). This method
+	      will create a texture based on a desired texture format.
+	      At this moment it doesn't do anything yet. Just created
+	      stub implementations in all three renderers (OpenGL, software,
+	      and null renderer).
+	- Jorrit did further texture manager improvements:
+	    - iImage->GetRawFormat() must now return a string that is
+	      compatible with iTextureManager->CreateTexture(). Documented
+	      this and changed the dds image loader to return '*dxt1'
+	      instead of 'dxt1' (and others).
+	    - Also changed the GL renderer to react on '*dxt1' (and others)
+	      instead of 'dxt1'.
+	    - Added a new class CS::TextureFormatStrings and a static
+	      method called CanonicalTextureFormat() which converts a
+	      texture format string to a more canonical format (i.e.
+	      'rgba8' will be converted to 'r8g8b8a8_i').
+4-Dec-2006
+        - Piotr fixed bug in odedynam joints (when ball and amotor 
+          are used).
+	- res added support for gcc's "malloc" attribute.
+	- Jorrit fixed a bug in the engine. iEngine->DeleteAll() would not
+	  remove the shaders. Added iShaderManager->UnregisterShaders()
+	  to unregister all shaders.
+	- Jorrit changed csShaderExpressionAccessor to also implement iObject
+	  and iSelfDestruct.
+	- Jorrit added functions to iShaderManager to add named shader
+	  variable accessors.
+	- Jorrit fixed csEngine::CreatePortal() so that it works as
+	  intended.
+	- Jorrit added support for a <shaderexpressions> block in the world
+	  file. By doing that one can preload shader expressions and then
+	  reuse them easily on other things. At least... one can preload
+	  shader expressions but there is no way yet to use them as
+	  shader variables through xml. That's next commit.
+	- Jorrit added support for specifying a shadervar from an expression
+	  library:
+	  	<shadervar name="..." type="exprlib" exprname="..." />
+	  Added a currently not-doing-anything example to flarge.
+3-Dec-2006
+	- Marten made a few fixes to lighter2:
+	   - Worked around a bug when lightmap uv-layout code created a new
+	     submesh.
+	   - Unified function signatures in directlight.cpp.
+	- res fixed an issue in OpenGL R2T: the canvas clipping rect was only
+	  updated when all coordinates are different in comparison to the rect
+	  needed for the texture, while the rect needs to change when only
+	  one coordinate is different.
+	- Marten properly fixed the bug in lighter2 related to uv-layout code 
+	  creating new submeshes.
+2-Dec-2006
+	- Marten rewrote the direct lighting in lighter2 in a way so that
+	  it works better in combination with possible path tracing and/or
+	  photon mapping.
+	- res fixed a bug in lighter2 where data stored in two arrays could
+	  get out of sync.
+	- res fixed a crash in csEngine::CreatePortal() introduced in r25992.
+	- res fixed the "search existing portal container" logic in 
+	  csEngine::CreatePortal() to actually work. Previously it would 
+	  always create a portal container since the found mesh would be 
+	  stored in the wrong variable.
+	- res changed the names of the lighter2 lightmap layouter classes to 
+	  be less confusing.
+	- res fixed genmesify to handle <library path="..." file="..." />-
+	  style library tags. Fixes trac #201.
+1-Dec-2006
+	- Jorrit fixed a bug in the light code: The LSI system
+	  (LightSectorInfluence) ignored lights that were part of a scene
+	  node hierarchy.
+	- Jorrit extended the iLightManager with a GetRelevantLights() that
+	  works on a sector instead of a mesh.
+	- Jorrit fixed the light iterator step so that it uses the
+	  lightmanager now. That way it also catches lights that are part
+	  of a scene node. This fixes lighting for diffuse and related
+	  renderloops for parented lights.
+29-Nov-2006
+	- caedes made the following changes to swig interface files:
+	    - Added iEngineSequenceManager, iDocumentAttribute, 
+	      iDocumentAttributeIterator, iDocumentNode and 
+	      iDocumentNodeIterator to wrapped interfaces.
+	    - Added an (empty) ITERATOR_FUNTIONS swig macro in cspace.i so
+	      each language can redefine it for implementing language specific
+	      iterator protocol.
+	    - Implemented the ITERATOR_FUNTIONS swig macro for python.
+	    - Added iterator functions for iDocumentAttributeIterator and
+	      iDocumentNodeIterator.
+	    - Added %ignore for CS::TriangleT [] operator so swig doesnt emit
+	      a warning for it.
+	    - Added %extend for csTriangle implementing [] notation in python.
+	    - Added the iterator declaration for some more useful classes:
+	      - iVisibilityObjectIterator, iLightIterator, iSectorIterator,
+	        iMeshWrapperIterator.
+	- Vincent fixed ref-tracker enabled debug build by adding a header.
+	- Vincent added a few missing CS_LEAKGUARD_IMPLEMENT statements.
 28-Nov-2006
 	- Andrew Dai fixed a bug that's been lurking in csColliderActor::Move
 	  from the beginning of time. This occasionally allowed actors to pass
@@ -179,8 +439,8 @@ chronological order.
 10-Nov-2006
 	- Jorrit again disabled techniques 150 for character2 and
 	  character_bump2 since they are still giving problems:
-	  	- Not working lighting on linux/ATI
-		- Corrupted lighting on Intel Graphics
+	    - Not working lighting on linux/ATI
+	    - Corrupted lighting on Intel Graphics
 	- Jorrit changed iSndSysWrapper to keep track of iSndSysData
 	  instead (but see later) of iSndSysStream. The idea is that
 	  a sound object should only care about the sound data and

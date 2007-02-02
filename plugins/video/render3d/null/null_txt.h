@@ -100,9 +100,11 @@ public:
   int GetTextureFormat ()
   { return CS_IMGFMT_TRUECOLOR | CS_IMGFMT_ALPHA; }
 
-  ///
-  virtual csPtr<iTextureHandle> RegisterTexture (iImage* image, int flags);
-  ///
+  virtual csPtr<iTextureHandle> RegisterTexture (iImage* image, int flags,
+      iString* fail_reason = 0);
+  virtual csPtr<iTextureHandle> CreateTexture (int w, int h,
+      csImageType imagetype, const char* format, int flags,
+      iString* fail_reason = 0);
   virtual void UnregisterTexture (csTextureHandleNull* handle);
 
   virtual csPtr<iSuperLightmap> CreateSuperLightmap(int w, int h);

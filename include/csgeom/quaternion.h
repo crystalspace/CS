@@ -62,6 +62,17 @@ public:
   csQuaternion (const csQuaternion& q)
     : v (q.v), w (q.w)
   {}
+
+  /**
+   * Set the components
+   */
+  inline void Set (float x, float y, float z, float w)
+  {
+    v.x = x;
+    v.y = y; 
+    v.z = z;
+    this->w = w;
+  }
   
   /// Set quaternion to identity rotation
   inline void SetIdentity () 

@@ -24,6 +24,7 @@
 #include "csutil/stringarray.h"
 #include "csutil/event.h"
 #include "csutil/eventnames.h"
+#include "csutil/scfstr.h"
 #include "csgfx/imagememory.h"
 #include "iutil/objreg.h"
 #include "iutil/eventq.h"
@@ -208,12 +209,15 @@ bool csCursor::HandleEvent (iEvent &ev)
 	ci->image = newImage;
 
 	// Create texture 
+        csRef<scfString> fail_reason;
+        fail_reason.AttachNew (new scfString ());
 	csRef<iTextureHandle> txt = txtmgr->RegisterTexture (ci->image, 
-	  CS_TEXTURE_2D);
+	  CS_TEXTURE_2D, fail_reason);
 	if (!txt)
 	{ 
 	  csReport (reg, CS_REPORTER_SEVERITY_ERROR, CURSOR_SCF_NAME,
-		    "Could not register texture for cursor %s, ignoring", name);
+		    "Could not register texture for cursor %s (%s), ignoring",
+		    name, fail_reason->GetData ());
 	  RemoveCursor (name);
 	  return false;
 	}

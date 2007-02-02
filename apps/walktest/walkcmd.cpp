@@ -41,6 +41,7 @@
 #include "iengine/sector.h"
 #include "iengine/sharevar.h"
 #include "iengine/scenenode.h"
+#include "iengine/campos.h"
 #include "igeom/clip2d.h"
 #include "igraphic/imageio.h"
 #include "imap/loader.h"
@@ -57,6 +58,7 @@
 #include "ivaria/pmeter.h" 
 #include "ivaria/reporter.h"
 #include "ivaria/view.h"
+#include "ivaria/engseq.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/material.h"
@@ -936,7 +938,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     CONPRI("  coordsave coordload bind p_alpha s_fog");
     CONPRI("  snd_play snd_volume record play playonce clrrec saverec");
     CONPRI("  loadrec action plugins conflist confset do_logo");
-    CONPRI("  varlist var setvar setvarv setvarc");
+    CONPRI("  varlist var setvar setvarv setvarc loadmap");
     CONPRI("  saveworld");
 
 #   undef CONPRI
@@ -1487,11 +1489,72 @@ bool CommandHandler (const char *cmd, const char *arg)
       Sys->view->GetCamera ()->GetSector ()->SetFog (f);
     }
   }
+  else if (!csStrCaseCmp (cmd, "loadmap"))
+  {
+    if (arg)
+    {
+      char level[300];
+      csScanStr (arg, "%s", level);
+      if (!Sys->SetMapDir (level))
+      {
+        Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
+      	  "Couldn't open level '%s'!", level);
+	return false;
+      }
+      csRef<iEngineSequenceManager> engseq = csQueryRegistry<
+	iEngineSequenceManager> (Sys->object_reg);
+      if (engseq)
+      {
+	engseq->RemoveTriggers ();
+	engseq->RemoveSequences ();
+      }
+      Sys->Engine->DeleteAll ();
+      Sys->Engine->SetVFSCacheManager ();
+      if (!Sys->LevelLoader->LoadMapFile ("world"))
+      {
+        Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
+      	  "Couldn't load level '%s'!", level);
+	return false;
+      }
+      Sys->Engine->Prepare ();
+      // Look for the start sector in this map.
+      bool camok = false;
+      if (!camok && Sys->Engine->GetCameraPositions ()->GetCount () > 0)
+      {
+        iCameraPosition *cp = Sys->Engine->GetCameraPositions ()->Get (0);
+        if (cp->Load(Sys->views[0]->GetCamera (), Sys->Engine) &&
+	    cp->Load(Sys->views[1]->GetCamera (), Sys->Engine))
+	  camok = true;
+      }
+      if (!camok)
+      {
+        iSector* room = Sys->Engine->GetSectors ()->FindByName ("room");
+        if (room)
+        {
+	  Sys->views[0]->GetCamera ()->SetSector (room);
+	  Sys->views[1]->GetCamera ()->SetSector (room);
+	  Sys->views[0]->GetCamera ()->GetTransform ().SetOrigin (
+	      csVector3 (0, 0, 0));
+	  Sys->views[1]->GetCamera ()->GetTransform ().SetOrigin (
+	      csVector3 (0, 0, 0));
+	  camok = true;
+        }
+      }
+      if (!camok)
+      {
+        Sys->Report (CS_REPORTER_SEVERITY_ERROR,
+          "Map does not contain a valid starting point!\n"
+          "Try adding a room called 'room' or a START keyword");
+        return false;
+      }
+      Sys->InitCollDet (Sys->Engine, 0);
+    }
+  }
   else if (!csStrCaseCmp (cmd, "portal"))
   {
     if (arg)
     {
-      char level[100];
+      char level[300];
       csScanStr (arg, "%s", level);
       void OpenPortal (iLoader*, iView* view, char* lev);
       OpenPortal (Sys->LevelLoader, Sys->view, level);

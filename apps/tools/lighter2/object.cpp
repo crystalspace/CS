@@ -18,8 +18,6 @@
 
 #include "crystalspace.h"
 
-#include <algorithm>
-
 #include "common.h"
 #include "lighter.h"
 #include "lightmap.h"
@@ -27,36 +25,37 @@
 #include "object.h"
 #include "config.h"
 
-// Debugging: uncomment to disable border smoothing
-//#define NOSMOOTH
-
 namespace lighter
 {
 
   ObjectFactory::ObjectFactory ()
-    : lightmapMaskArrayValid (false), factoryWrapper (0), 
-      lightPerVertex (false)
+    : factoryWrapper (0), lightPerVertex (false),
+    lmuScale (globalConfig.GetLMProperties ().uTexelPerUnit),
+    lmvScale (globalConfig.GetLMProperties ().vTexelPerUnit)
   {
   }
 
-  bool ObjectFactory::PrepareLightmapUV (LightmapUVLayouter* uvlayout)
+  bool ObjectFactory::PrepareLightmapUV (LightmapUVFactoryLayouter* uvlayout)
   {
-    size_t oldSize = allPrimitives.GetSize();
+    BeginSubmeshRemap ();
+    size_t oldSize = unlayoutedPrimitives.GetSize();
     for (size_t i = 0; i < oldSize; i++)
     {
       csArray<PrimitiveArray> newPrims;
-      LightmapUVLayoutFactory* lightmaplayout = 
-        uvlayout->LayoutFactory (allPrimitives[i], vertexData, newPrims);
+      csRef<LightmapUVObjectLayouter> lightmaplayout = 
+        uvlayout->LayoutFactory (unlayoutedPrimitives[i], vertexData, this, newPrims);
       if (!lightmaplayout) return false;
 
       for (size_t n = 0; n < newPrims.GetSize(); n++)
       {
-        allPrimitives.Push (newPrims[n]);
-        lightmaplayouts.Push (lightmaplayout);
-        lightmaplayoutGroups.Push (n);
+        layoutedPrimitives.Push (LayoutedPrimitives (newPrims[n],
+          lightmaplayout, n));
+
+        AddSubmeshRemap (i, layoutedPrimitives.GetSize () - 1);
       }
     }
-    while (oldSize-- > 0) allPrimitives.DeleteIndexFast (oldSize);
+    unlayoutedPrimitives.DeleteAll();
+    FinishSubmeshRemap ();
 
     return true;
   }
@@ -70,7 +69,9 @@ namespace lighter
   {
     this->factoryWrapper = factory;
     // Get the name
-    this->factoryName = factoryWrapper->QueryObject ()->GetName ();
+    this->factoryName = factoryWrapper->QueryObject ()->GetName ();   
+
+
     csRef<iObjectIterator> objiter = 
       factoryWrapper->QueryObject ()->GetIterator();
     while (objiter->HasNext())
@@ -83,6 +84,17 @@ namespace lighter
         const char* vVertexlight = kvp->GetValue ("vertexlight");
         if (vVertexlight != 0)
           lightPerVertex = (strcmp (vVertexlight, "yes") == 0);
+
+        const char* vLMScale = kvp->GetValue ("lmscale");
+        if (vLMScale)
+        {
+          float u=0,v=0;
+          if (sscanf (vLMScale, "%f;%f", &u, &v) == 2)
+          {
+            lmuScale = u;
+            lmvScale = v;
+          }
+        }
       }
     }
   }
@@ -98,11 +110,37 @@ namespace lighter
       saverPluginName);
     if (saver) 
     {
-      // Make sure to remove old params node
+      // Write new mesh
       csRef<iDocumentNode> paramChild = node->GetNode ("params");
-      if (paramChild) node->RemoveNode (paramChild);
       saver->WriteDown(factoryWrapper->GetMeshObjectFactory (), node,
-      	0/*ssource*/);
+        0/*ssource*/);
+      if (paramChild) 
+      {
+        // Move all nodes after the old params node to after the new params node
+        csRef<iDocumentNodeIterator> nodes = node->GetNodes();
+        while (nodes->HasNext())
+        {
+          csRef<iDocumentNode> child = nodes->Next();
+          if (child->Equals (paramChild)) break;
+        }
+        // Skip <params>
+        if (nodes->HasNext()) 
+        {
+          // Actual moving
+          while (nodes->HasNext())
+          {
+            csRef<iDocumentNode> child = nodes->Next();
+            if ((child->GetType() == CS_NODE_ELEMENT)
+              && (strcmp (child->GetValue(), "params") == 0))
+              break;
+            csRef<iDocumentNode> newNode = node->CreateNodeBefore (
+              child->GetType(), 0);
+            CS::DocumentHelper::CloneNode (child, newNode);
+            node->RemoveNode (child);
+          }
+        }
+        node->RemoveNode (paramChild);
+      }
     }
   }
 
@@ -130,9 +168,9 @@ namespace lighter
     vertexData.Transform (transform);
 
     unsigned int i = 0;
-    for(size_t j = 0; j < factory->allPrimitives.GetSize (); ++j)
+    for(size_t j = 0; j < factory->layoutedPrimitives.GetSize (); ++j)
     {
-      PrimitiveArray& factPrims = factory->allPrimitives[j];
+      PrimitiveArray& factPrims = factory->layoutedPrimitives[j].primitives;
       PrimitiveArray& allPrimitives =
         this->allPrimitives.GetExtend (j);
       for (i = 0; i < factPrims.GetSize(); i++)
@@ -148,8 +186,9 @@ namespace lighter
       if (!lightPerVertex)
       {
         // FIXME: probably separate out to allow for better progress display
-        bool res = factory->lightmaplayouts[j]->LayoutUVOnPrimitives (
-          allPrimitives, factory->lightmaplayoutGroups[j], vertexData, 
+        bool res = 
+          factory->layoutedPrimitives[j].factory->LayoutUVOnPrimitives (
+          allPrimitives, factory->layoutedPrimitives[j].group, vertexData, 
           lightmapIDs.GetExtend (j));
         if (!res) return false;
       }
@@ -226,6 +265,13 @@ namespace lighter
   void Object::ParseMesh (iMeshWrapper *wrapper)
   {
     this->meshWrapper = wrapper;
+
+    const csFlags& meshFlags = wrapper->GetFlags ();
+    if (meshFlags.Check (CS_ENTITY_NOSHADOWS))
+      objFlags.Set (OBJECT_FLAG_NOSHADOW);
+    if (meshFlags.Check (CS_ENTITY_NOLIGHTING))
+      objFlags.Set (OBJECT_FLAG_NOLIGHT);
+
     this->meshName = wrapper->QueryObject ()->GetName ();
     csRef<iObjectIterator> objiter = 
       wrapper->QueryObject ()->GetIterator();
@@ -240,25 +286,6 @@ namespace lighter
         if (vVertexlight != 0)
           lightPerVertex = (strcmp (vVertexlight, "yes") == 0);
       }
-    }
-  }
-
-  static void CloneNode (iDocumentNode* from, iDocumentNode* to)
-  {
-    to->SetValue (from->GetValue ());
-    csRef<iDocumentNodeIterator> it = from->GetNodes ();
-    while (it->HasNext ())
-    {
-      csRef<iDocumentNode> child = it->Next ();
-      csRef<iDocumentNode> child_clone = to->CreateNodeBefore (
-    	  child->GetType (), 0);
-      CloneNode (child, child_clone);
-    }
-    csRef<iDocumentAttributeIterator> atit = from->GetAttributes ();
-    while (atit->HasNext ())
-    {
-      csRef<iDocumentAttribute> attr = atit->Next ();
-      to->SetAttribute (attr->GetName (), attr->GetValue ());
     }
   }
 
@@ -297,7 +324,7 @@ namespace lighter
               break;
             csRef<iDocumentNode> newNode = node->CreateNodeBefore (
               child->GetType(), 0);
-            CloneNode (child, newNode);
+            CS::DocumentHelper::CloneNode (child, newNode);
             node->RemoveNode (child);
           }
         }
@@ -306,18 +333,9 @@ namespace lighter
     }
   }
 
-  void Object::FixupLightmaps (csArray<LightmapPtrDelArray*>& lightmaps)
+  void Object::FillLightmapMask (LightmapMaskArray& masks)
   {
     if (lightPerVertex) return;
-
-    //Create one
-    LightmapMaskArray masks;
-    LightmapPtrDelArray::Iterator lmIt = lightmaps[0]->GetIterator ();
-    while (lmIt.HasNext ())
-    {
-      const Lightmap* lm = lmIt.Next ();
-      masks.Push (LightmapMask (*lm));
-    }
 
     float totalArea = 0;
 
@@ -343,7 +361,7 @@ namespace lighter
           for (uint u = minu; u <= (uint)maxu; u++, findex++)
           {
             const float elemArea = prim.GetElementAreas ()[findex];
-            if (elemArea < FLT_EPSILON) continue; // No area, skip
+            if (elemArea == 0) continue; // No area, skip
 
             mask.maskData[vindex+u] += elemArea * area2pixel; //Accumulate
           }
@@ -351,94 +369,7 @@ namespace lighter
       }
     }
 
-    // Ok, here we are sure to have a mask
-    
-    // Un-antialias
-    uint i;
-#ifndef DUMP_NORMALS
-    for (size_t l = 0; l < lightmaps.GetSize (); l++)
-    {
-      for (i = 0; i < lightmaps[l]->GetSize(); i++)
-      {
-        csColor* lmData = lightmaps[l]->Get (i)->GetData ().GetArray ();
-        const float* mmData = masks[i].maskData.GetArray ();
-        const size_t size = lightmaps[l]->Get (i)->GetData ().GetSize ();
-
-        for (uint j = 0; j < size; j++, lmData++, mmData++)
-        {
-          if (*mmData < FLT_EPSILON || *mmData >= 1.0f) continue;
-
-          *lmData *= (1.0f / *mmData);
-        }
-      }
-    }
-#endif
-
-#ifndef NOSMOOTH
-    // Do the filtering
-    for (size_t l = 0; l < lightmaps.GetSize (); l++)
-    {
-      for (i = 0; i < lightmaps[l]->GetSize(); i++)
-      {
-        csColor* lmData = lightmaps[l]->Get (i)->GetData ().GetArray ();
-        const float* mmData = masks[i].maskData.GetArray ();
-              
-        uint lmw = lightmaps[l]->Get (i)->GetWidth ();
-        uint lmh = lightmaps[l]->Get (i)->GetHeight ();
-        
-        for (uint v = 0; v < lmh; v++)
-        {
-          // now scan over the row
-          for (uint u = 0; u < lmw; u++)
-          {
-            const uint idx = v*lmw+u;
-            
-            // Only try to fix non-masked
-            if (mmData[idx]>0) continue;
-
-            uint count = 0;
-            csColor newColor (0.0f,0.0f,0.0f);
-
-            // We have a row above to use
-            if (v > 0)
-            {
-              // We have a column to the left
-              if (u > 0 && mmData[(v-1)*lmw+(u-1)] > FLT_EPSILON) newColor += lmData[(v-1)*lmw+(u-1)], count++;
-              if (mmData[(v-1)*lmw+(u)] > FLT_EPSILON) newColor += lmData[(v-1)*lmw+(u)], count++;
-              if (u < lmw-1 && mmData[(v-1)*lmw+(u+1)] > FLT_EPSILON) newColor += lmData[(v-1)*lmw+(u+1)], count++;
-            }
-
-            //current row
-            if (u > 0 && mmData[v*lmw+(u-1)] > FLT_EPSILON) newColor += lmData[v*lmw+(u-1)], count++;
-            if (u < lmw-1 && mmData[v*lmw+(u+1)] > FLT_EPSILON) newColor += lmData[v*lmw+(u+1)], count++;
-
-            // We have a row below
-            if (v < (lmh-1))
-            {
-              if (u > 0 && mmData[(v+1)*lmw+(u-1)] > FLT_EPSILON) newColor += lmData[(v+1)*lmw+(u-1)], count++;
-              if (mmData[(v+1)*lmw+(u)] > FLT_EPSILON) newColor += lmData[(v+1)*lmw+(u)], count++;
-              if (u < lmw-1 && mmData[(v+1)*lmw+(u+1)] > FLT_EPSILON) newColor += lmData[(v+1)*lmw+(u+1)], count++;
-            }
-
-            if (count > 0) 
-            {
-#ifndef DUMP_NORMALS
-              newColor *= (1.0f/count);
-#else
-              csVector3 v (
-                newColor.red*2.0f-float (count), 
-                newColor.green*2.0f-float (count), 
-                newColor.blue*2.0f-float (count));
-              v.Normalize();
-              newColor.Set (v.x*0.5f+0.5f, v.y*0.5f+0.5f, v.z*0.5f+0.5f);
-#endif
-              lmData[idx] = newColor;
-            }
-          }
-        }
-      }
-    }
-#endif // NOSMOOTH
   }
+
 
 }

@@ -27,7 +27,7 @@
 #include "csutil/callstack.h"
 #include "csutil/hash.h"
 #include "csutil/scf_implementation.h"
-#include "csutil/thread.h"
+#include "csutil/threading/mutex.h"
 
 class CS_CRYSTALSPACE_EXPORT csRefTracker : 
   public scfImplementation1<csRefTracker, iRefTracker>
@@ -70,8 +70,8 @@ class CS_CRYSTALSPACE_EXPORT csRefTracker :
     RefInfo* ri;
   };
   csArray<OldRefInfo> oldData;
-  //csRef<csMutex> mutex;
-  csMutex* mutex;
+  
+  CS::Threading::RecursiveMutex mutex;
   
   RefInfo& GetObjRefInfo (void* obj);
 

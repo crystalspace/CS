@@ -27,6 +27,7 @@
 #include "csextern.h"
 
 #include "csgeom/math.h"
+#include "csgeom/quaternion.h"
 #include "csgeom/transfrm.h"
 #include "csgeom/vector2.h"
 #include "csgeom/vector3.h"
@@ -261,6 +262,14 @@ public:
     return true; 
   }
 
+  /// Retrieve a csQuaternion
+  bool GetValue (csQuaternion& value)
+  { 
+    if (accessor) accessor->PreGetValue (this);
+    value.Set (VectorValue.x, VectorValue.y, VectorValue.z, VectorValue.w);
+    return true; 
+  }
+
   /// Retrieve a csMatrix3
   bool GetValue (csMatrix3& value)
   {
@@ -382,6 +391,13 @@ public:
     VectorValue.Set (value.x, value.y, value.z, value.w);
     Int = (int)value.x;
     return true; 
+  }
+
+  bool SetValue (const csQuaternion& value)
+  {
+    Type = VECTOR4;
+    VectorValue.Set (value.v.x, value.v.y, value.v.z, value.w);
+    return true;
   }
 
   /// Store a csMatrix3

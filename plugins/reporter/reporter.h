@@ -24,7 +24,7 @@
 #include "csutil/scf_implementation.h"
 #include "csutil/parray.h"
 #include "csutil/refarr.h"
-#include "csutil/scopedmutexlock.h"
+#include "csutil/threading/mutex.h"
 #include "ivaria/reporter.h"
 
 /**
@@ -48,7 +48,7 @@ class csReporter :
   public scfImplementation2<csReporter, iReporter, iComponent>
 {
 private:
-  csRef<csMutex> mutex;
+  CS::Threading::RecursiveMutex mutex;
   iObjectRegistry *object_reg;
   csPDelArray<csReporterMessage> messages;
   csRefArray<iReporterListener> listeners;

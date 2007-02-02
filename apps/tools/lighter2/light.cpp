@@ -22,6 +22,7 @@
 #include "common.h"
 #include "light.h"
 #include "raytracer.h"
+#include "kdtree.h"
 
 // Attenuation functions
 static float LightAttnNone (float, const csVector3&);
@@ -61,12 +62,92 @@ namespace lighter
   }
 
 
-  bool VisibilityTester::Unoccluded (Raytracer& rt)
+  //--
+  VisibilityTester::VisibilityTester ()
   {
-    return true;
   }
 
+  void VisibilityTester::SetSegment (const csVector3& start, const csVector3& end)
+  {
+    csVector3 dir = end-start;
+    float d = dir.Norm ();
+
+    SetSegment (start, dir / d, d);
+  }
+
+  void VisibilityTester::SetSegment (const csVector3& start, const csVector3& dir,
+    float maxL)
+  {
+    testRay.origin = start;
+    testRay.direction = dir;
+    //testRay.minLength = FLT_EPSILON;
+    //testRay.maxLength = maxL * (1.0f - FLT_EPSILON);
+    testRay.maxLength = maxL - FLT_EPSILON*10.0f;
+    testRay.ignoreFlags = KDPRIM_FLAG_NOSHADOW; // Ignore primitives that don't cast shadows
+  }
+
+  bool VisibilityTester::Unoccluded (Raytracer& rt, const Primitive* ignorePrim)
+  {
+    HitPoint hp;
+    testRay.ignorePrimitive = ignorePrim;
+    return !rt.TraceAnyHit (testRay, hp);
+  }
+
+
+
+  //--
+  PointLight::PointLight ()
+    : Light (true)
+  {
+
+  }
+
+  PointLight::~PointLight ()
+  {
+
+  }
+
+  csColor PointLight::SampleLight (const csVector3& point, const csVector3& n,
+    float u1, float u2, csVector3& lightVec, float& pdf, VisibilityTester& vistest)
+  {
+    lightVec = position - point;
+    float sqD = lightVec.SquaredNorm ();
+    float d = sqrtf (sqD);
+    lightVec /= d;
+
+    pdf = 1;
+
+    vistest.SetSegment (position, -lightVec, d);
+
+    csColor res = color * ComputeAttenuation (sqD);
+
+    return res;
+  }
+
+  csColor PointLight::GetPower () const
+  {
+    return color;
+  }
+
+  void PointLight::SetRadius (float r)
+  {
+    radius = r;
+    //Update bb
+  }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 // Attenuation functions

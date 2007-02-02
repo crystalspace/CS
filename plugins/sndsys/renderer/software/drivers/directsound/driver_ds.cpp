@@ -298,7 +298,7 @@ bool SndSysDriverDirectSound::StartThread()
 
   m_bRunning=true;
   SndSysDriverRunnable* pRunnable = new SndSysDriverRunnable (this);
-  m_pBackgroundThread = csThread::Create(pRunnable);
+  m_pBackgroundThread.AttachNew (new CS::Threading::Thread (pRunnable, false));
   pRunnable->DecRef ();
 
   m_pBackgroundThread->Start();

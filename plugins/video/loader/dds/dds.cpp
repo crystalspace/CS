@@ -24,25 +24,12 @@
 #include "csutil/csendian.h"
 #include "dds.h"
 
+#include "dxt.h"
+
 CS_PLUGIN_NAMESPACE_BEGIN(DDSImageIO)
 {
 namespace dds
 {
-
-struct Color8888
-{
-  unsigned char r,g,b,a;
-};
-
-static inline int ColorComponent (int x, int bitcount, int shift)
-{
-  int val = ((x >> shift) & ((1 << bitcount) - 1));
-  return (val << (8 - bitcount)) + (val >> (2 * bitcount - 8));
-}
-
-#define COLOR565_RED(x)	    ColorComponent(x, 5, 11)
-#define COLOR565_GREEN(x)   ColorComponent(x, 6, 5)
-#define COLOR565_BLUE(x)    ColorComponent(x, 5, 0)
 
 bool Loader::ProbeDXT1Alpha (const uint8* source, int w, int h, int depth, 
 			     size_t /*size*/)
@@ -76,11 +63,9 @@ void Loader::DecompressDXT1 (csRGBpixel* buffer, const uint8* source,
 			     int Width, int Height, int depth, 
 			     size_t planesize)
 {
-  int          x, y, z, i, j, k, Select;
-  unsigned char *Temp;
-  uint16       color_0, color_1;
-  Color8888    colours[4];
-  uint32       bitmask;
+  int          x, y, z, i, j;
+  uint8 *Temp;
+  DXTDecompress::Color8888    colorBlock[16];
   size_t       Offset;
 
   Temp = (unsigned char*) source;
@@ -90,61 +75,15 @@ void Loader::DecompressDXT1 (csRGBpixel* buffer, const uint8* source,
     {
       for (x = 0; x < Width; x += 4) 
       {
-	color_0 = csLittleEndian::Convert (*((uint16*)Temp)); 
-	color_1 = csLittleEndian::Convert (*((uint16*)Temp+1));
-	bitmask = csLittleEndian::Convert (((uint32*)Temp)[1]);
-	Temp += 8;
+        DXTDecompress::DecodeDXT1Color<true> (Temp, colorBlock);
+        Temp += 8;
 
-	colours[0].r = COLOR565_RED(color_0); 
-	colours[0].g = COLOR565_GREEN(color_0);
-	colours[0].b = COLOR565_BLUE(color_0); 
-	colours[0].a = 0xFF;
-
-	colours[1].r = COLOR565_RED(color_1); 
-	colours[1].g = COLOR565_GREEN(color_1);
-	colours[1].b = COLOR565_BLUE(color_1);
-	colours[1].a = 0xFF;
-
-	if (color_0 > color_1) 
+        const DXTDecompress::Color8888* colorPtr = colorBlock;
+	for (j = 0; j < 4; j++) 
 	{
-	  // Four-color block: derive the other two colors.
-	  // 00 = color_0, 01 = color_1, 10 = color_2, 11 = color_3
-	  // These 2-bit codes correspond to the 2-bit fields
-	  // stored in the 64-bit block.
-	  colours[2].b = (2 * colours[0].b + colours[1].b + 1) / 3;
-	  colours[2].g = (2 * colours[0].g + colours[1].g + 1) / 3;
-	  colours[2].r = (2 * colours[0].r + colours[1].r + 1) / 3;
-	  colours[2].a = 0xFF;
-
-	  colours[3].b = (colours[0].b + 2 * colours[1].b + 1) / 3;
-	  colours[3].g = (colours[0].g + 2 * colours[1].g + 1) / 3;
-	  colours[3].r = (colours[0].r + 2 * colours[1].r + 1) / 3;
-	  colours[3].a = 0xFF;
-	}
-	else 
-	{
-	  // Three-color block: derive the other color.
-	  // 00 = color_0,  01 = color_1,  10 = color_2,
-	  // 11 = transparent.
-	  // These 2-bit codes correspond to the 2-bit fields
-	  // stored in the 64-bit block.
-	  colours[2].b = (colours[0].b + colours[1].b) / 2;
-	  colours[2].g = (colours[0].g + colours[1].g) / 2;
-	  colours[2].r = (colours[0].r + colours[1].r) / 2;
-	  colours[2].a = 0xFF;
-
-	  colours[3].b = (colours[0].b + 2 * colours[1].b + 1) / 3;
-	  colours[3].g = (colours[0].g + 2 * colours[1].g + 1) / 3;
-	  colours[3].r = (colours[0].r + 2 * colours[1].r + 1) / 3;
-	  colours[3].a = 0x00;
-	}
-
-	for (j = 0, k = 0; j < 4; j++) 
-	{
-	  for (i = 0; i < 4; i++, k++) 
+	  for (i = 0; i < 4; i++) 
 	  {
-	    Select = (bitmask & (0x03 << k*2)) >> k*2;
-	    const Color8888& col = colours[Select];
+	    const DXTDecompress::Color8888& col = *colorPtr++;
 
 	    if (((x + i) < Width) && ((y + j) < Height)) 
 	    {
@@ -176,11 +115,9 @@ void Loader::DecompressDXT3(csRGBpixel* buffer, const uint8* source,
 			    int Width, int Height, int depth, 
 			    size_t planesize)
 {
-  int           x, y, z, i, j, k, Select;
+  int           x, y, z, i, j;
   uint16        *Temp;
-  uint16        color_0, color_1;
-  Color8888     colours[4];
-  uint32        bitmask;
+  DXTDecompress::Color8888    colorBlock[16];
   size_t	Offset;
   uint16	word;
   DXTAlphaBlockExplicit alpha;
@@ -197,42 +134,15 @@ void Loader::DecompressDXT3(csRGBpixel* buffer, const uint8* source,
 	alpha.row[2] = csLittleEndian::Convert (Temp[2]);
 	alpha.row[3] = csLittleEndian::Convert (Temp[3]);
 	Temp += 4;
-	color_0 = csLittleEndian::Convert (*Temp);
-	color_1 = csLittleEndian::Convert (*(Temp+1));
-	bitmask = csLittleEndian::Convert (((uint32*)Temp)[1]);
+        DXTDecompress::DecodeDXT1Color<false> ((uint8*)Temp, colorBlock);
 	Temp += 4;
 
-	colours[0].r = COLOR565_RED(color_0); 
-	colours[0].g = COLOR565_GREEN(color_0);
-	colours[0].b = COLOR565_BLUE(color_0); 
-	colours[0].a = 0xFF;
-
-	colours[1].r = COLOR565_RED(color_1); 
-	colours[1].g = COLOR565_GREEN(color_1);
-	colours[1].b = COLOR565_BLUE(color_1); 
-	colours[1].a = 0xFF;
-
-	// Four-color block: derive the other two colors.
-	// 00 = color_0, 01 = color_1, 10 = color_2, 11	= color_3
-	// These 2-bit codes correspond to the 2-bit fields
-	// stored in the 64-bit block.
-	colours[2].b = (2 * colours[0].b + colours[1].b + 1) / 3;
-	colours[2].g = (2 * colours[0].g + colours[1].g + 1) / 3;
-	colours[2].r = (2 * colours[0].r + colours[1].r + 1) / 3;
-	colours[2].a = 0xFF;
-
-	colours[3].b = (colours[0].b + 2 * colours[1].b + 1) / 3;
-	colours[3].g = (colours[0].g + 2 * colours[1].g + 1) / 3;
-	colours[3].r = (colours[0].r + 2 * colours[1].r + 1) / 3;
-	colours[3].a = 0xFF;
-
-	k = 0;
+        const DXTDecompress::Color8888* colorPtr = colorBlock;
 	for (j = 0; j < 4; j++) 
 	{
-	  for (i = 0; i < 4; i++, k++) 
+	  for (i = 0; i < 4; i++) 
 	  {
-	    Select = (bitmask & (0x03 << k*2)) >> k*2;
-	    const Color8888& col = colours[Select];
+	    const DXTDecompress::Color8888& col = *colorPtr++;
 
 	    if (((x + i) < Width) && ((y + j) < Height)) 
 	    {
@@ -275,15 +185,11 @@ void Loader::DecompressDXT5 (csRGBpixel* buffer, const uint8* source,
 			     int Width, int Height, int depth, 
 			     size_t planesize)
 {
-  int             x, y, z, i, j, k, Select;
+  int             x, y, z, i, j;
   const uint8     *Temp;
-  uint16       color_0, color_1;
-  Color8888       colours[4];
-  uint32          bitmask;
+  DXTDecompress::Color8888    colorBlock[16];
   size_t	  Offset;
-  uint8		  alphas[8];
-  const uint8*	  alphamask;
-  uint32          bits;
+  uint8           alphaMask[16];
 
   Temp = source;
   for (z = 0; z < depth; z++) 
@@ -294,114 +200,27 @@ void Loader::DecompressDXT5 (csRGBpixel* buffer, const uint8* source,
       {
 	if (y >= Height || x >= Width)
 	  break;
-	alphas[0] = Temp[0];
-	alphas[1] = Temp[1];
-	alphamask = Temp + 2;
+        DXTDecompress::DecodeDXT5Alpha (Temp, alphaMask);
 	Temp += 8;
-	color_0 = csLittleEndian::Convert (*((uint16*)Temp));   
-	color_1 = csLittleEndian::Convert (*((uint16*)Temp+1));
-	bitmask = csLittleEndian::Convert (((uint32*)Temp)[1]);
+        DXTDecompress::DecodeDXT1Color<false> (Temp, colorBlock);
 	Temp += 8;
 
-	colours[0].r = COLOR565_RED(color_0); 
-	colours[0].g = COLOR565_GREEN(color_0);
-	colours[0].b = COLOR565_BLUE(color_0); 
-	colours[0].a = 0xFF;
-
-	colours[1].r = COLOR565_RED(color_1); 
-	colours[1].g = COLOR565_GREEN(color_1);
-	colours[1].b = COLOR565_BLUE(color_1); 
-	colours[1].a = 0xFF;
-
-	// Four-color block: derive the other two colors.
-	// 00 = color_0, 01 = color_1, 10 = color_2, 11	= color_3
-	// These 2-bit codes correspond to the 2-bit fields
-	// stored in the 64-bit block.
-	colours[2].b = (2 * colours[0].b + colours[1].b + 1) / 3;
-	colours[2].g = (2 * colours[0].g + colours[1].g + 1) / 3;
-	colours[2].r = (2 * colours[0].r + colours[1].r + 1) / 3;
-	colours[2].a = 0xFF;
-
-	colours[3].b = (colours[0].b + 2 * colours[1].b + 1) / 3;
-	colours[3].g = (colours[0].g + 2 * colours[1].g + 1) / 3;
-	colours[3].r = (colours[0].r + 2 * colours[1].r + 1) / 3;
-	colours[3].a = 0xFF;
-
-	k = 0;
+        const uint8* alphaMaskPtr = alphaMask;
+        const DXTDecompress::Color8888* colorPtr = colorBlock;
 	for (j = 0; j < 4; j++) 
 	{
-	  for (i = 0; i < 4; i++, k++) 
-	  {
-	    Select = (bitmask & (0x03 << k*2)) >> k*2;
-	    const Color8888& col = colours[Select];
-
-	    // only put pixels out < width or height
-	    if (((x + i) < Width) && ((y + j) < Height)) 
-	    {
-	      Offset = z * planesize + (y + j) * Width + (x + i);
-	      buffer[Offset].Set (col.r, col.g, col.b, col.a);
-	    }
-	  }
-	}
-
-	// 8-alpha or 6-alpha block?
-	if (alphas[0] > alphas[1]) 
-	{
-	  // 8-alpha block:  derive the other six alphas.
-	  // Bit code 000 = alpha_0, 001 = alpha_1, others are interpolated.
-	  alphas[2] = (6 * alphas[0] + 1 * alphas[1] + 3) / 7; // bit code 010
-	  alphas[3] = (5 * alphas[0] + 2 * alphas[1] + 3) / 7; // bit code 011
-	  alphas[4] = (4 * alphas[0] + 3 * alphas[1] + 3) / 7; // bit code 100
-	  alphas[5] = (3 * alphas[0] + 4 * alphas[1] + 3) / 7; // bit code 101
-	  alphas[6] = (2 * alphas[0] + 5 * alphas[1] + 3) / 7; // bit code 110
-	  alphas[7] = (1 * alphas[0] + 6 * alphas[1] + 3) / 7; // bit code 111
-	}
-	else 
-	{
-	  // 6-alpha block.
-	  // Bit code 000 = alpha_0, 001 = alpha_1, others are interpolated.
-	  alphas[2] = (4 * alphas[0] + 1 * alphas[1] + 2) / 5; // Bit code 010
-	  alphas[3] = (3 * alphas[0] + 2 * alphas[1] + 2) / 5; // Bit code 011
-	  alphas[4] = (2 * alphas[0] + 3 * alphas[1] + 2) / 5; // Bit code 100
-	  alphas[5] = (1 * alphas[0] + 4 * alphas[1] + 2) / 5; // Bit code 101
-	  alphas[6] = 0x00;
-	  // Bit code 110
-	  alphas[7] = 0xFF;
-	  // Bit code 111
-	}
-
-	// Note: Have to separate the next two loops,
-	// it operates on a 6-byte system.
-
-	// First three bytes
-	bits = csLittleEndian::Convert (*((uint32*)alphamask));
-	for (j = 0; j < 2; j++) 
-	{
 	  for (i = 0; i < 4; i++) 
 	  {
-	    // only put pixels out < width or height
-	    if (((x + i) < Width) && ((y + j) < Height)) 
-	    {
-	      Offset = z * planesize + (y + j) * Width + (x + i);
-	      buffer[Offset].alpha = alphas[bits & 0x07];
-	    }
-	    bits >>= 3;
-	  }
-	}
+	    const DXTDecompress::Color8888& col = *colorPtr++;
 
-	// Last three bytes
-	bits = csLittleEndian::Convert (*((uint32*)&alphamask[3]));
-	for (j = 2; j < 4; j++) 
-	{
-	  for (i = 0; i < 4; i++) 
-	  {
 	    // only put pixels out < width or height
 	    if (((x + i) < Width) && ((y + j) < Height)) 
 	    {
 	      Offset = z * planesize + (y + j) * Width + (x + i);
-	      buffer[Offset].alpha = alphas[bits & 0x07];
+	      buffer[Offset].Set (col.r, col.g, col.b, *alphaMaskPtr++);
 	    }
-	    bits >>= 3;
+            else
+              alphaMaskPtr++;
 	  }
 	}
       }

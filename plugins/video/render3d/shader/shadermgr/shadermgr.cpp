@@ -28,6 +28,7 @@
 #include "csutil/eventnames.h"
 #include "csutil/ref.h"
 #include "csutil/scf.h"
+#include "csutil/callstack.h"
 #include "iengine/engine.h"
 #include "iengine/material.h"
 #include "iengine/texture.h"
@@ -54,6 +55,8 @@ CS_IMPLEMENT_PLUGIN
 
 CS_PLUGIN_NAMESPACE_BEGIN(ShaderManager)
 {
+
+CS_LEAKGUARD_IMPLEMENT (csNullShader);
 
 SCF_IMPLEMENT_FACTORY (csShaderManager)
 
@@ -226,6 +229,29 @@ void csShaderManager::Close ()
 {
 }
 
+void csShaderManager::RegisterShaderVariableAccessor (const char* name,
+      iShaderVariableAccessor* accessor)
+{
+  sva_hash.Put (name, accessor);
+}
+
+void csShaderManager::UnregisterShaderVariableAccessor (const char* name,
+      iShaderVariableAccessor* accessor)
+{
+  sva_hash.Delete (name, accessor);
+}
+
+iShaderVariableAccessor* csShaderManager::GetShaderVariableAccessor (
+      const char* name)
+{
+  return sva_hash.Get (name, 0);
+}
+
+void csShaderManager::UnregisterShaderVariableAcessors ()
+{
+  sva_hash.DeleteAll ();
+}
+
 bool csShaderManager::HandleEvent(iEvent& event)
 {
   if (event.Name == PreProcess)
@@ -272,6 +298,15 @@ void csShaderManager::UnregisterShader (iShader* shader)
       csArrayCmp<iShader*, iShader*> (shader, &ShaderCompare));
     if (index != csArrayItemNotFound) shaders.DeleteIndex (index);
   }
+}
+
+void csShaderManager::UnregisterShaders ()
+{
+  shaders.DeleteAll ();
+  csRef<csNullShader> nullShader;
+  nullShader.AttachNew (new csNullShader (this));
+  nullShader->SetName ("*null");
+  RegisterShader (nullShader);
 }
 
 static int ShaderCompareName (iShader* const& s1,

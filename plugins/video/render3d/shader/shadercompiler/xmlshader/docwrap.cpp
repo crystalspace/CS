@@ -258,10 +258,6 @@ void ConditionTree::RecursiveAdd (csConditionID condition, Node* node,
   }
 }
 
-#if defined(CS_EXTENSIVE_MEMDEBUG) || defined(CS_MEMORY_TRACKER)
-# define new CS_EXTENSIVE_MEMDEBUG_NEW
-#endif
-
 Logic3 ConditionTree::Descend (csConditionID condition)
 {
   const NodeStackEntry& current = 
@@ -359,6 +355,10 @@ void csWrappedDocumentNode::WrappedChild::operator delete (void* p)
 {
   ChildAlloc()->Free (p);
 }
+
+#if defined(CS_EXTENSIVE_MEMDEBUG) || defined(CS_MEMORY_TRACKER)
+# define new CS_EXTENSIVE_MEMDEBUG_NEW
+#endif
 
 //---------------------------------------------------------------------------
 

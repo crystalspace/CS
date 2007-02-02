@@ -1167,9 +1167,15 @@ csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (
       CS_ASSERT (mater != 0);
       meshPtr->worldspace_origin = wo;
       csRef<MergedSVContext> mergedSVContext;
+#if defined(CS_EXTENSIVE_MEMDEBUG) || defined(CS_MEMORY_TRACKER)
+# undef new
+#endif
       mergedSVContext.AttachNew (
         new (factory->genmesh_type->mergedSVContextPool) MergedSVContext (
         static_cast<iShaderVariableContext*> (&subMesh), svcontext));
+#if defined(CS_EXTENSIVE_MEMDEBUG) || defined(CS_MEMORY_TRACKER)
+# define new CS_EXTENSIVE_MEMDEBUG_NEW
+#endif
       meshPtr->variablecontext = mergedSVContext;
       meshPtr->object2world = o2wt;
 
@@ -1743,13 +1749,13 @@ static void RemapIndexBuffer (csRef<iRenderBuffer>& index_buffer,
 
 void csGenmeshMeshObjectFactory::Compress ()
 {
-  size_t old_num = mesh_vertices.Length ();
+  //size_t old_num = mesh_vertices.Length ();
   csCompressVertexInfo* vt = csVertexCompressor::Compress (
     	mesh_vertices, mesh_texels, mesh_normals, mesh_colors);
   if (vt)
   {
-    printf ("From %d to %d\n", int (old_num), int (mesh_vertices.Length ()));
-    fflush (stdout);
+    //printf ("From %d to %d\n", int (old_num), int (mesh_vertices.Length ()));
+    //fflush (stdout);
 
     if (subMeshes.GetSize () == 0)
     {

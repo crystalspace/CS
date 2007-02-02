@@ -2170,6 +2170,18 @@ CS_SYMBOL_QUALIFIER([how to declare pure functions],
 
 
 #------------------------------------------------------------------------------
+# Check if the "malloc" attribute is available.
+#------------------------------------------------------------------------------
+CS_SYMBOL_QUALIFIER([for "malloc" attribute],
+    [cs_cv_prog_c_attr_malloc],
+    [__attribute__((malloc))], [], [C])
+AS_IF([test $cs_cv_prog_c_attr_malloc != no],
+    [CS_HEADER_PROPERTY([CS_ATTRIBUTE_MALLOC],
+	[$cs_cv_prog_c_attr_malloc])])
+
+
+
+#------------------------------------------------------------------------------
 # CS_CHECK_QSQRT
 #	Check if compiler is able to understand the assembly code in csqsqrt.h.
 #	The MacOS/X PowerPC version of csQsqrt() requires the

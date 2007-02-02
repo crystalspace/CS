@@ -1286,10 +1286,6 @@ csTerrainObject::csTerrainObject (iObjectRegistry* object_reg,
   //terr_func = &((csTerrainFactory*)pFactory)->terr_func;
   terraformer = ((csTerrainFactory*)pFactory)->terraformer;
 
-  /*builder = new csBlockBuilder (this);
-  buildthread = csThread::Create (builder);
-  buildthread->Start ();*/
-
   staticlighting = false;
   castshadows = false;
   lmres = 257;

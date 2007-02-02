@@ -21,6 +21,7 @@
 #include "common.h"
 #include "config.h"
 #include "statistics.h"
+#include "lighter.h"
 #include "tui.h"
 
 
@@ -29,13 +30,25 @@ namespace lighter
   TUI globalTUI;
 
   TUI::TUI ()
-    : scfImplementationType (this), messageBufferEnd (0)
+    : scfImplementationType (this), messageBufferEnd (0),
+    simpleMode (false), prevWasReporter (false), 
+    kdLastNumNudes (0), lastTaskProgress (0.0f)
   {
   }
 
-  void TUI::Redraw (int drawFlags) const
+  void TUI::Initialize ()
+  {
+    simpleMode = globalLighter->configMgr->GetBool ("lighter2.simpletui", false);
+  }
+
+  void TUI::Redraw (int drawFlags)
   {
     // Redraw the "static" background
+    if (simpleMode)
+    {
+      DrawSimple ();
+      return;
+    }
 
     // Clear
     if (drawFlags & TUI_DRAW_CLEAR)
@@ -91,12 +104,20 @@ namespace lighter
       csString tmp(descrSplit[i]);
       buf.Append (tmp.Slice (0,69).PadRight (69));
 
+      if (simpleMode)
+      {
+        if (!prevWasReporter)
+          csPrintf ("\n");
+        csPrintf ("%s\n", buf.GetDataSafe ());
+        prevWasReporter = true;
+      }
+
       messageBufferEnd++;
       if(messageBufferEnd > 3) messageBufferEnd = 0;
     }
 
     // Print them
-    DrawMessage ();
+    Redraw (TUI::TUI_DRAW_MESSAGES);
 
     return true;
   }
@@ -120,7 +141,7 @@ namespace lighter
     csPrintf ("|          |            | N:                                                  |\n");
     csPrintf ("|          | Tu/u:      | D:                                                  |\n");
     csPrintf ("|          |            | P:                                                  |\n");
-    csPrintf ("|          | Tv/u:      |                                                     |\n");
+    csPrintf ("|          | Tv/v:      |                                                     |\n");
     csPrintf ("|          |            |                                                     |\n");
     csPrintf ("|- CS Messages ---------------------------------------------------------------|\n");
     csPrintf ("|                                                                             |\n");
@@ -143,7 +164,7 @@ namespace lighter
   void TUI::DrawSettings () const
   {
     csPrintf (CS_ANSI_CURSOR(14,7) "%s", globalConfig.GetLighterProperties ().doDirectLight ? "X" : "");
-    csPrintf (CS_ANSI_CURSOR(14,8) "%s", globalConfig.GetLighterProperties ().doiosity ? "X" : "");
+    csPrintf (CS_ANSI_CURSOR(14,8) "%s", false ? "X" : "");
     csPrintf (CS_ANSI_CURSOR(14,9) "%s", true ? "X" : "");
     csPrintf (CS_ANSI_CURSOR(14,10) "%s", false ? "X" : "");
   
@@ -277,5 +298,44 @@ namespace lighter
     result.Append ('|');
 
     return result;
+  }
+
+
+  void TUI::DrawSimple ()
+  {
+    // Check if kd-tree haven't been printed but now have been created
+    if (globalStats.kdtree.numNodes != kdLastNumNudes)
+    {
+      prevWasReporter = false;
+      // Print KD-tree stats
+      csPrintf ("\nKD-tree: \n");
+      csPrintf ("N: % 8d / % 8d\n", globalStats.kdtree.numNodes, globalStats.kdtree.leafNodes);
+      csPrintf ("D: % 8d / % 8.03f\n", globalStats.kdtree.maxDepth, 
+        (float)globalStats.kdtree.sumDepth / (float)globalStats.kdtree.leafNodes);
+      csPrintf ("P: % 8d / % 8.03f\n", globalStats.kdtree.numPrimitives, 
+        (float)globalStats.kdtree.numPrimitives / (float)globalStats.kdtree.leafNodes);
+
+      kdLastNumNudes = globalStats.kdtree.numNodes;
+    }
+
+    if (globalStats.progress.taskName != lastTask)
+    {
+      prevWasReporter = false;
+      csPrintf ("\n% 4d %% - %s ", (int)globalStats.progress.overallProgress,
+        globalStats.progress.taskName.GetDataSafe ());
+
+      // Print new task and global progress
+      lastTaskProgress = 0;
+      lastTask = globalStats.progress.taskName;
+    }
+    else
+    {
+      while (lastTaskProgress + 10 < globalStats.progress.taskProgress)
+      {
+        prevWasReporter = false;
+        csPrintf (".");
+        lastTaskProgress += 10;
+      }
+    }
   }
 }

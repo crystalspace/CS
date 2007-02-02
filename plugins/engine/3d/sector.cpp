@@ -132,6 +132,7 @@ csSector::csSector (csEngine *engine) :
   renderloop = 0;
   use_lightculling = false;
   single_mesh = 0;
+  relevant_lights_dirty = true;
 
   SetupSVNames();
   svDynamicAmbient.AttachNew (new csShaderVariable (SVNames().dynamicAmbient));
@@ -1137,16 +1138,43 @@ void csSector::CleanupLSI ()
     ((csLight*)inf->light)->RemoveLSI (inf);
   }
   influences.Empty ();
+  relevant_lights_dirty = true;
 }
 
 void csSector::AddLSI (csLightSectorInfluence* inf)
 {
   influences.Add (inf);
+  relevant_lights_dirty = true;
 }
 
 void csSector::RemoveLSI (csLightSectorInfluence* inf)
 {
   influences.Delete (inf);
+  relevant_lights_dirty = true;
+}
+
+const csArray<iLightSectorInfluence*>& csSector::GetRelevantLights (
+  	int maxLights, bool desireSorting)
+{
+  if (relevant_lights_dirty)
+  {
+    if (maxLights != -1)
+      relevant_lights.SetSize (maxLights);
+    relevant_lights.Empty ();
+    csLightSectorInfluences::GlobalIterator it = influences.GetIterator ();
+    size_t cnt = 0;
+    while (it.HasNext ())
+    {
+      csLightSectorInfluence* inf = it.Next ();
+      relevant_lights.Push (inf);
+      cnt++;
+      if (maxLights != -1 && cnt >= (size_t)maxLights)
+	break;
+    }
+
+    relevant_lights_dirty = false;
+  }
+  return relevant_lights;
 }
 
 //---------------------------------------------------------------------------

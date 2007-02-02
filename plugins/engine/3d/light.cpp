@@ -188,7 +188,7 @@ void csLight::FindLSI ()
 {
   CleanupLSI ();
 
-  iSector* sector = GetSector ();
+  iSector* sector = GetFullSector ();
   if (!sector) return;
   const csVector3 center = GetFullCenter ();
 
@@ -569,6 +569,25 @@ static void object_light_func (iMeshWrapper *mesh, iFrustumView *lview,
   cmw->InvalidateRelevantLights ();
 }
 
+iSector* csLight::GetFullSector ()
+{
+  iSector* s = GetSector ();
+  if (s) return s;
+  iSceneNode* node = (iSceneNode*)this;
+  iSceneNode* parent = node->GetParent ();
+  while (parent)
+  {
+    iSectorList* sl = parent->GetMovable ()->GetSectors ();
+    if (sl && sl->GetCount () > 0)
+    {
+      return sl->Get (0);
+    }
+
+    parent = parent->GetParent ();
+  }
+  return 0;
+}
+
 void csLight::CalculateLighting ()
 {
   csFrustumView lview;
@@ -595,16 +614,7 @@ void csLight::CalculateLighting ()
   ctxt->SetNewLightFrustum (new csFrustum (GetFullCenter ()));
   ctxt->GetLightFrustum ()->MakeInfinite ();
 
-  iSector* sect = GetSector ();
-  if (!sect)
-  {
-    if (movable.GetParent ())
-    {
-      iSectorList* sl = movable.GetParent ()->GetSectors ();
-      if (sl && sl->GetCount () > 0)
-	sect = sl->Get (0);
-    }
-  }
+  iSector* sect = GetFullSector ();
   if (!sect) return;	// Do nothing.
 
   if (dynamicType == CS_LIGHT_DYNAMICTYPE_DYNAMIC)

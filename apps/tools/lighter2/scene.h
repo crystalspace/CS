@@ -68,8 +68,11 @@ namespace lighter
     // All lightsources (old)
     LightOldRefArray allLightsOld;
 
-    // All light sources
-    LightRefArray allLights;
+    // All light sources (no PD lights)
+    LightRefArray allNonPDLights;
+
+    // All PD light sources
+    LightRefArray allPDLights;
 
     // KD-tree of all primitives in sector
     KDTree *kdTree;
@@ -85,6 +88,7 @@ namespace lighter
   {
   public:
     Scene ();
+    ~Scene ();
 
     // Add a file for later loading
     void AddFile (const char* directory);
@@ -115,7 +119,8 @@ namespace lighter
     LightmapPtrDelArray& GetLightmaps () 
     { return lightmaps; }
 
-    Lightmap* GetLightmap (uint lightmapID, Light_old* light);
+    Lightmap* GetLightmap (uint lightmapID, Light* light);
+
     csArray<LightmapPtrDelArray*> GetAllLightmaps ();
   protected:
     
@@ -126,7 +131,7 @@ namespace lighter
     SectorHash sectors;
 
     LightmapPtrDelArray lightmaps;
-    typedef csHash<LightmapPtrDelArray*, csPtrKey<Light_old> > PDLightmapsHash;
+    typedef csHash<LightmapPtrDelArray*, csPtrKey<Light> > PDLightmapsHash;
     PDLightmapsHash pdLightmaps;
 
     struct LoadedFile
@@ -150,9 +155,13 @@ namespace lighter
     csSet<csString> texturesToClean;
 
     // Save functions
+    void CollectDeleteTextures (iDocumentNode* textureNode,
+      csSet<csString>& filesToDelete);
     void CleanOldLightmaps (LoadedFile* fileInfo, 
-      const csStringArray& texFileNames);
+      const csSet<csString>& texFileNames);
     void SaveSceneToDom (iDocumentNode* root, LoadedFile* fileInfo);
+    bool SaveSceneLibrary (const char* libFile, LoadedFile* fileInfo);
+    void HandleLibraryNode (iDocumentNode* node, LoadedFile* fileInfo);
     void SaveMeshFactoryToDom (iDocumentNode* factNode, LoadedFile* fileInfo);
     void SaveSectorToDom (iDocumentNode* sectorNode, LoadedFile* fileInfo);
     void SaveMeshObjectToDom (iDocumentNode *objNode, Sector* sect, LoadedFile* fileInfo);

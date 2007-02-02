@@ -47,8 +47,15 @@ namespace lighter
     // Unique id
     size_t rayID;
 
+    // Flags for primitives to ignore
+    uint32 ignoreFlags;
+
+    // Specific primitive to ignore
+    const Primitive* ignorePrimitive;
+
     Ray () 
-      : origin (0,0,0), direction (1,0,0), minLength (0), maxLength (FLT_MAX*0.9f)
+      : origin (0,0,0), direction (1,0,0), minLength (0), maxLength (FLT_MAX*0.9f),
+      rayID (0), ignoreFlags (0), ignorePrimitive (0)
     {}
 
     // Clip to box. Returns if ray touch box at all
@@ -57,7 +64,7 @@ namespace lighter
       const csVector3& minBox = box.Min ();
       const csVector3& maxBox = box.Max ();
 
-      float mint = 0;
+      float mint = minLength;
       float maxt = maxLength;
 
       // Check if ray have any chance of going through box

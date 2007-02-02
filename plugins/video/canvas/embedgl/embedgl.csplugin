@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<!-- null2d.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.graphics2d.embedgl</name>
+        <implementation>csGraphics2DGLEmbed</implementation>
+        <description>Embedded gl 2D graphics driver for Crystal Space</description>
+        <requires>
+          <class>crystalspace.font.server.</class>
+        </requires>
+      </class>
+    </classes>
+  </scf>
+</plugin>

@@ -127,6 +127,8 @@ public:
   virtual const char* GetAppPath ();
 
   virtual const char* GetOptionName (size_t iIndex) const;
+  /// Query specific commandline option by index
+  virtual const char *GetOption (size_t iIndex = 0) const;
 };
 
 #endif // __CS_CMDLINE_H__

@@ -574,6 +574,7 @@ public:
   virtual void RemoveDelayedRemoves (bool remove = false);
 
   virtual void DeleteAll ();
+  void DeleteAllForce ();
 
   virtual void ResetWorldSpecificSettings(); 
 

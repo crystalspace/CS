@@ -61,11 +61,21 @@ namespace lighter
   protected:
     friend class Object_Genmesh;
 
+    // Begin remapping of submeshes
+    virtual void BeginSubmeshRemap ();
+
+    // Add a new mapping between old index and new index
+    virtual void AddSubmeshRemap (size_t oldIndex, size_t newIndex);
+
+    // Finish remapping of submeshes
+    virtual void FinishSubmeshRemap ();
+
     // Extra data saved
     csVector3 *normals;
 
     typedef csHashReversible<size_t, Submesh> SubmeshHash;
     SubmeshHash submeshes;
+    SubmeshHash tempSubmeshes;
     csArray<csString> submeshNames;
 
     void AddPrimitive (size_t a, size_t b, size_t c, 
