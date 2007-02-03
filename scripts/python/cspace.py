@@ -1452,6 +1452,7 @@ class csPoly3D(_object):
     def ComputePlane(*args): return _cspace.csPoly3D_ComputePlane(*args)
     def GetArea(*args): return _cspace.csPoly3D_GetArea(*args)
     def GetCenter(*args): return _cspace.csPoly3D_GetCenter(*args)
+    def InSphere(*args): return _cspace.csPoly3D_InSphere(*args)
     def __getitem__(*args): return _cspace.csPoly3D___getitem__(*args)
     def __setitem__ (self, i, v):
       own_v = self.__getitem__(i)
@@ -2310,7 +2311,6 @@ class csPluginRequestArray(_object):
         try: self.this.append(this)
         except: self.this = this
     def GetSize(*args): return _cspace.csPluginRequestArray_GetSize(*args)
-    def Length(*args): return _cspace.csPluginRequestArray_Length(*args)
     def Get(*args): return _cspace.csPluginRequestArray_Get(*args)
     def Push(*args): return _cspace.csPluginRequestArray_Push(*args)
     def Pop(*args): return _cspace.csPluginRequestArray_Pop(*args)
@@ -2327,6 +2327,7 @@ class csPluginRequestArray(_object):
     def __eq__(*args): return _cspace.csPluginRequestArray___eq__(*args)
     def __ne__(*args): return _cspace.csPluginRequestArray___ne__(*args)
     def GetAllocator(*args): return _cspace.csPluginRequestArray_GetAllocator(*args)
+    def Length(*args): return _cspace.csPluginRequestArray_Length(*args)
 csPluginRequestArray_swigregister = _cspace.csPluginRequestArray_swigregister
 csPluginRequestArray_swigregister(csPluginRequestArray)
 
@@ -3154,11 +3155,9 @@ class csPath(scfPath):
     __del__ = lambda self : None;
     def Length(*args): return _cspace.csPath_Length(*args)
     def CalculateAtTime(*args): return _cspace.csPath_CalculateAtTime(*args)
-    def Calculate(*args): return _cspace.csPath_Calculate(*args)
     def GetCurrentIndex(*args): return _cspace.csPath_GetCurrentIndex(*args)
     def GetTime(*args): return _cspace.csPath_GetTime(*args)
     def SetTime(*args): return _cspace.csPath_SetTime(*args)
-    def SetTimeValue(*args): return _cspace.csPath_SetTimeValue(*args)
     def SetTimes(*args): return _cspace.csPath_SetTimes(*args)
     def GetTimes(*args): return _cspace.csPath_GetTimes(*args)
     def SetPositionVectors(*args): return _cspace.csPath_SetPositionVectors(*args)
@@ -3310,7 +3309,6 @@ class csIntArray(_object):
         try: self.this.append(this)
         except: self.this = this
     def GetSize(*args): return _cspace.csIntArray_GetSize(*args)
-    def Length(*args): return _cspace.csIntArray_Length(*args)
     def Get(*args): return _cspace.csIntArray_Get(*args)
     def Put(*args): return _cspace.csIntArray_Put(*args)
     def Push(*args): return _cspace.csIntArray_Push(*args)
@@ -3328,6 +3326,7 @@ class csIntArray(_object):
     def __eq__(*args): return _cspace.csIntArray___eq__(*args)
     def __ne__(*args): return _cspace.csIntArray___ne__(*args)
     def GetAllocator(*args): return _cspace.csIntArray_GetAllocator(*args)
+    def Length(*args): return _cspace.csIntArray_Length(*args)
     def __getitem__(*args): return _cspace.csIntArray___getitem__(*args)
     def __contains__(*args): return _cspace.csIntArray___contains__(*args)
     def __delitem__(*args): return _cspace.csIntArray___delitem__(*args)
@@ -3353,7 +3352,6 @@ class csIntArrayArray(_object):
         try: self.this.append(this)
         except: self.this = this
     def GetSize(*args): return _cspace.csIntArrayArray_GetSize(*args)
-    def Length(*args): return _cspace.csIntArrayArray_Length(*args)
     def Get(*args): return _cspace.csIntArrayArray_Get(*args)
     def Put(*args): return _cspace.csIntArrayArray_Put(*args)
     def Push(*args): return _cspace.csIntArrayArray_Push(*args)
@@ -3370,6 +3368,7 @@ class csIntArrayArray(_object):
     def __eq__(*args): return _cspace.csIntArrayArray___eq__(*args)
     def __ne__(*args): return _cspace.csIntArrayArray___ne__(*args)
     def GetAllocator(*args): return _cspace.csIntArrayArray_GetAllocator(*args)
+    def Length(*args): return _cspace.csIntArrayArray_Length(*args)
     def __getitem__(*args): return _cspace.csIntArrayArray___getitem__(*args)
     def __contains__(*args): return _cspace.csIntArrayArray___contains__(*args)
     def __delitem__(*args): return _cspace.csIntArrayArray___delitem__(*args)
@@ -4614,6 +4613,10 @@ class iMeshWrapper(iBase):
     def AddMeshToStaticLOD(*args): return _cspace.iMeshWrapper_AddMeshToStaticLOD(*args)
     def RemoveMeshFromStaticLOD(*args): return _cspace.iMeshWrapper_RemoveMeshFromStaticLOD(*args)
     def GetSVContext(*args): return _cspace.iMeshWrapper_GetSVContext(*args)
+    def AddExtraRenderMesh(*args): return _cspace.iMeshWrapper_AddExtraRenderMesh(*args)
+    def GetExtraRenderMeshPriority(*args): return _cspace.iMeshWrapper_GetExtraRenderMeshPriority(*args)
+    def GetExtraRenderMeshZBufMode(*args): return _cspace.iMeshWrapper_GetExtraRenderMeshZBufMode(*args)
+    def RemoveExtraRenderMesh(*args): return _cspace.iMeshWrapper_RemoveExtraRenderMesh(*args)
     __swig_destroy__ = _cspace.delete_iMeshWrapper
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iMeshWrapper_scfGetVersion
@@ -6202,6 +6205,7 @@ class iMeshObject(iBase):
     def GetMixMode(*args): return _cspace.iMeshObject_GetMixMode(*args)
     def InvalidateMaterialHandles(*args): return _cspace.iMeshObject_InvalidateMaterialHandles(*args)
     def PositionChild(*args): return _cspace.iMeshObject_PositionChild(*args)
+    def BuildDecal(*args): return _cspace.iMeshObject_BuildDecal(*args)
     __swig_destroy__ = _cspace.delete_iMeshObject
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iMeshObject_scfGetVersion
@@ -6431,7 +6435,6 @@ class csCharArrayArray(_object):
         try: self.this.append(this)
         except: self.this = this
     def GetSize(*args): return _cspace.csCharArrayArray_GetSize(*args)
-    def Length(*args): return _cspace.csCharArrayArray_Length(*args)
     def Get(*args): return _cspace.csCharArrayArray_Get(*args)
     def Put(*args): return _cspace.csCharArrayArray_Put(*args)
     def Push(*args): return _cspace.csCharArrayArray_Push(*args)
@@ -6449,6 +6452,7 @@ class csCharArrayArray(_object):
     def __eq__(*args): return _cspace.csCharArrayArray___eq__(*args)
     def __ne__(*args): return _cspace.csCharArrayArray___ne__(*args)
     def GetAllocator(*args): return _cspace.csCharArrayArray_GetAllocator(*args)
+    def Length(*args): return _cspace.csCharArrayArray_Length(*args)
 csCharArrayArray_swigregister = _cspace.csCharArrayArray_swigregister
 csCharArrayArray_swigregister(csCharArrayArray)
 
@@ -10075,9 +10079,7 @@ class iImage(iBase):
     def GetPalette(*args): return _cspace.iImage_GetPalette(*args)
     def GetAlpha(*args): return _cspace.iImage_GetAlpha(*args)
     def HasKeyColor(*args): return _cspace.iImage_HasKeyColor(*args)
-    def HasKeycolor(*args): return _cspace.iImage_HasKeycolor(*args)
     def GetKeyColor(*args): return _cspace.iImage_GetKeyColor(*args)
-    def GetKeycolor(*args): return _cspace.iImage_GetKeycolor(*args)
     def HasMipmaps(*args): return _cspace.iImage_HasMipmaps(*args)
     def GetMipmap(*args): return _cspace.iImage_GetMipmap(*args)
     def GetRawFormat(*args): return _cspace.iImage_GetRawFormat(*args)
@@ -10128,9 +10130,7 @@ class csImageBase(csImageBaseBase):
     def GetPalette(*args): return _cspace.csImageBase_GetPalette(*args)
     def GetAlpha(*args): return _cspace.csImageBase_GetAlpha(*args)
     def HasKeyColor(*args): return _cspace.csImageBase_HasKeyColor(*args)
-    def HasKeycolor(*args): return _cspace.csImageBase_HasKeycolor(*args)
     def GetKeyColor(*args): return _cspace.csImageBase_GetKeyColor(*args)
-    def GetKeycolor(*args): return _cspace.csImageBase_GetKeycolor(*args)
     def HasMipmaps(*args): return _cspace.csImageBase_HasMipmaps(*args)
     def GetMipmap(*args): return _cspace.csImageBase_GetMipmap(*args)
     def GetRawFormat(*args): return _cspace.csImageBase_GetRawFormat(*args)
@@ -10222,7 +10222,6 @@ class csImageIOFileFormatDescriptions(_object):
         try: self.this.append(this)
         except: self.this = this
     def GetSize(*args): return _cspace.csImageIOFileFormatDescriptions_GetSize(*args)
-    def Length(*args): return _cspace.csImageIOFileFormatDescriptions_Length(*args)
     def Get(*args): return _cspace.csImageIOFileFormatDescriptions_Get(*args)
     def Put(*args): return _cspace.csImageIOFileFormatDescriptions_Put(*args)
     def Push(*args): return _cspace.csImageIOFileFormatDescriptions_Push(*args)
@@ -10240,6 +10239,7 @@ class csImageIOFileFormatDescriptions(_object):
     def __eq__(*args): return _cspace.csImageIOFileFormatDescriptions___eq__(*args)
     def __ne__(*args): return _cspace.csImageIOFileFormatDescriptions___ne__(*args)
     def GetAllocator(*args): return _cspace.csImageIOFileFormatDescriptions_GetAllocator(*args)
+    def Length(*args): return _cspace.csImageIOFileFormatDescriptions_Length(*args)
 csImageIOFileFormatDescriptions_swigregister = _cspace.csImageIOFileFormatDescriptions_swigregister
 csImageIOFileFormatDescriptions_swigregister(csImageIOFileFormatDescriptions)
 
