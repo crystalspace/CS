@@ -8,6 +8,8 @@ chronological order.
 
 3-Feb-2007
 	- Jorrit added 'decal_test' to the online help for walktest.
+	- Marten fixed a compilation error in sector.cpp that only showed
+	  in release mode.
 2-Feb-2007
 	- res worked around Cg not being properly detected on Linux when
 	  -Wl,--as-needed was passed in LDFLAGS.

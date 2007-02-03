@@ -517,7 +517,7 @@ public:
       csRenderMesh** extraMeshes = cmesh->GetExtraRenderMeshes (num, rview,
                                             frustum_mask);
       CS_ASSERT(!((num != 0) && (extraMeshes == 0)));
-      for (i = 0; i < num; ++i)
+      for (size_t i = 0; i < num; ++i)
       {
           privMeshlist->AddRenderMeshes (&extraMeshes[i], 1,
                   cmesh->csMeshWrapper::GetExtraRenderMeshPriority(i),
