@@ -672,7 +672,7 @@ void csMeshWrapper::AddExtraRenderMesh(csRenderMesh* renderMesh, long priority,
   extraRenderMeshData.Push(data);
 }
 
-csRenderMesh** csMeshWrapper::GetExtraRenderMeshes (int& num, 
+csRenderMesh** csMeshWrapper::GetExtraRenderMeshes (size_t& num, 
                     iRenderView* rview, uint32 frustum_mask)
 {
   // Here we check the CS_ENTITY_NOCLIP flag. If that flag is set
@@ -709,7 +709,7 @@ csRenderMesh** csMeshWrapper::GetExtraRenderMeshes (int& num,
   const csReversibleTransform& o2wt = movable.GetFullTransform();
   const csVector3& wo = o2wt.GetOrigin();
   num = extraRenderMeshes.GetSize();
-  for (int a=num-1; a>=0; --a)
+  for (size_t a = 0; a < num; a++)
   {
     extraRenderMeshes[a]->clip_portal = clip_portal;
     extraRenderMeshes[a]->clip_plane = clip_plane;

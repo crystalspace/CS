@@ -65,7 +65,7 @@ private:
   float					life;
 
   // used to keep track of the next open slot in our buffers and what to render
-  size_t                        indexCount;
+  uint                          indexCount;
   size_t                        vertexCount;
 
   // some worldspace values defining this decal
@@ -85,7 +85,7 @@ private:
 
   // some settings for the current mesh
   iMeshWrapper*                 currMesh;
-  size_t                        firstIndex;
+  uint                          firstIndex;
   csVector3                     localNormal;
   csVector3                     localUp;
   csVector3                     localRight;

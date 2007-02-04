@@ -556,11 +556,9 @@ int csSpriteCal3DMeshObjectFactory::FindMorphAnimationName (
   return -1;
 }
 
-#include "csutil/custom_new_disable.h"
-
 bool csSpriteCal3DMeshObjectFactory::AddCoreMaterial(iMaterialWrapper *mat)
 {
-  CalCoreMaterial *newmat = new (allocPlatform) CalCoreMaterial;
+  CalCoreMaterial *newmat = new CalCoreMaterial;
   CalCoreMaterial::Map newmap;
   newmap.userData = mat;
 
@@ -572,8 +570,6 @@ bool csSpriteCal3DMeshObjectFactory::AddCoreMaterial(iMaterialWrapper *mat)
   calCoreModel.addCoreMaterial(newmat);
   return true;
 }
-
-#include "csutil/custom_new_enable.h"
 
 void csSpriteCal3DMeshObjectFactory::BindMaterials()
 {

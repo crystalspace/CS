@@ -545,7 +545,7 @@ public:
    * Grabs any additional render meshes this mesh might have on top
    * of the normal rendermeshes through GetRenderMeshes.
    */
-  virtual csRenderMesh** GetExtraRenderMeshes (int& num, iRenderView* rview,
+  virtual csRenderMesh** GetExtraRenderMeshes (size_t& num, iRenderView* rview,
     uint32 frustum_mask);
 
   /** 

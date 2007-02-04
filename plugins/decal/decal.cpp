@@ -17,23 +17,26 @@
 */
 
 #include "cssysdef.h"
-#include "decal.h"
-#include "decaltemplate.h"
 #include "iutil/objreg.h"
 #include "iutil/plugin.h"
 #include "iutil/object.h"
 #include "iengine/mesh.h"
 #include "iengine/engine.h"
-#include "csgfx/renderbuffer.h"
 #include "iengine/movable.h"
 #include "imesh/genmesh.h"
 #include "iengine/material.h"
 #include "imesh/object.h"
-#include "cstool/collider.h"
 #include "ivideo/material.h"
-#include "csgfx/shadervarcontext.h"
 #include "iutil/eventq.h"
+
+#include "csgeom/tri.h"
+#include "csgfx/renderbuffer.h"
+#include "csgfx/shadervarcontext.h"
 #include "csutil/event.h"
+#include "cstool/collider.h"
+
+#include "decal.h"
+#include "decaltemplate.h"
 
 csDecal::csDecal(iObjectRegistry * objectReg, iDecalManager * pManager)
        : objectReg(objectReg),
@@ -141,7 +144,7 @@ void csDecal::BeginMesh(iMeshWrapper * mesh)
 void csDecal::AddStaticPoly(const csPoly3D & p)
 {
   size_t a;
-  unsigned int tri[3];
+  CS::TriangleT<size_t> tri;
 
   if (!currMesh)
       return;
