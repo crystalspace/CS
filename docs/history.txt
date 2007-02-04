@@ -10,6 +10,11 @@ chronological order.
 	- res worked around an apparent incompatibility between one of VC8's
 	  headers and a header from the latest Windows SDK 6.0.
 	- res fixed a couple of compile warnings.
+	- res changed the CS_REQUEST_FONTSERVER macro to pull in the font
+	  multiplexer plugin instead of the "default" font plugin. (The idea
+	  is that nowadays most people would probably like to use TrueType
+	  fonts instead of the built-in bitmap fonts; using the font plexer
+	  by default this will work out of the box.)
 3-Feb-2007
 	- Jorrit added 'decal_test' to the online help for walktest.
 	- Marten fixed a compilation error in sector.cpp that only showed
