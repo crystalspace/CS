@@ -217,9 +217,29 @@ This is the list of frequently asked questions for the Win32 port of Crystal
 Space.  Please consult this list if you are having difficulty building or using
 the project.
 
-@subsubheading Compilation
+@subsubheading Building
 
 @itemize @bullet
+@item
+Q1. @emph{I'm using the Visual C++ 2005 Express Edition and I get a lot of 
+``file not found'' errors for @file{windef.h} and others. What is wrong?}
+Q2. @emph{I'm using the Visual C++ 2005 Express Edition and I get a lot of 
+``unresolved symbol'' errors for names like 
+@code{SHGetSpecialFolderLocation@@12}. What is wrong?}
+
+A. These errors indicate a lacking or an incomplete installation of the 
+Platform SDK. Exactly follow the instructions given on Microsoft's 
+``Using Visual C++ 2005 Express Edition with the Microsoft Platform SDK'' 
+page:
+@ifnottex
+@uref{http://msdn.microsoft.com/vstudio/express/visualc/usingpsdk/}
+@end ifnottex
+@iftex
+@code{http://msdn.microsoft.com/vstudio/express/visualc/usingpsdk/}
+@end iftex
+Also, the instructions don't say that, but if you have Visual C++ open while 
+applying those changes you need to restart it. 
+
 @item 
 Q. @emph{I get "Errors in post link" and later "file not found" errors.}
 
@@ -236,27 +256,6 @@ of which can be easily found on the Internet.  You can download precompiled
 versions of these libraries i.e. @emph{cs-win32libs} or grab the source code and
 compile it yourself if you prefer.  @xref{External Libraries}.
 
-The resources from these packages should be placed in the following locations.
-
-@item
-Q. @emph{How can I reduce build times?}
-
-A. Build only the projects you will need. You must build all the Crystal Space
-libraries, however those you may not need can be unloaded (Right click on the
-project you wish unload from the build process and click on Unload). @emph{Be
-very careful when unloading projects as some of Crystal Spaces projects e.g.
-some plugins are dependent on others}.
-
-@item
-Q. @emph{How can I reduce build sizes?}
-A. Build only the projects you will need.
-A. Turning off precompiled headers tends to save a large amount of file space
-while increasing build times somewhat.
-@end itemize
-
-@subsubheading Linking
-
-@itemize @bullet
 @item
 Q. @emph{Where are the files @file{libpng.lib} and @file{zlib.lib}?}
 
@@ -283,26 +282,30 @@ project lacks @file{zlib.lib}.  The trick is explained just below, so hang on.
 component), look below.
 
 @item
-Any others: Well, I always have a solution, but this one is more difficult.  It
-seems that there is a missing source file in your project.  But the question
-is, which source file?  If it isn't obvious by the name of the functions, just
-to the following: In the menu @emph{Edit}, select the option @emph{Find in
-Files@dots{}}.  Put the name of the function in the field ``Find What'', check
-that the ``In Folder'' field content is the Crystal Space source directory and
-press @emph{Find}.  You should get a bunch of files, many of them just making a
-call to the function.  But there is surely one which contains the definition of
-the function.  Look at the position of the file where it is defined, and add it
-to the project (menu @emph{Project/Add To Project/Files}).
+Q. @emph{How can I reduce build times?}
 
-In order to add (or remove) a library for the link process, invoke the
-@emph{Project/Settings/Link} menu item, then select the ``General'' category
-tab..  There is a field called ``Object/Library Modules'' that lists all the
-libraries added to the project at link time.
-@end itemize
-@end itemize
+A. Build only the projects you will need. You must build all the Crystal Space
+libraries, however those you may not need can be unloaded (Right click on the
+project you wish unload from the build process and click on Unload). @emph{Be
+very careful when unloading projects as some of Crystal Spaces projects e.g.
+some plugins are dependent on others}.
 
-OK, now it should link.  So you should have an executable file called
-@file{walktest.exe} in your src directory.  Let's run it!
+@item
+Q. @emph{How can I reduce build sizes?}
+A. Build only the projects you will need.
+A. Turning off precompiled headers tends to save a large amount of file space
+while increasing build times somewhat.
+
+@item
+Any others: It seems that there is a missing source file in the project.  
+
+For Crystal Space the MSVC project files are generated once every 24 hours, so 
+normally all missing sources should have been added after that time.  If you
+can't wait that long, or the file is still missing, contact one of the Crystal
+Space developers.
+
+For third party projects it's usually the best idea to contact one of it's
+developers, they should be able to tell you which file is missing.
 
 @subsubheading Executing
 
