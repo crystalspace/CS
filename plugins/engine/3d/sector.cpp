@@ -502,8 +502,7 @@ public:
     csRenderMesh** meshes = cmesh->GetRenderMeshes (num, rview, frustum_mask);
     CS_ASSERT(!((num != 0) && (meshes == 0)));
 #ifdef CS_DEBUG
-    int i;
-    for (i = 0 ; i < num ; i++)
+    for (int i = 0 ; i < num ; i++)
       meshes[i]->db_mesh_name = cmesh->GetName ();
 #endif
     if (num > 0)
@@ -513,11 +512,11 @@ public:
       	cmesh->csMeshWrapper::GetZBufMode (), (iMeshWrapper*)cmesh);
 
       // get extra render meshes
-      num = 0;
-      csRenderMesh** extraMeshes = cmesh->GetExtraRenderMeshes (num, rview,
+      size_t numExtra = 0;
+      csRenderMesh** extraMeshes = cmesh->GetExtraRenderMeshes (numExtra, rview,
                                             frustum_mask);
-      CS_ASSERT(!((num != 0) && (extraMeshes == 0)));
-      for (size_t i = 0; i < num; ++i)
+      CS_ASSERT(!((numExtra != 0) && (extraMeshes == 0)));
+      for (size_t i = 0; i < numExtra; ++i)
       {
           privMeshlist->AddRenderMeshes (&extraMeshes[i], 1,
                   cmesh->csMeshWrapper::GetExtraRenderMeshPriority(i),
