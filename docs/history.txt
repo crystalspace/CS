@@ -17,6 +17,8 @@ chronological order.
 	  by default this will work out of the box.)
 	- Luca fixed the source code of the examples in the Threading 
 	  Library section of the manual.
+	- res fixed the static plugin dependencies file to contain the correct
+	  library names.
 3-Feb-2007
 	- Jorrit added 'decal_test' to the online help for walktest.
 	- Marten fixed a compilation error in sector.cpp that only showed
