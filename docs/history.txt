@@ -6,6 +6,9 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+6-Feb-2007
+	- res added CS::ScopedDelete<>, a helper class to delete a pointer 
+	  when leaving a scope.
 4-Feb-2007
 	- res worked around an apparent incompatibility between one of VC8's
 	  headers and a header from the latest Windows SDK 6.0.
