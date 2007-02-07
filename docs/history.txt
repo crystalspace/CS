@@ -8,6 +8,8 @@ chronological order.
 
 7-Feb-2007
 	- Genjix changed csWeakRefArray to not use deprecated Length ().
+	- res changed configure to normalize sparc* cpu names to sparc (so
+	  e.g. sparc64 is treated as sparc).
 6-Feb-2007
 	- res added CS::ScopedDelete<>, a helper class to delete a pointer 
 	  when leaving a scope.
