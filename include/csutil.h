@@ -118,6 +118,7 @@
 #include "csutil/scfstringarray.h"
 #include "csutil/scfstrset.h"
 #include "csutil/schedule.h"
+#include "csutil/scopeddelete.h"
 #include "csutil/scopedmutexlock.h"
 #include "csutil/set.h"
 #include "csutil/snprintf.h"
