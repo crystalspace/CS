@@ -16,6 +16,8 @@ chronological order.
 	      problem when switching from texcoord rotation to none.
 	- res split csutil/threading/atomicops.h up into multiple files (one
 	  per implementation).
+        - Piotr made more backward compatibility safe and improved code quality
+          (removed not valid comments and unecesery method) in his latest commit.
 7-Feb-2007
 	- Genjix changed csWeakRefArray to not use deprecated Length ().
 	- res changed configure to normalize sparc* cpu names to sparc (so

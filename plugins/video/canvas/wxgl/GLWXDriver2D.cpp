@@ -457,18 +457,7 @@ int csGraphics2DWX::FindPixelFormatGDI (HDC hDC,
 
   return newPixelFormat;
 }
-LRESULT CALLBACK csGraphics2DWX::DummyWindow (HWND hWnd, UINT message,
-                                                  WPARAM wParam, LPARAM lParam)
-{
-  switch(message)
-  {
-  case WM_CREATE:
-    {
-    }
-    break;
-  }
-  return DefWindowProc (hWnd, message, wParam, lParam);
-}
+
 
 int csGraphics2DWX::FindPixelFormat (csGLPixelFormatPicker& picker, PIXELFORMATDESCRIPTOR& pfd)
 {
@@ -490,7 +479,7 @@ int csGraphics2DWX::FindPixelFormat (csGLPixelFormatPicker& picker, PIXELFORMATD
   wc.hbrBackground  = (HBRUSH)(COLOR_BTNFACE + 1);
   wc.hInstance      = ModuleHandle;
   wc.style          = CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
-  wc.lpfnWndProc    = DummyWindow;
+  wc.lpfnWndProc    = DefWindowProc;
   wc.cbClsExtra     = 0;
   wc.cbWndExtra     = 0;
 
