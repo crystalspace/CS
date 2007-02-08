@@ -338,6 +338,75 @@ namespace Threading
 
   typedef AtomicOperationsBase<AtomicOperationsPPCGCC> AtomicOperations;
 
+#elif defined(CS_COMPILER_GCC) && \
+      defined(CS_PROCESSOR_SPARC)
+
+  class AtomicOperationsPPCGCC
+  {
+  public:
+    inline static int32 Set (int32* target, int32 value)
+    {
+      *const_cast<volatile int32*> (target) = value;
+      __asm__ __volatile__
+        (
+        "membar #StoreStore | #StoreLoad"
+        : : : "memory"
+        );
+      return value;
+    }
+
+    inline static void* Set (void** target, void* value)
+    {
+      return (void*)Set ((int32*)target, (int32)value);
+    }
+
+    inline static int32 CompareAndSet (int32* target, int32 value,
+      int32 comparand)
+    {
+      int32 prev;
+
+      __asm__ __volatile__ 
+        (
+        "cas [%1],%2,%0"
+        : "+r" (value)
+        : "r" (target), "r" (comparand)
+        );
+
+      return prev;
+    }
+
+    inline static void* CompareAndSet (void** target, void* value,
+      void* comparand)
+    {
+      return (void*)CompareAndSet ((int32*)target, (int32)value, 
+        (int32)comparand);
+    }
+
+    inline static int32 Increment (int32* target, int32 incr = 1)
+    {
+      //@@Potentially dangerous code, needs to be revisited
+      int32 prevValue, currValue, nextValue;
+      do 
+      {
+        __asm__ __volatile__
+          (
+          "membar #StoreLoad | #LoadLoad"
+          : : : "memory"
+          );
+
+        currValue = *target;
+        nextValue = currValue + incr;
+        prevValue = CompareAndSet (target, nextValue, currValue);
+      } while(prevValue == currValue);
+      return nextValue;
+    }
+
+    inline static int32 Decrement (int32* target)
+    {
+      return (int32)Increment (target, -1);
+    }
+  };
+
 #else
 #error "No atomic operations defined for your platform!"
 #endif
