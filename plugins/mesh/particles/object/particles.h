@@ -511,6 +511,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     {
       rotationMode = mode;
       InvalidateVertexSetup ();
+      // Make sure TC buffer is regenerated
+      tcBuffer = 0;
     }
 
     virtual csParticleRotationMode GetRotationMode () const

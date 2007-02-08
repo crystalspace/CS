@@ -291,7 +291,11 @@ only the magnitude should be used and direction should be emitter-specific.
 
 @item @code{<initialvelocity x="" y="" z=""/>}
 @tab @samp{all}
-@tab Set initial velocity vector.
+@tab Set initial linear velocity vector.
+
+@item @code{<initialangularvelocity x="" y="" z=""/>}
+@tab @samp{all}
+@tab Set initial angular velocity vector.
 
 @item @code{<radius>rad</radius>}
 @tab @samp{sphere}, @samp{cylinder}
