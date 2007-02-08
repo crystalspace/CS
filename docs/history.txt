@@ -14,6 +14,8 @@ chronological order.
 	    - Exposed initial angular velocity setting on emitters to xml.
 	    - Made sure rotation-mode resets the texcoord vectors. Fixes
 	      problem when switching from texcoord rotation to none.
+	- res split csutil/threading/atomicops.h up into multiple files (one
+	  per implementation).
 7-Feb-2007
 	- Genjix changed csWeakRefArray to not use deprecated Length ().
 	- res changed configure to normalize sparc* cpu names to sparc (so
