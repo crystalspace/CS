@@ -187,14 +187,8 @@ bool csGraphics2DWX::Open()
 #ifdef WIN32
 
   csGLPixelFormatPicker picker (this);
-  /*
-    Check if the WGL pixel format check should be used at all.
-    It appears that some drivers take "odd" choices when using the WGL
-    pixel format path (e.g. returning Accum-capable formats even if none
-    was requested).
-   */
-  int pixelFormat = -1;
 
+  int pixelFormat = -1;
 
   PIXELFORMATDESCRIPTOR pfd;
   pixelFormat = FindPixelFormat (picker, pfd);
@@ -461,12 +455,6 @@ int csGraphics2DWX::FindPixelFormatGDI (HDC hDC,
 
 int csGraphics2DWX::FindPixelFormat (csGLPixelFormatPicker& picker, PIXELFORMATDESCRIPTOR& pfd)
 {
-  /*
-    To use multisampling, a special pixel format has to determined.
-    However, this determination works over a WGL ext - thus we need
-    a GL context. So we create a window just for checking that
-    ext.
-   */
   static const char* dummyClassName = "CSGL_DummyWindow";
 
   HINSTANCE ModuleHandle = GetModuleHandle(0);
@@ -745,6 +733,9 @@ static bool wxCodeToCSCode(int wxkey, utf32_char& raw, utf32_char& cooked)
     MAP (NUMPAD_DOWN,     PAD2,         DOWN)
     MAPC (NUMPAD3,        PAD3,         '3')
     MAP (NUMPAD_NEXT,     PAD3,         PGDN)
+#if wxVERSION_NUMBER < 2700
+    MAP (NUMPAD_PAGEDOWN, PAD3,         PGDN)
+#endif
     MAPC (NUMPAD4,        PAD4,         '4')
     MAP (NUMPAD_LEFT,     PAD4,         LEFT)
     MAPC (NUMPAD5,        PAD5,         '5')
@@ -756,6 +747,9 @@ static bool wxCodeToCSCode(int wxkey, utf32_char& raw, utf32_char& cooked)
     MAP (NUMPAD_UP,       PAD8,         UP)
     MAPC (NUMPAD9,        PAD9,         '9')
     MAP (NUMPAD_PRIOR,    PAD9,         PGUP)
+#if wxVERSION_NUMBER < 2700
+    MAP (NUMPAD_PAGEUP,   PAD9,         PGUP)
+#endif
     MAPC (MULTIPLY,       PADMULT,      '*')
     MAPC (NUMPAD_MULTIPLY,PADMULT,      '*')
     MAPC (ADD,            PADPLUS,      '+')
@@ -781,6 +775,10 @@ static bool wxCodeToCSCode(int wxkey, utf32_char& raw, utf32_char& cooked)
     MAP (F12,             F12,          F12)
     MAP (NUMLOCK,         PADNUM,       PADNUM)
     MAP (SCROLL,          SCROLLLOCK,   SCROLLLOCK)
+#if wxVERSION_NUMBER < 2700
+    MAP (PAGEUP,          PGUP,         PGUP)
+    MAP (PAGEDOWN,        PGDN,         PGDN)
+#endif
     MAP (NUMPAD_ENTER,    PADENTER,     ENTER)
     default: return false;
   }
