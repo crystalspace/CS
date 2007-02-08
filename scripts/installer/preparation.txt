@@ -1,6 +1,19 @@
 General:
 --------
+ * Install the winlibs' "Copy DLLs to CS directory" and "VC support" into
+   the source tree.
  * Extract the 1.0 API docs into the source tree.
  * The installed maps should be lit with cslight: parallaxtest, partsys, 
    r3dtest, stenciltest, terrain, terrainf, castle, flarge.
   
+MSVC:
+-----
+ * Use wkstypical. In release mode, build all. In debug mode, build grplibs,
+   plgcscegui, plgsprcal3d.
+
+MinGW:
+------
+ * Configure in a directory 'CS-<version_major>.<version_minor>-mingw' which 
+   is on the same level as the CS source directory.
+ * You need to adjust the 'CSWin32LibsDir' definition in sdk-mingw.iss to your
+   local installation.

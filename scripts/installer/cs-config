@@ -1,0 +1,539 @@
+#!/bin/sh
+# Config Script for Crystal Space, outputs compiler flags for compiling 
+# Crystal Space applications
+# (c)2002,2003 by Matthias Braun <matze@braunis.de>
+#
+# ...code stolen from gnome-config...
+# From autoconf:
+# The user is always right.
+if test "${PATH_SEPARATOR+set}" != set; then
+  echo "#! /bin/sh" >conf$$.sh
+  echo  "exit 0"   >>conf$$.sh
+  chmod +x conf$$.sh
+  if (PATH="/nonexistent;."; conf3080.sh) >/dev/null 2>&1; then
+    PATH_SEPARATOR=';'
+  else
+    PATH_SEPARATOR=:
+  fi
+  rm -f conf$$.sh
+fi
+
+CRYSTAL="${CRYSTAL-/usr/local$PATH_SEPARATOR.}"
+my_IFS=$IFS; IFS=$PATH_SEPARATOR
+for p in $CRYSTAL
+do
+  prefix="${p}"
+  exec_prefix="${prefix}"
+  makeout="./out/msysx86/optimize"
+  version="1.0"
+  longversion="crystalspace 1.0"
+  newincdir=""
+  # try to determine if we're in a source or installed CS version
+  if test "x$includedir_main" = "x"
+  then
+    if [ -r ${prefix}/include/crystalspace/cssysdef.h ] ; then
+      newincdir="${prefix}/include/crystalspace"
+      includedir_main=$newincdir
+    elif [ -r ${prefix}/include/cssysdef.h ] ; then
+      newincdir="${prefix}/include"
+      includedir_main=$newincdir
+    fi
+  fi
+  if test "x$includedir_config" = "x"
+  then
+    if [ -r ${prefix}/include/crystalspace/csconfig.h ] ; then
+      newincdir="${prefix}/include/crystalspace"
+      includedir_config=$newincdir
+    elif [ -r ${prefix}/include/csconfig.h ] ; then
+      newincdir="${prefix}/include"
+      includedir_config=$newincdir
+    fi
+  fi
+  if test -n "$newincdir"
+  then
+    if test "x$includedir" = "x"
+    then
+      includedir="$newincdir"
+    else
+      includedir="$includedir$PATH_SEPARATOR$newincdir"
+    fi
+  fi
+done
+IFS=$my_IFS
+if test "x$includedir" = "x"
+then
+  includedir="/usr/local/include/crystalspace"
+fi
+syslibs=" -lm -Wl,-Bsymbolic -Wl,--warn-unresolved-symbols -L/usr/local/lib -g2 -L/usr/lib/w32api -lgdi32 -lshell32 "
+common_cflags="  "
+common_cxxflags="   "
+staticdeps="crystalspace_staticplugins.jam"
+
+makevars()
+{
+cat << "__EOF__"
+# Transliterate $@ to uppercase.
+UPCASE = \
+    $(subst a,A,\
+    $(subst b,B,\
+    $(subst c,C,\
+    $(subst d,D,\
+    $(subst e,E,\
+    $(subst f,F,\
+    $(subst g,G,\
+    $(subst h,H,\
+    $(subst i,I,\
+    $(subst j,J,\
+    $(subst k,K,\
+    $(subst l,L,\
+    $(subst m,M,\
+    $(subst n,N,\
+    $(subst o,O,\
+    $(subst p,P,\
+    $(subst q,Q,\
+    $(subst r,R,\
+    $(subst s,S,\
+    $(subst t,T,\
+    $(subst u,U,\
+    $(subst v,V,\
+    $(subst w,W,\
+    $(subst x,X,\
+    $(subst y,Y,\
+    $(subst z,Z,$@))))))))))))))))))))))))))
+
+# Transliterate $r to uppercase.  Typically, $r would be the iterator variable
+# in a $(foreach) invocation.
+UPCASE_V = \
+    $(subst a,A,\
+    $(subst b,B,\
+    $(subst c,C,\
+    $(subst d,D,\
+    $(subst e,E,\
+    $(subst f,F,\
+    $(subst g,G,\
+    $(subst h,H,\
+    $(subst i,I,\
+    $(subst j,J,\
+    $(subst k,K,\
+    $(subst l,L,\
+    $(subst m,M,\
+    $(subst n,N,\
+    $(subst o,O,\
+    $(subst p,P,\
+    $(subst q,Q,\
+    $(subst r,R,\
+    $(subst s,S,\
+    $(subst t,T,\
+    $(subst u,U,\
+    $(subst v,V,\
+    $(subst w,W,\
+    $(subst x,X,\
+    $(subst y,Y,\
+    $(subst z,Z,$r))))))))))))))))))))))))))
+
+LFLAGS.L = -L
+LFLAGS.l = -l
+CFLAGS.D = -D
+CFLAGS.I = -I
+EXE=.exe
+DLL=.dll
+LIBS.EXE.PLATFORM=-L/usr/lib/w32api -lgdi32 -lshell32
+TARGET.RAW = $(basename $(notdir $@))
+TARGET.RAW.UPCASE = $(basename $(notdir $(UPCASE)))
+LFLAGS.GENERAL=
+LFLAGS.DLL=-shared
+LFLAGS.EXE=-mconsole
+LINK.PLUGIN = $(LINK)
+PLUGIN.POSTFLAGS = -mwindows -mconsole
+COMMAND_DELIM= ;
+DO.SHARED.PLUGIN.POSTAMBLE = -mwindows
+__EOF__
+}
+# dependencies of CS
+depends()
+{
+    case $1 in
+        -lcrystalspace) DEPS=" -lzlib" ;;
+        -lcrystalspace_directx) DEPS=" -lcrystalspace -lddraw -ldsound -ldinput" ;;
+        -lcrystalspace_opengl) DEPS=" -lcrystalspace -lopengl32 -lm" ;;
+        -lcrystalspace_windows) DEPS=" -lcrystalspace" ;;
+        -lcrystalspace_python) DEPS=" -lcrystalspace -Ld:/Programme/Python23/Lib -lpython23" ;;
+        -lcrystalspace_staticplugins) DEPS="" ;;
+
+	*)
+	    CEXFILE=.cex
+	    findcexfile "$CEXFILE"
+	    if test -r "$CEXFILE"; then
+		DEPS=`/bin/sh $CEXFILE --deps`
+	    else
+		DEPS=''
+	    fi
+	    ;;                                        	    
+    esac
+}
+
+checklibname()
+{
+    case $1 in
+     crystalspace) 
+	addlib "-lcrystalspace" 	
+	;;			
+     crystalspace_directx) 
+	addlib "-lcrystalspace_directx" 	
+	;;			
+     crystalspace_opengl) 
+	addlib "-lcrystalspace_opengl" 	
+	;;			
+     crystalspace_windows) 
+	addlib "-lcrystalspace_windows" 	
+	;;			
+     crystalspace_python) 
+	addlib "-lcrystalspace_python" 	
+	;;			
+     crystalspace_staticplugins) 
+	addlib "-lcrystalspace_staticplugins" 	
+	;;			
+
+    *)
+	findcexfile "$1"
+	if test -z "$CEXFILE"; then
+	    echo "Unknown library: $1; consult --help for library list" 1>&2
+	    exit 1
+	fi
+	
+	addexlib "$CEXFILE"
+        ;;
+    esac
+}
+
+liblist=" crystalspace crystalspace_directx crystalspace_opengl crystalspace_windows
+"
+liblist_opt=" crystalspace_python crystalspace_staticplugins
+"
+# Detect type of the installation and the directories where the library files
+# reside in.
+libdir=""
+lflags=""
+
+for libname in libcrystalspace.so \
+	       libcrystalspace.dylib \
+	       libcrystalspace.dll.a \
+	       libcrystalspace.a \
+	       ; do
+    if test -r "$prefix/Jamfile" && \
+	test -r "$prefix/$makeout/libs/$libname"; then
+	libdir="$prefix/$makeout/libs"
+	lflags="-L$libdir"
+    elif test -z "$libdir" && test -r "${exec_prefix}/lib/$libname"; then
+	libdir="${exec_prefix}/lib"
+	lflags="-L${exec_prefix}/lib"
+    else
+	my_IFS=$IFS; IFS=$PATH_SEPARATOR
+	for p in $CRYSTAL
+	  do
+	  if test -r "$p/Jamfile" && \
+	      test -r "$p/$makeout/libs/$libname"; then
+	      libdir="$p/$makeout/libs"
+	      lflags="-L$libdir"
+	      break
+	  elif test -z "$libdir" && test -r "${p}/lib/$libname"; then
+	      libdir="${p}/lib"
+	      lflags="-L$libdir"
+	      break
+	  fi
+	done
+	IFS=$my_IFS
+    fi
+    if test -n "$lflags" ; then
+        break
+    fi
+done
+
+# Check for optional libs, add to list if present.
+
+for l in $liblist_opt
+do
+  if test -r "$libdir/lib$l.a" ; then
+    liblist="$liblist $l"
+  fi
+done
+
+usage()
+{
+	cat <<EOF
+Usage: cs-config [OPTIONS] [LIBRARIES]
+Options:
+	[--prefix]
+	[--exec-prefix]
+	[--version]
+	[--long-version]
+	[--libdir]
+	[--includedir]
+	[--libs]
+	[--cflags]
+	[--cxxflags]
+	[--available-libs]
+	[--makevars]
+	[--staticdeps]
+	[--help]
+Libraries:
+EOF
+    for lib in $liblist; do
+	echo "        $lib"
+    done
+    cat <<EOF
+Note that the Crystal Space directory is detect by examining the CRYSTAL
+environment variable. Ensure that this variable is set correctly.
+EOF
+}
+
+includedeps()
+{
+#we have to remember vars here because on older shells $1,$2... are global
+    id_first=$1
+    id_all=$@
+    shift
+    id_second=$1
+    id_rest=$@
+
+# already had all dependencies of this lib? then exit
+    case " $ALREADY_TESTED " in
+    	*\ ${id_first}\ *) return 0;;
+    	*) ;;
+    esac
+
+# if not add 1 dependency
+    depends ${id_first}
+    ALREADY_TESTED="$ALREADY_TESTED ${id_first}"
+    for a in $DEPS; do
+	case " ${id_all} " in
+	    *\ $a\ *) ;;
+    	    *)  
+		the_libs="${the_libs} $a"
+	    	return 1
+	    ;;
+	esac
+    done
+    if test -n "${id_second}"; then
+	if includedeps ${id_rest}; then
+	    return 0
+	else
+	    return 1
+	fi
+    else
+	return 0
+    fi
+}
+
+addlib()
+{
+    # Lib already in list?
+    case " $the_libs " in
+	*\ $1\ *) return;;
+	*) ;;
+    esac
+
+    the_libs="$1 $the_libs"
+
+    # loop till all dependencies are resolved
+    loop=true
+    while $loop; do
+	includedeps $the_libs
+	if test $? -eq 0; then
+	    loop=false
+	else
+	    ALREADY_TESTED=""
+	fi
+    done
+}
+
+findcexfile()
+{
+#   file in search path?
+    for p in $CSCONFPATH; do
+	if test -f "$p/$1.cex"; then
+	    CEXFILE="$p/$1.cex"
+	    return
+	fi
+    done
+
+    if test -f "$CRYSTAL/bin/$1.cex"; then
+	CEXFILE="$CRYSTAL/bin/$1.cex"
+	return
+    fi
+    
+    if test -f "$CRYSTAL/$1.cex"; then
+	CEXFILE="$CRYSTAL/$1.cex"
+	return
+    fi
+
+    CEXFILE=""
+}      
+
+addexlib()
+{
+    EXDEP=`/bin/sh $1 --deps`
+    EXLIB=`/bin/sh $1 --libs`
+    EXCXXFLAGS=`/bin/sh $1 --cxxflags`
+    EXCFLAGS=`/bin/sh $1 --cflags`
+    add_cxxflags="$add_cxxflags $EXCXXFLAGS"
+    add_cflags="$add_cflags $EXCFLAGS"
+
+    for lib in "$EXDEP"; do
+	addlib "$lib"
+    done
+
+    if test -n "$EXLIB"; then
+        addlib "$EXLIB"
+    fi
+}
+
+raw_names=""
+the_libs=""
+show_libs=""
+show_cflags=""
+show_cxxflags=""
+show_availlibs=""
+
+# Prepare path returned by --static-deps - it'll be a MSYS style path, but
+# Jam needs a native Win32 path.
+if test "`uname -s | sed -e 's+\(.*\)_.*+\1+'`" = "MINGW32" ; then
+  libdir_local=`echo $libdir | sed -e 's+^/\(.\)\(.*\)+\1:\2+'`
+else
+  libdir_local=$libdir
+fi
+
+if test $# -eq 0; then
+	usage 1>&2
+	exit 1
+fi
+
+while test $# -gt 0; do
+  case $1 in
+    --prefix)
+	echo $prefix
+	exit 0
+	;;
+    --exec-prefix)
+	echo $exec_prefix
+	exit 0
+	;;
+    --help)
+	usage
+	exit 0
+	;;
+    --version)
+        echo $version
+        exit 0
+        ;;
+    --long-version|--longversion)
+	echo $longversion
+	exit 0
+	;;
+    --libdir)
+	echo $libdir
+	exit 0
+	;;
+    --includedir)
+	echo $includedir_main
+	exit 0
+	;;
+    --cflags)
+        show_cflags=true
+        ;;
+    --includes)
+	show_includes=true
+	;;
+    --cxxflags)
+	show_cxxflags=true
+	;;
+    --makevars)
+	makevars
+	exit 0
+	;;
+    --libs)
+	show_libs=true
+	;;
+    --available-libs)
+	show_availlibs=true
+	;;
+    --static-deps)
+	echo $libdir_local/$staticdeps
+	exit 0
+	;;
+    *)
+	raw_names="$raw_names $1"
+        ;;
+  esac
+  shift
+done
+
+# This is tested late in order to allow --help to work even if the Crystal
+# Space directory is not found.
+if test -z "$lflags"; then
+  cat 1>&2 <<EOF
+Failed to detect directory containing Crystal Space link libraries; aborting!
+Did you build Crystal Space? Did you set the CRYSTAL environment variable
+correctly?
+EOF
+  exit 1
+fi
+
+inc_dir_shown=""
+my_IFS=$IFS; IFS=$PATH_SEPARATOR
+for p in $includedir
+do
+  inc_dir_shown="$inc_dir_shown -I$p"
+done
+IFS=$my_IFS
+
+if test -n "$show_cflags"; then
+	echo "$inc_dir_shown $common_cflags $add_cflags"
+else
+    if test -n "$show_cxxflags"; then
+	echo "$inc_dir_shown $common_cxxflags $add_cxxflags"
+    else
+	if test -n "$show_includes"; then
+	    echo "$inc_dir_shown"
+	fi
+    fi
+fi    
+    
+if test -n "$show_libs"; then
+    # If user specified no libraries, then emit commonly needed ones.
+    if test -z "$raw_names"; then
+	raw_names="$liblist"
+    fi
+    for do_lib in $raw_names; do
+	checklibname $do_lib
+    done
+    echo "$lflags $the_libs $syslibs"
+fi
+
+if test -n "$show_availlibs"; then
+    # If user specified no libraries, then emit all.
+    if test -z "$raw_names"; then
+	for x in $liblist; do
+	    echo $x
+	done
+    else
+	# Filter the user-supplied list down to valid entries. It is not an
+	# error for the user-supplied list to contain unknown library names;
+	# we are filtering the list down to names which are valid under this
+	# installation's configuration. For instance, the client might request
+	# `csplugincommon_osx', and we do not want to emit an error when the
+	# request is made on GNU/Linux; we just want to return a usable subset
+	# of those requested. Other options, such as --cflags, --libs, etc.,
+	# will emit an appropriate error for unknown library requests.
+	for x in $raw_names; do
+	    for z in $liblist; do
+		if test "_$x" = "_$z"; then
+		    echo $x
+		    break
+		fi
+	    done
+        done
+    fi
+fi
+
+exit 0
