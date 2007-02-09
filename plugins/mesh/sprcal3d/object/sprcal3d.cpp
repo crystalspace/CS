@@ -176,6 +176,8 @@ csSpriteCal3DMeshObjectFactory::csSpriteCal3DMeshObjectFactory (
   csSpriteCal3DMeshObjectFactory::object_reg = object_reg;
 
   light_mgr = csQueryRegistry<iLightManager> (object_reg);
+
+  skel_factory.AttachNew (new csCal3dSkeletonFactory ());
 }
 
 csSpriteCal3DMeshObjectFactory::~csSpriteCal3DMeshObjectFactory ()
@@ -704,6 +706,22 @@ void csSpriteCal3DMeshObjectFactory::HardTransform (
 
 //=============================================================================
 
+csCal3dSkeletonFactory::csCal3dSkeletonFactory () :
+scfImplementationType(this), core_skeleton(0) 
+{
+}
+
+void csCal3dSkeletonFactory::SetSkeleton (CalCoreSkeleton *skeleton)
+{
+  std::vector<CalCoreBone*> bvect = skeleton->getVectorCoreBone ();
+  for (size_t i = 0; i < bvect.size (); i++)
+  {
+    bones_factories.Push (new csCal3dSkeletonBoneFactory (bvect[i], this));
+  }
+}
+
+//=============================================================================
+
 void csSpriteCal3DMeshObject::DefaultAnimTimeUpdateHandler::UpdatePosition(
   float delta, CalModel* model)
 {
@@ -756,6 +774,7 @@ csSpriteCal3DMeshObject::csSpriteCal3DMeshObject (iBase *pParent,
 
   anim_time_handler.AttachNew (new DefaultAnimTimeUpdateHandler());
   calModel.getPhysique()->setAxisFactorX(-1.0f);
+  skeleton.AttachNew (new csCal3dSkeleton (calModel.getSkeleton ()));
 }
 
 csSpriteCal3DMeshObject::~csSpriteCal3DMeshObject ()
@@ -2201,6 +2220,12 @@ void csSpriteCal3DMeshObject::MeshAccessor::PreGetBuffer
   }
   else
     meshobj->factory->DefaultGetBuffer (mesh, holder, buffer);
+}
+
+//----------------------------------------------------------------------
+csCal3dSkeleton::csCal3dSkeleton (CalSkeleton* skeleton) :
+scfImplementationType(this), skeleton(skeleton) 
+{
 }
 
 //----------------------------------------------------------------------
