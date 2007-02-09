@@ -27,13 +27,17 @@
 
 CS_IMPLEMENT_PLUGIN
 
+template<>
+class csComparator<const char*, csString> :
+  public csComparatorString<const char*> {};
+
 CS_PLUGIN_NAMESPACE_BEGIN(Profiler)
 {
   using namespace CS::Debug;
 
   SCF_IMPLEMENT_FACTORY(ProfilerFactory)
 
-  CS_IMPLEMENT_STATIC_VAR(GetGlobalProfiler, Profiler,)
+  CS_IMPLEMENT_STATIC_VAR(GetGlobalProfiler, Profiler, ())
 
 
   ProfilerFactory::ProfilerFactory (iBase* parent)

@@ -205,6 +205,9 @@ namespace lighter
 
   };
 
+  struct CopyFunctor;
+  struct CountFunctor;
+
   class KDTreeBuilder
   {
   public:
@@ -215,6 +218,8 @@ namespace lighter
 
 
   private:
+    friend struct CopyFunctor;
+    friend struct CountFunctor;
 
     // Building constants
     enum
