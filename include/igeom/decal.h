@@ -255,11 +255,13 @@ struct iDecalManager : public virtual iBase
    * \param normal The overall normal of the decal.
    * \param width The width of the decal.
    * \param height The height of the decal.
+   * \param oldDecal An existing decal that can be reused for efficiency.
    * \return True if the decal is created.
    */
-  virtual bool CreateDecal(iDecalTemplate * decalTemplate, 
+  virtual iDecal * CreateDecal(iDecalTemplate * decalTemplate, 
     iSector * sector, const csVector3 & pos, const csVector3 & up, 
-    const csVector3 & normal, float width=1.0f, float height=1.0f) = 0;
+    const csVector3 & normal, float width=1.0f, float height=1.0f,
+    iDecal * oldDecal = 0) = 0;
 
   /**
    * Creates a decal template and fills it with default values.

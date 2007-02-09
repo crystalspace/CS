@@ -35,12 +35,14 @@
 #include "csutil/event.h"
 #include "cstool/collider.h"
 
+#include "decalmanager.h"
 #include "decal.h"
 #include "decaltemplate.h"
 
-csDecal::csDecal(iObjectRegistry * objectReg, iDecalManager * pManager)
-       : objectReg(objectReg),
+csDecal::csDecal(iObjectRegistry * objectReg, csDecalManager * decalManager)
+       : objectReg(objectReg), decalManager(decalManager),
          indexCount(0), vertexCount(0), width(0), height(0), currMesh(0)
+	 
 {
   engine = csQueryRegistry<iEngine>(objectReg);
 
@@ -63,18 +65,16 @@ csDecal::csDecal(iObjectRegistry * objectReg, iDecalManager * pManager)
 
 csDecal::~csDecal()
 {
-  for (size_t a=0; a<renderMeshInfos.GetSize(); ++a)
-  {
-    renderMeshInfos[a].mesh->RemoveExtraRenderMesh(
-	renderMeshInfos[a].pRenderMesh);
-    delete renderMeshInfos[a].pRenderMesh;
-  }
+  ClearRenderMeshes();
 }
 
 void csDecal::Initialize(iDecalTemplate * decalTemplate, 
     const csVector3 & normal, const csVector3 & pos, const csVector3 & up, 
     const csVector3 & right, float width, float height)
 {
+  this->indexCount = 0;
+  this->vertexCount = 0;
+  this->currMesh = 0;
   this->decalTemplate = decalTemplate;
     
   this->normal = normal;
@@ -90,6 +90,8 @@ void csDecal::Initialize(iDecalTemplate * decalTemplate,
   this->right = right;
 
   life = 0;
+
+  ClearRenderMeshes();
 }
 
 void csDecal::BeginMesh(iMeshWrapper * mesh)
@@ -227,7 +229,7 @@ void csDecal::EndMesh()
       return;
 
   // create a rendermesh for this mesh
-  csRenderMesh* pRenderMesh = new csRenderMesh();
+  csRenderMesh* pRenderMesh = decalManager->renderMeshAllocator.Alloc();
   
   csDecalRenderMeshInfo renderMeshInfo;
   renderMeshInfo.pRenderMesh = pRenderMesh;
@@ -256,4 +258,16 @@ bool csDecal::Age(csTicks ticks)
     return true;
 
   return life < lifespan;
+}
+
+void csDecal::ClearRenderMeshes()
+{
+  const size_t len = renderMeshInfos.GetSize();
+  for (size_t a=0; a<len; ++a)
+  {
+    renderMeshInfos[a].mesh->RemoveExtraRenderMesh(
+	renderMeshInfos[a].pRenderMesh);
+    decalManager->renderMeshAllocator.Free(renderMeshInfos[a].pRenderMesh);
+  }
+  renderMeshInfos.Empty();
 }

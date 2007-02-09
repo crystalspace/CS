@@ -47,8 +47,12 @@ csDecalManager::csDecalManager(iBase * parent)
 
 csDecalManager::~csDecalManager()
 {
-  for (size_t a=0; a<decals.GetSize(); ++a)
+  size_t a = decals.GetSize();
+  while (a)
+  {
+    --a;
     delete decals[a];
+  }
 
   if (objectReg)
   {
@@ -70,82 +74,74 @@ bool csDecalManager::Initialize(iObjectRegistry * objectReg)
   return true;
 }
 
-bool csDecalManager::CreateDecal(iDecalTemplate * decalTemplate, 
+iDecal * csDecalManager::CreateDecal(iDecalTemplate * decalTemplate, 
     iSector * sector, const csVector3 & pos, const csVector3 & up, 
-    const csVector3 & normal, float width, float height)
+    const csVector3 & normal, float width, float height,
+    iDecal * oldDecal)
 {
   // compute the maximum distance the decal can reach
   float radius = sqrt(width*width + height*height) * 2.0f;
 
-  csVector3 n = normal.Unit();
-
-  // our generated up vector depends on the primary axis of the normal
-  csVector3 normalAxis = normal.UnitAxisClamped(); 
-
-  csVector3 right = n % up;
-  csVector3 correctUp = right % n;
-
-  if (!engine)
-  {
-    engine = csQueryRegistry<iEngine>(objectReg);
-    if (!engine)
-    {
-      csReport(objectReg, CS_REPORTER_SEVERITY_ERROR, 
-	  "crystalspace.decal", "Couldn't query engine");
-      return false;
-    }
-  }
+  if (!EnsureEngineReference())
+    return 0;
 
   // get all meshes that could be affected by this decal
-  csDecal * decal = 0;
-  csVector3 relPos;
   csRef<iMeshWrapperIterator> it = engine->GetNearbyMeshes(sector, pos, 
                                                            radius, true);
   if (!it->HasNext())
-      return false;
+      return 0;
 
-  decal = new csDecal(objectReg, this);
+  // calculate a valid orientation for the decal
+  csVector3 n = normal.Unit();
+  csVector3 right = n % up;
+  csVector3 correctUp = right % n;
+
+  // create the decal and fill it with mesh geometry
+  csDecal * decal = 0;
+  if (oldDecal)
+  {
+    // we must ensure that this decal is actually active
+    const size_t len = decals.GetSize();
+    for (size_t a=0; a<len; ++a)
+    {
+      if (decals[a] != oldDecal)
+	continue;
+
+      decal = decals[a];
+      decals.DeleteIndexFast(a);
+    }
+  }
+  if (!decal)
+    decal = new csDecal(objectReg, this);
+
+  csVector3 relPos;
+
   decal->Initialize(decalTemplate, n, pos, correctUp, right, width, height);
   decals.Push(decal);
-  while (it->HasNext())
-  {
-    iMeshWrapper* mesh = it->Next();
-    csVector3 relPos = 
-        mesh->GetMovable()->GetFullTransform().Other2This(pos);
+  FillDecal(decal, it, pos, radius);
 
-    decal->BeginMesh(mesh);
-    mesh->GetMeshObject()->BuildDecal(&relPos, radius, 
-            (iDecalBuilder*)decal);
-    decal->EndMesh();
-  }
-  return true;
+  return decal;
 }
 
 csRef<iDecalTemplate> csDecalManager::CreateDecalTemplate(
         iMaterialWrapper* pMaterial)
 {
-    csRef<iDecalTemplate> ret;
+  csRef<iDecalTemplate> ret;
 
-  if (!engine)
-  {
-    engine = csQueryRegistry<iEngine>(objectReg);
-    if (!engine)
-    {
-      csReport(objectReg, CS_REPORTER_SEVERITY_ERROR, 
-	  "crystalspace.decal", "Couldn't query engine");
-      return false;
-    }
-  }
+  if (!EnsureEngineReference())
+    return false;
 
-    ret.AttachNew(new csDecalTemplate);
-    ret->SetMaterialWrapper(pMaterial);
-    ret->SetRenderPriority(engine->GetAlphaRenderPriority());
-    return ret;
+  ret.AttachNew(new csDecalTemplate);
+  ret->SetMaterialWrapper(pMaterial);
+  ret->SetRenderPriority(engine->GetAlphaRenderPriority());
+  return ret;
 }
 
 void csDecalManager::DeleteDecal(const iDecal * decal)
 {
-  for (size_t a=0; a<decals.GetSize(); ++a)
+  // we must ensure that this decal is actually active
+  const size_t len = decals.GetSize();
+  for (size_t a=0; a<len; ++a)
   {
     if (decals[a] != decal)
       continue;
@@ -185,5 +181,45 @@ bool csDecalManager::HandleEvent(iEvent & ev)
       ++a;
   }
   return true;
+}
+
+bool csDecalManager::EnsureEngineReference()
+{
+  if (!engine)
+  {
+    engine = csQueryRegistry<iEngine>(objectReg);
+    if (!engine)
+    {
+      csReport(objectReg, CS_REPORTER_SEVERITY_ERROR, 
+	  "crystalspace.decal", "Couldn't query engine");
+      return false;
+    }
+  }
+  return true;
+}
+
+void csDecalManager::FillDecal(csDecal * decal, 
+    iMeshWrapperIterator * meshIter, const csVector3 & pos, float radius)
+{
+  while (meshIter->HasNext())
+  {
+    iMeshWrapper* mesh = meshIter->Next();
+    csVector3 relPos = 
+        mesh->GetMovable()->GetFullTransform().Other2This(pos);
+
+    decal->BeginMesh(mesh);
+    mesh->GetMeshObject()->BuildDecal(&relPos, radius, 
+            (iDecalBuilder*)decal);
+    decal->EndMesh();
+  }
+}
+
+void csDecalManager::RemoveDecalFromList(csDecal * decal)
+{
+  size_t idx = decals.Find(decal);
+  if (idx == csArrayItemNotFound)
+    return;
+
+  decals.DeleteIndexFast(idx);
 }
 

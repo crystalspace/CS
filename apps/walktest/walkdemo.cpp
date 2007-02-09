@@ -783,8 +783,6 @@ void test_decal ()
     }
   }
 
-  
-  
   // create a template for our new decal
   csRef<iDecalTemplate> decalTemplate = 
       decalMgr->CreateDecalTemplate(material);

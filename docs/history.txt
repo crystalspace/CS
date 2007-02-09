@@ -18,6 +18,8 @@ chronological order.
 	  per implementation).
         - Piotr made more backward compatibility safe and improved code quality
           (removed not valid comments and unecesery method) in his latest commit.
+	- Andrew Robberts made decals a bit more efficient sharing memory and
+	  adding the ability to reuse/change existing decals
 7-Feb-2007
 	- Genjix changed csWeakRefArray to not use deprecated Length ().
 	- res changed configure to normalize sparc* cpu names to sparc (so

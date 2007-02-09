@@ -39,6 +39,8 @@
 #define CS_DECAL_MAX_TRIS_PER_DECAL         64 
 #define CS_DECAL_MAX_VERTS_PER_DECAL        128 
 
+class csDecalManager;
+
 struct csDecalRenderMeshInfo
 {
   csRenderMesh* pRenderMesh;
@@ -50,6 +52,7 @@ class csDecal : public iDecal, iDecalBuilder
 private:
   iObjectRegistry*              objectReg;
   csRef<iEngine>                engine;
+  csDecalManager *		decalManager;
 
   // buffers and rendermesh to hold the rendering data
   csRef<csRenderBuffer>         	vertexBuffer;
@@ -94,7 +97,7 @@ private:
   csPlane3                      clipPlanes[6];
   
 public:
-  csDecal(iObjectRegistry * objectReg, iDecalManager * pManager);
+  csDecal(iObjectRegistry * objectReg, csDecalManager * decalManager);
   virtual ~csDecal();
 
   void Initialize(iDecalTemplate * decalTemplate, 
@@ -106,6 +109,9 @@ public:
   void EndMesh();
 
   bool Age(csTicks ticks);
+
+private:
+  void ClearRenderMeshes();
 };
 
 #endif // __CS_DECAL_H__

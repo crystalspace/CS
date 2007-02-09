@@ -34,6 +34,7 @@
 #include "iutil/eventh.h"
 #include "csutil/eventnames.h"
 #include "iutil/virtclk.h"
+#include "csutil/blockallocator.h"
 
 struct iObjectRegistry;
 class csDecal;
@@ -43,12 +44,15 @@ class csDecalManager : public scfImplementation3<csDecalManager,
                                                  iComponent,
 						 iEventHandler>
 {
+  friend class csDecal;
+
 private:
   iObjectRegistry *     objectReg;
   csRef<iEngine>        engine;
   csArray<csDecal *>    decals;
   csRef<iEventHandler>  weakEventHandler;
   csRef<iVirtualClock>  vc;
+  csBlockAllocator<csRenderMesh>	renderMeshAllocator;
 
 public:
   csDecalManager(iBase * parent);
@@ -56,9 +60,9 @@ public:
 
   virtual bool Initialize(iObjectRegistry * objectReg);
 
-  virtual bool CreateDecal(iDecalTemplate * decalTemplate, 
+  virtual iDecal * CreateDecal(iDecalTemplate * decalTemplate, 
       iSector * sector, const csVector3 & pos, const csVector3 & up, 
-      const csVector3 & normal, float width, float height);
+      const csVector3 & normal, float width, float height, iDecal * oldDecal);
 
   virtual csRef<iDecalTemplate> CreateDecalTemplate(
       iMaterialWrapper * material);
@@ -72,6 +76,14 @@ public:
   CS_EVENTHANDLER_NAMES ("crystalspace.decals")
   CS_EVENTHANDLER_NIL_CONSTRAINTS
   CS_DECLARE_EVENT_SHORTCUTS;
+  
+private:
+  bool EnsureEngineReference();
+
+  void FillDecal(csDecal * decal, iMeshWrapperIterator * meshIter, 
+      const csVector3 & pos, float radius);
+      
+  void RemoveDecalFromList(csDecal * decal);
 };  
 
 #endif // __CS_DECAL_MANAGER_H__
