@@ -347,13 +347,11 @@ namespace lighter
       PrimBox* clone;               // 4 /  8 
       uint8 pad[4];                 // 4 /  4
 
+      int32 flags;                  // 4 /  4
 #if (CS_PROCESSOR_SIZE == 64)
       //Bit unfortunate, but we need an even pot-2 alignment
-      static const int padSize = 128 - sizeof(side) - sizeof(primitive) - 
-        sizeof(clone) - sizeof(pad) - sizeof(flags);
-      uint8 pad0[padSize];          // 0 / 24
+      uint8 pad0[24];               // 0 / 24
 #endif
-      int32 flags;                  // 4 /  4
     }; //sizeof = 64 / 128
 #if (CS_PROCESSOR_SIZE == 64)
     CS_COMPILE_ASSERT(sizeof (PrimBox) == 128);
