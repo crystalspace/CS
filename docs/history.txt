@@ -8,6 +8,10 @@ chronological order.
 
 10-Feb-2007
 	- Marten hopefully fixed lighter2 compiled with MSVC on win64.
+	- res changed csjpgimg to not use setjmp() but exceptions for error
+	  handling (setjmp doesn't work right on Win64 MSVC). Also added some
+	  wrappers around the JPEG structs so the client code more feels like
+	  C++ and less like C.
 9-Feb-2007
         - Piotr started implementation of iSkeleton related interfaces in
           Cal3d plugin.
