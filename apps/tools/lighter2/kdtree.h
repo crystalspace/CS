@@ -24,6 +24,8 @@
 // For a tad more speed:
 #define KDTREE_ASSERT(x)  (void)0
 
+#include "csutil/compileassert.h"
+
 namespace lighter
 {
   class Primitive;
@@ -36,10 +38,10 @@ namespace lighter
   };
 
   /**
-   * Optimized KD-tree primitive
-   * \todo
-   * Make more efficient on 64 bit platforms!
-   */
+  * Optimized KD-tree primitive
+  * \todo
+  * Make more efficient on 64 bit platforms!
+  */
   struct KDTreePrimitive
   {
     /// Normal u, v and d components. Normalized.
@@ -205,9 +207,6 @@ namespace lighter
 
   };
 
-  struct CopyFunctor;
-  struct CountFunctor;
-
   class KDTreeBuilder
   {
   public:
@@ -216,10 +215,27 @@ namespace lighter
     */
     KDTree* BuildTree (csHash<csRef<Object>, csString>::GlobalIterator& objects);
 
+    //Internal node representing a kd-tree node (inner or leaf) while building
+    struct KDNode
+    {
+      // CS_AXIS_* 
+      uint splitDimension;
+
+      // Split plane location (world space)
+      float splitLocation;
+
+      // Left-right pointer
+      KDNode *leftChild, *rightChild;
+
+      // Primitives
+      csArray<Primitive*> primitives;
+
+      KDNode()
+        : splitDimension(0), splitLocation(0.0f), leftChild(0), rightChild(0)
+      {}
+    };
 
   private:
-    friend struct CopyFunctor;
-    friend struct CountFunctor;
 
     // Building constants
     enum
@@ -230,7 +246,7 @@ namespace lighter
       PRIMS_PER_LEAF = 4,
       NODE_SIZE_EPSILON = 1000 //*1e-9
     };
-    
+
     class PrimBox;
     // Represent an end-point of triangle along given axis
     class EndPoint
@@ -268,10 +284,10 @@ namespace lighter
       }
 
       /*
-       Get the (probable) location of the primbox by realigning the this pointer
-       to an even 64/128 byte boundary.
-       Can be dangerous, use with care!
-       */
+      Get the (probable) location of the primbox by realigning the this pointer
+      to an even 64/128 byte boundary.
+      Can be dangerous, use with care!
+      */
       PrimBox* GetBox ()
       {
         return reinterpret_cast<PrimBox*> ( reinterpret_cast<size_t> (this) &
@@ -293,8 +309,7 @@ namespace lighter
       float position[3];
 
 #if (CS_PROCESSOR_SIZE == 64)
-      enum {BOX_ALIGN = ~0x7f};
-      float pad0; //For 64-bit we pad this to have a size dividable by even 4 bytes
+      enum {BOX_ALIGN = ~0x7f};      
 #else
       enum {BOX_ALIGN = ~0x3f};
 #endif
@@ -317,7 +332,7 @@ namespace lighter
           side[1].SetSide (i, EndPoint::SIDE_END);
         } 
       }
-      
+
       enum
       {
         STATE_LEFT = 0,
@@ -327,17 +342,25 @@ namespace lighter
       };
 
       //End-point [min/max]
-      EndPoint side[2];             //48 / 96
-      Primitive* primitive;         // 4 /  8
-      int32 flags;                  // 4 /  4
+      EndPoint side[2];             //48 / 80
+      Primitive* primitive;         // 4 /  8     
       PrimBox* clone;               // 4 /  8 
-
       uint8 pad[4];                 // 4 /  4
+
 #if (CS_PROCESSOR_SIZE == 64)
       //Bit unfortunate, but we need an even pot-2 alignment
-      uint8 pad0[8];                // 0 / 8
+      static const int padSize = 128 - sizeof(side) - sizeof(primitive) - 
+        sizeof(clone) - sizeof(pad) - sizeof(flags);
+      uint8 pad0[padSize];          // 0 / 24
 #endif
+      int32 flags;                  // 4 /  4
     }; //sizeof = 64 / 128
+#if (CS_PROCESSOR_SIZE == 64)
+    CS_COMPILE_ASSERT(sizeof (PrimBox) == 128);
+#else
+    CS_COMPILE_ASSERT(sizeof (PrimBox) == 64);
+#endif
+
 
     // Helper class for clipping primitives and computing primitive AABB
     struct PrimHelper
@@ -345,7 +368,7 @@ namespace lighter
       PrimHelper ()
       {
       }
-      
+
       //Init with a Prrimitive
       void Init (const Primitive* prim);
 
@@ -362,9 +385,9 @@ namespace lighter
     } primHelper;
 
     /**
-     * Holder for the sorted end point lists.
-     * The lists are sorted by position followed by side.
-     */
+    * Holder for the sorted end point lists.
+    * The lists are sorted by position followed by side.
+    */
     struct EndPointList
     {
       void Insert (size_t axis, EndPoint* ep);
@@ -373,34 +396,13 @@ namespace lighter
 
       EndPoint* head[3];
       EndPoint* tail[3];
-     
+
       EndPointList ()
       {
         head[0] = head[1] = head[2] = 0;
         tail[0] = tail[1] = tail[2] = 0;
       }
     } endPointList;
-
-    //Internal node representing a kd-tree node (inner or leaf) while building
-    struct KDNode
-    {
-      // CS_AXIS_* 
-      uint splitDimension;
-
-      // Split plane location (world space)
-      float splitLocation;
-
-      // Left-right pointer
-      KDNode *leftChild, *rightChild;
-
-      // Primitives
-      csArray<Primitive*> primitives;
-
-      KDNode()
-        : splitDimension(0), splitLocation(0.0f), leftChild(0), rightChild(0)
-      {}
-    };
-
 
     //Allocator for boxes
     typedef csBlockAllocator<PrimBox, CS::Memory::AllocatorAlign<128> >

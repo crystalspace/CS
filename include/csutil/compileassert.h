@@ -26,9 +26,7 @@ namespace CS
 {
 
 template <bool x> 
-struct COMPILE_ASSERT_FAILURE
-{
-};
+struct COMPILE_ASSERT_FAILURE;
 
 template <> 
 struct COMPILE_ASSERT_FAILURE<true>
