@@ -215,6 +215,18 @@ namespace lighter
     */
     KDTree* BuildTree (csHash<csRef<Object>, csString>::GlobalIterator& objects);
 
+  private:
+
+    // Building constants
+    enum
+    {
+      TRAVERSAL_COST = 1,
+      INTERSECTION_CONST = 6,
+      MAX_DEPTH = 60,
+      PRIMS_PER_LEAF = 4,
+      NODE_SIZE_EPSILON = 1000 //*1e-9
+    };
+
     //Internal node representing a kd-tree node (inner or leaf) while building
     struct KDNode
     {
@@ -233,18 +245,6 @@ namespace lighter
       KDNode()
         : splitDimension(0), splitLocation(0.0f), leftChild(0), rightChild(0)
       {}
-    };
-
-  private:
-
-    // Building constants
-    enum
-    {
-      TRAVERSAL_COST = 1,
-      INTERSECTION_CONST = 6,
-      MAX_DEPTH = 60,
-      PRIMS_PER_LEAF = 4,
-      NODE_SIZE_EPSILON = 1000 //*1e-9
     };
 
     class PrimBox;
@@ -424,6 +424,8 @@ namespace lighter
       csBox3 aabb, size_t numPrim, size_t treeDepth);
     KDTree* SetupRealTree (KDNode* rootNode);
 
+    friend struct CopyFunctor;
+    friend struct CountFunctor;
   };
 
   // Helper to do operations on a kd-tree
