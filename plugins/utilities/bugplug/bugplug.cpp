@@ -78,6 +78,7 @@
 #include "ivaria/collider.h"
 #include "ivaria/conout.h"
 #include "ivaria/reporter.h"
+#include "ivaria/profile.h"
 #include "ivideo/fontserv.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
@@ -94,6 +95,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(BugPlug)
 {
 
 SCF_IMPLEMENT_FACTORY (csBugPlug)
+
+CS_DECLARE_PROFILER
 
 void csBugPlug::Report (int severity, const char* msg, ...)
 {
@@ -153,6 +156,9 @@ csBugPlug::csBugPlug (iBase *iParent)
 
   do_shadow_debug = false;
   delay_command = DEBUGCMD_UNKNOWN;
+
+  do_profiler_reset = false;
+  do_profiler_log = false;
 }
 
 csBugPlug::~csBugPlug ()
@@ -1159,6 +1165,25 @@ bool csBugPlug::ExecCommand (int cmd, const csString& args)
     case DEBUGCMD_LISTPLUGINS:
 	ListLoadedPlugins();
 	break;
+    case DEBUGCMD_PROFTOGGLELOG:
+      {
+        if (do_profiler_log)
+        {
+          CS_PROFILER_STOP_LOGGING();
+        }
+        else
+        {
+          CS_PROFILER_START_LOGGING(0, 0);
+        }
+
+        do_profiler_log = !do_profiler_log;
+        break;
+      }
+    case DEBUGCMD_PROFAUTORESET:
+      {
+        do_profiler_reset = !do_profiler_reset;
+        break;
+      }
     case DEBUGCMD_UBERSCREENSHOT:
         {
           uint shotW, shotH;
@@ -1450,6 +1475,11 @@ bool csBugPlug::HandleStartFrame (iEvent& /*event*/)
     G3D->BeginDraw (CSDRAW_2DGRAPHICS | CSDRAW_CLEARZBUFFER);
     int bgcolor_clear = G2D->FindRGB (0, 255, 255);
     G2D->Clear (bgcolor_clear);
+  }
+
+  if (do_profiler_reset)
+  {
+    CS_PROFILER_RESET();
   }
 
   return false;
@@ -2008,8 +2038,8 @@ int csBugPlug::GetCommandCode (const char* cmdstr, csString& args)
   if (!strcmp (cmd, "mesh_zmin"))	return DEBUGCMD_MESH_ZMIN;
   if (!strcmp (cmd, "mesh_zplus"))	return DEBUGCMD_MESH_ZPLUS;
   if (!strcmp (cmd, "listplugins"))	return DEBUGCMD_LISTPLUGINS;
-  if (!strcmp (cmd, "profdump"))	return DEBUGCMD_PROFDUMP;
-  if (!strcmp (cmd, "profreset"))	return DEBUGCMD_PROFRESET;
+  if (!strcmp (cmd, "prof_log"))	return DEBUGCMD_PROFTOGGLELOG;
+  if (!strcmp (cmd, "prof_autoreset"))	return DEBUGCMD_PROFAUTORESET;
   if (!strcmp (cmd, "uberscreenshot"))	return DEBUGCMD_UBERSCREENSHOT;
 
   return DEBUGCMD_UNKNOWN;

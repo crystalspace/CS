@@ -25,6 +25,9 @@ chronological order.
 	  which actually ships this header [which was removed between bullet 
 	  versions]...)
 	- res made more Windows SDK 6.0 compatibility fixes.
+	- Marten added CSV logging to the profiling plugin. Also added a
+	  command to start and stop logging as well as activating automatic
+	  reset (and writing) of data once per frame.
 10-Feb-2007
 	- Marten hopefully fixed lighter2 compiled with MSVC on win64.
 	- res changed csjpgimg to not use setjmp() but exceptions for error
