@@ -166,8 +166,9 @@ void csDecal::AddStaticPoly(const csPoly3D & p)
     return;
     
   // ensure the polygon isn't facing away from the decal's normal too much
-  if (-poly.ComputeNormal() * localNormal < 
-          decalTemplate->GetPolygonNormalThreshold())
+  csVector3 polyNorm = poly.ComputeNormal();
+  float polyNormThresholdValue = -polyNorm * localNormal;
+  if (polyNormThresholdValue < decalTemplate->GetPolygonNormalThreshold())
     return;
 
   // check if we hit our maximum allowed vertices
@@ -182,13 +183,74 @@ void csDecal::AddStaticPoly(const csPoly3D & p)
   if (indexCount + idxCount > CS_DECAL_MAX_TRIS_PER_DECAL*3)
     return;
 
+  // if this face is too perpendicular, then we'll need to push it out a bit
+  // to avoid z-fighting.  We do this by pushing the bottom of the face out
+  // more than the top of the face
+#ifdef CS_DECAL_CLIP_DECAL
+  bool doFaceOffset = false;
+  float faceHighDot;
+  float invHighLowFaceDist;
+  csVector3 faceBottomOffset;
+  csVector3 faceCenter;
+  if (polyNormThresholdValue < CS_DECAL_FACE_OFFSET_THRESHOLD)
+  {
+    doFaceOffset = true;
+
+    csVector3 faceHighVert, faceLowVert;
+    float faceLowDot;
+
+    faceLowVert = faceHighVert = *poly.GetVertex(0);
+    faceLowDot = faceHighDot = (faceLowVert - relPos) * localNormal;
+    faceCenter = faceLowVert;
+    for (a=1; a<vertCount; ++a)
+    {
+      const csVector3 * vertPos = poly.GetVertex(a);
+      faceCenter += *vertPos;
+      float dot = (*vertPos - relPos) * localNormal;
+      if (dot > faceHighDot)
+      {
+	faceHighVert = *vertPos;
+	faceHighDot = dot;
+      }
+      if (dot < faceLowDot)
+      {
+	faceLowVert = *vertPos;
+	faceLowDot = dot;
+      }
+    }
+    invHighLowFaceDist = 1.0f / (faceHighDot - faceLowDot);
+    faceBottomOffset = -CS_DECAL_FACE_MAX_OFFSET * polyNorm;
+    faceCenter /= (float)vertCount;
+  }
+#endif // CS_DECAL_CLIP_DECAL
+
   const csVector2 & minTexCoord = decalTemplate->GetMinTexCoord();
   csVector2 texCoordRange = decalTemplate->GetMaxTexCoord() - minTexCoord;
 
   tri[0] = vertexCount;
   for (a=0; a<vertCount; ++a)
   {
-    csVector3 vertPos = *poly.GetVertex(a) + vertOffset;
+#ifdef CS_DECAL_CLIP_DECAL
+    csVector3 vertPos = *poly.GetVertex(a);
+
+    if (doFaceOffset)
+    {
+      // linear interpolation where high vert goes nowhere and low vert is
+      // full offset
+      float offsetVal = (faceHighDot - (vertPos - relPos) * localNormal) 
+	               * invHighLowFaceDist;
+      vertPos += offsetVal * faceBottomOffset;
+
+      // spread out the base to avoid vertical seams
+      vertPos += (vertPos - faceCenter).Unit() 
+	* (CS_DECAL_FACE_MAX_OFFSET * 2.0f); 
+    }
+
+    vertPos += vertOffset;
+#else
+    csVector3 vertPos = *poly.GetVertex(a);
+#endif // CS_DECAL_CLIP_DECAL
+
     csVector3 relVert = vertPos - relPos;
     size_t vertIdx = vertexCount+a;
 

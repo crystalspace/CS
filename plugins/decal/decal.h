@@ -39,6 +39,11 @@
 #define CS_DECAL_MAX_TRIS_PER_DECAL         64 
 #define CS_DECAL_MAX_VERTS_PER_DECAL        128 
 
+// these two settings kind of screw up the decal, but the z-fighting is 
+// too much otherwise
+#define CS_DECAL_FACE_OFFSET_THRESHOLD		0.05
+#define CS_DECAL_FACE_MAX_OFFSET		0.01
+
 class csDecalManager;
 
 struct csDecalRenderMeshInfo
