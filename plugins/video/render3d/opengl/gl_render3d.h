@@ -65,8 +65,7 @@
 class csGLTextureHandle;
 class csGLTextureManager;
 struct csGLExtensionManager;
-class csGLVBOBufferManager;
-class csGLRenderBuffer;
+
 struct iClipper2D;
 struct iObjectRegistry;
 struct iTextureManager;
@@ -359,6 +358,8 @@ private:
   ////////////////////////////////////////////////////////////////////
 	
   void Report (int severity, const char* msg, ...);
+
+  void ParseByteSize (const char* sizeStr, size_t& size);
 
   int GetMaxTextureSize () const { return rendercaps.maxTexWidth; }
 

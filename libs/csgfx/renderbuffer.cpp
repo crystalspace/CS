@@ -58,6 +58,10 @@ csRenderBuffer::~csRenderBuffer ()
     lockStack->Free();
   }
 #endif
+  //Notify callback
+  if (callback.IsValid ())
+    callback->RenderBufferDestroyed (this);
+
   if (props.doDelete) delete[] buffer;
   buffer = 0;
 }

@@ -94,6 +94,21 @@ static const size_t csRenderBufferComponentSizes[CS_BUFCOMP_TYPECOUNT] =
   sizeof (double)
 };
 
+struct iRenderBuffer;
+
+/**
+ * Callback function used upon destruction of render buffer. Used by renderer
+ * to properly uncache render buffer.
+ */
+struct iRenderBufferCallback : public virtual iBase
+{
+  SCF_INTERFACE (iRenderBufferCallback, 1,0,0);
+  /**
+   * Called when render buffer is about to be destroyed and removed
+   */
+  virtual void RenderBufferDestroyed (iRenderBuffer* buffer) = 0;
+};
+
 /**
  * This is a general buffer.
  *
@@ -106,7 +121,7 @@ static const size_t csRenderBufferComponentSizes[CS_BUFCOMP_TYPECOUNT] =
  */
 struct iRenderBuffer : public virtual iBase
 {
-  SCF_INTERFACE (iRenderBuffer, 2, 0, 0);
+  SCF_INTERFACE (iRenderBuffer, 2, 1, 0);
 
   /**
    * Lock the buffer to allow writing and return a pointer to the first 
@@ -174,6 +189,9 @@ struct iRenderBuffer : public virtual iBase
 
   /// Number of elements in a buffer.
   virtual size_t GetElementCount() const = 0;
+
+  /// Set callback object to use
+  virtual void SetCallback (iRenderBufferCallback* cb) = 0;
 };
 
 /**

@@ -43,6 +43,7 @@
 #include "csutil/scf.h"
 #include "csutil/scfarray.h"
 #include "csutil/strset.h"
+#include "ivaria/profile.h"
 
 #include "igeom/clip2d.h"
 #include "iutil/cmdline.h"
@@ -66,7 +67,8 @@
 
 #include "csplugincommon/opengl/glextmanager.h"
 
-
+CS_DECLARE_PROFILER
+CS_DECLARE_PROFILER_ZONE(csGLGraphics3D_DrawMesh);
 
 #define BYTE_TO_FLOAT(x) ((x) * (1.0 / 255.0))
 
@@ -725,6 +727,34 @@ void csGLGraphics3D::SetupProjection ()
   needProjectionUpdate = false;
 }
 
+void csGLGraphics3D::ParseByteSize (const char* sizeStr, size_t& size)
+{
+  const char* end = sizeStr + strspn (sizeStr, "0123456789"); 	 
+  size_t sizeFactor = 1; 	 
+  if ((*end == 'k') || (*end == 'K')) 	 
+    sizeFactor = 1024; 	 
+  else if ((*end == 'm') || (*end == 'M')) 	 
+    sizeFactor = 1024*1024; 	 
+  else if (*end != 0)
+  { 	 
+    Report (CS_REPORTER_SEVERITY_WARNING, 	 
+      "Unknown suffix '%s' in maximum buffer size '%s'.", end, sizeStr); 	 
+    sizeFactor = 0; 	 
+  } 	 
+  if (sizeFactor != 0) 	 
+  { 	 
+    unsigned long tmp;
+    if (sscanf (sizeStr, "%lu", &tmp) != 0)
+    {
+      size = tmp;
+      size *= sizeFactor; 	 
+    }
+    else 	 
+      Report (CS_REPORTER_SEVERITY_WARNING, 	 
+      "Invalid buffer size '%s'.", sizeStr); 	 
+  }
+}
+
 ////////////////////////////////////////////////////////////////////
 // iGraphics3D
 ////////////////////////////////////////////////////////////////////
@@ -851,7 +881,16 @@ bool csGLGraphics3D::Open ()
   // check for support of VBO
   use_hw_render_buffers = ext->CS_GL_ARB_vertex_buffer_object;
   if (use_hw_render_buffers) 
-    vboManager.AttachNew (new csGLVBOBufferManager (ext, statecache, object_reg));
+  {
+    size_t vboSize;
+
+
+    ParseByteSize (config->GetStr ("Video.OpenGL.VBO.MaxSize", "64M"), vboSize);
+
+    Report (CS_REPORTER_SEVERITY_NOTIFY, "Using VBO with %d MB of VBO memory",
+      vboSize / (1024*1024));
+    vboManager.AttachNew (new csGLVBOBufferManager (ext, statecache, vboSize));
+  }
 
   GLint dbits;
   glGetIntegerv (GL_DEPTH_BITS, &dbits);
@@ -1292,7 +1331,7 @@ void csGLGraphics3D::Print (csRect const* area)
 
   if (vboManager.IsValid ())
   {
-    vboManager->ResetFrameStats ();
+//@@TODO:    vboManager->ResetFrameStats ();
   }
 
   if (enableDelaySwap)
@@ -1694,6 +1733,8 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
 {
   if (cliptype == CS_CLIPPER_EMPTY) 
     return;
+
+  CS_PROFILER_ZONE(csGLGraphics3D_DrawMesh);
 
   GLRENDER3D_OUTPUT_STRING_MARKER(("%p ('%s')", mymesh, mymesh->db_mesh_name));
   SwapIfNeeded();
