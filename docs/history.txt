@@ -19,6 +19,7 @@ chronological order.
 	- res replaced the csPtr<> API docs with an excerpt from the user
 	  manual description. Also added pointer to section in manual.
 	- res made csRenderBuffer use cs_malloc() for buffer data allocation.
+	- res marked the new temp file/dir functions for DLL exporting.
 10-Feb-2007
 	- Marten hopefully fixed lighter2 compiled with MSVC on win64.
 	- res changed csjpgimg to not use setjmp() but exceptions for error

@@ -217,7 +217,7 @@ namespace CS
   namespace Macros
   {
     CS_DEPRECATED_METHOD_MSG("Use CS::Platform::GetTempDirectory () from "
-      "syspath.h") csString CS_TEMP_DIR ();
+      "syspath.h") CS_CRYSTALSPACE_EXPORT csString CS_TEMP_DIR ();
   }
 }
 #  define CS_TEMP_DIR CS::Macros::CS_TEMP_DIR.GetDataSafe()
@@ -236,7 +236,7 @@ namespace CS
   namespace Macros
   {
     CS_DEPRECATED_METHOD_MSG("Use CS::Platform::GetTempFilename () from "
-      "syspath.h") csString CS_TEMP_FILE ();
+      "syspath.h") CS_CRYSTALSPACE_EXPORT csString CS_TEMP_FILE ();
   }
 }
 #  define CS_TEMP_FILE CS::Macros::CS_TEMP_FILE.GetDataSafe()

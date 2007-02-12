@@ -372,10 +372,10 @@ namespace Platform
 {
 
 /// Get system specific temporary folder
-csString GetTempDirectory ();
+CS_CRYSTALSPACE_EXPORT csString GetTempDirectory ();
 
 /// Get file name for temporary file within specified directory
-csString GetTempFilename (const char* path/* = 0*/);
+CS_CRYSTALSPACE_EXPORT csString GetTempFilename (const char* path/* = 0*/);
 
 }
 }
