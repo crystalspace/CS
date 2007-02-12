@@ -50,7 +50,7 @@ struct iDecal
  */
 struct iDecalTemplate : public virtual iBase
 {
-  SCF_INTERFACE(iDecalTemplate, 1, 0, 0);
+  SCF_INTERFACE(iDecalTemplate, 1, 1, 0);
 
   /**
    * Retrieves the time the decal will have to live in seconds before it is 
@@ -101,21 +101,35 @@ struct iDecalTemplate : public virtual iBase
    *  \return the decal offset.
    */
   virtual float GetDecalOffset() const = 0;
+
+  /**
+   * Determines whether or not this type of decal will have its geometry
+   * clipped against a plane above the decal.
+   *  \return True if top clipping is enabled.
+   */
+  virtual bool HasTopClipping() const = 0;
+
+  /**
+   * Gets the distance between the decal position and the top clipping plane
+   * as a multiple of decal size.
+   *  \return The top clipping plane scale.
+   */
+  virtual float GetTopClippingScale() const = 0;
+
+  /**
+   * Determines whether or not this type of decal will have its geometry
+   * clipped against a plane below the decal.
+   *  \return True if bottom clipping is enabled.
+   */
+  virtual bool HasBottomClipping() const = 0;
+
+  /**
+   * Gets the distance between the decal position and the bottom clipping
+   * plane as a multiple of decal size.
+   *  \return The bottom clipping plane scale.
+   */
+  virtual bool GetBottomClippingScale() const = 0;
   
-  /**
-   * Determines whether the decal will be clipped against a near and far
-   * plane.
-   * \return True if near-far clipping is enabled.
-   */
-  virtual bool HasNearFarClipping() const = 0;
-
-  /**
-   * If near-far clipping is enabled, this determines the distance between
-   * the near and far plane.
-   * \return The distance between the near and far plane.
-   */
-  virtual float GetNearFarClippingDist() const = 0;
-
   /**
    * The min tex coord is the uv coordinate of the top-left corner of the
    * decal.
@@ -186,19 +200,19 @@ struct iDecalTemplate : public virtual iBase
    */
   virtual void SetDecalOffset(float decalOffset) = 0;
 
-  /**
-   * Determines whether the decal will be clipped against a near and far
-   * plane.
-   *  \param enabled	True if near-far clipping is enabled.
+  /** Enables or disables clipping geometry above the decal.
+   *   \param enabled		True if top clipping should be enabled.
+   *   \param topPlaneScale	The distance from the decal position to the
+   *                            top plane as a multiple of decal size.
    */
-  virtual void SetNearFarClipping(bool enabled) = 0;
+  virtual void SetTopClipping(bool enabled, float topPlaneScale=0.0f) = 0;
 
-  /**
-   * If near-far clipping is enabled, this determines the distance between
-   * the near and far plane.
-   *  \param dist	The distance between the near and far plane.
+  /** Enables or disables clipping geometry below the decal.
+   *   \param enabled		True if bottom clipping should be enabled.
+   *   \param bottomPlaneScale	The distance from the decal position to the
+   *                            bottom plane as a multiple of decal size.
    */
-  virtual void SetNearFarClippingDist(float dist) = 0;
+  virtual void SetBottomClipping(bool enabled, float bottomPlaneScale) = 0;
 
   /**
    * The tex coords are the uv coordinate of the top-left and bottom-right 

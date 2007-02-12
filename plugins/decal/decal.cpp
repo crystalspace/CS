@@ -83,6 +83,8 @@ void csDecal::Initialize(iDecalTemplate * decalTemplate,
   this->width = width;
   this->height = height;
 
+  radius = sqrt(width*width + height*height);
+
   invWidth = 1.0f / width;
   invHeight = 1.0f / height;
            
@@ -117,10 +119,10 @@ void csDecal::BeginMesh(iMeshWrapper * mesh)
   relPos = trans.Other2This(pos);
 
 #ifdef CS_DECAL_CLIP_DECAL
-  // bottom
+  // up 
   clipPlanes[0] = csPlane3(-localUp, -height*0.5f + localUp * relPos);
   
-  // top
+  // down
   clipPlanes[1] = csPlane3( localUp, -height*0.5f - localUp * relPos);
 
   // left
@@ -129,6 +131,25 @@ void csDecal::BeginMesh(iMeshWrapper * mesh)
   // right
   clipPlanes[3] = csPlane3( localRight, -width*0.5f - localRight * relPos);
 
+  numClipPlanes = 4;
+
+  // top
+  if (decalTemplate->HasTopClipping())
+  {
+    float topPlaneDist = decalTemplate->GetTopClippingScale() * radius;
+    clipPlanes[numClipPlanes++] = csPlane3(-localNormal,
+	-topPlaneDist + localNormal * relPos);
+  }
+
+  // bottom
+  if (decalTemplate->HasBottomClipping())
+  {
+    float bottomPlaneDist = decalTemplate->GetBottomClippingScale() * radius;
+    clipPlanes[numClipPlanes++] = csPlane3( localNormal,
+	-bottomPlaneDist - localNormal * relPos);
+  }
+  
+  /*
   if (decalTemplate->HasNearFarClipping())
   {
     float halfNearFarDist = decalTemplate->GetNearFarClippingDist() * 0.5f;
@@ -137,6 +158,7 @@ void csDecal::BeginMesh(iMeshWrapper * mesh)
     clipPlanes[5] = csPlane3( localNormal, 
             -halfNearFarDist - localNormal * relPos);
   }
+  */
 #endif // CS_DECAL_CLIP_DECAL
 
   // we didn't encounter any errors, so validate the current mesh
@@ -154,7 +176,6 @@ void csDecal::AddStaticPoly(const csPoly3D & p)
   csPoly3D poly = p;
 
 #ifdef CS_DECAL_CLIP_DECAL
-  size_t numClipPlanes = decalTemplate->HasNearFarClipping() ? 6 : 4;
   for (a=0; a<numClipPlanes; ++a)
       poly.CutToPlane(clipPlanes[a]);
 #endif // CS_DECAL_CLIP_DECAL

@@ -10,6 +10,8 @@ chronological order.
 	- Andrew Robberts updated decals so reduce z-fighting and seams.
 	- Marten rewrote the VBO buffer handling to be more robust, contain
 	  less cruft and be a bit faster.
+	- Andrew Robberts updated decals to better specify a top and
+	  bottom clipping plane for decals.
 10-Feb-2007
 	- Marten hopefully fixed lighter2 compiled with MSVC on win64.
 	- res changed csjpgimg to not use setjmp() but exceptions for error

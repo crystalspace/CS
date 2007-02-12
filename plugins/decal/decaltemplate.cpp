@@ -29,8 +29,8 @@ csDecalTemplate::csDecalTemplate()
       zBufMode(CS_ZBUF_TEST),
       polygonNormalThreshold(CS_DECAL_DEFAULT_NORMAL_THRESHOLD),
       decalOffset(CS_DECAL_DEFAULT_OFFSET),
-      hasNearFarClipping(CS_DECAL_DEFAULT_CLIP_NEAR_FAR),
-      nearFarClippingDist(CS_DECAL_DEFAULT_NEAR_FAR_DIST),
+      hasTopClip(true), topClipScale(0.5f),
+      hasBottomClip(true), bottomClipScale(0.5f),
       minTexCoord(0,0),
       maxTexCoord(1,1),
       mixMode(CS_FX_COPY)
@@ -76,14 +76,24 @@ float csDecalTemplate::GetDecalOffset() const
     return decalOffset;
 }
 
-bool csDecalTemplate::HasNearFarClipping() const
+bool csDecalTemplate::HasTopClipping() const
 {
-    return hasNearFarClipping;
+  return hasTopClip;
 }
 
-float csDecalTemplate::GetNearFarClippingDist() const
+float csDecalTemplate::GetTopClippingScale() const
 {
-    return nearFarClippingDist;
+  return topClipScale;
+}
+
+bool csDecalTemplate::HasBottomClipping() const
+{
+  return hasBottomClip;
+}
+
+bool csDecalTemplate::GetBottomClippingScale() const
+{
+  return bottomClipScale;
 }
 
 const csVector2 & csDecalTemplate::GetMinTexCoord() const
@@ -131,14 +141,16 @@ void csDecalTemplate::SetDecalOffset(float decalOffset)
     this->decalOffset = decalOffset;
 }
 
-void csDecalTemplate::SetNearFarClipping(bool enabled)
+void csDecalTemplate::SetTopClipping(bool enabled, float topPlaneScale)
 {
-    this->hasNearFarClipping = enabled;
+  hasTopClip = enabled;
+  topClipScale = topPlaneScale;
 }
 
-void csDecalTemplate::SetNearFarClippingDist(float dist)
+void csDecalTemplate::SetBottomClipping(bool enabled, float bottomPlaneScale)
 {
-    this->nearFarClippingDist = dist;
+  hasBottomClip = enabled;
+  bottomClipScale = bottomPlaneScale;
 }
 
 void csDecalTemplate::SetTexCoords(const csVector2 & min, 

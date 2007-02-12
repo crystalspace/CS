@@ -100,6 +100,7 @@ private:
   csVector3                     vertOffset;
   csVector3                     relPos;
   csPlane3                      clipPlanes[6];
+  size_t			numClipPlanes;
   
 public:
   csDecal(iObjectRegistry * objectReg, csDecalManager * decalManager);

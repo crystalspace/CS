@@ -40,8 +40,10 @@ private:
   csZBufMode            zBufMode;
   float                 polygonNormalThreshold;
   float                 decalOffset;
-  bool                  hasNearFarClipping;
-  float                 nearFarClippingDist;
+  bool			hasTopClip;
+  float			topClipScale;
+  bool			hasBottomClip;
+  float			bottomClipScale;
   csVector2             minTexCoord;
   csVector2             maxTexCoord;
   uint			mixMode;
@@ -58,8 +60,10 @@ public:
   virtual csZBufMode GetZBufMode() const;
   virtual float GetPolygonNormalThreshold() const;
   virtual float GetDecalOffset() const;
-  virtual bool HasNearFarClipping() const;
-  virtual float GetNearFarClippingDist() const;
+  virtual bool HasTopClipping() const;
+  virtual float GetTopClippingScale() const;
+  virtual bool HasBottomClipping() const;
+  virtual bool GetBottomClippingScale() const;
   virtual const csVector2 & GetMinTexCoord() const;
   virtual const csVector2 & GetMaxTexCoord() const;
   virtual const uint GetMixMode() const;
@@ -69,8 +73,8 @@ public:
   virtual void SetZBufMode(csZBufMode mode);
   virtual void SetPolygonNormalThreshold(float polygonNormalThreshold);
   virtual void SetDecalOffset(float decalOffset);
-  virtual void SetNearFarClipping(bool enabled);
-  virtual void SetNearFarClippingDist(float dist);
+  virtual void SetTopClipping(bool enabled, float topPlaneScale);
+  virtual void SetBottomClipping(bool enabled, float bottomPlaneScale);
   virtual void SetTexCoords(const csVector2 & min, const csVector2 & max);
   virtual void SetMixMode(uint mixMode);
 };
