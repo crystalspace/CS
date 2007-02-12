@@ -24,6 +24,7 @@ chronological order.
 	  plugin. (Probably went undetected due a blunder in cs-win32libs 
 	  which actually ships this header [which was removed between bullet 
 	  versions]...)
+	- res made more Windows SDK 6.0 compatibility fixes.
 10-Feb-2007
 	- Marten hopefully fixed lighter2 compiled with MSVC on win64.
 	- res changed csjpgimg to not use setjmp() but exceptions for error
