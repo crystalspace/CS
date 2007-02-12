@@ -12,6 +12,12 @@ chronological order.
 	  less cruft and be a bit faster.
 	- Andrew Robberts updated decals to better specify a top and
 	  bottom clipping plane for decals.
+	- res slightly expanded the manual section on smart pointers with
+	  information on translation to and from normal pointers as well as
+	  information on csWeakRef<> and how to deal with references in
+	  function parameters.
+	- res replaced the csPtr<> API docs with an excerpt from the user
+	  manual description. Also added pointer to section in manual.
 10-Feb-2007
 	- Marten hopefully fixed lighter2 compiled with MSVC on win64.
 	- res changed csjpgimg to not use setjmp() but exceptions for error
