@@ -28,6 +28,8 @@ chronological order.
 	- Marten added CSV logging to the profiling plugin. Also added a
 	  command to start and stop logging as well as activating automatic
 	  reset (and writing) of data once per frame.
+	- Marten removed some left-over debugging code in lighter2. Fixes
+	  trac #237.
 10-Feb-2007
 	- Marten hopefully fixed lighter2 compiled with MSVC on win64.
 	- res changed csjpgimg to not use setjmp() but exceptions for error
