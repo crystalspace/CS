@@ -9,8 +9,6 @@ chronological order.
 23-Jan-2007
 	- res fixed some documentation in hash.h.
 	- res added a note on iTextureHandle::Blit() behaviour to the docs.
-	- res added a GetSize() method to csFIFO and deprecated Length() so
-	  it handles more like csArray<>.
 18-Jan-2007
 	- res fixed the genmesh 3DS loader to allocate a correctly sized index
 	  buffer. Addresses #236.

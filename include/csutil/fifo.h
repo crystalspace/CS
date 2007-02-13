@@ -76,20 +76,10 @@ public:
     a1.Push (what);
   }
 
-  /// Return the number of elements in the FIFO.
-  size_t GetSize()
-  {
-    return a1.GetSize() + a2.GetSize();
-  }
-
-  /**
-   * Return the number of elements in the FIFO.
-   * \deprecated Use GetSize() instead.
-   */
-  CS_DEPRECATED_METHOD_MSG("Use GetSize() instead.")
+  /// Return number of elements.
   size_t Length()
   {
-    return GetSize();
+    return a1.Length() + a2.Length();
   }
 
   /**
