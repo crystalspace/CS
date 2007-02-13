@@ -8,6 +8,11 @@ chronological order.
 
 13-Feb-2007
 	- Marten hopefully fixed bitoperations on VC7 and VC7.1.
+	- res added CS::DocumentHelper::CloneAttributes() to clone only the
+	  attributes of a node.
+	- res added CS::DocumentHelper::FlattenNode(), a function that flattens
+	  a document node hierarchy into a string (can be used for e.g. 
+	  hashing).
 12-Feb-2007
 	- Andrew Robberts updated decals so reduce z-fighting and seams.
 	- Marten rewrote the VBO buffer handling to be more robust, contain
