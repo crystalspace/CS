@@ -13,6 +13,7 @@ chronological order.
 	- res added CS::DocumentHelper::FlattenNode(), a function that flattens
 	  a document node hierarchy into a string (can be used for e.g. 
 	  hashing).
+	- res made a small constness tweak to CS::ScopedDelete<>.
 12-Feb-2007
 	- Andrew Robberts updated decals so reduce z-fighting and seams.
 	- Marten rewrote the VBO buffer handling to be more robust, contain
