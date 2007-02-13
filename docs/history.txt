@@ -16,6 +16,11 @@ chronological order.
 	- res made a small constness tweak to CS::ScopedDelete<>.
 	- res added a missing shared lib export marker for generic
 	  csExpandPlatformFilename().
+	- res removed the Bsymbolic linker flag - it causes problem with shared
+	  libs on Linux. Also, searching a bit around has revealed that this
+	  flag is generally problematic with C++. Lastly, the custom allocation
+	  issues having caused the initial use of this flag probably went away
+	  when the global new/delete override was removed.
 12-Feb-2007
 	- Andrew Robberts updated decals so reduce z-fighting and seams.
 	- Marten rewrote the VBO buffer handling to be more robust, contain
