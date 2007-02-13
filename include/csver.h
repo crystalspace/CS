@@ -32,9 +32,9 @@
 /// Minor version (release, or "dev" for CVS version)
 #define CS_VERSION_MINOR CS_VER_QUOTE(0)
 /// Maintenance release / RC
-#define CS_VERSION_BUILD CS_VER_QUOTE(0)
+#define CS_VERSION_BUILD CS_VER_QUOTE(1)
 /// Date of release
-#define CS_RELEASE_DATE  CS_VER_QUOTE(Mon 15-Jan-2007)
+#define CS_RELEASE_DATE  CS_VER_QUOTE(Mon 15-Feb-2007)
 
 #define CS_VER_QUOTE(X) #X
 

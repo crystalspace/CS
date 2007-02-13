@@ -1,4 +1,4 @@
 @c -*-texinfo-*-
-@set UPDATED 15 January 2007
-@set EDITION 1.0
-@set VERSION 1.0
+@set UPDATED 15 Februari 2007
+@set EDITION 1.0.1
+@set VERSION 1.0.1
