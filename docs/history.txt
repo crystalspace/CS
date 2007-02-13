@@ -13,6 +13,9 @@ chronological order.
 	  function parameters.
 	- res replaced the csPtr<> API docs with an excerpt from the user
 	  manual description. Also added pointer to section in manual.
+2-Feb-2007
+	- res worked around Cg not being properly detected on Linux when
+	  -Wl,--as-needed was passed in LDFLAGS.
 1-Feb-2007
 	- Marten made sure genmesh doesn't return any rendermeshes when
 	  there is no triangles. Fix bug #224.

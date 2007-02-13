@@ -20,6 +20,8 @@ chronological order.
 	- Jorrit merged r26251 into 1.0 (fix for autoconf 2.60+).
 	- Jorrit merged r26253 into 1.0 (ELF reader fix).
 	- Jorrit merged r26297 into 1.0 (empty genmesh fix).
+	- Jorrit merged r26307:26309 into 1.0 (configure CG issue).
+	- Jorrit merged r26312 into 1.0 (configure CG issue).
 2-Feb-2007
 	- res added an initial version of an SDK installer script, currently
 	  for the MSVC versions.
