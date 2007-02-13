@@ -142,6 +142,9 @@ struct iTextureHandle : public virtual iBase
   /**
    * Blit a memory block to this texture. Format of the image is determined
    * by the \a format parameter. Row by row.
+   * \remarks If the specified target rectangle exceeds the texture dimensions
+   *   the Blit() call may have no effect. It's the responsibility of the 
+   *   caller to ensure that the rectangle lies completely inside the texture.
    */
   virtual void Blit (int x, int y, int width, int height,
     unsigned char const* data, TextureBlitDataFormat format = RGBA8888) = 0;
