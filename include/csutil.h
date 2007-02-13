@@ -30,6 +30,7 @@
 #include "csutil/array.h"
 #include "csutil/binder.h"
 #include "csutil/bitarray.h"
+#include "csutil/bitops.h"
 #include "csutil/blockallocator.h"
 #include "csutil/callstack.h"
 #include "csutil/cfgacc.h"
