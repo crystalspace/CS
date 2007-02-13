@@ -857,7 +857,7 @@ bool csConditionEvaluator::Evaluate (csConditionID condition,
   }
 
   EvaluatorShadervar eval (*this, modes, stacks);
-  bool result = Evaluate<EvaluatorShadervar> (eval, condition);
+  bool result = Evaluate (eval, condition);
 
   condChecked.Set (condition, true);
   condResult.Set (condition, result);

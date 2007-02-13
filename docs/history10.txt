@@ -26,6 +26,7 @@ chronological order.
 	- Jorrit merged r26354 into 1.0 (particle fix, angular velocity).
 	- Jorrit merged r26376 into 1.0 (bullet header fix).
 	- Jorrit merged r26377 into 1.0 (windows SDK fixes).
+	- res merged r26255 into 1.0 (gcc 3.2 compile fix).
 2-Feb-2007
 	- res added an initial version of an SDK installer script, currently
 	  for the MSVC versions.
