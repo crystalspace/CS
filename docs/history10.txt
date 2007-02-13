@@ -10,6 +10,7 @@ chronological order.
 	- Jorrit merged r26215 into 1.0 (genmesh AddTriangle fix).
 	- Jorrit merged r26217 into 1.0 (genmesh 3DS loader fix).
 	- Jorrit merged r26234:26235 into 1.0 (doc tweaks).
+	- Jorrit merged r26239 into 1.0 (doc tweaks).
 2-Feb-2007
 	- res added an initial version of an SDK installer script, currently
 	  for the MSVC versions.
