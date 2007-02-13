@@ -22,6 +22,8 @@ chronological order.
 	- Jorrit merged r26297 into 1.0 (empty genmesh fix).
 	- Jorrit merged r26307:26309 into 1.0 (configure CG issue).
 	- Jorrit merged r26312 into 1.0 (configure CG issue).
+	- Jorrit merged r26338 into 1.0 (VC8/SDK 6.0 incompatibility).
+	- Jorrit merged r26354 into 1.0 (particle fix, angular velocity).
 2-Feb-2007
 	- res added an initial version of an SDK installer script, currently
 	  for the MSVC versions.

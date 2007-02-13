@@ -280,7 +280,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ParticlesLoader)
 
     //properties
     float radius = 1.0f, coneAngle = PI/4;
-    csVector3 position (0.0f), extent (0.0f), initialVelocity (0.0f);
+    csVector3 position (0.0f), extent (0.0f), initialVelocity (0.0f), initialAngVelocity (0.0f);
     bool enabled = true;
     float startTime = 0.0f, duration = FLT_MAX, emissionRate = 0.0f, 
       minTTL = FLT_MAX, maxTTL = FLT_MAX, minMass = 1.0f, maxMass = 1.0f;
@@ -367,6 +367,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(ParticlesLoader)
           return 0;
         }
         break;
+      case XMLTOKEN_INITIALANGULARVELOCITY:
+        if (!synldr->ParseVector (child, initialAngVelocity))
+        {
+          return 0;
+        }
+        break;
       case XMLTOKEN_RADIUS:
         radius = child->GetContentsValueAsFloat ();
         break;
@@ -438,7 +444,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ParticlesLoader)
 
     // Set base properties
     baseEmitter->SetPosition (position);
-    baseEmitter->SetInitialVelocity (initialVelocity, csVector3 (0.0f));
+    baseEmitter->SetInitialVelocity (initialVelocity, initialAngVelocity);
     baseEmitter->SetUniformVelocity (unifromVelocity);
     baseEmitter->SetParticlePlacement (placement);
     
@@ -1120,6 +1126,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(ParticlesLoader)
     csVector3 lin, ang;
     emitterBase->GetInitialVelocity (lin, ang);
     synldr->WriteVector (velNode, lin);
+
+    // Initial angular velocity
+    csRef<iDocumentNode> angVelNode = emitterNode->CreateNodeBefore (
+      CS_NODE_ELEMENT, 0);
+    angVelNode->SetValue ("initialangularvelocity");
+    synldr->WriteVector (angVelNode, ang);
 
     //Write specific properties
     csRef<iParticleBuiltinEmitterSphere> sphereEmit = 

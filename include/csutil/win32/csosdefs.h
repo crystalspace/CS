@@ -83,7 +83,16 @@
   #pragma intrinsic (_byteswap_ushort, _byteswap_ulong, _byteswap_uint64)
   
   #if _MSC_VER >= 1400
+    /* Work around an apparent incompatibility between VC8's intrin.h and
+     * the Windows SDK 6.0's winnt.h - _interlockedbittestandset and
+     * _interlockedbittestandreset have slightly different prototypes.
+     * Go Microsoft!
+     */
+    #define _interlockedbittestandset   workaround_header_bug_1
+    #define _interlockedbittestandreset workaround_header_bug_2
     #include <intrin.h>
+    #undef _interlockedbittestandset
+    #undef _interlockedbittestandreset
   #else
     extern "C" long _InterlockedCompareExchange (long volatile *, long, long);
     extern "C" long _InterlockedDecrement (long volatile *);
