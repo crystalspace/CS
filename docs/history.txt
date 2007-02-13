@@ -13,6 +13,11 @@ chronological order.
 	  function parameters.
 	- res replaced the csPtr<> API docs with an excerpt from the user
 	  manual description. Also added pointer to section in manual.
+	- res fixed an inclusion of a non-existant header in the bullet 
+	  plugin. (Probably went undetected due a blunder in cs-win32libs 
+	  which actually ships this header [which was removed between bullet 
+	  versions]...)
+	- res made more Windows SDK 6.0 compatibility fixes.
 8-Feb-2007
 	- Marten made two tweaks to particles:
 	    - Exposed initial angular velocity setting on emitters to xml.

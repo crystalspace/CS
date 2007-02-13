@@ -37,12 +37,11 @@
 #include "ivideo/natwin.h"
 #include "ivideo/cursor.h"
 
+#include <windows.h>
 
 #include "csutil/win32/wintools.h"
 #include "win32kbd.h"
 #include "cachedll.h"
-
-#include <windows.h>
 
 #include <stdio.h>
 #include <time.h>
@@ -451,7 +450,7 @@ Win32Assistant::Win32Assistant (iObjectRegistry* r)
     {
       strcat (apppath, ".ico");
     }
-    appIcon = (HICON)LoadImage (ModuleHandle, apppath, IMAGE_ICON,
+    appIcon = (HICON)LoadImageA (ModuleHandle, apppath, IMAGE_ICON,
       0, 0, LR_DEFAULTSIZE | LR_LOADFROMFILE);
   }
   // finally the default one
