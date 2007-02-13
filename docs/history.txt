@@ -6,6 +6,13 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+12-Feb-2007
+	- res slightly expanded the manual section on smart pointers with
+	  information on translation to and from normal pointers as well as
+	  information on csWeakRef<> and how to deal with references in
+	  function parameters.
+	- res replaced the csPtr<> API docs with an excerpt from the user
+	  manual description. Also added pointer to section in manual.
 23-Jan-2007
 	- res fixed some documentation in hash.h.
 	- res added a note on iTextureHandle::Blit() behaviour to the docs.
