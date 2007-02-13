@@ -14,6 +14,8 @@ chronological order.
 	  a document node hierarchy into a string (can be used for e.g. 
 	  hashing).
 	- res made a small constness tweak to CS::ScopedDelete<>.
+	- res added a missing shared lib export marker for generic
+	  csExpandPlatformFilename().
 12-Feb-2007
 	- Andrew Robberts updated decals so reduce z-fighting and seams.
 	- Marten rewrote the VBO buffer handling to be more robust, contain
