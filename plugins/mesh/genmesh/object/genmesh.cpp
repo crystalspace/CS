@@ -999,7 +999,9 @@ csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (
   UpdateSubMeshProxies ();
   SubMeshProxiesContainer& sm = subMeshes;
 
-  if ((sm.GetSize () == 0) && (legacySubmeshes.GetSize() == 0))
+  if (sm.GetSize () == 0 && 
+      legacySubmeshes.GetSize () == 0 &&
+      factory->GetTriangleCount () > 0)
   {
     renderMeshes.SetLength (1);
 

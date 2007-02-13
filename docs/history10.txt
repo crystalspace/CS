@@ -17,6 +17,9 @@ chronological order.
 	- Jorrit merged r26378 into 1.0 (doc tweaks).
 	- Jorrit merged r26236 into 1.0 (genmeshify cmdline help).
 	- Jorrit merged r26238 into 1.0 (tokenlist.h docs).
+	- Jorrit merged r26251 into 1.0 (fix for autoconf 2.60+).
+	- Jorrit merged r26253 into 1.0 (ELF reader fix).
+	- Jorrit merged r26297 into 1.0 (empty genmesh fix).
 2-Feb-2007
 	- res added an initial version of an SDK installer script, currently
 	  for the MSVC versions.
