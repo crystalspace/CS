@@ -150,7 +150,8 @@ namespace genmeshify
           break;
         else
         {
-          CommandLineHelp();
+          if (!csCommandLineHelper::CheckHelp (objectRegistry))
+            CommandLineHelp();
           return false;
         }
       }
