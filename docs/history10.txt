@@ -13,6 +13,8 @@ chronological order.
 	- Jorrit merged r26339 into 1.0 (doc tweaks).
 	- Jorrit merged r26349 into 1.0 (doc tweaks).
 	- Jorrit merged r26372 into 1.0 (csRef doc tweaks).
+	- Jorrit merged r26373 into 1.0 (doc tweaks).
+	- Jorrit merged r26378 into 1.0 (doc tweaks).
 2-Feb-2007
 	- res added an initial version of an SDK installer script, currently
 	  for the MSVC versions.

@@ -170,9 +170,9 @@ released until object @samp{A} is destructed.  This circular dependency leads
 to neither objects being released automatically.
 
 To prevent this scenario one reference can be made a @code{csWeakRef<>} 
-instead.  If object @samp{B} holds only a weak reference to object @samp{A},
-both @samp{A} and @samp{B} are automatically destructed when object @samp{A}
-is released.
+instead.  If object @samp{B} holds only a weak reference to object @samp{A}, 
+this reference will become null when @samp{A} is destroyed, and @samp{B} may 
+also be destroyed if @samp{A} held the last reference to it.
 
 As all weak references to an object are automatically set to null when the
 object gets destroyed care must be taken when accessing a weak referenced
