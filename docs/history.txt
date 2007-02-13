@@ -18,6 +18,9 @@ chronological order.
 	    - Exposed initial angular velocity setting on emitters to xml.
 	    - Made sure rotation-mode resets the texcoord vectors. Fixes
 	      problem when switching from texcoord rotation to none.
+4-Feb-2007
+	- res worked around an apparent incompatibility between one of VC8's 
+	  headers and a header from the latest Windows SDK 6.0. 
 2-Feb-2007
 	- res worked around Cg not being properly detected on Linux when
 	  -Wl,--as-needed was passed in LDFLAGS.
