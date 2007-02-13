@@ -16,6 +16,7 @@ chronological order.
 	- Jorrit merged r26373 into 1.0 (doc tweaks).
 	- Jorrit merged r26378 into 1.0 (doc tweaks).
 	- Jorrit merged r26236 into 1.0 (genmeshify cmdline help).
+	- Jorrit merged r26238 into 1.0 (tokenlist.h docs).
 2-Feb-2007
 	- res added an initial version of an SDK installer script, currently
 	  for the MSVC versions.

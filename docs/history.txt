@@ -18,6 +18,7 @@ chronological order.
 	- res added a note on iTextureHandle::Blit() behaviour to the docs.
 	- res fixed genmeshify to print command line help twice when run
 	  with --help.
+	- res changed tokenlist.h to mention its csstring.h dependency.
 18-Jan-2007
 	- res fixed the genmesh 3DS loader to allocate a correctly sized index
 	  buffer. Addresses #236.
