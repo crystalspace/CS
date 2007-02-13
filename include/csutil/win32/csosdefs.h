@@ -70,11 +70,18 @@
     extern "C" long _InterlockedDecrement (long volatile *);
     extern "C" long _InterlockedExchange (long volatile *, long);
     extern "C" long _InterlockedIncrement (long volatile *);
+
+    extern "C" unsigned char _BitScanForward (unsigned long* Index, unsigned long Mask);
+    extern "C" unsigned char _BitScanReverse (unsigned long* Index, unsigned long Mask);
   #endif
   #pragma intrinsic (_InterlockedCompareExchange)
   #pragma intrinsic (_InterlockedDecrement)
   #pragma intrinsic (_InterlockedExchange)
   #pragma intrinsic (_InterlockedIncrement)
+  #pragma intrinsic (_BitScanForward)
+  #pragma intrinsic (_BitScanReverse)
+
+  #define CS_HAVE_BITSCAN_INTRINSICS
 
   #if defined(__CRYSTAL_SPACE__) && !defined(CS_DEBUG)
     #pragma code_seg("CSpace")	  // Just for fun :)
