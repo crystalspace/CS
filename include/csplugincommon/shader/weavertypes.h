@@ -62,8 +62,9 @@ namespace CS
           /// Position
           Position,
           /// Surface normal (or tangents/bitangents)
-          Normal,
+          Normal
 	#if 0
+	  ,
           /// Direction (e.g. light direction...)
           Direction
 	#endif
@@ -80,6 +81,7 @@ namespace CS
           /// Camera space
           Camera
 	#if 0
+	  ,
           /// Tangent space
           Tangent
 	#endif

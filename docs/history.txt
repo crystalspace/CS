@@ -9,6 +9,7 @@ chronological order.
 14-Feb-2007
 	- res made various fixes to the shader weaver and Cg combiner plugins.
 	- res added parallax mapping to the example std_lighting_2.
+	- Jorrit fixed a compile error in weavertypes.h.
 13-Feb-2007
 	- Marten hopefully fixed bitoperations on VC7 and VC7.1.
 	- res added CS::DocumentHelper::CloneAttributes() to clone only the
@@ -293,7 +294,8 @@ chronological order.
 	    - fixed vector division, was misimplemented as multiplication.
 	    - added declaration for some key event macros which are not
 	      found automatically by swig.
-	- Genjix added fix for iGeneralFactory::AddTriangle() crash in Invalidate().
+	- Genjix added fix for iGeneralFactory::AddTriangle() crash in
+          Invalidate().
 12-Jan-2007
 	- caedes added scfImplementationExt1 template to scf.i swig file so
 	  this template can be wrapped.
