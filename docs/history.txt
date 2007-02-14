@@ -13,6 +13,8 @@ chronological order.
 	- Jorrit fixed a compile error in weavertypes.h.
 	- Marten fixed a destruction/iteration order problem in 
 	  csGLVBOBufferManager destructor.
+	- Jorrit disabled the profiler in ivaria/profile.h because it seems
+	  to cause problems for static builds.
 13-Feb-2007
 	- Marten hopefully fixed bitoperations on VC7 and VC7.1.
 	- res added CS::DocumentHelper::CloneAttributes() to clone only the

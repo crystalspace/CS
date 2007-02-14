@@ -30,7 +30,7 @@
 
 struct iObjectRegistry;
 
-#define CS_USE_PROFILER
+//#define CS_USE_PROFILER
 
 namespace CS
 {
