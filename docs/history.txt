@@ -6,10 +6,13 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+
 14-Feb-2007
 	- res made various fixes to the shader weaver and Cg combiner plugins.
 	- res added parallax mapping to the example std_lighting_2.
 	- Jorrit fixed a compile error in weavertypes.h.
+	- Marten fixed a destruction/iteration order problem in 
+	  csGLVBOBufferManager destructor.
 13-Feb-2007
 	- Marten hopefully fixed bitoperations on VC7 and VC7.1.
 	- res added CS::DocumentHelper::CloneAttributes() to clone only the

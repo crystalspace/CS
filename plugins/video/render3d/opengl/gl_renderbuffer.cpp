@@ -89,8 +89,9 @@ csGLVBOBufferManager::~csGLVBOBufferManager ()
 
       while (buffer)
       {
+        VBOBuffer* next = buffer->nextBuffer;
         FreeVBOBuffer (buffer);
-        buffer = buffer->nextBuffer;
+        buffer = next;
       }
     }
 
