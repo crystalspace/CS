@@ -35,6 +35,9 @@
 #include "snippet.h"
 #include "synth.h"
 
+// Debugging
+#define WEAVER_PRINTF   if (false) csPrintf
+
 CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 {
   namespace WeaverCommon = CS::PluginCommon::ShaderWeaver;
@@ -64,7 +67,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     CS::DocumentHelper::CloneAttributes (sourceNode, shaderNode);
     shaderNode->SetAttribute ("compiler", "xmlshader");
     
-    printf ("%zu\n", graphs.GetSize());
+    WEAVER_PRINTF ("%zu graphs\n", graphs.GetSize());
     if (graphs.GetSize() > 0)
     {
       size_t techNum = graphs[0].GetSize();
@@ -72,7 +75,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       {
         techNum *= graphs[g].GetSize();
       }
-      printf ("%zu\n", techNum);
+      WEAVER_PRINTF ("%zu techniques\n", techNum);
       size_t currentTech = 0;
       while (currentTech < techNum)
       {
@@ -123,23 +126,21 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 
     TechniqueGraph graph (techGraph);
     /*
-      Here comes some of the magic. What we have now is an array of 
-      "snippets"; what we want is a graph structure a la Abstract Shade Trees
+      Here comes some of the magic. What we have is a graph structure a la 
+      Abstract Shade Trees
       (http://graphics.cs.brown.edu/games/AbstractShadeTrees/).
+
+      Given that graph, actual links between input and output parameters have
+      to be determined from the abstract connections.
      
-      So first we need to make a graph of our flat array.
-      * Each element will become a node.
-      * If an explicit connection is specified, use that. (@@@ TODO)
-      * Otherwise, try to implicitly connect. For each element,  search (from 
-        the element backwards) if some element provides an output that 
-        corresponds to an input to the current element. If so, connect.
-        (Correspondence is checked by name.)
-     
-      Once that graph is built, start off by the node that has the output 
-      "outputColor" (if none has, pick an arbitrary color output; if none
-      exists, pick an arbitrary output.)
+      Searched are all dependencies, the dependencies of dependencies and so on
+      for the best match. The best match is either perfect or a coercion
+      with the lowest cost. 
       
-      All dependent nodes will then be sent off to the combiner(s).
+      If no match is found, the "default" block are emitted.
+
+      Since a coercion may require input itself the coercions cause the graph
+      to be augmented, introducing new dependencies and connections.
      */
      
     CS_ASSERT(snippet->IsCompound());
@@ -205,7 +206,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       graph.AddConnection (conn);
     }
     /*
-      - Starting from our output node, collect all nodes that go into it.
+      - Starting from our output nodes, collect all nodes that go into them.
         These will be emitted.
       - For each node perform input/output renaming.
      */
@@ -241,11 +242,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	  const Snippet::Technique* sourceTech;
           const Snippet::Technique::Output* output;
           
-          printf ("find input: %p, %s", node.tech, inp.name.GetData());
+          WEAVER_PRINTF ("find input: %p, %s", node.tech, inp.name.GetData());
           if (FindInput (graph, combiner, node.tech, inp, sourceTech, output,
             usedOutputs))
           {
-            printf (" ...found\n");
+            WEAVER_PRINTF (" ...found\n");
             if (strcmp (output->type, inp.type) == 0)
             {
 	      Link link;
@@ -253,7 +254,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	        synthTree.GetNodeForTech (sourceTech).outputRenames.Get (
 		  output->name, (const char*)0);
 	      CS_ASSERT(!link.fromName.IsEmpty());
-	      //link.fromType = output->type;
 	    
 	      link.toName = node.inputRenames.Get (inp.name, (const char*)0);
 	      CS_ASSERT(!link.toName.IsEmpty());
@@ -274,7 +274,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	  }
 	  else
 	  {
-            printf (" ...use default\n");
+            WEAVER_PRINTF (" ...use default\n");
 	    // Obtain default
 	    switch (inp.defaultType)
 	    {
@@ -313,7 +313,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
         }
       }
     }
-    //synthTree.Resort (graph);
     {
       csArray<const Snippet::Technique*> outputs;
       outputs.Push (generatedOutput);
@@ -501,19 +500,19 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	{
 	  const Snippet::Technique::Output& outp = outputIt->Next();
 	  if (usedOutputs.Contains (&outp)) continue;
-	  printf ("\n%s %s -> %s %s",
+	  WEAVER_PRINTF ("\n%s %s -> %s %s",
 	   outp.type.GetData(), outp.name.GetData(),
 	   input.type.GetData(), input.name.GetData());
 	  if (outp.type == input.type)
 	  {
-	    printf (" match");
+	    WEAVER_PRINTF (" match");
 	    sourceTech = tech;
 	    output = &outp;
 	    usedOutputs.AddNoTest (output);
 	    return true;
 	  }
 	  uint cost = combiner->CoerceCost (outp.type, input.type);
-	  printf(" cost %u", cost);
+	  WEAVER_PRINTF(" cost %u", cost);
 	  if (cost < coerceCost)
 	  {
 	    sourceTech = tech;
@@ -553,6 +552,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     if (!used->CompatibleParams (requested.params)) return 0;
     return used;
   }
+
+  //-------------------------------------------------------------------------
       
   void Synthesizer::SynthesizeNodeTree::ComputeRenames (Node& node,
     WeaverCommon::iCombiner* combiner)
@@ -597,12 +598,24 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     {
       const Snippet::Technique* tech = techsToAdd.PopTop();
       
-      if (!techToNode.Contains (tech))
+      size_t oldIndex = techToNode.Get (tech, csArrayItemNotFound);
+      if (oldIndex == csArrayItemNotFound)
       {
         Node node;
         node.tech = tech;
         ComputeRenames (node, combiner);
         techToNode.Put (tech, nodes.Push (node));
+      }
+      else
+      {
+        /* A dependency was added earlier. However, dependencies of a node
+           must come after the depending node in the array; so push the
+           node back. */
+        Node node (nodes[oldIndex]);
+        nodes[oldIndex].tech = 0;
+        nodes[oldIndex].inputRenames.DeleteAll();
+        nodes[oldIndex].outputRenames.DeleteAll();
+        techToNode.PutUnique (tech, nodes.Push (node));
       }
       
       csArray<const Snippet::Technique*> deps;
@@ -634,10 +647,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     {
       csRef<iDocumentNode> link = linkChain->Next ();
       
-      // @@@ Leaks!
       Snippet::Technique* tech = 
         Snippet::LoadLibraryTechnique (compiler, link, combinerPlugin);
-      printf ("augment: %p\n", tech);
+      augmentedTechniques.Push (tech);
+      WEAVER_PRINTF ("augment: %p\n", tech);
       graph.AddTechnique (tech);
       TechniqueGraph::Connection conn;
       conn.from = lastTech;
@@ -692,10 +705,22 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     {
       const Snippet::Technique* tech = techsToAdd.PopTop();
       
-      if (!newTechToNode.Contains (tech))
+      size_t oldIndex = newTechToNode.Get (tech, csArrayItemNotFound);
+      if (oldIndex == csArrayItemNotFound)
       {
         Node node = GetNodeForTech (tech);
         newTechToNode.Put (tech, newNodes.Push (node));
+      }
+      else
+      {
+        /* A dependency was added earlier. However, dependencies of a node
+           must come after the depending node in the array; so push the
+           node back. */
+        Node node (newNodes[oldIndex]);
+        newNodes[oldIndex].tech = 0;
+        newNodes[oldIndex].inputRenames.DeleteAll();
+        newNodes[oldIndex].outputRenames.DeleteAll();
+        newTechToNode.PutUnique (tech, newNodes.Push (node));
       }
       
       csArray<const Snippet::Technique*> deps;
@@ -713,16 +738,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
   BasicIterator<const Synthesizer::SynthesizeNodeTree::Node>* 
   Synthesizer::SynthesizeNodeTree::GetNodes()
   {
-    return new BasicIteratorImpl<
-      const Synthesizer::SynthesizeNodeTree::Node, NodeArray> (nodes);
+    return new NodesIterator<false> (nodes);
   }
   
   BasicIterator<const Synthesizer::SynthesizeNodeTree::Node>* 
   Synthesizer::SynthesizeNodeTree::GetNodesReverse()
   {
-    return new BasicIteratorReverseImpl<
-      const Synthesizer::SynthesizeNodeTree::Node, NodeArray> (nodes);
+    return new NodesIterator<true> (nodes);
   }
-  
+
 }
 CS_PLUGIN_NAMESPACE_END(ShaderWeaver)

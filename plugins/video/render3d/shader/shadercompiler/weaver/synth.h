@@ -64,6 +64,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       size_t renameNr;
       NodeArray nodes;
       csHash<size_t, csConstPtrKey<Snippet::Technique> > techToNode;
+      /// Techs created in an augmentation, to be cleaned up later
+      csPDelArray<Snippet::Technique> augmentedTechniques;
       
       void ComputeRenames (Node& node,
         CS::PluginCommon::ShaderWeaver::iCombiner* combiner);
@@ -87,6 +89,42 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
         
       BasicIterator<const Node>* GetNodes();
       BasicIterator<const Node>* GetNodesReverse();
+    private:
+      template<bool reverse>
+      class NodesIterator : public BasicIterator<const Node>
+      {
+        const NodeArray& array;
+        size_t nextItem;
+
+        void SeekNext()
+        {
+          if (reverse)
+          {
+            while ((nextItem >= 1) && (array[nextItem-1].tech == 0))
+              nextItem--;
+          }
+          else
+          {
+            while ((nextItem < array.GetSize()) && (array[nextItem].tech == 0))
+              nextItem++;
+          }
+        }
+      public:
+        NodesIterator (const NodeArray& array) : array (array),
+          nextItem (reverse ? array.GetSize() : 0)
+        {
+          SeekNext();
+        }
+
+        bool HasNext()
+        { return reverse ? (nextItem > 0) : (nextItem < array.GetSize()); }
+        const Node& Next()
+        { 
+          const Node& val = reverse ? array[--nextItem] : array[nextItem++];
+          SeekNext();
+          return val; 
+        }
+      };
     };
     
     bool FindOutput (const TechniqueGraph& graph,

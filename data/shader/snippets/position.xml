@@ -37,9 +37,14 @@
     </block>
       
     <block location="cg:vertexMain">
-      vertexToFragment.position = mul (vertexIn.ModelViewProj, vertexIn.Hposition);
+      position_object = vertexIn.Hposition;
+      position = mul (vertexIn.ModelViewProj, position_object);
+      vertexToFragment.position = position;
     </block>
     
     <output name="position" type="position4_screen" />
+    <!-- @@@ FIXME: Other blocks may need the object space input as well... 
+         Pass through. But is there a better (ie automatic) way? -->
+    <output name="position_object" type="position4_object" />
   </technique>
 </snippet>
