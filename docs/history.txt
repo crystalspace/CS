@@ -15,6 +15,7 @@ chronological order.
 	  csGLVBOBufferManager destructor.
 	- Jorrit disabled the profiler in ivaria/profile.h because it seems
 	  to cause problems for static builds.
+	- Marten fixed interleaved render buffers when using VBO.
 13-Feb-2007
 	- Marten hopefully fixed bitoperations on VC7 and VC7.1.
 	- res added CS::DocumentHelper::CloneAttributes() to clone only the

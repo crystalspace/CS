@@ -134,7 +134,7 @@ void* csGLVBOBufferManager::RenderLock (iRenderBuffer* buffer,
     CS_ASSERT (slot->renderBuffer == effectiveBuffer);
     CS_ASSERT (slot->vboBuffer->slotSize >= effectiveBuffer->GetSize ());
 
-    return (void*)(((uint8*)offset) + effectiveBuffer->GetOffset ());
+    return (void*)(((uint8*)offset) + buffer->GetOffset ());
   }
   else
   {
@@ -143,7 +143,7 @@ void* csGLVBOBufferManager::RenderLock (iRenderBuffer* buffer,
 
     uint8* data = (uint8*)effectiveBuffer->Lock (CS_BUF_LOCK_READ);
     if (data != (uint8*)-1)
-      return data + effectiveBuffer->GetOffset ();
+      return data + buffer->GetOffset ();
     else
       return (void*)-1;
   }
@@ -208,7 +208,7 @@ csGLVBOBufferManager::VBOSlot* csGLVBOBufferManager::GetVBOSlot (
     if (slot)
     {
       slot->renderBuffer = buffer;
-      slot->bufferVersion = 0;
+      slot->bufferVersion = ~0;
       slot->slotAge = ~0;
       SetSlotUsed (slot);
 
