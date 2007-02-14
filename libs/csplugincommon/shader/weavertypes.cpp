@@ -34,12 +34,14 @@ namespace CS
           TypeInfo typeInfo;
         };
         static const TypeInfoMap typeInfoMap[] = {
+          {"normal",
+            {TypeInfo::Vector,  false, 3, TypeInfo::Normal,      TypeInfo::NoSpace}},
           {"position4",
             {TypeInfo::Vector,  false, 4, TypeInfo::Position,    TypeInfo::NoSpace}},
-          {"position4_camera",
-            {TypeInfo::Vector,  false, 4, TypeInfo::Position,    TypeInfo::Camera}},
           {"position4_object",
             {TypeInfo::Vector,  false, 4, TypeInfo::Position,    TypeInfo::Object}},
+          {"position4_screen",
+            {TypeInfo::Vector,  false, 4, TypeInfo::Position,    TypeInfo::Camera}},
           {"position4_world",
             {TypeInfo::Vector,  false, 4, TypeInfo::Position,    TypeInfo::World}},
           {"rgb",

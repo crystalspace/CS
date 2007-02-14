@@ -493,6 +493,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
     {
       destNodes = &currentSnippet.fragmentIn;
     }
+    else if (strcmp (location, "includes") == 0)
+    {
+      destNodes = &includes;
+    }
     
     if (destNodes != 0)
     {
@@ -558,6 +562,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
       programNode->SetValue ("program");
       
       DocNodeAppender appender (programNode);
+
+      if (includes.GetSize() > 0)
+      {
+        appender.Append ("\n");
+        appender.Append (includes);
+        appender.Append ("\n");
+      }
       
       appender.Append ("struct vertex2fragment\n");
       appender.Append ("{\n");
@@ -629,6 +640,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
       programNode->SetValue ("program");
       
       DocNodeAppender appender (programNode);
+      
+      if (includes.GetSize() > 0)
+      {
+        appender.Append ("\n");
+        appender.Append (includes);
+        appender.Append ("\n");
+      }
       
       appender.Append ("struct vertex2fragment\n");
       appender.Append ("{\n");
@@ -718,7 +736,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
       }
       else
       {
-        appender.Append (n);
+        appender.Append (node);
       }
     }
   }
@@ -774,23 +792,32 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
     stringAppend += str;
   }
   
+  void ShaderCombinerCg::DocNodeAppender::Append (iDocumentNode* appendNode)
+  {
+    csDocumentNodeType nodeType = appendNode->GetType();
+    if (nodeType == CS_NODE_TEXT)
+    {
+      Append (appendNode->GetValue());
+    }
+    else if (nodeType == CS_NODE_COMMENT)
+    {
+      // Skip
+    }
+    else
+    {
+      FlushAppendString();
+      csRef<iDocumentNode> newNode = 
+        node->CreateNodeBefore (nodeType);
+      CS::DocumentHelper::CloneNode (appendNode, newNode);
+    }
+  }
+
   void ShaderCombinerCg::DocNodeAppender::Append (
     const csRefArray<iDocumentNode>& nodes)
   {
     for (size_t n = 0; n < nodes.GetSize(); n++)
     {
-      csDocumentNodeType nodeType = nodes[n]->GetType();
-      if (nodeType == CS_NODE_TEXT)
-      {
-        Append (nodes[n]->GetValue());
-      }
-      else
-      {
-        FlushAppendString();
-        csRef<iDocumentNode> newNode = 
-          node->CreateNodeBefore (nodeType);
-        CS::DocumentHelper::CloneNode (nodes[n], newNode);
-      }
+      Append (nodes[n]);
     }
   }
 }

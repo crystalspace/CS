@@ -32,13 +32,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 
   class Synthesizer
   {
-    //csArray<csArray<Snippet::Technique> > allCombos;
     csArray<csArray<TechniqueGraph> > graphs;
     csArray<Snippet*> outerSnippets;
   public:
     Synthesizer (WeaverCompiler* compiler, 
       const csPDelArray<Snippet>& outerSnippets);
-    //void AddTechniqueNode (iDocumentNode* node);
     
     csPtr<iDocument> Synthesize (iDocumentNode* sourceNode);
   private:
@@ -47,8 +45,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     
     struct Link
     {
-      csString fromName/*, fromType*/;
-      csString toName/*, toType*/;
+      csString fromName;
+      csString toName;
     };
     typedef csHash<Link, csConstPtrKey<Snippet::Technique> > LinkHash;
   

@@ -61,9 +61,9 @@ namespace CS
           Texcoord,
           /// Position
           Position,
-	#if 0
           /// Surface normal (or tangents/bitangents)
           Normal,
+	#if 0
           /// Direction (e.g. light direction...)
           Direction
 	#endif

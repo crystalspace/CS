@@ -20,7 +20,7 @@
   <technique priority="100">
     <combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
     
-    <input name="Hposition" type="position4object" default="complex">
+    <input name="Hposition" type="position4_object" default="complex">
       <block location="cg:vertexToFragment">
 	float4 position : POSITION;
       </block>

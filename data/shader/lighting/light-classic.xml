@@ -85,11 +85,15 @@
       </block>
       
       <block location="cg:vertexMain">
+	<?if vars."tex lightmap".texture?>
 	vertexToFragment.texcoordLM = vertexIn.texcoordLM;
+	<?endif?>
       </block>
       
       <block location="cg:fragmentMain">
+	<?if vars."tex lightmap".texture?>
 	texCoordLM = vertexToFragment.texcoordLM;
+	<?endif?>
       </block>
     </input>
     

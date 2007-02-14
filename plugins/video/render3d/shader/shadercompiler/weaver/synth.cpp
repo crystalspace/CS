@@ -30,8 +30,6 @@
 #include "csutil/scopeddelete.h"
 #include "csutil/xmltiny.h"
 
-#include <algorithm>
-
 #include "combiner_default.h"
 #include "weaver.h"
 #include "snippet.h"
@@ -45,8 +43,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
                             const csPDelArray<Snippet>& outerSnippets) : 
     compiler (compiler), xmltokens (compiler->xmltokens)
   {
-    defaultCombiner.AttachNew (new CombinerDefault);
-  
     graphs.SetSize (outerSnippets.GetSize());
     for (size_t s = 0; s < outerSnippets.GetSize(); s++)
     {
@@ -56,30 +52,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     }
   }
 
-#if 0
-  void Synthesizer::AddTechniqueNode (iDocumentNode* node)
-  {
-    csRef<iDocumentNodeIterator> nodes = node->GetNodes ();
-    while (nodes->HasNext ())
-    {
-      csRef<iDocumentNode> child = nodes->Next ();
-      if (child->GetType() != CS_NODE_ELEMENT) continue;
-      
-      csStringID id = xmltokens.Request (child->GetValue());
-      switch (id)
-      {
-        case WeaverCompiler::XMLTOKEN_SNIPPET:
-          {
-            HandleSnippetNode (child);
-          }
-          break;
-        default:
-          compiler->synldr->ReportBadToken (child);
-      }
-    }
-  }
-#endif
-  
   csPtr<iDocument> Synthesizer::Synthesize (iDocumentNode* sourceNode)
   {
     csRef<iDocumentSystem> docsys;
@@ -110,6 +82,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
         techniqueNode->SetAttributeAsInt ("priority", int (techNum - currentTech));
         
         size_t current = currentTech;
+        bool aPassSucceeded = false;
 	for (size_t g = 0; g < graphs.GetSize(); g++)
 	{
           const TechniqueGraph& graph = graphs.Get (g)[(current % graphs[g].GetSize())];
@@ -118,8 +91,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	    techniqueNode->CreateNodeBefore (CS_NODE_ELEMENT);
 	  passNode->SetValue ("pass");
 	  
-	  SynthesizeTechnique (passNode, outerSnippets[g], graph);
+	  if (!SynthesizeTechnique (passNode, outerSnippets[g], graph))
+            techniqueNode->RemoveNode (passNode);
+          else
+            aPassSucceeded = true;
 	}
+        if (!aPassSucceeded)
+          shaderNode->RemoveNode (techniqueNode);
 	
 	currentTech++;
       }
@@ -141,6 +119,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
                                          const Snippet* snippet, 
                                          const TechniqueGraph& techGraph)
   {
+    defaultCombiner.AttachNew (new CombinerDefault);
+
     TechniqueGraph graph (techGraph);
     /*
       Here comes some of the magic. What we have now is an array of 
@@ -423,6 +403,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
                                 Snippet::Technique::Output& theOutput)
   {
     outTechnique = 0;
+    /* Search for an output of a type.
+       - First search all output nodes for a suitable output.
+       - Then check their dependencies if maybe one of the has a suitable
+         output.
+     */
   
     csArray<const Snippet::Technique*> outTechs;
     graph.GetOutputTechniques (outTechs);
@@ -442,7 +427,44 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	  coerceCost = cost;
 	  outTechnique = outTechs[t];
 	  theOutput = output;
+          if (cost == 0) return true;
 	}
+      }
+    }
+
+    if (outTechnique == 0)
+    {
+      csFIFO<const Snippet::Technique*> depTechs;
+      for (size_t t = 0; t < outTechs.GetSize(); t++)
+      {
+        csArray<const Snippet::Technique*> deps;
+        graph.GetDependencies (outTechs[t], deps);
+        for (size_t d = 0; d < deps.GetSize(); d++)
+          depTechs.Push (deps[d]);
+      }
+      while (depTechs.GetSize() > 0)
+      {
+        const Snippet::Technique* tech = depTechs.PopTop ();
+        CS::ScopedDelete<BasicIterator<const Snippet::Technique::Output> > 
+	  outputs (tech->GetOutputs());
+        while (outputs->HasNext())
+        {
+	  const Snippet::Technique::Output& output = outputs->Next();
+	  // pick output var that has lowest coercion cost to desiredType
+	  uint cost = (strcmp (output.type, desiredType) == 0) ? 0 :
+	    combiner->CoerceCost (output.type, desiredType);
+	  if (cost < coerceCost)
+	  {
+	    coerceCost = cost;
+	    outTechnique = tech;
+	    theOutput = output;
+            if (cost == 0) return true;
+	  }
+        }
+        csArray<const Snippet::Technique*> deps;
+        graph.GetDependencies (tech, deps);
+        for (size_t d = 0; d < deps.GetSize(); d++)
+          depTechs.Push (deps[d]);
       }
     }
     

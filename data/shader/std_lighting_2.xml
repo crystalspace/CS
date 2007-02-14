@@ -26,15 +26,22 @@
 	   doesn't meet that requirement, the next one is tried.
 	-->
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
-      
+
+      <!-- Snippets - the building blocks of this shader. -->
       <snippet id="position" file="snippets/position.xml" />
+      <snippet id="parallax" file="surface/parallax.xml" />
       <snippet id="surface" file="surface/surface-classic.xml" />
       <snippet id="lighting" file="lighting/light-classic.xml" />
       <snippet id="mod_light_surf" file="snippets/modulate.xml" />
+      <!-- "connections" describe what snippets take input from what other
+           snippets (ie the "data flow" is modeled). The exact resolution of
+	   what output is linked to what input is done automatically. -->
+      <connection from="position" to="parallax" />
+      <connection from="parallax" to="surface" />
       <connection from="surface" to="mod_light_surf" />
       <connection from="lighting" to="mod_light_surf" />
       <!-- snippet file="fog/fog-sector.xml" / -->
-      <!-- snippet file="surface/parallax.xml" / -->
+      <!-- snippet file="surface/glow.xml" / -->
       <!-- snippet file="snippets/mixmode-alpha.xml" / -->
     </pass>
   </technique>
